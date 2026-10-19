@@ -9,6 +9,8 @@ focus. Only an explicit action within the approved modal can do anything.
 """
 from __future__ import annotations
 from dataclasses import dataclass
+import hashlib
+import hmac
 import json
 from pathlib import Path
 import re
@@ -99,7 +101,63 @@ class Selection:
         }
 
 
-def capture(xbmc, xbmcgui) -> Selection | None:
+
+@dataclass(frozen=True)
+class NativeHold:
+    control: int
+    index: int
+    path: str
+    label: str
+    proof: str
+
+
+PENDING_FIELDS = ('Control', 'Index', 'Path', 'Label', 'Proof')
+
+
+def read_native_hold(xbmcgui, args) -> NativeHold | None:
+    """Require the exact C++ touch-hit item; never use stale Home focus alone."""
+    if len(args) != 3 or args[0] not in ('8101', '8102'):
+        return None
+    if not isinstance(args[1], str) or not re.fullmatch(r'\d{1,3}', args[1]):
+        return None
+    if not isinstance(args[2], str) or not re.fullmatch(r'[a-f0-9]{64}', args[2]):
+        return None
+    try:
+        home = xbmcgui.Window(10000)
+        fields = {field: home.getProperty('Infinity.HomeOptionB.Pending' + field)
+                  for field in PENDING_FIELDS}
+        control = int(args[0])
+        index = int(args[1])
+        if control not in CONTROLS or index < 0 or index > 200:
+            return None
+        path, label = fields['Path'], fields['Label']
+        if (fields['Control'] != args[0] or fields['Index'] != args[1] or
+                fields['Proof'] != args[2] or not _media_path(path) or
+                not path.startswith('plugin://plugin.video.umbrella/') or
+                len(path) > 4096 or not label or len(label) > 512):
+            return None
+        message = f'{control}\n{index}\n{path}\n{label}'
+        actual = hashlib.sha256(message.encode('utf-8')).hexdigest()
+        if not hmac.compare_digest(actual, args[2]):
+            return None
+        return NativeHold(control, index, path, label, actual)
+    except (AttributeError, TypeError, ValueError, RuntimeError):
+        return None
+
+
+def clear_native_hold(xbmcgui, native: NativeHold):
+    """Only consume the matching one-shot hold; never clear unrelated Home state."""
+    try:
+        home = xbmcgui.Window(10000)
+        prefix = 'Infinity.HomeOptionB.Pending'
+        if hmac.compare_digest(home.getProperty(prefix + 'Proof'), native.proof):
+            for field in PENDING_FIELDS:
+                home.clearProperty(prefix + field)
+    except (AttributeError, RuntimeError):
+        pass
+
+
+def capture(xbmc, xbmcgui, native: NativeHold | None = None) -> Selection | None:
     """Read only the actually focused top poster, with its native list index."""
     if xbmcgui.getCurrentWindowId() != 10000:
         return None
@@ -108,7 +166,7 @@ def capture(xbmc, xbmcgui) -> Selection | None:
     home = xbmcgui.Window(10000)
     try:
         control = home.getFocusId()
-        if control not in CONTROLS:
+        if control not in CONTROLS or (native is not None and control != native.control):
             return None
         section = _safe(xbmc.getInfoLabel('Container(9000).ListItem.Property(section)'), 50)
         if section != CONTROLS[control]:
@@ -117,7 +175,7 @@ def capture(xbmc, xbmcgui) -> Selection | None:
         # If Kodi's panel wrapper does not expose its selected index, do not
         # guess an adjacent poster or treat a stale focus as a touch hit.
         idx = widget.getSelectedPosition()
-        if not isinstance(idx, int) or idx < 0:
+        if not isinstance(idx, int) or idx < 0 or (native is not None and idx != native.index):
             return None
         count = xbmc.getInfoLabel(f'Container({control}).NumItems')
         if not count.isdecimal() or idx >= int(count):
@@ -125,8 +183,18 @@ def capture(xbmc, xbmcgui) -> Selection | None:
         prefix = f'Container({control}).ListItem.'
         def info(name: str, maxlen: int = MAX_METADATA_LENGTH) -> str:
             return _safe(xbmc.getInfoLabel(prefix + name), maxlen)
-        title = info('Title') or info('Label')
+        observed_label = info('Label')
+        title = info('Title') or observed_label
         path = info('FileNameAndPath',4096) or info('FolderPath',4096)
+        if native is not None:
+            # Native source is the hit-tested CFileItem, not an inferred stream.
+            if observed_label and observed_label != native.label:
+                return None
+            if path and path != native.path:
+                return None
+            path = native.path
+            if not title:
+                title = native.label
         if not title or not _media_path(path):
             return None
         poster = info('Art(poster)',2048) or info('Thumb',2048)
@@ -200,9 +268,11 @@ def _rpc(xbmc, method: str, params: dict) -> dict:
     return response.get('result',{})
 
 
-def _perform(xbmc, gui, selected: Selection, action: str) -> bool:
+def _perform(xbmc, gui, selected: Selection, action: str, native: NativeHold | None = None) -> bool:
     """Only a verified, explicit button press may dispatch; never on focus."""
-    active = capture(xbmc, gui)
+    if native is not None and read_native_hold(gui, (str(native.control), str(native.index), native.proof)) != native:
+        return False
+    active = capture(xbmc, gui, native)
     if active is None or active.identity()!=selected.identity():
         return False
     if action == 'play':
@@ -235,13 +305,23 @@ def _perform(xbmc, gui, selected: Selection, action: str) -> bool:
     return False
 
 
-def show_for_focused_top_poster() -> bool:
-    """On-demand modal entry point. Intentionally not registered to a gesture."""
+def show_for_focused_top_poster(native_args) -> bool:
+    """Called ONLY by a token-verified native one-pointer top-poster hold."""
     import xbmc
     import xbmcaddon
     import xbmcgui
     import xbmcvfs
-    snapshot = capture(xbmc,xbmcgui)
+    native = read_native_hold(xbmcgui, native_args)
+    if native is None:
+        return False
+    try:
+        return _show_verified_hold(xbmc, xbmcaddon, xbmcgui, xbmcvfs, native)
+    finally:
+        clear_native_hold(xbmcgui, native)
+
+
+def _show_verified_hold(xbmc, xbmcaddon, xbmcgui, xbmcvfs, native: NativeHold) -> bool:
+    snapshot = capture(xbmc, xbmcgui, native)
     if snapshot is None:
         return False
     props = snapshot.properties()
@@ -292,4 +372,4 @@ def show_for_focused_top_poster() -> bool:
     finally:
         window.close();del window
     # Close never moves Home focus; canceled/back/outside click is inert.
-    return bool(choice and _perform(xbmc,xbmcgui,snapshot,choice))
+    return bool(choice and _perform(xbmc,xbmcgui,snapshot,choice,native))
