@@ -1,5 +1,33 @@
 # CURRENT PRIMARY HANDOFF — SEVEN WORK GROUPS, GROUP #6 SILENT MODE
 
+## CURRENT GROUP #3 — OPTION B MODAL SOURCE CHECKPOINT (2026-10-19)
+
+**LAST USER COMMAND: “Move on to three.”** This authorizes work Group #3 only (original tasks 09, 10). Groups #1 and #2 remain PAUSED AND UNFINISHED: #1 category reload not fixed, #2 root/add-on browser only partially source-staged. All other Groups #4–7, Cobra and unrelated Infinity strictly OFF LIMITS. Original signed Infinity 2103390 SHA256 778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb, 7,430 original members, and locked 2103384 shutdown fallback remain unchanged. Original actual top release rails Movie=8101 and TV=8102.
+
+**APPROVED DESIGN BITE FOR BITE:** repairs/design-approvals/INFINITY-HOME-POSTER-LONGPRESS-OPTION-B-LOCKED.md. Same existing Home positions and original normal tap, one centered compact Infinity glass dialog, actual touched poster on LEFT and verified metadata RIGHT, four actions EXACTLY Play → Trailer → Favorite → More Info, close X/Back, no double launch or provider guessing. TV variation only shows S/E if metadata actually identifies a typed episode. Original screenshot 19035.jpg and user-approved Option B mock were not accessible here; physical pixel-fidelity remains unverified.
+
+**SAVED SOURCE ONLY, NOT CONNECTED TO LONGPRESS:**
+
+- New on-demand first-party modal engine: repairs/2103390-bugfixes/group3/home_option_b.py, commit 6d1623e844f2033bd9adc701eef44bdfa28ea0eb, Git blob e75e07e41d823d5e2aad50630d38d0734d4910f4, SHA256 2ac0c6dfd68d1b6922632da6e7142cf1f740382a8cc0110d6769fe0c84892ab3. Strict Home focus only 8101/8102 and native selected poster index/original provider URL, revalidate full identity just before any action. Original Kodi Action(Select) for Play, Action(Info) for More Info, Favourites JSON-RPC only on click, only provider-supplied supported Trailer. Cancel/Back/outside dismissal inert. No network fetch, autoplay, data wipe or background services.
+- New designed modal XML: repairs/2103390-bugfixes/group3/InfinityHomeOptionB.xml, commit 14605aa250f4502880d527d7cec7d7acf3a8f71d, Git blob 043ce3183dfca5369c672e0d1fd346a5b3fc082c, SHA256 bfe3c823e98631f9e19f8c2a0d6c98b1a39140b6f8c51120f2d9ccd2c06f5e63. One centered glass dialog, four approved buttons in right order, exact Home background preserved, light/dark/OLED/Night Cinema current theme tokens, existing motion gate, responsive narrow layout. Structural source stage only, not physically compared/rendered on Fold.
+- Fail-closed staging tool repairs/2103390-bugfixes/group3/stage_option_b.py commit bf0d08cd523ae74f88a6141aab0e2c096cadb371, Git blob 4416043f721d1a02ee173445bc27fe8d97a884e0. Verifies exact original signed SHA, 7,430 members, original UI Repair hashes, all 14 Home variants, and refuses unknown source. Theoretical candidate would ADD exactly TWO NEW first-party UI Repair members (Python modal + XML modal), modify ZERO originals: 7,430 unchanged, theoretical total 7,432. NO APK generated or signed. No Home XML, native libs, keymaps, Cobra, shutdown, providers or data changed.
+
+**INPUT BLOCKER / NEVER CLAIM FIRST-LONG-PRESS WORKS YET:**
+
+- Signed 2103390 global touchscreen.xml binds longpress to RightClick and mouse binds longclick to contextmenu, native Kodi GUIBaseContainer/DirectoryProvider handles right click. No per-control direct hold callback in original Home skin XML for release panels 8101/8102. A skin onclick override would change normal tap and is forbidden.
+- The custom native Infinity add-on rail hold implementation DOES exist in libkodi.so, but actual signed source repairs/rails-hold-2103378/patch_native.py guards only control IDs 9200, 8820, 8720, 19601, excluding release panels 8101/8102. Reusing it blindly or changing global touch/native logic may affect Cobra or unrelated Home; user binding contract forbids. Direct touch-hit-selected first-hold hook and short-tap suppression for release posters are NOT connected. Do not substitute a second conventional context-menu selection; user approved one direct popup. If shared native change is necessary, STOP for separate explicit approval.
+- Read-only signed input audit repairs/2103390-bugfixes/group3/input_longpress_audit.py, commit d15f473014f0acc0d257c11943142481fa1a4d27; tests repairs/2103390-bugfixes/group3/test_input_longpress_audit.py, commit 06e59e7d066d22d8fb2e600bd6b94c13d4c17636.
+
+**REAL EXECUTED HOST TESTS:** 20/20 PASS locally against SHA-matched original signed APK plus mocked Kodi GUI/action dispatch: python -m unittest -q test_group3_option_b test_input_longpress_audit from group3 sources, with INFINITY_2103390_APK set to original signed APK. Tests cover 14 real Home layout variants, 28 release controls total, exact four buttons, responsive layout, invalid focus/index/metadata, no guessed episodes, source identity recheck, Play/Info/Kodi Favorites/trailer routing mocks, canceled modal, no-op stage and failed modified-parent SHA, native keymap/hold inventory. This is NOT a real Android provider/gesture test or visual Fold test. Main tests commit a93d9dc95ba87432cfca917de85f77280f8d86a6. All six committed source and test Git blob hashes verified BYTE FOR BYTE against the executed local sources.
+
+**IMMUTABLE RECEIPT:** repairs/2103390-bugfixes/receipts/GROUP03-OPTION-B-MODAL-20HOST-INPUT-BLOCK-20261019.md, receipt commit 35319321baeb640359c54668a361e9ff72493f87. Machine-readable tracker TASK-STATUS.json saved at commit c1a9c13560bbb0569501e86c259dbfdd4c5e004e. Query live HEAD before next edit; documentation commits are newer than source/test checkpoints.
+
+**REAL GROUP #3 STATUS:** ACTIVE / PARTIALLY SOURCE-STAGED / 20/20 HOST PASS; DIRECT FIRST LONGPRESS STILL UNSOLVED; 0/7 groups fully complete. No integrated signed APK, no Fold physical/pixel/user acceptance, no final lock. Group #1 and Group #2 remain preserved unfinished. Do not move on automatically or quietly change native/Cobra.
+
+---
+
+
+
 ## CURRENT ACTIVE WORK: GROUP #2 ADD-ON BROWSER (USER SAID “MOVING ON TO 2”)
 
 **Latest explicit user instruction: “Moving on to 2.”** This selects **work Group #2**, original detailed post-base tasks **05, 06, 07, 08** (Add-on Browser). It does **NOT** mean historical original task #02, and does **NOT** make Group #1 complete. **Group #1 is PAUSED and UNFINISHED**: task #19 Movies↔TV Shows blank/reload not fixed, prior Group #1 source experiments / Fold tests unverified, original signed 2103390 unchanged. The other work groups #3–7 remain unstarted/not authorized. User's absolute preservation rule: **Cobra never touched**, all other Infinity outside Group #2, Essential-First shutdown, providers, native engine, user data, existing Diggz+Infinity and add-on versions remain untouched. No final lock.
