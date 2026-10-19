@@ -4,7 +4,7 @@
 
 ## CONTROLLING FILES — READ IN THIS ORDER
 
-1. **`repairs/2103390-bugfixes/REPAIR-CONTRACT-01-18.md`** — complete verbatim user directives, hard preservation boundaries, precise #01–#18 issues, limited acceptance, and "save every completed task" protocol. This controls task scope.
+1. **`repairs/2103390-bugfixes/REPAIR-CONTRACT-01-19.md`** — complete verbatim user directives, hard preservation boundaries, precise #01–#19 issues, limited acceptance, and "save every completed task" protocol. This controls task scope.
 2. **`repairs/2103390-bugfixes/TASK-STATUS.json`** — machine-readable current state/actual completed numbers and exact commits/artifacts, which tasks are still open, last evidence, user sign-off.
 3. **`repairs/baselines/INFINITY-2103390-PROVISIONAL-BUGFIX-BASE.md`** — exact signed 2103390 source/hash and immutable locked 2103384 shutdown fallback.
 4. **`repairs/design-approvals/INFINITY-HOME-POSTER-LONGPRESS-OPTION-B-LOCKED.md`** — approved **exact Option B** movie and TV top-rail long-press pop-up design. Do not substitute Option A or redesign existing Infinity Home.
@@ -27,7 +27,7 @@
 
 ## NUMBERING RECONCILIATION AND LATEST PLAYER GLASS VISUAL REQUEST
 
-**Single controlling task IDs are 01 through 18.** Current authoritative scope: `repairs/2103390-bugfixes/REPAIR-CONTRACT-01-18.md`. Only live machine-readable completion statuses: `repairs/2103390-bugfixes/TASK-STATUS.json`. The earlier BF-01 through BF-16 descriptive draft is archived and must NOT override, renumber or compete with tasks 01–18; detailed alias map: `repairs/bugfix-program-2103390/DRAFT-BF-ALIAS-TO-CANONICAL-01-18.md`.
+**Single controlling task IDs are 01 through 18.** Current authoritative scope: `repairs/2103390-bugfixes/REPAIR-CONTRACT-01-19.md`. Only live machine-readable completion statuses: `repairs/2103390-bugfixes/TASK-STATUS.json`. The earlier BF-01 through BF-16 descriptive draft is archived and must NOT override, renumber or compete with tasks 01–18; detailed alias map: `repairs/bugfix-program-2103390/DRAFT-BF-ALIAS-TO-CANONICAL-01-18.md`.
 
 **Important new user wording:** “Also, for the video icon and the subtitle icon, they should be glass to where the video still can be seen through them to a sense. So if you want to mock that so we can approve it, we can do that.” Then user clarified: “I'm referring to the menu, that is.” and “If anything, playback menu should follow the same.”
 
@@ -37,7 +37,7 @@
 
 ## SAVED STATUS AT HANDOFF
 
-**As of October 19, 2026: TRACKER CREATED; 0/18 NEW TASKS IMPLEMENTED OR COMPLETED.** This handoff created documentation only; no Kodi engine, APK, skin, Cobra or user data was changed.
+**As of October 19, 2026: TRACKER UPDATED TO #19; 0/19 NEW TASKS IMPLEMENTED OR COMPLETED.** This handoff created documentation only; no Kodi engine, APK, skin, Cobra or user data was changed.
 
 **Compact task map:**
 
@@ -60,7 +60,8 @@
 | 15 | Native engine exit 139 missing traceback / root cause | OPEN / DIAGNOSTICS FIRST |
 | 16 | CU LRC Lyrics script TypeError | TRIAGE ONLY |
 | 17 | TMDb Helper/SlyGuy startup quarantine | TRIAGE ONLY |
-| 18 | Selective combined signed APK + strict final physical Fold audit | FINAL GATE NOT STARTED |
+| 18 | Selective combined signed APK + strict final physical Fold audit (run after accepted #19 if user authorizes) | FINAL GATE NOT STARTED |
+| 19 | Movies↔TV Shows show retained populated rails immediately on each navigation, no reload after initial startup | OPEN / USER-REPORTED |
 
 ## EVIDENCE TO REUSE (PRIVATE USER UPLOADS; NEVER COMMIT RAW)
 
@@ -84,8 +85,21 @@
 7. Only combine completed user-accepted numbers when user orders combination. Independently preserve all other files/native libraries/add-ons and Cobra; fail closed if any gate red.
 8. Final full fold test + original 2103384 working Close and no data loss, then user alone approves final lock.
 
+
+## NEW USER REQUEST — #19 MOVIES/TV SHOWS STAY POPULATED AND GLASS MENU CLARIFICATION
+
+**Verbatim #19:** “If you look at the video, how we can go from movies to TV shows, and it would be as if, like, they would have to reload going from movies and TV shows. It should not be that way because as soon as I start up Kodi, or I mean Infinity, and everything populates, everything should be there at all times. Unless, obviously, I shut down Infinity and it comes back, and I turn it back on and it reloads, which is fine, but that should not happen.”
+
+**Recording:** `19049.mp4` (approx. 76.9s). Switching into TV Shows briefly shows already-populated category/add-on tiles but blank Umbrella Latest Releases/Continue Watching. Those appear later in the same running app. Root cause/provider lifecycle **unverified**. Requirement is to retain ready Movies and TV content while session runs and not visibly reload on each tab switch; a true cold startup or Close/reopen may load normally. No permanent stale data, provider bulk refetch or RAM leak.
+
+**Verbatim #12–14 visual direction:** “Also, for the video icon and the subtitle icon, they should be glass to where the video still can be seen through them to a sense. So if you want to mock that so we can approve it, we can do that.” “I'm referring to the menu, that is.” “If anything, playback menu should follow the same.”
+
+**Explicit corrected object:** This is about the semi-transparent **MENU PANELS**: existing Playback list (#12), smaller Video Settings modal (#13), smaller Audio & Subtitles modal (#14). Not about changing the OSD toolbar icon appearance. Video OSD icon functionality remains task #11. The background video should be partially perceivable through the glass, respecting Light/Dark/OLED/Night Cinema and reduced/off motion. All original functional rows and their handlers remain intact except the separately approved redundant Video Settings row removal in #12. Do not substitute conceptual mockups' movie names or different menu rows for the user's actual `Sacrifice` player screenshot. Exact glass appearance **AWAITING VISUAL APPROVAL**; generated concepts are not code or an approved runtime screenshot.
+
+**Status after saving:** This changed **documentation only**. 0/19 new fixes implemented, original signed 2103390 base intact, 2103384 shutdown locked, COBRA NEVER TOUCHED.
+
 ## WHAT TO DO NEXT
 
-At the moment of this save, **no new task number has been selected for implementation**. The current user requested the entire enumerated contract and persistence/savepoint behavior, and most recently supplied the Playback screenshot for tasks 11–14.
+At the moment of this save, **no new task number has been selected for implementation**. The user just added task #19 with recording `19049.mp4` and clarified that existing Playback, Video Settings and Audio & Subtitles menu SURFACES should be translucent glass, not toolbar icons. These are specifications, not completed fixes.
 
-**Next user-facing response:** Show tasks 01–18 succinctly but distinctly, mention the 4 newly added player changes, confirm 0/18 fixes done in this new round, provide direct links to the contract and this handoff. Ask which task number to authorize, then begin **only that one**, with mandatory saved progress after tests. Do not attempt any implementation from this handoff itself.
+**Next user-facing response:** Show tasks 01–19 succinctly but distinctly, mention the previously requested four player changes, glass-menu refinement and new category no-reload requirement, confirm 0/18 fixes done in this new round, provide direct links to the contract and this handoff. Ask which task number to authorize, then begin **only that one**, with mandatory saved progress after tests. Do not attempt any implementation from this handoff itself.
