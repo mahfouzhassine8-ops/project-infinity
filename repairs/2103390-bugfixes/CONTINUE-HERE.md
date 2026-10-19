@@ -1,5 +1,24 @@
 # CURRENT PRIMARY HANDOFF — SEVEN WORK GROUPS, GROUP #6 SILENT MODE
 
+## DUAL CONTROLLER-CONSUMER COMPATIBILITY — NEWEST VERIFIED GROUP #1 CHECKPOINT (2026-10-19)
+
+**THIS CHECKPOINT SUPERSEDES THE PREVIOUS `12 OF 7,430` POTENTIAL-APK MEMBER ASSUMPTION.** User's latest authorization remains **CONTINUE GROUP #1 ONLY**. No new signed APK, no package modification, no Fold proof, no user lock; **Group #1 STILL RED**. Cobra, Essential-First shutdown, all other Infinity groups and third-party add-ons remain untouchable.
+
+The genuine signed 2103390 APK was recovered (original SHA-256 `778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb`). Its `script.infinity.uirepair/controller_access.py` (which serves **Home Continue Watching** through `script.infinity.uirepair/?action=continue`) and `script.infinity.watchedbridge/controller.py` BOTH require exact SHA matches to 13 Command Center source files. The three previously staged behavior patches include TV `plugin.py` and movie `resume_hub.py`, so applying only the prior 12 member changes would leave both consumers verifying OLD pinned hashes and rejecting the newly corrected modules. This is a **proven first-party integration defect in the previous virtual candidate**, NOT proof of the user's original TV playback or category reload root cause.
+
+**NEW REAL SOURCE STAGING — COMPLETE AT HOST LEVEL:**
+- New `group1/cc_preimage_contract_patch.py` source commit: `9d6bc1845e3f392cbe48ed86aa96eb73cc79d681`. Patches **only two expected hashes** in each of the two original `CONTROLLER-PREIMAGES.json` maps; the other **11 pins per map and all runtime guard logic are unchanged**. Exact original source + staged patch hash proofs; refuses unknown versions, double apply or mutated contracts.
+- New `group1/test_cc_preimage_contract_patch.py` test commit: `0bf2be94fcbfa22e64344ca9b8105f7614708c13`. Executed against original signed APK bytes: **5/5 tests passed**, signed base SHA verified, both consumer guard maps verified, fail-closed tamper negatives, original file preservation, full simulated APK member inventory.
+- **Corrected Group #1 virtual packaging scope: 14 of 7,430 members** may differ: original 10 skin clock-orb include variants, original 1 Command Center TV `plugin.py`, original 1 Command Center movie `resume_hub.py`, plus **2 first-party preimage JSON maps**. Other **7,416 members remain original** in the simulation. NO Cobra/native/shutdown/provider/code-guard changes. This 14-member allowlist is now mandatory for any later approved integration. **DO NOT ship historical 12-member candidate.**
+- Immutable verification receipt: `repairs/2103390-bugfixes/receipts/GROUP01-CONTROLLER-CONSUMER-14MEMBER-20261019.md`, commit `c3cc7181fef5781f329f12a1a49195c4095b3684`.
+- Master status committed `33fb53e782fa1b971e2370950718cd4ce029e714`; prior **19/19** Group #1 host checks and new **5/5** compatibility checks were performed in **SEPARATE runs**, so do not misrepresent a single full 24-check run.
+
+**Still RED and next work**: prove user-specific TV episodes actually resolve; verify real saved Insidious identity/upsert; **task 03** physically reliable Movies AND TV horizontal poster swipe, correct tapped card, retained offset, and VERTICAL touch-friendly Resume/Play choices; **task 19** first isolate exact Movies↔TV category invalidation/blanking trigger affecting BOTH Umbrella latest-release and Continue Watching rails (20 repeat directory jobs same state revision, but trigger not yet confirmed); verify clock/orb on Fold. Do not touch shared GUI input/Kodi DialogSelect, native DirectoryProvider, Cobra, startup SlyGuy/TMDb, Lyrics, shutdown, or other groups. No combined APK without Group #7 user authorization.
+
+---
+
+
+
 ## LIVE WORK STATUS — GROUP #1 ACTIVE, THREE SCOPED SOURCE PATCHES STAGED, 19/19 HOST CHECKS
 
 **LATEST USER INSTRUCTION:** “Continue” during the specifically authorized **Group #1** repair. Do NOT mistake old handoff text below saying no group selected for current truth. Group #1 is **ACTIVE/AUTHORIZED**. STOP and ask before changing anything beyond this group. The separate SlyGuy/TMDb startup-error and CU LRC Lyrics bug repairs are USER-SKIPPED, not part of this group. No changes to third-party addons, Cobra, shutdown, any other Infinity feature, or other Groups #2–#7.
