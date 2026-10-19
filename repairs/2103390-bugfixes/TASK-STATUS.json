@@ -565,7 +565,9 @@
       "user_acceptance": "NOT_GIVEN",
       "apk_artifact": null,
       "sha256": null,
-      "blocking_or_caveat": "Previous Work diagnostics exist, but underlying status-139 crash unresolved."
+      "blocking_or_caveat": "Previous Work diagnostics exist, but underlying status-139 crash unresolved.",
+      "new_diagnostic_receipt": "repairs/2103390-bugfixes/receipts/CRASH139-FOLD-20261019-092026-READONLY.md",
+      "new_evidence_only": "Matched October 19 06:44:03 status139 + SIGSEGV, last Videos Nav/Busy in landscape multi-window, stale 2103229 crash recorder fingerprint vs 2103390 packaged libkodi; no tombstone/maps/stack; no native fix made"
     },
     {
       "id": "16",
@@ -786,11 +788,13 @@
       "original_subrequirements": [
         "15"
       ],
-      "status": "INVESTIGATION_PENDING",
+      "status": "INVESTIGATION_PENDING_NEW_SIGSEGV_139_EVIDENCE_SAVED_NOT_IMPLEMENTED",
       "implementation_authorized": false,
       "savepoint": null,
       "targeted_tests": "NOT_RUN",
-      "fold": "NOT_VERIFIED"
+      "fold": "NOT_VERIFIED",
+      "new_read_only_evidence_receipt": "repairs/2103390-bugfixes/receipts/CRASH139-FOLD-20261019-092026-READONLY.md",
+      "new_read_only_evidence_status": "2026-10-19_SIGNED_APK_2103390_SIGSEGV139_VIDEO_NAV_BUSY_STALE_RECORDER_NATIVE_HASH_CRASH_FUNCTION_NOT_SYMBOLIZED_NO_FIX"
     },
     "06": {
       "name": "SYSTEM HUB SILENT MODE ON/OFF — suppress unwanted Kodi/in-app notification banners/toasts",
@@ -1177,5 +1181,43 @@
     "signed_apk_created": false,
     "current_active_group": "02",
     "group_done_count_unchanged": 0
+  },
+  "native_crash_evidence_20261019_092026": {
+    "diagnostic_uploaded": "Infinity-Diagnostics-20261019-092026.zip",
+    "diagnostic_zip_sha256": "4c94730679487a007c6678c12ebf31581b75e8a493ce0b19a9a26d0992e27762",
+    "report_version_code": 2103390,
+    "report_version_name": "1.0.9-UI-Restoration-Fold-TEST06",
+    "crash_epoch_ms": 1792406643161,
+    "crash_local": "2026-10-19 06:44:03 EDT",
+    "process": "com.projectinfinity.kodi:kodi",
+    "pid": 29396,
+    "tid": 29630,
+    "sigsegv": 11,
+    "si_code": 1,
+    "fault_address": "0x10",
+    "android_recorded_exit_status": 139,
+    "last_native_snapshot_epoch_ms": 1792406640631,
+    "last_native_window_id": 10025,
+    "last_native_window": "Videos navigation",
+    "last_native_dialog_id": 10138,
+    "last_native_dialog": "Busy",
+    "last_android_multi_window": true,
+    "last_orientation": "landscape",
+    "last_player_flags": 0,
+    "exact_2103390_apk_sha256": "778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb",
+    "packaged_2103390_libkodi_so_sha256": "6e82e18868345ce919714364466e6473b15ed00abb68f6d09eebd7f5ef33f3f8",
+    "packaged_2103390_libinfinitycrash_so_sha256": "19f017612d9447503ef8957d2ad82266631150c98454359789bdf6f547f4b3df",
+    "crash_collector_embedded_historical_native_sha256": "db92b30f5523cacd9029aa21d7b52c8bc7819e4cd5c1dea76d4bfcdcf9205375",
+    "collector_historical_lineage": "repairs/native-crash-forensics-2103250/apply.py hardcoded native SHA for 2103229",
+    "collector_sha_matches_actual_packaged_native": false,
+    "outstanding_needed": "Matched tombstone/backtrace plus ELF build ID and module mapping for crashing process, followed by exact cause-based correction",
+    "crash_root_cause_proven": false,
+    "native_fix_implemented": false,
+    "android_native_code_modified": false,
+    "active_work_group_unchanged": "02",
+    "evidence_for_future_group": "05",
+    "group_05_implementation_authorized": false,
+    "receipt": "repairs/2103390-bugfixes/receipts/CRASH139-FOLD-20261019-092026-READONLY.md",
+    "receipt_commit": "05466d0f8ca369f9ba0df61867ee0da52861cf0a"
   }
 }
