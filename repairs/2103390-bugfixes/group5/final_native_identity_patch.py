@@ -45,7 +45,7 @@ def elf_sections(raw:bytes)->dict[str,tuple[int,int]]:
     for i in range(count):
         base=start+i*each
         name,stype,flags,address,offset,size,link,info,align,ent=struct.unpack_from("<IIQQQQIIQQ",raw,base)
-        if offset+size>len(raw):raise ValueError("ELF segment out of bounds")
+        # SHT_NOBITS (.bss) allocates memory but has no file payload.\n        if stype!=8 and offset+size>len(raw):raise ValueError("ELF segment out of bounds")
         sections.append((name,stype,offset,size))
     _,_,name_off,name_size=sections[strings]
     names=raw[name_off:name_off+name_size]
