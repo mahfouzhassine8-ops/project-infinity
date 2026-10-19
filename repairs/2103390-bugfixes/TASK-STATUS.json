@@ -2,7 +2,7 @@
   "schema": 1,
   "record_type": "Infinity_2103390_postbase_exact_new_19_tasks",
   "timestamp_date": "2026-10-19",
-  "status": "GROUP2_FIRST_BROWSER_SKIN_SOURCE_PATCH_10HOST_GREEN_42_OF_7430_GROUP1_PAUSED_NO_APK_NO_FOLD",
+  "status": "GROUP3_ACTIVE_DESIGN_LOCKED_AUDIT_IN_PROGRESS_GROUPS1_2_PAUSED_NO_BUILD",
   "repository": "mahfouzhassine8-ops/project-infinity",
   "branch": "work/infinity-2103390-targeted-bugfixes",
   "binding_contract": "repairs/2103390-bugfixes/REPAIR-CONTRACT-01-19.md",
@@ -353,8 +353,8 @@
       "id": "09",
       "title": "Top Movies featured rail — approved Option B long-press info",
       "approval_stage": "design_only_approved",
-      "implementation_authorized": false,
-      "status": "OPEN_NOT_IMPLEMENTED",
+      "implementation_authorized": true,
+      "status": "GROUP3_ACTIVE_EXACT_OPTION_B_DESIGN_LOCKED_SOURCE_INSPECTION",
       "prechange_commit": null,
       "implementation_commit": null,
       "changed_files": [],
@@ -373,14 +373,14 @@
       "user_acceptance": "NOT_GIVEN",
       "apk_artifact": null,
       "sha256": null,
-      "blocking_or_caveat": null
+      "blocking_or_caveat": "Do not change short tap, Cobra, third-party providers, shared native Kodi input or modify Home layout; must prove original longpress context dispatch and selected poster identity before wiring directly to approved modal."
     },
     {
       "id": "10",
       "title": "Top TV featured rail — approved Option B long-press info",
       "approval_stage": "design_only_approved",
-      "implementation_authorized": false,
-      "status": "OPEN_NOT_IMPLEMENTED",
+      "implementation_authorized": true,
+      "status": "GROUP3_ACTIVE_EXACT_OPTION_B_DESIGN_LOCKED_SOURCE_INSPECTION",
       "prechange_commit": null,
       "implementation_commit": null,
       "changed_files": [],
@@ -399,7 +399,7 @@
       "user_acceptance": "NOT_GIVEN",
       "apk_artifact": null,
       "sha256": null,
-      "blocking_or_caveat": null
+      "blocking_or_caveat": "Do not change short tap, Cobra, third-party providers, shared native Kodi input or modify Home layout; must prove original longpress context dispatch and selected poster identity before wiring directly to approved modal."
     },
     {
       "id": "11",
@@ -662,9 +662,9 @@
     "must_preserve": "actual original player controls and settings/row labels/positions, audio/subtitle tracks, controls, playback, provider, themes, motion policy, Cobra, shutdown",
     "approval_doc": "repairs/2103390-bugfixes/PLAYER-GLASS-MENUS-APPROVED-20261019.md"
   },
-  "primary_work_unit": "GROUP_02_ADDON_BROWSER_05_06_07_08",
+  "primary_work_unit": "GROUP_03_OPTION_B_MOVIE_TV_LONGPRESS_MODAL",
   "active_group_contract": "repairs/2103390-bugfixes/GROUPED-01-07-BINDING-CONTRACT.md",
-  "current_authorized_group": "02",
+  "current_authorized_group": "03",
   "group_count": 7,
   "group_done_count": 0,
   "group_status": {
@@ -704,8 +704,8 @@
         "07",
         "08"
       ],
-      "status": "ACTIVE_05_06_SOURCE_STAGED_07_08_PARTIAL_FOCUS_STAGE_NATIVE_CONFIRM_HIDE_FOLD_UNVERIFIED",
-      "implementation_authorized": true,
+      "status": "PAUSED_UNFINISHED_GROUP2_05_06_SKIN_STAGED_07_08_PARTIAL_FOLD_UNVERIFIED",
+      "implementation_authorized": false,
       "savepoint": "6eaf788484c0606c6435b659dc35b3bf43b8bc2e",
       "targeted_tests": "10_OF_10_HOST_SIGNED_2103390_FULL_42_MEMBER_SCOPE_PASS_ANDROID_AND_FOLD_PENDING",
       "fold": "NOT_VERIFIED"
@@ -716,9 +716,9 @@
         "09",
         "10"
       ],
-      "status": "DESIGN_APPROVED_NOT_IMPLEMENTED",
-      "implementation_authorized": false,
-      "savepoint": null,
+      "status": "ACTIVE_AUTHORIZED_EXACT_OPTION_B_SOURCE_AND_INPUT_DISPATCH_AUDIT_NOT_IMPLEMENTED",
+      "implementation_authorized": true,
+      "savepoint": "d6e78b4a8e51a685eb116ab77636138bd26681cd",
       "targeted_tests": "NOT_RUN",
       "fold": "NOT_VERIFIED"
     },
@@ -808,7 +808,7 @@
     "commit_every_green_milestone_and_group_before_advancing": true,
     "not_permission_to_build_or_edit_automatically": true
   },
-  "last_user_instruction": "Move on to Group #2; leave Group #1 saved and still unfinished; only Group #2 corrections now.",
+  "last_user_instruction": "Move on to three. User authorizes Group #3 approved exact Option B Movie and TV top-rail long-press details; Group #1 and Group #2 remain saved unfinished.",
   "last_verified_group1_checkpoint": "f436c0e9f79066803f9dd98fa2c453dff7f32f82",
   "group_1_latest_receipts": [
     "repairs/2103390-bugfixes/receipts/GROUP01-TASK04-CLOCK-ORIGIN-TESTED-20261019.md",
@@ -962,5 +962,29 @@
     "caveat": "Task07 native Disable confirmation / view Hide and task08 full repository/ZIP/Search real Fold behavior unverified; no signed integration."
   },
   "group_2_signed_apk_status": "NONE — only source patch/tests/receipt; original signed 2103390 immutable, 42 original members virtual stage.",
-  "group_2_physical_fold_status": "NOT_VERIFIED"
+  "group_2_physical_fold_status": "NOT_VERIFIED",
+  "group_3_authorization": {
+    "signed_base_sha256": "778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb",
+    "base_source_commit": "0efb67a0237c8d05ca066c5f893e6a1713bc5e2d",
+    "before_group_branch_head": "d6e78b4a8e51a685eb116ab77636138bd26681cd",
+    "approved_design": "repairs/design-approvals/INFINITY-HOME-POSTER-LONGPRESS-OPTION-B-LOCKED.md",
+    "protected_movie_tv_top_home_controls": [
+      8101,
+      8102
+    ],
+    "approved_buttons": [
+      "Play",
+      "Trailer",
+      "Favorite",
+      "More Info"
+    ],
+    "preserve_short_tap": true,
+    "preserve_home_layout": true,
+    "preserve_cobra": true,
+    "forbid_shared_native_modifications": true,
+    "preserve_groups_1_and_2_as_incomplete": true,
+    "signed_apk_built": false,
+    "physical_fold_verified": false,
+    "actual_runtime_source_edits": "NONE"
+  }
 }
