@@ -2,7 +2,7 @@
   "schema": 1,
   "record_type": "Infinity_2103390_postbase_exact_new_19_tasks",
   "timestamp_date": "2026-10-19",
-  "status": "GROUP3_ACTIVE_DESIGN_LOCKED_AUDIT_IN_PROGRESS_GROUPS1_2_PAUSED_NO_BUILD",
+  "status": "GROUP3_OPTION_B_MODAL_SOURCE_STAGED_20_OF_20_HOST_GREEN_UNCONNECTED_NATIVE_LONGPRESS_NO_BUILD_FOLD",
   "repository": "mahfouzhassine8-ops/project-infinity",
   "branch": "work/infinity-2103390-targeted-bugfixes",
   "binding_contract": "repairs/2103390-bugfixes/REPAIR-CONTRACT-01-19.md",
@@ -354,52 +354,76 @@
       "title": "Top Movies featured rail — approved Option B long-press info",
       "approval_stage": "design_only_approved",
       "implementation_authorized": true,
-      "status": "GROUP3_ACTIVE_EXACT_OPTION_B_DESIGN_LOCKED_SOURCE_INSPECTION",
-      "prechange_commit": null,
-      "implementation_commit": null,
-      "changed_files": [],
+      "status": "OPTION_B_GLASS_MODAL_CODE_AND_XML_STAGED_20_HOST_GREEN_NATIVE_FIRST_HOLD_DISPATCH_NOT_WIRED_FOLD_RED",
+      "prechange_commit": "0efb67a0237c8d05ca066c5f893e6a1713bc5e2d",
+      "implementation_commit": "6d1623e844f2033bd9adc701eef44bdfa28ea0eb",
+      "changed_files": [
+        "repairs/2103390-bugfixes/group3/InfinityHomeOptionB.xml",
+        "repairs/2103390-bugfixes/group3/home_option_b.py",
+        "repairs/2103390-bugfixes/group3/stage_option_b.py",
+        "repairs/2103390-bugfixes/group3/test_group3_option_b.py",
+        "repairs/2103390-bugfixes/group3/input_longpress_audit.py",
+        "repairs/2103390-bugfixes/group3/test_input_longpress_audit.py"
+      ],
       "targeted_tests": {
-        "result": "NOT_RUN",
-        "runs": []
+        "result": "16_OF_16_MODAL_HOST_PLUS_4_OF_4_SIGNED_INPUT_AUDIT_PASS_NO_KODI_GUI_DEVICE",
+        "runs": [
+          "2026-10-19 local CPython unittest test_group3_option_b test_input_longpress_audit: 20/20 host PASS, signed original APK SHA matched, 7,430 members untouched; XML/control/actions and Kodi entry mocks only, direct native gesture not installed or tested."
+        ]
       },
       "regression_tests": {
-        "result": "NOT_RUN",
-        "runs": []
+        "result": "SOURCE_STAGE_ONLY_2_ADDITIVE_UIREPAIR_FILES_7430_ORIGINAL_APK_MEMBERS_UNCHANGED",
+        "runs": [
+          "Exact signed 2103390 stage tool proposes 2 newly added first-party UI Repair members (home_option_b.py; InfinityHomeOptionB.xml) without modifying original Home XML, libkodi.so, keymaps, Cobra, shutdown, providers, script.infinity.rails or existing add-ons. No APK output or signing."
+        ]
       },
       "physical_fold": {
         "result": "NOT_VERIFIED",
         "evidence": []
       },
-      "user_acceptance": "NOT_GIVEN",
+      "user_acceptance": "PENDING_DIRECT_HOLD_KODI_ANDROID_AND_VISUAL_DEVICE_APPROVAL",
       "apk_artifact": null,
       "sha256": null,
-      "blocking_or_caveat": "Do not change short tap, Cobra, third-party providers, shared native Kodi input or modify Home layout; must prove original longpress context dispatch and selected poster identity before wiring directly to approved modal."
+      "blocking_or_caveat": "Critical: Approved Option B MUST open directly on first longpress of exact touched movie or TV top release poster and must not send short-tap. Original signed global touch longpress maps RightClick to native CDirectoryProvider context; existing OnInfinityRailLongPress only permits add-on controls 9200/8820/8720/19601, not top movie/tv 8101/8102. New modal is ON-DEMAND SOURCE ONLY, NOT REGISTERED TO GESTURE. Shared native/keymap change prohibited until separately authorized and proven Cobra-safe. Physical Fold/theme/pixel fidelity and provider actions remain unverified.",
+      "receipt": "repairs/2103390-bugfixes/receipts/GROUP03-OPTION-B-MODAL-20HOST-INPUT-BLOCK-20261019.md"
     },
     {
       "id": "10",
       "title": "Top TV featured rail — approved Option B long-press info",
       "approval_stage": "design_only_approved",
       "implementation_authorized": true,
-      "status": "GROUP3_ACTIVE_EXACT_OPTION_B_DESIGN_LOCKED_SOURCE_INSPECTION",
-      "prechange_commit": null,
-      "implementation_commit": null,
-      "changed_files": [],
+      "status": "OPTION_B_GLASS_MODAL_CODE_AND_XML_STAGED_20_HOST_GREEN_NATIVE_FIRST_HOLD_DISPATCH_NOT_WIRED_FOLD_RED",
+      "prechange_commit": "0efb67a0237c8d05ca066c5f893e6a1713bc5e2d",
+      "implementation_commit": "6d1623e844f2033bd9adc701eef44bdfa28ea0eb",
+      "changed_files": [
+        "repairs/2103390-bugfixes/group3/InfinityHomeOptionB.xml",
+        "repairs/2103390-bugfixes/group3/home_option_b.py",
+        "repairs/2103390-bugfixes/group3/stage_option_b.py",
+        "repairs/2103390-bugfixes/group3/test_group3_option_b.py",
+        "repairs/2103390-bugfixes/group3/input_longpress_audit.py",
+        "repairs/2103390-bugfixes/group3/test_input_longpress_audit.py"
+      ],
       "targeted_tests": {
-        "result": "NOT_RUN",
-        "runs": []
+        "result": "16_OF_16_MODAL_HOST_PLUS_4_OF_4_SIGNED_INPUT_AUDIT_PASS_NO_KODI_GUI_DEVICE",
+        "runs": [
+          "2026-10-19 local CPython unittest test_group3_option_b test_input_longpress_audit: 20/20 host PASS, signed original APK SHA matched, 7,430 members untouched; XML/control/actions and Kodi entry mocks only, direct native gesture not installed or tested."
+        ]
       },
       "regression_tests": {
-        "result": "NOT_RUN",
-        "runs": []
+        "result": "SOURCE_STAGE_ONLY_2_ADDITIVE_UIREPAIR_FILES_7430_ORIGINAL_APK_MEMBERS_UNCHANGED",
+        "runs": [
+          "Exact signed 2103390 stage tool proposes 2 newly added first-party UI Repair members (home_option_b.py; InfinityHomeOptionB.xml) without modifying original Home XML, libkodi.so, keymaps, Cobra, shutdown, providers, script.infinity.rails or existing add-ons. No APK output or signing."
+        ]
       },
       "physical_fold": {
         "result": "NOT_VERIFIED",
         "evidence": []
       },
-      "user_acceptance": "NOT_GIVEN",
+      "user_acceptance": "PENDING_DIRECT_HOLD_KODI_ANDROID_AND_VISUAL_DEVICE_APPROVAL",
       "apk_artifact": null,
       "sha256": null,
-      "blocking_or_caveat": "Do not change short tap, Cobra, third-party providers, shared native Kodi input or modify Home layout; must prove original longpress context dispatch and selected poster identity before wiring directly to approved modal."
+      "blocking_or_caveat": "Critical: Approved Option B MUST open directly on first longpress of exact touched movie or TV top release poster and must not send short-tap. Original signed global touch longpress maps RightClick to native CDirectoryProvider context; existing OnInfinityRailLongPress only permits add-on controls 9200/8820/8720/19601, not top movie/tv 8101/8102. New modal is ON-DEMAND SOURCE ONLY, NOT REGISTERED TO GESTURE. Shared native/keymap change prohibited until separately authorized and proven Cobra-safe. Physical Fold/theme/pixel fidelity and provider actions remain unverified.",
+      "receipt": "repairs/2103390-bugfixes/receipts/GROUP03-OPTION-B-MODAL-20HOST-INPUT-BLOCK-20261019.md"
     },
     {
       "id": "11",
@@ -716,10 +740,10 @@
         "09",
         "10"
       ],
-      "status": "ACTIVE_AUTHORIZED_EXACT_OPTION_B_SOURCE_AND_INPUT_DISPATCH_AUDIT_NOT_IMPLEMENTED",
+      "status": "ACTIVE_BOTH_OPTION_B_MODAL_SOURCE_STAGED_HOST_GREEN_INPUT_LONGPRESS_NOT_WIRED_FOLD_UNVERIFIED",
       "implementation_authorized": true,
-      "savepoint": "d6e78b4a8e51a685eb116ab77636138bd26681cd",
-      "targeted_tests": "NOT_RUN",
+      "savepoint": "35319321baeb640359c54668a361e9ff72493f87",
+      "targeted_tests": "20_OF_20_HOST_SIGNED_2103390_AND_MOCKS_PASS_DIRECT_LONGPRESS_UNIMPLEMENTED",
       "fold": "NOT_VERIFIED"
     },
     "04": {
@@ -986,5 +1010,52 @@
     "signed_apk_built": false,
     "physical_fold_verified": false,
     "actual_runtime_source_edits": "NONE"
-  }
+  },
+  "group_3_source_checkpoint": {
+    "date": "2026-10-19",
+    "source_parent_sha256": "778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb",
+    "parent_original_apk_members": 7430,
+    "proposed_added_first_party_members": 2,
+    "proposed_changed_existing_members": 0,
+    "proposed_removed_members": 0,
+    "proposed_total_members_if_future_packaged": 7432,
+    "original_members_preserved": 7430,
+    "additions": [
+      "assets/addons/script.infinity.uirepair/home_option_b.py",
+      "assets/addons/script.infinity.uirepair/resources/skins/Default/1080i/InfinityHomeOptionB.xml"
+    ],
+    "source_code_commit": "6d1623e844f2033bd9adc701eef44bdfa28ea0eb",
+    "source_xml_commit": "14605aa250f4502880d527d7cec7d7acf3a8f71d",
+    "stage_tool_commit": "bf0d08cd523ae74f88a6141aab0e2c096cadb371",
+    "tests_commit": "a93d9dc95ba87432cfca917de85f77280f8d86a6",
+    "longpress_audit_commit": "d15f473014f0acc0d257c11943142481fa1a4d27",
+    "longpress_tests_commit": "06e59e7d066d22d8fb2e600bd6b94c13d4c17636",
+    "modal_xml_sha256": "bfe3c823e98631f9e19f8c2a0d6c98b1a39140b6f8c51120f2d9ccd2c06f5e63",
+    "modal_python_sha256": "2ac0c6dfd68d1b6922632da6e7142cf1f740382a8cc0110d6769fe0c84892ab3",
+    "host_test_result": "20_OF_20_PASS_SOURCE_AND_MOCKS_ONLY",
+    "movie_tv_controls": [
+      8101,
+      8102
+    ],
+    "original_native_rail_longpress_supported_control_ids": [
+      9200,
+      8820,
+      8720,
+      19601
+    ],
+    "direct_longpress_hook": "NOT_CONNECTED_NOT_PROVEN",
+    "physical_fold": "NOT_VERIFIED",
+    "design_pixel_fidelity": "NOT_VERIFIED",
+    "signed_build": "NONE",
+    "native_engine_edited": false,
+    "keymaps_edited": false,
+    "original_skin_home_edited": false,
+    "cobra_edited": false,
+    "shutdown_edited": false,
+    "original_group1_group2_stages_preserved": true,
+    "receipt": "repairs/2103390-bugfixes/receipts/GROUP03-OPTION-B-MODAL-20HOST-INPUT-BLOCK-20261019.md",
+    "receipt_commit": "35319321baeb640359c54668a361e9ff72493f87"
+  },
+  "group_3_signed_apk_status": "NONE — new first-party option B modal files staged in repo only; input not wired and neither APK nor Fold acceptance exists",
+  "group_3_physical_fold_status": "NOT_VERIFIED"
 }
