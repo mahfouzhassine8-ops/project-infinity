@@ -1,4 +1,4 @@
-# INFINITY 2103390 — EXACT NEW BUG-FIX CONTRACT (TASKS 01–18)
+# INFINITY 2103390 — EXACT NEW BUG-FIX CONTRACT (TASKS 01–19)
 
 **THIS DOCUMENT IS THE CONTROLLING TRACKER FOR THE NEW POST-2103390 WORK.** It is NOT the historical #1–16 repair list, which is already included in the signed 2103390 experiment. The numbering here is separate. The user will authorize/advance tasks by exact number, one at a time, followed by a single reviewed integration. Never conflate these task numbers with historical repairs.
 
@@ -11,6 +11,21 @@
 **User's newly approved playback behavior (verbatim):**
 
 > "The video looking think on the menu is empty, that button should toggle video setting and that also should be removed from playback settings. Aslo subtitles and video settings should have a similar pop-up like playback they should not cover the whole screen if anything maybe a little smaller than that"
+
+**Additional user requirement for task 19 (verbatim):**
+
+> "If you look at the video, how we can go from movies to TV shows, and it would be as if, like, they would have to reload going from movies and TV shows. It should not be that way because as soon as I start up Kodi, or I mean Infinity, and everything populates, everything should be there at all times. Unless, obviously, I shut down Infinity and it comes back, and I turn it back on and it reloads, which is fine, but that should not happen."
+
+**Additional user requirement for tasks 12–14, menus (NOT toolbar icons), verbatim:**
+
+> "Also, for the video icon and the subtitle icon, they should be glass to where the video still can be seen through them to a sense. So if you want to mock that so we can approve it, we can do that."
+
+> "I'm referring to the menu, that is."
+
+> "If anything, playback menu should follow the same."
+
+**Meaning:** *Playback*, *Video Settings*, and *Audio & Subtitles* pop-up **surfaces** must inherit the same translucent Infinity liquid-glass material so the moving video remains partially perceptible behind them. The user did **not** request transparent player toolbar/icons or recoloring video. The exact design opacity, material treatment, geometry and layout are to be shown in a mock for visual approval BEFORE skin implementation. Until specifically approved, a generated mock is a **proposal**, not a locked design; all original menu actions, labels, tracks and player state must be retained.
+
 
 ## A. Base and unconditional preservation — applies to EVERY task
 
@@ -126,19 +141,25 @@
 
 **User-required correction:** Since Video Settings becomes accessible from existing OSD button **11**, **remove only the redundant “Video Settings” menu row** from the **Playback popup**. Do **not** delete its functionality or remove the distinct **Player Settings** entry; do not touch other rows, their order/handlers, Close Player or the video decoder. Existing Player Settings remains what it was. Video Settings must still work through OSD and the new dedicated popup **13**.
 
-**Status: EXPLICITLY REQUESTED; not implemented.**
+**Additional approved styling requirement:** The Playback popup itself must use Infinity's **translucent glass menu surface**, where the playing video is subtly visible behind/through it. **Do not add/remove/reorder actions except the specifically requested removal of the redundant Video Settings row.** Do not apply transparency to the icons; this is the *menu surface*. Final material opacity/visual styling awaits the user's mock approval.
+
+**Status: EXPLICITLY REQUESTED; exact glass design mock PENDING APPROVAL; not implemented.**
 
 ### 13 — Video Settings: compact Infinity playback-context pop-up
 
 **User-required correction:** When invoked by OSD video icon **11**, Video Settings uses a **standalone compact centered Infinity modal**, visually consistent with the existing Playback options popup, but **slightly smaller**, **never replacing/covering the entire screen with a new full-screen menu**. Maintain existing real video settings, focus/scroll, adjustment previews and correct apply/cancel/back behavior; keep live video context visible. Use actual safe-area space and internal scrolling if content exceeds available height; support Fold cover/inner, themes and large touch targets. Do not silently reset settings or recolor video. No extra shared dialogue redesign.
 
-**Status: EXPLICITLY REQUESTED; not implemented.**
+**Additional approved styling requirement:** Use the same Infinity translucent liquid-glass material as Playback, with the real moving video partially visible THROUGH the compact menu background; text and sliders remain readable and accessible; do not make the OSD video icon itself translucent. Share original theme colors (Light, Dark, OLED, Night Cinema), safe areas and reduced motion. Exact mock-style approval pending.
+
+**Status: EXPLICITLY REQUESTED; exact glass design mock PENDING APPROVAL; not implemented.**
 
 ### 14 — Audio & Subtitles: compact Infinity playback-context pop-up
 
 **User-required correction:** Playback → **Audio & Subtitles** must use a **standalone compact centered Infinity modal** in the SAME established Playback-glass style, **slightly smaller than Playback**, **not full-screen**. Preserve all real audio track/subtitle track selections, enable/disable, delays and other existing player options; if too many choices, scroll inside popup, never clip controls or move to a full-screen replacement. Focus, taps, Back/X and theme parity; do not interrupt audio, playback session or subtitle synchronization. **Do not remove “Audio & Subtitles” from the Playback popup.**
 
-**Status: EXPLICITLY REQUESTED; not implemented.**
+**Additional approved styling requirement:** Same translucent Infinity glass surface as the Playback and Video Settings popups, showing some live video THROUGH the popup without reducing label legibility. No icon transparency redesign, audio track list replacement, forced track changes, or global dialog system restyle. Mock for exact visual opacity/placement approval pending.
+
+**Status: EXPLICITLY REQUESTED; exact glass design mock PENDING APPROVAL; not implemented.**
 
 ### 15 — Native exit 139: evidence and targeted cause-based correction
 
@@ -174,9 +195,27 @@ Verify: signed package ID and permanent signer; full byte-level added/removed/ch
 
 **Status: NOT STARTED.**
 
+
+### 19 — Movies ↔ TV Shows: keep fully populated Home content resident after initial startup (NO RELOAD ON TAB SWITCH)
+
+**Observed and user-reproduced in `19049.mp4`** (approx. 76.9-second physical Fold screen capture): After normal Infinity startup and populating Home, navigating between **MOVIES** and **TV SHOWS** can leave a category's top Umbrella Latest Releases poster strip and **Continue Watching** tiles temporarily empty while the display repopulates, even though they previously loaded in the same running session. In the supplied capture TV SHOWS navigation displays already-rendered category/menu/add-on tiles while the hero strip and Continue Watching content are absent for multiple captured frames; later the poster strip and watched rail reappear. This is user-visible repeat loading when switching categories, **not** a deliberate shutdown/restart. The exact underlying provider request/cache invalidation/root-cause is not yet proven.
+
+**User's precise behavior requirement:** Once Infinity opens and the applicable Movie and TV Home data have initially populated, **the complete relevant content stays available during that running application session**. Moving MOVIES → TV SHOWS → MOVIES → TV SHOWS must **immediately** show the previously populated top poster rail, provider/content/add-on rails, Continue Watching entries, and their artwork without visible blank panels, reinitialization/refresh loading, unwanted scroll resets or repeat initial-start wait. **Normal content initialization after quitting and reopening Infinity is explicitly acceptable.**
+
+**Proposed safe diagnostic scope (implementation requires targeted authorization):**
+1. Reproduce on actual installed Infinity `2103390`/skin `1.0.5.228` using the **actual** `19049.mp4` Movies↔TV Shows sequence, log item counts, frame/UI visibility, Home category transitions, directory provider lifecycle, skin conditional content paths, and Command Center read-only list snapshots. Determine what is invalidated on tab changes; do not guess a failing provider.
+2. Keep each already fully populated Movies/TV Shows Home category snapshot and local poster artwork mapping alive across ordinary Home tab switches **for the current app session**. Reuse existing Kodi/Infinity provider cache and Home rendering state when possible, not a second database, unrelated global cache, broad add-on edit or extra daemon.
+3. Any legitimate content updates/expiry may run **nonblocking** in the background and atomically replace the already visible content WHEN proven ready. Do not freeze content forever, show obsolete data as guaranteed live, or suppress explicit manual Refresh. Do **not** cause blanking/disappearing/reloading on routine category navigation.
+4. Preserve initial startup responsiveness and memory budget on Fold: do not block Home while warming every add-on, make duplicate requests or keep unbounded textures/objects indefinitely. Reuse existing cache bounds, laziness and art cache; no prohibited resource leak, ANR, native/persistence race or increased memory pressure.
+5. Keep title identities, focused poster, category selection/rail offset, user settings, original provider route, watched/progress, source freshness, Download/Playback state unchanged. Do not touch Cobra shared sessions, OSD, background playback/PiP, Essential-First shutdown, protected write owners or native crash collector.
+
+**Acceptance:** After cold launch, wait until both categories have genuinely populated once. In the **same live process**, perform at least six alternating Movies↔TV Shows transitions, including quick switches and return after playback; previously displayed items should render immediately from retained verified state each time, no empty rails/re-render wait, no accidental duplicate Continue Watching rows, no stale taps, same item counts/focus except genuine asynchronous upstream updates. Test disconnected/slow provider availability with cached already-loaded content and transparent background refresh behavior, Fold cover/inner/rotation, all Infinity themes, screensaver/background return, legitimate explicit refresh and normal new startup after full Close/reopen. Inspect logs for unexpected provider re-resolution and memory impact. Compare actual screen recording and Android17/Fold evidence. Do not mark fixed before physical testing and protected-fallback regression tests pass.
+
+**Status: USER-REPORTED / REQUIREMENTS CAPTURED ONLY. NO CODE CHANGE OR ACCEPTED FIX YET.**
+
 ## C. Per-task approval, testing, savepoint and handoff contract (MANDATORY)
 
-All 18 new tasks start **OPEN**. “Option B” is **design-approved only**, not implemented. The user must authorize task-specific implementation (e.g., “Fix 01”, “Proceed 11”) before source changes for that item. An authorization for one number cannot modify other tasks.
+All 19 new tasks start **OPEN**. “Option B” is **design-approved only**, not implemented. The user must authorize task-specific implementation (e.g., “Fix 01”, “Proceed 11”) before source changes for that item. An authorization for one number cannot modify other tasks.
 
 For EACH approved item, in this precise order:
 
@@ -197,8 +236,9 @@ Every new chat must open `CONTINUE-HERE.md` and `TASK-STATUS.json` first, then t
 - **11–14:** User explicitly requested these precise player-menu/OSD changes; no implementation yet.
 - **15:** Previous diagnostics/source investigation exist; actual underlying native crash unresolved.
 - **16–17:** Diagnostic findings only, no independent repair authorization.
-- **18:** Consolidation/audit gate, not started.
+- **18:** Consolidation/audit gate, not started; run AFTER all user-selected individual tasks, including #19 if authorized.
+- **19:** Keep Movies and TV Shows Home content resident across normal tab switches; initial launch/restart reload permitted, no repeated visible blanking.
 - **Cobra:** 100% prohibited from modifications; no exemptions.
 - **2103390 APK:** preserved as signed provisional base; no new bug-fix APK created from this tracker.
 
-**NEXT ACTION: Ask user which specific task number to implement first. This documentation-only step does not authorize implementation.**
+**NEXT ACTION: Ask user which specific task number (01–19) to implement first. This documentation-only step does not authorize implementation.**
