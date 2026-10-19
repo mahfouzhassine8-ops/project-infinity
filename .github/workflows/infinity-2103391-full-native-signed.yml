@@ -95,21 +95,53 @@ jobs:
           key: infinity-pinned-ndk-linux-21.4.7075529-v1
       - run: bash repairs/android-checkpoint-shutdown/install_ndk.sh
       - uses: actions/download-artifact@v4
-        with: {run-id: 38132105717, name: Infinity-2103367-Verified-Compiler-Dependencies, github-token: ${{ github.token }}, path: dependency-transfer}
+        with:
+          run-id: 38132105717
+          name: Infinity-2103367-Verified-Compiler-Dependencies
+          github-token: '${{ github.token }}'
+          path: dependency-transfer
       - uses: actions/download-artifact@v4
-        with: {run-id: 38246713743, name: Cobra-2103374-Verified-Deadweight-Signed-Test-APK, github-token: ${{ github.token }}, path: locked-parent}
+        with:
+          run-id: 38246713743
+          name: Cobra-2103374-Verified-Deadweight-Signed-Test-APK
+          github-token: '${{ github.token }}'
+          path: locked-parent
       - uses: actions/download-artifact@v4
-        with: {run-id: 38270097041, name: Cobra-2103375-File-Preview-Native-Signed-Test-APK, github-token: ${{ github.token }}, path: previous-candidate}
+        with:
+          run-id: 38270097041
+          name: Cobra-2103375-File-Preview-Native-Signed-Test-APK
+          github-token: '${{ github.token }}'
+          path: previous-candidate
       - uses: actions/download-artifact@v4
-        with: {run-id: 38321848412, name: Cobra-2103376-Critical-Preview-Native-Evidence, github-token: ${{ github.token }}, path: locked-native-evidence}
+        with:
+          run-id: 38321848412
+          name: Cobra-2103376-Critical-Preview-Native-Evidence
+          github-token: '${{ github.token }}'
+          path: locked-native-evidence
       - uses: actions/download-artifact@v4
-        with: {run-id: 38493645998, name: Infinity-2103377-RC3-Exact-Native-Curl-Source, github-token: ${{ github.token }}, path: rc2-captured-source}
+        with:
+          run-id: 38493645998
+          name: Infinity-2103377-RC3-Exact-Native-Curl-Source
+          github-token: '${{ github.token }}'
+          path: rc2-captured-source
       - uses: actions/download-artifact@v4
-        with: {run-id: 38732470818, name: Infinity-2103377-Rails-Handoff-RC1-Native-Evidence, github-token: ${{ github.token }}, path: rails-locked-evidence}
+        with:
+          run-id: 38732470818
+          name: Infinity-2103377-Rails-Handoff-RC1-Native-Evidence
+          github-token: '${{ github.token }}'
+          path: rails-locked-evidence
       - uses: actions/download-artifact@v4
-        with: {run-id: 38975950035, name: Infinity-2103377-Essential-First-Native-Evidence, github-token: ${{ github.token }}, path: exact-test4-native}
+        with:
+          run-id: 38975950035
+          name: Infinity-2103377-Essential-First-Native-Evidence
+          github-token: '${{ github.token }}'
+          path: exact-test4-native
       - uses: actions/download-artifact@v4
-        with: {run-id: 39088898437, name: Infinity-2103384-Write-Integrity-Native-Evidence, github-token: ${{ github.token }}, path: locked-384-native}
+        with:
+          run-id: 39088898437
+          name: Infinity-2103384-Write-Integrity-Native-Evidence
+          github-token: '${{ github.token }}'
+          path: locked-384-native
       - name: Restore exact full native compiler cache and libraries
         run: |
           set -euo pipefail
@@ -208,9 +240,17 @@ jobs:
           packages: 'platform-tools build-tools;34.0.0'
           log-accepted-android-sdk-licenses: false
       - uses: actions/download-artifact@v4
-        with: {run-id: 39173982272, name: Infinity-2103390-Exact-Nine-Combined-EXPERIMENTAL-NOT-FOLD-QUALIFIED, github-token: ${{ github.token }}, path: protected-2103390}
+        with:
+          run-id: 39173982272
+          name: Infinity-2103390-Exact-Nine-Combined-EXPERIMENTAL-NOT-FOLD-QUALIFIED
+          github-token: '${{ github.token }}'
+          path: protected-2103390
       - uses: actions/download-artifact@v4
-        with: {run-id: ${{ github.run_id }}, name: Infinity-2103391-Verified-Native-Engine, github-token: ${{ github.token }}, path: native-2103391}
+        with:
+          run-id: '${{ github.run_id }}'
+          name: Infinity-2103391-Verified-Native-Engine
+          github-token: '${{ github.token }}'
+          path: native-2103391
       - name: Recover exact original signed APK and compile/source receipts
         run: |
           set -euo pipefail
