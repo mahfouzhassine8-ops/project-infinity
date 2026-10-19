@@ -1,9 +1,10 @@
 """Read-only signed APK proof that Option B direct touch hook is still unresolved."""
 from pathlib import Path
+import os
 import tempfile,unittest
 from input_longpress_audit import analyze
 
-ORIGINAL=Path('/mnt/data/Infinity-2103390-Nine-Item-Integration-EXPERIMENTAL.apk')
+ORIGINAL=Path(os.environ.get('INFINITY_2103390_APK', '/mnt/data/Infinity-2103390-Nine-Item-Integration-EXPERIMENTAL.apk'))
 
 @unittest.skipUnless(ORIGINAL.is_file(),'Signed original required')
 class InputScope(unittest.TestCase):
