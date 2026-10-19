@@ -2,7 +2,7 @@
   "schema": 1,
   "record_type": "Infinity_2103390_postbase_exact_new_19_tasks",
   "timestamp_date": "2026-10-19",
-  "status": "SEVEN_GROUPS_APPROVED_GROUP6_SILENT_MODE_SCOPED_NO_BUGFIX_IMPLEMENTATION",
+  "status": "SEVEN_GROUPS_STRICT_PRESERVATION_FREEZE_GROUP1_HORIZONTAL_SCROLL_CONFIRMED_NO_FIX_IMPLEMENTED",
   "repository": "mahfouzhassine8-ops/project-infinity",
   "branch": "work/infinity-2103390-targeted-bugfixes",
   "binding_contract": "repairs/2103390-bugfixes/REPAIR-CONTRACT-01-19.md",
@@ -139,7 +139,12 @@
       "user_acceptance": "NOT_GIVEN",
       "apk_artifact": null,
       "sha256": null,
-      "blocking_or_caveat": null
+      "blocking_or_caveat": "Hard gate: BOTH Continue Watching poster rails MUST scroll horizontally and have precise touch selection; only separate Resume/Play chooser stays vertical. Preserve scroll offset, playback and movie/episode progress. Not implemented yet.",
+      "horizontal_scroll_explicit_group_1_gate": true,
+      "horizontal_scroll_scope": [
+        "Movies Continue Watching rail",
+        "TV Shows Continue Watching rail"
+      ]
     },
     {
       "id": "04",
@@ -593,7 +598,20 @@
       "implementation_authorized": false,
       "savepoint": null,
       "targeted_tests": "NOT_RUN",
-      "fold": "NOT_VERIFIED"
+      "fold": "NOT_VERIFIED",
+      "continue_watching_horizontal_scroll": {
+        "user_verbatim": "Also, for number one, the continue hub, or resume hub, continue watching. I know you told me that it's horizontal. I want you to ensure that it is horizontal scroll, and that is part of number one.",
+        "required": true,
+        "scope": [
+          "Movies → Continue Watching poster rail",
+          "TV Shows → Continue Watching poster rail"
+        ],
+        "behavior": "real left-right one-finger scroll; reliable correct card tap after swiping; no accidental playback during gesture; selected card and scroll offset retained on return; no change to existing Home layout or data; vertical two-choice Resume/Play dialog remains vertical",
+        "pass_gate": "BOTH Movies and TV Shows must pass real Fold horizontal swipe, tap, Back and offset test before Group #1 passes",
+        "implementation": "NOT_STARTED",
+        "tests": "NOT_RUN",
+        "fold": "NOT_VERIFIED"
+      }
     },
     "02": {
       "name": "Add-on Browser end-to-end including root task 06",
@@ -690,5 +708,21 @@
     "status": "SPECIFICATION_ONLY_NOT_IMPLEMENTED",
     "compatibility": "preserve existing Infinity System Hub layout, all theme and Fold variants",
     "notification_source_audit": "REQUIRED_BEFORE_IMPLEMENTATION"
+  },
+  "hard_scope_freeze": {
+    "user_verbatim": "I know you say Cobra is off limits, but also everything else besides 1 through 7 within infinity is off limits as well. Nothing. No new buttons that we didn't approve, nothing. I don't want new whatever, or features being taken out, or any of that bullshit. Everything must be aligned. Everything from 1 through 7 is only through 1 through 7, nothing else. No taking away features, nothing. We can't afford those mistakes.",
+    "policy": "Every feature, UI element, behavior, add-on, native/skin resource, setting and runtime process OUTSIDE EXACT SEVEN APPROVED GROUPS is STRICTLY OFF LIMITS. Cobra is ALWAYS off limits, including potentially shared code. No speculative new buttons/features, removals, relabels, reorders, default-setting changes, global refactors or unrelated cleanup.",
+    "approved_exceptions_only": [
+      "Group 3 approved Option B long-press modal controls",
+      "Group 4 existing video OSD icon route, specifically remove redundant Video Settings ROW from Playback, three already approved glass modal surfaces",
+      "Group 6 one Silent Mode On/Off switch inside existing System Hub",
+      "other exactly listed symptoms and their minimum corrections under separately authorized groups"
+    ],
+    "pre_edit_group_specific_file_symbol_and_apk_entry_allowlist_required": true,
+    "unchanged_component_hash_and_apk_member_inventory_required": true,
+    "group_and_negative_regression_proof_required": true,
+    "block_unapproved_or_shared_cobra_affecting_changes": true,
+    "commit_every_green_milestone_and_group_before_advancing": true,
+    "not_permission_to_build_or_edit_automatically": true
   }
 }
