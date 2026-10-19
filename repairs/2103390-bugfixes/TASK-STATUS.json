@@ -2,7 +2,7 @@
   "schema": 1,
   "record_type": "Infinity_2103390_postbase_exact_new_19_tasks",
   "timestamp_date": "2026-10-19",
-  "status": "GROUP1_PROGRESS_SAVED_CLOCK_SOURCE_GREEN_BUT_OTHER_GROUP1_AND_FOLD_GATES_OPEN",
+  "status": "GROUP1_PARTIAL_SOURCE_TESTS_GREEN_NOT_COMPLETE_OTHERS_UNTOUCHED",
   "repository": "mahfouzhassine8-ops/project-infinity",
   "branch": "work/infinity-2103390-targeted-bugfixes",
   "binding_contract": "repairs/2103390-bugfixes/REPAIR-CONTRACT-01-19.md",
@@ -94,26 +94,34 @@
       "title": "Continue Watching duplicate movies / progress",
       "approval_stage": "user_reported_queued",
       "implementation_authorized": false,
-      "status": "OPEN_NOT_IMPLEMENTED",
-      "prechange_commit": null,
-      "implementation_commit": null,
-      "changed_files": [],
+      "status": "SOURCE_STAGED_HOST_5_5_GREEN_FOLD_PENDING_REAL_DATA_MATCH_UNKNOWN",
+      "prechange_commit": "0efb67a0237c8d05ca066c5f893e6a1713bc5e2d",
+      "implementation_commit": "570095ca27fd0cc5f246ba6a7c8d6cdca7e5101c",
+      "changed_files": [
+        "repairs/2103390-bugfixes/group1/movie_identity_patch.py",
+        "repairs/2103390-bugfixes/group1/test_movie_identity_patch.py"
+      ],
       "targeted_tests": {
-        "result": "NOT_RUN",
-        "runs": []
+        "result": "5_HOST_TESTS_PASS",
+        "runs": [
+          "local python -m unittest -v test_movie_identity_patch: 5 PASS, 0.036s; actual signed 2103390 Command Center preimage 7794e25...; original source RED (2 cards, third replay key), patched source GREEN (one card/newest verified key)"
+        ]
       },
       "regression_tests": {
-        "result": "NOT_RUN",
-        "runs": []
+        "result": "FOCUSED_SYNTHETIC_NEGATIVE_CASES_PASS_FULL_RUNTIME_UNTESTED",
+        "runs": [
+          "identical labels but different verified TMDb IDs remain distinct; overlapping conflicting IMDb IDs remain distinct; unverified legacy rows remain; TV unaffected; no file writes or modifications to saved input dict; source preimage guard, py-compile pass"
+        ]
       },
       "physical_fold": {
         "result": "NOT_VERIFIED",
         "evidence": []
       },
-      "user_acceptance": "NOT_GIVEN",
+      "user_acceptance": "PENDING_REAL_SAVED_RECORD_IDENTITY_TEST",
       "apk_artifact": null,
       "sha256": null,
-      "blocking_or_caveat": null
+      "blocking_or_caveat": "Actual Insidious stored records were NOT included in diagnostic ZIP; sample identity not verified. Patch refuses title-only/poster-only merge, preserves both stored rows. This is source-only staging, not installed or proved on Fold.",
+      "receipt": "repairs/2103390-bugfixes/receipts/GROUP01-TASK02-VERIFIED-MOVIE-KEY-STAGED-20261019.md"
     },
     {
       "id": "03",
@@ -601,10 +609,10 @@
         "04",
         "19"
       ],
-      "status": "IN_PROGRESS_TASK04_HOST_GREEN_OTHER_TASKS_OPEN",
+      "status": "IN_PROGRESS_TWO_SOURCE_CHECKPOINTS_TESTED_01_03_19_OPEN_FOLD_PENDING",
       "implementation_authorized": true,
-      "savepoint": "938ce39a1a5c2bb2c8da9bde3b710f39e7e5e7c1",
-      "targeted_tests": "PARTIAL_GREEN_T04_CLOCK_ONLY",
+      "savepoint": "882e33063fda01b160171168a0eb9372f78b21e7",
+      "targeted_tests": "PARTIAL_HOST_GREEN_TASK04_2_OF_2_AND_TASK02_5_OF_5",
       "fold": "NOT_VERIFIED",
       "continue_watching_horizontal_scroll": {
         "user_verbatim": "Also, for number one, the continue hub, or resume hub, continue watching. I know you told me that it's horizontal. I want you to ensure that it is horizontal scroll, and that is part of number one.",
@@ -733,5 +741,5 @@
     "not_permission_to_build_or_edit_automatically": true
   },
   "last_user_instruction": "Proceed with Group #1 ONLY after explicitly skipping old Group #1 quarantine diagnosis (task 17) and original lyrics script error task 16; save real source/tests and checkpoint after verified completion",
-  "last_verified_group1_checkpoint": "938ce39a1a5c2bb2c8da9bde3b710f39e7e5e7c1"
+  "last_verified_group1_checkpoint": "882e33063fda01b160171168a0eb9372f78b21e7"
 }
