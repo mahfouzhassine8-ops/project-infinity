@@ -354,4 +354,24 @@ bool CGUIBaseContainer::OnInfinityRailLongPress(float x, float y)
         self.assertIn(msource[:msource.index(b'            if (handled)')],out['xbmc/input/InputManager.cpp'])
         with self.assertRaises(ValueError):patch.patch_sources(out)
 
+    def test_21_all_in_one_group1_and_group3_shared_runtime_composable(self):
+        import importlib.util, runtime_option_b_patch
+        other=ROOT.parent/'group1'/'continue_choice_patch.py'
+        spec=importlib.util.spec_from_file_location('group1_continue_choice',other)
+        group1=importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(group1)
+        with ZipFile(APK) as original:
+            raw=original.read('assets/addons/script.infinity.uirepair/runtime.py')
+        after_group1=group1.patch_runtime(raw)
+        combined=runtime_option_b_patch.patch_runtime(after_group1)
+        self.assertEqual(combined.count(b"elif action == 'home-choice':"),1)
+        self.assertEqual(combined.count(b"elif action == 'option-b':"),1)
+        self.assertEqual(combined.replace(
+            runtime_option_b_patch.GROUP1_REPLACEMENT.encode(),
+            runtime_option_b_patch.GROUP1_ANCHOR.encode()),after_group1)
+        self.assertIn(b"home_continue_choice(",combined)
+        self.assertIn(b"show_for_focused_top_poster(",combined)
+        with self.assertRaises(ValueError):
+            runtime_option_b_patch.patch_runtime(combined)
+
 if __name__=='__main__':unittest.main(verbosity=2)
