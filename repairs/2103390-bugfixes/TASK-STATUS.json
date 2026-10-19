@@ -2,7 +2,7 @@
   "schema": 1,
   "record_type": "Infinity_2103390_postbase_exact_new_19_tasks",
   "timestamp_date": "2026-10-19",
-  "status": "GROUP2_REACTIVATED_FOR_FULL_FIX_05_TO_08_GROUP1_GROUP3_PAUSED_NO_APK",
+  "status": "GROUP2_SKIN_NATIVE_CODE_STAGED_20_LOCAL_HOST_GREEN_13_OMEGA_ANCHORS_ANDROID_AND_FOLD_UNVERIFIED",
   "repository": "mahfouzhassine8-ops/project-infinity",
   "branch": "work/infinity-2103390-targeted-bugfixes",
   "binding_contract": "repairs/2103390-bugfixes/REPAIR-CONTRACT-01-19.md",
@@ -218,7 +218,7 @@
       "title": "Add-on Browser header stray blue slash",
       "approval_stage": "user_reported_queued",
       "implementation_authorized": true,
-      "status": "BLUE_SLASH_SINGLE_DECORATION_SOURCE_PATCH_STAGED_ALL_14_LAYOUTS_HOST_GREEN_FOLD_PENDING",
+      "status": "SKIN_HEADER_SLASH_FIX_STAGED_10_SKIN_HOST_GREEN_FOLD_VISUAL_PENDING",
       "prechange_commit": "0efb67a0237c8d05ca066c5f893e6a1713bc5e2d",
       "implementation_commit": "4b18d89c7fb69ec554887257c07b87ff6aebf400",
       "changed_files": [
@@ -252,102 +252,114 @@
       "title": "Add-on Browser root navigation and redundant instructions",
       "approval_stage": "user_reported_queued",
       "implementation_authorized": true,
-      "status": "ROOT_CONTEXT_HELP_AND_FALSE_FOOTER_TABS_SOURCE_PATCH_STAGED_ALL_14_LAYOUTS_HOST_GREEN_FOLD_PENDING",
+      "status": "SKIN_CONTEXT_HELP_AND_FOOTER_STAGED_NATIVE_ALL_SIX_ACTUAL_ROOT_ROUTES_SOURCE_READY_FOLD_PENDING",
       "prechange_commit": "0efb67a0237c8d05ca066c5f893e6a1713bc5e2d",
-      "implementation_commit": "4b18d89c7fb69ec554887257c07b87ff6aebf400",
+      "implementation_commit": "a58918b2a62b71898bf4e075964b9566567c05f8",
       "changed_files": [
         "repairs/2103390-bugfixes/group2/addon_browser_group2_patch.py",
-        "repairs/2103390-bugfixes/group2/test_addon_browser_group2_patch.py"
+        "repairs/2103390-bugfixes/group2/test_addon_browser_group2_patch.py",
+        "repairs/2103390-bugfixes/group2/native_addonbrowser_patch.py",
+        "repairs/2103390-bugfixes/group2/test_native_addonbrowser_patch.py"
       ],
       "targeted_tests": {
-        "result": "LOCAL_SIGNED_BASE_10_OF_10_HOST_TESTS_PASS_ACROSS_ALL_14_LAYOUTS_NO_FOLD",
+        "result": "SOURCE_STAGING_LOCAL_HOST_20_20_SKIN_AND_NATIVE_TESTS_PASS_SEPARATE_SUITES_13_NATIVE_OMEGA_ANCHORS_ANDROID_UNVERIFIED",
         "runs": [
-          "Host Python unittest: 10/10 focused tests on exact signed 2103390 SHA256, all 14 layouts, 42 existing APK members allowed to differ, 7388 byte-identical in simulation; original Kodi routes/handlers and Cobra/native/shutdown excluded."
+          "Host Python unittest: 10/10 focused tests on exact signed 2103390 SHA256, all 14 layouts, 42 existing APK members allowed to differ, 7388 byte-identical in simulation; original Kodi routes/handlers and Cobra/native/shutdown excluded.",
+          "2026-10-19 signed 2103390 skin 10/10 local host tests passed; separate synthetic native source overlay suite 10/10 passed; GitHub patch verified 13 exact unique reversible anchored modifications across 4 original upstream Kodi Omega sources. No custom 2103390 source compile or physical Fold test."
         ]
       },
       "regression_tests": {
-        "result": "42_MEMBER_VIRTUAL_SCOPE_7388_ORIGINAL_UNCHANGED_NO_SIGNED_APK",
+        "result": "SOURCE_ONLY_SAFE_PATH_GUARDS_UPSTREAM_OMEGA_PASS_COMPILED_BINARY_UNVERIFIED",
         "runs": [
-          "Strict immutable original file member inventory and SHA guard plus no new/remove members; isolated to AddonBrowser.xml, Includes_InfinityBrowser223.xml, FileBrowser.xml across 14 layouts. Native add-on source untouched."
+          "Strict immutable original file member inventory and SHA guard plus no new/remove members; isolated to AddonBrowser.xml, Includes_InfinityBrowser223.xml, FileBrowser.xml across 14 layouts. Native add-on source untouched.",
+          "Existing native handlers for ZIP installation, repository categories, native search and Kodi context items preserved; only four Kodi addons native paths staged with Infinity Add-on Browser guard; original signed APK unchanged."
         ]
       },
       "physical_fold": {
         "result": "NOT_VERIFIED",
         "evidence": []
       },
-      "user_acceptance": "PENDING_FOLD_AND_FUNCTIONAL_BEHAVIOR",
+      "user_acceptance": "PENDING_COMPILED_NATIVE_AND_REAL_FOLD",
       "apk_artifact": null,
       "sha256": null,
-      "blocking_or_caveat": "All six original native destinations left untouched; native Available Updates and Recently Updated may be conditional. Need Fold navigation/theme/selection and dynamic help validation.",
-      "receipt": "repairs/2103390-bugfixes/receipts/GROUP02-BROWSER-SKIN-42MEMBER-FIRST-STAGE-20261019.md"
+      "blocking_or_caveat": "Six real native Kodi root route endpoints including conditionally absent Available/Recently Updated made accessible via guarded addonbrowser GetDirectory. Root skin contextual labels/false footer fix staged, but not runtime/physical tested.",
+      "receipt": "repairs/2103390-bugfixes/receipts/GROUP02-NATIVE-REPAIR-SOURCE-20HOST-20261019.md"
     },
     {
       "id": "07",
       "title": "Add-on Browser My Add-ons / Updates / Recently Updated",
       "approval_stage": "user_reported_queued",
       "implementation_authorized": true,
-      "status": "BROWSER_LIST_TO_BACK_FOCUS_PARTIALLY_STAGED_NATIVE_DISABLE_CONFIRM_AND_HIDE_OPEN",
+      "status": "SCOPED_NATIVE_TWO_TAP_CONTEXT_HIDE_UNHIDE_AND_BOTH_DISABLE_CONFIRM_PATHS_SOURCE_STAGED_UNCOMPILED_FOLD_PENDING",
       "prechange_commit": "0efb67a0237c8d05ca066c5f893e6a1713bc5e2d",
-      "implementation_commit": "4b18d89c7fb69ec554887257c07b87ff6aebf400",
+      "implementation_commit": "a58918b2a62b71898bf4e075964b9566567c05f8",
       "changed_files": [
         "repairs/2103390-bugfixes/group2/addon_browser_group2_patch.py",
-        "repairs/2103390-bugfixes/group2/test_addon_browser_group2_patch.py"
+        "repairs/2103390-bugfixes/group2/test_addon_browser_group2_patch.py",
+        "repairs/2103390-bugfixes/group2/native_addonbrowser_patch.py",
+        "repairs/2103390-bugfixes/group2/test_native_addonbrowser_patch.py"
       ],
       "targeted_tests": {
-        "result": "LOCAL_SIGNED_BASE_10_OF_10_HOST_TESTS_PASS_ACROSS_ALL_14_LAYOUTS_NO_FOLD",
+        "result": "SOURCE_STAGING_LOCAL_HOST_20_20_SKIN_AND_NATIVE_TESTS_PASS_SEPARATE_SUITES_13_NATIVE_OMEGA_ANCHORS_ANDROID_UNVERIFIED",
         "runs": [
-          "Host Python unittest: 10/10 focused tests on exact signed 2103390 SHA256, all 14 layouts, 42 existing APK members allowed to differ, 7388 byte-identical in simulation; original Kodi routes/handlers and Cobra/native/shutdown excluded."
+          "Host Python unittest: 10/10 focused tests on exact signed 2103390 SHA256, all 14 layouts, 42 existing APK members allowed to differ, 7388 byte-identical in simulation; original Kodi routes/handlers and Cobra/native/shutdown excluded.",
+          "2026-10-19 signed 2103390 skin 10/10 local host tests passed; separate synthetic native source overlay suite 10/10 passed; GitHub patch verified 13 exact unique reversible anchored modifications across 4 original upstream Kodi Omega sources. No custom 2103390 source compile or physical Fold test."
         ]
       },
       "regression_tests": {
-        "result": "42_MEMBER_VIRTUAL_SCOPE_7388_ORIGINAL_UNCHANGED_NO_SIGNED_APK",
+        "result": "SOURCE_ONLY_SAFE_PATH_GUARDS_UPSTREAM_OMEGA_PASS_COMPILED_BINARY_UNVERIFIED",
         "runs": [
-          "Strict immutable original file member inventory and SHA guard plus no new/remove members; isolated to AddonBrowser.xml, Includes_InfinityBrowser223.xml, FileBrowser.xml across 14 layouts. Native add-on source untouched."
+          "Strict immutable original file member inventory and SHA guard plus no new/remove members; isolated to AddonBrowser.xml, Includes_InfinityBrowser223.xml, FileBrowser.xml across 14 layouts. Native add-on source untouched.",
+          "Existing native handlers for ZIP installation, repository categories, native search and Kodi context items preserved; only four Kodi addons native paths staged with Infinity Add-on Browser guard; original signed APK unchanged."
         ]
       },
       "physical_fold": {
         "result": "NOT_VERIFIED",
         "evidence": []
       },
-      "user_acceptance": "PENDING_FOLD_AND_FUNCTIONAL_BEHAVIOR",
+      "user_acceptance": "PENDING_COMPILED_NATIVE_AND_REAL_FOLD",
       "apk_artifact": null,
       "sha256": null,
-      "blocking_or_caveat": "Panel 50 RIGHT now focuses original BACK 9096. Native list, AddonInfo and context actions unchanged; Kodi Disable truly disables and can be immediate. Native scoped confirmation and reversible view-local Hide not yet fixed. Full Fold proof required.",
-      "receipt": "repairs/2103390-bugfixes/receipts/GROUP02-BROWSER-SKIN-42MEMBER-FIRST-STAGE-20261019.md"
+      "blocking_or_caveat": "Scoped source code now stages two-step first touch/second activation and original longpress, Hide as in-memory view-only filter with Show hidden add-ons restore, plus real Disable confirmation in BOTH AddonInfo and direct context menu. Must still compile on exact custom 2103390 checkout and verify native behavior with real installed addons/Fold; don't mark green yet.",
+      "receipt": "repairs/2103390-bugfixes/receipts/GROUP02-NATIVE-REPAIR-SOURCE-20HOST-20261019.md"
     },
     {
       "id": "08",
       "title": "Add-on Browser Repository / ZIP / Search",
       "approval_stage": "user_reported_queued",
       "implementation_authorized": true,
-      "status": "NATIVE_ZIP_FILEBROWSER_LIST_RIGHT_BUTTON_FOCUS_PARTIALLY_STAGED_REPOSITORY_SEARCH_TESTS_PENDING",
+      "status": "NATIVE_REPOSITORY_ZIP_SEARCH_PRESERVED_ROOT_REACHABLE_ZIP_FOCUS_SOURCE_STAGED_UNCOMPILED_FOLD_PENDING",
       "prechange_commit": "0efb67a0237c8d05ca066c5f893e6a1713bc5e2d",
-      "implementation_commit": "4b18d89c7fb69ec554887257c07b87ff6aebf400",
+      "implementation_commit": "a58918b2a62b71898bf4e075964b9566567c05f8",
       "changed_files": [
         "repairs/2103390-bugfixes/group2/addon_browser_group2_patch.py",
-        "repairs/2103390-bugfixes/group2/test_addon_browser_group2_patch.py"
+        "repairs/2103390-bugfixes/group2/test_addon_browser_group2_patch.py",
+        "repairs/2103390-bugfixes/group2/native_addonbrowser_patch.py",
+        "repairs/2103390-bugfixes/group2/test_native_addonbrowser_patch.py"
       ],
       "targeted_tests": {
-        "result": "LOCAL_SIGNED_BASE_10_OF_10_HOST_TESTS_PASS_ACROSS_ALL_14_LAYOUTS_NO_FOLD",
+        "result": "SOURCE_STAGING_LOCAL_HOST_20_20_SKIN_AND_NATIVE_TESTS_PASS_SEPARATE_SUITES_13_NATIVE_OMEGA_ANCHORS_ANDROID_UNVERIFIED",
         "runs": [
-          "Host Python unittest: 10/10 focused tests on exact signed 2103390 SHA256, all 14 layouts, 42 existing APK members allowed to differ, 7388 byte-identical in simulation; original Kodi routes/handlers and Cobra/native/shutdown excluded."
+          "Host Python unittest: 10/10 focused tests on exact signed 2103390 SHA256, all 14 layouts, 42 existing APK members allowed to differ, 7388 byte-identical in simulation; original Kodi routes/handlers and Cobra/native/shutdown excluded.",
+          "2026-10-19 signed 2103390 skin 10/10 local host tests passed; separate synthetic native source overlay suite 10/10 passed; GitHub patch verified 13 exact unique reversible anchored modifications across 4 original upstream Kodi Omega sources. No custom 2103390 source compile or physical Fold test."
         ]
       },
       "regression_tests": {
-        "result": "42_MEMBER_VIRTUAL_SCOPE_7388_ORIGINAL_UNCHANGED_NO_SIGNED_APK",
+        "result": "SOURCE_ONLY_SAFE_PATH_GUARDS_UPSTREAM_OMEGA_PASS_COMPILED_BINARY_UNVERIFIED",
         "runs": [
-          "Strict immutable original file member inventory and SHA guard plus no new/remove members; isolated to AddonBrowser.xml, Includes_InfinityBrowser223.xml, FileBrowser.xml across 14 layouts. Native add-on source untouched."
+          "Strict immutable original file member inventory and SHA guard plus no new/remove members; isolated to AddonBrowser.xml, Includes_InfinityBrowser223.xml, FileBrowser.xml across 14 layouts. Native add-on source untouched.",
+          "Existing native handlers for ZIP installation, repository categories, native search and Kodi context items preserved; only four Kodi addons native paths staged with Infinity Add-on Browser guard; original signed APK unchanged."
         ]
       },
       "physical_fold": {
         "result": "NOT_VERIFIED",
         "evidence": []
       },
-      "user_acceptance": "PENDING_FOLD_AND_FUNCTIONAL_BEHAVIOR",
+      "user_acceptance": "PENDING_COMPILED_NATIVE_AND_REAL_FOLD",
       "apk_artifact": null,
       "sha256": null,
-      "blocking_or_caveat": "FileBrowser list 450/451 RIGHT goes to original OK 413 instead of scrollbar 61. Native ZIP picker, 9410 Preview, Search/repository/action handlers untouched, physical validation and other submenu alignment still pending.",
-      "receipt": "repairs/2103390-bugfixes/receipts/GROUP02-BROWSER-SKIN-42MEMBER-FIRST-STAGE-20261019.md"
+      "blocking_or_caveat": "Original Kodi native repository/ZIP and Search backend verified from Omega source; root always exposes real update routes, original keyboard/results and ZIP picker/Preview preserved. Native patch + 42 scoped skin members staged, but no signed build, runtime menu behavior or Fold confirmation.",
+      "receipt": "repairs/2103390-bugfixes/receipts/GROUP02-NATIVE-REPAIR-SOURCE-20HOST-20261019.md"
     },
     {
       "id": "09",
@@ -728,10 +740,10 @@
         "07",
         "08"
       ],
-      "status": "ACTIVE_FINISH_05_TO_08_NATIVE_SCOPED_REPAIR_STAGE_PARTIAL_HOST_PASS_NO_FOLD",
+      "status": "ACTIVE_GROUP2_SOURCE_STAGED_ALL_05_TO_08_NATIVE_SCOPED_IMPLEMENTATION_PENDING_KODI_2103390_BUILD_AND_FOLD",
       "implementation_authorized": true,
-      "savepoint": "10dcbb21ca19f1bd30e1b7aed614ccc49f83b6e7",
-      "targeted_tests": "10_OF_10_HOST_SIGNED_2103390_FULL_42_MEMBER_SCOPE_PASS_ANDROID_AND_FOLD_PENDING",
+      "savepoint": "dd4efe1526ee03d26d7a57ff177f5bc0ac9fff9e",
+      "targeted_tests": "EXISTING_SKIN_10_10_PLUS_LOCAL_NATIVE_10_10_PASS_DIFFERENT_SUITES;GITHUB_PATCH_13_EXACT_OMEGA_ANCHORS_4_FILES_REVERSIBLE;NATIVE_COMPILE_NOT_RUN",
       "fold": "NOT_VERIFIED",
       "preservation_clarification": "When Group2 is reselected, implement original 05-08 safely even if correction requires a shared Kodi native file, provided only the relevant Add-on Browser behaviors change and Cobra/others remain unaffected; not complete now."
     },
@@ -987,7 +999,7 @@
     "physical_fold": "NOT_VERIFIED",
     "caveat": "Task07 native Disable confirmation / view Hide and task08 full repository/ZIP/Search real Fold behavior unverified; no signed integration."
   },
-  "group_2_signed_apk_status": "NONE — only source patch/tests/receipt; original signed 2103390 immutable, 42 original members virtual stage.",
+  "group_2_signed_apk_status": "NO — original signed 2103390 untouched; 42 skin XML changes and 4 native source overlay files are staged, no custom libkodi rebuilt or APK resigned.",
   "group_2_physical_fold_status": "NOT_VERIFIED",
   "group_3_authorization": {
     "signed_base_sha256": "778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb",
@@ -1101,5 +1113,50 @@
     "signed_parent_sha256": "778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb",
     "apk_build": "NOT_STARTED",
     "physical_fold": "NOT_VERIFIED"
+  },
+  "group_2_native_checkpoint": {
+    "status": "SOURCE_PATCH_COMMITTED_KODI_2103390_SOURCE_COMPILE_AND_FOLD_PENDING",
+    "skin_source_commit": "4b18d89c7fb69ec554887257c07b87ff6aebf400",
+    "native_source_commit": "a58918b2a62b71898bf4e075964b9566567c05f8",
+    "native_source_file": "repairs/2103390-bugfixes/group2/native_addonbrowser_patch.py",
+    "native_source_blob": "a361eb1c326c671fa3b481a18ab4a8c9d676da62",
+    "native_test_commit": "3444bef95ec6678ddc46f8c0112b7ddc1f1d24b3",
+    "native_test_file": "repairs/2103390-bugfixes/group2/test_native_addonbrowser_patch.py",
+    "receipt": "repairs/2103390-bugfixes/receipts/GROUP02-NATIVE-REPAIR-SOURCE-20HOST-20261019.md",
+    "receipt_commit": "dd4efe1526ee03d26d7a57ff177f5bc0ac9fff9e",
+    "skin_host_test_result": "10_10_PASS_SIGNED_2103390_ORIGINAL",
+    "local_native_synthetic_result": "10_10_PASS",
+    "real_omega_source_exact_anchor_results": "13_13_UNIQUE_REVERSIBLE_ACROSS_4_FILES",
+    "github_test_suite_not_executed_in_full_native_source_checkout": true,
+    "native_source_paths": [
+      "xbmc/addons/gui/GUIWindowAddonBrowser.h",
+      "xbmc/addons/gui/GUIWindowAddonBrowser.cpp",
+      "xbmc/addons/gui/GUIDialogAddonInfo.cpp",
+      "xbmc/addons/ContextMenus.cpp"
+    ],
+    "guard": "WINDOW_ADDON_BROWSER + lookandfeel.skin skin.infinity.diggz, otherwise original native actions",
+    "direct_disable_entrypoints_guarded": [
+      "DialogAddonInfo button",
+      "Kodi global context menu action"
+    ],
+    "hide_behavior": "Temporary browser-only user addon ID filter, no addons state changes, Show hidden add-ons restores, resets on browser exit",
+    "native_routes_preserved": [
+      "addons://user/",
+      "addons://outdated/",
+      "addons://recently_updated/",
+      "addons://repos/",
+      "addons://install/",
+      "addons://search/"
+    ],
+    "protected_2103390_signed_apk_sha256": "778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb",
+    "skin_original_member_count": 7430,
+    "skin_original_members_staged_to_change": 42,
+    "compiled_libkodi_sha256": "UNKNOWN_NOT_BUILT",
+    "native_2103390_source_checkout_exact_hashes": "NOT_RETRIEVED_YET_UPSTREAM_OMEGA_ONLY",
+    "native_android_build": "NOT_RUN",
+    "runtime_fold": "NOT_VERIFIED",
+    "cobra_tested_on_device": false,
+    "Cobra_or_shutdown_source_modified": false,
+    "original_signed_2103390_mutated": false
   }
 }
