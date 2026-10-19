@@ -1,0 +1,68 @@
+name: Infinity 2103390 | Group 3 exact Option B host verification
+on:
+  push:
+    branches: [work/infinity-2103390-targeted-bugfixes]
+    paths:
+      - 'repairs/2103390-bugfixes/group3/**'
+      - '.github/workflows/infinity-2103390-group3-option-b-host.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  signed-source-host:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Download immutable signed 2103390 original (read only)
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39173982272
+          name: Infinity-2103390-Exact-Nine-Combined-EXPERIMENTAL-NOT-FOLD-QUALIFIED
+          github-token: ${{ github.token }}
+          path: parent-2103390
+      - name: Discover signed APK and enforce immutable parent SHA
+        run: |
+          python - <<'PY'
+          import hashlib, os, pathlib, zipfile
+          parent=pathlib.Path('parent-2103390')
+          target=pathlib.Path('original-2103390.apk')
+          expected='778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb'
+          candidates=[]
+          for p in parent.rglob('*'):
+              if not p.is_file():
+                  continue
+              if p.suffix.lower()=='.apk':
+                  candidates.append(p.read_bytes())
+              if p.suffix.lower()=='.zip':
+                  with zipfile.ZipFile(p) as z:
+                      for name in z.namelist():
+                          if name.endswith('Infinity-2103390-Nine-Item-Integration-EXPERIMENTAL.apk'):
+                              candidates.append(z.read(name))
+          matches=[b for b in candidates if hashlib.sha256(b).hexdigest()==expected]
+          assert len(matches)==1, 'Exact signed original missing or ambiguous'
+          target.write_bytes(matches[0])
+          with zipfile.ZipFile(target) as z:
+              assert len(z.namelist())==7430
+          with open(os.environ['GITHUB_ENV'],'a') as f:
+              f.write('INFINITY_2103390_APK='+str(target.resolve())+'\n')
+          print('Verified original signed 2103390 SHA-256',expected)
+          PY
+      - name: Run all Group 3 verified native-source and Option B component tests
+        run: |
+          python -m unittest discover -s repairs/2103390-bugfixes/group3 -p 'test_*.py' -v
+          python repairs/2103390-bugfixes/group3/stage_option_b.py original-2103390.apk repairs/2103390-bugfixes/group3
+          python repairs/2103390-bugfixes/group3/input_longpress_audit.py original-2103390.apk
+      - name: Enforce strictly source-only gate
+        run: |
+          python - <<'PY'
+          import hashlib, pathlib
+          src=pathlib.Path('original-2103390.apk')
+          assert hashlib.sha256(src.read_bytes()).hexdigest()=='778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb'
+          assert not pathlib.Path('signed-group3.apk').exists()
+          print('HOST SOURCE GATE ONLY — no rebuilt libkodi, APK, Android or physical Fold pass')
+          PY
