@@ -1,0 +1,518 @@
+{
+  "schema": 1,
+  "record_type": "Infinity_2103390_postbase_exact_new_18_tasks",
+  "timestamp_date": "2026-10-19",
+  "status": "TRACKER_CREATED_SCOPE_ONLY_NO_BUGFIX_IMPLEMENTATION",
+  "repository": "mahfouzhassine8-ops/project-infinity",
+  "branch": "work/infinity-2103390-targeted-bugfixes",
+  "binding_contract": "repairs/2103390-bugfixes/REPAIR-CONTRACT-01-18.md",
+  "continuation_handoff": "repairs/2103390-bugfixes/CONTINUE-HERE.md",
+  "approved_option_b": "repairs/design-approvals/INFINITY-HOME-POSTER-LONGPRESS-OPTION-B-LOCKED.md",
+  "protected_parent": {
+    "version_code": 2103390,
+    "apk_name": "Infinity-2103390-Nine-Item-Integration-EXPERIMENTAL.apk",
+    "apk_sha256": "778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb",
+    "build_source_commit": "0efb67a0237c8d05ca066c5f893e6a1713bc5e2d",
+    "status": "SIGNED_PROVISIONAL_DEVELOPMENT_BASE_NOT_FINAL_LOCK"
+  },
+  "locked_shutdown_fallback": {
+    "version_code": 2103384,
+    "apk_sha256": "b571676731bb9bdccb25134c557be613e15cc9adaf77d6675dabc8e0586e54af"
+  },
+  "permanent_signer_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "android_package_id": "com.projectinfinity.kodi",
+  "cobra_modification_allowed": false,
+  "shared_cobra_affecting_change_allowed": false,
+  "preserve_all_unapproved_components": true,
+  "user_data_clear_or_uninstall_allowed": false,
+  "native_crash_139_fixed": false,
+  "complete_tasks_count": 0,
+  "task_count": 18,
+  "current_authorized_task": null,
+  "next_task_requires_user_choice": true,
+  "save_after_each_task": {
+    "update_required": [
+      "task implementation and tests commit",
+      "TASK-STATUS.json",
+      "CONTINUE-HERE.md",
+      "exact changed-file diff and hashes",
+      "CI/test evidence and any failures",
+      "physical Fold result",
+      "next task and acceptance status"
+    ],
+    "save_to": "GitHub working branch",
+    "advance_without_user_instruction": false,
+    "combine_without_user_instruction": false,
+    "final_lock_without_user_approval": false
+  },
+  "tasks": [
+    {
+      "id": "01",
+      "title": "TV Shows — Continue Watching unavailable source",
+      "approval_stage": "user_reported_queued",
+      "implementation_authorized": false,
+      "status": "OPEN_NOT_IMPLEMENTED",
+      "prechange_commit": null,
+      "implementation_commit": null,
+      "changed_files": [],
+      "targeted_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "regression_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "NOT_GIVEN",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": null
+    },
+    {
+      "id": "02",
+      "title": "Continue Watching duplicate movies / progress",
+      "approval_stage": "user_reported_queued",
+      "implementation_authorized": false,
+      "status": "OPEN_NOT_IMPLEMENTED",
+      "prechange_commit": null,
+      "implementation_commit": null,
+      "changed_files": [],
+      "targeted_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "regression_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "NOT_GIVEN",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": null
+    },
+    {
+      "id": "03",
+      "title": "Continue Watching rail touch and Resume/Play picker",
+      "approval_stage": "user_reported_queued",
+      "implementation_authorized": false,
+      "status": "OPEN_NOT_IMPLEMENTED",
+      "prechange_commit": null,
+      "implementation_commit": null,
+      "changed_files": [],
+      "targeted_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "regression_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "NOT_GIVEN",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": null
+    },
+    {
+      "id": "04",
+      "title": "Home header moon/weather icon overlaps clock",
+      "approval_stage": "user_reported_queued",
+      "implementation_authorized": false,
+      "status": "OPEN_NOT_IMPLEMENTED",
+      "prechange_commit": null,
+      "implementation_commit": null,
+      "changed_files": [],
+      "targeted_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "regression_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "NOT_GIVEN",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": null
+    },
+    {
+      "id": "05",
+      "title": "Add-on Browser header stray blue slash",
+      "approval_stage": "user_reported_queued",
+      "implementation_authorized": false,
+      "status": "OPEN_NOT_IMPLEMENTED",
+      "prechange_commit": null,
+      "implementation_commit": null,
+      "changed_files": [],
+      "targeted_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "regression_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "NOT_GIVEN",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": null
+    },
+    {
+      "id": "06",
+      "title": "Add-on Browser root navigation and redundant instructions",
+      "approval_stage": "user_reported_queued",
+      "implementation_authorized": false,
+      "status": "OPEN_NOT_IMPLEMENTED",
+      "prechange_commit": null,
+      "implementation_commit": null,
+      "changed_files": [],
+      "targeted_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "regression_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "NOT_GIVEN",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": null
+    },
+    {
+      "id": "07",
+      "title": "Add-on Browser My Add-ons / Updates / Recently Updated",
+      "approval_stage": "user_reported_queued",
+      "implementation_authorized": false,
+      "status": "OPEN_NOT_IMPLEMENTED",
+      "prechange_commit": null,
+      "implementation_commit": null,
+      "changed_files": [],
+      "targeted_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "regression_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "NOT_GIVEN",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": null
+    },
+    {
+      "id": "08",
+      "title": "Add-on Browser Repository / ZIP / Search",
+      "approval_stage": "user_reported_queued",
+      "implementation_authorized": false,
+      "status": "OPEN_NOT_IMPLEMENTED",
+      "prechange_commit": null,
+      "implementation_commit": null,
+      "changed_files": [],
+      "targeted_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "regression_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "NOT_GIVEN",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": null
+    },
+    {
+      "id": "09",
+      "title": "Top Movies featured rail — approved Option B long-press info",
+      "approval_stage": "design_only_approved",
+      "implementation_authorized": false,
+      "status": "OPEN_NOT_IMPLEMENTED",
+      "prechange_commit": null,
+      "implementation_commit": null,
+      "changed_files": [],
+      "targeted_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "regression_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "NOT_GIVEN",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": null
+    },
+    {
+      "id": "10",
+      "title": "Top TV featured rail — approved Option B long-press info",
+      "approval_stage": "design_only_approved",
+      "implementation_authorized": false,
+      "status": "OPEN_NOT_IMPLEMENTED",
+      "prechange_commit": null,
+      "implementation_commit": null,
+      "changed_files": [],
+      "targeted_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "regression_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "NOT_GIVEN",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": null
+    },
+    {
+      "id": "11",
+      "title": "OSD video/monitor icon opens Video Settings",
+      "approval_stage": "requested_behavior_approved",
+      "implementation_authorized": false,
+      "status": "OPEN_NOT_IMPLEMENTED",
+      "prechange_commit": null,
+      "implementation_commit": null,
+      "changed_files": [],
+      "targeted_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "regression_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "NOT_GIVEN",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": null
+    },
+    {
+      "id": "12",
+      "title": "Remove only Video Settings row from Playback popup",
+      "approval_stage": "requested_behavior_approved",
+      "implementation_authorized": false,
+      "status": "OPEN_NOT_IMPLEMENTED",
+      "prechange_commit": null,
+      "implementation_commit": null,
+      "changed_files": [],
+      "targeted_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "regression_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "NOT_GIVEN",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": null
+    },
+    {
+      "id": "13",
+      "title": "Video Settings compact popup (slightly smaller than Playback)",
+      "approval_stage": "requested_behavior_approved",
+      "implementation_authorized": false,
+      "status": "OPEN_NOT_IMPLEMENTED",
+      "prechange_commit": null,
+      "implementation_commit": null,
+      "changed_files": [],
+      "targeted_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "regression_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "NOT_GIVEN",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": null
+    },
+    {
+      "id": "14",
+      "title": "Audio & Subtitles compact popup (slightly smaller than Playback)",
+      "approval_stage": "requested_behavior_approved",
+      "implementation_authorized": false,
+      "status": "OPEN_NOT_IMPLEMENTED",
+      "prechange_commit": null,
+      "implementation_commit": null,
+      "changed_files": [],
+      "targeted_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "regression_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "NOT_GIVEN",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": null
+    },
+    {
+      "id": "15",
+      "title": "Native exit status 139 root-cause investigation",
+      "approval_stage": "user_reported_queued",
+      "implementation_authorized": false,
+      "status": "OPEN_NOT_IMPLEMENTED",
+      "prechange_commit": null,
+      "implementation_commit": null,
+      "changed_files": [],
+      "targeted_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "regression_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "NOT_GIVEN",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": "Previous Work diagnostics exist, but underlying status-139 crash unresolved."
+    },
+    {
+      "id": "16",
+      "title": "CU LRC Lyrics Python exception investigation",
+      "approval_stage": "triage_only",
+      "implementation_authorized": false,
+      "status": "OPEN_NOT_IMPLEMENTED",
+      "prechange_commit": null,
+      "implementation_commit": null,
+      "changed_files": [],
+      "targeted_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "regression_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "NOT_GIVEN",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": null
+    },
+    {
+      "id": "17",
+      "title": "TMDb Helper/SlyGuy quarantined startup investigation",
+      "approval_stage": "triage_only",
+      "implementation_authorized": false,
+      "status": "OPEN_NOT_IMPLEMENTED",
+      "prechange_commit": null,
+      "implementation_commit": null,
+      "changed_files": [],
+      "targeted_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "regression_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "NOT_GIVEN",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": null
+    },
+    {
+      "id": "18",
+      "title": "Selectively combine signed APK and full Fold acceptance audit",
+      "approval_stage": "integration_gate",
+      "implementation_authorized": false,
+      "status": "OPEN_NOT_IMPLEMENTED",
+      "prechange_commit": null,
+      "implementation_commit": null,
+      "changed_files": [],
+      "targeted_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "regression_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "NOT_GIVEN",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": null
+    }
+  ]
+}
