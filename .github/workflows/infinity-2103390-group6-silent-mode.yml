@@ -1,0 +1,84 @@
+name: Infinity 2103390 | Group 6 System Hub Silent Mode source gate
+on:
+  push:
+    branches: [work/infinity-2103390-targeted-bugfixes]
+    paths:
+      - 'repairs/2103390-bugfixes/group6/**'
+      - '.github/workflows/infinity-2103390-group6-silent-mode.yml'
+  workflow_dispatch:
+permissions: {contents: read, actions: read}
+jobs:
+  source-only-preservation:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39173982272
+          name: Infinity-2103390-Exact-Nine-Combined-EXPERIMENTAL-NOT-FOLD-QUALIFIED
+          github-token: ${{ github.token }}
+          path: immutable-original
+      - name: Verify exact protected original signed 2103390
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile
+          import hashlib,os
+          expected='778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb'
+          candidates=[]
+          for file in Path('immutable-original').rglob('*'):
+              if not file.is_file():continue
+              if file.suffix=='.apk':candidates.append(file.read_bytes())
+              if file.suffix=='.zip':
+                  with ZipFile(file) as z:
+                      for name in z.namelist():
+                          if name.endswith('Infinity-2103390-Nine-Item-Integration-EXPERIMENTAL.apk'):
+                              candidates.append(z.read(name))
+          matched=[b for b in candidates if hashlib.sha256(b).hexdigest()==expected]
+          assert len(matched)==1,'Exact signed parent missing'
+          p=Path('original-2103390.apk');p.write_bytes(matched[0])
+          with ZipFile(p) as z:assert len(z.namelist())==7430
+          with open(os.environ['GITHUB_ENV'],'a') as env:
+              env.write('INFINITY_2103390_APK='+str(p.resolve())+'\n')
+          PY
+      - name: Pin original Kodi Omega passive notification renderer source
+        run: |
+          curl --fail --silent --show-error --location --retry 3 \
+            'https://raw.githubusercontent.com/xbmc/xbmc/Omega/xbmc/dialogs/GUIDialogKaiToast.cpp' \
+            -o repairs/2103390-bugfixes/group6/GUIDialogKaiToast.Omega.cpp
+          python - <<'PY'
+          import hashlib
+          from pathlib import Path
+          p=Path('repairs/2103390-bugfixes/group6/GUIDialogKaiToast.Omega.cpp')
+          content=p.read_bytes()
+          expected='2f8ca00cd765dff09720ee002d6dc390a240fd32'
+          git_blob=hashlib.sha1(b'blob '+str(len(content)).encode()+b'\0'+content).hexdigest()
+          assert git_blob==expected, 'Unexpected Kodi Omega native toast original'
+          print('Upstream Kodi Omega native toast original source identity verified')
+          PY
+      - name: Run signed Group 6 13-layout System Hub tests and notification native guards
+        run: |
+          python -m unittest discover -s repairs/2103390-bugfixes/group6 -p 'test_*.py' -v
+          python repairs/2103390-bugfixes/group6/silent_mode_patch.py original-2103390.apk > group6-scope.json
+          python - <<'PY'
+          import json
+          scope=json.load(open('group6-scope.json'))
+          assert scope['changed_skin_members']==13
+          assert scope['new_system_hub_controls']==1
+          assert scope['new_services']==scope['new_databases']==0
+          assert scope['signed_apk_created'] is False
+          assert scope['native_toast_compiled'] is False
+          assert scope['physical_fold_verified'] is False
+          print('Group6 host source gate only; no compiled native, Android or Fold success')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: Infinity-Group6-Silent-Mode-Scope-SOURCE-ONLY
+          path: group6-scope.json
+          retention-days: 60
+          if-no-files-found: error
