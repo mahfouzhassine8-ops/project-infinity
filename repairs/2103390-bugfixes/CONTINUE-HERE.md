@@ -1,5 +1,22 @@
 # CURRENT PRIMARY HANDOFF — SEVEN WORK GROUPS, GROUP #6 SILENT MODE
 
+
+## NEW FOLD NATIVE CRASH EVIDENCE — 2026-10-19 09:20 ZIP (READ ONLY)
+
+The user indicated an additional native-build/crash issue before Group #4–6, then supplied `Infinity-Diagnostics-20261019-092026.zip` (SHA256 `4c94730679487a007c6678c12ebf31581b75e8a493ce0b19a9a26d0992e27762`). **This is evidence review only, not authorization for unproven native fixes or final APK integration.** Preserve all already staged Groups #1–3, untouched Cobra and Essential-First Close.
+
+**Matched October 19 06:44:03 EDT crash:** `com.projectinfinity.kodi:kodi`, PID 29396/TID 29630, SIGSEGV signal11 si_code1 fault 0x10, Android process exit 139. 2.53 sec before fault, native heartbeat on same PID had Kodi `WINDOW_VIDEO_NAV (10025)` plus `WINDOW_DIALOG_BUSY (10138)`, landscape multi-window `2256×1244`, no playback. The last GUI state is a clue only: the exact crashed instruction, owner thread subsystem, or causal native source **has NOT been proven**. A separate earlier status139 occurred 2026-10-18 19:07:10. Two CPU resource terminations are different and should not be conflated.
+
+**IMPORTANT VERIFIED FINGERPRINT PROVENANCE FAULT:** Actual immutable signed 2103390 APK SHA `778b84a5…` packages `libkodi.so` SHA256 `6e82e18868345ce919714364466e6473b15ed00abb68f6d09eebd7f5ef33f3f8`, while bundled `libinfinitycrash.so` and its crash report embed *historical* `native_engine_sha256=db92b30f5523cacd9029aa21d7b52c8bc7819e4cd5c1dea76d4bfcdcf9205375`. GitHub source `repairs/native-crash-forensics-2103250/apply.py` line 11 confirms this is the fixed old **2103229** engine hash, not the signed 2103390 library hash. **Do not symbolicate against 2103229 or infer a wrong loaded engine from this stale metadata.** A future native build must tie the collector's identity/ELF Build ID to the exact packaged and runtime-loaded engine with a fail-closed proof.
+
+**Missing evidence:** no per-crash native backtrace, tombstone, ASLR module mapping or symbolized fault; absolute PC alone cannot prove crash root cause. The successful Essential-First close in the same ZIP belongs to DIFFERENT PID 31341 ~00:08 EDT; no shutdown repair is justified. Exit-manifest record array empty; saved RUNNING status for PID29396 is stale/nonauthoritative, given actual 139 exit.
+
+**Full read-only forensic receipt:** `repairs/2103390-bugfixes/receipts/CRASH139-FOLD-20261019-092026-READONLY.md`, commit `05466d0f8ca369f9ba0df61867ee0da52861cf0a`. Tracker updated commit `fd30ddc9fe0eb1a0f3427ff88d2d4d2516c14078`; Group #5 remains **INVESTIGATION_PENDING / NOT AUTHORIZED / NO CODE FIX**. This is an ADDITIONAL evidence item for native crash work when selected. Group #4 and Group #6 stay as approved but unimplemented. No native engine, APK, player, Cobra, provider, shutdown, add-on or installed user data was modified in this work.
+
+---
+
+
+
 ## USER CHECKMARK — GROUP #1 SOURCE WORK ACCEPTED, TASK #19 DEFERRED
 
 **2026-10-19 user instruction:** “So in other words, I have to replicate it and we have to do more research about it. So if anything, you've done everything you can do. So that means one gets a check, and we'll get back to it later for the other situation.”
