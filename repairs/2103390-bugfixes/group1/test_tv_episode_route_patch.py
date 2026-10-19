@@ -93,6 +93,11 @@ class TVEpisodeRouteTests(unittest.TestCase):
         new,_=target_from(self.patched,{'plugin.video.themoviedb.helper'})
         self.assertEqual(new(self.movie),old(self.movie))
         self.assertIn('tmdb_type=movie',new(self.movie))
+        masked=dict(self.movie,stable_source='plugin://plugin.video.fixture/?id=42')
+        sources={masked['key']:{'route':'https://expired.example/file.mp4','failures':0}}
+        existing,_=target_from(self.source,{'plugin.video.fixture'})
+        proposed,_=target_from(self.patched,{'plugin.video.fixture'})
+        self.assertEqual(proposed(masked,sources),existing(masked,sources))
         empty,_=target_from(self.patched,{'plugin.video.fixture'})
         self.assertEqual(empty(self.tv),'')
 
