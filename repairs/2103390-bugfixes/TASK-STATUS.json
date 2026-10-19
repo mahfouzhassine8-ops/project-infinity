@@ -2,7 +2,7 @@
   "schema": 1,
   "record_type": "Infinity_2103390_postbase_exact_new_19_tasks",
   "timestamp_date": "2026-10-19",
-  "status": "GROUP1_PARTIAL_SOURCE_TESTS_GREEN_NOT_COMPLETE_OTHERS_UNTOUCHED",
+  "status": "GROUP1_HOST_9_OF_9_GREEN_PARTIAL_SOURCE_GUARDS_NO_BUILD_NO_FOLD_01_03_19_OPEN",
   "repository": "mahfouzhassine8-ops/project-infinity",
   "branch": "work/infinity-2103390-targeted-bugfixes",
   "binding_contract": "repairs/2103390-bugfixes/REPAIR-CONTRACT-01-19.md",
@@ -128,17 +128,22 @@
       "title": "Continue Watching rail touch and Resume/Play picker",
       "approval_stage": "user_reported_queued",
       "implementation_authorized": false,
-      "status": "OPEN_NOT_IMPLEMENTED",
+      "status": "EXACT_14_LAYOUT_STATIC_HORIZONTAL_PASS_FOLD_TOUCH_REMAINS_UNTESTED",
       "prechange_commit": null,
       "implementation_commit": null,
       "changed_files": [],
       "targeted_tests": {
-        "result": "NOT_RUN",
-        "runs": []
+        "result": "SOURCE_HORIZONTAL_LAYOUT_PASS_14_14",
+        "runs": [
+          "2026-10-19 python -m unittest -v test_home_rail_contract: PASS 14 actual 1.0.5.228 Home.xml variants with both Movies panel 8830 and TV panel 8831 horizontal/scrolltime150.",
+          "Part of nine-test combined host run: python -m unittest -v test_clock_orb_patch test_movie_identity_patch test_home_rail_contract test_group1_scope_apk (9/9 PASS)."
+        ]
       },
       "regression_tests": {
-        "result": "NOT_RUN",
-        "runs": []
+        "result": "IN_MEMORY_SIGNED_BASE_DELTA_SCOPE_PASS_FOLD_UNKNOWN",
+        "runs": [
+          "Scope test asserts exact 11 proposed changed members among 7430 signed 2103390 APK assets and 7419 unchanged including Cobra, shutdown and other unrelated code. No actual combined APK built."
+        ]
       },
       "physical_fold": {
         "result": "NOT_VERIFIED",
@@ -147,12 +152,13 @@
       "user_acceptance": "NOT_GIVEN",
       "apk_artifact": null,
       "sha256": null,
-      "blocking_or_caveat": "Hard gate: BOTH Continue Watching poster rails MUST scroll horizontally and have precise touch selection; only separate Resume/Play chooser stays vertical. Preserve scroll offset, playback and movie/episode progress. Not implemented yet.",
+      "blocking_or_caveat": "Original rail orientation VERIFIED horizontal in 14/14 layouts; actual touch precision, swiping, focus restoration, vertical Resume chooser placement/selection NOT fixed or Fold-tested. No shared Kotlin/native touch/dialog changes allowed without isolation proof.",
       "horizontal_scroll_explicit_group_1_gate": true,
       "horizontal_scroll_scope": [
         "Movies Continue Watching rail",
         "TV Shows Continue Watching rail"
-      ]
+      ],
+      "receipt": "repairs/2103390-bugfixes/receipts/GROUP01-RAIL-AND-SIGNED-APK-SCOPE-AUDIT-20261019.md"
     },
     {
       "id": "04",
@@ -609,10 +615,10 @@
         "04",
         "19"
       ],
-      "status": "IN_PROGRESS_TWO_SOURCE_CHECKPOINTS_TESTED_01_03_19_OPEN_FOLD_PENDING",
+      "status": "IN_PROGRESS_HOST_9_9_GREEN_ORIENTATION_CONFIRMED_01_03_TOUCH_19_UNRESOLVED",
       "implementation_authorized": true,
-      "savepoint": "882e33063fda01b160171168a0eb9372f78b21e7",
-      "targeted_tests": "PARTIAL_HOST_GREEN_TASK04_2_OF_2_AND_TASK02_5_OF_5",
+      "savepoint": "a32afa5b7a38660add60ff9f2b1c56bb52629ee9",
+      "targeted_tests": "9_OF_9_HOST_TESTS_PASS_ABSOLUTE_FOLD_STATUS_NOT_VERIFIED",
       "fold": "NOT_VERIFIED",
       "continue_watching_horizontal_scroll": {
         "user_verbatim": "Also, for number one, the continue hub, or resume hub, continue watching. I know you told me that it's horizontal. I want you to ensure that it is horizontal scroll, and that is part of number one.",
@@ -741,5 +747,12 @@
     "not_permission_to_build_or_edit_automatically": true
   },
   "last_user_instruction": "Proceed with Group #1 ONLY after explicitly skipping old Group #1 quarantine diagnosis (task 17) and original lyrics script error task 16; save real source/tests and checkpoint after verified completion",
-  "last_verified_group1_checkpoint": "882e33063fda01b160171168a0eb9372f78b21e7"
+  "last_verified_group1_checkpoint": "a32afa5b7a38660add60ff9f2b1c56bb52629ee9",
+  "group_1_latest_receipts": [
+    "repairs/2103390-bugfixes/receipts/GROUP01-TASK04-CLOCK-ORIGIN-TESTED-20261019.md",
+    "repairs/2103390-bugfixes/receipts/GROUP01-TASK02-VERIFIED-MOVIE-KEY-STAGED-20261019.md",
+    "repairs/2103390-bugfixes/receipts/GROUP01-RAIL-AND-SIGNED-APK-SCOPE-AUDIT-20261019.md"
+  ],
+  "group_1_signed_apk_status": "NO_NEW_APK_BUILT_OR_INSTALLED",
+  "group_1_physical_fold_status": "NOT_VERIFIED"
 }
