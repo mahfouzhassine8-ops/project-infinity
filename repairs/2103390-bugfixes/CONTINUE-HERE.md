@@ -25,6 +25,16 @@
 - New post-base **tasks #01–18** are distinct from previous original **1–16** repaired/skipped gates. Do not re-open previous #1–16 tasks, rewrite fixes, or add new unrequested features. #09/10 (Option B) are **DESIGN-APPROVED ONLY**, no code implementation. #11–14 player OSD/Video Settings/Audio & Subtitles are user-requested behavior, not yet implemented.
 - Every progress report must separate **source implemented, host tests GREEN, integrated Android GREEN, physical Fold verified, user-approved**. Do not check off unproven stages or claim a production lock.
 
+## NUMBERING RECONCILIATION AND LATEST PLAYER GLASS VISUAL REQUEST
+
+**Single controlling task IDs are 01 through 18.** Current authoritative scope: `repairs/2103390-bugfixes/REPAIR-CONTRACT-01-18.md`. Only live machine-readable completion statuses: `repairs/2103390-bugfixes/TASK-STATUS.json`. The earlier BF-01 through BF-16 descriptive draft is archived and must NOT override, renumber or compete with tasks 01–18; detailed alias map: `repairs/bugfix-program-2103390/DRAFT-BF-ALIAS-TO-CANONICAL-01-18.md`.
+
+**Important new user wording:** “Also, for the video icon and the subtitle icon, they should be glass to where the video still can be seen through them to a sense. So if you want to mock that so we can approve it, we can do that.” Then user clarified: “I'm referring to the menu, that is.” and “If anything, playback menu should follow the same.”
+
+**Correct scope:** MENU PANELS, not the tiny OSD icon artwork: the **Playback options popup**, **Video Settings popup**, and **Audio & Subtitles popup** all use actual Infinity liquid-glass **semi-transparent** panels so live video is visible THROUGH the panels; compact Video/Audio menus slightly smaller than original Playback; Light/Dark/OLED/Night Cinema and original player controls preserved. Original Playback's true actions are `Now Playing`, `Audio & Subtitles`, `Video Settings` (only redundant row to be removed under task12 after task11 works), `Chapters & Bookmarks`, `Playlist`, `Go To Time`, `Player Settings`, `Playback Info`, `Close Player`. AI-generated mock rows such as `Play/Pause` / `Repeat Mode` are illustrative, **NOT APPROVED ACTIONS**.
+
+**Visual reference/spec saved:** `repairs/2103390-bugfixes/PLAYBACK-GLASS-MENUS-VISUAL-PROPOSAL.md`; latest mock shown in current conversation. **User has NOT yet approved exact opacity/layout of new glass menu mock.** Proposal only, 0/18 implementations remain complete, Cobra still absolutely OFF-LIMITS. If a future chat is asked to implement canonical task 11/12/13/14, read and obtain any missing user visual approval first. Do not interpret the mock as permission to change controls.
+
 ## SAVED STATUS AT HANDOFF
 
 **As of October 19, 2026: TRACKER CREATED; 0/18 NEW TASKS IMPLEMENTED OR COMPLETED.** This handoff created documentation only; no Kodi engine, APK, skin, Cobra or user data was changed.
