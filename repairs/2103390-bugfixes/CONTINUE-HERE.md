@@ -1,3 +1,24 @@
+# CURRENT PRIMARY HANDOFF — SEVEN WORK GROUPS, GROUP #6 SILENT MODE
+
+**READ THIS FIRST.** Current approved work UNIT numbers are **GROUP #1–#7**, with detailed requirements from the existing original tasks 01–19 retained for testing. Read `repairs/2103390-bugfixes/GROUPED-01-07-BINDING-CONTRACT.md` FIRST and this handoff and `repairs/2103390-bugfixes/TASK-STATUS.json` next. Read `REPAIR-CONTRACT-01-19.md` only as the detailed subrequirement index. No renumbering of original tasks took place.
+
+**USER'S LAST CONFIRMATION:** “Silent mode will be #6.” That unequivocally means **WORK GROUP #6 = the NEW System Hub Silent Mode On/Off setting**, NOT the original Add-on Browser subrequirement task 06 (which remains under Group #2). The previously proposed sixth work GROUP, CU LRC Lyrics bug repair (original task 16), is **SKIPPED BY USER**. Do not uninstall, disable, reinstall or repair Lyrics; future user may manage it, not authorized here.
+
+**SEVEN ACTIVE GROUPS:**
+1. Home / Continue Watching / episode resolver / movie duplicates / horizontal touch & vertical choice / clock and no MOVIES↔TV SHOWS reload (original 01,02,03,04,17,19).
+2. Add-on Browser end-to-end root, submenu, menus, ZIP picker, Search and stray blue slash (original 05,06,07,08).
+3. User-approved EXACT Option B long-press Movie and TV details modal (09,10).
+4. Player video-icon route, Playback rows, translucent glass Video Settings + Audio & Subtitles (11,12,13,14). Glass material design **user-approved “Prefect bite to bite”**, saved at `PLAYER-GLASS-MENUS-APPROVED-20261019.md`; actual Sacrifice player controls preserved.
+5. Native status139 physical Fold investigation/evidence-based correction (15).
+6. **NEW System Hub Silent Mode** — Off/On suppression of unsolicited on-screen Kodi/Infinity/third-party notification banners/toasts (e.g. CU LRC Lyrics and Trakt) via safe Infinity-only presentation gate, preserve scripts and diagnostics, no forced dismissal of interactive/essential prompts.
+7. Exact saved, approved group repairs only → full binding audit → new permanently signed APK → physical Fold acceptance and user final LOCK (18).
+
+**STATUS NOW: 0/7 GROUPS IMPLEMENTED OR TESTED; 0/19 ORIGINAL TASKS IMPLEMENTED IN THIS NEW ROUND; ONE ORIGINAL TASK (16) SKIPPED.** Neither design approval nor docs count as code. This is NOT authorization to touch other groups. Wait for a specific “Fix/Proceed Group #N.” This grouping records full scopes and acceptance checks; **NO COBRA WORK EVER**, no 2103390/2103384/Essential-First changes unless expressly authorized in a confined item and proven safe.
+
+**PERMANENT SAVE CONTRACT:** Before any group: record exact branch SHA and scoped file allowlist. After any verified in-group subtask and group completion: SAVE real GitHub code/tests commit, tests/receipts and exact rollback SHA, update GROUP statuses + detailed subrequirement statuses in TASK-STATUS.json, update THIS handoff, confirm saved URLs before moving on. Do not say “complete” for host proof alone or claim a Fold pass not performed. Do not combine until Group #7 user-authorized.
+
+---
+
 # CONTINUE HERE — INFINITY 2103390 POST-BASE BUG-FIX PROJECT
 
 **First file to open when any chat/work session resumes.** User requires saving each completed task, and a new conversation must resume saved work **without asking them to repeat the whole project or restarting old repairs**.
@@ -33,7 +54,7 @@
 
 **Correct scope:** MENU PANELS, not the tiny OSD icon artwork: the **Playback options popup**, **Video Settings popup**, and **Audio & Subtitles popup** all use actual Infinity liquid-glass **semi-transparent** panels so live video is visible THROUGH the panels; compact Video/Audio menus slightly smaller than original Playback; Light/Dark/OLED/Night Cinema and original player controls preserved. Original Playback's true actions are `Now Playing`, `Audio & Subtitles`, `Video Settings` (only redundant row to be removed under task12 after task11 works), `Chapters & Bookmarks`, `Playlist`, `Go To Time`, `Player Settings`, `Playback Info`, `Close Player`. AI-generated mock rows such as `Play/Pause` / `Repeat Mode` are illustrative, **NOT APPROVED ACTIONS**.
 
-**Visual reference/spec saved:** `repairs/2103390-bugfixes/PLAYBACK-GLASS-MENUS-VISUAL-PROPOSAL.md`; latest mock shown in current conversation. **User has NOT yet approved exact opacity/layout of new glass menu mock.** Proposal only, 0/18 implementations remain complete, Cobra still absolutely OFF-LIMITS. If a future chat is asked to implement canonical task 11/12/13/14, read and obtain any missing user visual approval first. Do not interpret the mock as permission to change controls.
+**Visual reference/spec saved:** `repairs/2103390-bugfixes/PLAYBACK-GLASS-MENUS-VISUAL-PROPOSAL.md`; latest mock shown in current conversation. **User has NOT yet approved exact opacity/layout of new glass menu mock.** Proposal only, 0/19 detailed tasks implementations remain complete, Cobra still absolutely OFF-LIMITS. If a future chat is asked to implement canonical task 11/12/13/14, read and obtain any missing user visual approval first. Do not interpret the mock as permission to change controls.
 
 ## SAVED STATUS AT HANDOFF
 
@@ -58,7 +79,7 @@
 | 13 | Dedicated compact Video Settings modal, smaller than Playback | OPEN / USER-REQUESTED |
 | 14 | Dedicated compact Audio & Subtitles modal, smaller than Playback | OPEN / USER-REQUESTED |
 | 15 | Native engine exit 139 missing traceback / root cause | OPEN / DIAGNOSTICS FIRST |
-| 16 | CU LRC Lyrics script TypeError | TRIAGE ONLY |
+| 16 | CU LRC Lyrics script TypeError | SKIPPED BY USER — NOT A REPAIR |
 | 17 | TMDb Helper/SlyGuy startup quarantine | TRIAGE ONLY |
 | 18 | Selective combined signed APK + strict final physical Fold audit (run after accepted #19 if user authorizes) | FINAL GATE NOT STARTED |
 | 19 | Movies↔TV Shows show retained populated rails immediately on each navigation, no reload after initial startup | OPEN / USER-REPORTED |
@@ -94,12 +115,12 @@
 
 **Verbatim #12–14 visual direction:** “Also, for the video icon and the subtitle icon, they should be glass to where the video still can be seen through them to a sense. So if you want to mock that so we can approve it, we can do that.” “I'm referring to the menu, that is.” “If anything, playback menu should follow the same.”
 
-**Explicit corrected object:** This is about the semi-transparent **MENU PANELS**: existing Playback list (#12), smaller Video Settings modal (#13), smaller Audio & Subtitles modal (#14). Not about changing the OSD toolbar icon appearance. Video OSD icon functionality remains task #11. The background video should be partially perceivable through the glass, respecting Light/Dark/OLED/Night Cinema and reduced/off motion. All original functional rows and their handlers remain intact except the separately approved redundant Video Settings row removal in #12. Do not substitute conceptual mockups' movie names or different menu rows for the user's actual `Sacrifice` player screenshot. Exact glass appearance **AWAITING VISUAL APPROVAL**; generated concepts are not code or an approved runtime screenshot.
+**Explicit corrected object:** This is about the semi-transparent **MENU PANELS**: existing Playback list (#12), smaller Video Settings modal (#13), smaller Audio & Subtitles modal (#14). Not about changing the OSD toolbar icon appearance. Video OSD icon functionality remains task #11. The background video should be partially perceivable through the glass, respecting Light/Dark/OLED/Night Cinema and reduced/off motion. All original functional rows and their handlers remain intact except the separately approved redundant Video Settings row removal in #12. Do not substitute conceptual mockups' movie names or different menu rows for the user's actual `Sacrifice` player screenshot. Exact glass material **APPROVED BITE FOR BITE** (see new approved glass contract); generated concepts are not code or an approved runtime screenshot.
 
 **Status after saving:** This changed **documentation only**. 0/19 new fixes implemented, original signed 2103390 base intact, 2103384 shutdown locked, COBRA NEVER TOUCHED.
 
 ## WHAT TO DO NEXT
 
-At the moment of this save, **no new task number has been selected for implementation**. The user just added task #19 with recording `19049.mp4` and clarified that existing Playback, Video Settings and Audio & Subtitles menu SURFACES should be translucent glass, not toolbar icons. These are specifications, not completed fixes.
+At this savepoint, **no work group has been selected for implementation**. Work unit selection uses Group #1–#7. The user just added task #19 with recording `19049.mp4` and clarified that existing Playback, Video Settings and Audio & Subtitles menu SURFACES should be translucent glass, not toolbar icons. These are specifications, not completed fixes.
 
-**Next user-facing response:** Show tasks 01–19 succinctly but distinctly, mention the previously requested four player changes, glass-menu refinement and new category no-reload requirement, confirm 0/18 fixes done in this new round, provide direct links to the contract and this handoff. Ask which task number to authorize, then begin **only that one**, with mandatory saved progress after tests. Do not attempt any implementation from this handoff itself.
+**Next user-facing response:** Show GROUPS #1–#7, emphasizing GROUP #6 = NEW System Hub Silent Mode, old Lyrics repair skipped; mention glass menu design saved/approved and original tasks 01–19 retained as subrequirements. Confirm 0/7 groups implemented. Ask which GROUP to authorize, then implement ONLY that group, saving every tested milestone and complete group to GitHub. No code changes from this documentation alone.
