@@ -51,7 +51,7 @@ bool CGUIBaseContainer::OnInfinityOptionBLongPress(float x, float y)
   const std::string label = item->GetLabel();
   // Original 2103390 top release panels use Umbrella. Reject unrelated
   // dynamic media, short names, or giant data; never execute item-supplied text.
-  if (path.compare(0, 29, "plugin://plugin.video.umbrella/") != 0 ||
+  if (path.compare(0, 31, "plugin://plugin.video.umbrella/") != 0 ||
       path.size() > 4096 || label.empty() || label.size() > 512)
     return restore();
 
