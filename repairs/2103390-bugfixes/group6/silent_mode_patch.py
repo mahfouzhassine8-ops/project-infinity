@@ -79,7 +79,8 @@ def patch_hub(raw:bytes,layout:str)->bytes:
     require(root.get('id')=='1191' and root.get('type')=='dialog',"native System Hub")
     require(root.find('.//control[@id="'+SILENT_ID+'"]') is None,"Silent Mode already exists")
     originals=original_actions(root)
-    require(set(BUTTON_IDS).issubset({i for i,_,_ in originals}),"all original action cards")
+    required=BUTTON_IDS[:-1] if layout=="unified" else BUTTON_IDS
+    require(set(required).issubset({i for i,_,_ in originals}),"all original action cards")
     if layout=="unified":
         list_control=root.find('.//control[@id="1191888"]')
         require(list_control is not None and list_control.get('type')=='grouplist' and
@@ -92,68 +93,67 @@ def patch_hub(raw:bytes,layout:str)->bytes:
         controls=root.find('controls')
         require(controls is not None,"original static hub controls")
         nodes=list(controls)
-        positions=[]
+        original_rows=[]
         for id in BUTTON_IDS:
             row=root.find(f'.//control[@id="{id}"]')
             require(row is not None and row in nodes and row.get('type')=='button',
                     "original hub row "+id)
-            index=nodes.index(row)
-            require(len(nodes)>index+2 and nodes[index+1].get('type')=='image' and
-                    nodes[index+2].get('type')=='label',"original decorated row triplet")
-            positions.append((row,nodes[index+1],nodes[index+2]))
-        first,second=positions[0][0],positions[1][0]
-        footers=[c for c in nodes if c.get('type')=='label' and
+            original_rows.append(row)
+        footer=[c for c in nodes if c.get('type')=='label' and
                  (c.findtext('label') or '').startswith('Infinity system tools')]
-        require(len(footers)==1,"existing informational footer preserved")
-        footer=footers[0]
-        start=dec(first.findtext('top'))
-        second_top=dec(second.findtext('top'))
-        footer_top=dec(footer.findtext('top'))
+        require(len(footer)==1,"original informational footer")
+        footer=footer[0]
+        first, second, last=original_rows[0],original_rows[1],original_rows[-1]
+        first_top, second_top, last_top, footer_top=(
+            dec(c.findtext('top')) for c in (first,second,last,footer))
+        step=second_top-first_top
         pct=first.findtext('top').endswith('%')
-        require(pct==second.findtext('top').endswith('%')==
-                footer.findtext('top').endswith('%'),"same coordinate units")
-        old_step=second_top-start
-        old_height=dec(first.findtext('height'))
-        require(old_step>0 and old_height>0 and footer_top>start,"positive original layout")
-        safety=Decimal('1') if pct else Decimal('12')
-        step=(footer_top-start-safety)/Decimal(8)
-        require(step>0 and step<old_step,"eight rows must fit without touching footer")
-        # Estimate px / native top-unit from the original element height/step.
-        # For percent variants, top percentages and button heights are different
-        # units; derive relative ratio from original sibling coordinates.
-        scale=old_height/old_step
-        new_height=min(old_height,(step*scale*Decimal('.91')))
-        require(new_height>=Decimal('62'),"touch target too small")
-        # All existing row actions, order and artwork remain exactly the same.
-        # Only vertical geometry is compacted within original panel and footer.
-        for i,(button,icon,label) in enumerate(positions):
-            old=dec(button.findtext('top'))
-            proposed=start+step*Decimal(i)
-            factor=new_height/old_height
-            button.find('top').text=fmt(proposed,pct)
-            button.find('height').text=fmt(new_height)
-            for associated in (icon,label):
-                child_top=associated.find('top')
-                child_height=associated.find('height')
-                require(child_top is not None and child_height is not None,"decorations intact")
-                offset=dec(child_top.text)-old
-                child_top.text=fmt(proposed+offset*factor,pct)
-                child_height.text=fmt(dec(child_height.text)*factor)
-        # Move ONLY the existing Health orb with its preserved Health Center row.
-        orb=[x for x in controls.findall('control[@type="image"]')
-             if x.findtext('texture')=='infinity_experience/health-orb.png']
-        require(len(orb)==1,"original Health Center status orb")
-        oldhealth=start+old_step*Decimal(2)
-        newhealth=start+step*Decimal(2)
-        orb[0].find('top').text=fmt(dec(orb[0].findtext('top'))+newhealth-oldhealth,pct)
-        # Append exactly ONE new toggle; all original buttons preserved.
-        top=fmt(start+step*Decimal(7),pct)
-        button=positions[-1][0]
-        index=nodes.index(positions[-1][2])+1
-        controls.insert(index,radio(left=button.findtext('left'),width=button.findtext('width'),
-                                    top=top,height=fmt(new_height)))
-        require(start+Decimal(7)*step+new_height/scale<footer_top,
-                "new switch cannot collide with original footer")
+        require(all(c.findtext('top').endswith('%')==pct
+                    for c in (first,second,last,footer)),
+                "original row and footer coordinate units must agree")
+        require(step>0 and first_top+step*6==last_top or
+                (step>0 and abs(first_top+step*6-last_top)<Decimal('.001')),
+                "original seven-row layout has unexpected spacing")
+        # Keep *every original action row, focus area and decoration untouched*.
+        # The eighth row sits immediately after POWER OPTIONS, using the same
+        # documented row spacing. Move ONLY the passive footer downward one row
+        # and enlarge ONLY the two existing glass background images to contain
+        # the new control; no original button is moved or resized.
+        next_top=last_top+step
+        height=dec(last.findtext('height'))
+        surfaces=[c for c in nodes if c.get('type')=='image' and
+                  c.findtext('texture') in ('infinity_glass/surface.png',
+                                             'infinity_glass/rim.png')]
+        require(len(surfaces)==2,"exact original System Hub glass surfaces")
+        for surface in surfaces:
+            size=surface.find('height')
+            require(size is not None and size.text.endswith('%')==pct,
+                    "native System Hub background layout coordinates")
+            size.text=fmt(dec(size.text)+step,pct)
+        footer.find('top').text=fmt(footer_top+step,pct)
+        # Validate bottom bounds in original base canvas units for every layout.
+        if pct:
+            top=dec(surfaces[0].findtext('top'))
+            final=top+dec(surfaces[0].findtext('height'))
+            require(final<=Decimal('100'),"cannot extend glass beyond Fold safe area")
+            require(footer_top+step<Decimal('100'),"footer outside screen")
+        else:
+            full_screen=[c for c in nodes if c.get('type')=='image' and
+                         c.findtext('texture')=='infinity_ui/contract_white.png' and
+                         c.findtext('left')=='0' and c.findtext('top')=='0']
+            require(len(full_screen)>=1,"original fullscreen backdrop")
+            cap=dec(full_screen[0].findtext('height'))
+            final=dec(surfaces[0].findtext('top'))+dec(surfaces[0].findtext('height'))
+            require(final<=cap,"cannot extend glass beyond Fold safe area")
+            require(footer_top+step+dec(footer.findtext('height'))<=cap,
+                    "footer outside screen")
+        require(next_top>last_top and footer_top+step>next_top,
+                "new switch must sit after last original row, before footer")
+        controls.insert(nodes.index(footer),radio(
+            left=last.findtext('left'),
+            width=last.findtext('width'),
+            top=fmt(next_top,pct),
+            height=last.findtext('height')))
     after=original_actions(root)
     require(after==originals,"pre-existing hub actions/IDs/labels unchanged")
     silent=root.find(".//control[@id='"+SILENT_ID+"']")
