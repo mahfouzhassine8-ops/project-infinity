@@ -1,0 +1,68 @@
+name: Infinity 2103390 | Group 5 native fingerprint gate
+on:
+  push:
+    branches: [work/infinity-2103390-targeted-bugfixes]
+    paths:
+      - 'repairs/2103390-bugfixes/group5/**'
+      - '.github/workflows/infinity-2103390-group5-fingerprint.yml'
+  workflow_dispatch:
+permissions: {contents: read, actions: read}
+jobs:
+  exact-fingerprint:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39173982272
+          name: Infinity-2103390-Exact-Nine-Combined-EXPERIMENTAL-NOT-FOLD-QUALIFIED
+          github-token: ${{ github.token }}
+          path: parent
+      - name: Require immutable exact 2103390 and resolve original APK
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile
+          import hashlib,os
+          want='778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb'
+          found=[]
+          for p in Path('parent').rglob('*'):
+              if not p.is_file():continue
+              if p.suffix=='.apk':found.append(p.read_bytes())
+              if p.suffix=='.zip':
+                  with ZipFile(p) as z:
+                      for n in z.namelist():
+                          if n.endswith('Infinity-2103390-Nine-Item-Integration-EXPERIMENTAL.apk'):
+                              found.append(z.read(n))
+          matched=[b for b in found if hashlib.sha256(b).hexdigest()==want]
+          assert len(matched)==1,'Immutable baseline missing or ambiguous'
+          out=Path('signed-original-2103390.apk');out.write_bytes(matched[0])
+          with ZipFile(out) as z:assert len(z.namelist())==7430
+          with open(os.environ['GITHUB_ENV'],'a') as env:
+              env.write('INFINITY_2103390_APK='+str(out.resolve())+'\n')
+          PY
+      - name: Test fixed-rodata field, ELF executable identity, no claimed root-cause fix
+        run: |
+          python -m unittest discover -s repairs/2103390-bugfixes/group5 -p 'test_*.py' -v
+          python repairs/2103390-bugfixes/group5/final_native_identity_patch.py signed-original-2103390.apk > group5-identity.json
+          python - <<'PY'
+          import json
+          x=json.load(open('group5-identity.json'))
+          assert x['collector_field_after']==x['final_native_engine_sha256']
+          assert x['crash_root_cause_proven'] is False
+          assert x['root_cause_fix_implemented'] is False
+          assert x['changed_apk_members_if_staged']==['lib/arm64-v8a/libinfinitycrash.so']
+          assert x['original_native_engine_modified'] is False and x['actual_apk_built'] is False
+          print('Group5 fingerprint metadata source gate passed; exact SIGSEGV cause still open')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: Infinity-Group5-Exact-Native-Fingerprint-Receipt-NOT-APK
+          path: group5-identity.json
+          retention-days: 60
+          if-no-files-found: error
