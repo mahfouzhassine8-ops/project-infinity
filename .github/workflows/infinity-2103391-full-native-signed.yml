@@ -1,0 +1,275 @@
+name: Infinity 2103391 | Full native ALL-IN-ONE signed experimental APK
+on:
+  push:
+    branches: [work/infinity-2103390-targeted-bugfixes]
+    paths:
+      - 'repairs/2103390-bugfixes/group7/**'
+      - '.github/workflows/infinity-2103391-full-native-signed.yml'
+  workflow_dispatch:
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-2103391-all-in-one-native, cancel-in-progress: false}
+jobs:
+  source-gate:
+    name: Require exact signed 2103390 and all six source group proofs
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false, fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39173982272
+          name: Infinity-2103390-Exact-Nine-Combined-EXPERIMENTAL-NOT-FOLD-QUALIFIED
+          github-token: ${{ github.token }}
+          path: source-parent
+      - name: Verify original signed 2103390 and stage exact group allowlist
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib,os,zipfile
+          from pathlib import Path
+          correct='778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb'
+          files=[]
+          for p in Path('source-parent').rglob('*'):
+              if not p.is_file():continue
+              if p.suffix=='.apk':files.append(p.read_bytes())
+              if p.suffix=='.zip':
+                  with zipfile.ZipFile(p) as z:
+                      for n in z.namelist():
+                          if n.endswith('Infinity-2103390-Nine-Item-Integration-EXPERIMENTAL.apk'):
+                              files.append(z.read(n))
+          matches=[b for b in files if hashlib.sha256(b).hexdigest()==correct]
+          assert len(matches)==1, 'Protected signed original unavailable or replaced'
+          original=Path('original-2103390.apk')
+          original.write_bytes(matches[0])
+          with zipfile.ZipFile(original) as z:
+              assert z.testzip() is None and len(z.namelist())==7430
+          with open(os.environ['GITHUB_ENV'],'a') as f:
+              f.write('INFINITY_2103390_APK='+str(original.resolve())+'\n')
+          PY
+          python3 -m unittest discover -s repairs/2103390-bugfixes/group7 -p 'test_stage_all_in_one.py' -v
+          python3 repairs/2103390-bugfixes/group7/stage_all_in_one.py original-2103390.apk > group7-source-gate.json
+          python3 - <<'PY'
+          import json
+          j=json.load(open('group7-source-gate.json'))
+          assert j['source_modified_original_members']==125
+          assert j['source_added_first_party_members']==2
+          assert j['task19_movies_tv_reload']=='DEFERRED_UNFIXED'
+          assert j['group5_sigsegv_139']=='ROOT_CAUSE_UNPROVEN_NOT_FIXED'
+          assert j['new_features_after_this_release']=='FREEZE_BUGFIXES_ONLY'
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-2103391-Prebuild-Source-Gate
+          path: group7-source-gate.json
+          retention-days: 90
+          if-no-files-found: warn
+
+  native-engine:
+    name: Reconstruct reviewed 2103385 Kodi source and compile eight gated native fixes
+    needs: source-gate
+    runs-on: ubuntu-22.04
+    timeout-minutes: 420
+    env:
+      NDK_VER: 21.4.7075529
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-build
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '17'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/cache@v4
+        with:
+          path: /usr/local/lib/android/sdk/ndk/21.4.7075529
+          key: infinity-pinned-ndk-linux-21.4.7075529-v1
+      - run: bash repairs/android-checkpoint-shutdown/install_ndk.sh
+      - uses: actions/download-artifact@v4
+        with: {run-id: 38132105717, name: Infinity-2103367-Verified-Compiler-Dependencies, github-token: ${{ github.token }}, path: dependency-transfer}
+      - uses: actions/download-artifact@v4
+        with: {run-id: 38246713743, name: Cobra-2103374-Verified-Deadweight-Signed-Test-APK, github-token: ${{ github.token }}, path: locked-parent}
+      - uses: actions/download-artifact@v4
+        with: {run-id: 38270097041, name: Cobra-2103375-File-Preview-Native-Signed-Test-APK, github-token: ${{ github.token }}, path: previous-candidate}
+      - uses: actions/download-artifact@v4
+        with: {run-id: 38321848412, name: Cobra-2103376-Critical-Preview-Native-Evidence, github-token: ${{ github.token }}, path: locked-native-evidence}
+      - uses: actions/download-artifact@v4
+        with: {run-id: 38493645998, name: Infinity-2103377-RC3-Exact-Native-Curl-Source, github-token: ${{ github.token }}, path: rc2-captured-source}
+      - uses: actions/download-artifact@v4
+        with: {run-id: 38732470818, name: Infinity-2103377-Rails-Handoff-RC1-Native-Evidence, github-token: ${{ github.token }}, path: rails-locked-evidence}
+      - uses: actions/download-artifact@v4
+        with: {run-id: 38975950035, name: Infinity-2103377-Essential-First-Native-Evidence, github-token: ${{ github.token }}, path: exact-test4-native}
+      - uses: actions/download-artifact@v4
+        with: {run-id: 39088898437, name: Infinity-2103384-Write-Integrity-Native-Evidence, github-token: ${{ github.token }}, path: locked-384-native}
+      - name: Restore exact full native compiler cache and libraries
+        run: |
+          set -euo pipefail
+          (cd dependency-transfer && sha256sum -c SHA256SUMS)
+          tar --no-same-owner -xf dependency-transfer/verified-android-dependencies.tar
+          tar --no-same-owner -xf dependency-transfer/verified-compiler-cache.tar -C "$HOME"
+          python3 repairs/android-checkpoint-shutdown/native_ci.py verify-dependencies
+          sudo apt-get update -qq
+          sudo apt-get install -y python3-yaml python3-dev libsqlite3-dev libssl-dev
+      - name: Require immutable Curl and original shutdown/watched source inventory
+        run: |
+          set -euo pipefail
+          mkdir -p checkpoint-build
+          python3 repairs/shutdown-rc3-2103377/test_source.py \
+            --source rc2-captured-source --output checkpoint-build/RC3-HOST-VERIFICATION.json
+      - name: Reconstruct exact 2103384 source then approved 2103385 UI source
+        run: |
+          set -euo pipefail
+          python3 repairs/four-repair-20261018/native_ci.py prepare \
+            --locked locked-parent/Cobra-2103374-Verified-Deadweight-RC1.apk \
+            --previous previous-candidate/Cobra-2103375-File-Preview-Native-RC1.apk \
+            --parent-proof locked-native-evidence \
+            --rails-proof rails-locked-evidence \
+            --test4-proof exact-test4-native \
+            --locked-384-proof locked-384-native \
+            2>&1 | tee checkpoint-build/2103391-RECONSTRUCTION.log
+      - name: Apply precisely Group2+3+6 native source deltas and update original compiler SHA manifests
+        run: |
+          set -euo pipefail
+          python3 repairs/2103390-bugfixes/group7/native_merge.py \
+            --native-root kodi --checkpoint checkpoint-build \
+            | tee checkpoint-build/GROUP7-NATIVE-INTEGRATION.log
+          python3 -m unittest discover -s repairs/2103390-bugfixes/group3 \
+            -p 'test_native_option_b_cpp.py' -v
+      - name: Compile complete matched ARM64 Kodi library with original Essential-First protections
+        run: |
+          set -euo pipefail
+          python3 repairs/four-repair-20261018/native_ci.py compile \
+            2>&1 | tee checkpoint-build/GROUP7-NATIVE-COMPILATION.log
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,json
+          engine=Path('checkpoint-build/libkodi.so')
+          proof=json.load(open('checkpoint-build/ENGINE-PROOF.json'))
+          ledger=json.load(open('checkpoint-build/GROUP7-NATIVE-SOURCE-ALLOWLIST.json'))
+          assert len(ledger['additional_modified_native_sources'])==8
+          assert proof['complete_native_engine_compiled'] and proof['shutdown_policy']=='essential_first_process_exit_v1'
+          assert hashlib.sha256(engine.read_bytes()).hexdigest()==proof['native_sha256']
+          assert engine.stat().st_size>90_000_000
+          for word in (b'RunScript(script.infinity.uirepair,option-b,',
+                       b'Skin.HasSetting(Infinity.SilentMode)',
+                       b'Hide from this browser (not Disable)'):
+              assert word in engine.read_bytes(), 'Missing compiled approved group'
+          assert not proof['physical_fold_verified'] and not proof['crash_fixed']
+          print('Compiled ARM64 Kodi full engine with protected shutdown and source allowlist')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: Infinity-2103391-Verified-Native-Engine
+          path: |
+            checkpoint-build/libkodi.so
+            checkpoint-build/ENGINE-PROOF.json
+            checkpoint-build/GROUP7-NATIVE-SOURCE-ALLOWLIST.json
+          retention-days: 90
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-2103391-Native-Compile-Diagnostics
+          path: |
+            checkpoint-build/GROUP7-NATIVE-*.log
+            checkpoint-build/2103391-RECONSTRUCTION.log
+            checkpoint-build/GROUP7-NATIVE-SOURCE-ALLOWLIST.json
+            checkpoint-build/ENGINE-PROOF.json
+            checkpoint-build/RC3-HOST-VERIFICATION.json
+          retention-days: 90
+          compression-level: 1
+          if-no-files-found: warn
+
+  signed-experimental-apk:
+    name: Permanently sign only exact native/skin/first-party delta over signed 2103390
+    needs: native-engine
+    runs-on: ubuntu-22.04
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/download-artifact@v4
+        with: {run-id: 39173982272, name: Infinity-2103390-Exact-Nine-Combined-EXPERIMENTAL-NOT-FOLD-QUALIFIED, github-token: ${{ github.token }}, path: protected-2103390}
+      - uses: actions/download-artifact@v4
+        with: {run-id: ${{ github.run_id }}, name: Infinity-2103391-Verified-Native-Engine, github-token: ${{ github.token }}, path: native-2103391}
+      - name: Recover exact original signed APK and compile/source receipts
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,zipfile
+          from pathlib import Path
+          want='778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb'
+          files=[]
+          for p in Path('protected-2103390').rglob('*'):
+              if not p.is_file():continue
+              if p.suffix=='.apk':files.append(p.read_bytes())
+              if p.suffix=='.zip':
+                  with zipfile.ZipFile(p) as z:
+                      for name in z.namelist():
+                          if name.endswith('Infinity-2103390-Nine-Item-Integration-EXPERIMENTAL.apk'):
+                              files.append(z.read(name))
+          valid=[b for b in files if hashlib.sha256(b).hexdigest()==want]
+          assert len(valid)==1,'Original signed APK missing'
+          p=Path('original-2103390.apk');p.write_bytes(valid[0])
+          with zipfile.ZipFile(p) as z:assert len(z.namelist())==7430
+          proof=Path('native-2103391/ENGINE-PROOF.json')
+          assert proof.is_file() and Path('native-2103391/libkodi.so').is_file()
+          PY
+      - name: Assemble, permanently sign and verify versionCode 2103391 experimental APK
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 repairs/2103390-bugfixes/group7/sign_all_in_one.py \
+            --parent original-2103390.apk \
+            --native native-2103391/libkodi.so \
+            --proof native-2103391/ENGINE-PROOF.json \
+            --out signed-2103391 --sign
+          test -f signed-2103391/Infinity-2103391-All-In-One-Bugfix-EXPERIMENTAL.apk
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          receipt=json.loads(Path('signed-2103391/INFINITY-2103391-SIGNED-EXPERIMENTAL.json').read_text())
+          assert receipt['signed_permanently'] and receipt['experimental_only']
+          assert receipt['changed_existing_apk_members']==128
+          assert receipt['new_first_party_apk_members']==2
+          assert receipt['physical_fold_accepted'] is False
+          assert receipt['actual_SIGSEGV_139_root_cause_fixed'] is False
+          assert receipt['user_final_LOCK'] is False
+          assert receipt['feature_freeze_after_this_apk']=='NO_NEW_FEATURES_BUG_FIXES_ONLY'
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-2103391-All-In-One-EXPERIMENTAL-NOT-FOLD-QUALIFIED
+          path: |
+            signed-2103391/Infinity-2103391-All-In-One-Bugfix-EXPERIMENTAL.apk
+            signed-2103391/Infinity-2103391-All-In-One-Bugfix-EXPERIMENTAL.signing.txt
+            signed-2103391/Infinity-2103391-All-In-One-Bugfix-EXPERIMENTAL.sha256
+            signed-2103391/INFINITY-2103391-SIGNED-EXPERIMENTAL.json
+            native-2103391/GROUP7-NATIVE-SOURCE-ALLOWLIST.json
+          retention-days: 90
+          compression-level: 0
+          if-no-files-found: warn
