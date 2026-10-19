@@ -2,7 +2,7 @@
   "schema": 1,
   "record_type": "Infinity_2103390_postbase_exact_new_19_tasks",
   "timestamp_date": "2026-10-19",
-  "status": "GROUP3_OPTION_B_MODAL_SOURCE_STAGED_20_OF_20_HOST_GREEN_UNCONNECTED_NATIVE_LONGPRESS_NO_BUILD_FOLD",
+  "status": "GROUP2_REACTIVATED_FOR_FULL_FIX_05_TO_08_GROUP1_GROUP3_PAUSED_NO_APK",
   "repository": "mahfouzhassine8-ops/project-infinity",
   "branch": "work/infinity-2103390-targeted-bugfixes",
   "binding_contract": "repairs/2103390-bugfixes/REPAIR-CONTRACT-01-19.md",
@@ -686,9 +686,9 @@
     "must_preserve": "actual original player controls and settings/row labels/positions, audio/subtitle tracks, controls, playback, provider, themes, motion policy, Cobra, shutdown",
     "approval_doc": "repairs/2103390-bugfixes/PLAYER-GLASS-MENUS-APPROVED-20261019.md"
   },
-  "primary_work_unit": "GROUP_03_OPTION_B_MOVIE_TV_LONGPRESS_MODAL",
+  "primary_work_unit": "GROUP_02_FINISH_ALL_ADDON_BROWSER_05_TO_08",
   "active_group_contract": "repairs/2103390-bugfixes/GROUPED-01-07-BINDING-CONTRACT.md",
-  "current_authorized_group": "03",
+  "current_authorized_group": "02",
   "group_count": 7,
   "group_done_count": 0,
   "group_status": {
@@ -728,9 +728,9 @@
         "07",
         "08"
       ],
-      "status": "PAUSED_UNFINISHED_GROUP2_05_06_SKIN_STAGED_07_08_PARTIAL_FOLD_UNVERIFIED",
-      "implementation_authorized": false,
-      "savepoint": "6eaf788484c0606c6435b659dc35b3bf43b8bc2e",
+      "status": "ACTIVE_FINISH_05_TO_08_NATIVE_SCOPED_REPAIR_STAGE_PARTIAL_HOST_PASS_NO_FOLD",
+      "implementation_authorized": true,
+      "savepoint": "10dcbb21ca19f1bd30e1b7aed614ccc49f83b6e7",
       "targeted_tests": "10_OF_10_HOST_SIGNED_2103390_FULL_42_MEMBER_SCOPE_PASS_ANDROID_AND_FOLD_PENDING",
       "fold": "NOT_VERIFIED",
       "preservation_clarification": "When Group2 is reselected, implement original 05-08 safely even if correction requires a shared Kodi native file, provided only the relevant Add-on Browser behaviors change and Cobra/others remain unaffected; not complete now."
@@ -741,8 +741,8 @@
         "09",
         "10"
       ],
-      "status": "ACTIVE_OPTION_B_MODAL_SOURCE_STAGED_NATIVE_HOLD_SCOPED_REPAIR_ALLOWED_NOT_YET_IMPLEMENTED_FOLD_PENDING",
-      "implementation_authorized": true,
+      "status": "PAUSED_UNFINISHED_OPTION_B_MODAL_SOURCE_STAGED_DIRECT_LONGPRESS_NOT_CONNECTED_FOLD_PENDING",
+      "implementation_authorized": false,
       "savepoint": "35319321baeb640359c54668a361e9ff72493f87",
       "targeted_tests": "20_OF_20_HOST_SIGNED_2103390_AND_MOCKS_PASS_DIRECT_LONGPRESS_UNIMPLEMENTED",
       "fold": "NOT_VERIFIED",
@@ -834,7 +834,7 @@
     "commit_every_green_milestone_and_group_before_advancing": true,
     "not_permission_to_build_or_edit_automatically": true
   },
-  "last_user_instruction": "Preservation is mandatory but does not prohibit implementing the needed approved repair, including a narrowly guarded shared-source/native correction proven not to affect Cobra or any other Infinity behavior. Keep other groups paused; no additional re-authorization for in-scope isolated fixes.",
+  "last_user_instruction": "Back to Group #2, finish the approved 05–08 Add-on Browser repairs rather than advancing with unfinished work. Preserve Group #3 source work and all Cobra/unrelated Infinity functionality.",
   "last_verified_group1_checkpoint": "f436c0e9f79066803f9dd98fa2c453dff7f32f82",
   "group_1_latest_receipts": [
     "repairs/2103390-bugfixes/receipts/GROUP01-TASK04-CLOCK-ORIGIN-TESTED-20261019.md",
@@ -1082,5 +1082,24 @@
     "status": "DOCUMENTATION_ONLY_PERMISSIONS_CLARIFIED_NO_RUNTIME_CODE_CHANGED",
     "governing_contract": "repairs/2103390-bugfixes/GROUPED-01-07-BINDING-CONTRACT.md",
     "contract_commit": "00b43672523a48c72debb9e8f1f85fffd65fe8d5"
+  },
+  "group_2_reactivation": {
+    "date": "2026-10-19",
+    "from_group": "03",
+    "current_group": "02",
+    "user_reauthorized_completion": true,
+    "required_to_finish": [
+      "05 header slash source and Fold",
+      "06 root six authentic routes and accurate contextual text",
+      "07 selection vs launch, context actions, reversible temporary Hide, confirm actual Disable",
+      "08 real native repository/ZIP picker/Preview/Search focus, return and keyboard"
+    ],
+    "native_shared_source_allowed_only_with_exact_browser_window_skin_control_guards": true,
+    "keep_group_1_group_3_stages": "IMMUTABLE_NOT_COMBINED",
+    "cobra": "NO_CHANGES",
+    "shutdown": "NO_CHANGES",
+    "signed_parent_sha256": "778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb",
+    "apk_build": "NOT_STARTED",
+    "physical_fold": "NOT_VERIFIED"
   }
 }
