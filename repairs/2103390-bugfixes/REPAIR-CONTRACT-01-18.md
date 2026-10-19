@@ -106,6 +106,12 @@
 
 **Status: DESIGN APPROVED ONLY; implementation not started.**
 
+## B.1 — USER-REQUESTED TRANSLUCENT PLAYER MENUS (VISUAL APPROVAL PENDING)
+
+**Applies precisely to tasks 11–14.** The user clarified on October 19, 2026 that they want the **menus themselves** (not little OSD icons) to be **Infinity liquid-glass/translucent**, so the playing video remains visibly discernible THROUGH Playback, Video Settings and Audio & Subtitles panels. Existing Playback actions/ordering must not be replaced with fictional actions from AI mockups; only the redundant “Video Settings” row is to be removed (task 12) after the OSD video button works (task 11). Video Settings and Audio & Subtitles are compact standalone windows slightly smaller than Playback. Exact Light/Dark/OLED/Night Cinema glass opacity/appearance is subject to user approval of the visual mock; **none of tasks 11–14 have been implemented**.
+
+**Controlling design proposal:** `repairs/2103390-bugfixes/PLAYBACK-GLASS-MENUS-VISUAL-PROPOSAL.md`. It records the user's verbatim clarification, full original Playback menu item list, zero Cobra change and nonintrusive video/session safeguards. **Do not lock incidental labels invented by the render.**
+
 ### 11 — Player OSD monitor/video-looking button: connect to Video Settings
 
 **Observed:** User points to the **video/monitor-looking icon in the player OSD bottom control strip** (screenshot `1792386488186.jpeg`) as presently empty/inert.
