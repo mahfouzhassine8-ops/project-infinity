@@ -2,7 +2,7 @@
   "schema": 1,
   "record_type": "Infinity_2103390_postbase_exact_new_19_tasks",
   "timestamp_date": "2026-10-19",
-  "status": "GROUP1_THREE_SOURCE_PATCHES_19HOST_GREEN_READONLY_CATEGORY_DIAG_NO_BUILD_OR_FOLD",
+  "status": "GROUP1_THREE_BEHAVIOR_SOURCE_PATCHES_DUAL_CONSUMER_PIN_COMPAT_STAGED_PREVIOUS_19_PLUS_NEW_5_HOST_GREEN_NO_APK_OR_FOLD",
   "repository": "mahfouzhassine8-ops/project-infinity",
   "branch": "work/infinity-2103390-targeted-bugfixes",
   "binding_contract": "repairs/2103390-bugfixes/REPAIR-CONTRACT-01-19.md",
@@ -628,10 +628,10 @@
         "04",
         "19"
       ],
-      "status": "IN_PROGRESS_19_HOST_TESTS_GREEN_THREE_SOURCE_PATCHES_STAGED_TOUCH_AND_CATEGORY_INVALIDATION_OPEN",
+      "status": "IN_PROGRESS_THREE_BEHAVIOR_PATCHES_DUAL_CONSUMER_PIN_COMPAT_HOST_GREEN_TOUCH_AND_CATEGORY_RELOAD_OPEN",
       "implementation_authorized": true,
-      "savepoint": "5cb853ccf6b4b09058945f82212a39d0cdef3bae",
-      "targeted_tests": "COMBINED_19_OF_19_HOST_TESTS_PASS_PLUS_READ_ONLY_CATEGORY_REPEAT_PROOF",
+      "savepoint": "c3cc7181fef5781f329f12a1a49195c4095b3684",
+      "targeted_tests": "PREVIOUS_19_19_HOST_CHECKS_PLUS_5_5_NEW_REAL_SIGNED_APK_DEPENDENCY_SCOPE_TESTS_DISTINCT_RUNS",
       "fold": "NOT_VERIFIED",
       "continue_watching_horizontal_scroll": {
         "user_verbatim": "Also, for number one, the continue hub, or resume hub, continue watching. I know you told me that it's horizontal. I want you to ensure that it is horizontal scroll, and that is part of number one.",
@@ -760,14 +760,40 @@
     "not_permission_to_build_or_edit_automatically": true
   },
   "last_user_instruction": "Proceed with Group #1 ONLY after explicitly skipping old Group #1 quarantine diagnosis (task 17) and original lyrics script error task 16; save real source/tests and checkpoint after verified completion",
-  "last_verified_group1_checkpoint": "5cb853ccf6b4b09058945f82212a39d0cdef3bae",
+  "last_verified_group1_checkpoint": "c3cc7181fef5781f329f12a1a49195c4095b3684",
   "group_1_latest_receipts": [
     "repairs/2103390-bugfixes/receipts/GROUP01-TASK04-CLOCK-ORIGIN-TESTED-20261019.md",
     "repairs/2103390-bugfixes/receipts/GROUP01-TASK02-VERIFIED-MOVIE-KEY-STAGED-20261019.md",
     "repairs/2103390-bugfixes/receipts/GROUP01-RAIL-AND-SIGNED-APK-SCOPE-AUDIT-20261019.md",
     "repairs/2103390-bugfixes/receipts/GROUP01-TASK01-EPISODE-SAVED-ROUTE-19HOST-20261019.md",
-    "repairs/2103390-bugfixes/receipts/GROUP01-TASK19-REPEAT-LOAD-TRACE-20261019.md"
+    "repairs/2103390-bugfixes/receipts/GROUP01-TASK19-REPEAT-LOAD-TRACE-20261019.md",
+    "repairs/2103390-bugfixes/receipts/GROUP01-CONTROLLER-CONSUMER-14MEMBER-20261019.md"
   ],
   "group_1_signed_apk_status": "NONE — ONLY source-level patch scripts and tests saved; original signed 2103390 untouched",
-  "group_1_physical_fold_status": "NOT_VERIFIED"
+  "group_1_physical_fold_status": "NOT_VERIFIED",
+  "group_1_dual_consumer_integration": {
+    "status": "SOURCE_ONLY_STAGE_5_OF_5_REAL_SIGNED_PARENT_HOST_TESTS_GREEN_DEVICE_UNVERIFIED",
+    "cause": "Existing UI Repair Continue Watching and Watched Bridge verify all 13 Command Center original file hashes; TV and movie patches change two pinned sources so consumers reject an uncoordinated 12-member candidate.",
+    "original_signed_apk": "2103390 SHA256 778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb",
+    "original_verified_hashes": 13,
+    "changed_hashes_each_contract": 2,
+    "unchanged_hashes_each_contract": 11,
+    "dependency_contract_files": [
+      "assets/addons/script.infinity.uirepair/CONTROLLER-PREIMAGES.json",
+      "assets/addons/script.infinity.watchedbridge/CONTROLLER-PREIMAGES.json"
+    ],
+    "saved_source": "repairs/2103390-bugfixes/group1/cc_preimage_contract_patch.py",
+    "saved_source_commit": "9d6bc1845e3f392cbe48ed86aa96eb73cc79d681",
+    "tests": "repairs/2103390-bugfixes/group1/test_cc_preimage_contract_patch.py",
+    "test_commit": "0bf2be94fcbfa22e64344ca9b8105f7614708c13",
+    "original_signed_member_count": 7430,
+    "virtual_modified_members": 14,
+    "virtual_untouched_members": 7416,
+    "replaces_stale_12_member_scope_claim_for_final_integration": true,
+    "real_apk_build": "NOT_BUILT",
+    "physical_fold": "NOT_VERIFIED",
+    "cobra": "UNCHANGED_IN_MEMORY_ONLY",
+    "shutdown": "UNCHANGED_IN_MEMORY_ONLY",
+    "receipt": "repairs/2103390-bugfixes/receipts/GROUP01-CONTROLLER-CONSUMER-14MEMBER-20261019.md"
+  }
 }
