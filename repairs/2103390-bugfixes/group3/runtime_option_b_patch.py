@@ -21,6 +21,24 @@ REPLACEMENT = """        elif action == 'resume': resume_menu(token)
         elif action == 'restore': restore_hidden()"""
 
 
+# Final all-in-one must also preserve Group #1's separately source-approved
+# Continue Watching chooser. That earlier scoped patch introduces a single
+# home-choice branch BETWEEN resume and restore; both legitimate preimages
+# must keep all existing actions and function bodies byte-identical.
+GROUP1_ANCHOR = ("        elif action == 'resume': resume_menu(token)\n"
+                 "        elif action == 'home-choice': home_continue_choice(token, args[2] if len(args) > 2 else '')\n"
+                 "        elif action == 'restore': restore_hidden()")
+GROUP1_REPLACEMENT = GROUP1_ANCHOR.replace(
+    "        elif action == 'restore': restore_hidden()",
+    """        elif action == 'option-b':
+            # Only a signed C++ Home-8101/8102 touch dispatch has the
+            # matching pending native item proof. Invalid/stale holds do nothing.
+            from home_option_b import show_for_focused_top_poster
+            if len(args) == 4:
+                show_for_focused_top_poster(args[1:])
+        elif action == 'restore': restore_hidden()""", 1)
+
+
 def sha(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
@@ -29,12 +47,21 @@ def patch_runtime(data: bytes) -> bytes:
     source = data.decode("utf-8")
     if "elif action == 'option-b':" in source:
         raise ValueError("Option B action already registered")
-    if source.count(ANCHOR) != 1:
-        raise ValueError("Expected original on-demand UI Repair entry missing")
-    before = source[:source.index(ANCHOR)]
-    after = source[source.index(ANCHOR)+len(ANCHOR):]
-    # Everything outside this single branch is exactly the original code.
-    return (before + REPLACEMENT + after).encode("utf-8")
+    # Accept precisely the untouched signed baseline OR the separately staged
+    # Group1 home-choice-prepared runtime; never substitute speculative snippets.
+    candidates = ((GROUP1_ANCHOR, GROUP1_REPLACEMENT),
+                  (ANCHOR, REPLACEMENT))
+    found = [(needle, replacement) for needle, replacement in candidates
+             if source.count(needle) == 1]
+    if len(found) != 1:
+        raise ValueError("Expected exactly one authorized UI Repair runtime preimage")
+    needle, replacement = found[0]
+    before = source[:source.index(needle)]
+    after = source[source.index(needle)+len(needle):]
+    # Everything outside the one bounded dispatch remains byte-for-byte.
+    result = (before + replacement + after).encode("utf-8")
+    compile(result.decode("utf-8"), ENTRY, "exec")
+    return result
 
 
 def apply_to_tree(tree: Path, *, expected_sha256: str | None = None) -> dict:
