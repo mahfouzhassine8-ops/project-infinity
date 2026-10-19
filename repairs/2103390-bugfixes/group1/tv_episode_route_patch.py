@@ -20,7 +20,10 @@ SAFE_ROUTE = '''        if number(preference.get('failures')) < 2:
             # Validate stored preferences and the entry's independently captured
             # stable source separately. A stale/invalid preferred URL must not
             # mask an already verified, still installed fallback plugin route.
-            for saved in (preference.get('route'), entry.get('stable_source')):
+            choices = ((preference.get('route'), entry.get('stable_source'))
+                       if entry.get('media') == 'tv' else
+                       (preference.get('route') or entry.get('stable_source'),))
+            for saved in choices:
                 route = stable_route(saved)
                 if not route:
                     continue
