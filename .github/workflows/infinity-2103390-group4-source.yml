@@ -1,0 +1,67 @@
+name: Infinity 2103390 | Group 4 Player Menus source gate
+on:
+  push:
+    branches: [work/infinity-2103390-targeted-bugfixes]
+    paths:
+      - 'repairs/2103390-bugfixes/group4/**'
+      - '.github/workflows/infinity-2103390-group4-source.yml'
+  workflow_dispatch:
+permissions: {contents: read, actions: read}
+jobs:
+  validate-exact-signed-source:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39173982272
+          name: Infinity-2103390-Exact-Nine-Combined-EXPERIMENTAL-NOT-FOLD-QUALIFIED
+          github-token: ${{ github.token }}
+          path: parent-2103390
+      - name: Load exact immutable original APK
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile
+          import hashlib,os
+          expect='778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb'
+          candidates=[]
+          for p in Path('parent-2103390').rglob('*'):
+              if not p.is_file():continue
+              if p.suffix=='.apk':candidates.append(p.read_bytes())
+              if p.suffix=='.zip':
+                  with ZipFile(p) as z:
+                      for name in z.namelist():
+                          if name.endswith('Infinity-2103390-Nine-Item-Integration-EXPERIMENTAL.apk'):
+                              candidates.append(z.read(name))
+          matches=[b for b in candidates if hashlib.sha256(b).hexdigest()==expect]
+          assert len(matches)==1,'Wrong signed base APK'
+          path=Path('signed-original-2103390.apk')
+          path.write_bytes(matches[0])
+          with ZipFile(path) as z: assert len(z.namelist())==7430
+          with open(os.environ['GITHUB_ENV'],'a') as env:
+              env.write('INFINITY_2103390_APK='+str(path.resolve())+'\n')
+          PY
+      - name: Check all original 14 OSD layouts and 41 exact proposed skin edits
+        run: |
+          python -m unittest discover -s repairs/2103390-bugfixes/group4 -p 'test_*.py' -v
+          python repairs/2103390-bugfixes/group4/player_glass_patch.py signed-original-2103390.apk > group4-source-scope.json
+          python - <<'PY'
+          import json
+          data=json.load(open('group4-source-scope.json'))
+          assert data['proposed_modified_members']==41
+          assert data['proposed_added_members']==data['proposed_removed_members']==0
+          assert data['signed_apk_built'] is False and data['physical_fold_verified'] is False
+          print('Group4 host-only PASS, no native/Android/Fold claim')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: Infinity-Group4-Exact-41-Skin-Source-Scope-NOT-APK
+          path: group4-source-scope.json
+          retention-days: 60
+          if-no-files-found: error
