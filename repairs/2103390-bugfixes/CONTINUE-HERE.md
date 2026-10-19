@@ -1,5 +1,21 @@
 # CURRENT PRIMARY HANDOFF — SEVEN WORK GROUPS, GROUP #6 SILENT MODE
 
+## USER CHECKMARK — GROUP #1 SOURCE WORK ACCEPTED, TASK #19 DEFERRED
+
+**2026-10-19 user instruction:** “So in other words, I have to replicate it and we have to do more research about it. So if anything, you've done everything you can do. So that means one gets a check, and we'll get back to it later for the other situation.”
+
+**Recorded decision:** **✓ Group #1 existing source-work checkpoint accepted and saved for later integration review**, while task **#19 Movies↔TV Shows Home reloading remains UNFIXED and intentionally deferred** until the user reproduces it again on the physical Fold and exports an in-app diagnostic ZIP from the same run. Source fixes for tasks #01/#02/#03/#04 remain saved and untouched, previous host tests retained. Do not restart or discard any work. **This checkmark is a source-stage bookkeeping milestone, NOT a declaration of 1/7 fully functional groups completed**, and not signed Android/Fold acceptance. Keep group_done_count = 0 and Fold = NOT_VERIFIED; do not bundle a fake #19 correction.
+
+**When user supplies #19 evidence:** use existing saved category-load and lifecycle offline analyzers and the read-only source audit, correlate exact selected vs activated Home category, HomeLoad generation, native directory URL/invalidation, Umbrella Latest releases and first-party Continue Watching loads and revisions; only then implement & test a narrow, proven fix that preserves Cobra/other functionality. No unnecessary new hardware tooling. No #19 coding while deferred.
+
+**Current active work remains GROUP #2 Add-on Browser**, native+skin repairs source-staged; compile/Android/Fold verification still pending. **Group #3 Option B staged and paused**. No APK build or lock authorized by this checkmark.
+
+**Saved tracker commit:** `24957c582047ba6740a8f6b96fe6d748c358b707`.
+
+---
+
+
+
 ## GROUP #2 RETURN — FULL SOURCE-LEVEL BROWSER CORRECTIONS (NOT COMPILED/FOLD-APPROVED)
 
 **LATEST USER INSTRUCTION:** “Okay back to 2 finish it so we can check... see now we are going backwards instead of forwards.” Active authorized work is GROUP **#2** again (original subtasks **05/06/07/08**). Group #1 and Group #3 remain **PAUSED / UNFINISHED**, all their source checkpoints preserved. All other groups, **Cobra, shutdown, unrelated Infinity behavior and user data are off-limits**. Preservation is a REQUIRED RESULT, not a ban on narrowly guarded native repairs. **Group #2 not yet checked complete**—no compiled Android APK or physical Fold test.
