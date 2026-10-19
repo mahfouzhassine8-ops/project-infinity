@@ -2,7 +2,7 @@
   "schema": 1,
   "record_type": "Infinity_2103390_postbase_exact_new_19_tasks",
   "timestamp_date": "2026-10-19",
-  "status": "GROUP4_10HOST_GROUP5_FINGERPRINT_10HOST_GROUP6_SILENT_10HOST_GREEN_GROUP1_3_COMPOSITION_26HOST_GREEN_ALL_IN_ONE_BLOCKED_ANDROID_FOLD_AND_CRASH139_CAUSE_OPEN",
+  "status": "GROUP7_EXPERIMENTAL_2103391_NATIVE_COMPILE_AND_SIGN_GITHUB_ACTIONS_STARTED_NO_APK_YET",
   "repository": "mahfouzhassine8-ops/project-infinity",
   "branch": "work/infinity-2103390-targeted-bugfixes",
   "binding_contract": "repairs/2103390-bugfixes/REPAIR-CONTRACT-01-19.md",
@@ -732,7 +732,7 @@
   },
   "primary_work_unit": "GROUP_02_FINISH_ALL_ADDON_BROWSER_05_TO_08",
   "active_group_contract": "repairs/2103390-bugfixes/GROUPED-01-07-BINDING-CONTRACT.md",
-  "current_authorized_group": "06",
+  "current_authorized_group": "07",
   "group_count": 7,
   "group_done_count": 0,
   "group_status": {
@@ -842,10 +842,10 @@
       "original_subrequirements": [
         "18"
       ],
-      "status": "CONDITIONAL_USER_REQUEST_RECEIVED_PREFLIGHT_BLOCKED_NO_SIGNED_INTEGRATION_OR_ANDROID_NATIVE_COMPILE",
-      "implementation_authorized": false,
-      "savepoint": null,
-      "targeted_tests": "READ_ONLY_PREFLIGHT_AND_SHARED_UIREPAIR_COMPOSABILITY_ONLY_39270553998_26_OF_26_HOST_GREEN",
+      "status": "AUTHORIZED_EXPERIMENTAL_SIGNED_BUILD_RUNNING_SOURCE_MERGE_GREEN_NATIVE_COMPILATION_AND_FINAL_SIGN_PENDING",
+      "implementation_authorized": true,
+      "savepoint": "2c49d1f16feb091538e2d6edf6ba0b1896629fcf",
+      "targeted_tests": "SOURCE_MERGE_GITHUB_ACTIONS_39344548533_PASS_125_ORIGINAL_XML_PY_FILES_AND_2_ADDITIONS;FULL_NATIVE_SIGNING_RUN_39344893535_QUEUED_OR_IN_PROGRESS",
       "fold": "NOT_VERIFIED"
     }
   },
@@ -887,7 +887,7 @@
     "commit_every_green_milestone_and_group_before_advancing": true,
     "not_permission_to_build_or_edit_automatically": true
   },
-  "last_user_instruction": "If everything is complete proceed to all-in-one; run honest readiness gate, preserve all groups and do not claim completion or produce final APK with native crash unresolved or untested builds.",
+  "last_user_instruction": "All right, build the APK. After these approved new features, add nothing further and concentrate on bug fixes. Authorize Group7 experimental signed all-in-one build from exact protected 2103390; no final LOCK or SIGSEGV fix claims.",
   "last_verified_group1_checkpoint": "f436c0e9f79066803f9dd98fa2c453dff7f32f82",
   "group_1_latest_receipts": [
     "repairs/2103390-bugfixes/receipts/GROUP01-TASK04-CLOCK-ORIGIN-TESTED-20261019.md",
@@ -1251,9 +1251,7 @@
     "receipt_commit": "05466d0f8ca369f9ba0df61867ee0da52861cf0a"
   },
   "current_authorized_groups": [
-    "04",
-    "05",
-    "06"
+    "07"
   ],
   "group_456_authorization": {
     "user_approved": true,
@@ -1273,7 +1271,7 @@
     "actual_build": "NONE",
     "fold": "NOT_VERIFIED"
   },
-  "active_next_phase": "READ_ONLY_ALL_IN_ONE_PREFLIGHT_BLOCKED_PENDING_SOURCE_MATCHED_NATIVE_ANDROID_BUILD_AND_EXPLICIT_OPEN_CRASH_TREATMENT",
+  "active_next_phase": "GROUP7_GITHUB_ACTIONS_NATIVE_REBUILD_AND_PERMANENT_EXPERIMENTAL_SIGNING_STARTED_TESTS_IN_PROGRESS",
   "groups_456_readiness": {
     "verified_at": "2026-10-19",
     "parent_sha256": "778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb",
@@ -1311,7 +1309,34 @@
     "user_lock": false,
     "receipt": "repairs/2103390-bugfixes/receipts/GROUPS04-06-AND-ALL-IN-ONE-PREFLIGHT-20261019.md",
     "receipt_commit": "d7ba7752ccc202348ac77769972a94f249e39258",
-    "all_in_one_preflight": "NOT_READY_BLOCKED_WITH_KNOWN_NATIVE_CRASH_AND_ANDROID_COMPILE_FOLD_OPEN"
+    "all_in_one_preflight": "SOURCE_STAGE_GATE_PASS_NATIVE_EXPERIMENTAL_APK_BUILD_RUNNING_FOLD_CRASH_GATES_STILL_OPEN"
   },
-  "group_7_signed_apk_status": "NONE — conditional readiness gate not satisfied; do not synthesize APK or state user lock."
+  "group_7_signed_apk_status": "NONE — conditional readiness gate not satisfied; do not synthesize APK or state user lock.",
+  "group_7_experimental_build": {
+    "explicit_authorization": true,
+    "version_code": 2103391,
+    "version_name": "1.0.9-All-In-One-Bugfix-TEST0001",
+    "intended_filename": "Infinity-2103391-All-In-One-Bugfix-EXPERIMENTAL.apk",
+    "source_branch": "work/infinity-2103390-targeted-bugfixes",
+    "workflow_path": ".github/workflows/infinity-2103391-full-native-signed.yml",
+    "workflow_run": 39344893535,
+    "workflow_commit": "2c49d1f16feb091538e2d6edf6ba0b1896629fcf",
+    "source_merge_workflow": ".github/workflows/infinity-2103391-integration-source.yml",
+    "source_merge_run": 39344548533,
+    "protected_parent_sha256": "778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb",
+    "approved_original_source_members": 125,
+    "approved_additive_modal_members": 2,
+    "pending_native_new_library": true,
+    "pending_crash_recorder_dynamic_hash": true,
+    "pending_binary_manifest_version": true,
+    "expected_total_modified_original_members": 128,
+    "experimental_pending_runtime": true,
+    "physical_fold_accepted": false,
+    "user_final_lock": false,
+    "final_apk_verified": false,
+    "actual_SIGSEGV_139_root_cause_fixed": false,
+    "group1_task19": "USER_DEFERRED_UNFIXED",
+    "feature_freeze_after_this_apk": true,
+    "future_scope": "BUGFIXES_STABILITY_REFINEMENT_ONLY_NO_MORE_FEATURES"
+  }
 }
