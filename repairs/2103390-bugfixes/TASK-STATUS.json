@@ -384,7 +384,7 @@
       "user_acceptance": "PENDING_DIRECT_HOLD_KODI_ANDROID_AND_VISUAL_DEVICE_APPROVAL",
       "apk_artifact": null,
       "sha256": null,
-      "blocking_or_caveat": "Critical: Approved Option B MUST open directly on first longpress of exact touched movie or TV top release poster and must not send short-tap. Original signed global touch longpress maps RightClick to native CDirectoryProvider context; existing OnInfinityRailLongPress only permits add-on controls 9200/8820/8720/19601, not top movie/tv 8101/8102. New modal is ON-DEMAND SOURCE ONLY, NOT REGISTERED TO GESTURE. Shared native/keymap change prohibited until separately authorized and proven Cobra-safe. Physical Fold/theme/pixel fidelity and provider actions remain unverified.",
+      "blocking_or_caveat": "Critical: Approved Option B MUST open directly on first longpress of exact touched movie or TV top release poster and must not send short-tap. Original signed global touch longpress maps RightClick to native CDirectoryProvider context; existing OnInfinityRailLongPress only permits add-on controls 9200/8820/8720/19601, not top movie/tv 8101/8102. New modal is ON-DEMAND SOURCE ONLY, NOT REGISTERED TO GESTURE. A narrowly guarded shared native hook is now authorized IF independently proven Cobra-safe and invisible on every unrelated path; no hook implemented yet. Physical Fold/theme/pixel fidelity and provider actions remain unverified.",
       "receipt": "repairs/2103390-bugfixes/receipts/GROUP03-OPTION-B-MODAL-20HOST-INPUT-BLOCK-20261019.md"
     },
     {
@@ -422,7 +422,7 @@
       "user_acceptance": "PENDING_DIRECT_HOLD_KODI_ANDROID_AND_VISUAL_DEVICE_APPROVAL",
       "apk_artifact": null,
       "sha256": null,
-      "blocking_or_caveat": "Critical: Approved Option B MUST open directly on first longpress of exact touched movie or TV top release poster and must not send short-tap. Original signed global touch longpress maps RightClick to native CDirectoryProvider context; existing OnInfinityRailLongPress only permits add-on controls 9200/8820/8720/19601, not top movie/tv 8101/8102. New modal is ON-DEMAND SOURCE ONLY, NOT REGISTERED TO GESTURE. Shared native/keymap change prohibited until separately authorized and proven Cobra-safe. Physical Fold/theme/pixel fidelity and provider actions remain unverified.",
+      "blocking_or_caveat": "Critical: Approved Option B MUST open directly on first longpress of exact touched movie or TV top release poster and must not send short-tap. Original signed global touch longpress maps RightClick to native CDirectoryProvider context; existing OnInfinityRailLongPress only permits add-on controls 9200/8820/8720/19601, not top movie/tv 8101/8102. New modal is ON-DEMAND SOURCE ONLY, NOT REGISTERED TO GESTURE. A narrowly guarded shared native hook is now authorized IF independently proven Cobra-safe and invisible on every unrelated path; no hook implemented yet. Physical Fold/theme/pixel fidelity and provider actions remain unverified.",
       "receipt": "repairs/2103390-bugfixes/receipts/GROUP03-OPTION-B-MODAL-20HOST-INPUT-BLOCK-20261019.md"
     },
     {
@@ -732,7 +732,8 @@
       "implementation_authorized": false,
       "savepoint": "6eaf788484c0606c6435b659dc35b3bf43b8bc2e",
       "targeted_tests": "10_OF_10_HOST_SIGNED_2103390_FULL_42_MEMBER_SCOPE_PASS_ANDROID_AND_FOLD_PENDING",
-      "fold": "NOT_VERIFIED"
+      "fold": "NOT_VERIFIED",
+      "preservation_clarification": "When Group2 is reselected, implement original 05-08 safely even if correction requires a shared Kodi native file, provided only the relevant Add-on Browser behaviors change and Cobra/others remain unaffected; not complete now."
     },
     "03": {
       "name": "Option B movie and TV top-rail long-press details",
@@ -740,11 +741,12 @@
         "09",
         "10"
       ],
-      "status": "ACTIVE_BOTH_OPTION_B_MODAL_SOURCE_STAGED_HOST_GREEN_INPUT_LONGPRESS_NOT_WIRED_FOLD_UNVERIFIED",
+      "status": "ACTIVE_OPTION_B_MODAL_SOURCE_STAGED_NATIVE_HOLD_SCOPED_REPAIR_ALLOWED_NOT_YET_IMPLEMENTED_FOLD_PENDING",
       "implementation_authorized": true,
       "savepoint": "35319321baeb640359c54668a361e9ff72493f87",
       "targeted_tests": "20_OF_20_HOST_SIGNED_2103390_AND_MOCKS_PASS_DIRECT_LONGPRESS_UNIMPLEMENTED",
-      "fold": "NOT_VERIFIED"
+      "fold": "NOT_VERIFIED",
+      "input_fix_scope": "Already-authorized Group3 may implement a necessary native input path guarded by WINDOW_HOME and controls 8101/8102 with exact touch-hit poster and no short-tap double launch, only if Cobra/add-on rails/other paths retain original behavior; original source and Fold acceptance required."
     },
     "04": {
       "name": "Player OSD and three translucent glass menus",
@@ -832,7 +834,7 @@
     "commit_every_green_milestone_and_group_before_advancing": true,
     "not_permission_to_build_or_edit_automatically": true
   },
-  "last_user_instruction": "Move on to three. User authorizes Group #3 approved exact Option B Movie and TV top-rail long-press details; Group #1 and Group #2 remain saved unfinished.",
+  "last_user_instruction": "Preservation is mandatory but does not prohibit implementing the needed approved repair, including a narrowly guarded shared-source/native correction proven not to affect Cobra or any other Infinity behavior. Keep other groups paused; no additional re-authorization for in-scope isolated fixes.",
   "last_verified_group1_checkpoint": "f436c0e9f79066803f9dd98fa2c453dff7f32f82",
   "group_1_latest_receipts": [
     "repairs/2103390-bugfixes/receipts/GROUP01-TASK04-CLOCK-ORIGIN-TESTED-20261019.md",
@@ -1054,8 +1056,31 @@
     "shutdown_edited": false,
     "original_group1_group2_stages_preserved": true,
     "receipt": "repairs/2103390-bugfixes/receipts/GROUP03-OPTION-B-MODAL-20HOST-INPUT-BLOCK-20261019.md",
-    "receipt_commit": "35319321baeb640359c54668a361e9ff72493f87"
+    "receipt_commit": "35319321baeb640359c54668a361e9ff72493f87",
+    "permission_for_isolated_native_input_fix": "CLARIFIED_ALLOW_WITH_STRICT_WINDOW_CONTROL_ID_AND_REGRESSION_GUARDS_NOT_IMPLEMENTED"
   },
   "group_3_signed_apk_status": "NONE — new first-party option B modal files staged in repo only; input not wired and neither APK nor Fold acceptance exists",
-  "group_3_physical_fold_status": "NOT_VERIFIED"
+  "group_3_physical_fold_status": "NOT_VERIFIED",
+  "preservation_clarification_20261019": {
+    "user_instruction": "Well, yes, we were strict about preserving Cobra and everything outside. However, if there is a fix that is needed to be, you can still preserve everything and do the fix that is needed.",
+    "meaning": "Do not stall an already authorized scoped repair merely because code is shared/native. Implement the necessary minimal guarded edit only if tests and diff establish no effect on Cobra, other controls or other work groups.",
+    "not_allowed": [
+      "Cobra source/data/UI/behavior modifications",
+      "changes outside active group",
+      "blind global input changes",
+      "unapproved extra features",
+      "data wipe",
+      "shutdown changes",
+      "unverified packaging or final lock"
+    ],
+    "requirement": "Use exact entry guards, source/member allowlist, negative Cobra/unrelated path regression, baseline identity and Fold acceptance gate; reject unsafe implementations.",
+    "active_group": "03",
+    "paused_groups": [
+      "01",
+      "02"
+    ],
+    "status": "DOCUMENTATION_ONLY_PERMISSIONS_CLARIFIED_NO_RUNTIME_CODE_CHANGED",
+    "governing_contract": "repairs/2103390-bugfixes/GROUPED-01-07-BINDING-CONTRACT.md",
+    "contract_commit": "00b43672523a48c72debb9e8f1f85fffd65fe8d5"
+  }
 }
