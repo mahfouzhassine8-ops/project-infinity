@@ -1,3 +1,11 @@
+# ARCHIVED BF-DRAFT HANDOFF — DO NOT USE FOR NEW CHAT PROGRESS
+
+**IMPORTANT:** The separate BF-01–BF-16 draft was superseded to prevent competing task numbering and two progress logs. The SOLE live handoff is **repairs/2103390-bugfixes/CONTINUE-HERE.md**. The single controlling task scope is **repairs/2103390-bugfixes/REPAIR-CONTRACT-01-18.md**. Current status is **repairs/2103390-bugfixes/TASK-STATUS.json**. Use **tasks 01–18**, not BF aliases, for ALL future user-selected fixes and saved receipts.
+
+To interpret historical BF mentions see **repairs/bugfix-program-2103390/DRAFT-BF-ALIAS-TO-CANONICAL-01-18.md**. The old handoff below is preserved for audit only, **must not be updated after this notice**, and never authorizes Cobra changes.
+
+---
+
 # INFINITY 2103390 — LIVE CONTINUATION HANDOFF (READ THIS FIRST)
 
 **Purpose:** recover the EXACT approved task-by-task bug-fix project from a new conversation. Saved in the actual GitHub project. Update immediately after EVERY individually completed task, code revision, failed test, or newly authorized scope change. Never rely only on a chat summary.
