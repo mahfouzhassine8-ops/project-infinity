@@ -1,0 +1,71 @@
+name: Infinity 2103391 | Exact All-in-One Source Merge Gate
+on:
+  push:
+    branches: [work/infinity-2103390-targeted-bugfixes]
+    paths:
+      - 'repairs/2103390-bugfixes/group7/**'
+      - '.github/workflows/infinity-2103391-integration-source.yml'
+  workflow_dispatch:
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-2103391-combine-source, cancel-in-progress: false}
+jobs:
+  exact-merge:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39173982272
+          name: Infinity-2103390-Exact-Nine-Combined-EXPERIMENTAL-NOT-FOLD-QUALIFIED
+          github-token: ${{ github.token }}
+          path: immutable-2103390
+      - name: Require actual permanently signed original baseline bytes
+        run: |
+          python - <<'PY'
+          import hashlib,os,zipfile
+          from pathlib import Path
+          sha="778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb"
+          found=[]
+          for file in Path("immutable-2103390").rglob("*"):
+              if not file.is_file():continue
+              if file.suffix==".apk":found.append(file.read_bytes())
+              if file.suffix==".zip":
+                  with zipfile.ZipFile(file) as z:
+                      for n in z.namelist():
+                          if n.endswith("Infinity-2103390-Nine-Item-Integration-EXPERIMENTAL.apk"):
+                              found.append(z.read(n))
+          matches=[data for data in found if hashlib.sha256(data).hexdigest()==sha]
+          assert len(matches)==1, "Wrong signed original, refuse integration"
+          path=Path("original-2103390.apk")
+          path.write_bytes(matches[0])
+          with zipfile.ZipFile(path) as z:
+              assert z.testzip() is None and len(z.namelist())==7430
+          with open(os.environ["GITHUB_ENV"],"a") as e:
+              e.write("INFINITY_2103390_APK="+str(path.resolve())+"\n")
+          PY
+      - name: Execute full-source cross-group original SHA and all 10 merge cases
+        run: |
+          python -m unittest discover -s repairs/2103390-bugfixes/group7 -p 'test_*.py' -v
+          python repairs/2103390-bugfixes/group7/stage_all_in_one.py original-2103390.apk > INFINITY-2103391-SOURCE-READY.json
+          python - <<'PY'
+          import json
+          r=json.load(open("INFINITY-2103391-SOURCE-READY.json"))
+          assert r["source_modified_original_members"]==125
+          assert r["source_added_first_party_members"]==2
+          assert r["task19_movies_tv_reload"]=="DEFERRED_UNFIXED"
+          assert r["group5_sigsegv_139"]=="ROOT_CAUSE_UNPROVEN_NOT_FIXED"
+          assert r["compiled_android_engine_in_this_step"] is False
+          assert r["signed_apk_in_this_step"] is False
+          print("Only exact scoped sources ready, now require native Android build")
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-2103391-Source-Merge-Receipt-NOT-APK
+          path: INFINITY-2103391-SOURCE-READY.json
+          retention-days: 90
+          if-no-files-found: warn
