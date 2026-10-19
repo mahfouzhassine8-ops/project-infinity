@@ -1,3 +1,13 @@
+# SEVEN-GROUP PROJECT — CONTROL NOTICE (READ BEFORE HISTORICAL TASK 01–19 DETAIL)
+
+**CANONICAL USER WORK UNIT IS NOW GROUP #1–#7**, documented in `repairs/2103390-bugfixes/GROUPED-01-07-BINDING-CONTRACT.md`. The original 01–19 numbers below remain unchanged as fine-grained acceptance subrequirements, not standalone work-order numbers. The old Lyrics repair task 16 is SKIPPED_BY_USER. The NEW **GROUP #6 is Silent Mode inside Infinity's System Hub**; do NOT confuse it with original task 06 (Add-on Browser root), which belongs to Group #2. Group approval does not mean implementation has started.
+
+The user approved the three translucent Playback / Video Settings / Audio & Subtitles menu materials “Prefect bite to bite.” Exact approved design is `repairs/2103390-bugfixes/PLAYER-GLASS-MENUS-APPROVED-20261019.md`, superseding earlier glass visual “approval pending” language below. All real existing player labels, controls, theme tokens, codecs and playback video remain protected. The approved grouped scope and original 01–19 subrequirement contracts must BOTH pass their distinct acceptance checks.
+
+The authoritative actual progress, skipped items, source commits, tests and physical Fold results live ONLY in `repairs/2103390-bugfixes/TASK-STATUS.json` and `repairs/2103390-bugfixes/CONTINUE-HERE.md`. Save both after every green milestone, item and group. **Cobra is never touched.** Original signed 2103390 provisional base and locked 2103384 shutdown remain preserved. No new code implemented from this documentation note.
+
+---
+
 # INFINITY 2103390 — EXACT NEW BUG-FIX CONTRACT (TASKS 01–19)
 
 **THIS FILE IS THE AUTHORITATIVE CONTROLLING CONTRACT FOR THE NEW POST-2103390 WORK (01–19).** It is NOT the historical #1–16 repair list, which is already included in the signed 2103390 experiment. The numbering here is separate. The user will authorize/advance tasks by exact number, one at a time, followed by a single reviewed integration. Never conflate these task numbers with historical repairs.
