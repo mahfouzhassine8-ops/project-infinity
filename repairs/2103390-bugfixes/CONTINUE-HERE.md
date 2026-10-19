@@ -1,5 +1,39 @@
 # CURRENT PRIMARY HANDOFF — SEVEN WORK GROUPS, GROUP #6 SILENT MODE
 
+## NEWEST GROUP #1 SOURCE CHECKPOINT — OCT 19 NUMERIC CONTINUE CARD AND NAVIGATION AUDIT
+
+**USER AUTHORIZATION: CONTINUE GROUP #1 ONLY.** Cobra ABSOLUTELY off limits; likewise Essential-First shutdown, other Infinity work groups, third-party plugins and installed user data. **GROUP #1 STILL IN PROGRESS, NOT COMPLETE.** Current actual original signed APK `2103390` remains unchanged. **NO new signed APK**, no install/Fold pass, no user lock.
+
+**NEW TASK #03 SOURCE CHANGE — DEFAULT FOLD HORIZONTAL POSTER TOUCH DIMENSIONS**
+- Exact original signed 2103390 default skin is `skin.infinity.diggz` 1.0.5.228, with default `<res width="1080" height="2400" aspect="9:20" default="true" folder="unified"/>`.
+- In ORIGINAL default `unified/Home.xml`, Continue Watching Movies panel ID `8830` and TV Shows ID `8831` have `<itemlayout width="auto" height="97.619048%" aspectratio="0.561219512">` and identical focused layout dimensions. Kodi upstream reads numeric list item width/height with `QueryFloatAttribute`; invalid width can default to the entire parent width, misaligning poster touch cell and horizontal scrolling. **Other 13 original Home layout variants ALREADY use correct numeric 230.1 × 410 card dimensions.**
+- **SOURCE PATCH COMMITTED:** `repairs/2103390-bugfixes/group1/continue_horizontal_touch_patch.py` commit `d6ba53d7317e379044a23062434ff128f5b39cf2`, verified Git blob `47c2b02ed6cd96a65453be6270cab01ab5243829`. Exact immutable unified Home preimage SHA-256 `61fe23defed0536ce24f7c6d2d9b6beed5c0f3b8d04a33809a929a6b1f2532be`. Only **four layout tags** change: the item/focused dimensions of panels 8830 and 8831 to `width="230.1" height="410"`. All other existing Home item art, playback routes, visibility, navigation, formatting and XML remain byte-equivalent. No other 13 Home files changed.
+- **TESTS COMMITTED** `group1/test_continue_horizontal_touch_patch.py` at `bd0ecbf5c608b649e5dcedbd8546174ab1e3f59b`, **6/6 host PASS**. Separate `group1/test_group1_scope_apk_15.py` at `a07b7840ed835e98c54e5c389ce347f07dd9d946`, **1/1 full real signed APK virtual scope PASS**.
+- **CURRENT VIRTUAL APK SCOPE: 15 of 7430 MAY CHANGE, 7415 UNCHANGED.** The 15: previously staged 10 Home orb include XML, 1 Command Center TV `plugin.py`, 1 movie `resume_hub.py`, 2 first-party UI Repair/Watched Bridge expected SHA JSON, plus 1 default `unified/Home.xml` for both narrow touch fixes. No file deletion/addition, no Cobra, no native, no shutdown, no provider, no guarded controller *executable* logic change. Previous 14- and 12-member virtual checks are HISTORICAL and MUST NOT be used for future combined packaging.
+- **NO PHYSICAL INPUT PROOF.** This corrects a tangible source-level layout defect; real one-finger swipe/accurate tapped poster/no accidental tap-on-drag/offset restoration on actual Fold are still **RED**. The VERTICAL compact Resume from [time] / Play from beginning chooser is **NOT FIXED**; do NOT globally change Android touch/Kodi native/DialogSelect without an exact first-party-only scope proof.
+- Source receipt: `repairs/2103390-bugfixes/receipts/GROUP01-TASK03-DEFAULT-FOLD-HORIZONTAL-15MEMBER-20261019.md`, saved at commit `6613f6dbed514bdbaaafb1b96c66a138b9fad663`.
+
+**NEW TASK #19 READ-ONLY NAVIGATION/FETCH INVESTIGATION — NOT A FIX**
+- Exact original signed Home (all 14 variants) shows category selector ID 9000: **focus/selection** changes `Container(9000).ListItem.Property(section)` and show/hide of corresponding widget panels. But **click activation** is originally `ActivateWindow(Videos,...)`, which leaves Home and may legitimately lead to window reinit on return. Neither source proves which event the user's Fold video shows; do not remove these existing navigation actions.
+- Movie and TV normal latest-release panels 8101/8102 are **Umbrella-owned**. Movies and TV Continue Watching panels 8830/8831 are **Infinity first-party UI Repair/Command Center**. The original retains distinct revision properties. The previous in-app diagnostics confirmed 20 new Continue Watching jobs under one stable data revision over ~49.584 seconds (not a proven invalidation reason). Fixing only CC snapshot cache or deleting Umbrella refresh is not supported.
+- Read-only audit `group1/home_category_contract.py` source commit `6dcb0ce4d1003e4e7cda4352f8b9fcc72ee33f8c`; tested `group1/test_home_category_contract.py` commit `52c1840810dee5e74419101c1fab499226f6cfbf`, **5/5 host PASS**. No source/provider behavior changed for #19.
+- Receipt: `repairs/2103390-bugfixes/receipts/GROUP01-TASK19-HOME-SELECT-VS-ACTIVATE-20261019.md`, saved `7e341678e337405b4f646bf08ddcff5d778c34f6`. #19 RED: need cause-correlated Fold visibility/URL/provider reset/Window activation trace, user changes refresh correctness, and both Umbrella+CC rail retention.
+
+**LAST EXECUTED COMBINED HOST RUN**:
+```
+cd repairs/2103390-bugfixes/group1
+python -m unittest -v test_home_category_contract test_continue_horizontal_touch_patch test_group1_scope_apk_15 test_cc_preimage_contract_patch
+```
+**17/17 PASS** using original signed 2103390 locally: five navigation read-only audits, six #03 layout tests, one 15-member virtual APK firewall, five first-party pinned controller compatibility tests. The earlier **19/19** host run is a separate historical run: DO NOT claim 36 distinct tests or a single 36/36 run.
+
+**STATUS TRACKER** `TASK-STATUS.json` updated by commit `edeaf2db13a84d24b90a0fb0e2dbcd4e1f97a68e`. SOURCE ONLY, no combined/signed APK, no Fold; all prior validated source patches preserved.
+
+**NEXT GROUP #1 work**: narrowly scoped vertical Resume/Play chooser without global dialogs, real swipe and focused selection physical proof, #19 root-cause isolation and source correction for category blanking, TV user episode evidence, actual duplicate Insidious identity, clock/orb physical proof. #01/#02/#04 still source-staged only. SlyGuy/Lyrics work stays USER-SKIPPED. After all Group #1 gates, user authorizes any Group #7 combined build/final lock separately. Older handoff paragraphs below listing 12 or 14 members or "task03 not started" are historical and superseded by THIS section.
+
+---
+
+
+
 ## DUAL CONTROLLER-CONSUMER COMPATIBILITY — NEWEST VERIFIED GROUP #1 CHECKPOINT (2026-10-19)
 
 **THIS CHECKPOINT SUPERSEDES THE PREVIOUS `12 OF 7,430` POTENTIAL-APK MEMBER ASSUMPTION.** User's latest authorization remains **CONTINUE GROUP #1 ONLY**. No new signed APK, no package modification, no Fold proof, no user lock; **Group #1 STILL RED**. Cobra, Essential-First shutdown, all other Infinity groups and third-party add-ons remain untouchable.
