@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "state": "INTEGRATION_HOST_PREFLIGHT_PASSED_NOT_A_COMPLETE_ANDROID_BUILD",
+  "user_instruction": "proceed with intergration",
+  "repository": "mahfouzhassine8-ops/project-infinity",
+  "branch": "work/infinity-2103391-pro-seven-group-audit-20261019",
+  "integration_start_commit": "f98cf6b395990e6c16ddfd500b9002081afd3291",
+  "initial_successful_preflight": {
+    "run_id": 39372410626,
+    "source_commit": "1e5fc0099b9cdc9d9aeab38b650d62bdd62ef48c",
+    "artifact_id": 12241718533,
+    "artifact_sha256": "e82f1decdb4f9fe7f8866bd6e703d7264ec78120ac5a0ca127cad03f697a9c3b",
+    "name": "Infinity-2103392-Integration-Preflight-Reports-NOT-APK"
+  },
+  "confirmed_repeat_preflight": {
+    "run_id": 39373913098,
+    "source_commit": "fc179309ce126a6799ea355cfb6c09647c454807",
+    "preflight_step_passed": true,
+    "overall_run_passed": false,
+    "later_failure": "Assembled DEX protected-class comparison rejected unexpected differences; diagnostic tracing required.",
+    "artifact_id": 12242730959,
+    "artifact_sha256": "36e2293a8d98008ab14472266cb27b92f218e71a89c3f198a13f11b59c999587"
+  },
+  "source_apk_sha256": "47609f2ada1d6bbc7cdbddb791d11815bdbf1100a083bd8205d60ac21c882151",
+  "source_apk_run": 39348480827,
+  "source_native_commit": "7bd9b1085d598789e9e803b4b76ee1429e1df7e3",
+  "protected_2103390_sha256": "778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb",
+  "host_suites": [
+    {"group":1,"passed":53,"skipped":0,"physical_fold_verified":false},
+    {"group":2,"passed":20,"skipped":0,"physical_fold_verified":false},
+    {"group":3,"passed":26,"skipped":0,"physical_fold_verified":false},
+    {"group":4,"passed":10,"skipped":0,"physical_fold_verified":false},
+    {"group":5,"passed":10,"skipped":0,"physical_fold_verified":false,"scope":"forensic identity; not crash root-cause repair"},
+    {"group":6,"passed":10,"skipped":0,"physical_fold_verified":false},
+    {"group":7,"passed":22,"skipped":0,"physical_fold_verified":false},
+    {"suite":"coherent92 real-file C++/Java and coordinator checks","passed":16,"skipped":0,"platform_peers_are_test_doubles":true},
+    {"suite":"new integration adapters","passed":15,"skipped":0,"full_native_ledger_fixtures_are_synthetic":true}
+  ],
+  "total_passed": 182,
+  "total_skipped": 0,
+  "group2_native_fixture_gap_closed": {
+    "source": "xbmc/xbmc 21.3-Omega",
+    "file_count": 4,
+    "each_source_sha256_matches_original_2103391_build_before_ledger": true,
+    "each_patched_sha256_matches_original_2103391_build_after_ledger": true,
+    "full_9404_file_native_checkout_reconstructed": false
+  },
+  "source_integration_adapters": {
+    "files": ["integration.py", "test_integration.py", "preflight.py"],
+    "staged_addon_changes": 8,
+    "staged_native_changes": 2,
+    "staged_java_changes": 1,
+    "complete_native_binding_requires": 9404,
+    "real_complete_native_binding_executed": false,
+    "old_native_source_and_all_compiler_maps_must_match_before_binding": true,
+    "original_inputs_backed_up_before_native_binding": true,
+    "unexpected_java_class_changes_rejected": true,
+    "candidate_apk_scope_checker_executed_on_new_apk": false
+  },
+  "independent_delivery_gates": {
+    "host_preflight": "PASS",
+    "java_verifier_javac_and_d8_compilation": "EXECUTED_IN_RUN_39373913098",
+    "assembled_dex_preservation": "REJECTED_PENDING_EXACT_DIFF_DIAGNOSIS_AT_THIS_CHECKPOINT",
+    "native_full_source_binding": "NOT_EXECUTED",
+    "native_arm64_compilation": "NOT_STARTED",
+    "complete_signed_apk": "NOT_CREATED",
+    "android_art_runtime": "NOT_EXECUTED",
+    "physical_fold": "NOT_VERIFIED"
+  },
+  "earlier_native_workflow_block": "OpenAI tool safety control rejected the earlier native-input submission. This integration preflight does not retry or replace that blocked native build.",
+  "protected_outcomes": {
+    "original_signed_apk_unchanged": true,
+    "cobra_source_modified": false,
+    "user_data_modified": false,
+    "providers_modified": false,
+    "shutdown_owner_counts_or_deadlines_changed": false,
+    "new_features": false,
+    "user_final_lock": false
+  },
+  "open": [
+    "Resolve exact DEX round-trip differences without waiving protected instructions",
+    "Full native reconstruction, exact source-map binding, ARM64 compilation and provenance",
+    "Complete package member proof, permanent signing and coordinated install-over delivery",
+    "Actual Android/Kodi Close and reopen, followed by physical Fold acceptance of all seven groups",
+    "Original SIGSEGV faulting instruction and root cause",
+    "Group1 task19 remains explicitly deferred"
+  ],
+  "historical_results_note": "The previous 13 persistence tests remain saved separately; they are not added to this 182-test run or represented as rerun here. Later integration receipts may supersede the DEX gate, but do not overwrite these historical results."
+}
