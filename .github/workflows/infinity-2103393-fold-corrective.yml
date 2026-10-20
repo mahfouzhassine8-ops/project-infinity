@@ -11,7 +11,7 @@ permissions:
   actions: read
 concurrency:
   group: infinity-2103393-fold-corrective
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   components:
     name: Reuse all seven groups, verify corrections and execute actual DEX on Android 17

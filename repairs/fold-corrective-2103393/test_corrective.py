@@ -158,6 +158,14 @@ class Corrective(unittest.TestCase):
             dots=[n for n in b.iter('control') if n.findtext('texture')=='infinity_experience/health-orb.png' and n.findtext('visible')=='Skin.HasSetting(Infinity.SilentMode)']
             self.assertEqual(len(dots),1)
             self.assertEqual(dots[0].find('texture').get('colordiffuse'),'FF24A8FF')
+            # The unified row has local coordinates; alternate layouts have
+            # absolute pixel/percentage row coordinates. Match the relative
+            # vertical offset rather than copying the red dot's global top.
+            owner=next(n for n in a.iter() if a.find('.//control[@id="1191103"]') in list(n))
+            red=next(n for n in owner.findall('control') if n.findtext('texture')=='infinity_experience/health-orb.png')
+            from decimal import Decimal
+            number=lambda node,tag:Decimal(node.findtext(tag).rstrip('%'))
+            self.assertEqual(number(dots[0],'top')-number(row,'top'),number(red,'top')-number(a.find('.//control[@id="1191103"]'),'top'))
             self.assertFalse(row.findall('selected'))
         self.assertEqual(count,13)
 

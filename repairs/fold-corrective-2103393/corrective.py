@@ -7,6 +7,7 @@ The complete parent hash and the committed member ledger are mandatory build inp
 from __future__ import annotations
 import argparse
 import base64
+from decimal import Decimal
 import hashlib
 import json
 from pathlib import Path
@@ -161,7 +162,15 @@ def silent_row(raw):
     dots = [c for c in owner.findall('control') if c.findtext('texture') == 'infinity_experience/health-orb.png']
     require(len(dots) == 1, 'missing/ambiguous independent Health Center dot')
     dot = dots[0]
-    geo = ''.join('<'+k+'>'+dot.findtext(k)+'</'+k+'>' for k in ('left','right','top','width','height') if dot.findtext(k) is not None)
+    require(root.findtext('left')==health.findtext('left') and root.findtext('width')==health.findtext('width'),
+            'Silent/Health row horizontal bounds differ')
+    tops=[dot.findtext('top'),health.findtext('top'),root.findtext('top')]
+    require(all(t is not None for t in tops) and len({t.endswith('%') for t in tops})==1,
+            'incompatible dot/row coordinate units')
+    blue_top=Decimal(tops[0].rstrip('%'))-Decimal(tops[1].rstrip('%'))+Decimal(tops[2].rstrip('%'))
+    blue_top=format(blue_top.normalize(),'f')+('%' if tops[0].endswith('%') else '')
+    geo = ''.join('<'+k+'>'+(blue_top if k=='top' else dot.findtext(k))+'</'+k+'>'
+                  for k in ('left','right','top','width','height') if dot.findtext(k) is not None)
     new = ('''<control type="button" id="1191108"><label>Silent Mode</label>
 <font>InfinitySmall</font><align>left</align><aligny>center</aligny>
 <textoffsetx>84</textoffsetx><textoffsety>0</textoffsety>
