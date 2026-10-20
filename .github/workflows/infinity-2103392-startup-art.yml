@@ -1,0 +1,102 @@
+name: Infinity 2103392 | Existing startup DEX Android ART (no APK)
+on:
+  push:
+    branches: [work/infinity-2103391-pro-seven-group-audit-20261019]
+    paths:
+      - 'audits/2103392-art-component/**'
+      - '.github/workflows/infinity-2103392-startup-art.yml'
+  workflow_dispatch:
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-2103392-existing-startup-art, cancel-in-progress: false}
+jobs:
+  existing-startup-component:
+    name: Execute exact previously built CC22 verifier on disposable Android ART
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11'}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@be39fa834029ff78f1a44aa3bb0819b8fc2bd8fd
+        with:
+          packages: 'platform-tools build-tools;34.0.0 platforms;android-34'
+          cmdline-tools-version: '15859902'
+          log-accepted-android-sdk-licenses: false
+      - name: Require test-result guards before invoking Android
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s audits/2103392-art-component -p 'test_runner.py' -v 2>&1 | tee art-host-guards.log
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          run-id: 39348480827
+          name: Infinity-2103391-All-In-One-EXPERIMENTAL-NOT-FOLD-QUALIFIED
+          github-token: '${{ github.token }}'
+          path: audit-original
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          run-id: 39376264712
+          name: Infinity-2103392-Verified-Startup-DEX-COMPONENT-NOT-INSTALLABLE
+          github-token: '${{ github.token }}'
+          path: startup-component
+      - name: Verify original DEX fingerprints and compile only the disposable test entrypoint
+        run: |
+          set -euo pipefail
+          APK="$(find audit-original -type f -name 'Infinity-2103391-All-In-One-Bugfix-EXPERIMENTAL.apk')"
+          test -f "$APK"
+          python3 audits/2103392-art-component/run.py prepare \
+            --apk "$APK" --component startup-component --out art-output \
+            --build-tools "$ANDROID_HOME/build-tools/34.0.0" \
+            --android-jar "$ANDROID_HOME/platforms/android-34/android.jar"
+          git diff --exit-code
+      - name: Require the exact Android17 image and prepare the isolated emulator
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y libpulse0
+          python3 repairs/four-repair-20261018/android37_gate.py \
+            --sdk-root "$ANDROID_HOME" --out api37-support --pin-tools
+          python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out emulator-setup
+          sudo chmod 666 /dev/kvm
+      - name: Execute existing bytecode and all thirteen file-identity rejection cases on ART
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: '37.0'
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disk-size: 8G
+          avd-name: infinity-four-repair-api37
+          pre-emulator-launch-script: python3 repairs/four-repair-20261018/android37_gate.py --sdk-root "$ANDROID_HOME" --out api37-support --check-avd
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: python3 audits/2103392-art-component/run.py android --out art-output
+      - name: Require actual component execution without overclaiming full APK acceptance
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          r=json.load(open('art-output/ART-COMPONENT-VERIFICATION.json'))
+          assert r['passed'] and r['android_art_component_executed']
+          assert r['candidate_cases_passed']==37 and r['baseline_control_cases_passed']==1
+          assert r['platform']['api']==37 and r['platform']['release'].split('.')[0]=='17'
+          for key in ('tested_component_recompiled','native_engine_compiled','installed_app_started',
+                      'whole_process_shutdown_tested','actual_startup_apply_before_native_invoked',
+                      'new_signed_apk','physical_fold_verified','final_lock'):
+              assert r[key] is False,key
+          PY
+          git diff --exit-code
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: Infinity-2103392-Existing-Startup-ART-Evidence-NOT-APK
+          path: |
+            art-output/*.json
+            art-output/*-art.log
+            art-host-guards.log
+            api37-support/
+            emulator-setup/
+          retention-days: 90
+          if-no-files-found: error
