@@ -1,0 +1,384 @@
+name: Infinity 2103393 | Fold corrective source to signed individual APK
+on:
+  push:
+    branches: [work/infinity-2103393-fold-corrective-20261020]
+    paths:
+      - '.github/workflows/infinity-2103393-fold-corrective.yml'
+      - 'repairs/fold-corrective-2103393/**'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-2103393-fold-corrective
+  cancel-in-progress: false
+jobs:
+  components:
+    name: Reuse all seven groups, verify corrections and execute actual DEX on Android 17
+    runs-on: ubuntu-22.04
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0 platforms;android-34'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39396114522
+          name: Infinity-2103392-SIGNED-APK-AND-MATCHING-COMPONENTS-EXPERIMENTAL
+          github-token: '${{ github.token }}'
+          path: protected-2103392
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39348480827
+          name: Infinity-2103391-All-In-One-EXPERIMENTAL-NOT-FOLD-QUALIFIED
+          github-token: '${{ github.token }}'
+          path: audit-original
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39173982272
+          name: Infinity-2103390-Exact-Nine-Combined-EXPERIMENTAL-NOT-FOLD-QUALIFIED
+          github-token: '${{ github.token }}'
+          path: audit-parent
+      - name: Enforce corrective branch scope and prepare the already-pinned bytecode tools
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import subprocess
+          base='27d5f2fdfb64818134f988caf327f20b33160e1c'
+          paths=subprocess.check_output(['git','diff','--name-only',base,'HEAD'],text=True).splitlines()
+          assert paths and all(p.startswith('repairs/fold-corrective-2103393/') or p=='.github/workflows/infinity-2103393-fold-corrective.yml' for p in paths),paths
+          assert not any('cobra' in p.lower() for p in paths)
+          PY
+          sudo install -d -o "$(id -u)" -g "$(id -g)" /mnt/data
+          mkdir -p integration-preflight-output integration-tools
+          python3 -m pip install --disable-pip-version-check Pillow==11.3.0
+          cat > integration-tools/pom.xml <<'XML'
+          <project xmlns="http://maven.apache.org/POM/4.0.0">
+            <modelVersion>4.0.0</modelVersion>
+            <groupId>local.infinity.audit</groupId><artifactId>bytecode-inspection</artifactId><version>1</version>
+            <dependencies>
+              <dependency><groupId>org.smali</groupId><artifactId>baksmali</artifactId><version>2.5.2</version></dependency>
+              <dependency><groupId>org.smali</groupId><artifactId>smali</artifactId><version>2.5.2</version></dependency>
+            </dependencies>
+          </project>
+          XML
+          mvn -B -q -f integration-tools/pom.xml org.apache.maven.plugins:maven-dependency-plugin:3.6.1:build-classpath \
+            -Dmdep.outputFile="$GITHUB_WORKSPACE/integration-tools-classpath.txt"
+      - name: Retain all existing seven-group and exact-integration host regressions
+        run: |
+          set -euo pipefail
+          python3 repairs/2103390-bugfixes/group7/finish92/preflight.py \
+            2>&1 | tee integration-preflight-output/2103393-PREVIOUS-REGRESSIONS.log
+          git diff --exit-code
+      - name: Verify actual protected-APK corrections and produce the reviewed component stage
+        run: |
+          set -euo pipefail
+          export INFINITY_2103392_APK="$GITHUB_WORKSPACE/protected-2103392/Infinity-2103392-Coherent-Integration-EXPERIMENTAL.apk"
+          python3 -m unittest discover -s repairs/fold-corrective-2103393 -p 'test*.py' -v \
+            2>&1 | tee integration-preflight-output/2103393-CORRECTIVE-REGRESSIONS.log
+          python3 repairs/fold-corrective-2103393/corrective.py "$INFINITY_2103392_APK" component-stage93 \
+            > integration-preflight-output/2103393-MEMBER-DELTA.json
+          python3 repairs/fold-corrective-2103393/dex93.py \
+            --apk "$INFINITY_2103392_APK" --stage component-stage93 --out startup93 \
+            --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" \
+            --build-tools "$ANDROID_HOME/build-tools/34.0.0" --classpath-file integration-tools-classpath.txt
+          python3 repairs/fold-corrective-2103393/art93.py prepare \
+            --apk "$INFINITY_2103392_APK" --component startup93 --out art93 \
+            --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" \
+            --build-tools "$ANDROID_HOME/build-tools/34.0.0"
+          git diff --exit-code
+      - name: Prepare the exact previously verified Android 17 emulator
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y libpulse0
+          python3 repairs/four-repair-20261018/android37_gate.py --sdk-root "$ANDROID_HOME" --out api37-support --pin-tools
+          python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out emulator-setup
+          sudo chmod 666 /dev/kvm
+      - name: Execute the integrated production DEX and all thirteen file-rejection cases on ART
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: '37.0'
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disk-size: 8G
+          avd-name: infinity-four-repair-api37
+          pre-emulator-launch-script: python3 repairs/four-repair-20261018/android37_gate.py --sdk-root "$ANDROID_HOME" --out api37-support --check-avd
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: python3 repairs/fold-corrective-2103393/art93.py android --out art93
+      - name: Require the real Android result and package only verified build inputs
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,pathlib,shutil,os
+          r=json.load(open('art93/ART-COMPONENT-VERIFICATION.json'))
+          assert r['passed'] and r['candidate_cases_passed']==37 and r['baseline_control_cases_passed']==1
+          assert r['source_commit']==os.environ['GITHUB_SHA']
+          assert r['platform']['api']==37 and r['platform']['release'].split('.')[0]=='17'
+          out=pathlib.Path('ready93');(out/'component').mkdir(parents=True)
+          for src,dst in [('startup93/component/classes.dex','component/classes.dex'),
+                          ('startup93/STARTUP-DEX-INTEGRATION.json','STARTUP-DEX-INTEGRATION.json'),
+                          ('art93/ART-COMPONENT-VERIFICATION.json','ART-COMPONENT-VERIFICATION.json')]:
+              shutil.copyfile(src,out/dst)
+          PY
+          git diff --exit-code
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: Infinity-2103393-Verified-Startup-Input
+          path: ready93/
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-2103393-Source-DEX-ART-Diagnostics
+          path: |
+            integration-preflight-output/
+            startup93/*.json
+            startup93/*smali.txt
+            art93/*.json
+            art93/*art.log
+          retention-days: 90
+          if-no-files-found: error
+  build-and-sign:
+    name: Reconstruct 9404 sources, compile ARM64, permanently sign and deliver
+    needs: components
+    permissions: {contents: write, actions: read}
+    runs-on: ubuntu-22.04
+    timeout-minutes: 420
+    env:
+      NDK_VER: 21.4.7075529
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-build
+    steps:
+      - name: Checkout exact original native producer without modifying its source
+        uses: actions/checkout@v4
+        with:
+          ref: 7bd9b1085d598789e9e803b4b76ee1429e1df7e3
+          fetch-depth: 0
+          persist-credentials: false
+          show-progress: false
+      - name: Checkout reviewed integration and build adapters separately
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          path: release93
+          fetch-depth: 0
+          persist-credentials: false
+          show-progress: false
+      - name: Verify immutable producer and corrective-only release scope
+        run: |
+          set -euo pipefail
+          python3 - <<'PYTHON'
+          import subprocess
+          assert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()=='7bd9b1085d598789e9e803b4b76ee1429e1df7e3'
+          paths=subprocess.check_output(['git','-C','release93','diff','--name-only','27d5f2fdfb64818134f988caf327f20b33160e1c','HEAD'],text=True).splitlines()
+          assert paths and all(p.startswith('repairs/fold-corrective-2103393/') or p=='.github/workflows/infinity-2103393-fold-corrective.yml' for p in paths),paths
+          PYTHON
+          mkdir -p checkpoint-build
+          git -C release93 archive --format=tar.gz --output="$GITHUB_WORKSPACE/checkpoint-build/2103393-RELEASE-SOURCE.tar.gz" HEAD
+          git archive --format=tar.gz --output="$GITHUB_WORKSPACE/checkpoint-build/2103393-ORIGINAL-PRODUCER.tar.gz" HEAD
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - name: Install required native bootstrap dependencies on the build runner
+        run: |
+          set -euo pipefail
+          sudo apt-get -o Acquire::Retries=3 update -qq
+          sudo apt-get install -y python3-yaml python3-dev libsqlite3-dev libssl-dev
+          /usr/bin/python3 -c 'import yaml, sqlite3, ssl; print("Required system-Python bootstrap dependencies available")'
+      - uses: actions/cache@v4
+        with:
+          path: /usr/local/lib/android/sdk/ndk/21.4.7075529
+          key: infinity-pinned-ndk-linux-21.4.7075529-v1
+      - run: bash repairs/android-checkpoint-shutdown/install_ndk.sh
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 38132105717
+          name: Infinity-2103367-Verified-Compiler-Dependencies
+          github-token: ${{ github.token }}
+          path: dependency-transfer
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 38246713743
+          name: Cobra-2103374-Verified-Deadweight-Signed-Test-APK
+          github-token: ${{ github.token }}
+          path: locked-parent
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 38270097041
+          name: Cobra-2103375-File-Preview-Native-Signed-Test-APK
+          github-token: ${{ github.token }}
+          path: previous-candidate
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 38321848412
+          name: Cobra-2103376-Critical-Preview-Native-Evidence
+          github-token: ${{ github.token }}
+          path: locked-native-evidence
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 38493645998
+          name: Infinity-2103377-RC3-Exact-Native-Curl-Source
+          github-token: ${{ github.token }}
+          path: rc2-captured-source
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 38732470818
+          name: Infinity-2103377-Rails-Handoff-RC1-Native-Evidence
+          github-token: ${{ github.token }}
+          path: rails-locked-evidence
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 38975950035
+          name: Infinity-2103377-Essential-First-Native-Evidence
+          github-token: ${{ github.token }}
+          path: exact-test4-native
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39088898437
+          name: Infinity-2103384-Write-Integrity-Native-Evidence
+          github-token: ${{ github.token }}
+          path: locked-384-native
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39348480827
+          name: Infinity-2103391-All-In-One-EXPERIMENTAL-NOT-FOLD-QUALIFIED
+          github-token: ${{ github.token }}
+          path: original-2103391
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39396114522
+          name: Infinity-2103392-SIGNED-APK-AND-MATCHING-COMPONENTS-EXPERIMENTAL
+          github-token: ${{ github.token }}
+          path: protected-2103392
+      - uses: actions/download-artifact@v4
+        with:
+          name: Infinity-2103393-Verified-Startup-Input
+          path: ready93
+      - name: Restore verified compiler dependencies and cache without changing original scripts
+        run: |
+          set -euo pipefail
+          (cd dependency-transfer && sha256sum -c SHA256SUMS)
+          tar --no-same-owner -xf dependency-transfer/verified-android-dependencies.tar
+          tar --no-same-owner -xf dependency-transfer/verified-compiler-cache.tar -C "$HOME"
+          python3 repairs/android-checkpoint-shutdown/native_ci.py verify-dependencies
+          mkdir -p checkpoint-build
+          python3 repairs/shutdown-rc3-2103377/test_source.py --source rc2-captured-source --output checkpoint-build/RC3-HOST-VERIFICATION.json
+      - name: Reconstruct all original native sources using the successful immutable producer
+        run: |
+          set -euo pipefail
+          python3 repairs/four-repair-20261018/native_ci.py prepare \
+            --locked locked-parent/Cobra-2103374-Verified-Deadweight-RC1.apk \
+            --previous previous-candidate/Cobra-2103375-File-Preview-Native-RC1.apk \
+            --parent-proof locked-native-evidence --rails-proof rails-locked-evidence \
+            --test4-proof exact-test4-native --locked-384-proof locked-384-native \
+            2>&1 | tee checkpoint-build/2103393-RECONSTRUCTION.log
+          python3 repairs/2103390-bugfixes/group7/native_merge.py \
+            --native-root kodi --checkpoint checkpoint-build \
+            2>&1 | tee checkpoint-build/2103393-ORIGINAL-GROUP7.log
+          git diff --exit-code
+      - name: Bind only the two reviewed CC22 native corrections to the complete 9404-file inventory
+        run: |
+          set -euo pipefail
+          python3 release93/repairs/2103390-bugfixes/group7/finish92/delivery92.py bind \
+            --producer "$GITHUB_WORKSPACE" --parent-dir original-2103391 \
+            --stage coherent92-inputs --source-commit "$GITHUB_SHA" \
+            2>&1 | tee checkpoint-build/2103393-BINDING.log
+          git diff --exit-code
+          git -C release93 diff --exit-code
+      - name: Bind the exact corrective delta without weakening native source verification
+        run: |
+          set -euo pipefail
+          python3 release93/repairs/fold-corrective-2103393/delivery93.py bind \
+            --producer "$GITHUB_WORKSPACE" --parent-dir protected-2103392 \
+            --stage component-stage93 --source-commit "$GITHUB_SHA" \
+            2>&1 | tee checkpoint-build/2103393-CORRECTIVE-BINDING.log
+          git diff --exit-code
+          git -C release93 diff --exit-code
+      - name: Compile the complete matched ARM64 Kodi native engine
+        run: |
+          set -euo pipefail
+          python3 repairs/four-repair-20261018/native_ci.py compile \
+            2>&1 | tee checkpoint-build/2103393-NATIVE-COMPILATION.log
+          git diff --exit-code
+      - name: Assemble the reviewed corrective delta and require permanent signing and verification
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 release93/repairs/fold-corrective-2103393/delivery93.py assemble \
+            --producer "$GITHUB_WORKSPACE" --parent-dir protected-2103392 \
+            --stage component-stage93 --component ready93 --source-commit "$GITHUB_SHA" \
+            --out signed-2103393 \
+            2>&1 | tee checkpoint-build/2103393-DELIVERY.log
+          test -f signed-2103393/Infinity-2103393-Fold-Corrective-EXPERIMENTAL.apk
+          (cd signed-2103393 && sha256sum -c SHA256SUMS)
+          git diff --exit-code
+          git -C release93 diff --exit-code
+      - name: Publish only the verified signed APK and matching installation components
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-2103393-SIGNED-APK-AND-MATCHING-COMPONENTS-EXPERIMENTAL
+          path: signed-2103393/
+          retention-days: 90
+          compression-level: 0
+          if-no-files-found: error
+      - name: Deliver the actual individual APK and ZIP files as an immutable experimental prerelease
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG="infinity-2103393-fold-corrective-${GITHUB_RUN_ID}"
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --prerelease \
+            --title "Infinity 2103393 - Fold corrective experimental candidate" \
+            --notes-file release93/repairs/fold-corrective-2103393/RELEASE-NOTES.md \
+            signed-2103393/Infinity-2103393-Fold-Corrective-EXPERIMENTAL.apk \
+            signed-2103393/script.infinity.commandcenter-0.3.5.23.zip \
+            signed-2103393/script.infinity.watchedbridge-1.0.4.zip \
+            signed-2103393/script.infinity.uirepair-0.1.5.zip \
+            signed-2103393/skin.infinity.diggz-1.0.5.230.zip \
+            signed-2103393/script.infinity.rails-0.2.7.zip \
+            signed-2103393/INSTALLATION.txt signed-2103393/SHA256SUMS \
+            signed-2103393/COMPONENTS.json signed-2103393/INFINITY-2103393-DELIVERY.json \
+            signed-2103393/FINAL-SIGNATURE.txt signed-2103393/CORRECTIVE-ACCEPTANCE.md
+      - name: Retain precise build failure or provenance evidence separately from installation files
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-2103393-NATIVE-DELIVERY-DIAGNOSTICS
+          path: |
+            checkpoint-build/2103393-*.log
+            checkpoint-build/2103393-*.tar.gz
+            checkpoint-build/COHERENT92-ACTUAL-ORIGINAL-INPUTS/
+            checkpoint-build/COHERENT92-ORIGINAL-INPUTS/
+            checkpoint-build/ENGINE-PROOF.json
+            checkpoint-build/COHERENT92-*.json
+            checkpoint-build/FOLD93-*.json
+            checkpoint-build/FOLD93-ORIGINAL-INPUTS/
+            checkpoint-build/POST-BUILD-SOURCE-INVENTORY.json
+            checkpoint-build/LOCKED-SOURCE-COMPARISON.json
+          retention-days: 90
+          compression-level: 6
+          if-no-files-found: warn
