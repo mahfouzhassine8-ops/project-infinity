@@ -24,6 +24,26 @@ def functions(raw,names,namespace):
     exec(compile(ast.Module(body=selected,type_ignores=[]),'actual_component','exec'),namespace)
     return namespace
 
+def compiler_ledgers_peer():
+    # Match the captured producer schema: ten sparse changes, two full maps.
+    # The real CI binder separately verifies every byte of the 9404-file tree.
+    group7=['xbmc/addons/ContextMenus.cpp','xbmc/addons/gui/GUIDialogAddonInfo.cpp',
+            'xbmc/addons/gui/GUIWindowAddonBrowser.cpp','xbmc/addons/gui/GUIWindowAddonBrowser.h',
+            'xbmc/dialogs/GUIDialogKaiToast.cpp',native.CONTAINER,
+            'xbmc/guilib/GUIBaseContainer.h',native.INPUT]
+    names=set(group7)|native.PATHS
+    names.update('xbmc/compiler-schema-peer/%04d.cpp'%i for i in range(9404-len(names)))
+    locked={n:c.sha(('locked:'+n).encode()) for n in names}
+    sparse={n:c.sha(('CC22:'+n).encode()) for n in set(group7)|{native.CONTRACT,native.COORDINATOR}}
+    expected=dict(locked,**sparse)
+    delta={'after':sparse,'source_file_count':9404,'changed':sorted(sparse),
+           'coherent92_native_delta':sorted((native.CONTRACT,native.COORDINATOR)),
+           'group7_extra_native_delta':group7,'shutdown_changed':False,'locked':False}
+    maps=[{'after':dict(expected),'changed':sorted(sparse),'essential_owners_required':16},
+          {'after':dict(expected),'changed':sorted(sparse),'unknown_writes_abandoned':False}]
+    final=dict(expected,**{n:c.sha(('CC23:'+n).encode()) for n in native.PATHS})
+    return expected,locked,delta,maps,final,'a'*40
+
 class Corrective(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -355,6 +375,42 @@ int main(){
             self.assertIn(pin.encode(),helper)
         self.assertIn(b'getCanonicalFile()',helper)
         self.assertIn(b'4 * 1024 * 1024',helper)
+
+    def test_sparse_native_delta_reconstructs_both_full_compiler_maps(self):
+        args=compiler_ledgers_peer();original=copy.deepcopy(args)
+        updated=native.compiler_plan(*args)
+        self.assertEqual(args,original)
+        self.assertEqual(len(args[2]['after']),10)
+        self.assertEqual(len(updated[0]['after']),11)
+        self.assertEqual(dict(args[1],**updated[0]['after']),args[4])
+        self.assertEqual([p['after'] for p in updated[1:]],[args[4],args[4]])
+        self.assertEqual(updated[0]['group7_extra_native_delta'],args[2]['group7_extra_native_delta'])
+        self.assertFalse(updated[0]['shutdown_changed'])
+        self.assertEqual(updated[1]['essential_owners_required'],16)
+        self.assertFalse(updated[2]['unknown_writes_abandoned'])
+
+    def test_compiler_ledgers_reject_missing_or_changed_protected_sources(self):
+        for target in ('locked','sparse','compiler','preservation','corrective_scope'):
+            args=list(compiler_ledgers_peer())
+            with self.subTest(target=target),self.assertRaises(ValueError):
+                if target=='locked':args[1].pop(native.WINDOW)
+                elif target=='sparse':args[2]['after'].pop(native.CONTRACT)
+                elif target=='compiler':args[3][0]['after'].pop(native.WINDOW)
+                elif target=='preservation':args[3][1]['after'][native.WINDOW]='0'*64
+                else:args[4][args[2]['group7_extra_native_delta'][0]]='0'*64
+                native.compiler_plan(*args)
+
+    def test_compiler_ledgers_require_all_prior_native_groups_and_complete_maps(self):
+        for target in ('group7','CC22','sparse_hash','full_map_replaced_by_sparse','one_map','count'):
+            args=list(compiler_ledgers_peer())
+            with self.subTest(target=target),self.assertRaises(ValueError):
+                if target=='group7':args[2]['group7_extra_native_delta'].pop()
+                elif target=='CC22':args[2]['coherent92_native_delta'].pop()
+                elif target=='sparse_hash':args[2]['after'][native.CONTRACT]='0'*64
+                elif target=='full_map_replaced_by_sparse':args[3][0]['after']=dict(args[2]['after'])
+                elif target=='one_map':args[3].pop()
+                else:args[2]['source_file_count']=4501
+                native.compiler_plan(*args)
 
     def test_art_probe_separates_new_candidate_from_previous_candidate_baseline(self):
         digest='10366f343faf444493b992c49ae5cd0cee1b79545e1ad959e7bac4e93e168ec6'

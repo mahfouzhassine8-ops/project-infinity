@@ -10,6 +10,7 @@ import importlib.util
 import json
 import os
 from pathlib import Path
+import re
 import sys
 import corrective as c
 
@@ -111,6 +112,40 @@ def patches(before, original, final):
 def save(path,obj):
     path.write_text(json.dumps(obj,indent=2,sort_keys=True)+'\n')
 
+def compiler_plan(expected, locked, delta, compiler_maps, after_map, source_commit):
+    """Retain the producer's sparse delta and its two complete source ledgers."""
+    c.require(bool(re.fullmatch('[0-9a-f]{40}',source_commit)), 'full corrective commit required')
+    c.require(len(expected)==len(locked)==9404 and set(expected)==set(locked),
+              'complete protected compiler inventory required')
+    c.require(isinstance(delta.get('after'),dict) and delta.get('source_file_count')==9404,
+              'invalid original sparse compiler delta')
+    c.require(set(delta.get('coherent92_native_delta',[]))=={CONTRACT,COORDINATOR},
+              'complete CC22 native binding required')
+    group7=delta.get('group7_extra_native_delta',[])
+    c.require(len(group7)==len(set(group7))==8 and set(group7).issubset(delta['after']),
+              'original seven-group native delta missing')
+    c.require(all(expected.get(n)==h for n,h in delta['after'].items()) and
+              dict(locked,**delta['after'])==expected, 'sparse compiler delta mismatch')
+    c.require(set(after_map)==set(expected) and
+              {n for n in expected if after_map[n]!=expected[n]}==PATHS,
+              'unexpected corrective compiler source scope')
+    c.require(len(compiler_maps)==2, 'both complete compiler ledgers required')
+    updated=[]
+    for original in [delta]+list(compiler_maps):
+        if original is not delta:
+            c.require(isinstance(original.get('after'),dict) and original['after']==expected,
+                      'incomplete or mismatched full compiler ledger')
+        value=copy.deepcopy(original)
+        value['after'].update({n:after_map[n] for n in PATHS})
+        value['changed']=sorted(set(value.get('changed',[]))|PATHS)
+        value['source_commit']=source_commit
+        value['fold_corrective_2103393_delta']=sorted(PATHS)
+        updated.append(value)
+    c.require(dict(locked,**updated[0]['after'])==after_map and
+              all(value['after']==after_map for value in updated[1:]),
+              'corrective compiler ledger reconstruction mismatch')
+    return updated
+
 def bind(producer, parent, stage, source_commit):
     d,r,i=old_adapters()
     native=producer/'kodi';checkpoint=producer/'checkpoint-build'
@@ -130,16 +165,12 @@ def bind(producer, parent, stage, source_commit):
     ordering=driver.parent.parent.parent.parent.parent.parent.parent
     compiler=Path(ordering.native_manifest(ordering.stable())).resolve()
     paths=[checkpoint/'FOUR-REPAIR-INPUT-DELTA.json',compiler,checkpoint/'FINAL-SHUTDOWN-SOURCE-PRESERVATION.json']
+    c.require(len({p.resolve() for p in paths})==3, 'distinct original compiler ledgers required')
+    locked=json.loads((checkpoint/'LOCKED-2103384-SOURCE-MAP.json').read_text())
+    ledgers=[json.loads(p.read_text()) for p in paths]
+    updated=compiler_plan(expected,locked,ledgers[0],ledgers[1:],after_map,source_commit)
     replacements={native/n:b for n,b in after.items()}
-    for path in paths:
-        value=json.loads(path.read_text())
-        c.require(isinstance(value.get('after'),dict) and len(value['after'])>=4500, 'incomplete compiler ledger')
-        c.require(PATHS.issubset(value['after']) and all(expected.get(n)==h for n,h in value['after'].items()), 'compiler ledger mismatch')
-        value=copy.deepcopy(value)
-        value['after'].update({n:after_map[n] for n in PATHS})
-        value['changed']=sorted(set(value.get('changed',[]))|PATHS)
-        value['source_commit']=source_commit
-        value['fold_corrective_2103393_delta']=sorted(PATHS)
+    for path,value in zip(paths,updated,strict=True):
         replacements[path]=(json.dumps(value,indent=2,sort_keys=True)+'\n').encode()
     rollback=checkpoint/'FOLD93-ORIGINAL-INPUTS';c.require(not rollback.exists(),'corrective binding already exists')
     rollback.mkdir()
