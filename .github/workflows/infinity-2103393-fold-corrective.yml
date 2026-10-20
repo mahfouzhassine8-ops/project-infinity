@@ -342,7 +342,7 @@ jobs:
           name: Infinity-2103393-SIGNED-APK-AND-MATCHING-COMPONENTS-EXPERIMENTAL
           path: signed-2103393/
           retention-days: 90
-          compression-level: 0
+          compression-level: 6
           if-no-files-found: error
       - name: Deliver the actual individual APK and ZIP files as an immutable experimental prerelease
         if: success()

@@ -16,6 +16,7 @@ import xml.etree.ElementTree as ET
 import corrective as c
 import native93 as native
 import dex93
+import art93
 
 def functions(raw,names,namespace):
     tree=ast.parse(raw)
@@ -321,6 +322,17 @@ int main(){
             self.assertIn(pin.encode(),helper)
         self.assertIn(b'getCanonicalFile()',helper)
         self.assertIn(b'4 * 1024 * 1024',helper)
+
+    def test_art_probe_separates_new_candidate_from_previous_candidate_baseline(self):
+        digest='10366f343faf444493b992c49ae5cd0cee1b79545e1ad959e7bac4e93e168ec6'
+        source=art93.probe_source(digest)
+        self.assertIn('private static final String CANDIDATE = "'+digest+'";',source)
+        self.assertIn('private static final String BASELINE = "'+dex93.BASELINE+'";',source)
+        self.assertEqual(source.count(digest),1)
+        self.assertEqual(source.count(dex93.BASELINE),1)
+        self.assertIn('verifyReviewedController23',source)
+        self.assertIn('PASSED.size() == 37',source)
+        self.assertEqual(len(art93.expected(json.loads(self.after[c.UI+'/CONTROLLER-PREIMAGES.json']))),37)
 
     def test_option_b_first_favorite_and_stale_selection(self):
         mod=types.ModuleType('corrective93_option_b_runtime');sys.modules[mod.__name__]=mod

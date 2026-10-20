@@ -24,6 +24,17 @@ def old_runner():
 def expected(pins):
     return [name.replace('cc22','cc23') for name in old_runner().expected_cases(pins)]
 
+def probe_source(component_sha):
+    c.require(re.fullmatch('[0-9a-f]{64}',component_sha) is not None,'invalid tested component hash')
+    java=(c.ROOT/'audits/2103392-art-component/Controller22ArtProbe.java').read_text()
+    # Name the declarations, not just their old values: the old candidate is
+    # now the new negative baseline and deliberately has the same fingerprint.
+    for name,before,after in (('CANDIDATE',old_runner().CANDIDATE,component_sha),
+                              ('BASELINE',old_runner().BASELINE,d.BASELINE)):
+        java=c.once(java,'private static final String '+name+' = "'+before+'";',
+                         'private static final String '+name+' = "'+after+'";')
+    return java.replace('Controller22ArtProbe','Controller23ArtProbe').replace('verifyReviewedController22','verifyReviewedController23').replace('cc22','cc23').replace('CC22','CC23').replace('0.3.5.22','0.3.5.23')
+
 def prepare(apk,component,out,android,tools):
     c.require(not out.exists(),'ART output exists')
     proof=json.loads((component/'STARTUP-DEX-INTEGRATION.json').read_text())
@@ -45,10 +56,7 @@ def prepare(apk,component,out,android,tools):
         (inputs/'baseline.dex').write_bytes(z.read('classes.dex'))
         (inputs/'classes2.dex').write_bytes(z.read('classes2.dex'))
     c.require(c.digest(inputs/'baseline.dex')==d.BASELINE and c.digest(inputs/'classes2.dex')==d.SHARD2,'protected baseline changed')
-    java=(c.ROOT/'audits/2103392-art-component/Controller22ArtProbe.java').read_text()
-    java=c.once(java,'"'+old_runner().BASELINE+'"','"'+d.BASELINE+'"')
-    java=c.once(java,'"'+old_runner().CANDIDATE+'"','"'+proof['component_dex_sha256']+'"')
-    java=java.replace('Controller22ArtProbe','Controller23ArtProbe').replace('verifyReviewedController22','verifyReviewedController23').replace('cc22','cc23').replace('CC22','CC23').replace('0.3.5.22','0.3.5.23')
+    java=probe_source(proof['component_dex_sha256'])
     src=out/'Controller23ArtProbe.java';src.write_text(java)
     classes=out/'probe-classes';classes.mkdir()
     subprocess.run(['javac','--release','8','-g:none','-Xlint:all,-options','-Werror','-d',str(classes),str(src)],check=True)
