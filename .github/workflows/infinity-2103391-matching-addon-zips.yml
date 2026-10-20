@@ -1,0 +1,117 @@
+name: Infinity 2103391 | Matching skin and first-party addon ZIP delivery
+on:
+  push:
+    branches: [work/infinity-2103390-targeted-bugfixes]
+    paths:
+      - 'repairs/2103390-bugfixes/group7/export_matched_addons.py'
+      - '.github/workflows/infinity-2103391-matching-addon-zips.yml'
+  workflow_dispatch:
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-2103391-matched-zips, cancel-in-progress: false}
+jobs:
+  matched-kodi-installable-zip-set:
+    name: Export signed 2103391 skin, Command Center, UI Repair, Watched Bridge, Rails
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - name: Require exact permanently signed green 2103391 producer
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,os,urllib.request
+          repo=os.environ['GITHUB_REPOSITORY']
+          request=urllib.request.Request(
+              f'https://api.github.com/repos/{repo}/actions/runs/39348480827',
+              headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],
+                       'Accept':'application/vnd.github+json'})
+          with urllib.request.urlopen(request,timeout=30) as resp: run=json.load(resp)
+          assert run['status']=='completed' and run['conclusion']=='success'
+          assert run['head_sha']=='7bd9b1085d598789e9e803b4b76ee1429e1df7e3'
+          print('Verified green full-native and permanent-signing producer',run['id'])
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39348480827
+          name: Infinity-2103391-All-In-One-EXPERIMENTAL-NOT-FOLD-QUALIFIED
+          github-token: ${{ github.token }}
+          path: signed-2103391-source
+      - name: Verify signed APK metadata and original 2103391 payload
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          root=Path('signed-2103391-source')
+          apks=list(root.rglob('Infinity-2103391-All-In-One-Bugfix-EXPERIMENTAL.apk'))
+          proofs=list(root.rglob('INFINITY-2103391-SIGNED-EXPERIMENTAL.json'))
+          assert len(apks)==1 and len(proofs)==1,'Exactly one actual signed APK and receipt required'
+          apk=apks[0]
+          p=json.loads(proofs[0].read_text())
+          assert hashlib.sha256(apk.read_bytes()).hexdigest()==p['apk_sha256']
+          assert p['signed_permanently'] and p['signer_sha256']=='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
+          assert p['original_apk_sha256']=='778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb'
+          print('Source signed 2103391 APK verified:',p['apk_sha256'])
+          PY
+          APK="$(find signed-2103391-source -name 'Infinity-2103391-All-In-One-Bugfix-EXPERIMENTAL.apk' -type f)"
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs "$APK" > signed-apk-cert-proof.txt
+          grep -iq 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' signed-apk-cert-proof.txt
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$APK" | grep -F "package: name='com.projectinfinity.kodi' versionCode='2103391'"
+      - name: Export five self-contained Kodi install-over ZIPs from actual 2103391 APK
+        run: |
+          set -euo pipefail
+          APK="$(find signed-2103391-source -name 'Infinity-2103391-All-In-One-Bugfix-EXPERIMENTAL.apk' -type f)"
+          RECEIPT="$(find signed-2103391-source -name 'INFINITY-2103391-SIGNED-EXPERIMENTAL.json' -type f)"
+          python3 -m py_compile repairs/2103390-bugfixes/group7/export_matched_addons.py
+          python3 repairs/2103390-bugfixes/group7/export_matched_addons.py \
+            --signed-apk "$APK" \
+            --signed-receipt "$RECEIPT" \
+            --out delivery-2103391
+          (cd delivery-2103391 && sha256sum -c SHA256SUMS)
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,zipfile,xml.etree.ElementTree as ET
+          out=Path('delivery-2103391')
+          report=json.loads((out/'INFINITY-2103391-MATCHING-ZIPS.json').read_text())
+          assert report['standalone_addon_archives']==5
+          assert report['all_addon_code_identical_to_signed_apk_except_version_attributes']
+          assert not report['rails_new_logic_in_2103391']
+          assert not report['group5_native_SIGSEGV_139_fixed']
+          assert not report['physical_fold_tested'] and not report['user_final_lock']
+          assert report['no_uninstall_no_data_clear']
+          assert len(list(out.glob('*.zip')))==5
+          for item in report['archives']:
+              p=out/item['standalone_zip']
+              with zipfile.ZipFile(p) as z:
+                  assert z.testzip() is None
+                  assert ET.fromstring(z.read(item['addon_id']+'/addon.xml')).get('id') == item['addon_id']
+                  assert ET.fromstring(z.read(item['addon_id']+'/addon.xml')).get('version') == item['separately_installable_version']
+              print('Installable ZIP verified:',p.name,'files',item['source_members'])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: Infinity-2103391-Matching-Skin-UIRepair-CC-WatchedBridge-Rails-ZIPs
+          path: delivery-2103391/
+          retention-days: 90
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: Infinity-2103391-Matched-Addon-ZIP-Failure-Receipts
+          path: |
+            signed-apk-cert-proof.txt
+            delivery-2103391/INFINITY-2103391-MATCHING-ZIPS.json
+            delivery-2103391/INSTALL-ORDER.txt
+          retention-days: 90
+          if-no-files-found: warn
