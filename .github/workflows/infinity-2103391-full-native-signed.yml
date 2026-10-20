@@ -83,8 +83,9 @@ jobs:
         with: {fetch-depth: 0, persist-credentials: false}
       - uses: actions/setup-java@v4
         with: {distribution: temurin, java-version: '17'}
-      - uses: actions/setup-python@v5
-        with: {python-version: '3.11'}
+      # Match the previously passed 2103385 native producer: Ubuntu 22.04
+      # system Python3, not a hosted CPython 3.11 interpreter. The inherited
+      # interpreter-retirement host tests stay mandatory and unmodified.
       - uses: android-actions/setup-android@v4
         with:
           packages: 'platform-tools build-tools;34.0.0'
