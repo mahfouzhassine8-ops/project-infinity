@@ -21,6 +21,40 @@ def one(root,pattern):
     if len(paths)!=1:raise ValueError('Expected one '+pattern)
     return paths[0]
 
+def prepare_group1_fixtures():
+    """Use only unchanged first-party members of the verified parent APK.
+
+    These are temporary disposable-runner fixtures, not Android installations.
+    Native checkout omissions remain visible rather than replaced with stubs.
+    """
+    parent=Path(os.environ['INFINITY_2103390_APK'])
+    if c.digest(parent.read_bytes())!='778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb':
+        raise ValueError('Wrong original Group1 fixture APK')
+    alias=Path('/mnt/data/integrated-2103390')/parent.name
+    alias.parent.mkdir(parents=True,exist_ok=True)
+    if alias.exists():
+        if c.digest(alias.read_bytes())!=c.digest(parent.read_bytes()):raise ValueError('Existing fixture differs')
+    else:
+        os.link(parent,alias)
+    base=Path('/mnt/data/infinity_group1_review/base')
+    skin=Path('/mnt/data/skin.infinity.diggz-1.0.5.228-from-Infinity-2103390.zip')
+    cc_count=0;skin_count=0
+    with zipfile.ZipFile(parent) as src, zipfile.ZipFile(skin,'x',compression=zipfile.ZIP_DEFLATED) as dst:
+        for name in src.namelist():
+            if name.endswith('/'):continue
+            if name.startswith('assets/addons/script.infinity.commandcenter/'):
+                target=base/name
+                if not target.resolve().is_relative_to(base.resolve()):raise ValueError('Invalid fixture path')
+                target.parent.mkdir(parents=True,exist_ok=True)
+                target.write_bytes(src.read(name));cc_count+=1
+            elif name.startswith('assets/addons/skin.infinity.diggz/'):
+                dst.writestr(name[len('assets/addons/'):],src.read(name));skin_count+=1
+    if cc_count<13 or skin_count<14:raise ValueError('Incomplete verified Group1 fixtures')
+    (OUT/'group1-fixture-provenance.json').write_text(json.dumps(dict(
+        original_parent_sha256=c.digest(parent.read_bytes()),command_center_files=cc_count,
+        skin_members=skin_count,fixture_members_byte_identical_to_signed_parent=True,
+        native_checkout_synthesized=False,user_files_used=False),indent=2)+'\n')
+
 def main():
     apk=one('audit-original','Infinity-2103391-All-In-One-Bugfix-EXPERIMENTAL.apk')
     receipt=one('audit-original','INFINITY-2103391-SIGNED-EXPERIMENTAL.json')
@@ -80,6 +114,7 @@ def main():
                 self.assertEqual(patched,expected)
 '''
     stage(path,replace_once(text,old,new))
+    prepare_group1_fixtures()
     # Expose real fixture requirements so missing source cannot become a pass.
     fixtures=[]
     for p in sorted((ROOT/'repairs/2103390-bugfixes').glob('group*/test*.py')):
@@ -87,7 +122,7 @@ def main():
         for i,line in enumerate(lines):
             if any(x in line for x in ('environ','/mnt/data','ORIGINAL_TOAST','SOURCE_ROOT','skipUnless','BASE_DIR','ADDONS =','ADDONS=')):
                 fixtures.append(str(p.relative_to(ROOT))+':'+str(i+1)+': '+' | '.join(lines[max(0,i-1):min(len(lines),i+3)]))
-    (OUT/'fixture-requirements.txt').write_text('\n'.join(fixtures)+'\n')
+    (OUT/'fixture-requirements.txt').write_text('\n'.join(line.rstrip() for line in fixtures)+'\n')
     (OUT/'source-correction-scope.json').write_text(json.dumps(dict(before=before,after=after,
         old_apk_unchanged=True,new_apk_built=False,physical_fold_tested=False,
         old_apk_release_gate='REJECTED',native_change='three exact complete CC20 Group1 variants; all legacy variants and classification logic retained',
