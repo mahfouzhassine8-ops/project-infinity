@@ -1,8 +1,11 @@
 /* Build-time DEX packaging adapter. Not packaged into Infinity.
- * Uses the public dexlib2 2.5.2 writer API. The original definitions of all
- * protected classes are read directly from the signed APK's DEX shard.
+ * Uses version-pinned dexlib2 2.5.2 writer extension types. This build-only
+ * adapter shares the writer package because PoolClassDef is package-private.
+ * Protected definitions come directly from the signed APK's original DEX.
  * No preservation comparison is relaxed or normalized by this adapter.
  */
+package org.jf.dexlib2.writer.pool;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,9 +22,6 @@ import org.jf.dexlib2.iface.value.ArrayEncodedValue;
 import org.jf.dexlib2.iface.value.EncodedValue;
 import org.jf.dexlib2.immutable.value.ImmutableArrayEncodedValue;
 import org.jf.dexlib2.writer.io.FileDataStore;
-import org.jf.dexlib2.writer.pool.ClassPool;
-import org.jf.dexlib2.writer.pool.DexPool;
-import org.jf.dexlib2.writer.pool.PoolClassDef;
 
 public final class PreserveDexFields {
     private static final String TARGET =
@@ -42,8 +42,8 @@ public final class PreserveDexFields {
                 ended = true;  // No encoded value, not the encoded null constant.
             } else {
                 require(!ended, "Non-contiguous original static values: " + definition.getType());
-                // Unlike the default writer, retain explicitly encoded null,
-                // false and zero. Preserve the original vector's exact length.
+                // Retain explicitly encoded null, false and zero, including
+                // the original vector's exact length.
                 values.add(value);
             }
         }
@@ -120,8 +120,8 @@ public final class PreserveDexFields {
         require(original.keySet().equals(assembled.keySet()), "Assembled class set differs");
         ExactValuePool pool = new ExactValuePool(originalDex.getOpcodes());
         for (Map.Entry<String, ClassDef> item : original.entrySet()) {
-            // Protected classes never come from the assembler's transformed
-            // definitions. Only the reviewed startup class is replaced.
+            // Protected classes never come from transformed assembler definitions.
+            // Only the reviewed startup class is replaced.
             ClassDef selected = item.getKey().equals(TARGET) ? assembled.get(TARGET) : item.getValue();
             pool.internClass(selected);
         }
