@@ -5,9 +5,11 @@ Only distribution artifacts are written; do not edit signed APK, native engine,
 Cobra, shutdown, Rails code, provider/addon user data or feature scope.
 
 User-installed add-ons may supersede identically-ID'd APK embedded assets.
-For four changed add-ons, bump the standalone addon.xml version attribute only
-to make normal Kodi install-over upgrades unambiguous; every OTHER addon
-member must be byte-identical to the permanently signed 2103391 APK.
+Export must preserve EVERY signed member, including addon.xml. A required
+install-over version must be finalized across the controller, dependent guards
+and native compilation BEFORE signing, never invented by ZIP distribution.
+The original 2103391 binary is intentionally rejected by the coherence gate;
+this source correction is NOT an installable repair or downgrade instruction.
 
 Rails 0.2.7 is unchanged from the signed 2103391 package; include a matching
 reinstallable ZIP for older manually installed Rails. No invented Rails changes.
@@ -23,6 +25,8 @@ import re
 from xml.etree import ElementTree as ET
 from zipfile import ZIP_DEFLATED, ZipFile
 
+from release_coherence import require_export_coherence
+
 SIGNED_BASE_2103390 = "778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb"
 EXPECTED_CERT = "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7"
 EXPECTED_VERSION_CODE = 2103391
@@ -30,18 +34,13 @@ PREFIX = "assets/addons/"
 
 # ID / embedded 2103391 version / standalone install-over version / install order
 PACKAGES = (
-    ("script.infinity.commandcenter", "0.3.5.20", "0.3.5.21", 1),
-    ("script.infinity.watchedbridge", "1.0.1", "1.0.2", 2),
-    ("script.infinity.uirepair", "0.1.2", "0.1.3", 3),
+    ("script.infinity.commandcenter", "0.3.5.20", "0.3.5.20", 1),
+    ("script.infinity.watchedbridge", "1.0.1", "1.0.1", 2),
+    ("script.infinity.uirepair", "0.1.2", "0.1.2", 3),
     ("script.infinity.rails", "0.2.7", "0.2.7", 4),
-    ("skin.infinity.diggz", "1.0.5.228", "1.0.5.229", 5),
+    ("skin.infinity.diggz", "1.0.5.228", "1.0.5.228", 5),
 )
-EXPECTED_CHANGED_ADDONS = {
-    "skin.infinity.diggz",
-    "script.infinity.commandcenter",
-    "script.infinity.watchedbridge",
-    "script.infinity.uirepair",
-}
+EXPECTED_CHANGED_ADDONS = set()  # No manifest rewrites after native compilation/signing.
 REQUIRED_PATHS = {
     "skin.infinity.diggz": (
         "unified/Home.xml",
@@ -131,6 +130,8 @@ def export(apk: Path, signed_receipt: Path, out: Path) -> dict:
     if out == apk.parent or apk.is_relative_to(out):
         fail("refusing to modify or stage alongside signed APK")
     report = verify_signed_receipt(apk, signed_receipt)
+    # Before any output: manifest, controller and compiled native identity agree.
+    require_export_coherence(apk, PACKAGES)
     if not out.exists():
         out.mkdir(parents=True)
     if any(out.iterdir()):

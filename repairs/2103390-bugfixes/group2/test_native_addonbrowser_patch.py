@@ -29,9 +29,17 @@ class Group2NativePatch(unittest.TestCase):
             with self.subTest(filename=filename):
                 original=fixture(filename)
                 patched=p.patch_member(filename,original).decode()
+                expected=original.decode()
                 for old,new in p.PATCHES[filename]:
-                    self.assertIn(new,patched)
-                    self.assertNotIn(old,patched)
+                    self.assertEqual(expected.count(old),1)
+                    expected=expected.replace(old,new,1)
+                    self.assertEqual(patched.count(new),1)
+                    # Additive include/constructor hooks intentionally retain
+                    # the old text inside the replacement. Assert exact output,
+                    # not the false premise that every old substring vanishes.
+                    if old not in new:
+                        self.assertNotIn(old,patched)
+                self.assertEqual(patched,expected)
                 with self.assertRaises(ValueError):
                     p.patch_member(filename,patched.encode())
 

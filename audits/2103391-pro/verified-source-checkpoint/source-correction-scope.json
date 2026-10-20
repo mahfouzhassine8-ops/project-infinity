@@ -1,0 +1,29 @@
+{
+  "before": {
+    "repairs/android-checkpoint-shutdown/runtime/native/overlay/xbmc/platform/android/activity/InfinityScriptCheckpointContracts.cpp": "8ceb3b60518dc2ab48c0aed480b78e81585ef7c0f66a47b214975e0fac8d6c02",
+    "repairs/2103390-bugfixes/group7/export_matched_addons.py": "970830389d1be8fc6e66d338c558dbeaac68a95d6af4152610c4950753d9cda5",
+    "audits/2103391-pro/inspect_release.py": "7374f57eeb0321cda137040092c6c4c27821f83942c5826274c6c5ec42d35753",
+    "repairs/2103390-bugfixes/group2/test_native_addonbrowser_patch.py": "2b4f5d680c55927dee26d72ff643945e9b5a69d2b4cdff70c23d6207c0584d7f"
+  },
+  "after": {
+    "repairs/android-checkpoint-shutdown/runtime/native/overlay/xbmc/platform/android/activity/InfinityScriptCheckpointContracts.cpp": "8c9de99346b1e74a08cf8b00fd1f29acef514b07041d40ebbe2678700a59abc8",
+    "repairs/2103390-bugfixes/group7/export_matched_addons.py": "19b510015d52ff4b1d14abb2d02fd94825f39db7940390bcc351b7181061d2ac",
+    "audits/2103391-pro/inspect_release.py": "8c635dbc658b0432140d9fb545863e67f92cc35dd42bd0614419cd3f48cd06dc",
+    "repairs/2103390-bugfixes/group2/test_native_addonbrowser_patch.py": "ff35bee1ffe260969b893458879ece5cd810a4e221ed21deb63be55995ba66ee"
+  },
+  "old_apk_unchanged": true,
+  "new_apk_built": false,
+  "physical_fold_tested": false,
+  "old_apk_release_gate": "REJECTED",
+  "native_change": "three exact complete CC20 Group1 variants; all legacy variants and classification logic retained",
+  "no_shutdown_owner_count_or_policy_change": true,
+  "cobra_code_changed": false,
+  "known_open": [
+    "CC21 installed-profile recovery and duplicate resident ownership",
+    "full Android compilation and source ledgers",
+    "seven-group physical Fold acceptance",
+    "SIGSEGV 139 root cause",
+    "Group1 task19 deferred"
+  ],
+  "final_lock": false
+}

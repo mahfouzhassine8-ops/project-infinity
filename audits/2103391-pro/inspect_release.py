@@ -52,16 +52,16 @@ def main():
     report['embedded_versions']=manifests(embedded)
     report['standalone_versions']=manifests(installed)
     contract=ROOT/'repairs/android-checkpoint-shutdown/runtime/native/overlay/xbmc/platform/android/activity/InfinityScriptCheckpointContracts.cpp'
-    pairs=sorted(set(re.findall(r'\{\s*"([^"]+/[^"]+)"\s*,\s*"([0-9a-f]{64})"\s*\}',contract.read_text())))
-    assert pairs,'Could not parse native pinned contracts'
-    comparisons=[]
-    for path,expected in pairs:
-        for label,payload in [('embedded',embedded),('standalone',installed)]:
-            if path in payload:
-                actual=sha(payload[path])
-                comparisons.append({'payload':label,'path':path,'expected':expected,'actual':actual,'match':actual==expected,'pin_present_in_native_binary':expected.encode() in native})
+    import sys
+    sys.path.insert(0,str(ROOT/'repairs/2103390-bugfixes/group7'))
+    from release_coherence import controller_report
+    original_source=subprocess.check_output(['git','show','83df773b742dc3f7e576a90157a04c15bc61fdb3:'+str(contract.relative_to(ROOT))],cwd=ROOT,text=True)
+    comparisons=[dict(payload=label,**controller_report(payload,original_source,native))
+                 for label,payload in [('embedded',embedded),('standalone',installed)]]
     report['native_contract_comparisons']=comparisons
-    report['native_contract_mismatches']=[v for v in comparisons if not v['match']]
+    report['native_contract_mismatches']=[v for v in comparisons if not v['coherent']]
+    report['legacy_contract_variants_are_alternatives']=True
+    report['inactive_compat_072_preserved_not_activated']=True
     report['standalone_member_changes']=[{'path':n,'embedded_sha256':sha(embedded[n]) if n in embedded else None,'standalone_sha256':sha(v)} for n,v in installed.items() if embedded.get(n)!=v]
     excerpts=[]
     for label,payload in [('embedded',embedded),('standalone',installed)]:

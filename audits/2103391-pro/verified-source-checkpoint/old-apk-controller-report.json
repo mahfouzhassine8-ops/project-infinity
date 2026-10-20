@@ -1,0 +1,31 @@
+{
+  "controller_version": "0.3.5.20",
+  "checkpoint_version": [
+    "0.3.5.20"
+  ],
+  "endpoint_contracts": [
+    {
+      "endpoint": "service.py",
+      "complete_source_variant": false,
+      "required_pins_present_in_binary": null
+    },
+    {
+      "endpoint": "plugin.py",
+      "complete_source_variant": false,
+      "required_pins_present_in_binary": null
+    },
+    {
+      "endpoint": "context.py",
+      "complete_source_variant": false,
+      "required_pins_present_in_binary": null
+    }
+  ],
+  "errors": [
+    "no complete native contract: service.py",
+    "no complete native contract: plugin.py",
+    "no complete native contract: context.py"
+  ],
+  "coherent": false,
+  "physical_fold_verified": false,
+  "binary_pin_check_is_necessary_not_sufficient_runtime_proof": true
+}
