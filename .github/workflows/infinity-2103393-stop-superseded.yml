@@ -1,0 +1,29 @@
+name: Infinity 2103393 | Stop superseded corrective builds
+on:
+  push:
+    branches: [work/infinity-2103393-build-control]
+    paths: ['.github/workflows/infinity-2103393-stop-superseded.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+jobs:
+  stop-superseded:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - name: Cancel only obsolete revisions of this corrective workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REPOSITORY" = 'mahfouzhassine8-ops/project-infinity'
+          CANDIDATE_BRANCH='work/infinity-2103393-fold-corrective-20261020'
+          LATEST_SHA=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/$CANDIDATE_BRANCH" --jq '.object.sha')
+          gh api "repos/$GITHUB_REPOSITORY/actions/workflows/390891413/runs?branch=$CANDIDATE_BRANCH&per_page=30" \
+            --jq ".workflow_runs[] | select(.head_sha != \"$LATEST_SHA\") | select(.status == \"in_progress\" or .status == \"queued\" or .status == \"pending\") | .id" > superseded-runs.txt
+          while read -r SUPERSEDED_ID; do
+            test -n "$SUPERSEDED_ID" || continue
+            [[ "$SUPERSEDED_ID" =~ ^[0-9]+$ ]]
+            gh api --method POST "repos/$GITHUB_REPOSITORY/actions/runs/$SUPERSEDED_ID/cancel"
+          done < superseded-runs.txt
