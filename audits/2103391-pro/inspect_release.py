@@ -5,7 +5,7 @@ This is not a runtime or physical-Fold pass. Never changes the APK or addon code
 Outputs contain only first-party source and build metadata; no user diagnostics.
 """
 from __future__ import annotations
-import hashlib, json, re, shutil, subprocess, sys, zipfile
+import hashlib, json, re, subprocess, zipfile
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
@@ -24,7 +24,7 @@ def main():
     receipt=json.loads(one('audit-original','INFINITY-2103391-SIGNED-EXPERIMENTAL.json').read_text())
     assert sha(apk.read_bytes())==receipt['apk_sha256'],'Original signed APK receipt mismatch'
     assert receipt['signed_permanently'] and receipt['signer_sha256']=='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
-    report={'apk_sha256':receipt['apk_sha256'],'apk_bytes':apk.stat().st_size(),'actual_fold_tested_by_this_audit':False,'runtime_code_modified':False,'final_lock':False}
+    report={'apk_sha256':receipt['apk_sha256'],'apk_bytes':apk.stat().st_size,'actual_fold_tested_by_this_audit':False,'runtime_code_modified':False,'final_lock':False}
     installed={}
     with zipfile.ZipFile(apk) as z:
         assert z.testzip() is None
@@ -52,7 +52,7 @@ def main():
     report['embedded_versions']=manifests(embedded)
     report['standalone_versions']=manifests(installed)
     contract=ROOT/'repairs/android-checkpoint-shutdown/runtime/native/overlay/xbmc/platform/android/activity/InfinityScriptCheckpointContracts.cpp'
-    pairs=sorted(set(re.findall(r'\{\s*"([^"]+/[^\"]+)"\s*,\s*"([0-9a-f]{64})"\s*\}',contract.read_text())))
+    pairs=sorted(set(re.findall(r'\{\s*"([^"]+/[^"]+)"\s*,\s*"([0-9a-f]{64})"\s*\}',contract.read_text())))
     assert pairs,'Could not parse native pinned contracts'
     comparisons=[]
     for path,expected in pairs:
@@ -69,8 +69,7 @@ def main():
             if 'CONTROLLER-PREIMAGES.json' in n:
                 excerpts.append('\n### '+label+' '+n+'\n'+data.decode())
             if n.endswith('.py') and n.split('/')[0] in ('script.infinity.commandcenter','script.infinity.watchedbridge','script.infinity.uirepair'):
-                text=data.decode('utf-8',errors='replace');lines=text.splitlines()
-                interesting=set()
+                text=data.decode('utf-8',errors='replace');lines=text.splitlines();interesting=set()
                 for i,line in enumerate(lines):
                     if any(term in line for term in ('0.3.5.20','0.3.5.21','CONTROLLER-PREIMAGES','expected_version','addon_version','preimage','VERSION','version mismatch')):
                         interesting.update(range(max(0,i-4),min(len(lines),i+6)))
@@ -81,23 +80,17 @@ def main():
     for base in ('repairs/android-checkpoint-shutdown','repairs/four-repair-20261018','repairs/2103390-bugfixes'):
         for p in (ROOT/base).rglob('*'):
             if p.is_file() and p.suffix in ('.py','.cpp','.h','.java','.smali','.json') and p.stat().st_size<2_000_000:
-                lines=p.read_text(errors='replace').splitlines()
-                for i,line in enumerate(lines):
+                for i,line in enumerate(p.read_text(errors='replace').splitlines()):
                     if any(term in line for term in ('legacy_or_unknown','exactly_one_canonical_resident_required','command_center_applied','0.3.5.20')):
                         source_hits.append(f'{p.relative_to(ROOT)}:{i+1}: {line[:500]}')
     (OUT/'startup-source-hits.txt').write_text('\n'.join(source_hits)+'\n')
     (OUT/'release-coherence.json').write_text(json.dumps(report,indent=2,sort_keys=True)+'\n')
     print('=== RELEASE COHERENCE SUMMARY ===')
     print(json.dumps({k:v for k,v in report.items() if k not in ('embedded_versions','native_contract_comparisons')},indent=2))
-    print('=== NATIVE ELF SECTIONS ===')
-    print((OUT/'native-sections.txt').read_text())
-    print('=== FIRST-PARTY GUARDS ===')
-    print((OUT/'first-party-contract-excerpts.txt').read_text())
-    print('=== STARTUP ROUTING GUARDS ===')
-    print((OUT/'startup-source-hits.txt').read_text())
+    for label,name in [('NATIVE ELF SECTIONS','native-sections.txt'),('FIRST-PARTY GUARDS','first-party-contract-excerpts.txt'),('STARTUP ROUTING GUARDS','startup-source-hits.txt')]:
+        print('\n=== '+label+' ===\n'+(OUT/name).read_text())
     print('=== EXISTING GROUP TEST FILES ===')
     for p in sorted((ROOT/'repairs/2103390-bugfixes').glob('group*/test*.py')):print(p.relative_to(ROOT))
-    # Audit completion is NOT a release pass. A known hash mismatch stays red.
     if report['native_contract_mismatches']:
         print('AUDIT FAIL: exact runtime contract mismatches found; no APK changed.')
         return 1
