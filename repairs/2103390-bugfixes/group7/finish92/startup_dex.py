@@ -138,7 +138,7 @@ def preserve_fields(original: Path, assembled: Path, work: Path, api: int, cp: s
     subprocess.run(['javac','--release','8','-g:none','-cp',cp,'-d',str(classes),str(adapter)],check=True)
     intermediate=work/'assembler-output.dex'
     os.rename(assembled,intermediate)
-    command=['java','-cp',str(classes)+os.pathsep+cp,'PreserveDexFields',str(original),str(intermediate),str(assembled),str(api)]
+    command=['java','-cp',str(classes)+os.pathsep+cp,'org.jf.dexlib2.writer.pool.PreserveDexFields',str(original),str(intermediate),str(assembled),str(api)]
     result=subprocess.run(command,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
     report_dir=r.ROOT/'integration-preflight-output'
     (report_dir/'exact-field-preservation.log').write_text(result.stdout)
