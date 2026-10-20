@@ -1,5 +1,25 @@
 # CURRENT PRIMARY HANDOFF — SEVEN WORK GROUPS, GROUP #6 SILENT MODE
 
+## OCT 19 21:32 FOLD — SIGNED 2103391 POST-INSTALL BUG FIX EVIDENCE
+
+**AUTHORITATIVE NEW REAL FOLD DIAGNOSTIC**: User uploaded `Infinity-Diagnostics-20261019-213206.zip`, SHA256 `5d8eeed7b0b4ca772d9d779a1ade65882f6279651b69293cdb723289187fdad9`. 20 ZIP members, includes a full AOSP native crash protobuf and matched shutdown receipts. **No source/runtime changes were made when reviewing this archive.**
+
+**ACTUAL PHYSICAL INSTALL**: installed APK `2103391`, signed native/signing GitHub run `39348480827` GREEN, actual skin `skin.infinity.diggz 1.0.5.229`, actual Command Center `0.3.5.21`, Compatibility `0.8.2`. Code snapshot does not identify UI Repair, Watched Bridge, Rails versions: **unknown from this ZIP**, not proof absent. Matching ZIP exporter run `39352426448` green. Keep signed 2103390 fallback, installed first-party and all user data untouched.
+
+**TWO DIFFERENT NORMAL CLOSE FAILURES**:
+- PID `9419`, 2026-10-19 **21:26:30 EDT**: `command_center: exactly_one_canonical_resident_required`. Observe mismatch: later disk code enumerator confirms CC 0.3.5.21, but `checkpoint/installed-participants.json` for subsequent PID18599 says `command_center_version=legacy_or_unknown; command_center_applied=false`. Investigate canonical Command Center startup/participant registration **before** speculative shutdown changes.
+- PID `18599`, **21:31:30–21:31:55 EDT**: `CHECKPOINT_FAILED` after **25,145 ms**, `native_admission: checkpoint_deadline_exceeded; owner proof incomplete`, `essential_writes_durable=false`, `authorization_consumed=false`, `process_death_confirmed=false`. PVR only is ALREADY_DURABLE; 15 essential owners incomplete. 5 pending Python writers: Crew, CC, Compatibility, Infinity Continuity and Infinity native ambient. Explicit `python_services` pending `unidentified:infinity_native_ambient.py`; `script_persistence.blocking_count=0` **does not** mean owner proof complete. Do not bypass barrier or pretend one advisory caused all 15 owner failures.
+
+**SEPARATE NATIVE CRASH:** `traces/1-1792458629820.tombstone.pb` decoded with public AOSP debuggerd proto locally: **21:10:29 EDT**, PID25057/TID25119, SIGSEGV11. Tombstone shows `SI_TKILL/-6` and `libinfinitycrash.so!restore_and_reraise+168`: this is the signal handler **re-raise**, NOT the original crashing Kodi instruction. `crash/native-crash-last.txt` is zero-length. Report notes a package update at 21:06:45, but exit-manifest `producer_apk_version=null`, thus version/ELF attribution **unproven** despite later reported installed 2103391. Fix crash evidence completeness with matched native symbols without blanket native/graphics or player assumptions.
+
+**Project consequence:** native compile/sign *CI green*, **real physical Fold Close RED**, original SIGSEGV function still unknown; **NO FINAL LOCK**. Continue approved bug fixes only; features frozen. Do not blame third-party add-on, drop essential saves, change Cobra, uninstall/clear, or restart groups #1–#6. Group #1 task19 reload remains deliberately deferred.
+
+**Read-only forensic receipt:** `repairs/2103390-bugfixes/receipts/FOLD-2103391-DIAGNOSTICS-20261019-213206-READONLY.md`, commit `ce88ad72354cbb1cdf71aee7b2094479b4396b17`. Tracker amended at `474ff285c74f8b21d742217a1c5a07c158459c76`. This supersedes old handoff text claiming no signed APK; do not erase prior checkpoints/tests.
+
+---
+
+
+
 
 ## GROUP7 2103391 EXPERIMENTAL BUILD — USER AUTHORIZED, FEATURE FREEZE
 
