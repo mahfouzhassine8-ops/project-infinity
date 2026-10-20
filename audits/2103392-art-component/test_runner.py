@@ -69,4 +69,21 @@ class EvidenceGuards(unittest.TestCase):
             run.component_proof({'source_commit': 'wrong'}, None)
 
 
+    def test_11_framework_launcher_keeps_actual_component_and_full_verification(self):
+        root = '/data/local/tmp/infinity-cc22-art-123-1'
+        for variant in ('baseline', 'candidate'):
+            command = run.art_command(root, variant)
+            self.assertEqual(command, 'CLASSPATH=' + root + '/probe.dex:' + root + '/' + variant +
+                             '.dex:' + root + '/classes2.dex /system/bin/app_process -Xverify:all '
+                             '/system/bin Controller22ArtProbe ' + variant + ' ' + root + ' 37')
+            self.assertNotIn('dalvikvm', command)
+
+    def test_12_launcher_rejects_unscoped_paths_or_variants(self):
+        for root, variant in (('/data/local/tmp/other', 'candidate'),
+                              ('/data/local/tmp/infinity-cc22-art-1-1;exit', 'candidate'),
+                              ('/data/local/tmp/infinity-cc22-art-1-1', 'other')):
+            with self.subTest(root=root, variant=variant), self.assertRaises(ValueError):
+                run.art_command(root, variant)
+
+
 if __name__ == '__main__': unittest.main(verbosity=2)

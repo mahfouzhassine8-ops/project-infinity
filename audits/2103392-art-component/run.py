@@ -155,6 +155,21 @@ def parse_result(output: str, variant: str, expected: list[str], api: int) -> di
     return result
 
 
+def art_command(device: str, variant: str) -> str:
+    """Use AndroidRuntime initialization, not bare ART lacking framework JNI.
+
+    app_process takes VM options, a command directory, then the Java main class.
+    This starts only the disposable probe; it does not start the installed app.
+    """
+    require(bool(re.fullmatch(r'/data/local/tmp/infinity-cc22-art-[0-9]+-[0-9]+', device)),
+            'Invalid disposable ART path')
+    require(variant in ('baseline', 'candidate'), 'Invalid ART variant')
+    cp = ':'.join(device + '/' + n for n in ('probe.dex', variant + '.dex', 'classes2.dex'))
+    return ('CLASSPATH=' + shlex.quote(cp) +
+            ' /system/bin/app_process -Xverify:all /system/bin Controller22ArtProbe ' +
+            variant + ' ' + shlex.quote(device) + ' 37')
+
+
 def android_test(out: Path, adb: str = 'adb') -> dict:
     proof = json.loads((out / 'ART-INPUTS.json').read_text()); inputs = out / 'inputs'
     require(proof.get('runner_compiled') is True, 'No compiled test entrypoint')
@@ -172,6 +187,7 @@ def android_test(out: Path, adb: str = 'adb') -> dict:
                   component_producer=PRODUCER, workflow_source=os.environ.get('GITHUB_SHA', ''),
                   workflow_run=token, scope='Exact startup verifier on Android ART; NOT full Infinity',
                   tested_component_recompiled=False, native_engine_compiled=False,
+                  android_runtime_launcher='/system/bin/app_process -Xverify:all',
                   installed_app_started=False, whole_process_shutdown_tested=False,
                   new_signed_apk=False, physical_fold_verified=False, final_lock=False, cases=[])
     try:
@@ -190,8 +206,7 @@ def android_test(out: Path, adb: str = 'adb') -> dict:
         subprocess.run([adb, '-s', devices[0], 'push', str(inputs) + '/.', device], check=True)
         shell('chmod 444 ' + ' '.join(shlex.quote(device + '/' + n) for n in ('candidate.dex', 'baseline.dex', 'classes2.dex', 'probe.dex')))
         for variant, cases in [('baseline', ['baseline_has_no_cc22_verifier']), ('candidate', expected)]:
-            cp = ':'.join(device + '/' + n for n in ('probe.dex', variant + '.dex', 'classes2.dex'))
-            command = 'dalvikvm -Xverify:all -cp ' + shlex.quote(cp) + ' Controller22ArtProbe ' + variant + ' ' + shlex.quote(device) + ' 37'
+            command = art_command(device, variant)
             result = subprocess.run([adb, '-s', devices[0], 'shell', command], text=True,
                                     stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=90)
             (out / (variant + '-art.log')).write_text(result.stdout)
