@@ -1,0 +1,132 @@
+name: Infinity 2103392 | Deliver existing verified signed candidate bytes
+on:
+  push:
+    branches: [work/infinity-2103392-delivery-artifacts]
+    paths: ['.github/workflows/infinity-2103392-delivery-transport.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-2103392-existing-signed-artifact-transport
+  cancel-in-progress: false
+jobs:
+  deliver-existing-candidate:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 420
+    steps:
+      - name: Require the exact complete build to succeed before transporting anything
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const run_id = 39396114522;
+            const expected = '27d5f2fdfb64818134f988caf327f20b33160e1c';
+            const deadline = Date.now() + 400 * 60 * 1000;
+            while (Date.now() < deadline) {
+              const {data: run} = await github.rest.actions.getWorkflowRun({...context.repo, run_id});
+              if (run.head_sha !== expected) throw new Error('Wrong native producer run identity');
+              if (run.status === 'completed') {
+                if (run.conclusion !== 'success') throw new Error('No successful signed candidate: ' + run.conclusion);
+                core.info('Exact signed APK producer succeeded; transporting existing bytes only.');
+                return;
+              }
+              core.info('Waiting for required native compilation, permanent signing and final integrity gates: ' + run.status);
+              await new Promise(resolve => setTimeout(resolve, 30000));
+            }
+            throw new Error('Required signed APK producer did not finish within the transport window');
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39396114522
+          name: Infinity-2103392-SIGNED-APK-AND-MATCHING-COMPONENTS-EXPERIMENTAL
+          github-token: ${{ github.token }}
+          path: signed-candidate
+      - name: Verify original signed bytes and partition only the transfer copy
+        run: |
+          set -euo pipefail
+          (cd signed-candidate && sha256sum -c SHA256SUMS)
+          python3 - <<'PY'
+          import hashlib,json,pathlib,re,shutil,subprocess,os
+          root=pathlib.Path('signed-candidate')
+          apk=root/'Infinity-2103392-Coherent-Integration-EXPERIMENTAL.apk'
+          receipt=json.loads((root/'INFINITY-2103392-DELIVERY.json').read_text())
+          def digest(path):
+              h=hashlib.sha256()
+              with path.open('rb') as f:
+                  for block in iter(lambda:f.read(1024*1024),b''):h.update(block)
+              return h.hexdigest()
+          expected='27d5f2fdfb64818134f988caf327f20b33160e1c'
+          assert receipt['source_commit']==expected
+          assert receipt['version_code']==2103392
+          assert receipt['signed_permanently'] and receipt['complete_native_engine_compiled']
+          assert receipt['matching_zips_identical_to_apk']
+          assert receipt['physical_fold_verified'] is False and receipt['original_sigsegv_fixed'] is False
+          assert receipt['final_lock'] is False
+          assert digest(apk)==receipt['apk_sha256']
+          bt=pathlib.Path(os.environ['ANDROID_HOME'])/'build-tools/34.0.0'
+          cert=subprocess.check_output([str(bt/'apksigner'),'verify','--verbose','--print-certs',str(apk)],text=True)
+          found=re.findall(r'Signer #\d+ certificate SHA-256 digest:\s*([0-9a-f:]+)',cert,re.I)
+          assert len(found)==1 and found[0].lower().replace(':','')=='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
+          for version in (1,2,3):assert re.search(r'Verified using v'+str(version)+r' scheme[^\n]*:\s*true',cert,re.I)
+          subprocess.run([str(bt/'zipalign'),'-c','-p','4',str(apk)],check=True)
+          out=pathlib.Path('delivery-transport');parts=out/'parts';components=out/'components'
+          parts.mkdir(parents=True);components.mkdir()
+          rows=[]
+          with apk.open('rb') as f:
+              for i in range(4):
+                  raw=f.read(300*1024*1024)
+                  if not raw:break
+                  name=f'apk.part-{i:03d}';(parts/name).write_bytes(raw)
+                  rows.append(dict(name=name,bytes=len(raw),sha256=hashlib.sha256(raw).hexdigest()))
+              assert not f.read(1),'Candidate exceeds verified transport partition budget'
+          for path in root.iterdir():
+              if path.is_file() and path!=apk:shutil.copyfile(path,components/path.name)
+          assert len(list(components.glob('*.zip')))==5
+          assert sum(p.stat().st_size for p in components.iterdir())<450*1024*1024
+          manifest=dict(schema=1,producer_run=39396114522,producer_commit=expected,
+              apk_name=apk.name,apk_bytes=apk.stat().st_size,apk_sha256=receipt['apk_sha256'],
+              parts=rows,apk_modified=False,apk_rebuilt=False,apk_resigned=False,
+              permanent_signature_reverified=True,physical_fold_verified=False,final_lock=False)
+          (components/'TRANSPORT-MANIFEST.json').write_text(json.dumps(manifest,indent=2)+'\n')
+          print(json.dumps(manifest,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-2103392-Signed-APK-Transport-Part-000
+          path: delivery-transport/parts/apk.part-000
+          retention-days: 90
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-2103392-Signed-APK-Transport-Part-001
+          path: delivery-transport/parts/apk.part-001
+          retention-days: 90
+          compression-level: 0
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-2103392-Signed-APK-Transport-Part-002
+          path: delivery-transport/parts/apk.part-002
+          retention-days: 90
+          compression-level: 0
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-2103392-Signed-APK-Transport-Part-003
+          path: delivery-transport/parts/apk.part-003
+          retention-days: 90
+          compression-level: 0
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-2103392-Matching-Component-ZIPs-And-Verified-Delivery
+          path: delivery-transport/components/
+          retention-days: 90
+          compression-level: 0
+          if-no-files-found: error
