@@ -271,6 +271,20 @@ def clock_cluster(raw):
     updated=ET.tostring(root,encoding='utf-8')
     return raw[:start]+updated+raw[stop:]
 
+DIRECTORY_TITLE = b'''  <variable name="InfinityResumeDirectoryTitle">
+    <value condition="String.IsEqual(Container.PluginName,script.infinity.commandcenter) + !String.IsEmpty(Container.PluginCategory)">$INFO[Container.PluginCategory]</value>
+    <value>$INFO[Container.FolderName]</value>
+  </variable>
+'''
+
+def directory_title_variable(raw):
+    require(b'InfinityResumeDirectoryTitle' not in raw,'directory heading already patched')
+    return once(raw,b'<includes>',b'<includes>\n'+DIRECTORY_TITLE)
+
+def directory_title_labels(raw):
+    require(raw.count(b'$INFO[Container.FolderName]')==3,'unexpected directory header count')
+    return raw.replace(b'$INFO[Container.FolderName]',b'$VAR[InfinityResumeDirectoryTitle]')
+
 def compact_player_settings(original):
     # Reuse the original native settings templates and actions; keep scrolling
     # controls 5/60 and all cloned native settings. This is a separate resource,
@@ -315,6 +329,13 @@ def components(original):
         elif name.endswith('/Home.xml'):
             result[name] = once(raw,b'>infinity_ui/header_dark.png</texture>',
                                     b'>infinity_ui/header_dark_clock_safe.png</texture>')
+        elif name.endswith('/Variables.xml'):
+            result[name] = directory_title_variable(raw)
+        elif name.endswith('/View_50_List.xml'):
+            result[name] = directory_title_labels(raw)
+        elif name.endswith('/MyVideoNav.xml'):
+            result[name] = once(raw,b'<param name="Subtitle" value="$INFO[Container.FolderName]"',
+                                    b'<param name="Subtitle" value="$VAR[InfinityResumeDirectoryTitle]"')
     for asset in ('header_dark_clock_safe','clock_moon'):
         result[SKIN+'/media/infinity_ui/'+asset+'.png'] = base64.b64decode((HERE/'assets'/(asset+'.png.b64')).read_text(),validate=False)
     compact = compact_player_settings(original[SKIN+'/unified/DialogSettings.xml'])

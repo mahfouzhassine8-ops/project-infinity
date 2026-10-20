@@ -92,6 +92,31 @@ class Corrective(unittest.TestCase):
                 self.assertTrue(cat(media,bucket).startswith(label+' — '))
         self.assertEqual(cat('tv','list','My shows'),'TV Shows — My shows')
 
+    def test_skin_consumes_plugin_category_only_for_command_center(self):
+        variables=0;headers=0;windows=0
+        for name,body in self.after.items():
+            if name.endswith('/Variables.xml'):
+                variables+=1;root=ET.fromstring(body)
+                var=root.find('variable[@name="InfinityResumeDirectoryTitle"]')
+                values=var.findall('value');self.assertEqual(len(values),2)
+                self.assertEqual(values[0].get('condition'),'String.IsEqual(Container.PluginName,script.infinity.commandcenter) + !String.IsEmpty(Container.PluginCategory)')
+                self.assertEqual(values[0].text,'$INFO[Container.PluginCategory]')
+                self.assertEqual(values[1].text,'$INFO[Container.FolderName]');self.assertFalse(values[1].attrib)
+            elif name.endswith('/View_50_List.xml'):
+                headers+=1
+                self.assertEqual(body.count(b'$VAR[InfinityResumeDirectoryTitle]'),3)
+                self.assertEqual(body.replace(b'$VAR[InfinityResumeDirectoryTitle]',b'$INFO[Container.FolderName]'),self.before[name])
+            elif name.endswith('/MyVideoNav.xml'):
+                windows+=1
+                self.assertEqual(body.replace(b'<param name="Subtitle" value="$VAR[InfinityResumeDirectoryTitle]"',
+                    b'<param name="Subtitle" value="$INFO[Container.FolderName]"'),self.before[name])
+        self.assertEqual((variables,headers,windows),(10,10,10))
+        profiles=lambda suffix:{n.rsplit('/',1)[0] for n in self.after if n.startswith(c.SKIN+'/') and n.endswith(suffix)}
+        self.assertEqual(profiles('/Variables.xml'),profiles('/View_50_List.xml'))
+        self.assertEqual(profiles('/Variables.xml'),profiles('/MyVideoNav.xml'))
+        for profile in profiles('/Variables.xml'):
+            self.assertIn(b'file="Variables.xml"',self.before[profile+'/Includes.xml'])
+
     def test_watchlist_history_owner_and_completed_filters_unchanged(self):
         for name in ('resume_hub.py','experience.py','context.py','common.py','persistence_participant.py'):
             self.assertEqual(self.before[c.CC+'/'+name],self.after[c.CC+'/'+name])
