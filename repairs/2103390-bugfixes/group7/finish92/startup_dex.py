@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Integrate only the reviewed CC22 startup route into its original DEX shard.
 
-Compiles the verbatim reviewed Java verifier with javac/D8, retains every old
-method and branch except an exact additive routing branch, then reassembles the
-original shard. This produces a build component, NOT an APK or an installation.
-No native build, signing, device write, or user-profile operation is performed.
+Compile the verbatim reviewed Java verifier with javac/D8. Preserve every old
+method/branch outside the exact additive startup route. Reuse original protected
+class definitions and retain their explicitly encoded static field values.
+This produces a build component, NOT an APK or an installation. No native build,
+signing, device write, or user-profile operation is performed.
 """
 from __future__ import annotations
 import argparse
@@ -130,6 +131,29 @@ def record_differences(before: dict[str,str], after: dict[str,str]) -> None:
         if name in unexpected[:12]:print(diff[:6000],flush=True)
 
 
+def preserve_fields(original: Path, assembled: Path, work: Path, api: int, cp: str) -> dict:
+    """Re-emit original protected definitions without trimming encoded defaults."""
+    adapter=Path(__file__).with_name('PreserveDexFields.java')
+    classes=work/'field-preservation-tool';classes.mkdir()
+    subprocess.run(['javac','--release','8','-g:none','-cp',cp,'-d',str(classes),str(adapter)],check=True)
+    intermediate=work/'assembler-output.dex'
+    os.rename(assembled,intermediate)
+    command=['java','-cp',str(classes)+os.pathsep+cp,'PreserveDexFields',str(original),str(intermediate),str(assembled),str(api)]
+    result=subprocess.run(command,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+    report_dir=r.ROOT/'integration-preflight-output'
+    (report_dir/'exact-field-preservation.log').write_text(result.stdout)
+    print(result.stdout,flush=True)
+    i.require(result.returncode==0,'Exact original field preservation failed')
+    count=re.search(r'VERIFIED_EXACT_FIELD_DEFINITIONS=(\d+)',result.stdout)
+    protected=re.search(r'PRESERVED_CLASSES=(\d+)',result.stdout)
+    i.require(count is not None and protected is not None and int(count.group(1))>0,'Missing structured field proof')
+    i.require('EXPLICIT_INITIALIZER_PRESENCE_AND_VALUES_PRESERVED=true' in result.stdout,'Encoded value preservation not verified')
+    return dict(build_only_adapter_sha256=r.sha(adapter.read_bytes()),
+        exact_field_definitions_verified=int(count.group(1)),protected_class_definitions_from_original=int(protected.group(1)),
+        encoded_values_and_presence_preserved=True,field_normalization_or_exemption_added=False,
+        protected_runtime_classes_recompiled=False,adapter_packaged_into_app=False)
+
+
 def build(apk: Path, stage: Path, out: Path, android: Path, tools: Path, cp: str) -> dict:
     i.verified_stage(apk,stage)
     i.require(not out.exists(),'Refusing DEX output overwrite')
@@ -174,6 +198,7 @@ def build(apk: Path, stage: Path, out: Path, android: Path, tools: Path, cp: str
         final=artifact/name
         subprocess.run(['java','-cp',cp,'org.jf.smali.Main','assemble','--api',str(api),str(modified_root),'-o',str(final)],check=True)
         i.require(final.is_file() and final.read_bytes().startswith(b'dex\n'),'No valid assembled DEX component')
+        field_proof=preserve_fields(original_dex,final,work,api,cp)
         decoded=work/'verified-smali'
         subprocess.run(['java','-cp',cp,'org.jf.baksmali.Main','disassemble','--sequential-labels',str(final),'-o',str(decoded)],check=True)
         after_raw={p.relative_to(decoded).as_posix():p.read_text() for p in decoded.rglob('*.smali')}
@@ -182,6 +207,7 @@ def build(apk: Path, stage: Path, out: Path, android: Path, tools: Path, cp: str
         after={n:normalize(t) for n,t in after_raw.items()}
         record_differences(before,after)
         preservation=i.verify_dex_class_maps(before,after)
+        i.require(field_proof['protected_class_definitions_from_original']==preservation['protected_classes'],'Class preservation evidence disagrees')
         new_methods=methods(after_raw[TARGET]);old_methods=methods(original_raw[TARGET])
         i.require(set(new_methods)==set(old_methods)|{HELPER},'Assembled startup class method set changed')
         i.require(normalize(new_methods[HELPER])==normalize(helper),'Compiled verifier changed during assembly')
@@ -196,7 +222,7 @@ def build(apk: Path, stage: Path, out: Path, android: Path, tools: Path, cp: str
             protected_classes_in_changed_shard=preservation['protected_classes'],
             other_dex_shards={n:h for n,h in dex_map.items() if n!=name},
             other_dex_shards_must_be_copied_byte_identically=True,
-            only_runtime_class_changed=TARGET,helper=helper_proof,route=route_proof,
+            only_runtime_class_changed=TARGET,helper=helper_proof,route=route_proof,fields=field_proof,
             invalid_reapplication_and_preimage_cases_rejected=rejected,
             decoded_protected_instructions_identical=True,
             original_apk_unchanged=True,native_engine_compiled=False,new_signed_apk=False,
