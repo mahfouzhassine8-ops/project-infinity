@@ -8,6 +8,7 @@ No native build, signing, device write, or user-profile operation is performed.
 """
 from __future__ import annotations
 import argparse
+import difflib
 import importlib.util
 import json
 import os
@@ -55,9 +56,6 @@ def merge_router(original: str, helper: str) -> tuple[str,dict]:
               '    invoke-virtual {v6, v2}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z\n'
               '    move-result v6\n'
               '    if-nez v6, :infinity_cc22_route\n\n')
-    # Place the new verifier call outside the original first try region. Its
-    # exception handler must preserve controllerVersion=.22, exactly as the
-    # reviewed Java source does, rather than reset it to unknown via catch_2.
     tail=('    # INFINITY_CC22_ROUTE_V1\n'
           '    :infinity_cc22_route\n'
           '    const-string v2, "0.3.5.22"\n'
@@ -117,6 +115,21 @@ def normalize_module():
     return value.normalize
 
 
+def record_differences(before: dict[str,str], after: dict[str,str]) -> None:
+    """Retain first-party source evidence; do not reinterpret a failing gate."""
+    output=r.ROOT/'integration-preflight-output'/'dex-roundtrip-comparison'
+    output.mkdir(parents=True,exist_ok=True)
+    changed=sorted(n for n in before.keys()|after.keys() if before.get(n)!=after.get(n))
+    unexpected=[n for n in changed if n!=TARGET]
+    (output/'INDEX.json').write_bytes(i.json_bytes(dict(changed=changed,unexpected=unexpected,
+        original_classes=len(before),candidate_classes=len(after),protection_gate_relaxed=False)))
+    print('=== DEX ROUND-TRIP DIFFERENCES ===\n'+json.dumps(dict(changed=len(changed),unexpected=unexpected),indent=2),flush=True)
+    for index,name in enumerate(changed):
+        diff=''.join(difflib.unified_diff(before.get(name,'').splitlines(True),after.get(name,'').splitlines(True),fromfile='original/'+name,tofile='assembled/'+name))
+        (output/(str(index)+'.diff')).write_text(diff)
+        if name in unexpected[:12]:print(diff[:6000],flush=True)
+
+
 def build(apk: Path, stage: Path, out: Path, android: Path, tools: Path, cp: str) -> dict:
     i.verified_stage(apk,stage)
     i.require(not out.exists(),'Refusing DEX output overwrite')
@@ -149,8 +162,6 @@ def build(apk: Path, stage: Path, out: Path, android: Path, tools: Path, cp: str
         modified,route_proof=merge_router(original_raw[TARGET],helper)
         for filename,pin in json.loads((stage/'addons'/r.UI/'CONTROLLER-PREIMAGES.json').read_text()).items():
             i.require('"'+filename+'"' in helper and '"'+pin+'"' in helper,'Compiled verifier lost a controller pin')
-        # Self-check guard failures on the actual released class, not synthetic
-        # class bodies, before writing a replacement DEX shard.
         rejected=0
         for changed in (modified,original_raw[TARGET].replace(OLD_PIN,'0'*64),
                         original_raw[TARGET].replace('.registers 13','.registers 14')):
@@ -169,6 +180,7 @@ def build(apk: Path, stage: Path, out: Path, android: Path, tools: Path, cp: str
         normalize=normalize_module()
         before={n:normalize(t) for n,t in original_raw.items()}
         after={n:normalize(t) for n,t in after_raw.items()}
+        record_differences(before,after)
         preservation=i.verify_dex_class_maps(before,after)
         new_methods=methods(after_raw[TARGET]);old_methods=methods(original_raw[TARGET])
         i.require(set(new_methods)==set(old_methods)|{HELPER},'Assembled startup class method set changed')
@@ -198,7 +210,6 @@ def build(apk: Path, stage: Path, out: Path, android: Path, tools: Path, cp: str
         print(json.dumps(report,indent=2,sort_keys=True),flush=True)
         return report
     except BaseException:
-        # Leave diagnostics but never leave a rejected DEX in delivery location.
         component=out/'component'
         if component.exists():shutil.rmtree(component)
         raise
