@@ -1,0 +1,117 @@
+name: Infinity 2103391 | Pro seven-group audit evidence
+on:
+  push:
+    branches: [work/infinity-2103391-pro-seven-group-audit-20261019]
+    paths: ['.github/workflows/infinity-2103391-pro-audit-evidence.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-2103391-pro-audit-evidence
+  cancel-in-progress: false
+jobs:
+  preserve-and-export-evidence:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Export pinned source snapshots without altering production source
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p audit-source
+          git archive --format=tar c04a54c96470117c0bfcc1aae9d4e0d5c0b8bcb0 | gzip -1 > audit-source/current-source.tar.gz
+          git archive --format=tar 7bd9b1085d598789e9e803b4b76ee1429e1df7e3 | gzip -1 > audit-source/signed-2103391-source.tar.gz
+          git archive --format=tar 00f43f463c3c5977825ead1f299dadf28b3fefbb | gzip -1 > audit-source/pre-seven-group-source.tar.gz
+          git log -80 --format='%H %ad %s' --date=iso-strict c04a54c96470117c0bfcc1aae9d4e0d5c0b8bcb0 > audit-source/history.txt
+          git diff --binary 00f43f463c3c5977825ead1f299dadf28b3fefbb 7bd9b1085d598789e9e803b4b76ee1429e1df7e3 > audit-source/seven-group-changes.patch
+          git diff --binary 7bd9b1085d598789e9e803b4b76ee1429e1df7e3 c04a54c96470117c0bfcc1aae9d4e0d5c0b8bcb0 > audit-source/post-build-changes.patch
+          (cd audit-source && sha256sum *.tar.gz *.patch history.txt > SHA256SUMS)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-2103391-Pro-Pinned-Source-Evidence
+          path: audit-source/
+          retention-days: 30
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39348480827
+          name: Infinity-2103391-All-In-One-EXPERIMENTAL-NOT-FOLD-QUALIFIED
+          github-token: ${{ github.token }}
+          path: original-producer
+      - name: Verify and partition existing APK bytes for audit transport only
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,json,shutil
+          source=Path('original-producer')
+          apks=list(source.rglob('Infinity-2103391-All-In-One-Bugfix-EXPERIMENTAL.apk'))
+          proofs=list(source.rglob('INFINITY-2103391-SIGNED-EXPERIMENTAL.json'))
+          assert len(apks)==len(proofs)==1
+          apk=apks[0]
+          proof=json.loads(proofs[0].read_text())
+          digest=hashlib.sha256(apk.read_bytes()).hexdigest()
+          assert digest==proof['apk_sha256']
+          assert proof['signed_permanently']
+          assert proof['signer_sha256']=='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
+          out=Path('audit-apk'); out.mkdir()
+          rows=[]
+          with apk.open('rb') as src:
+              for i in range(4):
+                  part=src.read(300*1024*1024)
+                  if not part: break
+                  name=f'apk.part-{i:03d}'
+                  (out/name).write_bytes(part)
+                  rows.append({'name':name,'bytes':len(part),'sha256':hashlib.sha256(part).hexdigest()})
+              assert not src.read(1),'APK unexpectedly exceeds partition budget'
+          manifests=Path('audit-manifests'); manifests.mkdir()
+          for p in source.rglob('*'):
+              if p.is_file() and p.suffix.lower() in ('.json','.txt','.log','.md'):
+                  target=manifests/p.relative_to(source)
+                  target.parent.mkdir(parents=True,exist_ok=True)
+                  shutil.copyfile(p,target)
+          inventory=[{'path':str(p.relative_to(source)),'bytes':p.stat().st_size} for p in source.rglob('*') if p.is_file()]
+          manifest={'original_run':39348480827,'original_head':'7bd9b1085d598789e9e803b4b76ee1429e1df7e3','apk_name':apk.name,'apk_bytes':apk.stat().st_size,'apk_sha256':digest,'parts':rows,'producer_inventory':inventory,'apk_modified':False,'apk_rebuilt':False,'audit_is_runtime_pass':False,'user_final_lock':False}
+          (manifests/'TRANSPORT-MANIFEST.json').write_text(json.dumps(manifest,indent=2)+'\n')
+          print(json.dumps(manifest,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-2103391-Pro-Original-APK-Manifests
+          path: audit-manifests/
+          retention-days: 30
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-2103391-Pro-Original-APK-Part-000
+          path: audit-apk/apk.part-000
+          retention-days: 30
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-2103391-Pro-Original-APK-Part-001
+          path: audit-apk/apk.part-001
+          retention-days: 30
+          compression-level: 0
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-2103391-Pro-Original-APK-Part-002
+          path: audit-apk/apk.part-002
+          retention-days: 30
+          compression-level: 0
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-2103391-Pro-Original-APK-Part-003
+          path: audit-apk/apk.part-003
+          retention-days: 30
+          compression-level: 0
+          if-no-files-found: ignore
