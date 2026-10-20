@@ -6,6 +6,9 @@ on:
       - '.github/workflows/infinity-2103392-final-apk.yml'
       - 'repairs/2103390-bugfixes/group7/finish92/delivery92.py'
       - 'repairs/2103390-bugfixes/group7/finish92/test_delivery92.py'
+      - 'repairs/2103390-bugfixes/group7/finish92/release.py'
+      - 'repairs/2103390-bugfixes/group7/finish92/integration.py'
+      - 'repairs/2103390-bugfixes/group7/finish92/test_release92.py'
   workflow_dispatch:
 permissions:
   contents: read
@@ -48,7 +51,10 @@ jobs:
           actual=set(subprocess.check_output(['git','-C','release92','diff','--name-only',base,'HEAD'],text=True).splitlines())
           allowed={'.github/workflows/infinity-2103392-final-apk.yml',
             'repairs/2103390-bugfixes/group7/finish92/delivery92.py',
-            'repairs/2103390-bugfixes/group7/finish92/test_delivery92.py'}
+            'repairs/2103390-bugfixes/group7/finish92/test_delivery92.py',
+            'repairs/2103390-bugfixes/group7/finish92/release.py',
+            'repairs/2103390-bugfixes/group7/finish92/integration.py',
+            'repairs/2103390-bugfixes/group7/finish92/test_release92.py'}
           assert actual==allowed, 'Unexpected source change outside final delivery adapters: '+repr(actual)
           assert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()=='7bd9b1085d598789e9e803b4b76ee1429e1df7e3'
           PY
@@ -135,6 +141,13 @@ jobs:
           name: Infinity-2103392-Verified-Startup-DEX-COMPONENT-NOT-INSTALLABLE
           github-token: ${{ github.token }}
           path: verified-startup-dex
+      - name: Verify corrected classifier and binding against the original signed APK
+        run: |
+          set -euo pipefail
+          export INFINITY_2103391_APK="$(find "$GITHUB_WORKSPACE/original-2103391" -type f -name 'Infinity-2103391-All-In-One-Bugfix-EXPERIMENTAL.apk')"
+          test -f "$INFINITY_2103391_APK"
+          python3 -m unittest discover -s release92/repairs/2103390-bugfixes/group7/finish92 -p 'test*.py' -v \
+            2>&1 | tee checkpoint-build/2103392-CLASSIFIER-AND-INTEGRATION-TESTS.log
       - name: Restore verified compiler dependencies and cache without changing original scripts
         run: |
           set -euo pipefail

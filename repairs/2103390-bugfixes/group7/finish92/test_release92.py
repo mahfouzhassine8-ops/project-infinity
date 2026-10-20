@@ -22,7 +22,7 @@ class Coherent92(unittest.TestCase):
     def setUpClass(cls):
         cls.original=r.read_original(Path(os.environ['INFINITY_2103391_APK']))
         cls.final=r.components(cls.original)
-        cls.before=(r.NATIVE_BASE/r.CONTRACT_PATH).read_bytes()
+        cls.before=r.original_classifier()
         cls.after=r.contracts(cls.before,cls.final)
         cls.temp=tempfile.TemporaryDirectory();cls.root=Path(cls.temp.name)
         cls.ccroot=cls.root/'external/.kodi/addons'
@@ -213,7 +213,7 @@ public class Check {public static void main(String[]a){
 
     def test_09_all_previous_contracts_and_classifier_logic_retained(self):
         before=r.coherence.contracts(self.before.decode());after=r.coherence.contracts(self.after.decode())
-        self.assertEqual(len(after),len(before)+3)
+        self.assertEqual(len(after),len(before)+6)
         for v in before:self.assertIn(v,after)
         self.assertEqual(self.before[self.before.index(b'std::string ClassifyScript'):],
                          self.after[self.after.index(b'std::string ClassifyScript'):])
@@ -228,6 +228,20 @@ public class Check {public static void main(String[]a){
         for marker in (b'AndroidCheckpointResidentCount() != 1',b'AndroidCheckpointCompatCount() != 1',b'essential_writes_durable',b'EssentialOwner',b'SealEssentialWrites',b'EssentialWritesAuthorized',b'BeginCheckpointStartupAdmission'):
             self.assertGreater(before.count(marker),0)
             self.assertEqual(before.count(marker),after.count(marker))
+
+    def test_locked_rc5_optional_and_unknown_script_behavior_is_preserved(self):
+        self.assertEqual(r.sha(self.before),r.FINAL_CLASSIFIER_PREIMAGE)
+        for root in ('special://home/addons/','special://xbmc/addons/'):
+            for entry,addon,expected in (
+                ('script.trakt/default.py','script.trakt','stop-only:trakt-cloud-owned'),
+                ('script.trakt/other.py','script.trakt',''),
+                ('script.trakt/default.py','unreviewed.addon',''),
+                ('unreviewed.addon/service.py','unreviewed.addon',''),
+            ):
+                for label in ('before','after'):
+                    self.assertEqual(self.cpp(label=label,addon=addon,script=root+entry),expected)
+        for token in (b'stop-only:trakt-cloud-owned',b'stop-only:continuity-diagnostic'):
+            self.assertEqual(self.before.count(token),self.after.count(token))
 
     def test_11_wrong_addon_or_script_is_not_admitted(self):
         for addon in ('plugin.video.cobra','unknown',''):

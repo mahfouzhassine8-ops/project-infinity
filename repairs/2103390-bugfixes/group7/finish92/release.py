@@ -7,6 +7,7 @@ no post-signing manifest retags, synthetic owner exemptions, or force-green.
 """
 from __future__ import annotations
 import hashlib
+import importlib.util
 import json
 from pathlib import Path
 import re
@@ -38,6 +39,10 @@ FINAL_COORDINATOR_PREIMAGE = 'eb74a3730456fc4c4fb0bfd65a45afcd7823dfdd66125fd16f
 # Verified against locked TEST4 artifact 12079997774 / run 38975950035.
 # Later 2103384 and Group7 native ledgers retain this coordinator unchanged.
 NATIVE_PREIMAGE = '8c9de99346b1e74a08cf8b00fd1f29acef514b07041d40ebbe2678700a59abc8'
+RAW_CLASSIFIER_PREIMAGE = '8ceb3b60518dc2ab48c0aed480b78e81585ef7c0f66a47b214975e0fac8d6c02'
+# The full locked 2103384/TEST4 ledger includes the approved RC5 additions.
+FINAL_CLASSIFIER_PREIMAGE = '803e8ded2657a43b1dfbd5797300e66bb3ba730e24c1716b70d3df57e7435b49'
+GROUP1_CLASSIFIER = '23b4fba33636574951b40f79831b75f173aad3eda7fa38efae3f714ff398b11c'
 CHANGED_ADDON_MEMBERS = {CC+'/addon.xml', CC+'/checkpoint_runtime.py', WB+'/addon.xml',
                        WB+'/controller.py', WB+'/CONTROLLER-PREIMAGES.json',
                        UI+'/addon.xml', UI+'/CONTROLLER-PREIMAGES.json', SKIN+'/addon.xml'}
@@ -111,10 +116,47 @@ def components(original: dict[str, bytes]) -> dict[str, bytes]:
     return result
 
 
-def contracts(before: bytes, payload: dict[str, bytes]) -> bytes:
-    if sha(before)!=NATIVE_PREIMAGE:
+def original_classifier() -> bytes:
+    """Reproduce the actual locked classifier with the original RC5 adapter.
+
+    The saved overlay has the later Group1 table additions but predates the
+    native producer's RC5 step. Verify and undo only that table insertion, then
+    replay the unchanged RC5 insertion. Both historical hashes stay mandatory.
+    """
+    saved=(NATIVE_BASE/CONTRACT_PATH).read_bytes()
+    if sha(saved)!=NATIVE_PREIMAGE:
         raise ValueError('Saved Pro classifier source was replaced')
-    text=before.decode()
+    marker=coherence.MARKER.encode()
+    anchor=b'  };\n  return *contracts;'
+    if saved.count(marker)!=1 or saved.count(anchor)!=1:
+        raise ValueError('Unrecognized saved Group1 classifier insertion')
+    start=saved.index(marker);end=saved.index(anchor,start)
+    legacy=saved[:start]+saved[end:]
+    if sha(legacy)!=RAW_CLASSIFIER_PREIMAGE:
+        raise ValueError('Original immutable producer classifier differs')
+    spec=importlib.util.spec_from_file_location('coherent92_original_rc5',
+        ROOT/'repairs/shutdown-rc5-2103377/optional_shutdown.py')
+    rc5=importlib.util.module_from_spec(spec);spec.loader.exec_module(rc5)
+    old='    // Home RunScript has no add-on object.'
+    result=rc5.replace_one(legacy.decode(),old,rc5.OPTIONAL_BLOCK+old,'classifier_approved_entry').encode()
+    if sha(result)!=FINAL_CLASSIFIER_PREIMAGE:
+        raise ValueError('Classifier does not match locked TEST4/2103384 native ledger')
+    return result
+
+
+def contracts(before: bytes, payload: dict[str, bytes]) -> bytes:
+    if sha(before)!=FINAL_CLASSIFIER_PREIMAGE:
+        raise ValueError('Not the complete locked RC5 classifier')
+    # Replay the already approved Group1 table delta on the real final native
+    # classifier, retaining its RC5 behavior. Then add the exact CC22 variants.
+    old_payload=dict(payload)
+    old_payload[CC+'/addon.xml']=retag(payload[CC+'/addon.xml'],CC,'0.3.5.22','0.3.5.20')
+    old_payload[CC+'/checkpoint_runtime.py']=replace_one(payload[CC+'/checkpoint_runtime.py'],
+        b'ADDON_VERSION = "0.3.5.22"', b'ADDON_VERSION = "0.3.5.20"')
+    text=coherence.append_reviewed_group1_contracts(before.decode(),old_payload)
+    if sha(text.encode())!=GROUP1_CLASSIFIER:
+        raise ValueError('Reviewed Group1 delta on locked classifier differs')
+    reviewed20=text.encode()
     hashes={path:sha(raw) for path,raw in payload.items()}
     blocks=[]
     for endpoint in coherence.ENDPOINTS:
@@ -133,10 +175,10 @@ def contracts(before: bytes, payload: dict[str, bytes]) -> bytes:
         blocks.append(block)
     anchor=b'  };\n  return *contracts;'
     insertion=b'    // GROUP7_EXACT_CC22_COHERENT_INSTALL_OVER_V1\n'+b'\n'.join(blocks)+b'\n'
-    after=replace_one(before,anchor,insertion+anchor)
+    after=replace_one(reviewed20,anchor,insertion+anchor)
     report=coherence.controller_report(payload,after.decode())
     if report['errors']:raise ValueError(report['errors'])
-    if after.replace(insertion,b'',1)!=before:raise ValueError('Legacy classifier altered')
+    if after.replace(insertion,b'',1)!=reviewed20:raise ValueError('Legacy classifier altered')
     return after
 
 
@@ -214,7 +256,8 @@ def stage(apk: Path, destination: Path) -> dict:
     if destination.exists() and any(destination.iterdir()):
         raise ValueError('Staging output must be empty')
     original=read_original(apk);final=components(original)
-    native=contracts((NATIVE_BASE/CONTRACT_PATH).read_bytes(),final)
+    classifier_before=original_classifier()
+    native=contracts(classifier_before,final)
     coordinator_before=original_coordinator()
     coordinator_source=coordinator(coordinator_before)
     java=java_router((JAVA_BASE/JAVA_PATH).read_bytes(),final)
@@ -222,7 +265,7 @@ def stage(apk: Path, destination: Path) -> dict:
                 actual_android_runtime_tested=False,physical_fold_verified=False,final_lock=False,
                 component_changes={n:dict(before=sha(original[n]),after=sha(final[n]))
                                    for n in sorted(CHANGED_ADDON_MEMBERS)},
-                native_changes={CONTRACT_PATH:dict(before=sha((NATIVE_BASE/CONTRACT_PATH).read_bytes()),after=sha(native)),
+                native_changes={CONTRACT_PATH:dict(before=sha(classifier_before),after=sha(native)),
                                 COORDINATOR_PATH:dict(before=sha(coordinator_before),after=sha(coordinator_source))},
                 java_changes={JAVA_PATH:dict(before=sha((JAVA_BASE/JAVA_PATH).read_bytes()),after=sha(java))},
                 full_native_source_tree_reconstructed=False,

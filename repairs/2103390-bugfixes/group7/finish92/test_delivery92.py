@@ -118,6 +118,17 @@ class NativeBuildLinkGuards(unittest.TestCase):
         with self.assertRaises(RuntimeError):self.check()
 
 class SavedIntegrationInterface(unittest.TestCase):
+    def test_classifier_is_the_exact_locked_rc5_preimage(self):
+        release, integration, _ = d.adapters()
+        source = release.original_classifier()
+        self.assertEqual(d.sha(source), '803e8ded2657a43b1dfbd5797300e66bb3ba730e24c1716b70d3df57e7435b49')
+        self.assertEqual(d.sha(source), integration.ORIGINAL_CLASSIFIER)
+        self.assertNotEqual(d.sha(source), release.RAW_CLASSIFIER_PREIMAGE)
+        self.assertNotEqual(d.sha(source), release.NATIVE_PREIMAGE)
+        self.assertIn(b'stop-only:trakt-cloud-owned', source)
+        self.assertIn(b'stop-only:continuity-diagnostic', source)
+        self.assertNotIn(release.coherence.MARKER.encode(), source)
+
     def test_checked_in_api_matches_delivery_adapter(self):
         release, integration, signer = d.adapters()
         for name in ('native_plan', 'bind_native', 'prepare', 'verified_stage', 'verify_addon_delta'):

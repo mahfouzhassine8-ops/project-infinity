@@ -19,11 +19,11 @@ from zipfile import ZipFile
 import release as r
 
 ORIGINAL_NATIVE_COMMIT='7bd9b1085d598789e9e803b4b76ee1429e1df7e3'
-ORIGINAL_CLASSIFIER='8ceb3b60518dc2ab48c0aed480b78e81585ef7c0f66a47b214975e0fac8d6c02'
+ORIGINAL_CLASSIFIER=r.FINAL_CLASSIFIER_PREIMAGE
 EXPECTED_FILES=9404
 TARGET_CLASS='com/projectinfinity/kodi/InfinityInstalledCheckpointInstaller.smali'
 NATIVE_PATHS={r.CONTRACT_PATH,r.COORDINATOR_PATH}
-FINAL_NATIVE={r.CONTRACT_PATH:'116d0677d8530dc84afbf9646fcbff9ca58ecfee9efc16542eaecfb1039bc8f6',
+FINAL_NATIVE={r.CONTRACT_PATH:'0ff3fb5831282c413db891f4d6d259547712b7d61d1c6ac922f1d2107c26d1ec',
               r.COORDINATOR_PATH:'a17e43f22ac1716ad14fb8e7635888d2e10d3d0ee11a35b7798e3b38c62c122e'}
 FINAL_JAVA='7cef1dfb1c1fce521e4c27788f293ea85f494ec6ff9edb4014cce72b7de88194'
 SIGNATURE=re.compile(r'META-INF/(?:MANIFEST\.MF|[^/]+\.(?:SF|RSA|DSA|EC))',re.I)
@@ -59,7 +59,7 @@ def snapshot(root: Path) -> dict[str,str]:
 def verified_stage(apk: Path, stage: Path) -> tuple[dict,dict[str,bytes]]:
     """Regenerate all reviewed bytes, never trust a caller-supplied green flag."""
     original=r.read_original(apk); final=r.components(original)
-    expected_native={r.CONTRACT_PATH:r.contracts((r.NATIVE_BASE/r.CONTRACT_PATH).read_bytes(),final),
+    expected_native={r.CONTRACT_PATH:r.contracts(r.original_classifier(),final),
                      r.COORDINATOR_PATH:r.coordinator(r.original_coordinator())}
     expected_java=r.java_router((r.JAVA_BASE/r.JAVA_PATH).read_bytes(),final)
     require({n:r.sha(b) for n,b in expected_native.items()}==FINAL_NATIVE,'Reviewed native output drift')
