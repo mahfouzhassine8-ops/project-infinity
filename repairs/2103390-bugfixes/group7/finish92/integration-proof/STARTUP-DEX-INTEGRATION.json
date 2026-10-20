@@ -1,0 +1,55 @@
+{
+  "android_art_verifier_executed": false,
+  "android_process_tested": false,
+  "component_dex_name": "classes.dex",
+  "component_dex_sha256": "2b54ba6ede1461cfcd0e1788de8c35a7cf63df582d9c8e03bb3c583890b8de54",
+  "decoded_protected_instructions_identical": true,
+  "fields": {
+    "adapter_packaged_into_app": false,
+    "build_only_adapter_sha256": "742846f5d6acad04e35c0c181dcc6b7ff31fae850978f0cc903ff3b79b3c9eb2",
+    "encoded_values_and_presence_preserved": true,
+    "exact_field_definitions_verified": 25870,
+    "field_normalization_or_exemption_added": false,
+    "protected_class_definitions_from_original": 7854,
+    "protected_runtime_classes_recompiled": false
+  },
+  "final_lock": false,
+  "helper": {
+    "actual_javac_and_d8_executed": true,
+    "compiled_helper_class_sha256": "7ba4cc6f1e0e689a12f8b1a2d5d7e4a7a45cbf2ae0302c9b008c9795500df949",
+    "compiled_helper_dex_sha256": "ebe932bda6deae5445e6cea629c5e3579f8b2a7ccf609293b915fd733579c7ec",
+    "helper_smali_sha256": "c995271b5e1ef3b4e20881691e39a23204b87258c13d6a968ee473ff31c7cc62",
+    "platform_api_stubs_compiled_into_dex": false,
+    "reviewed_java_sha256": "7cef1dfb1c1fce521e4c27788f293ea85f494ec6ff9edb4014cce72b7de88194",
+    "verbatim_helper_java_sha256": "cfeef66849289eb83b2c3ae9b3e046f83c2ce54ba4973c8147710b5695d8fe6e"
+  },
+  "invalid_reapplication_and_preimage_cases_rejected": 3,
+  "min_android_api": 21,
+  "native_engine_compiled": false,
+  "new_signed_apk": false,
+  "only_runtime_class_changed": "com/projectinfinity/kodi/InfinityInstalledCheckpointInstaller.smali",
+  "original_apk_unchanged": true,
+  "original_dex_sha256": "67e556c37a534be95789b3d88a9468219ecc5ea47d81dd5aab9b5911ba1c6573",
+  "other_dex_shards": {
+    "classes2.dex": "d4df6604044e7cb66584229562186bf2ed8f0031d2d3efba03bba8ebe38934ca"
+  },
+  "other_dex_shards_must_be_copied_byte_identically": true,
+  "physical_fold_verified": false,
+  "protected_classes_in_changed_shard": 7854,
+  "requires_matched_native_engine_and_addons_before_installation": true,
+  "route": {
+    "added_registers": 0,
+    "integrated_smali_sha256": "e9771eefafae7c51275f171e6f78c62c04e9dc1178fdf44f041fc8c6b1bdec1e",
+    "new_method": "verifyReviewedController22(Ljava/io/File;)Z",
+    "new_route_exception_handler": "original catch_1 preserves CC22 version",
+    "original_class_sha256": "49c01dfe24c81d56af058ad2c12f3eac1efa1cf6e0165bca0a0cf3f62720a98d",
+    "original_exception_paths_preserved": true,
+    "original_methods_preserved_except_additive_route": true
+  },
+  "run_id": "39376264712",
+  "shard_runtime_classes": 7855,
+  "source_apk_sha256": "47609f2ada1d6bbc7cdbddb791d11815bdbf1100a083bd8205d60ac21c882151",
+  "source_commit": "0308452b1a6164e659630076d6d0908c37c00789",
+  "state": "ANDROID_DEX_COMPONENT_INTEGRATED_NOT_A_SIGNED_APK",
+  "total_original_runtime_classes": 8829
+}

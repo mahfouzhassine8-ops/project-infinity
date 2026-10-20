@@ -1,0 +1,112 @@
+{
+  "schema": 1,
+  "state": "HOST_PREFLIGHT_AND_STARTUP_DEX_COMPONENT_VERIFIED_FULL_NATIVE_APK_INTEGRATION_INCOMPLETE",
+  "user_instruction": "proceed with intergration",
+  "integration_start_commit": "f98cf6b395990e6c16ddfd500b9002081afd3291",
+  "verified_build_source_commit": "0308452b1a6164e659630076d6d0908c37c00789",
+  "workflow": ".github/workflows/infinity-2103392-integration-preflight.yml",
+  "run_id": 39376264712,
+  "job_id": 118474986600,
+  "run_conclusion": "success",
+  "source_apk_sha256": "47609f2ada1d6bbc7cdbddb791d11815bdbf1100a083bd8205d60ac21c882151",
+  "original_apk_unchanged": true,
+  "seven_group_host_suites": [
+    {"group":1,"passed":53,"skipped":0,"physical_fold_verified":false},
+    {"group":2,"passed":20,"skipped":0,"physical_fold_verified":false},
+    {"group":3,"passed":26,"skipped":0,"physical_fold_verified":false},
+    {"group":4,"passed":10,"skipped":0,"physical_fold_verified":false},
+    {"group":5,"passed":10,"skipped":0,"physical_fold_verified":false,"scope":"forensic identity only; not a crash fix"},
+    {"group":6,"passed":10,"skipped":0,"physical_fold_verified":false},
+    {"group":7,"passed":22,"skipped":0,"physical_fold_verified":false}
+  ],
+  "additional_host_suites": [
+    {"suite":"coherent92 real-file C++/Java and Close identity checks","passed":16,"skipped":0,"platform_peers_are_test_doubles":true},
+    {"suite":"integration adapters","passed":15,"skipped":0,"full_native_ledger_fixtures_are_synthetic":true}
+  ],
+  "host_tests_passed": 182,
+  "host_tests_skipped": 0,
+  "host_test_failures": 0,
+  "historical_persistence_tests_not_in_this_run": 13,
+  "group2_native_fixture_gap_closed": {
+    "files": 4,
+    "source": "xbmc/xbmc 21.3-Omega",
+    "actual_source_sha256_matches_original_2103391_build_before_ledger": true,
+    "patched_sha256_matches_original_2103391_build_after_ledger": true,
+    "full_native_tree_reconstructed": false
+  },
+  "source_adapters": {
+    "source_staging_verified": true,
+    "coordinated_addon_member_changes": 8,
+    "native_source_changes": 2,
+    "java_source_changes": 1,
+    "native_binding_requires_exact_original_source_files": 9404,
+    "real_full_native_binding_executed": false,
+    "candidate_apk_scope_checker_implemented": true,
+    "candidate_apk_scope_checker_executed_on_new_apk": false
+  },
+  "startup_dex": {
+    "actual_javac_d8_compilation_and_dex_assembly": true,
+    "producer_proof": "integration-proof/STARTUP-DEX-INTEGRATION.json",
+    "component_name": "classes.dex",
+    "sha256": "2b54ba6ede1461cfcd0e1788de8c35a7cf63df582d9c8e03bb3c583890b8de54",
+    "only_changed_class": "com/projectinfinity/kodi/InfinityInstalledCheckpointInstaller.smali",
+    "protected_classes_verified": 7854,
+    "field_definitions_verified": 25870,
+    "unexpected_class_changes": [],
+    "explicit_initializers_preserved": true,
+    "original_evidence_write_paths_preserved": true,
+    "old_method_logic_preserved_outside_exact_new_route": true,
+    "rejected_bad_preimage_or_reapplication_cases": 3,
+    "android_art_verifier_executed": false,
+    "whole_android_process_tested": false,
+    "standalone_component_is_installable": false
+  },
+  "artifacts": {
+    "host_reports": {
+      "id": 12243074682,
+      "name": "Infinity-2103392-Integration-Preflight-Reports-NOT-APK",
+      "sha256": "75f3dadc0108a27ad21c2ec4285bb516bff95f9d85e0595ac9d60996d7b5bd8a",
+      "bytes": 16101
+    },
+    "startup_dex_component": {
+      "id": 12243174532,
+      "name": "Infinity-2103392-Verified-Startup-DEX-COMPONENT-NOT-INSTALLABLE",
+      "sha256": "7779edccfe9317a21838beae8a22577daaa4432dcd4ea349e9431b8b99499d65",
+      "bytes": 4363433
+    },
+    "downloaded_archives_sha256_and_crc_rechecked_locally": true
+  },
+  "earlier_attempts_preserved": [
+    {"run_id":39372410626,"state":"182 host tests passed before DEX build was added"},
+    {"run_id":39373318114,"state":"182 host tests passed; own filename construction bug stopped Java compile; corrected"},
+    {"run_id":39373913098,"state":"182 host tests passed; strict DEX preservation rejected unexpected defaults; no component published"},
+    {"run_id":39374525795,"state":"182 host tests passed; exact diff identified six protected classes with explicit default field encodings omitted by writer"},
+    {"run_id":39375481121,"state":"182 host tests passed; build-only adapter package-private Java type access error; corrected"}
+  ],
+  "dex_preservation_correction": "Use original protected class definitions and retain explicit static initializer presence/values through a version-pinned build-only writer adapter. Compare every field and unchanged normalized instructions. No protected-field exemption or new normalization rule.",
+  "phase_order_note": "The preflight JSON records java_dex_integrated=false before the subsequent DEX build. The final startup producer proof supersedes that phase flag only; native/APK/runtime/Fold flags remain false.",
+  "preservation": {
+    "cobra_source_changed": false,
+    "cobra_executable_class_logic_changed": false,
+    "user_data_changed": false,
+    "providers_changed": false,
+    "skin_ui_or_rails_logic_changed": false,
+    "essential_first_owner_counts_or_deadlines_changed": false,
+    "new_features": false
+  },
+  "native_workflow_block": "Earlier native-input workflow submission was rejected by OpenAI tool safety control. This preflight/DEX workflow did not retry or replace that blocked native build.",
+  "native_engine_compiled": false,
+  "new_signed_apk": false,
+  "new_installable_matching_zip_set": false,
+  "physical_fold_verified": false,
+  "final_lock": false,
+  "remaining": [
+    "Real complete native reconstruction and 9404-source inventory binding",
+    "Actual matched ARM64 engine compilation and source-to-binary proof",
+    "Complete APK member preservation verification, permanent signing and matching component delivery",
+    "Android ART and whole-process install-over, complete Essential-First Close and reopen",
+    "All required physical Fold tests for seven groups, approved polish, player/PiP/background and Cobra preservation",
+    "Original SIGSEGV faulting instruction/root cause remains unproved",
+    "Group1 task19 remains explicitly user-deferred"
+  ]
+}
