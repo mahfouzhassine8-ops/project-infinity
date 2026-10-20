@@ -1,0 +1,41 @@
+{
+  "scope": "Actual production observer/ledger and extracted attach placement; host CPython, not Galaxy Fold acceptance.",
+  "old_source_reproduction": false,
+  "cases": [
+    {
+      "case": "cancelled",
+      "passed": true,
+      "detail": "PASS cancelled proof=checked-retirement"
+    },
+    {
+      "case": "missing-file",
+      "passed": true,
+      "detail": "PASS missing-file proof=blocked"
+    },
+    {
+      "case": "normal-readonly",
+      "passed": true,
+      "detail": "PASS normal-readonly proof=checked-retirement"
+    },
+    {
+      "case": "checked-write",
+      "passed": true,
+      "detail": "PASS checked-write proof=checked-retirement"
+    },
+    {
+      "case": "pending-transaction",
+      "passed": true,
+      "detail": "PASS pending-transaction proof=blocked"
+    },
+    {
+      "case": "opaque-writer",
+      "passed": true,
+      "detail": "PASS opaque-writer proof=blocked"
+    },
+    {
+      "case": "observer-error",
+      "passed": true,
+      "detail": "PASS observer-error proof=blocked"
+    }
+  ]
+}

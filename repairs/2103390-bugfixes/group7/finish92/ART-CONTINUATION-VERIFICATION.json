@@ -1,0 +1,106 @@
+{
+  "actual_kodi_install_over_tested": false,
+  "all_19_task_identities_retained": true,
+  "android_component_tests": {
+    "abi": "x86_64",
+    "actual_bytecode_reused_not_recompiled": true,
+    "actual_compiled_production_method": "InfinityInstalledCheckpointInstaller.verifyReviewedController22(File)",
+    "actual_startup_apply_before_native_invoked": false,
+    "api": 37,
+    "candidate_cases": 37,
+    "cc21_manifest_retag_rejected": true,
+    "complete_cc22_accepted_before_and_after_tests": true,
+    "each_of_13_changed_and_each_of_13_missing_files_rejected": true,
+    "launcher": "/system/bin/app_process -Xverify:all",
+    "native_engine_loaded": false,
+    "original_build_control": 1,
+    "oversized_and_missing_root_rejected": true,
+    "passed": 38,
+    "proof": "art-proof/ART-COMPONENT-VERIFICATION.json",
+    "release": "17",
+    "samsung_one_ui_emulated": false,
+    "sentinel_is_disposable_fixture_not_user_profile_proof": true,
+    "symlinked_file_and_root_rejected": true
+  },
+  "android_job": 118489409142,
+  "android_run": 39380859431,
+  "artifacts": {
+    "downloaded_checksums_crc_and_individual_case_logs_rechecked_locally": true,
+    "first_attempt": {
+      "bytes": 17260,
+      "id": 12245351697,
+      "sha256": "a34273ee1e98838e37b0859ccbfcfc0de7c6f4a54f049a2f9d3e5246f3910ed0"
+    },
+    "successful_art": {
+      "bytes": 18337,
+      "id": 12245228706,
+      "sha256": "1bdb60505c11ba7148577a9195d0f7db856637a5aec5c0656980a1d415a49ab7"
+    }
+  },
+  "component_producer": "0308452b1a6164e659630076d6d0908c37c00789",
+  "component_sha256": "2b54ba6ede1461cfcd0e1788de8c35a7cf63df582d9c8e03bb3c583890b8de54",
+  "continued_from": "9be6c813aa7565f9eef44b54fa0d993b4bb659fe",
+  "final_lock": false,
+  "first_art_attempt": {
+    "assertions_removed_or_ignored": false,
+    "changed_only_test_launcher_and_added_two_harness_regressions": true,
+    "conclusion": "failure",
+    "corrected_in": "5757539239d01a3bc2103a073017630fe9c0b92f",
+    "failure": "Bare dalvikvm lacked Android SystemProperties framework JNI initialization; failed in the test probe before the Infinity class was loaded.",
+    "job": 118486754972,
+    "production_code_failure_demonstrated": false,
+    "run": 39380017377
+  },
+  "full_seven_group_scope_retained": true,
+  "group5_original_sigsegv_fixed": false,
+  "harness_host_tests": {
+    "passed": 12,
+    "scope": "Evidence and command-construction guards; not extra Android cases",
+    "skipped": 0
+  },
+  "local_native_input_checks": {
+    "cancellation_write_safety_host_passed": 7,
+    "native_library_compile_proven": false,
+    "pinned_curl_host_passed": 10,
+    "receipt": "art-proof/NATIVE-RECONSTRUCTION-ATTEMPT.json"
+  },
+  "native_integration": {
+    "complete_9404_source_binding_executed": false,
+    "earlier_native_workflow_tool_safety_block_retried": false,
+    "local_failure": "Original bootstrap network dependencies unavailable; deb.debian.org DNS resolution and python3-yaml installation failed.",
+    "local_reconstruction_attempted": true,
+    "matched_arm64_engine_compiled": false
+  },
+  "new_matching_installable_zip_set": false,
+  "new_signed_apk": false,
+  "next_required_gate": "Permitted complete original-native reconstruction, exact source-map binding and matched ARM64 compile; component ART success is not a substitute.",
+  "physical_fold_verified": false,
+  "prior_182_preflight_host_passes": {
+    "reused_historical_evidence_not_rerun_or_added_to_this_run": true,
+    "run": 39376264712
+  },
+  "production_changes_this_continuation": {
+    "cobra_modified": false,
+    "essential_first_policy_owner_counts_deadlines_modified": false,
+    "original_apk_modified": false,
+    "runtime_source_files": 0,
+    "skin_rails_providers_user_data_modified": false,
+    "verified_dex_modified": false
+  },
+  "remaining": [
+    "Matched native engine compile and provenance",
+    "Final APK member preservation, permanent signing and coordinated same-ID ZIPs",
+    "Actual installed startup path, Kodi install-over and Essential-First Close/reopen",
+    "Physical Fold qualification of all seven groups including UI, playback, PiP, background and Cobra noninterference",
+    "Group5 original faulting instruction/root cause",
+    "User-deferred task19 remains unfixed"
+  ],
+  "run_conclusion": "success",
+  "schema": 1,
+  "source_apk_sha256": "47609f2ada1d6bbc7cdbddb791d11815bdbf1100a083bd8205d60ac21c882151",
+  "state": "EXISTING_STARTUP_VERIFIER_ANDROID_ART_PASSED_FULL_NATIVE_APK_INTEGRATION_BLOCKED",
+  "task19_explicitly_deferred": true,
+  "user_instruction": "proceed",
+  "verified_harness_commit": "5757539239d01a3bc2103a073017630fe9c0b92f",
+  "whole_process_close_reopen_tested": false
+}

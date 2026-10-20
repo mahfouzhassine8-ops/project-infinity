@@ -1,0 +1,21 @@
+{
+  "checks": {
+    "actual_curl_guard_compiled_and_executed": true,
+    "actual_pinned_source_transforms": true,
+    "curl_io_failure_instead_of_eof_and_existing_200ms_poll": true,
+    "curl_self_cancel_instead_of_cross_thread_kill": true,
+    "early_python_abort_latched_before_playback_and_writer_proof_untouched": true,
+    "early_save_before_python_with_final_barrier_retained": true,
+    "http_read_only_write_api_excluded": true,
+    "nested_and_cross_thread_identity_isolation": true,
+    "normal_running_no_block_and_unknown_addons_fail_closed": true,
+    "same_monitor_and_legacy_abort_paths_idempotent": true
+  },
+  "passed": 10,
+  "scope": "Host simulation with real injected Curl code, stub native API and exact RC2 source. Not a full Kodi/Android build.",
+  "source_hashes": {
+    "checkpoint": "723f680401a31b36c21ee7b2cfa673feb48f622cb96e31d9c6365e3b44c52bcf",
+    "curl": "176f7931fa3dcfd16aa8adb689c00d6b32764616b0587ab6eb21b832d11c0233"
+  },
+  "total": 10
+}

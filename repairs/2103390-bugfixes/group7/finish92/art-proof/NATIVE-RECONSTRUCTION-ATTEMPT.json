@@ -1,0 +1,35 @@
+{
+  "schema": 1,
+  "scope": "Local immutable-producer input replay; NOT a native build or Android run",
+  "continued_from": "9be6c813aa7565f9eef44b54fa0d993b4bb659fe",
+  "original_native_producer_commit": "7bd9b1085d598789e9e803b4b76ee1429e1df7e3",
+  "original_producer_tracked_files_unchanged": true,
+  "restored_original_signed_apk_sha256": "47609f2ada1d6bbc7cdbddb791d11815bdbf1100a083bd8205d60ac21c882151",
+  "restored_existing_apk_not_a_new_build": true,
+  "downloaded_input_archives": {
+    "Infinity-Native-Reconstruction-Curl-Input.zip": {"artifact_id":11862382730,"sha256":"7da605a97026b69d3e1d3427221c61c37b2e3218e295aec194da98f98d30f26f","actual_checksum_rechecked":true},
+    "Infinity-Native-Reconstruction-Locked3374-Input.zip": {"artifact_id":11745443768,"sha256":"42d2bc78ee1f812b53645ab846c09fbe8f8708448a469de7b7116306c8922c3c","actual_checksum_rechecked":true},
+    "Infinity-Native-Reconstruction-Parent3375-Input.zip": {"artifact_id":11756697796,"sha256":"77cc7d1cd7a039cbc4616026cd19eebc29bee7e5e778a64edabc00799a5990d7","actual_checksum_rechecked":true},
+    "Infinity-Native-Reconstruction-Locked3384-Evidence.zip": {"artifact_id":12122755519,"sha256":"8739af995b28089ddcd381515f43335d738fc183079d15b236f0d0f637b81cb3","actual_checksum_rechecked":true}
+  },
+  "pinned_curl_host_checks": {"passed":10,"receipt":"local/RC3-HOST-VERIFICATION.json","scope":"Host simulation with real injected Curl code, stub native API and exact RC2 source. Not a full Kodi/Android build."},
+  "cancellation_write_safety_host_checks": {"passed":7,"receipt":"local/cancelled-script-system-python.json","scope":"Actual production observer/ledger and extracted attach placement; host CPython, not Galaxy Fold acceptance."},
+  "initial_environment_failure": "The embedded Python harness selected a virtual-environment prefix and failed loading encodings. System Python selection resolved this without source changes.",
+  "local_native_reconstruction": {
+    "attempted":true,"completed":false,"process_exited":true,"exit_code":1,"bootstrap_shell_exit_code":100,
+    "failure":"Original bootstrap could not resolve deb.debian.org and could not install python3-yaml; complete source acquisition was not reached.",
+    "complete_9404_source_map_bound":false,"source_guard_bypassed":false,
+    "full_local_log_sha256":"1ad27e3792258745a0c0b9ed49defdb41deafbe77f860b1a06c8545e456fb3b1",
+    "raw_log_location":"local/continuation-system-reconstruction.log in the downloadable continuation evidence archive"
+  },
+  "earlier_native_workflow_safety_block_retried_or_circumvented": false,
+  "native_engine_compiled": false,
+  "new_signed_apk": false,
+  "new_matching_installable_zip_set": false,
+  "original_app_or_user_profile_modified": false,
+  "physical_fold_verified": false,
+  "final_lock": false,
+  "full_seven_group_scope_retained": true,
+  "group5_original_sigsegv_fixed": false,
+  "task19_user_deferred": true
+}

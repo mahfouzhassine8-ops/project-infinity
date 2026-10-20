@@ -1,10 +1,10 @@
 {
-  "schema": 3,
+  "schema": 4,
   "record_type": "Infinity_seven_group_current_status_with_immutable_history",
   "repository": "mahfouzhassine8-ops/project-infinity",
   "branch": "work/infinity-2103391-pro-seven-group-audit-20261019",
-  "status": "HOST_PREFLIGHT_AND_ANDROID_STARTUP_DEX_VERIFIED_FULL_NATIVE_APK_INTEGRATION_INCOMPLETE",
-  "last_user_instruction": "proceed with intergration",
+  "status": "EXISTING_STARTUP_VERIFIER_ANDROID_ART_PASSED_FULL_NATIVE_APK_INTEGRATION_BLOCKED",
+  "last_user_instruction": "proceed",
   "active_group_contract": "repairs/2103390-bugfixes/GROUPED-01-07-BINDING-CONTRACT.md",
   "binding_contract": "repairs/2103390-bugfixes/REPAIR-CONTRACT-01-19.md",
   "continuation_handoff": "repairs/2103390-bugfixes/CONTINUE-HERE.md",
@@ -60,7 +60,7 @@
     {"id":"15","title":"Native exit status 139 root-cause investigation","status":"FORENSIC_IDENTITY_TESTS_PASS_ORIGINAL_CRASH_CAUSE_UNPROVEN","historical_detail_index":14},
     {"id":"16","title":"CU LRC Lyrics Python exception investigation","status":"SKIPPED_BY_USER_NO_CHANGES","historical_detail_index":15},
     {"id":"17","title":"TMDb Helper/SlyGuy quarantined startup investigation","status":"SKIPPED_BY_USER_NO_CHANGES","historical_detail_index":16},
-    {"id":"18","title":"Selectively combine signed APK and full Fold acceptance audit","status":"182_HOST_TESTS_AND_STARTUP_DEX_COMPONENT_VERIFIED_FULL_NATIVE_APK_NOT_BUILT","historical_detail_index":17},
+    {"id":"18","title":"Selectively combine signed APK and full Fold acceptance audit","status":"EXACT_STARTUP_VERIFIER_ANDROID_ART_PASSED_FULL_NATIVE_APK_NOT_BUILT","historical_detail_index":17},
     {"id":"19","title":"Movies ↔ TV Shows keep all initially populated Home rails immediately available without tab-switch reload","status":"USER_DEFERRED_NOT_FIXED","historical_detail_index":18}
   ],
   "group_status": {
@@ -72,7 +72,7 @@
     "6":{"scope":"System Hub Silent Mode","host":{"tests":10,"passed":10,"skipped":0,"successful":true},"full_device_acceptance":"PENDING"},
     "7":{"scope":"Integration, component identities and packaging","host":{"tests":22,"passed":22,"skipped":0,"successful":true},"full_device_acceptance":"PENDING"}
   },
-  "latest_corrective_receipt": "group7/finish92/INTEGRATION-VERIFICATION.json",
+  "latest_corrective_receipt": "group7/finish92/ART-CONTINUATION-VERIFICATION.json",
   "latest_source_manifest": "group7/finish92/COHERENT92-SOURCE.json",
   "source_corrections_commit": "d65d2d05ecee8fca912d8b63b7dd628add8bd257",
   "source_tests_commit": "30ed08c206858c32dfe869c9d7004795b9a89774",
@@ -97,9 +97,24 @@
   "remaining": [
     "Full native reconstruction/source-ledger binding and actual matched ARM64 compile",
     "Complete APK member preservation verification, permanent signing and matching component delivery",
-    "Actual Android ART, Kodi install-over and whole-process Close/reopen validation",
+    "Actual installed Android startup path, Kodi install-over and whole-process Close/reopen validation",
     "All required physical Fold input/UI/polish/playback/PiP/background acceptance",
     "Group5 original SIGSEGV faulting instruction/root cause",
     "Group1 task19 explicitly deferred"
-  ]
+  ],
+  "previous_corrective_receipt": "group7/finish92/INTEGRATION-VERIFICATION.json",
+  "prior_art_tracker": {
+    "path": "receipts/history/TASK-STATUS-before-art92.json",
+    "git_blob_sha": "e3726dca30f0b745a54a8015df2c27d3e3c6f8c0",
+    "complete_prior_records_preserved_byte_identically": true
+  },
+  "host_total_basis": "Historical preflight run 39376264712; the 182 tests were not rerun in this ART-only workflow.",
+  "android_startup_verifier_component_art_verified": true,
+  "android_startup_verifier_component_art_run": 39380859431,
+  "android_startup_verifier_component_art_cases": 38,
+  "android_startup_verifier_component_art_proof": "group7/finish92/art-proof/ART-COMPONENT-VERIFICATION.json",
+  "android_art_or_whole_process_verified_scope": "Legacy combined flag stays false because the installed app startup path and whole-process lifecycle are not verified. See separate true component-only ART flag.",
+  "local_native_source_reconstruction_attempted": true,
+  "local_native_source_reconstruction_completed": false,
+  "local_native_reconstruction_receipt": "group7/finish92/art-proof/NATIVE-RECONSTRUCTION-ATTEMPT.json"
 }

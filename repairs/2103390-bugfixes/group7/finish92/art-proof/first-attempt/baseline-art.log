@@ -1,0 +1,11 @@
+Exception in thread "main" java.lang.UnsatisfiedLinkError: No implementation found for java.lang.String android.os.SystemProperties.native_get(java.lang.String, java.lang.String) (tried Java_android_os_SystemProperties_native_1get and Java_android_os_SystemProperties_native_1get__Ljava_lang_String_2Ljava_lang_String_2) - is the library loaded, e.g. System.loadLibrary?
+	at android.os.SystemProperties.native_get(Native Method)
+	at android.os.SystemProperties.get(SystemProperties.java:167)
+	at android.os.Build.getString(Build.java:1969)
+	at android.os.Build.<clinit>(Build.java:66)
+	at android.os.Build$VERSION.<clinit>(Build.java:372)
+	at java.lang.Class.classForName(Native Method)
+	at java.lang.Class.forName(Class.java:591)
+	at java.lang.Class.forName(Class.java:496)
+	at Controller22ArtProbe.androidApi(dex-id-53c62f51c825b6c919cd13de74d5443c5e711d2d:2)
+	at Controller22ArtProbe.main(dex-id-53c62f51c825b6c919cd13de74d5443c5e711d2d:87)
