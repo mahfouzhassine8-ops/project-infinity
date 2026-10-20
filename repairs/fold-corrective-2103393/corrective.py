@@ -254,7 +254,10 @@ def clock_cluster(raw):
                 element.remove(node)
     for tag,value in (('left','0'),('centertop','50%'),('width','18'),('height','18')):
         ET.SubElement(image,tag).text=value
-    for tag,value in (('left','0'),('top','0'),('height','$PARAM[timeheight]'),('align','right')):
+    # The GROUP aligns the measured span to the right. The auto-width label
+    # itself must align left: Kodi renders right-aligned labels inside their
+    # maximum rectangle even when GetWidth() returns the measured text width.
+    for tag,value in (('left','0'),('top','0'),('height','$PARAM[timeheight]'),('align','left')):
         ET.SubElement(clock,tag).text=value
     width=ET.SubElement(clock,'width',{'min':'1','max':'$PARAM[timewidth]'})
     width.text='auto'

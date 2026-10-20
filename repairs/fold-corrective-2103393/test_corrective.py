@@ -384,8 +384,10 @@ int main(){
             b=after.find('include[@name="InfinityHomeStatusCluster"]/definition')
             group=b.find('control[@type="grouplist"]');self.assertIsNotNone(group)
             self.assertEqual(group.findtext('itemgap'),'8')
+            self.assertEqual(group.findtext('align'),'right')
             clock=group.find('control[@type="label"]')
             self.assertEqual(clock.findtext('width'),'auto');self.assertEqual(clock.findtext('label'),'$INFO[System.Time]')
+            self.assertEqual(clock.findtext('align'),'left')
             for n in a.findall('control[@type="label"]'):
                 if n.findtext('label')!='$INFO[System.Time]':
                     self.assertIn(ET.tostring(n),[ET.tostring(x) for x in b.findall('control[@type="label"]')])
