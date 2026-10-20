@@ -1,0 +1,87 @@
+{
+  "state": "CONTROLLER22_SOURCE_CORRECTIONS_TESTED_NOT_AN_APK",
+  "verified_source_parent_commit": "7c07e3757604b69ced8735b65cb1a3061fa73a0d",
+  "rollback_commit": "a2c528f412c5a2b7105d10abfd593b91ab63a7b0",
+  "source_apk_sha256": "47609f2ada1d6bbc7cdbddb791d11815bdbf1100a083bd8205d60ac21c882151",
+  "original_signed_apks_unchanged": true,
+  "seven_groups": [
+    {"group":1,"tests":53,"skipped":0,"successful":true,"physical_fold_verified":false,"passed":53},
+    {"group":2,"tests":20,"skipped":1,"successful":true,"physical_fold_verified":false,"passed":19},
+    {"group":3,"tests":26,"skipped":0,"successful":true,"physical_fold_verified":false,"passed":26},
+    {"group":4,"tests":10,"skipped":0,"successful":true,"physical_fold_verified":false,"passed":10},
+    {"group":5,"tests":10,"skipped":0,"successful":true,"physical_fold_verified":false,"passed":10},
+    {"group":6,"tests":10,"skipped":0,"successful":true,"physical_fold_verified":false,"passed":10},
+    {"group":7,"tests":22,"skipped":0,"successful":true,"physical_fold_verified":false,"passed":22}
+  ],
+  "additional_tests": {
+    "coordinated_real_file_cpp_java_close_gate": {"passed":16,"skipped":0},
+    "existing_actual_controller_persistence_integration": {"passed":13,"skipped":0}
+  },
+  "total_host_tests_passed": 179,
+  "total_host_tests_skipped": 1,
+  "failed_completed_host_tests": 0,
+  "group2_skip": "test_10_actual_native_checkout_exact_anchor_guards: real four-file native checkout fixture not mounted",
+  "proof_boundary": "Host C++/Java compiled and executed over real files. Android/Kodi APIs and JSON peers are doubles. No whole ARM64 library, Android process, Kodi ZIP installer, or physical Fold qualification.",
+  "native_input_workflow_submission": "BLOCKED_BY_OPENAI_TOOL_SAFETY_CHECK_NO_RUN_CREATED",
+  "native_build_started": false,
+  "new_signed_apk": false,
+  "installable_addon_zip_set": false,
+  "physical_fold_verified": false,
+  "user_final_lock": false,
+  "coordinator": {
+    "old_base_overlay_rejected": true,
+    "final_test4_sha256": "eb74a3730456fc4c4fb0bfd65a45afcd7823dfdd66125fd16fd4119fa8d3c6ee",
+    "staged_sha256": "a17e43f22ac1716ad14fb8e7635888d2e10d3d0ee11a35b7798e3b38c62c122e",
+    "evidence_run": 38975950035,
+    "evidence_artifact": 12079997774,
+    "evidence_zip_sha256": "d416508a25299816ca6565cfba09a9cb8642e35a0fa607f8ad5271e99de95c27",
+    "change": "Only append exact 0.3.5.22 to supported active participant versions; policy, counts, deadlines and durability checks retained"
+  },
+  "silent_mode_fixture": {
+    "upstream_repository": "xbmc/xbmc",
+    "upstream_ref": "21.3-Omega",
+    "upstream_path": "xbmc/dialogs/GUIDialogKaiToast.cpp",
+    "git_blob_sha": "2f8ca00cd765dff09720ee002d6dc390a240fd32",
+    "sha256": "b302de3bd291691d0a43bba686b93cc389c0735e1758c5078102dd51b83e4c38",
+    "matches_original_2103391_native_input_ledger": true
+  },
+  "existing_delivered_components": [
+    {"original_zip":"script.infinity.rails-0.2.7-Infinity-2103391-TEST.zip","members":15,"changed_members":[],"all_members_equal":true},
+    {"original_zip":"skin.infinity.diggz-1.0.5.229-Infinity-2103391-TEST.zip","members":3072,"changed_members":[],"all_members_equal":true}
+  ],
+  "component_versions_proposed": {
+    "script.infinity.commandcenter": "0.3.5.22",
+    "script.infinity.watchedbridge": "1.0.3",
+    "script.infinity.uirepair": "0.1.4",
+    "script.infinity.rails": "0.2.7",
+    "skin.infinity.diggz": "1.0.5.229"
+  },
+  "log_sha256": {
+    "group1-current.log": "c549e0889da5b2d173c6219f53920c75e407bf7eade7cc21005f3b185d6fb495",
+    "group2-current.log": "831b4f75f919ea7f10c0b9f98b2903da19fed69e74ec758a3ed16053b6eb65f5",
+    "group3-current.log": "b85780ad0fc61f7c92a650baa7c80f78a6fc860c847405fb66249d0b8fb5f6f6",
+    "group4-current.log": "f96b70b78ea79961d2044a89348c832067aa53ad372d2e3359bfd30798ee3b73",
+    "group5-current.log": "d65fbea64c145b6f1cd44d583055b3880c9b0fb0a780e7b59d486bb5c6c84473",
+    "group6-current.log": "d8142446b727271d6fa5a94e9a738cfce5966d2ff89510e280bd96a734692bc8",
+    "group7-current.log": "2758685ca27211f9ff8757efac0fdf74cc32dbe1e8eaca8ee32a7d986c701af7",
+    "cc22-coherent-tests.log": "1d4ff2124388e6f7e94bb6fa33a3b46367912216d3489059359f6511487f37ce",
+    "cc22-runtime-tests.log": "d8e85686dfb98eef5f2a2aa28f85e69c5523cfeaff83a0f413f083b4ee721ccb"
+  },
+  "preservation": {
+    "cobra_changes": false,
+    "user_data_changes": false,
+    "database_migrations": 0,
+    "essential_first_owner_count_changes": false,
+    "prior_contract_variants_preserved": true,
+    "new_features": false
+  },
+  "open": [
+    "Full native reconstruction/source-ledger integration and actual ARM64 compile",
+    "Java-to-DEX integration, package preservation verification and permanent signing",
+    "Actual Kodi install-over and whole-process Close/reopen validation",
+    "All required physical Fold input/UI/polish/playback/PiP/background acceptance",
+    "Group2 exact native source fixture",
+    "Group5 original SIGSEGV faulting instruction/root cause",
+    "Group1 task19 explicitly deferred"
+  ]
+}

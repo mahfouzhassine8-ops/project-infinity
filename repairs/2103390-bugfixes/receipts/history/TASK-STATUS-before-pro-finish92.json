@@ -1,0 +1,1396 @@
+{
+  "schema": 1,
+  "record_type": "Infinity_2103390_postbase_exact_new_19_tasks",
+  "timestamp_date": "2026-10-19",
+  "status": "GROUP7_2103391_PERMANENTLY_SIGNED_NATIVE_CI_GREEN_PHYSICAL_FOLD_CLOSE_FAILED_TWO_SESSIONS_NATIVE_SIGSEGV_TOMBSTONE_ORIGINAL_CALLSITE_UNKNOWN",
+  "repository": "mahfouzhassine8-ops/project-infinity",
+  "branch": "work/infinity-2103390-targeted-bugfixes",
+  "binding_contract": "repairs/2103390-bugfixes/REPAIR-CONTRACT-01-19.md",
+  "continuation_handoff": "repairs/2103390-bugfixes/CONTINUE-HERE.md",
+  "approved_option_b": "repairs/design-approvals/INFINITY-HOME-POSTER-LONGPRESS-OPTION-B-LOCKED.md",
+  "protected_parent": {
+    "version_code": 2103390,
+    "apk_name": "Infinity-2103390-Nine-Item-Integration-EXPERIMENTAL.apk",
+    "apk_sha256": "778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb",
+    "build_source_commit": "0efb67a0237c8d05ca066c5f893e6a1713bc5e2d",
+    "status": "SIGNED_PROVISIONAL_DEVELOPMENT_BASE_NOT_FINAL_LOCK"
+  },
+  "locked_shutdown_fallback": {
+    "version_code": 2103384,
+    "apk_sha256": "b571676731bb9bdccb25134c557be613e15cc9adaf77d6675dabc8e0586e54af"
+  },
+  "permanent_signer_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "android_package_id": "com.projectinfinity.kodi",
+  "cobra_modification_allowed": false,
+  "shared_cobra_affecting_change_allowed": false,
+  "preserve_all_unapproved_components": true,
+  "user_data_clear_or_uninstall_allowed": false,
+  "native_crash_139_fixed": false,
+  "complete_tasks_count": 0,
+  "task_count": 19,
+  "current_authorized_task": null,
+  "next_task_requires_user_choice": false,
+  "player_glass_menu_visual_proposal": {
+    "canonical_tasks": [
+      "11",
+      "12",
+      "13",
+      "14"
+    ],
+    "user_requested": true,
+    "design_artifact": "repairs/2103390-bugfixes/PLAYER-GLASS-MENUS-APPROVED-20261019.md",
+    "appearance_state": "USER_APPROVED_BITE_FOR_BITE_GLASS_MENU_MATERIAL",
+    "behavior_requested": "Playback, Video Settings and Audio & Subtitles menus must be translucent Infinity liquid glass, with moving video visible THROUGH the panel.",
+    "visual_approval_given": true,
+    "mocked_playback_actions_are_not_authoritative": true,
+    "preserve_real_playback_actions_except_redundant_video_settings_row": true,
+    "cobra_modification_allowed": false,
+    "implementation_or_build_started": false
+  },
+  "save_after_each_task": {
+    "update_required": [
+      "task implementation and tests commit",
+      "TASK-STATUS.json",
+      "CONTINUE-HERE.md",
+      "exact changed-file diff and hashes",
+      "CI/test evidence and any failures",
+      "physical Fold result",
+      "next task and acceptance status"
+    ],
+    "save_to": "GitHub working branch",
+    "advance_without_user_instruction": false,
+    "combine_without_user_instruction": false,
+    "final_lock_without_user_approval": false
+  },
+  "tasks": [
+    {
+      "id": "01",
+      "title": "TV Shows — Continue Watching unavailable source",
+      "approval_stage": "user_reported_queued",
+      "implementation_authorized": true,
+      "status": "TV_ONLY_SOURCE_PATCH_STAGED_9_HOST_TESTS_PASS_FOLD_AND_USER_EPISODES_UNVERIFIED",
+      "prechange_commit": "0efb67a0237c8d05ca066c5f893e6a1713bc5e2d",
+      "implementation_commit": "65e27c93079507895bc88113389b0b786a608a9b",
+      "changed_files": [
+        "repairs/2103390-bugfixes/group1/tv_episode_route_patch.py",
+        "repairs/2103390-bugfixes/group1/test_tv_episode_route_patch.py"
+      ],
+      "targeted_tests": {
+        "result": "9_SOURCE_FIXTURE_CASES_PASS",
+        "runs": [
+          "Host Python, real signed 2103390 plugin.py preimage 11a741a...; 9 tests PASS: invalid-preference route fallback, unavailable preferred-addon fallback, typed SHOW ID, reject EPISODE ID, synthetic next safety, no bypass for 2 failures, movies unchanged, missing source unavailable, source diff compile."
+        ]
+      },
+      "regression_tests": {
+        "result": "SOURCE_AND_IN_MEMORY_APK_DIFF_PASS_NO_FOLD",
+        "runs": [
+          "2026-10-19 combined 19/19 host tests PASS after TV-only narrowing; exact 12/7430 potential signed source member changes (10 Home orb, 1 CC movie, 1 CC TV), other 7418 unchanged in simulation"
+        ]
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "PENDING_PHYSICAL_DEVICE",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": "No proof user-specific episodes use this route/typed-series edge case. Preserves honest error for genuinely unavailable source. Source-only; no APK/skin install or Fold playback pass.",
+      "receipt": "repairs/2103390-bugfixes/receipts/GROUP01-TASK01-EPISODE-SAVED-ROUTE-19HOST-20261019.md"
+    },
+    {
+      "id": "02",
+      "title": "Continue Watching duplicate movies / progress",
+      "approval_stage": "user_reported_queued",
+      "implementation_authorized": false,
+      "status": "SOURCE_STAGED_HOST_5_5_GREEN_FOLD_PENDING_REAL_DATA_MATCH_UNKNOWN",
+      "prechange_commit": "0efb67a0237c8d05ca066c5f893e6a1713bc5e2d",
+      "implementation_commit": "570095ca27fd0cc5f246ba6a7c8d6cdca7e5101c",
+      "changed_files": [
+        "repairs/2103390-bugfixes/group1/movie_identity_patch.py",
+        "repairs/2103390-bugfixes/group1/test_movie_identity_patch.py"
+      ],
+      "targeted_tests": {
+        "result": "5_HOST_TESTS_PASS",
+        "runs": [
+          "local python -m unittest -v test_movie_identity_patch: 5 PASS, 0.036s; actual signed 2103390 Command Center preimage 7794e25...; original source RED (2 cards, third replay key), patched source GREEN (one card/newest verified key)"
+        ]
+      },
+      "regression_tests": {
+        "result": "FOCUSED_SYNTHETIC_NEGATIVE_CASES_PASS_FULL_RUNTIME_UNTESTED",
+        "runs": [
+          "identical labels but different verified TMDb IDs remain distinct; overlapping conflicting IMDb IDs remain distinct; unverified legacy rows remain; TV unaffected; no file writes or modifications to saved input dict; source preimage guard, py-compile pass"
+        ]
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "PENDING_REAL_SAVED_RECORD_IDENTITY_TEST",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": "Actual Insidious stored records were NOT included in diagnostic ZIP; sample identity not verified. Patch refuses title-only/poster-only merge, preserves both stored rows. This is source-only staging, not installed or proved on Fold.",
+      "receipt": "repairs/2103390-bugfixes/receipts/GROUP01-TASK02-VERIFIED-MOVIE-KEY-STAGED-20261019.md"
+    },
+    {
+      "id": "03",
+      "title": "Continue Watching rail touch and Resume/Play picker",
+      "approval_stage": "user_reported_queued",
+      "implementation_authorized": true,
+      "status": "VERTICAL_HOME_CHOOSER_EXPERIMENTAL_SOURCE_STAGED_12_HOST_TESTS_GREEN_FOLD_AND_KODI_PROVIDER_BEHAVIOR_UNVERIFIED",
+      "prechange_commit": "0efb67a0237c8d05ca066c5f893e6a1713bc5e2d",
+      "implementation_commit": "bed9bd932edd5b9ed0643b6a3c3ec55a11641518",
+      "changed_files": [
+        "repairs/2103390-bugfixes/group1/continue_horizontal_touch_patch.py",
+        "repairs/2103390-bugfixes/group1/test_continue_horizontal_touch_patch.py",
+        "repairs/2103390-bugfixes/group1/test_group1_scope_apk_15.py",
+        "repairs/2103390-bugfixes/group1/continue_choice_patch.py",
+        "repairs/2103390-bugfixes/group1/test_continue_choice_patch.py",
+        "repairs/2103390-bugfixes/group1/test_group1_scope_apk_29.py"
+      ],
+      "targeted_tests": {
+        "result": "HOME_VERTICAL_POPUP_12_12_HOST_PASS_SIGNED_SOURCE_AND_MOCK_PLAYER_NO_FOLD",
+        "runs": [
+          "2026-10-19 python -m unittest -v test_home_rail_contract: PASS 14 actual 1.0.5.228 Home.xml variants with both Movies panel 8830 and TV panel 8831 horizontal/scrolltime150.",
+          "Part of nine-test combined host run: python -m unittest -v test_clock_orb_patch test_movie_identity_patch test_home_rail_contract test_group1_scope_apk (9/9 PASS).",
+          "2026-10-19 original signed 2103390 default 'unified' 9:20 layout has invalid width=auto/percentage height for Continue panels 8830/8831; safe patch replaces exactly four item/focused layout tags with verified pre-existing 230.1x410 dimensions. 6/6 host tests PASS.",
+          "2026-10-19: 12/12 source plus mocked Kodi/player tests for 14 Home control pairs (8830/8831), existing UI Repair vertical 78px popup, resume saved seconds vs zero, back cancel, stale source/progress refusal. NOT real device playback."
+        ]
+      },
+      "regression_tests": {
+        "result": "FULL_SIGNED_BASE_29_OF_7430_VIRTUAL_SCOPE_LOCAL_PASS_NO_SIGNED_APK_OR_FOLD",
+        "runs": [
+          "Scope test asserts exact 11 proposed changed members among 7430 signed 2103390 APK assets and 7419 unchanged including Cobra, shutdown and other unrelated code. No actual combined APK built.",
+          "2026-10-19 17/17 combined host tests PASS; current virtual Group1 candidate changes only 15/7430 signed original members (10 orb, 1 TV, 1 movie, 2 pinned controller JSON, 1 default unified Home); other 7415 unchanged including Cobra, Essential-First, engine, UI Repair and Watched Bridge executable code.",
+          "2026-10-19: local independently executed full 7430-member virtual Group1 combination 1/1 PASS (29 changed, 7401 unchanged) including 14 Home XML, 10 clock includes, 2 Command Center sources, 2 first party pinned JSON, 1 UI Repair runtime.py. Original Cobra/native/shutdown/provider files untouched."
+        ]
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "NOT_GIVEN",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": "Experimental scoped picker relies on first-party UI Repair WindowXMLDialog and xbmc.Player().play(target,original_listitem) with StartOffset/ResumeTime. This is NOT original native PlayMedia/VideoSelectActionProcessor; verify real Kodi addon resolver behavior, no secondary native popup, exact resume position, source continuity, horizontal swipe/offset and both Fold displays before acceptance. No APK built. If playback semantics wrong, reject candidate rather than silently ship.",
+      "horizontal_scroll_explicit_group_1_gate": true,
+      "horizontal_scroll_scope": [
+        "Movies Continue Watching rail",
+        "TV Shows Continue Watching rail"
+      ],
+      "receipt": "repairs/2103390-bugfixes/receipts/GROUP01-CONTINUE-CHOICE-29MEMBER-HOST-20261019.md"
+    },
+    {
+      "id": "04",
+      "title": "Home header moon/weather icon overlaps clock",
+      "approval_stage": "user_reported_queued",
+      "implementation_authorized": false,
+      "status": "SOURCE_STAGED_TARGETED_HOST_GREEN_FOLD_PENDING",
+      "prechange_commit": "0efb67a0237c8d05ca066c5f893e6a1713bc5e2d",
+      "implementation_commit": "9d52bbc17364234e7733b99f4618b567940b1b57",
+      "changed_files": [
+        "repairs/2103390-bugfixes/group1/clock_orb_patch.py",
+        "repairs/2103390-bugfixes/group1/test_clock_orb_patch.py"
+      ],
+      "targeted_tests": {
+        "result": "2_HOST_UNIT_TESTS_PASS",
+        "runs": [
+          "local Python 3 unittest test_clock_orb_patch: 2/2 PASS; 10 targeted skin members changed; 3062 unchanged source assets"
+        ]
+      },
+      "regression_tests": {
+        "result": "SOURCE_DIFF_GUARD_PASS_FULL_ANDROID_REGRESSION_NOT_RUN",
+        "runs": [
+          "10/10 exact original HomeStatusCluster member preimage hashes matched signed 2103390 APK and 3062/3062 unchanged skin ZIP members preserved"
+        ]
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "PENDING_PHYSICAL_TEST",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": "Original health orb and clock use same timeleft anchor; patch stages only existing orb position change. Needs skin packaging, installed Fold test, exact full regression before complete.",
+      "receipt": "repairs/2103390-bugfixes/receipts/GROUP01-TASK04-CLOCK-ORIGIN-TESTED-20261019.md"
+    },
+    {
+      "id": "05",
+      "title": "Add-on Browser header stray blue slash",
+      "approval_stage": "user_reported_queued",
+      "implementation_authorized": true,
+      "status": "SKIN_HEADER_SLASH_FIX_STAGED_10_SKIN_HOST_GREEN_FOLD_VISUAL_PENDING",
+      "prechange_commit": "0efb67a0237c8d05ca066c5f893e6a1713bc5e2d",
+      "implementation_commit": "4b18d89c7fb69ec554887257c07b87ff6aebf400",
+      "changed_files": [
+        "repairs/2103390-bugfixes/group2/addon_browser_group2_patch.py",
+        "repairs/2103390-bugfixes/group2/test_addon_browser_group2_patch.py"
+      ],
+      "targeted_tests": {
+        "result": "LOCAL_SIGNED_BASE_10_OF_10_HOST_TESTS_PASS_ACROSS_ALL_14_LAYOUTS_NO_FOLD",
+        "runs": [
+          "Host Python unittest: 10/10 focused tests on exact signed 2103390 SHA256, all 14 layouts, 42 existing APK members allowed to differ, 7388 byte-identical in simulation; original Kodi routes/handlers and Cobra/native/shutdown excluded."
+        ]
+      },
+      "regression_tests": {
+        "result": "42_MEMBER_VIRTUAL_SCOPE_7388_ORIGINAL_UNCHANGED_NO_SIGNED_APK",
+        "runs": [
+          "Strict immutable original file member inventory and SHA guard plus no new/remove members; isolated to AddonBrowser.xml, Includes_InfinityBrowser223.xml, FileBrowser.xml across 14 layouts. Native add-on source untouched."
+        ]
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "PENDING_FOLD_AND_FUNCTIONAL_BEHAVIOR",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": "Exact stray header_arc.png AddonBrowser-only removal; logo, title, BACK, FileBrowser decoration unchanged. Signed-asset synthetic tests; not Fold visual-tested.",
+      "receipt": "repairs/2103390-bugfixes/receipts/GROUP02-BROWSER-SKIN-42MEMBER-FIRST-STAGE-20261019.md"
+    },
+    {
+      "id": "06",
+      "title": "Add-on Browser root navigation and redundant instructions",
+      "approval_stage": "user_reported_queued",
+      "implementation_authorized": true,
+      "status": "SKIN_CONTEXT_HELP_AND_FOOTER_STAGED_NATIVE_ALL_SIX_ACTUAL_ROOT_ROUTES_SOURCE_READY_FOLD_PENDING",
+      "prechange_commit": "0efb67a0237c8d05ca066c5f893e6a1713bc5e2d",
+      "implementation_commit": "a58918b2a62b71898bf4e075964b9566567c05f8",
+      "changed_files": [
+        "repairs/2103390-bugfixes/group2/addon_browser_group2_patch.py",
+        "repairs/2103390-bugfixes/group2/test_addon_browser_group2_patch.py",
+        "repairs/2103390-bugfixes/group2/native_addonbrowser_patch.py",
+        "repairs/2103390-bugfixes/group2/test_native_addonbrowser_patch.py"
+      ],
+      "targeted_tests": {
+        "result": "SOURCE_STAGING_LOCAL_HOST_20_20_SKIN_AND_NATIVE_TESTS_PASS_SEPARATE_SUITES_13_NATIVE_OMEGA_ANCHORS_ANDROID_UNVERIFIED",
+        "runs": [
+          "Host Python unittest: 10/10 focused tests on exact signed 2103390 SHA256, all 14 layouts, 42 existing APK members allowed to differ, 7388 byte-identical in simulation; original Kodi routes/handlers and Cobra/native/shutdown excluded.",
+          "2026-10-19 signed 2103390 skin 10/10 local host tests passed; separate synthetic native source overlay suite 10/10 passed; GitHub patch verified 13 exact unique reversible anchored modifications across 4 original upstream Kodi Omega sources. No custom 2103390 source compile or physical Fold test."
+        ]
+      },
+      "regression_tests": {
+        "result": "SOURCE_ONLY_SAFE_PATH_GUARDS_UPSTREAM_OMEGA_PASS_COMPILED_BINARY_UNVERIFIED",
+        "runs": [
+          "Strict immutable original file member inventory and SHA guard plus no new/remove members; isolated to AddonBrowser.xml, Includes_InfinityBrowser223.xml, FileBrowser.xml across 14 layouts. Native add-on source untouched.",
+          "Existing native handlers for ZIP installation, repository categories, native search and Kodi context items preserved; only four Kodi addons native paths staged with Infinity Add-on Browser guard; original signed APK unchanged."
+        ]
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "PENDING_COMPILED_NATIVE_AND_REAL_FOLD",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": "Six real native Kodi root route endpoints including conditionally absent Available/Recently Updated made accessible via guarded addonbrowser GetDirectory. Root skin contextual labels/false footer fix staged, but not runtime/physical tested.",
+      "receipt": "repairs/2103390-bugfixes/receipts/GROUP02-NATIVE-REPAIR-SOURCE-20HOST-20261019.md"
+    },
+    {
+      "id": "07",
+      "title": "Add-on Browser My Add-ons / Updates / Recently Updated",
+      "approval_stage": "user_reported_queued",
+      "implementation_authorized": true,
+      "status": "SCOPED_NATIVE_TWO_TAP_CONTEXT_HIDE_UNHIDE_AND_BOTH_DISABLE_CONFIRM_PATHS_SOURCE_STAGED_UNCOMPILED_FOLD_PENDING",
+      "prechange_commit": "0efb67a0237c8d05ca066c5f893e6a1713bc5e2d",
+      "implementation_commit": "a58918b2a62b71898bf4e075964b9566567c05f8",
+      "changed_files": [
+        "repairs/2103390-bugfixes/group2/addon_browser_group2_patch.py",
+        "repairs/2103390-bugfixes/group2/test_addon_browser_group2_patch.py",
+        "repairs/2103390-bugfixes/group2/native_addonbrowser_patch.py",
+        "repairs/2103390-bugfixes/group2/test_native_addonbrowser_patch.py"
+      ],
+      "targeted_tests": {
+        "result": "SOURCE_STAGING_LOCAL_HOST_20_20_SKIN_AND_NATIVE_TESTS_PASS_SEPARATE_SUITES_13_NATIVE_OMEGA_ANCHORS_ANDROID_UNVERIFIED",
+        "runs": [
+          "Host Python unittest: 10/10 focused tests on exact signed 2103390 SHA256, all 14 layouts, 42 existing APK members allowed to differ, 7388 byte-identical in simulation; original Kodi routes/handlers and Cobra/native/shutdown excluded.",
+          "2026-10-19 signed 2103390 skin 10/10 local host tests passed; separate synthetic native source overlay suite 10/10 passed; GitHub patch verified 13 exact unique reversible anchored modifications across 4 original upstream Kodi Omega sources. No custom 2103390 source compile or physical Fold test."
+        ]
+      },
+      "regression_tests": {
+        "result": "SOURCE_ONLY_SAFE_PATH_GUARDS_UPSTREAM_OMEGA_PASS_COMPILED_BINARY_UNVERIFIED",
+        "runs": [
+          "Strict immutable original file member inventory and SHA guard plus no new/remove members; isolated to AddonBrowser.xml, Includes_InfinityBrowser223.xml, FileBrowser.xml across 14 layouts. Native add-on source untouched.",
+          "Existing native handlers for ZIP installation, repository categories, native search and Kodi context items preserved; only four Kodi addons native paths staged with Infinity Add-on Browser guard; original signed APK unchanged."
+        ]
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "PENDING_COMPILED_NATIVE_AND_REAL_FOLD",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": "Scoped source code now stages two-step first touch/second activation and original longpress, Hide as in-memory view-only filter with Show hidden add-ons restore, plus real Disable confirmation in BOTH AddonInfo and direct context menu. Must still compile on exact custom 2103390 checkout and verify native behavior with real installed addons/Fold; don't mark green yet.",
+      "receipt": "repairs/2103390-bugfixes/receipts/GROUP02-NATIVE-REPAIR-SOURCE-20HOST-20261019.md"
+    },
+    {
+      "id": "08",
+      "title": "Add-on Browser Repository / ZIP / Search",
+      "approval_stage": "user_reported_queued",
+      "implementation_authorized": true,
+      "status": "NATIVE_REPOSITORY_ZIP_SEARCH_PRESERVED_ROOT_REACHABLE_ZIP_FOCUS_SOURCE_STAGED_UNCOMPILED_FOLD_PENDING",
+      "prechange_commit": "0efb67a0237c8d05ca066c5f893e6a1713bc5e2d",
+      "implementation_commit": "a58918b2a62b71898bf4e075964b9566567c05f8",
+      "changed_files": [
+        "repairs/2103390-bugfixes/group2/addon_browser_group2_patch.py",
+        "repairs/2103390-bugfixes/group2/test_addon_browser_group2_patch.py",
+        "repairs/2103390-bugfixes/group2/native_addonbrowser_patch.py",
+        "repairs/2103390-bugfixes/group2/test_native_addonbrowser_patch.py"
+      ],
+      "targeted_tests": {
+        "result": "SOURCE_STAGING_LOCAL_HOST_20_20_SKIN_AND_NATIVE_TESTS_PASS_SEPARATE_SUITES_13_NATIVE_OMEGA_ANCHORS_ANDROID_UNVERIFIED",
+        "runs": [
+          "Host Python unittest: 10/10 focused tests on exact signed 2103390 SHA256, all 14 layouts, 42 existing APK members allowed to differ, 7388 byte-identical in simulation; original Kodi routes/handlers and Cobra/native/shutdown excluded.",
+          "2026-10-19 signed 2103390 skin 10/10 local host tests passed; separate synthetic native source overlay suite 10/10 passed; GitHub patch verified 13 exact unique reversible anchored modifications across 4 original upstream Kodi Omega sources. No custom 2103390 source compile or physical Fold test."
+        ]
+      },
+      "regression_tests": {
+        "result": "SOURCE_ONLY_SAFE_PATH_GUARDS_UPSTREAM_OMEGA_PASS_COMPILED_BINARY_UNVERIFIED",
+        "runs": [
+          "Strict immutable original file member inventory and SHA guard plus no new/remove members; isolated to AddonBrowser.xml, Includes_InfinityBrowser223.xml, FileBrowser.xml across 14 layouts. Native add-on source untouched.",
+          "Existing native handlers for ZIP installation, repository categories, native search and Kodi context items preserved; only four Kodi addons native paths staged with Infinity Add-on Browser guard; original signed APK unchanged."
+        ]
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "PENDING_COMPILED_NATIVE_AND_REAL_FOLD",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": "Original Kodi native repository/ZIP and Search backend verified from Omega source; root always exposes real update routes, original keyboard/results and ZIP picker/Preview preserved. Native patch + 42 scoped skin members staged, but no signed build, runtime menu behavior or Fold confirmation.",
+      "receipt": "repairs/2103390-bugfixes/receipts/GROUP02-NATIVE-REPAIR-SOURCE-20HOST-20261019.md"
+    },
+    {
+      "id": "09",
+      "title": "Top Movies featured rail — approved Option B long-press info",
+      "approval_stage": "design_only_approved",
+      "implementation_authorized": true,
+      "status": "OPTION_B_GLASS_MODAL_CODE_AND_XML_STAGED_20_HOST_GREEN_NATIVE_FIRST_HOLD_DISPATCH_NOT_WIRED_FOLD_RED",
+      "prechange_commit": "0efb67a0237c8d05ca066c5f893e6a1713bc5e2d",
+      "implementation_commit": "6d1623e844f2033bd9adc701eef44bdfa28ea0eb",
+      "changed_files": [
+        "repairs/2103390-bugfixes/group3/InfinityHomeOptionB.xml",
+        "repairs/2103390-bugfixes/group3/home_option_b.py",
+        "repairs/2103390-bugfixes/group3/stage_option_b.py",
+        "repairs/2103390-bugfixes/group3/test_group3_option_b.py",
+        "repairs/2103390-bugfixes/group3/input_longpress_audit.py",
+        "repairs/2103390-bugfixes/group3/test_input_longpress_audit.py"
+      ],
+      "targeted_tests": {
+        "result": "16_OF_16_MODAL_HOST_PLUS_4_OF_4_SIGNED_INPUT_AUDIT_PASS_NO_KODI_GUI_DEVICE",
+        "runs": [
+          "2026-10-19 local CPython unittest test_group3_option_b test_input_longpress_audit: 20/20 host PASS, signed original APK SHA matched, 7,430 members untouched; XML/control/actions and Kodi entry mocks only, direct native gesture not installed or tested."
+        ]
+      },
+      "regression_tests": {
+        "result": "SOURCE_STAGE_ONLY_2_ADDITIVE_UIREPAIR_FILES_7430_ORIGINAL_APK_MEMBERS_UNCHANGED",
+        "runs": [
+          "Exact signed 2103390 stage tool proposes 2 newly added first-party UI Repair members (home_option_b.py; InfinityHomeOptionB.xml) without modifying original Home XML, libkodi.so, keymaps, Cobra, shutdown, providers, script.infinity.rails or existing add-ons. No APK output or signing."
+        ]
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "PENDING_DIRECT_HOLD_KODI_ANDROID_AND_VISUAL_DEVICE_APPROVAL",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": "Critical: Approved Option B MUST open directly on first longpress of exact touched movie or TV top release poster and must not send short-tap. Original signed global touch longpress maps RightClick to native CDirectoryProvider context; existing OnInfinityRailLongPress only permits add-on controls 9200/8820/8720/19601, not top movie/tv 8101/8102. New modal is ON-DEMAND SOURCE ONLY, NOT REGISTERED TO GESTURE. A narrowly guarded shared native hook is now authorized IF independently proven Cobra-safe and invisible on every unrelated path; no hook implemented yet. Physical Fold/theme/pixel fidelity and provider actions remain unverified.",
+      "receipt": "repairs/2103390-bugfixes/receipts/GROUP03-OPTION-B-MODAL-20HOST-INPUT-BLOCK-20261019.md"
+    },
+    {
+      "id": "10",
+      "title": "Top TV featured rail — approved Option B long-press info",
+      "approval_stage": "design_only_approved",
+      "implementation_authorized": true,
+      "status": "OPTION_B_GLASS_MODAL_CODE_AND_XML_STAGED_20_HOST_GREEN_NATIVE_FIRST_HOLD_DISPATCH_NOT_WIRED_FOLD_RED",
+      "prechange_commit": "0efb67a0237c8d05ca066c5f893e6a1713bc5e2d",
+      "implementation_commit": "6d1623e844f2033bd9adc701eef44bdfa28ea0eb",
+      "changed_files": [
+        "repairs/2103390-bugfixes/group3/InfinityHomeOptionB.xml",
+        "repairs/2103390-bugfixes/group3/home_option_b.py",
+        "repairs/2103390-bugfixes/group3/stage_option_b.py",
+        "repairs/2103390-bugfixes/group3/test_group3_option_b.py",
+        "repairs/2103390-bugfixes/group3/input_longpress_audit.py",
+        "repairs/2103390-bugfixes/group3/test_input_longpress_audit.py"
+      ],
+      "targeted_tests": {
+        "result": "16_OF_16_MODAL_HOST_PLUS_4_OF_4_SIGNED_INPUT_AUDIT_PASS_NO_KODI_GUI_DEVICE",
+        "runs": [
+          "2026-10-19 local CPython unittest test_group3_option_b test_input_longpress_audit: 20/20 host PASS, signed original APK SHA matched, 7,430 members untouched; XML/control/actions and Kodi entry mocks only, direct native gesture not installed or tested."
+        ]
+      },
+      "regression_tests": {
+        "result": "SOURCE_STAGE_ONLY_2_ADDITIVE_UIREPAIR_FILES_7430_ORIGINAL_APK_MEMBERS_UNCHANGED",
+        "runs": [
+          "Exact signed 2103390 stage tool proposes 2 newly added first-party UI Repair members (home_option_b.py; InfinityHomeOptionB.xml) without modifying original Home XML, libkodi.so, keymaps, Cobra, shutdown, providers, script.infinity.rails or existing add-ons. No APK output or signing."
+        ]
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "PENDING_DIRECT_HOLD_KODI_ANDROID_AND_VISUAL_DEVICE_APPROVAL",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": "Critical: Approved Option B MUST open directly on first longpress of exact touched movie or TV top release poster and must not send short-tap. Original signed global touch longpress maps RightClick to native CDirectoryProvider context; existing OnInfinityRailLongPress only permits add-on controls 9200/8820/8720/19601, not top movie/tv 8101/8102. New modal is ON-DEMAND SOURCE ONLY, NOT REGISTERED TO GESTURE. A narrowly guarded shared native hook is now authorized IF independently proven Cobra-safe and invisible on every unrelated path; no hook implemented yet. Physical Fold/theme/pixel fidelity and provider actions remain unverified.",
+      "receipt": "repairs/2103390-bugfixes/receipts/GROUP03-OPTION-B-MODAL-20HOST-INPUT-BLOCK-20261019.md"
+    },
+    {
+      "id": "11",
+      "title": "OSD video/monitor icon opens Video Settings",
+      "approval_stage": "requested_behavior_approved",
+      "implementation_authorized": true,
+      "status": "SOURCE_STAGE_HOST_CI_GREEN_PLAYER_GLASSES_NO_ANDROID_FOLD_RENDERING",
+      "prechange_commit": "0efb67a0237c8d05ca066c5f893e6a1713bc5e2d",
+      "implementation_commit": "55df2ad96f6704aba9746917d1b2718e483e09e5",
+      "changed_files": [
+        "repairs/2103390-bugfixes/group4/player_glass_patch.py",
+        "repairs/2103390-bugfixes/group4/test_player_glass_patch.py"
+      ],
+      "targeted_tests": {
+        "result": "GITHUB_ACTIONS_39265841878_10_OF_10_HOST_PASS_41_SIGNED_SKIN_ONLY",
+        "runs": [
+          "Exact immutable APK2103390 SHA256, 14 VideoOSD layouts, 41 total scoped XML members; screenshot/theme and actual player actions not Android tested."
+        ]
+      },
+      "regression_tests": {
+        "result": "SOURCE_ONLY_SCOPE_HOST_GREEN_NOT_ANDROID_RUNTIME",
+        "runs": []
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "NOT_YET_GIVEN_FOR_ANDROID_VISUAL",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": "Original OSD button 255 had Action(AspectRatio); approved tap rebinding to OSDVideoSettings changes that existing shortcut. Must verify video/aspect capability preserved through real Video Settings on Fold; no user-facing APK yet.",
+      "receipt": "repairs/2103390-bugfixes/receipts/GROUPS04-06-AND-ALL-IN-ONE-PREFLIGHT-20261019.md"
+    },
+    {
+      "id": "12",
+      "title": "Remove only Video Settings row from Playback popup",
+      "approval_stage": "DESIGN_APPROVED_SCOPE_QUEUED_NO_IMPLEMENTATION",
+      "implementation_authorized": true,
+      "status": "SOURCE_STAGE_HOST_CI_GREEN_PLAYER_GLASSES_NO_ANDROID_FOLD_RENDERING",
+      "prechange_commit": "0efb67a0237c8d05ca066c5f893e6a1713bc5e2d",
+      "implementation_commit": "55df2ad96f6704aba9746917d1b2718e483e09e5",
+      "changed_files": [
+        "repairs/2103390-bugfixes/group4/player_glass_patch.py",
+        "repairs/2103390-bugfixes/group4/test_player_glass_patch.py"
+      ],
+      "targeted_tests": {
+        "result": "GITHUB_ACTIONS_39265841878_10_OF_10_HOST_PASS_41_SIGNED_SKIN_ONLY",
+        "runs": [
+          "Exact immutable APK2103390 SHA256, 14 VideoOSD layouts, 41 total scoped XML members; screenshot/theme and actual player actions not Android tested."
+        ]
+      },
+      "regression_tests": {
+        "result": "SOURCE_ONLY_SCOPE_HOST_GREEN_NOT_ANDROID_RUNTIME",
+        "runs": []
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "NOT_YET_GIVEN_FOR_ANDROID_VISUAL",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": "Original supported native controls remain source-preserved, but rendering/Focus/Fold theme/material and active playback remain unverified.",
+      "receipt": "repairs/2103390-bugfixes/receipts/GROUPS04-06-AND-ALL-IN-ONE-PREFLIGHT-20261019.md"
+    },
+    {
+      "id": "13",
+      "title": "Video Settings compact popup (slightly smaller than Playback)",
+      "approval_stage": "DESIGN_APPROVED_SCOPE_QUEUED_NO_IMPLEMENTATION",
+      "implementation_authorized": true,
+      "status": "SOURCE_STAGE_HOST_CI_GREEN_PLAYER_GLASSES_NO_ANDROID_FOLD_RENDERING",
+      "prechange_commit": "0efb67a0237c8d05ca066c5f893e6a1713bc5e2d",
+      "implementation_commit": "55df2ad96f6704aba9746917d1b2718e483e09e5",
+      "changed_files": [
+        "repairs/2103390-bugfixes/group4/player_glass_patch.py",
+        "repairs/2103390-bugfixes/group4/test_player_glass_patch.py"
+      ],
+      "targeted_tests": {
+        "result": "GITHUB_ACTIONS_39265841878_10_OF_10_HOST_PASS_41_SIGNED_SKIN_ONLY",
+        "runs": [
+          "Exact immutable APK2103390 SHA256, 14 VideoOSD layouts, 41 total scoped XML members; screenshot/theme and actual player actions not Android tested."
+        ]
+      },
+      "regression_tests": {
+        "result": "SOURCE_ONLY_SCOPE_HOST_GREEN_NOT_ANDROID_RUNTIME",
+        "runs": []
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "NOT_YET_GIVEN_FOR_ANDROID_VISUAL",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": "Original supported native controls remain source-preserved, but rendering/Focus/Fold theme/material and active playback remain unverified.",
+      "receipt": "repairs/2103390-bugfixes/receipts/GROUPS04-06-AND-ALL-IN-ONE-PREFLIGHT-20261019.md"
+    },
+    {
+      "id": "14",
+      "title": "Audio & Subtitles compact popup (slightly smaller than Playback)",
+      "approval_stage": "DESIGN_APPROVED_SCOPE_QUEUED_NO_IMPLEMENTATION",
+      "implementation_authorized": true,
+      "status": "SOURCE_STAGE_HOST_CI_GREEN_PLAYER_GLASSES_NO_ANDROID_FOLD_RENDERING",
+      "prechange_commit": "0efb67a0237c8d05ca066c5f893e6a1713bc5e2d",
+      "implementation_commit": "55df2ad96f6704aba9746917d1b2718e483e09e5",
+      "changed_files": [
+        "repairs/2103390-bugfixes/group4/player_glass_patch.py",
+        "repairs/2103390-bugfixes/group4/test_player_glass_patch.py"
+      ],
+      "targeted_tests": {
+        "result": "GITHUB_ACTIONS_39265841878_10_OF_10_HOST_PASS_41_SIGNED_SKIN_ONLY",
+        "runs": [
+          "Exact immutable APK2103390 SHA256, 14 VideoOSD layouts, 41 total scoped XML members; screenshot/theme and actual player actions not Android tested."
+        ]
+      },
+      "regression_tests": {
+        "result": "SOURCE_ONLY_SCOPE_HOST_GREEN_NOT_ANDROID_RUNTIME",
+        "runs": []
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "NOT_YET_GIVEN_FOR_ANDROID_VISUAL",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": "Original supported native controls remain source-preserved, but rendering/Focus/Fold theme/material and active playback remain unverified.",
+      "receipt": "repairs/2103390-bugfixes/receipts/GROUPS04-06-AND-ALL-IN-ONE-PREFLIGHT-20261019.md"
+    },
+    {
+      "id": "15",
+      "title": "Native exit status 139 root-cause investigation",
+      "approval_stage": "user_reported_queued",
+      "implementation_authorized": true,
+      "status": "STALE_NATIVE_RECORDER_SHA_SOURCE_REPAIR_GREEN_SIGSEGV139_FUNCTION_UNPROVEN",
+      "prechange_commit": null,
+      "implementation_commit": "cecb049cb66733deca395ddbd4a3713f01c92a17",
+      "changed_files": [
+        "repairs/2103390-bugfixes/group5/final_native_identity_patch.py",
+        "repairs/2103390-bugfixes/group5/test_final_native_identity_patch.py"
+      ],
+      "targeted_tests": {
+        "result": "GITHUB_ACTIONS_39267576509_10_OF_10_HOST_GREEN_CRASH_CAUSE_OPEN",
+        "runs": [
+          "Corrects crash recorder's 2103229 SHA provenance to final compiled ELF at future packaging, source only; Oct19 SIGSEGV/139 no exact native function/tombstone."
+        ]
+      },
+      "regression_tests": {
+        "result": "SOURCE_RODATA_IDENTITY_ONLY_ANDROID_COLLECTOR_UNCOMPILED",
+        "runs": []
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "NOT_GIVEN",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": "Fatal native crash 139 still unresolved: exact faulting thread function missing ASLR map and native tombstone. Do not invent cause-based crash repair; original 2103390 unsafe baseline cannot be declared stable. Not compiled or installed.",
+      "new_diagnostic_receipt": "repairs/2103390-bugfixes/receipts/CRASH139-FOLD-20261019-092026-READONLY.md",
+      "new_evidence_only": "Matched October 19 06:44:03 status139 + SIGSEGV, last Videos Nav/Busy in landscape multi-window, stale 2103229 crash recorder fingerprint vs 2103390 packaged libkodi; no tombstone/maps/stack; no native fix made",
+      "receipt": "repairs/2103390-bugfixes/receipts/GROUPS04-06-AND-ALL-IN-ONE-PREFLIGHT-20261019.md"
+    },
+    {
+      "id": "16",
+      "title": "CU LRC Lyrics Python exception investigation",
+      "approval_stage": "SKIPPED_BY_USER",
+      "implementation_authorized": false,
+      "status": "SKIPPED_BY_USER_NO_CODE_CHANGES",
+      "prechange_commit": null,
+      "implementation_commit": null,
+      "changed_files": [],
+      "targeted_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "regression_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "USER_SKIPPED_REPAIR",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": "Former Group 6 Lyrics repair explicitly removed from active work; user may self-uninstall/reinstall later but no such action authorized. Any old script-error diagnostic remains historical. New active Group #6 is separate System Hub Silent Mode."
+    },
+    {
+      "id": "17",
+      "title": "TMDb Helper/SlyGuy quarantined startup investigation",
+      "approval_stage": "SKIPPED_BY_USER",
+      "implementation_authorized": false,
+      "status": "SKIPPED_BY_USER_NO_CODE_CHANGES",
+      "prechange_commit": null,
+      "implementation_commit": null,
+      "changed_files": [],
+      "targeted_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "regression_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "USER_EXCLUDED_AS_UNRELATED_ERROR",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": "User excluded separate SlyGuy/TMDb Helper quarantine investigation as unrelated/error. Do not modify, disable or reinstall either addon. Read-only provider route evidence may be inspected solely within task 01, no generic service startup repair."
+    },
+    {
+      "id": "18",
+      "title": "Selectively combine signed APK and full Fold acceptance audit",
+      "approval_stage": "integration_gate",
+      "implementation_authorized": false,
+      "status": "OPEN_NOT_IMPLEMENTED",
+      "prechange_commit": null,
+      "implementation_commit": null,
+      "changed_files": [],
+      "targeted_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "regression_tests": {
+        "result": "NOT_RUN",
+        "runs": []
+      },
+      "physical_fold": {
+        "result": "NOT_VERIFIED",
+        "evidence": []
+      },
+      "user_acceptance": "NOT_GIVEN",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": null
+    },
+    {
+      "id": "19",
+      "title": "Movies ↔ TV Shows keep all initially populated Home rails immediately available without tab-switch reload",
+      "approval_stage": "user_reported_queued",
+      "implementation_authorized": false,
+      "status": "USER_DEFERRED_PENDING_FOLD_REPRO_AND_CAUSAL_LOGS_NOT_FIXED",
+      "prechange_commit": null,
+      "implementation_commit": null,
+      "changed_files": [
+        "repairs/2103390-bugfixes/group1/category_load_diagnostic.py",
+        "repairs/2103390-bugfixes/group1/home_category_contract.py",
+        "repairs/2103390-bugfixes/group1/test_home_category_contract.py",
+        "repairs/2103390-bugfixes/group1/home_reload_correlation.py",
+        "repairs/2103390-bugfixes/group1/test_home_reload_correlation.py"
+      ],
+      "targeted_tests": {
+        "result": "READ_ONLY_20_REPEATED_JOBS_5_5_HOME_SOURCE_AUDIT_AND_4_4_SYNTHETIC_HOMELOAD_CORRELATION_NO_CAUSAL_FIX",
+        "runs": [
+          "User supplied Infinity-Diagnostics-20261019-000835.zip, 20 fresh Continue Watching requests over 49,584 ms under single revision 1792382779737, 20/20 cache_hit 0; 9 movie/11 TV; no causal native invalidation proof.",
+          "2026-10-19 signed original Home source 14/14 layouts: selecting category changes property/visible state whereas clicking category triggers ActivateWindow(Videos), Umbrella owns latest releases, first-party CC owns Continue Watching; 5/5 nav/ownership host tests PASS. No proof which path caused Fold blank/reload.",
+          "2026-10-19: offline-only HomeLoad continuity JSON + Resume Hub trace aggregate 4/4 synthetic test cases; a changing HomeLoad identifies Home reinitialization, not cause. No user-specific recent diagnostic matched to precise native URL/invalidation trigger."
+        ]
+      },
+      "regression_tests": {
+        "result": "NOT_APPLICABLE_NO_FIX_YET",
+        "runs": []
+      },
+      "physical_fold": {
+        "result": "USER_VIDEO_SHOWS_BLANKING_NOT_FIX_VERIFICATION",
+        "evidence": [
+          "19049.mp4 shows Movies/TV switching while latest releases/Continue Watching go blank; fix not verified."
+        ]
+      },
+      "user_acceptance": "DEFERRED_INVESTIGATION_ONLY_OTHER_GROUP1_SOURCE_WORK_ACCEPTED_AS_STAGED",
+      "apk_artifact": null,
+      "sha256": null,
+      "blocking_or_caveat": "User has explicitly deferred #19 to a future replay and in-app diagnostics review. No #19 functional repair is implemented; do not mark FULL group 1 complete or include #19 in combined APK. Previously staged other Group1 source changes remain unchanged for future integration verification. Genuine Kodi Fold/device tests still pending.",
+      "receipt": "repairs/2103390-bugfixes/receipts/GROUP01-TASK19-HOME-SELECT-VS-ACTIVATE-20261019.md"
+    }
+  ],
+  "glass_player_menu_proposal": {
+    "affected_existing_tasks": [
+      "12",
+      "13",
+      "14"
+    ],
+    "clarified_object": "the Playback, Video Settings, and Audio & Subtitles menu/dialog BACKGROUNDS, not the toolbar icons",
+    "user_direction": "translucent Infinity liquid glass with some real video visible beneath, same material across all three menus",
+    "exact_visual_design_status": "USER_APPROVED_BITE_FOR_BITE_GLASS_MENU_MATERIAL",
+    "implementation_status": "NOT_STARTED",
+    "must_preserve": "actual original player controls and settings/row labels/positions, audio/subtitle tracks, controls, playback, provider, themes, motion policy, Cobra, shutdown",
+    "approval_doc": "repairs/2103390-bugfixes/PLAYER-GLASS-MENUS-APPROVED-20261019.md"
+  },
+  "primary_work_unit": "GROUP_02_FINISH_ALL_ADDON_BROWSER_05_TO_08",
+  "active_group_contract": "repairs/2103390-bugfixes/GROUPED-01-07-BINDING-CONTRACT.md",
+  "current_authorized_group": "07",
+  "group_count": 7,
+  "group_done_count": 0,
+  "group_status": {
+    "01": {
+      "name": "Home, Continue Watching, category caching and clock (no SlyGuy/TMDb service work)",
+      "original_subrequirements": [
+        "01",
+        "02",
+        "03",
+        "04",
+        "19"
+      ],
+      "status": "CHECKED_FOR_SAVED_SOURCE_STAGE_ONLY_TASK19_DEFERRED_PENDING_USER_REPRO_AND_NEW_CORRELATED_DIAGNOSTICS_NO_COMBINED_RUNTIME_VERIFICATION",
+      "implementation_authorized": false,
+      "savepoint": "f436c0e9f79066803f9dd98fa2c453dff7f32f82",
+      "targeted_tests": "LOCAL_NEW_17_17_CHOICE_INTEGRATION_DIAGNOSTIC_HOST_PASS_PREVIOUS_HOST_RUNS_SEPARATE_NO_FOLD",
+      "fold": "NOT_VERIFIED",
+      "continue_watching_horizontal_scroll": {
+        "user_verbatim": "Also, for number one, the continue hub, or resume hub, continue watching. I know you told me that it's horizontal. I want you to ensure that it is horizontal scroll, and that is part of number one.",
+        "required": true,
+        "scope": [
+          "Movies → Continue Watching poster rail",
+          "TV Shows → Continue Watching poster rail"
+        ],
+        "behavior": "real left-right one-finger scroll; reliable correct card tap after swiping; no accidental playback during gesture; selected card and scroll offset retained on return; no change to existing Home layout or data; vertical two-choice Resume/Play dialog remains vertical",
+        "pass_gate": "BOTH Movies and TV Shows must pass real Fold horizontal swipe, tap, Back and offset test before Group #1 passes",
+        "implementation": "SOURCE_ONLY_DEFAULT_FOLD_CARD_GEOMETRY_AND_14_HOME_VARIANT_EXPERIMENTAL_VERTICAL_CHOOSER_STAGE_NO_APK",
+        "tests": "PREVIOUS_6_6_NUMERIC_FOLD_DEFAULT_GEOMETRY_HOST_TEST_PLUS_NEW_12_12_CHOOSER_LOGIC_HOST_TEST_1_1_VIRTUAL_APK_GATE",
+        "fold": "NOT_VERIFIED"
+      },
+      "source_stage_checkmark": true,
+      "source_stage_user_acknowledged": true,
+      "deferred_open_subrequirements": [
+        "19"
+      ],
+      "carry_forward_for_later_integration": "EXISTING_CHECKED_SOURCE_WORK_ONLY_DO_NOT_CLAIM_TASK19_FIXED_OR_GROUP_FULLY_COMPLETE",
+      "next_gate": "Wait for user to reproduce Movies-TV category switch blanking and supply a fresh in-app Infinity Diagnostic ZIP from the same run; correlate Home selection-vs-activation, Window HomeLoad, DirectoryProvider refresh/reset reasons, Umbrella Latest and Continue Watching URLs and revisions, then implement #19 root-cause correction within Group1 authorization."
+    },
+    "02": {
+      "name": "Add-on Browser end-to-end including root task 06",
+      "original_subrequirements": [
+        "05",
+        "06",
+        "07",
+        "08"
+      ],
+      "status": "SAVED_SOURCE_STAGED_05_TO_08_20_HOST_PASS_NO_ANDROID_COMPILE_OR_FOLD",
+      "implementation_authorized": false,
+      "savepoint": "dd4efe1526ee03d26d7a57ff177f5bc0ac9fff9e",
+      "targeted_tests": "EXISTING_SKIN_10_10_PLUS_LOCAL_NATIVE_10_10_PASS_DIFFERENT_SUITES;GITHUB_PATCH_13_EXACT_OMEGA_ANCHORS_4_FILES_REVERSIBLE;NATIVE_COMPILE_NOT_RUN",
+      "fold": "NOT_VERIFIED",
+      "preservation_clarification": "When Group2 is reselected, implement original 05-08 safely even if correction requires a shared Kodi native file, provided only the relevant Add-on Browser behaviors change and Cobra/others remain unaffected; not complete now."
+    },
+    "03": {
+      "name": "Option B movie and TV top-rail long-press details",
+      "original_subrequirements": [
+        "09",
+        "10"
+      ],
+      "status": "SAVED_SOURCE_STAGED_OPTION_B_GUARDED_HOLD_25_HOST_CI_PASS_NO_LIBKODI_COMPILE_FOLD",
+      "implementation_authorized": false,
+      "savepoint": "35319321baeb640359c54668a361e9ff72493f87",
+      "targeted_tests": "20_OF_20_HOST_SIGNED_2103390_AND_MOCKS_PASS_DIRECT_LONGPRESS_UNIMPLEMENTED",
+      "fold": "NOT_VERIFIED",
+      "input_fix_scope": "Already-authorized Group3 may implement a necessary native input path guarded by WINDOW_HOME and controls 8101/8102 with exact touch-hit poster and no short-tap double launch, only if Cobra/add-on rails/other paths retain original behavior; original source and Fold acceptance required."
+    },
+    "04": {
+      "name": "Player OSD and three translucent glass menus",
+      "original_subrequirements": [
+        "11",
+        "12",
+        "13",
+        "14"
+      ],
+      "status": "PLAYER_GLASSES_AND_OSD_SOURCE_STAGED_10_OF_10_CI_HOST_PASS_ANDROID_RENDERING_ASPECT_ACTION_AND_FOLD_UNVERIFIED",
+      "implementation_authorized": true,
+      "savepoint": "6f7681384ec19c9704c8bfd055d2e56ea3bc9877",
+      "targeted_tests": "GITHUB_ACTIONS_39265841878_10_OF_10_HOST_PASS_SIGNED_2103390_41_SKIN_MEMBERS_NO_FOLD",
+      "fold": "NOT_VERIFIED"
+    },
+    "05": {
+      "name": "Native status139 crash evidence/root cause",
+      "original_subrequirements": [
+        "15"
+      ],
+      "status": "FINGERPRINT_CORRECTION_BUILT_IN_2103391_ACTUAL_NATIVE_SIGSEGV_211029_OBSERVED_RETHROW_TOMBSTONE_ORIGINAL_CAUSE_UNPROVEN",
+      "implementation_authorized": true,
+      "savepoint": "cecb049cb66733deca395ddbd4a3713f01c92a17",
+      "targeted_tests": "GITHUB_ACTIONS_39267576509_10_OF_10_HOST_PASS_AFTER_ELF_BSS_CORRECTION_PRIOR_RUN_39266729693_RED_ROOT_CAUSE_NOT_IDENTIFIED",
+      "fold": "REAL_FOLD_NATIVE_CRASH_RECORDED_20261019_211029_PID25057_ORIGINAL_PRODUCER_NATIVE_BUILD_ID_UNPROVEN",
+      "new_read_only_evidence_receipt": "repairs/2103390-bugfixes/receipts/CRASH139-FOLD-20261019-092026-READONLY.md",
+      "new_read_only_evidence_status": "2026-10-19_SIGNED_APK_2103390_SIGSEGV139_VIDEO_NAV_BUSY_STALE_RECORDER_NATIVE_HASH_CRASH_FUNCTION_NOT_SYMBOLIZED_NO_FIX",
+      "real_fold_diagnostic_receipt": "repairs/2103390-bugfixes/receipts/FOLD-2103391-DIAGNOSTICS-20261019-213206-READONLY.md"
+    },
+    "06": {
+      "name": "SYSTEM HUB SILENT MODE ON/OFF — suppress unwanted Kodi/in-app notification banners/toasts",
+      "original_subrequirements": [],
+      "new_scoped_feature": true,
+      "replaces_group": "former group 06 CU LRC Lyrics repair",
+      "status": "SYSTEM_HUB_ONE_PERSISTENT_SILENT_MODE_SWITCH_AND_KAITOAST_ONLY_NATIVE_SOURCE_STAGED_10_OF_10_HOST_PASS_NO_ANDROID_OR_FOLD",
+      "implementation_authorized": true,
+      "savepoint": "4c3384fe2e34aafab2ae665702d96685d27033c0",
+      "targeted_tests": "GITHUB_ACTIONS_39269926154_10_OF_10_HOST_PASS_PINNED_OMEGA_TOAST_SOURCE_AND_13_SIGNED_ORIGINAL_HUB_LAYOUTS",
+      "fold": "NOT_VERIFIED"
+    },
+    "07": {
+      "name": "Final combined APK, preservation audit and physical Fold/user LOCK",
+      "original_subrequirements": [
+        "18"
+      ],
+      "status": "EXPERIMENTAL_APK_2103391_NATIVE_COMPILED_AND_PERMANENTLY_SIGNED_CI_GREEN_REAL_FOLD_NORMAL_CLOSE_FAILURE_AND_NATIVE_CRASH_EVIDENCE_NO_LOCK",
+      "implementation_authorized": true,
+      "savepoint": "7bd9b1085d598789e9e803b4b76ee1429e1df7e3",
+      "targeted_tests": "GITHUB_ACTIONS_39348480827_GREEN_NATIVE_ARM64_REBUILD_SIGNED_2103391_COMPILATION_SOURCE_SCOPE_PASS;FOLD_CAPTURE_20261019_213206_NORMAL_CLOSE_FAILED",
+      "fold": "REAL_FOLD_DIAGNOSTIC_RECEIVED_SHUTDOWN_FAILED_PIDS_9419_AND_18599_OTHER_APPROVED_UI_FUNCTIONS_UNVERIFIED",
+      "real_fold_diagnostic_receipt": "repairs/2103390-bugfixes/receipts/FOLD-2103391-DIAGNOSTICS-20261019-213206-READONLY.md"
+    }
+  },
+  "group6_silent_mode": {
+    "group": "06",
+    "placement": "EXISTING_INFINITY_SYSTEM_HUB",
+    "label": "Silent Mode",
+    "type": "TOGGLE",
+    "initial_value": "OFF",
+    "persistent": true,
+    "when_on": "suppress unsolicited noninteractive on-screen notification banners/toasts from Infinity, CU LRC Lyrics, Trakt and other addons; preserve diagnostic logs, running addon services and provider state",
+    "when_off": "restore usual banners/alert sounds immediately; no notification backlog",
+    "guard": "do not automatically dismiss dialogs requiring user consent, actions, playback choices, security/permission confirmation, core errors or shutdown safety; verify source of each banner; if shared Cobra path required STOP",
+    "prohibit": [
+      "Cobra modifications",
+      "third-party addon code edits or removals",
+      "global Android notification disabling",
+      "muting playback audio",
+      "shutdown/Essential-First changes",
+      "data wipe or reinstall"
+    ],
+    "status": "SPECIFICATION_ONLY_NOT_IMPLEMENTED",
+    "compatibility": "preserve existing Infinity System Hub layout, all theme and Fold variants",
+    "notification_source_audit": "REQUIRED_BEFORE_IMPLEMENTATION"
+  },
+  "hard_scope_freeze": {
+    "user_verbatim": "I know you say Cobra is off limits, but also everything else besides 1 through 7 within infinity is off limits as well. Nothing. No new buttons that we didn't approve, nothing. I don't want new whatever, or features being taken out, or any of that bullshit. Everything must be aligned. Everything from 1 through 7 is only through 1 through 7, nothing else. No taking away features, nothing. We can't afford those mistakes.",
+    "policy": "Every feature, UI element, behavior, add-on, native/skin resource, setting and runtime process OUTSIDE EXACT SEVEN APPROVED GROUPS is STRICTLY OFF LIMITS. Cobra is ALWAYS off limits, including potentially shared code. No speculative new buttons/features, removals, relabels, reorders, default-setting changes, global refactors or unrelated cleanup.",
+    "approved_exceptions_only": [
+      "Group 3 approved Option B long-press modal controls",
+      "Group 4 existing video OSD icon route, specifically remove redundant Video Settings ROW from Playback, three already approved glass modal surfaces",
+      "Group 6 one Silent Mode On/Off switch inside existing System Hub",
+      "other exactly listed symptoms and their minimum corrections under separately authorized groups"
+    ],
+    "pre_edit_group_specific_file_symbol_and_apk_entry_allowlist_required": true,
+    "unchanged_component_hash_and_apk_member_inventory_required": true,
+    "group_and_negative_regression_proof_required": true,
+    "block_unapproved_or_shared_cobra_affecting_changes": true,
+    "commit_every_green_milestone_and_group_before_advancing": true,
+    "not_permission_to_build_or_edit_automatically": true
+  },
+  "last_user_instruction": "User provided Infinity-Diagnostics-20261019-213206.zip after installing experimental 2103391 and matching ZIPs; inspect and preserve real Fold evidence, do not falsely report Fold green or modify Cobra/Essential-First.",
+  "last_verified_group1_checkpoint": "f436c0e9f79066803f9dd98fa2c453dff7f32f82",
+  "group_1_latest_receipts": [
+    "repairs/2103390-bugfixes/receipts/GROUP01-TASK04-CLOCK-ORIGIN-TESTED-20261019.md",
+    "repairs/2103390-bugfixes/receipts/GROUP01-TASK02-VERIFIED-MOVIE-KEY-STAGED-20261019.md",
+    "repairs/2103390-bugfixes/receipts/GROUP01-RAIL-AND-SIGNED-APK-SCOPE-AUDIT-20261019.md",
+    "repairs/2103390-bugfixes/receipts/GROUP01-TASK01-EPISODE-SAVED-ROUTE-19HOST-20261019.md",
+    "repairs/2103390-bugfixes/receipts/GROUP01-TASK19-REPEAT-LOAD-TRACE-20261019.md",
+    "repairs/2103390-bugfixes/receipts/GROUP01-CONTROLLER-CONSUMER-14MEMBER-20261019.md",
+    "repairs/2103390-bugfixes/receipts/GROUP01-TASK03-DEFAULT-FOLD-HORIZONTAL-15MEMBER-20261019.md",
+    "repairs/2103390-bugfixes/receipts/GROUP01-TASK19-HOME-SELECT-VS-ACTIVATE-20261019.md",
+    "repairs/2103390-bugfixes/receipts/GROUP01-CONTINUE-CHOICE-29MEMBER-HOST-20261019.md"
+  ],
+  "group_1_signed_apk_status": "NONE — exact source-only experimental popup patches/tests; original signed 2103390 unmodified; 29-of-7430 theoretical member delta",
+  "group_1_physical_fold_status": "NOT_VERIFIED",
+  "group_1_dual_consumer_integration": {
+    "status": "SOURCE_ONLY_STAGE_5_OF_5_REAL_SIGNED_PARENT_HOST_TESTS_GREEN_DEVICE_UNVERIFIED",
+    "cause": "Existing UI Repair Continue Watching and Watched Bridge verify all 13 Command Center original file hashes; TV and movie patches change two pinned sources so consumers reject an uncoordinated 12-member candidate.",
+    "original_signed_apk": "2103390 SHA256 778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb",
+    "original_verified_hashes": 13,
+    "changed_hashes_each_contract": 2,
+    "unchanged_hashes_each_contract": 11,
+    "dependency_contract_files": [
+      "assets/addons/script.infinity.uirepair/CONTROLLER-PREIMAGES.json",
+      "assets/addons/script.infinity.watchedbridge/CONTROLLER-PREIMAGES.json"
+    ],
+    "saved_source": "repairs/2103390-bugfixes/group1/cc_preimage_contract_patch.py",
+    "saved_source_commit": "9d6bc1845e3f392cbe48ed86aa96eb73cc79d681",
+    "tests": "repairs/2103390-bugfixes/group1/test_cc_preimage_contract_patch.py",
+    "test_commit": "0bf2be94fcbfa22e64344ca9b8105f7614708c13",
+    "original_signed_member_count": 7430,
+    "virtual_modified_members": 14,
+    "virtual_untouched_members": 7416,
+    "replaces_stale_12_member_scope_claim_for_final_integration": true,
+    "real_apk_build": "NOT_BUILT",
+    "physical_fold": "NOT_VERIFIED",
+    "cobra": "UNCHANGED_IN_MEMORY_ONLY",
+    "shutdown": "UNCHANGED_IN_MEMORY_ONLY",
+    "receipt": "repairs/2103390-bugfixes/receipts/GROUP01-CONTROLLER-CONSUMER-14MEMBER-20261019.md"
+  },
+  "group_1_current_virtual_source_scope": {
+    "original_apk_sha256": "778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb",
+    "all_original_members": 7430,
+    "proposed_changed_members": 29,
+    "proposed_unchanged_members": 7401,
+    "changed_member_breakdown": "14 original skin Home.xml variants (two scoped Continue Watching onclick and default unified poster width), 10 clock-orb include XML variants, 2 Command Center sources, 2 first-party expected SHA JSON, 1 UI Repair runtime.py",
+    "latest_scope_test": "repairs/2103390-bugfixes/group1/test_group1_scope_apk_29.py",
+    "current_signed_apk": "NONE_UNBUILT",
+    "all_fourteen_fold_layout_variants_for_touch": "ONLY DEFAULT_UNIFIED_CHANGED_THIRTEEN_ALREADY_NUMERIC",
+    "physical_fold": "NOT_TESTED",
+    "signoff": "PENDING_USER",
+    "previous_14_member_virtual_check": "HISTORICAL_SUPERSEDED_BY_15",
+    "previous_15_member_virtual_check": "HISTORICAL_SUPERSEDED_BY_29"
+  },
+  "group_1_latest_host_run": {
+    "date": "2026-10-19",
+    "tested_locally": "python -m unittest -q test_continue_choice_patch test_integrated_scope_29 test_home_reload_correlation",
+    "passing_tests": 17,
+    "total_tests": 17,
+    "result": "PASS_HOST_ONLY_NO_ANDROID_CI_NO_FOLD",
+    "original_parent_sha256": "778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb",
+    "note": "The independent locally run virtual 29-member gate is equivalent to separately committed source test_group1_scope_apk_29.py; no full GitHub CI run claimed. Earlier 19/19 and 17/17 batches separate."
+  },
+  "group_1_touch_default_fold_details": {
+    "source_commit": "d6ba53d7317e379044a23062434ff128f5b39cf2",
+    "test_commit": "bd0ecbf5c608b649e5dcedbd8546174ab1e3f59b",
+    "integrated_15_scope_commit": "a07b7840ed835e98c54e5c389ce347f07dd9d946",
+    "original_skin": "skin.infinity.diggz-1.0.5.228",
+    "original_unified_home_sha256": "61fe23defed0536ce24f7c6d2d9b6beed5c0f3b8d04a33809a929a6b1f2532be",
+    "changed_panels": [
+      "8830",
+      "8831"
+    ],
+    "source_test": "6_6_GREEN",
+    "fold_verified": false,
+    "vertical_resume_play_chooser_fixed": false,
+    "receipt": "repairs/2103390-bugfixes/receipts/GROUP01-TASK03-DEFAULT-FOLD-HORIZONTAL-15MEMBER-20261019.md"
+  },
+  "group_1_task19_navigation_audit": {
+    "source_commit": "6dcb0ce4d1003e4e7cda4352f8b9fcc72ee33f8c",
+    "test_commit": "52c1840810dee5e74419101c1fab499226f6cfbf",
+    "layouts_audited": 14,
+    "test_result": "5_OF_5_SOURCE_HOST_PASS",
+    "state": "NO_RUNTIME_FIX",
+    "source_ownership": {
+      "latest_releases": "plugin.video.umbrella",
+      "continue_watching": "Infinity first-party UI Repair / Command Center"
+    },
+    "root_cause": "NOT_YET_PROVEN",
+    "receipt": "repairs/2103390-bugfixes/receipts/GROUP01-TASK19-HOME-SELECT-VS-ACTIVATE-20261019.md"
+  },
+  "group_1_vertical_chooser_staged": {
+    "status": "SOURCE_ONLY_EXPERIMENTAL_HOST_GREEN_PHYSICAL_FOLD_OPEN",
+    "source": "repairs/2103390-bugfixes/group1/continue_choice_patch.py",
+    "commit": "bed9bd932edd5b9ed0643b6a3c3ec55a11641518",
+    "source_git_blob": "b5775c1597d603c3b53757be334cb8321f9ff458",
+    "tests": "repairs/2103390-bugfixes/group1/test_continue_choice_patch.py",
+    "test_commit": "7fc82b6e42052bdea7e3850b3fcd33656fbcaa62",
+    "host_test_result": "12_OF_12_PASS_MOCKED_PLAYER_NO_FOLD",
+    "modified_srcs": "14 Home variants panel 8830/8831 conditional click + first party UI Repair runtime.py only",
+    "risks": "xbmc.Player().play() may not match native PlayMedia(resume/noresume) for arbitrary provider; must prove Kodi starts correct item at chosen seconds without second native resume dialog",
+    "receipt": "repairs/2103390-bugfixes/receipts/GROUP01-CONTINUE-CHOICE-29MEMBER-HOST-20261019.md"
+  },
+  "group_1_task19_lifecycle_probe": {
+    "status": "READ_ONLY_OFFLINE_CORRELATION_UNPROVEN_NO_RUNTIME_FIX",
+    "source": "repairs/2103390-bugfixes/group1/home_reload_correlation.py",
+    "source_commit": "c1546bd9e49264d003c2c3cfae08bcfccfbad58f",
+    "tests": "repairs/2103390-bugfixes/group1/test_home_reload_correlation.py",
+    "test_commit": "a1ae517749f922aa52304ed2ad01566b03b654bd",
+    "host_tests": "4_OF_4_SYNTHETIC_PASS",
+    "evidence": "Earlier real 20 jobs in 49.6 seconds; precise category-change provider invalidation trigger unproved",
+    "root_cause_fixed": false,
+    "additional_actions_authorized": false
+  },
+  "group_2_authorization": {
+    "source_parent": "2103390",
+    "signed_apk_sha256": "778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb",
+    "source_branch_head_before_group2": "bea310aca5ba5ece2bc11209b064e0050c06e345",
+    "original_subtasks": [
+      "05",
+      "06",
+      "07",
+      "08"
+    ],
+    "protected_group1": "PAUSED_UNFINISHED_DO_NOT_MARK_COMPLETE",
+    "cobra_modification_allowed": false,
+    "approved_scope": "Original Add-on Browser root/header/context/navigation and My Add-ons/Updates/Recently Updated/Repository/ZIP/Search subpages only",
+    "state": "ACTIVE_IMPLEMENTATION_UNDER_GROUP2",
+    "changed_runtime_apk": false,
+    "fold": "NOT_VERIFIED"
+  },
+  "group_2_first_checkpoint": {
+    "status": "SOURCE_ONLY_STAGED_10_HOST_PASS_GROUP_NOT_COMPLETE",
+    "source_commit": "4b18d89c7fb69ec554887257c07b87ff6aebf400",
+    "source_git_blob": "d62986156ca61bfafd5ea13fb037d62e0a3d7d06",
+    "test_commit": "2b97f4ecb8aa835e9d39ae0c26776df946d0c345",
+    "test_git_blob": "1c6934398826b03f88eee32cf6b7b783d1079a2a",
+    "receipt_commit": "6eaf788484c0606c6435b659dc35b3bf43b8bc2e",
+    "receipt": "repairs/2103390-bugfixes/receipts/GROUP02-BROWSER-SKIN-42MEMBER-FIRST-STAGE-20261019.md",
+    "test_result": "10_OF_10_PASS_LOCAL_SIGNED_2103390_ORIGINAL",
+    "source_parent": "2103390",
+    "source_parent_sha256": "778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb",
+    "total_original_members": 7430,
+    "proposed_group_2_changed_members": 42,
+    "proposed_original_untouched_members": 7388,
+    "allowed_paths": "14 original skin.infinity.diggz variants of AddonBrowser.xml, Includes_InfinityBrowser223.xml, FileBrowser.xml",
+    "all_original_layout_variants": 14,
+    "virtual_member_before_after_digest": "dd9eca615bcb4f7c908510a27845592acbd98e05bfe744ceabc4cf52d771207a",
+    "changed_runtime_code": false,
+    "signed_apk_built": false,
+    "physical_fold": "NOT_VERIFIED",
+    "caveat": "Task07 native Disable confirmation / view Hide and task08 full repository/ZIP/Search real Fold behavior unverified; no signed integration."
+  },
+  "group_2_signed_apk_status": "NO — original signed 2103390 untouched; 42 skin XML changes and 4 native source overlay files are staged, no custom libkodi rebuilt or APK resigned.",
+  "group_2_physical_fold_status": "NOT_VERIFIED",
+  "group_3_authorization": {
+    "signed_base_sha256": "778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb",
+    "base_source_commit": "0efb67a0237c8d05ca066c5f893e6a1713bc5e2d",
+    "before_group_branch_head": "d6e78b4a8e51a685eb116ab77636138bd26681cd",
+    "approved_design": "repairs/design-approvals/INFINITY-HOME-POSTER-LONGPRESS-OPTION-B-LOCKED.md",
+    "protected_movie_tv_top_home_controls": [
+      8101,
+      8102
+    ],
+    "approved_buttons": [
+      "Play",
+      "Trailer",
+      "Favorite",
+      "More Info"
+    ],
+    "preserve_short_tap": true,
+    "preserve_home_layout": true,
+    "preserve_cobra": true,
+    "forbid_shared_native_modifications": true,
+    "preserve_groups_1_and_2_as_incomplete": true,
+    "signed_apk_built": false,
+    "physical_fold_verified": false,
+    "actual_runtime_source_edits": "NONE"
+  },
+  "group_3_source_checkpoint": {
+    "date": "2026-10-19",
+    "source_parent_sha256": "778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb",
+    "parent_original_apk_members": 7430,
+    "proposed_added_first_party_members": 2,
+    "proposed_changed_existing_members": 0,
+    "proposed_removed_members": 0,
+    "proposed_total_members_if_future_packaged": 7432,
+    "original_members_preserved": 7430,
+    "additions": [
+      "assets/addons/script.infinity.uirepair/home_option_b.py",
+      "assets/addons/script.infinity.uirepair/resources/skins/Default/1080i/InfinityHomeOptionB.xml"
+    ],
+    "source_code_commit": "6d1623e844f2033bd9adc701eef44bdfa28ea0eb",
+    "source_xml_commit": "14605aa250f4502880d527d7cec7d7acf3a8f71d",
+    "stage_tool_commit": "bf0d08cd523ae74f88a6141aab0e2c096cadb371",
+    "tests_commit": "a93d9dc95ba87432cfca917de85f77280f8d86a6",
+    "longpress_audit_commit": "d15f473014f0acc0d257c11943142481fa1a4d27",
+    "longpress_tests_commit": "06e59e7d066d22d8fb2e600bd6b94c13d4c17636",
+    "modal_xml_sha256": "bfe3c823e98631f9e19f8c2a0d6c98b1a39140b6f8c51120f2d9ccd2c06f5e63",
+    "modal_python_sha256": "2ac0c6dfd68d1b6922632da6e7142cf1f740382a8cc0110d6769fe0c84892ab3",
+    "host_test_result": "20_OF_20_PASS_SOURCE_AND_MOCKS_ONLY",
+    "movie_tv_controls": [
+      8101,
+      8102
+    ],
+    "original_native_rail_longpress_supported_control_ids": [
+      9200,
+      8820,
+      8720,
+      19601
+    ],
+    "direct_longpress_hook": "NOT_CONNECTED_NOT_PROVEN",
+    "physical_fold": "NOT_VERIFIED",
+    "design_pixel_fidelity": "NOT_VERIFIED",
+    "signed_build": "NONE",
+    "native_engine_edited": false,
+    "keymaps_edited": false,
+    "original_skin_home_edited": false,
+    "cobra_edited": false,
+    "shutdown_edited": false,
+    "original_group1_group2_stages_preserved": true,
+    "receipt": "repairs/2103390-bugfixes/receipts/GROUP03-OPTION-B-MODAL-20HOST-INPUT-BLOCK-20261019.md",
+    "receipt_commit": "35319321baeb640359c54668a361e9ff72493f87",
+    "permission_for_isolated_native_input_fix": "CLARIFIED_ALLOW_WITH_STRICT_WINDOW_CONTROL_ID_AND_REGRESSION_GUARDS_NOT_IMPLEMENTED"
+  },
+  "group_3_signed_apk_status": "NONE — new first-party option B modal files staged in repo only; input not wired and neither APK nor Fold acceptance exists",
+  "group_3_physical_fold_status": "NOT_VERIFIED",
+  "preservation_clarification_20261019": {
+    "user_instruction": "Well, yes, we were strict about preserving Cobra and everything outside. However, if there is a fix that is needed to be, you can still preserve everything and do the fix that is needed.",
+    "meaning": "Do not stall an already authorized scoped repair merely because code is shared/native. Implement the necessary minimal guarded edit only if tests and diff establish no effect on Cobra, other controls or other work groups.",
+    "not_allowed": [
+      "Cobra source/data/UI/behavior modifications",
+      "changes outside active group",
+      "blind global input changes",
+      "unapproved extra features",
+      "data wipe",
+      "shutdown changes",
+      "unverified packaging or final lock"
+    ],
+    "requirement": "Use exact entry guards, source/member allowlist, negative Cobra/unrelated path regression, baseline identity and Fold acceptance gate; reject unsafe implementations.",
+    "active_group": "03",
+    "paused_groups": [
+      "01",
+      "02"
+    ],
+    "status": "DOCUMENTATION_ONLY_PERMISSIONS_CLARIFIED_NO_RUNTIME_CODE_CHANGED",
+    "governing_contract": "repairs/2103390-bugfixes/GROUPED-01-07-BINDING-CONTRACT.md",
+    "contract_commit": "00b43672523a48c72debb9e8f1f85fffd65fe8d5"
+  },
+  "group_2_reactivation": {
+    "date": "2026-10-19",
+    "from_group": "03",
+    "current_group": "02",
+    "user_reauthorized_completion": true,
+    "required_to_finish": [
+      "05 header slash source and Fold",
+      "06 root six authentic routes and accurate contextual text",
+      "07 selection vs launch, context actions, reversible temporary Hide, confirm actual Disable",
+      "08 real native repository/ZIP picker/Preview/Search focus, return and keyboard"
+    ],
+    "native_shared_source_allowed_only_with_exact_browser_window_skin_control_guards": true,
+    "keep_group_1_group_3_stages": "IMMUTABLE_NOT_COMBINED",
+    "cobra": "NO_CHANGES",
+    "shutdown": "NO_CHANGES",
+    "signed_parent_sha256": "778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb",
+    "apk_build": "NOT_STARTED",
+    "physical_fold": "NOT_VERIFIED"
+  },
+  "group_2_native_checkpoint": {
+    "status": "SOURCE_PATCH_COMMITTED_KODI_2103390_SOURCE_COMPILE_AND_FOLD_PENDING",
+    "skin_source_commit": "4b18d89c7fb69ec554887257c07b87ff6aebf400",
+    "native_source_commit": "a58918b2a62b71898bf4e075964b9566567c05f8",
+    "native_source_file": "repairs/2103390-bugfixes/group2/native_addonbrowser_patch.py",
+    "native_source_blob": "a361eb1c326c671fa3b481a18ab4a8c9d676da62",
+    "native_test_commit": "3444bef95ec6678ddc46f8c0112b7ddc1f1d24b3",
+    "native_test_file": "repairs/2103390-bugfixes/group2/test_native_addonbrowser_patch.py",
+    "receipt": "repairs/2103390-bugfixes/receipts/GROUP02-NATIVE-REPAIR-SOURCE-20HOST-20261019.md",
+    "receipt_commit": "dd4efe1526ee03d26d7a57ff177f5bc0ac9fff9e",
+    "skin_host_test_result": "10_10_PASS_SIGNED_2103390_ORIGINAL",
+    "local_native_synthetic_result": "10_10_PASS",
+    "real_omega_source_exact_anchor_results": "13_13_UNIQUE_REVERSIBLE_ACROSS_4_FILES",
+    "github_test_suite_not_executed_in_full_native_source_checkout": true,
+    "native_source_paths": [
+      "xbmc/addons/gui/GUIWindowAddonBrowser.h",
+      "xbmc/addons/gui/GUIWindowAddonBrowser.cpp",
+      "xbmc/addons/gui/GUIDialogAddonInfo.cpp",
+      "xbmc/addons/ContextMenus.cpp"
+    ],
+    "guard": "WINDOW_ADDON_BROWSER + lookandfeel.skin skin.infinity.diggz, otherwise original native actions",
+    "direct_disable_entrypoints_guarded": [
+      "DialogAddonInfo button",
+      "Kodi global context menu action"
+    ],
+    "hide_behavior": "Temporary browser-only user addon ID filter, no addons state changes, Show hidden add-ons restores, resets on browser exit",
+    "native_routes_preserved": [
+      "addons://user/",
+      "addons://outdated/",
+      "addons://recently_updated/",
+      "addons://repos/",
+      "addons://install/",
+      "addons://search/"
+    ],
+    "protected_2103390_signed_apk_sha256": "778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb",
+    "skin_original_member_count": 7430,
+    "skin_original_members_staged_to_change": 42,
+    "compiled_libkodi_sha256": "UNKNOWN_NOT_BUILT",
+    "native_2103390_source_checkout_exact_hashes": "NOT_RETRIEVED_YET_UPSTREAM_OMEGA_ONLY",
+    "native_android_build": "NOT_RUN",
+    "runtime_fold": "NOT_VERIFIED",
+    "cobra_tested_on_device": false,
+    "Cobra_or_shutdown_source_modified": false,
+    "original_signed_2103390_mutated": false
+  },
+  "group_1_user_stage_acceptance_20261019": {
+    "user_words": "So in other words, I have to replicate it and we have to do more research about it. So if anything, you've done everything you can do. So that means one gets a check, and we'll get back to it later for the other situation.",
+    "checkmark_meaning": "GROUP1_SOURCE_CHECKPOINT_ACCEPTED_AND_SAVED_NOT_FULLY_COMPLETE",
+    "other_source_work": "PRESERVED_FOR_LATER_COMBINED_REVIEW",
+    "task_19": "DEFERRED_UNFIXED_AWAITING_USER_REPRO_AND_CORRELATED_DIAGNOSTICS",
+    "source_checkmark": true,
+    "full_group_completed": false,
+    "fold_verified": false,
+    "signed_apk_created": false,
+    "current_active_group": "02",
+    "group_done_count_unchanged": 0
+  },
+  "native_crash_evidence_20261019_092026": {
+    "diagnostic_uploaded": "Infinity-Diagnostics-20261019-092026.zip",
+    "diagnostic_zip_sha256": "4c94730679487a007c6678c12ebf31581b75e8a493ce0b19a9a26d0992e27762",
+    "report_version_code": 2103390,
+    "report_version_name": "1.0.9-UI-Restoration-Fold-TEST06",
+    "crash_epoch_ms": 1792406643161,
+    "crash_local": "2026-10-19 06:44:03 EDT",
+    "process": "com.projectinfinity.kodi:kodi",
+    "pid": 29396,
+    "tid": 29630,
+    "sigsegv": 11,
+    "si_code": 1,
+    "fault_address": "0x10",
+    "android_recorded_exit_status": 139,
+    "last_native_snapshot_epoch_ms": 1792406640631,
+    "last_native_window_id": 10025,
+    "last_native_window": "Videos navigation",
+    "last_native_dialog_id": 10138,
+    "last_native_dialog": "Busy",
+    "last_android_multi_window": true,
+    "last_orientation": "landscape",
+    "last_player_flags": 0,
+    "exact_2103390_apk_sha256": "778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb",
+    "packaged_2103390_libkodi_so_sha256": "6e82e18868345ce919714364466e6473b15ed00abb68f6d09eebd7f5ef33f3f8",
+    "packaged_2103390_libinfinitycrash_so_sha256": "19f017612d9447503ef8957d2ad82266631150c98454359789bdf6f547f4b3df",
+    "crash_collector_embedded_historical_native_sha256": "db92b30f5523cacd9029aa21d7b52c8bc7819e4cd5c1dea76d4bfcdcf9205375",
+    "collector_historical_lineage": "repairs/native-crash-forensics-2103250/apply.py hardcoded native SHA for 2103229",
+    "collector_sha_matches_actual_packaged_native": false,
+    "outstanding_needed": "Matched tombstone/backtrace plus ELF build ID and module mapping for crashing process, followed by exact cause-based correction",
+    "crash_root_cause_proven": false,
+    "native_fix_implemented": false,
+    "android_native_code_modified": false,
+    "active_work_group_unchanged": "02",
+    "evidence_for_future_group": "05",
+    "group_05_implementation_authorized": false,
+    "receipt": "repairs/2103390-bugfixes/receipts/CRASH139-FOLD-20261019-092026-READONLY.md",
+    "receipt_commit": "05466d0f8ca369f9ba0df61867ee0da52861cf0a"
+  },
+  "current_authorized_groups": [
+    "07"
+  ],
+  "group_456_authorization": {
+    "user_approved": true,
+    "groups": [
+      "04",
+      "05",
+      "06"
+    ],
+    "start_parent_commit": "32420005937d5938bfcc82e66515c8ff2b42f170",
+    "approved_2103390_sha256": "778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb",
+    "order": "04_then_05_then_06",
+    "group1_task19": "DEFERRED_UNFIXED",
+    "group1_group2_group3_source_savepoints": "PRESERVE",
+    "cobra": "ABSOLUTELY_NO_BEHAVIOR_CHANGE",
+    "essential_first_shutdown": "ABSOLUTELY_NO_BEHAVIOR_CHANGE",
+    "separate_group7_apk_gate": true,
+    "actual_build": "NONE",
+    "fold": "NOT_VERIFIED"
+  },
+  "active_next_phase": "BUGFIX_ONLY_TARGETED_COMMAND_CENTER_RESIDENT_REGISTRATION_AND_NATIVE_DURABILITY_WRITERS_PLUS_SIGSEGV_DIAGNOSTIC_NO_FEATURES",
+  "groups_456_readiness": {
+    "verified_at": "2026-10-19",
+    "parent_sha256": "778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb",
+    "group4": {
+      "run": 39265841878,
+      "host_tests": "10/10",
+      "skin_modified_original_apk_members": 41,
+      "native_engine_compiled": false,
+      "physical_fold": false
+    },
+    "group5": {
+      "run": 39267576509,
+      "host_tests": "10/10",
+      "collector_fingerprint_correction": "SOURCE_VERIFIED_PENDING_FINAL_ELF",
+      "fatal_139_crash_function_identified": false,
+      "cause_based_fix": false,
+      "root_cause_fix": false,
+      "built_recorder_fingerprint_correction": true,
+      "real_fold_SIGSEGV_original_faulting_function_proven": false
+    },
+    "group6": {
+      "run": 39269926154,
+      "host_tests": "10/10",
+      "skin_modified_original_apk_members": 13,
+      "native_kaitoast_compiled": true,
+      "physical_fold": false
+    },
+    "group1_group3_shared_ui_runtime": {
+      "run": 39270553998,
+      "host_tests": "26/26",
+      "exact_shared_runtime_composition": "HOST_VERIFIED",
+      "source_fix_commit": "fe0e5f7f2e99dda373bf9edadc14a56ffaa5364d",
+      "tests_commit": "7628081245ff165828a52c1432b4547a317bc773",
+      "fold": false
+    },
+    "combined_apk_built": true,
+    "full_android_native_compiled": true,
+    "user_lock": false,
+    "receipt": "repairs/2103390-bugfixes/receipts/GROUPS04-06-AND-ALL-IN-ONE-PREFLIGHT-20261019.md",
+    "receipt_commit": "d7ba7752ccc202348ac77769972a94f249e39258",
+    "all_in_one_preflight": "SOURCE_BUILD_SIGN_GREEN_REAL_FOLD_SHUTDOWN_FAILED_SIGSEGV_CAUSE_OPEN",
+    "native_compile_and_signing_run": 39348480827,
+    "physical_fold_shutdown_pass": false
+  },
+  "group_7_signed_apk_status": "GITHUB_ACTIONS_RUN_39348480827_GREEN_PERMANENTLY_SIGNED_2103391_SHA256_47609f2ada1d6bbc7cdbddb791d11815bdbf1100a083bd8205d60ac21c882151_EXPERIMENTAL_FOLD_SHUTDOWN_RED_NO_LOCK",
+  "group_7_experimental_build": {
+    "explicit_authorization": true,
+    "version_code": 2103391,
+    "version_name": "1.0.9-All-In-One-Bugfix-TEST0001",
+    "intended_filename": "Infinity-2103391-All-In-One-Bugfix-EXPERIMENTAL.apk",
+    "source_branch": "work/infinity-2103390-targeted-bugfixes",
+    "workflow_path": ".github/workflows/infinity-2103391-full-native-signed.yml",
+    "workflow_run": 39344893535,
+    "workflow_commit": "2c49d1f16feb091538e2d6edf6ba0b1896629fcf",
+    "source_merge_workflow": ".github/workflows/infinity-2103391-integration-source.yml",
+    "source_merge_run": 39344548533,
+    "protected_parent_sha256": "778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb",
+    "approved_original_source_members": 125,
+    "approved_additive_modal_members": 2,
+    "pending_native_new_library": true,
+    "pending_crash_recorder_dynamic_hash": true,
+    "pending_binary_manifest_version": true,
+    "expected_total_modified_original_members": 128,
+    "experimental_pending_runtime": true,
+    "physical_fold_accepted": false,
+    "user_final_lock": false,
+    "final_apk_verified": false,
+    "actual_SIGSEGV_139_root_cause_fixed": false,
+    "group1_task19": "USER_DEFERRED_UNFIXED",
+    "feature_freeze_after_this_apk": true,
+    "future_scope": "BUGFIXES_STABILITY_REFINEMENT_ONLY_NO_MORE_FEATURES"
+  },
+  "postinstall_fold_2103391_20261019_213206": {
+    "diagnostic_zip_sha256": "5d8eeed7b0b4ca772d9d779a1ade65882f6279651b69293cdb723289187fdad9",
+    "reported_apk_version_code": 2103391,
+    "report_device": "SM-F976U1 Android17 API37",
+    "installed_skin": "skin.infinity.diggz 1.0.5.229",
+    "installed_command_center": "script.infinity.commandcenter 0.3.5.21",
+    "unobserved_matching_zip_activations": [
+      "script.infinity.uirepair",
+      "script.infinity.rails",
+      "script.infinity.watchedbridge"
+    ],
+    "earlier_close": {
+      "pid": 9419,
+      "epoch_ms": 1792459590074,
+      "error": "command_center: exactly_one_canonical_resident_required"
+    },
+    "latest_close": {
+      "pid": 18599,
+      "started_epoch_ms": 1792459890342,
+      "failed_epoch_ms": 1792459915460,
+      "duration_ms": 25145,
+      "error": "native_admission: checkpoint_deadline_exceeded; owner proof incomplete",
+      "normal_close_passed": false,
+      "process_death_confirmed": false,
+      "authorization_consumed": false,
+      "pvr_already_durable": true,
+      "essential_owner_blockers": 15,
+      "pending_python_writers": 5,
+      "command_center_participant": "legacy_or_unknown command_center_applied false"
+    },
+    "historical_native_crash": {
+      "pid": 25057,
+      "tid": 25119,
+      "epoch_ms": 1792458629820,
+      "signal": 11,
+      "tombstone_signal_code": "SI_TKILL/-6",
+      "top_native_frame": "libinfinitycrash.so restore_and_reraise+168",
+      "original_faulting_function_proven": false,
+      "producer_apk_version_proven": false
+    },
+    "group1_task19_still_deferred": true,
+    "cobra_changed": false,
+    "shutdown_architecture_changed": false,
+    "source_or_apk_modified_by_this_forensic_review": false,
+    "receipt": "repairs/2103390-bugfixes/receipts/FOLD-2103391-DIAGNOSTICS-20261019-213206-READONLY.md",
+    "receipt_commit": "ce88ad72354cbb1cdf71aee7b2094479b4396b17"
+  }
+}

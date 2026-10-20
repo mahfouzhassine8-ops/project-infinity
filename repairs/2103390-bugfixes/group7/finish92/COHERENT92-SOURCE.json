@@ -1,0 +1,42 @@
+{
+  "source_apk_sha256": "47609f2ada1d6bbc7cdbddb791d11815bdbf1100a083bd8205d60ac21c882151",
+  "component_versions": {
+    "script.infinity.commandcenter": "0.3.5.22",
+    "script.infinity.watchedbridge": "1.0.3",
+    "script.infinity.uirepair": "0.1.4",
+    "script.infinity.rails": "0.2.7",
+    "skin.infinity.diggz": "1.0.5.229"
+  },
+  "actual_android_runtime_tested": false,
+  "physical_fold_verified": false,
+  "final_lock": false,
+  "component_changes": {
+    "script.infinity.commandcenter/addon.xml": {"before":"5711db9be562db665e1db70aa8798c7d254843196cc6beb7520055918758628f","after":"af43f2b192337ed4b342a594e980a1095d236e12209168505697cd0245497306"},
+    "script.infinity.commandcenter/checkpoint_runtime.py": {"before":"1378bae80f7f732b858e8020846b922e8778405a66eca05d6d11812f5aff9697","after":"1455de1a96acfd0b1655a3b2ee35b4b2e11944009b81ba68a8e130d9bcc8f939"},
+    "script.infinity.uirepair/CONTROLLER-PREIMAGES.json": {"before":"ccd9f8637a72cdb9be50a1d2a5b0887c29e884e87f8e39378096558e65238e75","after":"4425446ab1a187a8be0d8f9d916f2b6aa9bfce242a34bea2c78f4e2e3342ef9d"},
+    "script.infinity.uirepair/addon.xml": {"before":"802e311aca8428da0cc69b2adb37635fb1d255625f2dee269b1c928eee576677","after":"0f6c68350a3a2a1d2aa78de91a0abc5c94acb89c72631f66656de286cbc6e47d"},
+    "script.infinity.watchedbridge/CONTROLLER-PREIMAGES.json": {"before":"ccd9f8637a72cdb9be50a1d2a5b0887c29e884e87f8e39378096558e65238e75","after":"4425446ab1a187a8be0d8f9d916f2b6aa9bfce242a34bea2c78f4e2e3342ef9d"},
+    "script.infinity.watchedbridge/addon.xml": {"before":"8ca994531d08ce2a30eae951464ce0a852148f617f54de351dcec7985cad1fe6","after":"4f03b3c5b998603ae4d07189e47cfcca22c19748d45499ee0feeb6ad5e73de5e"},
+    "script.infinity.watchedbridge/controller.py": {"before":"a67e495c837829d267289e630b8a044a0fc4012e14806640c860f0a60097f260","after":"c8caceecd719446175438bc9ba67a60df4bbe619d3b0a88bf799b70eed4b68bd"},
+    "skin.infinity.diggz/addon.xml": {"before":"3b5fe73c33694a0d120c4621a7af38490bcbf83cff7e395e1f7f9ac20f244b6c","after":"ad0fd01468352dfdb0b6be330fa4944dd56e02daad578dbc910def651df38644"}
+  },
+  "native_changes": {
+    "xbmc/platform/android/activity/InfinityScriptCheckpointContracts.cpp": {"before":"8c9de99346b1e74a08cf8b00fd1f29acef514b07041d40ebbe2678700a59abc8","after":"116d0677d8530dc84afbf9646fcbff9ca58ecfee9efc16542eaecfb1039bc8f6"},
+    "xbmc/platform/android/activity/InfinityAndroidCheckpoint.cpp": {"before":"eb74a3730456fc4c4fb0bfd65a45afcd7823dfdd66125fd16fd4119fa8d3c6ee","after":"a17e43f22ac1716ad14fb8e7635888d2e10d3d0ee11a35b7798e3b38c62c122e"}
+  },
+  "java_changes": {
+    "tools/android/packaging/xbmc/src/InfinityInstalledCheckpointInstaller.java.in": {"before":"a000f882665cb9d8560e1cd4138d488819f9eb9dfa7c7c76f58f70d559cab9b5","after":"7cef1dfb1c1fce521e4c27788f293ea85f494ec6ff9edb4014cce72b7de88194"}
+  },
+  "full_native_source_tree_reconstructed": false,
+  "android_native_library_compiled": false,
+  "coordinator_source_matches_locked_test4": true,
+  "required_install_over_components": ["script.infinity.commandcenter","script.infinity.watchedbridge","script.infinity.uirepair"],
+  "existing_skin229_and_rails027_code_unchanged": true,
+  "database_migrations": 0,
+  "shutdown_required_owner_count_changed": false,
+  "classifier_legacy_variants_retained": true,
+  "original_apk_modified": false,
+  "cobra_code_resources_or_data_changed": false,
+  "group5_crash_root_cause_fixed": false,
+  "group1_task19_fixed": false
+}

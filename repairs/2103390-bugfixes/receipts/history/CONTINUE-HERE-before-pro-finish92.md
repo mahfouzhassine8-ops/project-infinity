@@ -1,0 +1,418 @@
+# CURRENT PRIMARY HANDOFF — SEVEN WORK GROUPS, GROUP #6 SILENT MODE
+
+## OCT 19 21:32 FOLD — SIGNED 2103391 POST-INSTALL BUG FIX EVIDENCE
+
+**AUTHORITATIVE NEW REAL FOLD DIAGNOSTIC**: User uploaded `Infinity-Diagnostics-20261019-213206.zip`, SHA256 `5d8eeed7b0b4ca772d9d779a1ade65882f6279651b69293cdb723289187fdad9`. 20 ZIP members, includes a full AOSP native crash protobuf and matched shutdown receipts. **No source/runtime changes were made when reviewing this archive.**
+
+**ACTUAL PHYSICAL INSTALL**: installed APK `2103391`, signed native/signing GitHub run `39348480827` GREEN, actual skin `skin.infinity.diggz 1.0.5.229`, actual Command Center `0.3.5.21`, Compatibility `0.8.2`. Code snapshot does not identify UI Repair, Watched Bridge, Rails versions: **unknown from this ZIP**, not proof absent. Matching ZIP exporter run `39352426448` green. Keep signed 2103390 fallback, installed first-party and all user data untouched.
+
+**TWO DIFFERENT NORMAL CLOSE FAILURES**:
+- PID `9419`, 2026-10-19 **21:26:30 EDT**: `command_center: exactly_one_canonical_resident_required`. Observe mismatch: later disk code enumerator confirms CC 0.3.5.21, but `checkpoint/installed-participants.json` for subsequent PID18599 says `command_center_version=legacy_or_unknown; command_center_applied=false`. Investigate canonical Command Center startup/participant registration **before** speculative shutdown changes.
+- PID `18599`, **21:31:30–21:31:55 EDT**: `CHECKPOINT_FAILED` after **25,145 ms**, `native_admission: checkpoint_deadline_exceeded; owner proof incomplete`, `essential_writes_durable=false`, `authorization_consumed=false`, `process_death_confirmed=false`. PVR only is ALREADY_DURABLE; 15 essential owners incomplete. 5 pending Python writers: Crew, CC, Compatibility, Infinity Continuity and Infinity native ambient. Explicit `python_services` pending `unidentified:infinity_native_ambient.py`; `script_persistence.blocking_count=0` **does not** mean owner proof complete. Do not bypass barrier or pretend one advisory caused all 15 owner failures.
+
+**SEPARATE NATIVE CRASH:** `traces/1-1792458629820.tombstone.pb` decoded with public AOSP debuggerd proto locally: **21:10:29 EDT**, PID25057/TID25119, SIGSEGV11. Tombstone shows `SI_TKILL/-6` and `libinfinitycrash.so!restore_and_reraise+168`: this is the signal handler **re-raise**, NOT the original crashing Kodi instruction. `crash/native-crash-last.txt` is zero-length. Report notes a package update at 21:06:45, but exit-manifest `producer_apk_version=null`, thus version/ELF attribution **unproven** despite later reported installed 2103391. Fix crash evidence completeness with matched native symbols without blanket native/graphics or player assumptions.
+
+**Project consequence:** native compile/sign *CI green*, **real physical Fold Close RED**, original SIGSEGV function still unknown; **NO FINAL LOCK**. Continue approved bug fixes only; features frozen. Do not blame third-party add-on, drop essential saves, change Cobra, uninstall/clear, or restart groups #1–#6. Group #1 task19 reload remains deliberately deferred.
+
+**Read-only forensic receipt:** `repairs/2103390-bugfixes/receipts/FOLD-2103391-DIAGNOSTICS-20261019-213206-READONLY.md`, commit `ce88ad72354cbb1cdf71aee7b2094479b4396b17`. Tracker amended at `474ff285c74f8b21d742217a1c5a07c158459c76`. This supersedes old handoff text claiming no signed APK; do not erase prior checkpoints/tests.
+
+---
+
+
+
+
+## GROUP7 2103391 EXPERIMENTAL BUILD — USER AUTHORIZED, FEATURE FREEZE
+
+User explicitly requested: "All right, build the APK" and "Yeah, after these new features, there's going to be nothing to add. So we'll work on bug fixes." Group #7 now permits a **properly permanently signed experimental install-over** build only, not a release LOCK.
+
+- Protected **signed 2103390 SHA256 778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb** is immutable. User data, Cobra, Essential-First, add-ons and all unrelated behavior must be preserved. Zero new features after this approved change set; only bug fixes/stability/refinement thereafter.
+- Exact source merger: \`repairs/2103390-bugfixes/group7/stage_all_in_one.py\`; GitHub source gate **39344548533 succeeded**, exact **125 original skin/first-party members modified**, **2 Option B first-party files added**, no third-party/new runtime services. G1 Home/Resume, G2 browser, G3 popup/native hold, G4 player glass, G5 collector fingerprint (NOT crash fix), G6 System Hub Silent Mode. Group1 task19 deferred/unfixed, Group5 SIGSEGV/139 real cause unknown; these are explicitly tagged in the receipt.
+- Eight scoped compiled native source files: \`group7/native_merge.py\`, original verified 2103384/2103385 source reconstruction and full prior compiler manifest retained. Group2 browser confirmation repaired to use Kodi-supported four-variant \`CGUIDialogYesNo::ShowAndGetInput\` overload, before compiling.
+- Package/sign script \`repairs/2103390-bugfixes/group7/sign_all_in_one.py\`, exact original signed SHA checked, requires genuinely **new** compiled Android ARM64 \`libkodi.so\` and matching proof; adds new 2103391 binary manifest version and crash-recorder actual SHA; strict 128 original modified including native/crash/manifest + 2 added; original v1/v2/v3 permanent signing certificate; unsigned/test identity forbidden.
+- Full pipeline \`.github/workflows/infinity-2103391-full-native-signed.yml\`: initial config run 39344785144 failed YAML; source gate passed and native run 39344893535 failed BEFORE source reconstruction at an unchanged interpreter-retirement host test under accidental hosted Python3.11.17. Corrected native compiler to proven Ubuntu22 system Python as historical green producer, without suppressing the test. **Current active run 39345352107**, source gate GREEN; actual complete native compilation/signing separate jobs. This is an *in-progress experimental build attempt*, not an APK.
+- Planned artifact filename: \`Infinity-2103391-All-In-One-Bugfix-EXPERIMENTAL.apk\`, versionCode 2103391, versionName \`1.0.9-All-In-One-Bugfix-TEST0001\`. User Fold physical acceptance and explicit "LOCK" still required. Native crash139 remains unproven even if signed output exists.
+- This handoff/documentation is not itself part of the APK. Never claim experimental candidate created, signed, or Fold-approved unless GitHub Actions signed job actually completes with verified receipt.
+
+---
+
+## OCT 19 ALL-IN-ONE READINESS GATE — SOURCE GREEN, ANDROID/FOLD/CRASH OPEN
+
+**User:** “All right, so if everything's complete, it's time to go to all-in-one phase.” The condition **IS NOT MET**. We have saved a source-stage audit, not compiled/signed a candidate or called a final lock. User's earlier directive requires full byte-preservation of Cobra and all unapproved Infinity behavior; do not mistake successful Python host fixtures for actual APK installation.
+
+**NEW GROUPS #4–#6 TESTED ON ORIGINAL SIGNED 2103390:**
+
+- **Group #4 — Player OSD and 3 glass menus:** 41 strictly scoped skin XML changes only. `group4/player_glass_patch.py` commit `55df2ad96f6704aba9746917d1b2718e483e09e5`. **CI run 39265841878, 10/10 PASS**. Existing OSD control #255 reuses real Video Settings; redundant Playback row #274 removed, rest preserved, 3 menu glass resources/conditions. **CAUTION:** original control #255 is actually `Action(AspectRatio)` in 2103390, so prove existing video/aspect capability remains available before shipping—its original one-tap behavior is not automatically preserved. No Fold player/device rendering test.
+- **Group #5 — native fatal SIGSEGV/139:** Original Oct 19 06:44 crash PID29396/TID29630, signal 11, exit139, Videos Navigation + Busy at last recorded state. Historical 2103229 native hash in crash recorder is provably stale compared to packaged 2103390 `libkodi.so`. Source-only `group5/final_native_identity_patch.py` commit `079b6b3249ca8c1849d00d0583fb4ae3e3a939fa` derives identity from final ELF, patches only fixed-sized companion recorder rodata at packaging; ELF NOBITS guard corrected at `cecb049cb66733deca395ddbd4a3713f01c92a17`. **CI run 39267576509, 10/10 PASS** (first 39266729693 failed and was corrected). **NO PROVEN FAULTING STACK/FUNCTION, NO CRASH CAUSE REPAIR, NO NATIVE REBUILD**. Do not imply the known crash is fixed. Crash receipt `repairs/2103390-bugfixes/receipts/CRASH139-FOLD-20261019-092026-READONLY.md`.
+- **Group #6 — existing System Hub Silent Mode:** 13 original Hub layout XMLs get exactly one persistent `Silent Mode` radiobutton. All existing original button IDs/actions and geometry untouched. Only footer and surrounding glass envelope expanded to make room; unified scrolling preserved. Native one-function-only `CGUIDialogKaiToast::DoWork` presentation gate scoped by `skin.infinity.diggz` plus persistent Skin.HasSetting, discards passive toasts before sound/haptic; does not suppress interactive dialogs, player audio, logs, third-party add-ons or Cobra. Initial Group6 source `e9c83cf16783f307331b2f9ace1f10cc5a8ea10d`; layout safety correction `6b79ac88963e9e61fe6c7429ab3bd9f21b8747ff`; tests `d2a0888d770a3e19aa18993757f3edbf03226c05`. **CI run 39269926154, 10/10 PASS**. Native toast source NOT built or Fold-tested. Blocking CU LRC script-error dialogs aren't ordinary KaiToast and must not be claimed suppressed.
+
+**INTEGRATION COLLISION DISCOVERED/RESOLVED AT SOURCE LEVEL:** Earlier Group1 Continue Watching `home-choice` and Group3 Option B `option-b` each add a dispatcher case to **the same** first-party `script.infinity.uirepair/runtime.py`. Individual patches would fail if applied sequentially unchanged. Exact G3 `runtime_option_b_patch.py` was corrected at `fe0e5f7f2e99dda373bf9edadc14a56ffaa5364d` to recognize ONLY either signed original or Group1-approved source, with no other actions modified. Integration test commit `7628081245ff165828a52c1432b4547a317bc773`, **CI run 39270553998 26/26 PASS**, source only. Does not prove GUI input/Android.
+
+**Group1:** user accepted saved source checkpoint; task #19 Movies↔TV category reload deliberately deferred/unfixed for later actual Fold replay. **Group2:** 20/20 host source, native source modifications not compiled. **Group3:** 26/26 host source after Group1 overlap fix, native movie/TV hold not rebuilt. All stages preserved; never redo or discard existing accepted work.
+
+**ALL-IN-ONE CONDITION NOT MET:** 
+- Group #5 actual crash SIGSEGV/139 remains unresolved and lacks faulting native stack/module mapping; fingerprint alone does not fix it.
+- Groups #2, #3 and #6 native fixes have never been compiled together into source-matched **2103390** Android `libkodi.so` nor tested on a real Android process. Group #4 player OSD must be verified against real AspectRatio capability.
+- User's actual Fold 17, inner+cover, all theme player navigation, touch gestures, native package signing/install-over, Essential-First full Close, Cobra and provider regressions are still unknown.
+- Final Group #7 implementation remains unauthorized by the user's condition; **NO all-in-one APK, no signed candidate, no lock**. A future experimental diagnostic APK could be considered separately if the user explicitly accepts the known unresolved crash; do not quietly promote it to a corrected release.
+
+**All-stage verification receipt:** `repairs/2103390-bugfixes/receipts/GROUPS04-06-AND-ALL-IN-ONE-PREFLIGHT-20261019.md`, commit `d7ba7752ccc202348ac77769972a94f249e39258`. **Authoritative tracker update:** `TASK-STATUS.json`, commit `e4040a65a0ef1bb88f8dbb89dc217ed5eb8066b4`. This is a truthful readiness checkpoint; source changes/receipts/CI remain saved.
+
+---
+
+
+
+
+## NEW FOLD NATIVE CRASH EVIDENCE — 2026-10-19 09:20 ZIP (READ ONLY)
+
+The user indicated an additional native-build/crash issue before Group #4–6, then supplied `Infinity-Diagnostics-20261019-092026.zip` (SHA256 `4c94730679487a007c6678c12ebf31581b75e8a493ce0b19a9a26d0992e27762`). **This is evidence review only, not authorization for unproven native fixes or final APK integration.** Preserve all already staged Groups #1–3, untouched Cobra and Essential-First Close.
+
+**Matched October 19 06:44:03 EDT crash:** `com.projectinfinity.kodi:kodi`, PID 29396/TID 29630, SIGSEGV signal11 si_code1 fault 0x10, Android process exit 139. 2.53 sec before fault, native heartbeat on same PID had Kodi `WINDOW_VIDEO_NAV (10025)` plus `WINDOW_DIALOG_BUSY (10138)`, landscape multi-window `2256×1244`, no playback. The last GUI state is a clue only: the exact crashed instruction, owner thread subsystem, or causal native source **has NOT been proven**. A separate earlier status139 occurred 2026-10-18 19:07:10. Two CPU resource terminations are different and should not be conflated.
+
+**IMPORTANT VERIFIED FINGERPRINT PROVENANCE FAULT:** Actual immutable signed 2103390 APK SHA `778b84a5…` packages `libkodi.so` SHA256 `6e82e18868345ce919714364466e6473b15ed00abb68f6d09eebd7f5ef33f3f8`, while bundled `libinfinitycrash.so` and its crash report embed *historical* `native_engine_sha256=db92b30f5523cacd9029aa21d7b52c8bc7819e4cd5c1dea76d4bfcdcf9205375`. GitHub source `repairs/native-crash-forensics-2103250/apply.py` line 11 confirms this is the fixed old **2103229** engine hash, not the signed 2103390 library hash. **Do not symbolicate against 2103229 or infer a wrong loaded engine from this stale metadata.** A future native build must tie the collector's identity/ELF Build ID to the exact packaged and runtime-loaded engine with a fail-closed proof.
+
+**Missing evidence:** no per-crash native backtrace, tombstone, ASLR module mapping or symbolized fault; absolute PC alone cannot prove crash root cause. The successful Essential-First close in the same ZIP belongs to DIFFERENT PID 31341 ~00:08 EDT; no shutdown repair is justified. Exit-manifest record array empty; saved RUNNING status for PID29396 is stale/nonauthoritative, given actual 139 exit.
+
+**Full read-only forensic receipt:** `repairs/2103390-bugfixes/receipts/CRASH139-FOLD-20261019-092026-READONLY.md`, commit `05466d0f8ca369f9ba0df61867ee0da52861cf0a`. Tracker updated commit `fd30ddc9fe0eb1a0f3427ff88d2d4d2516c14078`; Group #5 remains **INVESTIGATION_PENDING / NOT AUTHORIZED / NO CODE FIX**. This is an ADDITIONAL evidence item for native crash work when selected. Group #4 and Group #6 stay as approved but unimplemented. No native engine, APK, player, Cobra, provider, shutdown, add-on or installed user data was modified in this work.
+
+---
+
+
+
+## USER CHECKMARK — GROUP #1 SOURCE WORK ACCEPTED, TASK #19 DEFERRED
+
+**2026-10-19 user instruction:** “So in other words, I have to replicate it and we have to do more research about it. So if anything, you've done everything you can do. So that means one gets a check, and we'll get back to it later for the other situation.”
+
+**Recorded decision:** **✓ Group #1 existing source-work checkpoint accepted and saved for later integration review**, while task **#19 Movies↔TV Shows Home reloading remains UNFIXED and intentionally deferred** until the user reproduces it again on the physical Fold and exports an in-app diagnostic ZIP from the same run. Source fixes for tasks #01/#02/#03/#04 remain saved and untouched, previous host tests retained. Do not restart or discard any work. **This checkmark is a source-stage bookkeeping milestone, NOT a declaration of 1/7 fully functional groups completed**, and not signed Android/Fold acceptance. Keep group_done_count = 0 and Fold = NOT_VERIFIED; do not bundle a fake #19 correction.
+
+**When user supplies #19 evidence:** use existing saved category-load and lifecycle offline analyzers and the read-only source audit, correlate exact selected vs activated Home category, HomeLoad generation, native directory URL/invalidation, Umbrella Latest releases and first-party Continue Watching loads and revisions; only then implement & test a narrow, proven fix that preserves Cobra/other functionality. No unnecessary new hardware tooling. No #19 coding while deferred.
+
+**Current active work remains GROUP #2 Add-on Browser**, native+skin repairs source-staged; compile/Android/Fold verification still pending. **Group #3 Option B staged and paused**. No APK build or lock authorized by this checkmark.
+
+**Saved tracker commit:** `24957c582047ba6740a8f6b96fe6d748c358b707`.
+
+---
+
+
+
+## GROUP #2 RETURN — FULL SOURCE-LEVEL BROWSER CORRECTIONS (NOT COMPILED/FOLD-APPROVED)
+
+**LATEST USER INSTRUCTION:** “Okay back to 2 finish it so we can check... see now we are going backwards instead of forwards.” Active authorized work is GROUP **#2** again (original subtasks **05/06/07/08**). Group #1 and Group #3 remain **PAUSED / UNFINISHED**, all their source checkpoints preserved. All other groups, **Cobra, shutdown, unrelated Infinity behavior and user data are off-limits**. Preservation is a REQUIRED RESULT, not a ban on narrowly guarded native repairs. **Group #2 not yet checked complete**—no compiled Android APK or physical Fold test.
+
+**Exact signed base protected:** Infinity versionCode **2103390**, SHA256 **778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb**, **7,430 original APK members**. Keep signed base and permanently approved 2103384 shutdown fallback immutable.
+
+**Previous source patches reused without starting over:** Group #2 signed-source skin patch `repairs/2103390-bugfixes/group2/addon_browser_group2_patch.py` commit **4b18d89c7fb69ec554887257c07b87ff6aebf400**. Its `test_addon_browser_group2_patch.py` **10/10 host pass on the signed 2103390 APK**. Strict staged skin allowlist: 42 existing XML members (3 per each of 14 original Infinity skin layout variants). Those preserve all original Kodi native routes and compact ZIP Preview. Old first Group #2 receipt: `receipts/GROUP02-BROWSER-SKIN-42MEMBER-FIRST-STAGE-20261019.md`.
+
+**NOW STAGED: The unfinished functional interactions (#07/#08) through a strictly guarded native Kodi source overlay.**
+- `repairs/2103390-bugfixes/group2/native_addonbrowser_patch.py`, committed **a58918b2a62b71898bf4e075964b9566567c05f8**, remote Git blob `a361eb1c326c671fa3b481a18ab4a8c9d676da62`. Four—and ONLY four—native source paths: `xbmc/addons/gui/GUIWindowAddonBrowser.h`, `xbmc/addons/gui/GUIWindowAddonBrowser.cpp`, `xbmc/addons/gui/GUIDialogAddonInfo.cpp`, `xbmc/addons/ContextMenus.cpp`. Output is **staged in a separate source directory**, guarded by caller-provided original file SHA-256 and exact source anchors; no binary is compiled or installed. The patch was verified against original upstream Kodi Omega **13/13 unique source anchors across four source files**, and each replacement was reversed perfectly to its original upstream content. The **custom 2103390 native checkout is NOT proven SHA-identical to upstream Omega**; apply fail-closed.
+- **Actual interactive fixes described by the staged C++:** (1) in Infinity's Add-on Browser and only there, one touch selects selected path/index, second deliberate touch activates, D-pad/keyboard normal; right-click/longpress native context remains; (2) My add-ons gets **Hide from this browser (not Disable)**, implemented only as a temporary in-memory filter, no add-on manager state changes or Kodi/Trakt watched writes, plus **Show hidden add-ons** restoration even if every item is filtered; closing Browser resets this temporary Hide state; (3) native **Disable** in both AddonInfo button and global context-menu action now confirms before proceeding and Cancel returns without disabling. The guard requires **WINDOW_ADDON_BROWSER + skin.infinity.diggz**, and any other window/skin follows original Kodi behavior unchanged; dependency lock still runs; (4) original root's real native `addons://outdated/` and `addons://recently_updated/` routes remain reachable even when Kodi would otherwise hide empty update sections, without injecting fake providers.
+- `repairs/2103390-bugfixes/group2/test_native_addonbrowser_patch.py` committed **3444bef95ec6678ddc46f8c0112b7ddc1f1d24b3**. Saved source tests include 9 executable fixture-based guards plus a real native-checkout test which **skips when no source checkout is mounted**; do NOT call its skip a pass. An equivalent independent local native-source stage regression ran **10/10 synthetic host checks**; the original skin regression ran a separate **10/10**. Combined local two suites **20/20 PASS**, source/test only, not binary/device. Exact connected upstream Omega anchors 13/13 checked separately via GitHub source and reversible-delta audit; no complete Android CI run.
+- Native Kodak context and real route audit: original Kodi `CAddonsDirectory` has all six authentic endpoints, Search input keyboard and database result navigation, `CGUIWindowAddonBrowser::InstallFromZip` delegates to Kodi's original `CGUIDialogFileBrowser` and `CAddonInstaller`, original repository menus and native global/provider context actions retained. In signed 2103390 original `FileBrowser.xml` native action buttons 413/414/415 and compact Preview 9410 remain present; the 42-member skin source stage routes list RIGHT to existing 413 and browser list RIGHT to existing BACK 9096. Changes not yet physically verified for actual Fold UI.
+- **Exact immutable second receipt:** `repairs/2103390-bugfixes/receipts/GROUP02-NATIVE-REPAIR-SOURCE-20HOST-20261019.md` commit **dd4efe1526ee03d26d7a57ff177f5bc0ac9fff9e**. Machine tracker `TASK-STATUS.json` updated commit **7516ed275e4da928d5347a3236557f5c501b76e0**.
+
+**NO FALSE CHECKMARK:** Host source staging and Omega matching are NOT a completed Group #2 APK repair. **NEXT REQUIRED VERIFICATION**: exact native **2103390 build checkout preimage**, actual C++ Android compile/link, immutable original vs signed candidate changed APK member/hash inventory including native `libkodi.so` and scoped skin XML, followed by the real user's Samsung Galaxy Fold installed-over test (touch vs deliberate tap, correct item/longpress, Hide/Unhide with zero disable/data change, two independent Disable Cancel/Confirm paths, native root/installed/update/recent/repo/ZIP/Preview/Search, both Fold screens/themes, Back/scroll, Cobra and 16-owner Essential-First Close). No signed APK was created here and Group #7 packaging/final user lock remains separately gated. **Do not call #2 fully complete until this passes**.
+
+**CURRENT REAL STATUS:** Group #2 source patch covering the remaining interactions is now staged and host-validated at source level. Group #1/#3 are frozen where user left them. No runtime/native binary installed, no physical Fold verification, no final lock. Earlier handoff sections below describing #2 as "only source root stage" are historical and superseded by THIS section.
+
+---
+
+
+
+## OVERRIDING USER CLARIFICATION — DO THE NECESSARY APPROVED REPAIR, PRESERVE EVERYTHING ELSE
+
+**Latest user statement (October 19, 2026):** “Well, yes, we were strict about preserving Cobra and everything outside. However, if there is a fix that is needed to be, you can still preserve everything and do the fix that is needed.”
+
+**Meaning:** Protection is a required outcome, NOT an automatic veto of legitimate repair work. Earlier handoff language demanding *another* separate authorization merely to edit a shared/native source file was overrestrictive. For the **currently authorized Group #3** (approved Option B top Movie/TV release poster hold), investigate and implement a necessary, strictly gated native input fix if no first-party-only alternative exists and if negative tests and source diff show **Cobra and every unrelated path keep their original behavior**. The native change must fire only for Window Home, actual touch-hit Movie/TV top rail 8101/8102 and correct single long-press; default input for everything else, including add-on rails 9200/8820/8720/19601, remains original. Don't claim the hookup exists until code and tests actually prove it.
+
+**Group #2** is paused, not finished. When expressly reselected, finish the *already-approved* Add-on Browser original tasks 05–08 (submenu selection, view-only Hide, actual disable confirmation, Repository/ZIP/Search) rather than refusing all work merely because native Kodi supplies an action. Use an isolated first-party mechanism or narrowly scoped native condition with functional and protected-path tests. Existing UI Repair has a separate, first-party video-source hide/confirm implementation; this is evidence for reuse, not proof that Kodi's native Add-on Browser currently has Hide or Disable confirmation.
+
+**No permission** to change Cobra, unrelated Infinity functionality, provider data, shutdown, background playback, or another work group; no cleanup/features beyond the named repairs; no blind shared-native edits. If a candidate fails isolation or tests, reject it and keep the last accepted baseline. A host pass does not mean Fold pass, and final signing/group completion remains separately gated.
+
+**Contract update saved:** `repairs/2103390-bugfixes/GROUPED-01-07-BINDING-CONTRACT.md`, commit `00b43672523a48c72debb9e8f1f85fffd65fe8d5`. **Tracker update saved:** `TASK-STATUS.json`, commit `215d527fcc18bb5185ba262f4e55257b8d895d0a`. This continuation only updated scope/permission documentation, **not native runtime code, APK, skin, or device**. Group #3 source still unconnected to real long-press and Group #2 remains paused unfinished.
+
+---
+
+
+
+## CURRENT GROUP #3 — OPTION B MODAL SOURCE CHECKPOINT (2026-10-19)
+
+**LAST USER COMMAND: “Move on to three.”** This authorizes work Group #3 only (original tasks 09, 10). Groups #1 and #2 remain PAUSED AND UNFINISHED: #1 category reload not fixed, #2 root/add-on browser only partially source-staged. All other Groups #4–7, Cobra and unrelated Infinity strictly OFF LIMITS. Original signed Infinity 2103390 SHA256 778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb, 7,430 original members, and locked 2103384 shutdown fallback remain unchanged. Original actual top release rails Movie=8101 and TV=8102.
+
+**APPROVED DESIGN BITE FOR BITE:** repairs/design-approvals/INFINITY-HOME-POSTER-LONGPRESS-OPTION-B-LOCKED.md. Same existing Home positions and original normal tap, one centered compact Infinity glass dialog, actual touched poster on LEFT and verified metadata RIGHT, four actions EXACTLY Play → Trailer → Favorite → More Info, close X/Back, no double launch or provider guessing. TV variation only shows S/E if metadata actually identifies a typed episode. Original screenshot 19035.jpg and user-approved Option B mock were not accessible here; physical pixel-fidelity remains unverified.
+
+**SAVED SOURCE ONLY, NOT CONNECTED TO LONGPRESS:**
+
+- New on-demand first-party modal engine: repairs/2103390-bugfixes/group3/home_option_b.py, commit 6d1623e844f2033bd9adc701eef44bdfa28ea0eb, Git blob e75e07e41d823d5e2aad50630d38d0734d4910f4, SHA256 2ac0c6dfd68d1b6922632da6e7142cf1f740382a8cc0110d6769fe0c84892ab3. Strict Home focus only 8101/8102 and native selected poster index/original provider URL, revalidate full identity just before any action. Original Kodi Action(Select) for Play, Action(Info) for More Info, Favourites JSON-RPC only on click, only provider-supplied supported Trailer. Cancel/Back/outside dismissal inert. No network fetch, autoplay, data wipe or background services.
+- New designed modal XML: repairs/2103390-bugfixes/group3/InfinityHomeOptionB.xml, commit 14605aa250f4502880d527d7cec7d7acf3a8f71d, Git blob 043ce3183dfca5369c672e0d1fd346a5b3fc082c, SHA256 bfe3c823e98631f9e19f8c2a0d6c98b1a39140b6f8c51120f2d9ccd2c06f5e63. One centered glass dialog, four approved buttons in right order, exact Home background preserved, light/dark/OLED/Night Cinema current theme tokens, existing motion gate, responsive narrow layout. Structural source stage only, not physically compared/rendered on Fold.
+- Fail-closed staging tool repairs/2103390-bugfixes/group3/stage_option_b.py commit bf0d08cd523ae74f88a6141aab0e2c096cadb371, Git blob 4416043f721d1a02ee173445bc27fe8d97a884e0. Verifies exact original signed SHA, 7,430 members, original UI Repair hashes, all 14 Home variants, and refuses unknown source. Theoretical candidate would ADD exactly TWO NEW first-party UI Repair members (Python modal + XML modal), modify ZERO originals: 7,430 unchanged, theoretical total 7,432. NO APK generated or signed. No Home XML, native libs, keymaps, Cobra, shutdown, providers or data changed.
+
+**INPUT BLOCKER / NEVER CLAIM FIRST-LONG-PRESS WORKS YET:**
+
+- Signed 2103390 global touchscreen.xml binds longpress to RightClick and mouse binds longclick to contextmenu, native Kodi GUIBaseContainer/DirectoryProvider handles right click. No per-control direct hold callback in original Home skin XML for release panels 8101/8102. A skin onclick override would change normal tap and is forbidden.
+- The custom native Infinity add-on rail hold implementation DOES exist in libkodi.so, but actual signed source repairs/rails-hold-2103378/patch_native.py guards only control IDs 9200, 8820, 8720, 19601, excluding release panels 8101/8102. Reusing it blindly or changing global touch/native logic may affect Cobra or unrelated Home; user binding contract forbids. Direct touch-hit-selected first-hold hook and short-tap suppression for release posters are NOT connected. Do not substitute a second conventional context-menu selection; user approved one direct popup. If shared native change is necessary, STOP for separate explicit approval.
+- Read-only signed input audit repairs/2103390-bugfixes/group3/input_longpress_audit.py, commit d15f473014f0acc0d257c11943142481fa1a4d27; tests repairs/2103390-bugfixes/group3/test_input_longpress_audit.py, commit 06e59e7d066d22d8fb2e600bd6b94c13d4c17636.
+
+**REAL EXECUTED HOST TESTS:** 20/20 PASS locally against SHA-matched original signed APK plus mocked Kodi GUI/action dispatch: python -m unittest -q test_group3_option_b test_input_longpress_audit from group3 sources, with INFINITY_2103390_APK set to original signed APK. Tests cover 14 real Home layout variants, 28 release controls total, exact four buttons, responsive layout, invalid focus/index/metadata, no guessed episodes, source identity recheck, Play/Info/Kodi Favorites/trailer routing mocks, canceled modal, no-op stage and failed modified-parent SHA, native keymap/hold inventory. This is NOT a real Android provider/gesture test or visual Fold test. Main tests commit a93d9dc95ba87432cfca917de85f77280f8d86a6. All six committed source and test Git blob hashes verified BYTE FOR BYTE against the executed local sources.
+
+**IMMUTABLE RECEIPT:** repairs/2103390-bugfixes/receipts/GROUP03-OPTION-B-MODAL-20HOST-INPUT-BLOCK-20261019.md, receipt commit 35319321baeb640359c54668a361e9ff72493f87. Machine-readable tracker TASK-STATUS.json saved at commit c1a9c13560bbb0569501e86c259dbfdd4c5e004e. Query live HEAD before next edit; documentation commits are newer than source/test checkpoints.
+
+**REAL GROUP #3 STATUS:** ACTIVE / PARTIALLY SOURCE-STAGED / 20/20 HOST PASS; DIRECT FIRST LONGPRESS STILL UNSOLVED; 0/7 groups fully complete. No integrated signed APK, no Fold physical/pixel/user acceptance, no final lock. Group #1 and Group #2 remain preserved unfinished. Do not move on automatically or quietly change native/Cobra.
+
+---
+
+
+
+## CURRENT ACTIVE WORK: GROUP #2 ADD-ON BROWSER (USER SAID “MOVING ON TO 2”)
+
+**Latest explicit user instruction: “Moving on to 2.”** This selects **work Group #2**, original detailed post-base tasks **05, 06, 07, 08** (Add-on Browser). It does **NOT** mean historical original task #02, and does **NOT** make Group #1 complete. **Group #1 is PAUSED and UNFINISHED**: task #19 Movies↔TV Shows blank/reload not fixed, prior Group #1 source experiments / Fold tests unverified, original signed 2103390 unchanged. The other work groups #3–7 remain unstarted/not authorized. User's absolute preservation rule: **Cobra never touched**, all other Infinity outside Group #2, Essential-First shutdown, providers, native engine, user data, existing Diggz+Infinity and add-on versions remain untouched. No final lock.
+
+**Live branch:** `work/infinity-2103390-targeted-bugfixes`; original signed base APK `2103390` SHA256 `778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb`, 7,430 members, original signing and shutdown fallback protected. Saved pre-Group2 branch head `bea310aca5ba5ece2bc11209b064e0050c06e345`; Group2 authorization-only tracker commit `3b97e1be79ec09135815c4d7dfb626ec9ae52805`.
+
+**ACTUAL FIRST SOURCE-HOST CHECKPOINT (NOT FULL GROUP COMPLETION):**
+
+- User screenshot `1792383561650.jpeg` was inspected (actual cyan curved slash visible in Add-on Browser header, false ZIP instruction, four misleading footer labels). All **14 real signed** `skin.infinity.diggz` `AddonBrowser.xml` layouts embed that exact `header_arc.png` single control, ZIP help and non-functional `INSTALL ZIP / REPOSITORIES / UPDATES / DEPENDENCIES` footer labels.
+- Source-only tool **`repairs/2103390-bugfixes/group2/addon_browser_group2_patch.py`** committed `4b18d89c7fb69ec554887257c07b87ff6aebf400`, actual Git blob `d62986156ca61bfafd5ea13fb037d62e0a3d7d06`. The actual signed parent SHA and exact layout/member count must match before staging. It never modifies the original signed APK or installed components.
+- Test source **`repairs/2103390-bugfixes/group2/test_addon_browser_group2_patch.py`** committed `2b97f4ecb8aa835e9d39ae0c26776df946d0c345`, blob `1c6934398826b03f88eee32cf6b7b783d1079a2a`. **10/10 local host tests PASSED on genuine signed 2103390** (~3.6 seconds) with strict full APK member scope; **no Android CI or physical Fold verification**.
+- Current Group #2 **virtual-only allowlist = exactly 42 original APK members**: `AddonBrowser.xml`, `Includes_InfinityBrowser223.xml`, `FileBrowser.xml` in each of **14** original Infinity skin layouts. **7,388 original members unchanged** in simulation. No member added/removed. No Cobra, native binaries, shutdown, Command Center, health, other window/dialog files, addon state, third-party sources or databases changed. **DO NOT combine this with Group #1 or build a new APK under Group #2**; Group #7 packaging authorization is separate.
+- Detailed first stage **tasks #05 + #06**: delete only stray AddonBrowser cyan `header_arc.png` draw control; preserve true Infinity icon, title, subtitle, Back and real theme. Replace out-of-context permanent ZIP help using NEW exclusively named path-conditioned variable `InfinityAddonBrowserHint`; replace four false noninteractive footer labels and separators with one accurate contextual status label while retaining original footer art. Original Kodi's root and all subpaths remain unchanged. Kodi provides native `addons://user/`, `outdated/`, `recently_updated/`, `repos/`, `install/`, `search/`. Note Kodi may conditionally show Available/Recent updates, depending on real updater state; do not invent fake entries.
+- **Tasks #07 + #08 PARTIAL, not complete**: In existing `AddonBrowser.xml` panel 50 RIGHT now focuses original BACK button ID 9096 (its LEFT remains 50). In original `FileBrowser.xml` native ZIP picker list controls IDs 450/451 RIGHT now go directly to existing OK ID 413 instead of potentially non-focusable scrollbar 61; original 413/414/415 and compact Preview 9410 survive, as do all handlers, permissions, actual Search input and repository navigation. No global touch handler, native addon logic, extra buttons, popup redesign, file preview rewrite or provider edits.
+- **Kodi native Disable risk:** `xbmc/addons/gui/GUIDialogAddonInfo.cpp:OnEnableDisable` directly calls `DisableAddon(USER)` for a non-required add-on; it is NOT a Hide action and doesn't necessarily ask confirmation. Group #2 requirement for explicitly confirmed Disable and independent reversible *view-local Hide* remains **OPEN**. Do not relabel Disable as Hide or patch shared native code that could touch Cobra. User must never silently lose add-ons. First-party-only limited mechanism must be proven before claiming #07 fixed.
+- **All 10 host checks** prove original signed SHA, exact 42 changed/7388 unchanged simulation, only root arc removed (not FileBrowser decoration), all original infinity logos, Kodi list+BACK and original click handlers, contexts keyed to native paths, fake footer labels absent, existing theme variables byte-equivalent, direct focus routes and original ZIP Preview preserved, immutable source and fail-closed against unknown/re-applied originals.
+- **Immutable first receipt:** `repairs/2103390-bugfixes/receipts/GROUP02-BROWSER-SKIN-42MEMBER-FIRST-STAGE-20261019.md`, commit `6eaf788484c0606c6435b659dc35b3bf43b8bc2e`. Default `unified` before/after file hashes and reproducible SHA manifest digest `dd9eca615bcb4f7c908510a27845592acbd98e05bfe744ceabc4cf52d771207a` are recorded there. Tracker saved `af49dd637c49b14b05e27a13a7b8929fd9e53834`.
+
+**UNFINISHED / RED GROUP #2 gates:** verify actual installed root six operations + all subpaths on physical Fold; available/recently-updated native conditional entries; selected list card and long-press menus with relevant actions and no accidental launch; actual scoped Disable confirmation and **view-only reversible Hide** (currently not changed); folder/side-button/Back focus and exact selected item restoration; real Kodi ZIP/Preview Search keyboard/results repository browser through native flows; Light/Dark/OLED, cover/inner and rotation visual proof. If a proposed correction requires shared native Android, Cocoa, Kodi or other group code, STOP and ask instead of touching. **No combined/signed APK, no Fold pass, no Group #2 completion or final lock.**
+
+---
+
+
+
+## GROUP #1 LATEST: SCOPED RESUME CHOOSER EXPERIMENT, 29-MEMBER SOURCE-ONLY SCOPE, #19 NOT FIXED
+
+**Date:** 2026-10-19. **Latest user authorization:** “Fix and complete” **Group #1 only**. This does not authorize Cobra, native-wide UI, Essential-First shutdown, third-party provider modifications, unrelated Groups #2–#7 or auto-locking. **CURRENT GROUP #1 REMAINS IN PROGRESS / RED**, NOT completed. Source-only stage and local tests below: **no APK build/sign/install, no Fold pass, no user acceptance**.
+
+**Signed original unchanged:** Infinity 2103390, SHA-256 `778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb`, exactly 7,430 APK members.
+
+**New Group #1 original task 03 experiment—first-party vertical Resume/Play chooser:** The original horizontal Home Continue Watching panel IDs 8830 Movies and 8831 TV use Kodi's CDirectoryProvider native click. Its resume prompt uses shared native VideoSelectActionProcessor / DialogSelect, which might change Cobra if edited globally. Instead source-stage a direct **Infinity Home panel-only** conditional click into the existing first-party `script.infinity.uirepair/runtime.py` and `popup.py:choose()` WindowXMLDialog. It displays vertical touch rows `Resume from M:SS` and `Play from beginning`, 78px-tall native rows, reuses Command Center verified identity/source/ListItem/saved playback position, rechecks record/source/progress after the modal, and cancels cleanly. It invokes `xbmc.Player().play(original_verified_route, original_listitem)` with original saved offset or 0. **CAVEAT:** This Python playback call does *NOT* equal the original Kodi native `PlayMedia(...,resume/noresume)` and absolutely requires physical provider playback verification (avoid second dialog/wrong source or position); DO NOT treat synthetic mocks as that proof or install as final. The fallback native click is preserved only if UI Repair is disabled. No popup artwork, player engine, third-party addons or stored progress were edited.
+
+- SHA-guarded patch `group1/continue_choice_patch.py` commit **`bed9bd932edd5b9ed0643b6a3c3ec55a11641518`**, Git blob **`b5775c1597d603c3b53757be334cb8321f9ff458`**.
+- `group1/test_continue_choice_patch.py` commit **`7fc82b6e42052bdea7e3850b3fcd33656fbcaa62`**, **12/12 PASS source/host mocked-player** including 14 actual signed Home variants, only 2 conditional Home clicks per variant, exact single first-party runtime handler, tab/media identity, 0 vs saved resume seconds, Back/cancel and stale media refusals.
+- New virtual full original-APK combination `group1/test_group1_scope_apk_29.py`, commit **`51b0f661b8141512c28b14efc528f737d3600d56`**. Separately executed equivalent independent local 7,430-member scope gate **1/1 PASS**: 14 existing Home XML, 10 clock orb includes, 2 Command Center source files, 2 first-party pinned controller JSON, 1 UI Repair runtime; **exactly 29 potentially changed members, 7,401 unchanged**. No files added/removed, Cobra/native/shutdown/Version Check/provider unchanged. Historical 12/14/15-member checks are superseded; no candidate APK packaged.
+- **Local combined host regression:** `python -m unittest -q test_continue_choice_patch test_integrated_scope_29 test_home_reload_correlation` = **17/17 PASS** (12 + 1 + 4) in ~4.5s on original signed base, no Android CI. Earlier host 17/17 and 19/19 were **separate runs**; don't total them as one suite. Full signed APK SHA verified. Host scripts/receipt in `repairs/2103390-bugfixes/receipts/GROUP01-CONTINUE-CHOICE-29MEMBER-HOST-20261019.md`, commit **`f436c0e9f79066803f9dd98fa2c453dff7f32f82`**.
+
+**Original task 19 still RED, no runtime fix.** Native source audit confirms hiding a panel does not automatically reset DirectoryProvider items; refresh may instead result from URL, invalidation or Home reset. Existing `infinity_continuity.py` already marks Home reinitialization with `Infinity.Continuity.HomeLoad`. New read-only offline diagnostic collector `group1/home_reload_correlation.py` source commit **`c1546bd9e49264d003c2c3cfae08bcfccfbad58f`**, tests `group1/test_home_reload_correlation.py` commit **`a1ae517749f922aa52304ed2ad01566b03b654bd`**, **4/4 synthetic host PASS**. It only aggregates HomeLoad tokens and Continue Watching starts from existing user-owned in-app ZIP export. Earlier actual user diagnostic had **20** Continue Watching jobs in ~49.6 seconds under one revision; **exact per-tab native invalidation reason still unknown**. Umbrella supplies the top latest-release widgets; Command Center/UI Repair supplies Continue Watching; do not conceal real updates with a blind CC cache or alter Umbrella. **A real no-reload correction has NOT been coded or proved.** Do not falsely mark task 19 complete.
+
+**Tracker now saved at commit `fea428d1c49298c2c228f7968089ea10d2868e06`. Latest commit after this handoff will be newer; query live HEAD before next edit.**
+
+**Next mandatory gates before ANY Group #1 completion/checkbox:** true selected horizontal swipe/accurate tap/scroll restoration; actual working vertical chooser/correct saved position vs restart under real Kodi/Fold provider; actual failing TV episode route, real duplicate Insidious stored identities/progress, clock orb across Fold/themes, true cause-isolated #19 Movies↔TV Home rail persistence with legitimately refreshed progress/provider, strict unchanged Cobra/Essential-First/shutdown and signed install-over physical Fold validation. If evidence shows this staged Python playback is incompatible, reject/repair it instead of shipping. **No full Group #1 completion, no APK, no LOCK at this checkpoint.**
+
+---
+
+
+
+## NEWEST GROUP #1 SOURCE CHECKPOINT — OCT 19 NUMERIC CONTINUE CARD AND NAVIGATION AUDIT
+
+**USER AUTHORIZATION: CONTINUE GROUP #1 ONLY.** Cobra ABSOLUTELY off limits; likewise Essential-First shutdown, other Infinity work groups, third-party plugins and installed user data. **GROUP #1 STILL IN PROGRESS, NOT COMPLETE.** Current actual original signed APK `2103390` remains unchanged. **NO new signed APK**, no install/Fold pass, no user lock.
+
+**NEW TASK #03 SOURCE CHANGE — DEFAULT FOLD HORIZONTAL POSTER TOUCH DIMENSIONS**
+- Exact original signed 2103390 default skin is `skin.infinity.diggz` 1.0.5.228, with default `<res width="1080" height="2400" aspect="9:20" default="true" folder="unified"/>`.
+- In ORIGINAL default `unified/Home.xml`, Continue Watching Movies panel ID `8830` and TV Shows ID `8831` have `<itemlayout width="auto" height="97.619048%" aspectratio="0.561219512">` and identical focused layout dimensions. Kodi upstream reads numeric list item width/height with `QueryFloatAttribute`; invalid width can default to the entire parent width, misaligning poster touch cell and horizontal scrolling. **Other 13 original Home layout variants ALREADY use correct numeric 230.1 × 410 card dimensions.**
+- **SOURCE PATCH COMMITTED:** `repairs/2103390-bugfixes/group1/continue_horizontal_touch_patch.py` commit `d6ba53d7317e379044a23062434ff128f5b39cf2`, verified Git blob `47c2b02ed6cd96a65453be6270cab01ab5243829`. Exact immutable unified Home preimage SHA-256 `61fe23defed0536ce24f7c6d2d9b6beed5c0f3b8d04a33809a929a6b1f2532be`. Only **four layout tags** change: the item/focused dimensions of panels 8830 and 8831 to `width="230.1" height="410"`. All other existing Home item art, playback routes, visibility, navigation, formatting and XML remain byte-equivalent. No other 13 Home files changed.
+- **TESTS COMMITTED** `group1/test_continue_horizontal_touch_patch.py` at `bd0ecbf5c608b649e5dcedbd8546174ab1e3f59b`, **6/6 host PASS**. Separate `group1/test_group1_scope_apk_15.py` at `a07b7840ed835e98c54e5c389ce347f07dd9d946`, **1/1 full real signed APK virtual scope PASS**.
+- **CURRENT VIRTUAL APK SCOPE: 15 of 7430 MAY CHANGE, 7415 UNCHANGED.** The 15: previously staged 10 Home orb include XML, 1 Command Center TV `plugin.py`, 1 movie `resume_hub.py`, 2 first-party UI Repair/Watched Bridge expected SHA JSON, plus 1 default `unified/Home.xml` for both narrow touch fixes. No file deletion/addition, no Cobra, no native, no shutdown, no provider, no guarded controller *executable* logic change. Previous 14- and 12-member virtual checks are HISTORICAL and MUST NOT be used for future combined packaging.
+- **NO PHYSICAL INPUT PROOF.** This corrects a tangible source-level layout defect; real one-finger swipe/accurate tapped poster/no accidental tap-on-drag/offset restoration on actual Fold are still **RED**. The VERTICAL compact Resume from [time] / Play from beginning chooser is **NOT FIXED**; do NOT globally change Android touch/Kodi native/DialogSelect without an exact first-party-only scope proof.
+- Source receipt: `repairs/2103390-bugfixes/receipts/GROUP01-TASK03-DEFAULT-FOLD-HORIZONTAL-15MEMBER-20261019.md`, saved at commit `6613f6dbed514bdbaaafb1b96c66a138b9fad663`.
+
+**NEW TASK #19 READ-ONLY NAVIGATION/FETCH INVESTIGATION — NOT A FIX**
+- Exact original signed Home (all 14 variants) shows category selector ID 9000: **focus/selection** changes `Container(9000).ListItem.Property(section)` and show/hide of corresponding widget panels. But **click activation** is originally `ActivateWindow(Videos,...)`, which leaves Home and may legitimately lead to window reinit on return. Neither source proves which event the user's Fold video shows; do not remove these existing navigation actions.
+- Movie and TV normal latest-release panels 8101/8102 are **Umbrella-owned**. Movies and TV Continue Watching panels 8830/8831 are **Infinity first-party UI Repair/Command Center**. The original retains distinct revision properties. The previous in-app diagnostics confirmed 20 new Continue Watching jobs under one stable data revision over ~49.584 seconds (not a proven invalidation reason). Fixing only CC snapshot cache or deleting Umbrella refresh is not supported.
+- Read-only audit `group1/home_category_contract.py` source commit `6dcb0ce4d1003e4e7cda4352f8b9fcc72ee33f8c`; tested `group1/test_home_category_contract.py` commit `52c1840810dee5e74419101c1fab499226f6cfbf`, **5/5 host PASS**. No source/provider behavior changed for #19.
+- Receipt: `repairs/2103390-bugfixes/receipts/GROUP01-TASK19-HOME-SELECT-VS-ACTIVATE-20261019.md`, saved `7e341678e337405b4f646bf08ddcff5d778c34f6`. #19 RED: need cause-correlated Fold visibility/URL/provider reset/Window activation trace, user changes refresh correctness, and both Umbrella+CC rail retention.
+
+**LAST EXECUTED COMBINED HOST RUN**:
+```
+cd repairs/2103390-bugfixes/group1
+python -m unittest -v test_home_category_contract test_continue_horizontal_touch_patch test_group1_scope_apk_15 test_cc_preimage_contract_patch
+```
+**17/17 PASS** using original signed 2103390 locally: five navigation read-only audits, six #03 layout tests, one 15-member virtual APK firewall, five first-party pinned controller compatibility tests. The earlier **19/19** host run is a separate historical run: DO NOT claim 36 distinct tests or a single 36/36 run.
+
+**STATUS TRACKER** `TASK-STATUS.json` updated by commit `edeaf2db13a84d24b90a0fb0e2dbcd4e1f97a68e`. SOURCE ONLY, no combined/signed APK, no Fold; all prior validated source patches preserved.
+
+**NEXT GROUP #1 work**: narrowly scoped vertical Resume/Play chooser without global dialogs, real swipe and focused selection physical proof, #19 root-cause isolation and source correction for category blanking, TV user episode evidence, actual duplicate Insidious identity, clock/orb physical proof. #01/#02/#04 still source-staged only. SlyGuy/Lyrics work stays USER-SKIPPED. After all Group #1 gates, user authorizes any Group #7 combined build/final lock separately. Older handoff paragraphs below listing 12 or 14 members or "task03 not started" are historical and superseded by THIS section.
+
+---
+
+
+
+## DUAL CONTROLLER-CONSUMER COMPATIBILITY — NEWEST VERIFIED GROUP #1 CHECKPOINT (2026-10-19)
+
+**THIS CHECKPOINT SUPERSEDES THE PREVIOUS `12 OF 7,430` POTENTIAL-APK MEMBER ASSUMPTION.** User's latest authorization remains **CONTINUE GROUP #1 ONLY**. No new signed APK, no package modification, no Fold proof, no user lock; **Group #1 STILL RED**. Cobra, Essential-First shutdown, all other Infinity groups and third-party add-ons remain untouchable.
+
+The genuine signed 2103390 APK was recovered (original SHA-256 `778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb`). Its `script.infinity.uirepair/controller_access.py` (which serves **Home Continue Watching** through `script.infinity.uirepair/?action=continue`) and `script.infinity.watchedbridge/controller.py` BOTH require exact SHA matches to 13 Command Center source files. The three previously staged behavior patches include TV `plugin.py` and movie `resume_hub.py`, so applying only the prior 12 member changes would leave both consumers verifying OLD pinned hashes and rejecting the newly corrected modules. This is a **proven first-party integration defect in the previous virtual candidate**, NOT proof of the user's original TV playback or category reload root cause.
+
+**NEW REAL SOURCE STAGING — COMPLETE AT HOST LEVEL:**
+- New `group1/cc_preimage_contract_patch.py` source commit: `9d6bc1845e3f392cbe48ed86aa96eb73cc79d681`. Patches **only two expected hashes** in each of the two original `CONTROLLER-PREIMAGES.json` maps; the other **11 pins per map and all runtime guard logic are unchanged**. Exact original source + staged patch hash proofs; refuses unknown versions, double apply or mutated contracts.
+- New `group1/test_cc_preimage_contract_patch.py` test commit: `0bf2be94fcbfa22e64344ca9b8105f7614708c13`. Executed against original signed APK bytes: **5/5 tests passed**, signed base SHA verified, both consumer guard maps verified, fail-closed tamper negatives, original file preservation, full simulated APK member inventory.
+- **Corrected Group #1 virtual packaging scope: 14 of 7,430 members** may differ: original 10 skin clock-orb include variants, original 1 Command Center TV `plugin.py`, original 1 Command Center movie `resume_hub.py`, plus **2 first-party preimage JSON maps**. Other **7,416 members remain original** in the simulation. NO Cobra/native/shutdown/provider/code-guard changes. This 14-member allowlist is now mandatory for any later approved integration. **DO NOT ship historical 12-member candidate.**
+- Immutable verification receipt: `repairs/2103390-bugfixes/receipts/GROUP01-CONTROLLER-CONSUMER-14MEMBER-20261019.md`, commit `c3cc7181fef5781f329f12a1a49195c4095b3684`.
+- Master status committed `33fb53e782fa1b971e2370950718cd4ce029e714`; prior **19/19** Group #1 host checks and new **5/5** compatibility checks were performed in **SEPARATE runs**, so do not misrepresent a single full 24-check run.
+
+**Still RED and next work**: prove user-specific TV episodes actually resolve; verify real saved Insidious identity/upsert; **task 03** physically reliable Movies AND TV horizontal poster swipe, correct tapped card, retained offset, and VERTICAL touch-friendly Resume/Play choices; **task 19** first isolate exact Movies↔TV category invalidation/blanking trigger affecting BOTH Umbrella latest-release and Continue Watching rails (20 repeat directory jobs same state revision, but trigger not yet confirmed); verify clock/orb on Fold. Do not touch shared GUI input/Kodi DialogSelect, native DirectoryProvider, Cobra, startup SlyGuy/TMDb, Lyrics, shutdown, or other groups. No combined APK without Group #7 user authorization.
+
+---
+
+
+
+## LIVE WORK STATUS — GROUP #1 ACTIVE, THREE SCOPED SOURCE PATCHES STAGED, 19/19 HOST CHECKS
+
+**LATEST USER INSTRUCTION:** “Continue” during the specifically authorized **Group #1** repair. Do NOT mistake old handoff text below saying no group selected for current truth. Group #1 is **ACTIVE/AUTHORIZED**. STOP and ask before changing anything beyond this group. The separate SlyGuy/TMDb startup-error and CU LRC Lyrics bug repairs are USER-SKIPPED, not part of this group. No changes to third-party addons, Cobra, shutdown, any other Infinity feature, or other Groups #2–#7.
+
+**Current live branch:** `work/infinity-2103390-targeted-bugfixes`; query live HEAD immediately before next edit. Last verified source-only receipt checkpoint: **5cb853ccf6b4b09058945f82212a39d0cdef3bae**. Current master TASK-STATUS.json records the latest precise committed statuses; never assume latest checkpoint equals current HEAD after documentation commits.
+
+**ACTUAL COMPLETED SOURCE-HOST MILESTONES (NOT PHYSICAL REPAIRS):**
+- Original #04 Home clock/status-orb overlap: exact-hash protected source-only 10 Home include XML anchor reposition, **2/2 tests passed**, 3062 unchanged skin ZIP members. Receipt `receipts/GROUP01-TASK04-CLOCK-ORIGIN-TESTED-20261019.md`. Not installed, not fold verified.
+- Original #02 verified duplicate movie progress/card: original CC Resume Hub source-only change to reuse newest **mutually verified movie identity**, display one confirmed duplicate without deleting records, **5/5 tests passed**. User's actual Insidious stored IDs not yet confirmed; no data touched. Receipt `receipts/GROUP01-TASK02-VERIFIED-MOVIE-KEY-STAGED-20261019.md`.
+- Original #01 TV episode source route: original CC plugin.py source-only patch, **TV-only preferred/stable route fallback**, legacy pre-verified SHOW identity fallback, rejected episode-ID guess and two-failure bypass; **9/9 fixture tests passed**. Movies retain ORIGINAL preference precedence exactly. Source commit narrowed at `9ef345369b999694c944334385b4d77aaefc18f5`, test commit `65e27c93079507895bc88113389b0b786a608a9b`. Receipt `receipts/GROUP01-TASK01-EPISODE-SAVED-ROUTE-19HOST-20261019.md`. User's actual TV item identities and Fold proof unknown.
+- Original #03 horizontal rails: real signed 2103390 skin has Movies 8830 and TV 8831 panel `orientation=horizontal`, `scrolltime=150`, **14/14 Home layouts**. This is static orientation only; real touch focus/drag and **vertical Resume/Play dialog** remain uncorrected and not Fold-tested. Receipt `receipts/GROUP01-RAIL-AND-SIGNED-APK-SCOPE-AUDIT-20261019.md`. No global Kodi DialogSelect/native input edits.
+- Original #19 no repeated Movies↔TV Shows reload: in-app diagnostic confirms **20 fresh Continue Watching directory jobs over ~49,584 ms under one constant revision**, 20/20 `cache_hit=0` (9 movie/11 TV) in ONE collected session. Code `group1/category_load_diagnostic.py` read-only aggregate, no private raw data committed. Exact visibility/URL/native invalidation cause not yet proven. NO #19 fix staged. Receipt `receipts/GROUP01-TASK19-REPEAT-LOAD-TRACE-20261019.md`. Do NOT touch native DirectoryProvider, Cobra, Umbrella or invent a new global cache without isolated proof.
+
+**LATEST VERIFIED FULL HOST TEST:** `python -m unittest -v test_clock_orb_patch test_movie_identity_patch test_home_rail_contract test_group1_scope_apk test_tv_episode_route_patch test_group1_scope_apk_12`, **19/19 PASS** (Python local, ~8.44s). Strict **simulation** of potential signed APK changes: **12 of 7430** original signed 2103390 members permitted (10 Home status-orb variants, 1 CC `resume_hub.py`, 1 CC `plugin.py`), **7418 unchanged**, Cobra, native engine, shutdown, VersionCheck, services unchanged. This is NOT a signed APK/CI/Fold result. All patch scripts use exact original SHA guards, fail closed on mismatched source and never edit original/device.
+
+**STILL REQUIRED FOR GROUP #1 ACCEPTANCE:** Real/failing TV episode route evidence and playback, actual Insidious identity/durable progress, reliable horizontal swipe/selected poster/focus, touch-friendly vertical two-choice Resume dialog scoped to Infinity only, actual cause-based solution for category-switch blank/reload (top Umbrella + Continue Watching, including genuine updates), proper fold/rotation/themes/screensaver, and final strict unchanged-Cobra/shutdown/source/Android regression tests. No combined APK; no final lock. **0/7 full groups completed.**
+
+**MANDATORY SAVING:** Every new source/test correction must be GitHub committed with receipt, then TASK-STATUS.json and THIS handoff updated before moving beyond the checkpoint. Never claim 2103390 base was modified or that a Fold test passed when not performed.
+
+---
+
+## LATEST USER HARD FREEZE AND GROUP #1 HORIZONTAL SCROLL — OVERRIDES ANY OLDER GENERIC GUIDANCE
+
+User explicitly states **Cobra and EVERYTHING ELSE INSIDE INFINITY outside exact Groups #1–#7 are OFF LIMITS**. No unapproved new buttons, menus, options, actions, source changes, removal/hiding/reordering of any existing feature, global GUI/native rebuild/refactor, opportunistic fixes or layout redesign. Protect all behavior that is not the minimum specifically named edit of the current authorized group. For even a possible shared Cobra side-effect or need to change outside the current group, **STOP AND REQUEST USER APPROVAL**. Before edits and after builds: exact file/source/APK member allowlist + before/after SHA + untouched inventory + negative regression proofs. No silently “necessary” related extras. Full directive and examples preserved in `GROUPED-01-07-BINDING-CONTRACT.md` section “HIGHEST-PRIORITY USER SCOPE FREEZE.”
+
+User additionally requires **Group #1** to have **fully functional HORIZONTAL swipe/scroll** in BOTH **Movies → Continue Watching** and **TV Shows → Continue Watching/Resume Hub** poster rails. This is **MANDATORY PASS/FAIL**, not a future option or vertical list. Swipe left/right, choose the actual tapped card reliably without accidental launch on swipe, preserve selected poster/horizontal offset when returning or dismissing an action and retain saved progress/source identity. Separately, `Resume from [time] / Play from beginning` is a **VERTICAL** touch chooser. Verify EACH category independently on actual Galaxy Fold. If either rail does not horizontally scroll, do not mark Group 1 green.
+
+**Precise current state:** Seven groups scoped, **0 of 7 groups actually implemented**, no bugfix source changes or APK built. Group #6 = new **Silent Mode** in System Hub (old lyrics repair skipped); Group #4 translucent glass menu material approved; Group #3 Option B design approved. No implementation group specifically authorized yet. Last edits to this note and trackers are **documentation only**. Original signed 2103390 baseline and locked 2103384 shutdown remain immutable.
+
+**SAVE RULE:** After every tested in-group milestone and finished group commit real source/tests + immutable receipt and update TASK-STATUS.json plus THIS handoff before next task. Read current source SHA in live GitHub; do not rely on stale hardcoded HEAD.
+
+**READ THIS FIRST.** Current approved work UNIT numbers are **GROUP #1–#7**, with detailed requirements from the existing original tasks 01–19 retained for testing. Read `repairs/2103390-bugfixes/GROUPED-01-07-BINDING-CONTRACT.md` FIRST and this handoff and `repairs/2103390-bugfixes/TASK-STATUS.json` next. Read `REPAIR-CONTRACT-01-19.md` only as the detailed subrequirement index. No renumbering of original tasks took place.
+
+**USER'S LAST CONFIRMATION:** “Silent mode will be #6.” That unequivocally means **WORK GROUP #6 = the NEW System Hub Silent Mode On/Off setting**, NOT the original Add-on Browser subrequirement task 06 (which remains under Group #2). The previously proposed sixth work GROUP, CU LRC Lyrics bug repair (original task 16), is **SKIPPED BY USER**. Do not uninstall, disable, reinstall or repair Lyrics; future user may manage it, not authorized here.
+
+**SEVEN ACTIVE GROUPS:**
+1. Home / Continue Watching / episode resolver / movie duplicates / horizontal touch & vertical choice / clock and no MOVIES↔TV SHOWS reload (original 01,02,03,04,17,19).
+2. Add-on Browser end-to-end root, submenu, menus, ZIP picker, Search and stray blue slash (original 05,06,07,08).
+3. User-approved EXACT Option B long-press Movie and TV details modal (09,10).
+4. Player video-icon route, Playback rows, translucent glass Video Settings + Audio & Subtitles (11,12,13,14). Glass material design **user-approved “Prefect bite to bite”**, saved at `PLAYER-GLASS-MENUS-APPROVED-20261019.md`; actual Sacrifice player controls preserved.
+5. Native status139 physical Fold investigation/evidence-based correction (15).
+6. **NEW System Hub Silent Mode** — Off/On suppression of unsolicited on-screen Kodi/Infinity/third-party notification banners/toasts (e.g. CU LRC Lyrics and Trakt) via safe Infinity-only presentation gate, preserve scripts and diagnostics, no forced dismissal of interactive/essential prompts.
+7. Exact saved, approved group repairs only → full binding audit → new permanently signed APK → physical Fold acceptance and user final LOCK (18).
+
+**STATUS NOW: 0/7 GROUPS IMPLEMENTED OR TESTED; 0/19 ORIGINAL TASKS IMPLEMENTED IN THIS NEW ROUND; ONE ORIGINAL TASK (16) SKIPPED.** Neither design approval nor docs count as code. This is NOT authorization to touch other groups. Wait for a specific “Fix/Proceed Group #N.” This grouping records full scopes and acceptance checks; **NO COBRA WORK EVER**, no 2103390/2103384/Essential-First changes unless expressly authorized in a confined item and proven safe.
+
+**PERMANENT SAVE CONTRACT:** Before any group: record exact branch SHA and scoped file allowlist. After any verified in-group subtask and group completion: SAVE real GitHub code/tests commit, tests/receipts and exact rollback SHA, update GROUP statuses + detailed subrequirement statuses in TASK-STATUS.json, update THIS handoff, confirm saved URLs before moving on. Do not say “complete” for host proof alone or claim a Fold pass not performed. Do not combine until Group #7 user-authorized.
+
+---
+
+# CONTINUE HERE — INFINITY 2103390 POST-BASE BUG-FIX PROJECT
+
+**First file to open when any chat/work session resumes.** User requires saving each completed task, and a new conversation must resume saved work **without asking them to repeat the whole project or restarting old repairs**.
+
+## CONTROLLING FILES — READ IN THIS ORDER
+
+1. **`repairs/2103390-bugfixes/REPAIR-CONTRACT-01-19.md`** — complete verbatim user directives, hard preservation boundaries, precise #01–#19 issues, limited acceptance, and "save every completed task" protocol. This controls task scope.
+2. **`repairs/2103390-bugfixes/TASK-STATUS.json`** — machine-readable current state/actual completed numbers and exact commits/artifacts, which tasks are still open, last evidence, user sign-off.
+3. **`repairs/baselines/INFINITY-2103390-PROVISIONAL-BUGFIX-BASE.md`** — exact signed 2103390 source/hash and immutable locked 2103384 shutdown fallback.
+4. **`repairs/design-approvals/INFINITY-HOME-POSTER-LONGPRESS-OPTION-B-LOCKED.md`** — approved **exact Option B** movie and TV top-rail long-press pop-up design. Do not substitute Option A or redesign existing Infinity Home.
+
+**Repository:** `mahfouzhassine8-ops/project-infinity`.  
+**Working branch:** `work/infinity-2103390-targeted-bugfixes`.  
+**Original source of signed provisional base:** `0efb67a0237c8d05ca066c5f893e6a1713bc5e2d`.  
+**Base APK SHA-256:** `778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb`, versionCode `2103390`.  
+**Signed base artifact:** [GitHub Actions run 39173982272](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/39173982272) / artifact `12153970810`.  
+**Protected locked prior shutdown:** `2103384`, SHA `b571676731bb9bdccb25134c557be613e15cc9adaf77d6675dabc8e0586e54af`.  
+**Permanent signing certificate:** `d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7`.
+
+## ABSOLUTE NON-NEGOTIABLES
+
+- **COBRA SHALL NOT BE TOUCHED AT ALL. NO REASON TO TOUCH IT.** Do not write Cobra files/resources/configs or a shared path that might change Cobra; STOP for separately explicit approval rather than expanding any task.
+- **Only fix the item explicitly authorized by NUMBER.** Nothing else. Preserve every feature, previous correction, native playback, PiP, background behavior, player controls, skin identity and user data.
+- Preserve fully working Essential-First shutdown and all protected write safeguards, and original crash reporter. No clean install, uninstall, data wipe, package/signing ID change, provider delete, baseline overwrite or speculative native crash fix.
+- New post-base **tasks #01–18** are distinct from previous original **1–16** repaired/skipped gates. Do not re-open previous #1–16 tasks, rewrite fixes, or add new unrequested features. #09/10 (Option B) are **DESIGN-APPROVED ONLY**, no code implementation. #11–14 player OSD/Video Settings/Audio & Subtitles are user-requested behavior, not yet implemented.
+- Every progress report must separate **source implemented, host tests GREEN, integrated Android GREEN, physical Fold verified, user-approved**. Do not check off unproven stages or claim a production lock.
+
+## NUMBERING RECONCILIATION AND LATEST PLAYER GLASS VISUAL REQUEST
+
+**Single controlling task IDs are 01 through 18.** Current authoritative scope: `repairs/2103390-bugfixes/REPAIR-CONTRACT-01-19.md`. Only live machine-readable completion statuses: `repairs/2103390-bugfixes/TASK-STATUS.json`. The earlier BF-01 through BF-16 descriptive draft is archived and must NOT override, renumber or compete with tasks 01–18; detailed alias map: `repairs/bugfix-program-2103390/DRAFT-BF-ALIAS-TO-CANONICAL-01-18.md`.
+
+**Important new user wording:** “Also, for the video icon and the subtitle icon, they should be glass to where the video still can be seen through them to a sense. So if you want to mock that so we can approve it, we can do that.” Then user clarified: “I'm referring to the menu, that is.” and “If anything, playback menu should follow the same.”
+
+**Correct scope:** MENU PANELS, not the tiny OSD icon artwork: the **Playback options popup**, **Video Settings popup**, and **Audio & Subtitles popup** all use actual Infinity liquid-glass **semi-transparent** panels so live video is visible THROUGH the panels; compact Video/Audio menus slightly smaller than original Playback; Light/Dark/OLED/Night Cinema and original player controls preserved. Original Playback's true actions are `Now Playing`, `Audio & Subtitles`, `Video Settings` (only redundant row to be removed under task12 after task11 works), `Chapters & Bookmarks`, `Playlist`, `Go To Time`, `Player Settings`, `Playback Info`, `Close Player`. AI-generated mock rows such as `Play/Pause` / `Repeat Mode` are illustrative, **NOT APPROVED ACTIONS**.
+
+**Visual reference/spec saved:** `repairs/2103390-bugfixes/PLAYBACK-GLASS-MENUS-VISUAL-PROPOSAL.md`; latest mock shown in current conversation. **User has NOT yet approved exact opacity/layout of new glass menu mock.** Proposal only, 0/19 detailed tasks implementations remain complete, Cobra still absolutely OFF-LIMITS. If a future chat is asked to implement canonical task 11/12/13/14, read and obtain any missing user visual approval first. Do not interpret the mock as permission to change controls.
+
+## SAVED STATUS AT HANDOFF
+
+**As of October 19, 2026: TRACKER UPDATED TO #19; 0/19 NEW TASKS IMPLEMENTED OR COMPLETED.** This handoff created documentation only; no Kodi engine, APK, skin, Cobra or user data was changed.
+
+**Compact task map:**
+
+| Number | Scope | State |
+|---|---|---|
+| 01 | TV Shows Continue Watching unresolvable episode source | OPEN |
+| 02 | Duplicate Insidious/movie Continue Watching records | OPEN |
+| 03 | Continue Watching horizontal touch and Resume/Play choice popup | OPEN |
+| 04 | Home moon/weather icon overlapping upper-right clock | OPEN |
+| 05 | Add-on Browser stray blue slash in header | OPEN |
+| 06 | Add-on Browser root hierarchy/nav/instructions | OPEN |
+| 07 | Browser My Add-ons/Available Updates/Recently Updated | OPEN |
+| 08 | Browser Repository/ZIP picker/Search subpages | OPEN |
+| 09 | Movies top rail — EXACT approved Option B long-press details | DESIGN LOCK ONLY |
+| 10 | TV top rail — SAME exact Option B long-press details | DESIGN LOCK ONLY |
+| 11 | Video/monitor-looking OSD button opens Video Settings | OPEN / USER-REQUESTED |
+| 12 | Remove ONLY redundant "Video Settings" row from Playback popup | OPEN / USER-REQUESTED |
+| 13 | Dedicated compact Video Settings modal, smaller than Playback | OPEN / USER-REQUESTED |
+| 14 | Dedicated compact Audio & Subtitles modal, smaller than Playback | OPEN / USER-REQUESTED |
+| 15 | Native engine exit 139 missing traceback / root cause | OPEN / DIAGNOSTICS FIRST |
+| 16 | CU LRC Lyrics script TypeError | SKIPPED BY USER — NOT A REPAIR |
+| 17 | TMDb Helper/SlyGuy startup quarantine | TRIAGE ONLY |
+| 18 | Selective combined signed APK + strict final physical Fold audit (run after accepted #19 if user authorizes) | FINAL GATE NOT STARTED |
+| 19 | Movies↔TV Shows show retained populated rails immediately on each navigation, no reload after initial startup | OPEN / USER-REPORTED |
+
+## EVIDENCE TO REUSE (PRIVATE USER UPLOADS; NEVER COMMIT RAW)
+
+- `19021.jpg` and `19028.jpg`: TV Continue Watching unavailable source dialog.
+- `19035.jpg`: actual Infinity Home, double Insidious cards and moon overlapping clock. **Authoritative Home visual layout reference**.
+- `19042.mp4`: Continue Watching touch selection and Resume/Play vertical choice.
+- `19032.mp4`, Add-on Browser screenshot `1792383561650.jpeg`: browser menu issues and stray header slash.
+- `19043.jpg` stock Kodi title-detail concept; `19045.mp4` actual Infinity top Home rail; `infinity_ui_interaction_options_mockup.png` approved option B visually.
+- **NEW screenshot `1792386488186.jpeg`**: Playback popup over `Sacrifice`, includes `Now Playing`, `Audio & Subtitles`, `Video Settings`, `Chapters & Bookmarks`, `Playlist`, `Go To Time`, `Player Settings`, `Playback Info`, `Close Player`. Bottom OSD video/monitor-looking button is user-reported inert; user requests it open Video Settings, remove only redundant Playback popup Video Settings entry, and make Video Settings and Audio & Subtitles smaller compact popups.
+- `Infinity-Diagnostics-20261019-000835.zip`, `Kodi_Diagnostics_20261019T042154Z-2eaea0ee.zip` and earlier diagnostics (user-owned; private) for installed components, TV route and add-on script exceptions. Avoid copying sensitive logs to public repo.
+- Earlier original 12:55 EDT Oct 18 status139 and native crash evidence review in `repairs/full-system-20261017/CONSOLIDATED-THREE-UI-AND-NATIVE-EXIT-BRIEF.md` and `repairs/four-repair-20261018/STOP-TRACE.md`.
+
+## REQUIRED TASK WORKFLOW IN EVERY FUTURE CHAT
+
+1. Read controlling files and the latest GitHub commits; identify the **one user-authorized exact task number** and its current status.
+2. Do NOT skip user authorization or silently revise original task definitions.
+3. Save before modifying source: exact prechange SHA + unchanged baseline + task scope/allowed paths.
+4. Reproduce, make the narrow actual correction, add targeted positive + fail-closed negative tests.
+5. After each numbered task, **COMMIT ALL SOURCE + TESTS + STATUS/HANDOFF UPDATE** to GitHub. Record exact git SHA, changed files, test run IDs, APK/ZIP hashes if any, open failures, physical test evidence, rollback anchor, next number.
+6. Update **both `TASK-STATUS.json` and this `CONTINUE-HERE.md`**, so if chat closes a different assistant can resume from the last saved task without recreating it or inventing successes.
+7. Only combine completed user-accepted numbers when user orders combination. Independently preserve all other files/native libraries/add-ons and Cobra; fail closed if any gate red.
+8. Final full fold test + original 2103384 working Close and no data loss, then user alone approves final lock.
+
+
+## NEW USER REQUEST — #19 MOVIES/TV SHOWS STAY POPULATED AND GLASS MENU CLARIFICATION
+
+**Verbatim #19:** “If you look at the video, how we can go from movies to TV shows, and it would be as if, like, they would have to reload going from movies and TV shows. It should not be that way because as soon as I start up Kodi, or I mean Infinity, and everything populates, everything should be there at all times. Unless, obviously, I shut down Infinity and it comes back, and I turn it back on and it reloads, which is fine, but that should not happen.”
+
+**Recording:** `19049.mp4` (approx. 76.9s). Switching into TV Shows briefly shows already-populated category/add-on tiles but blank Umbrella Latest Releases/Continue Watching. Those appear later in the same running app. Root cause/provider lifecycle **unverified**. Requirement is to retain ready Movies and TV content while session runs and not visibly reload on each tab switch; a true cold startup or Close/reopen may load normally. No permanent stale data, provider bulk refetch or RAM leak.
+
+**Verbatim #12–14 visual direction:** “Also, for the video icon and the subtitle icon, they should be glass to where the video still can be seen through them to a sense. So if you want to mock that so we can approve it, we can do that.” “I'm referring to the menu, that is.” “If anything, playback menu should follow the same.”
+
+**Explicit corrected object:** This is about the semi-transparent **MENU PANELS**: existing Playback list (#12), smaller Video Settings modal (#13), smaller Audio & Subtitles modal (#14). Not about changing the OSD toolbar icon appearance. Video OSD icon functionality remains task #11. The background video should be partially perceivable through the glass, respecting Light/Dark/OLED/Night Cinema and reduced/off motion. All original functional rows and their handlers remain intact except the separately approved redundant Video Settings row removal in #12. Do not substitute conceptual mockups' movie names or different menu rows for the user's actual `Sacrifice` player screenshot. Exact glass material **APPROVED BITE FOR BITE** (see new approved glass contract); generated concepts are not code or an approved runtime screenshot.
+
+**Status after saving:** This changed **documentation only**. 0/19 new fixes implemented, original signed 2103390 base intact, 2103384 shutdown locked, COBRA NEVER TOUCHED.
+
+## WHAT TO DO NEXT
+
+At this savepoint, **no work group has been selected for implementation**. Work unit selection uses Group #1–#7. The user just added task #19 with recording `19049.mp4` and clarified that existing Playback, Video Settings and Audio & Subtitles menu SURFACES should be translucent glass, not toolbar icons. These are specifications, not completed fixes.
+
+**Next user-facing response:** Show GROUPS #1–#7, emphasizing GROUP #6 = NEW System Hub Silent Mode, old Lyrics repair skipped; mention glass menu design saved/approved and original tasks 01–19 retained as subrequirements. Confirm 0/7 groups implemented. Ask which GROUP to authorize, then implement ONLY that group, saving every tested milestone and complete group to GitHub. No code changes from this documentation alone.
