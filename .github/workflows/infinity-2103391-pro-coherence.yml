@@ -1,0 +1,118 @@
+name: Infinity 2103391 | Pro release coherence audit
+on:
+  push:
+    branches: [work/infinity-2103391-pro-seven-group-audit-20261019]
+    paths:
+      - '.github/workflows/infinity-2103391-pro-coherence.yml'
+      - 'audits/2103391-pro/inspect_release.py'
+  workflow_dispatch:
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-2103391-pro-coherence, cancel-in-progress: false}
+jobs:
+  independent-evidence:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39348480827
+          name: Infinity-2103391-All-In-One-EXPERIMENTAL-NOT-FOLD-QUALIFIED
+          github-token: '${{ github.token }}'
+          path: audit-original
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39352426448
+          name: Infinity-2103391-Matching-Skin-UIRepair-CC-WatchedBridge-Rails-ZIPs
+          github-token: '${{ github.token }}'
+          path: audit-matching
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39173982272
+          name: Infinity-2103390-Exact-Nine-Combined-EXPERIMENTAL-NOT-FOLD-QUALIFIED
+          github-token: '${{ github.token }}'
+          path: audit-parent
+      - name: Independently verify APK signatures and exact protected parent
+        run: |
+          set -euo pipefail
+          mkdir -p pro-audit-output
+          APK="$(find audit-original -name 'Infinity-2103391-All-In-One-Bugfix-EXPERIMENTAL.apk' -type f)"
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs "$APK" | tee pro-audit-output/apk-signature-verification.txt
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$APK" > pro-audit-output/apk-badging.txt
+          grep 'versionCode=' pro-audit-output/apk-badging.txt
+          python3 - <<'PY'
+          import hashlib,os,zipfile
+          from pathlib import Path
+          want='778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb'
+          matches=[]
+          for p in Path('audit-parent').rglob('*'):
+              if not p.is_file():continue
+              if p.suffix=='.apk':
+                  data=p.read_bytes()
+                  if hashlib.sha256(data).hexdigest()==want:matches.append(data)
+              elif p.suffix=='.zip':
+                  with zipfile.ZipFile(p) as z:
+                      for n in z.namelist():
+                          if n.endswith('Infinity-2103390-Nine-Item-Integration-EXPERIMENTAL.apk'):
+                              data=z.read(n)
+                              if hashlib.sha256(data).hexdigest()==want:matches.append(data)
+          assert len(matches)==1,'Exact protected parent not uniquely identified'
+          parent=Path('original-2103390.apk');parent.write_bytes(matches[0])
+          with open(os.environ['GITHUB_ENV'],'a') as f:f.write('INFINITY_2103390_APK='+str(parent.resolve())+'\n')
+          badging=Path('pro-audit-output/apk-badging.txt').read_text()
+          assert "name='com.projectinfinity.kodi'" in badging and "versionCode='2103391'" in badging
+          cert=Path('pro-audit-output/apk-signature-verification.txt').read_text()
+          assert 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' in cert
+          PY
+      - name: Audit actual embedded and separately delivered runtime contracts
+        run: |
+          set -euo pipefail
+          python3 -m py_compile audits/2103391-pro/inspect_release.py
+          python3 audits/2103391-pro/inspect_release.py 2>&1 | tee pro-audit-output/coherence.log
+      - name: Re-run each existing group host suite against exact original APK
+        if: always()
+        run: |
+          set -euo pipefail
+          test -f original-2103390.apk
+          python3 - <<'PY'
+          import json,os,re,subprocess
+          from pathlib import Path
+          out=Path('pro-audit-output');out.mkdir(exist_ok=True)
+          env=dict(os.environ,INFINITY_2103390_APK=str(Path('original-2103390.apk').resolve()))
+          results=[]
+          for i in range(1,8):
+              folder=Path(f'repairs/2103390-bugfixes/group{i}')
+              tests=sorted(folder.glob('test*.py'))
+              if not tests:
+                  results.append({'group':i,'state':'NO_TEST_FILES','runtime_verified':False});continue
+              command=['python3','-m','unittest','discover','-s',str(folder),'-p','test*.py','-v']
+              try:
+                  p=subprocess.run(command,env=env,text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=300)
+                  text=p.stdout;code=p.returncode
+              except subprocess.TimeoutExpired as e:
+                  text=str(e.stdout or '')+'\nHOST SUITE TIMEOUT';code=124
+              (out/f'group{i}-host-tests.log').write_text(text)
+              print(f'=== GROUP {i} HOST TESTS (NOT ANDROID/FOLD) ===\n{text}',flush=True)
+              count=re.search(r'Ran (\d+) tests?',text)
+              skipped=bool(re.search(r'skipped=\d+|\.\.\. skipped ',text))
+              results.append({'group':i,'returncode':code,'tests':int(count.group(1)) if count else None,'contains_skips':skipped,'runtime_verified':False})
+          (out/'host-suite-results.json').write_text(json.dumps(results,indent=2)+'\n')
+          print(json.dumps(results,indent=2))
+          if any(r.get('returncode',1)!=0 or r.get('contains_skips',False) for r in results):raise SystemExit(1)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-2103391-Pro-Independent-Audit-Reports
+          path: pro-audit-output/
+          retention-days: 90
+          if-no-files-found: error
