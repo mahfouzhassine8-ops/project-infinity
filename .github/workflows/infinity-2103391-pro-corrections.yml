@@ -14,7 +14,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
-        with: {fetch-depth: 0}
+        with: {fetch-depth: 0, show-progress: false}
       - uses: actions/setup-python@v5
         with: {python-version: '3.11'}
       - uses: actions/download-artifact@v4
@@ -32,6 +32,9 @@ jobs:
       - name: Prepare verified original APK fixtures without changing payloads
         run: |
           set -euo pipefail
+          # Disposable Ubuntu runner, not the user's computer or Android data.
+          sudo install -d -o "$(id -u)" -g "$(id -g)" /mnt/data
+          mkdir -p pro-correction-output
           python3 - <<'PY'
           import hashlib,os,zipfile
           from pathlib import Path
@@ -49,7 +52,7 @@ jobs:
                               data=z.read(n)
                               if hashlib.sha256(data).hexdigest()==wanted:matches.append(data)
           assert len(matches)==1
-          root=Path('/mnt/data');root.mkdir(exist_ok=True)
+          root=Path('/mnt/data')
           apk=root/'Infinity-2103390-Nine-Item-Integration-EXPERIMENTAL.apk';apk.write_bytes(matches[0])
           outer=root/'Infinity-2103390-Combined-Build-Artifact.zip'
           with zipfile.ZipFile(outer,'w',compression=zipfile.ZIP_STORED) as z:z.write(apk,apk.name)
