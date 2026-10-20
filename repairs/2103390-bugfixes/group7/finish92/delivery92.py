@@ -120,6 +120,110 @@ def verify_source_binding(binding, expected_native, source_commit):
     require(binding.get('physical_fold_verified') is False and binding.get('final_lock') is False, 'Invented device qualification')
 
 
+def native_build_inventory(root, expected, dependency_root):
+    """Separate exact reviewed source bytes from unchanged build-link metadata.
+
+    The immutable producer's 9404-file map is still authoritative. The strict
+    integration binder receives a symlink-free mirror of exactly that map,
+    while the compiler continues using the original tree. This does not admit
+    symlinks into add-on/controller staging or weaken any runtime contract.
+    """
+    root = Path(root).resolve()
+    dependency_root = Path(dependency_root).resolve()
+    regular = {}
+    links = {}
+    for p in sorted(root.rglob('*')):
+        rel = p.relative_to(root).as_posix()
+        if '.git' in p.relative_to(root).parts:
+            continue
+        if p.is_symlink():
+            target = os.readlink(p)
+            resolved = p.resolve(strict=False)
+            require(resolved != root and resolved != dependency_root, 'Build link targets an entire input root: ' + rel)
+            require(resolved.is_relative_to(root) or resolved.is_relative_to(dependency_root), 'Build link leaves verified source/dependency roots: ' + rel + ' -> ' + target)
+            tracked = command(['git', '-C', root, 'ls-files', '--stage', '--', rel]).strip()
+            if tracked:
+                entries = tracked.splitlines()
+                require(len(entries) == 1, 'Ambiguous tracked link: ' + rel)
+                meta, tracked_name = entries[0].split('\t', 1)
+                mode, blob, stage = meta.split()
+                raw = os.fsencode(target)
+                git_blob = hashlib.sha1(b'blob ' + str(len(raw)).encode() + b'\0' + raw).hexdigest()
+                require(mode == '120000' and stage == '0' and tracked_name == rel and blob == git_blob, 'Tracked build link changed: ' + rel)
+                origin = 'unchanged_upstream_git_link'
+            else:
+                # The original native reconstruction creates this FlatBuffers
+                # include bridge. Do not broaden this to arbitrary source links.
+                require(rel == 'tools/depends/target/flatbuffers/include', 'Unreviewed generated build link: ' + rel + ' -> ' + target)
+                native_flatbuffers = root / 'tools/depends/native/flatbuffers'
+                require(resolved.is_relative_to(native_flatbuffers) or resolved.is_relative_to(dependency_root), 'Unexpected FlatBuffers include target: ' + target)
+                require(resolved.is_dir(), 'FlatBuffers include target is unavailable: ' + target)
+                origin = 'immutable_producer_flatbuffers_dependency_bridge'
+            links[rel] = dict(target=target, resolved=str(resolved), origin=origin)
+            if rel in expected:
+                require(p.is_file(), 'Manifest link is not a file: ' + rel)
+                regular[rel] = digest(p)
+        elif p.is_file():
+            regular[rel] = digest(p)
+        else:
+            require(p.is_dir(), 'Unsupported filesystem object in native tree: ' + rel)
+    require(regular == expected, 'Actual native file inventory differs: missing=' + repr(sorted(set(expected)-set(regular))[:8]) + '; extra=' + repr(sorted(set(regular)-set(expected))[:8]) + '; changed=' + repr([n for n in expected.keys() & regular.keys() if expected[n] != regular[n]][:8]))
+    return links
+
+
+def bind_native_mirror(integration, parent, staged, producer, manifest, source_commit):
+    import shutil
+    native = producer / 'kodi'
+    checkpoint = producer / 'checkpoint-build'
+    dependencies = Path(os.environ['DEPENDS']).resolve()
+    _, before, _ = integration.expected_bindings(checkpoint, manifest)
+    require(len(before) == 9404, 'Complete original native map is required before mirroring')
+    links_before = native_build_inventory(native, before, dependencies)
+    print('Reviewed native build links: ' + json.dumps(links_before, sort_keys=True), flush=True)
+    original_sources = {n:(native / n).read_bytes() for n in integration.FINAL_NATIVE}
+    manifest_names = ('FOUR-REPAIR-NATIVE-SOURCE-MAP.json', 'GROUP7-MERGED-NATIVE-SOURCE-MAP.json')
+    original_manifests = {n:(checkpoint / n).read_bytes() for n in manifest_names}
+    require(not (checkpoint / 'COHERENT92-NATIVE-BUILD-LINKS.json').exists(), 'Native mirror binding already exists')
+    try:
+        with tempfile.TemporaryDirectory(prefix='coherent92-source-mirror-', dir=checkpoint) as temp:
+            mirror = Path(temp)
+            for n, expected_hash in before.items():
+                rel = Path(n)
+                require(not rel.is_absolute() and '..' not in rel.parts, 'Unsafe manifest path')
+                data = (native / rel).read_bytes()
+                require(sha(data) == expected_hash, 'Source changed while mirroring: ' + n)
+                destination = mirror / rel
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                destination.write_bytes(data)
+            report = integration.bind_native(parent, staged, mirror, checkpoint, manifest, source_commit)
+            verify_source_binding(report, integration.FINAL_NATIVE, source_commit)
+            after = load_json(checkpoint / 'COHERENT92-NATIVE-SOURCE-MAP.json')
+            require(len(after) == len(before) and {n for n in before if before[n] != after[n]} == set(integration.FINAL_NATIVE), 'Mirror delta is not exactly the two reviewed sources')
+            require(native_build_inventory(native, before, dependencies) == links_before, 'Actual compiler inputs changed during mirror binding')
+            for n, expected_hash in integration.FINAL_NATIVE.items():
+                data = (mirror / n).read_bytes()
+                require(sha(data) == expected_hash and (native / n).read_bytes() == original_sources[n], 'Actual native preimage or reviewed mirror changed')
+                (native / n).write_bytes(data)
+            require(native_build_inventory(native, after, dependencies) == links_before, 'Actual compiler tree differs after binding')
+            save(checkpoint / 'COHERENT92-NATIVE-BUILD-LINKS.json', dict(schema=1, source_commit=source_commit,
+                actual_compiler_tree=str(native.resolve()), reviewed_source_count=9404,
+                source_mirror_used_only_for_strict_binding=True, unchanged_build_links=links_before,
+                actual_compiler_inputs_verified=True, add_on_symlink_admission_changed=False,
+                runtime_contracts_weakened=False))
+            return report
+    except BaseException:
+        for n, data in original_sources.items():
+            (native / n).write_bytes(data)
+        for n, data in original_manifests.items():
+            (checkpoint / n).write_bytes(data)
+        for name in ('COHERENT92-NATIVE-BINDING.json', 'COHERENT92-NATIVE-SOURCE-MAP.json', 'COHERENT92-NATIVE-BUILD-LINKS.json'):
+            (checkpoint / name).unlink(missing_ok=True)
+        backup = checkpoint / 'coherent92-original-native-inputs'
+        if backup.exists():
+            shutil.rmtree(backup)
+        raise
+
+
 def bind(args):
     r, integration, _ = adapters()
     producer = args.producer.resolve()
@@ -130,7 +234,7 @@ def bind(args):
     driver = module('delivery92_original_native_driver', producer / 'repairs/four-repair-20261018/native_ci.py')
     ordering = driver.parent.parent.parent.parent.parent.parent.parent
     manifest = Path(ordering.native_manifest(ordering.stable())).resolve()
-    report = integration.bind_native(parent, args.stage.resolve() / 'source', producer / 'kodi', producer / 'checkpoint-build', manifest, args.source_commit)
+    report = bind_native_mirror(integration, parent, args.stage.resolve() / 'source', producer, manifest, args.source_commit)
     verify_source_binding(report, integration.FINAL_NATIVE, args.source_commit)
     print(json.dumps(report, indent=2, sort_keys=True))
 
@@ -138,7 +242,8 @@ def bind(args):
 def verify_signature(apk, build_tools):
     text = command([build_tools / 'apksigner', 'verify', '--verbose', '--print-certs', apk])
     found = re.findall(r'Signer #\d+ certificate SHA-256 digest:\s*([0-9a-f:]+)', text, re.I)
-    require(len(found) == 1 and found[0].lower().replace(':', '') == CERT, 'Permanent signing identity mismatch')
+    require(len(found) == 1, 'APK must have exactly one signer')
+    require(found[0].lower().replace(':', '') == CERT, 'Permanent signing identity mismatch')
     for version in (1, 2, 3):
         require(re.search(r'Verified using v' + str(version) + r' scheme[^\n]*:\s*true', text, re.I), 'APK signature scheme failed')
     subprocess.run([str(build_tools / 'zipalign'), '-c', '-p', '4', str(apk)], check=True)
@@ -146,8 +251,6 @@ def verify_signature(apk, build_tools):
 
 
 def assemble(args):
-    # Reject absent/partial credentials before invoking the inherited signer,
-    # whose separate test-only mode must never be reachable from this adapter.
     require(all(os.environ.get(k) for k in KEYS), 'All four permanent signing secrets required; no debug fallback')
     r, integration, signer = adapters()
     producer = args.producer.resolve()
@@ -161,6 +264,11 @@ def assemble(args):
     verify_source_binding(binding, integration.FINAL_NATIVE, args.source_commit)
     expected = load_json(checkpoint / 'COHERENT92-NATIVE-SOURCE-MAP.json')
     require(len(expected) == 9404 and all(digest(producer / 'kodi' / n) == h for n, h in expected.items()), 'Reviewed native source changed during compilation')
+    link_proof = load_json(checkpoint / 'COHERENT92-NATIVE-BUILD-LINKS.json')
+    require(link_proof.get('source_commit') == args.source_commit and link_proof.get('actual_compiler_inputs_verified') is True, 'Actual native tree binding proof missing')
+    for n, value in link_proof['unchanged_build_links'].items():
+        path = producer / 'kodi' / n
+        require(path.is_symlink() and os.readlink(path) == value['target'] and str(path.resolve(strict=False)) == value['resolved'], 'Build-link topology changed during compilation: ' + n)
     proof = load_json(checkpoint / 'ENGINE-PROOF.json')
     engine_path = checkpoint / 'libkodi.so'
     engine_hash = digest(engine_path)
@@ -240,7 +348,7 @@ def assemble(args):
         (temp / 'PARENT-SIGNATURE.txt').write_text(parent_signing)
         (temp / 'FINAL-SIGNATURE.txt').write_text(signing)
         (temp / 'APK-BADGING.txt').write_text(badge)
-        for filename in ('ENGINE-PROOF.json', 'COHERENT92-NATIVE-BINDING.json'):
+        for filename in ('ENGINE-PROOF.json', 'COHERENT92-NATIVE-BINDING.json', 'COHERENT92-NATIVE-BUILD-LINKS.json'):
             (temp / filename).write_bytes((checkpoint / filename).read_bytes())
         receipt = dict(schema=1, version_code=CODE, source_commit=args.source_commit, native_producer_commit=PRODUCER,
             parent_apk_sha256=PARENT_SHA, apk_sha256=digest(signed), native_sha256=engine_hash,
@@ -269,7 +377,6 @@ def assemble(args):
             'Actual install-over, installed startup, Close/reopen and physical Fold behavior are not yet accepted.\n'
             'If Close fails, retain the failure and export diagnostics; do not clear data or assume success.\n'
             'The original SIGSEGV cause remains unresolved; task 19 remains deferred. No final LOCK.\n')
-        # Publish only a complete validated set, never an unsigned intermediate.
         hashes = {p.name:digest(p) for p in temp.iterdir() if p.is_file()}
         (temp / 'SHA256SUMS').write_text(''.join(h + '  ' + n + '\n' for n,h in sorted(hashes.items())))
         os.rename(temp, out)
