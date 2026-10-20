@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """Build-only delivery adapter for the coordinated 2103392 test candidate.
-
 No runtime repair is invented here. Reuse the reviewed source stage, exact
 startup DEX, immutable 2103391 native producer and permanent signing script.
-A package can be published only after the full native build and strict delta
-checks. Real install-over, whole-process Close and Fold acceptance stay open.
+Publish only after the full native build and strict package-delta checks.
+Real install-over, whole-process Close and physical Fold acceptance stay open.
 """
 from __future__ import annotations
 import argparse
@@ -121,17 +120,14 @@ def verify_source_binding(binding, expected_native, source_commit):
 
 
 def native_build_inventory(root, expected, dependency_root):
-    """Separate exact reviewed source bytes from unchanged build-link metadata.
-
-    The immutable producer's 9404-file map is still authoritative. The strict
-    integration binder receives a symlink-free mirror of exactly that map,
-    while the compiler continues using the original tree. This does not admit
-    symlinks into add-on/controller staging or weaken any runtime contract.
+    """Verify the complete source map and separately preserve build-link metadata.
+    The compiler uses the unchanged original topology. The strict binder receives
+    exactly the same reviewed file bytes in a symlink-free temporary mirror.
+    Controller/add-on staging and runtime symlink restrictions are not changed.
     """
     root = Path(root).resolve()
     dependency_root = Path(dependency_root).resolve()
-    regular = {}
-    links = {}
+    regular, links = {}, {}
     for p in sorted(root.rglob('*')):
         rel = p.relative_to(root).as_posix()
         if '.git' in p.relative_to(root).parts:
@@ -152,8 +148,6 @@ def native_build_inventory(root, expected, dependency_root):
                 require(mode == '120000' and stage == '0' and tracked_name == rel and blob == git_blob, 'Tracked build link changed: ' + rel)
                 origin = 'unchanged_upstream_git_link'
             else:
-                # The original native reconstruction creates this FlatBuffers
-                # include bridge. Do not broaden this to arbitrary source links.
                 require(rel == 'tools/depends/target/flatbuffers/include', 'Unreviewed generated build link: ' + rel + ' -> ' + target)
                 native_flatbuffers = root / 'tools/depends/native/flatbuffers'
                 require(resolved.is_relative_to(native_flatbuffers) or resolved.is_relative_to(dependency_root), 'Unexpected FlatBuffers include target: ' + target)
@@ -172,18 +166,28 @@ def native_build_inventory(root, expected, dependency_root):
 
 
 def bind_native_mirror(integration, parent, staged, producer, manifest, source_commit):
-    import shutil
     native = producer / 'kodi'
     checkpoint = producer / 'checkpoint-build'
     dependencies = Path(os.environ['DEPENDS']).resolve()
-    _, before, _ = integration.expected_bindings(checkpoint, manifest)
-    require(len(before) == 9404, 'Complete original native map is required before mirroring')
+    locked = load_json(checkpoint / 'LOCKED-2103384-SOURCE-MAP.json')
+    delta = load_json(checkpoint / 'FOUR-REPAIR-INPUT-DELTA.json')
+    before = dict(locked, **delta['after'])
+    manifest_paths = (checkpoint / 'FOUR-REPAIR-INPUT-DELTA.json', Path(manifest), checkpoint / 'FINAL-SHUTDOWN-SOURCE-PRESERVATION.json')
+    require(len({p.resolve() for p in manifest_paths}) == 3, 'Distinct native compiler ledgers required')
+    _, _, _, planned = integration.native_plan(before, locked, delta, [load_json(manifest_paths[1]), load_json(manifest_paths[2])], source_commit)
+    verify_source_binding(planned, integration.FINAL_NATIVE, source_commit)
+    print('Native symlink inputs: ' + json.dumps({p.relative_to(native).as_posix():os.readlink(p) for p in native.rglob('*') if p.is_symlink() and '.git' not in p.relative_to(native).parts}, sort_keys=True), flush=True)
     links_before = native_build_inventory(native, before, dependencies)
     print('Reviewed native build links: ' + json.dumps(links_before, sort_keys=True), flush=True)
     original_sources = {n:(native / n).read_bytes() for n in integration.FINAL_NATIVE}
-    manifest_names = ('FOUR-REPAIR-NATIVE-SOURCE-MAP.json', 'GROUP7-MERGED-NATIVE-SOURCE-MAP.json')
-    original_manifests = {n:(checkpoint / n).read_bytes() for n in manifest_names}
+    original_manifests = {path:path.read_bytes() for path in manifest_paths}
     require(not (checkpoint / 'COHERENT92-NATIVE-BUILD-LINKS.json').exists(), 'Native mirror binding already exists')
+    actual_backup = checkpoint / 'COHERENT92-ACTUAL-ORIGINAL-INPUTS'
+    actual_backup.mkdir(exist_ok=False)
+    backup_inputs = {**{native / n:b for n,b in original_sources.items()}, **original_manifests}
+    for i, (path, body) in enumerate(backup_inputs.items()):
+        (actual_backup / (str(i) + '.original')).write_bytes(body)
+    save(actual_backup / 'INDEX.json', {str(i):dict(path=str(path),sha256=sha(body)) for i,(path,body) in enumerate(backup_inputs.items())})
     try:
         with tempfile.TemporaryDirectory(prefix='coherent92-source-mirror-', dir=checkpoint) as temp:
             mirror = Path(temp)
@@ -196,9 +200,10 @@ def bind_native_mirror(integration, parent, staged, producer, manifest, source_c
                 destination.parent.mkdir(parents=True, exist_ok=True)
                 destination.write_bytes(data)
             report = integration.bind_native(parent, staged, mirror, checkpoint, manifest, source_commit)
+            require(report == planned, 'Real strict binder differs from its checked native plan')
             verify_source_binding(report, integration.FINAL_NATIVE, source_commit)
             after = load_json(checkpoint / 'COHERENT92-NATIVE-SOURCE-MAP.json')
-            require(len(after) == len(before) and {n for n in before if before[n] != after[n]} == set(integration.FINAL_NATIVE), 'Mirror delta is not exactly the two reviewed sources')
+            require(set(after) == set(before) and {n for n in before if before[n] != after[n]} == set(integration.FINAL_NATIVE), 'Mirror delta is not exactly the two reviewed sources')
             require(native_build_inventory(native, before, dependencies) == links_before, 'Actual compiler inputs changed during mirror binding')
             for n, expected_hash in integration.FINAL_NATIVE.items():
                 data = (mirror / n).read_bytes()
@@ -214,13 +219,10 @@ def bind_native_mirror(integration, parent, staged, producer, manifest, source_c
     except BaseException:
         for n, data in original_sources.items():
             (native / n).write_bytes(data)
-        for n, data in original_manifests.items():
-            (checkpoint / n).write_bytes(data)
+        for path, data in original_manifests.items():
+            path.write_bytes(data)
         for name in ('COHERENT92-NATIVE-BINDING.json', 'COHERENT92-NATIVE-SOURCE-MAP.json', 'COHERENT92-NATIVE-BUILD-LINKS.json'):
             (checkpoint / name).unlink(missing_ok=True)
-        backup = checkpoint / 'coherent92-original-native-inputs'
-        if backup.exists():
-            shutil.rmtree(backup)
         raise
 
 
@@ -242,8 +244,7 @@ def bind(args):
 def verify_signature(apk, build_tools):
     text = command([build_tools / 'apksigner', 'verify', '--verbose', '--print-certs', apk])
     found = re.findall(r'Signer #\d+ certificate SHA-256 digest:\s*([0-9a-f:]+)', text, re.I)
-    require(len(found) == 1, 'APK must have exactly one signer')
-    require(found[0].lower().replace(':', '') == CERT, 'Permanent signing identity mismatch')
+    require(len(found) == 1 and found[0].lower().replace(':', '') == CERT, 'Permanent signing identity mismatch')
     for version in (1, 2, 3):
         require(re.search(r'Verified using v' + str(version) + r' scheme[^\n]*:\s*true', text, re.I), 'APK signature scheme failed')
     subprocess.run([str(build_tools / 'zipalign'), '-c', '-p', '4', str(apk)], check=True)
@@ -398,7 +399,6 @@ def main():
         assemble(args)
     else:
         bind(args)
-
 
 if __name__ == '__main__':
     main()

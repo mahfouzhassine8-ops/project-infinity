@@ -66,12 +66,9 @@ class NativeBuildLinkGuards(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.base = pathlib.Path(self.temp.name)
-        self.root = self.base / 'kodi'
-        self.root.mkdir()
-        self.dependencies = self.base / 'verified-dependencies'
-        self.dependencies.mkdir()
-        self.include = self.dependencies / 'include'
-        self.include.mkdir()
+        self.root = self.base / 'kodi'; self.root.mkdir()
+        self.dependencies = self.base / 'verified-dependencies'; self.dependencies.mkdir()
+        self.include = self.dependencies / 'include'; self.include.mkdir()
         (self.include / 'flatbuffers.h').write_bytes(b'verified dependency header')
         (self.root / 'source.cpp').write_bytes(b'protected original source')
         d.command(['git', '-C', self.root, 'init', '--quiet'])
@@ -86,14 +83,12 @@ class NativeBuildLinkGuards(unittest.TestCase):
         self.assertEqual(self.check(), {})
     def test_generated_dependency_bridge_kept(self):
         self.bridge.symlink_to(self.include)
-        before = self.bridge.readlink()
-        proof = self.check()
+        before = self.bridge.readlink(); proof = self.check()
         self.assertEqual(self.bridge.readlink(), before)
         self.assertEqual(proof['tools/depends/target/flatbuffers/include']['target'], str(self.include))
         self.assertEqual((self.root / 'source.cpp').read_bytes(), b'protected original source')
     def test_external_bridge_rejected(self):
-        outside = self.base / 'unverified'; outside.mkdir()
-        self.bridge.symlink_to(outside)
+        outside = self.base / 'unverified'; outside.mkdir(); self.bridge.symlink_to(outside)
         with self.assertRaises(RuntimeError):self.check()
     def test_missing_bridge_target_rejected(self):
         self.bridge.symlink_to(self.dependencies / 'missing')
@@ -112,17 +107,26 @@ class NativeBuildLinkGuards(unittest.TestCase):
         (self.root / 'source.cpp').unlink()
         with self.assertRaises(RuntimeError):self.check()
     def test_tracked_internal_link_kept(self):
-        link = self.root / 'tracked.h'
-        link.symlink_to('source.cpp')
+        link = self.root / 'tracked.h'; link.symlink_to('source.cpp')
         d.command(['git', '-C', self.root, 'add', 'tracked.h'])
         self.expected['tracked.h'] = self.expected['source.cpp']
-        proof = self.check()
-        self.assertEqual(proof['tracked.h']['origin'], 'unchanged_upstream_git_link')
+        self.assertEqual(self.check()['tracked.h']['origin'], 'unchanged_upstream_git_link')
     def test_changed_tracked_link_rejected(self):
-        link = self.root / 'tracked.h'
-        link.symlink_to('source.cpp')
+        link = self.root / 'tracked.h'; link.symlink_to('source.cpp')
         d.command(['git', '-C', self.root, 'add', 'tracked.h'])
         link.unlink(); link.symlink_to(self.include / 'flatbuffers.h')
         with self.assertRaises(RuntimeError):self.check()
+
+class SavedIntegrationInterface(unittest.TestCase):
+    def test_checked_in_api_matches_delivery_adapter(self):
+        release, integration, signer = d.adapters()
+        for name in ('native_plan', 'bind_native', 'prepare', 'verified_stage', 'verify_addon_delta'):
+            self.assertTrue(callable(getattr(integration, name)), name)
+        self.assertEqual(set(integration.FINAL_NATIVE), {release.CONTRACT_PATH, release.COORDINATOR_PATH})
+        self.assertEqual(len(release.CHANGED_ADDON_MEMBERS), 8)
+        self.assertEqual(len(release.PACKAGES), 5)
+        for name in ('native_export_compatibility', 'load_module'):
+            self.assertTrue(callable(getattr(signer, name)), name)
+        self.assertTrue(callable(signer.nativeidentity.elf_sections))
 
 if __name__=='__main__':unittest.main()

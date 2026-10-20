@@ -44,7 +44,6 @@ jobs:
           set -euo pipefail
           python3 - <<'PY'
           import subprocess
-          from pathlib import Path
           base='de0513018ea7e5644f92f149feadee8762e95de7'
           actual=set(subprocess.check_output(['git','-C','release92','diff','--name-only',base,'HEAD'],text=True).splitlines())
           allowed={'.github/workflows/infinity-2103392-final-apk.yml',
@@ -53,6 +52,9 @@ jobs:
           assert actual==allowed, 'Unexpected source change outside final delivery adapters: '+repr(actual)
           assert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()=='7bd9b1085d598789e9e803b4b76ee1429e1df7e3'
           PY
+          mkdir -p checkpoint-build
+          git -C release92 archive --format=tar.gz --output="$GITHUB_WORKSPACE/checkpoint-build/2103392-RELEASE-SOURCE.tar.gz" HEAD
+          git archive --format=tar.gz --output="$GITHUB_WORKSPACE/checkpoint-build/2103392-ORIGINAL-PRODUCER.tar.gz" HEAD
           python3 -m unittest discover -s release92/repairs/2103390-bugfixes/group7/finish92 -p test_delivery92.py -v
       - uses: actions/setup-java@v4
         with:
@@ -203,6 +205,9 @@ jobs:
           name: Infinity-2103392-NATIVE-DELIVERY-DIAGNOSTICS
           path: |
             checkpoint-build/2103392-*.log
+            checkpoint-build/2103392-*.tar.gz
+            checkpoint-build/COHERENT92-ACTUAL-ORIGINAL-INPUTS/
+            checkpoint-build/COHERENT92-ORIGINAL-INPUTS/
             checkpoint-build/ENGINE-PROOF.json
             checkpoint-build/COHERENT92-*.json
             checkpoint-build/POST-BUILD-SOURCE-INVENTORY.json
