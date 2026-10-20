@@ -89,7 +89,7 @@ def javac_helper(java: bytes, work: Path, android: Path, d8: Path, api: int, cp:
     helper=java[java.index(start):java.index(end)]
     text=(b'package com.projectinfinity.kodi;\nimport java.io.File;\nimport java.io.FileInputStream;\n'
           b'import java.security.MessageDigest;\nfinal class InfinityInstalledCheckpointInstaller {\n'+helper+b'}\n')
-    src=work/'java'/NAME+'.java';src.parent.mkdir();src.write_bytes(text)
+    src=work/'java'/(NAME+'.java');src.parent.mkdir();src.write_bytes(text)
     classes=work/'javac';classes.mkdir()
     subprocess.run(['javac','--release','8','-g:none','-Xlint:all,-options','-Werror','-d',str(classes),str(src)],check=True)
     produced=list(classes.rglob('*.class'))
