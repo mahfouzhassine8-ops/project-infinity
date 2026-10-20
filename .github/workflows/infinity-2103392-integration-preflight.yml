@@ -1,4 +1,4 @@
-name: Infinity 2103392 | Integration preflight (no APK build)
+name: Infinity 2103392 | Preflight and startup DEX (no APK build)
 on:
   push:
     branches: [work/infinity-2103391-pro-seven-group-audit-20261019]
@@ -7,6 +7,7 @@ on:
       - 'repairs/2103390-bugfixes/group7/finish92/integration.py'
       - 'repairs/2103390-bugfixes/group7/finish92/test_integration.py'
       - 'repairs/2103390-bugfixes/group7/finish92/preflight.py'
+      - 'repairs/2103390-bugfixes/group7/finish92/startup_dex.py'
   workflow_dispatch:
 permissions:
   contents: read
@@ -31,6 +32,10 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0 platforms;android-34'
+          log-accepted-android-sdk-licenses: false
       - uses: actions/download-artifact@v4
         with:
           run-id: 39348480827
@@ -43,7 +48,7 @@ jobs:
           name: Infinity-2103390-Exact-Nine-Combined-EXPERIMENTAL-NOT-FOLD-QUALIFIED
           github-token: '${{ github.token }}'
           path: audit-parent
-      - name: Prepare read-only bytecode inspection tools and disposable test directory
+      - name: Prepare fixed bytecode tools and disposable test directory
         run: |
           set -euo pipefail
           sudo install -d -o "$(id -u)" -g "$(id -g)" /mnt/data
@@ -54,6 +59,7 @@ jobs:
             <groupId>local.infinity.audit</groupId><artifactId>bytecode-inspection</artifactId><version>1</version>
             <dependencies>
               <dependency><groupId>org.smali</groupId><artifactId>baksmali</artifactId><version>2.5.2</version></dependency>
+              <dependency><groupId>org.smali</groupId><artifactId>smali</artifactId><version>2.5.2</version></dependency>
             </dependencies>
           </project>
           XML
@@ -65,13 +71,36 @@ jobs:
           set -euo pipefail
           python3 -m py_compile repairs/2103390-bugfixes/group7/finish92/integration.py \
             repairs/2103390-bugfixes/group7/finish92/test_integration.py \
-            repairs/2103390-bugfixes/group7/finish92/preflight.py
+            repairs/2103390-bugfixes/group7/finish92/preflight.py \
+            repairs/2103390-bugfixes/group7/finish92/startup_dex.py
           python3 repairs/2103390-bugfixes/group7/finish92/preflight.py
+          git diff --exit-code
+      - name: Compile reviewed Java verifier and integrate only its original DEX shard
+        run: |
+          set -euo pipefail
+          APK="$(find audit-original -name 'Infinity-2103391-All-In-One-Bugfix-EXPERIMENTAL.apk' -type f)"
+          python3 repairs/2103390-bugfixes/group7/finish92/startup_dex.py \
+            --apk "$APK" --stage coherent92-integration-inputs/source \
+            --out startup-dex-output \
+            --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" \
+            --build-tools "$ANDROID_HOME/build-tools/34.0.0" \
+            --classpath-file integration-tools-classpath.txt
           git diff --exit-code
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: Infinity-2103392-Integration-Preflight-Reports-NOT-APK
           path: integration-preflight-output/
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: Infinity-2103392-Verified-Startup-DEX-COMPONENT-NOT-INSTALLABLE
+          path: |
+            startup-dex-output/component/
+            startup-dex-output/STARTUP-DEX-INTEGRATION.json
+            startup-dex-output/*smali.txt
+            startup-dex-output/original-apk-badging.txt
           retention-days: 90
           if-no-files-found: error
