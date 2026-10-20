@@ -1,0 +1,77 @@
+name: Infinity 2103392 | Integration preflight (no APK build)
+on:
+  push:
+    branches: [work/infinity-2103391-pro-seven-group-audit-20261019]
+    paths:
+      - '.github/workflows/infinity-2103392-integration-preflight.yml'
+      - 'repairs/2103390-bugfixes/group7/finish92/integration.py'
+      - 'repairs/2103390-bugfixes/group7/finish92/test_integration.py'
+      - 'repairs/2103390-bugfixes/group7/finish92/preflight.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-2103392-integration-preflight
+  cancel-in-progress: false
+jobs:
+  source-and-bytecode-preflight:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          show-progress: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39348480827
+          name: Infinity-2103391-All-In-One-EXPERIMENTAL-NOT-FOLD-QUALIFIED
+          github-token: '${{ github.token }}'
+          path: audit-original
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39173982272
+          name: Infinity-2103390-Exact-Nine-Combined-EXPERIMENTAL-NOT-FOLD-QUALIFIED
+          github-token: '${{ github.token }}'
+          path: audit-parent
+      - name: Prepare read-only bytecode inspection tools and disposable test directory
+        run: |
+          set -euo pipefail
+          sudo install -d -o "$(id -u)" -g "$(id -g)" /mnt/data
+          mkdir -p integration-preflight-output integration-tools
+          cat > integration-tools/pom.xml <<'XML'
+          <project xmlns="http://maven.apache.org/POM/4.0.0">
+            <modelVersion>4.0.0</modelVersion>
+            <groupId>local.infinity.audit</groupId><artifactId>bytecode-inspection</artifactId><version>1</version>
+            <dependencies>
+              <dependency><groupId>org.smali</groupId><artifactId>baksmali</artifactId><version>2.5.2</version></dependency>
+            </dependencies>
+          </project>
+          XML
+          mvn -B -q -f integration-tools/pom.xml org.apache.maven.plugins:maven-dependency-plugin:3.6.1:build-classpath \
+            -Dmdep.outputFile="$GITHUB_WORKSPACE/integration-tools-classpath.txt"
+          test -s integration-tools-classpath.txt
+      - name: Check actual shipped startup bytecode, exact native fixtures and all host suites
+        run: |
+          set -euo pipefail
+          python3 -m py_compile repairs/2103390-bugfixes/group7/finish92/integration.py \
+            repairs/2103390-bugfixes/group7/finish92/test_integration.py \
+            repairs/2103390-bugfixes/group7/finish92/preflight.py
+          python3 repairs/2103390-bugfixes/group7/finish92/preflight.py
+          git diff --exit-code
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-2103392-Integration-Preflight-Reports-NOT-APK
+          path: integration-preflight-output/
+          retention-days: 90
+          if-no-files-found: error
