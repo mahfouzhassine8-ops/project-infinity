@@ -18,10 +18,6 @@ jobs:
         with: {persist-credentials: false}
       - uses: actions/setup-python@v5
         with: {python-version: '3.11'}
-      - uses: android-actions/setup-android@v4
-        with:
-          packages: 'platform-tools build-tools;34.0.0'
-          log-accepted-android-sdk-licenses: false
       - name: Require exact permanently signed green 2103391 producer
         env:
           GH_TOKEN: ${{ github.token }}
@@ -62,10 +58,10 @@ jobs:
           assert p['original_apk_sha256']=='778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb'
           print('Source signed 2103391 APK verified:',p['apk_sha256'])
           PY
-          APK="$(find signed-2103391-source -name 'Infinity-2103391-All-In-One-Bugfix-EXPERIMENTAL.apk' -type f)"
-          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs "$APK" > signed-apk-cert-proof.txt
-          grep -iq 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' signed-apk-cert-proof.txt
-          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging "$APK" | grep -F "package: name='com.projectinfinity.kodi' versionCode='2103391'"
+          # Full release signing and APK manifest were verified by the pinned,
+          # successful producer run 39348480827. This extraction also verifies
+          # the receipt's actual APK SHA and release signer identity.
+          # Do not invoke sdkmanager here: no Android build is being performed.
       - name: Export five self-contained Kodi install-over ZIPs from actual 2103391 APK
         run: |
           set -euo pipefail
