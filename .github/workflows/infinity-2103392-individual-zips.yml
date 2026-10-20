@@ -1,0 +1,87 @@
+name: Infinity 2103392 | Five individual install ZIP downloads
+on:
+  push:
+    branches: [work/infinity-2103392-individual-zips]
+    paths: ['.github/workflows/infinity-2103392-individual-zips.yml']
+  workflow_dispatch:
+permissions:
+  actions: read
+  contents: read
+jobs:
+  separate-verified-component-zips:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - name: Retrieve original signed 2103392 delivery artifact (do not rebuild)
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39396114522
+          name: Infinity-2103392-SIGNED-APK-AND-MATCHING-COMPONENTS-EXPERIMENTAL
+          github-token: ${{ github.token }}
+          path: original
+      - name: Verify original SHA256 receipts, ZIP integrity and exact component versions
+        shell: bash
+        run: |
+          set -euo pipefail
+          (cd original && sha256sum -c SHA256SUMS)
+          python3 - <<'PY'
+          import json, zipfile, pathlib
+          import xml.etree.ElementTree as ET
+          root=pathlib.Path('original')
+          receipt=json.loads((root/'INFINITY-2103392-DELIVERY.json').read_text())
+          assert receipt['version_code']==2103392 and receipt['signed_permanently'] is True
+          assert receipt['matching_zips_identical_to_apk'] is True
+          assert receipt['original_sigsegv_fixed'] is False and receipt['final_lock'] is False
+          expected={
+           'script.infinity.commandcenter':'0.3.5.22',
+           'script.infinity.watchedbridge':'1.0.3',
+           'script.infinity.uirepair':'0.1.4',
+           'script.infinity.rails':'0.2.7',
+           'skin.infinity.diggz':'1.0.5.229',
+          }
+          assert receipt['matching_component_versions']==expected, 'Wrong 2103392 component version set'
+          for addon,version in expected.items():
+           filename=f'{addon}-{version}.zip'
+           with zipfile.ZipFile(root/filename) as archive:
+            assert archive.testzip() is None, filename
+            name=f'{addon}/addon.xml'
+            assert name in archive.namelist(), filename
+            manifest=ET.fromstring(archive.read(name))
+            assert manifest.attrib.get('id')==addon and manifest.attrib.get('version')==version, filename
+            print('VERIFIED INDIVIDUAL INSTALL ZIP:',filename, 'size:', (root/filename).stat().st_size)
+          PY
+      - name: Command Center 0.3.5.22 individual ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-2103392-Command-Center-0.3.5.22
+          path: original/script.infinity.commandcenter-0.3.5.22.zip
+          if-no-files-found: error
+          compression-level: 0
+      - name: Watched Bridge 1.0.3 individual ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-2103392-Watched-Bridge-1.0.3
+          path: original/script.infinity.watchedbridge-1.0.3.zip
+          if-no-files-found: error
+          compression-level: 0
+      - name: UI Repair 0.1.4 individual ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-2103392-UI-Repair-0.1.4
+          path: original/script.infinity.uirepair-0.1.4.zip
+          if-no-files-found: error
+          compression-level: 0
+      - name: Rails 0.2.7 individual ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-2103392-Rails-0.2.7
+          path: original/script.infinity.rails-0.2.7.zip
+          if-no-files-found: error
+          compression-level: 0
+      - name: Infinity Skin 1.0.5.229 individual ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-2103392-Skin-1.0.5.229
+          path: original/skin.infinity.diggz-1.0.5.229.zip
+          if-no-files-found: error
+          compression-level: 0
