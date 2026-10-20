@@ -2,7 +2,7 @@
   "schema": 1,
   "record_type": "Infinity_2103390_postbase_exact_new_19_tasks",
   "timestamp_date": "2026-10-19",
-  "status": "GROUP7_EXPERIMENTAL_2103391_NATIVE_COMPILE_AND_SIGN_GITHUB_ACTIONS_STARTED_NO_APK_YET",
+  "status": "GROUP7_2103391_PERMANENTLY_SIGNED_NATIVE_CI_GREEN_PHYSICAL_FOLD_CLOSE_FAILED_TWO_SESSIONS_NATIVE_SIGSEGV_TOMBSTONE_ORIGINAL_CALLSITE_UNKNOWN",
   "repository": "mahfouzhassine8-ops/project-infinity",
   "branch": "work/infinity-2103390-targeted-bugfixes",
   "binding_contract": "repairs/2103390-bugfixes/REPAIR-CONTRACT-01-19.md",
@@ -818,13 +818,14 @@
       "original_subrequirements": [
         "15"
       ],
-      "status": "CRASH_RECORDER_FINGERPRINT_SOURCE_PATCH_10_OF_10_CI_HOST_PASS_SIGSEGV139_ROOT_CAUSE_UNPROVEN_NO_NATIVE_REBUILD",
+      "status": "FINGERPRINT_CORRECTION_BUILT_IN_2103391_ACTUAL_NATIVE_SIGSEGV_211029_OBSERVED_RETHROW_TOMBSTONE_ORIGINAL_CAUSE_UNPROVEN",
       "implementation_authorized": true,
       "savepoint": "cecb049cb66733deca395ddbd4a3713f01c92a17",
       "targeted_tests": "GITHUB_ACTIONS_39267576509_10_OF_10_HOST_PASS_AFTER_ELF_BSS_CORRECTION_PRIOR_RUN_39266729693_RED_ROOT_CAUSE_NOT_IDENTIFIED",
-      "fold": "NOT_VERIFIED",
+      "fold": "REAL_FOLD_NATIVE_CRASH_RECORDED_20261019_211029_PID25057_ORIGINAL_PRODUCER_NATIVE_BUILD_ID_UNPROVEN",
       "new_read_only_evidence_receipt": "repairs/2103390-bugfixes/receipts/CRASH139-FOLD-20261019-092026-READONLY.md",
-      "new_read_only_evidence_status": "2026-10-19_SIGNED_APK_2103390_SIGSEGV139_VIDEO_NAV_BUSY_STALE_RECORDER_NATIVE_HASH_CRASH_FUNCTION_NOT_SYMBOLIZED_NO_FIX"
+      "new_read_only_evidence_status": "2026-10-19_SIGNED_APK_2103390_SIGSEGV139_VIDEO_NAV_BUSY_STALE_RECORDER_NATIVE_HASH_CRASH_FUNCTION_NOT_SYMBOLIZED_NO_FIX",
+      "real_fold_diagnostic_receipt": "repairs/2103390-bugfixes/receipts/FOLD-2103391-DIAGNOSTICS-20261019-213206-READONLY.md"
     },
     "06": {
       "name": "SYSTEM HUB SILENT MODE ON/OFF — suppress unwanted Kodi/in-app notification banners/toasts",
@@ -842,11 +843,12 @@
       "original_subrequirements": [
         "18"
       ],
-      "status": "AUTHORIZED_EXPERIMENTAL_SIGNED_BUILD_RUNNING_SOURCE_MERGE_GREEN_NATIVE_COMPILATION_AND_FINAL_SIGN_PENDING",
+      "status": "EXPERIMENTAL_APK_2103391_NATIVE_COMPILED_AND_PERMANENTLY_SIGNED_CI_GREEN_REAL_FOLD_NORMAL_CLOSE_FAILURE_AND_NATIVE_CRASH_EVIDENCE_NO_LOCK",
       "implementation_authorized": true,
-      "savepoint": "2c49d1f16feb091538e2d6edf6ba0b1896629fcf",
-      "targeted_tests": "SOURCE_MERGE_GITHUB_ACTIONS_39344548533_PASS_125_ORIGINAL_XML_PY_FILES_AND_2_ADDITIONS;FULL_NATIVE_SIGNING_RUN_39344893535_QUEUED_OR_IN_PROGRESS",
-      "fold": "NOT_VERIFIED"
+      "savepoint": "7bd9b1085d598789e9e803b4b76ee1429e1df7e3",
+      "targeted_tests": "GITHUB_ACTIONS_39348480827_GREEN_NATIVE_ARM64_REBUILD_SIGNED_2103391_COMPILATION_SOURCE_SCOPE_PASS;FOLD_CAPTURE_20261019_213206_NORMAL_CLOSE_FAILED",
+      "fold": "REAL_FOLD_DIAGNOSTIC_RECEIVED_SHUTDOWN_FAILED_PIDS_9419_AND_18599_OTHER_APPROVED_UI_FUNCTIONS_UNVERIFIED",
+      "real_fold_diagnostic_receipt": "repairs/2103390-bugfixes/receipts/FOLD-2103391-DIAGNOSTICS-20261019-213206-READONLY.md"
     }
   },
   "group6_silent_mode": {
@@ -887,7 +889,7 @@
     "commit_every_green_milestone_and_group_before_advancing": true,
     "not_permission_to_build_or_edit_automatically": true
   },
-  "last_user_instruction": "All right, build the APK. After these approved new features, add nothing further and concentrate on bug fixes. Authorize Group7 experimental signed all-in-one build from exact protected 2103390; no final LOCK or SIGSEGV fix claims.",
+  "last_user_instruction": "User provided Infinity-Diagnostics-20261019-213206.zip after installing experimental 2103391 and matching ZIPs; inspect and preserve real Fold evidence, do not falsely report Fold green or modify Cobra/Essential-First.",
   "last_verified_group1_checkpoint": "f436c0e9f79066803f9dd98fa2c453dff7f32f82",
   "group_1_latest_receipts": [
     "repairs/2103390-bugfixes/receipts/GROUP01-TASK04-CLOCK-ORIGIN-TESTED-20261019.md",
@@ -1271,7 +1273,7 @@
     "actual_build": "NONE",
     "fold": "NOT_VERIFIED"
   },
-  "active_next_phase": "GROUP7_GITHUB_ACTIONS_NATIVE_REBUILD_AND_PERMANENT_EXPERIMENTAL_SIGNING_STARTED_TESTS_IN_PROGRESS",
+  "active_next_phase": "BUGFIX_ONLY_TARGETED_COMMAND_CENTER_RESIDENT_REGISTRATION_AND_NATIVE_DURABILITY_WRITERS_PLUS_SIGSEGV_DIAGNOSTIC_NO_FEATURES",
   "groups_456_readiness": {
     "verified_at": "2026-10-19",
     "parent_sha256": "778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb",
@@ -1287,13 +1289,16 @@
       "host_tests": "10/10",
       "collector_fingerprint_correction": "SOURCE_VERIFIED_PENDING_FINAL_ELF",
       "fatal_139_crash_function_identified": false,
-      "cause_based_fix": false
+      "cause_based_fix": false,
+      "root_cause_fix": false,
+      "built_recorder_fingerprint_correction": true,
+      "real_fold_SIGSEGV_original_faulting_function_proven": false
     },
     "group6": {
       "run": 39269926154,
       "host_tests": "10/10",
       "skin_modified_original_apk_members": 13,
-      "native_kaitoast_compiled": false,
+      "native_kaitoast_compiled": true,
       "physical_fold": false
     },
     "group1_group3_shared_ui_runtime": {
@@ -1304,14 +1309,16 @@
       "tests_commit": "7628081245ff165828a52c1432b4547a317bc773",
       "fold": false
     },
-    "combined_apk_built": false,
-    "full_android_native_compiled": false,
+    "combined_apk_built": true,
+    "full_android_native_compiled": true,
     "user_lock": false,
     "receipt": "repairs/2103390-bugfixes/receipts/GROUPS04-06-AND-ALL-IN-ONE-PREFLIGHT-20261019.md",
     "receipt_commit": "d7ba7752ccc202348ac77769972a94f249e39258",
-    "all_in_one_preflight": "SOURCE_STAGE_GATE_PASS_NATIVE_EXPERIMENTAL_APK_BUILD_RUNNING_FOLD_CRASH_GATES_STILL_OPEN"
+    "all_in_one_preflight": "SOURCE_BUILD_SIGN_GREEN_REAL_FOLD_SHUTDOWN_FAILED_SIGSEGV_CAUSE_OPEN",
+    "native_compile_and_signing_run": 39348480827,
+    "physical_fold_shutdown_pass": false
   },
-  "group_7_signed_apk_status": "NONE — conditional readiness gate not satisfied; do not synthesize APK or state user lock.",
+  "group_7_signed_apk_status": "GITHUB_ACTIONS_RUN_39348480827_GREEN_PERMANENTLY_SIGNED_2103391_SHA256_47609f2ada1d6bbc7cdbddb791d11815bdbf1100a083bd8205d60ac21c882151_EXPERIMENTAL_FOLD_SHUTDOWN_RED_NO_LOCK",
   "group_7_experimental_build": {
     "explicit_authorization": true,
     "version_code": 2103391,
@@ -1338,5 +1345,52 @@
     "group1_task19": "USER_DEFERRED_UNFIXED",
     "feature_freeze_after_this_apk": true,
     "future_scope": "BUGFIXES_STABILITY_REFINEMENT_ONLY_NO_MORE_FEATURES"
+  },
+  "postinstall_fold_2103391_20261019_213206": {
+    "diagnostic_zip_sha256": "5d8eeed7b0b4ca772d9d779a1ade65882f6279651b69293cdb723289187fdad9",
+    "reported_apk_version_code": 2103391,
+    "report_device": "SM-F976U1 Android17 API37",
+    "installed_skin": "skin.infinity.diggz 1.0.5.229",
+    "installed_command_center": "script.infinity.commandcenter 0.3.5.21",
+    "unobserved_matching_zip_activations": [
+      "script.infinity.uirepair",
+      "script.infinity.rails",
+      "script.infinity.watchedbridge"
+    ],
+    "earlier_close": {
+      "pid": 9419,
+      "epoch_ms": 1792459590074,
+      "error": "command_center: exactly_one_canonical_resident_required"
+    },
+    "latest_close": {
+      "pid": 18599,
+      "started_epoch_ms": 1792459890342,
+      "failed_epoch_ms": 1792459915460,
+      "duration_ms": 25145,
+      "error": "native_admission: checkpoint_deadline_exceeded; owner proof incomplete",
+      "normal_close_passed": false,
+      "process_death_confirmed": false,
+      "authorization_consumed": false,
+      "pvr_already_durable": true,
+      "essential_owner_blockers": 15,
+      "pending_python_writers": 5,
+      "command_center_participant": "legacy_or_unknown command_center_applied false"
+    },
+    "historical_native_crash": {
+      "pid": 25057,
+      "tid": 25119,
+      "epoch_ms": 1792458629820,
+      "signal": 11,
+      "tombstone_signal_code": "SI_TKILL/-6",
+      "top_native_frame": "libinfinitycrash.so restore_and_reraise+168",
+      "original_faulting_function_proven": false,
+      "producer_apk_version_proven": false
+    },
+    "group1_task19_still_deferred": true,
+    "cobra_changed": false,
+    "shutdown_architecture_changed": false,
+    "source_or_apk_modified_by_this_forensic_review": false,
+    "receipt": "repairs/2103390-bugfixes/receipts/FOLD-2103391-DIAGNOSTICS-20261019-213206-READONLY.md",
+    "receipt_commit": "ce88ad72354cbb1cdf71aee7b2094479b4396b17"
   }
 }
