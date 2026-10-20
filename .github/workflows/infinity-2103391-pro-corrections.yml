@@ -1,0 +1,136 @@
+name: Infinity 2103391 | Pro tested source corrections
+on:
+  push:
+    branches: [work/infinity-2103391-pro-seven-group-audit-20261019]
+    paths:
+      - '.github/workflows/infinity-2103391-pro-corrections.yml'
+      - 'audits/2103391-pro/apply_source_corrections.py'
+  workflow_dispatch:
+permissions: {contents: write, actions: read}
+concurrency: {group: infinity-2103391-pro-corrections, cancel-in-progress: false}
+jobs:
+  targeted-corrective-proof:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39348480827
+          name: Infinity-2103391-All-In-One-EXPERIMENTAL-NOT-FOLD-QUALIFIED
+          github-token: '${{ github.token }}'
+          path: audit-original
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39173982272
+          name: Infinity-2103390-Exact-Nine-Combined-EXPERIMENTAL-NOT-FOLD-QUALIFIED
+          github-token: '${{ github.token }}'
+          path: audit-parent
+      - name: Prepare verified original APK fixtures without changing payloads
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,os,zipfile
+          from pathlib import Path
+          wanted='778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb'
+          matches=[]
+          for p in Path('audit-parent').rglob('*'):
+              if not p.is_file():continue
+              if p.suffix=='.apk':
+                  data=p.read_bytes()
+                  if hashlib.sha256(data).hexdigest()==wanted:matches.append(data)
+              elif p.suffix=='.zip':
+                  with zipfile.ZipFile(p) as z:
+                      for n in z.namelist():
+                          if n.endswith('Infinity-2103390-Nine-Item-Integration-EXPERIMENTAL.apk'):
+                              data=z.read(n)
+                              if hashlib.sha256(data).hexdigest()==wanted:matches.append(data)
+          assert len(matches)==1
+          root=Path('/mnt/data');root.mkdir(exist_ok=True)
+          apk=root/'Infinity-2103390-Nine-Item-Integration-EXPERIMENTAL.apk';apk.write_bytes(matches[0])
+          outer=root/'Infinity-2103390-Combined-Build-Artifact.zip'
+          with zipfile.ZipFile(outer,'w',compression=zipfile.ZIP_STORED) as z:z.write(apk,apk.name)
+          with open(os.environ['GITHUB_ENV'],'a') as f:
+              f.write('INFINITY_2103390_APK='+str(apk)+'\nINFINITY_2103390_ARTIFACT_ZIP='+str(outer)+'\n')
+          PY
+      - name: Stage exact isolated native identity and exporter corrections
+        run: |
+          set -euo pipefail
+          python3 -m py_compile repairs/2103390-bugfixes/group7/release_coherence.py audits/2103391-pro/apply_source_corrections.py
+          python3 audits/2103391-pro/apply_source_corrections.py
+      - name: Require released-byte regressions and actual host C++ classifier to pass
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s repairs/2103390-bugfixes/group7 -p test_release_coherence.py -v 2>&1 | tee pro-correction-output/targeted-corrective-tests.log
+          ! grep -E 'skipped=|\.\.\. skipped ' pro-correction-output/targeted-corrective-tests.log
+      - name: Recheck all seven groups with available genuine fixtures and retain every limitation
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,re,subprocess
+          from pathlib import Path
+          out=Path('pro-correction-output');rows=[]
+          for group in range(1,8):
+              cmd=['python3','-m','unittest','discover','-s',f'repairs/2103390-bugfixes/group{group}','-p','test*.py','-v']
+              try:
+                  p=subprocess.run(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,timeout=300)
+                  code=p.returncode;text=p.stdout
+              except subprocess.TimeoutExpired as e:
+                  code=124;text=str(e.stdout or '')+'\nTEST TIMEOUT'
+              (out/f'group{group}-tests.log').write_text(text)
+              m=re.search(r'Ran (\d+) tests?',text);skip=re.search(r'skipped=(\d+)',text)
+              row=dict(group=group,exit_code=code,tests=int(m.group(1)) if m else None,skipped=int(skip.group(1)) if skip else 0,physical_fold_verified=False)
+              row['host_suite_fully_passed']=code==0 and row['skipped']==0 and row['tests'] is not None
+              rows.append(row)
+              print(f'=== GROUP {group} ===\n{text}',flush=True)
+          (out/'seven-group-host-status.json').write_text(json.dumps(rows,indent=2)+'\n')
+          print('These results do not grant a seven-group release pass.\n'+json.dumps(rows,indent=2))
+          PY
+      - name: Save only tested source corrections and explicit incomplete audit receipt
+        env:
+          SOURCE_BRANCH: work/infinity-2103391-pro-seven-group-audit-20261019
+        run: |
+          set -euo pipefail
+          test "$GITHUB_REF_NAME" = "$SOURCE_BRANCH"
+          python3 - <<'PY'
+          import json,os,subprocess
+          from pathlib import Path
+          allowed={
+            'repairs/android-checkpoint-shutdown/runtime/native/overlay/xbmc/platform/android/activity/InfinityScriptCheckpointContracts.cpp',
+            'repairs/2103390-bugfixes/group7/export_matched_addons.py',
+            'repairs/2103390-bugfixes/group2/test_native_addonbrowser_patch.py',
+            'audits/2103391-pro/inspect_release.py',
+          }
+          changed=set(subprocess.check_output(['git','diff','--name-only'],text=True).splitlines())
+          assert changed==allowed,(changed,allowed)
+          out=Path('pro-correction-output')
+          target=Path('audits/2103391-pro/verified-source-checkpoint');target.mkdir(parents=True,exist_ok=True)
+          for name in ('source-correction-scope.json','old-apk-controller-report.json','seven-group-host-status.json','targeted-corrective-tests.log','fixture-requirements.txt'):
+              (target/name).write_bytes((out/name).read_bytes())
+          report={'source_input_commit':os.environ['GITHUB_SHA'],'run_id':os.environ['GITHUB_RUN_ID'],'state':'TARGETED_SOURCE_CORRECTIONS_VERIFIED_FULL_PROJECT_NOT_COMPLETE',
+                  'targeted_tests':12,'targeted_host_cpp_classifier_compiled_and_executed':True,
+                  'android_engine_rebuilt':False,'new_signed_apk':False,'physical_fold_pass':False,
+                  'final_lock':False,'old_signed_apk_unchanged':True,
+                  'original_release_coherence':'FAIL','all_seven_groups_retained':True,
+                  'open':['Installed CC21 duplicate-owner recovery','Full native source-ledger and Android rebuild qualification','Native SIGSEGV/139 cause','Group1 task19','All required Fold visual/input/playback/shutdown gates']}
+          (target/'STATUS.json').write_text(json.dumps(report,indent=2)+'\n')
+          subprocess.run(['git','add','--',*sorted(allowed),str(target)],check=True)
+          staged=set(subprocess.check_output(['git','diff','--cached','--name-only'],text=True).splitlines())
+          assert all(p in allowed or p.startswith(str(target)+'/') for p in staged)
+          subprocess.run(['git','diff','--cached','--check'],check=True)
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'fix(group7): save verified exact native-controller identities and fail-closed ZIP export; no APK or Fold pass'
+          git push origin "HEAD:refs/heads/$SOURCE_BRANCH"
+          git rev-parse HEAD | tee pro-correction-output/SAVED-COMMIT.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-2103391-Pro-Corrective-Source-Tests
+          path: pro-correction-output/
+          retention-days: 90
+          if-no-files-found: error
