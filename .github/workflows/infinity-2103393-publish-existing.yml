@@ -1,0 +1,148 @@
+name: Infinity 2103393 | Publish existing verified signed binaries
+on:
+  push:
+    branches: [work/infinity-2103393-build-control]
+    paths: ['.github/workflows/infinity-2103393-publish-existing.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: infinity-2103393-publish-existing
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+      BUILD_COMMIT: 2a9b6ae6bd0556b2f7b13a786a6382850b05cd83
+      BUILD_RUN: '39483588212'
+      DELIVERY_TAG: infinity-2103393-binaries-39483588212
+    steps:
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39483588212
+          name: Infinity-2103393-SIGNED-APK-AND-MATCHING-COMPONENTS-EXPERIMENTAL
+          github-token: ${{ github.token }}
+          path: delivery
+      - name: Verify the existing signed files without rebuilding or resigning
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json,os,subprocess
+          from pathlib import Path
+          from zipfile import ZipFile
+          root=Path('delivery').resolve()
+          def digest(path):
+              with path.open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
+          hashes={}
+          for line in (root/'SHA256SUMS').read_text().splitlines():
+              h,n=line.split('  ',1)
+              assert '/' not in n and n not in hashes
+              assert digest(root/n)==h,n
+              hashes[n]=h
+          apk=root/'Infinity-2103393-Fold-Corrective-EXPERIMENTAL.apk'
+          assert digest(apk)=='0326782173ef609d0f55284245ce00f55a8a78d73b3d2acf5928950bd4af068e'
+          r=json.loads((root/'INFINITY-2103393-DELIVERY.json').read_text())
+          assert r['source_commit']==os.environ['BUILD_COMMIT'] and r['version_code']==2103393
+          assert r['apk_sha256']==digest(apk) and r['signed_permanently'] and r['complete_native_engine_compiled']
+          assert r['native_source_files_verified']==9404 and r['protected_native_source_files']==9399
+          assert r['cobra_members_and_instructions_byte_identical'] and not r['essential_first_guards_weakened']
+          assert r['android_art_verifier_cases_passed']==37 and r['matching_zips_identical_to_apk']
+          assert not r['physical_fold_verified'] and not r['original_sigsegv_fixed'] and not r['final_lock']
+          cert='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
+          assert r['permanent_certificate_sha256']==cert
+          tools=Path(os.environ['ANDROID_HOME'])/'build-tools/34.0.0'
+          signature=subprocess.check_output([str(tools/'apksigner'),'verify','--verbose','--print-certs',str(apk)],text=True)
+          for v in ('v1 scheme (JAR signing)','v2 scheme (APK Signature Scheme v2)','v3 scheme (APK Signature Scheme v3)'):
+              assert 'Verified using '+v+': true' in signature
+          assert 'Signer #1 certificate SHA-256 digest: '+cert in signature
+          subprocess.run([str(tools/'zipalign'),'-c','-p','4',str(apk)],check=True)
+          badging=subprocess.check_output([str(tools/'aapt'),'dump','badging',str(apk)],text=True)
+          assert "package: name='com.projectinfinity.kodi' versionCode='2103393'" in badging
+          assert 'application-debuggable' not in badging
+          index=json.loads((root/'COMPONENTS.json').read_text())
+          versions={'script.infinity.commandcenter':'0.3.5.23','script.infinity.watchedbridge':'1.0.4',
+                    'script.infinity.uirepair':'0.1.5','skin.infinity.diggz':'1.0.5.230','script.infinity.rails':'0.2.7'}
+          assert set(index)==set(versions)
+          with ZipFile(apk) as package:
+              for addon,version in versions.items():
+                  item=index[addon];assert item['version']==version
+                  assert item['sha256']==digest(root/item['file'])
+                  with ZipFile(root/item['file']) as component:
+                      assert len(component.namelist())==len(set(component.namelist()))
+                      expected={n[len('assets/addons/'):] for n in package.namelist()
+                                if n.startswith('assets/addons/'+addon+'/') and not n.endswith('/')}
+                      assert set(component.namelist())==expected
+                      assert all(component.read(n)==package.read('assets/addons/'+n) for n in expected)
+          print(json.dumps({'all_recorded_hashes_verified':len(hashes),'same_permanent_certificate':True,
+                            'matching_components':versions,'rebuilt':False,'resigned':False},indent=2))
+          PY
+      - name: Publish individual binaries with explicit actual-build provenance
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import base64,hashlib,json,os,subprocess
+          from pathlib import Path
+          repo=os.environ['GITHUB_REPOSITORY'];build=os.environ['BUILD_COMMIT'];tag=os.environ['DELIVERY_TAG']
+          def api(path):return json.loads(subprocess.check_output(['gh','api',path],text=True))
+          default=api('repos/'+repo)['default_branch']
+          anchor=api('repos/'+repo+'/branches/'+default)['commit']['sha']
+          # GitHub permits a contents-only token to create a delivery tag here:
+          # its target is the unchanged default branch, with no workflow changes.
+          # The tag is explicitly a binary delivery anchor, not the build source.
+          proof={'schema':1,'build_source_commit':build,'build_run_id':int(os.environ['BUILD_RUN']),
+                 'binary_delivery_tag':tag,'delivery_tag_anchor':anchor,'default_branch':default,
+                 'repository_files_modified_for_publication':False,'binary_files_rebuilt_or_resigned':False,
+                 'apk_sha256':'0326782173ef609d0f55284245ce00f55a8a78d73b3d2acf5928950bd4af068e'}
+          Path('PUBLISHER-PROOF.json').write_text(json.dumps(proof,indent=2,sort_keys=True)+'\n')
+          note=api('repos/'+repo+'/contents/repairs/fold-corrective-2103393/RELEASE-NOTES.md?ref='+build)
+          body=base64.b64decode(note['content']).decode()
+          body+='\n\nVerified build source: ['+build+'](https://github.com/'+repo+'/tree/'+build+'). '
+          body+='Build and signing: [run '+os.environ['BUILD_RUN']+'](https://github.com/'+repo+'/actions/runs/'+os.environ['BUILD_RUN']+').\n\n'
+          body+='This is a binary-delivery tag anchored to the unchanged default branch. '
+          body+='For the actual candidate source, use the verified build commit above and the source_commit in INFINITY-2103393-DELIVERY.json; '
+          body+='the automatically generated Source code archives on this delivery tag are not the candidate build source.\n'
+          Path('release-notes.txt').write_text(body)
+          names=['Infinity-2103393-Fold-Corrective-EXPERIMENTAL.apk',
+                 'script.infinity.commandcenter-0.3.5.23.zip','script.infinity.watchedbridge-1.0.4.zip',
+                 'script.infinity.uirepair-0.1.5.zip','skin.infinity.diggz-1.0.5.230.zip','script.infinity.rails-0.2.7.zip',
+                 'INSTALLATION.txt','SHA256SUMS','COMPONENTS.json','INFINITY-2103393-DELIVERY.json',
+                 'FINAL-SIGNATURE.txt','CORRECTIVE-ACCEPTANCE.md']
+          subprocess.run(['gh','release','create',tag,'--repo',repo,'--target',anchor,'--prerelease',
+                          '--title','Infinity 2103393 - Signed Fold corrective experimental candidate',
+                          '--notes-file','release-notes.txt',*[str(Path('delivery')/n) for n in names],
+                          'PUBLISHER-PROOF.json'],check=True)
+          release=api('repos/'+repo+'/releases/tags/'+tag)
+          assert release['prerelease'] and not release['draft']
+          assets={a['name']:a for a in release['assets']}
+          assert set(assets)==set(names)|{'PUBLISHER-PROOF.json'}
+          for name in names+['PUBLISHER-PROOF.json']:
+              path=Path('delivery')/name if name in names else Path(name)
+              with path.open('rb') as f:h=hashlib.file_digest(f,'sha256').hexdigest()
+              assert assets[name]['size']==path.stat().st_size
+              assert assets[name]['digest']=='sha256:'+h,name
+          proof.update(release_url=release['html_url'],all_uploaded_asset_sizes_and_hashes_verified=True)
+          Path('PUBLISHER-RESULT.json').write_text(json.dumps(proof,indent=2,sort_keys=True)+'\n')
+          with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as f:f.write('Verified individual APK and ZIP downloads: '+release['html_url']+'\n')
+          print(json.dumps(proof,indent=2,sort_keys=True))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-2103393-Existing-Binaries-Publication
+          path: |
+            PUBLISHER-PROOF.json
+            PUBLISHER-RESULT.json
+            release-notes.txt
+          retention-days: 90
+          if-no-files-found: warn
