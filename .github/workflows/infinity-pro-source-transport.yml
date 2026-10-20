@@ -1,0 +1,31 @@
+name: Infinity Pro | Exact source transport
+on:
+  push:
+    branches: [work/infinity-2103391-pro-seven-group-audit-20261019]
+    paths: ['.github/workflows/infinity-pro-source-transport.yml']
+  workflow_dispatch:
+permissions: {contents: read, actions: read}
+jobs:
+  source-transport:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false}
+      - name: Archive immutable source and matching upstream test inputs
+        run: |
+          set -euo pipefail
+          mkdir -p transport
+          git bundle create transport/pro-history.bundle "$GITHUB_REF_NAME"
+          git rev-parse HEAD > transport/HEAD.txt
+          # Exact upstream revision used by the prior native source producer is
+          # resolved from its checked-in scripts, not an assumed latest nightly.
+          grep -R -n -E 'Omega|UPSTREAM|KODI_COMMIT|KODI_REF|SOURCE_COMMIT|github.com/xbmc' repairs/*/native_ci.py repairs/*/*native_ci.py repairs/*/*.py | head -160 > transport/native-source-locators.txt || true
+          (cd transport && sha256sum pro-history.bundle > SHA256SUMS)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-Pro-Exact-Source-Bundle
+          path: transport/
+          retention-days: 90
+          compression-level: 0
+          if-no-files-found: error
