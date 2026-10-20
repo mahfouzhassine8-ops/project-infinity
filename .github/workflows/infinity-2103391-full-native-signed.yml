@@ -4,6 +4,7 @@ on:
     branches: [work/infinity-2103390-targeted-bugfixes]
     paths:
       - 'repairs/2103390-bugfixes/group7/**'
+      - 'repairs/2103390-bugfixes/group2/native_addonbrowser_patch.py'
       - '.github/workflows/infinity-2103391-full-native-signed.yml'
   workflow_dispatch:
 permissions: {contents: read, actions: read}
