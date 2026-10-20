@@ -1,0 +1,83 @@
+name: Infinity 2103392 | Retrieve original signed APK for direct handoff
+on:
+  push:
+    branches: [work/infinity-2103392-apk-download-chunks]
+    paths: ['.github/workflows/infinity-2103392-standalone-extract.yml']
+  workflow_dispatch:
+permissions:
+  actions: read
+  contents: read
+jobs:
+  extract-standalone-verified-apk:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    steps:
+      - name: Read successful 2103392 signed delivery artifact, no rebuild
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39396114522
+          name: Infinity-2103392-SIGNED-APK-AND-MATCHING-COMPONENTS-EXPERIMENTAL
+          github-token: ${{ github.token }}
+          path: original
+      - name: SHA256 verify original package and partition the identical APK for transfer
+        shell: bash
+        run: |
+          set -euo pipefail
+          (cd original && sha256sum -c SHA256SUMS)
+          python3 - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          d=json.loads(Path('original/INFINITY-2103392-DELIVERY.json').read_text())
+          src=Path('original/Infinity-2103392-Coherent-Integration-EXPERIMENTAL.apk')
+          digest='d4ae792898b26bbea47b97310244b31304f972f062e692c1562edef3ac0bbd58'
+          assert d['apk_sha256']==digest
+          assert d['version_code']==2103392
+          assert d['signed_permanently'] is True
+          assert d['complete_native_engine_compiled'] is True
+          assert d['final_lock'] is False
+          assert d['physical_fold_verified'] is False
+          assert d['original_sigsegv_fixed'] is False
+          h=hashlib.sha256()
+          with src.open('rb') as f:
+           while b:=f.read(8*1024*1024): h.update(b)
+          assert h.hexdigest()==digest
+          length=src.stat().st_size
+          chunk=(length+2)//3
+          assert chunk<500*1024*1024, 'Unexpectedly large APK; reconfigure transport before publishing'
+          Path('parts').mkdir()
+          with src.open('rb') as inp:
+           for i in range(3):
+            p=Path('parts')/f'infinity-2103392-apk-part-{i+1}-of-3.bin'
+            remaining=min(chunk,length-i*chunk)
+            assert remaining>0
+            with p.open('wb') as out:
+             while remaining:
+              b=inp.read(min(8*1024*1024,remaining))
+              assert b
+              out.write(b)
+              remaining-=len(b)
+            print('VERIFIED ORIGINAL APK TRANSFER PART',i+1,p.stat().st_size)
+           assert inp.read(1)==b''
+          print('EXPECTED ASSEMBLED APK SHA256',digest,'SIZE',length)
+          PY
+      - name: Upload verified APK transfer part 1
+        uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-2103392-APK-ORIGINAL-PART-1-of-3
+          path: parts/infinity-2103392-apk-part-1-of-3.bin
+          if-no-files-found: error
+          compression-level: 0
+      - name: Upload verified APK transfer part 2
+        uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-2103392-APK-ORIGINAL-PART-2-of-3
+          path: parts/infinity-2103392-apk-part-2-of-3.bin
+          if-no-files-found: error
+          compression-level: 0
+      - name: Upload verified APK transfer part 3
+        uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-2103392-APK-ORIGINAL-PART-3-of-3
+          path: parts/infinity-2103392-apk-part-3-of-3.bin
+          if-no-files-found: error
+          compression-level: 0
