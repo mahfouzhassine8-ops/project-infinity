@@ -1,5 +1,20 @@
 # CURRENT PRIMARY HANDOFF — SEVEN WORK GROUPS, GROUP #6 SILENT MODE
 
+
+## GROUP7 2103391 EXPERIMENTAL BUILD — USER AUTHORIZED, FEATURE FREEZE
+
+User explicitly requested: "All right, build the APK" and "Yeah, after these new features, there's going to be nothing to add. So we'll work on bug fixes." Group #7 now permits a **properly permanently signed experimental install-over** build only, not a release LOCK.
+
+- Protected **signed 2103390 SHA256 778b84a5f0d8712f250c538bacfa3c01e1352a936e0b7b9aa79cbaada9b22dbb** is immutable. User data, Cobra, Essential-First, add-ons and all unrelated behavior must be preserved. Zero new features after this approved change set; only bug fixes/stability/refinement thereafter.
+- Exact source merger: \`repairs/2103390-bugfixes/group7/stage_all_in_one.py\`; GitHub source gate **39344548533 succeeded**, exact **125 original skin/first-party members modified**, **2 Option B first-party files added**, no third-party/new runtime services. G1 Home/Resume, G2 browser, G3 popup/native hold, G4 player glass, G5 collector fingerprint (NOT crash fix), G6 System Hub Silent Mode. Group1 task19 deferred/unfixed, Group5 SIGSEGV/139 real cause unknown; these are explicitly tagged in the receipt.
+- Eight scoped compiled native source files: \`group7/native_merge.py\`, original verified 2103384/2103385 source reconstruction and full prior compiler manifest retained. Group2 browser confirmation repaired to use Kodi-supported four-variant \`CGUIDialogYesNo::ShowAndGetInput\` overload, before compiling.
+- Package/sign script \`repairs/2103390-bugfixes/group7/sign_all_in_one.py\`, exact original signed SHA checked, requires genuinely **new** compiled Android ARM64 \`libkodi.so\` and matching proof; adds new 2103391 binary manifest version and crash-recorder actual SHA; strict 128 original modified including native/crash/manifest + 2 added; original v1/v2/v3 permanent signing certificate; unsigned/test identity forbidden.
+- Full pipeline \`.github/workflows/infinity-2103391-full-native-signed.yml\`: initial config run 39344785144 failed YAML; source gate passed and native run 39344893535 failed BEFORE source reconstruction at an unchanged interpreter-retirement host test under accidental hosted Python3.11.17. Corrected native compiler to proven Ubuntu22 system Python as historical green producer, without suppressing the test. **Current active run 39345352107**, source gate GREEN; actual complete native compilation/signing separate jobs. This is an *in-progress experimental build attempt*, not an APK.
+- Planned artifact filename: \`Infinity-2103391-All-In-One-Bugfix-EXPERIMENTAL.apk\`, versionCode 2103391, versionName \`1.0.9-All-In-One-Bugfix-TEST0001\`. User Fold physical acceptance and explicit "LOCK" still required. Native crash139 remains unproven even if signed output exists.
+- This handoff/documentation is not itself part of the APK. Never claim experimental candidate created, signed, or Fold-approved unless GitHub Actions signed job actually completes with verified receipt.
+
+---
+
 ## OCT 19 ALL-IN-ONE READINESS GATE — SOURCE GREEN, ANDROID/FOLD/CRASH OPEN
 
 **User:** “All right, so if everything's complete, it's time to go to all-in-one phase.” The condition **IS NOT MET**. We have saved a source-stage audit, not compiled/signed a candidate or called a final lock. User's earlier directive requires full byte-preservation of Cobra and all unapproved Infinity behavior; do not mistake successful Python host fixtures for actual APK installation.
