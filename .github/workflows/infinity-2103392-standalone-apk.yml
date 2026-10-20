@@ -1,0 +1,66 @@
+name: Infinity 2103392 | Direct standalone signed APK download
+on:
+  push:
+    branches: [work/infinity-2103392-standalone-apk-delivery]
+    paths: ['.github/workflows/infinity-2103392-standalone-apk.yml']
+  workflow_dispatch:
+permissions:
+  actions: read
+  contents: write
+jobs:
+  publish-verified-standalone-apk:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    steps:
+      - name: Retrieve the original already-passed signed 2103392 build, no rebuilding
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39396114522
+          name: Infinity-2103392-SIGNED-APK-AND-MATCHING-COMPONENTS-EXPERIMENTAL
+          github-token: ${{ github.token }}
+          path: original
+      - name: Check original receipt SHA256 and exact permanent signed APK bytes
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd original
+          sha256sum -c SHA256SUMS
+          test -f Infinity-2103392-Coherent-Integration-EXPERIMENTAL.apk
+          printf '%s  %s\n' 'd4ae792898b26bbea47b97310244b31304f972f062e692c1562edef3ac0bbd58' 'Infinity-2103392-Coherent-Integration-EXPERIMENTAL.apk' | sha256sum -c -
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('INFINITY-2103392-DELIVERY.json').read_text())
+          assert d['version_code']==2103392
+          assert d['complete_native_engine_compiled'] is True
+          assert d['signed_permanently'] is True
+          assert d['install_over_package_and_signing_compatible'] is True
+          assert d['apk_sha256']=='d4ae792898b26bbea47b97310244b31304f972f062e692c1562edef3ac0bbd58'
+          assert d['original_sigsegv_fixed'] is False
+          assert d['physical_fold_verified'] is False
+          assert d['final_lock'] is False
+          print('Signed verified 2103392 APK confirmed; experimental only')
+          PY
+      - name: Publish unchanged original signed APK as a standalone GitHub prerelease download
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          TAG: infinity-2103392-standalone-experimental
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > notes.txt <<'EOF'
+          **Experimental signed Infinity 2103392 APK — not a final LOCK.**
+          
+          This is the identical permanently signed APK from successful GitHub Actions run #39396114522, SHA256 `d4ae792898b26bbea47b97310244b31304f972f062e692c1562edef3ac0bbd58`. No rebuilding, repackaging, or resigning.
+          
+          Download the .apk file directly and save it. On the Samsung Fold, install it **over the existing Infinity** without uninstalling or clearing data. Preserve Cobra and Essential-First data.
+          
+          This experimental APK still requires physical Fold acceptance, Close/reopen tests, and investigation of the unresolved original SIGSEGV. Do not mark it a final locked release.
+          EOF
+          gh release create "$TAG" original/Infinity-2103392-Coherent-Integration-EXPERIMENTAL.apk \
+            --target "$GITHUB_SHA" \
+            --title 'Infinity 2103392 — Permanently Signed APK (Experimental)' \
+            --notes-file notes.txt \
+            --prerelease --latest=false
+          gh release view "$TAG" --json tagName,isPrerelease,assets,url
