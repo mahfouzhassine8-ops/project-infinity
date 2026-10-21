@@ -41,6 +41,12 @@ MODAL_DETAILS_NEW=b'''                finally:
                     details_id=getattr(details,'modal_id',0)
                     details.close();del details
                 _wait_for_option_b_close(xbmc,xbmcgui,details_id,self.modal_id)'''
+INFO_OLD=b"                extra = ' \xe2\x80\xa2 '.join(v for v in (snapshot.release_date, snapshot.credits) if v)"
+INFO_NEW=b'''                extra = '\\n'.join(label+': '+value for label,value in (
+                    ('Year / episode', props['YearAndEpisode']), ('Release date', snapshot.release_date),
+                    ('Rating', props['Rating']), ('Certification', snapshot.certification),
+                    ('Genres', snapshot.genres), ('Runtime', props['Runtime']),
+                    ('Credits', snapshot.credits)) if value)'''
 
 
 def popup(raw):
@@ -109,13 +115,14 @@ def runtime(raw):
     guarded=b'    return bool(choice and _wait_for_option_b_close(xbmc,xbmcgui,modal_id) and\n                _perform(xbmc,xbmcgui,snapshot,choice,native))'
     result=c.once(result,dispatch,guarded)
     result=c.once(result,MODAL_DETAILS_OLD,MODAL_DETAILS_NEW)
+    result=c.once(result,INFO_OLD,INFO_NEW)
     after=ast.parse(result)
     # Every capture/validation/action function is byte-for-byte AST equivalent.
     b={n.name:ast.dump(n) for n in before.body if isinstance(n,(ast.FunctionDef,ast.ClassDef))}
     a={n.name:ast.dump(n) for n in after.body if isinstance(n,(ast.FunctionDef,ast.ClassDef))}
     for name in b:
         if name!='_show_verified_hold':c.require(a[name]==b[name],'nonpresentation function changed '+name)
-    restored=result.replace(code,old,1).replace(MODAL_BARRIER+anchor,anchor,1).replace(observed,closed,1).replace(guarded,dispatch,1).replace(MODAL_DETAILS_NEW,MODAL_DETAILS_OLD,1)
+    restored=result.replace(code,old,1).replace(MODAL_BARRIER+anchor,anchor,1).replace(observed,closed,1).replace(guarded,dispatch,1).replace(MODAL_DETAILS_NEW,MODAL_DETAILS_OLD,1).replace(INFO_NEW,INFO_OLD,1)
     c.require(restored==raw,'unexpected runtime edit outside presentation/close barrier')
     return result
 

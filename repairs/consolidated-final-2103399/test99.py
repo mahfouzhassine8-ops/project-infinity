@@ -81,6 +81,10 @@ class Final99(unittest.TestCase):
   self.assertEqual(a,self.after[f.c.SKIN+'/unified/InfinityHomeOptionB.xml'])
   root=ET.fromstring(a)
   self.assertEqual(root.findtext('.//control[@id="126"]/pagecontrol'),'128')
+  code=self.after[f.c.UI+'/home_option_b.py']
+  self.assertIn(f.INFO_NEW,code)
+  for name in (b'snapshot.release_date',b'snapshot.certification',b'snapshot.genres',b'snapshot.credits'):
+   self.assertIn(name,f.INFO_NEW)
   ids=[n.get('id') for n in root.iter('control') if n.get('id')]
   self.assertEqual(len(ids),len(set(ids)))
   for n,b in self.before.items():
