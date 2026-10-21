@@ -101,6 +101,11 @@ class Touch(unittest.TestCase):
   root=Path(os.environ['INFINITY_2103393_NATIVE'])
   paths=(input94.CONTAINER,input94.HEADER,input94.INPUT,input94.GUIWINDOW,input94.LABEL)
   before={n:(root/n).read_bytes() for n in paths};after=input94.patches(before)
+  import re
+  for name in paths:
+   old=set(re.findall(rb'(?m)^#include "([^"]+)"',before[name]))
+   new=set(re.findall(rb'(?m)^#include "([^"]+)"',after[name]))
+   for header in new-old:self.assertTrue((root/'xbmc'/header.decode()).is_file(),header)
   s=after[input94.INPUT]
   self.assertLess(s.index(b'OnInfinityRailLongPress'),s.index(b'OnInfinityMediaTouch'))
   self.assertLess(s.index(b'OnInfinityOptionBLongPress'),s.index(b'OnInfinityMediaTouch'))

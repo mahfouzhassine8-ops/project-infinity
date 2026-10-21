@@ -37,7 +37,7 @@ def window_language_hook(raw):
     """
     raw = once(raw, b'#include "Window.h"',
                b'#include "Window.h"\n#if defined(TARGET_ANDROID)\n'
-               b'#include "interfaces/legacy/ModuleXbmc.h"\n#endif')
+               b'#include "interfaces/legacy/ModuleXbmc.h"\n#include <memory>\n#endif')
     old = b'''    Control* Window::getControl(int iControlId)
     {
       XBMC_TRACE;

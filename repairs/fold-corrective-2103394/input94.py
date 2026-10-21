@@ -157,7 +157,7 @@ def patches(before):
   std::chrono::steady_clock::time_point m_infinityMediaSuppressUntil{};''')
     out[HEADER]=raw
     raw=out[CONTAINER]
-    raw=once(raw,b'#include "FileItem.h"',b'#include "FileItem.h"\n#include "FileItemList.h"\n#include "video/VideoInfoTag.h"\n#include "windows/GUIMediaWindow.h"')
+    raw=once(raw,b'#include "FileItem.h"',b'#include "FileItem.h"\n#include "video/VideoInfoTag.h"\n#include "windows/GUIMediaWindow.h"')
     raw=once(raw,b'bool CGUIBaseContainer::OnInfinityUiTouch(',METHOD.encode()+b'\nbool CGUIBaseContainer::OnInfinityUiTouch(')
     start=raw.index(b'bool CGUIBaseContainer::OnInfinityOptionBLongPress(')
     end=raw.index(b'bool CGUIBaseContainer::OnInfinityRailLongPress(',start)
