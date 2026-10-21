@@ -9,6 +9,7 @@ import org.json.*;
 
 /** Explicit export only. Distinguishes disk candidates from Kodi-resolved paths. */
 final class InfinityEvidence95 {
+  @SuppressWarnings("deprecation") // Retain the package API available to the original app.
   static void append(Context context,JSONObject report) {
     try {
       JSONObject details=new JSONObject();report.put("corrective_2103395",details);

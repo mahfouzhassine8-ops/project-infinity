@@ -12,8 +12,10 @@ def collect():
    addon=xbmcaddon.Addon(aid);raw_root=addon.getAddonInfo('path');root=Path(xbmcvfs.translatePath(raw_root))
    row.update(version=addon.getAddonInfo('version'),resolved_directory=raw_root,enabled=xbmc.getCondVisibility('System.AddonIsEnabled('+aid+')'),files={},state='OBSERVED')
    names={'addon.xml'}
-   if aid=='script.infinity.commandcenter':names.update(json.loads((root.parent/'script.infinity.uirepair/CONTROLLER-PREIMAGES.json').read_text()))
+   if aid=='script.infinity.commandcenter':names.update(('addon.xml', 'checkpoint_runtime.py', 'common.py', 'context.py', 'default.py', 'experience.py', 'infinity_search.py', 'infinity_settings.py', 'infinity_trakt.py', 'persistence_participant.py', 'plugin.py', 'resources/settings.xml', 'resume_hub.py', 'runtime_visibility.py', 'service.py', 'skin_upgrade.py', 'view_mode.py'))
    if aid=='script.infinity.uirepair':names.update(('home_option_b.py','runtime.py','controller_access.py','CONTROLLER-PREIMAGES.json','resources/skins/Default/1080i/InfinityHomeOptionB.xml'))
+   if aid=='script.kodihealthcenter':names.update(('default.py','service.py','khc_lifecycle.py','khc_diagnostics.py','infinity_runtime_identity.py'))
+   if aid=='script.infinity.rails':names.update(('default.py','service.py','addon.xml'))
    if aid=='script.infinity.watchedbridge':names.update(('controller.py','CONTROLLER-PREIMAGES.json'))
    if aid=='skin.infinity.diggz':names.update(('unified/Home.xml','Infinity-Protected-Manifest.json','infinity-skin.json'))
    if aid=='service.infinity.compat':names.update(('runtime_service.py','compat_runtime.py','checkpoint_runtime.py','resources/settings.xml'))

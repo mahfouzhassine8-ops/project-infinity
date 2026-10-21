@@ -70,6 +70,11 @@ class Corrective(unittest.TestCase):
   block=after[n.CONTAINER].split(b'bool CGUIBaseContainer::OnInfinityOptionBLongPress(')[1].split(b'bool CGUIBaseContainer::OnInfinityRailLongPress(')[0]
   for cid in (8101,8102,8801,8802):self.assertIn(str(cid).encode(),block)
   for cid in (8601,8602,8701,8702):self.assertNotIn(str(cid).encode(),block)
+  for source_path in (n.CONTAINER,n.INPUT):
+   for line in after[source_path].splitlines():
+    if b'CLog::Log' in line and b'[InfinityTouch]' in line:
+     self.assertNotIn(bytes((92,92,34)),line,'double escaping invalidates C++ literal')
+     self.assertIn(bytes((92,34)),line,'JSON quotes must remain C++ escaped')
   self.assertIn(b'InfinityScriptPersistence::Fail(context->id,"unclassified_native_persistence_operation",event)',after[n.AUDIT])
   _,r,_=n.old_adapters();hashes={k:c.sha(v) for k,v in self.after.items()}
   for endpoint in (*r.coherence.ENDPOINTS,'default.py'):

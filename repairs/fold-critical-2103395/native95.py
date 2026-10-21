@@ -19,7 +19,7 @@ def patches(before,original,final):
  require(set(before)==PATHS,'native95 scope differs');out=dict(before)
  raw=out[CONTAINER];start=raw.index(b'bool CGUIBaseContainer::OnInfinityOptionBLongPress(');end=raw.index(b'bool CGUIBaseContainer::OnInfinityRailLongPress(',start);body=raw[start:end]
  body=once(body,b'(GetID() != 8101 && GetID() != 8102 && GetID() != 8601 && GetID() != 8602 &&\n       GetID() != 8701 && GetID() != 8702 && GetID() != 8801 && GetID() != 8802)',b'(GetID() != 8101 && GetID() != 8102 && GetID() != 8801 && GetID() != 8802)')
- body=once(body,b'  // GROUP3_OPTION_B_V1:',br'''  const auto trace = [this](const char* phase,const char* outcome) {
+ body=once(body,b'  // GROUP3_OPTION_B_V1:',b'''  const auto trace = [this](const char* phase,const char* outcome) {
     CLog::Log(LOGINFO,"[InfinityTouch] {{\\"event\\":\\"touch.option_b\\",\\"phase\\":\\"{}\\",\\"outcome\\":\\"{}\\",\\"control\\":{},\\"index\\":{}}}",phase,outcome,GetID(),GetSelectedItem());
   };
   trace("native.entry","received");
@@ -34,7 +34,7 @@ def patches(before,original,final):
  require(b'    return restore();' not in body,'untraced validation')
  out[CONTAINER]=raw[:start]+body+raw[end:]
  out[INPUT]=once(out[INPUT],b'for (const int mediaID : {8101, 8102, 8601, 8602, 8701, 8702, 8801, 8802})',b'for (const int mediaID : {8101, 8102, 8801, 8802})')
- out[INPUT]=once(out[INPUT],b'      // INFINITY_RAIL_HOLD_V2:',br'''#if defined(TARGET_ANDROID)
+ out[INPUT]=once(out[INPUT],b'      // INFINITY_RAIL_HOLD_V2:',b'''#if defined(TARGET_ANDROID)
       if (newEvent.touch.action == ACTION_TOUCH_LONGPRESS &&
           CServiceBroker::GetSettingsComponent()->GetSettings()->GetString("lookandfeel.skin") == "skin.infinity.diggz")
         CLog::Log(LOGINFO,"[InfinityTouch] {{\\"event\\":\\"touch.option_b\\",\\"phase\\":\\"gesture.dispatch\\",\\"outcome\\":\\"received\\",\\"pointers\\":{},\\"window\\":{},\\"modal\\":{}}}",newEvent.touch.pointers,CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow(),CServiceBroker::GetGUI()->GetWindowManager().GetTopmostModalDialog());

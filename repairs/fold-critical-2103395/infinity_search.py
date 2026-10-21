@@ -248,7 +248,7 @@ def open_search(media='movie'):
     ready,unsupported=providers(media)
     home=xbmcgui.Window(10000)
     theme=home.getProperty('Infinity.SystemTheme') or home.getProperty('Infinity.NativeSystemTheme')
-    theme='light' if theme.lower() in ('light','light pearl') else 'dark'
+    theme='light' if theme.lower() in ('light','light pearl') else 'oled' if theme.lower()=='oled' else 'dark'
     if theme=='dark' and xbmc.getInfoLabel('Skin.String(Infinity.DarkAppearance)')=='oled':theme='oled'
     token=uuid.uuid4().hex
     rows=[]
