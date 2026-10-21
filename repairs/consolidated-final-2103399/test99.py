@@ -25,9 +25,9 @@ class Final99(unittest.TestCase):
   import home_option_b
   cls.ui=home_option_b
 
- def test_final_delta_is_only_seventeen_declared_presentation_files(self):
-  self.assertEqual(len(self.delta),17)
-  for n in self.delta:self.assertTrue(n.startswith((f.c.UI+'/',f.c.SKIN+'/')))
+ def test_final_delta_is_only_declared_popup_and_reporting_files(self):
+  self.assertEqual(len(self.delta),22)
+  for n in self.delta:self.assertTrue(n.startswith((f.c.UI+'/',f.c.SKIN+'/',f.c.HEALTH+'/')))
   for n in self.before:
    if n not in self.delta:self.assertEqual(self.before[n],self.after[n])
 
@@ -141,5 +141,17 @@ class Final99(unittest.TestCase):
   state.update(modal=13000,window=10000,abort=False);clock[0]=0
   monitor.waitForAbort=lambda delay:clock.__setitem__(0,clock[0]+delay) or False
   self.assertFalse(close(xbmc,gui,13000));self.assertGreaterEqual(clock[0],1.0)
+
+ def test_health_unknown_events_never_claim_package_termination(self):
+  ns={'__name__':'final_health_causal'}
+  exec(compile(self.after[f.c.HEALTH+'/khc_causal.py'],'<actual-final-health-causal>','exec'),ns)
+  event=ns['event']
+  cases=[('sqlite.write','failed'),('cleanup.exception','failed'),('ordinary.operation','ok')]
+  for operation,outcome in cases:
+   result=event({'operation_kind':operation,'outcome':outcome},'host fixture')
+   self.assertEqual(result['classification'],'unclassified_event')
+   self.assertNotIn('termination',result['classification'])
+  for operation,expected in [('internal_native_ui_freeze_recovered','recovered_ui_freeze'),('CHECKPOINT_FAILED','essential_checkpoint_failed'),('engine.death','engine_termination_observed')]:
+   self.assertEqual(event({'operation_kind':operation},'host fixture')['classification'],expected)
 
 if __name__=='__main__':unittest.main(verbosity=2)

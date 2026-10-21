@@ -1,6 +1,6 @@
 """Final Option B reference details over the compiled, tested 2103398 candidate.
 
-Only popup presentation, its close-animation barrier and two versions change.
+Only popup presentation, its close-animation barrier, Health reporting and their versions change.
 Native/DEX, selected-item validation, action handlers and provider code are reused.
 """
 import ast
@@ -15,7 +15,7 @@ sys.path.insert(0, str(HERE.parent/'consolidated-2103398'))
 import components98 as c
 
 VERSIONS = {a:v for a,_,v in c.PACKAGES}
-VERSIONS.update({c.UI:'0.1.10', c.SKIN:'1.0.5.236'})
+VERSIONS.update({c.UI:'0.1.10', c.SKIN:'1.0.5.236', c.HEALTH:'2.5.25'})
 META = {121:'YearAndEpisode',122:'Certification',123:'Runtime',124:'Rating',125:'Genres'}
 ICONS = {101:'play',102:'movie',103:'favourite',104:'info'}
 INK = 'FF00111C'
@@ -134,6 +134,11 @@ def components(before):
     after[popup_key]=popup(before[popup_key])
     after[c.SKIN+'/unified/InfinityHomeOptionB.xml']=after[popup_key]
     after[c.UI+'/home_option_b.py']=runtime(before[c.UI+'/home_option_b.py'])
+    key=c.HEALTH+'/khc_causal.py'
+    after[key]=c.once(before[key],b"'whole_package_termination_unverified')",b"'unclassified_event')")
+    for name,body in list(after.items()):
+        if name.startswith(c.HEALTH+'/') and (name.endswith('.py') or name==c.HEALTH+'/addon.xml'):
+            after[name]=body.replace(b'2.5.24',b'2.5.25')
     palettes=0
     for name,body in before.items():
         if not name.startswith(c.SKIN+'/') or not name.endswith('.xml') or b'name="InfinityLegacyAccent"' not in body:
@@ -158,7 +163,7 @@ def components(before):
         if 'protected_files' in value:value['protected_files']={p:c.sha(after[c.SKIN+'/'+p]) for p in value['protected_files']}
         after[key]=(json.dumps(value,indent=2,sort_keys=True)+'\n').encode()
     changed={n:b for n,b in after.items() if before[n]!=b}
-    c.require(len(changed)==17 and all(n.startswith((c.UI+'/',c.SKIN+'/')) for n in changed),'final presentation scope changed')
+    c.require(len(changed)==22 and all(n.startswith((c.UI+'/',c.SKIN+'/',c.HEALTH+'/')) for n in changed),'final popup/reporting scope changed')
     c.require(not any('cobra' in n.lower() for n in changed),'Cobra change prohibited')
     for n,b in changed.items():
         if n.endswith('.xml'):ET.fromstring(b)

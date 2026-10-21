@@ -109,7 +109,7 @@ def assemble(directory,out,commit):
             for addon,version in f.VERSIONS.items():
                 filename=addon+'-'+version+'.zip'
                 entries=sorted(n for n in z.namelist() if n.startswith('assets/addons/'+addon+'/') and not n.endswith('/'))
-                if addon not in (c.UI,c.SKIN):shutil.copyfile(directory/filename,temp/filename)
+                if addon not in (c.UI,c.SKIN,c.HEALTH):shutil.copyfile(directory/filename,temp/filename)
                 else:
                     with ZipFile(temp/filename,'w',compression=ZIP_DEFLATED,compresslevel=9) as component:
                         for n in entries:component.writestr(n[14:],z.read(n))
@@ -128,7 +128,7 @@ def assemble(directory,out,commit):
             original_engine_proof_not_rewritten=True,art_tested_source_commit=ORIGIN,
             tested_dex_byte_identical_to_verified_2103398=True,matching_component_versions=f.VERSIONS,
             apk_changed_members=changed,apk_changed_members_from_2103397=sorted(set(origin['apk_changed_members'])|set(changed)),
-            final_presentation_files=sorted(delta),physical_fold_verified=False,actual_install_over_tested=False,
+            final_presentation_files=sorted(delta),final_stage_source_files=sorted(delta),final_stage_scope='Popup presentation and Health report classification',physical_fold_verified=False,actual_install_over_tested=False,
             final_lock=False,experimental_only=True)
         save(temp/'INFINITY-2103399-DELIVERY.json',receipt)
         origin_manifest=json.loads((directory/'CHANGED-FILE-MANIFEST.json').read_text())
@@ -144,7 +144,7 @@ def assemble(directory,out,commit):
         save(temp/'CHANGED-FILE-MANIFEST.json',changed_manifest)
         report=json.loads((directory/'PASS-FAIL-REPORT.json').read_text())
         report.update(source_commit=commit,native_and_android17_source_commit=ORIGIN,native_and_android17_run=ORIGIN_RUN,
-            final_presentation_tests_passed=8,all_final_components_match_apk=True,
+            final_presentation_tests_passed=9,all_final_components_match_apk=True,
             android17_execution_scope='Production DEX and component/Search UI on API37 emulator; whole ARM64 app execution not claimed',
             whole_apk_android_execution='NEEDS EVIDENCE: physical ARM64 installation and execution',
             physical_popup_reference_approval='NEEDS EVIDENCE',final_lock=False)
