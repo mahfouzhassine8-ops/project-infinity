@@ -1,0 +1,115 @@
+name: Infinity 2103397 | Final OLED chrome, verified engine reuse and permanent signature
+on:
+  push:
+    branches: [work/infinity-2103397-final-oled]
+    paths: ['.github/workflows/infinity-2103397-final-oled.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-2103397-final-oled
+  cancel-in-progress: false
+jobs:
+  finish:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - name: Require the exact originating full native build to finish successfully
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,os,time,urllib.request
+          url='https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs/39579955813'
+          for attempt in range(90):
+              req=urllib.request.Request(url,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+              with urllib.request.urlopen(req,timeout=30) as response:run=json.load(response)
+              assert run['head_sha']=='2d15e6ed2d4045f9ee041c81a8334afb780d2fd7'
+              if run['status']=='completed':
+                  assert run['conclusion']=='success',run['conclusion']
+                  print('Exact native/ART/signing source run succeeded');break
+              print('Waiting for the existing verified native compilation; no duplicate compilation',flush=True)
+              time.sleep(30)
+          else:raise SystemExit('Originating native build has not completed successfully')
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39579955813
+          name: Infinity-2103396-SIGNED-APK-AND-MATCHING-COMPONENTS-EXPERIMENTAL
+          github-token: ${{ github.token }}
+          path: verified-2103396
+      - name: Verify all actual compiler inputs and finish only the declared OLED skin delta
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          (cd verified-2103396 && sha256sum -c SHA256SUMS)
+          python3 repairs/fold-final-2103397/final97.py verified-2103396 signed-2103397 "$GITHUB_SHA" \
+            2>&1 | tee final97-verification.log
+          (cd signed-2103397 && sha256sum -c SHA256SUMS)
+          git diff --exit-code
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: Infinity-2103397-SIGNED-APK-AND-MATCHING-COMPONENTS-EXPERIMENTAL
+          path: signed-2103397/
+          retention-days: 90
+          compression-level: 6
+          if-no-files-found: error
+      - name: Publish actual signed APK, matching individual ZIPs and source receipts
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG="infinity-2103397-binaries-${GITHUB_RUN_ID}"
+          MAIN_SHA=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)
+          test "${#MAIN_SHA}" -eq 40
+          gh api "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/$TAG" -f sha="$MAIN_SHA"
+          python3 - <<'PY'
+          import os,pathlib
+          text=pathlib.Path('repairs/fold-final-2103397/CORRECTIVE-ACCEPTANCE.md').read_text()
+          text+='\nFinal corrective source: '+os.environ['GITHUB_SHA']+'\n'
+          text+='Native/DEx compilation provenance remains the actual 2103396 source/run; all 9404 inputs and unchanged binaries are verified.\n'
+          text+='The delivery tag anchors unchanged main for publication permissions. Use the provided source archive and actual source commits, not GitHub automatic tag source archives.\n'
+          pathlib.Path('/tmp/infinity97-notes.md').write_text(text)
+          PY
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --prerelease \
+            --title "Infinity 2103397 - Experimental corrective candidate, Fold acceptance pending" \
+            --notes-file /tmp/infinity97-notes.md \
+            signed-2103397/Infinity-2103397-Fold-Corrective-EXPERIMENTAL.apk \
+            signed-2103397/script.infinity.commandcenter-0.3.5.26.zip \
+            signed-2103397/script.infinity.watchedbridge-1.0.7.zip \
+            signed-2103397/script.infinity.uirepair-0.1.8.zip \
+            signed-2103397/skin.infinity.diggz-1.0.5.234.zip \
+            signed-2103397/script.infinity.rails-0.2.7.zip \
+            signed-2103397/script.kodihealthcenter-2.5.23.zip \
+            signed-2103397/INSTALLATION.txt signed-2103397/SHA256SUMS \
+            signed-2103397/COMPONENTS.json signed-2103397/INFINITY-2103397-DELIVERY.json \
+            signed-2103397/FINAL-SIGNATURE.txt signed-2103397/CORRECTIVE-ACCEPTANCE.md \
+            signed-2103397/Infinity-2103397-Source-and-Build-Receipts.zip \
+            signed-2103397/CHANGED-FILE-MANIFEST.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-2103397-Final-Verification-Log
+          path: final97-verification.log
+          retention-days: 90
+          if-no-files-found: warn
