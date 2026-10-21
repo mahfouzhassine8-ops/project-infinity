@@ -24,10 +24,12 @@ Mandatory physical sequence: APK install-over before ZIPs; each matching ZIP in 
 
 Final popup reference details: actual metadata chips, existing action icons, cyan primary Play action and responsive geometry. No physical visual approval is claimed.
 
-Native compilation and Android 17 tests originate from d2e693560c78ea419c79c0e6f10dea8deb317374, run 39656812472. The final presentation source is recorded separately. All 9,404 compiler inputs, native binary, crash recorder and DEX shards are verified unchanged from that successful build.
+Native compilation and Android 17 tests originate from 53ed214b629f078d6ab48b992ecdeca468ab1d88, run 39662467387. The final presentation source is recorded separately. All 9,404 compiler inputs, native binary, crash recorder and DEX shards are verified unchanged from that successful build.
 
 Kodi close-animation correction: the actual WindowDialogMixin clears its Python modal loop before CGUIWindow closes its 140 ms animation. The final UI waits cooperatively for its own real dialog to leave the modal stack, then reruns the original selected-item/security checks. Foreign modals, shutdown, changed selection and timeout remain fail-closed. More Info returns to its exact parent card after the same close barrier. Essential-First deadlines are unchanged.
 
 Primary action asset verification: Play uses the existing fully opaque rounded field texture. The popup-only foreground variable is white on the existing Light Pearl blue accent and dark ink on the existing Dark/OLED cyan. All ten actual palette declarations receive the same variable; every pre-existing theme value and condition is preserved. Final source tests include texture opacity and text contrast.
 
 Health Center 2.5.25 preserves the explicit recovered-freeze, checkpoint-failure and engine-observation classifications. Other events remain unclassified instead of being mislabeled as package termination. Nine final source tests include this report regression.
+
+Control ABI preservation: scoped tap state is external to the existing control class layouts. The source/lifecycle regression checks restored header shape, independent pairs, reset, release suppression, destruction/address reuse and concurrent cleanup. Signing still requires every original native export; no missing-export exception or alias is permitted.

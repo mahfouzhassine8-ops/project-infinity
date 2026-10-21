@@ -62,12 +62,10 @@ def patches(before, original, final):
       ' ||\n        '.join(checks)+')\n    { trace("native.validate","infinity_source_identity_mismatch"); return restore(); }\n  }\n')
     anchor=b'  if (label.empty() || label.size() > 512)\n    { trace("native.validate","label_empty_or_exceeds_512"); return restore(); }'
     raw=once(raw,anchor,anchor+b'\n'+source_guard.encode())
-    raw=once(raw,b'bool CGUIBaseContainer::OnAction(const CAction &action)\n{',b'bool CGUIBaseContainer::OnAction(const CAction &action)\n{\n  m_infinityAddonTapKey.clear(); // A remote/gesture action ends the touch pair.')
+    raw=once(raw,b'bool CGUIBaseContainer::OnAction(const CAction &action)\n{',b'bool CGUIBaseContainer::OnAction(const CAction &action)\n{\n  InfinityTouchClearForAction(this); // A remote/gesture action ends the touch pair.')
     out[CONTAINER]=raw
     out[HEADER]=once(before[HEADER],b'  bool OnInfinityUiTouch(float x, float y, bool hold);',b'''  bool OnInfinityUiTouch(float x, float y, bool hold);
-  bool OnInfinityAddonBrowserTouch(float x, float y, bool hold);
-  std::string m_infinityAddonTapKey;
-  std::chrono::steady_clock::time_point m_infinityAddonSuppressUntil{};''')
+  bool OnInfinityAddonBrowserTouch(float x, float y, bool hold);''')
     out[BROWSER]=once(before[BROWSER],b'if (InfinityAddonBrowserSkinActive() && iAction == ACTION_MOUSE_LEFT_CLICK &&',b'''if (InfinityAddonBrowserSkinActive() &&
             !StringUtils::StartsWith(m_vecItems->GetPath(), "addons://search") &&
             iItem >= 0 && iItem < m_vecItems->Size() &&
@@ -148,10 +146,8 @@ def patches(before, original, final):
   return encoded;''')
     out[COORDINATOR]=raw[:a]+status+raw[b:]
     out[BUTTON_HEADER]=once(before[BUTTON_HEADER],b'  bool OnAction(const CAction &action) override ;',b'''  bool OnAction(const CAction &action) override ;
-  bool OnInfinityAddonActionTouch(float x,float y,bool hold);
-  std::string m_infinityAddonActionKey;
-  std::chrono::steady_clock::time_point m_infinityAddonActionSuppressUntil{};''')
-    out[BUTTON_HEADER]=once(out[BUTTON_HEADER],b'#pragma once',b'#pragma once\n#include <chrono>')
+  bool OnInfinityAddonActionTouch(float x,float y,bool hold);''')
+    out[BUTTON_HEADER]=once(out[BUTTON_HEADER],b'  ~CGUIButtonControl() override = default;',b'  ~CGUIButtonControl() override;')
     out[BUTTON]=once(before[BUTTON],b'#include "GUIButtonControl.h"',b'''#include "GUIButtonControl.h"
 #include "ServiceBroker.h"
 #include "guilib/GUIComponent.h"
@@ -162,7 +158,7 @@ def patches(before, original, final):
 #include <cstdint>''')
     out[BUTTON]=once(out[BUTTON],b'EVENT_RESULT CGUIButtonControl::OnMouseEvent(',
         (HERE/'addon_button_touch.cpp').read_bytes()+b'\n\nEVENT_RESULT CGUIButtonControl::OnMouseEvent(')
-    out[BUTTON]=once(out[BUTTON],b'bool CGUIButtonControl::OnAction(const CAction &action)\n{',b'bool CGUIButtonControl::OnAction(const CAction &action)\n{\n  m_infinityAddonActionKey.clear(); // Remote activation cannot leave a stale touch pair.')
+    out[BUTTON]=once(out[BUTTON],b'bool CGUIButtonControl::OnAction(const CAction &action)\n{',b'bool CGUIButtonControl::OnAction(const CAction &action)\n{\n  InfinityTouchClearForAction(this); // Remote activation cannot leave a stale touch pair.')
     out[ADDON_INFO]=once(before[ADDON_INFO],b'  CGUIDialog::OnInitWindow();\n  BuildDependencyList();',b'''  CGUIDialog::OnInitWindow();
   SetProperty("Infinity.AddonBrowser.ActionIdentity", m_item ? m_item->GetPath() + "\\n" +
       std::to_string(reinterpret_cast<std::uintptr_t>(m_item.get())) : "");
@@ -212,6 +208,11 @@ constexpr CONTEXT_BUTTON INFINITY_OPEN_FROM_BROWSER = static_cast<CONTEXT_BUTTON
   }''')
     out[BROWSER]=raw
     out[BROWSER_HEADER]=once(before[BROWSER_HEADER],b'  std::string m_infinityArmedTouchItem;',b'  std::string m_infinityArmedTouchItem;\n  std::string m_infinityContextOpenKey;')
+    sidecar=(HERE/'touch_pair_state.inc').read_bytes()
+    for path in (CONTAINER,BUTTON):
+        out[path]=once(out[path],b'using namespace KODI;',sidecar+b'\nusing namespace KODI;')
+    out[CONTAINER]=once(out[CONTAINER],b'CGUIBaseContainer::~CGUIBaseContainer(void)\n{',b'CGUIBaseContainer::~CGUIBaseContainer(void)\n{\n  InfinityTouchForget(this);')
+    out[BUTTON]=once(out[BUTTON],b'void CGUIButtonControl::Process(',b'CGUIButtonControl::~CGUIButtonControl()\n{\n  InfinityTouchForget(this);\n}\n\nvoid CGUIButtonControl::Process(')
     return out
 
 import components98 as c

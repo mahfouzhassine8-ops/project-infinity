@@ -156,7 +156,7 @@ def assemble(args):
             shutil.copyfile(args.component/leaf,temp/leaf)
         save(temp/'PASS-FAIL-REPORT.json',{'schema':1,'source_commit':args.source_commit,
              'workstreams':{str(i):{'implementation':'IMPLEMENTED','ci':'CI VERIFIED','physical_fold':'NEEDS EVIDENCE'} for i in range(1,8)},
-             'targeted_source_tests_passed':22,'android17_candidate_cases_passed':45,'android17_baseline_control_cases_passed':1,
+             'targeted_source_tests_passed':23,'android17_candidate_cases_passed':45,'android17_baseline_control_cases_passed':1,
              'complete_arm64_native_compilation':True,'native_sources_verified':9404,'permanent_signature_verified':True,
              'actual_install_over_tested':False,'live_feed_equivalence':'NEEDS EVIDENCE: physical Kodi listing comparison',
              'repeated_device_close_all_ambient_modes':'NEEDS EVIDENCE','fatal_native_crash_cause':'NEEDS EVIDENCE',

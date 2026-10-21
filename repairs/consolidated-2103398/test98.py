@@ -207,6 +207,22 @@ class Corrective98(unittest.TestCase):
   self.assertIn('Hide from this browser (not Disable)',text)
   self.assertIn('StringUtils::StartsWith(selected->GetPath(), "addons://search")',text)
 
+ def test_touch_state_preserves_original_core_class_layout_and_lifecycle(self):
+  original=(NATIVE/n.HEADER).read_bytes()
+  restored=self.native[n.HEADER].replace(b'\n  bool OnInfinityAddonBrowserTouch(float x, float y, bool hold);',b'')
+  self.assertEqual(original,restored)
+  original=(NATIVE/n.BUTTON_HEADER).read_bytes()
+  restored=self.native[n.BUTTON_HEADER].replace(b'\n  bool OnInfinityAddonActionTouch(float x,float y,bool hold);',b'').replace(b'~CGUIButtonControl() override;',b'~CGUIButtonControl() override = default;')
+  self.assertEqual(original,restored)
+  for path in (n.CONTAINER,n.BUTTON):
+   self.assertIn(b'InfinityTouchClearForAction(this)',self.native[path])
+   self.assertIn(b'InfinityTouchForget(this)',self.native[path])
+  with tempfile.TemporaryDirectory() as directory:
+   binary=Path(directory)/'touch-state'
+   subprocess.run(['g++','-std=c++17','-O2','-pthread','-I'+str(c.HERE),str(c.HERE/'touch_pair_test.cpp'),'-o',str(binary)],check=True,capture_output=True)
+   result=subprocess.run([str(binary)],check=True,capture_output=True,text=True)
+   self.assertIn('destruction/address reuse and concurrent cleanup passed',result.stdout)
+
  def test_each_native_close_attempt_has_distinct_terminal_receipt(self):
   raw=self.native[n.COORDINATOR].decode()
   self.assertIn('directory + "/attempt-" + key + ".json"',raw)
