@@ -72,6 +72,8 @@ def skin_settings(raw):
 def twopane(raw):
     root=xml(raw);group=root.find('.//control[@id="40002"]')
     require(group is not None and 'twopane' in group.findtext('visible',''),'missing Two-Pane group')
+    require(all(root.find('.//control[@id="'+ident+'"]') is None for ident in ('48701','48702','49701','49702')),
+            'new Two-Pane scrolling IDs collide with the protected Home controls')
     logo=[c for c in group.findall('control') if c.findtext('texture') in ('infinity_polish/infinity_mark.png','infinity_ui/infinity_logo.png')]
     require(len(logo)==1,'ambiguous Two-Pane logo')
     settext(logo[0],'left','112');settext(logo[0],'width','96');settext(logo[0],'height','56')
@@ -90,17 +92,17 @@ def twopane(raw):
                     +'$INFO[Container('+cid+').ListItem.Duration,  •  ,]'
                     +'$INFO[Container('+cid+').ListItem.Rating,  •  ,]')
         else:
-            plots+=1;control.set('type','textbox');control.set('id','988'+cid[-1])
+            plots+=1;control.set('type','textbox');control.set('id','48'+cid[-3:])
             settext(control,'top','16%');settext(control,'height','14%')
             settext(control,'width','62.8%');settext(control,'font','InfinitySmall')
             for name in ('scroll','aligny','autoscroll'):
                 for e in control.findall(name):control.remove(e)
-            settext(control,'pagecontrol','989'+cid[-1]);settext(control,'scrolltime','140')
-            bar=ET.SubElement(group,'control',{'type':'scrollbar','id':'989'+cid[-1]})
+            settext(control,'pagecontrol','49'+cid[-3:]);settext(control,'scrolltime','140')
+            bar=ET.SubElement(group,'control',{'type':'scrollbar','id':'49'+cid[-3:]})
             for k,v in {'left':'96%','top':'16%','width':'18','height':'14%',
                         'orientation':'vertical','showonepage':'false',
                         'visible':control.findtext('visible',''),
-                        'onleft':'988'+cid[-1],'onright':'9870',
+                        'onleft':'48'+cid[-3:],'onright':'9870',
                         'texturesliderbackground':'infinity_legacy/track.png',
                         'texturesliderbar':'infinity_legacy/track.png',
                         'texturesliderbarfocus':'infinity_legacy/track.png'}.items():settext(bar,k,v)

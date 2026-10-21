@@ -94,6 +94,12 @@ class Components(unittest.TestCase):
    if path.endswith('/Home.xml') and path.startswith(c.SKIN+'/'):
     count+=1;t=ET.fromstring(body);group=t.find('.//control[@id="40002"]')
     self.assertEqual(len(group.findall('control[@type="textbox"]')),2)
+    for ident in ('48701','48702','49701','49702'):
+     self.assertEqual(len(t.findall('.//control[@id="'+ident+'"]')),1)
+    self.assertEqual(ET.tostring(t.find('.//control[@id="9881"]')),
+                     ET.tostring(ET.fromstring(self.before[path]).find('.//control[@id="9881"]')))
+    for ident in ('48701','48702'):
+     self.assertEqual(t.find('.//control[@id="'+ident+'"]/pagecontrol').text,'49'+ident[-3:])
     self.assertEqual(ET.tostring(t.find('.//control[@id="8830"]')),ET.tostring(ET.fromstring(self.before[path]).find('.//control[@id="8830"]')))
    if path.endswith('/InfinitySubtitleSettings.xml'):
     panel=ET.fromstring(body).find('.//control[@id="9900"]');self.assertEqual(panel.findtext('right'),'4%');self.assertEqual(panel.findtext('bottom'),'14%')
