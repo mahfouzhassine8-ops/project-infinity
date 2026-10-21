@@ -14,7 +14,8 @@ def geometry(width, height, physical_width='', physical_height=''):
     # Work in horizontal canvas units, then map vertical units independently.
     ratio = (height * pw) / (width * ph)
     available_h = height / ratio
-    card_w = min(width * .90, available_h * 2.75)
+    width_fraction = .56 if pw > ph * 1.45 else .90
+    card_w = min(width * width_fraction, available_h * 2.75)
     card_h = min(card_w * .35, available_h * .86)
     pad = card_w * .025
     gap = card_w * .025
