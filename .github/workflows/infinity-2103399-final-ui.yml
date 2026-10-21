@@ -1,0 +1,126 @@
+name: Infinity 2103399 | Final approved popup details and permanently signed delivery
+on:
+  push:
+    branches: [work/infinity-2103399-final-ui]
+    paths: ['.github/workflows/infinity-2103399-final-ui.yml', 'repairs/consolidated-final-2103399/**']
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-2103399-final-ui
+  cancel-in-progress: true
+jobs:
+  finish:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platform-tools build-tools;34.0.0'
+          log-accepted-android-sdk-licenses: false
+      - name: Require the exact actual full native build to have succeeded
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json,os,urllib.request
+          url='https://api.github.com/repos/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs/39652560882'
+          import time
+          for attempt in range(90):
+              req=urllib.request.Request(url,headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
+              with urllib.request.urlopen(req,timeout=30) as response:r=json.load(response)
+              assert r['head_sha']=='d3b8fb5e393a4241bca71846449949993d139051'
+              if r['status']=='completed':
+                  assert r['conclusion']=='success',r['conclusion']
+                  print('Exact full ARM64 compile, Android17 execution and permanent signature passed');break
+              print('Waiting for the actual existing native compilation; no duplicate engine build',flush=True)
+              time.sleep(30)
+          else:raise SystemExit('Originating native build did not complete successfully within this job')
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39652560882
+          name: Infinity-2103398-SIGNED-APK-AND-MATCHING-COMPONENTS-EXPERIMENTAL
+          github-token: ${{ github.token }}
+          path: verified-2103398
+      - name: Verify final reference details against real fonts and preserve all identity/actions
+        env:
+          INFINITY_FINAL_PARENT: verified-2103398/Infinity-2103398-Fold-Corrective-EXPERIMENTAL.apk
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          set -euo pipefail
+          (cd verified-2103398 && sha256sum -c SHA256SUMS)
+          python3 -m pip install --disable-pip-version-check pillow==11.3.0
+          python3 repairs/consolidated-final-2103399/test99.py 2>&1 | tee final99-tests.log
+      - name: Verify all 9404 compiler inputs and permanently sign the final presentation delta
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 repairs/consolidated-final-2103399/delivery99.py verified-2103398 signed-2103399 "$GITHUB_SHA" \
+            2>&1 | tee final99-verification.log
+          (cd signed-2103399 && sha256sum -c SHA256SUMS)
+          git diff --exit-code
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: Infinity-2103399-SIGNED-APK-AND-MATCHING-COMPONENTS-EXPERIMENTAL
+          path: signed-2103399/
+          retention-days: 90
+          compression-level: 6
+          if-no-files-found: error
+      - name: Publish the actual signed APK, individual components and complete receipts
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG="infinity-2103399-binaries-${GITHUB_RUN_ID}"
+          MAIN_SHA=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq .object.sha)
+          test "${#MAIN_SHA}" -eq 40
+          gh api "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/$TAG" -f sha="$MAIN_SHA"
+          python3 - <<'PY'
+          import os,pathlib
+          text=pathlib.Path('repairs/consolidated-final-2103399/CORRECTIVE-ACCEPTANCE.md').read_text()
+          text+='\nFinal corrective source: '+os.environ['GITHUB_SHA']+'\n'
+          text+='The release tag anchors unchanged main for publication permissions; source/build receipts contain the actual final/native source commits. GitHub automatic tag source archives do not represent this corrective candidate.\n'
+          pathlib.Path('/tmp/infinity99-notes.md').write_text(text)
+          PY
+          gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --prerelease \
+            --title "Infinity 2103399 - Consolidated corrective candidate, Fold acceptance pending" \
+            --notes-file /tmp/infinity99-notes.md \
+            signed-2103399/Infinity-2103399-Fold-Corrective-EXPERIMENTAL.apk \
+            signed-2103399/plugin.infinity.latestreleases-0.1.0.zip \
+            signed-2103399/script.infinity.commandcenter-0.3.5.27.zip \
+            signed-2103399/script.infinity.watchedbridge-1.0.8.zip \
+            signed-2103399/script.infinity.uirepair-0.1.10.zip \
+            signed-2103399/skin.infinity.diggz-1.0.5.236.zip \
+            signed-2103399/script.infinity.rails-0.2.7.zip \
+            signed-2103399/script.kodihealthcenter-2.5.24.zip \
+            signed-2103399/INSTALLATION.txt signed-2103399/SHA256SUMS \
+            signed-2103399/COMPONENTS.json signed-2103399/INFINITY-2103399-DELIVERY.json \
+            signed-2103399/FINAL-SIGNATURE.txt signed-2103399/CORRECTIVE-ACCEPTANCE.md \
+            signed-2103399/Infinity-2103399-Source-and-Build-Receipts.zip \
+            signed-2103399/CHANGED-FILE-MANIFEST.json signed-2103399/PASS-FAIL-REPORT.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-2103399-Final-Verification-Logs
+          path: |
+            final99-tests.log
+            final99-verification.log
+          retention-days: 90
+          if-no-files-found: warn
