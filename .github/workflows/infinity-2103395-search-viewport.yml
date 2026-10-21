@@ -1,0 +1,65 @@
+name: Infinity 2103395 exact DEX | keyboard-visible Android 17 cover and inner viewports
+on:
+  push:
+    branches: [work/infinity-2103395-search-android17-execution-20261021]
+    paths: ['.github/workflows/infinity-2103395-search-viewport.yml']
+  workflow_dispatch:
+permissions: {contents: read, actions: read}
+jobs:
+  execute:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {packages: 'platform-tools build-tools;34.0.0 platforms;android-34', log-accepted-android-sdk-licenses: false}
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39555495053
+          name: Infinity-2103395-Verified-Startup-Input
+          github-token: '${{ github.token }}'
+          path: ready95
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39539171911
+          name: Infinity-2103394-SIGNED-APK-AND-MATCHING-COMPONENTS-EXPERIMENTAL
+          github-token: '${{ github.token }}'
+          path: protected-2103394
+      - name: Prepare disposable test APK using the exact verified candidate DEX
+        run: python3 repairs/fold-critical-2103395/viewport_execution.py prepare
+      - name: Prepare the retained Android 17 emulator
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y libpulse0
+          python3 repairs/four-repair-20261018/android37_gate.py --sdk-root "$ANDROID_HOME" --out api37-support --pin-tools
+          python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out emulator-setup
+          sudo chmod 666 /dev/kvm
+      - name: Require visible IME and query/Search All on both viewport sizes
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: '37.0'
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disk-size: 8G
+          avd-name: infinity-four-repair-api37
+          pre-emulator-launch-script: python3 repairs/four-repair-20261018/android37_gate.py --sdk-root "$ANDROID_HOME" --out api37-support --check-avd
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: python3 repairs/fold-critical-2103395/viewport_execution.py run
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-2103395-Keyboard-Viewport-Execution
+          path: |
+            viewport95/*.json
+            viewport95/*.png
+            viewport95/*ui.log
+          retention-days: 90
+          if-no-files-found: error
