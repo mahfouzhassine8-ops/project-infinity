@@ -24,6 +24,6 @@ Mandatory physical sequence: APK install-over before ZIPs; each matching ZIP in 
 
 Final popup reference details: actual metadata chips, existing action icons, cyan primary Play action and responsive geometry. No physical visual approval is claimed.
 
-Native compilation and Android 17 tests originate from 923d82d8e0e859382866fa4b4d8a66661d3151bc, run 39655731334. The final presentation source is recorded separately. All 9,404 compiler inputs, native binary, crash recorder and DEX shards are verified unchanged from that successful build.
+Native compilation and Android 17 tests originate from d2e693560c78ea419c79c0e6f10dea8deb317374, run 39656812472. The final presentation source is recorded separately. All 9,404 compiler inputs, native binary, crash recorder and DEX shards are verified unchanged from that successful build.
 
 Kodi close-animation correction: the actual WindowDialogMixin clears its Python modal loop before CGUIWindow closes its 140 ms animation. The final UI waits cooperatively for its own real dialog to leave the modal stack, then reruns the original selected-item/security checks. Foreign modals, shutdown, changed selection and timeout remain fail-closed. More Info returns to its exact parent card after the same close barrier. Essential-First deadlines are unchanged.
