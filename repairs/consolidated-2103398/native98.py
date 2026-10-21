@@ -62,6 +62,7 @@ def patches(before, original, final):
       ' ||\n        '.join(checks)+')\n    { trace("native.validate","infinity_source_identity_mismatch"); return restore(); }\n  }\n')
     anchor=b'  if (label.empty() || label.size() > 512)\n    { trace("native.validate","label_empty_or_exceeds_512"); return restore(); }'
     raw=once(raw,anchor,anchor+b'\n'+source_guard.encode())
+    raw=once(raw,b'bool CGUIBaseContainer::OnAction(const CAction &action)\n{',b'bool CGUIBaseContainer::OnAction(const CAction &action)\n{\n  m_infinityAddonTapKey.clear(); // A remote/gesture action ends the touch pair.')
     out[CONTAINER]=raw
     out[HEADER]=once(before[HEADER],b'  bool OnInfinityUiTouch(float x, float y, bool hold);',b'''  bool OnInfinityUiTouch(float x, float y, bool hold);
   bool OnInfinityAddonBrowserTouch(float x, float y, bool hold);
@@ -161,6 +162,7 @@ def patches(before, original, final):
 #include <cstdint>''')
     out[BUTTON]=once(out[BUTTON],b'EVENT_RESULT CGUIButtonControl::OnMouseEvent(',
         (HERE/'addon_button_touch.cpp').read_bytes()+b'\n\nEVENT_RESULT CGUIButtonControl::OnMouseEvent(')
+    out[BUTTON]=once(out[BUTTON],b'bool CGUIButtonControl::OnAction(const CAction &action)\n{',b'bool CGUIButtonControl::OnAction(const CAction &action)\n{\n  m_infinityAddonActionKey.clear(); // Remote activation cannot leave a stale touch pair.')
     out[ADDON_INFO]=once(before[ADDON_INFO],b'  CGUIDialog::OnInitWindow();\n  BuildDependencyList();',b'''  CGUIDialog::OnInitWindow();
   SetProperty("Infinity.AddonBrowser.ActionIdentity", m_item ? m_item->GetPath() + "\\n" +
       std::to_string(reinterpret_cast<std::uintptr_t>(m_item.get())) : "");
