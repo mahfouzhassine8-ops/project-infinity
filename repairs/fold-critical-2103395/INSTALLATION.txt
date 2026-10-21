@@ -1,0 +1,16 @@
+Infinity 2103395 — experimental update, NOT final LOCK
+
+1. Keep Infinity installed. Do not clear data, uninstall, or use a fresh profile.
+2. Check SHA256SUMS and INFINITY-2103395-DELIVERY.json. The permanent certificate SHA-256 must be d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7.
+3. Install Infinity-2103395-Fold-Corrective-EXPERIMENTAL.apk over 2103394 using Android's Update action. If Android rejects it, stop and retain the existing installation/data; record the exact error. Do not uninstall to work around it.
+4. Open Infinity. BEFORE installing ZIPs, test the four approved featured-poster holds, Ambient/Motion persistence, Search, Compact spacing and a normal Close/reopen. Export diagnostics and note this is the APK-only phase. Do not force-stop to turn a failed Close into a pass.
+5. Matching ZIP order, only after the APK: Command Center 0.3.5.25; UI Repair 0.1.7; Watched Bridge 1.0.6; Infinity Skin 1.0.5.232; Health Center 2.5.22. Rails 0.2.7 is unchanged and is supplied for exact coherence; reinstall it only when evaluating the requested matching-ZIP case.
+6. Install ONE matching ZIP at a time via Install from zip file. Retest and export after each. During this controlled sequence, a strict source mismatch can temporarily reject an action until the corresponding matching component is installed. Record it; never bypass it. Do not mix older ZIPs with this candidate.
+7. After all matching components, perform normal Close/reopen and repeat. The Health Center export's runtime-component-identity.json records Kodi-resolved paths/versions/hashes/dependencies. The Android export records disk candidates separately and bounded touch traces; disk presence is not runtime proof.
+8. Compare cover/inner display and Light/Dark/True OLED behavior. See CORRECTIVE-ACCEPTANCE.md for all required checks and unresolved causes.
+
+Expected versions: APK 2103395 / TEST0005; Skin 1.0.5.232; Command Center 0.3.5.25; UI Repair 0.1.7; Watched Bridge 1.0.6; Rails 0.2.7; Health Center 2.5.22.
+
+Cobra and provider code are untouched. Existing user data and Essential-First guards are preserved. Do not delete stale add-on folders or edit databases manually. If a wrong runtime source is observed, preserve that evidence for a specific repair.
+
+The unexplained physical Option B failure, full Close/Crew acceptance, original SIGSEGV and physical Fold qualification remain open. The candidate is not a final LOCK and requires user approval after physical acceptance.
