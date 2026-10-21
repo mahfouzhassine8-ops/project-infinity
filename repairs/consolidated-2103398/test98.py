@@ -199,6 +199,14 @@ class Corrective98(unittest.TestCase):
   self.assertNotIn('DisableAddon',part);self.assertNotIn('InstallAddon',part)
   self.assertIn('ACTION_TOUCH_TAP',self.native[n.INPUT].decode())
 
+ def test_browser_category_hold_has_relevant_identity_checked_open_action(self):
+  text=self.native[n.BROWSER].decode()
+  self.assertIn('buttons.Add(INFINITY_OPEN_FROM_BROWSER, "Open")',text)
+  self.assertIn('m_infinityContextOpenKey != m_vecItems->GetPath()',text)
+  self.assertIn('return OnClick(itemNumber);',text)
+  self.assertIn('Hide from this browser (not Disable)',text)
+  self.assertIn('StringUtils::StartsWith(selected->GetPath(), "addons://search")',text)
+
  def test_each_native_close_attempt_has_distinct_terminal_receipt(self):
   raw=self.native[n.COORDINATOR].decode()
   self.assertIn('directory + "/attempt-" + key + ".json"',raw)

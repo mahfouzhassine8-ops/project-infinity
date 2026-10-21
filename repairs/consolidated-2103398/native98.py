@@ -12,12 +12,13 @@ CONTAINER=previous.CONTAINER
 HEADER='xbmc/guilib/GUIBaseContainer.h'
 INPUT='xbmc/input/InputManager.cpp'
 BROWSER='xbmc/addons/gui/GUIWindowAddonBrowser.cpp'
+BROWSER_HEADER='xbmc/addons/gui/GUIWindowAddonBrowser.h'
 CONTRACT=previous.CONTRACT
 COORDINATOR=previous.COORDINATOR
 BUTTON='xbmc/guilib/GUIButtonControl.cpp'
 BUTTON_HEADER='xbmc/guilib/GUIButtonControl.h'
 ADDON_INFO='xbmc/addons/gui/GUIDialogAddonInfo.cpp'
-PATHS={VFS,CONTAINER,HEADER,INPUT,BROWSER,CONTRACT,COORDINATOR,BUTTON,BUTTON_HEADER,ADDON_INFO}
+PATHS={VFS,CONTAINER,HEADER,INPUT,BROWSER,BROWSER_HEADER,CONTRACT,COORDINATOR,BUTTON,BUTTON_HEADER,ADDON_INFO}
 
 
 def patches(before, original, final):
@@ -177,6 +178,36 @@ def patches(before, original, final):
           if(handled)break;
         }
         if (wm.GetActiveWindow() == WINDOW_ADDON_BROWSER''')
+    raw=out[BROWSER]
+    raw=once(raw,b'constexpr CONTEXT_BUTTON INFINITY_HIDE_FROM_BROWSER = static_cast<CONTEXT_BUTTON>(0x7901);',b'''constexpr CONTEXT_BUTTON INFINITY_HIDE_FROM_BROWSER = static_cast<CONTEXT_BUTTON>(0x7901);
+constexpr CONTEXT_BUTTON INFINITY_OPEN_FROM_BROWSER = static_cast<CONTEXT_BUTTON>(0x7902);''')
+    marker=b'void CGUIWindowAddonBrowser::GetContextButtons(int itemNumber, CContextButtons& buttons)\n{'
+    raw=once(raw,marker,marker+b'''
+  m_infinityContextOpenKey.clear();
+  if (InfinityAddonBrowserSkinActive() && itemNumber >= 0 && itemNumber < m_vecItems->Size() &&
+      !StringUtils::StartsWith(m_vecItems->GetPath(), "addons://search"))
+  {
+    const auto& selected = m_vecItems->Get(itemNumber);
+    if (selected && !StringUtils::StartsWith(selected->GetPath(), "addons://search") &&
+        (selected->m_bIsFolder || selected->GetPath() == "addons://install/"))
+    {
+      m_infinityContextOpenKey = m_vecItems->GetPath() + "\\n" + selected->GetPath();
+      buttons.Add(INFINITY_OPEN_FROM_BROWSER, "Open");
+    }
+  }''')
+    marker=b'bool CGUIWindowAddonBrowser::OnContextButton(int itemNumber, CONTEXT_BUTTON button)\n{'
+    raw=once(raw,marker,marker+b'''
+  if (button == INFINITY_OPEN_FROM_BROWSER)
+  {
+    if (!InfinityAddonBrowserSkinActive() || itemNumber < 0 || itemNumber >= m_vecItems->Size() ||
+        StringUtils::StartsWith(m_vecItems->GetPath(), "addons://search")) return false;
+    const auto& selected = m_vecItems->Get(itemNumber);
+    if (!selected || m_infinityContextOpenKey != m_vecItems->GetPath() + "\\n" + selected->GetPath()) return false;
+    m_infinityContextOpenKey.clear();
+    return OnClick(itemNumber); // Original Kodi entry/confirmation/permission route.
+  }''')
+    out[BROWSER]=raw
+    out[BROWSER_HEADER]=once(before[BROWSER_HEADER],b'  std::string m_infinityArmedTouchItem;',b'  std::string m_infinityArmedTouchItem;\n  std::string m_infinityContextOpenKey;')
     return out
 
 import components98 as c
