@@ -3,6 +3,8 @@ bool CGUIButtonControl::OnInfinityAddonActionTouch(float x,float y,bool hold)
   auto& wm=CServiceBroker::GetGUI()->GetWindowManager();
   if(GetParentID()!=WINDOW_DIALOG_ADDON_INFO || wm.GetActiveWindow()!=WINDOW_ADDON_BROWSER ||
       wm.GetTopmostModalDialog()!=WINDOW_DIALOG_ADDON_INFO)return false;
+  auto* browser=wm.GetWindow(WINDOW_ADDON_BROWSER);
+  if(!browser || browser->GetProperty("Infinity.AddonBrowser.SearchScope").asBoolean())return false;
   auto* owner=wm.GetWindow(WINDOW_DIALOG_ADDON_INFO);if(!owner)return false;
   const auto identity=owner->GetProperty("Infinity.AddonBrowser.ActionIdentity").asString();
   if(identity.empty())return false;

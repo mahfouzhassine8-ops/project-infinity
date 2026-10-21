@@ -78,6 +78,10 @@ def popup(raw):
         n=body.find(tag)
         if n is None:n=ET.SubElement(body,tag)
         n.text=value
+    ET.SubElement(body,'pagecontrol').text='128'
+    bar=ET.SubElement(root.find('.//control[@id="100"]'),'control',{'type':'scrollbar','id':'128'})
+    for tag,value in [('visible','String.IsEqual(Window.Property(Infinity.HomeOptionB.Expanded),true)'),('showonepage','true'),('onleft','104'),('onright','104'),('onup','128'),('ondown','128')]:ET.SubElement(bar,tag).text=value
+    for tag,color in [('texturesliderbackground','InfinityLegacyField'),('texturesliderbar','InfinityLegacyTrack'),('texturesliderbarfocus','InfinityLegacyAccent')]:ET.SubElement(bar,tag,{'border':'6','colordiffuse':'$VAR['+color+']'}).text='infinity_legacy/track.png'
     return xml(root)
 
 

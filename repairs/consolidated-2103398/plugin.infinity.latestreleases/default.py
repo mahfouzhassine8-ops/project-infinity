@@ -5,7 +5,7 @@ requests, filters, sorting, pagination, artwork and metadata transformations.
 """
 import json
 import sys
-from urllib.parse import parse_qs, urlsplit
+from urllib.parse import parse_qs, urlsplit, urlencode
 import xbmc
 import xbmcgui
 import xbmcplugin
@@ -14,11 +14,11 @@ from identity import BASE, FEEDS, decode, equivalent, wrap
 FIELDS = ['title', 'originaltitle', 'year', 'genre', 'plot', 'plotoutline',
           'runtime', 'rating', 'mpaa', 'premiered', 'trailer', 'uniqueid',
           'imdbnumber', 'art', 'thumbnail', 'fanart', 'season', 'episode',
-          'tvshowtitle', 'playcount', 'lastplayed', 'resume', 'cast', 'director',
+          'showtitle', 'playcount', 'lastplayed', 'resume', 'cast', 'director',
           'writer', 'studio', 'country', 'tagline']
 INFO = {'originaltitle', 'title', 'year', 'genre', 'plot', 'plotoutline', 'runtime',
         'rating', 'mpaa', 'premiered', 'trailer', 'imdbnumber', 'season', 'episode',
-        'tvshowtitle', 'playcount', 'lastplayed', 'director', 'writer', 'studio',
+        'showtitle', 'playcount', 'lastplayed', 'director', 'writer', 'studio',
         'country', 'tagline'}
 
 
@@ -46,6 +46,7 @@ def item(row):
     if row.get('fanart'): art.setdefault('fanart',row['fanart'])
     li.setArt(art)
     info = {k: row[k] for k in INFO if row.get(k) not in (None, '', [])}
+    if row.get('showtitle'): info['tvshowtitle']=row['showtitle']
     kind = row.get('_infinity_kind') or row.get('type')
     if kind in ('movie', 'tvshow', 'season', 'episode'):
         info['mediatype'] = kind
@@ -83,7 +84,10 @@ def run():
         section = q.get('section', ['movies'])[0]
         if section not in FEEDS:
             raise ValueError('Unknown Latest Releases feed')
-        before = listing(FEEDS[section])
+        route=FEEDS[section]
+        if q.get('reload'):
+            route+='&'+urlencode({'reload':q['reload'][0][:200]})
+        before = listing(route)
         rows = []
         for row in before:
             # Preserve next-page/navigation entries exactly. Only genuine media

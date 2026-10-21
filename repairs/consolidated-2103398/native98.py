@@ -71,6 +71,7 @@ def patches(before, original, final):
             iItem >= 0 && iItem < m_vecItems->Size() &&
             !StringUtils::StartsWith(m_vecItems->Get(iItem)->GetPath(), "addons://search") &&
             iAction == ACTION_MOUSE_LEFT_CLICK &&''')
+    out[BROWSER]=once(out[BROWSER],b'  bool result = CGUIMediaWindow::GetDirectory(strDirectory, items);',b'  SetProperty("Infinity.AddonBrowser.SearchScope", StringUtils::StartsWith(strDirectory, "addons://search"));\n  bool result = CGUIMediaWindow::GetDirectory(strDirectory, items);')
     out[INPUT]=once(before[INPUT],b'      // INFINITY_UI_TOUCH_V1:',b'''#if defined(TARGET_ANDROID)
       // INFINITY_2103398_BROWSER_TOUCH: only actual one-pointer touch while
       // Infinity's Add-on Browser owns the active window. Search is excluded.

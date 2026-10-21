@@ -31,6 +31,14 @@ class Corrective98(unittest.TestCase):
   cls.before=c.read_parent(APK);cls.after=c.components(cls.before)
   cls.native=n.patches({p:(NATIVE/p).read_bytes() for p in n.PATHS},cls.before,cls.after)
 
+ def test_directory_fields_are_supported_by_actual_kodi_schema(self):
+  schema=json.loads((NATIVE/'xbmc/interfaces/json-rpc/schema/types.json').read_text())
+  source=(c.HERE/c.LATEST/'default.py').read_text()
+  import ast
+  tree=ast.parse(source)
+  fields=next(ast.literal_eval(n.value) for n in tree.body if isinstance(n,ast.Assign) and any(getattr(t,'id','')=='FIELDS' for t in n.targets))
+  self.assertLessEqual(set(fields),set(schema['List.Fields.Files']['items']['enum']))
+
  def test_identity_keeps_the_original_long_provider_route(self):
   self.assertGreater(len(ROUTE),4096)
   path=identity.encode(ROUTE,'movie',{'imdb':'tt123456','tmdb':'456'})
@@ -91,8 +99,32 @@ class Corrective98(unittest.TestCase):
   self.assertEqual(root.find('.//control[@id="113"]/texture').text,'infinity_ui/icons/close.png')
   self.assertEqual([root.find('.//control[@id="%d"]/label'%i).text for i in (101,102,103,104)],['Play','Trailer','Favorite','More Info'])
   self.assertEqual(root.find('.//control[@id="126"]').get('type'),'textbox')
+  self.assertEqual(root.find('.//control[@id="126"]/pagecontrol').text,'128')
+  self.assertEqual(root.find('.//control[@id="128"]').get('type'),'scrollbar')
   code=self.after[c.UI+'/home_option_b.py'];self.assertIn(b'details.doModal()',code);self.assertNotIn(b"executebuiltin('Action(Info)')",code)
   self.assertIn(b"synopsis=info('Plot',65536)",code)
+
+ def test_actual_selected_item_native_and_python_identity_cases(self):
+  for control,kind,section in [(8101,'movie','movies'),(8801,'movie','movies'),(8102,'tvshow','tvshows'),(8802,'tvshow','tvshows')]:
+   route=ROUTE if kind=='movie' else ROUTE.replace('action=play','action=seasons')
+   path=identity.encode(route,kind,{'imdb':'tt123456','tmdb':'456'})
+   label='Verified fixture poster'
+   proof=hashlib.sha256(f'{control}\n0\n{path}\n{label}'.encode()).hexdigest()
+   pending=dict(Control=str(control),Index='0',Path=path,Label=label,Proof=proof)
+   labels={'Container(9000).ListItem.Property(section)':section}
+   prefix=f'Container({control}).'
+   labels.update({prefix+'CurrentItem':'1',prefix+'NumItems':'20',prefix+'NumAllItems':'20',prefix+'ListItem.Label':label,prefix+'ListItem.Title':label,prefix+'ListItem.FileNameAndPath':path,prefix+'ListItem.DBTYPE':kind,prefix+'ListItem.Property(Infinity.LatestReleases.Identity)':'v1'})
+   window=types.SimpleNamespace(getFocusId=lambda:control,getProperty=lambda key:pending.get(key.removeprefix('Infinity.HomeOptionB.Pending'),''))
+   gui=types.SimpleNamespace(Window=lambda ident:window,getCurrentWindowId=lambda:10000,getCurrentWindowDialogId=lambda:0)
+   xbmc=types.SimpleNamespace(getInfoLabel=lambda key:labels.get(key,''),getCondVisibility=lambda key:kind=='tvshow' and key.endswith('IsFolder'),log=lambda *args:None,LOGINFO=1)
+   args=(str(control),'0',proof)
+   native=ui.read_native_hold(gui,args);self.assertIsNotNone(native);self.assertIsNotNone(ui.capture(xbmc,gui,native))
+   self.assertIsNone(ui.read_native_hold(gui,(str(control),'0','0'*64)))
+   self.assertIsNone(ui.read_native_hold(gui,('9200','0',proof)))
+   for key,bad in [(prefix+'CurrentItem','2'),(prefix+'ListItem.Label','Wrong poster'),(prefix+'ListItem.FileNameAndPath',ROUTE),(prefix+'ListItem.DBTYPE','episode'),('Container(9000).ListItem.Property(section)','other'),(prefix+'ListItem.Property(Infinity.LatestReleases.Identity)','')]:
+    saved=labels[key];labels[key]=bad
+    self.assertIsNone(ui.capture(xbmc,gui,native),key)
+    labels[key]=saved
 
  def test_favorite_uses_existing_kodi_toggle_and_trailer_unavailable_is_explicit(self):
   s=ui.Selection(8101,0,'movies',ROUTE,'Fixture title')

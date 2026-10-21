@@ -397,12 +397,18 @@ def _show_verified_hold(xbmc, xbmcaddon, xbmcgui, xbmcvfs, native: NativeHold) -
                 ctrl=self.getControl(ident)
                 ctrl.setPosition(coords[0],coords[1])
                 ctrl.setWidth(coords[2]);ctrl.setHeight(coords[3])
+            self.setProperty('Infinity.HomeOptionB.Expanded', 'true' if self.expanded else 'false')
             if self.expanded:
+                body=self.getControl(126)
+                xx,yy,ww,hh=bounds['details']['synopsis']
+                bar=self.getControl(128)
+                bar.setPosition(xx+ww-32,yy);bar.setWidth(32);bar.setHeight(hh)
+                body.setWidth(ww-44)
                 extra = ' • '.join(v for v in (snapshot.release_date, snapshot.credits) if v)
                 self.setProperty('Infinity.HomeOptionB.Synopsis', (extra+'\n\n' if extra else '')+snapshot.synopsis)
                 for ident in (101,102,103): self.getControl(ident).setVisible(False)
                 self.getControl(104).setLabel('Back')
-                self.setFocusId(126)
+                self.setFocusId(128)
             else:
                 self.setFocusId(101 if props['PlayAvailable']=='true' else 9)
             self.ready=True
