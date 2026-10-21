@@ -10,7 +10,7 @@ permissions:
   actions: read
 concurrency:
   group: infinity-2103394-fold-complete
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   components:
     name: Reuse all seven groups, verify corrections and execute actual DEX on Android 17
@@ -131,7 +131,7 @@ jobs:
           python3 repairs/four-repair-20261018/android37_gate.py --sdk-root "$ANDROID_HOME" --out api37-support --pin-tools
           python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out emulator-setup
           sudo chmod 666 /dev/kvm
-      - name: Execute the integrated production DEX and all thirteen file-rejection cases on ART
+      - name: Execute the integrated production DEX and all sixteen file-rejection cases on ART
         uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
         with:
           api-level: '37.0'

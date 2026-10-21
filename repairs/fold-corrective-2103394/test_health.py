@@ -10,6 +10,12 @@ import native94
 
 
 class CausalReport(unittest.TestCase):
+    def test_original_native_signal_retains_exact_engine_and_register_gap(self):
+        raw='schema=1\ntimestamp_ms=1000\npid=42\ntid=43\nsignal=11\nsi_code=1\npc=0x1234\nfault_address=0x20\narch=aarch64\nnative_engine_sha256='+'a'*64+'\n'
+        report=causal.build({'native-crash-last.txt':raw});row=report['timeline'][0]
+        self.assertEqual(row['category'],'native');self.assertEqual(row['engine_sha256'],'a'*64)
+        self.assertEqual(row['epoch_ns'],1000000000);self.assertIn('pc=0x1234',row['error_context'])
+        self.assertEqual(report['original_sigsegv'],'needs_evidence');self.assertFalse(report['termination_authority'])
     def report(self, reason, detail='', blocking=True):
         return causal.build({'coordinator-receipt.json': dict(pid=42, session='real-session',
             phase='CHECKPOINT_FAILED', error='native_admission: unverified_protected_writer:plugin.video.thecrew:service.py:'+reason,

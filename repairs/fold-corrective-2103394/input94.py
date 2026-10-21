@@ -38,11 +38,14 @@ bool CGUIBaseContainer::OnInfinityMediaTouch(float x, float y, bool hold)
   if (type != "movie" && type != "tvshow" && type != "season" && type != "episode")
     return reject(); // search/history/command entries are not media records
   const std::string path = item->GetPath();
-  const bool provider = path.compare(0,22,"plugin://plugin.video.") == 0;
-  const bool library = path.compare(0,10,"videodb://") == 0;
+  const auto* mediaWindow = video ? dynamic_cast<const CGUIMediaWindow*>(window) : nullptr;
+  const std::string directory = mediaWindow ? mediaWindow->CurrentDirectory().GetPath() : "";
+  const bool provider = path.compare(0,22,"plugin://plugin.video.") == 0 ||
+      directory.compare(0,22,"plugin://plugin.video.") == 0;
+  const bool library = path.compare(0,10,"videodb://") == 0 || directory.compare(0,10,"videodb://") == 0;
   const std::string saved = item->GetProperty("Infinity.ResumeHub.Key").asString();
   const bool local = saved.size() == 64 && saved.find_first_not_of("0123456789abcdef") == std::string::npos &&
-      (resume || path.compare(0,39,"plugin://script.infinity.commandcenter/") == 0);
+      (resume || directory.compare(0,39,"plugin://script.infinity.commandcenter/") == 0);
   if ((!provider && !library && !local) || path.size() > 8192 || item->IsParentFolder()) return reject();
   if (hold && (featured || resume)) return reject(); // existing Option B / Resume management owns holds
   const auto now = std::chrono::steady_clock::now();
@@ -154,7 +157,7 @@ def patches(before):
   std::chrono::steady_clock::time_point m_infinityMediaSuppressUntil{};''')
     out[HEADER]=raw
     raw=out[CONTAINER]
-    raw=once(raw,b'#include "FileItem.h"',b'#include "FileItem.h"\n#include "video/VideoInfoTag.h"')
+    raw=once(raw,b'#include "FileItem.h"',b'#include "FileItem.h"\n#include "FileItemList.h"\n#include "video/VideoInfoTag.h"\n#include "windows/GUIMediaWindow.h"')
     raw=once(raw,b'bool CGUIBaseContainer::OnInfinityUiTouch(',METHOD.encode()+b'\nbool CGUIBaseContainer::OnInfinityUiTouch(')
     start=raw.index(b'bool CGUIBaseContainer::OnInfinityOptionBLongPress(')
     end=raw.index(b'bool CGUIBaseContainer::OnInfinityRailLongPress(',start)

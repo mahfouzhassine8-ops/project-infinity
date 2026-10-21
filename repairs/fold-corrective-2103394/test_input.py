@@ -27,7 +27,11 @@ struct CGUIControl {bool visible=true,disabled=false;const CGUIControl* parent=n
  const CGUIControl* GetParentControl()const{return parent;}};
 struct Transform {float scale=2,origin=40;void InverseTransformPosition(float& x,float& y){x=(x-origin)/scale;y=y/scale;}};
 struct CGUIMessage {int id;CGUIMessage(int,int,int c):id(c){}};
-struct Window {int focused=0,view=55;void OnMessage(const CGUIMessage&m){focused=m.id;}int GetFocusedControlID(){return focused;}int GetViewContainerID(){return view;}};
+struct Directory {std::string path;std::string GetPath()const{return path;}};
+struct Window {virtual ~Window()=default;int focused=0,view=55;Directory directory;
+ void OnMessage(const CGUIMessage&m){focused=m.id;}int GetFocusedControlID(){return focused;}int GetViewContainerID(){return view;}
+ const Directory& CurrentDirectory()const{return directory;}};
+using CGUIMediaWindow=Window;
 struct Manager {int active=WINDOW_VIDEO_NAV,modal=WINDOW_INVALID;Window window;
  Window* GetWindow(int){return &window;}int GetActiveWindow(){return active;}int GetTopmostModalDialog(){return modal;}};
 struct Gui{Manager manager;Manager& GetWindowManager(){return manager;}};
@@ -70,7 +74,11 @@ int main(){
  CServiceBroker::settings.settings.skin="skin.infinity.diggz";
  item->path="plugin://script.unrelated/?action=run";assert(!c.OnInfinityMediaTouch(260,50,true));
  item->path="plugin://script.infinity.commandcenter/?action=unavailable";item->saved=std::string(64,'a');
+ CServiceBroker::gui.manager.window.directory.path="plugin://script.infinity.commandcenter/?action=library";
  assert(c.OnInfinityMediaTouch(260,50,true));
+ item->path="https://existing-source.invalid/original";
+ testNow+=std::chrono::seconds(1);assert(c.OnInfinityMediaTouch(260,50,false));advance();
+ int beforeOpen=c.opens;assert(c.OnInfinityMediaTouch(260,50,false)&&c.opens==beforeOpen+1);
  c.parentID=WINDOW_HOME;c.id=8830;CServiceBroker::gui.manager.active=WINDOW_HOME;
  assert(!c.OnInfinityMediaTouch(260,50,true)); // original Resume management retained
  testNow+=std::chrono::seconds(2);assert(c.OnInfinityMediaTouch(260,50,false));

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Execute the actual newly integrated startup DEX on disposable Android 17 ART.
 
-Reuse the passed 37-case verifier matrix and result parser with exact CC23
+Extend the passed verifier matrix to 43 cases for all sixteen exact CC24
 fixtures. This is component execution, not physical Fold/app acceptance.
 """
 from __future__ import annotations

@@ -39,7 +39,8 @@ def _detail(value):
     """Allow exception types, numeric codes and bounded basename-only stacks."""
     text = str(value or '')[:4096]
     parts = []
-    for key in ('exception', 'errno', 'sqlite_code', 'sqlite_errorcode', 'verb', 'native_errno'):
+    for key in ('exception', 'errno', 'sqlite_code', 'sqlite_errorcode', 'verb', 'native_errno',
+                'signal', 'si_code', 'pc', 'fault_address', 'arch'):
         match = re.search(r'(?:^|[; ,])' + key + r'=([A-Za-z0-9_.-]{1,90})', text)
         if match:
             parts.append(key + '=' + match[1])
@@ -79,7 +80,7 @@ def event(row, source):
     owner_match = re.search(r'unverified_protected_writer:((?:plugin|script|service)\.[\w.-]+):', outcome)
     if not owner and owner_match:
         owner = owner_match[1]
-    failed = any(word in (operation + ' ' + outcome).lower()
+    failed = operation.startswith('native_crash.') or any(word in (operation + ' ' + outcome).lower()
                  for word in ('failed', 'failure', 'exception', 'denied', 'unverified_protected_writer'))
     details = _detail(row.get('error_detail') or row.get('detail') or outcome)
     sha = str(row.get('native_engine_sha256') or row.get('engine_sha256') or '')
@@ -103,6 +104,7 @@ def event(row, source):
                 monotonic_ns=_integer(row.get('monotonic_ns') or row.get('elapsed_ns')),
                 observed_epoch_ms=_integer(row.get('observed_epoch_ms')),
                 session=identifier(row.get('session') or row.get('session_start_ns')),
+                build_version_code=_integer(row.get('build_version_code') or row.get('version_code') or row.get('versionCode')),
                 component=owner if OWNER.fullmatch(owner) else None,
                 owner_verified=bool(OWNER.fullmatch(owner)) and row.get('owner_verified') is True, engine_sha256=sha,
                 source=source, consequence=('Protected save remains blocked.' if
@@ -152,6 +154,20 @@ def build(inputs, environment=None):
             raw = json.dumps(raw)
         raw = raw[-MAX_INPUT:]
         name = Path(source).name
+        if name.startswith('native-crash-'):
+            fields={key:value for key,value in re.findall(r'(?m)^([a-z_][a-z0-9_]*)=([A-Za-z0-9_.-]{1,90})$',raw)
+                    if key in ('schema','timestamp_ms','pid','tid','signal','si_code','fault_address','pc','arch','native_engine_sha256')}
+            if fields.get('signal','').isdecimal() and fields.get('pid','').isdecimal():
+                record=dict(event='native_crash.original_signal',outcome='signal_'+fields['signal'],
+                    pid=int(fields['pid']),tid=int(fields['tid']) if fields.get('tid','').isdecimal() else None,
+                    native_engine_sha256=fields.get('native_engine_sha256'),
+                    epoch_ms=int(fields['timestamp_ms']) if fields.get('timestamp_ms','').isdecimal() else None,
+                    detail=';'.join(k+'='+fields[k] for k in ('signal','si_code','pc','fault_address','arch') if k in fields))
+                fact=event(record,name)
+                fact['gaps'].append('Raw original-handler registers require symbolication with the exact matching engine; no faulting instruction or repair is proved here.')
+                timeline.append(fact)
+            elif raw.strip():gaps.append(name+': original signal fields unavailable')
+            continue
         if name.endswith('.anr.txt') or ('Input dispatching timed out' in raw and 'sysTid=' in raw):
             waits.append(anr_waits(raw))
             timeline.append(event({'event': 'anr.input_timeout', 'outcome': 'Android input timeout'}, name))
@@ -220,20 +236,23 @@ def build(inputs, environment=None):
     return {'schema': 1, 'read_only': True, 'termination_authority': False,
             'categories': groups, 'timeline': timeline, 'relations': relations,
             'anr_waits': waits, 'gaps': gaps, 'physical_acceptance': 'needs_evidence',
-            'build': identifier((environment or {}).get('kodi_build')),
+            'build': re.sub(r'[^A-Za-z0-9_. ():+-]','?',str((environment or {}).get('kodi_build') or ''))[:160],
             'original_sigsegv': 'needs_evidence'}
 
 
 def collect(roots, environment=None):
     inputs = {}
+    folders=[]
     for root in list(roots)[:8]:
+        root=Path(root);folders.extend((root,root/'traces'))
+    for root in folders:
         root = Path(root)
         if root.is_symlink() or not root.is_dir():
             continue
         for path in sorted(root.iterdir()):
             if len(inputs) >= MAX_FILES:
                 break
-            if path.is_symlink() or not path.is_file() or path.suffix not in ('.json', '.jsonl', '.txt', '.log'):
+            if path.is_symlink() or not path.is_file() or path.suffix not in ('.json', '.jsonl', '.txt', '.log', '.trace'):
                 continue
             if any(word in path.name for word in ('settings', 'account', 'token', 'source')):
                 continue
@@ -251,12 +270,15 @@ def text(report):
     out = ['Infinity Health Center — diagnostic tree',
            'Observed evidence only. Missing evidence never authorizes shutdown.']
     for group in report['categories']:
-        out.append('\n' + group['label'] + ' — ' + group['status'])
-        for row in (x for x in report['timeline'] if x['id'] in group['events']):
-            out.append('%s | pid=%s tid=%s | %s | %s' %
-                       (row['operation'], row['pid'], row['tid'], row['component'] or 'owner unverified', row['outcome']))
-            if row['error_context']:
-                out.append(row['error_context'])
-            out.extend('Gap: ' + x for x in row['gaps'])
+        out.append(group['label'] + ' — ' + group['status']+' ('+str(len(group['events']))+')')
+    out.append('\nCentral event timeline — build '+report['build'])
+    for row in report['timeline']:
+        out.append('%s | %s | epoch_ns=%s | pid=%s tid=%s | %s | %s' %
+                   (row['id'],row['role'],row['epoch_ns'],row['pid'],row['tid'],row['operation'],row['outcome']))
+        out.append('Component=%s | session=%s | build=%s | engine=%s | confidence=%s' %
+                   (row['component'] or 'unverified',row['session'],row['build_version_code'],
+                    row['engine_sha256'] or 'missing',row['confidence']))
+        if row['error_context']:out.append(row['error_context'])
+        out.extend('Gap: ' + x for x in row['gaps'])
     out.extend('\nGap: ' + x for x in report['gaps'])
     return '\n'.join(out)[:96000]
