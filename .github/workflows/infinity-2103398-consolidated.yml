@@ -5,6 +5,7 @@ on:
     branches: [work/infinity-2103398-consolidated]
     paths:
       - '.github/workflows/infinity-2103398-consolidated.yml'
+      - 'repairs/consolidated-2103398/**'
   workflow_dispatch:
 permissions:
   contents: read
