@@ -136,7 +136,7 @@ def patches(before, original, final):
     // No permission is added to any provider, and history is never read by exit
     // authorization. A later success cannot replace an earlier failed attempt.
     CoordinatorWriteScope permission;
-    const auto saved = infinity::checkpoint::files::SaveProtocolRecord(
+    const auto saved = infinity::checkpoint::files::SaveDirty(
         directory + "/attempt-" + key + ".json", encoded);
     if (saved.ok)
     {
