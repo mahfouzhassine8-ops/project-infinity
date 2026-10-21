@@ -103,7 +103,11 @@ def assemble(args):
             patched,edits=manifest.patch(a.read('AndroidManifest.xml'))
             c.require(len(edits)==2 and {e['field'] for e in edits}=={'versionCode','versionName'},'manifest delta not limited to version')
             targets={'assets/addons/'+name:final[name] for name in ledger['changed']}
-            targets['assets/infinity-2103396-components.json']=c.evidence_manifest(final)
+            # The preserved production collector still reads the 95 wire name.
+            # Keep that interface and publish exact current pins at both names.
+            evidence=c.evidence_manifest(final)
+            targets['assets/infinity-2103395-components.json']=evidence
+            targets['assets/infinity-2103396-components.json']=evidence
             targets.update({ENGINE:native,RECORDER:recorder,'classes.dex':dex.read_bytes(),'AndroidManifest.xml':patched})
             with ZipFile(unsigned,'w',allowZip64=True) as z:
                 for info in a.infolist():
