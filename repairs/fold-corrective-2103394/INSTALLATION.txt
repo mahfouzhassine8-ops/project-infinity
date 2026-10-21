@@ -1,0 +1,26 @@
+INFINITY 2103394 — EXPERIMENTAL INSTALL-OVER CANDIDATE
+
+Keep Infinity installed. Do not uninstall, clear app data or reset a profile.
+1. Open Infinity-2103394-Fold-Corrective-EXPERIMENTAL.apk and choose Update.
+   Package com.projectinfinity.kodi and the permanent signing certificate match 2103393.
+2. Existing external Kodi add-ons can override bundled assets. If their versions
+   are older, use Kodi's normal Install from ZIP, allowing each update to finish:
+   Command Center 0.3.5.24 -> Watched Bridge 1.0.5 -> UI Repair 0.1.6 ->
+   Health Center 2.5.21 -> Infinity Skin 1.0.5.231.
+   Rails 0.2.7 is unchanged; its matching ZIP is supplied for coherence/rollback.
+   Install this APK before the new component ZIPs. Keep the installed compatibility
+   service and all provider/user settings. No provider ZIP is replaced.
+3. Use normal Essential-First Close/reopen. If Close refuses, retain and export
+   diagnostics; do not treat an unverified writer as safe or erase its records.
+4. Complete the physical Fold checks in CORRECTIVE-ACCEPTANCE.md, including Cobra.
+
+Component ZIPs contain exactly the corresponding assets from the signed APK.
+Verify every download against SHA256SUMS. Permanent certificate SHA-256:
+d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7
+
+This is not a final LOCK. Physical installation/acceptance, historical SIGSEGV
+and original Crew exception reproduction remain open. No data wipe is required.
+Keep the signed 2103393 release and component ZIPs as the preserved baseline.
+Android ordinarily prevents an APK version downgrade: do not uninstall to force
+rollback. A retained higher-version rollback build can reuse that sealed source
+and permanent key if needed; data/schema additions here are backward compatible.

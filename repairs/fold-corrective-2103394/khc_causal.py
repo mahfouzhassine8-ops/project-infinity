@@ -28,7 +28,7 @@ OWNER = re.compile(r'(?:plugin|script|service|skin)\.[a-zA-Z0-9_.-]+\Z')
 
 def identifier(value, limit=120):
     value = str(value or '')
-    return value[:limit] if re.fullmatch(r'[A-Za-z0-9_.:<>() /-]*', value) else '<redacted>'
+    return value[:limit] if re.fullmatch(r'[A-Za-z0-9_.:<>()-]*', value) else '<redacted>'
 
 
 def _integer(value):
@@ -89,9 +89,14 @@ def event(row, source):
     if not HASH.fullmatch(sha):
         sha = None
         gaps.append('Matching native engine hash is absent from this event.')
-    category='shutdown' if operation in ('CHECKPOINT_FAILED','checkpoint.failed') else _category(operation + ' ' + outcome)
+    category='shutdown' if operation in ('CHECKPOINT_FAILED','checkpoint.failed') else _category(operation + ' ' + str(row.get('event') or '') + ' ' + outcome)
+    public_outcome=outcome.split(';',1)[0]
+    # This native admission prefix is a known structural separator, rather
+    # than permission to copy arbitrary exception messages or private paths.
+    if re.fullmatch(r'native_admission: unverified_protected_writer:(?:plugin|script|service)\.[A-Za-z0-9_.-]+:[A-Za-z0-9_.-]+:[A-Za-z0-9_.-]+',public_outcome):
+        public_outcome=public_outcome.replace('native_admission: ','native_admission:')
     return dict(category=category,
-                operation=identifier(operation), outcome=identifier(outcome.split(';', 1)[0], 240),
+                operation=identifier(operation), outcome=identifier(public_outcome,240),
                 error_context=details, pid=_integer(row.get('pid')), tid=_integer(row.get('tid')),
                 epoch_ns=_integer(row.get('epoch_ns')) or (
                     row['epoch_ms'] * 1000000 if type(row.get('epoch_ms')) is int else None),
@@ -99,7 +104,7 @@ def event(row, source):
                 observed_epoch_ms=_integer(row.get('observed_epoch_ms')),
                 session=identifier(row.get('session') or row.get('session_start_ns')),
                 component=owner if OWNER.fullmatch(owner) else None,
-                owner_verified=bool(OWNER.fullmatch(owner)), engine_sha256=sha,
+                owner_verified=bool(OWNER.fullmatch(owner)) and row.get('owner_verified') is True, engine_sha256=sha,
                 source=source, consequence=('Protected save remains blocked.' if
                     'unverified_protected_writer' in outcome else 'See observed operation.'),
                 role=('advisory' if row.get('blocking') is False else 'failure') if failed else 'observation',

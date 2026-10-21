@@ -13,10 +13,10 @@ import xbmcvfs
 from common import addon_profile, persistence_scope
 import resume_hub as hub
 
-ACTIONS=(('Mark Watched','mark-watched'),('Mark Unwatched','mark-unwatched'),
+ACTIONS=(('Mark as Watched','mark-watched'),('Mark as Unwatched','mark-unwatched'),
          ('Add to Watchlist','add-watchlist'),('Remove from Watchlist','remove-watchlist'),
          ('Add to Collection','add-collection'),('Remove from Collection','remove-collection'),
-         ('Save For Later','save-later'),('Remove Save For Later','remove-later'))
+         ('Save for Later','save-later'),('Remove from Save for Later','remove-later'))
 
 
 def _bridge():
@@ -89,6 +89,13 @@ def apply_local(profile, snapshot, action):
     identity=hub.entry_identity(snapshot)
     if not identity or not hub.KEY_RE.fullmatch(snapshot.get('key','')):return False
     with persistence_scope():
+        source=Path(profile)/hub.CONTINUE_FILE
+        if source.exists():
+            if source.stat().st_size>8*1024*1024:raise RuntimeError('The local tracking file exceeds the reviewed limit.')
+            try:original=json.loads(source.read_text(encoding='utf-8'))
+            except (OSError,ValueError):raise RuntimeError('The local tracking file could not be read. Its data was retained.')
+            if not isinstance(original,dict) or type(original.get('schema')) is not int or original['schema'] not in (1,2):
+                raise RuntimeError('The existing local schema is unsupported. Its data was retained.')
         data=hub.load(profile);key=hub.compatible_key(data,snapshot)
         saved=hub.find_entry(data,key)
         if saved and not hub.same_identity(identity,hub.entry_identity(saved)):return False
@@ -108,13 +115,18 @@ def show(entry, profile=None, bridge=None, modules=None):
     profile=profile or addon_profile()
     snapshot=dict(entry)
     native_watched=bool(snapshot.pop('_native_watched',False))
-    home=xbmcgui.Window(10000);home.setProperty('Infinity.Select.Compact','true')
-    try:pick=xbmcgui.Dialog().select('Infinity Trakt',[label for label,_ in ACTIONS])
-    finally:home.clearProperty('Infinity.Select.Compact')
+    from infinity_settings import choose
+    pick=choose('Infinity Trakt',[label for label,_ in ACTIONS])
     if not 0<=pick<len(ACTIONS):return False
     action=ACTIONS[pick][1]
     if snapshot['identity']['kind'] in ('movie','episode'):
         bridge,modules=(bridge,modules) if bridge is not None else _bridge()
+        producer=bridge.contracts.provider(snapshot)
+        if snapshot['identity']['kind']=='episode' and producer:
+            owner=xbmcaddon.Addon(producer)
+            proof=bridge.contracts.verify(producer,xbmcvfs.translatePath(owner.getAddonInfo('path')))
+            if not proof:raise RuntimeError('This saved episode producer cannot confirm its identity contract. Its records were retained.')
+            snapshot[bridge.contracts.ENTRY_PROOF]=proof
         # Reuse all producer proof, selected-state and pending-sync safeguards.
         data=hub.load_view(profile);key=hub.compatible_key(data,snapshot)
         query=bridge.contracts.canonical(snapshot,bridge.identity(snapshot),snapshot.get(bridge.contracts.ENTRY_PROOF))

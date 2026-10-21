@@ -1,0 +1,949 @@
+{
+  "parent_apk_sha256": "0326782173ef609d0f55284245ce00f55a8a78d73b3d2acf5928950bd4af068e",
+  "parent_source_commit": "2a9b6ae6bd0556b2f7b13a786a6382850b05cd83",
+  "versions": {
+    "script.infinity.commandcenter": "0.3.5.24",
+    "script.infinity.watchedbridge": "1.0.5",
+    "script.infinity.uirepair": "0.1.6",
+    "skin.infinity.diggz": "1.0.5.231",
+    "script.infinity.rails": "0.2.7",
+    "script.kodihealthcenter": "2.5.21"
+  },
+  "changed": {
+    "script.infinity.commandcenter/addon.xml": {
+      "before": "3e2e182758a890d1ad98992a8cb11ea704c54eaab41b940dde03ab6bd68fa39c",
+      "after": "13daf252855db45022687335f9b644f8aeecf808792c1cd3ab32cbdd54c0646d"
+    },
+    "script.infinity.commandcenter/context.py": {
+      "before": "1be51567f4022bc76dde6360932fa6e598c8cd16138fe60e0a16bbcfb0132320",
+      "after": "74514530150db859c8ec992983489901bc30eb047aada9fdce84348bb0eedf66"
+    },
+    "script.infinity.commandcenter/default.py": {
+      "before": "fa6c1827385b2ed4e704775d10a23dc7bb4b2fd5df2e26aa44fcaaa510254d67",
+      "after": "b4844b31397a0bc196262fc808a83e48c8a44ae147572fdabd855eba0598c12f"
+    },
+    "script.infinity.commandcenter/infinity_search.py": {
+      "before": null,
+      "after": "9dd3b4362bb8045b1703e189ecf150296aecec52fdd85ea91efacfa83538ac04"
+    },
+    "script.infinity.commandcenter/infinity_settings.py": {
+      "before": null,
+      "after": "fe1d2589a4e1ad3a14aea3444637f9e33f820352364b3c7967855ee977d48b55"
+    },
+    "script.infinity.commandcenter/infinity_trakt.py": {
+      "before": null,
+      "after": "1963132a569c650c3b9d747fdf7987abb0880506b09cc54226382ac6f81c4f13"
+    },
+    "script.infinity.commandcenter/plugin.py": {
+      "before": "af48040756435b290db305a5dc714bc6f24a1d993bf4ff75e1291a2f8848adf3",
+      "after": "f96f01a4a1370b5378ffaa9ad84e382dd985f2db73e18e308e7afc844bd3b76b"
+    },
+    "script.infinity.commandcenter/resources/settings.xml": {
+      "before": null,
+      "after": "7cf7649f80c4c3e6c81caa6e80b1f325f470055e7de62fdf37367effe8484451"
+    },
+    "script.infinity.commandcenter/resources/skins/Default/1080i/InfinityItemOptions.xml": {
+      "before": null,
+      "after": "6a5b19c52319b8493afffdace17fa10c38dafa7406d442e84ed04552e870f4ff"
+    },
+    "script.infinity.commandcenter/resources/skins/Default/1080i/InfinitySearch.xml": {
+      "before": null,
+      "after": "0fb440287b00d6dc4f6c15c99e16be0a4e4e70a62cd4be08b1dd9375595272ad"
+    },
+    "script.infinity.commandcenter/resume_hub.py": {
+      "before": "087860b6a551a23fdd8f7f11ab103b367f0ef44be32b5b42cadecf907e548784",
+      "after": "95cc0fdc4d4593ebfcd201d6c9a6d6b274ca756fe7194252bbadb5efc462ca60"
+    },
+    "script.infinity.uirepair/CONTROLLER-PREIMAGES.json": {
+      "before": "0bac5b5965941db10fe50dcff3e07b389558cfca29791666f4dd9f4fa08e184a",
+      "after": "45e5c4bd92e04fc2f2af9dc0e9d7cf7500dfaab546a7116a35d9e27b12992fda"
+    },
+    "script.infinity.uirepair/addon.xml": {
+      "before": "23ec8b381466131b9455565536bd621523cd3ac96f820a416e6ca7368bc4aa2d",
+      "after": "a5516374328365cb2fbbf65590848420db89eb49de7ecff7d2742e590b54e1bd"
+    },
+    "script.infinity.uirepair/controller_access.py": {
+      "before": "15e9c559678963c291e112302ab4542b6bf89637d1fa44922e319f615732eebf",
+      "after": "41d7e221ca000a8a9879d3db289fade098900c0ebd4954473364767b230914ec"
+    },
+    "script.infinity.uirepair/home_option_b.py": {
+      "before": "4a6c7816fad7409b4abd4c4f0be09a2b8d43060477c90007d0813adbd640f243",
+      "after": "09bd1658c4dd2ec250f24953f33d96cafdca2d1ee655cabd82802818aede6eb8"
+    },
+    "script.infinity.uirepair/runtime.py": {
+      "before": "4d5e316ca1620368e472800594899d7179587c05dee8bd1eedd69d9910bafcd6",
+      "after": "67fd69b6c38a998d81386a2705790562c5bc87e49d1e1dae2c174aadd0b661ea"
+    },
+    "script.infinity.watchedbridge/CONTROLLER-PREIMAGES.json": {
+      "before": "0bac5b5965941db10fe50dcff3e07b389558cfca29791666f4dd9f4fa08e184a",
+      "after": "45e5c4bd92e04fc2f2af9dc0e9d7cf7500dfaab546a7116a35d9e27b12992fda"
+    },
+    "script.infinity.watchedbridge/addon.xml": {
+      "before": "25eb550aeb56bb4aedccbbf2d0406d488fb94f952e3cd99cecfb433697c476d5",
+      "after": "57222970e83b7848dc7c0b34ff1ebc40860e0b43ef959b3088919fbafd57b9f5"
+    },
+    "script.infinity.watchedbridge/controller.py": {
+      "before": "8f41e70005304822ece27dd8197828afde94afe826c451f3d9636d93d5aa6ca5",
+      "after": "0d7a450f0a0f683eba538d199ea5b8e10efe1771aa652a62bfa1273cbbf8a629"
+    },
+    "script.kodihealthcenter/AUDIT-2.5.10.txt": {
+      "before": null,
+      "after": "92676e0f504e5edc0981d1a9be0da3572c44fdb92cceaad638fe97308cf2faa5"
+    },
+    "script.kodihealthcenter/AUDIT-2.5.11.txt": {
+      "before": null,
+      "after": "1a0265d3eb39192b4fe1c1b3033e77053427ed3a1030c8520bc979e40e2aaf34"
+    },
+    "script.kodihealthcenter/AUDIT-2.5.12.txt": {
+      "before": null,
+      "after": "e753eafc9d9c752fb3b655bf1c701b47126a4d7a1e64af42d72bfc9003a44e4e"
+    },
+    "script.kodihealthcenter/AUDIT-2.5.13.txt": {
+      "before": null,
+      "after": "3b15f7e63e671661f3a43cf99a8b65100d7f3a9b3eaaf3fa7e9feb1b3aa6c178"
+    },
+    "script.kodihealthcenter/AUDIT-2.5.14.txt": {
+      "before": null,
+      "after": "0ad8480f15ea59abdadca23b9ab33f030ac8461bcd12f25455c6b611e45597d4"
+    },
+    "script.kodihealthcenter/AUDIT-2.5.15.txt": {
+      "before": null,
+      "after": "25b8521fe5e3b436bc8550668b2c40ecafa8dee38711861333d006052a45fd5c"
+    },
+    "script.kodihealthcenter/AUDIT-2.5.9.txt": {
+      "before": null,
+      "after": "1e604114d9c6e70c0cb934f220d04dc9295aa1b16f7f8a10600be02fdf0f609a"
+    },
+    "script.kodihealthcenter/AUDIT-REPAIR-NOTES.txt": {
+      "before": null,
+      "after": "ba9c4379528ebd2822061ed40f5ac5eea59bcbdb0c1b46467192e7098de57ddb"
+    },
+    "script.kodihealthcenter/DIAGNOSTICS_VALIDATION.json": {
+      "before": null,
+      "after": "504ed49878c7adaba7d5ec7ecde46ad984c699ad9688fc0a0d7923ba239522cc"
+    },
+    "script.kodihealthcenter/INFINITY_MAP_ALIGNMENT_2_5_4.txt": {
+      "before": null,
+      "after": "692c5af69003071b0d39a6ea88ce9c69241d393b21d1a393e41a9abd70d25053"
+    },
+    "script.kodihealthcenter/INFINITY_MAP_ALIGNMENT_2_5_6.txt": {
+      "before": null,
+      "after": "da674f55cbf54fd79b98dccb203631b36b1b4271fee50188bb371b1fc26fc098"
+    },
+    "script.kodihealthcenter/KHC_RELEASE.json": {
+      "before": null,
+      "after": "0e2a5263c4561e7cfafc5f21c9c913996f2c398c0e5983910335dfd2a870d591"
+    },
+    "script.kodihealthcenter/README.txt": {
+      "before": null,
+      "after": "1971477b5c0a5049cd6684f2968144f1a0b696cb6f0e9e687ef79462a308c068"
+    },
+    "script.kodihealthcenter/addon.xml": {
+      "before": null,
+      "after": "6453e0c6843ec2580956d7fbb1369564be7b73c0956ff0881e04ed145fafa3e8"
+    },
+    "script.kodihealthcenter/default.py": {
+      "before": null,
+      "after": "fc2cb4ce6251cd363094b43462f4d919db27268d2701e30d705fc93fbefc2f26"
+    },
+    "script.kodihealthcenter/health_ui.py": {
+      "before": null,
+      "after": "8bfcd0a9920b7353d6d8fa576fc56be67d548d251e6e6211cbe9eef1a238e694"
+    },
+    "script.kodihealthcenter/khc_android.py": {
+      "before": null,
+      "after": "5852b63f7ec64d9b05a837c13d3974c0e90ff399858e4709c4c92940e2853a80"
+    },
+    "script.kodihealthcenter/khc_auto_repair.py": {
+      "before": null,
+      "after": "b539cba2714a50feccf3025ced3c67e19ed256c06acd42d929d6c87661dcfe6b"
+    },
+    "script.kodihealthcenter/khc_causal.py": {
+      "before": null,
+      "after": "456280d9e450f75bb41471447fac724dfb04a0e8b2a83a247c59cab0a0ac1713"
+    },
+    "script.kodihealthcenter/khc_contracts.py": {
+      "before": null,
+      "after": "141c5052d4459c1302d00dc29a6bc4a849879ba6b4e1b162088e5c3a01d49ee2"
+    },
+    "script.kodihealthcenter/khc_dependency.py": {
+      "before": null,
+      "after": "9f6bbabb6add6e689d72a3fd9c7ae2ad4c1b4cb9b315fb005af75c2af3c9d0c2"
+    },
+    "script.kodihealthcenter/khc_diagnostics.py": {
+      "before": null,
+      "after": "0c78d81c27a926e27f22f591b580b985903f6c3c2cd631e52cb071501cc45b6a"
+    },
+    "script.kodihealthcenter/khc_doctor.py": {
+      "before": null,
+      "after": "428042b2fdb05c9bea4491a43a06da2a33b994eb66892d81ed79981e73ba7249"
+    },
+    "script.kodihealthcenter/khc_download.py": {
+      "before": null,
+      "after": "b6cce27e725e02cb2e85a049578ad17e4a4763aa14d7b2af999d925e05e483e6"
+    },
+    "script.kodihealthcenter/khc_exit_status.py": {
+      "before": null,
+      "after": "bdad3a131b4b77566588a605b96f1cfe578a8309ca03bc58c783756203c976e9"
+    },
+    "script.kodihealthcenter/khc_exports.py": {
+      "before": null,
+      "after": "392c4a41a40f4cc8c7885ec1b399ef4698a36a3691474ee921b257b862cc8dfa"
+    },
+    "script.kodihealthcenter/khc_install.py": {
+      "before": null,
+      "after": "408b9320a18cbea4822bb0acf7bb90cd8876107a0ef413266335d3de0188d7eb"
+    },
+    "script.kodihealthcenter/khc_inventory.py": {
+      "before": null,
+      "after": "bc8f65694fc96e8601d38a13fa9bf6dcf05830d48bbfae1c4b677a418b73c7d2"
+    },
+    "script.kodihealthcenter/khc_kodi.py": {
+      "before": null,
+      "after": "a76b24e3799e2b78c5a95e4cf223e56b31c78d6f80148605c3040d0cf484b827"
+    },
+    "script.kodihealthcenter/khc_lifecycle.py": {
+      "before": null,
+      "after": "917e1a78a33b716f1c99960e65b5c0e004a37d6663fcb283e1adb6016a052bef"
+    },
+    "script.kodihealthcenter/khc_log_groups.py": {
+      "before": null,
+      "after": "67ecb39fc11456e9bddd79c107766be78e2fc6799c7bc08539e0ab61b3a0b61e"
+    },
+    "script.kodihealthcenter/khc_maintenance_status.py": {
+      "before": null,
+      "after": "e259ceca19def0593ab67d05d240051fdfcfaa339bf70315d56d765e96d40b6f"
+    },
+    "script.kodihealthcenter/khc_native.py": {
+      "before": null,
+      "after": "9a8fa1bcfbb79e19dd310ee4e9b2bc1a1d92e36656348700a9db2004fe2bc9f9"
+    },
+    "script.kodihealthcenter/khc_repo_review.py": {
+      "before": null,
+      "after": "cbe63ff2d793e8cbb13adf966a048761f8407dae06f09632937c48a0919f28d0"
+    },
+    "script.kodihealthcenter/khc_repo_ui.py": {
+      "before": null,
+      "after": "228be8f5377cf46a3309742241eb99454f7ac1169e131dd17b1102cbf02d1b99"
+    },
+    "script.kodihealthcenter/khc_safety.py": {
+      "before": null,
+      "after": "cf0f63eb529700393798fd45258a8d45f2bf6a54f2b12405445cac72d408aefc"
+    },
+    "script.kodihealthcenter/resources/skins/Default/1080i/HealthCenter.xml": {
+      "before": null,
+      "after": "b0f0a10cbdd4545c3c22e684e6c9bf68d61d2aaaa92f699f0f0da07f471742e6"
+    },
+    "script.kodihealthcenter/resources/skins/Default/16x9/HealthCenter.xml": {
+      "before": null,
+      "after": "b0f0a10cbdd4545c3c22e684e6c9bf68d61d2aaaa92f699f0f0da07f471742e6"
+    },
+    "script.kodihealthcenter/resources/skins/Default/20x9/HealthCenter.xml": {
+      "before": null,
+      "after": "5c5091e27428e2cb5e89dec0aaa616db7b045c8ce250529e313232665657ca3e"
+    },
+    "script.kodihealthcenter/resources/skins/Default/5x6/HealthCenter.xml": {
+      "before": null,
+      "after": "31e37fa64481f630519351e2d73068869452d6336e9fa938d90cb3714d4026be"
+    },
+    "script.kodihealthcenter/resources/skins/Default/6x5/HealthCenter.xml": {
+      "before": null,
+      "after": "2d0e5ef4fee2e9ed9709b5171a7f0ef826bea8f0ce26c5dbb0731b8ab51b62bf"
+    },
+    "script.kodihealthcenter/resources/skins/Default/media/hc_card.png": {
+      "before": null,
+      "after": "e049b5ee0e5dfd608767527a6b2de0d2d8185cb7e11a5b8abfe665049c7d4d55"
+    },
+    "script.kodihealthcenter/resources/skins/Default/media/hc_card_focus.png": {
+      "before": null,
+      "after": "8e5be27539974308148bea2d1c2b69b56fcc28e7d29e99b630b5ec3849c26c27"
+    },
+    "script.kodihealthcenter/resources/skins/Default/media/hc_card_new.png": {
+      "before": null,
+      "after": "64210280bf609d751239e3268344ecc7c866e27ffd65740f7ee22ea52d9ef53b"
+    },
+    "script.kodihealthcenter/resources/skins/Default/media/hc_close.png": {
+      "before": null,
+      "after": "36631b7679ce643908bf02b633dcc62e44267e346918d762e31de81c334f5054"
+    },
+    "script.kodihealthcenter/resources/skins/Default/media/hc_cyan.png": {
+      "before": null,
+      "after": "f7f399ecf8b4e241676399bcc511c0e34456f48c654da8ba8d30f0975d6cbee0"
+    },
+    "script.kodihealthcenter/resources/skins/Default/media/hc_green.png": {
+      "before": null,
+      "after": "ce6b856cb7d31a179d16543a1cad107e9f2a869973fa7d40e686790b0447731d"
+    },
+    "script.kodihealthcenter/resources/skins/Default/media/hc_header.png": {
+      "before": null,
+      "after": "9aa18fe9b775a8128c184a3ed1865ca26197f9ca7e66ad2780131d63cd2c93d2"
+    },
+    "script.kodihealthcenter/resources/skins/Default/media/hc_icon_bg.png": {
+      "before": null,
+      "after": "3ef807b7a66ae024d57920622c0acff8b2760cae307725be5992228d92b7de46"
+    },
+    "script.kodihealthcenter/resources/skins/Default/media/hc_panel.png": {
+      "before": null,
+      "after": "26b8fc843e71201d8311ba8c03c4ced939aa2afd0eb0aac30730da9a0fcaf8f6"
+    },
+    "script.kodihealthcenter/resources/skins/Default/media/hc_pill.png": {
+      "before": null,
+      "after": "9da2dd3d8e35e530e4c45553dd9d650f2e3f1fccb78cdddbbfada58508e55f62"
+    },
+    "script.kodihealthcenter/resources/skins/Default/media/hc_pill_focus.png": {
+      "before": null,
+      "after": "b2a1b1f08e40d5319e66dba3c34fa4b83dca75e1d8edf66182fc387fdda20482"
+    },
+    "script.kodihealthcenter/resources/skins/Default/media/hc_scrim.png": {
+      "before": null,
+      "after": "77c45121df1f23ea749b666f084d8d6931653b813681a154585ae562ba7cb3da"
+    },
+    "script.kodihealthcenter/resources/skins/Default/media/icon_clean.png": {
+      "before": null,
+      "after": "7b7393e3283c1b2c25a1cddf378da9aa8723474d897bb1b3cdc8c98485820021"
+    },
+    "script.kodihealthcenter/resources/skins/Default/media/icon_crash.png": {
+      "before": null,
+      "after": "8cbf9765e63085c47854a6bc2548d87d26d9842eadcaf55a97ba7a493ed9e5a3"
+    },
+    "script.kodihealthcenter/resources/skins/Default/media/icon_doctor.png": {
+      "before": null,
+      "after": "6f0b89cc22916d6467b1404859eac4ba24936e16127c1dc3ffcd1dccd93475cc"
+    },
+    "script.kodihealthcenter/resources/skins/Default/media/icon_export.png": {
+      "before": null,
+      "after": "97bc07afc6966c83e63e0737a98596a48a5f28541cb444ae0e1ffaa145e698b2"
+    },
+    "script.kodihealthcenter/resources/skins/Default/media/icon_fresh.png": {
+      "before": null,
+      "after": "35f23f60d7121139436103ad0c30546348db3238208c1565ab42614917466952"
+    },
+    "script.kodihealthcenter/resources/skins/Default/media/icon_health.png": {
+      "before": null,
+      "after": "4159a0c0bfb62db9a11f0b22c092ecff1a26f791b957f4d2a64244f6d030ea1b"
+    },
+    "script.kodihealthcenter/resources/skins/Default/media/icon_help.png": {
+      "before": null,
+      "after": "e5c766324af7a883bd1a87b13e95774c6778f83b10e8d92a0d769e87d9a5a5ff"
+    },
+    "script.kodihealthcenter/resources/skins/Default/media/icon_refresh.png": {
+      "before": null,
+      "after": "35f23f60d7121139436103ad0c30546348db3238208c1565ab42614917466952"
+    },
+    "script.kodihealthcenter/resources/skins/Default/media/icon_repair.png": {
+      "before": null,
+      "after": "4f495262688ea1248e95ea7c84c9cf42bdd26b0e17a0a553c2c2d60a54d6c3c2"
+    },
+    "script.kodihealthcenter/resources/skins/Default/media/icon_repo.png": {
+      "before": null,
+      "after": "e5be459ece6ebd1d99d5048910b68019e6cd548f20725ec491060c02fc967267"
+    },
+    "script.kodihealthcenter/resources/skins/Default/media/icon_scan.png": {
+      "before": null,
+      "after": "c88b23c2df7e411fe7955a2a1b6e27127082d2e535899880929ba3d162449a29"
+    },
+    "script.kodihealthcenter/resources/skins/Default/media/icon_send.png": {
+      "before": null,
+      "after": "debf53c378b9d8ab8c59cd6d265481a412dc8a5837d64fcebb5a8a63bec8d67e"
+    },
+    "script.kodihealthcenter/resources/skins/Default/media/icon_skin.png": {
+      "before": null,
+      "after": "860a94e3f44586374bb4785df36656e5ab97b6484687d4966edcc22ed77c0852"
+    },
+    "script.kodihealthcenter/resources/skins/Default/media/icon_tools.png": {
+      "before": null,
+      "after": "99b0b54af89e06a891503ce2ee1b473cc364a740db97686a0bab77a71dcb92ed"
+    },
+    "script.kodihealthcenter/resources/skins/Default/portrait/HealthCenter.xml": {
+      "before": null,
+      "after": "623c1d63155fe46ed6fafba2da3acaa9bebd887162e4c1bf435ea2ae99d76bbe"
+    },
+    "script.kodihealthcenter/service.py": {
+      "before": null,
+      "after": "f0269a67c462f75acff36a4af58e9579a1b6e05f18bd3d1913c0a1cff8a8beb4"
+    },
+    "skin.infinity.diggz/16x9/AddonBrowser.xml": {
+      "before": "664ac272c38f925e5bdcbb07c10f333aad7c33bdab97bec3d03e208cff8f0c68",
+      "after": "63635eb8a96867080b6c9725dc6136d30144baeb33a1b3b890a12ba5e47cb080"
+    },
+    "skin.infinity.diggz/16x9/Custom_1188_InfinityHealthCenter.xml": {
+      "before": "15766033e851a3b6f1192049bd5dd5bff3bf99bb7a1ad41791ba9c2d841b2ecf",
+      "after": "7820e77974ca3209bb8d93e7fa795627730871ffbafe9e2c2726dfbbecd71406"
+    },
+    "skin.infinity.diggz/16x9/Custom_1194_InfinityCommandCenter.xml": {
+      "before": "ad7a3a4ab2c5bd38aec08cf7ff2a5622ceba3d7166500e92c19164b0f375c14b",
+      "after": "8bf656a3c9af9246ddfc30e95dca1b8d0099ed26b50f8a44a29bd4059da63562"
+    },
+    "skin.infinity.diggz/16x9/Home.xml": {
+      "before": "95af1900c472e58079773f2bc15a4f7994cfd369122ce05a0f2513f3108d21f5",
+      "after": "f0b8e0520acf738a71f5509c06f4eb0edb584d081de6337396227ed6e9f1f20d"
+    },
+    "skin.infinity.diggz/16x9/IncludesVariables.xml": {
+      "before": "e051790882a6acdea379942fc74c38ff803cfa4d7537a326a2af5e1f2e80e128",
+      "after": "8d7b6c9af8d31e3312a740ffbf14dc2d05afc910431283a3b7a8cd6c524d09f1"
+    },
+    "skin.infinity.diggz/16x9/Includes_InfinityLegacy.xml": {
+      "before": "f44425ae4fa63a6287290b22f3c9a7c61426d97f4bfb9cd0321bd5c37a456124",
+      "after": "12dfd323b7e26a2e508e7d1a4a3d389e5f22ae1c789b96ff430bafb045fad468"
+    },
+    "skin.infinity.diggz/16x9/InfinityPlaybackSettings.xml": {
+      "before": null,
+      "after": "29a221a08f39a49c29f87bcb2ddd3eea87143df7578fb9c4828c852267d18ade"
+    },
+    "skin.infinity.diggz/16x9/InfinitySubtitleSettings.xml": {
+      "before": null,
+      "after": "2057f91216791e78342bcecd8a6bda5cee63a741d44844b94b98e7cd9cca6836"
+    },
+    "skin.infinity.diggz/16x9/InfinityVideoSettings.xml": {
+      "before": null,
+      "after": "f7df9119b00fe0feae9099e084d9fc0ceb0af414b5784ccf0e60fb7f70a66637"
+    },
+    "skin.infinity.diggz/16x9/SkinSettings.xml": {
+      "before": "b7d870238474ec97cdb33617037717fd4e5f5e1a2d9837b2fc5955a3a247dc12",
+      "after": "ae8890d53fb371dad78f5f2d27b8f6738605c9b9b8de4d865a31052d203c0b99"
+    },
+    "skin.infinity.diggz/16x9/script-skinshortcuts-includes.xml": {
+      "before": "79cef3bf524149291d080689b63932e456229fd9b5145811058d04518ac6a9bd",
+      "after": "44e891178854f0c057653250541c49be94c472477b4cf7423e0fd2ad569eee05"
+    },
+    "skin.infinity.diggz/20x9/AddonBrowser.xml": {
+      "before": "0fe90e7ff9541b7d1e68f39aa5095a876833b57f09b996ab952d6a8cd0138c80",
+      "after": "f6951240708d21d573fd52c1fa8c84df504757d84375b8947d22734cb2a342c2"
+    },
+    "skin.infinity.diggz/20x9/Custom_1188_InfinityHealthCenter.xml": {
+      "before": "7360f35374c901c322cf5c24445323245a7ec3894cd27c40f08c323ba7a34a1d",
+      "after": "0d25a35cecdd0337b1d7cfa177d779d7ae09d9d29e2bcb0091964a40dc8595c7"
+    },
+    "skin.infinity.diggz/20x9/Custom_1194_InfinityCommandCenter.xml": {
+      "before": "22729077969d1c0ffb35257c4bcc38a1476fa0b6eaccc31abb0a15dae9572d29",
+      "after": "220d63d9e6145a3ab40e4e0644c6dcecf80504225d61fdaa5aba58534042bd1c"
+    },
+    "skin.infinity.diggz/20x9/Home.xml": {
+      "before": "95af1900c472e58079773f2bc15a4f7994cfd369122ce05a0f2513f3108d21f5",
+      "after": "f0b8e0520acf738a71f5509c06f4eb0edb584d081de6337396227ed6e9f1f20d"
+    },
+    "skin.infinity.diggz/20x9/InfinityPlaybackSettings.xml": {
+      "before": null,
+      "after": "29a221a08f39a49c29f87bcb2ddd3eea87143df7578fb9c4828c852267d18ade"
+    },
+    "skin.infinity.diggz/20x9/InfinitySubtitleSettings.xml": {
+      "before": null,
+      "after": "2057f91216791e78342bcecd8a6bda5cee63a741d44844b94b98e7cd9cca6836"
+    },
+    "skin.infinity.diggz/20x9/InfinityVideoSettings.xml": {
+      "before": null,
+      "after": "f7df9119b00fe0feae9099e084d9fc0ceb0af414b5784ccf0e60fb7f70a66637"
+    },
+    "skin.infinity.diggz/20x9/SkinSettings.xml": {
+      "before": "0c3f64861792344b09f100f8398019f141afa9ed7ee5693080434ebc753919ac",
+      "after": "d3117edda9182852d0c99d6cba66aa0cce39ab4d2a7a73c9536b9058898f50e6"
+    },
+    "skin.infinity.diggz/5x6/AddonBrowser.xml": {
+      "before": "3cb69978281e68cade95ce2d8a3315aa68cae45b28a741b39a8bf12fc8efc6f3",
+      "after": "330b08aa100d6221df057a6e8f24d8039569ec7cee52fd29812a37c627cec450"
+    },
+    "skin.infinity.diggz/5x6/Custom_1188_InfinityHealthCenter.xml": {
+      "before": "03b00518d043e219107a43f6aca51cb888557355bfce71ca8c575c75e1bd64dd",
+      "after": "a53ff7b28a12bd12c60e360a23377c2a11d068aa86de38a968f1d5e2ac1b9515"
+    },
+    "skin.infinity.diggz/5x6/Custom_1194_InfinityCommandCenter.xml": {
+      "before": "6d48b812e76b1bca6cca0aebef52047bbd6adca37b32ad644664b1a5c39c79ff",
+      "after": "12e6274ec3bf93f2f9628dd44ff8f31673f1c77b3c930625c889fcaec6e244e0"
+    },
+    "skin.infinity.diggz/5x6/Home.xml": {
+      "before": "95af1900c472e58079773f2bc15a4f7994cfd369122ce05a0f2513f3108d21f5",
+      "after": "f0b8e0520acf738a71f5509c06f4eb0edb584d081de6337396227ed6e9f1f20d"
+    },
+    "skin.infinity.diggz/5x6/InfinityPlaybackSettings.xml": {
+      "before": null,
+      "after": "29a221a08f39a49c29f87bcb2ddd3eea87143df7578fb9c4828c852267d18ade"
+    },
+    "skin.infinity.diggz/5x6/InfinitySubtitleSettings.xml": {
+      "before": null,
+      "after": "2057f91216791e78342bcecd8a6bda5cee63a741d44844b94b98e7cd9cca6836"
+    },
+    "skin.infinity.diggz/5x6/InfinityVideoSettings.xml": {
+      "before": null,
+      "after": "f7df9119b00fe0feae9099e084d9fc0ceb0af414b5784ccf0e60fb7f70a66637"
+    },
+    "skin.infinity.diggz/5x6/SkinSettings.xml": {
+      "before": "70b3f8b5958f52e4e4952f75f4547547cb5699db7f1368c817b54e8323e13089",
+      "after": "309e660a089f43b08d761a19e0578631cdd4ea8c8b7bf30e4fd53b55fcd199fc"
+    },
+    "skin.infinity.diggz/6x5/AddonBrowser.xml": {
+      "before": "727cfb2487284f0a6c3701dd3439f238eedcbba9fbdd1eca9ccfd3d1fbd628d2",
+      "after": "02f14e5468e850426ad6c42d5b63b4f3e918cfc9c1af202c86c995c739b3454a"
+    },
+    "skin.infinity.diggz/6x5/Custom_1188_InfinityHealthCenter.xml": {
+      "before": "63c3557362e805f4451cb3bf695efd0baf0f0895a14e715eb4726add0412a93a",
+      "after": "fad40969dd9ea636bbdb65464b022cdf896dafd9fa22d5895409372bf1124da0"
+    },
+    "skin.infinity.diggz/6x5/Custom_1194_InfinityCommandCenter.xml": {
+      "before": "8319c40e63315b715d25ce8e107b8bf742a33d655a8997e02bbc7091bbc2242b",
+      "after": "94f97e440de920bfdc063a07c90b5491826e3a7180db7e9a989ecbc38dae2518"
+    },
+    "skin.infinity.diggz/6x5/Home.xml": {
+      "before": "95af1900c472e58079773f2bc15a4f7994cfd369122ce05a0f2513f3108d21f5",
+      "after": "f0b8e0520acf738a71f5509c06f4eb0edb584d081de6337396227ed6e9f1f20d"
+    },
+    "skin.infinity.diggz/6x5/InfinityPlaybackSettings.xml": {
+      "before": null,
+      "after": "29a221a08f39a49c29f87bcb2ddd3eea87143df7578fb9c4828c852267d18ade"
+    },
+    "skin.infinity.diggz/6x5/InfinitySubtitleSettings.xml": {
+      "before": null,
+      "after": "2057f91216791e78342bcecd8a6bda5cee63a741d44844b94b98e7cd9cca6836"
+    },
+    "skin.infinity.diggz/6x5/InfinityVideoSettings.xml": {
+      "before": null,
+      "after": "f7df9119b00fe0feae9099e084d9fc0ceb0af414b5784ccf0e60fb7f70a66637"
+    },
+    "skin.infinity.diggz/6x5/SkinSettings.xml": {
+      "before": "c442a545e8c5de209fe748223414512c65c6fd70f69687ae6dd56d10dd3c3dab",
+      "after": "a6d76f8bc71561f96911e451a0338dc533d53e1fe7cc3e361ad94ab1e217fa38"
+    },
+    "skin.infinity.diggz/Infinity-Protected-Manifest.json": {
+      "before": "776c74a7c189c879b5e44f7884eb3abdfabc7e2e9c460b98db74a8d622da0a4c",
+      "after": "2a33e48cb2cf40bf25faaffc5eed474ce4c8d555d600ec3a12a909882afefe01"
+    },
+    "skin.infinity.diggz/addon.xml": {
+      "before": "635d05cf132c1f02564e4e8c5768e54eaa5af7dc1f28984c2b527a379507c6b8",
+      "after": "b157da970d0aaab47faf1bd91f39639315526e9923e31651db1070ecc59d5317"
+    },
+    "skin.infinity.diggz/fallback/AddonBrowser.xml": {
+      "before": "664ac272c38f925e5bdcbb07c10f333aad7c33bdab97bec3d03e208cff8f0c68",
+      "after": "63635eb8a96867080b6c9725dc6136d30144baeb33a1b3b890a12ba5e47cb080"
+    },
+    "skin.infinity.diggz/fallback/Home.xml": {
+      "before": "95af1900c472e58079773f2bc15a4f7994cfd369122ce05a0f2513f3108d21f5",
+      "after": "f0b8e0520acf738a71f5509c06f4eb0edb584d081de6337396227ed6e9f1f20d"
+    },
+    "skin.infinity.diggz/fallback/IncludesVariables.xml": {
+      "before": "e051790882a6acdea379942fc74c38ff803cfa4d7537a326a2af5e1f2e80e128",
+      "after": "8d7b6c9af8d31e3312a740ffbf14dc2d05afc910431283a3b7a8cd6c524d09f1"
+    },
+    "skin.infinity.diggz/fallback/Includes_InfinityLegacy.xml": {
+      "before": "f44425ae4fa63a6287290b22f3c9a7c61426d97f4bfb9cd0321bd5c37a456124",
+      "after": "12dfd323b7e26a2e508e7d1a4a3d389e5f22ae1c789b96ff430bafb045fad468"
+    },
+    "skin.infinity.diggz/fallback/InfinityPlaybackSettings.xml": {
+      "before": null,
+      "after": "29a221a08f39a49c29f87bcb2ddd3eea87143df7578fb9c4828c852267d18ade"
+    },
+    "skin.infinity.diggz/fallback/InfinitySubtitleSettings.xml": {
+      "before": null,
+      "after": "2057f91216791e78342bcecd8a6bda5cee63a741d44844b94b98e7cd9cca6836"
+    },
+    "skin.infinity.diggz/fallback/InfinityVideoSettings.xml": {
+      "before": null,
+      "after": "f7df9119b00fe0feae9099e084d9fc0ceb0af414b5784ccf0e60fb7f70a66637"
+    },
+    "skin.infinity.diggz/fallback/SkinSettings.xml": {
+      "before": "b7d870238474ec97cdb33617037717fd4e5f5e1a2d9837b2fc5955a3a247dc12",
+      "after": "ae8890d53fb371dad78f5f2d27b8f6738605c9b9b8de4d865a31052d203c0b99"
+    },
+    "skin.infinity.diggz/fallback/script-skinshortcuts-includes.xml": {
+      "before": "79cef3bf524149291d080689b63932e456229fd9b5145811058d04518ac6a9bd",
+      "after": "44e891178854f0c057653250541c49be94c472477b4cf7423e0fd2ad569eee05"
+    },
+    "skin.infinity.diggz/infinity-skin.json": {
+      "before": "aea0f5ea86945867a593510964078d07145a67c24dbb47c8f542efc2a2e9226c",
+      "after": "13f8d0958bd4e2fbea1b238937f9892ad2ebca699262797834855edc9afe6a2d"
+    },
+    "skin.infinity.diggz/portrait/AddonBrowser.xml": {
+      "before": "dfc6526fdb386539f8d8df0ddd387273dd710ce0796392de0ff87cf8044105bc",
+      "after": "f565c5ac1d68801f2d0e810b7de8b9f39d25212fe5b7ce47810ba936ff91e828"
+    },
+    "skin.infinity.diggz/portrait/Custom_1188_InfinityHealthCenter.xml": {
+      "before": "594bb72d4aab50cdf16a5da1783efd7b58895a43405299524e908fab81f49625",
+      "after": "e088510f07f6b415fa07f68bbfb9d610f48e4e7d8bda729e61cbccdccfe8a294"
+    },
+    "skin.infinity.diggz/portrait/Custom_1194_InfinityCommandCenter.xml": {
+      "before": "b6e18eae6da742b772cf19956fc1f1715e110bda2f5e3bb4f5e64ff58770c2a5",
+      "after": "62bb851f57437733c6a52e716a7c8195edda314442b779b95247eab31ceac359"
+    },
+    "skin.infinity.diggz/portrait/Home.xml": {
+      "before": "95af1900c472e58079773f2bc15a4f7994cfd369122ce05a0f2513f3108d21f5",
+      "after": "f0b8e0520acf738a71f5509c06f4eb0edb584d081de6337396227ed6e9f1f20d"
+    },
+    "skin.infinity.diggz/portrait/InfinityPlaybackSettings.xml": {
+      "before": null,
+      "after": "29a221a08f39a49c29f87bcb2ddd3eea87143df7578fb9c4828c852267d18ade"
+    },
+    "skin.infinity.diggz/portrait/InfinitySubtitleSettings.xml": {
+      "before": null,
+      "after": "2057f91216791e78342bcecd8a6bda5cee63a741d44844b94b98e7cd9cca6836"
+    },
+    "skin.infinity.diggz/portrait/InfinityVideoSettings.xml": {
+      "before": null,
+      "after": "f7df9119b00fe0feae9099e084d9fc0ceb0af414b5784ccf0e60fb7f70a66637"
+    },
+    "skin.infinity.diggz/portrait/SkinSettings.xml": {
+      "before": "b169302e563d62b8060f72d84d1658f196a211d4ed15dde111261127446816d2",
+      "after": "849a367491ba24faeeb85c00bb4ba3c08554d9c5785d19f57230f3921897edbe"
+    },
+    "skin.infinity.diggz/responsive/base/AddonBrowser.xml": {
+      "before": "e5756fa85404e12ce5a761513797e1ac702efe77e8fe81e94d59649056a14586",
+      "after": "1f6b145ccc1c2ab61224a267cf8580ec16cdf9e9ae5540fdac598ee50fecb947"
+    },
+    "skin.infinity.diggz/responsive/base/Custom_1188_InfinityHealthCenter.xml": {
+      "before": "6ef862d0371e6f4728e30149cba3e90ce5b0dee33cdb828a1afd5ee0668d689f",
+      "after": "7ee7cc55abecce1b0101c37214afe799ef70e5e93bae1db479b9d16b6ff578b1"
+    },
+    "skin.infinity.diggz/responsive/base/Custom_1194_InfinityCommandCenter.xml": {
+      "before": "cfcaa5a32509465e23845b8c786f5cbe8034f04018e56950a4f64981a06b556b",
+      "after": "ea2406121f210766d1758118a1a8112856505cdd609131273bf1ee15ba59d580"
+    },
+    "skin.infinity.diggz/responsive/base/Home.xml": {
+      "before": "85dfa342897e9f1586d7264075efbc7a6d240a5116a3ca6680487c6bf5eb5928",
+      "after": "d9c8de2ff00fd2316c0eb285d92e38f843a97b1926271b787e96fc43e09c9587"
+    },
+    "skin.infinity.diggz/responsive/base/IncludesVariables.xml": {
+      "before": "eca6fe61c3f6d588f923a63077489453fbe504f9b15b4d8f46f36126e21eca78",
+      "after": "8d7b6c9af8d31e3312a740ffbf14dc2d05afc910431283a3b7a8cd6c524d09f1"
+    },
+    "skin.infinity.diggz/responsive/base/Includes_InfinityLegacy.xml": {
+      "before": "78fd090851b5fa9ca9b3921577f39ebda2d9804230bda9cbf91f14d8d7484606",
+      "after": "e170fbc4d1e40dca38f83a4d0d6ee0e3c6b54fb0672313c694501a503a989fa6"
+    },
+    "skin.infinity.diggz/responsive/base/InfinityPlaybackSettings.xml": {
+      "before": null,
+      "after": "29a221a08f39a49c29f87bcb2ddd3eea87143df7578fb9c4828c852267d18ade"
+    },
+    "skin.infinity.diggz/responsive/base/InfinitySubtitleSettings.xml": {
+      "before": null,
+      "after": "2057f91216791e78342bcecd8a6bda5cee63a741d44844b94b98e7cd9cca6836"
+    },
+    "skin.infinity.diggz/responsive/base/InfinityVideoSettings.xml": {
+      "before": null,
+      "after": "f7df9119b00fe0feae9099e084d9fc0ceb0af414b5784ccf0e60fb7f70a66637"
+    },
+    "skin.infinity.diggz/responsive/base/SkinSettings.xml": {
+      "before": "eff85658e2407db26074ec4e1d716d44ecbec2e12da241962caf37fd25fde697",
+      "after": "4ac947f45e18d49c6e4e57e20142b000147fe16fe2573a8214abbede634db5ca"
+    },
+    "skin.infinity.diggz/responsive/base/script-skinshortcuts-includes.xml": {
+      "before": "913c093d697e3b749f721836c6bd87f80097648e08fc91d4c72f8f9057dc6ea5",
+      "after": "167863c2f4a957870fd004670f95e888c03dfceb886fc73e40e56d04261bdbfd"
+    },
+    "skin.infinity.diggz/responsive/landscape/AddonBrowser.xml": {
+      "before": "2dde10dae884ff91a69aef7709fa3ade1e73af707f38a1369323eb1396e54ee9",
+      "after": "7d4004e1ad99e6f5c6d332a3588133b2af54489f71c004e0fedd21ab1a6349b7"
+    },
+    "skin.infinity.diggz/responsive/landscape/Custom_1188_InfinityHealthCenter.xml": {
+      "before": "5474d9dda0b5f1ce67a568835270ca0514f6d9b4ae669ce253116cd2325ef99a",
+      "after": "512fdbcaa1d9f55ca4318b4ab6418cff25c4f929eaf5eede0b5b8259ffe0b375"
+    },
+    "skin.infinity.diggz/responsive/landscape/Custom_1194_InfinityCommandCenter.xml": {
+      "before": "9e724e3b5a5b253e752475cd2e84a95adc0258ce95a083b11498c5ccbbaa09aa",
+      "after": "cc941d6aa99bf384798ee3521c2223a38f4f187db71981a26325ed719bf50485"
+    },
+    "skin.infinity.diggz/responsive/landscape/Home.xml": {
+      "before": "85dfa342897e9f1586d7264075efbc7a6d240a5116a3ca6680487c6bf5eb5928",
+      "after": "d9c8de2ff00fd2316c0eb285d92e38f843a97b1926271b787e96fc43e09c9587"
+    },
+    "skin.infinity.diggz/responsive/landscape/IncludesVariables.xml": {
+      "before": "eca6fe61c3f6d588f923a63077489453fbe504f9b15b4d8f46f36126e21eca78",
+      "after": "8d7b6c9af8d31e3312a740ffbf14dc2d05afc910431283a3b7a8cd6c524d09f1"
+    },
+    "skin.infinity.diggz/responsive/landscape/Includes_InfinityLegacy.xml": {
+      "before": "939412ec0db46a99c5eaa33110c4a98c1a0ef277d9c39284c5c3fa4bdab0ad77",
+      "after": "9580d951cab1063061087b773c232692fc5d0c23bbaa3dadbe969ce3ec60f1d3"
+    },
+    "skin.infinity.diggz/responsive/landscape/InfinityPlaybackSettings.xml": {
+      "before": null,
+      "after": "29a221a08f39a49c29f87bcb2ddd3eea87143df7578fb9c4828c852267d18ade"
+    },
+    "skin.infinity.diggz/responsive/landscape/InfinitySubtitleSettings.xml": {
+      "before": null,
+      "after": "2057f91216791e78342bcecd8a6bda5cee63a741d44844b94b98e7cd9cca6836"
+    },
+    "skin.infinity.diggz/responsive/landscape/InfinityVideoSettings.xml": {
+      "before": null,
+      "after": "f7df9119b00fe0feae9099e084d9fc0ceb0af414b5784ccf0e60fb7f70a66637"
+    },
+    "skin.infinity.diggz/responsive/landscape/SkinSettings.xml": {
+      "before": "6529ed57091a2929007c3188450488739540da80a50e58ecfbd001682db3bf56",
+      "after": "75a4cf2e171284ac54a2cfd48c6cd8e94ef04e938457b903245cd858b9bf9b21"
+    },
+    "skin.infinity.diggz/responsive/landscape/script-skinshortcuts-includes.xml": {
+      "before": "913c093d697e3b749f721836c6bd87f80097648e08fc91d4c72f8f9057dc6ea5",
+      "after": "167863c2f4a957870fd004670f95e888c03dfceb886fc73e40e56d04261bdbfd"
+    },
+    "skin.infinity.diggz/responsive/portrait/AddonBrowser.xml": {
+      "before": "52471ebc5c0787a46e9edb38e119cb662c491cb822bd3abf82166530afe3c19a",
+      "after": "3ead32837ea5a936dc9dc738b400a95d09ff9f1620ffb3d7bad3a60060520638"
+    },
+    "skin.infinity.diggz/responsive/portrait/Custom_1188_InfinityHealthCenter.xml": {
+      "before": "e9dfb51b174b19ff5d0f18ebe1e423ed6d04ef11ece9daf99ef18eb5ad7ac91b",
+      "after": "98766644fa2cecf720c7bb8ab773c1b3ff57ff0d77303fc0cb6207d0aff27127"
+    },
+    "skin.infinity.diggz/responsive/portrait/Custom_1194_InfinityCommandCenter.xml": {
+      "before": "ec4eeead481bd4f8b17154ed6ed46972f31682acb9d59ecf09adc22acbc2060d",
+      "after": "873b4dad1c0408bf00ea56d53a17d9977aa9f2c5ef06731cae0e510500e54fee"
+    },
+    "skin.infinity.diggz/responsive/portrait/Home.xml": {
+      "before": "85dfa342897e9f1586d7264075efbc7a6d240a5116a3ca6680487c6bf5eb5928",
+      "after": "d9c8de2ff00fd2316c0eb285d92e38f843a97b1926271b787e96fc43e09c9587"
+    },
+    "skin.infinity.diggz/responsive/portrait/IncludesVariables.xml": {
+      "before": "eca6fe61c3f6d588f923a63077489453fbe504f9b15b4d8f46f36126e21eca78",
+      "after": "8d7b6c9af8d31e3312a740ffbf14dc2d05afc910431283a3b7a8cd6c524d09f1"
+    },
+    "skin.infinity.diggz/responsive/portrait/Includes_InfinityLegacy.xml": {
+      "before": "8a7dd0af7c8f877502e5e5124847d436c072c5f00a325059c56f84f34d832297",
+      "after": "174bc90e53012419c0bf2ff6e470ada6216b725f658dffcdc91b0e71bd204fa8"
+    },
+    "skin.infinity.diggz/responsive/portrait/InfinityPlaybackSettings.xml": {
+      "before": null,
+      "after": "29a221a08f39a49c29f87bcb2ddd3eea87143df7578fb9c4828c852267d18ade"
+    },
+    "skin.infinity.diggz/responsive/portrait/InfinitySubtitleSettings.xml": {
+      "before": null,
+      "after": "2057f91216791e78342bcecd8a6bda5cee63a741d44844b94b98e7cd9cca6836"
+    },
+    "skin.infinity.diggz/responsive/portrait/InfinityVideoSettings.xml": {
+      "before": null,
+      "after": "f7df9119b00fe0feae9099e084d9fc0ceb0af414b5784ccf0e60fb7f70a66637"
+    },
+    "skin.infinity.diggz/responsive/portrait/SkinSettings.xml": {
+      "before": "f9ea251ca9a8ddecc1b967691ffda43cec1a0076260b21accf23d778f112b2d8",
+      "after": "857fff0fdf6eb71f404ce1f89d8caf3de5b8f43bbe69325150302bf847eb5a69"
+    },
+    "skin.infinity.diggz/responsive/portrait/script-skinshortcuts-includes.xml": {
+      "before": "913c093d697e3b749f721836c6bd87f80097648e08fc91d4c72f8f9057dc6ea5",
+      "after": "167863c2f4a957870fd004670f95e888c03dfceb886fc73e40e56d04261bdbfd"
+    },
+    "skin.infinity.diggz/responsive/square/AddonBrowser.xml": {
+      "before": "19b9cec0a89d7279326033bc8f0c9a3ae9bc468df9af05e23d0ccec416bc5e9b",
+      "after": "24c0139db3affa26f7b3bd2c3b1b349bc1c4639c49f3dd0375ebfbac3dce9314"
+    },
+    "skin.infinity.diggz/responsive/square/Custom_1188_InfinityHealthCenter.xml": {
+      "before": "6ef862d0371e6f4728e30149cba3e90ce5b0dee33cdb828a1afd5ee0668d689f",
+      "after": "7ee7cc55abecce1b0101c37214afe799ef70e5e93bae1db479b9d16b6ff578b1"
+    },
+    "skin.infinity.diggz/responsive/square/Custom_1194_InfinityCommandCenter.xml": {
+      "before": "cfcaa5a32509465e23845b8c786f5cbe8034f04018e56950a4f64981a06b556b",
+      "after": "ea2406121f210766d1758118a1a8112856505cdd609131273bf1ee15ba59d580"
+    },
+    "skin.infinity.diggz/responsive/square/Home.xml": {
+      "before": "85dfa342897e9f1586d7264075efbc7a6d240a5116a3ca6680487c6bf5eb5928",
+      "after": "d9c8de2ff00fd2316c0eb285d92e38f843a97b1926271b787e96fc43e09c9587"
+    },
+    "skin.infinity.diggz/responsive/square/IncludesVariables.xml": {
+      "before": "eca6fe61c3f6d588f923a63077489453fbe504f9b15b4d8f46f36126e21eca78",
+      "after": "8d7b6c9af8d31e3312a740ffbf14dc2d05afc910431283a3b7a8cd6c524d09f1"
+    },
+    "skin.infinity.diggz/responsive/square/Includes_InfinityLegacy.xml": {
+      "before": "3650b3aeecd155efd5bd2877978e9763eaca167532d2407217565034c91740f6",
+      "after": "84ecc0267cc2f76c3524cae7371807677c7133382fbf383a9998d1fa9692e8fc"
+    },
+    "skin.infinity.diggz/responsive/square/InfinityPlaybackSettings.xml": {
+      "before": null,
+      "after": "29a221a08f39a49c29f87bcb2ddd3eea87143df7578fb9c4828c852267d18ade"
+    },
+    "skin.infinity.diggz/responsive/square/InfinitySubtitleSettings.xml": {
+      "before": null,
+      "after": "2057f91216791e78342bcecd8a6bda5cee63a741d44844b94b98e7cd9cca6836"
+    },
+    "skin.infinity.diggz/responsive/square/InfinityVideoSettings.xml": {
+      "before": null,
+      "after": "f7df9119b00fe0feae9099e084d9fc0ceb0af414b5784ccf0e60fb7f70a66637"
+    },
+    "skin.infinity.diggz/responsive/square/SkinSettings.xml": {
+      "before": "432ba24ea3e5e0f9a84feae50355c9d412a0fc650e3c0eb33abed8e554421903",
+      "after": "94a37f08d52de71f839e005b0371317d1be2a37892d2dfdcdaf9bd2bc002793d"
+    },
+    "skin.infinity.diggz/responsive/square/script-skinshortcuts-includes.xml": {
+      "before": "48272c0c015ddb1e63fed418bc0d431c2de904d78b26f2686195566ca5394090",
+      "after": "be1a71aeeb59f62bc9c096cc2191b875429abbc630d95d418cdedc20a9515c99"
+    },
+    "skin.infinity.diggz/responsive/tall/AddonBrowser.xml": {
+      "before": "4afa9b58fa0a2d27bd28d6f7faa8f3344ee6f4428aa7eb59055924a1c1dbf53a",
+      "after": "7bec2d84929c5f82786e7da55ac903bd5438d2d09a4bddda2bdc4e9195bef67c"
+    },
+    "skin.infinity.diggz/responsive/tall/Custom_1188_InfinityHealthCenter.xml": {
+      "before": "102e7412476e2866db8bcdad55cb5a0bc7293a1efebf46c6d1554bf4664f6d19",
+      "after": "59039cbddf251266216bf5a5d2f4d2d870b2e593d27d54a30b6b0a9aba15c61a"
+    },
+    "skin.infinity.diggz/responsive/tall/Custom_1194_InfinityCommandCenter.xml": {
+      "before": "efb22e6d29f6ea9c22f48c1100ffc33e706eb9c31b5f901f428674404df3e7bf",
+      "after": "6b33d1f86dbfd742408aae4e9138e67d00fa87210b2ce3ac28cb861db8c09983"
+    },
+    "skin.infinity.diggz/responsive/tall/Home.xml": {
+      "before": "85dfa342897e9f1586d7264075efbc7a6d240a5116a3ca6680487c6bf5eb5928",
+      "after": "d9c8de2ff00fd2316c0eb285d92e38f843a97b1926271b787e96fc43e09c9587"
+    },
+    "skin.infinity.diggz/responsive/tall/IncludesVariables.xml": {
+      "before": "eca6fe61c3f6d588f923a63077489453fbe504f9b15b4d8f46f36126e21eca78",
+      "after": "8d7b6c9af8d31e3312a740ffbf14dc2d05afc910431283a3b7a8cd6c524d09f1"
+    },
+    "skin.infinity.diggz/responsive/tall/Includes_InfinityLegacy.xml": {
+      "before": "95205da5b19f8508b9b05f16b094daedb6ddde13c773f8efcb765f3b7bc72f29",
+      "after": "82c20a53468334033f4e8f0432802557d4352a7c0ba6c943f9a49ee18e4e81b5"
+    },
+    "skin.infinity.diggz/responsive/tall/InfinityPlaybackSettings.xml": {
+      "before": null,
+      "after": "29a221a08f39a49c29f87bcb2ddd3eea87143df7578fb9c4828c852267d18ade"
+    },
+    "skin.infinity.diggz/responsive/tall/InfinitySubtitleSettings.xml": {
+      "before": null,
+      "after": "2057f91216791e78342bcecd8a6bda5cee63a741d44844b94b98e7cd9cca6836"
+    },
+    "skin.infinity.diggz/responsive/tall/InfinityVideoSettings.xml": {
+      "before": null,
+      "after": "f7df9119b00fe0feae9099e084d9fc0ceb0af414b5784ccf0e60fb7f70a66637"
+    },
+    "skin.infinity.diggz/responsive/tall/SkinSettings.xml": {
+      "before": "0f87fe0fbf78b8956c947d8945b24bcdd8c106a9ed104027672303128a3847ee",
+      "after": "bd93c0761ca9b581b15e439633efaa9e465ea2dc0e470c8bd11251c663de483b"
+    },
+    "skin.infinity.diggz/responsive/tall/script-skinshortcuts-includes.xml": {
+      "before": "913c093d697e3b749f721836c6bd87f80097648e08fc91d4c72f8f9057dc6ea5",
+      "after": "167863c2f4a957870fd004670f95e888c03dfceb886fc73e40e56d04261bdbfd"
+    },
+    "skin.infinity.diggz/responsive/ultrawide/AddonBrowser.xml": {
+      "before": "26b79a9c5ed7dcfa1f657b57daeed4a621d0ffa0e4d8749250a418bd1335677f",
+      "after": "753804ec12c5c228517ccbae05bf029e97d098f788704ff81d3873696cb683e5"
+    },
+    "skin.infinity.diggz/responsive/ultrawide/Custom_1188_InfinityHealthCenter.xml": {
+      "before": "0001118dc13127f685daa0e98627a61fb59edf4618cda83b0e0ae70431137a40",
+      "after": "af684be6b0942a632937086b5a14cfed902f05b5f1e296456465a74c223fa025"
+    },
+    "skin.infinity.diggz/responsive/ultrawide/Custom_1194_InfinityCommandCenter.xml": {
+      "before": "3b3bd8b3087a0c905e9a4829766612eddda13d2e4cf20b042da075af62e0423e",
+      "after": "efe7f21430bf6dfb43f131024f7aec0e8028a5a739f4c6bdc72427c66988b6d3"
+    },
+    "skin.infinity.diggz/responsive/ultrawide/Home.xml": {
+      "before": "85dfa342897e9f1586d7264075efbc7a6d240a5116a3ca6680487c6bf5eb5928",
+      "after": "d9c8de2ff00fd2316c0eb285d92e38f843a97b1926271b787e96fc43e09c9587"
+    },
+    "skin.infinity.diggz/responsive/ultrawide/IncludesVariables.xml": {
+      "before": "eca6fe61c3f6d588f923a63077489453fbe504f9b15b4d8f46f36126e21eca78",
+      "after": "8d7b6c9af8d31e3312a740ffbf14dc2d05afc910431283a3b7a8cd6c524d09f1"
+    },
+    "skin.infinity.diggz/responsive/ultrawide/Includes_InfinityLegacy.xml": {
+      "before": "543894c4b078261d1a83dfd0bc9a437eb9bca3e63a58fb8449669535558e51b9",
+      "after": "701f52ce238e1a7626b13668dfa4b52ca757698209dc1e9fb2a12bfc97c156ed"
+    },
+    "skin.infinity.diggz/responsive/ultrawide/InfinityPlaybackSettings.xml": {
+      "before": null,
+      "after": "29a221a08f39a49c29f87bcb2ddd3eea87143df7578fb9c4828c852267d18ade"
+    },
+    "skin.infinity.diggz/responsive/ultrawide/InfinitySubtitleSettings.xml": {
+      "before": null,
+      "after": "2057f91216791e78342bcecd8a6bda5cee63a741d44844b94b98e7cd9cca6836"
+    },
+    "skin.infinity.diggz/responsive/ultrawide/InfinityVideoSettings.xml": {
+      "before": null,
+      "after": "f7df9119b00fe0feae9099e084d9fc0ceb0af414b5784ccf0e60fb7f70a66637"
+    },
+    "skin.infinity.diggz/responsive/ultrawide/SkinSettings.xml": {
+      "before": "1885a17919aa8b71a6aa5929dbbf395817ad1290b09d061349d4552f3c01e7c4",
+      "after": "87df07b274c3586ac2dc645e1e379549ddb472401b0bc46645e98bc5162b0b84"
+    },
+    "skin.infinity.diggz/responsive/ultrawide/script-skinshortcuts-includes.xml": {
+      "before": "913c093d697e3b749f721836c6bd87f80097648e08fc91d4c72f8f9057dc6ea5",
+      "after": "167863c2f4a957870fd004670f95e888c03dfceb886fc73e40e56d04261bdbfd"
+    },
+    "skin.infinity.diggz/responsive/wide/AddonBrowser.xml": {
+      "before": "e5756fa85404e12ce5a761513797e1ac702efe77e8fe81e94d59649056a14586",
+      "after": "1f6b145ccc1c2ab61224a267cf8580ec16cdf9e9ae5540fdac598ee50fecb947"
+    },
+    "skin.infinity.diggz/responsive/wide/Custom_1188_InfinityHealthCenter.xml": {
+      "before": "6ef862d0371e6f4728e30149cba3e90ce5b0dee33cdb828a1afd5ee0668d689f",
+      "after": "7ee7cc55abecce1b0101c37214afe799ef70e5e93bae1db479b9d16b6ff578b1"
+    },
+    "skin.infinity.diggz/responsive/wide/Custom_1194_InfinityCommandCenter.xml": {
+      "before": "cfcaa5a32509465e23845b8c786f5cbe8034f04018e56950a4f64981a06b556b",
+      "after": "ea2406121f210766d1758118a1a8112856505cdd609131273bf1ee15ba59d580"
+    },
+    "skin.infinity.diggz/responsive/wide/Home.xml": {
+      "before": "85dfa342897e9f1586d7264075efbc7a6d240a5116a3ca6680487c6bf5eb5928",
+      "after": "d9c8de2ff00fd2316c0eb285d92e38f843a97b1926271b787e96fc43e09c9587"
+    },
+    "skin.infinity.diggz/responsive/wide/IncludesVariables.xml": {
+      "before": "eca6fe61c3f6d588f923a63077489453fbe504f9b15b4d8f46f36126e21eca78",
+      "after": "8d7b6c9af8d31e3312a740ffbf14dc2d05afc910431283a3b7a8cd6c524d09f1"
+    },
+    "skin.infinity.diggz/responsive/wide/Includes_InfinityLegacy.xml": {
+      "before": "78fd090851b5fa9ca9b3921577f39ebda2d9804230bda9cbf91f14d8d7484606",
+      "after": "e170fbc4d1e40dca38f83a4d0d6ee0e3c6b54fb0672313c694501a503a989fa6"
+    },
+    "skin.infinity.diggz/responsive/wide/InfinityPlaybackSettings.xml": {
+      "before": null,
+      "after": "29a221a08f39a49c29f87bcb2ddd3eea87143df7578fb9c4828c852267d18ade"
+    },
+    "skin.infinity.diggz/responsive/wide/InfinitySubtitleSettings.xml": {
+      "before": null,
+      "after": "2057f91216791e78342bcecd8a6bda5cee63a741d44844b94b98e7cd9cca6836"
+    },
+    "skin.infinity.diggz/responsive/wide/InfinityVideoSettings.xml": {
+      "before": null,
+      "after": "f7df9119b00fe0feae9099e084d9fc0ceb0af414b5784ccf0e60fb7f70a66637"
+    },
+    "skin.infinity.diggz/responsive/wide/SkinSettings.xml": {
+      "before": "eff85658e2407db26074ec4e1d716d44ecbec2e12da241962caf37fd25fde697",
+      "after": "4ac947f45e18d49c6e4e57e20142b000147fe16fe2573a8214abbede634db5ca"
+    },
+    "skin.infinity.diggz/responsive/wide/script-skinshortcuts-includes.xml": {
+      "before": "913c093d697e3b749f721836c6bd87f80097648e08fc91d4c72f8f9057dc6ea5",
+      "after": "167863c2f4a957870fd004670f95e888c03dfceb886fc73e40e56d04261bdbfd"
+    },
+    "skin.infinity.diggz/unified/AddonBrowser.xml": {
+      "before": "75d5293d407513dc0ed14280b3fbb3cf181a8d9261dfc3393f053873b02a2701",
+      "after": "326a4a32cfb2121fa500bc0bc70bb0ec7c9f2aec0b949e86441afa922d3b8cdf"
+    },
+    "skin.infinity.diggz/unified/Custom_1188_InfinityHealthCenter.xml": {
+      "before": "14c111922853b81d0a3db9adf863791c4d15b0fb22e26aabbc3548a52329102f",
+      "after": "aed28fbf3c13aca0eeacb7c28355cb6229472ea8310fff54214aed52523c4bd3"
+    },
+    "skin.infinity.diggz/unified/Custom_1194_InfinityCommandCenter.xml": {
+      "before": "a971077c6aaa8aeb2a3a93213ef2c6713c18dcbabe9fda30e8901558698b2b8f",
+      "after": "9f29bc3367213a7dded43c9a93e7ea7232fa1d020f7b155ac47b596fd4411a15"
+    },
+    "skin.infinity.diggz/unified/Home.xml": {
+      "before": "9e80adba97809f41b0dfdd6fd3aa03609cb7bf3868fa01e76cece8abf0699843",
+      "after": "e20a7a1f52b70eb3ebefb81f3fb951c9de687350af1b156ea219fc7f30570fb3"
+    },
+    "skin.infinity.diggz/unified/IncludesVariables.xml": {
+      "before": "65511e4e198a68255f8d104c66afd9541c911086555c7f761513f5491749ebc9",
+      "after": "6dce2e27f8b87021bda90a93510260407843461141b347c16480b7c195499b91"
+    },
+    "skin.infinity.diggz/unified/Includes_InfinityLegacy.xml": {
+      "before": "f2ccadf10d721c54c045d84e41d73ac99c51a4acdf999b0308f205da33b685e8",
+      "after": "e7c2049c1ed11b3dee147b5fcfd0082366724823b3c168aca7c96e3725eeb6ba"
+    },
+    "skin.infinity.diggz/unified/Includes_InfinityUIRepair.xml": {
+      "before": "41cd0bf98db5f600ac14735f11be265e9bb18de090eed7e323925a48a78bccc1",
+      "after": "f1391407dec9935cc06ba1a61de83d7c68c5ebcb140f4e170e251969d5d1efee"
+    },
+    "skin.infinity.diggz/unified/InfinityPlaybackSettings.xml": {
+      "before": null,
+      "after": "29a221a08f39a49c29f87bcb2ddd3eea87143df7578fb9c4828c852267d18ade"
+    },
+    "skin.infinity.diggz/unified/InfinitySubtitleSettings.xml": {
+      "before": null,
+      "after": "2057f91216791e78342bcecd8a6bda5cee63a741d44844b94b98e7cd9cca6836"
+    },
+    "skin.infinity.diggz/unified/InfinityVideoSettings.xml": {
+      "before": null,
+      "after": "f7df9119b00fe0feae9099e084d9fc0ceb0af414b5784ccf0e60fb7f70a66637"
+    },
+    "skin.infinity.diggz/unified/SkinSettings.xml": {
+      "before": "b2f1f9371db2a38920679b8f8a3b8ee2cfe4bfd7c9c1f4b662913ab06a09d2cb",
+      "after": "8c79438b7abbe0779fbf8f16287d2647bd5c01f958030994fb9a3d1cc0736e54"
+    },
+    "skin.infinity.diggz/unified/VideoOSD.xml": {
+      "before": "996fb0a2b5a49e03922e0ac277d189654cab65f602d03e0cbff67d61d19e7f8b",
+      "after": "5dc5dcd02ca375843484f7253fe12f9d0f718ac9afaead7b3b5df66c97c6475b"
+    },
+    "skin.infinity.diggz/unified/script-skinshortcuts-includes.xml": {
+      "before": "bd01815a217235a6e01b2f1baf61b03ea9b6344cabac8ddd45b1ef4755f0ac01",
+      "after": "f4b5f4a1d9429ca73ff6c222f3c2a5583a4347d98a5d2f1dc0317ff926faab32"
+    }
+  },
+  "removed": [],
+  "physical_fold_verified": false,
+  "final_lock": false
+}

@@ -34,18 +34,23 @@ def home_option_b(raw):
         _trace(xbmc, 'python.index', 'accepted', control, idx)
 '''
     raw=once(raw,old,new)
+    raw=once(raw,b'import json\n',b'import json\nimport os\nimport time\nimport threading\n')
     anchor=b'PENDING_FIELDS = '
     trace=b'''def _trace(xbmc, stage, outcome, control=-1, index=-1):
     # Event-triggered bounded facts only. No titles, item URLs or private paths.
     try:
         xbmc.log('[InfinityTouch] ' + json.dumps(dict(event='touch.option_b',
-            phase=stage, outcome=outcome, control=control, index=index)), xbmc.LOGINFO)
+            phase=stage, outcome=outcome, control=control, index=index,
+            pid=os.getpid(), tid=threading.get_native_id(), epoch_ns=time.time_ns(),
+            monotonic_ns=time.monotonic_ns())), xbmc.LOGINFO)
     except (AttributeError, TypeError, RuntimeError):
         pass
 
 
 '''
     raw=once(raw,anchor,trace+anchor)
+    raw=once(raw,b'    native = read_native_hold(xbmcgui, native_args)\n    if native is None:\n        return False',
+        b"    native = read_native_hold(xbmcgui, native_args)\n    if native is None:\n        _trace(xbmc, 'python.proof', 'rejected')\n        return False\n    _trace(xbmc, 'python.proof', 'accepted', native.control, native.index)")
     raw=once(raw,b'    snapshot = capture(xbmc, xbmcgui, native)\n    if snapshot is None:\n        return False',
         b"    snapshot = capture(xbmc, xbmcgui, native)\n    if snapshot is None:\n        _trace(xbmc, 'python.capture', 'rejected', native.control, native.index)\n        return False\n    _trace(xbmc, 'python.capture', 'accepted', native.control, native.index)")
     raw=once(raw,b'            self.ready=True',
@@ -68,7 +73,11 @@ def runtime_trace(raw):
 
 def settings_entry(raw):
     anchor=b"    action = argv[1].strip().lower()\n"
-    return once(raw,anchor,anchor+b'''    if action in ('appearance', 'theme', 'dark-appearance', 'motion-settings', 'ambient-home'):
+    return once(raw,anchor,anchor+b'''    if action == 'universal-search':
+        from infinity_search import open_search
+        open_search(argv[2] if len(argv) > 2 else 'movie')
+        return True
+    if action in ('appearance', 'theme', 'dark-appearance', 'motion-settings', 'ambient-home'):
         from infinity_settings import open_settings
         open_settings(action)
         return True

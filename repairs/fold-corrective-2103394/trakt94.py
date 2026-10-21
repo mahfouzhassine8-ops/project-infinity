@@ -50,10 +50,27 @@ def hub(raw):
         b"            if identity['kind'] == 'episode':\n                raw += '|%s|%s' % (identity['season'], identity['episode'])\n            elif identity['kind'] == 'season':\n                raw += '|%s' % identity['season']")
     raw=once(raw,b"    common = set(left['ids']) & set(right['ids'])",
         b"    if left['kind'] == 'season' and left['season'] != right['season']:\n        return False\n    common = set(left['ids']) & set(right['ids'])")
+    raw=once(raw,b"            elif (not old_identity and source.startswith('plugin://') and old.get('source') == source",
+        b"            elif (not old_identity and identity['kind'] in ('movie', 'episode') and source.startswith('plugin://') and old.get('source') == source")
     return raw
 
 
 def plugin(raw):
+    # A disabled provider cannot resolve a saved route. Preserve the recorded
+    # identity and management menu while allowing the existing resolver fallback.
+    raw=raw.replace(b"'System.HasAddon(%s)' % addon_id",b"'System.AddonIsEnabled(%s)' % addon_id")
+    raw=once(raw,b"    if bucket in ('watchlist', 'collection', 'ratings'):",
+                  b"    if bucket in ('watchlist', 'collection', 'ratings', 'later'):")
+    raw=once(raw,b"        'mediatype': 'episode' if kind == 'tv' else 'movie',",
+        b"        'mediatype': (hub.entry_identity(entry) or {}).get('kind') or ('episode' if kind == 'tv' else 'movie'),")
+    raw=once(raw,b"    li.setProperty('IsPlayable', 'true')",
+        b"    li.setProperty('IsPlayable', 'false' if (hub.entry_identity(entry) or {}).get('kind') in ('tvshow', 'season') else 'true')")
+    raw=once(raw,b"        xbmcplugin.addDirectoryItem(HANDLE, target, li, isFolder=False)",
+        b"        xbmcplugin.addDirectoryItem(HANDLE, target, li, isFolder=(hub.entry_identity(entry) or {}).get('kind') in ('tvshow', 'season'))")
+    raw=once(raw,b"    media = entry.get('media')\n",
+        b"    media = entry.get('media')\n    if (hub.entry_identity(entry) or {}).get('kind') in ('tvshow', 'season'):\n        return ''  # Only an original verified provider/library directory may open a show.\n")
+    raw=once(raw,b"    source = str(entry.get('source') or '').strip()\n",
+        b"    source = str(entry.get('source') or '').strip()\n    if source.startswith('plugin://') and not _has_addon(source.split('/')[2], render):\n        return ''\n")
     def context(block):
         legacy=block.replace('def _context(', 'def _legacy_management_context(',1)
         return legacy+'''
@@ -76,6 +93,18 @@ def _context(entry, data, bucket='', list_name=''):
     raw=raw.replace(b"            ('Collection', 'collection',",b"            ('Save For Later', 'later', 'Your separate local saved list'),\n            ('Collection', 'collection',")
     raw=once(raw,b"    action = PARAMS.get('action', 'continue')\n",
         b"    action = PARAMS.get('action', 'continue')\n    if action == 'search':\n        from infinity_search import open_search\n        open_search(PARAMS.get('media', 'movie'))\n        xbmcplugin.endOfDirectory(HANDLE, cacheToDisc=False)\n        return\n")
+    anchor=b"    action = PARAMS.get('action', 'continue')\n"
+    raw=once(raw,anchor,anchor+b'''    if action == 'search-probe':
+        xbmcplugin.endOfDirectory(HANDLE, cacheToDisc=False)
+        return
+    if action == 'search-all':
+        from infinity_search import search_all
+        try:
+            search_all(HANDLE, PARAMS.get('media', 'movie'), PARAMS.get('query', ''))
+        finally:
+            xbmcplugin.endOfDirectory(HANDLE, cacheToDisc=False)
+        return
+''')
     return raw
 
 

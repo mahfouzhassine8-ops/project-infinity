@@ -14,6 +14,7 @@ import xml.etree.ElementTree as ET
 from zipfile import ZipFile
 import ui94
 import trakt94
+import skin94
 from native94 import require, once
 
 HERE=Path(__file__).resolve().parent
@@ -127,18 +128,6 @@ def motion_route(raw):
     return xmlbytes(root)
 
 
-def compact_select(raw):
-    root=xml(raw)
-    # The existing compact selector marker is consumed dynamically, so this
-    # cannot replace repository/provider selection or another dialog's layout.
-    for e in root.findall('.//control'):
-        if e.get('type')=='group' and e.find('centerleft') is not None:
-            # Retain ordinary geometry; add a compact position condition only
-            # to the existing Infinity selector path where the marker is set.
-            pass
-    return raw
-
-
 SETTINGS_XML=b'''<?xml version="1.0" encoding="utf-8"?>
 <settings version="1"><section id="script.infinity.commandcenter"><category id="experience" label="Infinity Experience"><group id="1">
 <setting id="motion_mode" type="string" label="Motion"><level>0</level><default>full</default><constraints><options><option label="Full">full</option><option label="Reduced">reduced</option><option label="Off">off</option></options></constraints><control type="spinner" format="string"/></setting>
@@ -196,6 +185,11 @@ def components(original):
     final[CC+'/infinity_trakt.py']=(HERE/'infinity_trakt.py').read_bytes()
     final[CC+'/default.py']=ui94.settings_entry(original[CC+'/default.py'])
     final[CC+'/infinity_settings.py']=(HERE/'infinity_settings.py').read_bytes()
+    final[CC+'/infinity_search.py']=(HERE/'infinity_search.py').read_bytes()
+    final[CC+'/resources/skins/Default/1080i/InfinitySearch.xml']=(HERE/'InfinitySearch.xml').read_bytes()
+    popup=UI+'/resources/skins/Default/1080i/InfinityItemOptions.xml'
+    require(popup in original,'verified compact item menu resource missing')
+    final[CC+'/resources/skins/Default/1080i/InfinityItemOptions.xml']=original[popup]
     final[CC+'/resources/settings.xml']=SETTINGS_XML
     final[UI+'/home_option_b.py']=ui94.home_option_b(original[UI+'/home_option_b.py'])
     final[UI+'/controller_access.py']=ui94.tracking_menu(original[UI+'/controller_access.py'])
@@ -207,11 +201,32 @@ def components(original):
         if leaf=='Home.xml':raw=twopane(raw)
         elif leaf=='SkinSettings.xml':raw=skin_settings(raw)
         elif leaf=='Custom_1194_InfinityCommandCenter.xml':raw=motion_route(raw)
+        elif leaf=='Custom_1188_InfinityHealthCenter.xml':raw=skin94.health_dashboard(raw)
+        elif leaf=='VideoOSD.xml' and '/unified/' in name:raw=skin94.player_drawer(raw)
+        elif leaf=='InfinityPlayerSettings.xml':
+            for kind in ('playback','subtitle','video'):
+                final[name.replace(leaf,'Infinity'+kind.title()+'Settings.xml')]=skin94.player_settings(raw,kind)
+        elif leaf=='AddonBrowser.xml':raw=skin94.browser(raw)
+        elif leaf=='script-skinshortcuts-includes.xml':raw=skin94.search_routes(raw)
         if b'<variable ' in raw:raw=oled(raw)
         final[name]=raw
     for aid,old,new in PACKAGES:
         if aid==HEALTH or old==new:continue
         final[aid+'/addon.xml']=once(final[aid+'/addon.xml'],('version="'+old+'"').encode(),('version="'+new+'"').encode())
+    name=SKIN+'/infinity-skin.json';contract=json.loads(final[name])
+    required=contract['ui_health']['required_ids']['VideoOSD.xml']
+    require(252 in required and 265 in required,'original stale UI contract differs')
+    active=xml(final[SKIN+'/unified/VideoOSD.xml'])
+    audio=active.find('.//control[@id="272"]')
+    require(audio is not None and audio.findtext('onclick')=='ActivateWindow(1195)',
+            'retained Audio/Subtitles route missing')
+    require(active.find('.//control[@id="252"]') is None and active.find('.//control[@id="265"]') is None,
+            'stale ID analysis does not match the active unified layout')
+    contract['ui_health']['required_ids']['VideoOSD.xml']=sorted((set(required)-{252,265})|{272})
+    contract.update(candidate=231,candidate_locked=False,skin_version='1.0.5.231',version='1.0.5.231')
+    contract['corrective_231']={'obsolete_ui_ids':[252,265],'retained_audio_subtitles_id':272,
+                               'self_heal_performed':False,'physical_fold_verified':False}
+    final[name]=(json.dumps(contract,sort_keys=True,indent=2)+'\n').encode()
     # The new candidate manifest describes certified source bytes. Preserve its
     # historical locks and never change installed files to satisfy a checksum.
     name=SKIN+'/Infinity-Protected-Manifest.json';manifest=json.loads(final[name])
