@@ -17,7 +17,7 @@ import time
 import threading
 from pathlib import Path
 import re
-from urllib.parse import urlsplit
+from urllib.parse import urlsplit, parse_qs
 
 from latest_identity import BASE as LATEST_BASE, MAX_IDENTITY, decode as decode_latest
 
@@ -89,7 +89,10 @@ class Selection:
         more = 'S%s E%s' % (self.season, self.episode) if verified_episode else ''
         if verified_episode and self.episode_title:
             more += '  •  ' + self.episode_title
-        label = self.year if self.year.isdigit() else ''
+        label = self.year if len(self.year) == 4 and self.year.isdigit() and int(self.year) > 0 else ''
+        try: rating = self.rating if 0 < float(self.rating) <= 10 else ''
+        except (TypeError, ValueError): rating = ''
+        runtime = '' if self.runtime.strip().casefold() in ('0', '0:00', '00:00', '00:00:00', '0 min', '0m', 'unknown', 'n/a') else self.runtime
         if more:
             label = (label + '   •   ' + more).strip(' •')
         return {
@@ -97,8 +100,8 @@ class Selection:
             'Poster': self.poster,
             'YearAndEpisode': label,
             'Certification': self.certification,
-            'Runtime': self.runtime,
-            'Rating': self.rating,
+            'Runtime': runtime,
+            'Rating': rating,
             'Genres': self.genres,
             'Synopsis': self.synopsis,
             'ReleaseDate': self.release_date,
@@ -329,7 +332,32 @@ def _perform(xbmc, gui, selected: Selection, action: str, native: NativeHold | N
             params.update(window='Videos',windowparameter=target)
         else:
             params['path'] = target
-        # Kodi's AddFavourite calls AddOrRemove; repeating toggles this exact route.
+        # Reuse the existing local favorite even when provider metadata in its
+        # URI changed. Compare genuine IDs, never title-only or guessed matches.
+        def ids(route):
+            parsed=urlsplit(route)
+            if parsed.scheme != 'plugin' or parsed.netloc != 'plugin.video.umbrella': return {}
+            query=parse_qs(parsed.query)
+            action=query.get('action', [''])[0]
+            if action not in (('seasons','episodes') if selected.is_folder else ('play',)): return {}
+            return {k:v[0] for k,v in query.items() if k in ('imdb','tmdb','tvdb') and v and
+                    re.fullmatch(r'tt[0-9]+' if k=='imdb' else r'[1-9][0-9]*',v[0])}
+        wanted=ids(target)
+        current=_rpc(xbmc,'Favourites.GetFavourites',{'properties':['path','window','windowparameter','thumbnail']})
+        for fav in current.get('favourites',[]):
+            if fav.get('type') != kind: continue
+            old_target=fav.get('windowparameter' if kind=='window' else 'path','')
+            if isinstance(old_target,str) and old_target.startswith(LATEST_BASE):
+                try: old_route=decode_latest(old_target)['route']
+                except ValueError: continue
+            else: old_route=old_target
+            other=ids(old_route)
+            common=set(wanted)&set(other)
+            if old_route==target or (common and all(wanted[k]==other[k] for k in common)):
+                params.update(title=fav.get('title') or selected.title,thumbnail=fav.get('thumbnail') or selected.poster)
+                if kind=='window':params.update(window=fav.get('window') or 'Videos',windowparameter=old_target)
+                else:params['path']=old_target
+                break
         _rpc(xbmc,'Favourites.AddFavourite',params)
         return True
     if action == 'trailer' and not _trailer_path(selected.trailer):

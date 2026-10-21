@@ -128,13 +128,33 @@ class Corrective98(unittest.TestCase):
 
  def test_favorite_uses_existing_kodi_toggle_and_trailer_unavailable_is_explicit(self):
   s=ui.Selection(8101,0,'movies',ROUTE,'Fixture title')
-  calls=[];fake=types.SimpleNamespace(executebuiltin=lambda x:calls.append(x), executeJSONRPC=lambda raw:(calls.append(json.loads(raw)) or '{"result":"OK"}'))
+  calls=[];fake=types.SimpleNamespace(executebuiltin=lambda x:calls.append(x), executeJSONRPC=lambda raw:(calls.append(json.loads(raw)) or '{"result":{"favourites":[]}}'))
   gui=types.SimpleNamespace(Dialog=lambda:types.SimpleNamespace(ok=lambda *args:calls.append(args)))
   old=ui.capture;ui.capture=lambda *args:s
   try:
    self.assertTrue(ui._perform(fake,gui,s,'favorite'));self.assertTrue(ui._perform(fake,gui,s,'favorite'))
-   self.assertEqual([x['method'] for x in calls],['Favourites.AddFavourite']*2)
+   self.assertEqual([x['method'] for x in calls],['Favourites.GetFavourites','Favourites.AddFavourite']*2)
    self.assertTrue(ui._perform(fake,gui,s,'trailer'));self.assertIn('No trailer is available',calls[-1][1])
+  finally:ui.capture=old
+
+ def test_unavailable_metadata_does_not_become_a_rating_or_year(self):
+  s=ui.Selection(8101,0,'movies',ROUTE,'Fixture title',year='0',rating='0.0',runtime='00:00')
+  props=s.properties()
+  self.assertEqual([props[x] for x in ('YearAndEpisode','Rating','Runtime')],['','',''])
+
+ def test_favorite_reuses_exact_existing_route_when_metadata_changed(self):
+  s=ui.Selection(8101,0,'movies',ROUTE,'Fixture title')
+  existing=ROUTE+'&saved=earlier-metadata'
+  calls=[]
+  def rpc(raw):
+   call=json.loads(raw);calls.append(call)
+   return json.dumps({'result':{'favourites':[{'type':'media','path':existing,'title':'Saved fixture title'}]}}) if call['method']=='Favourites.GetFavourites' else '{"result":"OK"}'
+  fake=types.SimpleNamespace(executeJSONRPC=rpc)
+  old=ui.capture;ui.capture=lambda *args:s
+  try:
+   self.assertTrue(ui._perform(fake,object(),s,'favorite'))
+   self.assertEqual(calls[-1]['params']['path'],existing)
+   self.assertEqual(calls[-1]['params']['title'],'Saved fixture title')
   finally:ui.capture=old
 
  def test_ambient_layer_draws_above_opaque_home_and_never_over_video(self):

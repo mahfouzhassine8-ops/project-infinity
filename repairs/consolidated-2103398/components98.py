@@ -112,6 +112,7 @@ def components(before):
     # Publish independent applied-input/lifecycle facts, never certify pixels.
     key=CC+'/experience.py'
     after[key]=once(before[key],b"self.publish('AmbientHome.SubmittedMode', ambient if submitted else 'off')",b"self.publish('AmbientHome.SubmittedMode', ambient if submitted else 'off')\n                self.publish('AmbientHome.RenderInputReady', 'true' if submitted else 'false')")
+    after[key]=after[key].replace(b"'AmbientHome.SubmittedMode', 'Preload.One'",b"'AmbientHome.SubmittedMode', 'AmbientHome.RenderInputReady', 'Preload.One'")
     after[CC+'/checkpoint_runtime.py']=once(before[CC+'/checkpoint_runtime.py'],b'ADDON_VERSION = "0.3.5.26"',b'ADDON_VERSION = "0.3.5.27"')
     after[WB+'/controller.py']=once(before[WB+'/controller.py'],b'"0.3.5.26"',b'"0.3.5.27"')
     # Health recorder output is optional. Do not begin a fresh diagnostic write

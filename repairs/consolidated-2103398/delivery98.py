@@ -152,6 +152,16 @@ def assemble(args):
             shutil.copyfile(checkpoint/filename,temp/filename)
         for filename in ('STARTUP-DEX-INTEGRATION.json','ART-COMPONENT-VERIFICATION.json'):
             shutil.copyfile(args.component/filename,temp/filename)
+        for leaf in ('BASELINE97-REUSED-PROOFS.json','TARGETED-SOURCE-REGRESSIONS.log'):
+            shutil.copyfile(args.component/leaf,temp/leaf)
+        save(temp/'PASS-FAIL-REPORT.json',{'schema':1,'source_commit':args.source_commit,
+             'workstreams':{str(i):{'implementation':'IMPLEMENTED','ci':'CI VERIFIED','physical_fold':'NEEDS EVIDENCE'} for i in range(1,8)},
+             'targeted_source_tests_passed':19,'android17_candidate_cases_passed':45,'android17_baseline_control_cases_passed':1,
+             'complete_arm64_native_compilation':True,'native_sources_verified':9404,'permanent_signature_verified':True,
+             'actual_install_over_tested':False,'live_feed_equivalence':'NEEDS EVIDENCE: physical Kodi listing comparison',
+             'repeated_device_close_all_ambient_modes':'NEEDS EVIDENCE','fatal_native_crash_cause':'NEEDS EVIDENCE',
+             'separate_tmdb_and_slyguy_errors':'NEEDS EVIDENCE: not relabeled as repaired',
+             'cobra_changed':False,'final_lock':False})
         shutil.copyfile(c.HERE/'CORRECTIVE-ACCEPTANCE.md',temp/'CORRECTIVE-ACCEPTANCE.md')
         (temp/'INSTALLATION.txt').write_text((c.HERE/'INSTALLATION.txt').read_text())
         save(temp/'CHANGED-FILE-MANIFEST.json',{'components':ledger,
@@ -166,7 +176,8 @@ def assemble(args):
                 source_zip.write(producer/'kodi'/name,'native/'+name)
             for leaf in ('INFINITY-2103398-DELIVERY.json','FOLD98-NATIVE-BINDING.json',
                          'ENGINE-PROOF.json','STARTUP-DEX-INTEGRATION.json',
-                         'ART-COMPONENT-VERIFICATION.json','CHANGED-FILE-MANIFEST.json'):
+                         'ART-COMPONENT-VERIFICATION.json','CHANGED-FILE-MANIFEST.json',
+                         'BASELINE97-REUSED-PROOFS.json','TARGETED-SOURCE-REGRESSIONS.log','PASS-FAIL-REPORT.json'):
                 source_zip.write(temp/leaf,'receipts/'+leaf)
             for path in sorted(c.HERE.rglob('*')):
                 if path.is_file() and '__pycache__' not in path.parts:source_zip.write(path,'corrective/'+path.relative_to(c.HERE).as_posix())

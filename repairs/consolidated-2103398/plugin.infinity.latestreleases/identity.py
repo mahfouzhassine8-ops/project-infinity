@@ -41,7 +41,7 @@ def encode(route, kind, ids):
     route_ids=parse_qs(urlsplit(route).query)
     if any(route_ids.get(k) and route_ids[k][0] != v for k,v in ids.items()):
         raise ValueError('provider identifier mismatch')
-    if not any(re.fullmatch(r'tt[0-9]+', v) if k == 'imdb' else re.fullmatch(r'[0-9]+', v)
+    if not ids or not all(re.fullmatch(r'tt[0-9]+', v) if k == 'imdb' else re.fullmatch(r'[0-9]+', v)
                for k, v in ids.items()):
         raise ValueError('media identifiers unavailable')
     raw = json.dumps({'v': 1, 'kind': kind, 'ids': ids, 'route': route},
