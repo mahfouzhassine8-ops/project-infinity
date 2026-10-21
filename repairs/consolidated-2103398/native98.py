@@ -37,7 +37,7 @@ def patches(before, original, final):
   }
   // Inquiry controls do not mutate bytes.''')
     raw=before[CONTAINER]
-    raw=once(raw,b'#include "FileItem.h"',b'#include "FileItem.h"\n#include "FileItemList.h"\n#include "windows/GUIMediaWindow.h"\n#include "addons/IAddon.h"\n#include "Util.h"')
+    raw=once(raw,b'#include "FileItem.h"',b'#include "FileItem.h"\n#include "addons/IAddon.h"\n#include "Util.h"')
     raw=once(raw,b'''  if (path.compare(0, 31, "plugin://plugin.video.umbrella/") != 0)
     { trace("native.validate","provider_mismatch"); return restore(); }
   if (path.size() > 4096)''',b'''  const bool infinityLatest = path.rfind("plugin://plugin.infinity.latestreleases/", 0) == 0;
@@ -116,7 +116,7 @@ def patches(before, original, final):
         blocks.append(block)
     out[CONTRACT]=once(raw,b'  };\n  return *contracts;',b'    // INFINITY_2103398_CC27_EXACT_SOURCES\n'+b'\n'.join(blocks)+b'\n  };\n  return *contracts;')
     out[COORDINATOR]=once(before[COORDINATOR],b'active["addon_version"].asString() != "0.3.5.26"',b'active["addon_version"].asString() != "0.3.5.26" && active["addon_version"].asString() != "0.3.5.27"')
-    raw=out[COORDINATOR]
+    raw=once(out[COORDINATOR],b'#include "utils/Variant.h"',b'#include "utils/Variant.h"\n#include "utils/log.h"')
     raw=once(raw,b'  std::string safeStatus; // Immutable full receipt while SAFE remains valid.',
         b'  std::string archivedAttemptKey; // Diagnostic history never grants exit authority.\n  std::string safeStatus; // Immutable full receipt while SAFE remains valid.')
     a=raw.index(b'std::string Status(');b=raw.index(b'\nbool AuthorizeTermination(',a)
@@ -156,7 +156,9 @@ def patches(before, original, final):
 #include "guilib/GUIComponent.h"
 #include "guilib/GUIWindow.h"
 #include "guilib/GUIWindowManager.h"
-#include "guilib/WindowIDs.h"''')
+#include "guilib/WindowIDs.h"
+#include "utils/Variant.h"
+#include <cstdint>''')
     out[BUTTON]=once(out[BUTTON],b'EVENT_RESULT CGUIButtonControl::OnMouseEvent(',
         (HERE/'addon_button_touch.cpp').read_bytes()+b'\n\nEVENT_RESULT CGUIButtonControl::OnMouseEvent(')
     out[ADDON_INFO]=once(before[ADDON_INFO],b'  CGUIDialog::OnInitWindow();\n  BuildDependencyList();',b'''  CGUIDialog::OnInitWindow();
