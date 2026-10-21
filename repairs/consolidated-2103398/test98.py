@@ -210,7 +210,7 @@ class Corrective98(unittest.TestCase):
  def test_each_native_close_attempt_has_distinct_terminal_receipt(self):
   raw=self.native[n.COORDINATOR].decode()
   self.assertIn('directory + "/attempt-" + key + ".json"',raw)
-  self.assertIn('lock.unlock();',raw);self.assertIn('SaveProtocolRecord(',raw)
+  self.assertIn('lock.unlock();',raw);self.assertIn('files::SaveDirty(',raw)
   with tempfile.TemporaryDirectory() as directory:
    root=Path(directory)
    for session,phase in [('failed-one','CHECKPOINT_FAILED'),('passed-two','SAFE_TO_TERMINATE')]:
@@ -218,6 +218,13 @@ class Corrective98(unittest.TestCase):
    report=collect(root);self.assertEqual(len(report['attempts']),2)
    self.assertEqual({r['checkpoint'] for r in report['attempts']},{'FAILED','NATIVE_SAFE_RECEIPT'})
    self.assertTrue(all(r['engine_termination'].startswith('NEEDS_') for r in report['attempts']))
+
+ def test_actual_history_helper_rejects_old_shortcut_and_durably_preserves_attempts(self):
+  with tempfile.TemporaryDirectory() as directory:
+   root=Path(directory);binary=root/'receipts'
+   subprocess.run(['g++','-std=c++17','-O2','-I'+str(NATIVE/'xbmc'),str(c.HERE/'receipt_persistence_test.cpp'),'-o',str(binary)],check=True,capture_output=True)
+   result=subprocess.run([str(binary),str(root)],check=True,capture_output=True,text=True)
+   self.assertIn('both receipts durable and separate; symlink denied',result.stdout)
 
  def test_actual_sqlite_baseline_reproduction_and_corrected_durability(self):
   include=Path(os.environ.get('INFINITY_SQLITE_INCLUDE',str(c.ROOT.parent/'native-host-deps')))
