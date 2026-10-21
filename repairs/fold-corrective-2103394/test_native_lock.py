@@ -57,8 +57,10 @@ class ActualLanguageHookLockCycle(unittest.TestCase):
                 result=subprocess.run([str(work/'test'),variant,skin],check=True,capture_output=True,text=True,timeout=6)
                 self.assertIn(expected,result.stdout)
         # The ownership fix cannot change other Window methods or any control API.
+        includes=b'#if defined(TARGET_ANDROID)\n#include "interfaces/legacy/ModuleXbmc.h"\n#include <memory>\n#endif\n'
+        self.assertEqual(corrected.count(includes),1)
         self.assertEqual(corrected.replace(after.encode(),function(original.decode(),signature).encode(),1)
-                         .replace(b'#if defined(TARGET_ANDROID)\n#include "interfaces/legacy/ModuleXbmc.h"\n#endif\n',b'',1),original)
+                         .replace(includes,b'',1),original)
 
 
 HARNESS=r'''
