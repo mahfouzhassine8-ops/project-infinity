@@ -30,7 +30,10 @@ PACKAGES=((CC,'0.3.5.23','0.3.5.24'),(WB,'1.0.4','1.0.5'),
 
 def sha(raw):return hashlib.sha256(raw).hexdigest()
 def digest(path):
-    with Path(path).open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
+    value=hashlib.sha256()
+    with Path(path).open('rb') as stream:
+        for block in iter(lambda:stream.read(1024*1024),b''):value.update(block)
+    return value.hexdigest()
 
 
 def read_parent(path):
