@@ -131,13 +131,22 @@ def assemble(directory,out,commit):
             final_presentation_files=sorted(delta),physical_fold_verified=False,actual_install_over_tested=False,
             final_lock=False,experimental_only=True)
         save(temp/'INFINITY-2103399-DELIVERY.json',receipt)
-        changed_manifest={'final_stage_changed':{n:{'before':c.sha(before[n]),'after':c.sha(b)} for n,b in delta.items()},
+        origin_manifest=json.loads((directory/'CHANGED-FILE-MANIFEST.json').read_text())
+        cumulative=copy.deepcopy(origin_manifest['components'])
+        cumulative['versions']=f.VERSIONS
+        for n,b in delta.items():
+            entry=cumulative['changed'].setdefault(n,{'before':c.sha(before[n])})
+            entry['after']=c.sha(b)
+        changed_manifest={'components':cumulative,'native':origin_manifest['native'],'dex':origin_manifest['dex'],
+            'final_stage_changed':{n:{'before':c.sha(before[n]),'after':c.sha(b)} for n,b in delta.items()},
             'originating_98_changes':origin['apk_changed_members'],'final_apk_changes':changed,
             'native_and_dex_changed_in_final_stage':False,'originating_source_commit':ORIGIN,'final_source_commit':commit}
         save(temp/'CHANGED-FILE-MANIFEST.json',changed_manifest)
         report=json.loads((directory/'PASS-FAIL-REPORT.json').read_text())
         report.update(source_commit=commit,native_and_android17_source_commit=ORIGIN,native_and_android17_run=ORIGIN_RUN,
             final_presentation_tests_passed=7,all_final_components_match_apk=True,
+            android17_execution_scope='Production DEX and component/Search UI on API37 emulator; whole ARM64 app execution not claimed',
+            whole_apk_android_execution='NEEDS EVIDENCE: physical ARM64 installation and execution',
             physical_popup_reference_approval='NEEDS EVIDENCE',final_lock=False)
         report['workstreams']['7']['implementation']='IMPLEMENTED: proven observer/Health correction; other reported TMDb/SlyGuy causes NEEDS EVIDENCE'
         save(temp/'PASS-FAIL-REPORT.json',report)
