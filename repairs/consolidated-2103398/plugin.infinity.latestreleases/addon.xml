@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="plugin.infinity.latestreleases" name="Infinity Latest Releases" version="0.1.0" provider-name="Infinity">
+ <requires><import addon="xbmc.python" version="3.0.0"/><import addon="plugin.video.umbrella" version="6.7.93"/></requires>
+ <extension point="xbmc.python.pluginsource" library="default.py"><provides>video</provides></extension>
+ <extension point="xbmc.addon.metadata"><summary lang="en_GB">The existing Movie and TV Latest Releases listings with verified Infinity identities.</summary><description lang="en_GB">Uses Kodi's existing directory interface to the installed Umbrella. No independent discovery, credentials or metadata database.</description><platform>all</platform><license>GPL-2.0-or-later</license></extension>
+</addon>
