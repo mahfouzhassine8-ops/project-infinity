@@ -49,7 +49,7 @@ def prepare(apk,component,out,android,tools):
     proof=json.loads((component/'STARTUP-DEX-INTEGRATION.json').read_text())
     dex=component/'component/classes.dex'
     c.require(proof['source_commit']==os.environ['GITHUB_SHA'] and proof['source_apk_sha256']==c.PARENT,'wrong DEX provenance')
-    c.require(proof['decoded_protected_instructions_identical'] and proof['runtime_classes_changed']==[d.TARGET],'DEX class preservation missing')
+    c.require(proof['decoded_protected_instructions_identical'] and proof['runtime_classes_changed']==sorted(__import__('java96').TARGETS),'DEX class preservation missing')
     c.require(proof['fields']['encoded_values_and_presence_preserved'] and proof['fields']['all_original_field_definitions_verified'],'field preservation missing')
     c.require(c.digest(dex)==proof['component_dex_sha256'] and proof['original_dex_sha256']==d.BASELINE,'component fingerprint mismatch')
     source=c.read_parent(apk);final=c.components(source)

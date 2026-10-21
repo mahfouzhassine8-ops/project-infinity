@@ -5,7 +5,43 @@ import subprocess
 from pathlib import Path
 import components96 as c
 
-TARGETS = {'com/projectinfinity/kodi/InfinityInstalledCheckpointInstaller.smali'}
+TARGETS = {'com/projectinfinity/kodi/InfinityInstalledCheckpointInstaller.smali',
+           'com/projectinfinity/kodi/InfinityEvidence95.smali'}
+
+
+def patch_evidence(original_smali, modified, work, android, tools, cp, api):
+    """Replace only the defective collector method and add exact-size hashing."""
+    import dex96
+    source = c.HERE / 'InfinityEvidence95.java'
+    classes = work / 'evidence96-classes'
+    classes.mkdir()
+    subprocess.run(['javac', '--release', '8', '-g:none', '-Xlint:all,-options',
+        '-Werror', '-cp', str(android), '-d', str(classes), str(source)], check=True)
+    files = list(classes.rglob('*.class'))
+    c.require(len(files) == 1 and files[0].name == 'InfinityEvidence95.class',
+              'unexpected evidence class inventory')
+    dex = work / 'evidence96-dex'
+    dex.mkdir()
+    subprocess.run([str(tools/'d8'), '--release', '--min-api', str(api), '--lib',
+        str(android), '--output', str(dex), str(files[0])], check=True)
+    decoded = work / 'evidence96-smali'
+    subprocess.run(['java', '-cp', cp, 'org.jf.baksmali.Main', 'disassemble',
+        '--sequential-labels', str(dex/'classes.dex'), '-o', str(decoded)], check=True)
+    name = 'com/projectinfinity/kodi/InfinityEvidence95.smali'
+    before = original_smali[name]
+    methods = dex96.previous().methods
+    candidate = methods((decoded/name).read_text())
+    old = methods(before)
+    append = 'append(Landroid/content/Context;Lorg/json/JSONObject;)V'
+    exact = 'digestExact(Ljava/io/InputStream;J)Ljava/lang/String;'
+    c.require(set(candidate) == set(old) | {exact}, 'evidence method inventory differs')
+    c.require('->digestExact(Ljava/io/InputStream;J)' in candidate[append],
+              'exact-size native fingerprint missing')
+    result = before.replace(old[append], candidate[append], 1)
+    result += '\n' + candidate[exact].rstrip() + '\n'
+    c.require(result.removesuffix('\n'+candidate[exact].rstrip()+'\n').replace(
+        candidate[append], old[append], 1) == before, 'evidence change escaped authorized methods')
+    (modified/name).write_text(result)
 
 
 def preserve_fields(original, assembled, work, api, cp, original_smali):
@@ -27,7 +63,7 @@ def preserve_fields(original, assembled, work, api, cp, original_smali):
     expected_fields = sum(len(re.findall(r'^\.field ', body, re.M))
                           for body in original_smali.values())
     c.require(count and protected and int(count[1]) == expected_fields and
-        int(protected[1]) == len(original_smali)-1, 'complete original field/class proof differs')
+        int(protected[1]) == len(original_smali)-len(TARGETS), 'complete original field/class proof differs')
     return dict(build_only_adapter_sha256=c.digest(adapter),
         exact_field_definitions_verified=int(count[1]),
         all_original_field_definitions_verified=True,

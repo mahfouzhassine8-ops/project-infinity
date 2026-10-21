@@ -27,7 +27,8 @@ public final class PreserveDexFields96 {
     private static final String TARGET =
             "Lcom/projectinfinity/kodi/InfinityInstalledCheckpointInstaller;";
 
-    private static final java.util.Set<String> TARGETS = java.util.Collections.singleton(TARGET);
+    private static final java.util.Set<String> TARGETS = new java.util.HashSet<>(java.util.Arrays.asList(
+        TARGET, "Lcom/projectinfinity/kodi/InfinityEvidence95;"));
     private static boolean added(String name) { return false; }
     private PreserveDexFields96() {}
 

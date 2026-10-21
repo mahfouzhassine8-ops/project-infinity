@@ -234,6 +234,52 @@ int main(){
             self.assertEqual(props['Infinity.AmbientHome.Art'],
                 '' if mode == 'off' else 'special://existing/fanart.jpg')
 
+    def test_native_fingerprint_streams_the_actual_636mb_entry_and_rejects_size_mismatches(self):
+        import hashlib
+        original = (c.HERE.parent/'fold-critical-2103395/InfinityEvidence95.java').read_text()
+        corrected = (c.HERE/'InfinityEvidence95.java').read_text()
+        old = original[original.index('  static String digest('):original.rindex('\n}')]
+        new = corrected[corrected.index('  static String digestExact('):corrected.index('  static byte[] read(')]
+        # Match the actual signed 2103395 ZIP member size. Constant-memory
+        # synthetic input tests stream completeness without reading user data.
+        size = 636425552
+        digest = hashlib.sha256()
+        block = bytes(1024*1024)
+        remaining = size
+        while remaining:
+            count = min(remaining, len(block))
+            digest.update(block[:count])
+            remaining -= count
+        java = '''import java.io.*;import java.security.*;import java.util.*;
+public class EvidenceDigest96Check {
+''' + old + '\n' + new + '''
+ static final class Zeros extends InputStream {
+  long left;Zeros(long size){left=size;}
+  public int read(){if(left==0)return -1;left--;return 0;}
+  public int read(byte[] bytes,int offset,int length){
+   if(left==0)return -1;int n=(int)Math.min(left,length);
+   Arrays.fill(bytes,offset,offset+n,(byte)0);left-=n;return n;
+  }
+ }
+ public static void main(String[] args)throws Exception {
+  boolean rejected=false;
+  try{digest(new Zeros(SIZE),400*1024*1024);}catch(IOException expected){rejected=true;}
+  if(!rejected)throw new AssertionError("baseline failure not reproduced");
+  if(!digestExact(new Zeros(SIZE),SIZE).equals("HASH"))throw new AssertionError("incomplete fingerprint");
+  for(long[] pair:new long[][]{{9,10},{11,10},{0,0},{0,-1}}){
+   rejected=false;try{digestExact(new Zeros(pair[0]),pair[1]);}catch(IOException expected){rejected=true;}
+   if(!rejected)throw new AssertionError("declared-size mismatch accepted");
+  }
+ }
+}
+'''.replace('SIZE', str(size)).replace('HASH', digest.hexdigest())
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root/'EvidenceDigest96Check.java'
+            source.write_text(java)
+            subprocess.run(['javac', '--release', '8', '-d', str(root), str(source)], check=True)
+            subprocess.run(['java', '-cp', str(root), 'EvidenceDigest96Check'], check=True, timeout=30)
+
 
 if __name__ == '__main__':
     unittest.main()

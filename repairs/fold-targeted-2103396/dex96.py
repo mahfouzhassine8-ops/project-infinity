@@ -127,7 +127,12 @@ def build(apk, stage, out, android, tools, cp):
     modified=work/'modified-smali';shutil.copytree(original_smali,modified)
     (modified/TARGET).write_text(merged)
     import java96
-    added, java_proof = set(), {}
+    java96.patch_evidence(before_raw, modified, work, android, tools, cp, int(api))
+    added, java_proof = set(), {
+        'collector_source_sha256': c.digest(c.HERE/'InfinityEvidence95.java'),
+        'collector_changed_methods': ['append', 'digestExact'],
+        'collector_stream_requires_exact_declared_entry_size': True,
+    }
     component=out/'component';component.mkdir();candidate=component/'classes.dex'
     subprocess.run(['java','-cp',cp,'org.jf.smali.Main','assemble','--api',api,str(modified),'-o',str(candidate)],check=True)
     fields=java96.preserve_fields(original_dex,candidate,work,int(api),cp, before_raw)
@@ -137,8 +142,8 @@ def build(apk, stage, out, android, tools, cp):
     normalize=old.normalize_module()
     before={n:normalize(b) for n,b in before_raw.items()};after={n:normalize(b) for n,b in after_raw.items()}
     old.record_differences(before,after)
-    c.require(set(after)==set(before) and {p for p in before if before[p]!=after[p]}=={TARGET}, 'unrelated class or instructions changed')
-    preservation={'protected_classes':len(before)-1}
+    c.require(set(after)==set(before) and {p for p in before if before[p]!=after[p]}==java96.TARGETS, 'unrelated class or instructions changed')
+    preservation={'protected_classes':len(before)-len(java96.TARGETS)}
     c.require(fields['protected_class_definitions_from_original']==preservation['protected_classes'],'class/field proof mismatch')
     methods=old.methods(after_raw[TARGET]);old_methods=old.methods(before_raw[TARGET])
     c.require(set(methods)==set(old_methods)|{HELPER},'changed startup method inventory')
@@ -147,7 +152,7 @@ def build(apk, stage, out, android, tools, cp):
         if name!=APPLY:c.require(normalize(body)==normalize(methods[name]),'existing startup method changed')
     report={'source_commit':os.environ['GITHUB_SHA'],'source_apk_sha256':c.PARENT,
             'original_dex_sha256':BASELINE,'component_dex_name':'classes.dex','component_dex_sha256':c.digest(candidate),
-            'runtime_classes_changed':[TARGET],'added_classes':sorted(added),'java_ui_evidence':java_proof,'protected_classes_in_changed_shard':preservation['protected_classes'],
+            'runtime_classes_changed':sorted(java96.TARGETS),'added_classes':sorted(added),'java_ui_evidence':java_proof,'protected_classes_in_changed_shard':preservation['protected_classes'],
             'decoded_protected_instructions_identical':True,'fields':fields,'invalid_inputs_rejected':rejected,
             'other_dex_shards':{'classes2.dex':SHARD2},'native_engine_compiled':False,
             'physical_fold_verified':False,'final_lock':False,'reviewed_helper_source_sha256':c.sha(java)}
