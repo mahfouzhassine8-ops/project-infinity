@@ -30,7 +30,7 @@ bool CGUIBaseContainer::OnInfinityAddonBrowserTouch(float x, float y, bool hold)
   if(hold)
   {
     m_infinityAddonTapKey.clear();m_infinityAddonSuppressUntil=now+std::chrono::milliseconds(600);
-    OnClick(ACTION_CONTEXT_MENU);return true;
+    window->OnAction(CAction(ACTION_CONTEXT_MENU));return true;
   }
   if(now<m_infinityAddonSuppressUntil)return true;
   if(previous==selected&&m_infinityAddonTapKey==key)

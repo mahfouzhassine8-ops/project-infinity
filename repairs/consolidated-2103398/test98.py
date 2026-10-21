@@ -195,7 +195,7 @@ class Corrective98(unittest.TestCase):
  def test_browser_only_touch_excludes_search_and_uses_original_context_actions(self):
   text=self.native[n.CONTAINER].decode();part=text[text.index('bool CGUIBaseContainer::OnInfinityAddonBrowserTouch'):text.index('bool CGUIBaseContainer::OnInfinityUiTouch')]
   self.assertIn('addons://search',part);self.assertIn('WINDOW_DIALOG_FILE_BROWSER',part)
-  self.assertIn('OnClick(ACTION_CONTEXT_MENU)',part);self.assertIn('OnClick(ACTION_SELECT_ITEM)',part)
+  self.assertIn('window->OnAction(CAction(ACTION_CONTEXT_MENU))',part);self.assertIn('OnClick(ACTION_SELECT_ITEM)',part)
   self.assertNotIn('DisableAddon',part);self.assertNotIn('InstallAddon',part)
   self.assertIn('ACTION_TOUCH_TAP',self.native[n.INPUT].decode())
 
