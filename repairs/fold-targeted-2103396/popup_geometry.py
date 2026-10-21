@@ -15,7 +15,7 @@ def geometry(width, height, physical_width='', physical_height=''):
     ratio = (height * pw) / (width * ph)
     available_h = height / ratio
     card_w = min(width * .90, available_h * 2.75)
-    card_h = min(card_w * .47, available_h * .86)
+    card_h = min(card_w * .35, available_h * .86)
     pad = card_w * .025
     gap = card_w * .025
     close = card_w * .060
@@ -28,16 +28,18 @@ def geometry(width, height, physical_width='', physical_height=''):
     bw = (tw - 3 * gap) / 4
     def rect(x, y, w, h):
         return tuple(round(v) for v in (x, y * ratio, w, h * ratio))
+    metadata_y = pad + card_w * .060
+    metadata_h = card_w * .038
+    synopsis_y = metadata_y + metadata_h + gap
     details = {
         'poster': rect(pad, pad, poster_w, poster_h),
-        'title': rect(tx, pad, tw-close-gap, card_w*.062),
-        'year': rect(tx, pad+card_w*.065, tw, card_w*.042),
-        'certification': rect(tx, pad+card_w*.112, tw*.25, card_w*.038),
-        'runtime': rect(tx+tw*.26, pad+card_w*.112, tw*.35, card_w*.038),
-        'rating': rect(tx+tw*.64, pad+card_w*.112, tw*.36, card_w*.038),
-        'genres': rect(tx, pad+card_w*.155, tw, card_w*.043),
-        'synopsis': rect(tx, pad+card_w*.202, tw,
-                         max(0, actions_y-gap-pad-card_w*.202)),
+        'title': rect(tx, pad, tw-close-gap, card_w*.052),
+        'year': rect(tx, metadata_y, tw*.15, metadata_h),
+        'certification': rect(tx+tw*.16, metadata_y, tw*.12, metadata_h),
+        'runtime': rect(tx+tw*.29, metadata_y, tw*.18, metadata_h),
+        'rating': rect(tx+tw*.48, metadata_y, tw*.12, metadata_h),
+        'genres': rect(tx+tw*.61, metadata_y, tw*.39, metadata_h),
+        'synopsis': rect(tx, synopsis_y, tw, max(0, actions_y-gap-synopsis_y)),
     }
     return dict(x=round((width-card_w)/2), y=round((height-card_h*ratio)/2),
         width=round(card_w), height=round(card_h*ratio), compact=False,

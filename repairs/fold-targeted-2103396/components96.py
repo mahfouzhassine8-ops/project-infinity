@@ -50,6 +50,7 @@ def popup_xml(raw):
         for name in ('centerleft', 'centertop', 'right', 'bottom'):
             for node in ctrl.findall(name):
                 ctrl.remove(node)
+    root.find('.//control[@id="120"]/label').text = '$INFO[Window.Property(Infinity.HomeOptionB.Title)]$INFO[Window.Property(Infinity.HomeOptionB.YearAndEpisode), (,)]'
     close = root.find('.//control[@id="9"]')
     close.find('label').text = '×'
     for name in ('texturefocus', 'texturenofocus'):
@@ -92,6 +93,15 @@ OLED_SURFACES = prior.old.OLED_SURFACES | {
     'InfinityGlassSurfaceSoft', 'InfinityGlassSurfaceStrong',
     'InfinityBrowserSurface', 'InfinityBrowserCard', 'InfinityBrowserBackground',
     'InfinityDialogBackground', 'InfinityDialogPanel', 'InfinityMenuSurface',
+    'InfinityPreviewSurface', 'InfinityBrowserPanel', 'InfinityRailsSurface',
+    'InfinityRailsField', 'InfinityPaletteBackground', 'InfinityPaletteSurface',
+    'InfinityPaletteSurfaceElevated', 'InfinityPaletteControlSurface',
+    'InfinityCollectiveBackground', 'InfinityPaletteGlassSurface',
+    'InfinityPaletteCardSurface', 'InfinityPaletteHeaderSurface',
+    'InfinityGlassSurfaceElevated', 'InfinityOLEDControlSurface16',
+    'InfinityOLEDControlSurface22', 'InfinityOLEDControlSurface26',
+    'InfinityDirectoryRowSurface', 'InfinityPlayerQuietRow',
+    'InfinityPerfCardSurface', 'InfinityPerfPillSurface',
 }
 
 
