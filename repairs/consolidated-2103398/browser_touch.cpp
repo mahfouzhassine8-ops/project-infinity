@@ -27,14 +27,10 @@ bool CGUIBaseContainer::OnInfinityAddonBrowserTouch(float x, float y, bool hold)
   const std::string key=directory+"\n"+std::to_string(GetParentID())+"\n"+
       std::to_string(selected)+"\n"+item->GetPath()+"\n"+
       std::to_string(reinterpret_cast<std::uintptr_t>(item.get()));
-  if(hold)
-  {
-    m_infinityAddonTapKey.clear();m_infinityAddonSuppressUntil=now+std::chrono::milliseconds(600);
-    window->OnAction(CAction(ACTION_CONTEXT_MENU));return true;
-  }
-  if(now<m_infinityAddonSuppressUntil)return true;
-  if(previous==selected&&m_infinityAddonTapKey==key)
-  {m_infinityAddonTapKey.clear();OnClick(ACTION_SELECT_ITEM);}
-  else m_infinityAddonTapKey=key;
+  const auto decision=InfinityTouchPress(this,key,previous==selected,hold,now);
+  if(decision==InfinityTouchDecision::Context)
+    window->OnAction(CAction(ACTION_CONTEXT_MENU));
+  else if(decision==InfinityTouchDecision::Activate)
+    OnClick(ACTION_SELECT_ITEM);
   return true;
 }

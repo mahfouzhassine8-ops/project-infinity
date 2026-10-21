@@ -14,10 +14,7 @@ bool CGUIButtonControl::OnInfinityAddonActionTouch(float x,float y,bool hold)
   const int previous=owner->GetFocusedControlID();
   CGUIMessage focus(GUI_MSG_SETFOCUS,GetParentID(),GetID());owner->OnMessage(focus);
   const auto now=std::chrono::steady_clock::now();
-  if(hold){m_infinityAddonActionKey.clear();m_infinityAddonActionSuppressUntil=now+std::chrono::milliseconds(600);return true;}
-  if(now<m_infinityAddonActionSuppressUntil)return true;
-  if(previous==GetID() && m_infinityAddonActionKey==identity)
-  {m_infinityAddonActionKey.clear();OnAction(CAction(ACTION_SELECT_ITEM));}
-  else m_infinityAddonActionKey=identity;
+  const auto decision=InfinityTouchPress(this,identity,previous==GetID(),hold,now);
+  if(decision==InfinityTouchDecision::Activate)OnAction(CAction(ACTION_SELECT_ITEM));
   return true;
 }
