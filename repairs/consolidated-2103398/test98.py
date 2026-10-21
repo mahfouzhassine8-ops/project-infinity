@@ -39,6 +39,27 @@ class Corrective98(unittest.TestCase):
   fields=next(ast.literal_eval(n.value) for n in tree.body if isinstance(n,ast.Assign) and any(getattr(t,'id','')=='FIELDS' for t in n.targets))
   self.assertLessEqual(set(fields),set(schema['List.Fields.Files']['items']['enum']))
 
+ def test_actual_listitem_metadata_uses_kodi_supported_keys(self):
+  import ast,re
+  tree=ast.parse((c.HERE/c.LATEST/'default.py').read_text())
+  info=next(ast.literal_eval(n.value) for n in tree.body if isinstance(n,ast.Assign) and any(getattr(t,'id','')=='INFO' for t in n.targets))
+  native=(NATIVE/'xbmc/interfaces/legacy/ListItem.cpp').read_text()
+  self.assertLessEqual(info,set(re.findall(r'key == "([a-z]+)"',native)))
+  class Item:
+   def __init__(self,**kw):self.info={}
+   def setArt(self,v):self.art=v
+   def setInfo(self,k,v):self.info=v
+   def setUniqueIDs(self,v):self.ids=v
+   def setCast(self,v):self.cast=v
+   def setProperty(self,*args):pass
+  namespace={'xbmcgui':types.SimpleNamespace(ListItem=Item),'INFO':info,'BASE':identity.BASE,'decode':identity.decode}
+  fn=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='item')
+  exec(compile(ast.Module(body=[fn],type_ignores=[]),'<actual-plugin-item>','exec'),namespace)
+  row={'file':ROUTE,'label':'Fixture show','runtime':1440,'showtitle':'Actual supplied show title'}
+  _,li,_=namespace['item'](row)
+  self.assertEqual(li.info['duration'],1440);self.assertEqual(li.info['tvshowtitle'],row['showtitle'])
+  self.assertNotIn('runtime',li.info);self.assertNotIn('showtitle',li.info)
+
  def test_identity_keeps_the_original_long_provider_route(self):
   self.assertGreater(len(ROUTE),4096)
   path=identity.encode(ROUTE,'movie',{'imdb':'tt123456','tmdb':'456'})

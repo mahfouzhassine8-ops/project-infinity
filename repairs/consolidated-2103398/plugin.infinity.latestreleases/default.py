@@ -16,9 +16,9 @@ FIELDS = ['title', 'originaltitle', 'year', 'genre', 'plot', 'plotoutline',
           'imdbnumber', 'art', 'thumbnail', 'fanart', 'season', 'episode',
           'showtitle', 'playcount', 'lastplayed', 'resume', 'cast', 'director',
           'writer', 'studio', 'country', 'tagline']
-INFO = {'originaltitle', 'title', 'year', 'genre', 'plot', 'plotoutline', 'runtime',
+INFO = {'originaltitle', 'title', 'year', 'genre', 'plot', 'plotoutline',
         'rating', 'mpaa', 'premiered', 'trailer', 'imdbnumber', 'season', 'episode',
-        'showtitle', 'playcount', 'lastplayed', 'director', 'writer', 'studio',
+        'playcount', 'lastplayed', 'director', 'writer', 'studio',
         'country', 'tagline'}
 
 
@@ -47,6 +47,7 @@ def item(row):
     li.setArt(art)
     info = {k: row[k] for k in INFO if row.get(k) not in (None, '', [])}
     if row.get('showtitle'): info['tvshowtitle']=row['showtitle']
+    if row.get('runtime') is not None: info['duration']=row['runtime']
     kind = row.get('_infinity_kind') or row.get('type')
     if kind in ('movie', 'tvshow', 'season', 'episode'):
         info['mediatype'] = kind
