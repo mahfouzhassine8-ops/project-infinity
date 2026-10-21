@@ -19,6 +19,7 @@ VERSIONS.update({c.UI:'0.1.10', c.SKIN:'1.0.5.236'})
 META = {121:'YearAndEpisode',122:'Certification',123:'Runtime',124:'Rating',125:'Genres'}
 ICONS = {101:'play',102:'movie',103:'favourite',104:'info'}
 INK = 'FF00111C'
+PRIMARY_INK = '$VAR[InfinityOptionBPrimaryInk]'
 MODAL_BARRIER = b'''
 def _wait_for_option_b_close(xbmc, gui, modal_id, return_modal=None):
     """A closing Kodi dialog is still modal; wait without weakening capture."""
@@ -74,14 +75,14 @@ def popup(raw):
         if ident==101:
             # The approved primary action stays cyan when focus moves away.
             for tag in ('texturefocus','texturenofocus'):
-                button.find(tag).text='infinity_glass/focus.png'
+                button.find(tag).text='infinity_glass/field.png'
                 button.find(tag).set('colordiffuse','$VAR[InfinityLegacyAccent]')
-            button.find('textcolor').text=INK
-            ET.SubElement(button,'focusedcolor').text=INK
+            button.find('textcolor').text=PRIMARY_INK
+            ET.SubElement(button,'focusedcolor').text=PRIMARY_INK
         image=ET.SubElement(group,'control',{'type':'image','id':str(ident+50)})
         ET.SubElement(image,'visible').text='!String.IsEqual(Window.Property(Infinity.HomeOptionB.Expanded),true)'
         ET.SubElement(image,'aspectratio').text='keep'
-        ET.SubElement(image,'texture',{'colordiffuse':INK if ident==101 else '$VAR[InfinityLegacyText]'}).text='infinity_ui/icons/'+icon+'.png'
+        ET.SubElement(image,'texture',{'colordiffuse':PRIMARY_INK if ident==101 else '$VAR[InfinityLegacyText]'}).text='infinity_ui/icons/'+icon+'.png'
     return c.xml(root)
 
 
@@ -133,6 +134,19 @@ def components(before):
     after[popup_key]=popup(before[popup_key])
     after[c.SKIN+'/unified/InfinityHomeOptionB.xml']=after[popup_key]
     after[c.UI+'/home_option_b.py']=runtime(before[c.UI+'/home_option_b.py'])
+    palettes=0
+    for name,body in before.items():
+        if not name.startswith(c.SKIN+'/') or not name.endswith('.xml') or b'name="InfinityLegacyAccent"' not in body:
+            continue
+        root=ET.fromstring(body);accent=root.find('variable[@name="InfinityLegacyAccent"]')
+        if accent is None:continue
+        c.require(root.find('variable[@name="InfinityOptionBPrimaryInk"]') is None,'popup foreground already declared')
+        light=next(v.get('condition') for v in accent.findall('value') if 'Infinity.NativeSystemTheme),light)' in v.get('condition',''))
+        var=ET.SubElement(root,'variable',{'name':'InfinityOptionBPrimaryInk'})
+        ET.SubElement(var,'value',{'condition':light}).text='FFFFFFFF'
+        ET.SubElement(var,'value').text=INK
+        after[name]=c.xml(root);palettes+=1
+    c.require(palettes==10,'all ten actual legacy palette declarations required')
     for addon,old in ((c.UI,'0.1.9'),(c.SKIN,'1.0.5.235')):
         key=addon+'/addon.xml'
         after[key]=c.once(before[key],('version="'+old+'"').encode(),('version="'+VERSIONS[addon]+'"').encode())
@@ -144,7 +158,7 @@ def components(before):
         if 'protected_files' in value:value['protected_files']={p:c.sha(after[c.SKIN+'/'+p]) for p in value['protected_files']}
         after[key]=(json.dumps(value,indent=2,sort_keys=True)+'\n').encode()
     changed={n:b for n,b in after.items() if before[n]!=b}
-    c.require(len(changed)==7 and all(n.startswith((c.UI+'/',c.SKIN+'/')) for n in changed),'final presentation scope changed')
+    c.require(len(changed)==17 and all(n.startswith((c.UI+'/',c.SKIN+'/')) for n in changed),'final presentation scope changed')
     c.require(not any('cobra' in n.lower() for n in changed),'Cobra change prohibited')
     for n,b in changed.items():
         if n.endswith('.xml'):ET.fromstring(b)

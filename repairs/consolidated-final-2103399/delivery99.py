@@ -144,7 +144,7 @@ def assemble(directory,out,commit):
         save(temp/'CHANGED-FILE-MANIFEST.json',changed_manifest)
         report=json.loads((directory/'PASS-FAIL-REPORT.json').read_text())
         report.update(source_commit=commit,native_and_android17_source_commit=ORIGIN,native_and_android17_run=ORIGIN_RUN,
-            final_presentation_tests_passed=7,all_final_components_match_apk=True,
+            final_presentation_tests_passed=8,all_final_components_match_apk=True,
             android17_execution_scope='Production DEX and component/Search UI on API37 emulator; whole ARM64 app execution not claimed',
             whole_apk_android_execution='NEEDS EVIDENCE: physical ARM64 installation and execution',
             physical_popup_reference_approval='NEEDS EVIDENCE',final_lock=False)

@@ -25,8 +25,8 @@ class Final99(unittest.TestCase):
   import home_option_b
   cls.ui=home_option_b
 
- def test_final_delta_is_only_seven_declared_presentation_files(self):
-  self.assertEqual(len(self.delta),7)
+ def test_final_delta_is_only_seventeen_declared_presentation_files(self):
+  self.assertEqual(len(self.delta),17)
   for n in self.delta:self.assertTrue(n.startswith((f.c.UI+'/',f.c.SKIN+'/')))
   for n in self.before:
    if n not in self.delta:self.assertEqual(self.before[n],self.after[n])
@@ -45,9 +45,9 @@ class Final99(unittest.TestCase):
    self.assertEqual(root.findtext('.//control[@id="%d"]/label'%ident).strip(),caption)
    texture=root.findtext('.//control[@id="%d"]/texture'%(ident+50))
    self.assertIn(f.c.SKIN+'/media/'+texture,self.after)
-  self.assertEqual(root.findtext('.//control[@id="101"]/textcolor'),f.INK)
+  self.assertEqual(root.findtext('.//control[@id="101"]/textcolor'),f.PRIMARY_INK)
   for tag in ('texturefocus','texturenofocus'):
-   self.assertEqual(root.findtext('.//control[@id="101"]/'+tag),'infinity_glass/focus.png')
+   self.assertEqual(root.findtext('.//control[@id="101"]/'+tag),'infinity_glass/field.png')
   self.assertIn(f.c.SKIN+'/media/infinity_ui/icons/close.png',self.after)
 
  def test_font_metrics_leave_room_for_all_four_actions_on_both_fold_displays(self):
@@ -88,8 +88,34 @@ class Final99(unittest.TestCase):
   ids=[n.get('id') for n in root.iter('control') if n.get('id')]
   self.assertEqual(len(ids),len(set(ids)))
   for n,b in self.before.items():
-   if n.endswith('CONTROLLER-PREIMAGES.json') or n.startswith(f.c.LATEST+'/') or 'Includes_' in n or n.endswith('/Home.xml'):
+   if 'Includes_' in n and b'name="InfinityLegacyAccent"' in b:
+    before=ET.fromstring(b);after=ET.fromstring(self.after[n])
+    added=after.find('variable[@name="InfinityOptionBPrimaryInk"]');self.assertIsNotNone(added)
+    after.remove(added)
+    self.assertEqual(ET.tostring(before),ET.tostring(after))
+   elif n.endswith('CONTROLLER-PREIMAGES.json') or n.startswith(f.c.LATEST+'/') or 'Includes_' in n or n.endswith('/Home.xml'):
     self.assertEqual(b,self.after[n])
+
+ def test_primary_action_is_opaque_with_readable_theme_specific_foreground(self):
+  from PIL import Image
+  im=Image.open(io.BytesIO(self.after[f.c.SKIN+'/media/infinity_glass/field.png'])).convert('RGBA')
+  self.assertEqual(im.getpixel((im.width//2,im.height//2)),(255,255,255,255))
+  checked=0
+  def luminance(rgb):
+   values=[int(rgb[i:i+2],16)/255 for i in (2,4,6)]
+   values=[v/12.92 if v<=.04045 else ((v+.055)/1.055)**2.4 for v in values]
+   return sum(v*w for v,w in zip(values,(.2126,.7152,.0722)))
+  for n,body in self.after.items():
+   if not n.endswith('.xml') or b'<variable name="InfinityLegacyAccent"' not in body:continue
+   root=ET.fromstring(body);accent=root.find('variable[@name="InfinityLegacyAccent"]');ink=root.find('variable[@name="InfinityOptionBPrimaryInk"]')
+   if accent is None:continue
+   light=next(v for v in accent.findall('value') if 'Infinity.NativeSystemTheme),light)' in v.get('condition',''))
+   self.assertEqual(ink.find('value').get('condition'),light.get('condition'))
+   for bg,fg in ((light.text,ink.find('value').text),(accent.findall('value')[-1].text,ink.findall('value')[-1].text)):
+    a,b=sorted((luminance(bg),luminance(fg)))
+    self.assertGreaterEqual((b+.05)/(a+.05),4.5)
+   checked+=1
+  self.assertEqual(checked,10)
 
  def test_real_closing_modal_is_waited_for_and_foreign_dialogs_stay_rejected(self):
   tree=ast.parse(self.after[f.c.UI+'/home_option_b.py'])
