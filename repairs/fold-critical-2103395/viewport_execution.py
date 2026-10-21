@@ -18,6 +18,7 @@ def prepare(root):
   rows.put(new JSONObject().put("id","plugin.video.themoviedb.helper").put("name","TMDb Helper").put("description","Not installed or disabled").put("available",false).put("icon",""));
 '''
  s=s.replace(anchor,rows+anchor)
+ s=s.replace('   final InfinityAndroidKeyboard.Editor[] editor={null};', '   waitForIdleSync();android.os.SystemClock.sleep(800);\n   final InfinityAndroidKeyboard.Editor[] editor={null};')
  anchor='   waitForIdleSync();android.os.SystemClock.sleep(600);'
  assert s.count(anchor)==1
  s=s.replace(anchor,'''   runOnMainSync(()->{editor[0].input.requestFocus();((android.view.inputmethod.InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput(editor[0].input,android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT);});
@@ -35,7 +36,9 @@ def prepare(root):
     geometry[0]=editor[0].input.getGlobalVisibleRect(query)&&button.getGlobalVisibleRect(all)&&query.height()>=editor[0].dp(48)&&all.height()>=editor[0].dp(48);
    });
    check(geometry[0],"query and Search All remain visible above IME "+theme);
-   waitForIdleSync();android.os.SystemClock.sleep(600);''')
+   waitForIdleSync();android.os.SystemClock.sleep(600);
+   runOnMainSync(()->{WindowInsets insets=editor[0].input.getRootWindowInsets();visible[0]=insets!=null&&insets.isVisible(WindowInsets.Type.ime());});
+   check(visible[0],"IME remains visible at screenshot "+theme);''')
  (src/'Infinity95Test.java').write_text(s);shutil.copyfile(c.HERE/'Infinity95TestActivity.java',src/'Infinity95TestActivity.java');c.HERE=src
  with zipfile.ZipFile(apk) as z:(root/'classes2.dex').write_bytes(z.read('classes2.dex'))
  assert c.digest(root/'classes2.dex')=='d4df6604044e7cb66584229562186bf2ed8f0031d2d3efba03bba8ebe38934ca'
@@ -47,7 +50,7 @@ def run(root):
  shell('settings','put','secure','show_ime_with_hard_keyboard','1');results=[]
  for name,size,density in [('cover','1080x2520','420'),('inner','2184x1968','420')]:
   shell('wm','size',size);shell('wm','density',density)
-  result=ui_android95.run(root,'adb',device);assert result['assertions']==39
+  result=ui_android95.run(root,'adb',device);assert result['assertions']==42
   for theme in ('light','dark','oled'):(root/('search-'+theme+'.png')).rename(root/(name+'-'+theme+'.png'))
   shutil.copyfile(root/'integrated-search-ui.log',root/(name+'-ui.log'))
   results.append(dict(viewport=name,size=size,density=density,**result))
