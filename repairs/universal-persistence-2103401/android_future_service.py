@@ -32,8 +32,16 @@ def drain_identity(label, handle):
     method=handle.flush
     function=getattr(method,'__func__',None)
     closure=[repr(cell.cell_contents)[:160] for cell in (getattr(function,'__closure__',None) or ())]
+    def stat_identity(target, descriptor=False):
+        try:
+            info=os.fstat(target) if descriptor else os.lstat(target)
+            return dict(device=info.st_dev,inode=info.st_ino,mode=info.st_mode,links=info.st_nlink,size=info.st_size)
+        except OSError as error:return dict(error=repr(error))
+    link=os.readlink('/proc/self/fd/'+str(descriptor))
+    named=raw.name
     xbmc.log('INFINITY_FUTURE_IDENTITY '+json.dumps(dict(label=label,pid=os.getpid(),fd=descriptor,
-        path=os.readlink('/proc/self/fd/'+str(descriptor)),chain=chain,closure=closure)),xbmc.LOGINFO)
+        path=link,name=named,descriptor_stat=stat_identity(descriptor,True),name_stat=stat_identity(named),
+        proc_target_stat=stat_identity(link),chain=chain,closure=closure)),xbmc.LOGINFO)
 
 def worker():
     try:
