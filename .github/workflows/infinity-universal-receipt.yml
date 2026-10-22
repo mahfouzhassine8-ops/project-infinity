@@ -1,0 +1,113 @@
+name: Infinity Close receipt repair - isolated RC8 qualification
+on:
+  push:
+    branches: [work/infinity-universal-receipt-20261022]
+    paths:
+      - repairs/universal-persistence-2103401/**
+      - .github/workflows/infinity-universal-receipt.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-receipt-candidate-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  receipt_candidate:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 70
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39862996414
+          name: Infinity-Universal-Persistence-INTERNAL-QA-NOT-ACCEPTED
+          github-token: ${{ github.token }}
+          path: signed
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          cmdline-tools-version: '15859902'
+          packages: platform-tools build-tools;34.0.0 platforms;android-34
+          log-accepted-android-sdk-licenses: false
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39867073954
+          name: Infinity-Receipt-Race-Android17-Investigation
+          github-token: ${{ github.token }}
+          path: investigation
+      - name: Require isolated scope and integrate only Infinity coordinator receipt calls
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import subprocess,pathlib,json,hashlib
+          paths=subprocess.check_output(['git','diff','--name-only','f3ad961ffc4e0c0121c1f60385ba2ca3add60a6f','HEAD'],text=True).splitlines()
+          workflows={'.github/workflows/infinity-universal-persistence.yml','.github/workflows/infinity-universal-persistence-android.yml','.github/workflows/infinity-universal-receipt-investigation.yml','.github/workflows/infinity-universal-receipt.yml'}
+          assert all(p.startswith('repairs/universal-persistence-2103401/') or p in workflows for p in paths),paths
+          pins=json.load(open('repairs/universal-persistence-2103401/RECEIPT-TOOL-PINS.json'))
+          jars=pathlib.Path('investigation/receipt-evidence/tool-jars')
+          assert {p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in jars.iterdir()}==pins
+          PY
+          python3 repairs/universal-persistence-2103401/receipt_build.py prepare
+      - name: Prepare verified Android17 infrastructure
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y libpulse0
+          python3 repairs/four-repair-20261018/android37_gate.py --sdk-root "$ANDROID_HOME" --out api37-support --pin-tools
+          python3 - <<'PYSETUP'
+          import pathlib,subprocess,sys
+          # RC5's download failed while reading ZIP content before installation.
+          # Retry only that observed infrastructure error; preserve every log,
+          # run the unchanged shared verifier and never retry an app assertion.
+          for attempt in range(1,4):
+              out=pathlib.Path('emulator-setup')/('attempt-'+str(attempt))
+              code=subprocess.run([sys.executable,'repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py','--out',str(out)]).returncode
+              if code==0:break
+              logs='\n'.join(p.read_text(errors='replace') for p in out.glob('sdkmanager-attempt-*.log'))
+              if attempt==3 or 'Error reading Zip content from a SeekableByteChannel' not in logs:
+                  raise SystemExit(code)
+          PYSETUP
+          sudo chmod 666 /dev/kvm
+      - name: Verify original failure, corrected writer and negative controls on Android17 ART
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: '37.0'
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disk-size: 8G
+          avd-name: infinity-four-repair-api37
+          pre-emulator-launch-script: python3 repairs/four-repair-20261018/android37_gate.py --sdk-root "$ANDROID_HOME" --out api37-support --check-avd
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: python3 repairs/universal-persistence-2103401/receipt_build.py android
+      - name: Permanently sign RC8 and prove the exact six-member input APK delta
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 repairs/universal-persistence-2103401/receipt_build.py package
+          (cd internal-qa && sha256sum -c SHA256SUMS)
+          git diff --exit-code
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-Universal-Persistence-INTERNAL-QA-NOT-ACCEPTED
+          path: internal-qa/
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-Receipt-RC8-Qualification-Evidence
+          path: |
+            receipt-candidate/
+            api37-support/
+            emulator-setup/
+          retention-days: 90
+          if-no-files-found: error
