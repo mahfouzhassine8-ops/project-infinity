@@ -102,7 +102,8 @@ def main():
         old_owner=None
         for cycle in range(3 if a.mode=='safe' else 1):
             entry=dict(cycle=cycle);report['cycles'].append(entry)
-            probe.shell('am','start','-W','-n',probe.PACKAGE+'/.Splash')
+            entry['launch_result']=probe.shell('am','start','-W','-n',probe.PACKAGE+'/.Splash')
+            entry['startup_processes']=probe.processes()
             cycleout=a.out/('cycle-'+str(cycle));cycleout.mkdir()
             entry['first_party']=probe.enable_first_party(cycleout)
             entry['versioncheck']=probe.rpc('Addons.GetAddonDetails',{'addonid':'service.xbmc.versioncheck','properties':['enabled','version']})['addon']
@@ -200,6 +201,22 @@ def main():
     except Exception as error:report['failure']=type(error).__name__+': '+str(error)
     finally:
         save(a.out/'ANDROID17-RESULT.json',report)
+        # A real RC8 startup crashed in an ELF constructor before first Close.
+        # Collect evidence only; do not retry application startup or relax gates.
+        if report.get('platform',{}).get('qemu')=='1' and report['platform'].get('sdk')=='37':
+            try:
+                startup=dict(processes=probe.processes(),properties={name:probe.shell('getprop',name).strip() for name in
+                    ('ro.dalvik.vm.native.bridge','ro.enable.native.bridge.exec','ro.build.fingerprint','ro.product.cpu.abilist')})
+                save(a.out/'startup-platform.json',startup)
+                for name in probe.shell('ls','/data/tombstones',check=False).splitlines():
+                    if __import__('re').fullmatch(r'tombstone_\d+',name):
+                        body=probe.shell('cat','/data/tombstones/'+name,check=False)
+                        if probe.PACKAGE+':kodi' in body:
+                            target=a.out/'native-startup-tombstones';target.mkdir(exist_ok=True)
+                            (target/(name+'.txt')).write_text(body)
+                            probe.adb('pull','/data/tombstones/'+name+'.pb',target,check=False)
+            except Exception as unavailable:
+                (a.out/'startup-evidence-unavailable.txt').write_text(str(unavailable))
         for path,name in [(probe.PRIVATE+'/files/infinity-checkpoint-close.json','coordinator.json'),(probe.PROFILE+'/../temp/kodi.log','kodi.log'),(probe.PRIVATE+'/files/infinity-android-checkpoint.jsonl','android-checkpoint.jsonl')]:
             try:probe.adb('pull',path,a.out/name,check=False)
             except Exception:pass

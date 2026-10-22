@@ -14,13 +14,14 @@ concurrency:
   cancel-in-progress: false
 jobs:
   android17:
-    name: Actual Android17 ${{ matrix.mode }} control
+    name: Actual Android17 ${{ matrix.mode }} repeat ${{ matrix.replica }}
     runs-on: ubuntu-22.04
     timeout-minutes: 150
     strategy:
       fail-fast: false
       matrix:
-        mode: [baseline, safe, pending, opaque, lost-file]
+        mode: [safe]
+        replica: [a, b]
     env:
       CANDIDATE_BUILD: '39868217775'
       CANDIDATE_COMMIT: '2ec8cb7e0323c1e2c4ba0c57594eb678541eb222'
@@ -135,7 +136,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: Infinity-Universal-Actual-Android17-${{ matrix.mode }}-Evidence
+          name: Infinity-Universal-Actual-Android17-${{ matrix.mode }}-${{ matrix.replica }}-Evidence
           path: |
             android-results/
             api37-support/
