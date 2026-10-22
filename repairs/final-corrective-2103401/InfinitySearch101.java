@@ -164,7 +164,7 @@ final class InfinitySearch101 {
       else {canvas.drawCircle(12,12,9,p);for(int i=0;i<4;i++){double a=i*Math.PI/2;canvas.drawCircle(12+(float)Math.cos(a)*5,12+(float)Math.sin(a)*5,2,p);}}
       canvas.restoreToCount(save);
     }
-    @Override public void setAlpha(int a){p.setAlpha(a);}@Override public void setColorFilter(android.graphics.ColorFilter f){p.setColorFilter(f);}@Override public int getOpacity(){return android.graphics.PixelFormat.TRANSLUCENT;}
+    @Override public void setAlpha(int a){p.setAlpha(a);}@Override public void setColorFilter(android.graphics.ColorFilter f){p.setColorFilter(f);}@Deprecated @Override public int getOpacity(){return android.graphics.PixelFormat.TRANSLUCENT;}
   }
 
 }
