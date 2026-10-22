@@ -106,7 +106,27 @@ try:commit_writer.commit()
 except sqlite3.IntegrityError as error:
     assert error.sqlite_errorcode & 255 == sqlite3.SQLITE_CONSTRAINT and commit_writer.in_transaction
 else:raise AssertionError('deferred constraint did not cause a real COMMIT failure')
-commit_writer.rollback();assert not commit_writer.in_transaction;commit_writer.close()
+commit_writer.rollback();assert not commit_writer.in_transaction
+# The ordinary context-manager API performs its own rollback after a failed
+# COMMIT. That failure is still raised, and the native ledger must verify the
+# resulting transaction state rather than retain an unrelated sticky blocker.
+try:
+    with commit_writer:
+        commit_writer.execute('UPDATE commits SET value=7 WHERE cycle=?',(cycle,))
+except sqlite3.IntegrityError as error:
+    assert error.sqlite_errorcode & 255 == sqlite3.SQLITE_CONSTRAINT and not commit_writer.in_transaction
+else:raise AssertionError('context COMMIT did not fail and roll back')
+sentinel=ValueError('fixture caller exception')
+try:
+    with commit_writer:
+        commit_writer.execute('UPDATE commits SET value=7 WHERE cycle=?',(cycle,))
+        raise sentinel
+except ValueError as error:assert error is sentinel and not commit_writer.in_transaction
+else:raise AssertionError('context swallowed the caller exception')
+with commit_writer:
+    commit_writer.execute('UPDATE commits SET value=1 WHERE cycle=?',(cycle,))
+assert commit_writer.execute('SELECT value FROM commits WHERE cycle=?',(cycle,)).fetchall()==[(1,)]
+commit_writer.close()
 buffer=open(os.path.join(root,'buffered-'+cycle),'w');buffer.write('buffered state')
 child=threading.Thread(target=worker);child.start();assert worker_ready.wait(10) and not worker_errors
 command_output=subprocess.check_output(['uname','-rs']).strip()
@@ -117,7 +137,7 @@ with open(os.path.join(versioncheck_path,'resources/lib/version_check/service.py
     versioncheck_hash=hashlib.sha256(stream.read()).hexdigest()
 with open(os.path.join(root,'ready-'+cycle+'.json'),'w') as stream:
     json.dump(dict(addon=identity,pid=os.getpid(),mode=mode,errors=errors,worker_ready=True,
-                   supported_child_returned=True,failed_commit_rolled_back=True,essential_vfs=essential_vfs,
+                   supported_child_returned=True,failed_commit_rolled_back=True,context_commit_rolled_back=True,essential_vfs=essential_vfs,
                    history_count=history_count,watched_count=watched_count,
                    versioncheck_version=versioncheck.getAddonInfo('version'),
                    versioncheck_service_sha256=versioncheck_hash),stream)

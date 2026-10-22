@@ -235,7 +235,50 @@
          self.install()
  
      @contextmanager
-@@ -580,6 +581,9 @@
+@@ -461,8 +462,12 @@
+             def __exit__(self, exc_type, exc, tb):
+                 # Preserve SQLite's commit-on-success / rollback-on-exception.
+                 try: return super().__exit__(exc_type, exc, tb)
+-                except Exception:
+-                    observer.error('sqlite_context_commit_or_rollback_failed')
++                except Exception as error:
++                    # The original context manager may already have rolled back.
++                    # Record the failed operation; native transaction/buffer
++                    # evidence and retirement still decide whether it is safe.
++                    observer.sqlite_error('sqlite_script_failed', error,
++                                          'ROLLBACK' if exc_type else 'COMMIT')
+                     raise
+             def __del__(self):
+                 if not getattr(self, '_infinity_closed', True):
+@@ -472,6 +477,27 @@
+                             observer.error('sqlite_collected_with_pending_transaction')
+                     except Exception:
+                         observer.error('sqlite_transaction_inspection_failed')
++
++        # Stepping/finalizing a cursor, rolling back, context exit and connection
++        # cleanup can call the native VFS after execute() has returned. Keep the
++        # invocation owner through the actual call, including GIL-released I/O.
++        # This coordination lease has no persistent target and grants no write
++        # permission: every actual VFS path retains its native admission/drain
++        # checks. Return values and exceptions come from the original method.
++        def owned_sqlite_call(original, operation):
++            def owned(handle, *args, **kwargs):
++                with observer.operation(operation, (NONPERSISTENT_TARGET,)):
++                    return original(handle, *args, **kwargs)
++            return owned
++
++        for klass, names in (
++                (Cursor, ('fetchone', 'fetchmany', 'fetchall', '__next__', 'close')),
++                (Connection, ('rollback', '__exit__', 'close', 'backup', 'blobopen',
++                              'serialize', 'deserialize'))):
++            for name in names:
++                original = getattr(klass, name, None)
++                if original is not None:
++                    setattr(klass, name, owned_sqlite_call(original, 'sqlite.'+name))
+ 
+         original_connect = sqlite3.connect
+         original_dbapi_connect = dbapi2.connect
+@@ -580,6 +606,9 @@
                      translated = self.vfs.translatePath(path)
                      with observer.operation('vfs.open', (translated,)):
                          handle = VFSFile(_original(path, mode), observer, translated)
@@ -245,7 +288,7 @@
                  except Exception:
                      observer.error('vfs_open_for_write_failed')
                      raise
-@@ -933,6 +937,8 @@
+@@ -933,6 +962,8 @@
      @protected_method('vfs.write')
      def write(self, value):
          self.observer.check_live()

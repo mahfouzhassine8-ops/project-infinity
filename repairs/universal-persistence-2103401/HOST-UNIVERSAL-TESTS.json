@@ -92,6 +92,46 @@
     {
       "source": "candidate",
       "provider_identity": "plugin.video.thecrew",
+      "case": "sqlite-context-success",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-context-success provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "sqlite-context-rollback",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-context-rollback provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "sqlite-context-constraint",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-context-constraint provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "sqlite-cursor-owner",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-cursor-owner provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
       "case": "sqlite-busy-recovered",
       "exit_code": 0,
       "stdout": "PASS sqlite-busy-recovered provider=plugin.video.thecrew seal=1\n",
@@ -535,6 +575,46 @@
       "case": "sqlite",
       "exit_code": 0,
       "stdout": "PASS sqlite provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "sqlite-context-success",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-context-success provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "sqlite-context-rollback",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-context-rollback provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "sqlite-context-constraint",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-context-constraint provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "sqlite-cursor-owner",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-cursor-owner provider=plugin.video.umbrella seal=1\n",
       "stderr": "",
       "independent_readback_passed": true,
       "existing_user_data_unchanged": true
@@ -992,6 +1072,46 @@
     {
       "source": "candidate",
       "provider_identity": "plugin.video.seren",
+      "case": "sqlite-context-success",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-context-success provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "sqlite-context-rollback",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-context-rollback provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "sqlite-context-constraint",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-context-constraint provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "sqlite-cursor-owner",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-cursor-owner provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
       "case": "sqlite-busy-recovered",
       "exit_code": 0,
       "stdout": "PASS sqlite-busy-recovered provider=plugin.video.seren seal=1\n",
@@ -1442,6 +1562,46 @@
     {
       "source": "candidate",
       "provider_identity": "plugin.video.pov",
+      "case": "sqlite-context-success",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-context-success provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "sqlite-context-rollback",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-context-rollback provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "sqlite-context-constraint",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-context-constraint provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "sqlite-cursor-owner",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-cursor-owner provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
       "case": "sqlite-busy-recovered",
       "exit_code": 0,
       "stdout": "PASS sqlite-busy-recovered provider=plugin.video.pov seal=1\n",
@@ -1885,6 +2045,46 @@
       "case": "sqlite",
       "exit_code": 0,
       "stdout": "PASS sqlite provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "sqlite-context-success",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-context-success provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "sqlite-context-rollback",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-context-rollback provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "sqlite-context-constraint",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-context-constraint provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "sqlite-cursor-owner",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-cursor-owner provider=plugin.video.future_provider_7fa29 seal=1\n",
       "stderr": "",
       "independent_readback_passed": true,
       "existing_user_data_unchanged": true
@@ -2353,7 +2553,7 @@
     },
     "after": {
       "xbmc/interfaces/python/InfinityPythonPersistence.h": "3f16723bde8c4524c389b0d618a2e46cc9419c3763d114424c7280b667dfd5e9",
-      "xbmc/interfaces/python/InfinityPythonPersistenceSource.h": "8e640d7aa12f5bd51c1dfef52a0bcfdfeb56881ee4fdbab9dc31fb6a66651d63",
+      "xbmc/interfaces/python/InfinityPythonPersistenceSource.h": "5ceb321b2a68b5c1b73709a1004a05ad1234bcefdb00bc0ab9a719fed0548aa8",
       "xbmc/platform/android/activity/InfinityScriptPersistence.h": "ee0737b3c684b2a447bda46b292c6dea0e79243bc05c2d7de95373519cd94133",
       "xbmc/platform/android/activity/InfinityProtectedWrites.h": "f11ed8f25eba3b397c9ad602ace163dd12281af7e9d6424a5cec9ff6d406f826",
       "xbmc/interfaces/python/InfinityPythonWriteHooks.h": "fc9c60b7d7269ec1298c82214be27084ff3edd104ea0b5171e6a1249a15245eb"

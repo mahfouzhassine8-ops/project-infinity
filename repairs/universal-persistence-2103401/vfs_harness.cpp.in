@@ -93,10 +93,11 @@ static PyObject* fileClose(PyObject* self,PyObject*) {
   Py_RETURN_NONE;
 }
 static PyObject* translate(PyObject*,PyObject* path){Py_INCREF(path);return path;}
+static PyObject* nativeOwner(PyObject*,PyObject*){return PyLong_FromLong(InfinityScriptPersistence::CurrentWriteOwner());}
 static PyMethodDef methods[]={
   {"write",reinterpret_cast<PyCFunction>(fileWrite),METH_VARARGS|METH_KEYWORDS,nullptr},
   {"close",fileClose,METH_NOARGS,nullptr},{nullptr,nullptr,0,nullptr}};
-static PyMethodDef moduleMethods[]={{"translatePath",translate,METH_O,nullptr},{nullptr,nullptr,0,nullptr}};
+static PyMethodDef moduleMethods[]={{"translatePath",translate,METH_O,nullptr},{"native_owner",nativeOwner,METH_NOARGS,nullptr},{nullptr,nullptr,0,nullptr}};
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
 static PyTypeObject fileType={PyVarObject_HEAD_INIT(nullptr,0)};
@@ -159,7 +160,7 @@ int main(int argc,char** argv){
   }
 #endif
   const bool descriptorCase=scenario.rfind("descriptor-",0)==0;
-  const bool ioCase=scenario.rfind("sqlite-constraint-",0)==0 || scenario.rfind("sqlite-busy-",0)==0 || descriptorCase || scenario=="composite-drain" || scenario=="multi-interpreter-drain" || scenario=="buffered-finalize" || scenario=="buffered-phase2" ||
+  const bool ioCase=scenario.rfind("sqlite-context-",0)==0 || scenario=="sqlite-cursor-owner" || scenario.rfind("sqlite-constraint-",0)==0 || scenario.rfind("sqlite-busy-",0)==0 || descriptorCase || scenario=="composite-drain" || scenario=="multi-interpreter-drain" || scenario=="buffered-finalize" || scenario=="buffered-phase2" ||
       scenario=="child-drain" || scenario=="clean-io-late-write" || scenario=="clean-io-override" ||
       scenario=="clean-io-retarget" || scenario=="empty-io-close" || scenario=="layered-drain" || scenario=="cached-drain";
   int savedDescriptor=-1,retargetDescriptor=-1,targetDescriptor=-1;
@@ -329,6 +330,29 @@ int main(int argc,char** argv){
         "try:writer.commit()\nexcept sqlite3.IntegrityError as error:assert error.sqlite_errorcode & 255 == sqlite3.SQLITE_CONSTRAINT and writer.in_transaction\nelse:raise AssertionError('deferred constraint did not fail COMMIT')\n");
     shouldBlock=scenario=="sqlite-constraint-pending";
     if(!shouldBlock)run("writer.rollback();assert not writer.in_transaction;writer.close()\n");
+  }
+  if(scenario.rfind("sqlite-context-",0)==0 || scenario=="sqlite-cursor-owner") {
+    run("writer=sqlite3.connect(root+'/profile/commit.db')\n"
+        "writer.execute('PRAGMA foreign_keys=ON');writer.execute('CREATE TABLE parents(v INTEGER PRIMARY KEY)');writer.execute('INSERT INTO parents VALUES(1)')\n"
+        "writer.execute('CREATE TABLE history(v INTEGER REFERENCES parents(v) DEFERRABLE INITIALLY DEFERRED)');writer.execute('INSERT INTO history VALUES(1)');writer.commit()\n"
+        "owners=[];writer.set_trace_callback(lambda sql:owners.append(xbmcvfs.native_owner()))\n");
+    if(scenario=="sqlite-context-constraint")run(
+        "try:\n with writer:writer.execute('UPDATE history SET v=7')\n"
+        "except sqlite3.IntegrityError as error:assert error.sqlite_errorcode & 255 == sqlite3.SQLITE_CONSTRAINT and not writer.in_transaction\n"
+        "else:raise AssertionError('context COMMIT did not fail and roll back')\n");
+    else if(scenario=="sqlite-context-rollback")run(
+        "sentinel=ValueError('caller exception')\n"
+        "try:\n with writer:\n  writer.execute('UPDATE history SET v=7')\n  raise sentinel\n"
+        "except ValueError as error:assert error is sentinel and not writer.in_transaction\n"
+        "else:raise AssertionError('context suppressed caller exception')\n");
+    else if(scenario=="sqlite-context-success")run("with writer:writer.execute('UPDATE history SET v=1')\nassert not writer.in_transaction\n");
+    else run(
+        "steps=[];writer.create_function('owner_probe',1,lambda value:(steps.append(xbmcvfs.native_owner()),value)[1])\n"
+        "cursor=writer.execute('WITH RECURSIVE n(v) AS (VALUES(1) UNION ALL SELECT v+1 FROM n WHERE v<6) SELECT owner_probe(v) FROM n')\n"
+        "assert cursor.fetchone()==(1,);assert cursor.fetchmany(1)==[(2,)];assert next(cursor)==(3,);assert cursor.fetchall()==[(4,),(5,),(6,)]\n"
+        "assert steps==[101]*6;cursor.close()\n");
+    run("writer.execute('BEGIN');writer.rollback();assert owners and all(owner==101 for owner in owners),owners\n"
+        "assert writer.execute('SELECT v FROM history').fetchall()==[(1,)];writer.close()\n");
   }
   if(baseline)run("f.close()\n");
   assert(InfinityScriptPersistence::BeginWriteProtection(71,{root+"/profile"},{root+"/cache"}));

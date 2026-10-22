@@ -86,6 +86,17 @@ def patches(before):
         '  Py_CLEAR(context->admissionError);')
     observer = before[OBSERVER].decode()
     observer = once(observer,
+        "                except Exception:\n                    observer.error('sqlite_context_commit_or_rollback_failed')\n                    raise",
+        "                except Exception as error:\n"
+        "                    # The original context manager may already have rolled back.\n"
+        "                    # Record the failed operation; native transaction/buffer\n"
+        "                    # evidence and retirement still decide whether it is safe.\n"
+        "                    observer.sqlite_error('sqlite_script_failed', error,\n"
+        "                                          'ROLLBACK' if exc_type else 'COMMIT')\n"
+        "                    raise")
+    observer = once(observer, '        original_connect = sqlite3.connect',
+        (HERE/'sqlite_owned_calls.inc').read_text()+'\n        original_connect = sqlite3.connect')
+    observer = once(observer,
         'def __init__(self, fail, touch, vfs=None, host_probe=False, protect=None, closed_error=None):',
         'def __init__(self, fail, touch, vfs=None, host_probe=False, protect=None, closed_error=None, native_vfs_write=None):')
     observer = once(observer, '        self.closed_error = closed_error',

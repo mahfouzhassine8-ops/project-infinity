@@ -52,7 +52,7 @@ thread, interpreter/admission identity and current checkpoint generation.
 
 ## Verification status
 
-Local production-source host execution: 233 new/control/cycle cases and 47 retained
+Local production-source host execution: 253 new/control/cycle cases and 47 retained
 native/SQLite regressions passed. The buffer conversion and File write loop are
 extracted from the exact production sources; only their host POSIX backend and
 native type harness are adapters. The actual observer, native hooks and ledger
@@ -133,7 +133,22 @@ COMMIT, a still-active transaction, explicit rollback and independent value
 readback. Host BUSY tests are retained; recovered and unresolved deferred-COMMIT
 cases are added. All 233 source-backed cases and 47 retained regressions pass.
 
-Pending for RC5: full ARM64 compilation, permanent signing/member verification,
+RC5's context-manager regression exposed a separate ordinary SQLite failure:
+`with connection:` can fail COMMIT, complete its automatic rollback, and still
+leave a permanent observer blocker. The same production-source replay fails all
+five identities. RC6 records that original exception through the existing generic
+SQLite operation diagnostic; native transaction/buffer checks and verified
+retirement still decide safety. No failed write is reported as successful.
+
+A reusable owner scope now covers inherited cursor stepping/finalization,
+rollback, context exit, close and the supported connection transfer operations.
+It holds invocation identity through the original native call, including released
+GIL I/O. It grants no persistent-path permission; every VFS admission and drain
+check remains active. Return values and exceptions come from the original call.
+Native trace/function callbacks verify owner identity for context exit, rollback
+and cursor stepping. All 253 source-backed cases and 47 retained regressions pass.
+
+Pending for RC6: full ARM64 compilation, permanent signing/member verification,
 actual Android 17 whole-engine tests, real-provider integration, and physical Fold
 Close/reopen/data-preservation acceptance. Final lock remains false. No permanent
 resolution claim is permitted without the physical evidence.
