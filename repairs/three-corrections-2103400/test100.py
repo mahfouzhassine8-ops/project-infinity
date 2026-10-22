@@ -160,6 +160,46 @@ class Corrective100(unittest.TestCase):
   for p in ('xbmc/interfaces/python/InfinityPythonPersistenceSource.h','xbmc/dbwrappers/InfinitySQLiteVFS.h'):
    self.assertNotIn(p,n.PATHS)
   for name,h in json.loads(self.after[c.UI+'/CONTROLLER-PREIMAGES.json']).items():self.assertEqual(h,c.sha(self.after[c.CC+'/'+name]))
+ def test_actual_native_source_capture_branches_compile_and_execute(self):
+  plugin=self.native[n.PLUGIN].decode();player=self.native[n.PLAYER].decode()
+  marker='    // INFINITY_2103400_SOURCE_CAPTURE:'
+  left=plugin.rfind('#if defined(TARGET_ANDROID)',0,plugin.index(marker));right=plugin.index('#endif',left)+len('#endif');capture=plugin[left:right]
+  marker='  // Add only the provenance of this exact active video item'
+  left=player.rfind('#if defined(TARGET_ANDROID)',0,player.index(marker));right=player.index('#endif',left)+len('#endif');report=player[left:right]
+  source=r"""
+#include <cassert>
+#include <map>
+#include <memory>
+#include <string>
+struct Value {std::string text;std::map<std::string,Value> children;Value& operator[](const std::string& k){return children[k];}Value& operator=(const std::string& v){text=v;return *this;}std::string asString()const{return text;}};
+struct Settings {std::string skin="skin.infinity.diggz";std::string GetString(const char*){return skin;}Settings* GetSettings(){return this;}} settings;
+struct CServiceBroker {static Settings* GetSettingsComponent(){return &settings;}};
+struct Item {std::map<std::string,Value> p;void SetProperty(const std::string& k,const std::string& v){p[k]=v;}Value GetProperty(const std::string& k){return p[k];}};
+struct Url {std::string host;std::string GetHostName(){return host;}};
+bool live=false;bool IsPVRChannel(){return live;}enum Type {Video,Audio};
+void capture(Item& resultItem,Url url,const std::string& strPath){
+"""+capture+r"""
+}
+Value report(std::shared_ptr<Item> fileItem,Type player){Value result;
+"""+report+r"""
+return result;}
+int main(){
+ const std::string route="plugin://plugin.video.umbrella/?action=play_Item&tmdb=123&season=2&episode=3";
+ auto item=std::make_shared<Item>();capture(*item,{"plugin.video.umbrella"},route);
+ assert(report(item,Video)["item"]["infinity_original_route"].asString()==route);
+ assert(report(item,Audio)["item"]["infinity_original_route"].asString().empty());
+ live=true;assert(report(item,Video)["item"]["infinity_original_route"].asString().empty());live=false;
+ settings.skin="skin.cobra";auto cobra=std::make_shared<Item>();capture(*cobra,{"plugin.video.umbrella"},route);
+ assert(cobra->p.empty());assert(report(item,Video)["item"]["infinity_original_route"].asString().empty());
+ settings.skin="skin.infinity.diggz";Item other;capture(other,{"plugin.video.other"},route);assert(other.p.empty());
+ capture(other,{"plugin.video.umbrella"},std::string(65537,'x'));assert(other.p.empty());
+}
+"""
+  with tempfile.TemporaryDirectory() as tmp:
+   root=Path(tmp);cpp=root/'actual.cpp';cpp.write_text(source);binary=root/'probe'
+   result=subprocess.run(['g++','-std=c++17','-Wall','-Wextra','-Werror','-DTARGET_ANDROID',str(cpp),'-o',str(binary)],capture_output=True,text=True)
+   self.assertEqual(result.returncode,0,result.stdout+result.stderr);subprocess.run([str(binary)],check=True)
+
  def test_health_named_capture_avoids_rejected_unnamed_open(self):
   # Reproduce the actual O_TMPFILE EACCES path with the unchanged observer in
   # a disposable interpreter, then run the changed production capture function.
