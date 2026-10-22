@@ -107,6 +107,9 @@ def assemble(a):
    for p in temp.iterdir():
     if p.is_file() and p.suffix in ('.json','.txt','.log','.md'):archive.write(p,'receipts/'+p.name)
   save(temp/'COMPONENTS.json',{a:dict(version=v,file=a+'-'+v+'.zip',sha256=c.digest(temp/(a+'-'+v+'.zip'))) for a,v in c.VERSIONS.items()})
+  with ZipFile(temp/'Infinity-2103401-Reports-and-Visuals.zip','w',compression=ZIP_DEFLATED,compresslevel=9) as reports:
+   for p in sorted(temp.rglob('*')):
+    if p.is_file() and p.suffix in ('.json','.txt','.log','.md','.csv','.png'):reports.write(p,p.relative_to(temp).as_posix())
   unsigned.unlink();(temp/'SHA256SUMS').write_text(''.join(c.digest(p)+'  '+p.relative_to(temp).as_posix()+'\n' for p in sorted(temp.rglob('*')) if p.is_file()))
   os.rename(temp,out)
  print(json.dumps(receipt,indent=2,sort_keys=True))

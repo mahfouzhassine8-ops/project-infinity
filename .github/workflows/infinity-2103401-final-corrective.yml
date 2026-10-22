@@ -448,7 +448,11 @@ jobs:
         import pathlib,os
         p=pathlib.Path('/tmp/infinity101-release-notes.md');p.write_text(p.read_text()+'\nActual corrective source: '+os.environ['GITHUB_SHA']+'\nRelease tag anchors unchanged main only for publication permissions; exact source/native/build receipts are included.\n')
         PYTHON
-        gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --prerelease --title "Infinity 2103401 - Four corrections and controlled refinement, Fold acceptance pending" --notes-file /tmp/infinity101-release-notes.md signed-2103401/*
+        assets=()
+        for file in signed-2103401/*; do
+          if [[ -f "$file" ]]; then assets+=("$file"); fi
+        done
+        gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --verify-tag --prerelease --title "Infinity 2103401 - Four corrections and controlled refinement, Fold acceptance pending" --notes-file /tmp/infinity101-release-notes.md "${assets[@]}"
     - uses: actions/upload-artifact@v4
       if: always()
       with:
