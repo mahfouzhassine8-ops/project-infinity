@@ -128,6 +128,37 @@ class Corrective100(unittest.TestCase):
    self.assertFalse(e.verified_source(entry,original,lambda _:None))
    if media=='tv':
     self.assertEqual(identity['scope'],'show_episode');self.assertFalse(e.verified_source(entry,original.replace('episode=3','episode=4'),verify))
+ def test_installed_pov_movie_and_episode_route_dialect(self):
+  hub=self.hub();e=self.experience();verify=lambda _:dict(scope='show_episode')
+  for media,kind in [('movie','movie'),('tv','episode')]:
+   values=dict(mode='play_media',mediatype=kind,tmdb_id='123')
+   if media=='tv':values.update(season='2',episode='3')
+   route='plugin://plugin.video.pov/?'+urlencode(values)
+   identity=e.source_identity(route,media,{'tmdb':'123'},2,3,verify);self.assertIsNotNone(identity)
+   entry=dict(media=media,identity=identity,season=2,episode=3)
+   self.assertEqual(e.verified_source(entry,route,verify),route)
+   for bad in (route.replace('tmdb_id=123','tmdb_id=999'),route.replace('play_media','mark_as_watched_unwatched_episode'),route+'&tmdb_id=999'):
+    self.assertFalse(e.verified_source(entry,bad,verify))
+ def test_current_producer_version_and_file_proofs_fail_closed(self):
+  e=self.experience()
+  self.assertEqual(self.before[c.WB+'/PROVIDER-CONTRACTS.json'],self.after[c.WB+'/PROVIDER-CONTRACTS.json'])
+  for addon,version in [('plugin.video.umbrella','6.7.94'),('plugin.video.pov','6.10.20')]:
+   self.assertIn(version,e.CURRENT_SOURCE_CONTRACTS[addon])
+   with tempfile.TemporaryDirectory() as tmp:
+    root=Path(tmp);bridge=root/'bridge';provider=root/'provider';bridge.mkdir();provider.mkdir()
+    (bridge/'PROVIDER-CONTRACTS.json').write_bytes(self.before[c.WB+'/PROVIDER-CONTRACTS.json'])
+    (provider/'addon.xml').write_text('<addon id="'+addon+'" version="'+version+'"/>')
+    code=b'reviewed fixture producer\n';(provider/'producer.py').write_bytes(code)
+    registry={addon:{version:dict(version=version,scope='show_episode',files={'producer.py':[hashlib.sha256(code).hexdigest()]})}}
+    api=types.SimpleNamespace(Addon=lambda aid:types.SimpleNamespace(getAddonInfo=lambda key:str(bridge if aid==c.WB else provider)))
+    with patch.dict(sys.modules,xbmcaddon=api,xbmcvfs=types.SimpleNamespace(translatePath=lambda v:v)),patch.object(e,'CURRENT_SOURCE_CONTRACTS',registry):
+     self.assertIsNotNone(e._source_contract(addon))
+     (provider/'producer.py').write_bytes(code+b'changed')
+     self.assertIsNone(e._source_contract(addon))
+     (provider/'producer.py').write_bytes(code)
+     (provider/'addon.xml').write_text('<addon id="'+addon+'" version="unreviewed"/>')
+     self.assertIsNone(e._source_contract(addon))
+
  def test_unrelated_provider_source_memory_contract_preserved(self):
   self.hub();e=self.experience();entry=dict(media='movie',source='plugin://plugin.video.unrelated/?action=existing_play&id=4')
   self.assertEqual(e.verified_source(entry,entry['source']),e.stable_route(entry['source']))

@@ -1,0 +1,47 @@
+{
+  "plugin.video.pov": {
+    "distribution_sha256": "0a4cdca9d1c4799a5e1879ddc3c7e303b56bdbc477c900d7237dbf9b7e9b3e2c",
+    "distribution_url": "https://raw.githubusercontent.com/kodifitzwell/repo/934413b3316ae601c639b35b8cd0ad25171e5429/plugin.video.pov/plugin.video.pov-6.10.20.zip",
+    "files": {
+      "resources/lib/indexers/metadata.py": [
+        "66409de0d892b20e4e8c3b23cc7214727f2f8b40a643c49b228a758db74168be"
+      ],
+      "resources/lib/menus/episodes.py": [
+        "ccc479ae765c31199d6342352a5ba463f556279f2da55005ef1f91e99fb531cf"
+      ],
+      "resources/lib/menus/movies.py": [
+        "2328d24a4090396f3970fa329d48bbff92e86b7fcc5ee14fbaedfc1594263bef"
+      ],
+      "resources/lib/modules/kodi_utils.py": [
+        "26115e6c5af1297fbfad7d1600221b7184c1c86304efea4d65b7697d154c7b0a"
+      ]
+    },
+    "historical_watched_bridge_contracts_unchanged": true,
+    "installed_version_from_fold": "6.10.20",
+    "route_action": "mode=play_media",
+    "scope": "show_episode",
+    "upstream_commit": "934413b3316ae601c639b35b8cd0ad25171e5429"
+  },
+  "plugin.video.umbrella": {
+    "distribution_sha256": "c7ce4a66787225f4d57bfec65cc1fa71776d50ef9642bef09b7191bef02e9dda",
+    "distribution_url": "https://raw.githubusercontent.com/umbrellaplug/umbrellaplug.github.io/cddcb7fce46bd8f430d552254d6bb9d93adea5df/omega/zips/plugin.video.umbrella/plugin.video.umbrella-6.7.94.zip",
+    "files": {
+      "resources/lib/menus/episodes.py": [
+        "52c610758b006d22a5dd9b9284122597afd183405a33a659b8f50c2c78115136",
+        "c3dd1ea82517b8a7def573ee90c4045cb6fd90baa40dda1c8d58e337cae25f73"
+      ],
+      "resources/lib/menus/movies.py": [
+        "c1c9de10e6102954aab890fbe6b1a1c41f122da1f136e3440b83310fe41608a5",
+        "d6a271b7d5a50aae95507dedbbb0e08c215fbda42db500e95ec78d22fb8c8482"
+      ],
+      "resources/lib/modules/control.py": [
+        "3b742abd6915ddd9f6b66bebf29b6aceecd0b78e68e43e273b8937a76cb07dcd"
+      ]
+    },
+    "historical_watched_bridge_contracts_unchanged": true,
+    "installed_version_from_fold": "6.7.94",
+    "route_action": "play_Item",
+    "scope": "show_episode",
+    "upstream_commit": "cddcb7fce46bd8f430d552254d6bb9d93adea5df"
+  }
+}

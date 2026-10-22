@@ -61,6 +61,11 @@ def stable_route(route):
     return ''
 
 
+# Exact current producer versions observed on the supplied Fold export.
+# Historical Watched Bridge contracts and saved history proofs remain intact.
+CURRENT_SOURCE_CONTRACTS = {'plugin.video.umbrella': {'6.7.94': {'version': '6.7.94', 'scope': 'show_episode', 'files': {'resources/lib/menus/episodes.py': ['52c610758b006d22a5dd9b9284122597afd183405a33a659b8f50c2c78115136', 'c3dd1ea82517b8a7def573ee90c4045cb6fd90baa40dda1c8d58e337cae25f73'], 'resources/lib/modules/control.py': ['3b742abd6915ddd9f6b66bebf29b6aceecd0b78e68e43e273b8937a76cb07dcd'], 'resources/lib/menus/movies.py': ['c1c9de10e6102954aab890fbe6b1a1c41f122da1f136e3440b83310fe41608a5', 'd6a271b7d5a50aae95507dedbbb0e08c215fbda42db500e95ec78d22fb8c8482']}}}, 'plugin.video.pov': {'6.10.20': {'version': '6.10.20', 'scope': 'show_episode', 'files': {'resources/lib/menus/episodes.py': ['ccc479ae765c31199d6342352a5ba463f556279f2da55005ef1f91e99fb531cf'], 'resources/lib/indexers/metadata.py': ['66409de0d892b20e4e8c3b23cc7214727f2f8b40a643c49b228a758db74168be'], 'resources/lib/menus/movies.py': ['2328d24a4090396f3970fa329d48bbff92e86b7fcc5ee14fbaedfc1594263bef'], 'resources/lib/modules/kodi_utils.py': ['26115e6c5af1297fbfad7d1600221b7184c1c86304efea4d65b7697d154c7b0a']}}}}
+
+
 def _source_contract(provider):
     """Reuse the existing Watched Bridge producer contract; never trust a name."""
     import xbmcaddon
@@ -76,11 +81,15 @@ def _source_contract(provider):
             return None
         root = Path(xbmcvfs.translatePath(xbmcaddon.Addon(provider).getAddonInfo('path'))).resolve()
         manifest = ET.parse(root / 'addon.xml').getroot()
-        if manifest.get('id') != provider or manifest.get('version') != contract['version']:
+        if manifest.get('id') != provider:
             return None
+        if manifest.get('version') != contract['version']:
+            contract = CURRENT_SOURCE_CONTRACTS.get(provider, {}).get(manifest.get('version'))
+            if not contract:
+                return None
         for name, digest in contract['files'].items():
             path = (root / name).resolve()
-            if not path.is_relative_to(root) or path.stat().st_size > 1024 * 1024 or hashlib.sha256(path.read_bytes()).hexdigest() != digest:
+            if not path.is_relative_to(root) or path.stat().st_size > 1024 * 1024 or hashlib.sha256(path.read_bytes()).hexdigest() not in (digest if isinstance(digest, (list, tuple)) else (digest,)):
                 return None
         return contract
     except (OSError, ValueError, RuntimeError, ET.ParseError):
@@ -100,9 +109,16 @@ def source_identity(route, media, ids, season=-1, episode=-1, verify=None):
         if not contract:
             return None
         query = parse_qs(parsed.query, keep_blank_values=True)
-        if any(len(v) != 1 for v in query.values()) or query.get('action') not in (['play'], ['play_Item']):
+        if any(len(v) != 1 for v in query.values()):
             return None
-        route_ids = hub.verified_ids({k: query[k][0] for k in ('imdb', 'tmdb', 'tvdb') if k in query})
+        if parsed.netloc == 'plugin.video.pov':
+            if query.get('mode') != ['play_media'] or query.get('mediatype') != [('movie' if media == 'movie' else 'episode')]:
+                return None
+            route_ids = hub.verified_ids({k: query[k + '_id'][0] for k in ('imdb', 'tmdb', 'tvdb') if k + '_id' in query})
+        else:
+            if query.get('action') not in (['play'], ['play_Item']):
+                return None
+            route_ids = hub.verified_ids({k: query[k][0] for k in ('imdb', 'tmdb', 'tvdb') if k in query})
         actual = hub.verified_ids(ids)
         common = set(route_ids) & set(actual)
         if not common or any(route_ids[k] != actual[k] for k in common):

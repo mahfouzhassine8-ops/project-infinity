@@ -6,7 +6,7 @@ The movie producer emits `play_Item`, which the prior feed wrapper incorrectly r
 
 The Health Center capture now uses exclusive named temporary files. The supplied receipt proves an EACCES failure through the unnamed temporary-file path; the unchanged persistence observer reproduces that failure and verifies the replacement. Unknown writers and Essential-First durability checks remain strict.
 
-Resume Hub records the literal provider invocation attached to the same successfully resolved native CFileItem. Command Center verifies the existing Watched Bridge producer contract, media ID namespaces and exact season/episode before retaining or reusing it. The existing continue-watching.json remains the sole progress store. Existing records without a provable original route remain saved and unavailable; no recovery route is guessed from title text. Trakt authentication remains optional.
+Resume Hub records the literal provider invocation attached to the same successfully resolved native CFileItem. Command Center verifies the existing Watched Bridge producer contract, media ID namespaces and exact season/episode before retaining or reusing it. The Fold-installed Umbrella 6.7.94 and POV 6.10.20 producer sources and route dialects were reviewed against their pinned official distributions. Exact additional recovery contracts recognize those versions without replacing historical Watched Bridge contracts or modifying providers. The existing continue-watching.json remains the sole progress store. Existing records without a provable original route remain saved and unavailable; no recovery route is guessed from title text. Trakt authentication remains optional.
 
 | Correction | Implementation | CI | Physical Fold |
 |---|---|---|---|
