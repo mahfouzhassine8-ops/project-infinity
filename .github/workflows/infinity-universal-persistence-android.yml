@@ -20,8 +20,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mode: [safe]
-        replica: [readback]
+        mode: [baseline, safe, pending, opaque, lost-file]
+        replica: [executed]
     env:
       CANDIDATE_BUILD: '39868217775'
       CANDIDATE_COMMIT: '2ec8cb7e0323c1e2c4ba0c57594eb678541eb222'

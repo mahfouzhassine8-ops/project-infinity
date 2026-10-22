@@ -4,11 +4,17 @@ import hashlib
 import os
 import sqlite3
 import subprocess
+import sys
 import threading
 from pathlib import Path
 import xbmc
 import xbmcaddon
 import xbmcvfs
+
+# Kodi deliberately sets Py_OptimizeFlag=1. Assertions and their expressions
+# disappear there; all fixture actions and checks must execute under -O/-OO.
+def require(condition, message):
+    if not condition:raise AssertionError(message)
 
 addon=xbmcaddon.Addon()
 identity=addon.getAddonInfo('id')
@@ -61,9 +67,19 @@ def worker():
 # Exercise the real production xbmcvfs binding under its installed observer.
 essential_vfs=xbmcvfs.translatePath('special://profile')+'/future-essential-vfs-'+cycle
 f=xbmcvfs.File(essential_vfs,'w')
-assert f.write('text') is True
-assert f.write(b'bytes') is True
-assert f.write(bytearray(b'array')) is True
+vfs_writes=[]
+expected_vfs=b''
+for payload in ('text',b'bytes',bytearray(b'array')):
+    returned=f.write(payload)
+    require(returned is True, 'Original VFS write did not return True')
+    expected_vfs+=payload.encode() if isinstance(payload,str) else bytes(payload)
+    with open(essential_vfs,'rb') as independent:actual=independent.read()
+    checkpoint=dict(value_type=type(payload).__name__,returned=returned,
+                    native_size=f.size(),native_position=f.seek(0,1),
+                    stat_size=os.stat(essential_vfs).st_size,readback=actual.decode())
+    vfs_writes.append(checkpoint)
+    xbmc.log('INFINITY_FUTURE_VFS '+json.dumps(checkpoint),xbmc.LOGINFO)
+    require(actual==expected_vfs, 'VFS write readback mismatch: '+repr(actual))
 errors=[]
 for value in (None,42,memoryview(b'invalid')):
     try:f.write(value)
@@ -97,7 +113,7 @@ else:db.close()
 # relying on host/emulator filesystem reader-lock behavior. Rollback is explicit.
 commit_writer=sqlite3.connect(os.path.join(root,'commit-controls.db'))
 commit_writer.execute('PRAGMA foreign_keys=ON')
-assert commit_writer.execute('PRAGMA foreign_keys').fetchone()==(1,)
+require(commit_writer.execute('PRAGMA foreign_keys').fetchone()==(1,), "Fixture check failed: commit_writer.execute('PRAGMA foreign_keys').fetchone()==(1,)")
 commit_writer.execute('CREATE TABLE IF NOT EXISTS parents(value INTEGER PRIMARY KEY)')
 commit_writer.execute('CREATE TABLE IF NOT EXISTS commits(cycle TEXT PRIMARY KEY,value INTEGER REFERENCES parents(value) DEFERRABLE INITIALLY DEFERRED)')
 commit_writer.execute('INSERT OR IGNORE INTO parents VALUES(1)')
@@ -105,9 +121,9 @@ commit_writer.execute('INSERT INTO commits VALUES(?,1)',(cycle,));commit_writer.
 commit_writer.execute('UPDATE commits SET value=7 WHERE cycle=?',(cycle,))
 try:commit_writer.commit()
 except sqlite3.IntegrityError as error:
-    assert error.sqlite_errorcode & 255 == sqlite3.SQLITE_CONSTRAINT and commit_writer.in_transaction
+    require(error.sqlite_errorcode & 255 == sqlite3.SQLITE_CONSTRAINT and commit_writer.in_transaction, 'Fixture check failed: error.sqlite_errorcode & 255 == sqlite3.SQLITE_CONSTRAINT and commit_writer.in_transaction')
 else:raise AssertionError('deferred constraint did not cause a real COMMIT failure')
-commit_writer.rollback();assert not commit_writer.in_transaction
+commit_writer.rollback();require(not commit_writer.in_transaction, 'Fixture check failed: not commit_writer.in_transaction')
 # The ordinary context-manager API performs its own rollback after a failed
 # COMMIT. That failure is still raised, and the native ledger must verify the
 # resulting transaction state rather than retain an unrelated sticky blocker.
@@ -115,29 +131,30 @@ try:
     with commit_writer:
         commit_writer.execute('UPDATE commits SET value=7 WHERE cycle=?',(cycle,))
 except sqlite3.IntegrityError as error:
-    assert error.sqlite_errorcode & 255 == sqlite3.SQLITE_CONSTRAINT and not commit_writer.in_transaction
+    require(error.sqlite_errorcode & 255 == sqlite3.SQLITE_CONSTRAINT and not commit_writer.in_transaction, 'Fixture check failed: error.sqlite_errorcode & 255 == sqlite3.SQLITE_CONSTRAINT and not commit_writer.in_transaction')
 else:raise AssertionError('context COMMIT did not fail and roll back')
 sentinel=ValueError('fixture caller exception')
 try:
     with commit_writer:
         commit_writer.execute('UPDATE commits SET value=7 WHERE cycle=?',(cycle,))
         raise sentinel
-except ValueError as error:assert error is sentinel and not commit_writer.in_transaction
+except ValueError as error:require(error is sentinel and not commit_writer.in_transaction, 'Fixture check failed: error is sentinel and not commit_writer.in_transaction')
 else:raise AssertionError('context swallowed the caller exception')
 with commit_writer:
     commit_writer.execute('UPDATE commits SET value=1 WHERE cycle=?',(cycle,))
-assert commit_writer.execute('SELECT value FROM commits WHERE cycle=?',(cycle,)).fetchall()==[(1,)]
+require(commit_writer.execute('SELECT value FROM commits WHERE cycle=?',(cycle,)).fetchall()==[(1,)], "Fixture check failed: commit_writer.execute('SELECT value FROM commits WHERE cycle=?',(cycle,)).fetchall()==[(1,)]")
 commit_writer.close()
 buffer=open(os.path.join(root,'buffered-'+cycle),'w');buffer.write('buffered state')
-child=threading.Thread(target=worker);child.start();assert worker_ready.wait(10) and not worker_errors
+child=threading.Thread(target=worker);child.start();require(worker_ready.wait(10) and not worker_errors, 'Fixture check failed: worker_ready.wait(10) and not worker_errors')
 command_output=subprocess.check_output(['uname','-rs']).strip()
-assert command_output
+require(command_output, 'Fixture check failed: command_output')
 versioncheck=xbmcaddon.Addon('service.xbmc.versioncheck')
 versioncheck_path=xbmcvfs.translatePath(versioncheck.getAddonInfo('path'))
 with open(os.path.join(versioncheck_path,'resources/lib/version_check/service.py'),'rb') as stream:
     versioncheck_hash=hashlib.sha256(stream.read()).hexdigest()
 with open(Path(root)/('ready-'+cycle+'.json'),'w') as stream:
     json.dump(dict(addon=identity,pid=os.getpid(),mode=mode,errors=errors,worker_ready=True,
+                   python_optimization=sys.flags.optimize,vfs_writes=vfs_writes,checks_always_executed=True,
                    supported_child_returned=True,pathlike_io=True,failed_commit_rolled_back=True,context_commit_rolled_back=True,essential_vfs=essential_vfs,
                    history_count=history_count,watched_count=watched_count,
                    versioncheck_version=versioncheck.getAddonInfo('version'),
@@ -156,6 +173,6 @@ buffer.flush()
 xbmc.log('INFINITY_FUTURE_DRAIN main_flush_done '+cycle,xbmc.LOGINFO)
 buffer.close()
 xbmc.log('INFINITY_FUTURE_DRAIN main_close_done '+cycle,xbmc.LOGINFO)
-child.join(10);assert not child.is_alive() and not worker_errors
+child.join(10);require(not child.is_alive() and not worker_errors, 'Fixture check failed: not child.is_alive() and not worker_errors')
 xbmc.log('INFINITY_FUTURE_DRAIN all_handles_drained '+cycle,xbmc.LOGINFO)
 # In pending mode, leave the real transaction unresolved. It must block safe exit.

@@ -125,8 +125,12 @@ def main():
                 assert ready['versioncheck_service_sha256']=='166a1f5974fd2f7c297f801dd36040b4e7d6ccf6655e2edfa335803f3bbc58d5'
             assert [x['value_type'] for x in ready['errors']]==['NoneType','int','memoryview']
             assert all(x['exception']=='TypeError' for x in ready['errors'])
+            assert ready['checks_always_executed'] and ready['python_optimization']==1
+            assert [x['readback'] for x in ready['vfs_writes']]==['text','textbytes','textbytesarray']
+            assert all(x['returned'] is True and x['stat_size']==len(x['readback']) for x in ready['vfs_writes'])
             entry['service_ready']=ready
             entry['essential_vfs_before_close']=probe.shell('cat',ready['essential_vfs'])
+            assert entry['essential_vfs_before_close']=='textbytesarray',repr(entry['essential_vfs_before_close'])
             entry['favourites_before_close']=probe.shell('cat',probe.PROFILE+'/favourites.xml')
             (cycleout/'favourites-before-close.xml').write_text(entry['favourites_before_close'])
             if a.mode=='lost-file':
