@@ -1,0 +1,210 @@
+#include <Python.h>
+#define INFINITY_SCRIPT_OBSERVER_HOST
+#include "InfinityPythonPersistence.h"
+#include "commons/Buffer.h"
+#include <cassert>
+#include <cstdarg>
+#include <cstdio>
+#include <filesystem>
+#include <iostream>
+#include <sys/syscall.h>
+
+static std::string syncFailurePath;
+extern "C" int fsync(int fd) {
+  if (!syncFailurePath.empty() && InfinityScriptPersistence::DescriptorPath(fd)==syncFailurePath)
+  { errno=EIO;return -1; }
+  return static_cast<int>(::syscall(SYS_fsync,fd));
+}
+
+// Host backend adapter only. Buffer conversion and the write loop below are
+// extracted unchanged from the verified production inputs by test.py.
+namespace XBMCAddon {
+struct WrongTypeException {
+  std::string message;
+  WrongTypeException(const char* format, const char* arg, const char* method) {
+    char text[256]; std::snprintf(text,sizeof(text),format,arg,method); message=text;
+  }
+};
+}
+static int writes = 0;
+static bool partial = false;
+struct Backend {
+  int fd;
+  std::string path;
+  ssize_t Write(const void* data, size_t size) {
+    ++writes;
+    if(partial && writes>1) {errno=EIO;return -1;}
+    auto* context=InfinityPythonWriteHooks::Context();
+    InfinityScriptPersistence::ProtectedOperation lease(context?context->id:-1,{path},"write");
+    if(!lease) return -1;
+    return ::write(fd,data,partial?std::min<size_t>(size,2):size);
+  }
+};
+struct NativeFile {
+  PyObject_HEAD
+  Backend* file;
+};
+static bool nativeWriteLoop(Backend* file, XbmcCommons::Buffer& buffer) {
+@@WRITE_LOOP@@
+}
+static PyObject* fileNew(PyTypeObject* type,PyObject* args,PyObject* kwargs) {
+  const char *path=nullptr,*mode="r";
+  static const char* names[]={"filepath","mode",nullptr};
+  if(!PyArg_ParseTupleAndKeywords(args,kwargs,"s|s",const_cast<char**>(names),&path,&mode))return nullptr;
+  auto* self=reinterpret_cast<NativeFile*>(type->tp_alloc(type,0));
+  if(!self)return nullptr;
+  self->file=new Backend{::open(path,*mode=='w'?O_CREAT|O_TRUNC|O_RDWR:O_RDONLY,0600),path};
+  if(self->file->fd<0){Py_DECREF(self);return PyErr_SetFromErrno(PyExc_OSError);}
+  return reinterpret_cast<PyObject*>(self);
+}
+static void fileDelete(NativeFile* self) {
+  if(self->file) {if(self->file->fd>=0)::close(self->file->fd);delete self->file;}
+  Py_TYPE(self)->tp_free(reinterpret_cast<PyObject*>(self));
+}
+static PyObject* fileWrite(PyObject* self,PyObject* args,PyObject* kwargs) {
+  PyObject* value=nullptr;
+  static const char* names[]={"buffer",nullptr};
+  if(!PyArg_ParseTupleAndKeywords(args,kwargs,"O",const_cast<char**>(names),&value))return nullptr;
+  XbmcCommons::Buffer buffer;
+  try {
+@@BUFFER_CONVERSION@@
+    if(nativeWriteLoop(reinterpret_cast<NativeFile*>(self)->file,buffer))Py_RETURN_TRUE;
+    Py_RETURN_FALSE;
+  }catch(const XBMCAddon::WrongTypeException& e) {
+    PyErr_SetString(PyExc_TypeError,e.message.c_str());return nullptr;
+  }
+}
+static PyObject* fileClose(PyObject* self,PyObject*) {
+  auto* file=reinterpret_cast<NativeFile*>(self)->file;
+  if(file->fd>=0) {if(::close(file->fd))return PyErr_SetFromErrno(PyExc_OSError);file->fd=-1;}
+  Py_RETURN_NONE;
+}
+static PyObject* translate(PyObject*,PyObject* path){Py_INCREF(path);return path;}
+static PyMethodDef methods[]={
+  {"write",reinterpret_cast<PyCFunction>(fileWrite),METH_VARARGS|METH_KEYWORDS,nullptr},
+  {"close",fileClose,METH_NOARGS,nullptr},{nullptr,nullptr,0,nullptr}};
+static PyMethodDef moduleMethods[]={{"translatePath",translate,METH_O,nullptr},{nullptr,nullptr,0,nullptr}};
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+static PyTypeObject fileType={PyVarObject_HEAD_INIT(nullptr,0)};
+#pragma GCC diagnostic pop
+static PyModuleDef module={PyModuleDef_HEAD_INIT,"xbmcvfs",nullptr,-1,moduleMethods,nullptr,nullptr,nullptr,nullptr};
+static PyObject* initVfs(){
+  fileType.tp_name="xbmcvfs.File";fileType.tp_basicsize=sizeof(NativeFile);
+  fileType.tp_flags=Py_TPFLAGS_DEFAULT|Py_TPFLAGS_BASETYPE;fileType.tp_methods=methods;
+  fileType.tp_new=fileNew;fileType.tp_dealloc=reinterpret_cast<destructor>(fileDelete);
+  if(PyType_Ready(&fileType)<0)return nullptr;
+  auto* m=PyModule_Create(&module);if(!m)return nullptr;
+  Py_INCREF(&fileType);PyModule_AddObject(m,"File",reinterpret_cast<PyObject*>(&fileType));return m;
+}
+static void run(const std::string& code){
+  if(PyRun_SimpleString(code.c_str())!=0){PyErr_Print();std::_Exit(20);}
+}
+int main(int argc,char** argv){
+  assert(argc==5);
+  const std::string scenario=argv[1],root=argv[2],provider=argv[3];
+  const bool baseline=std::string(argv[4])=="baseline";
+  PyImport_AppendInittab("xbmcvfs",initVfs);
+  Py_Initialize();auto* owner=PyThreadState_Get();
+  auto* globals=PyModule_GetDict(PyImport_AddModule("__main__"));
+  PyDict_SetItemString(globals,"root",PyUnicode_FromString(root.c_str()));
+  run("import xbmcvfs,os,sqlite3,threading\nNativeFile=xbmcvfs.File\n");
+  InfinityScriptPersistence::Admit(101,provider+":service.py");
+  auto* context=InfinityPythonPersistence::Start(101,owner->interp);
+  if(PyErr_Occurred())PyErr_Print();
+  assert(context && context->observer);
+  PyDict_SetItemString(globals,"observer",context->observer);
+  run("path=root+'/profile/provider-settings.json'\nf=xbmcvfs.File(path,'w')\n");
+  bool shouldBlock=false;
+  if(scenario=="invalid" || scenario=="buffered" || scenario=="transaction" ||
+      scenario=="child-thread" || scenario=="late" || scenario=="namespace" || scenario=="sqlite") {
+    run("assert f.write('preserved') is True\n"
+        "for value in (None,42,object(),memoryview(b'bad')):\n"
+        " try: NativeFile(root+'/cache/control','w').write(value)\n"
+        " except TypeError as e: original=(type(e),str(e))\n"
+        " else: raise AssertionError('native converter accepted invalid input')\n"
+        " try: f.write(value)\n"
+        " except TypeError as e: assert (type(e),str(e))==original\n"
+        " else: raise AssertionError('observer swallowed error')\n");
+    assert(writes==1);shouldBlock=baseline;
+  } else if(scenario=="normal") {
+    run("assert f.write('text') is True\nassert f.write(b'bytes') is True\nassert f.write(bytearray(b'array')) is True\n");
+    assert(writes==3);
+  } else if(scenario=="partial") {
+    partial=true;run("assert f.write(b'abcdef') is False\n");assert(writes==2);shouldBlock=true;
+  } else if(scenario=="foreign") {
+    run("class Foreign:\n def write(self,value):\n  with open(root+'/profile/foreign','w') as out:out.write('changed')\n  raise TypeError('foreign write mutated first')\n"
+        "original=f._infinity_handle\nf._infinity_handle=Foreign()\n"
+        "try:f.write(None)\nexcept TypeError as e:assert str(e)=='foreign write mutated first'\n"
+        "else:raise AssertionError('foreign failure swallowed')\n"
+        "f._infinity_handle=original\n");shouldBlock=true;
+  } else if(scenario=="subclass") {
+    run("class Subclass(NativeFile):\n def write(self,value):\n  with open(root+'/profile/subclass','w') as out:out.write('changed')\n  raise TypeError('subclass writes first')\n"
+        "original=f._infinity_handle\nf._infinity_handle=Subclass(root+'/cache/subclass','w')\n"
+        "try:f.write(None)\nexcept TypeError:pass\nelse:raise AssertionError('subclass failure swallowed')\n"
+        "f._infinity_handle.close()\nf._infinity_handle=original\n");shouldBlock=true;
+  } else if(scenario.rfind("namespace-",0)==0) {
+    run("os.mkdir(root+'/profile/gone')\nwith open(root+'/profile/gone/file','w') as out:out.write('state')\n");
+    if(scenario=="namespace-unobserved") {
+      assert(::unlink((root+"/profile/gone/file").c_str())==0);
+      assert(::rmdir((root+"/profile/gone").c_str())==0);
+    } else {
+      run("os.unlink(root+'/profile/gone/file');os.rmdir(root+'/profile/gone')\n");
+      if(scenario=="namespace-recreated") {
+        run("os.mkdir(root+'/profile/gone')\nwith open(root+'/profile/gone/file','w') as out:out.write('new state')\n");
+        assert(::unlink((root+"/profile/gone/file").c_str())==0);
+        assert(::rmdir((root+"/profile/gone").c_str())==0);
+      } else if(scenario=="namespace-symlink") {
+        assert(::symlink((root+"/cache").c_str(),(root+"/profile/gone").c_str())==0);
+      } else if(scenario=="namespace-fsync") syncFailurePath=root+"/profile";
+      else return 25;
+    }
+    shouldBlock=true;
+  } else if(scenario=="pending-native") {
+    assert(InfinityScriptPersistence::BeginProtectedOperation(101,{root+"/profile/pending"},"native.write"));shouldBlock=true;
+  } else if(scenario=="opaque") {
+    InfinityScriptPersistence::Fail(101,"external_or_opaque_writer_requires_explicit_participant");shouldBlock=true;
+  } else {std::cerr<<"Unknown scenario";return 25;}
+  if(scenario=="buffered")run("buffer=open(root+'/profile/resume.json','w');buffer.write('resume preserved')\n");
+  if(scenario=="transaction") {
+    run("db=sqlite3.connect(root+'/profile/history.db');db.execute('CREATE TABLE history(v)');db.execute('INSERT INTO history VALUES(7)')\n");shouldBlock=true;
+  }
+  if(scenario=="sqlite")run(
+    "db=sqlite3.connect(root+'/profile/history.db');db.execute('PRAGMA journal_mode=WAL');db.execute('CREATE TABLE history(v)');db.execute('INSERT INTO history VALUES(7)');db.commit()\n"
+    "try:db.execute('INSERT INTO missing VALUES(1)')\nexcept sqlite3.OperationalError:db.rollback()\n"
+    "db.execute(\"ATTACH DATABASE ? AS extra\",(root+'/profile/watched.db',));db.execute('CREATE TABLE extra.watched(v)');db.execute('INSERT INTO extra.watched VALUES(8)');db.commit();db.close()\n");
+  if(scenario=="namespace")run(
+    "os.mkdir(root+'/profile/newdir')\nwith open(root+'/profile/newdir/tmp','w') as out:out.write('state')\n"
+    "os.replace(root+'/profile/newdir/tmp',root+'/profile/newdir/final')\n"
+    "os.rename(root+'/profile/newdir/final',root+'/profile/state')\nos.rmdir(root+'/profile/newdir')\n");
+  if(scenario=="child-thread")run(
+    "def child():\n with open(root+'/profile/child','w') as out:out.write('owned')\n"
+    "t=threading.Thread(target=child);t.start();t.join()\n");
+  if(baseline)run("f.close()\n");
+  assert(InfinityScriptPersistence::BeginWriteProtection(71,{root+"/profile"},{root+"/cache"}));
+  if(scenario=="late")run(
+    "try:f.write('late mutation')\nexcept PermissionError:pass\nelse:raise AssertionError('late write admitted')\n");
+  run("f.close()\n");
+  InfinityPythonPersistence::Finish(context,owner);
+  if(context->finalized) InfinityScriptPersistence::Retired(101);
+  assert(InfinityScriptPersistence::CloseParticipantWrites(71));
+  bool authorized=InfinityScriptPersistence::SealEssentialWrites(71);
+  if(authorized==shouldBlock){
+#if defined(INFINITY_UNIVERSAL_CANDIDATE)
+    for(const auto& removed:InfinityScriptPersistence::Get().protection.removedNamespaces)std::cerr<<"REMOVED "<<removed<<'\n';
+#endif
+    for(const auto& why:InfinityScriptPersistence::EssentialWrites().blockers)std::cerr<<why<<'\n';
+    std::cerr<<"Wrong seal outcome "<<authorized<<" shouldBlock="<<shouldBlock<<'\n';return 30;
+  }
+  if(!baseline && scenario=="invalid") {
+    auto& state=InfinityScriptPersistence::Get();
+    assert(!state.blockers.empty());
+    for(const auto& blocker:state.blockers) {
+      assert(!blocker.blocking);
+      assert(blocker.writerId==101 && blocker.writer==provider+":service.py");
+      assert(blocker.detail.find("argument_rejected_before_native_write")!=std::string::npos);
+    }
+  }
+  std::cout<<"PASS "<<scenario<<" provider="<<provider<<" seal="<<authorized<<'\n'<<std::flush;
+  std::_Exit(0); // Host test only; never interpreted as Android process evidence.
+}
