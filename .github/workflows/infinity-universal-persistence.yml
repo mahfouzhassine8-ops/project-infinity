@@ -11,7 +11,7 @@ permissions:
   actions: read
 concurrency:
   group: infinity-universal-persistence-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   build:
     name: Exact-source host gates, ARM64 build and permanent QA signature

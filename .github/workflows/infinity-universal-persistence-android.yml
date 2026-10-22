@@ -9,6 +9,9 @@ on:
 permissions:
   contents: read
   actions: read
+concurrency:
+  group: infinity-universal-android-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
   android17:
     name: Actual Android17 ${{ matrix.mode }} control
@@ -17,10 +20,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mode: [baseline, safe, pending]
+        mode: [baseline, safe, pending, opaque]
     env:
-      CANDIDATE_BUILD: '39830562437'
-      CANDIDATE_COMMIT: '000813212ce0e3376a24f58360bb0e0562e5b951'
+      CANDIDATE_BUILD: '39832148260'
+      CANDIDATE_COMMIT: '462f5280973a53c86e250495cf59e3ee5d73cb95'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -64,6 +67,14 @@ jobs:
           name: Infinity-Universal-Persistence-INTERNAL-QA-NOT-ACCEPTED
           github-token: ${{ github.token }}
           path: signed
+      - name: Retrieve the existing compatible Version Check package for separate safe profiles
+        if: matrix.mode == 'safe' || matrix.mode == 'pending'
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39136763823
+          name: Infinity-2103387-Permanent-Signed-EXPERIMENTAL-UNQUALIFIED
+          github-token: ${{ github.token }}
+          path: archived-compatible-fixture
       - uses: actions/setup-java@v4
         with: {distribution: temurin, java-version: '17'}
       - uses: actions/setup-python@v5
@@ -108,7 +119,7 @@ jobs:
           pre-emulator-launch-script: python3 repairs/four-repair-20261018/android37_gate.py --sdk-root "$ANDROID_HOME" --out api37-support --check-avd
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
-          script: python3 repairs/universal-persistence-2103401/android_probe.py --apk "$TEST_APK" --expected-sha "$TEST_APK_SHA" --mode ${{ matrix.mode }} --out android-results
+          script: python3 repairs/universal-persistence-2103401/android_probe.py --apk "$TEST_APK" --expected-sha "$TEST_APK_SHA" --mode ${{ matrix.mode }} --versioncheck-fixture archived-compatible-fixture/versioncheck-companion/service.xbmc.versioncheck-0.5.28+infinity.1-Android-TEST.zip --out android-results
       - uses: actions/upload-artifact@v4
         if: always()
         with:

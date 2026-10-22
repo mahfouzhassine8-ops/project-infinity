@@ -33,7 +33,8 @@ def until(fn,seconds):
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--apk',type=Path,required=True);p.add_argument('--expected-sha',required=True)
-    p.add_argument('--mode',choices=['safe','pending','baseline'],required=True)
+    p.add_argument('--mode',choices=['safe','pending','baseline','opaque'],required=True)
+    p.add_argument('--versioncheck-fixture',type=Path)
     p.add_argument('--out',type=Path,required=True);a=p.parse_args();a.out.mkdir(parents=True,exist_ok=True)
     report=dict(passed=False,scope='actual signed APK on disposable Android17 emulator',mode=a.mode,
         physical_fold_verified=False,real_provider_code_tested=False,final_lock=False,cycles=[])
@@ -70,6 +71,12 @@ def main():
         _,compat=installed.sources('service.infinity.compat')
         for name,data in compat.items():
             target=stage/'service.infinity.compat'/name;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(data)
+        if a.mode in ('safe','pending'):
+            assert a.versioncheck_fixture
+            # Reuse the existing archived compatible package byte-for-byte,
+            # never patch provider source, disable its service or edit the APK.
+            original=load('original_versioncheck_stager',ROOT/'repairs/four-repair-20261018/versioncheck_android.py')
+            report['preexisting_compatible_profile_fixture']=original.stage(a.versioncheck_fixture,stage)
         future=stage/FUTURE;future.mkdir()
         (future/'addon.xml').write_text('<addon id="'+FUTURE+'" name="Future persistence test" version="1.0.0" provider-name="Disposable CI fixture"><requires><import addon="xbmc.python" version="3.0.0"/></requires><extension point="xbmc.service" library="service.py" start="startup"/><extension point="xbmc.addon.metadata"><summary lang="en_GB">Future provider regression</summary><description lang="en_GB">Disposable emulator only</description><platform>all</platform><license>GPL-2.0-or-later</license></extension></addon>')
         shutil.copyfile(HERE/'android_future_service.py',future/'service.py')
@@ -89,6 +96,8 @@ def main():
             probe.shell('am','start','-W','-n',probe.PACKAGE+'/.Splash')
             cycleout=a.out/('cycle-'+str(cycle));cycleout.mkdir()
             entry['first_party']=probe.enable_first_party(cycleout)
+            entry['versioncheck']=probe.rpc('Addons.GetAddonDetails',{'addonid':'service.xbmc.versioncheck','properties':['enabled','version']})['addon']
+            assert entry['versioncheck']['enabled']
             details=probe.rpc('Addons.GetAddonDetails',{'addonid':FUTURE,'properties':['enabled','version']})['addon']
             if not details['enabled']:assert probe.rpc('Addons.SetAddonEnabled',{'addonid':FUTURE,'enabled':True})=='OK'
             owner=probe.wait_ready(old_owner);entry['owner']=owner
@@ -96,6 +105,13 @@ def main():
             ready=until(lambda:probe.read_json(ready_path),60)
             assert ready['pid']==owner['pid'] and ready['addon']==FUTURE and ready['worker_ready']
             assert ready['supported_child_returned']
+            assert ready['history_count']==ready['watched_count']==cycle+1
+            if a.mode in ('safe','pending'):
+                assert ready['versioncheck_version']=='0.5.28+infinity.1'
+                assert ready['versioncheck_service_sha256']=='6eb8ed9dd5d4712aacb44d55c3e006b1da5198c6bee076315579927c437bcfc1'
+            else:
+                assert ready['versioncheck_version']=='0.5.27+matrix.1'
+                assert ready['versioncheck_service_sha256']=='166a1f5974fd2f7c297f801dd36040b4e7d6ccf6655e2edfa335803f3bbc58d5'
             assert [x['value_type'] for x in ready['errors']]==['NoneType','int','memoryview']
             assert all(x['exception']=='TypeError' for x in ready['errors'])
             entry['service_ready']=ready
@@ -110,8 +126,16 @@ def main():
                 assert receipt['phase']=='CHECKPOINT_FAILED'
                 assert not receipt.get('authorization_consumed')
                 assert any(x['pid']==owner['pid'] for x in entry['processes_after'])
-                reason='vfs_write_exception' if a.mode=='baseline' else 'sqlite'
-                assert reason in json.dumps(receipt).lower(),json.dumps(receipt)
+                evidence=json.dumps(receipt)
+                if a.mode=='baseline':assert FUTURE in evidence and 'vfs_write_exception' in evidence
+                elif a.mode=='pending':
+                    assert FUTURE in evidence and ('pending_protected_sqlite_write_transaction' in evidence or 'sqlite_pending_transaction_at_retirement' in evidence)
+                else:
+                    assert 'service.xbmc.versioncheck' in evidence and 'external_or_opaque_writer_requires_explicit_participant' in evidence
+                    blockers=receipt['last_native_status']['script_persistence']['blockers']
+                    rejected=[x for x in blockers if x.get('writer','').startswith(FUTURE) and x.get('reason')=='vfs_write_exception']
+                    assert len(rejected)==3 and all(not x['blocking'] and 'argument_rejected_before_native_write' in x['detail'] for x in rejected)
+                    assert all('service.xbmc.versioncheck' in x['writer'] for x in blockers if x['blocking'])
                 entry['unverified_state_remained_blocked']=True
                 break
             assert receipt['phase']=='COMPLETE',json.dumps(receipt)
@@ -119,6 +143,8 @@ def main():
             assert all(receipt.get(k) is True for k in ('checkpoint_saved','authorization_consumed','process_death_confirmed'))
             native=receipt['native_receipt']
             assert native['essential_writes_sealed'] and native['essential_writes_durable'] and not native['essential_write_blockers']
+            mandatory=[x for x in native['owners'] if x['owner'] in native['essential_owners']]
+            assert len(mandatory)==16 and all(x['required_writes_finished'] and not x['dirty_remaining'] and x['result'] in ('COMMITTED','ALREADY_DURABLE') for x in mandatory)
             assert not any(x['pid']==owner['pid'] for x in entry['processes_after'])
             data=cycleout/'future-data';probe.adb('pull',probe.PROFILE+'/addon_data/'+FUTURE,data)
             stamp=str(owner['pid'])
@@ -139,6 +165,13 @@ def main():
             for database in databases:
                 with sqlite3.connect(database.resolve().as_uri()+'?mode=ro',uri=True) as db:assert db.execute('PRAGMA integrity_check').fetchone()==('ok',),database
             entry['kodi_database_integrity_passed']=True
+        if a.mode=='safe':
+            probe.shell('am','start','-W','-n',probe.PACKAGE+'/.Splash')
+            final=a.out/'final-reopen';final.mkdir();probe.enable_first_party(final)
+            owner=probe.wait_ready(old_owner)
+            ready=until(lambda:probe.read_json(probe.PROFILE+'/addon_data/'+FUTURE+'/ready-'+str(owner['pid'])+'.json'),60)
+            assert ready['pid']==owner['pid'] and ready['history_count']==ready['watched_count']==4
+            report['final_reopen_verified']=dict(owner=owner,ready=ready)
         report['passed']=True
     except Exception as error:report['failure']=type(error).__name__+': '+str(error)
     finally:

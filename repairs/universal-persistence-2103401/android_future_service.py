@@ -1,5 +1,6 @@
 """Disposable emulator-only future provider. Never installed on a user device."""
 import json
+import hashlib
 import os
 import sqlite3
 import subprocess
@@ -55,6 +56,8 @@ db.execute('INSERT INTO history VALUES(?,37)',(cycle,));db.commit()
 db.execute('ATTACH DATABASE ? AS extra',(os.path.join(root,'watched.db'),))
 db.execute('CREATE TABLE IF NOT EXISTS extra.watched(cycle TEXT PRIMARY KEY,watched INTEGER)')
 db.execute('INSERT INTO extra.watched VALUES(?,1)',(cycle,));db.commit()
+history_count=db.execute('SELECT COUNT(*) FROM history').fetchone()[0]
+watched_count=db.execute('SELECT COUNT(*) FROM extra.watched').fetchone()[0]
 try:db.execute('INSERT INTO nonexistent_table VALUES(1)')
 except sqlite3.OperationalError:db.rollback()
 else:raise AssertionError('failed transaction was not reported')
@@ -64,9 +67,16 @@ buffer=open(os.path.join(root,'buffered-'+cycle),'w');buffer.write('buffered sta
 child=threading.Thread(target=worker);child.start();assert worker_ready.wait(10) and not worker_errors
 command_output=subprocess.check_output(['uname','-rs']).strip()
 assert command_output
+versioncheck=xbmcaddon.Addon('service.xbmc.versioncheck')
+versioncheck_path=xbmcvfs.translatePath(versioncheck.getAddonInfo('path'))
+with open(os.path.join(versioncheck_path,'resources/lib/version_check/service.py'),'rb') as stream:
+    versioncheck_hash=hashlib.sha256(stream.read()).hexdigest()
 with open(os.path.join(root,'ready-'+cycle+'.json'),'w') as stream:
     json.dump(dict(addon=identity,pid=os.getpid(),mode=mode,errors=errors,worker_ready=True,
-                   supported_child_returned=True,essential_vfs=essential_vfs),stream)
+                   supported_child_returned=True,essential_vfs=essential_vfs,
+                   history_count=history_count,watched_count=watched_count,
+                   versioncheck_version=versioncheck.getAddonInfo('version'),
+                   versioncheck_service_sha256=versioncheck_hash),stream)
 while not monitor.waitForAbort(.2):pass
 # Admission must be closed before cooperative retirement. Existing handles can
 # drain, but no new payload may cross the write boundary after this signal.
