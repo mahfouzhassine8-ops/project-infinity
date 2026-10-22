@@ -33,7 +33,7 @@ def until(fn,seconds):
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--apk',type=Path,required=True);p.add_argument('--expected-sha',required=True)
-    p.add_argument('--mode',choices=['safe','pending','baseline','opaque'],required=True)
+    p.add_argument('--mode',choices=['safe','pending','baseline','opaque','lost-file'],required=True)
     p.add_argument('--versioncheck-fixture',type=Path)
     p.add_argument('--out',type=Path,required=True);a=p.parse_args();a.out.mkdir(parents=True,exist_ok=True)
     report=dict(passed=False,scope='actual signed APK on disposable Android17 emulator',mode=a.mode,
@@ -71,7 +71,7 @@ def main():
         _,compat=installed.sources('service.infinity.compat')
         for name,data in compat.items():
             target=stage/'service.infinity.compat'/name;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(data)
-        if a.mode in ('safe','pending'):
+        if a.mode in ('safe','pending','lost-file'):
             assert a.versioncheck_fixture
             # Reuse the existing archived compatible package byte-for-byte,
             # never patch provider source, disable its service or edit the APK.
@@ -106,7 +106,7 @@ def main():
             assert ready['pid']==owner['pid'] and ready['addon']==FUTURE and ready['worker_ready']
             assert ready['supported_child_returned']
             assert ready['history_count']==ready['watched_count']==cycle+1
-            if a.mode in ('safe','pending'):
+            if a.mode in ('safe','pending','lost-file'):
                 assert ready['versioncheck_version']=='0.5.28+infinity.1'
                 assert ready['versioncheck_service_sha256']=='6eb8ed9dd5d4712aacb44d55c3e006b1da5198c6bee076315579927c437bcfc1'
             else:
@@ -115,6 +115,13 @@ def main():
             assert [x['value_type'] for x in ready['errors']]==['NoneType','int','memoryview']
             assert all(x['exception']=='TypeError' for x in ready['errors'])
             entry['service_ready']=ready
+            if a.mode=='lost-file':
+                # Fault injection only into this fresh emulator's own fixture,
+                # after its dirty file is admitted. Never a user profile file.
+                lost=probe.PROFILE+'/addon_data/'+FUTURE+'/buffered-'+str(owner['pid'])
+                assert probe.shell('getprop','ro.kernel.qemu').strip()=='1'
+                probe.shell('rm','--',lost)
+                entry['injected_external_namespace_loss']=lost
             probe.shell('am','start','-n',probe.PACKAGE+'/.InfinityPowerControlActivity','-a',probe.PACKAGE+'.action.CLOSE_KODI')
             def terminal():
                 r=probe.read_json(probe.PRIVATE+'/files/infinity-checkpoint-close.json')
@@ -130,12 +137,19 @@ def main():
                 if a.mode=='baseline':assert FUTURE in evidence and 'vfs_write_exception' in evidence
                 elif a.mode=='pending':
                     assert FUTURE in evidence and ('pending_protected_sqlite_write_transaction' in evidence or 'sqlite_pending_transaction_at_retirement' in evidence)
+                    assert not any('unflushed_protected_buffer' in x for x in receipt['last_native_status']['essential_write_blockers'])
+                elif a.mode=='lost-file':
+                    actual=receipt['last_native_status']['essential_write_blockers']
+                    stamp='buffered-'+str(owner['pid'])
+                    assert any('unflushed_protected_buffer' in x and FUTURE in x and stamp in x for x in actual),actual
+                    assert all(FUTURE in x and (stamp in x or 'unverified_dirty_buffer_namespace' in x) for x in actual),actual
                 else:
                     assert 'service.xbmc.versioncheck' in evidence and 'external_or_opaque_writer_requires_explicit_participant' in evidence
                     blockers=receipt['last_native_status']['script_persistence']['blockers']
                     rejected=[x for x in blockers if x.get('writer','').startswith(FUTURE) and x.get('reason')=='vfs_write_exception']
                     assert len(rejected)==3 and all(not x['blocking'] and 'argument_rejected_before_native_write' in x['detail'] for x in rejected)
                     assert all('service.xbmc.versioncheck' in x['writer'] for x in blockers if x['blocking'])
+                    assert all('service.xbmc.versioncheck' in x for x in receipt['last_native_status']['essential_write_blockers'])
                 entry['unverified_state_remained_blocked']=True
                 break
             assert receipt['phase']=='COMPLETE',json.dumps(receipt)

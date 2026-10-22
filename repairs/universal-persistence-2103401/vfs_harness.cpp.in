@@ -9,6 +9,17 @@
 #include <iostream>
 #include <sys/syscall.h>
 
+static std::string staleDescriptorOriginal, staleDescriptorActual;
+extern "C" ssize_t readlink(const char* path,char* buffer,size_t capacity) {
+  char actual[PATH_MAX]{};
+  const auto result=static_cast<ssize_t>(::syscall(SYS_readlink,path,actual,sizeof(actual)));
+  if(result<0)return result;
+  std::string target(actual,static_cast<size_t>(result));
+  if(!staleDescriptorOriginal.empty() && std::string(path).rfind("/proc/self/fd/",0)==0 &&
+      target==staleDescriptorActual)target=staleDescriptorOriginal+" (deleted)";
+  const auto copied=std::min(capacity,target.size());std::memcpy(buffer,target.data(),copied);
+  return static_cast<ssize_t>(copied);
+}
 static std::string syncFailurePath;
 extern "C" int fsync(int fd) {
   if (!syncFailurePath.empty() && InfinityScriptPersistence::DescriptorPath(fd)==syncFailurePath)
@@ -112,6 +123,15 @@ int main(int argc,char** argv){
   const bool baseline=std::string(argv[4])=="baseline";
   PyImport_AppendInittab("xbmcvfs",initVfs);
   Py_Initialize();auto* owner=PyThreadState_Get();
+  PyThreadState* auxiliary=nullptr;
+  InfinityPythonPersistence::Context* auxiliaryContext=nullptr;
+  if(scenario=="multi-interpreter-drain") {
+    auxiliary=Py_NewInterpreter();assert(auxiliary);
+    InfinityScriptPersistence::Admit(90,"service.another.fixture:service.py");
+    auxiliaryContext=InfinityPythonPersistence::Start(90,auxiliary->interp);
+    assert(auxiliaryContext && auxiliaryContext->observer);
+    owner=Py_NewInterpreter();assert(owner);
+  }
   auto* globals=PyModule_GetDict(PyImport_AddModule("__main__"));
   PyDict_SetItemString(globals,"root",PyUnicode_FromString(root.c_str()));
   run("import xbmcvfs,os,sqlite3,threading\nNativeFile=xbmcvfs.File\nOldOpen=open\n");
@@ -122,7 +142,8 @@ int main(int argc,char** argv){
   PyDict_SetItemString(globals,"observer",context->observer);
   run("path=root+'/profile/provider-settings.json'\nf=xbmcvfs.File(path,'w')\n");
   bool shouldBlock=false;
-  const bool ioCase=scenario=="buffered-finalize" || scenario=="buffered-phase2" ||
+  const bool descriptorCase=scenario.rfind("descriptor-",0)==0;
+  const bool ioCase=descriptorCase || scenario=="composite-drain" || scenario=="multi-interpreter-drain" || scenario=="buffered-finalize" || scenario=="buffered-phase2" ||
       scenario=="child-drain" || scenario=="clean-io-late-write" || scenario=="clean-io-override" ||
       scenario=="clean-io-retarget" || scenario=="empty-io-close" || scenario=="layered-drain" || scenario=="cached-drain";
   int savedDescriptor=-1,retargetDescriptor=-1,targetDescriptor=-1;
@@ -183,6 +204,7 @@ int main(int argc,char** argv){
   if(scenario=="buffered" || ioCase) {
     if(scenario=="layered-drain")run("import io\nbuffer=io.TextIOWrapper(io.BufferedWriter(io.FileIO(root+'/profile/resume.json','w')))\n");
     else if(scenario=="cached-drain")run("buffer=OldOpen(root+'/profile/resume.json','w')\n");
+    else if(scenario=="descriptor-literal-deleted")run("buffer=open(root+'/profile/resume.json (deleted)','w')\n");
     else run("buffer=open(root+'/profile/resume.json','w')\n");
     if(scenario!="empty-io-close")run("buffer.write('resume preserved')\n");
     if(scenario.rfind("clean-io-",0)==0)run("buffer.flush()\n");
@@ -194,7 +216,7 @@ int main(int argc,char** argv){
       retargetDescriptor=::open((root+"/profile/retarget-target").c_str(),O_CREAT|O_RDWR,0600);assert(retargetDescriptor>=0);
       assert(::write(retargetDescriptor,"sentinel",8)==8);assert(::dup2(retargetDescriptor,targetDescriptor)==targetDescriptor);
     }
-    if(scenario=="child-drain")run(
+    if(scenario=="child-drain" || scenario=="composite-drain")run(
       "ready=threading.Event();go=threading.Event();worker_errors=[]\n"
       "def drain_worker():\n try:\n  with open(root+'/profile/worker','w') as output:\n   output.write('worker state');ready.set();go.wait(5);output.flush()\n except BaseException as error:worker_errors.append(repr(error))\n"
       "t=threading.Thread(target=drain_worker);t.start();assert ready.wait(5)\n");
@@ -213,6 +235,39 @@ int main(int argc,char** argv){
   if(scenario=="child-thread")run(
     "def child():\n with open(root+'/profile/child','w') as out:out.write('owned')\n"
     "t=threading.Thread(target=child);t.start();t.join()\n");
+  if(scenario=="composite-drain")run(
+    "import subprocess,json,hashlib\n"
+    "db=sqlite3.connect(root+'/profile/history.db');db.execute('PRAGMA journal_mode=WAL');db.execute('CREATE TABLE history(v)');db.execute('INSERT INTO history VALUES(7)');db.commit()\n"
+    "db.execute(\"ATTACH DATABASE ? AS extra\",(root+'/profile/watched.db',));db.execute('CREATE TABLE extra.watched(v)');db.execute('INSERT INTO extra.watched VALUES(8)');db.commit()\n"
+    "try:db.execute('INSERT INTO missing VALUES(1)')\nexcept sqlite3.OperationalError:db.rollback()\n"
+    "db.close()\n"
+    "assert subprocess.check_output(['/bin/echo','infinity-diagnostic-fixture']).strip()==b'infinity-diagnostic-fixture'\n"
+    "with open(root+'/profile/ready.json','w') as output:json.dump(dict(ready=True),output)\n");
+  if(descriptorCase && scenario!="descriptor-literal-deleted") {
+    staleDescriptorOriginal=root+"/profile/resume.json";
+    staleDescriptorActual=staleDescriptorOriginal;
+    if(scenario=="descriptor-stale-unlinked") {
+      assert(::unlink(staleDescriptorOriginal.c_str())==0);shouldBlock=true;
+    } else if(scenario=="descriptor-observed-unlinked") {
+      run("os.unlink(root+'/profile/resume.json')\n");
+    } else if(scenario!="descriptor-stale-drain") {
+      staleDescriptorActual=root+"/profile/moved-buffer";
+      assert(::rename(staleDescriptorOriginal.c_str(),staleDescriptorActual.c_str())==0);
+      if(scenario=="descriptor-stale-symlink")
+        assert(::symlink(staleDescriptorActual.c_str(),staleDescriptorOriginal.c_str())==0);
+      else {
+        const int replaced=::open(staleDescriptorOriginal.c_str(),O_CREAT|O_RDWR,0600);assert(replaced>=0);
+        assert(::write(replaced,"sentinel",8)==8);assert(::close(replaced)==0);
+      }
+      shouldBlock=true;
+    }
+  }
+  if(auxiliary) {
+    PyThreadState_Swap(auxiliary);
+    InfinityPythonPersistence::Finish(auxiliaryContext,auxiliary);
+    assert(auxiliaryContext->finalized);InfinityScriptPersistence::Retired(90);
+    Py_EndInterpreter(auxiliary);PyThreadState_Swap(owner);
+  }
   if(baseline)run("f.close()\n");
   assert(InfinityScriptPersistence::BeginWriteProtection(71,{root+"/profile"},{root+"/cache"}));
 #if defined(INFINITY_UNIVERSAL_CANDIDATE)
@@ -235,8 +290,10 @@ int main(int argc,char** argv){
     if(scenario=="clean-io-override")run("del buffer._infinity_handle.close\n");
     else {assert(::dup2(savedDescriptor,targetDescriptor)==targetDescriptor);::close(savedDescriptor);::close(retargetDescriptor);}
   }
-  if(scenario=="child-drain")run("go.set();t.join(5);assert not t.is_alive() and not worker_errors,worker_errors\n");
-  if((scenario=="buffered" || ioCase) && scenario!="buffered-finalize")run("buffer.flush();buffer.close()\n");
+  if(scenario=="child-drain" || scenario=="composite-drain")run("go.set();t.join(5);assert not t.is_alive() and not worker_errors,worker_errors\n");
+  if(descriptorCase && shouldBlock)
+    run("try:buffer.flush()\nexcept PermissionError:pass\nelse:raise AssertionError('unverified descriptor namespace admitted')\n");
+  else if((scenario=="buffered" || ioCase) && scenario!="buffered-finalize")run("buffer.flush();buffer.close()\n");
   if(scenario=="late")run(
     "try:f.write('late mutation')\nexcept PermissionError:pass\nelse:raise AssertionError('late write admitted')\n");
   run("f.close()\n");

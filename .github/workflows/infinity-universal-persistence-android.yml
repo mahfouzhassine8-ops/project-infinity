@@ -20,10 +20,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        mode: [baseline, safe, pending, opaque]
+        mode: [baseline, safe, pending, opaque, lost-file]
     env:
-      CANDIDATE_BUILD: '39841286004'
-      CANDIDATE_COMMIT: 'b7476c548179f2615714dd5578eaf83912a46f8c'
+      CANDIDATE_BUILD: '39849297105'
+      CANDIDATE_COMMIT: 'd758cbc74b7b18898bf54fd9ac3a17bb5b568fad'
     steps:
       - uses: actions/checkout@v4
         with:
@@ -68,7 +68,7 @@ jobs:
           github-token: ${{ github.token }}
           path: signed
       - name: Retrieve the existing compatible Version Check package for separate safe profiles
-        if: matrix.mode == 'safe' || matrix.mode == 'pending'
+        if: matrix.mode == 'safe' || matrix.mode == 'pending' || matrix.mode == 'lost-file'
         uses: actions/download-artifact@v4
         with:
           run-id: 39136763823
