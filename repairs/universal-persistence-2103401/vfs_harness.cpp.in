@@ -98,7 +98,13 @@ static PyObject* initVfs(){
   Py_INCREF(&fileType);PyModule_AddObject(m,"File",reinterpret_cast<PyObject*>(&fileType));return m;
 }
 static void run(const std::string& code){
-  if(PyRun_SimpleString(code.c_str())!=0){PyErr_Print();std::_Exit(20);}
+  if(PyRun_SimpleString(code.c_str())!=0){
+    PyErr_Print();auto& p=InfinityScriptPersistence::Get().protection;
+    std::cerr<<"PHASE "<<p.phase<<'\n';
+    for(const auto& x:p.buffers){std::cerr<<"BUFFER "<<x.first<<" writer="<<x.second.writer;for(const auto& path:x.second.paths)std::cerr<<" ["<<path<<"]";std::cerr<<'\n';}
+    for(const auto& x:p.denials)std::cerr<<"DENIAL "<<x<<'\n';
+    std::_Exit(20);
+  }
 }
 int main(int argc,char** argv){
   assert(argc==5);
@@ -108,7 +114,7 @@ int main(int argc,char** argv){
   Py_Initialize();auto* owner=PyThreadState_Get();
   auto* globals=PyModule_GetDict(PyImport_AddModule("__main__"));
   PyDict_SetItemString(globals,"root",PyUnicode_FromString(root.c_str()));
-  run("import xbmcvfs,os,sqlite3,threading\nNativeFile=xbmcvfs.File\n");
+  run("import xbmcvfs,os,sqlite3,threading\nNativeFile=xbmcvfs.File\nOldOpen=open\n");
   InfinityScriptPersistence::Admit(101,provider+":service.py");
   auto* context=InfinityPythonPersistence::Start(101,owner->interp);
   if(PyErr_Occurred())PyErr_Print();
@@ -116,7 +122,11 @@ int main(int argc,char** argv){
   PyDict_SetItemString(globals,"observer",context->observer);
   run("path=root+'/profile/provider-settings.json'\nf=xbmcvfs.File(path,'w')\n");
   bool shouldBlock=false;
-  if(scenario=="invalid" || scenario=="buffered" || scenario=="transaction" ||
+  const bool ioCase=scenario=="buffered-finalize" || scenario=="buffered-phase2" ||
+      scenario=="child-drain" || scenario=="clean-io-late-write" || scenario=="clean-io-override" ||
+      scenario=="clean-io-retarget" || scenario=="empty-io-close" || scenario=="layered-drain" || scenario=="cached-drain";
+  int savedDescriptor=-1,retargetDescriptor=-1,targetDescriptor=-1;
+  if(ioCase || scenario=="invalid" || scenario=="buffered" || scenario=="transaction" ||
       scenario=="child-thread" || scenario=="late" || scenario=="namespace" || scenario=="sqlite") {
     run("assert f.write('preserved') is True\n"
         "for value in (None,42,object(),memoryview(b'bad')):\n"
@@ -170,7 +180,25 @@ int main(int argc,char** argv){
   } else if(scenario=="opaque") {
     InfinityScriptPersistence::Fail(101,"external_or_opaque_writer_requires_explicit_participant");shouldBlock=true;
   } else {std::cerr<<"Unknown scenario";return 25;}
-  if(scenario=="buffered")run("buffer=open(root+'/profile/resume.json','w');buffer.write('resume preserved')\n");
+  if(scenario=="buffered" || ioCase) {
+    if(scenario=="layered-drain")run("import io\nbuffer=io.TextIOWrapper(io.BufferedWriter(io.FileIO(root+'/profile/resume.json','w')))\n");
+    else if(scenario=="cached-drain")run("buffer=OldOpen(root+'/profile/resume.json','w')\n");
+    else run("buffer=open(root+'/profile/resume.json','w')\n");
+    if(scenario!="empty-io-close")run("buffer.write('resume preserved')\n");
+    if(scenario.rfind("clean-io-",0)==0)run("buffer.flush()\n");
+    if(scenario=="clean-io-override")run("buffer._infinity_handle.close=lambda: os.write(buffer.fileno(),b'BAD')\n");
+    if(scenario=="clean-io-retarget") {
+      auto* object=PyDict_GetItemString(globals,"buffer");auto* number=PyObject_CallMethod(object,"fileno",nullptr);assert(number);
+      targetDescriptor=static_cast<int>(PyLong_AsLong(number));Py_DECREF(number);
+      savedDescriptor=::dup(targetDescriptor);assert(savedDescriptor>=0);
+      retargetDescriptor=::open((root+"/profile/retarget-target").c_str(),O_CREAT|O_RDWR,0600);assert(retargetDescriptor>=0);
+      assert(::write(retargetDescriptor,"sentinel",8)==8);assert(::dup2(retargetDescriptor,targetDescriptor)==targetDescriptor);
+    }
+    if(scenario=="child-drain")run(
+      "ready=threading.Event();go=threading.Event();worker_errors=[]\n"
+      "def drain_worker():\n try:\n  with open(root+'/profile/worker','w') as output:\n   output.write('worker state');ready.set();go.wait(5);output.flush()\n except BaseException as error:worker_errors.append(repr(error))\n"
+      "t=threading.Thread(target=drain_worker);t.start();assert ready.wait(5)\n");
+  }
   if(scenario=="transaction") {
     run("db=sqlite3.connect(root+'/profile/history.db');db.execute('CREATE TABLE history(v)');db.execute('INSERT INTO history VALUES(7)')\n");shouldBlock=true;
   }
@@ -199,12 +227,22 @@ int main(int argc,char** argv){
     assert(attributed);
   }
 #endif
+  const bool phaseTwo=ioCase && scenario!="buffered-finalize";
+  if(phaseTwo)assert(InfinityScriptPersistence::CloseParticipantWrites(71));
+  if(scenario=="clean-io-late-write")run("try:buffer.write('BAD')\nexcept PermissionError:pass\nelse:raise AssertionError('new payload admitted after clean flush')\n");
+  if(scenario=="clean-io-override" || scenario=="clean-io-retarget") {
+    run("try:buffer.close()\nexcept PermissionError:pass\nelse:raise AssertionError('unverified close escaped')\n");
+    if(scenario=="clean-io-override")run("del buffer._infinity_handle.close\n");
+    else {assert(::dup2(savedDescriptor,targetDescriptor)==targetDescriptor);::close(savedDescriptor);::close(retargetDescriptor);}
+  }
+  if(scenario=="child-drain")run("go.set();t.join(5);assert not t.is_alive() and not worker_errors,worker_errors\n");
+  if((scenario=="buffered" || ioCase) && scenario!="buffered-finalize")run("buffer.flush();buffer.close()\n");
   if(scenario=="late")run(
     "try:f.write('late mutation')\nexcept PermissionError:pass\nelse:raise AssertionError('late write admitted')\n");
   run("f.close()\n");
   InfinityPythonPersistence::Finish(context,owner);
   if(context->finalized) InfinityScriptPersistence::Retired(101);
-  assert(InfinityScriptPersistence::CloseParticipantWrites(71));
+  if(!phaseTwo)assert(InfinityScriptPersistence::CloseParticipantWrites(71));
   bool authorized=InfinityScriptPersistence::SealEssentialWrites(71);
   if(authorized==shouldBlock){
 #if defined(INFINITY_UNIVERSAL_CANDIDATE)

@@ -52,7 +52,7 @@ thread, interpreter/admission identity and current checkpoint generation.
 
 ## Verification status
 
-Local production-source host execution: 98 new/control/cycle cases and 47 retained
+Local production-source host execution: 143 new/control/cycle cases and 47 retained
 native/SQLite regressions passed. The buffer conversion and File write loop are
 extracted from the exact production sources; only their host POSIX backend and
 native type harness are adapters. The actual observer, native hooks and ledger
@@ -65,7 +65,20 @@ reopen and synthetic resume/watched/settings sentinels are NOT device Resume Hub
 provider-functionality acceptance. Test-only process exit is not Android termination
 or interpreter-retirement evidence.
 
-Pending: full ARM64 compilation, permanent signing/member verification, actual
-Android 17 whole-engine tests, real-provider integration, and physical Fold
+RC1 compiled and passed permanent signing/member verification. Android 17 proved
+native VFS rejection semantics and correct pending-transaction/opaque-writer
+blocking, but the safe control failed: successful buffer flush erased permission
+for the subsequent close. The expanded host cases reproduce that error.
+
+RC2 keeps weak, interpreter-owned native handle evidence after successful opens
+and flushes. Clean close/flush is classified nonpersistent only with unchanged
+native/observer method contracts, descriptor identity/flags, a live weak reference
+and no pending buffer in its actual I/O chain. It never grants a callback new
+payload-write permission. Overrides, retargeted descriptors, dirty buffers and
+unknown handles remain protected. Explicit closes, layered/cached buffers, phase-2
+worker draining and negative controls pass with the 47 retained regressions.
+
+Pending for RC2: full ARM64 compilation, permanent signing/member verification,
+actual Android 17 whole-engine tests, real-provider integration, and physical Fold
 Close/reopen/data-preservation acceptance. Final lock remains false. No permanent
 resolution claim is permitted without the physical evidence.

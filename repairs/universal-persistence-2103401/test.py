@@ -15,7 +15,9 @@ PROVIDERS = ('plugin.video.thecrew', 'plugin.video.umbrella', 'plugin.video.sere
 CASES = ('normal', 'invalid', 'partial', 'foreign', 'subclass', 'buffered',
          'transaction', 'sqlite', 'namespace', 'child-thread', 'late',
          'pending-native', 'opaque', 'namespace-unobserved', 'namespace-recreated',
-         'namespace-symlink', 'namespace-fsync', 'profile-transaction')
+         'namespace-symlink', 'namespace-fsync', 'profile-transaction',
+         'buffered-finalize','buffered-phase2','child-drain','clean-io-late-write',
+         'clean-io-override','clean-io-retarget','empty-io-close','layered-drain','cached-drain')
 
 
 def readback(root, case):
@@ -23,9 +25,14 @@ def readback(root, case):
     profile = root/'profile'
     expected = {'normal': b'textbytesarray', 'partial': b'ab'}
     preserved = {'invalid', 'buffered', 'transaction', 'sqlite', 'namespace', 'child-thread', 'late'}
+    io_cases={'buffered-finalize','buffered-phase2','child-drain','clean-io-late-write','clean-io-override','clean-io-retarget','empty-io-close','layered-drain','cached-drain'}
+    preserved |= io_cases
     data = (profile/'provider-settings.json').read_bytes()
     assert data == expected.get(case, b'preserved' if case in preserved else b''), (case, data)
-    if case == 'buffered': assert (profile/'resume.json').read_bytes() == b'resume preserved'
+    if case=='buffered' or case in io_cases:
+        assert (profile/'resume.json').read_bytes()==(b'' if case=='empty-io-close' else b'resume preserved')
+    if case=='child-drain':assert (profile/'worker').read_bytes()==b'worker state'
+    if case=='clean-io-retarget':assert (profile/'retarget-target').read_bytes()==b'sentinel'
     if case == 'namespace': assert (profile/'state').read_bytes() == b'state'
     if case == 'child-thread': assert (profile/'child').read_bytes() == b'owned'
     if case in ('foreign', 'subclass'): assert (profile/case).read_bytes() == b'changed'
