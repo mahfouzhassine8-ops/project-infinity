@@ -62,11 +62,13 @@ final class InfinityCheckpointReceipt {
     try{
       File parent=supplied.getAbsoluteFile().getParentFile().getCanonicalFile();
       File target=new File(parent,supplied.getName());
+      StructStat parentBefore=stat(parent);
+      require(parentBefore!=null&&OsConstants.S_ISDIR(parentBefore.st_mode),"parent is not a directory");
       StructStat existing=stat(target);if(existing!=null)regular(existing);
       noLegacyBackup(target);
       File stage=new File(parent,".infinity-checkpoint-receipt-"+UUID.randomUUID()+".pending");
       StructStat identity=null;boolean renamed=false;
-      try(Descriptor directory=new Descriptor(parent.getPath(),OsConstants.O_RDONLY|OsConstants.O_DIRECTORY|OsConstants.O_NOFOLLOW|OsConstants.O_CLOEXEC,0)){
+      try(Descriptor directory=new Descriptor(parent.getPath(),OsConstants.O_RDONLY|OsConstants.O_NONBLOCK|OsConstants.O_NOFOLLOW|OsConstants.O_CLOEXEC,0)){
         StructStat directoryIdentity;
         try{directoryIdentity=Os.fstat(directory.value);}catch(ErrnoException error){throw io("directory identity",error);}
         require(OsConstants.S_ISDIR(directoryIdentity.st_mode)&&directoryIdentity.st_uid==Os.getuid()&&same(directoryIdentity,stat(parent)),"parent identity unverified");
@@ -99,7 +101,7 @@ final class InfinityCheckpointReceipt {
           // A post-rename failure may have changed the receipt; retain failure.
           // Remove only our proven unchanged stage, never a replacement inode.
           if(!renamed&&identity!=null)try{
-            if(same(directoryIdentity,stat(parent))&&same(identity,stat(stage)))Os.unlink(stage.getPath());
+            if(same(directoryIdentity,stat(parent))&&same(identity,stat(stage)))Os.remove(stage.getPath());
           }catch(IOException|ErrnoException cleanup){failure.addSuppressed(cleanup);}
           throw failure;
         }

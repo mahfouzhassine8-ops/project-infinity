@@ -57,7 +57,7 @@ public final class ReceiptRaceProbe {
       check(backup.isFile()&&backup.length()==6,"legacy recovery evidence changed");check(backup.delete(),"test backup cleanup");
       check(committed.equals(read.invoke(null,root).toString()),"legacy failure changed receipt");
       check(receipt.renameTo(foreign),"test fixture move");android.system.Os.symlink(foreign.getPath(),receipt.getPath());
-      expectFailure(atomic,receipt,new JSONObject());negative++;android.system.Os.unlink(receipt.getPath());
+      expectFailure(atomic,receipt,new JSONObject());negative++;android.system.Os.remove(receipt.getPath());
       check(foreign.renameTo(receipt),"test fixture restore");check(committed.equals(read.invoke(null,root).toString()),"symlink failure changed target");
       File badParent=new File(root,"not-a-directory");check(badParent.createNewFile(),"negative parent fixture");
       expectFailure(atomic,new File(badParent,receipt.getName()),new JSONObject());negative++;
