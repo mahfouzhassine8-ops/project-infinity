@@ -123,6 +123,9 @@ class Corrective100(unittest.TestCase):
    self.assertFalse(e.verified_source(entry,original,lambda _:None))
    if media=='tv':
     self.assertEqual(identity['scope'],'show_episode');self.assertFalse(e.verified_source(entry,original.replace('episode=3','episode=4'),verify))
+ def test_unrelated_provider_source_memory_contract_preserved(self):
+  self.hub();e=self.experience();entry=dict(media='movie',source='plugin://plugin.video.unrelated/?action=existing_play&id=4')
+  self.assertEqual(e.verified_source(entry,entry['source']),e.stable_route(entry['source']))
  def test_recovery_legacy_unknown_episode_scope_not_upgraded(self):
   hub=self.hub();e=self.experience();entry=dict(media='tv',identity=hub.media_identity('tv',{'tmdb':'123'},2,3),season=2,episode=3)
   self.assertFalse(e.verified_source(entry,route('tv'),lambda _:dict(scope='show_episode')))

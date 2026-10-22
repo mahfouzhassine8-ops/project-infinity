@@ -127,6 +127,13 @@ def verified_source(entry, route, verify=None):
         return ''
     if not route.startswith('plugin://'):
         return stable_route(route)
+    # Existing source-memory contracts for other providers are outside this
+    # corrective scope. Their original validated-route behavior is preserved.
+    try:
+        if urlsplit(route).netloc not in ('plugin.video.umbrella', 'plugin.video.pov'):
+            return stable_route(route)
+    except ValueError:
+        return ''
     identity = hub.entry_identity(entry)
     if not identity:
         return ''
@@ -253,6 +260,19 @@ class ExperienceController:
         # The actual resolved CFileItem supplies this route. Home focus, title
         # similarity and elapsed time cannot prove a movie or episode identity.
         route = verified_source(item, item.get('stable_source') or item.get('source', ''))
+        # Retain the original source-memory fallback for unrelated providers.
+        # Reviewed Umbrella/POV routes require the native capture above.
+        if not item.get('stable_source') and self.origin and time.monotonic() - self.origin['at'] < 20:
+            origin_route = self.origin['route']
+            origin_host = urlsplit(origin_route).netloc if origin_route else ''
+            if origin_host not in ('plugin.video.umbrella', 'plugin.video.pov'):
+                title = item.get('showtitle') or item.get('title') or ''
+                matched = title.casefold() == self.origin['title'].casefold()
+                if matched and item.get('media') == 'tv':
+                    matched = (str(item.get('season')) == self.origin['season'] and
+                               str(item.get('episode')) == self.origin['episode'])
+                if matched:
+                    route = origin_route or route
         if route and self.api['bool']('source_memory_enabled', True):
             self.save_source(item['key'], route)
             item['stable_source'] = route
