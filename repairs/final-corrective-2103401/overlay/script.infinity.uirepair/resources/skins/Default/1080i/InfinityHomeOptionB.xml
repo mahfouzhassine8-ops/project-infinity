@@ -1,0 +1,94 @@
+<?xml version='1.0' encoding='utf-8'?>
+<window type="dialog">
+  <defaultcontrol always="true">101</defaultcontrol>
+  <animation effect="fade" start="0" end="100" time="170" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowOpen</animation>
+  <animation effect="fade" start="100" end="0" time="140" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowClose</animation>
+  <controls>
+    
+    <control type="button" id="2">
+      <left>0</left><top>0</top><width>100%</width><height>100%</height><label />
+      <texturefocus colordiffuse="99000000">infinity_ui/contract_white.png</texturefocus>
+      <texturenofocus colordiffuse="99000000">infinity_ui/contract_white.png</texturenofocus>
+    </control>
+    <control type="group" id="100">
+      <width max="920">88%</width><height max="580">74%</height>
+      <control type="image" id="110">
+        <left>0</left><top>0</top><width>100%</width><height>100%</height>
+        <texture border="24" colordiffuse="$VAR[InfinityLegacySurface]">infinity_glass/surface.png</texture>
+      </control>
+      <control type="image" id="111">
+        <left>0</left><top>0</top><width>100%</width><height>100%</height>
+        <texture border="24" colordiffuse="$VAR[InfinityLegacyBorder]">infinity_glass/rim.png</texture>
+      </control>
+      <control type="image" id="112">
+        <left>28</left><top>91</top><width>228</width><height>354</height><aspectratio>keep</aspectratio>
+        <texture fallback="DefaultVideo.png">$INFO[Window.Property(Infinity.HomeOptionB.Poster)]</texture>
+      </control>
+      <control type="label" id="120">
+        <left>288</left><top>87</top><height>64</height>
+        <font>InfinityOptionBTitle</font><textcolor>$VAR[InfinityLegacyText]</textcolor>
+        <aligny>center</aligny><scroll>true</scroll>
+        <label>$INFO[Window.Property(Infinity.HomeOptionB.Title)]$INFO[Window.Property(Infinity.HomeOptionB.YearAndEpisode), (,)]</label>
+      </control>
+      <control type="button" id="9">
+        <top>16</top><width>72</width><height>72</height><label />
+        <texturefocus colordiffuse="$VAR[InfinityLegacyField]" border="16">infinity_glass/field.png</texturefocus>
+        <texturenofocus colordiffuse="$VAR[InfinityLegacyField]" border="16">infinity_glass/field.png</texturenofocus>
+        <onleft>104</onleft><onright>101</onright><onup>104</onup><ondown>101</ondown>
+      <font>InfinityBodyBold</font><align>center</align><aligny>center</aligny><textcolor>$VAR[InfinityLegacyText]</textcolor></control>
+      <control type="image" id="201"><visible>!String.IsEmpty(Window.Property(Infinity.HomeOptionB.YearAndEpisode))</visible><texture border="8" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texture></control><control type="image" id="211"><visible>!String.IsEmpty(Window.Property(Infinity.HomeOptionB.YearAndEpisode))</visible><texture border="8" colordiffuse="$VAR[InfinityLegacyBorder]">infinity_glass/rim.png</texture></control><control type="label" id="121">
+        <left>288</left><top>153</top><height>40</height>
+        <font>InfinityOptionBMeta</font><textcolor>$VAR[InfinityLegacyText]</textcolor><aligny>center</aligny>
+        <label>$INFO[Window.Property(Infinity.HomeOptionB.YearAndEpisode)]</label>
+      <align>center</align></control>
+      
+      <control type="image" id="202"><visible>!String.IsEmpty(Window.Property(Infinity.HomeOptionB.Certification))</visible><texture border="8" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texture></control><control type="image" id="212"><visible>!String.IsEmpty(Window.Property(Infinity.HomeOptionB.Certification))</visible><texture border="8" colordiffuse="$VAR[InfinityLegacyBorder]">infinity_glass/rim.png</texture></control><control type="label" id="122"><left>288</left><top>203</top><width>95</width><height>34</height>
+        <font>InfinityOptionBMeta</font><textcolor>$VAR[InfinityLegacyText]</textcolor>
+        <label>$INFO[Window.Property(Infinity.HomeOptionB.Certification)]</label><align>center</align></control>
+      <control type="image" id="203"><visible>!String.IsEmpty(Window.Property(Infinity.HomeOptionB.Runtime))</visible><texture border="8" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texture></control><control type="image" id="213"><visible>!String.IsEmpty(Window.Property(Infinity.HomeOptionB.Runtime))</visible><texture border="8" colordiffuse="$VAR[InfinityLegacyBorder]">infinity_glass/rim.png</texture></control><control type="label" id="123"><left>385</left><top>203</top><width>110</width><height>34</height>
+        <font>InfinityOptionBMeta</font><textcolor>$VAR[InfinityLegacyText]</textcolor>
+        <label>$INFO[Window.Property(Infinity.HomeOptionB.Runtime)]</label><align>center</align></control>
+      <control type="image" id="204"><visible>!String.IsEmpty(Window.Property(Infinity.HomeOptionB.Rating))</visible><texture border="8" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texture></control><control type="image" id="214"><visible>!String.IsEmpty(Window.Property(Infinity.HomeOptionB.Rating))</visible><texture border="8" colordiffuse="$VAR[InfinityLegacyBorder]">infinity_glass/rim.png</texture></control><control type="label" id="124"><left>498</left><top>203</top><width>110</width><height>34</height>
+        <font>InfinityOptionBMeta</font><textcolor>$VAR[InfinityLegacyText]</textcolor>
+        <label>$INFO[Window.Property(Infinity.HomeOptionB.Rating)]</label><align>center</align></control>
+      <control type="image" id="205"><visible>!String.IsEmpty(Window.Property(Infinity.HomeOptionB.Genres))</visible><texture border="8" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texture></control><control type="image" id="215"><visible>!String.IsEmpty(Window.Property(Infinity.HomeOptionB.Genres))</visible><texture border="8" colordiffuse="$VAR[InfinityLegacyBorder]">infinity_glass/rim.png</texture></control><control type="textbox" id="125"><left>288</left><top>248</top><height>58</height>
+        <font>InfinityOptionBMeta</font><textcolor>$VAR[InfinityLegacyText]</textcolor>
+        <label>$INFO[Window.Property(Infinity.HomeOptionB.Genres)]</label><align>center</align></control>
+      <control type="textbox" id="126"><left>288</left><top>318</top><font>InfinityOptionBText</font><textcolor>$VAR[InfinityLegacyText]</textcolor>
+        <label>$INFO[Window.Property(Infinity.HomeOptionB.Synopsis)]</label><onup>9</onup><ondown>104</ondown><onright>104</onright><autoscroll>0</autoscroll><pagecontrol>128</pagecontrol></control>
+      
+      <control type="button" id="101">
+        <left>24</left><width>207</width><height>74</height>
+        <label>    Play</label><font>InfinityOptionBAction</font><align>center</align><aligny>center</aligny>
+        <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/field.png</texturefocus>
+        <texturenofocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/field.png</texturenofocus>
+        <textcolor>$VAR[InfinityOptionBPrimaryInk]</textcolor><onleft>104</onleft><onright>102</onright><onup>9</onup>
+        <enable>String.IsEqual(Window.Property(Infinity.HomeOptionB.PlayAvailable),true)</enable>
+      <focusedcolor>$VAR[InfinityOptionBPrimaryInk]</focusedcolor></control>
+      <control type="button" id="102">
+        <left>245</left><width>207</width><height>74</height>
+        <label>    Trailer</label><font>InfinityOptionBAction</font><align>center</align><aligny>center</aligny>
+        <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+        <texturenofocus border="16" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+        <textcolor>$VAR[InfinityLegacyText]</textcolor><onleft>101</onleft><onright>103</onright><onup>9</onup>
+        <enable>String.IsEqual(Window.Property(Infinity.HomeOptionB.TrailerAvailable),true)</enable>
+      </control>
+      <control type="button" id="103">
+        <left>466</left><width>207</width><height>74</height>
+        <label>    Favorite</label><font>InfinityOptionBAction</font><align>center</align><aligny>center</aligny>
+        <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+        <texturenofocus border="16" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+        <textcolor>$VAR[InfinityLegacyText]</textcolor><onleft>102</onleft><onright>104</onright><onup>9</onup>
+        <enable>String.IsEqual(Window.Property(Infinity.HomeOptionB.FavoriteAvailable),true)</enable>
+      </control>
+      <control type="button" id="104">
+        <left>687</left><width>207</width><height>74</height>
+        <label>    More Info</label><font>InfinityOptionBAction</font><align>center</align><aligny>center</aligny>
+        <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+        <texturenofocus border="16" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+        <textcolor>$VAR[InfinityLegacyText]</textcolor><onleft>103</onleft><onright>101</onright><onup>9</onup>
+        <enable>String.IsEqual(Window.Property(Infinity.HomeOptionB.InfoAvailable),true)</enable>
+      </control>
+    <control type="image" id="113"><aspectratio>keep</aspectratio><texture colordiffuse="$VAR[InfinityLegacyText]">infinity_ui/icons/close.png</texture></control><control type="group" id="127"><width>32</width><height>1000</height><control type="scrollbar" id="128"><left>0</left><top>0</top><width>32</width><height>1000</height><visible>String.IsEqual(Window.Property(Infinity.HomeOptionB.Expanded),true)</visible><showonepage>true</showonepage><onleft>104</onleft><onright>104</onright><onup>128</onup><ondown>128</ondown><texturesliderbackground border="6" colordiffuse="$VAR[InfinityLegacyField]">infinity_legacy/track.png</texturesliderbackground><texturesliderbar border="6" colordiffuse="$VAR[InfinityLegacyTrack]">infinity_legacy/track.png</texturesliderbar><texturesliderbarfocus border="6" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_legacy/track.png</texturesliderbarfocus></control></control><control type="image" id="151"><visible>!String.IsEqual(Window.Property(Infinity.HomeOptionB.Expanded),true)</visible><aspectratio>keep</aspectratio><texture colordiffuse="$VAR[InfinityOptionBPrimaryInk]">infinity_ui/icons/play.png</texture></control><control type="image" id="152"><visible>!String.IsEqual(Window.Property(Infinity.HomeOptionB.Expanded),true)</visible><aspectratio>keep</aspectratio><texture colordiffuse="$VAR[InfinityLegacyText]">infinity_ui/icons/movie.png</texture></control><control type="image" id="153"><visible>!String.IsEqual(Window.Property(Infinity.HomeOptionB.Expanded),true)</visible><aspectratio>keep</aspectratio><texture colordiffuse="$VAR[InfinityLegacyText]">infinity_ui/icons/favourite.png</texture></control><control type="image" id="154"><visible>!String.IsEqual(Window.Property(Infinity.HomeOptionB.Expanded),true)</visible><aspectratio>keep</aspectratio><texture colordiffuse="$VAR[InfinityLegacyText]">infinity_ui/icons/info.png</texture></control></control>
+  </controls>
+</window>
