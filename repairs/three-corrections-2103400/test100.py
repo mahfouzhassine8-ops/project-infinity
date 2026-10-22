@@ -139,6 +139,12 @@ class Corrective100(unittest.TestCase):
    self.assertEqual(e.verified_source(entry,route,verify),route)
    for bad in (route.replace('tmdb_id=123','tmdb_id=999'),route.replace('play_media','mark_as_watched_unwatched_episode'),route+'&tmdb_id=999'):
     self.assertFalse(e.verified_source(entry,bad,verify))
+ def test_watchlist_show_and_season_navigation_preserved(self):
+  hub=self.hub();e=self.experience()
+  for kind in ('tvshow','season'):
+   entry=dict(media='tv',identity=hub.show_identity(kind,{'tmdb':'123'},2),season=2)
+   for route in ('plugin://plugin.video.umbrella/?action=seasons&tmdb=123','plugin://plugin.video.pov/?mode=build_season_list&tmdb_id=123'):
+    self.assertEqual(e.verified_source(entry,route),route)
  def test_current_producer_version_and_file_proofs_fail_closed(self):
   e=self.experience()
   self.assertEqual(self.before[c.WB+'/PROVIDER-CONTRACTS.json'],self.after[c.WB+'/PROVIDER-CONTRACTS.json'])

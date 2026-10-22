@@ -153,6 +153,10 @@ def verified_source(entry, route, verify=None):
     identity = hub.entry_identity(entry)
     if not identity:
         return ''
+    if identity.get('kind') in ('tvshow', 'season'):
+        # Existing Watchlist/Collection directory navigation is not expired
+        # movie/episode playback recovery. Preserve its original saved route.
+        return stable_route(route)
     proof = source_identity(route, entry.get('media'), identity['ids'], entry.get('season'), entry.get('episode'), verify)
     return route if hub.same_identity(identity, proof) else ''
 
