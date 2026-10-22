@@ -415,11 +415,10 @@
      const int writer = m_context ? m_context->id : -1;
      // Unbuffered close changes descriptor identity, not file contents. Do not
      // invent dirty files merely because a read-only module file was closed.
-@@ -282,6 +418,14 @@
-       auto* value = args.At(1,"operation");
+@@ -283,8 +419,17 @@
        if (value && PyLong_Check(value)) m_lockOperation = static_cast<int>(PyLong_AsLong(value));
        if (m_lockOperation & LOCK_UN) m_paths = {Ledger::NonPersistentTarget()};
-+    }
+     }
 +    std::string unresolved;
 +    if (kind>=RAW_WRITE && !Ledger::VerifiedBufferNamespaceTransition(
 +        writer,m_key,m_descriptor,m_paths,unresolved)) {
@@ -427,10 +426,15 @@
 +          "operation="+std::string(Specs()[kind].original.ml_name)+";target="+unresolved.substr(0,768));
 +      InfinityPythonPersistence::AdmissionDenied(m_context,"Infinity dirty buffer namespace is unverified");
 +      return;
-     }
++    }
      if (std::find(m_paths.begin(), m_paths.end(), "") != m_paths.end()) m_paths.clear();
-     m_token = Ledger::BeginProtectedOperation(writer, m_paths, Specs()[kind].original.ml_name, false, false, m_descriptor);
-@@ -307,7 +451,7 @@
+-    m_token = Ledger::BeginProtectedOperation(writer, m_paths, Specs()[kind].original.ml_name, false, false, m_descriptor);
++    m_token = Ledger::BeginProtectedOperation(writer, m_paths, Specs()[kind].original.ml_name, false, false, m_descriptor,
++        kind==EXTENSION_CREATE ? Ledger::NamespaceEffect::OBSERVED_CHILDREN : Ledger::NamespaceEffect::MAY_MUTATE);
+     m_allowed = m_token != 0;
+     if (!m_allowed) { InfinityPythonPersistence::AdmissionDenied(m_context, "Infinity protected write admission is closed"); return; }
+     m_previousOwner = Ledger::protectedWriteOwner;
+@@ -307,7 +452,7 @@
        if (target && PyLong_Check(target)) Ledger::InvalidateDescriptor(static_cast<int>(PyLong_AsLong(target)));
      }
      if (kind == BUFFER_WRITE || kind == BUFFER_TRUNCATE || kind == TEXT_WRITE || kind == TEXT_TRUNCATE)
@@ -439,7 +443,7 @@
    }
    ~Call()
    {
-@@ -347,6 +491,10 @@
+@@ -347,6 +492,10 @@
      }
      if (result && (m_kind == OS_RENAME || m_kind == OS_REPLACE || m_kind == OS_DUP2) && m_paths.size() == 2)
        Ledger::RememberAlias(m_paths[0], m_paths[1]);
@@ -450,7 +454,7 @@
      if (result && m_kind == EXTENSION_CREATE && !ProtectNativeModule(result))
      {
        Ledger::ProtectionFailure("bundled_native_encoder_write_adapter_missing");
-@@ -357,11 +505,15 @@
+@@ -357,11 +506,15 @@
      if (result && m_token && (m_kind == BUFFER_FLUSH || m_kind == BUFFER_CLOSE ||
                                m_kind == TEXT_FLUSH || m_kind == TEXT_CLOSE))
        Ledger::SetProtectedBuffer(m_context ? m_context->id : -1, m_key, m_paths, false);
@@ -466,7 +470,17 @@
    uint64_t m_token{0};
    uint64_t m_previousToken{0};
    bool m_allowed{false};
-@@ -572,7 +724,9 @@
+@@ -412,7 +565,8 @@
+   // Hold the existing ledger while validating and converting a child launch.
+   // A concurrent Close cannot seal between admission and binding its actual
+   // child output leases, even when command validation itself has not finished.
+-  Ledger::ProtectedOperation preparing(writer,{},"native_child_contract_preparation");
++  Ledger::ProtectedOperation preparing(writer,{},"native_child_contract_preparation",false,false,-1,
++      Ledger::NamespaceEffect::OBSERVED_CHILDREN);
+   if (!preparing)
+   { InfinityPythonPersistence::AdmissionDenied(context,"Child preparation crosses protected write barrier"); return nullptr; }
+   std::string detail="readonly_child_scope_absent";
+@@ -572,7 +726,9 @@
    for (Py_ssize_t i = 0; i < PyTuple_GET_SIZE(tuple); ++i) values.push_back(PyTuple_GET_ITEM(tuple, i));
    Call call(IO_OPEN, self, {values.data(), static_cast<Py_ssize_t>(values.size()), nullptr, dictionary});
    if (!call) return -1;
@@ -504,10 +518,32 @@
    return false;
  }
  inline bool OptionalPathLocked(const WriteProtection& p, const std::string& raw)
-@@ -207,6 +195,23 @@
+@@ -170,12 +158,14 @@
+ 
+ inline uint64_t BeginProtectedOperation(int id, const std::vector<std::string>& paths,
+                                        const std::string& operation, bool nativeSave = false,
+-                                       bool existingTransaction = false, int descriptor = -1)
++                                       bool existingTransaction = false, int descriptor = -1,
++                                       NamespaceEffect effect = NamespaceEffect::MAY_MUTATE)
+ {
+   auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex);
+   auto& p = s.protection;
+   ProtectedResource resource{id, paths, operation};
+   resource.descriptor = descriptor;
++  resource.namespaceEffect = effect;
+   bool bufferDrain = false;
+   const bool flushing = operation == "flush" || operation == "close" ||
+       (operation.size() >= 6 && operation.compare(operation.size()-6, 6, ".flush") == 0) ||
+@@ -206,6 +196,29 @@
+     ProtectionFailureLocked(p, "protected_operation_inventory_exhausted");
      // Never silently grant an untracked mutation, even while running.
      errno = ENOSPC; return 0;
-   }
++  }
++  // Coordination barriers retain admission and pending-owner protection.
++  // Their actual effects are observed by nested native leases and audit
++  // contracts; the barrier itself cannot invalidate a removed name.
++  // Unclassified operations still use MAY_MUTATE and fail closed.
++  if (effect == NamespaceEffect::MAY_MUTATE) {
 +  // Any later admitted operation that overlaps a removed name revokes
 +  // its earlier absence evidence, even when the new operation fails.
 +  if (paths.empty()) p.removedNamespaces.clear();
@@ -525,13 +561,26 @@
 +      if (path.empty() || Within(path,*it) || (!removesParent && Within(*it,path))) it=p.removedNamespaces.erase(it);
 +      else ++it;
 +  }
+   }
    const auto token = ++p.nextOperation;
    p.operations.emplace(token, resource);
-   for (const auto& path : paths)
-@@ -346,6 +351,72 @@
+@@ -336,8 +349,9 @@
+ {
+ public:
+   ProtectedOperation(int writer, const std::vector<std::string>& paths, const char* operation,
+-                     bool nativeSave = false, bool existingTransaction = false, int descriptor = -1)
+-    : m_token(BeginProtectedOperation(writer, paths, operation, nativeSave, existingTransaction, descriptor)) {}
++                     bool nativeSave = false, bool existingTransaction = false, int descriptor = -1,
++                     NamespaceEffect effect = NamespaceEffect::MAY_MUTATE)
++    : m_token(BeginProtectedOperation(writer, paths, operation, nativeSave, existingTransaction, descriptor, effect)) {}
+   ~ProtectedOperation() { if (m_token) EndProtectedOperation(m_token); }
+   explicit operator bool() const { return m_token != 0; }
+   ProtectedOperation(const ProtectedOperation&) = delete;
+@@ -345,6 +359,72 @@
+ private:
    uint64_t m_token;
  };
- 
++
 +// A procfs " (deleted)" annotation is not itself namespace evidence. FUSE can
 +// retain it on a live descriptor whose original named file still has one link.
 +// Resolve it only by proving the live descriptor and a no-follow opened name
@@ -597,11 +646,10 @@
 +    {unresolved=previous;return false;}
 +  return true;
 +}
-+
+ 
  inline std::string DescriptorPath(int fd)
  {
-   struct stat st{};
-@@ -356,7 +427,7 @@
+@@ -356,7 +436,7 @@
    const auto name = "/proc/self/fd/" + std::to_string(fd);
    const auto size = ::readlink(name.c_str(), target, sizeof(target) - 1);
    if (size <= 0 || size >= static_cast<ssize_t>(sizeof(target) - 1)) return {};
@@ -610,7 +658,7 @@
  }
  inline void SetProtectedBuffer(int writer, const std::string& key,
                                 const std::vector<std::string>& paths, bool dirty)
-@@ -373,7 +444,8 @@
+@@ -373,7 +453,8 @@
    auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex); auto& p = s.protection;
    if (!active) { p.transactions.erase(key); return; }
    if (p.transactions.size() >= 65536) { ProtectionFailureLocked(p, "protected_transaction_inventory_exhausted"); return; }
@@ -620,7 +668,7 @@
  }
  inline bool HasProtectedTransaction(const std::string& path)
  {
-@@ -416,6 +488,19 @@
+@@ -416,6 +497,19 @@
    bool durable{false};
    std::vector<std::string> blockers;
  };
@@ -640,7 +688,7 @@
  inline EssentialWriteProof EssentialWritesLocked(State& s)
  {
    RefreshProtectedChildrenLocked(s);
-@@ -475,11 +560,11 @@
+@@ -475,11 +569,11 @@
    }
    if (s.blockingOverflow) proof.blockers.push_back("protected_writer_failure_inventory_overflow");
    for (const auto& entry : p.operations)
@@ -655,7 +703,7 @@
    return proof;
  }
  inline EssentialWriteProof EssentialWrites()
-@@ -598,8 +683,68 @@
+@@ -598,8 +692,72 @@
    return false;
  }
  
@@ -677,9 +725,13 @@
 +  if (operation != "rename" && operation != "replace" && operation != "remove" &&
 +      operation != "unlink" && operation != "rmdir") return;
 +  for (const auto& live : state.protection.operations)
-+    if (live.second.thread != found->second.thread)
++    if (live.second.thread != found->second.thread &&
++        live.second.namespaceEffect == NamespaceEffect::MAY_MUTATE)
++    {
++      if (live.second.paths.empty()) return;
 +      for (const auto& target : live.second.paths)
 +        if (target.empty() || Within(target,path) || Within(path,target)) return;
++    }
 +  if (state.protection.removedNamespaces.size() >= 65536)
 +  { ProtectionFailureLocked(state.protection,"removed_namespace_inventory_exhausted"); return; }
 +  state.protection.removedNamespaces.insert(path);
@@ -725,7 +777,7 @@
  {
    struct stat st{};
    if (::lstat(path.c_str(), &st) == 0)
-@@ -636,7 +781,8 @@
+@@ -636,7 +794,8 @@
      // A vanished UUID staging parent is not a vanished essential database.
      // Fsync its surviving staging ancestor only when the installer path
      // exactly matches a verified profile-bound UUID scratch hierarchy.
@@ -735,7 +787,7 @@
    }
    int rc; do { rc = ::fsync(fd); } while (rc < 0 && errno == EINTR);
    const int closed = ::close(fd);
-@@ -645,12 +791,14 @@
+@@ -645,12 +804,14 @@
  inline bool SealEssentialWrites(uint64_t generation)
  {
    std::vector<std::string> paths, profiles;
@@ -750,7 +802,7 @@
      profiles = p.profiles; // Already canonical, captured under the admission mutex.
      for (const auto& path : p.paths)
        if (!OptionalPathLocked(p, path)) paths.push_back(path);
-@@ -658,7 +806,7 @@
+@@ -658,7 +819,7 @@
    for (const auto& path : paths)
    {
      const auto canonical = ProtectedCanonical(path);
@@ -761,7 +813,23 @@
    std::lock_guard<std::mutex> lock(s.mutex);
 --- a/xbmc/platform/android/activity/InfinityScriptPersistence.h
 +++ b/xbmc/platform/android/activity/InfinityScriptPersistence.h
-@@ -84,6 +84,7 @@
+@@ -60,6 +60,7 @@
+ };
+ // This is part of the existing persistence ledger. These are live resource
+ // obligations, independent of interpreter retirement and its diagnostic receipt.
++enum class NamespaceEffect { MAY_MUTATE, OBSERVED_CHILDREN };
+ struct ProtectedResource
+ {
+   int writer{-1};
+@@ -67,6 +68,7 @@
+   std::string operation;
+   std::thread::id thread{std::this_thread::get_id()};
+   int descriptor{-1};
++  NamespaceEffect namespaceEffect{NamespaceEffect::MAY_MUTATE};
+ };
+ struct WriteProtection
+ {
+@@ -84,6 +86,7 @@
    std::map<std::string, ProtectedResource> buffers, transactions;
    std::map<int, std::set<std::string>> writerPaths;
    std::set<std::string> paths;

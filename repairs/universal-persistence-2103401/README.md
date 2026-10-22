@@ -52,7 +52,7 @@ thread, interpreter/admission identity and current checkpoint generation.
 
 ## Verification status
 
-Local production-source host execution: 183 new/control/cycle cases and 47 retained
+Local production-source host execution: 213 new/control/cycle cases and 47 retained
 native/SQLite regressions passed. The buffer conversion and File write loop are
 extracted from the exact production sources; only their host POSIX backend and
 native type harness are adapters. The actual observer, native hooks and ledger
@@ -92,7 +92,29 @@ successful removal; an unverified loss of its namespace remains a named blocker.
 The added multi-interpreter, composite I/O, stale-descriptor and negative cases
 pass with all retained gates: 183 source-backed cases plus 47 native regressions.
 
-Pending for RC3: full ARM64 compilation, permanent signing/member verification,
+RC3 compiled and signed, with all five source inputs and exact APK-member deltas
+independently verified. Actual Android 17 drained both buffers, preserving the
+original TypeErrors as no-mutation failures. Pending SQLite and opaque-child
+controls were isolated and correctly blocked. The safe test then exposed a
+namespace durability failure. No RC3 safe Close/reopen pass is claimed.
+
+The combined host sequence reproduces that failure: importing a supported native
+module or preparing a supported child used an unknown-target coordination lease
+that erased earlier removal evidence. RC4 represents namespace effects separately
+from admission/pending ownership. Only the existing native import and child
+preparation barriers observe effects through their nested native leases and
+unchanged audit contracts. They retain all admission and pending-owner gates.
+Unknown operations, unknown concurrent writers and nested mutations still revoke
+or prevent absence proof. A live preparation barrier still prevents sealing.
+No new native-extension or subprocess allowlist entry is added.
+
+RC4 runs directory removal in the combined SQLite/child/buffer sequence and adds
+concurrent barrier, unknown-effect and real SQLITE_BUSY COMMIT/rollback controls.
+All 213 source-backed cases and 47 retained regressions pass locally. ADB startup
+handshake retry is limited to test infrastructure before installation; no Close
+acceptance check is relaxed.
+
+Pending for RC4: full ARM64 compilation, permanent signing/member verification,
 actual Android 17 whole-engine tests, real-provider integration, and physical Fold
 Close/reopen/data-preservation acceptance. Final lock remains false. No permanent
 resolution claim is permitted without the physical evidence.

@@ -7,6 +7,7 @@
 #include <cstdio>
 #include <filesystem>
 #include <iostream>
+#include <atomic>
 #include <sys/syscall.h>
 
 static std::string staleDescriptorOriginal, staleDescriptorActual;
@@ -142,8 +143,22 @@ int main(int argc,char** argv){
   PyDict_SetItemString(globals,"observer",context->observer);
   run("path=root+'/profile/provider-settings.json'\nf=xbmcvfs.File(path,'w')\n");
   bool shouldBlock=false;
+  std::atomic<bool> namespaceLeaseReady{false}, namespaceLeaseRelease{false};
+  std::thread namespaceWorker;
+  const bool namespaceBarrier=scenario=="namespace-barrier" || scenario=="namespace-concurrent-unknown" || scenario=="namespace-nested-mutation";
+#if defined(INFINITY_UNIVERSAL_CANDIDATE)
+  if(namespaceBarrier) {
+    namespaceWorker=std::thread([&] {
+      InfinityScriptPersistence::ProtectedOperation lease(202,{},"native-coordination-fixture",false,false,-1,
+          scenario=="namespace-concurrent-unknown" ? InfinityScriptPersistence::NamespaceEffect::MAY_MUTATE : InfinityScriptPersistence::NamespaceEffect::OBSERVED_CHILDREN);
+      assert(lease);namespaceLeaseReady=true;
+      while(!namespaceLeaseRelease)std::this_thread::yield();
+    });
+    while(!namespaceLeaseReady)std::this_thread::yield();
+  }
+#endif
   const bool descriptorCase=scenario.rfind("descriptor-",0)==0;
-  const bool ioCase=descriptorCase || scenario=="composite-drain" || scenario=="multi-interpreter-drain" || scenario=="buffered-finalize" || scenario=="buffered-phase2" ||
+  const bool ioCase=scenario.rfind("sqlite-busy-",0)==0 || descriptorCase || scenario=="composite-drain" || scenario=="multi-interpreter-drain" || scenario=="buffered-finalize" || scenario=="buffered-phase2" ||
       scenario=="child-drain" || scenario=="clean-io-late-write" || scenario=="clean-io-override" ||
       scenario=="clean-io-retarget" || scenario=="empty-io-close" || scenario=="layered-drain" || scenario=="cached-drain";
   int savedDescriptor=-1,retargetDescriptor=-1,targetDescriptor=-1;
@@ -188,9 +203,15 @@ int main(int argc,char** argv){
       } else if(scenario=="namespace-symlink") {
         assert(::symlink((root+"/cache").c_str(),(root+"/profile/gone").c_str())==0);
       } else if(scenario=="namespace-fsync") syncFailurePath=root+"/profile";
-      else return 25;
+      else if(!namespaceBarrier && scenario!="namespace-unknown-later")return 25;
     }
-    shouldBlock=true;
+    if(scenario=="namespace-unknown-later" || scenario=="namespace-nested-mutation") {
+      // Unknown effects revoke prior absence evidence even inside a known
+      // coordination barrier. No caller-supplied success claim repairs it.
+      InfinityScriptPersistence::ProtectedOperation unknown(101,{},"unknown-native-effect");
+      assert(unknown);
+    }
+    shouldBlock=scenario!="namespace-barrier";
   } else if(scenario=="profile-transaction") {
     PyDict_SetItemString(globals,"provider",PyUnicode_FromString(provider.c_str()));
     run("folder=root+'/profile/addon_data/'+provider\nos.makedirs(folder)\n"
@@ -228,7 +249,7 @@ int main(int argc,char** argv){
     "db=sqlite3.connect(root+'/profile/history.db');db.execute('PRAGMA journal_mode=WAL');db.execute('CREATE TABLE history(v)');db.execute('INSERT INTO history VALUES(7)');db.commit()\n"
     "try:db.execute('INSERT INTO missing VALUES(1)')\nexcept sqlite3.OperationalError:db.rollback()\n"
     "db.execute(\"ATTACH DATABASE ? AS extra\",(root+'/profile/watched.db',));db.execute('CREATE TABLE extra.watched(v)');db.execute('INSERT INTO extra.watched VALUES(8)');db.commit();db.close()\n");
-  if(scenario=="namespace")run(
+  if(scenario=="namespace" || scenario=="composite-drain")run(
     "os.mkdir(root+'/profile/newdir')\nwith open(root+'/profile/newdir/tmp','w') as out:out.write('state')\n"
     "os.replace(root+'/profile/newdir/tmp',root+'/profile/newdir/final')\n"
     "os.rename(root+'/profile/newdir/final',root+'/profile/state')\nos.rmdir(root+'/profile/newdir')\n");
@@ -268,6 +289,15 @@ int main(int argc,char** argv){
     assert(auxiliaryContext->finalized);InfinityScriptPersistence::Retired(90);
     Py_EndInterpreter(auxiliary);PyThreadState_Swap(owner);
   }
+  if(scenario.rfind("sqlite-busy-",0)==0) {
+    run("writer=sqlite3.connect(root+'/profile/commit.db',timeout=.05)\n"
+        "writer.execute('PRAGMA journal_mode=DELETE');writer.execute('CREATE TABLE history(v)');writer.execute('INSERT INTO history VALUES(1)');writer.commit()\n"
+        "reader=sqlite3.connect(root+'/profile/commit.db',timeout=.05);reader.execute('BEGIN');assert reader.execute('SELECT v FROM history').fetchall()==[(1,)]\n"
+        "writer.execute('INSERT INTO history VALUES(7)')\n"
+        "try:writer.commit()\nexcept sqlite3.OperationalError as error:assert error.sqlite_errorcode & 255 == sqlite3.SQLITE_BUSY and writer.in_transaction\nelse:raise AssertionError('COMMIT did not encounter the real reader lock')\n");
+    shouldBlock=scenario=="sqlite-busy-pending";
+    if(!shouldBlock)run("reader.rollback();reader.close();writer.rollback();assert not writer.in_transaction;writer.close()\n");
+  }
   if(baseline)run("f.close()\n");
   assert(InfinityScriptPersistence::BeginWriteProtection(71,{root+"/profile"},{root+"/cache"}));
 #if defined(INFINITY_UNIVERSAL_CANDIDATE)
@@ -300,6 +330,10 @@ int main(int argc,char** argv){
   InfinityPythonPersistence::Finish(context,owner);
   if(context->finalized) InfinityScriptPersistence::Retired(101);
   if(!phaseTwo)assert(InfinityScriptPersistence::CloseParticipantWrites(71));
+  if(namespaceBarrier) {
+    assert(!InfinityScriptPersistence::SealEssentialWrites(71));
+    namespaceLeaseRelease=true;namespaceWorker.join();
+  }
   bool authorized=InfinityScriptPersistence::SealEssentialWrites(71);
   if(authorized==shouldBlock){
 #if defined(INFINITY_UNIVERSAL_CANDIDATE)

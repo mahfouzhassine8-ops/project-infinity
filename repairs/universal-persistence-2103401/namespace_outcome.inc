@@ -16,9 +16,13 @@ inline void RecordRemovedNamespace(uint64_t token, const std::string& raw)
   if (operation != "rename" && operation != "replace" && operation != "remove" &&
       operation != "unlink" && operation != "rmdir") return;
   for (const auto& live : state.protection.operations)
-    if (live.second.thread != found->second.thread)
+    if (live.second.thread != found->second.thread &&
+        live.second.namespaceEffect == NamespaceEffect::MAY_MUTATE)
+    {
+      if (live.second.paths.empty()) return;
       for (const auto& target : live.second.paths)
         if (target.empty() || Within(target,path) || Within(path,target)) return;
+    }
   if (state.protection.removedNamespaces.size() >= 65536)
   { ProtectionFailureLocked(state.protection,"removed_namespace_inventory_exhausted"); return; }
   state.protection.removedNamespaces.insert(path);

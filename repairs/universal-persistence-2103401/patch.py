@@ -105,7 +105,22 @@ def patches(before):
         '            return self.observer.native_vfs_write(self._infinity_handle, value)\n')
     ledger = once(before[LEDGER].decode(), '  std::set<std::string> paths;\n',
         '  std::set<std::string> paths;\n  std::set<std::string> removedNamespaces;\n')
+    ledger = once(ledger, 'struct ProtectedResource\n{',
+        'enum class NamespaceEffect { MAY_MUTATE, OBSERVED_CHILDREN };\nstruct ProtectedResource\n{')
+    ledger = once(ledger, '  int descriptor{-1};\n};',
+        '  int descriptor{-1};\n  NamespaceEffect namespaceEffect{NamespaceEffect::MAY_MUTATE};\n};')
     writes = before[WRITES].decode()
+    writes = once(writes, 'bool existingTransaction = false, int descriptor = -1)\n{',
+        'bool existingTransaction = false, int descriptor = -1,\n'
+        '                                       NamespaceEffect effect = NamespaceEffect::MAY_MUTATE)\n{')
+    writes = once(writes, '  resource.descriptor = descriptor;',
+        '  resource.descriptor = descriptor;\n  resource.namespaceEffect = effect;')
+    writes = once(writes,
+        'bool nativeSave = false, bool existingTransaction = false, int descriptor = -1)\n'
+        '    : m_token(BeginProtectedOperation(writer, paths, operation, nativeSave, existingTransaction, descriptor)) {}',
+        'bool nativeSave = false, bool existingTransaction = false, int descriptor = -1,\n'
+        '                     NamespaceEffect effect = NamespaceEffect::MAY_MUTATE)\n'
+        '    : m_token(BeginProtectedOperation(writer, paths, operation, nativeSave, existingTransaction, descriptor, effect)) {}')
     writes = once(writes, 'inline std::string DescriptorPath(int fd)',
         (HERE/'descriptor_identity.inc').read_text()+'\ninline std::string DescriptorPath(int fd)')
     writes = once(writes, "  target[size] = '\\0'; return target;",
@@ -145,6 +160,11 @@ def patches(before):
         '"pending_protected_" + entry.second.operation + ":" + entry.first);',
         '"pending_protected_" + entry.second.operation + ":" + entry.first + ResourceOwnerLocked(s,entry.second));')
     writes = once(writes, '  const auto token = ++p.nextOperation;',
+        '  // Coordination barriers retain admission and pending-owner protection.\n'
+        '  // Their actual effects are observed by nested native leases and audit\n'
+        '  // contracts; the barrier itself cannot invalidate a removed name.\n'
+        '  // Unclassified operations still use MAY_MUTATE and fail closed.\n'
+        '  if (effect == NamespaceEffect::MAY_MUTATE) {\n'
         '  // Any later admitted operation that overlaps a removed name revokes\n'
         '  // its earlier absence evidence, even when the new operation fails.\n'
         '  if (paths.empty()) p.removedNamespaces.clear();\n'
@@ -161,6 +181,7 @@ def patches(before):
         '    for (auto it=p.removedNamespaces.begin(); it!=p.removedNamespaces.end();)\n'
         '      if (path.empty() || Within(path,*it) || (!removesParent && Within(*it,path))) it=p.removedNamespaces.erase(it);\n'
         '      else ++it;\n'
+        '  }\n'
         '  }\n'
         '  const auto token = ++p.nextOperation;')
     writes = once(writes, 'inline bool SyncProtectedPath(const std::string& path,',
@@ -180,6 +201,13 @@ def patches(before):
     writes = once(writes, '!SyncProtectedPath(canonical, profiles)',
         '!SyncProtectedPath(canonical, profiles, removed)')
     hooks = before[HOOKS].decode()
+    hooks = once(hooks,
+        'm_paths, Specs()[kind].original.ml_name, false, false, m_descriptor);',
+        'm_paths, Specs()[kind].original.ml_name, false, false, m_descriptor,\n'
+        '        kind==EXTENSION_CREATE ? Ledger::NamespaceEffect::OBSERVED_CHILDREN : Ledger::NamespaceEffect::MAY_MUTATE);')
+    hooks = once(hooks, 'preparing(writer,{},"native_child_contract_preparation");',
+        'preparing(writer,{},"native_child_contract_preparation",false,false,-1,\n'
+        '      Ledger::NamespaceEffect::OBSERVED_CHILDREN);')
     hooks = once(hooks,
         '    if (result && m_kind == EXTENSION_CREATE && !ProtectNativeModule(result))',
         '    if (result && m_token && !m_paths.empty() &&\n'

@@ -92,6 +92,26 @@
     {
       "source": "candidate",
       "provider_identity": "plugin.video.thecrew",
+      "case": "sqlite-busy-recovered",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-busy-recovered provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "sqlite-busy-pending",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-busy-pending provider=plugin.video.thecrew seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
       "case": "namespace",
       "exit_code": 0,
       "stdout": "PASS namespace provider=plugin.video.thecrew seal=1\n",
@@ -175,6 +195,46 @@
       "case": "namespace-fsync",
       "exit_code": 0,
       "stdout": "PASS namespace-fsync provider=plugin.video.thecrew seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "namespace-barrier",
+      "exit_code": 0,
+      "stdout": "PASS namespace-barrier provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "namespace-concurrent-unknown",
+      "exit_code": 0,
+      "stdout": "PASS namespace-concurrent-unknown provider=plugin.video.thecrew seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "namespace-unknown-later",
+      "exit_code": 0,
+      "stdout": "PASS namespace-unknown-later provider=plugin.video.thecrew seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "namespace-nested-mutation",
+      "exit_code": 0,
+      "stdout": "PASS namespace-nested-mutation provider=plugin.video.thecrew seal=0\n",
       "stderr": "",
       "independent_readback_passed": true,
       "existing_user_data_unchanged": true
@@ -442,6 +502,26 @@
     {
       "source": "candidate",
       "provider_identity": "plugin.video.umbrella",
+      "case": "sqlite-busy-recovered",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-busy-recovered provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "sqlite-busy-pending",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-busy-pending provider=plugin.video.umbrella seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
       "case": "namespace",
       "exit_code": 0,
       "stdout": "PASS namespace provider=plugin.video.umbrella seal=1\n",
@@ -525,6 +605,46 @@
       "case": "namespace-fsync",
       "exit_code": 0,
       "stdout": "PASS namespace-fsync provider=plugin.video.umbrella seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "namespace-barrier",
+      "exit_code": 0,
+      "stdout": "PASS namespace-barrier provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "namespace-concurrent-unknown",
+      "exit_code": 0,
+      "stdout": "PASS namespace-concurrent-unknown provider=plugin.video.umbrella seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "namespace-unknown-later",
+      "exit_code": 0,
+      "stdout": "PASS namespace-unknown-later provider=plugin.video.umbrella seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "namespace-nested-mutation",
+      "exit_code": 0,
+      "stdout": "PASS namespace-nested-mutation provider=plugin.video.umbrella seal=0\n",
       "stderr": "",
       "independent_readback_passed": true,
       "existing_user_data_unchanged": true
@@ -792,6 +912,26 @@
     {
       "source": "candidate",
       "provider_identity": "plugin.video.seren",
+      "case": "sqlite-busy-recovered",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-busy-recovered provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "sqlite-busy-pending",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-busy-pending provider=plugin.video.seren seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
       "case": "namespace",
       "exit_code": 0,
       "stdout": "PASS namespace provider=plugin.video.seren seal=1\n",
@@ -875,6 +1015,46 @@
       "case": "namespace-fsync",
       "exit_code": 0,
       "stdout": "PASS namespace-fsync provider=plugin.video.seren seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "namespace-barrier",
+      "exit_code": 0,
+      "stdout": "PASS namespace-barrier provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "namespace-concurrent-unknown",
+      "exit_code": 0,
+      "stdout": "PASS namespace-concurrent-unknown provider=plugin.video.seren seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "namespace-unknown-later",
+      "exit_code": 0,
+      "stdout": "PASS namespace-unknown-later provider=plugin.video.seren seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "namespace-nested-mutation",
+      "exit_code": 0,
+      "stdout": "PASS namespace-nested-mutation provider=plugin.video.seren seal=0\n",
       "stderr": "",
       "independent_readback_passed": true,
       "existing_user_data_unchanged": true
@@ -1142,6 +1322,26 @@
     {
       "source": "candidate",
       "provider_identity": "plugin.video.pov",
+      "case": "sqlite-busy-recovered",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-busy-recovered provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "sqlite-busy-pending",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-busy-pending provider=plugin.video.pov seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
       "case": "namespace",
       "exit_code": 0,
       "stdout": "PASS namespace provider=plugin.video.pov seal=1\n",
@@ -1225,6 +1425,46 @@
       "case": "namespace-fsync",
       "exit_code": 0,
       "stdout": "PASS namespace-fsync provider=plugin.video.pov seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "namespace-barrier",
+      "exit_code": 0,
+      "stdout": "PASS namespace-barrier provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "namespace-concurrent-unknown",
+      "exit_code": 0,
+      "stdout": "PASS namespace-concurrent-unknown provider=plugin.video.pov seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "namespace-unknown-later",
+      "exit_code": 0,
+      "stdout": "PASS namespace-unknown-later provider=plugin.video.pov seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "namespace-nested-mutation",
+      "exit_code": 0,
+      "stdout": "PASS namespace-nested-mutation provider=plugin.video.pov seal=0\n",
       "stderr": "",
       "independent_readback_passed": true,
       "existing_user_data_unchanged": true
@@ -1492,6 +1732,26 @@
     {
       "source": "candidate",
       "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "sqlite-busy-recovered",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-busy-recovered provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "sqlite-busy-pending",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-busy-pending provider=plugin.video.future_provider_7fa29 seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
       "case": "namespace",
       "exit_code": 0,
       "stdout": "PASS namespace provider=plugin.video.future_provider_7fa29 seal=1\n",
@@ -1575,6 +1835,46 @@
       "case": "namespace-fsync",
       "exit_code": 0,
       "stdout": "PASS namespace-fsync provider=plugin.video.future_provider_7fa29 seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "namespace-barrier",
+      "exit_code": 0,
+      "stdout": "PASS namespace-barrier provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "namespace-concurrent-unknown",
+      "exit_code": 0,
+      "stdout": "PASS namespace-concurrent-unknown provider=plugin.video.future_provider_7fa29 seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "namespace-unknown-later",
+      "exit_code": 0,
+      "stdout": "PASS namespace-unknown-later provider=plugin.video.future_provider_7fa29 seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "namespace-nested-mutation",
+      "exit_code": 0,
+      "stdout": "PASS namespace-nested-mutation provider=plugin.video.future_provider_7fa29 seal=0\n",
       "stderr": "",
       "independent_readback_passed": true,
       "existing_user_data_unchanged": true
@@ -1854,9 +2154,9 @@
     "after": {
       "xbmc/interfaces/python/InfinityPythonPersistence.h": "3f16723bde8c4524c389b0d618a2e46cc9419c3763d114424c7280b667dfd5e9",
       "xbmc/interfaces/python/InfinityPythonPersistenceSource.h": "8e640d7aa12f5bd51c1dfef52a0bcfdfeb56881ee4fdbab9dc31fb6a66651d63",
-      "xbmc/platform/android/activity/InfinityScriptPersistence.h": "dca1a8196c11874bd80aaf6d236e230b3daaa4d0f94dafbfbcb2ac32f67517c0",
-      "xbmc/platform/android/activity/InfinityProtectedWrites.h": "8052cdc219dd38d38cadd9eca127b19515d44d7c8928354b6fdd4338a6283af6",
-      "xbmc/interfaces/python/InfinityPythonWriteHooks.h": "2a9cddd760e067e6280019fe6b8cc5796fdeac728b199c94aa32e38491000839"
+      "xbmc/platform/android/activity/InfinityScriptPersistence.h": "ee0737b3c684b2a447bda46b292c6dea0e79243bc05c2d7de95373519cd94133",
+      "xbmc/platform/android/activity/InfinityProtectedWrites.h": "ed975e08e85081d6de35ae3a9873e0bb05b9d68a8c99d8c575859ebe32edfd36",
+      "xbmc/interfaces/python/InfinityPythonWriteHooks.h": "fc9c60b7d7269ec1298c82214be27084ff3edd104ea0b5171e6a1249a15245eb"
     },
     "native_source_count": 9404,
     "other_native_inputs_unchanged": 9399,

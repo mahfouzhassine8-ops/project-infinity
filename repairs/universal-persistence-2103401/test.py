@@ -13,9 +13,10 @@ HERE = Path(__file__).resolve().parent
 PROVIDERS = ('plugin.video.thecrew', 'plugin.video.umbrella', 'plugin.video.seren',
              'plugin.video.pov', 'plugin.video.future_provider_7fa29')
 CASES = ('normal', 'invalid', 'partial', 'foreign', 'subclass', 'buffered',
-         'transaction', 'sqlite', 'namespace', 'child-thread', 'late',
+         'transaction', 'sqlite', 'sqlite-busy-recovered', 'sqlite-busy-pending', 'namespace', 'child-thread', 'late',
          'pending-native', 'opaque', 'namespace-unobserved', 'namespace-recreated',
-         'namespace-symlink', 'namespace-fsync', 'profile-transaction',
+         'namespace-symlink', 'namespace-fsync', 'namespace-barrier',
+         'namespace-concurrent-unknown', 'namespace-unknown-later', 'namespace-nested-mutation', 'profile-transaction',
          'buffered-finalize','buffered-phase2','child-drain','clean-io-late-write',
          'clean-io-override','clean-io-retarget','empty-io-close','layered-drain','cached-drain','multi-interpreter-drain','composite-drain','descriptor-stale-drain','descriptor-stale-replaced','descriptor-stale-symlink','descriptor-literal-deleted','descriptor-stale-unlinked','descriptor-observed-unlinked')
 
@@ -25,7 +26,7 @@ def readback(root, case):
     profile = root/'profile'
     expected = {'normal': b'textbytesarray', 'partial': b'ab'}
     preserved = {'invalid', 'buffered', 'transaction', 'sqlite', 'namespace', 'child-thread', 'late'}
-    io_cases={'composite-drain','multi-interpreter-drain','buffered-finalize','buffered-phase2','child-drain','clean-io-late-write','clean-io-override','clean-io-retarget','empty-io-close','layered-drain','cached-drain'}
+    io_cases={'sqlite-busy-recovered','sqlite-busy-pending','composite-drain','multi-interpreter-drain','buffered-finalize','buffered-phase2','child-drain','clean-io-late-write','clean-io-override','clean-io-retarget','empty-io-close','layered-drain','cached-drain'}
     preserved |= io_cases
     if case.startswith('descriptor-'):preserved.add(case)
     data = (profile/'provider-settings.json').read_bytes()
@@ -39,7 +40,7 @@ def readback(root, case):
         assert (profile/'resume.json').read_bytes()==(b'' if case=='empty-io-close' else b'resume preserved')
     if case in ('child-drain','composite-drain'):assert (profile/'worker').read_bytes()==b'worker state'
     if case=='clean-io-retarget':assert (profile/'retarget-target').read_bytes()==b'sentinel'
-    if case == 'namespace': assert (profile/'state').read_bytes() == b'state'
+    if case in ('namespace','composite-drain'): assert (profile/'state').read_bytes() == b'state'
     if case == 'child-thread': assert (profile/'child').read_bytes() == b'owned'
     if case in ('foreign', 'subclass'): assert (profile/case).read_bytes() == b'changed'
     if case == 'sqlite':
@@ -47,6 +48,10 @@ def readback(root, case):
             with sqlite3.connect(profile/leaf) as db:
                 assert db.execute('PRAGMA integrity_check').fetchall() == [('ok',)]
                 assert db.execute('SELECT v FROM '+table).fetchall() == expected
+    if case.startswith('sqlite-busy-'):
+        with sqlite3.connect((profile/'commit.db').resolve().as_uri()+'?mode=ro',uri=True) as db:
+            assert db.execute('PRAGMA integrity_check').fetchone()==('ok',)
+            assert db.execute('SELECT v FROM history').fetchall()==[(1,)]
     return True
 
 
