@@ -19,6 +19,22 @@ monitor=xbmc.Monitor()
 worker_errors=[]
 worker_ready=threading.Event()
 
+def drain_identity(label, handle):
+    raw=getattr(handle, '_infinity_handle', handle)
+    descriptor=raw.fileno()
+    chain=[]
+    current=raw
+    for _ in range(5):
+        chain.append(type(current).__module__+'.'+type(current).__name__)
+        if hasattr(current,'buffer'):current=current.buffer
+        elif hasattr(current,'raw'):current=current.raw
+        else:break
+    method=handle.flush
+    function=getattr(method,'__func__',None)
+    closure=[repr(cell.cell_contents)[:160] for cell in (getattr(function,'__closure__',None) or ())]
+    xbmc.log('INFINITY_FUTURE_IDENTITY '+json.dumps(dict(label=label,pid=os.getpid(),fd=descriptor,
+        path=os.readlink('/proc/self/fd/'+str(descriptor)),chain=chain,closure=closure)),xbmc.LOGINFO)
+
 def worker():
     try:
         with open(os.path.join(root,'worker-'+cycle),'w') as stream:
@@ -26,6 +42,7 @@ def worker():
             worker_ready.set()
             while not monitor.waitForAbort(.2): pass
             xbmc.log('INFINITY_FUTURE_DRAIN worker_flush_begin '+cycle,xbmc.LOGINFO)
+            drain_identity('worker_first_flush',stream)
             stream.flush()
             xbmc.log('INFINITY_FUTURE_DRAIN worker_flush_done '+cycle,xbmc.LOGINFO)
         xbmc.log('INFINITY_FUTURE_DRAIN worker_close_done '+cycle,xbmc.LOGINFO)
@@ -89,6 +106,7 @@ else:raise AssertionError('late VFS payload crossed shutdown admission')
 f.close()
 xbmc.log('INFINITY_FUTURE_DRAIN vfs_close_done '+cycle,xbmc.LOGINFO)
 xbmc.log('INFINITY_FUTURE_DRAIN main_flush_begin '+cycle,xbmc.LOGINFO)
+drain_identity('main_first_flush',buffer)
 buffer.flush()
 xbmc.log('INFINITY_FUTURE_DRAIN main_flush_done '+cycle,xbmc.LOGINFO)
 buffer.close()
