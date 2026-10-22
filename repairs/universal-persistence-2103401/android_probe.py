@@ -126,6 +126,9 @@ def main():
             assert [x['value_type'] for x in ready['errors']]==['NoneType','int','memoryview']
             assert all(x['exception']=='TypeError' for x in ready['errors'])
             entry['service_ready']=ready
+            entry['essential_vfs_before_close']=probe.shell('cat',ready['essential_vfs'])
+            entry['favourites_before_close']=probe.shell('cat',probe.PROFILE+'/favourites.xml')
+            (cycleout/'favourites-before-close.xml').write_text(entry['favourites_before_close'])
             if a.mode=='lost-file':
                 # Fault injection only into this fresh emulator's own fixture,
                 # after its dirty file is admitted. Never a user profile file.
@@ -173,17 +176,23 @@ def main():
             assert not any(x['pid']==owner['pid'] for x in entry['processes_after'])
             data=cycleout/'future-data';probe.adb('pull',probe.PROFILE+'/addon_data/'+FUTURE,data)
             stamp=str(owner['pid'])
-            assert probe.shell('cat',ready['essential_vfs'])=='textbytesarray'
+            vfs_actual=probe.shell('cat',ready['essential_vfs'])
+            (cycleout/'essential-vfs-after-close.txt').write_text(vfs_actual)
+            entry['essential_vfs_after_close']=vfs_actual
+            assert vfs_actual=='textbytesarray',repr(vfs_actual)
             for leaf,expected in [('plain-','ordinary state'),('replaced-','replaced state'),('buffered-','buffered state'),('worker-','child buffered state')]:
-                assert (data/(leaf+stamp)).read_text()==expected
+                actual=(data/(leaf+stamp)).read_text()
+                assert actual==expected,(leaf,repr(actual),repr(expected))
             for name,table,field,value in [('history.db','history','position',37),('watched.db','watched','watched',1),('commit-controls.db','commits','value',1)]:
                 with sqlite3.connect(data/name) as db:
                     assert db.execute('PRAGMA integrity_check').fetchone()==('ok',)
                     rows=db.execute('SELECT '+field+' FROM '+table).fetchall()
                     assert rows==[(value,)]*(cycle+1),rows
             assert 'future-provider-state' in (data/'settings.xml').read_text()
-            saved=ET.fromstring(probe.shell('cat',probe.PROFILE+'/favourites.xml'))
-            assert any(x.get('name')=='Universal persistence preserved' for x in saved)
+            favourites=probe.shell('cat',probe.PROFILE+'/favourites.xml')
+            (cycleout/'favourites-after-close.xml').write_text(favourites)
+            saved=ET.fromstring(favourites)
+            assert any(x.get('name')=='Universal persistence preserved' for x in saved),favourites
             entry['independent_data_readback_passed']=True;old_owner=owner['owner']
             probe.adb('pull',probe.PROFILE+'/Database',cycleout/'Database')
             databases=list((cycleout/'Database').glob('*.db'));assert databases
@@ -198,7 +207,9 @@ def main():
             assert ready['pid']==owner['pid'] and ready['history_count']==ready['watched_count']==4
             report['final_reopen_verified']=dict(owner=owner,ready=ready)
         report['passed']=True
-    except Exception as error:report['failure']=type(error).__name__+': '+str(error)
+    except Exception as error:
+        report['failure']=type(error).__name__+': '+str(error)
+        report['failure_traceback']=__import__('traceback').format_exc()
     finally:
         save(a.out/'ANDROID17-RESULT.json',report)
         # A real RC8 startup crashed in an ELF constructor before first Close.

@@ -21,7 +21,7 @@ jobs:
       fail-fast: false
       matrix:
         mode: [safe]
-        replica: [a, b]
+        replica: [readback]
     env:
       CANDIDATE_BUILD: '39868217775'
       CANDIDATE_COMMIT: '2ec8cb7e0323c1e2c4ba0c57594eb678541eb222'
