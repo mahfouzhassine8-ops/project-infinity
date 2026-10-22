@@ -114,6 +114,7 @@ def main():
             ready=until(lambda:probe.read_json(ready_path),60)
             assert ready['pid']==owner['pid'] and ready['addon']==FUTURE and ready['worker_ready']
             assert ready['supported_child_returned']
+            assert ready['failed_commit_rolled_back']
             assert ready['history_count']==ready['watched_count']==cycle+1
             if a.mode in ('safe','pending','lost-file'):
                 assert ready['versioncheck_version']=='0.5.28+infinity.1'
@@ -174,7 +175,7 @@ def main():
             assert probe.shell('cat',ready['essential_vfs'])=='textbytesarray'
             for leaf,expected in [('plain-','ordinary state'),('replaced-','replaced state'),('buffered-','buffered state'),('worker-','child buffered state')]:
                 assert (data/(leaf+stamp)).read_text()==expected
-            for name,table,field,value in [('history.db','history','position',37),('watched.db','watched','watched',1)]:
+            for name,table,field,value in [('history.db','history','position',37),('watched.db','watched','watched',1),('commit-controls.db','commits','value',1)]:
                 with sqlite3.connect(data/name) as db:
                     assert db.execute('PRAGMA integrity_check').fetchone()==('ok',)
                     rows=db.execute('SELECT '+field+' FROM '+table).fetchall()

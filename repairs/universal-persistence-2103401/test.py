@@ -13,12 +13,12 @@ HERE = Path(__file__).resolve().parent
 PROVIDERS = ('plugin.video.thecrew', 'plugin.video.umbrella', 'plugin.video.seren',
              'plugin.video.pov', 'plugin.video.future_provider_7fa29')
 CASES = ('normal', 'invalid', 'partial', 'foreign', 'subclass', 'buffered',
-         'transaction', 'sqlite', 'sqlite-busy-recovered', 'sqlite-busy-pending', 'namespace', 'child-thread', 'late',
+         'transaction', 'sqlite', 'sqlite-busy-recovered', 'sqlite-busy-pending', 'sqlite-constraint-recovered', 'sqlite-constraint-pending', 'namespace', 'child-thread', 'late',
          'pending-native', 'opaque', 'namespace-unobserved', 'namespace-recreated',
          'namespace-symlink', 'namespace-fsync', 'namespace-parent-recreated', 'namespace-barrier',
          'namespace-concurrent-unknown', 'namespace-unknown-later', 'namespace-nested-mutation', 'profile-transaction',
          'buffered-finalize','buffered-phase2','child-drain','clean-io-late-write',
-         'clean-io-override','clean-io-retarget','empty-io-close','layered-drain','cached-drain','multi-interpreter-drain','composite-drain','descriptor-stale-drain','descriptor-stale-replaced','descriptor-stale-symlink','descriptor-literal-deleted','descriptor-stale-unlinked','descriptor-observed-unlinked')
+         'clean-io-override','clean-io-retarget','empty-io-close','layered-drain','cached-drain','multi-interpreter-drain','composite-drain','descriptor-stale-drain','descriptor-stale-lock','descriptor-stale-replaced','descriptor-stale-symlink','descriptor-literal-deleted','descriptor-stale-unlinked','descriptor-observed-unlinked')
 
 
 def readback(root, case):
@@ -26,13 +26,13 @@ def readback(root, case):
     profile = root/'profile'
     expected = {'normal': b'textbytesarray', 'partial': b'ab'}
     preserved = {'invalid', 'buffered', 'transaction', 'sqlite', 'namespace', 'child-thread', 'late'}
-    io_cases={'sqlite-busy-recovered','sqlite-busy-pending','composite-drain','multi-interpreter-drain','buffered-finalize','buffered-phase2','child-drain','clean-io-late-write','clean-io-override','clean-io-retarget','empty-io-close','layered-drain','cached-drain'}
+    io_cases={'sqlite-constraint-recovered','sqlite-constraint-pending','sqlite-busy-recovered','sqlite-busy-pending','composite-drain','multi-interpreter-drain','buffered-finalize','buffered-phase2','child-drain','clean-io-late-write','clean-io-override','clean-io-retarget','empty-io-close','layered-drain','cached-drain'}
     preserved |= io_cases
     if case.startswith('descriptor-'):preserved.add(case)
     data = (profile/'provider-settings.json').read_bytes()
     assert data == expected.get(case, b'preserved' if case in preserved else b''), (case, data)
     if case in ('descriptor-stale-unlinked','descriptor-observed-unlinked'):assert not (profile/'resume.json').exists()
-    if case=='descriptor-stale-drain':assert (profile/'resume.json').read_bytes()==b'resume preserved'
+    if case in ('descriptor-stale-drain','descriptor-stale-lock'):assert (profile/'resume.json').read_bytes()==b'resume preserved'
     if case=='descriptor-literal-deleted':assert (profile/'resume.json (deleted)').read_bytes()==b'resume preserved'
     if case=='descriptor-stale-replaced':assert (profile/'resume.json').read_bytes()==b'sentinel'
     if case in ('descriptor-stale-replaced','descriptor-stale-symlink'):assert (profile/'moved-buffer').read_bytes()==b''
@@ -48,7 +48,7 @@ def readback(root, case):
             with sqlite3.connect(profile/leaf) as db:
                 assert db.execute('PRAGMA integrity_check').fetchall() == [('ok',)]
                 assert db.execute('SELECT v FROM '+table).fetchall() == expected
-    if case.startswith('sqlite-busy-'):
+    if case.startswith(('sqlite-busy-','sqlite-constraint-')):
         with sqlite3.connect((profile/'commit.db').resolve().as_uri()+'?mode=ro',uri=True) as db:
             assert db.execute('PRAGMA integrity_check').fetchone()==('ok',)
             assert db.execute('SELECT v FROM history').fetchall()==[(1,)]

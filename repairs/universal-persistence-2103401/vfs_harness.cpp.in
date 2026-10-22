@@ -9,6 +9,7 @@
 #include <iostream>
 #include <atomic>
 #include <sys/syscall.h>
+#include <sys/wait.h>
 
 static std::string staleDescriptorOriginal, staleDescriptorActual;
 extern "C" ssize_t readlink(const char* path,char* buffer,size_t capacity) {
@@ -158,7 +159,7 @@ int main(int argc,char** argv){
   }
 #endif
   const bool descriptorCase=scenario.rfind("descriptor-",0)==0;
-  const bool ioCase=scenario.rfind("sqlite-busy-",0)==0 || descriptorCase || scenario=="composite-drain" || scenario=="multi-interpreter-drain" || scenario=="buffered-finalize" || scenario=="buffered-phase2" ||
+  const bool ioCase=scenario.rfind("sqlite-constraint-",0)==0 || scenario.rfind("sqlite-busy-",0)==0 || descriptorCase || scenario=="composite-drain" || scenario=="multi-interpreter-drain" || scenario=="buffered-finalize" || scenario=="buffered-phase2" ||
       scenario=="child-drain" || scenario=="clean-io-late-write" || scenario=="clean-io-override" ||
       scenario=="clean-io-retarget" || scenario=="empty-io-close" || scenario=="layered-drain" || scenario=="cached-drain";
   int savedDescriptor=-1,retargetDescriptor=-1,targetDescriptor=-1;
@@ -275,7 +276,7 @@ int main(int argc,char** argv){
       assert(::unlink(staleDescriptorOriginal.c_str())==0);shouldBlock=true;
     } else if(scenario=="descriptor-observed-unlinked") {
       run("os.unlink(root+'/profile/resume.json')\n");
-    } else if(scenario!="descriptor-stale-drain") {
+    } else if(scenario!="descriptor-stale-drain" && scenario!="descriptor-stale-lock") {
       staleDescriptorActual=root+"/profile/moved-buffer";
       assert(::rename(staleDescriptorOriginal.c_str(),staleDescriptorActual.c_str())==0);
       if(scenario=="descriptor-stale-symlink")
@@ -301,6 +302,33 @@ int main(int argc,char** argv){
         "try:writer.commit()\nexcept sqlite3.OperationalError as error:assert error.sqlite_errorcode & 255 == sqlite3.SQLITE_BUSY and writer.in_transaction\nelse:raise AssertionError('COMMIT did not encounter the real reader lock')\n");
     shouldBlock=scenario=="sqlite-busy-pending";
     if(!shouldBlock)run("reader.rollback();reader.close();writer.rollback();assert not writer.in_transaction;writer.close()\n");
+  }
+  if(scenario=="descriptor-stale-lock") {
+    auto* handle=PyDict_GetItemString(globals,"buffer");auto* number=PyObject_CallMethod(handle,"fileno",nullptr);assert(number);
+    const int descriptor=static_cast<int>(PyLong_AsLong(number));Py_DECREF(number);
+    struct flock lock{};lock.l_type=F_WRLCK;lock.l_whence=SEEK_SET;
+    assert(::fcntl(descriptor,F_SETLK,&lock)==0);
+    assert(InfinityScriptPersistence::DescriptorPath(descriptor)==root+"/profile/resume.json");
+    const pid_t child=::fork();assert(child>=0);
+    if(child==0) {
+      const int check=::open((root+"/profile/resume.json").c_str(),O_RDWR);
+      if(check<0)std::_Exit(2);
+      const int locked=::fcntl(check,F_SETLK,&lock);const int code=errno;
+      std::_Exit(locked<0 && (code==EAGAIN || code==EACCES)?0:1);
+    }
+    int status=0;assert(::waitpid(child,&status,0)==child);
+    if(!WIFEXITED(status) || WEXITSTATUS(status)!=0) {std::cerr<<"descriptor identity probe released a live POSIX lock\n";return 31;}
+    lock.l_type=F_UNLCK;assert(::fcntl(descriptor,F_SETLK,&lock)==0);
+  }
+  if(scenario.rfind("sqlite-constraint-",0)==0) {
+    run("writer=sqlite3.connect(root+'/profile/commit.db')\n"
+        "writer.execute('PRAGMA foreign_keys=ON');assert writer.execute('PRAGMA foreign_keys').fetchone()==(1,)\n"
+        "writer.execute('CREATE TABLE parents(v INTEGER PRIMARY KEY)');writer.execute('INSERT INTO parents VALUES(1)')\n"
+        "writer.execute('CREATE TABLE history(v INTEGER REFERENCES parents(v) DEFERRABLE INITIALLY DEFERRED)');writer.execute('INSERT INTO history VALUES(1)');writer.commit()\n"
+        "writer.execute('UPDATE history SET v=7')\n"
+        "try:writer.commit()\nexcept sqlite3.IntegrityError as error:assert error.sqlite_errorcode & 255 == sqlite3.SQLITE_CONSTRAINT and writer.in_transaction\nelse:raise AssertionError('deferred constraint did not fail COMMIT')\n");
+    shouldBlock=scenario=="sqlite-constraint-pending";
+    if(!shouldBlock)run("writer.rollback();assert not writer.in_transaction;writer.close()\n");
   }
   if(baseline)run("f.close()\n");
   assert(InfinityScriptPersistence::BeginWriteProtection(71,{root+"/profile"},{root+"/cache"}));

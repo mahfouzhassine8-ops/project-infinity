@@ -76,6 +76,7 @@ with open(os.path.join(directory,'tmp'),'w') as stream:stream.write('replaced st
 os.replace(os.path.join(directory,'tmp'),os.path.join(directory,'final'))
 os.rename(os.path.join(directory,'final'),os.path.join(root,'replaced-'+cycle))
 os.rmdir(directory)
+os.makedirs(root,exist_ok=True)  # Ordinary repeated parent preparation preserves removed-child evidence.
 addon.setSettingString('preserved_setting','future-provider-state')
 db=sqlite3.connect(os.path.join(root,'history.db'))
 db.execute('PRAGMA journal_mode=WAL')
@@ -91,6 +92,21 @@ except sqlite3.OperationalError:db.rollback()
 else:raise AssertionError('failed transaction was not reported')
 if mode=='pending':db.execute('INSERT INTO history VALUES(?,999)',('uncommitted-'+cycle,))
 else:db.close()
+# Deferred foreign-key enforcement guarantees a genuine failed COMMIT without
+# relying on host/emulator filesystem reader-lock behavior. Rollback is explicit.
+commit_writer=sqlite3.connect(os.path.join(root,'commit-controls.db'))
+commit_writer.execute('PRAGMA foreign_keys=ON')
+assert commit_writer.execute('PRAGMA foreign_keys').fetchone()==(1,)
+commit_writer.execute('CREATE TABLE IF NOT EXISTS parents(value INTEGER PRIMARY KEY)')
+commit_writer.execute('CREATE TABLE IF NOT EXISTS commits(cycle TEXT PRIMARY KEY,value INTEGER REFERENCES parents(value) DEFERRABLE INITIALLY DEFERRED)')
+commit_writer.execute('INSERT OR IGNORE INTO parents VALUES(1)')
+commit_writer.execute('INSERT INTO commits VALUES(?,1)',(cycle,));commit_writer.commit()
+commit_writer.execute('UPDATE commits SET value=7 WHERE cycle=?',(cycle,))
+try:commit_writer.commit()
+except sqlite3.IntegrityError as error:
+    assert error.sqlite_errorcode & 255 == sqlite3.SQLITE_CONSTRAINT and commit_writer.in_transaction
+else:raise AssertionError('deferred constraint did not cause a real COMMIT failure')
+commit_writer.rollback();assert not commit_writer.in_transaction;commit_writer.close()
 buffer=open(os.path.join(root,'buffered-'+cycle),'w');buffer.write('buffered state')
 child=threading.Thread(target=worker);child.start();assert worker_ready.wait(10) and not worker_errors
 command_output=subprocess.check_output(['uname','-rs']).strip()
@@ -101,7 +117,7 @@ with open(os.path.join(versioncheck_path,'resources/lib/version_check/service.py
     versioncheck_hash=hashlib.sha256(stream.read()).hexdigest()
 with open(os.path.join(root,'ready-'+cycle+'.json'),'w') as stream:
     json.dump(dict(addon=identity,pid=os.getpid(),mode=mode,errors=errors,worker_ready=True,
-                   supported_child_returned=True,essential_vfs=essential_vfs,
+                   supported_child_returned=True,failed_commit_rolled_back=True,essential_vfs=essential_vfs,
                    history_count=history_count,watched_count=watched_count,
                    versioncheck_version=versioncheck.getAddonInfo('version'),
                    versioncheck_service_sha256=versioncheck_hash),stream)

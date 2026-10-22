@@ -16,7 +16,10 @@ inline bool VerifiedDescriptorName(int descriptor,const struct stat& original,
      !SameDescriptorObject(original,named))return false;
   if((S_ISREG(named.st_mode) && named.st_nlink!=1) ||
      (!S_ISREG(named.st_mode) && !S_ISDIR(named.st_mode)))return false;
-  const int probe=::open(path.c_str(),O_RDONLY|O_CLOEXEC|O_NOFOLLOW|
+  // A second ordinary descriptor's close would release this process's POSIX
+  // record locks on the inode. O_PATH inspects identity without that effect.
+  // It still requires the same no-follow metadata and live-fd checks below.
+  const int probe=::open(path.c_str(),O_PATH|O_CLOEXEC|O_NOFOLLOW|
       (S_ISDIR(named.st_mode)?O_DIRECTORY:0));
   if(probe<0)return false;
   const bool matched=::fstat(probe,&opened)==0 && SameDescriptorObject(original,opened) &&

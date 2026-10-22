@@ -581,7 +581,7 @@
    ~ProtectedOperation() { if (m_token) EndProtectedOperation(m_token); }
    explicit operator bool() const { return m_token != 0; }
    ProtectedOperation(const ProtectedOperation&) = delete;
-@@ -345,6 +364,72 @@
+@@ -345,6 +364,75 @@
  private:
    uint64_t m_token;
  };
@@ -604,7 +604,10 @@
 +     !SameDescriptorObject(original,named))return false;
 +  if((S_ISREG(named.st_mode) && named.st_nlink!=1) ||
 +     (!S_ISREG(named.st_mode) && !S_ISDIR(named.st_mode)))return false;
-+  const int probe=::open(path.c_str(),O_RDONLY|O_CLOEXEC|O_NOFOLLOW|
++  // A second ordinary descriptor's close would release this process's POSIX
++  // record locks on the inode. O_PATH inspects identity without that effect.
++  // It still requires the same no-follow metadata and live-fd checks below.
++  const int probe=::open(path.c_str(),O_PATH|O_CLOEXEC|O_NOFOLLOW|
 +      (S_ISDIR(named.st_mode)?O_DIRECTORY:0));
 +  if(probe<0)return false;
 +  const bool matched=::fstat(probe,&opened)==0 && SameDescriptorObject(original,opened) &&
@@ -654,7 +657,7 @@
  
  inline std::string DescriptorPath(int fd)
  {
-@@ -356,7 +441,7 @@
+@@ -356,7 +444,7 @@
    const auto name = "/proc/self/fd/" + std::to_string(fd);
    const auto size = ::readlink(name.c_str(), target, sizeof(target) - 1);
    if (size <= 0 || size >= static_cast<ssize_t>(sizeof(target) - 1)) return {};
@@ -663,7 +666,7 @@
  }
  inline void SetProtectedBuffer(int writer, const std::string& key,
                                 const std::vector<std::string>& paths, bool dirty)
-@@ -373,7 +458,8 @@
+@@ -373,7 +461,8 @@
    auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex); auto& p = s.protection;
    if (!active) { p.transactions.erase(key); return; }
    if (p.transactions.size() >= 65536) { ProtectionFailureLocked(p, "protected_transaction_inventory_exhausted"); return; }
@@ -673,7 +676,7 @@
  }
  inline bool HasProtectedTransaction(const std::string& path)
  {
-@@ -416,6 +502,19 @@
+@@ -416,6 +505,19 @@
    bool durable{false};
    std::vector<std::string> blockers;
  };
@@ -693,7 +696,7 @@
  inline EssentialWriteProof EssentialWritesLocked(State& s)
  {
    RefreshProtectedChildrenLocked(s);
-@@ -475,11 +574,11 @@
+@@ -475,11 +577,11 @@
    }
    if (s.blockingOverflow) proof.blockers.push_back("protected_writer_failure_inventory_overflow");
    for (const auto& entry : p.operations)
@@ -708,7 +711,7 @@
    return proof;
  }
  inline EssentialWriteProof EssentialWrites()
-@@ -598,8 +697,72 @@
+@@ -598,8 +700,72 @@
    return false;
  }
  
@@ -782,7 +785,7 @@
  {
    struct stat st{};
    if (::lstat(path.c_str(), &st) == 0)
-@@ -636,7 +799,8 @@
+@@ -636,7 +802,8 @@
      // A vanished UUID staging parent is not a vanished essential database.
      // Fsync its surviving staging ancestor only when the installer path
      // exactly matches a verified profile-bound UUID scratch hierarchy.
@@ -792,7 +795,7 @@
    }
    int rc; do { rc = ::fsync(fd); } while (rc < 0 && errno == EINTR);
    const int closed = ::close(fd);
-@@ -645,12 +809,14 @@
+@@ -645,12 +812,14 @@
  inline bool SealEssentialWrites(uint64_t generation)
  {
    std::vector<std::string> paths, profiles;
@@ -807,7 +810,7 @@
      profiles = p.profiles; // Already canonical, captured under the admission mutex.
      for (const auto& path : p.paths)
        if (!OptionalPathLocked(p, path)) paths.push_back(path);
-@@ -658,7 +824,7 @@
+@@ -658,7 +827,7 @@
    for (const auto& path : paths)
    {
      const auto canonical = ProtectedCanonical(path);
