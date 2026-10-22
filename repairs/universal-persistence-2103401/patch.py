@@ -49,6 +49,38 @@ def patches(before):
     bridge = once(bridge, '  Py_CLEAR(context->rawWrite);Py_CLEAR(context->rawType);',
         '  Py_CLEAR(context->rawWrite);Py_CLEAR(context->rawType);\n'
         '  Py_CLEAR(context->vfsWrite);Py_CLEAR(context->vfsType);')
+    bridge = once(bridge,
+        'namespace InfinityPythonWriteHooks { inline PyObject* ActualDescriptor(PyObject* object,unsigned depth); }',
+        'namespace InfinityPythonWriteHooks { inline PyObject* ActualDescriptor(PyObject* object,unsigned depth); inline bool VerifiedCleanIo(PyObject* object); }')
+    bridge = once(bridge, 'struct Context\n{',
+        'struct IoContract { PyObject* type{nullptr}; PyObject* methods[4]{}; };\n'
+        'struct CleanIoReceipt { PyObject* weak{nullptr}; int fd{-1}; dev_t device{}; ino_t inode{}; mode_t mode{}; int flags{-1}; };\n'
+        'struct Context\n{')
+    bridge = once(bridge, '  PyObject* admissionError{nullptr};',
+        '  PyObject* admissionError{nullptr};\n'
+        '  std::vector<IoContract> ioContracts;\n'
+        '  std::map<PyObject*,CleanIoReceipt> cleanIo;')
+    bridge = once(bridge, '    paths.push_back(path);\n  }\n  Py_DECREF(sequence);',
+        '    // A proven clean native handle needs no persistent write lease.\n'
+        '    // New writes from callbacks still encounter the normal barrier.\n'
+        '    if ((operation=="file.flush" || operation=="file.close" ||\n'
+        '         operation=="buffer.flush" || operation=="buffer.close" ||\n'
+        '         operation=="raw.flush" || operation=="raw.close") &&\n'
+        '        InfinityPythonWriteHooks::VerifiedCleanIo(item))\n'
+        '      path=InfinityScriptPersistence::NonPersistentTarget();\n'
+        '    paths.push_back(path);\n  }\n  Py_DECREF(sequence);')
+    bridge = once(bridge, '  InitializationStage(context,"complete");',
+        '  if(!InfinityPythonWriteHooks::CaptureIoContracts(context))return failed();\n'
+        '  InitializationStage(context,"complete");')
+    bridge = once(bridge, '  Py_CLEAR(context->admissionError);',
+        '  for(auto& item:context->cleanIo)Py_XDECREF(item.second.weak);\n'
+        '  context->cleanIo.clear();\n'
+        '  for(auto& contract:context->ioContracts) {\n'
+        '    for(auto* method:contract.methods)Py_XDECREF(method);\n'
+        '    Py_XDECREF(contract.type);\n'
+        '  }\n'
+        '  context->ioContracts.clear();\n'
+        '  Py_CLEAR(context->admissionError);')
     observer = before[OBSERVER].decode()
     observer = once(observer,
         'def __init__(self, fail, touch, vfs=None, host_probe=False, protect=None, closed_error=None):',
@@ -87,7 +119,8 @@ def patches(before):
         '{\n'
         '  std::ostringstream out;\n'
         '  out << ";writer_id=" << r.writer << ";thread=" << r.thread\n'
-        '      << ";checkpoint_generation=" << s.protection.generation;\n'
+        '      << ";checkpoint_generation=" << s.protection.generation << ";phase=" << s.protection.phase;\n'
+        '  for(const auto& path:r.paths)out << ";target=" << (path.empty()?"<unresolved>":path.substr(0,768));\n'
         '  const auto writer=s.writers.find(r.writer);\n'
         '  if (writer!=s.writers.end()) {\n'
         '    out << ";interpreter=" << writer->second.initialization.interpreterIdentity;\n'
@@ -147,6 +180,29 @@ def patches(before):
         '         m_kind == OS_UNLINK || m_kind == OS_RMDIR))\n'
         '      Ledger::RecordRemovedNamespace(m_token,m_paths.front());\n'
         '    if (result && m_kind == EXTENSION_CREATE && !ProtectNativeModule(result))')
+    hooks = once(hooks, 'inline bool DescriptorReader(PyObject* io, const char* typeName, unsigned index,',
+        (HERE/'clean_io.inc').read_text()+'\ninline bool DescriptorReader(PyObject* io, const char* typeName, unsigned index,')
+    hooks = once(hooks,
+        'Call(Kind kind, PyObject* self, const Arguments& args) : m_kind(kind), m_context(Context())',
+        'Call(Kind kind, PyObject* self, const Arguments& args) : m_kind(kind), m_context(Context()), m_object(self)')
+    hooks = once(hooks, '  InfinityPythonPersistence::Context* m_context;',
+        '  InfinityPythonPersistence::Context* m_context;\n  PyObject* m_object;')
+    hooks = once(hooks, '    const int writer = m_context ? m_context->id : -1;',
+        '    if ((kind==BUFFER_FLUSH || kind==BUFFER_CLOSE || kind==TEXT_FLUSH || kind==TEXT_CLOSE) &&\n'
+        '        VerifiedCleanIo(self))m_paths={Ledger::NonPersistentTarget()};\n'
+        '    const int writer = m_context ? m_context->id : -1;')
+    hooks = once(hooks,
+        '      Ledger::SetProtectedBuffer(writer, m_key, m_paths, true);',
+        '    { ForgetCleanIo(self); Ledger::SetProtectedBuffer(writer, m_key, m_paths, true); }')
+    hooks = once(hooks, '    return result;\n  }\nprivate:',
+        '    if (result && (m_kind==BUFFER_FLUSH || m_kind==TEXT_FLUSH))RecordCleanIo(m_object);\n'
+        '    if (result && (m_kind==BUFFER_CLOSE || m_kind==TEXT_CLOSE || m_kind==RAW_CLOSE))ForgetCleanIo(m_object);\n'
+        '    if (result && m_kind==IO_OPEN)RecordCleanIo(result);\n'
+        '    return result;\n  }\nprivate:')
+    hooks = once(hooks, '  return RawInitializer()(self, tuple, dictionary);',
+        '  const int result=RawInitializer()(self, tuple, dictionary);\n'
+        '  if(result==0)RecordCleanIo(self);\n'
+        '  return result;')
     return {BRIDGE: bridge.encode(), OBSERVER: observer.encode(),
             LEDGER: ledger.encode(), WRITES: writes.encode(), HOOKS: hooks.encode()}
 

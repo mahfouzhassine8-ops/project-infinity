@@ -22,8 +22,8 @@ jobs:
       matrix:
         mode: [baseline, safe, pending, opaque]
     env:
-      CANDIDATE_BUILD: '39834562848'
-      CANDIDATE_COMMIT: 'd31f9919c43641afb76bf154b2cedb458c512719'
+      CANDIDATE_BUILD: '39841286004'
+      CANDIDATE_COMMIT: 'b7476c548179f2615714dd5578eaf83912a46f8c'
     steps:
       - uses: actions/checkout@v4
         with:
