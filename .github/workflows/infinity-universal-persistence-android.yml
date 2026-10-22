@@ -1,0 +1,132 @@
+name: Infinity universal persistence - actual Android17 gates
+on:
+  push:
+    branches: [work/infinity-universal-persistence-android-20261022]
+    paths:
+      - repairs/universal-persistence-2103401/android*.py
+      - .github/workflows/infinity-universal-persistence-android.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-universal-android-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  android17:
+    name: Actual Android17 ${{ matrix.mode }} control
+    runs-on: ubuntu-22.04
+    timeout-minutes: 150
+    strategy:
+      fail-fast: false
+      matrix:
+        mode: [baseline, safe, pending, opaque, lost-file]
+    env:
+      CANDIDATE_BUILD: '39853465525'
+      CANDIDATE_COMMIT: '3c7c5475beba6594afb91f93bb790dbaebc781b6'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          show-progress: false
+      - name: Require unchanged implementation relative to the pinned candidate build
+        run: |
+          python3 - <<'PY'
+          import os,subprocess
+          paths=subprocess.check_output(['git','diff','--name-only',os.environ['CANDIDATE_COMMIT'],'HEAD'],text=True).splitlines()
+          assert all(p in ('repairs/universal-persistence-2103401/android_probe.py','repairs/universal-persistence-2103401/android_future_service.py','.github/workflows/infinity-universal-persistence-android.yml') for p in paths),paths
+          PY
+      - name: Require successful candidate compilation and signing
+        if: matrix.mode != 'baseline'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import os,json,subprocess,time
+          for _ in range(180):
+              r=json.loads(subprocess.check_output(['gh','api','repos/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs/'+os.environ['CANDIDATE_BUILD']],text=True))
+              assert r['head_sha']==os.environ['CANDIDATE_COMMIT']
+              if r['status']=='completed':
+                  assert r['conclusion']=='success',r['conclusion']
+                  break
+              time.sleep(30)
+          else:raise RuntimeError('Pinned build has not passed; no APK substitution')
+          PY
+      - uses: actions/download-artifact@v4
+        if: matrix.mode == 'baseline'
+        with:
+          run-id: 39779917183
+          name: Infinity-2103401-SIGNED-APK-AND-MATCHING-COMPONENTS-EXPERIMENTAL
+          github-token: ${{ github.token }}
+          path: signed
+      - uses: actions/download-artifact@v4
+        if: matrix.mode != 'baseline'
+        with:
+          run-id: ${{ env.CANDIDATE_BUILD }}
+          name: Infinity-Universal-Persistence-INTERNAL-QA-NOT-ACCEPTED
+          github-token: ${{ github.token }}
+          path: signed
+      - name: Retrieve the existing compatible Version Check package for separate safe profiles
+        if: matrix.mode == 'safe' || matrix.mode == 'pending' || matrix.mode == 'lost-file'
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39136763823
+          name: Infinity-2103387-Permanent-Signed-EXPERIMENTAL-UNQUALIFIED
+          github-token: ${{ github.token }}
+          path: archived-compatible-fixture
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '17'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.7'}
+      - uses: android-actions/setup-android@v4
+        with:
+          cmdline-tools-version: '15859902'
+          packages: platform-tools build-tools;34.0.0
+          log-accepted-android-sdk-licenses: false
+      - name: Verify exact signed APK identity and prepare API37 infrastructure
+        env:
+          TEST_MODE: ${{ matrix.mode }}
+        run: |
+          set -euo pipefail
+          (cd signed && sha256sum -c SHA256SUMS)
+          python3 - <<'PY'
+          import hashlib,json,os,pathlib,subprocess,sys
+          sys.path.insert(0,'repairs/2103390-bugfixes/group7/finish92')
+          import delivery92
+          files=list(pathlib.Path('signed').glob('*.apk'));assert len(files)==1
+          apk=files[0];digest=hashlib.sha256(apk.read_bytes()).hexdigest()
+          if os.environ['TEST_MODE']=='baseline':assert digest=='17041a44f121693ab0852c6a826b7f728a4d834a64225efec363861616b698e6'
+          else:
+              r=json.load(open('signed/CANDIDATE.json'));assert r['source_commit']==os.environ['CANDIDATE_COMMIT'] and r['apk_sha256']==digest
+          delivery92.verify_signature(apk,pathlib.Path(os.environ['ANDROID_HOME'])/'build-tools/34.0.0')
+          with open(os.environ['GITHUB_ENV'],'a') as f:f.write('TEST_APK='+str(apk)+'\nTEST_APK_SHA='+digest+'\n')
+          PY
+          sudo apt-get update -qq
+          sudo apt-get install -y libpulse0
+          python3 repairs/four-repair-20261018/android37_gate.py --sdk-root "$ANDROID_HOME" --out api37-support --pin-tools
+          python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out emulator-setup
+          sudo chmod 666 /dev/kvm
+      - name: Execute actual installed VFS, native ownership and Close/reopen behavior
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: '37.0'
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disk-size: 8G
+          avd-name: infinity-four-repair-api37
+          pre-emulator-launch-script: python3 repairs/four-repair-20261018/android37_gate.py --sdk-root "$ANDROID_HOME" --out api37-support --check-avd
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: python3 repairs/universal-persistence-2103401/android_probe.py --apk "$TEST_APK" --expected-sha "$TEST_APK_SHA" --mode ${{ matrix.mode }} --versioncheck-fixture archived-compatible-fixture/versioncheck-companion/service.xbmc.versioncheck-0.5.28+infinity.1-Android-TEST.zip --out android-results
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-Universal-Actual-Android17-${{ matrix.mode }}-Evidence
+          path: |
+            android-results/
+            api37-support/
+            emulator-setup/
+          retention-days: 90
+          if-no-files-found: warn
