@@ -1,0 +1,44 @@
+10-22 23:04:41.974  4345  4345 F libc    : Fatal signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 0x7916fbdf7fa7 in tid 4345 (inity.kodi:kodi), pid 4345 (inity.kodi:kodi)
+10-22 23:04:43.170  4398  4398 F DEBUG   : *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+10-22 23:04:43.170  4398  4398 F DEBUG   : Build fingerprint: 'google/sdk_gphone64_x86_64/emu64xa:17/CE2A.260420.051.A3/16571990:userdebug/dev-keys'
+10-22 23:04:43.170  4398  4398 F DEBUG   : Kernel Release: '6.12.81-android16-6-g4f69fc7b210c-ab16167562'
+10-22 23:04:43.170  4398  4398 F DEBUG   : Revision: '0'
+10-22 23:04:43.170  4398  4398 F DEBUG   : ABI: 'x86_64'
+10-22 23:04:43.170  4398  4398 F DEBUG   : Guest architecture: 'arm64'
+10-22 23:04:43.170  4398  4398 F DEBUG   : Timestamp: 2026-10-22 23:04:42.186160667+0000
+10-22 23:04:43.170  4398  4398 F DEBUG   : Process uptime: 4s
+10-22 23:04:43.170  4398  4398 F DEBUG   : Executable: /system/bin/app_process64
+10-22 23:04:43.170  4398  4398 F DEBUG   : Cmdline: com.projectinfinity.kodi:kodi
+10-22 23:04:43.170  4398  4398 F DEBUG   : pid: 4345, ppid: 432, tid: 4345, name: inity.kodi:kodi  >>> com.projectinfinity.kodi:kodi <<<
+10-22 23:04:43.170  4398  4398 F DEBUG   : uid: 10234
+10-22 23:04:43.170  4398  4398 F DEBUG   : signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 0x00007916fbdf7fa7 (read)
+10-22 23:04:43.170  4398  4398 F DEBUG   :     rax 000000006b8b4560  rbx 0000791a0848c020  rcx 00007919f11f310c  rdx 0000000000000001
+10-22 23:04:43.170  4398  4398 F DEBUG   :     r8  0000000052005101  r9  0000000000000001  r10 000000000034d03d  r11 00007917078bc2c0
+10-22 23:04:43.170  4398  4398 F DEBUG   :     r12 0000000000000007  r13 00007916fbdf7fa0  r14 0000000000000007  r15 0000000000000007
+10-22 23:04:43.170  4398  4398 F DEBUG   :     rdi 0000791a0848c020  rsi 0000000040fe5700
+10-22 23:04:43.170  4398  4398 F DEBUG   :     rbp 0000791a0848c020  rsp 00007ffe303bb980  rip 0000000040fe595a  err 0000000000000004
+10-22 23:04:43.170  4398  4398 F DEBUG   : 1 total frames
+10-22 23:04:43.170  4398  4398 F DEBUG   : backtrace:
+10-22 23:04:43.170  4398  4398 F DEBUG   :       #00 pc 000000000019c95a  /memfd:exec (deleted)
+10-22 23:04:43.170  4398  4398 F DEBUG   : Note: To display stack pointer information, use the pbtombstone tool:
+10-22 23:04:43.170  4398  4398 F DEBUG   :         pbtombstone --display-sp tombstone_XX.pb
+10-22 23:04:43.191  4398  4398 F DEBUG   :     x0  000000006b8b4567  x1  00007916a514e5d0  x2  00007916a514e5d0  x3  0000000000000047
+10-22 23:04:43.192  4398  4398 F DEBUG   :     x4  0000000000000041  x5  0000000000000000  x6  1b1a030611000600  x7  0006001106031a1b
+10-22 23:04:43.192  4398  4398 F DEBUG   :     x8  0000000000000007  x9  0000000008f645c8  x10 000000000000000c  x11 00007916a513d4b0
+10-22 23:04:43.192  4398  4398 F DEBUG   :     x12 00000000d7168acf  x13 00007916a513d4bc  x14 00007916a513d4ac  x15 00007916a513d4b0
+10-22 23:04:43.192  4398  4398 F DEBUG   :     x16 0000000000000001  x17 00007916a50c3568  x18 00007916a2a00000  x19 00007916fbdf7fa0
+10-22 23:04:43.192  4398  4398 F DEBUG   :     x20 00007916fbe8a46d  x21 0000791695cfd438  x22 00000000000003ae  x23 00007916fbe82d5d
+10-22 23:04:43.192  4398  4398 F DEBUG   :     x24 00000000000003cf  x25 00007916fbe845a3  x26 00007916fbf35000  x27 0000791692e799c0
+10-22 23:04:43.192  4398  4398 F DEBUG   :     x28 00007916fbf35000  x29 00007916a41fecf0  lr  0000791692e799e0  sp  00007916a41fece0
+10-22 23:04:43.192  4398  4398 F DEBUG   :     pc  0000791692e799fc  pst 0000000000000000  esr 0000000000000000  vg  0000000000000000
+10-22 23:04:43.192  4398  4398 F DEBUG   :   
+10-22 23:04:43.192  4398  4398 F DEBUG   : 6 total frames
+10-22 23:04:43.192  4398  4398 F DEBUG   : backtrace:
+10-22 23:04:43.192  4398  4398 F DEBUG   :       #00 pc 0000000002bd49fc  /data/app/~~Ok7KMdp8sDHIHqgytcwLEQ==/com.projectinfinity.kodi-9ESdB__DEq9xZguJhwPogA==/lib/arm64/libkodi.so (talloc_lib_init+60)
+10-22 23:04:43.192  4398  4398 F DEBUG   :       #01 pc 00000000000970cc  /system/bin/arm64/linker64 (__dl_void call_array<void (*)(int, char**, char**)>(char const*, void (**)(int, char**, char**), unsigned long, bool, char const*)+260) (BuildId: a8223eb066f58fc574a79f10b3d8b4e1)
+10-22 23:04:43.192  4398  4398 F DEBUG   :       #02 pc 0000000000097300  /system/bin/arm64/linker64 (__dl_soinfo::call_constructors()+432) (BuildId: a8223eb066f58fc574a79f10b3d8b4e1)
+10-22 23:04:43.192  4398  4398 F DEBUG   :       #03 pc 000000000007b36c  /system/bin/arm64/linker64 (__dl_do_dlopen(char const*, int, android_dlextinfo const*, void const*)+3272) (BuildId: a8223eb066f58fc574a79f10b3d8b4e1)
+10-22 23:04:43.192  4398  4398 F DEBUG   :       #04 pc 0000000000075100  /system/bin/arm64/linker64 (__dl_dlopen_ext(char const*, int, android_dlextinfo const*, void const*)+72) (BuildId: a8223eb066f58fc574a79f10b3d8b4e1)
+10-22 23:04:43.192  4398  4398 F DEBUG   :       #05 pc 0000000000008018  /system/lib64/arm64/libnative_bridge_vdso.so (BuildId: 669de18a1b49081cead6374c9d053f94)
+10-22 23:04:43.195  4398  4398 F DEBUG   : 4 total frames
+10-22 23:04:43.195  4398  4398 F DEBUG   : backtrace:

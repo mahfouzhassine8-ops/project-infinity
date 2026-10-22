@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "candidate_apk_sha256": "033e48211b646bfbcf34894ae69ef934d433a38213aed8e368dc7bb2b2bd3317",
+  "build_run": "39834562848",
+  "source_commit": "d31f9919c43641afb76bf154b2cedb458c512719",
+  "verified_source_files": 9404,
+  "changed_source_files": [
+    "xbmc/interfaces/python/InfinityPythonPersistence.h",
+    "xbmc/interfaces/python/InfinityPythonPersistenceSource.h",
+    "xbmc/interfaces/python/InfinityPythonWriteHooks.h",
+    "xbmc/platform/android/activity/InfinityProtectedWrites.h",
+    "xbmc/platform/android/activity/InfinityScriptPersistence.h"
+  ],
+  "unchanged_source_files": 9399,
+  "apk_changed_members": [
+    {
+      "path": "META-INF/INFINITY.RSA",
+      "before": "80be126e0d2f82705873918eb145d655ded6a4062bc2458bee8b2a4a4becabcd",
+      "after": "df13a84721558213738fc7a758a7bf40e92412150069b2f4122a64572fbe9745"
+    },
+    {
+      "path": "META-INF/INFINITY.SF",
+      "before": "327de2a704b6c5f0fa708fd62e44db80342aa9d1ed0f17816f52533d34cac94b",
+      "after": "6d1ce3ca1b4b80039a4d3fec0ada6cb2cace61a4638d406789ef87dc311771c7"
+    },
+    {
+      "path": "META-INF/MANIFEST.MF",
+      "before": "75efceaa2b541c1fc88331b1b17ab87608f61d4eaba0c9e5be41ff7b3b925baf",
+      "after": "ce8ce04dcf4a89c6d1151028d651bd9b97984ac1e4f7048337cba12d4847e9b5"
+    },
+    {
+      "path": "lib/arm64-v8a/libinfinitycrash.so",
+      "before": "3a1a4eb5164d3503bd6321be4d939a08b7a31058719c074ac4a491fddeb6c171",
+      "after": "bef5ba7e258c0438f9f99d5a1dac188fe6b64a68089e51efbb7612d789e436c8"
+    },
+    {
+      "path": "lib/arm64-v8a/libkodi.so",
+      "before": "1c34d5a24ab4d39785282849e280153c71f0ddef29bbcf91ad894de9de2f5254",
+      "after": "40c5d327abbda0f8967d66f502c6ce2af74a31f86ba4f819ac30b84974ad377f"
+    }
+  ],
+  "apk_unchanged_member_count": 7576,
+  "recorder_only_bounded_engine_hash_changed": true,
+  "dex_assets_manifest_other_libraries_identical": true,
+  "provider_code_changed": false,
+  "physical_fold_verified": false,
+  "final_lock": false
+}

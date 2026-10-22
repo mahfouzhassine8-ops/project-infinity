@@ -1,0 +1,56 @@
+--- reference/InfinityCloseGuardService.java.in
++++ overlay/InfinityCloseGuardService.java.in
+@@ -237,7 +237,7 @@
+     phase=next;error=detail;
+     present(next);
+     evidence("phase."+next,next,detail);
+-    final JSONObject row=receipt(next,detail);worker.execute(()->{try{InfinityCheckpointProtocol.atomic(new File(getFilesDir(),InfinityCheckpointProtocol.RECEIPT),row);}catch(IOException unavailable){ui.post(()->fail("coordinator_receipt_write_failed"));}});
++    final JSONObject row=receipt(next,detail);worker.execute(()->{try{InfinityCheckpointReceipt.atomic(new File(getFilesDir(),InfinityCheckpointProtocol.RECEIPT),row);}catch(IOException unavailable){ui.post(()->fail("coordinator_receipt_write_failed"));}});
+   }
+   private void present(String next){
+     InfinityCloseProgress.display=new InfinityCloseProgress.Display(session.pid,session.owner,session.started,next,presentation(next),false);
+@@ -287,7 +287,7 @@
+     // Durable coordinator receipt must precede the engine-termination command. No stale write can pass.
+     final JSONObject durable=receipt("SAFE_TO_TERMINATE","");durable.put("checkpoint_saved",true);
+     worker.execute(()->{
+-      try{InfinityCheckpointProtocol.atomic(new File(getFilesDir(),InfinityCheckpointProtocol.RECEIPT),durable);}
++      try{InfinityCheckpointReceipt.atomic(new File(getFilesDir(),InfinityCheckpointProtocol.RECEIPT),durable);}
+       catch(IOException unavailable){ui.post(()->fail("checkpoint_receipt_commit_failed"));return;}
+       ui.post(()->{
+         if(ended||revoked||!inTime()){deadline();return;}
+@@ -296,7 +296,7 @@
+         present("ENGINE_TERMINATING");
+         final JSONObject dispatched=receipt("ENGINE_TERMINATING","");
+         worker.execute(()->{
+-          try{InfinityCheckpointProtocol.atomic(new File(getFilesDir(),InfinityCheckpointProtocol.RECEIPT),dispatched);}
++          try{InfinityCheckpointReceipt.atomic(new File(getFilesDir(),InfinityCheckpointProtocol.RECEIPT),dispatched);}
+           catch(IOException unavailable){ui.post(()->fail("termination_receipt_commit_failed"));return;}
+           ui.post(()->{
+             if(ended||revoked||!inTime()){deadline();return;}
+@@ -335,7 +335,7 @@
+           // Persist COMPLETE before returning Home. Failure retains recovery
+           // without claiming a successful exit or clearing saved evidence.
+           worker.execute(()->{
+-            try{InfinityCheckpointProtocol.atomic(new File(getFilesDir(),InfinityCheckpointProtocol.RECEIPT),done);}
++            try{InfinityCheckpointReceipt.atomic(new File(getFilesDir(),InfinityCheckpointProtocol.RECEIPT),done);}
+             catch(IOException unavailable){
+               evidence("completion_receipt_failed","ENGINE_TERMINATING","");
+               ui.post(()->fail("completion_receipt_commit_failed"));return;
+@@ -435,7 +435,7 @@
+   private void fail(String reason){
+     synchronized(authorityLock){if(ended||"COMPLETE".equals(phase)||"CHECKPOINT_FAILED".equals(phase))return;revoked=true;if(gate!=null)gate.revoke();phase="CHECKPOINT_FAILED";error=reason;}
+     evidence("checkpoint.failed",phase,reason);final JSONObject failed=receipt("CHECKPOINT_FAILED",reason);
+-    worker.execute(()->{try{InfinityCheckpointProtocol.atomic(new File(getFilesDir(),InfinityCheckpointProtocol.RECEIPT),failed);}catch(IOException ignored){}
++    worker.execute(()->{try{InfinityCheckpointReceipt.atomic(new File(getFilesDir(),InfinityCheckpointProtocol.RECEIPT),failed);}catch(IOException ignored){}
+       ui.post(()->{InfinityCloseProgress.display=new InfinityCloseProgress.Display(session.pid,session.owner,session.started,"CHECKPOINT_FAILED",presentation("CHECKPOINT_FAILED"),true);end();});});
+   }
+   private void evidence(String event,String state,String detail){
+@@ -472,7 +472,7 @@
+           JSONObject finalReceipt=receipt("COMPLETE","");
+           finalReceipt.put("coordinator_termination_authorized",true);
+           finalReceipt.put("coordinator_pid",android.os.Process.myPid());
+-          InfinityCheckpointProtocol.atomic(new File(getFilesDir(),InfinityCheckpointProtocol.RECEIPT),finalReceipt);
++          InfinityCheckpointReceipt.atomic(new File(getFilesDir(),InfinityCheckpointProtocol.RECEIPT),finalReceipt);
+           android.os.Process.killProcess(android.os.Process.myPid());
+         }catch(Exception unavailable){android.util.Log.e("InfinityClose","Coordinator exit retained: durable final evidence unavailable",unavailable);}
+       });

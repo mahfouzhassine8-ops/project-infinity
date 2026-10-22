@@ -1,0 +1,64 @@
+{
+  "candidate": "RC7",
+  "accepted": false,
+  "build_commit": "d9edecbe843eb92457e26cbeab712f0264c55192",
+  "build_tree": "f458575151e359e89075004a474f185a75f635fe",
+  "build_run": 39862996414,
+  "android_commit": "cca956c99e04615885499232a8fe52be9bee607b",
+  "android_tree": "4c2873cc845e9a7858979fce6090a4c1394fa184",
+  "android_run": 39863205054,
+  "host_cases": 263,
+  "retained_regressions": 47,
+  "local_overlay": "universal-native-rc7-verified-overlay",
+  "native_patch_sha256": "551ea8a2593e4e307eb91ec9500e26d341ef1420beab65f7a88c98d218d2352a",
+  "physical_fold_verified": false,
+  "final_lock": false,
+  "build_job": 120120643479,
+  "android_jobs": {
+    "baseline": 120123406933,
+    "safe": 120123407185,
+    "opaque": 120123407238,
+    "lost-file": 120123407476,
+    "pending": 120123407542
+  },
+  "android_artifacts": {
+    "baseline": {
+      "id": 12463607509,
+      "sha256": "42bd7f449d0cae59d3ab6a0b4b6cc00bf26e168e75fc263defe8308e293b2d64"
+    },
+    "safe": {
+      "id": 12462779875,
+      "sha256": "b3fa766c6439cf3e3b7fd4ab001c2ea1280e42ec569bb0c6f940fb00a904a5b9"
+    },
+    "opaque": {
+      "id": 12463673261,
+      "sha256": "116292855426c131d8d4e767b566078327738877be59e91be1565d59374a34ce"
+    },
+    "pending": {
+      "id": 12463627698,
+      "sha256": "aa71d466f89659998f52987b9822a9ab3acb12bac01321a307e32169c93d63cd"
+    },
+    "lost-file": {
+      "id": 12462869939,
+      "sha256": "396a661de2e34c2785e8a9218a7d77e8d8d17dbbcb9f75ec6488dac1946b6d91"
+    }
+  },
+  "build_artifact": {
+    "id": 12464115936,
+    "sha256": "bab602b8483fce1674a12d07af7687b63a46ab2e3972405ac4c6362123037b19"
+  },
+  "build_evidence_artifact": {
+    "id": 12463891948,
+    "sha256": "ca8a5c0da39e211ba32344a047a1ca48355ab3a22e28754ca0aa8939860c73f3"
+  },
+  "android_outcomes": {
+    "baseline": "passed",
+    "safe": "failed_completion_receipt_commit",
+    "opaque": "passed",
+    "pending": "passed",
+    "lost-file": "passed"
+  },
+  "native_safe_gate_passed": true,
+  "full_safe_close_passed": false,
+  "rejection": "Completion receipt commit failed after native mandatory owners passed and engine authorization was consumed."
+}

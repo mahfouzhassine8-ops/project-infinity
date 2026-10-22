@@ -1,0 +1,37 @@
+{
+  "status": "REJECTED",
+  "build_commit": "d758cbc74b7b18898bf54fd9ac3a17bb5b568fad",
+  "build_run": 39849297105,
+  "build_artifact": 12458085263,
+  "build_artifact_sha256": "7fbbd3cd3428312fc92ebe4804311f43b4b3680939acc4e816b0fe403619b777",
+  "build_evidence_artifact": 12456973928,
+  "build_evidence_sha256": "f074b40ae2e1bb23d4c35248e6b60c5eec9349dca0bcce90f01b6a0cd6541f19",
+  "android_commit": "fdccbcd59ec8c53859d838db4d5b2ece9d3acf01",
+  "android_run": 39849674853,
+  "original_vfs_errors_preserved": [
+    {
+      "value_type": "NoneType",
+      "exception": "TypeError",
+      "message": "argument \"buffer\" for \"write\" must be a string, bytes or a bytearray"
+    },
+    {
+      "value_type": "int",
+      "exception": "TypeError",
+      "message": "argument \"buffer\" for \"write\" must be a string, bytes or a bytearray"
+    },
+    {
+      "value_type": "memoryview",
+      "exception": "TypeError",
+      "message": "argument \"buffer\" for \"write\" must be a string, bytes or a bytearray"
+    }
+  ],
+  "android_artifacts": {
+    "safe": "e8a659bcd406538fb8fea3e949b2613318940f5a412600d1049ae6a5259b87ea",
+    "pending": "15a775f468d3aaf5eba58d93618e458991ea08b358fd2b24639ad06b0c19be49",
+    "opaque": "d2ef651e5b117696280c0c7f482fb1d4a3635da6be589157586b0c1e199cffd1",
+    "baseline": "0a23637e1b83bda8d1a674937ed40cf27179d783bea050e5c2007f0334369233",
+    "lost-file": "4b2eee5051c712ab510e6e5c7c28590b06197a5dcd06daee749b98ce39b026ab"
+  },
+  "physical_fold_verified": false,
+  "final_lock": false
+}

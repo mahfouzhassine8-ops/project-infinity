@@ -1,0 +1,431 @@
+[
+  {
+    "mode": "baseline",
+    "passed": true,
+    "apk_sha256": "17041a44f121693ab0852c6a826b7f728a4d834a64225efec363861616b698e6",
+    "platform": {
+      "qemu": "1",
+      "sdk": "37",
+      "release": "17",
+      "abis": "x86_64,arm64-v8a"
+    },
+    "phase": "CHECKPOINT_FAILED",
+    "error": "native_admission: unverified_protected_writer:service.future.persistence.7fa29:service.py:vfs_write_exception",
+    "engine_remained_alive": true,
+    "authorization_consumed": false,
+    "essential_write_blockers": [
+      "unverified_protected_writer:service.future.persistence.7fa29:service.py:vfs_write_exception",
+      "unverified_protected_writer:service.future.persistence.7fa29:service.py:vfs_write_exception",
+      "unverified_protected_writer:service.future.persistence.7fa29:service.py:vfs_write_exception",
+      "unverified_protected_writer:service.xbmc.versioncheck:runner.py:external_or_opaque_writer_requires_explicit_participant",
+      "unverified_protected_writer:service.xbmc.versioncheck:runner.py:unobserved_native_child_process"
+    ],
+    "script_blockers": [
+      {
+        "blocking": true,
+        "count": 1,
+        "detail": "value_type=NoneType;exception=TypeError;stack=<observer>:935:write",
+        "reason": "vfs_write_exception",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": true,
+        "count": 1,
+        "detail": "value_type=int;exception=TypeError;stack=<observer>:935:write",
+        "reason": "vfs_write_exception",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": true,
+        "count": 1,
+        "detail": "value_type=memoryview;exception=TypeError;stack=<observer>:935:write",
+        "reason": "vfs_write_exception",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": false,
+        "count": 1,
+        "detail": "exception=OperationalError;sqlite_code=1;verb=INSERT;exception=OperationalError;sqlite_errorcode=1;stack=<observer>:362:execute",
+        "reason": "sqlite_write_failed",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": true,
+        "count": 1,
+        "detail": "executable=lsb_release;argc=2",
+        "reason": "external_or_opaque_writer_requires_explicit_participant",
+        "writer": "service.xbmc.versioncheck:runner.py",
+        "writer_id": 3
+      },
+      {
+        "blocking": true,
+        "count": 1,
+        "detail": "readonly_child_scope_absent",
+        "reason": "unobserved_native_child_process",
+        "writer": "service.xbmc.versioncheck:runner.py",
+        "writer_id": 3
+      },
+      {
+        "blocking": false,
+        "count": 1,
+        "detail": "",
+        "reason": "uncaught_script_failure_before_persistence_receipt",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": false,
+        "count": 2,
+        "detail": "layered_buffer_close_failed",
+        "reason": "protected_write_rejected_before_mutation",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": false,
+        "count": 2,
+        "detail": "layered_buffer_flush_failed",
+        "reason": "protected_write_rejected_before_mutation",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": false,
+        "count": 2,
+        "detail": "buffer_flush_before_retirement_failed",
+        "reason": "protected_write_rejected_before_mutation",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      }
+    ],
+    "actual_vfs_errors": [
+      {
+        "value_type": "NoneType",
+        "exception": "TypeError",
+        "message": "argument \"buffer\" for \"write\" must be a string, bytes or a bytearray"
+      },
+      {
+        "value_type": "int",
+        "exception": "TypeError",
+        "message": "argument \"buffer\" for \"write\" must be a string, bytes or a bytearray"
+      },
+      {
+        "value_type": "memoryview",
+        "exception": "TypeError",
+        "message": "argument \"buffer\" for \"write\" must be a string, bytes or a bytearray"
+      }
+    ]
+  },
+  {
+    "mode": "safe",
+    "passed": false,
+    "apk_sha256": "41fcc6568bf977c8095bfec0052f9556e4cf33ac103c6e45796f48d2bf18d7fa",
+    "platform": {
+      "qemu": "1",
+      "sdk": "37",
+      "release": "17",
+      "abis": "x86_64,arm64-v8a"
+    },
+    "phase": "CHECKPOINT_FAILED",
+    "error": "native_admission: checkpoint_deadline_exceeded; owner proof incomplete",
+    "engine_remained_alive": true,
+    "authorization_consumed": false,
+    "essential_write_blockers": [
+      "unflushed_protected_buffer:5:138400723524144;writer_id=5;thread=138392543133888;checkpoint_generation=1;phase=2;target=/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/addon_data/service.future.persistence.7fa29/buffered-4100;interpreter=138409580858128;invocation=service.future.persistence.7fa29:service.py",
+      "unflushed_protected_buffer:5:138400723662544;writer_id=5;thread=138397803536576;checkpoint_generation=1;phase=2;target=/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/addon_data/service.future.persistence.7fa29/worker-4100;interpreter=138409580858128;invocation=service.future.persistence.7fa29:service.py",
+      "unflushed_protected_buffer:5:native-buffer:138400989403424;writer_id=5;thread=138397803536576;checkpoint_generation=1;phase=2;target=/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/addon_data/service.future.persistence.7fa29/worker-4100;interpreter=138409580858128;invocation=service.future.persistence.7fa29:service.py",
+      "unflushed_protected_buffer:5:native-buffer:138400989963648;writer_id=5;thread=138392543133888;checkpoint_generation=1;phase=2;target=/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/addon_data/service.future.persistence.7fa29/buffered-4100;interpreter=138409580858128;invocation=service.future.persistence.7fa29:service.py"
+    ],
+    "script_blockers": [
+      {
+        "blocking": false,
+        "count": 1,
+        "detail": "value_type=NoneType;exception=TypeError;operation_id=3634;checkpoint_generation=0;effect=argument_rejected_before_native_write",
+        "reason": "vfs_write_exception",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": false,
+        "count": 1,
+        "detail": "value_type=int;exception=TypeError;operation_id=3635;checkpoint_generation=0;effect=argument_rejected_before_native_write",
+        "reason": "vfs_write_exception",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": false,
+        "count": 1,
+        "detail": "value_type=memoryview;exception=TypeError;operation_id=3636;checkpoint_generation=0;effect=argument_rejected_before_native_write",
+        "reason": "vfs_write_exception",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": false,
+        "count": 1,
+        "detail": "exception=OperationalError;sqlite_code=1;verb=INSERT;exception=OperationalError;sqlite_errorcode=1;stack=<observer>:363:execute",
+        "reason": "sqlite_write_failed",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": false,
+        "count": 1,
+        "detail": "",
+        "reason": "uncaught_script_failure_before_persistence_receipt",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": false,
+        "count": 2,
+        "detail": "namespace_open_failed",
+        "reason": "protected_write_rejected_before_mutation",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": false,
+        "count": 1,
+        "detail": "buffer_flush_before_retirement_failed",
+        "reason": "protected_write_rejected_before_mutation",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      }
+    ],
+    "actual_vfs_errors": [
+      {
+        "value_type": "NoneType",
+        "exception": "TypeError",
+        "message": "argument \"buffer\" for \"write\" must be a string, bytes or a bytearray"
+      },
+      {
+        "value_type": "int",
+        "exception": "TypeError",
+        "message": "argument \"buffer\" for \"write\" must be a string, bytes or a bytearray"
+      },
+      {
+        "value_type": "memoryview",
+        "exception": "TypeError",
+        "message": "argument \"buffer\" for \"write\" must be a string, bytes or a bytearray"
+      }
+    ]
+  },
+  {
+    "mode": "pending",
+    "passed": true,
+    "apk_sha256": "41fcc6568bf977c8095bfec0052f9556e4cf33ac103c6e45796f48d2bf18d7fa",
+    "platform": {
+      "qemu": "1",
+      "sdk": "37",
+      "release": "17",
+      "abis": "x86_64,arm64-v8a"
+    },
+    "phase": "CHECKPOINT_FAILED",
+    "error": "native_admission: checkpoint_deadline_exceeded; owner proof incomplete",
+    "engine_remained_alive": true,
+    "authorization_consumed": false,
+    "essential_write_blockers": [
+      "unverified_protected_writer:service.future.persistence.7fa29:service.py:sqlite_pending_transaction_at_retirement",
+      "unflushed_protected_buffer:5:132008312715808;writer_id=5;thread=132002401382592;checkpoint_generation=1;phase=2;target=/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/addon_data/service.future.persistence.7fa29/buffered-4235;interpreter=132002405632784;invocation=service.future.persistence.7fa29:service.py",
+      "unflushed_protected_buffer:5:132008312777328;writer_id=5;thread=132002334343360;checkpoint_generation=1;phase=2;target=/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/addon_data/service.future.persistence.7fa29/worker-4235;interpreter=132002405632784;invocation=service.future.persistence.7fa29:service.py",
+      "unflushed_protected_buffer:5:native-buffer:132002941970208;writer_id=5;thread=132002334343360;checkpoint_generation=1;phase=2;target=/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/addon_data/service.future.persistence.7fa29/worker-4235;interpreter=132002405632784;invocation=service.future.persistence.7fa29:service.py",
+      "unflushed_protected_buffer:5:native-buffer:132002941980064;writer_id=5;thread=132002401382592;checkpoint_generation=1;phase=2;target=/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/addon_data/service.future.persistence.7fa29/buffered-4235;interpreter=132002405632784;invocation=service.future.persistence.7fa29:service.py",
+      "pending_protected_sqlite_write_transaction:sqlite:132005088381784:wal;writer_id=5;thread=132002401382592;checkpoint_generation=1;phase=2;target=/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/addon_data/service.future.persistence.7fa29/history.db;interpreter=132002405632784;invocation=service.future.persistence.7fa29:service.py"
+    ],
+    "script_blockers": [
+      {
+        "blocking": false,
+        "count": 1,
+        "detail": "value_type=NoneType;exception=TypeError;operation_id=3245;checkpoint_generation=0;effect=argument_rejected_before_native_write",
+        "reason": "vfs_write_exception",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": false,
+        "count": 1,
+        "detail": "value_type=int;exception=TypeError;operation_id=3246;checkpoint_generation=0;effect=argument_rejected_before_native_write",
+        "reason": "vfs_write_exception",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": false,
+        "count": 1,
+        "detail": "value_type=memoryview;exception=TypeError;operation_id=3247;checkpoint_generation=0;effect=argument_rejected_before_native_write",
+        "reason": "vfs_write_exception",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": false,
+        "count": 1,
+        "detail": "exception=OperationalError;sqlite_code=1;verb=INSERT;exception=OperationalError;sqlite_errorcode=1;stack=<observer>:363:execute",
+        "reason": "sqlite_write_failed",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": false,
+        "count": 1,
+        "detail": "",
+        "reason": "uncaught_script_failure_before_persistence_receipt",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": false,
+        "count": 2,
+        "detail": "namespace_open_failed",
+        "reason": "protected_write_rejected_before_mutation",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": true,
+        "count": 1,
+        "detail": "",
+        "reason": "sqlite_pending_transaction_at_retirement",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": false,
+        "count": 1,
+        "detail": "buffer_flush_before_retirement_failed",
+        "reason": "protected_write_rejected_before_mutation",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      }
+    ],
+    "actual_vfs_errors": [
+      {
+        "value_type": "NoneType",
+        "exception": "TypeError",
+        "message": "argument \"buffer\" for \"write\" must be a string, bytes or a bytearray"
+      },
+      {
+        "value_type": "int",
+        "exception": "TypeError",
+        "message": "argument \"buffer\" for \"write\" must be a string, bytes or a bytearray"
+      },
+      {
+        "value_type": "memoryview",
+        "exception": "TypeError",
+        "message": "argument \"buffer\" for \"write\" must be a string, bytes or a bytearray"
+      }
+    ]
+  },
+  {
+    "mode": "opaque",
+    "passed": true,
+    "apk_sha256": "41fcc6568bf977c8095bfec0052f9556e4cf33ac103c6e45796f48d2bf18d7fa",
+    "platform": {
+      "qemu": "1",
+      "sdk": "37",
+      "release": "17",
+      "abis": "x86_64,arm64-v8a"
+    },
+    "phase": "CHECKPOINT_FAILED",
+    "error": "native_admission: checkpoint_deadline_exceeded; owner proof incomplete",
+    "engine_remained_alive": true,
+    "authorization_consumed": false,
+    "essential_write_blockers": [
+      "unverified_protected_writer:service.xbmc.versioncheck:runner.py:external_or_opaque_writer_requires_explicit_participant",
+      "unverified_protected_writer:service.xbmc.versioncheck:runner.py:unobserved_native_child_process",
+      "unflushed_protected_buffer:5:135419193994528;writer_id=5;thread=135414667817152;checkpoint_generation=1;phase=2;target=/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/addon_data/service.future.persistence.7fa29/buffered-4215;interpreter=135414606207760;invocation=service.future.persistence.7fa29:service.py",
+      "unflushed_protected_buffer:5:135419194240448;writer_id=5;thread=135414546124992;checkpoint_generation=1;phase=2;target=/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/addon_data/service.future.persistence.7fa29/worker-4215;interpreter=135414606207760;invocation=service.future.persistence.7fa29:service.py",
+      "unflushed_protected_buffer:5:native-buffer:135422681759872;writer_id=5;thread=135414546124992;checkpoint_generation=1;phase=2;target=/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/addon_data/service.future.persistence.7fa29/worker-4215;interpreter=135414606207760;invocation=service.future.persistence.7fa29:service.py",
+      "unflushed_protected_buffer:5:native-buffer:135422681810720;writer_id=5;thread=135414667817152;checkpoint_generation=1;phase=2;target=/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/addon_data/service.future.persistence.7fa29/buffered-4215;interpreter=135414606207760;invocation=service.future.persistence.7fa29:service.py"
+    ],
+    "script_blockers": [
+      {
+        "blocking": false,
+        "count": 1,
+        "detail": "value_type=NoneType;exception=TypeError;operation_id=3413;checkpoint_generation=0;effect=argument_rejected_before_native_write",
+        "reason": "vfs_write_exception",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": false,
+        "count": 1,
+        "detail": "value_type=int;exception=TypeError;operation_id=3414;checkpoint_generation=0;effect=argument_rejected_before_native_write",
+        "reason": "vfs_write_exception",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": false,
+        "count": 1,
+        "detail": "value_type=memoryview;exception=TypeError;operation_id=3415;checkpoint_generation=0;effect=argument_rejected_before_native_write",
+        "reason": "vfs_write_exception",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": false,
+        "count": 1,
+        "detail": "exception=OperationalError;sqlite_code=1;verb=INSERT;exception=OperationalError;sqlite_errorcode=1;stack=<observer>:363:execute",
+        "reason": "sqlite_write_failed",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": true,
+        "count": 1,
+        "detail": "executable=lsb_release;argc=2",
+        "reason": "external_or_opaque_writer_requires_explicit_participant",
+        "writer": "service.xbmc.versioncheck:runner.py",
+        "writer_id": 3
+      },
+      {
+        "blocking": true,
+        "count": 1,
+        "detail": "readonly_child_scope_absent",
+        "reason": "unobserved_native_child_process",
+        "writer": "service.xbmc.versioncheck:runner.py",
+        "writer_id": 3
+      },
+      {
+        "blocking": false,
+        "count": 1,
+        "detail": "",
+        "reason": "uncaught_script_failure_before_persistence_receipt",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": false,
+        "count": 1,
+        "detail": "buffer_flush_before_retirement_failed",
+        "reason": "protected_write_rejected_before_mutation",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      }
+    ],
+    "actual_vfs_errors": [
+      {
+        "value_type": "NoneType",
+        "exception": "TypeError",
+        "message": "argument \"buffer\" for \"write\" must be a string, bytes or a bytearray"
+      },
+      {
+        "value_type": "int",
+        "exception": "TypeError",
+        "message": "argument \"buffer\" for \"write\" must be a string, bytes or a bytearray"
+      },
+      {
+        "value_type": "memoryview",
+        "exception": "TypeError",
+        "message": "argument \"buffer\" for \"write\" must be a string, bytes or a bytearray"
+      }
+    ]
+  }
+]

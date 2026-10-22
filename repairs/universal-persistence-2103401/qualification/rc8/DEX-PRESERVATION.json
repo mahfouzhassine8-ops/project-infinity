@@ -1,0 +1,33 @@
+{
+  "added_classes": [
+    "com/projectinfinity/kodi/InfinityCheckpointReceipt$Descriptor.smali",
+    "com/projectinfinity/kodi/InfinityCheckpointReceipt.smali"
+  ],
+  "all_other_original_class_definitions_preserved": true,
+  "candidate_dex_sha256": "8b3f0cf83cf05e99f0b6d7e141d543af0d5f096e2406e73751ea4cfbff774d7c",
+  "changed_call_count": 6,
+  "changed_callsite_methods": [
+    ".method synthetic lambda$acceptSafe$12$com-projectinfinity-kodi-InfinityCloseGuardService(Lorg/json/JSONObject;)V",
+    ".method synthetic lambda$acceptSafe$14$com-projectinfinity-kodi-InfinityCloseGuardService(Lorg/json/JSONObject;)V",
+    ".method synthetic lambda$checkOwner$17$com-projectinfinity-kodi-InfinityCloseGuardService(Lorg/json/JSONObject;Lcom/projectinfinity/kodi/InfinityCloseGuardService$Session;)V",
+    ".method synthetic lambda$fail$21$com-projectinfinity-kodi-InfinityCloseGuardService(Lorg/json/JSONObject;)V",
+    ".method synthetic lambda$finishCoordinatorProcess$24$com-projectinfinity-kodi-InfinityCloseGuardService()V",
+    ".method synthetic lambda$transition$7$com-projectinfinity-kodi-InfinityCloseGuardService(Lorg/json/JSONObject;)V"
+  ],
+  "changed_classes": [
+    "com/projectinfinity/kodi/InfinityCloseGuardService.smali"
+  ],
+  "final_lock": false,
+  "helper_java_sha256": "05e19c4c0d347a757eeb563a9f51865000f6282572a2dd0681df23b4c140c829",
+  "native_build_commit": "d9edecbe843eb92457e26cbeab712f0264c55192",
+  "native_build_run": 39862996414,
+  "original_dex_sha256": "9b12109c04ea99375685486e62afcb3e1e2b3beea01b1a87b8de1e2cff7f9603",
+  "original_field_definitions_verified": 25931,
+  "original_protocol_and_installer_unchanged": true,
+  "other_dex_sha256": "d4df6604044e7cb66584229562186bf2ed8f0031d2d3efba03bba8ebe38934ca",
+  "parent_apk_sha256": "5b4519fa570ef80c0fbb9287c8cb09bd635f1e7babcbb82370e860de0c69643d",
+  "physical_fold_verified": false,
+  "protected_classes": 7879,
+  "source_commit": "2ec8cb7e0323c1e2c4ba0c57594eb678541eb222",
+  "unchanged_native_engine_sha256": "a538ef1cca66a8841ba116e3af028fc76dcebecfcb94ac5db9a0405d023e3fc8"
+}

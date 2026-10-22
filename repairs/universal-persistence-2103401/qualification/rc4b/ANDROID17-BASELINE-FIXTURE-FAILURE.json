@@ -1,0 +1,83 @@
+{
+  "passed": false,
+  "scope": "actual signed APK on disposable Android17 emulator",
+  "mode": "baseline",
+  "physical_fold_verified": false,
+  "real_provider_code_tested": false,
+  "final_lock": false,
+  "cycles": [
+    {
+      "cycle": 0,
+      "first_party": {
+        "script.infinity.commandcenter": {
+          "addonid": "script.infinity.commandcenter",
+          "enabled": true,
+          "type": "xbmc.python.script",
+          "version": "0.3.5.29"
+        },
+        "service.infinity.compat": {
+          "addonid": "service.infinity.compat",
+          "enabled": true,
+          "type": "xbmc.service",
+          "version": "0.8.2"
+        }
+      },
+      "versioncheck": {
+        "addonid": "service.xbmc.versioncheck",
+        "enabled": true,
+        "type": "xbmc.service",
+        "version": "0.5.27+matrix.1"
+      },
+      "owner": {
+        "schema": 2,
+        "pid": 4295,
+        "owner": "7c52034a-8bd4-4a25-a22e-cc743cacc753",
+        "launch": "338d62b4-3310-4488-b855-ac14cf470f2e",
+        "began": 1792703851839,
+        "close_at": 0,
+        "phase": "RUNNING",
+        "live": true,
+        "error": ""
+      }
+    }
+  ],
+  "apk_sha256": "17041a44f121693ab0852c6a826b7f728a4d834a64225efec363861616b698e6",
+  "platform": {
+    "qemu": "1",
+    "sdk": "37",
+    "release": "17",
+    "abis": "x86_64,arm64-v8a"
+  },
+  "fixture_manifest": {
+    "service.future.persistence.7fa29/service.py": "6001a62e21c85fae5780da831aeb8725c8735f95782987ede9d1b5a5ce1c327d",
+    "service.future.persistence.7fa29/addon.xml": "e2fc6ff49dea49efd57844d08e0d721da0bf2be8d2f1957f131626a3e947414f",
+    "service.future.persistence.7fa29/resources/settings.xml": "19844b90b8112315cbeff8e30cc7c416a64562890e58a69141593e40ac3c7cd9",
+    "script.infinity.commandcenter/default.py": "b4844b31397a0bc196262fc808a83e48c8a44ae147572fdabd855eba0598c12f",
+    "script.infinity.commandcenter/checkpoint_runtime.py": "d11b87f88d1b225f2a095182cac501e7341cebdc7cd5824559103b44c4e09c83",
+    "script.infinity.commandcenter/plugin.py": "47ce816e00ca30d8eb77ea4d6e034bdbd40b2a5d6c51bfd4eda8d6c75545edb8",
+    "script.infinity.commandcenter/infinity_search.py": "f712063e1a451b4dec2f11bdd7b92d7f83fa4f4f6fe3f4c517b801f6f4ec5003",
+    "script.infinity.commandcenter/skin_upgrade.py": "044aa0dc3e6d22f1cc585e503c482cb1d5ba58fb6734298449480ca02c53e1f8",
+    "script.infinity.commandcenter/service.py": "e3d4db126508a90ca70305ccca8376f4064cee0624d6c5d912ca319c48fdb045",
+    "script.infinity.commandcenter/infinity_trakt.py": "d76c79aa29300e4f8ad5b0141ccc02f807372030c97d109485a4cd8aefef0e22",
+    "script.infinity.commandcenter/view_mode.py": "5f5583e9c36e32e970a0341ca353d32dd92e48d41079aaabaf7a113c66ddfc71",
+    "script.infinity.commandcenter/addon.xml": "04a37ce44bad16bd3e656305cbbae3a8f37568b2bad8c81543d326fadb80e2df",
+    "script.infinity.commandcenter/context.py": "74514530150db859c8ec992983489901bc30eb047aada9fdce84348bb0eedf66",
+    "script.infinity.commandcenter/common.py": "168e2888b7f75363875aa5c70ddcf31128f0e66efa17e1fe82935aec457747b7",
+    "script.infinity.commandcenter/infinity_settings.py": "b52bbc9f8e0e934a92e9375fa1e5c865bede9bf82f5a1ddeecce01db15a5cd2b",
+    "script.infinity.commandcenter/resume_hub.py": "95cc0fdc4d4593ebfcd201d6c9a6d6b274ca756fe7194252bbadb5efc462ca60",
+    "script.infinity.commandcenter/experience.py": "c84c2987aa192e13af64beddf451389584617d557d0cecfca65e4f911b803a6f",
+    "script.infinity.commandcenter/persistence_participant.py": "7658db0f21c20853f272f61832e720df02b2b4b9ebaeba83ca1c7ba8758e1b9b",
+    "script.infinity.commandcenter/runtime_visibility.py": "11a985fc544fdb37c906f2575516b78c6141ed2b68e95b6c390d824f4386560a",
+    "script.infinity.commandcenter/resources/settings.xml": "7cf7649f80c4c3e6c81caa6e80b1f325f470055e7de62fdf37367effe8484451",
+    "script.infinity.commandcenter/resources/skins/Default/1080i/InfinityTraktNotice.xml": "321835add4ebbb71fcf9e177868f000ca35659c776d1473e0532aa0a1fd70064",
+    "script.infinity.commandcenter/resources/skins/Default/1080i/InfinityItemOptions.xml": "6a5b19c52319b8493afffdace17fa10c38dafa7406d442e84ed04552e870f4ff",
+    "script.infinity.commandcenter/resources/skins/Default/1080i/InfinitySearch.xml": "0fb440287b00d6dc4f6c15c99e16be0a4e4e70a62cd4be08b1dd9375595272ad",
+    "service.infinity.compat/checkpoint_runtime.py": "eb07f7cac8e773b5edc770d853618ca12a21c6279224fcfb04e23801c90077be",
+    "service.infinity.compat/layout_service.py": "227cf88d71febf61fe46b5dce5d8c131a31f0bfa11bc66d1bd4b02176582abdf",
+    "service.infinity.compat/runtime_service.py": "657d75dee8f04d5cbdb1307893eed55efe05f32a1cefc0fa11c5213395080dca",
+    "service.infinity.compat/addon.xml": "6105af7bbb1d179f32326c82c323c9b2a6d2f7935b4f82f91f06614041bb3720",
+    "service.infinity.compat/compat_runtime.py": "f70cc391f88a4ccad1327c7bea36378e5a615549da0ca31fc077347decff4878",
+    "service.infinity.compat/theme_contract.py": "93320b9c0bfdb3ea87b1d76d2aae1a39bef715015977326a74740f3490410735"
+  },
+  "failure": "RuntimeError: Timed out waiting for independently observed device state"
+}

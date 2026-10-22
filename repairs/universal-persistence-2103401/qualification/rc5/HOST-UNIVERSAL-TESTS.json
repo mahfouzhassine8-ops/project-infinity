@@ -1,0 +1,2372 @@
+{
+  "scope": "production observer + production Kodi buffer conversion/write loop; host POSIX backend adapter",
+  "provider_code_executed": false,
+  "provider_identities": [
+    "plugin.video.thecrew",
+    "plugin.video.umbrella",
+    "plugin.video.seren",
+    "plugin.video.pov",
+    "plugin.video.future_provider_7fa29"
+  ],
+  "results": [
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "normal",
+      "exit_code": 0,
+      "stdout": "PASS normal provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "invalid",
+      "exit_code": 0,
+      "stdout": "PASS invalid provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "partial",
+      "exit_code": 0,
+      "stdout": "PASS partial provider=plugin.video.thecrew seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "foreign",
+      "exit_code": 0,
+      "stdout": "PASS foreign provider=plugin.video.thecrew seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "subclass",
+      "exit_code": 0,
+      "stdout": "PASS subclass provider=plugin.video.thecrew seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "buffered",
+      "exit_code": 0,
+      "stdout": "PASS buffered provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "transaction",
+      "exit_code": 0,
+      "stdout": "PASS transaction provider=plugin.video.thecrew seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "sqlite",
+      "exit_code": 0,
+      "stdout": "PASS sqlite provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "sqlite-busy-recovered",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-busy-recovered provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "sqlite-busy-pending",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-busy-pending provider=plugin.video.thecrew seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "sqlite-constraint-recovered",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-constraint-recovered provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "sqlite-constraint-pending",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-constraint-pending provider=plugin.video.thecrew seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "namespace",
+      "exit_code": 0,
+      "stdout": "PASS namespace provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "child-thread",
+      "exit_code": 0,
+      "stdout": "PASS child-thread provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "late",
+      "exit_code": 0,
+      "stdout": "PASS late provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "pending-native",
+      "exit_code": 0,
+      "stdout": "PASS pending-native provider=plugin.video.thecrew seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "opaque",
+      "exit_code": 0,
+      "stdout": "PASS opaque provider=plugin.video.thecrew seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "namespace-unobserved",
+      "exit_code": 0,
+      "stdout": "PASS namespace-unobserved provider=plugin.video.thecrew seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "namespace-recreated",
+      "exit_code": 0,
+      "stdout": "PASS namespace-recreated provider=plugin.video.thecrew seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "namespace-symlink",
+      "exit_code": 0,
+      "stdout": "PASS namespace-symlink provider=plugin.video.thecrew seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "namespace-fsync",
+      "exit_code": 0,
+      "stdout": "PASS namespace-fsync provider=plugin.video.thecrew seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "namespace-parent-recreated",
+      "exit_code": 0,
+      "stdout": "PASS namespace-parent-recreated provider=plugin.video.thecrew seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "namespace-barrier",
+      "exit_code": 0,
+      "stdout": "PASS namespace-barrier provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "namespace-concurrent-unknown",
+      "exit_code": 0,
+      "stdout": "PASS namespace-concurrent-unknown provider=plugin.video.thecrew seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "namespace-unknown-later",
+      "exit_code": 0,
+      "stdout": "PASS namespace-unknown-later provider=plugin.video.thecrew seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "namespace-nested-mutation",
+      "exit_code": 0,
+      "stdout": "PASS namespace-nested-mutation provider=plugin.video.thecrew seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "profile-transaction",
+      "exit_code": 0,
+      "stdout": "PASS profile-transaction provider=plugin.video.thecrew seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "buffered-finalize",
+      "exit_code": 0,
+      "stdout": "PASS buffered-finalize provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "buffered-phase2",
+      "exit_code": 0,
+      "stdout": "PASS buffered-phase2 provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "child-drain",
+      "exit_code": 0,
+      "stdout": "PASS child-drain provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "clean-io-late-write",
+      "exit_code": 0,
+      "stdout": "PASS clean-io-late-write provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "clean-io-override",
+      "exit_code": 0,
+      "stdout": "PASS clean-io-override provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "clean-io-retarget",
+      "exit_code": 0,
+      "stdout": "PASS clean-io-retarget provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "empty-io-close",
+      "exit_code": 0,
+      "stdout": "PASS empty-io-close provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "layered-drain",
+      "exit_code": 0,
+      "stdout": "PASS layered-drain provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "cached-drain",
+      "exit_code": 0,
+      "stdout": "PASS cached-drain provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "multi-interpreter-drain",
+      "exit_code": 0,
+      "stdout": "PASS multi-interpreter-drain provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "composite-drain",
+      "exit_code": 0,
+      "stdout": "PASS composite-drain provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "descriptor-stale-drain",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-drain provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "descriptor-stale-lock",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-lock provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "descriptor-stale-replaced",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-replaced provider=plugin.video.thecrew seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "descriptor-stale-symlink",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-symlink provider=plugin.video.thecrew seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "descriptor-literal-deleted",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-literal-deleted provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "descriptor-stale-unlinked",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-unlinked provider=plugin.video.thecrew seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "descriptor-observed-unlinked",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-observed-unlinked provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "normal",
+      "exit_code": 0,
+      "stdout": "PASS normal provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "invalid",
+      "exit_code": 0,
+      "stdout": "PASS invalid provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "partial",
+      "exit_code": 0,
+      "stdout": "PASS partial provider=plugin.video.umbrella seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "foreign",
+      "exit_code": 0,
+      "stdout": "PASS foreign provider=plugin.video.umbrella seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "subclass",
+      "exit_code": 0,
+      "stdout": "PASS subclass provider=plugin.video.umbrella seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "buffered",
+      "exit_code": 0,
+      "stdout": "PASS buffered provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "transaction",
+      "exit_code": 0,
+      "stdout": "PASS transaction provider=plugin.video.umbrella seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "sqlite",
+      "exit_code": 0,
+      "stdout": "PASS sqlite provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "sqlite-busy-recovered",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-busy-recovered provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "sqlite-busy-pending",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-busy-pending provider=plugin.video.umbrella seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "sqlite-constraint-recovered",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-constraint-recovered provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "sqlite-constraint-pending",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-constraint-pending provider=plugin.video.umbrella seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "namespace",
+      "exit_code": 0,
+      "stdout": "PASS namespace provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "child-thread",
+      "exit_code": 0,
+      "stdout": "PASS child-thread provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "late",
+      "exit_code": 0,
+      "stdout": "PASS late provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "pending-native",
+      "exit_code": 0,
+      "stdout": "PASS pending-native provider=plugin.video.umbrella seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "opaque",
+      "exit_code": 0,
+      "stdout": "PASS opaque provider=plugin.video.umbrella seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "namespace-unobserved",
+      "exit_code": 0,
+      "stdout": "PASS namespace-unobserved provider=plugin.video.umbrella seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "namespace-recreated",
+      "exit_code": 0,
+      "stdout": "PASS namespace-recreated provider=plugin.video.umbrella seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "namespace-symlink",
+      "exit_code": 0,
+      "stdout": "PASS namespace-symlink provider=plugin.video.umbrella seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "namespace-fsync",
+      "exit_code": 0,
+      "stdout": "PASS namespace-fsync provider=plugin.video.umbrella seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "namespace-parent-recreated",
+      "exit_code": 0,
+      "stdout": "PASS namespace-parent-recreated provider=plugin.video.umbrella seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "namespace-barrier",
+      "exit_code": 0,
+      "stdout": "PASS namespace-barrier provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "namespace-concurrent-unknown",
+      "exit_code": 0,
+      "stdout": "PASS namespace-concurrent-unknown provider=plugin.video.umbrella seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "namespace-unknown-later",
+      "exit_code": 0,
+      "stdout": "PASS namespace-unknown-later provider=plugin.video.umbrella seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "namespace-nested-mutation",
+      "exit_code": 0,
+      "stdout": "PASS namespace-nested-mutation provider=plugin.video.umbrella seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "profile-transaction",
+      "exit_code": 0,
+      "stdout": "PASS profile-transaction provider=plugin.video.umbrella seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "buffered-finalize",
+      "exit_code": 0,
+      "stdout": "PASS buffered-finalize provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "buffered-phase2",
+      "exit_code": 0,
+      "stdout": "PASS buffered-phase2 provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "child-drain",
+      "exit_code": 0,
+      "stdout": "PASS child-drain provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "clean-io-late-write",
+      "exit_code": 0,
+      "stdout": "PASS clean-io-late-write provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "clean-io-override",
+      "exit_code": 0,
+      "stdout": "PASS clean-io-override provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "clean-io-retarget",
+      "exit_code": 0,
+      "stdout": "PASS clean-io-retarget provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "empty-io-close",
+      "exit_code": 0,
+      "stdout": "PASS empty-io-close provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "layered-drain",
+      "exit_code": 0,
+      "stdout": "PASS layered-drain provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "cached-drain",
+      "exit_code": 0,
+      "stdout": "PASS cached-drain provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "multi-interpreter-drain",
+      "exit_code": 0,
+      "stdout": "PASS multi-interpreter-drain provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "composite-drain",
+      "exit_code": 0,
+      "stdout": "PASS composite-drain provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "descriptor-stale-drain",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-drain provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "descriptor-stale-lock",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-lock provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "descriptor-stale-replaced",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-replaced provider=plugin.video.umbrella seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "descriptor-stale-symlink",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-symlink provider=plugin.video.umbrella seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "descriptor-literal-deleted",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-literal-deleted provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "descriptor-stale-unlinked",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-unlinked provider=plugin.video.umbrella seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "descriptor-observed-unlinked",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-observed-unlinked provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "normal",
+      "exit_code": 0,
+      "stdout": "PASS normal provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "invalid",
+      "exit_code": 0,
+      "stdout": "PASS invalid provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "partial",
+      "exit_code": 0,
+      "stdout": "PASS partial provider=plugin.video.seren seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "foreign",
+      "exit_code": 0,
+      "stdout": "PASS foreign provider=plugin.video.seren seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "subclass",
+      "exit_code": 0,
+      "stdout": "PASS subclass provider=plugin.video.seren seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "buffered",
+      "exit_code": 0,
+      "stdout": "PASS buffered provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "transaction",
+      "exit_code": 0,
+      "stdout": "PASS transaction provider=plugin.video.seren seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "sqlite",
+      "exit_code": 0,
+      "stdout": "PASS sqlite provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "sqlite-busy-recovered",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-busy-recovered provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "sqlite-busy-pending",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-busy-pending provider=plugin.video.seren seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "sqlite-constraint-recovered",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-constraint-recovered provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "sqlite-constraint-pending",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-constraint-pending provider=plugin.video.seren seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "namespace",
+      "exit_code": 0,
+      "stdout": "PASS namespace provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "child-thread",
+      "exit_code": 0,
+      "stdout": "PASS child-thread provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "late",
+      "exit_code": 0,
+      "stdout": "PASS late provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "pending-native",
+      "exit_code": 0,
+      "stdout": "PASS pending-native provider=plugin.video.seren seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "opaque",
+      "exit_code": 0,
+      "stdout": "PASS opaque provider=plugin.video.seren seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "namespace-unobserved",
+      "exit_code": 0,
+      "stdout": "PASS namespace-unobserved provider=plugin.video.seren seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "namespace-recreated",
+      "exit_code": 0,
+      "stdout": "PASS namespace-recreated provider=plugin.video.seren seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "namespace-symlink",
+      "exit_code": 0,
+      "stdout": "PASS namespace-symlink provider=plugin.video.seren seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "namespace-fsync",
+      "exit_code": 0,
+      "stdout": "PASS namespace-fsync provider=plugin.video.seren seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "namespace-parent-recreated",
+      "exit_code": 0,
+      "stdout": "PASS namespace-parent-recreated provider=plugin.video.seren seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "namespace-barrier",
+      "exit_code": 0,
+      "stdout": "PASS namespace-barrier provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "namespace-concurrent-unknown",
+      "exit_code": 0,
+      "stdout": "PASS namespace-concurrent-unknown provider=plugin.video.seren seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "namespace-unknown-later",
+      "exit_code": 0,
+      "stdout": "PASS namespace-unknown-later provider=plugin.video.seren seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "namespace-nested-mutation",
+      "exit_code": 0,
+      "stdout": "PASS namespace-nested-mutation provider=plugin.video.seren seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "profile-transaction",
+      "exit_code": 0,
+      "stdout": "PASS profile-transaction provider=plugin.video.seren seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "buffered-finalize",
+      "exit_code": 0,
+      "stdout": "PASS buffered-finalize provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "buffered-phase2",
+      "exit_code": 0,
+      "stdout": "PASS buffered-phase2 provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "child-drain",
+      "exit_code": 0,
+      "stdout": "PASS child-drain provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "clean-io-late-write",
+      "exit_code": 0,
+      "stdout": "PASS clean-io-late-write provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "clean-io-override",
+      "exit_code": 0,
+      "stdout": "PASS clean-io-override provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "clean-io-retarget",
+      "exit_code": 0,
+      "stdout": "PASS clean-io-retarget provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "empty-io-close",
+      "exit_code": 0,
+      "stdout": "PASS empty-io-close provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "layered-drain",
+      "exit_code": 0,
+      "stdout": "PASS layered-drain provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "cached-drain",
+      "exit_code": 0,
+      "stdout": "PASS cached-drain provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "multi-interpreter-drain",
+      "exit_code": 0,
+      "stdout": "PASS multi-interpreter-drain provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "composite-drain",
+      "exit_code": 0,
+      "stdout": "PASS composite-drain provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "descriptor-stale-drain",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-drain provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "descriptor-stale-lock",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-lock provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "descriptor-stale-replaced",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-replaced provider=plugin.video.seren seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "descriptor-stale-symlink",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-symlink provider=plugin.video.seren seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "descriptor-literal-deleted",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-literal-deleted provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "descriptor-stale-unlinked",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-unlinked provider=plugin.video.seren seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "descriptor-observed-unlinked",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-observed-unlinked provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "normal",
+      "exit_code": 0,
+      "stdout": "PASS normal provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "invalid",
+      "exit_code": 0,
+      "stdout": "PASS invalid provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "partial",
+      "exit_code": 0,
+      "stdout": "PASS partial provider=plugin.video.pov seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "foreign",
+      "exit_code": 0,
+      "stdout": "PASS foreign provider=plugin.video.pov seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "subclass",
+      "exit_code": 0,
+      "stdout": "PASS subclass provider=plugin.video.pov seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "buffered",
+      "exit_code": 0,
+      "stdout": "PASS buffered provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "transaction",
+      "exit_code": 0,
+      "stdout": "PASS transaction provider=plugin.video.pov seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "sqlite",
+      "exit_code": 0,
+      "stdout": "PASS sqlite provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "sqlite-busy-recovered",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-busy-recovered provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "sqlite-busy-pending",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-busy-pending provider=plugin.video.pov seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "sqlite-constraint-recovered",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-constraint-recovered provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "sqlite-constraint-pending",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-constraint-pending provider=plugin.video.pov seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "namespace",
+      "exit_code": 0,
+      "stdout": "PASS namespace provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "child-thread",
+      "exit_code": 0,
+      "stdout": "PASS child-thread provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "late",
+      "exit_code": 0,
+      "stdout": "PASS late provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "pending-native",
+      "exit_code": 0,
+      "stdout": "PASS pending-native provider=plugin.video.pov seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "opaque",
+      "exit_code": 0,
+      "stdout": "PASS opaque provider=plugin.video.pov seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "namespace-unobserved",
+      "exit_code": 0,
+      "stdout": "PASS namespace-unobserved provider=plugin.video.pov seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "namespace-recreated",
+      "exit_code": 0,
+      "stdout": "PASS namespace-recreated provider=plugin.video.pov seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "namespace-symlink",
+      "exit_code": 0,
+      "stdout": "PASS namespace-symlink provider=plugin.video.pov seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "namespace-fsync",
+      "exit_code": 0,
+      "stdout": "PASS namespace-fsync provider=plugin.video.pov seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "namespace-parent-recreated",
+      "exit_code": 0,
+      "stdout": "PASS namespace-parent-recreated provider=plugin.video.pov seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "namespace-barrier",
+      "exit_code": 0,
+      "stdout": "PASS namespace-barrier provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "namespace-concurrent-unknown",
+      "exit_code": 0,
+      "stdout": "PASS namespace-concurrent-unknown provider=plugin.video.pov seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "namespace-unknown-later",
+      "exit_code": 0,
+      "stdout": "PASS namespace-unknown-later provider=plugin.video.pov seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "namespace-nested-mutation",
+      "exit_code": 0,
+      "stdout": "PASS namespace-nested-mutation provider=plugin.video.pov seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "profile-transaction",
+      "exit_code": 0,
+      "stdout": "PASS profile-transaction provider=plugin.video.pov seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "buffered-finalize",
+      "exit_code": 0,
+      "stdout": "PASS buffered-finalize provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "buffered-phase2",
+      "exit_code": 0,
+      "stdout": "PASS buffered-phase2 provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "child-drain",
+      "exit_code": 0,
+      "stdout": "PASS child-drain provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "clean-io-late-write",
+      "exit_code": 0,
+      "stdout": "PASS clean-io-late-write provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "clean-io-override",
+      "exit_code": 0,
+      "stdout": "PASS clean-io-override provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "clean-io-retarget",
+      "exit_code": 0,
+      "stdout": "PASS clean-io-retarget provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "empty-io-close",
+      "exit_code": 0,
+      "stdout": "PASS empty-io-close provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "layered-drain",
+      "exit_code": 0,
+      "stdout": "PASS layered-drain provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "cached-drain",
+      "exit_code": 0,
+      "stdout": "PASS cached-drain provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "multi-interpreter-drain",
+      "exit_code": 0,
+      "stdout": "PASS multi-interpreter-drain provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "composite-drain",
+      "exit_code": 0,
+      "stdout": "PASS composite-drain provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "descriptor-stale-drain",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-drain provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "descriptor-stale-lock",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-lock provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "descriptor-stale-replaced",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-replaced provider=plugin.video.pov seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "descriptor-stale-symlink",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-symlink provider=plugin.video.pov seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "descriptor-literal-deleted",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-literal-deleted provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "descriptor-stale-unlinked",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-unlinked provider=plugin.video.pov seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "descriptor-observed-unlinked",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-observed-unlinked provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "normal",
+      "exit_code": 0,
+      "stdout": "PASS normal provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "invalid",
+      "exit_code": 0,
+      "stdout": "PASS invalid provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "partial",
+      "exit_code": 0,
+      "stdout": "PASS partial provider=plugin.video.future_provider_7fa29 seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "foreign",
+      "exit_code": 0,
+      "stdout": "PASS foreign provider=plugin.video.future_provider_7fa29 seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "subclass",
+      "exit_code": 0,
+      "stdout": "PASS subclass provider=plugin.video.future_provider_7fa29 seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "buffered",
+      "exit_code": 0,
+      "stdout": "PASS buffered provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "transaction",
+      "exit_code": 0,
+      "stdout": "PASS transaction provider=plugin.video.future_provider_7fa29 seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "sqlite",
+      "exit_code": 0,
+      "stdout": "PASS sqlite provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "sqlite-busy-recovered",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-busy-recovered provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "sqlite-busy-pending",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-busy-pending provider=plugin.video.future_provider_7fa29 seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "sqlite-constraint-recovered",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-constraint-recovered provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "sqlite-constraint-pending",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-constraint-pending provider=plugin.video.future_provider_7fa29 seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "namespace",
+      "exit_code": 0,
+      "stdout": "PASS namespace provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "child-thread",
+      "exit_code": 0,
+      "stdout": "PASS child-thread provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "late",
+      "exit_code": 0,
+      "stdout": "PASS late provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "pending-native",
+      "exit_code": 0,
+      "stdout": "PASS pending-native provider=plugin.video.future_provider_7fa29 seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "opaque",
+      "exit_code": 0,
+      "stdout": "PASS opaque provider=plugin.video.future_provider_7fa29 seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "namespace-unobserved",
+      "exit_code": 0,
+      "stdout": "PASS namespace-unobserved provider=plugin.video.future_provider_7fa29 seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "namespace-recreated",
+      "exit_code": 0,
+      "stdout": "PASS namespace-recreated provider=plugin.video.future_provider_7fa29 seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "namespace-symlink",
+      "exit_code": 0,
+      "stdout": "PASS namespace-symlink provider=plugin.video.future_provider_7fa29 seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "namespace-fsync",
+      "exit_code": 0,
+      "stdout": "PASS namespace-fsync provider=plugin.video.future_provider_7fa29 seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "namespace-parent-recreated",
+      "exit_code": 0,
+      "stdout": "PASS namespace-parent-recreated provider=plugin.video.future_provider_7fa29 seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "namespace-barrier",
+      "exit_code": 0,
+      "stdout": "PASS namespace-barrier provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "namespace-concurrent-unknown",
+      "exit_code": 0,
+      "stdout": "PASS namespace-concurrent-unknown provider=plugin.video.future_provider_7fa29 seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "namespace-unknown-later",
+      "exit_code": 0,
+      "stdout": "PASS namespace-unknown-later provider=plugin.video.future_provider_7fa29 seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "namespace-nested-mutation",
+      "exit_code": 0,
+      "stdout": "PASS namespace-nested-mutation provider=plugin.video.future_provider_7fa29 seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "profile-transaction",
+      "exit_code": 0,
+      "stdout": "PASS profile-transaction provider=plugin.video.future_provider_7fa29 seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "buffered-finalize",
+      "exit_code": 0,
+      "stdout": "PASS buffered-finalize provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "buffered-phase2",
+      "exit_code": 0,
+      "stdout": "PASS buffered-phase2 provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "child-drain",
+      "exit_code": 0,
+      "stdout": "PASS child-drain provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "clean-io-late-write",
+      "exit_code": 0,
+      "stdout": "PASS clean-io-late-write provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "clean-io-override",
+      "exit_code": 0,
+      "stdout": "PASS clean-io-override provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "clean-io-retarget",
+      "exit_code": 0,
+      "stdout": "PASS clean-io-retarget provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "empty-io-close",
+      "exit_code": 0,
+      "stdout": "PASS empty-io-close provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "layered-drain",
+      "exit_code": 0,
+      "stdout": "PASS layered-drain provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "cached-drain",
+      "exit_code": 0,
+      "stdout": "PASS cached-drain provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "multi-interpreter-drain",
+      "exit_code": 0,
+      "stdout": "PASS multi-interpreter-drain provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "composite-drain",
+      "exit_code": 0,
+      "stdout": "PASS composite-drain provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "descriptor-stale-drain",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-drain provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "descriptor-stale-lock",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-lock provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "descriptor-stale-replaced",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-replaced provider=plugin.video.future_provider_7fa29 seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "descriptor-stale-symlink",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-symlink provider=plugin.video.future_provider_7fa29 seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "descriptor-literal-deleted",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-literal-deleted provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "descriptor-stale-unlinked",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-unlinked provider=plugin.video.future_provider_7fa29 seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "descriptor-observed-unlinked",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-observed-unlinked provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "case": "process-reopen-cycle",
+      "cycle": 0,
+      "exit_code": 0,
+      "stdout": "PASS invalid provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true
+    },
+    {
+      "source": "candidate",
+      "case": "process-reopen-cycle",
+      "cycle": 1,
+      "exit_code": 0,
+      "stdout": "PASS invalid provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true
+    },
+    {
+      "source": "candidate",
+      "case": "process-reopen-cycle",
+      "cycle": 2,
+      "exit_code": 0,
+      "stdout": "PASS invalid provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true
+    },
+    {
+      "source": "baseline",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "invalid",
+      "exit_code": 0,
+      "stdout": "PASS invalid provider=plugin.video.thecrew seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "baseline",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "invalid",
+      "exit_code": 0,
+      "stdout": "PASS invalid provider=plugin.video.umbrella seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "baseline",
+      "provider_identity": "plugin.video.seren",
+      "case": "invalid",
+      "exit_code": 0,
+      "stdout": "PASS invalid provider=plugin.video.seren seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "baseline",
+      "provider_identity": "plugin.video.pov",
+      "case": "invalid",
+      "exit_code": 0,
+      "stdout": "PASS invalid provider=plugin.video.pov seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "baseline",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "invalid",
+      "exit_code": 0,
+      "stdout": "PASS invalid provider=plugin.video.future_provider_7fa29 seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    }
+  ],
+  "passed": true,
+  "input_hashes": {
+    "xbmc/interfaces/python/typemaps/python.buffer.intm": "b2b72d20b7ea13020502b213a52b9cc7ae3b66cd5f1cf06f95ee972f1e5f2595",
+    "xbmc/interfaces/legacy/File.cpp": "07f51ad4b22725be63d4ade7da34db2ec46cdf7b3cf8d87267ff71d9bc5bacbb",
+    "xbmc/commons/Buffer.h": "3899ff0abee8fdc0938769e0a331fa2bfb78e83d53914729164cce2d32db0156"
+  },
+  "source_delta": {
+    "before": {
+      "xbmc/interfaces/python/InfinityPythonPersistence.h": "ca92acd5cf76cc000ba0d50940b93496f5ec5ab421255bc17e044db0ba17321c",
+      "xbmc/interfaces/python/InfinityPythonPersistenceSource.h": "92365ec928f12e83c0bd4e1d6deb9ee090607851ef64572ad5b4b9756f277461",
+      "xbmc/platform/android/activity/InfinityScriptPersistence.h": "f7b241da7d0f6643afc1f8c1e10ab3f8ad0b999823cd1c223693bf6ff586037c",
+      "xbmc/platform/android/activity/InfinityProtectedWrites.h": "0446665ee568f5b15f28a0e2a09c421e08ff4bbe3cb73e9deb6d48cdd1d527ad",
+      "xbmc/interfaces/python/InfinityPythonWriteHooks.h": "660b54d7b411058cfd17d78f259ecc1c8c660891fe494de45292693f53431035"
+    },
+    "after": {
+      "xbmc/interfaces/python/InfinityPythonPersistence.h": "3f16723bde8c4524c389b0d618a2e46cc9419c3763d114424c7280b667dfd5e9",
+      "xbmc/interfaces/python/InfinityPythonPersistenceSource.h": "8e640d7aa12f5bd51c1dfef52a0bcfdfeb56881ee4fdbab9dc31fb6a66651d63",
+      "xbmc/platform/android/activity/InfinityScriptPersistence.h": "ee0737b3c684b2a447bda46b292c6dea0e79243bc05c2d7de95373519cd94133",
+      "xbmc/platform/android/activity/InfinityProtectedWrites.h": "f11ed8f25eba3b397c9ad602ace163dd12281af7e9d6424a5cec9ff6d406f826",
+      "xbmc/interfaces/python/InfinityPythonWriteHooks.h": "fc9c60b7d7269ec1298c82214be27084ff3edd104ea0b5171e6a1249a15245eb"
+    },
+    "native_source_count": 9404,
+    "other_native_inputs_unchanged": 9399,
+    "native_source_only": true,
+    "signed_apk_created": false,
+    "android_validated": false,
+    "physical_fold_verified": false,
+    "final_lock": false
+  },
+  "android_validated": false,
+  "physical_fold_verified": false,
+  "final_lock": false
+}

@@ -1,0 +1,10 @@
+{
+  "source_commit": "d47db1da134c2c914ca33265825d9403927506e5",
+  "run": 39868032073,
+  "job": 120135088183,
+  "gate": "javac public Android SDK compile",
+  "failure": "O_DIRECTORY and Os.unlink are not in the SDK34 public stubs",
+  "correction": "Use public O_NONBLOCK plus pre-open and descriptor S_ISDIR/identity verification; use public Os.remove for the proven own stage. No compiler flag or assertion waived.",
+  "apk_produced": false,
+  "physical_fold_verified": false
+}

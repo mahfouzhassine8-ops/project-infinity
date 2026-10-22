@@ -1,0 +1,46 @@
+{
+  "candidate": "RC6",
+  "accepted": false,
+  "build_commit": "5c86fc1d4ece7976b4d80c68696c20a49b1e5bcc",
+  "build_tree": "822de25b1dcc77aff675f2fc36b0515ec9202586",
+  "build_run": 39860152087,
+  "build_job": 120109788164,
+  "android_commit": "5731762c485a8036ed2856f219dd7a4c68769c3b",
+  "android_tree": "b55de569df33c33e5be97436a547fb360f338894",
+  "android_run": 39860229707,
+  "rejection": "Ordinary PathLike open after completed namespace removal loses absence proof; unchanged RC6-source controls fail all five identities.",
+  "causal_instrumentation": "INSTRUMENTED-PATHLIKE-NAMESPACE-CAUSE uses the initial RC7 diagnostic/atomic-receipt overlay without the subsequent PathLike correction. PATHLIKE-NAMESPACE-REPRODUCTION uses unchanged RC6 source.",
+  "physical_fold_verified": false,
+  "final_lock": false,
+  "build_artifact": {
+    "id": 12462553717,
+    "sha256": "c303226ee91386103dcf5f6687671e5a3d74761f07bf63aa85b66ea3c2264f43"
+  },
+  "build_evidence_artifact": {
+    "id": 12462239556,
+    "sha256": "55aab6caaac3a3bf603a585066f0f203af914a8da19f0953dae224c490ad2bae"
+  },
+  "android_artifacts": {
+    "safe": {
+      "id": 12463576455,
+      "sha256": "d54c980f22c9da5e91b22ee3c0e7e5c79ee08980e7b00e12e20b71ff9695737f"
+    },
+    "opaque": {
+      "id": 12463501106,
+      "sha256": "43a07309c2f1829e3e9c67c251ae58de6351e461ecddc08aa6eb2e5c728f0e0a"
+    },
+    "pending": {
+      "id": 12463406372,
+      "sha256": "0fcf786b63ca80e2fb7cf38d92083af01d90fc3fa5c8dde953a8caf495ad0ad9"
+    },
+    "lost-file": {
+      "id": 12463192248,
+      "sha256": "547d4e6bf4ec32c9575aa05957f8ebc5fc49167162c17866e4cf1fd8d7ed1ff6"
+    },
+    "baseline": {
+      "id": 12462227256,
+      "sha256": "8a1b2b479f5b9fe5bb84b3149545e9c9317955d8b69fb0dd474124ec1952dc90"
+    }
+  },
+  "android_summary": "All four negative controls passed; safe Close failed removed-directory durability without authorization. Actual recovered context COMMIT remains nonblocking in candidate controls, while original baseline retains the false context blocker."
+}

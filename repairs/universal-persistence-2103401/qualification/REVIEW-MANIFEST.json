@@ -1,0 +1,81 @@
+{
+  "status": "ANDROID17_GATE_PASSED_PHYSICAL_FOLD_NOT_ACCEPTED",
+  "runtime_build_commit": "2ec8cb7e0323c1e2c4ba0c57594eb678541eb222",
+  "runtime_build_run": 39868217775,
+  "android_test_commit": "e7adb8a24a7855399d08be90a858c9586e726912",
+  "android_test_run": 39872761320,
+  "candidate_apk_sha256": "4c3e465eb78ebbba14df02b810b1851188dc8fbcb20fe17b4cc41f84dc824879",
+  "review_changes": "Qualification, read-only auditors, fixture-integrity checks and bytecode-cache suppression in this repair own new build workflow; signed runtime implementation unchanged.",
+  "native_cases": 310,
+  "fixture_integrity_cases": 12,
+  "android_safe_closes": 3,
+  "android_final_reopens": 1,
+  "negative_controls": [
+    "original-input invalid VFS classification",
+    "pending SQLite transaction",
+    "opaque external writer",
+    "lost dirty file"
+  ],
+  "earlier_startup_failure_waived": false,
+  "real_provider_code_tested": false,
+  "physical_fold_verified": false,
+  "final_lock": false,
+  "reference_files": [
+    {
+      "path": "repairs/universal-persistence-2103401/NATIVE-SOURCE.patch",
+      "sha256": "551ea8a2593e4e307eb91ec9500e26d341ef1420beab65f7a88c98d218d2352a"
+    },
+    {
+      "path": "repairs/universal-persistence-2103401/InfinityCheckpointReceipt.java",
+      "sha256": "05e19c4c0d347a757eeb563a9f51865000f6282572a2dd0681df23b4c140c829"
+    },
+    {
+      "path": "repairs/universal-persistence-2103401/JAVA-SOURCE.patch",
+      "sha256": "9a1023d48fae62ea80155b2f94e5029aed811990d22262b4fece9c4326f51f4b"
+    },
+    {
+      "path": "repairs/universal-persistence-2103401/RECEIPT-SOURCE-BOUNDARY.json",
+      "sha256": "3849e6a7e54fe4ef3daa872412671d86828ad9751140c20311832551880c6928"
+    },
+    {
+      "path": "repairs/universal-persistence-2103401/android_future_service.py",
+      "sha256": "7abb08a3f5a587f25449531c9cb6e687dd65d9b32793d1b8c596cccbb6274ad8"
+    },
+    {
+      "path": "repairs/universal-persistence-2103401/android_probe.py",
+      "sha256": "fc6be3851836c3c159d5ee1627bc8d5c5796b9d58e9488449c5338e0c6b82c34"
+    },
+    {
+      "path": "repairs/universal-persistence-2103401/fixture_integrity.py",
+      "sha256": "ff91f0056bc58a3153a7134113844882242483f7e61362db89473ca68fa0145d"
+    },
+    {
+      "path": "repairs/universal-persistence-2103401/audit_android.py",
+      "sha256": "f26e4a66601fd4d4b34ff48d3cd791744c68811cb0fe3ce80b10dc1d217a6a5d"
+    },
+    {
+      "path": "repairs/universal-persistence-2103401/audit_receipt.py",
+      "sha256": "13b38b7e6cb65f9438ae4c99fe8a817323673fff7a4c252d62c3c8b1db66de48"
+    },
+    {
+      "path": "repairs/universal-persistence-2103401/audit_artifact.py",
+      "sha256": "4ae785bbe6dccc5d62957b154b2e77e7effad686a0e0f15315294110fcb452fc"
+    },
+    {
+      "path": "repairs/universal-persistence-2103401/startup_constructor.py",
+      "sha256": "547e3973e9fcd6f08e434e3dde14fe017425c296d01d4d8c12ce7da15d7d1f1a"
+    },
+    {
+      "path": "repairs/universal-persistence-2103401/README.md",
+      "sha256": "b8196aed67750a939f461cf8a68822c8e302ebcb3f82e489547d22999dca001f"
+    },
+    {
+      "path": "repairs/universal-persistence-2103401/QUALIFICATION.md",
+      "sha256": "14f8636c90dd9e024842d7a8357b2af321a5a0c1ca2954c11795231d8e3384af"
+    },
+    {
+      "path": "repairs/universal-persistence-2103401/FOLD-ACCEPTANCE.md",
+      "sha256": "ee1a0662ddc326fa63e04ac5470398cf146c7f05fd162345d7fc007202239f53"
+    }
+  ]
+}

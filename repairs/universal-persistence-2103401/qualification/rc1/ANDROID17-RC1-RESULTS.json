@@ -1,0 +1,232 @@
+[
+  {
+    "mode": "pending",
+    "passed": true,
+    "platform": {
+      "qemu": "1",
+      "sdk": "37",
+      "release": "17",
+      "abis": "x86_64,arm64-v8a"
+    },
+    "apk_sha256": "033e48211b646bfbcf34894ae69ef934d433a38213aed8e368dc7bb2b2bd3317",
+    "phase": "CHECKPOINT_FAILED",
+    "error": "native_admission: checkpoint_deadline_exceeded; owner proof incomplete",
+    "essential_write_blockers": [
+      "unverified_protected_writer:service.future.persistence.7fa29:service.py:sqlite_pending_transaction_at_retirement",
+      "unflushed_protected_buffer:5:130850124909072;writer_id=5;thread=130842902503616;checkpoint_generation=1;interpreter=130842864556816;invocation=service.future.persistence.7fa29:service.py",
+      "unflushed_protected_buffer:5:130850124985712;writer_id=5;thread=130842846884032;checkpoint_generation=1;interpreter=130842864556816;invocation=service.future.persistence.7fa29:service.py",
+      "unflushed_protected_buffer:5:native-buffer:130851464983904;writer_id=5;thread=130842902503616;checkpoint_generation=1;interpreter=130842864556816;invocation=service.future.persistence.7fa29:service.py",
+      "unflushed_protected_buffer:5:native-buffer:130851464998688;writer_id=5;thread=130842846884032;checkpoint_generation=1;interpreter=130842864556816;invocation=service.future.persistence.7fa29:service.py",
+      "pending_protected_sqlite_write_transaction:sqlite:130844752916728:wal;writer_id=5;thread=130842902503616;checkpoint_generation=1;interpreter=130842864556816;invocation=service.future.persistence.7fa29:service.py"
+    ],
+    "script_blockers": [
+      {
+        "blocking": false,
+        "count": 1,
+        "detail": "value_type=NoneType;exception=TypeError;operation_id=3295;checkpoint_generation=0;effect=argument_rejected_before_native_write",
+        "reason": "vfs_write_exception",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": false,
+        "count": 1,
+        "detail": "value_type=int;exception=TypeError;operation_id=3296;checkpoint_generation=0;effect=argument_rejected_before_native_write",
+        "reason": "vfs_write_exception",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": false,
+        "count": 1,
+        "detail": "value_type=memoryview;exception=TypeError;operation_id=3297;checkpoint_generation=0;effect=argument_rejected_before_native_write",
+        "reason": "vfs_write_exception",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": false,
+        "count": 1,
+        "detail": "exception=OperationalError;sqlite_code=1;verb=INSERT;exception=OperationalError;sqlite_errorcode=1;stack=<observer>:363:execute",
+        "reason": "sqlite_write_failed",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": false,
+        "count": 1,
+        "detail": "buffer_flush_failed",
+        "reason": "protected_write_rejected_before_mutation",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": false,
+        "count": 1,
+        "detail": "",
+        "reason": "uncaught_script_failure_before_persistence_receipt",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": false,
+        "count": 7,
+        "detail": "layered_buffer_close_failed",
+        "reason": "protected_write_rejected_before_mutation",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": false,
+        "count": 2,
+        "detail": "namespace_open_failed",
+        "reason": "protected_write_rejected_before_mutation",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": true,
+        "count": 1,
+        "detail": "",
+        "reason": "sqlite_pending_transaction_at_retirement",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": false,
+        "count": 7,
+        "detail": "layered_buffer_flush_failed",
+        "reason": "protected_write_rejected_before_mutation",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": false,
+        "count": 8,
+        "detail": "buffer_flush_before_retirement_failed",
+        "reason": "protected_write_rejected_before_mutation",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      }
+    ],
+    "engine_remained_alive": true
+  },
+  {
+    "mode": "opaque",
+    "passed": true,
+    "platform": {
+      "qemu": "1",
+      "sdk": "37",
+      "release": "17",
+      "abis": "x86_64,arm64-v8a"
+    },
+    "apk_sha256": "033e48211b646bfbcf34894ae69ef934d433a38213aed8e368dc7bb2b2bd3317",
+    "phase": "CHECKPOINT_FAILED",
+    "error": "native_admission: checkpoint_deadline_exceeded; owner proof incomplete",
+    "essential_write_blockers": [
+      "unverified_protected_writer:service.xbmc.versioncheck:runner.py:external_or_opaque_writer_requires_explicit_participant",
+      "unverified_protected_writer:service.xbmc.versioncheck:runner.py:unobserved_native_child_process",
+      "unflushed_protected_buffer:5:137085960370048;writer_id=5;thread=137078990946496;checkpoint_generation=1;interpreter=137090854071056;invocation=service.future.persistence.7fa29:service.py",
+      "unflushed_protected_buffer:5:137085960394368;writer_id=5;thread=137079266853056;checkpoint_generation=1;interpreter=137090854071056;invocation=service.future.persistence.7fa29:service.py",
+      "unflushed_protected_buffer:5:native-buffer:137082200017088;writer_id=5;thread=137079266853056;checkpoint_generation=1;interpreter=137090854071056;invocation=service.future.persistence.7fa29:service.py",
+      "unflushed_protected_buffer:5:native-buffer:137082200067488;writer_id=5;thread=137078990946496;checkpoint_generation=1;interpreter=137090854071056;invocation=service.future.persistence.7fa29:service.py"
+    ],
+    "script_blockers": [
+      {
+        "blocking": false,
+        "count": 1,
+        "detail": "value_type=NoneType;exception=TypeError;operation_id=3309;checkpoint_generation=0;effect=argument_rejected_before_native_write",
+        "reason": "vfs_write_exception",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": false,
+        "count": 1,
+        "detail": "value_type=int;exception=TypeError;operation_id=3310;checkpoint_generation=0;effect=argument_rejected_before_native_write",
+        "reason": "vfs_write_exception",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": false,
+        "count": 1,
+        "detail": "value_type=memoryview;exception=TypeError;operation_id=3311;checkpoint_generation=0;effect=argument_rejected_before_native_write",
+        "reason": "vfs_write_exception",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": false,
+        "count": 1,
+        "detail": "exception=OperationalError;sqlite_code=1;verb=INSERT;exception=OperationalError;sqlite_errorcode=1;stack=<observer>:363:execute",
+        "reason": "sqlite_write_failed",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": true,
+        "count": 1,
+        "detail": "executable=lsb_release;argc=2",
+        "reason": "external_or_opaque_writer_requires_explicit_participant",
+        "writer": "service.xbmc.versioncheck:runner.py",
+        "writer_id": 3
+      },
+      {
+        "blocking": true,
+        "count": 1,
+        "detail": "readonly_child_scope_absent",
+        "reason": "unobserved_native_child_process",
+        "writer": "service.xbmc.versioncheck:runner.py",
+        "writer_id": 3
+      },
+      {
+        "blocking": false,
+        "count": 1,
+        "detail": "",
+        "reason": "uncaught_script_failure_before_persistence_receipt",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": false,
+        "count": 8,
+        "detail": "layered_buffer_close_failed",
+        "reason": "protected_write_rejected_before_mutation",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": false,
+        "count": 8,
+        "detail": "layered_buffer_flush_failed",
+        "reason": "protected_write_rejected_before_mutation",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      },
+      {
+        "blocking": false,
+        "count": 9,
+        "detail": "buffer_flush_before_retirement_failed",
+        "reason": "protected_write_rejected_before_mutation",
+        "writer": "service.future.persistence.7fa29:service.py",
+        "writer_id": 5
+      }
+    ],
+    "engine_remained_alive": true
+  },
+  {
+    "mode": "safe",
+    "passed": false,
+    "apk_sha256": "033e48211b646bfbcf34894ae69ef934d433a38213aed8e368dc7bb2b2bd3317",
+    "phase": "CHECKPOINT_FAILED",
+    "error": "native_admission: checkpoint_deadline_exceeded; owner proof incomplete",
+    "essential_write_blockers": [
+      "unflushed_protected_buffer:5:123549204649424;writer_id=5;thread=123541526913216;checkpoint_generation=1;interpreter=123555605850896;invocation=service.future.persistence.7fa29:service.py",
+      "unflushed_protected_buffer:5:123549204866304;writer_id=5;thread=123543763255488;checkpoint_generation=1;interpreter=123555605850896;invocation=service.future.persistence.7fa29:service.py",
+      "unflushed_protected_buffer:5:native-buffer:123544370792640;writer_id=5;thread=123543763255488;checkpoint_generation=1;interpreter=123555605850896;invocation=service.future.persistence.7fa29:service.py",
+      "unflushed_protected_buffer:5:native-buffer:123544370801824;writer_id=5;thread=123541526913216;checkpoint_generation=1;interpreter=123555605850896;invocation=service.future.persistence.7fa29:service.py"
+    ],
+    "cause": "Successful flush retired dirty-buffer record; subsequent close denied; no safe exit authorized"
+  }
+]

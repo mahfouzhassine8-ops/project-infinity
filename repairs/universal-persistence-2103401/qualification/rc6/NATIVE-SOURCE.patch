@@ -1,0 +1,890 @@
+--- a/xbmc/interfaces/python/InfinityPythonPersistence.h
++++ b/xbmc/interfaces/python/InfinityPythonPersistence.h
+@@ -16,9 +16,11 @@
+ #include <string>
+ #include <sys/statvfs.h>
+ 
+-namespace InfinityPythonWriteHooks { inline PyObject* ActualDescriptor(PyObject* object,unsigned depth); }
++namespace InfinityPythonWriteHooks { inline PyObject* ActualDescriptor(PyObject* object,unsigned depth); inline bool VerifiedCleanIo(PyObject* object); }
+ namespace InfinityPythonPersistence
+ {
++struct IoContract { PyObject* type{nullptr}; PyObject* methods[4]{}; };
++struct CleanIoReceipt { PyObject* weak{nullptr}; int fd{-1}; dev_t device{}; ino_t inode{}; mode_t mode{}; int flags{-1}; };
+ struct Context
+ {
+   int id{-1};
+@@ -27,7 +29,11 @@
+   PyObject* connectionType{nullptr};
+   PyObject* rawType{nullptr};
+   PyObject* rawWrite{nullptr};
++  PyObject* vfsType{nullptr};
++  PyObject* vfsWrite{nullptr};
+   PyObject* admissionError{nullptr};
++  std::vector<IoContract> ioContracts;
++  std::map<PyObject*,CleanIoReceipt> cleanIo;
+   std::string initializationStage;
+   uint64_t interpreterIdentity{0};
+   bool retiring{false};
+@@ -149,7 +155,7 @@
+       return {}; // Anonymous temporary files/memfd have no persistent namespace.
+     // Sockets/pipes/stdout carry no persistent file contents.
+     if(target[0]!='/')return {};
+-    return target;
++    return InfinityScriptPersistence::VerifiedDescriptorLink(static_cast<int>(fd),target);
+   }
+   PyObject* filesystem=PyOS_FSPath(value);if(!filesystem){PyErr_Clear();return {};}
+   PyObject* bytes=PyUnicode_Check(filesystem)?PyUnicode_EncodeFSDefault(filesystem):filesystem;
+@@ -788,6 +794,122 @@
+ }
+ inline Context* Capsule(PyObject* self)
+ {return static_cast<Context*>(PyCapsule_GetPointer(self,"Infinity.Persistence.Observer"));}
++// Called only inside the existing Infinity interpreter observer. Do not patch
++// Kodi's shared argument converter, VFS implementation or provider modules.
++inline PyObject* CheckedVfsWrite(PyObject* self, PyObject* args)
++{
++  auto* context = Capsule(self);
++  PyObject *handle = nullptr, *value = nullptr;
++  if (!context || !PyArg_ParseTuple(args, "OO", &handle, &value)) return nullptr;
++  const auto found = Contexts().find(PyThreadState_Get()->interp);
++  if (found == Contexts().end() || found->second != context)
++  {
++    PyErr_SetString(PyExc_RuntimeError, "VFS observer interpreter ownership mismatch");
++    return nullptr;
++  }
++
++  // Capture and invoke the same callable. Only the original static Kodi File
++  // type and its original C method can establish the conversion contract.
++  // A Python override, subclass, replacement or unknown extension gets no proof.
++  PyObject* method = PyObject_GetAttrString(handle, "write");
++  bool nativeMethod = method && context->vfsType && context->vfsWrite &&
++      Py_TYPE(handle) == reinterpret_cast<PyTypeObject*>(context->vfsType) &&
++      PyCFunction_Check(method) && PyCFunction_GetSelf(method) == handle;
++  if (nativeMethod)
++  {
++    const auto* definition = reinterpret_cast<PyMethodDescrObject*>(context->vfsWrite)->d_method;
++    nativeMethod = PyCFunction_GetFunction(method) == definition->ml_meth &&
++        PyCFunction_GetFlags(method) == definition->ml_flags;
++  }
++  const bool invalidBuffer = !PyUnicode_Check(value) && !PyBytes_Check(value) &&
++      !PyByteArray_Check(value);
++
++  uint64_t operation = 0, generation = 0;
++  std::string target;
++  {
++    auto& state = InfinityScriptPersistence::Get();
++    std::lock_guard<std::mutex> lock(state.mutex);
++    for (const auto& item : state.protection.operations)
++    {
++      const auto& lease = item.second;
++      if (lease.writer != context->id || lease.thread != std::this_thread::get_id() ||
++          lease.operation != "vfs.write") continue;
++      // Nested/ambiguous leases never establish no-mutation proof.
++      if (operation) { operation = 0; target.clear(); break; }
++      operation = item.first;
++      if (lease.paths.size() == 1) target = lease.paths.front();
++    }
++    generation = state.protection.generation;
++  }
++  PyObject* result = method ? PyObject_CallFunctionObjArgs(method, value, nullptr) : nullptr;
++  Py_XDECREF(method);
++  if (result == Py_True) return result;
++
++  // Preserve exactly the original result, pending exception and errno. Neither
++  // a rejection nor a failed/partial write is a successful save receipt.
++  const int savedErrno = errno;
++  PyObject *type = nullptr, *error = nullptr, *trace = nullptr;
++  PyErr_Fetch(&type, &error, &trace);
++  const bool rejected = !result && type == PyExc_TypeError && nativeMethod &&
++      invalidBuffer && operation != 0;
++  const char* reason = result ? "vfs_write_failed" : "vfs_write_exception";
++  const std::string detail = "value_type=" + std::string(Py_TYPE(value)->tp_name).substr(0, 80) +
++      ";exception=" + (type && PyType_Check(type) ?
++          std::string(reinterpret_cast<PyTypeObject*>(type)->tp_name).substr(0, 80) : "<none>") +
++      ";operation_id=" + std::to_string(operation) +
++      ";checkpoint_generation=" + std::to_string(generation) +
++      ";effect=" + (rejected ? "argument_rejected_before_native_write" : "unverified");
++  bool recorded = false;
++  if (rejected)
++  {
++    auto& state = InfinityScriptPersistence::Get();
++    std::lock_guard<std::mutex> lock(state.mutex);
++    const auto live = state.protection.operations.find(operation);
++    const auto writer = state.writers.find(context->id);
++    if (live != state.protection.operations.end() && writer != state.writers.end() &&
++        live->second.writer == context->id && live->second.thread == std::this_thread::get_id() &&
++        live->second.operation == "vfs.write" && state.protection.generation == generation)
++    {
++      // Direct native evidence; this reason is NOT added to the generic
++      // AdvisoryFailureReason allowlist. Python cannot assert this proof.
++      std::string name;
++      for (const auto& admission : writer->second.admissions)
++      { if (!name.empty()) name += ","; name += admission.first; }
++      InfinityScriptPersistence::AddBlockerLocked(state, context->id, name,
++          reason, detail, false);
++      recorded = true;
++    }
++  }
++  if (!recorded)
++  {
++    const auto verified = InfinityScriptPersistence::VerifiedVfsWriteFailureTarget(
++        context->id, "vfs.write", target);
++    InfinityScriptPersistence::Fail(context->id, reason, detail, verified);
++  }
++  PyErr_Restore(type, error, trace);
++  errno = savedErrno;
++  return result;
++}
++
++inline void CaptureNativeVfsContract(Context* context, PyObject* vfs)
++{
++  if (!vfs || vfs == Py_None) return;
++  PyObject* type = PyObject_GetAttrString(vfs, "File");
++  if (!type) { PyErr_Clear(); return; }
++  if (PyType_Check(type) &&
++      !(reinterpret_cast<PyTypeObject*>(type)->tp_flags & Py_TPFLAGS_HEAPTYPE) &&
++      std::strcmp(reinterpret_cast<PyTypeObject*>(type)->tp_name, "xbmcvfs.File") == 0)
++  {
++    PyObject* method = PyObject_GetAttrString(type, "write");
++    if (method && Py_TYPE(method) == &PyMethodDescr_Type &&
++        PyDescr_TYPE(method) == reinterpret_cast<PyTypeObject*>(type))
++    { context->vfsType = type; context->vfsWrite = method; return; }
++    Py_XDECREF(method);
++    PyErr_Clear();
++  }
++  Py_DECREF(type);
++}
++
+ inline PyObject* Error(PyObject* self,PyObject* args)
+ {
+   auto* context=Capsule(self);const char* reason=nullptr;const char* detail="";
+@@ -878,6 +1000,13 @@
+       }
+       else if (PyErr_Occurred()) { Py_DECREF(sequence); return nullptr; }
+     }
++    // A proven clean native handle needs no persistent write lease.
++    // New writes from callbacks still encounter the normal barrier.
++    if ((operation=="file.flush" || operation=="file.close" ||
++         operation=="buffer.flush" || operation=="buffer.close" ||
++         operation=="raw.flush" || operation=="raw.close") &&
++        InfinityPythonWriteHooks::VerifiedCleanIo(item))
++      path=InfinityScriptPersistence::NonPersistentTarget();
+     paths.push_back(path);
+   }
+   Py_DECREF(sequence);
+@@ -950,6 +1079,7 @@
+   PyObject* result=PyRun_String(INFINITY_PYTHON_PERSISTENCE_SOURCE,Py_file_input,context->globals,context->globals);
+   if(!result) { Py_DECREF(capsule);return failed(); }
+   Py_DECREF(result);
++  static PyMethodDef vfsWriteMethod={"checked_vfs_write",CheckedVfsWrite,METH_VARARGS,nullptr};
+   static PyMethodDef errorMethod={"record_failure",Error,METH_VARARGS,nullptr};
+   static PyMethodDef mutationMethod={"record_mutation",Mutation,METH_VARARGS,nullptr};
+   static PyMethodDef protectionMethod={"protect_mutation",Protect,METH_VARARGS,nullptr};
+@@ -977,7 +1107,12 @@
+ #endif
+   if(klass && !PyErr_Occurred() && vfs) {
+     InitializationStage(context,"python.observer.construct");
+-    context->observer=PyObject_CallFunctionObjArgs(klass,error,mutation,vfs,hostProbe,protection,context->admissionError,nullptr);
++    CaptureNativeVfsContract(context, vfs);
++    PyObject* vfsWrite=PyCFunction_NewEx(&vfsWriteMethod,capsule,nullptr);
++    if(vfsWrite) {
++      context->observer=PyObject_CallFunctionObjArgs(klass,error,mutation,vfs,hostProbe,protection,context->admissionError,vfsWrite,nullptr);
++      Py_DECREF(vfsWrite);
++    }
+   }
+   if(!initializationFailed && (!context->observer || PyErr_Occurred())) {
+     if(!klass)InitializationStage(context,"python.observer.class");
+@@ -994,6 +1129,7 @@
+   InitializationStage(context,"python.observer.raw_write");
+   context->rawWrite=PyObject_GetAttrString(context->rawType,"write");
+   if(!context->rawWrite || PyErr_Occurred())return failed();
++  if(!InfinityPythonWriteHooks::CaptureIoContracts(context))return failed();
+   InitializationStage(context,"complete");
+   InfinityScriptPersistence::Observed(id);
+   return context;
+@@ -1030,6 +1166,14 @@
+   context->retiring=true;
+   Py_CLEAR(context->observer);Py_CLEAR(context->connectionType);Py_CLEAR(context->globals);
+   Py_CLEAR(context->rawWrite);Py_CLEAR(context->rawType);
++  Py_CLEAR(context->vfsWrite);Py_CLEAR(context->vfsType);
++  for(auto& item:context->cleanIo)Py_XDECREF(item.second.weak);
++  context->cleanIo.clear();
++  for(auto& contract:context->ioContracts) {
++    for(auto* method:contract.methods)Py_XDECREF(method);
++    Py_XDECREF(contract.type);
++  }
++  context->ioContracts.clear();
+   Py_CLEAR(context->admissionError);
+ }
+ inline void End(Context* context,PyInterpreterState* interpreter)
+--- a/xbmc/interfaces/python/InfinityPythonPersistenceSource.h
++++ b/xbmc/interfaces/python/InfinityPythonPersistenceSource.h
+@@ -107,7 +107,7 @@
+ 
+ 
+ class Observer:
+-    def __init__(self, fail, touch, vfs=None, host_probe=False, protect=None, closed_error=None):
++    def __init__(self, fail, touch, vfs=None, host_probe=False, protect=None, closed_error=None, native_vfs_write=None):
+         global _INFINITY_INITIALIZATION_STAGE
+         _INFINITY_INITIALIZATION_STAGE = 'python.observer.state'
+         _infinity_report_initialization_stage()
+@@ -126,6 +126,7 @@
+         self.vfs = vfs
+         self.protect = protect
+         self.closed_error = closed_error
++        self.native_vfs_write = native_vfs_write
+         self.install()
+ 
+     @contextmanager
+@@ -461,8 +462,12 @@
+             def __exit__(self, exc_type, exc, tb):
+                 # Preserve SQLite's commit-on-success / rollback-on-exception.
+                 try: return super().__exit__(exc_type, exc, tb)
+-                except Exception:
+-                    observer.error('sqlite_context_commit_or_rollback_failed')
++                except Exception as error:
++                    # The original context manager may already have rolled back.
++                    # Record the failed operation; native transaction/buffer
++                    # evidence and retirement still decide whether it is safe.
++                    observer.sqlite_error('sqlite_script_failed', error,
++                                          'ROLLBACK' if exc_type else 'COMMIT')
+                     raise
+             def __del__(self):
+                 if not getattr(self, '_infinity_closed', True):
+@@ -472,6 +477,27 @@
+                             observer.error('sqlite_collected_with_pending_transaction')
+                     except Exception:
+                         observer.error('sqlite_transaction_inspection_failed')
++
++        # Stepping/finalizing a cursor, rolling back, context exit and connection
++        # cleanup can call the native VFS after execute() has returned. Keep the
++        # invocation owner through the actual call, including GIL-released I/O.
++        # This coordination lease has no persistent target and grants no write
++        # permission: every actual VFS path retains its native admission/drain
++        # checks. Return values and exceptions come from the original method.
++        def owned_sqlite_call(original, operation):
++            def owned(handle, *args, **kwargs):
++                with observer.operation(operation, (NONPERSISTENT_TARGET,)):
++                    return original(handle, *args, **kwargs)
++            return owned
++
++        for klass, names in (
++                (Cursor, ('fetchone', 'fetchmany', 'fetchall', '__next__', 'close')),
++                (Connection, ('rollback', '__exit__', 'close', 'backup', 'blobopen',
++                              'serialize', 'deserialize'))):
++            for name in names:
++                original = getattr(klass, name, None)
++                if original is not None:
++                    setattr(klass, name, owned_sqlite_call(original, 'sqlite.'+name))
+ 
+         original_connect = sqlite3.connect
+         original_dbapi_connect = dbapi2.connect
+@@ -580,6 +606,9 @@
+                     translated = self.vfs.translatePath(path)
+                     with observer.operation('vfs.open', (translated,)):
+                         handle = VFSFile(_original(path, mode), observer, translated)
++                        # A writable VFS open may already truncate/create data.
++                        # Keep its drain obligation until checked native close.
++                        observer.buffer(handle, (translated,), True)
+                 except Exception:
+                     observer.error('vfs_open_for_write_failed')
+                     raise
+@@ -933,6 +962,8 @@
+     @protected_method('vfs.write')
+     def write(self, value):
+         self.observer.check_live()
++        if self.observer.native_vfs_write is not None:
++            return self.observer.native_vfs_write(self._infinity_handle, value)
+         try:
+             result = self._infinity_handle.write(value)
+             if result is not True: self.observer.error(
+--- a/xbmc/interfaces/python/InfinityPythonWriteHooks.h
++++ b/xbmc/interfaces/python/InfinityPythonWriteHooks.h
+@@ -99,6 +99,140 @@
+     }
+   return nullptr;
+ }
++// Positive, interpreter-owned evidence from a successful native open/flush.
++// A clean close/flush is admitted as NONPERSISTENT: it confers no permission
++// for a callback to write new payload through an enclosing drain lease.
++inline const char* const* IoMethodNames()
++{
++  static const char* names[]{"write","flush","close","truncate"}; return names;
++}
++inline bool CaptureIoContracts(InfinityPythonPersistence::Context* context)
++{
++  auto* io=PyImport_ImportModule("_io"); if(!io)return false;
++  bool ok=true;
++  for(const auto* name:{"FileIO","BufferedWriter","BufferedRandom","TextIOWrapper"})
++  {
++    InfinityPythonPersistence::IoContract contract;
++    contract.type=PyObject_GetAttrString(io,name);
++    if(!contract.type || !PyType_Check(contract.type))ok=false;
++    for(unsigned i=0;i<4 && ok;++i)
++    { contract.methods[i]=PyObject_GetAttrString(contract.type,IoMethodNames()[i]);if(!contract.methods[i])ok=false; }
++    context->ioContracts.push_back(contract);
++    if(!ok)break;
++  }
++  Py_DECREF(io); return ok;
++}
++inline bool TrustedIoObject(PyObject* object)
++{
++  auto* type=Py_TYPE(object); bool known=false;
++  for(auto* native:IOTypes())if(type==native)known=true;
++  auto* context=Context();
++  if(!known && context)
++    for(const auto& contract:context->ioContracts)
++      if(reinterpret_cast<PyObject*>(type)==contract.type)
++      {
++        known=true;
++        for(unsigned i=0;i<4;++i)
++        {
++          auto* method=PyObject_GetAttrString(contract.type,IoMethodNames()[i]);
++          if(!method || method!=contract.methods[i])known=false;
++          Py_XDECREF(method);
++        }
++      }
++  if(!known)return false;
++  if(type->tp_dictoffset)
++  {
++    auto* dictionary=PyObject_GenericGetDict(object,nullptr);if(!dictionary)return false;
++    for(const auto* name:{"write","flush","close","truncate","fileno","writable","raw","buffer"})
++      if(PyDict_GetItemString(dictionary,name))known=false;
++    Py_DECREF(dictionary);
++  }
++  return known;
++}
++inline bool IoIdentity(PyObject* object,InfinityPythonPersistence::CleanIoReceipt& receipt)
++{
++  auto* descriptor=ActualDescriptor(object);
++  if(!descriptor)return false;
++  const long value=PyLong_Check(descriptor)?PyLong_AsLong(descriptor):-1;
++  Py_DECREF(descriptor);
++  if(PyErr_Occurred() || value<0 || value>INT_MAX)return false;
++  struct stat st{};
++  const int fd=static_cast<int>(value),flags=::fcntl(fd,F_GETFL);
++  if(flags<0 || ::fstat(fd,&st)!=0)return false;
++  receipt.fd=fd;receipt.device=st.st_dev;receipt.inode=st.st_ino;
++  receipt.mode=st.st_mode;receipt.flags=flags;return true;
++}
++inline void ForgetCleanIo(PyObject* object)
++{
++  auto* context=Context();if(!context)return;
++  const auto found=context->cleanIo.find(object);
++  if(found!=context->cleanIo.end())
++  {Py_XDECREF(found->second.weak);context->cleanIo.erase(found);}
++}
++inline void RecordCleanIo(PyObject* object)
++{
++  auto* context=Context();if(!context || !object)return;
++  const int savedErrno=errno;PyObject *type=nullptr,*error=nullptr,*trace=nullptr;
++  PyErr_Fetch(&type,&error,&trace);
++  InfinityPythonPersistence::CleanIoReceipt receipt;
++  if(TrustedIoObject(object) && IoIdentity(object,receipt))
++  {
++    receipt.weak=PyWeakref_NewRef(object,nullptr);
++    if(receipt.weak)
++    {
++      ForgetCleanIo(object);
++      if(context->cleanIo.size()>=65536)
++      {
++        for(auto it=context->cleanIo.begin();it!=context->cleanIo.end();)
++          if(PyWeakref_GetObject(it->second.weak)==Py_None)
++          {Py_DECREF(it->second.weak);it=context->cleanIo.erase(it);}else ++it;
++      }
++      if(context->cleanIo.size()<65536)context->cleanIo.emplace(object,receipt);
++      else {Py_DECREF(receipt.weak);Ledger::Fail(context->id,"native_clean_io_inventory_exhausted");}
++    }
++  }
++  PyErr_Clear();PyErr_Restore(type,error,trace);errno=savedErrno;
++}
++inline bool CleanIoTree(PyObject* object,bool& proof,unsigned depth=0)
++{
++  if(depth>4 || !TrustedIoObject(object))return false;
++  auto* context=Context();if(!context)return false;
++  InfinityPythonPersistence::CleanIoReceipt current;
++  if(!IoIdentity(object,current))return false;
++  const auto key=std::to_string(context->id)+":";
++  const auto address=std::to_string(reinterpret_cast<uintptr_t>(object));
++  {
++    auto& state=Ledger::Get();std::lock_guard<std::mutex> lock(state.mutex);
++    if(state.protection.buffers.count(key+address) ||
++       state.protection.buffers.count(key+"native-buffer:"+address))return false;
++  }
++  const auto found=context->cleanIo.find(object);
++  if(found!=context->cleanIo.end())
++  {
++    const auto& prior=found->second;
++    if(PyWeakref_GetObject(prior.weak)!=object || prior.fd!=current.fd ||
++       prior.device!=current.device || prior.inode!=current.inode ||
++       prior.mode!=current.mode || prior.flags!=current.flags)return false;
++    proof=true;
++  }
++  if(PyObject_TypeCheck(object,IOTypes()[0]))return true;
++  for(unsigned i=1;i<=4;++i)
++    if(PyObject_TypeCheck(object,IOTypes()[i]))
++    {
++      auto* next=NativeField(object,IOTypes()[i],i==4?"buffer":"raw");
++      if(!next)return false;
++      const bool clean=CleanIoTree(next,proof,depth+1);Py_DECREF(next);return clean;
++    }
++  return false;
++}
++inline bool VerifiedCleanIo(PyObject* object)
++{
++  const int savedErrno=errno;PyObject *type=nullptr,*error=nullptr,*trace=nullptr;
++  PyErr_Fetch(&type,&error,&trace);bool proof=false;
++  const bool clean=CleanIoTree(object,proof) && proof;
++  PyErr_Clear();PyErr_Restore(type,error,trace);errno=savedErrno;return clean;
++}
++
+ inline bool DescriptorReader(PyObject* io, const char* typeName, unsigned index,
+                              const char* methodName = "fileno")
+ {
+@@ -212,7 +346,7 @@
+ class Call
+ {
+ public:
+-  Call(Kind kind, PyObject* self, const Arguments& args) : m_kind(kind), m_context(Context())
++  Call(Kind kind, PyObject* self, const Arguments& args) : m_kind(kind), m_context(Context()), m_object(self)
+   {
+     if (!WritesOpen(kind, args)) { m_allowed = true; return; }
+     if (kind == EXTENSION_CREATE)
+@@ -273,6 +407,8 @@
+       m_paths = {Target(target, args.At(-1, "dir_fd"))};
+       if (target && PyLong_Check(target)) m_descriptor = static_cast<int>(PyLong_AsLong(target));
+     }
++    if ((kind==BUFFER_FLUSH || kind==BUFFER_CLOSE || kind==TEXT_FLUSH || kind==TEXT_CLOSE) &&
++        VerifiedCleanIo(self))m_paths={Ledger::NonPersistentTarget()};
+     const int writer = m_context ? m_context->id : -1;
+     // Unbuffered close changes descriptor identity, not file contents. Do not
+     // invent dirty files merely because a read-only module file was closed.
+@@ -283,8 +419,17 @@
+       if (value && PyLong_Check(value)) m_lockOperation = static_cast<int>(PyLong_AsLong(value));
+       if (m_lockOperation & LOCK_UN) m_paths = {Ledger::NonPersistentTarget()};
+     }
++    std::string unresolved;
++    if (kind>=RAW_WRITE && !Ledger::VerifiedBufferNamespaceTransition(
++        writer,m_key,m_descriptor,m_paths,unresolved)) {
++      Ledger::Fail(writer,"unverified_dirty_buffer_namespace",
++          "operation="+std::string(Specs()[kind].original.ml_name)+";target="+unresolved.substr(0,768));
++      InfinityPythonPersistence::AdmissionDenied(m_context,"Infinity dirty buffer namespace is unverified");
++      return;
++    }
+     if (std::find(m_paths.begin(), m_paths.end(), "") != m_paths.end()) m_paths.clear();
+-    m_token = Ledger::BeginProtectedOperation(writer, m_paths, Specs()[kind].original.ml_name, false, false, m_descriptor);
++    m_token = Ledger::BeginProtectedOperation(writer, m_paths, Specs()[kind].original.ml_name, false, false, m_descriptor,
++        kind==EXTENSION_CREATE ? Ledger::NamespaceEffect::OBSERVED_CHILDREN : Ledger::NamespaceEffect::MAY_MUTATE);
+     m_allowed = m_token != 0;
+     if (!m_allowed) { InfinityPythonPersistence::AdmissionDenied(m_context, "Infinity protected write admission is closed"); return; }
+     m_previousOwner = Ledger::protectedWriteOwner;
+@@ -307,7 +452,7 @@
+       if (target && PyLong_Check(target)) Ledger::InvalidateDescriptor(static_cast<int>(PyLong_AsLong(target)));
+     }
+     if (kind == BUFFER_WRITE || kind == BUFFER_TRUNCATE || kind == TEXT_WRITE || kind == TEXT_TRUNCATE)
+-      Ledger::SetProtectedBuffer(writer, m_key, m_paths, true);
++    { ForgetCleanIo(self); Ledger::SetProtectedBuffer(writer, m_key, m_paths, true); }
+   }
+   ~Call()
+   {
+@@ -347,6 +492,10 @@
+     }
+     if (result && (m_kind == OS_RENAME || m_kind == OS_REPLACE || m_kind == OS_DUP2) && m_paths.size() == 2)
+       Ledger::RememberAlias(m_paths[0], m_paths[1]);
++    if (result && m_token && !m_paths.empty() &&
++        (m_kind == OS_RENAME || m_kind == OS_REPLACE || m_kind == OS_REMOVE ||
++         m_kind == OS_UNLINK || m_kind == OS_RMDIR))
++      Ledger::RecordRemovedNamespace(m_token,m_paths.front());
+     if (result && m_kind == EXTENSION_CREATE && !ProtectNativeModule(result))
+     {
+       Ledger::ProtectionFailure("bundled_native_encoder_write_adapter_missing");
+@@ -357,11 +506,15 @@
+     if (result && m_token && (m_kind == BUFFER_FLUSH || m_kind == BUFFER_CLOSE ||
+                               m_kind == TEXT_FLUSH || m_kind == TEXT_CLOSE))
+       Ledger::SetProtectedBuffer(m_context ? m_context->id : -1, m_key, m_paths, false);
++    if (result && (m_kind==BUFFER_FLUSH || m_kind==TEXT_FLUSH))RecordCleanIo(m_object);
++    if (result && (m_kind==BUFFER_CLOSE || m_kind==TEXT_CLOSE || m_kind==RAW_CLOSE))ForgetCleanIo(m_object);
++    if (result && m_kind==IO_OPEN)RecordCleanIo(result);
+     return result;
+   }
+ private:
+   Kind m_kind;
+   InfinityPythonPersistence::Context* m_context;
++  PyObject* m_object;
+   uint64_t m_token{0};
+   uint64_t m_previousToken{0};
+   bool m_allowed{false};
+@@ -412,7 +565,8 @@
+   // Hold the existing ledger while validating and converting a child launch.
+   // A concurrent Close cannot seal between admission and binding its actual
+   // child output leases, even when command validation itself has not finished.
+-  Ledger::ProtectedOperation preparing(writer,{},"native_child_contract_preparation");
++  Ledger::ProtectedOperation preparing(writer,{},"native_child_contract_preparation",false,false,-1,
++      Ledger::NamespaceEffect::OBSERVED_CHILDREN);
+   if (!preparing)
+   { InfinityPythonPersistence::AdmissionDenied(context,"Child preparation crosses protected write barrier"); return nullptr; }
+   std::string detail="readonly_child_scope_absent";
+@@ -572,7 +726,9 @@
+   for (Py_ssize_t i = 0; i < PyTuple_GET_SIZE(tuple); ++i) values.push_back(PyTuple_GET_ITEM(tuple, i));
+   Call call(IO_OPEN, self, {values.data(), static_cast<Py_ssize_t>(values.size()), nullptr, dictionary});
+   if (!call) return -1;
+-  return RawInitializer()(self, tuple, dictionary);
++  const int result=RawInitializer()(self, tuple, dictionary);
++  if(result==0)RecordCleanIo(self);
++  return result;
+ }
+ inline bool Initializer(PyObject* io)
+ {
+--- a/xbmc/platform/android/activity/InfinityProtectedWrites.h
++++ b/xbmc/platform/android/activity/InfinityProtectedWrites.h
+@@ -77,21 +77,9 @@
+   const auto path = ProtectedCanonical(raw);
+   if (path.empty()) return false;
+   for (const auto& cache : p.caches) if (Within(path, cache)) return true;
+-  for (const auto& root : p.profiles)
+-  {
+-    const auto prefix = root + "/addon_data/";
+-    if (path.rfind(prefix, 0) != 0) continue;
+-    const auto slash = path.find('/', prefix.size());
+-    if (slash == std::string::npos) return false;
+-    const auto addon = path.substr(prefix.size(), slash - prefix.size());
+-    if (addon.empty() || addon == "." || addon == ".." ||
+-        addon.find("infinity") != std::string::npos ||
+-        addon.find("arctic") != std::string::npos || addon.rfind("skin.", 0) == 0)
+-      return false;
+-    // Add-on settings are user state even when other private cache is optional.
+-    if (path.substr(slash + 1) == "settings.xml") return false;
+-    return true;
+-  }
++  // An add-on identity or private profile folder does not prove that
++  // databases/history/provider state are recoverable. Only the
++  // coordinator's explicit cache roots may be optional.
+   return false;
+ }
+ inline bool OptionalPathLocked(const WriteProtection& p, const std::string& raw)
+@@ -170,12 +158,14 @@
+ 
+ inline uint64_t BeginProtectedOperation(int id, const std::vector<std::string>& paths,
+                                        const std::string& operation, bool nativeSave = false,
+-                                       bool existingTransaction = false, int descriptor = -1)
++                                       bool existingTransaction = false, int descriptor = -1,
++                                       NamespaceEffect effect = NamespaceEffect::MAY_MUTATE)
+ {
+   auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex);
+   auto& p = s.protection;
+   ProtectedResource resource{id, paths, operation};
+   resource.descriptor = descriptor;
++  resource.namespaceEffect = effect;
+   bool bufferDrain = false;
+   const bool flushing = operation == "flush" || operation == "close" ||
+       (operation.size() >= 6 && operation.compare(operation.size()-6, 6, ".flush") == 0) ||
+@@ -206,6 +196,34 @@
+     ProtectionFailureLocked(p, "protected_operation_inventory_exhausted");
+     // Never silently grant an untracked mutation, even while running.
+     errno = ENOSPC; return 0;
++  }
++  // Coordination barriers retain admission and pending-owner protection.
++  // Their actual effects are observed by nested native leases and audit
++  // contracts; the barrier itself cannot invalidate a removed name.
++  // Unclassified operations still use MAY_MUTATE and fail closed.
++  if (effect == NamespaceEffect::MAY_MUTATE) {
++  // Any later admitted operation that overlaps a removed name revokes
++  // its earlier absence evidence, even when the new operation fails.
++  if (paths.empty()) p.removedNamespaces.clear();
++  // mkdir creates an empty directory (or fails without adding descendants);
++  // rmdir removes an empty directory. Neither can recreate an absent child.
++  // Exact/ancestor identities are still invalidated below.
++  bool preservesRemovedDescendants = operation == "rmdir" || operation == "namespace.rmdir" ||
++      operation == "mkdir" || operation == "namespace.mkdir";
++  if (operation == "converted_native_write_target") {
++    const auto parent=p.operations.find(protectedWriteToken);
++    preservesRemovedDescendants=parent!=p.operations.end() && parent->second.writer==id &&
++        parent->second.thread==std::this_thread::get_id() &&
++        (parent->second.operation=="rmdir" || parent->second.operation=="namespace.rmdir" ||
++         parent->second.operation=="mkdir" || parent->second.operation=="namespace.mkdir");
++  }
++  for (const auto& raw : paths) {
++    if (raw == NonPersistentTarget()) continue;
++    const auto path = Absolute(raw);
++    for (auto it=p.removedNamespaces.begin(); it!=p.removedNamespaces.end();)
++      if (path.empty() || Within(path,*it) || (!preservesRemovedDescendants && Within(*it,path))) it=p.removedNamespaces.erase(it);
++      else ++it;
++  }
+   }
+   const auto token = ++p.nextOperation;
+   p.operations.emplace(token, resource);
+@@ -336,8 +354,9 @@
+ {
+ public:
+   ProtectedOperation(int writer, const std::vector<std::string>& paths, const char* operation,
+-                     bool nativeSave = false, bool existingTransaction = false, int descriptor = -1)
+-    : m_token(BeginProtectedOperation(writer, paths, operation, nativeSave, existingTransaction, descriptor)) {}
++                     bool nativeSave = false, bool existingTransaction = false, int descriptor = -1,
++                     NamespaceEffect effect = NamespaceEffect::MAY_MUTATE)
++    : m_token(BeginProtectedOperation(writer, paths, operation, nativeSave, existingTransaction, descriptor, effect)) {}
+   ~ProtectedOperation() { if (m_token) EndProtectedOperation(m_token); }
+   explicit operator bool() const { return m_token != 0; }
+   ProtectedOperation(const ProtectedOperation&) = delete;
+@@ -345,6 +364,75 @@
+ private:
+   uint64_t m_token;
+ };
++
++// A procfs " (deleted)" annotation is not itself namespace evidence. FUSE can
++// retain it on a live descriptor whose original named file still has one link.
++// Resolve it only by proving the live descriptor and a no-follow opened name
++// identify the same object. Never guess from the spelling or an add-on name.
++inline bool SameDescriptorObject(const struct stat& a,const struct stat& b)
++{
++  return a.st_dev==b.st_dev && a.st_ino==b.st_ino && a.st_mode==b.st_mode &&
++      a.st_uid==b.st_uid && a.st_gid==b.st_gid && a.st_nlink==b.st_nlink;
++}
++inline bool VerifiedDescriptorName(int descriptor,const struct stat& original,
++                                   const std::string& path)
++{
++  if(path.empty() || path.front()!='/' || ProtectedCanonical(path)!=path)return false;
++  struct stat named{},opened{},current{};
++  if(::lstat(path.c_str(),&named)!=0 || S_ISLNK(named.st_mode) ||
++     !SameDescriptorObject(original,named))return false;
++  if((S_ISREG(named.st_mode) && named.st_nlink!=1) ||
++     (!S_ISREG(named.st_mode) && !S_ISDIR(named.st_mode)))return false;
++  // A second ordinary descriptor's close would release this process's POSIX
++  // record locks on the inode. O_PATH inspects identity without that effect.
++  // It still requires the same no-follow metadata and live-fd checks below.
++  const int probe=::open(path.c_str(),O_PATH|O_CLOEXEC|O_NOFOLLOW|
++      (S_ISDIR(named.st_mode)?O_DIRECTORY:0));
++  if(probe<0)return false;
++  const bool matched=::fstat(probe,&opened)==0 && SameDescriptorObject(original,opened) &&
++      ::fstat(descriptor,&current)==0 && SameDescriptorObject(original,current);
++  const int closed=::close(probe);
++  return matched && closed==0;
++}
++inline std::string VerifiedDescriptorLink(int descriptor,const std::string& reported)
++{
++  static const std::string suffix=" (deleted)";
++  if(reported.size()<=suffix.size() ||
++      reported.compare(reported.size()-suffix.size(),suffix.size(),suffix)!=0)return reported;
++  const int savedErrno=errno;
++  std::string result=reported;
++  struct stat original{};
++  if(::fstat(descriptor,&original)==0 && original.st_nlink>0 &&
++      (S_ISREG(original.st_mode) || S_ISDIR(original.st_mode)))
++  {
++    // A real filename can end in this suffix. Preserve it when it names the fd.
++    const auto candidate=reported.substr(0,reported.size()-suffix.size());
++    if(!VerifiedDescriptorName(descriptor,original,reported) &&
++        VerifiedDescriptorName(descriptor,original,candidate))result=candidate;
++  }
++  errno=savedErrno;
++  return result;
++}
++
++inline bool VerifiedBufferNamespaceTransition(int writer,const std::string& key,
++    int descriptor,const std::vector<std::string>& paths,std::string& unresolved)
++{
++  if(paths.size()!=1 || paths.front()!=NonPersistentTarget())return true;
++  auto& state=Get();std::lock_guard<std::mutex> lock(state.mutex);
++  const auto found=state.protection.buffers.find(std::to_string(writer)+":"+key);
++  if(found==state.protection.buffers.end())return true;
++  const int savedErrno=errno;
++  struct stat actual{};
++  const bool unlinked=descriptor>=0 && ::fstat(descriptor,&actual)==0 &&
++      S_ISREG(actual.st_mode) && actual.st_nlink==0;
++  errno=savedErrno;
++  if(found->second.paths.empty()){unresolved="<unresolved>";return false;}
++  for(const auto& previous:found->second.paths)
++    if(previous!=NonPersistentTarget() &&
++        (!unlinked || !state.protection.removedNamespaces.count(Absolute(previous))))
++    {unresolved=previous;return false;}
++  return true;
++}
+ 
+ inline std::string DescriptorPath(int fd)
+ {
+@@ -356,7 +444,7 @@
+   const auto name = "/proc/self/fd/" + std::to_string(fd);
+   const auto size = ::readlink(name.c_str(), target, sizeof(target) - 1);
+   if (size <= 0 || size >= static_cast<ssize_t>(sizeof(target) - 1)) return {};
+-  target[size] = '\0'; return target;
++  target[size] = '\0'; return VerifiedDescriptorLink(fd,target);
+ }
+ inline void SetProtectedBuffer(int writer, const std::string& key,
+                                const std::vector<std::string>& paths, bool dirty)
+@@ -373,7 +461,8 @@
+   auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex); auto& p = s.protection;
+   if (!active) { p.transactions.erase(key); return; }
+   if (p.transactions.size() >= 65536) { ProtectionFailureLocked(p, "protected_transaction_inventory_exhausted"); return; }
+-  p.transactions[key] = {-1, {path}, operation};
++  // Capture the actual native lease owner, including Python child threads.
++  p.transactions[key] = {CurrentWriteOwner(), {path}, operation};
+ }
+ inline bool HasProtectedTransaction(const std::string& path)
+ {
+@@ -416,6 +505,19 @@
+   bool durable{false};
+   std::vector<std::string> blockers;
+ };
++inline std::string ResourceOwnerLocked(const State& s, const ProtectedResource& r)
++{
++  std::ostringstream out;
++  out << ";writer_id=" << r.writer << ";thread=" << r.thread
++      << ";checkpoint_generation=" << s.protection.generation << ";phase=" << s.protection.phase;
++  for(const auto& path:r.paths)out << ";target=" << (path.empty()?"<unresolved>":path.substr(0,768));
++  const auto writer=s.writers.find(r.writer);
++  if (writer!=s.writers.end()) {
++    out << ";interpreter=" << writer->second.initialization.interpreterIdentity;
++    for (const auto& name:writer->second.admissions) out << ";invocation=" << name.first;
++  }
++  return out.str();
++}
+ inline EssentialWriteProof EssentialWritesLocked(State& s)
+ {
+   RefreshProtectedChildrenLocked(s);
+@@ -475,11 +577,11 @@
+   }
+   if (s.blockingOverflow) proof.blockers.push_back("protected_writer_failure_inventory_overflow");
+   for (const auto& entry : p.operations)
+-    if (ProtectedLocked(p, entry.second)) proof.blockers.push_back("active_protected_operation:" + entry.second.operation);
++    if (ProtectedLocked(p, entry.second)) proof.blockers.push_back("active_protected_operation:" + entry.second.operation + ";operation_id=" + std::to_string(entry.first) + ResourceOwnerLocked(s,entry.second));
+   for (const auto& entry : p.buffers)
+-    if (ProtectedLocked(p, entry.second)) proof.blockers.push_back("unflushed_protected_buffer:" + entry.first);
++    if (ProtectedLocked(p, entry.second)) proof.blockers.push_back("unflushed_protected_buffer:" + entry.first + ResourceOwnerLocked(s,entry.second));
+   for (const auto& entry : p.transactions)
+-    if (ProtectedLocked(p, entry.second)) proof.blockers.push_back("pending_protected_" + entry.second.operation + ":" + entry.first);
++    if (ProtectedLocked(p, entry.second)) proof.blockers.push_back("pending_protected_" + entry.second.operation + ":" + entry.first + ResourceOwnerLocked(s,entry.second));
+   return proof;
+ }
+ inline EssentialWriteProof EssentialWrites()
+@@ -598,8 +700,72 @@
+   return false;
+ }
+ 
++// Called only after a successful native namespace operation, while its exact
++// writer/thread lease is still active. This is absence evidence, not fsync proof.
++inline void RecordRemovedNamespace(uint64_t token, const std::string& raw)
++{
++  const auto path = Absolute(raw);
++  if (path.empty() || path != raw || ProtectedCanonical(path) != path) return;
++  struct stat st{};
++  if (::lstat(path.c_str(), &st) == 0 || errno != ENOENT) return;
++  auto& state = Get();
++  std::lock_guard<std::mutex> lock(state.mutex);
++  const auto found = state.protection.operations.find(token);
++  if (found == state.protection.operations.end() ||
++      found->second.thread != std::this_thread::get_id() ||
++      found->second.paths.empty() || found->second.paths.front() != raw) return;
++  const auto& operation = found->second.operation;
++  if (operation != "rename" && operation != "replace" && operation != "remove" &&
++      operation != "unlink" && operation != "rmdir") return;
++  for (const auto& live : state.protection.operations)
++    if (live.second.thread != found->second.thread &&
++        live.second.namespaceEffect == NamespaceEffect::MAY_MUTATE)
++    {
++      if (live.second.paths.empty()) return;
++      for (const auto& target : live.second.paths)
++        if (target.empty() || Within(target,path) || Within(path,target)) return;
++    }
++  if (state.protection.removedNamespaces.size() >= 65536)
++  { ProtectionFailureLocked(state.protection,"removed_namespace_inventory_exhausted"); return; }
++  state.protection.removedNamespaces.insert(path);
++}
++
++// A vanished parent may be traversed only when every absent component has its
++// own completed native removal/rename evidence. The first surviving directory
++// is opened without following a final symlink, identity checked and fsynced.
++// Unknown disappearance, a changed alias or an I/O failure remains a blocker.
++inline bool SyncRemovedNamespace(const std::string& path,
++                                 const std::set<std::string>& removed)
++{
++  std::string current = path;
++  for (unsigned depth = 0; depth < 256; ++depth)
++  {
++    if (ProtectedCanonical(current) != current) return false;
++    struct stat observed{};
++    if (::lstat(current.c_str(), &observed) == 0)
++    {
++      if (!S_ISDIR(observed.st_mode) || S_ISLNK(observed.st_mode)) return false;
++      const int fd = ::open(current.c_str(), O_RDONLY|O_DIRECTORY|O_CLOEXEC|O_NOFOLLOW);
++      if (fd < 0) return false;
++      struct stat verified{};
++      const bool same = ::fstat(fd,&verified) == 0 && S_ISDIR(verified.st_mode) &&
++          observed.st_dev == verified.st_dev && observed.st_ino == verified.st_ino;
++      int rc = -1;
++      if (same) do { rc = ::fsync(fd); } while (rc < 0 && errno == EINTR);
++      const int closed = ::close(fd);
++      return same && rc == 0 && closed == 0;
++    }
++    if (errno != ENOENT || !removed.count(current)) return false;
++    const auto slash = current.rfind('/');
++    if (slash == std::string::npos || slash == 0) return false;
++    current.resize(slash);
++  }
++  return false;
++}
++
+ inline bool SyncProtectedPath(const std::string& path,
+-                              const std::vector<std::string>& profiles)
++                              const std::vector<std::string>& profiles,
++                              const std::set<std::string>& removed = {})
+ {
+   struct stat st{};
+   if (::lstat(path.c_str(), &st) == 0)
+@@ -636,7 +802,8 @@
+     // A vanished UUID staging parent is not a vanished essential database.
+     // Fsync its surviving staging ancestor only when the installer path
+     // exactly matches a verified profile-bound UUID scratch hierarchy.
+-    return errno == ENOENT && SyncRemovedInstallerStage(parent, path, profiles);
++    return errno == ENOENT && (SyncRemovedNamespace(path, removed) ||
++                               SyncRemovedInstallerStage(parent, path, profiles));
+   }
+   int rc; do { rc = ::fsync(fd); } while (rc < 0 && errno == EINTR);
+   const int closed = ::close(fd);
+@@ -645,12 +812,14 @@
+ inline bool SealEssentialWrites(uint64_t generation)
+ {
+   std::vector<std::string> paths, profiles;
++  std::set<std::string> removed;
+   auto& s = Get();
+   {
+     std::lock_guard<std::mutex> lock(s.mutex); auto& p = s.protection;
+     if (p.generation != generation || p.phase != 2 || !EssentialWritesLocked(s).blockers.empty()) return false;
+     // Close permission atomically with the zero-in-flight test, BEFORE fsync.
+     p.phase = 3;
++    removed = p.removedNamespaces;
+     profiles = p.profiles; // Already canonical, captured under the admission mutex.
+     for (const auto& path : p.paths)
+       if (!OptionalPathLocked(p, path)) paths.push_back(path);
+@@ -658,7 +827,7 @@
+   for (const auto& path : paths)
+   {
+     const auto canonical = ProtectedCanonical(path);
+-    if (canonical.empty() || !SyncProtectedPath(canonical, profiles))
++    if (canonical.empty() || !SyncProtectedPath(canonical, profiles, removed))
+     { ProtectionFailure("protected_durability_failed:" + path); return false; }
+   }
+   std::lock_guard<std::mutex> lock(s.mutex);
+--- a/xbmc/platform/android/activity/InfinityScriptPersistence.h
++++ b/xbmc/platform/android/activity/InfinityScriptPersistence.h
+@@ -60,6 +60,7 @@
+ };
+ // This is part of the existing persistence ledger. These are live resource
+ // obligations, independent of interpreter retirement and its diagnostic receipt.
++enum class NamespaceEffect { MAY_MUTATE, OBSERVED_CHILDREN };
+ struct ProtectedResource
+ {
+   int writer{-1};
+@@ -67,6 +68,7 @@
+   std::string operation;
+   std::thread::id thread{std::this_thread::get_id()};
+   int descriptor{-1};
++  NamespaceEffect namespaceEffect{NamespaceEffect::MAY_MUTATE};
+ };
+ struct WriteProtection
+ {
+@@ -84,6 +86,7 @@
+   std::map<std::string, ProtectedResource> buffers, transactions;
+   std::map<int, std::set<std::string>> writerPaths;
+   std::set<std::string> paths;
++  std::set<std::string> removedNamespaces;
+   std::set<std::pair<std::string, std::string>> aliases;
+   std::vector<std::string> failures;
+   std::vector<std::string> denials;

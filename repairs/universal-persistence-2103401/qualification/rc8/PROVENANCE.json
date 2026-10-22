@@ -1,0 +1,149 @@
+{
+  "candidate": "RC8",
+  "accepted": false,
+  "build_commit": "2ec8cb7e0323c1e2c4ba0c57594eb678541eb222",
+  "build_tree": "612158b0ce18c1f9246f4a5db1a9ce4d6eeea20e",
+  "build_run": 39868217775,
+  "build_job": 120135709023,
+  "build_conclusion": "success",
+  "native_engine_build_commit": "d9edecbe843eb92457e26cbeab712f0264c55192",
+  "native_engine_build_run": 39862996414,
+  "native_engine_recompiled": false,
+  "host_cases": 263,
+  "retained_regressions": 47,
+  "android_commit": "b6785590354556ad841f8a63e94fa0e9700f6d1e",
+  "android_tree": "49a905adac7a22e2f765ad3feca07ea460f03cdf",
+  "android_run": 39868780521,
+  "android_jobs": {
+    "baseline": 120137647745,
+    "lost-file": 120137647923,
+    "pending": 120137647957,
+    "opaque": 120137648001,
+    "safe": 120137648074
+  },
+  "build_artifact": {
+    "id": 12464667993,
+    "sha256": "242c6375c809210fd57a70f2e0146406cfccb54374319077442db5ce9f5debc9"
+  },
+  "build_evidence_artifact": {
+    "id": 12464912447,
+    "sha256": "8c411f095d1ec22a2ff8e390be0c25997efab7dcadfb858913f2d058bb4f35a1"
+  },
+  "physical_fold_verified": false,
+  "final_lock": false,
+  "android_outcomes": {
+    "baseline": "passed",
+    "safe": "startup_SIGSEGV_before_first_Close",
+    "pending": "passed",
+    "opaque": "passed",
+    "lost-file": "passed"
+  },
+  "full_safe_close_passed": true,
+  "android_artifacts": {
+    "baseline": {
+      "id": 12465512605,
+      "sha256": "8874f8776051da9ef07f237212878166739978215fc9fff3e8ede516285be307"
+    },
+    "safe": {
+      "id": 12466245084,
+      "sha256": "d3eca81035c480eb0b51ee8aff8fdedcec78a2a87bb12975523917f3ad4c25d8"
+    },
+    "pending": {
+      "id": 12465208296,
+      "sha256": "bd1b5ae1998a03d746e2376820b55ec6873ca20759ff583ca0e6b60911a14b53"
+    },
+    "opaque": {
+      "id": 12466070459,
+      "sha256": "3c52ffe5d7e32135cc8d5646cf7110b1abd040311b0cdb585603c003e067a17d"
+    },
+    "lost-file": {
+      "id": 12466055498,
+      "sha256": "b5c243dcdb107f28112f368aa6e4c8b6fa26f0d3c1057fd3f43a564e81428c2b"
+    }
+  },
+  "diagnostic_repeat": {
+    "source_commit": "d27916fa9d66659555b0b084c6ac849b41cf2a91",
+    "source_tree": "486261be1547991305e15ac3ef5daef9547f2071",
+    "run": 39870395699,
+    "runtime_apk_changed": false,
+    "safe_replicas": 2,
+    "acceptance_assertions_unchanged": true,
+    "startup_failure_waived": false,
+    "jobs": {
+      "a": 120143079691,
+      "b": 120143079398
+    },
+    "outcome": "Both first Closes reached COMPLETE with consumed authorization, verified mandatory durability and engine death; later readback assertion failed before reopen.",
+    "artifacts": {
+      "a": {
+        "id": 12465694386,
+        "sha256": "e7ea8592a3910dbd9f3bb0c6877518585ae5dee3fbfce852acc915cd705883b0"
+      },
+      "b": {
+        "id": 12465888501,
+        "sha256": "674a052d4295fb2d87da875127ce84322a109c5c3e634b1fce1201e521b44151"
+      }
+    }
+  },
+  "readback_investigation": {
+    "commit": "b24eb008b5d4b3b9011c71d197f6d3da6abe12ed",
+    "tree": "af4b2456236bbc3aa6498cef43396a9ceade69e3",
+    "run": 39871348002,
+    "job": 120146272020,
+    "runtime_apk_changed": false,
+    "conclusion": "failure",
+    "artifact": 12466721985,
+    "artifact_sha256": "0bdc3699b6caee1cb8b6d04b29fb3d73c0b4641edb6c78729664188174260a80",
+    "outcome": "COMPLETE, then empty essential VFS file detected before and after Close; fixture writes embedded in removable assertions. Diagnosis requires optimized-runtime evidence."
+  },
+  "executed_fixture_matrix": {
+    "commit": "e7adb8a24a7855399d08be90a858c9586e726912",
+    "tree": "b38f4fdd2ff7e14b55395935f8ce1d6befe1bc74",
+    "run": 39872761320,
+    "runtime_apk_changed": false,
+    "all_fixture_assertions_replaced": true,
+    "per_write_independent_readback_required": true,
+    "jobs": {
+      "baseline": 120150920248,
+      "pending": 120150920465,
+      "opaque": 120150920600,
+      "lost-file": 120150920603,
+      "safe": 120150920635
+    },
+    "artifacts": {
+      "pending": {
+        "id": 12467490641,
+        "sha256": "a9926e05d840b14abcfce9a545ce6298f40296fc267f2c6af53b3f13da24e89e"
+      },
+      "lost-file": {
+        "id": 12466598188,
+        "sha256": "c350aca160f3115dda197ecbda98c829273385aee686b9f8bac51348f990ca87"
+      },
+      "baseline": {
+        "id": 12466589226,
+        "sha256": "1c5369a19eabc3e20c7f6df2ea59c0986173cf30885eedc77a8b90bca71551c6"
+      },
+      "opaque": {
+        "id": 12466333724,
+        "sha256": "ded59a36790dd873484fa2a1942cf1ba7624aac9035a7442ca9c23680f916255"
+      },
+      "safe": {
+        "id": 12467187283,
+        "sha256": "febb8af0a6accd4c29352b7fdfc4fe33dd4d8fba90c180c1bef8c145d6bc3a8f"
+      }
+    },
+    "outcomes": {
+      "pending": "passed",
+      "lost-file": "passed",
+      "baseline": "passed",
+      "opaque": "passed",
+      "safe": "passed"
+    },
+    "actual_python_optimization": 1,
+    "runtime_fixture_sha256": "7abb08a3f5a587f25449531c9cb6e687dd65d9b32793d1b8c596cccbb6274ad8",
+    "conclusion": "success",
+    "safe_close_cycles": 3,
+    "fourth_start_verified": true,
+    "startup_failure_waived": false
+  }
+}

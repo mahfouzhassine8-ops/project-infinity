@@ -1,0 +1,278 @@
+{
+  "protected_baseline_sha256": "e1334ce46bc96edce76a8b7af2d3ebb9871ac7c351526ac2cc6cc58820da009a",
+  "experimental_parent_sha256": "17041a44f121693ab0852c6a826b7f728a4d834a64225efec363861616b698e6",
+  "changed": [
+    {
+      "path": "AndroidManifest.xml",
+      "before": "e881d18057a943a8bc1d0563bbfc4c324ecf8ad02de5449af59ee168cd56b15e",
+      "after": "f93de7f5a0cd5983754d57f7735e11bfe6cd30829144121f1fee14ecbfa7c46d",
+      "signature": false
+    },
+    {
+      "path": "META-INF/INFINITY.RSA",
+      "before": "8cf0f3ca683c31aad1db38b095dd6afaa209636cc64dc00c8dcd01ecadf597cb",
+      "after": "80be126e0d2f82705873918eb145d655ded6a4062bc2458bee8b2a4a4becabcd",
+      "signature": true
+    },
+    {
+      "path": "META-INF/INFINITY.SF",
+      "before": "47023d95a709944f7dcdfa11d02f42cc7a62396f09877ab83f97e0e1f2200923",
+      "after": "327de2a704b6c5f0fa708fd62e44db80342aa9d1ed0f17816f52533d34cac94b",
+      "signature": true
+    },
+    {
+      "path": "META-INF/MANIFEST.MF",
+      "before": "512038e7839cd0d193af70f4969689350ceab414cc75da9928be638a12ac71b1",
+      "after": "75efceaa2b541c1fc88331b1b17ab87608f61d4eaba0c9e5be41ff7b3b925baf",
+      "signature": true
+    },
+    {
+      "path": "assets/addons/script.infinity.commandcenter/addon.xml",
+      "before": "f5eb0d6e2d0d34ed47ff10c618465271d686fd798fffd4988d22900b1eaa2abd",
+      "after": "04a37ce44bad16bd3e656305cbbae3a8f37568b2bad8c81543d326fadb80e2df",
+      "signature": false
+    },
+    {
+      "path": "assets/addons/script.infinity.commandcenter/checkpoint_runtime.py",
+      "before": "43c19e4c1a6b99086c59929c7ab0dbd0605b21380f95e00e18b9e83dfb75a8de",
+      "after": "d11b87f88d1b225f2a095182cac501e7341cebdc7cd5824559103b44c4e09c83",
+      "signature": false
+    },
+    {
+      "path": "assets/addons/script.infinity.commandcenter/infinity_search.py",
+      "before": "33c0cc82f15e2d8a4284293abbb1c9cb61c87dbd7a094a4ecd04f802ab9e780a",
+      "after": "f712063e1a451b4dec2f11bdd7b92d7f83fa4f4f6fe3f4c517b801f6f4ec5003",
+      "signature": false
+    },
+    {
+      "path": "assets/addons/script.infinity.commandcenter/infinity_trakt.py",
+      "before": "1963132a569c650c3b9d747fdf7987abb0880506b09cc54226382ac6f81c4f13",
+      "after": "d76c79aa29300e4f8ad5b0141ccc02f807372030c97d109485a4cd8aefef0e22",
+      "signature": false
+    },
+    {
+      "path": "assets/addons/script.infinity.commandcenter/resources/skins/Default/1080i/InfinityTraktNotice.xml",
+      "before": null,
+      "after": "321835add4ebbb71fcf9e177868f000ca35659c776d1473e0532aa0a1fd70064",
+      "signature": false
+    },
+    {
+      "path": "assets/addons/script.infinity.uirepair/CONTROLLER-PREIMAGES.json",
+      "before": "92aa039edc9e705ae1f7e255b8bff70d843ca60cb2c5ed1a005fe320e69d0f48",
+      "after": "459757da322bdb5034921ab8da6cfe2520afc168b6cf307fe02683a62b9976aa",
+      "signature": false
+    },
+    {
+      "path": "assets/addons/script.infinity.uirepair/addon.xml",
+      "before": "926cf3287e059e05f166ba5d638c4504cadd87090dbfe26d9d33c6aab153ad42",
+      "after": "001b553fc95ecd165eed1f3df2de5a823961252af7a9ddf7f0e74aeb6eff77c2",
+      "signature": false
+    },
+    {
+      "path": "assets/addons/script.infinity.uirepair/home_option_b.py",
+      "before": "800ee6b501ad46823cddb50bbc8d3b8a9301b67e599aabcfd136a91e2e4749be",
+      "after": "cd64216203e82746c7bd1dcf18b4b491b5430c1abf687cc3ca6b42e3cefa1438",
+      "signature": false
+    },
+    {
+      "path": "assets/addons/script.infinity.uirepair/resources/skins/Default/1080i/InfinityHomeOptionB.xml",
+      "before": "aad252c9d46c3590f817dec8e599f9220410893a5c3e16c24af9ac6b9d8c09a0",
+      "after": "b524ebc4bc586ef3642190e43897bd0f9b23e5844fd67c2b02806f9159bc0c6e",
+      "signature": false
+    },
+    {
+      "path": "assets/addons/script.infinity.watchedbridge/CONTROLLER-PREIMAGES.json",
+      "before": "92aa039edc9e705ae1f7e255b8bff70d843ca60cb2c5ed1a005fe320e69d0f48",
+      "after": "459757da322bdb5034921ab8da6cfe2520afc168b6cf307fe02683a62b9976aa",
+      "signature": false
+    },
+    {
+      "path": "assets/addons/script.infinity.watchedbridge/addon.xml",
+      "before": "70fd1a3860f039e4fcb1b524cf74130a8c6da2da74d310b0cd84ac3f1c635213",
+      "after": "9feef443f9f4fbf61d256096b3ad4feeb725ab5718db8520fa4a97af30ec6103",
+      "signature": false
+    },
+    {
+      "path": "assets/addons/script.infinity.watchedbridge/controller.py",
+      "before": "671da0130fff6fa37e6fbec036e88cfe45f90820f5c3e654b7a78db626c60112",
+      "after": "0a7a1806957396786061a8e914e754ac90d092fdae52388df2a2b0cf3dc7475b",
+      "signature": false
+    },
+    {
+      "path": "assets/addons/skin.infinity.diggz/16x9/Home.xml",
+      "before": "f729d69345353b7950d867d7a4ad9aba21a3403e0e4e5f283e89872598d59551",
+      "after": "4ecb3c63c47e30bb8f7cc1e3191a009742537c0c35c2ca99651b859b656b1f22",
+      "signature": false
+    },
+    {
+      "path": "assets/addons/skin.infinity.diggz/20x9/Home.xml",
+      "before": "f729d69345353b7950d867d7a4ad9aba21a3403e0e4e5f283e89872598d59551",
+      "after": "4ecb3c63c47e30bb8f7cc1e3191a009742537c0c35c2ca99651b859b656b1f22",
+      "signature": false
+    },
+    {
+      "path": "assets/addons/skin.infinity.diggz/5x6/Home.xml",
+      "before": "f729d69345353b7950d867d7a4ad9aba21a3403e0e4e5f283e89872598d59551",
+      "after": "4ecb3c63c47e30bb8f7cc1e3191a009742537c0c35c2ca99651b859b656b1f22",
+      "signature": false
+    },
+    {
+      "path": "assets/addons/skin.infinity.diggz/6x5/Home.xml",
+      "before": "f729d69345353b7950d867d7a4ad9aba21a3403e0e4e5f283e89872598d59551",
+      "after": "4ecb3c63c47e30bb8f7cc1e3191a009742537c0c35c2ca99651b859b656b1f22",
+      "signature": false
+    },
+    {
+      "path": "assets/addons/skin.infinity.diggz/Infinity-Protected-Manifest.json",
+      "before": "7190f7e42c13b52c61a312134625ea175441e0e78946017f027d76278a9be48c",
+      "after": "16c7e394f8cd6381fc346a87d8b8b442a7e22d26317c09669cf5422499b40d13",
+      "signature": false
+    },
+    {
+      "path": "assets/addons/skin.infinity.diggz/addon.xml",
+      "before": "b4093fb640be0bd926cef124cf5817eb3eaaa07f0867cbe2be6e68bcfc98e571",
+      "after": "7095f819d020b2c3501aa7e6775701f3e1c4b3a31242700d7f41e9c2b8ace60a",
+      "signature": false
+    },
+    {
+      "path": "assets/addons/skin.infinity.diggz/fallback/Home.xml",
+      "before": "f729d69345353b7950d867d7a4ad9aba21a3403e0e4e5f283e89872598d59551",
+      "after": "4ecb3c63c47e30bb8f7cc1e3191a009742537c0c35c2ca99651b859b656b1f22",
+      "signature": false
+    },
+    {
+      "path": "assets/addons/skin.infinity.diggz/infinity-skin.json",
+      "before": "115a35cf36397bac19d64432464fbdc33fef87ea2db783c0eb7b49abe12c1bf8",
+      "after": "6c05634fa2f805f2be572fc9e994509834ac902e64fd1855605f59924c7e536f",
+      "signature": false
+    },
+    {
+      "path": "assets/addons/skin.infinity.diggz/portrait/Home.xml",
+      "before": "f729d69345353b7950d867d7a4ad9aba21a3403e0e4e5f283e89872598d59551",
+      "after": "4ecb3c63c47e30bb8f7cc1e3191a009742537c0c35c2ca99651b859b656b1f22",
+      "signature": false
+    },
+    {
+      "path": "assets/addons/skin.infinity.diggz/responsive/base/Home.xml",
+      "before": "8bb1498f9a26e044d6664c1a36026e5a536361f3cd3b8911ec52002fec5796a1",
+      "after": "f44976b8ef52f866e5a3055d40216f49778aff5e52210f4bc12c0e73bbdee235",
+      "signature": false
+    },
+    {
+      "path": "assets/addons/skin.infinity.diggz/responsive/landscape/Home.xml",
+      "before": "8bb1498f9a26e044d6664c1a36026e5a536361f3cd3b8911ec52002fec5796a1",
+      "after": "f44976b8ef52f866e5a3055d40216f49778aff5e52210f4bc12c0e73bbdee235",
+      "signature": false
+    },
+    {
+      "path": "assets/addons/skin.infinity.diggz/responsive/portrait/Home.xml",
+      "before": "8bb1498f9a26e044d6664c1a36026e5a536361f3cd3b8911ec52002fec5796a1",
+      "after": "f44976b8ef52f866e5a3055d40216f49778aff5e52210f4bc12c0e73bbdee235",
+      "signature": false
+    },
+    {
+      "path": "assets/addons/skin.infinity.diggz/responsive/square/Home.xml",
+      "before": "8bb1498f9a26e044d6664c1a36026e5a536361f3cd3b8911ec52002fec5796a1",
+      "after": "f44976b8ef52f866e5a3055d40216f49778aff5e52210f4bc12c0e73bbdee235",
+      "signature": false
+    },
+    {
+      "path": "assets/addons/skin.infinity.diggz/responsive/tall/Home.xml",
+      "before": "8bb1498f9a26e044d6664c1a36026e5a536361f3cd3b8911ec52002fec5796a1",
+      "after": "f44976b8ef52f866e5a3055d40216f49778aff5e52210f4bc12c0e73bbdee235",
+      "signature": false
+    },
+    {
+      "path": "assets/addons/skin.infinity.diggz/responsive/ultrawide/Home.xml",
+      "before": "8bb1498f9a26e044d6664c1a36026e5a536361f3cd3b8911ec52002fec5796a1",
+      "after": "f44976b8ef52f866e5a3055d40216f49778aff5e52210f4bc12c0e73bbdee235",
+      "signature": false
+    },
+    {
+      "path": "assets/addons/skin.infinity.diggz/responsive/wide/Home.xml",
+      "before": "8bb1498f9a26e044d6664c1a36026e5a536361f3cd3b8911ec52002fec5796a1",
+      "after": "f44976b8ef52f866e5a3055d40216f49778aff5e52210f4bc12c0e73bbdee235",
+      "signature": false
+    },
+    {
+      "path": "assets/addons/skin.infinity.diggz/unified/Home.xml",
+      "before": "993659a944c630dd9563d7dac60f657e0de27371b9e0a9c965d9caee10a78bef",
+      "after": "b848c31e61324175f60297003071cea7961a9a4ca55b216cef44af8fdbbc0205",
+      "signature": false
+    },
+    {
+      "path": "assets/addons/skin.infinity.diggz/unified/InfinityHomeOptionB.xml",
+      "before": "aad252c9d46c3590f817dec8e599f9220410893a5c3e16c24af9ac6b9d8c09a0",
+      "after": "b524ebc4bc586ef3642190e43897bd0f9b23e5844fd67c2b02806f9159bc0c6e",
+      "signature": false
+    },
+    {
+      "path": "assets/addons/skin.infinity.diggz/unified/InfinityTraktNotice.xml",
+      "before": null,
+      "after": "321835add4ebbb71fcf9e177868f000ca35659c776d1473e0532aa0a1fd70064",
+      "signature": false
+    },
+    {
+      "path": "assets/infinity-2103395-components.json",
+      "before": "72e533ff9efc63081fc515ad0a8d0ee15bae58af79b8705407fcfc272c1eb877",
+      "after": "520b8367554d6f8a5f6856ea66908dab22c087fa3656610977d8a2dfdc76730d",
+      "signature": false
+    },
+    {
+      "path": "assets/infinity-2103396-components.json",
+      "before": "72e533ff9efc63081fc515ad0a8d0ee15bae58af79b8705407fcfc272c1eb877",
+      "after": "520b8367554d6f8a5f6856ea66908dab22c087fa3656610977d8a2dfdc76730d",
+      "signature": false
+    },
+    {
+      "path": "assets/infinity-2103397-components.json",
+      "before": "72e533ff9efc63081fc515ad0a8d0ee15bae58af79b8705407fcfc272c1eb877",
+      "after": "520b8367554d6f8a5f6856ea66908dab22c087fa3656610977d8a2dfdc76730d",
+      "signature": false
+    },
+    {
+      "path": "assets/infinity-2103398-components.json",
+      "before": "72e533ff9efc63081fc515ad0a8d0ee15bae58af79b8705407fcfc272c1eb877",
+      "after": "520b8367554d6f8a5f6856ea66908dab22c087fa3656610977d8a2dfdc76730d",
+      "signature": false
+    },
+    {
+      "path": "assets/infinity-2103399-components.json",
+      "before": "72e533ff9efc63081fc515ad0a8d0ee15bae58af79b8705407fcfc272c1eb877",
+      "after": "520b8367554d6f8a5f6856ea66908dab22c087fa3656610977d8a2dfdc76730d",
+      "signature": false
+    },
+    {
+      "path": "assets/infinity-2103400-components.json",
+      "before": "72e533ff9efc63081fc515ad0a8d0ee15bae58af79b8705407fcfc272c1eb877",
+      "after": "520b8367554d6f8a5f6856ea66908dab22c087fa3656610977d8a2dfdc76730d",
+      "signature": false
+    },
+    {
+      "path": "assets/infinity-2103401-components.json",
+      "before": null,
+      "after": "520b8367554d6f8a5f6856ea66908dab22c087fa3656610977d8a2dfdc76730d",
+      "signature": false
+    },
+    {
+      "path": "classes.dex",
+      "before": "863aa11665eed05999695452b7a70273baedbd6ff1ed8533c45f108d1cd05783",
+      "after": "9b12109c04ea99375685486e62afcb3e1e2b3beea01b1a87b8de1e2cff7f9603",
+      "signature": false
+    },
+    {
+      "path": "lib/arm64-v8a/libinfinitycrash.so",
+      "before": "ea27ec911bbe7ab38481f910f0b6b707397255bd03523b7aa1776a052be45073",
+      "after": "3a1a4eb5164d3503bd6321be4d939a08b7a31058719c074ac4a491fddeb6c171",
+      "signature": false
+    },
+    {
+      "path": "lib/arm64-v8a/libkodi.so",
+      "before": "bd4d7cfda9a146415d1a1ba1c3cf68fe123aa85563ce8edddfa662a61623265c",
+      "after": "1c34d5a24ab4d39785282849e280153c71f0ddef29bbcf91ad894de9de2f5254",
+      "signature": false
+    }
+  ],
+  "unchanged_member_count": 7536,
+  "scope": "Pre-existing 2103400 to 2103401 delta; not changes introduced by universal repair"
+}

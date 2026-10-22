@@ -1,0 +1,271 @@
+{
+  "run": 39855114035,
+  "status": "No Close acceptance: fixture did not generate expected COMMIT failure",
+  "results": {
+    "safe": {
+      "passed": false,
+      "failure": "RuntimeError: Timed out waiting for independently observed device state",
+      "cycles": [
+        {
+          "cycle": 0,
+          "first_party": {
+            "script.infinity.commandcenter": {
+              "addonid": "script.infinity.commandcenter",
+              "enabled": true,
+              "type": "xbmc.python.script",
+              "version": "0.3.5.29"
+            },
+            "service.infinity.compat": {
+              "addonid": "service.infinity.compat",
+              "enabled": true,
+              "type": "xbmc.service",
+              "version": "0.8.2"
+            }
+          },
+          "versioncheck": {
+            "addonid": "service.xbmc.versioncheck",
+            "enabled": true,
+            "type": "xbmc.service",
+            "version": "0.5.28+infinity.1"
+          },
+          "owner": {
+            "schema": 2,
+            "pid": 4481,
+            "owner": "a095d13d-71ea-4533-9c04-75589c620f85",
+            "launch": "a4e7e280-ea5a-43e4-afdd-de1c6e5b2338",
+            "began": 1792704245089,
+            "close_at": 0,
+            "phase": "RUNNING",
+            "live": true,
+            "error": ""
+          }
+        }
+      ],
+      "reader_lock_fault_did_not_fail": true,
+      "artifact": {
+        "id": 12460615517,
+        "name": "Infinity-Universal-Actual-Android17-safe-Evidence",
+        "digest": "sha256:13cec7acba6e883cb7fda63bf1b6395c9609305dfea8e48b7906c1eb1202f582",
+        "workflow_run": {
+          "id": 39855114035,
+          "repository_id": 1357922020,
+          "head_repository_id": 1357922020,
+          "head_branch": "work/infinity-universal-persistence-android-20261022",
+          "head_sha": "58447424819a25f3295b264cd48f3ebc4c504658"
+        }
+      }
+    },
+    "lost-file": {
+      "passed": false,
+      "failure": "RuntimeError: Timed out waiting for independently observed device state",
+      "cycles": [
+        {
+          "cycle": 0,
+          "first_party": {
+            "script.infinity.commandcenter": {
+              "addonid": "script.infinity.commandcenter",
+              "enabled": true,
+              "type": "xbmc.python.script",
+              "version": "0.3.5.29"
+            },
+            "service.infinity.compat": {
+              "addonid": "service.infinity.compat",
+              "enabled": true,
+              "type": "xbmc.service",
+              "version": "0.8.2"
+            }
+          },
+          "versioncheck": {
+            "addonid": "service.xbmc.versioncheck",
+            "enabled": true,
+            "type": "xbmc.service",
+            "version": "0.5.28+infinity.1"
+          },
+          "owner": {
+            "schema": 2,
+            "pid": 4388,
+            "owner": "1d8d362b-e5fc-44ff-ba56-e90fd51dd0c2",
+            "launch": "3cdac2b6-aa40-4708-8735-99f7818421b7",
+            "began": 1792704208827,
+            "close_at": 0,
+            "phase": "RUNNING",
+            "live": false,
+            "error": ""
+          }
+        }
+      ],
+      "reader_lock_fault_did_not_fail": true,
+      "artifact": {
+        "id": 12460440543,
+        "name": "Infinity-Universal-Actual-Android17-lost-file-Evidence",
+        "digest": "sha256:e1845367ac32345992f0aeccfaec9a00785991225470b234ab0e2e947a059bbc",
+        "workflow_run": {
+          "id": 39855114035,
+          "repository_id": 1357922020,
+          "head_repository_id": 1357922020,
+          "head_branch": "work/infinity-universal-persistence-android-20261022",
+          "head_sha": "58447424819a25f3295b264cd48f3ebc4c504658"
+        }
+      }
+    },
+    "opaque": {
+      "passed": false,
+      "failure": "RuntimeError: Timed out waiting for independently observed device state",
+      "cycles": [
+        {
+          "cycle": 0,
+          "first_party": {
+            "script.infinity.commandcenter": {
+              "addonid": "script.infinity.commandcenter",
+              "enabled": true,
+              "type": "xbmc.python.script",
+              "version": "0.3.5.29"
+            },
+            "service.infinity.compat": {
+              "addonid": "service.infinity.compat",
+              "enabled": true,
+              "type": "xbmc.service",
+              "version": "0.8.2"
+            }
+          },
+          "versioncheck": {
+            "addonid": "service.xbmc.versioncheck",
+            "enabled": true,
+            "type": "xbmc.service",
+            "version": "0.5.27+matrix.1"
+          },
+          "owner": {
+            "schema": 2,
+            "pid": 4424,
+            "owner": "1031adb9-e034-45e3-8950-745feffdfbe7",
+            "launch": "ed41485c-5057-4211-af81-de5b5f30a6af",
+            "began": 1792704327043,
+            "close_at": 0,
+            "phase": "RUNNING",
+            "live": true,
+            "error": ""
+          }
+        }
+      ],
+      "reader_lock_fault_did_not_fail": true,
+      "artifact": {
+        "id": 12460121720,
+        "name": "Infinity-Universal-Actual-Android17-opaque-Evidence",
+        "digest": "sha256:e41ce022c9805075fa7dd2806d96adfda337f170f63a36303db82af116291e3a",
+        "workflow_run": {
+          "id": 39855114035,
+          "repository_id": 1357922020,
+          "head_repository_id": 1357922020,
+          "head_branch": "work/infinity-universal-persistence-android-20261022",
+          "head_sha": "58447424819a25f3295b264cd48f3ebc4c504658"
+        }
+      }
+    },
+    "pending": {
+      "passed": false,
+      "failure": "RuntimeError: Timed out waiting for independently observed device state",
+      "cycles": [
+        {
+          "cycle": 0,
+          "first_party": {
+            "script.infinity.commandcenter": {
+              "addonid": "script.infinity.commandcenter",
+              "enabled": true,
+              "type": "xbmc.python.script",
+              "version": "0.3.5.29"
+            },
+            "service.infinity.compat": {
+              "addonid": "service.infinity.compat",
+              "enabled": true,
+              "type": "xbmc.service",
+              "version": "0.8.2"
+            }
+          },
+          "versioncheck": {
+            "addonid": "service.xbmc.versioncheck",
+            "enabled": true,
+            "type": "xbmc.service",
+            "version": "0.5.28+infinity.1"
+          },
+          "owner": {
+            "schema": 2,
+            "pid": 4284,
+            "owner": "3d779af8-2076-4fec-9a6d-baa22a03b42b",
+            "launch": "4f100024-2c5b-49ed-b523-c80595915ba5",
+            "began": 1792704258925,
+            "close_at": 0,
+            "phase": "RUNNING",
+            "live": false,
+            "error": ""
+          }
+        }
+      ],
+      "reader_lock_fault_did_not_fail": true,
+      "artifact": {
+        "id": 12460091221,
+        "name": "Infinity-Universal-Actual-Android17-pending-Evidence",
+        "digest": "sha256:5ef037fa7d1a5af7dd46ba75a3cdc8f0efb7739d8ff53c6e5c8187559612c540",
+        "workflow_run": {
+          "id": 39855114035,
+          "repository_id": 1357922020,
+          "head_repository_id": 1357922020,
+          "head_branch": "work/infinity-universal-persistence-android-20261022",
+          "head_sha": "58447424819a25f3295b264cd48f3ebc4c504658"
+        }
+      }
+    },
+    "baseline": {
+      "passed": false,
+      "failure": "RuntimeError: Timed out waiting for independently observed device state",
+      "cycles": [
+        {
+          "cycle": 0,
+          "first_party": {
+            "script.infinity.commandcenter": {
+              "addonid": "script.infinity.commandcenter",
+              "enabled": true,
+              "type": "xbmc.python.script",
+              "version": "0.3.5.29"
+            },
+            "service.infinity.compat": {
+              "addonid": "service.infinity.compat",
+              "enabled": true,
+              "type": "xbmc.service",
+              "version": "0.8.2"
+            }
+          },
+          "versioncheck": {
+            "addonid": "service.xbmc.versioncheck",
+            "enabled": true,
+            "type": "xbmc.service",
+            "version": "0.5.27+matrix.1"
+          },
+          "owner": {
+            "schema": 2,
+            "pid": 4295,
+            "owner": "7c52034a-8bd4-4a25-a22e-cc743cacc753",
+            "launch": "338d62b4-3310-4488-b855-ac14cf470f2e",
+            "began": 1792703851839,
+            "close_at": 0,
+            "phase": "RUNNING",
+            "live": true,
+            "error": ""
+          }
+        }
+      ],
+      "reader_lock_fault_did_not_fail": true,
+      "artifact": {
+        "id": 12458868420,
+        "name": "Infinity-Universal-Actual-Android17-baseline-Evidence",
+        "digest": "sha256:0f5dabd9d3197bfd44b15f8b59af33e06a3f2ed28be56a42961f82185d8f8d0c",
+        "workflow_run": {
+          "id": 39855114035,
+          "repository_id": 1357922020,
+          "head_repository_id": 1357922020,
+          "head_branch": "work/infinity-universal-persistence-android-20261022",
+          "head_sha": "58447424819a25f3295b264cd48f3ebc4c504658"
+        }
+      }
+    }
+  }
+}

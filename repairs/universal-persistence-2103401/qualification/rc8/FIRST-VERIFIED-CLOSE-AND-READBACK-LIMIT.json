@@ -1,0 +1,69 @@
+{
+  "run": 39870395699,
+  "source_commit": "d27916fa9d66659555b0b084c6ac849b41cf2a91",
+  "results": [
+    {
+      "replica": "a",
+      "artifact": 12465694386,
+      "artifact_sha256": "e7ea8592a3910dbd9f3bb0c6877518585ae5dee3fbfce852acc915cd705883b0",
+      "one_verified_close": true,
+      "reopen_test_reached": false,
+      "engine_pid": 4437,
+      "copied_data_values": {
+        "plain-": "ordinary state",
+        "replaced-": "replaced state",
+        "buffered-": "buffered state",
+        "worker-": "child buffered state",
+        "history.db": [
+          [
+            37
+          ]
+        ],
+        "watched.db": [
+          [
+            1
+          ]
+        ],
+        "commit-controls.db": [
+          [
+            1
+          ]
+        ]
+      },
+      "unresolved_readback_assertion": true
+    },
+    {
+      "replica": "b",
+      "artifact": 12465888501,
+      "artifact_sha256": "674a052d4295fb2d87da875127ce84322a109c5c3e634b1fce1201e521b44151",
+      "one_verified_close": true,
+      "reopen_test_reached": false,
+      "engine_pid": 4318,
+      "copied_data_values": {
+        "plain-": "ordinary state",
+        "replaced-": "replaced state",
+        "buffered-": "buffered state",
+        "worker-": "child buffered state",
+        "history.db": [
+          [
+            37
+          ]
+        ],
+        "watched.db": [
+          [
+            1
+          ]
+        ],
+        "commit-controls.db": [
+          [
+            1
+          ]
+        ]
+      },
+      "unresolved_readback_assertion": true
+    }
+  ],
+  "accepted": false,
+  "physical_fold_verified": false,
+  "qualification_scope_correction": "Native completion/engine-death receipts are genuine, but the fixture put valid VFS write calls and other checks inside assertions. These runs do not prove execution of those writes or checks under optimized Python. The later full matrix requires explicit checks and per-write readback."
+}

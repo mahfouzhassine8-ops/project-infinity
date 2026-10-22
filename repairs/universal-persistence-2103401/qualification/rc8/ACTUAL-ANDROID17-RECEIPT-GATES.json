@@ -1,0 +1,39 @@
+{
+  "input_hashes": {
+    "candidate.dex": "8b3f0cf83cf05e99f0b6d7e141d543af0d5f096e2406e73751ea4cfbff774d7c",
+    "classes2.dex": "d4df6604044e7cb66584229562186bf2ed8f0031d2d3efba03bba8ebe38934ca",
+    "original.dex": "9b12109c04ea99375685486e62afcb3e1e2b3beea01b1a87b8de1e2cff7f9603",
+    "probe.dex": "03e2bb35bf3c4d397c3215e85d7855d8594cc3f6e0ad801277d442b7fc9482c1"
+  },
+  "passed": true,
+  "physical_fold_verified": false,
+  "results": {
+    "candidate": {
+      "actual_atomic_failures": 0,
+      "actual_atomic_successes": 100,
+      "concurrent_reads": 1769,
+      "failure": "",
+      "installed_app_modified": false,
+      "negative_controls": 6,
+      "original_reader_deleted_in_progress_stage": true,
+      "passed": true,
+      "physical_fold_verified": false,
+      "sdk": 37,
+      "variant": "candidate"
+    },
+    "original": {
+      "actual_atomic_failures": 71,
+      "actual_atomic_successes": 29,
+      "concurrent_reads": 2102,
+      "failure": "java.io.IOException: checkpoint receipt replacement unconfirmed",
+      "installed_app_modified": false,
+      "negative_controls": 0,
+      "original_reader_deleted_in_progress_stage": true,
+      "passed": true,
+      "physical_fold_verified": false,
+      "sdk": 37,
+      "variant": "original"
+    }
+  },
+  "source_commit": "2ec8cb7e0323c1e2c4ba0c57594eb678541eb222"
+}

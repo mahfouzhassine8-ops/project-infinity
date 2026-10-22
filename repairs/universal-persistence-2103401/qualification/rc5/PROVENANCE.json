@@ -1,0 +1,45 @@
+{
+  "candidate": "RC5",
+  "accepted": false,
+  "rejection": "Ordinary context-manager COMMIT recovery leaves permanent observer blocker; production-source reproduction fails all five identities.",
+  "build_commit": "efffee6f11254340486d5adc9df5baba0ae06521",
+  "build_tree": "372d40e6b5ed87562cbf7e463d9d8f55a28217bf",
+  "build_run": 39857336997,
+  "build_job": 120098856980,
+  "build_artifact": {
+    "id": 12460718613,
+    "sha256": "8fe92edb040d5195128c116bd87f15fd039dee849f513656e97476e924015601"
+  },
+  "build_evidence_artifact": {
+    "id": 12460498751,
+    "sha256": "eb0626f720fb60ce5d98035135d3f594348f9d4c3d41af38e0da8a7a3ea34979"
+  },
+  "android_run": 39857391499,
+  "android_commit": "d741478be5602121b9820c500762fad0ccf90cad",
+  "android_tree": "1ea2ef657f1b55834d167c1bc9272cde092bf329",
+  "physical_fold_verified": false,
+  "final_lock": false,
+  "android_artifacts": {
+    "baseline": {
+      "id": 12460532199,
+      "sha256": "ef60b1a7331cb6e4ec005c73b509d25d10dde08f7fff0abcd29e3b98569b9f6d"
+    },
+    "safe": {
+      "id": 12460169939,
+      "sha256": "4fb810bdcea093f9f817aef915187691c75e290884a666ba3261703eb58082eb"
+    },
+    "pending": {
+      "id": 12461941823,
+      "sha256": "bf66a5506ec73086611cb4bdd582d2478f57bde06f3363f0a36ad14ce9530929"
+    },
+    "lost-file": {
+      "id": 12462031798,
+      "sha256": "00ad7c34941022e7715a4608578f5c4628f97b51b54bd6d07394091d4a8ce901"
+    },
+    "opaque": {
+      "id": 12462165875,
+      "sha256": "9d3b10f40c37157b0f425d123885bfa61016557988baa3788bfa9d0870adfe89"
+    }
+  },
+  "android_summary": "Baseline, pending SQLite and lost-file controls passed; safe Close failed namespace durability; opaque control failed SDK setup before installation."
+}

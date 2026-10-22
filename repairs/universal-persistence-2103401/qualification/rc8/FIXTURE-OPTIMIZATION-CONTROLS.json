@@ -1,0 +1,121 @@
+{
+  "passed": true,
+  "scope": "Exercise the actual fixture's VFS actions/checks at Python optimization 0/1/2.\n\nThe backend below is a test peer. This verifies fixture execution and refusal of\nfalse success, not Kodi's binding, native durability, or physical device behavior.\n",
+  "cases": 12,
+  "fixture_sha256": "7abb08a3f5a587f25449531c9cb6e687dd65d9b32793d1b8c596cccbb6274ad8",
+  "no_removable_assertions": true,
+  "results": [
+    {
+      "optimization": 0,
+      "variant": "original",
+      "write_calls": [
+        "str",
+        "bytes",
+        "bytearray"
+      ],
+      "readback": "textbytesarray",
+      "rejected": null
+    },
+    {
+      "optimization": 0,
+      "variant": "corrected",
+      "write_calls": [
+        "str",
+        "bytes",
+        "bytearray"
+      ],
+      "readback": "textbytesarray",
+      "rejected": null
+    },
+    {
+      "optimization": 0,
+      "variant": "false-result",
+      "write_calls": [
+        "str"
+      ],
+      "readback": "",
+      "rejected": "Original VFS write did not return True"
+    },
+    {
+      "optimization": 0,
+      "variant": "false-success",
+      "write_calls": [
+        "str"
+      ],
+      "readback": "",
+      "rejected": "VFS write readback mismatch: b''"
+    },
+    {
+      "optimization": 1,
+      "variant": "original",
+      "write_calls": [],
+      "readback": "",
+      "rejected": null
+    },
+    {
+      "optimization": 1,
+      "variant": "corrected",
+      "write_calls": [
+        "str",
+        "bytes",
+        "bytearray"
+      ],
+      "readback": "textbytesarray",
+      "rejected": null
+    },
+    {
+      "optimization": 1,
+      "variant": "false-result",
+      "write_calls": [
+        "str"
+      ],
+      "readback": "",
+      "rejected": "Original VFS write did not return True"
+    },
+    {
+      "optimization": 1,
+      "variant": "false-success",
+      "write_calls": [
+        "str"
+      ],
+      "readback": "",
+      "rejected": "VFS write readback mismatch: b''"
+    },
+    {
+      "optimization": 2,
+      "variant": "original",
+      "write_calls": [],
+      "readback": "",
+      "rejected": null
+    },
+    {
+      "optimization": 2,
+      "variant": "corrected",
+      "write_calls": [
+        "str",
+        "bytes",
+        "bytearray"
+      ],
+      "readback": "textbytesarray",
+      "rejected": null
+    },
+    {
+      "optimization": 2,
+      "variant": "false-result",
+      "write_calls": [
+        "str"
+      ],
+      "readback": "",
+      "rejected": "Original VFS write did not return True"
+    },
+    {
+      "optimization": 2,
+      "variant": "false-success",
+      "write_calls": [
+        "str"
+      ],
+      "readback": "",
+      "rejected": "VFS write readback mismatch: b''"
+    }
+  ]
+}

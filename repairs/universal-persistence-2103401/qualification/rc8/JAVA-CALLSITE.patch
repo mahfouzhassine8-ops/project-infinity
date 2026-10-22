@@ -1,0 +1,56 @@
+--- input/com/projectinfinity/kodi/InfinityCloseGuardService.smali
++++ candidate/com/projectinfinity/kodi/InfinityCloseGuardService.smali
+@@ -3205,7 +3205,7 @@
+ 
+     invoke-direct {v0, v1, v2}, Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V
+ 
+-    invoke-static {v0, p1}, Lcom/projectinfinity/kodi/InfinityCheckpointProtocol;->atomic(Ljava/io/File;Lorg/json/JSONObject;)V
++    invoke-static {v0, p1}, Lcom/projectinfinity/kodi/InfinityCheckpointReceipt;->atomic(Ljava/io/File;Lorg/json/JSONObject;)V
+     :try_end_0
+     .catch Ljava/io/IOException; {:try_start_0 .. :try_end_0} :catch_0
+ 
+@@ -3352,7 +3352,7 @@
+ 
+     invoke-direct {v0, v1, v2}, Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V
+ 
+-    invoke-static {v0, p1}, Lcom/projectinfinity/kodi/InfinityCheckpointProtocol;->atomic(Ljava/io/File;Lorg/json/JSONObject;)V
++    invoke-static {v0, p1}, Lcom/projectinfinity/kodi/InfinityCheckpointReceipt;->atomic(Ljava/io/File;Lorg/json/JSONObject;)V
+     :try_end_0
+     .catch Ljava/io/IOException; {:try_start_0 .. :try_end_0} :catch_0
+ 
+@@ -3628,7 +3628,7 @@
+ 
+     invoke-direct {v0, v1, v2}, Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V
+ 
+-    invoke-static {v0, p1}, Lcom/projectinfinity/kodi/InfinityCheckpointProtocol;->atomic(Ljava/io/File;Lorg/json/JSONObject;)V
++    invoke-static {v0, p1}, Lcom/projectinfinity/kodi/InfinityCheckpointReceipt;->atomic(Ljava/io/File;Lorg/json/JSONObject;)V
+     :try_end_0
+     .catch Ljava/io/IOException; {:try_start_0 .. :try_end_0} :catch_0
+ 
+@@ -4073,7 +4073,7 @@
+ 
+     invoke-direct {v0, v1, v2}, Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V
+ 
+-    invoke-static {v0, p1}, Lcom/projectinfinity/kodi/InfinityCheckpointProtocol;->atomic(Ljava/io/File;Lorg/json/JSONObject;)V
++    invoke-static {v0, p1}, Lcom/projectinfinity/kodi/InfinityCheckpointReceipt;->atomic(Ljava/io/File;Lorg/json/JSONObject;)V
+     :try_end_0
+     .catch Ljava/io/IOException; {:try_start_0 .. :try_end_0} :catch_0
+ 
+@@ -4151,7 +4151,7 @@
+ 
+     invoke-direct {v1, v2, v3}, Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V
+ 
+-    invoke-static {v1, v0}, Lcom/projectinfinity/kodi/InfinityCheckpointProtocol;->atomic(Ljava/io/File;Lorg/json/JSONObject;)V
++    invoke-static {v1, v0}, Lcom/projectinfinity/kodi/InfinityCheckpointReceipt;->atomic(Ljava/io/File;Lorg/json/JSONObject;)V
+ 
+     .line 476
+     invoke-static {}, Landroid/os/Process;->myPid()I
+@@ -4616,7 +4616,7 @@
+ 
+     invoke-direct {v0, v1, v2}, Ljava/io/File;-><init>(Ljava/io/File;Ljava/lang/String;)V
+ 
+-    invoke-static {v0, p1}, Lcom/projectinfinity/kodi/InfinityCheckpointProtocol;->atomic(Ljava/io/File;Lorg/json/JSONObject;)V
++    invoke-static {v0, p1}, Lcom/projectinfinity/kodi/InfinityCheckpointReceipt;->atomic(Ljava/io/File;Lorg/json/JSONObject;)V
+     :try_end_0
+     .catch Ljava/io/IOException; {:try_start_0 .. :try_end_0} :catch_0
+ 

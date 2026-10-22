@@ -1,0 +1,14 @@
+{
+  "status": "REJECTED: ordinary descriptor identity probe releases POSIX record locks; no release",
+  "build_source": "63d0d435a08c018a1511e05ff5e3181a8d757811",
+  "build_run": 39854212023,
+  "build_artifact": 12460305241,
+  "build_artifact_sha256": "724c637fca8cb3f21b78a7194988c02b7403c49665cc3c8086bba07c6a938003",
+  "build_evidence_artifact": 12458564247,
+  "build_evidence_sha256": "7c2a8da4e886602551db43b10f726b5c8b47dccafac5259ef48365b7b840006a",
+  "android_source": "58447424819a25f3295b264cd48f3ebc4c504658",
+  "android_run": 39855114035,
+  "android_fixture_failure": "Reader lock did not produce SQLITE_BUSY in the original baseline; no ready marker, no Close acceptance. Not evidence of an APK regression.",
+  "physical_fold_verified": false,
+  "final_lock": false
+}

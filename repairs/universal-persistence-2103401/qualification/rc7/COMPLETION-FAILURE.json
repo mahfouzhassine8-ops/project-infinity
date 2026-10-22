@@ -1,0 +1,19 @@
+{
+  "error": "completion_receipt_commit_failed",
+  "engine_pid": 4460,
+  "processes_after": [
+    {
+      "pid": 4302,
+      "uid": 10234,
+      "name": "com.projectinfinity.kodi"
+    }
+  ],
+  "native_gate_passed": true,
+  "completion_receipt_verified": false,
+  "source_log_lines": [
+    "10-22 22:34:25.728  4302  4302 I InfinityStartup: 1792708465728 session=4302-1792708465724 +3ms UI splash.resume",
+    "10-22 22:34:34.345  4460  4480 E AtomicFile: Failed to rename /data/user/0/com.projectinfinity.kodi/files/infinity-kodi-process.json.new to /data/user/0/com.projectinfinity.kodi/files/infinity-kodi-process.json",
+    "10-22 22:35:12.853  4302  4302 I InfinityStartup: 1792708512853 session=4302-1792708465724 +47128ms UI splash.resume",
+    "10-22 22:35:12.858  4302  4896 E AtomicFile: Failed to rename /data/user/0/com.projectinfinity.kodi/files/infinity-checkpoint-close.json.new to /data/user/0/com.projectinfinity.kodi/files/infinity-checkpoint-close.json"
+  ]
+}

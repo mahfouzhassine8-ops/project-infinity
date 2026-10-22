@@ -1,0 +1,168 @@
+{
+  "android_run": 39847524802,
+  "android_source": "61d07542bc87688b73f56d46bc45ded7cf994343",
+  "apk_build_run": 39841286004,
+  "entries": [
+    {
+      "mode": "safe",
+      "apk_sha256": "41fcc6568bf977c8095bfec0052f9556e4cf33ac103c6e45796f48d2bf18d7fa",
+      "passed": false,
+      "identities": [
+        {
+          "label": "main_first_flush",
+          "pid": 4290,
+          "fd": 173,
+          "path": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/addon_data/service.future.persistence.7fa29/buffered-4290 (deleted)",
+          "name": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/addon_data/service.future.persistence.7fa29/buffered-4290",
+          "descriptor_stat": {
+            "device": 45,
+            "inode": 180728,
+            "mode": 33200,
+            "links": 1,
+            "size": 0
+          },
+          "name_stat": {
+            "device": 45,
+            "inode": 180728,
+            "mode": 33200,
+            "links": 1,
+            "size": 0
+          },
+          "proc_target_stat": {
+            "error": "FileNotFoundError(2, 'No such file or directory')"
+          },
+          "chain": [
+            "_io.TextIOWrapper",
+            "_io.BufferedWriter",
+            "_io.FileIO"
+          ],
+          "closure": [
+            "True",
+            "False",
+            "'file.flush'",
+            "<function File.flush at 0x72a9f2ab8fe0>"
+          ]
+        },
+        {
+          "label": "worker_first_flush",
+          "pid": 4290,
+          "fd": 178,
+          "path": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/addon_data/service.future.persistence.7fa29/worker-4290 (deleted)",
+          "name": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/addon_data/service.future.persistence.7fa29/worker-4290",
+          "descriptor_stat": {
+            "device": 45,
+            "inode": 180729,
+            "mode": 33200,
+            "links": 1,
+            "size": 0
+          },
+          "name_stat": {
+            "device": 45,
+            "inode": 180729,
+            "mode": 33200,
+            "links": 1,
+            "size": 0
+          },
+          "proc_target_stat": {
+            "error": "FileNotFoundError(2, 'No such file or directory')"
+          },
+          "chain": [
+            "_io.TextIOWrapper",
+            "_io.BufferedWriter",
+            "_io.FileIO"
+          ],
+          "closure": [
+            "True",
+            "False",
+            "'file.flush'",
+            "<function File.flush at 0x72a9f2ab8fe0>"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "opaque",
+      "apk_sha256": "41fcc6568bf977c8095bfec0052f9556e4cf33ac103c6e45796f48d2bf18d7fa",
+      "passed": true,
+      "identities": [
+        {
+          "label": "worker_first_flush",
+          "pid": 4355,
+          "fd": 184,
+          "path": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/addon_data/service.future.persistence.7fa29/worker-4355",
+          "name": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/addon_data/service.future.persistence.7fa29/worker-4355",
+          "descriptor_stat": {
+            "device": 45,
+            "inode": 188515,
+            "mode": 33200,
+            "links": 1,
+            "size": 0
+          },
+          "name_stat": {
+            "device": 45,
+            "inode": 188515,
+            "mode": 33200,
+            "links": 1,
+            "size": 0
+          },
+          "proc_target_stat": {
+            "device": 45,
+            "inode": 188515,
+            "mode": 33200,
+            "links": 1,
+            "size": 0
+          },
+          "chain": [
+            "_io.TextIOWrapper",
+            "_io.BufferedWriter",
+            "_io.FileIO"
+          ],
+          "closure": [
+            "True",
+            "False",
+            "'file.flush'",
+            "<function File.flush at 0x76f3e38d9ec0>"
+          ]
+        },
+        {
+          "label": "main_first_flush",
+          "pid": 4355,
+          "fd": 179,
+          "path": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/addon_data/service.future.persistence.7fa29/buffered-4355 (deleted)",
+          "name": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/addon_data/service.future.persistence.7fa29/buffered-4355",
+          "descriptor_stat": {
+            "device": 45,
+            "inode": 188492,
+            "mode": 33200,
+            "links": 1,
+            "size": 0
+          },
+          "name_stat": {
+            "device": 45,
+            "inode": 188492,
+            "mode": 33200,
+            "links": 1,
+            "size": 0
+          },
+          "proc_target_stat": {
+            "error": "FileNotFoundError(2, 'No such file or directory')"
+          },
+          "chain": [
+            "_io.TextIOWrapper",
+            "_io.BufferedWriter",
+            "_io.FileIO"
+          ],
+          "closure": [
+            "True",
+            "False",
+            "'file.flush'",
+            "<function File.flush at 0x76f3e38d9ec0>"
+          ]
+        }
+      ]
+    }
+  ],
+  "interpretation": "Observed stale procfs descriptor annotations: original named file exists with matching live descriptor metadata; no claim of a kernel-internal cause",
+  "physical_fold_verified": false,
+  "final_lock": false
+}

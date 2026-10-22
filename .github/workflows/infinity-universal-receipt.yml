@@ -16,6 +16,8 @@ jobs:
   receipt_candidate:
     runs-on: ubuntu-22.04
     timeout-minutes: 70
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
     steps:
       - uses: actions/checkout@v4
         with: {fetch-depth: 0, persist-credentials: false, show-progress: false}

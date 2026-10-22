@@ -1,0 +1,345 @@
+{
+  "scope": "existing regression code with full matching candidate native source and overlay",
+  "results": [
+    {
+      "kind": "native",
+      "case": "cached-write",
+      "exit_code": 0,
+      "stdout": "PASS cached-write; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "cached-pwrite",
+      "exit_code": 0,
+      "stdout": "PASS cached-pwrite; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "cached-writev",
+      "exit_code": 0,
+      "stdout": "PASS cached-writev; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "raw",
+      "exit_code": 0,
+      "stdout": "PASS raw; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "raw-fd-spoof",
+      "exit_code": 0,
+      "stdout": "PASS raw-fd-spoof; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "buffer-fd-spoof",
+      "exit_code": 0,
+      "stdout": "PASS buffer-fd-spoof; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "late-raw-open",
+      "exit_code": 0,
+      "stdout": "PASS late-raw-open; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "late-cached-open",
+      "exit_code": 0,
+      "stdout": "PASS late-cached-open; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "cached-rename",
+      "exit_code": 0,
+      "stdout": "PASS cached-rename; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "cached-remove",
+      "exit_code": 0,
+      "stdout": "PASS cached-remove; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "late-chmod",
+      "exit_code": 0,
+      "stdout": "PASS late-chmod; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "late-mmap",
+      "exit_code": 0,
+      "stdout": "PASS late-mmap; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "late-ctypes",
+      "exit_code": 0,
+      "stdout": "PASS late-ctypes; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "buffer-drain",
+      "exit_code": 0,
+      "stdout": "PASS buffer-drain; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "layered",
+      "exit_code": 0,
+      "stdout": "PASS layered; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "cached-buffer",
+      "exit_code": 0,
+      "stdout": "PASS cached-buffer; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "optional-blocked",
+      "exit_code": 0,
+      "stdout": "PASS optional-blocked; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "sqlite-attach",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-attach; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "descriptor-race",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-race; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "rename-race",
+      "exit_code": 0,
+      "stdout": "PASS rename-race; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "sqlite-renamed",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-renamed; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "sqlite-row-factory",
+      "exit_code": 0,
+      "stdout": "PASS sqlite-row-factory; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "file-lock",
+      "exit_code": 0,
+      "stdout": "PASS file-lock; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "pathlike",
+      "exit_code": 0,
+      "stdout": "PASS pathlike; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "memory-buffer",
+      "exit_code": 0,
+      "stdout": "PASS memory-buffer; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "observer-denials",
+      "exit_code": 0,
+      "stdout": "PASS observer-denials; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "unknown-descriptor",
+      "exit_code": 0,
+      "stdout": "PASS unresolved actual descriptor conversion fails closed\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "unverified-posix-spawn",
+      "exit_code": 0,
+      "stdout": "PASS unobserved posix_spawn file actions remain an essential blocker\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "late-native-child",
+      "exit_code": 0,
+      "stdout": "PASS late-native-child; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "marker-filename",
+      "exit_code": 0,
+      "stdout": "PASS marker-filename; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "readonly-proc-close",
+      "exit_code": 0,
+      "stdout": "Actual reader fd=4 flags=32768 dev=30 ino=178140 mode=33060 filesystem=9fa0\nPASS readonly-proc-close; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "readonly-proc-flush",
+      "exit_code": 0,
+      "stdout": "Actual reader fd=4 flags=32768 dev=30 ino=188521 mode=33060 filesystem=9fa0\nPASS readonly-proc-flush; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "readonly-proc-late",
+      "exit_code": 0,
+      "stdout": "PASS readonly-proc-late; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "readonly-regular-input",
+      "exit_code": 0,
+      "stdout": "Actual reader fd=4 flags=32768 dev=27 ino=1314210 mode=33152 filesystem=794c7630\nPASS readonly-regular-input; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "readonly-proc-user-sync-failure",
+      "exit_code": 0,
+      "stdout": "Actual reader fd=4 flags=32768 dev=30 ino=178150 mode=33060 filesystem=9fa0\nprotected_durability_failed:/tmp/universal-regressions-q48luumv/readonly-proc-user-sync-failure/profile/state\nPASS genuine/unknown write durability still fails closed: readonly-proc-user-sync-failure\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "writable-proc-real-write",
+      "exit_code": 0,
+      "stdout": "protected_durability_failed:/proc/50355/comm\nPASS genuine/unknown write durability still fails closed: writable-proc-real-write\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "readonly-proc-override",
+      "exit_code": 0,
+      "stdout": "Actual reader fd=4 flags=32768 dev=30 ino=188541 mode=33060 filesystem=9fa0\nprotected_durability_failed:/proc/50357/maps\nPASS genuine/unknown write durability still fails closed: readonly-proc-override\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "readonly-proc-writable-retarget",
+      "exit_code": 0,
+      "stdout": "Actual reader fd=4 flags=32768 dev=30 ino=183062 mode=33060 filesystem=9fa0\nPASS readonly-proc-writable-retarget; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stderr": ""
+    },
+    {
+      "kind": "native",
+      "case": "writable-reader-retarget",
+      "exit_code": 0,
+      "stdout": "unflushed_protected_buffer:1:native-buffer:140166508883184;writer_id=1;thread=140166515393216;checkpoint_generation=23;phase=2;target=/proc/50362/maps;interpreter=94873451479056;invocation=test.provider:service.py\nunflushed_protected_buffer:1:native-buffer:140166509033968;writer_id=1;thread=140166515393216;checkpoint_generation=23;phase=2;target=/tmp/universal-regressions-q48luumv/writable-reader-retarget/profile/state;interpreter=94873451479056;invocation=test.provider:service.py\nPASS genuine/unknown write durability still fails closed: writable-reader-retarget\n",
+      "stderr": ""
+    },
+    {
+      "kind": "sqlite",
+      "case": "pending",
+      "exit_code": 0,
+      "stdout": "{\"case\": \"pending\", \"result\": \"PASS\", \"sqlite\": \"3.45.1\", \"actual_python_sqlite\": true, \"actual_runtime_vfs\": true, \"folder\": \"/tmp/essential-sqlite-uov1ez63\", \"expected\": [[321]]}\n",
+      "stderr": "",
+      "reopened_rows_and_integrity_verified": true
+    },
+    {
+      "kind": "sqlite",
+      "case": "pending-wal",
+      "exit_code": 0,
+      "stdout": "{\"case\": \"pending-wal\", \"result\": \"PASS\", \"sqlite\": \"3.45.1\", \"actual_python_sqlite\": true, \"actual_runtime_vfs\": true, \"folder\": \"/tmp/essential-sqlite-g5zy8lyc\", \"expected\": [[321]]}\n",
+      "stderr": "",
+      "reopened_rows_and_integrity_verified": true
+    },
+    {
+      "kind": "sqlite",
+      "case": "attach",
+      "exit_code": 0,
+      "stdout": "{\"case\": \"attach\", \"result\": \"PASS\", \"sqlite\": \"3.45.1\", \"actual_python_sqlite\": true, \"actual_runtime_vfs\": true, \"folder\": \"/tmp/essential-sqlite-cfk274hw\", \"expected\": [[321]]}\n",
+      "stderr": "",
+      "reopened_rows_and_integrity_verified": true
+    },
+    {
+      "kind": "sqlite",
+      "case": "attach-wal",
+      "exit_code": 0,
+      "stdout": "{\"case\": \"attach-wal\", \"result\": \"PASS\", \"sqlite\": \"3.45.1\", \"actual_python_sqlite\": true, \"actual_runtime_vfs\": true, \"folder\": \"/tmp/essential-sqlite-5agmwqnq\", \"expected\": [[321]]}\n",
+      "stderr": "",
+      "reopened_rows_and_integrity_verified": true
+    },
+    {
+      "kind": "sqlite",
+      "case": "optional-pending",
+      "exit_code": 0,
+      "stdout": "{\"case\": \"optional-pending\", \"result\": \"PASS\", \"sqlite\": \"3.45.1\", \"actual_python_sqlite\": true, \"actual_runtime_vfs\": true, \"folder\": \"/tmp/essential-sqlite-9ujvupwn\", \"expected\": []}\n",
+      "stderr": "",
+      "reopened_rows_and_integrity_verified": true
+    },
+    {
+      "kind": "sqlite",
+      "case": "late-write",
+      "exit_code": 0,
+      "stdout": "{\"case\": \"late-write\", \"result\": \"PASS\", \"sqlite\": \"3.45.1\", \"actual_python_sqlite\": true, \"actual_runtime_vfs\": true, \"folder\": \"/tmp/essential-sqlite-49vugkcx\", \"expected\": [[321]]}\n",
+      "stderr": "",
+      "reopened_rows_and_integrity_verified": true
+    },
+    {
+      "kind": "sqlite",
+      "case": "late-write-wal",
+      "exit_code": 0,
+      "stdout": "{\"case\": \"late-write-wal\", \"result\": \"PASS\", \"sqlite\": \"3.45.1\", \"actual_python_sqlite\": true, \"actual_runtime_vfs\": true, \"folder\": \"/tmp/essential-sqlite-16nhu7b5\", \"expected\": [[321]]}\n",
+      "stderr": "",
+      "reopened_rows_and_integrity_verified": true
+    },
+    {
+      "kind": "sqlite",
+      "case": "uri-vfs",
+      "exit_code": 0,
+      "stdout": "{\"case\": \"uri-vfs\", \"result\": \"PASS\", \"sqlite\": \"3.45.1\", \"actual_python_sqlite\": true, \"actual_runtime_vfs\": true, \"folder\": \"/tmp/essential-sqlite-0fw9dyi7\", \"expected\": [[321]]}\n",
+      "stderr": "",
+      "reopened_rows_and_integrity_verified": true
+    }
+  ],
+  "passed": true,
+  "android_validated": false,
+  "physical_fold_verified": false
+}

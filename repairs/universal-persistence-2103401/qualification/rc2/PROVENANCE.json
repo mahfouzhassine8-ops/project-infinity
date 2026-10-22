@@ -1,0 +1,58 @@
+{
+  "status": "REJECTED RC2; Android safe control failed",
+  "build_run": 39841286004,
+  "build_source": "b7476c548179f2615714dd5578eaf83912a46f8c",
+  "candidate_artifact": {
+    "id": 12453659067,
+    "sha256": "489d2d81a48fb41509121c16d9618cc8756518efe56b7e5ee3bcbb9f671d94cd"
+  },
+  "build_evidence_artifact": {
+    "id": 12453429679,
+    "sha256": "9e9ca483a8002de0cac5f51fbac714680425d794f6609dcde42805a47cc92402"
+  },
+  "android_run": 39842743705,
+  "android_source": "1354467417f3581543413d54a7bb01c7958521b3",
+  "android_artifacts": {
+    "baseline": {
+      "id": 12453727633,
+      "sha256": "4293a298b6d77fb60e01a342197fc338229d01b63faab3f10a368a3d03400640"
+    },
+    "safe": {
+      "id": 12455391268,
+      "sha256": "a1237d81902eda07198fe0ad70694906c7a942ac8ffc155ed96534503c1bf510"
+    },
+    "pending": {
+      "id": 12454368412,
+      "sha256": "e4022a71edad49ce8406464985b0b1b6db58a1b0cfe8654a02437c955baa2e32"
+    },
+    "opaque": {
+      "id": 12454872310,
+      "sha256": "7b409c63c26fffd13094dff298bf15818e93b577341fc72273e3740896606e8d"
+    }
+  },
+  "physical_fold_verified": false,
+  "real_installed_provider_validation": false,
+  "final_lock": false,
+  "diagnostic_runs": [
+    {
+      "id": 39846465956,
+      "source": "f51861349a01ec46cacdb309200c0e08fa29ce69",
+      "purpose": "read-only actual handle identities"
+    },
+    {
+      "id": 39847524802,
+      "source": "61d07542bc87688b73f56d46bc45ded7cf994343",
+      "purpose": "read-only named and descriptor metadata",
+      "artifacts": {
+        "safe": {
+          "id": 12455203989,
+          "sha256": "b3d6a453b2448df1882dc304ec699c8277085729f8eb1841404a0cee4b7bc6b9"
+        },
+        "opaque": {
+          "id": 12455539217,
+          "sha256": "63c95fc97e1188cd4887233ce3a3c3c2ae225130a762c079129bb13502dce8dd"
+        }
+      }
+    }
+  ]
+}
