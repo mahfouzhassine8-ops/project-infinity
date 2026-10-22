@@ -37,14 +37,20 @@ public final class Infinity101Test extends Instrumentation {
   e=InfinityAndroidKeyboard.show(activity,++token,"x",request("dark","Movies"),false,true,0,sink=new Capture());e.finish(false);check(sink.completed==1&&!sink.accepted,"cancel inert");
  }
  void clickText(String text)throws Exception {
-  waitForIdleSync();AccessibilityNodeInfo root=getUiAutomation().getRootInActiveWindow();check(root!=null,"active accessibility window");
-  List<AccessibilityNodeInfo> nodes=root.findAccessibilityNodeInfosByText(text);
-  for(AccessibilityNodeInfo node:nodes)if(text.contentEquals(node.getText())){
-   AccessibilityNodeInfo target=node;while(target!=null&&!target.isClickable())target=target.getParent();
-   if(target!=null&&target.performAction(AccessibilityNodeInfo.ACTION_CLICK)){waitForIdleSync();return;}
-  }
-  throw new AssertionError("Missing clickable text: "+text);
+  long until=android.os.SystemClock.uptimeMillis()+2500;
+  do {
+   waitForIdleSync();AccessibilityNodeInfo root=getUiAutomation().getRootInActiveWindow();
+   if(root!=null){List<AccessibilityNodeInfo> nodes=root.findAccessibilityNodeInfosByText(text);
+    for(AccessibilityNodeInfo node:nodes)if(node.getText()!=null&&text.equalsIgnoreCase(node.getText().toString())){
+     AccessibilityNodeInfo target=node;while(target!=null&&!target.isClickable())target=target.getParent();
+     if(target!=null&&target.performAction(AccessibilityNodeInfo.ACTION_CLICK)){android.os.SystemClock.sleep(100);waitForIdleSync();return;}
+    }
+   }
+   android.os.SystemClock.sleep(50);
+  }while(android.os.SystemClock.uptimeMillis()<until);
+  throw new AssertionError("Missing clickable text: "+text+"; hierarchy="+tree(getUiAutomation().getRootInActiveWindow(),0));
  }
+ String tree(AccessibilityNodeInfo n,int depth){if(n==null||depth>12)return "";String s="["+n.getClassName()+":"+n.getText()+":"+n.getContentDescription()+":click="+n.isClickable()+"]";for(int i=0;i<n.getChildCount();i++)s+=tree(n.getChild(i),depth+1);return s;}
  void frame(String name)throws Exception {
   waitForIdleSync();android.os.SystemClock.sleep(200);android.graphics.Bitmap b=getUiAutomation().takeScreenshot();check(b!=null,"screenshot");
   try(FileOutputStream out=new FileOutputStream(new File(getTargetContext().getFilesDir(),name+".png"))){check(b.compress(android.graphics.Bitmap.CompressFormat.PNG,100,out),"screenshot saved");}b.recycle();
@@ -65,5 +71,5 @@ public final class Infinity101Test extends Instrumentation {
   if(Build.VERSION.SDK_INT!=37)throw new AssertionError("Android17 required");activity=startActivitySync(new Intent(getTargetContext(),Infinity101TestActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));waitForIdleSync();final Throwable[] error={null};
   runOnMainSync(()->{try{suite();}catch(Throwable e){error[0]=e;}});if(error[0]!=null)throw new AssertionError(error[0]);historyAndScreenshots();
   result.putString("stream","INFINITY101_UI_PASS="+passed+"\n");result.putInt("passed",passed);finish(Activity.RESULT_OK,result);
- }catch(Throwable error){StringWriter trace=new StringWriter();error.printStackTrace(new PrintWriter(trace));result.putString("stream","INFINITY101_UI_FAILED="+trace+"\n");finish(Activity.RESULT_CANCELED,result);}}
+ }catch(Throwable error){try{frame("failure");}catch(Exception ignored){}StringWriter trace=new StringWriter();error.printStackTrace(new PrintWriter(trace));result.putString("stream","INFINITY101_UI_FAILED="+trace+"\n");finish(Activity.RESULT_CANCELED,result);}}
 }

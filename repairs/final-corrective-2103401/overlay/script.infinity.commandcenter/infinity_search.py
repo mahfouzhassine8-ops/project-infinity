@@ -299,7 +299,10 @@ def open_search(media='movie'):
         query=choice.get('query');aid=choice.get('provider')
         if not isinstance(query,str) or len(query)>160:return
         if choice.get('operation')=='clear-history' and choice.get('confirmed') is True:
-            shared_history(clear=True)
+            try:shared_history(clear=True)
+            except (OSError,ValueError,RuntimeError) as error:
+                from infinity_trakt import notice
+                notice(str(error),'Infinity Search');return
             current=query;selected=aid;view='history';continue
         legacy_history=choice.get('history') is True
         if not query.strip() and not legacy_history:return
@@ -314,7 +317,7 @@ def open_search(media='movie'):
             provider=next((p for p in ready if p['id']==aid),None)
             if provider is None:return
             target=route(provider,query,history=legacy_history);provider_name=provider['name']
-        xbmc.executebuiltin('ActivateWindow(Videos,"'+target+'",return)',True)
+        xbmc.executebuiltin('ActivateWindow(Videos,"'+target+'",return)')
         if not legacy_history:shared_history(query=query,media=media,provider=aid,name=provider_name)
         return
 
