@@ -1,0 +1,15 @@
+Infinity 2103400 EXPERIMENTAL - install over the locked 2103399.
+
+1. Keep all existing Infinity data and add-ons. Install Infinity-2103400-Fold-Corrective-EXPERIMENTAL.apk over Infinity. Never uninstall or clear data.
+2. The APK contains every matching component. Open Infinity and verify Kodi-loaded versions and source hashes using Health Center's component identity export.
+3. If manually applying component ZIPs, install these matching ZIPs in this exact order through Install from ZIP:
+   script.infinity.commandcenter-0.3.5.28.zip
+   script.infinity.watchedbridge-1.0.9.zip
+   script.infinity.uirepair-0.1.11.zip
+   plugin.infinity.latestreleases-0.1.1.zip
+   script.kodihealthcenter-2.5.26.zip
+   skin.infinity.diggz-1.0.5.237.zip
+4. Restart Infinity after completing the set. Do not mix older component ZIPs with this candidate. The bundled script.infinity.rails-0.2.7.zip is byte-identical in content to the baseline; do not reinstall it.
+5. Follow CORRECTIVE-ACCEPTANCE.md on the physical Fold. Keep failed/successful Close exports separately. No final LOCK until the user approves the device result.
+
+Existing expired direct URLs lacking a provable original route remain saved. They cannot safely be converted to guessed provider routes. Open that exact title/episode in its original provider once; successful playback now captures the reusable route and preserves verified local identity/progress. No automatic different-title playback is authorized.
