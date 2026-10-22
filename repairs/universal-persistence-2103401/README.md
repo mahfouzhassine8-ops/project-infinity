@@ -43,9 +43,16 @@ SQLite VFS/WAL/ATTACH barriers, supported subprocess tracking, quarantine/probat
 mandatory-owner checks and coordinator ordering are retained. Unknown writers
 remain blocked. A failure cannot be erased by interpreter completion.
 
+The inherited add-on-name heuristic for optional profile data is removed. Only
+the coordinator's explicit trusted cache roots and verified nonpersistent targets
+are optional; ordinary third-party profile databases/history are mandatory.
+SQLite transactions capture the current native writer instead of always -1.
+Pending operation, buffer and transaction diagnostics include the actual writer,
+thread, interpreter/admission identity and current checkpoint generation.
+
 ## Verification status
 
-Local production-source host execution: 93 new/control/cycle cases and 47 retained
+Local production-source host execution: 98 new/control/cycle cases and 47 retained
 native/SQLite regressions passed. The buffer conversion and File write loop are
 extracted from the exact production sources; only their host POSIX backend and
 native type harness are adapters. The actual observer, native hooks and ledger

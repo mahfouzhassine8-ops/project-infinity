@@ -160,6 +160,11 @@ int main(int argc,char** argv){
       else return 25;
     }
     shouldBlock=true;
+  } else if(scenario=="profile-transaction") {
+    PyDict_SetItemString(globals,"provider",PyUnicode_FromString(provider.c_str()));
+    run("folder=root+'/profile/addon_data/'+provider\nos.makedirs(folder)\n"
+        "db=sqlite3.connect(folder+'/private.db');db.execute('CREATE TABLE t(v)');db.execute('INSERT INTO t VALUES(1)')\n");
+    shouldBlock=true;
   } else if(scenario=="pending-native") {
     assert(InfinityScriptPersistence::BeginProtectedOperation(101,{root+"/profile/pending"},"native.write"));shouldBlock=true;
   } else if(scenario=="opaque") {
@@ -182,6 +187,18 @@ int main(int argc,char** argv){
     "t=threading.Thread(target=child);t.start();t.join()\n");
   if(baseline)run("f.close()\n");
   assert(InfinityScriptPersistence::BeginWriteProtection(71,{root+"/profile"},{root+"/cache"}));
+#if defined(INFINITY_UNIVERSAL_CANDIDATE)
+  if(scenario=="profile-transaction") {
+    const auto proof=InfinityScriptPersistence::EssentialWrites();
+    assert(!proof.blockers.empty());
+    bool attributed=false;
+    for(const auto& message:proof.blockers)
+      if(message.find("pending_protected_")!=std::string::npos &&
+         message.find("writer_id=101")!=std::string::npos &&
+         message.find("invocation="+provider+":service.py")!=std::string::npos)attributed=true;
+    assert(attributed);
+  }
+#endif
   if(scenario=="late")run(
     "try:f.write('late mutation')\nexcept PermissionError:pass\nelse:raise AssertionError('late write admitted')\n");
   run("f.close()\n");

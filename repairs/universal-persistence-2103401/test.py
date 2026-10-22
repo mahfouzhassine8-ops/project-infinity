@@ -15,7 +15,7 @@ PROVIDERS = ('plugin.video.thecrew', 'plugin.video.umbrella', 'plugin.video.sere
 CASES = ('normal', 'invalid', 'partial', 'foreign', 'subclass', 'buffered',
          'transaction', 'sqlite', 'namespace', 'child-thread', 'late',
          'pending-native', 'opaque', 'namespace-unobserved', 'namespace-recreated',
-         'namespace-symlink', 'namespace-fsync')
+         'namespace-symlink', 'namespace-fsync', 'profile-transaction')
 
 
 def readback(root, case):
