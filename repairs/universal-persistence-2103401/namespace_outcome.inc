@@ -1,31 +1,48 @@
 // Called only after a successful native namespace operation, while its exact
 // writer/thread lease is still active. This is absence evidence, not fsync proof.
-inline void RecordRemovedNamespace(uint64_t token, const std::string& raw)
+inline void RecordRemovedNamespace(uint64_t token)
 {
-  const auto path = Absolute(raw);
-  if (path.empty() || path != raw || ProtectedCanonical(path) != path) return;
-  struct stat st{};
-  if (::lstat(path.c_str(), &st) == 0 || errno != ENOENT) return;
   auto& state = Get();
   std::lock_guard<std::mutex> lock(state.mutex);
   const auto found = state.protection.operations.find(token);
   if (found == state.protection.operations.end() ||
       found->second.thread != std::this_thread::get_id() ||
-      found->second.paths.empty() || found->second.paths.front() != raw) return;
+      found->second.actualPaths.empty()) return;
+  const auto& raw=found->second.actualPaths.front();
+  const auto path=Absolute(raw);
   const auto& operation = found->second.operation;
   if (operation != "rename" && operation != "replace" && operation != "remove" &&
       operation != "unlink" && operation != "rmdir") return;
+  // Inspect and record under the admission mutex. A new mutator cannot finish
+  // between the absence check and insertion; an already admitted overlapping
+  // mutator remains visible below until it ends under the same mutex.
+  const auto canonical=ProtectedCanonical(path);
+  std::string rejection;
+  if (path.empty() || path != raw || canonical != path)
+    rejection="removal_identity_unverified;canonical="+canonical;
+  struct stat st{};
+  if(rejection.empty())
+  {
+    const int result=::lstat(path.c_str(),&st),error=errno;
+    if(result==0 || error!=ENOENT)
+      rejection="removal_absence_unverified;lstat="+std::to_string(result)+";errno="+std::to_string(error);
+  }
+  if(!rejection.empty())
+  { NamespaceEvidenceLocked(state.protection,path,rejection+";"+NamespaceLease(state,found->second));return; }
   for (const auto& live : state.protection.operations)
     if (live.second.thread != found->second.thread &&
         live.second.namespaceEffect == NamespaceEffect::MAY_MUTATE)
     {
-      if (live.second.paths.empty()) return;
+      if (live.second.paths.empty())
+      { NamespaceEvidenceLocked(state.protection,path,"concurrent_unknown_target;"+NamespaceLease(state,live.second));return; }
       for (const auto& target : live.second.paths)
-        if (target.empty() || Within(target,path) || Within(path,target)) return;
+        if (target.empty() || Within(target,path) || Within(path,target))
+        { NamespaceEvidenceLocked(state.protection,path,"concurrent_overlap;target="+target+";"+NamespaceLease(state,live.second));return; }
     }
   if (state.protection.removedNamespaces.size() >= 65536)
   { ProtectionFailureLocked(state.protection,"removed_namespace_inventory_exhausted"); return; }
   state.protection.removedNamespaces.insert(path);
+  NamespaceEvidenceLocked(state.protection,path,"observed_absent;"+NamespaceLease(state,found->second));
 }
 
 // A vanished parent may be traversed only when every absent component has its

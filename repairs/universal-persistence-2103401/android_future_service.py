@@ -5,6 +5,7 @@ import os
 import sqlite3
 import subprocess
 import threading
+from pathlib import Path
 import xbmc
 import xbmcaddon
 import xbmcvfs
@@ -135,9 +136,9 @@ versioncheck=xbmcaddon.Addon('service.xbmc.versioncheck')
 versioncheck_path=xbmcvfs.translatePath(versioncheck.getAddonInfo('path'))
 with open(os.path.join(versioncheck_path,'resources/lib/version_check/service.py'),'rb') as stream:
     versioncheck_hash=hashlib.sha256(stream.read()).hexdigest()
-with open(os.path.join(root,'ready-'+cycle+'.json'),'w') as stream:
+with open(Path(root)/('ready-'+cycle+'.json'),'w') as stream:
     json.dump(dict(addon=identity,pid=os.getpid(),mode=mode,errors=errors,worker_ready=True,
-                   supported_child_returned=True,failed_commit_rolled_back=True,context_commit_rolled_back=True,essential_vfs=essential_vfs,
+                   supported_child_returned=True,pathlike_io=True,failed_commit_rolled_back=True,context_commit_rolled_back=True,essential_vfs=essential_vfs,
                    history_count=history_count,watched_count=watched_count,
                    versioncheck_version=versioncheck.getAddonInfo('version'),
                    versioncheck_service_sha256=versioncheck_hash),stream)

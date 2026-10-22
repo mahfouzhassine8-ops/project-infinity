@@ -215,14 +215,14 @@
       "kind": "native",
       "case": "readonly-proc-close",
       "exit_code": 0,
-      "stdout": "Actual reader fd=4 flags=32768 dev=30 ino=205602 mode=33060 filesystem=9fa0\nPASS readonly-proc-close; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stdout": "Actual reader fd=4 flags=32768 dev=30 ino=233752 mode=33060 filesystem=9fa0\nPASS readonly-proc-close; actual CPython 3.11.7; no interpreter retirement required\n",
       "stderr": ""
     },
     {
       "kind": "native",
       "case": "readonly-proc-flush",
       "exit_code": 0,
-      "stdout": "Actual reader fd=4 flags=32768 dev=30 ino=209735 mode=33060 filesystem=9fa0\nPASS readonly-proc-flush; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stdout": "Actual reader fd=4 flags=32768 dev=30 ino=220048 mode=33060 filesystem=9fa0\nPASS readonly-proc-flush; actual CPython 3.11.7; no interpreter retirement required\n",
       "stderr": ""
     },
     {
@@ -236,49 +236,49 @@
       "kind": "native",
       "case": "readonly-regular-input",
       "exit_code": 0,
-      "stdout": "Actual reader fd=4 flags=32768 dev=27 ino=1314079 mode=33152 filesystem=794c7630\nPASS readonly-regular-input; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stdout": "Actual reader fd=4 flags=32768 dev=27 ino=1312227 mode=33152 filesystem=794c7630\nPASS readonly-regular-input; actual CPython 3.11.7; no interpreter retirement required\n",
       "stderr": ""
     },
     {
       "kind": "native",
       "case": "readonly-proc-user-sync-failure",
       "exit_code": 0,
-      "stdout": "Actual reader fd=4 flags=32768 dev=30 ino=216187 mode=33060 filesystem=9fa0\nprotected_durability_failed:/tmp/universal-regressions-a9qkr8m4/readonly-proc-user-sync-failure/profile/state\nPASS genuine/unknown write durability still fails closed: readonly-proc-user-sync-failure\n",
+      "stdout": "Actual reader fd=4 flags=32768 dev=30 ino=231321 mode=33060 filesystem=9fa0\nprotected_durability_failed:/tmp/universal-regressions-xegmz6w2/readonly-proc-user-sync-failure/profile/state\nprotected_durability_context:/tmp/universal-regressions-xegmz6w2/readonly-proc-user-sync-failure/profile/state;errno=5\nPASS genuine/unknown write durability still fails closed: readonly-proc-user-sync-failure\n",
       "stderr": ""
     },
     {
       "kind": "native",
       "case": "writable-proc-real-write",
       "exit_code": 0,
-      "stdout": "protected_durability_failed:/proc/52066/comm\nPASS genuine/unknown write durability still fails closed: writable-proc-real-write\n",
+      "stdout": "protected_durability_failed:/proc/53899/comm\nprotected_durability_context:/proc/53899/comm;errno=22\nPASS genuine/unknown write durability still fails closed: writable-proc-real-write\n",
       "stderr": ""
     },
     {
       "kind": "native",
       "case": "readonly-proc-override",
       "exit_code": 0,
-      "stdout": "Actual reader fd=4 flags=32768 dev=30 ino=216197 mode=33060 filesystem=9fa0\nprotected_durability_failed:/proc/52067/maps\nPASS genuine/unknown write durability still fails closed: readonly-proc-override\n",
+      "stdout": "Actual reader fd=4 flags=32768 dev=30 ino=231331 mode=33060 filesystem=9fa0\nprotected_durability_failed:/proc/53901/maps\nprotected_durability_context:/proc/53901/maps;errno=22\nPASS genuine/unknown write durability still fails closed: readonly-proc-override\n",
       "stderr": ""
     },
     {
       "kind": "native",
       "case": "readonly-proc-writable-retarget",
       "exit_code": 0,
-      "stdout": "Actual reader fd=4 flags=32768 dev=30 ino=209755 mode=33060 filesystem=9fa0\nPASS readonly-proc-writable-retarget; actual CPython 3.11.7; no interpreter retirement required\n",
+      "stdout": "Actual reader fd=4 flags=32768 dev=30 ino=233782 mode=33060 filesystem=9fa0\nPASS readonly-proc-writable-retarget; actual CPython 3.11.7; no interpreter retirement required\n",
       "stderr": ""
     },
     {
       "kind": "native",
       "case": "writable-reader-retarget",
       "exit_code": 0,
-      "stdout": "unflushed_protected_buffer:1:native-buffer:140511224606560;writer_id=1;thread=140511231623872;checkpoint_generation=23;phase=2;target=/tmp/universal-regressions-a9qkr8m4/writable-reader-retarget/profile/state;interpreter=93870271930384;invocation=test.provider:service.py\nunflushed_protected_buffer:1:native-buffer:140511224802544;writer_id=1;thread=140511231623872;checkpoint_generation=23;phase=2;target=/proc/52069/maps;interpreter=93870271930384;invocation=test.provider:service.py\nPASS genuine/unknown write durability still fails closed: writable-reader-retarget\n",
+      "stdout": "unflushed_protected_buffer:1:native-buffer:140229617397600;writer_id=1;thread=140229624459968;checkpoint_generation=23;phase=2;target=/tmp/universal-regressions-xegmz6w2/writable-reader-retarget/profile/state;interpreter=94036343799824;invocation=test.provider:service.py\nunflushed_protected_buffer:1:native-buffer:140229617593584;writer_id=1;thread=140229624459968;checkpoint_generation=23;phase=2;target=/proc/53906/maps;interpreter=94036343799824;invocation=test.provider:service.py\nPASS genuine/unknown write durability still fails closed: writable-reader-retarget\n",
       "stderr": ""
     },
     {
       "kind": "sqlite",
       "case": "pending",
       "exit_code": 0,
-      "stdout": "{\"case\": \"pending\", \"result\": \"PASS\", \"sqlite\": \"3.45.1\", \"actual_python_sqlite\": true, \"actual_runtime_vfs\": true, \"folder\": \"/tmp/essential-sqlite-a8lp603g\", \"expected\": [[321]]}\n",
+      "stdout": "{\"case\": \"pending\", \"result\": \"PASS\", \"sqlite\": \"3.45.1\", \"actual_python_sqlite\": true, \"actual_runtime_vfs\": true, \"folder\": \"/tmp/essential-sqlite-hc7chgys\", \"expected\": [[321]]}\n",
       "stderr": "",
       "reopened_rows_and_integrity_verified": true
     },
@@ -286,7 +286,7 @@
       "kind": "sqlite",
       "case": "pending-wal",
       "exit_code": 0,
-      "stdout": "{\"case\": \"pending-wal\", \"result\": \"PASS\", \"sqlite\": \"3.45.1\", \"actual_python_sqlite\": true, \"actual_runtime_vfs\": true, \"folder\": \"/tmp/essential-sqlite-ic4ua8nk\", \"expected\": [[321]]}\n",
+      "stdout": "{\"case\": \"pending-wal\", \"result\": \"PASS\", \"sqlite\": \"3.45.1\", \"actual_python_sqlite\": true, \"actual_runtime_vfs\": true, \"folder\": \"/tmp/essential-sqlite-49f8upm4\", \"expected\": [[321]]}\n",
       "stderr": "",
       "reopened_rows_and_integrity_verified": true
     },
@@ -294,7 +294,7 @@
       "kind": "sqlite",
       "case": "attach",
       "exit_code": 0,
-      "stdout": "{\"case\": \"attach\", \"result\": \"PASS\", \"sqlite\": \"3.45.1\", \"actual_python_sqlite\": true, \"actual_runtime_vfs\": true, \"folder\": \"/tmp/essential-sqlite-aroihhug\", \"expected\": [[321]]}\n",
+      "stdout": "{\"case\": \"attach\", \"result\": \"PASS\", \"sqlite\": \"3.45.1\", \"actual_python_sqlite\": true, \"actual_runtime_vfs\": true, \"folder\": \"/tmp/essential-sqlite-_sclcrwg\", \"expected\": [[321]]}\n",
       "stderr": "",
       "reopened_rows_and_integrity_verified": true
     },
@@ -302,7 +302,7 @@
       "kind": "sqlite",
       "case": "attach-wal",
       "exit_code": 0,
-      "stdout": "{\"case\": \"attach-wal\", \"result\": \"PASS\", \"sqlite\": \"3.45.1\", \"actual_python_sqlite\": true, \"actual_runtime_vfs\": true, \"folder\": \"/tmp/essential-sqlite-cnicthxs\", \"expected\": [[321]]}\n",
+      "stdout": "{\"case\": \"attach-wal\", \"result\": \"PASS\", \"sqlite\": \"3.45.1\", \"actual_python_sqlite\": true, \"actual_runtime_vfs\": true, \"folder\": \"/tmp/essential-sqlite-mxeu7hka\", \"expected\": [[321]]}\n",
       "stderr": "",
       "reopened_rows_and_integrity_verified": true
     },
@@ -310,7 +310,7 @@
       "kind": "sqlite",
       "case": "optional-pending",
       "exit_code": 0,
-      "stdout": "{\"case\": \"optional-pending\", \"result\": \"PASS\", \"sqlite\": \"3.45.1\", \"actual_python_sqlite\": true, \"actual_runtime_vfs\": true, \"folder\": \"/tmp/essential-sqlite-0wtd7rrc\", \"expected\": []}\n",
+      "stdout": "{\"case\": \"optional-pending\", \"result\": \"PASS\", \"sqlite\": \"3.45.1\", \"actual_python_sqlite\": true, \"actual_runtime_vfs\": true, \"folder\": \"/tmp/essential-sqlite-argkmexn\", \"expected\": []}\n",
       "stderr": "",
       "reopened_rows_and_integrity_verified": true
     },
@@ -318,7 +318,7 @@
       "kind": "sqlite",
       "case": "late-write",
       "exit_code": 0,
-      "stdout": "{\"case\": \"late-write\", \"result\": \"PASS\", \"sqlite\": \"3.45.1\", \"actual_python_sqlite\": true, \"actual_runtime_vfs\": true, \"folder\": \"/tmp/essential-sqlite-5mchlult\", \"expected\": [[321]]}\n",
+      "stdout": "{\"case\": \"late-write\", \"result\": \"PASS\", \"sqlite\": \"3.45.1\", \"actual_python_sqlite\": true, \"actual_runtime_vfs\": true, \"folder\": \"/tmp/essential-sqlite-kzabp40c\", \"expected\": [[321]]}\n",
       "stderr": "",
       "reopened_rows_and_integrity_verified": true
     },
@@ -326,7 +326,7 @@
       "kind": "sqlite",
       "case": "late-write-wal",
       "exit_code": 0,
-      "stdout": "{\"case\": \"late-write-wal\", \"result\": \"PASS\", \"sqlite\": \"3.45.1\", \"actual_python_sqlite\": true, \"actual_runtime_vfs\": true, \"folder\": \"/tmp/essential-sqlite-tke7hq7s\", \"expected\": [[321]]}\n",
+      "stdout": "{\"case\": \"late-write-wal\", \"result\": \"PASS\", \"sqlite\": \"3.45.1\", \"actual_python_sqlite\": true, \"actual_runtime_vfs\": true, \"folder\": \"/tmp/essential-sqlite-0g_8lt5e\", \"expected\": [[321]]}\n",
       "stderr": "",
       "reopened_rows_and_integrity_verified": true
     },
@@ -334,7 +334,7 @@
       "kind": "sqlite",
       "case": "uri-vfs",
       "exit_code": 0,
-      "stdout": "{\"case\": \"uri-vfs\", \"result\": \"PASS\", \"sqlite\": \"3.45.1\", \"actual_python_sqlite\": true, \"actual_runtime_vfs\": true, \"folder\": \"/tmp/essential-sqlite-jp89thym\", \"expected\": [[321]]}\n",
+      "stdout": "{\"case\": \"uri-vfs\", \"result\": \"PASS\", \"sqlite\": \"3.45.1\", \"actual_python_sqlite\": true, \"actual_runtime_vfs\": true, \"folder\": \"/tmp/essential-sqlite-e9vz_a18\", \"expected\": [[321]]}\n",
       "stderr": "",
       "reopened_rows_and_integrity_verified": true
     }

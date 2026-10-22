@@ -114,7 +114,7 @@ def main():
             ready=until(lambda:probe.read_json(ready_path),60)
             assert ready['pid']==owner['pid'] and ready['addon']==FUTURE and ready['worker_ready']
             assert ready['supported_child_returned']
-            assert ready['failed_commit_rolled_back'] and ready['context_commit_rolled_back']
+            assert ready['failed_commit_rolled_back'] and ready['context_commit_rolled_back'] and ready['pathlike_io']
             assert ready['history_count']==ready['watched_count']==cycle+1
             if a.mode in ('safe','pending','lost-file'):
                 assert ready['versioncheck_version']=='0.5.28+infinity.1'

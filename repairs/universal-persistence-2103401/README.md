@@ -52,7 +52,7 @@ thread, interpreter/admission identity and current checkpoint generation.
 
 ## Verification status
 
-Local production-source host execution: 253 new/control/cycle cases and 47 retained
+Local production-source host execution: 263 new/control/cycle cases and 47 retained
 native/SQLite regressions passed. The buffer conversion and File write loop are
 extracted from the exact production sources; only their host POSIX backend and
 native type harness are adapters. The actual observer, native hooks and ledger
@@ -148,7 +148,28 @@ check remains active. Return values and exceptions come from the original call.
 Native trace/function callbacks verify owner identity for context exit, rollback
 and cursor stepping. All 253 source-backed cases and 47 retained regressions pass.
 
-Pending for RC6: full ARM64 compilation, permanent signing/member verification,
+RC5 Android safe Close still failed at removed-directory durability, although
+its pending-transaction and lost-file controls passed. RC6's context fix does
+not establish resolution of that separate failure. A composite host replay now
+reproduces the same failure across all five identities when an ordinary PathLike
+open follows completed namespace removal.
+
+RC7 keeps an unresolved, natively audited path operation as a coordination lease
+until the actual converted target arrives. Its admission/pending protection is
+unchanged; native audit children still classify every actual effect, and missing
+completion identity still blocks. Removal receipts use those actual converted
+arguments, including PathLike rename/removal. Overlapping recreation and unknown
+writers still invalidate evidence. Absence inspection/insertion now share the
+admission mutex, preventing an intervening admitted mutation. Bounded provenance
+identifies why absence proof was refused or revoked and which native operation
+and owner caused it; original durability error strings are retained.
+
+The composite PathLike replay, PathLike removal and recreation controls, and
+existing unknown-effect diagnostics pass with all retained gates: 263 production-
+source cases plus 47 native/SQLite regressions. This host reproduction alone is
+not proof of the exact Android invalidator; RC7 device receipts remain decisive.
+
+Pending for RC7: full ARM64 compilation, permanent signing/member verification,
 actual Android 17 whole-engine tests, real-provider integration, and physical Fold
 Close/reopen/data-preservation acceptance. Final lock remains false. No permanent
 resolution claim is permitted without the physical evidence.

@@ -115,12 +115,20 @@ def patches(before):
         '        if self.observer.native_vfs_write is not None:\n'
         '            return self.observer.native_vfs_write(self._infinity_handle, value)\n')
     ledger = once(before[LEDGER].decode(), '  std::set<std::string> paths;\n',
-        '  std::set<std::string> paths;\n  std::set<std::string> removedNamespaces;\n')
+        '  std::set<std::string> paths;\n  std::set<std::string> removedNamespaces;\n'
+        '  std::map<std::string,std::string> namespaceEvidence;\n')
     ledger = once(ledger, 'struct ProtectedResource\n{',
         'enum class NamespaceEffect { MAY_MUTATE, OBSERVED_CHILDREN };\nstruct ProtectedResource\n{')
     ledger = once(ledger, '  int descriptor{-1};\n};',
-        '  int descriptor{-1};\n  NamespaceEffect namespaceEffect{NamespaceEffect::MAY_MUTATE};\n};')
+        '  int descriptor{-1};\n  NamespaceEffect namespaceEffect{NamespaceEffect::MAY_MUTATE};\n'
+        '  std::vector<std::string> actualPaths{};\n};')
     writes = before[WRITES].decode()
+    writes = once(writes, 'inline uint64_t BeginProtectedOperation(',
+        (HERE/'namespace_evidence.inc').read_text()+'\ninline uint64_t BeginProtectedOperation(')
+    writes = once(writes,
+        '    resource.paths.insert(resource.paths.end(), paths.begin(), paths.end());',
+        '    resource.paths.insert(resource.paths.end(), paths.begin(), paths.end());\n'
+        '    resource.actualPaths=paths; // Converted arguments from the real native audit event.')
     writes = once(writes, 'bool existingTransaction = false, int descriptor = -1)\n{',
         'bool existingTransaction = false, int descriptor = -1,\n'
         '                                       NamespaceEffect effect = NamespaceEffect::MAY_MUTATE)\n{')
@@ -178,7 +186,11 @@ def patches(before):
         '  if (effect == NamespaceEffect::MAY_MUTATE) {\n'
         '  // Any later admitted operation that overlaps a removed name revokes\n'
         '  // its earlier absence evidence, even when the new operation fails.\n'
-        '  if (paths.empty()) p.removedNamespaces.clear();\n'
+        '  if (paths.empty()) {\n'
+        '    for(const auto& removed:p.removedNamespaces)\n'
+        '      NamespaceEvidenceLocked(p,removed,"revoked_unknown_target;"+NamespaceLease(s,resource));\n'
+        '    p.removedNamespaces.clear();\n'
+        '  }\n'
         '  // mkdir creates an empty directory (or fails without adding descendants);\n'
         '  // rmdir removes an empty directory. Neither can recreate an absent child.\n'
         '  // Exact/ancestor identities are still invalidated below.\n'
@@ -195,7 +207,10 @@ def patches(before):
         '    if (raw == NonPersistentTarget()) continue;\n'
         '    const auto path = Absolute(raw);\n'
         '    for (auto it=p.removedNamespaces.begin(); it!=p.removedNamespaces.end();)\n'
-        '      if (path.empty() || Within(path,*it) || (!preservesRemovedDescendants && Within(*it,path))) it=p.removedNamespaces.erase(it);\n'
+        '      if (path.empty() || Within(path,*it) || (!preservesRemovedDescendants && Within(*it,path))) {\n'
+        '        NamespaceEvidenceLocked(p,*it,"revoked_overlap;target="+path+";"+NamespaceLease(s,resource));\n'
+        '        it=p.removedNamespaces.erase(it);\n'
+        '      }\n'
         '      else ++it;\n'
         '  }\n'
         '  }\n'
@@ -216,20 +231,35 @@ def patches(before):
         '    removed = p.removedNamespaces;\n    profiles = p.profiles;')
     writes = once(writes, '!SyncProtectedPath(canonical, profiles)',
         '!SyncProtectedPath(canonical, profiles, removed)')
+    writes = once(writes,
+        'ProtectionFailure("protected_durability_failed:" + path); return false;',
+        'const int error=errno; ProtectionFailure("protected_durability_failed:" + path);\n'
+        '      ProtectionFailure("protected_durability_context:" + path + NamespaceFailureEvidence(path,error)); return false;')
     hooks = before[HOOKS].decode()
+    hooks = once(hooks, 'class Call\n{',
+        '// These native primitives publish converted targets before their syscall.\n'
+        '// An unresolved PathLike is a coordination lease until that audit event;\n'
+        '// actual nested effects still revoke absence proof and missing target\n'
+        '// identity still blocks completion. No admission permission is added.\n'
+        'inline bool AuditedPathOperation(Kind kind)\n'
+        '{ return kind==OS_OPEN || kind==IO_OPEN || kind==OS_RENAME || kind==OS_REPLACE ||\n'
+        '         kind==OS_UNLINK || kind==OS_REMOVE || kind==OS_MKDIR || kind==OS_RMDIR ||\n'
+        '         kind==OS_TRUNCATE; }\n'
+        'class Call\n{')
     hooks = once(hooks,
         'm_paths, Specs()[kind].original.ml_name, false, false, m_descriptor);',
         'm_paths, Specs()[kind].original.ml_name, false, false, m_descriptor,\n'
-        '        kind==EXTENSION_CREATE ? Ledger::NamespaceEffect::OBSERVED_CHILDREN : Ledger::NamespaceEffect::MAY_MUTATE);')
+        '        (kind==EXTENSION_CREATE || (m_paths.empty() && AuditedPathOperation(kind))) ?\n'
+        '          Ledger::NamespaceEffect::OBSERVED_CHILDREN : Ledger::NamespaceEffect::MAY_MUTATE);')
     hooks = once(hooks, 'preparing(writer,{},"native_child_contract_preparation");',
         'preparing(writer,{},"native_child_contract_preparation",false,false,-1,\n'
         '      Ledger::NamespaceEffect::OBSERVED_CHILDREN);')
     hooks = once(hooks,
         '    if (result && m_kind == EXTENSION_CREATE && !ProtectNativeModule(result))',
-        '    if (result && m_token && !m_paths.empty() &&\n'
+        '    if (result && m_token &&\n'
         '        (m_kind == OS_RENAME || m_kind == OS_REPLACE || m_kind == OS_REMOVE ||\n'
         '         m_kind == OS_UNLINK || m_kind == OS_RMDIR))\n'
-        '      Ledger::RecordRemovedNamespace(m_token,m_paths.front());\n'
+        '      Ledger::RecordRemovedNamespace(m_token);\n'
         '    if (result && m_kind == EXTENSION_CREATE && !ProtectNativeModule(result))')
     hooks = once(hooks, 'inline bool DescriptorReader(PyObject* io, const char* typeName, unsigned index,',
         (HERE/'clean_io.inc').read_text()+'\ninline bool DescriptorReader(PyObject* io, const char* typeName, unsigned index,')

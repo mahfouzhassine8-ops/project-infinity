@@ -20,7 +20,7 @@ ENGINE='lib/arm64-v8a/libkodi.so'
 RECORDER='lib/arm64-v8a/libinfinitycrash.so'
 SIGNATURE=re.compile(r'META-INF/(?:MANIFEST\.MF|[^/]+\.(?:SF|RSA|DSA|EC))',re.I)
 PARENT='17041a44f121693ab0852c6a826b7f728a4d834a64225efec363861616b698e6'
-NAME='Infinity-2103401-Universal-Persistence-RC6-NOT-ACCEPTED.apk'
+NAME='Infinity-2103401-Universal-Persistence-RC7-NOT-ACCEPTED.apk'
 
 def delta(parent,final,targets):
     changes=[];same=[]
