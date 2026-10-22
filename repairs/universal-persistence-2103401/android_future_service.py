@@ -92,6 +92,22 @@ except sqlite3.OperationalError:db.rollback()
 else:raise AssertionError('failed transaction was not reported')
 if mode=='pending':db.execute('INSERT INTO history VALUES(?,999)',('uncommitted-'+cycle,))
 else:db.close()
+# A real COMMIT failure, not merely an invalid SQL statement: the reader holds
+# a shared rollback-journal lock until the writer's COMMIT returns SQLITE_BUSY.
+commit_writer=sqlite3.connect(os.path.join(root,'commit-controls.db'),timeout=.05)
+commit_writer.execute('PRAGMA journal_mode=DELETE')
+commit_writer.execute('CREATE TABLE IF NOT EXISTS commits(cycle TEXT PRIMARY KEY,value INTEGER)')
+commit_writer.execute('INSERT INTO commits VALUES(?,1)',(cycle,));commit_writer.commit()
+commit_reader=sqlite3.connect(os.path.join(root,'commit-controls.db'),timeout=.05)
+commit_reader.execute('BEGIN')
+assert commit_reader.execute('SELECT value FROM commits WHERE cycle=?',(cycle,)).fetchone()==(1,)
+commit_writer.execute('UPDATE commits SET value=7 WHERE cycle=?',(cycle,))
+try:commit_writer.commit()
+except sqlite3.OperationalError as error:
+    assert error.sqlite_errorcode & 255 == sqlite3.SQLITE_BUSY and commit_writer.in_transaction
+else:raise AssertionError('reader did not cause the expected real COMMIT failure')
+commit_reader.rollback();commit_reader.close()
+commit_writer.rollback();assert not commit_writer.in_transaction;commit_writer.close()
 buffer=open(os.path.join(root,'buffered-'+cycle),'w');buffer.write('buffered state')
 child=threading.Thread(target=worker);child.start();assert worker_ready.wait(10) and not worker_errors
 command_output=subprocess.check_output(['uname','-rs']).strip()
@@ -102,7 +118,7 @@ with open(os.path.join(versioncheck_path,'resources/lib/version_check/service.py
     versioncheck_hash=hashlib.sha256(stream.read()).hexdigest()
 with open(os.path.join(root,'ready-'+cycle+'.json'),'w') as stream:
     json.dump(dict(addon=identity,pid=os.getpid(),mode=mode,errors=errors,worker_ready=True,
-                   supported_child_returned=True,essential_vfs=essential_vfs,
+                   supported_child_returned=True,failed_commit_rolled_back=True,essential_vfs=essential_vfs,
                    history_count=history_count,watched_count=watched_count,
                    versioncheck_version=versioncheck.getAddonInfo('version'),
                    versioncheck_service_sha256=versioncheck_hash),stream)
