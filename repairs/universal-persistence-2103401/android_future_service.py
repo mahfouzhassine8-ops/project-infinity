@@ -25,7 +25,10 @@ def worker():
             stream.write('child buffered state')
             worker_ready.set()
             while not monitor.waitForAbort(.2): pass
+            xbmc.log('INFINITY_FUTURE_DRAIN worker_flush_begin '+cycle,xbmc.LOGINFO)
             stream.flush()
+            xbmc.log('INFINITY_FUTURE_DRAIN worker_flush_done '+cycle,xbmc.LOGINFO)
+        xbmc.log('INFINITY_FUTURE_DRAIN worker_close_done '+cycle,xbmc.LOGINFO)
     except BaseException as error:
         worker_errors.append(repr(error));worker_ready.set();raise
 
@@ -84,6 +87,12 @@ try:f.write('forbidden late bytes')
 except PermissionError:xbmc.log('INFINITY_FUTURE_FIXTURE_LATE_WRITE_REJECTED '+cycle,xbmc.LOGINFO)
 else:raise AssertionError('late VFS payload crossed shutdown admission')
 f.close()
-buffer.flush();buffer.close()
+xbmc.log('INFINITY_FUTURE_DRAIN vfs_close_done '+cycle,xbmc.LOGINFO)
+xbmc.log('INFINITY_FUTURE_DRAIN main_flush_begin '+cycle,xbmc.LOGINFO)
+buffer.flush()
+xbmc.log('INFINITY_FUTURE_DRAIN main_flush_done '+cycle,xbmc.LOGINFO)
+buffer.close()
+xbmc.log('INFINITY_FUTURE_DRAIN main_close_done '+cycle,xbmc.LOGINFO)
 child.join(10);assert not child.is_alive() and not worker_errors
+xbmc.log('INFINITY_FUTURE_DRAIN all_handles_drained '+cycle,xbmc.LOGINFO)
 # In pending mode, leave the real transaction unresolved. It must block safe exit.
