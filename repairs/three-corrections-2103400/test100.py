@@ -183,11 +183,13 @@ class Corrective100(unittest.TestCase):
  def test_actual_capture_carries_route_and_verified_show_identity(self):
   hub=self.hub();e=self.experience()
   with patch.object(e,'_source_contract',lambda _:dict(scope='show_episode')):
-   ns=dict(xbmc=types.SimpleNamespace(getInfoLabel=lambda _:''),hub=hub,source_identity=e.source_identity,_continue_show_identity=lambda *a:{})
+   ns=dict(xbmc=types.SimpleNamespace(getInfoLabel=lambda _:''),hub=hub,source_identity=e.source_identity,_continue_show_identity=lambda *a:{},setting_bool=lambda *a:True)
    definitions(self.after[c.CC+'/service.py'],{'_continue_identity'},ns)
    item=dict(type='episode',title='Fixture episode',showtitle='Fixture show',season=2,episode=3,uniqueid={'tmdb':'123'},file='https://resolved.test/stream',infinity_original_route=route('tv'))
    entry=ns['_continue_identity'](item);self.assertEqual(entry['stable_source'],route('tv'));self.assertTrue(entry['show_ids_verified']);self.assertEqual(entry['identity']['scope'],'show_episode')
    item['infinity_original_route']=route('tv',episode=4);entry=ns['_continue_identity'](item);self.assertNotIn('stable_source',entry)
+   item['infinity_original_route']=route('tv');ns['setting_bool']=lambda *a:False
+   entry=ns['_continue_identity'](item);self.assertNotIn('stable_source',entry);self.assertEqual(entry['identity']['scope'],'show_episode')
  def test_local_state_reopen_no_tracking_database_or_duplicate_progress(self):
   hub=self.hub();identity=hub.media_identity('movie',{'tmdb':'123'});key=hub.identity_key(identity)
   entry=dict(key=key,media='movie',identity=identity,source='https://expired.test/stream',stable_source=route(),position=97.5,duration=700,updated=1)

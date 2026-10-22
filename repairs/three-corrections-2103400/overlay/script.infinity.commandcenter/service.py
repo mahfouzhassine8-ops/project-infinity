@@ -527,6 +527,8 @@ def _continue_identity(item):
                                  **{'show_' + k: v for k, v in captured['ids'].items()})
     else:
         stable_source = ''
+    if not setting_bool('source_memory_enabled', True):
+        stable_source = ''
     key = hub.identity_key(identity)
     if not key:
         return None
