@@ -36,6 +36,11 @@ class Corrective100(unittest.TestCase):
  def experience(self):
   common=types.ModuleType('common');common.persistence_scope=nullcontext
   with patch.dict(sys.modules,common=common):return module('experience100',self.after[c.CC+'/experience.py'])
+ def test_component_manifest_versions_and_health_reporting_match(self):
+  import xml.etree.ElementTree as ET
+  for addon,version in c.VERSIONS.items():self.assertEqual(ET.fromstring(self.after[addon+'/addon.xml']).get('version'),version)
+  for leaf in ('khc_contracts.py','khc_diagnostics.py','khc_doctor.py'):
+   self.assertIn(b"VERSION = '2.5.26'",self.after[c.HEALTH+'/'+leaf])
  def test_real_play_item_movie_regression_and_lossless_lifecycles(self):
   old=module('old_identity100',self.before[c.LATEST+'/identity.py'])
   for cycle in ('initial','after_movie','home_return','reload','restart'):

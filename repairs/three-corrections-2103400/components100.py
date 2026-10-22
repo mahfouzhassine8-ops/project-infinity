@@ -34,6 +34,9 @@ def components(before):
  for a,v in VERSIONS.items():
   if OLD[a]!=v:after[a+'/addon.xml']=once(before[a+'/addon.xml'],('version="'+OLD[a]+'"').encode(),('version="'+v+'"').encode())
  after[CC+'/checkpoint_runtime.py']=once(before[CC+'/checkpoint_runtime.py'],b'ADDON_VERSION = "0.3.5.27"',b'ADDON_VERSION = "0.3.5.28"')
+ for leaf in ('khc_contracts.py','khc_diagnostics.py','khc_doctor.py'):
+  key=HEALTH+'/'+leaf
+  after[key]=once(before[key],b"VERSION = '2.5.25'",b"VERSION = '2.5.26'")
  after[WB+'/controller.py']=once(before[WB+'/controller.py'],b'"0.3.5.27"',b'"0.3.5.28"')
  pins={n.split('/',1)[1]:sha(b) for n,b in after.items() if n.startswith(CC+'/') and (n.endswith('.py') or n.endswith('/addon.xml') or n==CC+'/resources/settings.xml')}
  require(len(pins)==17,'controller source inventory changed')
