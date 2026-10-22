@@ -15,7 +15,7 @@ PROVIDERS = ('plugin.video.thecrew', 'plugin.video.umbrella', 'plugin.video.sere
 CASES = ('normal', 'invalid', 'partial', 'foreign', 'subclass', 'buffered',
          'transaction', 'sqlite', 'sqlite-busy-recovered', 'sqlite-busy-pending', 'namespace', 'child-thread', 'late',
          'pending-native', 'opaque', 'namespace-unobserved', 'namespace-recreated',
-         'namespace-symlink', 'namespace-fsync', 'namespace-barrier',
+         'namespace-symlink', 'namespace-fsync', 'namespace-parent-recreated', 'namespace-barrier',
          'namespace-concurrent-unknown', 'namespace-unknown-later', 'namespace-nested-mutation', 'profile-transaction',
          'buffered-finalize','buffered-phase2','child-drain','clean-io-late-write',
          'clean-io-override','clean-io-retarget','empty-io-close','layered-drain','cached-drain','multi-interpreter-drain','composite-drain','descriptor-stale-drain','descriptor-stale-replaced','descriptor-stale-symlink','descriptor-literal-deleted','descriptor-stale-unlinked','descriptor-observed-unlinked')

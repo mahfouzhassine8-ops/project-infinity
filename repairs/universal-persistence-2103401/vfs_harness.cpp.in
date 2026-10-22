@@ -196,7 +196,10 @@ int main(int argc,char** argv){
       assert(::rmdir((root+"/profile/gone").c_str())==0);
     } else {
       run("os.unlink(root+'/profile/gone/file');os.rmdir(root+'/profile/gone')\n");
-      if(scenario=="namespace-recreated") {
+      if(scenario=="namespace-parent-recreated") {
+        run("os.mkdir(root+'/profile/gone')\n");
+        assert(::rmdir((root+"/profile/gone").c_str())==0);
+      } else if(scenario=="namespace-recreated") {
         run("os.mkdir(root+'/profile/gone')\nwith open(root+'/profile/gone/file','w') as out:out.write('new state')\n");
         assert(::unlink((root+"/profile/gone/file").c_str())==0);
         assert(::rmdir((root+"/profile/gone").c_str())==0);
@@ -257,6 +260,7 @@ int main(int argc,char** argv){
     "def child():\n with open(root+'/profile/child','w') as out:out.write('owned')\n"
     "t=threading.Thread(target=child);t.start();t.join()\n");
   if(scenario=="composite-drain")run(
+    "os.makedirs(root+'/profile',exist_ok=True)\n"
     "import subprocess,json,hashlib\n"
     "db=sqlite3.connect(root+'/profile/history.db');db.execute('PRAGMA journal_mode=WAL');db.execute('CREATE TABLE history(v)');db.execute('INSERT INTO history VALUES(7)');db.commit()\n"
     "db.execute(\"ATTACH DATABASE ? AS extra\",(root+'/profile/watched.db',));db.execute('CREATE TABLE extra.watched(v)');db.execute('INSERT INTO extra.watched VALUES(8)');db.commit()\n"
