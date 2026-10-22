@@ -76,6 +76,7 @@ with open(os.path.join(directory,'tmp'),'w') as stream:stream.write('replaced st
 os.replace(os.path.join(directory,'tmp'),os.path.join(directory,'final'))
 os.rename(os.path.join(directory,'final'),os.path.join(root,'replaced-'+cycle))
 os.rmdir(directory)
+os.makedirs(root,exist_ok=True)  # Ordinary repeated parent preparation preserves removed-child evidence.
 addon.setSettingString('preserved_setting','future-provider-state')
 db=sqlite3.connect(os.path.join(root,'history.db'))
 db.execute('PRAGMA journal_mode=WAL')
