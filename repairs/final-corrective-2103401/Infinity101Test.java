@@ -51,6 +51,11 @@ public final class Infinity101Test extends Instrumentation {
   throw new AssertionError("Missing clickable text: "+text+"; hierarchy="+tree(getUiAutomation().getRootInActiveWindow(),0));
  }
  String tree(AccessibilityNodeInfo n,int depth){if(n==null||depth>12)return "";String s="["+n.getClassName()+":"+n.getText()+":"+n.getContentDescription()+":click="+n.isClickable()+"]";for(int i=0;i<n.getChildCount();i++)s+=tree(n.getChild(i),depth+1);return s;}
+ void awaitText(String text)throws Exception {
+  long until=android.os.SystemClock.uptimeMillis()+3000;
+  do {waitForIdleSync();AccessibilityNodeInfo root=getUiAutomation().getRootInActiveWindow();if(root!=null)for(AccessibilityNodeInfo node:root.findAccessibilityNodeInfosByText(text))if(node.getText()!=null&&text.equalsIgnoreCase(node.getText().toString())){android.os.SystemClock.sleep(150);return;}android.os.SystemClock.sleep(50);}while(android.os.SystemClock.uptimeMillis()<until);
+  throw new AssertionError("Expected rendered window: "+text+"; hierarchy="+tree(getUiAutomation().getRootInActiveWindow(),0));
+ }
  void frame(String name)throws Exception {
   waitForIdleSync();android.os.SystemClock.sleep(200);android.graphics.Bitmap b=getUiAutomation().takeScreenshot();check(b!=null,"screenshot");
   try(FileOutputStream out=new FileOutputStream(new File(getTargetContext().getFilesDir(),name+".png"))){check(b.compress(android.graphics.Bitmap.CompressFormat.PNG,100,out),"screenshot saved");}b.recycle();
@@ -60,9 +65,9 @@ public final class Infinity101Test extends Instrumentation {
    Capture sink=new Capture();final Throwable[] error={null};
    runOnMainSync(()->{try{active=InfinityAndroidKeyboard.show(activity,++token,"Dune",request(theme,"Movies"),false,true,0,sink);panel(active).findViewWithTag("plugin.video.seren").performClick();}catch(Throwable e){error[0]=e;}});if(error[0]!=null)throw new AssertionError(error[0]);
    frame("search-"+theme);
-   runOnMainSync(()->panel(active).findViewById(0x01010002).performClick());frame("history-"+theme);check(sink.completed==0,"history opens without submit");
+   runOnMainSync(()->panel(active).findViewById(0x01010002).performClick());awaitText("Search History");frame("history-"+theme);check(sink.completed==0,"history opens without submit");
    clickText("Relationship Rehab");runOnMainSync(()->{check(active.input.getText().toString().equals("Relationship Rehab"),"history populates existing query");check(active.dialog.isShowing()&&sink.completed==0,"history reuse waits for Search");check(panel(active).findViewWithTag("plugin.video.seren").isSelected(),"provider selection retained");});frame("history-reused-"+theme);
-   runOnMainSync(()->panel(active).findViewById(0x01010002).performClick());clickText("Clear History");frame("history-confirm-"+theme);check(sink.completed==0,"clear needs confirmation");clickText("Cancel");check(sink.completed==0,"cancel retains history");
+   runOnMainSync(()->panel(active).findViewById(0x01010002).performClick());clickText("Clear History");awaitText("Clear Search History?");frame("history-confirm-"+theme);check(sink.completed==0,"clear needs confirmation");clickText("Cancel");check(sink.completed==0,"cancel retains history");
    clickText("Clear History");clickText("Clear History");check(sink.completed==1&&sink.accepted,"confirmed clear returns once");JSONObject result=new JSONObject(sink.text);check(result.getString("operation").equals("clear-history")&&result.getBoolean("confirmed")&&result.getString("query").equals("Relationship Rehab"),"clear envelope retains query and selection");
   }
  }

@@ -21,13 +21,25 @@ def prepare(out,android,tools,dex,second):
 
 def run(out,adb,device):
  apk=out/'ui-test/test.apk';subprocess.run([adb,'-s',device,'install','-r',str(apk)],check=True)
- result=subprocess.run([adb,'-s',device,'shell','am','instrument','-w','com.projectinfinity.corrective101test/com.projectinfinity.kodi.Infinity101Test'],text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=120)
- (out/'integrated-search-ui.log').write_text(result.stdout);print(result.stdout,flush=True)
-
- # Preserve captured images even when an assertion fails, then enforce the gate.
- captured=subprocess.check_output([adb,'-s',device,'shell','run-as','com.projectinfinity.corrective101test','ls','files'],text=True).splitlines()
- for filename in captured:
-  if re.fullmatch(r'[a-z-]+\.png',filename):
-   with (out/filename).open('wb') as f:subprocess.run([adb,'-s',device,'exec-out','run-as','com.projectinfinity.corrective101test','cat','files/'+filename],stdout=f,check=True)
- match=re.search(r'INFINITY101_UI_PASS=(\d+)',result.stdout);c.require(result.returncode==0 and match and int(match[1])>=200 and 'INFINITY101_UI_FAILED' not in result.stdout,'actual Android Search UI execution failed')
- return {'passed':True,'assertions':int(match[1]),'production_dex_used':True,'emulator':True,'api':37,'physical_fold_verified':False,'whole_app_tested':False}
+ scenarios=[('default',None,None),('folded','1080x2520','420'),('unfolded','2160x2160','480'),('landscape','2520x1080','420')]
+ results=[]
+ try:
+  for label,size,density in scenarios:
+   if size:
+    subprocess.run([adb,'-s',device,'shell','wm','size',size],check=True)
+    subprocess.run([adb,'-s',device,'shell','wm','density',density],check=True)
+   subprocess.run([adb,'-s',device,'shell','am','force-stop','com.projectinfinity.corrective101test'],check=True)
+   result=subprocess.run([adb,'-s',device,'shell','am','instrument','-w','com.projectinfinity.corrective101test/com.projectinfinity.kodi.Infinity101Test'],text=True,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,timeout=120)
+   (out/('integrated-search-ui-'+label+'.log')).write_text(result.stdout);print(result.stdout,flush=True)
+   # Preserve captured images even if an assertion fails, then enforce the gate.
+   captured=subprocess.check_output([adb,'-s',device,'shell','run-as','com.projectinfinity.corrective101test','ls','files'],text=True).splitlines()
+   for filename in captured:
+    if re.fullmatch(r'[a-z-]+\.png',filename):
+     with (out/(label+'-'+filename)).open('wb') as f:subprocess.run([adb,'-s',device,'exec-out','run-as','com.projectinfinity.corrective101test','cat','files/'+filename],stdout=f,check=True)
+   match=re.search(r'INFINITY101_UI_PASS=(\d+)',result.stdout)
+   c.require(result.returncode==0 and match and int(match[1])>=200 and 'INFINITY101_UI_FAILED' not in result.stdout,'actual Android Search UI execution failed: '+label)
+   results.append(dict(viewport=label,size=size or 'emulator default',density=density or 'emulator default',assertions=int(match[1]),passed=True))
+ finally:
+  subprocess.run([adb,'-s',device,'shell','wm','size','reset'],check=False)
+  subprocess.run([adb,'-s',device,'shell','wm','density','reset'],check=False)
+ return {'passed':True,'assertions':sum(r['assertions'] for r in results),'viewports':results,'production_dex_used':True,'emulator':True,'api':37,'physical_fold_verified':False,'whole_app_tested':False}
