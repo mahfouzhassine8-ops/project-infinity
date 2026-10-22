@@ -2,6 +2,7 @@
 import json
 import os
 import sqlite3
+import subprocess
 import threading
 import xbmc
 import xbmcaddon
@@ -28,7 +29,8 @@ def worker():
         worker_errors.append(repr(error));worker_ready.set();raise
 
 # Exercise the real production xbmcvfs binding under its installed observer.
-f=xbmcvfs.File(os.path.join(root,'vfs-'+cycle),'w')
+essential_vfs=xbmcvfs.translatePath('special://profile')+'/future-essential-vfs-'+cycle
+f=xbmcvfs.File(essential_vfs,'w')
 assert f.write('text') is True
 assert f.write(b'bytes') is True
 assert f.write(bytearray(b'array')) is True
@@ -60,8 +62,11 @@ if mode=='pending':db.execute('INSERT INTO history VALUES(?,999)',('uncommitted-
 else:db.close()
 buffer=open(os.path.join(root,'buffered-'+cycle),'w');buffer.write('buffered state')
 child=threading.Thread(target=worker);child.start();assert worker_ready.wait(10) and not worker_errors
+command_output=subprocess.check_output(['uname','-rs']).strip()
+assert command_output
 with open(os.path.join(root,'ready-'+cycle+'.json'),'w') as stream:
-    json.dump(dict(addon=identity,pid=os.getpid(),mode=mode,errors=errors,worker_ready=True),stream)
+    json.dump(dict(addon=identity,pid=os.getpid(),mode=mode,errors=errors,worker_ready=True,
+                   supported_child_returned=True,essential_vfs=essential_vfs),stream)
 while not monitor.waitForAbort(.2):pass
 # Admission must be closed before cooperative retirement. Existing handles can
 # drain, but no new payload may cross the write boundary after this signal.

@@ -71,15 +71,53 @@ def patches(before):
     ledger = once(before[LEDGER].decode(), '  std::set<std::string> paths;\n',
         '  std::set<std::string> paths;\n  std::set<std::string> removedNamespaces;\n')
     writes = before[WRITES].decode()
+    optional_start = writes.index('  for (const auto& root : p.profiles)\n', writes.index('inline bool OptionalBasePathLocked'))
+    optional_end = writes.index('  return false;\n}\ninline bool OptionalPathLocked', optional_start)
+    writes = writes[:optional_start] + (
+        '  // An add-on identity or private profile folder does not prove that\n'
+        '  // databases/history/provider state are recoverable. Only the\n'
+        '  // coordinator\'s explicit cache roots may be optional.\n') + writes[optional_end:]
+    writes = once(writes,
+        '  p.transactions[key] = {-1, {path}, operation};',
+        '  // Capture the actual native lease owner, including Python child threads.\n'
+        '  p.transactions[key] = {CurrentWriteOwner(), {path}, operation};')
+    anchor = 'inline EssentialWriteProof EssentialWritesLocked(State& s)'
+    writes = once(writes, anchor,
+        'inline std::string ResourceOwnerLocked(const State& s, const ProtectedResource& r)\n'
+        '{\n'
+        '  std::ostringstream out;\n'
+        '  out << ";writer_id=" << r.writer << ";thread=" << r.thread\n'
+        '      << ";checkpoint_generation=" << s.protection.generation;\n'
+        '  const auto writer=s.writers.find(r.writer);\n'
+        '  if (writer!=s.writers.end()) {\n'
+        '    out << ";interpreter=" << writer->second.initialization.interpreterIdentity;\n'
+        '    for (const auto& name:writer->second.admissions) out << ";invocation=" << name.first;\n'
+        '  }\n'
+        '  return out.str();\n'
+        '}\n' + anchor)
+    writes = once(writes,
+        '"active_protected_operation:" + entry.second.operation);',
+        '"active_protected_operation:" + entry.second.operation + ";operation_id=" + std::to_string(entry.first) + ResourceOwnerLocked(s,entry.second));')
+    writes = once(writes,
+        '"unflushed_protected_buffer:" + entry.first);',
+        '"unflushed_protected_buffer:" + entry.first + ResourceOwnerLocked(s,entry.second));')
+    writes = once(writes,
+        '"pending_protected_" + entry.second.operation + ":" + entry.first);',
+        '"pending_protected_" + entry.second.operation + ":" + entry.first + ResourceOwnerLocked(s,entry.second));')
     writes = once(writes, '  const auto token = ++p.nextOperation;',
         '  // Any later admitted operation that overlaps a removed name revokes\n'
         '  // its earlier absence evidence, even when the new operation fails.\n'
         '  if (paths.empty()) p.removedNamespaces.clear();\n'
-        '  if (operation != "converted_native_write_target")\n'
+        '  bool removesParent = operation == "rmdir" || operation == "namespace.rmdir";\n'
+        '  if (operation == "converted_native_write_target") {\n'
+        '    const auto parent=p.operations.find(protectedWriteToken);\n'
+        '    removesParent=parent!=p.operations.end() && parent->second.writer==id &&\n'
+        '        parent->second.thread==std::this_thread::get_id() &&\n'
+        '        (parent->second.operation=="rmdir" || parent->second.operation=="namespace.rmdir");\n'
+        '  }\n'
         '  for (const auto& raw : paths) {\n'
         '    if (raw == NonPersistentTarget()) continue;\n'
         '    const auto path = Absolute(raw);\n'
-        '    const bool removesParent = operation == "rmdir" || operation == "namespace.rmdir";\n'
         '    for (auto it=p.removedNamespaces.begin(); it!=p.removedNamespaces.end();)\n'
         '      if (path.empty() || Within(path,*it) || (!removesParent && Within(*it,path))) it=p.removedNamespaces.erase(it);\n'
         '      else ++it;\n'

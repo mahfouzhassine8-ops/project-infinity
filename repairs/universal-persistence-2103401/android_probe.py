@@ -95,6 +95,7 @@ def main():
             ready_path=probe.PROFILE+'/addon_data/'+FUTURE+'/ready-'+str(owner['pid'])+'.json'
             ready=until(lambda:probe.read_json(ready_path),60)
             assert ready['pid']==owner['pid'] and ready['addon']==FUTURE and ready['worker_ready']
+            assert ready['supported_child_returned']
             assert [x['value_type'] for x in ready['errors']]==['NoneType','int','memoryview']
             assert all(x['exception']=='TypeError' for x in ready['errors'])
             entry['service_ready']=ready
@@ -121,7 +122,8 @@ def main():
             assert not any(x['pid']==owner['pid'] for x in entry['processes_after'])
             data=cycleout/'future-data';probe.adb('pull',probe.PROFILE+'/addon_data/'+FUTURE,data)
             stamp=str(owner['pid'])
-            for leaf,expected in [('vfs-','textbytesarray'),('plain-','ordinary state'),('replaced-','replaced state'),('buffered-','buffered state'),('worker-','child buffered state')]:
+            assert probe.shell('cat',ready['essential_vfs'])=='textbytesarray'
+            for leaf,expected in [('plain-','ordinary state'),('replaced-','replaced state'),('buffered-','buffered state'),('worker-','child buffered state')]:
                 assert (data/(leaf+stamp)).read_text()==expected
             for name,table,field,value in [('history.db','history','position',37),('watched.db','watched','watched',1)]:
                 with sqlite3.connect(data/name) as db:

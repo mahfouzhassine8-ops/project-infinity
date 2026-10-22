@@ -181,6 +181,16 @@
     },
     {
       "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "profile-transaction",
+      "exit_code": 0,
+      "stdout": "PASS profile-transaction provider=plugin.video.thecrew seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
       "provider_identity": "plugin.video.umbrella",
       "case": "normal",
       "exit_code": 0,
@@ -345,6 +355,16 @@
       "case": "namespace-fsync",
       "exit_code": 0,
       "stdout": "PASS namespace-fsync provider=plugin.video.umbrella seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "profile-transaction",
+      "exit_code": 0,
+      "stdout": "PASS profile-transaction provider=plugin.video.umbrella seal=0\n",
       "stderr": "",
       "independent_readback_passed": true,
       "existing_user_data_unchanged": true
@@ -521,6 +541,16 @@
     },
     {
       "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "profile-transaction",
+      "exit_code": 0,
+      "stdout": "PASS profile-transaction provider=plugin.video.seren seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
       "provider_identity": "plugin.video.pov",
       "case": "normal",
       "exit_code": 0,
@@ -685,6 +715,16 @@
       "case": "namespace-fsync",
       "exit_code": 0,
       "stdout": "PASS namespace-fsync provider=plugin.video.pov seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "profile-transaction",
+      "exit_code": 0,
+      "stdout": "PASS profile-transaction provider=plugin.video.pov seal=0\n",
       "stderr": "",
       "independent_readback_passed": true,
       "existing_user_data_unchanged": true
@@ -861,6 +901,16 @@
     },
     {
       "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "profile-transaction",
+      "exit_code": 0,
+      "stdout": "PASS profile-transaction provider=plugin.video.future_provider_7fa29 seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
       "case": "process-reopen-cycle",
       "cycle": 0,
       "exit_code": 0,
@@ -955,7 +1005,7 @@
       "xbmc/interfaces/python/InfinityPythonPersistence.h": "8d1d070ef271a4c6bda21400fcefedbe4722b191012b08c8b84d9af1257bcb99",
       "xbmc/interfaces/python/InfinityPythonPersistenceSource.h": "8e640d7aa12f5bd51c1dfef52a0bcfdfeb56881ee4fdbab9dc31fb6a66651d63",
       "xbmc/platform/android/activity/InfinityScriptPersistence.h": "dca1a8196c11874bd80aaf6d236e230b3daaa4d0f94dafbfbcb2ac32f67517c0",
-      "xbmc/platform/android/activity/InfinityProtectedWrites.h": "67ec9a790e3276efcfe6440fa01b3d6cb695764ab0fc33084fe488b1b8c65a14",
+      "xbmc/platform/android/activity/InfinityProtectedWrites.h": "62aa91c5fdb6bfd6e2d01ee3387e2d6d6406df9ea2314ab91e67acf2df52d2cb",
       "xbmc/interfaces/python/InfinityPythonWriteHooks.h": "1a1f6ca55498f2852b8d0a831615586bad44588b0ff9b0bb075abb06cf120d40"
     },
     "native_source_count": 9404,
