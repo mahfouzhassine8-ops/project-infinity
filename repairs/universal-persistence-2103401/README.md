@@ -52,7 +52,7 @@ thread, interpreter/admission identity and current checkpoint generation.
 
 ## Verification status
 
-Local production-source host execution: 143 new/control/cycle cases and 47 retained
+Local production-source host execution: 183 new/control/cycle cases and 47 retained
 native/SQLite regressions passed. The buffer conversion and File write loop are
 extracted from the exact production sources; only their host POSIX backend and
 native type harness are adapters. The actual observer, native hooks and ledger
@@ -78,7 +78,21 @@ payload-write permission. Overrides, retargeted descriptors, dirty buffers and
 unknown handles remain protected. Explicit closes, layered/cached buffers, phase-2
 worker draining and negative controls pass with the 47 retained regressions.
 
-Pending for RC2: full ARM64 compilation, permanent signing/member verification,
+RC2 also compiled, signed and passed exact preservation checks, but Android still
+rejected first flushes. Read-only device diagnostics found a live descriptor
+reported with a ` (deleted)` suffix even though the original name still existed
+with matching device, inode, mode and one link. Replaying that descriptor report
+reproduced the failure in all five host identities.
+
+RC3 resolves that annotation only through the live descriptor and a canonical,
+no-follow opened name with matching metadata. Literal suffixed filenames keep
+their identity. Replaced files, symlinks and unknown paths do not gain permission.
+A genuinely unlinked dirty buffer may become anonymous only after an observed
+successful removal; an unverified loss of its namespace remains a named blocker.
+The added multi-interpreter, composite I/O, stale-descriptor and negative cases
+pass with all retained gates: 183 source-backed cases plus 47 native regressions.
+
+Pending for RC3: full ARM64 compilation, permanent signing/member verification,
 actual Android 17 whole-engine tests, real-provider integration, and physical Fold
 Close/reopen/data-preservation acceptance. Final lock remains false. No permanent
 resolution claim is permitted without the physical evidence.

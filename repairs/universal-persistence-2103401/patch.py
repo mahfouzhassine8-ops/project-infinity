@@ -30,6 +30,9 @@ def patches(before):
         if sha(data) != BASELINE['before'][name]:
             raise ValueError('Native source preimage mismatch: ' + name)
     bridge = before[BRIDGE].decode()
+    bridge = once(bridge, "    if(target[0]!='/')return {};\n    return target;",
+        "    if(target[0]!='/')return {};\n"
+        "    return InfinityScriptPersistence::VerifiedDescriptorLink(static_cast<int>(fd),target);")
     bridge = once(bridge, '  PyObject* rawWrite{nullptr};',
         '  PyObject* rawWrite{nullptr};\n  PyObject* vfsType{nullptr};\n  PyObject* vfsWrite{nullptr};')
     anchor = 'inline PyObject* Error(PyObject* self,PyObject* args)'
@@ -103,6 +106,10 @@ def patches(before):
     ledger = once(before[LEDGER].decode(), '  std::set<std::string> paths;\n',
         '  std::set<std::string> paths;\n  std::set<std::string> removedNamespaces;\n')
     writes = before[WRITES].decode()
+    writes = once(writes, 'inline std::string DescriptorPath(int fd)',
+        (HERE/'descriptor_identity.inc').read_text()+'\ninline std::string DescriptorPath(int fd)')
+    writes = once(writes, "  target[size] = '\\0'; return target;",
+        "  target[size] = '\\0'; return VerifiedDescriptorLink(fd,target);")
     optional_start = writes.index('  for (const auto& root : p.profiles)\n', writes.index('inline bool OptionalBasePathLocked'))
     optional_end = writes.index('  return false;\n}\ninline bool OptionalPathLocked', optional_start)
     writes = writes[:optional_start] + (
@@ -191,6 +198,17 @@ def patches(before):
         '    if ((kind==BUFFER_FLUSH || kind==BUFFER_CLOSE || kind==TEXT_FLUSH || kind==TEXT_CLOSE) &&\n'
         '        VerifiedCleanIo(self))m_paths={Ledger::NonPersistentTarget()};\n'
         '    const int writer = m_context ? m_context->id : -1;')
+    hooks = once(hooks,
+        '    if (std::find(m_paths.begin(), m_paths.end(), "") != m_paths.end()) m_paths.clear();',
+        '    std::string unresolved;\n'
+        '    if (kind>=RAW_WRITE && !Ledger::VerifiedBufferNamespaceTransition(\n'
+        '        writer,m_key,m_descriptor,m_paths,unresolved)) {\n'
+        '      Ledger::Fail(writer,"unverified_dirty_buffer_namespace",\n'
+        '          "operation="+std::string(Specs()[kind].original.ml_name)+";target="+unresolved.substr(0,768));\n'
+        '      InfinityPythonPersistence::AdmissionDenied(m_context,"Infinity dirty buffer namespace is unverified");\n'
+        '      return;\n'
+        '    }\n'
+        '    if (std::find(m_paths.begin(), m_paths.end(), "") != m_paths.end()) m_paths.clear();')
     hooks = once(hooks,
         '      Ledger::SetProtectedBuffer(writer, m_key, m_paths, true);',
         '    { ForgetCleanIo(self); Ledger::SetProtectedBuffer(writer, m_key, m_paths, true); }')

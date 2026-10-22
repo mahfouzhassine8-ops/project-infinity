@@ -281,6 +281,86 @@
     },
     {
       "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "multi-interpreter-drain",
+      "exit_code": 0,
+      "stdout": "PASS multi-interpreter-drain provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "composite-drain",
+      "exit_code": 0,
+      "stdout": "PASS composite-drain provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "descriptor-stale-drain",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-drain provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "descriptor-stale-replaced",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-replaced provider=plugin.video.thecrew seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "descriptor-stale-symlink",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-symlink provider=plugin.video.thecrew seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "descriptor-literal-deleted",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-literal-deleted provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "descriptor-stale-unlinked",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-unlinked provider=plugin.video.thecrew seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.thecrew",
+      "case": "descriptor-observed-unlinked",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-observed-unlinked provider=plugin.video.thecrew seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
       "provider_identity": "plugin.video.umbrella",
       "case": "normal",
       "exit_code": 0,
@@ -545,6 +625,86 @@
       "case": "cached-drain",
       "exit_code": 0,
       "stdout": "PASS cached-drain provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "multi-interpreter-drain",
+      "exit_code": 0,
+      "stdout": "PASS multi-interpreter-drain provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "composite-drain",
+      "exit_code": 0,
+      "stdout": "PASS composite-drain provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "descriptor-stale-drain",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-drain provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "descriptor-stale-replaced",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-replaced provider=plugin.video.umbrella seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "descriptor-stale-symlink",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-symlink provider=plugin.video.umbrella seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "descriptor-literal-deleted",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-literal-deleted provider=plugin.video.umbrella seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "descriptor-stale-unlinked",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-unlinked provider=plugin.video.umbrella seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.umbrella",
+      "case": "descriptor-observed-unlinked",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-observed-unlinked provider=plugin.video.umbrella seal=1\n",
       "stderr": "",
       "independent_readback_passed": true,
       "existing_user_data_unchanged": true
@@ -821,6 +981,86 @@
     },
     {
       "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "multi-interpreter-drain",
+      "exit_code": 0,
+      "stdout": "PASS multi-interpreter-drain provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "composite-drain",
+      "exit_code": 0,
+      "stdout": "PASS composite-drain provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "descriptor-stale-drain",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-drain provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "descriptor-stale-replaced",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-replaced provider=plugin.video.seren seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "descriptor-stale-symlink",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-symlink provider=plugin.video.seren seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "descriptor-literal-deleted",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-literal-deleted provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "descriptor-stale-unlinked",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-unlinked provider=plugin.video.seren seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.seren",
+      "case": "descriptor-observed-unlinked",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-observed-unlinked provider=plugin.video.seren seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
       "provider_identity": "plugin.video.pov",
       "case": "normal",
       "exit_code": 0,
@@ -1085,6 +1325,86 @@
       "case": "cached-drain",
       "exit_code": 0,
       "stdout": "PASS cached-drain provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "multi-interpreter-drain",
+      "exit_code": 0,
+      "stdout": "PASS multi-interpreter-drain provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "composite-drain",
+      "exit_code": 0,
+      "stdout": "PASS composite-drain provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "descriptor-stale-drain",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-drain provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "descriptor-stale-replaced",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-replaced provider=plugin.video.pov seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "descriptor-stale-symlink",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-symlink provider=plugin.video.pov seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "descriptor-literal-deleted",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-literal-deleted provider=plugin.video.pov seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "descriptor-stale-unlinked",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-unlinked provider=plugin.video.pov seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.pov",
+      "case": "descriptor-observed-unlinked",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-observed-unlinked provider=plugin.video.pov seal=1\n",
       "stderr": "",
       "independent_readback_passed": true,
       "existing_user_data_unchanged": true
@@ -1361,6 +1681,86 @@
     },
     {
       "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "multi-interpreter-drain",
+      "exit_code": 0,
+      "stdout": "PASS multi-interpreter-drain provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "composite-drain",
+      "exit_code": 0,
+      "stdout": "PASS composite-drain provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "descriptor-stale-drain",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-drain provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "descriptor-stale-replaced",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-replaced provider=plugin.video.future_provider_7fa29 seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "descriptor-stale-symlink",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-symlink provider=plugin.video.future_provider_7fa29 seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "descriptor-literal-deleted",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-literal-deleted provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "descriptor-stale-unlinked",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-stale-unlinked provider=plugin.video.future_provider_7fa29 seal=0\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
+      "provider_identity": "plugin.video.future_provider_7fa29",
+      "case": "descriptor-observed-unlinked",
+      "exit_code": 0,
+      "stdout": "PASS descriptor-observed-unlinked provider=plugin.video.future_provider_7fa29 seal=1\n",
+      "stderr": "",
+      "independent_readback_passed": true,
+      "existing_user_data_unchanged": true
+    },
+    {
+      "source": "candidate",
       "case": "process-reopen-cycle",
       "cycle": 0,
       "exit_code": 0,
@@ -1452,11 +1852,11 @@
       "xbmc/interfaces/python/InfinityPythonWriteHooks.h": "660b54d7b411058cfd17d78f259ecc1c8c660891fe494de45292693f53431035"
     },
     "after": {
-      "xbmc/interfaces/python/InfinityPythonPersistence.h": "0447d11d818ed504b09e9558b74ff9251bc87072c888cf2f8c58c3e3d0d868ec",
+      "xbmc/interfaces/python/InfinityPythonPersistence.h": "3f16723bde8c4524c389b0d618a2e46cc9419c3763d114424c7280b667dfd5e9",
       "xbmc/interfaces/python/InfinityPythonPersistenceSource.h": "8e640d7aa12f5bd51c1dfef52a0bcfdfeb56881ee4fdbab9dc31fb6a66651d63",
       "xbmc/platform/android/activity/InfinityScriptPersistence.h": "dca1a8196c11874bd80aaf6d236e230b3daaa4d0f94dafbfbcb2ac32f67517c0",
-      "xbmc/platform/android/activity/InfinityProtectedWrites.h": "b176c567477ddd093e3f53c6b64d6765b159e68ddcc8fe79b53125ca0e0c8c0a",
-      "xbmc/interfaces/python/InfinityPythonWriteHooks.h": "14edb04e118a3b46ea8b5c43b8308934d25a9438292e6a46c6f9e314504fbcbc"
+      "xbmc/platform/android/activity/InfinityProtectedWrites.h": "8052cdc219dd38d38cadd9eca127b19515d44d7c8928354b6fdd4338a6283af6",
+      "xbmc/interfaces/python/InfinityPythonWriteHooks.h": "2a9cddd760e067e6280019fe6b8cc5796fdeac728b199c94aa32e38491000839"
     },
     "native_source_count": 9404,
     "other_native_inputs_unchanged": 9399,

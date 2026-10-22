@@ -17,7 +17,7 @@ CASES = ('normal', 'invalid', 'partial', 'foreign', 'subclass', 'buffered',
          'pending-native', 'opaque', 'namespace-unobserved', 'namespace-recreated',
          'namespace-symlink', 'namespace-fsync', 'profile-transaction',
          'buffered-finalize','buffered-phase2','child-drain','clean-io-late-write',
-         'clean-io-override','clean-io-retarget','empty-io-close','layered-drain','cached-drain')
+         'clean-io-override','clean-io-retarget','empty-io-close','layered-drain','cached-drain','multi-interpreter-drain','composite-drain','descriptor-stale-drain','descriptor-stale-replaced','descriptor-stale-symlink','descriptor-literal-deleted','descriptor-stale-unlinked','descriptor-observed-unlinked')
 
 
 def readback(root, case):
@@ -25,13 +25,19 @@ def readback(root, case):
     profile = root/'profile'
     expected = {'normal': b'textbytesarray', 'partial': b'ab'}
     preserved = {'invalid', 'buffered', 'transaction', 'sqlite', 'namespace', 'child-thread', 'late'}
-    io_cases={'buffered-finalize','buffered-phase2','child-drain','clean-io-late-write','clean-io-override','clean-io-retarget','empty-io-close','layered-drain','cached-drain'}
+    io_cases={'composite-drain','multi-interpreter-drain','buffered-finalize','buffered-phase2','child-drain','clean-io-late-write','clean-io-override','clean-io-retarget','empty-io-close','layered-drain','cached-drain'}
     preserved |= io_cases
+    if case.startswith('descriptor-'):preserved.add(case)
     data = (profile/'provider-settings.json').read_bytes()
     assert data == expected.get(case, b'preserved' if case in preserved else b''), (case, data)
+    if case in ('descriptor-stale-unlinked','descriptor-observed-unlinked'):assert not (profile/'resume.json').exists()
+    if case=='descriptor-stale-drain':assert (profile/'resume.json').read_bytes()==b'resume preserved'
+    if case=='descriptor-literal-deleted':assert (profile/'resume.json (deleted)').read_bytes()==b'resume preserved'
+    if case=='descriptor-stale-replaced':assert (profile/'resume.json').read_bytes()==b'sentinel'
+    if case in ('descriptor-stale-replaced','descriptor-stale-symlink'):assert (profile/'moved-buffer').read_bytes()==b''
     if case=='buffered' or case in io_cases:
         assert (profile/'resume.json').read_bytes()==(b'' if case=='empty-io-close' else b'resume preserved')
-    if case=='child-drain':assert (profile/'worker').read_bytes()==b'worker state'
+    if case in ('child-drain','composite-drain'):assert (profile/'worker').read_bytes()==b'worker state'
     if case=='clean-io-retarget':assert (profile/'retarget-target').read_bytes()==b'sentinel'
     if case == 'namespace': assert (profile/'state').read_bytes() == b'state'
     if case == 'child-thread': assert (profile/'child').read_bytes() == b'owned'

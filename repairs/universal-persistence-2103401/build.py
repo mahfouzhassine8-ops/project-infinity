@@ -80,7 +80,7 @@ def compile_engine():
     engine=OUT/'libkodi.so';shutil.copyfile(libraries[0],engine)
     binary=engine.read_bytes()
     for marker in (b'argument_rejected_before_native_write',b'removed_namespace_inventory_exhausted',
-                   b'native_clean_io_inventory_exhausted',
+                   b'native_clean_io_inventory_exhausted',b'unverified_dirty_buffer_namespace',
                    b'pending_protected_',b'sqlite_write_transaction',b'SAFE_TO_TERMINATE',b'CHECKPOINT_FAILED'):
         assert marker in binary,marker
     proof=dict(source_commit=os.environ['GITHUB_SHA'],complete_native_engine_compiled=True,
