@@ -1,0 +1,241 @@
+{
+  "passed": true,
+  "baseline": false,
+  "cases": 32,
+  "scope": "Execute production multi-image code, factory, POSIX reader and job manager.\n\nThe GUI, network/unknown-directory and service boundaries are explicit host\npeers. No provider implementation, native decoder or physical Fold is simulated.\n",
+  "results": [
+    {
+      "scenario": "local",
+      "phase": "normal",
+      "passed": true,
+      "stdout": "PASS local normal required=0\n",
+      "stderr": ""
+    },
+    {
+      "scenario": "local",
+      "phase": "close",
+      "passed": true,
+      "stdout": "PASS local close required=0\n",
+      "stderr": ""
+    },
+    {
+      "scenario": "single",
+      "phase": "normal",
+      "passed": true,
+      "stdout": "PASS single normal required=0\n",
+      "stderr": ""
+    },
+    {
+      "scenario": "single",
+      "phase": "close",
+      "passed": true,
+      "stdout": "PASS single close required=0\n",
+      "stderr": ""
+    },
+    {
+      "scenario": "special",
+      "phase": "normal",
+      "passed": true,
+      "stdout": "PASS special normal required=0\n",
+      "stderr": ""
+    },
+    {
+      "scenario": "special",
+      "phase": "close",
+      "passed": true,
+      "stdout": "PASS special close required=0\n",
+      "stderr": ""
+    },
+    {
+      "scenario": "relative",
+      "phase": "normal",
+      "passed": true,
+      "stdout": "PASS relative normal required=0\n",
+      "stderr": ""
+    },
+    {
+      "scenario": "relative",
+      "phase": "close",
+      "passed": true,
+      "stdout": "PASS relative close required=0\n",
+      "stderr": ""
+    },
+    {
+      "scenario": "empty",
+      "phase": "normal",
+      "passed": true,
+      "stdout": "PASS empty normal required=0\n",
+      "stderr": ""
+    },
+    {
+      "scenario": "empty",
+      "phase": "close",
+      "passed": true,
+      "stdout": "PASS empty close required=0\n",
+      "stderr": ""
+    },
+    {
+      "scenario": "unknown",
+      "phase": "normal",
+      "passed": true,
+      "stdout": "PASS unknown normal required=1\n",
+      "stderr": ""
+    },
+    {
+      "scenario": "unknown",
+      "phase": "close",
+      "passed": true,
+      "stdout": "PASS unknown close required=1\n",
+      "stderr": ""
+    },
+    {
+      "scenario": "network",
+      "phase": "normal",
+      "passed": true,
+      "stdout": "PASS network normal required=1\n",
+      "stderr": ""
+    },
+    {
+      "scenario": "network",
+      "phase": "close",
+      "passed": true,
+      "stdout": "PASS network close required=1\n",
+      "stderr": ""
+    },
+    {
+      "scenario": "apk",
+      "phase": "normal",
+      "passed": true,
+      "stdout": "PASS apk normal required=1\n",
+      "stderr": ""
+    },
+    {
+      "scenario": "apk",
+      "phase": "close",
+      "passed": true,
+      "stdout": "PASS apk close required=1\n",
+      "stderr": ""
+    },
+    {
+      "scenario": "extension",
+      "phase": "normal",
+      "passed": true,
+      "stdout": "PASS extension normal required=1\n",
+      "stderr": ""
+    },
+    {
+      "scenario": "extension",
+      "phase": "close",
+      "passed": true,
+      "stdout": "PASS extension close required=1\n",
+      "stderr": ""
+    },
+    {
+      "scenario": "override",
+      "phase": "normal",
+      "passed": true,
+      "stdout": "PASS override normal required=1\n",
+      "stderr": ""
+    },
+    {
+      "scenario": "override",
+      "phase": "close",
+      "passed": true,
+      "stdout": "PASS override close required=1\n",
+      "stderr": ""
+    },
+    {
+      "scenario": "throws",
+      "phase": "normal",
+      "passed": true,
+      "stdout": "PASS throws normal required=1\n",
+      "stderr": ""
+    },
+    {
+      "scenario": "throws",
+      "phase": "close",
+      "passed": true,
+      "stdout": "PASS throws close required=1\n",
+      "stderr": ""
+    },
+    {
+      "scenario": "derived-job",
+      "phase": "normal",
+      "passed": true,
+      "stdout": "PASS derived-job normal required=1\n",
+      "stderr": ""
+    },
+    {
+      "scenario": "derived-job",
+      "phase": "close",
+      "passed": true,
+      "stdout": "PASS derived-job close required=1\n",
+      "stderr": ""
+    },
+    {
+      "scenario": "derived-control",
+      "phase": "normal",
+      "passed": true,
+      "stdout": "PASS derived-control normal required=1\n",
+      "stderr": ""
+    },
+    {
+      "scenario": "derived-control",
+      "phase": "close",
+      "passed": true,
+      "stdout": "PASS derived-control close required=1\n",
+      "stderr": ""
+    },
+    {
+      "scenario": "null",
+      "phase": "normal",
+      "passed": true,
+      "stdout": "PASS null normal required=1\n",
+      "stderr": ""
+    },
+    {
+      "scenario": "null",
+      "phase": "close",
+      "passed": true,
+      "stdout": "PASS null close required=1\n",
+      "stderr": ""
+    },
+    {
+      "scenario": "spoof",
+      "phase": "normal",
+      "passed": true,
+      "stdout": "PASS spoof normal required=1\n",
+      "stderr": ""
+    },
+    {
+      "scenario": "spoof",
+      "phase": "close",
+      "passed": true,
+      "stdout": "PASS spoof close required=1\n",
+      "stderr": ""
+    },
+    {
+      "scenario": "cancel",
+      "phase": "normal",
+      "passed": true,
+      "stdout": "PASS cancel normal required=0\n",
+      "stderr": ""
+    },
+    {
+      "scenario": "cancel",
+      "phase": "close",
+      "passed": true,
+      "stdout": "PASS cancel close required=0\n",
+      "stderr": ""
+    }
+  ],
+  "executed_production_functions": [
+    "complete GUIMultiImage.cpp and header",
+    "complete JobManager.cpp",
+    "DirectoryFactory::Create(CURL)",
+    "CPosixDirectory::GetDirectory",
+    "CSpecialProtocolDirectory::GetDirectory",
+    "CGUITextureManager::GetTexturePath"
+  ],
+  "physical_fold_verified": false
+}

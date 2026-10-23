@@ -1,0 +1,191 @@
+{
+  "android17_verified": false,
+  "apk_built_or_signed": false,
+  "apk_member_delta": null,
+  "applied_to_installed_app": false,
+  "base_commit": "8df2e26f481eb7ff2d791c8cab39548de949d030",
+  "checkpoint_inventory_self_hash": "Anchored by repository commit; excluded from recursive self-inventory",
+  "cobra_modified": false,
+  "exact_installed_pov_source_verified": false,
+  "original_physical_exception_reproduced": false,
+  "parent_apk_sha256": "4c3e465eb78ebbba14df02b810b1851188dc8fbcb20fe17b4cc41f84dc824879",
+  "physical_fold_verified": false,
+  "proposed_component_overlay": {
+    "script.infinity.commandcenter/NAVIGATION-CONTRACTS.json": {
+      "defect": "Universal Save for Later verified navigation",
+      "final_sha256": "0bd3a2cc775f34d8daef3262ec412a32624ba907b10896ca85a75460597c010b",
+      "justification": "Later-only identity-keyed action, reviewed installed API contracts, exact dependent source bindings",
+      "original_sha256": null,
+      "test_result": "PASS: 12 navigation host test methods with mocked directory responses; actual provider/Android/Fold PENDING"
+    },
+    "script.infinity.commandcenter/plugin.py": {
+      "defect": "Universal Save for Later verified navigation",
+      "final_sha256": "ea30799a09ad5b1fda7a7ff44dc4dbaf27a69864fdbbf594ff7ba66fd1155545",
+      "justification": "Later-only identity-keyed action, reviewed installed API contracts, exact dependent source bindings",
+      "original_sha256": "47ce816e00ca30d8eb77ea4d6e034bdbd40b2a5d6c51bfd4eda8d6c75545edb8",
+      "test_result": "PASS: 12 navigation host test methods with mocked directory responses; actual provider/Android/Fold PENDING"
+    },
+    "script.infinity.commandcenter/saved_navigation.py": {
+      "defect": "Universal Save for Later verified navigation",
+      "final_sha256": "885fb6128e298d45febc12a743b04289db02fd8017703fae7bc5765a1a8def49",
+      "justification": "Later-only identity-keyed action, reviewed installed API contracts, exact dependent source bindings",
+      "original_sha256": null,
+      "test_result": "PASS: 12 navigation host test methods with mocked directory responses; actual provider/Android/Fold PENDING"
+    },
+    "script.infinity.uirepair/CONTROLLER-PREIMAGES.json": {
+      "defect": "Universal Save for Later verified navigation",
+      "final_sha256": "9dd8f6fd004719e8587b2681e9916a35aae177193beefbadf28af157d2c482e8",
+      "justification": "Later-only identity-keyed action, reviewed installed API contracts, exact dependent source bindings",
+      "original_sha256": "459757da322bdb5034921ab8da6cfe2520afc168b6cf307fe02683a62b9976aa",
+      "test_result": "PASS: 12 navigation host test methods with mocked directory responses; actual provider/Android/Fold PENDING"
+    },
+    "script.infinity.watchedbridge/CONTROLLER-PREIMAGES.json": {
+      "defect": "Universal Save for Later verified navigation",
+      "final_sha256": "9dd8f6fd004719e8587b2681e9916a35aae177193beefbadf28af157d2c482e8",
+      "justification": "Later-only identity-keyed action, reviewed installed API contracts, exact dependent source bindings",
+      "original_sha256": "459757da322bdb5034921ab8da6cfe2520afc168b6cf307fe02683a62b9976aa",
+      "test_result": "PASS: 12 navigation host test methods with mocked directory responses; actual provider/Android/Fold PENDING"
+    }
+  },
+  "proposed_native_overlay": {
+    "xbmc/filesystem/DirectoryFactory.cpp": {
+      "defect": "Essential-First multi-image operation ownership",
+      "final_sha256": "f2af6479a16d17d9f5c8f525162d58779c3f84f2e5945de03a18d76dd041f8aa",
+      "justification": "Exact job/callback ownership and actual audited backend observation; required completion with verified unchanged outcome; unknown dispatch stays unresolved",
+      "original_sha256": "05e24bbe57a5309d8f5a016209d7d58901bd76b942e2f8adb465d3753a0208b7",
+      "test_result": "PASS: 32 candidate production-source host cases; Android/Fold PENDING"
+    },
+    "xbmc/guilib/GUIMultiImage.cpp": {
+      "defect": "Essential-First multi-image operation ownership",
+      "final_sha256": "11a6d2908dcf89a4d9ad5a96d4c132d5dad1d1a4c58f8e39facf5e56b0bef68e",
+      "justification": "Exact job/callback ownership and actual audited backend observation; required completion with verified unchanged outcome; unknown dispatch stays unresolved",
+      "original_sha256": "dfe2d92a2d344fcf0e9e6130d78e65d3a39bdb6774c6a79c5fe3095220aa67ab",
+      "test_result": "PASS: 32 candidate production-source host cases; Android/Fold PENDING"
+    },
+    "xbmc/guilib/GUIMultiImage.h": {
+      "defect": "Essential-First multi-image operation ownership",
+      "final_sha256": "8bbf1417407a7192a03e46e7e376395826584cc880a679ca37b9b97aa1262cb3",
+      "justification": "Exact job/callback ownership and actual audited backend observation; required completion with verified unchanged outcome; unknown dispatch stays unresolved",
+      "original_sha256": "c8dbd13d27d84a5682b7522f32f3e2576acaaf945e78c3769e647c14f5a0d6ee",
+      "test_result": "PASS: 32 candidate production-source host cases; Android/Fold PENDING"
+    },
+    "xbmc/guilib/InfinityMultiImagePersistence.h": {
+      "defect": "Essential-First multi-image operation ownership",
+      "final_sha256": "d7ec07c4be0593b4e09c84288927a9e3196b0608338aef552118b1a153fe61f8",
+      "justification": "Exact job/callback ownership and actual audited backend observation; required completion with verified unchanged outcome; unknown dispatch stays unresolved",
+      "original_sha256": null,
+      "test_result": "PASS: 32 candidate production-source host cases; Android/Fold PENDING"
+    }
+  },
+  "real_provider_runtime_verified": false,
+  "repository_added_files": {
+    "repairs/save-later-multiimage-20261023/InfinityMultiImagePersistence.h": {
+      "defect": "Two authorized corrective areas; isolated experimental implementation and evidence",
+      "final_sha256": "d7ec07c4be0593b4e09c84288927a9e3196b0608338aef552118b1a153fe61f8",
+      "justification": "New task-local source/host test/provenance only; does not alter an installed application",
+      "original_sha256": null,
+      "test_result": "Host checkpoint only; not an accepted integrated build"
+    },
+    "repairs/save-later-multiimage-20261023/README.md": {
+      "defect": "Two authorized corrective areas; isolated experimental implementation and evidence",
+      "final_sha256": "f05aae7ff421a6bbccac38bae0eebc8c8955135793f934fcc9180c176338d66b",
+      "justification": "New task-local source/host test/provenance only; does not alter an installed application",
+      "original_sha256": null,
+      "test_result": "Host checkpoint only; not an accepted integrated build"
+    },
+    "repairs/save-later-multiimage-20261023/checkpoint.py": {
+      "defect": "Two authorized corrective areas; isolated experimental implementation and evidence",
+      "final_sha256": "463d3cb0f52eefb1d410b080b69038d18feba3b1f175ddb31b793e3231b2d069",
+      "justification": "New task-local source/host test/provenance only; does not alter an installed application",
+      "original_sha256": null,
+      "test_result": "Host checkpoint only; not an accepted integrated build"
+    },
+    "repairs/save-later-multiimage-20261023/component_contract.py": {
+      "defect": "Two authorized corrective areas; isolated experimental implementation and evidence",
+      "final_sha256": "4ace4e3adc81ed9d1d744d21889209c7a8dd53f832b46e5a987895fccb74241c",
+      "justification": "New task-local source/host test/provenance only; does not alter an installed application",
+      "original_sha256": null,
+      "test_result": "Host checkpoint only; not an accepted integrated build"
+    },
+    "repairs/save-later-multiimage-20261023/multiimage_methods.inc": {
+      "defect": "Two authorized corrective areas; isolated experimental implementation and evidence",
+      "final_sha256": "7853fee84d2282ce50ed2df355ad9c8812bda6f6cd89dfb5352acedc7dda3337",
+      "justification": "New task-local source/host test/provenance only; does not alter an installed application",
+      "original_sha256": null,
+      "test_result": "Host checkpoint only; not an accepted integrated build"
+    },
+    "repairs/save-later-multiimage-20261023/native_contract.py": {
+      "defect": "Two authorized corrective areas; isolated experimental implementation and evidence",
+      "final_sha256": "71bc97c3f5a173dbfe9df181430327d8f2f4d7afe52fc406f6066d8b39cf7c94",
+      "justification": "New task-local source/host test/provenance only; does not alter an installed application",
+      "original_sha256": null,
+      "test_result": "Host checkpoint only; not an accepted integrated build"
+    },
+    "repairs/save-later-multiimage-20261023/probe_pov_metadata.py": {
+      "defect": "Two authorized corrective areas; isolated experimental implementation and evidence",
+      "final_sha256": "432a20e7560d40eecde2948f5e83a32dcf17496ad3e12f320637111d4d14c80e",
+      "justification": "New task-local source/host test/provenance only; does not alter an installed application",
+      "original_sha256": null,
+      "test_result": "Host checkpoint only; not an accepted integrated build"
+    },
+    "repairs/save-later-multiimage-20261023/provider_contracts.py": {
+      "defect": "Two authorized corrective areas; isolated experimental implementation and evidence",
+      "final_sha256": "859d11fedd03c1c6510830688b98cd80e55568d85db07e9f3a8d9bde767bd733",
+      "justification": "New task-local source/host test/provenance only; does not alter an installed application",
+      "original_sha256": null,
+      "test_result": "Host checkpoint only; not an accepted integrated build"
+    },
+    "repairs/save-later-multiimage-20261023/qualification/HOST-NATIVE-BASELINE.json": {
+      "defect": "Two authorized corrective areas; isolated experimental implementation and evidence",
+      "final_sha256": "67741bc10cea0ca645a6191a0b9397a76ef07f8c56875d7b19c150009ee22902",
+      "justification": "New task-local source/host test/provenance only; does not alter an installed application",
+      "original_sha256": null,
+      "test_result": "Host checkpoint only; not an accepted integrated build"
+    },
+    "repairs/save-later-multiimage-20261023/qualification/HOST-NATIVE-CANDIDATE.json": {
+      "defect": "Two authorized corrective areas; isolated experimental implementation and evidence",
+      "final_sha256": "7ea19d907f601470e0e64083247346b8f22e70eaa08479fb1b437779aacf63a7",
+      "justification": "New task-local source/host test/provenance only; does not alter an installed application",
+      "original_sha256": null,
+      "test_result": "Host checkpoint only; not an accepted integrated build"
+    },
+    "repairs/save-later-multiimage-20261023/qualification/HOST-NAVIGATION.json": {
+      "defect": "Two authorized corrective areas; isolated experimental implementation and evidence",
+      "final_sha256": "531e09d38cbc4a94082df33344a20283b590b4144b6c173478e61daa872a009f",
+      "justification": "New task-local source/host test/provenance only; does not alter an installed application",
+      "original_sha256": null,
+      "test_result": "Host checkpoint only; not an accepted integrated build"
+    },
+    "repairs/save-later-multiimage-20261023/qualification/README.md": {
+      "defect": "Two authorized corrective areas; isolated experimental implementation and evidence",
+      "final_sha256": "ed96b07de45b49995fd013afe690504481c631b3f91067e649d25771b36eee41",
+      "justification": "New task-local source/host test/provenance only; does not alter an installed application",
+      "original_sha256": null,
+      "test_result": "Host checkpoint only; not an accepted integrated build"
+    },
+    "repairs/save-later-multiimage-20261023/saved_navigation.py": {
+      "defect": "Two authorized corrective areas; isolated experimental implementation and evidence",
+      "final_sha256": "885fb6128e298d45febc12a743b04289db02fd8017703fae7bc5765a1a8def49",
+      "justification": "New task-local source/host test/provenance only; does not alter an installed application",
+      "original_sha256": null,
+      "test_result": "Host checkpoint only; not an accepted integrated build"
+    },
+    "repairs/save-later-multiimage-20261023/test_native.py": {
+      "defect": "Two authorized corrective areas; isolated experimental implementation and evidence",
+      "final_sha256": "c2c991f13ac2deabc20d0d7bef12c510222d1d9e71d3d3b0af985b46cb610de5",
+      "justification": "New task-local source/host test/provenance only; does not alter an installed application",
+      "original_sha256": null,
+      "test_result": "Host checkpoint only; not an accepted integrated build"
+    },
+    "repairs/save-later-multiimage-20261023/test_navigation.py": {
+      "defect": "Two authorized corrective areas; isolated experimental implementation and evidence",
+      "final_sha256": "47061e33bd92b975b8bf77af9cabfdbdd19ea601958020c1f1f2e6c652ccf5e6",
+      "justification": "New task-local source/host test/provenance only; does not alter an installed application",
+      "original_sha256": null,
+      "test_result": "Host checkpoint only; not an accepted integrated build"
+    }
+  },
+  "schema": 1,
+  "source_binding_and_deployment_review_pending": true,
+  "state": "EXPERIMENTAL CHECKPOINT; NOT RELEASE READY"
+}
