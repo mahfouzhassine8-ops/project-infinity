@@ -25,39 +25,53 @@ def once(text,old,new):
 def extra(stage,args,report):
     inputs=ROOT/'android-provider-inputs'
     pins=json.loads((HERE/'ANDROID-INPUT-PINS.json').read_text())
-    for row in pins['archives']:
+    feature_only=getattr(args,'feature_only',False)
+    image_only=feature_only and args.mode=='feature-multiimage'
+    for row in ([] if image_only else pins['archives']):
         shutil.copytree(inputs/row['addon'],stage/row['addon'])
     # A compatible future fork is explicitly a disposable test fixture. All
     # reviewed API bodies are unchanged apart from its own add-on identity.
-    shutil.copytree(stage/'plugin.video.pov',stage/NAVFUTURE)
-    for p in (stage/NAVFUTURE).rglob('*'):
-        if p.is_file() and p.suffix in ('.py','.xml'):
-            p.write_bytes(p.read_bytes().replace(b'plugin.video.pov',NAVFUTURE.encode()))
-    # The POV alias retains a reverse-encoded hard-coded original URL. Keep
-    # it as a real unrelated-provider rejection control, never rewrite results.
-    # Umbrella's literal/argv-based URLs permit an identity-only compatible fork.
-    if args.mode=='provider-future':
-        shutil.copytree(stage/'plugin.video.umbrella',stage/COMPATFUTURE)
-        for p in (stage/COMPATFUTURE).rglob('*'):
+    if not image_only:
+        shutil.copytree(stage/'plugin.video.pov',stage/NAVFUTURE)
+        for p in (stage/NAVFUTURE).rglob('*'):
             if p.is_file() and p.suffix in ('.py','.xml'):
-                p.write_bytes(p.read_bytes().replace(b'plugin.video.umbrella',COMPATFUTURE.encode()))
+                p.write_bytes(p.read_bytes().replace(b'plugin.video.pov',NAVFUTURE.encode()))
+        # The POV alias retains a reverse-encoded hard-coded original URL. Keep
+        # it as a real unrelated-provider rejection control, never rewrite results.
+        # Umbrella's literal/argv-based URLs permit an identity-only compatible fork.
+        if args.mode=='provider-future':
+            shutil.copytree(stage/'plugin.video.umbrella',stage/COMPATFUTURE)
+            for p in (stage/COMPATFUTURE).rglob('*'):
+                if p.is_file() and p.suffix in ('.py','.xml'):
+                    p.write_bytes(p.read_bytes().replace(b'plugin.video.umbrella',COMPATFUTURE.encode()))
     fixture=stage/FUTURE
     shutil.copyfile(HERE/'android_runtime_checks.py',fixture/'android_runtime_checks.py')
     shutil.copyfile(HERE/'ANDROID-FAVORITES-REFERENCE.json',fixture/'ANDROID-FAVORITES-REFERENCE.json')
-    service=(OLD/'android_future_service.py').read_text()
-    require_hash='7abb08a3f5a587f25449531c9cb6e687dd65d9b32793d1b8c596cccbb6274ad8'
-    if sha(service.encode())!=require_hash:raise RuntimeError('Retained service changed')
-    service=once(service,"versioncheck=xbmcaddon.Addon('service.xbmc.versioncheck')",
-        "import android_runtime_checks\nandroid_runtime_checks.run(root,cycle,mode)\nversioncheck=xbmcaddon.Addon('service.xbmc.versioncheck')")
-    if os.environ.get('INFINITY_DIAGNOSTIC_CLOSE_TRACE')=='1':
-        if args.mode!='safe':raise RuntimeError('Close diagnostics are limited to the remaining safe case')
-        shutil.copyfile(HERE/'android_close_trace.py',fixture/'android_close_trace.py')
-        service='import android_close_trace\nandroid_close_trace.start()\n'+service
-        service=once(service,'import android_runtime_checks\n',
-            'android_close_trace.finish()\nimport android_runtime_checks\n')
-        report['close_trace_diagnostic_only']=True
-        report['close_trace_timing_may_be_perturbed']=True
-        report['close_trace_fixture_sha256']=sha((fixture/'android_close_trace.py').read_bytes())
+    if feature_only:
+        # A dedicated feature service: no persistence fixtures, VFS/SQLite
+        # controls, service retirement loop, Close or reopen are executed.
+        selected='multiimage' if image_only else 'navigation'
+        service=("import os,xbmcaddon,xbmcvfs\n"
+                 "from pathlib import Path\n"
+                 "import android_runtime_checks\n"
+                 "root=xbmcvfs.translatePath(xbmcaddon.Addon().getAddonInfo('profile'))\n"
+                 "Path(root).mkdir(parents=True,exist_ok=True)\n"
+                 "android_runtime_checks.run(root,str(os.getpid()),"+repr(args.mode)+",features=["+repr(selected)+"])\n")
+    else:
+        service=(OLD/'android_future_service.py').read_text()
+        require_hash='7abb08a3f5a587f25449531c9cb6e687dd65d9b32793d1b8c596cccbb6274ad8'
+        if sha(service.encode())!=require_hash:raise RuntimeError('Retained service changed')
+        service=once(service,"versioncheck=xbmcaddon.Addon('service.xbmc.versioncheck')",
+            "import android_runtime_checks\nandroid_runtime_checks.run(root,cycle,mode)\nversioncheck=xbmcaddon.Addon('service.xbmc.versioncheck')")
+        if os.environ.get('INFINITY_DIAGNOSTIC_CLOSE_TRACE')=='1':
+            if args.mode!='safe':raise RuntimeError('Close diagnostics are limited to the remaining safe case')
+            shutil.copyfile(HERE/'android_close_trace.py',fixture/'android_close_trace.py')
+            service='import android_close_trace\nandroid_close_trace.start()\n'+service
+            service=once(service,'import android_runtime_checks\n',
+                'android_close_trace.finish()\nimport android_runtime_checks\n')
+            report['close_trace_diagnostic_only']=True
+            report['close_trace_timing_may_be_perturbed']=True
+            report['close_trace_fixture_sha256']=sha((fixture/'android_close_trace.py').read_bytes())
     (fixture/'service.py').write_text(service)
     xml=fixture/'resources/skins/Default/1080i/multiimage-probe.xml';xml.parent.mkdir(parents=True)
     imagepath=('resource://resource.images.weathericons.default/' if args.mode=='native-opaque' else
@@ -66,8 +80,8 @@ def extra(stage,args,report):
         '<control type="multiimage" id="941"><left>0</left><top>0</top><width>64</width><height>64</height>'
         '<imagepath>'+imagepath+'</imagepath><timeperimage>1000</timeperimage><fadetime>0</fadetime>'
         '<randomize>false</randomize></control></controls></window>')
-    report['test_provider_inputs']=pins
-    report['future_provider_fixture_only']=NAVFUTURE
+    report['test_provider_inputs']=None if image_only else pins
+    report['future_provider_fixture_only']=None if image_only else NAVFUTURE
     report['compatible_future_fixture_only']=COMPATFUTURE if args.mode=='provider-future' else None
     # The original service's pending test remains independent of navigation.
     # Extra fixture-mode settings are explicitly staged, never production data.

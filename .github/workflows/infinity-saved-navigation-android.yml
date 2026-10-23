@@ -1,79 +1,61 @@
-name: Infinity saved routes - Android17 close diagnostic
+name: Infinity feature-only verification
 on:
-  push:
-    branches: [work/infinity-saved-route-android-20261023]
-    paths:
-      - repairs/save-later-multiimage-20261023/android*.py
-      - repairs/save-later-multiimage-20261023/NavigationBindingProbe.java
-      - repairs/save-later-multiimage-20261023/ANDROID-INPUT-PINS.json
-      - repairs/save-later-multiimage-20261023/ANDROID-FAVORITES-REFERENCE.json
-      - .github/workflows/infinity-saved-navigation-android.yml
   workflow_dispatch:
     inputs:
-      phase:
-        description: Remaining safe gate; full matrix available for a changed APK
+      source_ref:
+        description: Corrective source/test branch or exact commit
+        required: true
+        type: string
+        default: work/infinity-saved-route-android-20261023
+      authorization:
+        description: User-approved feature correction and exact test scope
+        required: true
+        type: string
+      feature:
+        description: Run only this selected feature (never Close or shutdown)
+        required: true
         type: choice
-        options: [focused, full]
-        default: focused
+        default: select-a-feature
+        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage]
+      candidate_build:
+        description: Existing signed build run (no rebuild)
+        required: true
+        type: string
+        default: '39994772688'
 permissions:
   contents: read
   actions: read
 concurrency:
-  group: infinity-saved-route-android-${{ github.ref }}
+  group: infinity-feature-${{ inputs.source_ref }}-${{ inputs.feature }}
   cancel-in-progress: false
 jobs:
   android17:
-    name: Actual Android17 ${{ matrix.mode }}
+    name: Selected feature ${{ inputs.feature }}
     runs-on: ubuntu-22.04
     timeout-minutes: 150
-    strategy:
-      fail-fast: false
-      matrix:
-        # Same signed APK: retain eight executed passing modes from 39998374579.
-        # Only the remaining safe gate needs the evidence-backed dialog wait fix.
-        mode: ${{ fromJSON(github.event_name == 'workflow_dispatch' && inputs.phase == 'full' && '["safe","pending","opaque","native-opaque","lost-file","provider-pov","provider-umbrella","provider-seren","provider-future"]' || '["safe"]') }}
     env:
-      CANDIDATE_BUILD: '39994772688'
-      CANDIDATE_COMMIT: '3d3730c490220a1169e9dea280832c42da4971e8'
+      CANDIDATE_BUILD: ${{ inputs.candidate_build }}
+      AUTHORIZED_SCOPE: ${{ inputs.authorization }}
+      SELECTED_CASE: ${{ inputs.feature }}
       PYTHONDONTWRITEBYTECODE: '1'
-      INFINITY_DIAGNOSTIC_CLOSE_TRACE: ${{ matrix.mode == 'safe' && '1' || '0' }}
     steps:
       - uses: actions/checkout@v4
-        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
-      - name: Require exact production checkpoint and successful signing
-        env:
-          GH_TOKEN: ${{ github.token }}
+        with: {ref: "${{ inputs.source_ref }}", fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - name: Require one explicitly authorized feature
         run: |
-          python3 - <<'PY'
-          import os,json,subprocess
-          prefix='repairs/save-later-multiimage-20261023/'
-          allowed={prefix+n for n in ('android_probe.py','android_runtime_checks.py','android_inputs.py','android_binding.py','android_close_trace.py','NavigationBindingProbe.java','ANDROID-INPUT-PINS.json','ANDROID-FAVORITES-REFERENCE.json')}
-          allowed.add('.github/workflows/infinity-saved-navigation-android.yml')
-          paths=subprocess.check_output(['git','diff','--name-only',os.environ['CANDIDATE_COMMIT'],'HEAD'],text=True).splitlines()
-          assert set(paths)<=allowed,paths
-          r=json.loads(subprocess.check_output(['gh','api','repos/'+os.environ['GITHUB_REPOSITORY']+'/actions/runs/'+os.environ['CANDIDATE_BUILD']],text=True))
-          assert r['head_sha']==os.environ['CANDIDATE_COMMIT'] and r['conclusion']=='success',r.get('conclusion')
-          PY
+          python3 - <<'PYCODE'
+          import os
+          allowed={'saved-navigation','provider-pov','provider-umbrella','provider-seren','provider-future','multiimage'}
+          assert os.environ['SELECTED_CASE'] in allowed, 'Select one feature explicitly'
+          assert os.environ['AUTHORIZED_SCOPE'].strip(), 'Record the user-authorized feature scope'
+          assert os.environ['CANDIDATE_BUILD'].isdigit(), 'Signed build run must be numeric'
+          PYCODE
       - uses: actions/download-artifact@v4
         with:
           run-id: ${{ env.CANDIDATE_BUILD }}
           name: Infinity-Saved-Navigation-MultiImage-INTERNAL-QA-NOT-ACCEPTED
           github-token: ${{ github.token }}
           path: signed
-      - uses: actions/download-artifact@v4
-        if: matrix.mode != 'opaque'
-        with:
-          run-id: 39136763823
-          name: Infinity-2103387-Permanent-Signed-EXPERIMENTAL-UNQUALIFIED
-          github-token: ${{ github.token }}
-          path: archived-compatible-fixture
-      - uses: actions/download-artifact@v4
-        if: matrix.mode == 'safe'
-        with:
-          run-id: 39868217775
-          name: Infinity-Universal-Persistence-INTERNAL-QA-NOT-ACCEPTED
-          github-token: ${{ github.token }}
-          path: rc8-input
       - uses: actions/setup-java@v4
         with: {distribution: temurin, java-version: '17'}
       - uses: actions/setup-python@v5
@@ -84,19 +66,24 @@ jobs:
           packages: platform-tools build-tools;34.0.0
           log-accepted-android-sdk-licenses: false
       - name: Verify signed identity, provider source pins, and API37 infrastructure
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           (cd signed && sha256sum -c SHA256SUMS)
           python3 - <<'PY'
-          import hashlib,json,os,pathlib,sys
+          import hashlib,json,os,pathlib,subprocess,sys
           sys.path.insert(0,'repairs/2103390-bugfixes/group7/finish92')
           import delivery92
           files=list(pathlib.Path('signed').glob('*.apk'));assert len(files)==1
           apk=files[0];digest=hashlib.sha256(apk.read_bytes()).hexdigest()
           r=json.load(open('signed/CANDIDATE.json'))
-          assert r['source_commit']==os.environ['CANDIDATE_COMMIT'] and r['apk_sha256']==digest
+          assert r['apk_sha256']==digest
+          run=json.loads(subprocess.check_output(['gh','api',f"repos/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['CANDIDATE_BUILD']}"],text=True))
+          assert run['head_sha']==r['source_commit'] and run['conclusion']=='success', 'Signed build/source mismatch'
+          test_commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
           delivery92.verify_signature(apk,pathlib.Path(os.environ['ANDROID_HOME'])/'build-tools/34.0.0')
-          with open(os.environ['GITHUB_ENV'],'a') as f:f.write('TEST_APK='+str(apk)+'\nTEST_APK_SHA='+digest+'\n')
+          with open(os.environ['GITHUB_ENV'],'a') as f:f.write('TEST_APK='+str(apk)+'\nTEST_APK_SHA='+digest+'\nCANDIDATE_SOURCE_COMMIT='+r['source_commit']+'\nTEST_SOURCE_COMMIT='+test_commit+'\n')
           PY
           python3 repairs/save-later-multiimage-20261023/android_inputs.py stage --out android-provider-inputs
           sudo apt-get update -qq
@@ -112,7 +99,7 @@ jobs:
               if attempt==3 or 'Error reading Zip content from a SeekableByteChannel' not in logs:raise SystemExit(code)
           PY
           sudo chmod 666 /dev/kvm
-      - name: Actual original routes, native failures and protected Close/reopen
+      - name: Execute only the selected feature; leave the app running
         uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
         with:
           api-level: '37.0'
@@ -125,15 +112,13 @@ jobs:
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
           script: |
-            if [ '${{ matrix.mode }}' = safe ]; then python3 repairs/save-later-multiimage-20261023/android_binding.py --apk "$TEST_APK" --parent rc8-input/Infinity-2103401-Universal-Persistence-RC8-NOT-ACCEPTED.apk --out art-binding; fi
-            python3 repairs/save-later-multiimage-20261023/android_probe.py --apk "$TEST_APK" --expected-sha "$TEST_APK_SHA" --mode ${{ matrix.mode }} --versioncheck-fixture archived-compatible-fixture/versioncheck-companion/service.xbmc.versioncheck-0.5.28+infinity.1-Android-TEST.zip --out android-results
+            python3 repairs/save-later-multiimage-20261023/android_feature_probe.py --apk "$TEST_APK" --expected-sha "$TEST_APK_SHA" --case "$SELECTED_CASE" --authorization "$AUTHORIZED_SCOPE" --out feature-results
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: Infinity-Saved-Routes-Actual-Android17-${{ matrix.mode }}-Evidence
+          name: Infinity-Feature-${{ inputs.feature }}-${{ github.run_id }}-Evidence
           path: |
-            android-results/
-            art-binding/
+            feature-results/
             api37-support/
             emulator-setup/
             android-provider-inputs/INPUTS.json

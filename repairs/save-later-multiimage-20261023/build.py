@@ -145,9 +145,12 @@ def package(parent,dex,out):
     parent_signature=delivery.verify_signature(apk,tools);_,_,signer=delivery.adapters()
     proof=json.loads((OUT/'ENGINE-PROOF.json').read_text())
     dexproof=json.loads((dex/'DEX-PRESERVATION.json').read_text())
-    for report in ('HOST-NAVIGATION.json','HOST-NATIVE-CANDIDATE.json','HOST-NATIVE-BASELINE.json','RETAINED-PERSISTENCE.json',
-                   'HOST-NAVIGATION-NATIVE.json','HOST-FILE-DISPATCH.json','HOST-ARCHIVE-READERS.json'):
-        if not json.loads((OUT/report).read_text())['passed']:raise RuntimeError('Required host gate failed: '+report)
+    # Feature and shutdown jobs are separate, explicitly selected workflows.
+    # Their absence/failure cannot be converted into a package integrity failure
+    # or a fabricated PASS. Packaging itself makes no runtime acceptance claim.
+    verification=dict(feature_tests='NOT_RUN_IN_PACKAGING',
+        shutdown_tests='NOT_RUN_IN_PACKAGING', runtime_acceptance=False,
+        compilation_signing_integrity='PASS', independent_workflows=True)
     if not dexproof['passed'] or not proof['complete_native_engine_compiled']:raise RuntimeError('Build proofs did not pass')
     engine=(OUT/'libkodi.so').read_bytes();finaldex=(dex/'classes.dex').read_bytes()
     if sha(engine)!=proof['native_sha256'] or sha(finaldex)!=dexproof['final_dex_sha256']:raise RuntimeError('Compiler output drift')
@@ -201,14 +204,15 @@ def package(parent,dex,out):
         cobra_definitions_changed=[],provider_code_changed=False,user_profile_changed=False,
         rc8_receipt_and_universal_observer_sources_unchanged=True,
         actual_android_verified=False,physical_fold_verified=False,final_lock=False,
-        distribution='INTERNAL QA; full Android/Fold acceptance gates pending')
+        distribution='INTERNAL QA; separate selected verification and physical acceptance',
+        verification=verification)
     save(out/'CANDIDATE.json',receipt);save(out/'APK-DELTA.json',members)
     for group in ('native','components'):
         for record in delta[group].values():
-            record['test_result']='PASS: focused host gates, retained persistence and compiled source binding; actual Android/Fold acceptance pending'
+            record['test_result']='NOT_RUN_IN_PACKAGING; compilation/source binding verified; selected tests reported separately'
     save(out/'SOURCE-DELTA.json',delta)
-    for n in ('NATIVE-SOURCE-MAP.json','ENGINE-PROOF.json','HOST-NAVIGATION.json','HOST-NATIVE-CANDIDATE.json','HOST-NATIVE-BASELINE.json','RETAINED-PERSISTENCE.json',
-              'HOST-NAVIGATION-NATIVE.json','HOST-FILE-DISPATCH.json','HOST-ARCHIVE-READERS.json'):
+    save(out/'VERIFICATION-STATUS.json',verification)
+    for n in ('NATIVE-SOURCE-MAP.json','ENGINE-PROOF.json'):
         shutil.copyfile(OUT/n,out/n)
     shutil.copyfile(HERE/'qualification/CACHE-EVIDENCE.json',out/'CACHE-EVIDENCE.json')
     shutil.copyfile(HERE/'qualification/CACHE-SCHEMA-EVIDENCE.json',out/'CACHE-SCHEMA-EVIDENCE.json')
