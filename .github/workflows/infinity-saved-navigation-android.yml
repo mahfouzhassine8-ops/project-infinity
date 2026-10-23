@@ -1,0 +1,126 @@
+name: Infinity feature-only verification
+on:
+  workflow_dispatch:
+    inputs:
+      source_ref:
+        description: Corrective source/test branch or exact commit
+        required: true
+        type: string
+        default: work/infinity-saved-route-android-20261023
+      authorization:
+        description: User-approved feature correction and exact test scope
+        required: true
+        type: string
+      feature:
+        description: Run only this selected feature (never Close or shutdown)
+        required: true
+        type: choice
+        default: select-a-feature
+        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage]
+      candidate_build:
+        description: Existing signed build run (no rebuild)
+        required: true
+        type: string
+        default: '39994772688'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-feature-${{ inputs.source_ref }}-${{ inputs.feature }}
+  cancel-in-progress: false
+jobs:
+  android17:
+    name: Selected feature ${{ inputs.feature }}
+    runs-on: ubuntu-22.04
+    timeout-minutes: 150
+    env:
+      CANDIDATE_BUILD: ${{ inputs.candidate_build }}
+      AUTHORIZED_SCOPE: ${{ inputs.authorization }}
+      SELECTED_CASE: ${{ inputs.feature }}
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: "${{ inputs.source_ref }}", fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - name: Require one explicitly authorized feature
+        run: |
+          python3 - <<'PYCODE'
+          import os
+          allowed={'saved-navigation','provider-pov','provider-umbrella','provider-seren','provider-future','multiimage'}
+          assert os.environ['SELECTED_CASE'] in allowed, 'Select one feature explicitly'
+          assert os.environ['AUTHORIZED_SCOPE'].strip(), 'Record the user-authorized feature scope'
+          assert os.environ['CANDIDATE_BUILD'].isdigit(), 'Signed build run must be numeric'
+          PYCODE
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ env.CANDIDATE_BUILD }}
+          name: Infinity-Saved-Navigation-MultiImage-INTERNAL-QA-NOT-ACCEPTED
+          github-token: ${{ github.token }}
+          path: signed
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '17'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.7'}
+      - uses: android-actions/setup-android@v4
+        with:
+          cmdline-tools-version: '15859902'
+          packages: platform-tools build-tools;34.0.0
+          log-accepted-android-sdk-licenses: false
+      - name: Verify signed identity, provider source pins, and API37 infrastructure
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          (cd signed && sha256sum -c SHA256SUMS)
+          python3 - <<'PY'
+          import hashlib,json,os,pathlib,subprocess,sys
+          sys.path.insert(0,'repairs/2103390-bugfixes/group7/finish92')
+          import delivery92
+          files=list(pathlib.Path('signed').glob('*.apk'));assert len(files)==1
+          apk=files[0];digest=hashlib.sha256(apk.read_bytes()).hexdigest()
+          r=json.load(open('signed/CANDIDATE.json'))
+          assert r['apk_sha256']==digest
+          run=json.loads(subprocess.check_output(['gh','api',f"repos/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['CANDIDATE_BUILD']}"],text=True))
+          assert run['head_sha']==r['source_commit'] and run['conclusion']=='success', 'Signed build/source mismatch'
+          test_commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+          delivery92.verify_signature(apk,pathlib.Path(os.environ['ANDROID_HOME'])/'build-tools/34.0.0')
+          with open(os.environ['GITHUB_ENV'],'a') as f:f.write('TEST_APK='+str(apk)+'\nTEST_APK_SHA='+digest+'\nCANDIDATE_SOURCE_COMMIT='+r['source_commit']+'\nTEST_SOURCE_COMMIT='+test_commit+'\n')
+          PY
+          python3 repairs/save-later-multiimage-20261023/android_inputs.py stage --out android-provider-inputs
+          sudo apt-get update -qq
+          sudo apt-get install -y libpulse0
+          python3 repairs/four-repair-20261018/android37_gate.py --sdk-root "$ANDROID_HOME" --out api37-support --pin-tools
+          python3 - <<'PY'
+          import pathlib,subprocess,sys
+          for attempt in range(1,4):
+              out=pathlib.Path('emulator-setup')/('attempt-'+str(attempt))
+              code=subprocess.run([sys.executable,'repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py','--out',str(out)]).returncode
+              if code==0:break
+              logs='\n'.join(p.read_text(errors='replace') for p in out.glob('sdkmanager-attempt-*.log'))
+              if attempt==3 or 'Error reading Zip content from a SeekableByteChannel' not in logs:raise SystemExit(code)
+          PY
+          sudo chmod 666 /dev/kvm
+      - name: Execute only the selected feature; leave the app running
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: '37.0'
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disk-size: 8G
+          avd-name: infinity-four-repair-api37
+          pre-emulator-launch-script: python3 repairs/four-repair-20261018/android37_gate.py --sdk-root "$ANDROID_HOME" --out api37-support --check-avd
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: |
+            python3 repairs/save-later-multiimage-20261023/android_feature_probe.py --apk "$TEST_APK" --expected-sha "$TEST_APK_SHA" --case "$SELECTED_CASE" --authorization "$AUTHORIZED_SCOPE" --out feature-results
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-Feature-${{ inputs.feature }}-${{ github.run_id }}-Evidence
+          path: |
+            feature-results/
+            api37-support/
+            emulator-setup/
+            android-provider-inputs/INPUTS.json
+          retention-days: 90
+          if-no-files-found: warn
