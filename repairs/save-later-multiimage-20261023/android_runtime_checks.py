@@ -202,6 +202,45 @@ def verify_favorites_reference(nav,home,result,affected,umbrella):
     result['cases'].append(dict(case='exact-physical-umbrella-favorite',passed=True,
         archive_sha256=reference['archive_sha256'],episodes=len(episodes),identity=ids,**opened))
 
+def observe_normal_directory(nav,search,entry,provider,result,record):
+    # Run39955714826: the bounded consumer expired at 20 seconds, while POV's
+    # invocation retired about eight seconds later without a provider traceback.
+    # Compare Kodi's ordinary directory path as a separate diagnostic. This is
+    # never a retry-to-pass and does not alter any production deadline or route.
+    import threading
+    query=str(entry.get('showtitle') or entry.get('title') or '').strip()
+    path=search.route(provider,query)
+    observation=dict(purpose='diagnostic only; original timeout remains failed',
+        destination_sha256=digest(path),completed=False,request_started_epoch_ms=int(time.time()*1000))
+    result['normal_directory_comparison']=observation
+    answers=[]
+    def request():
+        began=time.monotonic()
+        try:
+            rows=rpc('Files.GetDirectory',dict(directory=path,media='video',
+                properties=search.PROPERTIES,limits=dict(start=0,end=search.MAX_RESULTS)))['files']
+            wanted=nav.hub.entry_identity(entry)
+            matches=[r for r in rows if r.get('type')==wanted['kind'] and
+                nav._same_ids(wanted['ids'],r.get('uniqueid'))]
+            valid=[];rejected=[]
+            for row in matches:
+                try:valid.append(digest(nav.destination(provider,row)))
+                except nav.Unavailable as error:rejected.append(str(error))
+            answers.append(dict(completed=True,items=len(rows),identity_matches=len(matches),
+                verified_destination_sha256=valid,rejected_destinations=rejected,
+                elapsed_seconds=round(time.monotonic()-began,3)))
+        except Exception as error:
+            answers.append(dict(completed=True,error_type=type(error).__name__,
+                elapsed_seconds=round(time.monotonic()-began,3)))
+    worker=threading.Thread(target=request,name='InfinityNavigationDiagnostic')
+    record('failed-normal-directory-comparison');worker.start()
+    end=time.monotonic()+180
+    while worker.is_alive() and time.monotonic()<end and not xbmc.Monitor().abortRequested():
+        worker.join(.1)
+    observation.update(answers[0] if answers else dict(still_pending=True))
+    # Do not kill or mark a still-running provider/interpreter retired.
+    record('failed-normal-directory-observed')
+
 def run(root,cycle,mode):
     cc=xbmcaddon.Addon('script.infinity.commandcenter')
     sys.path.insert(0,xbmcvfs.translatePath(cc.getAddonInfo('path')))
@@ -342,6 +381,10 @@ def run(root,cycle,mode):
         # production resolver deadline, so timeout logs include late completion.
         xbmc.Monitor().waitForAbort(30)
         result['failure_gui_after_observation']=gui_snapshot()
+        if mode.startswith('provider-') and isinstance(error,nav.Unavailable) and '(timeout)' in str(error):
+            try:observe_normal_directory(nav,search,entries[key],provider,result,record)
+            except Exception as diagnostic_error:
+                result['normal_directory_comparison_error']=type(diagnostic_error).__name__
     finally:
         with out.open('w') as stream:json.dump(result,stream)
     require(result['passed'],result.get('failure','Runtime check failed'))
