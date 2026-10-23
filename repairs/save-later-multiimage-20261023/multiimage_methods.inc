@@ -2,6 +2,8 @@
 CJob::CheckpointResponsibility CGUIMultiImage::CMultiImageJob::GetCheckpointResponsibility(
     const IJobCallback* callback) const
 {
+  m_checkpointInfinity = XBMCAddon::xbmc::getSkinDir() == "skin.infinity.diggz";
+  if (!m_checkpointInfinity) return CJob::GetCheckpointResponsibility(callback);
   // The original callback copies a vector and changes directory-status memory.
   // A different implementation, including a derived control, is not covered.
   if (typeid(*this) != typeid(CMultiImageJob) || !callback ||
@@ -15,32 +17,36 @@ CJob::CheckpointResponsibility CGUIMultiImage::CMultiImageJob::GetCheckpointResp
 
 CGUIMultiImage::CMultiImageJob::~CMultiImageJob()
 {
+  if (!m_checkpointInfinity) return;
   try
   {
     const auto record = CJobManager::CheckpointRecord(this);
     if (!record) return;
-    std::string phase;
+    std::string phase, failure;
     bool unchangedReceipt = false;
     {
       std::lock_guard<std::mutex> lock(JobCheckpoint::Get().mutex);
       phase = record->phase;
+      failure = record->failureDetail;
       unchangedReceipt = record->completionRecorded && record->completionCallbackVerified &&
           !record->unknown && record->durability == CJobDurability::VerifiedUnchanged &&
           phase == "completion_receipt_verified";
     }
-    CLog::Log(LOGINFO, "INFINITY_MULTIIMAGE_RETIRED token={} job={} unchanged_receipt={} phase={} resource={}",
-        record->token, record->jobId, unchangedReceipt, phase, GetCheckpointResource());
+    CLog::Log(LOGINFO, "INFINITY_MULTIIMAGE_RETIRED token={} job={} unchanged_receipt={} phase={} reason={} resource={}",
+        record->token, record->jobId, unchangedReceipt, phase, failure, GetCheckpointResource());
   }
   catch (...) { } // Keep original destruction semantics if observation fails.
 }
 
 bool CGUIMultiImage::CMultiImageJob::CheckpointSucceeded(bool success) const
 {
+  if (!m_checkpointInfinity) return CJob::CheckpointSucceeded(success);
   return success && m_checkpointReadOnly && typeid(*this) == typeid(CMultiImageJob);
 }
 
 bool CGUIMultiImage::CMultiImageJob::CheckpointCancelledWithoutWork() const
 {
+  if (!m_checkpointInfinity) return CJob::CheckpointCancelledWithoutWork();
   const auto record = CJobManager::CheckpointRecord(this);
   if (typeid(*this) != typeid(CMultiImageJob) || !record || record->unknown)
     return false;
@@ -52,6 +58,7 @@ bool CGUIMultiImage::CMultiImageJob::CheckpointCancelledWithoutWork() const
 
 std::string CGUIMultiImage::CMultiImageJob::GetCheckpointResource() const
 {
+  if (!m_checkpointInfinity) return CJob::GetCheckpointResource();
   const CURL url(m_path);
   const auto& protocol = url.GetProtocol();
   const std::string control = "window=" + std::to_string(m_checkpointWindow) +

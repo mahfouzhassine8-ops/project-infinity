@@ -30,10 +30,13 @@ PEERS=r'''
 
 namespace Fixture {
 inline std::string root;
+inline bool infinity=true;
 inline bool opaqueFile=false,overrideSpecial=false,substitute=false;
 inline int unknownWork=0, mimeNetwork=0;
 inline bool factoryThrows=false;
 }
+namespace InfinityMultiImagePersistence { void UnreviewedDispatch(const char*); }
+namespace XBMCAddon {namespace xbmc {inline std::string getSkinDir(){return Fixture::infinity?"skin.infinity.diggz":"skin.cobra";}}}
 struct CTextureInfo {};
 struct CAspectRatio {};
 struct CAction {};
@@ -164,7 +167,10 @@ class CFileDirectoryFactory {
 public:
  static IFileDirectory*Create(const CURL&url,CFileItem*){
   if(Fixture::factoryThrows)throw std::runtime_error("factory peer failure");
-  if(Fixture::opaqueFile&&!URIUtils::GetExtension(url).empty()){++Fixture::unknownWork;std::ofstream(Fixture::root+"/opaque-peer")<<"mutation";}return nullptr;
+  if(Fixture::opaqueFile&&!URIUtils::GetExtension(url).empty()){
+    InfinityMultiImagePersistence::UnreviewedDispatch("multiimage_binary_vfs_dispatch_unverified");
+    ++Fixture::unknownWork;std::ofstream(Fixture::root+"/opaque-peer")<<"mutation";
+  }return nullptr;
  }
 };
 class VfsAddon{public:std::string GetProtocols()const{return "special";}bool HasDirectories()const{return true;}};
@@ -222,6 +228,7 @@ int main(int argc,char**argv){
  assert(argc==5);std::string scenario=argv[1];Fixture::root=argv[2];
  const bool baseline=std::string(argv[3])=="baseline";
  const bool closed=std::string(argv[4])=="close";
+ Fixture::infinity=scenario!="cobra";
  CServiceBroker::manager=new CJobManager;
  CTextureInfo texture;
  CGUIMultiImage owner(1,2,0,0,10,10,texture,100,1,false,true,0);
@@ -233,13 +240,14 @@ int main(int argc,char**argv){
  if(scenario=="special"||scenario=="override")path="special://fixture/images/";
  if(scenario=="unknown")path="plugin://opaque/";
  if(scenario=="network")path="https://fixture.invalid/cover";
- if(scenario=="apk")path="apk://fixture/images/";
+ if(scenario=="resource")path="resource://fixture/images/";
  if(scenario=="empty")path="missing-relative";
  if(scenario=="relative")path="images/";
  if(scenario=="extension"){path="folder.pkg";Fixture::opaqueFile=true;}
+ if(scenario=="dotted-local")path="folder.pkg";
  if(scenario=="override")Fixture::overrideSpecial=true;
  if(scenario=="throws")Fixture::factoryThrows=true;
- if(scenario=="relative"||scenario=="extension")CServiceBroker::gui.texture.m_texturePaths={Fixture::root+"/skin"};
+ if(scenario=="relative"||scenario=="extension"||scenario=="dotted-local")CServiceBroker::gui.texture.m_texturePaths={Fixture::root+"/skin"};
  CJob*job=new CGUIMultiImage::CMultiImageJob(path);
  IJobCallback*callback=&owner;
  if(scenario=="derived-job"){delete job;job=new DerivedJob(path);}
@@ -249,10 +257,18 @@ int main(int argc,char**argv){
  auto id=CServiceBroker::manager->AddJob(job,callback);
  assert(id);
  auto before=CJobManager::AndroidCheckpointSnapshot();assert(before.required==1);
- if(!baseline && scenario!="derived-job" && scenario!="derived-control" && scenario!="null" && scenario!="spoof"){
+ if(scenario=="cobra"){
+  assert(before.unknown==1);
+  assert(std::string(job->GetCheckpointPersistenceOwner()).empty());
+  assert(std::string(job->GetCheckpointOperation())==job->GetType());
+  assert(job->GetCheckpointResource().empty());
+  assert(!job->RequiresCheckpointCompletionReceipt());
+  assert(!job->RequiresCheckpointCallback());
+ }
+ if(!baseline && scenario!="cobra" && scenario!="derived-job" && scenario!="derived-control" && scenario!="null" && scenario!="spoof"){
   assert(before.unknown==0);assert(before.blockers[0].owner=="background_jobs");
  }
- bool blocked=baseline||scenario=="unknown"||scenario=="network"||scenario=="apk"||
+ bool blocked=baseline||scenario=="cobra"||scenario=="unknown"||scenario=="network"||scenario=="resource"||
   scenario=="extension"||scenario=="override"||scenario=="throws"||scenario=="derived-job"||
   scenario=="derived-control"||scenario=="null"||scenario=="spoof";
  InfinityAndroidCheckpoint::active=closed;
@@ -264,12 +280,13 @@ int main(int argc,char**argv){
  auto after=CJobManager::AndroidCheckpointSnapshot();
  assert((after.required!=0)==blocked);
  if(!blocked)assert(after.unknown==0);
- if(!baseline&&blocked&&scenario!="derived-job"&&scenario!="derived-control"&&scenario!="null"&&scenario!="spoof"){
+ if(!baseline&&blocked&&scenario!="cobra"&&scenario!="derived-job"&&scenario!="derived-control"&&scenario!="null"&&scenario!="spoof"){
   assert(after.blockers[0].phase=="completed_write_failed");
   assert(after.blockers[0].failureDetail.find("multiimage_")==0);
  }
  if(scenario=="single"&&!blocked)assert(owner.m_files==std::vector<std::string>{path});
  if(scenario=="local"&&!blocked)assert(owner.m_files.size()==2);
+ if(scenario=="cobra")assert(owner.m_files.size()==2);
  if(scenario=="special"&&!blocked)assert(owner.m_files.size()==2);
  if(scenario=="extension")assert(Fixture::unknownWork>0);
  if(scenario=="network")assert(Fixture::mimeNetwork==1);
@@ -323,6 +340,7 @@ def run(source, overlay, baseline, out):
                      'utils/StringUtils.h','utils/URIUtils.h','utils/Stopwatch.h','utils/log.h','URL.h'):
             put(name,'#pragma once\n#include "Peers.h"\n')
             if name=='GUIImage.h':put('guilib/GUIImage.h','#pragma once\n#include "Peers.h"\n')
+        put('interfaces/legacy/ModuleXbmc.h','#pragma once\n#include "Peers.h"\n')
         factories='#include "Peers.h"\n#include "guilib/InfinityMultiImagePersistence.h"\nusing namespace XFILE;\n'
         factories+=function(handler,'IDirectory* CDirectoryFactory::Create(const CURL& url)')
         factories+='\n'+function((source/'xbmc/platform/posix/filesystem/PosixDirectory.cpp').read_text(),
@@ -345,8 +363,8 @@ def run(source, overlay, baseline, out):
         (fixture/'skin/media/folder.pkg').mkdir()
         (fixture/'skin/media/images/one.png').write_bytes(b'one')
         (fixture/'sentinel').write_text('preserved')
-        scenarios=('local','single','special','relative','empty','unknown','network','apk','extension','override',
-                   'throws','derived-job','derived-control','null','spoof','cancel')
+        scenarios=('local','single','special','relative','empty','unknown','network','resource','extension','dotted-local','override',
+                   'throws','derived-job','derived-control','null','spoof','cancel','cobra')
         results=[]
         for scenario in scenarios:
             for phase in ('normal','close'):

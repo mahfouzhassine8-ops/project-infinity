@@ -23,6 +23,10 @@ struct Observation
   }
 };
 inline thread_local Observation* current{nullptr};
+inline void UnreviewedDispatch(const char* reason)
+{
+  if (current) current->Reject(reason);
+}
 
 class Scope
 {
@@ -78,16 +82,12 @@ private:
 class DirectoryFactoryObservation
 {
 public:
-  explicit DirectoryFactoryObservation(bool noFileDirectoryDispatch)
+  DirectoryFactoryObservation()
     : m_observation(current)
   {
     if (!m_observation) return;
     if (++m_observation->factories > 65536)
       m_observation->Reject("multiimage_directory_observation_limit");
-    // The factory may call arbitrary binary add-on ContainsFiles handlers for
-    // a file extension BEFORE it selects a final directory implementation.
-    if (!noFileDirectoryDispatch)
-      m_observation->Reject("multiimage_file_directory_dispatch_unverified");
   }
   ~DirectoryFactoryObservation()
   {
@@ -97,8 +97,9 @@ public:
   DirectoryFactoryObservation(const DirectoryFactoryObservation&) = delete;
   DirectoryFactoryObservation& operator=(const DirectoryFactoryObservation&) = delete;
 
-  // Called only at the two audited concrete constructor return sites in the
-  // original native factory. No type-name string or caller claim is accepted.
+  // Called only at audited constructor returns, or after the instrumented
+  // FileDirectoryFactory. Opaque handlers reject BEFORE their first call,
+  // including handlers that return null and fall back to a local directory.
   template<class T> T* Reviewed(T* directory)
   {
     m_reviewed = directory != nullptr;

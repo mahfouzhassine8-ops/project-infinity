@@ -1,9 +1,8 @@
-"""Infinity-owned Save for Later navigation. Saved records are read-only inputs.
+"""Failure-only recovery for Infinity Save for Later.
 
-Provider URLs are hints about provider preference, never media identity. Only a
-fresh result from a reviewed installed API may supply a destination. Titles are
-queries, not matching evidence. No provider imports, profile writes or database
-migrations occur here. Continue Playing and Search keep their original paths.
+Successful original routes never import or invoke this module. Native Kodi
+results identify a failed attempt. Alternatives require explicit selection,
+typed saved identity and a reviewed installed API. Saved records stay read-only.
 """
 from __future__ import annotations
 
@@ -131,7 +130,7 @@ def available(media):
     ready, unsupported = [], []
     for row in response.get('result', {}).get('addons', []):
         aid = row.get('addonid', '')
-        if not re.fullmatch(r'plugin\.video\.[A-Za-z0-9._-]{1,160}', aid):
+        if not re.fullmatch(r'plugin\.[A-Za-z0-9._-]{1,170}', aid):
             continue
         try:
             addon = xbmcaddon.Addon(aid)
@@ -261,7 +260,10 @@ def resolve(entry, provider, home, progress):
     if len(targets) != 1:
         raise Unavailable('Provider returned multiple destinations for the saved identity. Nothing was opened.')
     target = next(iter(targets))
-    if wanted == 'movie':
+    if wanted in ('movie', 'tvshow'):
+        # The selected provider opens the returned item through Kodi's normal
+        # path. Native observation reports its actual result. Do not execute a
+        # successful show twice merely to predict that second invocation.
         return target
     # Verify the show directory actually opens. A failed invocation must never
     # become a silent selection or be called a successful navigation.
@@ -334,9 +336,59 @@ def resolve_with_choices(entry, ready, preferred, choose, attempt):
     raise Unavailable('No enabled provider has a verified navigation API for this saved entry.')
 
 
-def open_saved(handle, profile, key):
-    """Only the Save for Later action calls this. It never rewrites saved state."""
-    folder = True
+def direct_destination(entry, provider):
+    """Only reviewed ID-addressed show/season APIs; no title-based substitution."""
+    identity = hub.entry_identity(entry)
+    if not identity or identity['scope'] == 'episode':
+        return None
+    kind, ids = identity['kind'], identity['ids']
+    if kind not in ('tvshow', 'season') or not ids.get('tmdb'):
+        return None
+    # Recheck all raw source pins and enabled state immediately before use.
+    search.route(provider)
+    if provider['family'] == 'mode-list-v1':
+        params = dict(mode='build_season_list' if kind == 'tvshow' else 'build_episode_list',
+                      tmdb_id=ids['tmdb'])
+        if kind == 'season':
+            params['season'] = identity['season']
+    elif provider['family'] == 'action-list-v1' and kind == 'tvshow':
+        # The actual router calls Seasons.get with these identifiers, and its
+        # receiver fetches TMDb show seasons by tmdb ID. Title is display text.
+        params = dict(action='seasons', tmdb=ids['tmdb'], imdb=ids.get('imdb', ''),
+                      tvdb=ids.get('tvdb', ''),
+                      tvshowtitle=str(entry.get('showtitle') or entry.get('title') or ''),
+                      year=str(entry.get('year') or ''))
+    else:
+        return None
+    target = 'plugin://' + provider['id'] + '/?' + urlencode(params)
+    row = dict(type=kind, uniqueid=ids, file=target, filetype='directory',
+               season=identity.get('season'))
+    return destination(provider, row)
+
+
+def failure_ticket(home, key, token, original, identity):
+    raw = home.getProperty('Infinity.SavedNavigation.Failure')
+    if not raw or len(raw) > 8192:
+        raise Unavailable('No current failed navigation result is available. The saved entry was kept.')
+    value = json.loads(raw)
+    if (not isinstance(value, dict) or value.get('schema') != 1 or
+            value.get('key') != key or value.get('token') != token or
+            not re.fullmatch(r'[A-Fa-f0-9-]{32,36}', token) or
+            value.get('reason') not in ('provider_directory_failed', 'provider_resolution_failed') or
+            not isinstance(value.get('epoch_ms'), int) or
+            not 0 <= time.time()*1000-value['epoch_ms'] <= 300000 or
+            not original or value.get('original_sha256') != hashlib.sha256(original.encode()).hexdigest() or
+            value.get('folder') != (identity['kind'] in ('tvshow', 'season')) or
+            not isinstance(value.get('attempted'), list) or
+            not 1 <= len(value['attempted']) <= 8 or
+            any(not isinstance(p, str) or not re.fullmatch(r'[A-Za-z0-9._-]{1,180}', p)
+                for p in value['attempted'])):
+        raise Unavailable('The failed navigation no longer matches this saved entry. Nothing was changed.')
+    return value
+
+
+def recover_saved(profile, key, token, original_target):
+    """Invoked by an observed failed original route, never a successful click."""
     try:
         if xbmc.getSkinDir() != 'skin.infinity.diggz':
             raise Unavailable('Save for Later navigation is available only in Infinity.')
@@ -350,54 +402,51 @@ def open_saved(handle, profile, key):
         identity = hub.entry_identity(entry)
         if not identity:
             raise Unavailable('The saved media identity is not verified.')
-        folder = identity['kind'] in ('tvshow', 'season')
-        _trace('saved_navigation_click', saved_key=key, media_identity=identity)
-        ready, unsupported = available('movie' if identity['kind'] == 'movie' else 'tv')
-        # The route is used ONLY to retain the original provider preference.
-        try:
-            sources = data.get('sources', {})
-            preference = sources.get(key, {}) if isinstance(sources, dict) else {}
-            if not isinstance(preference, dict):preference = {}
-            try:failed = float(preference.get('failures') or 0) >= 2
-            except (TypeError, ValueError):failed = False
-            remembered = preference.get('route') if not failed else ''
-            if not isinstance(remembered, str):remembered = ''
-            preferred = urlsplit(remembered or entry.get('stable_source') or entry.get('source') or '').netloc
-        except ValueError:
-            preferred = ''
         home = xbmcgui.Window(10000)
-        if home.getProperty('Infinity.Search.Protocol') != '1':
-            search._leased_directory('plugin://' + CC + '/?action=search-probe', home)
-        if home.getProperty('Infinity.Search.Protocol') != '1':
-            raise Unavailable('The installed engine lacks the required bounded navigation protocol.')
+        original = original_target(entry, data.get('sources', {}))
+        failure = failure_ticket(home, key, token, original, identity)
+        _trace('saved_navigation_recovery', saved_key=key, media_identity=identity,
+               reason=failure['reason'])
+        ready, unsupported = available('movie' if identity['kind'] == 'movie' else 'tv')
+        ready = [p for p in ready if p['id'] not in failure['attempted']]
         def attempt(saved, provider):
+            target = direct_destination(saved, provider)
+            if target:
+                return target
+            if home.getProperty('Infinity.Search.Protocol') != '1':
+                search._leased_directory('plugin://' + CC + '/?action=search-probe', home)
+            if home.getProperty('Infinity.Search.Protocol') != '1':
+                raise Unavailable('The installed engine lacks the required bounded navigation protocol.')
             progress = xbmcgui.DialogProgress()
             progress.create('Save for Later', 'Verifying saved identity with ' + provider['name'])
             try:
                 return resolve(saved, provider, home, progress)
             finally:
                 progress.close()
-        provider, target = resolve_with_choices(entry, ready, preferred,
-            lambda reason, options: xbmcgui.Dialog().select(reason, [p['name'] for p in options]), attempt)
+        provider, target = resolve_with_choices(entry, ready, '',
+            lambda reason, options: xbmcgui.Dialog().select(
+                'The saved destination failed — open with', [p['name'] for p in options]), attempt)
+        # A newer user click, Close, or saved-record change invalidates this
+        # recovery. Never let an older dialog navigate a different selection.
+        current = hub.load_view(profile)
+        current_entry = next((e for e in hub.entries(current, 'all', 'later') if e['key'] == key), None)
+        if (xbmc.Monitor().abortRequested() or not current_entry or
+                hub.entry_identity(current_entry) != identity or
+                original_target(current_entry, current.get('sources', {})) != original):
+            raise Cancelled('Navigation changed; the saved entry was kept.')
+        failure_ticket(home, key, token, original, identity)
+        search.route(provider)  # Provider updates invalidate the checked raw pins.
         _trace('saved_navigation_handoff', saved_key=key, provider=provider['id'],
                          destination_sha256=hashlib.sha256(target.encode()).hexdigest(),
                          media_identity=identity)
-        if folder:
-            xbmcplugin.endOfDirectory(handle, succeeded=False, cacheToDisc=False)
+        home.setProperty('Infinity.SavedNavigation.Next', json.dumps(dict(token=token, path=target)))
+        if identity['kind'] in ('tvshow', 'season'):
             xbmc.executebuiltin('Container.Update("' + target.replace('"', '%22') + '")')
         else:
-            xbmcplugin.setResolvedUrl(handle, True, xbmcgui.ListItem(path=target))
+            xbmc.executebuiltin('PlayMedia("' + target.replace('"', '%22') + '")')
     except Cancelled:
         _trace('saved_navigation_cancelled', saved_key=str(key)[:64])
-        if folder:
-            xbmcplugin.endOfDirectory(handle, succeeded=False, cacheToDisc=False)
-        else:
-            xbmcplugin.setResolvedUrl(handle, False, xbmcgui.ListItem())
     except (Unavailable, OSError, ValueError, RuntimeError, TypeError, KeyError,
             AttributeError, SyntaxError, ET.ParseError) as error:
         _trace('saved_navigation_failed', saved_key=str(key)[:64], error_type=type(error).__name__)
         xbmcgui.Dialog().ok('Infinity Save for Later', str(error))
-        if folder:
-            xbmcplugin.endOfDirectory(handle, succeeded=False, cacheToDisc=False)
-        else:
-            xbmcplugin.setResolvedUrl(handle, False, xbmcgui.ListItem())

@@ -8,9 +8,9 @@ import shutil
 
 HERE=Path(__file__).resolve().parent
 PLUGIN_SHA='47ce816e00ca30d8eb77ea4d6e034bdbd40b2a5d6c51bfd4eda8d6c75545edb8'
-VERSIONS={'script.infinity.commandcenter':('0.3.5.29','0.3.5.30'),
-          'script.infinity.watchedbridge':('1.0.10','1.0.11'),
-          'script.infinity.uirepair':('0.1.12','0.1.13')}
+VERSIONS={'script.infinity.commandcenter':('0.3.5.29','0.3.5.31'),
+          'script.infinity.watchedbridge':('1.0.10','1.0.12'),
+          'script.infinity.uirepair':('0.1.12','0.1.14')}
 
 
 def once(source,before,after):
@@ -21,13 +21,10 @@ def once(source,before,after):
 def plugin(raw):
     if hashlib.sha256(raw).hexdigest()!=PLUGIN_SHA:raise RuntimeError('Exact RC8 plugin required')
     value=raw.decode()
-    value=once(value,"    target = _target(entry, data.get('sources', {}), render)\n",
-        "    target = (_url(action='open-later', key=key) if bucket == 'later' else\n"
-        "              _target(entry, data.get('sources', {}), render))\n")
     value=once(value,"    if action == 'play-saved':\n",
-        "    if action == 'open-later':\n"
-        "        from saved_navigation import open_saved\n"
-        "        open_saved(HANDLE, PROFILE, PARAMS.get('key', '')); return\n"
+        "    if action == 'saved-fallback':\n"
+        "        from saved_navigation import recover_saved\n"
+        "        recover_saved(PROFILE, PARAMS.get('key', ''), PARAMS.get('token', ''), _target); return\n"
         "    if action == 'play-saved':\n")
     return value.encode()
 
@@ -43,9 +40,9 @@ def stage(source,output,contracts):
         changed[addon+'/addon.xml']=once((source/addon/'addon.xml').read_bytes(),
             ('version="'+old+'"').encode(),('version="'+new+'"').encode())
     changed['script.infinity.commandcenter/checkpoint_runtime.py']=once((cc/'checkpoint_runtime.py').read_bytes(),
-        b'ADDON_VERSION = "0.3.5.29"',b'ADDON_VERSION = "0.3.5.30"')
+        b'ADDON_VERSION = "0.3.5.29"',b'ADDON_VERSION = "0.3.5.31"')
     changed['script.infinity.watchedbridge/controller.py']=once(
-        (source/'script.infinity.watchedbridge/controller.py').read_bytes(),b'"0.3.5.29"',b'"0.3.5.30"')
+        (source/'script.infinity.watchedbridge/controller.py').read_bytes(),b'"0.3.5.29"',b'"0.3.5.31"')
     trakt=(cc/'infinity_trakt.py').read_bytes()
     assignment=next(n for n in ast.parse(trakt).body if isinstance(n,ast.Assign) and
         any(isinstance(t,ast.Name) and t.id=='BRIDGE_PINS' for t in n.targets))
@@ -75,7 +72,7 @@ def stage(source,output,contracts):
         ledger[name]=dict(original_sha256=hashlib.sha256(old.read_bytes()).hexdigest() if old.exists() else None,
                           final_sha256=hashlib.sha256(data).hexdigest(),
                           defect='Universal Save for Later verified navigation',
-                          justification='Later-only identity-keyed action, reviewed installed API contracts, exact dependent source bindings')
+                          justification='Original targets and list items restored verbatim; failure-only recovery action and exact dependent source bindings')
     return ledger
 
 

@@ -16,6 +16,7 @@ from zipfile import ZipFile,ZIP_DEFLATED
 
 import component_contract
 import native_contract
+import navigation_native
 import owner_binding
 import provider_contracts
 
@@ -93,11 +94,12 @@ def prepare(parent,modes):
     component_delta=component_contract.stage(base,components,contracts)
     overlay=ROOT/'targeted-native-overlay'
     delta=native_contract.apply(native,overlay)
+    delta.update(navigation_native.apply(native,overlay))
     delta.update(owner_binding.bind(native,base,components,overlay))
     for n,v in delta.items():
         path=native/n;path.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(overlay/n,path)
     final=dict(expected,**{n:v['final_sha256'] for n,v in delta.items()})
-    if len(final)!=9405 or len(delta)!=6:raise RuntimeError('Native delta exceeded its reviewed scope')
+    if len(final)!=9407 or len(delta)!=13:raise RuntimeError('Native delta exceeded its reviewed scope')
     save(OUT/'BASE-NATIVE-SOURCE-MAP.json',expected);save(OUT/'NATIVE-SOURCE-MAP.json',final)
     save(OUT/'SOURCE-DELTA.json',dict(native=delta,components=component_delta,
          original_links=links,parent_apk_sha256=PARENT,source_commit=os.environ.get('GITHUB_SHA'),
@@ -112,7 +114,7 @@ def compile_engine():
     old.OUT=OUT
     proof=old.compile_engine()
     data=(OUT/'libkodi.so').read_bytes()
-    for marker in (b'multiimage-enumeration',b'multiimage_directory_backend_unverified',b'multiimage_operation_did_not_reach_verified_boundary',b'0.3.5.30'):
+    for marker in (b'multiimage-enumeration',b'multiimage_directory_backend_unverified',b'multiimage_operation_did_not_reach_verified_boundary',b'0.3.5.31',b'INFINITY_SAVED_ROUTE_FAILED'):
         if marker not in data:raise RuntimeError('Compiled correction missing: '+repr(marker))
     pins=json.loads((ROOT/'targeted-component-overlay/script.infinity.uirepair/CONTROLLER-PREIMAGES.json').read_text())
     if not all(pin.encode() in data for pin in pins.values()):raise RuntimeError('Compiled exact controller source pins absent')
@@ -143,7 +145,8 @@ def package(parent,dex,out):
     parent_signature=delivery.verify_signature(apk,tools);_,_,signer=delivery.adapters()
     proof=json.loads((OUT/'ENGINE-PROOF.json').read_text())
     dexproof=json.loads((dex/'DEX-PRESERVATION.json').read_text())
-    for report in ('HOST-NAVIGATION.json','HOST-NATIVE-CANDIDATE.json','HOST-NATIVE-BASELINE.json','RETAINED-PERSISTENCE.json'):
+    for report in ('HOST-NAVIGATION.json','HOST-NATIVE-CANDIDATE.json','HOST-NATIVE-BASELINE.json','RETAINED-PERSISTENCE.json',
+                   'HOST-NAVIGATION-NATIVE.json','HOST-FILE-DISPATCH.json','HOST-ARCHIVE-READERS.json'):
         if not json.loads((OUT/report).read_text())['passed']:raise RuntimeError('Required host gate failed: '+report)
     if not dexproof['passed'] or not proof['complete_native_engine_compiled']:raise RuntimeError('Build proofs did not pass')
     engine=(OUT/'libkodi.so').read_bytes();finaldex=(dex/'classes.dex').read_bytes()
@@ -194,7 +197,7 @@ def package(parent,dex,out):
         native_abi=abi,version_code=2103401,manifest_unchanged=True,
         permanent_certificate_sha256=delivery.CERT,signature_schemes_verified=[1,2,3],
         matching_component_versions={k:v[1] for k,v in component_contract.VERSIONS.items()},
-        native_source_count=9405,original_native_files_changed=5,new_native_files=1,
+        native_source_count=9407,original_native_files_changed=10,new_native_files=3,
         cobra_definitions_changed=[],provider_code_changed=False,user_profile_changed=False,
         rc8_receipt_and_universal_observer_sources_unchanged=True,
         actual_android_verified=False,physical_fold_verified=False,final_lock=False,
@@ -204,9 +207,11 @@ def package(parent,dex,out):
         for record in delta[group].values():
             record['test_result']='PASS: focused host gates, retained persistence and compiled source binding; actual Android/Fold acceptance pending'
     save(out/'SOURCE-DELTA.json',delta)
-    for n in ('NATIVE-SOURCE-MAP.json','ENGINE-PROOF.json','HOST-NAVIGATION.json','HOST-NATIVE-CANDIDATE.json','HOST-NATIVE-BASELINE.json','RETAINED-PERSISTENCE.json'):
+    for n in ('NATIVE-SOURCE-MAP.json','ENGINE-PROOF.json','HOST-NAVIGATION.json','HOST-NATIVE-CANDIDATE.json','HOST-NATIVE-BASELINE.json','RETAINED-PERSISTENCE.json',
+              'HOST-NAVIGATION-NATIVE.json','HOST-FILE-DISPATCH.json','HOST-ARCHIVE-READERS.json'):
         shutil.copyfile(OUT/n,out/n)
     shutil.copyfile(HERE/'qualification/CACHE-EVIDENCE.json',out/'CACHE-EVIDENCE.json')
+    shutil.copyfile(HERE/'qualification/CACHE-SCHEMA-EVIDENCE.json',out/'CACHE-SCHEMA-EVIDENCE.json')
     shutil.copyfile(dex/'DEX-PRESERVATION.json',out/'DEX-PRESERVATION.json')
     (out/'PARENT-SIGNATURE.txt').write_text(parent_signature);(out/'FINAL-SIGNATURE.txt').write_text(signature)
     (out/'APK-BADGING.txt').write_text(badging)

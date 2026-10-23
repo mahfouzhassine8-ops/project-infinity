@@ -1,0 +1,88 @@
+{
+  "actual_class_methods_executed": true,
+  "captured_column_order": {
+    "maincache": [
+      "id",
+      "data",
+      "expires"
+    ],
+    "metadata": [
+      "db_type",
+      "tmdb_id",
+      "imdb_id",
+      "tvdb_id",
+      "meta",
+      "expires"
+    ],
+    "season_metadata": [
+      "tmdb_id",
+      "meta",
+      "expires"
+    ]
+  },
+  "collected_reader_writer_sha256": "0cbb93769c9867a61d0faf31140510c19f3f8bbe6c1c0f312bd7cfd9e862de46",
+  "conclusion": "The recorded column order is incompatible with current positional inserts. Unchanged POV methods on that order write JSON into expires and reproduce the exact second-read TypeError. Original Fold row values were not collected.",
+  "expected_positional_insert_order": {
+    "maincache": [
+      "id",
+      "expires",
+      "data"
+    ],
+    "metadata": [
+      "db_type",
+      "tmdb_id",
+      "imdb_id",
+      "tvdb_id",
+      "expires",
+      "meta"
+    ],
+    "season_metadata": [
+      "tmdb_id",
+      "expires",
+      "meta"
+    ]
+  },
+  "passed": true,
+  "physical_bad_row_producer_proven": false,
+  "physical_exact_bad_row_exported": false,
+  "physical_schema_order_mismatch_verified": true,
+  "provider_source_modified": false,
+  "published_base_sha256": "f3448d8392d0d587c561d2d3444e6c97474b77c3d30a915a0da247e8d4364c2b",
+  "results": [
+    {
+      "cases": [
+        {
+          "expiry_storage_type": "integer",
+          "first_read_type": "dict",
+          "second_read": "valid dictionary and integer expiry",
+          "table": "metadata"
+        },
+        {
+          "expiry_storage_type": "integer",
+          "first_read_type": "dict",
+          "second_read": "valid dictionary and integer expiry",
+          "table": "maincache"
+        }
+      ],
+      "schema": "current_source_order"
+    },
+    {
+      "cases": [
+        {
+          "expiry_storage_type": "text",
+          "first_read_type": "int",
+          "second_read": "'<' not supported between instances of 'str' and 'int'",
+          "table": "metadata"
+        },
+        {
+          "expiry_storage_type": "text",
+          "first_read_type": "int",
+          "second_read": "'<' not supported between instances of 'str' and 'int'",
+          "table": "maincache"
+        }
+      ],
+      "schema": "captured_fold_order"
+    }
+  ],
+  "user_databases_opened": false
+}

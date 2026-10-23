@@ -1,4 +1,4 @@
-"""Add CC30's exact installed-code verifier; preserve all other DEX definitions."""
+"""Add CC31's exact installed-code verifier; preserve all other DEX definitions."""
 import argparse
 import difflib
 import hashlib
@@ -16,7 +16,7 @@ DEX='8b3f0cf83cf05e99f0b6d7e141d543af0d5f096e2406e73751ea4cfbff774d7c'
 TARGET='com/projectinfinity/kodi/InfinityInstalledCheckpointInstaller.smali'
 CLASS='L'+TARGET[:-6]+';'
 APPLY='applyBeforeNative(Landroid/content/Context;)Z'
-HELPER='verifyReviewedController30(Ljava/io/File;)Z'
+HELPER='verify(Ljava/io/File;)Z'
 
 
 def sha(raw):return hashlib.sha256(raw).hexdigest()
@@ -56,12 +56,16 @@ def prepare(apk,stage,jars,android,d8,out):
     cp,before=inspect(apk,jars,out)
     pins=json.loads((stage/'script.infinity.uirepair/CONTROLLER-PREIMAGES.json').read_text())
     if len(pins)!=19:raise RuntimeError('All nineteen controller source pins required')
-    pairs=',\n'.join('      {"'+n+'","'+h+'"}' for n,h in sorted(pins.items()))
+    # Keep the original DEX string pool exactly unchanged. Adding hash strings
+    # previously shifted a protected Cobra string past the 16-bit boundary and
+    # widened its instruction. Character payloads avoid that encoded change.
+    chars=lambda s:'new String(new char[]{'+','.join(str(ord(c)) for c in s)+'})'
+    pairs=',\n'.join('      {'+chars(n)+','+chars(h)+'}' for n,h in sorted(pins.items()))
     java='''package com.projectinfinity.kodi;
 import java.io.*;
 import java.security.MessageDigest;
 final class InfinityInstalledCheckpointInstaller {
-  private static boolean verifyReviewedController30(File addons) throws Exception {
+  private static boolean verify(File addons) throws Exception {
     File root = new File(addons,"script.infinity.commandcenter").getAbsoluteFile();
     if (!root.equals(root.getCanonicalFile()) || !root.isDirectory()) return false;
     String[][] pins = {
@@ -98,18 +102,20 @@ final class InfinityInstalledCheckpointInstaller {
     if set(compiled)!={'<init>()V',HELPER}:raise RuntimeError('Unexpected compiled verifier methods')
     original=before[TARGET];old=methods(original)
     if HELPER in old or 'verifyReviewedController29(Ljava/io/File;)Z' not in old:
-        raise RuntimeError('Original CC29 verifier absent or CC30 already present')
+        raise RuntimeError('Original CC29 verifier absent or CC31 already present')
     block=old[APPLY]
     anchor='    const-string v6, "3e2e182758a890d1ad98992a8cb11ea704c54eaab41b940dde03ab6bd68fa39c"\n'
-    pin=sha((stage/'script.infinity.commandcenter/addon.xml').read_bytes())
-    selector=('    const-string v6, "'+pin+'"\n'
-        '    invoke-virtual {v6, v2}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z\n'
-        '    move-result v6\n    if-nez v6, :infinity_cc30_route\n\n')
-    tail=('    :infinity_cc30_route\n    const-string v2, "0.3.5.30"\n'
-        '    :infinity_cc30_try_start\n    invoke-static {v5}, '+CLASS+'->'+HELPER+'\n'
-        '    move-result v6\n    :infinity_cc30_try_end\n'
-        '    .catch Ljava/lang/Exception; {:infinity_cc30_try_start .. :infinity_cc30_try_end} :catch_1\n'
-        '    goto/16 :goto_1\n')
+    selector=('    invoke-static {v5}, '+CLASS+'->'+HELPER+'\n'
+        '    move-result v6\n    if-nez v6, :infinity_cc31_route\n\n')
+    tail=('    :infinity_cc31_route\n'
+        '    const/16 v2, 0x8\n    new-array v2, v2, [C\n'
+        '    fill-array-data v2, :infinity_cc31_version\n'
+        '    new-instance v7, Ljava/lang/String;\n'
+        '    invoke-direct {v7, v2}, Ljava/lang/String;-><init>([C)V\n'
+        '    move-object v2, v7\n    goto/16 :goto_1\n'
+        '    :infinity_cc31_version\n    .array-data 2\n'+
+        ''.join('        0x'+format(ord(c),'x')+'s\n' for c in '0.3.5.31')+
+        '    .end array-data\n')
     updated=once(once(block,anchor,selector+anchor),'.end method',tail+'.end method')
     if updated.replace(selector,'',1).replace(tail,'',1)!=block:raise RuntimeError('Original installer route changed')
     merged=once(original,block,updated)+'\n'+compiled[HELPER]+'\n'
@@ -144,8 +150,10 @@ final class InfinityInstalledCheckpointInstaller {
     after=raw(verified)
     spec=importlib.util.spec_from_file_location('unchanged_bytecode_guard',ROOT/'repairs/cobra-clean-restart/bytecode_guard.py')
     guard=importlib.util.module_from_spec(spec);spec.loader.exec_module(guard);guard.selftest();norm=guard.normalize
-    if set(after)!=set(before) or [n for n in before if norm(before[n])!=norm(after[n])]!=[TARGET]:
-        raise RuntimeError('Unexpected DEX definition difference')
+    if set(after)!=set(before) or [n for n in before if before[n]!=after[n]]!=[TARGET]:
+        raise RuntimeError('Protected DEX encoding or definition changed; opcode normalization is forbidden')
+    if dex_strings(final.read_bytes())!=dex_strings((out/'original.dex').read_bytes()):
+        raise RuntimeError('Original DEX string inventory or indices changed')
     checked=methods(after[TARGET])
     if set(checked)!=set(old)|{HELPER}:raise RuntimeError('Unexpected installer method inventory')
     for name,body in old.items():
@@ -156,10 +164,24 @@ final class InfinityInstalledCheckpointInstaller {
         changed_classes=[TARGET],added_classes=[],added_methods=[HELPER],
         original_installer_routes_preserved=True,all_other_original_definitions_preserved=True,
         protected_class_count=len(before)-1,exact_original_field_definitions_preserved=True,
+        protected_disassembly_byte_identical=True,original_string_pool_identical=True,
+        protected_opcode_widening_permitted=False,
         cobra_definitions_changed=[],search_definitions_changed=[],rc8_receipt_and_close_definitions_changed=[],
         adapter_packaged=False,physical_fold_verified=False,actual_android_verified=False)
     save(out/'DEX-PRESERVATION.json',report)
     return report
+
+
+def dex_strings(raw):
+    import struct
+    size,offset=struct.unpack_from('<II',raw,56)
+    values=[]
+    for i in range(size):
+        at=struct.unpack_from('<I',raw,offset+4*i)[0]
+        while raw[at]&128:at+=1
+        at+=1
+        values.append(raw[at:raw.index(b'\0',at)])
+    return values
 
 
 if __name__=='__main__':

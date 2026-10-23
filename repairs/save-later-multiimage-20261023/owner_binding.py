@@ -1,4 +1,4 @@
-"""Add only exact CC30 source admission; retain every older owner contract."""
+"""Add only exact CC31 source admission; retain every older owner contract."""
 import hashlib
 import json
 from pathlib import Path
@@ -33,10 +33,10 @@ def bind(source,assets,stage,overlay):
         block='    {"'+m[1]+'", "'+CC+'", "'+m[2]+'", {\n'
         block+=''.join('      {"'+CC+'/'+n+'", "'+h+'"},\n' for n,h in sorted(pins.items()))
         additions.append(block+'    }},')
-    addition='    // INFINITY_2103401_SAVED_NAVIGATION_CC30_EXACT_SOURCES\n'+'\n'.join(additions)+'\n'
+    addition='    // INFINITY_2103401_SAVED_NAVIGATION_CC31_EXACT_SOURCES\n'+'\n'.join(additions)+'\n'
     after={CONTRACT:once(text,'  };\n  return *contracts;',addition+'  };\n  return *contracts;').encode(),
            COORDINATOR:once(before[COORDINATOR],b'active["addon_version"].asString() != "0.3.5.29"',
-               b'active["addon_version"].asString() != "0.3.5.29" && active["addon_version"].asString() != "0.3.5.30"')}
+               b'active["addon_version"].asString() != "0.3.5.29" && active["addon_version"].asString() != "0.3.5.31"')}
     if after[CONTRACT].decode().replace(addition,'',1)!=text:raise RuntimeError('Older source contracts changed')
     for n,b in after.items():
         path=overlay/n
@@ -44,4 +44,4 @@ def bind(source,assets,stage,overlay):
         path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(b)
     return {n:dict(original_sha256=BEFORE[n],final_sha256=hashlib.sha256(b).hexdigest(),
         defect='Universal Save for Later deployment ownership',
-        justification='Add exact nineteen-file CC30 owner contract and matching version; all prior contracts and barriers retained') for n,b in after.items()}
+        justification='Add exact nineteen-file CC31 owner contract and matching version; all prior contracts and barriers retained') for n,b in after.items()}

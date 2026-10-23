@@ -1,7 +1,7 @@
 name: Infinity saved navigation and multi-image corrective gates
 on:
   push:
-    branches: [work/infinity-save-later-multiimage-20261023]
+    branches: [work/infinity-saved-route-correction-20261023]
     paths:
       - repairs/save-later-multiimage-20261023/**
       - .github/workflows/infinity-saved-navigation-multiimage.yml
@@ -94,6 +94,10 @@ jobs:
           python3 repairs/save-later-multiimage-20261023/test_navigation.py --providers verified-navigation-providers --assets targeted-component-base --out checkpoint-targeted/HOST-NAVIGATION.json 2>&1 | tee checkpoint-targeted/HOST-NAVIGATION.log
           python3 repairs/save-later-multiimage-20261023/test_native.py --source baseline-native --overlay targeted-native-overlay --out checkpoint-targeted/HOST-NATIVE-CANDIDATE.json 2>&1 | tee checkpoint-targeted/HOST-NATIVE-CANDIDATE.log
           python3 repairs/save-later-multiimage-20261023/test_native.py --source baseline-native --overlay targeted-native-overlay --baseline --out checkpoint-targeted/HOST-NATIVE-BASELINE.json 2>&1 | tee checkpoint-targeted/HOST-NATIVE-BASELINE.log
+          python3 repairs/save-later-multiimage-20261023/test_navigation_native.py --source baseline-native --overlay targeted-native-overlay --out checkpoint-targeted/HOST-NAVIGATION-NATIVE.json 2>&1 | tee checkpoint-targeted/HOST-NAVIGATION-NATIVE.log
+          python3 repairs/save-later-multiimage-20261023/test_file_dispatch.py --source baseline-native --overlay targeted-native-overlay --out checkpoint-targeted/HOST-FILE-DISPATCH.json 2>&1 | tee checkpoint-targeted/HOST-FILE-DISPATCH.log
+          python3 repairs/save-later-multiimage-20261023/host_archive_dependencies.py --tarballs "$TARBALLS" --out checkpoint-targeted/archive-readers
+          python3 repairs/save-later-multiimage-20261023/test_archive_readers.py --source baseline-native --libzip-source checkpoint-targeted/archive-readers/libzip-1.8.0 --libzip-build checkpoint-targeted/archive-readers/build --out checkpoint-targeted/HOST-ARCHIVE-READERS.json 2>&1 | tee checkpoint-targeted/HOST-ARCHIVE-READERS.log
           PREFIX=$(python3 -c 'import sys;print(sys.prefix)')
           python3 repairs/universal-persistence-2103401/regressions.py --source baseline-native --overlay targeted-native-overlay --python-prefix "$PREFIX" --out checkpoint-targeted/RETAINED-PERSISTENCE.json 2>&1 | tee checkpoint-targeted/RETAINED-PERSISTENCE.log
           git diff --exit-code

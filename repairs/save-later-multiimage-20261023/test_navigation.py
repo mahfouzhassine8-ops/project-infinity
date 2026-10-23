@@ -138,8 +138,8 @@ class Navigation(unittest.TestCase):
 
     def test_07_empty_and_failed_destinations_are_visible_errors(self):
         p=self.provider()
-        with self.assertRaisesRegex(self.nav.Unavailable,'no verified seasons'):
-            self.resolve(self.entry(),p,[[self.row(p)],[]])
+        with self.assertRaisesRegex(self.nav.Unavailable,'no result'):
+            self.resolve(self.entry(),p,[[]])
         with patch.object(self.search,'_leased_directory',lambda *a:('failed',{'error':{}})):
             with self.assertRaisesRegex(self.nav.Unavailable,'did not complete'):
                 self.nav._directory('route',p,'title',None,Progress())
@@ -184,10 +184,12 @@ class Navigation(unittest.TestCase):
         old,new=ast.parse(before),ast.parse(after)
         functions=lambda tree:{n.name:ast.dump(n) for n in tree.body if isinstance(n,ast.FunctionDef)}
         old,new=functions(old),functions(new)
-        self.assertEqual({n for n in old if old[n]!=new[n]},{'_list_item','main'})
+        self.assertEqual({n for n in old if old[n]!=new[n]},{'main'})
         self.assertEqual(old['_target'],new['_target'])
         self.assertEqual(old['play_saved'],new['play_saved'])
-        self.assertNotIn(b'open-later',before);self.assertIn(b"if bucket == 'later' else",after)
+        self.assertNotIn(b'open-later',after)
+        self.assertIn(b"if action == 'saved-fallback':",after)
+        self.assertEqual(old['_list_item'],new['_list_item'])
 
     def test_12_actual_profile_readonly_original_identity_and_control(self):
         if self.data is None:self.skipTest('No physical profile supplied')
@@ -203,8 +205,8 @@ class Navigation(unittest.TestCase):
             self.assertEqual(target,self.row(p,ids=ids)['file'])
         self.assertEqual(self.data,snapshot)
         self.assertEqual(hashlib.sha256(CONFIG.profile.read_bytes()).hexdigest(),before)
-        self.assertEqual(len(self.data['items']),3)
-        self.assertEqual(len(self.data['watchlist']),3)
+        self.assertEqual(self.data['items'],snapshot['items'])
+        self.assertEqual(self.data['watchlist'],snapshot['watchlist'])
 
     def test_13_failed_provider_offers_explicit_verified_alternative(self):
         for kind in ('movie','tvshow'):
@@ -246,6 +248,33 @@ class Navigation(unittest.TestCase):
         with self.assertRaises(self.nav.Cancelled):
             self.nav.resolve_with_choices(self.entry(),providers,providers[0]['id'],
                 lambda *a:self.fail('Do not offer new work after cancellation'),attempt)
+
+
+    def test_17_direct_identity_contracts_do_not_query_by_title(self):
+        for i in (0,1):
+            for tmdb,title in (('330430','Love After Lockup: Relationship Rehab'),('1396','Breaking Bad')):
+                p=self.provider(i);e=self.entry();e['title']=title
+                e['identity']=self.hub.show_identity('tvshow',{'tmdb':tmdb})
+                with patch.object(self.nav,'_directory',side_effect=AssertionError('No preliminary invocation')):
+                    target=self.nav.direct_destination(e,p)
+                self.assertIn(tmdb,target)
+                self.assertIn('mode=build_season_list' if i==0 else 'action=seasons',target)
+
+    def test_18_recovery_requires_current_matching_failure(self):
+        import time
+        key='a'*64;token='1'*32;original='plugin://plugin.video.pov/?mode=build_episode_list&season=all&tmdb_id=330430'
+        identity=self.hub.show_identity('tvshow',{'tmdb':'330430'})
+        value=dict(schema=1,token=token,key=key,reason='provider_directory_failed',
+            epoch_ms=int(time.time()*1000),original_sha256=hashlib.sha256(original.encode()).hexdigest(),
+            folder=True,attempted=['plugin.video.pov'])
+        home=types.SimpleNamespace(getProperty=lambda _:json.dumps(value))
+        self.assertEqual(self.nav.failure_ticket(home,key,token,original,identity),value)
+        for field,bad in [('key','b'*64),('token','2'*32),('reason','completed'),
+                          ('epoch_ms',0),('original_sha256','0'*64),('folder',False),('attempted',[])]:
+            prior=value[field];value[field]=bad
+            with self.subTest(field=field),self.assertRaises(self.nav.Unavailable):
+                self.nav.failure_ticket(home,key,token,original,identity)
+            value[field]=prior
 
 
 if __name__=='__main__':
