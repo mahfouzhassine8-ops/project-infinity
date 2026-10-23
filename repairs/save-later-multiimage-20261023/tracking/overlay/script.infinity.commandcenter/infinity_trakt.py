@@ -42,7 +42,7 @@ def _verified_component(addon, aid, version):
 
 def _bridge():
     addon=xbmcaddon.Addon('script.infinity.watchedbridge')
-    root=_verified_component(addon,'script.infinity.watchedbridge','1.0.12')
+    root=_verified_component(addon,'script.infinity.watchedbridge','1.0.13')
     if not BRIDGE_PINS:raise RuntimeError('The release tracking contract is missing.')
     for name,pin in BRIDGE_PINS.items():
         path=root/name
@@ -62,7 +62,7 @@ def _bridge():
         if Path(getattr(sys.modules.get(name),'__file__','')).resolve()!=root/(name+'.py'):
             raise RuntimeError('The effective tracking module path is not the verified component.')
     cc=xbmcaddon.Addon('script.infinity.commandcenter')
-    ccroot=_verified_component(cc,'script.infinity.commandcenter','0.3.5.31')
+    ccroot=_verified_component(cc,'script.infinity.commandcenter','0.3.5.32')
     if Path(__file__).resolve()!=ccroot/'infinity_trakt.py' or Path(hub.__file__).resolve()!=ccroot/'resume_hub.py':
         raise RuntimeError('A conflicting Infinity controller is loaded. No saved data was changed.')
     previous=list(sys.path)
@@ -165,7 +165,7 @@ def apply_local(profile, snapshot, action):
             # records or synchronize a provider/library database from them.
             if action=='mark-watched':data,result=hub.mark_watched_data(data,key,entry);changed=result is not None
             elif action=='mark-unwatched':data,result=hub.mark_unwatched_data(data,key);changed=result is not None
-        if changed:hub.save(profile,data,hub.publish_home)
+        if changed:hub.save(profile,data,hub.publish_home,retain_records=True)
     return bool(changed)
 
 
