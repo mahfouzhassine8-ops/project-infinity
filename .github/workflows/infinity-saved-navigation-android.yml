@@ -1,4 +1,4 @@
-name: Infinity saved routes - actual Android17 verification
+name: Infinity saved routes - Android17 close diagnostic
 on:
   push:
     branches: [work/infinity-saved-route-android-20261023]
@@ -36,6 +36,7 @@ jobs:
       CANDIDATE_BUILD: '39994772688'
       CANDIDATE_COMMIT: '3d3730c490220a1169e9dea280832c42da4971e8'
       PYTHONDONTWRITEBYTECODE: '1'
+      INFINITY_DIAGNOSTIC_CLOSE_TRACE: ${{ matrix.mode == 'safe' && '1' || '0' }}
     steps:
       - uses: actions/checkout@v4
         with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
@@ -46,7 +47,7 @@ jobs:
           python3 - <<'PY'
           import os,json,subprocess
           prefix='repairs/save-later-multiimage-20261023/'
-          allowed={prefix+n for n in ('android_probe.py','android_runtime_checks.py','android_inputs.py','android_binding.py','NavigationBindingProbe.java','ANDROID-INPUT-PINS.json','ANDROID-FAVORITES-REFERENCE.json')}
+          allowed={prefix+n for n in ('android_probe.py','android_runtime_checks.py','android_inputs.py','android_binding.py','android_close_trace.py','NavigationBindingProbe.java','ANDROID-INPUT-PINS.json','ANDROID-FAVORITES-REFERENCE.json')}
           allowed.add('.github/workflows/infinity-saved-navigation-android.yml')
           paths=subprocess.check_output(['git','diff','--name-only',os.environ['CANDIDATE_COMMIT'],'HEAD'],text=True).splitlines()
           assert set(paths)<=allowed,paths

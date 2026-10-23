@@ -3,6 +3,7 @@ import argparse
 import difflib
 import hashlib
 import json
+import os
 from pathlib import Path
 import shutil
 import sys
@@ -48,6 +49,15 @@ def extra(stage,args,report):
     if sha(service.encode())!=require_hash:raise RuntimeError('Retained service changed')
     service=once(service,"versioncheck=xbmcaddon.Addon('service.xbmc.versioncheck')",
         "import android_runtime_checks\nandroid_runtime_checks.run(root,cycle,mode)\nversioncheck=xbmcaddon.Addon('service.xbmc.versioncheck')")
+    if os.environ.get('INFINITY_DIAGNOSTIC_CLOSE_TRACE')=='1':
+        if args.mode!='safe':raise RuntimeError('Close diagnostics are limited to the remaining safe case')
+        shutil.copyfile(HERE/'android_close_trace.py',fixture/'android_close_trace.py')
+        service='import android_close_trace\nandroid_close_trace.start()\n'+service
+        service=once(service,'import android_runtime_checks\n',
+            'android_close_trace.finish()\nimport android_runtime_checks\n')
+        report['close_trace_diagnostic_only']=True
+        report['close_trace_timing_may_be_perturbed']=True
+        report['close_trace_fixture_sha256']=sha((fixture/'android_close_trace.py').read_bytes())
     (fixture/'service.py').write_text(service)
     xml=fixture/'resources/skins/Default/1080i/multiimage-probe.xml';xml.parent.mkdir(parents=True)
     imagepath=('resource://resource.images.weathericons.default/' if args.mode=='native-opaque' else
