@@ -140,7 +140,7 @@ class Navigation(unittest.TestCase):
         p=self.provider()
         with self.assertRaisesRegex(self.nav.Unavailable,'no result'):
             self.resolve(self.entry(),p,[[]])
-        with patch.object(self.search,'_leased_directory',lambda *a:('failed',{'error':{}})):
+        with patch.object(self.nav,'_lookup_directory',lambda *a:('failed',{'error':{}})):
             with self.assertRaisesRegex(self.nav.Unavailable,'did not complete'):
                 self.nav._directory('route',p,'title',None,Progress())
 
@@ -275,6 +275,56 @@ class Navigation(unittest.TestCase):
             with self.subTest(field=field),self.assertRaises(self.nav.Unavailable):
                 self.nav.failure_ticket(home,key,token,original,identity)
             value[field]=prior
+
+    def test_19_saved_lookup_protocol_cleanup_and_real_worker(self):
+        import threading
+        class Home:
+            def __init__(self):
+                self.values={'Infinity.SavedNavigation.Lookup.Protocol':'1'}
+            def getProperty(self,key):return self.values.get(key,'')
+            def setProperty(self,key,value):self.values[key]=value
+            def clearProperty(self,key):self.values.pop(key,None)
+        for outcome in ('completed','failed','cancelled','exception'):
+            with self.subTest(outcome=outcome):
+                home=Home();cancel=threading.Event();calls=[]
+                class CancelProgress:
+                    count=0
+                    def iscanceled(inner):
+                        inner.count+=1
+                        return outcome=='cancelled' and inner.count>1
+                def native_property(key,value):
+                    home.values[key]=value
+                    if key.startswith('Infinity.Search.Cancel.') and value=='1':cancel.set()
+                def rpc(method,params):
+                    calls.append((method,params))
+                    path,token=params['directory'].split('|infinity_search=')
+                    proof=hashlib.sha256(path.encode()).hexdigest()
+                    self.assertEqual(home.getProperty('Infinity.Search.Request.'+token),proof)
+                    self.assertEqual(home.getProperty('Infinity.SavedNavigation.Lookup.'+token),proof)
+                    self.assertEqual(params['limits']['end'],self.search.MAX_RESULTS)
+                    if outcome=='cancelled':self.assertTrue(cancel.wait(2),'Cancellation did not reach native consumer')
+                    if outcome=='exception':raise RuntimeError('RPC rejected')
+                    home.setProperty('Infinity.Search.Result.'+token,outcome)
+                    return {'result':{'files':[]}} if outcome=='completed' else {'error':{}}
+                with patch.object(home,'setProperty',native_property),patch.object(self.search,'rpc',rpc):
+                    status,answer=self.nav._lookup_directory('plugin://plugin.video.future/?mode=list',home,CancelProgress())
+                self.assertEqual(status,'' if outcome=='exception' else outcome)
+                self.assertEqual('error' in answer,outcome!='completed')
+                self.assertEqual(len(calls),1)
+                self.assertEqual(home.values,{'Infinity.SavedNavigation.Lookup.Protocol':'1'})
+                self.assertFalse(any(t.name=='InfinitySavedNavigationResult' for t in threading.enumerate()))
+
+    def test_20_saved_lookup_missing_protocol_or_cancelled_never_starts_provider(self):
+        home=types.SimpleNamespace(getProperty=lambda _: '')
+        with (patch.object(self.search,'_leased_directory',return_value=('completed',{})) as probe,
+              patch.object(self.search,'rpc',side_effect=AssertionError('Do not invoke an unsupported provider'))):
+            with self.assertRaisesRegex(self.nav.Unavailable,'required bounded navigation protocol'):
+                self.nav._lookup_directory('plugin://plugin.video.future/',home,Progress())
+            self.assertEqual(probe.call_count,1)
+        home.getProperty=lambda _: '1'
+        with patch.object(self.search,'rpc',side_effect=AssertionError('Do not admit work after cancellation')):
+            with self.assertRaises(self.nav.Cancelled):
+                self.nav._lookup_directory('plugin://plugin.video.future/',home,types.SimpleNamespace(iscanceled=lambda:True))
 
 
 if __name__=='__main__':

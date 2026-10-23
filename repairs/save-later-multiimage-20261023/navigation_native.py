@@ -10,6 +10,17 @@ BEFORE = {
     'xbmc/interfaces/generic/ScriptRunner.h': 'e39aeabe417cbe6a2a1f791420b9d9b9ad6db1618dbf6278619910d7f2481b15',
 }
 
+# Applied after all original Infinity Search admission checks and its shared
+# three-invocation reservation. No timeout releases an invocation or writer.
+LOOKUP_DEADLINE = '''    // INFINITY_SAVED_NAVIGATION_LOOKUP: only an explicit, path-bound recovery intent.
+    const std::string savedLookupKey = "Infinity.SavedNavigation.Lookup." + m_infinitySearchToken;
+    const bool savedLookup = InfinitySearchProperty(savedLookupKey) == proof;
+    InfinitySearchProperty(savedLookupKey, "");
+    if (savedLookup)
+      m_infinitySearchDeadline = std::chrono::steady_clock::now() + std::chrono::seconds(60);
+'''
+LOOKUP_PROTOCOL = '      InfinitySearchProperty("Infinity.SavedNavigation.Lookup.Protocol", "1");\n'
+
 
 def once(text, old, new):
     if text.count(old) != 1:
@@ -97,6 +108,10 @@ def apply(source, overlay):
     after[runner] = once(after[runner], '  if (cancelled || IsCancelled())\n',
         '#if defined(TARGET_ANDROID)\n  m_infinityResultCancelled = cancelled;\n#endif\n'
         '  if (cancelled || IsCancelled())\n')
+    marker = '    m_infinitySearchDeadline = std::chrono::steady_clock::now() + std::chrono::seconds(20);\n'
+    after[runner] = once(after[runner], marker, marker + LOOKUP_DEADLINE)
+    marker = '      InfinitySearchProperty("Infinity.Search.Protocol", "1");\n'
+    after[runner] = once(after[runner], marker, marker + LOOKUP_PROTOCOL)
     after = {n: b.encode() for n, b in after.items()}
     for name in ('InfinitySavedNavigation.h', 'InfinitySavedNavigationState.h'):
         target = 'xbmc/guilib/' + name
@@ -113,4 +128,7 @@ def apply(source, overlay):
         ledger[n] = dict(original_sha256=BEFORE.get(n), final_sha256=hashlib.sha256(b).hexdigest(),
             defect='Save for Later original-route failure observation',
             justification='Observe actual original directory/resolution return; only Infinity later clicks may offer recovery; no result, provider argument, lifecycle or persistence receipt changed')
+    ledger[runner]['justification'] += ('; path-bound failure-recovery lookup gets a bounded 60-second consumer allowance '
+        'after original admission and shared three-slot reservation; ordinary Search remains 20 seconds, '
+        'actual script retirement and every cancellation/shutdown check remain unchanged')
     return ledger

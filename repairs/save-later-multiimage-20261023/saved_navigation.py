@@ -12,7 +12,9 @@ import hashlib
 import json
 from pathlib import Path
 import re
+import threading
 import time
+import uuid
 from urllib.parse import parse_qs, unquote, urlencode, urlsplit
 import xml.etree.ElementTree as ET
 
@@ -216,6 +218,47 @@ def destination(provider, row):
     return path
 
 
+def _lookup_directory(path, home, progress):
+    """Bound only failure-recovery lookups; retain the original native owner.
+
+    Cold provider imports on Android exceeded Search's 20-second allowance.
+    This separate intent uses the same three-slot lease, cancellation and real
+    invocation retirement. The engine, not Python, owns its 60-second deadline.
+    """
+    if home.getProperty('Infinity.SavedNavigation.Lookup.Protocol') != '1':
+        search._leased_directory('plugin://' + CC + '/?action=search-probe', home)
+    if home.getProperty('Infinity.SavedNavigation.Lookup.Protocol') != '1':
+        raise Unavailable('The installed engine lacks the required bounded navigation protocol.')
+    monitor = xbmc.Monitor()
+    if monitor.abortRequested() or progress.iscanceled():
+        raise Cancelled('Navigation was cancelled; the saved entry was kept.')
+    token = uuid.uuid4().hex
+    proof = hashlib.sha256(path.encode('utf-8')).hexdigest()
+    keys = ['Infinity.Search.' + part + token for part in ('Request.', 'Cancel.', 'Result.')]
+    intent = 'Infinity.SavedNavigation.Lookup.' + token
+    output = []
+    def request():
+        try:
+            output.append(search.rpc('Files.GetDirectory', dict(
+                directory=path + '|infinity_search=' + token, media='video',
+                properties=search.PROPERTIES, limits={'start': 0, 'end': search.MAX_RESULTS})))
+        except (ValueError, RuntimeError):
+            output.append({'error': {'message': 'provider_failed'}})
+    try:
+        home.setProperty(keys[0], proof)
+        home.setProperty(intent, proof)
+        worker = threading.Thread(target=request, name='InfinitySavedNavigationResult')
+        worker.start()
+        while worker.is_alive():
+            if monitor.abortRequested() or progress.iscanceled():
+                home.setProperty(keys[1], '1')
+            worker.join(.05)
+        return home.getProperty(keys[2]), output[0] if output else {'error': {}}
+    finally:
+        for key in (*keys, intent):
+            home.clearProperty(key)
+
+
 def _directory(path, provider, query, home, progress):
     # Preserve the existing engine's bounded consumer protocol and Search limit.
     # Larger, unverified request envelopes remain explicit failures.
@@ -224,7 +267,7 @@ def _directory(path, provider, query, home, progress):
     _trace('saved_navigation_request', provider=provider['id'],
                      destination_sha256=hashlib.sha256(path.encode()).hexdigest())
     search.route(provider, query)  # Raw installed source and enabled-state recheck.
-    status, answer = search._leased_directory(path, home, progress)
+    status, answer = _lookup_directory(path, home, progress)
     search.route(provider, query)
     if progress.iscanceled() or xbmc.Monitor().abortRequested():
         raise Cancelled('Navigation was cancelled; the saved entry was kept.')
