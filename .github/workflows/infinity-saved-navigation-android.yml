@@ -29,10 +29,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Focus the measured lookup correction and real original/fallback GUI
-        # flow first. Prior APK evidence is retained; full qualification of this
-        # new native build, including negative writer controls, remains required.
-        mode: ${{ fromJSON(github.event_name == 'workflow_dispatch' && inputs.phase == 'full' && '["safe","pending","opaque","native-opaque","lost-file","provider-pov","provider-umbrella","provider-seren","provider-future"]' || '["safe","provider-pov"]') }}
+        # Host/source gates have passed. Qualify the exact new signed engine
+        # across all nine real-runtime cases; manual focused reruns remain
+        # available. No previous APK's negative control substitutes for this run.
+        mode: ${{ fromJSON(github.event_name == 'workflow_dispatch' && inputs.phase == 'focused' && '["safe","provider-pov"]' || '["safe","pending","opaque","native-opaque","lost-file","provider-pov","provider-umbrella","provider-seren","provider-future"]') }}
     env:
       CANDIDATE_BUILD: '39970426642'
       CANDIDATE_COMMIT: '40bc7fc0d3d38ad8d1071bd2a5fac27ccdbcdd00'
