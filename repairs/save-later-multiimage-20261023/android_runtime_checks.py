@@ -63,6 +63,11 @@ def first_use_action(state,notice,seren):
     if (state['modal'] and Path(state['xml']).name=='textviewer.xml' and
         state['umbrella_heading']==notice['heading'] and state['umbrella_text']==notice['text']):
         return 'acknowledge-umbrella-first-use-information'
+    if (state['modal'] and Path(state['xml']).name=='textviewer.xml' and
+        notice.get('changelog_heading') and notice.get('changelog_text') and
+        state['umbrella_heading']==notice['changelog_heading'] and
+        state['umbrella_text']==notice['changelog_text']):
+        return 'acknowledge-umbrella-first-home-changelog'
     bodies=[' '.join(s.split()) for s in state['body']]
     if (state['ok'] and state['heading']=='Seren' and
         ' '.join(seren['cache_complete'].split()) in bodies):
@@ -88,35 +93,42 @@ def first_use_status(log,home):
         and '?action=torrentCacheCleanup' in log)  # Scheduled after the optional timezone prompt.
     return statuses
 
-def complete_first_use(home,result,record):
-    # Run39944949734: Kodi refused ActivateWindow(10025) because Umbrella's
-    # first-use textviewer was modal; Seren subsequently displayed its own
-    # completed-initialization notice. Finish only these real setup interactions
-    # before starting navigation assertions. No provider settings/DB are seeded.
+def first_use_specifications():
     umbrella=xbmcaddon.Addon('plugin.video.umbrella')
     path=Path(xbmcvfs.translatePath(umbrella.getAddonInfo('path')))
     notice=dict(heading='[B]Umbrella -  v%s - externalProviders[/B]'%umbrella.getAddonInfo('version'),
-                text=(path/'resources/help/externalProviders.txt').read_text())
+        text=(path/'resources/help/externalProviders.txt').read_text(),
+        changelog_heading='[B]Umbrella -  v%s - ChangeLog[/B]'%umbrella.getAddonInfo('version'),
+        changelog_text=(path/'changelog.txt').read_text(encoding='utf-8',errors='ignore'))
     seren_addon=xbmcaddon.Addon('plugin.video.seren')
     seren=dict(cache_complete=seren_addon.getLocalizedString(30480),
         timezone_heading=seren_addon.getLocalizedString(30549),timezone_body=seren_addon.getLocalizedString(30550))
     require(all(seren.values()),'Pinned Seren first-use strings missing')
+    return notice,seren
+
+def acknowledge_first_use(state,notice,seren,result,record):
+    action=first_use_action(state,notice,seren)
+    if not action:return False
+    require(len(result['first_use_actions'])<8,'Provider first-use notice repeated unexpectedly')
+    result['first_use_actions'].append(dict(action=action,observed=state,epoch_ms=int(time.time()*1000)))
+    record('provider-first-use-interaction')
+    # Back acknowledges only source-verified information, or declines optional
+    # timezone selection. It never accepts a destructive or account prompt.
+    require(rpc('Input.Back')=='OK','First-use information could not be dismissed')
+    xbmc.sleep(500)
+    return True
+
+def complete_first_use(home,result,record):
+    # Run39944949734: finish real setup interactions before navigation.
+    # No provider settings/DB are seeded and no unknown dialog is dismissed.
+    notice,seren=first_use_specifications()
     logpath=Path(xbmcvfs.translatePath('special://logpath/kodi.log'))
     end=time.monotonic()+600;stable=None;last=None
     result['first_use_actions']=[]
     while time.monotonic()<end:
         require(not xbmc.Monitor().abortRequested(),'Shutdown during provider initialization')
         state=gui_snapshot();status=first_use_status(logpath.read_text(errors='replace'),home)
-        action=first_use_action(state,notice,seren)
-        if action:
-            require(len(result['first_use_actions'])<8,'Provider first-use notice repeated unexpectedly')
-            result['first_use_actions'].append(dict(action=action,observed=state,epoch_ms=int(time.time()*1000)))
-            record('provider-first-use-interaction')
-            # Back acknowledges informational viewers/OK and declines optional
-            # yes/no. The provider's own callback performs its normal continuation.
-            require(rpc('Input.Back')=='OK','First-use information could not be dismissed')
-            xbmc.sleep(500)
-            continue
+        if acknowledge_first_use(state,notice,seren,result,record):continue
         observation=dict(first_use_ui_boundaries=status,gui=state,
             service_retirement_verified=False,persistence_verified=False)
         if observation!=last:
@@ -127,6 +139,28 @@ def complete_first_use(home,result,record):
         else:stable=None
         xbmc.sleep(500)
     raise RuntimeError('Provider first-use did not complete: '+json.dumps(result['first_use_observation']))
+
+def first_provider_home(aid,result,record):
+    # Run39955714826 safe waited inside Umbrella's first-home changelog.
+    # Its pinned router displays that modal before returning its real directory.
+    # Keep observing only verified setup notices while the actual RPC runs.
+    # This helper is never used for saved clicks, recovery, or provider results.
+    import threading
+    notice,seren=first_use_specifications();answers=[]
+    def request():
+        try:answers.append((True,rpc('Files.GetDirectory',dict(directory='plugin://'+aid+'/',media='video'))['files']))
+        except Exception as error:answers.append((False,error))
+    worker=threading.Thread(target=request,name='InfinityProviderFirstHome');worker.start()
+    end=time.monotonic()+180
+    while worker.is_alive():
+        require(not xbmc.Monitor().abortRequested(),'Shutdown during provider first home')
+        state=gui_snapshot();result['first_home_gui']=state
+        if acknowledge_first_use(state,notice,seren,result,record):continue
+        require(time.monotonic()<end,'Provider first home did not return: '+aid+'; '+json.dumps(state))
+        worker.join(.1)
+    require(bool(answers),'Provider first home returned no result')
+    if not answers[0][0]:raise answers[0][1]
+    return answers[0][1]
 
 def select_native_item(control,predicate,message):
     # Run39938059169 crashed in the Python ControlList.size wrapper for a
@@ -248,7 +282,7 @@ def run(root,cycle,mode):
     import resume_hub as hub
     import infinity_search as search
     result=dict(passed=False,pid=os.getpid(),provider_source_modified=False,
-        third_party_cache_cleared=False,physical_fold_verified=False,
+        third_party_cache_cleared_by_test=False,disposable_profile=True,physical_fold_verified=False,
         authenticated_provider_playback_verified=False,cases=[])
     out=Path(root)/('navigation-ready-'+cycle+'.json')
     def record(stage):
@@ -288,7 +322,7 @@ def run(root,cycle,mode):
         for aid in initialize:
             record('provider-home:'+aid)
             began=time.monotonic()
-            rows=rpc('Files.GetDirectory',dict(directory='plugin://'+aid+'/',media='video'))['files']
+            rows=first_provider_home(aid,result,record)
             require(bool(rows),'Actual provider home returned no items: '+aid)
             result['cases'].append(dict(case='real-first-provider-home',provider=aid,
                 elapsed_seconds=round(time.monotonic()-began,3),count=len(rows),passed=True))

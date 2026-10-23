@@ -30,9 +30,9 @@ jobs:
       fail-fast: false
       matrix:
         # Reuse Run39944949734's native-opaque PASS on the exact same APK.
-        # Run39955714826's safe case continues independently. Diagnose its
-        # completed POV timeout without repeating that active case; full stays required.
-        mode: ${{ fromJSON(github.event_name == 'workflow_dispatch' && inputs.phase == 'full' && '["safe","pending","opaque","native-opaque","lost-file","provider-pov","provider-umbrella","provider-seren","provider-future"]' || '["provider-pov"]') }}
+        # Run39958442372 continues the separate POV timeout diagnostic.
+        # Correct Run39955714826's first-home changelog interaction; full stays required.
+        mode: ${{ fromJSON(github.event_name == 'workflow_dispatch' && inputs.phase == 'full' && '["safe","pending","opaque","native-opaque","lost-file","provider-pov","provider-umbrella","provider-seren","provider-future"]' || '["safe"]') }}
     env:
       CANDIDATE_BUILD: '39930734489'
       CANDIDATE_COMMIT: 'ee8f630247b993dc2262fcdc2a6f8ce093c4c2d9'
