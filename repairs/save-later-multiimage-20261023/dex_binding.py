@@ -119,6 +119,13 @@ final class InfinityInstalledCheckpointInstaller {
     (modified/TARGET).write_text(merged)
     assembled=out/'assembled.dex'
     run(['java','-cp',cp,'org.jf.smali.Main','assemble','--api','21',modified,'-o',assembled])
+    # Compare the explicitly reviewed patch after the same assembler/decoder
+    # round trip. Baksmali assigns canonical labels to the new named branch and
+    # catch region; comparing those labels to the source spelling is invalid.
+    # No branch, exception, register or instruction normalization is relaxed.
+    expected_smali=out/'expected-smali'
+    run(['java','-cp',cp,'org.jf.baksmali.Main','disassemble','--sequential-labels',assembled,'-o',expected_smali])
+    expected_methods=methods((expected_smali/TARGET).read_text())
     # Reuse the passed exact-value writer, adapting ONLY its one permitted class
     # target and forbidding additions. All protected definitions come directly
     # from RC8, including Cobra, Search, the RC8 receipt helper and Close guard.
@@ -142,9 +149,9 @@ final class InfinityInstalledCheckpointInstaller {
     checked=methods(after[TARGET])
     if set(checked)!=set(old)|{HELPER}:raise RuntimeError('Unexpected installer method inventory')
     for name,body in old.items():
-        expected=updated if name==APPLY else body
+        expected=expected_methods[name] if name==APPLY else body
         if norm(checked[name])!=norm(expected):raise RuntimeError('Unexpected existing method change: '+name)
-    if norm(checked[HELPER])!=norm(compiled[HELPER]):raise RuntimeError('Verifier compilation drift')
+    if norm(checked[HELPER])!=norm(expected_methods[HELPER]):raise RuntimeError('Verifier compilation drift')
     report=dict(passed=True,original_dex_sha256=DEX,final_dex_sha256=sha(final.read_bytes()),
         changed_classes=[TARGET],added_classes=[],added_methods=[HELPER],
         original_installer_routes_preserved=True,all_other_original_definitions_preserved=True,
