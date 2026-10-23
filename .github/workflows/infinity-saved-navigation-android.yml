@@ -29,12 +29,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Same signed APK: retain four passed rejection controls from 39974282065.
-        # Push rechecks only the five failed cases; explicit full remains available.
-        mode: ${{ fromJSON(github.event_name == 'workflow_dispatch' && inputs.phase == 'full' && '["safe","pending","opaque","native-opaque","lost-file","provider-pov","provider-umbrella","provider-seren","provider-future"]' || '["safe","provider-pov","provider-umbrella","provider-seren","provider-future"]') }}
+        # New native lifecycle correction: all nine gates must run against this exact APK.
+        # Prior candidate evidence is retained but cannot qualify the changed engine.
+        mode: ${{ fromJSON(github.event_name == 'workflow_dispatch' && inputs.phase == 'focused' && '["safe","provider-pov"]' || '["safe","pending","opaque","native-opaque","lost-file","provider-pov","provider-umbrella","provider-seren","provider-future"]') }}
     env:
-      CANDIDATE_BUILD: '39970426642'
-      CANDIDATE_COMMIT: '40bc7fc0d3d38ad8d1071bd2a5fac27ccdbcdd00'
+      CANDIDATE_BUILD: '39994772688'
+      CANDIDATE_COMMIT: '3d3730c490220a1169e9dea280832c42da4971e8'
       PYTHONDONTWRITEBYTECODE: '1'
     steps:
       - uses: actions/checkout@v4

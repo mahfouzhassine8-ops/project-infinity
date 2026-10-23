@@ -1,0 +1,985 @@
+{
+  "rc8_original_negative_control": {
+    "passed": true,
+    "baseline": true,
+    "cases": 48,
+    "scope": "Execute production multi-image code, factory, POSIX reader and job manager.\n\nThe GUI, network/unknown-directory and service boundaries are explicit host\npeers. No provider implementation, native decoder or physical Fold is simulated.\n",
+    "results": [
+      {
+        "scenario": "local",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS local normal required=1\n",
+        "stderr": "lifecycle local reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "local",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS local close required=1\n",
+        "stderr": "lifecycle local reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "single",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS single normal required=1\n",
+        "stderr": "lifecycle single reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "single",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS single close required=1\n",
+        "stderr": "lifecycle single reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "special",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS special normal required=1\n",
+        "stderr": "lifecycle special reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "special",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS special close required=1\n",
+        "stderr": "lifecycle special reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "relative",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS relative normal required=1\n",
+        "stderr": "lifecycle relative reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "relative",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS relative close required=1\n",
+        "stderr": "lifecycle relative reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "empty",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS empty normal required=1\n",
+        "stderr": "lifecycle empty reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "empty",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS empty close required=1\n",
+        "stderr": "lifecycle empty reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "unknown",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS unknown normal required=1\n",
+        "stderr": "lifecycle unknown reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "unknown",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS unknown close required=1\n",
+        "stderr": "lifecycle unknown reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "network",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS network normal required=1\n",
+        "stderr": "lifecycle network reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "network",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS network close required=1\n",
+        "stderr": "lifecycle network reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "resource",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS resource normal required=1\n",
+        "stderr": "lifecycle resource reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "resource",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS resource close required=1\n",
+        "stderr": "lifecycle resource reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "extension",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS extension normal required=1\n",
+        "stderr": "lifecycle extension reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "extension",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS extension close required=1\n",
+        "stderr": "lifecycle extension reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "dotted-local",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS dotted-local normal required=1\n",
+        "stderr": "lifecycle dotted-local reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "dotted-local",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS dotted-local close required=1\n",
+        "stderr": "lifecycle dotted-local reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "override",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS override normal required=1\n",
+        "stderr": "lifecycle override reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "override",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS override close required=1\n",
+        "stderr": "lifecycle override reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "throws",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS throws normal required=1\n",
+        "stderr": "lifecycle throws reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "throws",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS throws close required=1\n",
+        "stderr": "lifecycle throws reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "derived-job",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS derived-job normal required=1\n",
+        "stderr": "lifecycle derived-job reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "derived-job",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS derived-job close required=1\n",
+        "stderr": "lifecycle derived-job reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "derived-control",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS derived-control normal required=1\n",
+        "stderr": "lifecycle derived-control reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "derived-control",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS derived-control close required=1\n",
+        "stderr": "lifecycle derived-control reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "null",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS null normal required=1\n",
+        "stderr": "lifecycle null reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "null",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS null close required=1\n",
+        "stderr": "lifecycle null reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "spoof",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS spoof normal required=1\n",
+        "stderr": "lifecycle spoof reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "spoof",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS spoof close required=1\n",
+        "stderr": "lifecycle spoof reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "cancel",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS cancel normal required=1\n",
+        "stderr": "lifecycle cancel reviewed=0 operation_succeeded=0 callback_verified=1 phase=manager_pending\n"
+      },
+      {
+        "scenario": "cancel",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS cancel close required=1\n",
+        "stderr": "lifecycle cancel reviewed=0 operation_succeeded=0 callback_verified=1 phase=manager_pending\n"
+      },
+      {
+        "scenario": "cobra",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS cobra normal required=1\n",
+        "stderr": "lifecycle cobra reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "cobra",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS cobra close required=1\n",
+        "stderr": "lifecycle cobra reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "active-cancel",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS active-cancel normal required=1\n",
+        "stderr": "lifecycle active-cancel reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "active-cancel",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS active-cancel close required=1\n",
+        "stderr": "lifecycle active-cancel reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "active-shutdown",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS active-shutdown normal required=1\n",
+        "stderr": "lifecycle active-shutdown reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "active-shutdown",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS active-shutdown close required=1\n",
+        "stderr": "lifecycle active-shutdown reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "active-opaque",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS active-opaque normal required=1\n",
+        "stderr": "lifecycle active-opaque reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "active-opaque",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS active-opaque close required=1\n",
+        "stderr": "lifecycle active-opaque reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "active-throws",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS active-throws normal required=1\n",
+        "stderr": "lifecycle active-throws reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "active-throws",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS active-throws close required=1\n",
+        "stderr": "lifecycle active-throws reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "late-cancel",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS late-cancel normal required=1\n",
+        "stderr": "lifecycle late-cancel reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "late-cancel",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS late-cancel close required=1\n",
+        "stderr": "lifecycle late-cancel reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "callback-throws",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS callback-throws normal required=1\n",
+        "stderr": "lifecycle callback-throws reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "callback-throws",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS callback-throws close required=1\n",
+        "stderr": "lifecycle callback-throws reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      }
+    ],
+    "executed_production_functions": [
+      "complete GUIMultiImage.cpp and header",
+      "complete JobManager.cpp",
+      "DirectoryFactory::Create(CURL)",
+      "CPosixDirectory::GetDirectory",
+      "CSpecialProtocolDirectory::GetDirectory",
+      "CGUITextureManager::GetTexturePath"
+    ],
+    "physical_fold_verified": false
+  },
+  "signed_candidate_reproduction": {
+    "passed": false,
+    "baseline": false,
+    "executed_cases": 37,
+    "planned_cases": 48,
+    "results": [
+      {
+        "scenario": "local",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS local normal required=0\n",
+        "stderr": "lifecycle local reviewed=1 operation_succeeded=1 callback_verified=1 phase=completion_receipt_verified\n"
+      },
+      {
+        "scenario": "local",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS local close required=0\n",
+        "stderr": "lifecycle local reviewed=1 operation_succeeded=1 callback_verified=1 phase=completion_receipt_verified\n"
+      },
+      {
+        "scenario": "single",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS single normal required=0\n",
+        "stderr": "lifecycle single reviewed=1 operation_succeeded=1 callback_verified=1 phase=completion_receipt_verified\n"
+      },
+      {
+        "scenario": "single",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS single close required=0\n",
+        "stderr": "lifecycle single reviewed=1 operation_succeeded=1 callback_verified=1 phase=completion_receipt_verified\n"
+      },
+      {
+        "scenario": "special",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS special normal required=0\n",
+        "stderr": "lifecycle special reviewed=1 operation_succeeded=1 callback_verified=1 phase=completion_receipt_verified\n"
+      },
+      {
+        "scenario": "special",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS special close required=0\n",
+        "stderr": "lifecycle special reviewed=1 operation_succeeded=1 callback_verified=1 phase=completion_receipt_verified\n"
+      },
+      {
+        "scenario": "relative",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS relative normal required=0\n",
+        "stderr": "lifecycle relative reviewed=1 operation_succeeded=1 callback_verified=1 phase=completion_receipt_verified\n"
+      },
+      {
+        "scenario": "relative",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS relative close required=0\n",
+        "stderr": "lifecycle relative reviewed=1 operation_succeeded=1 callback_verified=1 phase=completion_receipt_verified\n"
+      },
+      {
+        "scenario": "empty",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS empty normal required=0\n",
+        "stderr": "lifecycle empty reviewed=1 operation_succeeded=1 callback_verified=1 phase=completion_receipt_verified\n"
+      },
+      {
+        "scenario": "empty",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS empty close required=0\n",
+        "stderr": "lifecycle empty reviewed=1 operation_succeeded=1 callback_verified=1 phase=completion_receipt_verified\n"
+      },
+      {
+        "scenario": "unknown",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS unknown normal required=1\n",
+        "stderr": "lifecycle unknown reviewed=1 operation_succeeded=1 callback_verified=1 phase=completed_write_failed\n"
+      },
+      {
+        "scenario": "unknown",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS unknown close required=1\n",
+        "stderr": "lifecycle unknown reviewed=1 operation_succeeded=1 callback_verified=1 phase=completed_write_failed\n"
+      },
+      {
+        "scenario": "network",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS network normal required=1\n",
+        "stderr": "lifecycle network reviewed=1 operation_succeeded=1 callback_verified=1 phase=completed_write_failed\n"
+      },
+      {
+        "scenario": "network",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS network close required=1\n",
+        "stderr": "lifecycle network reviewed=1 operation_succeeded=1 callback_verified=1 phase=completed_write_failed\n"
+      },
+      {
+        "scenario": "resource",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS resource normal required=1\n",
+        "stderr": "lifecycle resource reviewed=1 operation_succeeded=1 callback_verified=1 phase=completed_write_failed\n"
+      },
+      {
+        "scenario": "resource",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS resource close required=1\n",
+        "stderr": "lifecycle resource reviewed=1 operation_succeeded=1 callback_verified=1 phase=completed_write_failed\n"
+      },
+      {
+        "scenario": "extension",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS extension normal required=1\n",
+        "stderr": "lifecycle extension reviewed=1 operation_succeeded=1 callback_verified=1 phase=completed_write_failed\n"
+      },
+      {
+        "scenario": "extension",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS extension close required=1\n",
+        "stderr": "lifecycle extension reviewed=1 operation_succeeded=1 callback_verified=1 phase=completed_write_failed\n"
+      },
+      {
+        "scenario": "dotted-local",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS dotted-local normal required=0\n",
+        "stderr": "lifecycle dotted-local reviewed=1 operation_succeeded=1 callback_verified=1 phase=completion_receipt_verified\n"
+      },
+      {
+        "scenario": "dotted-local",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS dotted-local close required=0\n",
+        "stderr": "lifecycle dotted-local reviewed=1 operation_succeeded=1 callback_verified=1 phase=completion_receipt_verified\n"
+      },
+      {
+        "scenario": "override",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS override normal required=1\n",
+        "stderr": "lifecycle override reviewed=1 operation_succeeded=1 callback_verified=1 phase=completed_write_failed\n"
+      },
+      {
+        "scenario": "override",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS override close required=1\n",
+        "stderr": "lifecycle override reviewed=1 operation_succeeded=1 callback_verified=1 phase=completed_write_failed\n"
+      },
+      {
+        "scenario": "throws",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS throws normal required=1\n",
+        "stderr": "lifecycle throws reviewed=1 operation_succeeded=0 callback_verified=1 phase=completed_write_failed\n"
+      },
+      {
+        "scenario": "throws",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS throws close required=1\n",
+        "stderr": "lifecycle throws reviewed=1 operation_succeeded=0 callback_verified=1 phase=completed_write_failed\n"
+      },
+      {
+        "scenario": "derived-job",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS derived-job normal required=1\n",
+        "stderr": "lifecycle derived-job reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "derived-job",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS derived-job close required=1\n",
+        "stderr": "lifecycle derived-job reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "derived-control",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS derived-control normal required=1\n",
+        "stderr": "lifecycle derived-control reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "derived-control",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS derived-control close required=1\n",
+        "stderr": "lifecycle derived-control reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "null",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS null normal required=1\n",
+        "stderr": "lifecycle null reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "null",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS null close required=1\n",
+        "stderr": "lifecycle null reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "spoof",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS spoof normal required=1\n",
+        "stderr": "lifecycle spoof reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "spoof",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS spoof close required=1\n",
+        "stderr": "lifecycle spoof reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "cancel",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS cancel normal required=0\n",
+        "stderr": "lifecycle cancel reviewed=1 operation_succeeded=0 callback_verified=1 phase=completion_receipt_verified\n"
+      },
+      {
+        "scenario": "cancel",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS cancel close required=0\n",
+        "stderr": "lifecycle cancel reviewed=1 operation_succeeded=0 callback_verified=1 phase=completion_receipt_verified\n"
+      },
+      {
+        "scenario": "cobra",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS cobra normal required=1\n",
+        "stderr": "lifecycle cobra reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "cobra",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS cobra close required=1\n",
+        "stderr": "lifecycle cobra reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "active-cancel",
+        "phase": "normal",
+        "passed": false,
+        "stdout": "",
+        "stderr": "lifecycle active-cancel reviewed=1 operation_succeeded=1 callback_verified=0 phase=completed_write_failed\ntest: /tmp/actual-multiimage-z59g002n/test.cpp:113: int main(int, char**): Assertion `(after.required!=0)==blocked' failed.\n"
+      }
+    ],
+    "physical_fold_verified": false
+  },
+  "corrected_candidate": {
+    "passed": true,
+    "baseline": false,
+    "cases": 48,
+    "scope": "Execute production multi-image code, factory, POSIX reader and job manager.\n\nThe GUI, network/unknown-directory and service boundaries are explicit host\npeers. No provider implementation, native decoder or physical Fold is simulated.\n",
+    "results": [
+      {
+        "scenario": "local",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS local normal required=0\n",
+        "stderr": "lifecycle local reviewed=1 operation_succeeded=1 callback_verified=1 phase=completion_receipt_verified\n"
+      },
+      {
+        "scenario": "local",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS local close required=0\n",
+        "stderr": "lifecycle local reviewed=1 operation_succeeded=1 callback_verified=1 phase=completion_receipt_verified\n"
+      },
+      {
+        "scenario": "single",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS single normal required=0\n",
+        "stderr": "lifecycle single reviewed=1 operation_succeeded=1 callback_verified=1 phase=completion_receipt_verified\n"
+      },
+      {
+        "scenario": "single",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS single close required=0\n",
+        "stderr": "lifecycle single reviewed=1 operation_succeeded=1 callback_verified=1 phase=completion_receipt_verified\n"
+      },
+      {
+        "scenario": "special",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS special normal required=0\n",
+        "stderr": "lifecycle special reviewed=1 operation_succeeded=1 callback_verified=1 phase=completion_receipt_verified\n"
+      },
+      {
+        "scenario": "special",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS special close required=0\n",
+        "stderr": "lifecycle special reviewed=1 operation_succeeded=1 callback_verified=1 phase=completion_receipt_verified\n"
+      },
+      {
+        "scenario": "relative",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS relative normal required=0\n",
+        "stderr": "lifecycle relative reviewed=1 operation_succeeded=1 callback_verified=1 phase=completion_receipt_verified\n"
+      },
+      {
+        "scenario": "relative",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS relative close required=0\n",
+        "stderr": "lifecycle relative reviewed=1 operation_succeeded=1 callback_verified=1 phase=completion_receipt_verified\n"
+      },
+      {
+        "scenario": "empty",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS empty normal required=0\n",
+        "stderr": "lifecycle empty reviewed=1 operation_succeeded=1 callback_verified=1 phase=completion_receipt_verified\n"
+      },
+      {
+        "scenario": "empty",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS empty close required=0\n",
+        "stderr": "lifecycle empty reviewed=1 operation_succeeded=1 callback_verified=1 phase=completion_receipt_verified\n"
+      },
+      {
+        "scenario": "unknown",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS unknown normal required=1\n",
+        "stderr": "lifecycle unknown reviewed=1 operation_succeeded=1 callback_verified=1 phase=completed_write_failed\n"
+      },
+      {
+        "scenario": "unknown",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS unknown close required=1\n",
+        "stderr": "lifecycle unknown reviewed=1 operation_succeeded=1 callback_verified=1 phase=completed_write_failed\n"
+      },
+      {
+        "scenario": "network",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS network normal required=1\n",
+        "stderr": "lifecycle network reviewed=1 operation_succeeded=1 callback_verified=1 phase=completed_write_failed\n"
+      },
+      {
+        "scenario": "network",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS network close required=1\n",
+        "stderr": "lifecycle network reviewed=1 operation_succeeded=1 callback_verified=1 phase=completed_write_failed\n"
+      },
+      {
+        "scenario": "resource",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS resource normal required=1\n",
+        "stderr": "lifecycle resource reviewed=1 operation_succeeded=1 callback_verified=1 phase=completed_write_failed\n"
+      },
+      {
+        "scenario": "resource",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS resource close required=1\n",
+        "stderr": "lifecycle resource reviewed=1 operation_succeeded=1 callback_verified=1 phase=completed_write_failed\n"
+      },
+      {
+        "scenario": "extension",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS extension normal required=1\n",
+        "stderr": "lifecycle extension reviewed=1 operation_succeeded=1 callback_verified=1 phase=completed_write_failed\n"
+      },
+      {
+        "scenario": "extension",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS extension close required=1\n",
+        "stderr": "lifecycle extension reviewed=1 operation_succeeded=1 callback_verified=1 phase=completed_write_failed\n"
+      },
+      {
+        "scenario": "dotted-local",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS dotted-local normal required=0\n",
+        "stderr": "lifecycle dotted-local reviewed=1 operation_succeeded=1 callback_verified=1 phase=completion_receipt_verified\n"
+      },
+      {
+        "scenario": "dotted-local",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS dotted-local close required=0\n",
+        "stderr": "lifecycle dotted-local reviewed=1 operation_succeeded=1 callback_verified=1 phase=completion_receipt_verified\n"
+      },
+      {
+        "scenario": "override",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS override normal required=1\n",
+        "stderr": "lifecycle override reviewed=1 operation_succeeded=1 callback_verified=1 phase=completed_write_failed\n"
+      },
+      {
+        "scenario": "override",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS override close required=1\n",
+        "stderr": "lifecycle override reviewed=1 operation_succeeded=1 callback_verified=1 phase=completed_write_failed\n"
+      },
+      {
+        "scenario": "throws",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS throws normal required=1\n",
+        "stderr": "lifecycle throws reviewed=1 operation_succeeded=0 callback_verified=1 phase=completed_write_failed\n"
+      },
+      {
+        "scenario": "throws",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS throws close required=1\n",
+        "stderr": "lifecycle throws reviewed=1 operation_succeeded=0 callback_verified=1 phase=completed_write_failed\n"
+      },
+      {
+        "scenario": "derived-job",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS derived-job normal required=1\n",
+        "stderr": "lifecycle derived-job reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "derived-job",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS derived-job close required=1\n",
+        "stderr": "lifecycle derived-job reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "derived-control",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS derived-control normal required=1\n",
+        "stderr": "lifecycle derived-control reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "derived-control",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS derived-control close required=1\n",
+        "stderr": "lifecycle derived-control reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "null",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS null normal required=1\n",
+        "stderr": "lifecycle null reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "null",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS null close required=1\n",
+        "stderr": "lifecycle null reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "spoof",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS spoof normal required=1\n",
+        "stderr": "lifecycle spoof reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "spoof",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS spoof close required=1\n",
+        "stderr": "lifecycle spoof reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "cancel",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS cancel normal required=0\n",
+        "stderr": "lifecycle cancel reviewed=1 operation_succeeded=0 callback_verified=1 phase=completion_receipt_verified\n"
+      },
+      {
+        "scenario": "cancel",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS cancel close required=0\n",
+        "stderr": "lifecycle cancel reviewed=1 operation_succeeded=0 callback_verified=1 phase=completion_receipt_verified\n"
+      },
+      {
+        "scenario": "cobra",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS cobra normal required=1\n",
+        "stderr": "lifecycle cobra reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "cobra",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS cobra close required=1\n",
+        "stderr": "lifecycle cobra reviewed=0 operation_succeeded=0 callback_verified=1 phase=destructor\n"
+      },
+      {
+        "scenario": "active-cancel",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS active-cancel normal required=0\n",
+        "stderr": "lifecycle active-cancel reviewed=1 operation_succeeded=1 callback_verified=1 phase=completion_receipt_verified\n"
+      },
+      {
+        "scenario": "active-cancel",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS active-cancel close required=0\n",
+        "stderr": "lifecycle active-cancel reviewed=1 operation_succeeded=1 callback_verified=1 phase=completion_receipt_verified\n"
+      },
+      {
+        "scenario": "active-shutdown",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS active-shutdown normal required=0\n",
+        "stderr": "lifecycle active-shutdown reviewed=1 operation_succeeded=1 callback_verified=1 phase=completion_receipt_verified\n"
+      },
+      {
+        "scenario": "active-shutdown",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS active-shutdown close required=0\n",
+        "stderr": "lifecycle active-shutdown reviewed=1 operation_succeeded=1 callback_verified=1 phase=completion_receipt_verified\n"
+      },
+      {
+        "scenario": "active-opaque",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS active-opaque normal required=1\n",
+        "stderr": "lifecycle active-opaque reviewed=1 operation_succeeded=1 callback_verified=0 phase=completed_write_failed\n"
+      },
+      {
+        "scenario": "active-opaque",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS active-opaque close required=1\n",
+        "stderr": "lifecycle active-opaque reviewed=1 operation_succeeded=1 callback_verified=0 phase=completed_write_failed\n"
+      },
+      {
+        "scenario": "active-throws",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS active-throws normal required=1\n",
+        "stderr": "lifecycle active-throws reviewed=1 operation_succeeded=0 callback_verified=0 phase=completed_write_failed\n"
+      },
+      {
+        "scenario": "active-throws",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS active-throws close required=1\n",
+        "stderr": "lifecycle active-throws reviewed=1 operation_succeeded=0 callback_verified=0 phase=completed_write_failed\n"
+      },
+      {
+        "scenario": "late-cancel",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS late-cancel normal required=0\n",
+        "stderr": "lifecycle late-cancel reviewed=1 operation_succeeded=1 callback_verified=1 phase=completion_receipt_verified\n"
+      },
+      {
+        "scenario": "late-cancel",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS late-cancel close required=0\n",
+        "stderr": "lifecycle late-cancel reviewed=1 operation_succeeded=1 callback_verified=1 phase=completion_receipt_verified\n"
+      },
+      {
+        "scenario": "callback-throws",
+        "phase": "normal",
+        "passed": true,
+        "stdout": "PASS callback-throws normal required=1\n",
+        "stderr": "lifecycle callback-throws reviewed=1 operation_succeeded=1 callback_verified=0 phase=completed_write_failed\n"
+      },
+      {
+        "scenario": "callback-throws",
+        "phase": "close",
+        "passed": true,
+        "stdout": "PASS callback-throws close required=1\n",
+        "stderr": "lifecycle callback-throws reviewed=1 operation_succeeded=1 callback_verified=0 phase=completed_write_failed\n"
+      }
+    ],
+    "executed_production_functions": [
+      "complete GUIMultiImage.cpp and header",
+      "complete JobManager.cpp",
+      "DirectoryFactory::Create(CURL)",
+      "CPosixDirectory::GetDirectory",
+      "CSpecialProtocolDirectory::GetDirectory",
+      "CGUITextureManager::GetTexturePath"
+    ],
+    "physical_fold_verified": false
+  },
+  "scope": "Host production-source lifecycle tests with retained service/GUI peers; not Android or Fold acceptance",
+  "signed_base_build": "39970426642",
+  "signed_base_source": "40bc7fc0d3d38ad8d1071bd2a5fac27ccdbcdd00",
+  "production_delta": [
+    "xbmc/guilib/GUIMultiImage.h"
+  ],
+  "cobra_execution_changed": false,
+  "android17_verified": false,
+  "physical_fold_verified": false
+}

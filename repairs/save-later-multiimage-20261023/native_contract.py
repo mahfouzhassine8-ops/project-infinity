@@ -35,7 +35,11 @@ def apply(source, overlay):
     const char* GetCheckpointPersistenceOwner() const override { return m_checkpointInfinity ? "background_jobs" : CJob::GetCheckpointPersistenceOwner(); }
     const char* GetCheckpointOperation() const override { return m_checkpointInfinity ? "multiimage-enumeration" : CJob::GetCheckpointOperation(); }
     bool RequiresCheckpointCompletionReceipt() const override { return m_checkpointInfinity; }
-    bool RequiresCheckpointCallback() const override { return m_checkpointInfinity; }
+    // The exact original callback only publishes in-memory image-list state.
+    // Once DoWork proves its unchanged outcome, cancellation may remove that
+    // callback without leaving any persistence obligation for it to fulfill.
+    // Any callback that still runs must succeed through the unchanged manager.
+    bool RequiresCheckpointCallback() const override { return m_checkpointInfinity && !m_checkpointReadOnly; }
     bool CheckpointSucceeded(bool success) const override;
     bool CheckpointCancelledWithoutWork() const override;
     std::string GetCheckpointResource() const override;

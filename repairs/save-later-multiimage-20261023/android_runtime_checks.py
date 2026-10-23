@@ -90,7 +90,8 @@ def first_use_status(log,home):
         starts=list(re.finditer(r'T:(\d+).*Settings Monitor Service Starting \('+re.escape(aid)+r'-[^)]*\)',log))
         statuses[aid]=bool(starts and re.search(r'T:'+starts[-1].group(1)+r'\s.*CheckUndesirablesDatabase Service Starting',log[starts[-1].end():]))
     statuses['plugin.video.umbrella']='[ plugin.video.umbrella ]  Settings Monitor Service Starting...' in log
-    statuses[COMPATFUTURE]='[ '+COMPATFUTURE+' ]  Settings Monitor Service Starting...' in log
+    if xbmc.getCondVisibility('System.AddonIsEnabled('+COMPATFUTURE+')'):
+        statuses[COMPATFUTURE]='[ '+COMPATFUTURE+' ]  Settings Monitor Service Starting...' in log
     statuses['plugin.video.seren']=(home.getProperty('seren.service.ready')==xbmcaddon.Addon('plugin.video.seren').getAddonInfo('version')
         and '?action=torrentCacheCleanup' in log)  # Scheduled after the optional timezone prompt.
     return statuses
@@ -371,6 +372,7 @@ def run(root,cycle,mode):
         require(rpc('Settings.GetSettingValue',dict(setting='general.addonupdates'))['value']==2,
                 'Disposable profile input-update policy was not loaded')
         for aid in (*PROVIDERS.values(),FUTURE):
+            if aid==COMPATFUTURE and mode!='provider-future':continue
             details=rpc('Addons.GetAddonDetails',dict(addonid=aid,properties=['enabled','version']))['addon']
             if not details['enabled']:
                 require(rpc('Addons.SetAddonEnabled',dict(addonid=aid,enabled=True))=='OK','Provider enable failed')

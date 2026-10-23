@@ -22,6 +22,7 @@ PEERS=r'''
 #include <cstring>
 #include <filesystem>
 #include <fstream>
+#include <functional>
 #include <memory>
 #include <string>
 #include <vector>
@@ -34,6 +35,7 @@ inline bool infinity=true;
 inline bool opaqueFile=false,overrideSpecial=false,substitute=false;
 inline int unknownWork=0, mimeNetwork=0;
 inline bool factoryThrows=false;
+inline std::function<void()> duringDirectoryRead;
 }
 namespace InfinityMultiImagePersistence { void UnreviewedDispatch(const char*); }
 namespace XBMCAddon {namespace xbmc {inline std::string getSkinDir(){return Fixture::infinity?"skin.infinity.diggz":"skin.cobra";}}}
@@ -156,6 +158,7 @@ class CDirectoryFactory{public:static IDirectory*Create(const CURL&);};
 class CDirectory {
 public:
  static bool GetDirectory(const std::string&p,CFileItemList&i,const std::string&,int){
+  auto observation=std::move(Fixture::duringDirectoryRead);if(observation)observation();
   std::unique_ptr<IDirectory>d(CDirectoryFactory::Create(CURL(p)));return d&&d->GetDirectory(CURL(p),i);
  }
  static bool Exists(const std::string&p){
@@ -218,6 +221,16 @@ HARNESS=r'''
 #include <cassert>
 #include <iostream>
 #include <typeinfo>
+#include <cstdlib>
+#include <new>
+bool failNextAllocation=false;
+void* operator new(std::size_t size){
+ if(failNextAllocation){failNextAllocation=false;throw std::bad_alloc();}
+ if(void* value=std::malloc(size))return value;
+ throw std::bad_alloc();
+}
+void operator delete(void* value)noexcept{std::free(value);}
+void operator delete(void* value,std::size_t)noexcept{std::free(value);}
 CJobManager*CServiceBroker::manager=nullptr;
 GUI CServiceBroker::gui;
 struct DerivedControl:CGUIMultiImage{using CGUIMultiImage::CGUIMultiImage;};
@@ -241,12 +254,14 @@ int main(int argc,char**argv){
  if(scenario=="unknown")path="plugin://opaque/";
  if(scenario=="network")path="https://fixture.invalid/cover";
  if(scenario=="resource")path="resource://fixture/images/";
+ if(scenario=="active-opaque")path="resource://fixture/images/";
  if(scenario=="empty")path="missing-relative";
  if(scenario=="relative")path="images/";
  if(scenario=="extension"){path="folder.pkg";Fixture::opaqueFile=true;}
  if(scenario=="dotted-local")path="folder.pkg";
  if(scenario=="override")Fixture::overrideSpecial=true;
  if(scenario=="throws")Fixture::factoryThrows=true;
+ if(scenario=="active-throws")Fixture::factoryThrows=true;
  if(scenario=="relative"||scenario=="extension"||scenario=="dotted-local")CServiceBroker::gui.texture.m_texturePaths={Fixture::root+"/skin"};
  CJob*job=new CGUIMultiImage::CMultiImageJob(path);
  IJobCallback*callback=&owner;
@@ -256,6 +271,8 @@ int main(int argc,char**argv){
  if(scenario=="spoof"){delete job;job=new Spoof;callback=&neutral;}
  auto id=CServiceBroker::manager->AddJob(job,callback);
  assert(id);
+ owner.m_jobID=id;
+ auto record=CJobManager::CheckpointRecord(job);
  auto before=CJobManager::AndroidCheckpointSnapshot();assert(before.required==1);
  if(scenario=="cobra"){
   assert(before.unknown==1);
@@ -269,18 +286,47 @@ int main(int argc,char**argv){
   assert(before.unknown==0);assert(before.blockers[0].owner=="background_jobs");
  }
  bool blocked=baseline||scenario=="cobra"||scenario=="unknown"||scenario=="network"||scenario=="resource"||
-  scenario=="extension"||scenario=="override"||scenario=="throws"||scenario=="derived-job"||
+  scenario=="extension"||scenario=="override"||scenario=="throws"||scenario=="active-opaque"||scenario=="active-throws"||scenario=="callback-throws"||scenario=="derived-job"||
   scenario=="derived-control"||scenario=="null"||scenario=="spoof";
  InfinityAndroidCheckpoint::active=closed;
+ if(scenario=="active-cancel"||scenario=="active-shutdown"||scenario=="active-opaque"||scenario=="active-throws"){
+  Fixture::duringDirectoryRead=[&](){
+   assert(CJobManager::AndroidCheckpointSnapshot().required==1);
+   if(scenario=="active-shutdown")CServiceBroker::manager->BeginShutdown();
+   else owner.CancelLoading();
+   // A removed GUI callback never retires the running job or its obligations.
+   assert(CJobManager::AndroidCheckpointSnapshot().required==1);
+   assert(!record->completionRecorded);
+  };
+ }
  if(scenario=="cancel"){
   CServiceBroker::manager->CancelJob(id);
+ }else if(scenario=="late-cancel"||scenario=="callback-throws"){
+  auto* manager=CServiceBroker::manager;
+  assert(manager->GetNextJob()==job);
+  JobCheckpoint::WorkBinding operation(record);
+  const bool success=job->DoWork();assert(success);
+  assert(CJobManager::AndroidCheckpointSnapshot().required==1);
+  if(scenario=="late-cancel")owner.CancelLoading();
+  else failNextAllocation=true; // The original callback's vector copy must fail visibly.
+  assert(!record->completionRecorded);
+  manager->OnJobComplete(success,job);
+  if(scenario=="callback-throws"){
+   assert(!failNextAllocation); // Both candidates executed the throwing callback.
+   if(!baseline)assert(!record->completionCallbackVerified);
+   else assert(record->unknown&&!record->completionRecorded);
+  }
  }else{
   CJobWorker worker(CServiceBroker::manager);worker.Process();
  }
+  std::cerr<<"lifecycle "<<scenario
+   <<" reviewed="<<record->outcomeReviewed<<" operation_succeeded="<<record->operationSucceeded
+   <<" callback_verified="<<record->completionCallbackVerified<<" phase="<<record->phase<<"\n";
+ record.reset(); // Observing must not keep a retired job live in the weak registry.
  auto after=CJobManager::AndroidCheckpointSnapshot();
  assert((after.required!=0)==blocked);
  if(!blocked)assert(after.unknown==0);
- if(!baseline&&blocked&&scenario!="cobra"&&scenario!="derived-job"&&scenario!="derived-control"&&scenario!="null"&&scenario!="spoof"){
+ if(!baseline&&blocked&&scenario!="cobra"&&scenario!="derived-job"&&scenario!="derived-control"&&scenario!="null"&&scenario!="spoof"&&scenario!="callback-throws"){
   assert(after.blockers[0].phase=="completed_write_failed");
   assert(after.blockers[0].failureDetail.find("multiimage_")==0);
  }
@@ -319,7 +365,11 @@ def run(source, overlay, baseline, out):
         def put(name,content):
             target=work/name;target.parent.mkdir(parents=True,exist_ok=True);target.write_text(content)
         for name in ('Job.h','JobManager.h','JobManager.cpp','JobCheckpoint.h'):
-            put('utils/'+name,data('xbmc/utils/'+name))
+            content=data('xbmc/utils/'+name)
+            # Expose protected lifecycle entry points only in this disposable
+            # harness header; CJobManager remains final and its bodies unchanged.
+            if name=='JobManager.h':content=content.replace('protected:', 'public:')
+            put('utils/'+name,content)
         for name,content in module.STUBS.items():
             if name in ('ServiceBroker.h','utils/log.h'):continue
             if name.endswith('InfinityAndroidCheckpoint.h'):
@@ -364,7 +414,8 @@ def run(source, overlay, baseline, out):
         (fixture/'skin/media/images/one.png').write_bytes(b'one')
         (fixture/'sentinel').write_text('preserved')
         scenarios=('local','single','special','relative','empty','unknown','network','resource','extension','dotted-local','override',
-                   'throws','derived-job','derived-control','null','spoof','cancel','cobra')
+                   'throws','derived-job','derived-control','null','spoof','cancel','cobra',
+                   'active-cancel','active-shutdown','active-opaque','active-throws','late-cancel','callback-throws')
         results=[]
         for scenario in scenarios:
             for phase in ('normal','close'):
@@ -373,6 +424,9 @@ def run(source, overlay, baseline, out):
                 results.append(dict(scenario=scenario,phase=phase,passed=result.returncode==0,
                                     stdout=result.stdout,stderr=result.stderr))
                 if result.returncode:
+                    out.write_text(json.dumps(dict(passed=False,baseline=baseline,
+                        executed_cases=len(results),planned_cases=len(scenarios)*2,
+                        results=results,physical_fold_verified=False),indent=2)+'\n')
                     print(json.dumps(results[-1],indent=2));raise RuntimeError('Native contract case failed')
         report=dict(passed=True,baseline=baseline,cases=len(results),scope=__doc__,results=results,
                     executed_production_functions=['complete GUIMultiImage.cpp and header','complete JobManager.cpp',
