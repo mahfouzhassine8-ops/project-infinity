@@ -178,7 +178,14 @@ def select_native_item(control,predicate,message):
 
 def open_saved(entry,home):
     path='plugin://script.infinity.commandcenter/?action=library&media='+entry['media']+'&bucket=later'
-    xbmc.executebuiltin('ActivateWindow(Videos,"'+path+'",return)')
+    # GUIMediaWindow WINDOW_INIT with "return" and the same start directory
+    # intentionally restores its current child. Run39959879847 therefore
+    # reopened Breaking Bad instead of returning to the saved list. Update the
+    # active container explicitly; keep ActivateWindow for entry from Home.
+    if xbmcgui.getCurrentWindowId()==10025:
+        xbmc.executebuiltin('Container.Update("'+path+'",replace)')
+    else:
+        xbmc.executebuiltin('ActivateWindow(Videos,"'+path+'",return)')
     until(lambda:folder().rstrip('/')==path.rstrip('/'),'actual Save for Later listing')
     xbmc.executebuiltin('Container.SetViewMode(50)',True)
     until(lambda:int(xbmc.getInfoLabel('Container(50).NumItems') or '0')>0,'saved native items')
