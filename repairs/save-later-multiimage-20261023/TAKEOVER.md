@@ -160,3 +160,46 @@ were active. Its saved directory subsequently produced all three items at
 a saved identity mismatch and not a multi-image durability receipt. No provider
 service is disabled, no database is reset and no late completion changes the
 failed result. Full actual Android and physical Fold acceptance remain pending.
+
+
+## Continuation after Android run 39974282065
+
+The passed signed candidate is build 39970426642, source 40bc7fc0d3d38ad8d1071bd2a5fac27ccdbcdd00,
+APK SHA-256 e1f86b1c143a5513d473ae1176f28a9fed10a16004ec54f17f6bfe2ea4967676.
+Android 39974282065 passed pending, opaque, native-opaque and lost-file controls.
+Safe, POV, Umbrella and Seren each completed their recorded navigation checks
+but failed the required actual multi-image execution gate. Native logs contain
+queued-job retirement only, with no matching BEGIN for test control 941.
+The fixture's fixed 2.5-second display was not execution proof. No completed
+navigation check is being promoted to full Close/reopen or release acceptance.
+
+The safe case opened the exact captured Umbrella favorite for TMDb 330430 and
+verified four episodes; the controlled POV string-expiry exception and explicit
+same-identity alternative also executed with the malformed property preserved.
+The future POV alias was correctly rejected: its build_url reverses a literal
+POV URL, so replacing normal add-on identifiers did not make a compatible fork.
+The Android-only branch keeps it as an unrelated-provider negative control,
+adds an identity-only Umbrella fork for positive compatibility, and waits for
+the actual same-token job begin/retirement while the GUI dialog stays open.
+The production resolver and all saved records remain unchanged.
+
+The unfinished local lifecycle test was recovered and made executable against
+CJobManager's final type. The harness releases its observation shared_ptr before
+checking registry liveness; retaining it falsely kept completed jobs alive.
+An actual active-cancel case then reproduced a production defect: successful
+verified-unchanged work was retained as completed_write_failed solely because
+CancelLoading removed the memory-only GUI callback.
+
+The production correction is confined to CMultiImageJob's Infinity-only callback
+requirement in GUIMultiImage.h. It still requires a callback until DoWork reaches
+a verified unchanged boundary. After that boundary, the original manager may
+complete a job whose callback was removed; an existing callback still executes,
+and an exception still fails. Running work remains mandatory until actual job
+retirement. Opaque backends, work exceptions, unknown/derived implementations,
+and callback exceptions remain blockers. JobManager, JobCheckpoint, native
+coordinator, provider code and every Cobra execution path are unchanged.
+
+Targeted cases cover active cancellation, active shutdown, cancellation after
+work, opaque/throwing operations, callback allocation failure and the retained
+Cobra control. This source correction requires a fresh permanent signed build
+and its Android gates. It is not installation-ready or physically accepted.
