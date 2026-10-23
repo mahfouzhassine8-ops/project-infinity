@@ -236,6 +236,38 @@ def verify_favorites_reference(nav,home,result,affected,umbrella):
     result['cases'].append(dict(case='exact-physical-umbrella-favorite',passed=True,
         archive_sha256=reference['archive_sha256'],episodes=len(episodes),identity=ids,**opened))
 
+def provider_stack_snapshot(aid):
+    # Python3.11 exposes registered interpreter thread frames read-only. Keep
+    # locations only: no locals, source text, credentials, URL values or writes.
+    # This diagnostic cannot acknowledge work or authorize shutdown.
+    import gc
+    captured=[];frames={};frame=None
+    try:
+        # The APK embeds 3.11.7. Apply the later CPython _current_frames GC
+        # protection only around this diagnostic call in its own interpreter;
+        # restore the original GC state on every path (upstream gh-106883).
+        enabled=gc.isenabled();gc.disable()
+        try:frames=sys._current_frames()
+        finally:
+            if enabled:gc.enable()
+        for ident,frame in list(frames.items())[:128]:
+            locations=[];owned=False
+            while frame is not None and len(locations)<96:
+                name=frame.f_code.co_filename.replace('\\','/')
+                owned=owned or ('/addons/'+aid+'/') in name
+                if '/addons/' in name:name='addons/'+name.split('/addons/',1)[1]
+                elif name.startswith('/'):name=Path(name).name
+                locations.append(dict(file=name,function=frame.f_code.co_name,line=frame.f_lineno))
+                frame=frame.f_back
+            if owned:captured.append(dict(thread_ident=ident,locations=locations))
+    except Exception as error:
+        return dict(provider=aid,available=False,error_type=type(error).__name__)
+    finally:
+        frame=None;frames.clear()
+    return dict(epoch_ms=int(time.time()*1000),provider=aid,threads=captured,
+        python_version=sys.version.split()[0],
+        scope='read-only locations; not a persistence or retirement receipt')
+
 def observe_normal_directory(nav,search,entry,provider,result,record):
     # Run39955714826: the bounded consumer expired at 20 seconds, while POV's
     # invocation retired about eight seconds later without a provider traceback.
@@ -272,6 +304,7 @@ def observe_normal_directory(nav,search,entry,provider,result,record):
     while worker.is_alive() and time.monotonic()<end and not xbmc.Monitor().abortRequested():
         worker.join(.1)
     observation.update(answers[0] if answers else dict(still_pending=True))
+    observation['provider_stacks']=provider_stack_snapshot(provider['id'])
     # Do not kill or mark a still-running provider/interpreter retired.
     record('failed-normal-directory-observed')
 
@@ -410,6 +443,8 @@ def run(root,cycle,mode):
         result['failure']=type(error).__name__+': '+str(error)
         result['traceback']=__import__('traceback').format_exc()
         result['failure_gui']=gui_snapshot()
+        if mode.startswith('provider-'):
+            result['provider_stacks_at_failure']=provider_stack_snapshot(PROVIDERS[mode.split('-',1)[1]])
         record('failed-observing-late-provider-completion')
         # Preserve failure. Observe once, without retrying or extending the
         # production resolver deadline, so timeout logs include late completion.
