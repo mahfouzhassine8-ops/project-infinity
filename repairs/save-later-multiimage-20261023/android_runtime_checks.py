@@ -73,12 +73,16 @@ def first_use_action(state,notice,seren):
     return None
 
 def first_use_status(log,home):
-    # These markers are emitted by the unmodified installed services after
-    # their initialization. They are test preconditions, never durability proof.
+    # Only the source-backed first-use UI boundary, never service retirement or
+    # durability. POV's final CheckUndesirablesDatabase is optional background
+    # DB work: its caller swallows errors and may never log "Finished". Waiting
+    # for that line blocked both Run39948674614 cases before navigation began.
+    # "Starting" follows all first-use UI in the installed SettingsMonitor.
+    # Any remaining DB obligations still face the unchanged native checkpoint.
     statuses={}
     for aid in ('plugin.video.pov',FUTURE):
-        starts=re.findall(r'T:(\d+).*Settings Monitor Service Starting \('+re.escape(aid)+r'-[^)]*\)',log)
-        statuses[aid]=bool(starts and re.search(r'T:'+starts[-1]+r'\s.*CheckUndesirablesDatabase Service Finished',log))
+        starts=list(re.finditer(r'T:(\d+).*Settings Monitor Service Starting \('+re.escape(aid)+r'-[^)]*\)',log))
+        statuses[aid]=bool(starts and re.search(r'T:'+starts[-1].group(1)+r'\s.*CheckUndesirablesDatabase Service Starting',log[starts[-1].end():]))
     statuses['plugin.video.umbrella']='[ plugin.video.umbrella ]  Settings Monitor Service Starting...' in log
     statuses['plugin.video.seren']=(home.getProperty('seren.service.ready')==xbmcaddon.Addon('plugin.video.seren').getAddonInfo('version')
         and '?action=torrentCacheCleanup' in log)  # Scheduled after the optional timezone prompt.
@@ -113,7 +117,8 @@ def complete_first_use(home,result,record):
             require(rpc('Input.Back')=='OK','First-use information could not be dismissed')
             xbmc.sleep(500)
             continue
-        observation=dict(services=status,gui=state)
+        observation=dict(first_use_ui_boundaries=status,gui=state,
+            service_retirement_verified=False,persistence_verified=False)
         if observation!=last:
             result['first_use_observation']=observation;record('provider-first-use');last=observation
         if all(status.values()) and not state['modal']:
