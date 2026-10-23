@@ -1,0 +1,23 @@
+{
+  "authorization": "2026-10-23 user-approved end-to-end tracking/navigation/responsiveness correction, execute in stated priority",
+  "baseline_signed_build": "39994772688",
+  "baseline_source_commit": "3d3730c490220a1169e9dea280832c42da4971e8",
+  "continued_checkpoint": "de78ede2165b0cbe75d19575bd07bdeea18c9ef4",
+  "preserved_component_hotfix_sha256": "57aaa20e33a40f1278d12d4d30aeaa0fd00d5f1014eace9d4aa077c5f245d3d2",
+  "first_step": "Failure-triggered shared recovery with exact-identity successful route memory",
+  "allowed_tests": [
+    "working original Movie/TV saved destinations unchanged",
+    "failed TMDb330430 route explicit provider recovery and verified successful choice persistence",
+    "Watchlist/Save for Later equivalent recovery and Continue Playing where applicable",
+    "Infinity Trakt local tracking actions, release compatibility and preservation",
+    "actual Home Continue Watching series deduplication with episode records retained",
+    "tracking/navigation responsiveness and UI stall regression",
+    "approved Play/Pause appearance only",
+    "compilation/signing/component binding/package and data integrity relevant to these changes"
+  ],
+  "forbidden_tests": ["shutdown", "Normal Close", "Essential-First", "Close/reopen", "unrelated runtime suites"],
+  "cobra_modifications": false,
+  "physical_acceptance": "NOT RUN",
+  "release_accepted": false,
+  "final_lock": false
+}

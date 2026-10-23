@@ -12,9 +12,10 @@ namespace InfinitySavedNavigation
 {
 struct Ticket
 {
-  std::string token, key, originalPath, path, reason;
+  std::string token, key, originalPath, path, reason, bucket;
   std::vector<std::string> attempted;
-  bool folder{false}, cancelled{false}, failed{false};
+  double resume{0.0};
+  bool folder{false}, cancelled{false}, failed{false}, recovering{false}, succeeded{false};
   std::chrono::steady_clock::time_point created;
 };
 
@@ -47,6 +48,7 @@ public:
     m_current->cancelled = false;
     m_current->failed = false;
     m_current->reason.clear();
+    m_current->recovering = true;
     return true;
   }
   void Cancelled(const std::string& token)
@@ -63,7 +65,13 @@ public:
       return {};
     if (success || m_current->cancelled)
     {
+      auto finished = m_current;
       m_current.reset();
+      if (success && !finished->cancelled && finished->recovering)
+      {
+        finished->succeeded = true;
+        return finished;
+      }
       return {};
     }
     m_current->failed = true;

@@ -19,7 +19,7 @@ LOOKUP_DEADLINE = '''    // INFINITY_SAVED_NAVIGATION_LOOKUP: only an explicit, 
     if (savedLookup)
       m_infinitySearchDeadline = std::chrono::steady_clock::now() + std::chrono::seconds(60);
 '''
-LOOKUP_PROTOCOL = '      InfinitySearchProperty("Infinity.SavedNavigation.Lookup.Protocol", "1");\n'
+LOOKUP_PROTOCOL = '      InfinitySearchProperty("Infinity.SavedNavigation.Lookup.Protocol", "1");\n      InfinitySearchProperty("Infinity.SavedNavigation.Protocol", "2");\n'
 
 
 def once(text, old, new):
@@ -58,13 +58,13 @@ def apply(source, overlay):
     after[window] = once(after[window], '  CFileItemPtr pItem = m_vecItems->Get(iItem);\n\n  if (pItem->IsParentFolder())',
         '  CFileItemPtr pItem = m_vecItems->Get(iItem);\n'
         '#if defined(TARGET_ANDROID)\n'
-        '  InfinitySavedNavigation::Begin(*pItem, m_vecItems->GetPath());\n'
+        '  if (InfinitySavedNavigation::Begin(*pItem, m_vecItems->GetPath())) return true;\n'
         '#endif\n\n  if (pItem->IsParentFolder())')
     after[window] = wrap(after[window],
         'bool CGUIMediaWindow::Update(const std::string &strDirectory, bool updateFilterPath /* = true */)\n{',
         'bool CGUIMediaWindow::Refresh(',
         '  InfinitySavedNavigation::PrepareNext(strDirectory);\n',
-        '  InfinitySavedNavigation::WindowResult(strDirectory, originalResult);\n')
+        '  InfinitySavedNavigation::WindowResult(strDirectory, originalResult, *m_vecItems);\n')
     start = after[window].index('bool CGUIMediaWindow::GetDirectoryItems(')
     tail = after[window][start:]
     wait = 'CGUIDialogBusy::Wait(&getItems, 100, true)'
@@ -83,7 +83,7 @@ def apply(source, overlay):
         'bool CPluginDirectory::GetResolvedPluginResult(CFileItem& resultItem)\n{',
         'bool CPluginDirectory::GetPluginResult(',
         '  InfinitySavedNavigation::MovieAttempt savedAttempt(resultItem);\n',
-        '  savedAttempt.Finish(originalResult);\n')
+        '  savedAttempt.Finish(originalResult, resultItem);\n')
     after[plugin] = once(after[plugin], '  bool success = newDir.StartScript(strPath, resume);\n',
         '  bool success = newDir.StartScript(strPath, resume);\n'
         '#if defined(TARGET_ANDROID)\n'
