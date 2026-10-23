@@ -16,7 +16,7 @@ HERE = Path(__file__).resolve().parent
 PROOFS = (
     dict(family='mode-list-v1', addon='plugin.video.pov', version='6.10.21',
          archive='pov-6.10.21.zip', sha256='e75d5e0946631a735efa6e3cab62d5121f5cb52e6ab829de1a1a4673ff3c4c98',
-         url='https://raw.githubusercontent.com/kodifitzwell/repo/master/plugin.video.pov/plugin.video.pov-6.10.21.zip',
+         url='https://raw.githubusercontent.com/kodifitzwell/repo/61f18ed18f4ef342b37fe8ff4bce2eaf2ff499c1/plugin.video.pov/plugin.video.pov-6.10.21.zip',
          git_blob='2bd9233a980758dd8471bb9eb0e10267fa1629de',
          entrypoint='resources/lib/router.py',
          sources=['resources/lib/router.py', 'resources/lib/modules/entry.py',

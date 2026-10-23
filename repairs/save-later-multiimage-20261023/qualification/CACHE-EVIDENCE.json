@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "collected_source_sha256": "0cbb93769c9867a61d0faf31140510c19f3f8bbe6c1c0f312bd7cfd9e862de46",
+  "collected_matches_published": true,
+  "published_base_source_sha256": "f3448d8392d0d587c561d2d3444e6c97474b77c3d30a915a0da247e8d4364c2b",
+  "actual_collected_reader_executed": true,
+  "current_timestamp_type": "int",
+  "invalid_comparison_left_operand": "str",
+  "valid_current_serializer_preserves_integer": true,
+  "failure_precedes_database_read": true,
+  "exact_exception_reproductions": [
+    {
+      "shape": "string expiry array",
+      "exception_type": "TypeError",
+      "message": "'<' not supported between instances of 'str' and 'int'"
+    },
+    {
+      "shape": "two-key object",
+      "exception_type": "TypeError",
+      "message": "'<' not supported between instances of 'str' and 'int'"
+    }
+  ],
+  "sqlite_text_propagation_reproduced_in_memory": true,
+  "physical_malformed_cache_payload_available": false,
+  "physical_original_producer_proven": false,
+  "physical_database_modified": false,
+  "third_party_code_modified": false,
+  "conclusion": "Invalid cached value/schema at the expiry reader; current timestamp/JSON round trip does not introduce the mismatch. Physical original producer is unknown."
+}

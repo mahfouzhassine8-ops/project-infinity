@@ -206,6 +206,47 @@ class Navigation(unittest.TestCase):
         self.assertEqual(len(self.data['items']),3)
         self.assertEqual(len(self.data['watchlist']),3)
 
+    def test_13_failed_provider_offers_explicit_verified_alternative(self):
+        for kind in ('movie','tvshow'):
+            e=self.entry(kind);before=deepcopy(e)
+            providers=[dict(self.provider(i,'movie' if kind=='movie' else 'tv'),name=str(i)) for i in range(3)]
+            choices=[];attempts=[]
+            def choose(reason,remaining):
+                choices.append([p['id'] for p in remaining]);return 0
+            def attempt(saved,provider):
+                attempts.append(provider['id'])
+                if len(attempts)==1:raise self.nav.Unavailable('Provider directory request did not complete (failed).')
+                base=self.row(provider,'movie' if kind=='movie' else 'tvshow')
+                return self.resolve(saved,provider,[[base],[self.row(provider,'episode')]])[0]
+            provider,target=self.nav.resolve_with_choices(e,providers,providers[0]['id'],choose,attempt)
+            self.assertEqual(provider['id'],providers[1]['id'])
+            self.assertEqual(choices,[[p['id'] for p in providers[1:]]])
+            self.assertEqual(attempts,[p['id'] for p in providers[:2]])
+            self.assertEqual(e,before);self.assertIn(providers[1]['id'],target)
+
+    def test_14_alternative_is_not_opened_without_user_choice(self):
+        providers=[dict(self.provider(i),name=str(i)) for i in (0,1)]
+        attempts=[]
+        def attempt(e,p):attempts.append(p['id']);raise self.nav.Unavailable('Failed')
+        with self.assertRaises(self.nav.Cancelled):
+            self.nav.resolve_with_choices(self.entry(),providers,providers[0]['id'],lambda *a:-1,attempt)
+        self.assertEqual(attempts,[providers[0]['id']])
+
+    def test_15_alternative_with_similar_title_wrong_ids_cannot_open(self):
+        providers=[dict(self.provider(i),name=str(i)) for i in (0,1)]
+        def attempt(e,p):
+            if p is providers[0]:raise self.nav.Unavailable('Original provider failed')
+            return self.resolve(e,p,[[self.row(p,ids={'tmdb':'999'})]])[0]
+        with self.assertRaisesRegex(self.nav.Unavailable,'exact saved media identity'):
+            self.nav.resolve_with_choices(self.entry(),providers,providers[0]['id'],lambda *a:0,attempt)
+
+    def test_16_progress_cancellation_never_schedules_another_provider(self):
+        providers=[dict(self.provider(i),name=str(i)) for i in (0,1)]
+        def attempt(*a):raise self.nav.Cancelled('Cancelled')
+        with self.assertRaises(self.nav.Cancelled):
+            self.nav.resolve_with_choices(self.entry(),providers,providers[0]['id'],
+                lambda *a:self.fail('Do not offer new work after cancellation'),attempt)
+
 
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__)

@@ -3,7 +3,10 @@
 This work continues the passed RC8 foundation. It does not replace or restart
 the universal persistence/RC8 repairs. Protected baseline: 2103400. Current
 experimental package remains 2103401. No APK version or release identity has
-been invented, and no new APK/component ZIP has been signed or delivered here.
+been invented. Required component versions are derived from the actual input:
+Command Center 0.3.5.29 → 0.3.5.30, Watched Bridge 1.0.10 → 1.0.11 and UI Repair
+0.1.12 → 0.1.13. Native compilation/signing is handled by the isolated corrective
+workflow; its result must pass the remaining runtime gates before delivery.
 
 ## Evidence and limits
 
@@ -21,11 +24,25 @@ been invented, and no new APK/component ZIP has been signed or delivered here.
   failed. A follow-up returned HTTP 200, the exact Relationship Rehab title,
   and both saved external IDs. This does not justify an identity correction or
   substitution. The HTTP transport peer is not the installed Kodi runtime.
-- Current `plugin.py` and `experience.verified_source` replay saved show URLs
+- The new 212-entry physical archive `Infinity-Universal-Trace-20261023-020632.zip`
+  (SHA-256 `8eeaffeb5620b56e09266e96b89ea6e3610c957a466eafc05f87241060eea3ab`)
+  contains the actual POV cache reader. It matches the published source exactly:
+  `0cbb93769c9867a61d0faf31140510c19f3f8bbe6c1c0f312bd7cfd9e862de46`.
+  The recorded invocation reaches POV's episode handler, metadata parser and
+  cache reader, then fails at `meta_cache.py:78`: string `expiry` is compared
+  with integer `current_time`. Infinity did invoke the requested provider.
+- Executing that collected reader reproduces the exact exception before a DB
+  read. The current published timestamp generator returns an integer and its
+  JSON round trip preserves it. Both a string-expiry array and a two-key object
+  reproduce the exception. SQLite TEXT in an INTEGER-affinity column can also
+  propagate through this reader into memory. These are verified mechanisms,
+  not proof of which malformed payload/producer existed on the Fold: that value
+  and its database were not exported. No cache was cleared or coerced.
+- Original `plugin.py` and `experience.verified_source` replay saved show URLs
   without verifying their current installed navigation contract. This generic
-  gap is established in source. The first actual exception inside the Fold's
-  failed POV invocation is NOT established: supplied diagnostics record repeated
-  router failures but do not contain their Python traceback/source bodies.
+  gap is established in source. The new traceback establishes a separate cache
+  failure after provider dispatch. The resolver detects failed requests and
+  offers an explicitly selected compatible alternative with the same typed IDs.
 - Successful native Close has no unknown jobs. The failed Close retains job
   313/token 314, operation `multiimage`, type
   `N14CGUIMultiImage14CMultiImageJobE`, phase
@@ -77,26 +94,27 @@ Host results are in `qualification/`. The native harness compiles the actual
 GUIMultiImage/JobManager implementations and audited directory/texture-path
 functions, with documented GUI/service peers. Candidate: 32 production-source
 cases. Original-source negative control: 32 cases, retaining the blocker.
-The navigation suite has 12 test methods covering three real reviewed source
+The navigation suite has 16 test methods covering three real reviewed source
 distributions, a simulated future compatible provider, identity/route errors,
 disabled/updated providers, original profile read-only checks and later-only
 hook isolation. Directory responses are mocked: these are NOT actual provider,
 Android 17, playback, Close/reopen or physical Fold navigation acceptance.
 
-The source/component staging tools are experimental. Do NOT install their output
-as a standalone component. Exact native owner pins, dependent controller pins,
-startup verifier/deployment selection and installed-version behavior still need
-an integrated review before a build is eligible for signing. Existing strict
-verifiers must not be bypassed or weakened to deploy these changes.
+The source/component staging tools are experimental. Do NOT install an isolated
+staging output. Exact native owner pins and dependent controller pins are updated
+together. The startup verifier adds an exact nineteen-file CC30 contract while
+retaining all earlier branches. Only the verifier class may change in DEX; all
+other definitions, including Cobra, Search and RC8 Close/receipt code, are taken
+from the original signed DEX and checked. Native source changes comprise five
+original files plus one new header; the other 9,399 inputs remain identical.
 
 ## Outstanding gates
 
-1. Obtain the actual installed POV code and the relevant traceback from a failed
-   saved-item click; establish the precise first divergence. Do not diagnose it
-   from the endpoint string or manifest alone.
+1. DONE: use the collected cache reader and physical traceback to establish the
+   first failing comparison. Preserve the unknown original cache-producer detail.
 2. Execute actual provider navigation, not only mocked directory responses, and
    demonstrate the original affected entry opens its correct content.
-3. Complete minimal deployment/source pin binding and Cobra isolation review.
+3. Verify minimal deployment/source pin binding and Cobra isolation in the build.
 4. Run retained universal/RC8 protection tests, integration tests and full exact
    ARM64 compile with source inventory before/after. Reuse RC8 binaries where
    unchanged; do not rebuild/rewrite unrelated functionality.

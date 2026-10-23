@@ -44,8 +44,12 @@ public:
     {
       // An escaping exception is not evidence that nothing was changed.
       // Keep the original exception and leave the owning job unresolved.
-      JobCheckpoint::WorkResult(m_observation.record, CJobDurability::Unresolved, false,
-          "multiimage_operation_did_not_reach_verified_boundary");
+      try
+      {
+        JobCheckpoint::WorkResult(m_observation.record, CJobDurability::Unresolved, false,
+            "multiimage_operation_did_not_reach_verified_boundary");
+      }
+      catch (...) { } // The original escaping exception must be preserved.
     }
   }
   Scope(const Scope&) = delete;
@@ -54,9 +58,13 @@ public:
   void Reject(const char* reason) { m_observation.Reject(reason); }
   bool Finish(bool operationResult)
   {
-    JobCheckpoint::WorkResult(m_observation.record,
-        m_observation.verified ? CJobDurability::VerifiedUnchanged : CJobDurability::Unresolved,
-        operationResult, m_observation.failure);
+    try
+    {
+      JobCheckpoint::WorkResult(m_observation.record,
+          m_observation.verified ? CJobDurability::VerifiedUnchanged : CJobDurability::Unresolved,
+          operationResult, m_observation.failure);
+    }
+    catch (...) { m_observation.verified = false; }
     m_finished = true;
     return m_observation.verified;
   }

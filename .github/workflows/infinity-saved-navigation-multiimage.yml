@@ -1,0 +1,134 @@
+name: Infinity saved navigation and multi-image corrective gates
+on:
+  push:
+    branches: [work/infinity-save-later-multiimage-20261023]
+    paths:
+      - repairs/save-later-multiimage-20261023/**
+      - .github/workflows/infinity-saved-navigation-multiimage.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-saved-navigation-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  build:
+    name: Exact RC8 inputs, targeted host gates, ARM64 compilation and signature
+    runs-on: ubuntu-22.04
+    timeout-minutes: 420
+    env:
+      NDK_VER: 21.4.7075529
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-build
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - name: Require the two authorized areas and unchanged protected source
+        run: |
+          python3 - <<'PY'
+          import subprocess
+          paths=subprocess.check_output(['git','diff','--name-only','8df2e26f481eb7ff2d791c8cab39548de949d030','HEAD'],text=True).splitlines()
+          assert paths and all(p.startswith('repairs/save-later-multiimage-20261023/') or p=='.github/workflows/infinity-saved-navigation-multiimage.yml' for p in paths),paths
+          assert not any('cobra' in p.lower() for p in paths),paths
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39868217775
+          name: Infinity-Universal-Persistence-INTERNAL-QA-NOT-ACCEPTED
+          github-token: ${{ github.token }}
+          path: rc8-input
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39862996414
+          name: Infinity-Universal-Persistence-INTERNAL-QA-NOT-ACCEPTED
+          github-token: ${{ github.token }}
+          path: rc7-native-modes
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39867073954
+          name: Infinity-Receipt-Race-Android17-Investigation
+          github-token: ${{ github.token }}
+          path: verified-dex-tools
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 38132105717
+          name: Infinity-2103367-Verified-Compiler-Dependencies
+          github-token: ${{ github.token }}
+          path: dependency-transfer
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.7'}
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with:
+          cmdline-tools-version: '15859902'
+          packages: platform-tools build-tools;34.0.0 platforms;android-34
+          log-accepted-android-sdk-licenses: false
+      - name: Restore passed compiler dependencies
+        run: |
+          set -euo pipefail
+          sudo apt-get -o Acquire::Retries=3 update -qq
+          sudo apt-get install -y python3-yaml python3-dev libsqlite3-dev libssl-dev libffi-dev
+          (cd rc8-input && sha256sum -c SHA256SUMS)
+          (cd rc7-native-modes && sha256sum -c SHA256SUMS)
+          (cd dependency-transfer && sha256sum -c SHA256SUMS)
+          tar --no-same-owner -xf dependency-transfer/verified-android-dependencies.tar
+          tar --no-same-owner -xf dependency-transfer/verified-compiler-cache.tar -C "$HOME"
+      - uses: actions/cache@v4
+        with:
+          path: /usr/local/lib/android/sdk/ndk/21.4.7075529
+          key: infinity-pinned-ndk-linux-21.4.7075529-v1
+      - run: bash repairs/android-checkpoint-shutdown/install_ndk.sh
+      - name: Stage exact source and required component ownership bindings
+        run: |
+          set -euo pipefail
+          python3 repairs/save-later-multiimage-20261023/build.py prepare --parent rc8-input --modes rc7-native-modes
+          python3 repairs/save-later-multiimage-20261023/dex_binding.py prepare --apk rc8-input/Infinity-2103401-Universal-Persistence-RC8-NOT-ACCEPTED.apk --stage targeted-component-overlay --jars verified-dex-tools/receipt-evidence/tool-jars --android "$ANDROID_HOME/platforms/android-34/android.jar" --d8 "$ANDROID_HOME/build-tools/34.0.0/d8" --out targeted-dex
+          git diff --exit-code
+      - name: Run focused production-source tests and retained persistence controls
+        run: |
+          set -euo pipefail
+          python3 repairs/save-later-multiimage-20261023/test_navigation.py --providers verified-navigation-providers --assets targeted-component-base --out checkpoint-targeted/HOST-NAVIGATION.json 2>&1 | tee checkpoint-targeted/HOST-NAVIGATION.log
+          python3 repairs/save-later-multiimage-20261023/test_native.py --source baseline-native --overlay targeted-native-overlay --out checkpoint-targeted/HOST-NATIVE-CANDIDATE.json 2>&1 | tee checkpoint-targeted/HOST-NATIVE-CANDIDATE.log
+          python3 repairs/save-later-multiimage-20261023/test_native.py --source baseline-native --overlay targeted-native-overlay --baseline --out checkpoint-targeted/HOST-NATIVE-BASELINE.json 2>&1 | tee checkpoint-targeted/HOST-NATIVE-BASELINE.log
+          PREFIX=$(python3 -c 'import sys;print(sys.prefix)')
+          python3 repairs/universal-persistence-2103401/regressions.py --source baseline-native --overlay targeted-native-overlay --python-prefix "$PREFIX" --out checkpoint-targeted/RETAINED-PERSISTENCE.json 2>&1 | tee checkpoint-targeted/RETAINED-PERSISTENCE.log
+          git diff --exit-code
+      - name: Compile only the complete matching native engine
+        run: |
+          set -euo pipefail
+          python3 repairs/save-later-multiimage-20261023/build.py compile 2>&1 | tee checkpoint-targeted/NATIVE-COMPILATION.log
+          git diff --exit-code
+      - name: Permanently sign internal QA candidate and verify every member delta
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 repairs/save-later-multiimage-20261023/build.py package --parent rc8-input --dex targeted-dex --out targeted-internal-qa
+          (cd targeted-internal-qa && sha256sum -c SHA256SUMS)
+          git diff --exit-code
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-Saved-Navigation-MultiImage-INTERNAL-QA-NOT-ACCEPTED
+          path: targeted-internal-qa/
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-Saved-Navigation-MultiImage-Build-Evidence
+          path: |
+            checkpoint-targeted/*.json
+            checkpoint-targeted/*.log
+            checkpoint-targeted/*.sh
+            targeted-dex/DEX-PRESERVATION.json
+            targeted-dex/ORIGINAL-CALLERS.json
+            targeted-dex/EXACT-FIELDS.log
+          retention-days: 90
+          if-no-files-found: warn

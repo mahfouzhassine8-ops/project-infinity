@@ -34,6 +34,10 @@ class Unavailable(RuntimeError):
     pass
 
 
+class Cancelled(Unavailable):
+    pass
+
+
 def _trace(stage, **fields):
     # Existing timing export accepts only its established stage enum. Keep
     # navigation observations separate; never call them persistence receipts.
@@ -111,7 +115,15 @@ def capability(addon_id, root, media, specs):
 
 
 def available(media):
-    specs = json.loads(Path(__file__).with_name('NAVIGATION-CONTRACTS.json').read_text())['contracts']
+    root = xbmcaddon.Addon(CC).getAddonInfo('path').rstrip('/')
+    stream = xbmcvfs.File(root + '/NAVIGATION-CONTRACTS.json')
+    try:
+        raw = stream.readBytes(65537)
+    finally:
+        stream.close()
+    if not raw or len(raw) > 65536:
+        raise Unavailable('The saved navigation contracts could not be verified.')
+    specs = json.loads(bytes(raw).decode('utf-8'))['contracts']
     response = search.rpc('Addons.GetAddons', dict(type='xbmc.addon.video', enabled=True,
                          properties=['name', 'path', 'version']))
     if 'error' in response:
@@ -206,13 +218,17 @@ def destination(provider, row):
 
 
 def _directory(path, provider, query, home, progress):
+    # Preserve the existing engine's bounded consumer protocol and Search limit.
+    # Larger, unverified request envelopes remain explicit failures.
+    if len(path.encode('utf-8')) + len('|infinity_search=') + 32 > 8192:
+        raise Unavailable('Provider destination exceeds the supported navigation request limit.')
     _trace('saved_navigation_request', provider=provider['id'],
                      destination_sha256=hashlib.sha256(path.encode()).hexdigest())
     search.route(provider, query)  # Raw installed source and enabled-state recheck.
     status, answer = search._leased_directory(path, home, progress)
     search.route(provider, query)
     if progress.iscanceled() or xbmc.Monitor().abortRequested():
-        raise Unavailable('Navigation was cancelled; the saved entry was kept.')
+        raise Cancelled('Navigation was cancelled; the saved entry was kept.')
     if status != 'completed' or 'error' in answer:
         # Never include an opaque URL, account token, or full provider exception.
         raise Unavailable('Provider directory request did not complete (' + (status or 'no completion receipt')[:80] + ').')
@@ -281,6 +297,43 @@ def resolve(entry, provider, home, progress):
     return destination(provider, selected[0])
 
 
+def resolve_with_choices(entry, ready, preferred, choose, attempt):
+    """User selects alternatives after a failure; every attempt verifies identity.
+
+    A provider exception is never repaired by mutating its cache, disabling its
+    service, changing its Python code, or rewriting the saved record.
+    """
+    remaining = list(ready)
+    provider = next((p for p in remaining if p['id'] == preferred), None)
+    reason = 'Saved provider unavailable — open with'
+    while remaining:
+        if xbmc.Monitor().abortRequested():
+            raise Cancelled('Navigation was cancelled; the saved entry was kept.')
+        if provider is None:
+            index = choose(reason, remaining)
+            if not isinstance(index, int) or index < 0 or index >= len(remaining):
+                raise Cancelled('No alternative was selected. The saved entry was kept.')
+            provider = remaining[index]
+        remaining.remove(provider)
+        try:
+            return provider, attempt(entry, provider)
+        except Cancelled:
+            raise
+        except (Unavailable, OSError, ValueError, RuntimeError, TypeError, KeyError,
+                AttributeError, SyntaxError) as error:
+            _trace('saved_navigation_provider_failed', provider=provider['id'],
+                   error_type=type(error).__name__)
+            # Original provider traceback and native persistence obligations
+            # remain with their original owner. No success receipt is inferred.
+            if xbmc.Monitor().abortRequested():
+                raise Cancelled('Navigation was cancelled; the saved entry was kept.') from error
+            reason = provider['name'] + ' could not open this saved identity — open with'
+            if not remaining:
+                raise Unavailable(provider['name'] + ': ' + str(error)) from error
+            provider = None
+    raise Unavailable('No enabled provider has a verified navigation API for this saved entry.')
+
+
 def open_saved(handle, profile, key):
     """Only the Save for Later action calls this. It never rewrites saved state."""
     folder = True
@@ -302,28 +355,30 @@ def open_saved(handle, profile, key):
         ready, unsupported = available('movie' if identity['kind'] == 'movie' else 'tv')
         # The route is used ONLY to retain the original provider preference.
         try:
-            preferred = urlsplit(entry.get('stable_source') or entry.get('source') or '').netloc
+            sources = data.get('sources', {})
+            preference = sources.get(key, {}) if isinstance(sources, dict) else {}
+            if not isinstance(preference, dict):preference = {}
+            try:failed = float(preference.get('failures') or 0) >= 2
+            except (TypeError, ValueError):failed = False
+            remembered = preference.get('route') if not failed else ''
+            if not isinstance(remembered, str):remembered = ''
+            preferred = urlsplit(remembered or entry.get('stable_source') or entry.get('source') or '').netloc
         except ValueError:
             preferred = ''
-        provider = next((p for p in ready if p['id'] == preferred), None)
-        if provider is None:
-            if not ready:
-                raise Unavailable('No enabled provider has a verified navigation API for this saved entry.')
-            choice = xbmcgui.Dialog().select('Saved provider unavailable — open with', [p['name'] for p in ready])
-            if choice < 0:
-                raise Unavailable('No replacement provider was selected. The saved entry was kept.')
-            provider = ready[choice]
         home = xbmcgui.Window(10000)
         if home.getProperty('Infinity.Search.Protocol') != '1':
             search._leased_directory('plugin://' + CC + '/?action=search-probe', home)
         if home.getProperty('Infinity.Search.Protocol') != '1':
             raise Unavailable('The installed engine lacks the required bounded navigation protocol.')
-        progress = xbmcgui.DialogProgress()
-        progress.create('Save for Later', 'Verifying saved identity with ' + provider['name'])
-        try:
-            target = resolve(entry, provider, home, progress)
-        finally:
-            progress.close()
+        def attempt(saved, provider):
+            progress = xbmcgui.DialogProgress()
+            progress.create('Save for Later', 'Verifying saved identity with ' + provider['name'])
+            try:
+                return resolve(saved, provider, home, progress)
+            finally:
+                progress.close()
+        provider, target = resolve_with_choices(entry, ready, preferred,
+            lambda reason, options: xbmcgui.Dialog().select(reason, [p['name'] for p in options]), attempt)
         _trace('saved_navigation_handoff', saved_key=key, provider=provider['id'],
                          destination_sha256=hashlib.sha256(target.encode()).hexdigest(),
                          media_identity=identity)
@@ -332,6 +387,12 @@ def open_saved(handle, profile, key):
             xbmc.executebuiltin('Container.Update("' + target.replace('"', '%22') + '")')
         else:
             xbmcplugin.setResolvedUrl(handle, True, xbmcgui.ListItem(path=target))
+    except Cancelled:
+        _trace('saved_navigation_cancelled', saved_key=str(key)[:64])
+        if folder:
+            xbmcplugin.endOfDirectory(handle, succeeded=False, cacheToDisc=False)
+        else:
+            xbmcplugin.setResolvedUrl(handle, False, xbmcgui.ListItem())
     except (Unavailable, OSError, ValueError, RuntimeError, TypeError, KeyError,
             AttributeError, SyntaxError, ET.ParseError) as error:
         _trace('saved_navigation_failed', saved_key=str(key)[:64], error_type=type(error).__name__)

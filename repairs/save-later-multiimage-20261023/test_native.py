@@ -65,6 +65,8 @@ public:
  virtual bool CanFocus()const{return false;}
  virtual std::string GetDescription()const{return {};}
  bool IsVisible()const{return true;}
+ int GetID()const{return 2;}
+ int GetParentID()const{return m_parentID;}
  void MarkDirtyRegion(){}
 };
 class CGUIImage {
@@ -195,7 +197,7 @@ public:
  static TextureCache*GetTextureCache(){static TextureCache c;return &c;}
  static CFileExtensionProvider&GetFileExtensionProvider(){static CFileExtensionProvider e;return e;}
 };
-constexpr int LOGERROR=1,LOGWARNING=2,LOGDEBUG=3;
+constexpr int LOGERROR=1,LOGWARNING=2,LOGDEBUG=3,LOGINFO=4;
 class CLog{public:template<class...T>static void Log(T...){}};
 inline bool IsAliasShortcut(const std::string&,bool){return false;}
 inline void TranslateAliasShortcut(std::string&){}

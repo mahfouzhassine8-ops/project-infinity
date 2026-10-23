@@ -29,6 +29,7 @@ def apply(source, overlay):
     h = originals['xbmc/guilib/GUIMultiImage.h'].decode()
     h = once(h, '    bool DoWork() override;\n', '''    bool DoWork() override;
 #if defined(TARGET_ANDROID)
+    ~CMultiImageJob() override;
     CheckpointResponsibility GetCheckpointResponsibility(const IJobCallback*) const override;
     const char* GetCheckpointPersistenceOwner() const override { return "background_jobs"; }
     const char* GetCheckpointOperation() const override { return "multiimage-enumeration"; }
@@ -39,6 +40,8 @@ def apply(source, overlay):
     std::string GetCheckpointResource() const override;
   private:
     bool m_checkpointReadOnly{false};
+    mutable int m_checkpointControl{-1};
+    mutable int m_checkpointWindow{-1};
   public:
 #endif
 ''')
@@ -47,6 +50,7 @@ def apply(source, overlay):
 #if defined(TARGET_ANDROID)
 #include "InfinityMultiImagePersistence.h"
 #include "URL.h"
+#include "utils/log.h"
 #include <typeinfo>
 #endif
 ''')
@@ -58,6 +62,13 @@ def apply(source, overlay):
     start = '''#if defined(TARGET_ANDROID)
   m_checkpointReadOnly = false;
   InfinityMultiImagePersistence::Scope evidence(CJobManager::CheckpointRecord(this));
+  try
+  {
+    const auto record = CJobManager::CheckpointRecord(this);
+    CLog::Log(LOGINFO, "INFINITY_MULTIIMAGE_BEGIN token={} job={} resource={}",
+        record ? record->token : 0, record ? record->jobId : 0, GetCheckpointResource());
+  }
+  catch (...) { } // Observation cannot change the original operation.
   // Only HTTP/shout MIME lookup can enter a network backend here. The other
   // original MIME branches use this fresh item's extension and memory only.
   if (StringUtils::StartsWithNoCase(m_path, "http://") ||
