@@ -6,6 +6,7 @@ on:
       - repairs/save-later-multiimage-20261023/android*.py
       - repairs/save-later-multiimage-20261023/NavigationBindingProbe.java
       - repairs/save-later-multiimage-20261023/ANDROID-INPUT-PINS.json
+      - repairs/save-later-multiimage-20261023/ANDROID-FAVORITES-REFERENCE.json
       - .github/workflows/infinity-saved-navigation-android.yml
   workflow_dispatch:
     inputs:
@@ -28,9 +29,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Run39938059169 found common fixture failures. Qualify those paths
-        # before spending nine full emulator jobs; never call focused a release pass.
-        mode: ${{ fromJSON(github.event_name == 'workflow_dispatch' && inputs.phase == 'full' && '["safe","pending","opaque","native-opaque","lost-file","provider-pov","provider-umbrella","provider-seren","provider-future"]' || '["safe","provider-pov","native-opaque"]') }}
+        # Reuse Run39944949734's native-opaque PASS on the exact same APK.
+        # Qualify the two remaining focused failures; full remains mandatory.
+        mode: ${{ fromJSON(github.event_name == 'workflow_dispatch' && inputs.phase == 'full' && '["safe","pending","opaque","native-opaque","lost-file","provider-pov","provider-umbrella","provider-seren","provider-future"]' || '["safe","provider-pov"]') }}
     env:
       CANDIDATE_BUILD: '39930734489'
       CANDIDATE_COMMIT: 'ee8f630247b993dc2262fcdc2a6f8ce093c4c2d9'
@@ -45,7 +46,7 @@ jobs:
           python3 - <<'PY'
           import os,json,subprocess
           prefix='repairs/save-later-multiimage-20261023/'
-          allowed={prefix+n for n in ('android_probe.py','android_runtime_checks.py','android_inputs.py','android_binding.py','NavigationBindingProbe.java','ANDROID-INPUT-PINS.json')}
+          allowed={prefix+n for n in ('android_probe.py','android_runtime_checks.py','android_inputs.py','android_binding.py','NavigationBindingProbe.java','ANDROID-INPUT-PINS.json','ANDROID-FAVORITES-REFERENCE.json')}
           allowed.add('.github/workflows/infinity-saved-navigation-android.yml')
           paths=subprocess.check_output(['git','diff','--name-only',os.environ['CANDIDATE_COMMIT'],'HEAD'],text=True).splitlines()
           assert set(paths)<=allowed,paths

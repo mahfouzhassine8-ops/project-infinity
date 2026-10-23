@@ -33,6 +33,7 @@ def extra(stage,args,report):
             p.write_bytes(p.read_bytes().replace(b'plugin.video.pov',NAVFUTURE.encode()))
     fixture=stage/FUTURE
     shutil.copyfile(HERE/'android_runtime_checks.py',fixture/'android_runtime_checks.py')
+    shutil.copyfile(HERE/'ANDROID-FAVORITES-REFERENCE.json',fixture/'ANDROID-FAVORITES-REFERENCE.json')
     service=(OLD/'android_future_service.py').read_text()
     require_hash='7abb08a3f5a587f25449531c9cb6e687dd65d9b32793d1b8c596cccbb6274ad8'
     if sha(service.encode())!=require_hash:raise RuntimeError('Retained service changed')

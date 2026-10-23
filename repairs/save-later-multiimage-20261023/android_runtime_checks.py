@@ -7,9 +7,10 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import sys
 import time
-from urllib.parse import urlsplit
+from urllib.parse import urlsplit,parse_qs
 import xbmc
 import xbmcaddon
 import xbmcgui
@@ -40,6 +41,87 @@ def until(fn,message,seconds=90):
 
 def folder():return xbmc.getInfoLabel('Container.FolderPath')
 def digest(value):return hashlib.sha256(value.encode()).hexdigest()
+
+def gui_snapshot():
+    modal=xbmc.getCondVisibility('System.HasActiveModalDialog')
+    dialog=xbmcgui.getCurrentWindowDialogId()
+    # Kodi returns a sentinel ID when no dialog exists; do not create a Window
+    # wrapper for that sentinel. No native control wrappers are used here.
+    window=xbmcgui.Window(dialog) if modal and dialog not in (0,-1,9999) else None
+    prop=lambda key:window.getProperty(key) if window is not None else ''
+    return dict(window=xbmcgui.getCurrentWindowId(),dialog=dialog,folder=folder(),
+        modal=modal,
+        ok=xbmc.getCondVisibility('Window.IsActive(okdialog)'),
+        yesno=xbmc.getCondVisibility('Window.IsActive(yesnodialog)'),
+        xml=prop('xmlfile'),heading=xbmc.getInfoLabel('Control.GetLabel(1)'),
+        body=[xbmc.getInfoLabel('Control.GetLabel(%d)'%i) for i in (9,2,3,4)],
+        umbrella_heading=prop('umbrella.heading'),umbrella_text=prop('umbrella.text'))
+
+def first_use_action(state,notice,seren):
+    # Only the actual pinned provider's informational first-use notices.
+    # Never dismiss a generic error, resolver chooser, account or data prompt.
+    if (state['modal'] and Path(state['xml']).name=='textviewer.xml' and
+        state['umbrella_heading']==notice['heading'] and state['umbrella_text']==notice['text']):
+        return 'acknowledge-umbrella-first-use-information'
+    bodies=[' '.join(s.split()) for s in state['body']]
+    if (state['ok'] and state['heading']=='Seren' and
+        ' '.join(seren['cache_complete'].split()) in bodies):
+        return 'acknowledge-seren-own-first-use-completion'
+    if (state['yesno'] and state['heading']==seren['timezone_heading'] and
+        ' '.join(seren['timezone_body'].split()) in bodies):
+        return 'decline-optional-seren-timezone-selection'
+    return None
+
+def first_use_status(log,home):
+    # These markers are emitted by the unmodified installed services after
+    # their initialization. They are test preconditions, never durability proof.
+    statuses={}
+    for aid in ('plugin.video.pov',FUTURE):
+        starts=re.findall(r'T:(\d+).*Settings Monitor Service Starting \('+re.escape(aid)+r'-[^)]*\)',log)
+        statuses[aid]=bool(starts and re.search(r'T:'+starts[-1]+r'\s.*CheckUndesirablesDatabase Service Finished',log))
+    statuses['plugin.video.umbrella']='[ plugin.video.umbrella ]  Settings Monitor Service Starting...' in log
+    statuses['plugin.video.seren']=(home.getProperty('seren.service.ready')==xbmcaddon.Addon('plugin.video.seren').getAddonInfo('version')
+        and '?action=torrentCacheCleanup' in log)  # Scheduled after the optional timezone prompt.
+    return statuses
+
+def complete_first_use(home,result,record):
+    # Run39944949734: Kodi refused ActivateWindow(10025) because Umbrella's
+    # first-use textviewer was modal; Seren subsequently displayed its own
+    # completed-initialization notice. Finish only these real setup interactions
+    # before starting navigation assertions. No provider settings/DB are seeded.
+    umbrella=xbmcaddon.Addon('plugin.video.umbrella')
+    path=Path(xbmcvfs.translatePath(umbrella.getAddonInfo('path')))
+    notice=dict(heading='[B]Umbrella -  v%s - externalProviders[/B]'%umbrella.getAddonInfo('version'),
+                text=(path/'resources/help/externalProviders.txt').read_text())
+    seren_addon=xbmcaddon.Addon('plugin.video.seren')
+    seren=dict(cache_complete=seren_addon.getLocalizedString(30480),
+        timezone_heading=seren_addon.getLocalizedString(30549),timezone_body=seren_addon.getLocalizedString(30550))
+    require(all(seren.values()),'Pinned Seren first-use strings missing')
+    logpath=Path(xbmcvfs.translatePath('special://logpath/kodi.log'))
+    end=time.monotonic()+600;stable=None;last=None
+    result['first_use_actions']=[]
+    while time.monotonic()<end:
+        require(not xbmc.Monitor().abortRequested(),'Shutdown during provider initialization')
+        state=gui_snapshot();status=first_use_status(logpath.read_text(errors='replace'),home)
+        action=first_use_action(state,notice,seren)
+        if action:
+            require(len(result['first_use_actions'])<8,'Provider first-use notice repeated unexpectedly')
+            result['first_use_actions'].append(dict(action=action,observed=state,epoch_ms=int(time.time()*1000)))
+            record('provider-first-use-interaction')
+            # Back acknowledges informational viewers/OK and declines optional
+            # yes/no. The provider's own callback performs its normal continuation.
+            require(rpc('Input.Back')=='OK','First-use information could not be dismissed')
+            xbmc.sleep(500)
+            continue
+        observation=dict(services=status,gui=state)
+        if observation!=last:
+            result['first_use_observation']=observation;record('provider-first-use');last=observation
+        if all(status.values()) and not state['modal']:
+            if stable is None:stable=time.monotonic()
+            if time.monotonic()-stable>=3:return
+        else:stable=None
+        xbmc.sleep(500)
+    raise RuntimeError('Provider first-use did not complete: '+json.dumps(result['first_use_observation']))
 
 def select_native_item(control,predicate,message):
     # Run39938059169 crashed in the Python ControlList.size wrapper for a
@@ -88,6 +170,33 @@ def select_alternative(name):
     select_native_item(3,lambda:xbmc.getInfoLabel('Container(3).ListItem.Label')==name,
                        'explicit provider alternative')
 
+def verify_favorites_reference(nav,home,result,affected,umbrella):
+    reference=json.loads(Path(__file__).with_name('ANDROID-FAVORITES-REFERENCE.json').read_text())
+    path=reference['favorite_path'];ids=reference['identity']['ids']
+    require(digest(path)==reference['favorite_path_sha256'],'Physical Favorites reference drift')
+    params={k:v[0] for k,v in parse_qs(urlsplit(path).query).items()}
+    require(all(params[k]==ids[k] for k in ids),'Favorites route identity differs')
+    require(all(json.loads(params['meta'])[k]==ids[k] for k in ids),'Favorites metadata identity differs')
+    require(affected['identity']['ids']['tmdb']==ids['tmdb'],'Different affected show')
+    row=dict(type='tvshow',uniqueid=ids,file=path,filetype='directory')
+    require(nav.destination(umbrella,row)==path,'Installed contract rejected actual Favorites route')
+    # Exact native ActivateWindow command from the read-only physical capture.
+    # No favorite, provider preference or saved record is created or replaced.
+    xbmc.executebuiltin(reference['favorite_action'])
+    opened=verify_open_folder(path,home)
+    rows=rpc('Files.GetDirectory',dict(directory=path,media='video',
+        properties=['title','uniqueid','season','episode']))['files']
+    episodes=[r for r in rows if r.get('type')=='episode']
+    require(bool(episodes),'Favorites reference returned no real episodes')
+    for episode in episodes:
+        destination=nav.destination(umbrella,episode)
+        actual={k:v[0] for k,v in parse_qs(urlsplit(destination).query).items()}
+        require(actual.get('tmdb')==ids['tmdb'],'Episode belongs to another show')
+        require(all(actual.get(k) in (None,'',v) for k,v in ids.items()),'Conflicting episode identity')
+        require(int(episode['season'])>=0 and int(episode['episode'])>=1,'Episode coordinates missing')
+    result['cases'].append(dict(case='exact-physical-umbrella-favorite',passed=True,
+        archive_sha256=reference['archive_sha256'],episodes=len(episodes),identity=ids,**opened))
+
 def run(root,cycle,mode):
     cc=xbmcaddon.Addon('script.infinity.commandcenter')
     sys.path.insert(0,xbmcvfs.translatePath(cc.getAddonInfo('path')))
@@ -119,6 +228,8 @@ def run(root,cycle,mode):
                 require(rpc('Addons.SetAddonEnabled',dict(addonid=aid,enabled=True))=='OK','Provider enable failed')
         record('providers-enabled')
         home=xbmcgui.Window(10000)
+        if mode=='safe' or mode.startswith('provider-'):
+            complete_first_use(home,result,record)
         profile=Path(xbmcvfs.translatePath(cc.getAddonInfo('profile')))
         saved=profile/'continue-watching.json'
         before=saved.read_bytes();data=hub.load_view(profile)
@@ -179,6 +290,8 @@ def run(root,cycle,mode):
             require(home.getProperty(prop)==malformed,'Malformed cache changed or cleared')
             result['poisoned_cache_failure_and_explicit_alternative']=True
             result['poisoned_cache_preserved']=True
+            record('physical-favorites-reference')
+            verify_favorites_reference(nav,home,result,affected,umbrella)
         elif mode.startswith('provider-'):
             aid=PROVIDERS[mode.split('-',1)[1]]
             if home.getProperty('Infinity.Search.Protocol')!='1':
@@ -187,6 +300,7 @@ def run(root,cycle,mode):
             class Progress:
                 def iscanceled(self):return False
             for media,key in [('movie','b'*64),('tv','a'*64)]:
+                record('provider-resolve:'+aid+':'+media)
                 ready,_=nav.available(media);provider=next(p for p in ready if p['id']==aid)
                 target=nav.resolve(entries[key],provider,home,Progress())
                 require(urlsplit(target).netloc==aid,'Destination provider changed')
@@ -217,6 +331,12 @@ def run(root,cycle,mode):
     except BaseException as error:
         result['failure']=type(error).__name__+': '+str(error)
         result['traceback']=__import__('traceback').format_exc()
+        result['failure_gui']=gui_snapshot()
+        record('failed-observing-late-provider-completion')
+        # Preserve failure. Observe once, without retrying or extending the
+        # production resolver deadline, so timeout logs include late completion.
+        xbmc.Monitor().waitForAbort(30)
+        result['failure_gui_after_observation']=gui_snapshot()
     finally:
         with out.open('w') as stream:json.dump(result,stream)
     require(result['passed'],result.get('failure','Runtime check failed'))
