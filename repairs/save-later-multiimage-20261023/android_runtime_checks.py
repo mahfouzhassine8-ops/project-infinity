@@ -41,25 +41,36 @@ def until(fn,message,seconds=90):
 def folder():return xbmc.getInfoLabel('Container.FolderPath')
 def digest(value):return hashlib.sha256(value.encode()).hexdigest()
 
+def select_native_item(control,predicate,message):
+    # Run39938059169 crashed in the Python ControlList.size wrapper for a
+    # native skin container. Use the GUI's own labels and focus messages;
+    # never retain a Python control wrapper across native window changes.
+    count=int(xbmc.getInfoLabel('Container(%d).NumItems'%control) or '0')
+    require(0<count<=1000,'Native container has no bounded item list: '+message)
+    for index in range(count):
+        xbmc.executebuiltin('SetFocus(%d,%d,absolute)'%(control,index),True)
+        until(lambda:xbmc.getCondVisibility('Control.HasFocus(%d)'%control),message+' focus')
+        if predicate():
+            require(rpc('Input.Select')=='OK',message+' selection failed')
+            return
+    raise AssertionError('Native item not found: '+message)
+
 def open_saved(entry,home):
     path='plugin://script.infinity.commandcenter/?action=library&media='+entry['media']+'&bucket=later'
     xbmc.executebuiltin('ActivateWindow(Videos,"'+path+'",return)')
     until(lambda:folder().rstrip('/')==path.rstrip('/'),'actual Save for Later listing')
-    xbmc.executebuiltin('Container.SetViewMode(50)')
-    xbmc.executebuiltin('SetFocus(50)')
-    control=xbmcgui.Window(10025).getControl(50)
+    xbmc.executebuiltin('Container.SetViewMode(50)',True)
+    until(lambda:int(xbmc.getInfoLabel('Container(50).NumItems') or '0')>0,'saved native items')
     def selected():
-        for index in range(control.size()):
-            item=control.getListItem(index)
-            if item.getProperty('Infinity.ResumeHub.Key')==entry['key']:
-                require(item.getPath()==entry['source'],'Original saved route was intercepted')
-                require(item.getProperty('Infinity.ResumeHub.Bucket')=='later','Saved bucket missing')
-                control.selectItem(index)
-                return True
+        if xbmc.getInfoLabel('ListItem.Property(Infinity.ResumeHub.Key)')==entry['key']:
+            require(xbmc.getInfoLabel('ListItem.FileNameAndPath')==entry['source'],
+                    'Original saved route was intercepted')
+            require(xbmc.getInfoLabel('ListItem.Property(Infinity.ResumeHub.Bucket)')=='later',
+                    'Saved bucket missing')
+            return True
         return False
-    until(selected,'saved control item')
     require(not home.getProperty('Infinity.SavedNavigation.Failure'),'Stale failed ticket before new click')
-    require(rpc('Input.Select')=='OK','GUI saved selection failed')
+    select_native_item(50,selected,'saved control item')
 
 def verify_open_folder(path,home):
     def opened():
@@ -72,14 +83,10 @@ def verify_open_folder(path,home):
 
 def select_alternative(name):
     until(lambda:xbmc.getCondVisibility('Window.IsActive(selectdialog)'), 'actual recovery chooser')
-    window=xbmcgui.Window(12000)
-    label=window.getControl(1).getLabel()
+    label=xbmc.getInfoLabel('Control.GetLabel(1)')
     require('saved destination failed' in label.lower(),'Unrelated selection dialog: '+label)
-    control=window.getControl(3)
-    matches=[i for i in range(control.size()) if control.getListItem(i).getLabel()==name]
-    require(len(matches)==1,'Explicit alternative absent or ambiguous')
-    control.selectItem(matches[0]);window.setFocus(control)
-    require(rpc('Input.Select')=='OK','Explicit choice input failed')
+    select_native_item(3,lambda:xbmc.getInfoLabel('Container(3).ListItem.Label')==name,
+                       'explicit provider alternative')
 
 def run(root,cycle,mode):
     cc=xbmcaddon.Addon('script.infinity.commandcenter')
@@ -91,7 +98,15 @@ def run(root,cycle,mode):
         third_party_cache_cleared=False,physical_fold_verified=False,
         authenticated_provider_playback_verified=False,cases=[])
     out=Path(root)/('navigation-ready-'+cycle+'.json')
+    def record(stage):
+        result['stage']=stage
+        (Path(root)/('navigation-progress-'+cycle+'.json')).write_text(json.dumps(result))
     try:
+        # The host opens this test-only gate after real first-party startup
+        # receipts and dismissal of Android's observed first-use overlay.
+        # This marker is never a native persistence or termination receipt.
+        until(lambda:(Path(root)/('navigation-start-'+cycle+'.json')).exists(),
+              'host test admission',300)
         require(cc.getAddonInfo('version')=='0.3.5.31','Actual controller31 was not selected')
         result['active_skin']=xbmc.getSkinDir()
         require(result['active_skin']=='skin.infinity.diggz',
@@ -102,12 +117,27 @@ def run(root,cycle,mode):
             details=rpc('Addons.GetAddonDetails',dict(addonid=aid,properties=['enabled','version']))['addon']
             if not details['enabled']:
                 require(rpc('Addons.SetAddonEnabled',dict(addonid=aid,enabled=True))=='OK','Provider enable failed')
+        record('providers-enabled')
         home=xbmcgui.Window(10000)
         profile=Path(xbmcvfs.translatePath(cc.getAddonInfo('profile')))
         saved=profile/'continue-watching.json'
         before=saved.read_bytes();data=hub.load_view(profile)
         entries={e['key']:e for e in hub.entries(data,'all','later')}
         require(set(k*64 for k in 'abcd')<=set(entries),'Disposable saved controls missing')
+        # First visit the unmodified provider's real home on the fresh profile.
+        # Existing user installations have already performed this initialization.
+        # Record its actual duration/result; never change the bounded resolver's
+        # deadline, retry its failures, or replace a provider directory response.
+        initialize=(['plugin.video.pov','plugin.video.umbrella'] if mode=='safe' else
+                    [PROVIDERS[mode.split('-',1)[1]]] if mode.startswith('provider-') else [])
+        for aid in initialize:
+            record('provider-home:'+aid)
+            began=time.monotonic()
+            rows=rpc('Files.GetDirectory',dict(directory='plugin://'+aid+'/',media='video'))['files']
+            require(bool(rows),'Actual provider home returned no items: '+aid)
+            result['cases'].append(dict(case='real-first-provider-home',provider=aid,
+                elapsed_seconds=round(time.monotonic()-began,3),count=len(rows),passed=True))
+        record('navigation')
         if mode=='safe':
             control=entries['a'*64]
             open_saved(control,home)
@@ -171,6 +201,8 @@ def run(root,cycle,mode):
             rows=rpc('Files.GetDirectory',dict(directory='plugin://script.infinity.commandcenter/?action=library&media='+media+'&bucket='+bucket,
                 media='video',properties=['title']))['files']
             expected=(entries[key] if bucket=='later' else data['items'][key])['source']
+            result['listing_observation']=dict(media=media,bucket=bucket,expected_sha256=digest(expected),
+                returned_sha256=[digest(r.get('file','')) for r in rows])
             require(any(r.get('file')==expected for r in rows),'Original '+bucket+' route missing')
             result['cases'].append(dict(case=media+'-'+bucket+'-original-route',passed=True))
         require(saved.read_bytes()==before,'Navigation mutated saved controls')

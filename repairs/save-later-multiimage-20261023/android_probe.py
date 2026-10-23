@@ -6,6 +6,8 @@ import json
 from pathlib import Path
 import shutil
 import sys
+import time
+import xml.etree.ElementTree as ET
 from zipfile import ZipFile
 
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[1]
@@ -59,15 +61,21 @@ def extra(stage,args,report):
     def entry(key,title,tmdb,imdb,kind='tvshow'):
         route=('mode=play_media&mediatype=movie&tmdb_id='+tmdb if kind=='movie' else
                'mode=build_episode_list&season=all&tmdb_id='+tmdb)
+        # A captured show directory needs stable_source in the original RC8
+        # producer format. Movie/episode controls use the compatible future
+        # provider: current POV6.10.21 is outside the retained playback-memory
+        # contract, so the old synthetic POV movie was never a working control.
+        source='plugin://'+(NAVFUTURE if kind=='movie' else 'plugin.video.pov')+'/?'+route
         return dict(key=key*64,title=title,showtitle=title,media='movie' if kind=='movie' else 'tv',
-            season=-1,episode=-1,tmdb=tmdb,imdb=imdb,source='plugin://plugin.video.pov/?'+route,
+            season=-1,episode=-1,tmdb=tmdb,imdb=imdb,source=source,stable_source=source,
             identity=dict(schema=1,kind=kind,scope='movie' if kind=='movie' else 'show',ids=dict(tmdb=tmdb,imdb=imdb)))
     rows=[entry('a','Breaking Bad','1396','tt0903747'),entry('b','The Matrix','603','tt0133093','movie'),
           entry('c','Love After Lockup: Relationship Rehab','330430','tt48447471'),
           entry('d','Breaking Bad','1396','tt0903747')]
     later={e['key']:e for e in rows}
     resume=dict(rows[0],position=147.356,duration=2557.536,season=1,episode=3)
-    resume.update(key='f'*64,source='plugin://plugin.video.pov/?mode=play_media&mediatype=episode&tmdb_id=1396&season=1&episode=3')
+    resume.update(key='f'*64,source='plugin://'+NAVFUTURE+'/?mode=play_media&mediatype=episode&tmdb_id=1396&season=1&episode=3')
+    resume['stable_source']=resume['source']
     resume['identity']=dict(schema=1,kind='episode',scope='show_episode',ids=rows[0]['identity']['ids'],season=1,episode=3)
     data=dict(schema=1,revision=1,later=later,watchlist=later,watched={'e'*64:dict(rows[1],watched=True)},
               items={'f'*64:resume},sources={},collection={},ratings={},lists={})
@@ -76,6 +84,42 @@ def extra(stage,args,report):
     report['preserved_fixture_sha256']=sha(target.read_bytes())
     probe=globals()['runtime']['probe']
     probe.adb('push',addondata,probe.PROFILE+'/addon_data')
+    advanced=args.out/'advancedsettings.xml'
+    advanced.write_text('<advancedsettings><loglevel hide="true">1</loglevel></advancedsettings>')
+    probe.adb('push',advanced,probe.PROFILE+'/advancedsettings.xml')
+
+def admit_runtime(probe,owner,out):
+    # The screenshots from Run39938059169 show Android's first-use fullscreen
+    # tutorial covering the app. Dismiss only that identified system button.
+    # No provider modal, error or app failure is acknowledged automatically.
+    observed=[]
+    dump='/data/local/tmp/infinity-navigation-ui.xml'
+    for attempt in range(2):
+        probe.shell('uiautomator','dump',dump)
+        raw=probe.shell('cat',dump);(out/('android-ui-'+str(attempt)+'.xml')).write_text(raw)
+        nodes=ET.fromstring(raw).iter('node')
+        buttons=[n for n in nodes if n.get('text')=='Got it' and
+                 n.get('package')=='com.android.systemui' and n.get('clickable')=='true']
+        if not buttons:break
+        if attempt or len(buttons)!=1:raise RuntimeError('Android tutorial dismissal did not complete uniquely')
+        bounds=__import__('re').fullmatch(r'\[(\d+),(\d+)\]\[(\d+),(\d+)\]',buttons[0].get('bounds',''))
+        if not bounds:raise RuntimeError('Android tutorial button has invalid bounds')
+        x1,y1,x2,y2=map(int,bounds.groups())
+        observed.append(dict(action='dismiss-system-fullscreen-tutorial',bounds=[x1,y1,x2,y2]))
+        probe.shell('input','tap',str((x1+x2)//2),str((y1+y2)//2))
+        time.sleep(1)
+    value=probe.rpc('Settings.GetSettingValue',{'setting':'lookandfeel.skin'})['value']
+    if value!='skin.infinity.diggz':raise RuntimeError('Expected active Infinity skin, got '+str(value))
+    gate=out/'test-admission.json';gate.write_text(json.dumps(dict(pid=owner['pid'],scope='test scheduling only',android_actions=observed)))
+    probe.adb('push',gate,probe.PROFILE+'/addon_data/'+FUTURE+'/navigation-start-'+str(owner['pid'])+'.json')
+
+def collect_runtime(probe,out):
+    # Retain exact per-process navigation stage/error even when the service
+    # fails before its existing persistence-ready receipt. No success inferred.
+    base=probe.PROFILE+'/addon_data/'+FUTURE
+    for name in probe.shell('ls',base,check=False).splitlines():
+        if __import__('re').fullmatch(r'navigation-(?:ready|progress|start)-\d+\.json',name):
+            probe.adb('pull',base+'/'+name,out/name,check=False)
 
 def verify_runtime(args,entry,owner,probe):
     path=probe.PROFILE+'/addon_data/'+FUTURE+'/navigation-ready-'+str(owner['pid'])+'.json'
@@ -103,7 +147,8 @@ def wait_navigation_ready(probe,owner,ready_path):
         ready=probe.read_json(ready_path)
         if ready:return ready
         time.sleep(.25)
-    raise RuntimeError('Actual service did not reach its verified ready boundary')
+    progress=probe.read_json(probe.PROFILE+'/addon_data/'+FUTURE+'/navigation-progress-'+str(owner['pid'])+'.json')
+    raise RuntimeError('Actual service did not reach its verified ready boundary; stage='+str(progress.get('stage')))
 
 def main():
     # Keep original platform, SELinux, APK digest, all real VFS/SQLite tests,
@@ -144,14 +189,20 @@ def main():
         "'script.infinity.commandcenter':'0.3.5.31','script.infinity.watchedbridge':'1.0.12','script.infinity.uirepair':'0.1.14','service.infinity.compat':'0.8.2'")
     text=once(text,"ready=until(lambda:probe.read_json(ready_path),60)","ready=wait_navigation_ready(probe,owner,ready_path)")
     text=once(text,"            entry['service_ready']=ready", "            entry['service_ready']=ready\n            verify_runtime(a,entry,owner,probe)")
+    text=once(text,"owner=probe.wait_ready(old_owner);entry['owner']=owner",
+        "owner=probe.wait_ready(old_owner);entry['owner']=owner\n            admit_runtime(probe,owner,cycleout)")
+    text=once(text,"            owner=probe.wait_ready(old_owner)\n",
+        "            owner=probe.wait_ready(old_owner)\n            admit_runtime(probe,owner,final)\n")
     text=once(text,"                elif a.mode=='lost-file':", "                elif a.mode=='native-opaque':\n                    assert 'multiimage_directory_backend_unverified' in evidence and 'background_jobs' in evidence\n                elif a.mode=='lost-file':")
     text=once(text,"ready-'+str(owner['pid'])+'.json'),60)","ready-'+str(owner['pid'])+'.json'),1200)")
+    text=once(text,"    finally:\n        save(a.out/'ANDROID17-RESULT.json',report)",
+        "    finally:\n        try:collect_runtime(probe,a.out)\n        except Exception as error:report['navigation_collection_error']=str(error)\n        save(a.out/'ANDROID17-RESULT.json',report)")
     # Persist the precise harness-only patch for review; no original file edited.
     parser=argparse.ArgumentParser(add_help=False);parser.add_argument('--out',type=Path,required=True)
     args,_=parser.parse_known_args();args.out.mkdir(parents=True,exist_ok=True)
     (args.out/'RETAINED-HARNESS.patch').write_text(''.join(difflib.unified_diff(original.splitlines(True),text.splitlines(True),'retained/android_probe.py','disposable/extended_android_probe.py')))
     global runtime
-    runtime=dict(__file__=str(OLD/'android_probe.py'),__name__='retained_targeted_android',extra=extra,verify_runtime=verify_runtime,wait_navigation_ready=wait_navigation_ready)
+    runtime=dict(__file__=str(OLD/'android_probe.py'),__name__='retained_targeted_android',extra=extra,verify_runtime=verify_runtime,wait_navigation_ready=wait_navigation_ready,admit_runtime=admit_runtime,collect_runtime=collect_runtime)
     exec(compile(text,str(OLD/'android_probe.py'),'exec'),runtime)
     runtime['main']()
 
