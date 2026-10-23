@@ -241,9 +241,17 @@ def verify_open_folder(path,home):
     return dict(destination_sha256=digest(path),count=int(xbmc.getInfoLabel('Container.NumItems')))
 
 def select_alternative(name):
-    until(lambda:xbmc.getCondVisibility('Window.IsActive(selectdialog)'), 'actual recovery chooser')
-    label=xbmc.getInfoLabel('Control.GetLabel(1)')
-    require('saved destination failed' in label.lower(),'Unrelated selection dialog: '+label)
+    # Run39998374579 attempt2 observed the window active during initialization:
+    # its transient label was "Picture information", while the immediate failure
+    # snapshot already showed the correct DialogSelect.xml and recovery heading.
+    # Wait for the complete identity; never select from an unrelated dialog.
+    def recovery_chooser_ready():
+        if not xbmc.getCondVisibility('Window.IsActive(selectdialog)'):return False
+        state=gui_snapshot()
+        return (state['modal'] and state['dialog']==12000 and
+                Path(state['xml']).name=='DialogSelect.xml' and
+                state['heading']=='The saved destination failed — open with')
+    until(recovery_chooser_ready,'actual saved-destination recovery chooser')
     select_native_item(3,lambda:xbmc.getInfoLabel('Container(3).ListItem.Label')==name,
                        'explicit provider alternative')
 

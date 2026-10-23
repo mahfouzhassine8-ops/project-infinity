@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
     inputs:
       phase:
-        description: Focused blockers first; full matrix remains required for acceptance
+        description: Remaining safe gate; full matrix available for a changed APK
         type: choice
         options: [focused, full]
         default: focused
@@ -29,9 +29,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # New native lifecycle correction: all nine gates must run against this exact APK.
-        # Prior candidate evidence is retained but cannot qualify the changed engine.
-        mode: ${{ fromJSON(github.event_name == 'workflow_dispatch' && inputs.phase == 'focused' && '["safe","provider-pov"]' || '["safe","pending","opaque","native-opaque","lost-file","provider-pov","provider-umbrella","provider-seren","provider-future"]') }}
+        # Same signed APK: retain eight executed passing modes from 39998374579.
+        # Only the remaining safe gate needs the evidence-backed dialog wait fix.
+        mode: ${{ fromJSON(github.event_name == 'workflow_dispatch' && inputs.phase == 'full' && '["safe","pending","opaque","native-opaque","lost-file","provider-pov","provider-umbrella","provider-seren","provider-future"]' || '["safe"]') }}
     env:
       CANDIDATE_BUILD: '39994772688'
       CANDIDATE_COMMIT: '3d3730c490220a1169e9dea280832c42da4971e8'
