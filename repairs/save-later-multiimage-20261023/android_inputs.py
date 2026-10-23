@@ -8,6 +8,8 @@ import hashlib
 import io
 import json
 from pathlib import Path
+import time
+import urllib.error
 import urllib.request
 import xml.etree.ElementTree as ET
 from zipfile import ZipFile
@@ -20,7 +22,18 @@ CONTEXT='https://raw.githubusercontent.com/deklica/repo.dexe/824cbcaddf0ca882303
 
 def sha(raw):return hashlib.sha256(raw).hexdigest()
 def fetch(url):
-    with urllib.request.urlopen(url,timeout=90) as stream:return stream.read()
+    # Run39935367720/provider-pov lost its input-download network route.
+    # Retry only transport/transient HTTP failures before executing the APK.
+    # Integrity failures and application/runtime assertions are never retried.
+    for attempt in range(1,4):
+        try:
+            with urllib.request.urlopen(url,timeout=90) as stream:return stream.read()
+        except (urllib.error.URLError,TimeoutError) as error:
+            if isinstance(error,urllib.error.HTTPError) and error.code not in (408,429,500,502,503,504):
+                raise
+            print('Input download failed (attempt '+str(attempt)+'/3): '+url+'; '+str(error),flush=True)
+            if attempt==3:raise
+            time.sleep(2*attempt)
 def manifest(raw,aid):
     with ZipFile(io.BytesIO(raw)) as z:
         if len(z.namelist())!=len(set(z.namelist())) or z.testzip():raise RuntimeError('Invalid input archive')

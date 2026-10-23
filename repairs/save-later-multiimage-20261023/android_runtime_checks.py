@@ -93,7 +93,11 @@ def run(root,cycle,mode):
     out=Path(root)/('navigation-ready-'+cycle+'.json')
     try:
         require(cc.getAddonInfo('version')=='0.3.5.31','Actual controller31 was not selected')
-        require(xbmc.getSkinDir()=='skin.infinity.diggz','Infinity skin must be active')
+        result['active_skin']=xbmc.getSkinDir()
+        require(result['active_skin']=='skin.infinity.diggz',
+                'Infinity skin must be active; actual='+result['active_skin'])
+        require(rpc('Settings.GetSettingValue',dict(setting='general.addonupdates'))['value']==2,
+                'Disposable profile input-update policy was not loaded')
         for aid in PROVIDERS.values():
             details=rpc('Addons.GetAddonDetails',dict(addonid=aid,properties=['enabled','version']))['addon']
             if not details['enabled']:

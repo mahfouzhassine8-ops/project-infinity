@@ -115,6 +115,16 @@ def main():
     compatible=tuple(m for m in modes if m!='opaque')
     success=tuple(m for m in modes if m=='safe' or m.startswith('provider-'))
     text=once(original,"['safe','pending','baseline','opaque','lost-file']",repr(list(modes)))
+    # Run39935367720 loaded Estuary in all eight booted jobs: the retained
+    # persistence-only fixture neither selected Infinity nor supplied the
+    # <resolutions> required by CDisplaySettings::Load. CSettings::Load then
+    # reset the invalid fixture to defaults. Seed a valid fresh-test profile;
+    # do not change the APK, a shared harness, or an existing user profile.
+    text=once(text,
+        '<settings version="2"><setting id="general.addonupdates">2</setting></settings>',
+        '<settings version="2"><resolutions />'
+        '<setting id="lookandfeel.skin">skin.infinity.diggz</setting>'
+        '<setting id="general.addonupdates">2</setting></settings>')
     text=once(text,"\n        if a.mode in ('safe','pending','lost-file'):","\n        if a.mode in "+repr(compatible)+":")
     # Second occurrence validates the existing archived compatible version.
     text=once(text,"            if a.mode in ('safe','pending','lost-file'):","            if a.mode in "+repr(compatible)+":")
