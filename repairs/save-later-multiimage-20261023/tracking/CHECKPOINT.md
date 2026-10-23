@@ -1,15 +1,13 @@
-# Approved tracking/navigation continuation
+# Authorized tracking/navigation continuation
 
-Reference: signed build 39994772688; retained component-only TraktPinFix from the user's saved delivery.
+Reference: permanently signed build 39994772688. Reused its components, original routes, prior TraktPinFix, native build recipe, signing and exact preservation gates.
 
-1. Shared recovery implemented in source; 15 focused host contracts PASS. Actual Android and physical Fold NOT RUN. Full native compilation and release component sealing pending. This checkpoint is not an installable release.
-2. Trakt end-to-end compatibility and persistence: next.
-3. Actual Home Continue Watching series deduplication: pending.
-4. Targeted responsiveness: pending.
-5. Approved Play/Pause appearance: pending.
+1. Shared recovery: implemented. Sixteen focused host checks PASS. Selected alternatives require native directory identity evidence, or fresh resolver identity plus actual AV start. Working original routes remain direct; known failed choices are retained separately and require explicit selection. Actual Android and physical Fold NOT RUN.
+2. Local Trakt: fixed stale version requirements and original-source capture; exact 19-file controller contracts and reciprocal bridge pins regenerated. Six local action/contract host checks PASS. Existing records are retained during these actions. External Trakt synchronization NOT RUN and not claimed.
+3. Actual Home route: UI Repair → Command Center → read-only series projection. Four focused host checks PASS, including the actual Home Python directory entry point. Most recently updated episode remains visible; episode data/history are untouched. Rendered Android/Fold NOT RUN.
+4. Responsiveness: remembered routes skip old-provider inspection; exact provider source verification is shared within one render and destinations remain individually checked. Fold traces show fast Python listings and delayed native Home jobs. Global Home-freeze resolution is NOT PROVEN. No scheduler, battery, thermal or refresh-rate changes.
+5. Play/Pause: user selected recommended dark disc/white symbol with cyan fill/glow removed. Only two texture references changed in each of 14 layouts, using existing button_dark.png. Events, placement, size, glyphs and other controls remain identical. Source/XML integrity PASS; rendered Android/Fold NOT RUN.
 
-The recovery observer is scoped to Infinity's Command Center items in later/watchlist/continue. Working targets use the original operation. Missing/incompatible/known-failed targets require selection. Selected alternatives are remembered only following a correlated native identity/success result; movies/episodes also require actual playback start. Preferences occupy an additive navigation_recovery map in the existing admitted tracking store. Existing progress/list/history records are not rewritten or pruned by these writes.
+Coordinated component versions: Command Center 0.3.5.32, UI Repair 0.1.15, Watched Bridge 1.0.13, skin 1.0.5.239. A native build is required for the new Watchlist/Continue success observer and exact source-owner/installer bindings. Older admitted controller contracts are retained. Compilation and signing remain pending at this checkpoint; source overlays are not an installable delivery.
 
-A native observer extension is necessary because the existing compiled observer excludes Watchlist/Continue and publishes no success result. Consolidate its rebuild with final exact component owner/installer bindings after the remaining authorized steps; do not rebuild for each component edit.
-
-No shutdown tests, unrelated suites, Cobra edits, data resets, or APK changes have been executed at this checkpoint. Existing shutdown failures remain independent. Final acceptance/lock remains false.
+No shutdown tests, Cobra changes, user-data resets, provider edits or unrelated suites. Existing shutdown failures remain independent. Physical acceptance and final lock remain false.

@@ -72,8 +72,11 @@ inline bool Begin(const CFileItem& item, const std::string& listing)
     if (!Enabled() || !Bucket(bucket)) return false;
     // Home playback carries the exact first-party listing on its original item.
     const CURL parent(listing.empty() ? item.GetProperty("Infinity.SavedNavigation.Listing").asString() : listing);
-    if (!parent.IsProtocol("plugin") || parent.GetHostName() != "script.infinity.commandcenter" ||
-        parent.GetOption("action") != "library" || parent.GetOption("bucket") != bucket) return false;
+    const bool controllerLibrary = parent.GetHostName() == "script.infinity.commandcenter" &&
+        parent.GetOption("action") == "library" && parent.GetOption("bucket") == bucket;
+    const bool continueListing = bucket == "continue" && parent.GetOption("action") == "continue" &&
+        (parent.GetHostName() == "script.infinity.commandcenter" || parent.GetHostName() == "script.infinity.uirepair");
+    if (!parent.IsProtocol("plugin") || (!controllerLibrary && !continueListing)) return false;
     const auto key = item.GetProperty("Infinity.ResumeHub.Key").asString();
     const auto& path = item.GetPath();
     if (!Key(key)) return false;
@@ -253,9 +256,12 @@ inline void WindowResult(const std::string& path, bool success, const CFileItemL
   {
     const auto current = State().Read();
     if (!current || !current->folder || current->path != path) return;
-    const bool verified = success && (!current->recovering || FolderMatches(*current, items));
+    bool populated = false;
+    for (int i = 0; i < items.Size(); ++i)
+      if (items.Get(i) && !items.Get(i)->IsParentFolder()) { populated = true; break; }
+    const bool verified = success && populated && (!current->recovering || FolderMatches(*current, items));
     const auto ticket = State().Finish(current->token, path, verified,
-        success ? "provider_identity_unverified" : "provider_directory_failed");
+        success && populated ? "provider_identity_unverified" : "provider_directory_failed");
     if (ticket) { if (ticket->succeeded) PublishSuccess(*ticket); else Publish(*ticket); }
   }
   catch (...) { }
@@ -271,10 +277,22 @@ inline void DirectoryCancelled(const std::string& path, bool cancelled)
   catch (...) { }
 }
 inline thread_local std::string movieToken;
+inline thread_local bool movieIdentityVerified{false};
+// Inspect the fresh resolver result before Kodi merges the original saved tags.
+// Only a currently selected recovery is affected; ordinary providers retain
+// their exact success result and metadata path.
+inline bool MovieResolved(const std::string& path, bool success, const CFileItem& fresh)
+{
+  const auto current = State().Read();
+  if (!Enabled() || !current || !current->recovering || current->folder ||
+      current->token != movieToken || current->path != path || !success) return success;
+  movieIdentityVerified = MediaMatches(fresh, Pending(*current)["identity"], false);
+  return movieIdentityVerified;
+}
 class MovieAttempt
 {
 public:
-  explicit MovieAttempt(const CFileItem& item) : m_previous(movieToken)
+  explicit MovieAttempt(const CFileItem& item) : m_previous(movieToken), m_previousVerified(movieIdentityVerified)
   {
     try
     {
@@ -290,12 +308,13 @@ public:
       if (current && !current->folder && !current->failed && current->path == path)
       {
         m_token = movieToken = current->token;
+        movieIdentityVerified = false;
         m_path = path;
       }
     }
     catch (...) { }
   }
-  ~MovieAttempt() { movieToken = m_previous; }
+  ~MovieAttempt() { movieToken = m_previous; movieIdentityVerified = m_previousVerified; }
   void Finish(bool success, const CFileItem& result)
   {
     try
@@ -303,7 +322,7 @@ public:
       if (m_token.empty()) return;
       const auto current = State().Read();
       if (!current || current->token != m_token || current->path != m_path) return;
-      const bool verified = success && (!current->recovering || MediaMatches(result, Pending(*current)["identity"], false));
+      const bool verified = success && (!current->recovering || (movieIdentityVerified && MediaMatches(result, Pending(*current)["identity"], false)));
       const auto ticket = State().Finish(m_token, m_path, verified,
           success ? "provider_identity_unverified" : "provider_resolution_failed");
       if (ticket) { if (ticket->succeeded) PublishSuccess(*ticket); else Publish(*ticket); }
@@ -312,6 +331,7 @@ public:
   }
 private:
   std::string m_previous, m_token, m_path;
+  bool m_previousVerified{false};
 };
 inline void MovieCancelled(bool cancelled)
 {

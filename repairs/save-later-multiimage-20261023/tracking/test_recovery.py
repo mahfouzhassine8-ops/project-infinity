@@ -133,6 +133,14 @@ class Recovery(unittest.TestCase):
         target=self.nav.navigation_target(self.entry,json.loads(self.path.read_text()),self.entry['source'],'later')
         self.assertIn('action=saved-recovery',target);self.assertNotEqual(target,self.entry['source'])
 
+    def test_remembered_route_skips_old_provider_and_validates_cached_destinations(self):
+        self.pending();self.assertTrue(self.confirm());data=json.loads(self.path.read_text())
+        with patch.object(self.plugin, '_target', side_effect=AssertionError('Old provider must not be inspected')), patch.object(self.nav,'_provider_current',return_value=self.provider):
+            self.assertEqual(self.plugin.navigation_target(self.entry,data,'watchlist'),self.route)
+        record=self.memory();cache={(self.provider['id'],json.dumps(self.provider['contract'],sort_keys=True)):self.provider}
+        bad=dict(record,route='plugin://plugin.video.unrelated/?action=seasons')
+        self.assertIsNone(self.nav._provider_current(bad,{'navigation_providers':cache}))
+
     def test_unknown_or_conflicting_identity_never_reuses_memory(self):
         self.pending();self.confirm();data=json.loads(self.path.read_text())
         for ids in ({'tmdb':'999','imdb':'tt48447471'},{'tmdb':'330430','imdb':'tt9999999'}):

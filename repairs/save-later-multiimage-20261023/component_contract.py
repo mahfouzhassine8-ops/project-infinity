@@ -10,9 +10,10 @@ HERE=Path(__file__).resolve().parent
 PLUGIN_SHA='47ce816e00ca30d8eb77ea4d6e034bdbd40b2a5d6c51bfd4eda8d6c75545edb8'
 PARENT_VERSIONS={'script.infinity.commandcenter':('0.3.5.29','0.3.5.31'),
           'script.infinity.watchedbridge':('1.0.10','1.0.12'),
-          'script.infinity.uirepair':('0.1.12','0.1.14')}
+          'script.infinity.uirepair':('0.1.12','0.1.14'),
+          'skin.infinity.diggz':('1.0.5.238','1.0.5.238')}
 
-VERSIONS={k:(v[0], {'script.infinity.commandcenter':'0.3.5.32', 'script.infinity.watchedbridge':'1.0.13', 'script.infinity.uirepair':'0.1.15'}[k]) for k,v in PARENT_VERSIONS.items()}
+VERSIONS={k:(v[0], {'script.infinity.commandcenter':'0.3.5.32', 'script.infinity.watchedbridge':'1.0.13', 'script.infinity.uirepair':'0.1.15', 'skin.infinity.diggz':'1.0.5.239'}[k]) for k,v in PARENT_VERSIONS.items()}
 
 def once(source,before,after):
     if source.count(before)!=1:raise RuntimeError('Plugin preimage occurrence mismatch')

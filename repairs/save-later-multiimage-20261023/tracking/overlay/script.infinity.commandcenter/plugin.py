@@ -104,11 +104,17 @@ def _target(entry, sources=None, render=None):
 
 
 def navigation_target(entry, data, bucket='continue', render=None):
+    if bucket in ('later', 'watchlist', 'continue') and data.get('navigation_recovery'):
+        from saved_navigation import remembered, navigation_target as select_target
+        record = remembered(data, hub.entry_identity(entry))
+        if record and record.get('success_verified') is True and record.get('route'):
+            # A verified preference supersedes the failed old route. Do not
+            # inspect the old provider or construct another resolver first.
+            return select_target(entry, data, '', bucket, render)
     original = _target(entry, data.get('sources', {}), render)
     if bucket not in ('later', 'watchlist', 'continue'):
         return original
-    # Keep successful untouched records on the exact old path, including no
-    # recovery module import or provider inspection during ordinary listing.
+    # Keep untouched working records on the exact old path, with no discovery.
     if original and not data.get('navigation_recovery'):
         return original
     from saved_navigation import navigation_target as select_target
@@ -441,7 +447,11 @@ def play_saved(key):
         data = hub.load_view(PROFILE)
         entry = data.get('items', {}).get(key)
         if entry and hub.entry_identity(entry) and not entry.get('synthetic_next'):
-            target = _target(entry, data.get('sources', {}))
+            target = navigation_target(entry, data, 'continue')
+            if target.startswith('plugin://script.infinity.commandcenter/?action=saved-recovery&'):
+                xbmcplugin.setResolvedUrl(HANDLE, False, xbmcgui.ListItem())
+                recover_entry(key, 'continue', resume_offset=max(0.0, number(entry.get('position'))))
+                return
             if target:
                 _, item = _list_item(entry, data, 'continue')
                 xbmcplugin.setResolvedUrl(HANDLE, True, item)

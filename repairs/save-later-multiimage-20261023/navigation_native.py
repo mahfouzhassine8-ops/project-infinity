@@ -87,6 +87,7 @@ def apply(source, overlay):
     after[plugin] = once(after[plugin], '  bool success = newDir.StartScript(strPath, resume);\n',
         '  bool success = newDir.StartScript(strPath, resume);\n'
         '#if defined(TARGET_ANDROID)\n'
+        '  success = InfinitySavedNavigation::MovieResolved(strPath, success, *newDir.m_fileResult);\n'
         '  if (!success) InfinitySavedNavigation::MovieCancelled(\n'
         '      newDir.InfinityResultCancelled() || newDir.m_cancelled);\n'
         '#endif\n')

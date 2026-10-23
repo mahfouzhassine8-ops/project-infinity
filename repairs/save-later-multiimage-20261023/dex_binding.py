@@ -16,7 +16,7 @@ DEX='8b3f0cf83cf05e99f0b6d7e141d543af0d5f096e2406e73751ea4cfbff774d7c'
 TARGET='com/projectinfinity/kodi/InfinityInstalledCheckpointInstaller.smali'
 CLASS='L'+TARGET[:-6]+';'
 APPLY='applyBeforeNative(Landroid/content/Context;)Z'
-HELPER='verify(Ljava/io/File;)Z'
+HELPER='verify(Ljava/io/File;)Ljava/lang/String;'
 
 
 def sha(raw):return hashlib.sha256(raw).hexdigest()
@@ -60,35 +60,44 @@ def prepare(apk,stage,jars,android,d8,out):
     # previously shifted a protected Cobra string past the 16-bit boundary and
     # widened its instruction. Character payloads avoid that encoded change.
     chars=lambda s:'new String(new char[]{'+','.join(str(ord(c)) for c in s)+'})'
-    pairs=',\n'.join('      {'+chars(n)+','+chars(h)+'}' for n,h in sorted(pins.items()))
-    java='''package com.projectinfinity.kodi;
-import java.io.*;
-import java.security.MessageDigest;
-final class InfinityInstalledCheckpointInstaller {
-  private static boolean verify(File addons) throws Exception {
-    File root = new File(addons,"script.infinity.commandcenter").getAbsoluteFile();
-    if (!root.equals(root.getCanonicalFile()) || !root.isDirectory()) return false;
+    inventories=[('0.3.5.31',json.loads((HERE/'tracking/PARENT-CONTROLLER-PINS.json').read_text())),('0.3.5.32',pins)]
+    blocks=[]
+    for version, inventory in inventories:
+        pairs=',\n'.join('      {'+chars(n)+','+chars(h)+'}' for n,h in sorted(inventory.items()))
+        blocks.append("""    {
     String[][] pins = {
-'''+pairs+'''
+"""+pairs+"""
     };
+    boolean matched=true;
     for (String[] pin : pins) {
       File file = new File(root,pin[0]).getAbsoluteFile();
-      if (!file.equals(file.getCanonicalFile()) || !file.isFile()) return false;
+      if (!file.equals(file.getCanonicalFile()) || !file.isFile()) {matched=false;break;}
       MessageDigest digest=MessageDigest.getInstance("SHA-256");
       int size=0; byte[] buffer=new byte[8192];
       try (FileInputStream stream=new FileInputStream(file)) {
         int count; while ((count=stream.read(buffer))!=-1) {
-          size+=count; if (size>4194304) return false; digest.update(buffer,0,count);
+          size+=count; if (size>4194304) return null; digest.update(buffer,0,count);
         }
       }
       StringBuilder hash=new StringBuilder();
       for (byte value : digest.digest()) hash.append(String.format(java.util.Locale.ROOT,"%02x",value&255));
-      if (!hash.toString().equals(pin[1])) return false;
+      if (!hash.toString().equals(pin[1])) {matched=false;break;}
     }
-    return true;
+    if (matched) return """+chars(version)+""";
+    }
+""")
+    java="""package com.projectinfinity.kodi;
+import java.io.*;
+import java.security.MessageDigest;
+final class InfinityInstalledCheckpointInstaller {
+  private static String verify(File addons) throws Exception {
+    File root = new File(addons,"script.infinity.commandcenter").getAbsoluteFile();
+    if (!root.equals(root.getCanonicalFile()) || !root.isDirectory()) return null;
+"""+''.join(blocks)+"""
+    return null;
   }
 }
-'''
+"""
     source=out/'java/InfinityInstalledCheckpointInstaller.java';source.parent.mkdir();source.write_text(java)
     classes=out/'helper-classes';classes.mkdir()
     run(['javac','--release','8','-g:none','-Xlint:all,-options','-Werror','-d',classes,source])
@@ -106,16 +115,9 @@ final class InfinityInstalledCheckpointInstaller {
     block=old[APPLY]
     anchor='    const-string v6, "3e2e182758a890d1ad98992a8cb11ea704c54eaab41b940dde03ab6bd68fa39c"\n'
     selector=('    invoke-static {v5}, '+CLASS+'->'+HELPER+'\n'
-        '    move-result v6\n    if-nez v6, :infinity_cc31_route\n\n')
+        '    move-result-object v7\n    if-nez v7, :infinity_cc31_route\n\n')
     tail=('    :infinity_cc31_route\n'
-        '    const/16 v2, 0x8\n    new-array v2, v2, [C\n'
-        '    fill-array-data v2, :infinity_cc31_version\n'
-        '    new-instance v7, Ljava/lang/String;\n'
-        '    invoke-direct {v7, v2}, Ljava/lang/String;-><init>([C)V\n'
-        '    move-object v2, v7\n    goto/16 :goto_1\n'
-        '    :infinity_cc31_version\n    .array-data 2\n'+
-        ''.join('        0x'+format(ord(c),'x')+'s\n' for c in '0.3.5.31')+
-        '    .end array-data\n')
+        '    move-object v2, v7\n    goto/16 :goto_1\n')
     updated=once(once(block,anchor,selector+anchor),'.end method',tail+'.end method')
     if updated.replace(selector,'',1).replace(tail,'',1)!=block:raise RuntimeError('Original installer route changed')
     merged=once(original,block,updated)+'\n'+compiled[HELPER]+'\n'

@@ -27,7 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
-      - name: Require the two authorized areas and unchanged protected source
+      - name: Require authorized correction scope and unchanged protected source
         run: |
           python3 - <<'PY'
           import os,subprocess

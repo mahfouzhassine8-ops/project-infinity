@@ -1,0 +1,56 @@
+{
+  "source_sha256": "cd6d9594645cb2475ff08e360b4b5fb0761a51789aa1adc1800081cd00ec85eb",
+  "fold_observations": {
+    "resume/timing-current.jsonl": {
+      "snapshot_load": {
+        "samples": 13,
+        "min_ms": 0.443,
+        "median_ms": 3.663,
+        "max_ms": 5.577
+      },
+      "plugin_complete": {
+        "samples": 6,
+        "min_ms": 8.693,
+        "median_ms": 19.2105,
+        "max_ms": 37.219
+      },
+      "native_start": {
+        "samples": 9,
+        "min_ms": 0.18062496185302734,
+        "median_ms": 0.4440630078315735,
+        "max_ms": 3640.858437001705
+      },
+      "first_card_presented": {
+        "samples": 11,
+        "min_ms": 5.67927098274231,
+        "median_ms": 20.083334028720856,
+        "max_ms": 3237.5430189967155
+      }
+    },
+    "resume/timing-previous.jsonl": {
+      "snapshot_load": {
+        "samples": 1,
+        "min_ms": 7.092,
+        "median_ms": 7.092,
+        "max_ms": 7.092
+      },
+      "native_start": {
+        "samples": 6,
+        "min_ms": 0.375885009765625,
+        "median_ms": 96122.5610049963,
+        "max_ms": 96124.41392099857
+      }
+    }
+  },
+  "implemented": [
+    "Remembered routes bypass original-provider inspection",
+    "One exact provider source verification per render; every destination validated",
+    "Read-only Home series projection reduces duplicate cards without deleting progress"
+  ],
+  "shared_scheduler_changed": false,
+  "thermal_changes": false,
+  "background_workers_added": 0,
+  "performance_acceptance": "NOT RUN",
+  "home_freeze_resolution": "NOT PROVEN; queue observations do not isolate an authorized failing operation",
+  "shutdown": "NOT RUN"
+}

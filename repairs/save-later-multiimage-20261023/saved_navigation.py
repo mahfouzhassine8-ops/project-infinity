@@ -478,9 +478,13 @@ def _provider_current(record, render=None):
     if not re.fullmatch(r'plugin\.[A-Za-z0-9._-]{1,170}', identity):
         return None
     cache = render.setdefault('navigation_providers', {}) if render is not None else {}
-    cache_key = (identity, json.dumps(pins, sort_keys=True))
+    cache_key = (identity, json.dumps(proof['contract'], sort_keys=True))
     if cache_key in cache:
-        return cache[cache_key]
+        provider = cache[cache_key]
+        if provider:
+            try:_params(provider, record.get('route'))
+            except (Unavailable, ValueError, TypeError):return None
+        return provider
     try:
         provider = deepcopy(proof)
         provider['root'] = xbmcvfs.translatePath(xbmcaddon.Addon(identity).getAddonInfo('path'))
@@ -489,7 +493,9 @@ def _provider_current(record, render=None):
                 raise ValueError('Invalid provider source proof')
             if hashlib.sha256(_source(Path(provider['root']).resolve(), name)).hexdigest() != pin:
                 raise ValueError('Provider source changed')
-        search.route(provider)  # enabled state, exact raw API and manifest pins
+        # The exact bytes were checked above; do not read/hash them a second time.
+        if not xbmc.getCondVisibility('System.AddonIsEnabled(' + identity + ')'):
+            raise ValueError('Provider unavailable')
         _params(provider, record.get('route'))
         cache[cache_key] = provider
     except (OSError, ValueError, RuntimeError, TypeError, KeyError, AttributeError):
@@ -598,6 +604,8 @@ def confirm_saved(profile, key, token, playback=None):
     if (not hub.KEY_RE.fullmatch(str(key)) or not re.fullmatch(r'[A-Fa-f0-9-]{32,36}', str(token)) or
             pending.get('key') != key or pending.get('token') != token or
             success.get('schema') != 2 or success.get('key') != key or success.get('token') != token or
+            not isinstance(pending.get('source_snapshot'), dict) or
+            set(pending['source_snapshot']) != {'source', 'stable_source', 'legacy_preference'} or
             pending.get('bucket') not in BUCKETS or success.get('bucket') != pending['bucket'] or
             success.get('identity_verified') is not True or
             not isinstance(success.get('epoch_ms'), int) or not 0 <= time.time()*1000-success['epoch_ms'] <= 300000 or

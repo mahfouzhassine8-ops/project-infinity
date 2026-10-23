@@ -552,7 +552,45 @@ def entries(data, media='all', bucket='items', list_name=''):
                 hidden_keys.update(item['key'] for item in group[1:])
         if hidden_keys:
             values = [item for item in values if item.get('key') not in hidden_keys]
+    if bucket == 'items' and media in ('tv', 'all'):
+        # Home and the full Continue view share this read-only projection.
+        # Keep the most recently updated episode (including deliberate rewatches),
+        # retaining every underlying episode, watched record and source action.
+        groups = []
+        aliases = {}
+        hidden = set()
+        for value in values:
+            series = continue_series_ids(value)
+            if not series:
+                continue
+            candidates = set().union(*(aliases.get((n, uid), set()) for n, uid in series.items()))
+            compatible = [i for i in candidates if all(
+                all(series[n] == member[n] for n in set(series) & set(member)) and
+                bool(set(series) & set(member)) for member in groups[i])]
+            if len(compatible) == 1:
+                index = compatible[0]
+                groups[index].append(series)
+                hidden.add(value['key'])
+            else:
+                index = len(groups)
+                groups.append([series])
+            for namespace, uid in series.items():
+                aliases.setdefault((namespace, uid), set()).add(index)
+        values = [value for value in values if value.get('key') not in hidden]
     return values
+
+
+def continue_series_ids(value):
+    """Only proven parent-series IDs; never episode IDs or similar show names."""
+    if value.get('media') != 'tv':
+        return {}
+    identity = entry_identity(value)
+    typed = identity['ids'] if identity and identity.get('scope') == 'show_episode' else {}
+    parent = verified_ids({name: value.get('show_' + name) for name in ('tmdb', 'tvdb', 'imdb')}) \
+        if value.get('show_ids_verified') is True else {}
+    if any(typed[name] != parent[name] for name in set(typed) & set(parent)):
+        return {}
+    return dict(typed, **parent)
 
 
 def _show_key(value, key):
