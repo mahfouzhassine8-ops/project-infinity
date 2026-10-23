@@ -7,6 +7,7 @@ import subprocess
 import tempfile
 
 import navigation_native
+import test_lookup_native
 
 MAIN=r'''
 #include "InfinitySavedNavigationState.h"
@@ -61,7 +62,10 @@ def run(source,overlay,out):
     for assignment in ('false','cancelled'):
         addition='#if defined(TARGET_ANDROID)\n  m_infinityResultCancelled = '+assignment+';\n#endif\n'
         assert changed.count(addition)==1;changed=changed.replace(addition,'')
+    for addition in (navigation_native.LOOKUP_DEADLINE, navigation_native.LOOKUP_PROTOCOL):
+        assert changed.count(addition)==1;changed=changed.replace(addition,'')
     assert changed==original
+    lookup = test_lookup_native.run(overlay/name)
     with tempfile.TemporaryDirectory(prefix='saved-correlation-') as directory:
         work=Path(directory);(work/'main.cpp').write_text(MAIN)
         exe=work/'test'
@@ -71,7 +75,8 @@ def run(source,overlay,out):
         r=subprocess.run([str(exe)],capture_output=True,text=True,timeout=10)
         if r.returncode:raise RuntimeError(r.stdout+r.stderr)
     out.write_text(json.dumps(dict(passed=True,scope=__doc__,original_bodies=preserved,
-        search_lifecycle_unchanged=True,actual_android=False,actual_gui_execution=False),indent=2)+'\n')
+        search_lifecycle_unchanged=True,saved_lookup=lookup,
+        actual_android=False,actual_gui_execution=False),indent=2)+'\n')
     print('PASS failure correlation and exact original navigation body preservation')
 
 if __name__=='__main__':

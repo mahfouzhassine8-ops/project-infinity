@@ -114,7 +114,7 @@ def compile_engine():
     old.OUT=OUT
     proof=old.compile_engine()
     data=(OUT/'libkodi.so').read_bytes()
-    for marker in (b'multiimage-enumeration',b'multiimage_directory_backend_unverified',b'multiimage_operation_did_not_reach_verified_boundary',b'0.3.5.31',b'INFINITY_SAVED_ROUTE_FAILED'):
+    for marker in (b'multiimage-enumeration',b'multiimage_directory_backend_unverified',b'multiimage_operation_did_not_reach_verified_boundary',b'0.3.5.31',b'INFINITY_SAVED_ROUTE_FAILED',b'Infinity.SavedNavigation.Lookup.Protocol'):
         if marker not in data:raise RuntimeError('Compiled correction missing: '+repr(marker))
     pins=json.loads((ROOT/'targeted-component-overlay/script.infinity.uirepair/CONTROLLER-PREIMAGES.json').read_text())
     if not all(pin.encode() in data for pin in pins.values()):raise RuntimeError('Compiled exact controller source pins absent')

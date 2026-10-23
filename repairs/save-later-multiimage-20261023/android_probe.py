@@ -140,7 +140,10 @@ def verify_runtime(args,entry,owner,probe):
 
 def wait_navigation_ready(probe,owner,ready_path):
     import time
-    deadline=time.monotonic()+1200
+    # Fresh provider setup is separately observed for up to 900 seconds; keep
+    # enough host time for the actual navigation checks after that boundary.
+    # Checkpoint/Close deadlines and original writer controls are unchanged.
+    deadline=time.monotonic()+1800
     while time.monotonic()<deadline:
         navigation=probe.read_json(probe.PROFILE+'/addon_data/'+FUTURE+'/navigation-ready-'+str(owner['pid'])+'.json')
         if navigation and not navigation.get('passed'):

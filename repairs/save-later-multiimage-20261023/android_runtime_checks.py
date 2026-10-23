@@ -106,6 +106,25 @@ def first_use_specifications():
     require(all(seren.values()),'Pinned Seren first-use strings missing')
     return notice,seren
 
+SEREN_INITIAL_TASKS=('torrentCacheCleanup','undesirablesStartup','updateAnimeMappings',
+    'runMaintenance','syncTraktActivities','cleanOrphanedMetadata','updateLocalTimezone')
+
+def first_use_task_results(log):
+    # Actual Run39964672812 reached the UI boundary while Seren's one-time
+    # anime mappings still held interpreter initialization for several minutes.
+    # Observe completion of each finite startup invocation before normal-route
+    # tests. This is not service retirement, a write receipt, or Close admission.
+    results={}
+    for action in SEREN_INITIAL_TASKS:
+        starts=list(re.finditer(r'CPythonInvoker\((\d+)\):\s+\?action='+re.escape(action)+r'\s*$',log,re.M))
+        if not starts:
+            results[action]=dict(invocation=None,body_completed=False)
+            continue
+        start=starts[-1];ident=start.group(1)
+        completed=bool(re.search(r'CPythonInvoker\('+ident+r', [^\n]*/plugin\.video\.seren/seren\.py\): script successfully run',log[start.end():]))
+        results[action]=dict(invocation=int(ident),body_completed=completed)
+    return results
+
 def acknowledge_first_use(state,notice,seren,result,record):
     action=first_use_action(state,notice,seren)
     if not action:return False
@@ -123,17 +142,26 @@ def complete_first_use(home,result,record):
     # No provider settings/DB are seeded and no unknown dialog is dismissed.
     notice,seren=first_use_specifications()
     logpath=Path(xbmcvfs.translatePath('special://logpath/kodi.log'))
-    end=time.monotonic()+600;stable=None;last=None
+    # All actions are read from the unchanged installed service, not invented
+    # setup receipts. Its longLifeServiceManager intentionally remains active.
+    service=Path(xbmcvfs.translatePath(xbmcaddon.Addon('plugin.video.seren').getAddonInfo('path')))/'service.py'
+    service_source=service.read_text()
+    require(all('?action='+action in service_source for action in SEREN_INITIAL_TASKS),
+        'Installed Seren startup scheduling changed')
+    # The measured fresh API37/ARM-translation initialization took >12 minutes.
+    # This setup allowance does not alter any product or checkpoint deadline.
+    end=time.monotonic()+900;stable=None;last=None
     result['first_use_actions']=[]
     while time.monotonic()<end:
         require(not xbmc.Monitor().abortRequested(),'Shutdown during provider initialization')
-        state=gui_snapshot();status=first_use_status(logpath.read_text(errors='replace'),home)
+        state=gui_snapshot();log=logpath.read_text(errors='replace')
+        status=first_use_status(log,home);tasks=first_use_task_results(log)
         if acknowledge_first_use(state,notice,seren,result,record):continue
-        observation=dict(first_use_ui_boundaries=status,gui=state,
+        observation=dict(first_use_ui_boundaries=status,finite_startup_task_bodies=tasks,gui=state,
             service_retirement_verified=False,persistence_verified=False)
         if observation!=last:
             result['first_use_observation']=observation;record('provider-first-use');last=observation
-        if all(status.values()) and not state['modal']:
+        if (all(status.values()) and all(t['body_completed'] for t in tasks.values()) and not state['modal']):
             if stable is None:stable=time.monotonic()
             if time.monotonic()-stable>=3:return
         else:stable=None

@@ -29,14 +29,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Reuse Run39944949734's native-opaque PASS on the exact same APK.
-        # Run39963168764 continues the separate POV stack diagnostic.
-        # Correct the same-window return interaction observed in Run39959879847;
-        # its real original-show/affected-metadata passes remain retained.
-        mode: ${{ fromJSON(github.event_name == 'workflow_dispatch' && inputs.phase == 'full' && '["safe","pending","opaque","native-opaque","lost-file","provider-pov","provider-umbrella","provider-seren","provider-future"]' || '["safe"]') }}
+        # Focus the measured lookup correction and real original/fallback GUI
+        # flow first. Prior APK evidence is retained; full qualification of this
+        # new native build, including negative writer controls, remains required.
+        mode: ${{ fromJSON(github.event_name == 'workflow_dispatch' && inputs.phase == 'full' && '["safe","pending","opaque","native-opaque","lost-file","provider-pov","provider-umbrella","provider-seren","provider-future"]' || '["safe","provider-pov"]') }}
     env:
-      CANDIDATE_BUILD: '39930734489'
-      CANDIDATE_COMMIT: 'ee8f630247b993dc2262fcdc2a6f8ce093c4c2d9'
+      CANDIDATE_BUILD: '39970426642'
+      CANDIDATE_COMMIT: '40bc7fc0d3d38ad8d1071bd2a5fac27ccdbcdd00'
       PYTHONDONTWRITEBYTECODE: '1'
     steps:
       - uses: actions/checkout@v4
