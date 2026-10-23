@@ -14,6 +14,7 @@ HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[1]
 OLD=ROOT/'repairs/universal-persistence-2103401'
 FUTURE='service.future.persistence.7fa29'
 NAVFUTURE='plugin.video.future.navigation.7fa29'
+COMPATFUTURE='plugin.video.future.compatible.7fa29'
 
 def sha(raw):return hashlib.sha256(raw).hexdigest()
 def once(text,old,new):
@@ -31,6 +32,13 @@ def extra(stage,args,report):
     for p in (stage/NAVFUTURE).rglob('*'):
         if p.is_file() and p.suffix in ('.py','.xml'):
             p.write_bytes(p.read_bytes().replace(b'plugin.video.pov',NAVFUTURE.encode()))
+    # The POV alias retains a reverse-encoded hard-coded original URL. Keep
+    # it as a real unrelated-provider rejection control, never rewrite results.
+    # Umbrella's literal/argv-based URLs permit an identity-only compatible fork.
+    shutil.copytree(stage/'plugin.video.umbrella',stage/COMPATFUTURE)
+    for p in (stage/COMPATFUTURE).rglob('*'):
+        if p.is_file() and p.suffix in ('.py','.xml'):
+            p.write_bytes(p.read_bytes().replace(b'plugin.video.umbrella',COMPATFUTURE.encode()))
     fixture=stage/FUTURE
     shutil.copyfile(HERE/'android_runtime_checks.py',fixture/'android_runtime_checks.py')
     shutil.copyfile(HERE/'ANDROID-FAVORITES-REFERENCE.json',fixture/'ANDROID-FAVORITES-REFERENCE.json')
@@ -49,6 +57,7 @@ def extra(stage,args,report):
         '<randomize>false</randomize></control></controls></window>')
     report['test_provider_inputs']=pins
     report['future_provider_fixture_only']=NAVFUTURE
+    report['compatible_future_fixture_only']=COMPATFUTURE
     # The original service's pending test remains independent of navigation.
     # Extra fixture-mode settings are explicitly staged, never production data.
     settings=fixture/'resources/settings.xml'

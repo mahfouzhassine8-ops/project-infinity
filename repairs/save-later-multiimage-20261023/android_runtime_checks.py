@@ -17,8 +17,9 @@ import xbmcgui
 import xbmcvfs
 
 FUTURE='plugin.video.future.navigation.7fa29'
+COMPATFUTURE='plugin.video.future.compatible.7fa29'
 PROVIDERS={'pov':'plugin.video.pov','umbrella':'plugin.video.umbrella',
-           'seren':'plugin.video.seren','future':FUTURE}
+           'seren':'plugin.video.seren','future':COMPATFUTURE}
 
 def require(value,message):
     if not value:raise AssertionError(message)
@@ -89,6 +90,7 @@ def first_use_status(log,home):
         starts=list(re.finditer(r'T:(\d+).*Settings Monitor Service Starting \('+re.escape(aid)+r'-[^)]*\)',log))
         statuses[aid]=bool(starts and re.search(r'T:'+starts[-1].group(1)+r'\s.*CheckUndesirablesDatabase Service Starting',log[starts[-1].end():]))
     statuses['plugin.video.umbrella']='[ plugin.video.umbrella ]  Settings Monitor Service Starting...' in log
+    statuses[COMPATFUTURE]='[ '+COMPATFUTURE+' ]  Settings Monitor Service Starting...' in log
     statuses['plugin.video.seren']=(home.getProperty('seren.service.ready')==xbmcaddon.Addon('plugin.video.seren').getAddonInfo('version')
         and '?action=torrentCacheCleanup' in log)  # Scheduled after the optional timezone prompt.
     return statuses
@@ -368,7 +370,7 @@ def run(root,cycle,mode):
                 'Infinity skin must be active; actual='+result['active_skin'])
         require(rpc('Settings.GetSettingValue',dict(setting='general.addonupdates'))['value']==2,
                 'Disposable profile input-update policy was not loaded')
-        for aid in PROVIDERS.values():
+        for aid in (*PROVIDERS.values(),FUTURE):
             details=rpc('Addons.GetAddonDetails',dict(addonid=aid,properties=['enabled','version']))['addon']
             if not details['enabled']:
                 require(rpc('Addons.SetAddonEnabled',dict(addonid=aid,enabled=True))=='OK','Provider enable failed')
@@ -445,6 +447,19 @@ def run(root,cycle,mode):
             require(home.getProperty('Infinity.Search.Protocol')=='1','Actual bounded directory protocol absent')
             class Progress:
                 def iscanceled(self):return False
+            if mode=='provider-future':
+                # The original simulated fork produces POV URLs. The signed
+                # resolver must still reject them, even with matching media IDs.
+                record('future-unrelated-destination-control')
+                ready,_=nav.available('movie');invalid=next(p for p in ready if p['id']==FUTURE)
+                previous=folder()
+                try:nav.resolve(entries['b'*64],invalid,home,Progress())
+                except nav.Unavailable as error:
+                    require(str(error)=='Provider returned an unrelated destination.',
+                            'Unrelated-provider control failed for a different reason: '+str(error))
+                else:raise AssertionError('Unrelated provider destination was accepted')
+                require(folder()==previous,'Rejected provider changed the GUI destination')
+                result['cases'].append(dict(case='actual-unrelated-provider-rejected',passed=True))
             for media,key in [('movie','b'*64),('tv','a'*64)]:
                 record('provider-resolve:'+aid+':'+media)
                 ready,_=nav.available(media);provider=next(p for p in ready if p['id']==aid)
@@ -469,9 +484,28 @@ def run(root,cycle,mode):
         require(data['items'] and data['watched'] and data['watchlist'],'Preservation controls missing')
         result['saved_state_sha256']=hashlib.sha256(before).hexdigest()
         result['saved_watchlist_resume_watched_unchanged']=True
-        xbmc.executebuiltin('ActivateWindow(Home)')
+        # Do not start Home's unrelated rail refresh immediately before queuing
+        # this job. Keep the current idle native window and observe actual work.
         dialog=xbmcgui.WindowXMLDialog('multiimage-probe.xml',xbmcaddon.Addon().getAddonInfo('path'),'Default','1080i')
-        dialog.show();xbmc.sleep(2500);dialog.close()
+        logpath=Path(xbmcvfs.translatePath('special://logpath/kodi.log'))
+        offset=logpath.stat().st_size
+        def completed_multiimage():
+            with logpath.open('rb') as stream:
+                stream.seek(offset);text=stream.read().decode('utf-8','replace')
+            lines=[line for line in text.splitlines() if 'INFINITY_MULTIIMAGE_' in line and 'control=941;' in line]
+            began={re.search(r'token=(\d+) job=(\d+)',line).groups() for line in lines
+                   if 'INFINITY_MULTIIMAGE_BEGIN' in line}
+            retired=[line for line in lines if 'INFINITY_MULTIIMAGE_RETIRED' in line and
+                     re.search(r'token=(\d+) job=(\d+)',line).groups() in began]
+            result['observed_multiimage_jobs']=lines
+            if not retired:return False
+            expected='unchanged_receipt=false' if mode=='native-opaque' else 'unchanged_receipt=true'
+            require(any(expected in line for line in retired),'Executed multi-image job did not reach expected boundary')
+            return True
+        try:
+            dialog.show()
+            until(completed_multiimage,'actual native multi-image execution and matching retirement',120)
+        finally:dialog.close()
         result['multiimage_control_exercised']=True
         result['passed']=True
     except BaseException as error:
