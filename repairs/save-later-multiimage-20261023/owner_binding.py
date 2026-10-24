@@ -22,7 +22,10 @@ def bind(source,assets,stage,overlay):
         raise RuntimeError('Owner inputs differ from passed RC8')
     oldpins=json.loads((assets/'script.infinity.uirepair/CONTROLLER-PREIMAGES.json').read_text())
     pins=json.loads((stage/'script.infinity.uirepair/CONTROLLER-PREIMAGES.json').read_text())
-    if len(oldpins)!=17 or len(pins)!=19:raise RuntimeError('Incomplete controller inventories')
+    baseline33=json.loads((Path(__file__).parent/'universal/BASE33-CONTROLLER-PINS.json').read_text())
+    required=set(baseline33)|{'provider_inventory.py','title_metadata.py','information.py','selection_contract.py','resources/skins/Default/1080i/InfinityInformation.xml'}
+    if len(oldpins)!=17 or len(baseline33)!=19 or len(required)!=24 or set(pins)!=required:
+        raise RuntimeError('Incomplete exact controller inventories')
     parentpins=json.loads((Path(__file__).parent/'tracking/PARENT-CONTROLLER-PINS.json').read_text())
     if len(parentpins)!=19:raise RuntimeError('Signed CC31 contract incomplete')
     text=before[CONTRACT].decode();additions=[]
@@ -32,14 +35,14 @@ def bind(source,assets,stage,overlay):
                  dict(re.findall(r'\{"script\.infinity\.commandcenter/([^"\n]+)", "([a-f0-9]{64})"\}',m[3]))==oldpins]
         if len(matches)!=1:raise RuntimeError('Exact original endpoint owner absent: '+endpoint)
         m=matches[0]
-        for inventory in (parentpins, json.loads((Path(__file__).parent/'tracking/final-eight/BASE32-CONTROLLER-PINS.json').read_text()), pins):
+        for inventory in (parentpins, json.loads((Path(__file__).parent/'tracking/final-eight/BASE32-CONTROLLER-PINS.json').read_text()), baseline33, pins):
             block='    {"'+m[1]+'", "'+CC+'", "'+m[2]+'", {\n'
             block+=''.join('      {"'+CC+'/'+n+'", "'+h+'"},\n' for n,h in sorted(inventory.items()))
             additions.append(block+'    }},')
-    addition='    // INFINITY_2103401_SAVED_NAVIGATION_CC31_CC32_CC33_EXACT_SOURCES\n'+'\n'.join(additions)+'\n'
+    addition='    // INFINITY_2103401_SAVED_NAVIGATION_CC31_CC32_CC33_CC34_EXACT_SOURCES\n'+'\n'.join(additions)+'\n'
     after={CONTRACT:once(text,'  };\n  return *contracts;',addition+'  };\n  return *contracts;').encode(),
            COORDINATOR:once(before[COORDINATOR],b'active["addon_version"].asString() != "0.3.5.29"',
-               b'active["addon_version"].asString() != "0.3.5.29" && active["addon_version"].asString() != "0.3.5.31" && active["addon_version"].asString() != "0.3.5.32" && active["addon_version"].asString() != "0.3.5.33"')}
+               b'active["addon_version"].asString() != "0.3.5.29" && active["addon_version"].asString() != "0.3.5.31" && active["addon_version"].asString() != "0.3.5.32" && active["addon_version"].asString() != "0.3.5.33" && active["addon_version"].asString() != "0.3.5.34"')}
     if after[CONTRACT].decode().replace(addition,'',1)!=text:raise RuntimeError('Older source contracts changed')
     for n,b in after.items():
         path=overlay/n
@@ -47,4 +50,4 @@ def bind(source,assets,stage,overlay):
         path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(b)
     return {n:dict(original_sha256=BEFORE[n],final_sha256=hashlib.sha256(b).hexdigest(),
         defect='Universal Save for Later deployment ownership',
-        justification='Retain CC31/CC32 and add exact nineteen-file CC33 owner contract and matching version; all prior contracts and barriers retained') for n,b in after.items()}
+        justification='Retain CC31/CC32/CC33 and add exact twenty-four-file CC34 owner contract and matching version; all prior contracts and barriers retained') for n,b in after.items()}

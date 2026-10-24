@@ -55,12 +55,15 @@ def inspect(apk,jars,out):
 def prepare(apk,stage,jars,android,d8,out):
     cp,before=inspect(apk,jars,out)
     pins=json.loads((stage/'script.infinity.uirepair/CONTROLLER-PREIMAGES.json').read_text())
-    if len(pins)!=19:raise RuntimeError('All nineteen controller source pins required')
+    baseline33=json.loads((HERE/'universal/BASE33-CONTROLLER-PINS.json').read_text())
+    required=set(baseline33)|{'provider_inventory.py','title_metadata.py','information.py','selection_contract.py','resources/skins/Default/1080i/InfinityInformation.xml'}
+    if len(baseline33)!=19 or len(required)!=24 or set(pins)!=required:
+        raise RuntimeError('Exact twenty-four-file CC34 controller source inventory required')
     # Keep the original DEX string pool exactly unchanged. Adding hash strings
     # previously shifted a protected Cobra string past the 16-bit boundary and
     # widened its instruction. Character payloads avoid that encoded change.
     chars=lambda s:'new String(new char[]{'+','.join(str(ord(c)) for c in s)+'})'
-    inventories=[('0.3.5.31',json.loads((HERE/'tracking/PARENT-CONTROLLER-PINS.json').read_text())),('0.3.5.32',json.loads((HERE/'tracking/final-eight/BASE32-CONTROLLER-PINS.json').read_text())),('0.3.5.33',pins)]
+    inventories=[('0.3.5.31',json.loads((HERE/'tracking/PARENT-CONTROLLER-PINS.json').read_text())),('0.3.5.32',json.loads((HERE/'tracking/final-eight/BASE32-CONTROLLER-PINS.json').read_text())),('0.3.5.33',baseline33),('0.3.5.34',pins)]
     blocks=[]
     for version, inventory in inventories:
         pairs=',\n'.join('      {'+chars(n)+','+chars(h)+'}' for n,h in sorted(inventory.items()))
@@ -118,7 +121,7 @@ final class InfinityInstalledCheckpointInstaller {
         '    move-result-object v7\n    if-nez v7, :infinity_cc31_route\n\n')
     tail=('    :infinity_cc31_route\n'
         # This branch is reachable only after verify() returns a version for
-        # an exact nineteen-file match. Carry that verified result into the
+        # an exact versioned source inventory match. Carry that result into the
         # existing receipt/return register, as the CC22-29 branches do.
         '    move-object v2, v7\n    const/4 v6, 0x1\n    goto/16 :goto_1\n')
     updated=once(once(block,anchor,selector+anchor),'.end method',tail+'.end method')

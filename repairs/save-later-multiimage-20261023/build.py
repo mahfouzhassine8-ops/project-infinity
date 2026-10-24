@@ -27,7 +27,7 @@ SOURCE='0f1b28feb7cff502a9c3714583d1785d6e6eb7e909fe11f96fd72f463f6f7f8b'
 MAP='a520d539329a3b95c5f868836a5ae8e06e3bea0d21b622089d7ff9c7aefa657f'
 ENGINE='lib/arm64-v8a/libkodi.so';RECORDER='lib/arm64-v8a/libinfinitycrash.so'
 SIGNATURE=re.compile(r'META-INF/(?:MANIFEST\.MF|[^/]+\.(?:SF|RSA|DSA|EC))',re.I)
-NAME='Infinity-2103401-Tracking-Navigation-CORRECTIVE-QA.apk'
+NAME='Infinity-2103401-Universal-Search-OptionB-QA.apk'
 
 
 def sha(raw):return hashlib.sha256(raw).hexdigest()
@@ -91,10 +91,14 @@ def prepare(parent,modes):
     delta.update(navigation_native.apply(native,overlay))
     delta.update(owner_binding.bind(native,base,components,overlay))
     delta.update(final_eight_native.apply(native,overlay))
+    # This adapter changes only the Infinity Option B XML window resize path;
+    # its exact source preimage and owner predicate are verified separately.
+    information_native=load('universal_information_native',HERE/'universal/information_native.py')
+    delta.update(information_native.apply(native,overlay))
     for n,v in delta.items():
         path=native/n;path.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(overlay/n,path)
     final=dict(expected,**{n:v['final_sha256'] for n,v in delta.items()})
-    if len(final)!=9407 or len(delta)!=14:raise RuntimeError('Native delta exceeded its reviewed scope')
+    if len(final)!=9407 or len(delta)!=16:raise RuntimeError('Native delta exceeded its reviewed scope')
     save(OUT/'BASE-NATIVE-SOURCE-MAP.json',expected);save(OUT/'NATIVE-SOURCE-MAP.json',final)
     save(OUT/'SOURCE-DELTA.json',dict(native=delta,components=component_delta,
          original_links=links,parent_apk_sha256=PARENT,source_commit=os.environ.get('GITHUB_SHA'),
@@ -109,7 +113,7 @@ def compile_engine():
     old.OUT=OUT
     proof=old.compile_engine()
     data=(OUT/'libkodi.so').read_bytes()
-    for marker in (b'multiimage-enumeration',b'multiimage_directory_backend_unverified',b'multiimage_operation_did_not_reach_verified_boundary',b'0.3.5.31',b'0.3.5.32',b'0.3.5.33',b'Infinity.SavedNavigation.Protocol',b'INFINITY_SAVED_ROUTE_FAILED',b'Infinity.SavedNavigation.Lookup.Protocol'):
+    for marker in (b'multiimage-enumeration',b'multiimage_directory_backend_unverified',b'multiimage_operation_did_not_reach_verified_boundary',b'0.3.5.31',b'0.3.5.32',b'0.3.5.33',b'0.3.5.34',b'Infinity.SavedNavigation.Protocol',b'INFINITY_SAVED_ROUTE_FAILED',b'Infinity.SavedNavigation.Lookup.Protocol'):
         if marker not in data:raise RuntimeError('Compiled correction missing: '+repr(marker))
     pins=json.loads((ROOT/'targeted-component-overlay/script.infinity.uirepair/CONTROLLER-PREIMAGES.json').read_text())
     if not all(pin.encode() in data for pin in pins.values()):raise RuntimeError('Compiled exact controller source pins absent')
@@ -147,8 +151,22 @@ def package(parent,dex,out):
         shutdown_tests='NOT_RUN_IN_PACKAGING', runtime_acceptance=False,
         compilation_signing_integrity='PASS', independent_workflows=True)
     if not dexproof['passed'] or not proof['complete_native_engine_compiled']:raise RuntimeError('Build proofs did not pass')
-    engine=(OUT/'libkodi.so').read_bytes();finaldex=(dex/'classes.dex').read_bytes()
-    if sha(engine)!=proof['native_sha256'] or sha(finaldex)!=dexproof['final_dex_sha256']:raise RuntimeError('Compiler output drift')
+    engine=(OUT/'libkodi.so').read_bytes();controllerdex=(dex/'classes.dex').read_bytes()
+    if sha(engine)!=proof['native_sha256'] or sha(controllerdex)!=dexproof['final_dex_sha256']:raise RuntimeError('Compiler output drift')
+    search_dir=ROOT/'targeted-search-dex'
+    search_dex=load('universal_search_dex',HERE/'universal/search_dex.py')
+    # Re-disassemble the actual packaged bytes: do not treat a report's PASS
+    # field or editable hashes as proof of protected class preservation.
+    packagecheck=search_dex.verify_package(apk,dex/'classes.dex',search_dir,
+        ROOT/'verified-dex-tools/receipt-evidence/tool-jars')
+    searchproof=json.loads((search_dir/'SEARCH-DEX-PRESERVATION.json').read_text())
+    searchproof['packaging_reverification']=packagecheck
+    if searchproof['input_primary_sha256']!=dexproof['final_dex_sha256']:
+        raise RuntimeError('Search/controller DEX lineage mismatch')
+    finaldex=(search_dir/'classes.dex').read_bytes()
+    secondary_name=searchproof['secondary_name']
+    if not re.fullmatch(r'classes(?:[2-9]|[1-9][0-9]+)\.dex',secondary_name):raise RuntimeError('Invalid Search DEX member')
+    secondary=(search_dir/secondary_name).read_bytes()
     delta=json.loads((OUT/'SOURCE-DELTA.json').read_text())
     targets={'assets/addons/'+n:(ROOT/'targeted-component-overlay'/n).read_bytes() for n in delta['components']}
     # Keep the unchanged diagnostic reader's wire name and current candidate
@@ -165,7 +183,8 @@ def package(parent,dex,out):
                 if addon not in inventory:raise RuntimeError('Unknown diagnostic component inventory')
                 inventory[addon][leaf]=record['final_sha256']
             targets[n]=(json.dumps(inventory,indent=2,sort_keys=True)+'\n').encode()
-        targets.update({ENGINE:engine,RECORDER:recorder,'classes.dex':finaldex})
+        if secondary_name in a.namelist():raise RuntimeError('Search DEX would replace an existing member')
+        targets.update({ENGINE:engine,RECORDER:recorder,'classes.dex':finaldex,secondary_name:secondary})
         if out.exists():raise RuntimeError('Package output already exists')
         out.mkdir(parents=True)
         unsigned=out/'unsigned.apk';signed=out/NAME
@@ -195,12 +214,15 @@ def package(parent,dex,out):
         native_abi=abi,version_code=2103401,manifest_unchanged=True,
         permanent_certificate_sha256=delivery.CERT,signature_schemes_verified=[1,2,3],
         matching_component_versions={k:v[1] for k,v in component_contract.VERSIONS.items()},
-        passed_signed_reference_build='39994772688',
-        focused_scope='final-eight: Continue identity/visibility, Movies/TV popup, Home clock, CC participant binding, POV compatibility; native crash cause unresolved',
-        native_source_count=9407,original_native_files_changed=11,new_native_files=3,
+        passed_signed_reference_build='40070986647',
+        focused_scope='Universal capability inventory and Search, shared exact-title selection and retained popup, Option B full synopsis, ZIP header correction, coordinated exact component bindings; native crash cause unresolved',
+        native_source_count=9407,original_native_files_changed=13,new_native_files=3,
         cobra_definitions_changed=[],provider_code_changed=False,user_profile_changed=False,
         rc8_receipt_and_universal_observer_sources_unchanged=True,
         actual_android_verified=False,physical_fold_verified=False,final_lock=False,
+        unresolved=['Original physical Search Enter/Home freeze requires actual reproduction and Fold verification',
+                    'Pure-virtual and Scudo crash causes remain unresolved without original failing stacks',
+                    'Complete responsiveness, fluidity and frame pacing require Android17 and physical Fold measurements'],
         distribution='INTERNAL QA; separate selected verification and physical acceptance',
         verification=verification)
     save(out/'CANDIDATE.json',receipt);save(out/'APK-DELTA.json',members)
@@ -213,7 +235,26 @@ def package(parent,dex,out):
         shutil.copyfile(OUT/n,out/n)
     shutil.copyfile(HERE/'qualification/CACHE-EVIDENCE.json',out/'CACHE-EVIDENCE.json')
     shutil.copyfile(HERE/'qualification/CACHE-SCHEMA-EVIDENCE.json',out/'CACHE-SCHEMA-EVIDENCE.json')
-    shutil.copyfile(dex/'DEX-PRESERVATION.json',out/'DEX-PRESERVATION.json')
+    # Keep the intermediate admission proof under its own name. The standard
+    # DEX receipt must describe the final classes.dex that is actually signed.
+    shutil.copyfile(dex/'DEX-PRESERVATION.json',out/'CONTROLLER-DEX-PRESERVATION.json')
+    combined_dex=dict(passed=True,original_dex_sha256=dexproof['original_dex_sha256'],
+        controller_dex_sha256=dexproof['final_dex_sha256'],final_dex_sha256=sha(finaldex),
+        changed_primary_classes=dexproof['changed_classes'],
+        relocated_original_classes=searchproof['relocated_original_classes'],
+        search_helper_classes=searchproof['helper_classes'],secondary_name=secondary_name,
+        secondary_sha256=sha(secondary),
+        protected_primary_class_count=searchproof['protected_class_count']-len(dexproof['changed_classes']),
+        protected_disassembly_byte_identical=True,original_string_pool_identical=True,
+        original_installer_routes_preserved=True,search95_route_unchanged=True,
+        keyboard_editor_unchanged=True,all_other_original_definitions_preserved=True,
+        protected_opcode_widening_permitted=False,cobra_definitions_changed=[],
+        rc8_receipt_and_close_definitions_changed=[],actual_android_verified=False,
+        physical_fold_verified=False,
+        lineage=['original RC8 primary','exact CC34 source-admission change',
+                 'Infinity Search101 helper relocation; every other class exact'])
+    save(out/'DEX-PRESERVATION.json',combined_dex)
+    save(out/'SEARCH-DEX-PRESERVATION.json',searchproof)
     (out/'PARENT-SIGNATURE.txt').write_text(parent_signature);(out/'FINAL-SIGNATURE.txt').write_text(signature)
     (out/'APK-BADGING.txt').write_text(badging)
     with ZipFile(out/'Infinity-Targeted-Source-and-Evidence.zip','w',ZIP_DEFLATED,compresslevel=9) as z:

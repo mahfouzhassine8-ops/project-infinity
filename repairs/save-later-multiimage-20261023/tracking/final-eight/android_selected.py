@@ -7,6 +7,24 @@ SEARCH_CASES=('final-search-pov-enter','final-search-pov-button','final-search-a
 CASES=('final-participant','final-continue','final-actions','final-pov')+SEARCH_CASES
 HERE=Path(__file__).resolve().parent
 
+
+def search_results_match(case, folder, records):
+    """Selected fixture contract: exact requested CC route and source identity."""
+    from urllib.parse import urlsplit, parse_qs
+    if case not in SEARCH_CASES:return False
+    try:
+        parts=urlsplit(folder);query=parse_qs(parts.query,keep_blank_values=True,strict_parsing=True)
+    except ValueError:return False
+    if parts.scheme!='plugin' or parts.netloc!='script.infinity.commandcenter' or parts.path not in ('','/') or parts.fragment:return False
+    expected={'action':['search-all' if case=='final-search-all-enter' else 'search-provider'],
+              'media':['movie'],'query':['The Matrix']}
+    providers={'plugin.video.pov','plugin.video.umbrella','plugin.video.seren'} if case=='final-search-all-enter' else {'plugin.video.pov'}
+    if case!='final-search-all-enter':expected['provider']=['plugin.video.pov']
+    if query!=expected:return False
+    published={row['provider'] for row in records if row.get('provider')}
+    if published!=providers:return False
+    return any(row.get('tmdb')=='603' and row.get('provider') in providers for row in records)
+
 def inputs(out, case):
     if case not in CASES:raise ValueError('Select one final-eight feature')
     out.mkdir(parents=True,exist_ok=False)
@@ -118,11 +136,15 @@ def run(root,cycle,mode):
             def results():
                 if xbmcgui.getCurrentWindowId()!=10025:return None
                 folder=xbmc.getInfoLabel('Container.FolderPath')
-                if mode=='final-search-all-enter':
-                    valid=folder.startswith('plugin://script.infinity.commandcenter/') and 'action=search-all' in folder
-                else:valid=folder.startswith('plugin://plugin.video.pov/')
-                ids=[xbmc.getInfoLabel('Container.ListItemAbsolute(%d).UniqueID(tmdb)'%i) for i in range(40)]
-                return dict(folder=folder,tmdb_ids=ids) if valid and '603' in ids else None
+                count=int(xbmc.getInfoLabel('Container.NumItems') or 0)
+                # This isolated fixture has exactly three providers x40 titles
+                # plus group rows. Refuse an unexpected/unbounded UI listing.
+                if not 0<count<=200:return None
+                records=[dict(tmdb=xbmc.getInfoLabel('Container.ListItemAbsolute(%d).UniqueID(tmdb)'%i),
+                              provider=xbmc.getInfoLabel('Container.ListItemAbsolute(%d).Property(Infinity.Search.Provider)'%i))
+                         for i in range(count+1)]
+                return dict(folder=folder,tmdb_ids=[row['tmdb'] for row in records],
+                            provider_attribution=[row['provider'] for row in records]) if search_results_match(mode,folder,records) else None
             visible=ui.until(results,'actual Search results window with verified Matrix TMDb603',180)
             after=hub.load_view(profile)
             for bucket in ('items','watched','watchlist','collection','lists','sources','navigation_recovery'):

@@ -1,0 +1,73 @@
+{
+  "after_median_ms": 1.037,
+  "after_same_invoker_verified_inventory": [
+    {
+      "admitted_movie_providers": 3,
+      "ms": 1.142,
+      "provider_source_bytes": 0,
+      "provider_source_reads": 0
+    },
+    {
+      "admitted_movie_providers": 3,
+      "ms": 1.037,
+      "provider_source_bytes": 0,
+      "provider_source_reads": 0
+    },
+    {
+      "admitted_movie_providers": 3,
+      "ms": 1.015,
+      "provider_source_bytes": 0,
+      "provider_source_reads": 0
+    }
+  ],
+  "android_runtime": "NOT RUN",
+  "before_legacy_repeated_discovery": [
+    {
+      "admitted_movie_providers": 0,
+      "ms": 8.697,
+      "provider_source_bytes": 53662,
+      "provider_source_reads": 10
+    },
+    {
+      "admitted_movie_providers": 0,
+      "ms": 6.881,
+      "provider_source_bytes": 53662,
+      "provider_source_reads": 10
+    },
+    {
+      "admitted_movie_providers": 0,
+      "ms": 10.456,
+      "provider_source_bytes": 53662,
+      "provider_source_reads": 10
+    }
+  ],
+  "before_median_ms": 8.697,
+  "caveats": [
+    "Legacy source parser does not admit these specialty providers; new code verifies stricter reviewed source shapes and admits all three.",
+    "Warm results apply within one Python invoker. Restarts rebuild and reverify, and every dispatched route still hashes its raw sources.",
+    "No Android/Fold latency, FPS, frame-pacing, battery or end-to-end freeze claim."
+  ],
+  "environment": "local Python host; real immutable provider source fixtures; Kodi API enumeration stubbed",
+  "new_cold_verification": {
+    "admitted_movie_providers": 3,
+    "ms": 9.397,
+    "provider_source_bytes": 569347,
+    "provider_source_reads": 30
+  },
+  "physical_fold": "NOT RUN",
+  "providers": [
+    {
+      "addon": "plugin.video.otaku",
+      "version": "5.3.4"
+    },
+    {
+      "addon": "plugin.video.watchnixtoons2",
+      "version": "0.14.24"
+    },
+    {
+      "addon": "plugin.video.homelander",
+      "version": "1.2.5"
+    }
+  ],
+  "schema": 1
+}

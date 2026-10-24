@@ -1,0 +1,45 @@
+{
+  "source_archive": "Infinity-Diagnostics-20261023-220035.zip",
+  "source_sha256": "7d7feb4a87531bec02205cd04925d8546e4215f809a274dbba609218c26be283",
+  "status": "UNRESOLVED; no native ownership fix justified by supplied stacks",
+  "observations": [
+    {
+      "timestamp": "2026-10-23T21:44:50.719-04:00",
+      "failure": "Pure virtual function called!",
+      "pid": 3071,
+      "tid": 3071,
+      "process_uptime_seconds": 3,
+      "threads": 32
+    },
+    {
+      "timestamp": "2026-10-23T22:00:06.984-04:00",
+      "failure": "Scudo ERROR: internal map failure (Out of memory)",
+      "pid": 3485,
+      "tid": 18800,
+      "thread_name": "Thread-48",
+      "rss_kb": 2075664,
+      "complete_mappings_in_truncated_dump": 29708,
+      "scudo_secondary_mappings": 14681,
+      "threads": 150,
+      "threads_waiting_for_python_gil": 76,
+      "dump_truncated_at_bytes": 2097152
+    }
+  ],
+  "stack_limit": "Both fatal stacks terminate syscall -> libinfinitycrash.so restore_and_reraise; original crashing caller absent",
+  "recorder_build_id": "030b7fecb9bfdd816047454dd76f8438dca92479",
+  "native_crash_snapshot_exported": false,
+  "inferences": [
+    "Scudo dump establishes mapping/allocation pressure, not the allocating owner",
+    "GIL waits may follow a fatal thread holding the GIL; they do not independently prove a deadlock",
+    "Startup pure-virtual failure and later memory abort require distinct investigation",
+    "No supplied Search submission trace ties Search to either fatal error"
+  ],
+  "next_evidence": [
+    "Exact candidate original fault registers/stack before recorder re-raise",
+    "RSS/maps/threads/allocator sampling through reproduction",
+    "Search Enter and button directory/native/GUI ownership trace separately"
+  ],
+  "application_tests": "NOT RUN",
+  "shutdown": "NOT RUN; independent",
+  "cobra_changed": false
+}

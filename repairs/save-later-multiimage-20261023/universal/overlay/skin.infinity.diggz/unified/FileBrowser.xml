@@ -1,0 +1,341 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<window>
+  <defaultcontrol always="true">450</defaultcontrol>
+  <onload>SetProperty(Infinity.FilePreview.OptIn,v1)</onload>
+  <controls>
+    <control type="image">
+      <left>0%</left>
+      <top>0%</top>
+      <width>100%</width>
+      <height>100%</height>
+      <texture colordiffuse="$VAR[InfinityPaletteBackground]">infinity_ui/contract_white.png</texture>
+    </control>
+    <control type="image">
+      <left>0%</left>
+      <top>0%</top>
+      <width>100%</width>
+      <height>116</height>
+      <texture colordiffuse="$VAR[InfinityBrowserTop]">infinity_ui/contract_white.png</texture>
+    </control>
+    <control type="image">
+      <left>2.5%</left>
+      <top>12</top>
+      <width>10.925926%</width>
+      <height>66</height>
+      <aspectratio>keep</aspectratio>
+      <texture>infinity_polish/infinity_mark.png</texture>
+    </control>
+    <control type="label">
+      <left>16%</left>
+      <top>6</top>
+      <width>62%</width>
+      <height>44</height>
+      <font>InfinityBodyBold</font>
+      <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
+      <align>left</align>
+      <aligny>center</aligny>
+      <label>SELECT ZIP</label>
+    </control>
+    <control type="label" id="411">
+      <left>16%</left>
+      <top>52</top>
+      <width>62%</width>
+      <height>28</height>
+      <font>InfinityTiny</font>
+      <textcolor>$VAR[InfinityDiggzSecondaryText]</textcolor>
+      <align>left</align>
+      <aligny>center</aligny>
+      <label>1023</label>
+    </control>
+    <control type="label" id="412">
+      <left>2.5%</left>
+      <top>86</top>
+      <width>95%</width>
+      <height>28</height>
+      <font>InfinityTiny</font>
+      <textcolor>$VAR[InfinityDiggzSecondaryText]</textcolor>
+      <align>left</align>
+      <aligny>center</aligny>
+      <label/>
+      <haspath>true</haspath>
+    </control>
+    <control type="image"><left>2.5%</left><top>120</top><width>95%</width><height>2</height><texture colordiffuse="$VAR[InfinityPaletteAccent]">infinity_browser/hairline.png</texture></control><control type="button" id="419">
+      <left>81.7593%</left>
+      <top>12</top>
+      <width>15.740749%</width>
+      <height>68</height>
+      <label>BACK</label>
+      <onclick>PreviousMenu</onclick>
+      <texturefocus border="16" colordiffuse="$VAR[InfinityPaletteFocus]">infinity_browser/focus_frame.png</texturefocus>
+      <texturenofocus border="16" colordiffuse="$VAR[InfinityBrowserFooter]">infinity_browser/footer.png</texturenofocus>
+      <font>InfinitySmall</font>
+      <align>center</align>
+      <aligny>center</aligny>
+      <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
+      <focusedcolor>$VAR[InfinityBrowserFocusLabel]</focusedcolor>
+      <ondown>450</ondown>
+      <onleft>450</onleft>
+    </control>
+    <control type="image">
+      <left>2.5%</left>
+      <top>128</top>
+      <width>63.7037%</width>
+      <texture border="22" colordiffuse="$VAR[InfinityBrowserPanel]">infinity_browser/card_surface.png</texture>
+      <bottom>24</bottom>
+    </control>
+    <control type="image">
+      <left>67.5%</left>
+      <top>128</top>
+      <width>30%</width>
+      <texture border="22" colordiffuse="$VAR[InfinityBrowserPanel]">infinity_browser/card_surface.png</texture>
+      <bottom>24</bottom>
+    </control>
+    <control type="list" id="450">
+      <left>4.7222%</left>
+      <top>146</top>
+      <width>56.2963%</width>
+      <onup>450</onup>
+      <ondown>450</ondown>
+      <onleft>450</onleft>
+      <onright>413</onright>
+      <pagecontrol>61</pagecontrol>
+      <scrolltime>150</scrolltime>
+      <itemlayout width="100%" height="116">
+        <control type="image">
+          <left>0.3289%</left>
+          <top>2.5862%</top>
+          <width>99.3421%</width>
+          <height>93.9655%</height>
+          <texture border="22" colordiffuse="$VAR[InfinityBrowserCard]">infinity_browser/card_surface.png</texture>
+        </control>
+        <control type="image"><left>0.3289%</left><top>2.5862%</top><width>99.3421%</width><height>93.9655%</height><texture border="22" colordiffuse="$VAR[InfinityBrowserBorder]">infinity_browser/card_stroke.png</texture></control><control type="image"><left>2.6316%</left><top>20.6897%</top><width>11.184211%</width><height>58.6207%</height><texture border="14" colordiffuse="$VAR[InfinityBrowserIconTile]">infinity_browser/icon_tile.png</texture></control><control type="image">
+          <left>2.6316%</left>
+          <top>20.6897%</top>
+          <width>11.184211%</width>
+          <height>58.6207%</height>
+          <aspectratio>keep</aspectratio>
+          <texture fallback="DefaultFolder.png" colordiffuse="$VAR[InfinityPolishIcon0Tint]">$VAR[InfinityPolishIcon0]</texture>
+        </control>
+        <control type="label">
+          <left>16.1184%</left>
+          <top>3.4483%</top>
+          <width>72%</width>
+          <height>93.1034%</height>
+          <font>InfinitySmall</font>
+          <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
+          <aligny>center</aligny>
+          <label>$INFO[ListItem.Label]</label>
+        </control>
+      <control type="image"><left>91%</left><top>38%</top><width>24</width><height>24</height><texture colordiffuse="$VAR[InfinityPaletteAccent]">infinity_browser/chevron.png</texture></control></itemlayout>
+      <focusedlayout width="100%" height="116">
+        <control type="image">
+          <left>0.3289%</left>
+          <top>2.5862%</top>
+          <width>99.3421%</width>
+          <height>93.9655%</height>
+          <texture border="22" colordiffuse="$VAR[InfinityBrowserFocused]">infinity_browser/card_surface.png</texture>
+        </control>
+        <control type="image"><left>0.3289%</left><top>2.5862%</top><width>99.3421%</width><height>93.9655%</height><texture border="22" colordiffuse="$VAR[InfinityPaletteFocus]">infinity_browser/focus_frame.png</texture></control><control type="image"><left>2.6316%</left><top>20.6897%</top><width>11.184211%</width><height>58.6207%</height><texture border="14" colordiffuse="$VAR[InfinityBrowserIconTile]">infinity_browser/icon_tile.png</texture></control><control type="image">
+          <left>2.6316%</left>
+          <top>20.6897%</top>
+          <width>11.184211%</width>
+          <height>58.6207%</height>
+          <aspectratio>keep</aspectratio>
+          <texture fallback="DefaultFolder.png" colordiffuse="$VAR[InfinityPolishIcon0Tint]">$VAR[InfinityPolishIcon0]</texture>
+        </control>
+        <control type="label">
+          <left>16.1184%</left>
+          <top>3.4483%</top>
+          <width>72%</width>
+          <height>93.1034%</height>
+          <font>InfinityBodyBold</font>
+          <textcolor>$VAR[InfinityBrowserFocusLabel]</textcolor>
+          <aligny>center</aligny>
+          <label>$INFO[ListItem.Label]</label>
+        </control>
+      <control type="image"><left>91%</left><top>38%</top><width>24</width><height>24</height><texture colordiffuse="$VAR[InfinityPaletteAccent]">infinity_browser/chevron.png</texture></control></focusedlayout>
+      <bottom>42</bottom>
+    </control>
+    <control type="list" id="451">
+      <left>4.7222%</left>
+      <top>146</top>
+      <width>56.2963%</width>
+      <onup>451</onup>
+      <ondown>451</ondown>
+      <onleft>451</onleft>
+      <onright>413</onright>
+      <pagecontrol>61</pagecontrol>
+      <scrolltime>150</scrolltime>
+      <itemlayout width="100%" height="116">
+        <control type="image">
+          <left>0.3289%</left>
+          <top>2.5862%</top>
+          <width>99.3421%</width>
+          <height>93.9655%</height>
+          <texture border="22" colordiffuse="$VAR[InfinityBrowserCard]">infinity_browser/card_surface.png</texture>
+        </control>
+        <control type="image"><left>0.3289%</left><top>2.5862%</top><width>99.3421%</width><height>93.9655%</height><texture border="22" colordiffuse="$VAR[InfinityBrowserBorder]">infinity_browser/card_stroke.png</texture></control><control type="image"><left>2.6316%</left><top>20.6897%</top><width>11.184211%</width><height>58.6207%</height><texture border="14" colordiffuse="$VAR[InfinityBrowserIconTile]">infinity_browser/icon_tile.png</texture></control><control type="image">
+          <left>2.6316%</left>
+          <top>20.6897%</top>
+          <width>11.184211%</width>
+          <height>58.6207%</height>
+          <aspectratio>keep</aspectratio>
+          <texture fallback="DefaultFolder.png" colordiffuse="$VAR[InfinityPolishIcon0Tint]">$VAR[InfinityPolishIcon0]</texture>
+        </control>
+        <control type="label">
+          <left>16.1184%</left>
+          <top>3.4483%</top>
+          <width>72%</width>
+          <height>93.1034%</height>
+          <font>InfinitySmall</font>
+          <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
+          <aligny>center</aligny>
+          <label>$INFO[ListItem.Label]</label>
+        </control>
+      <control type="image"><left>91%</left><top>38%</top><width>24</width><height>24</height><texture colordiffuse="$VAR[InfinityPaletteAccent]">infinity_browser/chevron.png</texture></control></itemlayout>
+      <focusedlayout width="100%" height="116">
+        <control type="image">
+          <left>0.3289%</left>
+          <top>2.5862%</top>
+          <width>99.3421%</width>
+          <height>93.9655%</height>
+          <texture border="22" colordiffuse="$VAR[InfinityBrowserFocused]">infinity_browser/card_surface.png</texture>
+        </control>
+        <control type="image"><left>0.3289%</left><top>2.5862%</top><width>99.3421%</width><height>93.9655%</height><texture border="22" colordiffuse="$VAR[InfinityPaletteFocus]">infinity_browser/focus_frame.png</texture></control><control type="image"><left>2.6316%</left><top>20.6897%</top><width>11.184211%</width><height>58.6207%</height><texture border="14" colordiffuse="$VAR[InfinityBrowserIconTile]">infinity_browser/icon_tile.png</texture></control><control type="image">
+          <left>2.6316%</left>
+          <top>20.6897%</top>
+          <width>11.184211%</width>
+          <height>58.6207%</height>
+          <aspectratio>keep</aspectratio>
+          <texture fallback="DefaultFolder.png" colordiffuse="$VAR[InfinityPolishIcon0Tint]">$VAR[InfinityPolishIcon0]</texture>
+        </control>
+        <control type="label">
+          <left>16.1184%</left>
+          <top>3.4483%</top>
+          <width>72%</width>
+          <height>93.1034%</height>
+          <font>InfinityBodyBold</font>
+          <textcolor>$VAR[InfinityBrowserFocusLabel]</textcolor>
+          <aligny>center</aligny>
+          <label>$INFO[ListItem.Label]</label>
+        </control>
+      <control type="image"><left>91%</left><top>38%</top><width>24</width><height>24</height><texture colordiffuse="$VAR[InfinityPaletteAccent]">infinity_browser/chevron.png</texture></control></focusedlayout>
+      <bottom>42</bottom>
+    </control>
+    <control type="scrollbar" id="61">
+      <left>61.5741%</left>
+      <top>146</top>
+      <width>24</width>
+      <orientation>vertical</orientation>
+      <showonepage>false</showonepage>
+      <onleft>450</onleft>
+      <onright>413</onright>
+      <texturesliderbackground>infinity_ui/track_dark.png</texturesliderbackground>
+      <texturesliderbar>infinity_ui/blue.png</texturesliderbar>
+      <texturesliderbarfocus>infinity_ui/blue.png</texturesliderbarfocus>
+      <textureslidernib>infinity_ui/blue.png</textureslidernib>
+      <textureslidernibfocus>infinity_ui/blue.png</textureslidernibfocus>
+      <bottom>42</bottom>
+    </control>
+    <control type="grouplist" id="90">
+      <left>69.7222%</left>
+      <top>146</top>
+      <width>25.5556%</width>
+      <orientation>vertical</orientation>
+      <itemgap>12</itemgap>
+      <onleft>450</onleft>
+      <onright>450</onright>
+      <control type="button" id="413">
+        <width>100%</width>
+        <height>96</height>
+        <label>186</label>
+        <font>InfinityBodyBold</font>
+        <align>center</align>
+        <aligny>center</aligny>
+        <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
+        <focusedcolor>$VAR[InfinityBrowserFocusLabel]</focusedcolor>
+        <texturefocus border="18" colordiffuse="$VAR[InfinityPaletteFocus]">infinity_browser/focus_frame.png</texturefocus>
+        <texturenofocus border="18" colordiffuse="$VAR[InfinityBrowserCard]">infinity_browser/card_surface.png</texturenofocus>
+        <onleft>450</onleft>
+        <onright>450</onright>
+      </control>
+      <control type="button" id="414">
+        <width>100%</width>
+        <height>96</height>
+        <label>222</label>
+        <font>InfinitySmall</font>
+        <align>center</align>
+        <aligny>center</aligny>
+        <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
+        <focusedcolor>$VAR[InfinityBrowserFocusLabel]</focusedcolor>
+        <texturefocus border="18" colordiffuse="$VAR[InfinityPaletteFocus]">infinity_browser/focus_frame.png</texturefocus>
+        <texturenofocus border="18" colordiffuse="$VAR[InfinityBrowserCard]">infinity_browser/card_surface.png</texturenofocus>
+        <onleft>450</onleft>
+        <onright>450</onright>
+      </control>
+      <control type="button" id="415">
+        <width>100%</width>
+        <height>96</height>
+        <label>119</label>
+        <font>InfinitySmall</font>
+        <align>center</align>
+        <aligny>center</aligny>
+        <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
+        <focusedcolor>$VAR[InfinityBrowserFocusLabel]</focusedcolor>
+        <texturefocus border="18" colordiffuse="$VAR[InfinityPaletteFocus]">infinity_browser/focus_frame.png</texturefocus>
+        <texturenofocus border="18" colordiffuse="$VAR[InfinityBrowserCard]">infinity_browser/card_surface.png</texturenofocus>
+        <onleft>450</onleft>
+        <onright>450</onright>
+      </control>
+      <control type="button" id="9410">
+        <width>100%</width>
+        <height>84</height>
+        <label>Preview</label>
+        <font>InfinitySmall</font>
+        <align>center</align>
+        <aligny>center</aligny>
+        <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
+        <focusedcolor>$VAR[InfinityBrowserFocusLabel]</focusedcolor>
+        <texturefocus border="18" colordiffuse="$VAR[InfinityPaletteFocus]">infinity_browser/focus_frame.png</texturefocus>
+        <texturenofocus border="18" colordiffuse="$VAR[InfinityBrowserCard]">infinity_browser/card_surface.png</texturenofocus>
+        <onleft>450</onleft>
+        <onright>450</onright>
+        <visible>String.IsEqual(Window.Property(Infinity.FilePreview.NativeVersion),v1)</visible>
+      </control>
+      <bottom>42</bottom>
+      <control type="group" id="9413">
+        <width>100%</width>
+        <height>244</height>
+        <control type="image">
+          <left>33%</left>
+          <top>4</top>
+          <width>92</width>
+          <height>72</height>
+          <aspectratio>keep</aspectratio>
+          <texture fallback="DefaultFolder.png" colordiffuse="$VAR[InfinityPolishIcon0Tint]">$VAR[InfinityPolishIcon0]</texture>
+        </control>
+        <control type="label">
+          <left>0</left>
+          <top>86</top>
+          <width>100%</width>
+          <height>38</height>
+          <font>InfinityTiny</font>
+          <textcolor>$VAR[InfinityDiggzSecondaryText]</textcolor>
+          <align>center</align>
+          <aligny>center</aligny>
+          <label>$INFO[Container(450).NumItems] items  •  $INFO[Container(450).CurrentPage]/$INFO[Container(450).NumPages]</label>
+        </control>
+        <control type="textbox">
+          <left>0</left>
+          <top>132</top>
+          <width>100%</width>
+          <height>82</height>
+          <font>InfinityTiny</font>
+          <textcolor>$VAR[InfinityDiggzSecondaryText]</textcolor>
+          <align>center</align>
+          <text>Select a ZIP to install. Long press or choose Preview for file information. Back returns safely.</text>
+        </control>
+      </control>
+    </control>
+  </controls>
+</window>

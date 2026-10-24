@@ -1,0 +1,9 @@
+{
+  "command": "PYTHONDONTWRITEBYTECODE=1 python3 .github/scripts/test_infinity_focused_policy.py WorkflowIsolation -v",
+  "tests": 6,
+  "status": "PASS",
+  "exit_code": 0,
+  "application_tests": "NOT RUN",
+  "shutdown": "NOT RUN; separate manual workflow",
+  "scope": "build source guard and exact Search DEX build hook; no automatic behavioral checks"
+}

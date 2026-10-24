@@ -1,0 +1,20 @@
+{
+  "host": "PASS",
+  "tests": 1,
+  "scope": "Actual patched C++ selection method compiled against controlled GUI/API stubs; signed source preimages verified",
+  "source_sha256": {
+    "xbmc/guilib/GUIBaseContainer.cpp": "4a716be3ce8024e430fe17827437b83ba8ce5a438549958d9e57395e980d0082",
+    "xbmc/input/InputManager.cpp": "9f8a8b32257a69353edf93d18d5834a6d26145b50cb7c1c70e84fdd32a1988c1"
+  },
+  "patch_source_sha256": "6ca4e999ac289c6b1e38ec70334d673cba06332543031e5260545996cc8e0ba5",
+  "test_source_sha256": "75841e29079234455c37eab45187e4e61ae49f421779248c56b5a1f375c04e81",
+  "patched_source_sha256": {
+    "xbmc/guilib/GUIBaseContainer.cpp": "204b94ef5fd58229a1101a6ecdbf439785b01770bacdebc45b297227ec24c86b",
+    "xbmc/input/InputManager.cpp": "a7a23bf020927870f3e75b516183e4631e412f585e9bcfba630de29658395179"
+  },
+  "production_method_sha256": "5ad41c2319088a6ff552e2c6bc2588b279da760548c3939a1466633fcc65387a",
+  "compiled_test_source_sha256": "2c44741ec47d6b6ecd30ab9e7d5d46fe389a515866dccd00c3255e09ba3aae0a",
+  "android17": "NOT RUN",
+  "physical_fold": "NOT RUN",
+  "shutdown": "NOT RUN"
+}

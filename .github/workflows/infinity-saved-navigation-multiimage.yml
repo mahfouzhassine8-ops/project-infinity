@@ -16,6 +16,13 @@ on:
       - 'repairs/save-later-multiimage-20261023/dex_binding.py'
       - 'repairs/save-later-multiimage-20261023/final_eight_native.py'
       - 'repairs/save-later-multiimage-20261023/tracking/final-eight/overlay/**'
+      - 'repairs/save-later-multiimage-20261023/universal/overlay/**'
+      - 'repairs/save-later-multiimage-20261023/universal/SCOPE.json'
+      - 'repairs/save-later-multiimage-20261023/universal/OVERLAY-PREIMAGES.json'
+      - 'repairs/save-later-multiimage-20261023/universal/InfinitySearch101.java'
+      - 'repairs/save-later-multiimage-20261023/universal/search_dex.py'
+      - 'repairs/save-later-multiimage-20261023/universal/PreserveSearchPrimary.java'
+      - 'repairs/save-later-multiimage-20261023/universal/information_native.py'
   workflow_dispatch:
     inputs:
       authorization:
@@ -71,6 +78,13 @@ jobs:
           paths=subprocess.check_output(['git','diff','--name-only','8df2e26f481eb7ff2d791c8cab39548de949d030','HEAD'],text=True).splitlines()
           assert paths and all(p.startswith('repairs/save-later-multiimage-20261023/') or p in {'.github/workflows/infinity-saved-navigation-multiimage.yml','.github/workflows/infinity-saved-navigation-android.yml','.github/workflows/infinity-shutdown-verification.yml','.github/scripts/test_infinity_focused_policy.py','AGENTS.md','docs/INFINITY-FOCUSED-TESTING-POLICY.md'} for p in paths),paths
           assert not any('cobra' in p.lower() for p in paths),paths
+          universal=json.loads((repair/'universal/SCOPE.json').read_text())
+          assert universal['baseline_commit']=='07c7a9d6e488fe8cea091de792547f16e97c884d'
+          assert universal['cobra_modifications'] is False and universal['original_signer_required'] is True
+          assert universal['shutdown_tests']=='NOT RUN; independent'
+          assert universal['branch']=='work/infinity-saved-route-correction-20261023'
+          subprocess.run(['git','merge-base','--is-ancestor',universal['baseline_commit'],'HEAD'],check=True)
+          subprocess.run(['git','merge-base','--is-ancestor',universal['preserved_checkpoint'],'HEAD'],check=True)
           PY
       - uses: actions/download-artifact@v4
         with:
@@ -132,6 +146,7 @@ jobs:
           set -euo pipefail
           python3 repairs/save-later-multiimage-20261023/build.py prepare --parent rc8-input --modes rc7-native-modes
           python3 repairs/save-later-multiimage-20261023/dex_binding.py prepare --apk rc8-input/Infinity-2103401-Universal-Persistence-RC8-NOT-ACCEPTED.apk --stage targeted-component-overlay --jars verified-dex-tools/receipt-evidence/tool-jars --android "$ANDROID_HOME/platforms/android-34/android.jar" --d8 "$ANDROID_HOME/build-tools/34.0.0/d8" --out targeted-dex
+          python3 repairs/save-later-multiimage-20261023/universal/search_dex.py --apk rc8-input/Infinity-2103401-Universal-Persistence-RC8-NOT-ACCEPTED.apk --primary targeted-dex/classes.dex --jars verified-dex-tools/receipt-evidence/tool-jars --android "$ANDROID_HOME/platforms/android-34/android.jar" --d8 "$ANDROID_HOME/build-tools/34.0.0/d8" --out targeted-search-dex
           git diff --exit-code
       - name: Compile only the complete matching native engine
         run: |
@@ -166,5 +181,7 @@ jobs:
             targeted-dex/DEX-PRESERVATION.json
             targeted-dex/ORIGINAL-CALLERS.json
             targeted-dex/EXACT-FIELDS.log
+            targeted-search-dex/SEARCH-DEX-PRESERVATION.json
+            targeted-search-dex/SEARCH-PRIMARY-PRESERVATION.log
           retention-days: 90
           if-no-files-found: warn

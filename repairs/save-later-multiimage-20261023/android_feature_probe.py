@@ -98,7 +98,7 @@ def execute(args):
         owner=device.until(device.running_engine,180);report['engine']=owner
         staging.admit_runtime(device,owner,args.out)
         if args.case.startswith('final-search-'):
-            path=Path(__file__).resolve().parent/'tracking/final-eight/android_search_input.py'
+            path=Path(__file__).resolve().parent/'universal/android_search_input.py'
             spec=importlib.util.spec_from_file_location('selected_search_input',path)
             driver=importlib.util.module_from_spec(spec);spec.loader.exec_module(driver)
             report['actual_android_search_input']=driver.submit(device,args.out,owner,args.case,staging.FUTURE)

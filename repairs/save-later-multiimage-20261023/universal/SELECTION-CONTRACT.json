@@ -1,0 +1,409 @@
+{
+  "schema": 1,
+  "contract": "Infinity Title Selection and Actions v1",
+  "date": "2026-10-24",
+  "authorization": "User system-wide addendum; all original release work remains in the same coordinated candidate",
+  "reference_commit": "07c7a9d6e488fe8cea091de792547f16e97c884d",
+  "reference_signed_run": 40070986647,
+  "shared_owners": {
+    "native": "GUIBaseContainer::OnInfinityMediaTouch owned branch; original event dispatch retained",
+    "copied_item": "Kodi CContextMenuItem invoker -> context.title_popup",
+    "selection": "selection_contract.py schema1; no independent database",
+    "actions": "plugin.show_item_menu; authoritative resume_hub membership/progress APIs",
+    "information": "information.show_information; no generic Kodi dialog replacement",
+    "metadata": "title_metadata; original available synopsis unchanged"
+  },
+  "touch_semantics": {
+    "first_tap": "Selects the actual transformed/hit-tested item and arms its exact typed identity/context; default hover/focus is not sufficient to open.",
+    "second_tap": "Original ACTION_SELECT_ITEM only for same selected title identity/context and established elapsed interval.",
+    "preserved_second_tap_window_ms": {
+      "minimum_inclusive": 120,
+      "maximum_inclusive": 5000
+    },
+    "outside_interval": "Arms a fresh first tap without opening; this is inherited existing timing, not an unconditional any-time second-tap promise.",
+    "hold": "Clears tap arm, copies exact selected CFileItem into common popup, suppresses release tap for600ms.",
+    "selection_key": "Length-framed media type, original path, source directory/BrowsePath, saved capsule, Search provider, namespaced IDs, season and episode; never row coordinates or pointer as owned identity.",
+    "dismissal": "No mutation/rebind/Container.Refresh on cancel; real device focus/scroll retention still requires Android/Fold execution.",
+    "scope": "One-finger touch only in verified Infinity-owned surfaces; original mouse/D-pad/native provider paths remain preserved."
+  },
+  "surfaces": [
+    {
+      "surface": "Home Latest Releases / movie-TV featured panels",
+      "entrypoint": {
+        "producer": "plugin.infinity.latestreleases?action=feed&section=movies|tvshows",
+        "skin": "unified/Home.xml and responsive copies",
+        "controls": [
+          8101,
+          8102,
+          8601,
+          8602,
+          8701,
+          8702,
+          8801,
+          8802
+        ]
+      },
+      "native_ingress": "InputManager owned IDs -> OnInfinityOptionBLongPress where applicable -> OnInfinityMediaTouch common owned branch -> exact-copy context invoker",
+      "selection_proof": "Wrapper path plus Infinity.LatestReleases.Identity=v1 and matching Kind; pinned lossless latest_identity decoder rechecks route/IDs; exact copied native CFileItem; existing producer/typed-ID validation in infinity_trakt.selected; no global focused-item lookup or name-based matching",
+      "action_owner": "context.title_popup -> plugin.show_item_menu -> information.show_information for Information; existing Play/Resume dispatcher for playback",
+      "status": {
+        "host": "PASS: compiled actual common method across all eight IDs; Python exact title/metadata pipeline; real provider/Fold gestures NOT RUN",
+        "android17_api37": "NOT RUN",
+        "physical_fold": "NOT RUN",
+        "actual_focus_scroll_rendering": "NOT RUN; controlled native stubs retain index/scroll and Python cancellation performs no refresh"
+      }
+    },
+    {
+      "surface": "Home Infinity Movies primary and collection rails",
+      "entrypoint": {
+        "producer": "InfinityMoviesPrimaryPath -> CC?action=library&media=movie&bucket=watchlist; InfinityMoviesSecondaryPath -> collection when hubsource=infinity",
+        "primary_controls": [
+          8104,
+          8604,
+          8704,
+          8804
+        ],
+        "secondary_controls": [
+          8722,
+          8822,
+          9202
+        ]
+      },
+      "native_ingress": "InputManager expanded owned Home IDs -> OnInfinityMediaTouch; saved capsule required on shared controls",
+      "selection_proof": "selection_contract schema1 snapshot: owner, key, owning bucket/list, canonical typed identity, original source/stable_source, SHA256 token; checked against current authoritative Resume Hub row",
+      "action_owner": "context.title_popup -> plugin.show_item_menu -> information.show_information for Information; existing Play/Resume dispatcher for playback",
+      "status": {
+        "host": "PASS: source mapping and selected host contract",
+        "android17_api37": "NOT RUN",
+        "physical_fold": "NOT RUN",
+        "actual_focus_scroll_rendering": "NOT RUN; controlled native stubs retain index/scroll and Python cancellation performs no refresh"
+      }
+    },
+    {
+      "surface": "Home Infinity TV rails",
+      "entrypoint": {
+        "producer": "InfinityTVPrimaryPath -> CC?action=library&media=tv&bucket=next when hubsource=infinity",
+        "controls": [
+          8103,
+          8603,
+          8703,
+          8803,
+          8721,
+          8821,
+          9201
+        ]
+      },
+      "native_ingress": "InputManager expanded owned Home IDs -> OnInfinityMediaTouch; real saved capsule required",
+      "selection_proof": "selection_contract schema1 snapshot: owner, key, owning bucket/list, canonical typed identity, original source/stable_source, SHA256 token; checked against current authoritative Resume Hub row; synthetic_next candidates explicitly omit capsule and are not allowed authoritative mutation menus",
+      "action_owner": "context.title_popup -> plugin.show_item_menu -> information.show_information for Information; existing Play/Resume dispatcher for playback",
+      "status": {
+        "host": "PASS: compiled ownership/capsule decision across seven IDs; actual current synthetic-next rows intentionally unsupported for title mutations",
+        "android17_api37": "NOT RUN",
+        "physical_fold": "NOT RUN",
+        "actual_focus_scroll_rendering": "NOT RUN; controlled native stubs retain index/scroll and Python cancellation performs no refresh"
+      }
+    },
+    {
+      "surface": "Home Continue Playing / Continue Watching",
+      "entrypoint": {
+        "producer": "script.infinity.uirepair?action=continue&media=movie|tv -> controller._values_for -> controller._list_item; CC fallback same builder",
+        "controls": [
+          8830,
+          8831
+        ]
+      },
+      "native_ingress": "OnInfinityUiTouch delegates CC34 Home Resume events to OnInfinityMediaTouch; same exact-copy hold contract",
+      "selection_proof": "selection_contract schema1 snapshot: owner, key, owning bucket/list, canonical typed identity, original source/stable_source, SHA256 token; checked against current authoritative Resume Hub row",
+      "action_owner": "context.title_popup -> plugin.show_item_menu -> information.show_information for Information; existing Play/Resume dispatcher for playback; second-tap original Home onclick remains UIRepair.home_continue_choice with the exact resume key",
+      "status": {
+        "host": "PASS: compiled Resume controls, copied selection, saved metadata and existing authoritative progress tests; physical selection/scroll NOT RUN",
+        "android17_api37": "NOT RUN",
+        "physical_fold": "NOT RUN",
+        "actual_focus_scroll_rendering": "NOT RUN; controlled native stubs retain index/scroll and Python cancellation performs no refresh"
+      }
+    },
+    {
+      "surface": "Infinity Browse All / Featured browser",
+      "entrypoint": {
+        "skin": "Custom_1193_InfinityBrowse.xml",
+        "window": 11193,
+        "control": 50,
+        "path_property": "Window(Home).Infinity.BrowsePath"
+      },
+      "native_ingress": "InputManager owned custom window11193/control50 -> OnInfinityMediaTouch only CC browse capsules or verified latest wrappers",
+      "selection_proof": "selection_contract schema1 snapshot: owner, key, owning bucket/list, canonical typed identity, original source/stable_source, SHA256 token; checked against current authoritative Resume Hub row or validated Latest wrapper; ordinary provider/add-on BrowsePath remains outside title adapter",
+      "action_owner": "context.title_popup -> plugin.show_item_menu -> information.show_information for Information; existing Play/Resume dispatcher for playback",
+      "status": {
+        "host": "PASS: source mapping and selected host contract",
+        "android17_api37": "NOT RUN",
+        "physical_fold": "NOT RUN",
+        "actual_focus_scroll_rendering": "NOT RUN; controlled native stubs retain index/scroll and Python cancellation performs no refresh"
+      }
+    },
+    {
+      "surface": "Infinity Movies navigator and its title lists",
+      "entrypoint": {
+        "home_label": "INFINITY MOVIES",
+        "route": "plugin://script.infinity.commandcenter/?action=movies",
+        "producer": "plugin.navigator(movie) -> action=library or custom-lists"
+      },
+      "native_ingress": "WINDOW_VIDEO_NAV10025 current view; CC directory is explicit owner; untyped category/command rows rejected",
+      "selection_proof": "selection_contract schema1 snapshot: owner, key, owning bucket/list, canonical typed identity, original source/stable_source, SHA256 token; checked against current authoritative Resume Hub row",
+      "action_owner": "context.title_popup -> plugin.show_item_menu -> information.show_information for Information; existing Play/Resume dispatcher for playback",
+      "status": {
+        "host": "PASS: source mapping and selected host contract",
+        "android17_api37": "NOT RUN",
+        "physical_fold": "NOT RUN",
+        "actual_focus_scroll_rendering": "NOT RUN; controlled native stubs retain index/scroll and Python cancellation performs no refresh"
+      }
+    },
+    {
+      "surface": "Infinity TV navigator and its title lists",
+      "entrypoint": {
+        "home_label": "INFINITY TV",
+        "route": "plugin://script.infinity.commandcenter/?action=tv",
+        "producer": "plugin.navigator(tv) -> action=library or custom-lists"
+      },
+      "native_ingress": "WINDOW_VIDEO_NAV10025 current view; CC directory explicit owner; synthetic next-up mutation guard retained",
+      "selection_proof": "selection_contract schema1 snapshot: owner, key, owning bucket/list, canonical typed identity, original source/stable_source, SHA256 token; checked against current authoritative Resume Hub row",
+      "action_owner": "context.title_popup -> plugin.show_item_menu -> information.show_information for Information; existing Play/Resume dispatcher for playback",
+      "status": {
+        "host": "PASS: source mapping and selected host contract",
+        "android17_api37": "NOT RUN",
+        "physical_fold": "NOT RUN",
+        "actual_focus_scroll_rendering": "NOT RUN; controlled native stubs retain index/scroll and Python cancellation performs no refresh"
+      }
+    },
+    {
+      "surface": "Search single-provider results",
+      "entrypoint": {
+        "route": "CC?action=search-provider&media=...&query=...&provider=...",
+        "producer": "infinity_search.search_provider -> _search_results -> _publish_result"
+      },
+      "native_ingress": "WINDOW_VIDEO_NAV10025 current view in CC directory -> same OnInfinityMediaTouch; movie/tvshow/season/episode admitted",
+      "selection_proof": "exact copied native CFileItem; existing producer/typed-ID validation in infinity_trakt.selected; no global focused-item lookup or name-based matching; original provider navigation plus Infinity.Search.Provider preserved",
+      "action_owner": "context.title_popup -> plugin.show_item_menu -> information.show_information for Information; existing Play/Resume dispatcher for playback",
+      "status": {
+        "host": "PASS: compiled four typed result decisions and exact provider dispatch host test; real search dispatch/result/Fold responsiveness NOT RUN",
+        "android17_api37": "NOT RUN",
+        "physical_fold": "NOT RUN",
+        "actual_focus_scroll_rendering": "NOT RUN; controlled native stubs retain index/scroll and Python cancellation performs no refresh"
+      }
+    },
+    {
+      "surface": "Search All results",
+      "entrypoint": {
+        "route": "CC?action=search-all&media=...&query=...",
+        "producer": "infinity_search.search_all -> _search_results -> _publish_result"
+      },
+      "native_ingress": "Same current CC-directory media view; provider headings/commands are untyped and excluded",
+      "selection_proof": "exact copied native CFileItem; existing producer/typed-ID validation in infinity_trakt.selected; no global focused-item lookup or name-based matching; provider attribution is part of native selection key",
+      "action_owner": "context.title_popup -> plugin.show_item_menu -> information.show_information for Information; existing Play/Resume dispatcher for playback",
+      "status": {
+        "host": "PASS: source linkage plus compiled common result path; real providers and UI rendering NOT RUN",
+        "android17_api37": "NOT RUN",
+        "physical_fold": "NOT RUN",
+        "actual_focus_scroll_rendering": "NOT RUN; controlled native stubs retain index/scroll and Python cancellation performs no refresh"
+      }
+    },
+    {
+      "surface": "Continue Playing library",
+      "entrypoint": {
+        "route": "CC?action=library&media=movie|tv&bucket=continue",
+        "producer": "plugin.listing -> _values_for -> _list_item",
+        "bucket": "continue"
+      },
+      "native_ingress": "WINDOW_VIDEO_NAV10025 current view in CC directory; exact copied saved capsule",
+      "selection_proof": "selection_contract schema1 snapshot: owner, key, owning bucket/list, canonical typed identity, original source/stable_source, SHA256 token; checked against current authoritative Resume Hub row",
+      "action_owner": "context.title_popup -> plugin.show_item_menu -> information.show_information for Information; existing Play/Resume dispatcher for playback",
+      "status": {
+        "host": "PASS: each real saved projection publishes and validates its capsule in host tests; no per-surface Android PASS claimed",
+        "android17_api37": "NOT RUN",
+        "physical_fold": "NOT RUN",
+        "actual_focus_scroll_rendering": "NOT RUN; controlled native stubs retain index/scroll and Python cancellation performs no refresh"
+      }
+    },
+    {
+      "surface": "Watchlist",
+      "entrypoint": {
+        "route": "CC?action=library&media=movie|tv&bucket=watchlist",
+        "producer": "plugin.listing -> _values_for -> _list_item",
+        "bucket": "watchlist"
+      },
+      "native_ingress": "WINDOW_VIDEO_NAV10025 current view in CC directory; exact copied saved capsule",
+      "selection_proof": "selection_contract schema1 snapshot: owner, key, owning bucket/list, canonical typed identity, original source/stable_source, SHA256 token; checked against current authoritative Resume Hub row",
+      "action_owner": "context.title_popup -> plugin.show_item_menu -> information.show_information for Information; existing Play/Resume dispatcher for playback",
+      "status": {
+        "host": "PASS: each real saved projection publishes and validates its capsule in host tests; no per-surface Android PASS claimed",
+        "android17_api37": "NOT RUN",
+        "physical_fold": "NOT RUN",
+        "actual_focus_scroll_rendering": "NOT RUN; controlled native stubs retain index/scroll and Python cancellation performs no refresh"
+      }
+    },
+    {
+      "surface": "Save for Later",
+      "entrypoint": {
+        "route": "CC?action=library&media=movie|tv&bucket=later",
+        "producer": "plugin.listing -> _values_for -> _list_item",
+        "bucket": "later"
+      },
+      "native_ingress": "WINDOW_VIDEO_NAV10025 current view in CC directory; exact copied saved capsule",
+      "selection_proof": "selection_contract schema1 snapshot: owner, key, owning bucket/list, canonical typed identity, original source/stable_source, SHA256 token; checked against current authoritative Resume Hub row",
+      "action_owner": "context.title_popup -> plugin.show_item_menu -> information.show_information for Information; existing Play/Resume dispatcher for playback",
+      "status": {
+        "host": "PASS: each real saved projection publishes and validates its capsule in host tests; no per-surface Android PASS claimed",
+        "android17_api37": "NOT RUN",
+        "physical_fold": "NOT RUN",
+        "actual_focus_scroll_rendering": "NOT RUN; controlled native stubs retain index/scroll and Python cancellation performs no refresh"
+      }
+    },
+    {
+      "surface": "Collection",
+      "entrypoint": {
+        "route": "CC?action=library&media=movie|tv&bucket=collection",
+        "producer": "plugin.listing -> _values_for -> _list_item",
+        "bucket": "collection"
+      },
+      "native_ingress": "WINDOW_VIDEO_NAV10025 current view in CC directory; exact copied saved capsule",
+      "selection_proof": "selection_contract schema1 snapshot: owner, key, owning bucket/list, canonical typed identity, original source/stable_source, SHA256 token; checked against current authoritative Resume Hub row",
+      "action_owner": "context.title_popup -> plugin.show_item_menu -> information.show_information for Information; existing Play/Resume dispatcher for playback",
+      "status": {
+        "host": "PASS: each real saved projection publishes and validates its capsule in host tests; no per-surface Android PASS claimed",
+        "android17_api37": "NOT RUN",
+        "physical_fold": "NOT RUN",
+        "actual_focus_scroll_rendering": "NOT RUN; controlled native stubs retain index/scroll and Python cancellation performs no refresh"
+      }
+    },
+    {
+      "surface": "Watched History",
+      "entrypoint": {
+        "route": "CC?action=library&media=movie|tv&bucket=history",
+        "producer": "plugin.listing -> _values_for -> _list_item",
+        "bucket": "history"
+      },
+      "native_ingress": "WINDOW_VIDEO_NAV10025 current view in CC directory; exact copied saved capsule",
+      "selection_proof": "selection_contract schema1 snapshot: owner, key, owning bucket/list, canonical typed identity, original source/stable_source, SHA256 token; checked against current authoritative Resume Hub row",
+      "action_owner": "context.title_popup -> plugin.show_item_menu -> information.show_information for Information; existing Play/Resume dispatcher for playback",
+      "status": {
+        "host": "PASS: each real saved projection publishes and validates its capsule in host tests; no per-surface Android PASS claimed",
+        "android17_api37": "NOT RUN",
+        "physical_fold": "NOT RUN",
+        "actual_focus_scroll_rendering": "NOT RUN; controlled native stubs retain index/scroll and Python cancellation performs no refresh"
+      }
+    },
+    {
+      "surface": "Progress Shows",
+      "entrypoint": {
+        "route": "CC?action=library&media=movie|tv&bucket=progress",
+        "producer": "plugin.listing -> _values_for -> _list_item",
+        "bucket": "progress"
+      },
+      "native_ingress": "WINDOW_VIDEO_NAV10025 current view in CC directory; exact copied saved capsule",
+      "selection_proof": "selection_contract schema1 snapshot: owner, key, owning bucket/list, canonical typed identity, original source/stable_source, SHA256 token; checked against current authoritative Resume Hub row",
+      "action_owner": "context.title_popup -> plugin.show_item_menu -> information.show_information for Information; existing Play/Resume dispatcher for playback",
+      "status": {
+        "host": "PASS: each real saved projection publishes and validates its capsule in host tests; no per-surface Android PASS claimed",
+        "android17_api37": "NOT RUN",
+        "physical_fold": "NOT RUN",
+        "actual_focus_scroll_rendering": "NOT RUN; controlled native stubs retain index/scroll and Python cancellation performs no refresh"
+      }
+    },
+    {
+      "surface": "Ratings title projection",
+      "entrypoint": {
+        "route": "CC?action=library&media=movie|tv&bucket=ratings",
+        "producer": "plugin.listing -> _values_for -> _list_item",
+        "bucket": "ratings"
+      },
+      "native_ingress": "WINDOW_VIDEO_NAV10025 current view in CC directory; exact copied saved capsule",
+      "selection_proof": "selection_contract schema1 snapshot: owner, key, owning bucket/list, canonical typed identity, original source/stable_source, SHA256 token; checked against current authoritative Resume Hub row",
+      "action_owner": "context.title_popup -> plugin.show_item_menu -> information.show_information for Information; existing Play/Resume dispatcher for playback",
+      "status": {
+        "host": "PASS: each real saved projection publishes and validates its capsule in host tests; no per-surface Android PASS claimed",
+        "android17_api37": "NOT RUN",
+        "physical_fold": "NOT RUN",
+        "actual_focus_scroll_rendering": "NOT RUN; controlled native stubs retain index/scroll and Python cancellation performs no refresh"
+      }
+    },
+    {
+      "surface": "Custom Lists title projection",
+      "entrypoint": {
+        "route": "CC?action=library&media=movie|tv&bucket=list&list=<exact name>",
+        "producer": "plugin.custom_lists -> plugin.listing -> _list_item"
+      },
+      "native_ingress": "Same current CC-directory handler; copied capsule carries exact list name",
+      "selection_proof": "selection_contract schema1 snapshot: owner, key, owning bucket/list, canonical typed identity, original source/stable_source, SHA256 token; checked against current authoritative Resume Hub row; punctuation/quotes/commas in list names survive structured capsule and URL encoding",
+      "action_owner": "context.title_popup -> plugin.show_item_menu -> information.show_information for Information; existing Play/Resume dispatcher for playback",
+      "status": {
+        "host": "PASS: custom name, exact source, stale row rejection and saved action host cases; native key-only/list-name-loss branch replaced",
+        "android17_api37": "NOT RUN",
+        "physical_fold": "NOT RUN",
+        "actual_focus_scroll_rendering": "NOT RUN; controlled native stubs retain index/scroll and Python cancellation performs no refresh"
+      }
+    }
+  ],
+  "protected_or_excluded_surfaces": [
+    {
+      "surface": "Ordinary Kodi Movies/TV library and ordinary provider directories",
+      "behavior": "Existing signed-base native fallback/context is byte-preserved outside CC/owned Home/Browse paths; no universal-popup replacement there",
+      "host": "PASS: exact reverse-patch byte comparison and compiled videodb/provider/plugin.video.cobra old-context cases",
+      "android17_api37": "NOT RUN"
+    },
+    {
+      "surface": "Cobra",
+      "behavior": "Infinity skin plus enabled exact CC34 ownership guard; no Cobra source/resource/file changes authorized",
+      "host": "PASS: skin.cobra returns unhandled; ordinary plugin.video.cobra context uses preserved old branch",
+      "signed_artifact_preservation": "PENDING candidate signing/integrity verification"
+    },
+    {
+      "surface": "Add-on rail cards",
+      "controls": [
+        8720,
+        8820,
+        9200,
+        19600,
+        19601
+      ],
+      "behavior": "Add-on identities retain Rail Options and their existing selection owner; title adapter does not intercept them",
+      "host": "PASS: compiled exclusion cases"
+    },
+    {
+      "surface": "Search History and provider/category command rows",
+      "behavior": "Not media titles; Search History restores query/provider flow, no Title Options attached",
+      "host": "PASS: source type boundary and untyped command rejection; Search UI runtime NOT RUN"
+    },
+    {
+      "surface": "Synthetic Next Episodes",
+      "behavior": "Original open route retained. No saved-selection capsule, no guessed progress/watched/list mutations. Infinity.Selection.Unsupported marker prevents generic episode fallback granting actions.",
+      "host": "PASS: producer/consumer guard test and original route equality"
+    },
+    {
+      "surface": "Unknown/unverified media identity",
+      "behavior": "Producer/typed-ID verification fails closed; no saved-record mutation and no guessed similar-title match",
+      "host": "PASS: existing retained identity guards and selection conflict tests"
+    }
+  ],
+  "verification": {
+    "python_selection": "SELECTION-HOST.json:7 selected host cases PASS",
+    "popup_metadata": "QUICK-ACTIONS-HOST.json:15 host cases PASS before final synthetic-only guard;7-case selection suite covers final guard",
+    "native": "SELECTION-NATIVE-HOST.json: actual patched method and helper compiled against controlled GUI/API stubs; exact baseline and patched source hashes bound",
+    "not_claimed": [
+      "Actual Android touch event delivery",
+      "Rendered focus and scroll restoration",
+      "Physical Fold acceptance",
+      "Whole engine compilation from this host test",
+      "Signed candidate artifact preservation",
+      "Search freeze resolution from native selection tests",
+      "Shutdown acceptance"
+    ]
+  },
+  "source_bindings": {
+    "repairs/save-later-multiimage-20261023/universal/overlay/script.infinity.commandcenter/selection_contract.py": "31f04371cdf9902e234ef441e11a41bc914daf1a9cc12b1cc435d58285dc46c2",
+    "repairs/save-later-multiimage-20261023/universal/overlay/script.infinity.commandcenter/context.py": "b0bcd0f64b7883b1d05878ac23eafe439b7aa3b397e60453bf5f8dcfddbfa2bb",
+    "repairs/save-later-multiimage-20261023/universal/overlay/script.infinity.commandcenter/plugin.py": "44c0f6313eec710bbd98b2dd43222c9601d7ea70f3a49737b2b68962f9bb54e6",
+    "repairs/save-later-multiimage-20261023/final_eight_native.py": "6ca4e999ac289c6b1e38ec70334d673cba06332543031e5260545996cc8e0ba5",
+    "repairs/save-later-multiimage-20261023/universal/test_selection_native.py": "75841e29079234455c37eab45187e4e61ae49f421779248c56b5a1f375c04e81",
+    "repairs/save-later-multiimage-20261023/universal/test_selection_contract.py": "0241b62f95d30e8518584a708e08ff039e6061550db1ae6d6a39f61643489ac2"
+  },
+  "runtime_acceptance": "NOT RUN: API37 selected feature execution and physical Fold checklist remain mandatory independent gates; no shutdown prerequisite"
+}
