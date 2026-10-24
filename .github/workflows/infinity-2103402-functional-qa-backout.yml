@@ -1,0 +1,101 @@
+name: Infinity 2103402 original-behavior same-version rollback
+on:
+  push:
+    branches: [work/infinity-2103402-functional-qa-20261024]
+    paths:
+      - ".github/workflows/infinity-2103402-functional-qa-backout.yml"
+      - "repairs/infinity-2103402-final/package_functional_qa.py"
+permissions:
+  contents: read
+  actions: read
+jobs:
+  backout:
+    name: Signed accepted 2103401 behavior with install-over-compatible code 2103402
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40089463702
+          name: Infinity-Saved-Navigation-MultiImage-INTERNAL-QA-NOT-ACCEPTED
+          github-token: ${{ github.token }}
+          path: signed-2103401
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: "platform-tools build-tools;35.0.0 platforms;android-34"
+          log-accepted-android-sdk-licenses: false
+      - name: Exact protected source and same-version rollback stage
+        run: |
+          set -euo pipefail
+          (cd signed-2103401 && sha256sum -c SHA256SUMS)
+          python3 - <<'PY'
+          import subprocess
+          names=subprocess.check_output(['git','diff','--name-only','1738478709cd8881f7ad4a524e7abbbc82b5d79c','HEAD'],text=True).splitlines()
+          allowed=lambda n: (n.startswith('repairs/infinity-2103402-final/') or
+                  n in ('handoffs/INFINITY-2103402-FINAL-STABILIZATION-AUTHORIZED-20261024.md',
+                        'handoffs/INFINITY-2103402-ASTRA-TAKEOVER-CHECKPOINT-20261024.md',
+                        '.github/workflows/infinity-2103402-scoped-tests.yml',
+                        '.github/workflows/infinity-saved-navigation-android.yml',
+                        '.github/workflows/infinity-2103402-functional-qa.yml',
+                        '.github/workflows/infinity-2103402-functional-qa-backout.yml'))
+          assert all(map(allowed,names)), 'Out of scope changes'
+          assert not any('cobra' in n.lower() for n in names),'Cobra modifications prohibited'
+          PY
+          python3 repairs/infinity-2103402-final/package_functional_qa.py make-backout --baseline signed-2103401 --out ui-backout
+      - name: Sign rollback with original signing identity, verify exact member restrictions
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          : "${INFINITY_KEYSTORE_B64:?Existing keystore required}"
+          : "${INFINITY_STORE_PASSWORD:?Keystore password required}"
+          : "${INFINITY_KEY_PASSWORD:?Signing key password required}"
+          : "${INFINITY_KEY_ALIAS:?Signing key alias required}"
+          printf '%s' "$INFINITY_KEYSTORE_B64" | base64 -d > ui-backout/.qa-keystore
+          chmod 600 ui-backout/.qa-keystore
+          ALIGN="$ANDROID_HOME/build-tools/35.0.0/zipalign"
+          SIGNER="$ANDROID_HOME/build-tools/35.0.0/apksigner"
+          "$ALIGN" -P 16 -f 4 ui-backout/unsigned-2103402-backout.apk ui-backout/aligned-backout.apk
+          "$SIGNER" sign --ks ui-backout/.qa-keystore \
+             --ks-key-alias "$INFINITY_KEY_ALIAS" \
+             --ks-pass env:INFINITY_STORE_PASSWORD \
+             --key-pass env:INFINITY_KEY_PASSWORD \
+             --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true \
+             --out ui-backout/Infinity-2103402-Original-Behavior-ROLLBACK.apk ui-backout/aligned-backout.apk
+          "$SIGNER" verify --verbose --print-certs signed-2103401/Infinity-2103401-Universal-Performance-QA.apk > ui-backout/ORIGINAL-SIGNATURE.txt
+          "$SIGNER" verify --verbose --print-certs ui-backout/Infinity-2103402-Original-Behavior-ROLLBACK.apk > ui-backout/ROLLBACK-SIGNATURE.txt
+          python3 - <<'PY'
+          import pathlib,re
+          d=pathlib.Path('ui-backout')
+          signature=lambda name:re.search(r'Signer #1 certificate SHA-256 digest:\s*([0-9a-fA-F]{64})',(d/name).read_text()).group(1).lower()
+          assert signature('ORIGINAL-SIGNATURE.txt')==signature('ROLLBACK-SIGNATURE.txt')=='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7', 'Release identity mismatch'
+          PY
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging ui-backout/Infinity-2103402-Original-Behavior-ROLLBACK.apk | grep -E "^package: name='com.projectinfinity.kodi' versionCode='2103402'"
+          python3 repairs/infinity-2103402-final/package_functional_qa.py verify-backout --baseline signed-2103401 --signed ui-backout/Infinity-2103402-Original-Behavior-ROLLBACK.apk
+          rm -f ui-backout/.qa-keystore ui-backout/unsigned-2103402-backout.apk ui-backout/aligned-backout.apk
+          (cd ui-backout && sha256sum *.apk *.zip > SHA256SUMS)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-2103402-ORIGINAL-BEHAVIOR-ROLLBACK-SIGNED
+          path: |
+            ui-backout/Infinity-2103402-Original-Behavior-ROLLBACK.apk
+            ui-backout/script.infinity.commandcenter-0.3.5.37-ROLLBACK.zip
+            ui-backout/skin.infinity.diggz-1.0.5.244-ROLLBACK.zip
+            ui-backout/ROLLBACK-RECEIPT.json
+            ui-backout/SHA256SUMS
+            ui-backout/ROLLBACK-SIGNATURE.txt
+          retention-days: 90
+          if-no-files-found: error
