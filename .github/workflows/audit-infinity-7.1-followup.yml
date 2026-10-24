@@ -1,0 +1,67 @@
+name: Infinity 7.1 Independent Packaging and Signing Audit
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-7.1-core-unified]
+    paths:
+      - '.github/workflows/audit-infinity-7.1-followup.yml'
+      - 'scripts/infinity71.py'
+      - 'scripts/infinity71_axml.py'
+      - 'scripts/sign-infinity71.sh'
+      - 'tests/infinity71_packaging/**'
+
+permissions:
+  contents: read
+
+jobs:
+  validate-without-engine-rebuild:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+      - name: Compile the Java contract and test packaging/signing without building Kodi
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p results
+          sdkmanager 'platforms;android-34' 'build-tools;34.0.0' >/dev/null
+          git clone --depth 1 --branch 21.3-Omega https://github.com/xbmc/xbmc.git kodi
+          test "$(git -C kodi rev-parse HEAD)" = a3a448d26b8d560a65655dab2cd122994dc4e146
+          python3 scripts/infinity71.py source --source kodi
+          python3 scripts/validate-infinity71-java.py --source kodi \
+            --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" --out checks/java
+          mkdir -p checks/dex
+          "$ANDROID_HOME/build-tools/34.0.0/d8" \
+            --lib "$ANDROID_HOME/platforms/android-34/android.jar" --min-api 21 \
+            --output checks/dex checks/java/compile-check.jar
+          export INFINITY_KODI_SOURCE="$PWD/kodi"
+          export INFINITY_TEST_DEX="$PWD/checks/dex/classes.dex"
+          export INFINITY_ANDROID_JAR="$ANDROID_HOME/platforms/android-34/android.jar"
+          python3 tests/infinity71/test_contract.py 2>&1 | tee results/original-regressions.txt
+          python3 tests/infinity71_packaging/test_followup.py 2>&1 | tee results/followup-regressions.txt
+          c++ -std=c++17 -Wall -Wextra -Werror -pthread \
+            -Ikodi/xbmc/platform/android/activity tests/infinity71/test_bridge_state.cpp \
+            -o checks/bridge-state-tests
+          checks/bridge-state-tests | tee results/native-state.txt
+          bash -n scripts/sign-infinity71.sh
+          {
+            echo '## Independent audit'
+            echo '30 regression tests plus host C++ state checks passed.'
+            echo 'Android resource packaging and APK signing used the real SDK tools.'
+            echo 'Signing keys were temporary fixtures, deleted after testing; repository signing secrets were not accessed.'
+            echo 'No Kodi engine was rebuilt. These fixtures do not establish device compatibility.'
+            echo 'Known open limitation: Leanback TV return from PiP needs a separate geometry handoff fix and device acceptance.'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-7.1-Independent-Audit-Results
+          path: results/
+          if-no-files-found: warn
+          retention-days: 30

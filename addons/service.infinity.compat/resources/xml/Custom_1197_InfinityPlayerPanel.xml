@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<window type="dialog">
+  <defaultcontrol always="true">9701</defaultcontrol>
+  <controls>
+    <!-- Infinity player panel overlays only UI; it never defines/resizes the Kodi video surface. -->
+    <control type="image">
+      <left>0</left><top>0</top><width>100%</width><height>100%</height>
+      <texture colordiffuse="$INFO[Window(Home).Property(Infinity.Palette.Scrim)]">special://xbmc/addons/skin.estuary/media/white.png</texture>
+    </control>
+    <control type="image">
+      <left>0</left><top>0</top><width>34%</width><height>100%</height>
+      <texture colordiffuse="$INFO[Window(Home).Property(Infinity.Palette.Surface)]">special://xbmc/addons/skin.estuary/media/white.png</texture>
+    </control>
+    <control type="button" id="9798">
+      <left>38</left><top>32</top><width>78</width><height>64</height><label>☰</label>
+      <font>font13</font><textcolor>$INFO[Window(Home).Property(Infinity.Palette.TextPrimary)]</textcolor>
+      <focusedcolor>FFFFFFFF</focusedcolor>
+      <texturefocus colordiffuse="$INFO[Window(Home).Property(Infinity.Palette.Focus)]">special://xbmc/addons/skin.estuary/media/white.png</texturefocus>
+      <texturenofocus colordiffuse="$INFO[Window(Home).Property(Infinity.Palette.SurfaceElevated)]">special://xbmc/addons/skin.estuary/media/white.png</texturenofocus>
+      <onclick>Dialog.Close(1197)</onclick>
+    </control>
+    <control type="label"><left>132</left><top>34</top><width>480</width><height>46</height><font>font13</font><textcolor>$INFO[Window(Home).Property(Infinity.Palette.TextPrimary)]</textcolor><label>NOW PLAYING</label></control>
+    <control type="label"><left>38</left><top>104</top><width>570</width><height>52</height><font>font13</font><textcolor>$INFO[Window(Home).Property(Infinity.Palette.TextPrimary)]</textcolor><label>$INFO[VideoPlayer.Title]</label><scroll>true</scroll></control>
+    <control type="label"><left>38</left><top>156</top><width>570</width><height>34</height><font>font12</font><textcolor>$INFO[Window(Home).Property(Infinity.Palette.TextSecondary)]</textcolor><label>$INFO[VideoPlayer.ChapterName]</label><scroll>true</scroll></control>
+    <control type="grouplist" id="9700">
+      <left>38</left><top>222</top><width>570</width><height>720</height><orientation>vertical</orientation><itemgap>10</itemgap>
+      <control type="button" id="9701"><width>570</width><height>66</height><label>Chapters / Bookmarks</label><onclick>Dialog.Close(1197)</onclick><onclick>ActivateWindow(videobookmarks)</onclick></control>
+      <control type="button" id="9702"><width>570</width><height>66</height><label>Subtitles</label><onclick>Dialog.Close(1197)</onclick><onclick>ActivateWindow(osdsubtitlesettings)</onclick></control>
+      <control type="button" id="9703"><width>570</width><height>66</height><label>Audio</label><onclick>Dialog.Close(1197)</onclick><onclick>ActivateWindow(osdaudiosettings)</onclick></control>
+      <control type="button" id="9704"><width>570</width><height>66</height><label>Video Settings</label><onclick>Dialog.Close(1197)</onclick><onclick>ActivateWindow(osdvideosettings)</onclick></control>
+      <control type="button" id="9705"><width>570</width><height>66</height><label>Playback Speed +</label><onclick>PlayerControl(tempoup)</onclick></control>
+      <control type="button" id="9706"><width>570</width><height>66</height><label>Playback Speed -</label><onclick>PlayerControl(tempodown)</onclick></control>
+      <control type="button" id="9707"><width>570</width><height>66</height><label>Related / Cast &amp; Crew</label><onclick>Dialog.Close(1197)</onclick><onclick>Info</onclick></control>
+      <control type="button" id="9708"><width>570</width><height>66</height><label>Close Player</label><onclick>Dialog.Close(1197)</onclick><onclick>PlayerControl(Stop)</onclick></control>
+    </control>
+    <control type="label"><left>38</left><bottom>38</bottom><width>570</width><height>34</height><font>font12</font><textcolor>$INFO[Window(Home).Property(Infinity.Palette.TextSecondary)]</textcolor><label>$INFO[Window(Home).Property(Infinity.DeviceMode)] • $INFO[Window(Home).Property(Infinity.Orientation)] • $INFO[Window(Home).Property(Infinity.RefreshPolicy)]</label></control>
+  </controls>
+</window>
