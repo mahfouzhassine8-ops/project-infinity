@@ -33,7 +33,7 @@ jobs:
         run: |
           (cd signed-2103401 && sha256sum -c SHA256SUMS)
           cd repairs/infinity-2103402-final
-          python3 -m unittest -v test_home_reflow_scope test_clock_reflow_scope
+          python3 -m unittest -v test_home_reflow_scope test_clock_reflow_scope test_information_spacing_scope
       - name: Reject changes outside approved repair records
         run: |
           python3 - <<'PY'
