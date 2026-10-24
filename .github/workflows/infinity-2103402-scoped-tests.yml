@@ -30,10 +30,11 @@ jobs:
         env:
           INFINITY_SIGNED_CC35_ZIP: ${{ github.workspace }}/signed-2103401/script.infinity.commandcenter-0.3.5.35.zip
           INFINITY_SIGNED_SKIN242_ZIP: ${{ github.workspace }}/signed-2103401/skin.infinity.diggz-1.0.5.242.zip
+          INFINITY_BASELINE_APK: ${{ github.workspace }}/signed-2103401/Infinity-2103401-Universal-Performance-QA.apk
         run: |
           (cd signed-2103401 && sha256sum -c SHA256SUMS)
           cd repairs/infinity-2103402-final
-          python3 -m unittest -v test_home_reflow_scope test_clock_reflow_scope test_information_spacing_scope
+          python3 -m unittest -v test_home_reflow_scope test_clock_reflow_scope test_information_spacing_scope test_visual_scope test_health_export_scope
       - name: Reject changes outside approved repair records
         run: |
           python3 - <<'PY'
