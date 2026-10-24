@@ -48,9 +48,15 @@ def extra(stage,args,report):
     shutil.copyfile(HERE/'android_runtime_checks.py',fixture/'android_runtime_checks.py')
     shutil.copyfile(HERE/'ANDROID-FAVORITES-REFERENCE.json',fixture/'ANDROID-FAVORITES-REFERENCE.json')
     if feature_only:
+        with ZipFile(args.apk) as archive:
+            expected={aid:ET.fromstring(archive.read('assets/addons/'+aid+'/addon.xml')).get('version')
+                for aid in ('script.infinity.commandcenter','script.infinity.uirepair','script.infinity.watchedbridge')}
+        (fixture/'EXPECTED-COMPONENTS.json').write_text(json.dumps(expected,sort_keys=True))
         # A dedicated feature service: no persistence fixtures, VFS/SQLite
         # controls, service retirement loop, Close or reopen are executed.
-        selected='multiimage' if image_only else 'navigation'
+        selected=args.mode if args.mode.startswith('tracking-') else 'multiimage' if image_only else 'navigation'
+        if args.mode.startswith('tracking-'):
+            shutil.copyfile(HERE/'tracking/android_tracking_checks.py',fixture/'android_tracking_checks.py')
         service=("import os,xbmcaddon,xbmcvfs\n"
                  "from pathlib import Path\n"
                  "import android_runtime_checks\n"
@@ -72,6 +78,10 @@ def extra(stage,args,report):
             report['close_trace_diagnostic_only']=True
             report['close_trace_timing_may_be_perturbed']=True
             report['close_trace_fixture_sha256']=sha((fixture/'android_close_trace.py').read_bytes())
+    if feature_only and args.mode.startswith('tracking-'):
+        service=("import os,xbmcaddon,xbmcvfs\nfrom pathlib import Path\nimport android_tracking_checks\n"
+            "root=xbmcvfs.translatePath(xbmcaddon.Addon().getAddonInfo('profile'))\nPath(root).mkdir(parents=True,exist_ok=True)\n"
+            "android_tracking_checks.run(root,str(os.getpid()),"+repr(args.mode)+")\n")
     (fixture/'service.py').write_text(service)
     xml=fixture/'resources/skins/Default/1080i/multiimage-probe.xml';xml.parent.mkdir(parents=True)
     imagepath=('resource://resource.images.weathericons.default/' if args.mode=='native-opaque' else
@@ -114,6 +124,15 @@ def extra(stage,args,report):
     resume['identity']=dict(schema=1,kind='episode',scope='show_episode',ids=rows[0]['identity']['ids'],season=1,episode=3)
     data=dict(schema=1,revision=1,later=later,watchlist=later,watched={'e'*64:dict(rows[1],watched=True)},
               items={'f'*64:resume},sources={},collection={},ratings={},lists={})
+    if feature_only and args.mode=='tracking-continue':
+        data['items']['f'*64]['updated']=10
+        second=json.loads(json.dumps(resume));second.update(key='8'*64,episode=2,position=201.5,updated=20)
+        second['identity']['episode']=2
+        second['source']=second['source'].replace('episode=3','episode=2');second['stable_source']=second['source']
+        data['items']['8'*64]=second
+    if feature_only and args.mode=='tracking-actions':
+        for bucket in ('later','watchlist','watched'):
+            data[bucket]={key:row for key,row in data[bucket].items() if row.get('media')!='movie'}
     target=addondata/'script.infinity.commandcenter/continue-watching.json';target.parent.mkdir()
     target.write_text(json.dumps(data,sort_keys=True)+'\n')
     report['preserved_fixture_sha256']=sha(target.read_bytes())

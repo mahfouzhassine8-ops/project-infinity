@@ -14,7 +14,7 @@ from zipfile import ZipFile
 import android_feature_device as device
 import android_probe as staging
 
-CASES=('saved-navigation','provider-pov','provider-umbrella','provider-seren','provider-future','multiimage')
+CASES=('saved-navigation','provider-pov','provider-umbrella','provider-seren','provider-future','multiimage','tracking-recovery','tracking-actions','tracking-continue')
 COMPONENTS=('script.infinity.commandcenter','script.infinity.uirepair','script.infinity.watchedbridge')
 
 def execute(args):
@@ -82,7 +82,8 @@ def execute(args):
         if device.shell('getenforce').strip()!='Enforcing':raise RuntimeError('SELinux must remain enforcing')
         device.adb('logcat','-c')
         report['launch']=device.shell('am','start','-W','-n',device.PACKAGE+'/.Splash')
-        device.enable_features(args.out)
+        receipt=json.loads((args.apk.parent/'CANDIDATE.json').read_text())
+        device.enable_features(args.out,receipt['matching_component_versions'])
         details=device.rpc('Addons.GetAddonDetails',{'addonid':staging.FUTURE,'properties':['enabled']})['addon']
         if not details['enabled']:
             if device.rpc('Addons.SetAddonEnabled',{'addonid':staging.FUTURE,'enabled':True})!='OK':
@@ -92,7 +93,7 @@ def execute(args):
         path=device.PROFILE+'/addon_data/'+staging.FUTURE+'/navigation-ready-'+str(owner['pid'])+'.json'
         result=device.until(lambda:device.read_json(path),1800)
         report['feature_result']=result
-        expected=['multiimage'] if args.case=='multiimage' else ['navigation']
+        expected=[args.case] if args.case.startswith('tracking-') else ['multiimage'] if args.case=='multiimage' else ['navigation']
         if result.get('selected_features')!=expected or result.get('selected_mode')!=args.mode:raise RuntimeError('Unexpected test family executed')
         if result.get('pid')!=owner['pid'] or result.get('passed') is not True:
             raise RuntimeError('Selected feature failed: '+str(result.get('failure')))

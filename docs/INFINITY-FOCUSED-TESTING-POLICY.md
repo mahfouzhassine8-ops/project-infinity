@@ -76,3 +76,13 @@ workflow separation.
 Policy-change validation: **14 focused contract tests PASS**. Shell and embedded
 Python syntax checks pass. Android feature, shutdown, and physical Fold tests were
 **NOT RUN** for this orchestration change; no APK was rebuilt or modified.
+
+For the authorized tracking/navigation continuation, the feature workflow also
+provides `tracking-recovery`, `tracking-actions`, and `tracking-continue`.
+Select one explicitly, supply its authorization, the newly signed build run, and
+`work/infinity-saved-route-correction-20261023` as `source_ref`. These cases use
+the real provider/GUI paths on a disposable emulator, leave the app running,
+and report physical Fold acceptance separately. The existing provider-only
+choices remain independently selectable. Do not select the historical
+`saved-navigation` case for a CC32 recovery-memory write: that earlier case
+asserts that all saved bytes remain unchanged, before recovery memory existed.

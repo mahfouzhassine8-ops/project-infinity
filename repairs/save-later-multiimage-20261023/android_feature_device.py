@@ -58,7 +58,7 @@ def until(function,seconds):
         time.sleep(.25)
     raise RuntimeError('Feature state was not observed before deadline')
 
-def enable_features(out):
+def enable_features(out,versions=None):
     adb('forward','tcp:19090','tcp:9090')
     def ready():
         try:return rpc('JSONRPC.Ping')=='pong'
@@ -68,6 +68,9 @@ def enable_features(out):
     (out/'addon-inventory.json').write_text(json.dumps(inventory,indent=2)+'\n')
     wanted={'script.infinity.commandcenter':'0.3.5.31',
             'script.infinity.uirepair':'0.1.14','script.infinity.watchedbridge':'1.0.12'}
+    if versions is not None:
+        if not all(name in versions for name in wanted):raise RuntimeError('Signed component version receipt incomplete')
+        wanted={name:versions[name] for name in wanted}
     for name,version in wanted.items():
         details=rpc('Addons.GetAddonDetails',{'addonid':name,'properties':['version','enabled']})['addon']
         if details['version']!=version:raise RuntimeError('Unexpected feature component: '+name)

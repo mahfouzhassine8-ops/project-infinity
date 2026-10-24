@@ -390,7 +390,13 @@ def run(root,cycle,mode,features=None):
         # This marker is never a native persistence or termination receipt.
         until(lambda:(Path(root)/('navigation-start-'+cycle+'.json')).exists(),
               'host test admission',300)
-        require(cc.getAddonInfo('version')=='0.3.5.31','Actual controller31 was not selected')
+        if features is not None:
+            expected=json.loads((Path(__file__).parent/'EXPECTED-COMPONENTS.json').read_text())
+            require(set(expected)=={'script.infinity.commandcenter','script.infinity.uirepair','script.infinity.watchedbridge'},'Signed component inventory incomplete')
+            for aid,version in expected.items():
+                require(xbmcaddon.Addon(aid).getAddonInfo('version')==version,'Actual component differs from signed candidate: '+aid)
+        else:
+            require(cc.getAddonInfo('version')=='0.3.5.31','Actual controller31 was not selected')
         result['active_skin']=xbmc.getSkinDir()
         require(result['active_skin']=='skin.infinity.diggz',
                 'Infinity skin must be active; actual='+result['active_skin'])

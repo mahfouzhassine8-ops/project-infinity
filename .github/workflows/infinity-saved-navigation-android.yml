@@ -16,7 +16,7 @@ on:
         required: true
         type: choice
         default: select-a-feature
-        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage]
+        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue]
       candidate_build:
         description: Existing signed build run (no rebuild)
         required: true
@@ -45,7 +45,7 @@ jobs:
         run: |
           python3 - <<'PYCODE'
           import os
-          allowed={'saved-navigation','provider-pov','provider-umbrella','provider-seren','provider-future','multiimage'}
+          allowed={'saved-navigation','provider-pov','provider-umbrella','provider-seren','provider-future','multiimage','tracking-recovery','tracking-actions','tracking-continue'}
           assert os.environ['SELECTED_CASE'] in allowed, 'Select one feature explicitly'
           assert os.environ['AUTHORIZED_SCOPE'].strip(), 'Record the user-authorized feature scope'
           assert os.environ['CANDIDATE_BUILD'].isdigit(), 'Signed build run must be numeric'

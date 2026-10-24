@@ -217,6 +217,8 @@ class RuntimeRouting(unittest.TestCase):
             stack.enter_context(patch.dict(sys.modules,modules))
             spec=importlib.util.spec_from_file_location('policy_runtime_checks',HERE/'android_runtime_checks.py')
             module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+            module.__file__=str(root/'android_runtime_checks.py')
+            (root/'EXPECTED-COMPONENTS.json').write_text(json.dumps({name:'0.3.5.31' for name in ('script.infinity.commandcenter','script.infinity.uirepair','script.infinity.watchedbridge')}))
             def rpc(method,params):
                 if method=='Settings.GetSettingValue':return {'value':2}
                 calls.append(method+':'+params.get('addonid',''))

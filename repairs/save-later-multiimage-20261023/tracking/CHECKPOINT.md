@@ -11,3 +11,7 @@ Reference: permanently signed build 39994772688. Reused its components, original
 Coordinated component versions: Command Center 0.3.5.32, UI Repair 0.1.15, Watched Bridge 1.0.13, skin 1.0.5.239. A native build is required for the new Watchlist/Continue success observer and exact source-owner/installer bindings. Older admitted controller contracts are retained. Compilation and signing remain pending at this checkpoint; source overlays are not an installable delivery.
 
 No shutdown tests, Cobra changes, user-data resets, provider edits or unrelated suites. Existing shutdown failures remain independent. Physical acceptance and final lock remain false.
+
+Runtime setup checkpoint: explicit tracking-recovery/actions/continue choices prepared. Three new routing/transport host checks and two existing feature-isolation checks PASS. No build was dispatched. Full ARM64 compilation, signing, Android execution and physical Fold remain NOT RUN.
+
+Continuation 2026-10-24: browser authentication deferred at the user's request. The connected GitHub integration remains available for repository reads and writes; it does not expose new workflow dispatch. Preserve the manual feature-selection policy and do not add automatic triggers to bypass this limitation. Completed checks are reused. The pending `FileItemList.h` include was removed after checking the exact signed source archive: that header does not exist, and `FileItem.h` already defines `CFileItemList`, `Get` and `Size`. This is a source compatibility correction, not a successful native compilation claim.
