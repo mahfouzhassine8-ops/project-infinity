@@ -668,24 +668,44 @@ def set_rating_data(data, key, rating):
     return data, data['ratings'][key]
 
 
+def list_entry_keys(data, list_name, entry):
+    values = _dict(_dict(data.get('lists')).get(str(list_name)))
+    if not entry_identity(entry):
+        return [entry['key']] if entry.get('key') in values else []
+    # List membership uses original typed IDs. Progress-only links never alter
+    # a saved list's media identity or provider route.
+    rows = [(key, dict(value, resume_verified_ids={})) for key, value in values.items()
+            if isinstance(value, dict) and KEY_RE.fullmatch(str(key))]
+    groups = _resume_groups([value for _, value in rows] + [dict(entry, resume_verified_ids={})], series=False)
+    return [key for (key, _), group in zip(rows, groups) if group == groups[-1]]
+
+
 def add_to_list_data(data, key, list_name, incoming=None):
     data = _normalize(data)
     name = str(list_name).strip()[:80]
     entry = find_entry(data, str(key)) or incoming
     if not name or not entry:
         return data, None
+    if list_entry_keys(data, name, entry):
+        return data, None
     bucket = data['lists'].setdefault(name, {})
     bucket[str(key)] = _stamp(entry, 'added_at')
     return data, bucket[str(key)]
 
 
-def remove_from_list_data(data, key, list_name):
+def remove_from_list_data(data, key, list_name, incoming=None):
     data = _normalize(data)
     name = str(list_name).strip()[:80]
     bucket = data['lists'].get(name)
     if not isinstance(bucket, dict):
         return data, None
-    removed = bucket.pop(str(key), None)
+    entry = find_entry(data, str(key)) or incoming
+    keys = list_entry_keys(data, name, entry) if entry else ([str(key)] if str(key) in bucket else [])
+    removed = None
+    for old_key in keys:
+        value = bucket.pop(old_key)
+        if removed is None:
+            removed = value
     if not bucket:
         data['lists'].pop(name, None)
     return data, removed

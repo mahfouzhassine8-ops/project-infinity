@@ -193,6 +193,25 @@ class Features(unittest.TestCase):
         unrelated=dict(incoming,identity=self.hub.media_identity('movie',{'tmdb':'604'}))
         self.assertEqual(self.plugin._menu_rows(unrelated,self.data)[0][0],'Play')
 
+    def test_custom_list_membership_uses_verified_identity_without_rewriting_saved_route(self):
+        old=self.movie('a',{'tmdb':'603','imdb':'tt0133093'});self.data['items'].clear()
+        self.data['lists']['Weekend']={old['key']:copy.deepcopy(old)}
+        incoming=dict(old,key=self.hub.identity_key(old['identity']),source='different-provider')
+        self.assertIn(('Remove from Weekend','remove-list','Weekend'),self.plugin._menu_rows(incoming,self.data))
+        before=copy.deepcopy(self.data)
+        after,changed=self.hub.add_to_list_data(self.data,incoming['key'],'Weekend',incoming)
+        self.assertIsNone(changed);self.assertEqual(after['lists'],before['lists'])
+        self.f.path.write_text(json.dumps(self.data))
+        with self.plugin.persistence_scope():
+            changed,_=self.plugin._mutate_locked('remove-list',incoming['key'],'Weekend',incoming=incoming)
+        self.assertTrue(changed);after=json.loads(self.f.path.read_text());self.assertNotIn('Weekend',after['lists'])
+        for bucket in ('items','watched','watchlist','collection','navigation_recovery'):
+            self.assertEqual(after[bucket],before[bucket])
+        other=dict(old,key='b'*64,identity=self.hub.media_identity('movie',{'tmdb':'604','imdb':'tt0133093'}))
+        self.data['lists']['Weekend']={old['key']:old,other['key']:other}
+        ambiguous=dict(incoming,identity=self.hub.media_identity('movie',{'imdb':'tt0133093'}))
+        self.assertEqual(self.hub.list_entry_keys(self.data,'Weekend',ambiguous),[])
+
     def test_native_selected_copy_ingress_decodes_exact_latest_route_and_rejects_conflict(self):
         context=fixture.load('final_title_context',BASE/'script.infinity.commandcenter/context.py')
         trakt=fixture.load('infinity_trakt',BASE/'script.infinity.commandcenter/infinity_trakt.py')

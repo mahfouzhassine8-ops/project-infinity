@@ -6,11 +6,12 @@
       "item": 1,
       "name": "Search/native stability",
       "source_implemented": "No",
-      "focused_host_tests": "PASS only scoped poll reduction; Search/native correction NOT RUN",
+      "focused_host_tests": "NOT RUN",
       "android17": "NOT RUN",
       "physical_fold_acceptance": "NOT RUN",
       "blocker": "Search freeze not reproduced; original crashing frames missing; Android dispatch requires browser authorization",
-      "complete": false
+      "complete": false,
+      "separate_host_evidence": "PASS: scoped playback poll reduction; does not establish Search or native crash correction"
     },
     {
       "item": 2,

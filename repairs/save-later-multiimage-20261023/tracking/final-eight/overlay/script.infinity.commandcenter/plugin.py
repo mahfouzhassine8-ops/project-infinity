@@ -242,7 +242,7 @@ def _menu_rows(entry, data, favourite_state=None, list_name='', bucket=''):
                  'toggle-collection', ''))
     rows.append(('Add to Custom List', 'add-list', ''))
     for name, values in sorted(data.get('lists', {}).items()):
-        if key in values:
+        if hub.list_entry_keys(data, name, entry):
             rows.append(('Remove from ' + name, 'remove-list', name))
     if bucket == 'later' and key in data.get('later', {}):
         rows.append(('Remove from Save for Later', 'remove-later', ''))
@@ -623,7 +623,7 @@ def _mutate_locked(op, key, list_name, choice=None, name='', incoming=None):
             changed = result is not None
             notice = 'Added to ' + name
     elif op == 'remove-list' and list_name:
-        data, removed = hub.remove_from_list_data(data, key, list_name)
+        data, removed = hub.remove_from_list_data(data, key, list_name, incoming)
         changed = removed is not None
         notice = 'Removed from ' + list_name
     if changed:
