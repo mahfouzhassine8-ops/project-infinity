@@ -1,0 +1,26 @@
+{
+  "status": "BLOCKED_PENDING_RUNTIME_REPRODUCTION",
+  "source_fix_implemented": false,
+  "android17": "NOT RUN",
+  "fold": "FAIL (user-reported reference behavior); corrected acceptance NOT RUN",
+  "reference_build": "40045714305",
+  "evidence": {
+    "keyboard": "Enter/Search share Surface.submit guarded by finished flag; token-bound accepted result",
+    "submission": "Home RunScript -> default.direct_command -> infinity_search.open_search -> asynchronous ActivateWindow(Videos,target,return), then shared_history",
+    "history": "existing reentrant persistence writer; independent bounded namespace; unrelated state preserved",
+    "search_all": "path-bound native result lease, 20s per provider; max three outstanding invokers; actual completion required",
+    "directory_graphics": "prior item-retirement fix still present; original jobmanager releases manager lock before callback/destruction",
+    "crash_bundle": "no original Search freeze trace or original crashing C++ frames"
+  },
+  "next_selected_tests": [
+    "final-search-pov-enter",
+    "final-search-pov-button",
+    "final-search-all-enter"
+  ],
+  "not_conclusions": [
+    "Activation/history sequencing alone does not prove a deadlock",
+    "150 fatal-crash threads do not prove ordinary Search allocation or CPU growth",
+    "No generic lock, lifetime, provider, TrackIt or Cobra change is justified by current evidence"
+  ],
+  "dispatch_blocker": "Connector read/write works but has no workflow dispatch; browser authentication was automatically rejected due to earlier instruction to defer GitHub authentication. Explicit secure sign-in authorization required."
+}

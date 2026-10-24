@@ -3,7 +3,7 @@
   "baseline_build": "40045714305",
   "baseline_commit": "bc60843572d184e9a528170b88662c6fe04c0f3c",
   "workstreams": [
-    "native crashes, CPU and memory growth",
+    "critical Search submission freeze; native crashes, CPU and memory growth",
     "clock after rotation",
     "universal identity progress and duplicates",
     "Movies/TV selection and long press",
@@ -32,7 +32,12 @@
     "POV6.10.22 navigation source comparison",
     "focused packaging workflow scope and policy isolation contracts",
     "actual playback poll method: ordinary no-op polls skip writer, due poll persists; forced callback bodies unchanged",
-    "verified cross-namespace bridges share one progress card; conflicting connected identities remain separate; original routes and TrackIt identity retained"
+    "verified cross-namespace bridges share one progress card; conflicting connected identities remain separate; original routes and TrackIt identity retained",
+    "actual service restart/rewind including below 30 seconds and zero; checkpoint admission unchanged",
+    "unseen Movie/TV exact-item popup: membership, non-destructive series removal, latest resume and cancel without new records",
+    "native exact selected-item popup handoff on Infinity Home release rails and Movies/TV lists",
+    "exact selected-copy latest-release ingress verifies existing decoder, original route/IDs, conflict rejection",
+    "same-second TV progress uses persisted revision to select latest episode"
   ],
   "new_versions": {
     "script.infinity.commandcenter": "0.3.5.33",
@@ -45,11 +50,15 @@
     "final-participant",
     "final-continue",
     "final-actions",
-    "final-pov"
+    "final-pov",
+    "final-search-pov-enter",
+    "final-search-pov-button",
+    "final-search-all-enter"
   ],
   "android_dispatch": "BLOCKED: browser sign-in rejected by automatic approval review under earlier user instruction to defer authentication; connector has no dispatch operation",
   "pending_physical_and_rotation_tests": [
     "first tap selects / second opens / hold popup and retained scroll",
     "playback rotation Stop Home clock, portrait landscape fold/unfold"
-  ]
+  ],
+  "search_source_fix": "NOT IMPLEMENTED: original freeze not reproduced; actual Android input checks prepared, no speculative native/shared-runtime patch"
 }

@@ -635,6 +635,18 @@ class InfinityPlayer(xbmc.Player):
         log('Playback memory armed for ' + self.readable)
 
     @_serialized_callback
+    def onPlayBackSeek(self, time, seekOffset):
+        # A deliberate seek must not wait behind the ordinary eight-second
+        # sampling interval. The original writer/checkpoint admission still
+        # owns the write; no additional timer or background worker is created.
+        if xbmc.getSkinDir() != 'skin.infinity.diggz':
+            return
+        if self.shutdown_checkpoint and self.shutdown_checkpoint.record_event('seek'):
+            return
+        if self.cw_item and self.cw_key and self.isPlayingVideo():
+            self.persist_continue(immediate=True)
+
+    @_serialized_callback
     def onPlayBackStopped(self):
         if self.shutdown_checkpoint and self.shutdown_checkpoint.record_event('stopped'):
             return
@@ -709,7 +721,7 @@ class InfinityPlayer(xbmc.Player):
         log('Continue Watching armed for ' + item.get('label', 'video'))
 
     @_serialized_progress
-    def persist_continue(self, completed=False, force=False):
+    def persist_continue(self, completed=False, force=False, immediate=False):
         if not setting_bool('continue_watching_enabled', True):
             return
         if not self.cw_item or not self.cw_key:
@@ -730,7 +742,7 @@ class InfinityPlayer(xbmc.Player):
             return
 
         now = time.monotonic()
-        if not force and now - self.cw_last_save < 8.0:
+        if not force and not immediate and now - self.cw_last_save < 8.0:
             return
 
         try:
@@ -764,7 +776,10 @@ class InfinityPlayer(xbmc.Player):
             changed = watched_entry is not None
             if watched_entry:
                 hub.queue_kodi_sync(data, watched_entry, True)
-        elif (position >= 30.0 and duration >= 120.0 and percent >= 1.0 and
+        elif (duration >= 120.0 and
+              ((position >= 30.0 and percent >= 1.0) or
+               (self.cw_key in items and xbmc.getSkinDir() == 'skin.infinity.diggz' and
+                (position > 0.0 or self.isPlayingVideo()))) and
               not hub.occurrence_completed(data, self.cw_key, self.cw_occurrence)):
             entry = dict(self.cw_item)
             entry.update({
@@ -774,7 +789,7 @@ class InfinityPlayer(xbmc.Player):
                 'updated': int(time.time()),
             })
             prior = items.get(self.cw_key, {}) if isinstance(items.get(self.cw_key), dict) else {}
-            if (force or prior.get('playback_occurrence') != self.cw_occurrence or
+            if (force or immediate or prior.get('playback_occurrence') != self.cw_occurrence or
                     abs(float(prior.get('position', 0.0) or 0.0) - position) >= 5.0):
                 data, saved_key = hub.record_progress(data, entry)
                 if saved_key:

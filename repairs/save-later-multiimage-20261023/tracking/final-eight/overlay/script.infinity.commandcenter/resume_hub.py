@@ -546,12 +546,12 @@ def resume_visible(data, key):
     return key in _dict(data.get('items')) and key not in _dict(data.get('resume_hidden'))
 
 
-def remove_resume_data(data, key):
+def remove_resume_data(data, key, incoming=None):
     # Suppression is separate from progress/history and provider preferences.
     # A new playback occurrence can restore a card; a late observer write from
     # the currently playing occurrence cannot undo an explicit removal.
     data = _normalize(data)
-    entry = find_entry(data, key)
+    entry = find_entry(data, key) or incoming
     if not entry:
         return data, None
     hidden = data.setdefault('resume_hidden', {})
@@ -587,7 +587,11 @@ def record_progress(data, entry):
     old = _dict(items.get(key))
     result = dict(old or entry, key=key)
     result.setdefault('resume_first_seen', int(result.get('added_at') or result.get('updated') or 0))
-    fields = ('position', 'duration', 'percentage', 'updated', 'playback_occurrence')
+    # Wall-clock seconds alone cannot order two episode updates in one second.
+    # The existing store revision supplies an ordered tie-break, retained on
+    # disk and independent of the provider route or media identity.
+    entry = dict(entry, resume_revision=int(data.get('revision') or 0) + 1)
+    fields = ('position', 'duration', 'percentage', 'updated', 'playback_occurrence', 'resume_revision')
     for field in fields:
         if field in entry:
             result[field] = entry[field]
@@ -645,8 +649,8 @@ def toggle_watchlist_data(data, key, incoming=None):
     return _toggle_bucket(data, key, 'watchlist', incoming)
 
 
-def toggle_collection_data(data, key):
-    return _toggle_bucket(data, key, 'collection')
+def toggle_collection_data(data, key, incoming=None):
+    return _toggle_bucket(data, key, 'collection', incoming)
 
 
 def set_rating_data(data, key, rating):
@@ -664,10 +668,10 @@ def set_rating_data(data, key, rating):
     return data, data['ratings'][key]
 
 
-def add_to_list_data(data, key, list_name):
+def add_to_list_data(data, key, list_name, incoming=None):
     data = _normalize(data)
     name = str(list_name).strip()[:80]
-    entry = find_entry(data, str(key))
+    entry = find_entry(data, str(key)) or incoming
     if not name or not entry:
         return data, None
     bucket = data['lists'].setdefault(name, {})
@@ -704,8 +708,9 @@ def entries(data, media='all', bucket='items', list_name=''):
         source = _dict(data.get(bucket))
     values = [_entry_copy(value, key) for key, value in source.items()
               if isinstance(value, dict) and (media == 'all' or value.get('media') == media)]
-    values.sort(key=lambda value: int(value.get('updated') or value.get('watched_at') or
-                                      value.get('added_at') or 0), reverse=True)
+    values.sort(key=lambda value: (int(value.get('updated') or value.get('watched_at') or
+                                       value.get('added_at') or 0),
+                                   int(value.get('resume_revision') or 0) if bucket == 'items' else 0), reverse=True)
     if bucket == 'items':
         # Both Home and the full list use this projection. Every record remains
         # in storage; newest playback wins, even when it is an earlier episode.

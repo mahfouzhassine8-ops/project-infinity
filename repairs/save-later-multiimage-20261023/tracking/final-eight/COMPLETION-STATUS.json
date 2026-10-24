@@ -1,0 +1,90 @@
+{
+  "checkpoint_preserved": "2030627852ee5779baed54f89a76db2fd5b6ed76",
+  "all_eight_complete": false,
+  "items": [
+    {
+      "item": 1,
+      "name": "Search/native stability",
+      "source_implemented": "No",
+      "focused_host_tests": "PASS only scoped poll reduction; Search/native correction NOT RUN",
+      "android17": "NOT RUN",
+      "physical_fold_acceptance": "NOT RUN",
+      "blocker": "Search freeze not reproduced; original crashing frames missing; Android dispatch requires browser authorization",
+      "complete": false
+    },
+    {
+      "item": 2,
+      "name": "Clock after rotation",
+      "source_implemented": "Yes",
+      "focused_host_tests": "PASS",
+      "android17": "NOT RUN",
+      "physical_fold_acceptance": "NOT RUN",
+      "blocker": "Actual rotation acceptance pending",
+      "complete": false
+    },
+    {
+      "item": 3,
+      "name": "Universal Continue identity/rewind",
+      "source_implemented": "Yes",
+      "focused_host_tests": "PASS",
+      "android17": "NOT RUN",
+      "physical_fold_acceptance": "NOT RUN",
+      "blocker": "Actual Android Home/playback pending",
+      "complete": false
+    },
+    {
+      "item": 4,
+      "name": "Movies/TV taps and holds",
+      "source_implemented": "Yes",
+      "focused_host_tests": "PASS",
+      "android17": "NOT RUN",
+      "physical_fold_acceptance": "NOT RUN",
+      "blocker": "Actual Android touch/focus/scroll pending",
+      "complete": false
+    },
+    {
+      "item": 5,
+      "name": "Applicable popup actions",
+      "source_implemented": "Yes",
+      "focused_host_tests": "PASS",
+      "android17": "NOT RUN",
+      "physical_fold_acceptance": "NOT RUN",
+      "blocker": "Actual Android popup actions pending",
+      "complete": false
+    },
+    {
+      "item": 6,
+      "name": "Cross-section Continue synchronization",
+      "source_implemented": "Yes",
+      "focused_host_tests": "PASS",
+      "android17": "NOT RUN",
+      "physical_fold_acceptance": "NOT RUN",
+      "blocker": "Actual Android persistence and playback pending",
+      "complete": false
+    },
+    {
+      "item": 7,
+      "name": "Command Center integration",
+      "source_implemented": "Yes",
+      "focused_host_tests": "PASS",
+      "android17": "NOT RUN",
+      "physical_fold_acceptance": "NOT RUN",
+      "blocker": "Actual API37 applied receipt/resident owner pending",
+      "complete": false
+    },
+    {
+      "item": 8,
+      "name": "POV6.10.22 compatibility",
+      "source_implemented": "Yes",
+      "focused_host_tests": "PASS",
+      "android17": "NOT RUN",
+      "physical_fold_acceptance": "NOT RUN",
+      "blocker": "Actual provider navigation pending",
+      "complete": false
+    }
+  ],
+  "shutdown": "NOT RUN; independent; no gate",
+  "accepted": false,
+  "release_ready": false,
+  "locked": false
+}

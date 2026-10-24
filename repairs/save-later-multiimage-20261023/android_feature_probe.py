@@ -15,7 +15,7 @@ from zipfile import ZipFile
 import android_feature_device as device
 import android_probe as staging
 
-CASES=('saved-navigation','provider-pov','provider-umbrella','provider-seren','provider-future','multiimage','tracking-recovery','tracking-actions','tracking-continue','final-participant','final-continue','final-actions','final-pov')
+CASES=('saved-navigation','provider-pov','provider-umbrella','provider-seren','provider-future','multiimage','tracking-recovery','tracking-actions','tracking-continue','final-participant','final-continue','final-actions','final-pov','final-search-pov-enter','final-search-pov-button','final-search-all-enter')
 COMPONENTS=('script.infinity.commandcenter','script.infinity.uirepair','script.infinity.watchedbridge')
 
 def execute(args):
@@ -97,6 +97,11 @@ def execute(args):
                 raise RuntimeError('Selected feature fixture not enabled')
         owner=device.until(device.running_engine,180);report['engine']=owner
         staging.admit_runtime(device,owner,args.out)
+        if args.case.startswith('final-search-'):
+            path=Path(__file__).resolve().parent/'tracking/final-eight/android_search_input.py'
+            spec=importlib.util.spec_from_file_location('selected_search_input',path)
+            driver=importlib.util.module_from_spec(spec);spec.loader.exec_module(driver)
+            report['actual_android_search_input']=driver.submit(device,args.out,owner,args.case,staging.FUTURE)
         path=device.PROFILE+'/addon_data/'+staging.FUTURE+'/navigation-ready-'+str(owner['pid'])+'.json'
         result=device.until(lambda:device.read_json(path),1800)
         report['feature_result']=result
@@ -115,6 +120,16 @@ def execute(args):
             except Exception:pass
             try:(args.out/'logcat.txt').write_text(device.adb('logcat','-d','-v','threadtime',check=False))
             except Exception:pass
+            if args.case.startswith('final-search-'):
+                try:device.adb('pull',device.PROFILE+'/../temp/infinity-stability-probe.jsonl',args.out/'infinity-stability-probe.jsonl',check=False)
+                except Exception:pass
+                if report.get('engine',{}).get('pid'):
+                    pid=str(report['engine']['pid'])
+                    try:(args.out/'search-after-memory.txt').write_text(device.shell('dumpsys','meminfo',pid,check=False))
+                    except Exception:pass
+                    if not report['passed']:
+                        try:(args.out/'search-native-backtrace.txt').write_text(device.shell('debuggerd','-b',pid,check=False))
+                        except Exception:pass
     return report
 
 def main():

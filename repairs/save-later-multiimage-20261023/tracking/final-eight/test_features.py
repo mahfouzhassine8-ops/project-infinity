@@ -13,6 +13,7 @@ class Features(unittest.TestCase):
     def setUp(self):
         self.f=fixture.Recovery('test_unknown_or_conflicting_identity_never_reuses_memory')
         self.f.setUp();self.addCleanup(self.f.doCleanups)
+        sys.modules['xbmc'].getInfoLabel=lambda name:''
         self.hub=fixture.load('resume_hub',BASE/'script.infinity.commandcenter/resume_hub.py')
         self.hub.publish_home=lambda data:None
         with patch.object(sys,'argv',['plugin.py','1','']):
@@ -85,6 +86,17 @@ class Features(unittest.TestCase):
         rows=self.hub.entries(self.data,'tv')
         self.assertEqual([r['key'] for r in rows],['c'*64,recent['key']])
         self.assertEqual(self.data,before)
+    def test_two_episode_updates_in_one_second_use_persisted_revision(self):
+        older=self.episode('a',{'tmdb':'330430'},4,100)
+        recent=self.episode('b',{'tmdb':'330430'},2,100)
+        self.data['revision']=10
+        self.data,_=self.hub.record_progress(self.data,dict(older,updated=100))
+        self.data['revision']=11
+        self.data,_=self.hub.record_progress(self.data,dict(recent,updated=100,position=3))
+        restored=json.loads(json.dumps(self.data))
+        self.assertEqual([row['key'] for row in self.hub.entries(restored)],[recent['key']])
+        self.assertEqual(restored['items'][recent['key']]['position'],3)
+        self.assertEqual(len(restored['items']),2)
     def test_remove_series_from_show_list_retains_records_and_replay_restores(self):
         a=self.episode('a',{'tmdb':'330430'},1,10);b=self.episode('b',{'tmdb':'330430'},2,20)
         show=dict(key='d'*64,media='tv',season=-1,episode=-1,identity=self.hub.show_identity('tvshow',{'tmdb':'330430'}))
@@ -141,6 +153,70 @@ class Features(unittest.TestCase):
         with patch.object(self.plugin,'_favourite',return_value=(None,None)),patch.dict(sys.modules,{'infinity_settings':types.SimpleNamespace(choose=lambda *a:-1)}):
             self.assertFalse(self.plugin.show_item_menu(entry['key']))
         self.assertEqual(self.f.path.read_bytes(),before);self.assertEqual(self.f.calls,[])
+
+    def test_unseen_title_popup_does_not_create_progress_and_membership_is_local(self):
+        entry=self.movie('a',{'tmdb':'603'});self.data['items'].clear()
+        entry['key']=self.hub.identity_key(entry['identity'])
+        self.f.path.write_text(json.dumps(self.data));before=self.f.path.read_bytes()
+        choice=[None]
+        def choose(title,labels):return -1 if choice[0] is None else labels.index(choice[0])
+        with patch.object(self.plugin,'_favourite',return_value=(None,None)),patch.object(self.hub,'flush_kodi_sync'),patch.dict(sys.modules,{'infinity_settings':types.SimpleNamespace(choose=choose)}):
+            self.assertFalse(self.plugin.show_item_menu(entry['key'],bucket='',incoming=entry))
+            self.assertEqual(self.f.path.read_bytes(),before)
+            for action,expected in [('Add to Watchlist',True),('Remove from Watchlist',False),
+                                    ('Add to Collection',True),('Remove from Collection',False)]:
+                choice[0]=action
+                self.assertTrue(self.plugin.show_item_menu(entry['key'],bucket='',incoming=entry))
+                after=json.loads(self.f.path.read_text())
+                bucket='watchlist' if 'Watchlist' in action else 'collection'
+                self.assertEqual(entry['key'] in after[bucket],expected)
+                self.assertEqual(after['items'],{});self.assertEqual(after['watched'],{})
+                self.assertEqual(after['navigation_recovery'],self.data['navigation_recovery'])
+
+    def test_unsaved_show_popup_removes_whole_series_without_creating_show_record(self):
+        self.episode('a',{'tmdb':'330430'},1,10);self.episode('b',{'tmdb':'330430'},2,20)
+        show=dict(key='d'*64,media='tv',season=-1,episode=-1,source='original-show-route',
+                  identity=self.hub.show_identity('tvshow',{'tmdb':'330430'}))
+        before=copy.deepcopy(self.data);self.f.path.write_text(json.dumps(self.data))
+        with patch.object(self.plugin,'_favourite',return_value=(None,None)),patch.object(self.hub,'flush_kodi_sync'),patch.dict(sys.modules,{'infinity_settings':types.SimpleNamespace(choose=lambda title,labels:labels.index('Remove from Continue Watching'))}):
+            self.assertTrue(self.plugin.show_item_menu(show['key'],bucket='',incoming=show))
+        after=json.loads(self.f.path.read_text());self.assertEqual(self.hub.entries(after),[])
+        for bucket in ('items','watched','watchlist','collection','navigation_recovery'):
+            self.assertEqual(after[bucket],before[bucket])
+        self.assertNotIn(show['key'],after['items'])
+
+    def test_external_title_resume_uses_latest_verified_progress_not_title_name(self):
+        old=self.movie('a',{'tmdb':'603'},10);recent=self.movie('b',{'tmdb':'603'},20)
+        incoming=dict(old,key='d'*64,position=0)
+        self.assertEqual(self.plugin._menu_rows(incoming,self.data)[0][0],'Resume')
+        self.assertEqual(self.plugin._menu_resume(incoming,self.data)['key'],recent['key'])
+        unrelated=dict(incoming,identity=self.hub.media_identity('movie',{'tmdb':'604'}))
+        self.assertEqual(self.plugin._menu_rows(unrelated,self.data)[0][0],'Play')
+
+    def test_native_selected_copy_ingress_decodes_exact_latest_route_and_rejects_conflict(self):
+        context=fixture.load('final_title_context',BASE/'script.infinity.commandcenter/context.py')
+        trakt=fixture.load('infinity_trakt',BASE/'script.infinity.commandcenter/infinity_trakt.py')
+        decoder=fixture.load('title_identity_fixture',BASE/'script.infinity.uirepair/latest_identity.py')
+        route='plugin://plugin.video.umbrella/?action=play&tmdb=603&imdb=tt0133093'
+        wrapped=decoder.encode(route,'movie',{'tmdb':'603','imdb':'tt0133093'})
+        ids={'tmdb':'603'} # wrapper also proves IMDb from the exact original route
+        tag=types.SimpleNamespace(getMediaType=lambda:'movie',getUniqueID=lambda n:ids.get(n,''),
+            getTitle=lambda:'The Matrix',getDbId=lambda:-1,getPlayCount=lambda:0)
+        item=types.SimpleNamespace(getVideoInfoTag=lambda:tag,getPath=lambda:wrapped,
+            getLabel=lambda:'The Matrix',getArt=lambda key:'',isFolder=lambda:False)
+        sys.modules['xbmcaddon'].Addon=lambda aid:types.SimpleNamespace(getAddonInfo=lambda name:str(BASE/aid))
+        sys.modules['xbmcvfs'].translatePath=lambda path:path
+        sys.modules['xbmc'].executeJSONRPC=lambda request:json.dumps({'result':{'favourites':[]}})
+        notices=[];bridge=types.SimpleNamespace(selected=lambda modules,selected:context.selected_entry(selected))
+        self.data['items'].clear();self.f.path.write_text(json.dumps(self.data));argv=sys.argv
+        with patch.object(trakt,'_bridge',return_value=(bridge,{})),patch.object(trakt,'notice',side_effect=lambda *a:notices.append(a)),patch.object(self.hub,'flush_kodi_sync'),patch.dict(sys.modules,{'infinity_settings':types.SimpleNamespace(choose=lambda title,labels:labels.index('Add to Watchlist'))}):
+            self.assertTrue(context.title_popup(item))
+            saved=json.loads(self.f.path.read_text());entry=next(iter(saved['watchlist'].values()))
+            self.assertEqual(entry['source'],route);self.assertEqual(entry['identity']['ids'],{'tmdb':'603','imdb':'tt0133093'})
+            self.assertEqual(saved['items'],{});self.assertIs(sys.argv,argv)
+            before=self.f.path.read_bytes();ids['tmdb']='604'
+            self.assertFalse(context.title_popup(item));self.assertEqual(self.f.path.read_bytes(),before)
+        self.assertEqual(len(notices),1)
     def test_stale_popup_does_not_remove_new_playback(self):
         entry=self.movie('a',{'tmdb':'603'});self.f.path.write_text(json.dumps(self.data))
         def choose(title,labels):
@@ -209,6 +285,52 @@ class Features(unittest.TestCase):
             after=next(n for n in player(final).body if isinstance(n,ast.FunctionDef) and n.name==name)
             if name!='persist_continue':self.assertEqual(ast.dump(before),ast.dump(after),name)
         print('actual poll writer entries per 8 seconds: before=16 after=1')
+
+    def test_actual_service_restart_and_short_rewind_update_existing_position(self):
+        entry=self.movie('a',{'tmdb':'603'},position_override=0)
+        entry.pop('position_override');entry.update(position=2880,duration=6000)
+        service=ast.parse((BASE/'script.infinity.commandcenter/service.py').read_text())
+        player=next(n for n in service.body if isinstance(n,ast.ClassDef) and n.name=='InfinityPlayer')
+        method=next(n for n in player.body if isinstance(n,ast.FunctionDef) and n.name=='persist_continue')
+        saves=[]
+        env={'_serialized_progress':lambda f:f,'setting_bool':lambda *a:True,
+             '_load_continue':lambda p:self.data,'_save_continue':lambda p,d:saves.append(copy.deepcopy(d)),
+             'hub':self.hub,'time':types.SimpleNamespace(monotonic=lambda:101,time=lambda:1001),
+             'xbmc':types.SimpleNamespace(getSkinDir=lambda:'skin.infinity.diggz')}
+        exec(compile(ast.Module(body=[method],type_ignores=[]),'actual-service-persist','exec'),env)
+        state=types.SimpleNamespace(profile=self.f.root,cw_item=dict(entry),cw_key=entry['key'],
+            cw_occurrence='2'*32,cw_pending=False,cw_last_save=100,getTime=lambda:0,
+            getTotalTime=lambda:6000,isPlayingVideo=lambda:True)
+        for position in (0.0,5.0,20.0,3.0):
+            state.getTime=lambda:position
+            env['persist_continue'](state,immediate=True)
+            self.assertEqual(saves[-1]['items'][entry['key']]['position'],position)
+            self.assertEqual(saves[-1]['items'][entry['key']]['updated'],1001)
+        self.assertEqual(len(saves),4)
+        state.getTotalTime=lambda:0
+        env['persist_continue'](state,force=True)
+        self.assertEqual(len(saves),4) # a released/invalid clock never erases progress
+        self.assertIsNone(state.cw_key)
+        self.data['items'].clear();saves.clear()
+        state.cw_item=dict(entry);state.cw_key=entry['key'];state.getTotalTime=lambda:6000
+        state.getTime=lambda:5
+        env['persist_continue'](state,immediate=True)
+        self.assertEqual(saves,[]) # original minimum for a brand-new entry remains
+
+    def test_actual_seek_callback_obeys_skin_and_checkpoint_admission(self):
+        tree=ast.parse((BASE/'script.infinity.commandcenter/service.py').read_text())
+        method=next(n for c in tree.body if isinstance(c,ast.ClassDef) and c.name=='InfinityPlayer'
+                    for n in c.body if isinstance(n,ast.FunctionDef) and n.name=='onPlayBackSeek')
+        calls=[];skin=['skin.infinity.diggz'];parked=[False]
+        env={'_serialized_callback':lambda f:f,'xbmc':types.SimpleNamespace(getSkinDir=lambda:skin[0])}
+        exec(compile(ast.Module(body=[method],type_ignores=[]),'actual-service-seek','exec'),env)
+        state=types.SimpleNamespace(shutdown_checkpoint=types.SimpleNamespace(record_event=lambda kind:parked[0]),
+            cw_item={'key':'a'*64},cw_key='a'*64,isPlayingVideo=lambda:True,
+            persist_continue=lambda **kw:calls.append(kw))
+        env['onPlayBackSeek'](state,3000,-10000);self.assertEqual(calls,[{'immediate':True}])
+        parked[0]=True;env['onPlayBackSeek'](state,0,-3000);self.assertEqual(len(calls),1)
+        parked[0]=False;skin[0]='skin.other';env['onPlayBackSeek'](state,0,-3000)
+        self.assertEqual(len(calls),1)
 
     def test_projection_has_no_quadratic_growth_for_large_series(self):
         for n in range(3000):

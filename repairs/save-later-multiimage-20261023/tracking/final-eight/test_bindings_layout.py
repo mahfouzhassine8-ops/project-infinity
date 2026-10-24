@@ -39,8 +39,15 @@ Object r=m.invoke(null,new File(a[0]));System.out.print(r==null?"REJECT":r); }}'
         spec=importlib.util.spec_from_file_location('final_native',REPAIR/'final_eight_native.py');module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
         assert json.loads(rc8map.read_text())[module.PATH]==module.BEFORE
         delta=module.apply(native,out/'overlay');before=(native/module.PATH).read_text();after=(out/'overlay'/module.PATH).read_text()
-        assert after.replace(module.NEW,module.OLD)==before
+        restored=after
+        for old,new in reversed(module.REPLACEMENTS):
+            assert restored.count(new)==1
+            restored=restored.replace(new,old)
+        assert restored==before
         assert 'if (local && video)' in module.NEW and 'SelectItem' not in module.NEW and 'ACTION_SELECT_ITEM' not in module.NEW
+        assert 'popup.Execute(std::make_shared<CFileItem>(*item))' in module.HELPER
+        assert '"skin.infinity.diggz"' in module.HELPER and '"0.3.5.33"' in module.HELPER
+        assert 'getSelectedItem' not in (final/'script.infinity.commandcenter/context.py').read_text()
         # Compile the exact responsive-axis implementation, not a Python replica.
         cpp=(native/'xbmc/guilib/GUIControl.cpp').read_text()
         a=cpp.index('float InfinityResponsiveParse(');b=cpp.index('} // namespace',a)
@@ -64,7 +71,7 @@ assert(x+w<=parent);
     assert after.replace('<width min="1" max="100%">auto</width>','<width min="1" max="$PARAM[timewidth]">auto</width>')==before
     report=dict(host='PASS',CC32_admission_retained=True,CC33_exact_binding=True,bridge_UI_CC_coordinated=True,
         CC33_tamper_rejections=19,clock_actual_axis_cpp='PASS five reflow sizes; nested percentage reproduced',
-        native_touch_scope='PASS exact local/video hold replacement; other source bytes identical',
+        native_touch_scope='PASS exact Infinity-only hit-tested title handoff; original fallback and resume ownership retained; all other source restored byte-identically',
         dex_assembly='NOT RUN',android='NOT RUN',physical_fold='NOT RUN',shutdown='NOT RUN')
     (HERE/'BINDINGS-LAYOUT-HOST.json').write_text(json.dumps(report,indent=2)+'\n');return report
 if __name__=='__main__':print(json.dumps(run(*map(Path,sys.argv[1:]))))

@@ -3,13 +3,14 @@ import hashlib, json, os, shutil, subprocess, sys, time
 from pathlib import Path
 from zipfile import ZipFile
 
-CASES=('final-participant','final-continue','final-actions','final-pov')
+SEARCH_CASES=('final-search-pov-enter','final-search-pov-button','final-search-all-enter')
+CASES=('final-participant','final-continue','final-actions','final-pov')+SEARCH_CASES
 HERE=Path(__file__).resolve().parent
 
 def inputs(out, case):
     if case not in CASES:raise ValueError('Select one final-eight feature')
     out.mkdir(parents=True,exist_ok=False)
-    if case!='final-pov':
+    if case!='final-pov' and case not in SEARCH_CASES:
         (out/'INPUTS.json').write_text(json.dumps({'archives':[],'case':case}));return
     sys.path.insert(0,str(HERE.parents[1]));import android_inputs
     pins=json.loads((HERE.parents[1]/'ANDROID-INPUT-PINS.json').read_text())
@@ -17,6 +18,8 @@ def inputs(out, case):
     pending=[dict(addon='plugin.video.pov',version='6.10.22',
         url='https://raw.githubusercontent.com/kodifitzwell/repo/master/plugin.video.pov/plugin.video.pov-6.10.22.zip',
         sha256='126b9fbe690dded613d0c2bab177babd6ce2235bc9d67fb25e1c79aefc9dc0d3')]
+    if case=='final-search-all-enter':
+        pending.extend(pinned[aid] for aid in ('plugin.video.umbrella','plugin.video.seren'))
     rows=[];seen=set()
     while pending:
         row=pending.pop(0);aid=row['addon']
@@ -54,6 +57,9 @@ def stage(stage, args, report, device, fixture_id):
         expected={aid:ET.fromstring(apk.read('assets/addons/'+aid+'/addon.xml')).get('version') for aid in
                   ('script.infinity.commandcenter','script.infinity.uirepair','script.infinity.watchedbridge')}
     (fixture/'EXPECTED-COMPONENTS.json').write_text(json.dumps(expected))
+    if args.case in SEARCH_CASES:
+        report['test_provider_inputs']=pins
+        return
     profile=args.out/'final-profile';profile.mkdir()
     clip='special://profile/infinity-final-qa.mp4'
     if args.case in ('final-continue','final-actions'):
@@ -94,7 +100,49 @@ def run(root,cycle,mode):
         uiroot=Path(xbmcvfs.translatePath(xbmcaddon.Addon('script.infinity.uirepair').getAddonInfo('path')))
         sys.path.insert(0,str(uiroot));from controller_access import load
         plugin=load();hub=plugin.hub;profile=plugin.PROFILE;home=xbmcgui.Window(10000)
-        if mode=='final-participant':
+        if mode in SEARCH_CASES:
+            providers=['plugin.video.pov'] if mode!='final-search-all-enter' else ['plugin.video.pov','plugin.video.umbrella','plugin.video.seren']
+            for aid in providers:
+                details=ui.rpc('Addons.GetAddonDetails',{'addonid':aid,'properties':['enabled']})['addon']
+                if not details['enabled']:ui.require(ui.rpc('Addons.SetAddonEnabled',{'addonid':aid,'enabled':True})=='OK','Provider not enabled: '+aid)
+            ui.complete_first_use(home,result,lambda stage:None,providers=providers)
+            for aid in providers:ui.require(ui.first_provider_home(aid,result,lambda stage:None,providers=[aid]),'Provider first-home incomplete: '+aid)
+            ui.rpc('GUI.ActivateWindow',{'window':'home'})
+            ui.until(lambda:xbmcgui.getCurrentWindowId()==10000,'Home before Search')
+            before=hub.load_view(profile)
+            (path/('search-ui-ready-'+cycle+'.json')).write_text(json.dumps({'pid':os.getpid(),'mode':mode}))
+            # This is the exact Home Search action, not a replacement keyboard
+            # or direct search-results RPC. Host sends actual Android input.
+            xbmc.executebuiltin('RunScript(script.infinity.commandcenter,universal-search,movie)')
+            ui.until(lambda:(path/('search-submitted-'+cycle+'.json')).exists(),'physical Android Search submission',180)
+            def results():
+                if xbmcgui.getCurrentWindowId()!=10025:return None
+                folder=xbmc.getInfoLabel('Container.FolderPath')
+                if mode=='final-search-all-enter':
+                    valid=folder.startswith('plugin://script.infinity.commandcenter/') and 'action=search-all' in folder
+                else:valid=folder.startswith('plugin://plugin.video.pov/')
+                ids=[xbmc.getInfoLabel('Container.ListItemAbsolute(%d).UniqueID(tmdb)'%i) for i in range(40)]
+                return dict(folder=folder,tmdb_ids=ids) if valid and '603' in ids else None
+            visible=ui.until(results,'actual Search results window with verified Matrix TMDb603',180)
+            after=hub.load_view(profile)
+            for bucket in ('items','watched','watchlist','collection','lists','sources','navigation_recovery'):
+                ui.require(after.get(bucket)==before.get(bucket),'Search damaged '+bucket)
+            sys.path.insert(0,str(ccroot));from infinity_search import shared_history
+            history=shared_history()
+            selected='all' if mode=='final-search-all-enter' else 'plugin.video.pov'
+            ui.require(any(row['query']=='The Matrix' and row['provider']==selected and row['media']=='movie' for row in history),'Search History submission not persisted')
+            passed('actual-search-submission-results-and-history',**visible)
+            ui.rpc('Input.Back')
+            ui.until(lambda:xbmcgui.getCurrentWindowId()==10000,'Search results back to Home')
+            home=xbmcgui.Window(10000)
+            def focus():
+                ident=home.getFocusId()
+                return ident,xbmc.getInfoLabel('Container(%d).CurrentItem'%ident)
+            old=focus()
+            ui.rpc('Input.Down')
+            ui.until(lambda:focus()!=old,'Home accepts navigation after Search',10)
+            passed('Home-responsive-after-Search',before_focus=old,after_focus=focus())
+        elif mode=='final-participant':
             def receipt():
                 try:return json.loads(Path('/data/user/0/com.projectinfinity.kodi/files/checkpoint/installed-participants.json').read_text())
                 except (OSError,ValueError):return None
@@ -163,7 +211,9 @@ def run(root,cycle,mode):
                 after=ui.until(saved,'actual playback updates original movie and restores card',45)
                 ui.require(after['items']['a'*64]['position']==after['items']['b'*64]['position'],'Alias progress differs')
                 for key in ('c'*64,'d'*64):ui.require(after['items'][key]==before['items'][key],'Episode progress changed')
-                xbmc.Player().stop();passed('actual-new-playback-restores-original-progress-key')
+                xbmc.Player().seekTime(3)
+                ui.until(lambda:0<=hub.load_view(profile)['items']['a'*64].get('position',-1)<15,'actual deliberate short rewind replaces older progress',15)
+                xbmc.Player().stop();passed('actual-new-playback-and-short-rewind-update-original-progress-key')
             else:
                 list_view('movie')
                 for label,bucket,present in [('Add to Watchlist','watchlist',True),('Remove from Watchlist','watchlist',False),

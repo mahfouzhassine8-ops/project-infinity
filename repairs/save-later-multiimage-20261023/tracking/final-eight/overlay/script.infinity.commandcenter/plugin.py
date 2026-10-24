@@ -210,15 +210,28 @@ def _favourite(entry, data, bucket):
     return spec, bool(matches)
 
 
+def _menu_resume(entry, data):
+    return next((row for row in hub.entries(data)
+                 if row['key'] == entry['key'] or hub.resume_matches(entry, row)), None)
+
+
+def _menu_progress_state(entry, data):
+    return sorted((key, old.get('position'), old.get('playback_occurrence'))
+                  for key, old in data.get('items', {}).items()
+                  if isinstance(old, dict) and (key == entry['key'] or hub.resume_matches(entry, old)))
+
+
 def _menu_rows(entry, data, favourite_state=None, list_name='', bucket=''):
     key = entry['key']
     identity = hub.entry_identity(entry)
     rows = []
     if entry.get('source') or entry.get('stable_source') or identity:
-        resume = hub.resume_visible(data, key) and number(entry.get('position')) > 0
+        progress = _menu_resume(entry, data)
+        resume = progress is not None and number(progress.get('position')) > 0
         rows.append(('Resume' if resume else 'Play', 'play', ''))
     if identity:
-        watched = hub.is_watched(data, key)
+        watched = hub.is_watched(data, key) or (entry.get('_native_watched') is True and
+                  key not in data.get('infinity_watched_overrides', {}))
         rows.append(('Mark Unwatched' if watched else 'Mark Watched',
                      'mark-unwatched' if watched else 'mark-watched', ''))
     rows.append(('Remove from Watchlist' if hub.bucket_has(data, 'watchlist', entry) else 'Add to Watchlist',
@@ -252,11 +265,16 @@ def _selected_menu_entry(data, key, bucket, list_name=''):
     return hub.find_entry(data, key)
 
 
-def show_item_menu(key, bucket='continue', list_name=''):
+def show_item_menu(key, bucket='continue', list_name='', incoming=None):
     if not hub.KEY_RE.fullmatch(str(key)):
         return False
     data = hub.load_view(PROFILE)
-    original = _selected_menu_entry(data, key, bucket, list_name)
+    if incoming is not None:
+        if not hub.entry_identity(incoming) or incoming.get('key') != key:
+            return False
+        key = hub.compatible_key(data, incoming)
+        incoming = dict(incoming, key=key)
+    original = incoming or _selected_menu_entry(data, key, bucket, list_name)
     if not original or original.get('synthetic_next'):
         return False
     try:
@@ -274,7 +292,7 @@ def show_item_menu(key, bucket='continue', list_name=''):
         return False
     with persistence_scope():
         current_data = hub.load(PROFILE)
-        current = _selected_menu_entry(current_data, key, bucket, list_name)
+        current = incoming or _selected_menu_entry(current_data, key, bucket, list_name)
         if not current:
             return False
         original_id, current_id = hub.entry_identity(original), hub.entry_identity(current)
@@ -286,15 +304,19 @@ def show_item_menu(key, bucket='continue', list_name=''):
         if (label, op, selected_list) not in _menu_rows(current, current_data, favourite_state, list_name, bucket):
             return False
         # A newer playback must never be removed/marked by a stale popup.
-        if op in ('remove-resume', 'mark-watched', 'mark-unwatched') and any(
-                original.get(field) != current.get(field) for field in ('position', 'playback_occurrence')):
+        if op in ('remove-resume', 'mark-watched', 'mark-unwatched') and (
+                _menu_progress_state(original, data) != _menu_progress_state(current, current_data)):
             return False
         if op not in ('play', 'information', 'favourite'):
-            changed, notice = _mutate_locked(op, key, selected_list, name=name)
+            changed, notice = _mutate_locked(op, key, selected_list, name=name, incoming=incoming)
         else:
             changed = False
     # Navigation, dialogs and favourites RPC never hold the progress writer.
     if op == 'play':
+        if incoming is not None:
+            progress = _menu_resume(current, current_data)
+            if progress is not None:
+                current, key, bucket = progress, progress['key'], 'continue'
         target, item = _list_item(current, current_data, bucket, list_name)
         if target.startswith('plugin://script.infinity.commandcenter/?action=saved-recovery&'):
             recover_entry(key, bucket, resume_offset=max(0.0, number(current.get('position')))
@@ -547,9 +569,16 @@ def mutate():
     xbmcplugin.endOfDirectory(HANDLE, succeeded=True, cacheToDisc=False)
 
 
-def _mutate_locked(op, key, list_name, choice=None, name=''):
+def _mutate_locked(op, key, list_name, choice=None, name='', incoming=None):
     data = hub.load(PROFILE)
-    entry = hub.find_entry(data, key)
+    entry = hub.find_entry(data, key) or incoming
+    if incoming is not None and (not hub.entry_identity(incoming) or not entry or
+            not hub.same_identity(hub.entry_identity(entry), hub.entry_identity(incoming))):
+        return False, ''
+    native_watched = incoming is not None and incoming.get('_native_watched') is True
+    if incoming is not None:
+        incoming = {name: value for name, value in incoming.items() if name != '_native_watched'}
+        entry = {name: value for name, value in entry.items() if name != '_native_watched'}
     changed = False
     notice = ''
     if op == 'mark-watched' and entry:
@@ -560,12 +589,14 @@ def _mutate_locked(op, key, list_name, choice=None, name=''):
         notice = 'Marked watched'
     elif op == 'mark-unwatched':
         data, changed_entry = hub.mark_unwatched_data(data, key)
+        if not changed_entry and native_watched:
+            changed_entry = dict(entry)
         changed = changed_entry is not None
         if changed_entry:
             hub.queue_kodi_sync(data, changed_entry, False)
         notice = 'Marked unwatched'
     elif op in ('reset-progress', 'remove-resume'):
-        data, removed = (hub.remove_resume_data(data, key) if op == 'remove-resume'
+        data, removed = (hub.remove_resume_data(data, key, incoming) if op == 'remove-resume'
                          else hub.reset_progress_data(data, key))
         changed = removed is not None
         notice = 'Progress reset' if op == 'reset-progress' else 'Removed from Continue Playing'
@@ -574,11 +605,11 @@ def _mutate_locked(op, key, list_name, choice=None, name=''):
         changed = True
         notice = 'Removed from Save for Later'
     elif op == 'toggle-watchlist' and entry:
-        data, added, changed_entry = hub.toggle_watchlist_data(data, key)
+        data, added, changed_entry = hub.toggle_watchlist_data(data, key, incoming)
         changed = changed_entry is not None
         notice = 'Added to Watchlist' if added else 'Removed from Watchlist'
     elif op == 'toggle-collection' and entry:
-        data, added, changed_entry = hub.toggle_collection_data(data, key)
+        data, added, changed_entry = hub.toggle_collection_data(data, key, incoming)
         changed = changed_entry is not None
         notice = 'Added to Collection' if added else 'Removed from Collection'
     elif op == 'rate' and entry:
@@ -588,7 +619,7 @@ def _mutate_locked(op, key, list_name, choice=None, name=''):
             notice = 'Rating removed' if choice == 0 else 'Rated %d/10' % choice
     elif op == 'add-list' and entry:
         if name:
-            data, result = hub.add_to_list_data(data, key, name)
+            data, result = hub.add_to_list_data(data, key, name, incoming)
             changed = result is not None
             notice = 'Added to ' + name
     elif op == 'remove-list' and list_name:
