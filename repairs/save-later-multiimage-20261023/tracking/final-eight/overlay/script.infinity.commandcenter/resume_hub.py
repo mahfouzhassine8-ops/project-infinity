@@ -439,9 +439,10 @@ def mark_watched_data(data, key, entry=None, completed=False):
     hidden = data.setdefault('resume_hidden', {})
     if not isinstance(hidden, dict):
         raise ValueError('Unsupported Continue visibility state')
+    aliases = {old_key for old_key, _ in _resume_aliases(data, entry, series=completed or
+               (entry_identity(entry) or {}).get('kind') == 'tvshow')}
     for old_key, old in data['items'].items():
-        if isinstance(old, dict) and (old_key == key or resume_matches(entry, old, series=completed or
-                (entry_identity(entry) or {}).get('kind') == 'tvshow')):
+        if isinstance(old, dict) and (old_key == key or old_key in aliases):
             hidden[old_key] = {'occurrence': str(old.get('playback_occurrence') or ''),
                                'removed_at': _now()}
     data['watched'][key] = entry
@@ -477,9 +478,65 @@ def _agreeing_ids(left, right):
     return bool(common) and all(left[n] == right[n] for n in common)
 
 
+def _resume_identity(entry):
+    # Additional ID links are scoped to progress only. The original identity,
+    # saved action and TrackIt preference lookup remain unchanged.
+    identity = entry_identity(entry)
+    if not identity:
+        return None
+    ids = verified_ids(entry.get('resume_verified_ids'))
+    if ids and _agreeing_ids(identity['ids'], ids):
+        identity = dict(identity, ids=dict(identity['ids'], **ids))
+    return identity
+
+
+def _resume_groups(values, series=True):
+    """Join verified ID links; quarantine entire conflicting components."""
+    parent = list(range(len(values)))
+    tokens, row_ids = {}, []
+    def root(index):
+        while parent[index] != index:
+            parent[index] = parent[parent[index]]
+            index = parent[index]
+        return index
+    for index, value in enumerate(values):
+        identity = _resume_identity(value)
+        if series and value.get('media') == 'tv':
+            scope, ids = ('series',), continue_series_ids(value)
+        elif identity:
+            scope = (identity['kind'], identity['scope'], identity.get('season'), identity.get('episode'))
+            ids = identity['ids']
+        else:
+            scope, ids = (), {}
+        row_ids.append(ids)
+        for namespace, uid in ids.items():
+            token = (scope, namespace, uid)
+            if token in tokens:
+                a, b = root(index), root(tokens[token])
+                parent[max(a, b)] = min(a, b)
+            else:
+                tokens[token] = index
+    combined, conflicts = {}, set()
+    for index, ids in enumerate(row_ids):
+        group = root(index)
+        known = combined.setdefault(group, {})
+        if any(namespace in known and known[namespace] != uid for namespace, uid in ids.items()):
+            conflicts.add(group)
+        known.update(ids)
+    return [('row', index) if root(index) in conflicts else ('group', root(index))
+            for index in range(len(values))]
+
+
+def _resume_aliases(data, entry, series=False):
+    values = [(key, old) for key, old in _dict(data.get('items')).items()
+              if KEY_RE.fullmatch(str(key)) and isinstance(old, dict)]
+    groups = _resume_groups([old for _, old in values] + [entry], series=series)
+    return [pair for pair, group in zip(values, groups) if group == groups[-1]]
+
+
 def resume_matches(left, right, series=True):
     """Exact typed IDs only. Names, provider URLs and episode IDs cannot alias shows."""
-    a, b = entry_identity(left), entry_identity(right)
+    a, b = _resume_identity(left), _resume_identity(right)
     if series and left.get('media') == right.get('media') == 'tv':
         return _agreeing_ids(continue_series_ids(left), continue_series_ids(right))
     return same_identity(a, b)
@@ -501,8 +558,9 @@ def remove_resume_data(data, key):
     if not isinstance(hidden, dict):
         raise ValueError('Unsupported Continue visibility state')
     changed = False
+    aliases = {old_key for old_key, _ in _resume_aliases(data, entry, series=True)}
     for old_key, old in data['items'].items():
-        if isinstance(old, dict) and (old_key == key or resume_matches(entry, old)):
+        if isinstance(old, dict) and (old_key == key or old_key in aliases):
             if old_key not in hidden:
                 hidden[old_key] = {'occurrence': str(old.get('playback_occurrence') or ''),
                                    'removed_at': _now()}
@@ -512,11 +570,8 @@ def remove_resume_data(data, key):
 
 def progress_key(data, entry):
     """Keep the original progress key when verified provider aliases agree."""
-    matches = [(key, old) for key, old in _dict(data.get('items')).items()
-               if KEY_RE.fullmatch(str(key)) and isinstance(old, dict) and
-               resume_matches(entry, old, series=False)]
-    if matches and all(resume_matches(a, b, series=False) for i, (_, a) in enumerate(matches)
-                       for _, b in matches[i + 1:]):
+    matches = _resume_aliases(data, entry)
+    if matches:
         return min(matches, key=lambda pair: (int(pair[1].get('resume_first_seen') or pair[1].get('added_at') or
                                                   pair[1].get('updated') or 0), pair[0]))[0]
     return compatible_key(data, entry)
@@ -541,11 +596,17 @@ def record_progress(data, entry):
     if not entry_identity(result) and entry_identity(entry):
         result['identity'] = deepcopy(entry['identity'])
     items[key] = result
-    aliases = [(k, v) for k, v in items.items() if isinstance(v, dict) and
-               (k == key or resume_matches(result, v, series=False))]
-    if not all(resume_matches(a, b, series=False) for i, (_, a) in enumerate(aliases)
-               for _, b in aliases[i + 1:]):
+    aliases = _resume_aliases(data, entry)
+    verified_aliases = key in {k for k, _ in aliases}
+    if not verified_aliases:
         aliases = [(key, result)]
+    identity = _resume_identity(entry)
+    if identity and verified_aliases:
+        linked = dict(identity['ids'])
+        for _, value in aliases:
+            linked.update(_resume_identity(value)['ids'])
+        if linked != entry_identity(result)['ids']:
+            result['resume_verified_ids'] = linked
     hidden = data.get('resume_hidden', {})
     if not isinstance(hidden, dict):
         raise ValueError('Unsupported Continue visibility state')
@@ -649,29 +710,11 @@ def entries(data, media='all', bucket='items', list_name=''):
         # Both Home and the full list use this projection. Every record remains
         # in storage; newest playback wins, even when it is an earlier episode.
         values = [value for value in values if resume_visible(data, value['key'])]
-        groups, aliases, visible = [], {}, []
-        for value in values:
-            identity = entry_identity(value)
-            ids = (identity['ids'] if identity and identity['kind'] == 'movie'
-                   else continue_series_ids(value))
-            kind = 'movie' if value.get('media') == 'movie' else 'series'
-            if not ids:
+        seen, visible = set(), []
+        for value, group in zip(values, _resume_groups(values)):
+            if group not in seen:
+                seen.add(group)
                 visible.append(value)
-                continue
-            candidates = set().union(*(aliases.get((kind, n, uid), set()) for n, uid in ids.items()))
-            compatible = [i for i in candidates if
-                          _agreeing_ids(ids, groups[i][0]) and
-                          all(set(ids) & mask for mask in groups[i][1])]
-            if len(compatible) == 1:
-                index = compatible[0]
-                groups[index][0].update(ids)
-                groups[index][1].add(frozenset(ids))
-            else:
-                index = len(groups)
-                groups.append((dict(ids), {frozenset(ids)}))
-                visible.append(value)
-            for namespace, uid in ids.items():
-                aliases.setdefault((kind, namespace, uid), set()).add(index)
         values = visible
     return values
 
@@ -680,7 +723,7 @@ def continue_series_ids(value):
     """Only proven parent-series IDs; never episode IDs or similar show names."""
     if value.get('media') != 'tv':
         return {}
-    identity = entry_identity(value)
+    identity = _resume_identity(value)
     typed = identity['ids'] if identity and identity.get('scope') in ('show_episode', 'show', 'show_season') else {}
     parent = verified_ids({name: value.get('show_' + name) for name in ('tmdb', 'tvdb', 'imdb')}) \
         if value.get('show_ids_verified') is True else {}

@@ -20,3 +20,5 @@ Selected host evidence: FEATURE-HOST.json, BINDINGS-LAYOUT-HOST.json, POV-COMPAT
 Manual feature modes prepared: final-participant, final-continue, final-actions, final-pov. No automatic runtime trigger was added. Browser sign-in was rejected by automatic approval review because the user previously deferred authentication. The working GitHub connector lacks workflow dispatch. Android modes are NOT RUN until authorized dispatch is available; physical gestures and clock acceptance remain separate.
 
 Final preservation review: popup Play reads the selected saved bucket, retaining its exact route rather than another bucket's same-key record. Save for Later keeps its existing removal operation; the redundant add action is absent. These cases are included in the focused host checks.
+
+Identity edge correction: verified TMDb/IMDb links now form one conflict-free progress group, independent of input order. A connected group with contradictory IDs stays entirely separate. Additive resume-only ID evidence retains the original identity used by TrackIt and every saved route. Added two focused bridge/conflict regression cases; no runtime claim.

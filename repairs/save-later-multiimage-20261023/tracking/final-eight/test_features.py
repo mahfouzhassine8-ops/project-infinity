@@ -51,6 +51,32 @@ class Features(unittest.TestCase):
         self.movie('d',{'tvdb':'603'},5)
         self.movie('e',{},1)
         self.assertEqual(len(self.hub.entries(self.data)),5)
+    def test_verified_cross_namespace_link_is_one_card_and_original_progress(self):
+        a=self.movie('a',{'tmdb':'603'},10)
+        b=self.movie('b',{'imdb':'tt0133093'},20)
+        original=copy.deepcopy(self.data)
+        incoming=dict(a,key='c'*64,identity=self.hub.media_identity('movie',{'tmdb':'603','imdb':'tt0133093'}),
+                      position=211,updated=30,playback_occurrence='2'*32)
+        self.data,key=self.hub.record_progress(self.data,incoming)
+        self.assertEqual(key,a['key']);self.assertEqual(len(self.hub.entries(self.data)),1)
+        self.assertEqual(len(self.data['items']),2)
+        for key,old in original['items'].items():
+            value=self.data['items'][key]
+            self.assertEqual(value['position'],211)
+            for field in ('identity','source'):self.assertEqual(value[field],old[field])
+        self.assertEqual(self.data['navigation_recovery'],original['navigation_recovery'])
+        self.assertEqual(self.hub.progress_key(self.data,b),a['key'])
+        self.data,_=self.hub.remove_resume_data(self.data,b['key'])
+        self.assertEqual(self.hub.entries(self.data),[])
+    def test_existing_verified_bridge_and_later_conflict_are_order_independent(self):
+        self.movie('a',{'tmdb':'603'},30)
+        self.movie('b',{'imdb':'tt0133093'},20)
+        self.movie('c',{'tmdb':'603','imdb':'tt0133093'},10)
+        self.assertEqual([r['key'] for r in self.hub.entries(self.data)],['a'*64])
+        self.movie('d',{'tmdb':'604','imdb':'tt0133093'},1)
+        self.assertEqual(len(self.hub.entries(self.data)),4)
+        self.data,_=self.hub.remove_resume_data(self.data,'a'*64)
+        self.assertEqual(set(self.data['resume_hidden']),{'a'*64})
     def test_series_uses_latest_playback_even_earlier_episode_keeps_all_progress(self):
         self.episode('a',{'tmdb':'330430','tvdb':'123'},8,10)
         recent=self.episode('b',{'tvdb':'123'},2,20)
