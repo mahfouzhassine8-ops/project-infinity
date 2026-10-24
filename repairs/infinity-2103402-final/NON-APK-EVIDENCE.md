@@ -10,9 +10,12 @@ Its native crash snapshot is zero bytes. No faulting thread, PC, stack, signal
 code or matching native build ID is present. The APK-native file hash matches
 the signed baseline, but it cannot replace an actual crash stack.
 
-No newer uploaded bugreport was found in the recent Library inventory. This
-workspace has no attached USB device, ADB, Android SDK, emulator or `/dev/kvm`.
-Device reproduction and OS captures are **NOT RUN**, not exhausted methods.
+The user subsequently supplied the original October24 Android bugreport. It has
+now been inspected: all32 text and32 protobuf tombstones contain no matching
+SearchPID9097 incident. See `ANDROID-BUGREPORT-FINDINGS.md`; do not request the
+same archive again. This workspace has no attached USB device, ADB, Android SDK,
+emulator or `/dev/kvm`. Live device reproduction remains **NOT RUN**, not an
+exhausted non-APK method.
 
 ## Capture without replacing the APK
 
@@ -51,7 +54,9 @@ process/PID, signal/code/address, native backtrace and module build IDs.
 ## Attribution and release gates
 
 1. Match event time and process to the observed Search failure.
-2. Match each faulting module build ID to the exact baseline binary and symbols.
+2. Match available module build IDs to exact binaries and symbols. The signed
+   baseline libkodi has no GNU build ID: use its exact native/APK SHA and runtime
+   mapping/load offset instead. A recorder build ID does not prove engine identity.
 3. Establish the failing ownership/call path before proposing a native repair.
 4. Keep signal termination distinct from ANR, Java exceptions, older crashes and
    Essential-First Close results.

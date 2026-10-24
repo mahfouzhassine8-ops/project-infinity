@@ -1,12 +1,12 @@
 {
-  "scope": "2103402 correction9 partial diagnostic exports and non-APK evidence capture; exact source/package preservation",
+  "scope": "2103402 correction9 evidence retention after original Android bugreport; correction1 attribution only",
   "selected_tests": [
-    "test_health_partial_scope.py",
-    "test_baseline_capture.py",
-    "test_staging_audit.py: exact 19-file staged inventory, reject extra files and unrelated edits; pinned APK input"
+    "test_crash_context_scope.py: native original-context forwarding and fatal fallback, exact process ownership and preservation",
+    "test_health_export_scope.py: added OS memory/importance metadata with failure isolation",
+    "test_bugreport_analysis.py: process/time isolation, protobuf coverage, bounded parsing, recovered register fragments and aggregate mapping counts"
   ],
-  "prior_host_tests": "Retain successful 40132316838; rerun only if affected source or integration changes",
-  "device_execution": "NOT RUN; no attached adb/device/emulator",
-  "non_apk_methods": "Existing archive inspected; no newer uploaded Oct24 archive or bugreport found in recent100 inventory; OS bugreport/ADB capture remains viable on baseline device, not exhausted",
+  "prior_host_tests": "26 PASS run40137879262 retained; existing addon overlays unchanged",
+  "android17": "NOT RUN; no attached device/ADB/emulator",
+  "non_apk_methods": "Original bugreport provided and inspected; no SearchPID9097 tombstone found so far; no diagnostic APK requested",
   "interim_apk_requested": false
 }

@@ -1,0 +1,50 @@
+{
+  "schema": 1,
+  "baseline_checkpoint": "e66371a0a0a69792c78f8b317b8563f952cadd97",
+  "prior_host_ci": {
+    "run": 40137879262,
+    "tests": 26,
+    "status": "PASS",
+    "retained": true
+  },
+  "selected_host_results": [
+    {
+      "test": "test_crash_context_scope.py",
+      "count": 5,
+      "status": "PASS",
+      "seconds": 0.225,
+      "coverage": "Real Linux x86_64 signal fault/forwarding, prior handler masks and fatal fallback; baseline loss reproduced; exact process guard and source/binary identity"
+    },
+    {
+      "test": "test_health_export_scope.py",
+      "count": 2,
+      "status": "PASS",
+      "seconds": 0.784,
+      "coverage": "Actual revised exporter methods compiled and executed with controlled Android API fixtures; existing checks retained plus OS resource fields"
+    },
+    {
+      "test": "test_bugreport_analysis.py",
+      "count": 4,
+      "status": "PASS",
+      "seconds": 0.003,
+      "coverage": "Scope, PID/date isolation, contiguous memory recovery, privacy-safe count aggregation, malformed protobuf rejection"
+    }
+  ],
+  "sources": {
+    "crash_context_scope.py": "0b9eb9178c2f39da4f646a2cf4f5fbff224b2aaafaf19c27b8e863fdf0ecb4ae",
+    "native-overlay/infinity_crash_recorder.c": "1cce2f59b5bc7ea201a352beea3c41413d156b68250dac79ec2a0d0f1dbd559f",
+    "test_crash_context_scope.py": "dd277f23a6974834d39734f4a369a5863f55e94d3c89b785ed5dd44cec041686",
+    "health_export_scope.py": "9c77bcce2e2618eedc65ea80fcdfff6e46ffc00837eb59ee482d2d6c0c769845",
+    "java-overlay/InfinityHealthExport.java.in": "c2baa954f3d77f52682e153f1ac7570acbd5d8b2171cfdb363e5304cb8f86583",
+    "test_health_export_scope.py": "f003d1840bb9d5e63a0ad9688b7fb62e2f1e4791384b8b2e4725163288dc2049",
+    "analyze_android_bugreport.py": "0c713dce14b9ec05456e469ab00d96b2f4f0afbdc02ac0923e880dea3322c4b5",
+    "test_bugreport_analysis.py": "3304e287a28f99c4a9afeaa9fa9d14654f13f1a24d15efbfc9b73bd72ea9a970"
+  },
+  "android17": "NOT RUN",
+  "physical_fold": "NOT RUN",
+  "arm64_candidate_compile": "NOT RUN",
+  "candidate_dex_integration": "NOT RUN",
+  "native_search_fix": "NOT IMPLEMENTED; original fault unproven",
+  "interim_apk_requested": false,
+  "signed2103402": "NOT BUILT"
+}

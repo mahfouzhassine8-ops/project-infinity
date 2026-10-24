@@ -21,6 +21,7 @@ class android {static class app {
  static class ApplicationExitInfo {static final int REASON_CRASH_NATIVE=5,REASON_ANR=6;int reason,status;java.io.InputStream stream;String process="com.projectinfinity.kodi:kodi";int reads;
  ApplicationExitInfo(int r,int s,java.io.InputStream i){reason=r;status=s;stream=i;}
  int getReason(){return reason;}int getStatus(){return status;}int getPid(){return 9097;}long getTimestamp(){return 1792869738390L;}String getProcessName(){return process;}
+ long getPss(){return 0;}long getRss(){if(reason==9)throw new SecurityException("private");return 736256;}int getImportance(){return 100;}
  java.io.InputStream getTraceInputStream(){reads++;return stream;}}
 }}
 '''
@@ -50,10 +51,14 @@ MAIN=r'''
  rows=new JSONArray();bytes=new ByteArrayOutputStream();try(ZipOutputStream z=new ZipOutputStream(bytes)){Api30.collect(context,z,rows);}
  check(rows.size()==12,"metadata bounded12");check(rows.get(0).get("reason").equals(2)&&rows.get(0).get("exit_status").equals(7),"signal retained honestly");
  check(!rows.get(0).containsKey("format")&&rows.get(0).get("available").equals(false),"signal not fabricated native trace");
+ check(rows.get(0).get("rss_kb").equals(736256L)&&rows.get(0).get("pss_kb")==JSONObject.NULL&&rows.get(0).get("importance").equals(100),"OS sample retained; zero PSS is unavailable");
  check(rows.get(1).get("reason").equals(4),"Java retained");check(rows.get(2).get("status").equals("empty_no_evidence"),"empty Android trace");
  check(rows.get(3).get("status").equals("partial_read_failure"),"partial trace marked");
  check(manager.entries.stream().mapToInt(e->e.reads).sum()==4,"trace attempts bounded4");
  check(rows.get(6).get("status").equals("trace_budget_exhausted"),"budget represented");
+ manager.entries.clear();manager.entries.add(new android.app.ApplicationExitInfo(9,0,null));
+ rows=new JSONArray();try(ZipOutputStream z=new ZipOutputStream(new ByteArrayOutputStream())){Api30.collect(context,z,rows);}
+ check(rows.get(0).get("reason").equals(9)&&rows.get(0).get("resource_context_status").equals("unavailable")&&rows.get(0).get("rss_kb")==JSONObject.NULL,"resource failure retains exit identity");
  manager.denied=true;rows=new JSONArray();try(ZipOutputStream z=new ZipOutputStream(new ByteArrayOutputStream())){Api30.collect(context,z,rows);}
  check(rows.get(0).get("status").equals("exit_history_unavailable"),"service failure doesn't abort exporter");
  boolean failed=false;try(ZipOutputStream z=new ZipOutputStream(new OutputStream(){public void write(int b)throws IOException{throw new IOException();}})){attachShutdown(context,z,new JSONArray(),"data","data.txt",16);}catch(IOException wanted){failed=true;}check(failed,"destination failure not swallowed");

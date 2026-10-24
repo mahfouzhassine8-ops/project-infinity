@@ -83,6 +83,20 @@ API='''  private static final class Api30 {
         // Metadata is retained for signal/Java/resource exits too. A signal exit
         // is not automatically a native-crash tombstone or a failed Close.
         records.put(row); row.put("available", false);
+        // OS-retained samples describe this exit, not the current process and
+        // not its faulting allocation. Android's zero means unavailable here.
+        row.put("pss_kb", JSONObject.NULL); row.put("rss_kb", JSONObject.NULL);
+        row.put("importance", JSONObject.NULL);
+        try {
+          long pss = exit.getPss(), rss = exit.getRss();
+          row.put("pss_kb", pss > 0 ? pss : JSONObject.NULL);
+          row.put("rss_kb", rss > 0 ? rss : JSONObject.NULL);
+          row.put("importance", exit.getImportance());
+          row.put("resource_context_status", "os_snapshot_not_fault_cause");
+        } catch (RuntimeException unavailable) {
+          row.put("resource_context_status", "unavailable");
+          row.put("resource_error_type", unavailable.getClass().getSimpleName());
+        }
         boolean nativeCrash = reason == android.app.ApplicationExitInfo.REASON_CRASH_NATIVE;
         boolean anr = reason == android.app.ApplicationExitInfo.REASON_ANR;
         if (!nativeCrash && !anr) { row.put("status", "metadata_only_no_supported_trace"); continue; }

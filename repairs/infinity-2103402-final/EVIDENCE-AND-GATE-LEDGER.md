@@ -20,7 +20,7 @@
 
 | # | Owner / authorized problem | Evidence status | Implementation status | Targeted tests | Android 17 integration | Physical Fold candidate PASS |
 |---|---|---|---|---|---|---|
-| 1 | Search/native signal process exit | Observed; stack unavailable; retained native logs belong to other PIDs | No speculative native fix; non-APK capture path prepared | Capture-tool host checks PASS; Search runtime NOT RUN | NOT RUN | NOT RUN |
+| 1 | Search/native signal process exit | Original OS bugreport confirms SIGBUS; all32 text/32 protobuf tombstones lack this PID/date | No speculative Search fix; older aborts kept separate | Capture/analyzer host checks PASS; Search runtime NOT RUN | NOT RUN | NOT RUN |
 | 2 | Home blank loading/re-entry restoration | Visibly reproduced; native-owned geometry invalidation identified | Scoped native-owned revision-trigger correction STAGED; complete warm Home delay still unresolved | 4 host tests + CI PASS for changed path | NOT RUN | NOT RUN |
 | 3 | Clock suffix clipped after reflow | Visibly reproduced | Clock bounding-width correction STAGED in unified Home only | 3 host tests + CI PASS | NOT RUN | NOT RUN |
 | 4 | Option B scrollbars and oversized plot space | Forced one-page bars and unused short-plot area confirmed | Track hiding and short-synopsis geometry correction STAGED; physical scrolling not accepted | 4 new host geometry tests + prior XML source checks PASS | NOT RUN | NOT RUN |
@@ -28,7 +28,7 @@
 | 6 | Player seek-time contrast | Unified variant uses theme ink over video; other13 already white | Unified white text/black shadow staged; other13 time controls unchanged | Scoped source/package tests PASS | NOT RUN | NOT RUN |
 | 7 | Play/Pause heavy dark styling regression | 14 exact XML source preimages identified | **Isolated source-only prototype staged** | **4 local unittest cases PASS; 14 variants parsed** | NOT RUN | NOT RUN |
 | 8 | Post-Information focus restoration | Suspected visually; needs identity proof | NOT STARTED | NOT RUN | NOT RUN | NOT RUN |
-| 9 | Health Center diagnostics reliability | Signal/empty-source defects confirmed in signed DEX; optional Python collector failure reproduced | Java staged; Python partial-export repair staged; candidate DEX integration pending | 2 Java host checks retained; 5 new Python export checks PASS | NOT RUN | NOT RUN |
+| 9 | Health Center diagnostics reliability | Signed exporter gaps and native re-raise context loss confirmed; original abort registers partly recovered from older tombstones | Partial Python export, Java exit/resource metadata and isolated native context forwarding STAGED; candidate DEX/ARM64 integration pending | Python5 retained; Java2 updated PASS; native5 and analyzer4 PASS | NOT RUN | NOT RUN |
 
 **OSD prototype limitation:** `osd_playpause_scope.py` makes only two texture tag opacity changes inside existing control `202` in the exact 14 `VideoOSD.xml` members. Its source tests independently assert byte-exact invariance of all other control text/behavior, exact input SHA-256, strict fail-closed baseline mismatches, XML parse and no source archive mutation. It is a **staged experiment, not the final approved look, not a component ZIP, not signed, not physically tested**. Reference the user's approved clean/translucent appearance before final packaging; replace the prototype only if needed by documented physical result, always within control 202.
 
@@ -116,3 +116,34 @@ remain blocked; no sign-in request or workflow authorization bypass was used.
 - GitHub CI run `40131873559` succeeded against the exact 2103401 signed ZIPs, with full-history source preservation checking. Later CI incorporating Option B is selected separately; do not infer Android/physical acceptance. An initial run `40131428226` failed because checkout was shallow; preserved the failure and repaired the test checkout by fetching full history without relaxing the diff guard.
 - `FILE-AUTHORIZATION-LEDGER.json` now includes exact preimage/candidate SHA-256 and negative regressions for the three new scoped member overlays. Private user recording/log data remain outside the public repository.
 - **Still open:** Search SIGBUS faulting stack/root cause, full Home warm-return timing, native/Android17 end-to-end acceptance, chooser owner and Cancel/formatting, selected-title focus restoration, broader Health/DEX integration, and a user-approved signed final release. No suspected cause is being treated as fixed merely because a source test passes.
+
+## Original Android bugreport continuation from e66371a0
+
+The new original bugreport was verified against SHA256
+`938f1859648fcbf1c7118646e3896de0c721c5a4c2d9f0b037446e0d186af0c9`.
+`ANDROID-BUGREPORT-EVIDENCE.json` and `ANDROID-BUGREPORT-FINDINGS.md` record
+the separated incident findings and actual limitations. All32 text and32
+protobuf tombstones were inspected; none matches the Oct24 Search SIGBUS.
+The two Oct23 tombstones contain partial original register buffers recoverable
+from displayed memory, but not the original caller stack. The Scudo snapshot's
+65685 VMAs/29749 secondary regions are a mapping-pressure lead, not a proven
+allocation-owner fix or evidence that today's Search has the same cause.
+
+The exact recorder source and signed executable establish a downstream-context
+loss: re-raising creates a syscall PC rather than forwarding the original one.
+An isolated native source repair passes5 host signal/ownership/preservation
+checks, including a real SIGBUS baseline/candidate comparison. Main is the sole
+literal library load site in signed DEX, and the signed manifest assigns Main
+to :kodi; an additional exact-process constructor guard enforces that boundary.
+No Kodi engine, Cobra, original recorder binary or baseline APK was edited.
+Android17/ART/debuggerd and ARM64 compilation remain NOT RUN. The candidate
+source is not eligible for final integration until those checks pass.
+
+The staged Java exporter now also preserves OS RSS/PSS/importance metadata,
+with honest unavailable values and isolated getter failures. Its2 existing host
+checks pass with added cases;4 parser/privacy tests pass. Earlier26 host passes
+(run40137879262) and all19 addon overlays remain retained. See
+`BUGREPORT-HOST-RESULTS.json`; source CI is selected for the expanded35 checks.
+No interim installation requested, no signed2103402 package, and no Search/Home/
+rotation/Fold performance or stability PASS claimed. Raw diagnostics remain
+private. All other approved workstreams and physical release gates remain open.

@@ -34,7 +34,7 @@ jobs:
         run: |
           (cd signed-2103401 && sha256sum -c SHA256SUMS)
           cd repairs/infinity-2103402-final
-          python3 -m unittest -v test_home_reflow_scope test_clock_reflow_scope test_information_spacing_scope test_visual_scope test_health_export_scope test_health_partial_scope test_baseline_capture test_staging_audit
+          python3 -m unittest -v test_home_reflow_scope test_clock_reflow_scope test_information_spacing_scope test_visual_scope test_health_export_scope test_health_partial_scope test_baseline_capture test_staging_audit test_crash_context_scope test_bugreport_analysis
       - name: Reject changes outside approved repair records
         run: |
           python3 - <<'PY'

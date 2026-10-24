@@ -442,5 +442,175 @@
   "workflow_scope_change": {
     "path": ".github/workflows/infinity-2103402-scoped-tests.yml",
     "purpose": "Add only new Health/capture/staging host checks and exact existing Astra takeover handoff to source path allowlist. No Android/shutdown/build/signing automation changes."
-  }
+  },
+  "bugreport_diagnostics_scope": {
+    "recorded_before_runtime_edit": true,
+    "baseline_commit": "1738478709cd8881f7ad4a524e7abbbc82b5d79c",
+    "defect": 9,
+    "evidence": "Original Android bugreport SHA256 938f1859648fcbf1c7118646e3896de0c721c5a4c2d9f0b037446e0d186af0c9; Oct23 tombstones27/28, separate Oct24 Search exit",
+    "native_recorder": {
+      "source": "repairs/native-crash-forensics-2103250/infinity_crash_recorder.c.gz.b64",
+      "decoded_preimage_sha256": "b314c9f715d5cc6a30dcc34cf85268860d0a4cb66d830588fe3ee99e6c77c7a7",
+      "signed_apk_member": "lib/arm64-v8a/libinfinitycrash.so",
+      "baseline_member_sha256": "bc7aab86fc97844e02e25c96fc73f269bc85f5f8ce5528e132a78841aa130bca",
+      "baseline_build_id": "030b7fecb9bfdd816047454dd76f8438dca92479",
+      "boundary": "Isolated staged source only: pass original siginfo/ucontext to existing SA_SIGINFO handler before default fatal fallback; constructor exact Kodi process guard. Existing serializer, polling, files, thread lifetime and engine code unchanged. No APK integration until ARM64/Android17 proof.",
+      "necessity": "Both tombstones show re-raised SI_TKILL syscall context; original source passes neither original siginfo nor ucontext to previous handler. Exact recorder executable matches historical binary after reversing only existing engine SHA field.",
+      "negative_tests": [
+        "Real host SIGBUS at known faulting instruction: baseline loses original context; candidate previous handler receives original fault address/code/PC",
+        "SIGABRT prior handler called once; process still exits by original signal",
+        "Default/ignore/legacy handlers and no writable record do not conceal fatal exit",
+        "Non-Kodi process fails ownership guard; source inverse rejects unrelated edits; signed binary reverse-identity match"
+      ],
+      "signed_ownership_evidence": {
+        "classes.dex_sha256": "7ea38f88187dfec80211b3c5be6e09ef3cbd38928527c42570b8b89deeed3185",
+        "sole_literal_load_site": "com.projectinfinity.kodi.Main.onCreate(Bundle) after super.onCreate",
+        "manifest_process": ":kodi",
+        "candidate_guard": "Exact com.projectinfinity.kodi:kodi cmdline; all other process names and unreadable cmdline return before side effects"
+      }
+    },
+    "health_java": {
+      "source": "repairs/android-checkpoint-shutdown/runtime/android/overlay/tools/android/packaging/xbmc/src/InfinityHealthExport.java.in",
+      "baseline_sha256": "d9a34ac6139ef2e52b963f23aa613258387d8127cfbc489e300addbd268e1d61",
+      "boundary": "Only existing Api30 metadata export adds Android-provided PSS/RSS KB and process importance; metadata field failures cannot discard exit/signal identity. No polling or process-control changes.",
+      "necessity": "New OS evidence confirms excessive-CPU exits and high RSS, but staged metadata export omitted OS retained memory/importance.",
+      "negative_tests": [
+        "Actual exporter host harness retains SIGBUS, resource-exit and unavailable memory metadata without inventing zero or leaking exception text"
+      ]
+    },
+    "runtime_integration": "NOT RUN",
+    "physical_fold": "NOT RUN",
+    "search_fix_claimed": false,
+    "staged_source_sha256": {
+      "crash_context_scope.py": "0b9eb9178c2f39da4f646a2cf4f5fbff224b2aaafaf19c27b8e863fdf0ecb4ae",
+      "native-overlay/infinity_crash_recorder.c": "1cce2f59b5bc7ea201a352beea3c41413d156b68250dac79ec2a0d0f1dbd559f",
+      "test_crash_context_scope.py": "dd277f23a6974834d39734f4a369a5863f55e94d3c89b785ed5dd44cec041686",
+      "health_export_scope.py": "9c77bcce2e2618eedc65ea80fcdfff6e46ffc00837eb59ee482d2d6c0c769845",
+      "java-overlay/InfinityHealthExport.java.in": "c2baa954f3d77f52682e153f1ac7570acbd5d8b2171cfdb363e5304cb8f86583",
+      "test_health_export_scope.py": "f003d1840bb9d5e63a0ad9688b7fb62e2f1e4791384b8b2e4725163288dc2049",
+      "analyze_android_bugreport.py": "0c713dce14b9ec05456e469ab00d96b2f4f0afbdc02ac0923e880dea3322c4b5",
+      "test_bugreport_analysis.py": "3304e287a28f99c4a9afeaa9fa9d14654f13f1a24d15efbfc9b73bd72ea9a970"
+    },
+    "selected_host_results": [
+      {
+        "test": "test_crash_context_scope.py",
+        "count": 5,
+        "status": "PASS",
+        "seconds": 0.225,
+        "coverage": "Real Linux x86_64 signal fault/forwarding, prior handler masks and fatal fallback; baseline loss reproduced; exact process guard and source/binary identity"
+      },
+      {
+        "test": "test_health_export_scope.py",
+        "count": 2,
+        "status": "PASS",
+        "seconds": 0.784,
+        "coverage": "Actual revised exporter methods compiled and executed with controlled Android API fixtures; existing checks retained plus OS resource fields"
+      },
+      {
+        "test": "test_bugreport_analysis.py",
+        "count": 4,
+        "status": "PASS",
+        "seconds": 0.003,
+        "coverage": "Scope, PID/date isolation, contiguous memory recovery, privacy-safe count aggregation, malformed protobuf rejection"
+      }
+    ]
+  },
+  "bugreport_changed_files": [
+    {
+      "path": ".github/workflows/infinity-2103402-scoped-tests.yml",
+      "checkpoint_preimage_sha256": "5e07c16c94b1f4687a4b2bd2c1decc7643d9e15dd2eaaa79593835b0c9c0d49c",
+      "checkpoint": "e66371a0a0a69792c78f8b317b8563f952cadd97",
+      "purpose": "Correction9 evidence retention, isolated native/Java source, focused host tests, or sanitized investigation records; production preimages and precise runtime boundaries listed above"
+    },
+    {
+      "path": "repairs/infinity-2103402-final/EVIDENCE-AND-GATE-LEDGER.md",
+      "checkpoint_preimage_sha256": "9a6804d11af44264f5c25fcc18acd01ad971530372b2badad024dc48aed7c9ea",
+      "checkpoint": "e66371a0a0a69792c78f8b317b8563f952cadd97",
+      "purpose": "Correction9 evidence retention, isolated native/Java source, focused host tests, or sanitized investigation records; production preimages and precise runtime boundaries listed above"
+    },
+    {
+      "path": "repairs/infinity-2103402-final/FILE-AUTHORIZATION-LEDGER.json",
+      "checkpoint_preimage_sha256": "57284a21479e834d84e409d374fc93f8a2a2378a43def4e92037e539167e949a",
+      "checkpoint": "e66371a0a0a69792c78f8b317b8563f952cadd97",
+      "purpose": "Correction9 evidence retention, isolated native/Java source, focused host tests, or sanitized investigation records; production preimages and precise runtime boundaries listed above"
+    },
+    {
+      "path": "repairs/infinity-2103402-final/NEXT-VERIFICATION.json",
+      "checkpoint_preimage_sha256": "8a481f9b4820338a4c172b300451ad564e7ac872eafcfb4dc1c9edc5c5b567d4",
+      "checkpoint": "e66371a0a0a69792c78f8b317b8563f952cadd97",
+      "purpose": "Correction9 evidence retention, isolated native/Java source, focused host tests, or sanitized investigation records; production preimages and precise runtime boundaries listed above"
+    },
+    {
+      "path": "repairs/infinity-2103402-final/NON-APK-EVIDENCE.md",
+      "checkpoint_preimage_sha256": "0fcd09f1d614d4e0ff6e7b3b0e7a0e63bd4373fc010566f7321241622149b49c",
+      "checkpoint": "e66371a0a0a69792c78f8b317b8563f952cadd97",
+      "purpose": "Correction9 evidence retention, isolated native/Java source, focused host tests, or sanitized investigation records; production preimages and precise runtime boundaries listed above"
+    },
+    {
+      "path": "repairs/infinity-2103402-final/health_export_scope.py",
+      "checkpoint_preimage_sha256": "71e84d0269b58da2931cab86b25f5ab1c2c02e6ae9c0a0814358b8a0aeb91aae",
+      "checkpoint": "e66371a0a0a69792c78f8b317b8563f952cadd97",
+      "purpose": "Correction9 evidence retention, isolated native/Java source, focused host tests, or sanitized investigation records; production preimages and precise runtime boundaries listed above"
+    },
+    {
+      "path": "repairs/infinity-2103402-final/java-overlay/InfinityHealthExport.java.in",
+      "checkpoint_preimage_sha256": "6163b48422c414e9e3968b1b5989e4477a902c345f3dbabe49b3350b8d68a378",
+      "checkpoint": "e66371a0a0a69792c78f8b317b8563f952cadd97",
+      "purpose": "Correction9 evidence retention, isolated native/Java source, focused host tests, or sanitized investigation records; production preimages and precise runtime boundaries listed above"
+    },
+    {
+      "path": "repairs/infinity-2103402-final/test_health_export_scope.py",
+      "checkpoint_preimage_sha256": "6bf50ad1514bc7f1a6dc41ff374ce0f4ac6c7c8ff0883e9aa69a67721099797b",
+      "checkpoint": "e66371a0a0a69792c78f8b317b8563f952cadd97",
+      "purpose": "Correction9 evidence retention, isolated native/Java source, focused host tests, or sanitized investigation records; production preimages and precise runtime boundaries listed above"
+    },
+    {
+      "path": "repairs/infinity-2103402-final/ANDROID-BUGREPORT-EVIDENCE.json",
+      "checkpoint_preimage_sha256": null,
+      "checkpoint": "e66371a0a0a69792c78f8b317b8563f952cadd97",
+      "purpose": "Correction9 evidence retention, isolated native/Java source, focused host tests, or sanitized investigation records; production preimages and precise runtime boundaries listed above"
+    },
+    {
+      "path": "repairs/infinity-2103402-final/ANDROID-BUGREPORT-FINDINGS.md",
+      "checkpoint_preimage_sha256": null,
+      "checkpoint": "e66371a0a0a69792c78f8b317b8563f952cadd97",
+      "purpose": "Correction9 evidence retention, isolated native/Java source, focused host tests, or sanitized investigation records; production preimages and precise runtime boundaries listed above"
+    },
+    {
+      "path": "repairs/infinity-2103402-final/BUGREPORT-HOST-RESULTS.json",
+      "checkpoint_preimage_sha256": null,
+      "checkpoint": "e66371a0a0a69792c78f8b317b8563f952cadd97",
+      "purpose": "Correction9 evidence retention, isolated native/Java source, focused host tests, or sanitized investigation records; production preimages and precise runtime boundaries listed above"
+    },
+    {
+      "path": "repairs/infinity-2103402-final/analyze_android_bugreport.py",
+      "checkpoint_preimage_sha256": null,
+      "checkpoint": "e66371a0a0a69792c78f8b317b8563f952cadd97",
+      "purpose": "Correction9 evidence retention, isolated native/Java source, focused host tests, or sanitized investigation records; production preimages and precise runtime boundaries listed above"
+    },
+    {
+      "path": "repairs/infinity-2103402-final/crash_context_scope.py",
+      "checkpoint_preimage_sha256": null,
+      "checkpoint": "e66371a0a0a69792c78f8b317b8563f952cadd97",
+      "purpose": "Correction9 evidence retention, isolated native/Java source, focused host tests, or sanitized investigation records; production preimages and precise runtime boundaries listed above"
+    },
+    {
+      "path": "repairs/infinity-2103402-final/native-overlay/infinity_crash_recorder.c",
+      "checkpoint_preimage_sha256": null,
+      "checkpoint": "e66371a0a0a69792c78f8b317b8563f952cadd97",
+      "purpose": "Correction9 evidence retention, isolated native/Java source, focused host tests, or sanitized investigation records; production preimages and precise runtime boundaries listed above"
+    },
+    {
+      "path": "repairs/infinity-2103402-final/test_bugreport_analysis.py",
+      "checkpoint_preimage_sha256": null,
+      "checkpoint": "e66371a0a0a69792c78f8b317b8563f952cadd97",
+      "purpose": "Correction9 evidence retention, isolated native/Java source, focused host tests, or sanitized investigation records; production preimages and precise runtime boundaries listed above"
+    },
+    {
+      "path": "repairs/infinity-2103402-final/test_crash_context_scope.py",
+      "checkpoint_preimage_sha256": null,
+      "checkpoint": "e66371a0a0a69792c78f8b317b8563f952cadd97",
+      "purpose": "Correction9 evidence retention, isolated native/Java source, focused host tests, or sanitized investigation records; production preimages and precise runtime boundaries listed above"
+    }
+  ]
 }
