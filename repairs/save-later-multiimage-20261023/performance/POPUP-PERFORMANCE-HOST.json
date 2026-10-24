@@ -1,0 +1,295 @@
+{
+  "schema": 1,
+  "result": "PASS",
+  "tests": 4,
+  "test_sha256": "18f2f0308fd25733b0b8fdf7d985b1537369a7109c58c0c089bc40ea02e10ad8",
+  "sources": {
+    "cc33": {
+      "resume_hub.py": "4432749e619649c0f949bb30906c630a0b98012f4533fc8fde46f6272ffa7207",
+      "plugin.py": "e87a3faa473be3895f73ba658e28810ecef94893abd299f4179d95729ad33a95"
+    },
+    "cc34": {
+      "title_metadata.py": "d56a1a41d80fbd1e544918bbb846518bb47567f1e0ea71132f0cc3d355b15562",
+      "resume_hub.py": "60ce5f692a56c7583c844827b538e518de894383ba326dc78b12075f4d5838c9",
+      "selection_contract.py": "31f04371cdf9902e234ef441e11a41bc914daf1a9cc12b1cc435d58285dc46c2",
+      "plugin.py": "44c0f6313eec710bbd98b2dd43222c9601d7ea70f3a49737b2b68962f9bb54e6"
+    },
+    "candidate35": {
+      "infinity_settings.py": "a846e6fa285618495e572ff77665b4914eb2438ae3c1d7f38f2e53b150cb8e3d",
+      "resume_hub.py": "d1ee9efe3aa7d59132e63d9a1cd726e579a14ef53b671a5d2aa0204dea7d5155",
+      "information.py": "c388b83353bff8e7687a545d3a00ea16691a208bd34b3a0a0678ff6441abb54e",
+      "infinity_search.py": "fb469b20cea3fd86e7eec454aba7ae25d14472d9ebddea36120841925c170be0",
+      "provider_inventory.py": "6533bcaf90d161a9ff188c57c686efdf9e8f29ef4c9d6de589f09e91da561145",
+      "plugin.py": "380dc998e10419b957337a7337719808ada2c946657b3953a63e81ab18f60c84",
+      "service.py": "ca9233507680c5d013468a38d4996bb54389ebe4d3e2410df8c241dd8340f6c5"
+    }
+  },
+  "measurements": {
+    "cc33": [
+      {
+        "watched": 100,
+        "visible_cards": 100,
+        "custom_list_entries": 100,
+        "fixture_bytes": 142649,
+        "cold_snapshot_ms": 3.944,
+        "warm_snapshot_ms": [
+          2.514,
+          2.65,
+          2.468
+        ],
+        "cold_listing_ms": 29.657,
+        "warm_listing_ms": [
+          28.5,
+          32.02,
+          28.194
+        ],
+        "cold_popup_cancel_ms": 4.351,
+        "warm_popup_cancel_ms": [
+          3.3,
+          3.287,
+          3.397
+        ],
+        "warm_listing_median_ms": 28.5,
+        "warm_popup_median_ms": 3.3,
+        "file_unchanged": true,
+        "writer_entries": 0
+      },
+      {
+        "watched": 1000,
+        "visible_cards": 100,
+        "custom_list_entries": 1000,
+        "fixture_bytes": 1001257,
+        "cold_snapshot_ms": 34.859,
+        "warm_snapshot_ms": [
+          17.73,
+          17.149,
+          15.464
+        ],
+        "cold_listing_ms": 246.292,
+        "warm_listing_ms": [
+          235.036,
+          234.453,
+          236.186
+        ],
+        "cold_popup_cancel_ms": 31.332,
+        "warm_popup_cancel_ms": [
+          24.556,
+          30.529,
+          23.92
+        ],
+        "warm_listing_median_ms": 235.036,
+        "warm_popup_median_ms": 24.556,
+        "file_unchanged": true,
+        "writer_entries": 0
+      },
+      {
+        "watched": 4000,
+        "visible_cards": 100,
+        "custom_list_entries": 1000,
+        "fixture_bytes": 2444257,
+        "cold_snapshot_ms": 59.474,
+        "warm_snapshot_ms": [
+          42.471,
+          58.45,
+          42.546
+        ],
+        "cold_listing_ms": 747.925,
+        "warm_listing_ms": [
+          745.141,
+          750.699,
+          769.317
+        ],
+        "cold_popup_cancel_ms": 71.083,
+        "warm_popup_cancel_ms": [
+          59.233,
+          58.943,
+          68.974
+        ],
+        "warm_listing_median_ms": 750.699,
+        "warm_popup_median_ms": 59.233,
+        "file_unchanged": true,
+        "writer_entries": 0
+      }
+    ],
+    "cc34": [
+      {
+        "watched": 100,
+        "visible_cards": 100,
+        "custom_list_entries": 100,
+        "fixture_bytes": 142649,
+        "cold_snapshot_ms": 3.144,
+        "warm_snapshot_ms": [
+          2.415,
+          2.272,
+          2.187
+        ],
+        "cold_listing_ms": 30.073,
+        "warm_listing_ms": [
+          30.271,
+          30.079,
+          29.495
+        ],
+        "cold_popup_cancel_ms": 3.962,
+        "warm_popup_cancel_ms": [
+          2.996,
+          2.922,
+          2.937
+        ],
+        "warm_listing_median_ms": 30.079,
+        "warm_popup_median_ms": 2.937,
+        "file_unchanged": true,
+        "writer_entries": 0
+      },
+      {
+        "watched": 1000,
+        "visible_cards": 100,
+        "custom_list_entries": 1000,
+        "fixture_bytes": 1001257,
+        "cold_snapshot_ms": 21.439,
+        "warm_snapshot_ms": [
+          14.973,
+          18.48,
+          16.057
+        ],
+        "cold_listing_ms": 245.745,
+        "warm_listing_ms": [
+          252.218,
+          231.853,
+          238.127
+        ],
+        "cold_popup_cancel_ms": 31.292,
+        "warm_popup_cancel_ms": [
+          24.125,
+          24.004,
+          24.077
+        ],
+        "warm_listing_median_ms": 238.127,
+        "warm_popup_median_ms": 24.077,
+        "file_unchanged": true,
+        "writer_entries": 0
+      },
+      {
+        "watched": 4000,
+        "visible_cards": 100,
+        "custom_list_entries": 1000,
+        "fixture_bytes": 2444257,
+        "cold_snapshot_ms": 83.756,
+        "warm_snapshot_ms": [
+          45.466,
+          45.142,
+          43.141
+        ],
+        "cold_listing_ms": 788.383,
+        "warm_listing_ms": [
+          746.771,
+          906.943,
+          804.396
+        ],
+        "cold_popup_cancel_ms": 88.138,
+        "warm_popup_cancel_ms": [
+          74.665,
+          66.617,
+          61.957
+        ],
+        "warm_listing_median_ms": 804.396,
+        "warm_popup_median_ms": 66.617,
+        "file_unchanged": true,
+        "writer_entries": 0
+      }
+    ],
+    "candidate35": [
+      {
+        "watched": 100,
+        "visible_cards": 100,
+        "custom_list_entries": 100,
+        "fixture_bytes": 142649,
+        "cold_snapshot_ms": 3.403,
+        "warm_snapshot_ms": [
+          2.55,
+          2.215,
+          2.315
+        ],
+        "cold_listing_ms": 10.161,
+        "warm_listing_ms": [
+          9.125,
+          9.038,
+          9.086
+        ],
+        "cold_popup_cancel_ms": 4.257,
+        "warm_popup_cancel_ms": [
+          3.009,
+          2.89,
+          2.975
+        ],
+        "warm_listing_median_ms": 9.086,
+        "warm_popup_median_ms": 2.975,
+        "file_unchanged": true,
+        "writer_entries": 0
+      },
+      {
+        "watched": 1000,
+        "visible_cards": 100,
+        "custom_list_entries": 1000,
+        "fixture_bytes": 1001257,
+        "cold_snapshot_ms": 23.274,
+        "warm_snapshot_ms": [
+          16.427,
+          16.521,
+          15.95
+        ],
+        "cold_listing_ms": 31.531,
+        "warm_listing_ms": [
+          25.789,
+          25.928,
+          26.254
+        ],
+        "cold_popup_cancel_ms": 27.689,
+        "warm_popup_cancel_ms": [
+          33.017,
+          25.76,
+          25.203
+        ],
+        "warm_listing_median_ms": 25.928,
+        "warm_popup_median_ms": 25.76,
+        "file_unchanged": true,
+        "writer_entries": 0
+      },
+      {
+        "watched": 4000,
+        "visible_cards": 100,
+        "custom_list_entries": 1000,
+        "fixture_bytes": 2444257,
+        "cold_snapshot_ms": 55.447,
+        "warm_snapshot_ms": [
+          44.357,
+          58.858,
+          52.772
+        ],
+        "cold_listing_ms": 74.128,
+        "warm_listing_ms": [
+          61.774,
+          70.55,
+          58.292
+        ],
+        "cold_popup_cancel_ms": 77.733,
+        "warm_popup_cancel_ms": [
+          54.923,
+          68.199,
+          58.293
+        ],
+        "warm_listing_median_ms": 61.774,
+        "warm_popup_median_ms": 58.293,
+        "file_unchanged": true,
+        "writer_entries": 0
+      }
+    ]
+  },
+  "limits": [
+    "Host CPython timings; mocked Kodi ListItems and modal cancellation.",
+    "Real listing, snapshot, membership, metadata and selection functions; provider navigation validation and favourites RPC stubbed.",
+    "Profile reads use real JSON file IO; native participant digest/admission verification is not measured.",
+    "Warm means existing in-process snapshot; cold means empty snapshot cache, not cold OS caches.",
+    "4000 watched rows are a scalable retained-profile fixture, not claimed device inventory.",
+    "No Android17/Fold execution, frame-pacing, touch latency, memory-pressure or shutdown acceptance."
+  ]
+}

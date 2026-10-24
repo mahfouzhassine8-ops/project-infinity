@@ -1,0 +1,354 @@
+<?xml version='1.0' encoding='utf-8'?>
+<includes>
+  <include name="InfinityHomeStatusCluster">
+    <param name="statusleft" />
+    <param name="statuswidth" />
+    <param name="datetop" />
+    <param name="dateheight" />
+    <param name="weathertop" />
+    <param name="weatherheight" />
+    <param name="weatherfont" default="InfinityTiny" />
+    <param name="timeleft" />
+    <param name="timetop" />
+    <param name="timewidth" />
+    <param name="timeheight" />
+    <definition>
+      <control type="image">
+        <left>708</left>
+        <top>$PARAM[timetop]</top>
+        <width>18</width>
+        <height>18</height>
+        <texture colordiffuse="$VAR[InfinityHealthOrbColor]">infinity_experience/health-orb.png</texture>
+        <visible>String.IsEqual(Window(Home).Property(Infinity.RuntimeBadgesVisible),true) + !Player.HasMedia</visible>
+        <animation effect="fade" start="70" end="100" time="2100" pulse="true" condition="String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),true) + !String.IsEqual(Window(Home).Property(Infinity.HealthOrb.State),unknown)">Conditional</animation>
+      </control>
+      <control type="label">
+        <left>$PARAM[statusleft]</left>
+        <top>$PARAM[datetop]</top>
+        <width>$PARAM[statuswidth]</width>
+        <height>$PARAM[dateheight]</height>
+        <font>InfinityTiny</font>
+        <textcolor>$VAR[InfinityPaletteTextSecondary]</textcolor>
+        <align>right</align>
+        <aligny>center</aligny>
+        <label>$INFO[System.Date]</label>
+      </control>
+      <control type="label">
+        <left>$PARAM[statusleft]</left>
+        <top>$PARAM[weathertop]</top>
+        <width>$PARAM[statuswidth]</width>
+        <height>$PARAM[weatherheight]</height>
+        <font>$PARAM[weatherfont]</font>
+        <textcolor>$VAR[InfinityPaletteTextPrimary]</textcolor>
+        <align>right</align>
+        <aligny>center</aligny>
+        <label>$INFO[Weather.Location]  •  $INFO[Weather.Temperature]  $INFO[Weather.Conditions]</label>
+        <scroll>true</scroll>
+      </control>
+      <control type="grouplist"><left>$PARAM[timeleft]</left><top>$PARAM[timetop]</top><width>$PARAM[timewidth]</width><height>$PARAM[timeheight]</height><orientation>horizontal</orientation><align>right</align><itemgap>8</itemgap><usecontrolcoords>true</usecontrolcoords><control type="image"><texture>infinity_ui/clock_moon.png</texture><aspectratio>keep</aspectratio><visible>![String.IsEqual(Window(Home).Property(Infinity.SystemTheme),light) | String.IsEqual(Window(Home).Property(Infinity.SystemTheme),Light) | [String.IsEmpty(Window(Home).Property(Infinity.SystemTheme)) + String.IsEqual(Window(Home).Property(Infinity.NativeSystemTheme),light)] | [String.IsEmpty(Window(Home).Property(Infinity.SystemTheme)) + String.IsEqual(Window(Home).Property(Infinity.NativeSystemTheme),Light)]] + !Control.IsVisible(29900)</visible><left>0</left><centertop>50%</centertop><width>18</width><height>18</height></control><control type="label">
+        <font>InfinityClock</font>
+        <textcolor>$VAR[InfinityPaletteTextPrimary]</textcolor>
+        <aligny>center</aligny>
+        <label>$INFO[System.Time]</label>
+      <left>0</left><top>0</top><height>$PARAM[timeheight]</height><align>left</align><width min="1" max="100%">auto</width></control>
+    </control></definition>
+  </include>
+  <include name="InfinityHomeAddonCardNormal">
+    <param name="surfaceleft" />
+    <param name="surfacetop" />
+    <param name="surfacewidth" />
+    <param name="surfaceheight" />
+    <param name="frameleft" />
+    <param name="frametop" />
+    <param name="framewidth" />
+    <param name="frameheight" />
+    <param name="artleft" />
+    <param name="arttop" />
+    <param name="artwidth" />
+    <param name="artheight" />
+    <param name="labelleft" />
+    <param name="labeltop" />
+    <param name="labelwidth" />
+    <param name="labelheight" />
+    <param name="accentleft" />
+    <param name="accenttop" />
+    <param name="accentwidth" />
+    <definition>
+      <control type="image">
+        <left>$PARAM[surfaceleft]</left>
+        <top>$PARAM[surfacetop]</top>
+        <width>$PARAM[surfacewidth]</width>
+        <height>$PARAM[surfaceheight]</height>
+        <texture border="16" colordiffuse="$VAR[InfinityPaletteCardSurface]">infinity_ui/contract_white.png</texture>
+      </control>
+      <control type="image">
+        <left>$PARAM[frameleft]</left>
+        <top>$PARAM[frametop]</top>
+        <width>$PARAM[framewidth]</width>
+        <height>$PARAM[frameheight]</height>
+        <texture border="18" colordiffuse="$VAR[InfinityCollectiveFrameSoft]">infinity_ui/frame_soft.png</texture>
+      </control>
+      <control type="image">
+        <left>$PARAM[artleft]</left>
+        <top>$PARAM[arttop]</top>
+        <width>$PARAM[artwidth]</width>
+        <height>$PARAM[artheight]</height>
+        <aspectratio>keep</aspectratio>
+        <texture fallback="DefaultAddon.png" background="true">$INFO[ListItem.Thumb]</texture>
+      </control>
+      <control type="label">
+        <left>$PARAM[labelleft]</left>
+        <top>$PARAM[labeltop]</top>
+        <width>$PARAM[labelwidth]</width>
+        <height>$PARAM[labelheight]</height>
+        <align>center</align>
+        <aligny>center</aligny>
+        <font>InfinityTiny</font>
+        <textcolor>$VAR[InfinityCollectiveTextSecondary]</textcolor>
+        <label>$INFO[ListItem.Label]</label>
+      </control>
+      <control type="image">
+        <left>$PARAM[accentleft]</left>
+        <top>$PARAM[accenttop]</top>
+        <width>$PARAM[accentwidth]</width>
+        <height>2</height>
+        <texture colordiffuse="$VAR[InfinityCollectiveFrameSoft]">infinity_ui/contract_white.png</texture>
+      </control>
+    </definition>
+  </include>
+  <include name="InfinityHomeAddonCardFocused">
+    <param name="surfaceleft" />
+    <param name="surfacetop" />
+    <param name="surfacewidth" />
+    <param name="surfaceheight" />
+    <param name="frameleft" />
+    <param name="frametop" />
+    <param name="framewidth" />
+    <param name="frameheight" />
+    <param name="artleft" />
+    <param name="arttop" />
+    <param name="artwidth" />
+    <param name="artheight" />
+    <param name="labelleft" />
+    <param name="labeltop" />
+    <param name="labelwidth" />
+    <param name="labelheight" />
+    <param name="accentleft" />
+    <param name="accenttop" />
+    <param name="accentwidth" />
+    <definition>
+      <control type="image">
+        <left>$PARAM[surfaceleft]</left>
+        <top>$PARAM[surfacetop]</top>
+        <width>$PARAM[surfacewidth]</width>
+        <height>$PARAM[surfaceheight]</height>
+        <texture border="16" colordiffuse="$VAR[InfinityPaletteCardSurface]">infinity_ui/contract_white.png</texture>
+      </control>
+      <control type="image">
+        <left>$PARAM[frameleft]</left>
+        <top>$PARAM[frametop]</top>
+        <width>$PARAM[framewidth]</width>
+        <height>$PARAM[frameheight]</height>
+        <texture border="18" colordiffuse="$VAR[InfinityCollectiveFrameColor]">infinity_ui/frame.png</texture>
+      </control>
+      <control type="image">
+        <left>$PARAM[artleft]</left>
+        <top>$PARAM[arttop]</top>
+        <width>$PARAM[artwidth]</width>
+        <height>$PARAM[artheight]</height>
+        <aspectratio>keep</aspectratio>
+        <texture fallback="DefaultAddon.png" background="true">$INFO[ListItem.Thumb]</texture>
+      </control>
+      <control type="label">
+        <left>$PARAM[labelleft]</left>
+        <top>$PARAM[labeltop]</top>
+        <width>$PARAM[labelwidth]</width>
+        <height>$PARAM[labelheight]</height>
+        <align>center</align>
+        <aligny>center</aligny>
+        <font>InfinityBodyBold</font>
+        <textcolor>$VAR[InfinityCollectiveTextPrimary]</textcolor>
+        <label>$INFO[ListItem.Label]</label>
+      </control>
+      <control type="image">
+        <left>$PARAM[accentleft]</left>
+        <top>$PARAM[accenttop]</top>
+        <width>$PARAM[accentwidth]</width>
+        <height>3</height>
+        <texture colordiffuse="$VAR[InfinityCollectiveAccent]">infinity_ui/contract_white.png</texture>
+      </control>
+    </definition>
+  </include>
+  <variable name="InfinityCompactContinueMoviesPath"><value condition="System.AddonIsEnabled(script.infinity.uirepair)">plugin://script.infinity.uirepair/?action=continue&amp;media=movie&amp;rev=$INFO[Window(Home).Property(Infinity.ContinueWatchingRevision)]</value>
+    <value>plugin://script.infinity.commandcenter/?action=continue&amp;media=movie&amp;rev=$INFO[Window(Home).Property(Infinity.ContinueWatchingRevision)]</value>
+  </variable>
+  <variable name="InfinityCompactContinueTVPath"><value condition="System.AddonIsEnabled(script.infinity.uirepair)">plugin://script.infinity.uirepair/?action=continue&amp;media=tv&amp;rev=$INFO[Window(Home).Property(Infinity.ContinueWatchingRevision)]</value>
+    <value>plugin://script.infinity.commandcenter/?action=continue&amp;media=tv&amp;rev=$INFO[Window(Home).Property(Infinity.ContinueWatchingRevision)]</value>
+  </variable>
+  <include name="InfinityCompactContinueCardNormal">
+    <param name="surfaceleft" />
+    <param name="surfacetop" />
+    <param name="surfacewidth" />
+    <param name="surfaceheight" />
+    <param name="frameleft" />
+    <param name="frametop" />
+    <param name="framewidth" />
+    <param name="frameheight" />
+    <param name="artleft" />
+    <param name="arttop" />
+    <param name="artwidth" />
+    <param name="artheight" />
+    <param name="labelleft" />
+    <param name="labeltop" />
+    <param name="labelwidth" />
+    <param name="labelheight" />
+    <param name="accentleft" />
+    <param name="accenttop" />
+    <param name="accentwidth" />
+    <definition>
+      <control type="image">
+        <left>$PARAM[surfaceleft]</left>
+        <top>$PARAM[surfacetop]</top>
+        <width>$PARAM[surfacewidth]</width>
+        <height>$PARAM[surfaceheight]</height>
+        <texture border="16" colordiffuse="$VAR[InfinityPaletteCardSurface]">infinity_ui/contract_white.png</texture>
+      </control>
+      <control type="image">
+        <left>$PARAM[frameleft]</left>
+        <top>$PARAM[frametop]</top>
+        <width>$PARAM[framewidth]</width>
+        <height>$PARAM[frameheight]</height>
+        <texture border="18" colordiffuse="$VAR[InfinityCollectiveFrameSoft]">infinity_ui/frame_soft.png</texture>
+      </control>
+      <control type="group"><bottom>46.02</bottom>
+        <left>$PARAM[artleft]</left>
+        <top>$PARAM[arttop]</top>
+        <width>$PARAM[artwidth]</width>
+        
+        <control type="image">
+          <aspectratio>scale</aspectratio>
+          <texture fallback="DefaultVideo.png" background="true">$VAR[PosterThumbVar]</texture>
+          <left>0</left>
+          <top>0</top>
+          <width>100%</width>
+          <height>100%</height>
+        </control>
+        <include content="InfinityWatched224Badge">
+          <param name="size" value="28" />
+        </include>
+      </control>
+      <control type="label"><bottom>6.7</bottom>
+        <left>$PARAM[labelleft]</left>
+        
+        <width>$PARAM[labelwidth]</width>
+        <height>35.14</height>
+        <font>InfinityTiny</font>
+        <textcolor>$VAR[InfinityCollectiveTextSecondary]</textcolor>
+        <align>center</align>
+        <aligny>center</aligny>
+        <label>$INFO[ListItem.Label]</label>
+      </control>
+      <control type="image">
+        <left>$PARAM[accentleft]</left>
+        <top>$PARAM[accenttop]</top>
+        <width>$PARAM[accentwidth]</width>
+        <height>2</height>
+        <texture colordiffuse="$VAR[InfinityCollectiveFrameSoft]">infinity_ui/contract_white.png</texture>
+      </control>
+    </definition>
+  </include>
+  <include name="InfinityCompactContinueCardFocused">
+    <param name="surfaceleft" />
+    <param name="surfacetop" />
+    <param name="surfacewidth" />
+    <param name="surfaceheight" />
+    <param name="frameleft" />
+    <param name="frametop" />
+    <param name="framewidth" />
+    <param name="frameheight" />
+    <param name="artleft" />
+    <param name="arttop" />
+    <param name="artwidth" />
+    <param name="artheight" />
+    <param name="labelleft" />
+    <param name="labeltop" />
+    <param name="labelwidth" />
+    <param name="labelheight" />
+    <param name="accentleft" />
+    <param name="accenttop" />
+    <param name="accentwidth" />
+    <definition>
+      <control type="image">
+        <left>$PARAM[surfaceleft]</left>
+        <top>$PARAM[surfacetop]</top>
+        <width>$PARAM[surfacewidth]</width>
+        <height>$PARAM[surfaceheight]</height>
+        <texture border="16" colordiffuse="$VAR[InfinityPaletteCardSurface]">infinity_ui/contract_white.png</texture>
+      </control>
+      <control type="image">
+        <left>$PARAM[frameleft]</left>
+        <top>$PARAM[frametop]</top>
+        <width>$PARAM[framewidth]</width>
+        <height>$PARAM[frameheight]</height>
+        <texture border="18" colordiffuse="$VAR[InfinityCollectiveFrameColor]">infinity_ui/frame.png</texture>
+      </control>
+      <control type="group"><bottom>46.02</bottom>
+        <left>$PARAM[artleft]</left>
+        <top>$PARAM[arttop]</top>
+        <width>$PARAM[artwidth]</width>
+        
+        <control type="image">
+          <aspectratio>scale</aspectratio>
+          <texture fallback="DefaultVideo.png" background="true">$VAR[PosterThumbVar]</texture>
+          <left>0</left>
+          <top>0</top>
+          <width>100%</width>
+          <height>100%</height>
+        </control>
+        <include content="InfinityWatched224Badge">
+          <param name="size" value="28" />
+        </include>
+      </control>
+      <control type="label"><bottom>6.7</bottom>
+        <left>$PARAM[labelleft]</left>
+        
+        <width>$PARAM[labelwidth]</width>
+        <height>35.14</height>
+        <font>InfinityBodyBold</font>
+        <textcolor>$VAR[InfinityCollectiveTextPrimary]</textcolor>
+        <align>center</align>
+        <aligny>center</aligny>
+        <label>$INFO[ListItem.Label]</label>
+      </control>
+      <control type="image">
+        <left>$PARAM[accentleft]</left>
+        <top>$PARAM[accenttop]</top>
+        <width>$PARAM[accentwidth]</width>
+        <height>3</height>
+        <texture colordiffuse="$VAR[InfinityCollectiveAccent]">infinity_ui/contract_white.png</texture>
+      </control>
+    </definition>
+  </include>
+  <variable name="InfinityMoviesPrimaryPath">
+    <value condition="String.IsEqual(Container(9000).ListItem.Property(hubsource),infinity)">plugin://script.infinity.commandcenter/?action=library&amp;media=movie&amp;bucket=watchlist&amp;rev=$INFO[Window(Home).Property(Infinity.ResumeHubRevision)]</value>
+    <value>plugin://plugin.video.umbrella/?action=movies&amp;url=traktwatchlist&amp;folderName=Trakt+Watchlist&amp;reload=$INFO[Window(Home).Property(widgetreload-movies)]</value>
+  </variable>
+  <variable name="InfinityMoviesSecondaryPath">
+    <value condition="String.IsEqual(Container(9000).ListItem.Property(hubsource),infinity)">plugin://script.infinity.commandcenter/?action=library&amp;media=movie&amp;bucket=collection&amp;rev=$INFO[Window(Home).Property(Infinity.ResumeHubRevision)]</value>
+    <value>plugin://plugin.video.umbrella/?action=movies&amp;url=traktcollection&amp;folderName=Collection&amp;reload=$INFO[Window(Home).Property(widgetreload-movies)]</value>
+  </variable>
+  <variable name="InfinityTVPrimaryPath">
+    <value condition="String.IsEqual(Container(9000).ListItem.Property(hubsource),infinity)">plugin://script.infinity.commandcenter/?action=library&amp;media=tv&amp;bucket=next&amp;rev=$INFO[Window(Home).Property(Infinity.ResumeHubRevision)]</value>
+    <value>plugin://plugin.video.umbrella/?action=calendar&amp;url=progress&amp;folderName=Progress+Episodes&amp;reload=$INFO[Window(Home).Property(widgetreload)]$INFO[Window(Home).Property(widgetreload2)]</value>
+  </variable>
+  <variable name="InfinityTVSecondaryPath">
+    <value condition="String.IsEqual(Container(9000).ListItem.Property(hubsource),infinity)">plugin://script.infinity.commandcenter/?action=library&amp;media=tv&amp;bucket=progress&amp;rev=$INFO[Window(Home).Property(Infinity.ResumeHubRevision)]</value>
+    <value>plugin://plugin.video.umbrella/?action=shows_progress&amp;url=progresstv&amp;folderName=Progress+Shows&amp;reload=$INFO[Window(Home).Property(widgetreload)]$INFO[Window(Home).Property(widgetreload2)]</value>
+  </variable>
+  <variable name="InfinityResumeHubWatchedState">
+    <value condition="[String.IsEqual(ListItem.DBTYPE,movie) | String.IsEqual(ListItem.DBTYPE,episode)] + String.IsEqual(ListItem.Property(Infinity.ResumeHub.Watched),false)">false</value>
+    <value condition="String.IsEqual(ListItem.Property(Infinity.ResumeHub.Watched),true)">true</value>
+    <value condition="Integer.IsGreater(ListItem.PlayCount,0)">true</value>
+    <value>false</value>
+  </variable>
+</includes>

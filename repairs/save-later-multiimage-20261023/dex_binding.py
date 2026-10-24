@@ -56,14 +56,16 @@ def prepare(apk,stage,jars,android,d8,out):
     cp,before=inspect(apk,jars,out)
     pins=json.loads((stage/'script.infinity.uirepair/CONTROLLER-PREIMAGES.json').read_text())
     baseline33=json.loads((HERE/'universal/BASE33-CONTROLLER-PINS.json').read_text())
-    required=set(baseline33)|{'provider_inventory.py','title_metadata.py','information.py','selection_contract.py','resources/skins/Default/1080i/InfinityInformation.xml'}
-    if len(baseline33)!=19 or len(required)!=24 or set(pins)!=required:
-        raise RuntimeError('Exact twenty-four-file CC34 controller source inventory required')
+    baseline34=json.loads((HERE/'performance/BASE34-CONTROLLER-PINS.json').read_text())
+    required34=set(baseline33)|{'provider_inventory.py','title_metadata.py','information.py','selection_contract.py','resources/skins/Default/1080i/InfinityInformation.xml'}
+    required=required34|{'resources/skins/Default/1080i/InfinityItemOptions.xml'}
+    if len(baseline33)!=19 or len(required34)!=24 or set(baseline34)!=required34 or len(required)!=25 or set(pins)!=required:
+        raise RuntimeError('Exact twenty-five-file CC35 controller source inventory required')
     # Keep the original DEX string pool exactly unchanged. Adding hash strings
     # previously shifted a protected Cobra string past the 16-bit boundary and
     # widened its instruction. Character payloads avoid that encoded change.
     chars=lambda s:'new String(new char[]{'+','.join(str(ord(c)) for c in s)+'})'
-    inventories=[('0.3.5.31',json.loads((HERE/'tracking/PARENT-CONTROLLER-PINS.json').read_text())),('0.3.5.32',json.loads((HERE/'tracking/final-eight/BASE32-CONTROLLER-PINS.json').read_text())),('0.3.5.33',baseline33),('0.3.5.34',pins)]
+    inventories=[('0.3.5.31',json.loads((HERE/'tracking/PARENT-CONTROLLER-PINS.json').read_text())),('0.3.5.32',json.loads((HERE/'tracking/final-eight/BASE32-CONTROLLER-PINS.json').read_text())),('0.3.5.33',baseline33),('0.3.5.34',baseline34),('0.3.5.35',pins)]
     blocks=[]
     for version, inventory in inventories:
         pairs=',\n'.join('      {'+chars(n)+','+chars(h)+'}' for n,h in sorted(inventory.items()))

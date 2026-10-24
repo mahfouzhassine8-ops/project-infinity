@@ -27,7 +27,7 @@ SOURCE='0f1b28feb7cff502a9c3714583d1785d6e6eb7e909fe11f96fd72f463f6f7f8b'
 MAP='a520d539329a3b95c5f868836a5ae8e06e3bea0d21b622089d7ff9c7aefa657f'
 ENGINE='lib/arm64-v8a/libkodi.so';RECORDER='lib/arm64-v8a/libinfinitycrash.so'
 SIGNATURE=re.compile(r'META-INF/(?:MANIFEST\.MF|[^/]+\.(?:SF|RSA|DSA|EC))',re.I)
-NAME='Infinity-2103401-Universal-Search-OptionB-QA.apk'
+NAME='Infinity-2103401-Universal-Performance-QA.apk'
 
 
 def sha(raw):return hashlib.sha256(raw).hexdigest()
@@ -44,6 +44,8 @@ def parent_apk(folder):
 
 def prepare(parent,modes):
     apk=parent_apk(parent)
+    reference=load('performance_signed_reference',HERE/'performance/reference.py')
+    reference_proof=reference.verify(ROOT/'signed-universal-reference',Path(os.environ['ANDROID_HOME'])/'build-tools/34.0.0')
     if digest(parent/'Infinity-Universal-Source-and-Evidence.zip')!=SOURCE or digest(parent/'NATIVE-SOURCE-MAP.json')!=MAP:
         raise RuntimeError('Exact RC8 source receipts required')
     expected=json.loads((parent/'NATIVE-SOURCE-MAP.json').read_text())
@@ -51,7 +53,7 @@ def prepare(parent,modes):
     native=ROOT/'kodi';baseline=ROOT/'baseline-native'
     for path in (OUT,native,baseline,ROOT/'targeted-component-base',ROOT/'targeted-component-overlay',ROOT/'targeted-native-overlay'):
         if path.exists():raise RuntimeError('Refusing stale build output: '+str(path))
-    OUT.mkdir();base=ROOT/'targeted-component-base'
+    OUT.mkdir();save(OUT/'SIGNED34-REFERENCE.json',reference_proof);base=ROOT/'targeted-component-base'
     with ZipFile(apk) as archive:
         if len(archive.namelist())!=len(set(archive.namelist())) or archive.testzip():raise RuntimeError('Invalid input APK')
         for n in archive.namelist():
@@ -91,10 +93,14 @@ def prepare(parent,modes):
     delta.update(navigation_native.apply(native,overlay))
     delta.update(owner_binding.bind(native,base,components,overlay))
     delta.update(final_eight_native.apply(native,overlay))
+    selection=load('performance_selection_native',HERE/'performance/selection_native.py')
+    delta.update(selection.apply(native,overlay))
     # This adapter changes only the Infinity Option B XML window resize path;
     # its exact source preimage and owner predicate are verified separately.
     information_native=load('universal_information_native',HERE/'universal/information_native.py')
     delta.update(information_native.apply(native,overlay))
+    popup=load('performance_popup_native',HERE/'performance/popup_native.py')
+    delta.update(popup.apply(native,overlay))
     for n,v in delta.items():
         path=native/n;path.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(overlay/n,path)
     final=dict(expected,**{n:v['final_sha256'] for n,v in delta.items()})
@@ -113,7 +119,7 @@ def compile_engine():
     old.OUT=OUT
     proof=old.compile_engine()
     data=(OUT/'libkodi.so').read_bytes()
-    for marker in (b'multiimage-enumeration',b'multiimage_directory_backend_unverified',b'multiimage_operation_did_not_reach_verified_boundary',b'0.3.5.31',b'0.3.5.32',b'0.3.5.33',b'0.3.5.34',b'Infinity.SavedNavigation.Protocol',b'INFINITY_SAVED_ROUTE_FAILED',b'Infinity.SavedNavigation.Lookup.Protocol'):
+    for marker in (b'multiimage-enumeration',b'multiimage_directory_backend_unverified',b'multiimage_operation_did_not_reach_verified_boundary',b'0.3.5.31',b'0.3.5.32',b'0.3.5.33',b'0.3.5.34',b'0.3.5.35',b'Infinity.SavedNavigation.Protocol',b'INFINITY_SAVED_ROUTE_FAILED',b'Infinity.SavedNavigation.Lookup.Protocol'):
         if marker not in data:raise RuntimeError('Compiled correction missing: '+repr(marker))
     pins=json.loads((ROOT/'targeted-component-overlay/script.infinity.uirepair/CONTROLLER-PREIMAGES.json').read_text())
     if not all(pin.encode() in data for pin in pins.values()):raise RuntimeError('Compiled exact controller source pins absent')
@@ -214,8 +220,8 @@ def package(parent,dex,out):
         native_abi=abi,version_code=2103401,manifest_unchanged=True,
         permanent_certificate_sha256=delivery.CERT,signature_schemes_verified=[1,2,3],
         matching_component_versions={k:v[1] for k,v in component_contract.VERSIONS.items()},
-        passed_signed_reference_build='40070986647',
-        focused_scope='Universal capability inventory and Search, shared exact-title selection and retained popup, Option B full synopsis, ZIP header correction, coordinated exact component bindings; native crash cause unresolved',
+        passed_signed_reference_build='40086558043',
+        focused_scope='Retained Universal Search, shared selection, Option B full synopsis and ZIP repair; measured provider, saved-render, service and popup work reductions; owned responsive reflow and rail bounds; exact CC35 bindings; native crash cause unresolved',
         native_source_count=9407,original_native_files_changed=13,new_native_files=3,
         cobra_definitions_changed=[],provider_code_changed=False,user_profile_changed=False,
         rc8_receipt_and_universal_observer_sources_unchanged=True,
@@ -231,7 +237,7 @@ def package(parent,dex,out):
             record['test_result']='NOT_RUN_IN_PACKAGING; compilation/source binding verified; selected tests reported separately'
     save(out/'SOURCE-DELTA.json',delta)
     save(out/'VERIFICATION-STATUS.json',verification)
-    for n in ('NATIVE-SOURCE-MAP.json','ENGINE-PROOF.json'):
+    for n in ('NATIVE-SOURCE-MAP.json','ENGINE-PROOF.json','SIGNED34-REFERENCE.json'):
         shutil.copyfile(OUT/n,out/n)
     shutil.copyfile(HERE/'qualification/CACHE-EVIDENCE.json',out/'CACHE-EVIDENCE.json')
     shutil.copyfile(HERE/'qualification/CACHE-SCHEMA-EVIDENCE.json',out/'CACHE-SCHEMA-EVIDENCE.json')
@@ -251,7 +257,7 @@ def package(parent,dex,out):
         protected_opcode_widening_permitted=False,cobra_definitions_changed=[],
         rc8_receipt_and_close_definitions_changed=[],actual_android_verified=False,
         physical_fold_verified=False,
-        lineage=['original RC8 primary','exact CC34 source-admission change',
+        lineage=['original RC8 primary','exact CC35 source-admission change retaining CC34',
                  'Infinity Search101 helper relocation; every other class exact'])
     save(out/'DEX-PRESERVATION.json',combined_dex)
     save(out/'SEARCH-DEX-PRESERVATION.json',searchproof)

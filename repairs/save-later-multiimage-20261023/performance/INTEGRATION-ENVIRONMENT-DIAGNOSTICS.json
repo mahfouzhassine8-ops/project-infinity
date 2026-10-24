@@ -1,0 +1,12 @@
+{
+  "selected_check": "signed34 input verification before coordinated35 staging",
+  "initial_attempts": [
+    {"result":"BLOCKED", "cause":"Local extracted Android apksigner lacked executable mode", "log":"integration35-performance-permission-attempt.log"},
+    {"result":"BLOCKED", "cause":"Local extracted Android zipalign lacked executable mode after cross-call mode reset", "log":"integration35-performance-mode-attempt.log"}
+  ],
+  "correction": "Set executable mode on the existing official apksigner, zipalign and d8 tools in the same host orchestration process before invoking them; no tool bytes or verification requirements changed",
+  "retry": "Actual permanently signed APK, schemes1/2/3, zip alignment, all component ZIP members and24 controller source pins passed",
+  "android_runtime": "NOT RUN",
+  "physical_fold": "NOT RUN",
+  "shutdown": "NOT RUN; independent"
+}

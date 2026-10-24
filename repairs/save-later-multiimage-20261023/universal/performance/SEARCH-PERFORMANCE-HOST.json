@@ -1,0 +1,23 @@
+{
+  "android17": "NOT RUN",
+  "checks": 7,
+  "failed": [],
+  "passed": [
+    "test_actual_reviewed_provider_capabilities_match_committed34",
+    "test_shared_sources_read_and_fingerprinted_once_per_cold_verification",
+    "test_refresh_stamps_only_manifest_matched_candidate_sources",
+    "test_same_version_source_manifest_disable_and_removal_still_refresh",
+    "test_wrong_identity_symlink_and_changed_exact_source_fail_closed",
+    "test_submission_does_not_hash_before_firstparty_results_dispatch",
+    "test_real_request_still_validates_before_and_after_provider_execution"
+  ],
+  "physical_fold": "NOT RUN",
+  "preserved_reference": "c0dba465; universal overlay34 unchanged",
+  "schema": 1,
+  "selected_test": "python3 repairs/save-later-multiimage-20261023/universal/performance/test_search_performance.py",
+  "shutdown": "NOT RUN; independent",
+  "source_sha256": {
+    "infinity_search.py": "fb469b20cea3fd86e7eec454aba7ae25d14472d9ebddea36120841925c170be0",
+    "provider_inventory.py": "6533bcaf90d161a9ff188c57c686efdf9e8f29ef4c9d6de589f09e91da561145"
+  }
+}

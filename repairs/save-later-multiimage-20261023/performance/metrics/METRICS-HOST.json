@@ -1,0 +1,43 @@
+{
+  "actual_android_verified": false,
+  "device_observation": "NOT RUN",
+  "passed": true,
+  "physical_fold_verified": false,
+  "relative_imports_preserved": true,
+  "relocation_byte_identical": true,
+  "selected_command": "python3 -m unittest -v test_android_metrics",
+  "shutdown": "NOT RUN",
+  "source_sha256": {
+    "DEVICE-METRICS-SELECTION.md": "a8f7d1496d411d04300051102057220d848efced65dbd51a3833f1fb08d0c528",
+    "android_metrics.py": "121272b2fab38b17b73ac5558bdaa6fa3d7afd0dcd91bac5da804e083d451f72",
+    "test_android_metrics.py": "1e38e1f2c60e424025982e0563cc1385a348803b49b98ebade1bde62cdadd373"
+  },
+  "tests": [
+    {
+      "name": "test_admission_rejects_other_api_and_unselected_physical_device",
+      "status": "PASS"
+    },
+    {
+      "name": "test_distinct_windows_do_not_collapse_same_vsync_timestamp",
+      "status": "PASS"
+    },
+    {
+      "name": "test_invalid_flagged_and_pending_frames_are_not_zero_time_passes",
+      "status": "PASS"
+    },
+    {
+      "name": "test_only_new_completed_hwui_frames_count",
+      "status": "PASS"
+    },
+    {
+      "name": "test_stat_fields_name_spaces_and_resource_units",
+      "status": "PASS"
+    },
+    {
+      "name": "test_unknown_units_and_missing_frames_are_explicit",
+      "status": "PASS"
+    }
+  ],
+  "tests_rerun_for_relocation": false,
+  "verification_kind": "Six previously executed synthetic parser/admission checks; evidence retained after byte-identical relocation"
+}

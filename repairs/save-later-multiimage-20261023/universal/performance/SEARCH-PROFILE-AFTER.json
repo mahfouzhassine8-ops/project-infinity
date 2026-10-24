@@ -1,0 +1,324 @@
+{
+  "android17": "NOT RUN",
+  "caveats": [
+    "Signed33 admits fewer providers; signed33/current34 aggregate discovery timings are not equivalent-capability comparisons.",
+    "Only current34-to-optimized results use identical provider contracts, fixture set and workloads.",
+    "OS file cache is warm; cold means a fresh Infinity invocation inventory, not cold flash storage.",
+    "No providers executed. No GUI, network, Android/Fold loading latency, frame-pacing or FPS measured."
+  ],
+  "environment": "Local CPython host; actual provider source bytes; Kodi inventory, UI and dispatch stubbed",
+  "phase": "after",
+  "physical_fold": "NOT RUN",
+  "results": {
+    "optimized": {
+      "admitted_providers": [
+        "plugin.video.pov",
+        "plugin.video.homelander",
+        "plugin.video.otaku",
+        "plugin.video.watchnixtoons2"
+      ],
+      "cold_discovery": {
+        "hot_functions": [
+          {
+            "calls": 1,
+            "cumulative_ms": 184.292,
+            "file": "infinity_search.py",
+            "function": "providers",
+            "line": 35,
+            "self_ms": 0.005
+          },
+          {
+            "calls": 1,
+            "cumulative_ms": 184.287,
+            "file": "provider_inventory.py",
+            "function": "eligible",
+            "line": 264,
+            "self_ms": 0.024
+          },
+          {
+            "calls": 1,
+            "cumulative_ms": 184.09,
+            "file": "provider_inventory.py",
+            "function": "snapshot",
+            "line": 225,
+            "self_ms": 0.047
+          },
+          {
+            "calls": 1,
+            "cumulative_ms": 182.725,
+            "file": "provider_inventory.py",
+            "function": "_scan",
+            "line": 183,
+            "self_ms": 0.399
+          },
+          {
+            "calls": 4,
+            "cumulative_ms": 177.945,
+            "file": "provider_inventory.py",
+            "function": "_verify",
+            "line": 138,
+            "self_ms": 2.617
+          },
+          {
+            "calls": 8,
+            "cumulative_ms": 162.84,
+            "file": "saved_navigation.py",
+            "function": "fingerprint",
+            "line": 54,
+            "self_ms": 0.109
+          },
+          {
+            "calls": 18307,
+            "cumulative_ms": 74.436,
+            "file": "saved_navigation.py",
+            "function": "generic_visit",
+            "line": 67,
+            "self_ms": 11.181
+          },
+          {
+            "calls": 32,
+            "cumulative_ms": 12.872,
+            "file": "saved_navigation.py",
+            "function": "_source",
+            "line": 79,
+            "self_ms": 0.371
+          },
+          {
+            "calls": 306,
+            "cumulative_ms": 3.963,
+            "file": "saved_navigation.py",
+            "function": "<genexpr>",
+            "line": 83,
+            "self_ms": 0.305
+          },
+          {
+            "calls": 4,
+            "cumulative_ms": 1.613,
+            "file": "provider_inventory.py",
+            "function": "_manifest",
+            "line": 124,
+            "self_ms": 0.042
+          },
+          {
+            "calls": 4,
+            "cumulative_ms": 1.607,
+            "file": "provider_inventory.py",
+            "function": "_stamp",
+            "line": 108,
+            "self_ms": 0.155
+          },
+          {
+            "calls": 2526,
+            "cumulative_ms": 1.541,
+            "file": "saved_navigation.py",
+            "function": "visit_Constant",
+            "line": 63,
+            "self_ms": 1.092
+          }
+        ],
+        "max_ms": 69.659,
+        "median_ms": 63.211,
+        "min_ms": 55.224,
+        "provider_lstat_calls": 126,
+        "source_bytes": 669396,
+        "source_reads": 32
+      },
+      "cold_search_submission": {
+        "hot_functions": [
+          {
+            "calls": 1,
+            "cumulative_ms": 178.052,
+            "file": "infinity_search.py",
+            "function": "open_search",
+            "line": 228,
+            "self_ms": 0.012
+          },
+          {
+            "calls": 1,
+            "cumulative_ms": 178.04,
+            "file": "infinity_search.py",
+            "function": "_open_search",
+            "line": 234,
+            "self_ms": 0.066
+          },
+          {
+            "calls": 2,
+            "cumulative_ms": 177.364,
+            "file": "infinity_search.py",
+            "function": "providers",
+            "line": 35,
+            "self_ms": 0.007
+          },
+          {
+            "calls": 2,
+            "cumulative_ms": 177.357,
+            "file": "provider_inventory.py",
+            "function": "eligible",
+            "line": 264,
+            "self_ms": 0.054
+          },
+          {
+            "calls": 2,
+            "cumulative_ms": 176.944,
+            "file": "provider_inventory.py",
+            "function": "snapshot",
+            "line": 225,
+            "self_ms": 0.052
+          },
+          {
+            "calls": 2,
+            "cumulative_ms": 174.618,
+            "file": "provider_inventory.py",
+            "function": "_scan",
+            "line": 183,
+            "self_ms": 0.208
+          },
+          {
+            "calls": 4,
+            "cumulative_ms": 167.405,
+            "file": "provider_inventory.py",
+            "function": "_verify",
+            "line": 138,
+            "self_ms": 2.164
+          },
+          {
+            "calls": 8,
+            "cumulative_ms": 154.11,
+            "file": "saved_navigation.py",
+            "function": "fingerprint",
+            "line": 54,
+            "self_ms": 0.105
+          },
+          {
+            "calls": 18307,
+            "cumulative_ms": 70.414,
+            "file": "saved_navigation.py",
+            "function": "generic_visit",
+            "line": 67,
+            "self_ms": 10.53
+          },
+          {
+            "calls": 32,
+            "cumulative_ms": 11.496,
+            "file": "saved_navigation.py",
+            "function": "_source",
+            "line": 79,
+            "self_ms": 0.374
+          },
+          {
+            "calls": 306,
+            "cumulative_ms": 3.485,
+            "file": "saved_navigation.py",
+            "function": "<genexpr>",
+            "line": 83,
+            "self_ms": 0.323
+          },
+          {
+            "calls": 8,
+            "cumulative_ms": 3.345,
+            "file": "provider_inventory.py",
+            "function": "_stamp",
+            "line": 108,
+            "self_ms": 0.308
+          }
+        ],
+        "max_ms": 84.368,
+        "median_ms": 62.266,
+        "min_ms": 56.85,
+        "provider_lstat_calls": 130,
+        "source_bytes": 669396,
+        "source_reads": 32
+      },
+      "dispatch_sample": [
+        "ActivateWindow(Videos,\"plugin://script.infinity.commandcenter/?action=search-provider&media=movie&query=The+Matrix&provider=plugin.video.pov\",return)"
+      ],
+      "source_sha256": {
+        "inventory": "6533bcaf90d161a9ff188c57c686efdf9e8f29ef4c9d6de589f09e91da561145",
+        "search": "fb469b20cea3fd86e7eec454aba7ae25d14472d9ebddea36120841925c170be0"
+      },
+      "warm_refresh": {
+        "hot_functions": [
+          {
+            "calls": 1,
+            "cumulative_ms": 4.121,
+            "file": "infinity_search.py",
+            "function": "providers",
+            "line": 35,
+            "self_ms": 0.003
+          },
+          {
+            "calls": 1,
+            "cumulative_ms": 4.118,
+            "file": "provider_inventory.py",
+            "function": "eligible",
+            "line": 264,
+            "self_ms": 0.024
+          },
+          {
+            "calls": 1,
+            "cumulative_ms": 3.915,
+            "file": "provider_inventory.py",
+            "function": "snapshot",
+            "line": 225,
+            "self_ms": 0.027
+          },
+          {
+            "calls": 1,
+            "cumulative_ms": 2.604,
+            "file": "provider_inventory.py",
+            "function": "_scan",
+            "line": 183,
+            "self_ms": 0.049
+          },
+          {
+            "calls": 4,
+            "cumulative_ms": 1.497,
+            "file": "provider_inventory.py",
+            "function": "_stamp",
+            "line": 108,
+            "self_ms": 0.144
+          },
+          {
+            "calls": 1,
+            "cumulative_ms": 0.33,
+            "file": "provider_inventory.py",
+            "function": "_contracts",
+            "line": 80,
+            "self_ms": 0.045
+          },
+          {
+            "calls": 1,
+            "cumulative_ms": 0.125,
+            "file": "provider_inventory.py",
+            "function": "_rpc",
+            "line": 47,
+            "self_ms": 0.005
+          },
+          {
+            "calls": 4,
+            "cumulative_ms": 0.004,
+            "file": "provider_inventory.py",
+            "function": "<lambda>",
+            "line": 221,
+            "self_ms": 0.003
+          },
+          {
+            "calls": 22,
+            "cumulative_ms": 0.003,
+            "file": "provider_inventory.py",
+            "function": "<genexpr>",
+            "line": 99,
+            "self_ms": 0.003
+          }
+        ],
+        "max_ms": 3.031,
+        "median_ms": 1.176,
+        "min_ms": 1.07,
+        "provider_lstat_calls": 4,
+        "source_bytes": 0,
+        "source_reads": 0
+      }
+    }
+  },
+  "schema": 1
+}

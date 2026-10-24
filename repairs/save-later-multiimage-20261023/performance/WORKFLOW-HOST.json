@@ -1,0 +1,20 @@
+{
+  "host": "PASS",
+  "tests": 6,
+  "scope": "Focused WorkflowIsolation after adding performance source paths and signed34 reference artifact; no runtime authorization changes",
+  "workflow_sha256": "98ab37c9e7343738e4620ca3c57f1ec1df9ce2269c2823eee06491d9c444b283",
+  "test_sha256": "793022919d994065b2dcfc56a47e2ef3b196d09c3af57a1b5a2b046c640ff88d",
+  "android17": "NOT RUN",
+  "physical_fold": "NOT RUN",
+  "shutdown": "NOT RUN",
+  "final_build_integration_rechecks": {
+    "tests": [
+      "WorkflowIsolation.test_packaging_requires_integrity_not_behavior_reports",
+      "WorkflowIsolation.test_embedded_python_and_shell_parse"
+    ],
+    "status": "PASS",
+    "build_py_sha256": "61da3c444016beae9463facd2385cfa9e5fa4bd337a97f596887554715664d85",
+    "reason": "Final build integration and added exact performance/reference.py push path"
+  },
+  "prior_workflow_sha256": "3fdbe8a7ee6f082075b4ef8faeb43e0dbf9893534d48eb293f6366f48aab6462"
+}

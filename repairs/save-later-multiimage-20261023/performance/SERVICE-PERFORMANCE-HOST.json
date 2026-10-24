@@ -1,0 +1,74 @@
+{
+  "host": "PASS",
+  "source_sha256": "8c29fcd7f0ff858ee58b7ce7edadd9ebefa5b818ce686c9930876c75d03ff548",
+  "candidate_sha256": "ca9233507680c5d013468a38d4996bb54389ebe4d3e2410df8c241dd8340f6c5",
+  "cold_actual_method_sequence": {
+    "before": {
+      "admissions": 9,
+      "scope_entries": 13,
+      "json_reads": 5,
+      "json_writes": 5,
+      "property_reads": 36,
+      "property_changes": 13
+    },
+    "after": {
+      "admissions": 8,
+      "scope_entries": 12,
+      "json_reads": 5,
+      "json_writes": 5,
+      "property_reads": 36,
+      "property_changes": 13
+    }
+  },
+  "warm_60_seconds_120_ticks": {
+    "before": {
+      "admissions": 120,
+      "scope_entries": 120,
+      "json_reads": 0,
+      "json_writes": 0,
+      "property_reads": 480,
+      "property_changes": 0
+    },
+    "after": {
+      "admissions": 0,
+      "scope_entries": 0,
+      "json_reads": 0,
+      "json_writes": 0,
+      "property_reads": 480,
+      "property_changes": 0
+    }
+  },
+  "all_four_live_policies_match": true,
+  "five_incomplete_flag_paths_match": true,
+  "prior_methods_byte_identical": true,
+  "host_microbenchmark": {
+    "before": {
+      "median_ns_per_call": 1783.3,
+      "samples_ns_per_call": [
+        1766.2,
+        1795.5,
+        1795.0,
+        1800.1,
+        1761.0,
+        1783.3,
+        1745.4
+      ]
+    },
+    "after": {
+      "median_ns_per_call": 721.9,
+      "samples_ns_per_call": [
+        698.5,
+        698.5,
+        721.9,
+        724.6,
+        717.2,
+        732.0,
+        766.9
+      ]
+    }
+  },
+  "timing_limit": "In-memory boundary; no synthetic delays, not Android CPU/frame pacing",
+  "android": "NOT RUN",
+  "physical_fold": "NOT RUN",
+  "shutdown": "NOT RUN; independent"
+}

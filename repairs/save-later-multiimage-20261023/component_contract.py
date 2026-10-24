@@ -17,7 +17,8 @@ BASE_VERSIONS={k:(v[0], {'script.infinity.commandcenter':'0.3.5.32', 'script.inf
 
 FINAL_EIGHT_VERSIONS={k:(v[0], {'script.infinity.commandcenter':'0.3.5.33', 'script.infinity.watchedbridge':'1.0.14', 'script.infinity.uirepair':'0.1.16', 'skin.infinity.diggz':'1.0.5.240'}[k]) for k,v in BASE_VERSIONS.items()}
 
-VERSIONS={k:(v[0], {'script.infinity.commandcenter':'0.3.5.34', 'script.infinity.watchedbridge':'1.0.15', 'script.infinity.uirepair':'0.1.17', 'skin.infinity.diggz':'1.0.5.241'}[k]) for k,v in FINAL_EIGHT_VERSIONS.items()}
+UNIVERSAL_VERSIONS={k:(v[0], {'script.infinity.commandcenter':'0.3.5.34', 'script.infinity.watchedbridge':'1.0.15', 'script.infinity.uirepair':'0.1.17', 'skin.infinity.diggz':'1.0.5.241'}[k]) for k,v in FINAL_EIGHT_VERSIONS.items()}
+VERSIONS={k:(v[0], {'script.infinity.commandcenter':'0.3.5.35', 'script.infinity.watchedbridge':'1.0.16', 'script.infinity.uirepair':'0.1.18', 'skin.infinity.diggz':'1.0.5.242'}[k]) for k,v in UNIVERSAL_VERSIONS.items()}
 NEW_CONTROLLER_FILES={'provider_inventory.py','title_metadata.py','information.py','selection_contract.py','resources/skins/Default/1080i/InfinityInformation.xml'}
 
 def once(source,before,after):
@@ -162,7 +163,7 @@ def stage(source,output,contracts):
         elif hashlib.sha256(current(name)).hexdigest()!=preimages[name]:
             raise RuntimeError('Universal source preimage mismatch: '+name)
         changed[name]=p.read_bytes()
-    for addon,(_,new) in VERSIONS.items():
+    for addon,(_,new) in UNIVERSAL_VERSIONS.items():
         name=addon+'/addon.xml';old=FINAL_EIGHT_VERSIONS[addon][1]
         changed[name]=once(current(name),('version="'+old+'"').encode(),('version="'+new+'"').encode())
     name='script.infinity.commandcenter/checkpoint_runtime.py'
@@ -181,6 +182,60 @@ def stage(source,output,contracts):
         ('BRIDGE_PINS = '+repr(dict(sorted(bridge.items())))+'\n').encode())
     required=set(baseline33)|NEW_CONTROLLER_FILES
     if len(baseline33)!=19 or len(required)!=24:raise RuntimeError('CC34 named source inventory drifted')
+    pins={name:hashlib.sha256(current('script.infinity.commandcenter/'+name)).hexdigest() for name in required}
+    for consumer in ('script.infinity.watchedbridge','script.infinity.uirepair'):
+        changed[consumer+'/CONTROLLER-PREIMAGES.json']=(json.dumps(pins,indent=2,sort_keys=True)+'\n').encode()
+    # Retain the literal signed CC34 sources/admission before appending the
+    # separately reviewed performance release. No prior overlay is overwritten.
+    performance=HERE/'performance'
+    baseline34=json.loads((performance/'BASE34-CONTROLLER-PINS.json').read_text())
+    if pins!=baseline34:raise RuntimeError('Signed CC34 reconstruction drifted')
+    preimages=json.loads((performance/'OVERLAY-PREIMAGES.json').read_text())
+    approved={
+        'script.infinity.commandcenter/provider_inventory.py',
+        'script.infinity.commandcenter/infinity_search.py',
+        'script.infinity.commandcenter/plugin.py',
+        'script.infinity.commandcenter/resume_hub.py',
+        'script.infinity.commandcenter/service.py',
+        'script.infinity.commandcenter/information.py',
+        'script.infinity.commandcenter/infinity_settings.py',
+        'script.infinity.commandcenter/resources/skins/Default/1080i/InfinityItemOptions.xml',
+        'script.infinity.uirepair/plugin.py',
+        'script.infinity.uirepair/popup.py',
+        'script.infinity.uirepair/resources/skins/Default/1080i/InfinityItemOptions.xml',
+        'skin.infinity.diggz/unified/InfinityItemOptions.xml',
+        'skin.infinity.diggz/unified/Home.xml',
+        'skin.infinity.diggz/unified/Includes_InfinityHomeUnified.xml',
+    }
+    overlay=performance/'overlay'
+    files={p.relative_to(overlay).as_posix():p for p in overlay.rglob('*') if p.is_file() and '__pycache__' not in p.parts}
+    if set(files)!=approved or set(preimages)!=approved or any(h is None for h in preimages.values()):
+        raise RuntimeError('Unreviewed performance component inventory')
+    for name,path in files.items():
+        if hashlib.sha256(current(name)).hexdigest()!=preimages[name]:
+            raise RuntimeError('Performance signed34 preimage mismatch: '+name)
+        changed[name]=path.read_bytes()
+    for addon,(_,new) in VERSIONS.items():
+        name=addon+'/addon.xml';old=UNIVERSAL_VERSIONS[addon][1]
+        changed[name]=once(current(name),('version="'+old+'"').encode(),('version="'+new+'"').encode())
+    name='script.infinity.commandcenter/checkpoint_runtime.py'
+    changed[name]=once(current(name),b'ADDON_VERSION = "0.3.5.34"',b'ADDON_VERSION = "0.3.5.35"')
+    name='script.infinity.watchedbridge/controller.py'
+    changed[name]=once(current(name),b'"0.3.5.34"',b'"0.3.5.35"')
+    name='script.infinity.commandcenter/infinity_trakt.py'
+    changed[name]=once(once(current(name),b"'1.0.15'",b"'1.0.16'"),b"'0.3.5.34'",b"'0.3.5.35'")
+    trakt=current(name)
+    assignment=next(n for n in ast.parse(trakt).body if isinstance(n,ast.Assign) and
+        any(isinstance(t,ast.Name) and t.id=='BRIDGE_PINS' for t in n.targets))
+    bridge=ast.literal_eval(assignment.value)
+    for file in bridge:bridge[file]=hashlib.sha256(current('script.infinity.watchedbridge/'+file)).hexdigest()
+    lines=trakt.splitlines(keepends=True)
+    changed[name]=once(trakt,b''.join(lines[assignment.lineno-1:assignment.end_lineno]),
+        ('BRIDGE_PINS = '+repr(dict(sorted(bridge.items())))+'\n').encode())
+    # The popup XML already existed in CC34; CC35 now verifies that dependency
+    # explicitly as well. This is an added pin, not an added runtime file.
+    required=set(baseline34)|{'resources/skins/Default/1080i/InfinityItemOptions.xml'}
+    if len(baseline34)!=24 or len(required)!=25:raise RuntimeError('CC35 named source inventory drifted')
     pins={name:hashlib.sha256(current('script.infinity.commandcenter/'+name)).hexdigest() for name in required}
     for consumer in ('script.infinity.watchedbridge','script.infinity.uirepair'):
         changed[consumer+'/CONTROLLER-PREIMAGES.json']=(json.dumps(pins,indent=2,sort_keys=True)+'\n').encode()

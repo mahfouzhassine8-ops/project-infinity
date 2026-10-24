@@ -1,0 +1,239 @@
+{
+  "android_rendering": "NOT RUN",
+  "artwork": {
+    "changed_owned_templates": 10,
+    "frames": "NOT MEASURED",
+    "proven_change": "Local nonbundled artwork uses existing large-image asynchronous branch; bundled fast path retained",
+    "remote_behavior": "Already asynchronous; no improvement claimed"
+  },
+  "continue_actual_native_rects": [
+    {
+      "after_card_height": 410.0,
+      "after_card_width": 230.1,
+      "available_height": 483.999,
+      "logical_height": 2400.0,
+      "old_card_height": 410
+    },
+    {
+      "after_card_height": 410.0,
+      "after_card_width": 230.1,
+      "available_height": 497.626,
+      "logical_height": 2456.0,
+      "old_card_height": 410
+    },
+    {
+      "after_card_height": 271.813,
+      "after_card_width": 152.547,
+      "available_height": 271.813,
+      "logical_height": 1528.0,
+      "old_card_height": 410
+    },
+    {
+      "after_card_height": 156.96,
+      "after_card_width": 88.0888,
+      "available_height": 156.96,
+      "logical_height": 1056.0,
+      "old_card_height": 410
+    },
+    {
+      "after_card_height": 162.8,
+      "after_card_width": 91.3663,
+      "available_height": 162.8,
+      "logical_height": 1080.0,
+      "old_card_height": 410
+    },
+    {
+      "after_card_height": 250.399,
+      "after_card_width": 140.529,
+      "available_height": 250.399,
+      "logical_height": 1440.0,
+      "old_card_height": 410
+    }
+  ],
+  "errors": 0,
+  "failures": 0,
+  "frame_pacing": "NOT MEASURED",
+  "information": {
+    "after": {
+      "geometry_reads": 8,
+      "gesture_geometry_reads": 0,
+      "image_binds": 1,
+      "resize_geometry_reads": 4
+    },
+    "before": {
+      "geometry_reads": 12008,
+      "gesture_geometry_reads": 12000,
+      "image_binds": 1,
+      "resize_geometry_reads": 4
+    },
+    "dataset": "1000 gesture cycles: action + irrelevant click + focus"
+  },
+  "passed": true,
+  "physical_fold": "NOT RUN",
+  "popup_bounds": [
+    {
+      "after_overflow": false,
+      "before_overflow": false,
+      "rows": 1,
+      "view": [
+        1920,
+        1080
+      ]
+    },
+    {
+      "after_overflow": false,
+      "before_overflow": false,
+      "rows": 3,
+      "view": [
+        1920,
+        1080
+      ]
+    },
+    {
+      "after_overflow": false,
+      "before_overflow": false,
+      "rows": 12,
+      "view": [
+        1920,
+        1080
+      ]
+    },
+    {
+      "after_overflow": false,
+      "before_overflow": false,
+      "rows": 1,
+      "view": [
+        1080,
+        2400
+      ]
+    },
+    {
+      "after_overflow": false,
+      "before_overflow": false,
+      "rows": 3,
+      "view": [
+        1080,
+        2400
+      ]
+    },
+    {
+      "after_overflow": false,
+      "before_overflow": false,
+      "rows": 12,
+      "view": [
+        1080,
+        2400
+      ]
+    },
+    {
+      "after_overflow": false,
+      "before_overflow": true,
+      "rows": 1,
+      "view": [
+        640,
+        360
+      ]
+    },
+    {
+      "after_overflow": false,
+      "before_overflow": true,
+      "rows": 3,
+      "view": [
+        640,
+        360
+      ]
+    },
+    {
+      "after_overflow": false,
+      "before_overflow": true,
+      "rows": 12,
+      "view": [
+        640,
+        360
+      ]
+    },
+    {
+      "after_overflow": false,
+      "before_overflow": true,
+      "rows": 1,
+      "view": [
+        500,
+        300
+      ]
+    },
+    {
+      "after_overflow": false,
+      "before_overflow": true,
+      "rows": 3,
+      "view": [
+        500,
+        300
+      ]
+    },
+    {
+      "after_overflow": false,
+      "before_overflow": true,
+      "rows": 12,
+      "view": [
+        500,
+        300
+      ]
+    },
+    {
+      "after_overflow": false,
+      "before_overflow": true,
+      "rows": 1,
+      "view": [
+        320,
+        200
+      ]
+    },
+    {
+      "after_overflow": false,
+      "before_overflow": true,
+      "rows": 3,
+      "view": [
+        320,
+        200
+      ]
+    },
+    {
+      "after_overflow": false,
+      "before_overflow": true,
+      "rows": 12,
+      "view": [
+        320,
+        200
+      ]
+    },
+    {
+      "after_overflow": false,
+      "before_overflow": true,
+      "rows": 1,
+      "view": [
+        720,
+        3600
+      ]
+    },
+    {
+      "after_overflow": false,
+      "before_overflow": true,
+      "rows": 3,
+      "view": [
+        720,
+        3600
+      ]
+    },
+    {
+      "after_overflow": false,
+      "before_overflow": true,
+      "rows": 12,
+      "view": [
+        720,
+        3600
+      ]
+    }
+  ],
+  "tests_run": 7,
+  "type": "focused host source/native-operation and geometry evidence"
+}

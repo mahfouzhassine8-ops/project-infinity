@@ -1,0 +1,17 @@
+{
+  "authorization": "2026-10-24 critical performance, refresh and responsive addendum; coordinated follow-up candidate",
+  "reference_source": "c0dba465",
+  "reference_build": "40086558043; continues independently without modification",
+  "owned_runtime_file": "script.infinity.commandcenter/service.py",
+  "selected_defect": "StabilityController.tick acquires its persistence decorator every foreground 0.5-second loop after all startup flags are complete, even when policy and outputs are unchanged",
+  "selected_checks": [
+    "Execute original actual StabilityController methods with controlled clock and instrumented in-memory persistence boundary; cold and stable-ready sequences",
+    "Compare policy transitions, readiness flags, published properties and persisted startup records before/after",
+    "Count warm no-op persistence admissions and collect repeated actual-method elapsed timings without artificial I/O delays",
+    "Prove every pre-existing service function/method body remains byte-identical except main invoking the new gate",
+    "Confirm checkpoint, player, persistence, TrackIt and background branches remain byte-identical"
+  ],
+  "excluded": ["application execution", "Normal Close", "Essential-First", "shutdown", "reopen", "unrelated runtime suites"],
+  "runtime_acceptance": "NOT RUN",
+  "physical_fold": "NOT RUN"
+}
