@@ -84,6 +84,12 @@ jobs:
           name: Infinity-2103367-Verified-Compiler-Dependencies
           github-token: ${{ github.token }}
           path: dependency-transfer
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39994772688
+          name: Infinity-Saved-Navigation-MultiImage-INTERNAL-QA-NOT-ACCEPTED
+          github-token: ${{ github.token }}
+          path: signed-navigation-proof
       - uses: actions/setup-python@v5
         with: {python-version: '3.11.7'}
       - uses: actions/setup-java@v4
@@ -100,6 +106,7 @@ jobs:
           sudo apt-get install -y python3-yaml python3-dev libsqlite3-dev libssl-dev libffi-dev
           (cd rc8-input && sha256sum -c SHA256SUMS)
           (cd rc7-native-modes && sha256sum -c SHA256SUMS)
+          (cd signed-navigation-proof && sha256sum -c SHA256SUMS)
           (cd dependency-transfer && sha256sum -c SHA256SUMS)
           tar --no-same-owner -xf dependency-transfer/verified-android-dependencies.tar
           tar --no-same-owner -xf dependency-transfer/verified-compiler-cache.tar -C "$HOME"

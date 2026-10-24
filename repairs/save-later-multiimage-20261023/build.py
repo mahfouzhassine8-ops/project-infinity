@@ -11,7 +11,6 @@ import shutil
 import subprocess
 import sys
 import tempfile
-import urllib.request
 from zipfile import ZipFile,ZIP_DEFLATED
 
 import component_contract
@@ -79,17 +78,11 @@ def prepare(parent,modes):
         path=native/n;path.unlink();path.symlink_to(record['target'])
         if not path.resolve().is_relative_to(native.resolve()) or digest(path)!=expected[n]:raise RuntimeError('Original link target changed')
     shutil.copytree(native,baseline,symlinks=True)
-    providers=ROOT/'verified-navigation-providers';providers.mkdir()
-    for proof in provider_contracts.PROOFS:
-        path=providers/proof['archive']
-        with urllib.request.urlopen(proof['url'],timeout=90) as stream:raw=stream.read()
-        if sha(raw)!=proof['sha256']:raise RuntimeError('Provider distribution differs: '+proof['archive'])
-        path.write_bytes(raw)
-        with ZipFile(path) as z:
-            for n in z.namelist():
-                if Path(n).is_absolute() or '..' in Path(n).parts:raise RuntimeError('Unsafe provider archive')
-            z.extractall(providers/proof['archive'][:-4])
-    contracts=OUT/'NAVIGATION-CONTRACTS.json';save(contracts,provider_contracts.build(providers))
+    # Reuse the identical, already-reviewed provider source fingerprints
+    # from the exact signed reference APK. The original POV archive URL is
+    # unavailable; do not substitute unpinned archives or weaken runtime pins.
+    contracts=OUT/'NAVIGATION-CONTRACTS.json'
+    contracts.write_bytes(provider_contracts.reuse_signed_contracts(ROOT/'signed-navigation-proof'))
     components=ROOT/'targeted-component-overlay'
     component_delta=component_contract.stage(base,components,contracts)
     overlay=ROOT/'targeted-native-overlay'

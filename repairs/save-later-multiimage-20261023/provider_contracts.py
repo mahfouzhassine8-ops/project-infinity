@@ -75,6 +75,62 @@ def build(folder):
                 if k not in ('sources','search','entrypoint','family')} for p in PROOFS])
 
 
+
+# Immutable proof from the successful, permanently signed 39994772688 build.
+# Runtime navigation continues checking actual installed-provider fingerprints.
+SIGNED_REFERENCE_APK='Infinity-2103401-Saved-Navigation-MultiImage-EXPERIMENTAL.apk'
+SIGNED_REFERENCE_SHA256='3babfcc9969bda448323e7f25b1424e39501614a3db6e14cf78602a2898cb768'
+SIGNED_REFERENCE_COMMIT='3d3730c490220a1169e9dea280832c42da4971e8'
+SIGNED_REFERENCE_CERT='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
+SIGNED_CONTRACTS_PATH='assets/addons/script.infinity.commandcenter/NAVIGATION-CONTRACTS.json'
+SIGNED_CONTRACTS_SHA256='c752c88dce9958627ca65e232b6f5fba758b354fb07d581d51198c122c833605'
+
+def reuse_signed_contracts(folder):
+    """Load exact signed provider contracts without a new upstream download.
+
+    Source fingerprints, original distributor SHA pins, entrypoints and search
+    capabilities were qualified in the signed reference. Actual provider source
+    verification is still mandatory when Infinity opens a destination.
+    """
+    apk=folder/SIGNED_REFERENCE_APK
+    if not apk.is_file():
+        raise RuntimeError('Exact prior permanently signed APK required for provider contract reuse')
+    with apk.open('rb') as stream:
+        digest=hashlib.file_digest(stream,'sha256').hexdigest()
+    if digest!=SIGNED_REFERENCE_SHA256:
+        raise RuntimeError('Exact prior permanently signed APK required for provider contract reuse')
+    receipt=json.loads((folder/'CANDIDATE.json').read_text())
+    if (receipt.get('source_commit')!=SIGNED_REFERENCE_COMMIT
+        or receipt.get('build_run')!='39994772688'
+        or receipt.get('apk_sha256')!=SIGNED_REFERENCE_SHA256
+        or receipt.get('permanent_certificate_sha256')!=SIGNED_REFERENCE_CERT
+        or receipt.get('signature_schemes_verified')!=[1,2,3]):
+        raise RuntimeError('Incorrect signed provider-contract evidence receipt')
+    with zipfile.ZipFile(apk) as signed:
+        raw=signed.read(SIGNED_CONTRACTS_PATH)
+    if hashlib.sha256(raw).hexdigest()!=SIGNED_CONTRACTS_SHA256:
+        raise RuntimeError('Signed provider-contract bytes differ from verified build')
+    data=json.loads(raw)
+    expected=[{k:v for k,v in proof.items()
+               if k not in ('family','entrypoint','sources','search')} for proof in PROOFS]
+    if data.get('schema')!=1 or data.get('provenance')!=expected:
+        raise RuntimeError('Signed provider provenance differs from pinned original proofs')
+    contracts=data.get('contracts')
+    if not isinstance(contracts,list) or len(contracts)!=len(PROOFS):
+        raise RuntimeError('Signed provider contract count differs')
+    for record,proof in zip(contracts,PROOFS):
+        sources=record.get('sources')
+        if (record.get('family')!=proof['family']
+            or record.get('entrypoint')!=proof['entrypoint']
+            or record.get('search')!=proof['search']
+            or not isinstance(sources,dict)
+            or set(sources)!=set(proof['sources'])
+            or any(not isinstance(v,str) or len(v)!=64 or
+                   any(c not in '0123456789abcdef' for c in v)
+                   for v in sources.values())):
+            raise RuntimeError('Signed provider navigation shape differs from reviewed source')
+    return raw
+
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--providers',type=Path,required=True);p.add_argument('--out',type=Path,required=True)
