@@ -20,7 +20,7 @@
 
 | # | Owner / authorized problem | Evidence status | Implementation status | Targeted tests | Android 17 integration | Physical Fold candidate PASS |
 |---|---|---|---|---|---|---|
-| 1 | Search/native signal process exit | Observed; stack unavailable | NOT STARTED | NOT RUN | NOT RUN | NOT RUN |
+| 1 | Search/native signal process exit | Observed; stack unavailable; retained native logs belong to other PIDs | No speculative native fix; non-APK capture path prepared | Capture-tool host checks PASS; Search runtime NOT RUN | NOT RUN | NOT RUN |
 | 2 | Home blank loading/re-entry restoration | Visibly reproduced; native-owned geometry invalidation identified | Scoped native-owned revision-trigger correction STAGED; complete warm Home delay still unresolved | 4 host tests + CI PASS for changed path | NOT RUN | NOT RUN |
 | 3 | Clock suffix clipped after reflow | Visibly reproduced | Clock bounding-width correction STAGED in unified Home only | 3 host tests + CI PASS | NOT RUN | NOT RUN |
 | 4 | Option B scrollbars and oversized plot space | Forced one-page bars and unused short-plot area confirmed | Track hiding and short-synopsis geometry correction STAGED; physical scrolling not accepted | 4 new host geometry tests + prior XML source checks PASS | NOT RUN | NOT RUN |
@@ -28,7 +28,7 @@
 | 6 | Player seek-time contrast | Unified variant uses theme ink over video; other13 already white | Unified white text/black shadow staged; other13 time controls unchanged | Scoped source/package tests PASS | NOT RUN | NOT RUN |
 | 7 | Play/Pause heavy dark styling regression | 14 exact XML source preimages identified | **Isolated source-only prototype staged** | **4 local unittest cases PASS; 14 variants parsed** | NOT RUN | NOT RUN |
 | 8 | Post-Information focus restoration | Suspected visually; needs identity proof | NOT STARTED | NOT RUN | NOT RUN | NOT RUN |
-| 9 | Health Center diagnostics reliability | Signal metadata omitted; empty snapshot falsely available; read failure abort risk | Bounded partial-read and exit-metadata fixes staged; signed DEX binding and broader integration pending | 2 focused tests PASS, including compiled actual Java methods with controlled interfaces | NOT RUN | NOT RUN |
+| 9 | Health Center diagnostics reliability | Signal/empty-source defects confirmed in signed DEX; optional Python collector failure reproduced | Java staged; Python partial-export repair staged; candidate DEX integration pending | 2 Java host checks retained; 5 new Python export checks PASS | NOT RUN | NOT RUN |
 
 **OSD prototype limitation:** `osd_playpause_scope.py` makes only two texture tag opacity changes inside existing control `202` in the exact 14 `VideoOSD.xml` members. Its source tests independently assert byte-exact invariance of all other control text/behavior, exact input SHA-256, strict fail-closed baseline mismatches, XML parse and no source archive mutation. It is a **staged experiment, not the final approved look, not a component ZIP, not signed, not physically tested**. Reference the user's approved clean/translucent appearance before final packaging; replace the prototype only if needed by documented physical result, always within control 202.
 
@@ -59,6 +59,42 @@ Android interfaces are controlled fixtures, not an Android test. Signed DEX
 identity/preservation and actual API37 export integration are still required.
 The Health export source adapter remains fail-closed to its exact preimage.
 Initial failures are retained separately from the passing results.
+
+## Single-install continuation from Astra checkpoint 8ed595fb
+
+The latest remote checkpoint and its 17 passing host checks from run40132316838
+were retained before editing. Delivery remains one integrated, permanently
+signed 2103402 candidate. Internal test builds are allowed; no diagnostic APK
+installation has been requested, and no candidate has been promoted.
+
+The supplied archive's native/critical logs contain PIDs27962 and30115 from
+08:11 and06:49 America/Detroit, with zero rows for Search incident PID9097 at
+15:22:18. They cannot identify this Search fault. `SEARCH-LOG-COVERAGE.json`
+records these boundaries. Existing-baseline OS bugreport/ADB capture remains
+viable and NOT RUN; it is not exhausted. `NON-APK-EVIDENCE.md` and the tested,
+read-only `capture_baseline.py` support that route without installing anything.
+
+Read-only disassembly of the signed APK confirms the two staged Java exporter
+defects. `HEALTH-DEX-BASELINE-REVIEW.json` pins the DEX and method instructions,
+records the sole external caller in Splash's Infinity export action, and lists
+existing compiler-generated shared API helpers that must remain untouched.
+This is targeted original-bytecode review, not candidate DEX equivalence or ART
+execution. Candidate integration remains blocked on those separate checks.
+
+The exact signed Health Center Python exporter was also shown to discard an
+otherwise useful report when optional collection throws. The scoped correction
+retains existing evidence, writes unavailable statuses without exception text,
+reports empty source files honestly, and preserves fatal archive-write errors.
+Five focused checks pass against the real exporter; no lifecycle, persistence,
+provider or shutdown policy changed. Three capture-tool host checks and an
+exact 19-member staging gate also pass. All required Android/Fold cycles remain
+NOT RUN. Home latency, chooser ownership, focus restoration and actual visual
+rendering remain unresolved acceptance gates.
+
+The source-only workflow now includes these nine new checks and explicitly
+allows the existing takeover handoff document. It does not add runtime,
+shutdown or packaging triggers. See `CONTINUATION-HOST-RESULTS.json` for the
+current source-only receipt. No raw diagnostics were committed.
 
 No signed2103402 artifact has been produced. No workflow, signing, provider,
 TrackIt, database, persistence or Cobra source was edited. The only revised

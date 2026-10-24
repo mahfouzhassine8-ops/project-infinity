@@ -290,7 +290,8 @@
     "original_apk_dex_binding": "PENDING; this staged source cannot be packaged until original class disassembly is verified",
     "selected_test": "test_health_export_scope.py",
     "android17": "NOT RUN",
-    "physical_fold": "NOT RUN"
+    "physical_fold": "NOT RUN",
+    "original_signed_dex_binding": "Targeted original DEX instruction/callsite review completed; see HEALTH-DEX-BASELINE-REVIEW.json. Full compile equivalence and candidate DEX/Cobra preservation NOT RUN."
   },
   "support_files": [
     {
@@ -332,6 +333,61 @@
       "path": "repairs/infinity-2103402-final/visual_scope.py",
       "baseline_sha256": null,
       "purpose": "Scoped repair implementation, negative regression fixtures, sanitized evidence or acceptance receipt; never runtime-authorizes unrelated changes"
+    },
+    {
+      "path": "repairs/infinity-2103402-final/audit_staging.py",
+      "baseline_sha256": null,
+      "purpose": "Correction9 partial-export repair, non-APK Search evidence acquisition, exact staging gate or sanitized evidence; no authorization for additional runtime edits"
+    },
+    {
+      "path": "repairs/infinity-2103402-final/capture_baseline.py",
+      "baseline_sha256": null,
+      "purpose": "Correction9 partial-export repair, non-APK Search evidence acquisition, exact staging gate or sanitized evidence; no authorization for additional runtime edits"
+    },
+    {
+      "path": "repairs/infinity-2103402-final/health_partial_scope.py",
+      "baseline_sha256": null,
+      "purpose": "Correction9 partial-export repair, non-APK Search evidence acquisition, exact staging gate or sanitized evidence; no authorization for additional runtime edits"
+    },
+    {
+      "path": "repairs/infinity-2103402-final/test_baseline_capture.py",
+      "baseline_sha256": null,
+      "purpose": "Correction9 partial-export repair, non-APK Search evidence acquisition, exact staging gate or sanitized evidence; no authorization for additional runtime edits"
+    },
+    {
+      "path": "repairs/infinity-2103402-final/test_health_partial_scope.py",
+      "baseline_sha256": null,
+      "purpose": "Correction9 partial-export repair, non-APK Search evidence acquisition, exact staging gate or sanitized evidence; no authorization for additional runtime edits"
+    },
+    {
+      "path": "repairs/infinity-2103402-final/test_staging_audit.py",
+      "baseline_sha256": null,
+      "purpose": "Correction9 partial-export repair, non-APK Search evidence acquisition, exact staging gate or sanitized evidence; no authorization for additional runtime edits"
+    },
+    {
+      "path": "repairs/infinity-2103402-final/NEXT-VERIFICATION.json",
+      "baseline_sha256": null,
+      "purpose": "Correction9 partial-export repair, non-APK Search evidence acquisition, exact staging gate or sanitized evidence; no authorization for additional runtime edits"
+    },
+    {
+      "path": "repairs/infinity-2103402-final/NON-APK-EVIDENCE.md",
+      "baseline_sha256": null,
+      "purpose": "Correction9 partial-export repair, non-APK Search evidence acquisition, exact staging gate or sanitized evidence; no authorization for additional runtime edits"
+    },
+    {
+      "path": "repairs/infinity-2103402-final/HEALTH-DEX-BASELINE-REVIEW.json",
+      "baseline_sha256": null,
+      "purpose": "Correction9 partial-export repair, non-APK Search evidence acquisition, exact staging gate or sanitized evidence; no authorization for additional runtime edits"
+    },
+    {
+      "path": "repairs/infinity-2103402-final/SEARCH-LOG-COVERAGE.json",
+      "baseline_sha256": null,
+      "purpose": "Correction9 partial-export repair, non-APK Search evidence acquisition, exact staging gate or sanitized evidence; no authorization for additional runtime edits"
+    },
+    {
+      "path": "repairs/infinity-2103402-final/CONTINUATION-HOST-RESULTS.json",
+      "baseline_sha256": null,
+      "purpose": "Correction9 partial-export repair, non-APK Search evidence acquisition, exact staging gate or sanitized evidence; no authorization for additional runtime edits"
     }
   ],
   "existing_document_change": {
@@ -353,5 +409,38 @@
       "Health Java source not bound to signed DEX",
       "No signed 2103402 APK"
     ]
+  },
+  "health_python_scope": {
+    "path": "script.kodihealthcenter/khc_diagnostics.py",
+    "baseline_sha256": "5c7e698e2b1865cee96639f252dfdcab2c7a595a27b9e6e55d942fef8fec618a",
+    "baseline_commit": "1738478709cd8881f7ad4a524e7abbbc82b5d79c",
+    "defect": 9,
+    "recorded_before_runtime_edit": true,
+    "boundary": "Only optional runtime identity / causal collection / native correlation failures, native-directory enumeration, and empty file evidence classification inside the existing diagnostic exporter. No lifecycle or shutdown changes.",
+    "necessity": "Exact signed source calls optional collectors unguarded inside the outer abort block; inaccessible source directories or an unavailable collector discard the whole diagnostic archive. Empty source files are otherwise listed as collected evidence.",
+    "selected_tests": [
+      "test_health_partial_scope.py: reproduce baseline whole-export loss with failed optional collectors; candidate retains valid evidence and explicit unavailable statuses",
+      "test_health_partial_scope.py: missing/empty/native directory failures remain honest; write failure aborts atomically; original files unchanged",
+      "test_health_partial_scope.py: exact byte inverse and unexpected preimage rejection; existing baseline-aware attribution remains intact"
+    ],
+    "android17": "NOT RUN",
+    "physical_fold": "NOT RUN",
+    "targeted_tests": {
+      "status": "PASS",
+      "count": 5,
+      "executed_source": "Exact signed APK khc_diagnostics.py plus fail-closed transform; original exception reproduced before candidate test"
+    }
+  },
+  "single_install_strategy": {
+    "authorization": "Continue from latest saved checkpoint; one final user installation; internal test builds allowed",
+    "starting_checkpoint": "8ed595fbcfd7e803c885b904e34b96c564485eef",
+    "interim_diagnostic_apk_requested": false,
+    "non_apk_paths_exhausted": false,
+    "device_access": "Unavailable in this environment; OS bugreport and existing-baseline ADB reproduction remain viable",
+    "final_apk": "NOT BUILT"
+  },
+  "workflow_scope_change": {
+    "path": ".github/workflows/infinity-2103402-scoped-tests.yml",
+    "purpose": "Add only new Health/capture/staging host checks and exact existing Astra takeover handoff to source path allowlist. No Android/shutdown/build/signing automation changes."
   }
 }

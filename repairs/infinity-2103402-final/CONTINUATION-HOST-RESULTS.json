@@ -1,0 +1,116 @@
+{
+  "starting_checkpoint": "8ed595fbcfd7e803c885b904e34b96c564485eef",
+  "retained_source_ci": {
+    "run": 40132316838,
+    "status": "PASS",
+    "tests": 17
+  },
+  "new_host_checks": {
+    "test_health_partial_scope": {
+      "status": "PASS",
+      "tests": 5
+    },
+    "test_baseline_capture": {
+      "status": "PASS",
+      "tests": 3
+    },
+    "test_staging_audit": {
+      "status": "PASS",
+      "tests": 1
+    }
+  },
+  "staging_audit": {
+    "status": "PASS",
+    "scope": "Exact staged addon sources only",
+    "members": {
+      "script.infinity.commandcenter/information.py": {
+        "baseline_sha256": "c388b83353bff8e7687a545d3a00ea16691a208bd34b3a0a0678ff6441abb54e",
+        "staged_sha256": "8cf3cfcab461d73d4e8bb625039d905478ffb52688f729252002b292ea87c429"
+      },
+      "script.infinity.commandcenter/resources/skins/Default/1080i/InfinityInformation.xml": {
+        "baseline_sha256": "bcfae57fcacc96a799e67f0c80cdfc22919a4a39fcb7f8ef9876eabf02f3a1e7",
+        "staged_sha256": "b9059729493751dfc0be65801f73e41a06b604f3fdaf099963821b84f2b2e443"
+      },
+      "script.infinity.commandcenter/service.py": {
+        "baseline_sha256": "ca9233507680c5d013468a38d4996bb54389ebe4d3e2410df8c241dd8340f6c5",
+        "staged_sha256": "51fc63f6922885c8473277398e6f3569274eb42afe06be0148501d6ddc65bb23"
+      },
+      "script.kodihealthcenter/khc_diagnostics.py": {
+        "baseline_sha256": "5c7e698e2b1865cee96639f252dfdcab2c7a595a27b9e6e55d942fef8fec618a",
+        "staged_sha256": "fde10344f0e198ff0b8d0a1e48ca8e34541e1237503c02b5de613ba4ebd178c0"
+      },
+      "skin.infinity.diggz/16x9/VideoOSD.xml": {
+        "baseline_sha256": "0c7042089bc24f41f156d7b8215b5d4cdf245e4bcd0fd3efbfa124fe926af6f4",
+        "staged_sha256": "19ed1fb7e2d753c846529d4176f5ab3d158384b4d0c3f9959ca258b1fa0fef8e"
+      },
+      "skin.infinity.diggz/20x9/VideoOSD.xml": {
+        "baseline_sha256": "fead7cffef3741b6b2d86925478efbe5aab9a4859558e9bedca655bccb40d85a",
+        "staged_sha256": "2db244cb6d965a33bb0c931bdab15ef0e16dcaf072b0227848998f52ac432b8e"
+      },
+      "skin.infinity.diggz/5x6/VideoOSD.xml": {
+        "baseline_sha256": "1adc32868a003dba1dfac6889ed7a28c24ba18914f6a03d8c1b7424a96be91f3",
+        "staged_sha256": "900d3787b74e1be65e942449a1868acc6f022f5d3d2e8526203f855519e4842b"
+      },
+      "skin.infinity.diggz/6x5/VideoOSD.xml": {
+        "baseline_sha256": "35210a42904268391a7b80f36a0b83d374634b3bfe2145f0e7e74fb8ea26e854",
+        "staged_sha256": "210572e9a828c666eed9824ab58d0ecf9faa2809812cb8bb7ecd6d327e34abcc"
+      },
+      "skin.infinity.diggz/fallback/VideoOSD.xml": {
+        "baseline_sha256": "0c7042089bc24f41f156d7b8215b5d4cdf245e4bcd0fd3efbfa124fe926af6f4",
+        "staged_sha256": "19ed1fb7e2d753c846529d4176f5ab3d158384b4d0c3f9959ca258b1fa0fef8e"
+      },
+      "skin.infinity.diggz/portrait/VideoOSD.xml": {
+        "baseline_sha256": "fad55411e6ea920f0860e244e449c0b7c598f253954f726796d39e662b273924",
+        "staged_sha256": "3f980272eacb1f1ce9e224cbf3e5342a73b98d196b12a2f67d3ea0b2c676f69c"
+      },
+      "skin.infinity.diggz/responsive/base/VideoOSD.xml": {
+        "baseline_sha256": "01e5e11856c7b9c59b04e033a269615c4a88e11f557e21f1cb74ab3ed9ee6897",
+        "staged_sha256": "febc99ccfe1d03857fe669cc1d36d6e5359c5dae176218b9a95651d9edcd4abb"
+      },
+      "skin.infinity.diggz/responsive/landscape/VideoOSD.xml": {
+        "baseline_sha256": "eb4f80fd9e7325a448360ac704e210fc5505a74d5f2a3a103dbf46e23eeb715f",
+        "staged_sha256": "4948593a00110f515c2117241a0e7e689a49f5270ea6e9daf65cb3add3b2e1ca"
+      },
+      "skin.infinity.diggz/responsive/portrait/VideoOSD.xml": {
+        "baseline_sha256": "bcbbe9ec3d3f1552ce8978dcc015b1a94ff332c44e9cfe97ef795a95b8927fa3",
+        "staged_sha256": "1ae9d01ee11083c25b2140c65e6466dd3b0cdfd588f8a5383191811fe79e8289"
+      },
+      "skin.infinity.diggz/responsive/square/VideoOSD.xml": {
+        "baseline_sha256": "a02b3276e115bd694b4182a606337eb7dbb63b15552e2140c043a0220543938f",
+        "staged_sha256": "b1e88299556a8f92955880d02dea6040276de4ca4a3cb9643e4ed1ed61758f5d"
+      },
+      "skin.infinity.diggz/responsive/tall/VideoOSD.xml": {
+        "baseline_sha256": "28285e21434a1e3bec943da99a3e39e1be05f7bc5b1aea3626c74284688e17ec",
+        "staged_sha256": "7da8ed4ce0db52d60ef52240150e21f9d3e1cd1f09f893528ffefd8d7cbaee27"
+      },
+      "skin.infinity.diggz/responsive/ultrawide/VideoOSD.xml": {
+        "baseline_sha256": "ac60127700062ffef6ba91244ef24270d85564f0551ffa78e079aae050244ff1",
+        "staged_sha256": "7ca19c1a7991243aa3de3cc88a025459d204a5bd988262f3f79894195dd88bc4"
+      },
+      "skin.infinity.diggz/responsive/wide/VideoOSD.xml": {
+        "baseline_sha256": "01e5e11856c7b9c59b04e033a269615c4a88e11f557e21f1cb74ab3ed9ee6897",
+        "staged_sha256": "febc99ccfe1d03857fe669cc1d36d6e5359c5dae176218b9a95651d9edcd4abb"
+      },
+      "skin.infinity.diggz/unified/Home.xml": {
+        "baseline_sha256": "3f774364299b3c535dda0a52b1b304fc65b562f84a8ca6e1a9110ab7c39056f0",
+        "staged_sha256": "20761381b3bf5916b515a67c082f9946c53dea0be195aeaefd465cea210e9e81"
+      },
+      "skin.infinity.diggz/unified/VideoOSD.xml": {
+        "baseline_sha256": "b235de8685b8d163e611b0b46cb1108262f5ba21ef1959139735a3087b4a288f",
+        "staged_sha256": "b7bff21dbd42415f6f38b08829d182b63b9a96a5b0c72f97335c684f1ceaf7a1"
+      }
+    },
+    "production_apk_audit": "NOT RUN",
+    "android17": "NOT RUN",
+    "physical_fold": "NOT RUN"
+  },
+  "apk_installations_requested": 0,
+  "android17": "NOT RUN",
+  "physical_fold": "NOT RUN",
+  "search_cycles_50": "NOT RUN",
+  "playback_return_cycles_30": "NOT RUN",
+  "rotation_cycles_20": "NOT RUN",
+  "close_reopen": "NOT RUN; independent test selection retained",
+  "final_apk": "NOT BUILT",
+  "note": "Host fault injection and disassembly are not Android execution or a Search fix."
+}

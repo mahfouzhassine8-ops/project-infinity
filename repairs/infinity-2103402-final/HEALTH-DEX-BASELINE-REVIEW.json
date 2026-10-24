@@ -1,0 +1,125 @@
+{
+  "schema": 1,
+  "baseline_commit": "1738478709cd8881f7ad4a524e7abbbc82b5d79c",
+  "baseline_run": 40089463702,
+  "baseline_apk_sha256": "a7abd878768cd09cac0c0caeadd5afc691a842cf97c9ff14b0d913677117a742",
+  "classes_dex_sha256": "7ea38f88187dfec80211b3c5be6e09ef3cbd38928527c42570b8b89deeed3185",
+  "analysis_tool": "androguard4.1.3; read-only DEX disassembly",
+  "methods": [
+    {
+      "class": "Lcom/projectinfinity/kodi/InfinityHealthExport$Api30;",
+      "method": "<init>()V",
+      "instruction_sha256": "66aae991d473b531913bcfc413615846391b0e621d700dc922427ddd6ff15dd3",
+      "code_item_sha256": "6dde9b105f3f54e2b3fa10e4d445816e60467e9ce51fde42f2094437887fa4f9"
+    },
+    {
+      "class": "Lcom/projectinfinity/kodi/InfinityHealthExport$Api30;",
+      "method": "collect(Landroid/content/Context; Ljava/util/zip/ZipOutputStream; Lorg/json/JSONArray;)V",
+      "instruction_sha256": "0e4d056686a8ceeb8b8b94907ce5c810d5532338a432a0c66ee8cba28f3b027f",
+      "code_item_sha256": "ff23dcbe3ed6dc4e1e279a0ab6b479677337e1866e4a9d3b1a815441ce71882a"
+    },
+    {
+      "class": "Lcom/projectinfinity/kodi/InfinityHealthExport;",
+      "method": "<init>()V",
+      "instruction_sha256": "66aae991d473b531913bcfc413615846391b0e621d700dc922427ddd6ff15dd3",
+      "code_item_sha256": "b8a8db356719eae210bb4e2c795283e833ac6237d2d023531453e1e2cc587f20"
+    },
+    {
+      "class": "Lcom/projectinfinity/kodi/InfinityHealthExport;",
+      "method": "addonQuarantineFile(Landroid/content/Context;)Ljava/io/File;",
+      "instruction_sha256": "48cd3fb118740f34b2453d3fb0e9f58c8436dc08ccca53f7692f09015ee793b8",
+      "code_item_sha256": "52406b7cbf373ee407d5c950b5624a742bebfc8912af75963c11609882de4f34"
+    },
+    {
+      "class": "Lcom/projectinfinity/kodi/InfinityHealthExport;",
+      "method": "appendAddonQuarantineEvidence(Ljava/lang/StringBuilder; Landroid/content/Context;)V",
+      "instruction_sha256": "b6a4e5ee2ea301b8043af75fc66b9d7091bfc63f4edf6b4b330e9e58f3e1d02c",
+      "code_item_sha256": "877308040a7b7f6391152159d4ab247166a0338aebdc8fc6870a14b6e9f3e9eb"
+    },
+    {
+      "class": "Lcom/projectinfinity/kodi/InfinityHealthExport;",
+      "method": "appendCheckpointEvidence(Ljava/lang/StringBuilder; Landroid/content/Context;)V",
+      "instruction_sha256": "1259ea42b2c23ae490e592879a1785106eb667737a7a9011e1ae91a4f44357fb",
+      "code_item_sha256": "e93d7d9dad397687ea172d3cb3668b2baa9dddcd783cf54c0b604b3380093994"
+    },
+    {
+      "class": "Lcom/projectinfinity/kodi/InfinityHealthExport;",
+      "method": "appendNativeShutdownEvidence(Ljava/lang/StringBuilder; Landroid/content/Context; Ljava/lang/String; Ljava/lang/String;)V",
+      "instruction_sha256": "7ebe052528d7c368eb8ea6bd3bfec2926a7a2eb46b86511b9dc59481d1d3ece7",
+      "code_item_sha256": "f6e6da0a91539236b5ced38a385797804045fde60c23178ffb773305da6c5a98"
+    },
+    {
+      "class": "Lcom/projectinfinity/kodi/InfinityHealthExport;",
+      "method": "attach(Landroid/content/Context; Ljava/util/zip/ZipOutputStream; Lorg/json/JSONArray; Ljava/lang/String; Ljava/lang/String; I)V",
+      "instruction_sha256": "197b224bfa02c8e179fdc0dc61ed296818f67e723ca847bb2ea17d94f01d9dd6",
+      "code_item_sha256": "32de8d4e125a917084057f1bb4ba93a08a1ab836e71e556002086b80e40b110e"
+    },
+    {
+      "class": "Lcom/projectinfinity/kodi/InfinityHealthExport;",
+      "method": "attachAddonQuarantine(Landroid/content/Context; Ljava/util/zip/ZipOutputStream; Lorg/json/JSONArray;)V",
+      "instruction_sha256": "7d8415a9c9c3582c2e4706b43fc45bff2b3b724040a6e3e6401e9865fdd34098",
+      "code_item_sha256": "30641790513b43d29e76976c02a1a626ff8e1bf37f6dacf53d385169f0f94004"
+    },
+    {
+      "class": "Lcom/projectinfinity/kodi/InfinityHealthExport;",
+      "method": "attachShutdown(Landroid/content/Context; Ljava/util/zip/ZipOutputStream; Lorg/json/JSONArray; Ljava/lang/String; Ljava/lang/String; I)V",
+      "instruction_sha256": "7e7669e755216897b22c2cace6297e24411946d94c2114db19bfabf78e688a11",
+      "code_item_sha256": "06c42369de233484d9dfa46cc92facb5ea071572b8a7101a08a7a5056da56a77"
+    },
+    {
+      "class": "Lcom/projectinfinity/kodi/InfinityHealthExport;",
+      "method": "copyBounded(Ljava/io/InputStream; Ljava/io/OutputStream; I)Z",
+      "instruction_sha256": "8d869bbae12b5208e526d1bd4c89cd213c3f4b963c915ff238a2ae3b03b96406",
+      "code_item_sha256": "3243bfc0870624368b2184175ccbb1029d4d413e750a99f67599f946be817401"
+    },
+    {
+      "class": "Lcom/projectinfinity/kodi/InfinityHealthExport;",
+      "method": "nativeTraceScope(Landroid/content/Context; Ljava/lang/String;)Ljava/lang/String;",
+      "instruction_sha256": "0a7ffeac0ae1c1e6449590b2d984b2d67a70621b6dd50c170f87cd30ccea8a5f",
+      "code_item_sha256": "f0a7810b28fbae4f7aa0c544b23f7effa510d5d972ea59803b798981c8ebf001"
+    },
+    {
+      "class": "Lcom/projectinfinity/kodi/InfinityHealthExport;",
+      "method": "put(Ljava/util/zip/ZipOutputStream; Ljava/lang/String; [B)V",
+      "instruction_sha256": "434870708da5efa88c5fa765899a24717da0c1516d6d011d4f919a21405b9384",
+      "code_item_sha256": "9536de49de7a3199e47874845861d6ae76a2e185be3400b8dcc6837ccf91795e"
+    },
+    {
+      "class": "Lcom/projectinfinity/kodi/InfinityHealthExport;",
+      "method": "reportWithNativeShutdownEvidence(Landroid/content/Context; Ljava/lang/String;)Ljava/lang/String;",
+      "instruction_sha256": "212b4580071ebe2a90eb179c05ff86b727185bd737bd0cb8b85576baceca9d64",
+      "code_item_sha256": "e3334911b0932b07a424bc25e2367a3aa43e73471621e49c25593b27b3c52464"
+    },
+    {
+      "class": "Lcom/projectinfinity/kodi/InfinityHealthExport;",
+      "method": "write(Landroid/content/Context; Ljava/io/OutputStream; Ljava/lang/String;)V",
+      "instruction_sha256": "4267a5ae08e21dba20c2dfbc3e8a7921b848be4c377611a4bc5641b48b06bc18",
+      "code_item_sha256": "a206a63ed1fc34a9ee16db19b4bff45d1e3fdfcbd62b86c5257f49808d32d5e8"
+    }
+  ],
+  "external_callers": [
+    {
+      "class": "Lcom/projectinfinity/kodi/Splash;",
+      "method": "lambda$infinitySaveHealthArchive$22$com-projectinfinity-kodi-Splash(Landroid/content/Context; Landroid/net/Uri;)V",
+      "calls": [
+        "v6, v7, v1, Lcom/projectinfinity/kodi/InfinityHealthExport;->write(Landroid/content/Context; Ljava/io/OutputStream; Ljava/lang/String;)V"
+      ]
+    }
+  ],
+  "existing_shared_api_outlines_protected": [
+    "Lcom/projectinfinity/kodi/CobraProUi$Hero$$ExternalSyntheticApiModelOutline1;->m$1(Landroid/app/ApplicationExitInfo;)I",
+    "Lcom/projectinfinity/kodi/CobraProUi$Hero$$ExternalSyntheticApiModelOutline1;->m(Landroid/app/ActivityManager; Ljava/lang/String; I I)Ljava/util/List;",
+    "Lcom/projectinfinity/kodi/CobraProUi$Hero$$ExternalSyntheticApiModelOutline1;->m(Landroid/app/ApplicationExitInfo;)I",
+    "Lcom/projectinfinity/kodi/CobraProUi$Hero$$ExternalSyntheticApiModelOutline1;->m(Landroid/app/ApplicationExitInfo;)J",
+    "Lcom/projectinfinity/kodi/CobraProUi$Hero$$ExternalSyntheticApiModelOutline1;->m(Landroid/app/ApplicationExitInfo;)Ljava/io/InputStream;",
+    "Lcom/projectinfinity/kodi/CobraProUi$Hero$$ExternalSyntheticApiModelOutline1;->m(Landroid/app/ApplicationExitInfo;)Ljava/lang/String;",
+    "Lcom/projectinfinity/kodi/CobraProUi$Hero$$ExternalSyntheticApiModelOutline1;->m(Ljava/lang/Object;)Landroid/app/ApplicationExitInfo;"
+  ],
+  "confirmed_defects": [
+    "Api30.collect filters reason5/6 before retaining metadata; Android reason2/status7 cannot be exported by this code",
+    "attachShutdown marks available before copying and has no empty-file check"
+  ],
+  "source_to_original_dex": "Targeted control-flow inspection confirms staged defect owners; full compiler/instruction equivalence NOT RUN",
+  "candidate_dex_preservation": "NOT RUN",
+  "android17": "NOT RUN"
+}

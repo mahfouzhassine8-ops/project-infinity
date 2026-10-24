@@ -1,0 +1,73 @@
+{
+  "scope": "Read-only October24 supplied archive; retained native logs must not be misattributed",
+  "incident_pid": 9097,
+  "incident_local_time": "2026-10-24T15:22:18-04:00",
+  "native_crash_snapshot_bytes": 0,
+  "fault_stack_available": false,
+  "native_logs": [
+    {
+      "member": "shutdown/android-guard.jsonl",
+      "bytes": 30899,
+      "pid9097_rows": 0,
+      "pid_counts": {
+        "null": 140
+      },
+      "incomplete_json_lines": 0,
+      "first_last_observed_detroit": []
+    },
+    {
+      "member": "shutdown/critical.jsonl",
+      "bytes": 642009,
+      "pid9097_rows": 0,
+      "pid_counts": {
+        "27962": 701
+      },
+      "incomplete_json_lines": 0,
+      "first_last_observed_detroit": [
+        "2026-10-24T08:11:48.197869-04:00",
+        "2026-10-24T08:11:51.560884-04:00"
+      ]
+    },
+    {
+      "member": "shutdown/critical.previous.jsonl",
+      "bytes": 664918,
+      "pid9097_rows": 0,
+      "pid_counts": {
+        "30115": 811
+      },
+      "incomplete_json_lines": 0,
+      "first_last_observed_detroit": [
+        "2026-10-24T06:49:37.822263-04:00",
+        "2026-10-24T06:49:47.867201-04:00"
+      ]
+    },
+    {
+      "member": "shutdown/native.jsonl",
+      "bytes": 8388608,
+      "pid9097_rows": 0,
+      "pid_counts": {
+        "27962": 7862
+      },
+      "incomplete_json_lines": 1,
+      "first_last_observed_detroit": [
+        "2026-10-24T08:11:48.197869-04:00",
+        "2026-10-24T08:11:48.233510-04:00"
+      ]
+    },
+    {
+      "member": "shutdown/native.previous.jsonl",
+      "bytes": 8388608,
+      "pid9097_rows": 0,
+      "pid_counts": {
+        "30115": 7918
+      },
+      "incomplete_json_lines": 1,
+      "first_last_observed_detroit": [
+        "2026-10-24T06:49:37.822263-04:00",
+        "2026-10-24T06:49:40.859102-04:00"
+      ]
+    }
+  ],
+  "reproduction_android17": "NOT RUN",
+  "adb_bugreport": "NOT RUN; device access required; viable non-APK method not exhausted"
+}

@@ -1,0 +1,12 @@
+{
+  "scope": "2103402 correction9 partial diagnostic exports and non-APK evidence capture; exact source/package preservation",
+  "selected_tests": [
+    "test_health_partial_scope.py",
+    "test_baseline_capture.py",
+    "test_staging_audit.py: exact 19-file staged inventory, reject extra files and unrelated edits; pinned APK input"
+  ],
+  "prior_host_tests": "Retain successful 40132316838; rerun only if affected source or integration changes",
+  "device_execution": "NOT RUN; no attached adb/device/emulator",
+  "non_apk_methods": "Existing archive inspected; no newer uploaded Oct24 archive or bugreport found in recent100 inventory; OS bugreport/ADB capture remains viable on baseline device, not exhausted",
+  "interim_apk_requested": false
+}
