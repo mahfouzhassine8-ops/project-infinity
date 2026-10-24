@@ -117,7 +117,10 @@ final class InfinityInstalledCheckpointInstaller {
     selector=('    invoke-static {v5}, '+CLASS+'->'+HELPER+'\n'
         '    move-result-object v7\n    if-nez v7, :infinity_cc31_route\n\n')
     tail=('    :infinity_cc31_route\n'
-        '    move-object v2, v7\n    goto/16 :goto_1\n')
+        # This branch is reachable only after verify() returns a version for
+        # an exact nineteen-file match. Carry that verified result into the
+        # existing receipt/return register, as the CC22-29 branches do.
+        '    move-object v2, v7\n    const/4 v6, 0x1\n    goto/16 :goto_1\n')
     updated=once(once(block,anchor,selector+anchor),'.end method',tail+'.end method')
     if updated.replace(selector,'',1).replace(tail,'',1)!=block:raise RuntimeError('Original installer route changed')
     merged=once(original,block,updated)+'\n'+compiled[HELPER]+'\n'

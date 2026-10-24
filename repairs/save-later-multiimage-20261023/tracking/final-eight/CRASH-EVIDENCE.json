@@ -1,0 +1,69 @@
+{
+  "schema_reference": "https://android.googlesource.com/platform/system/core/+/refs/heads/main/debuggerd/proto/tombstone.proto",
+  "archive_sha256": "7d7feb4a87531bec02205cd04925d8546e4215f809a274dbba609218c26be283",
+  "crashes": [
+    {
+      "file": "2-1792806291192.tombstone.pb",
+      "pid": 3071,
+      "tid": 3071,
+      "timestamp": "2026-10-23 21:44:50.719544356-0400",
+      "abort": "Pure virtual function called!",
+      "truncated": false,
+      "observed_threads": 32,
+      "crashing_thread": [
+        {
+          "name": "inity.kodi:kodi",
+          "frames": [
+            {
+              "pc": "0xa5924",
+              "name": "syscall",
+              "offset": 36,
+              "binary": "libc.so",
+              "build_id": "8dd29b5be3344cf1545af1db8c58e42c"
+            },
+            {
+              "pc": "0x2158",
+              "name": "restore_and_reraise",
+              "offset": 168,
+              "binary": "libinfinitycrash.so",
+              "build_id": "030b7fecb9bfdd816047454dd76f8438dca92479"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "1-1792807208405.tombstone.pb",
+      "pid": 3485,
+      "tid": 18800,
+      "timestamp": "2026-10-23 22:00:06.984822601-0400",
+      "abort": "Scudo ERROR: internal map failure (error desc=Out of memory)",
+      "truncated": true,
+      "observed_threads": 150,
+      "crashing_thread": [
+        {
+          "name": "Thread-48",
+          "frames": [
+            {
+              "pc": "0xa5924",
+              "name": "syscall",
+              "offset": 36,
+              "binary": "libc.so",
+              "build_id": "8dd29b5be3344cf1545af1db8c58e42c"
+            },
+            {
+              "pc": "0x2158",
+              "name": "restore_and_reraise",
+              "offset": 168,
+              "binary": "libinfinitycrash.so",
+              "build_id": "030b7fecb9bfdd816047454dd76f8438dca92479"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "original_native_snapshot_present": false,
+  "root_cause": "UNRESOLVED; crashing stacks contain recorder re-raise, not original abort origin",
+  "native_fix": "NOT IMPLEMENTED; no speculative change"
+}
