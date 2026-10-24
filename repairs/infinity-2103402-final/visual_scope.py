@@ -6,7 +6,8 @@ import xml.etree.ElementTree as ET
 from osd_playpause_scope import patch_one, MEMBERS, OLD, NEW
 ROOT=Path(__file__).parent
 LEDGER=json.loads((ROOT/'FILE-AUTHORIZATION-LEDGER.json').read_text())
-PINS={row['path']:row['baseline_sha256'] for row in LEDGER['files']}
+PINS={row['path']:row['baseline_sha256'] for row in LEDGER['files']
+      if row['path'] in MEMBERS or row['path']=='script.infinity.commandcenter/resources/skins/Default/1080i/InfinityInformation.xml'}
 INK=b'<textcolor>FFFFFFFF</textcolor><shadowcolor>FF000000</shadowcolor>'
 ORIGINAL_INK=b'<textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>'
 LABEL=re.compile(rb'<control type="label">.*?</control>',re.S)
