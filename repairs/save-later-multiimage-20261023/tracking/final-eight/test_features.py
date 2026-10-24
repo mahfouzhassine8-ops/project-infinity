@@ -146,6 +146,29 @@ class Features(unittest.TestCase):
         for bucket in ('later','watchlist','continue'):
             with patch.object(self.plugin,'_target',return_value=entry['source']):
                 self.assertEqual(self.plugin.navigation_target(entry,self.data,bucket),entry['source'])
+    def test_real_poll_skips_fifteen_unnecessary_writer_entries(self):
+        original=ast.parse((HERE.parent/'overlay/script.infinity.commandcenter/service.py').read_text())
+        final=ast.parse((BASE/'script.infinity.commandcenter/service.py').read_text())
+        def player(tree):return next(n for n in tree.body if isinstance(n,ast.ClassDef) and n.name=='InfinityPlayer')
+        counts=[]
+        for tree in (original,final):
+            method=next(n for n in player(tree).body if isinstance(n,ast.FunctionDef) and n.name=='poll')
+            clock=[100.0];calls=[]
+            env={'time':types.SimpleNamespace(monotonic=lambda:clock[0]),
+                 'setting_bool':lambda name,*a:name=='continue_watching_enabled'}
+            exec(compile(ast.Module(body=[method],type_ignores=[]),'actual-service-poll','exec'),env)
+            item=types.SimpleNamespace(isPlayingVideo=lambda:True,cw_pending=False,cw_item={'key':'a'*64},cw_key='a'*64,cw_last_save=100.0)
+            def persist(**kwargs):calls.append(clock[0]);item.cw_last_save=clock[0]
+            item.persist_continue=persist
+            for tick in range(1,17):clock[0]=100+tick*.5;env['poll'](item)
+            counts.append(len(calls))
+        self.assertEqual(counts,[16,1])
+        for name in ('onPlayBackStopped','onPlayBackEnded','onPlayBackError','persist_continue'):
+            before=next(n for n in player(original).body if isinstance(n,ast.FunctionDef) and n.name==name)
+            after=next(n for n in player(final).body if isinstance(n,ast.FunctionDef) and n.name==name)
+            if name!='persist_continue':self.assertEqual(ast.dump(before),ast.dump(after),name)
+        print('actual poll writer entries per 8 seconds: before=16 after=1')
+
     def test_projection_has_no_quadratic_growth_for_large_series(self):
         for n in range(3000):
             key=hashlib.sha256(str(n).encode()).hexdigest();self.data['items'][key]=dict(key=key,media='tv',season=1,episode=n,updated=n,identity=self.hub.media_identity('tv',{},1,n,{'tmdb':'330430'}))

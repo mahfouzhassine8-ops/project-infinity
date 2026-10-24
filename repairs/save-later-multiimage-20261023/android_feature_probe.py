@@ -5,6 +5,7 @@ The app is left running; runner teardown is infrastructure, not a shutdown test.
 """
 import argparse
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -14,7 +15,7 @@ from zipfile import ZipFile
 import android_feature_device as device
 import android_probe as staging
 
-CASES=('saved-navigation','provider-pov','provider-umbrella','provider-seren','provider-future','multiimage','tracking-recovery','tracking-actions','tracking-continue')
+CASES=('saved-navigation','provider-pov','provider-umbrella','provider-seren','provider-future','multiimage','tracking-recovery','tracking-actions','tracking-continue','final-participant','final-continue','final-actions','final-pov')
 COMPONENTS=('script.infinity.commandcenter','script.infinity.uirepair','script.infinity.watchedbridge')
 
 def execute(args):
@@ -73,7 +74,13 @@ def execute(args):
         args.mode='safe' if args.case=='saved-navigation' else 'feature-multiimage' if args.case=='multiimage' else args.case
         args.feature_only=True
         staging.runtime={'probe':device}
-        staging.extra(stage,args,report)
+        if args.case.startswith('final-'):
+            path=Path(__file__).resolve().parent/'tracking/final-eight/android_selected.py'
+            spec=importlib.util.spec_from_file_location('final_selected_host',path)
+            selected=importlib.util.module_from_spec(spec);spec.loader.exec_module(selected)
+            selected.stage(stage,args,report,device,staging.FUTURE)
+        else:
+            staging.extra(stage,args,report)
         report['fixture_manifest']={str(p.relative_to(stage)):hashlib.sha256(p.read_bytes()).hexdigest() for p in stage.rglob('*') if p.is_file()}
         for addon in stage.iterdir():device.adb('push',addon,device.PROFILE+'/../addons/'+addon.name)
         backing='/data/media/0/Android/data/'+device.PACKAGE
@@ -93,7 +100,7 @@ def execute(args):
         path=device.PROFILE+'/addon_data/'+staging.FUTURE+'/navigation-ready-'+str(owner['pid'])+'.json'
         result=device.until(lambda:device.read_json(path),1800)
         report['feature_result']=result
-        expected=[args.case] if args.case.startswith('tracking-') else ['multiimage'] if args.case=='multiimage' else ['navigation']
+        expected=[args.case] if args.case.startswith(('tracking-','final-')) else ['multiimage'] if args.case=='multiimage' else ['navigation']
         if result.get('selected_features')!=expected or result.get('selected_mode')!=args.mode:raise RuntimeError('Unexpected test family executed')
         if result.get('pid')!=owner['pid'] or result.get('passed') is not True:
             raise RuntimeError('Selected feature failed: '+str(result.get('failure')))

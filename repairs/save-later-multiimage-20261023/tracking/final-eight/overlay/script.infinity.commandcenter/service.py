@@ -664,7 +664,11 @@ class InfinityPlayer(xbmc.Player):
         if self.isPlayingVideo() and setting_bool('continue_watching_enabled', True):
             if self.cw_pending or not self.cw_item:
                 self._arm_continue()
-            self.persist_continue(completed=False, force=False)
+            # The resident loop polls every 0.5s. Avoid entering the durable
+            # writer/JSON reader for the fifteen polls that cannot save yet.
+            # Forced stop/end/error/checkpoint calls retain their original path.
+            if self.cw_item and self.cw_key and time.monotonic() - self.cw_last_save >= 8.0:
+                self.persist_continue(completed=False, force=False)
         if not setting_bool('playback_memory_enabled', True) or not self.isPlayingVideo():
             return
         if not self.key:

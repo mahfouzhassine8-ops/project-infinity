@@ -16,7 +16,7 @@ on:
         required: true
         type: choice
         default: select-a-feature
-        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue]
+        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov]
       candidate_build:
         description: Existing signed build run (no rebuild)
         required: true
@@ -45,7 +45,7 @@ jobs:
         run: |
           python3 - <<'PYCODE'
           import os
-          allowed={'saved-navigation','provider-pov','provider-umbrella','provider-seren','provider-future','multiimage','tracking-recovery','tracking-actions','tracking-continue'}
+          allowed={'saved-navigation','provider-pov','provider-umbrella','provider-seren','provider-future','multiimage','tracking-recovery','tracking-actions','tracking-continue','final-participant','final-continue','final-actions','final-pov'}
           assert os.environ['SELECTED_CASE'] in allowed, 'Select one feature explicitly'
           assert os.environ['AUTHORIZED_SCOPE'].strip(), 'Record the user-authorized feature scope'
           assert os.environ['CANDIDATE_BUILD'].isdigit(), 'Signed build run must be numeric'
@@ -85,9 +85,16 @@ jobs:
           delivery92.verify_signature(apk,pathlib.Path(os.environ['ANDROID_HOME'])/'build-tools/34.0.0')
           with open(os.environ['GITHUB_ENV'],'a') as f:f.write('TEST_APK='+str(apk)+'\nTEST_APK_SHA='+digest+'\nCANDIDATE_SOURCE_COMMIT='+r['source_commit']+'\nTEST_SOURCE_COMMIT='+test_commit+'\n')
           PY
-          python3 repairs/save-later-multiimage-20261023/android_inputs.py stage --out android-provider-inputs
+          if [[ "$SELECTED_CASE" == final-* ]]; then
+            python3 repairs/save-later-multiimage-20261023/tracking/final-eight/android_selected.py inputs android-provider-inputs "$SELECTED_CASE"
+          else
+            python3 repairs/save-later-multiimage-20261023/android_inputs.py stage --out android-provider-inputs
+          fi
           sudo apt-get update -qq
           sudo apt-get install -y libpulse0
+          if [[ "$SELECTED_CASE" == final-continue || "$SELECTED_CASE" == final-actions ]]; then
+            sudo apt-get install -y ffmpeg
+          fi
           python3 repairs/four-repair-20261018/android37_gate.py --sdk-root "$ANDROID_HOME" --out api37-support --pin-tools
           python3 - <<'PY'
           import pathlib,subprocess,sys

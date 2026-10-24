@@ -30,7 +30,8 @@
     "clock bounds across responsive layout",
     "exact CC31/CC32/CC33 component bindings and installer result",
     "POV6.10.22 navigation source comparison",
-    "focused packaging workflow scope and policy isolation contracts"
+    "focused packaging workflow scope and policy isolation contracts",
+    "actual playback poll method: ordinary no-op polls skip writer, due poll persists; forced callback bodies unchanged"
   ],
   "new_versions": {
     "script.infinity.commandcenter": "0.3.5.33",
@@ -38,5 +39,16 @@
     "script.infinity.uirepair": "0.1.16",
     "skin.infinity.diggz": "1.0.5.240"
   },
-  "version_reason": "Changed production source requires coordinated strict nineteen-file pins and original CC32 admission retained"
+  "version_reason": "Changed production source requires coordinated strict nineteen-file pins and original CC32 admission retained",
+  "selected_android_tests": [
+    "final-participant",
+    "final-continue",
+    "final-actions",
+    "final-pov"
+  ],
+  "android_dispatch": "BLOCKED: browser sign-in rejected by automatic approval review under earlier user instruction to defer authentication; connector has no dispatch operation",
+  "pending_physical_and_rotation_tests": [
+    "first tap selects / second opens / hold popup and retained scroll",
+    "playback rotation Stop Home clock, portrait landscape fold/unfold"
+  ]
 }
