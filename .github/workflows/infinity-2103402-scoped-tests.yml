@@ -1,0 +1,46 @@
+name: Infinity 2103402 scoped regression gates
+on:
+  push:
+    branches: [work/infinity-2103402-final-stabilization-20261024]
+    paths:
+      - 'repairs/infinity-2103402-final/**'
+      - '.github/workflows/infinity-2103402-scoped-tests.yml'
+permissions:
+  contents: read
+  actions: read
+jobs:
+  signed-baseline-source:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11.7'
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40089463702
+          name: Infinity-Saved-Navigation-MultiImage-INTERNAL-QA-NOT-ACCEPTED
+          github-token: ${{ github.token }}
+          path: signed-2103401
+      - name: Verify signed reference and target-only host regressions
+        env:
+          INFINITY_SIGNED_CC35_ZIP: ${{ github.workspace }}/signed-2103401/script.infinity.commandcenter-0.3.5.35.zip
+          INFINITY_SIGNED_SKIN242_ZIP: ${{ github.workspace }}/signed-2103401/skin.infinity.diggz-1.0.5.242.zip
+        run: |
+          (cd signed-2103401 && sha256sum -c SHA256SUMS)
+          cd repairs/infinity-2103402-final
+          python3 -m unittest -v test_home_reflow_scope test_clock_reflow_scope
+      - name: Reject changes outside approved repair records
+        run: |
+          python3 - <<'PY'
+          from subprocess import check_output
+          names = check_output(['git','diff','--name-only','1738478709cd8881f7ad4a524e7abbbc82b5d79c','HEAD'],text=True).splitlines()
+          assert all(n.startswith('repairs/infinity-2103402-final/') or
+                     n=='handoffs/INFINITY-2103402-FINAL-STABILIZATION-AUTHORIZED-20261024.md' or
+                     n=='.github/workflows/infinity-2103402-scoped-tests.yml'
+                     for n in names), names
+          assert not any('cobra' in n.lower() for n in names), names
+          PY
