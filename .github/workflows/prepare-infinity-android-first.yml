@@ -1,0 +1,43 @@
+name: Infinity Android-first preparation
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-android-first]
+    paths: ['.github/workflows/prepare-infinity-android-first.yml']
+permissions:
+  contents: read
+jobs:
+  prepare:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platforms;android-34 build-tools;34.0.0'
+      - name: Export pinned source and public build tools only
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/infinity-preparation
+          git archive --format=tar HEAD | gzip > /tmp/infinity-preparation/project-source.tar.gz
+          git clone --depth 1 --branch 21.3-Omega https://github.com/xbmc/xbmc.git /tmp/kodi-reference
+          test "$(git -C /tmp/kodi-reference rev-parse HEAD)" = a3a448d26b8d560a65655dab2cd122994dc4e146
+          git -C /tmp/kodi-reference archive --format=tar HEAD tools/android/packaging cmake/scripts/android xbmc/platform/android xbmc/windowing/android xbmc/application xbmc/messaging xbmc/settings xbmc/interfaces xbmc/guilib xbmc/input addons/skin.estuary version.txt | gzip > /tmp/infinity-preparation/kodi-reference.tar.gz
+          tar -czf /tmp/infinity-preparation/android-build-tools.tar.gz -C "$ANDROID_HOME" build-tools/34.0.0 platforms/android-34/android.jar
+          printf 'project=%s\nkodi=a3a448d26b8d560a65655dab2cd122994dc4e146\n' "$GITHUB_SHA" > /tmp/infinity-preparation/provenance.txt
+          cd /tmp/infinity-preparation
+          sha256sum *.tar.gz > SHA256SUMS
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-Android-First-Preparation
+          path: /tmp/infinity-preparation/
+          retention-days: 7
+          compression-level: 0
+          if-no-files-found: error

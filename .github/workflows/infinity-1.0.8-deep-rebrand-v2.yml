@@ -1,0 +1,380 @@
+name: Infinity 1.0.8 | Deep Rebrand v2
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-1.0.8-deep-rebrand]
+    paths:
+      - '.github/workflows/infinity-1.0.8-deep-rebrand-v2.yml'
+      - 'scripts/infinity_1_0_8_deep_rebrand.py'
+      - 'scripts/infinity_1_0_8_deep_rebrand_preimage.py'
+      - 'scripts/infinity71.py'
+      - 'scripts/infinity-responsive-v5.py'
+      - 'scripts/infinity_upper_layer_repack.py'
+      - 'patches/infinity-7.1-audited/**'
+      - 'patches/infinity-responsive-v5/**'
+      - 'addons/service.infinity.compat/**'
+      - 'addons/service.infinity.refresh/**'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  preflight:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+
+      - name: Install exact branding and Android validation tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends imagemagick fonts-dejavu-core
+          sdkmanager 'platforms;android-34' 'build-tools;34.0.0' >/dev/null
+          python3 -m py_compile \
+            scripts/infinity_1_0_8_deep_rebrand.py \
+            scripts/infinity_1_0_8_deep_rebrand_preimage.py
+
+      - name: Validate v4 then Responsive Bridge v5 before branding ownership changes
+        run: |
+          set -euo pipefail
+          git clone --depth 1 --branch 21.3-Omega https://github.com/xbmc/xbmc.git kodi
+          test "$(git -C kodi rev-parse HEAD)" = a3a448d26b8d560a65655dab2cd122994dc4e146
+          python3 scripts/infinity71.py source --source kodi
+          python3 scripts/validate-infinity71-java.py --source kodi \
+            --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" --out preflight/v4-java
+          python3 scripts/infinity-responsive-v5.py source --source kodi
+          # responsive-v5.py source verifies the exact v5 contract before any branding takeover.
+          python3 scripts/validate-infinity71-java.py --source kodi \
+            --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" --out preflight/v5-java
+          grep -q 'versionCode 2103109' kodi/tools/android/packaging/xbmc/build.gradle.in
+          grep -q 'versionName "1.0.8-Responsive-Bridge-v5"' kodi/tools/android/packaging/xbmc/build.gradle.in
+          grep -q 'android:src="@drawable/project_infinity_icon"' kodi/tools/android/packaging/xbmc/res/layout/activity_splash.xml
+          grep -q 'static final int VERSION = 5' kodi/tools/android/packaging/xbmc/src/InfinityCoreBridge.java.in
+          grep -q 'Infinity.NativeDeviceMode' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
+          grep -q 'Infinity.NativeWidthDp' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
+          python3 scripts/validate_infinity_skin_contract.py
+
+      - name: Transfer splash ownership and apply deep Infinity branding
+        run: |
+          set -euo pipefail
+          python3 scripts/infinity_1_0_8_deep_rebrand_preimage.py --source kodi
+          python3 scripts/infinity_1_0_8_deep_rebrand.py source \
+            --source kodi --receipt preflight/deep-rebrand-source.json
+          python3 scripts/infinity_1_0_8_deep_rebrand.py verify-source --source kodi
+          # Do not rerun responsive-v5's presentation verifier now: branding intentionally owns icon/splash/version.
+          # Instead prove the responsive native/Java facts survived the ownership handoff.
+          grep -q 'static final int VERSION = 5' kodi/tools/android/packaging/xbmc/src/InfinityCoreBridge.java.in
+          grep -q 'Published responsive v5' kodi/tools/android/packaging/xbmc/src/InfinityCoreBridge.java.in
+          grep -q 'Infinity.NativeDeviceMode' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
+          grep -q 'Infinity.NativeWidthDp' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
+          grep -q 'versionCode 2103122' kodi/tools/android/packaging/xbmc/build.gradle.in
+          grep -q 'versionName "1.0.8-Deep-Rebrand-1"' kodi/tools/android/packaging/xbmc/build.gradle.in
+          grep -q 'android:icon="@mipmap/ic_launcher"' kodi/tools/android/packaging/xbmc/AndroidManifest.xml.in
+          grep -q 'android:roundIcon="@mipmap/ic_launcher_round"' kodi/tools/android/packaging/xbmc/AndroidManifest.xml.in
+          grep -q 'windowSplashScreenAnimatedIcon' kodi/tools/android/packaging/xbmc/res/values-v31/infinity_splash_theme.xml
+          grep -q '<monochrome ' kodi/tools/android/packaging/xbmc/res/mipmap-anydpi-v33/ic_launcher.xml
+          ! grep -q 'android:padding="48dp"' kodi/tools/android/packaging/xbmc/res/layout/activity_splash.xml
+          test -s kodi/media/applaunch_screen.png
+          test -s kodi/media/infinity_launch_dark.png
+          test -s kodi/media/splash.jpg
+          test -s kodi/media/vendor_logo.png
+          test -s kodi/media/vendor_icon.png
+          python3 scripts/validate-infinity71-java.py --source kodi \
+            --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" --out preflight/rebrand-java
+          python3 -m py_compile \
+            addons/service.infinity.compat/service.py \
+            addons/service.infinity.compat/layout_service.py \
+            addons/service.infinity.compat/theme_contract.py \
+            addons/service.infinity.refresh/service.py
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-1.0.8-Deep-Rebrand-v2-Preflight
+          path: |
+            preflight/deep-rebrand-source.json
+            preflight/v4-java/Main.javap.txt
+            preflight/v5-java/Main.javap.txt
+            preflight/rebrand-java/Main.javap.txt
+          if-no-files-found: warn
+          retention-days: 30
+
+  engine:
+    needs: preflight
+    runs-on: ubuntu-22.04
+    timeout-minutes: 360
+    env:
+      NDK_VER: 21.4.7075529
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-build
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+
+      - name: Prepare matched Android and branding toolchain
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y autoconf bison build-essential curl flex gawk git gperf \
+            lib32stdc++6 lib32z1 lib32z1-dev libcurl4-openssl-dev unzip zip zlib1g-dev \
+            ccache python3 nasm yasm imagemagick fonts-dejavu-core
+          sdkmanager 'platform-tools' 'platforms;android-34' 'build-tools;34.0.0' "ndk;$NDK_VER"
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" \
+              -storepass android -keypass android -alias androiddebugkey \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -dname 'CN=Android Debug,O=Android,C=US'
+          fi
+
+      - name: Apply exact v4 then verified v5 then deep rebrand
+        run: |
+          set -euo pipefail
+          git clone --depth 1 --branch 21.3-Omega https://github.com/xbmc/xbmc.git kodi
+          test "$(git -C kodi rev-parse HEAD)" = a3a448d26b8d560a65655dab2cd122994dc4e146
+          python3 scripts/infinity71.py source --source kodi
+          python3 scripts/infinity-responsive-v5.py source --source kodi
+          python3 scripts/infinity_1_0_8_deep_rebrand_preimage.py --source kodi
+          python3 scripts/infinity_1_0_8_deep_rebrand.py source \
+            --source kodi --receipt engine-deep-rebrand-source.json
+          python3 scripts/infinity_1_0_8_deep_rebrand.py verify-source --source kodi
+          grep -q 'static final int VERSION = 5' kodi/tools/android/packaging/xbmc/src/InfinityCoreBridge.java.in
+          grep -q 'Infinity.NativeDeviceMode' kodi/xbmc/windowing/android/WinSystemAndroid.cpp
+
+      - uses: actions/cache/restore@v4
+        id: deps-cache
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: infinity-responsive-v5-21.3-arm64-${{ runner.os }}-${{ hashFiles('patches/infinity-7.1-audited/contract.json', 'patches/infinity-responsive-v5/contract.json') }}
+          restore-keys: |
+            infinity-responsive-v5-21.3-arm64-${{ runner.os }}-
+            infinity-71-audited-deps-21.3-arm64-${{ runner.os }}-
+
+      - name: Prepare matched dependencies and native build configuration
+        id: depends
+        run: |
+          set -euo pipefail
+          mkdir -p "$TARBALLS" "$DEPENDS" "$BUILD_DIR"
+          cd kodi/tools/depends
+          ./bootstrap
+          ./configure --with-tarballs="$TARBALLS" --host=aarch64-linux-android \
+            --with-sdk-path="$ANDROID_HOME" --with-ndk-path="$ANDROID_HOME/ndk/$NDK_VER" \
+            --prefix="$DEPENDS" --enable-debug=yes
+          make -j"$(nproc)"
+          make -C target/cmakebuildsys BUILD_DIR="$BUILD_DIR"
+
+      - name: Compile-check changed native owners
+        run: |
+          set -euo pipefail
+          CMAKE_BIN=$(sed -n 's/^CMAKE_COMMAND:INTERNAL=//p' "$BUILD_DIR/CMakeCache.txt")
+          test -x "$CMAKE_BIN"
+          "$CMAKE_BIN" -S "$PWD/kodi" -B "$BUILD_DIR" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          python3 scripts/infinity71.py native-check --build-dir "$BUILD_DIR"
+
+      - name: Build complete source-branded Kodi 21.3 engine and APK
+        run: |
+          set -euo pipefail
+          make -C "$BUILD_DIR" -j"$(nproc)"
+          make -C "$BUILD_DIR" apk -j"$(nproc)"
+          APK=$(find kodi "$BUILD_DIR" -type f -name '*.apk' -print -quit)
+          test -n "$APK"
+          mkdir -p engine
+          cp "$APK" engine/Infinity-1.0.8-Deep-Rebrand-Engine-Base.apk
+          cp engine-deep-rebrand-source.json engine/deep-rebrand-source.json
+          python3 scripts/infinity71.py record-engine \
+            --apk engine/Infinity-1.0.8-Deep-Rebrand-Engine-Base.apk \
+            --output engine/engine-v4-overlay-manifest.json --source-commit "$GITHUB_SHA"
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging \
+            engine/Infinity-1.0.8-Deep-Rebrand-Engine-Base.apk | tee engine/base-badging.txt
+          grep -q "package: name='com.projectinfinity.kodi' versionCode='2103122'" engine/base-badging.txt
+          grep -q "application-label:'Infinity'" engine/base-badging.txt
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump resources \
+            engine/Infinity-1.0.8-Deep-Rebrand-Engine-Base.apk > engine/base-resources.txt
+          grep -q 'ic_launcher' engine/base-resources.txt
+          python3 - <<'PY'
+          import hashlib,json,zipfile
+          from pathlib import Path
+          apk=Path('engine/Infinity-1.0.8-Deep-Rebrand-Engine-Base.apk')
+          with zipfile.ZipFile(apk) as z:
+              dex={n:hashlib.sha256(z.read(n)).hexdigest() for n in z.namelist() if n.startswith('classes') and n.endswith('.dex')}
+              native=hashlib.sha256(z.read('lib/arm64-v8a/libkodi.so')).hexdigest()
+              joined=b''.join(z.read(n) for n in z.namelist() if n.startswith('classes') and n.endswith('.dex'))
+              assert b'Published responsive v5' in joined
+              assert b'Infinity.NativeDeviceMode' in z.read('lib/arm64-v8a/libkodi.so')
+          Path('engine/responsive-v5-deep-rebrand.json').write_text(json.dumps({
+              'schema':1,'bridge_version':5,'version_code':2103122,
+              'version_name':'1.0.8-Deep-Rebrand-1','base_apk_sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),
+              'libkodi_sha256':native,'dex':dex,'source_commit':'${GITHUB_SHA}'
+          },indent=2,sort_keys=True)+'\n')
+          PY
+          printf '%s\n' 'Source-built Responsive Bridge v5 engine with source-owned Infinity branding. Runtime device acceptance is still required.' > engine/README.txt
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-1.0.8-Deep-Rebrand-v2-Engine
+          path: engine/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
+
+      - uses: actions/cache/save@v4
+        if: always() && steps.depends.conclusion == 'success' && steps.deps-cache.outputs.cache-hit != 'true'
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: ${{ steps.deps-cache.outputs.cache-primary-key }}
+
+  package:
+    needs: engine
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+      - name: Install final packaging and branding tools
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends imagemagick fonts-dejavu-core unzip zip
+          sdkmanager 'build-tools;34.0.0' >/dev/null
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-1.0.8-Deep-Rebrand-v2-Engine
+          path: engine
+
+      - name: Apply preserved Infinity player lock and current upper layer
+        run: |
+          set -euo pipefail
+          mkdir -p candidate
+          python3 scripts/infinity71.py overlay \
+            --apk engine/Infinity-1.0.8-Deep-Rebrand-Engine-Base.apk \
+            --manifest engine/engine-v4-overlay-manifest.json \
+            --output candidate/with-lock-unsigned.apk
+          python3 scripts/infinity_upper_layer_repack.py \
+            candidate/with-lock-unsigned.apk candidate/upper-layer-unsigned.apk
+
+      - name: Re-assert final user-facing Infinity branding after upper-layer repack
+        run: |
+          set -euo pipefail
+          python3 scripts/infinity_1_0_8_deep_rebrand.py apk \
+            --input candidate/upper-layer-unsigned.apk \
+            --output candidate/Infinity-1.0.8-Deep-Rebrand-unsigned.apk \
+            --receipt candidate/deep-rebrand-apk.json
+          python3 scripts/infinity_1_0_8_deep_rebrand.py verify-apk \
+            --apk candidate/Infinity-1.0.8-Deep-Rebrand-unsigned.apk
+
+      - name: Sign with permanent Infinity identity and verify updateability
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          bash scripts/sign-infinity71.sh \
+            candidate/Infinity-1.0.8-Deep-Rebrand-unsigned.apk \
+            candidate/Infinity-1.0.8-Deep-Rebrand.apk
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs \
+            candidate/Infinity-1.0.8-Deep-Rebrand.apk | tee candidate/signing-verification.txt
+          grep -qi 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' candidate/signing-verification.txt
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging \
+            candidate/Infinity-1.0.8-Deep-Rebrand.apk | tee candidate/badging.txt
+          grep -q "package: name='com.projectinfinity.kodi' versionCode='2103122'" candidate/badging.txt
+          grep -q "application-label:'Infinity'" candidate/badging.txt
+
+      - name: Final responsive-engine and branding regression gates
+        run: |
+          set -euo pipefail
+          python3 scripts/infinity_1_0_8_deep_rebrand.py verify-apk \
+            --apk candidate/Infinity-1.0.8-Deep-Rebrand.apk
+          python3 scripts/validate_infinity_skin_contract.py
+          python3 - <<'PY'
+          import zipfile
+          base='engine/Infinity-1.0.8-Deep-Rebrand-Engine-Base.apk'
+          final='candidate/Infinity-1.0.8-Deep-Rebrand.apk'
+          with zipfile.ZipFile(base) as a, zipfile.ZipFile(final) as b:
+              for name in a.namelist():
+                  if name == 'lib/arm64-v8a/libkodi.so' or (name.startswith('classes') and name.endswith('.dex')):
+                      assert a.read(name) == b.read(name), name
+              dex=b''.join(b.read(n) for n in b.namelist() if n.startswith('classes') and n.endswith('.dex'))
+              native=b.read('lib/arm64-v8a/libkodi.so')
+              assert b'Published responsive v5' in dex
+              assert b'Infinity.NativeDeviceMode' in native
+              required=[
+                'assets/addons/service.infinity.compat/addon.xml',
+                'assets/addons/service.infinity.compat/layout_service.py',
+                'assets/addons/service.infinity.compat/theme_contract.py',
+                'assets/addons/service.infinity.refresh/service.py',
+                'assets/media/splash.jpg',
+                'assets/media/vendor_logo.png',
+                'assets/media/vendor_icon.png',
+              ]
+              for name in required: assert name in b.namelist(), name
+              po=b.read('assets/addons/resource.language.en_gb/resources/strings.po').decode()
+              assert 'msgid "About Infinity"' in po
+              assert 'Kodi Foundation' in po
+          print('PASS: final signed APK preserves responsive v5 compiled engine and Infinity branding/legal boundary')
+          PY
+          cp engine/deep-rebrand-source.json candidate/deep-rebrand-source.json
+          cp engine/responsive-v5-deep-rebrand.json candidate/responsive-v5-deep-rebrand.json
+          sha256sum candidate/Infinity-1.0.8-Deep-Rebrand.apk | tee candidate/Infinity-1.0.8-Deep-Rebrand.sha256
+          cat > candidate/DEVICE-TEST.txt <<'EOF'
+          DEVICE TEST REQUIRED — build/static success is not runtime proof.
+
+          BRANDING
+          - Samsung launcher: trimmed Infinity icon under circle/squircle masks.
+          - Android themed/monochrome icon: Infinity symbol remains legible.
+          - Light system/app launch: light Infinity splash; no stock Kodi launch art.
+          - Dark/OLED launch: black/deep Infinity splash; no stock Kodi launch art.
+          - First-run/storage/permission startup text says Infinity.
+          - Native handoff/startup remains Infinity branded.
+          - Normal English Settings/About/user-facing labels say Infinity.
+          - Kodi legal/open-source attribution may remain only where required/appropriate.
+          - Web interface, if used, shows Infinity logo/title.
+
+          REGRESSION
+          - Package remains com.projectinfinity.kodi and installs over the permanent Infinity signing line.
+          - Responsive Bridge v5: cover, inner, portrait, landscape, fold/unfold, PiP.
+          - Refresh controller/performance mode and video playback are unchanged regression checks.
+          - Locked C30.4.1 skin, player, player submenus, glass dialogs and Install from ZIP remain regression checks.
+
+          Do not promote this APK to a locked baseline until on-device acceptance passes.
+          EOF
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-1.0.8-Deep-Rebrand-v2
+          path: |
+            candidate/Infinity-1.0.8-Deep-Rebrand.apk
+            candidate/Infinity-1.0.8-Deep-Rebrand.sha256
+            candidate/signing-verification.txt
+            candidate/badging.txt
+            candidate/deep-rebrand-source.json
+            candidate/deep-rebrand-apk.json
+            candidate/responsive-v5-deep-rebrand.json
+            candidate/DEVICE-TEST.txt
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 30
