@@ -1,12 +1,15 @@
 {
-  "scope": "2103402 correction9 evidence retention after original Android bugreport; correction1 attribution only",
   "selected_tests": [
-    "test_crash_context_scope.py: native original-context forwarding and fatal fallback, exact process ownership and preservation",
-    "test_health_export_scope.py: added OS memory/importance metadata with failure isolation",
-    "test_bugreport_analysis.py: process/time isolation, protobuf coverage, bounded parsing, recovered register fragments and aggregate mapping counts"
+    "test_android17_request: fail-closed request/branch/event/build binding and preserved workflow routing",
+    "Android17 final-search-all-enter on signed 2103401 build40089463702: existing real input/results/history/back/Home probe"
   ],
-  "prior_host_tests": "26 PASS run40137879262 retained; existing addon overlays unchanged",
-  "android17": "NOT RUN; no attached device/ADB/emulator",
+  "prior_host_tests": "35 PASS at aca8ba83/run40140363553 retained; not selected for another unrelated repeat",
+  "android17": "SELECTED; pending push dispatch",
   "non_apk_methods": "Original bugreport provided and inspected; no SearchPID9097 tombstone found so far; no diagnostic APK requested",
-  "interim_apk_requested": false
+  "interim_apk_requested": false,
+  "previous_scope": "2103402 correction9 evidence retention after original Android bugreport; correction1 attribution only",
+  "scope": "Explicitly authorized narrow push reuse of Android17 feature verification; existing signed baseline final-search-all-enter",
+  "host_test_modules": [
+    "test_android17_request"
+  ]
 }

@@ -1,5 +1,8 @@
 name: Infinity feature-only verification
 on:
+  push:
+    branches: [work/infinity-2103402-final-stabilization-20261024]
+    paths: ['repairs/infinity-2103402-final/android17/REQUEST.json']
   workflow_dispatch:
     inputs:
       source_ref:
@@ -26,11 +29,11 @@ permissions:
   contents: read
   actions: read
 concurrency:
-  group: infinity-feature-${{ inputs.source_ref }}-${{ inputs.feature }}
+  group: infinity-feature-${{ inputs.source_ref || github.ref }}-${{ inputs.feature || '2103402-request' }}
   cancel-in-progress: false
 jobs:
   android17:
-    name: Selected feature ${{ inputs.feature }}
+    name: Selected feature ${{ inputs.feature || '2103402 baseline Search request' }}
     runs-on: ubuntu-22.04
     timeout-minutes: 150
     env:
@@ -40,7 +43,10 @@ jobs:
       PYTHONDONTWRITEBYTECODE: '1'
     steps:
       - uses: actions/checkout@v4
-        with: {ref: "${{ inputs.source_ref }}", fetch-depth: 0, persist-credentials: false, show-progress: false}
+        with: {ref: "${{ inputs.source_ref || github.sha }}", fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - name: Validate explicitly requested 2103402 push scope
+        if: github.event_name == 'push'
+        run: python3 repairs/infinity-2103402-final/android17/push_request.py
       - name: Require one explicitly authorized feature
         run: |
           python3 - <<'PYCODE'
@@ -79,6 +85,9 @@ jobs:
           apk=files[0];digest=hashlib.sha256(apk.read_bytes()).hexdigest()
           r=json.load(open('signed/CANDIDATE.json'))
           assert r['apk_sha256']==digest
+          if os.environ['GITHUB_EVENT_NAME']=='push':
+              request=json.load(open('repairs/infinity-2103402-final/android17/REQUEST.json'))
+              assert digest==request['baseline_apk_sha256'] and r['source_commit']==request['baseline_commit'], 'Requested locked baseline differs'
           run=json.loads(subprocess.check_output(['gh','api',f"repos/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['CANDIDATE_BUILD']}"],text=True))
           assert run['head_sha']==r['source_commit'] and run['conclusion']=='success', 'Signed build/source mismatch'
           test_commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
@@ -123,8 +132,9 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: Infinity-Feature-${{ inputs.feature }}-${{ github.run_id }}-Evidence
+          name: Infinity-Feature-${{ env.SELECTED_CASE }}-${{ github.run_id }}-Evidence
           path: |
+            android17-request-evidence.json
             feature-results/
             api37-support/
             emulator-setup/

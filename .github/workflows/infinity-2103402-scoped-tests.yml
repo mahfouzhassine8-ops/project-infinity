@@ -31,10 +31,21 @@ jobs:
           INFINITY_SIGNED_CC35_ZIP: ${{ github.workspace }}/signed-2103401/script.infinity.commandcenter-0.3.5.35.zip
           INFINITY_SIGNED_SKIN242_ZIP: ${{ github.workspace }}/signed-2103401/skin.infinity.diggz-1.0.5.242.zip
           INFINITY_BASELINE_APK: ${{ github.workspace }}/signed-2103401/Infinity-2103401-Universal-Performance-QA.apk
+          INFINITY_BASELINE_SOURCE_ARCHIVE: ${{ github.workspace }}/signed-2103401/Infinity-Targeted-Source-and-Evidence.zip
         run: |
           (cd signed-2103401 && sha256sum -c SHA256SUMS)
           cd repairs/infinity-2103402-final
-          python3 -m unittest -v test_home_reflow_scope test_clock_reflow_scope test_information_spacing_scope test_visual_scope test_health_export_scope test_health_partial_scope test_baseline_capture test_staging_audit test_crash_context_scope test_bugreport_analysis
+          python3 - <<'PY'
+          import json, subprocess, sys
+          request=json.load(open('NEXT-VERIFICATION.json'))
+          allowed={'test_home_reflow_scope','test_clock_reflow_scope','test_information_spacing_scope',
+                   'test_visual_scope','test_health_export_scope','test_health_partial_scope',
+                   'test_baseline_capture','test_staging_audit','test_crash_context_scope',
+                   'test_bugreport_analysis','test_android17_request','test_release_bindings'}
+          selected=request.get('host_test_modules',[])
+          assert selected and len(selected)==len(set(selected)) and set(selected)<=allowed, 'Explicit reviewed host modules required'
+          subprocess.run([sys.executable,'-m','unittest','-v',*selected],check=True)
+          PY
       - name: Reject changes outside approved repair records
         run: |
           python3 - <<'PY'
@@ -43,7 +54,8 @@ jobs:
           assert all(n.startswith('repairs/infinity-2103402-final/') or
                      n=='handoffs/INFINITY-2103402-FINAL-STABILIZATION-AUTHORIZED-20261024.md' or
                      n=='handoffs/INFINITY-2103402-ASTRA-TAKEOVER-CHECKPOINT-20261024.md' or
-                     n=='.github/workflows/infinity-2103402-scoped-tests.yml'
+                     n in ('.github/workflows/infinity-2103402-scoped-tests.yml',
+                           '.github/workflows/infinity-saved-navigation-android.yml')
                      for n in names), names
           assert not any('cobra' in n.lower() for n in names), names
           PY

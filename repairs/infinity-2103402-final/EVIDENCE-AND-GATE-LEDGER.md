@@ -147,3 +147,17 @@ checks pass with added cases;4 parser/privacy tests pass. Earlier26 host passes
 No interim installation requested, no signed2103402 package, and no Search/Home/
 rotation/Fold performance or stability PASS claimed. Raw diagnostics remain
 private. All other approved workstreams and physical release gates remain open.
+
+## Explicit Android17 push authorization — baseline Search request
+
+The user's Android17 verification-blocker directive explicitly authorizes a narrowly
+scoped push trigger on the existing2103402 branch. This is the limited exception
+to the repository's default manual feature-workflow routing. The existing
+`infinity-saved-navigation-android.yml` remains the runner; only an explicit change
+to `android17/REQUEST.json` selects the reviewed baseline Search All Enter case.
+The request binds build40089463702, its source commit and APK SHA256. Original
+signature, source, provider, API37 and disposable-device gates remain required.
+No permissions, secrets, signing, shutdown policies or application sources change.
+The3 local routing/rejection checks PASS. Actual Android execution is SELECTED,
+not yet PASS; this first existing case does not claim50 History cycles or physical
+Fold acceptance. The earlier35 host passes remain retained rather than rerun.

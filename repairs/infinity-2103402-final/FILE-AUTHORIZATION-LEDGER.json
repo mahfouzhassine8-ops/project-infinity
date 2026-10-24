@@ -612,5 +612,77 @@
       "checkpoint": "e66371a0a0a69792c78f8b317b8563f952cadd97",
       "purpose": "Correction9 evidence retention, isolated native/Java source, focused host tests, or sanitized investigation records; production preimages and precise runtime boundaries listed above"
     }
-  ]
+  ],
+  "release_binding_scope": {
+    "recorded_before_runtime_edit": true,
+    "defects": [
+      2,
+      3,
+      4,
+      6,
+      7,
+      9
+    ],
+    "necessity": "The staged authorized repairs change the exact CC35 source inventory. Existing native, installed-code and bridge checks reject unmatched sources. New versioned exact admissions are indispensable; never overwrite or weaken old checks.",
+    "baseline_build": 40089463702,
+    "baseline_apk_sha256": "a7abd878768cd09cac0c0caeadd5afc691a842cf97c9ff14b0d913677117a742",
+    "component_preimages": {
+      "script.infinity.commandcenter/addon.xml": "f6021a3f3c556a0a5377d462552a01c7f6fab463c495e7070c9a916451b379d2",
+      "script.infinity.commandcenter/checkpoint_runtime.py": "1392f627e4d94ed73f7c9fa8f6445b3050aa9ee59b6f4ee49780b43023b008ba",
+      "script.infinity.commandcenter/infinity_trakt.py": "0f004ca4d3c8b874eaf718f4e742ca97c400e8dc59957495b82f10346a16f413",
+      "script.infinity.watchedbridge/addon.xml": "917ece10cbeebffb1442c81572579ffe497760b914248076ea4d6a241c11815c",
+      "script.infinity.watchedbridge/controller.py": "b8ee39262e1a6e63b6884daa9f3741bcbe71ebc10ee06b06f0b9631961a372aa",
+      "script.infinity.watchedbridge/CONTROLLER-PREIMAGES.json": "56e743fe9683d7b650c5cc9d2bad0b33e4c16d51a295c542ca3c1cdc646a707e",
+      "script.infinity.uirepair/addon.xml": "caaa6aff00999926be79f55938748d053a78a3255948355d914c73c8cc6ac97c",
+      "script.infinity.uirepair/CONTROLLER-PREIMAGES.json": "56e743fe9683d7b650c5cc9d2bad0b33e4c16d51a295c542ca3c1cdc646a707e",
+      "skin.infinity.diggz/addon.xml": "9e07a53c2db3aa68930f5bd2931c4a04cb3f66252d7a2c7fd2ac3c7f15076695",
+      "script.kodihealthcenter/addon.xml": "3a12f57560f3c1692aa171e98777fa4d81ddfef7e6928a6f537de82234cace9b",
+      "script.kodihealthcenter/khc_diagnostics.py": "5c7e698e2b1865cee96639f252dfdcab2c7a595a27b9e6e55d942fef8fec618a",
+      "script.kodihealthcenter/khc_contracts.py": "3cf340b3c8c49a55e07d0e798b78323b9d46bebfcb949b1040b6e80327769214",
+      "script.kodihealthcenter/khc_doctor.py": "ad5a841b97813d6fdb893522458cbe9bc7edcc19e6e102d60fe7a99caece8e36"
+    },
+    "native_preimages": {
+      "xbmc/platform/android/activity/InfinityScriptCheckpointContracts.cpp": "f934bdfe39180e131f4e59c6f1320236d6daf9cfcf37d5fe604e8a16ed696633",
+      "xbmc/platform/android/activity/InfinityAndroidCheckpoint.cpp": "87cc60d6512c98999c3479afaa0245eb95ad43991d1f93d802c01e27a98a58e7",
+      "xbmc/guilib/GUIBaseContainer.cpp": "319735f89a61a54715fadab22487a561647d454e36255e2588d92d5005da1e1f",
+      "xbmc/interfaces/legacy/WindowXML.cpp": "1723a5defae3ba6b643b100b4917553e6c572d10a11a71e9be006bb1d1d83057"
+    },
+    "boundaries": {
+      "component_metadata": "Only five addon versions, exact controller/bridge dependency pins and corresponding version constants; original TrackIt, progress, routing and persistence algorithms unchanged.",
+      "InfinityScriptCheckpointContracts.cpp": "Append four exact CC36 inventory admissions to existing CC35 endpoints. All original contracts byte-identical.",
+      "InfinityAndroidCheckpoint.cpp": "Add CC36 to existing Infinity participant version check only; no barrier, deadline, termination or durability changes.",
+      "GUIBaseContainer.cpp": "Add CC36 to existing skin- and owner-bound title popup version gate only.",
+      "WindowXML.cpp": "Add CC36/UI19 to existing exact caller/XML/skin resize callback gates only."
+    },
+    "target_versions": {
+      "script.infinity.commandcenter": "0.3.5.36",
+      "script.infinity.watchedbridge": "1.0.17",
+      "script.infinity.uirepair": "0.1.19",
+      "skin.infinity.diggz": "1.0.5.243",
+      "script.kodihealthcenter": "2.5.27"
+    },
+    "negative_tests": [
+      "Reject modified baseline assets/native sources and unexplained addon changes",
+      "Execute existing bridge verifier against staged component; reject modified file and original-version mismatch",
+      "Reverse new native admissions and require exact baseline bytes; retain all previous contracts",
+      "Verify all 25 pins and bridge dependency pins against actual staged bytes",
+      "No runtime verification or APK acceptance implied by source assembly"
+    ],
+    "android17": "NOT RUN",
+    "physical_fold": "NOT RUN",
+    "baseline_source_archive_sha256": "bc55f659aadf2a806297abdd6104ddd362906179e96b9c2b391eee8556a4f0a8"
+  },
+  "android17_push_scope": {
+    "authorization": "User explicit Android17 verification blocker directive: investigate narrowly scoped push-triggered reuse on 2103402 development branch; no authentication/signing/integrity/acceptance bypass",
+    "recorded_before_edit": true,
+    "existing_workflow": ".github/workflows/infinity-saved-navigation-android.yml",
+    "baseline_sha256": "1092cceddaa7511a6103c690c15b9d16c2aa4c5032b4e2e2a396920c742f0f52",
+    "runtime_changes": [],
+    "push_branch": "work/infinity-2103402-final-stabilization-20261024",
+    "sole_trigger_path": "repairs/infinity-2103402-final/android17/REQUEST.json",
+    "selected_case": "final-search-all-enter",
+    "candidate_build": 40089463702,
+    "goal": "Observe signed baseline Search All Enter and Back/Home responsiveness through existing API37 runner; not 50-cycle or physical acceptance",
+    "preserved": "Original manual choices, signed-artifact SHA and certificate checks, source commit matching, provider pins, API37 platform checks, disposable-emulator-only setup, no shutdown tests"
+  }
 }
