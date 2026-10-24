@@ -22,7 +22,7 @@ static bool InfinityOpenTitlePopup(const std::shared_ptr<CFileItem>& item)
   // Kodi's context invoker owns this exact copy. No later focused-item lookup,
   // Python wrapper of a live GUI container, provider command, or synchronous wait.
   const auto popup = CContextMenuItem::CreateItem("Title options", "",
-      addon->Path() + "/context.py", "", addon->ID(), {addon->ID(), "infinity-item-menu-v1"});
+      URIUtils::AddFileToFolder(addon->Path(), "context.py"), "", addon->ID(), {addon->ID(), "infinity-item-menu-v1"});
   return popup.Execute(std::make_shared<CFileItem>(*item));
 }
 #endif
@@ -31,7 +31,7 @@ static bool InfinityOpenTitlePopup(const std::shared_ptr<CFileItem>& item)
 
 NEW = NEW.replace('    else\n      OnClick', '    else if (!InfinityOpenTitlePopup(item))\n      OnClick')
 REPLACEMENTS = [
-    ('#include "GUIBaseContainer.h"', '#include "GUIBaseContainer.h"\n#include "ContextMenuItem.h"'),
+    ('#include "GUIBaseContainer.h"', '#include "GUIBaseContainer.h"\n#include "ContextMenuItem.h"\n#include "utils/URIUtils.h"'),
     ('bool CGUIBaseContainer::OnInfinityOptionBLongPress(float x, float y)', HELPER + 'bool CGUIBaseContainer::OnInfinityOptionBLongPress(float x, float y)'),
     ('  // The sole command is literal. The untrusted title/URL never enter a',
      '  #if defined(TARGET_ANDROID)\n  if (InfinityOpenTitlePopup(item))\n  {\n    m_waitForScrollEnd = false;\n    m_infinityMediaTapKey.clear();\n    m_infinityMediaSuppressUntil = std::chrono::steady_clock::now() + std::chrono::milliseconds(600);\n    return true;\n  }\n  #endif\n\n  // The sole command is literal. The untrusted title/URL never enter a'),
