@@ -212,6 +212,57 @@
       "negative_tests": [
         "Preserve pagecontrol bindings, complete textboxes, allnavigation/actions and all other bytes"
       ]
+    },
+    {
+      "path": "script.infinity.commandcenter/service.py",
+      "baseline_sha256": "ca9233507680c5d013468a38d4996bb54389ebe4d3e2410df8c241dd8340f6c5",
+      "staged_sha256": "51fc63f6922885c8473277398e6f3569274eb42afe06be0148501d6ddc65bb23",
+      "defects": [
+        2
+      ],
+      "boundary": "Only DisplayReflowController.tick native-owned semantic geometry branch: remove widget revision bump; leave native owner, fallback, playback and other service code byte-identical",
+      "necessity": "Direct source proof: native-owned fold/rotation semantic signature previously bumped Infinity.WidgetReloadRevision used in Home Latest Releases directory URL, causing an unnecessary directory invalidation on geometry alone",
+      "negative_tests": [
+        "Exact signed CC35 preimage hash required",
+        "Reverse only native-owner transform to recover identical source bytes",
+        "Host execute actual DisplayReflowController class; app-v1 geometric change never bumps or ReloadSkin",
+        "Legacy fallback _apply AST remains unchanged"
+      ],
+      "state": "STAGED: local seven combined Home/clock tests passed; GitHub source gate passed. Full Home 40-45 second return remains unresolved, Android/Fold not run"
+    },
+    {
+      "path": "skin.infinity.diggz/unified/Home.xml",
+      "baseline_sha256": "3f774364299b3c535dda0a52b1b304fc65b562f84a8ca6e1a9110ab7c39056f0",
+      "staged_sha256": "20761381b3bf5916b515a67c082f9946c53dea0be195aeaefd465cea210e9e81",
+      "defects": [
+        3
+      ],
+      "boundary": "Only InfinityHomeStatusCluster timeleft 72%->64%, timewidth 26%->34%, existing 98% right edge and all date/weather/labels identical",
+      "necessity": "Physical Fold recording showed clipped time suffix after playback return; only clock bounding box widened",
+      "negative_tests": [
+        "Exact signed skin242 preimage hash",
+        "Reverse-only parameter transform to restore full original Home XML",
+        "XML parses; date and weather geometry unchanged",
+        "Fold physical rendering still required"
+      ],
+      "state": "STAGED: local and GitHub source tests passed; physical Fold acceptance NOT RUN"
+    },
+    {
+      "path": "script.infinity.commandcenter/information.py",
+      "baseline_sha256": "c388b83353bff8e7687a545d3a00ea16691a208bd34b3a0a0678ff6441abb54e",
+      "staged_sha256": "8cf3cfcab461d73d4e8bb625039d905478ffb52688f729252002b292ea87c429",
+      "defects": [
+        4
+      ],
+      "boundary": "Only geometry synopsis-length-dependent vertical reservation and its owned reflow call; complete textbox text, action bindings, metadata, scrolling control IDs, all other code unchanged",
+      "necessity": "Physical short VisionQuest plot previously received a full 650-unit plot area, creating large empty whitespace; dynamic reserved height shrinks without trimming source text",
+      "negative_tests": [
+        "Exact signed CC35 information source hash",
+        "Reverse only helper/geometry change to recover original source bytes",
+        "Execute actual geometry functions for short vs long content and portrait/landscape windows",
+        "Verify full synopsis setter and controls are unchanged"
+      ],
+      "state": "STAGED: four local geometry tests passed; device text rendering and long scroll NOT RUN"
     }
   ],
   "pending_scope": "1/2/3/5/8/9 require further source ownership or root-cause evidence; no speculative native edit",
@@ -286,5 +337,21 @@
   "existing_document_change": {
     "path": "repairs/infinity-2103402-final/EVIDENCE-AND-GATE-LEDGER.md",
     "purpose": "Record actual continuation results and unresolved release gates"
+  },
+  "continuation_20261024": {
+    "recorded_after_scoped_source_staging": true,
+    "source_preimages_pinned_before_stage": true,
+    "host_test_source": "Exact signed 2103401 component ZIPs",
+    "last_confirmed_ci_success": "40131873559",
+    "target_overlays_included": false,
+    "android17": "NOT RUN",
+    "physical_fold": "NOT RUN",
+    "known_unresolved": [
+      "Search process signal 7 lacks faulting stack",
+      "Full Home return still blanks despite corrected invalidation trigger",
+      "Provider chooser callsite owner and focus restoration unverified",
+      "Health Java source not bound to signed DEX",
+      "No signed 2103402 APK"
+    ]
   }
 }
