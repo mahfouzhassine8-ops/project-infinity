@@ -21,8 +21,12 @@ verification or APK compilation/signing/packaging. Never turn failure into PASS
 with `continue-on-error`. Unselected checks are NOT RUN, never PASS.
 
 APK packaging retains compilation, permanent-signature, package identity, and
-integrity checks. It does not run behavioral suites. Select those independently
-when authorized. Changing test orchestration never authorizes weakening runtime
+integrity checks. It does not run behavioral suites. Packaging may auto-run ONLY
+for changes to specifically allowlisted build/source paths on the previously
+user-authorized Infinity corrective branch, after the checked-in tracking/SCOPE.json
+authorization and protected-source guard are verified. Manual packaging still
+requires a scope note. This never auto-runs feature or shutdown tests.
+Select behavioral tests independently when authorized. Changing test orchestration never authorizes weakening runtime
 protections or altering the APK to make a test pass.
 
 Preserve passing evidence and exact source/APK bindings; do not rerun completed

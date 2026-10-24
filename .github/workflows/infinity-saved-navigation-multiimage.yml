@@ -1,5 +1,18 @@
 name: Infinity corrective APK packaging - independent of runtime tests
 on:
+  push:
+    branches: [work/infinity-saved-route-correction-20261023]
+    paths:
+      - '.github/workflows/infinity-saved-navigation-multiimage.yml'
+      - 'repairs/save-later-multiimage-20261023/tracking/overlay/**'
+      - 'repairs/save-later-multiimage-20261023/tracking/SCOPE.json'
+      - 'repairs/save-later-multiimage-20261023/tracking/parent_saved_navigation.py'
+      - 'repairs/save-later-multiimage-20261023/saved_navigation.py'
+      - 'repairs/save-later-multiimage-20261023/component_contract.py'
+      - 'repairs/save-later-multiimage-20261023/native_contract.py'
+      - 'repairs/save-later-multiimage-20261023/navigation_native.py'
+      - 'repairs/save-later-multiimage-20261023/owner_binding.py'
+      - 'repairs/save-later-multiimage-20261023/build.py'
   workflow_dispatch:
     inputs:
       authorization:
@@ -30,8 +43,19 @@ jobs:
       - name: Require authorized correction scope and unchanged protected source
         run: |
           python3 - <<'PY'
-          import os,subprocess
-          assert os.environ['AUTHORIZED_SCOPE'].strip(), 'Explicit correction scope required'
+          import json,os,subprocess
+          if os.environ['GITHUB_EVENT_NAME']=='push':
+              assert os.environ['GITHUB_REF']=='refs/heads/work/infinity-saved-route-correction-20261023', 'Unapproved build branch'
+              with open('repairs/save-later-multiimage-20261023/tracking/SCOPE.json') as file:
+                  scope=json.load(file)
+              assert scope['authorization']=='2026-10-23 user-approved end-to-end tracking/navigation/responsiveness correction, execute in stated priority', 'Build scope is not user-authorized'
+              assert scope['cobra_modifications'] is False, 'Cobra protection changed'
+              assert {'shutdown','Normal Close','Essential-First','Close/reopen'}.issubset(set(scope['forbidden_tests'])), 'Shutdown isolation changed'
+              assert 'compilation/signing/component binding/package and data integrity relevant to these changes' in scope['allowed_tests'], 'Signing not authorized by tracked scope'
+          elif os.environ['GITHUB_EVENT_NAME']=='workflow_dispatch':
+              assert os.environ['AUTHORIZED_SCOPE'].strip(), 'Explicit correction scope required'
+          else:
+              raise RuntimeError('Unapproved build trigger')
           paths=subprocess.check_output(['git','diff','--name-only','8df2e26f481eb7ff2d791c8cab39548de949d030','HEAD'],text=True).splitlines()
           assert paths and all(p.startswith('repairs/save-later-multiimage-20261023/') or p in {'.github/workflows/infinity-saved-navigation-multiimage.yml','.github/workflows/infinity-saved-navigation-android.yml','.github/workflows/infinity-shutdown-verification.yml','.github/scripts/test_infinity_focused_policy.py','AGENTS.md','docs/INFINITY-FOCUSED-TESTING-POLICY.md'} for p in paths),paths
           assert not any('cobra' in p.lower() for p in paths),paths

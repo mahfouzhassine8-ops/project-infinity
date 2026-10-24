@@ -50,11 +50,14 @@ artifacts remain available; APK persistence safeguards are untouched.
 
 ## Packaging and reporting
 
-**Infinity corrective APK packaging - independent of runtime tests** is manual.
-Select the corrective branch in GitHub's workflow branch selector and provide the
-approved correction scope. Source reconstruction, ARM64 compilation, permanent
-signature, install-over package identity, and member/source integrity still gate
-the package. Packaging launches no behavioral suite and neither downloads nor
+**Infinity corrective APK packaging - independent of runtime tests** supports
+both manual dispatch (with an explicit authorization note) and automatic builds
+when reviewed source or this build workflow changes on the previously authorized
+`work/infinity-saved-route-correction-20261023` branch. The push path filter and
+the unchanged tracked `tracking/SCOPE.json` authorization are required for the
+automatic route; no other branch or unrelated edit can start this build.
+Source reconstruction, ARM64 compilation, permanent signature, install-over
+package identity, and member/source integrity still gate the package. Packaging launches no behavioral suite and neither downloads nor
 requires shutdown results. `VERIFICATION-STATUS.json` records both feature and
 shutdown verification as **NOT_RUN_IN_PACKAGING**; separately executed reports
 retain their own APK/source/run identity. Missing or failed shutdown reports do
@@ -86,3 +89,18 @@ and report physical Fold acceptance separately. The existing provider-only
 choices remain independently selectable. Do not select the historical
 `saved-navigation` case for a CC32 recovery-memory write: that earlier case
 asserts that all saved bytes remain unchanged, before recovery memory existed.
+
+## Restored authorized build automation — October 24, 2026
+
+The prior manual-only packaging change unintentionally blocked normal build
+handoff. A scoped push trigger now starts **compilation, signing and packaging**
+for the already-approved Infinity corrective branch and only its listed source
+and build-workflow paths. The tracked authorization guard must pass before
+artifact downloads or compilation. Manual build dispatch remains available.
+
+**Feature and shutdown workflows remain manual-only.** No automatic runtime
+verification, no Close/reopen test, no weakened persistence, and no new release
+acceptance are implied. Previous failures and unused test cases remain recorded
+as FAIL or NOT RUN. This workflow change itself is a build trigger, so its
+signed-candidate result must be reported truthfully; a queued or failed build
+is not a deliverable.

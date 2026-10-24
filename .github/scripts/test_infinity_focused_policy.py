@@ -33,12 +33,19 @@ def workflow(name):
     return yaml.load((ROOT/'.github/workflows'/name).read_text(),Loader=yaml.BaseLoader)
 
 class WorkflowIsolation(unittest.TestCase):
-    def test_manual_only_independent_jobs(self):
+    def test_independent_jobs_and_authorized_build_trigger(self):
         groups=[]
         for name in (FEATURE,SHUTDOWN,BUILD):
             with self.subTest(workflow=name):
                 w=workflow(name)
-                self.assertEqual(set(w['on']),{'workflow_dispatch'})
+                self.assertEqual(set(w['on']),{'workflow_dispatch','push'} if name==BUILD else {'workflow_dispatch'})
+                if name==BUILD:
+                    push=w['on']['push']
+                    self.assertEqual(push['branches'],['work/infinity-saved-route-correction-20261023'])
+                    self.assertIn('.github/workflows/infinity-saved-navigation-multiimage.yml',push['paths'])
+                    self.assertIn('repairs/save-later-multiimage-20261023/tracking/overlay/**',push['paths'])
+                    self.assertIn('repairs/save-later-multiimage-20261023/build.py',push['paths'])
+                    self.assertTrue(all(p.startswith('repairs/save-later-multiimage-20261023/') or p=='.github/workflows/infinity-saved-navigation-multiimage.yml' for p in push['paths']))
                 self.assertEqual(len(w['jobs']),1)
                 groups.append(w['concurrency']['group'])
                 job=next(iter(w['jobs'].values()))
@@ -76,6 +83,20 @@ class WorkflowIsolation(unittest.TestCase):
         calls={n.func.attr for n in ast.walk(tree) if isinstance(n,ast.Call) and isinstance(n.func,ast.Attribute)
                and isinstance(n.func.value,ast.Name) and n.func.value.id=='staging'}
         self.assertEqual(calls,{'extra','admit_runtime'})
+
+    def test_approved_push_scope_is_a_build_only_gate(self):
+        build=workflow(BUILD)
+        code=build['jobs']['build']['steps'][1]['run']
+        for expected in ("os.environ['GITHUB_EVENT_NAME']=='push'",
+                         "os.environ['GITHUB_REF']=='refs/heads/work/infinity-saved-route-correction-20261023'",
+                         "tracking/SCOPE.json", "scope['authorization']",
+                         "scope['cobra_modifications'] is False", "'shutdown'"):
+            self.assertIn(expected,code)
+        self.assertEqual(set(workflow(FEATURE)['on']),{'workflow_dispatch'})
+        self.assertEqual(set(workflow(SHUTDOWN)['on']),{'workflow_dispatch'})
+        self.assertNotIn('workflow_run',build['on'])
+        self.assertNotIn('needs',build['jobs']['build'])
+        self.assertNotIn('continue-on-error',build['jobs']['build'])
 
     def test_packaging_requires_integrity_not_behavior_reports(self):
         commands='\n'.join(s.get('run','') for s in workflow(BUILD)['jobs']['build']['steps'])
