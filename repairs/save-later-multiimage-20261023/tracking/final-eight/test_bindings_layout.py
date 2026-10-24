@@ -16,6 +16,22 @@ def run(baseline, final, native, rc8map):
     for name,digest in bridge.items():assert hashlib.sha256((final/'script.infinity.watchedbridge'/name).read_bytes()).hexdigest()==digest
     texts=(final/'script.infinity.commandcenter/infinity_trakt.py').read_text()
     assert "'0.3.5.33'" in texts and "'1.0.14'" in texts and "'0.3.5.32'" not in texts
+    # Static preservation only: do not invoke a checkpoint or shutdown scenario.
+    old_tree=ast.parse((baseline/'script.infinity.commandcenter/checkpoint_runtime.py').read_text())
+    new_tree=ast.parse((final/'script.infinity.commandcenter/checkpoint_runtime.py').read_text())
+    def methods(tree):
+        return {n.name:n for c in tree.body if isinstance(c,ast.ClassDef) and c.name=='ResidentCheckpoint'
+                for n in c.body if isinstance(n,ast.FunctionDef)}
+    old_methods,new_methods=methods(old_tree),methods(new_tree)
+    assert set(old_methods)==set(new_methods)
+    for name in old_methods:
+        if name!='_persist_progress':assert ast.dump(old_methods[name])==ast.dump(new_methods[name]),name
+    writer=new_methods['_persist_progress']
+    transactions=[n for n in ast.walk(writer) if isinstance(n,ast.With)]
+    assert len(transactions)==1 and ast.unparse(transactions[0].items[0].context_expr)=='self.store.transaction(self.session)'
+    calls=[n for n in ast.walk(transactions[0]) if isinstance(n,ast.Call) and ast.unparse(n.func)=='hub.record_progress']
+    assert len(calls)==1 and ast.unparse(calls[0])=='hub.record_progress(data, final)'
+    assert any(isinstance(n,ast.Raise) and 'final Resume Hub identity not admitted' in ast.unparse(n) for n in ast.walk(writer))
     tree=ast.parse((REPAIR/'dex_binding.py').read_text());function=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='prepare')
     end=next(i for i,n in enumerate(function.body) if isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and t.id=='classes' for t in n.targets))
     with tempfile.TemporaryDirectory() as temp:
@@ -72,6 +88,7 @@ assert(x+w<=parent);
     report=dict(host='PASS',CC32_admission_retained=True,CC33_exact_binding=True,bridge_UI_CC_coordinated=True,
         CC33_tamper_rejections=19,clock_actual_axis_cpp='PASS five reflow sizes; nested percentage reproduced',
         native_touch_scope='PASS exact Infinity-only hit-tested title handoff; original fallback and resume ownership retained; all other source restored byte-identically',
+        snapshot_writer='STATIC PASS: Resume Hub payload delegation inside unchanged transaction; all other resident methods unchanged; no checkpoint execution',
         dex_assembly='NOT RUN',android='NOT RUN',physical_fold='NOT RUN',shutdown='NOT RUN')
     (HERE/'BINDINGS-LAYOUT-HOST.json').write_text(json.dumps(report,indent=2)+'\n');return report
 if __name__=='__main__':print(json.dumps(run(*map(Path,sys.argv[1:]))))

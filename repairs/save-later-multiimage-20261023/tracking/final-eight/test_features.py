@@ -52,6 +52,16 @@ class Features(unittest.TestCase):
         self.movie('d',{'tvdb':'603'},5)
         self.movie('e',{},1)
         self.assertEqual(len(self.hub.entries(self.data)),5)
+    def test_conflicting_secondary_id_cannot_overwrite_an_existing_primary_id_key(self):
+        old=self.movie('a',{'tmdb':'603','imdb':'tt0133093'},10)
+        key=self.hub.identity_key(old['identity']);self.data['items']={key:dict(old,key=key)}
+        before=copy.deepcopy(self.data)
+        incoming=dict(old,key=key,identity=self.hub.media_identity('movie',{'tmdb':'603','imdb':'tt1234567'}),
+                      position=222,updated=30)
+        after,saved_key=self.hub.record_progress(self.data,incoming)
+        self.assertEqual(saved_key,'')
+        for bucket in ('items','watched','watchlist','collection','navigation_recovery'):
+            self.assertEqual(after[bucket],before[bucket])
     def test_verified_cross_namespace_link_is_one_card_and_original_progress(self):
         a=self.movie('a',{'tmdb':'603'},10)
         b=self.movie('b',{'imdb':'tt0133093'},20)

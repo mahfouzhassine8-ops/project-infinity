@@ -585,6 +585,16 @@ def record_progress(data, entry):
         return data, ''
     items = data['items']
     old = _dict(items.get(key))
+    if old:
+        old_identity, incoming_identity = _resume_identity(old), _resume_identity(entry)
+        if old_identity:
+            if not same_identity(old_identity, incoming_identity):
+                return data, ''  # a preferred-ID key collision is not identity proof
+        else:
+            old_ids = verified_ids({name: old.get(name) for name in ('tmdb','imdb','tvdb')})
+            if (old.get('source') != entry.get('source') or old.get('media') != entry.get('media') or
+                    not incoming_identity or not _agreeing_ids(old_ids, incoming_identity['ids'])):
+                return data, ''  # retain ambiguous legacy rows without relabeling
     result = dict(old or entry, key=key)
     result.setdefault('resume_first_seen', int(result.get('added_at') or result.get('updated') or 0))
     # Wall-clock seconds alone cannot order two episode updates in one second.
