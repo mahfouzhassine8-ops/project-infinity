@@ -1,0 +1,42 @@
+{
+  "scope": "Source staging and focused host behavior only; no production APK, Kodi runtime or physical execution",
+  "visual_tests": {
+    "status": "PASS",
+    "count": 4,
+    "variants": 14,
+    "candidate_hashes": {
+      "skin.infinity.diggz/16x9/VideoOSD.xml": "19ed1fb7e2d753c846529d4176f5ab3d158384b4d0c3f9959ca258b1fa0fef8e",
+      "skin.infinity.diggz/20x9/VideoOSD.xml": "2db244cb6d965a33bb0c931bdab15ef0e16dcaf072b0227848998f52ac432b8e",
+      "skin.infinity.diggz/5x6/VideoOSD.xml": "900d3787b74e1be65e942449a1868acc6f022f5d3d2e8526203f855519e4842b",
+      "skin.infinity.diggz/6x5/VideoOSD.xml": "210572e9a828c666eed9824ab58d0ecf9faa2809812cb8bb7ecd6d327e34abcc",
+      "skin.infinity.diggz/fallback/VideoOSD.xml": "19ed1fb7e2d753c846529d4176f5ab3d158384b4d0c3f9959ca258b1fa0fef8e",
+      "skin.infinity.diggz/portrait/VideoOSD.xml": "3f980272eacb1f1ce9e224cbf3e5342a73b98d196b12a2f67d3ea0b2c676f69c",
+      "skin.infinity.diggz/responsive/base/VideoOSD.xml": "febc99ccfe1d03857fe669cc1d36d6e5359c5dae176218b9a95651d9edcd4abb",
+      "skin.infinity.diggz/responsive/landscape/VideoOSD.xml": "4948593a00110f515c2117241a0e7e689a49f5270ea6e9daf65cb3add3b2e1ca",
+      "skin.infinity.diggz/responsive/portrait/VideoOSD.xml": "1ae9d01ee11083c25b2140c65e6466dd3b0cdfd588f8a5383191811fe79e8289",
+      "skin.infinity.diggz/responsive/square/VideoOSD.xml": "b1e88299556a8f92955880d02dea6040276de4ca4a3cb9643e4ed1ed61758f5d",
+      "skin.infinity.diggz/responsive/tall/VideoOSD.xml": "7da8ed4ce0db52d60ef52240150e21f9d3e1cd1f09f893528ffefd8d7cbaee27",
+      "skin.infinity.diggz/responsive/ultrawide/VideoOSD.xml": "7ca19c1a7991243aa3de3cc88a025459d204a5bd988262f3f79894195dd88bc4",
+      "skin.infinity.diggz/responsive/wide/VideoOSD.xml": "febc99ccfe1d03857fe669cc1d36d6e5359c5dae176218b9a95651d9edcd4abb",
+      "skin.infinity.diggz/unified/VideoOSD.xml": "b7bff21dbd42415f6f38b08829d182b63b9a96a5b0c72f97335c684f1ceaf7a1",
+      "script.infinity.commandcenter/resources/skins/Default/1080i/InfinityInformation.xml": "b9059729493751dfc0be65801f73e41a06b604f3fdaf099963821b84f2b2e443"
+    }
+  },
+  "health_tests": {
+    "status": "PASS",
+    "count": 2,
+    "method_execution": "Actual revised Java methods compiled with javac17; controlled Android/JSON interfaces",
+    "source_sha256": "6163b48422c414e9e3968b1b5989e4477a902c345f3dbabe49b3350b8d68a378",
+    "original_signed_dex_binding": "PENDING"
+  },
+  "initial_failures_retained": [
+    "VISUAL-INITIAL-FAIL.json",
+    "HEALTH-INITIAL-FAIL.json"
+  ],
+  "android17": "NOT RUN",
+  "physical_fold": "NOT RUN",
+  "search50_cycles": "NOT RUN",
+  "home30_cycles": "NOT RUN",
+  "rotation20_cycles": "NOT RUN",
+  "close_reopen": "NOT RUN; authorized separately by2103402 brief; original policy unchanged"
+}

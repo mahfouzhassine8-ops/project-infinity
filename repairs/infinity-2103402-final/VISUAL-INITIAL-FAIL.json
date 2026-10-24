@@ -1,0 +1,7 @@
+{
+  "status": "FAIL",
+  "tests": 4,
+  "errors": 3,
+  "cause": "Transformer assumed every variant uses the unified theme variable; 13 non-unified variants already use white time text. Baseline input was correctly rejected before staging.",
+  "correction": "Restrict time-label change to the demonstrated unified variant; other13 receive only approved button202 restoration."
+}

@@ -1,0 +1,53 @@
+{
+  "raw_evidence_committed": false,
+  "baseline_apk_sha256": "a7abd878768cd09cac0c0caeadd5afc691a842cf97c9ff14b0d913677117a742",
+  "baseline_native_sha256": "704834f42e49a2eea0a36ad41b5f79345f5e4108dcd339213899ea3c6ff045a0",
+  "diagnostic_apk_member_native_hash_matches": true,
+  "loaded_process_identity": "Not established by APK member hash alone",
+  "recording_duration_seconds": 197.006667,
+  "sampled_recording": {
+    "sampling_interval_seconds": 10,
+    "initial_rail_blank_samples_seconds": [
+      5,
+      15,
+      25,
+      35
+    ],
+    "first_sample_with_posters_seconds": 45,
+    "warm_return_blank_samples_seconds": [
+      135,
+      145,
+      155,
+      165,
+      175
+    ],
+    "interpretation": "At least40 seconds of sampled blank Home after playback return; exact readiness and elapsed1-2sec target not measured"
+  },
+  "signal_exit": {
+    "local_time": "2026-10-24T15:22:18-04:00",
+    "process": "com.projectinfinity.kodi:kodi",
+    "status": 7,
+    "rss_kb": 736476,
+    "native_snapshot_bytes": 0,
+    "structured_exit_records": 0,
+    "faulting_stack": "UNAVAILABLE",
+    "root_cause": "UNRESOLVED"
+  },
+  "health_source_findings": [
+    "Native snapshot marks available before reading; zero-byte file is falsely described as collected",
+    "Api30 export excludes signal and Java exit metadata by filtering to native-crash/ANR before adding records",
+    "Input read failure escapes an open ZIP entry; staged bounded pre-read preserves partial data and other sections"
+  ],
+  "home_source_findings": [
+    "CDirectoryProvider Reset clears items and URL, while ordinary Update retains current items during background work",
+    "All dynamic directories with SortByNone invalidate on Play/Resume/Stop",
+    "Latest Releases feed uses provider Files.GetDirectory and disables disk listing cache",
+    "No verified attribution yet of every reset/reload in captured45-second delay; no native cache rewrite authorized by assumption"
+  ],
+  "android_execution_blockers": [
+    "No attached Android device or local adb",
+    "No /dev/kvm",
+    "GitHub connector has no workflow-dispatch action; no additional sign-in requested"
+  ],
+  "release_status": "BLOCKED; no final packaging or promotion"
+}

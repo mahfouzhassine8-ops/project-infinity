@@ -1,0 +1,1086 @@
+<?xml version='1.0' encoding='utf-8'?>
+<window>
+  <onload>Skin.Reset(Infinity.PlayerDrawerOpen)</onload>
+  <onload condition="String.IsEmpty(Skin.String(AutoCloseVideoOSD))">Skin.SetString(AutoCloseVideoOSD,3)</onload>
+  <onunload>Skin.Reset(Infinity.PlayerDrawerOpen)</onunload>
+  <defaultcontrol always="true">202</defaultcontrol>
+  <backgroundcolor>00000000</backgroundcolor>
+  <animation effect="fade" start="0" end="100" time="110" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowOpen</animation>
+  <animation effect="fade" start="100" end="0" time="90" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowClose</animation>
+  <controls>
+    <control type="button">
+      <left>0</left>
+      <top>233</top>
+      <width>1080</width>
+      <height>1598</height>
+      <label />
+      <font />
+      <texturefocus />
+      <texturenofocus />
+      <onclick>Action(close)</onclick>
+    </control>
+    <control type="image">
+      <left>27</left>
+      <top>29</top>
+      <width>1026</width>
+      <height>204</height>
+      <texture border="49">$VAR[InfinityPlayerHeaderTexture]</texture>
+    </control>
+    <control type="button" id="240">
+      <left>60</left>
+      <top>90</top>
+      <width>81</width>
+      <height>81</height>
+      <label />
+      <font />
+      <description>Close player controls</description>
+      <texturefocus>$VAR[InfinityPlayerButtonFocusTexture]</texturefocus>
+      <texturenofocus>$VAR[InfinityPlayerButtonTexture]</texturenofocus>
+      <onclick>Action(close)</onclick>
+      <onup>87</onup>
+      <ondown>202</ondown>
+      <animation effect="zoom" start="100" end="102" time="85" tween="quadratic" easing="out" reversible="true" condition="Control.HasFocus(240)">Conditional</animation>
+    </control>
+    <control type="image">
+      <left>83</left>
+      <top>113</top>
+      <width>34</width>
+      <height>34</height>
+      <texture colordiffuse="FFFFFFFF">infinity_reference/back.png</texture>
+    </control>
+    <control type="label">
+      <left>168</left>
+      <top>64</top>
+      <width>625</width>
+      <height>78</height>
+      <font>InfinityTitle</font>
+      <textcolor>FFFFFFFF</textcolor>
+      <aligny>center</aligny>
+      <label>$INFO[Player.Title]</label>
+    </control>
+    <control type="label">
+      <left>168</left>
+      <top>141</top>
+      <width>625</width>
+      <height>49</height>
+      <font>InfinityTiny</font>
+      <textcolor>BFFFFFFF</textcolor>
+      <aligny>center</aligny>
+      <label>$INFO[VideoPlayer.Year]  •  $INFO[Player.Duration]  •  $INFO[Player.Chapter,Chapter ]$INFO[Player.ChapterCount, / ]</label>
+    </control>
+    <control type="label">
+      <left>815</left>
+      <top>76</top>
+      <width>238</width>
+      <height>82</height>
+      <font>InfinityClock</font>
+      <textcolor>FFFFFFFF</textcolor>
+      <align>right</align>
+      <aligny>center</aligny>
+      <label>$INFO[System.Time]</label>
+    </control>
+    <control type="image">
+      <left>27</left>
+      <top>1831</top>
+      <width>1026</width>
+      <height>540</height>
+      <texture border="49">$VAR[InfinityPlayerFooterTexture]</texture>
+    </control>
+    <control type="label">
+      <left>54</left>
+      <top>1861</top>
+      <width>272</width>
+      <height>54</height>
+      <font>InfinityTiny</font>
+      <textcolor>FFFFFFFF</textcolor>
+      <aligny>center</aligny>
+      <label>$INFO[Player.Time(hh:mm:ss)]</label>
+    </control>
+    <control type="label">
+      <left>754</left>
+      <top>1861</top>
+      <width>272</width>
+      <height>54</height>
+      <font>InfinityTiny</font>
+      <textcolor>FFFFFFFF</textcolor>
+      <align>right</align>
+      <aligny>center</aligny>
+      <label>$INFO[Player.Duration(hh:mm:ss)]</label>
+    </control>
+    <control type="progress">
+      <left>54</left>
+      <top>1904</top>
+      <width>972</width>
+      <height>70</height>
+      <texturebg border="8">infinity_reference/track_dark.png</texturebg>
+      <lefttexture />
+      <righttexture />
+      <overlaytexture />
+      <midtexture border="8">infinity_reference/fill.png</midtexture>
+      <info>Player.Progress</info>
+    </control>
+    <control type="slider" id="87">
+      <left>54</left>
+      <top>1904</top>
+      <width>972</width>
+      <height>70</height>
+      <texturesliderbar>infinity_reference/slider_transparent.png</texturesliderbar>
+      <texturesliderbardisabled>infinity_reference/slider_transparent.png</texturesliderbardisabled>
+      <textureslidernib>infinity_reference/knob.png</textureslidernib>
+      <textureslidernibfocus>infinity_reference/knob_focus.png</textureslidernibfocus>
+      <textureslidernibdisabled>infinity_reference/knob_disabled.png</textureslidernibdisabled>
+      <info>Player.Progress</info>
+      <action>seek</action>
+      <orientation>horizontal</orientation>
+      <enable>!Skin.HasSetting(Infinity.PlayerDrawerOpen) + [Player.SeekEnabled]</enable>
+      <onup>240</onup>
+      <ondown>202</ondown>
+      <onleft>240</onleft>
+      <onright>240</onright>
+    </control>
+    <control type="button" id="257">
+      <left>106</left>
+      <top>2031</top>
+      <width>81</width>
+      <height>81</height>
+      <label />
+      <font />
+      <description>Playback drawer</description>
+      <texturefocus>$VAR[InfinityPlayerButtonFocusTexture]</texturefocus>
+      <texturenofocus>$VAR[InfinityPlayerButtonTexture]</texturenofocus>
+      <onclick>Skin.SetBool(Infinity.PlayerDrawerOpen)</onclick>
+      <enable>!Skin.HasSetting(Infinity.PlayerDrawerOpen)</enable>
+      <onleft>253</onleft>
+      <onright>201</onright>
+      <onup>87</onup>
+      <ondown>260</ondown>
+      <onclick>SetFocus(270)</onclick>
+      <animation effect="zoom" start="100" end="102" time="85" tween="quadratic" easing="out" reversible="true" condition="Control.HasFocus(257)">Conditional</animation>
+    </control>
+    <control type="image">
+      <left>129</left>
+      <top>2054</top>
+      <width>34</width>
+      <height>34</height>
+      <texture colordiffuse="FFFFFFFF">infinity_reference/list.png</texture>
+    </control>
+    <control type="button" id="201">
+      <left>202</left>
+      <top>2031</top>
+      <width>81</width>
+      <height>81</height>
+      <label />
+      <font />
+      <description>Seek back 10 seconds</description>
+      <texturefocus>$VAR[InfinityPlayerButtonFocusTexture]</texturefocus>
+      <texturenofocus>$VAR[InfinityPlayerButtonTexture]</texturenofocus>
+      <onclick>Seek(-10)</onclick>
+      <enable>!Skin.HasSetting(Infinity.PlayerDrawerOpen)</enable>
+      <onleft>257</onleft>
+      <onright>200</onright>
+      <onup>87</onup>
+      <ondown>260</ondown>
+      <animation effect="zoom" start="100" end="102" time="85" tween="quadratic" easing="out" reversible="true" condition="Control.HasFocus(201)">Conditional</animation>
+    </control>
+    <control type="image">
+      <left>225</left>
+      <top>2054</top>
+      <width>34</width>
+      <height>34</height>
+      <texture colordiffuse="FFFFFFFF">infinity_reference/back10.png</texture>
+    </control>
+    <control type="button" id="200">
+      <left>298</left>
+      <top>2031</top>
+      <width>81</width>
+      <height>81</height>
+      <label />
+      <font />
+      <description>Previous</description>
+      <texturefocus>$VAR[InfinityPlayerButtonFocusTexture]</texturefocus>
+      <texturenofocus>$VAR[InfinityPlayerButtonTexture]</texturenofocus>
+      <onclick>PlayerControl(Previous)</onclick>
+      <enable>!Skin.HasSetting(Infinity.PlayerDrawerOpen)</enable>
+      <onleft>201</onleft>
+      <onright>202</onright>
+      <onup>87</onup>
+      <ondown>260</ondown>
+      <animation effect="zoom" start="100" end="102" time="85" tween="quadratic" easing="out" reversible="true" condition="Control.HasFocus(200)">Conditional</animation>
+    </control>
+    <control type="image">
+      <left>321</left>
+      <top>2054</top>
+      <width>34</width>
+      <height>34</height>
+      <texture colordiffuse="FFFFFFFF">infinity_reference/prev.png</texture>
+    </control>
+    <control type="button" id="202">
+      <left>394</left>
+      <top>2022</top>
+      <width>99</width>
+      <height>99</height>
+      <label />
+      <font />
+      <description>Play or pause</description>
+      <texturefocus colordiffuse="44FFFFFF">infinity_reference/button_dark.png</texturefocus>
+      <texturenofocus colordiffuse="18FFFFFF">infinity_reference/button_dark.png</texturenofocus>
+      <onclick>PlayerControl(Play)</onclick>
+      <enable>!Skin.HasSetting(Infinity.PlayerDrawerOpen)</enable>
+      <onleft>200</onleft>
+      <onright>205</onright>
+      <onup>87</onup>
+      <ondown>260</ondown>
+      <animation effect="zoom" start="100" end="102" time="85" tween="quadratic" easing="out" reversible="true" condition="Control.HasFocus(202)">Conditional</animation>
+    </control>
+    <control type="image">
+      <left>424</left>
+      <top>2052</top>
+      <width>38</width>
+      <height>38</height>
+      <texture colordiffuse="FFFFFFFF">infinity_reference/play.png</texture>
+      <visible>Player.Paused</visible>
+    </control>
+    <control type="image">
+      <left>424</left>
+      <top>2052</top>
+      <width>38</width>
+      <height>38</height>
+      <texture colordiffuse="FFFFFFFF">infinity_reference/pause.png</texture>
+      <visible>!Player.Paused</visible>
+    </control>
+    <control type="button" id="205">
+      <left>508</left>
+      <top>2031</top>
+      <width>81</width>
+      <height>81</height>
+      <label />
+      <font />
+      <description>Next</description>
+      <texturefocus>$VAR[InfinityPlayerButtonFocusTexture]</texturefocus>
+      <texturenofocus>$VAR[InfinityPlayerButtonTexture]</texturenofocus>
+      <onclick>PlayerControl(Next)</onclick>
+      <enable>!Skin.HasSetting(Infinity.PlayerDrawerOpen)</enable>
+      <onleft>202</onleft>
+      <onright>204</onright>
+      <onup>87</onup>
+      <ondown>260</ondown>
+      <animation effect="zoom" start="100" end="102" time="85" tween="quadratic" easing="out" reversible="true" condition="Control.HasFocus(205)">Conditional</animation>
+    </control>
+    <control type="image">
+      <left>531</left>
+      <top>2054</top>
+      <width>34</width>
+      <height>34</height>
+      <texture colordiffuse="FFFFFFFF">infinity_reference/next.png</texture>
+    </control>
+    <control type="button" id="204">
+      <left>604</left>
+      <top>2031</top>
+      <width>81</width>
+      <height>81</height>
+      <label />
+      <font />
+      <description>Seek forward 10 seconds</description>
+      <texturefocus>$VAR[InfinityPlayerButtonFocusTexture]</texturefocus>
+      <texturenofocus>$VAR[InfinityPlayerButtonTexture]</texturenofocus>
+      <onclick>Seek(10)</onclick>
+      <enable>!Skin.HasSetting(Infinity.PlayerDrawerOpen)</enable>
+      <onleft>205</onleft>
+      <onright>250</onright>
+      <onup>87</onup>
+      <ondown>260</ondown>
+      <animation effect="zoom" start="100" end="102" time="85" tween="quadratic" easing="out" reversible="true" condition="Control.HasFocus(204)">Conditional</animation>
+    </control>
+    <control type="image">
+      <left>627</left>
+      <top>2054</top>
+      <width>34</width>
+      <height>34</height>
+      <texture colordiffuse="FFFFFFFF">infinity_reference/forward10.png</texture>
+    </control>
+    <control type="button" id="250">
+      <left>700</left>
+      <top>2031</top>
+      <width>81</width>
+      <height>81</height>
+      <label />
+      <font />
+      <description>Subtitles</description>
+      <texturefocus>$VAR[InfinityPlayerButtonFocusTexture]</texturefocus>
+      <texturenofocus>$VAR[InfinityPlayerButtonTexture]</texturenofocus>
+      <onclick>ActivateWindow(OSDSubtitleSettings)</onclick>
+      <enable>!Skin.HasSetting(Infinity.PlayerDrawerOpen)</enable>
+      <onleft>204</onleft>
+      <onright>255</onright>
+      <onup>87</onup>
+      <ondown>260</ondown>
+      <animation effect="zoom" start="100" end="102" time="85" tween="quadratic" easing="out" reversible="true" condition="Control.HasFocus(250)">Conditional</animation>
+    </control>
+    <control type="image">
+      <left>723</left>
+      <top>2054</top>
+      <width>34</width>
+      <height>34</height>
+      <texture colordiffuse="FFFFFFFF">infinity_reference/subtitles.png</texture>
+    </control>
+    <control type="button" id="255">
+      <left>796</left>
+      <top>2031</top>
+      <width>81</width>
+      <height>81</height>
+      <label />
+      <font />
+      <description>Display / aspect ratio</description>
+      <texturefocus>$VAR[InfinityPlayerButtonFocusTexture]</texturefocus>
+      <texturenofocus>$VAR[InfinityPlayerButtonTexture]</texturenofocus>
+      <onclick>ActivateWindow(OSDVideoSettings)</onclick>
+      <enable>!Skin.HasSetting(Infinity.PlayerDrawerOpen)</enable>
+      <onleft>250</onleft>
+      <onright>253</onright>
+      <onup>87</onup>
+      <ondown>260</ondown>
+      <animation effect="zoom" start="100" end="102" time="85" tween="quadratic" easing="out" reversible="true" condition="Control.HasFocus(255)">Conditional</animation>
+    </control>
+    <control type="image">
+      <left>819</left>
+      <top>2054</top>
+      <width>34</width>
+      <height>34</height>
+      <texture colordiffuse="FFFFFFFF">infinity_reference/display.png</texture>
+    </control>
+    <control type="button" id="253">
+      <left>892</left>
+      <top>2031</top>
+      <width>81</width>
+      <height>81</height>
+      <label />
+      <font />
+      <description>Stop</description>
+      <texturefocus>$VAR[InfinityPlayerButtonFocusTexture]</texturefocus>
+      <texturenofocus>$VAR[InfinityPlayerButtonTexture]</texturenofocus>
+      <onclick>PlayerControl(Stop)</onclick>
+      <enable>!Skin.HasSetting(Infinity.PlayerDrawerOpen)</enable>
+      <onleft>255</onleft>
+      <onright>257</onright>
+      <onup>87</onup>
+      <ondown>260</ondown>
+      <animation effect="zoom" start="100" end="102" time="85" tween="quadratic" easing="out" reversible="true" condition="Control.HasFocus(253)">Conditional</animation>
+    </control>
+    <control type="image">
+      <left>915</left>
+      <top>2054</top>
+      <width>34</width>
+      <height>34</height>
+      <texture colordiffuse="FFFFFFFF">infinity_reference/stop.png</texture>
+    </control>
+    <control type="image">
+      <left>281</left>
+      <top>2220</top>
+      <width>340</width>
+      <height>79</height>
+      <texture border="24">$VAR[InfinityPlayerVolumeTexture]</texture>
+    </control>
+    <control type="button" id="261">
+      <left>287</left>
+      <top>2223</top>
+      <width>73</width>
+      <height>73</height>
+      <label />
+      <font />
+      <description>Mute</description>
+      <texturefocus>$VAR[InfinityPlayerButtonFocusTexture]</texturefocus>
+      <texturenofocus>infinity_reference/slider_transparent.png</texturenofocus>
+      <onclick>Mute</onclick>
+      <enable>!Skin.HasSetting(Infinity.PlayerDrawerOpen)</enable>
+      <onleft>262</onleft>
+      <onright>260</onright>
+      <onup>202</onup>
+      <ondown>87</ondown>
+      <animation effect="zoom" start="100" end="102" time="85" tween="quadratic" easing="out" reversible="true" condition="Control.HasFocus(261)">Conditional</animation>
+    </control>
+    <control type="image">
+      <left>309</left>
+      <top>2245</top>
+      <width>28</width>
+      <height>28</height>
+      <texture colordiffuse="FFFFFFFF">infinity_reference/volume.png</texture>
+      <visible>!Player.Muted</visible>
+    </control>
+    <control type="image">
+      <left>309</left>
+      <top>2245</top>
+      <width>28</width>
+      <height>28</height>
+      <texture colordiffuse="FFFFFFFF">infinity_reference/mute.png</texture>
+      <visible>Player.Muted</visible>
+    </control>
+    <control type="progress">
+      <left>370</left>
+      <top>2232</top>
+      <width>228</width>
+      <height>55</height>
+      <texturebg border="7">infinity_reference/track_dark.png</texturebg>
+      <lefttexture />
+      <righttexture />
+      <overlaytexture />
+      <midtexture border="7">infinity_reference/fill.png</midtexture>
+      <info>Player.Volume</info>
+    </control>
+    <control type="slider" id="260">
+      <left>370</left>
+      <top>2232</top>
+      <width>228</width>
+      <height>55</height>
+      <texturesliderbar>infinity_reference/slider_transparent.png</texturesliderbar>
+      <texturesliderbardisabled>infinity_reference/slider_transparent.png</texturesliderbardisabled>
+      <textureslidernib>infinity_reference/knob.png</textureslidernib>
+      <textureslidernibfocus>infinity_reference/knob_focus.png</textureslidernibfocus>
+      <textureslidernibdisabled>infinity_reference/knob_disabled.png</textureslidernibdisabled>
+      <info>Player.Volume</info>
+      <action>volume</action>
+      <orientation>horizontal</orientation>
+      <enable>!Skin.HasSetting(Infinity.PlayerDrawerOpen)</enable>
+      <onleft>261</onleft>
+      <onright>252</onright>
+      <onup>202</onup>
+      <ondown>87</ondown>
+    </control>
+    <control type="button" id="252">
+      <left>637</left>
+      <top>2223</top>
+      <width>73</width>
+      <height>73</height>
+      <label />
+      <font />
+      <description>Audio settings</description>
+      <texturefocus>$VAR[InfinityPlayerButtonFocusTexture]</texturefocus>
+      <texturenofocus>$VAR[InfinityPlayerButtonTexture]</texturenofocus>
+      <onclick>ActivateWindow(OSDAudioSettings)</onclick>
+      <enable>!Skin.HasSetting(Infinity.PlayerDrawerOpen)</enable>
+      <onleft>260</onleft>
+      <onright>263</onright>
+      <onup>202</onup>
+      <ondown>87</ondown>
+      <animation effect="zoom" start="100" end="102" time="85" tween="quadratic" easing="out" reversible="true" condition="Control.HasFocus(252)">Conditional</animation>
+    </control>
+    <control type="image">
+      <left>658</left>
+      <top>2244</top>
+      <width>31</width>
+      <height>31</height>
+      <texture colordiffuse="FFFFFFFF">infinity_reference/audio.png</texture>
+    </control>
+    <control type="button" id="263">
+      <left>726</left>
+      <top>2223</top>
+      <width>73</width>
+      <height>73</height>
+      <label />
+      <font />
+      <description>Player rotation policy: Follow Device / Unlocked During Video (selection, not Android grant status)</description>
+      <texturefocus>$VAR[InfinityPlayerButtonFocusTexture]</texturefocus>
+      <texturenofocus>$VAR[InfinityPlayerButtonTexture]</texturenofocus>
+      <onclick condition="System.Platform.Android + Player.HasVideo + !Skin.HasSetting(Infinity.PlayerDrawerOpen) + !Skin.HasSetting(Infinity.PlayerRotationUnlocked)">StartAndroidActivity(com.projectinfinity.kodi,com.projectinfinity.kodi.action.PLAYER_ROTATION_UNLOCKED)</onclick>
+      <onclick condition="System.Platform.Android + Player.HasVideo + !Skin.HasSetting(Infinity.PlayerDrawerOpen) + Skin.HasSetting(Infinity.PlayerRotationUnlocked)">StartAndroidActivity(com.projectinfinity.kodi,com.projectinfinity.kodi.action.PLAYER_ROTATION_FOLLOW_DEVICE)</onclick>
+      <onclick condition="System.Platform.Android + Player.HasVideo + !Skin.HasSetting(Infinity.PlayerDrawerOpen)">Skin.ToggleSetting(Infinity.PlayerRotationUnlocked)</onclick>
+      <enable>System.Platform.Android + Player.HasVideo + !Skin.HasSetting(Infinity.PlayerDrawerOpen)</enable>
+      <onleft>252</onleft>
+      <onright>262</onright>
+      <onup>202</onup>
+      <ondown>87</ondown>
+      <animation effect="zoom" start="100" end="102" time="85" tween="quadratic" easing="out" reversible="true" condition="[Control.HasFocus(263)] + [String.IsEmpty(Window(Home).Property(Infinity.RuntimeCapabilitiesReady)) | String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),true)]">Conditional</animation>
+    </control>
+    <control type="image">
+      <left>747</left>
+      <top>2244</top>
+      <width>31</width>
+      <height>31</height>
+      <texture colordiffuse="$VAR[InfinityGlassTextPrimary]">infinity_reference/rotate.png</texture>
+      <visible>!Skin.HasSetting(Infinity.PlayerRotationUnlocked)</visible>
+    </control>
+    <control type="image">
+      <left>747</left>
+      <top>2244</top>
+      <width>31</width>
+      <height>31</height>
+      <texture colordiffuse="FF00D9FF">infinity_reference/rotate.png</texture>
+      <visible>Skin.HasSetting(Infinity.PlayerRotationUnlocked)</visible>
+    </control>
+    <control type="button" id="262">
+      <left>815</left>
+      <top>2223</top>
+      <width>73</width>
+      <height>73</height>
+      <label />
+      <font />
+      <description>Lock controls</description>
+      <texturefocus>$VAR[InfinityPlayerButtonFocusTexture]</texturefocus>
+      <texturenofocus>$VAR[InfinityPlayerButtonTexture]</texturenofocus>
+      <onclick>Skin.Reset(Infinity.PlayerDrawerOpen)</onclick>
+      <onclick>Dialog.Close(videoosd)</onclick>
+      <onclick>ActivateWindow(1199)</onclick><enable>!Skin.HasSetting(Infinity.PlayerDrawerOpen)</enable>
+      <onleft>263</onleft>
+      <onright>261</onright>
+      <onup>202</onup>
+      <ondown>87</ondown>
+      <animation effect="zoom" start="100" end="102" time="85" tween="quadratic" easing="out" reversible="true" condition="Control.HasFocus(262)">Conditional</animation>
+    </control>
+    <control type="image">
+      <left>836</left>
+      <top>2244</top>
+      <width>31</width>
+      <height>31</height>
+      <texture colordiffuse="FFFFFFFF">infinity_ui/icons/lock.png</texture>
+    </control>
+    <control type="group">
+      <visible>Skin.HasSetting(Infinity.PlayerDrawerOpen)</visible>
+      <animation effect="slide" start="-40,0" end="0,0" time="180" tween="quadratic" easing="out" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">Visible</animation>
+      <animation effect="slide" start="0,0" end="-40,0" time="140" tween="quadratic" easing="in" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">Hidden</animation>
+      <animation effect="fade" start="0" end="100" time="140" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">Visible</animation>
+      <animation effect="fade" start="100" end="0" time="120" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">Hidden</animation>
+      <control type="image">
+        <left>0</left>
+        <top>0</top>
+        <width>1080</width>
+        <height>2400</height>
+        <texture colordiffuse="7A000000">infinity_ui/contract_white.png</texture>
+      </control>
+      <control type="image">
+        <left>18</left>
+        <top>156</top>
+        <width>842</width>
+        <height>2220</height>
+        <texture border="28" colordiffuse="$VAR[InfinityGlassControlSurface]">infinity_polish/surface.png</texture>
+      </control>
+      <control type="image">
+        <left>18</left>
+        <top>156</top>
+        <width>842</width>
+        <height>2220</height>
+        <texture border="28" colordiffuse="$VAR[InfinityFrameSoft]">infinity_ui/frame_soft.png</texture>
+      </control>
+      <control type="image">
+        <left>40</left>
+        <top>178</top>
+        <width>96</width>
+        <height>34</height>
+        <texture>infinity_ui/infinity_logo.png</texture>
+      </control>
+      <control type="label">
+        <left>146</left>
+        <top>174</top>
+        <width>652</width>
+        <height>34</height>
+        <font>InfinitySmall</font>
+        <textcolor>FFFFFFFF</textcolor>
+        <disabledcolor>$VAR[InfinityGlassTextSecondary]</disabledcolor>
+        <align>left</align>
+        <aligny>center</aligny>
+        <label>INFINITY</label>
+      </control>
+      <control type="label">
+        <left>146</left>
+        <top>202</top>
+        <width>652</width>
+        <height>22</height>
+        <font>InfinityTiny</font>
+        <textcolor>$VAR[InfinityGlassTextSecondary]</textcolor>
+        <disabledcolor>$VAR[InfinityGlassTextSecondary]</disabledcolor>
+        <align>left</align>
+        <aligny>center</aligny>
+        <label>PLAYBACK &amp; SETTINGS</label>
+      </control>
+      <control type="button" id="271">
+        <left>796</left>
+        <top>168</top>
+        <width>52</width>
+        <height>52</height>
+        <label />
+        <onclick>Skin.Reset(Infinity.PlayerDrawerOpen)</onclick>
+        <texturefocus>$VAR[InfinityPlayerButtonFocusTexture]</texturefocus>
+        <texturenofocus>$VAR[InfinityPlayerButtonTexture]</texturenofocus>
+        <font>InfinityTiny</font>
+        <textcolor>FFFFFFFF</textcolor>
+        <disabledcolor>$VAR[InfinityGlassTextSecondary]</disabledcolor>
+        <focusedcolor>FFFFFFFF</focusedcolor>
+        <align>center</align>
+        <aligny>center</aligny>
+        <onback>Skin.Reset(Infinity.PlayerDrawerOpen)</onback>
+        <onback>SetFocus(257)</onback>
+        <onup>282</onup>
+        <ondown>270</ondown>
+        <onleft>271</onleft>
+        <onright>271</onright>
+        <onclick>SetFocus(257)</onclick>
+      </control>
+      <control type="image">
+        <left>812</left>
+        <top>184</top>
+        <width>20</width>
+        <height>20</height>
+        <texture colordiffuse="FFFFFFFF">infinity_ui/icons/close.png</texture>
+      </control>
+      <control type="label">
+        <left>42</left>
+        <top>248</top>
+        <width>794</width>
+        <height>20</height>
+        <font>InfinityTiny</font>
+        <textcolor>$VAR[InfinityGlassTextSecondary]</textcolor>
+        <disabledcolor>$VAR[InfinityGlassTextSecondary]</disabledcolor>
+        <align>left</align>
+        <aligny>center</aligny>
+        <label>PLAYBACK</label>
+      </control>
+      <control type="button" id="270">
+        <left>42</left>
+        <top>276</top>
+        <width>794</width>
+        <height>56</height>
+        <label>Now Playing</label>
+        <onclick>Skin.Reset(Infinity.PlayerDrawerOpen)</onclick>
+        <onclick>SetFocus(257)</onclick>
+        <texturefocus border="22" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_glass/field.png</texturefocus>
+        <texturenofocus border="22" colordiffuse="$VAR[InfinityPlayerQuietRow]">infinity_glass/field.png</texturenofocus>
+        <font>InfinitySmall</font>
+        <textcolor>FFFFFFFF</textcolor>
+        <disabledcolor>$VAR[InfinityGlassTextSecondary]</disabledcolor>
+        <focusedcolor>FFFFFFFF</focusedcolor>
+        <align>left</align>
+        <textoffsetx>62</textoffsetx>
+        <aligny>center</aligny>
+        <onback>Skin.Reset(Infinity.PlayerDrawerOpen)</onback>
+        <onback>SetFocus(257)</onback>
+        <onup>271</onup>
+        <ondown>272</ondown>
+        <onleft>271</onleft>
+        <onright>270</onright>
+        <animation effect="zoom" start="100" end="102" time="90" tween="quadratic" easing="out" reversible="true" condition="Control.HasFocus(270)">Conditional</animation>
+      </control>
+      <control type="image">
+        <left>61</left>
+        <top>292</top>
+        <width>24</width>
+        <height>24</height>
+        <texture colordiffuse="FFFFFFFF">infinity_ui/icons/play.png</texture>
+      </control>
+      <control type="label">
+        <left>802</left>
+        <top>276</top>
+        <width>20</width>
+        <height>56</height>
+        <font>InfinityBody</font>
+        <textcolor>$VAR[InfinityGlassTextSecondary]</textcolor>
+        <disabledcolor>$VAR[InfinityGlassTextSecondary]</disabledcolor>
+        <align>right</align>
+        <aligny>center</aligny>
+        <label>›</label>
+      </control>
+      <control type="button" id="272">
+        <left>42</left>
+        <top>340</top>
+        <width>794</width>
+        <height>56</height>
+        <label>Audio &amp; Subtitles</label>
+        <onclick>ActivateWindow(1195)</onclick>
+        <texturefocus border="22" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_glass/field.png</texturefocus>
+        <texturenofocus border="22" colordiffuse="$VAR[InfinityPlayerQuietRow]">infinity_glass/field.png</texturenofocus>
+        <font>InfinitySmall</font>
+        <textcolor>FFFFFFFF</textcolor>
+        <disabledcolor>$VAR[InfinityGlassTextSecondary]</disabledcolor>
+        <focusedcolor>FFFFFFFF</focusedcolor>
+        <align>left</align>
+        <textoffsetx>62</textoffsetx>
+        <aligny>center</aligny>
+        <onback>Skin.Reset(Infinity.PlayerDrawerOpen)</onback>
+        <onback>SetFocus(257)</onback>
+        <onup>270</onup>
+        <ondown>275</ondown>
+        <onleft>271</onleft>
+        <onright>272</onright>
+        <animation effect="zoom" start="100" end="102" time="90" tween="quadratic" easing="out" reversible="true" condition="Control.HasFocus(272)">Conditional</animation>
+      </control>
+      <control type="image">
+        <left>61</left>
+        <top>356</top>
+        <width>24</width>
+        <height>24</height>
+        <texture colordiffuse="FFFFFFFF">infinity_ui/icons/subtitles.png</texture>
+      </control>
+      <control type="label">
+        <left>802</left>
+        <top>340</top>
+        <width>20</width>
+        <height>56</height>
+        <font>InfinityBody</font>
+        <textcolor>$VAR[InfinityGlassTextSecondary]</textcolor>
+        <disabledcolor>$VAR[InfinityGlassTextSecondary]</disabledcolor>
+        <align>right</align>
+        <aligny>center</aligny>
+        <label>›</label>
+      </control>
+      <control type="button" id="275">
+        <left>42</left>
+        <top>404</top>
+        <width>794</width>
+        <height>56</height>
+        <label>Playback Speed</label>
+        <onclick>ActivateWindow(1196)</onclick>
+        <visible>Player.TempoEnabled</visible>
+        <texturefocus border="22" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_glass/field.png</texturefocus>
+        <texturenofocus border="22" colordiffuse="$VAR[InfinityPlayerQuietRow]">infinity_glass/field.png</texturenofocus>
+        <font>InfinitySmall</font>
+        <textcolor>FFFFFFFF</textcolor>
+        <disabledcolor>$VAR[InfinityGlassTextSecondary]</disabledcolor>
+        <focusedcolor>FFFFFFFF</focusedcolor>
+        <align>left</align>
+        <textoffsetx>62</textoffsetx>
+        <aligny>center</aligny>
+        <onback>Skin.Reset(Infinity.PlayerDrawerOpen)</onback>
+        <onback>SetFocus(257)</onback>
+        <onup>272</onup>
+        <ondown>276</ondown>
+        <onleft>271</onleft>
+        <onright>275</onright>
+        <animation effect="zoom" start="100" end="102" time="90" tween="quadratic" easing="out" reversible="true" condition="Control.HasFocus(275)">Conditional</animation>
+      </control>
+      <control type="image">
+        <left>61</left>
+        <top>420</top>
+        <width>24</width>
+        <height>24</height>
+        <texture colordiffuse="FFFFFFFF">infinity_ui/icons/speed.png</texture>
+      </control>
+      <control type="label">
+        <left>716</left>
+        <top>404</top>
+        <width>102</width>
+        <height>56</height>
+        <font>InfinityTiny</font>
+        <textcolor>$VAR[InfinityGlassTextSecondary]</textcolor>
+        <disabledcolor>$VAR[InfinityGlassTextSecondary]</disabledcolor>
+        <align>right</align>
+        <aligny>center</aligny>
+        <label>$INFO[Player.PlaySpeed]</label>
+      </control>
+      <control type="button" id="276">
+        <left>42</left>
+        <top>468</top>
+        <width>794</width>
+        <height>56</height>
+        <label>Chapters &amp; Bookmarks</label>
+        <onclick>ActivateWindow(VideoBookmarks)</onclick>
+        <texturefocus border="22" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_glass/field.png</texturefocus>
+        <texturenofocus border="22" colordiffuse="$VAR[InfinityPlayerQuietRow]">infinity_glass/field.png</texturenofocus>
+        <font>InfinitySmall</font>
+        <textcolor>FFFFFFFF</textcolor>
+        <disabledcolor>$VAR[InfinityGlassTextSecondary]</disabledcolor>
+        <focusedcolor>FFFFFFFF</focusedcolor>
+        <align>left</align>
+        <textoffsetx>62</textoffsetx>
+        <aligny>center</aligny>
+        <onback>Skin.Reset(Infinity.PlayerDrawerOpen)</onback>
+        <onback>SetFocus(257)</onback>
+        <onup>275</onup>
+        <ondown>277</ondown>
+        <onleft>271</onleft>
+        <onright>276</onright>
+        <animation effect="zoom" start="100" end="102" time="90" tween="quadratic" easing="out" reversible="true" condition="Control.HasFocus(276)">Conditional</animation>
+      </control>
+      <control type="image">
+        <left>61</left>
+        <top>484</top>
+        <width>24</width>
+        <height>24</height>
+        <texture colordiffuse="FFFFFFFF">infinity_ui/icons/chapters.png</texture>
+      </control>
+      <control type="label">
+        <left>802</left>
+        <top>468</top>
+        <width>20</width>
+        <height>56</height>
+        <font>InfinityBody</font>
+        <textcolor>$VAR[InfinityGlassTextSecondary]</textcolor>
+        <disabledcolor>$VAR[InfinityGlassTextSecondary]</disabledcolor>
+        <align>right</align>
+        <aligny>center</aligny>
+        <label>›</label>
+      </control>
+      <control type="button" id="277">
+        <left>42</left>
+        <top>532</top>
+        <width>794</width>
+        <height>56</height>
+        <label>Playlist</label>
+        <onclick>ActivateWindow(VideoPlaylist)</onclick>
+        <texturefocus border="22" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_glass/field.png</texturefocus>
+        <texturenofocus border="22" colordiffuse="$VAR[InfinityPlayerQuietRow]">infinity_glass/field.png</texturenofocus>
+        <font>InfinitySmall</font>
+        <textcolor>FFFFFFFF</textcolor>
+        <disabledcolor>$VAR[InfinityGlassTextSecondary]</disabledcolor>
+        <focusedcolor>FFFFFFFF</focusedcolor>
+        <align>left</align>
+        <textoffsetx>62</textoffsetx>
+        <aligny>center</aligny>
+        <onback>Skin.Reset(Infinity.PlayerDrawerOpen)</onback>
+        <onback>SetFocus(257)</onback>
+        <onup>276</onup>
+        <ondown>278</ondown>
+        <onleft>271</onleft>
+        <onright>277</onright>
+        <animation effect="zoom" start="100" end="102" time="90" tween="quadratic" easing="out" reversible="true" condition="Control.HasFocus(277)">Conditional</animation>
+      </control>
+      <control type="image">
+        <left>61</left>
+        <top>548</top>
+        <width>24</width>
+        <height>24</height>
+        <texture colordiffuse="FFFFFFFF">infinity_ui/icons/playlist.png</texture>
+      </control>
+      <control type="label">
+        <left>802</left>
+        <top>532</top>
+        <width>20</width>
+        <height>56</height>
+        <font>InfinityBody</font>
+        <textcolor>$VAR[InfinityGlassTextSecondary]</textcolor>
+        <disabledcolor>$VAR[InfinityGlassTextSecondary]</disabledcolor>
+        <align>right</align>
+        <aligny>center</aligny>
+        <label>›</label>
+      </control>
+      <control type="button" id="278">
+        <left>42</left>
+        <top>596</top>
+        <width>794</width>
+        <height>56</height>
+        <label>Go To Time</label>
+        <onclick>DialogSeekBar</onclick>
+        <texturefocus border="22" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_glass/field.png</texturefocus>
+        <texturenofocus border="22" colordiffuse="$VAR[InfinityPlayerQuietRow]">infinity_glass/field.png</texturenofocus>
+        <font>InfinitySmall</font>
+        <textcolor>FFFFFFFF</textcolor>
+        <disabledcolor>$VAR[InfinityGlassTextSecondary]</disabledcolor>
+        <focusedcolor>FFFFFFFF</focusedcolor>
+        <align>left</align>
+        <textoffsetx>62</textoffsetx>
+        <aligny>center</aligny>
+        <onback>Skin.Reset(Infinity.PlayerDrawerOpen)</onback>
+        <onback>SetFocus(257)</onback>
+        <onup>277</onup>
+        <ondown>279</ondown>
+        <onleft>271</onleft>
+        <onright>278</onright>
+        <animation effect="zoom" start="100" end="102" time="90" tween="quadratic" easing="out" reversible="true" condition="Control.HasFocus(278)">Conditional</animation>
+      </control>
+      <control type="image">
+        <left>61</left>
+        <top>612</top>
+        <width>24</width>
+        <height>24</height>
+        <texture colordiffuse="FFFFFFFF">infinity_ui/icons/clock.png</texture>
+      </control>
+      <control type="label">
+        <left>802</left>
+        <top>596</top>
+        <width>20</width>
+        <height>56</height>
+        <font>InfinityBody</font>
+        <textcolor>$VAR[InfinityGlassTextSecondary]</textcolor>
+        <disabledcolor>$VAR[InfinityGlassTextSecondary]</disabledcolor>
+        <align>right</align>
+        <aligny>center</aligny>
+        <label>›</label>
+      </control>
+      <control type="label">
+        <left>42</left>
+        <top>672</top>
+        <width>794</width>
+        <height>20</height>
+        <font>InfinityTiny</font>
+        <textcolor>$VAR[InfinityGlassTextSecondary]</textcolor>
+        <disabledcolor>$VAR[InfinityGlassTextSecondary]</disabledcolor>
+        <align>left</align>
+        <aligny>center</aligny>
+        <label>PLAYER &amp; DISPLAY</label>
+      </control>
+      <control type="button" id="279">
+        <left>42</left>
+        <top>700</top>
+        <width>794</width>
+        <height>56</height>
+        <label>Player Settings</label>
+        <onclick>ActivateWindow(PlayerSettings)</onclick>
+        <texturefocus border="22" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_glass/field.png</texturefocus>
+        <texturenofocus border="22" colordiffuse="$VAR[InfinityPlayerQuietRow]">infinity_glass/field.png</texturenofocus>
+        <font>InfinitySmall</font>
+        <textcolor>FFFFFFFF</textcolor>
+        <disabledcolor>$VAR[InfinityGlassTextSecondary]</disabledcolor>
+        <focusedcolor>FFFFFFFF</focusedcolor>
+        <align>left</align>
+        <textoffsetx>62</textoffsetx>
+        <aligny>center</aligny>
+        <onback>Skin.Reset(Infinity.PlayerDrawerOpen)</onback>
+        <onback>SetFocus(257)</onback>
+        <onup>278</onup>
+        <ondown>281</ondown>
+        <onleft>271</onleft>
+        <onright>279</onright>
+        <animation effect="zoom" start="100" end="102" time="90" tween="quadratic" easing="out" reversible="true" condition="Control.HasFocus(279)">Conditional</animation>
+      </control>
+      <control type="image">
+        <left>61</left>
+        <top>716</top>
+        <width>24</width>
+        <height>24</height>
+        <texture colordiffuse="FFFFFFFF">infinity_ui/icons/settings.png</texture>
+      </control>
+      <control type="label">
+        <left>802</left>
+        <top>700</top>
+        <width>20</width>
+        <height>56</height>
+        <font>InfinityBody</font>
+        <textcolor>$VAR[InfinityGlassTextSecondary]</textcolor>
+        <disabledcolor>$VAR[InfinityGlassTextSecondary]</disabledcolor>
+        <align>right</align>
+        <aligny>center</aligny>
+        <label>›</label>
+      </control>
+      
+      
+      
+      <control type="button" id="281">
+        <left>42</left>
+        <top>828</top>
+        <width>794</width>
+        <height>56</height>
+        <label>Playback Diagnostics</label>
+        <onclick>ActivateWindow(playerprocessinfo)</onclick>
+        <texturefocus border="22" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_glass/field.png</texturefocus>
+        <texturenofocus border="22" colordiffuse="$VAR[InfinityPlayerQuietRow]">infinity_glass/field.png</texturenofocus>
+        <font>InfinitySmall</font>
+        <textcolor>FFFFFFFF</textcolor>
+        <disabledcolor>$VAR[InfinityGlassTextSecondary]</disabledcolor>
+        <focusedcolor>FFFFFFFF</focusedcolor>
+        <align>left</align>
+        <textoffsetx>62</textoffsetx>
+        <aligny>center</aligny>
+        <onback>Skin.Reset(Infinity.PlayerDrawerOpen)</onback>
+        <onback>SetFocus(257)</onback>
+        <onup>279</onup>
+        <ondown>282</ondown>
+        <onleft>271</onleft>
+        <onright>281</onright>
+        <animation effect="zoom" start="100" end="102" time="90" tween="quadratic" easing="out" reversible="true" condition="Control.HasFocus(281)">Conditional</animation>
+      </control>
+      <control type="image">
+        <left>61</left>
+        <top>844</top>
+        <width>24</width>
+        <height>24</height>
+        <texture colordiffuse="FFFFFFFF">infinity_ui/icons/info.png</texture>
+      </control>
+      <control type="label">
+        <left>802</left>
+        <top>828</top>
+        <width>20</width>
+        <height>56</height>
+        <font>InfinityBody</font>
+        <textcolor>$VAR[InfinityGlassTextSecondary]</textcolor>
+        <disabledcolor>$VAR[InfinityGlassTextSecondary]</disabledcolor>
+        <align>right</align>
+        <aligny>center</aligny>
+        <label>›</label>
+      </control>
+      <control type="button" id="282">
+        <left>42</left>
+        <top>892</top>
+        <width>794</width>
+        <height>56</height>
+        <label>Close Player</label>
+        <onclick>PlayerControl(Stop)</onclick>
+        <texturefocus border="22" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_glass/field.png</texturefocus>
+        <texturenofocus border="22" colordiffuse="$VAR[InfinityPlayerQuietRow]">infinity_glass/field.png</texturenofocus>
+        <font>InfinitySmall</font>
+        <textcolor>FFFFFFFF</textcolor>
+        <disabledcolor>$VAR[InfinityGlassTextSecondary]</disabledcolor>
+        <focusedcolor>FFFFFFFF</focusedcolor>
+        <align>left</align>
+        <textoffsetx>62</textoffsetx>
+        <aligny>center</aligny>
+        <onback>Skin.Reset(Infinity.PlayerDrawerOpen)</onback>
+        <onback>SetFocus(257)</onback>
+        <onup>281</onup>
+        <ondown>271</ondown>
+        <onleft>271</onleft>
+        <onright>282</onright>
+        <animation effect="zoom" start="100" end="102" time="90" tween="quadratic" easing="out" reversible="true" condition="Control.HasFocus(282)">Conditional</animation>
+      </control>
+      <control type="image">
+        <left>61</left>
+        <top>908</top>
+        <width>24</width>
+        <height>24</height>
+        <texture colordiffuse="FFFFFFFF">infinity_ui/icons/close.png</texture>
+      </control>
+      <control type="label">
+        <left>802</left>
+        <top>892</top>
+        <width>20</width>
+        <height>56</height>
+        <font>InfinityBody</font>
+        <textcolor>$VAR[InfinityGlassTextSecondary]</textcolor>
+        <disabledcolor>$VAR[InfinityGlassTextSecondary]</disabledcolor>
+        <align>right</align>
+        <aligny>center</aligny>
+        <label>›</label>
+      </control>
+    </control>
+    <control type="button" id="251">
+      <left>-1000</left>
+      <top>-1000</top>
+      <width>1</width>
+      <height>1</height>
+      <label />
+      <onclick>noop</onclick>
+      <visible>false</visible>
+      <texturefocus />
+      <texturenofocus />
+    </control>
+    <control type="button" id="254">
+      <left>-1000</left>
+      <top>-1000</top>
+      <width>1</width>
+      <height>1</height>
+      <label />
+      <onclick>ActivateWindow(VideoPlaylist)</onclick>
+      <visible>false</visible>
+      <texturefocus />
+      <texturenofocus />
+    </control>
+    <control type="button" id="256">
+      <left>-1000</left>
+      <top>-1000</top>
+      <width>1</width>
+      <height>1</height>
+      <label />
+      <onclick>PlayerControl(Stop)</onclick>
+      <visible>false</visible>
+      <texturefocus />
+      <texturenofocus />
+    </control>
+    <control type="button" id="7999">
+      <left>-1000</left>
+      <top>-1000</top>
+      <width>1</width>
+      <height>1</height>
+      <label />
+      <onclick>Skin.Reset(Infinity.PlayerDrawerOpen)</onclick>
+      <onclick>Dialog.Close(videoosd)</onclick>
+      <onclick>ActivateWindow(1199)</onclick><visible>false</visible>
+      <texturefocus />
+      <texturenofocus />
+    </control>
+  </controls>
+</window>

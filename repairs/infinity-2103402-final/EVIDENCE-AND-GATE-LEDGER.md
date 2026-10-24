@@ -23,12 +23,12 @@
 | 1 | Search/native signal process exit | Observed; stack unavailable | NOT STARTED | NOT RUN | NOT RUN | NOT RUN |
 | 2 | Home blank loading/re-entry restoration | Visibly reproduced; owner unknown | NOT STARTED | NOT RUN | NOT RUN | NOT RUN |
 | 3 | Clock suffix clipped after reflow | Visibly reproduced | NOT STARTED | NOT RUN | NOT RUN | NOT RUN |
-| 4 | Option B scrollbars and oversized plot space | Visibly reproduced | NOT STARTED | NOT RUN | NOT RUN | NOT RUN |
+| 4 | Option B scrollbars and oversized plot space | Forced one-page bars confirmed; layout sizing still open | One-page scrollbar correction staged; dead-space/scroll rendering pending | Scoped source/package tests PASS | NOT RUN | NOT RUN |
 | 5 | Provider chooser size/label issues | Visibly reproduced | NOT STARTED | NOT RUN | NOT RUN | NOT RUN |
-| 6 | Player seek-time contrast | Visibly reproduced | NOT STARTED | NOT RUN | NOT RUN | NOT RUN |
+| 6 | Player seek-time contrast | Unified variant uses theme ink over video; other13 already white | Unified white text/black shadow staged; other13 time controls unchanged | Scoped source/package tests PASS | NOT RUN | NOT RUN |
 | 7 | Play/Pause heavy dark styling regression | 14 exact XML source preimages identified | **Isolated source-only prototype staged** | **4 local unittest cases PASS; 14 variants parsed** | NOT RUN | NOT RUN |
 | 8 | Post-Information focus restoration | Suspected visually; needs identity proof | NOT STARTED | NOT RUN | NOT RUN | NOT RUN |
-| 9 | Health Center diagnostics reliability | Explicit user authorization; missing native crash snapshot | NOT STARTED | NOT RUN | NOT RUN | NOT RUN |
+| 9 | Health Center diagnostics reliability | Signal metadata omitted; empty snapshot falsely available; read failure abort risk | Bounded partial-read and exit-metadata fixes staged; signed DEX binding and broader integration pending | 2 focused tests PASS, including compiled actual Java methods with controlled interfaces | NOT RUN | NOT RUN |
 
 **OSD prototype limitation:** `osd_playpause_scope.py` makes only two texture tag opacity changes inside existing control `202` in the exact 14 `VideoOSD.xml` members. Its source tests independently assert byte-exact invariance of all other control text/behavior, exact input SHA-256, strict fail-closed baseline mismatches, XML parse and no source archive mutation. It is a **staged experiment, not the final approved look, not a component ZIP, not signed, not physically tested**. Reference the user's approved clean/translucent appearance before final packaging; replace the prototype only if needed by documented physical result, always within control 202.
 
@@ -39,3 +39,32 @@
 - Trace root cause before any native Search fix or Home performance rewrite. Do not block unrelated scoped fixes while tracing.
 - Do not start final signed packaging until the candidate is integrated, code/host/Android17 checks pass, and member-delta receipts are complete.
 - New physical acceptance is required for 2103402. Old 2103401 user acceptance is a retained rollback baseline, not advance acceptance of this new candidate.
+
+## Continuation checkpoint — source only
+
+Protected baseline APK hash and diagnostic APK-native hash match build40089463702.
+The new archive has no faulting stack. Signal7 remains unassigned to a function;
+no pure-virtual/Scudo attribution or speculative Search fix was made. Video
+samples show at least40 seconds of blank Home after playback return; no measured
+readiness target has passed. Directory reset, announcement invalidation and
+provider re-listing paths are identified, but the complete runtime owner chain
+still needs attribution before a native cache change.
+
+`FILE-AUTHORIZATION-LEDGER.json` was recorded before the respective staged edits.
+`visual_scope.py` and its four new checks preserve every non-target byte and
+reject both a reintroduced Play/Pause matte and seek-text regression in package
+fixtures. Existing Play/Pause prototype and its prior passing tests remain.
+`health_export_scope.py` compiles the actual revised methods in its host harness;
+Android interfaces are controlled fixtures, not an Android test. Signed DEX
+identity/preservation and actual API37 export integration are still required.
+The Health export source adapter remains fail-closed to its exact preimage.
+Initial failures are retained separately from the passing results.
+
+No signed2103402 artifact has been produced. No workflow, signing, provider,
+TrackIt, database, persistence or Cobra source was edited. The only revised
+existing repository document is this ledger; candidate XML and Java are isolated
+under this repair directory. No personal recording or diagnostic archive was
+committed. Required50 Search,30 playback-return,20 rotation and separate Close/
+reopen cycles are all NOT RUN. This session has no attached Android device, adb
+or emulator acceleration, and no GitHub workflow-dispatch action. These gates
+remain blocked; no sign-in request or workflow authorization bypass was used.
