@@ -1,0 +1,515 @@
+package @APP_PACKAGE@;
+
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
+/** Infinity-owned state/runtime layer for Cobra Candidate 2. */
+public final class InfinityCobraFeatureRuntime {
+  public static final String PREFS = "infinity_cobra_features_v2";
+  public static final String ACTION_RECORD = "com.projectinfinity.cobra.RECORD";
+  public static final String ACTION_STOP_RECORD = "com.projectinfinity.cobra.STOP_RECORD";
+  public static final String ACTION_REMINDER = "com.projectinfinity.cobra.REMINDER";
+  public static final String ACTION_RESCHEDULE = "com.projectinfinity.cobra.RESCHEDULE";
+  public static final String EXTRA_SESSION = "session";
+  public static final String EXTRA_URL = "url";
+  public static final String EXTRA_NAME = "name";
+  public static final String EXTRA_HEADERS = "headers";
+  public static final String EXTRA_END_AT = "end_at";
+  public static final String EXTRA_SOURCE_ID = "source_id";
+  public static final String EXTRA_CHANNEL_ID = "channel_id";
+  public static final String EXTRA_PROGRAM = "program";
+
+  private static final String PROFILES = "profiles";
+  private static final String ACTIVE_PROFILE = "active_profile";
+  private static final String SOURCE_META = "source_meta";
+  private static final String SCHEDULES = "recording_schedules";
+  private static final String REMINDERS = "reminders";
+  private static final String HEALTH = "health_snapshot";
+  private static final long MIN_RECORD_FREE_BYTES = 256L * 1024L * 1024L;
+
+  private final Context context;
+  private final SharedPreferences prefs;
+
+  public InfinityCobraFeatureRuntime(Context context) {
+    this.context = context.getApplicationContext();
+    this.prefs = this.context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+    ensureDefaultProfile();
+  }
+
+  public String activeProfileId() {
+    return prefs.getString(ACTIVE_PROFILE, "default");
+  }
+
+  public String profileKey(String base) {
+    return "profile:" + activeProfileId() + ":" + base;
+  }
+
+  public JSONArray profiles() {
+    try {
+      return new JSONArray(prefs.getString(PROFILES, "[]"));
+    } catch (Exception e) {
+      return new JSONArray();
+    }
+  }
+
+  public void ensureDefaultProfile() {
+    JSONArray list = profiles();
+    if (list.length() > 0) return;
+    JSONObject profile = new JSONObject();
+    try {
+      profile.put("id", "default");
+      profile.put("name", "Main");
+      profile.put("pin_hash", "");
+      profile.put("adult_locked", false);
+      list.put(profile);
+      prefs.edit().putString(PROFILES, list.toString())
+          .putString(ACTIVE_PROFILE, "default").apply();
+    } catch (Exception ignored) {}
+  }
+
+  public String createProfile(String name, String pin, boolean adultLocked) {
+    JSONArray list = profiles();
+    String id = "p" + Long.toHexString(System.currentTimeMillis());
+    JSONObject profile = new JSONObject();
+    try {
+      profile.put("id", id);
+      profile.put("name", cleanName(name, "Profile"));
+      profile.put("pin_hash", pin == null || pin.isEmpty() ? "" : sha256(pin));
+      profile.put("adult_locked", adultLocked);
+      list.put(profile);
+      prefs.edit().putString(PROFILES, list.toString()).apply();
+      return id;
+    } catch (Exception e) {
+      return "";
+    }
+  }
+
+  public boolean unlockAndSelectProfile(String id, String pin) {
+    JSONArray list = profiles();
+    for (int i = 0; i < list.length(); i++) {
+      JSONObject p = list.optJSONObject(i);
+      if (p == null || !id.equals(p.optString("id"))) continue;
+      String hash = p.optString("pin_hash", "");
+      if (!hash.isEmpty() && !hash.equals(sha256(pin == null ? "" : pin))) return false;
+      prefs.edit().putString(ACTIVE_PROFILE, id).apply();
+      return true;
+    }
+    return false;
+  }
+
+  public boolean adultLocked() {
+    String active = activeProfileId();
+    JSONArray list = profiles();
+    for (int i = 0; i < list.length(); i++) {
+      JSONObject p = list.optJSONObject(i);
+      if (p != null && active.equals(p.optString("id"))) {
+        return p.optBoolean("adult_locked", false);
+      }
+    }
+    return false;
+  }
+
+  public boolean looksAdult(String value) {
+    if (!adultLocked() || value == null) return false;
+    String s = value.toLowerCase(Locale.US);
+    return s.contains("adult") || s.contains("18+") || s.contains("xxx") ||
+        s.contains("porn") || s.contains("erotic");
+  }
+
+  public JSONObject sourceMeta(String sourceId) {
+    try {
+      JSONObject root = new JSONObject(prefs.getString(SOURCE_META, "{}"));
+      JSONObject meta = root.optJSONObject(sourceId);
+      if (meta != null) return meta;
+    } catch (Exception ignored) {}
+    JSONObject fallback = new JSONObject();
+    try {
+      fallback.put("enabled", true);
+      fallback.put("color", "#FF4059");
+      fallback.put("icon", "◈");
+    } catch (Exception ignored) {}
+    return fallback;
+  }
+
+  public void setSourceMeta(String sourceId, boolean enabled, String color, String icon) {
+    try {
+      JSONObject root = new JSONObject(prefs.getString(SOURCE_META, "{}"));
+      JSONObject meta = root.optJSONObject(sourceId);
+      if (meta == null) meta = new JSONObject();
+      meta.put("enabled", enabled);
+      meta.put("color", color == null || color.isEmpty() ? "#FF4059" : color);
+      meta.put("icon", icon == null || icon.isEmpty() ? "◈" : icon);
+      root.put(sourceId, meta);
+      prefs.edit().putString(SOURCE_META, root.toString()).apply();
+    } catch (Exception ignored) {}
+  }
+
+  public boolean sourceEnabled(String sourceId) {
+    return sourceMeta(sourceId).optBoolean("enabled", true);
+  }
+
+  public String sourceColor(String sourceId) {
+    return sourceMeta(sourceId).optString("color", "#FF4059");
+  }
+
+  public String sourceIcon(String sourceId) {
+    return sourceMeta(sourceId).optString("icon", "◈");
+  }
+
+  public File recordingsDir() {
+    File root = context.getExternalFilesDir(Environment.DIRECTORY_MOVIES);
+    if (root == null) root = context.getFilesDir();
+    File dir = new File(root, "CobraRecordings");
+    if (!dir.isDirectory()) dir.mkdirs();
+    return dir;
+  }
+
+  public boolean hasRecordingSpace() {
+    File dir = recordingsDir();
+    return dir.getUsableSpace() >= MIN_RECORD_FREE_BYTES;
+  }
+
+  public JSONArray recordings() {
+    JSONArray out = new JSONArray();
+    File[] files = recordingsDir().listFiles();
+    if (files == null) return out;
+    ArrayList<File> ordered = new ArrayList<>();
+    Collections.addAll(ordered, files);
+    ordered.sort((a, b) -> Long.compare(b.lastModified(), a.lastModified()));
+    for (File file : ordered) {
+      if (!file.isFile() || file.getName().endsWith(".json")) continue;
+      JSONObject item = new JSONObject();
+      try {
+        item.put("name", file.getName());
+        item.put("path", file.getAbsolutePath());
+        item.put("size", file.length());
+        item.put("modified", file.lastModified());
+        out.put(item);
+      } catch (Exception ignored) {}
+    }
+    return out;
+  }
+
+  public boolean deleteRecording(String path) {
+    try {
+      File file = new File(path);
+      if (!inside(recordingsDir(), file) || !file.isFile()) return false;
+      return file.delete();
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
+  public String renameRecording(String path, String newName) {
+    try {
+      File file = new File(path);
+      if (!inside(recordingsDir(), file) || !file.isFile()) return "";
+      String ext = file.getName().toLowerCase(Locale.US).endsWith(".mp4") ? ".mp4" : ".ts";
+      String safe = safeFileName(cleanName(newName, "Recording")) + ext;
+      File target = new File(recordingsDir(), safe);
+      if (target.exists()) target = new File(recordingsDir(), System.currentTimeMillis() + "-" + safe);
+      return file.renameTo(target) ? target.getAbsolutePath() : "";
+    } catch (Exception e) {
+      return "";
+    }
+  }
+
+  public String startRecording(String url, String name, Map<String, String> headers,
+                               long endAt, String sourceId, String channelId) {
+    if (!hasRecordingSpace()) return "";
+    String session = "rec-" + Long.toHexString(System.currentTimeMillis());
+    Intent intent = new Intent(context, InfinityCobraRecordingService.class)
+        .setAction(ACTION_RECORD)
+        .putExtra(EXTRA_SESSION, session)
+        .putExtra(EXTRA_URL, url)
+        .putExtra(EXTRA_NAME, cleanName(name, "Recording"))
+        .putExtra(EXTRA_HEADERS, headersJson(headers))
+        .putExtra(EXTRA_END_AT, endAt)
+        .putExtra(EXTRA_SOURCE_ID, sourceId == null ? "" : sourceId)
+        .putExtra(EXTRA_CHANNEL_ID, channelId == null ? "" : channelId);
+    if (Build.VERSION.SDK_INT >= 26) context.startForegroundService(intent); else context.startService(intent);
+    return session;
+  }
+
+  public void stopRecording(String session) {
+    Intent intent = new Intent(context, InfinityCobraRecordingService.class)
+        .setAction(ACTION_STOP_RECORD)
+        .putExtra(EXTRA_SESSION, session == null ? "" : session);
+    if (Build.VERSION.SDK_INT >= 26) context.startForegroundService(intent); else context.startService(intent);
+  }
+
+  public String scheduleRecording(String url, String name, Map<String, String> headers,
+                                  long startAt, long endAt, String sourceId, String channelId) {
+    String id = "sched-" + Long.toHexString(System.currentTimeMillis());
+    JSONObject item = new JSONObject();
+    try {
+      item.put("id", id);
+      item.put("url", url);
+      item.put("name", cleanName(name, "Scheduled recording"));
+      item.put("headers", headersJson(headers));
+      item.put("start_at", startAt);
+      item.put("end_at", endAt);
+      item.put("source_id", sourceId == null ? "" : sourceId);
+      item.put("channel_id", channelId == null ? "" : channelId);
+      JSONArray list = schedules();
+      list.put(item);
+      prefs.edit().putString(SCHEDULES, list.toString()).apply();
+      scheduleAlarm(item);
+      return id;
+    } catch (Exception e) {
+      return "";
+    }
+  }
+
+  public JSONArray schedules() {
+    try { return new JSONArray(prefs.getString(SCHEDULES, "[]")); }
+    catch (Exception e) { return new JSONArray(); }
+  }
+
+  public void rescheduleAll() {
+    JSONArray list = schedules();
+    long now = System.currentTimeMillis();
+    for (int i = 0; i < list.length(); i++) {
+      JSONObject item = list.optJSONObject(i);
+      if (item != null && item.optLong("end_at", 0) > now) scheduleAlarm(item);
+    }
+    JSONArray reminders = reminders();
+    for (int i = 0; i < reminders.length(); i++) {
+      JSONObject item = reminders.optJSONObject(i);
+      if (item != null && item.optLong("when", 0) > now) scheduleReminderAlarm(item);
+    }
+  }
+
+  public void removeSchedule(String id) {
+    JSONArray src = schedules();
+    JSONArray dst = new JSONArray();
+    for (int i = 0; i < src.length(); i++) {
+      JSONObject item = src.optJSONObject(i);
+      if (item != null && !id.equals(item.optString("id"))) dst.put(item);
+    }
+    prefs.edit().putString(SCHEDULES, dst.toString()).apply();
+    ((AlarmManager) context.getSystemService(Context.ALARM_SERVICE)).cancel(
+        recordingPendingIntent(id, new Intent(context, InfinityCobraRecordingService.class)));
+  }
+
+  public String addReminder(String sourceId, String channelId, String program, long when) {
+    String id = "rem-" + Long.toHexString(System.currentTimeMillis());
+    JSONObject item = new JSONObject();
+    try {
+      item.put("id", id);
+      item.put("source_id", sourceId == null ? "" : sourceId);
+      item.put("channel_id", channelId == null ? "" : channelId);
+      item.put("program", cleanName(program, "Programme"));
+      item.put("when", when);
+      JSONArray list = reminders();
+      list.put(item);
+      prefs.edit().putString(REMINDERS, list.toString()).apply();
+      scheduleReminderAlarm(item);
+      return id;
+    } catch (Exception e) { return ""; }
+  }
+
+  public JSONArray reminders() {
+    try { return new JSONArray(prefs.getString(REMINDERS, "[]")); }
+    catch (Exception e) { return new JSONArray(); }
+  }
+
+  public void removeReminder(String id) {
+    JSONArray src = reminders();
+    JSONArray dst = new JSONArray();
+    for (int i = 0; i < src.length(); i++) {
+      JSONObject item = src.optJSONObject(i);
+      if (item != null && !id.equals(item.optString("id"))) dst.put(item);
+    }
+    prefs.edit().putString(REMINDERS, dst.toString()).apply();
+    ((AlarmManager) context.getSystemService(Context.ALARM_SERVICE)).cancel(reminderPendingIntent(id));
+  }
+
+  public void writeHealth(String screen, String sourceId, String mediaId, String playerState,
+                          String error, int retries, int multiTiles, int audioOwner,
+                          String recordingState, String guideState) {
+    JSONObject root = new JSONObject();
+    try {
+      root.put("schema", 2);
+      root.put("cobra_version", "candidate-2");
+      root.put("timestamp", System.currentTimeMillis());
+      root.put("screen", safe(screen));
+      root.put("profile", hashId(activeProfileId()));
+      root.put("source", hashId(sourceId));
+      root.put("media", hashId(mediaId));
+      root.put("player_state", safe(playerState));
+      root.put("last_error", redact(error));
+      root.put("retry_count", retries);
+      root.put("multiview_tiles", multiTiles);
+      root.put("audio_owner", audioOwner);
+      root.put("recording_state", safe(recordingState));
+      root.put("guide_state", safe(guideState));
+      root.put("free_recording_bytes", recordingsDir().getUsableSpace());
+      String json = root.toString();
+      prefs.edit().putString(HEALTH, json).apply();
+      File healthDir = new File(context.getFilesDir(), "health");
+      if (!healthDir.isDirectory()) healthDir.mkdirs();
+      writeAtomic(new File(healthDir, "cobra-health.json"), json.getBytes(StandardCharsets.UTF_8));
+    } catch (Exception ignored) {}
+  }
+
+  public String healthSnapshot() {
+    return prefs.getString(HEALTH, "{}");
+  }
+
+  public static String redact(String input) {
+    if (input == null) return "";
+    String value = input;
+    value = value.replaceAll("(?i)(username|user|password|pass)=([^&\\s]+)", "$1=***");
+    value = value.replaceAll("(?i)/live/[^/]+/[^/]+/", "/live/***/***/");
+    value = value.replaceAll("(?i)/movie/[^/]+/[^/]+/", "/movie/***/***/");
+    value = value.replaceAll("(?i)/series/[^/]+/[^/]+/", "/series/***/***/");
+    value = value.replaceAll("(?i)/timeshift/[^/]+/[^/]+/", "/timeshift/***/***/");
+    if (value.length() > 500) value = value.substring(0, 500);
+    return value;
+  }
+
+  public static String hashId(String input) {
+    if (input == null || input.isEmpty()) return "";
+    return sha256(input).substring(0, 12);
+  }
+
+  private void scheduleAlarm(JSONObject item) {
+    try {
+      String id = item.getString("id");
+      Intent intent = new Intent(context, InfinityCobraRecordingService.class)
+          .setAction(ACTION_RECORD)
+          .putExtra(EXTRA_SESSION, id)
+          .putExtra(EXTRA_URL, item.optString("url"))
+          .putExtra(EXTRA_NAME, item.optString("name"))
+          .putExtra(EXTRA_HEADERS, item.optString("headers", "{}"))
+          .putExtra(EXTRA_END_AT, item.optLong("end_at", 0))
+          .putExtra(EXTRA_SOURCE_ID, item.optString("source_id"))
+          .putExtra(EXTRA_CHANNEL_ID, item.optString("channel_id"));
+      PendingIntent pending = recordingPendingIntent(id, intent);
+      AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+      long at = Math.max(System.currentTimeMillis() + 1000L, item.optLong("start_at", 0));
+      manager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, at, pending);
+    } catch (Exception ignored) {}
+  }
+
+  private PendingIntent recordingPendingIntent(String id, Intent intent) {
+    int flags = PendingIntent.FLAG_UPDATE_CURRENT;
+    if (Build.VERSION.SDK_INT >= 23) flags |= PendingIntent.FLAG_IMMUTABLE;
+    int request = Math.abs(id.hashCode());
+    if (Build.VERSION.SDK_INT >= 26) {
+      return PendingIntent.getForegroundService(context, request, intent, flags);
+    }
+    return PendingIntent.getService(context, request, intent, flags);
+  }
+
+  private void scheduleReminderAlarm(JSONObject item) {
+    try {
+      PendingIntent pending = reminderPendingIntent(item.getString("id"));
+      Intent fill = new Intent(context, InfinityCobraReminderReceiver.class)
+          .setAction(ACTION_REMINDER)
+          .putExtra("id", item.getString("id"))
+          .putExtra(EXTRA_SOURCE_ID, item.optString("source_id"))
+          .putExtra(EXTRA_CHANNEL_ID, item.optString("channel_id"))
+          .putExtra(EXTRA_PROGRAM, item.optString("program"));
+      int flags = PendingIntent.FLAG_UPDATE_CURRENT;
+      if (Build.VERSION.SDK_INT >= 23) flags |= PendingIntent.FLAG_IMMUTABLE;
+      pending = PendingIntent.getBroadcast(context, Math.abs(item.getString("id").hashCode()), fill, flags);
+      AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+      manager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,
+          Math.max(System.currentTimeMillis() + 1000L, item.optLong("when", 0)), pending);
+    } catch (Exception ignored) {}
+  }
+
+  private PendingIntent reminderPendingIntent(String id) {
+    Intent intent = new Intent(context, InfinityCobraReminderReceiver.class)
+        .setAction(ACTION_REMINDER)
+        .putExtra("id", id);
+    int flags = PendingIntent.FLAG_UPDATE_CURRENT;
+    if (Build.VERSION.SDK_INT >= 23) flags |= PendingIntent.FLAG_IMMUTABLE;
+    return PendingIntent.getBroadcast(context, Math.abs(id.hashCode()), intent, flags);
+  }
+
+  private static boolean inside(File root, File file) throws Exception {
+    String r = root.getCanonicalPath() + File.separator;
+    String f = file.getCanonicalPath();
+    return f.startsWith(r);
+  }
+
+  private static String headersJson(Map<String, String> headers) {
+    JSONObject object = new JSONObject();
+    if (headers != null) {
+      for (Map.Entry<String, String> entry : headers.entrySet()) {
+        try { object.put(entry.getKey(), entry.getValue()); } catch (Exception ignored) {}
+      }
+    }
+    return object.toString();
+  }
+
+  private static String cleanName(String value, String fallback) {
+    String out = value == null ? "" : value.trim();
+    if (out.isEmpty()) out = fallback;
+    if (out.length() > 120) out = out.substring(0, 120);
+    return out;
+  }
+
+  private static String safeFileName(String value) {
+    String safe = value.replaceAll("[^A-Za-z0-9._ -]+", "_").trim();
+    return safe.isEmpty() ? "Recording" : safe;
+  }
+
+  private static String safe(String value) {
+    if (value == null) return "";
+    String out = value.replaceAll("[\\r\\n\\t]+", " ").trim();
+    return out.length() > 160 ? out.substring(0, 160) : out;
+  }
+
+  private static void writeAtomic(File target, byte[] data) throws Exception {
+    File tmp = new File(target.getParentFile(), target.getName() + ".tmp");
+    try (BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(tmp))) {
+      out.write(data);
+      out.flush();
+    }
+    if (target.exists() && !target.delete()) throw new IllegalStateException("delete old health snapshot");
+    if (!tmp.renameTo(target)) throw new IllegalStateException("replace health snapshot");
+  }
+
+  private static String sha256(String value) {
+    try {
+      MessageDigest digest = MessageDigest.getInstance("SHA-256");
+      byte[] bytes = digest.digest(value.getBytes(StandardCharsets.UTF_8));
+      StringBuilder out = new StringBuilder();
+      for (byte b : bytes) out.append(String.format(Locale.US, "%02x", b));
+      return out.toString();
+    } catch (Exception e) {
+      return "00000000000000000000000000000000";
+    }
+  }
+}

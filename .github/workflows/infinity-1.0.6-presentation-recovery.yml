@@ -1,0 +1,110 @@
+name: Infinity 1.0.6 | presentation recovery from passed engine
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-theme-hook-audit]
+    paths:
+      - '.github/workflows/infinity-1.0.6-presentation-recovery.yml'
+      - 'scripts/infinity_1_0_6_presentation_fix.py'
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  presentation:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'build-tools;34.0.0'
+      - name: Reuse the already-passed 1.0.6 engine artifact
+        uses: actions/download-artifact@v8
+        with:
+          name: Infinity-1.0.6-Consolidated-Engine
+          path: engine
+          github-token: ${{ github.token }}
+          run-id: 34424963642
+      - name: Install presentation tooling
+        run: python3 -m pip install --disable-pip-version-check pillow
+      - name: Recover fresh-engine sidebar and build presentation
+        run: |
+          set -euo pipefail
+          mkdir -p candidate
+          python3 scripts/infinity71.py overlay --apk engine/Infinity-1.0.6-Engine-Base.apk \
+            --manifest engine/engine.json --output candidate/Infinity-1.0.6-Locked-unsigned.apk
+          python3 scripts/infinity_1_0_6_presentation_fix.py \
+            candidate/Infinity-1.0.6-Locked-unsigned.apk \
+            candidate/Infinity-1.0.6-Consolidated-unsigned.apk \
+            candidate/presentation-1.0.6.json
+      - name: Permanently sign and verify update
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          for name in INFINITY_KEYSTORE_B64 INFINITY_STORE_PASSWORD INFINITY_KEY_PASSWORD INFINITY_KEY_ALIAS; do
+            if [[ -z "${!name:-}" ]]; then echo "Missing permanent signing secret: $name" >&2; exit 2; fi
+          done
+          bash scripts/sign-infinity71.sh \
+            candidate/Infinity-1.0.6-Consolidated-unsigned.apk \
+            candidate/Infinity-1.0.6-Consolidated.apk
+          "$ANDROID_HOME/build-tools/34.0.0/apksigner" verify --verbose --print-certs \
+            candidate/Infinity-1.0.6-Consolidated.apk | tee candidate/signing-verification.txt
+          grep -qi 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' candidate/signing-verification.txt
+          "$ANDROID_HOME/build-tools/34.0.0/aapt" dump badging candidate/Infinity-1.0.6-Consolidated.apk | tee candidate/badging.txt
+          grep -q "package: name='com.projectinfinity.kodi' versionCode='2103106'" candidate/badging.txt
+      - name: Final structural release gates
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json, zipfile, xml.etree.ElementTree as ET
+          from PIL import Image
+          from io import BytesIO
+          apk='candidate/Infinity-1.0.6-Consolidated.apk'
+          skin='assets/addons/skin.estuary/'
+          with zipfile.ZipFile(apk) as z:
+              font=ET.fromstring(z.read(skin+'xml/Font.xml'))
+              systems=[x for x in font.findall('fontset') if x.get('id')=='System']
+              assert len(systems)==1
+              s=ET.tostring(systems[0],encoding='unicode')
+              assert 'InfinitySystem.ttf' in s and 'InfinitySystem-Mono.ttf' in s
+              assert Image.open(BytesIO(z.read('assets/media/splash.jpg'))).size==(1080,1080)
+              home=z.read(skin+'xml/Home.xml').decode()
+              ih=z.read(skin+'xml/Includes_Home.xml').decode()
+              inc=z.read(skin+'xml/Includes.xml').decode()
+              assert 'infinity/sidebar-dark.png' in home and '<width>320</width>' in home
+              assert 'Infinity palette light' in home and 'Infinity palette dark' in home
+              assert 'Infinity.ThemeLight' in inc and 'Infinity.ThemeDark' in inc
+              assert '<centerleft>50%</centerleft>' in ih and 'max="550"' in ih
+              assert skin+'xml/Custom_1199_InfinityVideoLock.xml' in z.namelist()
+          receipt=json.load(open('candidate/presentation-1.0.6.json'))
+          assert all(receipt['checks'].values())
+          assert receipt['device_tested'] is False
+          print('Final structural gates passed. Device visual test still required.')
+          PY
+          cp engine/source-1.0.6.json candidate/source-1.0.6.json
+          cp engine/engine.json candidate/engine.json
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-1.0.6-Consolidated-Candidate
+          path: |
+            candidate/Infinity-1.0.6-Consolidated.apk
+            candidate/Infinity-1.0.6-Consolidated.sha256
+            candidate/Infinity-1.0.6-Consolidated.signing.txt
+            candidate/signing-verification.txt
+            candidate/badging.txt
+            candidate/source-1.0.6.json
+            candidate/presentation-1.0.6.json
+            candidate/engine.json
+          if-no-files-found: error
+          retention-days: 90

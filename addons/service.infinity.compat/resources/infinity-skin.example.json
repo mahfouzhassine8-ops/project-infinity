@@ -1,0 +1,15 @@
+{
+  "skin_id": "skin.example.infinity",
+  "name": "Example Infinity Skin",
+  "skin_api": "1.0",
+  "capabilities": {
+    "home": true,
+    "widgets": true,
+    "menus": true,
+    "light_dark": true,
+    "performance_badge": true
+  },
+  "protected_zone_policy": "yield_to_infinity",
+  "theme_support": ["light", "dark", "oled", "system"],
+  "notes": "Place this file at the skin add-on root as infinity-skin.json. Infinity reads it and exposes stable Window(Home) properties for the skin to consume."
+}

@@ -1,0 +1,200 @@
+name: Infinity Android-first RC2
+run-name: 'Infinity Android-first RC2 | corrected native gate prerequisite'
+on:
+  workflow_dispatch:
+  push:
+    branches: [infinity-android-first]
+    paths:
+      - '.github/workflows/build-infinity-android-first-rc2.yml'
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-android-first-rc2
+  cancel-in-progress: false
+jobs:
+  preflight:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'platforms;android-34 build-tools;34.0.0'
+      - name: Verify pinned Infinity source and contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends python3-pil
+          mkdir -p checks/dex results
+          git clone --depth 1 --branch 21.3-Omega https://github.com/xbmc/xbmc.git kodi
+          test "$(git -C kodi rev-parse HEAD)" = a3a448d26b8d560a65655dab2cd122994dc4e146
+          python3 scripts/infinity71.py source --source kodi
+          python3 scripts/validate-infinity71-java.py --source kodi --android-jar "$ANDROID_HOME/platforms/android-34/android.jar" --out checks/java
+          "$ANDROID_HOME/build-tools/34.0.0/d8" --lib "$ANDROID_HOME/platforms/android-34/android.jar" --min-api 21 --output checks/dex checks/java/compile-check.jar
+          export INFINITY_KODI_SOURCE="$PWD/kodi"
+          export INFINITY_TEST_DEX="$PWD/checks/dex/classes.dex"
+          export INFINITY_ANDROID_JAR="$ANDROID_HOME/platforms/android-34/android.jar"
+          c++ -std=c++17 -Wall -Wextra -Werror -pthread -Ikodi/xbmc/platform/android/activity tests/infinity71/test_bridge_state.cpp -o checks/bridge-state-tests
+          checks/bridge-state-tests | tee results/native-state.txt
+          python3 tests/infinity71/test_contract.py 2>&1 | tee results/contract.txt
+          python3 tests/infinity71_packaging/test_followup.py 2>&1 | tee results/packaging-regressions.txt
+          python3 tests/infinity71/test_mobile_presentation.py 2>&1 | tee results/mobile-presentation.txt
+          python3 tests/infinity71/test_mobile_signing.py 2>&1 | tee results/mobile-signing.txt
+          python3 tests/infinity71/test_mobile_package_check.py 2>&1 | tee results/package-metadata.txt
+          bash -n scripts/sign-infinity-mobile.sh
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: Infinity-RC2-Preflight
+          path: results/
+          retention-days: 30
+  engine:
+    needs: preflight
+    runs-on: ubuntu-22.04
+    timeout-minutes: 360
+    env:
+      NDK_VER: 21.4.7075529
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-build
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+      - name: Prepare pinned Android toolchain and source
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y autoconf bison build-essential curl flex gawk git gperf lib32stdc++6 lib32z1 lib32z1-dev libcurl4-openssl-dev unzip zip zlib1g-dev ccache python3 nasm yasm
+          sdkmanager 'platform-tools' 'platforms;android-34' 'build-tools;34.0.0' "ndk;$NDK_VER"
+          mkdir -p "$HOME/.android"
+          if [ ! -f "$HOME/.android/debug.keystore" ]; then
+            keytool -genkeypair -noprompt -keystore "$HOME/.android/debug.keystore" -storepass android -keypass android -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=Internal Build Only,O=Project Infinity,C=US'
+          fi
+          git clone --depth 1 --branch 21.3-Omega https://github.com/xbmc/xbmc.git kodi
+          test "$(git -C kodi rev-parse HEAD)" = a3a448d26b8d560a65655dab2cd122994dc4e146
+          python3 scripts/infinity71.py source --source kodi
+      - uses: actions/cache/restore@v4
+        id: deps-cache
+        with:
+          path: |
+            android-tools/xbmc-depends
+            android-tools/xbmc-tarballs
+            ~/.ccache
+          key: infinity-android-first-rc2-deps-21.3-arm64-${{ runner.os }}-${{ hashFiles('patches/infinity-7.1-audited/contract.json') }}
+          restore-keys: |
+            infinity-android-first-deps-21.3-arm64-${{ runner.os }}-
+            infinity-71-audited-deps-21.3-arm64-${{ runner.os }}-
+      - name: Configure exact native dependencies
+        id: depends
+        run: |
+          set -euo pipefail
+          mkdir -p "$TARBALLS" "$DEPENDS" "$BUILD_DIR"
+          cd kodi/tools/depends
+          ./bootstrap
+          ./configure --with-tarballs="$TARBALLS" --host=aarch64-linux-android --with-sdk-path="$ANDROID_HOME" --with-ndk-path="$ANDROID_HOME/ndk/$NDK_VER" --prefix="$DEPENDS" --enable-debug=yes
+          make -j"$(nproc)"
+          # The previous gate failed before reaching Infinity code because this
+          # Android JNI header dependency was not installed into the depends prefix.
+          # Install it explicitly before replaying Kodi's real compile commands.
+          make -C target/libandroidjni
+          test -f "$DEPENDS/aarch64-linux-android-21-debug/include/androidjni/Activity.h"
+          make -C target/cmakebuildsys BUILD_DIR="$BUILD_DIR"
+      - name: Compile changed Infinity native units first
+        run: |
+          set -euo pipefail
+          CMAKE_BIN=$(sed -n 's/^CMAKE_COMMAND:INTERNAL=//p' "$BUILD_DIR/CMakeCache.txt")
+          test -x "$CMAKE_BIN"
+          "$CMAKE_BIN" -S "$PWD/kodi" -B "$BUILD_DIR" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+          python3 scripts/infinity71.py native-check --build-dir "$BUILD_DIR"
+      - name: Build matched Kodi 21.3 engine and APK
+        run: |
+          set -euo pipefail
+          make -C "$BUILD_DIR" -j"$(nproc)"
+          make -C "$BUILD_DIR" apk -j"$(nproc)"
+          APK=$(find kodi "$BUILD_DIR" -type f -name '*.apk' -print -quit)
+          test -n "$APK"
+          mkdir -p engine
+          cp "$APK" engine/Infinity-Android-First-Engine-Base.apk
+          python3 scripts/infinity71.py record-engine --apk engine/Infinity-Android-First-Engine-Base.apk --output engine/engine.json --source-commit "$GITHUB_SHA"
+          python3 scripts/infinity_mobile_package_check.py --apk engine/Infinity-Android-First-Engine-Base.apk --report engine/package-check.json
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-RC2-Engine
+          path: engine/
+          compression-level: 0
+          retention-days: 30
+          if-no-files-found: error
+  presentation:
+    needs: [preflight, engine]
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: 'build-tools;34.0.0'
+      - uses: actions/download-artifact@v5
+        with:
+          name: Infinity-RC2-Engine
+          path: engine
+      - name: Build and verify Infinity presentation
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends python3-pil
+          mkdir -p candidate signing
+          python3 scripts/infinity_mobile_presentation.py build --apk engine/Infinity-Android-First-Engine-Base.apk --manifest engine/engine.json --output candidate/Infinity-Android-First-unsigned.apk --receipt candidate/presentation.json
+          python3 scripts/infinity_mobile_package_check.py --apk candidate/Infinity-Android-First-unsigned.apk --report candidate/package-check.json
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Infinity-RC2-Unsigned-Candidate
+          path: candidate/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Sign only with retained Infinity identity
+        id: signing
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+          INFINITY_SIGNER_SHA256: ${{ secrets.INFINITY_SIGNER_SHA256 }}
+        run: |
+          set -euo pipefail
+          configured=false
+          if [ -n "${INFINITY_KEYSTORE_B64:-}" ] && [ -n "${INFINITY_STORE_PASSWORD:-}" ] && [ -n "${INFINITY_KEY_PASSWORD:-}" ] && [ -n "${INFINITY_KEY_ALIAS:-}" ] && [ -n "${INFINITY_SIGNER_SHA256:-}" ]; then
+            configured=true
+            bash scripts/sign-infinity-mobile.sh candidate/Infinity-Android-First-unsigned.apk signing/Infinity-Android-First.apk
+            python3 scripts/infinity_mobile_presentation.py verify --apk signing/Infinity-Android-First.apk --manifest engine/engine.json --receipt candidate/presentation.json
+          fi
+          echo "configured=$configured" >> "$GITHUB_OUTPUT"
+          if [ "$configured" != true ]; then
+            echo 'Persistent Infinity signing identity is not configured; unsigned candidate only.'
+          fi
+      - uses: actions/upload-artifact@v7
+        if: success() && steps.signing.outputs.configured == 'true'
+        with:
+          name: Infinity-RC2-Signed-Test-Candidate
+          path: signing/
+          retention-days: 30
+          if-no-files-found: error

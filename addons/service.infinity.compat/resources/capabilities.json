@@ -1,0 +1,43 @@
+{
+  "schema": 4,
+  "hook_api": "1.0",
+  "skin_api": "1.0",
+  "theme_contract": "1.1",
+  "layout_api": "1.2",
+  "release": "Infinity 1.0.8 Responsive Bridge v5",
+  "capabilities": {
+    "protected_player_ui": true,
+    "protected_player_panel": true,
+    "theme_policy_bridge": true,
+    "theme_revision": true,
+    "native_theme_truth": true,
+    "palette_tokens": true,
+    "oled_theme": true,
+    "responsive_display_state": true,
+    "native_responsive_bridge_v5": true,
+    "native_dp_window_classes": true,
+    "native_fold_hint": true,
+    "pane_mode": true,
+    "safe_insets": true,
+    "touch_class": true,
+    "motion_policy": true,
+    "refresh_policy_bridge": true,
+    "performance_mode": true,
+    "battery_saver_override": true,
+    "thermal_protection": true,
+    "power_policy": true,
+    "feature_flags": true,
+    "compatibility_mode": true,
+    "automatic_safe_mode": true,
+    "health_breadcrumbs": true,
+    "config_export_ready": true,
+    "event_driven_theme_updates": true,
+    "event_driven_layout_updates": true
+  },
+  "protected_ui": [
+    "VideoOSD.xml",
+    "DialogSeekBar.xml",
+    "Custom_1197_InfinityPlayerPanel.xml",
+    "Custom_1199_InfinityVideoLock.xml"
+  ]
+}
