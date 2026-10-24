@@ -35,6 +35,15 @@ COMPONENTS = {
     "script.infinity.watchedbridge": ("script.infinity.watchedbridge-1.0.16.zip", "script.infinity.watchedbridge-1.0.16.zip"),
     "skin.infinity.diggz": ("skin.infinity.diggz-1.0.5.242.zip", "skin.infinity.diggz-1.0.5.243.zip"),
 }
+BACKOUT_VERSIONS = {
+    "script.infinity.commandcenter/addon.xml": (b'version="0.3.5.35"', b'version="0.3.5.37"'),
+    "skin.infinity.diggz/addon.xml": (b'version="1.0.5.242"', b'version="1.0.5.244"'),
+}
+BACKOUT_COMPONENTS = {
+    "script.infinity.commandcenter": "script.infinity.commandcenter-0.3.5.37-ROLLBACK.zip",
+    "skin.infinity.diggz": "skin.infinity.diggz-1.0.5.244-ROLLBACK.zip",
+}
+BACKOUT_APK = "Infinity-2103402-Original-Behavior-ROLLBACK.apk"
 SIG_MEMBERS = {"META-INF/INFINITY.SF", "META-INF/INFINITY.RSA", "META-INF/MANIFEST.MF"}
 BASE_APK = "Infinity-2103401-Universal-Performance-QA.apk"
 QA_APK = "Infinity-2103402-Functional-Corrective-QA.apk"
@@ -197,9 +206,56 @@ def verify(args):
     print("Signed APK content guard PASSED: exact 22-member delta, native and DEX protected")
 
 
+def backout_edits(apk: Path):
+    with ZipFile(apk) as src:
+        edits = {"AndroidManifest.xml": manifest_code(src.read("AndroidManifest.xml"))}
+        for name, (old, new) in BACKOUT_VERSIONS.items():
+            source = src.read("assets/addons/" + name)
+            if source.count(old) != 1 or new in source:
+                raise ValueError("Rollback source preimage mismatch: " + name)
+            after = source.replace(old, new, 1)
+            assert after.replace(new, old, 1) == source
+            edits["assets/addons/" + name] = after
+    assert len(edits) == 3
+    return edits
+
+
+def make_backout(args):
+    original = args.baseline / BASE_APK
+    edits = backout_edits(original)
+    unsigned = args.out / "unsigned-2103402-backout.apk"
+    with ZipFile(original) as src:
+        write_zip(src, unsigned, edits, SIG_MEMBERS)
+    changed = verify_member_deltas(original, unsigned, edits, unsigned=True)
+    assert len(changed) == 3
+    for owner, dest_name in BACKOUT_COMPONENTS.items():
+        src_name = COMPONENTS[owner][0]
+        archive_path = "assets/addons/" + owner + "/addon.xml"
+        with ZipFile(args.baseline / src_name) as source:
+            write_zip(source, args.out / dest_name,
+                      {owner + "/addon.xml": edits[archive_path]})
+    (args.out / "ROLLBACK-RECEIPT.json").write_text(json.dumps({
+        "status": "UNTESTED DEVICE ROLLBACK",
+        "version_code": NEW_CODE,
+        "source": "Locked signed 2103401 exact original behavior",
+        "certificate": "Original signer required and checked in CI",
+        "changes": "Android manifest versionCode and two additive addon version numbers ONLY",
+        "native_code_and_dex": "IDENTICAL to signed accepted 2103401",
+        "installation": "Install this same-code APK over 2103402 QA, then install original-behavior Command Center .37 and skin .244 ZIPs. Keep watchedbridge and UIRepair unchanged."
+    }, indent=2) + "\n")
+    print("Non-destructive rollback staged; exactly 3 APK member changes")
+
+
+def verify_backout(args):
+    original = args.baseline / BASE_APK
+    changed = verify_member_deltas(original, args.signed, backout_edits(original), unsigned=False)
+    assert len(changed) == 3, "Rollback may only change three exact members"
+    print("Rollback content verified: accepted 2103401 behavior with same 2103402 versionCode")
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("action", choices=["make", "verify"])
+    parser.add_argument("action", choices=["make", "verify", "make-backout", "verify-backout"])
     parser.add_argument("--baseline", type=Path, required=True)
     parser.add_argument("--overlay", type=Path, default=HERE / "overlay")
     parser.add_argument("--out", type=Path)
@@ -209,7 +265,15 @@ if __name__ == "__main__":
         if args.out is None:
             parser.error("--out required for make")
         make(args)
-    else:
+    elif args.action == "verify":
         if args.signed is None:
             parser.error("--signed required for verify")
         verify(args)
+    elif args.action == "make-backout":
+        if args.out is None:
+            parser.error("--out required for make-backout")
+        make_backout(args)
+    else:
+        if args.signed is None:
+            parser.error("--signed required for verify-backout")
+        verify_backout(args)
