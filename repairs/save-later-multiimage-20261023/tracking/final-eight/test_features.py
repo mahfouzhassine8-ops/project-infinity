@@ -95,6 +95,21 @@ class Features(unittest.TestCase):
         self.assertNotIn('Save for Later',[r[0] for r in rows])
         self.data,_=self.hub.remove_resume_data(self.data,entry['key'])
         self.assertEqual(self.plugin._menu_rows(entry,self.data)[0][0],'Play')
+    def test_saved_list_menu_keeps_its_exact_route_and_removal(self):
+        entry=self.movie('a',{'tmdb':'603'})
+        saved=dict(entry,source='original-watchlist-provider',stable_source='original-watchlist-provider')
+        self.data['watchlist'][entry['key']]=saved
+        self.data['later']={entry['key']:copy.deepcopy(saved)}
+        self.assertEqual(self.plugin._selected_menu_entry(self.data,entry['key'],'watchlist'),saved)
+        rows=self.plugin._menu_rows(saved,self.data,bucket='later')
+        self.assertIn(('Remove from Save for Later','remove-later',''),rows)
+        self.assertNotIn('Save for Later',[r[0] for r in rows])
+        self.f.path.write_text(json.dumps(self.data));before=copy.deepcopy(self.data)
+        with self.plugin.persistence_scope():changed,_=self.plugin._mutate_locked('remove-later',entry['key'],'')
+        self.assertTrue(changed);after=json.loads(self.f.path.read_text());self.assertEqual(after['later'],{})
+        for bucket in ('items','watchlist','watched','sources','navigation_recovery'):
+            self.assertEqual(after[bucket],before[bucket])
+
     def test_menu_cancel_preserves_underlying_view_and_data(self):
         entry=self.movie('a',{'tmdb':'603'});self.f.path.write_text(json.dumps(self.data));before=self.f.path.read_bytes()
         with patch.object(self.plugin,'_favourite',return_value=(None,None)),patch.dict(sys.modules,{'infinity_settings':types.SimpleNamespace(choose=lambda *a:-1)}):

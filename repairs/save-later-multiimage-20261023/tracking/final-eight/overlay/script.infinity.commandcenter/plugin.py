@@ -210,7 +210,7 @@ def _favourite(entry, data, bucket):
     return spec, bool(matches)
 
 
-def _menu_rows(entry, data, favourite_state=None, list_name=''):
+def _menu_rows(entry, data, favourite_state=None, list_name='', bucket=''):
     key = entry['key']
     identity = hub.entry_identity(entry)
     rows = []
@@ -231,6 +231,8 @@ def _menu_rows(entry, data, favourite_state=None, list_name=''):
     for name, values in sorted(data.get('lists', {}).items()):
         if key in values:
             rows.append(('Remove from ' + name, 'remove-list', name))
+    if bucket == 'later' and key in data.get('later', {}):
+        rows.append(('Remove from Save for Later', 'remove-later', ''))
     rows.append(('Information', 'information', ''))
     if any(hub.resume_visible(data, old_key) and (old_key == key or hub.resume_matches(entry, old))
            for old_key, old in data.get('items', {}).items() if isinstance(old, dict)):
@@ -238,18 +240,30 @@ def _menu_rows(entry, data, favourite_state=None, list_name=''):
     return rows
 
 
+def _selected_menu_entry(data, key, bucket, list_name=''):
+    storage = {'continue': 'items', 'history': 'watched', 'watched': 'watched',
+               'later': 'later', 'watchlist': 'watchlist', 'collection': 'collection'}.get(bucket)
+    if storage:
+        value = data.get(storage, {}).get(key)
+        return dict(value, key=key) if isinstance(value, dict) else None
+    if bucket == 'list' and list_name:
+        value = data.get('lists', {}).get(list_name, {}).get(key)
+        return dict(value, key=key) if isinstance(value, dict) else None
+    return hub.find_entry(data, key)
+
+
 def show_item_menu(key, bucket='continue', list_name=''):
     if not hub.KEY_RE.fullmatch(str(key)):
         return False
     data = hub.load_view(PROFILE)
-    original = hub.find_entry(data, key)
+    original = _selected_menu_entry(data, key, bucket, list_name)
     if not original or original.get('synthetic_next'):
         return False
     try:
         favourite, favourite_state = _favourite(original, data, bucket)
     except (ValueError, RuntimeError, TypeError):
         favourite, favourite_state = None, None
-    rows = _menu_rows(original, data, favourite_state, list_name)
+    rows = _menu_rows(original, data, favourite_state, list_name, bucket)
     from infinity_settings import choose
     selected = choose(str(original.get('label') or original.get('title') or 'Title'), [r[0] for r in rows])
     if not 0 <= selected < len(rows):
@@ -260,7 +274,7 @@ def show_item_menu(key, bucket='continue', list_name=''):
         return False
     with persistence_scope():
         current_data = hub.load(PROFILE)
-        current = hub.find_entry(current_data, key)
+        current = _selected_menu_entry(current_data, key, bucket, list_name)
         if not current:
             return False
         original_id, current_id = hub.entry_identity(original), hub.entry_identity(current)
@@ -269,7 +283,7 @@ def show_item_menu(key, bucket='continue', list_name=''):
                 return False
         elif original != current:
             return False
-        if (label, op, selected_list) not in _menu_rows(current, current_data, favourite_state, list_name):
+        if (label, op, selected_list) not in _menu_rows(current, current_data, favourite_state, list_name, bucket):
             return False
         # A newer playback must never be removed/marked by a stale popup.
         if op in ('remove-resume', 'mark-watched', 'mark-unwatched') and any(
@@ -555,6 +569,10 @@ def _mutate_locked(op, key, list_name, choice=None, name=''):
                          else hub.reset_progress_data(data, key))
         changed = removed is not None
         notice = 'Progress reset' if op == 'reset-progress' else 'Removed from Continue Playing'
+    elif op == 'remove-later' and key in data.get('later', {}):
+        data['later'].pop(key)
+        changed = True
+        notice = 'Removed from Save for Later'
     elif op == 'toggle-watchlist' and entry:
         data, added, changed_entry = hub.toggle_watchlist_data(data, key)
         changed = changed_entry is not None
