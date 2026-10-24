@@ -63,12 +63,9 @@ jobs:
           assert names and all(map(allowed,names)), 'Unapproved source change: '+repr([n for n in names if not allowed(n)])
           assert not any('cobra' in n.lower() for n in names), 'Cobra is protected'
           PY
-          python3 -m unittest -v \
-            repairs/infinity-2103402-final/test_staging_audit.py \
-            repairs/infinity-2103402-final/test_visual_scope.py \
-            repairs/infinity-2103402-final/test_clock_reflow_scope.py \
-            repairs/infinity-2103402-final/test_home_reflow_scope.py \
-            repairs/infinity-2103402-final/test_information_spacing_scope.py
+          (cd repairs/infinity-2103402-final && python3 -m unittest -v \
+            test_staging_audit test_visual_scope test_clock_reflow_scope \
+            test_home_reflow_scope test_information_spacing_scope)
       - name: Stage only pinned 2103402 UI and Home patches
         run: |
           set -euo pipefail
