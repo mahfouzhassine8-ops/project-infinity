@@ -21,9 +21,9 @@
 | # | Owner / authorized problem | Evidence status | Implementation status | Targeted tests | Android 17 integration | Physical Fold candidate PASS |
 |---|---|---|---|---|---|---|
 | 1 | Search/native signal process exit | Observed; stack unavailable | NOT STARTED | NOT RUN | NOT RUN | NOT RUN |
-| 2 | Home blank loading/re-entry restoration | Visibly reproduced; owner unknown | NOT STARTED | NOT RUN | NOT RUN | NOT RUN |
-| 3 | Clock suffix clipped after reflow | Visibly reproduced | NOT STARTED | NOT RUN | NOT RUN | NOT RUN |
-| 4 | Option B scrollbars and oversized plot space | Forced one-page bars confirmed; layout sizing still open | One-page scrollbar correction staged; dead-space/scroll rendering pending | Scoped source/package tests PASS | NOT RUN | NOT RUN |
+| 2 | Home blank loading/re-entry restoration | Visibly reproduced; native-owned geometry invalidation identified | Scoped native-owned revision-trigger correction STAGED; complete warm Home delay still unresolved | 4 host tests + CI PASS for changed path | NOT RUN | NOT RUN |
+| 3 | Clock suffix clipped after reflow | Visibly reproduced | Clock bounding-width correction STAGED in unified Home only | 3 host tests + CI PASS | NOT RUN | NOT RUN |
+| 4 | Option B scrollbars and oversized plot space | Forced one-page bars and unused short-plot area confirmed | Track hiding and short-synopsis geometry correction STAGED; physical scrolling not accepted | 4 new host geometry tests + prior XML source checks PASS | NOT RUN | NOT RUN |
 | 5 | Provider chooser size/label issues | Visibly reproduced | NOT STARTED | NOT RUN | NOT RUN | NOT RUN |
 | 6 | Player seek-time contrast | Unified variant uses theme ink over video; other13 already white | Unified white text/black shadow staged; other13 time controls unchanged | Scoped source/package tests PASS | NOT RUN | NOT RUN |
 | 7 | Play/Pause heavy dark styling regression | 14 exact XML source preimages identified | **Isolated source-only prototype staged** | **4 local unittest cases PASS; 14 variants parsed** | NOT RUN | NOT RUN |
@@ -68,3 +68,15 @@ committed. Required50 Search,30 playback-return,20 rotation and separate Close/
 reopen cycles are all NOT RUN. This session has no attached Android device, adb
 or emulator acceleration, and no GitHub workflow-dispatch action. These gates
 remain blocked; no sign-in request or workflow authorization bypass was used.
+
+
+## Continuation — source-level corrections and gated CI
+
+- Signed 2103401 baseline remains the only accepted package; no 2103402 APK or component ZIP is signed.
+- Found a concrete unnecessary reload trigger: under native-owned `app-` display reflow, Command Center previously incremented `Infinity.WidgetReloadRevision` for a geometry-only change. Home Latest Releases URLs contain that revision, creating an avoidable new directory request. The 2103402 overlay changes only this branch; native layout updates still run, with older fallback code unchanged. This corrects one identified invalidation, **not yet the observed 40–45 second return delay as a whole**.
+- Extended the existing unified Home clock box from left 72% / width 26% to left 64% / width 34%, retaining the original 98% right edge and every other Home control.
+- Corrected Option B's fixed short-synopsis reservation while retaining full metadata text, the long-plot scrollable bound, existing textbox controls and action buttons. Existing one-page scrollbar hiding remains staged separately.
+- The actual signed CC35/skin242 preimages were rehashed and their full staged overlay members inverse-compared byte-for-byte. Focused local tests: **4 Home reflow + 3 clock + 4 Option B geometry = 11 PASS**. Earlier 2103402 visual/Health tests remain independent.
+- GitHub CI run `40131873559` succeeded against the exact 2103401 signed ZIPs, with full-history source preservation checking. Later CI incorporating Option B is selected separately; do not infer Android/physical acceptance. An initial run `40131428226` failed because checkout was shallow; preserved the failure and repaired the test checkout by fetching full history without relaxing the diff guard.
+- `FILE-AUTHORIZATION-LEDGER.json` now includes exact preimage/candidate SHA-256 and negative regressions for the three new scoped member overlays. Private user recording/log data remain outside the public repository.
+- **Still open:** Search SIGBUS faulting stack/root cause, full Home warm-return timing, native/Android17 end-to-end acceptance, chooser owner and Cancel/formatting, selected-title focus restoration, broader Health/DEX integration, and a user-approved signed final release. No suspected cause is being treated as fixed merely because a source test passes.
