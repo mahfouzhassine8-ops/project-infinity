@@ -1,0 +1,62 @@
+{
+  "provider": "plugin.video.pov",
+  "version": "6.10.22",
+  "reference": "6.10.21",
+  "archive_sha256": "126b9fbe690dded613d0c2bab177babd6ce2235bc9d67fb25e1c79aefc9dc0d3",
+  "old_contract_result": "REJECT; six reviewed source fingerprints changed",
+  "new_additive_contract": "PASS host capability for movie and TV; eight actual-file raw pins retained",
+  "old_contracts_unchanged": true,
+  "reviewed_routes": {
+    "movies": [
+      [
+        "play_media",
+        [
+          "mediatype",
+          "mode",
+          "tmdb_id"
+        ]
+      ]
+    ],
+    "tvshows": [
+      [
+        "build_episode_list",
+        [
+          "mode",
+          "season",
+          "tmdb_id"
+        ]
+      ],
+      [
+        "build_season_list",
+        [
+          "mode",
+          "tmdb_id"
+        ]
+      ]
+    ],
+    "seasons": [
+      [
+        "build_episode_list",
+        [
+          "mode",
+          "season",
+          "tmdb_id"
+        ]
+      ],
+      [
+        "play_media",
+        [
+          "episode",
+          "mediatype",
+          "mode",
+          "season",
+          "tmdb_id"
+        ]
+      ]
+    ]
+  },
+  "provider_modified": false,
+  "trackit_implementation_modified": false,
+  "android": "NOT RUN",
+  "physical_fold": "NOT RUN"
+}

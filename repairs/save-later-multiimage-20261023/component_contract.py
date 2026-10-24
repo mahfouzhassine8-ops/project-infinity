@@ -13,7 +13,9 @@ PARENT_VERSIONS={'script.infinity.commandcenter':('0.3.5.29','0.3.5.31'),
           'script.infinity.uirepair':('0.1.12','0.1.14'),
           'skin.infinity.diggz':('1.0.5.238','1.0.5.238')}
 
-VERSIONS={k:(v[0], {'script.infinity.commandcenter':'0.3.5.32', 'script.infinity.watchedbridge':'1.0.13', 'script.infinity.uirepair':'0.1.15', 'skin.infinity.diggz':'1.0.5.239'}[k]) for k,v in PARENT_VERSIONS.items()}
+BASE_VERSIONS={k:(v[0], {'script.infinity.commandcenter':'0.3.5.32', 'script.infinity.watchedbridge':'1.0.13', 'script.infinity.uirepair':'0.1.15', 'skin.infinity.diggz':'1.0.5.239'}[k]) for k,v in PARENT_VERSIONS.items()}
+
+VERSIONS={k:(v[0], {'script.infinity.commandcenter':'0.3.5.33', 'script.infinity.watchedbridge':'1.0.14', 'script.infinity.uirepair':'0.1.16', 'skin.infinity.diggz':'1.0.5.240'}[k]) for k,v in BASE_VERSIONS.items()}
 
 def once(source,before,after):
     if source.count(before)!=1:raise RuntimeError('Plugin preimage occurrence mismatch')
@@ -86,7 +88,7 @@ def stage(source,output,contracts):
         if hashlib.sha256(current(name)).hexdigest()!=preimages[name]:
             raise RuntimeError('Tracking overlay preimage mismatch: '+name)
         changed[name]=p.read_bytes()
-    for addon,(_,new) in VERSIONS.items():
+    for addon,(_,new) in BASE_VERSIONS.items():
         name=addon+'/addon.xml';old=PARENT_VERSIONS[addon][1]
         changed[name]=once(current(name),('version="'+old+'"').encode(),('version="'+new+'"').encode())
     name='script.infinity.commandcenter/checkpoint_runtime.py'
@@ -100,6 +102,39 @@ def stage(source,output,contracts):
     changed[name]=once(trakt,b''.join(lines[assignment.lineno-1:assignment.end_lineno]),
         ('BRIDGE_PINS = '+repr(dict(sorted(bridge.items())))+'\n').encode())
     pins={name:hashlib.sha256(current('script.infinity.commandcenter/'+name)).hexdigest() for name in parent_pins}
+    for consumer in ('script.infinity.watchedbridge','script.infinity.uirepair'):
+        changed[consumer+'/CONTROLLER-PREIMAGES.json']=(json.dumps(pins,indent=2,sort_keys=True)+'\n').encode()
+    # Preserve the exact signed CC32 admission before adding the coordinated
+    # final-eight release. Never relabel modified CC32 bytes as the old release.
+    final_dir=HERE/'tracking/final-eight'
+    baseline32=json.loads((final_dir/'BASE32-CONTROLLER-PINS.json').read_text())
+    if pins != baseline32:raise RuntimeError('Signed CC32 reconstruction drifted')
+    final_overlay=final_dir/'overlay'
+    preimages=json.loads((final_dir/'OVERLAY-PREIMAGES.json').read_text())
+    final_files={p.relative_to(final_overlay).as_posix():p for p in final_overlay.rglob('*') if p.is_file()}
+    if set(final_files)!=set(preimages):raise RuntimeError('Unreviewed final-eight component file')
+    for name,p in final_files.items():
+        if hashlib.sha256(current(name)).hexdigest()!=preimages[name]:
+            raise RuntimeError('Final-eight preimage mismatch: '+name)
+        changed[name]=p.read_bytes()
+    for addon,(_,new) in VERSIONS.items():
+        name=addon+'/addon.xml';old=BASE_VERSIONS[addon][1]
+        changed[name]=once(current(name),('version="'+old+'"').encode(),('version="'+new+'"').encode())
+    name='script.infinity.commandcenter/checkpoint_runtime.py'
+    changed[name]=once(current(name),b'ADDON_VERSION = "0.3.5.32"',b'ADDON_VERSION = "0.3.5.33"')
+    name='script.infinity.watchedbridge/controller.py'
+    changed[name]=once(current(name),b'"0.3.5.32"',b'"0.3.5.33"')
+    name='script.infinity.commandcenter/infinity_trakt.py'
+    changed[name]=once(once(current(name),b"'1.0.13'",b"'1.0.14'"),b"'0.3.5.32'",b"'0.3.5.33'")
+    trakt=current(name)
+    assignment=next(n for n in ast.parse(trakt).body if isinstance(n,ast.Assign) and
+        any(isinstance(t,ast.Name) and t.id=='BRIDGE_PINS' for t in n.targets))
+    bridge=ast.literal_eval(assignment.value)
+    for file in bridge:bridge[file]=hashlib.sha256(current('script.infinity.watchedbridge/'+file)).hexdigest()
+    lines=trakt.splitlines(keepends=True)
+    changed[name]=once(trakt,b''.join(lines[assignment.lineno-1:assignment.end_lineno]),
+        ('BRIDGE_PINS = '+repr(dict(sorted(bridge.items())))+'\n').encode())
+    pins={name:hashlib.sha256(current('script.infinity.commandcenter/'+name)).hexdigest() for name in baseline32}
     for consumer in ('script.infinity.watchedbridge','script.infinity.uirepair'):
         changed[consumer+'/CONTROLLER-PREIMAGES.json']=(json.dumps(pins,indent=2,sort_keys=True)+'\n').encode()
     ledger={}

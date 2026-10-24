@@ -18,6 +18,7 @@ import native_contract
 import navigation_native
 import owner_binding
 import provider_contracts
+import final_eight_native
 
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[1]
 OUT=ROOT/'checkpoint-targeted'
@@ -89,10 +90,11 @@ def prepare(parent,modes):
     delta=native_contract.apply(native,overlay)
     delta.update(navigation_native.apply(native,overlay))
     delta.update(owner_binding.bind(native,base,components,overlay))
+    delta.update(final_eight_native.apply(native,overlay))
     for n,v in delta.items():
         path=native/n;path.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(overlay/n,path)
     final=dict(expected,**{n:v['final_sha256'] for n,v in delta.items()})
-    if len(final)!=9407 or len(delta)!=13:raise RuntimeError('Native delta exceeded its reviewed scope')
+    if len(final)!=9407 or len(delta)!=14:raise RuntimeError('Native delta exceeded its reviewed scope')
     save(OUT/'BASE-NATIVE-SOURCE-MAP.json',expected);save(OUT/'NATIVE-SOURCE-MAP.json',final)
     save(OUT/'SOURCE-DELTA.json',dict(native=delta,components=component_delta,
          original_links=links,parent_apk_sha256=PARENT,source_commit=os.environ.get('GITHUB_SHA'),
@@ -107,7 +109,7 @@ def compile_engine():
     old.OUT=OUT
     proof=old.compile_engine()
     data=(OUT/'libkodi.so').read_bytes()
-    for marker in (b'multiimage-enumeration',b'multiimage_directory_backend_unverified',b'multiimage_operation_did_not_reach_verified_boundary',b'0.3.5.31',b'0.3.5.32',b'Infinity.SavedNavigation.Protocol',b'INFINITY_SAVED_ROUTE_FAILED',b'Infinity.SavedNavigation.Lookup.Protocol'):
+    for marker in (b'multiimage-enumeration',b'multiimage_directory_backend_unverified',b'multiimage_operation_did_not_reach_verified_boundary',b'0.3.5.31',b'0.3.5.32',b'0.3.5.33',b'Infinity.SavedNavigation.Protocol',b'INFINITY_SAVED_ROUTE_FAILED',b'Infinity.SavedNavigation.Lookup.Protocol'):
         if marker not in data:raise RuntimeError('Compiled correction missing: '+repr(marker))
     pins=json.loads((ROOT/'targeted-component-overlay/script.infinity.uirepair/CONTROLLER-PREIMAGES.json').read_text())
     if not all(pin.encode() in data for pin in pins.values()):raise RuntimeError('Compiled exact controller source pins absent')
@@ -194,8 +196,8 @@ def package(parent,dex,out):
         permanent_certificate_sha256=delivery.CERT,signature_schemes_verified=[1,2,3],
         matching_component_versions={k:v[1] for k,v in component_contract.VERSIONS.items()},
         passed_signed_reference_build='39994772688',
-        focused_scope='tracking/navigation, Continue series projection, responsiveness, Play/Pause textures',
-        native_source_count=9407,original_native_files_changed=10,new_native_files=3,
+        focused_scope='final-eight: Continue identity/visibility, Movies/TV popup, Home clock, CC participant binding, POV compatibility; native crash cause unresolved',
+        native_source_count=9407,original_native_files_changed=11,new_native_files=3,
         cobra_definitions_changed=[],provider_code_changed=False,user_profile_changed=False,
         rc8_receipt_and_universal_observer_sources_unchanged=True,
         actual_android_verified=False,physical_fold_verified=False,final_lock=False,

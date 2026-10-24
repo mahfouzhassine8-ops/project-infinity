@@ -60,7 +60,7 @@ def prepare(apk,stage,jars,android,d8,out):
     # previously shifted a protected Cobra string past the 16-bit boundary and
     # widened its instruction. Character payloads avoid that encoded change.
     chars=lambda s:'new String(new char[]{'+','.join(str(ord(c)) for c in s)+'})'
-    inventories=[('0.3.5.31',json.loads((HERE/'tracking/PARENT-CONTROLLER-PINS.json').read_text())),('0.3.5.32',pins)]
+    inventories=[('0.3.5.31',json.loads((HERE/'tracking/PARENT-CONTROLLER-PINS.json').read_text())),('0.3.5.32',json.loads((HERE/'tracking/final-eight/BASE32-CONTROLLER-PINS.json').read_text())),('0.3.5.33',pins)]
     blocks=[]
     for version, inventory in inventories:
         pairs=',\n'.join('      {'+chars(n)+','+chars(h)+'}' for n,h in sorted(inventory.items()))

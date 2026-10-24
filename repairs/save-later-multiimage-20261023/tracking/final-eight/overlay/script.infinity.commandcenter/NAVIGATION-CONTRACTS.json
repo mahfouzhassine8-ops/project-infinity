@@ -1,0 +1,151 @@
+{
+  "contracts": [
+    {
+      "entrypoint": "resources/lib/router.py",
+      "family": "mode-list-v1",
+      "search": {
+        "movie": {
+          "params": {
+            "action": "tmdb_movies_search",
+            "mode": "build_movie_list"
+          },
+          "query_key": "query"
+        },
+        "tv": {
+          "params": {
+            "action": "tmdb_tv_search",
+            "mode": "build_tvshow_list"
+          },
+          "query_key": "query"
+        }
+      },
+      "sources": {
+        "resources/lib/indexers/metadata.py": "8ffd6ac9d80f6bd8fb2709764227a0a53704563b59e46a6d6bd3461e3b4a4285",
+        "resources/lib/menus/movies.py": "7e05ce0a40542b010fd56b9bef37495eb18c194550a3d23bf7c935bd3c8a09ed",
+        "resources/lib/menus/seasons.py": "c999b6bbd12c22c74e95c7c471eefe1b0c46c8b05c62d17c808108ade5d299ae",
+        "resources/lib/menus/tvshows.py": "dca403fc9c07079098b4406237a6e4e3c4f8b9473e3a4e0556f9a6ac7ad64732",
+        "resources/lib/modules/entry.py": "c27e72e2d9e8aed57e52d9b5db92c68f6940082441e9e922979081c4da6ad089",
+        "resources/lib/modules/kodi_utils.py": "af05b7baf72c2a1f833c7df0f974a3815c520b38c03371052dd67c3f06c486c9",
+        "resources/lib/router.py": "969283a4c566c79d8acff5dc2806e1f13a31e5cf75384992dc5b3727705ec702"
+      }
+    },
+    {
+      "entrypoint": "umbrella.py",
+      "family": "action-list-v1",
+      "search": {
+        "movie": {
+          "params": {
+            "action": "movieSearchterm"
+          },
+          "query_key": "name"
+        },
+        "tv": {
+          "params": {
+            "action": "tvSearchterm"
+          },
+          "query_key": "name"
+        }
+      },
+      "sources": {
+        "resources/lib/menus/episodes.py": "8a48a418a9d57fcdd85256728a8bc477f0d3f976e86d4a38bae3e855598636ac",
+        "resources/lib/menus/movies.py": "a47a2d48fd21baf6185181e86f212d53d199df9d723c7d218a46d8fa55da9742",
+        "resources/lib/menus/seasons.py": "0b0292262a8879cf1bac4e96c48ec802ff8e5afcafba8d7a90c296a3fd9a3e18",
+        "resources/lib/menus/tvshows.py": "126e96a501fb3d0710fdaad0fefac87d5b9c5418bb49aedf142f9d0db08a9419",
+        "resources/lib/modules/control.py": "61cc9e8e5bbe38c43446118d9f6b1a47a7758556c86afa801f67b31aa9ef7733",
+        "resources/lib/modules/router.py": "4dc2c7e7eb1e281fda65ecdc2db04820d63cc4a9127c1642bbf525b5751234fc",
+        "umbrella.py": "e1d6f95d9995eecb59a66e17383451fc54f6b101e3c1e3c7f3b51df698d05cf6"
+      }
+    },
+    {
+      "entrypoint": "seren.py",
+      "family": "json-args-list-v1",
+      "search": {
+        "movie": {
+          "params": {
+            "action": "moviesSearch"
+          },
+          "query_codec": "seren_json",
+          "query_key": "action_args"
+        },
+        "tv": {
+          "params": {
+            "action": "showsSearch"
+          },
+          "query_codec": "seren_json",
+          "query_key": "action_args"
+        }
+      },
+      "sources": {
+        "resources/lib/common/tools.py": "8f5cb0b9c27c71fce215bc6c74ea0b5096093e7e6851c2b19dc1faa840f68d4b",
+        "resources/lib/gui/movieMenus.py": "6cd01c052382e49635a492ea0aefab1cd9751dc4e6a11bb1a6a1a5cfb1074d6e",
+        "resources/lib/gui/tvshowMenus.py": "822507a349e3178ece07754a7475cd34ff14030e73d6d5111c3c1c05fa8f70e0",
+        "resources/lib/modules/globals.py": "5f60ae36c1d02ab9b9c5f1dd5ba2afb6466f733da5eda9ef2623df7c50e02932",
+        "resources/lib/modules/list_builder.py": "86c258a46e9cc0652934dccc4a56b9c96b64da3c831c2b87b7da2653ad7691db",
+        "resources/lib/modules/router.py": "bcbe488639a9ca82d30ffe1362f9c24af1d6e8b82f2dfc6d5b1ba16db7d4845c",
+        "seren.py": "ffe33f8d71e33cb79a9029b347fd15d383d8b5f5f356e2357356330a91b9c9ac"
+      }
+    },
+    {
+      "entrypoint": "resources/lib/router.py",
+      "family": "mode-list-v1",
+      "search": {
+        "movie": {
+          "params": {
+            "action": "tmdb_movies_search",
+            "mode": "build_movie_list"
+          },
+          "query_key": "query"
+        },
+        "tv": {
+          "params": {
+            "action": "tmdb_tv_search",
+            "mode": "build_tvshow_list"
+          },
+          "query_key": "query"
+        }
+      },
+      "sources": {
+        "resources/lib/indexers/metadata.py": "00b1acaf8d28cdecb553bde9566f042fb70e250cdd86a67aa5cd38a8c05fefe9",
+        "resources/lib/menus/movies.py": "d0582f4e25dbbff737d01c4f4622034bd85c75b0ef994934bf32a335962c49a9",
+        "resources/lib/menus/seasons.py": "2bf8722134d943829a479c15161aefc4a394dcbd6fbd338d08c46d9f97ea82e3",
+        "resources/lib/menus/tvshows.py": "3b519adbfd33dbf50356d694fa1b875fb1c234aafbd6be14d694677382894e80",
+        "resources/lib/modules/entry.py": "2d41c6f3a5401027331de8b56b8f33cc45a81b5ad98bdb11abd7a5aebf61c88c",
+        "resources/lib/modules/kodi_utils.py": "66eb12e037cebcc36bfd259c36e8df11d2cb56deac51bd75c83555e1556315ae",
+        "resources/lib/router.py": "969283a4c566c79d8acff5dc2806e1f13a31e5cf75384992dc5b3727705ec702"
+      }
+    }
+  ],
+  "provenance": [
+    {
+      "addon": "plugin.video.pov",
+      "archive": "pov-6.10.21.zip",
+      "git_blob": "2bd9233a980758dd8471bb9eb0e10267fa1629de",
+      "sha256": "e75d5e0946631a735efa6e3cab62d5121f5cb52e6ab829de1a1a4673ff3c4c98",
+      "url": "https://raw.githubusercontent.com/kodifitzwell/repo/61f18ed18f4ef342b37fe8ff4bce2eaf2ff499c1/plugin.video.pov/plugin.video.pov-6.10.21.zip",
+      "version": "6.10.21"
+    },
+    {
+      "addon": "plugin.video.umbrella",
+      "archive": "umbrella-6.7.729.zip",
+      "sha256": "df02c5de5b614d70c32c27917d7e27110947b03efb15980f461522a5abceff3a",
+      "url": "https://raw.githubusercontent.com/umbrellaplug/umbrellaplug.github.io/c8e728d65cf2eb9b35501d90f218a49db44f46ca/omega/zips/plugin.video.umbrella/plugin.video.umbrella-6.7.729.zip",
+      "version": "6.7.729"
+    },
+    {
+      "addon": "plugin.video.seren",
+      "archive": "seren-4.3.214.zip",
+      "sha256": "83e4f40478b091ec21beb012ec0fdd060e0e0ce539c09e9a177b018beb35d3bf",
+      "url": "https://raw.githubusercontent.com/deklica/repo.dexe/824cbcaddf0ca88230300805f5b78744b0297eea/zips/plugin.video.seren/plugin.video.seren-4.3.214.zip",
+      "version": "4.3.214"
+    },
+    {
+      "addon": "plugin.video.pov",
+      "archive": "pov-6.10.22.zip",
+      "git_blob": "fde9f10672ac998157169ad296dc3ab6a1734b57",
+      "sha256": "126b9fbe690dded613d0c2bab177babd6ce2235bc9d67fb25e1c79aefc9dc0d3",
+      "url": "https://raw.githubusercontent.com/kodifitzwell/repo/master/plugin.video.pov/plugin.video.pov-6.10.22.zip",
+      "version": "6.10.22"
+    }
+  ],
+  "schema": 1
+}

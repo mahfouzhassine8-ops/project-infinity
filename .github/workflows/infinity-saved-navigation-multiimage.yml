@@ -13,6 +13,9 @@ on:
       - 'repairs/save-later-multiimage-20261023/navigation_native.py'
       - 'repairs/save-later-multiimage-20261023/owner_binding.py'
       - 'repairs/save-later-multiimage-20261023/build.py'
+      - 'repairs/save-later-multiimage-20261023/dex_binding.py'
+      - 'repairs/save-later-multiimage-20261023/final_eight_native.py'
+      - 'repairs/save-later-multiimage-20261023/tracking/final-eight/overlay/**'
   workflow_dispatch:
     inputs:
       authorization:
@@ -56,6 +59,15 @@ jobs:
               assert os.environ['AUTHORIZED_SCOPE'].strip(), 'Explicit correction scope required'
           else:
               raise RuntimeError('Unapproved build trigger')
+          with open('repairs/save-later-multiimage-20261023/tracking/final-eight/SCOPE.json') as file:
+              final_scope=json.load(file)
+          assert final_scope['authorization']=='2026-10-24 final eight corrective takeover'
+          assert final_scope['cobra_modifications'] is False
+          assert final_scope['shutdown_tests']=='NOT RUN; independent'
+          import hashlib,pathlib
+          repair=pathlib.Path('repairs/save-later-multiimage-20261023')
+          for name,pin in final_scope['locked_trackit_files'].items():
+              assert hashlib.sha256((repair/name).read_bytes()).hexdigest()==pin, 'Locked TrackIt changed: '+name
           paths=subprocess.check_output(['git','diff','--name-only','8df2e26f481eb7ff2d791c8cab39548de949d030','HEAD'],text=True).splitlines()
           assert paths and all(p.startswith('repairs/save-later-multiimage-20261023/') or p in {'.github/workflows/infinity-saved-navigation-multiimage.yml','.github/workflows/infinity-saved-navigation-android.yml','.github/workflows/infinity-shutdown-verification.yml','.github/scripts/test_infinity_focused_policy.py','AGENTS.md','docs/INFINITY-FOCUSED-TESTING-POLICY.md'} for p in paths),paths
           assert not any('cobra' in p.lower() for p in paths),paths
