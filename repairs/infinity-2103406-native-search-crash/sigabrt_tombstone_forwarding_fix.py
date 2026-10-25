@@ -46,6 +46,33 @@ def apply(source: bytes) -> bytes:
             raise RuntimeError("Existing signal/memory-map diagnostic owner disappeared")
     return modified
 
+# The signed 2103405 binary may have been compiled from the archived source
+# rather than the later diagnostic source revision. This alternate entrypoint
+# can be used ONLY after the exact archive Git blob and rebuilt binary SHA
+# are independently matched to the signed 2103405 inputs.
+ARCHIVED_SOURCE_B64_GIT_SHA1 = "0ab710a2102f1cc143119068502dfbc0df82f8f6"
+INSTALLED_RECORDER_BINARY_SHA256 = "bc7aab86fc97844e02e25c96fc73f269bc85f5f8ce5528e132a78841aa130bca"
+
+def apply_reproduced_archived_source(source: bytes, archive_git_sha: str,
+                                   recompiled_binary_sha256: str) -> bytes:
+    if archive_git_sha != ARCHIVED_SOURCE_B64_GIT_SHA1:
+        raise RuntimeError("Archived recorder input is not the reviewed original source archive")
+    if recompiled_binary_sha256 != INSTALLED_RECORDER_BINARY_SHA256:
+        raise RuntimeError("Original archived source did not reproduce signed 2103405 recorder")
+    old, new = BEFORE.encode("ascii"), AFTER.encode("ascii")
+    if source.count(old) != 1:
+        raise RuntimeError("Compiled archived source must expose exactly one signal ownership list")
+    modified = source.replace(old, new, 1)
+    if modified.replace(new, old, 1) != source:
+        raise RuntimeError("Archived recorder patch was not exactly reversible")
+    signal_list = modified.split(b"static const int g_signals[]",1)[1].split(b";",1)[0]
+    if b"SIGABRT" in signal_list:
+        raise RuntimeError("SIGABRT still registered")
+    if not all(x in signal_list for x in (b"SIGSEGV",b"SIGBUS",b"SIGILL",b"SIGFPE")):
+        raise RuntimeError("Existing other fatal signal owners changed")
+    return modified
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("source", type=Path)
