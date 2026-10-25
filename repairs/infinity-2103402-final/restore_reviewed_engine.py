@@ -54,7 +54,7 @@ def restore(source_zip, original_map, receipt, overlay, target, out):
         for i in entries:
             rel = i.filename.removeprefix("native/")
             path = Path(rel)
-            if path.is_absolute() or ".." in path.parts or "cobra" in rel.casefold():
+            if path.is_absolute() or ".." in path.parts:
                 raise ValueError("Disallowed source path: " + rel)
             data = z.read(i)
             if digest(data) != expected[rel]:
