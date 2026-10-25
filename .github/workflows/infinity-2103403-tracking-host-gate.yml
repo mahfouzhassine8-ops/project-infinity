@@ -70,6 +70,11 @@ jobs:
         env:
           CC_ROOT: input/cc
         run: python3 repairs/infinity-2103403-corrective/test_real_tracking_mutations.py
+      - name: Connected context-menu to real Resume Hub persistence (all five operations)
+        env:
+          CC_ROOT: input/cc
+          PATCHED_CONTEXT: stage/patched/context.py
+        run: python3 repairs/infinity-2103403-corrective/test_connected_dispatch.py
       - name: Record narrowly scoped gate status
         run: |
           mkdir -p stage
