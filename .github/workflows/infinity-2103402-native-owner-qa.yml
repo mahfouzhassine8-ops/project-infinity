@@ -1,0 +1,80 @@
+name: Infinity 2103402 native-owner compatibility regression
+on:
+  push:
+    branches: [work/infinity-2103402-native-owner-corrective-20261024]
+    paths:
+      - "repairs/infinity-2103402-final/native_ownership_qa.py"
+      - ".github/workflows/infinity-2103402-native-owner-qa.yml"
+permissions:
+  contents: read
+  actions: read
+jobs:
+  native-owner-review:
+    name: Exact CC36 hashes, original menu gate and Essential-First owned version
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11.7"
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40089463702
+          name: Infinity-Saved-Navigation-MultiImage-INTERNAL-QA-NOT-ACCEPTED
+          github-token: ${{ github.token }}
+          path: protected-2103401
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40144024130
+          name: Infinity-2103402-FUNCTIONAL-UI-QA-SIGNED-UNVERIFIED-ON-FOLD
+          github-token: ${{ github.token }}
+          path: signed-2103402-qa
+      - name: Reject unrelated or Cobra modifications
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import subprocess
+          base="98ac3730a6e64f95f788c4b2f5e41c4f718a8e7d"
+          names=subprocess.check_output(['git','diff','--name-only',base,'HEAD'],text=True).splitlines()
+          assert names and all(n in {
+              'repairs/infinity-2103402-final/native_ownership_qa.py',
+              '.github/workflows/infinity-2103402-native-owner-qa.yml'
+              } for n in names),names
+          assert not any('cobra' in n.lower() for n in names)
+          PY
+          (cd protected-2103401 && sha256sum -c SHA256SUMS)
+          (cd signed-2103402-qa && sha256sum -c SHA256SUMS)
+      - name: Verify exact 25-file installed Command Center and stage 4 guarded native changes
+        run: |
+          set -euo pipefail
+          python3 repairs/infinity-2103402-final/native_ownership_qa.py \
+            --source protected-2103401/Infinity-Targeted-Source-and-Evidence.zip \
+            --map protected-2103401/NATIVE-SOURCE-MAP.json \
+            --baseline protected-2103401/Infinity-2103401-Universal-Performance-QA.apk \
+            --qa signed-2103402-qa/Infinity-2103402-Functional-Corrective-QA.apk \
+            --out native-owner-overlay
+          python3 - <<'PY'
+          import json,pathlib,hashlib
+          root=pathlib.Path('native-owner-overlay')
+          r=json.loads((root/'EXACT-NATIVE-OWNER-REPAIR.json').read_text())
+          assert len(r['allowed_native_changes'])==4 and r['prior_contracts_removed']==0
+          for path,proof in r['allowed_native_changes'].items():
+              assert hashlib.sha256((root/path).read_bytes()).hexdigest()==proof['corrected_sha256']
+          contract=(root/'xbmc/platform/android/activity/InfinityScriptCheckpointContracts.cpp').read_text()
+          assert contract.count('"script.infinity.commandcenter", "command_center_client"')>=2
+          assert '1b0b2ae9da31cd4772463799d4a3d44d0fce0639ef514221d506f25d09efc10b' in contract
+          assert '8cf3cfcab461d73d4e8bb625039d905478ffb52688f729252002b292ea87c429' in contract
+          assert 'b9059729493751dfc0be65801f73e41a06b604f3fdaf099963821b84f2b2e443' in contract
+          assert '51fc63f6922885c8473277398e6f3569274eb42afe06be0148501d6ddc65bb23' in contract
+          print("PASS: exact 4 native overlays, owner hash admission, original menu route and shutdown gate")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-2103402-Exact-Native-Owner-Source-Correction
+          path: native-owner-overlay/
+          retention-days: 90
+          if-no-files-found: error
