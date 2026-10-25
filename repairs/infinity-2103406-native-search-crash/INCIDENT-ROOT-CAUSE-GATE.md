@@ -49,5 +49,16 @@ User-provided archive `Infinity-Diagnostics-20261025-052107.zip` (SHA-256: `e5c9
 5. Compile full matching ARM64 native library if required, permanently sign with original certificate, package exact matching ZIPs.
 6. Physical Galaxy Fold Android 17 acceptance; NO final lock or resolved-crash claim before device evidence.
 
+## New user archive: 2026-10-25 06:52:55, current signed 2103405
+- User provided `Infinity-Diagnostics-20261025-065255.zip`, SHA-256 `4854e82a103b790b7ee972aeb9e1ad78cc11a72111776bc6b50137b4aae32e10`; 21 members.
+- The report identifies installed Infinity **2103405**, Samsung Fold Android 17/API 37; `integration/installed-code.json` independently shows Command Center **0.3.5.38** and skin **1.0.5.243**. This confirms the known-good menu generation is installed, not that every runtime participant is healthy.
+- **NO new native crash trace**. `crash/native-crash-last.txt` is empty; `exit-manifest.json` has only historical native abort tombstones at **05:12:12** (pid 22197) and **05:20:55** (pid 26366). Do not attribute those older 2103403-era tombstones to build 2103405.
+- Separate, newly verified **Essential-First close failures**: process 17111 at **06:40:47 EDT**, and process 20595 at **06:48:28 EDT**. Both reported `native_admission: checkpoint_deadline_exceeded; owner proof incomplete` after a ~25-second bound.
+- Current close started **06:48:03**; `checkpoint/coordinator-receipt.json` shows `CHECKPOINT_FAILED`, 25,142 ms, `checkpoint_saved=false`, `authorization_consumed=false`, `essential_writes_durable=false`, `essential_writes_sealed=false`, and `blocking_operation=command_center` with 15 named essential owners failed for incomplete proof. This is **not** proof of file corruption or a fresh process SIGABRT.
+- At checkpoint, script persistence listed five active/pending writer participants: `plugin.video.thecrew:service.py`, `script.infinity.commandcenter:service.py`, `service.infinity.compat:runtime_service.py`, `unidentified:infinity_continuity.py`, `unidentified:infinity_native_ambient.py`. Script subsystem `blocking_count=0` while overall native checkpoint still failed; DO NOT assert any single pending Python service caused the native owner failure without further tracing. Some optional writers were pending, and `pvr` was already durable.
+- Notable `checkpoint/installed-participants.json` reports `command_center_applied=false` and `legacy_or_unknown` at startup although installed-code inventory shows Command Center 0.3.5.38. These are DIFFERENT signals; reconcile before diagnosing an installation mismatch.
+- These repeat close failures constitute a distinct possible **shutdown reliability workstream**. Under the user's preservation requirement, do not silently expand the native Search crash repair to cover close/shutdown or unreported new UI issues. Preserve working WatchNixtoons2 and Cobra.
+- This archive supplies no original destroyed-mutex caller and does not change the outstanding native Search root-cause gate. No new APK or original native-code correction has been validated from it.
+
 ## Current state
 Investigation checkpoint only. Native crash root function remains unproven. No 2103406 APK was built or signed.
