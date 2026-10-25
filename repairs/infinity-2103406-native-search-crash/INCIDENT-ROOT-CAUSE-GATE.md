@@ -28,6 +28,12 @@ User-provided archive `Infinity-Diagnostics-20261025-052107.zip` (SHA-256: `e5c9
 - Correcting signal forwarding is distinct from curing the underlying destroyed-mutex or SIGSEGV defect. Do not misrepresent the former as the latter.
 - Consider a scoped crash-recorder correction that delegates fatal signals to Android debuggerd *without* changing Kodi executable instructions, preserving on-device startup maps and diagnostic privacy. Keep rollback to signed 2103405. Any change needs native Android 17 validation.
 
+## Recorder correction now staged (SOURCE ONLY; no APK)
+- Added `sigabrt_tombstone_forwarding_fix.py` to this work branch. It enforces the exact audited recorder source Git blob `fc7be4f72c7e19606b718d4ef04487756a17a901` and makes precisely one reversible change: remove SIGABRT from the recorder's intercepted signal list.
+- Existing SIGSEGV/SIGBUS/SIGILL/SIGFPE recorders, startup native-map capture and forward/chain methods remain source-identical. Android can then retain the original SIGABRT fatal stack rather than only a recorder re-raise frame, subject to physical verification.
+- Static host checks pass: source pin, unique edit, reversibility, intended retained signal list, original diagnostic functions, Cobra untouched. **This has not been built or tested on Android 17.**
+- It addresses documented forensics corruption, NOT the mutex lifetime root cause and NOT the earlier SIGSEGV. The two native defect classes remain open until their respective original call sites are determined.
+
 ## Code investigation targets (not proven root causes)
 - Kodi's native ScriptRunner/PluginDirectory Infinity result lease and lifetime of GUI Window / graphics-context locks.
 - Native CPythonInvoker per-add-on subinterpreter shutdown and live child threads during Search/return.
