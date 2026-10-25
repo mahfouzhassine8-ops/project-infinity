@@ -1,0 +1,172 @@
+name: Infinity 2103402 WatchNixtoons2 only universal Trakt signed QA
+on:
+  push:
+    branches: [work/infinity-2103402-nixtoons-only-identity-menu-20261025]
+    paths:
+      - "repairs/infinity-2103402-final/nixtoons-only/**"
+      - ".github/workflows/infinity-2103402-nixtoons-only-signed-qa.yml"
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-2103402-nixtoons-signed-qa
+  cancel-in-progress: false
+jobs:
+  signed-qa:
+    name: Scope guard, 12 tests, exact five-member APK, original signing certificate
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Enforce WatchNixtoons2-only source scope (Cobra and prior QA untouched)
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import subprocess,hashlib,pathlib
+          base='8595cd8238c9e6973a671f88d68d7f4707d0a105'
+          names=set(subprocess.check_output(['git','diff','--name-only',base,'HEAD'],text=True).splitlines())
+          prefix='repairs/infinity-2103402-final/nixtoons-only/'
+          wanted={prefix+'make_watchnixtoons_patch.py',prefix+'qa_nixtoons_package.py',
+                  prefix+'test_watchnixtoons_scope.py',
+                  '.github/workflows/infinity-2103402-nixtoons-only-signed-qa.yml'}
+          assert names==wanted, f'Unexpected changed sources: {names^wanted}'
+          assert not any('cobra' in x.lower() for x in names)
+          expected={
+             prefix+'make_watchnixtoons_patch.py':'7504d3e1301893d55b91e9e54923d6be1cf59c50',
+             prefix+'qa_nixtoons_package.py':'9850a66f20cb779ce89fb839a2c36273237a4838',
+             prefix+'test_watchnixtoons_scope.py':'75f962ee4f93b6d46d5ca7f57777c6202a032ec0'}
+          for path,blob in expected.items():
+              actual=subprocess.check_output(['git','hash-object',path],text=True).strip()
+              assert actual==blob,f'Reviewed code changed: {path}'
+          print('PASS: three exact audited files, Cobra and all protected source unchanged')
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40158384817
+          name: Infinity-2103402-CONTINUE-OTAKU-NIXTOONS-FAVOURITES-SIGNED-QA
+          github-token: ${{ github.token }}
+          path: input/raw
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11.7"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: "platform-tools build-tools;35.0.0 platforms;android-34"
+          log-accepted-android-sdk-licenses: false
+      - name: Recover verified parent APK and matching components, never use mixed versions
+        run: |
+          set -euo pipefail
+          (cd input/raw/package-e2e && sha256sum -c SHA256SUMS)
+          mkdir -p input/files scope-work/script.infinity.commandcenter
+          cp input/raw/package-e2e/Infinity-2103402-Continue-Context-Favourites-QA.apk input/files/
+          cp input/raw/package-e2e/*.zip input/files/
+          python3 - <<'PY'
+          from zipfile import ZipFile
+          from pathlib import Path
+          source=Path('input/files/Infinity-2103402-Continue-Context-Favourites-QA.apk')
+          out=Path('scope-work/script.infinity.commandcenter')
+          with ZipFile(source) as z:
+              for name in ('context.py','plugin.py'):
+                  (out/name).write_bytes(z.read('assets/addons/script.infinity.commandcenter/'+name))
+          PY
+      - name: Patch ONLY Nixtoons menu and guarded common dispatch using exact reviewed CC35 inputs
+        run: |
+          set -euo pipefail
+          python3 repairs/infinity-2103402-final/nixtoons-only/make_watchnixtoons_patch.py --work scope-work
+          cp repairs/infinity-2103402-final/nixtoons-only/test_watchnixtoons_scope.py scope-work/test_watchnixtoons_scope.py
+          (cd scope-work && python3 -m unittest -v test_watchnixtoons_scope)
+      - name: Build exact five-member matched APK QA using prior compiled ARM64 instructions
+        run: |
+          set -euo pipefail
+          python3 repairs/infinity-2103402-final/nixtoons-only/qa_nixtoons_package.py stage \
+            --input input/files --patched scope-work/patched --output stage
+          python3 repairs/infinity-2103402-final/nixtoons-only/qa_nixtoons_package.py verify \
+            --input input/files --signed stage/unsigned-nixtoons.apk
+      - name: Permanently sign install-over QA and verify 25-of-25 component contracts
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          : "${INFINITY_KEYSTORE_B64:?Original release keystore required}"
+          : "${INFINITY_STORE_PASSWORD:?Original keystore pass required}"
+          : "${INFINITY_KEY_PASSWORD:?Original key pass required}"
+          : "${INFINITY_KEY_ALIAS:?Original key alias required}"
+          printf '%s' "$INFINITY_KEYSTORE_B64" | base64 -d > stage/.key.jks
+          chmod 600 stage/.key.jks
+          SDK="$ANDROID_HOME/build-tools/35.0.0"
+          "$SDK/zipalign" -P 16 -f 4 stage/unsigned-nixtoons.apk stage/.aligned.apk
+          "$SDK/apksigner" sign --ks stage/.key.jks \
+            --ks-key-alias "$INFINITY_KEY_ALIAS" --ks-pass env:INFINITY_STORE_PASSWORD \
+            --key-pass env:INFINITY_KEY_PASSWORD \
+            --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true \
+            --out stage/Infinity-2103402-WatchNixtoons2-Universal-Trakt-QA.apk stage/.aligned.apk
+          "$SDK/apksigner" verify --verbose --print-certs \
+            input/files/Infinity-2103402-Continue-Context-Favourites-QA.apk > stage/PARENT-SIGNATURE.txt
+          "$SDK/apksigner" verify --verbose --print-certs \
+            stage/Infinity-2103402-WatchNixtoons2-Universal-Trakt-QA.apk > stage/NEW-SIGNATURE.txt
+          python3 - <<'PY'
+          import pathlib,re
+          directory=pathlib.Path('stage')
+          pat=re.compile(r'Signer #1 certificate SHA-256 digest:\s*([0-9a-fA-F]{64})')
+          def signer(path):
+              found=pat.search((directory/path).read_text())
+              assert found,f'Missing certificate in {path}'
+              return found.group(1).lower()
+          expected='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
+          assert signer('PARENT-SIGNATURE.txt')==signer('NEW-SIGNATURE.txt')==expected
+          print('PASS: exact original Infinity permanent signing certificate retained')
+          PY
+          "$SDK/aapt" dump badging stage/Infinity-2103402-WatchNixtoons2-Universal-Trakt-QA.apk |
+            grep -E "^package: name='com.projectinfinity.kodi' versionCode='2103402'"
+          python3 repairs/infinity-2103402-final/nixtoons-only/qa_nixtoons_package.py verify \
+            --input input/files --signed stage/Infinity-2103402-WatchNixtoons2-Universal-Trakt-QA.apk
+          python3 - <<'PY'
+          from zipfile import ZipFile
+          from pathlib import Path
+          apk=Path('stage/Infinity-2103402-WatchNixtoons2-Universal-Trakt-QA.apk')
+          with ZipFile(apk) as a:
+              for leaf in ('script.infinity.commandcenter-0.3.5.35-NIXTOONS-QA.zip',
+                           'script.infinity.watchedbridge-1.0.16-NIXTOONS-QA.zip',
+                           'script.infinity.uirepair-0.1.18-NIXTOONS-QA.zip',
+                           'skin.infinity.diggz-1.0.5.243.zip'):
+                  with ZipFile(Path('stage')/leaf) as z:
+                      for name in z.namelist():
+                          if not name.endswith('/'):
+                              assert a.read('assets/addons/'+name)==z.read(name),f'Component APK/ZIP mismatch: {name}'
+          print('PASS: every shipped component ZIP exactly matches new signed APK')
+          PY
+          rm -f stage/.key.jks stage/unsigned-nixtoons.apk stage/.aligned.apk
+          (cd stage && sha256sum *.apk *.zip > SHA256SUMS)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-2103402-WATCHNIXTOONS2-ONLY-SIGNED-MATCHED-QA
+          path: |
+            stage/*.apk
+            stage/*.zip
+            stage/*RECEIPT.json
+            stage/SHA256SUMS
+            stage/*SIGNATURE.txt
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: Infinity-2103402-WatchNixtoons2-Scope-Failure
+          path: |
+            stage/*RECEIPT.json
+            stage/*SIGNATURE.txt
+            scope-work/patched/*.py
+          retention-days: 30
+          if-no-files-found: warn
