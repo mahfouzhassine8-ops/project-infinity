@@ -45,13 +45,13 @@ jobs:
       - name: Verify signed 2103406 artifact and recover the shipped Search Python module
         run: |
           set -euo pipefail
-          (cd input && sha256sum -c SHA256SUMS)
+          (cd input/stage && sha256sum -c SHA256SUMS)
           mkdir -p stage/signed-search stage/patched
           python3 - <<'PY'
           from zipfile import ZipFile
           from pathlib import Path
           import hashlib
-          file=Path('input/Infinity-2103406-SIGABRT-Crash-Recorder-QA.apk')
+          file=Path('input/stage/Infinity-2103406-SIGABRT-Crash-Recorder-QA.apk')
           with ZipFile(file) as apk:
               path='assets/addons/script.infinity.commandcenter/infinity_search.py'
               before=apk.read(path)
