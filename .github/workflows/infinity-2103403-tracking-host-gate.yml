@@ -1,0 +1,81 @@
+name: Infinity 2103403 exact-route tracking host gate
+on:
+  push:
+    branches: [work/infinity-2103403-nixtoons-route-link-search-crash-20261025]
+    paths:
+      - "repairs/infinity-2103403-corrective/**"
+      - ".github/workflows/infinity-2103403-tracking-host-gate.yml"
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-2103403-tracking-host
+  cancel-in-progress: false
+jobs:
+  tracking:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify isolated patch scope; Cobra and previous QA remain protected
+        run: |
+          set -euo pipefail
+          git diff --name-only d18be1893beca4c487583d9bd59f2db05383b0ba HEAD |
+            tee /tmp/changed-files.txt
+          if grep -v -E '^(repairs/infinity-2103403-corrective/|\.github/workflows/infinity-2103403-tracking-host-gate\.yml$)' /tmp/changed-files.txt; then
+            echo "Unexpected source change" >&2
+            exit 1
+          fi
+          if grep -i 'cobra' /tmp/changed-files.txt; then exit 1; fi
+          echo "PASS preserved locked parent sources, Cobra and other feature paths"
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40167419559
+          name: Infinity-2103402-WATCHNIXTOONS2-ONLY-SIGNED-MATCHED-QA
+          github-token: ${{ github.token }}
+          path: input
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11.7"
+      - name: Verify exact signed 2103402 parent artifact and extract original Command Center
+        run: |
+          set -euo pipefail
+          (cd input && sha256sum -c SHA256SUMS)
+          mkdir -p input/cc
+          python3 - <<'PY'
+          from zipfile import ZipFile
+          from pathlib import Path
+          signed=Path('input/Infinity-2103402-WatchNixtoons2-Universal-Trakt-QA.apk')
+          with ZipFile(signed) as z:
+              for name in ('context.py','plugin.py','resume_hub.py'):
+                  (Path('input/cc')/name).write_bytes(
+                      z.read('assets/addons/script.infinity.commandcenter/'+name))
+          PY
+      - name: Apply exact-route verification repair to signed baseline source
+        run: |
+          set -euo pipefail
+          python3 repairs/infinity-2103403-corrective/hotfix_2103403.py input/cc/context.py stage/patched/context.py
+          sha256sum stage/patched/context.py | tee /tmp/updated-context.txt
+          grep -q '^aec101d4c9ba7b38eb7b98876fd91fa5042b70f17ae0ca33d4832df6cb73e14f ' /tmp/updated-context.txt
+      - name: Seven identity-link tests (binding, cancellation, conflicts, route drift)
+        env:
+          PATCHED_CONTEXT: stage/patched/context.py
+        run: python3 -m unittest -v repairs/infinity-2103403-corrective/test_link_flow.py
+      - name: All five original Resume Hub tracking mutations
+        env:
+          CC_ROOT: input/cc
+        run: python3 repairs/infinity-2103403-corrective/test_real_tracking_mutations.py
+      - name: Record narrowly scoped gate status
+        run: |
+          mkdir -p stage
+          printf 'HOST-ONLY QA PASSED; no signed corrective APK produced.\nSearch SIGSEGV still needs a mapped tombstone or equivalent native proof.\nPhysical Android 17 Fold acceptance is pending.\n' > stage/STATUS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-2103403-TRACKING-HOST-EVIDENCE-NOT-AN-APK
+          path: stage/STATUS.txt
+          retention-days: 30
