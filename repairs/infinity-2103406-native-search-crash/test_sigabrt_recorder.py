@@ -72,17 +72,25 @@ class SignalRecorderChecks(unittest.TestCase):
         self.assertEqual(MODULE.git_blob_sha1(compressed_b64),
                          MODULE.ARCHIVED_SOURCE_B64_GIT_SHA1)
         source=gzip.decompress(base64.b64decode(compressed_b64))
+        old_id=b"db92b30f5523cacd9029aa21d7b52c8bc7819e4cd5c1dea76d4bfcdcf9205375"
+        current_id=b"704834f42e49a2eea0a36ad41b5f79345f5e4108dcd339213899ea3c6ff045a0"
+        self.assertEqual(source.count(old_id),1)
+        source=source.replace(old_id,current_id,1)
+        installed=Path("native-stage/parent-libinfinitycrash.so").read_bytes()
+        self.assertEqual(hashlib.sha256(installed).hexdigest(),
+                         MODULE.INSTALLED_RECORDER_BINARY_SHA256)
+        self.assertEqual(hashlib.sha256(MODULE.normalized_elf_build_id(installed)).hexdigest(),
+                         MODULE.MATCHED_BINARY_MASKED_BUILD_ID_SHA256)
         corrected=MODULE.apply_reproduced_archived_source(
-            source, MODULE.ARCHIVED_SOURCE_B64_GIT_SHA1,
-            MODULE.INSTALLED_RECORDER_BINARY_SHA256)
+            source, MODULE.ARCHIVED_SOURCE_B64_GIT_SHA1,installed)
         self.assertNotIn(b"SIGABRT",corrected.split(b"static const int g_signals[]",1)[1].split(b";",1)[0])
         self.assertEqual(corrected.replace(MODULE.AFTER.encode(), MODULE.BEFORE.encode(),1),source)
+        altered=bytearray(installed);altered[0x1100]^=1  # ELF machine code, not note.
         with self.assertRaisesRegex(RuntimeError,"did not reproduce"):
-            MODULE.apply_reproduced_archived_source(source,
-                MODULE.ARCHIVED_SOURCE_B64_GIT_SHA1,"0"*64)
+            MODULE.apply_reproduced_archived_source(
+                source,MODULE.ARCHIVED_SOURCE_B64_GIT_SHA1,bytes(altered))
         with self.assertRaisesRegex(RuntimeError,"not the reviewed"):
-            MODULE.apply_reproduced_archived_source(source,
-                "0"*40,MODULE.INSTALLED_RECORDER_BINARY_SHA256)
+            MODULE.apply_reproduced_archived_source(source,"0"*40,installed)
     def test_rejects_wrong_or_modified_source(self):
         with self.assertRaisesRegex(RuntimeError,"audited baseline"):
             MODULE.apply(self.before+b"\n")
