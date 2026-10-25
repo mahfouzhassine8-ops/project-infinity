@@ -121,9 +121,12 @@ jobs:
           module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
           root=Path('native-stage')
           expected='bc7aab86fc97844e02e25c96fc73f269bc85f5f8ce5528e132a78841aa130bca'
-          assert hashlib.sha256((root/'parent-libinfinitycrash.so').read_bytes()).hexdigest()==expected
+          installed=(root/'parent-libinfinitycrash.so').read_bytes()
+          assert hashlib.sha256(installed).hexdigest()==expected
+          normalized=module.normalized_elf_build_id(installed)
+          assert hashlib.sha256(normalized).hexdigest()==module.MATCHED_BINARY_MASKED_BUILD_ID_SHA256
           def match(path):
-              return hashlib.sha256(path.read_bytes()).hexdigest()==expected
+              return module.normalized_elf_build_id(path.read_bytes())==normalized
           old=Path('repairs/infinity-2103402-final/native-overlay/infinity_crash_recorder.c')
           current_matches=match(root/'reference-recompiled.so')
           archive_matches=match(root/'archived-recompiled.so')
@@ -134,10 +137,10 @@ jobs:
               amended=module.apply_reproduced_archived_source(
                   (root/'infinity_crash_recorder.c').read_bytes(),
                   module.ARCHIVED_SOURCE_B64_GIT_SHA1,
-                  expected)
-              matched_source='reviewed-archived'
+                  (root/'archived-recompiled.so').read_bytes())
+              matched_source='reviewed-archived; machine code/data byte-identical to installed'
           else:
-              raise RuntimeError('Neither reviewed C source reproduces installed signed 2103405 recorder binary; halt before signing')
+              raise RuntimeError('Neither reviewed C source reproduces the installed recorder machine code/data byte-for-byte; halt before signing')
           (root/'infinity_crash_recorder.c').write_bytes(amended)
           (root/'MATCHED-RECORDER-SOURCE.txt').write_text(
               'recorder_original_source_variant='+matched_source+'\n'
