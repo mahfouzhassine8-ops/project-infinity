@@ -189,6 +189,8 @@ jobs:
           path: |
             native-stage/*build-id.txt
             native-stage/new-symbols.txt
+            native-stage/*.so
+            native-stage/infinity_crash_recorder.c
             stage/*RECEIPT.json
           retention-days: 30
           if-no-files-found: warn
