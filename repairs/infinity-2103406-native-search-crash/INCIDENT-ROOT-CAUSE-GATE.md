@@ -67,5 +67,15 @@ User-provided archive `Infinity-Diagnostics-20261025-052107.zip` (SHA-256: `e5c9
 - Preserve the physically working WatchNixtoons2/Infinity Tracked implementation in signed 2103405; Cobra completely off limits; no data wipe or reinstall.
 - Reopening shutdown as a repair workstream requires later user authorization, after other priorities are polished. This freeze does not alter the diagnostic evidence already collected.
 
+## Fold diagnostics after signed 2103406 — 2026-10-25 15:24 EDT
+- User uploaded `Infinity-Diagnostics-20261025-152436.zip` (SHA-256 `c5da85b75e1eaedbf92f54dbecd279885de6f0f7b4bbfc6ff40b0365834b3325`, 19 ZIP members, chooser report exported at 15:24:39 EDT).
+- Device: Galaxy Fold SM-F976U1, Android 17/API 37. `report.txt` reports installed APK `2103406`; installed-code inventory records Command Center `0.3.5.38` and skin `1.0.5.243`.
+- `crash/native-crash-last.txt` is empty; `exit-manifest.json` has `records: []`. No new SIGABRT/SIGSEGV tombstone is bundled. **This does not prove native crash absence or debuggerd handoff success.**
+- The *separate* recent-exits subsection in `report.txt` reports a **15:21:39 EDT** Kodi process exit due to signal 9 (SIGKILL), RSS 881748 KiB. The exact same timestamp appears in startup/close evidence as `pid=17906 exit.force.userRequested`. Treat as explicit force close, not an unobserved destroyed-mutex SIGABRT.
+- `kodi-process-state.json` records new pid `20928` beginning **15:21:42 EDT**, then normal close requested at **15:23:46 EDT**.
+- Independent deferred shutdown evidence: checkpoint `CHECKPOINT_FAILED` at **15:24:11 EDT**, 25,149 ms, error `native_admission: checkpoint_deadline_exceeded; owner proof incomplete`; essential durability NOT confirmed. User explicitly postponed shutdown repairs; do not alter the essential-write gate as a side effect of crash forensics.
+- Export contains no Search invocation/result trace (`Infinity.Search.` absent from report and included native/critical JSONL). Do not claim Search was successfully stress-tested or that the earlier native fault is repaired.
+- No 2103406 application change is authorized by this upload. Working WatchNixtoons2/Infinity Tracked and Cobra remain protected. The SIGABRT recorder correction is built and signed from GitHub run `40191243446`, but **physical fatal-signal behavior remains unverified**.
+
 ## Current state
 Investigation checkpoint only. Native crash root function remains unproven. No 2103406 APK was built or signed.
