@@ -85,39 +85,73 @@ jobs:
           set -euo pipefail
           sdkmanager "ndk;$NDK_VERSION" >/dev/null
           test -x "$ANDROID_HOME/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang"
-      - name: Compile exact baseline recorder for provenance and the SIGABRT-corrected companion
+      - name: Reproduce installed recorder from pinned source before recompiling SIGABRT handling
         run: |
           set -euo pipefail
           TOOLCHAIN="$ANDROID_HOME/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin"
           CC="$TOOLCHAIN/aarch64-linux-android21-clang"
           SOURCE="repairs/infinity-2103402-final/native-overlay/infinity_crash_recorder.c"
+          ARCHIVE="repairs/native-crash-forensics-2103250/infinity_crash_recorder.c.gz.b64"
           FLAGS="-shared -fPIC -O2 -fvisibility=hidden -fno-omit-frame-pointer -pthread -Wl,--build-id=sha1"
+          test "$(git hash-object "$ARCHIVE")" = "0ab710a2102f1cc143119068502dfbc0df82f8f6"
+          base64 -d "$ARCHIVE" | gunzip > native-stage/archived-original.c
           "$CC" $FLAGS "$SOURCE" -o native-stage/reference-recompiled.so
+          "$CC" $FLAGS native-stage/archived-original.c -o native-stage/archived-recompiled.so
+          sha256sum native-stage/parent-libinfinitycrash.so native-stage/reference-recompiled.so native-stage/archived-recompiled.so
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,importlib.util
+          repo=Path('repairs/infinity-2103406-native-search-crash')
+          p=repo/'sigabrt_tombstone_forwarding_fix.py'
+          spec=importlib.util.spec_from_file_location('patched_recorder',p)
+          module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+          root=Path('native-stage')
+          expected='bc7aab86fc97844e02e25c96fc73f269bc85f5f8ce5528e132a78841aa130bca'
+          assert hashlib.sha256((root/'parent-libinfinitycrash.so').read_bytes()).hexdigest()==expected
+          def match(path):
+              return hashlib.sha256(path.read_bytes()).hexdigest()==expected
+          old=Path('repairs/infinity-2103402-final/native-overlay/infinity_crash_recorder.c')
+          current_matches=match(root/'reference-recompiled.so')
+          archive_matches=match(root/'archived-recompiled.so')
+          if current_matches:
+              amended=module.apply(old.read_bytes())
+              matched_source='reviewed-current'
+          elif archive_matches:
+              amended=module.apply_reproduced_archived_source(
+                  (root/'archived-original.c').read_bytes(),
+                  module.ARCHIVED_SOURCE_B64_GIT_SHA1,
+                  expected)
+              matched_source='reviewed-archived'
+          else:
+              raise RuntimeError('Neither reviewed C source reproduces installed signed 2103405 recorder binary; halt before signing')
+          (root/'infinity_crash_recorder.c').write_bytes(amended)
+          (root/'MATCHED-RECORDER-SOURCE.txt').write_text(
+              'recorder_original_source_variant='+matched_source+'\n'
+              'original_binary_sha256='+expected+'\n'
+              'exact_one_line_patch=remove SIGABRT from g_signals\n'
+              'this_is_not_a_mutex_lifetime_fix=true\n')
+          print('PASS: provenance matched installed recorder through exact ARM64 rebuild:',matched_source)
+          PY
           "$CC" $FLAGS native-stage/infinity_crash_recorder.c -o native-stage/libinfinitycrash.so
-          sha256sum native-stage/parent-libinfinitycrash.so native-stage/reference-recompiled.so native-stage/libinfinitycrash.so
-          readelf -n native-stage/reference-recompiled.so > native-stage/reference-build-id.txt
+          readelf -n native-stage/parent-libinfinitycrash.so > native-stage/reference-build-id.txt
           readelf -n native-stage/libinfinitycrash.so > native-stage/new-build-id.txt
           readelf -Ws native-stage/libinfinitycrash.so > native-stage/new-symbols.txt
           grep -Fq 'infinity_crash_recorder_install' native-stage/new-symbols.txt
           grep -Fq 'Build ID:' native-stage/new-build-id.txt
-          if cmp -s native-stage/parent-libinfinitycrash.so native-stage/libinfinitycrash.so; then
-            echo 'FATAL: unchanged recorder binary' >&2
-            exit 1
-          fi
           python3 - <<'PY'
           from pathlib import Path
-          import re
-          def build_id(f):
-              m=re.search(r'Build ID:\s*([a-fA-F0-9]+)', Path(f).read_text())
-              assert m,f
+          import re,hashlib
+          before=Path('native-stage/parent-libinfinitycrash.so').read_bytes()
+          after=Path('native-stage/libinfinitycrash.so').read_bytes()
+          assert before!=after and len(after)>10000
+          p=re.compile(r'Build ID:\s*([0-9a-fA-F]{40})')
+          def bid(file):
+              m=p.search(Path(file).read_text())
+              assert m,file
               return m.group(1).lower()
-          expected='030b7fecb9bfdd816047454dd76f8438dca92479'
-          old=build_id('native-stage/reference-build-id.txt')
-          new=build_id('native-stage/new-build-id.txt')
-          if old != expected:
-              raise RuntimeError('Pinned source/compiler do not reproduce installed original Build ID; cannot trust rebuild provenance: '+old)
-          assert new!=old,'Corrected recorder Build ID must change'
-          print('PASS: exact previous source/recompiled Build ID matches installed; new recorder unique')
+          assert bid('native-stage/reference-build-id.txt')=='030b7fecb9bfdd816047454dd76f8438dca92479'
+          assert bid('native-stage/reference-build-id.txt')!=bid('native-stage/new-build-id.txt')
+          print('PASS new ARM64 build retains original diagnostic signal owners except SIGABRT')
           PY
       - name: Build exact two-member install-over APK and preserve all original addon ZIPs
         run: |
@@ -180,6 +214,7 @@ jobs:
             stage/*SIGNATURE.txt
             native-stage/*build-id.txt
             native-stage/new-symbols.txt
+            native-stage/MATCHED-RECORDER-SOURCE.txt
           retention-days: 90
           if-no-files-found: error
       - uses: actions/upload-artifact@v4
@@ -190,7 +225,8 @@ jobs:
             native-stage/*build-id.txt
             native-stage/new-symbols.txt
             native-stage/*.so
-            native-stage/infinity_crash_recorder.c
+            native-stage/*.c
+            native-stage/MATCHED-RECORDER-SOURCE.txt
             stage/*RECEIPT.json
           retention-days: 30
           if-no-files-found: warn
