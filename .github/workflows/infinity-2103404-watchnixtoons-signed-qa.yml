@@ -1,0 +1,158 @@
+name: Infinity 2103404 WatchNixtoons2 exact-source-location signed QA
+on:
+  push:
+    branches: [work/infinity-2103404-watchnixtoons-source-location-only-20261025]
+    paths:
+      - "repairs/infinity-2103404-source-location/**"
+      - ".github/workflows/infinity-2103404-watchnixtoons-signed-qa.yml"
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-2103404-watchnixtoons-source-signed-qa
+  cancel-in-progress: false
+jobs:
+  signed-qa:
+    name: Source-route host tests, exact protected APK delta, permanent signing and ZIP contracts
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Enforce exact WatchNixtoons2 repair scope (Cobra is off limits)
+        run: |
+          set -euo pipefail
+          git diff --name-only 9d74c5b634639df942d0de25dc149539bb5ec5c2 HEAD | tee /tmp/source-diff
+          if grep -v -E '^(repairs/infinity-2103404-source-location/|\.github/workflows/infinity-2103404-watchnixtoons-signed-qa\.yml$)' /tmp/source-diff; then
+            echo "UNAPPROVED source diff" >&2; exit 1
+          fi
+          if grep -i 'cobra' /tmp/source-diff; then
+            echo "Cobra changed" >&2; exit 1
+          fi
+          echo "PASS source scope, Cobra and unrelated Infinity unchanged"
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40177354484
+          name: Infinity-2103403-SIGNED-MATCHED-TRACKING-SEARCH-QA
+          github-token: ${{ github.token }}
+          path: input
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11.7"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: "platform-tools build-tools;35.0.0 platforms;android-34"
+          log-accepted-android-sdk-licenses: false
+      - name: Validate exact original signed 2103403 parent and extract reviewed code
+        run: |
+          set -euo pipefail
+          (cd input && sha256sum -c SHA256SUMS)
+          mkdir -p repairs/infinity-2103404-source-location/parent_cc
+          python3 - <<'PY'
+          from zipfile import ZipFile
+          from pathlib import Path
+          root=Path('repairs/infinity-2103404-source-location/parent_cc')
+          with ZipFile('input/Infinity-2103403-Tracking-Search-Stabilization-QA.apk') as signed:
+              for item in ('context.py','resume_hub.py','checkpoint_runtime.py','infinity_trakt.py','plugin.py','addon.xml'):
+                  (root/item).write_bytes(signed.read('assets/addons/script.infinity.commandcenter/'+item))
+          PY
+      - name: Apply route-precise local tracking and reciprocal component version fixes
+        run: |
+          set -euo pipefail
+          python3 repairs/infinity-2103404-source-location/patch_nix2103404.py \
+            repairs/infinity-2103404-source-location/parent_cc \
+            repairs/infinity-2103404-source-location/patched
+      - name: Nine source-route identity security tests
+        run: python3 repairs/infinity-2103404-source-location/test_source_locator.py
+      - name: Five connected context menu and persisted tracking actions
+        run: python3 repairs/infinity-2103404-source-location/test_full_actions.py
+      - name: Stage exact member-scoped original ARM64 APK and component ZIPs
+        run: |
+          set -euo pipefail
+          python3 repairs/infinity-2103404-source-location/package_source.py stage \
+            --input input --patched repairs/infinity-2103404-source-location/patched --out stage
+          python3 repairs/infinity-2103404-source-location/package_source.py verify \
+            --input input --out stage --signed stage/unsigned-2103404.apk
+      - name: Sign APK with original Infinity certificate and verify complete ZIP/pin/diff contracts
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          test -n "$INFINITY_KEYSTORE_B64"
+          test -n "$INFINITY_STORE_PASSWORD"
+          test -n "$INFINITY_KEY_PASSWORD"
+          test -n "$INFINITY_KEY_ALIAS"
+          printf '%s' "$INFINITY_KEYSTORE_B64" | base64 -d > stage/.original-infinity.jks
+          chmod 600 stage/.original-infinity.jks
+          SDK="$ANDROID_HOME/build-tools/35.0.0"
+          "$SDK/zipalign" -P 16 -f 4 stage/unsigned-2103404.apk stage/.aligned.apk
+          "$SDK/apksigner" sign --ks stage/.original-infinity.jks \
+            --ks-key-alias "$INFINITY_KEY_ALIAS" \
+            --ks-pass env:INFINITY_STORE_PASSWORD --key-pass env:INFINITY_KEY_PASSWORD \
+            --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true \
+            --out stage/Infinity-2103404-WatchNixtoons2-Source-Location-QA.apk stage/.aligned.apk
+          "$SDK/apksigner" verify --verbose --print-certs \
+            input/Infinity-2103403-Tracking-Search-Stabilization-QA.apk > stage/PARENT-SIGNATURE.txt
+          "$SDK/apksigner" verify --verbose --print-certs \
+            stage/Infinity-2103404-WatchNixtoons2-Source-Location-QA.apk > stage/NEW-SIGNATURE.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          pat=re.compile(r'Signer #1 certificate SHA-256 digest:\s*([0-9a-fA-F]{64})')
+          def cert(file):
+              match=pat.search(Path(file).read_text())
+              assert match,file
+              return match.group(1).lower()
+          expected='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
+          assert cert('stage/PARENT-SIGNATURE.txt')==cert('stage/NEW-SIGNATURE.txt')==expected
+          print('PASS original permanent release signer')
+          PY
+          "$SDK/aapt" dump badging stage/Infinity-2103404-WatchNixtoons2-Source-Location-QA.apk |
+            grep -E "^package: name='com.projectinfinity.kodi' versionCode='2103404'"
+          python3 repairs/infinity-2103404-source-location/package_source.py verify \
+            --input input --out stage --signed stage/Infinity-2103404-WatchNixtoons2-Source-Location-QA.apk
+          python3 - <<'PY'
+          from zipfile import ZipFile
+          from pathlib import Path
+          app=Path('stage/Infinity-2103404-WatchNixtoons2-Source-Location-QA.apk')
+          with ZipFile(app) as signed:
+              for component in Path('stage').glob('*.zip'):
+                  with ZipFile(component) as zipfile:
+                      for name in zipfile.namelist():
+                          if not name.endswith('/'):
+                              assert zipfile.read(name)==signed.read('assets/addons/'+name),(component,name)
+          print('PASS component ZIP bytes identical to final signed APK')
+          PY
+          rm -f stage/.original-infinity.jks stage/unsigned-2103404.apk stage/.aligned.apk
+          (cd stage && sha256sum *.apk *.zip > SHA256SUMS)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-2103404-WATCHNIXTOONS2-SOURCE-LOCATION-SIGNED-QA
+          path: |
+            stage/*.apk
+            stage/*.zip
+            stage/*RECEIPT.json
+            stage/SHA256SUMS
+            stage/*SIGNATURE.txt
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: Infinity-2103404-SOURCE-LOCATION-QA-FAILURE
+          path: |
+            stage/*RECEIPT.json
+            stage/*SIGNATURE.txt
+          retention-days: 30
+          if-no-files-found: warn
