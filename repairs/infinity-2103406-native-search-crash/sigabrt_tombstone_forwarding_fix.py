@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import struct
 from pathlib import Path
 
 SOURCE_REL = "repairs/infinity-2103402-final/native-overlay/infinity_crash_recorder.c"
@@ -53,11 +54,43 @@ def apply(source: bytes) -> bytes:
 ARCHIVED_SOURCE_B64_GIT_SHA1 = "0ab710a2102f1cc143119068502dfbc0df82f8f6"
 INSTALLED_RECORDER_BINARY_SHA256 = "bc7aab86fc97844e02e25c96fc73f269bc85f5f8ce5528e132a78841aa130bca"
 
+MATCHED_BINARY_MASKED_BUILD_ID_SHA256 = "192d0a41f6678301c27756112dd627a2e38973ce3fd923fd0279b34ea728ce7d"
+
+def normalized_elf_build_id(binary: bytes) -> bytes:
+    """Ignore exactly the 20-byte non-runtime GNU Build ID, nothing else."""
+    if (binary[:4] != b"\x7fELF" or binary[4:6] != b"\x02\x01" or
+            binary[18:20] != b"\xb7\x00"):
+        raise RuntimeError("Expected ELF64 ARM64 recorder")
+    value=bytearray(binary)
+    shoff=struct.unpack_from("<Q",value,0x28)[0]
+    entsize,count,strings=struct.unpack_from("<HHH",value,0x3a)
+    if entsize != 64 or not (0 <= strings < count) or shoff+entsize*count>len(value):
+        raise RuntimeError("Invalid ELF section-header inventory")
+    headers=[struct.unpack_from("<IIQQQQIIQQ",value,shoff+i*entsize) for i in range(count)]
+    stringsec=headers[strings]
+    names=value[stringsec[4]:stringsec[4]+stringsec[5]]
+    matches=[]
+    for section in headers:
+        if section[0] >= len(names):continue
+        label=names[section[0]:names.find(b"\x00",section[0])]
+        if label == b".note.gnu.build-id":
+            at, length=section[4],section[5]
+            if length != 36 or at+36>len(value):
+                raise RuntimeError("Unexpected Build ID note format")
+            if struct.unpack_from("<III",value,at)!=(4,20,3) or value[at+12:at+16]!=b"GNU\x00":
+                raise RuntimeError("Build ID note is not a canonical GNU SHA-1 note")
+            matches.append((at+16,at+36))
+    if len(matches)!=1:
+        raise RuntimeError("Expected exactly one canonical Build ID note")
+    start,end=matches[0]
+    value[start:end]=b"\x00"*20
+    return bytes(value)
+
 def apply_reproduced_archived_source(source: bytes, archive_git_sha: str,
-                                   recompiled_binary_sha256: str) -> bytes:
+                                   recompiled_binary: bytes) -> bytes:
     if archive_git_sha != ARCHIVED_SOURCE_B64_GIT_SHA1:
         raise RuntimeError("Archived recorder input is not the reviewed original source archive")
-    if recompiled_binary_sha256 != INSTALLED_RECORDER_BINARY_SHA256:
+    if hashlib.sha256(normalized_elf_build_id(recompiled_binary)).hexdigest() != MATCHED_BINARY_MASKED_BUILD_ID_SHA256:
         raise RuntimeError("Original archived source did not reproduce signed 2103405 recorder")
     old, new = BEFORE.encode("ascii"), AFTER.encode("ascii")
     if source.count(old) != 1:
