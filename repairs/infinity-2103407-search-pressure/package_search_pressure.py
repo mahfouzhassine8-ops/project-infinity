@@ -270,11 +270,15 @@ def stage(args):
         old=args.input/source_name
         destination=args.output/TARGET_COMPONENTS[prefix]
         require(old.is_file(),"Missing exact component ZIP "+str(old))
-        require(prefix!=SKIN or hash_file(old)=="f45db8f57f0342a20fed240643966883a2f32894cb53d7b797980190b345b9f",
+        require(prefix!=SKIN or hash_file(old)=="0adfed89f1d5384a3fa3a023152c7c2a094ef2edb6dd60129f336fe3b7cb9ef9",
                 "Original unchanged skin SHA mismatch")
         changes={n[len(PREFIX):]:value for n,value in changed.items()
                  if n.startswith(PREFIX+prefix)}
-        write_archive(old,destination,changes)
+        if prefix==SKIN:
+            require(not changes,"Protected skin must not have edits")
+            shutil.copyfile(old,destination)
+        else:
+            write_archive(old,destination,changes)
     differences=compare_parent(parent,unsigned,args.output)
     receipt={
       "release_versionCode":2103407,
