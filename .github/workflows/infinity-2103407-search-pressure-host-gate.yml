@@ -1,0 +1,97 @@
+name: Infinity 2103407 signed-Search overload reproduction and guarded host verification
+on:
+  push:
+    branches: [work/infinity-2103407-search-overload-single-flight-20261025]
+    paths:
+      - "repairs/infinity-2103407-search-pressure/**"
+      - ".github/workflows/infinity-2103407-search-pressure-host-gate.yml"
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-2103407-search-pressure-host-gate
+  cancel-in-progress: false
+jobs:
+  search-pressure:
+    name: Signed Search overload reproduction, single-flight correctness, Cobra source preservation
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Exact source scope and Cobra protection
+        run: |
+          set -euo pipefail
+          git diff --name-only a84c2b7752d29c200dbd573b19ca065ec0574c46 HEAD | tee /tmp/scope
+          if grep -v -E '^(repairs/infinity-2103407-search-pressure/|\.github/workflows/infinity-2103407-search-pressure-host-gate\.yml$)' /tmp/scope; then
+            echo "Unrelated project source changed, refusing tests" >&2
+            exit 1
+          fi
+          if grep -i cobra /tmp/scope; then exit 1; fi
+          echo "PASS: no Cobra, skin, WatchNixtoons2, shutdown or native code changes"
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40191243446
+          name: Infinity-2103406-SIGABRT-RECORDER-ORIGINAL-SIGNER-QA
+          github-token: ${{ github.token }}
+          path: input
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11.7"
+      - name: Verify signed 2103406 artifact and recover the shipped Search Python module
+        run: |
+          set -euo pipefail
+          (cd input && sha256sum -c SHA256SUMS)
+          mkdir -p stage/signed-search stage/patched
+          python3 - <<'PY'
+          from zipfile import ZipFile
+          from pathlib import Path
+          import hashlib
+          file=Path('input/Infinity-2103406-SIGABRT-Crash-Recorder-QA.apk')
+          with ZipFile(file) as apk:
+              path='assets/addons/script.infinity.commandcenter/infinity_search.py'
+              before=apk.read(path)
+          wanted='a5640a725d07440e914fd5f8d83a29196ea9cbb1104686f1929b5140040b2c44'
+          assert hashlib.sha256(before).hexdigest()==wanted
+          (Path('stage/signed-search')/'infinity_search.py').write_bytes(before)
+          print('PASS: exact source from signed 2103406 APK, not stale repository overlay')
+          PY
+      - name: Apply only bounded Search pressure fix, verify exact reviewed source hash
+        run: |
+          set -euo pipefail
+          python3 repairs/infinity-2103407-search-pressure/patch_search_pressure.py \
+            stage/signed-search/infinity_search.py stage/patched/infinity_search.py
+          echo 'bb6e8791ca7644ca9d370b5871d69ded71790557069b56535e920baa6cf50531  stage/patched/infinity_search.py' | sha256sum -c -
+          python3 -m py_compile stage/patched/infinity_search.py
+      - name: Reproduce signed Search overload and verify all seven single-flight/retirement checks
+        env:
+          SIGNED_SEARCH: stage/signed-search/infinity_search.py
+          PATCHED_SEARCH: stage/patched/infinity_search.py
+        run: |
+          set -euo pipefail
+          python3 -m unittest -v repairs/infinity-2103407-search-pressure/test_search_pressure.py |& tee stage/SEARCH-PRESSURE-HOST-TESTS.txt
+      - name: Preserve honest verification gate; no premature signed APK
+        run: |
+          cat > stage/ACCEPTANCE-STATUS.txt <<'EOF'
+          Infinity 2103407 — Search pressure
+          Signed 2103406 Search overload reproduced: YES (two concurrent RPC workers across separate invokers)
+          Patched process-wide admission: host tests PASSED
+          Cancellations sent once, no orphan worker or lockfile: host tests PASSED
+          Search/Android 17 device integration: NOT RUN
+          Native SIGSEGV root cause proven: NO
+          Signed 2103407 install-over APK: NOT PRODUCED
+          Cobra, WatchNixtoons2, Essential-First shutdown: SOURCE UNCHANGED
+          The test source is a candidate, not an accepted crash fix.
+          EOF
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-2103407-SEARCH-PRESSURE-HOST-EVIDENCE-NOT-APK
+          path: |
+            stage/ACCEPTANCE-STATUS.txt
+            stage/SEARCH-PRESSURE-HOST-TESTS.txt
+          retention-days: 30
+          if-no-files-found: error
