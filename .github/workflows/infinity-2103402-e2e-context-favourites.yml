@@ -1,0 +1,247 @@
+name: Infinity 2103402 protected Continue and context menus QA
+on:
+  push:
+    branches: [work/infinity-2103402-resume-otaku-nixtoons-favorites-20261024]
+    paths:
+      - ".github/workflows/infinity-2103402-e2e-context-favourites.yml"
+      - "repairs/infinity-2103402-final/qa_component_holds.py"
+      - "repairs/infinity-2103402-final/qa_native_favourites.py"
+      - "repairs/infinity-2103402-final/qa_package_e2e.py"
+      - "repairs/infinity-2103402-final/test_qa_context.py"
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-2103402-context-favourites
+  cancel-in-progress: false
+
+jobs:
+  build-and-sign:
+    name: Recompile verified ARM64 native and package protected 2103402 QA
+    runs-on: ubuntu-22.04
+    timeout-minutes: 420
+    env:
+      NDK_VER: "21.4.7075529"
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-build
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          show-progress: false
+      - name: Reject source changes outside four exact native owner correction adapters
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import subprocess
+          parent="a9e51a8e36b92a4f8d520c58a02f17ba46b2fe91"
+          paths=subprocess.check_output(['git','diff','--name-only',parent,'HEAD'],text=True).splitlines()
+          whitelist={
+            'repairs/infinity-2103402-final/qa_component_holds.py',
+            'repairs/infinity-2103402-final/qa_native_favourites.py',
+            'repairs/infinity-2103402-final/qa_package_e2e.py',
+            'repairs/infinity-2103402-final/test_qa_context.py',
+            '.github/workflows/infinity-2103402-e2e-context-favourites.yml',
+          }
+          assert paths and set(paths)<=whitelist, ('Unapproved change',paths)
+          assert not any('cobra' in p.lower() for p in paths),paths
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40089463702
+          name: Infinity-Saved-Navigation-MultiImage-INTERNAL-QA-NOT-ACCEPTED
+          github-token: ${{ github.token }}
+          path: protected-2103401
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40144024130
+          name: Infinity-2103402-FUNCTIONAL-UI-QA-SIGNED-UNVERIFIED-ON-FOLD
+          github-token: ${{ github.token }}
+          path: signed-2103402-qa
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40153625864
+          name: Infinity-2103402-03535-MATCHED-SIGNED-FAST-QA
+          github-token: ${{ github.token }}
+          path: input
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 38132105717
+          name: Infinity-2103367-Verified-Compiler-Dependencies
+          github-token: ${{ github.token }}
+          path: dependency-transfer
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11.7"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: "platform-tools build-tools;35.0.0 platforms;android-34"
+          log-accepted-android-sdk-licenses: false
+      - name: Verify exact accepted source and user-tested QA components before native compilation
+        run: |
+          set -euo pipefail
+          (cd protected-2103401 && sha256sum -c SHA256SUMS)
+          (cd signed-2103402-qa && sha256sum -c SHA256SUMS)
+          echo "bc55f659aadf2a806297abdd6104ddd362906179e96b9c2b391eee8556a4f0a8  protected-2103401/Infinity-Targeted-Source-and-Evidence.zip" | sha256sum -c
+          echo "df545f4b03e56a9b212c9a7cf34a900fe594b153b8ee2b655dff6fd84195c801  protected-2103401/NATIVE-SOURCE-MAP.json" | sha256sum -c
+          python3 repairs/infinity-2103402-final/native_ownership_qa.py \
+            --source protected-2103401/Infinity-Targeted-Source-and-Evidence.zip \
+            --map protected-2103401/NATIVE-SOURCE-MAP.json \
+            --baseline protected-2103401/Infinity-2103401-Universal-Performance-QA.apk \
+            --qa signed-2103402-qa/Infinity-2103402-Functional-Corrective-QA.apk \
+            --out native-owner-overlay
+          python3 repairs/infinity-2103402-final/restore_reviewed_engine.py \
+            --source protected-2103401/Infinity-Targeted-Source-and-Evidence.zip \
+            --map protected-2103401/NATIVE-SOURCE-MAP.json \
+            --receipt protected-2103401/SOURCE-DELTA.json \
+            --overlay native-owner-overlay \
+            --target kodi \
+            --out native-owner-build
+          (cd input && sha256sum -c SHA256SUMS)
+          python3 repairs/infinity-2103402-final/qa_component_holds.py \
+            --apk input/Infinity-2103402-CommandCenter-03535-Matched-QA.apk \
+            --output component-overlay
+          (cd repairs/infinity-2103402-final && \
+            INFINITY_BASELINE_APK="$GITHUB_WORKSPACE/input/Infinity-2103402-CommandCenter-03535-Matched-QA.apk" \
+            python3 -m unittest -v test_qa_context)
+          python3 repairs/infinity-2103402-final/qa_native_favourites.py \
+            --native kodi \
+            --map native-owner-build/NATIVE-SOURCE-MAP.json \
+            --apk input/Infinity-2103402-CommandCenter-03535-Matched-QA.apk \
+            --context component-overlay/script.infinity.commandcenter/context.py \
+            --out favourites-owner-evidence
+          python3 - <<'PY'
+          import hashlib,json,pathlib
+          source=pathlib.Path('kodi')
+          expected=json.loads(pathlib.Path('native-owner-build/NATIVE-SOURCE-MAP.json').read_text())
+          assert len(expected)==9407
+          actual={str(p.relative_to(source)):hashlib.sha256(p.read_bytes()).hexdigest()
+                  for p in source.rglob('*') if p.is_file()}
+          assert actual==expected,'Source/Cobra inventory changed beyond six total native members'
+          receipt=json.loads(pathlib.Path('favourites-owner-evidence/FAVOURITES-NATIVE-RECEIPT.json').read_text())
+          assert len(receipt['changed_native_sources'])==4
+          print('PASS: all 9407 source fingerprints, native owner contracts, and Favorites scope')
+          PY
+      - name: Restore same verified compiler dependency foundation as successful 2103401
+        run: |
+          set -euo pipefail
+          sudo apt-get -o Acquire::Retries=3 update -qq
+          sudo apt-get install -y python3-yaml python3-dev libsqlite3-dev libssl-dev libffi-dev
+          (cd dependency-transfer && sha256sum -c SHA256SUMS)
+          tar --no-same-owner -xf dependency-transfer/verified-android-dependencies.tar
+          tar --no-same-owner -xf dependency-transfer/verified-compiler-cache.tar -C "$HOME"
+      - uses: actions/cache@v4
+        with:
+          path: /usr/local/lib/android/sdk/ndk/21.4.7075529
+          key: infinity-pinned-ndk-linux-21.4.7075529-v1
+      - run: bash repairs/android-checkpoint-shutdown/install_ndk.sh
+      - name: Compile exact 9407 ARM64 sources including Home favourites interception
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import importlib.util,os,pathlib,sys
+          root=pathlib.Path.cwd()
+          suite=root/'repairs/universal-persistence-2103401'
+          sys.path.insert(0,str(suite))
+          spec=importlib.util.spec_from_file_location('existing_verified_native_producer',suite/'build.py')
+          producer=importlib.util.module_from_spec(spec)
+          spec.loader.exec_module(producer)
+          producer.OUT=root/'native-owner-build'
+          result=producer.compile_engine()
+          assert result['complete_native_engine_compiled'] is True
+          assert result['reviewed_file_count']==9407
+          print('Verified original ARM64 producer compiled modified ownership source:',result['native_sha256'])
+          PY
+      - name: Preserve completed ARM64 engine before packaging and signing
+        uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-2103402-REUSABLE-ARM64-Context-Favourites-Engine
+          path: |
+            native-owner-build/libkodi.so
+            native-owner-build/ENGINE-PROOF.json
+            native-owner-build/NATIVE-SOURCE-MAP.json
+            favourites-owner-evidence/FAVOURITES-NATIVE-RECEIPT.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Package only matching native engine and three component source files
+        run: |
+          set -euo pipefail
+          python3 repairs/infinity-2103402-final/qa_package_e2e.py stage \
+            --input input --native native-owner-build/libkodi.so --out package-e2e
+      - name: Sign permanently with original certificate; verify scoped contents
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          : "${INFINITY_KEYSTORE_B64:?Original key required}"
+          : "${INFINITY_STORE_PASSWORD:?Original store password required}"
+          : "${INFINITY_KEY_PASSWORD:?Original key password required}"
+          : "${INFINITY_KEY_ALIAS:?Original alias required}"
+          printf '%s' "$INFINITY_KEYSTORE_B64" | base64 -d > package-e2e/.release-key.jks
+          chmod 600 package-e2e/.release-key.jks
+          SDK="$ANDROID_HOME/build-tools/35.0.0"
+          "$SDK/zipalign" -P 16 -f 4 package-e2e/unsigned-2103402.apk package-e2e/aligned-2103402.apk
+          "$SDK/apksigner" sign --ks package-e2e/.release-key.jks \
+            --ks-key-alias "$INFINITY_KEY_ALIAS" \
+            --ks-pass env:INFINITY_STORE_PASSWORD \
+            --key-pass env:INFINITY_KEY_PASSWORD \
+            --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true \
+            --out package-e2e/Infinity-2103402-Continue-Context-Favourites-QA.apk \
+            package-e2e/aligned-2103402.apk
+          "$SDK/apksigner" verify --verbose --print-certs input/Infinity-2103402-CommandCenter-03535-Matched-QA.apk \
+            > package-e2e/PARENT-SIGNATURE.txt
+          "$SDK/apksigner" verify --verbose --print-certs package-e2e/Infinity-2103402-Continue-Context-Favourites-QA.apk \
+            > package-e2e/FINAL-SIGNATURE.txt
+          python3 - <<'PY'
+          import re,pathlib
+          root=pathlib.Path('package-e2e')
+          rx=re.compile(r'Signer #1 certificate SHA-256 digest:\s*([0-9a-fA-F]{64})')
+          def owner(file):
+              m=rx.search((root/file).read_text())
+              if not m:raise ValueError('No certificate fingerprint')
+              return m.group(1).lower()
+          expected='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
+          assert owner('PARENT-SIGNATURE.txt')==owner('FINAL-SIGNATURE.txt')==expected
+          print('PASS: unchanged original signing certificate')
+          PY
+          "$SDK/aapt" dump badging package-e2e/Infinity-2103402-Continue-Context-Favourites-QA.apk |
+            grep -E "^package: name='com.projectinfinity.kodi' versionCode='2103402'"
+          python3 repairs/infinity-2103402-final/qa_package_e2e.py verify \
+            --input input --signed package-e2e/Infinity-2103402-Continue-Context-Favourites-QA.apk
+          rm -f package-e2e/.release-key.jks package-e2e/unsigned-2103402.apk package-e2e/aligned-2103402.apk
+          (cd package-e2e && sha256sum *.apk *.zip > SHA256SUMS)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-2103402-CONTINUE-OTAKU-NIXTOONS-FAVOURITES-SIGNED-QA
+          path: |
+            package-e2e/*.apk
+            package-e2e/*.zip
+            package-e2e/*.json
+            package-e2e/*.txt
+            package-e2e/SHA256SUMS
+            native-owner-build/ENGINE-PROOF.json
+            favourites-owner-evidence/FAVOURITES-NATIVE-RECEIPT.json
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: Infinity-2103402-E2E-Build-Failure-Evidence
+          path: |
+            native-owner-build/*.json
+            favourites-owner-evidence/*.json
+            component-overlay/RECEIPT.json
+            package-e2e/*.json
+            kodi-build/CMakeCache.txt
+          retention-days: 30
+          if-no-files-found: warn
