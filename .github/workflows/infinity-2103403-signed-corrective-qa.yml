@@ -1,0 +1,160 @@
+name: Infinity 2103403 signed tracking and Search QA
+on:
+  push:
+    branches: [work/infinity-2103403-nixtoons-route-link-search-crash-20261025]
+    paths:
+      - "repairs/infinity-2103403-corrective/**"
+      - ".github/workflows/infinity-2103403-signed-corrective-qa.yml"
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-2103403-signed-qa
+  cancel-in-progress: false
+jobs:
+  signed-qa:
+    name: Source guard, host checks, exact APK delta, original signing certificate
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Enforce Cobra-free 2103403 source scope
+        run: |
+          set -euo pipefail
+          git diff --name-only d18be1893beca4c487583d9bd59f2db05383b0ba HEAD | tee /tmp/changed
+          if grep -v -E '^(repairs/infinity-2103403-corrective/|\.github/workflows/infinity-2103403-(tracking-host-gate|signed-corrective-qa)\.yml$)' /tmp/changed; then exit 1; fi
+          if grep -i cobra /tmp/changed; then exit 1; fi
+          echo "PASS: Cobra and unrelated 2103402 sources untouched"
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40167419559
+          name: Infinity-2103402-WATCHNIXTOONS2-ONLY-SIGNED-MATCHED-QA
+          github-token: ${{ github.token }}
+          path: input/raw
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11.7"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: "platform-tools build-tools;35.0.0 platforms;android-34"
+          log-accepted-android-sdk-licenses: false
+      - name: Verify parent SHA256 and recover exact signed Command Center
+        run: |
+          set -euo pipefail
+          (cd input/raw && sha256sum -c SHA256SUMS)
+          mkdir -p input/cc
+          python3 - <<'PY'
+          from zipfile import ZipFile
+          from pathlib import Path
+          with ZipFile('input/raw/Infinity-2103402-WatchNixtoons2-Universal-Trakt-QA.apk') as z:
+              for name in ('context.py','infinity_search.py','plugin.py','resume_hub.py','addon.xml'):
+                  (Path('input/cc')/name).write_bytes(z.read('assets/addons/script.infinity.commandcenter/'+name))
+          PY
+      - name: Patch only verified identity binding and Search lifetimes
+        run: |
+          set -euo pipefail
+          python3 repairs/infinity-2103403-corrective/hotfix_2103403.py input/cc/context.py patch-work/patched/context.py
+          python3 repairs/infinity-2103403-corrective/search_hardening.py input/cc/infinity_search.py patch-work/patched/infinity_search.py
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib
+          old=Path('input/cc/addon.xml').read_bytes()
+          a=b'version="0.3.5.35"';b=b'version="0.3.5.36"'
+          assert old.count(a)==1 and len(a)==len(b)
+          changed=old.replace(a,b,1)
+          assert hashlib.sha256(changed).hexdigest()=='1b0b2ae9da31cd4772463799d4a3d44d0fce0639ef514221d506f25d09efc10b'
+          Path('patch-work/patched/addon.xml').write_bytes(changed)
+          PY
+      - name: Seven tracking identity-link tests
+        env:
+          PATCHED_CONTEXT: patch-work/patched/context.py
+        run: python3 -m unittest -v repairs/infinity-2103403-corrective/test_link_flow.py
+      - name: Five real Resume Hub tracking mutations
+        env:
+          CC_ROOT: input/cc
+        run: python3 repairs/infinity-2103403-corrective/test_real_tracking_mutations.py
+      - name: Connected WatchNixtoons2 context-to-persistence tests
+        env:
+          CC_ROOT: input/cc
+          PATCHED_CONTEXT: patch-work/patched/context.py
+        run: python3 repairs/infinity-2103403-corrective/test_connected_dispatch.py
+      - name: Five Search cancellation and native keyboard lifecycle tests
+        env:
+          PATCHED_SEARCH: patch-work/patched/infinity_search.py
+        run: python3 -m unittest -v repairs/infinity-2103403-corrective/test_search_hardening.py
+      - name: Repack nine-member QA from exact original native ARM64 binary
+        run: |
+          set -euo pipefail
+          python3 repairs/infinity-2103403-corrective/package_2103403.py stage --input input/raw --patched patch-work/patched --output stage
+      - name: Sign original release key, verify signer, manifest and matching ZIPs
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          test -n "$INFINITY_KEYSTORE_B64"
+          test -n "$INFINITY_STORE_PASSWORD"
+          test -n "$INFINITY_KEY_PASSWORD"
+          test -n "$INFINITY_KEY_ALIAS"
+          printf '%s' "$INFINITY_KEYSTORE_B64" | base64 -d > stage/.release-key.jks
+          chmod 600 stage/.release-key.jks
+          SDK="$ANDROID_HOME/build-tools/35.0.0"
+          "$SDK/zipalign" -P 16 -f 4 stage/unsigned-nixtoons.apk stage/.aligned.apk
+          "$SDK/apksigner" sign --ks stage/.release-key.jks \
+            --ks-key-alias "$INFINITY_KEY_ALIAS" --ks-pass env:INFINITY_STORE_PASSWORD \
+            --key-pass env:INFINITY_KEY_PASSWORD \
+            --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true \
+            --out stage/Infinity-2103403-Tracking-Search-Stabilization-QA.apk stage/.aligned.apk
+          "$SDK/apksigner" verify --verbose --print-certs \
+            input/raw/Infinity-2103402-WatchNixtoons2-Universal-Trakt-QA.apk > stage/PARENT-SIGNATURE.txt
+          "$SDK/apksigner" verify --verbose --print-certs \
+            stage/Infinity-2103403-Tracking-Search-Stabilization-QA.apk > stage/NEW-SIGNATURE.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          pat=re.compile(r'Signer #1 certificate SHA-256 digest:\s*([0-9a-fA-F]{64})')
+          def signer(path):
+              m=pat.search(Path(path).read_text())
+              assert m, 'No signer in '+path
+              return m.group(1).lower()
+          expected='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
+          assert signer('stage/PARENT-SIGNATURE.txt')==signer('stage/NEW-SIGNATURE.txt')==expected
+          print('PASS: original Infinity permanent signing certificate retained')
+          PY
+          "$SDK/aapt" dump badging stage/Infinity-2103403-Tracking-Search-Stabilization-QA.apk |
+            grep -E "^package: name='com.projectinfinity.kodi' versionCode='2103403'"
+          python3 repairs/infinity-2103403-corrective/package_2103403.py verify \
+            --input input/raw --output stage --signed stage/Infinity-2103403-Tracking-Search-Stabilization-QA.apk
+          rm -f stage/.release-key.jks stage/unsigned-nixtoons.apk stage/.aligned.apk
+          (cd stage && sha256sum *.apk *.zip > SHA256SUMS)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-2103403-SIGNED-MATCHED-TRACKING-SEARCH-QA
+          path: |
+            stage/*.apk
+            stage/*.zip
+            stage/*RECEIPT.json
+            stage/SHA256SUMS
+            stage/*SIGNATURE.txt
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: Infinity-2103403-GATE-FAILURE
+          path: |
+            stage/*RECEIPT.json
+            stage/*SIGNATURE.txt
+          retention-days: 30
+          if-no-files-found: warn
