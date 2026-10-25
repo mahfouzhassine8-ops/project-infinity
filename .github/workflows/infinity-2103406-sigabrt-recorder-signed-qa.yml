@@ -1,0 +1,194 @@
+name: Infinity 2103406 SIGABRT crash recorder ownership signed QA
+on:
+  push:
+    branches: [work/infinity-2103406-native-search-crash-correction-20261025]
+    paths:
+      - "repairs/infinity-2103406-native-search-crash/**"
+      - ".github/workflows/infinity-2103406-sigabrt-recorder-signed-qa.yml"
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-2103406-sigabrt-recorder-signed-qa
+  cancel-in-progress: false
+jobs:
+  signed-recorder:
+    name: Recorder ownership test, exact two-member APK, original permanent signature
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+      NDK_VERSION: 21.4.7075529
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Guard 2103405 baseline; only crash recorder files may change
+        run: |
+          set -euo pipefail
+          git diff --name-only d15d1c7745d3ffe85ba03b5cf81b9cb49d75aaca HEAD | tee /tmp/diff.txt
+          if grep -v -E '^(repairs/infinity-2103406-native-search-crash/|\.github/workflows/infinity-2103406-sigabrt-recorder-signed-qa\.yml$)' /tmp/diff.txt; then
+            echo 'FATAL: change outside recorder scope' >&2
+            exit 1
+          fi
+          if grep -i cobra /tmp/diff.txt; then
+            echo 'FATAL: Cobra touched' >&2
+            exit 1
+          fi
+          echo 'PASS: code scope, Cobra, skin, Search, WatchNixtoons2 and shutdown untouched'
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40184543219
+          name: Infinity-2103405-WATCHNIXTOONS2-INFINITY-TRACKED-SIGNED-QA
+          github-token: ${{ github.token }}
+          path: input
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11.7"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: "platform-tools build-tools;35.0.0 platforms;android-34"
+          log-accepted-android-sdk-licenses: false
+      - name: Verify permanent signed 2103405 parent and original installed crash-recorder identity
+        run: |
+          set -euo pipefail
+          (cd input && sha256sum -c SHA256SUMS)
+          mkdir -p native-stage
+          python3 - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile
+          import hashlib
+          parent=Path('input/Infinity-2103405-WatchNixtoons2-Infinity-Tracked-Context-QA.apk')
+          assert hashlib.sha256(parent.read_bytes()).hexdigest()=='22414799b39cb5ea7ace1085f5d8b0e313654b07979884585b183faffdd066c9'
+          with ZipFile(parent) as archive:
+              recorder=archive.read('lib/arm64-v8a/libinfinitycrash.so')
+              assert hashlib.sha256(recorder).hexdigest()=='bc7aab86fc97844e02e25c96fc73f269bc85f5f8ce5528e132a78841aa130bca'
+              Path('native-stage/parent-libinfinitycrash.so').write_bytes(recorder)
+          PY
+          readelf -n native-stage/parent-libinfinitycrash.so | tee native-stage/parent-build-id.txt
+          grep -Fiq 'Build ID: 030b7fecb9bfdd816047454dd76f8438dca92479' native-stage/parent-build-id.txt
+          echo 'PASS: exact installed 2103405 recorder and original tombstone Build ID'
+      - name: Source-specific signal tests and compile direct native signal table
+        run: |
+          set -euo pipefail
+          python3 -m unittest -v repairs/infinity-2103406-native-search-crash/test_sigabrt_recorder.py
+          python3 repairs/infinity-2103406-native-search-crash/sigabrt_tombstone_forwarding_fix.py \
+            repairs/infinity-2103402-final/native-overlay/infinity_crash_recorder.c \
+            native-stage/infinity_crash_recorder.c
+      - name: Install pinned native Android ARM64 compiler
+        run: |
+          set -euo pipefail
+          sdkmanager "ndk;$NDK_VERSION" >/dev/null
+          test -x "$ANDROID_HOME/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang"
+      - name: Compile exact baseline recorder for provenance and the SIGABRT-corrected companion
+        run: |
+          set -euo pipefail
+          TOOLCHAIN="$ANDROID_HOME/ndk/$NDK_VERSION/toolchains/llvm/prebuilt/linux-x86_64/bin"
+          CC="$TOOLCHAIN/aarch64-linux-android21-clang"
+          SOURCE="repairs/infinity-2103402-final/native-overlay/infinity_crash_recorder.c"
+          FLAGS="-shared -fPIC -O2 -fvisibility=hidden -fno-omit-frame-pointer -pthread -Wl,--build-id=sha1"
+          "$CC" $FLAGS "$SOURCE" -o native-stage/reference-recompiled.so
+          "$CC" $FLAGS native-stage/infinity_crash_recorder.c -o native-stage/libinfinitycrash.so
+          sha256sum native-stage/parent-libinfinitycrash.so native-stage/reference-recompiled.so native-stage/libinfinitycrash.so
+          readelf -n native-stage/reference-recompiled.so > native-stage/reference-build-id.txt
+          readelf -n native-stage/libinfinitycrash.so > native-stage/new-build-id.txt
+          readelf -Ws native-stage/libinfinitycrash.so > native-stage/new-symbols.txt
+          grep -Fq 'infinity_crash_recorder_install' native-stage/new-symbols.txt
+          grep -Fq 'Build ID:' native-stage/new-build-id.txt
+          if cmp -s native-stage/parent-libinfinitycrash.so native-stage/libinfinitycrash.so; then
+            echo 'FATAL: unchanged recorder binary' >&2
+            exit 1
+          fi
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          def build_id(f):
+              m=re.search(r'Build ID:\s*([a-fA-F0-9]+)', Path(f).read_text())
+              assert m,f
+              return m.group(1).lower()
+          expected='030b7fecb9bfdd816047454dd76f8438dca92479'
+          old=build_id('native-stage/reference-build-id.txt')
+          new=build_id('native-stage/new-build-id.txt')
+          if old != expected:
+              raise RuntimeError('Pinned source/compiler do not reproduce installed original Build ID; cannot trust rebuild provenance: '+old)
+          assert new!=old,'Corrected recorder Build ID must change'
+          print('PASS: exact previous source/recompiled Build ID matches installed; new recorder unique')
+          PY
+      - name: Build exact two-member install-over APK and preserve all original addon ZIPs
+        run: |
+          set -euo pipefail
+          python3 repairs/infinity-2103406-native-search-crash/package_sigabrt_2103406.py stage \
+            --input input --compiled native-stage/libinfinitycrash.so --output stage
+          python3 repairs/infinity-2103406-native-search-crash/package_sigabrt_2103406.py verify \
+            --input input --signed stage/unsigned-2103406.apk --output stage
+      - name: Sign using original Infinity release certificate and verify version/diff and components
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          test -n "$INFINITY_KEYSTORE_B64"
+          test -n "$INFINITY_STORE_PASSWORD"
+          test -n "$INFINITY_KEY_PASSWORD"
+          test -n "$INFINITY_KEY_ALIAS"
+          printf '%s' "$INFINITY_KEYSTORE_B64" | base64 -d > stage/.key.jks
+          chmod 600 stage/.key.jks
+          SDK="$ANDROID_HOME/build-tools/35.0.0"
+          "$SDK/zipalign" -P 16 -f 4 stage/unsigned-2103406.apk stage/.aligned.apk
+          "$SDK/apksigner" sign --ks stage/.key.jks \
+            --ks-key-alias "$INFINITY_KEY_ALIAS" \
+            --ks-pass env:INFINITY_STORE_PASSWORD --key-pass env:INFINITY_KEY_PASSWORD \
+            --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true \
+            --out stage/Infinity-2103406-SIGABRT-Crash-Recorder-QA.apk stage/.aligned.apk
+          "$SDK/apksigner" verify --verbose --print-certs \
+            input/Infinity-2103405-WatchNixtoons2-Infinity-Tracked-Context-QA.apk > stage/PARENT-SIGNATURE.txt
+          "$SDK/apksigner" verify --verbose --print-certs \
+            stage/Infinity-2103406-SIGABRT-Crash-Recorder-QA.apk > stage/NEW-SIGNATURE.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          pat=re.compile(r'Signer #1 certificate SHA-256 digest:\s*([0-9a-fA-F]{64})')
+          def signer(path):
+              m=pat.search(Path(path).read_text())
+              assert m,path
+              return m.group(1).lower()
+          expected='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
+          assert signer('stage/PARENT-SIGNATURE.txt')==signer('stage/NEW-SIGNATURE.txt')==expected
+          print('PASS: exact original Infinity permanent signing certificate')
+          PY
+          "$SDK/aapt" dump badging stage/Infinity-2103406-SIGABRT-Crash-Recorder-QA.apk |
+            grep -E "^package: name='com.projectinfinity.kodi' versionCode='2103406'"
+          python3 repairs/infinity-2103406-native-search-crash/package_sigabrt_2103406.py verify \
+            --input input --signed stage/Infinity-2103406-SIGABRT-Crash-Recorder-QA.apk --output stage
+          rm -f stage/.key.jks stage/.aligned.apk stage/unsigned-2103406.apk
+          (cd stage && sha256sum *.apk *.zip > SHA256SUMS)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-2103406-SIGABRT-RECORDER-ORIGINAL-SIGNER-QA
+          path: |
+            stage/*.apk
+            stage/*.zip
+            stage/*RECEIPT.json
+            stage/SHA256SUMS
+            stage/*SIGNATURE.txt
+            native-stage/*build-id.txt
+            native-stage/new-symbols.txt
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: Infinity-2103406-RECORDER-GATE-FAILURE
+          path: |
+            native-stage/*build-id.txt
+            native-stage/new-symbols.txt
+            stage/*RECEIPT.json
+          retention-days: 30
+          if-no-files-found: warn
