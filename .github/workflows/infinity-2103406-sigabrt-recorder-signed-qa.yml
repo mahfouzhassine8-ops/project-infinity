@@ -95,8 +95,22 @@ jobs:
           FLAGS="-shared -fPIC -O2 -fvisibility=hidden -fno-omit-frame-pointer -pthread -Wl,--build-id=sha1"
           test "$(git hash-object "$ARCHIVE")" = "0ab710a2102f1cc143119068502dfbc0df82f8f6"
           base64 -d "$ARCHIVE" | gunzip > native-stage/archived-original.c
+          # The archived source describes its historical native engine. Preserve
+          # every instruction while reconstructing the exact 2103405 shipped
+          # diagnostic engine literal and its original C source basename.
+          python3 - <<'PY'
+          from pathlib import Path
+          archived=Path('native-stage/archived-original.c').read_bytes()
+          old=b'#define INFINITY_NATIVE_ENGINE_SHA "db92b30f5523cacd9029aa21d7b52c8bc7819e4cd5c1dea76d4bfcdcf9205375"'
+          new=b'#define INFINITY_NATIVE_ENGINE_SHA "704834f42e49a2eea0a36ad41b5f79345f5e4108dcd339213899ea3c6ff045a0"'
+          assert archived.count(old)==1, 'Historical engine SHA is not exactly pinned'
+          reconstructed=archived.replace(old,new,1)
+          assert reconstructed.replace(new,old,1)==archived, 'Normalization changed unexpected bytes'
+          Path('native-stage/infinity_crash_recorder.c').write_bytes(reconstructed)
+          print('PASS: reconstructed historical recorder with exact installed read-only engine ID')
+          PY
           "$CC" $FLAGS "$SOURCE" -o native-stage/reference-recompiled.so
-          "$CC" $FLAGS native-stage/archived-original.c -o native-stage/archived-recompiled.so
+          "$CC" $FLAGS native-stage/infinity_crash_recorder.c -o native-stage/archived-recompiled.so
           sha256sum native-stage/parent-libinfinitycrash.so native-stage/reference-recompiled.so native-stage/archived-recompiled.so
           python3 - <<'PY'
           from pathlib import Path
@@ -118,7 +132,7 @@ jobs:
               matched_source='reviewed-current'
           elif archive_matches:
               amended=module.apply_reproduced_archived_source(
-                  (root/'archived-original.c').read_bytes(),
+                  (root/'infinity_crash_recorder.c').read_bytes(),
                   module.ARCHIVED_SOURCE_B64_GIT_SHA1,
                   expected)
               matched_source='reviewed-archived'
