@@ -98,7 +98,7 @@ class Tests(unittest.TestCase):
             getCondVisibility=lambda *a:False)
         def history(*a,**kw):
             events.append('history_written' if kw else 'history_read');return []
-        ns=selected(['_open_search'],dict(xbmc=fake_xbmc,xbmcgui=types.SimpleNamespace(Window=lambda _:Window()),
+        ns=selected(['_open_search'],dict(CC='script.infinity.commandcenter',xbmc=fake_xbmc,xbmcgui=types.SimpleNamespace(Window=lambda _:Window()),
             xbmcaddon=types.SimpleNamespace(Addon=Addon),xbmcvfs=types.SimpleNamespace(translatePath=lambda p:p),
             providers=lambda *a,**kw:([dict(id='plugin.video.seren',name='Seren',contract={})],[]),
             shared_history=history))
