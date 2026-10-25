@@ -26,6 +26,17 @@
 - The installed Health Center Crash Center Export latest incident / diagnostics is explicitly written to export preserved native-maps-* files, if still present. Use its ZIP to correlate exact pid and native ELF.
 - Search SIGSEGV root cause UNPROVEN; no speculative native fix, diagnostic bypass or re-signing as an accepted release.
 
+## Android 17 full bugreport reconciliation — October 25, 03:58 AM
+- User provided the full Android 17 bugreport generated at 03:58:01 EDT, in addition to Infinity-Diagnostics-20261025-021641.zip.
+- Android records ApplicationExitInfo for `com.projectinfinity.kodi:kodi`, pid 20410 at 02:16:30.157 EDT: reason=EXIT_SELF, status=139, trace=null; confirms the same process/incident as the native snapshot at 02:16:29.808.
+- Android IME history records activity in the Infinity Search window at 02:16:21–02:16:25 and its window closing at 02:16:29.821. This is time correlation, NOT proof that the IME triggered the native fault.
+- The bugreport archives 32 plaintext system tombstones; latest is from October 23. NONE is the October 25 02:16 crash; do not symbolicate an older tombstone as this incident.
+- The installed crash recorder's native fatal-signal path contains an unconditional `_exit(128+sig)` fallback after raising/forwarding the fatal signal. EXIT_SELF/status 139 and missing tombstone support a diagnostic forwarding flaw. This remains a hypothesis about recorder behavior, not the root cause of the Search SIGSEGV.
+- The signed 2103402 Health Center Crash Center implementation at `assets/addons/script.kodihealthcenter/khc_kodi.py` offers **Export latest incident / diagnostics**, prompts to **Include optional Android evidence**, and builds a `Kodi_Diagnostics_<timestamp>.zip` containing `native-maps-*` from the app-private `files/infinity-native-diagnostics` folder if present. This is NOT the earlier general `Infinity-Diagnostics-*.zip` exporter.
+- The crash recorder source saves a per-pid `native-maps-20410.txt` at native startup. The Health Center Crash Center export is the preferred read-only evidence recovery path before requesting any further reproduction. It may be missing if files were rotated or access fails.
+- NEVER infer the code function from absolute PC `0x6e063c6104` without a matching process-20410 memory map or reliable trace.
+- No production Search crash fix has been identified. Protect Cobra, provider behavior, user data, existing signed 2103402 and the staged WatchNixtoons2 tracking host correction.
+
 ## Acceptance gates
 1. Resolve Search root fault to actual symbols/source, implement and verify narrow correction.
 2. Host + Android 17 verification of tracking and repeated Search use; no cross-provider identity guessing.
