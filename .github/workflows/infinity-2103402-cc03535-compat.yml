@@ -1,0 +1,124 @@
+name: Infinity 2103402 CC03535 matched fast signing (reuse compiled ARM64)
+on:
+  push:
+    branches: [work/infinity-2103402-cc03535-compat-20261024]
+    paths:
+      - "repairs/infinity-2103402-final/reconcile35.py"
+      - ".github/workflows/infinity-2103402-cc03535-compat.yml"
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: cc03535-matched-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  package:
+    name: Original-native-compiler-reuse, CC03535 compatibility, original signer
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40149635167
+          name: Infinity-2103402-MATCHING-NATIVE-OWNER-SIGNED-QA-NOT-FOLD-VERIFIED
+          github-token: ${{ github.token }}
+          path: input
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11.7"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: "platform-tools build-tools;35.0.0 platforms;android-34"
+          log-accepted-android-sdk-licenses: false
+      - name: Verify preserved source scope and original signed native QA
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import subprocess
+          names=subprocess.check_output(["git","diff","--name-only","5f60775f46e9d09d7f7b2061a913f5f8e6e0791d","HEAD"],text=True).splitlines()
+          assert set(names)=={"repairs/infinity-2103402-final/reconcile35.py",".github/workflows/infinity-2103402-cc03535-compat.yml"},names
+          assert not any("cobra" in n.lower() for n in names)
+          PY
+          (cd input/native-owner-package && sha256sum -c SHA256SUMS)
+      - name: Stage only three reviewed compatibility changes, reuse compiled native ELF
+        run: |
+          set -euo pipefail
+          python3 repairs/infinity-2103402-final/reconcile35.py stage --input input/native-owner-package --out matched
+      - name: Permanently sign using same original certificate; verify all 3 member changes
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          : "${INFINITY_KEYSTORE_B64:?Original release keystore required}"
+          : "${INFINITY_STORE_PASSWORD:?Original keystore password required}"
+          : "${INFINITY_KEY_PASSWORD:?Original private key password required}"
+          : "${INFINITY_KEY_ALIAS:?Original release key alias required}"
+          printf '%s' "$INFINITY_KEYSTORE_B64" | base64 -d > matched/.release-key.jks
+          chmod 600 matched/.release-key.jks
+          SDK="$ANDROID_HOME/build-tools/35.0.0"
+          "$SDK/zipalign" -P 16 -f 4 matched/unsigned-cc03535.apk matched/.aligned.apk
+          "$SDK/apksigner" sign --ks matched/.release-key.jks \
+            --ks-key-alias "$INFINITY_KEY_ALIAS" --ks-pass env:INFINITY_STORE_PASSWORD \
+            --key-pass env:INFINITY_KEY_PASSWORD \
+            --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true \
+            --out matched/Infinity-2103402-CommandCenter-03535-Matched-QA.apk matched/.aligned.apk
+          "$SDK/apksigner" verify --verbose --print-certs input/native-owner-package/Infinity-2103402-Matching-Native-Ownership-QA.apk > matched/INPUT-SIGNATURE.txt
+          "$SDK/apksigner" verify --verbose --print-certs matched/Infinity-2103402-CommandCenter-03535-Matched-QA.apk > matched/MATCHED-SIGNATURE.txt
+          python3 - <<'PY'
+          import pathlib,re
+          base=pathlib.Path('matched')
+          pat=re.compile(r'Signer #1 certificate SHA-256 digest:\s*([0-9a-fA-F]{64})')
+          def get(name):
+              m=pat.search((base/name).read_text())
+              assert m, f'Certificate not present: {name}'
+              return m.group(1).lower()
+          original='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
+          assert get('INPUT-SIGNATURE.txt')==get('MATCHED-SIGNATURE.txt')==original,'Signing certificate changed'
+          print('PASS: original Infinity signing identity retained')
+          PY
+          "$SDK/aapt" dump badging matched/Infinity-2103402-CommandCenter-03535-Matched-QA.apk | grep -E "^package: name='com.projectinfinity.kodi' versionCode='2103402'"
+          python3 repairs/infinity-2103402-final/reconcile35.py verify \
+            --input input/native-owner-package --signed matched/Infinity-2103402-CommandCenter-03535-Matched-QA.apk
+          python3 - <<'PY'
+          from zipfile import ZipFile
+          with ZipFile('matched/Infinity-2103402-CommandCenter-03535-Matched-QA.apk') as apk:
+              for leaf in ['script.infinity.commandcenter-0.3.5.35-MATCHED-QA.zip','script.infinity.watchedbridge-1.0.16-MATCHED-QA.zip']:
+                  with ZipFile('matched/'+leaf) as c:
+                      for name in c.namelist():
+                          if not name.endswith('/'):
+                              assert c.read(name)==apk.read('assets/addons/'+name),name
+          print('PASS: matching Command Center and Watched Bridge exact ZIP/APK identity')
+          PY
+          rm -f matched/.release-key.jks matched/unsigned-cc03535.apk matched/.aligned.apk
+          (cd matched && sha256sum *.apk *.zip > SHA256SUMS)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-2103402-03535-MATCHED-SIGNED-FAST-QA
+          path: |
+            matched/*.apk
+            matched/*.zip
+            matched/*.json
+            matched/*.txt
+            matched/SHA256SUMS
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: Infinity-2103402-03535-Matched-Failure-Receipt
+          path: |
+            matched/*.json
+            matched/*.txt
+          retention-days: 30
+          if-no-files-found: warn
