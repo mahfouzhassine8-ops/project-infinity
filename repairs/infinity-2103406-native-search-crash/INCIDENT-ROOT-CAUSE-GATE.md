@@ -60,5 +60,12 @@ User-provided archive `Infinity-Diagnostics-20261025-052107.zip` (SHA-256: `e5c9
 - These repeat close failures constitute a distinct possible **shutdown reliability workstream**. Under the user's preservation requirement, do not silently expand the native Search crash repair to cover close/shutdown or unreported new UI issues. Preserve working WatchNixtoons2 and Cobra.
 - This archive supplies no original destroyed-mutex caller and does not change the outstanding native Search root-cause gate. No new APK or original native-code correction has been validated from it.
 
+## User-directed priority and freeze — October 25, 2026
+- User explicitly deferred **all Essential-First/shutdown corrective implementation** until other authorized Infinity crash, stability, performance, and UI-polish work is complete.
+- Existing shutdown failures remain documented and unresolved; do not label shutdown accepted, suppress failures, modify write protection, relax deadlines, discard participants, or alter existing essential data durability.
+- Current priority is the native Search crash root cause and approved end-to-end polish. Do not speculate about or modify the separate issue the user has not yet described.
+- Preserve the physically working WatchNixtoons2/Infinity Tracked implementation in signed 2103405; Cobra completely off limits; no data wipe or reinstall.
+- Reopening shutdown as a repair workstream requires later user authorization, after other priorities are polished. This freeze does not alter the diagnostic evidence already collected.
+
 ## Current state
 Investigation checkpoint only. Native crash root function remains unproven. No 2103406 APK was built or signed.
