@@ -60,6 +60,7 @@ def configure():
     base.MEMBERS=[CC+k for k in NEW_CC]+[
         UR+'CONTROLLER-PREIMAGES.json',WB+'CONTROLLER-PREIMAGES.json',NATIVE]
     base.COMPONENTS=COMPONENTS
+    base.native_patch=native_patch_three_verified_owners
 
 def version_change(raw,old,new):
     a=('version="'+old+'"').encode();b=('version="'+new+'"').encode()
@@ -115,6 +116,33 @@ def verify_components(apk,directory):
                     if not name.endswith('/'):
                         assert part.read(name)==app.read(PFX+name), 'ZIP/APK mismatch '+name
     print('PASS: every matching component ZIP equals signed APK bytes')
+
+def native_patch_three_verified_owners(original):
+    """Extend the existing .rodata-only owner update without touching ARM64 instructions."""
+    base.check(sha(original)==OLD_NATIVE_SHA,'Wrong original ARM64 image hash')
+    updated=original
+    locations={}
+    for name in OLD_CC:
+        previous,current=OLD_CC[name].encode(),NEW_CC[name].encode()
+        base.check(updated.count(previous)==1,'Owner literal not unique: '+name)
+        offset=updated.index(previous)
+        section,flags=base.section_at(updated,offset)
+        base.check(section=='.rodata' and (flags&2) and not(flags&1),
+                   'Owner literal not in immutable .rodata: '+name)
+        base.check(updated[offset-1]==0 and updated[offset+64]==0,
+                   'Hash constant not delimited by nulls')
+        updated=updated[:offset]+current+updated[offset+64:]
+        base.check(len(updated)==len(original),'Native binary length changed')
+        locations[name]=offset
+    rollback=updated
+    for name,offset in locations.items():
+        base.check(rollback[offset:offset+64]==NEW_CC[name].encode(),
+                   'Patched native owner digest mismatch: '+name)
+        rollback=rollback[:offset]+OLD_CC[name].encode()+rollback[offset+64:]
+    base.check(rollback==original,'Native code or unapproved content changed')
+    base.check(sha(updated)==NEW_NATIVE_SHA,'Unexpected ARM64 output digest')
+    return updated,locations
+
 
 def stage(args):
     configure()
