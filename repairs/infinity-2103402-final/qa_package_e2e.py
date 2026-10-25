@@ -68,7 +68,7 @@ def component_packages(parent_pkg,folder,edits):
                     if not name.endswith('/') and s.read(name)!=a.read(PREFIX+name):
                         raise ValueError('Input ZIP/APK mismatch: '+name)
             selected={n[len(PREFIX):]:blob for n,blob in edits.items()
-                      if n.startswith(PREFIX) and n[len(PREFIX):].startswith(original.split('-0.')[0]+'/')}
+                      if n.startswith(PREFIX) and n[len(PREFIX):].startswith(original.split('-')[0]+'/')}
             out=folder/dest
             if selected:copy_zip(source,out,selected)
             else:shutil.copyfile(source,out)
