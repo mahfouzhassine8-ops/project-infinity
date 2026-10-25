@@ -1,0 +1,168 @@
+name: Infinity 2103405 WatchNixtoons2 Infinity Tracked context signed QA
+on:
+  push:
+    branches: [work/infinity-2103405-watchnixtoons-infinity-tracked-context-20261025]
+    paths:
+      - "repairs/infinity-2103405-tracked-context/**"
+      - ".github/workflows/infinity-2103405-tracked-context-signed-qa.yml"
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-2103405-tracked-context-signed-qa
+  cancel-in-progress: false
+jobs:
+  signed-qa:
+    name: Native context registration, verified APK diff, original signer, matched components
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Enforce WatchNixtoons2-only context registration and Cobra preservation
+        run: |
+          set -euo pipefail
+          git diff --name-only accfa1d9ac53db83ef9626a41e17fde1061c6e38 HEAD | tee /tmp/changed
+          if grep -v -E '^(repairs/infinity-2103405-tracked-context/|\.github/workflows/infinity-2103405-tracked-context-signed-qa\.yml$)' /tmp/changed; then
+            echo 'UNAPPROVED SOURCE MODIFICATION' >&2
+            exit 1
+          fi
+          if grep -i cobra /tmp/changed; then exit 1; fi
+          echo 'PASS: no Cobra, providers, Search, skin, playback or prior baseline source modified'
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40182352624
+          name: Infinity-2103404-WATCHNIXTOONS2-SOURCE-LOCATION-SIGNED-QA
+          github-token: ${{ github.token }}
+          path: input
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11.7"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: "platform-tools build-tools;35.0.0 platforms;android-34"
+          log-accepted-android-sdk-licenses: false
+      - name: Verify exact 2103404 signed input and original Command Center source
+        run: |
+          set -euo pipefail
+          (cd input && sha256sum -c SHA256SUMS)
+          mkdir -p staging/parent_cc
+          python3 - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile
+          p=Path('input/Infinity-2103404-WatchNixtoons2-Source-Location-QA.apk')
+          with ZipFile(p) as z:
+              for name in ('context.py','plugin.py','resume_hub.py','addon.xml','checkpoint_runtime.py','infinity_trakt.py'):
+                  (Path('staging/parent_cc')/name).write_bytes(
+                      z.read('assets/addons/script.infinity.commandcenter/'+name))
+          PY
+      - name: Register missing native Infinity Tracked item and update owners
+        run: |
+          set -euo pipefail
+          python3 repairs/infinity-2103405-tracked-context/patch_infinity_tracked.py staging/parent_cc staging/patched
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib
+          expected={'addon.xml':'987c512db6eceba9ec8d078dc6e962358bd58d4093fe1619c4319377b66bf2c4',
+            'checkpoint_runtime.py':'58f3b801e69176a3e91ccca5c1fcb6ebce81bbf8f7e768e07148f531b66190d6',
+            'infinity_trakt.py':'fe9c8b1563cfc80a9b3ce2cac77d406152a6b50c4b65c71a8eabe9df6b2d4dc1'}
+          for filename,want in expected.items():
+              raw=(Path('staging/patched')/filename).read_bytes()
+              assert hashlib.sha256(raw).hexdigest()==want,'Unreviewed owner content: '+filename
+          print('PASS: exact three reviewed changes')
+          PY
+      - name: Five targeted Kodi context visibility, selector, preservation and version tests
+        env:
+          CC_PARENT: staging/parent_cc
+          CC_PATCHED: staging/patched
+        run: python3 -m unittest -v repairs/infinity-2103405-tracked-context/test_tracked_context.py
+      - name: Stage 2103405 native ARM64-preserving install-over APK and matching ZIPs
+        run: |
+          set -euo pipefail
+          python3 repairs/infinity-2103405-tracked-context/package_infinity_tracked.py stage \
+            --input input --patched staging/patched --out stage
+          python3 repairs/infinity-2103405-tracked-context/package_infinity_tracked.py verify \
+            --input input --out stage --signed stage/unsigned-2103405.apk
+      - name: Sign with original permanent key, enforce source and APK-to-ZIP parity
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          test -n "$INFINITY_KEYSTORE_B64"
+          test -n "$INFINITY_STORE_PASSWORD"
+          test -n "$INFINITY_KEY_PASSWORD"
+          test -n "$INFINITY_KEY_ALIAS"
+          printf '%s' "$INFINITY_KEYSTORE_B64" | base64 -d > stage/.original-infinity.jks
+          chmod 600 stage/.original-infinity.jks
+          SDK="$ANDROID_HOME/build-tools/35.0.0"
+          "$SDK/zipalign" -P 16 -f 4 stage/unsigned-2103405.apk stage/.aligned.apk
+          "$SDK/apksigner" sign --ks stage/.original-infinity.jks \
+            --ks-key-alias "$INFINITY_KEY_ALIAS" \
+            --ks-pass env:INFINITY_STORE_PASSWORD --key-pass env:INFINITY_KEY_PASSWORD \
+            --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true \
+            --out stage/Infinity-2103405-WatchNixtoons2-Infinity-Tracked-Context-QA.apk stage/.aligned.apk
+          "$SDK/apksigner" verify --verbose --print-certs \
+            input/Infinity-2103404-WatchNixtoons2-Source-Location-QA.apk > stage/PARENT-SIGNATURE.txt
+          "$SDK/apksigner" verify --verbose --print-certs \
+            stage/Infinity-2103405-WatchNixtoons2-Infinity-Tracked-Context-QA.apk > stage/NEW-SIGNATURE.txt
+          python3 - <<'PY'
+          import re
+          from pathlib import Path
+          pat=re.compile(r'Signer #1 certificate SHA-256 digest:\s*([0-9a-fA-F]{64})')
+          def cert(f):
+              m=pat.search(Path(f).read_text())
+              assert m,f
+              return m.group(1).lower()
+          expected='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
+          assert cert('stage/PARENT-SIGNATURE.txt')==cert('stage/NEW-SIGNATURE.txt')==expected
+          print('PASS original permanent release certificate')
+          PY
+          "$SDK/aapt" dump badging stage/Infinity-2103405-WatchNixtoons2-Infinity-Tracked-Context-QA.apk |
+            grep -E "^package: name='com.projectinfinity.kodi' versionCode='2103405'"
+          python3 repairs/infinity-2103405-tracked-context/package_infinity_tracked.py verify \
+            --input input --out stage --signed stage/Infinity-2103405-WatchNixtoons2-Infinity-Tracked-Context-QA.apk
+          python3 - <<'PY'
+          from zipfile import ZipFile
+          from pathlib import Path
+          apk=Path('stage/Infinity-2103405-WatchNixtoons2-Infinity-Tracked-Context-QA.apk')
+          with ZipFile(apk) as a:
+              for file in Path('stage').glob('*.zip'):
+                  with ZipFile(file) as p:
+                      for member in p.namelist():
+                          if not member.endswith('/'):
+                              assert a.read('assets/addons/'+member)==p.read(member),(file.name,member)
+          print('PASS all component ZIPs are byte-identical to installed APK assets')
+          PY
+          rm -f stage/.original-infinity.jks stage/unsigned-2103405.apk stage/.aligned.apk
+          (cd stage && sha256sum *.apk *.zip > SHA256SUMS)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-2103405-WATCHNIXTOONS2-INFINITY-TRACKED-SIGNED-QA
+          path: |
+            stage/*.apk
+            stage/*.zip
+            stage/*RECEIPT.json
+            stage/SHA256SUMS
+            stage/*SIGNATURE.txt
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: Infinity-2103405-FAILED-GATES
+          path: |
+            stage/*RECEIPT.json
+            stage/*SIGNATURE.txt
+          retention-days: 30
+          if-no-files-found: warn
