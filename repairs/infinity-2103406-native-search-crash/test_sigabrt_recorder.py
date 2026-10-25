@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Build-independent safety gates for the 2103406 native recorder delta."""
 import hashlib
+import base64
+import gzip
 import importlib.util
 import os
 from pathlib import Path
@@ -64,6 +66,23 @@ class SignalRecorderChecks(unittest.TestCase):
             cc=os.environ.get("HOST_CC","cc")
             subprocess.run([cc,"-std=gnu11","-O2","-pthread",str(harness),"-o",str(root/"test")],check=True)
             subprocess.run([str(root/"test")],check=True)
+    def test_archived_source_only_after_reproducing_installed_binary(self):
+        archived=ROOT.parent/"native-crash-forensics-2103250"/"infinity_crash_recorder.c.gz.b64"
+        compressed_b64=archived.read_bytes()
+        self.assertEqual(MODULE.git_blob_sha1(compressed_b64),
+                         MODULE.ARCHIVED_SOURCE_B64_GIT_SHA1)
+        source=gzip.decompress(base64.b64decode(compressed_b64))
+        corrected=MODULE.apply_reproduced_archived_source(
+            source, MODULE.ARCHIVED_SOURCE_B64_GIT_SHA1,
+            MODULE.INSTALLED_RECORDER_BINARY_SHA256)
+        self.assertNotIn(b"SIGABRT",corrected.split(b"static const int g_signals[]",1)[1].split(b";",1)[0])
+        self.assertEqual(corrected.replace(MODULE.AFTER.encode(), MODULE.BEFORE.encode(),1),source)
+        with self.assertRaisesRegex(RuntimeError,"did not reproduce"):
+            MODULE.apply_reproduced_archived_source(source,
+                MODULE.ARCHIVED_SOURCE_B64_GIT_SHA1,"0"*64)
+        with self.assertRaisesRegex(RuntimeError,"not the reviewed"):
+            MODULE.apply_reproduced_archived_source(source,
+                "0"*40,MODULE.INSTALLED_RECORDER_BINARY_SHA256)
     def test_rejects_wrong_or_modified_source(self):
         with self.assertRaisesRegex(RuntimeError,"audited baseline"):
             MODULE.apply(self.before+b"\n")
