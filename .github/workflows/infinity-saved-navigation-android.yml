@@ -126,7 +126,7 @@ jobs:
           if [[ "$SELECTED_CASE" == final-continue || "$SELECTED_CASE" == final-actions || "${FEATURE_STRESS:-}" == signed409-50-30-20 ]]; then
             sudo apt-get install -y ffmpeg
           fi
-          python3 repairs/four-repair-20261018/android37_gate.py --sdk-root "$ANDROID_HOME" --out api37-support --pin-tools
+          python3 "${INFINITY_API37_GATE:-repairs/four-repair-20261018/android37_gate.py}" --sdk-root "$ANDROID_HOME" --out api37-support --pin-tools
           python3 - <<'PY'
           import pathlib,subprocess,sys
           for attempt in range(1,4):
@@ -140,16 +140,19 @@ jobs:
       - name: Execute only the selected feature; leave the app running
         uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
         with:
-          api-level: '37.0'
+          api-level: ${{ env.INFINITY_EMULATOR_API || '37.0' }}
           arch: x86_64
-          target: google_apis
+          target: ${{ env.INFINITY_EMULATOR_TARGET || 'google_apis' }}
           profile: pixel_2
           disk-size: 8G
           avd-name: infinity-four-repair-api37
-          pre-emulator-launch-script: python3 repairs/four-repair-20261018/android37_gate.py --sdk-root "$ANDROID_HOME" --out api37-support --check-avd
+          pre-emulator-launch-script: python3 "${INFINITY_API37_GATE:-repairs/four-repair-20261018/android37_gate.py}" --sdk-root "$ANDROID_HOME" --out api37-support --check-avd
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
           script: |
+            adb shell getprop > api37-support/runtime-properties.txt
+            adb shell getconf PAGE_SIZE > api37-support/runtime-pagesize.txt
+            adb shell sha256sum /system/lib64/libndk_translation.so > api37-support/runtime-native-bridge-sha256.txt
             python3 "$FEATURE_PROBE" --apk "$TEST_APK" --expected-sha "$TEST_APK_SHA" --case "$SELECTED_CASE" --authorization "$AUTHORIZED_SCOPE" --out feature-results
       - uses: actions/upload-artifact@v4
         if: always()

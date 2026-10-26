@@ -1,0 +1,57 @@
+{
+  "apk_sha256": "0b202e3af93ce25be8cd5ecb2853043411ba5fbbf88dac0df94ef4b2ce55605a",
+  "candidate_source": "a24db78554da7bc40a2a0b658ba441793f1c1605",
+  "native_lib_sha256": "151128c176b6094f28bb3fc716cc07c3985a9aa38f1e1bb1424f0285a47e",
+  "native_and_DEX_exact418": true,
+  "environment": "Actual API37.0 google_apis x86_64 with ARM64 native bridge",
+  "runs": [
+    {
+      "run": 40397437746,
+      "artifact": 12687093542,
+      "artifact_sha256": "a81f54de94f3d9cc58326a4152adb7bbbed9e86861183ad9fd6f7ea8f1ef57f1",
+      "test_source": "9bc45976884c889c7ef0997c80e172374c254aef",
+      "passed": false,
+      "actual_app_launched": true,
+      "engine_pid": 4657,
+      "actual_native_SIGSEGV": true,
+      "fault": "Fatal signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 0x74e9e1077fa7 in tid 4657 (inity.kodi:kodi), pid 4657 (inity.kodi:kodi)",
+      "frame": "libkodi.so+0x2bf49fc talloc_lib_init+60; dlopen constructor before Kodi/Python",
+      "feature_interactions_completed": 0,
+      "stress_counts": {
+        "search": 0,
+        "playback_home": 0,
+        "rotation": 0
+      },
+      "kodi_log_created": false,
+      "reported_failure": "RuntimeError: Feature state was not observed before deadline",
+      "chooser_after_native_crash": "Observed nativefailure recovery is not an authorized normalClose result"
+    },
+    {
+      "run": 40397522955,
+      "artifact": 12688425618,
+      "artifact_sha256": "33e330db086300a2cb31f10d2ab2e1ff60cf6718142a6ebcb603f84b8b12240d",
+      "test_source": "a0505d2bc9b7ce5102d3e4d5fdb1dfd90ec6299e",
+      "passed": false,
+      "actual_app_launched": true,
+      "engine_pid": 4678,
+      "actual_native_SIGSEGV": true,
+      "fault": "Fatal signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 0x71bc40a77fa7 in tid 4678 (inity.kodi:kodi), pid 4678 (inity.kodi:kodi)",
+      "frame": "libkodi.so+0x2bf49fc talloc_lib_init+60; dlopen constructor before Kodi/Python",
+      "feature_interactions_completed": 0,
+      "stress_counts": {
+        "search": 0,
+        "playback_home": 0,
+        "rotation": 0
+      },
+      "kodi_log_created": false,
+      "reported_failure": "RuntimeError: Feature state was not observed before deadline",
+      "chooser_after_native_crash": "Observed nativefailure recovery is not an authorized normalClose result"
+    }
+  ],
+  "observed_cause": "Same actual constructor PC and unreadable AT_RANDOM+7 algorithm as earlier411/414 evidence; Home/Search Python did not execute. No new419Python runtime failure is established.",
+  "inference": "Native bridge/auxv mapping remains suspected; not proven physicalFold cause. Do not modify shared allocator/Cobra or suppress startupfailure.",
+  "planned_environment_comparison": "One explicitly recorded API37.1 image comparison at unchanged APK/feature/safety/deadlines, no automatic apprestart or retrytopass. SDKavailability/AVDmetadata/actualsdk37/release17/ARMcompat remain mandatory. No fallback API.",
+  "physical_Fold": "NOT RUN",
+  "release_accepted": false,
+  "final_lock": false
+}

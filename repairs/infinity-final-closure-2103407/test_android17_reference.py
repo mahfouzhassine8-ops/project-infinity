@@ -35,7 +35,7 @@ class ReferenceRoutingTests(unittest.TestCase):
         workflow = (ROOT.parents[1]/'.github/workflows/infinity-saved-navigation-android.yml').read_text()
         for required in ('workflow_dispatch:', 'delivery92.verify_signature', 'sha256sum -c SHA256SUMS',
                          "run['head_sha']==r['source_commit']", "run['conclusion']=='success'",
-                         "api-level: '37.0'", 'android37_gate.py', 'android_feature_probe.py',
+                         "api-level: ${{ env.INFINITY_EMULATOR_API || '37.0' }}", 'android37_gate.py', 'android_feature_probe.py',
                          'source_ref:', 'cancel-in-progress: false', guard.REQUEST,
                          'repairs/infinity-2103402-final/android17/push_request.py'):
             self.assertIn(required, workflow)
