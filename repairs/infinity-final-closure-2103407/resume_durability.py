@@ -55,7 +55,10 @@ def load_view(path):
     if not isinstance(value,dict):raise RuntimeError('Invalid state')
     return value
 try:
-    run(SimpleNamespace(require=require,rpc=rpc,until=until),SimpleNamespace(load_view=load_view,entries=entries),profile,result)
+    def progress(stage):
+        result['stage']=stage
+        (own/('progress-'+request['nonce']+'.json')).write_text(json.dumps(result))
+    run(SimpleNamespace(require=require,rpc=rpc,until=until),SimpleNamespace(load_view=load_view,entries=entries),profile,result,observe=progress)
     result['passed']=True
 except BaseException as error:
     result['failure']=type(error).__name__+': '+str(error)
@@ -127,6 +130,8 @@ def run(transport,owner,out):
             raise AssertionError('Final stopped playback records did not settle')
         time.sleep(.25)
     transport.adb('pull',profile,out/'actual-resume-scene-profile',check=False)
+    state=transport.read_json(transport.PROFILE+'/addon_data/script.infinity.commandcenter/continue-watching.json')
+    (out/'actual-continue-records-at-failure.json').write_text(json.dumps(state,indent=2)+'\n')
     (out/'resume-scene-live-native-backtrace.txt').write_text(
         transport.shell('debuggerd','-b',str(owner['pid']),check=False))
     raise AssertionError('Actual native TV scene did not complete')

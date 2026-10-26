@@ -124,5 +124,15 @@ class NativeTVFixtureTests(unittest.TestCase):
         self.assertIn("ui.until(started,'actual typed native TV playback',20)",text)
         self.assertLess(text.index("clock=ui.rpc("),text.index('player.seekTime(70)'))
 
+    def test_new_TV_scene_uses_native_Stop_and_retains_exact_state_checks(self):
+        text=Path(observer.__file__).read_text()
+        self.assertNotIn('player.stop()',text)
+        self.assertEqual(text.count("ui.rpc('Player.Stop',{'playerid':1})"),3)
+        self.assertIn("ui.until(lambda:not active(),'native TV stop',20)",text)
+        self.assertIn("'native completed TV stopped',20",text)
+        self.assertIn("'selected Next stopped',20",text)
+        self.assertIn('source_memory_preserved',text)
+        self.assertIn("observe(name)",text)
+
 
 if __name__=='__main__':unittest.main(verbosity=2)

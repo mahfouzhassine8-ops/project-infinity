@@ -1,0 +1,29 @@
+{
+  "passed": false,
+  "scenario": "integrated-resume-power-ui",
+  "apk_sha256": "4428332453714adc1aa652ee5db76ff2e79f705171dab8e020d7915631e00d83",
+  "candidate_source_commit": "d10fffd80182c796955534ffdecc5ccc288da99b",
+  "test_source_commit": "73cc00c5e912065ff762c34e8d22432d6978db21",
+  "workflow_run": "40380264449",
+  "cycles": [],
+  "failure": "AssertionError: Actual native TV scene did not complete",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/project-infinity/project-infinity/repairs/infinity-final-closure-2103407/android17_shutdown_probe.py\", line 147, in main\n    report['real_TV_before_Close']=resume_durability.run(transport,owner,args.out);save()\n                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/project-infinity/project-infinity/repairs/infinity-final-closure-2103407/resume_durability.py\", line 132, in run\n    raise AssertionError('Actual native TV scene did not complete')\nAssertionError: Actual native TV scene did not complete\n",
+  "run": 40380264449,
+  "artifact": 12678833084,
+  "artifact_sha256": "5fad9ebb7a5555c72a9df43a5890996d0a4151ed337cf8d08a10d923bd9ea67c",
+  "actual_Close_attempted": false,
+  "observations": [
+    "Same20sec advancing-clock readiness did not resolve the stall",
+    "First clip native Stop logged CloseFile and OnExit then stopped making progress",
+    "Observer and Kodi guest threads blocked in translated syscalls; debuggerd does not unwind exact guest callee",
+    "Codec errors also occur in PASS40376891456; they do not establish the cause"
+  ],
+  "inference": "Blocking legacy Python Player.stop synchronous SendMsg is a suspected observer transport issue, not proven guest stack root cause. Native JSONRPC Player.Stop posts the actual operation asynchronously; use it once while preserving all stopped/progress/completion/Close assertions.",
+  "primary_SDK": "https://github.com/xbmc/xbmc/blob/21.3-Omega/xbmc/interfaces/legacy/Player.cpp",
+  "SDK_source_sha256": "94c5a9a3422fa4d004bc552d02fde8a88de6e00ccc4bf03b84e5ee773a5981f2",
+  "primary_native_JSONRPC": "https://github.com/xbmc/xbmc/blob/21.3-Omega/xbmc/interfaces/json-rpc/PlayerOperations.cpp",
+  "ordinary_417_three_cycle_PASS_preserved": 40373328781,
+  "physical_Fold": "NOT RUN",
+  "release_accepted": false,
+  "final_lock": false
+}

@@ -21,5 +21,7 @@
   "physical_Galaxy_Fold": "NOT RUN",
   "release_accepted": false,
   "retained_first_attempt_failure": 40378085987,
-  "readiness_correction": "Native selected identity alone precedes decoder readiness. Require speed1/actual AV time>=1sec in original20sec start predicate before synthetic test seek; no action retry/reset/runtime change. Failure collects own QA profile and live native stack."
+  "readiness_correction": "Native selected identity alone precedes decoder readiness. Require speed1/actual AV time>=1sec in original20sec start predicate before synthetic test seek; no action retry/reset/runtime change. Failure collects own QA profile and live native stack.",
+  "second_retained_failure": 40380264449,
+  "next_selected_transport": "Actual native JSONRPC Player.Stop posts TMSG_MEDIA_STOP once, instead of new observer blocking synchronous legacy Player.stop. All exact20sec stopped/state/native16/Java/Close/reopen predicates retained. Optional own-profile stage logging and actual failed-state snapshot added. No APK/native change. Translated stack root cause remains unresolved."
 }

@@ -16,10 +16,13 @@ def source_memory_preserved(before,after,played_key,actual_source):
             selected.get('failures')==0 and type(selected.get('updated')) is int and selected['updated']>0)
 
 
-def run(ui,hub,profile,result):
+def run(ui,hub,profile,result,observe=None):
     import xbmc
+    def stage(name):
+        if observe is not None:observe(name)
     def passed(name,**fields):
         result['cases'].append(dict(case=name,status='PASS',**fields))
+        stage(name)
     def state():return hub.load_view(profile)
     def active():return ui.rpc('Player.GetActivePlayers')
     ui.until(lambda:not active(),'original clip stopped before native TV',20)
@@ -45,8 +48,11 @@ def run(ui,hub,profile,result):
             stamp=clock.get('time',{})
             return value if clock.get('speed')==1 and (stamp.get('seconds',0)>=1 or stamp.get('minutes',0)>0) else None
         return ui.until(started,'actual typed native TV playback',20)
+    stage('before-first-native-playback')
     result['native_tv_first_playback']=start(1,1,2)
+    stage('before-first-test-seek')
     player.seekTime(70)
+    stage('awaiting-exact-saved-TV-progress')
     def saved():
         value=state();row=value.get('items',{}).get('d'*64,{})
         return value if row.get('position',0)>=70 and row.get('show_ids_verified') is True and row.get('show_tmdb')=='1396' else None
@@ -54,7 +60,10 @@ def run(ui,hub,profile,result):
     row=progress['items']['d'*64]
     ui.require(row['identity']=={'schema':1,'kind':'episode','scope':'show_episode','ids':{'tmdb':'1396'},'season':1,'episode':2},'TV canonical identity')
     ui.require(progress['items']['c'*64]==before['items']['c'*64],'Different episode progress preserved')
-    player.stop();ui.until(lambda:not active(),'native TV stop',20)
+    stage('before-native-Stop-request')
+    ui.rpc('Player.Stop',{'playerid':1})
+    stage('native-Stop-acknowledged')
+    ui.until(lambda:not active(),'native TV stop',20)
     restored=state()['items']['d'*64]
     ui.require(restored['position']>=70 and restored.get('verified_next',{}).get('after')==[1,2],
                'Stopped TV retains exact progress and catalogue successor')
@@ -68,7 +77,7 @@ def run(ui,hub,profile,result):
         value=state();row=value.get('watched',{}).get('d'*64,{})
         return value if row.get('watched') is True and row.get('percentage')==100 else None
     complete=ui.until(completed,'actual TV completion and watched state',45)
-    if player.isPlayingVideo():player.stop()
+    if player.isPlayingVideo():ui.rpc('Player.Stop',{'playerid':1})
     ui.until(lambda:not active(),'native completed TV stopped',20)
     complete=state();result['native_tv_completed_record']=complete['watched']['d'*64]
     for key in ('c'*64,'d'*64):ui.require(key in complete['items'],'Completed history must remain stored')
@@ -97,5 +106,5 @@ def run(ui,hub,profile,result):
         return value if (value.get('type')=='episode' and value.get('id')==2 and value.get('season')==2 and
                          value.get('episode')==1 and value.get('file')==FOLDER+'QA.S02E01.mp4') else None
     observed=ui.until(correct_next_playback,'actual selected Next starts exact native episode/source',20)
-    player.stop();ui.until(lambda:not active(),'selected Next stopped',20)
+    ui.rpc('Player.Stop',{'playerid':1});ui.until(lambda:not active(),'selected Next stopped',20)
     passed('actual-native-Next-selection-plays-correct-episode',observed=observed)
