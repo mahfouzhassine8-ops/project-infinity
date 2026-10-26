@@ -36,12 +36,8 @@
   ],
   "pending_selected_runs": [
     {
-      "run": 40399697939,
-      "scope": "same419 API37.1ps16k independentHome30/rotation20, explicitenvironmentcomparison; original37.0failuresretained"
-    },
-    {
-      "run": 40399771565,
-      "scope": "same419 API37.1ps16k independentSearch50, explicitenvironmentcomparison; alloriginaldeadlinesretained"
+      "run": 40402313427,
+      "scope": "Same419 AOSP37.0Search50, strictSearchprecondition/45keyboard/90terminal/native20lease unchanged; all failuresretained"
     }
   ],
   "historical_418_results": [
@@ -139,6 +135,25 @@
       "passed": false,
       "scope": "Actual pre-Python native SIGSEGV in unchangedtallocconstructor;0Search/Home/rotation; not an appfeaturePASS",
       "report": "NATIVE-STARTUP-419-RESULT.json"
+    },
+    {
+      "run": 40399697939,
+      "passed": false,
+      "scope": "Strict16KiB API37.1 loader rejects4KiB ELF libc++ before Kodi/Python;0Search/Home/rotation, NOT sameAT_RANDOMcrash",
+      "report": "NATIVE-ELF-16K-419-RESULT.json"
+    },
+    {
+      "run": 40399771565,
+      "passed": false,
+      "scope": "Strict16KiB API37.1 loader rejects4KiB ELF libc++ before Kodi/Python;0Search/Home/rotation, NOT sameAT_RANDOMcrash",
+      "report": "NATIVE-ELF-16K-419-RESULT.json"
     }
-  ]
+  ],
+  "requested_followup_environment": "Same419 on explicitlyselected AOSP37.0/default; runtimepending and no claimedfix orsupportuntil actualresults",
+  "APK_ZIP_alignment_bytes": 16384,
+  "native_ELF_strict_16KiB_compatibility": false,
+  "native_4KiB_PT_LOAD_libraries": 46,
+  "native_ARM64_ELF_libraries_audited": 47,
+  "physical_Fold_page_size": "NOT VERIFIED; do not inferfrom priorstartupsuccess",
+  "requested_local_Home_test": "Exact existingfinal-participantadmission thenHome30/rotation20, no remoteSearch prerequisite; actualrunpending"
 }

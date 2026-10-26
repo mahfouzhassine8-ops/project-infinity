@@ -26,6 +26,9 @@ def require(value,message):
 
 def admit(device,setup,expected):
     require(expected.get('post_feature') in (COUNTS,HOME_COUNTS,SEARCH_COUNTS),'Exact stress selection required')
+    required_case='final-participant' if expected.get('post_feature')==HOME_COUNTS else 'final-search-all-enter'
+    require(expected.get('selected_case')==required_case and setup.get('selected_case')==required_case,
+            'Actual selected precondition does not match the exact stress scope')
     require(setup.get('passed') is True,'Selected real feature did not pass')
     require(setup.get('apk_sha256')==expected['candidate_apk_sha256'],'Stress APK binding differs')
     require(device.PACKAGE=='com.projectinfinity.kodi','Wrong application')

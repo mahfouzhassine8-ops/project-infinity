@@ -15,7 +15,7 @@ _context=None
 def stage(folder,args,report,device,aid):
     from android17_candidate_probe import require_disposable
     require_disposable(device)
-    if args.case!='final-search-all-enter' or aid!=ADDON or Path(folder).resolve()!=args.out.resolve()/'fixture':
+    if args.case not in ('final-search-all-enter','final-participant') or aid!=ADDON or Path(folder).resolve()!=args.out.resolve()/'fixture':
         raise ValueError('Only exact disposable Search stress stage permitted')
     raw=(OLD/'tracking/final-eight/android_selected.py').read_bytes()
     if hashlib.sha256(raw).hexdigest()!=FIXTURE_SHA or raw.count(('xbmc.executebuiltin('+repr(BUILTIN)+')').encode())!=1:
@@ -37,9 +37,9 @@ def initialize(device,out,owner):
     target=device.PROFILE+'/addon_data/'+ADDON
     def ready():
         value=device.read_json(target+'/stress-dispatch-ready.json')
-        return value if value.get('pid')==owner['pid'] and value.get('max_requests')==MAX_REQUESTS and value.get('first_actual_feature_passed') is True and value.get('source')=='exact-home-search' else None
-    device.until(ready,15)
-    _context=dict(out=Path(out),owner=owner,target=target,sequence=0)
+        return value if value.get('pid')==owner['pid'] and value.get('max_requests')==MAX_REQUESTS and value.get('first_actual_feature_passed') is True and value.get('source')=='admitted-native-home-actions' and value.get('selected_mode') in ('final-search-all-enter','final-participant') else None
+    admitted=device.until(ready,15)
+    _context=dict(selected_mode=admitted['selected_mode'],out=Path(out),owner=owner,target=target,sequence=0)
 
 
 def launch(device,action='home-search'):
@@ -48,6 +48,8 @@ def launch(device,action='home-search'):
     if not current or current.get('pid')!=owner['pid'] or current.get('owner')!=owner['owner']:
         raise ValueError('Actual dispatch process changed')
     if action not in ACTIONS:raise ValueError('Unknown fixed dispatcher action')
+    if _context['selected_mode']=='final-participant' and action=='home-search':
+        raise ValueError('Home-only admission does not select Search')
     _context['sequence']+=1;sequence=_context['sequence'];_context['action']=action
     if sequence>MAX_REQUESTS:raise ValueError('Dispatcher request budget exceeded')
     path=_context['out']/'dispatch-request.json'

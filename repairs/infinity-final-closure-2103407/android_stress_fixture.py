@@ -34,7 +34,9 @@ def retained_state(raw):
 
 
 def seed(device, args, report, expected):
-    if (args.case != 'final-search-all-enter' or expected.get('post_feature') not in (COUNTS,HOME_COUNTS,SEARCH_COUNTS) or
+    counts=expected.get('post_feature')
+    required_case='final-participant' if counts==HOME_COUNTS else 'final-search-all-enter'
+    if (args.case != required_case or counts not in (COUNTS,HOME_COUNTS,SEARCH_COUNTS) or
             not expected.get('candidate_apk_sha256') or
             report.get('apk_sha256') != expected.get('candidate_apk_sha256')):
         raise ValueError('Only an exact selected candidate stress scope may be seeded')
@@ -53,12 +55,22 @@ def seed(device, args, report, expected):
     target = PROFILE + '/addon_data/script.infinity.commandcenter/continue-watching.json'
     # Checked shell exit status rejects existing files, broken links, and
     # transport errors; no empty/read-error value is treated as absence.
-    device.shell('test', '!', '-e', target)
-    device.shell('test', '!', '-L', target)
-    clip_target=PROFILE+'/infinity-final-qa.mp4'
-    device.shell('test','!','-e',clip_target);device.shell('test','!','-L',clip_target)
     raw = (OLD / 'tracking/final-eight/android_selected.py').read_bytes()
     state = retained_state(raw)
+    device.shell('test', '!', '-L', target)
+    preseeded = args.case == 'final-participant'
+    if preseeded:
+        # The frozen participant stage itself created this exact disposable
+        # fixture before first launch. Admit only that unchanged local AND
+        # device payload; never replace an unknown or running profile.
+        original = args.out/'final-profile/addon_data/script.infinity.commandcenter/continue-watching.json'
+        if (original.is_symlink() or not original.is_file() or original.stat().st_size > 8*1024*1024 or
+                json.loads(original.read_text()) != state or json.loads(device.shell('cat',target)) != state):
+            raise ValueError('Exact owned prelaunch participant fixture required')
+    else:
+        device.shell('test', '!', '-e', target)
+    clip_target=PROFILE+'/infinity-final-qa.mp4'
+    device.shell('test','!','-e',clip_target);device.shell('test','!','-L',clip_target)
     poster=None
     if expected.get('measure_cached_poster') is True:
         import cached_poster_observer
@@ -82,7 +94,9 @@ def seed(device, args, report, expected):
                     fixture_sha256=hashlib.sha256(local.read_bytes()).hexdigest(),
                     phase='before first app launch', synthetic_records=len(state['items']),
                     actual_user_data=False, runtime_writer_authority_added=False,
-                    existing_profile_replaced=False, readback_matches=True)
+                    existing_profile_replaced=False, readback_matches=True,
+                    original_owned_prelaunch_fixture_reused=preseeded,
+                    owned_fixture_art_augmented_before_first_launch=preseeded and poster is not None)
     evidence.update(declared_resume_clip_exists=True,declared_resume_clip_sha256=clip_sha,
                     generated_clip_seconds=180,actual_movie_content=False)
     if poster:evidence['actual_cached_poster']=poster

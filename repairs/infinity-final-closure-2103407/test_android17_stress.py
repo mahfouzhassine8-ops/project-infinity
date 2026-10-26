@@ -13,8 +13,8 @@ class StressAdmissionTests(unittest.TestCase):
         owner={'pid':123,'owner':'test-process'}
         device=SimpleNamespace(PACKAGE='com.projectinfinity.kodi',
             shell=lambda *a:'1' if a[-1]=='ro.kernel.qemu' else '37',running_engine=lambda:owner)
-        setup={'passed':True,'apk_sha256':'a'*64,'engine':owner}
-        expected={'candidate_apk_sha256':'a'*64,'post_feature':dict(stress.COUNTS)}
+        setup={'selected_case':'final-search-all-enter','passed':True,'apk_sha256':'a'*64,'engine':owner}
+        expected={'selected_case':'final-search-all-enter','candidate_apk_sha256':'a'*64,'post_feature':dict(stress.COUNTS)}
         return device,setup,expected
 
     def test_explicit_exact_selection_only_after_actual_feature_pass(self):
@@ -36,11 +36,12 @@ class StressAdmissionTests(unittest.TestCase):
     def test_independent_home_selection_is_exact_and_does_not_select_search(self):
         device,setup,expected=self.values()
         expected['post_feature']=dict(stress.HOME_COUNTS)
+        expected['selected_case']='final-participant';setup['selected_case']='final-participant'
         self.assertEqual(stress.admit(device,setup,expected),setup['engine'])
         self.assertEqual(expected['post_feature']['search'],0)
         self.assertEqual(expected['post_feature']['playback_home'],30)
         self.assertEqual(expected['post_feature']['rotation'],20)
-        self.assertEqual(stress.admit(device,setup,dict(expected,post_feature=dict(stress.SEARCH_COUNTS))),setup['engine'])
+        with self.assertRaises(RuntimeError):stress.admit(device,setup,dict(expected,post_feature=dict(stress.SEARCH_COUNTS)))
         for counts in ({'search':0,'playback_home':0,'rotation':0},
                        {'search':0,'playback_home':29,'rotation':20},
                        {'search':1,'playback_home':30,'rotation':20}):

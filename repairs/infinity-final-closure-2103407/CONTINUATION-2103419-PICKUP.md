@@ -145,3 +145,30 @@ twoactual37.0startupfailures andexplicitpending37.1Search/Home/rotation status.
 Privateactualreceiptsupdatedoutsidegit; nextwriteexpected_current_version4.
 Do notclaimfinalrelease orrequestinterimphysicalinstallation. Currentresults
 stillpending:40399697939/40399771565; updateSAMEsaveditemswithnewactualresults.
+
+
+## Actualstrict16KiBcomparisonFAIL andone AOSP comparison —21:13UTC
+
+40399697939/Home and40399771565/Search FAILEDbeforeKodi/Python,0stresscounts.
+Actual37.1/SDK37/release17/PAGE_SIZE16384. NoSIGSEGVintheseattempts: Java
+UnsatisfiedLinkError becauseactualbundledlibc++_shared.soPT_LOADalignment4096
+islessthansystempage16384. Actual47ARM64ELFprogramheaderaudit:46do notmeet
+strict16KiBconditions, includinglibkodi.so. APK ZIPalignment16384doesNOTprove
+ELFcompatibility; correctionsrecordedNATIVE-ELF-16K-419-RESULT.json. Do not
+mislabelthesecases astheearlierAT_RANDOMcrash orclaimnative16KiBsupport.
+PhysicalFoldpagesize remainsunverified. No sharednative/Cobra overhauljust
+tosatisfythischosenstrictimage; preserve working4KiB/API37Power/writerPASS.
+
+OneexplicitAOSP37.0/default/x86_64image comparison selectedatSAME419APK:
+Home30/rotation20 source287a8f72adf120cd3085d2383c1969cbb5961498;
+Search50 source09ab37e00327ea2f7c155e697682f4816e07b07a.
+ActualSDKcatalogpublishedthisimage. No lowerAPI/restartloop/deadline/assertion
+waiver/ABIcompatibilityoverride orclaimthisfixesconstructor. UnsupportedARM
+bridge/rendering/startup stillFAIL. Defaultmanual/referenceworkflowunchanged.
+ExactfourAOSPgatechecks+oldfour37.1gatechecks+sevenrouting+threeenvironment
+allowlist/manualfallbackchecks passed; all appcounts stillrequireactualresults.
+
+SavedZIP/checksumversion4 currentlyhasPower/writerPASS butprecedesnewstrict16KiB
+report. Producer/DELIVERY-419-STATUS/installtextnowcorrectthatlimit; rebuild/update
+SAMEsaveditems with expected_current_version4 afteractualAOSPresults. Do not
+lock/requestrepeatedexperimentalinstalls orclaimallsevenstreamscomplete.

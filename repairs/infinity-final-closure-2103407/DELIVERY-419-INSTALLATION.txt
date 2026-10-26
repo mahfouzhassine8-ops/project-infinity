@@ -10,6 +10,16 @@ Successful signed build:
 https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/40396544415
 Exact application source: a24db78554da7bc40a2a0b658ba441793f1c1605
 
+KNOWN NATIVE COMPATIBILITY LIMIT
+The APK ZIP is aligned to16KiB, but46of47bundled native ARM64 ELF libraries
+do not satisfy strict16KiB loading. Actual API37.1/16KiB trials rejected
+libc++_shared.so before Kodi/Python. This is distinct from the recorded
+API37.0 native-bridge AT_RANDOM constructor failure. APK ZIP alignment is
+not native ELF compatibility. Physical Fold page-size/compatibility remains
+unverified; this package is NOT an accepted release or an instruction to install
+on a strict16KiB device. No compatibility override or shared/Cobra native edit
+was introduced to conceal these outcomes.
+
 INSTALLATION ORDER FOR FINAL PHYSICAL ACCEPTANCE
 Read ACCEPTANCE-STATUS.json for the actual engineering results and open gates.
 Do not repeatedly install interim candidates while engineering work continues.

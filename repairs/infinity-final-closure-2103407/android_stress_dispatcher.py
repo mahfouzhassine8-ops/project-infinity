@@ -11,8 +11,9 @@ ACTIONS=frozenset(('home-search','home-resume-movie','home-resume-tv'))
 
 def require_ready(value,pid):
     if (value.get('passed') is not True or value.get('pid')!=pid or
-            value.get('selected_mode')!='final-search-all-enter'):
-        raise ValueError('Original actual Search must pass before dispatch')
+            value.get('selected_mode') not in ('final-search-all-enter','final-participant')):
+        raise ValueError('Actual selected feature must pass before dispatch')
+    return value['selected_mode']
 
 
 def accept(value,pid,sequence):
@@ -41,12 +42,12 @@ def serve(root,pid):
     root=Path(root);pid=int(pid)
     if root.is_symlink():raise ValueError('Linked fixture refused')
     ready=root/('navigation-ready-'+str(pid)+'.json')
-    require_ready(json.loads(ready.read_text()),pid)
+    mode=require_ready(json.loads(ready.read_text()),pid)
     def output(name,value):
         path=root/name
         if path.is_symlink():raise ValueError('Linked dispatcher file refused')
         pending=path.with_suffix('.tmp');pending.write_text(json.dumps(value));pending.replace(path)
-    output('stress-dispatch-ready.json',dict(pid=pid,max_requests=MAX_REQUESTS,source='exact-home-search',first_actual_feature_passed=True))
+    output('stress-dispatch-ready.json',dict(pid=pid,max_requests=MAX_REQUESTS,source='admitted-native-home-actions',selected_mode=mode,first_actual_feature_passed=True))
     request=root/('stress-open-request-'+str(pid)+'.json');monitor=xbmc.Monitor();sequence=1
     deadline=time.monotonic()+LIFETIME_SECONDS
     while sequence<=MAX_REQUESTS and time.monotonic()<deadline and not monitor.abortRequested():
@@ -55,6 +56,8 @@ def serve(root,pid):
             try:value=json.loads(request.read_text())
             except ValueError:value={}
             if accept(value,pid,sequence):
+                if mode=='final-participant' and value['action']=='home-search':
+                    raise ValueError('Home-only admission does not select Search')
                 # Same Home builtin as the retained original selected case.
                 if value['action']=='home-search':xbmc.executebuiltin(BUILTIN)
                 else:select_resume_tab('movie' if value['action']=='home-resume-movie' else 'tv')

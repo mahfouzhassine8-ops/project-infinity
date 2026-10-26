@@ -27,12 +27,22 @@ class StressScriptDispatchTests(unittest.TestCase):
             self.assertTrue(report['stress_script_bridge']['existing_observer_only'])
             with self.assertRaises(ValueError):bridge.stage(folder,args,report,device,aid)
 
+    def test_participant_stage_keeps_original_service_and_has_no_search_execution(self):
+        with tempfile.TemporaryDirectory() as temp:
+            folder,args,report,device,aid=self.context(Path(temp))
+            args.case='final-participant';service=folder/aid/'service.py'
+            original=service.read_text().replace("'final-search-all-enter'","'final-participant'")
+            service.write_text(original);bridge.stage(folder,args,report,device,aid)
+            self.assertEqual(service.read_text(),original+bridge.TAIL)
+            self.assertNotIn('RunScript',service.read_text())
+            self.assertEqual(report['stress_script_bridge']['extra_invokers_per_request'],0)
+
     def test_wrong_stage_case_and_physical_device_refused(self):
         for mode in ('physical','case','folder','aid'):
             with self.subTest(mode=mode),tempfile.TemporaryDirectory() as temp:
                 folder,args,report,device,aid=self.context(Path(temp))
                 if mode=='physical':device.shell=lambda *a:'0'
-                elif mode=='case':args.case='final-participant'
+                elif mode=='case':args.case='final-actions'
                 elif mode=='folder':folder=folder/'other'
                 else:aid='other'
                 with self.assertRaises(ValueError):bridge.stage(folder,args,report,device,aid)
@@ -41,7 +51,7 @@ class StressScriptDispatchTests(unittest.TestCase):
         from unittest import mock
         with tempfile.TemporaryDirectory() as temp,mock.patch.object(bridge,'_context',None):
             root=Path(temp);owner={'pid':123,'owner':'exact-native-token'};pushed=[]
-            ready={'pid':123,'max_requests':bridge.MAX_REQUESTS,'first_actual_feature_passed':True,'source':'exact-home-search'}
+            ready={'pid':123,'max_requests':bridge.MAX_REQUESTS,'first_actual_feature_passed':True,'source':'admitted-native-home-actions','selected_mode':'final-search-all-enter'}
             device=SimpleNamespace(PROFILE='/qa/profile',read_json=lambda p:ready,
                 until=lambda fn,seconds:fn(),running_engine=lambda:owner,
                 adb=lambda *args:pushed.append(args))
@@ -59,6 +69,23 @@ class StressScriptDispatchTests(unittest.TestCase):
             with self.assertRaises(ValueError):bridge.launch(device)
             device.running_engine=lambda:owner;bridge._context['sequence']=bridge.MAX_REQUESTS
             with self.assertRaises(ValueError):bridge.launch(device)
+
+    def test_participant_home_dispatch_refuses_search_without_new_invoker(self):
+        from unittest import mock
+        import android_stress_dispatcher as dispatcher
+        self.assertEqual(dispatcher.require_ready({'passed':True,'pid':123,'selected_mode':'final-participant'},123),'final-participant')
+        for wrong in ({'passed':False,'pid':123,'selected_mode':'final-participant'},
+                      {'passed':True,'pid':124,'selected_mode':'final-participant'},
+                      {'passed':True,'pid':123,'selected_mode':'final-actions'}):
+            with self.assertRaises(ValueError):dispatcher.require_ready(wrong,123)
+        owner={'pid':123,'owner':'same'}
+        with tempfile.TemporaryDirectory() as temp,mock.patch.object(bridge,'_context',
+                dict(selected_mode='final-participant',out=Path(temp),owner=owner,target='/qa',sequence=0)):
+            pushed=[];device=SimpleNamespace(running_engine=lambda:owner,adb=lambda *a:pushed.append(a))
+            with self.assertRaises(ValueError):bridge.launch(device,'home-search')
+            self.assertEqual(pushed,[])
+            bridge.launch(device,'home-resume-tv');self.assertEqual(len(pushed),1)
+            self.assertEqual(bridge._context['sequence'],1)
 
     def test_both_stress_openings_use_bridge_and_keep_actual_input_assertions(self):
         path=Path(__file__).parent/'android17_stress.py';source=path.read_text();tree=ast.parse(source)

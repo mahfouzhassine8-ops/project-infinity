@@ -23,7 +23,7 @@ class CandidateVerificationTests(unittest.TestCase):
         result=dispatch.validate(request.EXPECTED,event,head,[dispatch.REQUEST])
         self.assertEqual(result['SELECTED_CASE'],request.EXPECTED['selected_case'])
         self.assertEqual(result['CANDIDATE_BUILD'],str(request.EXPECTED['candidate_build']))
-        for field,value in [('selected_case','final-participant'),('candidate_build',40230842944),
+        for field,value in [('selected_case','final-actions'),('candidate_build',40230842944),
             ('candidate_source_commit','b'*40),('candidate_apk_sha256','0'*64),('authorization',''),
             ('request_id','integrated408-participant-installover-01')]:
             with self.assertRaises(ValueError):dispatch.validate(dict(request.EXPECTED,**{field:value}),event,head,[dispatch.REQUEST])

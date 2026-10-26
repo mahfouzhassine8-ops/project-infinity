@@ -73,6 +73,12 @@ class StressFixtureTests(unittest.TestCase):
             with self.subTest(counts=counts),tempfile.TemporaryDirectory() as temp:
                 root=Path(temp);device,args,report,expected=self.context(root)
                 expected['post_feature']=dict(counts)
+                if counts==fixture.HOME_COUNTS:
+                    args.case='final-participant'
+                    state=fixture.retained_state((fixture.OLD/'tracking/final-eight/android_selected.py').read_bytes())
+                    original=root/'final-profile/addon_data/script.infinity.commandcenter/continue-watching.json'
+                    original.parent.mkdir(parents=True);original.write_text(json.dumps(state))
+                    device.data[fixture.PROFILE+'/addon_data/script.infinity.commandcenter/continue-watching.json']=original.read_text()
                 fixture.seed(device,args,report,expected)
                 state=json.loads(device.data[fixture.PROFILE+'/addon_data/script.infinity.commandcenter/continue-watching.json'])
                 self.assertEqual(state,fixture.retained_state((fixture.OLD/'tracking/final-eight/android_selected.py').read_bytes()))
@@ -81,6 +87,29 @@ class StressFixtureTests(unittest.TestCase):
             with tempfile.TemporaryDirectory() as temp:
                 root=Path(temp);device,args,report,expected=self.context(root)
                 expected['post_feature']=counts
+                with self.assertRaises(ValueError):fixture.seed(device,args,report,expected)
+                self.assertEqual(device.calls,[])
+
+    def test_unknown_preseeded_participant_state_is_never_overwritten(self):
+        for changed in ('local','device','link'):
+            with tempfile.TemporaryDirectory() as temp:
+                root=Path(temp);device,args,report,expected=self.context(root)
+                args.case='final-participant';expected['post_feature']=dict(fixture.HOME_COUNTS)
+                state=fixture.retained_state((fixture.OLD/'tracking/final-eight/android_selected.py').read_bytes())
+                original=root/'final-profile/addon_data/script.infinity.commandcenter/continue-watching.json'
+                original.parent.mkdir(parents=True);original.write_text(json.dumps(state))
+                device.data[fixture.PROFILE+'/addon_data/script.infinity.commandcenter/continue-watching.json']=original.read_text()
+                if changed=='local':original.write_text('{}')
+                elif changed=='device':device.data[fixture.PROFILE+'/addon_data/script.infinity.commandcenter/continue-watching.json']='{}'
+                else:original.unlink();original.symlink_to(root/'unknown')
+                with self.assertRaises(ValueError):fixture.seed(device,args,report,expected)
+                self.assertFalse(any(c[0]=='push' for c in device.calls))
+
+    def test_home_scope_needs_participant_and_search_scope_needs_search_precondition(self):
+        for mode,counts in (('final-participant',fixture.SEARCH_COUNTS),('final-search-all-enter',fixture.HOME_COUNTS)):
+            with tempfile.TemporaryDirectory() as temp:
+                root=Path(temp);device,args,report,expected=self.context(root)
+                args.case=mode;expected['post_feature']=dict(counts)
                 with self.assertRaises(ValueError):fixture.seed(device,args,report,expected)
                 self.assertEqual(device.calls,[])
 
