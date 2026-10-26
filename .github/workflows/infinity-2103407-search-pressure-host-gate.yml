@@ -127,7 +127,7 @@ jobs:
           scope=json.load(open('repairs/infinity-final-closure-2103407/SCOPE.json'))
           assert scope['baseline']['commit']==baseline
           assert len(scope['workstreams'])==7
-          print('PASS protected407 source boundary; no application runtime/Cobra source edits')
+          print('PASS protected407 source boundary; runtime recipes restricted to reviewed repair ownership; no Cobra paths')
           PY
       - uses: actions/download-artifact@v4
         with:
@@ -177,7 +177,7 @@ jobs:
           assert request['schema']==1 and request['scope'].strip()
           selected=request['selected']
           assert selected in {'search-lifetime','module-trust','installed-modules','module-protocol',
-                              'firstparty-compose','reference-observation','module-bundle','module-complete','internal-apk','candidate-routing','shutdown-routing','android-routing'}
+                              'firstparty-compose','reference-observation','module-bundle','module-complete','internal-apk','internal-service-apk','candidate-routing','shutdown-routing','android-routing'}
           with open(os.environ['GITHUB_OUTPUT'],'a') as output:
               output.write('selection='+selected+'\n')
           if selected=='search-lifetime':
@@ -211,6 +211,9 @@ jobs:
               sys.exit(0)
           elif selected=='internal-apk':
               print('Packagingonly: retainedsuccessfulfullnative40287479124 andauthenticatedCC41module40294818797. Noapplication/shutdownsuite orunit-testrepeat.')
+              sys.exit(0)
+          elif selected=='internal-service-apk':
+              print('Packaging410 only: exact409 engine/DEX/modules remain unchanged. Scoped VersionCheck source and negative checks run below against exact409 on Python3.11 before signing. No application or Close tests.')
               sys.exit(0)
           elif selected=='shutdown-routing':
               for pattern in ('test_shutdown_verification.py','test_candidate_verification.py'):
@@ -291,6 +294,31 @@ jobs:
           name: Infinity-Final-Source-Ownership-40294818797-NOT-APK
           github-token: ${{ github.token }}
           path: package-modules
+      - name: Recover exact original-signer409 for one scoped Android service correction
+        if: steps.selected.outputs.selection == 'internal-service-apk'
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 40295309934
+          name: Infinity-2103409-Integrated-INTERNAL-NOT-FINAL-40295309934
+          github-token: ${{ github.token }}
+          path: service-parent
+      - name: Verify actual bundled service scope and packaging negatives on Python311
+        if: steps.selected.outputs.selection == 'internal-service-apk'
+        run: |
+          set -euo pipefail
+          export INFINITY_SERVICE_PARENT_APK="$(find service-parent -type f -name 'Infinity-2103409-Integrated-INTERNAL-VERIFICATION.apk' -print -quit)"
+          PYTHONPATH=repairs/infinity-final-closure-2103407 python3 -m unittest test_versioncheck_scope.py test_service_packaging.py -v
+      - name: Audit exact409-to410 two-member delta and sign original identity
+        if: steps.selected.outputs.selection == 'internal-service-apk'
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 repairs/infinity-final-closure-2103407/package_versioncheck.py \
+            --parent-root service-parent --sdk "$ANDROID_HOME/build-tools/35.0.0" --out internal-service-candidate
       - name: Integrate, audit every APK member and sign original identity - internal candidate only
         if: steps.selected.outputs.selection == 'internal-apk'
         env:
@@ -304,7 +332,7 @@ jobs:
             --parent-root signed407 --module-root package-modules --native-root package-native \
             --sdk "$ANDROID_HOME/build-tools/35.0.0" --out internal-candidate
       - uses: actions/upload-artifact@v4
-        if: always() && steps.selected.outputs.selection != 'module-bundle' && steps.selected.outputs.selection != 'internal-apk'
+        if: always() && steps.selected.outputs.selection != 'module-bundle' && steps.selected.outputs.selection != 'internal-apk' && steps.selected.outputs.selection != 'internal-service-apk'
         with:
           name: Infinity-Final-Source-Ownership-${{ github.run_id }}-NOT-APK
           path: final-work/
@@ -321,6 +349,19 @@ jobs:
             internal-candidate/*.txt
             internal-candidate/SHA256SUMS
             internal-package-inputs.json
+          retention-days: 90
+          if-no-files-found: warn
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.selected.outputs.selection == 'internal-service-apk'
+        with:
+          name: Infinity-2103410-Corrective-INTERNAL-NOT-FINAL-${{ github.run_id }}
+          path: |
+            internal-service-candidate/*.apk
+            internal-service-candidate/components/*.zip
+            internal-service-candidate/*.json
+            internal-service-candidate/*.txt
+            internal-service-candidate/SHA256SUMS
+            repairs/infinity-final-closure-2103407/VERSIONCHECK-2103410-PLAN.json
           retention-days: 90
           if-no-files-found: warn
       - uses: actions/upload-artifact@v4
