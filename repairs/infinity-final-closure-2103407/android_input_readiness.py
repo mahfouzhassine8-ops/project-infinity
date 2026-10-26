@@ -12,7 +12,7 @@ DRIVER_AFTER="        return (values,edit) if edit is not None and _candidate_im
 def proof(state,log,pids):
     shown=bool(re.search(r'\bmInputShown\s*[=:]\s*true\b',state))
     current=IME in state
-    body=[line for line in log.splitlines() if 'onKeyboardViewShown' in line and 'keyboardType=BODY' in line and
+    body=[line for line in log.splitlines() if 'onKeyboardViewShown' in line and re.search(r'\bkeyboardViewType=BODY\b',line) and
           len(line.split())>4 and line.split()[2] in pids]
     return dict(ready=shown and current and bool(body),input_shown=shown,current_expected_IME=current,
                 keyboard_body_shown=bool(body),actual_IME_pids=pids,last_body_event=body[-1] if body else '')

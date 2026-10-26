@@ -10,7 +10,7 @@ EXPECTED=dict(schema=1,kind='integrated-candidate',selected_case='final-search-a
     candidate_build=40295309934,candidate_source_commit='b65ae4981f10bd6badf118ce95f360d28499c2d7',
     candidate_apk_sha256='4d68e3bf21ee109a9196267e9ed2b21ea8430fff8dede331af3c199e9921bf21',
     candidate_artifact='Infinity-2103409-Integrated-INTERNAL-NOT-FINAL-40295309934',
-    authorization=AUTHORIZATION,request_id='integrated409-search-ime-ready-01')
+    authorization=AUTHORIZATION,request_id='integrated409-search-ime-body-field-02')
 
 
 def validate(request):

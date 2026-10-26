@@ -12,11 +12,15 @@ import shutdown_environment as environment
 class InputReadinessTests(unittest.TestCase):
     def test_current_drawn_IME_is_required_and_cold_or_wrong_process_is_refused(self):
         state='mInputShown=true\nmCurId='+readiness.IME
-        line='10-26 09:42:51.689 1544 1544 I GoogleInputMethodService: onKeyboardViewShown():98 keyboardType=BODY'
-        self.assertTrue(readiness.proof(state,line,['1544'])['ready'])
-        for changed,log,pids in ((state.replace('true','false'),line,['1544']),
-            ('mInputShown=true',line,['1544']),(state,line,['9999']),
-            (state,line.replace('BODY','HEADER'),['1544']),(state,'',[])):
+        # Actual run40303745072 field names; keyboardType is "prime", while
+        # keyboardViewType distinguishes the HEADER from the rendered BODY.
+        line='10-26 10:15:44.299 1635 1635 I GoogleInputMethodService: GoogleInputMethodService$1.onKeyboardViewShown():344 onKeyboardViewShown: keyboardType=prime, keyboardViewType=BODY'
+        self.assertTrue(readiness.proof(state,line,['1635'])['ready'])
+        for changed,log,pids in ((state.replace('true','false'),line,['1635']),
+            ('mInputShown=true',line,['1635']),(state,line,['9999']),
+            (state,line.replace('BODY','HEADER'),['1635']),
+            (state,line.replace('keyboardViewType','keyboardType'),['1635']),
+            (state,line.replace('BODY','BODY_PENDING'),['1635']),(state,'',[])):
             self.assertFalse(readiness.proof(changed,log,pids)['ready'])
 
     def test_only_readiness_predicate_changes_in_frozen_actual_input_driver(self):

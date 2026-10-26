@@ -1,0 +1,25 @@
+{
+  "correction": "Parse the actual Gboard keyboardViewType=BODY field in the test-only readiness helper.",
+  "failed_run": 40303745072,
+  "failed_test_source": "5439021f9bf88912b735575e4cc864bd4d8ddca1",
+  "evidence_artifact": 12642077316,
+  "evidence_sha256": "2f1674c7708b84187f68b5e5333082cd0fb44490ca605523d7cb79afcabc3cfd",
+  "observed": "Input shown=true, expected IME PID 1635, onKeyboardViewShown keyboardType=prime, keyboardViewType=BODY at 10:15:44.299. The helper wrongly required keyboardType=BODY and timed out before text entry or Enter.",
+  "selected_before_implementation": [
+    "Host: actual BODY field accepted; HEADER, wrong field, suffix, hidden input, missing IME and mismatched PID refused.",
+    "Host: replay the captured input-method-state and input-method-view-events files with actual PID 1635.",
+    "Host: frozen driver inverse and exact candidate request binding checks.",
+    "Android 17 only: existing signed409 final-search-all-enter, unchanged input, exact query, Enter, result identity, history and responsive Home assertions. No stress, shutdown or rebuild."
+  ],
+  "preserved": [
+    "Original 45-second keyboard deadline",
+    "Exact query assertion",
+    "All APK/component bytes",
+    "Cobra",
+    "TrackIt provider memory",
+    "Historical failed runs"
+  ],
+  "host_result": "PASS: 3 selected unit tests and actual captured Android evidence replay (old predicate false, corrected predicate true). This is not a new device pass.",
+  "android17_result": "NOT RUN",
+  "physical_fold_result": "NOT RUN"
+}
