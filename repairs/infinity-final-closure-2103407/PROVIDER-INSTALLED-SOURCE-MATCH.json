@@ -1,0 +1,49 @@
+{
+  "private_probe_sha256": "1878614bac8493748ca3d1400ead0942aee52b0c59d02c6212a092f7957e30e1",
+  "collected_utc": "2026-10-26T08:04:39Z",
+  "matches": {
+    "plugin.video.thecrew": {
+      "version": "3.2.2",
+      "enabled": true,
+      "addon_xml_sha256": "17b833c8752fd7c2171939294c6a05f958e82b1e50537721189868e468ae1b91",
+      "exact_publisher_raw_matches": [
+        {
+          "file": "thecrew.py",
+          "sha256": "9ee54c130080be01f1fe209384e7cba04add0d09bb8edf72d02e5cbe4a94642d"
+        }
+      ]
+    },
+    "plugin.video.redlight": {
+      "version": "2.9.1",
+      "enabled": true,
+      "addon_xml_sha256": "a2ccceb1e503d3ab06242df149d6d7b87210c48d88177523a8c008e8e25b3f09",
+      "exact_publisher_raw_matches": [
+        {
+          "file": "resources/lib/redlight.py",
+          "sha256": "eff3258041bb8daec747c8d437a9bde415d135c9cb97492e91f4d404608b4d10"
+        },
+        {
+          "file": "resources/lib/apis/tmdb_api.py",
+          "sha256": "2670f6e42f42747ecf56003d8f2f9efed6551343ab9cc77fccf0f18065c70097"
+        },
+        {
+          "file": "resources/lib/indexers/movies.py",
+          "sha256": "7608fc1f0667a8223ef48715d4f03a67dc474761b5a4496ec09f1ab7d80b7177"
+        },
+        {
+          "file": "resources/lib/indexers/tvshows.py",
+          "sha256": "5824b9f9b95c0de362629b570928f21447157c06d4c13b8fc7d1f3bf74f41e37"
+        },
+        {
+          "file": "resources/lib/modules/router.py",
+          "sha256": "d0f6241ac206db95c026bd704a29e984095d91890081ac463460bebd72425a69"
+        }
+      ]
+    }
+  },
+  "not_claimed": [
+    "live search results",
+    "installed Crew dependency version/source proof",
+    "physical candidate acceptance"
+  ]
+}

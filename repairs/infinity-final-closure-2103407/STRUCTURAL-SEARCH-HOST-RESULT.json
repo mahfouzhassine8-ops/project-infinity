@@ -1,0 +1,45 @@
+{
+  "tested_before_publication": true,
+  "local_host_results": {
+    "test_mode_class_search.py": {
+      "passed": 7,
+      "actual_publisher_fixture_version": "2.9.1",
+      "installed_raw_source_matches": 5,
+      "provider_execution": false
+    },
+    "test_structural_cache.py": {
+      "passed": 2,
+      "unchanged_scans": 20,
+      "recognitions_first": 1,
+      "recognitions_after_unchanged_scans": 1,
+      "own_source_change_reverified": true,
+      "dependency_source_and_version_change_reverified": true,
+      "disabled_dependency_and_provider_excluded": true
+    }
+  },
+  "composition_check": {
+    "candidate_version": "0.3.5.41",
+    "matching_signed408_helper_files": 16,
+    "only_changed_Search_function_AST": [
+      "route",
+      "_publish_result"
+    ],
+    "worker_lease_cancellation_AST_preserved": true,
+    "W3C_release_getter": true
+  },
+  "source_sha256": {
+    "structural_search.py": "53dbe7c0f1b67ba6656731ff4dd979cfcf0b1fa2268de64f5517551ce4468f6d",
+    "patch_mode_class_integration.py": "02498f0e5e2428554f1e26d6a8307e83b9711784612cd5e0e8372c2d638f96a7",
+    "MODE-CLASS-SEARCH-POLICY.json": "b975208f74e4bb041058e2ae2310906002126c224672f0e5385b014abb282ff0"
+  },
+  "native_build": {
+    "run": 40287479124,
+    "source": "89300fa6690015f17378657f96230040bb4766ea",
+    "complete_ARM64_compile": "PASS",
+    "libkodi_sha256": "151128c176b6094f28bb3fc716cc07c3985a9aa38f1fe41e1bb1424f0285a47e"
+  },
+  "Android17": "NOT RUN for409",
+  "physical_Fold": "NOT RUN for409",
+  "signed_409_APK": "NOT PRODUCED bythisrecord",
+  "release_accepted": false
+}
