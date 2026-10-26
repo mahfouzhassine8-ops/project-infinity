@@ -140,9 +140,11 @@ def _run(device,setup,expected,out):
             edits=[n for n in values if n.get('class')=='android.widget.EditText' and n.get('enabled')=='true']
             return (values,edits[0]) if len(edits)==1 else None
         def typing_keyboard():
-            value=keyboard()
             import android_input_readiness
-            return value if value and android_input_readiness.ready(device,out) else None
+            # Do not launch repeated UIAutomator VMs while the actual native
+            # keyboard is still opening. Require the same strict IME proof,
+            # then read the current real EditText under the original deadline.
+            return keyboard() if android_input_readiness.ready(device,out) else None
         values,edit=device.until(typing_keyboard,45) # Retain the actual original keyboard deadline.
         android_stress_script.verify_dispatch(device)
         wanted='Search All' if provider=='all' else 'Umbrella'

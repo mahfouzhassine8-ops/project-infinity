@@ -1,0 +1,6 @@
+{
+  "recorded_before_implementation": true,
+  "cause_evidence": "SEARCH-41402-PARTIAL-RESULT.json and original Android log/dump: final UI hierarchy predates actual keyboard while current deadline expires. Repeated UIAutomator launch during Search startup is unnecessary observer work.",
+  "correction": "In stress typing_keyboard only, check original strict current Google IME readiness before asking UIAutomator for actual enabled EditText/provider rows. Retain every condition, original45sec wait and native input action. No app retries, deadline increase, synthetic UI or APK edits.",
+  "selected_checks": ["Actual stress function AST order proves no hierarchy dump while IME unready; after ready still requires actual single EditText", "Original45sec wait and Enter/provider/result/history/duplicate/cancel counts unchanged", "Existing actual first Search IME contract"]
+}
