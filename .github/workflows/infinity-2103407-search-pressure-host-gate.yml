@@ -122,6 +122,11 @@ jobs:
                              '.github/workflows/infinity-saved-navigation-android.yml',
                              '.github/workflows/infinity-2103402-native-owner-build.yml',
                          '.github/workflows/infinity-shutdown-verification.yml'}
+          # Existing read-only ARM capability probe predates this P0 change.
+          # Preserve its exact historical blob; this never selects or runs it.
+          historical_probe='.github/workflows/infinity-native-arm-capability.yml'
+          assert subprocess.check_output(['git','rev-parse','HEAD:'+historical_probe],text=True).strip()=='c3e32de69ba273bb408fbf305edf43ed41779529'
+          allowed_workflows.add(historical_probe)
           assert all(n.startswith('repairs/infinity-final-closure-2103407/') or n in allowed_workflows for n in names), names
           assert not any('cobra' in n.lower() for n in names), names
           scope=json.load(open('repairs/infinity-final-closure-2103407/SCOPE.json'))
