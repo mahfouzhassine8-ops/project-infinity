@@ -177,7 +177,7 @@ jobs:
           assert request['schema']==1 and request['scope'].strip()
           selected=request['selected']
           assert selected in {'search-lifetime','module-trust','installed-modules','module-protocol',
-                              'firstparty-compose','reference-observation','module-bundle','module-complete','internal-apk','internal-service-apk','candidate-routing','shutdown-routing','android-routing'}
+                              'firstparty-compose','reference-observation','module-bundle','module-complete','internal-apk','internal-service-apk','internal-coordinator-apk','candidate-routing','shutdown-routing','android-routing'}
           with open(os.environ['GITHUB_OUTPUT'],'a') as output:
               output.write('selection='+selected+'\n')
           if selected=='search-lifetime':
@@ -214,6 +214,9 @@ jobs:
               sys.exit(0)
           elif selected=='internal-service-apk':
               print('Packaging410 only: exact409 engine/DEX/modules remain unchanged. Scoped VersionCheck source and negative checks run below against exact409 on Python3.11 before signing. No application or Close tests.')
+              sys.exit(0)
+          elif selected=='internal-coordinator-apk':
+              print('Packaging411 only: exact410 with two audited coordinator dispatch instructions; no behavioral suite.')
               sys.exit(0)
           elif selected=='shutdown-routing':
               for pattern in ('test_shutdown_verification.py','test_candidate_verification.py'):
@@ -319,6 +322,44 @@ jobs:
           set -euo pipefail
           python3 repairs/infinity-final-closure-2103407/package_versioncheck.py \
             --parent-root service-parent --sdk "$ANDROID_HOME/build-tools/35.0.0" --out internal-service-candidate
+      - name: Recover exact original-signer410 for coordinator dispatch correction
+        if: steps.selected.outputs.selection == 'internal-coordinator-apk'
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 40305746524
+          name: Infinity-2103410-Corrective-INTERNAL-NOT-FINAL-40305746524
+          github-token: ${{ github.token }}
+          path: coordinator-parent
+      - name: Restore pinned original DEX writer
+        if: steps.selected.outputs.selection == 'internal-coordinator-apk'
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39867073954
+          name: Infinity-Receipt-Race-Android17-Investigation
+          github-token: ${{ github.token }}
+          path: coordinator-tools
+      - name: Reconstruct exact coordinator and audit all protected definitions
+        if: steps.selected.outputs.selection == 'internal-coordinator-apk'
+        run: |
+          set -euo pipefail
+          export INFINITY_COORDINATOR_PARENT_APK="$(find coordinator-parent -type f -name 'Infinity-2103410-VersionCheck-Corrective-INTERNAL-VERIFICATION.apk' -print -quit)"
+          python3 repairs/infinity-final-closure-2103407/coordinator_dex.py \
+            --apk "$INFINITY_COORDINATOR_PARENT_APK" --jars coordinator-tools/receipt-evidence/tool-jars \
+            --java "$JAVA_HOME/bin/java" --javac "$JAVA_HOME/bin/javac" --out final-work/coordinator-dex
+          export INFINITY_COORDINATOR_SMALI="$PWD/final-work/coordinator-dex/original-smali/com/projectinfinity/kodi/InfinityCloseGuardService.smali"
+          PYTHONPATH=repairs/infinity-final-closure-2103407 python3 -m unittest test_coordinator_dispatch test_coordinator_packaging -v
+      - name: Audit exact410-to411 two-member delta and sign original identity
+        if: steps.selected.outputs.selection == 'internal-coordinator-apk'
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 repairs/infinity-final-closure-2103407/package_coordinator.py \
+            --parent-root coordinator-parent --dex-root final-work/coordinator-dex \
+            --sdk "$ANDROID_HOME/build-tools/35.0.0" --out internal-coordinator-candidate
       - name: Integrate, audit every APK member and sign original identity - internal candidate only
         if: steps.selected.outputs.selection == 'internal-apk'
         env:
@@ -332,7 +373,7 @@ jobs:
             --parent-root signed407 --module-root package-modules --native-root package-native \
             --sdk "$ANDROID_HOME/build-tools/35.0.0" --out internal-candidate
       - uses: actions/upload-artifact@v4
-        if: always() && steps.selected.outputs.selection != 'module-bundle' && steps.selected.outputs.selection != 'internal-apk' && steps.selected.outputs.selection != 'internal-service-apk'
+        if: always() && steps.selected.outputs.selection != 'module-bundle' && steps.selected.outputs.selection != 'internal-apk' && steps.selected.outputs.selection != 'internal-service-apk' && steps.selected.outputs.selection != 'internal-coordinator-apk'
         with:
           name: Infinity-Final-Source-Ownership-${{ github.run_id }}-NOT-APK
           path: final-work/
@@ -362,6 +403,22 @@ jobs:
             internal-service-candidate/*.txt
             internal-service-candidate/SHA256SUMS
             repairs/infinity-final-closure-2103407/VERSIONCHECK-2103410-PLAN.json
+          retention-days: 90
+          if-no-files-found: warn
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.selected.outputs.selection == 'internal-coordinator-apk'
+        with:
+          name: Infinity-2103411-Corrective-INTERNAL-NOT-FINAL-${{ github.run_id }}
+          path: |
+            internal-coordinator-candidate/*.apk
+            internal-coordinator-candidate/components/*.zip
+            internal-coordinator-candidate/*.json
+            internal-coordinator-candidate/*.txt
+            internal-coordinator-candidate/*.patch
+            internal-coordinator-candidate/SHA256SUMS
+            final-work/coordinator-dex/DEX-COORDINATOR-PRESERVATION.json
+            final-work/coordinator-dex/COORDINATOR.patch
+            repairs/infinity-final-closure-2103407/COORDINATOR-2103411-PLAN.json
           retention-days: 90
           if-no-files-found: warn
       - uses: actions/upload-artifact@v4
