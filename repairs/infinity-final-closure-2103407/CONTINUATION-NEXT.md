@@ -1,5 +1,9 @@
 # Current continuation: final corrective from exact signed407
 
+> **NEW OCT 26 PHYSICAL FOLD EVIDENCE — ACTION REQUIRED IN EXISTING FINAL WORKSTREAMS:**
+> Read `repairs/infinity-final-closure-2103407/PHYSICAL-FOLD-2103408-PROVIDER-SELF-VERIFICATION-OPTIONB-SHUTDOWN-20261026.md` before next Search/provider, Option B, or Essential-First edit. User confirms Crew/Red Light excluded despite installed status; exact signed 2103408 inventory recognizes only seven reviewed code contracts, **not** automatic compatible-fork discovery. 2103408 Option B trailer is inert in Umbrella Search result, and actual ~6.9 s Close fails at image:// multiimage backend owner despite CC0.3.5.40 COMMITTED. Treat as direct regression evidence for seven already authorized workstreams; source-proof-driven safe fixes, no Cobra changes or unsafe verifier bypass. Diagnostic source ZIP remains private; no final acceptance claimed.
+
+
 Continue this checkout/branch; do not restart or move lock/infinity-2103407-proven-passing-only-20261025. Protected0e8739d2d0e1be0ab8f127519b526556426fb160; finalcandidate2103408, NOT accepted. Only7frozenworkstreams in AUTHORITATIVE-BRIEF.md. Cobra ZEROchanges, originalpermanentsigner/data/providers/TrackIt/WatchNixtoons2 preserved. No release or physicalPASS implied by hostchecks.
 
 Last prior published checkpoint217c5f5b6f1c7171cc09cbde92a1f50cd8bfa3f9. This checkpoint adds initial install-over module migration/build/signing producers, not anAPK. SCOPE.json and pre-editJAVA-MODULE-MIGRATION-PLAN/BUNDLE-OWNERSHIP/FIRSTPARTY-COMPOSITION-PLAN record exactboundaries. CurrentIMPLEMENTATION-EVIDENCE records realfailures/passes.
