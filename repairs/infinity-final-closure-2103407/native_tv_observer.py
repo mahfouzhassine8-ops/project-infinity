@@ -6,6 +6,16 @@ FOLDER='/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/us
 DIRECTORY='plugin://script.infinity.commandcenter/?action=library&media=tv&bucket=next'
 
 
+def source_memory_preserved(before,after,played_key,actual_source):
+    """Only the genuinely played title may acquire its new successful source."""
+    if not isinstance(before,dict) or not isinstance(after,dict):return False
+    if set(after)-set(before)-{played_key}:return False
+    if any(after.get(key)!=value for key,value in before.items() if key!=played_key):return False
+    selected=after.get(played_key)
+    return (isinstance(selected,dict) and selected.get('route')==actual_source and
+            selected.get('failures')==0 and type(selected.get('updated')) is int and selected['updated']>0)
+
+
 def run(ui,hub,profile,result):
     import xbmc
     def passed(name,**fields):
@@ -58,8 +68,11 @@ def run(ui,hub,profile,result):
     for key in ('c'*64,'d'*64):ui.require(key in complete['items'],'Completed history must remain stored')
     ui.require(not hub.entries(complete,'tv'),'Completed episode is removed from Continue Playing')
     for key in ('a'*64,'b'*64):ui.require(complete['items'][key]==before['items'][key],'Movie progress preserved by TV playback')
-    for bucket in ('watchlist','collection','lists','sources','navigation_recovery','later'):
+    for bucket in ('watchlist','collection','lists','navigation_recovery','later'):
         ui.require(complete.get(bucket)==before.get(bucket),'TV playback preserves '+bucket)
+    ui.require(source_memory_preserved(before.get('sources',{}),complete.get('sources',{}),
+               'd'*64,FOLDER+'QA.S01E02.mp4'),'TV preserves unrelated source memory and remembers actual played source')
+    result['native_tv_source_memory']=dict(before=before.get('sources',{}),after=complete.get('sources',{}))
     began=time.monotonic()
     rows=ui.rpc('Files.GetDirectory',{'directory':DIRECTORY,'media':'video',
         'properties':['season','episode','resume','uniqueid','showtitle']})['files']

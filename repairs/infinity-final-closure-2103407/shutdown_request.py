@@ -10,9 +10,9 @@ from candidate_request import EXPECTED as CANDIDATE
 ROOT=Path(__file__).parent
 REQUEST='repairs/infinity-final-closure-2103407/SHUTDOWN-REQUEST.json'
 WORKFLOW='.github/workflows/infinity-shutdown-verification.yml'
-AUTHORIZATION='UserOct26 independently verify latest signed417 original visible Power Close row after actual Continue Watching/Home scheduler corrections: exact backend mapping, all16 durable essential owners/native and2Java seals, Kodi engine termination, Android coordinator completion, strict zero final UID processes, Recents independent of PID proof, unchanged remembered preference and protected SQLite/all records readback across3authentic reopens. Preserve ordinary411run40317069331 and415PowerUI40360243111; separate image/unsafe415pass40361797363. No harness kill/reset, unknown writer waiver, chooser/Cobra change or physical acceptance.'
-EXPECTED=dict(schema=1,kind="independent-essential-first",request_id="integrated417-real-power-ui-three-close-readback-01",
-    scenario="integrated-real-power-ui",candidate_build=CANDIDATE["candidate_build"],
+AUTHORIZATION='UserOct26 independent latest signed417 native writer/persistence negative controls after actual Home/Continue integration:16real image-directory controls with distinct job/generation/factory identities, unchanged-no-start receipts separated from actual jobs, positive Essential-First protected Close/reopen then actual opaque writer must veto without save/authorization/death claim and unchanged protected state. Preserve original411ordinary3PASS40317069331 and latest417actualPower3PASS40373328781; this specialized outcome remains separate. No runtime/chooser/Cobra change, duplicate identity waiver, timeout increase, fake receipts, harness kill/reset or physical acceptance.'
+EXPECTED=dict(schema=1,kind="independent-essential-first",request_id="integrated417-native-image-and-unsafe-separate-01",
+    scenario="integrated-native-image-and-unsafe",candidate_build=CANDIDATE["candidate_build"],
     candidate_source_commit=CANDIDATE["candidate_source_commit"],
     candidate_apk_sha256=CANDIDATE["candidate_apk_sha256"],authorization=AUTHORIZATION)
 

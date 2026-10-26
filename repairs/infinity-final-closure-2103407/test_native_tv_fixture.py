@@ -9,11 +9,21 @@ import unittest
 from unittest.mock import patch
 
 import native_tv_fixture as fixture
+import native_tv_observer as observer
 import android17_candidate_probe as candidate
 from android17_reference_observation import OLD
 
 
 class NativeTVFixtureTests(unittest.TestCase):
+    def test_only_actual_played_title_may_update_successful_source_memory(self):
+        before={'foreign':{'route':'untouched original provider','failures':0,'updated':1}}
+        source=observer.FOLDER+'QA.S01E02.mp4'
+        after=dict(before,**{'d'*64:dict(route=source,failures=0,updated=2)})
+        self.assertTrue(observer.source_memory_preserved(before,after,'d'*64,source))
+        for bad in (dict(after,foreign={'route':'changed'}),dict(after,unexpected={'route':source}),
+                    dict(before),dict(after,**{'d'*64:dict(route='/stale/other.mp4',failures=0,updated=2)}),
+                    dict(after,**{'d'*64:dict(route=source,failures=1,updated=2)})):
+            self.assertFalse(observer.source_memory_preserved(before,bad,'d'*64,source))
     def test_real131_schema_views_exact_parent_episode_coordinates_and_existing_db_refusal(self):
         with tempfile.TemporaryDirectory() as temp:
             path=fixture.database(Path(temp)/'MyVideos131.db')

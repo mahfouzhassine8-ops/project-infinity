@@ -22,5 +22,15 @@
     "Actual runtime TV card/progress/completion/source tests after signed candidate selected"
   ],
   "physical_Fold": "NOT RUN",
-  "release_accepted": false
+  "release_accepted": false,
+  "actual417_partial": {
+    "run": 40373328890,
+    "artifact": 12673712690,
+    "artifact_sha256": "c621e8508b91e398e52d4b6649acfa3edc9b5cf41c9703fdb0e42f10644548b1",
+    "original_Continue_cases_passed": 4,
+    "actual_TV_stop_restore_pass": true,
+    "actual_TV_completion_watched": true,
+    "failure": "New test incorrectly required all source memory immutable during actual playback. Actual source d*64 now correctly remembers precisely the native episode file with failures0; existing movie source a*64 remained. Next-source selection was not reached.",
+    "correction": "Allow only played exact title to acquire native confirmed successful source; unchanged foreign entries/no unexpected keys/exact native path/failures0/positive timestamp required. Original assertions/deadlines remain. No runtime change."
+  }
 }
