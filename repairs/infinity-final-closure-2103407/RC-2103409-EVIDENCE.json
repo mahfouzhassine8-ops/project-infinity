@@ -1,0 +1,108 @@
+{
+  "schema": 1,
+  "candidate": {
+    "version_code": 2103409,
+    "package": "com.projectinfinity.kodi",
+    "abi": "arm64-v8a",
+    "apk_sha256": "4d68e3bf21ee109a9196267e9ed2b21ea8430fff8dede331af3c199e9921bf21",
+    "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "build": 40295309934,
+    "source": "b65ae4981f10bd6badf118ce95f360d28499c2d7",
+    "classification": "INTERNAL VERIFICATION CANDIDATE; NOT FINAL OR LOCKED"
+  },
+  "runtime": {
+    "search_all": {
+      "run": 40296904627,
+      "passed": true,
+      "artifact": 12638987832,
+      "artifact_sha256": "aa9712da9c6a47ac08543090378ab7d991a100b7387086bf12ecfb842edb5913",
+      "assertions": "actualAndroidEnter, Matrix603, Umbrella/POV/Seren attribution, History persisted, Home navigation"
+    },
+    "install_over": {
+      "from": 2103408,
+      "to": 2103409,
+      "uid": "10234 preserved",
+      "test_sentinel_preserved": true,
+      "CC41_applied": true,
+      "actual_Fold_existing_databases": "NOT TESTED"
+    },
+    "close": {
+      "run": 40298845997,
+      "source": "64d9c1e1437e0c934a5be207ae4e44ba9536b23a",
+      "artifact": 12640085982,
+      "artifact_sha256": "20753ed188e94825c2767141c26d9a85c45eda3ebdc2188934e9f2b1405be9cd",
+      "passed": false,
+      "cycles_completed": 0,
+      "failure": "native_admission: unverified_protected_writer:service.xbmc.versioncheck:runner.py:external_or_opaque_writer_requires_explicit_participant",
+      "actual_opaque_operation": "executable=lsb_release;argc=2; readonly_child_scope_absent",
+      "compat": "Exact physical82 ACTIVE and COMMITTED",
+      "command_center": "41 native ACTIVE and COMMITTED",
+      "background_jobs": "ALREADY_DURABLE for this workload, no image veto; not proof all physical image jobs exercised",
+      "authorization_consumed": false,
+      "process_death_confirmed": false,
+      "causality_limit": "Fresh CI bundledVersionCheck0.5.27+matrix.1. Physical diagnostics do not identify its installed source. Do not substitute companion, disable service or waive unknown child to claim physical correction."
+    },
+    "repetitions": {
+      "run": 40299492719,
+      "source": "389495fda23f71f372a174503da302f8efdeec49",
+      "selected": {
+        "search": 50,
+        "playback_home": 30,
+        "rotation": 20
+      },
+      "status": "IN PROGRESS; no repetition PASS claim yet"
+    },
+    "physical_Fold": "NOT RUN on409"
+  },
+  "original_workstreams": [
+    {
+      "id": 1,
+      "name": "Search admission and reliability",
+      "implementation": "Original single-flight retained; exact-source verification allocation fast path; compatible provider families; metadata transport.",
+      "tests": "Source focused pass plus one actualAPI37 SearchAll pass.50-cycle run pending."
+    },
+    {
+      "id": 2,
+      "name": "Unified Command Center and authenticated modules",
+      "implementation": "Existing unified service preserved; signed generation40->41 upgrade, exact source and recovery checks.",
+      "tests": "9JCA migration passes, original-key verification and7864unchanged DEX classes, actualAPI37 install-over/native41 ACTIVE pass."
+    },
+    {
+      "id": 3,
+      "name": "System-wide selection and exact actions",
+      "implementation": "Existing native selection/action/long-press work retained; no new dispatch redesign.",
+      "tests": "409physical Movies/TV long-press, allprovider/player/navigation regression NOT RUN. WatchNixtoons2/Otaku prior acceptance preserved as prior evidence only."
+    },
+    {
+      "id": 4,
+      "name": "Home loading, refresh, memory and frame pacing",
+      "implementation": "Avoid repeated AST for exact reviewed source, retain existing bounded caches and queues. No unproven service removal or refresh-rate forcing.",
+      "tests": "Host traced transient allocation reduced; deviceRAM reduction, actualposter-first-paint, scrollingjank, cold/warmbefore-after NOT PROVEN. Repeat rawmetrics pending."
+    },
+    {
+      "id": 5,
+      "name": "Essential-First persistence and shutdown",
+      "implementation": "Exact native terminal image backend has verified no-persistent-backend receipt inside observedInfinityjob only; VFS/opaque/failure paths remain vetoed.",
+      "tests": "16native before/after/negative cases pass and full native source compile pass. Actual409 firstClose FAIL unverified VersionCheckchild;0/3cycles. Controlledunsafe runtime NOT RUN."
+    },
+    {
+      "id": 6,
+      "name": "Visual, player and popup corrections",
+      "implementation": "Original accepted skin/player changes retained. Search->OptionB trailer/premiered metadata, validdate andone-decimal presentation, W3Cgetter corrected.",
+      "tests": "5metadata focused passes. Actual409 liveOptionB trailer playback,20rotation/Fold, Light/Dark/OLED, seek/clock/rotation-button physical QA pending."
+    },
+    {
+      "id": 7,
+      "name": "Integrated Android17 stability and physical acceptance",
+      "implementation": "Original signer/package,9411source integration,7541unchangedAPK members, zero unexplained diffs.",
+      "tests": "Signedbuild andfirstrealSearch pass; stresspending;shutdownfailed;physicalFoldacceptance andfinal lock NOT COMPLETE."
+    }
+  ],
+  "delivery_archive": {
+    "name": "Infinity-2103409-ARM64-Verification-Candidate.zip",
+    "bytes": 379492523,
+    "sha256": "6769f35d23b2f2feb7382abb0c0a47c13491aa28dc74339c1675aac28e15dec3",
+    "contains": "Exact original permanently signed777886236-byteAPK, matching fivecomponentZIPs, preservation/signature reports andinstallation instructions",
+    "status": "Internal verificationcandidate, notfinal orphysicalaccepted"
+  }
+}
