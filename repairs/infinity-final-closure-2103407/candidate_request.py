@@ -3,14 +3,16 @@ import json
 from pathlib import Path
 
 ROOT=Path(__file__).parent
-AUTHORIZATION=('UserOct26 GitHubfailure correction: actualsigned410 originalAPI37 SearchAll Enter/results/history/Home withactual '
-    'IMEbody-ready proof insideunchanged45secondkeyboarddeadline. ReadonlyPATH/defaultVersionChecksource metadata; '
-    'nochildexecution, Close, textrepair, stressrepetition orproductionAPKchange.')
+AUTHORIZATION=('UserOct26 authorized continuation after focused Search PASS40306535463: actual signed410 API37 '
+    'original SearchAll Enter/results/history/Home, then 50 Search, 30 generated native-clip playback-to-Home '
+    'and 20 OS rotations. Retain original assertions and deadlines; stop first failure and keep partial counts. '
+    'No Close, shutdown, reset, text repair, APK rebuild or physical Fold acceptance.')
 EXPECTED=dict(schema=1,kind='integrated-candidate',selected_case='final-search-all-enter',
     candidate_build=40305746524,candidate_source_commit='925b475f4e4c1c1862817c13167285ebec06894a',
     candidate_apk_sha256='7de8ada4774d39c80c3251e21b1750874fbbfdbdfb08b7468dd25151d92a7a34',
     candidate_artifact='Infinity-2103410-Corrective-INTERNAL-NOT-FINAL-40305746524',
-    authorization=AUTHORIZATION,request_id='integrated410-search-ime-ready-01')
+    authorization=AUTHORIZATION,request_id='integrated410-search50-playback30-rotation20-01',
+    post_feature={'search':50,'playback_home':30,'rotation':20})
 
 
 def validate(request):

@@ -1,0 +1,29 @@
+{
+  "authorization": "Continue the existing authorized 50 Search, 30 playback-to-Home and 20 rotation checks after the focused Search gate passes, as recorded in ANDROID17-410-BINDING-PLAN.json. No shutdown or new build.",
+  "prerequisite_result": {
+    "run": 40306535463,
+    "source": "9b6a6b608876298bd28ed742992be5972678de34",
+    "artifact": 12642714599,
+    "artifact_sha256": "f997af488a234fd294e57694a137a7245f94b3cb6dd5effa60ae433d93d161b5",
+    "candidate_build": 40295309934,
+    "result": "PASS: actual KEYCODE_ENTER, The Matrix Search All results with TMDb 603 and POV/Umbrella/Seren attribution, persisted history, responsive Home. Actual keyboardViewType=BODY observed. Shutdown NOT RUN; physical Fold NOT RUN."
+  },
+  "candidate_build": 40305746524,
+  "candidate_source": "925b475f4e4c1c1862817c13167285ebec06894a",
+  "candidate_apk_sha256": "7de8ada4774d39c80c3251e21b1750874fbbfdbdfb08b7468dd25151d92a7a34",
+  "selected_before_execution": [
+    "Three existing focused host checks: exact request binding, original feature assertion inverse, metadata byte-preservation bridge.",
+    "Actual API37 original Search All Enter/results/history/Home on exact signed410, then the unchanged existing driver: 50 Searches, 30 generated native-clip playback/Stop/Home cycles, 20 OS rotations. Stop at first failure; retain completed counts."
+  ],
+  "reuse": "Existing four stress admission/guard/partial-failure host passes and latest 17 candidate binding checks remain retained; no stress driver or production source changes.",
+  "limits": [
+    "Generated clip is not real movie/provider playback",
+    "Home RPC readiness is not poster first paint",
+    "OS rotations are not physical Fold acceptance",
+    "Raw memory/frame samples do not establish improved RAM or native FPS"
+  ],
+  "host_result": "PASS: the three selected exact-request, assertion-inverse and metadata-preservation checks.",
+  "android17_result": "NOT RUN",
+  "physical_fold_result": "NOT RUN",
+  "shutdown": "NOT SELECTED"
+}
