@@ -122,10 +122,9 @@ class ResumeRenderCacheTests(unittest.TestCase):
                                             {'tmdb':'1399'} if media=='tv' else None)
             entry=dict(media=media,identity=identity,title='Exact original title',season=season,episode=episode,
                        position=417.125,duration=900,percentage=46.35)
-            # entry_identity uses the actual persisted typed field.
-            entry['media_identity']=entry.pop('identity')
             route='plugin://plugin.video.umbrella/?action=play&tmdb='+('603' if media=='movie' else '1399&season=3&episode=7')
             before=deepcopy(entry)
+            self.assertEqual(self.old.verified_source(entry,route),route)
             for _ in range(11):
                 self.assertEqual(self.new.verified_source(entry,route,verify),self.old.verified_source(entry,route))
             self.assertEqual(self.new.verified_source(entry,route.replace('tmdb=','tmdb=99'),verify),'')

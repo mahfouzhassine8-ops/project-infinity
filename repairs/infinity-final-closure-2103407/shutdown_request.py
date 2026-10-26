@@ -10,14 +10,11 @@ from candidate_request import EXPECTED as CANDIDATE
 ROOT=Path(__file__).parent
 REQUEST='repairs/infinity-final-closure-2103407/SHUTDOWN-REQUEST.json'
 WORKFLOW='.github/workflows/infinity-shutdown-verification.yml'
-AUTHORIZATION=('UserOct26 originalPriority1 andsafety scope: independentlyverify16actualnativeGUIimage://directoryjobs, '
-    'oneactualsigned411EssentialFirstClose/reopen withall16owners/twoJava seals/finalflag/wholeUIDdeath/DBreadback, '
-    'thenonecontrolledownprofileunknownchildwrite mustvetoClose andkeepenginealive. Preserve40317069331threepositivepasses. '
-    'No productionbypass, deadlineextension, harnesskill orphysicalacceptance.')
-EXPECTED=dict(schema=1,kind='independent-essential-first',request_id='integrated411-native16-unsafe-refusal-05-exact-fixture-binding',
-    scenario='integrated-native-image-and-unsafe',candidate_build=CANDIDATE['candidate_build'],
-    candidate_source_commit=CANDIDATE['candidate_source_commit'],
-    candidate_apk_sha256=CANDIDATE['candidate_apk_sha256'],authorization=AUTHORIZATION)
+AUTHORIZATION='UserOct26 actual shutdown UI acceptance: independently verify signed412 actual visible Power Close row via Android key input, exact backend mapping, all16 essential owners, native and Java proof, native Kodi death, final Android coordinator completion, strict absence of remaining UID processes, Recents observation independent of PID proof, unchanged remembered preference, protected data readback across3reopens. Preserve signed411 ordinary pass40317069331 and report synthetic image/unsafe outcomes separately. No runtime or chooser modification, harness kill, deadline extension or physical Fold acceptance.'
+EXPECTED=dict(schema=1,kind="independent-essential-first",request_id="integrated412-real-power-ui-three-close-readback-01",
+    scenario="integrated-real-power-ui",candidate_build=CANDIDATE["candidate_build"],
+    candidate_source_commit=CANDIDATE["candidate_source_commit"],
+    candidate_apk_sha256=CANDIDATE["candidate_apk_sha256"],authorization=AUTHORIZATION)
 
 
 def validate(request,event,head,changed):

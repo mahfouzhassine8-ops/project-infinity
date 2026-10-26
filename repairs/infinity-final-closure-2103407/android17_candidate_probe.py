@@ -26,12 +26,12 @@ ENV_BEFORE="        ui.require(mode in CASES,'Explicit final-eight selection req
 ENV_AFTER="        from shutdown_environment import snapshot\n        snapshot(path/('environment-'+cycle+'.json'))\n"+ENV_BEFORE
 PROFILE_BEFORE='''        sys.path.insert(0,str(uiroot));from controller_access import load
         plugin=load();hub=plugin.hub;profile=plugin.PROFILE;home=xbmcgui.Window(10000)'''
-PROFILE_AFTER='''        if mode=='final-participant' or mode in SEARCH_CASES:
+PROFILE_AFTER='''        if mode=='final-participant' or mode in SEARCH_CASES or mode in ('final-continue','final-actions'):
             # This case reads actual native participant receipts only. No
             # first-party controller imports or writes in the test invoker.
             profile=Path(xbmcvfs.translatePath(xbmcaddon.Addon('script.infinity.commandcenter').getAddonInfo('profile')))
             home=xbmcgui.Window(10000)
-            if mode in SEARCH_CASES:
+            if mode in SEARCH_CASES or mode in ('final-continue','final-actions'):
                 # Independent read-only observation of persisted records. Do
                 # not acquire the production writer lease from a test invoker.
                 from types import SimpleNamespace
@@ -44,6 +44,9 @@ PROFILE_AFTER='''        if mode=='final-participant' or mode in SEARCH_CASES:
                     if not isinstance(value,dict):raise RuntimeError('Invalid actual persisted state')
                     return value
                 hub=SimpleNamespace(load_view=observed_state)
+                if mode in ('final-continue','final-actions'):
+                    from readonly_resume_view import entries
+                    hub.entries=entries
         else:
             sys.path.insert(0,str(uiroot));from controller_access import load
             plugin=load();hub=plugin.hub;profile=plugin.PROFILE;home=xbmcgui.Window(10000)'''
@@ -64,6 +67,8 @@ def fixture(raw):
     updated=observed.replace(PROFILE_BEFORE,PROFILE_AFTER,1).replace(RECEIPT_BEFORE,RECEIPT_AFTER,1).replace(HISTORY_BEFORE,HISTORY_AFTER,1)
     if updated.count(ENV_BEFORE)!=1:raise ValueError('Original selected-test admission differs')
     updated=updated.replace(ENV_BEFORE,ENV_AFTER,1)
+    import continue_card_observer
+    updated=continue_card_observer.instrument(updated)
     restored=restore_candidate_fixture(updated)
     if restore_fixture(restored).encode()!=raw:
         raise ValueError('An original feature assertion changed')
@@ -72,6 +77,8 @@ def fixture(raw):
 
 
 def restore_candidate_fixture(text):
+    import continue_card_observer
+    text=continue_card_observer.restore(text)
     return text.replace(PROFILE_AFTER,PROFILE_BEFORE,1).replace(RECEIPT_AFTER,RECEIPT_BEFORE,1).replace(HISTORY_AFTER,HISTORY_BEFORE,1).replace(ENV_AFTER,ENV_BEFORE,1)
 
 
@@ -151,6 +158,11 @@ def main(selected_case=None,independent_setup=None):
             path=stage/aid/'android_selected.py';before=path.read_bytes()
             if hashlib.sha256(before).hexdigest()!=FIXTURE_SHA:raise ValueError('Original selected feature differs')
             path.write_bytes(fixture(before))
+            if args.case in ('final-continue','final-actions'):
+                import readonly_resume_observer
+                report['read_only_resume_observer']=readonly_resume_observer.stage(
+                    args.apk,EXPECTED['candidate_apk_sha256'],stage/aid)
+                shutil.copyfile(Path(__file__).parent/'continue_card_observer.py',stage/aid/'continue_card_observer.py')
             shutil.copyfile(Path(__file__).parent/'shutdown_environment.py',stage/aid/'shutdown_environment.py')
             # Seed the actual previous code, not new code installed by a test.
             # The authenticated installer must migrate all four original IDs before Python starts.
