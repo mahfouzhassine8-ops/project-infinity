@@ -21,6 +21,7 @@ def wait_rows(xbmc,xbmcgui,ui,began,result):
     value=ui.until(ready,'actual selected popup rows/focus',remaining)
     value['actual_row_labels']=[xbmc.getInfoLabel('Container(50).ListItemAbsolute(%d).Label'%i)
                                 for i in range(value['count']+1)]
+    value['deadline_monotonic']=began+90
     return value
 
 

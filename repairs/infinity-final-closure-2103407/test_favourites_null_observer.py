@@ -1,4 +1,5 @@
 import ast
+import time
 from types import SimpleNamespace
 import unittest
 import favourites_null_observer as adapter
@@ -8,7 +9,7 @@ class NativeFavouritesObservationTests(unittest.TestCase):
     def proxy(self,value,mode='final-actions'):
         calls=[];result={}
         actual=SimpleNamespace(rpc=lambda *args:(calls.append(args) or value),require='original assertion')
-        scope=dict(ui=actual,mode=mode,result=result)
+        scope=dict(ui=actual,mode=mode,result=result,time=time)
         exec('if True:\n'+adapter.BLOCK,scope)
         return scope['ui'],actual,calls,result
 
@@ -27,6 +28,27 @@ class NativeFavouritesObservationTests(unittest.TestCase):
         self.assertIs(ui.rpc('Favourites.GetFavourites'),raw)
         self.assertIs(ui.rpc('Input.Select'),raw);self.assertEqual(ui.require,'original assertion')
         ui,actual,_,_=self.proxy(raw,mode='final-continue');self.assertIs(ui,actual)
+
+    def test_actual_async_add_and_remove_readback_within_same_popup_deadline(self):
+        empty=dict(favourites=None,limits=dict(start=0,end=0,total=0))
+        present=dict(favourites=[dict(path='special://profile/infinity-final-qa.mp4')])
+        for label,responses,expected in [('Add to Favorites',[empty,present],present),
+                                         ('Remove from Favorites',[present,empty],dict(empty,favourites=[]))]:
+            ui,actual,calls,result=self.proxy({});values=iter(responses);selected=[];budgets=[]
+            actual.rpc=lambda *args:next(values)
+            actual.select_native_item=lambda *args:selected.append(args)
+            def until(fn,message,seconds):
+                budgets.append(seconds)
+                return fn() or fn()
+            actual.until=until
+            result['popup_readiness_observation']=dict(deadline_monotonic=time.monotonic()+17)
+            ui.select_native_item(50,'original predicate',label)
+            self.assertEqual(ui.rpc('Favourites.GetFavourites'),expected)
+            self.assertEqual(selected,[(50,'original predicate',label)])
+            self.assertTrue(0<budgets[0]<=17);self.assertEqual(result['raw_native_favourites'],responses)
+            result['popup_readiness_observation']['deadline_monotonic']=time.monotonic()-1
+            ui.select_native_item(50,'original predicate',label)
+            with self.assertRaises(RuntimeError):ui.rpc('Favourites.GetFavourites')
 
     def test_full_inverse_and_each_original_assertion_ast_unchanged(self):
         from android17_reference_observation import OLD

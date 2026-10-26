@@ -1,0 +1,20 @@
+{
+  "run": 40360322176,
+  "test_source": "854bf5e355c9bf58c6c5e3138152687f1b4b4c1b",
+  "apk_sha256": "75e3982300aed71fe791f8d5ccf9542ac0c198f012aea9f124021f3a766eb4ac",
+  "artifact": 12668232428,
+  "artifact_sha256": "b900ab5b74aa7960449d4a280333b9ac10412dcfd63915f9cf86491eee6515e2",
+  "passed": false,
+  "actual_saved_state_toggles_passed": 6,
+  "actual_Add_to_Favorites_visible": true,
+  "actual_native_favourite_after_failure": {
+    "title": "The Matrix",
+    "type": "media",
+    "path": "special://profile/infinity-final-qa.mp4"
+  },
+  "failure": "Original test immediate query iterated favourites:null before asynchronous popup action applied, TypeError at add assertion. Later actual native read confirms exact requested favorite added. Remove assertion not reached; whole action suite not accepted.",
+  "correction": "NATIVE-FAVOURITES-OBSERVATION-PLAN.json",
+  "physical_gestures": "NOT RUN",
+  "shutdown": "NOT SELECTED",
+  "release_accepted": false
+}
