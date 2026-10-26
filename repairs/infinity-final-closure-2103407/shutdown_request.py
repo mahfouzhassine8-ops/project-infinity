@@ -10,12 +10,11 @@ from candidate_request import EXPECTED as CANDIDATE
 ROOT=Path(__file__).parent
 REQUEST='repairs/infinity-final-closure-2103407/SHUTDOWN-REQUEST.json'
 WORKFLOW='.github/workflows/infinity-shutdown-verification.yml'
-AUTHORIZATION='UserOct26 same signed418 real TV THREE visible Power Close/reopen cycles: unfinished exactTV progress/source first, completed watched/Next selection second, warm completed-state third, full16/native/twoJava/zeroUID/SQLite/data/preference proofs. Preserve failed40386278200 before anyClose: actual new episode occurrence/17.894sec progress/source memory existed; new test wrongly required overwriting original saved navigation source. Correct ONLY predicate to canonical exact episode/new occurrence/verified show and actual played file in sources/failures0, preserving original items source. Same20sec start/45sec completion/35sec Close gates, no retries/reset/APK/runtime/native/Cobra/chooser changes or fabricated receipts. Preserve411/417ordinary3passes; concurrent418Search40386278214 and independent418writer40387258351 untouched. PhysicalFold finalgate/no lock.'
-EXPECTED=dict(schema=1,kind="independent-essential-first",request_id="integrated418-real-TV-three-Power-cycles-source-contract-02",
+AUTHORIZATION='UserOct26 latest signed419 integrated THREE actual visible Power Close/reopen cycles: exact unfinished nativeTV position/source readback first, actual completed watched100/removedContinue/verifiedS2E1 selection second, completed warm third. Preserve successful ordinary41140317069331 and actual41840387720854; integration-specific reason is new14Home onload246native absent-provider path, while all75CC48/native/DEX/Power/chooser/Cobra bytes exact418. Verify16owners, protectednative/Python/twoJava writes, authentic engine termination/coordinator completion and externally owned remainingprocesses, AndroidHome/RecentApps separate, rememberedInfinityprefs, protectedJSON/7SQLite readback and noautoplay. Original20start/45completion/35Close gates retained, no retries/reset/fakes/install-userdata or forcedchooser. Actualemulator not Samsung physical. Independent Search40397437746 and Home/rotation requests untouched, no packaging/feature dependency, no finalacceptance/no lock.'
+EXPECTED=dict(schema=1,kind="independent-essential-first",request_id="integrated419-real-TV-three-visible-Power-cycles-01",
     scenario="integrated-resume-power-ui",candidate_build=CANDIDATE["candidate_build"],
     candidate_source_commit=CANDIDATE["candidate_source_commit"],
     candidate_apk_sha256=CANDIDATE["candidate_apk_sha256"],authorization=AUTHORIZATION)
-
 
 def validate(request,event,head,changed):
     if (event.get('ref')!=BRANCH or event.get('after')!=head or event.get('deleted') or
