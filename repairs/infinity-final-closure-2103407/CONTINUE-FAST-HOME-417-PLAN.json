@@ -1,0 +1,143 @@
+{
+  "recorded_before_implementation": true,
+  "parent_build": 40365070904,
+  "parent_source": "0e1e14ccab43d5d64e2e03c6c22068872d2dbcfe",
+  "parent_apk_sha256": "e93582e8b6a398c60b4c49a388221124a010249ba7ba27ed558ca08043036db2",
+  "candidate_version": 2103417,
+  "command_center_version": "0.3.5.47",
+  "skin_version": "1.0.5.245",
+  "source_preimages": {
+    "assets/addons/script.infinity.commandcenter/service.py": "239004e87438716bc44e721f6ca2fb9ab8f821d3c3f5fcd65b2d22555fccd513",
+    "assets/addons/script.infinity.commandcenter/resume_hub.py": "8db067d2eeedde8e5f4cac22e105dc890f3cc728c224206972e634f4e91efbde",
+    "assets/addons/script.infinity.commandcenter/plugin.py": "eb94e3b628811def75d61a96e7fd92d9f6c52aeda41b343c69e40d4871da1b86",
+    "assets/addons/script.infinity.commandcenter/addon.xml": "3fe45d17dbec4b4a64691bddf8243dfe3f803d43f8e753b6217e7b4053990784",
+    "assets/addons/skin.infinity.diggz/16x9/Home.xml": "b21980286064fd9448864c0bf1678a212aef3c03f96b39c5ea503f45cae5a619",
+    "assets/addons/skin.infinity.diggz/20x9/Home.xml": "b21980286064fd9448864c0bf1678a212aef3c03f96b39c5ea503f45cae5a619",
+    "assets/addons/skin.infinity.diggz/5x6/Home.xml": "b21980286064fd9448864c0bf1678a212aef3c03f96b39c5ea503f45cae5a619",
+    "assets/addons/skin.infinity.diggz/6x5/Home.xml": "b21980286064fd9448864c0bf1678a212aef3c03f96b39c5ea503f45cae5a619",
+    "assets/addons/skin.infinity.diggz/fallback/Home.xml": "b21980286064fd9448864c0bf1678a212aef3c03f96b39c5ea503f45cae5a619",
+    "assets/addons/skin.infinity.diggz/portrait/Home.xml": "b21980286064fd9448864c0bf1678a212aef3c03f96b39c5ea503f45cae5a619",
+    "assets/addons/skin.infinity.diggz/responsive/base/Home.xml": "11e799eca4fe7e069f06da3df1fedb6ff6eb7b99e468f47fc3c89091a04d8a3f",
+    "assets/addons/skin.infinity.diggz/responsive/landscape/Home.xml": "11e799eca4fe7e069f06da3df1fedb6ff6eb7b99e468f47fc3c89091a04d8a3f",
+    "assets/addons/skin.infinity.diggz/responsive/portrait/Home.xml": "11e799eca4fe7e069f06da3df1fedb6ff6eb7b99e468f47fc3c89091a04d8a3f",
+    "assets/addons/skin.infinity.diggz/responsive/square/Home.xml": "11e799eca4fe7e069f06da3df1fedb6ff6eb7b99e468f47fc3c89091a04d8a3f",
+    "assets/addons/skin.infinity.diggz/responsive/tall/Home.xml": "11e799eca4fe7e069f06da3df1fedb6ff6eb7b99e468f47fc3c89091a04d8a3f",
+    "assets/addons/skin.infinity.diggz/responsive/ultrawide/Home.xml": "11e799eca4fe7e069f06da3df1fedb6ff6eb7b99e468f47fc3c89091a04d8a3f",
+    "assets/addons/skin.infinity.diggz/responsive/wide/Home.xml": "11e799eca4fe7e069f06da3df1fedb6ff6eb7b99e468f47fc3c89091a04d8a3f",
+    "assets/addons/skin.infinity.diggz/unified/Home.xml": "7cdaaa68caa3fdc50a4c820963aeb404c327ca57bb0980e65652ba7090cb7faf",
+    "assets/addons/skin.infinity.diggz/addon.xml": "0e422cb642a1b2d2858625fbb807d1cfab28318c914fd298375b5351634f56a6",
+    "assets/addons/skin.infinity.diggz/infinity-skin.json": "8562a9f0b637f3b667796e32c74185fe7f3558dcad5d8ddc5535131243f9b662",
+    "assets/addons/skin.infinity.diggz/Infinity-Protected-Manifest.json": "8d4993c74cb5d60e2fb96b08021f72f6efd7fc2800c049e31803bcd68dff4f83"
+  },
+  "unchanged_helper_sha256": {
+    "infinity_continuity.py": "a9a5477eec6ae1684d04d6b0a574be3f6b07172ca793240af82c8d26a421c9d1",
+    "infinity_native_ambient.py": "cb4a2f075c67842c4864f88077474715448d7109738f86ea0be472eea291618e",
+    "infinity_playlist_routes.py": "848fa1e54d00dd9dd5595d5699fd0964351f5981339a3ed40c0aae419ac3996d"
+  },
+  "actual_reproductions": [
+    "Execute exact signed416 hub on retained original TV fixture: Continue selects most-recent S1E2; Next returns two rows S1E2/S1E3 without redundant parent flags, or older S1E3 when flags exist. Canonical show-episode identity already proves parent; next/progress must use actual playback chronology, not greatest episode number.",
+    "Signed416 native catalogue successor carries only coordinates, so known local library episode cannot be navigated when TMDb Helper is absent (actual415 inventory confirms absent). Capture exact native episode/file/parent proof and revalidate it at user-selected playback; do not search remote providers or replay stale streams.",
+    "Actual415 Search40360488977 original featurePASS plus15additional Search, then16th45sec keyboard deadlineFAIL; PSS930177->1381279KiB at10, threads70->73, fd521->503. Default interpreter startup17-21sec then provider/UI setup18-22sec on translated2CPU VM. Repeated Home runs two existing singleton helpers that only refresh UUIDs then lose flock; these invokers compete with foreground work. Exact source confirms UUID update occurs BEFORE lock. Preserve those tokens in existing resident and guard duplicate starts using actual lifecycle flags. No physical performance claim."
+  ],
+  "corrections": [
+    "Canonical verified parent grouping and updated/revision-first playback chronology for Next/Progress; retain completed/hidden filtering and all historical rows.",
+    "Native library successor proof (episodeid/tvshowid/local stable file/coordinates/series), no ambiguous duplicate-coordinate choice. Add Infinity-only user-selected resolver that reads current saved candidate and freshly revalidates native episode/source/parent IDs before setResolvedUrl. No autoplay while rendering, no remote lookup, existing non-library helper routes unchanged.",
+    "All14Home profiles: start continuity only when its Observer is not active; ambient only when WriterLifecycle is not running-optional. Publish both original HomeLoad/LayoutEpoch UUIDs through a native pending property consumed in existing authenticated CC resident after checkpoint poll. First start/recovery, optional helper source/locks/lifecycle/power/glass rendering remain exact; no worker/service or protected writer added. Skin245 requiresCC47, protected manifest rebound only exact signed parent+admitted deltas."
+  ],
+  "owned_members": [
+    "assets/addons/script.infinity.commandcenter/service.py",
+    "assets/addons/script.infinity.commandcenter/resume_hub.py",
+    "assets/addons/script.infinity.commandcenter/plugin.py",
+    "assets/addons/script.infinity.commandcenter/addon.xml",
+    "assets/addons/skin.infinity.diggz/16x9/Home.xml",
+    "assets/addons/skin.infinity.diggz/20x9/Home.xml",
+    "assets/addons/skin.infinity.diggz/5x6/Home.xml",
+    "assets/addons/skin.infinity.diggz/6x5/Home.xml",
+    "assets/addons/skin.infinity.diggz/fallback/Home.xml",
+    "assets/addons/skin.infinity.diggz/portrait/Home.xml",
+    "assets/addons/skin.infinity.diggz/responsive/base/Home.xml",
+    "assets/addons/skin.infinity.diggz/responsive/landscape/Home.xml",
+    "assets/addons/skin.infinity.diggz/responsive/portrait/Home.xml",
+    "assets/addons/skin.infinity.diggz/responsive/square/Home.xml",
+    "assets/addons/skin.infinity.diggz/responsive/tall/Home.xml",
+    "assets/addons/skin.infinity.diggz/responsive/ultrawide/Home.xml",
+    "assets/addons/skin.infinity.diggz/responsive/wide/Home.xml",
+    "assets/addons/skin.infinity.diggz/unified/Home.xml",
+    "assets/addons/skin.infinity.diggz/addon.xml",
+    "assets/addons/skin.infinity.diggz/infinity-skin.json",
+    "assets/addons/skin.infinity.diggz/Infinity-Protected-Manifest.json",
+    "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1",
+    "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1.sig",
+    "AndroidManifest.xml"
+  ],
+  "selected_checks": [
+    "Exact signed416 preimages/full inverses/Python/XML compile and24-member APK budget",
+    "Original TV fixture and rewound/rewatched chronological next/progress, canonical parent conflicts and immutable saved routes",
+    "Fresh native successor resolver: correct local target and identity, stale/reused IDs/source/series/coordinates/duplicates/missing file/wrong skin fail closed; rendering performs no playback or remote discovery",
+    "Original helper lifecycle/UUID side effects exactly preserved, all14Home XML inverse and unchanged helpers/geometry/player/Cobra",
+    "Original signer/native75-file/JCA46->47 sentinel migration; all components and skin942pins; no app/Close dependency"
+  ],
+  "runtime_selection": "After genuine build: originalContinue+fresh native library TV completion/cross-season successor/reopen/source test per TV-CONTINUE-WATCHING-PLAN; original actions,50Search/30Home/20rotation and measured loading/PSS/native frames; independent3actual PowerUI and separate image/unsafe controls. Preserve completed415 results and failedSearch; no release acceptance from targeted pass.",
+  "physical_Fold": "NOT RUN",
+  "release_accepted": false,
+  "final_lock": false,
+  "Home_helper_presence": {
+    "16x9/Home.xml": {
+      "infinity_continuity.py": 0,
+      "infinity_native_ambient.py": 1
+    },
+    "20x9/Home.xml": {
+      "infinity_continuity.py": 0,
+      "infinity_native_ambient.py": 1
+    },
+    "5x6/Home.xml": {
+      "infinity_continuity.py": 0,
+      "infinity_native_ambient.py": 1
+    },
+    "6x5/Home.xml": {
+      "infinity_continuity.py": 0,
+      "infinity_native_ambient.py": 1
+    },
+    "fallback/Home.xml": {
+      "infinity_continuity.py": 0,
+      "infinity_native_ambient.py": 1
+    },
+    "portrait/Home.xml": {
+      "infinity_continuity.py": 0,
+      "infinity_native_ambient.py": 1
+    },
+    "responsive/base/Home.xml": {
+      "infinity_continuity.py": 0,
+      "infinity_native_ambient.py": 1
+    },
+    "responsive/landscape/Home.xml": {
+      "infinity_continuity.py": 0,
+      "infinity_native_ambient.py": 1
+    },
+    "responsive/portrait/Home.xml": {
+      "infinity_continuity.py": 0,
+      "infinity_native_ambient.py": 1
+    },
+    "responsive/square/Home.xml": {
+      "infinity_continuity.py": 0,
+      "infinity_native_ambient.py": 1
+    },
+    "responsive/tall/Home.xml": {
+      "infinity_continuity.py": 0,
+      "infinity_native_ambient.py": 1
+    },
+    "responsive/ultrawide/Home.xml": {
+      "infinity_continuity.py": 0,
+      "infinity_native_ambient.py": 1
+    },
+    "responsive/wide/Home.xml": {
+      "infinity_continuity.py": 0,
+      "infinity_native_ambient.py": 1
+    },
+    "unified/Home.xml": {
+      "infinity_continuity.py": 1,
+      "infinity_native_ambient.py": 1
+    }
+  },
+  "pending_note": "Per-helper pending flags preserve profiles that do not start continuity. Guard falls back to original helper invocation if CC disabled. No helper added to a profile lacking it."
+}

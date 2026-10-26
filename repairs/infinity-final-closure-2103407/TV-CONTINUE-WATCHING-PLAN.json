@@ -1,0 +1,26 @@
+{
+  "recorded_before_implementation": true,
+  "scope": "UserOct26 real Continue Watching/playback persistence/correct successor/source navigation. Test-only fresh API37, no physical/user database edits.",
+  "schema_origin": {
+    "run": 40346078040,
+    "artifact": 12661533313,
+    "source_db_sha256": "58772bf026c9b28422e4a4b8617f3cd5e93368024c744fdf99e98f128d1a0e32",
+    "empty_tables_verified": true,
+    "only_nonempty_native_defaults": {
+      "version": 1,
+      "videoversiontype": 387
+    },
+    "sql_sha256": "df017059bfde3942a843f81280b8a354484684345ce4e3cd2d819ea2c0e2dbe3",
+    "compiled_VideoDatabase_h_sha256": "8fd43adf577e5f7d60002b0ecc2ce5c3d1151cd5a5416ad23c89476be1bb24ec",
+    "primary_source": "https://github.com/xbmc/xbmc/blob/21.3-Omega/xbmc/video/VideoDatabase.h"
+  },
+  "fixture": "Before first launch only: exact empty131 native schema, one synthetic library show and two generated180sec24fps episode files S1E2 and S2E1. Exact TMDb parent1396 agrees retained fixture; episode IDs are explicitly synthetic. Every target absent, fresh install-over sentinel, qemu/API37/no app/no live engine guards and binary hash readback mandatory. No database replacement, reset or live SQLite writes.",
+  "runtime": "Existing admitted read-only test invoker, original final-continue must PASS first. Use real native VideoLibrary details and Player.Open episodeid; update/stop/restoration of both exact aliases; replay and complete first episode; correct retained records, native watched/playcount and exact catalogue successor across season boundary; display without autoplay; require genuine usable source and actual selected next-episode playback, not unavailable placeholder. No provider search or forged native receipt.",
+  "selected_checks": [
+    "Native131 fixture schema/hash/rows/views/coordinates/IDs and safe absence/prelaunch guards",
+    "Original fixture full inverse/all assertions unchanged, no firstparty imports/writer grant",
+    "Actual runtime TV card/progress/completion/source tests after signed candidate selected"
+  ],
+  "physical_Fold": "NOT RUN",
+  "release_accepted": false
+}

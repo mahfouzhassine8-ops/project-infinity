@@ -1,0 +1,128 @@
+{
+  "run": 40360488977,
+  "artifact": 12668699679,
+  "artifact_sha256": "c234e451b51b41eb5050835958dcc85c6fd082e0c62f7ed47d105e66232eaa7f",
+  "candidate_source": "e92df08f23f9a66d9e004e48954a9e5d5dfc1ef7",
+  "test_source": "41b85aa390d497def2838a5fcb7dcd90f12a4f1d",
+  "apk_sha256": "75e3982300aed71fe791f8d5ccf9542ac0c198f012aea9f124021f3a766eb4ac",
+  "passed": false,
+  "original_selected_feature_passed": true,
+  "additional_Search_completed": 15,
+  "required_Search": 50,
+  "playback_Home_completed": 0,
+  "rotation_completed": 0,
+  "failure": "RuntimeError: Feature state was not observed before deadline",
+  "snapshots": [
+    {
+      "stage": "before",
+      "pss_kib": 930177,
+      "rss_kib": 1099172,
+      "thread_count": 70,
+      "descriptor_count": 521
+    },
+    {
+      "stage": "search-10",
+      "pss_kib": 1381279,
+      "rss_kib": 1549096,
+      "thread_count": 73,
+      "descriptor_count": 503
+    }
+  ],
+  "last_Search_cycles": [
+    {
+      "cycle": 10,
+      "query": "Just Friends",
+      "elapsed_ms": 85432.68900899989,
+      "visible": {
+        "Container.FolderPath": "plugin://script.infinity.commandcenter/?action=search-all&media=movie&query=Just+Friends",
+        "Container.NumItems": "53",
+        "actual_providers": [
+          "plugin.video.pov",
+          "plugin.video.seren",
+          "plugin.video.umbrella"
+        ]
+      },
+      "pid": 4616,
+      "actual_android_input": true,
+      "selected_provider": "all",
+      "history_row_used": false,
+      "duplicate_enter_sent": false
+    },
+    {
+      "cycle": 11,
+      "query": "The Matrix",
+      "elapsed_ms": 120645.68392399997,
+      "visible": {
+        "Container.FolderPath": "plugin://script.infinity.commandcenter/?action=search-provider&media=movie&query=The+Matrix&provider=plugin.video.umbrella",
+        "Container.NumItems": "22",
+        "actual_providers": [
+          "plugin.video.umbrella"
+        ]
+      },
+      "pid": 4616,
+      "actual_android_input": true,
+      "selected_provider": "plugin.video.umbrella",
+      "history_row_used": false,
+      "duplicate_enter_sent": false
+    },
+    {
+      "cycle": 12,
+      "query": "Just Friends",
+      "elapsed_ms": 108804.79576100015,
+      "visible": {
+        "Container.FolderPath": "plugin://script.infinity.commandcenter/?action=search-all&media=movie&query=Just+Friends",
+        "Container.NumItems": "53",
+        "actual_providers": [
+          "plugin.video.pov",
+          "plugin.video.seren",
+          "plugin.video.umbrella"
+        ]
+      },
+      "pid": 4616,
+      "actual_android_input": true,
+      "selected_provider": "all",
+      "history_row_used": false,
+      "duplicate_enter_sent": false
+    },
+    {
+      "cycle": 13,
+      "query": "The Matrix",
+      "elapsed_ms": 113454.10046000006,
+      "visible": {
+        "Container.FolderPath": "plugin://script.infinity.commandcenter/?action=search-provider&media=movie&query=The+Matrix&provider=plugin.video.umbrella",
+        "Container.NumItems": "22",
+        "actual_providers": [
+          "plugin.video.umbrella"
+        ]
+      },
+      "pid": 4616,
+      "actual_android_input": true,
+      "selected_provider": "plugin.video.umbrella",
+      "history_row_used": false,
+      "duplicate_enter_sent": false
+    },
+    {
+      "cycle": 14,
+      "query": "Just Friends",
+      "elapsed_ms": 103696.7682200002,
+      "visible": {
+        "Container.FolderPath": "plugin://script.infinity.commandcenter/?action=search-all&media=movie&query=Just+Friends",
+        "Container.NumItems": "53",
+        "actual_providers": [
+          "plugin.video.pov",
+          "plugin.video.seren",
+          "plugin.video.umbrella"
+        ]
+      },
+      "pid": 4616,
+      "actual_android_input": true,
+      "selected_provider": "all",
+      "history_row_used": false,
+      "duplicate_enter_sent": false
+    }
+  ],
+  "physical_Fold": "NOT RUN",
+  "memory_leak_elimination": "NOT PROVEN",
+  "shutdown": "NOT SELECTED",
+  "release_accepted": false
+}

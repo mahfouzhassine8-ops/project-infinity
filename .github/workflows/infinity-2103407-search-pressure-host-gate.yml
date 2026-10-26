@@ -177,7 +177,7 @@ jobs:
           assert request['schema']==1 and request['scope'].strip()
           selected=request['selected']
           assert selected in {'search-lifetime','module-trust','installed-modules','module-protocol',
-                              'firstparty-compose','reference-observation','module-bundle','module-complete','internal-apk','internal-service-apk','internal-coordinator-apk','internal-resume-apk','internal-home-entry-apk','internal-disabled-refresh-apk','internal-playback-favourites-apk','internal-continue-completion-apk','candidate-routing','shutdown-routing','android-routing'}
+                              'firstparty-compose','reference-observation','module-bundle','module-complete','internal-apk','internal-service-apk','internal-coordinator-apk','internal-resume-apk','internal-home-entry-apk','internal-disabled-refresh-apk','internal-playback-favourites-apk','internal-continue-completion-apk','internal-continue-fast-home-apk','candidate-routing','shutdown-routing','android-routing'}
           with open(os.environ['GITHUB_OUTPUT'],'a') as output:
               output.write('selection='+selected+'\n')
           if selected=='search-lifetime':
@@ -214,6 +214,10 @@ jobs:
               sys.exit(0)
           elif selected=='internal-service-apk':
               print('Packaging410 only: exact409 engine/DEX/modules remain unchanged. Scoped VersionCheck source and negative checks run below against exact409 on Python3.11 before signing. No application or Close tests.')
+              sys.exit(0)
+          elif selected=='internal-continue-fast-home-apk':
+              print('Packaging417 only: exact Continue Watching/local source and guarded Home helper correction; no app or Close tests.')
+              subprocess.run([sys.executable,'-m','unittest','discover','-s',str(root),'-p','test_fast_home_packaging.py','-v'],check=True)
               sys.exit(0)
           elif selected=='internal-continue-completion-apk':
               print('Packaging416 only: actual retained TV completion/successor and native missing-date correction; no app or Close tests.')
@@ -399,6 +403,30 @@ jobs:
           set -euo pipefail
           python3 repairs/infinity-final-closure-2103407/package_resume_render.py \
             --parent-root resume-parent --sdk "$ANDROID_HOME/build-tools/35.0.0" --out resume-candidate
+      - name: Recover exact signed416 for Continue Watching and guarded Home helpers
+        if: steps.selected.outputs.selection == 'internal-continue-fast-home-apk'
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 40365070904
+          name: Infinity-2103416-Continue-Completion-Corrective-Verification-40365070904
+          github-token: ${{ github.token }}
+          path: fast-home-parent
+      - name: Verify actual source ordering, fresh native resolver and original helper epochs
+        if: steps.selected.outputs.selection == 'internal-continue-fast-home-apk'
+        run: |
+          set -euo pipefail
+          export INFINITY_FAST_HOME_PARENT_APK="$(find fast-home-parent -type f -name 'Infinity-2103416-Continue-Completion-Corrective-VERIFICATION.apk' -print -quit)"
+          PYTHONPATH=repairs/infinity-final-closure-2103407 python3 -m unittest test_continue_fast_home -v
+      - name: Authenticate CC47 and Skin245, audit24members and permanently sign417
+        if: steps.selected.outputs.selection == 'internal-continue-fast-home-apk'
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 repairs/infinity-final-closure-2103407/package_continue_fast_home.py --parent-root fast-home-parent --sdk "$ANDROID_HOME/build-tools/35.0.0" --out fast-home-candidate
       - name: Recover exact signed415 for TV completion and successor correction
         if: steps.selected.outputs.selection == 'internal-continue-completion-apk'
         uses: actions/download-artifact@v4
@@ -509,7 +537,7 @@ jobs:
             --parent-root signed407 --module-root package-modules --native-root package-native \
             --sdk "$ANDROID_HOME/build-tools/35.0.0" --out internal-candidate
       - uses: actions/upload-artifact@v4
-        if: always() && steps.selected.outputs.selection != 'module-bundle' && steps.selected.outputs.selection != 'internal-apk' && steps.selected.outputs.selection != 'internal-service-apk' && steps.selected.outputs.selection != 'internal-coordinator-apk' && steps.selected.outputs.selection != 'internal-resume-apk' && steps.selected.outputs.selection != 'internal-home-entry-apk' && steps.selected.outputs.selection != 'internal-disabled-refresh-apk' && steps.selected.outputs.selection != 'internal-playback-favourites-apk' && steps.selected.outputs.selection != 'internal-continue-completion-apk'
+        if: always() && steps.selected.outputs.selection != 'module-bundle' && steps.selected.outputs.selection != 'internal-apk' && steps.selected.outputs.selection != 'internal-service-apk' && steps.selected.outputs.selection != 'internal-coordinator-apk' && steps.selected.outputs.selection != 'internal-resume-apk' && steps.selected.outputs.selection != 'internal-home-entry-apk' && steps.selected.outputs.selection != 'internal-disabled-refresh-apk' && steps.selected.outputs.selection != 'internal-playback-favourites-apk' && steps.selected.outputs.selection != 'internal-continue-completion-apk' && steps.selected.outputs.selection != 'internal-continue-fast-home-apk'
         with:
           name: Infinity-Final-Source-Ownership-${{ github.run_id }}-NOT-APK
           path: final-work/
@@ -597,6 +625,18 @@ jobs:
             repairs/infinity-final-closure-2103407/HOME-ENTRY-413-PLAN.json
           retention-days: 90
           if-no-files-found: warn
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.selected.outputs.selection == 'internal-continue-fast-home-apk'
+        with:
+          name: Infinity-2103417-Continue-Watching-Corrective-Verification-${{ github.run_id }}
+          path: |
+            fast-home-candidate/*.apk
+            fast-home-candidate/components/*.zip
+            fast-home-candidate/*.json
+            fast-home-candidate/*.txt
+            fast-home-candidate/SHA256SUMS
+            repairs/infinity-final-closure-2103407/CONTINUE-FAST-HOME-417-PLAN.json
+          retention-days: 90
       - uses: actions/upload-artifact@v4
         if: always() && steps.selected.outputs.selection == 'internal-continue-completion-apk'
         with:

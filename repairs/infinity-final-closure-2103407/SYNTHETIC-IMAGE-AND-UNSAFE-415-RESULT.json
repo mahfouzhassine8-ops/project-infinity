@@ -1,0 +1,90 @@
+{
+  "run": 40361797363,
+  "artifact": 12668267878,
+  "artifact_sha256": "bbca0ecc4f32333e39d41e47cf0df45c1bf0891f5888755c4c46af5c90b8fc82",
+  "candidate_source": "e92df08f23f9a66d9e004e48954a9e5d5dfc1ef7",
+  "test_source": "8c7a1edec759bd183254c5d87a385a6bef0ee132",
+  "apk_sha256": "75e3982300aed71fe791f8d5ccf9542ac0c198f012aea9f124021f3a766eb4ac",
+  "passed": true,
+  "native_image_control": {
+    "window": 13000,
+    "controls": [
+      2100,
+      2101,
+      2102,
+      2103,
+      2104,
+      2105,
+      2106,
+      2107,
+      2108,
+      2109,
+      2110,
+      2111,
+      2112,
+      2113,
+      2114,
+      2115
+    ],
+    "actual_native_jobs": 24,
+    "verified_readonly_receipts": 32,
+    "actual_directory_factory_terminals": 24,
+    "verified_unchanged_without_start": [
+      {
+        "token": 82,
+        "job": 82,
+        "control": 2102
+      },
+      {
+        "token": 84,
+        "job": 84,
+        "control": 2103
+      },
+      {
+        "token": 94,
+        "job": 94,
+        "control": 2108
+      },
+      {
+        "token": 100,
+        "job": 100,
+        "control": 2111
+      },
+      {
+        "token": 102,
+        "job": 102,
+        "control": 2112
+      },
+      {
+        "token": 104,
+        "job": 104,
+        "control": 2113
+      },
+      {
+        "token": 106,
+        "job": 106,
+        "control": 2114
+      },
+      {
+        "token": 108,
+        "job": 108,
+        "control": 2115
+      }
+    ]
+  },
+  "positive_Close_and_reopen_cycles": 1,
+  "unsafe_writer": {
+    "passed": true,
+    "expected": "actual opaque writer refusal; no successful Close claim",
+    "actual_marker": "controlled unsafe write\n",
+    "phase": "CHECKPOINT_FAILED",
+    "checkpoint_saved": false,
+    "authorization_consumed": false,
+    "process_death_confirmed": false,
+    "protected_records_unchanged": true
+  },
+  "ordinary411_pass_preserved": 40317069331,
+  "ordinary415_PowerUI_pass_preserved": 40360243111,
+  "physical_Fold": "NOT RUN",
+  "release_accepted": false
+}

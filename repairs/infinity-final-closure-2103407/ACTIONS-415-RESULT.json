@@ -1,0 +1,139 @@
+{
+  "run": 40362471408,
+  "artifact": 12669088044,
+  "artifact_sha256": "5a85528c868e094235d419370a722967732a11e88273a7dd6082616fb8e966a3",
+  "candidate_source": "e92df08f23f9a66d9e004e48954a9e5d5dfc1ef7",
+  "test_source": "2946df95df1f02f6a5cbcb8932b9d63d77be0690",
+  "apk_sha256": "75e3982300aed71fe791f8d5ccf9542ac0c198f012aea9f124021f3a766eb4ac",
+  "passed": true,
+  "cases": [
+    {
+      "case": "Add to Watchlist",
+      "status": "PASS",
+      "popup_seconds": 1.3396488180000006
+    },
+    {
+      "case": "Remove from Watchlist",
+      "status": "PASS",
+      "popup_seconds": 4.009256498000013
+    },
+    {
+      "case": "Add to Collection",
+      "status": "PASS",
+      "popup_seconds": 3.8647208259999957
+    },
+    {
+      "case": "Remove from Collection",
+      "status": "PASS",
+      "popup_seconds": 3.9536637180000014
+    },
+    {
+      "case": "Mark Watched",
+      "status": "PASS",
+      "popup_seconds": 3.8883968380000056
+    },
+    {
+      "case": "Mark Unwatched",
+      "status": "PASS",
+      "popup_seconds": 3.3477966119999962
+    },
+    {
+      "case": "actual-favourites-toggle",
+      "status": "PASS"
+    }
+  ],
+  "raw_native_Favorites": [
+    {
+      "favourites": null,
+      "limits": {
+        "end": 0,
+        "start": 0,
+        "total": 0
+      }
+    },
+    {
+      "favourites": null,
+      "limits": {
+        "end": 0,
+        "start": 0,
+        "total": 0
+      }
+    },
+    {
+      "favourites": null,
+      "limits": {
+        "end": 0,
+        "start": 0,
+        "total": 0
+      }
+    },
+    {
+      "favourites": [
+        {
+          "path": "special://profile/infinity-final-qa.mp4",
+          "title": "The Matrix",
+          "type": "media"
+        }
+      ],
+      "limits": {
+        "end": 1,
+        "start": 0,
+        "total": 1
+      }
+    },
+    {
+      "favourites": [
+        {
+          "path": "special://profile/infinity-final-qa.mp4",
+          "title": "The Matrix",
+          "type": "media"
+        }
+      ],
+      "limits": {
+        "end": 1,
+        "start": 0,
+        "total": 1
+      }
+    },
+    {
+      "favourites": [
+        {
+          "path": "special://profile/infinity-final-qa.mp4",
+          "title": "The Matrix",
+          "type": "media"
+        }
+      ],
+      "limits": {
+        "end": 1,
+        "start": 0,
+        "total": 1
+      }
+    },
+    {
+      "favourites": [
+        {
+          "path": "special://profile/infinity-final-qa.mp4",
+          "title": "The Matrix",
+          "type": "media"
+        }
+      ],
+      "limits": {
+        "end": 1,
+        "start": 0,
+        "total": 1
+      }
+    },
+    {
+      "favourites": null,
+      "limits": {
+        "end": 0,
+        "start": 0,
+        "total": 0
+      }
+    }
+  ],
+  "physical_gestures": "NOT RUN: first/second tap, hold, selection/scroll require separate Fold acceptance",
+  "observation_contract": "Exact target presence/absence within remaining original90sec popup deadline; all original assertions and input actions unchanged",
+  "shutdown": "NOT SELECTED",
+  "release_accepted": false
+}
