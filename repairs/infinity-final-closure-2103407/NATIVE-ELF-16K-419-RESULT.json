@@ -1,0 +1,427 @@
+{
+  "apk_sha256": "0b202e3af93ce25be8cd5ecb2853043411ba5fbbf88dac0df94ef4b2ce55605a",
+  "candidate_source": "a24db78554da7bc40a2a0b658ba441793f1c1605",
+  "runs": [
+    {
+      "run": 40399697939,
+      "artifact": 12688731837,
+      "artifact_sha256": "144cf01c0f88d4d3e4d2b0ce71c328bfc6216b3b2bc18ff1615f1e6f6c10d9f7",
+      "test_source": "bd9697f9d129f92adabcb1d012347f2ab6a79a6d",
+      "passed": false,
+      "actual_native_SIGSEGV": false,
+      "actual_Java_UnsatisfiedLinkError": true,
+      "exact_linker_error": "10-26 20:59:56.095  8549  8549 E linker  : \"/data/app/~~MuoLQQBPjsUBqQTkDTiIAw==/com.projectinfinity.kodi-1sFhtT6hUd5qJ2CQRHw9Sg==/lib/arm64/libc++_shared.so\" program alignment (4096) cannot be smaller than system page size (16384)",
+      "strict_environment": "API37.1 google_apis_ps16k x86_64, actualpage=16384",
+      "counts": {
+        "search": 0,
+        "playback_home": 0,
+        "rotation": 0
+      },
+      "Kodi_Python_Home_started": false
+    },
+    {
+      "run": 40399771565,
+      "artifact": 12687564352,
+      "artifact_sha256": "d4068a1b546e2190f0fe131b2490b7cf4ffcbbe39ec7c6db1f7f02335482d950",
+      "test_source": "5ee6bc6f8e41ac65b76b22b6bbc282d67f6ffccf",
+      "passed": false,
+      "actual_native_SIGSEGV": false,
+      "actual_Java_UnsatisfiedLinkError": true,
+      "exact_linker_error": "10-26 21:00:28.009 10014 10014 E linker  : \"/data/app/~~1xXs-wqdGBBSCV87e5VuwA==/com.projectinfinity.kodi-ONkILl1jieC5lKaWuc4FBA==/lib/arm64/libc++_shared.so\" program alignment (4096) cannot be smaller than system page size (16384)",
+      "strict_environment": "API37.1 google_apis_ps16k x86_64, actualpage=16384",
+      "counts": {
+        "search": 0,
+        "playback_home": 0,
+        "rotation": 0
+      },
+      "Kodi_Python_Home_started": false
+    }
+  ],
+  "actual_all_ARM64_ELF_inventory": [
+    {
+      "member": "lib/arm64-v8a/libCryptodome_Cipher__ARC4.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libCryptodome_Cipher__Salsa20.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libCryptodome_Cipher__chacha20.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libCryptodome_Cipher__pkcs1_decode.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libCryptodome_Cipher__raw_aes.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libCryptodome_Cipher__raw_arc2.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libCryptodome_Cipher__raw_blowfish.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libCryptodome_Cipher__raw_cast.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libCryptodome_Cipher__raw_cbc.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libCryptodome_Cipher__raw_cfb.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libCryptodome_Cipher__raw_ctr.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libCryptodome_Cipher__raw_des.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libCryptodome_Cipher__raw_des3.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libCryptodome_Cipher__raw_ecb.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libCryptodome_Cipher__raw_eksblowfish.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libCryptodome_Cipher__raw_ocb.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libCryptodome_Cipher__raw_ofb.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libCryptodome_Hash__BLAKE2b.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libCryptodome_Hash__BLAKE2s.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libCryptodome_Hash__MD2.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libCryptodome_Hash__MD4.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libCryptodome_Hash__MD5.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libCryptodome_Hash__RIPEMD160.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libCryptodome_Hash__SHA1.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libCryptodome_Hash__SHA224.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libCryptodome_Hash__SHA256.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libCryptodome_Hash__SHA384.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libCryptodome_Hash__SHA512.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libCryptodome_Hash__ghash_portable.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libCryptodome_Hash__keccak.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libCryptodome_Hash__poly1305.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libCryptodome_Math__modexp.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libCryptodome_Protocol__scrypt.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libCryptodome_PublicKey__ec_ws.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libCryptodome_Util__cpuid_c.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libCryptodome_Util__strxor.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/lib_imaging.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/lib_imagingft.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/lib_imagingmath.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/lib_imagingmorph.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/lib_imagingtk.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libc++_shared.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libdvdnav-aarch64.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libshairplay.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libinfinitycrash.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    },
+    {
+      "member": "lib/arm64-v8a/libinfinityambient.so",
+      "PT_LOAD_alignments": [
+        16384,
+        16384
+      ],
+      "all_segments_support_16KiB": true
+    },
+    {
+      "member": "lib/arm64-v8a/libkodi.so",
+      "PT_LOAD_alignments": [
+        4096,
+        4096,
+        4096
+      ],
+      "all_segments_support_16KiB": false
+    }
+  ],
+  "native_payload_unchanged_from_418": true,
+  "APK_ZIP_alignment_bytes": 16384,
+  "APK_ZIP_alignment_is_not_native_ELF_16KiB_compatibility": true,
+  "strict_16KiB_supported": false,
+  "physical_Fold_page_size": "NOT VERIFIED; previousphysical2103410passedstartup/Close does notestablishstrict16KiB",
+  "runtime_action": "No shared native/Cobra edit or page-size compatibility override. Originalnativefault and thisloaderfailure retainedindependently. Actual4KiBAndroid17 positivePower3/writer evidence preserved.",
+  "release_accepted": false,
+  "final_lock": false
+}

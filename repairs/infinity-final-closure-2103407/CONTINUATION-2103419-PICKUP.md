@@ -134,3 +134,14 @@ arenotperformanceimprovement. ReportSYNTHETIC-IMAGE-AND-UNSAFE-419-RESULT.json.
 Search40399771565 andHome40399697939 on37.1ps16k remainactive; do notrestart.
 Temporaryworkspace disconnect recoveredwithallfilesintact; savedLibrarystill
 older418version3. Final419repackage/uploadstillneededafteractualresults.
+
+
+## Actual419package saved —21:02UTC
+
+SameZIP+checksum items successfullyreplaced asversion4, orderedperitem success
+andlocalidentitymetadata applied. ZIP86a3ea03fc8050c10069b29c2e7630dd3e7d37f4d74fb87af5f7a95a1b925382,379608665bytes.
+It nowcontainsactual419APK, exact5matchingcomponents, Power3PASS+writerPASS,
+twoactual37.0startupfailures andexplicitpending37.1Search/Home/rotation status.
+Privateactualreceiptsupdatedoutsidegit; nextwriteexpected_current_version4.
+Do notclaimfinalrelease orrequestinterimphysicalinstallation. Currentresults
+stillpending:40399697939/40399771565; updateSAMEsaveditemswithnewactualresults.

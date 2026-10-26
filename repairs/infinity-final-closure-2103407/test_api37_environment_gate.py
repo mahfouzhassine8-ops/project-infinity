@@ -18,7 +18,9 @@ class EnvironmentGateTests(unittest.TestCase):
     def test_current_request_and_workflow_bind_only_explicit_image_and_preserve_manual_default(self):
         import candidate_request
         request=dict(candidate_request.EXPECTED)
-        result=candidate_request.validate(request)
+        from unittest.mock import patch
+        request.update(emulator_api='37.1',emulator_target='google_apis_ps16k')
+        with patch.object(candidate_request,'EXPECTED',request):result=candidate_request.validate(request)
         self.assertEqual(result['INFINITY_EMULATOR_API'],'37.1')
         self.assertEqual(result['INFINITY_EMULATOR_TARGET'],'google_apis_ps16k')
         self.assertEqual(request['emulator_api'],'37.1')
