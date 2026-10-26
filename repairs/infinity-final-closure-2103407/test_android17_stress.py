@@ -40,6 +40,7 @@ class StressAdmissionTests(unittest.TestCase):
         self.assertEqual(expected['post_feature']['search'],0)
         self.assertEqual(expected['post_feature']['playback_home'],30)
         self.assertEqual(expected['post_feature']['rotation'],20)
+        self.assertEqual(stress.admit(device,setup,dict(expected,post_feature=dict(stress.SEARCH_COUNTS))),setup['engine'])
         for counts in ({'search':0,'playback_home':0,'rotation':0},
                        {'search':0,'playback_home':29,'rotation':20},
                        {'search':1,'playback_home':30,'rotation':20}):

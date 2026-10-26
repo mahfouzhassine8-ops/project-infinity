@@ -17,6 +17,7 @@ import android_stress_script
 
 COUNTS={'search':50,'playback_home':30,'rotation':20}
 HOME_COUNTS={'search':0,'playback_home':30,'rotation':20}
+SEARCH_COUNTS={'search':50,'playback_home':0,'rotation':0}
 
 
 def require(value,message):
@@ -24,7 +25,7 @@ def require(value,message):
 
 
 def admit(device,setup,expected):
-    require(expected.get('post_feature') in (COUNTS,HOME_COUNTS),'Exact stress selection required')
+    require(expected.get('post_feature') in (COUNTS,HOME_COUNTS,SEARCH_COUNTS),'Exact stress selection required')
     require(setup.get('passed') is True,'Selected real feature did not pass')
     require(setup.get('apk_sha256')==expected['candidate_apk_sha256'],'Stress APK binding differs')
     require(device.PACKAGE=='com.projectinfinity.kodi','Wrong application')
@@ -48,7 +49,7 @@ def _run(device,setup,expected,out):
     owner=admit(device,setup,expected);out=Path(out);out.mkdir(exist_ok=False)
     wanted=dict(expected['post_feature'])
     report=dict(passed=False,apk_sha256=expected['candidate_apk_sha256'],owner=owner,
-        requested=wanted,search=[],playback_home=[],rotation=[],snapshots=[],scroll_samples=[],
+        requested=wanted,selected_scopes={k:('SELECTED' if v else 'NOT SELECTED') for k,v in wanted.items()},search=[],playback_home=[],rotation=[],snapshots=[],scroll_samples=[],
         physical_Fold='NOT RUN',shutdown='NOT SELECTED',poster_first_paint='NOT MEASURED',
         native_frame_pacing='RAW SAMPLES ONLY; no native FPS claim',
         playback_content='Generated gray640x360 H264 clip, no real movie playback claim')
@@ -222,11 +223,12 @@ def _run(device,setup,expected,out):
             home();report['search'][-1]['additional_search_cancelled']=True;save()
         if (index+1)%5==0:memory('search-'+str(index+1))
 
-    clip=out/'generated-native-cycle.mp4'
-    subprocess.run(['ffmpeg','-v','error','-f','lavfi','-i','color=c=gray:s=640x360:r=24',
-                    '-t','8','-an','-c:v','libx264','-pix_fmt','yuv420p',str(clip)],check=True)
-    remote=device.PROFILE+'/infinity-stress-native.mp4';device.adb('push',clip,remote)
-    require(not device.rpc('Player.GetActivePlayers'),'Unexpected playback before test clip')
+    if wanted['playback_home']:
+        clip=out/'generated-native-cycle.mp4'
+        subprocess.run(['ffmpeg','-v','error','-f','lavfi','-i','color=c=gray:s=640x360:r=24',
+                        '-t','8','-an','-c:v','libx264','-pix_fmt','yuv420p',str(clip)],check=True)
+        remote=device.PROFILE+'/infinity-stress-native.mp4';device.adb('push',clip,remote)
+        require(not device.rpc('Player.GetActivePlayers'),'Unexpected playback before test clip')
     for index in range(wanted['playback_home']):
         device.rpc('Player.Open',{'item':{'file':remote},'options':{'resume':False}})
         players=device.until(lambda:[p for p in device.rpc('Player.GetActivePlayers') if p.get('type')=='video'],20)
@@ -248,27 +250,28 @@ def _run(device,setup,expected,out):
         save()
         if (index+1)%10==0:memory('playback-'+str(index+1))
 
-    previous={k:device.shell('settings','get','system',k).strip() for k in ('accelerometer_rotation','user_rotation')}
-    report['original_rotation_settings']=previous
-    try:
-        device.shell('settings','put','system','accelerometer_rotation','0')
-        for index in range(wanted['rotation']):
-            value=1 if index%2==0 else 0;began=time.monotonic()
-            device.shell('settings','put','system','user_rotation',str(value))
-            def rotated():
-                raw=device.shell('dumpsys','input',check=False)
-                match=re.search(r'(?:orientation|SurfaceOrientation)\s*[=:]\s*([0-3])',raw)
-                return raw if match and int(match[1])==value else None
-            evidence=device.until(rotated,20)
-            (out/('rotation-'+str(index)+'-input.txt')).write_text(evidence)
-            home()
-            import stress_resume_card
-            card=stress_resume_card.observe(device,protected,'movie' if index%2==0 else 'tv',out/('poster-rotation-'+str(index)))
-            report['rotation'].append(dict(cycle=index,requested=value,actual=value,
-                    elapsed_ms=(time.monotonic()-began)*1000,physical_fold=False,actual_resume_card=card));save()
-    finally:
-        for name,value in previous.items():
-            if value!='null':device.shell('settings','put','system',name,value)
+    if wanted['rotation']:
+        previous={k:device.shell('settings','get','system',k).strip() for k in ('accelerometer_rotation','user_rotation')}
+        report['original_rotation_settings']=previous
+        try:
+            device.shell('settings','put','system','accelerometer_rotation','0')
+            for index in range(wanted['rotation']):
+                value=1 if index%2==0 else 0;began=time.monotonic()
+                device.shell('settings','put','system','user_rotation',str(value))
+                def rotated():
+                    raw=device.shell('dumpsys','input',check=False)
+                    match=re.search(r'(?:orientation|SurfaceOrientation)\s*[=:]\s*([0-3])',raw)
+                    return raw if match and int(match[1])==value else None
+                evidence=device.until(rotated,20)
+                (out/('rotation-'+str(index)+'-input.txt')).write_text(evidence)
+                home()
+                import stress_resume_card
+                card=stress_resume_card.observe(device,protected,'movie' if index%2==0 else 'tv',out/('poster-rotation-'+str(index)))
+                report['rotation'].append(dict(cycle=index,requested=value,actual=value,
+                        elapsed_ms=(time.monotonic()-began)*1000,physical_fold=False,actual_resume_card=card));save()
+        finally:
+            for name,value in previous.items():
+                if value!='null':device.shell('settings','put','system',name,value)
     memory('after')
     after=device.read_json(state_path)
     require(all(protected.get(k)==after.get(k) for k in protected_keys),'Stress changed protected tracking records')

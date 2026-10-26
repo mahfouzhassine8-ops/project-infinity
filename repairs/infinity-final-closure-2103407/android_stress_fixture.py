@@ -9,7 +9,7 @@ import subprocess
 from pathlib import Path
 
 from android17_reference_observation import OLD, FIXTURE_SHA
-from android17_stress import COUNTS
+from android17_stress import COUNTS,HOME_COUNTS,SEARCH_COUNTS
 
 PACKAGE = 'com.projectinfinity.kodi'
 PROFILE = '/sdcard/Android/data/' + PACKAGE + '/files/.kodi/userdata'
@@ -34,10 +34,10 @@ def retained_state(raw):
 
 
 def seed(device, args, report, expected):
-    if (args.case != 'final-search-all-enter' or expected.get('post_feature') != COUNTS or
+    if (args.case != 'final-search-all-enter' or expected.get('post_feature') not in (COUNTS,HOME_COUNTS,SEARCH_COUNTS) or
             not expected.get('candidate_apk_sha256') or
             report.get('apk_sha256') != expected.get('candidate_apk_sha256')):
-        raise ValueError('Only the exact selected candidate Search stress may be seeded')
+        raise ValueError('Only an exact selected candidate stress scope may be seeded')
     if (device.PACKAGE != PACKAGE or device.PROFILE != PROFILE or
             device.shell('getprop', 'ro.kernel.qemu').strip() != '1' or
             device.shell('getprop', 'ro.build.version.sdk').strip() != '37'):

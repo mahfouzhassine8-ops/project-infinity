@@ -1,0 +1,19 @@
+{
+  "recorded_before_correction": true,
+  "failed_setup_run": 40395925723,
+  "artifact": 12685758917,
+  "artifact_sha256": "8bf6db4a3fc83a52608f097930f76611f1aaf8cfca890ec52908863e43beec00",
+  "candidate_apk_sha256": "328757eb858a79f91883c0ba4e2884410baaf0b42730db5d62054679253674e4",
+  "actual_app_launched": false,
+  "failure": "Only the exact selected candidate Search stress may be seeded; android_stress_fixture still accepted combined50/30/20 only",
+  "correction": "Admit only three EXACT explicitly authorized scopes in BOTH fixture and actual stress guard: original combined50/30/20, Search50alone, Home30/rotation20alone; all APK/API37/qemu/fresh-no-launch/noexistingfile/sentinel/readback/protectedrecord guards retained. ZeroSearch produces NOT SELECTED/null content result, never SearchPASS. No APK/deadline/assertion/provider/source fixture delta.",
+  "selected_tests": [
+    "admission exactscope/notempty/wrongcount refusal",
+    "fresh seed/readback only for both independent scopes",
+    "all existing fixture physical/liveengine/existingfile/link/wrongSHA protections",
+    "all original stress admission/partialfailure retained"
+  ],
+  "release_accepted": false,
+  "final_lock": false,
+  "host_check_correction": "Initial extra dispatcher host check had2errors: obsolete prior bridge tests referenced removed enable function and omitted required original service preimage. Correct tests against current admitted observer stage inverse and bounded owner/action/ACK transport; production dispatcher unchanged."
+}

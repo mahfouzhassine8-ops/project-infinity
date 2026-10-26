@@ -68,6 +68,22 @@ class StressFixtureTests(unittest.TestCase):
             self.assertTrue(proof['declared_resume_clip_exists'])
             self.assertIsInstance(device.data[fixture.PROFILE+'/infinity-final-qa.mp4'],bytes)
 
+    def test_each_independent_scope_seeds_same_frozen_state_only_before_launch(self):
+        for counts in (fixture.HOME_COUNTS,fixture.SEARCH_COUNTS):
+            with self.subTest(counts=counts),tempfile.TemporaryDirectory() as temp:
+                root=Path(temp);device,args,report,expected=self.context(root)
+                expected['post_feature']=dict(counts)
+                fixture.seed(device,args,report,expected)
+                state=json.loads(device.data[fixture.PROFILE+'/addon_data/script.infinity.commandcenter/continue-watching.json'])
+                self.assertEqual(state,fixture.retained_state((fixture.OLD/'tracking/final-eight/android_selected.py').read_bytes()))
+                self.assertFalse(report['prelaunch_stress_fixture']['existing_profile_replaced'])
+        for counts in ({'search':0,'playback_home':0,'rotation':0},{'search':0,'playback_home':29,'rotation':20}):
+            with tempfile.TemporaryDirectory() as temp:
+                root=Path(temp);device,args,report,expected=self.context(root)
+                expected['post_feature']=counts
+                with self.assertRaises(ValueError):fixture.seed(device,args,report,expected)
+                self.assertEqual(device.calls,[])
+
     def test_physical_wrong_api_live_engine_existing_file_and_link_refused_before_write(self):
         for changes in ({'qemu':'0'},{'sdk':'36'},{'pid':'123'}, {'engine':{'pid':123}},
                         {'exists':True},{'link':True},{'PROFILE':'/other/profile'}, {'PACKAGE':'other'}):

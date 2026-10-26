@@ -10,19 +10,21 @@ import android_stress_script as bridge
 class StressScriptDispatchTests(unittest.TestCase):
     def context(self,root):
         folder=root/'fixture';folder.mkdir()
+        target=folder/'service.future.persistence.7fa29';target.mkdir()
+        (target/'service.py').write_text("import os,xbmcaddon,xbmcvfs\nfrom pathlib import Path\nimport android_selected\nroot=xbmcvfs.translatePath(xbmcaddon.Addon().getAddonInfo('profile'))\nPath(root).mkdir(parents=True,exist_ok=True)\nandroid_selected.run(root,str(os.getpid()),'final-search-all-enter')\n")
         device=SimpleNamespace(PACKAGE='com.projectinfinity.kodi',shell=lambda *a:'1' if a[-1]=='ro.kernel.qemu' else '37')
         return folder,SimpleNamespace(out=root,case='final-search-all-enter'),{},device,'service.future.persistence.7fa29'
 
-    def test_bridge_is_only_exact_original_home_builtin_no_autostart_or_writes(self):
+    def test_bridge_extends_only_original_admitted_service_and_keeps_exact_inverse(self):
         with tempfile.TemporaryDirectory() as temp:
-            folder,args,report,device,aid=self.context(Path(temp));bridge.stage(folder,args,report,device,aid)
-            target=folder/bridge.ADDON;manifest=ET.fromstring((target/'addon.xml').read_text())
-            extensions=manifest.findall('extension')
-            self.assertEqual([e.get('point') for e in extensions],['xbmc.python.script','xbmc.addon.metadata'])
-            calls=[];exec(compile((target/'default.py').read_text(),'bridge','exec'),{'__builtins__':dict(__import__=lambda *args:SimpleNamespace(executebuiltin=lambda value:calls.append(value)))})
-            self.assertEqual(calls,[bridge.BUILTIN])
-            self.assertFalse(report['stress_script_bridge']['automatically_started'])
-            self.assertEqual(set(p.name for p in target.iterdir()),{'addon.xml','default.py'})
+            folder,args,report,device,aid=self.context(Path(temp))
+            service=folder/aid/'service.py';original=service.read_text()
+            bridge.stage(folder,args,report,device,aid)
+            self.assertEqual(service.read_text(),original+bridge.TAIL)
+            self.assertEqual((folder/aid/'android_stress_dispatcher.py').read_bytes(),Path(bridge.__file__).with_name('android_stress_dispatcher.py').read_bytes())
+            self.assertFalse(report['stress_script_bridge']['production_changes'])
+            self.assertEqual(report['stress_script_bridge']['extra_invokers_per_request'],0)
+            self.assertTrue(report['stress_script_bridge']['existing_observer_only'])
             with self.assertRaises(ValueError):bridge.stage(folder,args,report,device,aid)
 
     def test_wrong_stage_case_and_physical_device_refused(self):
@@ -35,17 +37,28 @@ class StressScriptDispatchTests(unittest.TestCase):
                 else:aid='other'
                 with self.assertRaises(ValueError):bridge.stage(folder,args,report,device,aid)
 
-    def test_enable_and_launch_only_the_fixed_script_identity(self):
-        calls=[]
-        def rpc(method,params):
-            calls.append((method,params))
-            if method=='Addons.GetAddonDetails':return {'addon':{'version':'1.0.0','enabled':False}}
-            return 'OK'
-        device=SimpleNamespace(rpc=rpc);bridge.enable(device);bridge.launch(device)
-        self.assertEqual([x[0] for x in calls],['Addons.GetAddonDetails','Addons.SetAddonEnabled','Addons.ExecuteAddon'])
-        self.assertTrue(all(x[1]['addonid']==bridge.ADDON for x in calls))
-        self.assertEqual(calls[-1][1],{'addonid':bridge.ADDON,'wait':False})
-        with self.assertRaises(ValueError):bridge.enable(SimpleNamespace(rpc=lambda *a:{'addon':{'version':'2.0.0'}}))
+    def test_admitted_dispatch_requires_same_owner_bounded_action_and_exact_ack(self):
+        from unittest import mock
+        with tempfile.TemporaryDirectory() as temp,mock.patch.object(bridge,'_context',None):
+            root=Path(temp);owner={'pid':123,'owner':'exact-native-token'};pushed=[]
+            ready={'pid':123,'max_requests':bridge.MAX_REQUESTS,'first_actual_feature_passed':True,'source':'exact-home-search'}
+            device=SimpleNamespace(PROFILE='/qa/profile',read_json=lambda p:ready,
+                until=lambda fn,seconds:fn(),running_engine=lambda:owner,
+                adb=lambda *args:pushed.append(args))
+            with self.assertRaises(ValueError):bridge.launch(device)
+            bridge.initialize(device,root,owner)
+            bridge.launch(device)
+            request=__import__('json').loads((root/'dispatch-request.json').read_text())
+            self.assertEqual(request,{'pid':123,'sequence':1,'action':'home-search'})
+            self.assertEqual(pushed[0][0],'push')
+            with self.assertRaises(ValueError):bridge.verify_dispatch(device)
+            device.read_json=lambda p:request
+            bridge.verify_dispatch(device)
+            with self.assertRaises(ValueError):bridge.launch(device,action='arbitrary-action')
+            device.running_engine=lambda:{'pid':124,'owner':'exact-native-token'}
+            with self.assertRaises(ValueError):bridge.launch(device)
+            device.running_engine=lambda:owner;bridge._context['sequence']=bridge.MAX_REQUESTS
+            with self.assertRaises(ValueError):bridge.launch(device)
 
     def test_both_stress_openings_use_bridge_and_keep_actual_input_assertions(self):
         path=Path(__file__).parent/'android17_stress.py';source=path.read_text();tree=ast.parse(source)
