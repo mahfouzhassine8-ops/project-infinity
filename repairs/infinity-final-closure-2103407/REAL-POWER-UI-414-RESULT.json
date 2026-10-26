@@ -1,0 +1,253 @@
+{
+  "passed": true,
+  "scenario": "integrated-real-power-ui",
+  "apk_sha256": "a13bd3a5fc10752fc06621e2b49d050b5fd3ba0a8a86ad9e675420335b0313d3",
+  "candidate_source_commit": "f5dbd03fb3a5df6b2f0f209bc36768d6ebd16c71",
+  "test_source_commit": "81816146ce1f9c1906fcb64cce8e9ed0d139af72",
+  "workflow_run": "40346078040",
+  "physical_Fold": "NOT RUN",
+  "release_accepted": false,
+  "artifact_id": 12661533313,
+  "artifact_sha256": "ae77f28700342bb43782f3ad663246647daee819a8be23cfe486c9020a12ecb1",
+  "preserved_ordinary411_run": 40317069331,
+  "cycles": [
+    {
+      "cycle": 0,
+      "passed": true,
+      "close_seconds": 3.6510187950000272,
+      "process_ownership_before": {
+        "kodi_engine": [
+          {
+            "pid": 4444,
+            "uid": 10234,
+            "name": "com.projectinfinity.kodi:kodi"
+          }
+        ],
+        "android_coordinator": [
+          {
+            "pid": 4411,
+            "uid": 10234,
+            "name": "com.projectinfinity.kodi"
+          }
+        ],
+        "other_owned_processes": []
+      },
+      "process_ownership_after": {
+        "kodi_engine": [],
+        "android_coordinator": [],
+        "other_owned_processes": []
+      },
+      "separate_results": {
+        "essential_first_durable": true,
+        "kodi_engine_terminated": true,
+        "android_coordinator_completed": true,
+        "remaining_UID_processes": [],
+        "recent_apps_used_for_process_proof": false
+      },
+      "launch_preference_before": {
+        "present": true,
+        "sha256": "9f6ba54226d61b6cd02796a9d61d4831dc2154875bd22d5bcafb7da78b9ace0a",
+        "remembered": "infinity"
+      },
+      "launch_preference_after": {
+        "present": true,
+        "sha256": "9f6ba54226d61b6cd02796a9d61d4831dc2154875bd22d5bcafb7da78b9ace0a",
+        "remembered": "infinity"
+      },
+      "database_integrity": [
+        "Addons33.db",
+        "TV46.db",
+        "Textures13.db",
+        "ViewModes6.db",
+        "MyMusic83.db",
+        "Epg16.db",
+        "MyVideos131.db"
+      ],
+      "native_close_receipt_ms": 2139,
+      "essential_owners": [
+        "native_admission",
+        "background_jobs",
+        "playback",
+        "command_center",
+        "compat",
+        "kodi_settings",
+        "profiles",
+        "skin_settings",
+        "addon_settings",
+        "favourites",
+        "peripherals",
+        "audio_policy",
+        "deferred_dialog_state",
+        "xml_files",
+        "native_databases",
+        "pvr"
+      ],
+      "backend_matches": true,
+      "actual_ui_input": "Android KEYCODE_DPAD_CENTER",
+      "native_and_twoJava_verified": true,
+      "protected_readback_passed": true,
+      "reopened_fresh_owner": true
+    },
+    {
+      "cycle": 1,
+      "passed": true,
+      "close_seconds": 4.782852092999974,
+      "process_ownership_before": {
+        "kodi_engine": [
+          {
+            "pid": 5017,
+            "uid": 10234,
+            "name": "com.projectinfinity.kodi:kodi"
+          }
+        ],
+        "android_coordinator": [
+          {
+            "pid": 4983,
+            "uid": 10234,
+            "name": "com.projectinfinity.kodi"
+          }
+        ],
+        "other_owned_processes": []
+      },
+      "process_ownership_after": {
+        "kodi_engine": [],
+        "android_coordinator": [],
+        "other_owned_processes": []
+      },
+      "separate_results": {
+        "essential_first_durable": true,
+        "kodi_engine_terminated": true,
+        "android_coordinator_completed": true,
+        "remaining_UID_processes": [],
+        "recent_apps_used_for_process_proof": false
+      },
+      "launch_preference_before": {
+        "present": true,
+        "sha256": "9f6ba54226d61b6cd02796a9d61d4831dc2154875bd22d5bcafb7da78b9ace0a",
+        "remembered": "infinity"
+      },
+      "launch_preference_after": {
+        "present": true,
+        "sha256": "9f6ba54226d61b6cd02796a9d61d4831dc2154875bd22d5bcafb7da78b9ace0a",
+        "remembered": "infinity"
+      },
+      "database_integrity": [
+        "Addons33.db",
+        "TV46.db",
+        "Textures13.db",
+        "ViewModes6.db",
+        "MyMusic83.db",
+        "Epg16.db",
+        "MyVideos131.db"
+      ],
+      "native_close_receipt_ms": 2831,
+      "essential_owners": [
+        "native_admission",
+        "background_jobs",
+        "playback",
+        "command_center",
+        "compat",
+        "kodi_settings",
+        "profiles",
+        "skin_settings",
+        "addon_settings",
+        "favourites",
+        "peripherals",
+        "audio_policy",
+        "deferred_dialog_state",
+        "xml_files",
+        "native_databases",
+        "pvr"
+      ],
+      "backend_matches": true,
+      "actual_ui_input": "Android KEYCODE_DPAD_CENTER",
+      "native_and_twoJava_verified": true,
+      "protected_readback_passed": true,
+      "reopened_fresh_owner": true
+    },
+    {
+      "cycle": 2,
+      "passed": true,
+      "close_seconds": 4.059259531999942,
+      "process_ownership_before": {
+        "kodi_engine": [
+          {
+            "pid": 5729,
+            "uid": 10234,
+            "name": "com.projectinfinity.kodi:kodi"
+          }
+        ],
+        "android_coordinator": [
+          {
+            "pid": 5663,
+            "uid": 10234,
+            "name": "com.projectinfinity.kodi"
+          }
+        ],
+        "other_owned_processes": []
+      },
+      "process_ownership_after": {
+        "kodi_engine": [],
+        "android_coordinator": [],
+        "other_owned_processes": []
+      },
+      "separate_results": {
+        "essential_first_durable": true,
+        "kodi_engine_terminated": true,
+        "android_coordinator_completed": true,
+        "remaining_UID_processes": [],
+        "recent_apps_used_for_process_proof": false
+      },
+      "launch_preference_before": {
+        "present": true,
+        "sha256": "9f6ba54226d61b6cd02796a9d61d4831dc2154875bd22d5bcafb7da78b9ace0a",
+        "remembered": "infinity"
+      },
+      "launch_preference_after": {
+        "present": true,
+        "sha256": "9f6ba54226d61b6cd02796a9d61d4831dc2154875bd22d5bcafb7da78b9ace0a",
+        "remembered": "infinity"
+      },
+      "database_integrity": [
+        "Addons33.db",
+        "TV46.db",
+        "Textures13.db",
+        "ViewModes6.db",
+        "MyMusic83.db",
+        "Epg16.db",
+        "MyVideos131.db"
+      ],
+      "native_close_receipt_ms": 2546,
+      "essential_owners": [
+        "native_admission",
+        "background_jobs",
+        "playback",
+        "command_center",
+        "compat",
+        "kodi_settings",
+        "profiles",
+        "skin_settings",
+        "addon_settings",
+        "favourites",
+        "peripherals",
+        "audio_policy",
+        "deferred_dialog_state",
+        "xml_files",
+        "native_databases",
+        "pvr"
+      ],
+      "backend_matches": true,
+      "actual_ui_input": "Android KEYCODE_DPAD_CENTER",
+      "native_and_twoJava_verified": true,
+      "protected_readback_passed": true,
+      "reopened_fresh_owner": true
+    }
+  ],
+  "limits": [
+    "API37emulator, not physicalFold",
+    "RememberInfinity exercised; other chooser paths bytepreserved not runtimeexercised here",
+    "UI+Close clock includes openingPowerUI; native receipt duration separately reported",
+    "Recents separatelyobserved, not PIDproof",
+    "Not Search/Continue/50/30/20 or complete-release acceptance"
+  ]
+}

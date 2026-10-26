@@ -194,6 +194,10 @@ def main(selected_case=None,independent_setup=None):
             android_input_readiness.instrument(driver,OLD/'universal/android_search_input.py',DRIVER_SHA)
         probe._candidate_input_driver=input_driver
         def adb(*args,**kwargs):
+            if args==('root',):
+                from android_bootstrap_root import root
+                out=Path(sys.argv[sys.argv.index('--out')+1])
+                return root(probe.device,original_adb,out)
             if args and args[0]=='install':
                 # The original probe already refuses physical/non37/existing
                 # installs. Recheck that boundary before either APK install.

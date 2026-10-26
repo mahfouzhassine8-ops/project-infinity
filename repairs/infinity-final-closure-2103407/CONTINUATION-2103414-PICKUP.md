@@ -1,3 +1,5 @@
+> UPDATE: actual414 PowerUI40346078040 PASSED3/3. Artifact12661533313 SHAae77f28700342bb43782f3ad663246647daee819a8be23cfe486c9020a12ecb1. Actual414Continue40346077812 FAILED before anyAPK installation: adbroot unable to connect closed (artifact12661518001 SHAc8ae49f411c037449eb3987218ed3b80062adbdfb40d478e29cb2e0d6f71894b). New test-only android_bootstrap_root retries exactly this closed daemon once after30secwait+qemu/API37/noapp/nolive guards; other/second errors remainFAIL. Continue02 currentrequest; do not rerun completed Close. New414Search50/30/20 run40347261675 at457e3d5a284971a21660b0bceda5354ae416d524 is running; no result yet.
+
 # Continue current integration — signed414 built, runtime still open
 
 Do not restart, shrink seven-workstream scope, move protected407 lock, change Cobra/chooser or reset user data. Original411 ordinary3Close run40317069331 remains preserved.

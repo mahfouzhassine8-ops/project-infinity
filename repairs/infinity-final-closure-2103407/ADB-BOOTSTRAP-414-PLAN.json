@@ -1,0 +1,14 @@
+{
+  "recorded_before_implementation": true,
+  "run": 40346077812,
+  "artifact_id": 12661518001,
+  "artifact_sha256": "c8ae49f411c037449eb3987218ed3b80062adbdfb40d478e29cb2e0d6f71894b",
+  "failure": "adb root: unable to connect for root: closed, before any APK installation/platform admission",
+  "correction": "One root setup retry only for exact transport-closed error: wait-for-device at most30sec, reverify qemu/API37 and no Infinity installation or engine, then same original adb root once. Other errors or a second closed connection remain failure. Write actual retry reason. No application action, data reset, test/persistence assertion or deadline changed.",
+  "selected_checks": [
+    "Exact daemon-close retries once after guarded no-app fresh API37 preflight",
+    "Other root failures, physical/wrongAPI/installed/live/secondfailure never pass or retry app",
+    "Original fixture predicates/inverse and independent shutdown controls retained"
+  ],
+  "release_accepted": false
+}
