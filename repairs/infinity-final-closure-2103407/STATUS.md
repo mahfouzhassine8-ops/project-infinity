@@ -1,3 +1,5 @@
+> Latest: signed415 build40358644857 SUCCESS, actual native typed playback and null Favorites runtime fixes; independent Android17 Continue/PowerUI selections pending. See CONTINUATION-2103415-PICKUP.md and SIGNED-415-BUILD-RESULT.json.414Search02 reached original feature plus2extra searches, then actual observation deadline;50/30/20 NOT complete.414Continue valid24fps still failed progress; actual native metadata cause corrected415, runtime not yet proved.
+
 # Current integration: signed2103414 built, release open
 
 Continue the original seven workstreams from protected407; do not restart. Cobra and chooser untouched. Current source f5dbd03fb3a5df6b2f0f209bc36768d6ebd16c71; signed ARM64 build40345149803 SUCCESS; APK a13bd3a5fc10752fc06621e2b49d050b5fd3ba0a8a86ad9e675420335b0313d3. CC44/Skin244/UI23/WB21/Rails8. Six exact parent413 member changes;7594 preserved; native/DEX/skin/helper/chooser/Cobra bytes exact. See CONTINUATION-2103414-PICKUP.md.
