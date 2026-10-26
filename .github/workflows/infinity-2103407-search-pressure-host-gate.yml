@@ -176,7 +176,7 @@ jobs:
           assert request['schema']==1 and request['scope'].strip()
           selected=request['selected']
           assert selected in {'search-lifetime','module-trust','installed-modules','module-protocol',
-                              'firstparty-compose','reference-observation','module-bundle','module-complete','android-routing'}
+                              'firstparty-compose','reference-observation','module-bundle','module-complete','internal-apk','android-routing'}
           with open(os.environ['GITHUB_OUTPUT'],'a') as output:
               output.write('selection='+selected+'\n')
           if selected=='search-lifetime':
@@ -204,6 +204,9 @@ jobs:
               sys.exit(0)
           elif selected=='module-complete':
               print('No unit-test repeat: retain15passed source checks and exactDEXaudit from40274233925; run only corrected authenticated bundle completion below.')
+              sys.exit(0)
+          elif selected=='internal-apk':
+              print('Packagingonly: retainedsuccessfulfullnative40265974119 andauthenticatedmodule40274997360. Noapplication/shutdownsuite orunit-testrepeat.')
               sys.exit(0)
           elif selected=='android-routing':
               pattern='test_android17_reference.py'
@@ -257,12 +260,58 @@ jobs:
           set -euo pipefail
           python3 repairs/infinity-final-closure-2103407/complete_module_bundle.py \
             final-work/baseline/sources final-work/module-completion
+      - name: Verify exact successful input builds before internal packaging
+        if: steps.selected.outputs.selection == 'internal-apk'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 repairs/infinity-final-closure-2103407/validate_package_inputs.py
+      - name: Reuse successful full matching ARM64 engine
+        if: steps.selected.outputs.selection == 'internal-apk'
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 40265974119
+          name: Infinity-Final-Native-Modules-40265974119-INTERNAL-NOT-APK
+          github-token: ${{ github.token }}
+          path: package-native
+      - name: Reuse authenticated coherent module generation and exact DEX adapter
+        if: steps.selected.outputs.selection == 'internal-apk'
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 40274997360
+          name: Infinity-Final-Source-Ownership-40274997360-NOT-APK
+          github-token: ${{ github.token }}
+          path: package-modules
+      - name: Integrate, audit every APK member and sign original identity - internal candidate only
+        if: steps.selected.outputs.selection == 'internal-apk'
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 repairs/infinity-final-closure-2103407/package_candidate.py \
+            --parent-root signed407 --module-root package-modules --native-root package-native \
+            --sdk "$ANDROID_HOME/build-tools/35.0.0" --out internal-candidate
       - uses: actions/upload-artifact@v4
-        if: always() && steps.selected.outputs.selection != 'module-bundle'
+        if: always() && steps.selected.outputs.selection != 'module-bundle' && steps.selected.outputs.selection != 'internal-apk'
         with:
           name: Infinity-Final-Source-Ownership-${{ github.run_id }}-NOT-APK
           path: final-work/
           retention-days: 30
+          if-no-files-found: warn
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.selected.outputs.selection == 'internal-apk'
+        with:
+          name: Infinity-2103408-Integrated-INTERNAL-NOT-FINAL-${{ github.run_id }}
+          path: |
+            internal-candidate/*.apk
+            internal-candidate/components/*.zip
+            internal-candidate/*.json
+            internal-candidate/*.txt
+            internal-candidate/SHA256SUMS
+            internal-package-inputs.json
+          retention-days: 90
           if-no-files-found: warn
       - uses: actions/upload-artifact@v4
         if: always() && steps.selected.outputs.selection == 'module-bundle'
