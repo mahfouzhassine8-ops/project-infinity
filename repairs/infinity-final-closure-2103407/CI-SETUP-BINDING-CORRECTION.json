@@ -1,0 +1,9 @@
+{
+  "failed_run": 40330174829,
+  "failed_stage": "Prepare candidate metadata, before Android setup",
+  "cause": "SHUTDOWN-CANDIDATE.json retained prior feature request ID after candidate_request.py was advanced; exact verifier correctly refused.",
+  "app_Close_attempted": false,
+  "ordinary_shutdown_unchanged": true,
+  "correction": "Match the exact current candidate snapshot and add invariant test. Select only previously unreached synthetic/unsafe scenario once.",
+  "apk_runtime_change": false
+}

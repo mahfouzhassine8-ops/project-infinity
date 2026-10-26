@@ -1,0 +1,30 @@
+{
+  "scope": "Host actual signed411 vs patched per-render source-memory verification; 11 cards, five batches. Real reviewed Umbrella source bytes; local manifest-version fixture. Not Android RAM or Home launch timing.",
+  "results": {
+    "before": {
+      "samples_ms": [
+        9.909249005431775,
+        8.53807100065751,
+        8.25542399979895,
+        8.115484000882134,
+        7.323370999074541
+      ],
+      "median_ms": 8.25542399979895,
+      "large_source_hash_reads_per_11_cards": 33
+    },
+    "after": {
+      "samples_ms": [
+        5.352518994186539,
+        4.225248994771391,
+        4.270167002687231,
+        4.246332006005105,
+        4.580054999678396
+      ],
+      "median_ms": 4.270167002687231,
+      "large_source_hash_reads_per_11_cards": 3
+    }
+  },
+  "Android17": "NOT RUN",
+  "physical_Fold": "NOT RUN",
+  "near_instant_Home_proven": false
+}

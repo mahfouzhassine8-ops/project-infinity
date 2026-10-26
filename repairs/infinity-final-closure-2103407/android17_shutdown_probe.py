@@ -15,6 +15,7 @@ import sqlite3
 import sys
 import time
 from zipfile import ZipFile
+import power_ui_contract
 
 import android17_candidate_probe as candidate
 from candidate_request import EXPECTED as CANDIDATE
@@ -142,8 +143,13 @@ def main():
             active=transport.read_json(control+'/active.json');engine=transport.read_json(control+'/engine.json')
             require(active.get('pid')==engine.get('pid')==owner['pid'] and active.get('owner')==engine.get('owner')==owner['owner'] and active.get('status')=='ACTIVE','Reopen participant owner not active')
             entry['active']=active;entry['before_processes']=transport.processes();save()
+            entry['process_ownership_before']=power_ui_contract.partition_processes(entry['before_processes'],owner)
+            entry['launch_preference_before']=power_ui_contract.preference(transport)
             began=time.monotonic()
-            entry['request']=transport.shell('am','start','-n',transport.PACKAGE+'/.InfinityPowerControlActivity','-a',transport.PACKAGE+'.action.CLOSE_KODI')
+            if EXPECTED['scenario']=='integrated-real-power-ui':
+                entry['request']=power_ui_contract.close(transport,args.apk,folder)
+            else:
+                entry['request']=transport.shell('am','start','-n',transport.PACKAGE+'/.InfinityPowerControlActivity','-a',transport.PACKAGE+'.action.CLOSE_KODI')
             receipt={};deadline=time.monotonic()+35
             while time.monotonic()<deadline:
                 receipt=transport.read_json(transport.PRIVATE+'/files/infinity-checkpoint-close.json')
@@ -154,11 +160,20 @@ def main():
             entry['close_seconds']=time.monotonic()-began;entry['receipt']=receipt;save()
             require(receipt.get('phase')=='COMPLETE','Actual Close failed before completion: '+str(receipt.get('error','missing receipt')))
             entry['after_processes']=transport.processes()
+            entry['process_ownership_after']=power_ui_contract.partition_processes(entry['after_processes'],owner)
+            entry['launch_preference_after']=power_ui_contract.preference(transport)
+            require(entry['launch_preference_after']==entry['launch_preference_before'],'Close changed the remembered launch preference')
+            entry['recent_apps_observation']='Task UI only; independently verified PIDs determine process termination'
+            (folder/'android-recent-tasks-after.txt').write_text(transport.shell('dumpsys','activity','recents',check=False))
+            (folder/'android-foreground-after.txt').write_text(transport.shell('dumpsys','activity','activities',check=False))
             require(not entry['after_processes'],'An application-UID process remained after authorized Close')
             # The first COMPLETE is committed before coordinator self-exit.
             # Inspect the final durable receipt only after external UID death.
             receipt=transport.read_json(transport.PRIVATE+'/files/infinity-checkpoint-close.json')
             entry['receipt']=receipt;save();verify_receipt(receipt,owner)
+            entry['separate_results']=dict(essential_first_durable=True,kodi_engine_terminated=True,
+                android_coordinator_completed=receipt.get('coordinator_termination_authorized') is True,
+                remaining_UID_processes=entry['after_processes'],recent_apps_used_for_process_proof=False)
             after=transport.read_json(transport.PROFILE+'/addon_data/script.infinity.commandcenter/continue-watching.json')
             verify_records(before,after)
             transport.adb('pull',transport.PROFILE+'/Database',folder/'Database')

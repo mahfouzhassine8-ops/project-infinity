@@ -1,0 +1,24 @@
+{
+  "recorded_before_implementation": true,
+  "parent_version": 2103411,
+  "parent_apk_sha256": "0729e8403b842568665567db118902d5b15b6e554b9f96a23cc9a94e24779c80",
+  "candidate_version": 2103412,
+  "command_center_version": "0.3.5.42",
+  "owned_source_preimages": {
+    "experience.py": "c84c2987aa192e13af64beddf451389584617d557d0cecfca65e4f911b803a6f",
+    "plugin.py": "0206df61f08d0cf7974a2b94268f7281b9536f69d7d03648aead73ad2abb606f",
+    "addon.xml": "16d23eceb5316d8c4cea44a7133ada2025b29c5de5d80954ddd05d78d811efc1"
+  },
+  "change": "Per-listing verified source-file cache, bounded to two source-memory provider contracts. Keep exact source hashes, current manifest and stable file signatures; bypass cached proof for selected actions and all authoritative reads. No persistent cache or extra service.",
+  "proven_work": "Currently 11 cards each repeat the same pinned provider file hashes and manifest reads; source is local, repeated hashing is redundant within one stable listing. Establish before/after read-count and timing from the actual shipped functions.",
+  "selected_tests": [
+    "Actual original vs patched source verification across 11 movie/TV cards; exact route/identity/positions unchanged",
+    "Same-size atomic provider replacement, manifest update, provider missing, contract modified and symlink changes must invalidate/refuse",
+    "Selected action without render context must still read raw source; no remote call, autoplay or mutable saved-state change",
+    "Original local-first Resume Hub preservation tests against exact source; completed and watched movie/TV states, exact IDs and episodes",
+    "Signed411-to412 member audit: only typed version, CC experience/plugin/addon.xml and original-key module manifest/signature; all native/DEX/chooser/Cobra/skin/helpers exact"
+  ],
+  "limits": "Host proof is not Android/Fold near-instant Home acceptance. Longest fetch needs startup profiling; no scheduling change based on queue correlation alone.",
+  "physical_Fold": "NOT RUN",
+  "release_locked": false
+}

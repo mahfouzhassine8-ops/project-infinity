@@ -14,6 +14,10 @@ ROOT=Path(__file__).resolve().parents[2]
 
 
 class IndependentShutdownTests(unittest.TestCase):
+    def test_independent_fixture_metadata_uses_current_exact_candidate(self):
+        expected=json.loads((Path(request.__file__).parent/'SHUTDOWN-CANDIDATE.json').read_text())
+        self.assertEqual(expected,candidate.EXPECTED)
+
     def test_exact_independent_scope_and_branch_required(self):
         head='a'*40;event=dict(ref=request.BRANCH,after=head,repository={'full_name':'mahfouzhassine8-ops/project-infinity'})
         result=request.validate(request.EXPECTED,event,head,[request.REQUEST])
