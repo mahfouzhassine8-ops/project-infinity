@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "workstream": 1,
+  "baseline_apk_sha256": "3616c4e69c976bd63b36170d4dbbd9b190a7ec2eace4bc0c34c3c72f7f9e8578",
+  "baseline_member": "assets/addons/script.infinity.commandcenter/infinity_search.py",
+  "baseline_source_sha256": "bb6e8791ca7644ca9d370b5871d69ded71790557069b56535e920baa6cf50531",
+  "changed_functions": [
+    "_leased_directory"
+  ],
+  "demonstrated_source_path": "worker.start(); monitor.abortRequested()/progress.iscanceled()/home methods may throw; existing finally closes admission without joining live RPC thread",
+  "required_negative_reproduction": "Throw from consumer monitor after actual RPC has started; old invoker exits/relinquishes slot while RPC remains blocked; independently loaded Search invocation starts a second RPC",
+  "correction": "Transfer provider capacity ownership to the actual RPC thread; retain/join original worker before native token cleanup on consumer exception; attempt each token cleanup independently; close unstarted admission explicitly",
+  "preservation": [
+    "_native_search_admission literal abstract socket address remains byte-identical",
+    "Original native request path, token/hash handshake, properties, limit and native20-second consumer lease unchanged",
+    "Every other Search function and module byte remains unchanged",
+    "No source, code, route, identity or state change in any provider, WatchNixtoons2, TrackIt, Cobra, shutdown or UI design"
+  ],
+  "selected_tests": [
+    "old-source exceptional-consumer reproduction",
+    "new-source worker lifetime and independent invoker rejection",
+    "independent-invoker busy burst with bounded worker/descriptor counts",
+    "RPC exception cleanup and admission reuse",
+    "thread-start failure cleanup",
+    "per-key cleanup failure isolation",
+    "exact only-one-function source delta"
+  ],
+  "android17": "NOT RUN",
+  "physical_fold": "NOT RUN",
+  "staged_only": true
+}

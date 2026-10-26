@@ -55,7 +55,15 @@
     }
   ],
   "change_budget": {
-    "application_runtime_edits_admitted": [],
+    "application_runtime_edits_admitted": [
+      {
+        "member": "assets/addons/script.infinity.commandcenter/infinity_search.py",
+        "baseline_sha256": "bb6e8791ca7644ca9d370b5871d69ded71790557069b56535e920baa6cf50531",
+        "function": "_leased_directory",
+        "ownership_ledger": "SEARCH-OWNERSHIP-CHANGE.json",
+        "status": "Isolated source transform; no deployable APK yet"
+      }
+    ],
     "native_edits_admitted": [],
     "apk_member_edits_admitted": [],
     "initial_allowed_repository_paths": [
@@ -73,9 +81,13 @@
   },
   "selected_verification": {
     "host": [
-      "signed407 source/component integrity snapshot and actual source inspection",
-      "Search independent-invoker admission tests will be selected after actual source inspection",
-      "protocol mismatch negative reproduction before repair"
+      "old-source exceptional-consumer reproduction",
+      "new-source worker lifetime and independent invoker rejection",
+      "independent-invoker busy burst with bounded worker/descriptor counts",
+      "RPC exception cleanup and admission reuse",
+      "thread-start failure cleanup",
+      "per-key cleanup failure isolation",
+      "exact only-one-function source delta"
     ],
     "android17": "NOT RUN",
     "physical_fold": "NOT RUN",
@@ -83,6 +95,6 @@
     "packaging": "AUTHORIZED after required corrections/integration; no extra permission required",
     "final_lock": "Requires explicit user physical Fold acceptance"
   },
-  "source_edits_started": false,
+  "source_edits_started": true,
   "release_ready": false
 }
