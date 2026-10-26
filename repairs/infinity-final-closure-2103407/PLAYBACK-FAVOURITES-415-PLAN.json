@@ -1,0 +1,42 @@
+{
+  "recorded_before_implementation": true,
+  "parent_apk_sha256": "a13bd3a5fc10752fc06621e2b49d050b5fd3ba0a8a86ad9e675420335b0313d3",
+  "candidate_version": 2103415,
+  "command_center_version": "0.3.5.45",
+  "source_preimages": {
+    "service.py": "5f57e24994403cbb7f5dd57f9f4f46b70cc021b7703071f231112b498e1a6928",
+    "plugin.py": "9b8d7a0d61a7b7a77b3a9d8e5339eec886e1ef7c2928d7c831b7d68c1ed62216",
+    "addon.xml": "98ab77083211ddf0786c9f4b504fec1e0a6210840673f088187bc5db5b7613af"
+  },
+  "actual_runtime_evidence": {
+    "run": 40347802962,
+    "artifact": 12664828892,
+    "artifact_sha256": "e833dfef7f70234b29df7e1228a48d3ac8ad27b8baaa13b1dafbf64ff05604ba",
+    "playback": "Valid24fps native playback active, JSON item type unknown/title empty/uniqueid missing; native VideoPlayer title and TMDb603/IMDbtt0133093 remain. Original45sec alias progress predicate failed; not a clip-only or observation failure.",
+    "favourites": "Actual native Favourites.GetFavourites returns favourites:null,total0. Existing list comprehension raises TypeError, so popup hides Add to Favorites.",
+    "compiled_Player_cpp_sha256": "94c5a9a3422fa4d004bc552d02fde8a88de6e00ccc4bf03b84e5ee773a5981f2",
+    "compiled_InfoTagVideo_cpp_sha256": "c8a163a8eb551e5ba49610767e63c9519247d2ad01edc080246750ffd977fb60",
+    "primary_sources": [
+      "https://github.com/xbmc/xbmc/blob/21.3-Omega/xbmc/interfaces/legacy/Player.cpp",
+      "https://github.com/xbmc/xbmc/blob/21.3-Omega/xbmc/interfaces/legacy/InfoTagVideo.cpp"
+    ]
+  },
+  "correction": "For untyped JSON only and Infinity skin only, read active native typed playback tag, require movie/episode and verified namespaced identity, reject source/identity changes and conflicting JSON IDs. Preserve original typed JSON path, metadata, source proof and all persistence admission. Never infer type by title. Do not persist a transient resolved stream as a new replay route. Treat null favourites as an empty array, reject malformed arrays and preserve exact existing AddOrRemove/duplicate safety.",
+  "owned_members": [
+    "AndroidManifest.xml",
+    "assets/addons/script.infinity.commandcenter/service.py",
+    "assets/addons/script.infinity.commandcenter/plugin.py",
+    "assets/addons/script.infinity.commandcenter/addon.xml",
+    "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1",
+    "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1.sig"
+  ],
+  "selected_checks": [
+    "Exact414 preimage, inverse and Python compile",
+    "Actual native typed tag capture contract: movie/episode, IDs, metadata, unchanged typed JSON, source and same-file identity races, missing/invalid/conflicting/native unavailable and Cobra no fallback",
+    "Native null/empty/existing/duplicate/malformed Favorites; exact removal spec",
+    "Original signer,75-file native authentication, actual JCA44->45 sentinel preservation, exact six-member and component audits"
+  ],
+  "runtime_selection": "After genuine build select original final-continue and final-actions independently. Existing411 and414 PowerUI3pass preserved. Signed415 PowerUI3 and Search50/playbackHome30/rotation20 separately authorized by user, never a packaging dependency.",
+  "release_accepted": false,
+  "final_lock": false
+}
