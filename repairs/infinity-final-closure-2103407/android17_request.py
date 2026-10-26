@@ -25,7 +25,8 @@ def validate(request, event, head, changed):
         raise ValueError('An exact new reviewed reference request is required')
     allowed_workflows = {'.github/workflows/infinity-2103407-search-pressure-host-gate.yml',
                          '.github/workflows/infinity-saved-navigation-android.yml',
-                         '.github/workflows/infinity-2103402-native-owner-build.yml'}
+                         '.github/workflows/infinity-2103402-native-owner-build.yml',
+                         '.github/workflows/infinity-shutdown-verification.yml'}
     if not all(name.startswith('repairs/infinity-final-closure-2103407/') or name in allowed_workflows
                for name in changed):
         raise ValueError('Unrelated source changed with this request')

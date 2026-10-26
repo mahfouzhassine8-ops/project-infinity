@@ -1,5 +1,8 @@
 name: Infinity shutdown verification - independent and explicitly selected
 on:
+  push:
+    branches: [work/infinity-final-corrective-from-2103407-20261025]
+    paths: ['repairs/infinity-final-closure-2103407/SHUTDOWN-REQUEST.json']
   workflow_dispatch:
     inputs:
       source_ref:
@@ -34,6 +37,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   android17:
+    if: github.event_name == 'workflow_dispatch'
     name: Independent shutdown ${{ inputs.scenario }}
     runs-on: ubuntu-22.04
     timeout-minutes: 150
@@ -140,6 +144,117 @@ jobs:
           path: |
             android-results/
             art-binding/
+            api37-support/
+            emulator-setup/
+            android-provider-inputs/INPUTS.json
+          retention-days: 90
+          if-no-files-found: warn
+  integrated-candidate:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/work/infinity-final-corrective-from-2103407-20261025'
+    name: Independent integrated408 three Close and reopen cycles
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - name: Validate one exact independent shutdown request
+        run: python3 repairs/infinity-final-closure-2103407/shutdown_request.py
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ env.CANDIDATE_BUILD }}
+          name: ${{ env.CANDIDATE_ARTIFACT }}
+          github-token: ${{ github.token }}
+          path: signed
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '17'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.7'}
+      - name: Bind signed407 metadata to the existing feature probe without APK changes
+        if: github.event_name == 'push' && github.ref == 'refs/heads/work/infinity-final-corrective-from-2103407-20261025' && env.CANDIDATE_REQUEST_PATH == ''
+        run: python3 repairs/infinity-final-closure-2103407/prepare_signed407_fixture.py signed
+      - name: Recover protected signed407 for exact install-over feature verification
+        if: env.CANDIDATE_REQUEST_PATH != ''
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 40230842944
+          name: Infinity-2103407-SEARCH-SINGLE-FLIGHT-ORIGINAL-SIGNER-QA
+          github-token: ${{ github.token }}
+          path: baseline407
+      - name: Bind integrated candidate metadata without changing APK or component bytes
+        if: env.CANDIDATE_REQUEST_PATH != ''
+        run: python3 repairs/infinity-final-closure-2103407/prepare_candidate_fixture.py signed baseline407
+      - uses: android-actions/setup-android@v4
+        with:
+          cmdline-tools-version: '15859902'
+          packages: platform-tools build-tools;34.0.0
+          log-accepted-android-sdk-licenses: false
+      - name: Verify signed identity, provider source pins, and API37 infrastructure
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          (cd signed && sha256sum -c SHA256SUMS)
+          python3 - <<'PY'
+          import hashlib,json,os,pathlib,subprocess,sys
+          sys.path.insert(0,'repairs/2103390-bugfixes/group7/finish92')
+          import delivery92
+          files=list(pathlib.Path('signed').glob('*.apk'));assert len(files)==1
+          apk=files[0];digest=hashlib.sha256(apk.read_bytes()).hexdigest()
+          r=json.load(open('signed/CANDIDATE.json'))
+          assert r['apk_sha256']==digest
+          if os.environ['GITHUB_EVENT_NAME']=='push':
+              request=json.load(open(os.environ.get('CANDIDATE_REQUEST_PATH') or os.environ.get('BASELINE_REQUEST_PATH','repairs/infinity-2103402-final/android17/REQUEST.json')))
+              if request.get('kind')=='integrated-candidate':
+                  assert digest==request['candidate_apk_sha256'] and r['source_commit']==request['candidate_source_commit'], 'Requested integrated candidate differs'
+              else:
+                  assert digest==request['baseline_apk_sha256'] and r['source_commit']==request['baseline_commit'], 'Requested locked baseline differs'
+          run=json.loads(subprocess.check_output(['gh','api',f"repos/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['CANDIDATE_BUILD']}"],text=True))
+          assert run['head_sha']==r['source_commit'] and run['conclusion']=='success', 'Signed build/source mismatch'
+          test_commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+          delivery92.verify_signature(apk,pathlib.Path(os.environ['ANDROID_HOME'])/'build-tools/34.0.0')
+          with open(os.environ['GITHUB_ENV'],'a') as f:f.write('TEST_APK='+str(apk)+'\nTEST_APK_SHA='+digest+'\nCANDIDATE_SOURCE_COMMIT='+r['source_commit']+'\nTEST_SOURCE_COMMIT='+test_commit+'\n')
+          PY
+          python3 repairs/save-later-multiimage-20261023/tracking/final-eight/android_selected.py inputs android-provider-inputs final-participant
+          sudo apt-get update -qq
+          sudo apt-get install -y libpulse0
+          if [[ "$SELECTED_CASE" == final-continue || "$SELECTED_CASE" == final-actions ]]; then
+            sudo apt-get install -y ffmpeg
+          fi
+          python3 repairs/four-repair-20261018/android37_gate.py --sdk-root "$ANDROID_HOME" --out api37-support --pin-tools
+          python3 - <<'PY'
+          import pathlib,subprocess,sys
+          for attempt in range(1,4):
+              out=pathlib.Path('emulator-setup')/('attempt-'+str(attempt))
+              code=subprocess.run([sys.executable,'repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py','--out',str(out)]).returncode
+              if code==0:break
+              logs='\n'.join(p.read_text(errors='replace') for p in out.glob('sdkmanager-attempt-*.log'))
+              if attempt==3 or 'Error reading Zip content from a SeekableByteChannel' not in logs:raise SystemExit(code)
+          PY
+          sudo chmod 666 /dev/kvm
+      - name: Independently selected actual Essential-First Close and protected reopen
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: '37.0'
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disk-size: 8G
+          avd-name: infinity-four-repair-api37
+          pre-emulator-launch-script: python3 repairs/four-repair-20261018/android37_gate.py --sdk-root "$ANDROID_HOME" --out api37-support --check-avd
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: |
+            python3 repairs/infinity-final-closure-2103407/android17_shutdown_probe.py --apk "$TEST_APK" --expected-sha "$TEST_APK_SHA" --authorization "$AUTHORIZED_SCOPE" --out shutdown-results
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-Independent-Shutdown-integrated408-${{ github.run_id }}-Evidence
+          path: |
+            independent-shutdown-request-evidence.json
+            signed/FIXTURE-METADATA-EVIDENCE.json
+            shutdown-results/
             api37-support/
             emulator-setup/
             android-provider-inputs/INPUTS.json

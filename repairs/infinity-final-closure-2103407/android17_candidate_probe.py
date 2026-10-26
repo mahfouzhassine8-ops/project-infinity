@@ -114,7 +114,12 @@ def install_over(device,adb,baseline,candidate,out,fixture_id):
     return result
 
 
-def main():
+def main(selected_case=None):
+    # Independent shutdown may reuse only the already-passing participant
+    # setup. This module and its feature transport never request termination.
+    if selected_case not in (None,'final-participant'):
+        raise ValueError('Only retained participant setup may be reused')
+    selected_case=selected_case or EXPECTED['selected_case']
     original=OLD/'android_feature_probe.py';raw=original.read_bytes()
     if hashlib.sha256(raw).hexdigest()!=PROBE_SHA or raw.decode().count(HOOK_BEFORE)!=1:
         raise ValueError('Retained feature-only transport changed')
@@ -128,7 +133,7 @@ def main():
     with tempfile.TemporaryDirectory(prefix='infinity-test407-source-') as temp:
         sources=Path(temp);original_sources(baseline,sources)
         def adapt(stage,args,report,device,aid):
-            if args.case!=EXPECTED['selected_case'] or aid!='service.future.persistence.7fa29':
+            if args.case!=selected_case or aid!='service.future.persistence.7fa29':
                 raise ValueError('Only the explicitly selected candidate case is adapted')
             if stage.resolve()!=(args.out.resolve()/'fixture'):raise ValueError('Unexpected fixture root')
             path=stage/aid/'android_selected.py';before=path.read_bytes()

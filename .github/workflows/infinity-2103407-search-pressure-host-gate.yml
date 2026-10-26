@@ -120,7 +120,8 @@ jobs:
           names=subprocess.check_output(['git','diff','--name-only',baseline,'HEAD'],text=True).splitlines()
           allowed_workflows={'.github/workflows/infinity-2103407-search-pressure-host-gate.yml',
                              '.github/workflows/infinity-saved-navigation-android.yml',
-                             '.github/workflows/infinity-2103402-native-owner-build.yml'}
+                             '.github/workflows/infinity-2103402-native-owner-build.yml',
+                         '.github/workflows/infinity-shutdown-verification.yml'}
           assert all(n.startswith('repairs/infinity-final-closure-2103407/') or n in allowed_workflows for n in names), names
           assert not any('cobra' in n.lower() for n in names), names
           scope=json.load(open('repairs/infinity-final-closure-2103407/SCOPE.json'))
@@ -176,7 +177,7 @@ jobs:
           assert request['schema']==1 and request['scope'].strip()
           selected=request['selected']
           assert selected in {'search-lifetime','module-trust','installed-modules','module-protocol',
-                              'firstparty-compose','reference-observation','module-bundle','module-complete','internal-apk','candidate-routing','android-routing'}
+                              'firstparty-compose','reference-observation','module-bundle','module-complete','internal-apk','candidate-routing','shutdown-routing','android-routing'}
           with open(os.environ['GITHUB_OUTPUT'],'a') as output:
               output.write('selection='+selected+'\n')
           if selected=='search-lifetime':
@@ -207,6 +208,10 @@ jobs:
               sys.exit(0)
           elif selected=='internal-apk':
               print('Packagingonly: retainedsuccessfulfullnative40265974119 andauthenticatedmodule40274997360. Noapplication/shutdownsuite orunit-testrepeat.')
+              sys.exit(0)
+          elif selected=='shutdown-routing':
+              for pattern in ('test_shutdown_verification.py','test_candidate_verification.py'):
+                  subprocess.run([sys.executable,'-m','unittest','discover','-s',str(root),'-p',pattern,'-v'],check=True)
               sys.exit(0)
           elif selected=='candidate-routing':
               pattern='test_candidate_verification.py'
