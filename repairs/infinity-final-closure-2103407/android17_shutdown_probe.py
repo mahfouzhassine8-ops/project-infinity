@@ -149,7 +149,7 @@ def main():
         before=transport.read_json(transport.PROFILE+'/addon_data/script.infinity.commandcenter/continue-watching.json')
         require(isinstance(before.get('items'),dict) and before['items'],'Actual tracking fixture missing; no Close attempted')
         report['before_protected_records']=before
-        cycles=range(1) if controlled or real_resume else range(3)
+        cycles=range(1) if controlled else range(3)
         for cycle in cycles:
             entry=dict(cycle=cycle,owner=owner,passed=False);report['cycles'].append(entry)
             folder=args.out/('cycle-'+str(cycle));folder.mkdir()
@@ -215,6 +215,10 @@ def main():
             if real_resume:
                 entry['real_TV_reopen']=resume_durability.reopened(transport,before)
             entry.update(passed=True,reopened_owner=next_owner);owner=next_owner;save()
+            if real_resume and cycle==0:
+                report['real_TV_completion_before_Close']=resume_durability.run(transport,owner,args.out,phase='completion');save()
+                before=transport.read_json(transport.PROFILE+'/addon_data/script.infinity.commandcenter/continue-watching.json')
+                report['before_completed_TV_records']=before;save()
         if controlled:
             report['unsafe_writer_control']=unsafe_control.run(transport,owner,args.out);save()
         report['passed']=True

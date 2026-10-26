@@ -33,7 +33,8 @@ class StressResumeCardTests(unittest.TestCase):
                 if value:return value
             raise RuntimeError('No actual correct card')
         device=SimpleNamespace(rpc=rpc,until=until)
-        with patch.object(card.dispatch,'launch') as launch,patch.object(card.dispatch,'verify_dispatch'):
+        with patch.object(card.dispatch,'launch') as launch,patch.object(card.dispatch,'verify_dispatch'), \
+                patch('resume_native_rpc.read',return_value={'files':[{'resume':{'position':60,'total':180}}]}):
             result=card.observe(device,{'items':{key:entry}},'movie')
             self.assertTrue(result['exact_usable_card']);self.assertFalse(result['poster_paint_verified'])
             self.assertEqual(count[0],3);launch.assert_called_once_with(device,'home-resume-movie')

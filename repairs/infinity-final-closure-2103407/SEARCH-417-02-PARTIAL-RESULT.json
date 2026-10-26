@@ -1,0 +1,113 @@
+{
+  "run": 40379813877,
+  "test_source": "d52044d59fb84dd31e33e572143c85bfc240249f",
+  "candidate_source": "d10fffd80182c796955534ffdecc5ccc288da99b",
+  "apk_sha256": "4428332453714adc1aa652ee5db76ff2e79f705171dab8e020d7915631e00d83",
+  "artifact": 12678008656,
+  "artifact_sha256": "466be453d8b922d91fcbc289101dd4af16b80135e8c75e87c967ef58e4b5629a",
+  "passed": false,
+  "original_selected_Search_passed": true,
+  "completed": {
+    "search": 0,
+    "playback_home": 0,
+    "rotation": 0
+  },
+  "failure": "Selected stress: TimeoutError: timed out",
+  "actual_cached_surface_poster": {
+    "width": 1080,
+    "height": 1920,
+    "regions": [
+      {
+        "colour": [
+          17,
+          203,
+          91
+        ],
+        "pixels": 15105,
+        "sampled_pixels": 2158,
+        "x": 70.9902687673772,
+        "y": 1540.0157553290082,
+        "bounds": [
+          24,
+          1461,
+          118,
+          1619
+        ]
+      },
+      {
+        "colour": [
+          237,
+          49,
+          174
+        ],
+        "pixels": 15105,
+        "sampled_pixels": 2158,
+        "x": 165.99721964782205,
+        "y": 1540.005560704356,
+        "bounds": [
+          119,
+          1461,
+          213,
+          1619
+        ]
+      },
+      {
+        "colour": [
+          44,
+          97,
+          233
+        ],
+        "pixels": 15104,
+        "sampled_pixels": 2157,
+        "x": 71.00649049605934,
+        "y": 1698.9893370421883,
+        "bounds": [
+          24,
+          1620,
+          118,
+          1778
+        ]
+      },
+      {
+        "colour": [
+          243,
+          176,
+          33
+        ],
+        "pixels": 15104,
+        "sampled_pixels": 2158,
+        "x": 165.9902687673772,
+        "y": 1699.0157553290082,
+        "bounds": [
+          119,
+          1620,
+          213,
+          1778
+        ]
+      }
+    ],
+    "sample_stride": 7,
+    "actual_surface_bitmap_verified": true,
+    "first_observed_poster_capture_ms": 1417.7734049999344,
+    "paint_verification_finished_ms": 1913.041196999984,
+    "samples": 1,
+    "observation": "Actual cached synthetic bitmap on Android surface; conservative captured upper bound, not GPU first-paint timestamp"
+  },
+  "actual_memory": [
+    {
+      "stage": "before",
+      "pss_kib": 890503,
+      "rss_kib": 1070180,
+      "thread_count": 67,
+      "descriptor_count": 502
+    }
+  ],
+  "next_observer": "Keep original20sec total card/proof semantic deadline; fixed native proof consumes only its remaining budget rather than unrelated10sec general socket cap. No actual UI/native/45keyboard/90results budget extension.",
+  "measurement_limits": [
+    "Generated bitmap and synthetic saved metadata on actual Android17 native surface, not cold app launch/remote artwork or physical Fold",
+    "No additional Search/Home/rotation cycles completed; no after-memory sample or performance-improvement claim"
+  ],
+  "physical_Fold": "NOT RUN",
+  "release_accepted": false,
+  "final_lock": false
+}

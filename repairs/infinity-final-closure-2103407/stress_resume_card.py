@@ -39,8 +39,8 @@ def observe(device,records,media,out=None):
         import cached_poster_observer
         poster=cached_poster_observer.observe(device,out,began,began+20)
     usable_ms=poster['first_observed_poster_capture_ms'] if poster is not None else visible_ms
-    rows=device.rpc('Files.GetDirectory',{'directory':'plugin://script.infinity.uirepair/?action=continue&media='+media,
-                                        'media':'video','properties':['resume']})['files']
+    from resume_native_rpc import read
+    rows=read(device,media,began+20)['files']
     if len(rows)!=1:raise AssertionError('Native directory differs from exact single visible saved card')
     verify_card(expected,labels,prefix,bool(device.rpc('Player.GetActivePlayers')),rows[0].get('resume'))
     return dict(media=media,key=key,exact_usable_card=True,observed=labels,

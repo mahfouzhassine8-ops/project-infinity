@@ -1,0 +1,62 @@
+{
+  "run": 40382246813,
+  "test_source": "ca0e34b5ecf1627ddab9816e33b36f75a1025ff6",
+  "candidate_source": "d10fffd80182c796955534ffdecc5ccc288da99b",
+  "apk_sha256": "4428332453714adc1aa652ee5db76ff2e79f705171dab8e020d7915631e00d83",
+  "artifact": 12679676976,
+  "artifact_sha256": "0883dda953ae8605090f2c42604f8f8bbbbb692e4640e1d785de7c1932b2a237",
+  "passed": false,
+  "actual_Close_attempted": false,
+  "actual_native_scene": {
+    "passed": false,
+    "pid": 4877,
+    "owner": "027ace60-174a-482c-8d3e-7a8d54af604f",
+    "nonce": "558f38fba54849f18798401f2433098c",
+    "cases": [
+      {
+        "case": "actual-native-TV-stop-progress-restoration",
+        "status": "PASS",
+        "position": 78.355
+      }
+    ],
+    "stage": "actual-native-TV-stop-progress-restoration",
+    "native_tv_first_playback": {
+      "episode": 2,
+      "file": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/infinity-cw-qa/QA.S01E02.mp4",
+      "id": 1,
+      "label": "QA S01E02",
+      "season": 1,
+      "showtitle": "Breaking Bad",
+      "type": "episode",
+      "uniqueid": {
+        "tmdb": "900000000002"
+      }
+    },
+    "native_tv_in_progress_rows": [
+      {
+        "episode": 2,
+        "file": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/infinity-cw-qa/QA.S01E02.mp4",
+        "filetype": "file",
+        "label": "Breaking Bad S01E02",
+        "resume": {
+          "position": 78.355,
+          "total": 180.0
+        },
+        "season": 1,
+        "type": "episode"
+      }
+    ],
+    "failure": "RuntimeError: Timed out: actual TV completion and watched state",
+    "traceback": "Traceback (most recent call last):\n  File \"/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/addons/script.future.resumedurability.7fa29/default.py\", line 44, in <module>\n    run(SimpleNamespace(require=require,rpc=rpc,until=until),SimpleNamespace(load_view=load_view,entries=entries),profile,result,observe=progress)\n  File \"/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/addons/script.future.resumedurability.7fa29/native_tv_observer.py\", line 79, in run\n    complete=ui.until(completed,'actual TV completion and watched state',45)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/addons/script.future.resumedurability.7fa29/default.py\", line 33, in until\n    raise RuntimeError('Timed out: '+message)\nRuntimeError: Timed out: actual TV completion and watched state\n"
+  },
+  "failure": "AssertionError: Actual native TV scene failed: RuntimeError: Timed out: actual TV completion and watched state",
+  "observations": [
+    "Native JSONRPCStop fixed blocked observer transport: actualTV stop and exact78.355sec restoration PASS",
+    "Second native clip sought175sec and ended; service AVStarted was delivered after playback already ended, tracking was not armed before artificial early EOF",
+    "Completion45sec timeout remains FAILED; no rollback of predicates or runtime completion success claim"
+  ],
+  "next_selected": "Require actual new persisted tracking occurrence/source inside original20sec playback-start deadline BEFORE near-instant artificial completion. Latest418 independent3Close scene checks unfinished native position across first Close, completion/Next across second and warm third readback. Real runtime cause/physical short-playback behavior still requires evidence.",
+  "physical_Fold": "NOT RUN",
+  "release_accepted": false,
+  "final_lock": false
+}

@@ -121,7 +121,8 @@ class NativeTVFixtureTests(unittest.TestCase):
         self.assertIn("'properties':['time','speed']",text)
         self.assertIn("clock.get('speed')==1",text)
         self.assertIn("stamp.get('seconds',0)>=1",text)
-        self.assertIn("ui.until(started,'actual typed native TV playback',20)",text)
+        self.assertIn("ui.until(started,'actual typed native TV playback',max(0,20-(time.monotonic()-began)))",text)
+        self.assertIn("occurrence!=old_occurrence",text)
         self.assertLess(text.index("clock=ui.rpc("),text.index('player.seekTime(70)'))
 
     def test_new_TV_scene_uses_native_Stop_and_retains_exact_state_checks(self):

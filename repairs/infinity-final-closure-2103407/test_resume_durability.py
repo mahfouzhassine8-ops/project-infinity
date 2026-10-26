@@ -46,6 +46,20 @@ class ResumeDurabilityTests(unittest.TestCase):
         self.assertIn('verify_receipt(receipt,owner)',source)
         self.assertIn('verify_records(before,transport.read_json',source)
         self.assertIn('resume_durability.reopened(transport,before)',source)
+        self.assertIn("phase='completion'",source)
+
+    def test_unfinished_native_TV_readback_requires_exact_position_and_actual_source(self):
+        file=scene.native_tv_fixture.FOLDER+'QA.S01E02.mp4'
+        row=dict(season=1,episode=2,file=file,resume=dict(position=78.355,total=180))
+        detail=dict(tvshowid=1,season=1,episode=2,file=file)
+        responses={'Player.GetActivePlayers':[],'Files.GetDirectory':dict(files=[row]),
+                   'VideoLibrary.GetEpisodeDetails':dict(episodedetails=detail)}
+        device=SimpleNamespace(rpc=lambda method,params=None:responses[method])
+        before=dict(items={'d'*64:dict(position=78.355,duration=180)},watched={})
+        result=scene.reopened(device,before)
+        self.assertEqual(result['exact_unfinished_position'],78.355)
+        row['resume']['position']=78.0
+        with self.assertRaises(AssertionError):scene.reopened(device,before)
 
 
 if __name__=='__main__':unittest.main(verbosity=2)

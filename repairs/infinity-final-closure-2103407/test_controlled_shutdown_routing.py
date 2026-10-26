@@ -14,7 +14,7 @@ class ControlledShutdownRoutingTests(unittest.TestCase):
     def test_positive_three_cycles_and_all_proof_checks_are_preserved(self):
         source=Path(probe.__file__).read_text()
         self.assertIn("controlled=EXPECTED['scenario']=='integrated-native-image-and-unsafe'",source)
-        self.assertIn('cycles=range(1) if controlled or real_resume else range(3)',source)
+        self.assertIn('cycles=range(1) if controlled else range(3)',source)
         for required in ('verify_receipt(receipt,owner)','time.monotonic()+35','verify_records(before,after)',
                          "require(not entry['after_processes']",'PRAGMA integrity_check',
                          'native_image_control.run(transport,owner,args.out)',

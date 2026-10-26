@@ -31,7 +31,9 @@ if (request.get('pid')!=os.getpid() or request.get('owner')!=owner.get('owner') 
     len(request.get('nonce',''))!=32):raise RuntimeError('Exact live host admission required')
 output=own/('result-'+request['nonce']+'.json')
 if output.exists():raise RuntimeError('One-shot admission already consumed')
-result=dict(passed=False,pid=os.getpid(),owner=owner['owner'],nonce=request['nonce'],cases=[])
+phase=request.get('phase')
+if phase not in ('progress','completion'):raise RuntimeError('Explicit admitted scene phase required')
+result=dict(passed=False,pid=os.getpid(),owner=owner['owner'],nonce=request['nonce'],phase=phase,cases=[])
 def require(value,message):
     if not value:raise AssertionError(message)
 def rpc(method,params=None):
@@ -58,7 +60,7 @@ try:
     def progress(stage):
         result['stage']=stage
         (own/('progress-'+request['nonce']+'.json')).write_text(json.dumps(result))
-    run(SimpleNamespace(require=require,rpc=rpc,until=until),SimpleNamespace(load_view=load_view,entries=entries),profile,result,observe=progress)
+    run(SimpleNamespace(require=require,rpc=rpc,until=until),SimpleNamespace(load_view=load_view,entries=entries),profile,result,observe=progress,phase=phase)
     result['passed']=True
 except BaseException as error:
     result['failure']=type(error).__name__+': '+str(error)
@@ -105,11 +107,12 @@ def enable(device,out):
         raise ValueError('Cannot enable one-shot scene')
 
 
-def run(transport,owner,out):
+def run(transport,owner,out,phase='progress'):
+    if phase not in ('progress','completion'):raise ValueError('Explicit durability phase required')
     out=Path(out);nonce=uuid.uuid4().hex
     profile=transport.PROFILE+'/addon_data/'+ADDON
-    request=dict(pid=owner['pid'],owner=owner['owner'],nonce=nonce)
-    local=out/'resume-scene-admission.json';local.write_text(json.dumps(request))
+    request=dict(pid=owner['pid'],owner=owner['owner'],nonce=nonce,phase=phase)
+    local=out/('resume-scene-admission-'+phase+'.json');local.write_text(json.dumps(request))
     transport.shell('mkdir','-p',profile)
     transport.adb('push',local,profile+'/request.json')
     transport.rpc('Addons.ExecuteAddon',{'addonid':ADDON,'wait':False})
@@ -117,8 +120,11 @@ def run(transport,owner,out):
     while time.monotonic()<deadline:
         value=transport.read_json(profile+'/result-'+nonce+'.json')
         if value.get('nonce')==nonce:
-            (out/'REAL-TV-BEFORE-CLOSE.json').write_text(json.dumps(value,indent=2)+'\n')
+            (out/('REAL-TV-BEFORE-CLOSE-'+phase+'.json')).write_text(json.dumps(value,indent=2)+'\n')
             if not(value.get('passed') is True and value.get('pid')==owner['pid'] and value.get('owner')==owner['owner']):
+                state=transport.read_json(transport.PROFILE+'/addon_data/script.infinity.commandcenter/continue-watching.json')
+                (out/('actual-continue-failure-'+phase+'.json')).write_text(json.dumps(state,indent=2)+'\n')
+                transport.adb('pull',profile,out/('actual-resume-scene-profile-'+phase),check=False)
                 raise AssertionError('Actual native TV scene failed: '+str(value.get('failure')))
             # Observe the natural final stop callback settling before snapshot.
             prior=None;stable_since=time.monotonic();settle=time.monotonic()+15
@@ -141,11 +147,21 @@ def reopened(transport,before):
     if transport.rpc('Player.GetActivePlayers'):raise AssertionError('Reopened Home must not autoplay')
     rows=transport.rpc('Files.GetDirectory',{'directory':'plugin://script.infinity.commandcenter/?action=library&media=tv&bucket=next',
         'media':'video','properties':['season','episode','resume']})['files']
-    if not(len(rows)==1 and rows[0].get('season')==2 and rows[0].get('episode')==1 and
-           'action=play-local-next' in rows[0].get('file','')):
-        raise AssertionError('Reopened local Next is not the verified S2E1')
-    detail=transport.rpc('VideoLibrary.GetEpisodeDetails',{'episodeid':2,'properties':['season','episode','tvshowid','file']})['episodedetails']
-    if (detail.get('tvshowid'),detail.get('season'),detail.get('episode'),detail.get('file'))!=(1,2,1,native_tv_fixture.FOLDER+'QA.S02E01.mp4'):
+    completed=before.get('watched',{}).get('d'*64,{}).get('watched') is True
+    season,episode,dbid=(2,1,2) if completed else (1,2,1)
+    filename='QA.S%02dE%02d.mp4'%(season,episode)
+    if not(len(rows)==1 and rows[0].get('season')==season and rows[0].get('episode')==episode):
+        raise AssertionError('Reopened exact TV coordinate differs')
+    if completed and 'action=play-local-next' not in rows[0].get('file',''):
+        raise AssertionError('Reopened local Next has no verified selection route')
+    if not completed:
+        if (rows[0].get('resume')!={'position':before['items']['d'*64]['position'],'total':before['items']['d'*64]['duration']} or
+                rows[0].get('file')!=native_tv_fixture.FOLDER+filename):
+            raise AssertionError('Reopened actual TV native resume/source differs')
+    detail=transport.rpc('VideoLibrary.GetEpisodeDetails',{'episodeid':dbid,'properties':['season','episode','tvshowid','file']})['episodedetails']
+    if (detail.get('tvshowid'),detail.get('season'),detail.get('episode'),detail.get('file'))!=(1,season,episode,native_tv_fixture.FOLDER+filename):
         raise AssertionError('Reopened native source identity differs')
     return dict(passed=True,autoplay=False,next_rows=rows,native_source=detail,
-        completed_watched=before['watched']['d'*64],actual_playback_not_seed_only=True)
+        completed_watched=before.get('watched',{}).get('d'*64),
+        exact_unfinished_position=None if completed else before['items']['d'*64]['position'],
+        actual_playback_not_seed_only=True)
