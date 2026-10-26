@@ -4,13 +4,13 @@ from pathlib import Path
 
 ROOT=Path(__file__).parent
 AUTHORIZATION=('Authorized final workstreams1/7: actualAndroid17 SearchAll Enter throughoriginalAndroidkeyboard, '
-    'exactresults/providerattribution, persistedhistory, BackandHome responsiveness onintegratedsigned408. '
+    'exactresults/providerattribution, persistedhistory, BackandHome responsiveness onintegratedsigned409. '
     'Readonlyfixtureobservations; noClose/shutdown/physicalacceptance.')
 EXPECTED=dict(schema=1,kind='integrated-candidate',selected_case='final-search-all-enter',
-    candidate_build=40277375964,candidate_source_commit='a43ac034678acdfbd57c90f50b1c8a458531050f',
-    candidate_apk_sha256='fc1d726fee8002da7cdccec6dd79a029f6536f0f1c3857791bec94c45d620e50',
-    candidate_artifact='Infinity-2103408-Integrated-INTERNAL-NOT-FINAL-40277375964',
-    authorization=AUTHORIZATION,request_id='integrated408-search-all-enter-01')
+    candidate_build=40295309934,candidate_source_commit='b65ae4981f10bd6badf118ce95f360d28499c2d7',
+    candidate_apk_sha256='4d68e3bf21ee109a9196267e9ed2b21ea8430fff8dede331af3c199e9921bf21',
+    candidate_artifact='Infinity-2103409-Integrated-INTERNAL-NOT-FINAL-40295309934',
+    authorization=AUTHORIZATION,request_id='integrated409-search-all-enter-01')
 
 
 def validate(request):

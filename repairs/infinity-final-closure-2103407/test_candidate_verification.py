@@ -22,7 +22,7 @@ class CandidateVerificationTests(unittest.TestCase):
         head='a'*40;event={'ref':dispatch.BRANCH,'after':head,'repository':{'full_name':'mahfouzhassine8-ops/project-infinity'}}
         result=dispatch.validate(request.EXPECTED,event,head,[dispatch.REQUEST])
         self.assertEqual(result['SELECTED_CASE'],request.EXPECTED['selected_case'])
-        self.assertEqual(result['CANDIDATE_BUILD'],'40277375964')
+        self.assertEqual(result['CANDIDATE_BUILD'],'40295309934')
         for field,value in [('selected_case','final-participant'),('candidate_build',40230842944),
             ('candidate_source_commit','b'*40),('candidate_apk_sha256','0'*64),('authorization',''),
             ('request_id','integrated408-participant-installover-01')]:
@@ -121,7 +121,7 @@ class CandidateVerificationTests(unittest.TestCase):
         # mandatory original SDK signature step are never replaced in CI.
         with tempfile.TemporaryDirectory() as temp:
             root=Path(temp);nested=root/'input';nested.mkdir();apk=nested/'fixture.apk'
-            versions={'script.infinity.commandcenter':'0.3.5.40','script.infinity.uirepair':'0.1.23',
+            versions={'script.infinity.commandcenter':'0.3.5.41','script.infinity.uirepair':'0.1.23',
                 'script.infinity.watchedbridge':'1.0.21','script.infinity.rails':'0.2.8'}
             with ZipFile(apk,'w') as z:
                 for aid,version in versions.items():z.writestr('assets/addons/'+aid+'/addon.xml','<addon id="'+aid+'" version="'+version+'"/>')

@@ -43,7 +43,7 @@ PROFILE_AFTER='''        if mode=='final-participant' or mode in SEARCH_CASES:
         else:
             sys.path.insert(0,str(uiroot));from controller_access import load
             plugin=load();hub=plugin.hub;profile=plugin.PROFILE;home=xbmcgui.Window(10000)'''
-BASELINE_SHA='3616c4e69c976bd63b36170d4dbbd9b190a7ec2eace4bc0c34c3c72f7f9e8578'
+BASELINE_SHA='fc1d726fee8002da7cdccec6dd79a029f6536f0f1c3857791bec94c45d620e50'
 IDS={'script.infinity.commandcenter','script.infinity.uirepair','script.infinity.watchedbridge','script.infinity.rails'}
 RECEIPT_BEFORE='/data/user/0/com.projectinfinity.kodi/files/checkpoint/installed-participants.json'
 RECEIPT_AFTER='/data/user/0/com.projectinfinity.kodi/files/infinity-checkpoint-install.json'
@@ -70,7 +70,7 @@ def restore_candidate_fixture(text):
 
 
 def original_sources(apk,out):
-    if digest(apk)!=BASELINE_SHA:raise ValueError('Exact protected407 source required')
+    if digest(apk)!=BASELINE_SHA:raise ValueError('Exact signed408 reference source required')
     with ZipFile(apk) as archive:
         for name in archive.namelist():
             if not name.startswith('assets/addons/') or name.endswith('/'):continue
@@ -91,7 +91,7 @@ def require_disposable(device):
 def install_over(device,adb,baseline,candidate,out,fixture_id):
     require_disposable(device)
     if digest(baseline)!=BASELINE_SHA:raise ValueError('Protected baseline differs')
-    if digest(candidate)!=EXPECTED['candidate_apk_sha256']:raise ValueError('Exact signed408candidate required')
+    if digest(candidate)!=EXPECTED['candidate_apk_sha256']:raise ValueError('Exact signed409candidate required')
     if device.PACKAGE in device.shell('pm','list','packages',device.PACKAGE):
         raise ValueError('Existing device installation refused')
     if 'Success' not in adb('install','--no-incremental',baseline):raise RuntimeError('Protected baseline installation failed')
@@ -140,7 +140,7 @@ def main(selected_case=None):
             if hashlib.sha256(before).hexdigest()!=FIXTURE_SHA:raise ValueError('Original selected feature differs')
             path.write_bytes(fixture(before))
             # Seed the actual previous code, not new code installed by a test.
-            # Java408 must migrate all four original IDs before Python starts.
+            # Java409 must migrate all four original IDs before Python starts.
             for addon in IDS:
                 target=stage/addon
                 if target.is_symlink():raise ValueError('Linked fixture refused')

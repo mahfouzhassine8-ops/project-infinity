@@ -74,17 +74,17 @@ jobs:
       - name: Bind signed407 metadata to the existing feature probe without APK changes
         if: github.event_name == 'push' && github.ref == 'refs/heads/work/infinity-final-corrective-from-2103407-20261025' && env.CANDIDATE_REQUEST_PATH == ''
         run: python3 repairs/infinity-final-closure-2103407/prepare_signed407_fixture.py signed
-      - name: Recover protected signed407 for exact install-over feature verification
+      - name: Recover physically tested signed408 for exact install-over feature verification
         if: env.CANDIDATE_REQUEST_PATH != ''
         uses: actions/download-artifact@v4
         with:
-          run-id: 40230842944
-          name: Infinity-2103407-SEARCH-SINGLE-FLIGHT-ORIGINAL-SIGNER-QA
+          run-id: 40277375964
+          name: Infinity-2103408-Integrated-INTERNAL-NOT-FINAL-40277375964
           github-token: ${{ github.token }}
-          path: baseline407
+          path: baseline408
       - name: Bind integrated candidate metadata without changing APK or component bytes
         if: env.CANDIDATE_REQUEST_PATH != ''
-        run: python3 repairs/infinity-final-closure-2103407/prepare_candidate_fixture.py signed baseline407
+        run: python3 repairs/infinity-final-closure-2103407/prepare_candidate_fixture.py signed baseline408
       - uses: android-actions/setup-android@v4
         with:
           cmdline-tools-version: '15859902'
