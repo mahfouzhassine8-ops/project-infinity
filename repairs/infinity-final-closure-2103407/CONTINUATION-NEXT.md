@@ -1,3 +1,5 @@
+> **CURRENT SIGNED414 PICKUP:** Read `CONTINUATION-2103414-PICKUP.md` and current `STATUS.md`. Signed414 build40345149803 succeeds; actual414 Continue40346077812 and separate PowerUI40346078040 are running.413 exact real cached cards/removal passed; progress/rewind and Favorites still unresolved.413 Search failed before APK install due Android replacing Settings utility. Latest414 request targets50/30/20 with unchanged real app assertions. No final/Fold acceptance.
+
 > **CURRENT SIGNED413 PICKUP:** Read `CONTINUATION-2103413-HOME-ENTRY.md`. Signed413 build40336380247 succeeded with CC43/Skin244 and preserved native/DEX/chooser/Cobra. Actual412 PowerUI3/3 and independent411 synthetic/unsafe PASS; Search repetitions still failed2/50, playback/rotation0. No near-instant or final/Fold acceptance claim.
 
 # Current continuation: final corrective from exact signed407

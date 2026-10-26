@@ -1,21 +1,15 @@
-# Infinity final corrective continuation from signed 2103407
+# Current integration: signed2103414 built, release open
 
-The seven workstreams and no-touch boundary are frozen in SCOPE.json. The working branch starts directly at 0e8739d2d0e1be0ab8f127519b526556426fb160; the passing-only lock is not moved. GitHub signed build40230842944 was independently read and is successful from that exact commit.
+Continue the original seven workstreams from protected407; do not restart. Cobra and chooser untouched. Current source f5dbd03fb3a5df6b2f0f209bc36768d6ebd16c71; signed ARM64 build40345149803 SUCCESS; APK a13bd3a5fc10752fc06621e2b49d050b5fd3ba0a8a86ad9e675420335b0313d3. CC44/Skin244/UI23/WB21/Rails8. Six exact parent413 member changes;7594 preserved; native/DEX/skin/helper/chooser/Cobra bytes exact. See CONTINUATION-2103414-PICKUP.md.
 
-Current stage: inspect exact signed source and first-party owner/protocol contracts. No production runtime change, new APK, device pass or release acceptance is claimed. The local exec service is unavailable; use the existing scoped GitHub host runner for source inspection and targeted regression work. Preserve all original source overlays rather than reusing stale2103402 staging as a new baseline.
+| Original workstream | Verified stage and remaining gate |
+| --- | --- |
+| Search stability | Original407 single-flight plus actual worker-lifetime correction preserved.413 run40339101147 failed in system IME preparation before APK install; no413 Search result. Latest414 50Search/30Home/20rotation request follows actual disabled-refresh runtime correction and observed system utility replacement fix. Counts are not complete. |
+| Unified Command Center | Signed source composition/migration and actual API37 resident/Close startup proven through413. One CC scheduler, old addon IDs retained.414 original-key JCA43→44 and native75-file verification passed at build; Android result pending. |
+| Touch, selection, long press | Native selection/identity source and original routes preserved.413 real menus passed Watchlist add/remove, Collection add/remove, watched/unwatched; Favorites selection then failed. Physical first/second tap, long hold and selected focus/scroll remain open. |
+| Loading, refresh, memory, smoothness |412 per-listing source reads33→3; host8.255→4.270ms only.413 removed2Home interpreters. Actual413 cached Home/tab real card683.120ms movie/291.248ms TV with native60/180 positions; not app launch/poster/Fold.414 corrects repeated disabled optional refresh constructor exceptions. Full before/after PSS/RSS, native frame pacing, queues, cold/warm and Fold remain open. |
+| Essential-First | Preserve ordinary4113/3 run40317069331. Independent synthetic16image/unsafe411 run40331713617 PASS. Actual Power UI4123/3 run40333302310 and4133/3 run40339101105 PASS all16 owners,2Java/native/coordinator, zeroUID PIDs, unchanged rememberedInfinity and protected readback.414 independent PowerUI run40346078040 pending. |
+| Visual/Option B/player | Integrated metadata/trailer fixes and original layouts/themes/player preserved;413 Home changes only onload dispatch. No new complete visual or physical player acceptance. |
+| Whole application | Exact source/signature/package/component audits pass.413 Continue real cards/removal passed; actual progress/rewind not complete.414 valid seekable fixture and actual state/player readback run40346077812 pending. ContinueWatching next-episode, full journeys and physical Fold acceptance remain required. |
 
-| Workstream | Actual status |
-|---|---|
-| Search admission hardening | Existing2103407 behavior preserved; additional source inspection selected |
-| Unified Command Center | Owner/extension inventory pending; no migration applied |
-| Universal touch/actions | Current Infinity Movies/TV paths pending exact source inspection; working WatchNixtoons2 protected |
-| Loading/refresh/frame pacing | Measurement and causal changes pending |
-| Essential-First | Confirmed reported package/runtime version skew awaiting signed-source reproduction |
-| Remaining visuals/player/popups | Inspect/preserve passing2103407 behavior before editing |
-| Android17 integration | NOT RUN in this continuation; physical Fold remains final authority |
-
-Required final evidence remains50 Search cycles,30 playback/Home cycles,20 fold/rotation transitions, authenticated essential-save/reopen scenarios, exact source/APK preservation and original permanent signer. Compilation, packaging and final acceptance are separate stages. No shutdown success is inferred from feature QA.
-
-Current verified continuation: signed407 source/component/signer inspection PASS run40254036285. New Search exceptional-consumer defect reproduced and corrected in isolated source,7 host checks PASS run40254448852. The module trust core has8 compiled host checks PASS locally and CI run40256202271. Native adapter has6 new local checks PASS, with production-key negatives and explicitly isolated test-key positive fixtures. No engine integration, ARM64 compile, Android17, physical Fold pass or new APK yet.
-
-Actual signed407 ELF retains native0.3.5.35/36 version literals and lacks0.3.5.39. Its native title-owner symbol exists at0x1aa6620 (696 bytes). Its checkpoint Python declares0.3.5.38 while addon.xml reports0.3.5.39. Correct these ownership/API couplings through the authenticated manifest, preserving all old exact contracts.
+No final acceptance, near-instant physical startup, leak elimination or complete50/30/20 claim. All historical failures retained. Do not ask the user to install intermediate engineering candidates. Deliver one actual signed package with matching components after engineering verification; physical Fold remains final gate, no lock without explicit acceptance.

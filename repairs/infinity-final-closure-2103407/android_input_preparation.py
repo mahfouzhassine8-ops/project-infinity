@@ -46,7 +46,28 @@ def warm(device,out):
             return (matches[0],) if len(matches)==1 else None
         tap(device.until(editor,45)[0])
         import android_input_readiness
-        device.until(lambda:android_input_readiness.ready(device,out),90)
+        recovery={'phase':'unused'}
+        def prepared_keyboard():
+            if android_input_readiness.ready(device,out):return True
+            values=nodes()
+            if recovery['phase']=='editor':
+                edits=[n for n in values if n.get('package') in SETTINGS and
+                       n.get('class')=='android.widget.EditText' and n.get('enabled')=='true']
+                if len(edits)==1:tap(edits[0]);recovery['phase']='used'
+                return False
+            if recovery['phase']!='unused':return False
+            controls=[n for n in values if n.get('package')=='com.android.settings' and
+                      n.get('enabled')=='true' and n.get('class')!='android.widget.EditText' and
+                      any(n.get(k,'').casefold()=='search settings' for k in ('text','content-desc'))]
+            if len(controls)!=1:return False
+            log=device.adb('logcat','-d','-v','threadtime','-s','ActivityManager:I',check=False)
+            if not re.search(r'Killing \d+:com\.google\.android\.settings\.intelligence/[^\n]*: change com\.google\.android\.settings\.intelligence',log):
+                return False
+            report['system_settings_recovery']='One normal UI re-entry after observed Android Settings Intelligence replacement'
+            tap(controls[0]);recovery['phase']='editor'
+            return False
+        # Keep the original wait budget and actual current-PID/body/shown proof.
+        device.until(prepared_keyboard,90)
         report['actual_IME_proof']=json.loads((out/'IME-READINESS.json').read_text())
         require(report['actual_IME_proof'].get('ready') is True,'Actual system keyboard body not ready')
         device.shell('input','keyevent','3')

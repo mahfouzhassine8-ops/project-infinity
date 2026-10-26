@@ -1,0 +1,17 @@
+{
+  "recorded_before_implementation": true,
+  "run": 40339101147,
+  "artifact_id": 12660124051,
+  "artifact_sha256": "5335b133d4098399572eaa5b8fbd7eb6b17942880dee2577b07fdaaae7bcd33c",
+  "stage": "Before Infinity baseline or candidate APK installation; no application Search executed",
+  "failure": "IME preparation saw native keyboard BODY but input_method mInputShown=false",
+  "actual_native_cause": "Android ActivityManager killed com.google.android.settings.intelligence process2239 at15:02:00.376 reason change com.google.android.settings.intelligence, returning to SettingsHomepageActivity. The preparation Search utility was naturally replaced/updated.",
+  "correction": "One bounded normal Settings Search re-entry only when fresh Settings Home UI and exact native package-change kill evidence are observed; use same original90sec readiness wait, no extra wait budget. Re-tap actual editor only after new UI. Strict actual Gboard currentPID BODY and mInputShown true still mandatory. Any second failure remainsFAIL.",
+  "selected_tests": [
+    "Observed Google utility replacement recovers only once without query text/preferences/app start",
+    "Missing controls/body/second replacement cannot pass; physical/existing/live guards unchanged",
+    "Original realInfinity45sec keyboard, Enter/results/history/source/duplicate/cancel and50count predicates unchanged"
+  ],
+  "new_candidate": "signed414 after actual disabled refresh-loop runtime correction; no candidate413Search pass inferred",
+  "release_accepted": false
+}

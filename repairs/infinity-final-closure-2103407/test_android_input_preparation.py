@@ -62,7 +62,28 @@ class InputPreparationTests(unittest.TestCase):
         source=Path(preparation.__file__).read_text()
         for forbidden in ('force-stop','pm clear','uninstall','CLOSE_KODI','input\',\'text','settings\',\'put','install\''):
             self.assertNotIn(forbidden,source)
-        self.assertIn('device.until(lambda:android_input_readiness.ready(device,out),90)',source)
+        self.assertIn('device.until(prepared_keyboard,90)',source)
+
+    def test_observed_system_utility_replacement_has_one_bounded_ui_reentry(self):
+        with tempfile.TemporaryDirectory() as temp:
+            device,calls=self.device();checks=[0]
+            device.adb=lambda *a,**kw:'ActivityManager: Killing 2239:com.google.android.settings.intelligence/u0a155 (adj 0): change com.google.android.settings.intelligence'
+            def until(fn,seconds):
+                for _ in range(5):
+                    value=fn()
+                    if value:return value
+                raise RuntimeError('Original readiness budget expired')
+            device.until=until
+            def ready(observed,out):
+                checks[0]+=1
+                if checks[0]==1:device.tapped=0
+                value=checks[0]>=3
+                (out/'IME-READINESS.json').write_text(json.dumps({'ready':value}))
+                return value
+            with patch.object(android_input_readiness,'ready',side_effect=ready):
+                result=preparation.warm(device,Path(temp))
+            self.assertTrue(result['passed']);self.assertIn('system_settings_recovery',result)
+            self.assertEqual(len([v for v in calls if v[:2]==('input','tap')]),4)
 
 
 if __name__=='__main__':unittest.main(verbosity=2)
