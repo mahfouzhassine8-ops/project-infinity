@@ -128,3 +128,26 @@ separate historical417 evidence and current failed/pending gates. It is still
 an engineering checkpoint, not an installation request or accepted release.
 Replace same two items with expected_current_version3 after actual results,
 using existing prepared helper batch. Never commit private saved item IDs.
+
+
+## Actual418 real-TV3 Power PASS —19:48UTC
+
+Run40387720854/sourcecc4b27a PASS. Artifact12682238395, ZIPSHA
+7e9d59ae3cfd1650a35c9cf0d3ea59cabae729de9dba081d8c2a8bfc96cad139.
+REAL-TV-POWER-418-RESULT.json binds actual75.103sec unfinished nativeTV and played
+source after first hardClose/reopen, actual completion/watched100/removedContinue/
+verified S2E1 selection after second, unchanged completed-state third. No autoplay.
+All3 visiblePower routes/16owners/native/twoJava/coordinator/zeroUID/7SQLite/
+JSON/preference proofs passed. Foreground after everyClose is actual NexusLauncher
+on emulator, not Samsung physicalHome. RememberedInfinitySHA9f6ba542 unchanged.
+UI+Close9.686/19.730/5.599sec; nativeSafe5569/11441/2557ms under these actual
+workloads. Do NOT compare these mixed workloads as a speedup/regression from
+ordinary411/417. Completed record has watched100 and verifiedNext; no false
+claim of completed rootposition180 (actual completed record retained as observed).
+Tracking-start ready4786.672/5942.196ms is NOT Home/startup/poster timing.
+
+Only remaining selected engine run40386278214 is stillin_progress. Do not restart.
+Current savedZIPversion3 precedes this newTV PASS report; rebuild it with current
+status once endurance results arrive, replace sameZIP+checksum with version3
+guards, retain failed attempts, deliver actual signed418. PhysicalFold finalgate,
+allsevenstreams, noCobra changes/no user-data reset/no final lock still mandatory.
