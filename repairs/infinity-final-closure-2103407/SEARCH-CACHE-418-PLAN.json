@@ -1,0 +1,30 @@
+{
+  "parent_version": 2103417,
+  "candidate_version": 2103418,
+  "parent_APK_sha256": "4428332453714adc1aa652ee5db76ff2e79f705171dab8e020d7915631e00d83",
+  "source_preimages": {
+    "infinity_search.py": "1c81ad9c43e1eeead3a1c248b775120f1c298bf7ef9aa835a5417bfce5c124a9",
+    "addon.xml": "6e11c96a35c26471442d3f38c7578fb229a7e03c62804ac25835df1a97901735"
+  },
+  "source_evidence": "Signed417 infinity_search._provider_result caches a single answer per provider; alternating JustFriends/SearchAll and Matrix/Umbrella overwrites the same provider slot. Actual40375195635 log shows repeated identical Umbrella native requests,20sec timeout under concurrent background maintenance; keyboard/native init costs separate.",
+  "owned_members": [
+    "AndroidManifest.xml",
+    "assets/addons/script.infinity.commandcenter/infinity_search.py",
+    "assets/addons/script.infinity.commandcenter/addon.xml",
+    "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1",
+    "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1.sig"
+  ],
+  "correction": "Bounded4recent query responses per provider within SAME strict300000byte cache property and300sec per-response TTL. Key includes exact route/profile/source pins; route validation before and after cache unchanged. No TTL refresh on hit, no persistent store/writer, no caller lease/cancellation changes. Legacy cache reads supported. Oversized response cannot evict valid prior answers.",
+  "selected_tests": [
+    "Alternating two actual-source query signatures needs2native directory calls rather than4 in host transport contract; no real-device speed claim",
+    "Strict TTL boundary/future/nonfinite timestamps/invalid schemas/duplicate signatures/oversize rejected",
+    "At most4entries and strict300000byte bound; oversize single answer retains existing property",
+    "Legacy one-entry compatibility, source-pin/profile/query identity isolation and source-change rejection",
+    "Cancelled/failed native results are never cached; original native lease and route checks unchanged",
+    "Exact parent417 native/DEX/Skin/chooser/Cobra/allothermembers byte preservation; actual original-key75-file native authentication and47to48JCA host data-sentinel migration",
+    "Signing/package/ARM64/16KiB/component member equality only; no behavioral tests or shutdown dependency in build"
+  ],
+  "physical_Fold": "NOT RUN",
+  "release_accepted": false,
+  "final_lock": false
+}
