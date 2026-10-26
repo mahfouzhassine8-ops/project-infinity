@@ -101,3 +101,30 @@ until genuinely satisfied. Do not claim1-2sec cold startup, leak elimination,
 Samsung frame pacing/120Hz or physical fold/touch/player/provider acceptance
 from emulator/host data. Finish and deliver the corrected signed APK, not an
 additional audit-only handoff. No lock before explicit physical user acceptance.
+
+
+## Latest actual state,19:45UTC
+
+418writer controls PASS40387258351 (source118b190d):30actualnativejobs,32verified
+receipts,2unchanged-unstarted, one actual protected positiveClose/reopen and
+actualopaquechild writer veto. Report SYNTHETIC-IMAGE-AND-UNSAFE-418-RESULT.json.
+
+First418realTVrun40386278200 FAILED before anyClose because a new readiness
+predicate wrongly required overwriting the original items navigation source.
+Actual new canonical episode occurrence and17.894sec progress existed; actual
+played file was correctly in sources[d].route with failures0. Corrected pure
+tracking_ready requires canonical1396/S1E2/show_verified/newoccurrence plus exact
+played file in sources memory; original navigation stays unchanged.8focused
+fixture tests and4durability predicate checks passed. Sourcecc4b27a currently
+runs realTV3 case02 as40387720854. Preserve failed attempt; no APK change/rebuild.
+
+Current feature40386278214 still in_progress; do not restart. CurrentTV3
+40387720854 still in_progress. Exact app source remains90cb67fd/build40383785065.
+
+Actual418 archive/checksum now saved as SAME items,version3, receipts privately
+in delivery-library-receipts.json. ZIP139722a9bd77441b9f7473a60494ab7440422b7f9e49918214ec8c11c193addb,379584297bytes.
+It contains current418source/signature/components/writerPASS plus clearly
+separate historical417 evidence and current failed/pending gates. It is still
+an engineering checkpoint, not an installation request or accepted release.
+Replace same two items with expected_current_version3 after actual results,
+using existing prepared helper batch. Never commit private saved item IDs.

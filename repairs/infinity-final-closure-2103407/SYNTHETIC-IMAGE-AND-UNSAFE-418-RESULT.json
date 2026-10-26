@@ -1,0 +1,984 @@
+{
+  "run": 40387258351,
+  "test_source": "118b190d4a4fb5ebf835821b39a055fdf3f4c631",
+  "candidate_source": "90cb67fd7c1c581e1f6d195adf1bb0c95b8fb42b",
+  "apk_sha256": "328757eb858a79f91883c0ba4e2884410baaf0b42730db5d62054679253674e4",
+  "artifact": 12680718098,
+  "artifact_sha256": "3101304eebeddd692f920fbcfab6d084808719f1a48872ada6ce7dc5e6ff708e",
+  "passed": true,
+  "native_image_control": {
+    "passed": true,
+    "owner": {
+      "schema": 2,
+      "pid": 4545,
+      "owner": "49705b62-a749-4624-b9c3-4830e16efbb2",
+      "launch": "0d686aff-b77b-4af8-a46c-fd92b7750a63",
+      "began": 1793043231450,
+      "close_at": 0,
+      "phase": "RUNNING",
+      "live": true,
+      "error": ""
+    },
+    "script_observation": {
+      "pid": 4545,
+      "window": 13000,
+      "controls": [
+        2100,
+        2101,
+        2102,
+        2103,
+        2104,
+        2105,
+        2106,
+        2107,
+        2108,
+        2109,
+        2110,
+        2111,
+        2112,
+        2113,
+        2114,
+        2115
+      ]
+    },
+    "native": {
+      "window": 13000,
+      "controls": [
+        2100,
+        2101,
+        2102,
+        2103,
+        2104,
+        2105,
+        2106,
+        2107,
+        2108,
+        2109,
+        2110,
+        2111,
+        2112,
+        2113,
+        2114,
+        2115
+      ],
+      "actual_native_jobs": 30,
+      "verified_readonly_receipts": 32,
+      "actual_directory_factory_terminals": 30,
+      "verified_unchanged_without_start": [
+        {
+          "token": 82,
+          "job": 82,
+          "control": 2102
+        },
+        {
+          "token": 106,
+          "job": 106,
+          "control": 2114
+        }
+      ],
+      "jobs": [
+        {
+          "token": 78,
+          "job": 78,
+          "control": 2100
+        },
+        {
+          "token": 79,
+          "job": 79,
+          "control": 2100
+        },
+        {
+          "token": 80,
+          "job": 80,
+          "control": 2101
+        },
+        {
+          "token": 81,
+          "job": 81,
+          "control": 2101
+        },
+        {
+          "token": 83,
+          "job": 83,
+          "control": 2102
+        },
+        {
+          "token": 84,
+          "job": 84,
+          "control": 2103
+        },
+        {
+          "token": 85,
+          "job": 85,
+          "control": 2103
+        },
+        {
+          "token": 86,
+          "job": 86,
+          "control": 2104
+        },
+        {
+          "token": 87,
+          "job": 87,
+          "control": 2104
+        },
+        {
+          "token": 88,
+          "job": 88,
+          "control": 2105
+        },
+        {
+          "token": 89,
+          "job": 89,
+          "control": 2105
+        },
+        {
+          "token": 90,
+          "job": 90,
+          "control": 2106
+        },
+        {
+          "token": 91,
+          "job": 91,
+          "control": 2106
+        },
+        {
+          "token": 92,
+          "job": 92,
+          "control": 2107
+        },
+        {
+          "token": 93,
+          "job": 93,
+          "control": 2107
+        },
+        {
+          "token": 94,
+          "job": 94,
+          "control": 2108
+        },
+        {
+          "token": 95,
+          "job": 95,
+          "control": 2108
+        },
+        {
+          "token": 96,
+          "job": 96,
+          "control": 2109
+        },
+        {
+          "token": 97,
+          "job": 97,
+          "control": 2109
+        },
+        {
+          "token": 98,
+          "job": 98,
+          "control": 2110
+        },
+        {
+          "token": 99,
+          "job": 99,
+          "control": 2110
+        },
+        {
+          "token": 100,
+          "job": 100,
+          "control": 2111
+        },
+        {
+          "token": 101,
+          "job": 101,
+          "control": 2111
+        },
+        {
+          "token": 102,
+          "job": 102,
+          "control": 2112
+        },
+        {
+          "token": 103,
+          "job": 103,
+          "control": 2112
+        },
+        {
+          "token": 104,
+          "job": 104,
+          "control": 2113
+        },
+        {
+          "token": 105,
+          "job": 105,
+          "control": 2113
+        },
+        {
+          "token": 107,
+          "job": 107,
+          "control": 2114
+        },
+        {
+          "token": 108,
+          "job": 108,
+          "control": 2115
+        },
+        {
+          "token": 109,
+          "job": 109,
+          "control": 2115
+        }
+      ]
+    }
+  },
+  "positive_Close_reopen": [
+    {
+      "cycle": 0,
+      "passed": true,
+      "close_seconds": 7.145529343000021,
+      "native_safe_ms": 6227,
+      "separate_results": {
+        "essential_first_durable": true,
+        "kodi_engine_terminated": true,
+        "android_coordinator_completed": true,
+        "remaining_UID_processes": [],
+        "recent_apps_used_for_process_proof": false
+      },
+      "essential_owners": [
+        "native_admission",
+        "background_jobs",
+        "playback",
+        "command_center",
+        "compat",
+        "kodi_settings",
+        "profiles",
+        "skin_settings",
+        "addon_settings",
+        "favourites",
+        "peripherals",
+        "audio_policy",
+        "deferred_dialog_state",
+        "xml_files",
+        "native_databases",
+        "pvr"
+      ],
+      "database_integrity": [
+        "Addons33.db",
+        "TV46.db",
+        "Textures13.db",
+        "ViewModes6.db",
+        "MyMusic83.db",
+        "Epg16.db",
+        "MyVideos131.db"
+      ],
+      "preference_unchanged": true
+    }
+  ],
+  "unsafe_writer_control": {
+    "passed": true,
+    "expected": "actual opaque writer refusal; no successful Close claim",
+    "owner": {
+      "schema": 2,
+      "pid": 5196,
+      "owner": "a5a19cd7-8df9-43df-a175-c131e85e1b7a",
+      "launch": "cfeb3e2e-957d-4644-9d54-62dc6d42f78a",
+      "began": 1793043284932,
+      "close_at": 0,
+      "phase": "RUNNING",
+      "live": true,
+      "error": ""
+    },
+    "actual_writer": {
+      "pid": 5196,
+      "child_pid": 5724,
+      "marker": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/addon_data/script.infinity.unsafeproof.7fa29/unknown-native-write.txt",
+      "child_scope_readonly": false
+    },
+    "actual_marker": "controlled unsafe write\n",
+    "request": "Starting: Intent { act=com.projectinfinity.kodi.action.CLOSE_KODI cmp=com.projectinfinity.kodi/.InfinityPowerControlActivity }\n",
+    "receipt": {
+      "schema": 1,
+      "session": "26917cf7-7990-4de9-94e5-106b8f7873ef",
+      "owner": "a5a19cd7-8df9-43df-a175-c131e85e1b7a",
+      "pid": 5196,
+      "close_task_id": 15,
+      "started_elapsed_ms": 189298,
+      "started_epoch_ms": 1793043315808,
+      "updated_epoch_ms": 1793043318706,
+      "updated_elapsed_ms": 192241,
+      "phase": "CHECKPOINT_FAILED",
+      "error": "native_admission: unverified_protected_writer:script.infinity.unsafeproof.7fa29:default.py:external_or_opaque_writer_requires_explicit_participant",
+      "generation": 0,
+      "exit_policy": "essential_first_process_exit_v1",
+      "process_death_confirmed": false,
+      "exit_kind": "essential_first_process_exit_requested",
+      "optional_data_recovery_guaranteed": false,
+      "engine_java_save_seal": "",
+      "coordinator_java_save_seal": "",
+      "engine_java_pending": "",
+      "coordinator_java_pending": "",
+      "whole_package_death_confirmed": false,
+      "checkpoint_saved": false,
+      "authorization_consumed": false,
+      "safe_epoch_ms": 0,
+      "safe_elapsed_ms": 0,
+      "terminate_requested_epoch_ms": 0,
+      "terminate_requested_elapsed_ms": 0,
+      "authorization_consumed_epoch_ms": 0,
+      "authorization_consumed_elapsed_ms": 0,
+      "engine_death_epoch_ms": 0,
+      "engine_death_elapsed_ms": 0,
+      "total_duration_ms": 2943,
+      "last_native_status": {
+        "active_native_writers": 0,
+        "admission_sealed": true,
+        "application_core_initialized": true,
+        "application_startup_in_progress": false,
+        "blocker_count": 1,
+        "blocker_inventory_contract": "full_blocker_inventory_v1",
+        "blocker_overflow": false,
+        "blockers": [
+          {
+            "count": 1,
+            "detail": "unverified_protected_writer:script.infinity.unsafeproof.7fa29:default.py:external_or_opaque_writer_requires_explicit_participant",
+            "fatal": true,
+            "owner": "native_admission"
+          }
+        ],
+        "blocking_jobs": [],
+        "blocking_operation": "native_databases",
+        "elapsed_ms": 2662,
+        "error": "native_admission: unverified_protected_writer:script.infinity.unsafeproof.7fa29:default.py:external_or_opaque_writer_requires_explicit_participant",
+        "essential_owners": [
+          "native_admission",
+          "background_jobs",
+          "playback",
+          "command_center",
+          "compat",
+          "kodi_settings",
+          "profiles",
+          "skin_settings",
+          "addon_settings",
+          "favourites",
+          "peripherals",
+          "audio_policy",
+          "deferred_dialog_state",
+          "xml_files",
+          "native_databases",
+          "pvr"
+        ],
+        "essential_write_blockers": [
+          "unverified_protected_writer:script.infinity.unsafeproof.7fa29:default.py:external_or_opaque_writer_requires_explicit_participant",
+          "unverified_protected_writer:script.infinity.unsafeproof.7fa29:default.py:unobserved_native_child_process"
+        ],
+        "essential_write_generation": 1,
+        "essential_writes_durable": false,
+        "essential_writes_sealed": false,
+        "exit_kind": "essential_first_process_exit_requested",
+        "exit_policy": "essential_first_process_exit_v1",
+        "generation": 1,
+        "inventory_complete": true,
+        "job_recovery_history": [],
+        "nonpersistent_jobs": 0,
+        "optional_data_recovery_guaranteed": false,
+        "optional_unfinished_jobs": [],
+        "optional_unfinished_writers": 3,
+        "owner": "a5a19cd7-8df9-43df-a175-c131e85e1b7a",
+        "owners": [
+          {
+            "checkpoint_generation": 1,
+            "dirty": true,
+            "dirty_before": false,
+            "dirty_remaining": true,
+            "durable_generation": 0,
+            "duration_ms": 2405,
+            "elapsed_ms": 0,
+            "end_elapsed_ms": 0,
+            "error": "unverified_protected_writer:script.infinity.unsafeproof.7fa29:default.py:external_or_opaque_writer_requires_explicit_participant",
+            "essential": true,
+            "generation": 0,
+            "owner": "native_admission",
+            "required_writes_finished": false,
+            "result": "FAILED",
+            "start_elapsed_ms": 258
+          },
+          {
+            "checkpoint_generation": 1,
+            "dirty": true,
+            "dirty_before": false,
+            "dirty_remaining": true,
+            "durable_generation": 0,
+            "duration_ms": 2663,
+            "elapsed_ms": 0,
+            "end_elapsed_ms": 0,
+            "error": "python_writer:external_or_opaque_writer_requires_explicit_participant",
+            "essential": false,
+            "generation": 0,
+            "owner": "python_services",
+            "required_writes_finished": false,
+            "result": "FAILED",
+            "start_elapsed_ms": 0
+          },
+          {
+            "checkpoint_generation": 1,
+            "dirty": false,
+            "dirty_before": false,
+            "dirty_remaining": false,
+            "durable_generation": 0,
+            "duration_ms": 101,
+            "elapsed_ms": 2565,
+            "end_elapsed_ms": 2565,
+            "error": "",
+            "essential": true,
+            "generation": 0,
+            "owner": "background_jobs",
+            "required_writes_finished": true,
+            "result": "ALREADY_DURABLE",
+            "start_elapsed_ms": 2464
+          },
+          {
+            "checkpoint_generation": 1,
+            "dirty": false,
+            "dirty_before": true,
+            "dirty_remaining": false,
+            "durable_generation": 0,
+            "duration_ms": 1,
+            "elapsed_ms": 379,
+            "end_elapsed_ms": 379,
+            "error": "",
+            "essential": true,
+            "generation": 0,
+            "owner": "playback",
+            "required_writes_finished": true,
+            "result": "COMMITTED",
+            "start_elapsed_ms": 378
+          },
+          {
+            "checkpoint_generation": 1,
+            "dirty": false,
+            "dirty_before": true,
+            "dirty_remaining": false,
+            "durable_generation": 0,
+            "duration_ms": 2203,
+            "elapsed_ms": 2461,
+            "end_elapsed_ms": 2461,
+            "error": "",
+            "essential": true,
+            "generation": 0,
+            "owner": "command_center",
+            "required_writes_finished": true,
+            "result": "COMMITTED",
+            "start_elapsed_ms": 258
+          },
+          {
+            "checkpoint_generation": 1,
+            "dirty": false,
+            "dirty_before": true,
+            "dirty_remaining": false,
+            "durable_generation": 0,
+            "duration_ms": 2136,
+            "elapsed_ms": 2463,
+            "end_elapsed_ms": 2463,
+            "error": "",
+            "essential": true,
+            "generation": 0,
+            "owner": "compat",
+            "required_writes_finished": true,
+            "result": "COMMITTED",
+            "start_elapsed_ms": 327
+          },
+          {
+            "checkpoint_generation": 1,
+            "dirty": false,
+            "dirty_before": true,
+            "dirty_remaining": false,
+            "durable_generation": 1774,
+            "duration_ms": 11,
+            "elapsed_ms": 2564,
+            "end_elapsed_ms": 2564,
+            "error": "",
+            "essential": true,
+            "generation": 1774,
+            "owner": "kodi_settings",
+            "required_writes_finished": true,
+            "result": "COMMITTED",
+            "start_elapsed_ms": 2553
+          },
+          {
+            "checkpoint_generation": 1,
+            "dirty": false,
+            "dirty_before": true,
+            "dirty_remaining": false,
+            "durable_generation": 16,
+            "duration_ms": 1,
+            "elapsed_ms": 2565,
+            "end_elapsed_ms": 2565,
+            "error": "",
+            "essential": true,
+            "generation": 16,
+            "owner": "profiles",
+            "required_writes_finished": true,
+            "result": "COMMITTED",
+            "start_elapsed_ms": 2564
+          },
+          {
+            "checkpoint_generation": 1,
+            "dirty": false,
+            "dirty_before": true,
+            "dirty_remaining": false,
+            "durable_generation": 108,
+            "duration_ms": 0,
+            "elapsed_ms": 2547,
+            "end_elapsed_ms": 2547,
+            "error": "",
+            "essential": true,
+            "generation": 108,
+            "owner": "skin_settings",
+            "required_writes_finished": true,
+            "result": "COMMITTED",
+            "start_elapsed_ms": 2547
+          },
+          {
+            "checkpoint_generation": 1,
+            "dirty": false,
+            "dirty_before": true,
+            "dirty_remaining": false,
+            "durable_generation": 129,
+            "duration_ms": 5,
+            "elapsed_ms": 2552,
+            "end_elapsed_ms": 2552,
+            "error": "",
+            "essential": true,
+            "generation": 129,
+            "owner": "addon_settings",
+            "required_writes_finished": true,
+            "result": "COMMITTED",
+            "start_elapsed_ms": 2547
+          },
+          {
+            "checkpoint_generation": 1,
+            "dirty": false,
+            "dirty_before": true,
+            "dirty_remaining": false,
+            "durable_generation": 2,
+            "duration_ms": 0,
+            "elapsed_ms": 2552,
+            "end_elapsed_ms": 2552,
+            "error": "",
+            "essential": true,
+            "generation": 2,
+            "owner": "favourites",
+            "required_writes_finished": true,
+            "result": "COMMITTED",
+            "start_elapsed_ms": 2552
+          },
+          {
+            "checkpoint_generation": 1,
+            "dirty": false,
+            "dirty_before": true,
+            "dirty_remaining": false,
+            "durable_generation": 20,
+            "duration_ms": 1,
+            "elapsed_ms": 2553,
+            "end_elapsed_ms": 2553,
+            "error": "",
+            "essential": true,
+            "generation": 20,
+            "owner": "peripherals",
+            "required_writes_finished": true,
+            "result": "COMMITTED",
+            "start_elapsed_ms": 2552
+          },
+          {
+            "checkpoint_generation": 1,
+            "dirty": false,
+            "dirty_before": true,
+            "dirty_remaining": false,
+            "durable_generation": 1,
+            "duration_ms": 0,
+            "elapsed_ms": 2553,
+            "end_elapsed_ms": 2553,
+            "error": "",
+            "essential": true,
+            "generation": 1,
+            "owner": "audio_policy",
+            "required_writes_finished": true,
+            "result": "COMMITTED",
+            "start_elapsed_ms": 2553
+          },
+          {
+            "checkpoint_generation": 1,
+            "dirty": true,
+            "dirty_before": false,
+            "dirty_remaining": true,
+            "durable_generation": 0,
+            "duration_ms": 117,
+            "elapsed_ms": 0,
+            "end_elapsed_ms": 0,
+            "error": "",
+            "essential": true,
+            "generation": 79,
+            "owner": "deferred_dialog_state",
+            "required_writes_finished": false,
+            "result": "PENDING",
+            "start_elapsed_ms": 2546
+          },
+          {
+            "checkpoint_generation": 1,
+            "dirty": false,
+            "dirty_before": true,
+            "dirty_remaining": false,
+            "durable_generation": 28,
+            "duration_ms": 2565,
+            "elapsed_ms": 2565,
+            "end_elapsed_ms": 2565,
+            "error": "",
+            "essential": true,
+            "generation": 28,
+            "owner": "xml_files",
+            "required_writes_finished": true,
+            "result": "COMMITTED",
+            "start_elapsed_ms": 0
+          },
+          {
+            "checkpoint_generation": 1,
+            "dirty": true,
+            "dirty_before": false,
+            "dirty_remaining": true,
+            "durable_generation": 0,
+            "duration_ms": 119,
+            "elapsed_ms": 0,
+            "end_elapsed_ms": 0,
+            "error": "",
+            "essential": true,
+            "generation": 0,
+            "owner": "native_databases",
+            "required_writes_finished": false,
+            "result": "PENDING",
+            "start_elapsed_ms": 2545
+          },
+          {
+            "checkpoint_generation": 1,
+            "dirty": false,
+            "dirty_before": false,
+            "dirty_remaining": false,
+            "durable_generation": 0,
+            "duration_ms": 258,
+            "elapsed_ms": 258,
+            "end_elapsed_ms": 258,
+            "error": "",
+            "essential": true,
+            "generation": 0,
+            "owner": "pvr",
+            "required_writes_finished": true,
+            "result": "ALREADY_DURABLE",
+            "start_elapsed_ms": 0
+          }
+        ],
+        "pending_detail": "",
+        "phase": "CHECKPOINT_FAILED",
+        "pid": 5196,
+        "process_death_confirmed": false,
+        "python_retirement_contract": "python_retirement_batch_v1",
+        "required_jobs": 0,
+        "required_owners": [
+          "native_admission",
+          "python_services",
+          "background_jobs",
+          "playback",
+          "command_center",
+          "compat",
+          "kodi_settings",
+          "profiles",
+          "skin_settings",
+          "addon_settings",
+          "favourites",
+          "peripherals",
+          "audio_policy",
+          "deferred_dialog_state",
+          "xml_files",
+          "native_databases",
+          "pvr"
+        ],
+        "resolved_job_obligations": 0,
+        "safe_to_terminate_utc_ms": 0,
+        "schema": 1,
+        "script_persistence": {
+          "active_writers": 5,
+          "advisory_count": 5,
+          "advisory_retired_writers": 1,
+          "blocker_overflow": false,
+          "blockers": [
+            {
+              "blocking": true,
+              "count": 1,
+              "detail": "executable=/system/bin/sh;argc=5",
+              "reason": "external_or_opaque_writer_requires_explicit_participant",
+              "writer": "script.infinity.unsafeproof.7fa29:default.py",
+              "writer_id": 12
+            },
+            {
+              "blocking": true,
+              "count": 1,
+              "detail": "readonly_child_scope_absent",
+              "reason": "unobserved_native_child_process",
+              "writer": "script.infinity.unsafeproof.7fa29:default.py",
+              "writer_id": 12
+            },
+            {
+              "blocking": false,
+              "count": 2,
+              "detail": "namespace_open_failed",
+              "reason": "protected_write_rejected_before_mutation",
+              "writer": "service.future.persistence.7fa29:service.py",
+              "writer_id": 1
+            },
+            {
+              "blocking": false,
+              "count": 1,
+              "detail": "file_open_for_write_failed",
+              "reason": "protected_write_rejected_before_mutation",
+              "writer": "service.future.persistence.7fa29:service.py",
+              "writer_id": 1
+            },
+            {
+              "blocking": false,
+              "count": 1,
+              "detail": "",
+              "reason": "uncaught_script_failure_before_persistence_receipt",
+              "writer": "service.future.persistence.7fa29:service.py",
+              "writer_id": 1
+            },
+            {
+              "blocking": false,
+              "count": 1,
+              "detail": "namespace_mkdir_failed",
+              "reason": "protected_write_rejected_before_mutation",
+              "writer": "unidentified:infinity_continuity.py",
+              "writer_id": 6
+            },
+            {
+              "blocking": false,
+              "count": 1,
+              "detail": "file_open_for_write_failed",
+              "reason": "protected_write_rejected_before_mutation",
+              "writer": "unidentified:infinity_continuity.py",
+              "writer_id": 6
+            }
+          ],
+          "blocking_count": 2,
+          "blocking_overflow": false,
+          "durable": false,
+          "error": "python_writer:external_or_opaque_writer_requires_explicit_participant",
+          "failed_settled_writers": 0,
+          "failure_detail": "executable=/system/bin/sh;argc=5",
+          "failure_writer": "script.infinity.unsafeproof.7fa29:default.py",
+          "failure_writer_id": 12,
+          "initialization_progress": [
+            {
+              "elapsed_ms": 22882,
+              "interpreter_identity": 136303917914896,
+              "native_tid": 5430,
+              "observed": true,
+              "pid": 5196,
+              "stage": "complete",
+              "stage_elapsed_ms": 18472,
+              "steps": [
+                {
+                  "elapsed_ms": 2419,
+                  "stage": "python.import.stat"
+                },
+                {
+                  "elapsed_ms": 2419,
+                  "stage": "python.import.sys"
+                },
+                {
+                  "elapsed_ms": 2419,
+                  "stage": "python.import.subprocess"
+                },
+                {
+                  "elapsed_ms": 3804,
+                  "stage": "python.import.threading"
+                }
+              ],
+              "steps_overflow": true,
+              "steps_total": 32,
+              "writer": "script.infinity.commandcenter:service.py",
+              "writer_id": 0
+            },
+            {
+              "elapsed_ms": 22857,
+              "interpreter_identity": 136315280280336,
+              "native_tid": 5433,
+              "observed": true,
+              "pid": 5196,
+              "stage": "complete",
+              "stage_elapsed_ms": 18838,
+              "steps": [
+                {
+                  "elapsed_ms": 2273,
+                  "stage": "python.import.stat"
+                },
+                {
+                  "elapsed_ms": 2273,
+                  "stage": "python.import.sys"
+                },
+                {
+                  "elapsed_ms": 2273,
+                  "stage": "python.import.subprocess"
+                },
+                {
+                  "elapsed_ms": 3443,
+                  "stage": "python.import.threading"
+                }
+              ],
+              "steps_overflow": true,
+              "steps_total": 32,
+              "writer": "service.infinity.compat:runtime_service.py",
+              "writer_id": 3
+            },
+            {
+              "elapsed_ms": 20818,
+              "interpreter_identity": 136303847545616,
+              "native_tid": 5471,
+              "observed": true,
+              "pid": 5196,
+              "stage": "complete",
+              "stage_elapsed_ms": 17601,
+              "steps": [
+                {
+                  "elapsed_ms": 2077,
+                  "stage": "python.import.stat"
+                },
+                {
+                  "elapsed_ms": 2077,
+                  "stage": "python.import.sys"
+                },
+                {
+                  "elapsed_ms": 2077,
+                  "stage": "python.import.subprocess"
+                },
+                {
+                  "elapsed_ms": 2859,
+                  "stage": "python.import.threading"
+                }
+              ],
+              "steps_overflow": true,
+              "steps_total": 32,
+              "writer": "unidentified:infinity_continuity.py",
+              "writer_id": 6
+            },
+            {
+              "elapsed_ms": 20764,
+              "interpreter_identity": 136303788903184,
+              "native_tid": 5472,
+              "observed": true,
+              "pid": 5196,
+              "stage": "complete",
+              "stage_elapsed_ms": 17585,
+              "steps": [
+                {
+                  "elapsed_ms": 2064,
+                  "stage": "python.import.stat"
+                },
+                {
+                  "elapsed_ms": 2065,
+                  "stage": "python.import.sys"
+                },
+                {
+                  "elapsed_ms": 2065,
+                  "stage": "python.import.subprocess"
+                },
+                {
+                  "elapsed_ms": 2835,
+                  "stage": "python.import.threading"
+                }
+              ],
+              "steps_overflow": true,
+              "steps_total": 32,
+              "writer": "unidentified:infinity_native_ambient.py",
+              "writer_id": 7
+            },
+            {
+              "elapsed_ms": 4245,
+              "interpreter_identity": 136315931089680,
+              "native_tid": 5713,
+              "observed": true,
+              "pid": 5196,
+              "stage": "complete",
+              "stage_elapsed_ms": 3525,
+              "steps": [
+                {
+                  "elapsed_ms": 451,
+                  "stage": "python.import.stat"
+                },
+                {
+                  "elapsed_ms": 451,
+                  "stage": "python.import.sys"
+                },
+                {
+                  "elapsed_ms": 451,
+                  "stage": "python.import.subprocess"
+                },
+                {
+                  "elapsed_ms": 631,
+                  "stage": "python.import.threading"
+                }
+              ],
+              "steps_overflow": true,
+              "steps_total": 32,
+              "writer": "script.infinity.unsafeproof.7fa29:default.py",
+              "writer_id": 12
+            }
+          ],
+          "initialization_progress_contract": "native_python_initialization_progress_v1",
+          "initialization_progress_reported_writers": 5,
+          "initialization_progress_total_writers": 5,
+          "initialization_progress_truncated": false,
+          "observed_writers": 5,
+          "pending_writers": [
+            "script.infinity.commandcenter:service.py",
+            "service.infinity.compat:runtime_service.py",
+            "unidentified:infinity_continuity.py",
+            "unidentified:infinity_native_ambient.py",
+            "script.infinity.unsafeproof.7fa29:default.py"
+          ],
+          "retired_writers": 8,
+          "sync_finished": false,
+          "sync_started": false,
+          "tracked_paths": 52
+        },
+        "session": "26917cf7-7990-4de9-94e5-106b8f7873ef",
+        "unknown_job_owners": 0,
+        "write_admission_started": true
+      }
+    },
+    "after_processes": [
+      {
+        "pid": 5165,
+        "uid": 10234,
+        "name": "com.projectinfinity.kodi"
+      },
+      {
+        "pid": 5196,
+        "uid": 10234,
+        "name": "com.projectinfinity.kodi:kodi"
+      },
+      {
+        "pid": 5724,
+        "uid": 10234,
+        "name": "sh"
+      },
+      {
+        "pid": 5728,
+        "uid": 10234,
+        "name": "sleep"
+      }
+    ],
+    "protected_records_unchanged": true
+  },
+  "ordinary_411_three_cycle_PASS_preserved": 40317069331,
+  "ordinary_417_Power_three_cycle_PASS_preserved": 40373328781,
+  "physical_Fold": "NOT RUN",
+  "release_accepted": false,
+  "final_lock": false
+}

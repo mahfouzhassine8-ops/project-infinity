@@ -1,0 +1,86 @@
+{
+  "candidate_version": 2103418,
+  "candidate_build": 40383785065,
+  "candidate_source": "90cb67fd7c1c581e1f6d195adf1bb0c95b8fb42b",
+  "apk_sha256": "328757eb858a79f91883c0ba4e2884410baaf0b42730db5d62054679253674e4",
+  "package": "com.projectinfinity.kodi",
+  "abi": "arm64-v8a",
+  "permanent_certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "build_url": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/40383785065",
+  "components": {
+    "command_center": "0.3.5.48",
+    "skin": "1.0.5.245",
+    "ui": "0.1.23",
+    "watched_bridge": "1.0.21",
+    "rails": "0.2.8"
+  },
+  "current_candidate_results": [
+    {
+      "run": 40387258351,
+      "passed": true,
+      "scope": "16nativeimage controls,actual positive protectedClose/reopen,actual unsafe writer veto",
+      "report": "SYNTHETIC-IMAGE-AND-UNSAFE-418-RESULT.json"
+    }
+  ],
+  "pending_selected_runs": [
+    {
+      "run": 40386278214,
+      "scope": "Search50/native-playbackHome30/OSrotation20,actual cached-poster/memory/nativeframes"
+    },
+    {
+      "run": 40387720854,
+      "scope": "THREE visiblePower cycles preserving actual unfinishedTV position,completed/watched/Next source and warm third reopen"
+    }
+  ],
+  "retained_failed_current_attempts": [
+    {
+      "run": 40386278200,
+      "passed": false,
+      "actual_Close_attempted": false,
+      "reason": "Wrong new test required overwriting original navigation source; actual canonical/new playback/source-memory existed",
+      "report": "REAL-TV-DURABILITY-418-PARTIAL-RESULT.json"
+    }
+  ],
+  "historical_417_results": [
+    {
+      "run": 40373328781,
+      "passed": true,
+      "scope": "visiblePower3,16/native/twoJava/zeroUID/readback/preference/SQLite"
+    },
+    {
+      "run": 40373440070,
+      "passed": true,
+      "scope": "original saved actions and nativeFavorites"
+    },
+    {
+      "run": 40376891456,
+      "passed": true,
+      "scope": "original Continue Playing plus actual nativeTV completion/Next selection"
+    },
+    {
+      "run": 40376891135,
+      "passed": true,
+      "scope": "separate image and actual unsafewriter control"
+    }
+  ],
+  "ordinary411_three_cycle_shutdown_PASS_preserved": 40317069331,
+  "measurement_limits": [
+    "Actual failed417Search02 cached QA poster observed1417.773ms; this is historical generated-art surface observation, not current418/cold launch/real remote poster/Fold result",
+    "Host exact-source cache fixture4to2directory lease calls proves duplicate suppression only, not Android/Fold speedup",
+    "Actual418 full loading/memory/frame and required repeated interactions pending",
+    "OSrotations do not establish physical Fold/unfold/touch/player/refresh/PowerSaving/allprovider acceptance"
+  ],
+  "component_sha256s": [
+    "328757eb858a79f91883c0ba4e2884410baaf0b42730db5d62054679253674e4  Infinity-2103418-Search-Cache-Corrective-VERIFICATION.apk",
+    "634614e6230dcb4f3cb905f82467f35d18c5bccaab5a190e350c23ef403641c8  components/script.infinity.commandcenter-0.3.5.48-2103418-QA.zip",
+    "bf11b80ceed4b2f488c374d0767aba0491788cfb1456cc7cbdb32a3ddfea11f4  components/script.infinity.rails-0.2.8-2103418-QA.zip",
+    "b160213db7399f51f55d9dc76e715c7d982bb2fb61700a54c875cfe4d6af114c  components/script.infinity.uirepair-0.1.23-2103418-QA.zip",
+    "e216d775e673cb7737ea3fafcabffcb616a0f454303b85cb49e0926ea63f435a  components/script.infinity.watchedbridge-1.0.21-2103418-QA.zip",
+    "db0a5318deb63209503cb6de7879eea400f22ed44b3eee17eb3ae34776e67809  components/skin.infinity.diggz-1.0.5.245.zip"
+  ],
+  "checkpoint_only": true,
+  "engineering_gates_open": true,
+  "physical_Fold": "NOT RUN",
+  "release_accepted": false,
+  "final_lock": false
+}
