@@ -53,7 +53,7 @@ class NativeIntegrationTests(unittest.TestCase):
         self.assertEqual(set(n for n in before if before[n]!=after[n]),
                          set(integration.OWNED))
         self.assertEqual(len(set(after)-set(before)),4)
-        self.assertEqual(self.receipt['unchanged_existing_sources'],9400)
+        self.assertEqual(self.receipt['unchanged_existing_sources'],9398)
         for path in ('xbmc/guilib/GUIBaseContainer.h','xbmc/input/InputManager.cpp'):
             self.assertEqual((self.native/path).read_bytes(),(self.candidate/path).read_bytes())
 

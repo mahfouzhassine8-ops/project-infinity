@@ -10,7 +10,7 @@ class NativeBuildRequestTests(unittest.TestCase):
     def test_exact_explicit_engine_request_on_existing_branch(self):
         self.assertTrue(request.validate(request.EXPECTED,self.event(),'a'*40,[request.REQUEST]))
         self.assertEqual(request.EXPECTED['source_count'],9411)
-        self.assertEqual(request.EXPECTED['existing_source_changes'],7)
+        self.assertEqual(request.EXPECTED['existing_source_changes'],9)
 
     def test_unrelated_branch_source_packaging_or_weakened_scope_rejected(self):
         for event in (dict(self.event(),ref='refs/heads/main'),dict(self.event(),after='b'*40),dict(self.event(),deleted=True)):
@@ -26,7 +26,7 @@ class NativeBuildRequestTests(unittest.TestCase):
         final=text.split('\n  final-native:\n',1)[1]
         for literal in ('40158384817','40230842944','38132105717','21.4.7075529',
                         'producer.compile_engine()',"reviewed_file_count']==9411",'test_native_integration.py',
-                        'test_identity_audit.py','apksigner" verify','InfinityCommandCenterIdentityV1',
+                        'test_multiimage_image.py','apksigner" verify','InfinityCommandCenterIdentityV1',
                         'INTERNAL-NOT-APK','signed407-native/SIGNED407-NATIVE-SOURCE-MAP.json'):
             self.assertIn(literal,final)
         for forbidden in ('needs:','continue-on-error','secrets.','android_feature_probe.py','shutdown_runtime_probe'):

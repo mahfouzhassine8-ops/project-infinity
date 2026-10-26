@@ -151,6 +151,14 @@
         ],
         "reason": "Required read-only native identity handshake must not poison essential writer proof. Exact running-image/address lookup only; all other audit/writer/close behavior preserved.",
         "status": "Recorded before two-header transform"
+      },
+      {
+        "ownership_ledger": "CORRECTION-2103409-PLAN.json",
+        "files": [
+          "xbmc/guilib/InfinityMultiImagePersistence.h",
+          "xbmc/filesystem/DirectoryFactory.cpp"
+        ],
+        "reason": "Verified no backend terminal image directory return within existing exact Infinity multi-image observation scope; preserve every actual backend and unknown writer veto."
       }
     ],
     "apk_member_edits_admitted": [

@@ -237,7 +237,8 @@ jobs:
           baseline='0e8739d2d0e1be0ab8f127519b526556426fb160'
           allowed={'.github/workflows/infinity-2103407-search-pressure-host-gate.yml',
                    '.github/workflows/infinity-saved-navigation-android.yml',
-                   '.github/workflows/infinity-2103402-native-owner-build.yml'}
+                   '.github/workflows/infinity-2103402-native-owner-build.yml',
+                   '.github/workflows/infinity-shutdown-verification.yml'}
           names=subprocess.check_output(['git','diff','--name-only',baseline,'HEAD'],text=True).splitlines()
           assert all(n.startswith('repairs/infinity-final-closure-2103407/') or n in allowed for n in names),names
           assert not any('cobra' in n.lower() for n in names),names
@@ -300,7 +301,7 @@ jobs:
             --compiled retained-final-compile/native-owner-build \
             --signed407 signed407/release/Infinity-2103407-Search-Single-Flight-SIGNED-QA.apk \
             --target kodi --evidence signed407-native
-      - name: Selected six source plus two identity-audit checks - no application or shutdown suite
+      - name: Selected six integration plus two image directory checks - no application or shutdown suite
         env:
           FINAL_NATIVE_SOURCE_ROOT: ${{ github.workspace }}/kodi
           FINAL_NATIVE_SOURCE_MAP: ${{ github.workspace }}/signed407-native/SIGNED407-NATIVE-SOURCE-MAP.json
@@ -309,8 +310,8 @@ jobs:
           python3 -m unittest discover -s repairs/infinity-final-closure-2103407 \
             -p test_native_integration.py -v 2>&1 | tee NATIVE-SOURCE-CHECKS.txt
           python3 -m unittest discover -s repairs/infinity-final-closure-2103407 \
-            -p test_identity_audit.py -v 2>&1 | tee NATIVE-IDENTITY-AUDIT-CHECKS.txt
-      - name: Apply exactly seven owned source edits and four verifier files
+            -p test_multiimage_image.py -v 2>&1 | tee NATIVE-IMAGE-DIRECTORY-CHECKS.txt
+      - name: Apply exactly nine owned source edits and four verifier files
         run: |
           set -euo pipefail
           python3 repairs/infinity-final-closure-2103407/stage_native_modules.py \
@@ -358,7 +359,7 @@ jobs:
             NATIVE-REQUEST-EVIDENCE.json
             SIGNED407-SIGNATURE.txt
             NATIVE-SOURCE-CHECKS.txt
-            NATIVE-IDENTITY-AUDIT-CHECKS.txt
+            NATIVE-IMAGE-DIRECTORY-CHECKS.txt
             kodi-build/CMakeCache.txt
           retention-days: 90
           if-no-files-found: warn

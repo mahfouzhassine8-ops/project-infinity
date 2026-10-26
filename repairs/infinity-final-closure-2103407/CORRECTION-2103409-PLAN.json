@@ -1,0 +1,23 @@
+{
+  "authorization": "2026-10-26 user final corrective continuation, priorities1-7; original seven-workstream scope retained",
+  "baseline": "2103407",
+  "installed_candidate": "2103408",
+  "next_candidate": 2103409,
+  "native_changes": [
+    "xbmc/guilib/InfinityMultiImagePersistence.h",
+    "xbmc/filesystem/DirectoryFactory.cpp"
+  ],
+  "source_evidence": "Exact retained DirectoryFactory has no image directory handler; CImageFile is a separate file handler and not called by terminal unsupported directory return. All FileDirectoryFactory and VFS probes precede that branch.",
+  "guard": "DirectoryFactoryObservation operates only inside exact Infinity CMultiImageJob/CGUIMultiImage ownership scope; new terminal marker only image protocol after all handlers declined. Null, exception, earlier opaque dispatch and non-Infinity original behavior preserved.",
+  "selected_before_execution": [
+    "test_multiimage_image.py: actual factory source compiled; plain image terminal no-backend outcome; image VFS override; opaque earlier probe; exception; unknown backend; no active observation; nested owner; source tamper/inverse diff. Original manager scopes and callbacks unchanged.",
+    "Existing native source integration checks only when changed integration counts/producer are exercised.",
+    "Android17 independent 3 Close/reopen after matching new ARM64 candidate; unchanged unsafe-writer negative control."
+  ],
+  "not_claimed": [
+    "Android17 runtime PASS",
+    "physical Fold PASS",
+    "memory/frame-pacing gain"
+  ],
+  "performance_and_other_workstreams": "Mandatory; continue after priority1 native build launched."
+}

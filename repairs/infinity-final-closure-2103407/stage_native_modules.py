@@ -13,7 +13,9 @@ CHECKPOINT=ACTIVITY+'InfinityAndroidCheckpoint.cpp'
 CMAKE=ACTIVITY+'CMakeLists.txt'
 CRYPTO='xbmc/interfaces/python/InfinityPythonCryptoContract.h'
 AUDIT='xbmc/interfaces/python/InfinityPythonPersistence.h'
-OWNED=(CONTRACTS,TITLE,POPUP,CHECKPOINT,CMAKE,CRYPTO,AUDIT)
+MULTIIMAGE='xbmc/guilib/InfinityMultiImagePersistence.h'
+DIRECTORY='xbmc/filesystem/DirectoryFactory.cpp'
+OWNED=(CONTRACTS,TITLE,POPUP,CHECKPOINT,CMAKE,CRYPTO,AUDIT,MULTIIMAGE,DIRECTORY)
 
 IDENTITY_LOOKUP=r'''inline bool ApprovedInfinityModuleIdentityLookup(const char* event,PyObject* args) {
  const bool load=std::strcmp(event,"ctypes.dlopen")==0;
@@ -81,6 +83,21 @@ def sha(raw):return hashlib.sha256(raw).hexdigest()
 
 
 def edits(name):
+    if name==MULTIIMAGE:
+        return [('  template<class T> T* Reviewed(T* directory)',
+                 '  // Only an audited terminal return with no directory handler may call\n'
+                 '  // this. Previous opaque dispatch failures remain sticky on the scope.\n'
+                 '  void ReviewedNoBackend() { m_reviewed = true; }\n\n'
+                 '  template<class T> T* Reviewed(T* directory)')]
+    if name==DIRECTORY:
+        return [('  CLog::Log(LOGWARNING, "{} - unsupported protocol({}) in {}", __FUNCTION__, url.GetProtocol(),',
+                 '#if defined(TARGET_ANDROID)\n'
+                 '  // image:// is a file wrapper, not a built-in directory backend.\n'
+                 '  // Reaching this terminal branch proves that every factory declined it.\n'
+                 '  // VFS handlers return above; opaque file probes already veto the scope.\n'
+                 '  if (url.IsProtocol("image")) multiImageFactory.ReviewedNoBackend();\n'
+                 '#endif\n'
+                 '  CLog::Log(LOGWARNING, "{} - unsupported protocol({}) in {}", __FUNCTION__, url.GetProtocol(),')]
     if name==CONTRACTS:
         return [('#include "InfinityAndroidCheckpoint.h"',
                  '#include "InfinityAndroidCheckpoint.h"\n#include "InfinityInstalledModules.h"'),
@@ -179,7 +196,7 @@ def stage(native,source_map,out):
     after={p.relative_to(native).as_posix():sha(p.read_bytes()) for p in native.rglob('*') if p.is_file()}
     if after!=final:raise ValueError('Unexplained native source member difference')
     receipt={'signed407_source_count':9407,'candidate_source_count':9411,'changed_existing_sources':changes,
-             'unchanged_existing_sources':9400,'new_trust_files':sorted(set(final)-set(expected)),
+             'unchanged_existing_sources':9407-len(OWNED),'new_trust_files':sorted(set(final)-set(expected)),
              'original_input_and_Favourites_source_header_identical':True,
              'original_class_layouts_and_virtual_interfaces_changed':False,
              'unowned_sources_changed':False,'complete_ARM64_compile':'NOT RUN',

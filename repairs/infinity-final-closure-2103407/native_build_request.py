@@ -10,9 +10,9 @@ REQUEST='repairs/infinity-final-closure-2103407/NATIVE-BUILD-REQUEST.json'
 AUTHORIZATION=('Existing final takeover: compile complete matching engine for native module/selection/checkpoint '
                'corrections and subsequent internal Android17 integration. No final APK acceptance, user installation '
                'or shutdown verification is implied.')
-EXPECTED=dict(schema=1,request_id='final407-native-modules-01',kind='full-matching-arm64-engine',
-              protected_commit=BASELINE,source_count=9411,existing_source_changes=7,new_source_files=4,
-              targeted_source_checks='test_native_integration.py6 + test_identity_audit.py2',authorization=AUTHORIZATION)
+EXPECTED=dict(schema=1,request_id='final409-image-no-backend-02',kind='full-matching-arm64-engine',
+              protected_commit=BASELINE,source_count=9411,existing_source_changes=9,new_source_files=4,
+              targeted_source_checks='test_native_integration.py6 + test_multiimage_image.py2',authorization=AUTHORIZATION)
 
 
 def validate(request,event,head,changed):
@@ -22,7 +22,8 @@ def validate(request,event,head,changed):
     if request!=EXPECTED or REQUEST not in changed:raise ValueError('A new exact native compile request is required')
     allowed={'.github/workflows/infinity-2103407-search-pressure-host-gate.yml',
              '.github/workflows/infinity-saved-navigation-android.yml',
-             '.github/workflows/infinity-2103402-native-owner-build.yml'}
+             '.github/workflows/infinity-2103402-native-owner-build.yml',
+             '.github/workflows/infinity-shutdown-verification.yml'}
     if not all(n.startswith('repairs/infinity-final-closure-2103407/') or n in allowed for n in changed):
         raise ValueError('Unrelated source in native request')
     return True
