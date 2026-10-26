@@ -1,0 +1,6 @@
+
+## Actualcandidate nativeparticipant PASS; Searchnext
+
+API37run40282705953 atdb430e7 PASS; artifact12633380943 SHA0a46806d189ec13b245c66156434874df4151807e2b16d62220b64eb656ad88e. Samefc1APK/sourcea43/build402773. Actual407->408install-r UID10234/testsentinelretained, JavaCC40appliedtrue, nativeACTIVEpid4744 owner0cfb47ed-66c2-47ef-a30e-2c55e56b2b72 exactrunningengine, API1/manifestb3e53. Honestpartialgateonly, NOTClose/durability/physicalFold/SearchPASS. PriorfixturepathFAILretained.
+
+Nextrequest integrated408-search-all-enter-01 usesexistingoriginalAndroidinputdriver/45seckeyboarddeadline/results/attribution/history/Back/Homeassertions andsameAPK. FixtureSearchreadsactualpersistedJSONbuckets/historywithoutfirstpartywriter/controllerimports; exactinverse/allui.requirepredicatespreserved. Reusesrecordedsetup-only1800hostwait. Updated7candidatefixture/routingchecksPASSlocally aftertestscopemissingSEARCH_CASESNameErrorfixed(no runtimechange). NoAPK/nativebuild/shutdownselected. GetrealAPI37result; diagnosefirstfailedgatewithouttimeoutwaiver.

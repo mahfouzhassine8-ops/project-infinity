@@ -1,0 +1,50 @@
+{
+  "run": 40282705953,
+  "test_source": "db430e7f6f0d6bc6099ec85d8411e8ec032fc5dd",
+  "artifact": 12633380943,
+  "artifact_sha256": "0a46806d189ec13b245c66156434874df4151807e2b16d62220b64eb656ad88e",
+  "apk_sha256": "fc1d726fee8002da7cdccec6dd79a029f6536f0f1c3857791bec94c45d620e50",
+  "result": "PASS",
+  "case": "actual-startup-applied-and-resident-registration",
+  "installed": {
+    "schema": 1,
+    "pid": 4744,
+    "epoch_ms": 1792998021691,
+    "command_center_version": "0.3.5.40",
+    "command_center_applied": true,
+    "compat_version": "built_in",
+    "compat_applied": true
+  },
+  "active": {
+    "addon_version": "0.3.5.40",
+    "module_manifest_sha256": "b3e53a6dcd3c6a061c18296d7aa613738bc273b0ef3b0f2630740e03a925281e",
+    "owner": "0cfb47ed-66c2-47ef-a30e-2c55e56b2b72",
+    "participant_api": 1,
+    "pid": 4744,
+    "required_files": [
+      "boot-history.json",
+      "boot-marker.json",
+      "continue-watching.json",
+      "playback-memory.json",
+      "session.json"
+    ],
+    "schema": 1,
+    "session": null,
+    "status": "ACTIVE"
+  },
+  "installover": {
+    "baseline_sha256": "3616c4e69c976bd63b36170d4dbbd9b190a7ec2eace4bc0c34c3c72f7f9e8578",
+    "candidate_sha256": "fc1d726fee8002da7cdccec6dd79a029f6536f0f1c3857791bec94c45d620e50",
+    "baseline_uid": "10234",
+    "candidate_uid": "10234",
+    "install_method": "adb install -r",
+    "baseline_launched": false,
+    "test_sentinel_preserved": true,
+    "actual_user_database_acceptance": false,
+    "uninstall_or_data_clear": false
+  },
+  "shutdown": "NOT RUN",
+  "physical_Fold": "NOT RUN",
+  "Search": "NOT RUN",
+  "final_release": false
+}

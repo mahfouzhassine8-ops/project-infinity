@@ -13,8 +13,8 @@ import tempfile
 import types
 from zipfile import ZipFile
 
-from android17_reference_observation import (OLD,PROBE_SHA,FIXTURE_SHA,
-    instrument_fixture,restore_fixture,owned_fixture_profile,setup_logging)
+from android17_reference_observation import (OLD,PROBE_SHA,FIXTURE_SHA,DRIVER_SHA,CHECKS_SHA,
+    instrument_fixture,restore_fixture,owned_fixture_profile,setup_logging,preparation_seconds)
 from prepare_signed407_fixture import digest
 from candidate_request import EXPECTED
 
@@ -22,11 +22,24 @@ HOOK_BEFORE='            selected.stage(stage,args,report,device,staging.FUTURE)
 HOOK_AFTER=HOOK_BEFORE+'\n            _candidate_fixture(stage,args,report,device,staging.FUTURE)'
 PROFILE_BEFORE='''        sys.path.insert(0,str(uiroot));from controller_access import load
         plugin=load();hub=plugin.hub;profile=plugin.PROFILE;home=xbmcgui.Window(10000)'''
-PROFILE_AFTER='''        if mode=='final-participant':
+PROFILE_AFTER='''        if mode=='final-participant' or mode in SEARCH_CASES:
             # This case reads actual native participant receipts only. No
             # first-party controller imports or writes in the test invoker.
             profile=Path(xbmcvfs.translatePath(xbmcaddon.Addon('script.infinity.commandcenter').getAddonInfo('profile')))
             home=xbmcgui.Window(10000)
+            if mode in SEARCH_CASES:
+                # Independent read-only observation of persisted records. Do
+                # not acquire the production writer lease from a test invoker.
+                from types import SimpleNamespace
+                def observed_state(actual_profile):
+                    actual=Path(actual_profile)/'continue-watching.json'
+                    if actual.is_symlink():raise RuntimeError('Linked observation refused')
+                    if not actual.exists():return {'schema':2,'items':{}}
+                    if actual.stat().st_size>8*1024*1024:raise RuntimeError('Oversized observation refused')
+                    value=json.loads(actual.read_text(encoding='utf-8'))
+                    if not isinstance(value,dict):raise RuntimeError('Invalid actual persisted state')
+                    return value
+                hub=SimpleNamespace(load_view=observed_state)
         else:
             sys.path.insert(0,str(uiroot));from controller_access import load
             plugin=load();hub=plugin.hub;profile=plugin.PROFILE;home=xbmcgui.Window(10000)'''
@@ -34,18 +47,26 @@ BASELINE_SHA='3616c4e69c976bd63b36170d4dbbd9b190a7ec2eace4bc0c34c3c72f7f9e8578'
 IDS={'script.infinity.commandcenter','script.infinity.uirepair','script.infinity.watchedbridge','script.infinity.rails'}
 RECEIPT_BEFORE='/data/user/0/com.projectinfinity.kodi/files/checkpoint/installed-participants.json'
 RECEIPT_AFTER='/data/user/0/com.projectinfinity.kodi/files/infinity-checkpoint-install.json'
+HISTORY_BEFORE='''            sys.path.insert(0,str(ccroot));from infinity_search import shared_history
+            history=shared_history()'''
+HISTORY_AFTER='''            history=observed_state(profile).get('infinity_search_history_v1',[])'''
 
 
 def fixture(raw):
     observed=instrument_fixture(raw).decode()
     if observed.count(PROFILE_BEFORE)!=1:raise ValueError('Retained participant setup changed')
     if observed.count(RECEIPT_BEFORE)!=1:raise ValueError('Retained receipt read changed')
-    updated=observed.replace(PROFILE_BEFORE,PROFILE_AFTER,1).replace(RECEIPT_BEFORE,RECEIPT_AFTER,1)
-    restored=updated.replace(PROFILE_AFTER,PROFILE_BEFORE,1).replace(RECEIPT_AFTER,RECEIPT_BEFORE,1)
+    if observed.count(HISTORY_BEFORE)!=1:raise ValueError('Retained history observation changed')
+    updated=observed.replace(PROFILE_BEFORE,PROFILE_AFTER,1).replace(RECEIPT_BEFORE,RECEIPT_AFTER,1).replace(HISTORY_BEFORE,HISTORY_AFTER,1)
+    restored=restore_candidate_fixture(updated)
     if restore_fixture(restored).encode()!=raw:
         raise ValueError('An original feature assertion changed')
     compile(updated,'android_selected.py','exec')
     return updated.encode()
+
+
+def restore_candidate_fixture(text):
+    return text.replace(PROFILE_AFTER,PROFILE_BEFORE,1).replace(RECEIPT_AFTER,RECEIPT_BEFORE,1).replace(HISTORY_AFTER,HISTORY_BEFORE,1)
 
 
 def original_sources(apk,out):
@@ -107,8 +128,8 @@ def main():
     with tempfile.TemporaryDirectory(prefix='infinity-test407-source-') as temp:
         sources=Path(temp);original_sources(baseline,sources)
         def adapt(stage,args,report,device,aid):
-            if args.case!='final-participant' or aid!='service.future.persistence.7fa29':
-                raise ValueError('Only the explicitly selected participant case is adapted')
+            if args.case!=EXPECTED['selected_case'] or aid!='service.future.persistence.7fa29':
+                raise ValueError('Only the explicitly selected candidate case is adapted')
             if stage.resolve()!=(args.out.resolve()/'fixture'):raise ValueError('Unexpected fixture root')
             path=stage/aid/'android_selected.py';before=path.read_bytes()
             if hashlib.sha256(before).hexdigest()!=FIXTURE_SHA:raise ValueError('Original selected feature differs')
@@ -138,6 +159,12 @@ def main():
                     setup_logging(probe.device,folder.parent.parent)
             return original_adb(*args,**kwargs)
         probe.device.adb=adb
+        for source,wanted in ((OLD/'universal/android_search_input.py',DRIVER_SHA),
+                              (OLD/'android_runtime_checks.py',CHECKS_SHA)):
+            if hashlib.sha256(source.read_bytes()).hexdigest()!=wanted:
+                raise ValueError('Retained real Android input/assertions changed')
+        original_until=probe.device.until
+        probe.device.until=lambda function,seconds:original_until(function,preparation_seconds(function,seconds))
         original_admit=probe.staging.admit_runtime
         def admit(device,owner,out):
             owned_fixture_profile(device,probe.staging.FUTURE)

@@ -21,9 +21,9 @@ class CandidateVerificationTests(unittest.TestCase):
     def test_exact_source_feature_and_existing_branch_protections_are_required(self):
         head='a'*40;event={'ref':dispatch.BRANCH,'after':head,'repository':{'full_name':'mahfouzhassine8-ops/project-infinity'}}
         result=dispatch.validate(request.EXPECTED,event,head,[dispatch.REQUEST])
-        self.assertEqual(result['SELECTED_CASE'],'final-participant')
+        self.assertEqual(result['SELECTED_CASE'],request.EXPECTED['selected_case'])
         self.assertEqual(result['CANDIDATE_BUILD'],'40277375964')
-        for field,value in [('selected_case','final-search-all-enter'),('candidate_build',40230842944),
+        for field,value in [('selected_case','final-participant'),('candidate_build',40230842944),
             ('candidate_source_commit','b'*40),('candidate_apk_sha256','0'*64),('authorization',''),
             ('request_id','integrated408-participant-installover-01')]:
             with self.assertRaises(ValueError):dispatch.validate(dict(request.EXPECTED,**{field:value}),event,head,[dispatch.REQUEST])
@@ -34,7 +34,7 @@ class CandidateVerificationTests(unittest.TestCase):
     def test_fixture_inverse_preserves_every_original_assertion(self):
         before=(observation.OLD/'tracking/final-eight/android_selected.py').read_bytes()
         after=probe.fixture(before).decode()
-        restored=after.replace(probe.PROFILE_AFTER,probe.PROFILE_BEFORE,1).replace(probe.RECEIPT_AFTER,probe.RECEIPT_BEFORE,1)
+        restored=probe.restore_candidate_fixture(after)
         self.assertEqual(observation.restore_fixture(restored).encode(),before)
         self.assertIn(probe.RECEIPT_AFTER,after);self.assertNotIn(probe.RECEIPT_BEFORE,after)
         tree=lambda raw:[ast.dump(n,include_attributes=False) for n in ast.walk(ast.parse(raw)) if isinstance(n,ast.Call) and
@@ -46,12 +46,30 @@ class CandidateVerificationTests(unittest.TestCase):
 
     def test_participant_setup_only_reads_real_addon_profile_without_controller_imports(self):
         cc=Path('/test-real-addon-profile');calls=[]
-        scope=dict(mode='final-participant',Path=Path,xbmcvfs=SimpleNamespace(translatePath=lambda p:p),
+        scope=dict(mode='final-participant',SEARCH_CASES=(),Path=Path,xbmcvfs=SimpleNamespace(translatePath=lambda p:p),
             xbmcaddon=SimpleNamespace(Addon=lambda aid:(calls.append(aid) or SimpleNamespace(getAddonInfo=lambda key:str(cc)))),
             xbmcgui=SimpleNamespace(Window=lambda ident:('home',ident)))
         exec(compile('if True:\n'+probe.PROFILE_AFTER,'participant-profile','exec'),scope)
         self.assertEqual(scope['profile'],cc);self.assertEqual(calls,['script.infinity.commandcenter'])
         self.assertNotIn('plugin',scope);self.assertNotIn('hub',scope)
+
+    def test_search_observes_actual_records_without_importing_or_granting_firstparty_writers(self):
+        with tempfile.TemporaryDirectory() as temp:
+            cc=Path(temp);state={'schema':2,'items':{'exact-id':{'position':7}},
+                'infinity_search_history_v1':[{'query':'The Matrix','provider':'all'}]}
+            raw=json.dumps(state);(cc/'continue-watching.json').write_text(raw)
+            scope=dict(mode='final-search-all-enter',SEARCH_CASES=('final-search-all-enter',),Path=Path,json=json,
+                xbmcvfs=SimpleNamespace(translatePath=lambda p:p),
+                xbmcaddon=SimpleNamespace(Addon=lambda aid:SimpleNamespace(getAddonInfo=lambda key:str(cc))),
+                xbmcgui=SimpleNamespace(Window=lambda ident:ident))
+            exec(compile('if True:\n'+probe.PROFILE_AFTER,'search-readonly','exec'),scope)
+            self.assertEqual(scope['hub'].load_view(cc),state)
+            exec(compile('if True:\n'+probe.HISTORY_AFTER,'history-readonly','exec'),scope)
+            self.assertEqual(scope['history'],state['infinity_search_history_v1'])
+            self.assertEqual((cc/'continue-watching.json').read_text(),raw)
+            self.assertNotIn('plugin',scope)
+            (cc/'continue-watching.json').unlink();(cc/'continue-watching.json').symlink_to(cc/'other.json')
+            with self.assertRaises(RuntimeError):scope['hub'].load_view(cc)
 
     def fake_device(self,qemu='1',new_uid='10234'):
         class Device:
