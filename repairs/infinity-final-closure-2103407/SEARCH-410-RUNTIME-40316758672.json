@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "run": 40316758672,
+  "test_source": "ebd69ed1260da9ad08b47047ffae2012acf8cac3",
+  "candidate": {
+    "version": 2103410,
+    "build": 40305746524,
+    "source": "925b475f4e4c1c1862817c13167285ebec06894a",
+    "apk_sha256": "7de8ada4774d39c80c3251e21b1750874fbbfdbdfb08b7468dd25151d92a7a34"
+  },
+  "artifact": {
+    "id": 12648131949,
+    "sha256": "b2e4dc5644d1be4f159bd095025120cfad31bbf2df95eaf1e39b2e06093d616c"
+  },
+  "result": "FAIL",
+  "failed_gate": "Original first Search actual Android keyboard readiness, unchanged45seconds; no query typed or submitted.",
+  "completed": {
+    "search": 0,
+    "playback_home": 0,
+    "rotation": 0
+  },
+  "stress_report_created": false,
+  "observations": {
+    "script_invoker_started": "11:55:10.774",
+    "android_text_input_started": "11:55:44.651",
+    "gboard_input_view_created": "11:55:44.726",
+    "input_shown": true,
+    "expected_IME": true,
+    "actual_keyboard_body_ready": false,
+    "query_submitted": false,
+    "engine_pid": 4676,
+    "engine_owner": "c8aed256-9ea3-4afe-8620-de81b71e43c0",
+    "same_pid_live_at_capture": true,
+    "prelaunch_tracking_fixture": "PASS4records exact readback",
+    "command_center": "0.3.5.41 actual applied receipt in admitted engine",
+    "post_failure_snapshot": {
+      "pss_kib": 807327,
+      "rss_kib": 978688,
+      "native_heap_pss_kib": 431700
+    }
+  },
+  "causality_limits": [
+    "Actual Search dialog exists in search-ui.xml; this failure did not reproduce Enter-to-frozen-Home because Enter was never sent.",
+    "Native host main-thread post-failure sample is in Android Looper polling; guest ARM64 execution is translated. One late sample cannot establish or exclude an earlier Graphics/Directory deadlock.",
+    "Gboard cold initialization and concurrent Home rail initialization are visible; the evidence does not isolate a single production root cause.",
+    "No Pure virtual/Scudo/FATAL EXCEPTION/ANR-in-app marker found in this captured logcat. This is not native crash acceptance.",
+    "One memory sample cannot prove growth, improvement or a leak."
+  ],
+  "preserved_passes": [
+    {
+      "run": 40306535463,
+      "apk": 2103409,
+      "case": "Actual Enter/results/identity/history/Home PASS"
+    },
+    {
+      "run": 40308736912,
+      "apk": 2103410,
+      "case": "Initial actual Search feature PASS; overall stress setup FAIL"
+    },
+    {
+      "run": 40312405843,
+      "apk": 2103410,
+      "case": "Initial actual Search feature PASS and nonempty tracking fixture readback PASS; overall repetition dispatch FAIL"
+    }
+  ],
+  "next_scope": "Trace first Search invoker-to-dialog/IME latency using evidence that identifies the blocking operation. Do not extend45seconds, bypass initial gate, auto-correct input, remove preserved assertions or blindly rerun until a concrete correction is justified.",
+  "production_changes_from_this_record": false,
+  "apk_rebuilt": false,
+  "shutdown": "NOT SELECTED by feature continuation; independent",
+  "physical_fold": "NOT RUN",
+  "all_eight_complete": false,
+  "release_accepted": false,
+  "selected_followup": {
+    "run": 40319420418,
+    "test_source": "ed67607679d1fb3db61656365f49e779994b0865",
+    "candidate": 2103411,
+    "preparation": "Fresh emulator system keyboard prepared through Settings Search before Infinity installation; no query or settings writes. Cold-IME failure retained and warm-IME result separately classified.",
+    "Infinity_deadline_seconds": 45,
+    "scope": "Same selected50Search/30generatedplaybackHome/20OSrotations; no shutdown."
+  }
+}
