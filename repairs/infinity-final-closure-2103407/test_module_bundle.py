@@ -82,7 +82,9 @@ class ModuleBundleTests(unittest.TestCase):
         addon=self.root/bundle.CC/'addon.xml';original=addon.read_text()
         addon.write_text(original.replace('library="default.py"','library="unverified.py"',1))
         with self.assertRaisesRegex(ValueError,'Unverified registered entry'):bundle.build(self.root)
-        addon.write_text(original.replace('version="0.3.5.40"','version="0.3.bad.40"',1))
+        version='version="'+compose_firstparty.VERSION+'"'
+        self.assertEqual(original.count(version),1)
+        addon.write_text(original.replace(version,'version="0.3.bad.40"',1))
         with self.assertRaisesRegex(ValueError,'Invalid Command Center'):bundle.build(self.root)
 
     def test_unsafe_symlink_bytecode_and_unowned_addon_are_never_packaged(self):

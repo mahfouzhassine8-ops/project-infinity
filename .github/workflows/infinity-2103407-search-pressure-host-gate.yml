@@ -200,7 +200,10 @@ jobs:
                   subprocess.run([sys.executable,'-m','unittest','discover','-s',str(root),'-p',pattern,'-v'],check=True)
               sys.exit(0)
           elif selected=='module-bundle':
-              for pattern in ('test_module_bundle.py','test_java_module_migration.py','test_result_metadata.py','test_python_ast_compatibility.py'):
+              # Retain the other five exact-source bundle checks from40294522177.
+              sys.path.insert(0,str(root))
+              subprocess.run([sys.executable,'-m','unittest','test_module_bundle.ModuleBundleTests.test_missing_mandatory_code_unregistered_entry_or_unsupported_version_refuse_build','-v'],env=dict(os.environ,PYTHONPATH=str(root.resolve())),check=True)
+              for pattern in ('test_java_module_migration.py','test_result_metadata.py','test_python_ast_compatibility.py'):
                   subprocess.run([sys.executable,'-m','unittest','discover','-s',str(root),'-p',pattern,'-v'],check=True)
               sys.exit(0)
           elif selected=='module-complete':
