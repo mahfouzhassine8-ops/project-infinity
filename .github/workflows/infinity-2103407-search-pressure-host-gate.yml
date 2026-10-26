@@ -176,7 +176,7 @@ jobs:
           assert request['schema']==1 and request['scope'].strip()
           selected=request['selected']
           assert selected in {'search-lifetime','module-trust','installed-modules','module-protocol',
-                              'firstparty-compose','reference-observation','module-bundle','module-complete','internal-apk','android-routing'}
+                              'firstparty-compose','reference-observation','module-bundle','module-complete','internal-apk','candidate-routing','android-routing'}
           with open(os.environ['GITHUB_OUTPUT'],'a') as output:
               output.write('selection='+selected+'\n')
           if selected=='search-lifetime':
@@ -208,6 +208,8 @@ jobs:
           elif selected=='internal-apk':
               print('Packagingonly: retainedsuccessfulfullnative40265974119 andauthenticatedmodule40274997360. Noapplication/shutdownsuite orunit-testrepeat.')
               sys.exit(0)
+          elif selected=='candidate-routing':
+              pattern='test_candidate_verification.py'
           elif selected=='android-routing':
               pattern='test_android17_reference.py'
           else:

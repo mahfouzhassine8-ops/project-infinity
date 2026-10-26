@@ -72,8 +72,19 @@ jobs:
       - uses: actions/setup-python@v5
         with: {python-version: '3.11.7'}
       - name: Bind signed407 metadata to the existing feature probe without APK changes
-        if: github.event_name == 'push' && github.ref == 'refs/heads/work/infinity-final-corrective-from-2103407-20261025'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/work/infinity-final-corrective-from-2103407-20261025' && env.CANDIDATE_REQUEST_PATH == ''
         run: python3 repairs/infinity-final-closure-2103407/prepare_signed407_fixture.py signed
+      - name: Recover protected signed407 for exact install-over feature verification
+        if: env.CANDIDATE_REQUEST_PATH != ''
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 40230842944
+          name: Infinity-2103407-SEARCH-SINGLE-FLIGHT-ORIGINAL-SIGNER-QA
+          github-token: ${{ github.token }}
+          path: baseline407
+      - name: Bind integrated candidate metadata without changing APK or component bytes
+        if: env.CANDIDATE_REQUEST_PATH != ''
+        run: python3 repairs/infinity-final-closure-2103407/prepare_candidate_fixture.py signed baseline407
       - uses: android-actions/setup-android@v4
         with:
           cmdline-tools-version: '15859902'
@@ -94,8 +105,11 @@ jobs:
           r=json.load(open('signed/CANDIDATE.json'))
           assert r['apk_sha256']==digest
           if os.environ['GITHUB_EVENT_NAME']=='push':
-              request=json.load(open(os.environ.get('BASELINE_REQUEST_PATH','repairs/infinity-2103402-final/android17/REQUEST.json')))
-              assert digest==request['baseline_apk_sha256'] and r['source_commit']==request['baseline_commit'], 'Requested locked baseline differs'
+              request=json.load(open(os.environ.get('CANDIDATE_REQUEST_PATH') or os.environ.get('BASELINE_REQUEST_PATH','repairs/infinity-2103402-final/android17/REQUEST.json')))
+              if request.get('kind')=='integrated-candidate':
+                  assert digest==request['candidate_apk_sha256'] and r['source_commit']==request['candidate_source_commit'], 'Requested integrated candidate differs'
+              else:
+                  assert digest==request['baseline_apk_sha256'] and r['source_commit']==request['baseline_commit'], 'Requested locked baseline differs'
           run=json.loads(subprocess.check_output(['gh','api',f"repos/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['CANDIDATE_BUILD']}"],text=True))
           assert run['head_sha']==r['source_commit'] and run['conclusion']=='success', 'Signed build/source mismatch'
           test_commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()

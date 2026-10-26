@@ -21,7 +21,7 @@ def validate(request, event, head, changed):
         raise ValueError('Wrong branch/event/source for explicit Android17 reference request')
     if event.get('repository', {}).get('full_name') != 'mahfouzhassine8-ops/project-infinity':
         raise ValueError('Wrong repository')
-    if request != EXPECTED or REQUEST not in changed:
+    if REQUEST not in changed:
         raise ValueError('An exact new reviewed reference request is required')
     allowed_workflows = {'.github/workflows/infinity-2103407-search-pressure-host-gate.yml',
                          '.github/workflows/infinity-saved-navigation-android.yml',
@@ -29,6 +29,11 @@ def validate(request, event, head, changed):
     if not all(name.startswith('repairs/infinity-final-closure-2103407/') or name in allowed_workflows
                for name in changed):
         raise ValueError('Unrelated source changed with this request')
+    if request.get('kind')=='integrated-candidate':
+        from candidate_request import validate as candidate
+        return candidate(request)
+    if request!=EXPECTED:
+        raise ValueError('An exact reviewed baseline or integrated candidate request is required')
     return dict(CANDIDATE_BUILD='40230842944', SELECTED_CASE='final-search-all-enter',
                 CANDIDATE_ARTIFACT='Infinity-2103407-SEARCH-SINGLE-FLIGHT-ORIGINAL-SIGNER-QA',
                 BASELINE_REQUEST_PATH=REQUEST, AUTHORIZED_SCOPE=AUTHORIZATION,
@@ -46,7 +51,10 @@ def main():
     for commit in (BASELINE, before):
         subprocess.run(['git', 'merge-base', '--is-ancestor', commit, head], check=True)
     changed = subprocess.check_output(['git', 'diff', '--name-only', before, head], text=True).splitlines()
-    output = validate(json.loads(Path(REQUEST).read_text()), event, head, changed)
+    request=json.loads(Path(REQUEST).read_text())
+    if request.get('kind')=='integrated-candidate':
+        subprocess.run(['git','merge-base','--is-ancestor',request['candidate_source_commit'],head],check=True)
+    output = validate(request, event, head, changed)
     with Path(os.environ['GITHUB_ENV']).open('a') as stream:
         for key, value in output.items():
             if '\n' in value or '\r' in value:
