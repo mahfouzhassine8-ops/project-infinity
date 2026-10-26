@@ -1,0 +1,56 @@
+{
+  "recorded_before_implementation": true,
+  "parent_build": 40383785065,
+  "parent_source": "90cb67fd7c1c581e1f6d195adf1bb0c95b8fb42b",
+  "parent_apk_sha256": "328757eb858a79f91883c0ba4e2884410baaf0b42730db5d62054679253674e4",
+  "candidate_version": 2103419,
+  "skin_version": "1.0.5.246",
+  "command_center_version": "0.3.5.48",
+  "source_preimages": {
+    "assets/addons/skin.infinity.diggz/16x9/Home.xml": "7e2651d5174a96774f528358f0f59652779cd9f12a0118af21c9799b05bfc259",
+    "assets/addons/skin.infinity.diggz/20x9/Home.xml": "7e2651d5174a96774f528358f0f59652779cd9f12a0118af21c9799b05bfc259",
+    "assets/addons/skin.infinity.diggz/5x6/Home.xml": "7e2651d5174a96774f528358f0f59652779cd9f12a0118af21c9799b05bfc259",
+    "assets/addons/skin.infinity.diggz/6x5/Home.xml": "7e2651d5174a96774f528358f0f59652779cd9f12a0118af21c9799b05bfc259",
+    "assets/addons/skin.infinity.diggz/Infinity-Protected-Manifest.json": "df2e749b8399c8037ba21ca312ec0526e3118e9b8a19bee20ac531b682a2ae7b",
+    "assets/addons/skin.infinity.diggz/addon.xml": "b3bddff9ca7616f945e2082f632aa311fbd0f63105367772b7f65dd6a929a783",
+    "assets/addons/skin.infinity.diggz/fallback/Home.xml": "7e2651d5174a96774f528358f0f59652779cd9f12a0118af21c9799b05bfc259",
+    "assets/addons/skin.infinity.diggz/infinity-skin.json": "34a407451c5283027334b3195c36dd7f1a6f8f4b4ceb5a3f1dd0c119af718c81",
+    "assets/addons/skin.infinity.diggz/portrait/Home.xml": "7e2651d5174a96774f528358f0f59652779cd9f12a0118af21c9799b05bfc259",
+    "assets/addons/skin.infinity.diggz/responsive/base/Home.xml": "c99a526dd797f10fa6a19b19f11df0afed174b4eac8b06f052dfc7b1e1aa4012",
+    "assets/addons/skin.infinity.diggz/responsive/landscape/Home.xml": "c99a526dd797f10fa6a19b19f11df0afed174b4eac8b06f052dfc7b1e1aa4012",
+    "assets/addons/skin.infinity.diggz/responsive/portrait/Home.xml": "c99a526dd797f10fa6a19b19f11df0afed174b4eac8b06f052dfc7b1e1aa4012",
+    "assets/addons/skin.infinity.diggz/responsive/square/Home.xml": "c99a526dd797f10fa6a19b19f11df0afed174b4eac8b06f052dfc7b1e1aa4012",
+    "assets/addons/skin.infinity.diggz/responsive/tall/Home.xml": "c99a526dd797f10fa6a19b19f11df0afed174b4eac8b06f052dfc7b1e1aa4012",
+    "assets/addons/skin.infinity.diggz/responsive/ultrawide/Home.xml": "c99a526dd797f10fa6a19b19f11df0afed174b4eac8b06f052dfc7b1e1aa4012",
+    "assets/addons/skin.infinity.diggz/responsive/wide/Home.xml": "c99a526dd797f10fa6a19b19f11df0afed174b4eac8b06f052dfc7b1e1aa4012",
+    "assets/addons/skin.infinity.diggz/unified/Home.xml": "8ef54cd2b918793547494da790b773270c3e6f5ef7735cb85d84659377ab06f2"
+  },
+  "evidence": [
+    "Actual418 Search ninth opening45secFAIL40386278214: Home playlist invoker84 begins19:53:48.813, completes19:54:12.976; concurrently default85 begins19:53:49.291 and reaches Addon instantiation19:54:12.708. Playlistprovider actual unavailable. This proves redundant24.163sec interpreter job, not that removing it guarantees Search50pass.",
+    "6/8 successful-content interactions; Umbrella native20sec deadline failed atcycles5and7. PSS906321to1135189KiB at5. Do not waive or relabel these failures."
+  ],
+  "correction": [
+    "All14 Home onloads: condition original playlist RunScript on original System.HasAddon(plugin.video.playlistbrowser). Absent provider publishes original clear TV/Sports paths, addons browse fallback, unavailable status/version, Ready v1 LAST using native properties; clears stale Request before writes. Original helper and verified installed-provider behavior remain exact.",
+    "Skin246 metadata/protected942pins rebound only exact17approved files, no controls/layout/touch/player/Power/Search/CC/native/DEX/chooser/Cobra delta.",
+    "Original-key ARM64 install-over419 and exact5component archives. Retain418and411passes, no user-data or policy changes."
+  ],
+  "selected_host_tests": [
+    "Exact full-source preimage and inverse/all942protectedpins for all14profiles",
+    "Native absent result equivalence, stale-request invalidation, Readylast; installed originalscript branch retained",
+    "Packageversion and exact18memberdelta/unowned/Cobra/native/DEX rejection; actual signing/components checks"
+  ],
+  "selected_runtime_tests": [
+    "After genuine signed419 build: actual original Search then50additional realSearch interactions with unchanged45/90/native20sec deadlines; provider contentfailures separate",
+    "Independently still-required30generated-videoHome/20OSrotation with exact usable saved card/poster/protectedrecords and memory/frame samples",
+    "Actual visible Power3 exact16owner/native/Java/process/preference/readback contract on integrated419; no conditional dependency on features"
+  ],
+  "not_claimed": [
+    "No measured speedup until realAPI37 results",
+    "No physicalFold/no120HzFPS/no1-2sec coldstartup/no leakelimination",
+    "No releaseacceptance/no final lock"
+  ],
+  "unchanged_helper_sha256": {
+    "resources/lib/infinity_playlist_routes.py": "848fa1e54d00dd9dd5595d5699fd0964351f5981339a3ed40c0aae419ac3996d",
+    "resources/lib/infinity_playlist_registry.py": "956f2a2c5b1ba7f9888680e7e31547c3166cdcbb8cb937cfb82a18aa242ccddd"
+  }
+}
