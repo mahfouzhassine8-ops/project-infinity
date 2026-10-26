@@ -1,0 +1,162 @@
+{
+  "run": 40373440070,
+  "test_source": "343859e3e15779d9778eb44d900ab36fe9563f46",
+  "candidate_source": "d10fffd80182c796955534ffdecc5ccc288da99b",
+  "apk_sha256": "4428332453714adc1aa652ee5db76ff2e79f705171dab8e020d7915631e00d83",
+  "artifact": 12674296875,
+  "artifact_sha256": "0c33d943b56c6364eb579d0428a54a56b1c91e22f4e52f736aec78d0188189b2",
+  "passed": true,
+  "actual_result": {
+    "passed": true,
+    "pid": 4501,
+    "selected_mode": "final-actions",
+    "selected_features": [
+      "final-actions"
+    ],
+    "cases": [
+      {
+        "case": "Add to Watchlist",
+        "status": "PASS",
+        "popup_seconds": 1.2529417660000064
+      },
+      {
+        "case": "Remove from Watchlist",
+        "status": "PASS",
+        "popup_seconds": 3.104794403999989
+      },
+      {
+        "case": "Add to Collection",
+        "status": "PASS",
+        "popup_seconds": 2.897360418000005
+      },
+      {
+        "case": "Remove from Collection",
+        "status": "PASS",
+        "popup_seconds": 3.1055979629999797
+      },
+      {
+        "case": "Mark Watched",
+        "status": "PASS",
+        "popup_seconds": 3.7852960090000067
+      },
+      {
+        "case": "Mark Unwatched",
+        "status": "PASS",
+        "popup_seconds": 3.252135098999986
+      },
+      {
+        "case": "actual-favourites-toggle",
+        "status": "PASS"
+      }
+    ],
+    "shutdown": "NOT RUN",
+    "physical_fold_verified": false,
+    "final_lock": false,
+    "popup_readiness_observation": {
+      "dialog": 13000,
+      "count": 8,
+      "popup": "1",
+      "focus": true,
+      "actual_row_labels": [
+        "Play",
+        "Mark Watched",
+        "Add to Watchlist",
+        "Remove from Favorites",
+        "Add to Collection",
+        "Add to Custom List",
+        "Save for Later",
+        "Information",
+        ""
+      ],
+      "deadline_monotonic": 244.557774299
+    },
+    "raw_native_favourites": [
+      {
+        "favourites": null,
+        "limits": {
+          "end": 0,
+          "start": 0,
+          "total": 0
+        }
+      },
+      {
+        "favourites": null,
+        "limits": {
+          "end": 0,
+          "start": 0,
+          "total": 0
+        }
+      },
+      {
+        "favourites": [
+          {
+            "path": "special://profile/infinity-final-qa.mp4",
+            "title": "The Matrix",
+            "type": "media"
+          }
+        ],
+        "limits": {
+          "end": 1,
+          "start": 0,
+          "total": 1
+        }
+      },
+      {
+        "favourites": [
+          {
+            "path": "special://profile/infinity-final-qa.mp4",
+            "title": "The Matrix",
+            "type": "media"
+          }
+        ],
+        "limits": {
+          "end": 1,
+          "start": 0,
+          "total": 1
+        }
+      },
+      {
+        "favourites": [
+          {
+            "path": "special://profile/infinity-final-qa.mp4",
+            "title": "The Matrix",
+            "type": "media"
+          }
+        ],
+        "limits": {
+          "end": 1,
+          "start": 0,
+          "total": 1
+        }
+      },
+      {
+        "favourites": [
+          {
+            "path": "special://profile/infinity-final-qa.mp4",
+            "title": "The Matrix",
+            "type": "media"
+          }
+        ],
+        "limits": {
+          "end": 1,
+          "start": 0,
+          "total": 1
+        }
+      },
+      {
+        "favourites": null,
+        "limits": {
+          "end": 0,
+          "start": 0,
+          "total": 0
+        }
+      }
+    ],
+    "physical_gestures": "NOT RUN: first/second tap, hold, selection/scroll require separate Fold acceptance"
+  },
+  "shutdown": "NOT RUN",
+  "physical_gestures": "NOT RUN",
+  "physical_Fold": "NOT RUN",
+  "release_accepted": false,
+  "final_lock": false
+}

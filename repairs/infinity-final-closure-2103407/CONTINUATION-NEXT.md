@@ -90,3 +90,8 @@ Nextrequest integrated408-search-all-enter-01 usesexistingoriginalAndroidinputdr
 Existingindependentshutdownworkflow hasnewseparatepushjobforSHUTDOWN-REQUEST onlyonfinalbranch; originalmanualjobunchanged. No needs/workflow-run/featureorpackagingdependency. FourthspecificworkflowadmittedinSCOPE andcurrenthost/referenceguards; existingnative-buildinline3workflowguardleftunchangeduntilafutureactualnativebuildrequiresreview (no newnativebuildnow). SHUTDOWN-VERIFICATION-PLAN recordedbeforeedits. 6newrouting/receipt/owner/session/generation/16essential/twoJava-seals/unknownsharedwriter/readbacknegativechecks and7updatedcandidatefixturechecksPASSlocal; YAMLparsed. TheseareNOTdevicePASS.
 
 android17_shutdown_probe reusesactualpassedparticipantsetupusingexistingfeaturetransport(stillrejectsClose) thenindependentoriginalessentialtransport3PowerClose/reopencycles. No versioncheck/compatproviderreplacement, deadlineextension, sourceorAPKchange. Actualdefaultlegacycompat/versioncheckmaybeblockClose: retainfailureanddiagnoseonlyactualevidence. Stopfirstfailure. NativeCOMPLETE/Java/PIDprocessdeath/readbackDBandprotectedrecordsallrequired. PhysicalFoldNOTRUN. Pushrequestthengetactualresult, preservefc1APK. Search40283833043 stillrunningatthischeckpoint, sourceefc2; host7CI40283833101PASS. NoautomaticSearchrepeat.
+
+
+## Latest signed417 pickup — 2026-10-26
+
+Read CONTINUATION-2103417-PICKUP.md first for the exact current signed APK, independent real passes, retained failures, running Search/endurance40379813877 and TV-durability40380264449. Continue those existing runs; do not rebuild or repeat completed tests without an actual correction-specific cause. All seven original streams and physical Fold final gate remain mandatory.

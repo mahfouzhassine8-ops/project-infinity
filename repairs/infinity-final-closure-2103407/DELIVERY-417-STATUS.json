@@ -1,0 +1,103 @@
+{
+  "candidate_version": 2103417,
+  "candidate_build": 40371026995,
+  "candidate_source": "d10fffd80182c796955534ffdecc5ccc288da99b",
+  "apk_sha256": "4428332453714adc1aa652ee5db76ff2e79f705171dab8e020d7915631e00d83",
+  "permanent_certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "package": "com.projectinfinity.kodi",
+  "abi": "arm64-v8a",
+  "build_url": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/40371026995",
+  "components": {
+    "command_center": "0.3.5.47",
+    "skin": "1.0.5.245",
+    "ui": "0.1.23",
+    "watched_bridge": "1.0.21",
+    "rails": "0.2.8"
+  },
+  "actual_engineering_results": [
+    {
+      "report": "REAL-POWER-UI-417-RESULT.json",
+      "run": 40373328781,
+      "passed": true,
+      "url": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/40373328781"
+    },
+    {
+      "report": "ACTIONS-417-RESULT.json",
+      "run": 40373440070,
+      "passed": true,
+      "url": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/40373440070"
+    },
+    {
+      "report": "CONTINUE-417-RESULT.json",
+      "run": 40376891456,
+      "passed": true,
+      "url": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/40376891456"
+    },
+    {
+      "report": "SYNTHETIC-IMAGE-AND-UNSAFE-417-RESULT.json",
+      "run": 40376891135,
+      "passed": true,
+      "url": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/40376891135"
+    }
+  ],
+  "pending_selected_runs": [
+    {
+      "run": 40379813877,
+      "selected": "50Search terminal interactions with provider content outcomes reported separately,30actual playbackHome,20OSrotation,actual poster/memory/frame samples"
+    },
+    {
+      "run": 40380264449,
+      "selected": "Actual nativeTV through one visible Power Close/reopen; AV-clock readiness within original20sec before test seek"
+    }
+  ],
+  "physical_Fold": "NOT RUN",
+  "release_accepted": false,
+  "final_lock": false,
+  "measured_cached_Home_tab_cards_ms": {
+    "movie": 632.6710049999917,
+    "tv": 248.35708000000523
+  },
+  "first_verified_native_Next_directory_ms": 7906.287455999973,
+  "measurement_limits": [
+    "Cached Home/tab selection is not cold application launch",
+    "Native Next directory includes cold plugin interpreter initialization",
+    "Generated180sec clips and syntheticmetadata exercise real native playback/storage; no actual movie playback claim",
+    "x86_64 Android17/API37 emulator uses ARM64 native bridge; not a Samsung Galaxy Fold",
+    "Physical fold/unfold, Samsung frame pacing, refresh controls, real installed provider/account playback and long-term memory acceptance remain open"
+  ],
+  "preserved_evidence": {
+    "ordinary411_three_cycle_shutdown_PASS": 40317069331,
+    "ordinary415_three_cycle_shutdown_PASS": 40360243111,
+    "ordinary417_three_cycle_shutdown_PASS": 40373328781,
+    "earlier_failures_retained": true
+  },
+  "rollback_protection": "Install-over only; UID/profile retained in freshAPI37 migration test; authenticated known-generation code backup/failclosed unknown/newer code, no reset/uninstall/downgrade. No new recoveryAPK claimed.",
+  "component_sha256s": [
+    "4428332453714adc1aa652ee5db76ff2e79f705171dab8e020d7915631e00d83  Infinity-2103417-Continue-Watching-Corrective-VERIFICATION.apk",
+    "cfbfe774173697bc4812a189f0dd6598e0ea6945dcd9b9ac11755e3565a6a372  components/script.infinity.commandcenter-0.3.5.47-2103417-QA.zip",
+    "bf11b80ceed4b2f488c374d0767aba0491788cfb1456cc7cbdb32a3ddfea11f4  components/script.infinity.rails-0.2.8-2103417-QA.zip",
+    "b160213db7399f51f55d9dc76e715c7d982bb2fb61700a54c875cfe4d6af114c  components/script.infinity.uirepair-0.1.23-2103417-QA.zip",
+    "e216d775e673cb7737ea3fafcabffcb616a0f454303b85cb49e0926ea63f435a  components/script.infinity.watchedbridge-1.0.21-2103417-QA.zip",
+    "db0a5318deb63209503cb6de7879eea400f22ed44b3eee17eb3ae34776e67809  components/skin.infinity.diggz-1.0.5.245.zip"
+  ],
+  "retained_failed_attempts": [
+    {
+      "run": 40375195635,
+      "report": "SEARCH-417-PARTIAL-RESULT.json",
+      "passed": false,
+      "completed": {
+        "search": 7,
+        "playback_home": 0,
+        "rotation": 0
+      }
+    },
+    {
+      "run": 40378085987,
+      "report": "REAL-TV-DURABILITY-417-PARTIAL-RESULT.json",
+      "passed": false,
+      "actual_Close_attempted": false
+    }
+  ],
+  "checkpoint_only": true,
+  "engineering_gates_open": true
+}

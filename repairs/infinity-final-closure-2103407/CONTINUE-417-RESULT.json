@@ -1,0 +1,272 @@
+{
+  "run": 40376891456,
+  "test_source": "0bc51b9b07a9514eb3f78c3ea01fa0677e7d71ed",
+  "candidate_source": "d10fffd80182c796955534ffdecc5ccc288da99b",
+  "apk_sha256": "4428332453714adc1aa652ee5db76ff2e79f705171dab8e020d7915631e00d83",
+  "artifact": 12675867010,
+  "artifact_sha256": "0ea958c85b9f29271c2b7621069286abe4300792091a5eab29b4d36f088b39e4",
+  "passed": true,
+  "actual_result": {
+    "passed": true,
+    "pid": 4782,
+    "selected_mode": "final-continue",
+    "selected_features": [
+      "final-continue"
+    ],
+    "cases": [
+      {
+        "case": "actual-home-one-card-movie",
+        "status": "PASS"
+      },
+      {
+        "case": "actual-home-one-card-tv",
+        "status": "PASS"
+      },
+      {
+        "case": "remove-visible-card-retains-all-records",
+        "status": "PASS"
+      },
+      {
+        "case": "actual-new-playback-and-short-rewind-update-original-progress-key",
+        "status": "PASS"
+      },
+      {
+        "case": "actual-native-TV-stop-progress-restoration",
+        "status": "PASS",
+        "position": 75.331
+      },
+      {
+        "case": "actual-native-TV-completion-next-restoration",
+        "status": "PASS",
+        "elapsed_ms": 7906.287455999973,
+        "source": "plugin://script.infinity.commandcenter/?action=play-local-next&key=a1171072d95232f7f1c64c48a67ebd62d21d8c8160b848425b51347f1e84a5b2",
+        "synthetic_metadata_and_generated_clip": true
+      },
+      {
+        "case": "actual-native-Next-selection-plays-correct-episode",
+        "status": "PASS",
+        "observed": {
+          "episode": 1,
+          "file": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/infinity-cw-qa/QA.S02E01.mp4",
+          "id": 2,
+          "label": "QA S02E01",
+          "season": 2,
+          "showtitle": "Breaking Bad",
+          "type": "episode",
+          "uniqueid": {
+            "tmdb": "900000020001"
+          }
+        }
+      }
+    ],
+    "shutdown": "NOT RUN",
+    "physical_fold_verified": false,
+    "final_lock": false,
+    "last_continue_card_observation": {
+      "media": "tv",
+      "observed": {
+        "Container(8831).ListItem.Episode": "2",
+        "Container(8831).ListItem.Label": "Breaking Bad S01E02",
+        "Container(8831).ListItem.PercentPlayed": "33",
+        "Container(8831).ListItem.Property(Infinity.ResumeHub.Watched)": "false",
+        "Container(8831).ListItem.Property(Infinity.Selection.Snapshot)": "{\"bucket\":\"continue\",\"identity\":{\"episode\":2,\"ids\":{\"tmdb\":\"1396\"},\"kind\":\"episode\",\"schema\":1,\"scope\":\"show_episode\",\"season\":1},\"key\":\"dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd\",\"list\":\"\",\"owner\":\"script.infinity.commandcenter\",\"schema\":1,\"source\":\"special://profile/infinity-final-qa.mp4\",\"stable_source\":\"special://profile/infinity-final-qa.mp4\",\"token\":\"5fc569450d5cbb700333ff0a87eb80ccee56b7cb4f02e01999e97a4073b2fd96\"}",
+        "Container(8831).ListItem.Season": "1"
+      },
+      "native_directory_resume": {
+        "position": 60.0,
+        "total": 180.0
+      }
+    },
+    "usable_resume_cards": [
+      {
+        "media": "movie",
+        "key": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "observed": {
+          "Container(8830).ListItem.Episode": "",
+          "Container(8830).ListItem.Label": "The Matrix",
+          "Container(8830).ListItem.PercentPlayed": "33",
+          "Container(8830).ListItem.Property(Infinity.ResumeHub.Watched)": "false",
+          "Container(8830).ListItem.Property(Infinity.Selection.Snapshot)": "{\"bucket\":\"continue\",\"identity\":{\"ids\":{\"imdb\":\"tt0133093\"},\"kind\":\"movie\",\"schema\":1,\"scope\":\"movie\"},\"key\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"list\":\"\",\"owner\":\"script.infinity.commandcenter\",\"schema\":1,\"source\":\"special://profile/infinity-final-qa.mp4\",\"stable_source\":\"special://profile/infinity-final-qa.mp4\",\"token\":\"52f818e464fdd76b57048d55623ec9c816cafa102a29f74dbc6725a033f226ae\"}",
+          "Container(8830).ListItem.Season": ""
+        },
+        "native_directory_resume": {
+          "position": 60.0,
+          "total": 180.0
+        },
+        "home_tab_to_correct_usable_card_ms": 632.6710049999917,
+        "timing_scope": "Test Home activation and tab selection to real exact card; not app launch",
+        "synthetic_metadata_and_generated_clip": true
+      },
+      {
+        "media": "tv",
+        "key": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "observed": {
+          "Container(8831).ListItem.Episode": "2",
+          "Container(8831).ListItem.Label": "Breaking Bad S01E02",
+          "Container(8831).ListItem.PercentPlayed": "33",
+          "Container(8831).ListItem.Property(Infinity.ResumeHub.Watched)": "false",
+          "Container(8831).ListItem.Property(Infinity.Selection.Snapshot)": "{\"bucket\":\"continue\",\"identity\":{\"episode\":2,\"ids\":{\"tmdb\":\"1396\"},\"kind\":\"episode\",\"schema\":1,\"scope\":\"show_episode\",\"season\":1},\"key\":\"dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd\",\"list\":\"\",\"owner\":\"script.infinity.commandcenter\",\"schema\":1,\"source\":\"special://profile/infinity-final-qa.mp4\",\"stable_source\":\"special://profile/infinity-final-qa.mp4\",\"token\":\"5fc569450d5cbb700333ff0a87eb80ccee56b7cb4f02e01999e97a4073b2fd96\"}",
+          "Container(8831).ListItem.Season": "1"
+        },
+        "native_directory_resume": {
+          "position": 60.0,
+          "total": 180.0
+        },
+        "home_tab_to_correct_usable_card_ms": 248.35708000000523,
+        "timing_scope": "Test Home activation and tab selection to real exact card; not app launch",
+        "synthetic_metadata_and_generated_clip": true
+      }
+    ],
+    "popup_readiness_observation": {
+      "dialog": 13000,
+      "count": 2,
+      "popup": "1",
+      "focus": true,
+      "actual_row_labels": [
+        "Resume",
+        "Mark Watched",
+        "Add to Watchlist"
+      ],
+      "deadline_monotonic": 302.666343293
+    },
+    "native_tv_first_playback": {
+      "episode": 2,
+      "file": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/infinity-cw-qa/QA.S01E02.mp4",
+      "id": 1,
+      "label": "QA S01E02",
+      "season": 1,
+      "showtitle": "Breaking Bad",
+      "type": "episode",
+      "uniqueid": {
+        "tmdb": "900000000002"
+      }
+    },
+    "native_tv_in_progress_rows": [
+      {
+        "episode": 2,
+        "file": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/infinity-cw-qa/QA.S01E02.mp4",
+        "filetype": "file",
+        "label": "Breaking Bad S01E02",
+        "resume": {
+          "position": 75.331,
+          "total": 180.0
+        },
+        "season": 1,
+        "type": "episode"
+      }
+    ],
+    "native_tv_completed_record": {
+      "completed_occurrence": "b742e873485e4fb28faa78447d060163",
+      "dbid": 1,
+      "duration": 180.0,
+      "episode": 2,
+      "fanart": "VideoPlayer.Fanart",
+      "identity": {
+        "episode": 2,
+        "ids": {
+          "tmdb": "1396"
+        },
+        "kind": "episode",
+        "schema": 1,
+        "scope": "show_episode",
+        "season": 1
+      },
+      "imdb": "",
+      "information": {
+        "duration": 180,
+        "plot": "Full synthetic episode synopsis",
+        "premiered": "2008-01-20",
+        "year": 2008
+      },
+      "key": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "label": "Breaking Bad \u2022 S01E02",
+      "media": "tv",
+      "percentage": 100.0,
+      "play_count": 1,
+      "playback_occurrence": "b742e873485e4fb28faa78447d060163",
+      "position": 180.0,
+      "poster": "image://video@%2fstorage%2femulated%2f0%2fAndroid%2fdata%2fcom.projectinfinity.kodi%2ffiles%2f.kodi%2fuserdata%2finfinity-cw-qa%2fQA.S01E02.mp4/",
+      "resume_revision": 1793039280151,
+      "season": 1,
+      "show_ids_verified": true,
+      "show_tmdb": "1396",
+      "show_tvdb": "",
+      "showtitle": "Breaking Bad",
+      "source": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/infinity-cw-qa/QA.S01E02.mp4",
+      "stable_source": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/infinity-cw-qa/QA.S01E02.mp4",
+      "title": "QA S01E02",
+      "tmdb": "900000000002",
+      "tvdb": "",
+      "updated": 1793039292,
+      "verified_next": {
+        "after": [
+          1,
+          2
+        ],
+        "episode": 1,
+        "library": {
+          "episode": 1,
+          "episodeid": 2,
+          "file": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/infinity-cw-qa/QA.S02E01.mp4",
+          "season": 2,
+          "show_tmdb": "1396",
+          "tvshowid": 1
+        },
+        "season": 2,
+        "show_tmdb": "1396",
+        "verified": true
+      },
+      "watched": true,
+      "watched_at": 1793039292
+    },
+    "native_tv_source_memory": {
+      "before": {
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": {
+          "failures": 0,
+          "route": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/infinity-final-qa.mp4",
+          "updated": 1793039259
+        }
+      },
+      "after": {
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": {
+          "failures": 0,
+          "route": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/infinity-final-qa.mp4",
+          "updated": 1793039259
+        },
+        "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd": {
+          "failures": 0,
+          "route": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/infinity-cw-qa/QA.S01E02.mp4",
+          "updated": 1793039275
+        }
+      }
+    },
+    "native_tv_successor_rows": [
+      {
+        "episode": 1,
+        "file": "plugin://script.infinity.commandcenter/?action=play-local-next&key=a1171072d95232f7f1c64c48a67ebd62d21d8c8160b848425b51347f1e84a5b2",
+        "filetype": "file",
+        "label": "Breaking Bad \u2022 S02E01",
+        "resume": {
+          "position": 0.0,
+          "total": 0.0
+        },
+        "season": 2,
+        "showtitle": "Breaking Bad",
+        "type": "episode",
+        "uniqueid": {
+          "tmdb": "1396"
+        }
+      }
+    ]
+  },
+  "timing_scope": "Actual cached Home/tab cards and native Next directory; NOT app launch, remote poster or physical Fold",
+  "first_attempt": {
+    "run": 40373328890,
+    "outcome": "PARTIAL FAIL",
+    "reason": "Test incorrectly forbade successful exact played-title source remembrance; all runtime evidence retained, original assertions unchanged, unrelated source mutation still fails"
+  },
+  "shutdown": "NOT RUN",
+  "physical_Fold": "NOT RUN",
+  "release_accepted": false,
+  "final_lock": false
+}

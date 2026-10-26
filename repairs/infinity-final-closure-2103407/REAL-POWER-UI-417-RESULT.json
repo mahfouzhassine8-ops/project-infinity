@@ -1,0 +1,389 @@
+{
+  "run": 40373328781,
+  "test_source": "fbb4a538c7e9c35b86c36680b7e196e32a1122ae",
+  "candidate_source": "d10fffd80182c796955534ffdecc5ccc288da99b",
+  "apk_sha256": "4428332453714adc1aa652ee5db76ff2e79f705171dab8e020d7915631e00d83",
+  "artifact": 12673937374,
+  "artifact_sha256": "e5dc08d4992105d040031e3d1d5b681139ee3220616e0857059d11bfe5eac6f3",
+  "passed": true,
+  "cycles_completed": 3,
+  "cycles": [
+    {
+      "cycle": 0,
+      "passed": true,
+      "actual_Power_route": {
+        "skin_member": "assets/addons/skin.infinity.diggz/unified/DialogButtonMenu.xml",
+        "skin_sha256": "149b614b9dd96094e64c7b7a837fbc911bfceda40e4ecef84716f7a3a6220d78",
+        "control": 200,
+        "action": "com.projectinfinity.kodi.action.CLOSE_KODI",
+        "activity": "com.projectinfinity.kodi.InfinityPowerControlActivity",
+        "exact_builtin": "StartAndroidActivity(com.projectinfinity.kodi,com.projectinfinity.kodi.action.CLOSE_KODI,,,,,,,com.projectinfinity.kodi.InfinityPowerControlActivity)",
+        "backend_matches": true,
+        "observed_labels": {
+          "Control.GetLabel(200)": "CLOSE KODI",
+          "System.CurrentControl": "CLOSE KODI",
+          "System.CurrentControlID": "200"
+        },
+        "observed_flags": {
+          "Control.IsEnabled(200)": true,
+          "Control.IsVisible(200)": true,
+          "Window.IsActive(shutdownmenu)": true
+        },
+        "input": "Android KEYCODE_DPAD_CENTER",
+        "input_result": ""
+      },
+      "UI_and_Close_seconds": 5.603770078999958,
+      "native_safe_ms": 2585,
+      "separate_results": {
+        "essential_first_durable": true,
+        "kodi_engine_terminated": true,
+        "android_coordinator_completed": true,
+        "remaining_UID_processes": [],
+        "recent_apps_used_for_process_proof": false
+      },
+      "essential_owners": [
+        "native_admission",
+        "background_jobs",
+        "playback",
+        "command_center",
+        "compat",
+        "kodi_settings",
+        "profiles",
+        "skin_settings",
+        "addon_settings",
+        "favourites",
+        "peripherals",
+        "audio_policy",
+        "deferred_dialog_state",
+        "xml_files",
+        "native_databases",
+        "pvr"
+      ],
+      "engine_and_Java_proof": {
+        "checkpoint_saved": true,
+        "native_generation": 1,
+        "engine_Java_seal": "99ea39b2-f7a2-4105-88af-a57a40d482f0",
+        "coordinator_Java_seal": "87638c26-7fc4-456b-b0c0-ee69063556e4",
+        "process_death_confirmed": true
+      },
+      "final_UID_processes": [],
+      "remembered_preference_unchanged": true,
+      "launch_preference": {
+        "present": true,
+        "sha256": "9f6ba54226d61b6cd02796a9d61d4831dc2154875bd22d5bcafb7da78b9ace0a",
+        "remembered": "infinity"
+      },
+      "database_integrity": [
+        "Addons33.db",
+        "TV46.db",
+        "Textures13.db",
+        "ViewModes6.db",
+        "MyMusic83.db",
+        "Epg16.db",
+        "MyVideos131.db"
+      ],
+      "new_reopened_owner": {
+        "schema": 2,
+        "pid": 5276,
+        "owner": "b4c63423-bbb7-4666-9d38-75bd1e7f3bde",
+        "launch": "8dfffb30-dc14-4ad6-bdb7-9164ed98daaf",
+        "began": 1793037766985,
+        "close_at": 0,
+        "phase": "RUNNING",
+        "live": true,
+        "error": ""
+      },
+      "recents": "Task UI only; independently verified PIDs determine process termination",
+      "process_ownership_before": {
+        "kodi_engine": [
+          {
+            "pid": 4596,
+            "uid": 10234,
+            "name": "com.projectinfinity.kodi:kodi"
+          }
+        ],
+        "android_coordinator": [
+          {
+            "pid": 4558,
+            "uid": 10234,
+            "name": "com.projectinfinity.kodi"
+          }
+        ],
+        "other_owned_processes": []
+      },
+      "process_ownership_after": {
+        "kodi_engine": [],
+        "android_coordinator": [],
+        "other_owned_processes": []
+      },
+      "coordinator_completion_evidence": {
+        "coordinator_pid": 4558,
+        "authorized": true,
+        "actual_before": [
+          {
+            "pid": 4558,
+            "uid": 10234,
+            "name": "com.projectinfinity.kodi"
+          }
+        ],
+        "actual_after": [],
+        "external_app_UID_process_list": [],
+        "coordinator_self_observed_whole_package_death": false,
+        "note": "Coordinator cannot truthfully self-observe its own final exit. External empty UID/PID partitions prove its death after durable COMPLETE; no receipt bit is manufactured."
+      }
+    },
+    {
+      "cycle": 1,
+      "passed": true,
+      "actual_Power_route": {
+        "skin_member": "assets/addons/skin.infinity.diggz/unified/DialogButtonMenu.xml",
+        "skin_sha256": "149b614b9dd96094e64c7b7a837fbc911bfceda40e4ecef84716f7a3a6220d78",
+        "control": 200,
+        "action": "com.projectinfinity.kodi.action.CLOSE_KODI",
+        "activity": "com.projectinfinity.kodi.InfinityPowerControlActivity",
+        "exact_builtin": "StartAndroidActivity(com.projectinfinity.kodi,com.projectinfinity.kodi.action.CLOSE_KODI,,,,,,,com.projectinfinity.kodi.InfinityPowerControlActivity)",
+        "backend_matches": true,
+        "observed_labels": {
+          "Control.GetLabel(200)": "CLOSE KODI",
+          "System.CurrentControl": "CLOSE KODI",
+          "System.CurrentControlID": "200"
+        },
+        "observed_flags": {
+          "Control.IsEnabled(200)": true,
+          "Control.IsVisible(200)": true,
+          "Window.IsActive(shutdownmenu)": true
+        },
+        "input": "Android KEYCODE_DPAD_CENTER",
+        "input_result": ""
+      },
+      "UI_and_Close_seconds": 5.276468125000008,
+      "native_safe_ms": 2630,
+      "separate_results": {
+        "essential_first_durable": true,
+        "kodi_engine_terminated": true,
+        "android_coordinator_completed": true,
+        "remaining_UID_processes": [],
+        "recent_apps_used_for_process_proof": false
+      },
+      "essential_owners": [
+        "native_admission",
+        "background_jobs",
+        "playback",
+        "command_center",
+        "compat",
+        "kodi_settings",
+        "profiles",
+        "skin_settings",
+        "addon_settings",
+        "favourites",
+        "peripherals",
+        "audio_policy",
+        "deferred_dialog_state",
+        "xml_files",
+        "native_databases",
+        "pvr"
+      ],
+      "engine_and_Java_proof": {
+        "checkpoint_saved": true,
+        "native_generation": 1,
+        "engine_Java_seal": "101ee163-f291-49f3-b70c-99fd200f9483",
+        "coordinator_Java_seal": "3045db88-b832-446f-97dd-23dce03aa8d8",
+        "process_death_confirmed": true
+      },
+      "final_UID_processes": [],
+      "remembered_preference_unchanged": true,
+      "launch_preference": {
+        "present": true,
+        "sha256": "9f6ba54226d61b6cd02796a9d61d4831dc2154875bd22d5bcafb7da78b9ace0a",
+        "remembered": "infinity"
+      },
+      "database_integrity": [
+        "Addons33.db",
+        "TV46.db",
+        "Textures13.db",
+        "ViewModes6.db",
+        "MyMusic83.db",
+        "Epg16.db",
+        "MyVideos131.db"
+      ],
+      "new_reopened_owner": {
+        "schema": 2,
+        "pid": 6124,
+        "owner": "ddc16148-5417-4321-a5ce-8c3f5dced7b0",
+        "launch": "36f7d151-8e65-4652-9b55-76fb4173a5e9",
+        "began": 1793037818231,
+        "close_at": 0,
+        "phase": "RUNNING",
+        "live": true,
+        "error": ""
+      },
+      "recents": "Task UI only; independently verified PIDs determine process termination",
+      "process_ownership_before": {
+        "kodi_engine": [
+          {
+            "pid": 5276,
+            "uid": 10234,
+            "name": "com.projectinfinity.kodi:kodi"
+          }
+        ],
+        "android_coordinator": [
+          {
+            "pid": 5244,
+            "uid": 10234,
+            "name": "com.projectinfinity.kodi"
+          }
+        ],
+        "other_owned_processes": []
+      },
+      "process_ownership_after": {
+        "kodi_engine": [],
+        "android_coordinator": [],
+        "other_owned_processes": []
+      },
+      "coordinator_completion_evidence": {
+        "coordinator_pid": 5244,
+        "authorized": true,
+        "actual_before": [
+          {
+            "pid": 5244,
+            "uid": 10234,
+            "name": "com.projectinfinity.kodi"
+          }
+        ],
+        "actual_after": [],
+        "external_app_UID_process_list": [],
+        "coordinator_self_observed_whole_package_death": false,
+        "note": "Coordinator cannot truthfully self-observe its own final exit. External empty UID/PID partitions prove its death after durable COMPLETE; no receipt bit is manufactured."
+      }
+    },
+    {
+      "cycle": 2,
+      "passed": true,
+      "actual_Power_route": {
+        "skin_member": "assets/addons/skin.infinity.diggz/unified/DialogButtonMenu.xml",
+        "skin_sha256": "149b614b9dd96094e64c7b7a837fbc911bfceda40e4ecef84716f7a3a6220d78",
+        "control": 200,
+        "action": "com.projectinfinity.kodi.action.CLOSE_KODI",
+        "activity": "com.projectinfinity.kodi.InfinityPowerControlActivity",
+        "exact_builtin": "StartAndroidActivity(com.projectinfinity.kodi,com.projectinfinity.kodi.action.CLOSE_KODI,,,,,,,com.projectinfinity.kodi.InfinityPowerControlActivity)",
+        "backend_matches": true,
+        "observed_labels": {
+          "Control.GetLabel(200)": "CLOSE KODI",
+          "System.CurrentControl": "CLOSE KODI",
+          "System.CurrentControlID": "200"
+        },
+        "observed_flags": {
+          "Control.IsEnabled(200)": true,
+          "Control.IsVisible(200)": true,
+          "Window.IsActive(shutdownmenu)": true
+        },
+        "input": "Android KEYCODE_DPAD_CENTER",
+        "input_result": ""
+      },
+      "UI_and_Close_seconds": 5.478613527999983,
+      "native_safe_ms": 2739,
+      "separate_results": {
+        "essential_first_durable": true,
+        "kodi_engine_terminated": true,
+        "android_coordinator_completed": true,
+        "remaining_UID_processes": [],
+        "recent_apps_used_for_process_proof": false
+      },
+      "essential_owners": [
+        "native_admission",
+        "background_jobs",
+        "playback",
+        "command_center",
+        "compat",
+        "kodi_settings",
+        "profiles",
+        "skin_settings",
+        "addon_settings",
+        "favourites",
+        "peripherals",
+        "audio_policy",
+        "deferred_dialog_state",
+        "xml_files",
+        "native_databases",
+        "pvr"
+      ],
+      "engine_and_Java_proof": {
+        "checkpoint_saved": true,
+        "native_generation": 1,
+        "engine_Java_seal": "d64d32f2-4351-4d02-930e-1a7c1e00e3fd",
+        "coordinator_Java_seal": "304ee6af-6184-4ab0-b27c-8b3690350fdc",
+        "process_death_confirmed": true
+      },
+      "final_UID_processes": [],
+      "remembered_preference_unchanged": true,
+      "launch_preference": {
+        "present": true,
+        "sha256": "9f6ba54226d61b6cd02796a9d61d4831dc2154875bd22d5bcafb7da78b9ace0a",
+        "remembered": "infinity"
+      },
+      "database_integrity": [
+        "Addons33.db",
+        "TV46.db",
+        "Textures13.db",
+        "ViewModes6.db",
+        "MyMusic83.db",
+        "Epg16.db",
+        "MyVideos131.db"
+      ],
+      "new_reopened_owner": {
+        "schema": 2,
+        "pid": 6919,
+        "owner": "047c66d9-ce81-46b9-9bb4-5c470b3e90a4",
+        "launch": "754a5765-1eac-4ce3-888e-ada15affa27a",
+        "began": 1793037869545,
+        "close_at": 0,
+        "phase": "RUNNING",
+        "live": true,
+        "error": ""
+      },
+      "recents": "Task UI only; independently verified PIDs determine process termination",
+      "process_ownership_before": {
+        "kodi_engine": [
+          {
+            "pid": 6124,
+            "uid": 10234,
+            "name": "com.projectinfinity.kodi:kodi"
+          }
+        ],
+        "android_coordinator": [
+          {
+            "pid": 6049,
+            "uid": 10234,
+            "name": "com.projectinfinity.kodi"
+          }
+        ],
+        "other_owned_processes": []
+      },
+      "process_ownership_after": {
+        "kodi_engine": [],
+        "android_coordinator": [],
+        "other_owned_processes": []
+      },
+      "coordinator_completion_evidence": {
+        "coordinator_pid": 6049,
+        "authorized": true,
+        "actual_before": [
+          {
+            "pid": 6049,
+            "uid": 10234,
+            "name": "com.projectinfinity.kodi"
+          }
+        ],
+        "actual_after": [],
+        "external_app_UID_process_list": [],
+        "coordinator_self_observed_whole_package_death": false,
+        "note": "Coordinator cannot truthfully self-observe its own final exit. External empty UID/PID partitions prove its death after durable COMPLETE; no receipt bit is manufactured."
+      }
+    }
+  ],
+  "ordinary411_pass_preserved": 40317069331,
+  "ordinary415_pass_preserved": 40360243111,
+  "physical_Fold": "NOT RUN",
+  "release_accepted": false,
+  "final_lock": false
+}
