@@ -13,12 +13,13 @@ class NativeImageControlTests(unittest.TestCase):
         for i in sorted(control.IDS):
             resource='window=13001;control='+str(i)+';multiimage-protocol:image'
             lines+=['log INFINITY_MULTIIMAGE_BEGIN token='+str(i)+' job='+str(i+100)+' resource='+resource,
+                    'log CDirectoryFactory::Create - unsupported protocol(image) in '+control.image_path(i),
                     'log INFINITY_MULTIIMAGE_RETIRED token='+str(i)+' job='+str(i+100)+' unchanged_receipt=true phase=completion_receipt_verified reason= resource='+resource]
         return '\n'.join(lines)
 
     def test_all16_real_log_identities_required_and_unsafe_or_missing_never_pass(self):
         raw=self.actual_format();self.assertEqual(control.verify_log(raw,13001)['actual_native_jobs'],16)
-        for bad in (raw.replace('unchanged_receipt=true','unchanged_receipt=false',1),raw.replace('reason= resource','reason=opaque resource',1),raw.replace('phase=completion_receipt_verified','phase=completed_write_failed',1),raw.replace('job=2200 unchanged','job=9999 unchanged',1),raw.replace('control=2100','control=2199'),raw.split('\n',1)[1],raw+'\n'+raw.splitlines()[0]):
+        for bad in (raw.replace('unchanged_receipt=true','unchanged_receipt=false',1),raw.replace('reason= resource','reason=opaque resource',1),raw.replace('phase=completion_receipt_verified','phase=completed_write_failed',1),raw.replace('job=2200 unchanged','job=9999 unchanged',1),raw.replace('control=2100','control=2199'),raw.split('\n',1)[1],raw+'\n'+raw.splitlines()[0],raw.replace('unsupported protocol(image)','unobserved directory'),raw+'\n'+raw.splitlines()[1],raw.replace(control.image_path(2100),'image://relative/')):
             with self.assertRaises(AssertionError):control.verify_log(bad,13001)
         with self.assertRaises(AssertionError):control.verify_log(raw,13002)
 

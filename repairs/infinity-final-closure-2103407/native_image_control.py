@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 import re
 import time
-from urllib.parse import quote
+from urllib.parse import quote,unquote,urlsplit
 
 ADDON='script.future.multiimage.7fa29'
 IDS=set(range(2100,2116))
@@ -53,8 +53,14 @@ def stage(folder,args,report,device,aid):
 def verify_log(text,window):
     if type(window) is not int or window<=0:raise AssertionError('Actual native window identity absent')
     resource=r'window='+str(window)+r';control=(21\d\d);multiimage-protocol:image'
-    began={};retired={}
+    began={};retired={};factories={}
     for line in text.splitlines():
+        factory=re.search(r'unsupported protocol\(image\) in (image://\S+)',line)
+        if factory:
+            inner=unquote(urlsplit(factory[1]).netloc)
+            match=re.fullmatch(r'special://profile/addon_data/'+re.escape(ADDON)+r'/native-directory-(\d+)',inner)
+            if match and int(match[1]) in IDS:
+                control=int(match[1]);factories[control]=factories.get(control,0)+1
         start=re.search(r'INFINITY_MULTIIMAGE_BEGIN token=(\d+) job=(\d+) resource='+resource+r'$',line)
         end=re.search(r'INFINITY_MULTIIMAGE_RETIRED token=(\d+) job=(\d+) unchanged_receipt=(true|false) phase=(\S+) reason=(.*?) resource='+resource+r'$',line)
         if start:
@@ -71,7 +77,10 @@ def verify_log(text,window):
             retired[control]=(int(token),int(job))
     if set(began)!=IDS or retired!=began or len(set(began.values()))!=16:
         raise AssertionError('All16 actual native image jobs and exact retirement identities required')
+    if factories!={key:1 for key in IDS}:
+        raise AssertionError('All16 actual image directory-factory terminal calls required')
     return dict(window=window,controls=sorted(IDS),actual_native_jobs=16,verified_readonly_receipts=16,
+                actual_directory_factory_terminals=16,
                 jobs={str(k):dict(token=v[0],job=v[1]) for k,v in began.items()})
 
 

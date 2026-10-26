@@ -1,0 +1,36 @@
+{
+  "run": 40320293902,
+  "source": "28bf08f459bede955b5034c1c10244e20a854b7d",
+  "artifact": 12649316453,
+  "artifact_sha256": "25c4b931abc2c851a29d74adeb0781b9d9156a44a571bd14d866398123931f28",
+  "status": "FAIL before participant/nativeimage/Close setup",
+  "actual": {
+    "pid": 4693,
+    "signal": "SIGSEGV SEGV_MAPERR read",
+    "fault": "0x7e4c08337fa7",
+    "host_frame": "/memfd:exec+0x19d01a",
+    "guest_frame": "libkodi.so+0x2bf49fc talloc_lib_init+60",
+    "guest_context": "ARM64linkerconstructor/dlopen via libnative_bridge_vdso; no active module/test code yet",
+    "x19": "0x7e4c08337fa0",
+    "x8": 7,
+    "x0": "0x6b8b4567"
+  },
+  "preserved": "Actual411 threeClose/reopen passes40317069331 remain; do not count thisstartup failure as image/Close pass or assume bridge-vs-production cause without instruction/source proof.",
+  "selected_before_investigation": [
+    "Read-only disassembly exact409/410/411 unchanged libkodi.so151128c... atconstructor; compare actualprotected407 instruction bytes ifavailable.",
+    "Use isolatedhostcapstone5.0.3 decoder only; noAPK/native/source change, no behavioral suite; record actual faultinstruction andsource correspondence before any next runtime."
+  ],
+  "physical_Fold": "NOT RUN",
+  "repeated_native_image_case": "NOT REACHED",
+  "unsafe_case": "NOT REACHED",
+  "instruction_evidence": {
+    "guest_fault": "ldr w8,[x19,x8] at0x2bf49fc; x19+7 equalsactualreadfaultaddress",
+    "entry": "movw0,#0x19 followedbygetauxvalPLT thenmovx19,x0;randPLT andmod12choose7;read4bytes fromAT_RANDOM",
+    "getauxval_relocation": "R_AARCH64_JUMP_SLOT0x5d2abc8 ->getauxval@LIBC",
+    "rand_relocation": "R_AARCH64_JUMP_SLOT0x5d2b0a0 ->rand@LIBC",
+    "unchanged_constructor_protected407": "Located unique100byteconstructor at0x2bdc9c0; differing instructions: [{'offset': 16, 'old': 'bl #0x14452b0', 'new': 'bl #0x1446440'}, {'offset': 28, 'old': 'bl #0x1445c60', 'new': 'bl #0x1446df0'}, {'offset': 84, 'old': 'adrp x9, #0x5e7a000', 'new': 'adrp x9, #0x5e95000'}]",
+    "primary_source": "https://github.com/samba-team/samba/blob/master/lib/talloc/talloc.c",
+    "inference": "The failingpointer is the kernelauxvector random pointer as exposed to this translatedprocess, before Kodi/Python/teststartup. Suggests nativebridge/auxv mapping problem; no physicalnativeARM64comparison yet. Do notclaimemulatoronlycause proven.",
+    "production_change": false
+  }
+}
