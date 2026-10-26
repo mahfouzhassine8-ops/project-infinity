@@ -116,5 +116,13 @@ class NativeTVFixtureTests(unittest.TestCase):
         for forbidden in ('write_text','write_bytes','sqlite3','force-stop','CLOSE_KODI'):
             self.assertNotIn(forbidden,observer)
 
+    def test_native_seek_requires_advancing_clock_inside_original_start_deadline(self):
+        text=Path(observer.__file__).read_text()
+        self.assertIn("'properties':['time','speed']",text)
+        self.assertIn("clock.get('speed')==1",text)
+        self.assertIn("stamp.get('seconds',0)>=1",text)
+        self.assertIn("ui.until(started,'actual typed native TV playback',20)",text)
+        self.assertLess(text.index("clock=ui.rpc("),text.index('player.seekTime(70)'))
+
 
 if __name__=='__main__':unittest.main(verbosity=2)

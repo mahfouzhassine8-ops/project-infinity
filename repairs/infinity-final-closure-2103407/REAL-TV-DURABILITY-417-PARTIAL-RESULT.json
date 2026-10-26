@@ -1,0 +1,25 @@
+{
+  "passed": false,
+  "scenario": "integrated-resume-power-ui",
+  "apk_sha256": "4428332453714adc1aa652ee5db76ff2e79f705171dab8e020d7915631e00d83",
+  "candidate_source_commit": "d10fffd80182c796955534ffdecc5ccc288da99b",
+  "test_source_commit": "f6e59cdd765ae0d9da98fe74eede57fd0ecc3f80",
+  "workflow_run": "40378085987",
+  "cycles": [],
+  "failure": "AssertionError: Actual native TV scene did not complete",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/project-infinity/project-infinity/repairs/infinity-final-closure-2103407/android17_shutdown_probe.py\", line 147, in main\n    report['real_TV_before_Close']=resume_durability.run(transport,owner,args.out);save()\n                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/project-infinity/project-infinity/repairs/infinity-final-closure-2103407/resume_durability.py\", line 129, in run\n    raise AssertionError('Actual native TV scene did not complete')\nAssertionError: Actual native TV scene did not complete\n",
+  "run": 40378085987,
+  "artifact": 12678730925,
+  "artifact_sha256": "2d7ba8b8680988c33668787a58bd91fa02186fa38219bf4fe6cce11a31436330",
+  "actual_Close_attempted": false,
+  "observations": [
+    "First typed native TV playback started",
+    "MediaCodec output errors and CDVDMsgGeneralSynchronize global timeout followed first immediate test seek",
+    "Observer did not return within180sec; existing45sec save/20sec selection gates were not waived; no runtime cause proven without blocked native stack"
+  ],
+  "next_selected_correction": "Require actual advancing native AV clock/speed1 before test seek within SAME20sec start predicate; retain failure and collect actual profile/native stack on failure",
+  "ordinary_417_three_cycle_PASS_preserved": 40373328781,
+  "physical_Fold": "NOT RUN",
+  "release_accepted": false,
+  "final_lock": false
+}

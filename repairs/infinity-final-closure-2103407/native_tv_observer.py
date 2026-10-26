@@ -37,7 +37,13 @@ def run(ui,hub,profile,result):
         def started():
             if not player.isPlayingVideo():return None
             value=ui.rpc('Player.GetItem',{'playerid':1,'properties':['season','episode','file','uniqueid','showtitle']})['item']
-            return value if value.get('type')=='episode' and value.get('id')==dbid and value.get('season')==season and value.get('episode')==episode else None
+            if not(value.get('type')=='episode' and value.get('id')==dbid and value.get('season')==season and value.get('episode')==episode):return None
+            # A typed selected item may precede decoder/AV clock readiness.
+            # Keep the same20sec start deadline; never seek during initial
+            # codec opening merely because isPlayingVideo already became true.
+            clock=ui.rpc('Player.GetProperties',{'playerid':1,'properties':['time','speed']})
+            stamp=clock.get('time',{})
+            return value if clock.get('speed')==1 and (stamp.get('seconds',0)>=1 or stamp.get('minutes',0)>0) else None
         return ui.until(started,'actual typed native TV playback',20)
     result['native_tv_first_playback']=start(1,1,2)
     player.seekTime(70)

@@ -126,6 +126,9 @@ def run(transport,owner,out):
                 time.sleep(.25)
             raise AssertionError('Final stopped playback records did not settle')
         time.sleep(.25)
+    transport.adb('pull',profile,out/'actual-resume-scene-profile',check=False)
+    (out/'resume-scene-live-native-backtrace.txt').write_text(
+        transport.shell('debuggerd','-b',str(owner['pid']),check=False))
     raise AssertionError('Actual native TV scene did not complete')
 
 
