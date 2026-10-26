@@ -29,7 +29,7 @@ def prepare(root,request,baseline):
         found=list(root.rglob(name))
         if len(found)!=1 or digest(found[0])!=wanted:raise ValueError('Matchingcomponent differs: '+name)
         sources[name]=found[0]
-    expected={'script.infinity.commandcenter':'0.3.5.45','script.infinity.uirepair':'0.1.23',
+    expected={'script.infinity.commandcenter':'0.3.5.47','script.infinity.uirepair':'0.1.23',
               'script.infinity.watchedbridge':'1.0.21','script.infinity.rails':'0.2.8'}
     with ZipFile(apks[0]) as archive:
         versions={aid:ET.fromstring(archive.read('assets/addons/'+aid+'/addon.xml')).get('version') for aid in expected}

@@ -73,6 +73,9 @@ def fixture(raw):
     updated=popup_ready_observer.instrument(updated)
     import favourites_null_observer
     updated=favourites_null_observer.instrument(updated)
+    if EXPECTED.get('verify_tv_completion') is True:
+        import native_tv_fixture
+        updated=native_tv_fixture.instrument(updated)
     restored=restore_candidate_fixture(updated)
     if restore_fixture(restored).encode()!=raw:
         raise ValueError('An original feature assertion changed')
@@ -81,6 +84,8 @@ def fixture(raw):
 
 
 def restore_candidate_fixture(text):
+    import native_tv_fixture
+    text=native_tv_fixture.restore(text)
     import favourites_null_observer
     text=favourites_null_observer.restore(text)
     import popup_ready_observer
@@ -176,6 +181,10 @@ def main(selected_case=None,independent_setup=None):
                     args.apk,EXPECTED['candidate_apk_sha256'],stage/aid)
                 shutil.copyfile(Path(__file__).parent/'continue_card_observer.py',stage/aid/'continue_card_observer.py')
                 shutil.copyfile(Path(__file__).parent/'popup_ready_observer.py',stage/aid/'popup_ready_observer.py')
+                if args.case==EXPECTED['selected_case'] and EXPECTED.get('verify_tv_completion') is True:
+                    import native_tv_fixture
+                    native_tv_fixture.stage(device,args,report,EXPECTED)
+                    shutil.copyfile(Path(__file__).parent/'native_tv_observer.py',stage/aid/'native_tv_observer.py')
             shutil.copyfile(Path(__file__).parent/'shutdown_environment.py',stage/aid/'shutdown_environment.py')
             # Seed the actual previous code, not new code installed by a test.
             # The authenticated installer must migrate all four original IDs before Python starts.
