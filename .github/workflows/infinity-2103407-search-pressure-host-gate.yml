@@ -177,7 +177,7 @@ jobs:
           assert request['schema']==1 and request['scope'].strip()
           selected=request['selected']
           assert selected in {'search-lifetime','module-trust','installed-modules','module-protocol',
-                              'firstparty-compose','reference-observation','module-bundle','module-complete','internal-apk','internal-service-apk','internal-coordinator-apk','internal-resume-apk','candidate-routing','shutdown-routing','android-routing'}
+                              'firstparty-compose','reference-observation','module-bundle','module-complete','internal-apk','internal-service-apk','internal-coordinator-apk','internal-resume-apk','internal-home-entry-apk','candidate-routing','shutdown-routing','android-routing'}
           with open(os.environ['GITHUB_OUTPUT'],'a') as output:
               output.write('selection='+selected+'\n')
           if selected=='search-lifetime':
@@ -214,6 +214,10 @@ jobs:
               sys.exit(0)
           elif selected=='internal-service-apk':
               print('Packaging410 only: exact409 engine/DEX/modules remain unchanged. Scoped VersionCheck source and negative checks run below against exact409 on Python3.11 before signing. No application or Close tests.')
+              sys.exit(0)
+          elif selected=='internal-home-entry-apk':
+              print('Packaging413 only: equivalent native Home commands and existing signed resident runtime publication. No app/shutdown tests.')
+              subprocess.run([sys.executable,'-m','unittest','discover','-s',str(root),'-p','test_home_packaging.py','-v'],check=True)
               sys.exit(0)
           elif selected=='internal-resume-apk':
               print('Packaging412: exact signed411 parent plus read-only per-listing source verification reuse and authenticatedCC42. No behavioral or shutdown test.')
@@ -383,6 +387,31 @@ jobs:
           set -euo pipefail
           python3 repairs/infinity-final-closure-2103407/package_resume_render.py \
             --parent-root resume-parent --sdk "$ANDROID_HOME/build-tools/35.0.0" --out resume-candidate
+      - name: Recover exact signed412 for Home entry correction
+        if: steps.selected.outputs.selection == 'internal-home-entry-apk'
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 40331713692
+          name: Infinity-2103412-Resume-Corrective-Verification-40331713692
+          github-token: ${{ github.token }}
+          path: home-parent
+      - name: Verify exact Normal action equivalence and resident lifecycle ownership
+        if: steps.selected.outputs.selection == 'internal-home-entry-apk'
+        run: |
+          set -euo pipefail
+          export INFINITY_HOME_PARENT_APK="$(find home-parent -type f -name 'Infinity-2103412-Resume-Render-Corrective-VERIFICATION.apk' -print -quit)"
+          PYTHONPATH=repairs/infinity-final-closure-2103407 python3 -m unittest test_home_entry -v
+      - name: Authenticate CC43 and Skin244, audit every APK member and permanently sign413
+        if: steps.selected.outputs.selection == 'internal-home-entry-apk'
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 repairs/infinity-final-closure-2103407/package_home_entry.py \
+            --parent-root home-parent --sdk "$ANDROID_HOME/build-tools/35.0.0" --out home-candidate
       - name: Integrate, audit every APK member and sign original identity - internal candidate only
         if: steps.selected.outputs.selection == 'internal-apk'
         env:
@@ -396,7 +425,7 @@ jobs:
             --parent-root signed407 --module-root package-modules --native-root package-native \
             --sdk "$ANDROID_HOME/build-tools/35.0.0" --out internal-candidate
       - uses: actions/upload-artifact@v4
-        if: always() && steps.selected.outputs.selection != 'module-bundle' && steps.selected.outputs.selection != 'internal-apk' && steps.selected.outputs.selection != 'internal-service-apk' && steps.selected.outputs.selection != 'internal-coordinator-apk' && steps.selected.outputs.selection != 'internal-resume-apk'
+        if: always() && steps.selected.outputs.selection != 'module-bundle' && steps.selected.outputs.selection != 'internal-apk' && steps.selected.outputs.selection != 'internal-service-apk' && steps.selected.outputs.selection != 'internal-coordinator-apk' && steps.selected.outputs.selection != 'internal-resume-apk' && steps.selected.outputs.selection != 'internal-home-entry-apk'
         with:
           name: Infinity-Final-Source-Ownership-${{ github.run_id }}-NOT-APK
           path: final-work/
@@ -469,5 +498,18 @@ jobs:
             resume-candidate/*.txt
             resume-candidate/SHA256SUMS
             repairs/infinity-final-closure-2103407/RESUME-RENDER-412-PLAN.json
+          retention-days: 90
+          if-no-files-found: warn
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.selected.outputs.selection == 'internal-home-entry-apk'
+        with:
+          name: Infinity-2103413-Home-Corrective-Verification-${{ github.run_id }}
+          path: |
+            home-candidate/*.apk
+            home-candidate/components/*.zip
+            home-candidate/*.json
+            home-candidate/*.txt
+            home-candidate/SHA256SUMS
+            repairs/infinity-final-closure-2103407/HOME-ENTRY-413-PLAN.json
           retention-days: 90
           if-no-files-found: warn

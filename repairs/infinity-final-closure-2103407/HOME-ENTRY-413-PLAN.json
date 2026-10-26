@@ -1,0 +1,63 @@
+{
+  "recorded_before_implementation": true,
+  "parent_version": 2103412,
+  "parent_apk_sha256": "106e212a91ab68d028e5c39b2fcd87d1fa5102ef99be766e7fb8daf0d0656657",
+  "candidate_version": 2103413,
+  "command_center_version": "0.3.5.43",
+  "skin_version": "1.0.5.244",
+  "source_preimages": {
+    "assets/addons/script.infinity.commandcenter/service.py": "bd3d0f57d9b297fb38379452c2e14a6b75f276dcc486b897606f64db01306ccd",
+    "assets/addons/script.infinity.commandcenter/default.py": "3cfb85fa83f69498d06d34cf53a432dbf6476c5f967cc9903b0307574f2d3374",
+    "assets/addons/script.infinity.commandcenter/addon.xml": "f9f23aac8d202d2d6aa05369130fa49a042f9f384df27900963354f143c09f8f",
+    "assets/addons/skin.infinity.diggz/16x9/Home.xml": "4ecb3c63c47e30bb8f7cc1e3191a009742537c0c35c2ca99651b859b656b1f22",
+    "assets/addons/skin.infinity.diggz/20x9/Home.xml": "4ecb3c63c47e30bb8f7cc1e3191a009742537c0c35c2ca99651b859b656b1f22",
+    "assets/addons/skin.infinity.diggz/5x6/Home.xml": "4ecb3c63c47e30bb8f7cc1e3191a009742537c0c35c2ca99651b859b656b1f22",
+    "assets/addons/skin.infinity.diggz/6x5/Home.xml": "4ecb3c63c47e30bb8f7cc1e3191a009742537c0c35c2ca99651b859b656b1f22",
+    "assets/addons/skin.infinity.diggz/fallback/Home.xml": "4ecb3c63c47e30bb8f7cc1e3191a009742537c0c35c2ca99651b859b656b1f22",
+    "assets/addons/skin.infinity.diggz/portrait/Home.xml": "4ecb3c63c47e30bb8f7cc1e3191a009742537c0c35c2ca99651b859b656b1f22",
+    "assets/addons/skin.infinity.diggz/responsive/base/Home.xml": "f44976b8ef52f866e5a3055d40216f49778aff5e52210f4bc12c0e73bbdee235",
+    "assets/addons/skin.infinity.diggz/responsive/landscape/Home.xml": "f44976b8ef52f866e5a3055d40216f49778aff5e52210f4bc12c0e73bbdee235",
+    "assets/addons/skin.infinity.diggz/responsive/portrait/Home.xml": "f44976b8ef52f866e5a3055d40216f49778aff5e52210f4bc12c0e73bbdee235",
+    "assets/addons/skin.infinity.diggz/responsive/square/Home.xml": "f44976b8ef52f866e5a3055d40216f49778aff5e52210f4bc12c0e73bbdee235",
+    "assets/addons/skin.infinity.diggz/responsive/tall/Home.xml": "f44976b8ef52f866e5a3055d40216f49778aff5e52210f4bc12c0e73bbdee235",
+    "assets/addons/skin.infinity.diggz/responsive/ultrawide/Home.xml": "f44976b8ef52f866e5a3055d40216f49778aff5e52210f4bc12c0e73bbdee235",
+    "assets/addons/skin.infinity.diggz/responsive/wide/Home.xml": "f44976b8ef52f866e5a3055d40216f49778aff5e52210f4bc12c0e73bbdee235",
+    "assets/addons/skin.infinity.diggz/unified/Home.xml": "20761381b3bf5916b515a67c082f9946c53dea0be195aeaefd465cea210e9e81",
+    "assets/addons/skin.infinity.diggz/addon.xml": "573523c4cd8e757ef93778b23c4ce899e43b244cbc367ba5ee05b3096261b4a9",
+    "assets/addons/skin.infinity.diggz/Infinity-Protected-Manifest.json": "16c7e394f8cd6381fc346a87d8b8b442a7e22d26317c09669cf5422499b40d13",
+    "assets/addons/skin.infinity.diggz/infinity-skin.json": "6c05634fa2f805f2be572fc9e994509834ac902e64fd1855605f59924c7e536f"
+  },
+  "actual_failure_evidence": {
+    "run": 40330174834,
+    "initial_Search_passed": true,
+    "completed": {
+      "search": 2,
+      "playback_home": 0,
+      "rotation": 0
+    },
+    "third_Search_start_to_source_ms": 12297,
+    "competing_Home_interpreters": "view-mode47/52/62/70; runtime-sync48/53/63/71; universal-search72. Native Android17 ARM translation, not physical Fold timing.",
+    "third_Search_start": "13:44:47.985",
+    "third_Search_source_loaded": "13:45:00.282",
+    "competing_view_mode_source_wait_ms": 21182,
+    "app_deadline_changed": false
+  },
+  "correction": [
+    "Replace only Home onload view-mode normal RunScript with exact same builtins/property writes; keep every layout/control/onclick unchanged",
+    "Replace only Home onload runtime-sync true RunScript with coalesced read-only request to existing resident CC service; reuse actual default.runtime_sync quiet body",
+    "Existing checkpoint.poll and playback persistence remain before request consumption; exact skin ID guard; no new worker, timer, database or native changes",
+    "Default optional refresh-addon lookup respects actual HasAddon to avoid proven repeated missing-addon exception",
+    "Refresh protected skin hashes from exact signed parent plus approved Home changes; reject any other source delta"
+  ],
+  "selected_checks": [
+    "Evaluate actual shipped direct_command normal branch vs XML-builtins replay; all props/latches/skin strings equal",
+    "Actual pending-runtime consumer coalesces requests, refuses other skins, retries error without false success, obeys existing checkpoint-first ordering",
+    "Exact source inverse for every Home file; original controls/geometry/player and other onload entries preserved",
+    "Original quiet runtime_sync method body byte-identical; default missing-addon guard preserves installed/disabled behavior",
+    "Package/manifest/signature/component/source/DEX/native/Cobra audits, new CC42->43 authenticated migration",
+    "New signed candidate API37 actual Search50/playbackHome30/rotation20 and actual local movie/TV cards; independent real Power UI close3/readback; no physical acceptance inferred"
+  ],
+  "near_instant_Home_proven": false,
+  "physical_Fold": "NOT RUN",
+  "release_locked": false
+}
