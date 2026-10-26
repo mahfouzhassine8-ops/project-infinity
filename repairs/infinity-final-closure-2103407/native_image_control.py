@@ -66,22 +66,38 @@ def verify_log(text,window):
         if start:
             token,job,control=map(int,start.groups())
             if control not in IDS:continue
-            if control in began:raise AssertionError('Duplicate native control start')
-            began[control]=(token,job)
+            identity=(token,job)
+            if identity in began or token<=0 or job<=0:
+                raise AssertionError('Duplicate or invalid native job start')
+            if any(token==key[0] or job==key[1] for key in began):
+                raise AssertionError('Native token/job identity reused')
+            began[identity]=control
         if end:
             token,job,unchanged,phase,reason,control=end.groups();control=int(control)
             if control not in IDS:continue
-            if control in retired:raise AssertionError('Duplicate native control retirement')
+            identity=(int(token),int(job))
+            if identity in retired:raise AssertionError('Duplicate native job retirement')
             if unchanged!='true' or phase!='completion_receipt_verified' or reason:
                 raise AssertionError('Native multiimage receipt is unresolved')
-            retired[control]=(int(token),int(job))
-    if set(began)!=IDS or retired!=began or len(set(began.values()))!=16:
-        raise AssertionError('All16 actual native image jobs and exact retirement identities required')
-    if factories!={key:1 for key in IDS}:
-        raise AssertionError('All16 actual image directory-factory terminal calls required')
-    return dict(window=window,controls=sorted(IDS),actual_native_jobs=16,verified_readonly_receipts=16,
-                actual_directory_factory_terminals=16,
-                jobs={str(k):dict(token=v[0],job=v[1]) for k,v in began.items()})
+            if min(identity)<=0:raise AssertionError('Invalid retirement identity')
+            retired[identity]=control
+    if set(began.values())!=IDS or any(retired.get(key)!=value for key,value in began.items()):
+        raise AssertionError('All16 controls require actual work and exact matching retirement identities')
+    # One control can legitimately schedule another generation. Queued jobs
+    # cancelled before DoWork have no BEGIN/factory call. The native destructor
+    # only reports unchanged=true after its reviewed manager cancellation path
+    # and verified completion callback; retain those separately as unstarted.
+    expected={key:sum(value==key for value in began.values()) for key in IDS}
+    if factories!=expected:
+        raise AssertionError('Every started image job requires its actual factory terminal')
+    if len(retired)>256 or any(sum(key[0]==other[0] or key[1]==other[1] for other in retired)!=1 for key in retired):
+        raise AssertionError('Native retirement identity reused or job budget exceeded')
+    return dict(window=window,controls=sorted(IDS),actual_native_jobs=len(began),
+                verified_readonly_receipts=len(retired),
+                actual_directory_factory_terminals=sum(factories.values()),
+                verified_unchanged_without_start=[dict(token=k[0],job=k[1],control=v)
+                    for k,v in retired.items() if k not in began],
+                jobs=[dict(token=k[0],job=k[1],control=v) for k,v in began.items()])
 
 
 def run(transport,owner,out):

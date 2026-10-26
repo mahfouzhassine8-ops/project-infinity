@@ -12,7 +12,7 @@ EXPECTED=dict(schema=1,kind='integrated-candidate',selected_case='final-search-a
     candidate_build=40316348289,candidate_source_commit='26753a8e863f1e02c9993d2a1f5cd4940c5c305a',
     candidate_apk_sha256='0729e8403b842568665567db118902d5b15b6e554b9f96a23cc9a94e24779c80',
     candidate_artifact='Infinity-2103411-Corrective-INTERNAL-NOT-FINAL-40316348289',
-    authorization=AUTHORIZATION,request_id='integrated411-search50-playback30-rotation20-04-prepared-ime',
+    authorization=AUTHORIZATION,request_id='integrated411-search50-playback30-rotation20-05-resident-dispatch',
     post_feature={'search':50,'playback_home':30,'rotation':20})
 
 

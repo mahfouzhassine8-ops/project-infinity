@@ -1,0 +1,38 @@
+{
+  "ordinary_shutdown": {
+    "run": 40317069331,
+    "passed": true,
+    "cycles": 3,
+    "unchanged": true
+  },
+  "prior_repetitions": {
+    "run": 40319420418,
+    "initial_Search_passed": true,
+    "completed": {
+      "search": 8,
+      "playback_home": 0,
+      "rotation": 0
+    },
+    "failure": "Ninth dialog missed 45s after test bridge interpreter consumed 25s loading two lines",
+    "preserved": true
+  },
+  "synthetic_prior": {
+    "run": 40322860337,
+    "passed": false,
+    "failure": "Duplicate native control start",
+    "cause": "Distinct token/job generations for each control; source-reviewed queued cancellation receipts also present. Not failure of ordinary Close."
+  },
+  "corrections": [
+    "Reuse existing bounded test observation invoker for exact Home Search builtin; no extra interpreter hop",
+    "Track actual image job tokens/IDs per control; require each started job factory and retirement; report verified unstarted receipts separately"
+  ],
+  "selected_host_tests": {
+    "count": 9,
+    "passed": true,
+    "scope": "Dispatch admission/fixture identity and native receipt parser negatives plus existing stress admission"
+  },
+  "runtime_APK_changed": false,
+  "new_Android17_result": "PENDING",
+  "physical_Fold": "NOT RUN",
+  "release_accepted": false
+}

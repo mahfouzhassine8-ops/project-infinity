@@ -187,15 +187,11 @@ def main(selected_case=None,independent_setup=None):
                     setup_logging(probe.device,folder.parent.parent)
             return original_adb(*args,**kwargs)
         probe.device.adb=adb
-        stress_selected=selected_case==EXPECTED['selected_case'] and EXPECTED.get('post_feature')
-        if independent_setup is not None or stress_selected:
+        if independent_setup is not None:
             original_enable=probe.device.enable_features
             def enable(device_out,versions=None):
                 original_enable(device_out,versions)
-                if independent_setup is not None:independent_setup.enable(probe.device,device_out)
-                if stress_selected:
-                    import android_stress_script
-                    android_stress_script.enable(probe.device)
+                independent_setup.enable(probe.device,device_out)
             probe.device.enable_features=enable
         for source,wanted in ((OLD/'universal/android_search_input.py',DRIVER_SHA),
                               (OLD/'android_runtime_checks.py',CHECKS_SHA)):

@@ -123,6 +123,7 @@ def _run(device,setup,expected,out):
     ticks=device.shell('getconf','CLK_TCK',check=False).strip()
     report['clock_ticks']=int(ticks) if ticks.isdigit() and int(ticks)>0 else None
     memory('before');home()
+    android_stress_script.initialize(device,out,owner)
     state_path=device.PROFILE+'/addon_data/script.infinity.commandcenter/continue-watching.json'
     protected=device.read_json(state_path)
     protected_keys=('items','watched','watchlist','collection','lists','sources','navigation_recovery')
@@ -141,6 +142,7 @@ def _run(device,setup,expected,out):
             import android_input_readiness
             return value if value and android_input_readiness.ready(device,out) else None
         values,edit=device.until(typing_keyboard,45) # Retain the actual original keyboard deadline.
+        android_stress_script.verify_dispatch(device)
         wanted='Search All' if provider=='all' else 'Umbrella'
         choices=[n for n in values if n.get('clickable')=='true' and
             any(n.get('content-desc','').startswith(wanted+p) for p in (', ','. '))]
@@ -190,6 +192,7 @@ def _run(device,setup,expected,out):
         if (index+1)%10==0:
             android_stress_script.launch(device)
             values,_=device.until(keyboard,45)
+            android_stress_script.verify_dispatch(device)
             tap(control(values,'Close Infinity Search'))
             device.until(lambda:not any(n.get('class')=='android.widget.EditText' for n in nodes()),20)
             home();report['search'][-1]['additional_search_cancelled']=True;save()

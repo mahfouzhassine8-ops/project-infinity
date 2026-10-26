@@ -43,5 +43,20 @@ class NativeImageControlTests(unittest.TestCase):
             device.shell=lambda *a:'0'
             with self.assertRaises(ValueError):control.stage(folder,args,report,device,'service.future.persistence.7fa29')
 
+    def test_distinct_refresh_generations_and_verified_unstarted_jobs_are_separate(self):
+        raw=self.actual_format()
+        extra='\n'.join(raw.splitlines()[:3]).replace('token=2100','token=9991').replace('job=2200','job=9992')
+        raw+='\n'+extra
+        cancelled='log INFINITY_MULTIIMAGE_RETIRED token=9993 job=9994 unchanged_receipt=true phase=completion_receipt_verified reason= resource=window=13001;control=2100;multiimage-protocol:image'
+        result=control.verify_log(raw+'\n'+cancelled,13001)
+        self.assertEqual(result['actual_native_jobs'],17)
+        self.assertEqual(result['actual_directory_factory_terminals'],17)
+        self.assertEqual(result['verified_readonly_receipts'],18)
+        self.assertEqual(result['verified_unchanged_without_start'],[dict(token=9993,job=9994,control=2100)])
+        for bad in (raw+'\n'+extra,raw.replace('token=9991','token=2100'),
+                    raw.replace('job=9992','job=2200'),raw.replace('control=2100','control=2101',1),
+                    raw+'\n'+cancelled.replace('unchanged_receipt=true','unchanged_receipt=false')):
+            with self.assertRaises(AssertionError):control.verify_log(bad,13001)
+
 
 if __name__=='__main__':unittest.main(verbosity=2)
