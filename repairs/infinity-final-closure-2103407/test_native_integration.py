@@ -46,14 +46,14 @@ class NativeIntegrationTests(unittest.TestCase):
         subprocess.run(['g++','-std=c++14','-Wall','-Wextra','-Werror',str(cpp),'-o',str(exe)],check=True)
         subprocess.run([str(exe)],check=True)
 
-    def test_full9407_existing_sources_only_five_owned_files_differ(self):
+    def test_full9407_existing_sources_only_seven_owned_files_differ(self):
         before=json.loads(self.map.read_text())
         after={p.relative_to(self.candidate).as_posix():hashlib.sha256(p.read_bytes()).hexdigest()
                for p in self.candidate.rglob('*') if p.is_file()}
         self.assertEqual(set(n for n in before if before[n]!=after[n]),
-                         {integration.CONTRACTS,integration.TITLE,integration.POPUP,integration.CHECKPOINT,integration.CMAKE})
+                         set(integration.OWNED))
         self.assertEqual(len(set(after)-set(before)),4)
-        self.assertEqual(self.receipt['unchanged_existing_sources'],9402)
+        self.assertEqual(self.receipt['unchanged_existing_sources'],9400)
         for path in ('xbmc/guilib/GUIBaseContainer.h','xbmc/input/InputManager.cpp'):
             self.assertEqual((self.native/path).read_bytes(),(self.candidate/path).read_bytes())
 
@@ -77,7 +77,7 @@ class NativeIntegrationTests(unittest.TestCase):
             start=before.index(needle);body_start=before.index('{',start)
             current=after.index(needle);current_body=after.index('{',current)
             self.assertEqual(block(before,body_start),block(after,current_body),name)
-        for name in (integration.CONTRACTS,integration.TITLE,integration.POPUP,integration.CHECKPOINT,integration.CMAKE):
+        for name in integration.OWNED:
             actual=(self.candidate/name).read_text()
             for old,new in reversed(integration.edits(name)):actual=actual.replace(new,old,1)
             self.assertEqual(actual,(self.native/name).read_text())

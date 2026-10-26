@@ -133,13 +133,23 @@
         ],
         "status": "Planned isolated exact-source transform; no engine replaced",
         "reason": "Necessary authenticated module migration and actual evidenced title/reflow/checkpoint mismatches; all shared caller behavior must remain guarded and verified."
+      },
+      {
+        "ownership_ledger": "NATIVE-INTEGRATION-PLAN.json",
+        "files": [
+          "xbmc/interfaces/python/InfinityPythonCryptoContract.h",
+          "xbmc/interfaces/python/InfinityPythonPersistence.h"
+        ],
+        "reason": "Required read-only native identity handshake must not poison essential writer proof. Exact running-image/address lookup only; all other audit/writer/close behavior preserved.",
+        "status": "Recorded before two-header transform"
       }
     ],
     "apk_member_edits_admitted": [],
     "initial_allowed_repository_paths": [
       "repairs/infinity-final-closure-2103407/",
       ".github/workflows/infinity-2103407-search-pressure-host-gate.yml",
-      ".github/workflows/infinity-saved-navigation-android.yml"
+      ".github/workflows/infinity-saved-navigation-android.yml",
+      ".github/workflows/infinity-2103402-native-owner-build.yml"
     ],
     "rule": "Before adding any runtime member: record exact signed preimage, function/control, necessity, ownership guard and negative tests. All other original files and APK members protected."
   },
@@ -152,15 +162,19 @@
   },
   "selected_verification": {
     "host": [
-      "test_module_contract.py8",
+      "test_module_contract.py9",
       "test_checkpoint_protocol.py5",
-      "test_firstparty_composition.py8"
+      "test_firstparty_composition.py8",
+      "test_native_build_request.py3",
+      "separate native compile job: test_native_integration.py6 + test_identity_audit.py2"
     ],
     "android17": "Baseline reference FAIL before Search input; evidence artifact12624160445, no shutdown selected",
     "physical_fold": "NOT RUN",
     "shutdown": "Explicitly authorized workstream5; must run separately and retain real failures",
     "packaging": "AUTHORIZED after required corrections/integration; no extra permission required",
-    "final_lock": "Requires explicit user physical Fold acceptance"
+    "final_lock": "Requires explicit user physical Fold acceptance",
+    "local_python": "3.12.14",
+    "CI_python": "Pinned3.11.7; no host result implies Android17"
   },
   "source_edits_started": true,
   "release_ready": false,
@@ -184,5 +198,22 @@
         "test_reference_observation.py: exact fixture inverse-diff, original failing assertion remains failure, export failure remains failure, native source/APK untouched; test_android17_reference.py existing3routing only"
       ]
     }
+  },
+  "candidate": {
+    "version_code": 2103408,
+    "status": "Internal candidate, no acceptance/lock",
+    "reason": "Install-over successor to protected2103407; user final takeover supersedes earlier2103402 target."
+  },
+  "native_build_request": {
+    "workflow": ".github/workflows/infinity-2103402-native-owner-build.yml",
+    "kind": "Complete ARM64 native engine for integrated internal Android17 verification; no user APK installation, no final release claim",
+    "selected_source_tests": [
+      "test_native_integration.py6",
+      "test_identity_audit.py2"
+    ],
+    "compiler": "Reuse unchanged full9411-source native producer, existing verified dependencies and NDK21.4.7075529",
+    "behavioral_tests": "Separately selected; no shutdown or feature suite dependency",
+    "gate": "Exact407reconstruction,7nativeedits4newfiles, exact read-only ABI audit classification, permanent public trustkey, full source preservation and ABI/symbol checks",
+    "routing_checks": "test_native_build_request.py3 local PASS"
   }
 }

@@ -33,7 +33,14 @@ def _native():
     global _native_library, _native_function
     if _native_function is None:
         try:
-            library = ctypes.CDLL(None)
+            root = os.environ.get('KODI_ANDROID_LIBS', '')
+            if not root.startswith('/') or '\0' in root:
+                raise OSError('The running native engine path is unavailable')
+            # JNI may load Kodi with local symbol visibility. Resolve only the
+            # existing engine image; never load another engine or trust a
+            # process-global same-name symbol from a different library.
+            library = ctypes.CDLL(os.path.realpath(os.path.join(root, 'libkodi.so')),
+                                  mode=os.RTLD_NOLOAD | os.RTLD_NOW)
             function = library.InfinityCommandCenterIdentityV1
             function.argtypes = (ctypes.c_char_p, ctypes.POINTER(ctypes.c_char), ctypes.c_size_t,
                                  ctypes.POINTER(ctypes.c_char), ctypes.c_size_t, ctypes.POINTER(ctypes.c_uint))

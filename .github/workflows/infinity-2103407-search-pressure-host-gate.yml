@@ -119,7 +119,8 @@ jobs:
           subprocess.run(['git','merge-base','--is-ancestor',baseline,'HEAD'],check=True)
           names=subprocess.check_output(['git','diff','--name-only',baseline,'HEAD'],text=True).splitlines()
           allowed_workflows={'.github/workflows/infinity-2103407-search-pressure-host-gate.yml',
-                             '.github/workflows/infinity-saved-navigation-android.yml'}
+                             '.github/workflows/infinity-saved-navigation-android.yml',
+                             '.github/workflows/infinity-2103402-native-owner-build.yml'}
           assert all(n.startswith('repairs/infinity-final-closure-2103407/') or n in allowed_workflows for n in names), names
           assert not any('cobra' in n.lower() for n in names), names
           scope=json.load(open('repairs/infinity-final-closure-2103407/SCOPE.json'))
@@ -185,7 +186,7 @@ jobs:
                   subprocess.run([sys.executable,'-m','unittest','discover','-s',str(root),'-p',pattern,'-v'],check=True)
               sys.exit(0)
           elif selected=='firstparty-compose':
-              for pattern in ('test_module_contract.py','test_checkpoint_protocol.py','test_firstparty_composition.py'):
+              for pattern in ('test_module_contract.py','test_checkpoint_protocol.py','test_firstparty_composition.py','test_native_build_request.py'):
                   subprocess.run([sys.executable,'-m','unittest','discover','-s',str(root),'-p',pattern,'-v'],check=True)
               sys.exit(0)
           elif selected=='reference-observation':

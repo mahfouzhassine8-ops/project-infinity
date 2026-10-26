@@ -106,21 +106,31 @@
   },
   "native_module_integration": {
     "status": "TARGETED LOCAL PASS",
-    "checks": 6,
-    "scope": "Exactly5existing native gate/build files plus4new trust files;9402otherexisting sources exact, InputManager/header/Favourites/tap code byte-identical",
+    "checks": 8,
+    "scope": "Exactly7existing native gate/audit/build files plus4new verifier files;9400otherexisting sources exact; InputManager/header/Favourites/tap code byte-identical",
     "actual_host_compiled_expressions": [
       "InfinityTitleOwnerReady",
       "SameIdentity/API/package/module-manifest resident predicate"
     ],
-    "full_ARM64": "NOT RUN",
+    "full_ARM64": "SELECTED, not yet run",
     "Android17": "NOT RUN",
-    "Fold": "NOT RUN"
+    "Fold": "NOT RUN",
+    "identity_audit": "2 local actual CPython/ELF checks PASS; exact existing-engine RTLD_NOLOAD factory, shadow native identity denied, generic crypto/audit bodies preserved",
+    "local_python": "3.12.14"
   },
   "reference_observation": {
     "local_checks": 6,
     "status": "PASS:3error/export-scope +3existingrouting",
     "repeat_reason": "Original baseline407 Search input never reached; keep real fixture PermissionError, expose original failure/context and read-only UID/stat observations",
     "APK_changed": false,
-    "Android17": "SELECTED request02, pending commit/run"
+    "Android17": {
+      "run": 40263986044,
+      "status": "FAIL, evidence needs examination; do not infer app pass"
+    },
+    "CI": {
+      "run": 40263985955,
+      "checks": 6,
+      "result": "PASS"
+    }
   }
 }

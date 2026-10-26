@@ -1,9 +1,10 @@
 name: Infinity 2103402 matching ARM64 native-owner signed corrective QA
 on:
   push:
-    branches: [work/infinity-2103402-native-owner-corrective-20261024]
+    branches: [work/infinity-2103402-native-owner-corrective-20261024, work/infinity-final-corrective-from-2103407-20261025]
     paths:
       - ".github/workflows/infinity-2103402-native-owner-build.yml"
+      - "repairs/infinity-final-closure-2103407/NATIVE-BUILD-REQUEST.json"
       - "repairs/infinity-2103402-final/native_ownership_qa.py"
       - "repairs/infinity-2103402-final/restore_reviewed_engine.py"
       - "repairs/infinity-2103402-final/package_native_owner.py"
@@ -11,11 +12,12 @@ permissions:
   contents: read
   actions: read
 concurrency:
-  group: infinity-2103402-matching-native-owner
+  group: infinity-matching-native-owner-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
   build-and-sign:
+    if: github.ref == 'refs/heads/work/infinity-2103402-native-owner-corrective-20261024'
     name: Recompile exact reviewed 9407 native sources and sign verified install-over APK
     runs-on: ubuntu-22.04
     timeout-minutes: 420
@@ -207,4 +209,156 @@ jobs:
             native-owner-overlay/*.json
             kodi-build/CMakeCache.txt
           retention-days: 30
+          if-no-files-found: warn
+
+  final-native:
+    if: github.ref == 'refs/heads/work/infinity-final-corrective-from-2103407-20261025'
+    name: Full matching ARM64 engine from exact407 source - internal integration, not final APK
+    runs-on: ubuntu-22.04
+    timeout-minutes: 420
+    env:
+      NDK_VER: "21.4.7075529"
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-build
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          show-progress: false
+      - name: Validate exact native request and protected final scope
+        run: |
+          set -euo pipefail
+          python3 repairs/infinity-final-closure-2103407/native_build_request.py
+          python3 - <<'PY'
+          import subprocess
+          baseline='0e8739d2d0e1be0ab8f127519b526556426fb160'
+          allowed={'.github/workflows/infinity-2103407-search-pressure-host-gate.yml',
+                   '.github/workflows/infinity-saved-navigation-android.yml',
+                   '.github/workflows/infinity-2103402-native-owner-build.yml'}
+          names=subprocess.check_output(['git','diff','--name-only',baseline,'HEAD'],text=True).splitlines()
+          assert all(n.startswith('repairs/infinity-final-closure-2103407/') or n in allowed for n in names),names
+          assert not any('cobra' in n.lower() for n in names),names
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40089463702
+          name: Infinity-Saved-Navigation-MultiImage-INTERNAL-QA-NOT-ACCEPTED
+          github-token: ${{ github.token }}
+          path: native-foundation
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40149635167
+          name: Infinity-2103402-MATCHING-NATIVE-OWNER-SIGNED-QA-NOT-FOLD-VERIFIED
+          github-token: ${{ github.token }}
+          path: retained-owner
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40158384817
+          name: Infinity-2103402-REUSABLE-ARM64-Context-Favourites-Engine
+          github-token: ${{ github.token }}
+          path: retained-final-compile
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40230842944
+          name: Infinity-2103407-SEARCH-SINGLE-FLIGHT-ORIGINAL-SIGNER-QA
+          github-token: ${{ github.token }}
+          path: signed407
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 38132105717
+          name: Infinity-2103367-Verified-Compiler-Dependencies
+          github-token: ${{ github.token }}
+          path: dependency-transfer
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11.7"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: "platform-tools build-tools;35.0.0 platforms;android-34"
+          log-accepted-android-sdk-licenses: false
+      - name: Verify protected original signer and reconstruct exact407 native lineage
+        run: |
+          set -euo pipefail
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs \
+            signed407/release/Infinity-2103407-Search-Single-Flight-SIGNED-QA.apk > SIGNED407-SIGNATURE.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          value=Path('SIGNED407-SIGNATURE.txt').read_text()
+          match=re.search(r'Signer #1 certificate SHA-256 digest:\s*([a-fA-F0-9]{64})',value)
+          assert match and match.group(1).lower()=='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
+          PY
+          python3 repairs/infinity-final-closure-2103407/reconstruct_signed407_native.py \
+            --foundation native-foundation --owner retained-owner/native-owner-package \
+            --compiled retained-final-compile/native-owner-build \
+            --signed407 signed407/release/Infinity-2103407-Search-Single-Flight-SIGNED-QA.apk \
+            --target kodi --evidence signed407-native
+      - name: Selected six source plus two identity-audit checks - no application or shutdown suite
+        env:
+          FINAL_NATIVE_SOURCE_ROOT: ${{ github.workspace }}/kodi
+          FINAL_NATIVE_SOURCE_MAP: ${{ github.workspace }}/signed407-native/SIGNED407-NATIVE-SOURCE-MAP.json
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s repairs/infinity-final-closure-2103407 \
+            -p test_native_integration.py -v 2>&1 | tee NATIVE-SOURCE-CHECKS.txt
+          python3 -m unittest discover -s repairs/infinity-final-closure-2103407 \
+            -p test_identity_audit.py -v 2>&1 | tee NATIVE-IDENTITY-AUDIT-CHECKS.txt
+      - name: Apply exactly seven owned source edits and four verifier files
+        run: |
+          set -euo pipefail
+          python3 repairs/infinity-final-closure-2103407/stage_native_modules.py \
+            --native kodi --map signed407-native/SIGNED407-NATIVE-SOURCE-MAP.json --out final-native
+      - name: Restore existing verified compiler dependencies
+        run: |
+          set -euo pipefail
+          sudo apt-get -o Acquire::Retries=3 update -qq
+          sudo apt-get install -y python3-yaml python3-dev libsqlite3-dev libssl-dev libffi-dev
+          (cd dependency-transfer && sha256sum -c SHA256SUMS)
+          tar --no-same-owner -xf dependency-transfer/verified-android-dependencies.tar
+          tar --no-same-owner -xf dependency-transfer/verified-compiler-cache.tar -C "$HOME"
+      - uses: actions/cache@v4
+        with:
+          path: /usr/local/lib/android/sdk/ndk/21.4.7075529
+          key: infinity-pinned-ndk-linux-21.4.7075529-v1
+      - run: bash repairs/android-checkpoint-shutdown/install_ndk.sh
+      - name: Compile complete matching9411-source ARM64 engine with unchanged verified producer
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import importlib.util,os,pathlib,subprocess,sys
+          root=pathlib.Path.cwd();suite=root/'repairs/universal-persistence-2103401'
+          sys.path.insert(0,str(suite))
+          spec=importlib.util.spec_from_file_location('retained_complete_native_producer',suite/'build.py')
+          producer=importlib.util.module_from_spec(spec);spec.loader.exec_module(producer)
+          producer.OUT=root/'final-native'
+          proof=producer.compile_engine()
+          assert proof['complete_native_engine_compiled'] is True and proof['reviewed_file_count']==9411
+          readelf=pathlib.Path(os.environ['ANDROID_HOME'])/'ndk/21.4.7075529/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android-readelf'
+          dynamic=subprocess.check_output([str(readelf),'--dyn-syms','--wide','final-native/libkodi.so'],text=True)
+          assert any('InfinityCommandCenterIdentityV1' in line and 'GLOBAL' in line and 'DEFAULT' in line for line in dynamic.splitlines())
+          (root/'final-native/NATIVE-MODULE-ABI.txt').write_text('\n'.join(line for line in dynamic.splitlines() if 'InfinityCommandCenterIdentityV1' in line)+'\n')
+          print('Complete ARM64 compilation and original-key native module ABI verified; integrated Android17/Fold NOT RUN')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-Final-Native-Modules-${{ github.run_id }}-INTERNAL-NOT-APK
+          path: |
+            final-native/libkodi.so
+            final-native/*.json
+            final-native/*.txt
+            signed407-native/*.json
+            NATIVE-REQUEST-EVIDENCE.json
+            SIGNED407-SIGNATURE.txt
+            NATIVE-SOURCE-CHECKS.txt
+            NATIVE-IDENTITY-AUDIT-CHECKS.txt
+            kodi-build/CMakeCache.txt
+          retention-days: 90
           if-no-files-found: warn
