@@ -1,0 +1,265 @@
+{
+  "passed": true,
+  "scenario": "integrated-real-power-ui",
+  "apk_sha256": "b3af984c5f035f6c0e51f70f71726b317ddbb503764eb5306505b583c0643ec4",
+  "candidate_source_commit": "282a12a5e538a3ba05d5544d94a318b1c5de5ad4",
+  "test_source_commit": "fe0b035665f10e95d8ce50bb5471141beec69415",
+  "workflow_run": "40339101105",
+  "physical_Fold": "NOT RUN",
+  "release_accepted": false,
+  "artifact_id": 12657799577,
+  "artifact_sha256": "9171cfe16ed3c326cee9b7eef0d3442804d21feb8bd0a3dcaca1e6532d83fced",
+  "preserved_ordinary411_run": 40317069331,
+  "cycles": [
+    {
+      "cycle": 0,
+      "passed": true,
+      "close_seconds": 5.256245371999967,
+      "timing_scope": "Open existing Power menu, focus real Close control, Android DPAD_CENTER, complete process proof",
+      "native_close_receipt_ms": 2902,
+      "backend_matches": true,
+      "actual_ui_input": "Android KEYCODE_DPAD_CENTER",
+      "essential_owners": [
+        "native_admission",
+        "background_jobs",
+        "playback",
+        "command_center",
+        "compat",
+        "kodi_settings",
+        "profiles",
+        "skin_settings",
+        "addon_settings",
+        "favourites",
+        "peripherals",
+        "audio_policy",
+        "deferred_dialog_state",
+        "xml_files",
+        "native_databases",
+        "pvr"
+      ],
+      "process_ownership_before": {
+        "kodi_engine": [
+          {
+            "pid": 4887,
+            "uid": 10234,
+            "name": "com.projectinfinity.kodi:kodi"
+          }
+        ],
+        "android_coordinator": [
+          {
+            "pid": 4809,
+            "uid": 10234,
+            "name": "com.projectinfinity.kodi"
+          }
+        ],
+        "other_owned_processes": []
+      },
+      "process_ownership_after": {
+        "kodi_engine": [],
+        "android_coordinator": [],
+        "other_owned_processes": []
+      },
+      "separate_results": {
+        "essential_first_durable": true,
+        "kodi_engine_terminated": true,
+        "android_coordinator_completed": true,
+        "remaining_UID_processes": [],
+        "recent_apps_used_for_process_proof": false
+      },
+      "preference_before": {
+        "present": true,
+        "sha256": "9f6ba54226d61b6cd02796a9d61d4831dc2154875bd22d5bcafb7da78b9ace0a",
+        "remembered": "infinity"
+      },
+      "preference_after": {
+        "present": true,
+        "sha256": "9f6ba54226d61b6cd02796a9d61d4831dc2154875bd22d5bcafb7da78b9ace0a",
+        "remembered": "infinity"
+      },
+      "native_and_two_Java_receipts_verified": true,
+      "coordinator_final_termination_authorized": true,
+      "engine_receipt_whole_package_death_confirmed": false,
+      "whole_package_death_note": "Engine receipt predates coordinator final exit; independent after-process enumeration is empty.",
+      "database_integrity": [
+        "Addons33.db",
+        "TV46.db",
+        "Textures13.db",
+        "ViewModes6.db",
+        "MyMusic83.db",
+        "Epg16.db",
+        "MyVideos131.db"
+      ],
+      "protected_readback_passed": true,
+      "reopened_fresh_owner": true
+    },
+    {
+      "cycle": 1,
+      "passed": true,
+      "close_seconds": 5.424570743999993,
+      "timing_scope": "Open existing Power menu, focus real Close control, Android DPAD_CENTER, complete process proof",
+      "native_close_receipt_ms": 3220,
+      "backend_matches": true,
+      "actual_ui_input": "Android KEYCODE_DPAD_CENTER",
+      "essential_owners": [
+        "native_admission",
+        "background_jobs",
+        "playback",
+        "command_center",
+        "compat",
+        "kodi_settings",
+        "profiles",
+        "skin_settings",
+        "addon_settings",
+        "favourites",
+        "peripherals",
+        "audio_policy",
+        "deferred_dialog_state",
+        "xml_files",
+        "native_databases",
+        "pvr"
+      ],
+      "process_ownership_before": {
+        "kodi_engine": [
+          {
+            "pid": 5549,
+            "uid": 10234,
+            "name": "com.projectinfinity.kodi:kodi"
+          }
+        ],
+        "android_coordinator": [
+          {
+            "pid": 5513,
+            "uid": 10234,
+            "name": "com.projectinfinity.kodi"
+          }
+        ],
+        "other_owned_processes": []
+      },
+      "process_ownership_after": {
+        "kodi_engine": [],
+        "android_coordinator": [],
+        "other_owned_processes": []
+      },
+      "separate_results": {
+        "essential_first_durable": true,
+        "kodi_engine_terminated": true,
+        "android_coordinator_completed": true,
+        "remaining_UID_processes": [],
+        "recent_apps_used_for_process_proof": false
+      },
+      "preference_before": {
+        "present": true,
+        "sha256": "9f6ba54226d61b6cd02796a9d61d4831dc2154875bd22d5bcafb7da78b9ace0a",
+        "remembered": "infinity"
+      },
+      "preference_after": {
+        "present": true,
+        "sha256": "9f6ba54226d61b6cd02796a9d61d4831dc2154875bd22d5bcafb7da78b9ace0a",
+        "remembered": "infinity"
+      },
+      "native_and_two_Java_receipts_verified": true,
+      "coordinator_final_termination_authorized": true,
+      "engine_receipt_whole_package_death_confirmed": false,
+      "whole_package_death_note": "Engine receipt predates coordinator final exit; independent after-process enumeration is empty.",
+      "database_integrity": [
+        "Addons33.db",
+        "TV46.db",
+        "Textures13.db",
+        "ViewModes6.db",
+        "MyMusic83.db",
+        "Epg16.db",
+        "MyVideos131.db"
+      ],
+      "protected_readback_passed": true,
+      "reopened_fresh_owner": true
+    },
+    {
+      "cycle": 2,
+      "passed": true,
+      "close_seconds": 4.906029354999987,
+      "timing_scope": "Open existing Power menu, focus real Close control, Android DPAD_CENTER, complete process proof",
+      "native_close_receipt_ms": 2896,
+      "backend_matches": true,
+      "actual_ui_input": "Android KEYCODE_DPAD_CENTER",
+      "essential_owners": [
+        "native_admission",
+        "background_jobs",
+        "playback",
+        "command_center",
+        "compat",
+        "kodi_settings",
+        "profiles",
+        "skin_settings",
+        "addon_settings",
+        "favourites",
+        "peripherals",
+        "audio_policy",
+        "deferred_dialog_state",
+        "xml_files",
+        "native_databases",
+        "pvr"
+      ],
+      "process_ownership_before": {
+        "kodi_engine": [
+          {
+            "pid": 6316,
+            "uid": 10234,
+            "name": "com.projectinfinity.kodi:kodi"
+          }
+        ],
+        "android_coordinator": [
+          {
+            "pid": 6285,
+            "uid": 10234,
+            "name": "com.projectinfinity.kodi"
+          }
+        ],
+        "other_owned_processes": []
+      },
+      "process_ownership_after": {
+        "kodi_engine": [],
+        "android_coordinator": [],
+        "other_owned_processes": []
+      },
+      "separate_results": {
+        "essential_first_durable": true,
+        "kodi_engine_terminated": true,
+        "android_coordinator_completed": true,
+        "remaining_UID_processes": [],
+        "recent_apps_used_for_process_proof": false
+      },
+      "preference_before": {
+        "present": true,
+        "sha256": "9f6ba54226d61b6cd02796a9d61d4831dc2154875bd22d5bcafb7da78b9ace0a",
+        "remembered": "infinity"
+      },
+      "preference_after": {
+        "present": true,
+        "sha256": "9f6ba54226d61b6cd02796a9d61d4831dc2154875bd22d5bcafb7da78b9ace0a",
+        "remembered": "infinity"
+      },
+      "native_and_two_Java_receipts_verified": true,
+      "coordinator_final_termination_authorized": true,
+      "engine_receipt_whole_package_death_confirmed": false,
+      "whole_package_death_note": "Engine receipt predates coordinator final exit; independent after-process enumeration is empty.",
+      "database_integrity": [
+        "Addons33.db",
+        "TV46.db",
+        "Textures13.db",
+        "ViewModes6.db",
+        "MyMusic83.db",
+        "Epg16.db",
+        "MyVideos131.db"
+      ],
+      "protected_readback_passed": true,
+      "reopened_fresh_owner": true
+    }
+  ],
+  "limits": [
+    "API37 emulator, ARM64 APK via Android native bridge; not physical Samsung Fold",
+    "Remember Infinity was exercised. Cobra/Ask/one-time routing bytes preserved, other runtime preference choices not exercised in this lane",
+    "Recents tasks were observed separately and were never required to disappear",
+    "Synthetic16image/unsafe scenario411 remains a separate passing run40331713617",
+    "No loading, poster, 50Search/30Home/20rotation or whole-release acceptance inferred"
+  ]
+}
