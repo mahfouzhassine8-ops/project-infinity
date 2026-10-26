@@ -170,5 +170,23 @@
       "assertions_changed": false,
       "permissions_relaxed": false
     }
+  },
+  "native_full_build": {
+    "run": 40265974119,
+    "source": "eb480142cbc2a01504088eef88326e66d9c22e1e",
+    "status": "PASS_FULL_ARM64_COMPILE",
+    "artifact_id": 12627101398,
+    "artifact_sha256": "81da726e4df3e765a3a938101068df15c96af7010719f5cd0b22e40626f048f1",
+    "scope": "Exact407source reconstructed;7existingownednativefiles+4newverifiers;9411sources compiled.8native/identityaudit tests PASS. Not an APK or Android17/Fold runtime pass."
+  },
+  "api37_reference_03": {
+    "run": 40266735055,
+    "status": "FAIL_BEFORE_SEARCH_SUBMISSION",
+    "artifact_id": 12626777596,
+    "artifact_sha256": "dfefe906ed022371e6c4522578614d4b4ae3d97642c97b69cf4e91d04f935578",
+    "process": "4499 RUNNING",
+    "failure": "host prepared wait600 expired before first-use900+3x180; INFO-only logging cannot show required DEBUG invoker completions",
+    "shutdown": "NOT RUN",
+    "selected_correction": "9observer/setup plus3routing checks PASS locally. Actual API37 repeat pending. Debug logging original recipe, progress snapshots and bounded1800setup only."
   }
 }

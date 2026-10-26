@@ -16,6 +16,16 @@ ROOT=Path(__file__).resolve().parents[2]
 OLD=ROOT/'repairs/save-later-multiimage-20261023'
 PROBE_SHA='72a79edb17640df3a9b7ebf1916047a982211029289486cba0d5d21e48849511'
 FIXTURE_SHA='84f8bd92b186500f8a3d5a41a6492ac58bc7c895b423f3ddb0fa0ca6cdc4dd98'
+DRIVER_SHA='491f2837768294106eec95b83595b2d6ab4659ec35f63b16b61b23427ec139aa'
+CHECKS_SHA='0f2e23d88a9a60994f8ec22c543310b93bbc99977ab2ba9f60168755dd2b3ff1'
+SETUP_BEFORE="    def passed(name,**extra):"
+SETUP_AFTER='''    def record_setup(stage):
+        observation=dict(pid=os.getpid(),selected_mode=mode,setup_stage=stage,
+            first_use_observation=result.get('first_use_observation'),
+            first_use_actions=result.get('first_use_actions'),
+            first_home_gui=result.get('first_home_gui'),passed=False)
+        (path/('search-setup-'+cycle+'.json')).write_text(json.dumps(observation))
+    def passed(name,**extra):'''
 BEFORE='    finally:output.write_text(json.dumps(result,indent=2))'
 AFTER='''    finally:
         if not result.get('passed'):
@@ -35,9 +45,39 @@ def instrument_fixture(raw):
     text=raw.decode()
     if text.count(BEFORE)!=1:raise ValueError('Unexpected original fixture export')
     result=text.replace(BEFORE,AFTER,1)
-    if result.replace(AFTER,BEFORE,1)!=text:raise ValueError('A selected-test assertion changed')
+    if result.count(SETUP_BEFORE)!=1 or result.count('lambda stage:None')!=4:
+        raise ValueError('Unexpected retained provider setup observations')
+    result=result.replace(SETUP_BEFORE,SETUP_AFTER,1).replace('lambda stage:None','record_setup',2)
+    if restore_fixture(result)!=text:raise ValueError('A selected-test assertion changed')
     compile(result,'android_selected.py','exec')
     return result.encode()
+
+
+def restore_fixture(text):
+    return text.replace(AFTER,BEFORE,1).replace(SETUP_AFTER,SETUP_BEFORE,1).replace('record_setup,providers=', 'lambda stage:None,providers=')
+
+
+def setup_logging(device,out):
+    # This is the same debug-only setup used by the retained android_probe.
+    # Called only after the stricter disposable fixture/device/UID guard, and
+    # before launch. Never replace an existing profile configuration.
+    target=device.PROFILE+'/advancedsettings.xml'
+    if device.shell('stat','-c','%F',target,check=False).strip():
+        raise ValueError('Existing logging configuration must not be replaced')
+    path=out/'advancedsettings.xml'
+    path.write_text('<advancedsettings><loglevel hide="true">1</loglevel></advancedsettings>')
+    device.adb('push',path,target)
+
+
+def preparation_seconds(function,seconds):
+    # Only the host Search-ready wait needs to contain the existing finite
+    # setup bounds:900 first-use +3*180 provider homes + routing overhead.
+    # Search RPC, result, UI, persistence and shutdown deadlines stay exact.
+    code=getattr(function,'__code__',None)
+    if (seconds==600 and getattr(function,'__name__','')=='prepared' and code and
+            Path(code.co_filename).resolve()==OLD/'universal/android_search_input.py'):
+        return 1800
+    return seconds
 
 
 def failed_observation(log,pid):
@@ -85,7 +125,9 @@ def main():
     spec=importlib.util.spec_from_file_location('retained_feature_only_probe',path)
     probe=importlib.util.module_from_spec(spec);spec.loader.exec_module(probe)
     original_adb=probe.device.adb
+    logging_prepared=False
     def push(*args,**kwargs):
+        nonlocal logging_prepared
         if len(args)>=2 and args[0]=='push':
             candidate=Path(args[1])
             if candidate.is_dir() and candidate.name==probe.staging.FUTURE:
@@ -93,6 +135,9 @@ def main():
                 if fixture.exists():
                     raw=fixture.read_bytes();result=instrument_fixture(raw);fixture.write_bytes(result)
                     ownership=owned_fixture_profile(probe.device,probe.staging.FUTURE)
+                    if not logging_prepared:
+                        setup_logging(probe.device,candidate.parent.parent)
+                        logging_prepared=True
                     (candidate.parent.parent/'FIXTURE-OBSERVATION-SCOPE.json').write_text(json.dumps({
                         'original_fixture_sha256':hashlib.sha256(raw).hexdigest(),
                         'observed_fixture_sha256':hashlib.sha256(result).hexdigest(),
@@ -101,6 +146,14 @@ def main():
                         'fixture_ownership':ownership},indent=2)+'\n')
         return original_adb(*args,**kwargs)
     probe.device.adb=push
+    for source,wanted in ((OLD/'universal/android_search_input.py',DRIVER_SHA),
+                          (OLD/'android_runtime_checks.py',CHECKS_SHA)):
+        if hashlib.sha256(source.read_bytes()).hexdigest()!=wanted:
+            raise ValueError('Retained provider setup/Search driver changed')
+    original_until=probe.device.until
+    def until(function,seconds):
+        return original_until(function,preparation_seconds(function,seconds))
+    probe.device.until=until
     original_admit=probe.staging.admit_runtime
     def admit(device,owner,out):
         ownership=owned_fixture_profile(device,probe.staging.FUTURE)
@@ -113,6 +166,12 @@ def main():
                      profile+'/navigation-start-'+str(owner['pid'])+'.json'):
             report['fixture_permissions'][path]=device.shell('stat','-c','%u:%g:%a:%F',path,check=False).strip()
         (out/'FIXTURE-PERMISSIONS.json').write_text(json.dumps(report,indent=2)+'\n')
+        (out/'SEARCH-SETUP-BOUNDARY.json').write_text(json.dumps({
+            'host_preparation_seconds':1800,'retained_first_use_seconds':900,
+            'retained_provider_home_seconds_each':180,'providers':3,
+            'debug_log_for_real_invoker_completion':True,'APK_changed':False,
+            'Search_assertions_changed':False,'product_or_shutdown_deadlines_changed':False,
+            'driver_sha256':DRIVER_SHA,'runtime_checks_sha256':CHECKS_SHA},indent=2)+'\n')
     probe.staging.admit_runtime=admit
     original_read=probe.device.read_json;next_read=0.0
     def read(path):

@@ -4,6 +4,7 @@ import json
 import os
 from pathlib import Path
 from types import SimpleNamespace
+import tempfile
 import unittest
 
 import android17_reference_observation as observation
@@ -13,7 +14,7 @@ class ReferenceObservationTests(unittest.TestCase):
     def test_exact_fixture_inverse_diff_and_every_original_assertion_are_preserved(self):
         path=observation.OLD/'tracking/final-eight/android_selected.py'
         before=path.read_bytes();after=observation.instrument_fixture(before).decode()
-        self.assertEqual(after.replace(observation.AFTER,observation.BEFORE,1),before.decode())
+        self.assertEqual(observation.restore_fixture(after),before.decode())
         with self.assertRaises(ValueError):observation.instrument_fixture(before+b'\n')
         self.assertEqual(after.count('ui.require('),before.decode().count('ui.require('))
 
@@ -41,6 +42,45 @@ class ReferenceObservationTests(unittest.TestCase):
         for change in ({'pid':38},{'selected_mode':'final-continue'},{'passed':True}):
             self.assertIsNone(observation.failed_observation(prefix+json.dumps(dict(row,**change)),37))
         self.assertIsNone(observation.failed_observation(prefix+'malformed',37))
+
+    def test_real_setup_observation_never_sets_feature_pass(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source=observation.instrument_fixture((observation.OLD/'tracking/final-eight/android_selected.py').read_bytes())
+            run=next(n for n in ast.parse(source).body if isinstance(n,ast.FunctionDef) and n.name=='run')
+            record=next(n for n in run.body if isinstance(n,ast.FunctionDef) and n.name=='record_setup')
+            result={'passed':False,'first_use_observation':{'finite_startup_task_bodies':{'runMaintenance':{'body_completed':False}}}}
+            scope=dict(path=Path(directory),cycle='37',mode='final-search-all-enter',os=os,json=json,result=result)
+            exec(compile(ast.fix_missing_locations(ast.Module(body=[record],type_ignores=[])),'record','exec'),scope)
+            scope['record_setup']('provider-first-use')
+            row=json.loads((Path(directory)/'search-setup-37.json').read_text())
+            self.assertFalse(row['passed']);self.assertFalse(result['passed'])
+            self.assertEqual(row['first_use_observation'],result['first_use_observation'])
+            self.assertFalse((Path(directory)/'navigation-ready-37.json').exists())
+
+    def test_only_exact_retained_prepared_wait_contains_existing_setup_bounds(self):
+        scope={}
+        exec(compile('def prepared(): pass',str(observation.OLD/'universal/android_search_input.py'),'exec'),scope)
+        prepared=scope['prepared']
+        self.assertEqual(observation.preparation_seconds(prepared,600),1800)
+        for seconds in (10,45,90,180,900,1800):
+            self.assertEqual(observation.preparation_seconds(prepared,seconds),seconds)
+        self.assertEqual(observation.preparation_seconds(lambda:None,600),600)
+        exec(compile('def prepared(): pass','other-driver.py','exec'),scope)
+        self.assertEqual(observation.preparation_seconds(scope['prepared'],600),600)
+
+    def test_debug_setup_is_original_recipe_and_refuses_existing_configuration(self):
+        calls=[]
+        device=SimpleNamespace(PROFILE='/disposable',shell=lambda *a,**kw:'',adb=lambda *a:calls.append(a))
+        with tempfile.TemporaryDirectory() as directory:
+            observation.setup_logging(device,Path(directory))
+            self.assertEqual(len(calls),1)
+            self.assertEqual(calls[0][0],'push')
+            self.assertEqual(calls[0][-1],'/disposable/advancedsettings.xml')
+            raw=calls[0][1].read_text()
+            self.assertIn(raw,(observation.OLD/'android_probe.py').read_text())
+            device.shell=lambda *a,**kw:'regular file'
+            with self.assertRaises(ValueError):observation.setup_logging(device,Path(directory))
+            self.assertEqual(len(calls),1)
 
 
 class FixtureOwnershipTests(unittest.TestCase):
