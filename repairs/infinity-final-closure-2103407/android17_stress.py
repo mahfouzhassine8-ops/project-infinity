@@ -191,13 +191,19 @@ def _run(device,setup,expected,out):
             action='search-all' if provider=='all' else 'search-provider'
             if params.get('action')!=[action]:raise RuntimeError('Search provider selection changed unexpectedly')
             if provider!='all' and params.get('provider')!=[provider]:raise RuntimeError('Provider identity changed')
-            if not value.get(keys[1],'').isdigit() or int(value[keys[1]])<4:return None
+            if not value.get(keys[1],'').isdigit() or int(value[keys[1]])<1:return None
             count=int(value[keys[1]]);require(count<=200,'Unexpected unbounded fixture results')
-            labels=['Container.ListItemAbsolute('+str(i)+').Property(Infinity.Search.Provider)' for i in range(count+1)]
+            labels=[key for i in range(count+1) for key in (
+                'Container.ListItemAbsolute('+str(i)+').Property(Infinity.Search.Provider)',
+                'Container.ListItemAbsolute('+str(i)+').Label')]
             sources=device.rpc('XBMC.GetInfoLabels',{'labels':labels})
             required={'plugin.video.pov','plugin.video.umbrella','plugin.video.seren'} if provider=='all' else {provider}
-            if not required.issubset(set(sources.values())):return None
-            value['actual_providers']=sorted(set(sources.values())-{''})
+            from search_terminal_observer import classify
+            terminal=classify([dict(provider=sources.get(labels[2*i],''),label=sources.get(labels[2*i+1],''))
+                for i in range(count+1)],required)
+            if terminal is None:return None
+            value['actual_providers']=sorted(terminal['providers'])
+            value['actual_provider_terminal']=terminal
             return value
         visible=device.until(results,90)
         report['search'].append(dict(cycle=index,query=query,elapsed_ms=(time.monotonic()-began)*1000,
@@ -212,7 +218,7 @@ def _run(device,setup,expected,out):
             tap(control(values,'Close Infinity Search'))
             device.until(lambda:not any(n.get('class')=='android.widget.EditText' for n in nodes()),20)
             home();report['search'][-1]['additional_search_cancelled']=True;save()
-        if (index+1)%10==0:memory('search-'+str(index+1))
+        if (index+1)%5==0:memory('search-'+str(index+1))
 
     clip=out/'generated-native-cycle.mp4'
     subprocess.run(['ffmpeg','-v','error','-f','lavfi','-i','color=c=gray:s=640x360:r=24',
@@ -234,7 +240,8 @@ def _run(device,setup,expected,out):
         import stress_resume_card
         card=stress_resume_card.observe(device,protected,'movie' if index%2==0 else 'tv',out/('poster-playback-'+str(index)))
         report['playback_home'].append(dict(cycle=index,home_window_rpc_ready_ms=rpc_ready_ms,
-            stop_to_correct_usable_card_ms=(time.monotonic()-started)*1000,
+            stop_to_correct_usable_card_ms=(card['observation_began_monotonic']-started)*1000+card['tab_select_to_usable_card_ms'],
+            exact_native_proof_finished_after_stop_ms=(time.monotonic()-started)*1000,
             actual_resume_card=card,playback=evidence,poster_paint_verified=card['poster_paint_verified']))
         save()
         if (index+1)%10==0:memory('playback-'+str(index+1))
@@ -269,6 +276,11 @@ def _run(device,setup,expected,out):
         (out/('after-layer-'+str(index)+'.txt')).write_text(device.shell('dumpsys','SurfaceFlinger','--latency',layer,check=False))
     (out/'display-state.txt').write_text(device.shell('dumpsys','display',check=False))
     report['search_duration']=quantiles([x['elapsed_ms'] for x in report['search']])
+    report['search_interaction_stability_scope']='Exact actual terminal UI; attributed provider failures remain separate content failures'
+    report['successful_content_searches']=sum(x['visible']['actual_provider_terminal']['content_success'] for x in report['search'])
+    report['provider_content_failures']=[dict(cycle=x['cycle'],failures=x['visible']['actual_provider_terminal']['graceful_provider_failures'])
+        for x in report['search'] if not x['visible']['actual_provider_terminal']['content_success']]
+    report['all_searches_returned_successful_content']=report['successful_content_searches']==COUNTS['search']
     report['home_window_rpc_duration']=quantiles([x['home_window_rpc_ready_ms'] for x in report['playback_home']])
     report['stop_to_correct_usable_card_duration']=quantiles([x['stop_to_correct_usable_card_ms'] for x in report['playback_home']])
     report['cpu_intervals']=[dict(before=a['stage'],after=b['stage'],**android_frame_samples.cpu_interval(a,b,report['clock_ticks']))

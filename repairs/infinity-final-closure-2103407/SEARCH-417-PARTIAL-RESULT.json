@@ -1,0 +1,280 @@
+{
+  "run": 40375195635,
+  "test_source": "999a9193d7280bf9b5b744362564b611a9bb8d43",
+  "candidate_source": "d10fffd80182c796955534ffdecc5ccc288da99b",
+  "apk_sha256": "4428332453714adc1aa652ee5db76ff2e79f705171dab8e020d7915631e00d83",
+  "artifact": 12677925467,
+  "artifact_sha256": "bb080b19675653bcace658080b10df5010a8dd840a5374a19ad7d5cbcc2888b9",
+  "passed": false,
+  "original_actual_Enter_results_History_Home_passed": true,
+  "completed": {
+    "search": 7,
+    "playback_home": 0,
+    "rotation": 0
+  },
+  "failure": "Selected stress: RuntimeError: Feature state was not observed before deadline",
+  "actual_searches": [
+    {
+      "cycle": 0,
+      "query": "Just Friends",
+      "elapsed_ms": 65780.03973400018,
+      "visible": {
+        "Container.FolderPath": "plugin://script.infinity.commandcenter/?action=search-all&media=movie&query=Just+Friends",
+        "Container.NumItems": "53",
+        "actual_providers": [
+          "plugin.video.pov",
+          "plugin.video.seren",
+          "plugin.video.umbrella"
+        ]
+      },
+      "pid": 4709,
+      "actual_android_input": true,
+      "selected_provider": "all",
+      "history_row_used": false,
+      "duplicate_enter_sent": false
+    },
+    {
+      "cycle": 1,
+      "query": "The Matrix",
+      "elapsed_ms": 48031.44774700013,
+      "visible": {
+        "Container.FolderPath": "plugin://script.infinity.commandcenter/?action=search-provider&media=movie&query=The+Matrix&provider=plugin.video.umbrella",
+        "Container.NumItems": "22",
+        "actual_providers": [
+          "plugin.video.umbrella"
+        ]
+      },
+      "pid": 4709,
+      "actual_android_input": true,
+      "selected_provider": "plugin.video.umbrella",
+      "history_row_used": false,
+      "duplicate_enter_sent": false
+    },
+    {
+      "cycle": 2,
+      "query": "Just Friends",
+      "elapsed_ms": 54724.418914000125,
+      "visible": {
+        "Container.FolderPath": "plugin://script.infinity.commandcenter/?action=search-all&media=movie&query=Just+Friends",
+        "Container.NumItems": "53",
+        "actual_providers": [
+          "plugin.video.pov",
+          "plugin.video.seren",
+          "plugin.video.umbrella"
+        ]
+      },
+      "pid": 4709,
+      "actual_android_input": true,
+      "selected_provider": "all",
+      "history_row_used": false,
+      "duplicate_enter_sent": false
+    },
+    {
+      "cycle": 3,
+      "query": "The Matrix",
+      "elapsed_ms": 66209.52830600004,
+      "visible": {
+        "Container.FolderPath": "plugin://script.infinity.commandcenter/?action=search-provider&media=movie&query=The+Matrix&provider=plugin.video.umbrella",
+        "Container.NumItems": "22",
+        "actual_providers": [
+          "plugin.video.umbrella"
+        ]
+      },
+      "pid": 4709,
+      "actual_android_input": true,
+      "selected_provider": "plugin.video.umbrella",
+      "history_row_used": false,
+      "duplicate_enter_sent": false
+    },
+    {
+      "cycle": 4,
+      "query": "Just Friends",
+      "elapsed_ms": 86691.98486799997,
+      "visible": {
+        "Container.FolderPath": "plugin://script.infinity.commandcenter/?action=search-all&media=movie&query=Just+Friends",
+        "Container.NumItems": "53",
+        "actual_providers": [
+          "plugin.video.pov",
+          "plugin.video.seren",
+          "plugin.video.umbrella"
+        ]
+      },
+      "pid": 4709,
+      "actual_android_input": true,
+      "selected_provider": "all",
+      "history_row_used": false,
+      "duplicate_enter_sent": false
+    },
+    {
+      "cycle": 5,
+      "query": "The Matrix",
+      "elapsed_ms": 75903.80520899998,
+      "visible": {
+        "Container.FolderPath": "plugin://script.infinity.commandcenter/?action=search-provider&media=movie&query=The+Matrix&provider=plugin.video.umbrella",
+        "Container.NumItems": "22",
+        "actual_providers": [
+          "plugin.video.umbrella"
+        ]
+      },
+      "pid": 4709,
+      "actual_android_input": true,
+      "selected_provider": "plugin.video.umbrella",
+      "history_row_used": false,
+      "duplicate_enter_sent": false
+    },
+    {
+      "cycle": 6,
+      "query": "Just Friends",
+      "elapsed_ms": 86974.55073100014,
+      "visible": {
+        "Container.FolderPath": "plugin://script.infinity.commandcenter/?action=search-all&media=movie&query=Just+Friends",
+        "Container.NumItems": "53",
+        "actual_providers": [
+          "plugin.video.pov",
+          "plugin.video.seren",
+          "plugin.video.umbrella"
+        ]
+      },
+      "pid": 4709,
+      "actual_android_input": true,
+      "selected_provider": "all",
+      "history_row_used": false,
+      "duplicate_enter_sent": false
+    }
+  ],
+  "actual_initial_cached_Home_card": {
+    "media": "movie",
+    "key": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "exact_usable_card": true,
+    "observed": {
+      "Container(8830).ListItem.Episode": "",
+      "Container(8830).ListItem.Label": "The Matrix",
+      "Container(8830).ListItem.PercentPlayed": "33",
+      "Container(8830).ListItem.Property(Infinity.ResumeHub.Watched)": "false",
+      "Container(8830).ListItem.Property(Infinity.Selection.Snapshot)": "{\"bucket\":\"continue\",\"identity\":{\"ids\":{\"imdb\":\"tt0133093\"},\"kind\":\"movie\",\"schema\":1,\"scope\":\"movie\"},\"key\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"list\":\"\",\"owner\":\"script.infinity.commandcenter\",\"schema\":1,\"source\":\"special://profile/infinity-final-qa.mp4\",\"stable_source\":\"special://profile/infinity-final-qa.mp4\",\"token\":\"52f818e464fdd76b57048d55623ec9c816cafa102a29f74dbc6725a033f226ae\"}",
+      "Container(8830).ListItem.Season": "",
+      "Container(8830).NumItems": "1"
+    },
+    "native_directory_resume": {
+      "position": 60.0,
+      "total": 180.0
+    },
+    "tab_select_to_card_visible_ms": 3470.228991999875,
+    "tab_select_to_usable_card_ms": 13783.393625999906,
+    "verification_scope": "Visible native resume percent plus exact directory native resume; reserved GUI properties are not readouts",
+    "generated_metadata_and_declared_clip": true,
+    "poster_paint_verified": true,
+    "actual_cached_poster": {
+      "width": 1080,
+      "height": 1920,
+      "regions": [
+        {
+          "colour": [
+            17,
+            203,
+            91
+          ],
+          "pixels": 14904,
+          "sampled_pixels": 2129,
+          "x": 70.97463597933302,
+          "y": 1538.9488022545795,
+          "bounds": [
+            24,
+            1461,
+            118,
+            1617
+          ]
+        },
+        {
+          "colour": [
+            237,
+            49,
+            174
+          ],
+          "pixels": 14907,
+          "sampled_pixels": 2129,
+          "x": 166.03053076561767,
+          "y": 1538.937999060592,
+          "bounds": [
+            119,
+            1461,
+            213,
+            1617
+          ]
+        },
+        {
+          "colour": [
+            44,
+            97,
+            233
+          ],
+          "pixels": 14750,
+          "sampled_pixels": 2108,
+          "x": 70.5061669829222,
+          "y": 1699.9682163187856,
+          "bounds": [
+            24,
+            1622,
+            117,
+            1778
+          ]
+        },
+        {
+          "colour": [
+            243,
+            176,
+            33
+          ],
+          "pixels": 14745,
+          "sampled_pixels": 2105,
+          "x": 166.5562945368171,
+          "y": 1700.1040380047507,
+          "bounds": [
+            120,
+            1622,
+            213,
+            1778
+          ]
+        }
+      ],
+      "sample_stride": 7,
+      "actual_surface_bitmap_verified": true,
+      "first_observed_poster_capture_ms": 13484.854024000015,
+      "paint_verification_finished_ms": 13783.190160000004,
+      "samples": 1,
+      "observation": "Actual cached synthetic bitmap on Android surface; conservative captured upper bound, not GPU first-paint timestamp"
+    }
+  },
+  "actual_memory": [
+    {
+      "stage": "before",
+      "pss_kib": 903535,
+      "rss_kib": 1070824,
+      "thread_count": 65,
+      "descriptor_count": 505
+    }
+  ],
+  "actual_helpers": {
+    "Window(Home).Property(Infinity.Continuity.Observer)": "active",
+    "Window(Home).Property(Infinity.NativeAmbient.WriterLifecycle)": "running-optional"
+  },
+  "actual_observed_provider_timeout": {
+    "provider": "plugin.video.umbrella",
+    "request_time": "18:32:11.871",
+    "native_error_time": "18:32:31.890",
+    "actual_script_exit": "18:32:39.580",
+    "concurrent_provider_background": [
+      "Seren runMaintenance",
+      "Seren syncTraktActivities"
+    ]
+  },
+  "measurement_limits": [
+    "Initial visible correct card3470ms, actual poster captured13484ms AFTER a diagnostic native directory invocation; this is a conservative capture bound, not actual first paint",
+    "No after-memory sample was reached; no improvement/leak elimination claim",
+    "No playback or rotation scenarios reached",
+    "Original run remains FAILED; valid attributed native timeouts will be reported separately from successful content in the next explicitly selected observation"
+  ],
+  "physical_Fold": "NOT RUN",
+  "release_accepted": false,
+  "final_lock": false
+}

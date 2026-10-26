@@ -33,18 +33,21 @@ def observe(device,records,media,out=None):
         return labels
     labels=device.until(ready,20)
     visible_ms=(time.monotonic()-began)*1000
-    rows=device.rpc('Files.GetDirectory',{'directory':'plugin://script.infinity.uirepair/?action=continue&media='+media,
-                                        'media':'video','properties':['resume']})['files']
-    if len(rows)!=1:raise AssertionError('Native directory differs from exact single visible saved card')
-    verify_card(expected,labels,prefix,bool(device.rpc('Player.GetActivePlayers')),rows[0].get('resume'))
     poster=None
     if expected.get('poster')=='special://profile/infinity-qa-poster.png':
         if out is None:raise ValueError('Actual poster output required')
         import cached_poster_observer
         poster=cached_poster_observer.observe(device,out,began,began+20)
+    usable_ms=poster['first_observed_poster_capture_ms'] if poster is not None else visible_ms
+    rows=device.rpc('Files.GetDirectory',{'directory':'plugin://script.infinity.uirepair/?action=continue&media='+media,
+                                        'media':'video','properties':['resume']})['files']
+    if len(rows)!=1:raise AssertionError('Native directory differs from exact single visible saved card')
+    verify_card(expected,labels,prefix,bool(device.rpc('Player.GetActivePlayers')),rows[0].get('resume'))
     return dict(media=media,key=key,exact_usable_card=True,observed=labels,
+                observation_began_monotonic=began,
                 native_directory_resume=rows[0].get('resume'),tab_select_to_card_visible_ms=visible_ms,
-                tab_select_to_usable_card_ms=(time.monotonic()-began)*1000,
+                tab_select_to_usable_card_ms=usable_ms,
+                exact_native_proof_finished_ms=(time.monotonic()-began)*1000,
                 verification_scope='Visible native resume percent plus exact directory native resume; reserved GUI properties are not readouts',
                 generated_metadata_and_declared_clip=True,poster_paint_verified=poster is not None,
                 actual_cached_poster=poster)

@@ -52,7 +52,9 @@ class StressAdmissionTests(unittest.TestCase):
         for forbidden in ('essential_android_probe','InfinityPowerControlActivity','CLOSE_KODI','force-stop','pm clear','uninstall'):
             self.assertNotIn(forbidden,body)
         self.assertIn('device.until(keyboard,45)',body);self.assertIn('Player.Open',body)
-        self.assertIn('poster_paint_verified=False',body);self.assertIn('physical_fold=False',body)
+        self.assertIn("poster_paint_verified=card['poster_paint_verified']",body)
+        self.assertIn("cached QA bitmap observed on native Android surface",body)
+        self.assertIn('physical_fold=False',body)
 
 
 if __name__=='__main__':unittest.main(verbosity=2)
