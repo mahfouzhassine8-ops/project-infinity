@@ -199,6 +199,11 @@ class ImportGuard(importlib.abc.MetaPathFinder):
     def __init__(self, contract):
         self.contract = contract
 
+    def invalidate_caches(self):
+        # Replacing PathFinder must preserve its invalidation callback as well
+        # as find_spec, including for newly installed unrelated add-on modules.
+        importlib.machinery.PathFinder.invalidate_caches()
+
     def find_spec(self, fullname, path=None, target=None):
         spec = importlib.machinery.PathFinder.find_spec(fullname, path, target)
         relative = self.contract.relative_origin(spec.origin) if spec is not None else None

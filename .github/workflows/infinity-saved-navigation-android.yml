@@ -41,6 +41,7 @@ jobs:
       CANDIDATE_ARTIFACT: Infinity-Saved-Navigation-MultiImage-INTERNAL-QA-NOT-ACCEPTED
       AUTHORIZED_SCOPE: ${{ inputs.authorization }}
       SELECTED_CASE: ${{ inputs.feature }}
+      FEATURE_PROBE: repairs/save-later-multiimage-20261023/android_feature_probe.py
       PYTHONDONTWRITEBYTECODE: '1'
     steps:
       - uses: actions/checkout@v4
@@ -135,7 +136,7 @@ jobs:
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
           script: |
-            python3 repairs/save-later-multiimage-20261023/android_feature_probe.py --apk "$TEST_APK" --expected-sha "$TEST_APK_SHA" --case "$SELECTED_CASE" --authorization "$AUTHORIZED_SCOPE" --out feature-results
+            python3 "$FEATURE_PROBE" --apk "$TEST_APK" --expected-sha "$TEST_APK_SHA" --case "$SELECTED_CASE" --authorization "$AUTHORIZED_SCOPE" --out feature-results
       - uses: actions/upload-artifact@v4
         if: always()
         with:

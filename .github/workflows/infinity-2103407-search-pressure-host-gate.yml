@@ -188,6 +188,10 @@ jobs:
               for pattern in ('test_module_contract.py','test_checkpoint_protocol.py','test_firstparty_composition.py'):
                   subprocess.run([sys.executable,'-m','unittest','discover','-s',str(root),'-p',pattern,'-v'],check=True)
               sys.exit(0)
+          elif selected=='reference-observation':
+              for pattern in ('test_reference_observation.py','test_android17_reference.py'):
+                  subprocess.run([sys.executable,'-m','unittest','discover','-s',str(root),'-p',pattern,'-v'],check=True)
+              sys.exit(0)
           elif selected=='android-routing':
               pattern='test_android17_reference.py'
           else:

@@ -170,5 +170,18 @@ std::string CSpecialProtocol::TranslatePath(const std::string& p) {
         self.sign(version='0.3.5.41')
         with self.assertRaises(self.module.ContractRejected):self.module.require_current()
 
+    def test_import_cache_invalidation_finds_new_unrelated_modules(self):
+        outside=self.addons/'dynamic-unrelated';outside.mkdir()
+        self.guard();sys.path.insert(0,str(outside))
+        self.assertIsNone(importlib.machinery.PathFinder.find_spec('_infinity_new_module'))
+        stamp=outside.stat()
+        (outside/'_infinity_new_module.py').write_text('value="newly installed"\n')
+        # Guarantee that this exercises invalidation, independent of the CI
+        # filesystem's directory timestamp granularity.
+        os.utime(outside,ns=(stamp.st_atime_ns,stamp.st_mtime_ns))
+        self.assertIsNone(importlib.machinery.PathFinder.find_spec('_infinity_new_module'))
+        importlib.invalidate_caches()
+        self.assertEqual(importlib.import_module('_infinity_new_module').value,'newly installed')
+
 
 if __name__=='__main__':unittest.main(verbosity=2)

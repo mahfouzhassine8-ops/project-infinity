@@ -13,7 +13,7 @@ AUTHORIZATION = ('Authorized final Infinity scope: actual Android17 baseline407 
                  'existing feature-only runner. No shutdown, new APK, user installation or physical acceptance.')
 EXPECTED = dict(schema=1, selected_case='final-search-all-enter', candidate_build=40230842944,
                 baseline_commit=BASELINE, baseline_apk_sha256=APK,
-                authorization=AUTHORIZATION, request_id='final407-search-reference-01')
+                authorization=AUTHORIZATION, request_id='final407-search-reference-02-observation')
 
 
 def validate(request, event, head, changed):
@@ -30,7 +30,8 @@ def validate(request, event, head, changed):
         raise ValueError('Unrelated source changed with this request')
     return dict(CANDIDATE_BUILD='40230842944', SELECTED_CASE='final-search-all-enter',
                 CANDIDATE_ARTIFACT='Infinity-2103407-SEARCH-SINGLE-FLIGHT-ORIGINAL-SIGNER-QA',
-                BASELINE_REQUEST_PATH=REQUEST, AUTHORIZED_SCOPE=AUTHORIZATION)
+                BASELINE_REQUEST_PATH=REQUEST, AUTHORIZED_SCOPE=AUTHORIZATION,
+                FEATURE_PROBE='repairs/infinity-final-closure-2103407/android17_reference_observation.py')
 
 
 def main():

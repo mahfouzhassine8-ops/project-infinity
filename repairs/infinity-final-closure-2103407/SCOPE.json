@@ -173,6 +173,16 @@
     "sole_push_request": "repairs/infinity-final-closure-2103407/ANDROID17-REQUEST.json",
     "authorization": "Reuse existing explicitly authorized narrow push request architecture for final corrective branch; latest final scope explicitly requires Android17 execution.",
     "apk_mutation": false,
-    "shutdown_test": "NOT SELECTED; remains independent"
+    "shutdown_test": "NOT SELECTED; remains independent",
+    "observation_repair": {
+      "prior_failed_run": 40257708654,
+      "fixture_source": "repairs/save-later-multiimage-20261023/tracking/final-eight/android_selected.py",
+      "fixture_source_sha256": "84f8bd92b186500f8a3d5a41a6492ac58bc7c895b423f3ddb0fa0ca6cdc4dd98",
+      "change": "Log original selected-test failure before original result-file export; preserve every test assertion and write failure. Read-only UID/mode/status observations for the disposable fixture. No production source, APK, provider, app permission, SELinux, test result or checkpoint gate changes.",
+      "request": "One repeat of previously unreached actual signed407 Search All Enter path; not a passing result or a diagnostics APK",
+      "selected_checks": [
+        "test_reference_observation.py: exact fixture inverse-diff, original failing assertion remains failure, export failure remains failure, native source/APK untouched; test_android17_reference.py existing3routing only"
+      ]
+    }
   }
 }
