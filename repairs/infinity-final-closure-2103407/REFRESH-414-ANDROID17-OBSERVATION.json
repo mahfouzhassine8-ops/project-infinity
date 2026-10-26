@@ -1,0 +1,25 @@
+{
+  "scope": "actualCCresident_constructor_only; do not claim entire shared runtime is errorfree",
+  "raw_log_clock_comparability": "Different API37 VM sessions and durations; exception callcounts only, not CPU/RAM/speedup",
+  "source_change": "Signed414 enabled-only constructor guard in CC service/default, original native constructor semantics",
+  "observations": [
+    {
+      "run": 40339101105,
+      "CC_threads": [
+        "7367"
+      ],
+      "CC_errors": 1,
+      "total_errors": 10,
+      "remaining_error_owner": "Unchanged dual-skin Compat thread; Cobra/shared behavior off limits"
+    },
+    {
+      "run": 40346078040,
+      "CC_threads": [
+        "6572"
+      ],
+      "CC_errors": 0,
+      "total_errors": 6,
+      "remaining_error_owner": "Unchanged dual-skin Compat thread; Cobra/shared behavior off limits"
+    }
+  ]
+}

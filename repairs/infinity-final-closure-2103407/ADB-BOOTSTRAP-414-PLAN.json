@@ -10,5 +10,12 @@
     "Other root failures, physical/wrongAPI/installed/live/secondfailure never pass or retry app",
     "Original fixture predicates/inverse and independent shutdown controls retained"
   ],
-  "release_accepted": false
+  "release_accepted": false,
+  "actual_retry_failure": {
+    "run": 40348051988,
+    "artifact_id": 12663843276,
+    "artifact_sha256": "04bd953c9b190944fe191c9a34667fa5d0fc07a383d97920ebd43b705c4a9963",
+    "error": "Helper passed unsupported timeout keyword to retained adb wrapper before installation; host fake previously accepted arbitrary kwargs"
+  },
+  "signature_correction": "Actual retained adb(*args,check=True,binary=False) has fixed90sec subprocess timeout. Use one fixed non-mutating subprocess adb wait-for-device timeout30, then original root wrapper. New test invokes actual retained transport with simulated process responses and asserts actual90/30/90 budgets; no application retries."
 }

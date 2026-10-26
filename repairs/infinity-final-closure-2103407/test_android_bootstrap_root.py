@@ -2,7 +2,12 @@ from pathlib import Path
 import tempfile
 from types import SimpleNamespace
 from unittest import TestCase,main
+from unittest.mock import patch
 import android_bootstrap_root as bootstrap
+import android17_candidate_probe as candidate
+import sys
+sys.path.insert(0,str(candidate.OLD))
+import android_feature_device as retained
 
 
 class BootstrapRootTests(TestCase):
@@ -15,15 +20,15 @@ class BootstrapRootTests(TestCase):
 
     def test_one_transport_retry_before_app_and_other_errors_do_not_retry(self):
         calls=[]
-        def adb(*args,**kwargs):
-            calls.append((args,kwargs))
+        def adb(*args,check=True,binary=False):
+            calls.append(args)
             if len(calls)==1:raise RuntimeError('adb: unable to connect for root: closed')
             return 'restarting adbd as root'
-        with tempfile.TemporaryDirectory() as temp:
+        with tempfile.TemporaryDirectory() as temp,patch.object(bootstrap.subprocess,'run',return_value=SimpleNamespace(returncode=0,stderr='')) as wait:
             self.assertIn('root',bootstrap.root(self.device(),adb,Path(temp)))
             self.assertTrue((Path(temp)/'ADB-ROOT-TRANSPORT-RECOVERY.json').is_file())
-        self.assertEqual([v[0] for v in calls],[('root',),('wait-for-device',),('root',)])
-        self.assertEqual(calls[1][1],{'timeout':30})
+            wait.assert_called_once_with(['adb','wait-for-device'],capture_output=True,text=True,timeout=30)
+        self.assertEqual(calls,[('root',),('root',)])
         for message in ('permission denied','device unauthorized','unknown root failure'):
             calls=[]
             def fail(*args,**kwargs):calls.append(args);raise RuntimeError(message)
@@ -37,9 +42,21 @@ class BootstrapRootTests(TestCase):
                 calls.append(args)
                 if args==('root',):raise RuntimeError('unable to connect for root: closed')
                 return ''
-            with tempfile.TemporaryDirectory() as temp,self.assertRaises((ValueError,RuntimeError)):
+            with tempfile.TemporaryDirectory() as temp,patch.object(bootstrap.subprocess,'run',return_value=SimpleNamespace(returncode=0,stderr='')),self.assertRaises((ValueError,RuntimeError)):
                 bootstrap.root(self.device(**changes),adb,Path(temp))
             self.assertEqual(calls.count(('root',)),2 if not changes else 1)
+
+    def test_actual_retained_transport_signature_and_both_real_subprocess_budgets(self):
+        calls=[]
+        def process(command,**kwargs):
+            calls.append((command,kwargs))
+            closed=len(calls)==1
+            return SimpleNamespace(returncode=1 if closed else 0,
+                stderr='adb: unable to connect for root: closed' if closed else '',stdout='root ready')
+        with tempfile.TemporaryDirectory() as temp,patch.object(bootstrap.subprocess,'run',side_effect=process):
+            self.assertEqual(bootstrap.root(self.device(),retained.adb,Path(temp)),'root ready')
+        self.assertEqual([v[0] for v in calls],[['adb','root'],['adb','wait-for-device'],['adb','root']])
+        self.assertEqual([v[1]['timeout'] for v in calls],[90,30,90])
 
 
 if __name__=='__main__':main(verbosity=2)
