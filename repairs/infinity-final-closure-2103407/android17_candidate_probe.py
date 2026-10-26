@@ -97,7 +97,7 @@ def require_disposable(device):
 def install_over(device,adb,baseline,candidate,out,fixture_id):
     require_disposable(device)
     if digest(baseline)!=BASELINE_SHA:raise ValueError('Protected baseline differs')
-    if digest(candidate)!=EXPECTED['candidate_apk_sha256']:raise ValueError('Exact signed409candidate required')
+    if digest(candidate)!=EXPECTED['candidate_apk_sha256']:raise ValueError('Exact signed corrective candidate required')
     if device.PACKAGE in device.shell('pm','list','packages',device.PACKAGE):
         raise ValueError('Existing device installation refused')
     if 'Success' not in adb('install','--no-incremental',baseline):raise RuntimeError('Protected baseline installation failed')
@@ -150,7 +150,7 @@ def main(selected_case=None,independent_setup=None):
             path.write_bytes(fixture(before))
             shutil.copyfile(Path(__file__).parent/'shutdown_environment.py',stage/aid/'shutdown_environment.py')
             # Seed the actual previous code, not new code installed by a test.
-            # Java409 must migrate all four original IDs before Python starts.
+            # The authenticated installer must migrate all four original IDs before Python starts.
             for addon in IDS:
                 target=stage/addon
                 if target.is_symlink():raise ValueError('Linked fixture refused')
@@ -206,6 +206,11 @@ def main(selected_case=None,independent_setup=None):
         original_execute=probe.execute
         def execute(args):
             report=original_execute(args)
+            if report.get('platform',{}).get('qemu')=='1' and isinstance(report.get('engine',{}).get('pid'),int):
+                target=probe.device.PROFILE+'/addon_data/'+probe.staging.FUTURE+'/environment-'+str(report['engine']['pid'])+'.json'
+                environment=probe.device.read_json(target)
+                (args.out/'VERSIONCHECK-ENVIRONMENT.json').write_text(json.dumps(dict(
+                    status='AVAILABLE' if environment else 'UNAVAILABLE',value=environment),indent=2)+'\n')
             if selected_case==EXPECTED['selected_case'] and EXPECTED.get('post_feature'):
                 report['selected_feature_passed']=report.get('passed') is True
                 if report['selected_feature_passed']:

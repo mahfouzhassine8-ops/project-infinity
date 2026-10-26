@@ -3,14 +3,14 @@ import json
 from pathlib import Path
 
 ROOT=Path(__file__).parent
-AUTHORIZATION=('UserOct26 GitHubfailure correction: originalAPI37 SearchAll Enter/results/history/Home withactual '
+AUTHORIZATION=('UserOct26 GitHubfailure correction: actualsigned410 originalAPI37 SearchAll Enter/results/history/Home withactual '
     'IMEbody-ready proof insideunchanged45secondkeyboarddeadline. ReadonlyPATH/defaultVersionChecksource metadata; '
     'nochildexecution, Close, textrepair, stressrepetition orproductionAPKchange.')
 EXPECTED=dict(schema=1,kind='integrated-candidate',selected_case='final-search-all-enter',
-    candidate_build=40295309934,candidate_source_commit='b65ae4981f10bd6badf118ce95f360d28499c2d7',
-    candidate_apk_sha256='4d68e3bf21ee109a9196267e9ed2b21ea8430fff8dede331af3c199e9921bf21',
-    candidate_artifact='Infinity-2103409-Integrated-INTERNAL-NOT-FINAL-40295309934',
-    authorization=AUTHORIZATION,request_id='integrated409-search-ime-body-field-02')
+    candidate_build=40305746524,candidate_source_commit='925b475f4e4c1c1862817c13167285ebec06894a',
+    candidate_apk_sha256='7de8ada4774d39c80c3251e21b1750874fbbfdbdfb08b7468dd25151d92a7a34',
+    candidate_artifact='Infinity-2103410-Corrective-INTERNAL-NOT-FINAL-40305746524',
+    authorization=AUTHORIZATION,request_id='integrated410-search-ime-ready-01')
 
 
 def validate(request):

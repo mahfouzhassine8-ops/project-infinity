@@ -1,4 +1,4 @@
-"""Metadata-only bridge for the actual signed internal408 APK; no byte changes."""
+"""Metadata-only bridge for the exact signed corrective APK; no byte changes."""
 import json
 import os
 from pathlib import Path
@@ -16,7 +16,7 @@ def prepare(root,request,baseline):
     if any((root/n).exists() for n in outputs):raise ValueError('Existing fixture metadata must not be replaced')
     apks=list(root.rglob('*.apk'));reports=list(root.rglob('APK-PRESERVATION.json'))
     if len(apks)!=1 or len(reports)!=1 or digest(apks[0])!=EXPECTED['candidate_apk_sha256']:
-        raise ValueError('Exact signed409APK andpreservationrecord required')
+        raise ValueError('Exact signedcorrectiveAPK andpreservationrecord required')
     report=json.loads(reports[0].read_text())
     if (report['source_commit']!=EXPECTED['candidate_source_commit'] or report['build']!=str(EXPECTED['candidate_build']) or
         report['candidate_APK_sha256']!=EXPECTED['candidate_apk_sha256'] or report['unexpected_differences']!=[] or

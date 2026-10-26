@@ -151,7 +151,7 @@ jobs:
           if-no-files-found: warn
   integrated-candidate:
     if: github.event_name == 'push' && github.ref == 'refs/heads/work/infinity-final-corrective-from-2103407-20261025'
-    name: Independent integrated409 three Close and reopen cycles
+    name: Independent integrated410 three Close and reopen cycles
     runs-on: ubuntu-22.04
     timeout-minutes: 90
     env:
@@ -250,7 +250,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: Infinity-Independent-Shutdown-integrated409-${{ github.run_id }}-Evidence
+          name: Infinity-Independent-Shutdown-integrated410-${{ github.run_id }}-Evidence
           path: |
             independent-shutdown-request-evidence.json
             signed/FIXTURE-METADATA-EVIDENCE.json

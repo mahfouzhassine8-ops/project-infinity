@@ -42,4 +42,5 @@ def snapshot(output):
     addon=xbmcaddon.Addon('service.xbmc.versioncheck')
     value=collect(os.environ.get('PATH',''),xbmcvfs.translatePath(addon.getAddonInfo('path')))
     value['versioncheck_version']=addon.getAddonInfo('version')
+    value['versioncheck_settings']={key:addon.getSetting(key) for key in ('versioncheck_enable','upgrade_apt')}
     Path(output).write_text(json.dumps(value,indent=2)+'\n')

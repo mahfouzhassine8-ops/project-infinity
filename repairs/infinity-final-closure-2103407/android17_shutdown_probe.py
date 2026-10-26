@@ -14,6 +14,7 @@ import re
 import sqlite3
 import sys
 import time
+from zipfile import ZipFile
 
 import android17_candidate_probe as candidate
 from candidate_request import EXPECTED as CANDIDATE
@@ -69,6 +70,14 @@ def verify_records(before,after):
         require(before.get(bucket)==after.get(bucket),'Close/reopen changed protected bucket: '+bucket)
 
 
+def verify_runtime_service(environment,apk):
+    name='resources/lib/version_check/service.py'
+    with ZipFile(apk) as z:expected=hashlib.sha256(z.read('assets/addons/service.xbmc.versioncheck/'+name)).hexdigest()
+    observed=environment.get('versioncheck_source',{}).get(name,{})
+    require(observed.get('sha256')==expected,'Actual VersionCheck runtime source differs from the signed correction; no Close attempted')
+    require(environment.get('child_execution_attempted') is False and environment.get('save_authorization_granted') is False,'Unexpected environment diagnostic behavior')
+
+
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--apk',type=Path,required=True)
     parser.add_argument('--expected-sha',required=True);parser.add_argument('--authorization',required=True)
@@ -95,6 +104,8 @@ def main():
         require(startup.get('platform',{}).get('qemu')=='1' and startup['platform']['sdk']=='37','Fresh API37 required')
         transport.APP_UID=transport.shell('stat','-c','%u',transport.PRIVATE).strip()
         owner=startup['engine'];control=transport.CONTROL
+        environment=transport.read_json(transport.PROFILE+'/addon_data/service.future.persistence.7fa29/environment-'+str(owner['pid'])+'.json')
+        report['actual_versioncheck_environment']=environment;save();verify_runtime_service(environment,args.apk)
         deadline=time.monotonic()+180
         while time.monotonic()<deadline:
             compat=transport.read_json(control+'/compat-active.json')

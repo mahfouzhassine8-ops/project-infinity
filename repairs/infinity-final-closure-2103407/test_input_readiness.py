@@ -12,8 +12,6 @@ import shutdown_environment as environment
 class InputReadinessTests(unittest.TestCase):
     def test_current_drawn_IME_is_required_and_cold_or_wrong_process_is_refused(self):
         state='mInputShown=true\nmCurId='+readiness.IME
-        # Actual run40303745072 field names; keyboardType is "prime", while
-        # keyboardViewType distinguishes the HEADER from the rendered BODY.
         line='10-26 10:15:44.299 1635 1635 I GoogleInputMethodService: GoogleInputMethodService$1.onKeyboardViewShown():344 onKeyboardViewShown: keyboardType=prime, keyboardViewType=BODY'
         self.assertTrue(readiness.proof(state,line,['1635'])['ready'])
         for changed,log,pids in ((state.replace('true','false'),line,['1635']),

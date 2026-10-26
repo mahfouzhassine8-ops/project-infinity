@@ -16,7 +16,9 @@ ROOT=Path(__file__).resolve().parents[2]
 class IndependentShutdownTests(unittest.TestCase):
     def test_exact_independent_scope_and_branch_required(self):
         head='a'*40;event=dict(ref=request.BRANCH,after=head,repository={'full_name':'mahfouzhassine8-ops/project-infinity'})
-        self.assertEqual(request.validate(request.EXPECTED,event,head,[request.REQUEST])['SELECTED_CASE'],'integrated-3-close-reopen')
+        result=request.validate(request.EXPECTED,event,head,[request.REQUEST])
+        self.assertEqual(result['SELECTED_CASE'],'integrated-3-close-reopen')
+        self.assertEqual(result['CANDIDATE_REQUEST_PATH'],'repairs/infinity-final-closure-2103407/SHUTDOWN-CANDIDATE.json')
         for field,value in [('scenario','safe'),('candidate_apk_sha256','0'*64),('authorization',''),('request_id','unreviewed')]:
             with self.assertRaises(ValueError):request.validate(dict(request.EXPECTED,**{field:value}),event,head,[request.REQUEST])
         for changed in ([],[request.REQUEST,'unowned.cpp']):
@@ -89,6 +91,18 @@ class IndependentShutdownTests(unittest.TestCase):
         for bucket in probe.BUCKETS:
             changed=deepcopy(before);changed[bucket]['exact-id']['position']=0
             with self.assertRaises(AssertionError):probe.verify_records(before,changed)
+
+    def test_actual_runtime_service_must_match_signed_apk_before_close(self):
+        import tempfile
+        from zipfile import ZipFile
+        with tempfile.TemporaryDirectory() as temp:
+            apk=Path(temp)/'format-only.apk';name='resources/lib/version_check/service.py';raw=b'exact source fixture'
+            with ZipFile(apk,'w') as z:z.writestr('assets/addons/service.xbmc.versioncheck/'+name,raw)
+            environment=dict(versioncheck_source={name:{'sha256':hashlib.sha256(raw).hexdigest()}},
+                child_execution_attempted=False,save_authorization_granted=False)
+            probe.verify_runtime_service(environment,apk)
+            for change in ({'versioncheck_source':{}},{'child_execution_attempted':True},{'save_authorization_granted':True}):
+                with self.assertRaises(AssertionError):probe.verify_runtime_service(dict(environment,**change),apk)
 
     def test_reused_feature_setup_still_refuses_termination_and_wrong_case(self):
         import sys
