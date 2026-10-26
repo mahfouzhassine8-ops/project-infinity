@@ -94,12 +94,23 @@ def main():
         # The known-passing participant setup retains all fresh API37, original
         # signer/source, install-over, fixture identity and no-reset guards.
         controlled=EXPECTED['scenario']=='integrated-native-image-and-unsafe'
+        real_resume=EXPECTED['scenario']=='integrated-resume-power-ui'
         setup=args.out/'participant-setup';previous=sys.argv
         try:
             sys.argv=[str(candidate.__file__),'--apk',str(args.apk),'--expected-sha',args.expected_sha,
                 '--case','final-participant','--authorization',AUTHORIZATION,'--out',str(setup)]
             import shutdown_fixture
             independent=shutdown_fixture
+            if real_resume:
+                from types import SimpleNamespace
+                import resume_durability
+                def stage(folder,stage_args,stage_report,device,aid):
+                    shutdown_fixture.stage(folder,stage_args,stage_report,device,aid)
+                    resume_durability.stage(folder,stage_args,stage_report,device,aid)
+                def enable(device,device_out):
+                    shutdown_fixture.enable(device,device_out)
+                    resume_durability.enable(device,device_out)
+                independent=SimpleNamespace(stage=stage,enable=enable)
             if controlled:
                 from types import SimpleNamespace
                 import native_image_control,unsafe_control
@@ -132,11 +143,13 @@ def main():
         else:raise AssertionError('Exact physical Compat service did not become active; no Close attempted')
         if controlled:
             report['native_image_control']=native_image_control.run(transport,owner,args.out);save()
+        if real_resume:
+            report['real_TV_before_Close']=resume_durability.run(transport,owner,args.out);save()
         require(transport.rpc('Favourites.AddFavourite',dict(title=FAVOURITE,type='window',window='home'))=='OK','Could not add normal native test favourite')
         before=transport.read_json(transport.PROFILE+'/addon_data/script.infinity.commandcenter/continue-watching.json')
         require(isinstance(before.get('items'),dict) and before['items'],'Actual tracking fixture missing; no Close attempted')
         report['before_protected_records']=before
-        cycles=range(1) if controlled else range(3)
+        cycles=range(1) if controlled or real_resume else range(3)
         for cycle in cycles:
             entry=dict(cycle=cycle,owner=owner,passed=False);report['cycles'].append(entry)
             folder=args.out/('cycle-'+str(cycle));folder.mkdir()
@@ -146,7 +159,7 @@ def main():
             entry['process_ownership_before']=power_ui_contract.partition_processes(entry['before_processes'],owner)
             entry['launch_preference_before']=power_ui_contract.preference(transport)
             began=time.monotonic()
-            if EXPECTED['scenario']=='integrated-real-power-ui':
+            if EXPECTED['scenario'] in ('integrated-real-power-ui','integrated-resume-power-ui'):
                 entry['request']=power_ui_contract.close(transport,args.apk,folder)
             else:
                 entry['request']=transport.shell('am','start','-n',transport.PACKAGE+'/.InfinityPowerControlActivity','-a',transport.PACKAGE+'.action.CLOSE_KODI')
@@ -199,6 +212,8 @@ def main():
             transport.adb('forward','tcp:19090','tcp:9090')
             favourites=transport.rpc('Favourites.GetFavourites',{'properties':['window','windowparameter']})['favourites']
             require(any(row.get('title')==FAVOURITE for row in favourites),'Native favourite lost after reopening')
+            if real_resume:
+                entry['real_TV_reopen']=resume_durability.reopened(transport,before)
             entry.update(passed=True,reopened_owner=next_owner);owner=next_owner;save()
         if controlled:
             report['unsafe_writer_control']=unsafe_control.run(transport,owner,args.out);save()

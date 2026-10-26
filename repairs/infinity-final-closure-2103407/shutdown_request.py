@@ -10,9 +10,9 @@ from candidate_request import EXPECTED as CANDIDATE
 ROOT=Path(__file__).parent
 REQUEST='repairs/infinity-final-closure-2103407/SHUTDOWN-REQUEST.json'
 WORKFLOW='.github/workflows/infinity-shutdown-verification.yml'
-AUTHORIZATION='UserOct26 independent latest signed417 native writer/persistence negative controls after actual Home/Continue integration:16real image-directory controls with distinct job/generation/factory identities, unchanged-no-start receipts separated from actual jobs, positive Essential-First protected Close/reopen then actual opaque writer must veto without save/authorization/death claim and unchanged protected state. Preserve original411ordinary3PASS40317069331 and latest417actualPower3PASS40373328781; this specialized outcome remains separate. No runtime/chooser/Cobra change, duplicate identity waiver, timeout increase, fake receipts, harness kill/reset or physical acceptance.'
-EXPECTED=dict(schema=1,kind="independent-essential-first",request_id="integrated417-native-image-and-unsafe-separate-01",
-    scenario="integrated-native-image-and-unsafe",candidate_build=CANDIDATE["candidate_build"],
+AUTHORIZATION='UserOct26 actual Continue Playing/Watching native TV durability on unchanged signed417: freshly guarded synthetic native library, actual S1E2 play/seek/stop/completion and verified S2E1 selection, then ONE visible Power Close and real reopened records/Next source/no autoplay, all16 native+Java/engine+coordinator/zeroUID/SQLite/remembered launch proofs retained. Preserve ordinary411three PASS40317069331 and ordinary417three PASS40373328781; independent imageUnsafe417 run40376891135 remains separate. No runtime APK/Cobra/chooser changes, user-data resets, firstparty imports/writer grants, timeout increases or repeat three-cycle tests. Physical Fold acceptance NOT RUN.'
+EXPECTED=dict(schema=1,kind="independent-essential-first",request_id="integrated417-real-native-TV-visible-power-durable-01",
+    scenario="integrated-resume-power-ui",candidate_build=CANDIDATE["candidate_build"],
     candidate_source_commit=CANDIDATE["candidate_source_commit"],
     candidate_apk_sha256=CANDIDATE["candidate_apk_sha256"],authorization=AUTHORIZATION)
 
