@@ -1,365 +1,405 @@
 {
   "recorded_before_APKpackager_edit": true,
-  "purpose": "OneinternalintegratedARM64install-overcandidateforactualAndroid17verification, NOTfinalorreleaseacceptance; no userinterimdiagnosticinstallationrequest",
+  "purpose": "IntegratedARM64install-over2103409candidate, notacceptedfinal; actualAPI37testsseparate. Sourceandnative/Java/modulebindingmustallmatch.",
   "baseline_APK_sha256": "3616c4e69c976bd63b36170d4dbbd9b190a7ec2eace4bc0c34c3c72f7f9e8578",
   "baseline_commit": "0e8739d2d0e1be0ab8f127519b526556426fb160",
-  "candidate_versionCode": 2103408,
+  "candidate_versionCode": 2103409,
   "original_certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
   "member_ledger": {
     "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1": {
       "before": null,
-      "after": "b3e53a6dcd3c6a061c18296d7aa613738bc273b0ef3b0f2630740e03a925281e",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "after": "7860826b14d83fabacf07d48629347a54049a39d172860ea3651f63f5aa4b4ac",
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1.sig": {
       "before": null,
-      "after": "841025462ce01e3de1f0dca8cf68b2a298c9ad2f2d59a0b62f6ac48b54459e62",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "after": "32f993ad206c9f5e0269a154b12fa746d015b4f69d3ff696b60f1b03e1be1987",
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/INSTALL-BASELINE.v1": {
       "before": null,
       "after": "957e7e3b5666bd9191e9170633d2176b9acd65ce34a3800160eebc18a734c804",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
+    },
+    "assets/addons/script.infinity.commandcenter/MODE-CLASS-SEARCH-POLICY.json": {
+      "before": null,
+      "after": "e9195747744735e0848b94f26959cea411146b262a7d6865611ab5281fb4b45a",
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
+    },
+    "assets/addons/script.infinity.commandcenter/NAVIGATION-CONTRACTS.json": {
+      "before": "ff9f5d576a79cf18adac7693108d80aeeca6eb93d1aaf87e1017a7d19ada60c2",
+      "after": "fd5b58e3a8a5671ded84c0a91ba57d1bbd03a51c5d08869805d33269d275d76d",
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
+    },
+    "assets/addons/script.infinity.commandcenter/SEARCH-STRUCTURES.json": {
+      "before": null,
+      "after": "d0ced0458371ade4fb3ab73bd378159d5a8a79eca4103e114510ea1e72d4ab30",
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/addon.xml": {
       "before": "fa922b07e059c1c530561c37a4bb85a358cd1ba7bf2f2baad5165f808ae14d0a",
-      "after": "cafad9a5f2cb0c15cd40eefd0892eb8856229aa6c44e142d208856f025d55928",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "after": "16d23eceb5316d8c4cea44a7133ada2025b29c5de5d80954ddd05d78d811efc1",
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/checkpoint_runtime.py": {
       "before": "58f3b801e69176a3e91ccca5c1fcb6ebce81bbf8f7e768e07148f531b66190d6",
       "after": "902fbf1a03051efbd39bbd2380c344c0a9942c0e8e43cfcaf0deaddd06fd954e",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/context.py": {
       "before": "f0fd0d9941de8f2b64314aa6c24eb2824627d9ddbf74c9a9e0522c13a290e53c",
       "after": "f30a77073997f79e566a9308f0304002d4db3cbd19aa661e5de8199d869ba547",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/default.py": {
       "before": "b4844b31397a0bc196262fc808a83e48c8a44ae147572fdabd855eba0598c12f",
       "after": "3cfb85fa83f69498d06d34cf53a432dbf6476c5f967cc9903b0307574f2d3374",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/infinity_modules/__init__.py": {
       "before": null,
       "after": "dd65da30f3d82529011a305293041fabcc63d369f4805a446774996ae9ae5fc3",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/infinity_modules/rails/__init__.py": {
       "before": null,
       "after": "8798e72d7a93a29641e5368044bd7164b2f1024108791daf4b57c2d3cc7b79ab",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/infinity_modules/rails/catalog.py": {
       "before": null,
       "after": "7c307a52bf4fef44d9c1b1b910c1f76bd8b689c6de7f4a456205f13b5c1ab457",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/infinity_modules/rails/dialog.py": {
       "before": null,
       "after": "34dd1815176455278dabc10640627faffe16feabbcaa945578d573bbd8ec66ee",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/infinity_modules/rails/input_status.py": {
       "before": null,
       "after": "217073f1e9df990aa39215cf29067776612528fd0311b5c2d723e866812db111",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/infinity_modules/rails/mocha.py": {
       "before": null,
       "after": "b813b5d7a340c697917fa7b2b29b6cee86d97d284da59ce8bc96bde9ad629c96",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/infinity_modules/rails/runtime.py": {
       "before": null,
       "after": "2cb188fbc6f59da3c2c2bf43e64f1b523921290cd6e4937cf9303743785bcd3f",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/infinity_modules/rails/stability_probe.py": {
       "before": null,
       "after": "e275668b0638fdffb8810ee6f1cab1d9590a9bc8b9f08f402216a8ae50d754f9",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/infinity_modules/rails/store.py": {
       "before": null,
       "after": "22fc4b1f4ddb4d18be77acb89cd49e975f65cc9db410df40d17c62f4ad4171e4",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/infinity_modules/uirepair/__init__.py": {
       "before": null,
       "after": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/infinity_modules/uirepair/controller_access.py": {
       "before": null,
       "after": "4160a511efa9e12776db5bba28ab16d5d9d5e1a7825826df16ed76b7430ad826",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/infinity_modules/uirepair/default.py": {
       "before": null,
       "after": "5bbeb30b76ae9b169c18d2abcdc5a036f8c952ae91cadb317bf4a4576c3bb5c1",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/infinity_modules/uirepair/home_option_b.py": {
       "before": null,
       "after": "01dbb12c89cbb95d7b28200816a30fb0fbe66fb320928a65bb8be804e3d582f0",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/infinity_modules/uirepair/latest_identity.py": {
       "before": null,
       "after": "225ac23336701db63715583ca8b6716afa96bb9b738b4b99750d9a5bbd8ab223",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/infinity_modules/uirepair/menu_model.py": {
       "before": null,
       "after": "eea9605cf7b3712b6029bf49958d470dbc59df6b92e7f394799c1098e58956da",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/infinity_modules/uirepair/plugin.py": {
       "before": null,
       "after": "04912af01bca116947aef5fffc41764951fce5c36e2531961e25826e53b7df78",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/infinity_modules/uirepair/popup.py": {
       "before": null,
       "after": "230ee5646bf5b73faa9e9bc9988bb29e9a6d238da95efeec06e480a9c6d259de",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/infinity_modules/uirepair/runtime.py": {
       "before": null,
       "after": "31f7494146e476636e2732bb3a9cd37776d59ee61414335e7a03bb5eb81fee79",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/infinity_modules/watchedbridge/PROVIDER-CONTRACTS.json": {
       "before": null,
       "after": "c03846eaa853307da91634641bb4266a5420242d6b33770f1328cc18e9fd974e",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/infinity_modules/watchedbridge/__init__.py": {
       "before": null,
       "after": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/infinity_modules/watchedbridge/bridge_state.py": {
       "before": null,
       "after": "babe606965d4e81481ea573dd4ecc7cec82a7d23476364326731eb86ce1eeb1d",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/infinity_modules/watchedbridge/context.py": {
       "before": null,
       "after": "fb9867572530edec876192152c9adca8cb82387323ec26b6cbf7ffdc5a0b22d3",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/infinity_modules/watchedbridge/controller.py": {
       "before": null,
       "after": "a629c46a693f5d025fb8bc6805b7302e7876593d0918f07b45c96cd1bab5b703",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/infinity_modules/watchedbridge/default.py": {
       "before": null,
       "after": "77c65366ed07261992d12357bb284c3f96039452fd393cc0e36e15c2f75d5f9d",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/infinity_modules/watchedbridge/provider_contracts.py": {
       "before": null,
       "after": "5819eec3f7b29f43de164c4739753db0ad48bb5c5d92fe6ae136fa5c9753f804",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/infinity_modules/watchedbridge/service.py": {
       "before": null,
       "after": "0450559f72dbb1a3894de7075934bdc28d3fea5b91fc0d83f1da34e1ef4c1014",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/infinity_search.py": {
       "before": "bb6e8791ca7644ca9d370b5871d69ded71790557069b56535e920baa6cf50531",
-      "after": "f34f14e7103a8451d108061b5b7c0d3450e95ea43f95404ffc61254f4b3bdf2f",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "after": "1c81ad9c43e1eeead3a1c248b775120f1c298bf7ef9aa835a5417bfce5c124a9",
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/infinity_trakt.py": {
       "before": "75cb538ddf1e6c90d6cf5130f27d2c5e05a8faeb241a5265844ea9abdd27d9cc",
       "after": "e2f8b87ed45bea2423b0a12d3b2d30fad822e9435d6115f6b96adf3ffb0778af",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
+    },
+    "assets/addons/script.infinity.commandcenter/information.py": {
+      "before": "8cf3cfcab461d73d4e8bb625039d905478ffb52688f729252002b292ea87c429",
+      "after": "9033cc6042eb5349c0f6e53e81564a137853c32190287e2cebe3e654f78f47b1",
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/module_contract.py": {
       "before": null,
       "after": "759e60439fae0b1bf0f8a2ff6895209ac848101b9544ac6c0e297b9c73df1267",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/plugin.py": {
       "before": "3077359ad65afa86ca23edd303fc18683f94f6e0a42a75f37e6b6cbaf27bcc4f",
       "after": "0206df61f08d0cf7974a2b94268f7281b9536f69d7d03648aead73ad2abb606f",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
+    },
+    "assets/addons/script.infinity.commandcenter/provider_capabilities.py": {
+      "before": null,
+      "after": "7b0fda13e0fb529aa974b1e8ef792afb3adf0f681490784cb7837b715ae1fc44",
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
+    },
+    "assets/addons/script.infinity.commandcenter/provider_inventory.py": {
+      "before": "6533bcaf90d161a9ff188c57c686efdf9e8f29ef4c9d6de589f09e91da561145",
+      "after": "17d578e9c26069a01ca84ba415e1dbe478c10e2be71c014e0897087d4566937d",
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.commandcenter/service.py": {
       "before": "51fc63f6922885c8473277398e6f3569274eb42afe06be0148501d6ddc65bb23",
       "after": "bd3d0f57d9b297fb38379452c2e14a6b75f276dcc486b897606f64db01306ccd",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
+    },
+    "assets/addons/script.infinity.commandcenter/structural_search.py": {
+      "before": null,
+      "after": "dd0b200829fc63372ec88a0ba991bd98a7a3459f597853a5bc991a9e4e6693b3",
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
+    },
+    "assets/addons/script.infinity.commandcenter/title_metadata.py": {
+      "before": "d56a1a41d80fbd1e544918bbb846518bb47567f1e0ea71132f0cc3d355b15562",
+      "after": "115ac88c67e3fc9b3568ede2b3b019e10ab2829c6d0c14bef60d90d6248ad51e",
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.rails/addon.xml": {
       "before": "5b3260bfaeedb361712c79a341c12b9d32dca804313621bbbe3766736ca55cca",
       "after": "436b6fdfae5e76ef9b52027ae80e59ade2ff621784f328f96efbb83bdf6ac711",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.rails/context_add.py": {
       "before": "4eb526ed1e8b2dda75e6bc29d2bcaa5f5257f0096d0785b9c5fbaa459a4878c4",
       "after": "8ab29309b62147bbccfe45c92090ffe91e037a209f0e1cefce71fd09acc623f5",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.rails/default.py": {
       "before": "513b748c5730c554b4d3d0add7cede8ebbad4d13deef93f04ba48c4263f80a10",
       "after": "9b1030183c36f3b591cc2857588f97d759a48f176b6765ed6906a05378a5c432",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.rails/plugin.py": {
       "before": "2b2c2266809fa9eddce66fdd9c1b22caf2398f6f17cd408ad396c7d47055d719",
       "after": "1f684387061f6507e93c55c96eba9a0832e3255fcac3808efc80ec8af00f2144",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.rails/resources/lib/__init__.py": {
       "before": "8798e72d7a93a29641e5368044bd7164b2f1024108791daf4b57c2d3cc7b79ab",
       "after": null,
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.rails/resources/lib/catalog.py": {
       "before": "7c307a52bf4fef44d9c1b1b910c1f76bd8b689c6de7f4a456205f13b5c1ab457",
       "after": null,
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.rails/resources/lib/dialog.py": {
       "before": "34dd1815176455278dabc10640627faffe16feabbcaa945578d573bbd8ec66ee",
       "after": null,
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.rails/resources/lib/input_status.py": {
       "before": "217073f1e9df990aa39215cf29067776612528fd0311b5c2d723e866812db111",
       "after": null,
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.rails/resources/lib/mocha.py": {
       "before": "b813b5d7a340c697917fa7b2b29b6cee86d97d284da59ce8bc96bde9ad629c96",
       "after": null,
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.rails/resources/lib/runtime.py": {
       "before": "2cb188fbc6f59da3c2c2bf43e64f1b523921290cd6e4937cf9303743785bcd3f",
       "after": null,
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.rails/resources/lib/stability_probe.py": {
       "before": "e275668b0638fdffb8810ee6f1cab1d9590a9bc8b9f08f402216a8ae50d754f9",
       "after": null,
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.rails/resources/lib/store.py": {
       "before": "22fc4b1f4ddb4d18be77acb89cd49e975f65cc9db410df40d17c62f4ad4171e4",
       "after": null,
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.uirepair/CONTROLLER-PREIMAGES.json": {
       "before": "c66d5bf016266554655b7d2b3e296726af874865f5c1dae89f22a130c5f4073e",
       "after": null,
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.uirepair/addon.xml": {
       "before": "fa5923a337ba0241e8a21f7b32413e1a7b9b05878f7c737f0e5336b34532fa28",
       "after": "0ae97add7a937568f92ab9ab2b4655741ffb0a12465d76838e1b8dde2286a890",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.uirepair/controller_access.py": {
       "before": "41d7e221ca000a8a9879d3db289fade098900c0ebd4954473364767b230914ec",
       "after": null,
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.uirepair/default.py": {
       "before": "caf3b4f06adf803a87f0c4392f2cb8c8f6d8879f01c1b7c47402938f62f298ee",
       "after": "cd91adb02e7b57f0c4485968d8c53c55eabe5ff3883f38d2f36f5aea8184adef",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.uirepair/home_option_b.py": {
       "before": "cd64216203e82746c7bd1dcf18b4b491b5430c1abf687cc3ca6b42e3cefa1438",
       "after": null,
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.uirepair/latest_identity.py": {
       "before": "225ac23336701db63715583ca8b6716afa96bb9b738b4b99750d9a5bbd8ab223",
       "after": null,
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.uirepair/menu_model.py": {
       "before": "eea9605cf7b3712b6029bf49958d470dbc59df6b92e7f394799c1098e58956da",
       "after": null,
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.uirepair/plugin.py": {
       "before": "a812e8229596f4d5257914025638ef39a468d16e453dc95b8c851c1239869b9f",
       "after": "45df6e0886980856f78469209a3a28cb8b9948c68f4b22bcf916400424fa027c",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.uirepair/popup.py": {
       "before": "230ee5646bf5b73faa9e9bc9988bb29e9a6d238da95efeec06e480a9c6d259de",
       "after": null,
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.uirepair/runtime.py": {
       "before": "1ff9cb2f583e5df45dc1fe9116593babec173381c845d6b26ed93871307fd1f3",
       "after": null,
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.watchedbridge/CONTROLLER-PREIMAGES.json": {
       "before": "c66d5bf016266554655b7d2b3e296726af874865f5c1dae89f22a130c5f4073e",
       "after": null,
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.watchedbridge/addon.xml": {
       "before": "104b2dffce0aae8d6c3832447e4c5704e0c9a06c648865fae9da3651f44b2670",
       "after": "8f3b36fdf00763266b283abec03ab3c65213811669407280e6c11636381e8ae0",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.watchedbridge/bridge_state.py": {
       "before": "a8a9f0616beeb13b6621a3997f8f09cda55d1f6c779fc6f30abf77feb3d5a21e",
       "after": null,
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.watchedbridge/context.py": {
       "before": "e458ee969e80a1baf78c6354f49c53a45d2a355256fb9fb7051c08935587b451",
       "after": "ca373257b2b797c9ddd01c197d946eb43251d7259faf684d53e09e7a28f355a2",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.watchedbridge/controller.py": {
       "before": "b50ca9360299a91aadd9f5eb26c17ec995bded2a5a6858446e4817b492db599d",
       "after": null,
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.watchedbridge/default.py": {
       "before": "77c65366ed07261992d12357bb284c3f96039452fd393cc0e36e15c2f75d5f9d",
       "after": "7eb8a980d862bf2469f2bc68129e06f7a695fd206611430861ba563ec9f4908c",
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.watchedbridge/provider_contracts.py": {
       "before": "5819eec3f7b29f43de164c4739753db0ad48bb5c5d92fe6ae136fa5c9753f804",
       "after": null,
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "assets/addons/script.infinity.watchedbridge/service.py": {
       "before": "afda95dfb06a67cdca316c173a72389b5eab7f478ed9c3682afef6f279802536",
       "after": null,
-      "reason": "Authenticatedfirstpartycomposition/migration, exactfunctionownership inFIRSTPARTY-COMPOSITION-PLAN.json"
+      "reason": "CC41correctivemetadata/providerfamily/sourcefastpathcomposition; exactsourceownershipinCORRECTION-2103409-PLAN.json and FIRSTPARTY-COMPOSITION-PLAN.json; userdata untouched"
     },
     "classes.dex": {
       "before": "7ea38f88187dfec80211b3c5be6e09ef3cbd38928527c42570b8b89deeed3185",
-      "after": "d13ea18c00fff17d93d59732b3c4481fa2efcc40a4fd7366b459eeb32abf2b1a",
-      "reason": "Onlyownedinstallerclass;7864others/pool/fieldsverified"
+      "after": "f70e1f2218fdff1423982bfaa225ecf0e067d0f605315d0cd16aeafb611da306",
+      "reason": "Onlysignedgenerationinstallerclass;7864otherclassdefinitionsandstringindicesexact"
     },
     "lib/arm64-v8a/libkodi.so": {
       "before": "a7e0d2e7f314af197c486eb674ecf7e4b61649801829ec10ba4a0b1968ef36b7",
-      "after": "39def82573ec58bd1288249546f29d2b26e17f55dac4088e14c8e336773c3b2a",
-      "reason": "Actual9411sourcefullARM64compile40265974119;7ownededits4newverifiers"
+      "after": "151128c176b6094f28bb3fc716cc07c3985a9aa38f1fe41e1bb1424f0285a47e",
+      "reason": "Full9411sourcematchingcompile89300fa;9ownededits4newfiles,verifiedunsupportedimagefactoryaccounting"
     },
     "AndroidManifest.xml": {
       "before": "c17ed2bf6ef886766ca146fd79dd69b8a1bc136ed3dd4ba79e07c22ded1beea2",
-      "after": "5a311a0f22b014376f90a0b93fbf249dbb21ee4aff29d5e7af7b91948b476fe2",
-      "reason": "OnlytypedAXMLversionCode2103407->2103408;package,versionName,permissions/componentsunaltered"
+      "after": "8ddc6e797bee95a1373667ba501321c7347263ed7d9a734179597d38d8e706b8",
+      "reason": "OnlytypedversionCode2103407->2103409; package/versionName/permissions/components preserved"
     }
   },
   "signature_members_only": [
@@ -369,19 +409,21 @@
   ],
   "all_other_members": "ExactuncompressedSHA256preserved, inclclasses2/Cobra-specificmembers/allotherlibs/skin/player/crashrecorder/providers. PrimaryDEXsharedcontaineronlyownedinstallerchange,protectedclassdefinitions/disassemblyandstringindicesexact; do NOTclaimwholeDEXrawbyteidentity.",
   "source_inputs": {
-    "native_run": 40265974119,
-    "native_artifact_id": 12627101398,
-    "native_artifact_sha256": "81da726e4df3e765a3a938101068df15c96af7010719f5cd0b22e40626f048f1",
-    "module_run": 40274997360,
-    "module_source": "59087a68fcc9b4ea5c197a41bb141ebf4ba61319",
-    "module_artifact_id": 12629952551,
-    "module_artifact_sha256": "6e55218c3a7d7726594f847b27201e61e2350db824c32d70c4b1d5d12e3be855",
-    "module_manifest_sha256": "b3e53a6dcd3c6a061c18296d7aa613738bc273b0ef3b0f2630740e03a925281e"
+    "native_run": 40287479124,
+    "native_source": "89300fa6690015f17378657f96230040bb4766ea",
+    "native_artifact_id": 12636606216,
+    "native_artifact_sha256": "98fd817ea50e3a4246903067d6518b43a53aadf9305330737a5ba194265c9b0f",
+    "module_run": 40294818797,
+    "module_source": "8d95670b65235fad46fcc757dee76da40cc59dc1",
+    "module_artifact_id": 12637179257,
+    "module_artifact_sha256": "25d21813e3e0ae3b5a82c689f2141282c889be9d45608d9b7c38a96858e71c94",
+    "module_manifest_sha256": "7860826b14d83fabacf07d48629347a54049a39d172860ea3651f63f5aa4b4ac"
   },
   "selected_before_execution": [
     "Packagingonly: source/currentrecipe/manifestnative-RSAverification,allAPKmemberdiffaudit,originalsigner/apksigner/zipalign16KiB/ARM64/package/version/componentcorrespondence",
     "Noapplication/shutdown/orientationtestsfrombuild. InternalAPI37journeysselectedseparately; physicalFoldNOTRUN."
   ],
   "internal_APK_not_final": true,
-  "preserve_signed407_lock": true
+  "preserve_signed407_lock": true,
+  "retained_source_checks": "5bundlePASS40294522177+corrected1bundle/9JCA/5metadata/2portableAST40294818797PASS; exactnewDEXauditPASS; native6integration+2imagechecks40287479124PASS; no rerunsbyAPKpackaging."
 }

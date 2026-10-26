@@ -26,7 +26,7 @@ ROOT=Path(__file__).parent.resolve()
 PREFIX='assets/addons/'
 NATIVE='lib/arm64-v8a/libkodi.so'
 SIGNATURE={'META-INF/INFINITY.SF','META-INF/INFINITY.RSA','META-INF/MANIFEST.MF'}
-APK_NAME='Infinity-2103408-Integrated-INTERNAL-VERIFICATION.apk'
+APK_NAME='Infinity-2103409-Integrated-INTERNAL-VERIFICATION.apk'
 
 
 def sha(path):
@@ -56,7 +56,7 @@ def command(args,env=None):
 
 
 def manifest(raw):
-    old=struct.pack('<I',2103407);new=struct.pack('<I',2103408)
+    old=struct.pack('<I',2103407);new=struct.pack('<I',2103409)
     if raw.count(old)!=1 or new in raw:raise ValueError('Exact407versionCode required')
     at=raw.index(old)
     if raw[at-4:at]!=b'\x08\x00\x00\x10':raise ValueError('Typed integerAXMLversionCode required')
@@ -119,7 +119,7 @@ def audit(parent,candidate,plan,components):
             unexpected_differences=[],Cobra_specific_members_changed=[],
             classes2_preserved=member_sha(before,'classes2.dex')==member_sha(after,'classes2.dex'),
             primary_DEX='Onlyownedinstallerclass; exact7864otherclassdefinitions/stringindices inDEX-MODULE-PRESERVATION.json',
-            native='Full9411sourcecompiledengine;7ownedchanges4newverifiers,9400otherexistingfiles preserved; no legacyhash-onlyengine substitute',
+            native='Full9411sourcecompiledengine;9ownedchanges4newverifiers,9398otherexistingfiles preserved; no legacyhash-onlyengine substitute',
             Android17='NOT RUN',physical_Fold='NOT RUN',release_ready=False,final_lock=False)
 
 
@@ -139,7 +139,7 @@ def build(parent_root,module_root,native_root,out,sdk):
     native=only(native_root,'final-native/libkodi.so') if list(native_root.rglob('final-native/libkodi.so')) else None
     if native is None:raise ValueError('Complete compiled native engine unavailable')
     proof=json.loads((native.parent/'ENGINE-PROOF.json').read_text())
-    if (proof['source_commit']!='eb480142cbc2a01504088eef88326e66d9c22e1e' or
+    if (proof['source_commit']!='89300fa6690015f17378657f96230040bb4766ea' or
         proof['complete_native_engine_compiled'] is not True or proof['reviewed_file_count']!=9411 or
         proof['changed_or_missing_reviewed']!=[] or sha(native)!=plan['member_ledger'][NATIVE]['after'] or
         proof['native_sha256']!=sha(native)):raise ValueError('Complete matching9411sourceengine proof differs')
@@ -221,7 +221,7 @@ def build(parent_root,module_root,native_root,out,sdk):
     if not found or found.group(1).lower()!=plan['original_certificate_sha256']:raise ValueError('Permanent signer changed')
     command([sdk/'zipalign','-c','-P','16','4',final])
     badging=command([sdk/'aapt','dump','badging',final])
-    if not re.search(r"^package: name='com.projectinfinity.kodi' versionCode='2103408'",badging,re.M) or "native-code: 'arm64-v8a'" not in badging:
+    if not re.search(r"^package: name='com.projectinfinity.kodi' versionCode='2103409'",badging,re.M) or "native-code: 'arm64-v8a'" not in badging:
         raise ValueError('Install-over package/version/ABI differs')
     final_report=audit(parent,final,plan,components)
     final_report.update(source_commit=os.environ.get('GITHUB_SHA'),build=os.environ.get('GITHUB_RUN_ID'),
@@ -233,7 +233,7 @@ def build(parent_root,module_root,native_root,out,sdk):
     shutil.copyfile(dex_report,out/dex_report.name)
     for name in ('NATIVE-MODULE-INTEGRATION.json','ENGINE-PROOF.json'):shutil.copyfile(native.parent/name,out/name)
     (out/'SHA256SUMS').write_text(sha(final)+'  '+final.name+'\n'+''.join(sha(p)+'  components/'+p.name+'\n' for p in sorted(components.glob('*.zip'))))
-    (out/'INTERNAL-NOT-FINAL.txt').write_text('Internal integrated Infinity2103408 for separately selected Android17 verification. No physicalFoldPASS, no releaseacceptance/final lock. Protected2103407unchanged. No userdiagnosticinstallationrequest.\n')
+    (out/'INTERNAL-NOT-FINAL.txt').write_text('Internal integrated Infinity2103409 for separately selected Android17 verification. No physicalFoldPASS, no releaseacceptance/final lock. Protected2103407unchanged. No userdiagnosticinstallationrequest.\n')
     unsigned.unlink();aligned.unlink()
     return {k:v for k,v in final_report.items() if k not in ('explained_differences','native_proof')}
 
