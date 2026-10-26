@@ -24,7 +24,8 @@ class CandidateVerificationTests(unittest.TestCase):
         self.assertEqual(result['SELECTED_CASE'],'final-participant')
         self.assertEqual(result['CANDIDATE_BUILD'],'40277375964')
         for field,value in [('selected_case','final-search-all-enter'),('candidate_build',40230842944),
-            ('candidate_source_commit','b'*40),('candidate_apk_sha256','0'*64),('authorization','')]:
+            ('candidate_source_commit','b'*40),('candidate_apk_sha256','0'*64),('authorization',''),
+            ('request_id','integrated408-participant-installover-01')]:
             with self.assertRaises(ValueError):dispatch.validate(dict(request.EXPECTED,**{field:value}),event,head,[dispatch.REQUEST])
         for changed in ([],[dispatch.REQUEST,'unowned/source.cpp']):
             with self.assertRaises(ValueError):dispatch.validate(request.EXPECTED,event,head,changed)
@@ -33,7 +34,9 @@ class CandidateVerificationTests(unittest.TestCase):
     def test_fixture_inverse_preserves_every_original_assertion(self):
         before=(observation.OLD/'tracking/final-eight/android_selected.py').read_bytes()
         after=probe.fixture(before).decode()
-        self.assertEqual(observation.restore_fixture(after.replace(probe.PROFILE_AFTER,probe.PROFILE_BEFORE,1)).encode(),before)
+        restored=after.replace(probe.PROFILE_AFTER,probe.PROFILE_BEFORE,1).replace(probe.RECEIPT_AFTER,probe.RECEIPT_BEFORE,1)
+        self.assertEqual(observation.restore_fixture(restored).encode(),before)
+        self.assertIn(probe.RECEIPT_AFTER,after);self.assertNotIn(probe.RECEIPT_BEFORE,after)
         tree=lambda raw:[ast.dump(n,include_attributes=False) for n in ast.walk(ast.parse(raw)) if isinstance(n,ast.Call) and
             isinstance(n.func,ast.Attribute) and isinstance(n.func.value,ast.Name) and n.func.value.id=='ui' and n.func.attr=='require']
         # Undo the separately checked readout callback (lambda -> record),

@@ -10,7 +10,7 @@ EXPECTED=dict(schema=1,kind='integrated-candidate',selected_case='final-particip
     candidate_build=40277375964,candidate_source_commit='a43ac034678acdfbd57c90f50b1c8a458531050f',
     candidate_apk_sha256='fc1d726fee8002da7cdccec6dd79a029f6536f0f1c3857791bec94c45d620e50',
     candidate_artifact='Infinity-2103408-Integrated-INTERNAL-NOT-FINAL-40277375964',
-    authorization=AUTHORIZATION,request_id='integrated408-participant-installover-01')
+    authorization=AUTHORIZATION,request_id='integrated408-participant-installover-02-actual-receipt')
 
 
 def validate(request):

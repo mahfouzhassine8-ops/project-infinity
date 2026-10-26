@@ -32,13 +32,17 @@ PROFILE_AFTER='''        if mode=='final-participant':
             plugin=load();hub=plugin.hub;profile=plugin.PROFILE;home=xbmcgui.Window(10000)'''
 BASELINE_SHA='3616c4e69c976bd63b36170d4dbbd9b190a7ec2eace4bc0c34c3c72f7f9e8578'
 IDS={'script.infinity.commandcenter','script.infinity.uirepair','script.infinity.watchedbridge','script.infinity.rails'}
+RECEIPT_BEFORE='/data/user/0/com.projectinfinity.kodi/files/checkpoint/installed-participants.json'
+RECEIPT_AFTER='/data/user/0/com.projectinfinity.kodi/files/infinity-checkpoint-install.json'
 
 
 def fixture(raw):
     observed=instrument_fixture(raw).decode()
     if observed.count(PROFILE_BEFORE)!=1:raise ValueError('Retained participant setup changed')
-    updated=observed.replace(PROFILE_BEFORE,PROFILE_AFTER,1)
-    if restore_fixture(updated.replace(PROFILE_AFTER,PROFILE_BEFORE,1)).encode()!=raw:
+    if observed.count(RECEIPT_BEFORE)!=1:raise ValueError('Retained receipt read changed')
+    updated=observed.replace(PROFILE_BEFORE,PROFILE_AFTER,1).replace(RECEIPT_BEFORE,RECEIPT_AFTER,1)
+    restored=updated.replace(PROFILE_AFTER,PROFILE_BEFORE,1).replace(RECEIPT_AFTER,RECEIPT_BEFORE,1)
+    if restore_fixture(restored).encode()!=raw:
         raise ValueError('An original feature assertion changed')
     compile(updated,'android_selected.py','exec')
     return updated.encode()
@@ -146,6 +150,26 @@ def main():
                 observations[name]=device.read_json(device.PRIVATE+'/files/'+name)
             (out/'NATIVE-PARTICIPANT-OBSERVATIONS.json').write_text(json.dumps(observations,indent=2)+'\n')
         probe.staging.admit_runtime=admit
+        original_execute=probe.execute
+        def execute(args):
+            report=original_execute(args)
+            if report.get('platform',{}).get('qemu')=='1' and isinstance(report.get('engine',{}).get('pid'),int):
+                snapshot={}
+                for name in ('active.json','engine.json'):
+                    target=probe.device.PROFILE+'/addon_data/script.infinity.commandcenter/.android-checkpoint/'+name
+                    try:
+                        value=probe.device.read_json(target)
+                        snapshot[name]=dict(status='AVAILABLE' if value else 'UNAVAILABLE',value=value)
+                    except Exception as error:snapshot[name]=dict(status='UNAVAILABLE',reason=type(error).__name__)
+                (args.out/'POST-FEATURE-NATIVE-PARTICIPANT.json').write_text(json.dumps(snapshot,indent=2)+'\n')
+                if report.get('passed') is not True:
+                    try:
+                        stack=probe.device.shell('debuggerd','-b',str(report['engine']['pid']),check=False)
+                        (args.out/'participant-live-native-backtrace.txt').write_text(stack or 'UNAVAILABLE: debuggerd returned no context\n')
+                    except Exception as error:
+                        (args.out/'participant-live-native-backtrace.txt').write_text('UNAVAILABLE: '+type(error).__name__+'\n')
+            return report
+        probe.execute=execute
         probe.main()
 
 

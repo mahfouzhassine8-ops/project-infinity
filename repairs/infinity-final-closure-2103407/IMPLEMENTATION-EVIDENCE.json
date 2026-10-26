@@ -312,5 +312,27 @@
     "status": "PASS_LOCAL",
     "actual_candidate_metadata_adaptation": "PASS againstactualfc1...APK+5matchingZIPs, nobyteschanged. Hostmetadataonly, SDKsignatureandrealAndroidmandatory.",
     "fixture_guard": "Exactsourceinverseundoesprofile-onlysetup+observercallbacks; everyoriginalassertion/predicatepreserved. Privateemulatoronlyupdate-r; noreset/close/providerAPKchange."
+  },
+  "participant_android17_01": {
+    "run": 40280840669,
+    "source": "a48d4913fe13bd6a1a17f31a4e6423de94d487ac",
+    "status": "FAIL_RETAINED_TEST_RECEIPT_LOCATION",
+    "artifact_id": 12632099501,
+    "artifact_sha256": "b44f8527a9f379d252bceea2012948f4b5bcef6a751271bf1c7a2a9459b7777a",
+    "actual_passes": {
+      "install_over": "407->408 ADBinstall-r, UID10234retained,testdatasentinelpreserved",
+      "Java_code_application": "Actualprivateinfinity-checkpoint-install.json PID4680 CC0.3.5.40 appliedtrue,compatbuiltintrue",
+      "runtime_addon_versions": "Originalassertions passedactual40/23/21",
+      "process": "RUNNING"
+    },
+    "failure": "Originaltestreadobsoletecheckpoint/installed-participants.json (neverwritten); timedoutbeforeactualnativeACTIVEidentityassertion. Noapp/nativefixinvented.",
+    "next": "FixturepathonlycorrectedtoactualauthoritativeJavafile, sameoriginalfield/PID/version/ACTIVEpredicates,timeoutsunchanged. Post-testactualactive/engineJSONandlivebacktraceonFAIL, noClose.",
+    "physicalFold": "NOT RUN"
+  },
+  "refresh_API_semantics": {
+    "source": "https://github.com/xbmc/xbmc/blob/21.3-Omega/xbmc/guilib/guiinfo/AddonsGUIInfo.cpp",
+    "source_sha256": "fdadb3d9954d8d48d3fb783d5f38f5657664a62d119901b92a58dbacf8a86770",
+    "actual_compiled_source_map_matches": true,
+    "verified": "SYSTEM_HAS_ADDON callsIsAddonInstalled independentlyofSYSTEM_ADDON_IS_ENABLED; disabledinstalledsettingsremainreadable. No nativeedit."
   }
 }
