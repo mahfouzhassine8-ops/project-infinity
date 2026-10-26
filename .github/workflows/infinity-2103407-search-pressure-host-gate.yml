@@ -1,18 +1,20 @@
 name: Infinity 2103407 signed-Search overload reproduction and guarded host verification
 on:
   push:
-    branches: [work/infinity-2103407-search-overload-single-flight-20261025]
+    branches: [work/infinity-2103407-search-overload-single-flight-20261025, work/infinity-final-corrective-from-2103407-20261025]
     paths:
       - "repairs/infinity-2103407-search-pressure/**"
+      - "repairs/infinity-final-closure-2103407/**"
       - ".github/workflows/infinity-2103407-search-pressure-host-gate.yml"
 permissions:
   contents: read
   actions: read
 concurrency:
-  group: infinity-2103407-search-pressure-host-gate
+  group: infinity-2103407-search-pressure-host-gate-${{ github.ref }}
   cancel-in-progress: false
 jobs:
   search-pressure:
+    if: github.ref == 'refs/heads/work/infinity-2103407-search-overload-single-flight-20261025'
     name: Signed Search overload reproduction, single-flight correctness, Cobra source preservation
     runs-on: ubuntu-22.04
     timeout-minutes: 30
@@ -95,3 +97,70 @@ jobs:
             stage/SEARCH-PRESSURE-HOST-TESTS.txt
           retention-days: 30
           if-no-files-found: error
+
+  final-baseline:
+    if: github.ref == 'refs/heads/work/infinity-final-corrective-from-2103407-20261025'
+    name: Exact signed407 first-party ownership and selected final regression inputs
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Enforce final scope against protected signed407 source
+        run: |
+          python3 - <<'PY'
+          import json, subprocess
+          baseline='0e8739d2d0e1be0ab8f127519b526556426fb160'
+          subprocess.run(['git','merge-base','--is-ancestor',baseline,'HEAD'],check=True)
+          names=subprocess.check_output(['git','diff','--name-only',baseline,'HEAD'],text=True).splitlines()
+          allowed_workflow='.github/workflows/infinity-2103407-search-pressure-host-gate.yml'
+          assert all(n.startswith('repairs/infinity-final-closure-2103407/') or n==allowed_workflow for n in names), names
+          assert not any('cobra' in n.lower() for n in names), names
+          scope=json.load(open('repairs/infinity-final-closure-2103407/SCOPE.json'))
+          assert scope['baseline']['commit']==baseline
+          assert len(scope['workstreams'])==7
+          print('PASS protected407 source boundary; no application runtime/Cobra source edits')
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40230842944
+          name: Infinity-2103407-SEARCH-SINGLE-FLIGHT-ORIGINAL-SIGNER-QA
+          github-token: ${{ github.token }}
+          path: signed407
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11.7"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: android-actions/setup-android@v4
+        with:
+          packages: "platform-tools build-tools;35.0.0"
+          log-accepted-android-sdk-licenses: false
+      - name: Check original permanent signature and immutable baseline source/component inputs
+        run: |
+          set -euo pipefail
+          mkdir -p final-work
+          APK="$(find signed407 -type f -name '*.apk' -print -quit)"
+          test -n "$APK"
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs "$APK" > final-work/BASELINE-SIGNATURE.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          text=Path('final-work/BASELINE-SIGNATURE.txt').read_text()
+          match=re.search(r'Signer #1 certificate SHA-256 digest:\s*([a-fA-F0-9]{64})',text)
+          assert match and match.group(1).lower()=='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
+          PY
+          python3 repairs/infinity-final-closure-2103407/inspect_signed407.py signed407 final-work/baseline
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-Final-Source-Ownership-${{ github.run_id }}-NOT-APK
+          path: final-work/
+          retention-days: 30
+          if-no-files-found: warn
