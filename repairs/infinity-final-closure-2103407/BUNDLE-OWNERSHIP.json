@@ -1,0 +1,31 @@
+{
+  "workstreams": [
+    2,
+    5
+  ],
+  "recorded_before_implementation": true,
+  "new_build_only_files": [
+    "module_bundle.py",
+    "SignInfinityModules.java",
+    "verify_module_bundle.cpp",
+    "test_module_bundle.py"
+  ],
+  "runtime_modification": false,
+  "reason": "Required coherent first-party signed module inventory and original-permanent-key detached signature for already-compiled native verifier. No APK, profile or external provider mutation. Initial migration and installed-code Java adapter separately recorded before runtime changes.",
+  "trust": "Original RSA/SHA256 from existing permanent keystore; immutable certificate and public key match before signing. No private key export or fallback signer.",
+  "limits": "Match native128KiB manifest,256files,16entries,4MiB/file,32MiBtotal; exactly4ownedaddon IDs, no symlink/unsafe/unlisted executable packaging.",
+  "selected_before_execution": [
+    "test_module_bundle.py: actual composed source payload accepted by compiled native verifier with isolated temporary test signer; missing required code, mutated files/signatures, unsafe/symlink/unknown entries and budgets rejected",
+    "Existing8composition/9loader/5protocol results retained; no behavioral or shutdown tests from packaging"
+  ],
+  "Cobra": "No source or runtime changes; builder refuses paths outside fourfirstpartyIDs",
+  "existing_workflow_extension": {
+    "path": ".github/workflows/infinity-2103407-search-pressure-host-gate.yml",
+    "preimage_sha256": "01a4172e003f7d911b5eae32505de3d26e576246181ac00af70dfe9cdf598a28",
+    "selection": "module-bundle",
+    "tests": "6bundle+7JCAhost+2refresh; exactDEXpackageaudit; originalprivatekeystorenative/JCAauthpackagingseparatefrombehavioraltests",
+    "no_APK_or_application_tests": true,
+    "signing_after_successful_checks_only": true,
+    "private_key_material_in_uploaded_outputs": false
+  }
+}

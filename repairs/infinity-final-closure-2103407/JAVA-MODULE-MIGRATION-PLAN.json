@@ -1,0 +1,46 @@
+{
+  "recorded_before_runtime_adapter_edits": true,
+  "workstreams": [
+    2,
+    5
+  ],
+  "baseline_dex_sha256": "7ea38f88187dfec80211b3c5be6e09ef3cbd38928527c42570b8b89deeed3185",
+  "target": "com/projectinfinity/kodi/InfinityInstalledCheckpointInstaller.smali",
+  "target_smali_sha256": "85eed60dcfd2a5fcc6a008b579a6207de32492f0d40037322735371218d3d711",
+  "method_preimages": {
+    "<init>()V": "9df7451ac2397c68f971f600d0cde7e529833d4647f9697ec4bcee579947b5e4",
+    "applyBeforeNative(Landroid/content/Context;)Z": "3201b70f42280075d2ea7032d6af2a815d970379140b837dccbd8ee8ef0835d0",
+    "hash(Ljava/io/File;)Ljava/lang/String;": "7d8e12a40844e8acd7db3220fc463379d6c3578a5d551ffa38a0cd637ef98ff1",
+    "verify(Ljava/io/File;)Ljava/lang/String;": "c18fd00d5c78de518582a3389ab6a547f6ed3b96bf078dcdb4b2541e14444235",
+    "verifyReviewedController22(Ljava/io/File;)Z": "6b54483382eca012203f9b18a38d2cedbda3c9dbc198e5b7e850249e6cc1281d",
+    "verifyReviewedController23(Ljava/io/File;)Z": "c3272a0528de19e38f7334f76b26c0e28b64ae4ce6138f74851d0e592a454037",
+    "verifyReviewedController24(Ljava/io/File;)Z": "30c025c2facd644c2b7227e049255d81cba56e7198c1d9bcc2883b6a91b8e112",
+    "verifyReviewedController25(Ljava/io/File;)Z": "508b488aa8f089d41fab7b7e463e5f12a66c09b949bcbee6436721145dffdfd5",
+    "verifyReviewedController26(Ljava/io/File;)Z": "a3101ba925a2708d56e6aa0fa829e89d4f75a2db3e45c87d6e90712d7f141f68",
+    "verifyReviewedController27(Ljava/io/File;)Z": "2e4b9f167e52cea911b378f7d1cc88976050b47528c5bf64e9bf854e541a924c",
+    "verifyReviewedController28(Ljava/io/File;)Z": "915bf03364e1ed8e2db16b8eeb5170515c8602c05401321b029dc14ae596bafd",
+    "verifyReviewedController29(Ljava/io/File;)Z": "06bec48affa6b54b55b0a50864e405b6d24907434fb197b0bbb0215cc063cb34"
+  },
+  "runtime_need": "Actual signed407 installer returns legacy_or_unknown forCC39, native/Python module consolidation requires initial coherent code migration beforeNativeActivity starts Python. ExistingMain entry is one-shot native-task owned; preserve everycaller and onlymodify exact installer callsite.",
+  "allowed_method_change": "applyBeforeNative: replace exactlyone verify(File)call with verify(Context,File); all original legacyverifiers/hash/receipts/compat branches remain exact. New private overloads onlyread/verify/hash/write names already in DEXpool.",
+  "guard": "Only actual com.projectinfinity.kodi.Main context and exact app externalfiles .kodi/addons canonical root beforeNative; all other contexts follow original verifier. NoCobra source/class/callback change.",
+  "migration": "Authenticate original-RSA signed APKasset modulemanifest and fullfileinventory; signedBASE407codepreimages; preflightalltargetcurrentfiles old/new; backuponlyverifiedoldcode; atomic fsync/readbackknowncode files; signaturethenmanifest last; resumable partialgeneration onlywhen identicalnewAPKgeneration. Neverdowngrade a differentauthenticatedinstalledgeneration. Leaveunrecognizedfiles andalluserdata/providers unchanged.",
+  "negative_release_gates": [
+    "OriginalDEXstringpoolindicesidentical;zeroadditionalclasses;allotheroriginalclassdisassembliesbyteidentical;exactoriginalfields",
+    "Original-signaturewrongkey/tamper/path/symlink/size/protocol/entry rejected",
+    "Unknownmodifiedinstalledknownfile refused beforefirstwrite; signednewerversion neverdowngraded;partialmigrationresumes withoutdata writes",
+    "RealAndroid17install-overinitialmigration/nativeprotocol/selection/Close remainsrequired separately"
+  ],
+  "selected_before_execution": [
+    "Exact-source DEX adapter/cryptographic verifier and migration-specific host checks only, originalsignaturebound packageformat CI verification",
+    "API37 feature repeat remainsSearchonly; noautomaticClose frombuild/featuretests",
+    "test_java_module_migration.py: actual JCA/adapter body on bounded build-only POSIX/Context fixtures; initialmigration+unknownfile preservation, interruptedsamegenerationresume, unknownpreimage/backup rejection beforewrites, wrongsignature/symlink rejection, validfuturegenerationreuse/incompletedowngraderefusal, othercontext/roots legacyownership, signedprotocol/path/entry rejection. Hostmodels only; actualAPI37 separately required."
+  ],
+  "status": "PRE_IMPLEMENTATION; noAPK or runtimepass",
+  "build_only_helpers": [
+    "module_dex.py",
+    "host-java/",
+    "test_java_module_migration.py"
+  ],
+  "DEX_rule": "All final strings/indices exact. D8unusedtoolmarker excludedonlyfromunmergedhelperprecheck, finalDEX exactpool gate unchanged. AccessabsentStructStatfieldnames throughJDKreflection/charpayload topreventaddingst_size/st_mtime/st_ctime literalindices."
+}

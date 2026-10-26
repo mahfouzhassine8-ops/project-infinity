@@ -135,5 +135,11 @@
     "No extra WB service/worker; publisher parks with existing CC checkpoint gate",
     "Unknown/modified module source rejected; all four original component source inventories pinned",
     "All other APK members and Cobra untouched; full engine integration still a separate gate"
-  ]
+  ],
+  "performance_correction": {
+    "function": "CC.service._refresh_setting",
+    "verified_source": "51fc63f6922885c8473277398e6f3569274eb42afe06be0148501d6ddc65bb23",
+    "evidence_run": 40271389166,
+    "reason": "Repeatednativeunknownaddonexceptions eachsecond for absentoptionalrefreshservice. AddonlydynamicHasAddonexistenceguard, preservingdisabledinstalledsettings,allrefreshoptions andplaybackbehavior."
+  }
 }

@@ -1,0 +1,30 @@
+{
+  "status": "PASS_EXACT_DEX_SOURCE_AND_PACKAGE_BOUNDARY",
+  "baseline_dex_sha256": "7ea38f88187dfec80211b3c5be6e09ef3cbd38928527c42570b8b89deeed3185",
+  "runtime_adapter_template_sha256": "7369ab1c0ca4585e26cd4dc36eec4a7e54f6ab94e59c8a7e2f02103294dcd029",
+  "generated_java_sha256": "14634a4aea09ded2f9ba30897e9fc7f8a0685343ca69bff900617454a1b3d0b3",
+  "final_dex_sha256": "d13ea18c00fff17d93d59732b3c4481fa2efcc40a4fd7366b459eeb32abf2b1a",
+  "changed_classes": [
+    "com/projectinfinity/kodi/InfinityInstalledCheckpointInstaller.smali"
+  ],
+  "added_classes": [],
+  "new_private_methods": [
+    "hash([B)Ljava/lang/String;",
+    "read(Ljava/io/File;I)[B",
+    "read(Ljava/io/InputStream;I)[B",
+    "verify(Landroid/content/Context;Ljava/io/File;)Ljava/lang/String;",
+    "verify(Ljava/io/File;[B[B)Ljava/lang/String;",
+    "verify(Ljava/lang/String;)Z",
+    "verify([B[B)[Ljava/lang/String;",
+    "write(Ljava/io/File;[B)V"
+  ],
+  "original_legacy_verifiers_and_receipts_preserved": true,
+  "all_other_disassemblies_byte_identical": true,
+  "original_string_pool_and_indices_identical": true,
+  "protected_classes": 7864,
+  "Cobra_classes_changed": [],
+  "Main_or_other_callers_changed": [],
+  "runtime_Android17": "NOT RUN",
+  "physical_Fold": "NOT RUN",
+  "APK_produced": false
+}

@@ -1,0 +1,204 @@
+// Only the methods below are merged into the exact original installer class.
+// No helper class, field, caller or unowned DEX definition is packaged.
+package com.projectinfinity.kodi;
+import android.content.Context;
+import android.system.Os;
+import android.system.OsConstants;
+import android.system.StructStat;
+import java.io.*;
+import java.security.MessageDigest;
+import java.security.Signature;
+import java.util.*;
+
+final class InfinityInstalledCheckpointInstaller {
+  // Build-only stand-in: the merger keeps the original legacy method exactly.
+  private static String verify(File ignored)throws Exception {throw new IOException("Legacy verifier stand-in must not be packaged");}
+
+  private static boolean verify(String path) {
+    if(path.length()==0 || path.length()>240 || path.indexOf('/')<0 || path.toLowerCase(Locale.ROOT).contains("cobra"))return false;
+    String[] names=path.split("/",-1);
+    if(!Arrays.asList("script.infinity.commandcenter","script.infinity.uirepair","script.infinity.watchedbridge","script.infinity.rails").contains(names[0]))return false;
+    for(String name:names)if(name.length()==0 || name.equals(".") || name.equals("..") || !name.matches("[A-Za-z0-9._-]+"))return false;
+    return true;
+  }
+
+  private static byte[] read(InputStream input,int limit)throws Exception {
+    ByteArrayOutputStream out=new ByteArrayOutputStream();byte[] buffer=new byte[8192];int count;
+    while((count=input.read(buffer))!=-1) {
+      if(count>limit-out.size())throw new IOException("Oversized module input");
+      out.write(buffer,0,count);
+    }
+    return out.toByteArray();
+  }
+
+  private static byte[] read(File file,int limit)throws Exception {
+    if(!file.getAbsoluteFile().equals(file.getCanonicalFile()))throw new IOException("Linked module input");
+    FileDescriptor descriptor=Os.open(file.getPath(),OsConstants.O_RDONLY|OsConstants.O_CLOEXEC|OsConstants.O_NOFOLLOW|OsConstants.O_NONBLOCK,0);
+    try(FileInputStream input=new FileInputStream(descriptor)) {
+      StructStat before=Os.fstat(descriptor);
+      long size=StructStat.class.getField("st_size").getLong(before);
+      if((before.st_mode&61440)!=32768 || size<0 || size>limit)throw new IOException("Nonregular module input");
+      byte[] raw=read(input,limit);StructStat after=Os.fstat(descriptor);
+      if(before.st_dev!=after.st_dev || before.st_ino!=after.st_ino || raw.length!=size)
+        throw new IOException("Module generation changed");
+      for(String field:Arrays.asList("st_size","st_mtime","st_ctime"))
+        if(StructStat.class.getField(field).getLong(before)!=StructStat.class.getField(field).getLong(after))throw new IOException("Module file changed");
+      return raw;
+    }
+  }
+
+  private static String hash(byte[] raw)throws Exception {
+    StringBuilder out=new StringBuilder();
+    for(byte value:MessageDigest.getInstance("SHA-256").digest(raw))out.append(String.format(Locale.ROOT,"%02x",value&255));
+    return out.toString();
+  }
+
+  private static String[] verify(byte[] payload,byte[] signature)throws Exception {
+    if(payload.length==0 || payload.length>131072 || payload[payload.length-1]!='\n' || signature.length<256 || signature.length>512)
+      throw new IOException("Module limits exceeded");
+    // Reflection avoids introducing public-key type descriptors into the
+    // protected near-capacity DEX string pool. Cryptography remains JCA RSA.
+    Class<?> factoryType=Class.forName("java.security.KeyFactory");
+    Object factory=factoryType.getMethod("getInstance",String.class).invoke(null,"RSA");
+    Class<?> specType=Class.forName("java.security.spec.X509EncodedKeySpec");
+    Object spec=specType.getConstructor(byte[].class).newInstance((Object)new byte[]{@PUBLIC_KEY_DER@});
+    Object key=factoryType.getMethod("generatePublic",Class.forName("java.security.spec.KeySpec")).invoke(factory,spec);
+    Signature verifier=Signature.getInstance("SHA256withRSA");
+    Signature.class.getMethod("initVerify",Class.forName("java.security.PublicKey")).invoke(verifier,key);
+    verifier.update(payload);if(!verifier.verify(signature))throw new SecurityException("Original module signature rejected");
+    for(byte b:payload)if(b<0 || (b<32 && b!='\n' && b!='\t') || b==127)throw new IOException("Noncanonical module payload");
+    String[] lines=new String(payload,"US-ASCII").split("\n",-1);
+    if(lines.length<8 || !lines[0].equals("INFINITY-MODULES/1") || !lines[1].startsWith("package\t") ||
+       !lines[2].equals("protocol\t1") || !lines[lines.length-1].equals(""))throw new IOException("Unsupported module contract");
+    String version=lines[1].substring(8);
+    if(version.length()>48 || !version.matches("[0-9]+\\.[0-9]+\\.[0-9]+(?:\\.[0-9]+)?"))throw new IOException("Invalid module version");
+    HashSet<String> capabilities=new HashSet<String>();HashSet<String> files=new HashSet<String>();
+    String previousCapability="",previousFile="",previousEntry="";int phase=0,entries=0;
+    for(int i=3;i<lines.length-1;i++) {
+      if(lines[i].length()>512)throw new IOException("Oversized module record");
+      String[] row=lines[i].split("\t",-1);
+      if(row.length==2 && row[0].equals("capability")) {
+        if(phase!=0 || row[1].compareTo(previousCapability)<=0 || !Arrays.asList("checkpoint-v1","dialog-reflow-v1","first-party-modules-v1","title-actions-v1").contains(row[1]))throw new IOException("Invalid module capability");
+        capabilities.add(row[1]);previousCapability=row[1];
+      } else if(row.length==3 && row[0].equals("file")) {
+        if(phase>1 || !row[1].matches("[0-9a-f]{64}") || !verify(row[2]) || row[2].compareTo(previousFile)<=0 || files.size()>=256)throw new IOException("Invalid module source");
+        phase=1;files.add(row[2]);previousFile=row[2];
+      } else if(row.length==3 && row[0].equals("entry")) {
+        boolean resident=row[2].equals("script.infinity.commandcenter/service.py");
+        if(phase<1 || ++entries>16 || !files.contains(row[2]) || row[2].compareTo(previousEntry)<=0 ||
+           !(resident?row[1].equals("command_center"):row[1].equals("command_center_client")))throw new IOException("Invalid module entry");
+        phase=2;previousEntry=row[2];
+      } else throw new IOException("Unknown module record");
+    }
+    for(String name:Arrays.asList("addon.xml","checkpoint_runtime.py","common.py","context.py","default.py","module_contract.py","persistence_participant.py","plugin.py","service.py"))
+      if(!files.contains("script.infinity.commandcenter/"+name))throw new IOException("Missing required controller source");
+    if(!capabilities.contains("checkpoint-v1") || !capabilities.contains("first-party-modules-v1") ||
+       !Arrays.asList(lines).contains("entry\tcommand_center\tscript.infinity.commandcenter/service.py"))throw new IOException("Missing module ownership");
+    return lines;
+  }
+
+  private static String verify(File root,byte[] payload,byte[] signature)throws Exception {
+    String[] lines=verify(payload,signature);long total=0;
+    for(int i=3;i<lines.length-1;i++) {
+      String[] row=lines[i].split("\t",-1);
+      if(!row[0].equals("file"))continue;
+      byte[] raw=read(new File(root,row[2]),4194304);total+=raw.length;
+      if(total>33554432 || !hash(raw).equals(row[1]))throw new IOException("Module source mismatch");
+    }
+    String version=lines[1].substring(8);
+    String xml=new String(read(new File(root,"script.infinity.commandcenter/addon.xml"),4194304),"UTF-8");
+    int start=xml.indexOf("<addon "),end=xml.indexOf('>',start);
+    if(start<0 || end<start || !xml.substring(start,end).contains("version=\""+version+"\""))throw new IOException("Installed module version mismatch");
+    if(!Arrays.equals(payload,read(new File(root,"script.infinity.commandcenter/INFINITY-MODULES.v1"),131072)) ||
+       !Arrays.equals(signature,read(new File(root,"script.infinity.commandcenter/INFINITY-MODULES.v1.sig"),512)))throw new IOException("Module generation changed");
+    return version;
+  }
+
+  private static void write(File target,byte[] raw)throws Exception {
+    File parent=target.getParentFile();
+    if(!parent.getAbsoluteFile().equals(parent.getCanonicalFile()))throw new IOException("Linked module destination");
+    if(!parent.isDirectory() && !parent.mkdirs())throw new IOException("Module directory unavailable");
+    File pending=File.createTempFile(".infinity-modules-",".tmp",parent);
+    try {
+      try(FileOutputStream output=new FileOutputStream(pending)) {output.write(raw);output.getFD().sync();}
+      if(!Arrays.equals(raw,read(pending,4194304)))throw new IOException("Module stage readback failed");
+      Os.rename(pending.getPath(),target.getPath());
+      FileDescriptor directory=Os.open(parent.getPath(),OsConstants.O_RDONLY|OsConstants.O_NOFOLLOW|OsConstants.O_NONBLOCK|OsConstants.O_CLOEXEC,0);
+      try {
+        if((Os.fstat(directory).st_mode&61440)!=16384)throw new IOException("Module parent is not a directory");
+        Os.fsync(directory);
+      }finally {Os.close(directory);}
+      if(!Arrays.equals(raw,read(target,4194304)))throw new IOException("Module installed readback failed");
+    } finally {if(pending.exists() && !pending.delete())throw new IOException("Module temporary cleanup failed");}
+  }
+
+  private static String verify(Context context,File supplied)throws Exception {
+    if(!context.getClass().getName().equals("com.projectinfinity.kodi.Main"))return verify(supplied);
+    File storage=context.getExternalFilesDir(null);if(storage==null)storage=context.getFilesDir();
+    File root=new File(new File(storage,".kodi"),"addons").getCanonicalFile();
+    if(!root.equals(supplied.getCanonicalFile()))throw new IOException("Unowned module root");
+    File marker=new File(root,"script.infinity.commandcenter/INFINITY-MODULES.v1");
+    File signatureFile=new File(root,"script.infinity.commandcenter/INFINITY-MODULES.v1.sig");
+    byte[] installed=marker.exists()?read(marker,131072):null;
+    byte[] installedSignature=signatureFile.exists()?read(signatureFile,512):null;
+    if(installed!=null && installedSignature!=null) {
+      verify(installed,installedSignature); // Unknown or unsigned generations are never overwritten.
+      try {return verify(root,installed,installedSignature);}catch(Exception partial) { /* Android Os reports ErrnoException, not IOException. Only this exact authenticated APK generation may resume below. */ }
+    }
+    byte[] payload,signature;
+    try(InputStream input=context.getAssets().open("addons/script.infinity.commandcenter/INFINITY-MODULES.v1")) {payload=read(input,131072);}
+    try(InputStream input=context.getAssets().open("addons/script.infinity.commandcenter/INFINITY-MODULES.v1.sig")) {signature=read(input,512);}
+    String[] lines=verify(payload,signature);
+    if(installed!=null && !Arrays.equals(installed,payload))throw new IOException("Installed signed generation must not be downgraded");
+    if(installedSignature!=null && !Arrays.equals(installedSignature,signature))throw new IOException("Unknown partial signature generation must not be overwritten");
+    LinkedHashMap<String,byte[]> sources=new LinkedHashMap<String,byte[]>();long total=0;
+    for(int i=3;i<lines.length-1;i++) {
+      String[] row=lines[i].split("\t",-1);if(!row[0].equals("file"))continue;
+      byte[] raw;
+      try(InputStream input=context.getAssets().open("addons/"+row[2])) {raw=read(input,4194304);}
+      total+=raw.length;if(total>33554432 || !hash(raw).equals(row[1]))throw new IOException("APK module source mismatch");
+      sources.put(row[2],raw);
+    }
+    byte[] baseline=sources.get("script.infinity.commandcenter/INSTALL-BASELINE.v1");
+    if(baseline==null || baseline.length>131072)throw new IOException("Signed baseline inventory required");
+    String[] parents=new String(baseline,"US-ASCII").split("\n",-1);
+    if(parents.length<3 || !parents[0].equals("INFINITY-INSTALL-BASELINE/1") ||
+       !parents[1].equals("source\t0e8739d2d0e1be0ab8f127519b526556426fb160") || !parents[parents.length-1].equals(""))throw new IOException("Unapproved migration baseline");
+    HashMap<String,String> old=new HashMap<String,String>();String previous="";
+    for(int i=2;i<parents.length-1;i++) {
+      String[] row=parents[i].split("\t",-1);
+      if(row.length!=3 || !row[0].equals("file") || !row[1].matches("[0-9a-f]{64}") || !verify(row[2]) || row[2].compareTo(previous)<=0 || old.size()>=256)throw new IOException("Invalid baseline source inventory");
+      old.put(row[2],row[1]);previous=row[2];
+    }
+    // Preflight every known old and new member before the first code write.
+    // Unknown files and all profile/provider paths remain untouched.
+    HashSet<String> paths=new HashSet<String>(old.keySet());paths.addAll(sources.keySet());
+    for(String name:paths) {
+      File file=new File(root,name);
+      if(!file.getAbsoluteFile().equals(file.getCanonicalFile()))throw new IOException("Linked installed source");
+      if(!file.exists())continue;
+      String current=hash(read(file,4194304));
+      if(!current.equals(old.get(name)) && !(sources.containsKey(name) && current.equals(hash(sources.get(name)))))throw new IOException("Unrecognized installed source; preserved without modification");
+      if(current.equals(old.get(name))) {
+        File backup=new File(root,".infinity-module-baseline407/"+name);
+        if(backup.exists() && !hash(read(backup,4194304)).equals(current))throw new IOException("Unrecognized baseline backup; preserved without modification");
+      }
+    }
+    for(Map.Entry<String,byte[]> entry:sources.entrySet()) {
+      File file=new File(root,entry.getKey());byte[] desired=entry.getValue();
+      if(file.exists()) {
+        byte[] current=read(file,4194304);if(Arrays.equals(current,desired))continue;
+        if(!hash(current).equals(old.get(entry.getKey())))throw new IOException("Installed source changed after preflight; preserved");
+        File backup=new File(root,".infinity-module-baseline407/"+entry.getKey());
+        if(backup.exists()) {
+          if(!Arrays.equals(current,read(backup,4194304)))throw new IOException("Baseline backup changed after preflight; preserved");
+        } else write(backup,current);
+      }
+      write(file,desired);
+    }
+    // Commit the authenticated pair last. A partial code generation never
+    // satisfies native admission; the same checked APK can resume it on launch.
+    write(signatureFile,signature);write(marker,payload);
+    return verify(root,payload,signature);
+  }
+}

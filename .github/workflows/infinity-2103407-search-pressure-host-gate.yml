@@ -161,6 +161,7 @@ jobs:
           PY
           python3 repairs/infinity-final-closure-2103407/inspect_signed407.py signed407 final-work/baseline
       - name: Execute only the explicitly selected final correction host checks
+        id: selected
         env:
           FINAL_SIGNED_SEARCH: ${{ github.workspace }}/final-work/baseline/sources/script.infinity.commandcenter/infinity_search.py
           FINAL_PATCHED_SEARCH: ${{ github.workspace }}/final-work/candidate/infinity_search.py
@@ -174,6 +175,10 @@ jobs:
           request=json.loads((root/'HOST-REQUEST.json').read_text())
           assert request['schema']==1 and request['scope'].strip()
           selected=request['selected']
+          assert selected in {'search-lifetime','module-trust','installed-modules','module-protocol',
+                              'firstparty-compose','reference-observation','module-bundle','android-routing'}
+          with open(os.environ['GITHUB_OUTPUT'],'a') as output:
+              output.write('selection='+selected+'\n')
           if selected=='search-lifetime':
               subprocess.run([sys.executable,str(root/'patch_search_lifetime.py'),os.environ['FINAL_SIGNED_SEARCH'],os.environ['FINAL_PATCHED_SEARCH']],check=True)
               pattern='test_search_lifetime.py'
@@ -193,16 +198,64 @@ jobs:
               for pattern in ('test_reference_observation.py','test_android17_reference.py'):
                   subprocess.run([sys.executable,'-m','unittest','discover','-s',str(root),'-p',pattern,'-v'],check=True)
               sys.exit(0)
+          elif selected=='module-bundle':
+              for pattern in ('test_module_bundle.py','test_java_module_migration.py','test_refresh_lookup.py'):
+                  subprocess.run([sys.executable,'-m','unittest','discover','-s',str(root),'-p',pattern,'-v'],check=True)
+              sys.exit(0)
           elif selected=='android-routing':
               pattern='test_android17_reference.py'
           else:
               raise RuntimeError('Unreviewed host selection')
           subprocess.run([sys.executable,'-m','unittest','discover','-s',str(root),'-p',pattern,'-v'],check=True)
           PY
+      - name: Restore existing pinned DEX writer and Android signature inputs
+        if: steps.selected.outputs.selection == 'module-bundle'
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39867073954
+          name: Infinity-Receipt-Race-Android17-Investigation
+          github-token: ${{ github.token }}
+          path: dex-inputs
+      - name: Compile only the owned installer and prove exact protected DEX definitions
+        if: steps.selected.outputs.selection == 'module-bundle'
+        run: |
+          set -euo pipefail
+          APK="$(find signed407 -type f -name '*.apk' -print -quit)"
+          python3 repairs/infinity-final-closure-2103407/module_dex.py \
+            --apk "$APK" --jars dex-inputs/receipt-evidence/tool-jars \
+            --android dex-inputs/receipt-evidence/android-34.jar \
+            --d8 "$ANDROID_HOME/build-tools/35.0.0/lib/d8.jar" \
+            --java "$JAVA_HOME/bin/java" --javac "$JAVA_HOME/bin/javac" \
+            --out final-work/module-dex
+      - name: Authenticate internal module bundle with existing permanent signer and native verifier
+        if: steps.selected.outputs.selection == 'module-bundle'
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 repairs/infinity-final-closure-2103407/sign_module_bundle.py \
+            final-work/baseline/sources final-work/signed-modules
       - uses: actions/upload-artifact@v4
-        if: always()
+        if: always() && steps.selected.outputs.selection != 'module-bundle'
         with:
           name: Infinity-Final-Source-Ownership-${{ github.run_id }}-NOT-APK
           path: final-work/
+          retention-days: 30
+          if-no-files-found: warn
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.selected.outputs.selection == 'module-bundle'
+        with:
+          name: Infinity-Final-Source-Ownership-${{ github.run_id }}-NOT-APK
+          path: |
+            final-work/baseline/
+            final-work/BASELINE-SIGNATURE.txt
+            final-work/SELECTED-HOST-RESULTS.txt
+            final-work/module-dex/DEX-MODULE-PRESERVATION.json
+            final-work/module-dex/INSTALLER.patch
+            final-work/module-dex/classes.dex
+            final-work/signed-modules/
           retention-days: 30
           if-no-files-found: warn

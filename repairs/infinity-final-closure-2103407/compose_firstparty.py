@@ -229,6 +229,9 @@ def compose(sources,destination):
     text=''.join(line for line in lines if not line.startswith('BRIDGE_PINS = '))
     path.write_text(text)
     path=cc/'service.py';text=path.read_text()
+    text=replace_once(text,
+        "    try:\n        value = xbmcaddon.Addon('service.infinity.refresh').getSetting(key)",
+        "    try:\n        if not xbmc.getCondVisibility('System.HasAddon(service.infinity.refresh)'):\n            return default\n        value = xbmcaddon.Addon('service.infinity.refresh').getSetting(key)")
     text=replace_once(text,'    monitor = CheckpointMonitor(checkpoint)\n',
         '    monitor = CheckpointMonitor(checkpoint)\n    try:\n        from infinity_modules.watchedbridge.service import Publisher\n        watched_publisher = Publisher()\n    except Exception as error:\n        watched_publisher = None\n        log("Watched presentation unavailable: " + type(error).__name__)\n')
     text=replace_once(text,'        player.poll()\n        hub.poll_kodi_sync(profile)\n',

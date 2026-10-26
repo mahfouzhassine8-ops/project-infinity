@@ -30,8 +30,8 @@
     {
       "id": 2,
       "name": "Unified Command Center and authenticated modules",
-      "stage": "ISOLATED_COMPOSITION_HOST_TEST_PASS",
-      "integration": "Authenticated source loader, exact-source moves and single scheduler staged; matching engine/APK migration pending"
+      "stage": "SOURCE_AND_HOST_MIGRATION_PASS",
+      "integration": "LocalexactDEXadapter and7JCAhostmigration checksPASS,6bundleproducer/nativechecksPASS; originalsignerCIandactualAndroid17integrationpending"
     },
     {
       "id": 3,
@@ -99,6 +99,15 @@
           "CC.checkpoint_runtime.write_scope current-generation admission"
         ],
         "reason": "Required unified first-party modules and version-independent authenticated trust; protect data/fences and physically passing WatchNixtoons2 actions."
+      },
+      {
+        "member": "assets/addons/script.infinity.commandcenter/service.py",
+        "baseline_sha256": "51fc63f6922885c8473277398e6f3569274eb42afe06be0148501d6ddc65bb23",
+        "function": "_refresh_setting",
+        "reason": "ActualAPI37logs repeatedunknown service.infinity.refresh exceptions twicepersecond fromone-secondpublisher. Queryexisting System.HasAddon beforeconstructingonlythatoptionaladdon; retaininstalled-disabledsettings/defaults anddynamicinstall/removalbehavior. No caching/provider/refreshpolicychange.",
+        "selected_before_execution": [
+          "test_refresh_lookup.py2 exactsourcefunctioninverse andchanginginstalled/disabled/absent/settings-errorcontracts,2000lookupnegativecontrol; nodeviceframepacingclaim"
+        ]
       }
     ],
     "native_edits_admitted": [
@@ -144,7 +153,25 @@
         "status": "Recorded before two-header transform"
       }
     ],
-    "apk_member_edits_admitted": [],
+    "apk_member_edits_admitted": [
+      {
+        "member": "classes.dex",
+        "baseline_sha256": "7ea38f88187dfec80211b3c5be6e09ef3cbd38928527c42570b8b89deeed3185",
+        "ledger": "JAVA-MODULE-MIGRATION-PLAN.json",
+        "reason": "Only actual installed checkpoint installer: original-key authenticated module inventory and checked initial four-ID code migration. EveryotherDEXclass/field/stringindex remains exact."
+      },
+      {
+        "member": "assets/addons/script.infinity.commandcenter/INSTALL-BASELINE.v1",
+        "baseline_sha256": null,
+        "reason": "Original-signer-bound exact407codepreimages for non-destructive initial migration; no profile/database/path outside4codeIDs"
+      },
+      {
+        "member": "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1 and .sig",
+        "baseline_sha256": null,
+        "ledger": "BUNDLE-OWNERSHIP.json",
+        "reason": "OriginalpermanentRSA signed completefirstparty source/capability/entry inventory consumed by compiled native and Java adapter"
+      }
+    ],
     "initial_allowed_repository_paths": [
       "repairs/infinity-final-closure-2103407/",
       ".github/workflows/infinity-2103407-search-pressure-host-gate.yml",
@@ -162,10 +189,13 @@
   },
   "selected_verification": {
     "host": [
-      "test_reference_observation.py: existing6 plus debug-setup/progress/exact bounded Search-preparation wait checks",
-      "test_android17_reference.py3 unchanged routing contracts"
+      "test_module_bundle.py6",
+      "test_java_module_migration.py7",
+      "test_refresh_lookup.py2",
+      "module_dex.py exactoneclass/pool/field/classpreservation",
+      "OriginalpermanentRSA module signing thenactualnativeandJCAproducerinteroperation; buildonly"
     ],
-    "android17": "Baseline reference FAIL before Search input; evidence artifact12624160445, no shutdown selected",
+    "android17": "Reference04FAILbeforeAndroidinput: providerssetupcompleted, universal-search invoked, keyboardnotexposedwithin45s. No deadline extension/request05. Retainartifact12628674981.",
     "physical_fold": "NOT RUN",
     "shutdown": "Explicitly authorized workstream5; must run separately and retain real failures",
     "packaging": "AUTHORIZED after required corrections/integration; no extra permission required",
