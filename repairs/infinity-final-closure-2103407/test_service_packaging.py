@@ -57,7 +57,7 @@ class ServicePackagingTests(unittest.TestCase):
         workflow=(root/'.github/workflows/infinity-2103407-search-pressure-host-gate.yml').read_text()
         self.assertIn("selected=='internal-service-apk'",workflow)
         self.assertIn('package_versioncheck.py',workflow)
-        self.assertIn('test_versioncheck_scope.py test_service_packaging.py',workflow)
+        self.assertIn('test_versioncheck_scope test_service_packaging',workflow)
         for forbidden in ('needs:','workflow_run:','continue-on-error:','android17_shutdown_probe.py','android17_stress.py'):
             self.assertNotIn(forbidden,workflow)
         self.assertIn("if: steps.selected.outputs.selection == 'internal-apk'",workflow)

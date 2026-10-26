@@ -307,7 +307,7 @@ jobs:
         run: |
           set -euo pipefail
           export INFINITY_SERVICE_PARENT_APK="$(find service-parent -type f -name 'Infinity-2103409-Integrated-INTERNAL-VERIFICATION.apk' -print -quit)"
-          PYTHONPATH=repairs/infinity-final-closure-2103407 python3 -m unittest test_versioncheck_scope.py test_service_packaging.py -v
+          PYTHONPATH=repairs/infinity-final-closure-2103407 python3 -m unittest test_versioncheck_scope test_service_packaging -v
       - name: Audit exact409-to410 two-member delta and sign original identity
         if: steps.selected.outputs.selection == 'internal-service-apk'
         env:

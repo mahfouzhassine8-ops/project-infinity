@@ -31,5 +31,12 @@
       "after": "8c192bef13ac77002568d561b7112ea073fc916d676cd6e9433e4b9b30988f56"
     }
   },
-  "host_results": "8sourcebehavior/negative +5packagingnegative +1workflowindependence =14PASS onhost3.12. CI3.11firstverification selected before permanent signing. No applicationpassclaim."
+  "host_results": "8sourcebehavior/negative +5packagingnegative +1workflowindependence =14PASS onhost3.12. CI3.11firstverification selected before permanent signing. No applicationpassclaim.",
+  "first_CI_attempt": {
+    "run": 40305461955,
+    "source": "7470e482ce3abd537e344745ec9afeec6f02d95d",
+    "result": "FAIL beforeactualtests/packaging: rootunittest interpreted .py asattribute;2loadererrors,0actualsourcechecks",
+    "correction": "Use exactimportablemodule nameswithalreadyexplicitPYTHONPATH; runfirst14CI3.11sourcechecks andpackaging. Noproduction/App/testassertionchange.",
+    "selected_before_retry": "test_service_packaging.ServicePackagingTests.test_existing_build_workflow_keeps_behavioral_verification_independent aftercommandfix; samefirst14CIchecks, no application suites"
+  }
 }
