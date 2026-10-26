@@ -1,0 +1,6 @@
+{
+  "recorded_before_implementation": true,
+  "evidence": "Actual API37 Favourites.GetFavourites in414Continue artifact12664828892 returns favourites:null with start0/end0/total0. Runtime415 now fixes its production null handling. Original final-actions test also iterates that nullable array after actual remove; it must interpret the real native empty response correctly.",
+  "correction": "Test-local UI observation proxy, only final-actions. Delegate every original operation. For real Favourites.GetFavourites only, canonicalize null to[] ONLY when actual native limits start/end/total are exact integers0. Reject missing/malformed/inconsistent response. Retain original add/remove queries, exact path assertions and all ui.require predicates byte-for-byte. Record raw native responses; no write or production module import.",
+  "selected_checks": ["Actual null+zero limits versus malformed/nonzero/missing/bool limit rejection", "Actual nonempty native rows and unrelated methods unchanged", "Every original fixture assertion AST and exact full inverse retained", "Candidate routing guards"]
+}

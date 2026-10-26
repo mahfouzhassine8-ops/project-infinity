@@ -71,6 +71,8 @@ def fixture(raw):
     updated=continue_card_observer.instrument(updated)
     import popup_ready_observer
     updated=popup_ready_observer.instrument(updated)
+    import favourites_null_observer
+    updated=favourites_null_observer.instrument(updated)
     restored=restore_candidate_fixture(updated)
     if restore_fixture(restored).encode()!=raw:
         raise ValueError('An original feature assertion changed')
@@ -79,6 +81,8 @@ def fixture(raw):
 
 
 def restore_candidate_fixture(text):
+    import favourites_null_observer
+    text=favourites_null_observer.restore(text)
     import popup_ready_observer
     text=popup_ready_observer.restore(text)
     import continue_card_observer
