@@ -1,0 +1,16 @@
+{
+  "recorded_before_metadata_getter_edit": true,
+  "workstream": 6,
+  "file": "assets/addons/script.infinity.commandcenter/title_metadata.py",
+  "baseline_sha256": "d56a1a41d80fbd1e544918bbb846518bb47567f1e0ea71132f0cc3d355b15562",
+  "control": "TEXT_FIELDS premiered getter only",
+  "evidence": "Actualmatching9411source InfoTagVideo.cpp SHA c8a163a8eb551e5ba49610767e63c9519247d2ad01edc080246750ffd977fb60: getPremiered uses GetAsLocalizedDate; getPremieredAsW3C uses GetAsW3CDate. Information ISO calendar filtering must not discardvalidlocalizeddates.",
+  "change": "Use existinggetPremieredAsW3C for capturedpremiered, keeporiginalsnapshot/othergetters andsynopsis/trailer/IDs unchanged; no locale guessing.",
+  "selected_before_execution": [
+    "Capture realisticnativeTag with localizedoldgetter andISO W3Cgetter, actualSearchresult->ListItem->capture->Information, invalid1601hidden andrawsnapshotuntouched; exactsingle-lineinverse/title/source guard.",
+    "ReuseexistingOptionBmetadata4focusedchecks onlyafterthisdependencyiscomposed. No unrelatednativebuild/testrepeat."
+  ],
+  "Android17": "NOT RUN",
+  "physical_Fold": "NOT RUN",
+  "local_result": "5focusedmetadata tests PASS inclrealisticlocalizedoldgettercounterfactual; rawmetadata/synopsis/IDs preserved. Producercompositionmustincludeall3files, notonlySearch+Information."
+}

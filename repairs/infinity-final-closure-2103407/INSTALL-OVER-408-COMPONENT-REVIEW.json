@@ -1,0 +1,14 @@
+{
+  "recorded_before_any_installer_change": true,
+  "status": "SOURCE_VERIFIED_DEPENDENCY_NOT_IMPLEMENTED",
+  "user_installed": "2103408 withauthenticatedCC0.3.5.40",
+  "required_candidate": "2103409 orhigher; no408->407downgrade",
+  "file": "InfinityInstalledCheckpointInstaller::verify(Context,File)",
+  "source_template_sha256": "7369ab1c0ca4585e26cd4dc36eec4a7e54f6ab94e59c8a7e2f02103294dcd029",
+  "finding": "Afullyvalidinstalledsignedgeneration isreturnedbeforeAPKpayloadisread. ThusanAPKcontainingCC41willretainexistingvalidCC40. Thiscorrectlyprotects newerCCZIPupdatesfromolderAPK,butalso meansAPK-alonecannotadvance40->41. PreviousCIseeded407legacycodemissingmanifest, soitsautoinitialmigrationPASSdoesnotverifyuser408->409moduleupgrade.",
+  "preservation": "Do notoverwriteanunknownmodifiedsource, resetthebaseline407backup, downgradeanewerauthenticatedgeneration, orassumepairwriteatomicity. AnyAPK-ownedupdateneedsexactoriginal-keyold/newsourcepreimages,power-interruption-safepairrecoveryandalluserdata/providerpathsuntouched.",
+  "allowed_delivery_alternative": "ThebriefallowsoneauthenticatedCommandCenterZIPasthenormalPythonupdateaftermigration. Ifusingthatinstead ofchangingAPKinstaller, documentitsactualsafeupdate/reloadandpreciseorderwithone409APK; verifyactual408installedstate, not407legacyseed. MatchinghelperIDshimsstaystableonlyifsourcebytesmatchsignednewmanifest.",
+  "selected_next": "Chooseandimplementonecoherentupdatepathbeforefinalpackaging. Actual408->409testmustshowCCnewversion/digest, originalUID/saved-state preservation andnativeparticipantcompatibility; nofalseautomatic-upgradeclaim.",
+  "Android17": "NOT RUN",
+  "physical_Fold": "NOT RUN"
+}
