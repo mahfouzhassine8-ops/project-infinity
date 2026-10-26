@@ -1,0 +1,18 @@
+{
+  "recorded_before_repeat": true,
+  "kind": "test_observer_correction_no_APK_change",
+  "failed_run": 40339922552,
+  "artifact_id": 12659970454,
+  "artifact_sha256": "902f5470fb0ac8a790f342ffc81a9da040498813f8ab4024ca8ff31949e48339",
+  "failure": "ValueError converting blank GUI Property(ResumeTime) to float after actual correct saved card identity matched",
+  "exact_compiled_source_evidence": {
+    "xbmc/interfaces/legacy/ListItem.cpp": "0359986896afd88394639d5b2ad6d1da8bb61c5109f022195da632076706e803",
+    "xbmc/guilib/guiinfo/VideoGUIInfo.cpp": "21bc9319c6130d9d73aee3d4439951d1fdf7713e1a794e621f507f0e79059276",
+    "xbmc/interfaces/legacy/Control.cpp": "5a560e55a284415e193195d9a5c2e590ec0844dd3fe3c4aa99ce0e0d1d9b2f50"
+  },
+  "cause": "ListItem.setProperty routes reserved resume/total/offset into native fields, not ordinary GUI properties. Native ListItem.PercentPlayed reads actual native bookmark; Files.GetDirectory resume serializes exact doubles. Native panel Python ControlList vector is empty, so getSelectedItem is not a valid alternate reader.",
+  "correction": "Require exact visible identity/source/episode/watched/noautoplay, actual native PercentPlayed and same local directory native resume position/total. Missing or wrong native data fails. Original final-continue already obtains directory resume before Home; stress obtains a separate explicit readback after visible card and includes validation in usable elapsed.",
+  "checks": "1 observer positive/negative +2 actual card observation +7 original assertion/routing checks PASS locally; no device pass",
+  "not_directly_measured": "Native startoffset is consumed by Kodi and cannot be read through GUI Property; actual explicit Resume action still requires functional acceptance",
+  "release_accepted": false
+}

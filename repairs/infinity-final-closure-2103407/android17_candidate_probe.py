@@ -69,6 +69,8 @@ def fixture(raw):
     updated=updated.replace(ENV_BEFORE,ENV_AFTER,1)
     import continue_card_observer
     updated=continue_card_observer.instrument(updated)
+    import popup_ready_observer
+    updated=popup_ready_observer.instrument(updated)
     restored=restore_candidate_fixture(updated)
     if restore_fixture(restored).encode()!=raw:
         raise ValueError('An original feature assertion changed')
@@ -77,6 +79,8 @@ def fixture(raw):
 
 
 def restore_candidate_fixture(text):
+    import popup_ready_observer
+    text=popup_ready_observer.restore(text)
     import continue_card_observer
     text=continue_card_observer.restore(text)
     return text.replace(PROFILE_AFTER,PROFILE_BEFORE,1).replace(RECEIPT_AFTER,RECEIPT_BEFORE,1).replace(HISTORY_AFTER,HISTORY_BEFORE,1).replace(ENV_AFTER,ENV_BEFORE,1)
@@ -163,6 +167,7 @@ def main(selected_case=None,independent_setup=None):
                 report['read_only_resume_observer']=readonly_resume_observer.stage(
                     args.apk,EXPECTED['candidate_apk_sha256'],stage/aid)
                 shutil.copyfile(Path(__file__).parent/'continue_card_observer.py',stage/aid/'continue_card_observer.py')
+                shutil.copyfile(Path(__file__).parent/'popup_ready_observer.py',stage/aid/'popup_ready_observer.py')
             shutil.copyfile(Path(__file__).parent/'shutdown_environment.py',stage/aid/'shutdown_environment.py')
             # Seed the actual previous code, not new code installed by a test.
             # The authenticated installer must migrate all four original IDs before Python starts.

@@ -11,16 +11,18 @@ class ContinueCardObserverTests(unittest.TestCase):
                    media='tv',season=1,episode=2,position=60.125,duration=180)
         capsule={k:entry[k] for k in ('key','identity','source','stable_source')}
         labels={prefix+'Property(Infinity.Selection.Snapshot)':json.dumps(capsule),
-                prefix+'Property(ResumeTime)':'60.125',prefix+'Property(StartOffset)':'60.125',
-                prefix+'Property(TotalTime)':'180',prefix+'Property(Infinity.ResumeHub.Watched)':'false',
+                prefix+'PercentPlayed':'33',prefix+'Property(Infinity.ResumeHub.Watched)':'false',
                 prefix+'Season':'1',prefix+'Episode':'2'}
-        observer.verify_card(entry,labels,prefix,False)
-        for field,value in [('Property(ResumeTime)','60'),('Property(StartOffset)','0'),
-                            ('Property(TotalTime)','nan'),('Property(Infinity.ResumeHub.Watched)','true'),
+        observer.verify_card(entry,labels,prefix,False,{'position':60.125,'total':180})
+        for field,value in [('PercentPlayed','0'),('Property(Infinity.ResumeHub.Watched)','true'),
                             ('Season','2'),('Episode','3'),
                             ('Property(Infinity.Selection.Snapshot)',json.dumps(dict(capsule,key='e'*64)))]:
-            with self.assertRaises(AssertionError):observer.verify_card(entry,dict(labels,**{prefix+field:value}),prefix,False)
-        with self.assertRaises(AssertionError):observer.verify_card(entry,labels,prefix,True)
+            with self.assertRaises(AssertionError):observer.verify_card(entry,dict(labels,**{prefix+field:value}),prefix,False,{'position':60.125,'total':180})
+        with self.assertRaises(AssertionError):observer.verify_card(entry,labels,prefix,True,{'position':60.125,'total':180})
+        for native in [None,{}, {'position':60,'total':180},{'position':60.125,'total':0},
+                       {'position':float('nan'),'total':180},{'position':60.125,'total':float('inf')}]:
+            with self.subTest(native=native),self.assertRaises(AssertionError):
+                observer.verify_card(entry,labels,prefix,False,native)
 
 
 if __name__=='__main__':unittest.main(verbosity=2)

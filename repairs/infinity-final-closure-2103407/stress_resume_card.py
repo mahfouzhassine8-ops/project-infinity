@@ -13,8 +13,8 @@ def observe(device,records,media):
         raise ValueError('Original nonempty saved movie/episode fixture required')
     rail=8830 if media=='movie' else 8831
     prefix='Container(%d).ListItem.'%rail
-    fields=['Property(Infinity.Selection.Snapshot)','Property(ResumeTime)','Property(StartOffset)',
-            'Property(TotalTime)','Property(Infinity.ResumeHub.Watched)','Season','Episode','Label']
+    fields=['Property(Infinity.Selection.Snapshot)','PercentPlayed',
+            'Property(Infinity.ResumeHub.Watched)','Season','Episode','Label']
     count='Container(%d).NumItems'%rail
     began=time.monotonic()
     dispatch.launch(device,'home-resume-'+media)
@@ -30,9 +30,15 @@ def observe(device,records,media):
         if not raw:return None
         capsule=json.loads(raw)
         if capsule.get('key')!=key:return None
-        verify_card(expected,labels,prefix,bool(device.rpc('Player.GetActivePlayers')))
         return labels
     labels=device.until(ready,20)
+    visible_ms=(time.monotonic()-began)*1000
+    rows=device.rpc('Files.GetDirectory',{'directory':'plugin://script.infinity.uirepair/?action=continue&media='+media,
+                                        'media':'video','properties':['resume']})['files']
+    if len(rows)!=1:raise AssertionError('Native directory differs from exact single visible saved card')
+    verify_card(expected,labels,prefix,bool(device.rpc('Player.GetActivePlayers')),rows[0].get('resume'))
     return dict(media=media,key=key,exact_usable_card=True,observed=labels,
+                native_directory_resume=rows[0].get('resume'),tab_select_to_card_visible_ms=visible_ms,
                 tab_select_to_usable_card_ms=(time.monotonic()-began)*1000,
+                verification_scope='Visible native resume percent plus exact directory native resume; reserved GUI properties are not readouts',
                 generated_metadata_and_declared_clip=True,poster_paint_verified=False)

@@ -1,0 +1,14 @@
+{
+  "recorded_before_execution": true,
+  "failed_run": 40341010667,
+  "artifact_id": 12659930673,
+  "artifact_sha256": "585519bbc224967fa5f2e79bb40d062380143b2c565473fc8ac636efb1e90547",
+  "observed": "Real InfinityItemOptions modal set its presence flag; original test read count0 before selecting Add to Watchlist. Source onInit publishes flag before reset/addItem/focus. No completed action or runtime pass.",
+  "correction": "Wait for actual nonempty bounded list within remaining original90-second popup readiness budget before calling original select_native_item unchanged. Preserve count bound, exact label, original Input.Select, persistence/identity assertions. Record actual modal/count/focus readouts on failure.",
+  "selected_tests": [
+    "popup delayed rows become ready; empty/overbound/wrong modal/deadline do not pass",
+    "exact original fixture inverse and every original ui.require predicate unchanged"
+  ],
+  "APK_changed": false,
+  "runtime_cause": "No runtime defect established. If rows never populate, retain failure and diagnose runtime rather than manufacture pass."
+}

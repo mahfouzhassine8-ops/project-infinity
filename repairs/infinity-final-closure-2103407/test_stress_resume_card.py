@@ -14,7 +14,7 @@ class StressResumeCardTests(unittest.TestCase):
             position=60,duration=180)
         prefix='Container(8830).ListItem.'
         actual={prefix+'Property(Infinity.Selection.Snapshot)':json.dumps({k:entry[k] for k in ('key','identity','source','stable_source')}),
-            prefix+'Property(ResumeTime)':'60',prefix+'Property(StartOffset)':'60',prefix+'Property(TotalTime)':'180',
+            prefix+'PercentPlayed':'33',
             prefix+'Property(Infinity.ResumeHub.Watched)':'false','Container(8830).NumItems':'1'}
         count=[0]
         def rpc(method,params=None):
@@ -24,6 +24,7 @@ class StressResumeCardTests(unittest.TestCase):
                 if count[0]==1:return {'Container(8830).NumItems':'0'}
                 if count[0]==2:return dict(actual,**{prefix+'Property(Infinity.Selection.Snapshot)':json.dumps({'key':'wrong'})})
                 return actual
+            if method=='Files.GetDirectory':return {'files':[{'resume':{'position':60,'total':180}}]}
             if method=='Player.GetActivePlayers':return []
             raise AssertionError(method)
         def until(fn,seconds):
