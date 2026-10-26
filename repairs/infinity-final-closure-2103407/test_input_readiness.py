@@ -1,5 +1,6 @@
 """Readiness/observation source checks; no simulated device success."""
 import hashlib
+import os
 from pathlib import Path
 import tempfile
 from types import SimpleNamespace
@@ -10,6 +11,20 @@ import shutdown_environment as environment
 
 
 class InputReadinessTests(unittest.TestCase):
+    def test_actual_collector_supplies_required_service_sha(self):
+        from zipfile import ZipFile
+        import android17_shutdown_probe as shutdown
+        apk=Path(os.environ['INFINITY_RUNTIME_CANDIDATE_APK'])
+        with tempfile.TemporaryDirectory() as temp,ZipFile(apk) as z:
+            root=Path(temp)
+            for name in environment.FILES:
+                p=root/name;p.parent.mkdir(parents=True,exist_ok=True)
+                p.write_bytes(z.read('assets/addons/service.xbmc.versioncheck/'+name))
+            value=environment.collect(str(root),root)
+            observed=value['versioncheck_source']['resources/lib/version_check/service.py']['sha256']
+            self.assertEqual(observed,'8c192bef13ac77002568d561b7112ea073fc916d676cd6e9433e4b9b30988f56')
+            shutdown.verify_runtime_service(value,apk)
+
     def test_current_drawn_IME_is_required_and_cold_or_wrong_process_is_refused(self):
         state='mInputShown=true\nmCurId='+readiness.IME
         line='10-26 10:15:44.299 1635 1635 I GoogleInputMethodService: GoogleInputMethodService$1.onKeyboardViewShown():344 onKeyboardViewShown: keyboardType=prime, keyboardViewType=BODY'

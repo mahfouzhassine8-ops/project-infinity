@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 import stat
 
-FILES=('addon.xml','resources/lib/runner.py','resources/lib/version_check/distro/distro.py')
+FILES=('addon.xml','resources/lib/runner.py','resources/lib/version_check/service.py','resources/lib/version_check/distro/distro.py')
 
 
 def collect(path_value,code_root):

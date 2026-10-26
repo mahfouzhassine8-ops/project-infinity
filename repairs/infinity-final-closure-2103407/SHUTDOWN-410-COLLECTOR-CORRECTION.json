@@ -1,0 +1,16 @@
+{
+  "actual_run": 40307802854,
+  "test_source": "eb135c3108798ce23d6775e51acb6f27adda7036",
+  "artifact": 12643940419,
+  "artifact_sha256": "f4650d112b66197619ebcc93cb270820ef00fdd6b1a2121d6d11bd2b356f124e",
+  "failure": "Pre-Close SourceSHAcheck comparedservice.py butcollectorfixedlist omittedservice.py. Actualreporthadmanifest/runner/distro only. NoCloseattempted;0/3actualcycles. Notaprovenproductionfailure.",
+  "correction": "Add exactservice.py to readonlycollection andtestactualcollector->preflight interface usingexact410APK. RetainstrictSHAcheck, originalAPK andallnative/Java/35secclose predicates. NoAPKrebuild needed.",
+  "selected_before_edits": [
+    "test_input_readiness.InputReadinessTests.test_actual_collector_supplies_required_service_sha usingactual410APKwithnochildexec",
+    "test_input_readiness.InputReadinessTests.test_environment_observation_preserves_errno_and_never_executes_child after4filelist change",
+    "Same first actual410 independent3Close request, newID03 afterpreflightcollectorfix; previousrunexecutedzeroClose. No featuretestrepeat."
+  ],
+  "sourcefinding": "ActualfreshPATH /system/xbin has no executeaccess andcandidate errno13; nativeunknownchildveto appropriate. Correct410service avoidsunneededLinuxdistroprobe; do notwaiveinaccessiblepath.",
+  "host_result": "2PASS: actual410collector->strictpreflight interface plusreadonlyerrno/no-child observation. No APKorproofcheckchange.",
+  "coordination": "Remotea16fb4d alreadyselectedactual41050/30/20 onretaineddriver. Preserveexactrunningfeature request/auth/source; publishonlycollector/preflightClose03fix andmatchingindependentmetadata. No duplicatefeaturecase."
+}

@@ -13,7 +13,7 @@ WORKFLOW='.github/workflows/infinity-shutdown-verification.yml'
 AUTHORIZATION=('UserOct26 explicitlyauthorizes independentEssentialFirst3Close/reopen cycles onactualsigned410, '
     'exactphysicalCompat0.8.2 fixture andactualVersionChecksourceSHAfromsigned410, native16essentialowners andtwoJava seals, finalcoordinatorauthorization, '
     'externalwholeUIDprocessdeath andprotecteddatareadback. No productionbypass, deadlineextension orphysicalacceptance.')
-EXPECTED=dict(schema=1,kind='independent-essential-first',request_id='integrated410-close-reopen-01',
+EXPECTED=dict(schema=1,kind='independent-essential-first',request_id='integrated410-close-reopen-03',
     scenario='integrated-3-close-reopen',candidate_build=CANDIDATE['candidate_build'],
     candidate_source_commit=CANDIDATE['candidate_source_commit'],
     candidate_apk_sha256=CANDIDATE['candidate_apk_sha256'],authorization=AUTHORIZATION)
