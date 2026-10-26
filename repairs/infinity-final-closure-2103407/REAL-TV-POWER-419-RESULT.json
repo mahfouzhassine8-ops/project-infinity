@@ -1,0 +1,725 @@
+{
+  "run": 40397618519,
+  "test_source": "9eb8b509d0bb67408982063213df66941eb49bbe",
+  "candidate_source": "a24db78554da7bc40a2a0b658ba441793f1c1605",
+  "apk_sha256": "0b202e3af93ce25be8cd5ecb2853043411ba5fbbf88dac0df94ef4b2ce55605a",
+  "artifact": 12686684753,
+  "artifact_sha256": "53f2c5a72d0cb61d5c1e6b3ae6c8ff955f3d1474972ececa6dc75a649b138aa4",
+  "passed": true,
+  "cycles_completed": 3,
+  "actual_unfinished_TV_scene": {
+    "passed": true,
+    "pid": 4682,
+    "owner": "eb3d94e6-4444-4619-93d6-04fd812301e6",
+    "nonce": "70743b069f384f4495dbcaccc8341dd6",
+    "phase": "progress",
+    "cases": [
+      {
+        "case": "actual-native-TV-stop-progress-restoration",
+        "status": "PASS",
+        "position": 71.553
+      }
+    ],
+    "stage": "actual-native-TV-stop-progress-restoration",
+    "native_tv_tracking_ready": [
+      {
+        "episodeid": 1,
+        "elapsed_ms": 6579.388827999992,
+        "actual_occurrence": "97a602909d76484e9d314174ad2b6658"
+      }
+    ],
+    "native_tv_first_playback": {
+      "episode": 2,
+      "file": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/infinity-cw-qa/QA.S01E02.mp4",
+      "id": 1,
+      "label": "QA S01E02",
+      "season": 1,
+      "showtitle": "Breaking Bad",
+      "type": "episode",
+      "uniqueid": {
+        "tmdb": "900000000002"
+      }
+    },
+    "native_tv_in_progress_rows": [
+      {
+        "episode": 2,
+        "file": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/infinity-cw-qa/QA.S01E02.mp4",
+        "filetype": "file",
+        "label": "Breaking Bad S01E02",
+        "resume": {
+          "position": 71.553,
+          "total": 180.0
+        },
+        "season": 1,
+        "type": "episode"
+      }
+    ]
+  },
+  "actual_completed_TV_scene": {
+    "passed": true,
+    "pid": 5538,
+    "owner": "63b797f7-aef4-494d-9d8d-d0c6fed3122c",
+    "nonce": "e997500b324740d1bc10cb09ce4413f1",
+    "phase": "completion",
+    "cases": [
+      {
+        "case": "actual-native-TV-completion-next-restoration",
+        "status": "PASS",
+        "elapsed_ms": 11222.993712999994,
+        "source": "plugin://script.infinity.commandcenter/?action=play-local-next&key=a1171072d95232f7f1c64c48a67ebd62d21d8c8160b848425b51347f1e84a5b2",
+        "synthetic_metadata_and_generated_clip": true
+      },
+      {
+        "case": "actual-native-Next-selection-plays-correct-episode",
+        "status": "PASS",
+        "observed": {
+          "episode": 1,
+          "file": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/infinity-cw-qa/QA.S02E01.mp4",
+          "id": 2,
+          "label": "QA S02E01",
+          "season": 2,
+          "showtitle": "Breaking Bad",
+          "type": "episode",
+          "uniqueid": {
+            "tmdb": "900000020001"
+          }
+        }
+      }
+    ],
+    "native_tv_tracking_ready": [
+      {
+        "episodeid": 1,
+        "elapsed_ms": 4694.570735999946,
+        "actual_occurrence": "def21c0adbc8471c83ab5c847470253a"
+      }
+    ],
+    "native_tv_completed_record": {
+      "completed_occurrence": "def21c0adbc8471c83ab5c847470253a",
+      "dbid": 1,
+      "episode": 2,
+      "fanart": "VideoPlayer.Fanart",
+      "identity": {
+        "episode": 2,
+        "ids": {
+          "tmdb": "1396"
+        },
+        "kind": "episode",
+        "schema": 1,
+        "scope": "show_episode",
+        "season": 1
+      },
+      "imdb": "",
+      "information": {
+        "duration": 180,
+        "plot": "Full synthetic episode synopsis",
+        "premiered": "2008-01-20",
+        "year": 2008
+      },
+      "key": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "label": "Breaking Bad \u2022 S01E02",
+      "media": "tv",
+      "percentage": 100.0,
+      "play_count": 1,
+      "playback_occurrence": "def21c0adbc8471c83ab5c847470253a",
+      "position": 0.0,
+      "poster": "image://video@%2fstorage%2femulated%2f0%2fAndroid%2fdata%2fcom.projectinfinity.kodi%2ffiles%2f.kodi%2fuserdata%2finfinity-cw-qa%2fQA.S01E02.mp4/",
+      "resume_revision": 1793047671230,
+      "season": 1,
+      "show_ids_verified": true,
+      "show_tmdb": "1396",
+      "show_tvdb": "",
+      "showtitle": "Breaking Bad",
+      "source": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/infinity-cw-qa/QA.S01E02.mp4",
+      "stable_source": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/infinity-cw-qa/QA.S01E02.mp4",
+      "title": "QA S01E02",
+      "tmdb": "900000000002",
+      "tvdb": "",
+      "updated": 1793047691,
+      "verified_next": {
+        "after": [
+          1,
+          2
+        ],
+        "episode": 1,
+        "library": {
+          "episode": 1,
+          "episodeid": 2,
+          "file": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/infinity-cw-qa/QA.S02E01.mp4",
+          "season": 2,
+          "show_tmdb": "1396",
+          "tvshowid": 1
+        },
+        "season": 2,
+        "show_tmdb": "1396",
+        "verified": true
+      },
+      "watched": true,
+      "watched_at": 1793047691
+    },
+    "native_tv_source_memory": {
+      "before": {
+        "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd": {
+          "failures": 0,
+          "route": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/infinity-cw-qa/QA.S01E02.mp4",
+          "updated": 1793047596
+        }
+      },
+      "after": {
+        "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd": {
+          "failures": 0,
+          "route": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/infinity-cw-qa/QA.S01E02.mp4",
+          "updated": 1793047670
+        }
+      }
+    },
+    "native_tv_successor_rows": [
+      {
+        "episode": 1,
+        "file": "plugin://script.infinity.commandcenter/?action=play-local-next&key=a1171072d95232f7f1c64c48a67ebd62d21d8c8160b848425b51347f1e84a5b2",
+        "filetype": "file",
+        "label": "Breaking Bad \u2022 S02E01",
+        "resume": {
+          "position": 0.0,
+          "total": 0.0
+        },
+        "season": 2,
+        "showtitle": "Breaking Bad",
+        "type": "episode",
+        "uniqueid": {
+          "tmdb": "1396"
+        }
+      }
+    ],
+    "stage": "actual-native-Next-selection-plays-correct-episode"
+  },
+  "cycles": [
+    {
+      "cycle": 0,
+      "passed": true,
+      "actual_visible_Power_route": {
+        "skin_member": "assets/addons/skin.infinity.diggz/unified/DialogButtonMenu.xml",
+        "skin_sha256": "149b614b9dd96094e64c7b7a837fbc911bfceda40e4ecef84716f7a3a6220d78",
+        "control": 200,
+        "action": "com.projectinfinity.kodi.action.CLOSE_KODI",
+        "activity": "com.projectinfinity.kodi.InfinityPowerControlActivity",
+        "exact_builtin": "StartAndroidActivity(com.projectinfinity.kodi,com.projectinfinity.kodi.action.CLOSE_KODI,,,,,,,com.projectinfinity.kodi.InfinityPowerControlActivity)",
+        "backend_matches": true,
+        "observed_labels": {
+          "Control.GetLabel(200)": "CLOSE KODI",
+          "System.CurrentControl": "CLOSE KODI",
+          "System.CurrentControlID": "200"
+        },
+        "observed_flags": {
+          "Control.IsEnabled(200)": true,
+          "Control.IsVisible(200)": true,
+          "Window.IsActive(shutdownmenu)": true
+        },
+        "input": "Android KEYCODE_DPAD_CENTER",
+        "input_result": ""
+      },
+      "UI_and_Close_seconds": 7.69772358900002,
+      "native_safe_ms": 4478,
+      "essential_owners": [
+        "native_admission",
+        "background_jobs",
+        "playback",
+        "command_center",
+        "compat",
+        "kodi_settings",
+        "profiles",
+        "skin_settings",
+        "addon_settings",
+        "favourites",
+        "peripherals",
+        "audio_policy",
+        "deferred_dialog_state",
+        "xml_files",
+        "native_databases",
+        "pvr"
+      ],
+      "separate_results": {
+        "essential_first_durable": true,
+        "kodi_engine_terminated": true,
+        "android_coordinator_completed": true,
+        "remaining_UID_processes": [],
+        "recent_apps_used_for_process_proof": false
+      },
+      "engine_java_seal": "aa59c3ae-5fe0-40bb-bf06-238f527d292a",
+      "coordinator_java_seal": "78c3de31-4dba-439f-a574-7fc89e3614a6",
+      "authorization_consumed": true,
+      "process_death_confirmed": true,
+      "coordinator_pid": 4648,
+      "processes_before": {
+        "kodi_engine": [
+          {
+            "pid": 4682,
+            "uid": 10234,
+            "name": "com.projectinfinity.kodi:kodi"
+          }
+        ],
+        "android_coordinator": [
+          {
+            "pid": 4648,
+            "uid": 10234,
+            "name": "com.projectinfinity.kodi"
+          }
+        ],
+        "other_owned_processes": []
+      },
+      "processes_after": {
+        "kodi_engine": [],
+        "android_coordinator": [],
+        "other_owned_processes": []
+      },
+      "external_UID_processes_after": [],
+      "coordinator_self_observed_whole_package_death": false,
+      "coordinator_death_evidence": "External emptyUID and coordinatorPID partition after durableCOMPLETE; no self-observation bit manufactured",
+      "database_integrity": [
+        "Addons33.db",
+        "TV46.db",
+        "Textures13.db",
+        "ViewModes6.db",
+        "MyMusic83.db",
+        "Epg16.db",
+        "MyVideos131.db"
+      ],
+      "launch_preference_unchanged": true,
+      "launch_preference": {
+        "present": true,
+        "sha256": "9f6ba54226d61b6cd02796a9d61d4831dc2154875bd22d5bcafb7da78b9ace0a",
+        "remembered": "infinity"
+      },
+      "actual_Android_foreground_observation": [
+        "topResumedActivity=ActivityRecord{141303704 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t7}"
+      ],
+      "Recents": "Task appearance retained separately; not PID/termination evidence",
+      "actual_TV_readback": {
+        "passed": true,
+        "autoplay": false,
+        "next_rows": [
+          {
+            "episode": 2,
+            "file": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/infinity-cw-qa/QA.S01E02.mp4",
+            "filetype": "file",
+            "label": "Breaking Bad S01E02",
+            "resume": {
+              "position": 71.553,
+              "total": 180.0
+            },
+            "season": 1,
+            "type": "episode"
+          }
+        ],
+        "native_source": {
+          "episode": 2,
+          "episodeid": 1,
+          "file": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/infinity-cw-qa/QA.S01E02.mp4",
+          "label": "QA S01E02",
+          "season": 1,
+          "tvshowid": 1
+        },
+        "completed_watched": null,
+        "exact_unfinished_position": 71.553,
+        "actual_playback_not_seed_only": true
+      }
+    },
+    {
+      "cycle": 1,
+      "passed": true,
+      "actual_visible_Power_route": {
+        "skin_member": "assets/addons/skin.infinity.diggz/unified/DialogButtonMenu.xml",
+        "skin_sha256": "149b614b9dd96094e64c7b7a837fbc911bfceda40e4ecef84716f7a3a6220d78",
+        "control": 200,
+        "action": "com.projectinfinity.kodi.action.CLOSE_KODI",
+        "activity": "com.projectinfinity.kodi.InfinityPowerControlActivity",
+        "exact_builtin": "StartAndroidActivity(com.projectinfinity.kodi,com.projectinfinity.kodi.action.CLOSE_KODI,,,,,,,com.projectinfinity.kodi.InfinityPowerControlActivity)",
+        "backend_matches": true,
+        "observed_labels": {
+          "Control.GetLabel(200)": "CLOSE KODI",
+          "System.CurrentControl": "CLOSE KODI",
+          "System.CurrentControlID": "200"
+        },
+        "observed_flags": {
+          "Control.IsEnabled(200)": true,
+          "Control.IsVisible(200)": true,
+          "Window.IsActive(shutdownmenu)": true
+        },
+        "input": "Android KEYCODE_DPAD_CENTER",
+        "input_result": ""
+      },
+      "UI_and_Close_seconds": 9.08873044500001,
+      "native_safe_ms": 6265,
+      "essential_owners": [
+        "native_admission",
+        "background_jobs",
+        "playback",
+        "command_center",
+        "compat",
+        "kodi_settings",
+        "profiles",
+        "skin_settings",
+        "addon_settings",
+        "favourites",
+        "peripherals",
+        "audio_policy",
+        "deferred_dialog_state",
+        "xml_files",
+        "native_databases",
+        "pvr"
+      ],
+      "separate_results": {
+        "essential_first_durable": true,
+        "kodi_engine_terminated": true,
+        "android_coordinator_completed": true,
+        "remaining_UID_processes": [],
+        "recent_apps_used_for_process_proof": false
+      },
+      "engine_java_seal": "c5be3d10-9321-414c-9e90-fa5c98d0b65f",
+      "coordinator_java_seal": "15321dc3-47e3-4c76-a35c-de84647d9d38",
+      "authorization_consumed": true,
+      "process_death_confirmed": true,
+      "coordinator_pid": 5505,
+      "processes_before": {
+        "kodi_engine": [
+          {
+            "pid": 5538,
+            "uid": 10234,
+            "name": "com.projectinfinity.kodi:kodi"
+          }
+        ],
+        "android_coordinator": [
+          {
+            "pid": 5505,
+            "uid": 10234,
+            "name": "com.projectinfinity.kodi"
+          }
+        ],
+        "other_owned_processes": []
+      },
+      "processes_after": {
+        "kodi_engine": [],
+        "android_coordinator": [],
+        "other_owned_processes": []
+      },
+      "external_UID_processes_after": [],
+      "coordinator_self_observed_whole_package_death": false,
+      "coordinator_death_evidence": "External emptyUID and coordinatorPID partition after durableCOMPLETE; no self-observation bit manufactured",
+      "database_integrity": [
+        "Addons33.db",
+        "TV46.db",
+        "Textures13.db",
+        "ViewModes6.db",
+        "MyMusic83.db",
+        "Epg16.db",
+        "MyVideos131.db"
+      ],
+      "launch_preference_unchanged": true,
+      "launch_preference": {
+        "present": true,
+        "sha256": "9f6ba54226d61b6cd02796a9d61d4831dc2154875bd22d5bcafb7da78b9ace0a",
+        "remembered": "infinity"
+      },
+      "actual_Android_foreground_observation": [
+        "topResumedActivity=ActivityRecord{141303704 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t7}"
+      ],
+      "Recents": "Task appearance retained separately; not PID/termination evidence",
+      "actual_TV_readback": {
+        "passed": true,
+        "autoplay": false,
+        "next_rows": [
+          {
+            "episode": 1,
+            "file": "plugin://script.infinity.commandcenter/?action=play-local-next&key=a1171072d95232f7f1c64c48a67ebd62d21d8c8160b848425b51347f1e84a5b2",
+            "filetype": "file",
+            "label": "Breaking Bad \u2022 S02E01",
+            "resume": {
+              "position": 0.0,
+              "total": 0.0
+            },
+            "season": 2,
+            "type": "episode"
+          }
+        ],
+        "native_source": {
+          "episode": 1,
+          "episodeid": 2,
+          "file": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/infinity-cw-qa/QA.S02E01.mp4",
+          "label": "QA S02E01",
+          "season": 2,
+          "tvshowid": 1
+        },
+        "completed_watched": {
+          "completed_occurrence": "def21c0adbc8471c83ab5c847470253a",
+          "dbid": 1,
+          "episode": 2,
+          "fanart": "VideoPlayer.Fanart",
+          "identity": {
+            "episode": 2,
+            "ids": {
+              "tmdb": "1396"
+            },
+            "kind": "episode",
+            "schema": 1,
+            "scope": "show_episode",
+            "season": 1
+          },
+          "imdb": "",
+          "information": {
+            "duration": 180,
+            "plot": "Full synthetic episode synopsis",
+            "premiered": "2008-01-20",
+            "year": 2008
+          },
+          "key": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+          "label": "Breaking Bad \u2022 S01E02",
+          "media": "tv",
+          "percentage": 100.0,
+          "play_count": 1,
+          "playback_occurrence": "def21c0adbc8471c83ab5c847470253a",
+          "position": 0.0,
+          "poster": "image://video@%2fstorage%2femulated%2f0%2fAndroid%2fdata%2fcom.projectinfinity.kodi%2ffiles%2f.kodi%2fuserdata%2finfinity-cw-qa%2fQA.S01E02.mp4/",
+          "resume_revision": 1793047671230,
+          "season": 1,
+          "show_ids_verified": true,
+          "show_tmdb": "1396",
+          "show_tvdb": "",
+          "showtitle": "Breaking Bad",
+          "source": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/infinity-cw-qa/QA.S01E02.mp4",
+          "stable_source": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/infinity-cw-qa/QA.S01E02.mp4",
+          "title": "QA S01E02",
+          "tmdb": "900000000002",
+          "tvdb": "",
+          "updated": 1793047691,
+          "verified_next": {
+            "after": [
+              1,
+              2
+            ],
+            "episode": 1,
+            "library": {
+              "episode": 1,
+              "episodeid": 2,
+              "file": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/infinity-cw-qa/QA.S02E01.mp4",
+              "season": 2,
+              "show_tmdb": "1396",
+              "tvshowid": 1
+            },
+            "season": 2,
+            "show_tmdb": "1396",
+            "verified": true
+          },
+          "watched": true,
+          "watched_at": 1793047691
+        },
+        "exact_unfinished_position": null,
+        "actual_playback_not_seed_only": true
+      }
+    },
+    {
+      "cycle": 2,
+      "passed": true,
+      "actual_visible_Power_route": {
+        "skin_member": "assets/addons/skin.infinity.diggz/unified/DialogButtonMenu.xml",
+        "skin_sha256": "149b614b9dd96094e64c7b7a837fbc911bfceda40e4ecef84716f7a3a6220d78",
+        "control": 200,
+        "action": "com.projectinfinity.kodi.action.CLOSE_KODI",
+        "activity": "com.projectinfinity.kodi.InfinityPowerControlActivity",
+        "exact_builtin": "StartAndroidActivity(com.projectinfinity.kodi,com.projectinfinity.kodi.action.CLOSE_KODI,,,,,,,com.projectinfinity.kodi.InfinityPowerControlActivity)",
+        "backend_matches": true,
+        "observed_labels": {
+          "Control.GetLabel(200)": "CLOSE KODI",
+          "System.CurrentControl": "CLOSE KODI",
+          "System.CurrentControlID": "200"
+        },
+        "observed_flags": {
+          "Control.IsEnabled(200)": true,
+          "Control.IsVisible(200)": true,
+          "Window.IsActive(shutdownmenu)": true
+        },
+        "input": "Android KEYCODE_DPAD_CENTER",
+        "input_result": ""
+      },
+      "UI_and_Close_seconds": 12.84644740300007,
+      "native_safe_ms": 9640,
+      "essential_owners": [
+        "native_admission",
+        "background_jobs",
+        "playback",
+        "command_center",
+        "compat",
+        "kodi_settings",
+        "profiles",
+        "skin_settings",
+        "addon_settings",
+        "favourites",
+        "peripherals",
+        "audio_policy",
+        "deferred_dialog_state",
+        "xml_files",
+        "native_databases",
+        "pvr"
+      ],
+      "separate_results": {
+        "essential_first_durable": true,
+        "kodi_engine_terminated": true,
+        "android_coordinator_completed": true,
+        "remaining_UID_processes": [],
+        "recent_apps_used_for_process_proof": false
+      },
+      "engine_java_seal": "9bda1199-c91f-4648-ad03-38d6e6d62dea",
+      "coordinator_java_seal": "be797d59-8cbd-4901-92db-3abd4590bd55",
+      "authorization_consumed": true,
+      "process_death_confirmed": true,
+      "coordinator_pid": 6695,
+      "processes_before": {
+        "kodi_engine": [
+          {
+            "pid": 6725,
+            "uid": 10234,
+            "name": "com.projectinfinity.kodi:kodi"
+          }
+        ],
+        "android_coordinator": [
+          {
+            "pid": 6695,
+            "uid": 10234,
+            "name": "com.projectinfinity.kodi"
+          }
+        ],
+        "other_owned_processes": []
+      },
+      "processes_after": {
+        "kodi_engine": [],
+        "android_coordinator": [],
+        "other_owned_processes": []
+      },
+      "external_UID_processes_after": [],
+      "coordinator_self_observed_whole_package_death": false,
+      "coordinator_death_evidence": "External emptyUID and coordinatorPID partition after durableCOMPLETE; no self-observation bit manufactured",
+      "database_integrity": [
+        "Addons33.db",
+        "TV46.db",
+        "Textures13.db",
+        "ViewModes6.db",
+        "MyMusic83.db",
+        "Epg16.db",
+        "MyVideos131.db"
+      ],
+      "launch_preference_unchanged": true,
+      "launch_preference": {
+        "present": true,
+        "sha256": "9f6ba54226d61b6cd02796a9d61d4831dc2154875bd22d5bcafb7da78b9ace0a",
+        "remembered": "infinity"
+      },
+      "actual_Android_foreground_observation": [
+        "topResumedActivity=ActivityRecord{141303704 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t7}"
+      ],
+      "Recents": "Task appearance retained separately; not PID/termination evidence",
+      "actual_TV_readback": {
+        "passed": true,
+        "autoplay": false,
+        "next_rows": [
+          {
+            "episode": 1,
+            "file": "plugin://script.infinity.commandcenter/?action=play-local-next&key=a1171072d95232f7f1c64c48a67ebd62d21d8c8160b848425b51347f1e84a5b2",
+            "filetype": "file",
+            "label": "Breaking Bad \u2022 S02E01",
+            "resume": {
+              "position": 0.0,
+              "total": 0.0
+            },
+            "season": 2,
+            "type": "episode"
+          }
+        ],
+        "native_source": {
+          "episode": 1,
+          "episodeid": 2,
+          "file": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/infinity-cw-qa/QA.S02E01.mp4",
+          "label": "QA S02E01",
+          "season": 2,
+          "tvshowid": 1
+        },
+        "completed_watched": {
+          "completed_occurrence": "def21c0adbc8471c83ab5c847470253a",
+          "dbid": 1,
+          "episode": 2,
+          "fanart": "VideoPlayer.Fanart",
+          "identity": {
+            "episode": 2,
+            "ids": {
+              "tmdb": "1396"
+            },
+            "kind": "episode",
+            "schema": 1,
+            "scope": "show_episode",
+            "season": 1
+          },
+          "imdb": "",
+          "information": {
+            "duration": 180,
+            "plot": "Full synthetic episode synopsis",
+            "premiered": "2008-01-20",
+            "year": 2008
+          },
+          "key": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+          "label": "Breaking Bad \u2022 S01E02",
+          "media": "tv",
+          "percentage": 100.0,
+          "play_count": 1,
+          "playback_occurrence": "def21c0adbc8471c83ab5c847470253a",
+          "position": 0.0,
+          "poster": "image://video@%2fstorage%2femulated%2f0%2fAndroid%2fdata%2fcom.projectinfinity.kodi%2ffiles%2f.kodi%2fuserdata%2finfinity-cw-qa%2fQA.S01E02.mp4/",
+          "resume_revision": 1793047671230,
+          "season": 1,
+          "show_ids_verified": true,
+          "show_tmdb": "1396",
+          "show_tvdb": "",
+          "showtitle": "Breaking Bad",
+          "source": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/infinity-cw-qa/QA.S01E02.mp4",
+          "stable_source": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/infinity-cw-qa/QA.S01E02.mp4",
+          "title": "QA S01E02",
+          "tmdb": "900000000002",
+          "tvdb": "",
+          "updated": 1793047691,
+          "verified_next": {
+            "after": [
+              1,
+              2
+            ],
+            "episode": 1,
+            "library": {
+              "episode": 1,
+              "episodeid": 2,
+              "file": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/infinity-cw-qa/QA.S02E01.mp4",
+              "season": 2,
+              "show_tmdb": "1396",
+              "tvshowid": 1
+            },
+            "season": 2,
+            "show_tmdb": "1396",
+            "verified": true
+          },
+          "watched": true,
+          "watched_at": 1793047691
+        },
+        "exact_unfinished_position": null,
+        "actual_playback_not_seed_only": true
+      }
+    }
+  ],
+  "ordinary411_three_cycle_PASS_preserved": 40317069331,
+  "parent418_actual_TV_three_cycle_PASS_preserved": 40387720854,
+  "independent418_writer_PASS_preserved": 40387258351,
+  "independent419_writer_run": 40397718606,
+  "measurement_limits": [
+    "Generatednativeclips/syntheticmetadata, actualnativeplayback and protectedstorage; notrealcommercialmovie",
+    "Tracking-ready6579.389/4694.571ms is notHome/poster/coldstartup timing",
+    "Completedrecord actualrootposition0/watched100/informationduration180 retained; no claimedrootposition180",
+    "MixedCloseworkloads and newVM samples are notcomparable before-after speedup measurements",
+    "NexusLauncher on emulator, not SamsungHome; allchooserpreferences remainbytepreserved but onlyrememberedInfinity exercised"
+  ],
+  "physical_Fold": "NOT RUN",
+  "release_accepted": false,
+  "final_lock": false
+}

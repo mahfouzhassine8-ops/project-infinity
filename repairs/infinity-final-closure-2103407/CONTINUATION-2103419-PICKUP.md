@@ -81,3 +81,42 @@ prepared-upload helper and expectedversionguard; do notcommitprivate savedIDs.
 Current savedZIPversion3 still418andpredatesTVPASS/Searchfailure. Replace it with
 actual419 aftervalidresults. Do not deliver an audit-only outcome or manufacture
 whole-releasePASS. PhysicalSamsung acceptance is finalgate; no finallock.
+
+
+## Latest actual419 outcome —20:56UTC
+
+419Power3PASS40397618519, artifact12686684753 SHA
+53f2c5a72d0cb61d5c1e6b3ae6c8ff955f3d1474972ececa6dc75a649b138aa4.
+RealunfinishednativeTV71.553sec/source persistedfirstreopen; actualcompletion/
+watched100/removedContinue/verifiedS2E1selection andwarmthirdreopen. All3visible
+Power/16/native/twoJava/externalzeroUID/7SQLite/JSON/prefs/noautoplay PASS.
+UI+Close7.698/9.089/12.846sec, nativeSafe4478/6265/9640ms, notcomparable speedup.
+CurrentreportREAL-TV-POWER-419-RESULT.json binds exactactualreceipts.
+
+419initialSearch40397437746 andHome40397522955 BOTH FAILED beforeKodi/Python:
+actualnativeSIGSEGV atunchangedlibkodi+talloc_lib_init+60/0x2bf49fc, unreadable
+AT_RANDOM+7, sameprior411/414 algorithm. NoKodi.logcreated,0featureinteractions/
+0stresscounts. Native/DEXunchanged418; not a proven Homepatch/Searchregression
+orphysicalFoldcause. RetainedNATIVE-STARTUP-419-RESULT.json (bothartifacthashes).
+Do notmodifysharedallocator/Cobra orrestartuntilgreen.
+
+EXPLICIT environmentcomparison atSAME419APK, stillAPI37/Android17:
+API37.1 google_apis_ps16k x86_64 is actually publishedinrecordedSDKcatalog.
+Plain37.1google_apis notpublished; donotguess. Closure-owned wrapper reuses
+originalSDKcheck/22toolpin, requires exactnewAVDtarget/sysdir/ABI. Existingmanual
+workflowdefault remains37.0/google_apis/originalgate; currentrequest exact37.1
+fields outputs explicitly selectnewimage/gate. Actualgetprops/pagesize/bridgeSHA
+recorded.4gate+7routing+1manualdefault hostchecksPASS. No officialproof thisfixes
+constructor; comparisononly, no lowerAPI, apprestart, deadlines/assertion changes.
+Do notconfuse officialAPI37rev5PlayProtect/GMSissue withthisnativeconstructor.
+
+ACTIVE runs toawait, donotrestart:
+40399697939 Home30/rotation20only37.1ps16k, sourcebd9697f9d129f92adabcb1d012347f2ab6a79a6d.
+40399771565 Search50only37.1ps16k, source5ee6bc6f8e41ac65b76b22b6bbc282d67f6ffccf.
+40397718606 nativeimage/unsafe controls stillindependently37.0, source75db25f6;
+nowrunningafterserializedPower3. KeepalloriginalfailuresandcurrentPowerPASS.
+
+DELIVERY-419-STATUS updatedwithPowerPASS/twoactualstartupfailures/newpendingruns.
+prepare_delivery419.py strictactualartifactproducer prepared; actualsavedZIPstill
+older418version3. Do notfinalizearchiveuntilactualremainingresults incorporated.
+Allsevenstreams/physicalFoldfinalgate/noCobra/noreset/no finallock unchanged.
