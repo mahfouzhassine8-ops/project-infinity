@@ -40,23 +40,33 @@ class IndependentShutdownTests(unittest.TestCase):
 
     def receipt(self):
         owner={'pid':123,'owner':'e0d637de-9aa2-4f92-83fa-92d0ca2fd540'}
-        names=['owner'+str(i) for i in range(16)]
-        native=dict(**owner,session='a3d637de-9aa2-4f92-83fa-92d0ca2fd540',generation=7,essential_write_generation=7,
+        names=sorted(probe.ESSENTIAL)
+        native=dict(**owner,session='a3d637de-9aa2-4f92-83fa-92d0ca2fd540',phase='SAFE_TO_TERMINATE',generation=7,essential_write_generation=7,
             admission_sealed=True,inventory_complete=True,blocker_count=0,error='',
             essential_writes_sealed=True,essential_writes_durable=True,essential_write_blockers=[],
-            essential_owners=names,owners=[dict(owner=n,required_writes_finished=True,dirty_remaining=False,result='COMMITTED') for n in names]+[dict(owner='optional')])
+            essential_owners=names,owners=[dict(owner=n,required_writes_finished=True,dirty=False,dirty_remaining=False,
+                dirty_before=True,checkpoint_generation=7,generation=2,durable_generation=2,result='COMMITTED') for n in names]+[dict(owner='python_services')])
         receipt=dict(**owner,session=native['session'],phase='COMPLETE',checkpoint_saved=True,authorization_consumed=True,
             process_death_confirmed=True,exit_policy='essential_first_process_exit_v1',coordinator_termination_authorized=True,
             engine_java_save_seal=native['session'],coordinator_java_save_seal=native['session'],
-            engine_java_pending=False,coordinator_java_pending=False,native_receipt=native)
+            engine_java_pending='',coordinator_java_pending='',native_receipt=native,generation=7,
+            started_elapsed_ms=1,safe_elapsed_ms=2,terminate_requested_elapsed_ms=3,authorization_consumed_elapsed_ms=4,
+            engine_death_elapsed_ms=5,safe_epoch_ms=100,authorization_consumed_epoch_ms=101,engine_death_epoch_ms=102)
+        self.seal(receipt)
         return owner,receipt
+
+    def seal(self,receipt):
+        receipt['native_json']=json.dumps(receipt['native_receipt'])
+        receipt['native_proof_sha256']=hashlib.sha256(receipt['native_json'].encode()).hexdigest()
 
     def test_missing_or_failed_close_and_each_proof_is_rejected(self):
         owner,receipt=self.receipt();probe.verify_receipt(receipt,owner)
         for key,value in [('phase','CHECKPOINT_FAILED'),('pid',124),('owner','stale'),('checkpoint_saved',False),
             ('authorization_consumed',False),('process_death_confirmed',False),('exit_policy','other'),
             ('coordinator_termination_authorized',False),('engine_java_save_seal',''),('coordinator_java_save_seal',''),
-            ('engine_java_pending',True),('coordinator_java_pending',True),('session','stale')]:
+            ('engine_java_pending',True),('coordinator_java_pending',True),('session','stale'),('generation',6),
+            ('safe_elapsed_ms',0),('authorization_consumed_elapsed_ms',2),('engine_death_elapsed_ms',3),
+            ('started_elapsed_ms',None),('safe_epoch_ms',0),('native_proof_sha256','0'*64),('native_json','{}')]:
             with self.subTest(key=key),self.assertRaises(AssertionError):probe.verify_receipt(dict(receipt,**{key:value}),owner)
         with self.assertRaises(AssertionError):probe.verify_receipt({},owner)
 
@@ -66,10 +76,11 @@ class IndependentShutdownTests(unittest.TestCase):
             ('admission_sealed',False),('inventory_complete',False),('blocker_count',1),('error','failure'),
             ('essential_writes_sealed',False),('essential_writes_durable',False),('essential_write_blockers',['unknown writer']),
             ('essential_owners',[]),('owners',[])]:
-            changed=deepcopy(receipt);changed['native_receipt'][key]=value
+            changed=deepcopy(receipt);changed['native_receipt'][key]=value;self.seal(changed)
             with self.subTest(key=key),self.assertRaises(AssertionError):probe.verify_receipt(changed,owner)
-        for key,value in [('required_writes_finished',False),('dirty_remaining',True),('result','WAITING')]:
-            changed=deepcopy(receipt);changed['native_receipt']['owners'][0][key]=value
+        for key,value in [('required_writes_finished',False),('dirty_remaining',True),('result','WAITING'),
+            ('checkpoint_generation',6),('durable_generation',1),('generation',-1),('dirty',True)]:
+            changed=deepcopy(receipt);changed['native_receipt']['owners'][0][key]=value;self.seal(changed)
             with self.assertRaises(AssertionError):probe.verify_receipt(changed,owner)
 
     def test_readback_preserves_all_records_and_successful_provider_memory(self):

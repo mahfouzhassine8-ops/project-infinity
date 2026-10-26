@@ -114,11 +114,13 @@ def install_over(device,adb,baseline,candidate,out,fixture_id):
     return result
 
 
-def main(selected_case=None):
+def main(selected_case=None,independent_setup=None):
     # Independent shutdown may reuse only the already-passing participant
     # setup. This module and its feature transport never request termination.
     if selected_case not in (None,'final-participant'):
         raise ValueError('Only retained participant setup may be reused')
+    if independent_setup is not None and selected_case!='final-participant':
+        raise ValueError('Independent setup requires explicit participant reuse')
     selected_case=selected_case or EXPECTED['selected_case']
     original=OLD/'android_feature_probe.py';raw=original.read_bytes()
     if hashlib.sha256(raw).hexdigest()!=PROBE_SHA or raw.decode().count(HOOK_BEFORE)!=1:
@@ -150,6 +152,7 @@ def main(selected_case=None):
                 actual_fixture_sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
                 actual_old_code_staged=True,code_baseline_sha256=BASELINE_SHA,
                 APK_changed=False,assertions_changed=False,providers_changed=False,shutdown='NOT RUN')
+            if independent_setup is not None:independent_setup.stage(stage,args,report,device,aid)
         probe._candidate_fixture=adapt
         def adb(*args,**kwargs):
             if args and args[0]=='install':
@@ -164,6 +167,12 @@ def main(selected_case=None):
                     setup_logging(probe.device,folder.parent.parent)
             return original_adb(*args,**kwargs)
         probe.device.adb=adb
+        if independent_setup is not None:
+            original_enable=probe.device.enable_features
+            def enable(device_out,versions=None):
+                original_enable(device_out,versions)
+                independent_setup.enable(probe.device,device_out)
+            probe.device.enable_features=enable
         for source,wanted in ((OLD/'universal/android_search_input.py',DRIVER_SHA),
                               (OLD/'android_runtime_checks.py',CHECKS_SHA)):
             if hashlib.sha256(source.read_bytes()).hexdigest()!=wanted:

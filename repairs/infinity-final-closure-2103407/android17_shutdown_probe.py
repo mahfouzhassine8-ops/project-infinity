@@ -5,6 +5,7 @@ retained shutdown transport. Nothing in a feature or packaging path imports or
 calls this runner. Stop at the first failure and retain unavailable evidence.
 """
 import argparse
+import hashlib
 import importlib.util
 import json
 import os
@@ -22,6 +23,9 @@ ROOT=Path(__file__).resolve().parents[2]
 TRANSPORT=ROOT/'repairs/android-checkpoint-shutdown/runtime-tests/essential_android_probe.py'
 BUCKETS=('items','watched','watchlist','collection','lists','sources','later','ratings','navigation_recovery')
 FAVOURITE='Infinity final independent Close preservation'
+ESSENTIAL={'native_admission','background_jobs','playback','command_center','compat',
+    'kodi_settings','profiles','skin_settings','addon_settings','favourites','peripherals',
+    'audio_policy','deferred_dialog_state','xml_files','native_databases','pvr'}
 
 
 def require(value,message):
@@ -34,18 +38,30 @@ def verify_receipt(receipt,owner):
     require(all(receipt.get(k) is True for k in ('checkpoint_saved','authorization_consumed','process_death_confirmed')),'Missing save/authorization/death proof')
     require(receipt.get('exit_policy')=='essential_first_process_exit_v1','Unexpected termination policy')
     require(receipt.get('coordinator_termination_authorized') is True,'Coordinator termination not authorized')
+    times=[receipt.get(k) for k in ('started_elapsed_ms','safe_elapsed_ms','terminate_requested_elapsed_ms',
+        'authorization_consumed_elapsed_ms','engine_death_elapsed_ms')]
+    require(all(type(x) is int for x in times) and times[0]>=0 and all(x>0 for x in times[1:]) and times==sorted(times),'Missing or unordered real completion chronology')
+    require(all(type(receipt.get(k)) is int and receipt[k]>0 for k in ('safe_epoch_ms','authorization_consumed_epoch_ms','engine_death_epoch_ms')),'Missing real completion wall timestamps')
     require(all(re.fullmatch(r'[0-9a-f-]{36}',receipt.get(k,'')) for k in ('engine_java_save_seal','coordinator_java_save_seal')),'Missing Java save seals')
     require(not receipt.get('engine_java_pending') and not receipt.get('coordinator_java_pending'),'Java save remains pending')
     native=receipt.get('native_receipt',{})
+    raw=receipt.get('native_json','')
+    require(isinstance(raw,str) and raw and hashlib.sha256(raw.encode()).hexdigest()==receipt.get('native_proof_sha256'),'Native authorization digest differs')
+    require(json.loads(raw)==native,'Native authorization bytes differ from receipt')
+    require(native.get('phase')=='SAFE_TO_TERMINATE' and receipt.get('generation')==native.get('generation'),'No matching native safe generation')
     require(native.get('pid')==owner['pid'] and native.get('owner')==owner['owner'],'Native receipt identity mismatch')
     require(isinstance(receipt.get('session'),str) and re.fullmatch(r'[0-9a-f-]{36}',receipt['session']) and native.get('session')==receipt['session'],'Native session mismatch')
     require(type(native.get('generation')) is int and native['generation']>0 and native.get('essential_write_generation')==native['generation'],'Native durable generation mismatch')
     require(native.get('admission_sealed') is True and native.get('inventory_complete') is True and native.get('blocker_count')==0 and not native.get('error'),'Native inventory/admission not complete')
     require(native.get('essential_writes_sealed') is True and native.get('essential_writes_durable') is True and native.get('essential_write_blockers')==[],'Essential writes not sealed/durable or blocked')
     owners=native.get('owners',[]);essential=native.get('essential_owners',[])
-    require(len(owners)==17 and len(essential)==16 and len(set(essential))==16,'Essential owner inventory mismatch')
+    require(len(owners)==17 and len(essential)==16 and set(essential)==ESSENTIAL and
+        {x.get('owner') for x in owners}==ESSENTIAL|{'python_services'},'Essential owner inventory mismatch')
     mandatory=[x for x in owners if x.get('owner') in essential]
-    require(len(mandatory)==16 and all(x.get('required_writes_finished') is True and not x.get('dirty_remaining') and x.get('result') in ('COMMITTED','ALREADY_DURABLE') for x in mandatory),'An essential owner did not finish durable writes')
+    require(len(mandatory)==16 and all(x.get('required_writes_finished') is True and not x.get('dirty') and
+        not x.get('dirty_remaining') and x.get('checkpoint_generation')==native['generation'] and
+        type(x.get('generation')) is int and x['generation']>=0 and x['generation']==x.get('durable_generation') and
+        x.get('result')==('COMMITTED' if x.get('dirty_before') is True else 'ALREADY_DURABLE') for x in mandatory),'An essential owner did not finish durable writes')
 
 
 def verify_records(before,after):
@@ -71,13 +87,20 @@ def main():
         try:
             sys.argv=[str(candidate.__file__),'--apk',str(args.apk),'--expected-sha',args.expected_sha,
                 '--case','final-participant','--authorization',AUTHORIZATION,'--out',str(setup)]
-            candidate.main(selected_case='final-participant')
+            import shutdown_fixture
+            candidate.main(selected_case='final-participant',independent_setup=shutdown_fixture)
         finally:sys.argv=previous
         startup=json.loads((setup/'FEATURE-RESULT.json').read_text())
         require(startup.get('passed') is True,'Actual native participant setup failed')
         require(startup.get('platform',{}).get('qemu')=='1' and startup['platform']['sdk']=='37','Fresh API37 required')
         transport.APP_UID=transport.shell('stat','-c','%u',transport.PRIVATE).strip()
         owner=startup['engine'];control=transport.CONTROL
+        deadline=time.monotonic()+180
+        while time.monotonic()<deadline:
+            compat=transport.read_json(control+'/compat-active.json')
+            if compat.get('pid')==owner['pid'] and compat.get('owner')==owner['owner'] and compat.get('status')=='ACTIVE':break
+            time.sleep(.25)
+        else:raise AssertionError('Exact physical Compat service did not become active; no Close attempted')
         require(transport.rpc('Favourites.AddFavourite',dict(title=FAVOURITE,type='window',window='home'))=='OK','Could not add normal native test favourite')
         before=transport.read_json(transport.PROFILE+'/addon_data/script.infinity.commandcenter/continue-watching.json')
         require(isinstance(before.get('items'),dict) and before['items'],'Actual tracking fixture missing; no Close attempted')
@@ -93,15 +116,18 @@ def main():
             receipt={};deadline=time.monotonic()+35
             while time.monotonic()<deadline:
                 receipt=transport.read_json(transport.PRIVATE+'/files/infinity-checkpoint-close.json')
-                if receipt.get('owner')==owner['owner'] and receipt.get('phase') in ('COMPLETE','CHECKPOINT_FAILED'):break
+                if receipt.get('owner')==owner['owner']:
+                    if receipt.get('phase')=='CHECKPOINT_FAILED':break
+                    if receipt.get('phase')=='COMPLETE' and not transport.processes():break
                 time.sleep(.25)
             entry['close_seconds']=time.monotonic()-began;entry['receipt']=receipt;save()
-            verify_receipt(receipt,owner)
-            for _ in range(10):
-                if not transport.processes():break
-                time.sleep(.2)
+            require(receipt.get('phase')=='COMPLETE','Actual Close failed before completion: '+str(receipt.get('error','missing receipt')))
             entry['after_processes']=transport.processes()
             require(not entry['after_processes'],'An application-UID process remained after authorized Close')
+            # The first COMPLETE is committed before coordinator self-exit.
+            # Inspect the final durable receipt only after external UID death.
+            receipt=transport.read_json(transport.PRIVATE+'/files/infinity-checkpoint-close.json')
+            entry['receipt']=receipt;save();verify_receipt(receipt,owner)
             after=transport.read_json(transport.PROFILE+'/addon_data/script.infinity.commandcenter/continue-watching.json')
             verify_records(before,after)
             transport.adb('pull',transport.PROFILE+'/Database',folder/'Database')

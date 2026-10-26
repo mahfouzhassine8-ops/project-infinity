@@ -10,10 +10,10 @@ from candidate_request import EXPECTED as CANDIDATE
 ROOT=Path(__file__).parent
 REQUEST='repairs/infinity-final-closure-2103407/SHUTDOWN-REQUEST.json'
 WORKFLOW='.github/workflows/infinity-shutdown-verification.yml'
-AUTHORIZATION=('Finaltakeoverworkstream5 explicitlyauthorizes independentEssentialFirst3Close/reopen '
-    'cycles onactualsigned408, native16essentialowners andtwoJava seals, processdeath andprotecteddata '
-    'readback. No provider/service/source substitutes, deadlineextension orphysicalacceptance.')
-EXPECTED=dict(schema=1,kind='independent-essential-first',request_id='integrated408-close-reopen-01',
+AUTHORIZATION=('UserOct26 explicitlyauthorizes independentEssentialFirst3Close/reopen cycles onactualsigned409, '
+    'exactphysicalCompat0.8.2 fixture, native16essentialowners andtwoJava seals, finalcoordinatorauthorization, '
+    'externalwholeUIDprocessdeath andprotecteddatareadback. No productionbypass, deadlineextension orphysicalacceptance.')
+EXPECTED=dict(schema=1,kind='independent-essential-first',request_id='integrated409-close-reopen-01',
     scenario='integrated-3-close-reopen',candidate_build=CANDIDATE['candidate_build'],
     candidate_source_commit=CANDIDATE['candidate_source_commit'],
     candidate_apk_sha256=CANDIDATE['candidate_apk_sha256'],authorization=AUTHORIZATION)
