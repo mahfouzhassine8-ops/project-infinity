@@ -118,8 +118,9 @@ jobs:
           baseline='0e8739d2d0e1be0ab8f127519b526556426fb160'
           subprocess.run(['git','merge-base','--is-ancestor',baseline,'HEAD'],check=True)
           names=subprocess.check_output(['git','diff','--name-only',baseline,'HEAD'],text=True).splitlines()
-          allowed_workflow='.github/workflows/infinity-2103407-search-pressure-host-gate.yml'
-          assert all(n.startswith('repairs/infinity-final-closure-2103407/') or n==allowed_workflow for n in names), names
+          allowed_workflows={'.github/workflows/infinity-2103407-search-pressure-host-gate.yml',
+                             '.github/workflows/infinity-saved-navigation-android.yml'}
+          assert all(n.startswith('repairs/infinity-final-closure-2103407/') or n in allowed_workflows for n in names), names
           assert not any('cobra' in n.lower() for n in names), names
           scope=json.load(open('repairs/infinity-final-closure-2103407/SCOPE.json'))
           assert scope['baseline']['commit']==baseline
@@ -178,6 +179,8 @@ jobs:
               pattern='test_module_manifest.py'
           elif selected=='installed-modules':
               pattern='test_installed_modules.py'
+          elif selected=='android-routing':
+              pattern='test_android17_reference.py'
           else:
               raise RuntimeError('Unreviewed host selection')
           subprocess.run([sys.executable,'-m','unittest','discover','-s',str(root),'-p',pattern,'-v'],check=True)

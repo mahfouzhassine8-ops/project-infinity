@@ -1,8 +1,8 @@
 name: Infinity feature-only verification
 on:
   push:
-    branches: [work/infinity-2103402-final-stabilization-20261024]
-    paths: ['repairs/infinity-2103402-final/android17/REQUEST.json']
+    branches: [work/infinity-2103402-final-stabilization-20261024, work/infinity-final-corrective-from-2103407-20261025]
+    paths: ['repairs/infinity-2103402-final/android17/REQUEST.json', 'repairs/infinity-final-closure-2103407/ANDROID17-REQUEST.json']
   workflow_dispatch:
     inputs:
       source_ref:
@@ -29,15 +29,16 @@ permissions:
   contents: read
   actions: read
 concurrency:
-  group: infinity-feature-${{ inputs.source_ref || github.ref }}-${{ inputs.feature || '2103402-request' }}
+  group: infinity-feature-${{ inputs.source_ref || github.ref }}-${{ inputs.feature || 'explicit-request' }}
   cancel-in-progress: false
 jobs:
   android17:
-    name: Selected feature ${{ inputs.feature || '2103402 baseline Search request' }}
+    name: Selected feature ${{ inputs.feature || 'explicit baseline Search request' }}
     runs-on: ubuntu-22.04
     timeout-minutes: 150
     env:
       CANDIDATE_BUILD: ${{ inputs.candidate_build }}
+      CANDIDATE_ARTIFACT: Infinity-Saved-Navigation-MultiImage-INTERNAL-QA-NOT-ACCEPTED
       AUTHORIZED_SCOPE: ${{ inputs.authorization }}
       SELECTED_CASE: ${{ inputs.feature }}
       PYTHONDONTWRITEBYTECODE: '1'
@@ -45,8 +46,11 @@ jobs:
       - uses: actions/checkout@v4
         with: {ref: "${{ inputs.source_ref || github.sha }}", fetch-depth: 0, persist-credentials: false, show-progress: false}
       - name: Validate explicitly requested 2103402 push scope
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/work/infinity-2103402-final-stabilization-20261024'
         run: python3 repairs/infinity-2103402-final/android17/push_request.py
+      - name: Validate explicitly requested signed407 final-scope reference
+        if: github.event_name == 'push' && github.ref == 'refs/heads/work/infinity-final-corrective-from-2103407-20261025'
+        run: python3 repairs/infinity-final-closure-2103407/android17_request.py
       - name: Require one explicitly authorized feature
         run: |
           python3 - <<'PYCODE'
@@ -59,13 +63,16 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           run-id: ${{ env.CANDIDATE_BUILD }}
-          name: Infinity-Saved-Navigation-MultiImage-INTERNAL-QA-NOT-ACCEPTED
+          name: ${{ env.CANDIDATE_ARTIFACT }}
           github-token: ${{ github.token }}
           path: signed
       - uses: actions/setup-java@v4
         with: {distribution: temurin, java-version: '17'}
       - uses: actions/setup-python@v5
         with: {python-version: '3.11.7'}
+      - name: Bind signed407 metadata to the existing feature probe without APK changes
+        if: github.event_name == 'push' && github.ref == 'refs/heads/work/infinity-final-corrective-from-2103407-20261025'
+        run: python3 repairs/infinity-final-closure-2103407/prepare_signed407_fixture.py signed
       - uses: android-actions/setup-android@v4
         with:
           cmdline-tools-version: '15859902'
@@ -86,7 +93,7 @@ jobs:
           r=json.load(open('signed/CANDIDATE.json'))
           assert r['apk_sha256']==digest
           if os.environ['GITHUB_EVENT_NAME']=='push':
-              request=json.load(open('repairs/infinity-2103402-final/android17/REQUEST.json'))
+              request=json.load(open(os.environ.get('BASELINE_REQUEST_PATH','repairs/infinity-2103402-final/android17/REQUEST.json')))
               assert digest==request['baseline_apk_sha256'] and r['source_commit']==request['baseline_commit'], 'Requested locked baseline differs'
           run=json.loads(subprocess.check_output(['gh','api',f"repos/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['CANDIDATE_BUILD']}"],text=True))
           assert run['head_sha']==r['source_commit'] and run['conclusion']=='success', 'Signed build/source mismatch'
@@ -135,6 +142,7 @@ jobs:
           name: Infinity-Feature-${{ env.SELECTED_CASE }}-${{ github.run_id }}-Evidence
           path: |
             android17-request-evidence.json
+            signed/FIXTURE-METADATA-EVIDENCE.json
             feature-results/
             api37-support/
             emulator-setup/
