@@ -1,0 +1,28 @@
+{
+  "failure": {
+    "run": 40308736912,
+    "source": "a16fb4d06e52d21b2c67117b6b57e8859d68e1c7",
+    "artifact": 12644846390,
+    "artifact_sha256": "dd6235fc37d08448a3c14d027326230516ac23b69ddb1e585e73b90f291a0657",
+    "initial_search": "PASS: Enter, results, history and responsive Home on signed410",
+    "stress_failure": "Actual tracking fixture unavailable",
+    "completed": {
+      "search": 0,
+      "playback_home": 0,
+      "rotation": 0
+    }
+  },
+  "cause": "Frozen final-eight stage returns early for Search, before creating its four synthetic resume records. The stress driver correctly refuses a missing nonempty preservation fixture.",
+  "correction": "Reuse the exact frozen four-record fixture before the admitted disposable API37 app's first launch. Refuse a live process, physical/wrong API device, missing install-over receipt, wrong candidate, existing file or symlink. No running-app profile writes, new writer authority or production changes.",
+  "selected_before_implementation": [
+    "Host: exact frozen fixture extraction and four reviewed movie/episode identities; reject changed source.",
+    "Host: prelaunch seed/readback, refusal of physical/wrong API/live process/existing profile/mismatched candidate or install receipt.",
+    "Host: stress nonempty preservation assertion retained; original feature fixture inverse and exact request binding.",
+    "Android17: existing signed410 first Search gate then unchanged selected 50 Search, 30 generated playback/Home, 20 OS rotations, stop first failure. No shutdown or new APK."
+  ],
+  "host_result": "PASS: four fixture-source/prelaunch/readback/refusal tests and two original-assertion/request-binding tests.",
+  "android17_result": "NOT RUN",
+  "physical_fold": "NOT RUN",
+  "release_accepted": false,
+  "unchanged_stress_driver_sha256": "b17bf22a41b42c3633e4c2eeeb42dc4f7a68ce0feb683af4240cc6239d674e26"
+}

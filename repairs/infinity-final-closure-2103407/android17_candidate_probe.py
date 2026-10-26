@@ -160,6 +160,9 @@ def main(selected_case=None,independent_setup=None):
                 actual_fixture_sha256=hashlib.sha256(path.read_bytes()).hexdigest(),
                 actual_old_code_staged=True,code_baseline_sha256=BASELINE_SHA,
                 APK_changed=False,assertions_changed=False,providers_changed=False,shutdown='NOT RUN')
+            if args.case==EXPECTED['selected_case'] and EXPECTED.get('post_feature'):
+                import android_stress_fixture
+                android_stress_fixture.seed(device,args,report,EXPECTED)
             if independent_setup is not None:independent_setup.stage(stage,args,report,device,aid)
         probe._candidate_fixture=adapt
         def input_driver(driver):
