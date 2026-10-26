@@ -1,3 +1,5 @@
+> **USER-APPROVED INFINITY POWER ONE-TAP PREFERENCE RESTORE:** Read `repairs/infinity-final-closure-2103407/INFINITY-POWER-ASK-EVERY-TIME-ONE-TAP-20261026.md` and the user's single-row screenshot mock. Add `ASK EVERY TIME` directly to existing Infinity Power. ONE tap updates existing saved chooser preference immediately, no Save button/no submenu/no auto-exit; next app-icon launch after the user's normal Close shows existing chooser. Do NOT touch Cobra or shutdown or add new shutdown test/signing gate. Previous AI draft infographic showing submenu+Save is WRONG. This scoped item joins P0 integration/fast Home work without delaying delivery.
+
 # INFINITY — USER P0 COMPLETION DIRECTIVE: FIX ONLY INCOMPLETE ITEMS, FREEZE WORKING SHUTDOWN, SIGN APK
 
 **Explicit user authorization / highest priority — October 26, 2026.**
