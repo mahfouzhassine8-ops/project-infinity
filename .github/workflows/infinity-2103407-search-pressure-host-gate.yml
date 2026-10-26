@@ -176,6 +176,8 @@ jobs:
               pattern='test_search_lifetime.py'
           elif selected=='module-trust':
               pattern='test_module_manifest.py'
+          elif selected=='installed-modules':
+              pattern='test_installed_modules.py'
           else:
               raise RuntimeError('Unreviewed host selection')
           subprocess.run([sys.executable,'-m','unittest','discover','-s',str(root),'-p',pattern,'-v'],check=True)

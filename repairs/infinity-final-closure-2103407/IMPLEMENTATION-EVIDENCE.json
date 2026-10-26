@@ -13,10 +13,11 @@
   "manifest_core": {
     "local_compiler": "g++ -std=c++14 -Wall -Wextra -Werror; actual OpenSSL EVP RSA/SHA256",
     "tests": 8,
-    "status": "LOCAL TARGETED PASS",
+    "status": "TARGETED HOST PASS: local and CI",
     "engine_integration": "NOT APPLIED",
     "arm64": "NOT RUN",
-    "android17": "NOT RUN"
+    "android17": "NOT RUN",
+    "github_run": 40256202271
   },
   "confirmed_compatibility_skews": {
     "addon_version": "0.3.5.39",
@@ -31,5 +32,14 @@
       "bytes": 696
     }
   },
-  "release_ready": false
+  "release_ready": false,
+  "native_manifest_adapter": {
+    "local_new_checks": 6,
+    "status": "TARGETED LOCAL PASS",
+    "production_negative_checks": "Actual original-public-key source rejects test signature, Cobra and unknown-protocol calls do not resolve roots",
+    "positive_fixture": "Temporary copy differs only in test public-key literal; no production key bypass or APK change",
+    "engine_integration": "NOT APPLIED",
+    "arm64": "NOT RUN",
+    "android17": "NOT RUN"
+  }
 }

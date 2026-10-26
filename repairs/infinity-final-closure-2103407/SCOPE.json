@@ -80,6 +80,16 @@
         "path": "isolated-native/InfinityModuleManifest.cpp",
         "baseline_sha256": null,
         "reason": "Verify original signer RSA/SHA256 manifest and exact first-party code paths; no runtime trust relaxation or production integration yet"
+      },
+      {
+        "path": "isolated-native/InfinityInstalledModules.h",
+        "baseline_sha256": null,
+        "reason": "Infinity-only native adapter: immutable original public key, native-resolved root, exact entry owner, protocol identity and availability cache; no termination or writer policies"
+      },
+      {
+        "path": "isolated-native/InfinityInstalledModules.cpp",
+        "baseline_sha256": null,
+        "reason": "Infinity-only native adapter: immutable original public key, native-resolved root, exact entry owner, protocol identity and availability cache; no termination or writer policies"
       }
     ],
     "apk_member_edits_admitted": [],
@@ -98,7 +108,7 @@
   },
   "selected_verification": {
     "host": [
-      "test_module_manifest.py: actual compiled C++ signature/source verification; changed signature/code, wrong key/protocol/owner/path, symlink and size rejection; independent package/protocol versions"
+      "test_installed_modules.py: exact production-source negative owner/root/capability boundary; positive adapter fixtures explicitly use temporary test trust key; preserve original production key bytes"
     ],
     "android17": "NOT RUN",
     "physical_fold": "NOT RUN",

@@ -15,3 +15,7 @@ Current stage: inspect exact signed source and first-party owner/protocol contra
 | Android17 integration | NOT RUN in this continuation; physical Fold remains final authority |
 
 Required final evidence remains50 Search cycles,30 playback/Home cycles,20 fold/rotation transitions, authenticated essential-save/reopen scenarios, exact source/APK preservation and original permanent signer. Compilation, packaging and final acceptance are separate stages. No shutdown success is inferred from feature QA.
+
+Current verified continuation: signed407 source/component/signer inspection PASS run40254036285. New Search exceptional-consumer defect reproduced and corrected in isolated source,7 host checks PASS run40254448852. The module trust core has8 compiled host checks PASS locally and CI run40256202271. Native adapter has6 new local checks PASS, with production-key negatives and explicitly isolated test-key positive fixtures. No engine integration, ARM64 compile, Android17, physical Fold pass or new APK yet.
+
+Actual signed407 ELF retains native0.3.5.35/36 version literals and lacks0.3.5.39. Its native title-owner symbol exists at0x1aa6620 (696 bytes). Its checkpoint Python declares0.3.5.38 while addon.xml reports0.3.5.39. Correct these ownership/API couplings through the authenticated manifest, preserving all old exact contracts.
