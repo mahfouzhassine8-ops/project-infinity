@@ -126,6 +126,8 @@ def _run(device,setup,expected,out):
     android_stress_script.initialize(device,out,owner)
     state_path=device.PROFILE+'/addon_data/script.infinity.commandcenter/continue-watching.json'
     protected=device.read_json(state_path)
+    require(setup.get('prelaunch_stress_fixture',{}).get('declared_resume_clip_exists') is True,
+            'Declared saved-card clip must actually exist before a usability measurement')
     protected_keys=('items','watched','watchlist','collection','lists','sources','navigation_recovery')
     require(protected.get('items'),'Actual tracking fixture unavailable')
     for index in range(COUNTS['search']):
@@ -213,9 +215,13 @@ def _run(device,setup,expected,out):
             return value if value.get('speed')==1 and (stamp.get('seconds',0)>=1 or stamp.get('minutes',0)>0) else None
         evidence=device.until(progressed,20)
         started=time.monotonic();device.rpc('Player.Stop',{'playerid':player});home()
+        rpc_ready_ms=(time.monotonic()-started)*1000
         require(not device.rpc('Player.GetActivePlayers'),'Playback did not stop')
-        report['playback_home'].append(dict(cycle=index,home_window_rpc_ready_ms=(time.monotonic()-started)*1000,
-            playback=evidence,poster_paint_verified=False))
+        import stress_resume_card
+        card=stress_resume_card.observe(device,protected,'movie' if index%2==0 else 'tv')
+        report['playback_home'].append(dict(cycle=index,home_window_rpc_ready_ms=rpc_ready_ms,
+            stop_to_correct_usable_card_ms=(time.monotonic()-started)*1000,
+            actual_resume_card=card,playback=evidence,poster_paint_verified=False))
         save()
         if (index+1)%10==0:memory('playback-'+str(index+1))
 
@@ -232,8 +238,11 @@ def _run(device,setup,expected,out):
                 return raw if match and int(match[1])==value else None
             evidence=device.until(rotated,20)
             (out/('rotation-'+str(index)+'-input.txt')).write_text(evidence)
-            home();report['rotation'].append(dict(cycle=index,requested=value,actual=value,
-                    elapsed_ms=(time.monotonic()-began)*1000,physical_fold=False));save()
+            home()
+            import stress_resume_card
+            card=stress_resume_card.observe(device,protected,'movie' if index%2==0 else 'tv')
+            report['rotation'].append(dict(cycle=index,requested=value,actual=value,
+                    elapsed_ms=(time.monotonic()-began)*1000,physical_fold=False,actual_resume_card=card));save()
     finally:
         for name,value in previous.items():
             if value!='null':device.shell('settings','put','system',name,value)
@@ -247,6 +256,7 @@ def _run(device,setup,expected,out):
     (out/'display-state.txt').write_text(device.shell('dumpsys','display',check=False))
     report['search_duration']=quantiles([x['elapsed_ms'] for x in report['search']])
     report['home_window_rpc_duration']=quantiles([x['home_window_rpc_ready_ms'] for x in report['playback_home']])
+    report['stop_to_correct_usable_card_duration']=quantiles([x['stop_to_correct_usable_card_ms'] for x in report['playback_home']])
     report['cpu_intervals']=[dict(before=a['stage'],after=b['stage'],**android_frame_samples.cpu_interval(a,b,report['clock_ticks']))
                              for a,b in zip(report['snapshots'],report['snapshots'][1:])]
     report['passed']=all(len(report[k])==v for k,v in COUNTS.items());save()

@@ -4,8 +4,9 @@ from pathlib import Path
 import time
 
 BUILTIN='RunScript(script.infinity.commandcenter,universal-search,movie)'
-MAX_REQUESTS=55
+MAX_REQUESTS=110
 LIFETIME_SECONDS=90*60
+ACTIONS=frozenset(('home-search','home-resume-movie','home-resume-tv'))
 
 
 def require_ready(value,pid):
@@ -17,7 +18,22 @@ def require_ready(value,pid):
 def accept(value,pid,sequence):
     return (set(value)=={'pid','sequence','action'} and type(value.get('pid')) is int and
             value['pid']==pid and type(value.get('sequence')) is int and
-            value['sequence']==sequence and 1<=sequence<=MAX_REQUESTS and value.get('action')=='home-search')
+            value['sequence']==sequence and 1<=sequence<=MAX_REQUESTS and value.get('action') in ACTIONS)
+
+
+def select_resume_tab(media):
+    import xbmc
+    import xbmcgui
+    if media not in ('movie','tv'):raise ValueError('Unknown fixed Home tab')
+    if xbmcgui.getCurrentWindowId()!=10000:raise ValueError('Actual Home required before selecting resume tab')
+    wanted='movies' if media=='movie' else 'tvshows'
+    count=int(xbmc.getInfoLabel('Container(9000).NumItems') or 0)
+    if not 1<=count<=50:raise ValueError('Actual bounded Home tabs unavailable')
+    for index in range(count):
+        xbmc.executebuiltin('SetFocus(9000,%d,absolute)'%index,True)
+        if xbmc.getInfoLabel('Container(9000).ListItem.Property(section)')==wanted:
+            return
+    raise ValueError('Actual requested Home tab not found')
 
 
 def serve(root,pid):
@@ -40,7 +56,8 @@ def serve(root,pid):
             except ValueError:value={}
             if accept(value,pid,sequence):
                 # Same Home builtin as the retained original selected case.
-                xbmc.executebuiltin(BUILTIN)
-                output('stress-dispatch-ack.json',dict(pid=pid,sequence=sequence,action='home-search'))
+                if value['action']=='home-search':xbmc.executebuiltin(BUILTIN)
+                else:select_resume_tab('movie' if value['action']=='home-resume-movie' else 'tv')
+                output('stress-dispatch-ack.json',dict(pid=pid,sequence=sequence,action=value['action']))
                 sequence+=1
         monitor.waitForAbort(.1)

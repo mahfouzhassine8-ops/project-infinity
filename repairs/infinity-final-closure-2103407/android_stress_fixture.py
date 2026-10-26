@@ -5,6 +5,7 @@ stress driver's nonempty-state and post-run preservation assertions stay intact.
 """
 import hashlib
 import json
+import subprocess
 from pathlib import Path
 
 from android17_reference_observation import OLD, FIXTURE_SHA
@@ -54,6 +55,8 @@ def seed(device, args, report, expected):
     # transport errors; no empty/read-error value is treated as absence.
     device.shell('test', '!', '-e', target)
     device.shell('test', '!', '-L', target)
+    clip_target=PROFILE+'/infinity-final-qa.mp4'
+    device.shell('test','!','-e',clip_target);device.shell('test','!','-L',clip_target)
     raw = (OLD / 'tracking/final-eight/android_selected.py').read_bytes()
     state = retained_state(raw)
     local = args.out / 'prelaunch-stress-tracking-fixture.json'
@@ -63,10 +66,20 @@ def seed(device, args, report, expected):
     device.adb('push', local, target)
     if device.shell('cat', target) != local.read_text():
         raise RuntimeError('Prelaunch fixture readback differs')
+    clip=args.out/'prelaunch-resume-fixture.mp4'
+    subprocess.run(['ffmpeg','-v','error','-f','lavfi','-i','color=c=gray:s=64x64:r=1','-t','180',
+                    '-an','-c:v','libx264','-pix_fmt','yuv420p',str(clip)],check=True)
+    clip_sha=hashlib.sha256(clip.read_bytes()).hexdigest()
+    device.adb('push',clip,clip_target)
+    returned=device.adb('shell','cat',clip_target,binary=True)
+    if not isinstance(returned,bytes) or hashlib.sha256(returned).hexdigest()!=clip_sha:
+        raise RuntimeError('Actual declared resume clip readback differs')
     evidence = dict(source_sha256=FIXTURE_SHA,
                     fixture_sha256=hashlib.sha256(local.read_bytes()).hexdigest(),
                     phase='before first app launch', synthetic_records=len(state['items']),
                     actual_user_data=False, runtime_writer_authority_added=False,
                     existing_profile_replaced=False, readback_matches=True)
+    evidence.update(declared_resume_clip_exists=True,declared_resume_clip_sha256=clip_sha,
+                    generated_clip_seconds=180,actual_movie_content=False)
     (args.out / 'STRESS-FIXTURE-SEED.json').write_text(json.dumps(evidence, indent=2) + '\n')
     report['prelaunch_stress_fixture'] = evidence

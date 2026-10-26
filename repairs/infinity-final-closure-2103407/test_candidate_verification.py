@@ -121,7 +121,7 @@ class CandidateVerificationTests(unittest.TestCase):
         # mandatory original SDK signature step are never replaced in CI.
         with tempfile.TemporaryDirectory() as temp:
             root=Path(temp);nested=root/'input';nested.mkdir();apk=nested/'fixture.apk'
-            versions={'script.infinity.commandcenter':'0.3.5.42','script.infinity.uirepair':'0.1.23',
+            versions={'script.infinity.commandcenter':'0.3.5.43','script.infinity.uirepair':'0.1.23',
                 'script.infinity.watchedbridge':'1.0.21','script.infinity.rails':'0.2.8'}
             with ZipFile(apk,'w') as z:
                 for aid,version in versions.items():z.writestr('assets/addons/'+aid+'/addon.xml','<addon id="'+aid+'" version="'+version+'"/>')

@@ -19,7 +19,9 @@ class ResidentDispatchTests(unittest.TestCase):
         for changed in ({'pid':124},{'pid':True},{'sequence':2},{'sequence':True},
                         {'sequence':0},{'action':'arbitrary command'},{'extra':True}):
             self.assertFalse(dispatch.accept(dict(request,**changed),123,1))
-        self.assertFalse(dispatch.accept(dict(request,sequence=56),123,56))
+        self.assertFalse(dispatch.accept(dict(request,sequence=111),123,111))
+        for action in ('home-resume-movie','home-resume-tv'):
+            self.assertTrue(dispatch.accept(dict(request,action=action),123,1))
 
     def test_exact_observer_body_retained_no_new_service_or_production_writer(self):
         with tempfile.TemporaryDirectory() as temp:

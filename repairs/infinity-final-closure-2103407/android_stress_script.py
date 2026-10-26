@@ -4,6 +4,7 @@ from pathlib import Path
 import shutil
 from android17_reference_observation import OLD,FIXTURE_SHA
 import hashlib
+from android_stress_dispatcher import MAX_REQUESTS,ACTIONS
 
 ADDON='service.future.persistence.7fa29'
 BUILTIN='RunScript(script.infinity.commandcenter,universal-search,movie)'
@@ -36,25 +37,26 @@ def initialize(device,out,owner):
     target=device.PROFILE+'/addon_data/'+ADDON
     def ready():
         value=device.read_json(target+'/stress-dispatch-ready.json')
-        return value if value.get('pid')==owner['pid'] and value.get('max_requests')==55 and value.get('first_actual_feature_passed') is True and value.get('source')=='exact-home-search' else None
+        return value if value.get('pid')==owner['pid'] and value.get('max_requests')==MAX_REQUESTS and value.get('first_actual_feature_passed') is True and value.get('source')=='exact-home-search' else None
     device.until(ready,15)
     _context=dict(out=Path(out),owner=owner,target=target,sequence=0)
 
 
-def launch(device):
+def launch(device,action='home-search'):
     if _context is None:raise ValueError('Admitted existing dispatcher required')
     current=device.running_engine();owner=_context['owner']
     if not current or current.get('pid')!=owner['pid'] or current.get('owner')!=owner['owner']:
         raise ValueError('Actual dispatch process changed')
-    _context['sequence']+=1;sequence=_context['sequence']
-    if sequence>55:raise ValueError('Dispatcher request budget exceeded')
+    if action not in ACTIONS:raise ValueError('Unknown fixed dispatcher action')
+    _context['sequence']+=1;sequence=_context['sequence'];_context['action']=action
+    if sequence>MAX_REQUESTS:raise ValueError('Dispatcher request budget exceeded')
     path=_context['out']/'dispatch-request.json'
-    path.write_text(json.dumps(dict(pid=owner['pid'],sequence=sequence,action='home-search')))
+    path.write_text(json.dumps(dict(pid=owner['pid'],sequence=sequence,action=action)))
     return device.adb('push',path,_context['target']+'/stress-open-request-'+str(owner['pid'])+'.json')
 
 
 def verify_dispatch(device):
     if _context is None:raise ValueError('Dispatcher absent')
     ack=device.read_json(_context['target']+'/stress-dispatch-ack.json')
-    if ack!={'pid':_context['owner']['pid'],'sequence':_context['sequence'],'action':'home-search'}:
+    if ack!={'pid':_context['owner']['pid'],'sequence':_context['sequence'],'action':_context['action']}:
         raise ValueError('Actual Home Search dispatch not acknowledged')

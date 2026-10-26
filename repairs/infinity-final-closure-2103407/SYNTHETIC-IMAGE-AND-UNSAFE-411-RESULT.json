@@ -1,0 +1,41 @@
+{
+  "run": 40331713617,
+  "source": "e39d7cb8e61a593f5268be050589111139121744",
+  "apk_sha256": "0729e8403b842568665567db118902d5b15b6e554b9f96a23cc9a94e24779c80",
+  "passed": true,
+  "controls": 16,
+  "actual_started_jobs": 30,
+  "verified_readonly_retirements": 32,
+  "actual_factory_terminals": 30,
+  "verified_unchanged_without_start": [
+    {
+      "token": 84,
+      "job": 84,
+      "control": 2103
+    },
+    {
+      "token": 86,
+      "job": 86,
+      "control": 2104
+    }
+  ],
+  "positive_close_reopens": 1,
+  "unsafe_writer_control": {
+    "passed": true,
+    "expected": "Actual failure and live native process, not successful shutdown",
+    "phase": "CHECKPOINT_FAILED",
+    "error": "native_admission: unverified_protected_writer:script.infinity.unsafeproof.7fa29:default.py:external_or_opaque_writer_requires_explicit_participant",
+    "authorization_consumed": false,
+    "process_death_confirmed": false,
+    "protected_records_unchanged": true,
+    "remaining_UID_process_names": [
+      "com.projectinfinity.kodi",
+      "com.projectinfinity.kodi:kodi",
+      "sh",
+      "sleep"
+    ]
+  },
+  "ordinary_three_cycle_pass40317069331_preserved": true,
+  "physical_Fold": "NOT RUN",
+  "release_locked": false
+}

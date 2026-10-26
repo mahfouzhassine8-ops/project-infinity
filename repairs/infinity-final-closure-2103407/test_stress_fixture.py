@@ -31,9 +31,12 @@ class StressFixtureTests(unittest.TestCase):
                 if args[0]=='cat': return self.data.get(args[1], '')
                 return ''
             def running_engine(self): return self.engine
-            def adb(self, *args):
+            def adb(self, *args, **kwargs):
                 self.calls.append(args)
-                if args[0]=='push': self.data[args[2]]=Path(args[1]).read_text()
+                if args[0]=='push':
+                    file=Path(args[1]);self.data[args[2]]=file.read_bytes() if file.suffix=='.mp4' else file.read_text()
+                if args[:2]==('shell','cat') and kwargs.get('binary') is True:return self.data[args[2]]
+                return ''
         device = Device()
         for key, value in changes.items(): setattr(device, key, value)
         return (device, SimpleNamespace(case='final-search-all-enter', out=root),
@@ -60,8 +63,10 @@ class StressFixtureTests(unittest.TestCase):
             self.assertTrue(proof['readback_matches'])
             self.assertFalse(proof['runtime_writer_authority_added'])
             self.assertFalse(proof['existing_profile_replaced'])
-            self.assertEqual(len([c for c in device.calls if c[0]=='push']),1)
-            self.assertEqual([c[0] for c in device.calls if c[0] not in ('getprop','pidof','test','mkdir','push','cat')],[])
+            self.assertEqual(len([c for c in device.calls if c[0]=='push']),2)
+            self.assertEqual([c[0] for c in device.calls if c[0] not in ('getprop','pidof','test','mkdir','push','cat','shell')],[])
+            self.assertTrue(proof['declared_resume_clip_exists'])
+            self.assertIsInstance(device.data[fixture.PROFILE+'/infinity-final-qa.mp4'],bytes)
 
     def test_physical_wrong_api_live_engine_existing_file_and_link_refused_before_write(self):
         for changes in ({'qemu':'0'},{'sdk':'36'},{'pid':'123'}, {'engine':{'pid':123}},
