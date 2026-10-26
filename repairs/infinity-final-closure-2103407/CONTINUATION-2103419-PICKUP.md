@@ -120,3 +120,17 @@ DELIVERY-419-STATUS updatedwithPowerPASS/twoactualstartupfailures/newpendingruns
 prepare_delivery419.py strictactualartifactproducer prepared; actualsavedZIPstill
 older418version3. Do notfinalizearchiveuntilactualremainingresults incorporated.
 Allsevenstreams/physicalFoldfinalgate/noCobra/noreset/no finallock unchanged.
+
+
+## Actual419writerPASS —20:59UTC
+
+40397718606 PASS, artifact12689130625/SHA
+d4e27d9959b1e6e55e7da624ea9b63a04a8f89fe2fd790227b18acc016816ea6.
+25actualnativejobs,32verifiedreceipts,7unchanged-unstarted, exactfactories/
+tokens/generations/retirements. PositiveprotectedClose/reopen allproofs. Real
+opaquechildmarker writer veto: CHECKPOINT_FAILED, no save/auth/deathclaim, engine
++coordinator+actualsh/sleepchildalive, protectedrecordsunchanged. Schedulingcounts
+arenotperformanceimprovement. ReportSYNTHETIC-IMAGE-AND-UNSAFE-419-RESULT.json.
+Search40399771565 andHome40399697939 on37.1ps16k remainactive; do notrestart.
+Temporaryworkspace disconnect recoveredwithallfilesintact; savedLibrarystill
+older418version3. Final419repackage/uploadstillneededafteractualresults.

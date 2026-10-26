@@ -20,6 +20,13 @@ def sha(path):
     return h.hexdigest()
 
 
+def member_sha(archive,name):
+    digest=hashlib.sha256()
+    with archive.open(name) as stream:
+        for chunk in iter(lambda:stream.read(4*1024*1024),b''):digest.update(chunk)
+    return digest.hexdigest()
+
+
 def main():
     parser=argparse.ArgumentParser();parser.add_argument('--build-zip',type=Path,required=True)
     parser.add_argument('--status',type=Path,required=True);parser.add_argument('--out',type=Path,required=True)
@@ -40,12 +47,12 @@ def main():
         names=archive.namelist()
         if len(names)!=len(set(names)):raise ValueError('Duplicate artifact paths')
         apks=[n for n in names if n.endswith('.apk')]
-        if len(apks)!=1 or hashlib.sha256(archive.read(apks[0])).hexdigest()!=APK_SHA:
+        if len(apks)!=1 or member_sha(archive,apks[0])!=APK_SHA:
             raise ValueError('Exactly one actual signed APK is required')
         sums=archive.read(PREFIX+'SHA256SUMS').decode().splitlines()
         for line in sums:
             digest,name=line.split('  ',1)
-            if hashlib.sha256(archive.read(PREFIX+name)).hexdigest()!=digest:
+            if member_sha(archive,PREFIX+name)!=digest:
                 raise ValueError('Exact component bytes differ: '+name)
     args.out.parent.mkdir(parents=True,exist_ok=True)
     shutil.copyfile(args.build_zip,args.out)
