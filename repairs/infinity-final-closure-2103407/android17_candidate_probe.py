@@ -19,7 +19,7 @@ from prepare_signed407_fixture import digest
 from candidate_request import EXPECTED
 
 HOOK_BEFORE='            selected.stage(stage,args,report,device,staging.FUTURE)'
-HOOK_AFTER=HOOK_BEFORE+'\n            _candidate_fixture(stage,args,report,device,staging.FUTURE)'
+HOOK_AFTER='            _candidate_generated_media(selected,args,report,device)\n'+HOOK_BEFORE+'\n            _candidate_fixture(stage,args,report,device,staging.FUTURE)'
 DRIVER_HOOK_BEFORE="            report['actual_android_search_input']=driver.submit(device,args.out,owner,args.case,staging.FUTURE)"
 DRIVER_HOOK_AFTER="            _candidate_input_driver(driver)\n"+DRIVER_HOOK_BEFORE
 ENV_BEFORE="        ui.require(mode in CASES,'Explicit final-eight selection required')"
@@ -152,6 +152,8 @@ def main(selected_case=None,independent_setup=None):
     sys.path.insert(0,str(OLD))
     probe=types.ModuleType('exact_integrated_feature_probe');probe.__file__=str(original)
     exec(compile(text,str(original),'exec'),probe.__dict__)
+    from continue_media_fixture import prepare
+    probe._candidate_generated_media=prepare
     original_adb=probe.device.adb
     with tempfile.TemporaryDirectory(prefix='infinity-test407-source-') as temp:
         sources=Path(temp);original_sources(baseline,sources)
@@ -231,6 +233,19 @@ def main(selected_case=None,independent_setup=None):
         original_execute=probe.execute
         def execute(args):
             report=original_execute(args)
+            if (selected_case in ('final-continue','final-actions') and
+                    report.get('platform',{}).get('qemu')=='1' and report.get('platform',{}).get('sdk')=='37'):
+                observation={}
+                try:observation['committed_state']=probe.device.read_json(probe.device.PROFILE+'/addon_data/script.infinity.commandcenter/continue-watching.json')
+                except Exception as error:observation['state_error']=str(error)
+                queries=[('active_players','Player.GetActivePlayers',None),
+                    ('native_player_item','Player.GetItem',{'playerid':1,'properties':['title','showtitle','season','episode','file','thumbnail','art','uniqueid']}),
+                    ('typed_playback_labels','XBMC.GetInfoLabels',{'labels':['VideoPlayer.DBTYPE','VideoPlayer.Title','VideoPlayer.UniqueID(tmdb)','VideoPlayer.UniqueID(imdb)','VideoPlayer.Season','VideoPlayer.Episode','Player.Filenameandpath']}),
+                    ('actual_favourites','Favourites.GetFavourites',{'properties':['path','window','windowparameter','thumbnail']})]
+                for name,method,params in queries:
+                    try:observation[name]=probe.device.rpc(method,params)
+                    except Exception as error:observation[name]={'error':str(error)}
+                (args.out/'SAVED-PLAYBACK-OBSERVATION.json').write_text(json.dumps(observation,indent=2)+'\n')
             if report.get('platform',{}).get('qemu')=='1' and isinstance(report.get('engine',{}).get('pid'),int):
                 target=probe.device.PROFILE+'/addon_data/'+probe.staging.FUTURE+'/environment-'+str(report['engine']['pid'])+'.json'
                 environment=probe.device.read_json(target)

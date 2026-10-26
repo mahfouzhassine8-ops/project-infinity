@@ -1,0 +1,64 @@
+{
+  "passed": false,
+  "apk_sha256": "b3af984c5f035f6c0e51f70f71726b317ddbb503764eb5306505b583c0643ec4",
+  "candidate_source_commit": "282a12a5e538a3ba05d5544d94a318b1c5de5ad4",
+  "test_source_commit": "99391bb7a467e752f611ada869e09728e5559992",
+  "selected_case": "final-actions",
+  "feature_result": {
+    "passed": false,
+    "pid": 4595,
+    "selected_mode": "final-actions",
+    "selected_features": [
+      "final-actions"
+    ],
+    "cases": [
+      {
+        "case": "Add to Watchlist",
+        "status": "PASS",
+        "popup_seconds": 1.2100847680000015
+      },
+      {
+        "case": "Remove from Watchlist",
+        "status": "PASS",
+        "popup_seconds": 3.2661652020000105
+      },
+      {
+        "case": "Add to Collection",
+        "status": "PASS",
+        "popup_seconds": 2.6143010960000055
+      },
+      {
+        "case": "Remove from Collection",
+        "status": "PASS",
+        "popup_seconds": 3.053107424000004
+      },
+      {
+        "case": "Mark Watched",
+        "status": "PASS",
+        "popup_seconds": 3.026218107999995
+      },
+      {
+        "case": "Mark Unwatched",
+        "status": "PASS",
+        "popup_seconds": 2.77859188299999
+      }
+    ],
+    "shutdown": "NOT RUN",
+    "physical_fold_verified": false,
+    "final_lock": false,
+    "popup_readiness_observation": {
+      "dialog": 13000,
+      "count": 7,
+      "popup": "1",
+      "focus": true
+    },
+    "failure": "AssertionError: Native item not found: Add to Favorites",
+    "traceback": "Traceback (most recent call last):\n  File \"/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/addons/service.future.persistence.7fa29/android_selected.py\", line 291, in run\n    elapsed=popup('b'*64,'Add to Favorites')\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/addons/service.future.persistence.7fa29/android_selected.py\", line 237, in popup\n    ui.select_native_item(50,lambda:xbmc.getInfoLabel('Container(50).ListItem.Label')==label,label)\n  File \"/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/addons/service.future.persistence.7fa29/android_runtime_checks.py\", line 217, in select_native_item\n    raise AssertionError('Native item not found: '+message)\nAssertionError: Native item not found: Add to Favorites\n"
+  },
+  "failure": "RuntimeError: Selected feature failed: AssertionError: Native item not found: Add to Favorites",
+  "workflow_run": 40342716847,
+  "artifact_id": 12659338476,
+  "artifact_sha256": "b2c802e0571b648d4088a5137220092bebcc95133d3f58b4aa4dafc47118f805",
+  "release_accepted": false,
+  "physical_Fold": "NOT RUN"
+}

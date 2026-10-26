@@ -1,0 +1,101 @@
+{
+  "passed": false,
+  "apk_sha256": "b3af984c5f035f6c0e51f70f71726b317ddbb503764eb5306505b583c0643ec4",
+  "candidate_source_commit": "282a12a5e538a3ba05d5544d94a318b1c5de5ad4",
+  "test_source_commit": "33c7c1d7bb222fff8f20cce18409a0fe4e8bc29e",
+  "selected_case": "final-continue",
+  "feature_result": {
+    "passed": false,
+    "pid": 4781,
+    "selected_mode": "final-continue",
+    "selected_features": [
+      "final-continue"
+    ],
+    "cases": [
+      {
+        "case": "actual-home-one-card-movie",
+        "status": "PASS"
+      },
+      {
+        "case": "actual-home-one-card-tv",
+        "status": "PASS"
+      },
+      {
+        "case": "remove-visible-card-retains-all-records",
+        "status": "PASS"
+      }
+    ],
+    "shutdown": "NOT RUN",
+    "physical_fold_verified": false,
+    "final_lock": false,
+    "last_continue_card_observation": {
+      "media": "tv",
+      "observed": {
+        "Container(8831).ListItem.Episode": "2",
+        "Container(8831).ListItem.Label": "Breaking Bad S01E02",
+        "Container(8831).ListItem.PercentPlayed": "33",
+        "Container(8831).ListItem.Property(Infinity.ResumeHub.Watched)": "false",
+        "Container(8831).ListItem.Property(Infinity.Selection.Snapshot)": "{\"bucket\":\"continue\",\"identity\":{\"episode\":2,\"ids\":{\"tmdb\":\"1396\"},\"kind\":\"episode\",\"schema\":1,\"scope\":\"show_episode\",\"season\":1},\"key\":\"dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd\",\"list\":\"\",\"owner\":\"script.infinity.commandcenter\",\"schema\":1,\"source\":\"special://profile/infinity-final-qa.mp4\",\"stable_source\":\"special://profile/infinity-final-qa.mp4\",\"token\":\"5fc569450d5cbb700333ff0a87eb80ccee56b7cb4f02e01999e97a4073b2fd96\"}",
+        "Container(8831).ListItem.Season": "1"
+      },
+      "native_directory_resume": {
+        "position": 60.0,
+        "total": 180.0
+      }
+    },
+    "usable_resume_cards": [
+      {
+        "media": "movie",
+        "key": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "observed": {
+          "Container(8830).ListItem.Episode": "",
+          "Container(8830).ListItem.Label": "The Matrix",
+          "Container(8830).ListItem.PercentPlayed": "33",
+          "Container(8830).ListItem.Property(Infinity.ResumeHub.Watched)": "false",
+          "Container(8830).ListItem.Property(Infinity.Selection.Snapshot)": "{\"bucket\":\"continue\",\"identity\":{\"ids\":{\"imdb\":\"tt0133093\"},\"kind\":\"movie\",\"schema\":1,\"scope\":\"movie\"},\"key\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"list\":\"\",\"owner\":\"script.infinity.commandcenter\",\"schema\":1,\"source\":\"special://profile/infinity-final-qa.mp4\",\"stable_source\":\"special://profile/infinity-final-qa.mp4\",\"token\":\"52f818e464fdd76b57048d55623ec9c816cafa102a29f74dbc6725a033f226ae\"}",
+          "Container(8830).ListItem.Season": ""
+        },
+        "native_directory_resume": {
+          "position": 60.0,
+          "total": 180.0
+        },
+        "home_tab_to_correct_usable_card_ms": 683.1199519999984,
+        "timing_scope": "Test Home activation and tab selection to real exact card; not app launch",
+        "synthetic_metadata_and_generated_clip": true
+      },
+      {
+        "media": "tv",
+        "key": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+        "observed": {
+          "Container(8831).ListItem.Episode": "2",
+          "Container(8831).ListItem.Label": "Breaking Bad S01E02",
+          "Container(8831).ListItem.PercentPlayed": "33",
+          "Container(8831).ListItem.Property(Infinity.ResumeHub.Watched)": "false",
+          "Container(8831).ListItem.Property(Infinity.Selection.Snapshot)": "{\"bucket\":\"continue\",\"identity\":{\"episode\":2,\"ids\":{\"tmdb\":\"1396\"},\"kind\":\"episode\",\"schema\":1,\"scope\":\"show_episode\",\"season\":1},\"key\":\"dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd\",\"list\":\"\",\"owner\":\"script.infinity.commandcenter\",\"schema\":1,\"source\":\"special://profile/infinity-final-qa.mp4\",\"stable_source\":\"special://profile/infinity-final-qa.mp4\",\"token\":\"5fc569450d5cbb700333ff0a87eb80ccee56b7cb4f02e01999e97a4073b2fd96\"}",
+          "Container(8831).ListItem.Season": "1"
+        },
+        "native_directory_resume": {
+          "position": 60.0,
+          "total": 180.0
+        },
+        "home_tab_to_correct_usable_card_ms": 291.24785899998074,
+        "timing_scope": "Test Home activation and tab selection to real exact card; not app launch",
+        "synthetic_metadata_and_generated_clip": true
+      }
+    ],
+    "popup_readiness_observation": {
+      "dialog": 13000,
+      "count": 7,
+      "popup": "1",
+      "focus": true
+    },
+    "failure": "RuntimeError: Timed out: actual playback updates original movie and restores card",
+    "traceback": "Traceback (most recent call last):\n  File \"/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/addons/service.future.persistence.7fa29/android_selected.py\", line 277, in run\n    after=ui.until(saved,'actual playback updates original movie and restores card',45)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/addons/service.future.persistence.7fa29/android_runtime_checks.py\", line 41, in until\n    raise RuntimeError('Timed out: '+message)\nRuntimeError: Timed out: actual playback updates original movie and restores card\n"
+  },
+  "failure": "RuntimeError: Selected feature failed: RuntimeError: Timed out: actual playback updates original movie and restores card",
+  "workflow_run": 40342636323,
+  "artifact_id": 12661200406,
+  "artifact_sha256": "fc8c6958e193343e85aca77e7ee4240051f361aea8cf9113f237a5d6d2a19aed",
+  "release_accepted": false,
+  "physical_Fold": "NOT RUN"
+}

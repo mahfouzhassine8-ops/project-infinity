@@ -18,7 +18,10 @@ def wait_rows(xbmc,xbmcgui,ui,began,result):
             focus=xbmc.getCondVisibility('Control.HasFocus(50)'))
         result['popup_readiness_observation']=value
         return value if value['popup']=='1' and 0<count<=1000 and value['focus'] else None
-    return ui.until(ready,'actual selected popup rows/focus',remaining)
+    value=ui.until(ready,'actual selected popup rows/focus',remaining)
+    value['actual_row_labels']=[xbmc.getInfoLabel('Container(50).ListItemAbsolute(%d).Label'%i)
+                                for i in range(value['count']+1)]
+    return value
 
 
 def instrument(text):

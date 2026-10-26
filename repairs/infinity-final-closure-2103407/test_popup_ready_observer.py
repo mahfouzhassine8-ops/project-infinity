@@ -7,7 +7,7 @@ import popup_ready_observer as observer
 class PopupReadinessTests(TestCase):
     def test_delayed_native_rows_and_focus_share_original_deadline(self):
         counts=iter([0,3,3]);focused=iter([False,False,True]);samples=[];result={}
-        xbmc=SimpleNamespace(getInfoLabel=lambda key:str(next(counts)),getCondVisibility=lambda key:next(focused))
+        xbmc=SimpleNamespace(getInfoLabel=lambda key:str(next(counts)) if key.endswith('NumItems') else 'Actual row',getCondVisibility=lambda key:next(focused))
         gui=SimpleNamespace(getCurrentWindowDialogId=lambda:13000,
             Window=lambda ident:SimpleNamespace(getProperty=lambda key:'1'))
         def until(fn,message,seconds):

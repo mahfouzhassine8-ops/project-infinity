@@ -10,8 +10,8 @@ from candidate_request import EXPECTED as CANDIDATE
 ROOT=Path(__file__).parent
 REQUEST='repairs/infinity-final-closure-2103407/SHUTDOWN-REQUEST.json'
 WORKFLOW='.github/workflows/infinity-shutdown-verification.yml'
-AUTHORIZATION='UserOct26 actual shutdown UI acceptance after production Home-entry correction: independently verify signed413 actual visible Power Close row via Android key input, exact backend mapping, all16 essential owners, native and Java proof, native Kodi death, final Android coordinator completion, strict absence of remaining UID processes, Recents observation independent of PID proof, unchanged remembered preference, protected data readback across3reopens. Preserve signed411 ordinary pass40317069331 and report synthetic image/unsafe outcomes separately. No runtime or chooser modification, harness kill, deadline extension or physical Fold acceptance.'
-EXPECTED=dict(schema=1,kind="independent-essential-first",request_id="integrated413-real-power-ui-three-close-readback-01",
+AUTHORIZATION='UserOct26 actual shutdown UI acceptance after measured disabled-refresh-loop correction: independently verify signed414 actual visible Power Close row via Android key input, exact backend mapping, all16 essential owners, native and Java proof, native Kodi death, final Android coordinator completion, strict absence of remaining UID processes, Recents observation independent of PID proof, unchanged remembered preference, protected data readback across3reopens. Preserve signed411 ordinary pass40317069331 and report synthetic image/unsafe outcomes separately. No runtime or chooser modification, harness kill, deadline extension or physical Fold acceptance.'
+EXPECTED=dict(schema=1,kind="independent-essential-first",request_id="integrated414-real-power-ui-three-close-readback-01",
     scenario="integrated-real-power-ui",candidate_build=CANDIDATE["candidate_build"],
     candidate_source_commit=CANDIDATE["candidate_source_commit"],
     candidate_apk_sha256=CANDIDATE["candidate_apk_sha256"],authorization=AUTHORIZATION)
