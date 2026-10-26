@@ -130,7 +130,7 @@ class CandidateVerificationTests(unittest.TestCase):
                 'candidate_APK_sha256':actual,'unexpected_differences':[],'component_sha256':{},
                 'original_certificate_sha256':'d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'}
             (nested/'APK-PRESERVATION.json').write_text(json.dumps(report))
-            expected=dict(request.EXPECTED,candidate_apk_sha256=actual)
+            expected=dict(request.EXPECTED,candidate_apk_sha256=actual,os_page_compat=False)
             def digest(path):return probe.BASELINE_SHA if Path(path)==baseline else hashlib.sha256(Path(path).read_bytes()).hexdigest()
             # Keep baseline outside the candidate artifact, as in real CI.
             moved=root.parent/(root.name+'-baseline.apk');baseline.rename(moved)

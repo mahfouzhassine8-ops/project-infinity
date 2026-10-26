@@ -1,0 +1,22 @@
+{
+  "platform_capability_ready": false,
+  "application_tests_selected": false,
+  "application_APK_installed": false,
+  "application_test_passed": false,
+  "physical_Fold": "NOT RUN",
+  "image": "system-images;android-37.0;default;arm64-v8a",
+  "host_machine": "arm64",
+  "host_os": "Darwin",
+  "acceleration": "off",
+  "software_emulation": "Explicit experimental TCG, unsupported/slow; no physical performance claim",
+  "emulator_version": "Android emulator version 37.2.12.0 (build_id 16428233) (CL:N/A)\nCopyright (C) 2006-2024 The Android Open Source Project and many others.\nThis program is a derivative of the QEMU CPU emulator (www.qemu.org).\n\n  This software is licensed under the terms of the GNU General Public\n  License version 2, as published by the Free Software Foundation, and\n  may be copied, distributed, and modified under those terms.\n\n  This program is distributed in the hope that it will be useful,\n  but WITHOUT ANY WARRANTY; without even the implied warranty of\n  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n  GNU General Public License for more details.",
+  "failure": "RuntimeError: Emulator exited before boot; inspect emulator.log",
+  "run": 40405405813,
+  "test_source": "adbb2d686469359939dbfbc4ce63de042d5a5a0a",
+  "artifact": 12690152964,
+  "artifact_sha256": "06260820979e81928ef09e2d96355b4df30938430bc7caa48c201b8a74e525eb",
+  "actual_error": "HVF error: HV_UNSUPPORTED; qemu-system-aarch64-headless failed to initialize HVF: Invalid argument, even with explicit -accel off / TCG optin",
+  "apk_sha256": "0b202e3af93ce25be8cd5ecb2853043411ba5fbbf88dac0df94ef4b2ce55605a",
+  "release_accepted": false,
+  "final_lock": false
+}

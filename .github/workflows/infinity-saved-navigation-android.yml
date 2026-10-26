@@ -153,6 +153,7 @@ jobs:
             adb shell getprop > api37-support/runtime-properties.txt
             adb shell getconf PAGE_SIZE > api37-support/runtime-pagesize.txt
             adb shell sha256sum /system/lib64/libndk_translation.so > api37-support/runtime-native-bridge-sha256.txt
+            if [ "${INFINITY_PAGE_COMPAT:-}" = true ]; then python3 repairs/infinity-final-closure-2103407/api37_page_compat_setup.py --request "$CANDIDATE_REQUEST_PATH" --out api37-support/OS-PAGE-COMPAT.json; fi
             python3 "$FEATURE_PROBE" --apk "$TEST_APK" --expected-sha "$TEST_APK_SHA" --case "$SELECTED_CASE" --authorization "$AUTHORIZED_SCOPE" --out feature-results
       - uses: actions/upload-artifact@v4
         if: always()

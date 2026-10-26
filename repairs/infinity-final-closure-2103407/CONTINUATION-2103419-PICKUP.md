@@ -200,3 +200,6 @@ requests. Current savedactual419ZIP/checksumversion4 predate16KiBfailure report;
 newstatus/installtextcorrectlystateAPKZIPalignmentisNOTnativeELFcompatibility.
 RebuildandsaveSAMEitems expectedversion4 with latestactualresults beforehandoff.
 All7streams/physicalFoldpagesizeacceptance/noCobra/noreset/no finallock remain.
+
+
+Explicit OS backcompat comparison recorded before execution (OS-PAGE-COMPAT-419-PLAN.json). Same signed419 is selected only for local Home30/rotation20 through final-participant on API37.1/google_apis_ps16k with two documented emulator OS backcompat properties and mandatory actual readback before install. This is not native16KiB compliance or a physical Fold setting change. Original strict16KiB failures and 37.0 bridge crashes remain. Native ARM Mac probe40405405813 failed HV_UNSUPPORTED before boot/app. AOSP Search40402313427 also failed before probe because no ARM bridge; all interactions0. 31 focused host routing/setup/fixture/dispatcher tests PASS; no application claim. No runtime/Cobra/manifest/APK bytes changed, no rebuild, no safety/deadline waiver. Search50 and physical performance remain open.

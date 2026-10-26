@@ -1,0 +1,27 @@
+{
+  "recorded_before_execution": true,
+  "candidate_build": 40396544415,
+  "apk_sha256": "0b202e3af93ce25be8cd5ecb2853043411ba5fbbf88dac0df94ef4b2ce55605a",
+  "exact_image": "system-images;android-37.1;google_apis_ps16k;x86_64",
+  "mode": "EXPLICIT Android OS 16KiB backcompat for original4KiB ELFs, emulatorONLY; notstrictnative16KiB qualification",
+  "primary_documentation": [
+    "https://developer.android.com/guide/practices/page-sizes",
+    "https://source.android.com/docs/core/architecture/16kb-page-size/16kb-backcompat-option"
+  ],
+  "reason": "Existingengineeringimages blocked:37.0ARMbridgeAT_RANDOM;37.1strict16KiB rejects4KiBELFs; AOSPx86noARMbridge; nativeMacARMHV_FUNSUPPORTED. Android documents16KiB OSbackcompat forunchanged4KiB libraries. Test thatdefinedmode without alteringAPK/native/manifest/Cobra or any safety/assertion/deadline.",
+  "scope": "FirstONLYlocalHome30/rotation20 via realnativeparticipantadmission; no remoteSearch. IfplatformandactualHome work, remainingSearch50 canbeselected independently. No auto retry/apprestart or physicalOSsetting changes.",
+  "selected_tests": [
+    "Three exactrequest/device/root/propertyreadback guards; physical/existingapp/wrongAPI/signercontext/noCLIinjection controls",
+    "7fixture+5stress+6dispatcher+7routing sourceguards preserve localcard/protecteddata/noSearchscope",
+    "ActualnativeHome card/art/exact60of180/identity/source/watched/noautoplay after30nativevideoHome/20OSrotations underoriginal20sec total; no fakeposter orremotequery"
+  ],
+  "compatibility_properties": {
+    "bionic.linker.16kb.app_compat.enabled": "true",
+    "pm.16kb.app_compat.disabled": "false"
+  },
+  "strict16KiB_failure_retained": true,
+  "application_or_user_device_changes": false,
+  "physical_Fold_mode": "UNVERIFIED; do notassume usermode orrequestOSchanges",
+  "release_accepted": false,
+  "final_lock": false
+}
