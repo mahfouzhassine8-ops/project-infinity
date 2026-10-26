@@ -1,0 +1,40 @@
+{
+  "workstreams": [
+    2,
+    5
+  ],
+  "recorded_before_engine_integration": true,
+  "trust_anchor": {
+    "public_key_sha256": "bc883be4515d328935b1f3e28294bfc0fe0f2614083274db63b1d24d4da172e8",
+    "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "source_apk_sha256": "3616c4e69c976bd63b36170d4dbbd9b190a7ec2eace4bc0c34c3c72f7f9e8578",
+    "private_key_imported_or_exported": false
+  },
+  "permitted_addons": [
+    "script.infinity.commandcenter",
+    "script.infinity.uirepair",
+    "script.infinity.watchedbridge",
+    "script.infinity.rails"
+  ],
+  "format": "INFINITY-MODULES/1 ordered ASCII records, original RSA/SHA256 detached signature, exact code hashes and entry owners; checkpoint protocol1 independent of package version",
+  "limits": {
+    "payload_bytes": 131072,
+    "signature_bytes": 512,
+    "source_file_bytes": 4194304,
+    "total_source_bytes": 33554432,
+    "file_count": 256,
+    "entry_count": 16
+  },
+  "native_core_boundary": "Read-only verification, no workers, writes, GUI, player or termination side effects. Production adapters must resolve native roots and supply this immutable key; no Python success receipt or user-supplied trust key accepted. Core not integrated into engine yet.",
+  "negative_checks": [
+    "Wrong signature/key",
+    "Changed or missing source",
+    "Unknown protocol/capability/addon/owner",
+    "Traversal/symlink/duplicates/oversized input",
+    "Package version changes with unchanged protocol",
+    "Cobra entry rejected"
+  ],
+  "android17": "NOT RUN",
+  "complete_arm64_compilation": "NOT RUN",
+  "engine_integration": "NOT APPLIED"
+}

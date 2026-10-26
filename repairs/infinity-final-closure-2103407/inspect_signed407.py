@@ -105,9 +105,7 @@ def inspect(root, output):
         (output/"SIGNED407-READING.txt").write_text(text)
         print(json.dumps({key: value for key, value in report.items()
                           if key not in ("component_source_hashes", "controller_pins")}, indent=2))
-        print("SIGNED407_SOURCE_READING_BEGIN")
-        print(text)
-        print("SIGNED407_SOURCE_READING_END")
+        print("Exact source inspection snapshot retained in SIGNED407-READING.txt")
     return report
 
 if __name__ == "__main__":

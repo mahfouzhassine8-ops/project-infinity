@@ -4,7 +4,7 @@ on:
     branches: [work/infinity-2103407-search-overload-single-flight-20261025, work/infinity-final-corrective-from-2103407-20261025]
     paths:
       - "repairs/infinity-2103407-search-pressure/**"
-      - "repairs/infinity-final-closure-2103407/**"
+      - "repairs/infinity-final-closure-2103407/HOST-REQUEST.json"
       - ".github/workflows/infinity-2103407-search-pressure-host-gate.yml"
 permissions:
   contents: read
@@ -110,6 +110,7 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
+          show-progress: false
       - name: Enforce final scope against protected signed407 source
         run: |
           python3 - <<'PY'
@@ -157,14 +158,28 @@ jobs:
           assert match and match.group(1).lower()=='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
           PY
           python3 repairs/infinity-final-closure-2103407/inspect_signed407.py signed407 final-work/baseline
-      - name: Reproduce exceptional Search ownership race and check only the scoped correction
+      - name: Execute only the explicitly selected final correction host checks
         env:
           FINAL_SIGNED_SEARCH: ${{ github.workspace }}/final-work/baseline/sources/script.infinity.commandcenter/infinity_search.py
           FINAL_PATCHED_SEARCH: ${{ github.workspace }}/final-work/candidate/infinity_search.py
         run: |
           set -euo pipefail
-          python3 repairs/infinity-final-closure-2103407/patch_search_lifetime.py "$FINAL_SIGNED_SEARCH" "$FINAL_PATCHED_SEARCH"
-          python3 -m unittest discover -s repairs/infinity-final-closure-2103407 -p test_search_lifetime.py -v 2>&1 | tee final-work/SEARCH-LIFETIME-RESULTS.txt
+          python3 - <<'PY' 2>&1 | tee final-work/SELECTED-HOST-RESULTS.txt
+          import json, os, subprocess, sys
+          from pathlib import Path
+          root=Path('repairs/infinity-final-closure-2103407')
+          request=json.loads((root/'HOST-REQUEST.json').read_text())
+          assert request['schema']==1 and request['scope'].strip()
+          selected=request['selected']
+          if selected=='search-lifetime':
+              subprocess.run([sys.executable,str(root/'patch_search_lifetime.py'),os.environ['FINAL_SIGNED_SEARCH'],os.environ['FINAL_PATCHED_SEARCH']],check=True)
+              pattern='test_search_lifetime.py'
+          elif selected=='module-trust':
+              pattern='test_module_manifest.py'
+          else:
+              raise RuntimeError('Unreviewed host selection')
+          subprocess.run([sys.executable,'-m','unittest','discover','-s',str(root),'-p',pattern,'-v'],check=True)
+          PY
       - uses: actions/upload-artifact@v4
         if: always()
         with:

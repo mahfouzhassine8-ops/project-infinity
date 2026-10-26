@@ -18,8 +18,14 @@
     {
       "id": 1,
       "name": "Preserve and regression-proof working global Search admission",
-      "stage": "EVIDENCE",
-      "retained_evidence": "2103407 seven host tests and provisional one-minute physical Search pass"
+      "stage": "TARGETED_HOST_TEST_PASS",
+      "retained_evidence": "2103407 seven host tests and provisional one-minute physical Search pass",
+      "new_evidence": {
+        "run": 40254448852,
+        "tests": 7,
+        "candidate_search_sha256": "f34f14e7103a8451d108061b5b7c0d3450e95ea43f95404ffc61254f4b3bdf2f",
+        "limit": "No Android17 or physical acceptance"
+      }
     },
     {
       "id": 2,
@@ -64,7 +70,18 @@
         "status": "Isolated source transform; no deployable APK yet"
       }
     ],
-    "native_edits_admitted": [],
+    "native_edits_admitted": [
+      {
+        "path": "isolated-native/InfinityModuleManifest.h",
+        "baseline_sha256": null,
+        "reason": "Required bounded authenticated module manifest interface; isolated portable source until native/ARM64 integration and negative checks pass"
+      },
+      {
+        "path": "isolated-native/InfinityModuleManifest.cpp",
+        "baseline_sha256": null,
+        "reason": "Verify original signer RSA/SHA256 manifest and exact first-party code paths; no runtime trust relaxation or production integration yet"
+      }
+    ],
     "apk_member_edits_admitted": [],
     "initial_allowed_repository_paths": [
       "repairs/infinity-final-closure-2103407/",
@@ -81,13 +98,7 @@
   },
   "selected_verification": {
     "host": [
-      "old-source exceptional-consumer reproduction",
-      "new-source worker lifetime and independent invoker rejection",
-      "independent-invoker busy burst with bounded worker/descriptor counts",
-      "RPC exception cleanup and admission reuse",
-      "thread-start failure cleanup",
-      "per-key cleanup failure isolation",
-      "exact only-one-function source delta"
+      "test_module_manifest.py: actual compiled C++ signature/source verification; changed signature/code, wrong key/protocol/owner/path, symlink and size rejection; independent package/protocol versions"
     ],
     "android17": "NOT RUN",
     "physical_fold": "NOT RUN",

@@ -1,0 +1,35 @@
+{
+  "baseline407_source_verified_run": 40254036285,
+  "search_lifetime": {
+    "negative_reproduction": "Signed407 releases capacity on consumer exception while RPC alive; second independent invoker admitted",
+    "implemented": "Capacity follows actual RPC worker; no early release; retained token ownership until worker retirement",
+    "tests": 7,
+    "host_run": 40254448852,
+    "source_commit": "52475659e9b0eacd8b7d0efe5bf57b7478b4f54e",
+    "candidate_source_sha256": "f34f14e7103a8451d108061b5b7c0d3450e95ea43f95404ffc61254f4b3bdf2f",
+    "android17": "NOT RUN",
+    "fold": "NOT RUN"
+  },
+  "manifest_core": {
+    "local_compiler": "g++ -std=c++14 -Wall -Wextra -Werror; actual OpenSSL EVP RSA/SHA256",
+    "tests": 8,
+    "status": "LOCAL TARGETED PASS",
+    "engine_integration": "NOT APPLIED",
+    "arm64": "NOT RUN",
+    "android17": "NOT RUN"
+  },
+  "confirmed_compatibility_skews": {
+    "addon_version": "0.3.5.39",
+    "checkpoint_runtime_declared": "0.3.5.38",
+    "ELF_readonly_version_literals": [
+      "0.3.5.35",
+      "0.3.5.36"
+    ],
+    "ELF_no_current_39_literal": true,
+    "native_title_owner_symbol": {
+      "address": "0x1aa6620",
+      "bytes": 696
+    }
+  },
+  "release_ready": false
+}
