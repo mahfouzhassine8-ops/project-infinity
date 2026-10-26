@@ -17,7 +17,7 @@ class IndependentShutdownTests(unittest.TestCase):
     def test_exact_independent_scope_and_branch_required(self):
         head='a'*40;event=dict(ref=request.BRANCH,after=head,repository={'full_name':'mahfouzhassine8-ops/project-infinity'})
         result=request.validate(request.EXPECTED,event,head,[request.REQUEST])
-        self.assertEqual(result['SELECTED_CASE'],'integrated-3-close-reopen')
+        self.assertEqual(result['SELECTED_CASE'],request.EXPECTED['scenario'])
         self.assertEqual(result['CANDIDATE_REQUEST_PATH'],'repairs/infinity-final-closure-2103407/SHUTDOWN-CANDIDATE.json')
         for field,value in [('scenario','safe'),('candidate_apk_sha256','0'*64),('authorization',''),('request_id','unreviewed')]:
             with self.assertRaises(ValueError):request.validate(dict(request.EXPECTED,**{field:value}),event,head,[request.REQUEST])

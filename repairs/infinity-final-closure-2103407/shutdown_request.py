@@ -10,11 +10,12 @@ from candidate_request import EXPECTED as CANDIDATE
 ROOT=Path(__file__).parent
 REQUEST='repairs/infinity-final-closure-2103407/SHUTDOWN-REQUEST.json'
 WORKFLOW='.github/workflows/infinity-shutdown-verification.yml'
-AUTHORIZATION=('UserOct26 explicitlyauthorizes independentEssentialFirst3Close/reopen cycles onactualsigned411, '
-    'exactphysicalCompat0.8.2 fixture andactualVersionChecksourceSHAfromsigned411, native16essentialowners andtwoJava seals, finalcoordinatorauthorization, '
-    'externalwholeUIDprocessdeath andprotecteddatareadback. No productionbypass, deadlineextension orphysicalacceptance.')
-EXPECTED=dict(schema=1,kind='independent-essential-first',request_id='integrated411-close-reopen-01',
-    scenario='integrated-3-close-reopen',candidate_build=CANDIDATE['candidate_build'],
+AUTHORIZATION=('UserOct26 originalPriority1 andsafety scope: independentlyverify16actualnativeGUIimage://directoryjobs, '
+    'oneactualsigned411EssentialFirstClose/reopen withall16owners/twoJava seals/finalflag/wholeUIDdeath/DBreadback, '
+    'thenonecontrolledownprofileunknownchildwrite mustvetoClose andkeepenginealive. Preserve40317069331threepositivepasses. '
+    'No productionbypass, deadlineextension, harnesskill orphysicalacceptance.')
+EXPECTED=dict(schema=1,kind='independent-essential-first',request_id='integrated411-native16-unsafe-refusal-01',
+    scenario='integrated-native-image-and-unsafe',candidate_build=CANDIDATE['candidate_build'],
     candidate_source_commit=CANDIDATE['candidate_source_commit'],
     candidate_apk_sha256=CANDIDATE['candidate_apk_sha256'],authorization=AUTHORIZATION)
 

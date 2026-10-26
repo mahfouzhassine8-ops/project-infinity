@@ -92,12 +92,29 @@ def main():
     try:
         # The known-passing participant setup retains all fresh API37, original
         # signer/source, install-over, fixture identity and no-reset guards.
+        controlled=EXPECTED['scenario']=='integrated-native-image-and-unsafe'
         setup=args.out/'participant-setup';previous=sys.argv
         try:
             sys.argv=[str(candidate.__file__),'--apk',str(args.apk),'--expected-sha',args.expected_sha,
                 '--case','final-participant','--authorization',AUTHORIZATION,'--out',str(setup)]
             import shutdown_fixture
-            candidate.main(selected_case='final-participant',independent_setup=shutdown_fixture)
+            independent=shutdown_fixture
+            if controlled:
+                from types import SimpleNamespace
+                import native_image_control,unsafe_control
+                def stage(folder,stage_args,stage_report,device,aid):
+                    shutdown_fixture.stage(folder,stage_args,stage_report,device,aid)
+                    native_image_control.stage(folder,stage_args,stage_report,device,aid)
+                    unsafe_control.stage(folder,stage_args,stage_report,device,aid)
+                def enable(device,device_out):
+                    shutdown_fixture.enable(device,device_out)
+                    for addon in (native_image_control.ADDON,unsafe_control.ADDON):
+                        details=device.rpc('Addons.GetAddonDetails',{'addonid':addon,'properties':['version','enabled']})['addon']
+                        require(details.get('version')=='1.0.0','Unexpected disposable control identity')
+                        if not details.get('enabled'):
+                            require(device.rpc('Addons.SetAddonEnabled',{'addonid':addon,'enabled':True})=='OK','Cannot enable disposable control')
+                independent=SimpleNamespace(stage=stage,enable=enable)
+            candidate.main(selected_case='final-participant',independent_setup=independent)
         finally:sys.argv=previous
         startup=json.loads((setup/'FEATURE-RESULT.json').read_text())
         require(startup.get('passed') is True,'Actual native participant setup failed')
@@ -112,11 +129,14 @@ def main():
             if compat.get('pid')==owner['pid'] and compat.get('owner')==owner['owner'] and compat.get('status')=='ACTIVE':break
             time.sleep(.25)
         else:raise AssertionError('Exact physical Compat service did not become active; no Close attempted')
+        if controlled:
+            report['native_image_control']=native_image_control.run(transport,owner,args.out);save()
         require(transport.rpc('Favourites.AddFavourite',dict(title=FAVOURITE,type='window',window='home'))=='OK','Could not add normal native test favourite')
         before=transport.read_json(transport.PROFILE+'/addon_data/script.infinity.commandcenter/continue-watching.json')
         require(isinstance(before.get('items'),dict) and before['items'],'Actual tracking fixture missing; no Close attempted')
         report['before_protected_records']=before
-        for cycle in range(3):
+        cycles=range(1) if controlled else range(3)
+        for cycle in cycles:
             entry=dict(cycle=cycle,owner=owner,passed=False);report['cycles'].append(entry)
             folder=args.out/('cycle-'+str(cycle));folder.mkdir()
             active=transport.read_json(control+'/active.json');engine=transport.read_json(control+'/engine.json')
@@ -165,6 +185,8 @@ def main():
             favourites=transport.rpc('Favourites.GetFavourites',{'properties':['window','windowparameter']})['favourites']
             require(any(row.get('title')==FAVOURITE for row in favourites),'Native favourite lost after reopening')
             entry.update(passed=True,reopened_owner=next_owner);owner=next_owner;save()
+        if controlled:
+            report['unsafe_writer_control']=unsafe_control.run(transport,owner,args.out);save()
         report['passed']=True
     except BaseException as error:
         report['failure']=type(error).__name__+': '+str(error);report['traceback']=__import__('traceback').format_exc()
