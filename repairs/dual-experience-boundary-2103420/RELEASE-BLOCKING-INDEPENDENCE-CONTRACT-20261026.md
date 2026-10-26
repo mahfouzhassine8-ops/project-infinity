@@ -29,6 +29,28 @@ DEX packaging: `classes.dex` includes both many `Cobra*`/Cobra-support classes a
 
 **Current finding:** Existing Infinity native process is partly separate; **Cobra activity still shares the main app process with chooser and Infinity CloseGuard**. There is no established fully separated ownership + cross-update anti-rollback release machinery. Do not state that users already have zero functional sharing, nor that moving Cobra to `:cobra` is automatically safe.
 
+## Concrete implementation option: separate Gradle/library modules and assets inside ONE APK
+
+The user provided Gemini's description: separate Infinity and Cobra into independent Gradle modules or assets, leaving only the root launcher shell as their functional interface. **This is a valid build/source modularization approach for one APK**, and should be preferred when it can be integrated safely with the existing Kodi/native packaging pipeline. Android officially supports a single APK with a base app module and dependent library modules.
+
+Suggested logical boundaries (names illustrative; do not create a second `com.android.application` package):
+- `app-shell`: original single `com.projectinfinity.kodi` manifest/package, original permanent signer, chooser and existing launch preference; narrow, reviewed Android platform/lifecycle/permission integration only.
+- `infinity-feature`: locked 2103420 Infinity native/Kodi, player/PiP, Home, Search, Resume Hub, saved-state, timers and Essential-First own data/logic.
+- `cobra-feature`: Cobra player/PiP, Sports, Multi-View, Pro, Cobra settings/data/alarms and other currently supported Cobra behavior.
+- `android-contract` **only if unavoidably needed**: stable, minimal interfaces to Android OS facilities (e.g., media session/PiP callbacks, permissions, activity handoff); must not own cross-experience mutable feature state or secretly depend on Infinity's or Cobra's player. Keep a documented contract version and reject unsafe changes.
+
+The feature modules may expose a small entry interface for the chooser but must NOT depend on each other's implementation. Use distinct settings namespaces/data ownership and version/fingerprint manifests. Merely moving Java classes to two Gradle projects or asset folders does NOT:
+- move Cobra out of the default process or isolate it from `InfinityCloseGuardService` (manifest/process and actual cross-owner service behavior must be addressed separately, safely);
+- give different Linux UIDs/sandbox permissions to two modules inside the same installed package;
+- stop a later full APK from replacing a newer feature with an older bundled feature;
+- guarantee independence if both modules still call a shared mutable player/observer, file cache, database or native engine.
+
+**Existing build constraint:** this is a custom Kodi/native ARM64 app with authenticated code, bespoke APK reconstruction, DEX members, the original signing identity and the locked 2103420 runtime. Do not assume the existing build is a conventional Gradle Android app or rewrite the production project around Gradle merely because the pattern is standard. First map the true source/compiled artifacts. Preserve byte-identical Infinity baseline until a demonstrably equivalent module assembly exists. An asset/package-level module partition with cryptographic manifests and one controlled assembler is valid where native/DEX packaging makes Gradle refactoring unsafe.
+
+**Non-negotiable release rule:** one integrated release builder selects the latest approved `Infinity version + Cobra version`, creates a single package with increasing Android versionCode and exactly one original signer, and rejects either module's regression (including shared manifest/DEX member changes). Separately compiled feature versions do **not** mean the user may safely sequentially install independently assembled APKs from different outdated base commits.
+
+**Before proclaiming success**, actually demonstrate on a produced candidate: `Infinity(n+1)+Cobra(m)` leaves Cobra exactly unchanged; `Infinity(n+1)+Cobra(m+1)` retains both; a deliberately stale `Infinity(n)+Cobra(m+1)` candidate is rejected **before signing**. Show per-owner exact code+data fingerprints and no cross-owner mutation; keep all existing user functionality, chooser preferences, and shutdown.
+
 ## Required implementation stages — execute BEFORE Cobra fixes
 
 ### 1. Actual ownership + call/data-flow map (freeze 2103420)
