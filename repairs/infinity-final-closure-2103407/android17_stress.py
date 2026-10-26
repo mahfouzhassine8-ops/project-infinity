@@ -109,7 +109,8 @@ def _run(device,setup,expected,out):
         def keyboard():
             values=nodes()
             edits=[n for n in values if n.get('class')=='android.widget.EditText' and n.get('enabled')=='true']
-            return (values,edits[0]) if len(edits)==1 else None
+            import android_input_readiness
+            return (values,edits[0]) if len(edits)==1 and android_input_readiness.ready(device,out) else None
         values,edit=device.until(keyboard,45) # Retain the actual original keyboard deadline.
         wanted='Search All' if provider=='all' else 'Umbrella'
         choices=[n for n in values if n.get('clickable')=='true' and

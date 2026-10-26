@@ -20,6 +20,10 @@ from candidate_request import EXPECTED
 
 HOOK_BEFORE='            selected.stage(stage,args,report,device,staging.FUTURE)'
 HOOK_AFTER=HOOK_BEFORE+'\n            _candidate_fixture(stage,args,report,device,staging.FUTURE)'
+DRIVER_HOOK_BEFORE="            report['actual_android_search_input']=driver.submit(device,args.out,owner,args.case,staging.FUTURE)"
+DRIVER_HOOK_AFTER="            _candidate_input_driver(driver)\n"+DRIVER_HOOK_BEFORE
+ENV_BEFORE="        ui.require(mode in CASES,'Explicit final-eight selection required')"
+ENV_AFTER="        from shutdown_environment import snapshot\n        snapshot(path/('environment-'+cycle+'.json'))\n"+ENV_BEFORE
 PROFILE_BEFORE='''        sys.path.insert(0,str(uiroot));from controller_access import load
         plugin=load();hub=plugin.hub;profile=plugin.PROFILE;home=xbmcgui.Window(10000)'''
 PROFILE_AFTER='''        if mode=='final-participant' or mode in SEARCH_CASES:
@@ -58,6 +62,8 @@ def fixture(raw):
     if observed.count(RECEIPT_BEFORE)!=1:raise ValueError('Retained receipt read changed')
     if observed.count(HISTORY_BEFORE)!=1:raise ValueError('Retained history observation changed')
     updated=observed.replace(PROFILE_BEFORE,PROFILE_AFTER,1).replace(RECEIPT_BEFORE,RECEIPT_AFTER,1).replace(HISTORY_BEFORE,HISTORY_AFTER,1)
+    if updated.count(ENV_BEFORE)!=1:raise ValueError('Original selected-test admission differs')
+    updated=updated.replace(ENV_BEFORE,ENV_AFTER,1)
     restored=restore_candidate_fixture(updated)
     if restore_fixture(restored).encode()!=raw:
         raise ValueError('An original feature assertion changed')
@@ -66,7 +72,7 @@ def fixture(raw):
 
 
 def restore_candidate_fixture(text):
-    return text.replace(PROFILE_AFTER,PROFILE_BEFORE,1).replace(RECEIPT_AFTER,RECEIPT_BEFORE,1).replace(HISTORY_AFTER,HISTORY_BEFORE,1)
+    return text.replace(PROFILE_AFTER,PROFILE_BEFORE,1).replace(RECEIPT_AFTER,RECEIPT_BEFORE,1).replace(HISTORY_AFTER,HISTORY_BEFORE,1).replace(ENV_AFTER,ENV_BEFORE,1)
 
 
 def original_sources(apk,out):
@@ -125,8 +131,9 @@ def main(selected_case=None,independent_setup=None):
     original=OLD/'android_feature_probe.py';raw=original.read_bytes()
     if hashlib.sha256(raw).hexdigest()!=PROBE_SHA or raw.decode().count(HOOK_BEFORE)!=1:
         raise ValueError('Retained feature-only transport changed')
-    text=raw.decode().replace(HOOK_BEFORE,HOOK_AFTER,1)
-    if text.replace(HOOK_AFTER,HOOK_BEFORE,1)!=raw.decode():raise ValueError('Original transport assertions changed')
+    if raw.decode().count(DRIVER_HOOK_BEFORE)!=1:raise ValueError('Original input dispatch differs')
+    text=raw.decode().replace(HOOK_BEFORE,HOOK_AFTER,1).replace(DRIVER_HOOK_BEFORE,DRIVER_HOOK_AFTER,1)
+    if text.replace(HOOK_AFTER,HOOK_BEFORE,1).replace(DRIVER_HOOK_AFTER,DRIVER_HOOK_BEFORE,1)!=raw.decode():raise ValueError('Original transport assertions changed')
     baseline=Path(os.environ['TEST_BASELINE_APK']).resolve()
     sys.path.insert(0,str(OLD))
     probe=types.ModuleType('exact_integrated_feature_probe');probe.__file__=str(original)
@@ -141,6 +148,7 @@ def main(selected_case=None,independent_setup=None):
             path=stage/aid/'android_selected.py';before=path.read_bytes()
             if hashlib.sha256(before).hexdigest()!=FIXTURE_SHA:raise ValueError('Original selected feature differs')
             path.write_bytes(fixture(before))
+            shutil.copyfile(Path(__file__).parent/'shutdown_environment.py',stage/aid/'shutdown_environment.py')
             # Seed the actual previous code, not new code installed by a test.
             # Java409 must migrate all four original IDs before Python starts.
             for addon in IDS:
@@ -154,6 +162,10 @@ def main(selected_case=None,independent_setup=None):
                 APK_changed=False,assertions_changed=False,providers_changed=False,shutdown='NOT RUN')
             if independent_setup is not None:independent_setup.stage(stage,args,report,device,aid)
         probe._candidate_fixture=adapt
+        def input_driver(driver):
+            import android_input_readiness
+            android_input_readiness.instrument(driver,OLD/'universal/android_search_input.py',DRIVER_SHA)
+        probe._candidate_input_driver=input_driver
         def adb(*args,**kwargs):
             if args and args[0]=='install':
                 # The original probe already refuses physical/non37/existing

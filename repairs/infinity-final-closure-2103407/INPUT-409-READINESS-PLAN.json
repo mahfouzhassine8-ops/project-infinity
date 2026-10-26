@@ -1,0 +1,33 @@
+{
+  "authorization": "User finalcontinuation and repeated GitHubfailure steering; narrow test readiness correction plus read-only shutdown environment evidence. ProductionAPK, input assertions and deadlines unchanged.",
+  "actual_failure": {
+    "run": 40299492719,
+    "artifact": 12641150394,
+    "sha256": "fa240c621bb2458b9b66e4140b64140d51795647bb179378544a3c7eb18c13e3",
+    "observed_text": "TThe Matrix",
+    "submitted": false,
+    "repetitions_completed": {
+      "search": 0,
+      "playback_home": 0,
+      "rotation": 0
+    },
+    "log_evidence": [
+      "09:42:49.734 InputMethodManager timeout waiting2500ms forIME",
+      "09:42:49.752 InputDispatcher actualT DOWN spent2781ms processing",
+      "09:42:51.689 Gboard onKeyboardViewShown BODY occursafterfirstkey",
+      "09:42:53.818 IInputManager transaction took7010ms"
+    ],
+    "inference": "Host began key injection while cold IME was not fully ready. Delayedkeyrepeat is plausible, not yet a proven application defect."
+  },
+  "selected_before_edits": [
+    "test_input_readiness.py: strictIMEshown/body-view proof rejects cold/stale/mismatched state; exact frozen driver inverse preserves Enter/query/text assertion/45second deadline; read-only environment report has no child execution or provider/service mutation",
+    "test_candidate_verification.py selected sourcebinding andoriginalfixtureassertion inverse afteradapterchange",
+    "One actual API37 originalSearchAll Enter/results/history/Home with extra actualIMEreadiness within existing45seconds; no50/30/20 until this focused gatepasses. Capture read-only PATH directory/file metadata and defaultVersionCheck source hashes for genuine native/Python missing-command verification. NoClose."
+  ],
+  "protections": [
+    "No retry or repair of wrong enteredtext; exactoriginalpredicate stillfails ifwrong. No injected searchenvelope/result/RPC workaround.",
+    "No productionkeyboard/IME/Cobra/sharedsource change; nofixedsleep ordeadlineextension.",
+    "VersionCheck remainsunchanged; noexecution of suspectcommand fromdiagnostic. Nochild/write waiver."
+  ],
+  "host_checks": "5PASS:3IME/env/source-inverse plus2retainedcandidatebinding/assertioninverse. No runtimepassclaimed."
+}

@@ -50,7 +50,16 @@
         "playback_home": 30,
         "rotation": 20
       },
-      "status": "IN PROGRESS; no repetition PASS claim yet"
+      "status": "FAIL beforefirstsubmission: ActualAndroidsearchtextwasnotconfirmed",
+      "artifact": 12641150394,
+      "artifact_sha256": "fa240c621bb2458b9b66e4140b64140d51795647bb179378544a3c7eb18c13e3",
+      "observed_text": "TThe Matrix",
+      "completed": {
+        "search": 0,
+        "playback_home": 0,
+        "rotation": 0
+      },
+      "next": "One focused unchanged45second actualSearchgate with actualIMEbodyready proof, noautocorrection; readonlyVersionCheckPATHmetadata. No productionAPKchange."
     },
     "physical_Fold": "NOT RUN on409"
   },
@@ -59,7 +68,7 @@
       "id": 1,
       "name": "Search admission and reliability",
       "implementation": "Original single-flight retained; exact-source verification allocation fast path; compatible provider families; metadata transport.",
-      "tests": "Source focused pass plus one actualAPI37 SearchAll pass.50-cycle run pending."
+      "tests": "Hostfocusedpass andoneactualSearchAllpass retained; repetitionrunfailedbeforefirstsubmission on textmismatch.0/50 submissions,0/30playback,0/20rotation."
     },
     {
       "id": 2,
@@ -95,7 +104,7 @@
       "id": 7,
       "name": "Integrated Android17 stability and physical acceptance",
       "implementation": "Original signer/package,9411source integration,7541unchangedAPK members, zero unexplained diffs.",
-      "tests": "Signedbuild andfirstrealSearch pass; stresspending;shutdownfailed;physicalFoldacceptance andfinal lock NOT COMPLETE."
+      "tests": "Build andearlierSearchpassed; latestrepetitionrequestfailedbeforefirstsubmit; independentClosefailed0/3;physicalacceptance incomplete."
     }
   ],
   "delivery_archive": {
