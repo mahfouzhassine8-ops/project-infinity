@@ -59,6 +59,10 @@ def seed(device, args, report, expected):
     device.shell('test','!','-e',clip_target);device.shell('test','!','-L',clip_target)
     raw = (OLD / 'tracking/final-eight/android_selected.py').read_bytes()
     state = retained_state(raw)
+    poster=None
+    if expected.get('measure_cached_poster') is True:
+        import cached_poster_observer
+        poster=cached_poster_observer.stage(device,args,state)
     local = args.out / 'prelaunch-stress-tracking-fixture.json'
     with local.open('x', encoding='utf-8') as stream:
         stream.write(json.dumps(state, sort_keys=True) + '\n')
@@ -81,5 +85,6 @@ def seed(device, args, report, expected):
                     existing_profile_replaced=False, readback_matches=True)
     evidence.update(declared_resume_clip_exists=True,declared_resume_clip_sha256=clip_sha,
                     generated_clip_seconds=180,actual_movie_content=False)
+    if poster:evidence['actual_cached_poster']=poster
     (args.out / 'STRESS-FIXTURE-SEED.json').write_text(json.dumps(evidence, indent=2) + '\n')
     report['prelaunch_stress_fixture'] = evidence

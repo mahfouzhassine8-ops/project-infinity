@@ -5,7 +5,7 @@ import android_stress_script as dispatch
 from continue_card_observer import verify_card
 
 
-def observe(device,records,media):
+def observe(device,records,media,out=None):
     if media not in ('movie','tv'):raise ValueError('Unknown exact saved-card category')
     key=('b' if media=='movie' else 'd')*64
     expected=records.get('items',{}).get(key)
@@ -37,8 +37,14 @@ def observe(device,records,media):
                                         'media':'video','properties':['resume']})['files']
     if len(rows)!=1:raise AssertionError('Native directory differs from exact single visible saved card')
     verify_card(expected,labels,prefix,bool(device.rpc('Player.GetActivePlayers')),rows[0].get('resume'))
+    poster=None
+    if expected.get('poster')=='special://profile/infinity-qa-poster.png':
+        if out is None:raise ValueError('Actual poster output required')
+        import cached_poster_observer
+        poster=cached_poster_observer.observe(device,out,began,began+20)
     return dict(media=media,key=key,exact_usable_card=True,observed=labels,
                 native_directory_resume=rows[0].get('resume'),tab_select_to_card_visible_ms=visible_ms,
                 tab_select_to_usable_card_ms=(time.monotonic()-began)*1000,
                 verification_scope='Visible native resume percent plus exact directory native resume; reserved GUI properties are not readouts',
-                generated_metadata_and_declared_clip=True,poster_paint_verified=False)
+                generated_metadata_and_declared_clip=True,poster_paint_verified=poster is not None,
+                actual_cached_poster=poster)

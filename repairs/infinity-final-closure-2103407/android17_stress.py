@@ -123,6 +123,13 @@ def _run(device,setup,expected,out):
     ticks=device.shell('getconf','CLK_TCK',check=False).strip()
     report['clock_ticks']=int(ticks) if ticks.isdigit() and int(ticks)>0 else None
     memory('before');home()
+    if expected.get('expected_skin_version'):
+        actual_skin=device.rpc('Addons.GetAddonDetails',{'addonid':'skin.infinity.diggz','properties':['version','enabled']})['addon']
+        require(actual_skin.get('version')==expected['expected_skin_version'],'Actual active skin component version differs')
+        report['actual_skin']=actual_skin
+        report['helper_lifecycle_before']=device.rpc('XBMC.GetInfoLabels',{'labels':[
+            'Window(Home).Property(Infinity.Continuity.Observer)',
+            'Window(Home).Property(Infinity.NativeAmbient.WriterLifecycle)']})
     android_stress_script.initialize(device,out,owner)
     state_path=device.PROFILE+'/addon_data/script.infinity.commandcenter/continue-watching.json'
     protected=device.read_json(state_path)
@@ -130,6 +137,11 @@ def _run(device,setup,expected,out):
             'Declared saved-card clip must actually exist before a usability measurement')
     protected_keys=('items','watched','watchlist','collection','lists','sources','navigation_recovery')
     require(protected.get('items'),'Actual tracking fixture unavailable')
+    if expected.get('measure_cached_poster') is True:
+        import stress_resume_card
+        report['initial_cached_Home_card']=stress_resume_card.observe(device,protected,'movie',out/'initial-cached-poster')
+        report['poster_first_paint']='Actual cached QA bitmap observed on native Android surface; not cold app launch or remote artwork'
+        save();home()
     for index in range(COUNTS['search']):
         query='Just Friends' if index%2==0 else 'The Matrix'
         provider='all' if index%2==0 else 'plugin.video.umbrella'
@@ -220,10 +232,10 @@ def _run(device,setup,expected,out):
         rpc_ready_ms=(time.monotonic()-started)*1000
         require(not device.rpc('Player.GetActivePlayers'),'Playback did not stop')
         import stress_resume_card
-        card=stress_resume_card.observe(device,protected,'movie' if index%2==0 else 'tv')
+        card=stress_resume_card.observe(device,protected,'movie' if index%2==0 else 'tv',out/('poster-playback-'+str(index)))
         report['playback_home'].append(dict(cycle=index,home_window_rpc_ready_ms=rpc_ready_ms,
             stop_to_correct_usable_card_ms=(time.monotonic()-started)*1000,
-            actual_resume_card=card,playback=evidence,poster_paint_verified=False))
+            actual_resume_card=card,playback=evidence,poster_paint_verified=card['poster_paint_verified']))
         save()
         if (index+1)%10==0:memory('playback-'+str(index+1))
 
@@ -242,7 +254,7 @@ def _run(device,setup,expected,out):
             (out/('rotation-'+str(index)+'-input.txt')).write_text(evidence)
             home()
             import stress_resume_card
-            card=stress_resume_card.observe(device,protected,'movie' if index%2==0 else 'tv')
+            card=stress_resume_card.observe(device,protected,'movie' if index%2==0 else 'tv',out/('poster-rotation-'+str(index)))
             report['rotation'].append(dict(cycle=index,requested=value,actual=value,
                     elapsed_ms=(time.monotonic()-began)*1000,physical_fold=False,actual_resume_card=card));save()
     finally:
