@@ -10,9 +10,9 @@ from candidate_request import EXPECTED as CANDIDATE
 ROOT=Path(__file__).parent
 REQUEST='repairs/infinity-final-closure-2103407/SHUTDOWN-REQUEST.json'
 WORKFLOW='.github/workflows/infinity-shutdown-verification.yml'
-AUTHORIZATION='UserOct26 latest signed418 actual nativeTV durability: THREE actual visible Power Close/reopen cycles, unfinished exact nativeTV position/source readback first, completion/watched/removal/verified S2E1 selection/readback second, completed warm reopen third. Preserve411ordinary3PASS40317069331/417ordinaryPower3PASS40373328781, separate417imageUnsafePASS40376891135 and failedTV417runs40378085987/40380264449/40382246813 before anyClose. NativeStop transport once; require distinct persisted current playback occurrence and advancing clock WITHIN same20sec start before synthetic seek-to-EOF. No action retry/reset/deadline waiver/runtimeAPK/native/Cobra/chooser change in this lane; native16/twoJava/engine+coordinator/zeroUID/SQLite/protecteddata/preference proofs allrequired. No autoplay on reopens, ownphase diagnostics only, physicalFold finalgate and no lock.'
-EXPECTED=dict(schema=1,kind="independent-essential-first",request_id="integrated418-real-TV-three-Power-cycles-progress-completion-01",
-    scenario="integrated-resume-power-ui",candidate_build=CANDIDATE["candidate_build"],
+AUTHORIZATION='UserOct26 current signed418 independent native writer/persistence controls:16real native multi-image controls with unique jobs/tokens/generations, exact factory terminals and retirement receipts including separately identified unchanged-unstarted jobs. One actual protected positive Close/reopen with all16/native/twoJava/engine+coordinator/zeroUID/SQLite/data/preference proofs, then actual opaque child marker writer must veto Close with no save/auth/death claim and unchanged protected state. Preserve411ordinary3PASS40317069331/417Power3PASS40373328781/417writerPASS40376891135; current418realTV3run40386278200 and Search50/Home30/rotation20run40386278214 stay independent and untouched. No runtimeAPK/native/chooser/Cobra changes, synthetic success, count waiver, reset or physical acceptance.'
+EXPECTED=dict(schema=1,kind="independent-essential-first",request_id="integrated418-native-image-and-unsafe-separate-01",
+    scenario="integrated-native-image-and-unsafe",candidate_build=CANDIDATE["candidate_build"],
     candidate_source_commit=CANDIDATE["candidate_source_commit"],
     candidate_apk_sha256=CANDIDATE["candidate_apk_sha256"],authorization=AUTHORIZATION)
 

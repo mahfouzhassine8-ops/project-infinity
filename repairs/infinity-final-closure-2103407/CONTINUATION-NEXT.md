@@ -95,3 +95,8 @@ android17_shutdown_probe reusesactualpassedparticipantsetupusingexistingfeaturet
 ## Latest signed417 pickup — 2026-10-26
 
 Read CONTINUATION-2103417-PICKUP.md first for the exact current signed APK, independent real passes, retained failures, running Search/endurance40379813877 and TV-durability40380264449. Continue those existing runs; do not rebuild or repeat completed tests without an actual correction-specific cause. All seven original streams and physical Fold final gate remain mandatory.
+
+
+## Latest signed418 pickup — 2026-10-26
+
+Read CONTINUATION-2103418-PICKUP.md first. Actual signed418 build40383785065 is available; continue existing feature40386278214 and independent realTV3 Power40386278200. The next independent418native image/unsafe request remains separate. No repeat/rebuild/restart without an actual correction-specific reason; all seven streams and physical Fold final acceptance remain mandatory.
