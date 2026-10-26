@@ -13,7 +13,7 @@ AUTHORIZATION = ('Authorized final Infinity scope: actual Android17 baseline407 
                  'existing feature-only runner. No shutdown, new APK, user installation or physical acceptance.')
 EXPECTED = dict(schema=1, selected_case='final-search-all-enter', candidate_build=40230842944,
                 baseline_commit=BASELINE, baseline_apk_sha256=APK,
-                authorization=AUTHORIZATION, request_id='final407-search-reference-02-observation')
+                authorization=AUTHORIZATION, request_id='final407-search-reference-03-owned-fixture')
 
 
 def validate(request, event, head, changed):

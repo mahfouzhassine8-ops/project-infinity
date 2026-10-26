@@ -52,6 +52,32 @@ def failed_observation(log,pid):
     return None
 
 
+def owned_fixture_profile(device,fixture_id):
+    expected='/sdcard/Android/data/com.projectinfinity.kodi/files/.kodi/userdata'
+    if (device.PROFILE!=expected or fixture_id!='service.future.persistence.7fa29' or
+        device.PACKAGE!='com.projectinfinity.kodi' or
+        device.shell('getprop','ro.kernel.qemu').strip()!='1' or
+        device.shell('getprop','ro.build.version.sdk').strip()!='37'):
+        raise ValueError('Only the original disposable API37 fixture may be prepared')
+    uid=device.shell('stat','-c','%u',device.PRIVATE).strip()
+    if not uid.isdigit() or int(uid)<10000:raise ValueError('Verified installed application UID required')
+    relative='/Android/data/'+device.PACKAGE+'/files/.kodi/userdata/addon_data/'+fixture_id
+    backing='/data/media/0'+relative
+    profile=expected+'/addon_data/'+fixture_id
+    device.shell('mkdir','-p',profile)
+    before=device.shell('stat','-c','%u',profile).strip()
+    if before not in ('0',uid):raise ValueError('Unexpected fixture owner; no ownership change permitted')
+    if before=='0':
+        device.shell('chown','-R',uid+':'+uid,backing)
+        device.shell('restorecon','-RF',backing)
+    after=device.shell('stat','-c','%u',profile).strip()
+    if after!=uid or device.shell('getenforce').strip()!='Enforcing':
+        raise ValueError('Fixture ownership or original SELinux boundary could not be established')
+    return dict(fixture_profile=profile,backing_fixture_profile=backing,installed_uid=uid,
+                before_uid=before,after_uid=after,permissions_relaxed=False,
+                provider_or_other_profile_modified=False)
+
+
 def main():
     path=OLD/'android_feature_probe.py'
     if hashlib.sha256(path.read_bytes()).hexdigest()!=PROBE_SHA:raise ValueError('Existing feature-only runner changed')
@@ -66,20 +92,23 @@ def main():
                 fixture=candidate/'android_selected.py'
                 if fixture.exists():
                     raw=fixture.read_bytes();result=instrument_fixture(raw);fixture.write_bytes(result)
+                    ownership=owned_fixture_profile(probe.device,probe.staging.FUTURE)
                     (candidate.parent.parent/'FIXTURE-OBSERVATION-SCOPE.json').write_text(json.dumps({
                         'original_fixture_sha256':hashlib.sha256(raw).hexdigest(),
                         'observed_fixture_sha256':hashlib.sha256(result).hexdigest(),
                         'test_assertions_changed':False,'APK_changed':False,'provider_code_changed':False,
-                        'shutdown':'NOT RUN','false_or_missing_results_cannot_pass':True},indent=2)+'\n')
+                        'shutdown':'NOT RUN','false_or_missing_results_cannot_pass':True,
+                        'fixture_ownership':ownership},indent=2)+'\n')
         return original_adb(*args,**kwargs)
     probe.device.adb=push
     original_admit=probe.staging.admit_runtime
     def admit(device,owner,out):
+        ownership=owned_fixture_profile(device,probe.staging.FUTURE)
         original_admit(device,owner,out)
         profile=device.PROFILE+'/addon_data/'+probe.staging.FUTURE
         report={'pid':owner['pid'],'private_uid':device.shell('stat','-c','%u',device.PRIVATE,check=False).strip(),
                 'process_uid_status':device.shell('cat','/proc/'+str(owner['pid'])+'/status',check=False),
-                'fixture_permissions':{}}
+                'fixture_permissions':{},'owned_fixture_preparation':ownership}
         for path in (device.PROFILE,device.PROFILE+'/addon_data',profile,
                      profile+'/navigation-start-'+str(owner['pid'])+'.json'):
             report['fixture_permissions'][path]=device.shell('stat','-c','%u:%g:%a:%F',path,check=False).strip()

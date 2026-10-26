@@ -65,6 +65,11 @@
     "CI_failure_root_cause": {
       "run": 40262126053,
       "result": "Missing PathFinder.invalidate_caches forwarding; new guard now preserves the callback and adds a forced unchanged-directory-timestamp dynamic-import test.9local checks PASS, CI pending. Earlier inference that fixture invalidation alone fixed it was incorrect."
+    },
+    "CI": {
+      "run": 40265974139,
+      "checks": 9,
+      "result": "PASS"
     }
   },
   "checkpoint_protocol": {
@@ -73,7 +78,12 @@
     "source_preimage": "58f3b801e69176a3e91ccca5c1fcb6ebce81bbf8f7e768e07148f531b66190d6",
     "scope": "Only register and obsolete UI version constant; all other save/fence/receipt source bytes preserved",
     "native_coordinator_integration": "NOT APPLIED",
-    "Android17": "NOT RUN"
+    "Android17": "NOT RUN",
+    "CI": {
+      "run": 40265974139,
+      "checks": 5,
+      "result": "PASS"
+    }
   },
   "android17_reference": {
     "run": 40257708654,
@@ -96,7 +106,18 @@
     "WatchNixtoons2_context_registration": "Exact XML preserved apart from parent package version",
     "native_engine_APK_integration": "NOT APPLIED",
     "Android17": "NOT RUN",
-    "Fold": "NOT RUN"
+    "Fold": "NOT RUN",
+    "CI": {
+      "run": 40265974139,
+      "source_commit": "eb480142cbc2a01504088eef88326e66d9c22e1e",
+      "check_counts": {
+        "module_loader": 9,
+        "checkpoint_registration": 5,
+        "composition": 8,
+        "native_request_routing": 3
+      },
+      "result": "25PASS on pinnedCPython3.11.7"
+    }
   },
   "signed407_native_reconstruction": {
     "status": "PASS: exact9407 compiled source map recovered;407 differs from that637230824byte compiled engine only in8 read-only hash-string slots",
@@ -116,7 +137,13 @@
     "Android17": "NOT RUN",
     "Fold": "NOT RUN",
     "identity_audit": "2 local actual CPython/ELF checks PASS; exact existing-engine RTLD_NOLOAD factory, shadow native identity denied, generic crypto/audit bodies preserved",
-    "local_python": "3.12.14"
+    "local_python": "3.12.14",
+    "CI": {
+      "run": 40265974119,
+      "source_checks": 6,
+      "identity_audit_checks": 2,
+      "result": "8PASS; exact407reconstruction/sourceboundary and originalsigner passed; fullARM64compile IN PROGRESS"
+    }
   },
   "reference_observation": {
     "local_checks": 6,
@@ -125,12 +152,23 @@
     "APK_changed": false,
     "Android17": {
       "run": 40263986044,
-      "status": "FAIL, evidence needs examination; do not infer app pass"
+      "status": "FAIL beforeSearch, no native crash reproduced",
+      "artifact_id": 12625592815,
+      "artifact_sha256": "a3888356d7b45c02b7c2361e4c8fb8782b37e8f218caa58a3c77b1fcac0f7bb3",
+      "root_cause": "Disposablefixtureprofile owner0/mode2770, actualappUID10234; permissiondenied statnavigation-start thenexport. OtherprofileparentscorrectUID."
     },
     "CI": {
       "run": 40263985955,
       "checks": 6,
       "result": "PASS"
+    },
+    "fixture_ownership_correction": {
+      "local_checks": 6,
+      "result": "PASS",
+      "source_and_request": "Owned-fixture request03pendingpush",
+      "APK_modified": false,
+      "assertions_changed": false,
+      "permissions_relaxed": false
     }
   }
 }

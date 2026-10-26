@@ -197,6 +197,17 @@
       "selected_checks": [
         "test_reference_observation.py: exact fixture inverse-diff, original failing assertion remains failure, export failure remains failure, native source/APK untouched; test_android17_reference.py existing3routing only"
       ]
+    },
+    "fixture_ownership_cause": {
+      "run": 40263986044,
+      "artifact_id": 12625592815,
+      "proof": "Actual app UID10234; only disposable future-fixture profile directory/root gate UID0, mode2770. Its stat/read and original error export fail before Search input. Rest of userdata/addon_data UID10234.",
+      "correction": "Create/restore ownership of exactly the disposable CI fixture profile to the verified installed UID before app launch and before host gate push. Preserve modes, SELinux Enforcing, all assertions, APK/components/provider bytes and original runtime/persistence gates. No real user profile can reach the fixture because original runner refuses existing installations and non-API37/nonemulator devices.",
+      "selected_tests": [
+        "test_reference_observation.py existing3 plus3ownership path/UID/negative checks",
+        "test_android17_reference.py3routing unchangedbytes checks"
+      ],
+      "next_request": "final407-search-reference-03-owned-fixture"
     }
   },
   "candidate": {

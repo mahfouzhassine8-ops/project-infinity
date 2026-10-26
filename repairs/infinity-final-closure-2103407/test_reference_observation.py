@@ -43,4 +43,42 @@ class ReferenceObservationTests(unittest.TestCase):
         self.assertIsNone(observation.failed_observation(prefix+'malformed',37))
 
 
+class FixtureOwnershipTests(unittest.TestCase):
+    def device(self,owner='0',qemu='1'):
+        class Device:
+            PACKAGE='com.projectinfinity.kodi'
+            PRIVATE='/data/user/0/com.projectinfinity.kodi'
+            PROFILE='/sdcard/Android/data/com.projectinfinity.kodi/files/.kodi/userdata'
+            def __init__(self):self.calls=[];self.owner=owner
+            def shell(self,*args,**kwargs):
+                self.calls.append(args)
+                if args==('getprop','ro.kernel.qemu'):return qemu
+                if args==('getprop','ro.build.version.sdk'):return '37'
+                if args[:3]==('stat','-c','%u'):return '10234' if args[-1]==self.PRIVATE else self.owner
+                if args[0]=='chown':self.owner='10234'
+                if args==('getenforce',):return 'Enforcing'
+                return ''
+        return Device()
+
+    def test_root_owned_disposable_fixture_only_gets_original_app_uid(self):
+        device=self.device();result=observation.owned_fixture_profile(device,'service.future.persistence.7fa29')
+        self.assertEqual((result['before_uid'],result['after_uid']),('0','10234'))
+        mutation=[args for args in device.calls if args[0] in ('chown','restorecon')]
+        exact='/data/media/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/addon_data/service.future.persistence.7fa29'
+        self.assertEqual(mutation,[('chown','-R','10234:10234',exact),('restorecon','-RF',exact)])
+        self.assertFalse(result['permissions_relaxed'])
+        self.assertFalse(any(args[0] in ('chmod','setenforce','rm') for args in device.calls))
+
+    def test_already_owned_profile_keeps_ownership_and_permissions(self):
+        device=self.device(owner='10234');observation.owned_fixture_profile(device,'service.future.persistence.7fa29')
+        self.assertFalse(any(args[0] in ('chown','restorecon','chmod') for args in device.calls))
+
+    def test_real_device_wrong_profile_or_unexpected_owner_are_refused(self):
+        for device,name in ((self.device(qemu='0'),'service.future.persistence.7fa29'),
+                            (self.device(),'script.infinity.commandcenter'),
+                            (self.device(owner='11111'),'service.future.persistence.7fa29')):
+            with self.assertRaises(ValueError):observation.owned_fixture_profile(device,name)
+            self.assertFalse(any(args[0] in ('chown','restorecon','chmod') for args in device.calls))
+
+
 if __name__=='__main__':unittest.main(verbosity=2)
