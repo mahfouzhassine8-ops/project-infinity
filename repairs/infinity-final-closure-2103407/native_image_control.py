@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 import re
 import time
+from urllib.parse import quote
 
 ADDON='script.future.multiimage.7fa29'
 IDS=set(range(2100,2116))
@@ -23,8 +24,15 @@ gc.collect()
 '''
 
 
+def image_path(control):
+    # A relative wrapped URL is considered cached by Kodi before the job.
+    # A full noncached path in this fixture's own profile exercises the factory.
+    inner='special://profile/addon_data/'+ADDON+'/native-directory-'+str(control)
+    return 'image://'+quote(inner,safe='')+'/'
+
+
 def xml():
-    controls=''.join('<control type="multiimage" id="'+str(i)+'"><left>'+str((i-2100)%4*240)+'</left><top>'+str((i-2100)//4*200)+'</top><width>240</width><height>200</height><imagepath>image://infinity-ci-directory-'+str(i)+'/</imagepath><timeperimage>10000</timeperimage><fadetime>0</fadetime><randomize>false</randomize><loop>yes</loop></control>' for i in sorted(IDS))
+    controls=''.join('<control type="multiimage" id="'+str(i)+'"><left>'+str((i-2100)%4*240)+'</left><top>'+str((i-2100)//4*200)+'</top><width>240</width><height>200</height><imagepath>'+image_path(i)+'</imagepath><timeperimage>10000</timeperimage><fadetime>0</fadetime><randomize>false</randomize><loop>yes</loop></control>' for i in sorted(IDS))
     return '<window><defaultcontrol always="true">2100</defaultcontrol><coordinates><system>1</system></coordinates><controls>'+controls+'</controls></window>'
 
 

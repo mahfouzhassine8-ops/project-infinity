@@ -3,6 +3,7 @@ import tempfile
 from types import SimpleNamespace
 import unittest
 import xml.etree.ElementTree as ET
+from urllib.parse import unquote,urlsplit
 import native_image_control as control
 
 
@@ -30,7 +31,11 @@ class NativeImageControlTests(unittest.TestCase):
             self.assertEqual([e.get('point') for e in manifest.findall('extension')],['xbmc.python.script','xbmc.addon.metadata'])
             layout=ET.parse(target/'resources/skins/Default/1080i/native-images.xml');widgets=layout.findall('controls/control')
             self.assertEqual({int(w.get('id')) for w in widgets},control.IDS)
-            self.assertTrue(all(w.get('type')=='multiimage' and w.find('imagepath').text=='image://infinity-ci-directory-'+w.get('id')+'/' for w in widgets))
+            self.assertTrue(all(w.get('type')=='multiimage' for w in widgets))
+            for widget in widgets:
+                path=urlsplit(widget.find('imagepath').text)
+                self.assertEqual(path.scheme,'image')
+                self.assertEqual(unquote(path.netloc),'special://profile/addon_data/'+control.ADDON+'/native-directory-'+widget.get('id'))
             self.assertIn('xbmcgui.WindowXML',control.SCRIPT);self.assertIn('window.close()',control.SCRIPT)
             with self.assertRaises(ValueError):control.stage(folder,args,report,device,'service.future.persistence.7fa29')
             with self.assertRaises(ValueError):control.stage(folder,args,report,device,'wrong')
