@@ -11,6 +11,7 @@ import ctypes
 import hashlib
 import importlib.abc
 import importlib.machinery
+import importlib.util
 import os
 from pathlib import Path
 import re
@@ -216,6 +217,13 @@ def install_import_guard(contract):
         relative = contract.relative_origin(getattr(module, '__file__', None))
         if relative is not None:
             contract.source(relative)
+            loader = getattr(module, '__loader__', None)
+            bootstrap = module is sys.modules.get(__name__)
+            entry = name == '__main__' and relative in contract.entries
+            verified = isinstance(loader, _SourceLoader) and \
+                loader.contract.identity.manifest_sha256 == contract.identity.manifest_sha256
+            if not (bootstrap or entry or verified):
+                raise ContractRejected('First-party code was loaded before verified source ownership was established.')
     guards = [item for item in sys.meta_path if isinstance(item, ImportGuard)]
     if guards:
         if len(guards) != 1 or guards[0].contract.identity.manifest_sha256 != contract.identity.manifest_sha256:
@@ -228,3 +236,34 @@ def install_import_guard(contract):
         raise ContractRejected('The expected Python source-loading boundary is unavailable.') from error
     sys.meta_path[position] = guard
     return guard
+
+
+def active_contract(command_center_root, expected_package_version):
+    root = Path(command_center_root).absolute()
+    for guard in sys.meta_path:
+        if isinstance(guard, ImportGuard):
+            contract = guard.contract
+            if contract.root != root.parent or contract.identity.package_version != expected_package_version:
+                raise ContractRejected('A conflicting Command Center package is active.')
+            contract.current()
+            return contract
+    contract = load_contract(root, expected_package_version)
+    install_import_guard(contract)
+    return contract
+
+
+def require_current():
+    guards = [guard for guard in sys.meta_path if isinstance(guard, ImportGuard)]
+    if len(guards) != 1:
+        raise ContractRejected('No unique authenticated first-party generation owns this operation.')
+    guards[0].contract.current()
+
+
+def source_module(contract, name, relative):
+    """For existing explicit module loads that bypass PathFinder, use the same bytes."""
+    origin = str(contract.root / _relative(relative))
+    loader = _SourceLoader(contract, origin, contract.source(relative))
+    spec = importlib.machinery.ModuleSpec(name, loader, origin=origin)
+    module = importlib.util.module_from_spec(spec)
+    loader.exec_module(module)
+    return module

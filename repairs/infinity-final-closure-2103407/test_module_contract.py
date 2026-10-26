@@ -125,11 +125,14 @@ std::string CSpecialProtocol::TranslatePath(const std::string& p) {
     def test_unlisted_source_compiled_only_and_changed_source_rejected(self):
         self.guard()
         (self.cc/'_infinity_unknown.py').write_text('raise AssertionError("unlisted executed")\n')
+        importlib.invalidate_caches()
         with self.assertRaises(self.module.ContractRejected):importlib.import_module('_infinity_unknown')
         source=self.cc/'_infinity_guarded_probe.py';py_compile.compile(str(source),cfile=str(source.with_suffix('.pyc')),doraise=True);source.unlink()
+        importlib.invalidate_caches()
         with self.assertRaises(self.module.ContractRejected):importlib.import_module('_infinity_guarded_probe')
         source.write_text('raise AssertionError("changed executed")\n')
         source.with_suffix('.pyc').unlink()
+        importlib.invalidate_caches()
         with self.assertRaises(self.module.ContractRejected):importlib.import_module('_infinity_guarded_probe')
 
     def test_generation_change_and_symlink_or_fifo_source_rejected(self):
@@ -151,6 +154,21 @@ std::string CSpecialProtocol::TranslatePath(const std::string& p) {
         before=tuple(threading.enumerate())
         for _ in range(20):self.load()
         self.assertEqual(tuple(threading.enumerate()),before)
+
+    def test_preloaded_owned_module_without_verified_loader_is_rejected(self):
+        sys.path.insert(0,str(self.cc))
+        importlib.import_module('_infinity_guarded_probe')
+        with self.assertRaises(self.module.ContractRejected):self.module.install_import_guard(self.load())
+
+    def test_explicit_source_loader_and_current_generation_admission(self):
+        contract=self.guard()
+        loaded=self.module.source_module(contract,'_infinity_explicit',CC+'/_infinity_guarded_probe.py')
+        self.assertEqual(loaded.value,'verified')
+        sys.modules['_infinity_explicit']=loaded
+        self.module.install_import_guard(contract)
+        self.module.require_current()
+        self.sign(version='0.3.5.41')
+        with self.assertRaises(self.module.ContractRejected):self.module.require_current()
 
 
 if __name__=='__main__':unittest.main(verbosity=2)

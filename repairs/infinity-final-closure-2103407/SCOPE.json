@@ -30,7 +30,8 @@
     {
       "id": 2,
       "name": "Unified Command Center and authenticated modules",
-      "stage": "EVIDENCE"
+      "stage": "ISOLATED_COMPOSITION_HOST_TEST_PASS",
+      "integration": "Authenticated source loader, exact-source moves and single scheduler staged; matching engine/APK migration pending"
     },
     {
       "id": 3,
@@ -84,6 +85,20 @@
           "Remove UI-package ADDON_VERSION; retain protocol API=1"
         ],
         "reason": "Reported and signed-source confirmed0.3.5.39/.38 mismatch rejects registration. Use original-signer native identity, explicit protocol API and exact package/hash handshake; preserve every save/identity/fence operation."
+      },
+      {
+        "ownership_ledger": "FIRSTPARTY-COMPOSITION-PLAN.json",
+        "operation": "Preserve four source inventories; move helper functions to internal CC namespace and retain stable minimal registration shims",
+        "status": "Planned isolated exact-source composition, not installed",
+        "functions_changed": [
+          "UI.controller_access.load",
+          "WB.controller.verify",
+          "CC.infinity_trakt._bridge",
+          "CC.service.main publisher tick",
+          "WB.service.run converted stateful tick; no new thread",
+          "CC.checkpoint_runtime.write_scope current-generation admission"
+        ],
+        "reason": "Required unified first-party modules and version-independent authenticated trust; protect data/fences and physically passing WatchNixtoons2 actions."
       }
     ],
     "native_edits_admitted": [
@@ -106,6 +121,18 @@
         "path": "isolated-native/InfinityInstalledModules.cpp",
         "baseline_sha256": null,
         "reason": "Infinity-only native adapter: immutable original public key, native-resolved root, exact entry owner, protocol identity and availability cache; no termination or writer policies"
+      },
+      {
+        "ownership_ledger": "NATIVE-INTEGRATION-PLAN.json",
+        "files": [
+          "xbmc/platform/android/activity/InfinityScriptCheckpointContracts.cpp",
+          "xbmc/guilib/GUIBaseContainer.cpp",
+          "xbmc/interfaces/legacy/WindowXML.cpp",
+          "xbmc/platform/android/activity/InfinityAndroidCheckpoint.cpp",
+          "xbmc/platform/android/activity/CMakeLists.txt"
+        ],
+        "status": "Planned isolated exact-source transform; no engine replaced",
+        "reason": "Necessary authenticated module migration and actual evidenced title/reflow/checkpoint mismatches; all shared caller behavior must remain guarded and verified."
       }
     ],
     "apk_member_edits_admitted": [],
@@ -125,10 +152,9 @@
   },
   "selected_verification": {
     "host": [
-      "test_module_manifest.py9",
-      "test_installed_modules.py6",
-      "test_module_contract.py6",
-      "test_checkpoint_protocol.py5"
+      "test_module_contract.py8",
+      "test_checkpoint_protocol.py5",
+      "test_firstparty_composition.py8"
     ],
     "android17": "Baseline reference FAIL before Search input; evidence artifact12624160445, no shutdown selected",
     "physical_fold": "NOT RUN",

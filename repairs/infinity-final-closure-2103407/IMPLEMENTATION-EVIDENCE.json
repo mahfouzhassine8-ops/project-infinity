@@ -18,7 +18,12 @@
     "arm64": "NOT RUN",
     "android17": "NOT RUN",
     "github_run": 40256202271,
-    "latest_refinement": "Local9 pass: helper mandatory, FIFO rejected nonblocking; prior core8 CI retained"
+    "latest_refinement": "Local9 pass: helper mandatory, FIFO rejected nonblocking; prior core8 CI retained",
+    "latest_CI": {
+      "run": 40260064088,
+      "checks": 9,
+      "result": "PASS"
+    }
   },
   "confirmed_compatibility_skews": {
     "addon_version": "0.3.5.39",
@@ -41,13 +46,22 @@
     "positive_fixture": "Temporary copy differs only in test public-key literal; no production key bypass or APK change",
     "engine_integration": "NOT APPLIED",
     "arm64": "NOT RUN",
-    "android17": "NOT RUN"
+    "android17": "NOT RUN",
+    "latest_CI": {
+      "run": 40260064088,
+      "checks": 6,
+      "result": "PASS"
+    }
   },
   "module_python_loader": {
-    "local_checks": 6,
+    "local_checks": 8,
     "status": "TARGETED LOCAL PASS",
     "native_test": "Real C ABI with isolated temporary test key; original-key negative test remains separate",
-    "production_bootstrap_integration": "NOT APPLIED"
+    "production_bootstrap_integration": "NOT APPLIED",
+    "previous_CI": {
+      "run": 40260064088,
+      "result": "5/6 checks passed; sourceless-fixture import cache was stale and raised ModuleNotFoundError before reaching the rejection assertion. Explicit fixture cache invalidation added; rejection assertion unchanged."
+    }
   },
   "checkpoint_protocol": {
     "local_checks": 5,
@@ -68,5 +82,16 @@
     "observed_application_error": "Repeated unsupported installed Command Center version",
     "native_crash_reproduced": false,
     "limit": "No app stability PASS; do not assume fixture failure is Search fault"
+  },
+  "firstparty_composition": {
+    "local_checks": 8,
+    "status": "TARGETED LOCAL PASS",
+    "data": "Original paths, original Rails Store byte-identical, no user data opened by staging",
+    "owned_code_moves": "UI/WB/Rails implementations now CC internal modules, old IDs/entry routes retained as shims",
+    "scheduler": "One existing CC loop; no separate WB resident or new thread; existing checkpoint park remains first",
+    "WatchNixtoons2_context_registration": "Exact XML preserved apart from parent package version",
+    "native_engine_APK_integration": "NOT APPLIED",
+    "Android17": "NOT RUN",
+    "Fold": "NOT RUN"
   }
 }

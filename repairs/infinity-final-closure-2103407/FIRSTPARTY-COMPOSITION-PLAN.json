@@ -1,0 +1,139 @@
+{
+  "baseline_commit": "0e8739d2d0e1be0ab8f127519b526556426fb160",
+  "runtime_not_yet_packaged": true,
+  "plan": {
+    "script.infinity.commandcenter": {
+      "entries": [
+        "default.py",
+        "context.py",
+        "plugin.py",
+        "service.py"
+      ],
+      "changed": [
+        "checkpoint_runtime.py",
+        "infinity_search.py",
+        "infinity_trakt.py",
+        "addon.xml"
+      ],
+      "reason": "Native-authenticated entry bootstrap and internal module coordination; retain all original menu/action implementations, data paths and WatchNixtoons2 metadata registration.",
+      "signed407_all_file_preimages": {
+        "persistence_participant.py": "7658db0f21c20853f272f61832e720df02b2b4b9ebaeba83ca1c7ba8758e1b9b",
+        "common.py": "168e2888b7f75363875aa5c70ddcf31128f0e66efa17e1fe82935aec457747b7",
+        "selection_contract.py": "31f04371cdf9902e234ef441e11a41bc914daf1a9cc12b1cc435d58285dc46c2",
+        "information.py": "8cf3cfcab461d73d4e8bb625039d905478ffb52688f729252002b292ea87c429",
+        "addon.xml": "fa922b07e059c1c530561c37a4bb85a358cd1ba7bf2f2baad5165f808ae14d0a",
+        "plugin.py": "3077359ad65afa86ca23edd303fc18683f94f6e0a42a75f37e6b6cbaf27bcc4f",
+        "saved_navigation.py": "36061dae60e4787131c6e333da4f1036b34ea3baa68d962b3e1a879ed192c19f",
+        "NAVIGATION-CONTRACTS.json": "ff9f5d576a79cf18adac7693108d80aeeca6eb93d1aaf87e1017a7d19ada60c2",
+        "default.py": "b4844b31397a0bc196262fc808a83e48c8a44ae147572fdabd855eba0598c12f",
+        "experience.py": "c84c2987aa192e13af64beddf451389584617d557d0cecfca65e4f911b803a6f",
+        "skin_upgrade.py": "044aa0dc3e6d22f1cc585e503c482cb1d5ba58fb6734298449480ca02c53e1f8",
+        "infinity_search.py": "bb6e8791ca7644ca9d370b5871d69ded71790557069b56535e920baa6cf50531",
+        "resume_hub.py": "64d5f0c81810beabf82dab8ef96229ef9ba99d8f9673a39c227f4a85d82d5f71",
+        "context.py": "f0fd0d9941de8f2b64314aa6c24eb2824627d9ddbf74c9a9e0522c13a290e53c",
+        "runtime_visibility.py": "11a985fc544fdb37c906f2575516b78c6141ed2b68e95b6c390d824f4386560a",
+        "infinity_trakt.py": "75cb538ddf1e6c90d6cf5130f27d2c5e05a8faeb241a5265844ea9abdd27d9cc",
+        "checkpoint_runtime.py": "58f3b801e69176a3e91ccca5c1fcb6ebce81bbf8f7e768e07148f531b66190d6",
+        "title_metadata.py": "d56a1a41d80fbd1e544918bbb846518bb47567f1e0ea71132f0cc3d355b15562",
+        "infinity_settings.py": "a846e6fa285618495e572ff77665b4914eb2438ae3c1d7f38f2e53b150cb8e3d",
+        "service.py": "51fc63f6922885c8473277398e6f3569274eb42afe06be0148501d6ddc65bb23",
+        "provider_inventory.py": "6533bcaf90d161a9ff188c57c686efdf9e8f29ef4c9d6de589f09e91da561145",
+        "view_mode.py": "5f5583e9c36e32e970a0341ca353d32dd92e48d41079aaabaf7a113c66ddfc71",
+        "resources/settings.xml": "7cf7649f80c4c3e6c81caa6e80b1f325f470055e7de62fdf37367effe8484451",
+        "resources/skins/Default/1080i/InfinityItemOptions.xml": "201125d0d7bdda987d92523c04882f19e03560d361f70e52508cd4783e071db6",
+        "resources/skins/Default/1080i/InfinitySearch.xml": "0fb440287b00d6dc4f6c15c99e16be0a4e4e70a62cd4be08b1dd9375595272ad",
+        "resources/skins/Default/1080i/InfinityTraktNotice.xml": "321835add4ebbb71fcf9e177868f000ca35659c776d1473e0532aa0a1fd70064",
+        "resources/skins/Default/1080i/InfinityInformation.xml": "b9059729493751dfc0be65801f73e41a06b604f3fdaf099963821b84f2b2e443"
+      }
+    },
+    "script.infinity.uirepair": {
+      "entries": [
+        "default.py",
+        "plugin.py"
+      ],
+      "changed": [
+        "controller_access.py",
+        "runtime.py",
+        "popup.py",
+        "home_option_b.py",
+        "latest_identity.py",
+        "menu_model.py",
+        "addon.xml"
+      ],
+      "reason": "Move functions under CC internal namespace; stable ID entry shims keep XML resources/data/context semantics; replace reciprocal static pins with original-signer manifest.",
+      "signed407_all_file_preimages": {
+        "addon.xml": "fa5923a337ba0241e8a21f7b32413e1a7b9b05878f7c737f0e5336b34532fa28",
+        "plugin.py": "a812e8229596f4d5257914025638ef39a468d16e453dc95b8c851c1239869b9f",
+        "default.py": "caf3b4f06adf803a87f0c4392f2cb8c8f6d8879f01c1b7c47402938f62f298ee",
+        "CONTROLLER-PREIMAGES.json": "c66d5bf016266554655b7d2b3e296726af874865f5c1dae89f22a130c5f4073e",
+        "popup.py": "230ee5646bf5b73faa9e9bc9988bb29e9a6d238da95efeec06e480a9c6d259de",
+        "latest_identity.py": "225ac23336701db63715583ca8b6716afa96bb9b738b4b99750d9a5bbd8ab223",
+        "menu_model.py": "eea9605cf7b3712b6029bf49958d470dbc59df6b92e7f394799c1098e58956da",
+        "home_option_b.py": "cd64216203e82746c7bd1dcf18b4b491b5430c1abf687cc3ca6b42e3cefa1438",
+        "runtime.py": "1ff9cb2f583e5df45dc1fe9116593babec173381c845d6b26ed93871307fd1f3",
+        "controller_access.py": "41d7e221ca000a8a9879d3db289fade098900c0ebd4954473364767b230914ec",
+        "resources/skins/Default/1080i/InfinityItemOptions.xml": "201125d0d7bdda987d92523c04882f19e03560d361f70e52508cd4783e071db6",
+        "resources/skins/Default/1080i/InfinityHomeOptionB.xml": "b524ebc4bc586ef3642190e43897bd0f9b23e5844fd67c2b02806f9159bc0c6e"
+      }
+    },
+    "script.infinity.watchedbridge": {
+      "entries": [
+        "context.py",
+        "default.py"
+      ],
+      "changed": [
+        "service.py",
+        "controller.py",
+        "bridge_state.py",
+        "provider_contracts.py",
+        "addon.xml"
+      ],
+      "reason": "Move actual functions under CC modules; keep ID/context ingress and all exact identity/pending-sync guards; merge read-only publisher tick into existing parked CC scheduler, remove second resident service.",
+      "signed407_all_file_preimages": {
+        "PROVIDER-CONTRACTS.json": "c03846eaa853307da91634641bb4266a5420242d6b33770f1328cc18e9fd974e",
+        "addon.xml": "104b2dffce0aae8d6c3832447e4c5704e0c9a06c648865fae9da3651f44b2670",
+        "controller.py": "b50ca9360299a91aadd9f5eb26c17ec995bded2a5a6858446e4817b492db599d",
+        "provider_contracts.py": "5819eec3f7b29f43de164c4739753db0ad48bb5c5d92fe6ae136fa5c9753f804",
+        "default.py": "77c65366ed07261992d12357bb284c3f96039452fd393cc0e36e15c2f75d5f9d",
+        "CONTROLLER-PREIMAGES.json": "c66d5bf016266554655b7d2b3e296726af874865f5c1dae89f22a130c5f4073e",
+        "context.py": "e458ee969e80a1baf78c6354f49c53a45d2a355256fb9fb7051c08935587b451",
+        "bridge_state.py": "a8a9f0616beeb13b6621a3997f8f09cda55d1f6c779fc6f30abf77feb3d5a21e",
+        "service.py": "afda95dfb06a67cdca316c173a72389b5eab7f478ed9c3682afef6f279802536"
+      }
+    },
+    "script.infinity.rails": {
+      "entries": [
+        "default.py",
+        "plugin.py",
+        "context_add.py"
+      ],
+      "changed": [],
+      "reason": "Move on-demand module code under CC; stable addon ID/routes retain original profile/locking/default resources, no database migration or new background job.",
+      "signed407_all_file_preimages": {
+        "addon.xml": "5b3260bfaeedb361712c79a341c12b9d32dca804313621bbbe3766736ca55cca",
+        "plugin.py": "2b2c2266809fa9eddce66fdd9c1b22caf2398f6f17cd408ad396c7d47055d719",
+        "default.py": "513b748c5730c554b4d3d0add7cede8ebbad4d13deef93f04ba48c4263f80a10",
+        "context_add.py": "4eb526ed1e8b2dda75e6bc29d2bcaa5f5257f0096d0785b9c5fbaa459a4878c4",
+        "resources/defaults.xml": "bd1c102f0b2bcacb36556c19dbfbdb027c7aac7481af44ba3445edcf84d7c110",
+        "resources/lib/catalog.py": "7c307a52bf4fef44d9c1b1b910c1f76bd8b689c6de7f4a456205f13b5c1ab457",
+        "resources/lib/stability_probe.py": "e275668b0638fdffb8810ee6f1cab1d9590a9bc8b9f08f402216a8ae50d754f9",
+        "resources/lib/mocha.py": "b813b5d7a340c697917fa7b2b29b6cee86d97d284da59ce8bc96bde9ad629c96",
+        "resources/lib/__init__.py": "8798e72d7a93a29641e5368044bd7164b2f1024108791daf4b57c2d3cc7b79ab",
+        "resources/lib/dialog.py": "34dd1815176455278dabc10640627faffe16feabbcaa945578d573bbd8ec66ee",
+        "resources/lib/store.py": "22fc4b1f4ddb4d18be77acb89cd49e975f65cc9db410df40d17c62f4ad4171e4",
+        "resources/lib/runtime.py": "2cb188fbc6f59da3c2c2bf43e64f1b523921290cd6e4937cf9303743785bcd3f",
+        "resources/lib/input_status.py": "217073f1e9df990aa39215cf29067776612528fd0311b5c2d723e866812db111",
+        "resources/language/resource.language.en_gb/strings.po": "48314b935797774fbac9f78e443ed329737ffb3bc994c945e14bf4bfd3980e5f",
+        "resources/skins/Default/720p/InfinityRailsOptions.xml": "351a03286dd4e5b3d82dcba01974bdc5af082de3fb348bd581c2c0b70586e5ab"
+      }
+    }
+  },
+  "negative_tests": [
+    "Exact unchanged WatchNixtoons2 extension registration except version",
+    "Exact AST for action/identity/mutation methods outside explicitly listed loaders/publisher scheduler",
+    "Stable original addon IDs, resource paths, user-data paths and argv/listitem ingress",
+    "No extra WB service/worker; publisher parks with existing CC checkpoint gate",
+    "Unknown/modified module source rejected; all four original component source inventories pinned",
+    "All other APK members and Cobra untouched; full engine integration still a separate gate"
+  ]
+}
