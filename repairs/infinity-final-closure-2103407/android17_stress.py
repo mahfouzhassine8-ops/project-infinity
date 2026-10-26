@@ -12,6 +12,8 @@ import subprocess
 import time
 from urllib.parse import parse_qs,urlsplit
 import xml.etree.ElementTree as ET
+import android_frame_samples
+import android_stress_script
 
 COUNTS={'search':50,'playback_home':30,'rotation':20}
 
@@ -44,7 +46,7 @@ def quantiles(values):
 def _run(device,setup,expected,out):
     owner=admit(device,setup,expected);out=Path(out);out.mkdir(exist_ok=False)
     report=dict(passed=False,apk_sha256=expected['candidate_apk_sha256'],owner=owner,
-        requested=COUNTS,search=[],playback_home=[],rotation=[],snapshots=[],
+        requested=COUNTS,search=[],playback_home=[],rotation=[],snapshots=[],scroll_samples=[],
         physical_Fold='NOT RUN',shutdown='NOT SELECTED',poster_first_paint='NOT MEASURED',
         native_frame_pacing='RAW SAMPLES ONLY; no native FPS claim',
         playback_content='Generated gray640x360 H264 clip, no real movie playback claim')
@@ -56,13 +58,18 @@ def _run(device,setup,expected,out):
 
     def memory(stage):
         alive();pid=str(owner['pid'])
+        native_stat=device.shell('cat','/proc/'+pid+'/stat',check=False);sampled_at=time.monotonic()
         raw=device.shell('dumpsys','meminfo',pid,check=False)
         (out/(stage+'-meminfo.txt')).write_text(raw)
         match=re.search(r'TOTAL PSS:\s*(\d+).*?TOTAL RSS:\s*(\d+)',raw,re.S)
-        report['snapshots'].append(dict(stage=stage,monotonic=time.monotonic(),
+        status=device.shell('cat','/proc/'+pid+'/status',check=False)
+        threads=re.search(r'^Threads:\s*(\d+)',status,re.M)
+        descriptors=device.shell('ls','/proc/'+pid+'/fd',check=False).split()
+        descriptor_count=len(descriptors) if descriptors and all(v.isdigit() for v in descriptors) else None
+        report['snapshots'].append(dict(stage=stage,monotonic=sampled_at,
             pss_kib=int(match[1]) if match else None,rss_kib=int(match[2]) if match else None,
-            proc_status=device.shell('cat','/proc/'+pid+'/status',check=False),
-            proc_stat=device.shell('cat','/proc/'+pid+'/stat',check=False)))
+            proc_status=status,thread_count=int(threads[1]) if threads else None,descriptor_count=descriptor_count,
+            proc_stat=native_stat))
         save()
 
     def nodes():
@@ -88,6 +95,24 @@ def _run(device,setup,expected,out):
         device.until(lambda:gui().get('id')==10000,20)
         alive();require(device.rpc('JSONRPC.Ping')=='pong','Home RPC did not respond')
 
+    def scroll_sample(index):
+        folder=out/('scroll-'+str(index));folder.mkdir()
+        current_layers=[s for s in device.shell('dumpsys','SurfaceFlinger','--list',check=False).splitlines()
+                        if device.PACKAGE in s and 'SurfaceView' in s]
+        before={layer:device.shell('dumpsys','SurfaceFlinger','--latency',layer,check=False) for layer in current_layers}
+        entry=dict(search_cycle=index,scope='actual Search results list,25Down/25Up',native_layers=current_layers,selection=[],frames=[])
+        began=time.monotonic()
+        for step in range(50):
+            device.rpc('Input.Down' if step<25 else 'Input.Up')
+            if step%5==0:entry['selection'].append(device.rpc('XBMC.GetInfoLabels',{'labels':['Container.CurrentItem','Container.FolderPath']}))
+            time.sleep(.05)
+        entry['seconds']=time.monotonic()-began
+        for number,layer in enumerate(current_layers):
+            after=device.shell('dumpsys','SurfaceFlinger','--latency',layer,check=False)
+            (folder/(str(number)+'-before.txt')).write_text(before[layer]);(folder/(str(number)+'-after.txt')).write_text(after)
+            entry['frames'].append(dict(layer=layer,**android_frame_samples.summarize(before[layer],after)))
+        alive();report['scroll_samples'].append(entry);save()
+
     frame_before=device.shell('dumpsys','gfxinfo',device.PACKAGE,'framestats',check=False)
     (out/'before-hwui.txt').write_text(frame_before)
     layers=[s for s in device.shell('dumpsys','SurfaceFlinger','--list',check=False).splitlines()
@@ -95,6 +120,8 @@ def _run(device,setup,expected,out):
     report['native_layers']=layers
     for index,layer in enumerate(layers):
         (out/('before-layer-'+str(index)+'.txt')).write_text(device.shell('dumpsys','SurfaceFlinger','--latency',layer,check=False))
+    ticks=device.shell('getconf','CLK_TCK',check=False).strip()
+    report['clock_ticks']=int(ticks) if ticks.isdigit() and int(ticks)>0 else None
     memory('before');home()
     state_path=device.PROFILE+'/addon_data/script.infinity.commandcenter/continue-watching.json'
     protected=device.read_json(state_path)
@@ -104,14 +131,16 @@ def _run(device,setup,expected,out):
         query='Just Friends' if index%2==0 else 'The Matrix'
         provider='all' if index%2==0 else 'plugin.video.umbrella'
         began=time.monotonic()
-        device.rpc('Addons.ExecuteAddon',{'addonid':'script.infinity.commandcenter',
-                   'params':['universal-search','movie'],'wait':False})
+        android_stress_script.launch(device)
         def keyboard():
             values=nodes()
             edits=[n for n in values if n.get('class')=='android.widget.EditText' and n.get('enabled')=='true']
+            return (values,edits[0]) if len(edits)==1 else None
+        def typing_keyboard():
+            value=keyboard()
             import android_input_readiness
-            return (values,edits[0]) if len(edits)==1 and android_input_readiness.ready(device,out) else None
-        values,edit=device.until(keyboard,45) # Retain the actual original keyboard deadline.
+            return value if value and android_input_readiness.ready(device,out) else None
+        values,edit=device.until(typing_keyboard,45) # Retain the actual original keyboard deadline.
         wanted='Search All' if provider=='all' else 'Umbrella'
         choices=[n for n in values if n.get('clickable')=='true' and
             any(n.get('content-desc','').startswith(wanted+p) for p in (', ','. '))]
@@ -156,10 +185,10 @@ def _run(device,setup,expected,out):
         report['search'].append(dict(cycle=index,query=query,elapsed_ms=(time.monotonic()-began)*1000,
                                      visible=visible,pid=owner['pid'],actual_android_input=True,
                                      selected_provider=provider,history_row_used=history_used,duplicate_enter_sent=duplicate))
+        if index in (9,49):scroll_sample(index+1)
         home();save()
         if (index+1)%10==0:
-            device.rpc('Addons.ExecuteAddon',{'addonid':'script.infinity.commandcenter',
-                       'params':['universal-search','movie'],'wait':False})
+            android_stress_script.launch(device)
             values,_=device.until(keyboard,45)
             tap(control(values,'Close Infinity Search'))
             device.until(lambda:not any(n.get('class')=='android.widget.EditText' for n in nodes()),20)
@@ -215,6 +244,8 @@ def _run(device,setup,expected,out):
     (out/'display-state.txt').write_text(device.shell('dumpsys','display',check=False))
     report['search_duration']=quantiles([x['elapsed_ms'] for x in report['search']])
     report['home_window_rpc_duration']=quantiles([x['home_window_rpc_ready_ms'] for x in report['playback_home']])
+    report['cpu_intervals']=[dict(before=a['stage'],after=b['stage'],**android_frame_samples.cpu_interval(a,b,report['clock_ticks']))
+                             for a,b in zip(report['snapshots'],report['snapshots'][1:])]
     report['passed']=all(len(report[k])==v for k,v in COUNTS.items());save()
     return report
 

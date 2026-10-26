@@ -1,0 +1,19 @@
+{
+  "failure": {
+    "run": 40312405843,
+    "source": "fb5cb8bfb23e439378132712bf52d6cb36907bc1",
+    "artifact": 12646014123,
+    "sha256": "9189cb679b49349567a521009732836221fd98389730798db8523576483296d9",
+    "initial_feature": "PASS original RunScript route, Enter/results/history/Home",
+    "stress": "0/50; Addons.ExecuteAddon for multi-entry CC dispatched plugin.py with ?universal-search&movie; no Android keyboard. No playback/rotation loops reached."
+  },
+  "correction": "Disposable script-only bridge executes exact original Home RunScript builtin. No production changes, result substitute or keyboard/result predicate weakening. Preserve prelaunch4record fixture fromfb5. Existing input readiness used before typing, not after History hides IME. Include previously tested actualSurfaceFlinger/CPU instrumentation.",
+  "selected_before_edits": [
+    "test_stress_script_dispatch.py: single script extension/no auto service, exact fixed original RunScript call, no query/result/production writes, refused wrong stage/device, enabled exact helper, driver both initial/cancel openings use script helper.",
+    "test_android17_stress.StressAdmissionTests.test_driver_uses_feature_guard_and_no_shutdown_or_reset_transport and retained feature fixture inverse (changed adapter wiring only).",
+    "Android17 same signed410 exact50Search/30generatedplaybackHome/20OSrotation, stopfirstfailure; no Close or physical Fold claim."
+  ],
+  "limits": "No repeatedinteraction success yet; keep historical failures.",
+  "host_result": "PASS4script-dispatch source/refusal checks; retained stress transport guard and original fixture assertion inverse PASS. Actual frame parser3 and retained stress admission4 previously PASS; no rerun without new reason.",
+  "android17": "Selected corrected retry, NOT RUN yet"
+}
