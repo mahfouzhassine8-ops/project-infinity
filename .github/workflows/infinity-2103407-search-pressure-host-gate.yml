@@ -200,7 +200,7 @@ jobs:
                   subprocess.run([sys.executable,'-m','unittest','discover','-s',str(root),'-p',pattern,'-v'],check=True)
               sys.exit(0)
           elif selected=='module-bundle':
-              for pattern in ('test_module_bundle.py','test_java_module_migration.py','test_refresh_lookup.py'):
+              for pattern in ('test_module_bundle.py','test_java_module_migration.py','test_result_metadata.py','test_python_ast_compatibility.py'):
                   subprocess.run([sys.executable,'-m','unittest','discover','-s',str(root),'-p',pattern,'-v'],check=True)
               sys.exit(0)
           elif selected=='module-complete':

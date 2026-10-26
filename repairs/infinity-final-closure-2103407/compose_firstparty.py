@@ -13,12 +13,14 @@ import xml.etree.ElementTree as ET
 
 from patch_checkpoint_protocol import patch as checkpoint_patch
 from patch_search_lifetime import patch as search_patch
+from patch_result_metadata import patch as metadata_patch
+from patch_provider_capabilities import patch as capabilities_patch
 
 ROOT=Path(__file__).parent
 CC='script.infinity.commandcenter'
 PACKAGES={'script.infinity.uirepair':'uirepair',
           'script.infinity.watchedbridge':'watchedbridge','script.infinity.rails':'rails'}
-VERSION='0.3.5.40'
+VERSION='0.3.5.41'
 
 
 def sha(raw):return hashlib.sha256(raw).hexdigest()
@@ -223,7 +225,18 @@ def compose(sources,destination):
     text=replace_once(text,'def write_scope(profile, session=None):\n    store = store_for(profile)',
         'def write_scope(profile, session=None):\n    from module_contract import require_current\n    require_current()\n    store = store_for(profile)')
     path.write_text(text)
-    (cc/'infinity_search.py').write_bytes(search_patch((cc/'infinity_search.py').read_bytes()))
+    search_source=search_patch((cc/'infinity_search.py').read_bytes())
+    search_source=metadata_patch('infinity_search.py',search_source,require_preimage=False)
+    (cc/'infinity_search.py').write_bytes(capabilities_patch('infinity_search.py',search_source,require_preimage=False))
+    (cc/'information.py').write_bytes(metadata_patch('information.py',(cc/'information.py').read_bytes()))
+    (cc/'title_metadata.py').write_bytes(metadata_patch('title_metadata.py',(cc/'title_metadata.py').read_bytes()))
+    (cc/'provider_inventory.py').write_bytes(capabilities_patch('provider_inventory.py',(cc/'provider_inventory.py').read_bytes()))
+    shutil.copyfile(ROOT/'isolated-python/provider_capabilities.py',cc/'provider_capabilities.py')
+    shutil.copyfile(ROOT/'SEARCH-STRUCTURES.json',cc/'SEARCH-STRUCTURES.json')
+    shutil.copyfile(ROOT/'structural_search.py',cc/'structural_search.py')
+    shutil.copyfile(ROOT/'MODE-CLASS-SEARCH-POLICY.json',cc/'MODE-CLASS-SEARCH-POLICY.json')
+    exact_review=json.loads((ROOT/'EXACT-SOURCE-REVIEW.json').read_text())
+    (cc/'NAVIGATION-CONTRACTS.json').write_text(json.dumps(exact_review['contracts'],indent=2)+'\n')
     path=cc/'infinity_trakt.py';text=replace_function(path.read_text(),'_bridge',CC_BRIDGE)
     lines=text.splitlines(keepends=True)
     text=''.join(line for line in lines if not line.startswith('BRIDGE_PINS = '))

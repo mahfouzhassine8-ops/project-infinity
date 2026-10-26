@@ -138,7 +138,7 @@ def archive(root,out):
     checksums={}
     for aid in IDS:
         version=ET.fromstring(files[aid+'/addon.xml']).get('version')
-        target=out/(aid+'-'+version+'-2103408-QA.zip')
+        target=out/(aid+'-'+version+'-2103409-QA.zip')
         with ZipFile(target,'w',compression=ZIP_DEFLATED,compresslevel=9) as z:
             for name,raw in sorted(files.items()):
                 if not name.startswith(aid+'/'):continue

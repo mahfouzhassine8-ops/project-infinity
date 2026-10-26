@@ -29,7 +29,7 @@ def build(sources,out):
     sources=Path(sources).resolve();out=Path(out).absolute()
     if out.exists():raise ValueError('Fresh internal signed bundle output required')
     scope=json.loads((ROOT/'SCOPE.json').read_text())
-    if scope['baseline']['commit']!='0e8739d2d0e1be0ab8f127519b526556426fb160' or scope['candidate']['version_code']!=2103408:
+    if scope['baseline']['commit']!='0e8739d2d0e1be0ab8f127519b526556426fb160' or scope['candidate']['version_code']!=2103409:
         raise ValueError('Exact final scope required')
     credentials={name:os.environ[name] for name in ('INFINITY_STORE_PASSWORD','INFINITY_KEY_PASSWORD','INFINITY_KEY_ALIAS')}
     if not all(credentials.values()) or not os.environ.get('INFINITY_KEYSTORE_B64'):
@@ -56,7 +56,7 @@ def complete(sources,out):
     sources=Path(sources).resolve();out=Path(out).resolve()
     if (out/'SIGNED-MODULE-BUNDLE.json').exists():raise ValueError('Completed generation must not be overwritten')
     scope=json.loads((ROOT/'SCOPE.json').read_text());addons=out/'assets/addons'
-    if scope['baseline']['commit']!='0e8739d2d0e1be0ab8f127519b526556426fb160' or scope['candidate']['version_code']!=2103408:
+    if scope['baseline']['commit']!='0e8739d2d0e1be0ab8f127519b526556426fb160' or scope['candidate']['version_code']!=2103409:
         raise ValueError('Exact final scope required')
     with tempfile.TemporaryDirectory(prefix='infinity-exact-module-recipe-') as temp:
         expected=Path(temp)/'addons';composition=compose_firstparty.compose(sources,expected)
@@ -81,7 +81,7 @@ def complete(sources,out):
         run([javac,'--release','8','-g:none','-Xlint:all,-options','-Werror','-d',classes,source,*sorted((ROOT/'host-java').rglob('*.java'))])
         storage=work/'storage';installed=storage/'.kodi/addons';shutil.copytree(sources,installed)
         proof=run([java,'-cp',classes,'com.projectinfinity.kodi.Main',storage,out/'assets'])
-        if 'VERIFIED_VERSION=0.3.5.40' not in proof:raise ValueError('Actual original-key Java migration unconfirmed')
+        if 'VERIFIED_VERSION=0.3.5.41' not in proof:raise ValueError('Actual original-key Java migration unconfirmed')
         proof+=run([verifier,installed,ROOT/'ORIGINAL-INFINITY-PUBLIC-KEY.pem'])
         (out/'JCA-ORIGINAL-KEY-HOST-MIGRATION.txt').write_text(proof+'Host transport only. Android17 and physical Fold NOT RUN.\n')
     checksums=module_bundle.archive(addons,out/'components')

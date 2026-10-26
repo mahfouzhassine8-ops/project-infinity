@@ -41,7 +41,12 @@ def reviewed_shape(node,addon_id=''):
             if isinstance(body,list) and body and isinstance(body[0],ast.Expr) and isinstance(body[0].value,ast.Constant) and isinstance(body[0].value.value,str):
                 del body[0]
             return node
-    return hashlib.sha256(shape(Normalize().visit(deepcopy(node))).encode()).hexdigest()
+    value=Normalize().visit(deepcopy(node))
+    for item in ast.walk(value):
+        if hasattr(item,'type_params'):
+            if item.type_params:raise Unverified('Unsupported provider Python generic syntax')
+            item._fields=tuple(field for field in item._fields if field!='type_params')
+    return hashlib.sha256(shape(value).encode()).hexdigest()
 
 
 def expr(text):return ast.parse(text,mode='eval').body

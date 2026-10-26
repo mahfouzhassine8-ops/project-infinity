@@ -1,0 +1,39 @@
+{
+  "scope": "Host signed verifier body, five two-provider batches with Python3.11 AST serialization; Python3.12 host.  Not Android/Fold memory, RSS/PSS, Home or frame performance.",
+  "results": {
+    "before": {
+      "median_ms": 4732.819832999667,
+      "samples_ms": [
+        4606.907435001631,
+        5310.1666450020275,
+        5196.006501995726,
+        4732.819832999667,
+        4664.430124998034
+      ],
+      "traced_peak_bytes": 24712569,
+      "traced_current_bytes": 435604,
+      "work_per_two_providers": {
+        "read": 14,
+        "fingerprint": 14
+      }
+    },
+    "after": {
+      "median_ms": 2.521982001780998,
+      "samples_ms": [
+        2.929847003542818,
+        2.521982001780998,
+        2.5048469979083166,
+        2.538027001719456,
+        2.4562230028095655
+      ],
+      "traced_peak_bytes": 789887,
+      "traced_current_bytes": 43317,
+      "work_per_two_providers": {
+        "read": 14,
+        "fingerprint": 0
+      }
+    }
+  },
+  "Android17": "NOT RUN",
+  "physical_Fold": "NOT RUN"
+}

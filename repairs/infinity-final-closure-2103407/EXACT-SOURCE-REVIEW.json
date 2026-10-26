@@ -1,0 +1,440 @@
+{
+  "contracts": {
+    "contracts": [
+      {
+        "entrypoint": "resources/lib/router.py",
+        "family": "mode-list-v1",
+        "search": {
+          "movie": {
+            "params": {
+              "action": "tmdb_movies_search",
+              "mode": "build_movie_list"
+            },
+            "query_key": "query"
+          },
+          "tv": {
+            "params": {
+              "action": "tmdb_tv_search",
+              "mode": "build_tvshow_list"
+            },
+            "query_key": "query"
+          }
+        },
+        "sources": {
+          "resources/lib/indexers/metadata.py": "8ffd6ac9d80f6bd8fb2709764227a0a53704563b59e46a6d6bd3461e3b4a4285",
+          "resources/lib/menus/movies.py": "7e05ce0a40542b010fd56b9bef37495eb18c194550a3d23bf7c935bd3c8a09ed",
+          "resources/lib/menus/seasons.py": "c999b6bbd12c22c74e95c7c471eefe1b0c46c8b05c62d17c808108ade5d299ae",
+          "resources/lib/menus/tvshows.py": "dca403fc9c07079098b4406237a6e4e3c4f8b9473e3a4e0556f9a6ac7ad64732",
+          "resources/lib/modules/entry.py": "c27e72e2d9e8aed57e52d9b5db92c68f6940082441e9e922979081c4da6ad089",
+          "resources/lib/modules/kodi_utils.py": "af05b7baf72c2a1f833c7df0f974a3815c520b38c03371052dd67c3f06c486c9",
+          "resources/lib/router.py": "969283a4c566c79d8acff5dc2806e1f13a31e5cf75384992dc5b3727705ec702"
+        }
+      },
+      {
+        "entrypoint": "umbrella.py",
+        "family": "action-list-v1",
+        "search": {
+          "movie": {
+            "params": {
+              "action": "movieSearchterm"
+            },
+            "query_key": "name"
+          },
+          "tv": {
+            "params": {
+              "action": "tvSearchterm"
+            },
+            "query_key": "name"
+          }
+        },
+        "sources": {
+          "resources/lib/menus/episodes.py": "8a48a418a9d57fcdd85256728a8bc477f0d3f976e86d4a38bae3e855598636ac",
+          "resources/lib/menus/movies.py": "a47a2d48fd21baf6185181e86f212d53d199df9d723c7d218a46d8fa55da9742",
+          "resources/lib/menus/seasons.py": "0b0292262a8879cf1bac4e96c48ec802ff8e5afcafba8d7a90c296a3fd9a3e18",
+          "resources/lib/menus/tvshows.py": "126e96a501fb3d0710fdaad0fefac87d5b9c5418bb49aedf142f9d0db08a9419",
+          "resources/lib/modules/control.py": "61cc9e8e5bbe38c43446118d9f6b1a47a7758556c86afa801f67b31aa9ef7733",
+          "resources/lib/modules/router.py": "4dc2c7e7eb1e281fda65ecdc2db04820d63cc4a9127c1642bbf525b5751234fc",
+          "umbrella.py": "e1d6f95d9995eecb59a66e17383451fc54f6b101e3c1e3c7f3b51df698d05cf6"
+        },
+        "exact_sources": {
+          "resources/lib/menus/episodes.py": "c3dd1ea82517b8a7def573ee90c4045cb6fd90baa40dda1c8d58e337cae25f73",
+          "resources/lib/menus/movies.py": "d6a271b7d5a50aae95507dedbbb0e08c215fbda42db500e95ec78d22fb8c8482",
+          "resources/lib/menus/seasons.py": "b9a3e2948e662c07750486aa527b8554faf61087d4e988186f6540f222cb186c",
+          "resources/lib/menus/tvshows.py": "5c075e845519eb92adc95d6b9efe539df781ac55604091c717794330d7827822",
+          "resources/lib/modules/control.py": "3b742abd6915ddd9f6b66bebf29b6aceecd0b78e68e43e273b8937a76cb07dcd",
+          "resources/lib/modules/router.py": "f996323bc7a94cf6c694f950e86d89d498c27d7e0723321d0241b957188b2c96",
+          "umbrella.py": "73e9e42ffde76121e6f79f986bb6ca204c7d0b21e8e93a0d0bcfa8a6fe1fc6c7"
+        }
+      },
+      {
+        "entrypoint": "seren.py",
+        "family": "json-args-list-v1",
+        "search": {
+          "movie": {
+            "params": {
+              "action": "moviesSearch"
+            },
+            "query_codec": "seren_json",
+            "query_key": "action_args"
+          },
+          "tv": {
+            "params": {
+              "action": "showsSearch"
+            },
+            "query_codec": "seren_json",
+            "query_key": "action_args"
+          }
+        },
+        "sources": {
+          "resources/lib/common/tools.py": "8f5cb0b9c27c71fce215bc6c74ea0b5096093e7e6851c2b19dc1faa840f68d4b",
+          "resources/lib/gui/movieMenus.py": "6cd01c052382e49635a492ea0aefab1cd9751dc4e6a11bb1a6a1a5cfb1074d6e",
+          "resources/lib/gui/tvshowMenus.py": "822507a349e3178ece07754a7475cd34ff14030e73d6d5111c3c1c05fa8f70e0",
+          "resources/lib/modules/globals.py": "5f60ae36c1d02ab9b9c5f1dd5ba2afb6466f733da5eda9ef2623df7c50e02932",
+          "resources/lib/modules/list_builder.py": "86c258a46e9cc0652934dccc4a56b9c96b64da3c831c2b87b7da2653ad7691db",
+          "resources/lib/modules/router.py": "bcbe488639a9ca82d30ffe1362f9c24af1d6e8b82f2dfc6d5b1ba16db7d4845c",
+          "seren.py": "ffe33f8d71e33cb79a9029b347fd15d383d8b5f5f356e2357356330a91b9c9ac"
+        },
+        "exact_sources": {
+          "resources/lib/common/tools.py": "558f5a58f2eefb0ab920db3b9b5961eb10203144e96a55a162711d59b5ee35cb",
+          "resources/lib/gui/movieMenus.py": "a3bcdb8ff489bee4ffb3858c47ca660bd0781edd144758ca7b869a02988a02e7",
+          "resources/lib/gui/tvshowMenus.py": "721ad77ccd318fd6ce52975e75d5ae3c2c81c918f4ac06005acb82798f0b8839",
+          "resources/lib/modules/globals.py": "ab943ec1dddb26e8172f46b2f4f446a06efdc0c9b9d9adc6a22e689798b623b8",
+          "resources/lib/modules/list_builder.py": "1557adc652ccb7576425212c1777ddabe2087ca1dab3e1c5808c40df5ce11569",
+          "resources/lib/modules/router.py": "cd96ae0e41952dae82e01e39e5cf2337dd85dc2fb1be597108f6545a7f094d90",
+          "seren.py": "515f177f58fe40da7bb2ff64c9f9625aa760c99350470389d97fea82dfbe5320"
+        }
+      },
+      {
+        "entrypoint": "resources/lib/router.py",
+        "family": "mode-list-v1",
+        "search": {
+          "movie": {
+            "params": {
+              "action": "tmdb_movies_search",
+              "mode": "build_movie_list"
+            },
+            "query_key": "query"
+          },
+          "tv": {
+            "params": {
+              "action": "tmdb_tv_search",
+              "mode": "build_tvshow_list"
+            },
+            "query_key": "query"
+          }
+        },
+        "sources": {
+          "resources/lib/indexers/metadata.py": "8ffd6ac9d80f6bd8fb2709764227a0a53704563b59e46a6d6bd3461e3b4a4285",
+          "resources/lib/menus/movies.py": "7e05ce0a40542b010fd56b9bef37495eb18c194550a3d23bf7c935bd3c8a09ed",
+          "resources/lib/menus/seasons.py": "c999b6bbd12c22c74e95c7c471eefe1b0c46c8b05c62d17c808108ade5d299ae",
+          "resources/lib/menus/tvshows.py": "dca403fc9c07079098b4406237a6e4e3c4f8b9473e3a4e0556f9a6ac7ad64732",
+          "resources/lib/modules/entry.py": "521e472aaa11c584b5cde62afa4badbef34c5bb6160541b88a44530833799b31",
+          "resources/lib/modules/kodi_utils.py": "af05b7baf72c2a1f833c7df0f974a3815c520b38c03371052dd67c3f06c486c9",
+          "resources/lib/router.py": "969283a4c566c79d8acff5dc2806e1f13a31e5cf75384992dc5b3727705ec702"
+        },
+        "exact_sources": {
+          "resources/lib/indexers/metadata.py": "66409de0d892b20e4e8c3b23cc7214727f2f8b40a643c49b228a758db74168be",
+          "resources/lib/menus/movies.py": "2328d24a4090396f3970fa329d48bbff92e86b7fcc5ee14fbaedfc1594263bef",
+          "resources/lib/menus/seasons.py": "1a29b118399825708302d090ff8d569ce831774e5fa23a26082a52352d9aa4a1",
+          "resources/lib/menus/tvshows.py": "b13b2fbfb4f48def0ef81c2ef4dede92a11f04c85ff54c101dd4286e94639680",
+          "resources/lib/modules/entry.py": "0814bc3b11b377ce96ce3373936a4fd40fb683e5330daa25fc8a17f63c732b6f",
+          "resources/lib/modules/kodi_utils.py": "26115e6c5af1297fbfad7d1600221b7184c1c86304efea4d65b7697d154c7b0a",
+          "resources/lib/router.py": "9bab400e60cfcb7a3923f9584c5348efa068fc361c3ee5e7d97101b65dbb3534"
+        }
+      },
+      {
+        "category_scope": {
+          "anime": "All anime formats",
+          "movie": "Anime movies only",
+          "tv": "Anime TV series only"
+        },
+        "entrypoint": "default.py",
+        "exact_sources": {
+          "default.py": "6b1047d153d25815b6dcb1161be998a24c6d8420d23d55e7b3894ec673586ed8",
+          "resources/lib/AniListBrowser.py": "638e42485644060787a6aa2dc7d8a0e365b3cb0c1bbb37ade23d583015d4d267",
+          "resources/lib/Main.py": "f04355c6f7ae9c19725a305ecd868a5a83c483fa919ece32727c63d5cd0a0653",
+          "resources/lib/MalBrowser.py": "7fe48afa7f6f6cd5040c5e325e1fd17d734c53b9558d960d5fb39d3189d0aa47",
+          "resources/lib/MetaBrowser.py": "bce6309c16cb61c2571b8685f54378c4b61b0d1f764250f6795d39ecebb47a55",
+          "resources/lib/OtakuBrowser.py": "a4893b3b8bc44f669b9919b763190d15d35632edfc7c5197355ce7c7bff3f704",
+          "resources/lib/ui/control.py": "04772586b06fb4a6b48f9a44aa2912e6cb551f2621231ef41f40a7b5ed255a13",
+          "resources/lib/ui/router.py": "b8992af051f878538120042b0c456dd5a072105b5cd1536d849522f86538d824"
+        },
+        "family": "otaku-path-search-v1",
+        "operations": [
+          "search"
+        ],
+        "search": {
+          "anime": {
+            "params": {},
+            "path_prefix": "search_anime/",
+            "query_codec": "path_component",
+            "query_key": "query"
+          },
+          "movie": {
+            "params": {},
+            "path_prefix": "search_movie/",
+            "query_codec": "path_component",
+            "query_key": "query"
+          },
+          "tv": {
+            "params": {},
+            "path_prefix": "search_tv_show/",
+            "query_codec": "path_component",
+            "query_key": "query"
+          }
+        },
+        "sources": {
+          "default.py": "15df616878857f8907beb9ce5fa021c1f3eeb3eb8e6c98768a12b814892298a1",
+          "resources/lib/AniListBrowser.py": "b4bae34508100c8da8af7dc4b632b9ced0845dfde9ff8a01a551b2059e3971c7",
+          "resources/lib/Main.py": "3e3ee60a3c44ff2869a57c7915ac877bfbaae361a1218f77fccb96c651ddf80c",
+          "resources/lib/MalBrowser.py": "6d4735f9f8312dabb297e742a9543d65c28f4db6f2a354fdb38c24a9b49c138f",
+          "resources/lib/MetaBrowser.py": "bc74e8deb3d1b2df6188cd76d9fa5f1e27b1ca50c459f89aa9f250397b95c4e0",
+          "resources/lib/OtakuBrowser.py": "521873c0e5cdb466a20e847ed4f65fe937819c84c3dc6b8dbbfefca0ffdf41b4",
+          "resources/lib/ui/control.py": "96e9e955fa2e48a733f3cb828fc16ba0480ef632fdaac4de5e861cb683658cbb",
+          "resources/lib/ui/router.py": "8b752ea1963379bb48a13cf36a82d6a30eeb1a2d72e2802093c8f832e848dfa4"
+        }
+      },
+      {
+        "category_scope": {
+          "movie": "Animated movies",
+          "tv": "Mixed anime and cartoon series; no genre filter"
+        },
+        "entrypoint": "default.py",
+        "exact_sources": {
+          "default.py": "aa2ce18fcbdf1a4076419e3e5b23b65d1dcc6abe0bf9edc66c206b4bfe8c7d75",
+          "lib/common.py": "826e411989c9d02b89ce6efe9715f3c74f7e241cbaca4bbac5c5f9999425c03e",
+          "lib/constants.py": "81c63b78d46f8cd7c99318be2923d86e85b4ff6833b6047970c5bb9155a6ee23",
+          "lib/network.py": "6cd59019db4fddeb86d83596cc163bd56176f181efcd3f21cf4313554b564d66",
+          "lib/plugin.py": "d8d395634eff8ada8c9d09138744997573035b7819fcac91985ff870bbfc2283",
+          "lib/sites/wcoflix.py": "171a090d4e26b0f94a39a9dd1e48301849561abbaa6aec2fd7c6534f42273395",
+          "lib/sites/wcoforever.py": "5a8fe52886a516b146481bcbb41b11ea31f8bdbdf0f10a1664481d7a239dd213",
+          "lib/sites/wcostream.py": "9c7b2e051cf61e147e860494f8eaebe597e0eddf3ef883ea35c0fb7fa226fa0d"
+        },
+        "family": "nixtoons-query-search-v1",
+        "operations": [
+          "search"
+        ],
+        "search": {
+          "movie": {
+            "params": {
+              "action": "actionSearchMenu",
+              "path": "/search",
+              "searchType": "movies"
+            },
+            "query_key": "query"
+          },
+          "tv": {
+            "params": {
+              "action": "actionSearchMenu",
+              "path": "/search",
+              "searchType": "series"
+            },
+            "query_key": "query"
+          }
+        },
+        "sources": {
+          "default.py": "d70758a5ce3b3e5f52e1f6efb95ca197b274483291267e5cc42aaa7533ef5fa8",
+          "lib/common.py": "a4e2115e0d08037b378b252c8a165c8e404d6503b9e63fba427ef4eb5520e18c",
+          "lib/constants.py": "9602d1f6d8b724ab431b28d54ca6a4d8cf08f12da8420002848eefabfa468125",
+          "lib/network.py": "a47f753af272fc1182b372d30be02926186455da9bd4d5956166a1519372ac06",
+          "lib/plugin.py": "47e60bc0b7c62e3388fafab1da365dca0d5032111d614e2710a24bbdf304ed92",
+          "lib/sites/wcoflix.py": "3b9e856aea09be1e9d5c26e9e693d273c4170d6972e5743407dca3a0e2b96b3b",
+          "lib/sites/wcoforever.py": "1c45cfe25482040fe47926f0626abab125442aa7aab92b9ca51f038025c10bb2",
+          "lib/sites/wcostream.py": "1085f41c7b81057f566dd8cb3773ab6f27aef5e25aec55277852f34af5ccbe02"
+        }
+      },
+      {
+        "category_scope": {
+          "movie": "Movies",
+          "tv": "TV shows"
+        },
+        "entrypoint": "homelander.py",
+        "exact_sources": {
+          "homelander.py": "12356cee4b5f3b2b3d322e83df29b6231ee68d5ac13f3e8e8b29f5639b762041",
+          "resources/lib/indexers/movies.py": "0e46b1e0511b033b36ac33e8447785ed455ebbfbf19750be33288eb50d295db7",
+          "resources/lib/indexers/tvshows.py": "c28baa6197e9e86696a0106905f8a33d448c6cca3d46d2d70c28e97f8b8dfb93",
+          "resources/lib/modules/control.py": "dd0b0caf81f4d4ee4607b0de297e0a7efdc96aca4aa7c562cf4a1917cebfdc2e",
+          "resources/lib/modules/router.py": "0de0b96fd83089dd0efb612ce6159c0122a938465d0634a1e76ce44b8cb1e1a5"
+        },
+        "family": "indexers-action-search-v1",
+        "operations": [
+          "search"
+        ],
+        "search": {
+          "movie": {
+            "params": {
+              "action": "movieSearchterm"
+            },
+            "query_key": "name"
+          },
+          "tv": {
+            "params": {
+              "action": "tvSearchterm"
+            },
+            "query_key": "name"
+          }
+        },
+        "sources": {
+          "homelander.py": "4c7b76b932e932e9145e3e8c8714de8cadf4a1bd9abf809fd55b4e87959b9f37",
+          "resources/lib/indexers/movies.py": "9c1eb582eece179dce036b12d8ab937eadf11d2aebdc301b83a893161f9082e1",
+          "resources/lib/indexers/tvshows.py": "763011de1055efac22929d024fbad32d99e528eb97c0c114905b1481ba2f7cfe",
+          "resources/lib/modules/control.py": "9cbef0a1c8787fa2fdd1ebfe4e349321f6623223a5189519e9fce6aec094dd60",
+          "resources/lib/modules/router.py": "519bc13f272fc077a773a8838c71fd32c2431c440338e1c5bfa3b0d6d371957d"
+        }
+      }
+    ],
+    "provenance": [
+      {
+        "addon": "plugin.video.pov",
+        "archive": "pov-6.10.21.zip",
+        "git_blob": "2bd9233a980758dd8471bb9eb0e10267fa1629de",
+        "sha256": "e75d5e0946631a735efa6e3cab62d5121f5cb52e6ab829de1a1a4673ff3c4c98",
+        "url": "https://raw.githubusercontent.com/kodifitzwell/repo/61f18ed18f4ef342b37fe8ff4bce2eaf2ff499c1/plugin.video.pov/plugin.video.pov-6.10.21.zip",
+        "version": "6.10.21"
+      },
+      {
+        "addon": "plugin.video.umbrella",
+        "archive": "umbrella-6.7.729.zip",
+        "sha256": "df02c5de5b614d70c32c27917d7e27110947b03efb15980f461522a5abceff3a",
+        "url": "https://raw.githubusercontent.com/umbrellaplug/umbrellaplug.github.io/c8e728d65cf2eb9b35501d90f218a49db44f46ca/omega/zips/plugin.video.umbrella/plugin.video.umbrella-6.7.729.zip",
+        "version": "6.7.729"
+      },
+      {
+        "addon": "plugin.video.seren",
+        "archive": "seren-4.3.214.zip",
+        "sha256": "83e4f40478b091ec21beb012ec0fdd060e0e0ce539c09e9a177b018beb35d3bf",
+        "url": "https://raw.githubusercontent.com/deklica/repo.dexe/824cbcaddf0ca88230300805f5b78744b0297eea/zips/plugin.video.seren/plugin.video.seren-4.3.214.zip",
+        "version": "4.3.214"
+      },
+      {
+        "addon": "plugin.video.pov",
+        "archive": "pov-6.10.22.zip",
+        "git_blob": "fde9f10672ac998157169ad296dc3ab6a1734b57",
+        "sha256": "126b9fbe690dded613d0c2bab177babd6ce2235bc9d67fb25e1c79aefc9dc0d3",
+        "url": "https://raw.githubusercontent.com/kodifitzwell/repo/master/plugin.video.pov/plugin.video.pov-6.10.22.zip",
+        "version": "6.10.22"
+      },
+      {
+        "addon": "plugin.video.otaku",
+        "category_scope": {
+          "anime": "All anime formats",
+          "movie": "Anime movies only",
+          "tv": "Anime TV series only"
+        },
+        "entrypoint": "default.py",
+        "family": "otaku-path-search-v1",
+        "identity_notes": "Source publishes mal_id and sometimes additional IDs; no new saved-navigation identity adapter authorized by this search contract.",
+        "raw_sha256": {
+          "addon.xml": "ae4ab72c164d9be7a7bf557e503ceb4e735b5605cd8027854149e26fa92b8596",
+          "default.py": "6b1047d153d25815b6dcb1161be998a24c6d8420d23d55e7b3894ec673586ed8",
+          "resources/lib/AniListBrowser.py": "638e42485644060787a6aa2dc7d8a0e365b3cb0c1bbb37ade23d583015d4d267",
+          "resources/lib/Main.py": "f04355c6f7ae9c19725a305ecd868a5a83c483fa919ece32727c63d5cd0a0653",
+          "resources/lib/MalBrowser.py": "7fe48afa7f6f6cd5040c5e325e1fd17d734c53b9558d960d5fb39d3189d0aa47",
+          "resources/lib/MetaBrowser.py": "bce6309c16cb61c2571b8685f54378c4b61b0d1f764250f6795d39ecebb47a55",
+          "resources/lib/OtakuBrowser.py": "a4893b3b8bc44f669b9919b763190d15d35632edfc7c5197355ce7c7bff3f704",
+          "resources/lib/ui/control.py": "04772586b06fb4a6b48f9a44aa2912e6cb551f2621231ef41f40a7b5ed255a13",
+          "resources/lib/ui/router.py": "b8992af051f878538120042b0c456dd5a072105b5cd1536d849522f86538d824"
+        },
+        "source_commit": "f6d542131c958ca63105e37bcf7cd414c9c55684",
+        "source_repository": "https://github.com/Goldenfreddy0703/Otaku",
+        "version": "5.3.4"
+      },
+      {
+        "addon": "plugin.video.watchnixtoons2",
+        "archive": "plugin.video.watchnixtoons2-0.14.24.zip",
+        "archive_sha256": "76a0580d035b80634fc6775f46aacc780a9449a9ca46b446dde63c2360ce6540",
+        "archive_url": "https://raw.githubusercontent.com/OldManJax/repository.animaniac/ac317fdf6d001f6e252b41037fb1086817e8b00f/plugin.video.watchnixtoons2/plugin.video.watchnixtoons2-0.14.24.zip",
+        "category_scope": {
+          "movie": "Animated movies",
+          "tv": "Mixed anime and cartoon series; no genre filter"
+        },
+        "entrypoint": "default.py",
+        "family": "nixtoons-query-search-v1",
+        "identity_notes": "No setUniqueIDs in search list-item factory; movie/series/episode labels alone are not cross-provider identities. Exact-identity recovery unsupported.",
+        "raw_sha256": {
+          "addon.xml": "9dc68f15ce6d7e80ff31443eff8fcf43afe80d8fcdd88a5e8fc592f9fa31318c",
+          "default.py": "aa2ce18fcbdf1a4076419e3e5b23b65d1dcc6abe0bf9edc66c206b4bfe8c7d75",
+          "lib/common.py": "826e411989c9d02b89ce6efe9715f3c74f7e241cbaca4bbac5c5f9999425c03e",
+          "lib/constants.py": "81c63b78d46f8cd7c99318be2923d86e85b4ff6833b6047970c5bb9155a6ee23",
+          "lib/network.py": "6cd59019db4fddeb86d83596cc163bd56176f181efcd3f21cf4313554b564d66",
+          "lib/plugin.py": "d8d395634eff8ada8c9d09138744997573035b7819fcac91985ff870bbfc2283",
+          "lib/sites/wcoflix.py": "171a090d4e26b0f94a39a9dd1e48301849561abbaa6aec2fd7c6534f42273395",
+          "lib/sites/wcoforever.py": "5a8fe52886a516b146481bcbb41b11ea31f8bdbdf0f10a1664481d7a239dd213",
+          "lib/sites/wcostream.py": "9c7b2e051cf61e147e860494f8eaebe597e0eddf3ef883ea35c0fb7fa226fa0d"
+        },
+        "source_commit": "ac317fdf6d001f6e252b41037fb1086817e8b00f",
+        "source_repository": "https://github.com/OldManJax/repository.animaniac",
+        "version": "0.14.24"
+      },
+      {
+        "addon": "plugin.video.homelander",
+        "archive": "plugin.video.homelander-1.2.5.zip",
+        "archive_sha256": "f9a5b061c9053541343370d5ee3a37245a1c8cd016c08146d075932951bcabea",
+        "archive_url": "https://raw.githubusercontent.com/thecrewwh/zips/88ff49ac1efd13f3187f029360ffd6b6a9d6ea78/matrix/_zip/plugin.video.homelander/plugin.video.homelander-1.2.5.zip",
+        "category_scope": {
+          "movie": "Movies",
+          "tv": "TV shows"
+        },
+        "entrypoint": "homelander.py",
+        "family": "indexers-action-search-v1",
+        "identity_notes": "Search returns IMDb/TMDb IDs and original routes. This contract grants search only, not a new title-navigation adapter. This version was removed from the current official repository; no assertion that it is latest.",
+        "raw_sha256": {
+          "addon.xml": "1d871b8b3d1929d0554335ba19915c386a142617db2d78fe81883c1fead22115",
+          "homelander.py": "12356cee4b5f3b2b3d322e83df29b6231ee68d5ac13f3e8e8b29f5639b762041",
+          "resources/lib/indexers/movies.py": "0e46b1e0511b033b36ac33e8447785ed455ebbfbf19750be33288eb50d295db7",
+          "resources/lib/indexers/tvshows.py": "c28baa6197e9e86696a0106905f8a33d448c6cca3d46d2d70c28e97f8b8dfb93",
+          "resources/lib/modules/control.py": "dd0b0caf81f4d4ee4607b0de297e0a7efdc96aca4aa7c562cf4a1917cebfdc2e",
+          "resources/lib/modules/router.py": "0de0b96fd83089dd0efb612ce6159c0122a938465d0634a1e76ce44b8cb1e1a5"
+        },
+        "source_commit": "88ff49ac1efd13f3187f029360ffd6b6a9d6ea78",
+        "source_repository": "https://github.com/thecrewwh/zips",
+        "version": "1.2.5"
+      }
+    ],
+    "schema": 1
+  },
+  "reviewed": [
+    {
+      "contract": 1,
+      "observed_provider": "plugin.video.umbrella",
+      "observed_version": "6.7.729",
+      "source_pins": {
+        "resources/lib/menus/episodes.py": "c3dd1ea82517b8a7def573ee90c4045cb6fd90baa40dda1c8d58e337cae25f73",
+        "resources/lib/menus/movies.py": "d6a271b7d5a50aae95507dedbbb0e08c215fbda42db500e95ec78d22fb8c8482",
+        "resources/lib/menus/seasons.py": "b9a3e2948e662c07750486aa527b8554faf61087d4e988186f6540f222cb186c",
+        "resources/lib/menus/tvshows.py": "5c075e845519eb92adc95d6b9efe539df781ac55604091c717794330d7827822",
+        "resources/lib/modules/control.py": "3b742abd6915ddd9f6b66bebf29b6aceecd0b78e68e43e273b8937a76cb07dcd",
+        "resources/lib/modules/router.py": "f996323bc7a94cf6c694f950e86d89d498c27d7e0723321d0241b957188b2c96",
+        "umbrella.py": "73e9e42ffde76121e6f79f986bb6ca204c7d0b21e8e93a0d0bcfa8a6fe1fc6c7"
+      }
+    },
+    {
+      "contract": 3,
+      "observed_provider": "plugin.video.pov",
+      "observed_version": "6.10.22",
+      "source_pins": {
+        "resources/lib/indexers/metadata.py": "66409de0d892b20e4e8c3b23cc7214727f2f8b40a643c49b228a758db74168be",
+        "resources/lib/menus/movies.py": "2328d24a4090396f3970fa329d48bbff92e86b7fcc5ee14fbaedfc1594263bef",
+        "resources/lib/menus/seasons.py": "1a29b118399825708302d090ff8d569ce831774e5fa23a26082a52352d9aa4a1",
+        "resources/lib/menus/tvshows.py": "b13b2fbfb4f48def0ef81c2ef4dede92a11f04c85ff54c101dd4286e94639680",
+        "resources/lib/modules/entry.py": "0814bc3b11b377ce96ce3373936a4fd40fb683e5330daa25fc8a17f63c732b6f",
+        "resources/lib/modules/kodi_utils.py": "26115e6c5af1297fbfad7d1600221b7184c1c86304efea4d65b7697d154c7b0a",
+        "resources/lib/router.py": "9bab400e60cfcb7a3923f9584c5348efa068fc361c3ee5e7d97101b65dbb3534"
+      }
+    },
+    {
+      "contract": 2,
+      "observed_provider": "plugin.video.seren",
+      "observed_version": "4.3.214",
+      "source_pins": {
+        "resources/lib/common/tools.py": "558f5a58f2eefb0ab920db3b9b5961eb10203144e96a55a162711d59b5ee35cb",
+        "resources/lib/gui/movieMenus.py": "a3bcdb8ff489bee4ffb3858c47ca660bd0781edd144758ca7b869a02988a02e7",
+        "resources/lib/gui/tvshowMenus.py": "721ad77ccd318fd6ce52975e75d5ae3c2c81c918f4ac06005acb82798f0b8839",
+        "resources/lib/modules/globals.py": "ab943ec1dddb26e8172f46b2f4f446a06efdc0c9b9d9adc6a22e689798b623b8",
+        "resources/lib/modules/list_builder.py": "1557adc652ccb7576425212c1777ddabe2087ca1dab3e1c5808c40df5ce11569",
+        "resources/lib/modules/router.py": "cd96ae0e41952dae82e01e39e5cf2337dd85dc2fb1be597108f6545a7f094d90",
+        "seren.py": "515f177f58fe40da7bb2ff64c9f9625aa760c99350470389d97fea82dfbe5320"
+      }
+    }
+  ]
+}

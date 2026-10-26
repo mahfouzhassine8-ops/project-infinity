@@ -131,10 +131,10 @@ class JavaModuleMigrationTests(unittest.TestCase):
         old=self.path/'old-assets';shutil.copytree(self.composed,old/'addons')
         cc=old/'addons'/bundle.CC
         (cc/'addon.xml').write_text((cc/'addon.xml').read_text().replace('version="0.3.5.41"','version="0.3.5.40"',1))
-        for name in ('information.py','provider_inventory.py'):
+        for name in ('information.py','title_metadata.py','provider_inventory.py','NAVIGATION-CONTRACTS.json'):
             shutil.copyfile(self.sources/bundle.CC/name,cc/name)
         (cc/'infinity_search.py').write_bytes(search_patch((self.sources/bundle.CC/'infinity_search.py').read_bytes()))
-        for name in ('provider_capabilities.py','SEARCH-STRUCTURES.json',bundle.MANIFEST,bundle.MANIFEST+'.sig'):
+        for name in ('provider_capabilities.py','SEARCH-STRUCTURES.json','structural_search.py','MODE-CLASS-SEARCH-POLICY.json',bundle.MANIFEST,bundle.MANIFEST+'.sig'):
             if (cc/name).exists():(cc/name).unlink()
         report=bundle.prepare(old/'addons')
         self.assertEqual(report['manifest_sha256'],'b3e53a6dcd3c6a061c18296d7aa613738bc273b0ef3b0f2630740e03a925281e')
