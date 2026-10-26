@@ -100,3 +100,12 @@ Read CONTINUATION-2103417-PICKUP.md first for the exact current signed APK, inde
 ## Latest signed418 pickup — 2026-10-26
 
 Read CONTINUATION-2103418-PICKUP.md first. Actual signed418 build40383785065 is available; continue existing feature40386278214 and independent realTV3 Power40386278200. The next independent418native image/unsafe request remains separate. No repeat/rebuild/restart without an actual correction-specific reason; all seven streams and physical Fold final acceptance remain mandatory.
+
+
+## Current signed419 correction and independent integration runs
+
+Read CONTINUATION-2103419-PICKUP.md first for actual419 APK/source/build pins and
+four independent active runs. Do not restart them or replace the seven-stream
+scope. Preserve418actualTVPower3/writerPASS and actualSearch/prelaunch failures.
+Current saved deliverable remains older418; rebuild/update SAME items after
+actual419evidence. PhysicalFold acceptance/noCobra/noreset/no finallock remain.
