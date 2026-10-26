@@ -1,0 +1,520 @@
+{
+  "run": 40386278214,
+  "test_source": "b3f2f0ed9b776a0eea48d88bc9e734451547261a",
+  "candidate_source": "90cb67fd7c1c581e1f6d195adf1bb0c95b8fb42b",
+  "apk_sha256": "328757eb858a79f91883c0ba4e2884410baaf0b42730db5d62054679253674e4",
+  "artifact": 12684400044,
+  "artifact_sha256": "0f6074b81695bf32a445d1897a37bfa8afe0dcd07639d7d49e1230b9e665c3d5",
+  "passed": false,
+  "original_selected_feature_passed": true,
+  "completed": {
+    "search": 8,
+    "playback_home": 0,
+    "rotation": 0
+  },
+  "failure": "Selected stress: RuntimeError: Feature state was not observed before deadline",
+  "actual_searches": [
+    {
+      "cycle": 0,
+      "query": "Just Friends",
+      "elapsed_ms": 108016.87783199987,
+      "visible": {
+        "Container.FolderPath": "plugin://script.infinity.commandcenter/?action=search-all&media=movie&query=Just+Friends",
+        "Container.NumItems": "53",
+        "actual_providers": [
+          "plugin.video.pov",
+          "plugin.video.seren",
+          "plugin.video.umbrella"
+        ],
+        "actual_provider_terminal": {
+          "providers": {
+            "plugin.video.umbrella": {
+              "status": "completed",
+              "reported_result_count": 21,
+              "content_success": true,
+              "actual_label": "Umbrella \u2014 21 results"
+            },
+            "plugin.video.pov": {
+              "status": "completed",
+              "reported_result_count": 21,
+              "content_success": true,
+              "actual_label": "POV \u2014 21 results"
+            },
+            "plugin.video.seren": {
+              "status": "completed",
+              "reported_result_count": 8,
+              "content_success": true,
+              "actual_label": "Seren \u2014 8 results"
+            }
+          },
+          "content_success": true,
+          "graceful_provider_failures": []
+        }
+      },
+      "pid": 4805,
+      "actual_android_input": true,
+      "selected_provider": "all",
+      "history_row_used": false,
+      "duplicate_enter_sent": false
+    },
+    {
+      "cycle": 1,
+      "query": "The Matrix",
+      "elapsed_ms": 71389.40576699997,
+      "visible": {
+        "Container.FolderPath": "plugin://script.infinity.commandcenter/?action=search-provider&media=movie&query=The+Matrix&provider=plugin.video.umbrella",
+        "Container.NumItems": "22",
+        "actual_providers": [
+          "plugin.video.umbrella"
+        ],
+        "actual_provider_terminal": {
+          "providers": {
+            "plugin.video.umbrella": {
+              "status": "completed",
+              "reported_result_count": 21,
+              "content_success": true,
+              "actual_label": "Umbrella \u2014 21 results"
+            }
+          },
+          "content_success": true,
+          "graceful_provider_failures": []
+        }
+      },
+      "pid": 4805,
+      "actual_android_input": true,
+      "selected_provider": "plugin.video.umbrella",
+      "history_row_used": false,
+      "duplicate_enter_sent": false
+    },
+    {
+      "cycle": 2,
+      "query": "Just Friends",
+      "elapsed_ms": 80138.18756599995,
+      "visible": {
+        "Container.FolderPath": "plugin://script.infinity.commandcenter/?action=search-all&media=movie&query=Just+Friends",
+        "Container.NumItems": "53",
+        "actual_providers": [
+          "plugin.video.pov",
+          "plugin.video.seren",
+          "plugin.video.umbrella"
+        ],
+        "actual_provider_terminal": {
+          "providers": {
+            "plugin.video.umbrella": {
+              "status": "completed",
+              "reported_result_count": 21,
+              "content_success": true,
+              "actual_label": "Umbrella \u2014 21 results"
+            },
+            "plugin.video.pov": {
+              "status": "completed",
+              "reported_result_count": 21,
+              "content_success": true,
+              "actual_label": "POV \u2014 21 results"
+            },
+            "plugin.video.seren": {
+              "status": "completed",
+              "reported_result_count": 8,
+              "content_success": true,
+              "actual_label": "Seren \u2014 8 results"
+            }
+          },
+          "content_success": true,
+          "graceful_provider_failures": []
+        }
+      },
+      "pid": 4805,
+      "actual_android_input": true,
+      "selected_provider": "all",
+      "history_row_used": false,
+      "duplicate_enter_sent": false
+    },
+    {
+      "cycle": 3,
+      "query": "The Matrix",
+      "elapsed_ms": 98868.70774399996,
+      "visible": {
+        "Container.FolderPath": "plugin://script.infinity.commandcenter/?action=search-provider&media=movie&query=The+Matrix&provider=plugin.video.umbrella",
+        "Container.NumItems": "22",
+        "actual_providers": [
+          "plugin.video.umbrella"
+        ],
+        "actual_provider_terminal": {
+          "providers": {
+            "plugin.video.umbrella": {
+              "status": "completed",
+              "reported_result_count": 21,
+              "content_success": true,
+              "actual_label": "Umbrella \u2014 21 results"
+            }
+          },
+          "content_success": true,
+          "graceful_provider_failures": []
+        }
+      },
+      "pid": 4805,
+      "actual_android_input": true,
+      "selected_provider": "plugin.video.umbrella",
+      "history_row_used": false,
+      "duplicate_enter_sent": false
+    },
+    {
+      "cycle": 4,
+      "query": "Just Friends",
+      "elapsed_ms": 112310.79761800016,
+      "visible": {
+        "Container.FolderPath": "plugin://script.infinity.commandcenter/?action=search-all&media=movie&query=Just+Friends",
+        "Container.NumItems": "53",
+        "actual_providers": [
+          "plugin.video.pov",
+          "plugin.video.seren",
+          "plugin.video.umbrella"
+        ],
+        "actual_provider_terminal": {
+          "providers": {
+            "plugin.video.umbrella": {
+              "status": "completed",
+              "reported_result_count": 21,
+              "content_success": true,
+              "actual_label": "Umbrella \u2014 21 results"
+            },
+            "plugin.video.pov": {
+              "status": "completed",
+              "reported_result_count": 21,
+              "content_success": true,
+              "actual_label": "POV \u2014 21 results"
+            },
+            "plugin.video.seren": {
+              "status": "completed",
+              "reported_result_count": 8,
+              "content_success": true,
+              "actual_label": "Seren \u2014 8 results"
+            }
+          },
+          "content_success": true,
+          "graceful_provider_failures": []
+        }
+      },
+      "pid": 4805,
+      "actual_android_input": true,
+      "selected_provider": "all",
+      "history_row_used": false,
+      "duplicate_enter_sent": false
+    },
+    {
+      "cycle": 5,
+      "query": "The Matrix",
+      "elapsed_ms": 128291.83616699993,
+      "visible": {
+        "Container.FolderPath": "plugin://script.infinity.commandcenter/?action=search-provider&media=movie&query=The+Matrix&provider=plugin.video.umbrella",
+        "Container.NumItems": "1",
+        "actual_providers": [
+          "plugin.video.umbrella"
+        ],
+        "actual_provider_terminal": {
+          "providers": {
+            "plugin.video.umbrella": {
+              "status": "timeout",
+              "content_success": false,
+              "actual_label": "Umbrella \u2014 timeout"
+            }
+          },
+          "content_success": false,
+          "graceful_provider_failures": [
+            {
+              "provider": "plugin.video.umbrella",
+              "status": "timeout",
+              "content_success": false,
+              "actual_label": "Umbrella \u2014 timeout"
+            }
+          ]
+        }
+      },
+      "pid": 4805,
+      "actual_android_input": true,
+      "selected_provider": "plugin.video.umbrella",
+      "history_row_used": false,
+      "duplicate_enter_sent": false
+    },
+    {
+      "cycle": 6,
+      "query": "Just Friends",
+      "elapsed_ms": 90613.08737600007,
+      "visible": {
+        "Container.FolderPath": "plugin://script.infinity.commandcenter/?action=search-all&media=movie&query=Just+Friends",
+        "Container.NumItems": "53",
+        "actual_providers": [
+          "plugin.video.pov",
+          "plugin.video.seren",
+          "plugin.video.umbrella"
+        ],
+        "actual_provider_terminal": {
+          "providers": {
+            "plugin.video.umbrella": {
+              "status": "completed",
+              "reported_result_count": 21,
+              "content_success": true,
+              "actual_label": "Umbrella \u2014 21 results"
+            },
+            "plugin.video.pov": {
+              "status": "completed",
+              "reported_result_count": 21,
+              "content_success": true,
+              "actual_label": "POV \u2014 21 results"
+            },
+            "plugin.video.seren": {
+              "status": "completed",
+              "reported_result_count": 8,
+              "content_success": true,
+              "actual_label": "Seren \u2014 8 results"
+            }
+          },
+          "content_success": true,
+          "graceful_provider_failures": []
+        }
+      },
+      "pid": 4805,
+      "actual_android_input": true,
+      "selected_provider": "all",
+      "history_row_used": false,
+      "duplicate_enter_sent": false
+    },
+    {
+      "cycle": 7,
+      "query": "The Matrix",
+      "elapsed_ms": 114189.37679500005,
+      "visible": {
+        "Container.FolderPath": "plugin://script.infinity.commandcenter/?action=search-provider&media=movie&query=The+Matrix&provider=plugin.video.umbrella",
+        "Container.NumItems": "1",
+        "actual_providers": [
+          "plugin.video.umbrella"
+        ],
+        "actual_provider_terminal": {
+          "providers": {
+            "plugin.video.umbrella": {
+              "status": "timeout",
+              "content_success": false,
+              "actual_label": "Umbrella \u2014 timeout"
+            }
+          },
+          "content_success": false,
+          "graceful_provider_failures": [
+            {
+              "provider": "plugin.video.umbrella",
+              "status": "timeout",
+              "content_success": false,
+              "actual_label": "Umbrella \u2014 timeout"
+            }
+          ]
+        }
+      },
+      "pid": 4805,
+      "actual_android_input": true,
+      "selected_provider": "plugin.video.umbrella",
+      "history_row_used": false,
+      "duplicate_enter_sent": false
+    }
+  ],
+  "successful_content": 6,
+  "graceful_provider_failures": [
+    {
+      "cycle": 5,
+      "query": "The Matrix",
+      "elapsed_ms": 128291.83616699993,
+      "visible": {
+        "Container.FolderPath": "plugin://script.infinity.commandcenter/?action=search-provider&media=movie&query=The+Matrix&provider=plugin.video.umbrella",
+        "Container.NumItems": "1",
+        "actual_providers": [
+          "plugin.video.umbrella"
+        ],
+        "actual_provider_terminal": {
+          "providers": {
+            "plugin.video.umbrella": {
+              "status": "timeout",
+              "content_success": false,
+              "actual_label": "Umbrella \u2014 timeout"
+            }
+          },
+          "content_success": false,
+          "graceful_provider_failures": [
+            {
+              "provider": "plugin.video.umbrella",
+              "status": "timeout",
+              "content_success": false,
+              "actual_label": "Umbrella \u2014 timeout"
+            }
+          ]
+        }
+      },
+      "pid": 4805,
+      "actual_android_input": true,
+      "selected_provider": "plugin.video.umbrella",
+      "history_row_used": false,
+      "duplicate_enter_sent": false
+    },
+    {
+      "cycle": 7,
+      "query": "The Matrix",
+      "elapsed_ms": 114189.37679500005,
+      "visible": {
+        "Container.FolderPath": "plugin://script.infinity.commandcenter/?action=search-provider&media=movie&query=The+Matrix&provider=plugin.video.umbrella",
+        "Container.NumItems": "1",
+        "actual_providers": [
+          "plugin.video.umbrella"
+        ],
+        "actual_provider_terminal": {
+          "providers": {
+            "plugin.video.umbrella": {
+              "status": "timeout",
+              "content_success": false,
+              "actual_label": "Umbrella \u2014 timeout"
+            }
+          },
+          "content_success": false,
+          "graceful_provider_failures": [
+            {
+              "provider": "plugin.video.umbrella",
+              "status": "timeout",
+              "content_success": false,
+              "actual_label": "Umbrella \u2014 timeout"
+            }
+          ]
+        }
+      },
+      "pid": 4805,
+      "actual_android_input": true,
+      "selected_provider": "plugin.video.umbrella",
+      "history_row_used": false,
+      "duplicate_enter_sent": false
+    }
+  ],
+  "actual_cached_Home_card": {
+    "media": "movie",
+    "key": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "exact_usable_card": true,
+    "observed": {
+      "Container(8830).ListItem.Episode": "",
+      "Container(8830).ListItem.Label": "The Matrix",
+      "Container(8830).ListItem.PercentPlayed": "33",
+      "Container(8830).ListItem.Property(Infinity.ResumeHub.Watched)": "false",
+      "Container(8830).ListItem.Property(Infinity.Selection.Snapshot)": "{\"bucket\":\"continue\",\"identity\":{\"ids\":{\"imdb\":\"tt0133093\"},\"kind\":\"movie\",\"schema\":1,\"scope\":\"movie\"},\"key\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"list\":\"\",\"owner\":\"script.infinity.commandcenter\",\"schema\":1,\"source\":\"special://profile/infinity-final-qa.mp4\",\"stable_source\":\"special://profile/infinity-final-qa.mp4\",\"token\":\"52f818e464fdd76b57048d55623ec9c816cafa102a29f74dbc6725a033f226ae\"}",
+      "Container(8830).ListItem.Season": "",
+      "Container(8830).NumItems": "1"
+    },
+    "observation_began_monotonic": 1022.667910487,
+    "native_directory_resume": {
+      "position": 60.0,
+      "total": 180.0
+    },
+    "tab_select_to_card_visible_ms": 4011.6845259999536,
+    "tab_select_to_usable_card_ms": 4523.704935000069,
+    "exact_native_proof_finished_ms": 17282.837596000034,
+    "verification_scope": "Visible native resume percent plus exact directory native resume; reserved GUI properties are not readouts",
+    "generated_metadata_and_declared_clip": true,
+    "poster_paint_verified": true,
+    "actual_cached_poster": {
+      "width": 1080,
+      "height": 1920,
+      "regions": [
+        {
+          "colour": [
+            17,
+            203,
+            91
+          ],
+          "pixels": 15105,
+          "sampled_pixels": 2158,
+          "x": 70.9902687673772,
+          "y": 1540.0157553290082,
+          "bounds": [
+            24,
+            1461,
+            118,
+            1619
+          ]
+        },
+        {
+          "colour": [
+            237,
+            49,
+            174
+          ],
+          "pixels": 15105,
+          "sampled_pixels": 2158,
+          "x": 165.99721964782205,
+          "y": 1540.005560704356,
+          "bounds": [
+            119,
+            1461,
+            213,
+            1619
+          ]
+        },
+        {
+          "colour": [
+            44,
+            97,
+            233
+          ],
+          "pixels": 15104,
+          "sampled_pixels": 2157,
+          "x": 71.00649049605934,
+          "y": 1698.9893370421883,
+          "bounds": [
+            24,
+            1620,
+            118,
+            1778
+          ]
+        },
+        {
+          "colour": [
+            243,
+            176,
+            33
+          ],
+          "pixels": 15104,
+          "sampled_pixels": 2158,
+          "x": 165.9902687673772,
+          "y": 1699.0157553290082,
+          "bounds": [
+            119,
+            1620,
+            213,
+            1778
+          ]
+        }
+      ],
+      "sample_stride": 7,
+      "actual_surface_bitmap_verified": true,
+      "first_observed_poster_capture_ms": 4523.704935000069,
+      "paint_verification_finished_ms": 4817.201823999994,
+      "samples": 1,
+      "observation": "Actual cached synthetic bitmap on Android surface; conservative captured upper bound, not GPU first-paint timestamp"
+    }
+  },
+  "actual_memory": [
+    {
+      "stage": "before",
+      "pss_kib": 906321,
+      "rss_kib": 1076464,
+      "thread_count": 69,
+      "descriptor_count": 505
+    },
+    {
+      "stage": "search-5",
+      "pss_kib": 1135189,
+      "rss_kib": 1274084,
+      "thread_count": 68,
+      "descriptor_count": 508
+    }
+  ],
+  "measurement_limits": [
+    "Cached card/poster4523.705ms after tab, not coldstartup",
+    "906321to1135189KiB PSS at5Search; no after-full-run sample, no memory-improvement/leak-elimination claim",
+    "0playbackHome/rotation; new independent explicitly selected run does not waive8/50Search failure"
+  ],
+  "physical_Fold": "NOT RUN",
+  "release_accepted": false,
+  "final_lock": false
+}

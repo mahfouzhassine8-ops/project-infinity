@@ -16,6 +16,7 @@ import android_frame_samples
 import android_stress_script
 
 COUNTS={'search':50,'playback_home':30,'rotation':20}
+HOME_COUNTS={'search':0,'playback_home':30,'rotation':20}
 
 
 def require(value,message):
@@ -23,7 +24,7 @@ def require(value,message):
 
 
 def admit(device,setup,expected):
-    require(expected.get('post_feature')==COUNTS,'Exact stress selection required')
+    require(expected.get('post_feature') in (COUNTS,HOME_COUNTS),'Exact stress selection required')
     require(setup.get('passed') is True,'Selected real feature did not pass')
     require(setup.get('apk_sha256')==expected['candidate_apk_sha256'],'Stress APK binding differs')
     require(device.PACKAGE=='com.projectinfinity.kodi','Wrong application')
@@ -45,8 +46,9 @@ def quantiles(values):
 
 def _run(device,setup,expected,out):
     owner=admit(device,setup,expected);out=Path(out);out.mkdir(exist_ok=False)
+    wanted=dict(expected['post_feature'])
     report=dict(passed=False,apk_sha256=expected['candidate_apk_sha256'],owner=owner,
-        requested=COUNTS,search=[],playback_home=[],rotation=[],snapshots=[],scroll_samples=[],
+        requested=wanted,search=[],playback_home=[],rotation=[],snapshots=[],scroll_samples=[],
         physical_Fold='NOT RUN',shutdown='NOT SELECTED',poster_first_paint='NOT MEASURED',
         native_frame_pacing='RAW SAMPLES ONLY; no native FPS claim',
         playback_content='Generated gray640x360 H264 clip, no real movie playback claim')
@@ -142,7 +144,7 @@ def _run(device,setup,expected,out):
         report['initial_cached_Home_card']=stress_resume_card.observe(device,protected,'movie',out/'initial-cached-poster')
         report['poster_first_paint']='Actual cached QA bitmap observed on native Android surface; not cold app launch or remote artwork'
         save();home()
-    for index in range(COUNTS['search']):
+    for index in range(wanted['search']):
         query='Just Friends' if index%2==0 else 'The Matrix'
         provider='all' if index%2==0 else 'plugin.video.umbrella'
         began=time.monotonic()
@@ -225,7 +227,7 @@ def _run(device,setup,expected,out):
                     '-t','8','-an','-c:v','libx264','-pix_fmt','yuv420p',str(clip)],check=True)
     remote=device.PROFILE+'/infinity-stress-native.mp4';device.adb('push',clip,remote)
     require(not device.rpc('Player.GetActivePlayers'),'Unexpected playback before test clip')
-    for index in range(COUNTS['playback_home']):
+    for index in range(wanted['playback_home']):
         device.rpc('Player.Open',{'item':{'file':remote},'options':{'resume':False}})
         players=device.until(lambda:[p for p in device.rpc('Player.GetActivePlayers') if p.get('type')=='video'],20)
         player=players[0]['playerid']
@@ -250,7 +252,7 @@ def _run(device,setup,expected,out):
     report['original_rotation_settings']=previous
     try:
         device.shell('settings','put','system','accelerometer_rotation','0')
-        for index in range(COUNTS['rotation']):
+        for index in range(wanted['rotation']):
             value=1 if index%2==0 else 0;began=time.monotonic()
             device.shell('settings','put','system','user_rotation',str(value))
             def rotated():
@@ -276,16 +278,16 @@ def _run(device,setup,expected,out):
         (out/('after-layer-'+str(index)+'.txt')).write_text(device.shell('dumpsys','SurfaceFlinger','--latency',layer,check=False))
     (out/'display-state.txt').write_text(device.shell('dumpsys','display',check=False))
     report['search_duration']=quantiles([x['elapsed_ms'] for x in report['search']])
-    report['search_interaction_stability_scope']='Exact actual terminal UI; attributed provider failures remain separate content failures'
+    report['search_interaction_stability_scope']='Exact actual terminal UI; attributed provider failures remain separate content failures' if wanted['search'] else 'NOT SELECTED; prior Search50failure remains independent'
     report['successful_content_searches']=sum(x['visible']['actual_provider_terminal']['content_success'] for x in report['search'])
     report['provider_content_failures']=[dict(cycle=x['cycle'],failures=x['visible']['actual_provider_terminal']['graceful_provider_failures'])
         for x in report['search'] if not x['visible']['actual_provider_terminal']['content_success']]
-    report['all_searches_returned_successful_content']=report['successful_content_searches']==COUNTS['search']
+    report['all_searches_returned_successful_content']=report['successful_content_searches']==wanted['search'] if wanted['search'] else None
     report['home_window_rpc_duration']=quantiles([x['home_window_rpc_ready_ms'] for x in report['playback_home']])
     report['stop_to_correct_usable_card_duration']=quantiles([x['stop_to_correct_usable_card_ms'] for x in report['playback_home']])
     report['cpu_intervals']=[dict(before=a['stage'],after=b['stage'],**android_frame_samples.cpu_interval(a,b,report['clock_ticks']))
                              for a,b in zip(report['snapshots'],report['snapshots'][1:])]
-    report['passed']=all(len(report[k])==v for k,v in COUNTS.items());save()
+    report['passed']=all(len(report[k])==v for k,v in wanted.items());save()
     return report
 
 

@@ -33,6 +33,19 @@ class StressAdmissionTests(unittest.TestCase):
             changed=SimpleNamespace(**dict(vars(device),**change))
             with self.assertRaises(RuntimeError):stress.admit(changed,setup,expected)
 
+    def test_independent_home_selection_is_exact_and_does_not_select_search(self):
+        device,setup,expected=self.values()
+        expected['post_feature']=dict(stress.HOME_COUNTS)
+        self.assertEqual(stress.admit(device,setup,expected),setup['engine'])
+        self.assertEqual(expected['post_feature']['search'],0)
+        self.assertEqual(expected['post_feature']['playback_home'],30)
+        self.assertEqual(expected['post_feature']['rotation'],20)
+        for counts in ({'search':0,'playback_home':0,'rotation':0},
+                       {'search':0,'playback_home':29,'rotation':20},
+                       {'search':1,'playback_home':30,'rotation':20}):
+            with self.assertRaises(RuntimeError):
+                stress.admit(device,setup,dict(expected,post_feature=counts))
+
     def test_partial_actual_failure_remains_failed_and_keeps_completed_counts(self):
         with tempfile.TemporaryDirectory() as temp:
             out=Path(temp);path=out/'STRESS-RESULT.json'
