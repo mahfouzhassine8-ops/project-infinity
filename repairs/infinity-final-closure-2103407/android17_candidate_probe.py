@@ -194,6 +194,24 @@ def main(selected_case=None,independent_setup=None):
         original_execute=probe.execute
         def execute(args):
             report=original_execute(args)
+            if selected_case==EXPECTED['selected_case'] and EXPECTED.get('post_feature'):
+                report['selected_feature_passed']=report.get('passed') is True
+                if report['selected_feature_passed']:
+                    try:
+                        import android17_stress
+                        stress=android17_stress.run(probe.device,report,EXPECTED,args.out/'stress')
+                        report['post_feature_stress']=dict(passed=stress['passed'],requested=stress['requested'],
+                            completed={key:len(stress[key]) for key in stress['requested']})
+                        report['passed']=stress['passed']
+                    except BaseException as error:
+                        report['passed']=False;report['failure']='Selected stress: '+type(error).__name__+': '+str(error)
+                        report['traceback']=__import__('traceback').format_exc()
+                    finally:
+                        (args.out/'FEATURE-RESULT.json').write_text(json.dumps(report,indent=2)+'\n')
+                        try:(args.out/'stress-logcat.txt').write_text(probe.device.adb('logcat','-d','-v','threadtime',check=False))
+                        except Exception:pass
+                        try:probe.device.adb('pull',probe.device.PROFILE+'/../temp/kodi.log',args.out/'stress-kodi.log',check=False)
+                        except Exception:pass
             if report.get('platform',{}).get('qemu')=='1' and isinstance(report.get('engine',{}).get('pid'),int):
                 snapshot={}
                 for name in ('active.json','engine.json'):

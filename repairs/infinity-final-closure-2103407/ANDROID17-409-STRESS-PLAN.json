@@ -23,5 +23,27 @@
   "first_source_checks_selected": [
     "test_candidate_verification.py7: exactbinding, alloriginalassertions/inverse, realprofile/read-onlyhistory, physical/existingdevice/UIDrefusal,metadataformat/bytespreservation."
   ],
-  "candidate_apk_sha256": "4d68e3bf21ee109a9196267e9ed2b21ea8430fff8dede331af3c199e9921bf21"
+  "candidate_apk_sha256": "4d68e3bf21ee109a9196267e9ed2b21ea8430fff8dede331af3c199e9921bf21",
+  "first_gate_result": {
+    "run": 40296904627,
+    "test_source": "d614edcef7020289ed153036ed4226e3bfbe52cc",
+    "artifact": 12638987832,
+    "artifact_sha256": "aa9712da9c6a47ac08543090378ab7d991a100b7387086bf12ecfb842edb5913",
+    "result": "PASS actual SearchAll Enter, providerattributedTMDb603, persistedHistory, Back/Home input, CC40->41 nativeinstaller receipt",
+    "installover": "SameUID10234, protected408->409, preservedtestsentinel. ActualexistingFoldDBacceptance notproven.",
+    "actual_API37_snapshot": {
+      "pss_kib": 939291,
+      "rss_kib": 1106508,
+      "context": "ARM64translationfreshx86emulator afterfirstpassingSearch. Notcomparable toprevious408incompleteSearch; noreductionclaim."
+    }
+  },
+  "driver_focused_checks": {
+    "test_android17_stress.py": "4 PASS admission/physical/stale-process/partial-failure/featureguard. These are host checks only.",
+    "before_next_execution": [
+      "test_candidate_verification.CandidateVerificationTests.test_exact_source_feature_and_existing_branch_protections_are_required",
+      "test_candidate_verification.CandidateVerificationTests.test_fixture_inverse_preserves_every_original_assertion",
+      "test_candidate_verification.CandidateVerificationTests.test_metadata_bridge_does_not_modify_apk_and_refuses_mismatched_or_existing_receipts"
+    ]
+  },
+  "actual_repetition_status": "NOT RUN at publication; new exact request selects50/30/20 only after originalSearch gate passes. Stop firstfailure, preservepartialcounts."
 }

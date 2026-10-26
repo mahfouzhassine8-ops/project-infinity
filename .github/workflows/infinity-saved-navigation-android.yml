@@ -123,7 +123,7 @@ jobs:
           fi
           sudo apt-get update -qq
           sudo apt-get install -y libpulse0
-          if [[ "$SELECTED_CASE" == final-continue || "$SELECTED_CASE" == final-actions ]]; then
+          if [[ "$SELECTED_CASE" == final-continue || "$SELECTED_CASE" == final-actions || "${FEATURE_STRESS:-}" == signed409-50-30-20 ]]; then
             sudo apt-get install -y ffmpeg
           fi
           python3 repairs/four-repair-20261018/android37_gate.py --sdk-root "$ANDROID_HOME" --out api37-support --pin-tools
