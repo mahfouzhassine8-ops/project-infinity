@@ -1,5 +1,6 @@
 """Run the actual portable C++ verifier; test keys never enter production trust."""
 import hashlib
+import os
 from pathlib import Path
 import subprocess
 import tempfile
@@ -8,7 +9,7 @@ import unittest
 ROOT = Path(__file__).parent
 CC = 'script.infinity.commandcenter'
 REQUIRED = ('addon.xml', 'checkpoint_runtime.py', 'common.py', 'context.py',
-            'default.py', 'persistence_participant.py', 'plugin.py', 'service.py')
+            'default.py', 'module_contract.py', 'persistence_participant.py', 'plugin.py', 'service.py')
 
 
 class ModuleManifestTests(unittest.TestCase):
@@ -160,6 +161,15 @@ int main(int argc, char** argv) {
         (self.root / CC).rename(saved)
         (self.root / CC).symlink_to(saved, target_is_directory=True)
         self.assertEqual(self.verify().returncode, 1)
+
+    def test_fifo_source_is_rejected_without_waiting_for_a_writer(self):
+        source = self.root / CC / 'common.py'
+        source.unlink()
+        os.mkfifo(source)
+        result = subprocess.run([str(self.binary), str(self.root), str(self.work / 'trusted-test.public.pem'),
+                                 CC + '/service.py', CC], text=True, stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE, timeout=3)
+        self.assertEqual(result.returncode, 1)
 
     def test_source_and_payload_limits_and_required_owner_fail_closed(self):
         source = self.root / CC / 'common.py'

@@ -22,7 +22,7 @@ constexpr size_t MANIFEST_LIMIT = 128 * 1024;
 constexpr size_t SOURCE_LIMIT = 4 * 1024 * 1024;
 constexpr size_t TOTAL_LIMIT = 32 * 1024 * 1024;
 constexpr size_t FILE_LIMIT = 256;
-const std::string MANIFEST = "script.infinity.commandcenter/INFINITY-MODULES.v1";
+constexpr char MANIFEST[] = "script.infinity.commandcenter/INFINITY-MODULES.v1";
 
 class Descriptor
 {
@@ -96,7 +96,7 @@ bool ReadAt(int root, const std::string& path, size_t limit, std::vector<unsigne
     directory.Replace(next);
   }
   Descriptor source(openat(directory.Get(), names.back().c_str(),
-                           O_RDONLY | O_NOFOLLOW | O_CLOEXEC));
+                           O_RDONLY | O_NOFOLLOW | O_CLOEXEC | O_NONBLOCK));
   struct stat before{}, after{};
   if (source.Get() < 0 || fstat(source.Get(), &before) != 0 || !S_ISREG(before.st_mode) ||
       before.st_size < 0 || static_cast<unsigned long long>(before.st_size) > limit)
@@ -231,7 +231,7 @@ bool Parse(const std::vector<unsigned char>& payload, Verified& result)
     else return false;
   }
   for (const char* path : {"addon.xml", "checkpoint_runtime.py", "common.py", "context.py", "default.py",
-                           "persistence_participant.py", "plugin.py", "service.py"})
+                           "module_contract.py", "persistence_participant.py", "plugin.py", "service.py"})
     if (result.files.count(std::string("script.infinity.commandcenter/") + path) != 1) return false;
   return result.capabilities.count("checkpoint-v1") == 1 &&
          result.capabilities.count("first-party-modules-v1") == 1 &&
@@ -248,7 +248,7 @@ bool Verify(const std::string& addonsRoot, const std::string& trustedPublicKeyPe
   Descriptor root(open(addonsRoot.c_str(), O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC));
   std::vector<unsigned char> payload, signature;
   if (root.Get() < 0 || !ReadAt(root.Get(), MANIFEST, MANIFEST_LIMIT, payload) ||
-      !ReadAt(root.Get(), MANIFEST + ".sig", 512, signature)) return false;
+      !ReadAt(root.Get(), std::string(MANIFEST) + ".sig", 512, signature)) return false;
   failure = "signature_rejected";
   if (!Signature(payload, signature, trustedPublicKeyPem)) return false;
   Verified candidate;
@@ -269,7 +269,7 @@ bool Verify(const std::string& addonsRoot, const std::string& trustedPublicKeyPe
   // bundle if a coherent Command Center update replaced its manifest meanwhile.
   std::vector<unsigned char> finalPayload, finalSignature;
   if (!ReadAt(root.Get(), MANIFEST, MANIFEST_LIMIT, finalPayload) ||
-      !ReadAt(root.Get(), MANIFEST + ".sig", 512, finalSignature) ||
+      !ReadAt(root.Get(), std::string(MANIFEST) + ".sig", 512, finalSignature) ||
       payload != finalPayload || signature != finalSignature) return false;
   result = std::move(candidate);
   failure.clear();

@@ -12,12 +12,13 @@
   },
   "manifest_core": {
     "local_compiler": "g++ -std=c++14 -Wall -Wextra -Werror; actual OpenSSL EVP RSA/SHA256",
-    "tests": 8,
+    "tests": 9,
     "status": "TARGETED HOST PASS: local and CI",
     "engine_integration": "NOT APPLIED",
     "arm64": "NOT RUN",
     "android17": "NOT RUN",
-    "github_run": 40256202271
+    "github_run": 40256202271,
+    "latest_refinement": "Local9 pass: helper mandatory, FIFO rejected nonblocking; prior core8 CI retained"
   },
   "confirmed_compatibility_skews": {
     "addon_version": "0.3.5.39",
@@ -41,5 +42,31 @@
     "engine_integration": "NOT APPLIED",
     "arm64": "NOT RUN",
     "android17": "NOT RUN"
+  },
+  "module_python_loader": {
+    "local_checks": 6,
+    "status": "TARGETED LOCAL PASS",
+    "native_test": "Real C ABI with isolated temporary test key; original-key negative test remains separate",
+    "production_bootstrap_integration": "NOT APPLIED"
+  },
+  "checkpoint_protocol": {
+    "local_checks": 5,
+    "status": "TARGETED LOCAL PASS",
+    "source_preimage": "58f3b801e69176a3e91ccca5c1fcb6ebce81bbf8f7e768e07148f531b66190d6",
+    "scope": "Only register and obsolete UI version constant; all other save/fence/receipt source bytes preserved",
+    "native_coordinator_integration": "NOT APPLIED",
+    "Android17": "NOT RUN"
+  },
+  "android17_reference": {
+    "run": 40257708654,
+    "source_commit": "6abeec4468a129a7db0bdddc6934ab2220499ee4",
+    "status": "FAIL: observation fixture PermissionError before Search input",
+    "artifact_id": 12624160445,
+    "artifact_zip_sha256": "b46d7c41bd0515c447c74c7b9f77c253dec73594c87fd975d1e6b4e3cd297411",
+    "actual_search_submit": "NOT REACHED",
+    "shutdown": "NOT RUN",
+    "observed_application_error": "Repeated unsupported installed Command Center version",
+    "native_crash_reproduced": false,
+    "limit": "No app stability PASS; do not assume fixture failure is Search fault"
   }
 }

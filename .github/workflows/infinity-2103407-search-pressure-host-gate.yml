@@ -163,6 +163,7 @@ jobs:
         env:
           FINAL_SIGNED_SEARCH: ${{ github.workspace }}/final-work/baseline/sources/script.infinity.commandcenter/infinity_search.py
           FINAL_PATCHED_SEARCH: ${{ github.workspace }}/final-work/candidate/infinity_search.py
+          INFINITY_SIGNED407_SOURCES: ${{ github.workspace }}/final-work/baseline/sources
         run: |
           set -euo pipefail
           python3 - <<'PY' 2>&1 | tee final-work/SELECTED-HOST-RESULTS.txt
@@ -179,6 +180,10 @@ jobs:
               pattern='test_module_manifest.py'
           elif selected=='installed-modules':
               pattern='test_installed_modules.py'
+          elif selected=='module-protocol':
+              for pattern in ('test_module_manifest.py','test_installed_modules.py','test_module_contract.py','test_checkpoint_protocol.py'):
+                  subprocess.run([sys.executable,'-m','unittest','discover','-s',str(root),'-p',pattern,'-v'],check=True)
+              sys.exit(0)
           elif selected=='android-routing':
               pattern='test_android17_reference.py'
           else:

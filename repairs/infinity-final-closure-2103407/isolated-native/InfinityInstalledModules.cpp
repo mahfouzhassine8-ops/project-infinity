@@ -79,8 +79,20 @@ struct Cached
   InfinityModuleManifest::Verified bundle;
   Stamp payload, signature;
 };
-std::mutex g_mutex;
-std::map<std::string, Cached> g_cache;
+struct ProcessState
+{
+  std::mutex mutex;
+  std::map<std::string, Cached> cache;
+};
+
+ProcessState& State()
+{
+  // Bounded process-lifetime state. It must not destroy a mutex/cache under a
+  // still-running optional interpreter during native teardown. No worker or
+  // unbounded registry is created, and whole-process exit reclaims it.
+  static auto* const state = new ProcessState;
+  return *state;
+}
 
 bool VerifyRoot(const std::string& root, InfinityModuleManifest::Verified& bundle)
 {
@@ -91,15 +103,17 @@ bool VerifyRoot(const std::string& root, InfinityModuleManifest::Verified& bundl
       InfinityModuleManifest::Verify(root, PUBLIC_KEY, bundle, failure) &&
       ReadStamp(base, afterPayload) && ReadStamp(base + ".sig", afterSignature) &&
       Same(beforePayload, afterPayload) && Same(beforeSignature, afterSignature);
-  std::lock_guard<std::mutex> lock(g_mutex);
+  auto& state = State();
+  std::lock_guard<std::mutex> lock(state.mutex);
   if (!valid)
   {
-    g_cache.erase(root);
+    state.cache.erase(root);
     bundle = {};
     return false;
   }
-  // There are only two native-resolved roots; callers cannot grow this map.
-  g_cache[root] = {bundle, afterPayload, afterSignature};
+  // Resolve paths afresh, but never retain more than the two current roots.
+  if (state.cache.count(root) == 0 && state.cache.size() >= 2) state.cache.clear();
+  state.cache[root] = {bundle, afterPayload, afterSignature};
   return true;
 }
 } // namespace
@@ -164,9 +178,10 @@ bool CapabilityReady(const std::string& addonId, const std::string& addonRoot,
       Stamp payload, signature;
       const auto base = root + "/" + CC + "/INFINITY-MODULES.v1";
       if (!ReadStamp(base, payload) || !ReadStamp(base + ".sig", signature)) return false;
-      std::lock_guard<std::mutex> lock(g_mutex);
-      const auto cached = g_cache.find(root);
-      if (cached == g_cache.end() || cached->second.bundle.files.count(addonId + "/addon.xml") != 1)
+      auto& state = State();
+      std::lock_guard<std::mutex> lock(state.mutex);
+      const auto cached = state.cache.find(root);
+      if (cached == state.cache.end() || cached->second.bundle.files.count(addonId + "/addon.xml") != 1)
         return false;
       bool signedEntry = false;
       for (const auto& entry : cached->second.bundle.entries)

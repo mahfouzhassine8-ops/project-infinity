@@ -47,7 +47,7 @@
       "id": 5,
       "name": "Essential-First owner/protocol compatibility and write separation",
       "stage": "EVIDENCE",
-      "confirmed_defect": "addon.xml0.3.5.39/checkpoint_runtime.py0.3.5.38 mismatch in authoritative brief; verify actual signed bytes before editing"
+      "confirmed_defect": "Signed407 CC39/.38 Python mismatch and native35/36 gate; repeated Android17 unsupported-version errors, private Fold deadline/legacy_or_unknown proof. Registration-only source correction5host checks PASS; full native owner/write separation pending."
     },
     {
       "id": 6,
@@ -68,6 +68,22 @@
         "function": "_leased_directory",
         "ownership_ledger": "SEARCH-OWNERSHIP-CHANGE.json",
         "status": "Isolated source transform; no deployable APK yet"
+      },
+      {
+        "member": "assets/addons/script.infinity.commandcenter/module_contract.py",
+        "baseline_sha256": null,
+        "reason": "Authenticated native module/protocol identity and exact-source Python imports; reject unknown files and cached bytecode without a new database or worker"
+      },
+      {
+        "member": "assets/addons/script.infinity.commandcenter/checkpoint_runtime.py",
+        "baseline_sha256": "58f3b801e69176a3e91ccca5c1fcb6ebce81bbf8f7e768e07148f531b66190d6",
+        "functions": [
+          "ResidentCheckpoint.register"
+        ],
+        "constants": [
+          "Remove UI-package ADDON_VERSION; retain protocol API=1"
+        ],
+        "reason": "Reported and signed-source confirmed0.3.5.39/.38 mismatch rejects registration. Use original-signer native identity, explicit protocol API and exact package/hash handshake; preserve every save/identity/fence operation."
       }
     ],
     "native_edits_admitted": [
@@ -109,9 +125,12 @@
   },
   "selected_verification": {
     "host": [
-      "test_android17_reference.py: exact event/branch/request binding, immutable original407 fixture metadata, rejection and preserved manual/signature/source/provider/API37 gates"
+      "test_module_manifest.py9",
+      "test_installed_modules.py6",
+      "test_module_contract.py6",
+      "test_checkpoint_protocol.py5"
     ],
-    "android17": "NOT RUN",
+    "android17": "Baseline reference FAIL before Search input; evidence artifact12624160445, no shutdown selected",
     "physical_fold": "NOT RUN",
     "shutdown": "Explicitly authorized workstream5; must run separately and retain real failures",
     "packaging": "AUTHORIZED after required corrections/integration; no extra permission required",
