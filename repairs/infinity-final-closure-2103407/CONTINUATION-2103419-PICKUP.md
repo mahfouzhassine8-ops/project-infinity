@@ -172,3 +172,31 @@ SavedZIP/checksumversion4 currentlyhasPower/writerPASS butprecedesnewstrict16KiB
 report. Producer/DELIVERY-419-STATUS/installtextnowcorrectthatlimit; rebuild/update
 SAMEsaveditems with expected_current_version4 afteractualAOSPresults. Do not
 lock/requestrepeatedexperimentalinstalls orclaimallsevenstreamscomplete.
+
+
+## LatestAOSPrequests andcorrectlocalHomeprecondition —21:22UTC
+
+40402313427 Search50 AOSP37.0/default, testsource09ab37e0, activeSDKsetup.
+287a8f72HomeoriginalSearch-basedrequest has NO GitHubruncreated; not aPASS or
+completedcase. CorrectHomepreconditionnow final-participant: localHome mustnot
+depend onremoteproviderSearch. Existingnative/source/installover/owneradmission
+mustactuallyPASS, thenHome30/rotation20requiresalloriginalexactcard/source/
+position/watched/noautoplay/cachedsurfacebitmap/20sectotalproof/PID/data checks.
+OriginalSearchfixture and50Searchrunremainstrict andindependent.
+
+ActualHomeLOCALrun40403509742, sourcee4678c489aa831d649e72039dd9d30d3a538d69f,
+AOSP37.0/default. Noapprebuild. Dispatcherallowsfinal-participantonlyforHome;
+explicitlyrefuseshome-search inthatmode. OriginalSearchcaserequiresoriginal
+Searchpass. Frozenparticipantstagealreadyseedsfourtestrecords: beforeaddingQAart
+requireBOTH exactsource-boundlocalstage andexactdeviceJSON, freshinstallover
+receipt/noappPID/noengine/nosymlinks. Unknown/changed/linkedstate refusedbefore
+anypush. Noexistinguserdataoverwrite orgrant; thisisownedfixturebeforefirst
+launchonly. Evidenceexplicitlymarksreusedownedprelaunchfixture/artaugmentation.
+7fixture+5stressadmission+6dispatcher+7routing+3environmentcheckspassed, no
+hostresultclaimingapplicationPASS. PlanHOME-LOCAL-ONLY-419-TEST-PLAN.json.
+
+Await40402313427 and40403509742; no repeatedunchangedtests/APKs/physicalinstall
+requests. Current savedactual419ZIP/checksumversion4 predate16KiBfailure report;
+newstatus/installtextcorrectlystateAPKZIPalignmentisNOTnativeELFcompatibility.
+RebuildandsaveSAMEitems expectedversion4 with latestactualresults beforehandoff.
+All7streams/physicalFoldpagesizeacceptance/noCobra/noreset/no finallock remain.

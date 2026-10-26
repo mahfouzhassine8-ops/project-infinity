@@ -1,0 +1,57 @@
+name: Infinity native ARM64 API37 platform capability only
+on:
+  push:
+    branches: [work/infinity-final-corrective-from-2103407-20261025]
+    paths: [repairs/infinity-final-closure-2103407/NATIVE-ARM-CAPABILITY-REQUEST.json, .github/workflows/infinity-native-arm-capability.yml]
+permissions:
+  contents: read
+concurrency:
+  group: infinity-native-arm-platform-${{ github.sha }}
+  cancel-in-progress: false
+jobs:
+  capability:
+    runs-on: macos-26
+    timeout-minutes: 15
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      IMAGE: system-images;android-37.0;default;arm64-v8a
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11.7'}
+      - name: Validate exact native ARM64 platform-only selection
+        run: |
+          set -euo pipefail
+          mkdir -p native-arm-capability
+          test "$(uname -m)" = arm64
+          git merge-base --is-ancestor 0e8739d2d0e1be0ab8f127519b526556426fb160 HEAD
+          python3 repairs/infinity-final-closure-2103407/native_arm_capability.py --request repairs/infinity-final-closure-2103407/NATIVE-ARM-CAPABILITY-REQUEST.json
+          python3 -m unittest discover -s repairs/infinity-final-closure-2103407 -p test_native_arm_capability.py -v
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@v4
+        with: {cmdline-tools-version: '15859902', packages: platform-tools emulator, log-accepted-android-sdk-licenses: false}
+      - name: Inspect and install only the exact native ARM64 system image
+        run: |
+          set -euo pipefail
+          mkdir -p native-arm-capability
+          sdkmanager --list --channel=0 > native-arm-capability/sdk-list.txt
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          rows={line.split('|')[0].strip() for line in Path('native-arm-capability/sdk-list.txt').read_text().splitlines() if '|' in line}
+          assert os.environ['IMAGE'] in rows, 'Exact ARM64 Android17/API37.0 image unavailable; no fallback'
+          PY
+          sdkmanager --install "$IMAGE" --channel=0
+          echo no | avdmanager create avd --name infinity-native-arm-capability --package "$IMAGE" --device pixel_2
+      - name: Probe actual native ARM64 boot, SDK37,4KiB and root without an application
+        run: |
+          python3 repairs/infinity-final-closure-2103407/native_arm_capability.py --request repairs/infinity-final-closure-2103407/NATIVE-ARM-CAPABILITY-REQUEST.json --sdk "$ANDROID_HOME" --out native-arm-capability
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-Native-ARM64-Platform-Capability-${{ github.run_id }}
+          path: native-arm-capability/
+          retention-days: 90
+          if-no-files-found: warn
