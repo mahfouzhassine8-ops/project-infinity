@@ -10,9 +10,9 @@ from candidate_request import EXPECTED as CANDIDATE
 ROOT=Path(__file__).parent
 REQUEST='repairs/infinity-final-closure-2103407/SHUTDOWN-REQUEST.json'
 WORKFLOW='.github/workflows/infinity-shutdown-verification.yml'
-AUTHORIZATION='UserOct26 current signed418 independent native writer/persistence controls:16real native multi-image controls with unique jobs/tokens/generations, exact factory terminals and retirement receipts including separately identified unchanged-unstarted jobs. One actual protected positive Close/reopen with all16/native/twoJava/engine+coordinator/zeroUID/SQLite/data/preference proofs, then actual opaque child marker writer must veto Close with no save/auth/death claim and unchanged protected state. Preserve411ordinary3PASS40317069331/417Power3PASS40373328781/417writerPASS40376891135; current418realTV3run40386278200 and Search50/Home30/rotation20run40386278214 stay independent and untouched. No runtimeAPK/native/chooser/Cobra changes, synthetic success, count waiver, reset or physical acceptance.'
-EXPECTED=dict(schema=1,kind="independent-essential-first",request_id="integrated418-native-image-and-unsafe-separate-01",
-    scenario="integrated-native-image-and-unsafe",candidate_build=CANDIDATE["candidate_build"],
+AUTHORIZATION='UserOct26 same signed418 real TV THREE visible Power Close/reopen cycles: unfinished exactTV progress/source first, completed watched/Next selection second, warm completed-state third, full16/native/twoJava/zeroUID/SQLite/data/preference proofs. Preserve failed40386278200 before anyClose: actual new episode occurrence/17.894sec progress/source memory existed; new test wrongly required overwriting original saved navigation source. Correct ONLY predicate to canonical exact episode/new occurrence/verified show and actual played file in sources/failures0, preserving original items source. Same20sec start/45sec completion/35sec Close gates, no retries/reset/APK/runtime/native/Cobra/chooser changes or fabricated receipts. Preserve411/417ordinary3passes; concurrent418Search40386278214 and independent418writer40387258351 untouched. PhysicalFold finalgate/no lock.'
+EXPECTED=dict(schema=1,kind="independent-essential-first",request_id="integrated418-real-TV-three-Power-cycles-source-contract-02",
+    scenario="integrated-resume-power-ui",candidate_build=CANDIDATE["candidate_build"],
     candidate_source_commit=CANDIDATE["candidate_source_commit"],
     candidate_apk_sha256=CANDIDATE["candidate_apk_sha256"],authorization=AUTHORIZATION)
 

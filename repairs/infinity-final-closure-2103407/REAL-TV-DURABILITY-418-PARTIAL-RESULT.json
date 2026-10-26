@@ -1,0 +1,75 @@
+{
+  "run": 40386278200,
+  "test_source": "b3f2f0ed9b776a0eea48d88bc9e734451547261a",
+  "candidate_source": "90cb67fd7c1c581e1f6d195adf1bb0c95b8fb42b",
+  "apk_sha256": "328757eb858a79f91883c0ba4e2884410baaf0b42730db5d62054679253674e4",
+  "artifact": 12680687773,
+  "artifact_sha256": "b4aef23cac95f4a92d39ed2104222b2def5dc4db3442430a5d17715eb66dc8e7",
+  "passed": false,
+  "actual_Close_attempted": false,
+  "failure": "AssertionError: Actual native TV scene failed: RuntimeError: Timed out: actual typed native TV playback",
+  "actual_current_episode": {
+    "duration": 180.0,
+    "episode": 2,
+    "identity": {
+      "episode": 2,
+      "ids": {
+        "tmdb": "1396"
+      },
+      "kind": "episode",
+      "schema": 1,
+      "scope": "show_episode",
+      "season": 1
+    },
+    "information": {
+      "duration": 180,
+      "plot": "Full synthetic episode synopsis",
+      "premiered": "2008-01-20",
+      "year": 2008
+    },
+    "key": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "label": "Breaking Bad S01E02",
+    "media": "tv",
+    "percentage": 9.94,
+    "playback_occurrence": "19e62c919bab499c8e660b435cefa1fe",
+    "position": 17.894,
+    "resume_first_seen": 4,
+    "resume_revision": 1793042881976,
+    "season": 1,
+    "show_ids_verified": true,
+    "show_tmdb": "1396",
+    "showtitle": "Breaking Bad",
+    "source": "special://profile/infinity-final-qa.mp4",
+    "stable_source": "special://profile/infinity-final-qa.mp4",
+    "title": "Breaking Bad",
+    "tmdb": "1396",
+    "updated": 1793042890,
+    "verified_next": {
+      "after": [
+        1,
+        2
+      ],
+      "episode": 1,
+      "library": {
+        "episode": 1,
+        "episodeid": 2,
+        "file": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/infinity-cw-qa/QA.S02E01.mp4",
+        "season": 2,
+        "show_tmdb": "1396",
+        "tvshowid": 1
+      },
+      "season": 2,
+      "show_tmdb": "1396",
+      "verified": true
+    }
+  },
+  "actual_played_source_memory": {
+    "failures": 0,
+    "route": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/infinity-cw-qa/QA.S01E02.mp4",
+    "updated": 1793042873
+  },
+  "actual_result": "Runtime registered new exact episode occurrence and persisted17.894sec progress; test incorrectly required original saved navigation source be overwritten by actual playback file. Corrected predicate keeps original navigation and checks canonical identity/new occurrence/verified show/exact sources route/failures0. No runtime change or20sec extension.",
+  "physical_Fold": "NOT RUN",
+  "release_accepted": false,
+  "final_lock": false
+}

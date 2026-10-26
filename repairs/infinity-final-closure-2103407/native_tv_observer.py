@@ -6,6 +6,18 @@ FOLDER='/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/us
 DIRECTORY='plugin://script.infinity.commandcenter/?action=library&media=tv&bucket=next'
 
 
+def tracking_ready(value,previous):
+    """Original title navigation survives; actual played file belongs to sources."""
+    row=value.get('items',{}).get('d'*64,{})
+    source=value.get('sources',{}).get('d'*64,{})
+    occurrence=row.get('playback_occurrence')
+    return (isinstance(occurrence,str) and len(occurrence)==32 and
+            all(ch in '0123456789abcdef' for ch in occurrence) and occurrence!=previous and
+            row.get('identity')==dict(schema=1,kind='episode',scope='show_episode',
+                ids={'tmdb':'1396'},season=1,episode=2) and row.get('show_ids_verified') is True and
+            source.get('route')==FOLDER+'QA.S01E02.mp4' and source.get('failures')==0)
+
+
 def source_memory_preserved(before,after,played_key,actual_source):
     """Only the genuinely played title may acquire its new successful source."""
     if not isinstance(before,dict) or not isinstance(after,dict):return False
@@ -49,10 +61,7 @@ def run(ui,hub,profile,result,observe=None,phase='all'):
             # codec opening merely because isPlayingVideo already became true.
             clock=ui.rpc('Player.GetProperties',{'playerid':1,'properties':['time','speed']})
             stamp=clock.get('time',{})
-            tracked=state().get('items',{}).get('d'*64,{})
-            occurrence=tracked.get('playback_occurrence')
-            armed=(isinstance(occurrence,str) and len(occurrence)==32 and occurrence!=old_occurrence and
-                   tracked.get('source')==FOLDER+'QA.S01E02.mp4')
+            armed=tracking_ready(state(),old_occurrence)
             return value if armed and clock.get('speed')==1 and (stamp.get('seconds',0)>=1 or stamp.get('minutes',0)>0) else None
         value=ui.until(started,'actual typed native TV playback',max(0,20-(time.monotonic()-began)))
         result.setdefault('native_tv_tracking_ready',[]).append(dict(episodeid=dbid,

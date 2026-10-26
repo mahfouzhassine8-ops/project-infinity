@@ -122,7 +122,7 @@ class NativeTVFixtureTests(unittest.TestCase):
         self.assertIn("clock.get('speed')==1",text)
         self.assertIn("stamp.get('seconds',0)>=1",text)
         self.assertIn("ui.until(started,'actual typed native TV playback',max(0,20-(time.monotonic()-began)))",text)
-        self.assertIn("occurrence!=old_occurrence",text)
+        self.assertIn("tracking_ready(state(),old_occurrence)",text)
         self.assertLess(text.index("clock=ui.rpc("),text.index('player.seekTime(70)'))
 
     def test_new_TV_scene_uses_native_Stop_and_retains_exact_state_checks(self):
@@ -134,6 +134,20 @@ class NativeTVFixtureTests(unittest.TestCase):
         self.assertIn("'selected Next stopped',20",text)
         self.assertIn('source_memory_preserved',text)
         self.assertIn("observe(name)",text)
+
+    def test_new_occurrence_requires_native_played_source_without_replacing_original_navigation(self):
+        value=dict(items={'d'*64:dict(playback_occurrence='2'*32,show_ids_verified=True,
+            identity=dict(schema=1,kind='episode',scope='show_episode',ids={'tmdb':'1396'},season=1,episode=2),
+            source='special://profile/original-title-navigation.mp4')},
+            sources={'d'*64:dict(route=observer.FOLDER+'QA.S01E02.mp4',failures=0)})
+        self.assertTrue(observer.tracking_ready(value,'1'*32))
+        self.assertFalse(observer.tracking_ready(value,'2'*32))
+        for bucket,field,bad in [('sources','route','/unrelated.mp4'),('sources','failures',1),
+                                 ('items','show_ids_verified',False),('items','playback_occurrence','not-a-real-token')]:
+            changed=deepcopy(value);changed[bucket]['d'*64][field]=bad
+            self.assertFalse(observer.tracking_ready(changed,'1'*32))
+        changed=deepcopy(value);changed['items']['d'*64]['identity']['episode']=3
+        self.assertFalse(observer.tracking_ready(changed,'1'*32))
 
 
 if __name__=='__main__':unittest.main(verbosity=2)
