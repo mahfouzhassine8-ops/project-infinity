@@ -141,16 +141,47 @@ final class InfinityInstalledCheckpointInstaller {
     File signatureFile=new File(root,"script.infinity.commandcenter/INFINITY-MODULES.v1.sig");
     byte[] installed=marker.exists()?read(marker,131072):null;
     byte[] installedSignature=signatureFile.exists()?read(signatureFile,512):null;
-    if(installed!=null && installedSignature!=null) {
-      verify(installed,installedSignature); // Unknown or unsigned generations are never overwritten.
-      try {return verify(root,installed,installedSignature);}catch(Exception partial) { /* Android Os reports ErrnoException, not IOException. Only this exact authenticated APK generation may resume below. */ }
-    }
     byte[] payload,signature;
     try(InputStream input=context.getAssets().open("addons/script.infinity.commandcenter/INFINITY-MODULES.v1")) {payload=read(input,131072);}
     try(InputStream input=context.getAssets().open("addons/script.infinity.commandcenter/INFINITY-MODULES.v1.sig")) {signature=read(input,512);}
     String[] lines=verify(payload,signature);
-    if(installed!=null && !Arrays.equals(installed,payload))throw new IOException("Installed signed generation must not be downgraded");
-    if(installedSignature!=null && !Arrays.equals(installedSignature,signature))throw new IOException("Unknown partial signature generation must not be overwritten");
+    String[] installedLines=null;
+    boolean upgrading=false;
+    String backupPrefix=".infinity-module-baseline407/";
+    if(installed!=null) {
+      if(installedSignature==null)throw new IOException("Installed signed generation has no signature");
+      try {installedLines=verify(installed,installedSignature);}
+      catch(Exception interruptedPair) {
+        // A previous upgrade may have committed the new signature immediately
+        // before its manifest. Recover only the original signed old pair saved
+        // before the first code write, and only for this exact APK signature.
+        if(!Arrays.equals(installedSignature,signature))throw interruptedPair;
+        File savedSignature=new File(root,".infinity-module-previous/"+hash(installed)+"/INFINITY-MODULES.v1.sig");
+        installedSignature=read(savedSignature,512);
+        installedLines=verify(installed,installedSignature);
+      }
+      if(Arrays.equals(installed,payload)) {
+        try {return verify(root,installed,installedSignature);}catch(Exception partial) { /* Same signed APK resumes exact known files below. */ }
+      } else {
+        String[] from=installedLines[1].substring(8).split("\\.",-1);
+        String[] to=lines[1].substring(8).split("\\.",-1);
+        int comparison=0;
+        for(int i=0;i<Math.max(from.length,to.length);i++) {
+          long a=i<from.length?Long.parseLong(from[i]):0;
+          long b=i<to.length?Long.parseLong(to[i]):0;
+          if(a!=b){comparison=b>a?1:-1;break;}
+        }
+        if(comparison<=0) {
+          try {return verify(root,installed,installedSignature);}catch(Exception incompleteNewer) {
+            throw new IOException("Installed signed generation must not be downgraded");
+          }
+        }
+        upgrading=true;
+        backupPrefix=".infinity-module-previous/"+hash(installed)+"/";
+      }
+    } else if(installedSignature!=null && !Arrays.equals(installedSignature,signature)) {
+      throw new IOException("Unknown partial signature generation must not be overwritten");
+    }
     LinkedHashMap<String,byte[]> sources=new LinkedHashMap<String,byte[]>();long total=0;
     for(int i=3;i<lines.length-1;i++) {
       String[] row=lines[i].split("\t",-1);if(!row[0].equals("file"))continue;
@@ -170,6 +201,13 @@ final class InfinityInstalledCheckpointInstaller {
       if(row.length!=3 || !row[0].equals("file") || !row[1].matches("[0-9a-f]{64}") || !verify(row[2]) || row[2].compareTo(previous)<=0 || old.size()>=256)throw new IOException("Invalid baseline source inventory");
       old.put(row[2],row[1]);previous=row[2];
     }
+    if(upgrading) {
+      old.clear();
+      for(int i=3;i<installedLines.length-1;i++) {
+        String[] row=installedLines[i].split("\t",-1);
+        if(row[0].equals("file"))old.put(row[2],row[1]);
+      }
+    }
     // Preflight every known old and new member before the first code write.
     // Unknown files and all profile/provider paths remain untouched.
     HashSet<String> paths=new HashSet<String>(old.keySet());paths.addAll(sources.keySet());
@@ -180,16 +218,25 @@ final class InfinityInstalledCheckpointInstaller {
       String current=hash(read(file,4194304));
       if(!current.equals(old.get(name)) && !(sources.containsKey(name) && current.equals(hash(sources.get(name)))))throw new IOException("Unrecognized installed source; preserved without modification");
       if(current.equals(old.get(name))) {
-        File backup=new File(root,".infinity-module-baseline407/"+name);
+        File backup=new File(root,backupPrefix+name);
         if(backup.exists() && !hash(read(backup,4194304)).equals(current))throw new IOException("Unrecognized baseline backup; preserved without modification");
       }
+    }
+    if(upgrading) {
+      // Preserve the authenticated previous metadata pair before touching code.
+      File oldPayload=new File(root,backupPrefix+"INFINITY-MODULES.v1");
+      File oldSignature=new File(root,backupPrefix+"INFINITY-MODULES.v1.sig");
+      if(oldPayload.exists() && !Arrays.equals(read(oldPayload,131072),installed))throw new IOException("Unknown previous module payload backup");
+      if(oldSignature.exists() && !Arrays.equals(read(oldSignature,512),installedSignature))throw new IOException("Unknown previous module signature backup");
+      if(!oldPayload.exists())write(oldPayload,installed);
+      if(!oldSignature.exists())write(oldSignature,installedSignature);
     }
     for(Map.Entry<String,byte[]> entry:sources.entrySet()) {
       File file=new File(root,entry.getKey());byte[] desired=entry.getValue();
       if(file.exists()) {
         byte[] current=read(file,4194304);if(Arrays.equals(current,desired))continue;
         if(!hash(current).equals(old.get(entry.getKey())))throw new IOException("Installed source changed after preflight; preserved");
-        File backup=new File(root,".infinity-module-baseline407/"+entry.getKey());
+        File backup=new File(root,backupPrefix+entry.getKey());
         if(backup.exists()) {
           if(!Arrays.equals(current,read(backup,4194304)))throw new IOException("Baseline backup changed after preflight; preserved");
         } else write(backup,current);

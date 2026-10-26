@@ -1,0 +1,15 @@
+{
+  "observed_source_defect": "Current2103408 installer immediately reuses a verified installed CC40 generation before reading newer APK modules; an APK-only409 would silently retain oldPython.",
+  "admitted_member": "classes.dex existingInfinityInstalledCheckpointInstaller class only",
+  "preimage_template_sha256": "7369ab1c0ca4585e26cd4dc36eec4a7e54f6ab94e59c8a7e2f02103294dcd029",
+  "necessary_change": "Support original-key authenticated newer package generation, preflight old/new exact source fingerprints, preserve old signed metadata and code backup, recover interrupted paircommit, reject unknowncode or downgrade of an incomplete newer generation.",
+  "negative_checks_before_execution": [
+    "test_java_module_migration.py selectedinitial/partial/wrongsignature/unknowncode/antirollback plus new authenticated40->41 complete/interruptedupgrade tests.",
+    "Exact7864otherDEXclasses/stringindices disassemblyaudits aftercompile.",
+    "Only4firstpartycodeIDs allowed; userdata/provider/Cobra unchanged."
+  ],
+  "status": "IMPLEMENTED_9_HOST_CHECKS_PASS",
+  "Android17": "NOT RUN",
+  "physical_Fold": "NOT RUN",
+  "release_ready": false
+}

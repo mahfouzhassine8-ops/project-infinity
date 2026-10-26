@@ -75,7 +75,7 @@ class JavaModuleMigrationTests(unittest.TestCase):
 
     def test_actual_jca_initial_migration_preserves_profile_unknown_files_and_old_code_backup(self):
         original=(self.addons/bundle.CC/'plugin.py').read_bytes()
-        result=self.call();self.assertEqual(result.returncode,0,result.stderr);self.assertIn('VERIFIED_VERSION=0.3.5.40',result.stdout)
+        result=self.call();self.assertEqual(result.returncode,0,result.stderr);self.assertIn('VERIFIED_VERSION=0.3.5.41',result.stdout)
         self.assert_migrated()
         self.assertEqual((self.addons/'.infinity-module-baseline407'/bundle.CC/'plugin.py').read_bytes(),original)
         self.assertEqual((self.addons/'script.infinity.watchedbridge/service.py').read_bytes(),(self.sources/'script.infinity.watchedbridge/service.py').read_bytes())
@@ -110,7 +110,7 @@ class JavaModuleMigrationTests(unittest.TestCase):
 
     def test_complete_newer_signed_generation_is_reused_and_incomplete_newer_never_downgraded(self):
         self.assertEqual(self.call().returncode,0)
-        addon=self.addons/bundle.CC/'addon.xml';addon.write_text(addon.read_text().replace('version="0.3.5.40"','version="0.3.5.41"',1))
+        addon=self.addons/bundle.CC/'addon.xml';addon.write_text(addon.read_text().replace('version="0.3.5.41"','version="0.3.5.42"',1))
         # Build from the exact signed files, without the deliberately preserved
         # unrelated old-code/backup members in this installed runtime tree.
         newer=self.path/'newer';shutil.copytree(self.composed,newer)
@@ -121,9 +121,51 @@ class JavaModuleMigrationTests(unittest.TestCase):
         subprocess.run(['openssl','dgst','-sha256','-sign',self.private,'-out',str(manifest)+'.sig',manifest],check=True,capture_output=True)
         for name in (bundle.MANIFEST,bundle.MANIFEST+'.sig'):shutil.copyfile(newer/bundle.CC/name,self.addons/bundle.CC/name)
         before=self.snapshot();result=self.call();self.assertEqual(result.returncode,0,result.stderr)
-        self.assertIn('VERIFIED_VERSION=0.3.5.41',result.stdout);self.assertEqual(self.snapshot(),before)
+        self.assertIn('VERIFIED_VERSION=0.3.5.42',result.stdout);self.assertEqual(self.snapshot(),before)
         (self.addons/bundle.CC/'plugin.py').unlink();before=self.snapshot();result=self.call()
         self.assertNotEqual(result.returncode,0);self.assertIn('must not be downgraded',result.stderr);self.assertEqual(self.snapshot(),before)
+
+    def install_exact_previous40(self):
+        from patch_search_lifetime import patch as search_patch
+        import hashlib
+        old=self.path/'old-assets';shutil.copytree(self.composed,old/'addons')
+        cc=old/'addons'/bundle.CC
+        (cc/'addon.xml').write_text((cc/'addon.xml').read_text().replace('version="0.3.5.41"','version="0.3.5.40"',1))
+        for name in ('information.py','provider_inventory.py'):
+            shutil.copyfile(self.sources/bundle.CC/name,cc/name)
+        (cc/'infinity_search.py').write_bytes(search_patch((self.sources/bundle.CC/'infinity_search.py').read_bytes()))
+        for name in ('provider_capabilities.py','SEARCH-STRUCTURES.json',bundle.MANIFEST,bundle.MANIFEST+'.sig'):
+            if (cc/name).exists():(cc/name).unlink()
+        report=bundle.prepare(old/'addons')
+        self.assertEqual(report['manifest_sha256'],'b3e53a6dcd3c6a061c18296d7aa613738bc273b0ef3b0f2630740e03a925281e')
+        manifest=cc/bundle.MANIFEST
+        subprocess.run(['openssl','dgst','-sha256','-sign',self.private,'-out',str(manifest)+'.sig',manifest],check=True,capture_output=True)
+        target=self.assets;self.assets=old
+        result=self.call();self.assets=target
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertIn('VERIFIED_VERSION=0.3.5.40',result.stdout)
+        return old
+
+    def test_actual_signed40_to41_upgrade_and_previous_signed_code_backup(self):
+        self.install_exact_previous40()
+        previous=(self.addons/bundle.CC/'infinity_search.py').read_bytes()
+        result=self.call();self.assertEqual(result.returncode,0,result.stderr)
+        self.assertIn('VERIFIED_VERSION=0.3.5.41',result.stdout);self.assert_migrated()
+        backup=self.addons/'.infinity-module-previous/b3e53a6dcd3c6a061c18296d7aa613738bc273b0ef3b0f2630740e03a925281e'
+        self.assertEqual((backup/bundle.CC/'infinity_search.py').read_bytes(),previous)
+        self.assertEqual((backup/bundle.MANIFEST).read_bytes(),(self.path/'old-assets/addons'/bundle.CC/bundle.MANIFEST).read_bytes())
+
+    def test_interrupted40_to41_code_and_pair_commit_recover_without_data_changes(self):
+        self.install_exact_previous40()
+        result=self.call(fail=4);self.assertNotEqual(result.returncode,0)
+        self.assertIn('Injected host atomic-write failure',result.stderr)
+        result=self.call();self.assertEqual(result.returncode,0,result.stderr);self.assert_migrated()
+        # Reconstruct precisely the commit gap: all new code and signature,
+        # previous signed manifest still present. Its backed old signature is
+        # the only admitted recovery proof.
+        old=self.path/'old-assets/addons'/bundle.CC
+        shutil.copyfile(old/bundle.MANIFEST,self.addons/bundle.CC/bundle.MANIFEST)
+        result=self.call();self.assertEqual(result.returncode,0,result.stderr);self.assert_migrated()
 
     def test_other_context_and_wrong_root_preserve_original_ownership_boundary(self):
         for mode,message in [('other','Legacy verifier stand-in'),('wrong-root','Unowned module root')]:
