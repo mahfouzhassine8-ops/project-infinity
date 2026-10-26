@@ -87,25 +87,19 @@ Required final release gate, notwithstanding the user's earlier decision to defe
 - Keep Health Center useful/low-overhead for native/ANR/Search/close evidence; missing tombstone = unavailable, not healthy; atomic redacted partial export; preserve crash history and do not overload UI or weaken shutdown protection.
 - When an earlier defect is already physically fixed in 2103407, classify it as PASS/PRESERVE, not another task to rewrite.
 
-## 6. User's Cobra PiP / Android Recents discovery — PRESERVATION ONLY
-
-On October 25, user supplied an image and observed Cobra playing media in Picture-in-Picture while Android Recents appeared to show TWO Infinity entries; selecting the Recents entry associated with Cobra returned to Cobra playback.
-
-This is *interesting observed behavior*, **not** a report asking for a fix, a new feature, or permission to change Cobra. Multiple Android tasks/activities and PiP can show entries from the same app; screenshot alone does not prove simultaneous independent Kodi native engines or independent playback sessions. Document as a no-touch regression: final Infinity UI/loading/navigation adjustments must not disturb that existing behavior. NO Cobra PiP/activity/player/native modifications; separate Cobra work only after Infinity release is locked and user approves.
-
-## 7. Full release verification and lock
+## 6. Full release verification and lock
 
 1. Preserve user-accepted signed 2103407 reference, source, components and SHA/cert, and compile on separately isolated final work branch; keep signed 2103405/2103406 references for troubleshooting. Report permitted changed APK members and true native code deltas.
 2. Gate each item in a ledger: SOURCE CONFIRMED -> REPRODUCED -> FIX IMPLEMENTED -> HOST VERIFIED -> INTEGRATED ANDROID17 VERIFIED -> FOLD PASSED. A source commit or GitHub success is not a device PASS.
 3. Universal long hold: exact item and menu across all approved named Infinity views, 2-tap launch, provider context and focus; Search: 50 repeat/overlap/busy/History/provider cycles; UI: fold/reflow and menu negative controls. Preserve WatchNixtoons2 Infinity Tracked.
 4. Speed and visual: 30 play/stop/back Home tests, 20 fold/rotate/multiwindow cases, real warm/cold load timing, native frame-time/jank/Hz readings and Light/Dark/OLED OS D visual checks. No invented performance improvements.
 5. Shutdown: three or more real essential-first close/reopen cycles, safe and injected error paths, third-party optional idle/hang vs shared write obligations, correct one-shot process-death evidence and durable saved state. Exact owner receipts mandatory.
-6. Zero Cobra changes; no broken player, skin, providers, search, watched, favorites, data, essential protections or forced reinstall. Preserve screenshot-observed PiP/Recents behavior.
+6. Zero Cobra changes; no broken player, skin, providers, Search, watched, Favorites, data, essential protections or forced reinstall.
 7. Build one full permanently signed ARM64 install-over APK IF native/Android changes are required; migrate helpers to a **unified Command Center** and deliver its one coherent ZIP (separately only if needed). Skin ZIP only if the user's approved visuals require a changed skin. Do not force user to manage old Rails/UI Repair/Watched Bridge ZIPs for every new Command Center Python fix after migration.
 8. Release needs the original certificate, APK/component source-integrity receipts, native compilation and signature verification, physical Fold acceptance, measured before/after performance and exact remaining limitations; explicitly report if any gate is unverified.
 9. No final label or lock until user says physical PASS. Then tag immutable release source/assets/checksums, retain rollback, freeze Infinity feature development and start Cobra only under a separate directive. A branch named lock is not proof that repository branch protection exists.
 
-## 8. Honest workstream ledger as of scope freeze
+## 7. Honest workstream ledger as of scope freeze
 
 | Workstream | Present state | Final acceptance requirement |
 |---|---|---|
@@ -116,7 +110,6 @@ This is *interesting observed behavior*, **not** a report asking for a fix, a ne
 | Physical refresh and frame pacing | No trusted physical FPS/frame metrics yet | Real frame/refresh improvement measured on Fold |
 | Essential-First Shutdown | Confirmed Command Center 0.3.5.39 vs 0.3.5.38 mismatch and lingering Python writers; recurring 25s deadline | Stable protocol, essential-owner real writes, safe optional worker isolation, successful Fold close/reopen |
 | Previously approved UI polish | Some corrections previously shipped, incomplete final on-device matrix | Restore identified visual/OSD/popup/focus regressions, no redesign |
-| Cobra PiP / two Recents entries | User observation, no authorized modification | Preserve as seen; ZERO Cobra changes |
 | Final package and lock | Not built / not accepted | Full signed integration, device QA, user approval, source lock |
 
 **FINAL FENCE:** This document consolidates previously authorized corrections and the user's explicitly requested loading speed/refresh smoothness. No further Infinity feature program or scope additions are authorized. Creating this file modifies no runtime code, APK, addon component, or user data.
