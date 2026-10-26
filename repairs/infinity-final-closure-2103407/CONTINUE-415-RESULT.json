@@ -1,0 +1,96 @@
+{
+  "run": 40360243018,
+  "test_source": "d99ff76a1bc5b446dcf63a21934faf411d867900",
+  "candidate_source": "e92df08f23f9a66d9e004e48954a9e5d5dfc1ef7",
+  "apk_sha256": "75e3982300aed71fe791f8d5ccf9542ac0c198f012aea9f124021f3a766eb4ac",
+  "artifact": 12669765102,
+  "artifact_sha256": "51ddbf24d897760ab8efdc5f555b80861b3d327e26d99220352f53c1169f6a6e",
+  "passed": true,
+  "cases": [
+    {
+      "case": "actual-home-one-card-movie",
+      "status": "PASS"
+    },
+    {
+      "case": "actual-home-one-card-tv",
+      "status": "PASS"
+    },
+    {
+      "case": "remove-visible-card-retains-all-records",
+      "status": "PASS"
+    },
+    {
+      "case": "actual-new-playback-and-short-rewind-update-original-progress-key",
+      "status": "PASS"
+    }
+  ],
+  "cards": [
+    {
+      "media": "movie",
+      "key": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "observed": {
+        "Container(8830).ListItem.Episode": "",
+        "Container(8830).ListItem.Label": "The Matrix",
+        "Container(8830).ListItem.PercentPlayed": "33",
+        "Container(8830).ListItem.Property(Infinity.ResumeHub.Watched)": "false",
+        "Container(8830).ListItem.Property(Infinity.Selection.Snapshot)": "{\"bucket\":\"continue\",\"identity\":{\"ids\":{\"imdb\":\"tt0133093\"},\"kind\":\"movie\",\"schema\":1,\"scope\":\"movie\"},\"key\":\"bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb\",\"list\":\"\",\"owner\":\"script.infinity.commandcenter\",\"schema\":1,\"source\":\"special://profile/infinity-final-qa.mp4\",\"stable_source\":\"special://profile/infinity-final-qa.mp4\",\"token\":\"52f818e464fdd76b57048d55623ec9c816cafa102a29f74dbc6725a033f226ae\"}",
+        "Container(8830).ListItem.Season": ""
+      },
+      "native_directory_resume": {
+        "position": 60.0,
+        "total": 180.0
+      },
+      "home_tab_to_correct_usable_card_ms": 1279.2526270000053,
+      "timing_scope": "Test Home activation and tab selection to real exact card; not app launch",
+      "synthetic_metadata_and_generated_clip": true
+    },
+    {
+      "media": "tv",
+      "key": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "observed": {
+        "Container(8831).ListItem.Episode": "2",
+        "Container(8831).ListItem.Label": "Breaking Bad S01E02",
+        "Container(8831).ListItem.PercentPlayed": "33",
+        "Container(8831).ListItem.Property(Infinity.ResumeHub.Watched)": "false",
+        "Container(8831).ListItem.Property(Infinity.Selection.Snapshot)": "{\"bucket\":\"continue\",\"identity\":{\"episode\":2,\"ids\":{\"tmdb\":\"1396\"},\"kind\":\"episode\",\"schema\":1,\"scope\":\"show_episode\",\"season\":1},\"key\":\"dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd\",\"list\":\"\",\"owner\":\"script.infinity.commandcenter\",\"schema\":1,\"source\":\"special://profile/infinity-final-qa.mp4\",\"stable_source\":\"special://profile/infinity-final-qa.mp4\",\"token\":\"5fc569450d5cbb700333ff0a87eb80ccee56b7cb4f02e01999e97a4073b2fd96\"}",
+        "Container(8831).ListItem.Season": "1"
+      },
+      "native_directory_resume": {
+        "position": 60.0,
+        "total": 180.0
+      },
+      "home_tab_to_correct_usable_card_ms": 464.5395100000087,
+      "timing_scope": "Test Home activation and tab selection to real exact card; not app launch",
+      "synthetic_metadata_and_generated_clip": true
+    }
+  ],
+  "actual_movie_aliases_after_short_rewind": {
+    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa": {
+      "position": 3.0,
+      "duration": 180.0,
+      "playback_occurrence": "5b5111447bf54ffda5309776c6ebd436",
+      "information": {
+        "duration": 180,
+        "premiered": "1601-01-01"
+      }
+    },
+    "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb": {
+      "position": 3.0,
+      "duration": 180.0,
+      "playback_occurrence": "5b5111447bf54ffda5309776c6ebd436",
+      "information": {
+        "duration": 180,
+        "premiered": "1601-01-01"
+      }
+    }
+  },
+  "actual_TV_preserved_positions": {
+    "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc": 60,
+    "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd": 60
+  },
+  "limits": "Actual native generated180sec clip and synthetic saved metadata on API37 ARM64 translation. Cached Home/tab time includes actual card/native resume checks; not cold app launch, poster paint, remote playback or physical Fold.",
+  "ContinueWatching_successor": "NOT SELECTED by this original test",
+  "shutdown": "NOT SELECTED",
+  "physical_Fold": "NOT RUN",
+  "release_accepted": false
+}

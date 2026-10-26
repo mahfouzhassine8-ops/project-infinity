@@ -1,0 +1,35 @@
+Read-only LLVM20 disassembly, exact native409/411/414/415 libkodi151128c176b6094f28bb3fc716cc07c3985a9aa38f1e1bb1424f0285a47e.
+0x2bf49c0 f30f1ef8 	str	x19, [sp, #-32]!
+0x2bf49c4 fd7b01a9 	stp	x29, x30, [sp, #16]
+0x2bf49c8 fd430091 	add	x29, sp, #16
+0x2bf49cc 20038052 	mov	w0, #25
+0x2bf49d0 9c46a197 	bl	#-24831376
+0x2bf49d4 800100b4 	cbz	x0, #48
+0x2bf49d8 f30300aa 	mov	x19, x0
+0x2bf49dc 0549a197 	bl	#-24828908
+0x2bf49e0 e9f301b2 	mov	x9, #-6148914691236517206
+0x2bf49e4 087c4093 	sxtw	x8, w0
+0x2bf49e8 695595f2 	movk	x9, #43691
+0x2bf49ec 097dc99b 	umulh	x9, x8, x9
+0x2bf49f0 29fd43d3 	lsr	x9, x9, #3
+0x2bf49f4 8a018052 	mov	w10, #12
+0x2bf49f8 28a10a9b 	msub	x8, x9, x10, x8
+0x2bf49fc 686a68b8 	ldr	w8, [x19, x8]
+0x2bf4a00 03000014 	b	#12
+0x2bf4a04 08000090 	adrp	x8, #0
+0x2bf4a08 08012791 	add	x8, x8, #2496
+0x2bf4a0c fd7b41a9 	ldp	x29, x30, [sp, #16]
+0x2bf4a10 086d1c12 	and	w8, w8, #0xfffffff0
+0x2bf4a14 099501b0 	adrp	x9, #53088256
+0x2bf4a18 281909b9 	str	w8, [x9, #2328]
+0x2bf4a1c f30742f8 	ldr	x19, [sp], #32
+0x2bf4a20 c0035fd6 	ret
+0x1446440 30470290 	adrp	x16, #76431360
+0x1446444 11e645f9 	ldr	x17, [x16, #3016]
+0x1446448 10222f91 	add	x16, x16, #3016
+0x144644c 20021fd6 	br	x17
+0x1446df0 304702b0 	adrp	x16, #76435456
+0x1446df4 115240f9 	ldr	x17, [x16, #160]
+0x1446df8 10820291 	add	x16, x16, #160
+0x1446dfc 20021fd6 	br	x17
+getauxval JUMP_SLOT=0x5d2abc8; rand JUMP_SLOT=0x5d2b0a0. No native edits.

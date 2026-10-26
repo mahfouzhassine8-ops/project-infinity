@@ -1,0 +1,278 @@
+{
+  "run": 40360243111,
+  "test_source": "d99ff76a1bc5b446dcf63a21934faf411d867900",
+  "candidate_source": "e92df08f23f9a66d9e004e48954a9e5d5dfc1ef7",
+  "apk_sha256": "75e3982300aed71fe791f8d5ccf9542ac0c198f012aea9f124021f3a766eb4ac",
+  "artifact": 12668332687,
+  "artifact_sha256": "261ef376fb4a58131d3a68f3bc95f5fc3149106f6ae7ed22c5c033c60dc4af1f",
+  "passed": true,
+  "cycles_completed": 3,
+  "cycles": [
+    {
+      "cycle": 0,
+      "passed": true,
+      "actual_Power_route": {
+        "skin_member": "assets/addons/skin.infinity.diggz/unified/DialogButtonMenu.xml",
+        "skin_sha256": "149b614b9dd96094e64c7b7a837fbc911bfceda40e4ecef84716f7a3a6220d78",
+        "control": 200,
+        "action": "com.projectinfinity.kodi.action.CLOSE_KODI",
+        "activity": "com.projectinfinity.kodi.InfinityPowerControlActivity",
+        "exact_builtin": "StartAndroidActivity(com.projectinfinity.kodi,com.projectinfinity.kodi.action.CLOSE_KODI,,,,,,,com.projectinfinity.kodi.InfinityPowerControlActivity)",
+        "backend_matches": true,
+        "observed_labels": {
+          "Control.GetLabel(200)": "CLOSE KODI",
+          "System.CurrentControl": "CLOSE KODI",
+          "System.CurrentControlID": "200"
+        },
+        "observed_flags": {
+          "Control.IsEnabled(200)": true,
+          "Control.IsVisible(200)": true,
+          "Window.IsActive(shutdownmenu)": true
+        },
+        "input": "Android KEYCODE_DPAD_CENTER",
+        "input_result": ""
+      },
+      "UI_and_Close_seconds": 5.306175602000053,
+      "native_safe_ms": 2796,
+      "separate_results": {
+        "essential_first_durable": true,
+        "kodi_engine_terminated": true,
+        "android_coordinator_completed": true,
+        "remaining_UID_processes": [],
+        "recent_apps_used_for_process_proof": false
+      },
+      "essential_owners": [
+        "native_admission",
+        "background_jobs",
+        "playback",
+        "command_center",
+        "compat",
+        "kodi_settings",
+        "profiles",
+        "skin_settings",
+        "addon_settings",
+        "favourites",
+        "peripherals",
+        "audio_policy",
+        "deferred_dialog_state",
+        "xml_files",
+        "native_databases",
+        "pvr"
+      ],
+      "engine_and_Java_proof": {
+        "checkpoint_saved": true,
+        "native_generation": 1,
+        "engine_Java_seal": "ffe64d09-f5ac-4901-9a28-6dded8ea837a",
+        "coordinator_Java_seal": "e673bf27-4338-418e-9124-6c216ed16302",
+        "process_death_confirmed": true
+      },
+      "final_UID_processes": [],
+      "remembered_preference_unchanged": true,
+      "launch_preference": {
+        "present": true,
+        "sha256": "9f6ba54226d61b6cd02796a9d61d4831dc2154875bd22d5bcafb7da78b9ace0a",
+        "remembered": "infinity"
+      },
+      "database_integrity": [
+        "Addons33.db",
+        "TV46.db",
+        "Textures13.db",
+        "ViewModes6.db",
+        "MyMusic83.db",
+        "Epg16.db",
+        "MyVideos131.db"
+      ],
+      "new_reopened_owner": {
+        "schema": 2,
+        "pid": 5381,
+        "owner": "a3bf71ce-b576-41b3-bf12-3f59404ccd3c",
+        "launch": "7d05243c-63a5-4d23-8803-03e08a6a9398",
+        "began": 1793032956933,
+        "close_at": 0,
+        "phase": "RUNNING",
+        "live": true,
+        "error": ""
+      },
+      "recents": "Task UI observed separately; not used as a PID proof"
+    },
+    {
+      "cycle": 1,
+      "passed": true,
+      "actual_Power_route": {
+        "skin_member": "assets/addons/skin.infinity.diggz/unified/DialogButtonMenu.xml",
+        "skin_sha256": "149b614b9dd96094e64c7b7a837fbc911bfceda40e4ecef84716f7a3a6220d78",
+        "control": 200,
+        "action": "com.projectinfinity.kodi.action.CLOSE_KODI",
+        "activity": "com.projectinfinity.kodi.InfinityPowerControlActivity",
+        "exact_builtin": "StartAndroidActivity(com.projectinfinity.kodi,com.projectinfinity.kodi.action.CLOSE_KODI,,,,,,,com.projectinfinity.kodi.InfinityPowerControlActivity)",
+        "backend_matches": true,
+        "observed_labels": {
+          "Control.GetLabel(200)": "CLOSE KODI",
+          "System.CurrentControl": "CLOSE KODI",
+          "System.CurrentControlID": "200"
+        },
+        "observed_flags": {
+          "Control.IsEnabled(200)": true,
+          "Control.IsVisible(200)": true,
+          "Window.IsActive(shutdownmenu)": true
+        },
+        "input": "Android KEYCODE_DPAD_CENTER",
+        "input_result": ""
+      },
+      "UI_and_Close_seconds": 4.043076987000063,
+      "native_safe_ms": 2104,
+      "separate_results": {
+        "essential_first_durable": true,
+        "kodi_engine_terminated": true,
+        "android_coordinator_completed": true,
+        "remaining_UID_processes": [],
+        "recent_apps_used_for_process_proof": false
+      },
+      "essential_owners": [
+        "native_admission",
+        "background_jobs",
+        "playback",
+        "command_center",
+        "compat",
+        "kodi_settings",
+        "profiles",
+        "skin_settings",
+        "addon_settings",
+        "favourites",
+        "peripherals",
+        "audio_policy",
+        "deferred_dialog_state",
+        "xml_files",
+        "native_databases",
+        "pvr"
+      ],
+      "engine_and_Java_proof": {
+        "checkpoint_saved": true,
+        "native_generation": 1,
+        "engine_Java_seal": "44c16079-4544-4ee5-b17e-3a6e1664a89a",
+        "coordinator_Java_seal": "1698c590-aa91-4588-bf19-e8024867e125",
+        "process_death_confirmed": true
+      },
+      "final_UID_processes": [],
+      "remembered_preference_unchanged": true,
+      "launch_preference": {
+        "present": true,
+        "sha256": "9f6ba54226d61b6cd02796a9d61d4831dc2154875bd22d5bcafb7da78b9ace0a",
+        "remembered": "infinity"
+      },
+      "database_integrity": [
+        "Addons33.db",
+        "TV46.db",
+        "Textures13.db",
+        "ViewModes6.db",
+        "MyMusic83.db",
+        "Epg16.db",
+        "MyVideos131.db"
+      ],
+      "new_reopened_owner": {
+        "schema": 2,
+        "pid": 6144,
+        "owner": "4242b46b-e468-4c11-8500-ab3105a4ae60",
+        "launch": "5ea1c0d1-85d1-4be3-bd4b-3b810146a821",
+        "began": 1793033004252,
+        "close_at": 0,
+        "phase": "RUNNING",
+        "live": true,
+        "error": ""
+      },
+      "recents": "Task UI observed separately; not used as a PID proof"
+    },
+    {
+      "cycle": 2,
+      "passed": true,
+      "actual_Power_route": {
+        "skin_member": "assets/addons/skin.infinity.diggz/unified/DialogButtonMenu.xml",
+        "skin_sha256": "149b614b9dd96094e64c7b7a837fbc911bfceda40e4ecef84716f7a3a6220d78",
+        "control": 200,
+        "action": "com.projectinfinity.kodi.action.CLOSE_KODI",
+        "activity": "com.projectinfinity.kodi.InfinityPowerControlActivity",
+        "exact_builtin": "StartAndroidActivity(com.projectinfinity.kodi,com.projectinfinity.kodi.action.CLOSE_KODI,,,,,,,com.projectinfinity.kodi.InfinityPowerControlActivity)",
+        "backend_matches": true,
+        "observed_labels": {
+          "Control.GetLabel(200)": "CLOSE KODI",
+          "System.CurrentControl": "CLOSE KODI",
+          "System.CurrentControlID": "200"
+        },
+        "observed_flags": {
+          "Control.IsEnabled(200)": true,
+          "Control.IsVisible(200)": true,
+          "Window.IsActive(shutdownmenu)": true
+        },
+        "input": "Android KEYCODE_DPAD_CENTER",
+        "input_result": ""
+      },
+      "UI_and_Close_seconds": 4.32595989999993,
+      "native_safe_ms": 2089,
+      "separate_results": {
+        "essential_first_durable": true,
+        "kodi_engine_terminated": true,
+        "android_coordinator_completed": true,
+        "remaining_UID_processes": [],
+        "recent_apps_used_for_process_proof": false
+      },
+      "essential_owners": [
+        "native_admission",
+        "background_jobs",
+        "playback",
+        "command_center",
+        "compat",
+        "kodi_settings",
+        "profiles",
+        "skin_settings",
+        "addon_settings",
+        "favourites",
+        "peripherals",
+        "audio_policy",
+        "deferred_dialog_state",
+        "xml_files",
+        "native_databases",
+        "pvr"
+      ],
+      "engine_and_Java_proof": {
+        "checkpoint_saved": true,
+        "native_generation": 1,
+        "engine_Java_seal": "8897ed80-647f-41b9-8bb5-528e91f23f86",
+        "coordinator_Java_seal": "3a73864b-9615-46b8-8ee1-76e755528328",
+        "process_death_confirmed": true
+      },
+      "final_UID_processes": [],
+      "remembered_preference_unchanged": true,
+      "launch_preference": {
+        "present": true,
+        "sha256": "9f6ba54226d61b6cd02796a9d61d4831dc2154875bd22d5bcafb7da78b9ace0a",
+        "remembered": "infinity"
+      },
+      "database_integrity": [
+        "Addons33.db",
+        "TV46.db",
+        "Textures13.db",
+        "ViewModes6.db",
+        "MyMusic83.db",
+        "Epg16.db",
+        "MyVideos131.db"
+      ],
+      "new_reopened_owner": {
+        "schema": 2,
+        "pid": 6911,
+        "owner": "f0afccce-63f3-462a-906d-7ac48ef12b57",
+        "launch": "07d003e1-9a84-4784-a1c0-ece2f222c978",
+        "began": 1793033051934,
+        "close_at": 0,
+        "phase": "RUNNING",
+        "live": true,
+        "error": ""
+      },
+      "recents": "Task UI observed separately; not used as a PID proof"
+    }
+  ],
+  "ordinary411_pass_preserved": 40317069331,
+  "synthetic_411_separate_pass": 40331713617,
+  "physical_Fold": "NOT RUN",
+  "release_accepted": false,
+  "final_lock": false
+}

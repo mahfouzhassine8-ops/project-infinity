@@ -1,0 +1,38 @@
+{
+  "recorded_before_implementation": true,
+  "parent_apk_sha256": "75e3982300aed71fe791f8d5ccf9542ac0c198f012aea9f124021f3a766eb4ac",
+  "candidate_version": 2103416,
+  "command_center_version": "0.3.5.46",
+  "source_preimages": {
+    "service.py": "a965bf0b114cfa87121ea359f02a16697b49ab68f433567862f06561755afe39",
+    "resume_hub.py": "64d5f0c81810beabf82dab8ef96229ef9ba99d8f9673a39c227f4a85d82d5f71",
+    "addon.xml": "7552347e7693053e04849275c91edd3dcbf5a4ee45a719f521c3884a5e34e0b5"
+  },
+  "preserved_success": {
+    "signed415_original_Continue": 40360243018,
+    "signed415_actual_Power_UI_Close3": 40360243111,
+    "ordinary411_Close3": 40317069331
+  },
+  "actual_source_reproduction": "Execute exact signed415 pure functions: mark_watched_data(completed=True) retains S1E2 progress row and hides it, but next_episodes returns S1E2 instead of verified catalogue successor S2E1; progress_shows also prefers old70sec row over watched100percent. Separately record_progress into an existing exact identity row drops incoming verified_next. No invented pass or deletion.",
+  "actual_native_metadata_observation": "Continue415 run40360243018 original movie/TV/progress/rewind PASS; real native InfoTag returns premiered1601-01-01 for missing date and the fallback stored this sentinel. Remove this exact native zero-date sentinel only from fallback metadata, retaining any prior real saved synopsis/date and valid actual dates.",
+  "correction": "Filter retained hidden/completed progress through existing resume_visible when projecting Next Episodes and per-series progress. Persist a newly captured successor only when its verified parent IDs, exact after coordinates and chronological successor agree; never guess E+1 or replace saved navigation. Preserve all buckets, aliases, historical items and original writer fences. Drop exact native missing-date sentinel in native fallback; typed JSON path unchanged.",
+  "owned_members": [
+    "AndroidManifest.xml",
+    "assets/addons/script.infinity.commandcenter/service.py",
+    "assets/addons/script.infinity.commandcenter/resume_hub.py",
+    "assets/addons/script.infinity.commandcenter/addon.xml",
+    "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1",
+    "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1.sig"
+  ],
+  "selected_checks": [
+    "Exact415 preimage/inverse/compile and six-member package budget",
+    "Actual signed hub reproduction before/after: completion hides retained aliases, correct cross-season successor from exact catalogue proof, correct watched progress, preserved all saved routes/buckets",
+    "Existing progress persists valid successor; reject missing/false/conflicting parent/after/backward/special transition proof",
+    "Actual native missing-date sentinel omitted, valid dates and old metadata retained; typed JSON remains original",
+    "Original permanent signer, native75-file auth, actual JCA45->46 sentinel migration, source/components/native/DEX/skin/chooser/Cobra audits"
+  ],
+  "runtime_selection": "Separately select latest signed candidate original Continue plus real library TV completion/cross-season progression, original actions,50Search/30Home/20rotation, actualPowerUI3 and separate writer controls. Preserve all completed415 results. No behavior lane is a packaging dependency.",
+  "physical_Fold": "NOT RUN",
+  "release_accepted": false,
+  "final_lock": false
+}

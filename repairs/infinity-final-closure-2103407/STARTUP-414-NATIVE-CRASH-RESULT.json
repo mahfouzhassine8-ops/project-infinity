@@ -1,0 +1,28 @@
+{
+  "run": 40355125114,
+  "test_source": "db1af57def1fb8638f4af5da92809a059c32c14c",
+  "apk_sha256": "a13bd3a5fc10752fc06621e2b49d050b5fd3ba0a8a86ad9e675420335b0313d3",
+  "artifact": 12668612514,
+  "artifact_sha256": "09862490c7fa644dc37fba9f30d1ae9cfd796d42610e5f94a173c74c4fdbfb53",
+  "passed": false,
+  "APK_install_over": "COMPLETED",
+  "failure": "Actual startup SIGSEGV before Kodi RPC/interface/feature test. Not a preinstall setup failure.",
+  "native_process": 4674,
+  "uptime_seconds": 4,
+  "environment": "API37 Google CE2A.260420.051.A3/16571990 x86_64 guestARM64 native bridge",
+  "native_lib_sha256": "151128c176b6094f28bb3fc716cc07c3985a9aa38f1e1bb1424f0285a47e",
+  "native_frame": "talloc_lib_init+60 at libkodi0x2bf49fc",
+  "instruction": "ldr w8,[x19,x8]",
+  "registers": {
+    "x19": "0x7d53283b7fa0",
+    "x8": 7,
+    "rand": "0x6b8b4567",
+    "fault": "0x7d53283b7fa7"
+  },
+  "observed_cause": "Exact ELF constructor calls getauxval(AT_RANDOM=25), rand(), then reads4bytes at returned pointer+(rand%12). Returned pointer is nonzero but unreadable in this translated process. Guest stack confirms dlopen constructor before Kodi/Python work; native and DEX identical415. See actual disassembly and original raw log.",
+  "primary_corresponding_algorithm": "https://github.com/samba-team/samba/blob/master/lib/talloc/talloc.c",
+  "inference": "Evidence points to native-bridge/auxv mapping failure at startup. An unmodified native-ARM physical result is required; this does not establish a physical Fold Search crash cause or justify changing shared/Cobra allocator code.",
+  "result_policy": "Retain real failure; no automatic application restart or retry-to-PASS, no native/Java/Cobra workaround introduced.",
+  "physical_Fold": "NOT RUN",
+  "release_accepted": false
+}
