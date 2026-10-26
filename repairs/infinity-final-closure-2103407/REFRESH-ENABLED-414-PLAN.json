@@ -1,0 +1,37 @@
+{
+  "recorded_before_implementation": true,
+  "parent_apk_sha256": "b3af984c5f035f6c0e51f70f71726b317ddbb503764eb5306505b583c0643ec4",
+  "candidate_version": 2103414,
+  "command_center_version": "0.3.5.44",
+  "source_preimages": {
+    "service.py": "12da3f56dec8fd73e045f8185bd7233bdee24d4544363467a6ef314376b4efa1",
+    "default.py": "c236a824ad5fed590b3b67240738739c728e2cc3ee0865119cf2df1239554daf",
+    "addon.xml": "5653884a69853afd1201c77628275c1859b5bc0a800a6468b3142b1a27db034d"
+  },
+  "evidence": {
+    "run": 40342716847,
+    "inventory": "service.infinity.refresh installed version1.0.1 enabledfalse",
+    "resident_thread": 4684,
+    "error": "Repeated Unknown addon id service.infinity.refresh in existing CC resident",
+    "compiled_Addon_cpp_sha256": "cce5f9857dc5102c8c7f744a110dde53c757e10400472131f4da401c96e72ff4",
+    "primary_source": "https://github.com/xbmc/xbmc/blob/21.3-Omega/xbmc/interfaces/legacy/Addon.cpp",
+    "cause": "Constructor GetAddon(...OnlyEnabled::CHOICE_YES) rejects disabled add-ons. Prior HasAddon guard and its fake constructor test incorrectly assumed disabled settings were readable."
+  },
+  "correction": "Change only HasAddon to AddonIsEnabled in existing service/default refresh getters; absent and disabled retain the same auto/default outputs without constructing an Addon or throwing. Enabled and live enable/disable setting behavior remains original; no OS or add-on state writes.",
+  "owned_members": [
+    "AndroidManifest.xml",
+    "assets/addons/script.infinity.commandcenter/service.py",
+    "assets/addons/script.infinity.commandcenter/default.py",
+    "assets/addons/script.infinity.commandcenter/addon.xml",
+    "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1",
+    "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1.sig"
+  ],
+  "selected_checks": [
+    "Exact source inverse/compile",
+    "Missing, disabled (real native constructor semantics), enabled dynamic setting and remove/disable transitions",
+    "Typed version and unowned member/package rejection",
+    "Original signer,75-file native and JCA43->44 migration, every APK member/components, native/DEX/skin/Cobra preservation"
+  ],
+  "runtime_tests": "Separately select actual candidate Android17 after build. Existing413actualPower3pass remains preserved; no Close/test dependency on packaging.",
+  "release_accepted": false
+}

@@ -177,7 +177,7 @@ jobs:
           assert request['schema']==1 and request['scope'].strip()
           selected=request['selected']
           assert selected in {'search-lifetime','module-trust','installed-modules','module-protocol',
-                              'firstparty-compose','reference-observation','module-bundle','module-complete','internal-apk','internal-service-apk','internal-coordinator-apk','internal-resume-apk','internal-home-entry-apk','candidate-routing','shutdown-routing','android-routing'}
+                              'firstparty-compose','reference-observation','module-bundle','module-complete','internal-apk','internal-service-apk','internal-coordinator-apk','internal-resume-apk','internal-home-entry-apk','internal-disabled-refresh-apk','candidate-routing','shutdown-routing','android-routing'}
           with open(os.environ['GITHUB_OUTPUT'],'a') as output:
               output.write('selection='+selected+'\n')
           if selected=='search-lifetime':
@@ -214,6 +214,10 @@ jobs:
               sys.exit(0)
           elif selected=='internal-service-apk':
               print('Packaging410 only: exact409 engine/DEX/modules remain unchanged. Scoped VersionCheck source and negative checks run below against exact409 on Python3.11 before signing. No application or Close tests.')
+              sys.exit(0)
+          elif selected=='internal-disabled-refresh-apk':
+              print('Packaging414 only: enabled-only optional refresh constructor guard, original default outputs; no app or Close tests.')
+              subprocess.run([sys.executable,'-m','unittest','discover','-s',str(root),'-p','test_refresh_packaging.py','-v'],check=True)
               sys.exit(0)
           elif selected=='internal-home-entry-apk':
               print('Packaging413 only: equivalent native Home commands and existing signed resident runtime publication. No app/shutdown tests.')
@@ -387,6 +391,30 @@ jobs:
           set -euo pipefail
           python3 repairs/infinity-final-closure-2103407/package_resume_render.py \
             --parent-root resume-parent --sdk "$ANDROID_HOME/build-tools/35.0.0" --out resume-candidate
+      - name: Recover exact signed413 for disabled refresh correction
+        if: steps.selected.outputs.selection == 'internal-disabled-refresh-apk'
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 40336380247
+          name: Infinity-2103413-Home-Corrective-Verification-40336380247
+          github-token: ${{ github.token }}
+          path: refresh-parent
+      - name: Verify actual signed getters and enabled-only constructor semantics
+        if: steps.selected.outputs.selection == 'internal-disabled-refresh-apk'
+        run: |
+          set -euo pipefail
+          export INFINITY_REFRESH_PARENT_APK="$(find refresh-parent -type f -name 'Infinity-2103413-Home-Entry-Corrective-VERIFICATION.apk' -print -quit)"
+          PYTHONPATH=repairs/infinity-final-closure-2103407 python3 -m unittest test_refresh_enabled -v
+      - name: Authenticate CC44, audit exact six members and permanently sign414
+        if: steps.selected.outputs.selection == 'internal-disabled-refresh-apk'
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 repairs/infinity-final-closure-2103407/package_refresh_enabled.py --parent-root refresh-parent --sdk "$ANDROID_HOME/build-tools/35.0.0" --out refresh-candidate
       - name: Recover exact signed412 for Home entry correction
         if: steps.selected.outputs.selection == 'internal-home-entry-apk'
         uses: actions/download-artifact@v4
@@ -425,7 +453,7 @@ jobs:
             --parent-root signed407 --module-root package-modules --native-root package-native \
             --sdk "$ANDROID_HOME/build-tools/35.0.0" --out internal-candidate
       - uses: actions/upload-artifact@v4
-        if: always() && steps.selected.outputs.selection != 'module-bundle' && steps.selected.outputs.selection != 'internal-apk' && steps.selected.outputs.selection != 'internal-service-apk' && steps.selected.outputs.selection != 'internal-coordinator-apk' && steps.selected.outputs.selection != 'internal-resume-apk' && steps.selected.outputs.selection != 'internal-home-entry-apk'
+        if: always() && steps.selected.outputs.selection != 'module-bundle' && steps.selected.outputs.selection != 'internal-apk' && steps.selected.outputs.selection != 'internal-service-apk' && steps.selected.outputs.selection != 'internal-coordinator-apk' && steps.selected.outputs.selection != 'internal-resume-apk' && steps.selected.outputs.selection != 'internal-home-entry-apk' && steps.selected.outputs.selection != 'internal-disabled-refresh-apk'
         with:
           name: Infinity-Final-Source-Ownership-${{ github.run_id }}-NOT-APK
           path: final-work/
@@ -513,3 +541,15 @@ jobs:
             repairs/infinity-final-closure-2103407/HOME-ENTRY-413-PLAN.json
           retention-days: 90
           if-no-files-found: warn
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.selected.outputs.selection == 'internal-disabled-refresh-apk'
+        with:
+          name: Infinity-2103414-Refresh-Corrective-Verification-${{ github.run_id }}
+          path: |
+            refresh-candidate/*.apk
+            refresh-candidate/components/*.zip
+            refresh-candidate/*.json
+            refresh-candidate/*.txt
+            refresh-candidate/SHA256SUMS
+            repairs/infinity-final-closure-2103407/REFRESH-ENABLED-414-PLAN.json
+          retention-days: 90
