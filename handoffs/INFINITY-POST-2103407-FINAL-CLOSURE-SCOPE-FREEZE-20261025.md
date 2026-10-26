@@ -1,5 +1,12 @@
 # INFINITY — FINAL CONSOLIDATED CLOSURE RELEASE BRIEF
 
+> **REVIEW-ONLY HISTORICAL SCOPE CHECKLIST — SUPERSEDED FOR GPT-6.1 EXECUTION.**
+>
+> The single authoritative engineering brief is:
+> [INFINITY-GPT-6.1-FINAL-END-TO-END-CORRECTIVE-20261025.md](INFINITY-GPT-6.1-FINAL-END-TO-END-CORRECTIVE-20261025.md).
+> Its baseline is the passing-only 2103407 signed-source reference, with a separate passing receipt. **Do not work from this older checklist or treat every listed issue as passed.**
+>
+
 **Scope frozen by user on October 25, 2026.** One final corrective, consolidation, speed and visual-polish release for phone Infinity. Complete and physically accept it, lock Infinity, then move to separate Cobra work only upon new explicit authorization. No further feature additions, repeated diagnostics-only releases or speculative redesigns.
 
 **Repository:** mahfouzhassine8-ops/project-infinity
