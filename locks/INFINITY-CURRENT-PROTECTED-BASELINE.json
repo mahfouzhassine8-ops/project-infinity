@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "effective_date": "2026-10-26",
+  "status": "USER_APPROVED_PROTECTED_BASELINE",
+  "experience": "Infinity/Kodi",
+  "version_code": 2103420,
+  "package": "com.projectinfinity.kodi",
+  "same_apk_same_icon": true,
+  "user_frozen_scope": [
+    "Infinity Home and skin",
+    "Infinity playback and Resume Hub",
+    "Search and Command Center",
+    "Continue Playing and Continue Watching",
+    "Favorites/Watched/Watchlist and all local state",
+    "Essential-First shutdown and persistent settings",
+    "shared chooser and saved launch preferences"
+  ],
+  "cobra_frozen": false,
+  "allow_future_authorized_cobra_only_updates": true,
+  "lock_branch": "lock/infinity-2103420-user-approved-baseline-20261026",
+  "lock_commit": "883c64a4de6f87077893921454de71bba850235b",
+  "signed_application_source_commit": "ddc054583c5e5f3cd04c328e131cb76af8d4728b",
+  "successful_build_run": 40413893227,
+  "artifact_id": 12695160919,
+  "artifact_name": "Infinity-2103420-P0-Original-Signer-40413893227",
+  "signed_apk": "Infinity-2103420-P0-Corrective-SIGNED.apk",
+  "signed_apk_sha256": "ae641e74bbe0b3360d103254d9bc5425fe1558f625466a99f1da9f16414fef26",
+  "artifact_zip_sha256": "7e8004b793ceebf13da342ec564b934551a057492b8ac56fdaf6746e0b9c9ecb",
+  "signing_certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "component_sha256": {
+    "script.kodihealthcenter-2.5.27.zip": "218afbdaf44c1c1626e54d09c787bc69a7ed5d23bc1c5dd5279c39e7b3bc6363",
+    "script.infinity.watchedbridge-1.0.21-2103420.zip": "e216d775e673cb7737ea3fafcabffcb616a0f454303b85cb49e0926ea63f435a",
+    "script.infinity.commandcenter-0.3.5.49-2103420.zip": "71706b7985a201b9f4615f25710523ccbaff58ef342733ecac165f1fb98b811a",
+    "skin.infinity.diggz-1.0.5.247.zip": "c99d0de4146d3dbdaa3e9aa101ed9da318ec5a5e7a8329c22546749f00abae7c",
+    "script.infinity.uirepair-0.1.23-2103420.zip": "b160213db7399f51f55d9dc76e715c7d982bb2fb61700a54c875cfe4d6af114c",
+    "script.infinity.rails-0.2.8-2103420.zip": "bf11b80ceed4b2f488c374d0767aba0491788cfb1456cc7cbdb32a3ddfea11f4"
+  },
+  "physical_acceptance": {
+    "device": "Samsung Galaxy Fold 8 Ultra",
+    "os": "Android 17 / API 37",
+    "observed": [
+      "2103420 installed",
+      "feels snappy and loads well",
+      "shutdown works correctly",
+      "one-tap ASK EVERY TIME works",
+      "otherwise running well"
+    ],
+    "explicit_lock_authorized": true,
+    "not_claimed": [
+      "quantitative frame pacing",
+      "strict 16KiB native ELF compatibility",
+      "all-provider exhaustive tests"
+    ]
+  },
+  "cobra_only_upgrade_contract": {
+    "preserve_infinity_runtime_and_state": true,
+    "do_not_modify_shutdown": true,
+    "do_not_modify_chooser_or_launcher": true,
+    "do_not_duplicate_icon_or_package": true,
+    "do_not_reset_user_data": true,
+    "shared_files": "use exact class/member ownership and functional scope checks; block changes affecting protected Infinity",
+    "authorization_required_for_shared_native_change": true,
+    "require_same_permanent_signer": true
+  },
+  "evidence_doc": "locks/INFINITY-2103420-USER-APPROVED-BASELINE-20261026.md",
+  "build_result_doc": "repairs/infinity-final-closure-2103407/p0/SIGNED-420-BUILD-RESULT.json",
+  "administrative_branch_protection_configured": false
+}
