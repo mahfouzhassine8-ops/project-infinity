@@ -111,9 +111,11 @@ def install_over(device,adb,baseline,candidate,out,fixture_id):
     if digest(candidate)!=EXPECTED['candidate_apk_sha256']:raise ValueError('Exact signed corrective candidate required')
     if device.PACKAGE in device.shell('pm','list','packages',device.PACKAGE):
         raise ValueError('Existing device installation refused')
-    if EXPECTED.get('post_feature') and '--case' in sys.argv and sys.argv[sys.argv.index('--case')+1]==EXPECTED['selected_case']:
-        import android_input_preparation
-        android_input_preparation.warm(device,out)
+    if EXPECTED.get('post_feature'):
+        (out/'IME-PREPARATION-STATUS.json').write_text(json.dumps(dict(
+            status='NOT RUN',system_utility_required_for_app_acceptance=False,
+            actual_Infinity_keyboard_deadline_seconds=45,
+            actual_current_IME_and_BODY_proof_required=True),indent=2)+'\n')
     if 'Success' not in adb('install','--no-incremental',baseline):raise RuntimeError('Protected baseline installation failed')
     uid=device.shell('stat','-c','%u',device.PRIVATE).strip()
     if not uid.isdigit() or int(uid)<10000:raise RuntimeError('Baseline UID unavailable')
