@@ -4,6 +4,7 @@ CI internal integration artifact only. No APK, app installation or behavioral
 test is started here; no private signing input enters the output directory.
 """
 import base64
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -25,6 +26,7 @@ def run(argv,env=None):
 
 
 def build(sources,out):
+    sources=Path(sources).resolve();out=Path(out).absolute()
     if out.exists():raise ValueError('Fresh internal signed bundle output required')
     scope=json.loads((ROOT/'SCOPE.json').read_text())
     if scope['baseline']['commit']!='0e8739d2d0e1be0ab8f127519b526556426fb160' or scope['candidate']['version_code']!=2103408:
@@ -46,6 +48,25 @@ def build(sources,out):
         environment={name:os.environ[name] for name in ('PATH','JAVA_HOME') if name in os.environ};environment.update(credentials)
         proof=run([java,'-cp',classes,'SignInfinityModules',key,addons/module_bundle.CC/module_bundle.MANIFEST],environment)
         (out/'ORIGINAL-MODULE-SIGNATURE.txt').write_text(proof)
+    return complete(sources,out)
+
+
+def complete(sources,out):
+    """Resume only exact, already-signed source; never trust a prior PASS flag."""
+    sources=Path(sources).resolve();out=Path(out).resolve()
+    if (out/'SIGNED-MODULE-BUNDLE.json').exists():raise ValueError('Completed generation must not be overwritten')
+    scope=json.loads((ROOT/'SCOPE.json').read_text());addons=out/'assets/addons'
+    if scope['baseline']['commit']!='0e8739d2d0e1be0ab8f127519b526556426fb160' or scope['candidate']['version_code']!=2103408:
+        raise ValueError('Exact final scope required')
+    with tempfile.TemporaryDirectory(prefix='infinity-exact-module-recipe-') as temp:
+        expected=Path(temp)/'addons';composition=compose_firstparty.compose(sources,expected)
+        report=module_bundle.prepare(expected)
+        wanted={p.relative_to(expected).as_posix():p.read_bytes() for p in expected.rglob('*') if p.is_file()}
+        actual={p.relative_to(addons).as_posix():p.read_bytes() for p in addons.rglob('*') if p.is_file()}
+        signature=module_bundle.CC+'/'+module_bundle.MANIFEST+'.sig'
+        if set(actual)!=set(wanted)|{signature} or any(actual[n]!=raw for n,raw in wanted.items()):
+            raise ValueError('Already-signed module generation differs from the exact reviewed recipe')
+    java=Path(os.environ['JAVA_HOME'])/'bin/java';javac=java.with_name('javac')
     verifier=out/'verify-native-bundle'
     run(['g++','-std=c++17','-O2','-Wall','-Wextra','-Werror',ROOT/'verify_module_bundle.cpp',
          ROOT/'isolated-native/InfinityModuleManifest.cpp','-lcrypto','-o',verifier])
@@ -75,5 +96,6 @@ def build(sources,out):
 if __name__=='__main__':
     import argparse
     parser=argparse.ArgumentParser();parser.add_argument('sources',type=Path);parser.add_argument('out',type=Path)
-    args=parser.parse_args();report=build(args.sources,args.out)
+    parser.add_argument('--complete-only',action='store_true')
+    args=parser.parse_args();report=complete(args.sources,args.out) if args.complete_only else build(args.sources,args.out)
     print(json.dumps({k:v for k,v in report.items() if k!='composition'},indent=2))

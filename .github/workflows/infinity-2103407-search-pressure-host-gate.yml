@@ -176,7 +176,7 @@ jobs:
           assert request['schema']==1 and request['scope'].strip()
           selected=request['selected']
           assert selected in {'search-lifetime','module-trust','installed-modules','module-protocol',
-                              'firstparty-compose','reference-observation','module-bundle','android-routing'}
+                              'firstparty-compose','reference-observation','module-bundle','module-complete','android-routing'}
           with open(os.environ['GITHUB_OUTPUT'],'a') as output:
               output.write('selection='+selected+'\n')
           if selected=='search-lifetime':
@@ -201,6 +201,9 @@ jobs:
           elif selected=='module-bundle':
               for pattern in ('test_module_bundle.py','test_java_module_migration.py','test_refresh_lookup.py'):
                   subprocess.run([sys.executable,'-m','unittest','discover','-s',str(root),'-p',pattern,'-v'],check=True)
+              sys.exit(0)
+          elif selected=='module-complete':
+              print('No unit-test repeat: retain15passed source checks and exactDEXaudit from40274233925; run only corrected authenticated bundle completion below.')
               sys.exit(0)
           elif selected=='android-routing':
               pattern='test_android17_reference.py'
@@ -238,6 +241,22 @@ jobs:
           set -euo pipefail
           python3 repairs/infinity-final-closure-2103407/sign_module_bundle.py \
             final-work/baseline/sources final-work/signed-modules
+      - name: Recover already-signed module generation and retained passing source gates
+        if: steps.selected.outputs.selection == 'module-complete'
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 40274233925
+          name: Infinity-Final-Source-Ownership-40274233925-NOT-APK
+          github-token: ${{ github.token }}
+          path: final-work/module-completion
+      - name: Correct absolute build caller and verify original-key completion without repeating passing tests
+        if: steps.selected.outputs.selection == 'module-complete'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          python3 repairs/infinity-final-closure-2103407/complete_module_bundle.py \
+            final-work/baseline/sources final-work/module-completion
       - uses: actions/upload-artifact@v4
         if: always() && steps.selected.outputs.selection != 'module-bundle'
         with:

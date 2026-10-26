@@ -243,5 +243,29 @@
     "runtime_Android17": "NOT RUN",
     "physical_Fold": "NOT RUN",
     "APK_produced": false
+  },
+  "module_bundle_ci_01": {
+    "run": 40274233925,
+    "source": "772f10fb95c893264f112a18bb3a62053172f4ec",
+    "overall": "FAIL_RETAINED",
+    "passed": [
+      "15newhostchecks",
+      "exactDEXaudit7864protectedclasses+allstringindices",
+      "OriginalpermanentRSA module signaturecreation+selfverify"
+    ],
+    "failure": "Callerpassedrelativeaddonsroot; strictnativeverifier correctlyreturnedunavailable. Noauthgateweakened.",
+    "artifact_id": 12629472776,
+    "artifact_sha256": "aa3121605ef2ef3b6ec8319eef9cbee580bfb84e47b3bbd0aa249e84767fe19f"
+  },
+  "module_bundle_completion_local": {
+    "status": "PASS_ACTUAL_ORIGINAL_KEY_NATIVE_AND_JCA_HOST_MIGRATION",
+    "manifest_sha256": "b3e53a6dcd3c6a061c18296d7aa613738bc273b0ef3b0f2630740e03a925281e",
+    "files": 71,
+    "source_bytes": 703937,
+    "private_key_access": false,
+    "APK_produced": false,
+    "Android17": "NOT RUN",
+    "physicalFold": "NOT RUN",
+    "negative": "Mutatedretainedsource rejectedbeforearchive. CompletionCIpending; retained15/DEXchecksnotrepeated."
   }
 }

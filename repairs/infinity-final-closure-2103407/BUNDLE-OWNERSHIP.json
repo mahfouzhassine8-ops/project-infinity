@@ -27,5 +27,22 @@
     "no_APK_or_application_tests": true,
     "signing_after_successful_checks_only": true,
     "private_key_material_in_uploaded_outputs": false
+  },
+  "completion_correction": {
+    "failed_run": 40274233925,
+    "source": "772f10fb95c893264f112a18bb3a62053172f4ec",
+    "artifact_id": 12629472776,
+    "artifact_sha256": "aa3121605ef2ef3b6ec8319eef9cbee580bfb84e47b3bbd0aa249e84767fe19f",
+    "actual_failure": "sign_module_bundle passed relative final-work/... to strict nativeVerify absolute-root check. Signaturecreation/selfverify succeeded;15testsandexactDEXpassed.",
+    "correct_only": "Resolvecallerpaths; completealready-signedexactsourceafterfreshrecipe-bytecomparison,original-keyC++/JCAverificationandarchiveguards. No newprivatekeyuse needed.",
+    "selected_before_execution": [
+      "Actualoriginal-key signedpartialbundle completion/native/JCAhostinterop",
+      "Mutatedsource or recipegeneration mismatch refusesbeforearchive"
+    ],
+    "no_rerun": [
+      "15passinghosttests",
+      "exactunchangedDEXadapteraudit",
+      "nativeenginecompile"
+    ]
   }
 }
