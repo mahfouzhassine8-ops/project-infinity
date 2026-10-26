@@ -1,3 +1,5 @@
+> **USER P0 OCT 26 — SHUTDOWN FROZEN, FINISH MISSING APK WORK**: The newer explicit user directive `repairs/infinity-final-closure-2103407/WORK-P0-FINISH-MISSING-IMPLEMENTATIONS-SHUTDOWN-FROZEN-20261026.md` is authoritative for CURRENT next-release scope. Work on genuinely incomplete code and performance; leave proven 2103419 shutdown frozen. Do NOT run further shutdown tests or condition signing/delivery on shutdown/stress CI. Preserve passing 419 Power3 run40397618519 and writer-negative run40397718606. Fix Latest Releases stale context-module path and Health Center pre-consolidation source inventory; finish near-instant usable Home, correct Continue Playing/Watching, native queue/refresh/scroll/memory items. Sign/install-over original-key with matching components. No Cobra/chooser touch, no data wipe, no broad redesign.
+
 # Current integrated419 — continue, do not restart
 
 This checkpoint does not supersede any of the original seven workstreams or the
