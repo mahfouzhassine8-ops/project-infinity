@@ -103,3 +103,19 @@ def patch(raw):
     payload=b''.join(output);result=struct.pack('<HHI',3,8,8+len(payload))+payload
     list(chunks(result))
     return result
+
+def verify_preference_activity(raw):
+    parts=list(chunks(raw));strings=string_pool(next(p for _,k,p in parts if k==1));matches=[]
+    for _,kind,part in parts:
+        if kind!=0x102 or strings[struct.unpack_from('<I',part,20)[0]]!='activity':continue
+        first,step,count=struct.unpack_from('<3H',part,24);attributes={}
+        for i in range(count):
+            at=16+first+i*step;ns,key,unused=struct.unpack_from('<3I',part,at)
+            typ=part[at+15];value=struct.unpack_from('<I',part,at+16)[0]
+            if ns==NONE or strings[ns]!=ANDROID:raise ValueError('Activity attribute namespace differs')
+            attributes[strings[key]]=(typ,strings[value] if typ==3 else value)
+        if attributes.get('name')==(3,CLASS):matches.append(attributes)
+    expected={'theme':(1,0x01030055),'name':(3,CLASS),'exported':(0x12,0),
+              'excludeFromRecents':(0x12,1),'noHistory':(0x12,1)}
+    if matches!=[expected]:raise ValueError('Exactly one private NoDisplay preference activity required')
+    return expected

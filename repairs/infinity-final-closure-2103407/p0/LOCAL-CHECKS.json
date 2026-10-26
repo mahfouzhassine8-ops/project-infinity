@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "host_checks": 5,
+  "host_result": "PASS",
+  "test_source_sha256": "20b1b15418587e9a160cb6dd878b901248a43d0733c4f6c0882108b2de3f43ff",
+  "checked_source_sha256": {
+    "infinity_runtime_identity.py": "9a87d2790f457af7965babce6fa7c45ff1c43b2dc938cc5defec64aa5442853c",
+    "InfinityJavaPersistence.java": "d16af294374efacce77b6eaec0fe8678ae5c39e64720ad314b6b593c70f5f50e",
+    "patch_p0_finish.py": "0b69cb1556d121579fe8b3f8f8a182859b2d2312735758535cb649ddf50b7197",
+    "package_p0_finish.py": "fcfc9d9fe2d9d5ebc379ffcf8efaf086fde5890dab55cac175a7881fe92cbd53",
+    "manifest.py": "d4664d19b60683ca816a537ecfc6629199500ed3e1cde59fded2632d394a2f12",
+    "InfinityAskEveryTimeActivity.java": "13cbdfce17ca365b3cf06841e7fd88700f7585a69db0f0e34b566e020be392b2"
+  },
+  "original_key_signature_checks": "PERFORMED_IN_PACKAGING",
+  "Android_UI": "NOT_RUN",
+  "physical_Fold": "USER_FINAL_ACCEPTANCE_PENDING",
+  "shutdown": "NOT_SELECTED_NOT_RUN",
+  "selected_scope": "Five P0 checks recorded before execution in P0-PLAN.json; no repeated passing suites",
+  "build_guard_correction": "Pre-existing ARM capability workflow remains exact blob c3e32de69ba273bb408fbf305edf43ed41779529; no runtime or test modifications.",
+  "home_readiness_change": "Actual completion callback; no timers/threads added",
+  "changed_feature_rechecks": 2,
+  "changed_feature_rechecks_result": "PASS",
+  "typed_manifest_activity_check": "PASS exact count, unexported NoDisplay, noHistory, excludeFromRecents; absent activity rejected"
+}

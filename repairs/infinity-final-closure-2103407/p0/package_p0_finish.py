@@ -185,8 +185,8 @@ def build(parent_root,sdk,android,out):
     if not re.search(r"^package: name='com.projectinfinity.kodi' versionCode='2103420'",badging,re.M) or "native-code: 'arm64-v8a'" not in badging:
         raise ValueError('Install-over package/ABI differs')
     xml=run([sdk/'aapt','dump','xmltree',final,'AndroidManifest.xml'])
-    if xml.count(manifest.CLASS)!=1:raise ValueError('Private preference activity absent/duplicated')
     with ZipFile(parent) as original,ZipFile(final) as candidate:
+        manifest.verify_preference_activity(candidate.read('AndroidManifest.xml'))
         report=compare(original,candidate,changes)
         for file in components.glob('*.zip'):
             with ZipFile(file) as component:
@@ -204,6 +204,7 @@ def build(parent_root,sdk,android,out):
     (out/'SHA256SUMS').write_text(sha(final)+'  '+final.name+'\n'+''.join(sha(p)+'  components/'+p.name+'\n' for p in sorted(components.iterdir())))
     for name in ('INSTALLATION.txt','REQUIREMENT-LEDGER.md'):
         shutil.copyfile(HERE/name,out/name)
+    shutil.copyfile(HERE/'LOCAL-CHECKS.json',out/'LOCAL-CHECKS.json')
     unsigned.unlink();aligned.unlink()
     return report
 

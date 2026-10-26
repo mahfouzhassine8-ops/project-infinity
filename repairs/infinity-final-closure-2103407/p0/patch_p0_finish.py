@@ -39,10 +39,16 @@ def firstparty(before):
     text=once(text,'            for entry in values:\n', '            rows = []\n            for entry in values:\n')
     text=once(text,'                xbmcplugin.addDirectoryItem(handle, target, item, isFolder=False)',
         '                rows.append((target, item, False))\n            xbmcplugin.addDirectoryItems(handle, rows, totalItems=len(rows))')
+    text=once(text,'            xbmcplugin.addDirectoryItems(handle, rows, totalItems=len(rows))',
+        '            xbmcplugin.addDirectoryItems(handle, rows, totalItems=len(rows))\n            xbmcgui.Window(10000).setProperty(\'Infinity.Home.FirstViewportReady\', \'true\')')
+    text=once(text,'    except Exception as exc:\n',
+        "    except Exception as exc:\n        if action == 'continue':\n            xbmcgui.Window(10000).setProperty('Infinity.Home.FirstViewportReady', 'true')\n")
     result[name]=text.encode()
     name=CC+'/plugin.py';checked(name,before[name]);text=before[name].decode()
     text=once(text,'    visible = values[:100]\n',
         "    visible = values[:20 if PARAMS.get('home') == '1' else 100]\n")
+    anchor="    hub.trace_timing('directory_items', rendered, items=min(len(values), 100), revision=int(data.get(\"revision\") or 0), **timing)\n"
+    text=once(text,anchor,anchor+"    if PARAMS.get('home') == '1':\n        xbmcgui.Window(10000).setProperty('Infinity.Home.FirstViewportReady', 'true')\n")
     for old in ('items=min(len(values), 100),',):
         if text.count(old)!=2:raise ValueError('Original listing timing boundaries differ')
         text=text.replace(old,'items=len(visible),')
@@ -94,9 +100,6 @@ READY = ('!System.AddonIsEnabled(script.infinity.commandcenter) | '
     '[!String.IsEmpty(Window(Home).Property(Infinity.ContinueWatchingRevision)) + '
     '[!Control.IsVisible(8830) | !Integer.IsGreater(Window(Home).Property(Infinity.ContinueWatchingMovies),0) | Integer.IsGreater(Container(8830).NumItems,0)] + '
     '[!Control.IsVisible(8831) | !Integer.IsGreater(Window(Home).Property(Infinity.ContinueWatchingTV),0) | Integer.IsGreater(Container(8831).NumItems,0)]]')
-ALARM = ('  <onload condition="System.AddonIsEnabled(script.infinity.commandcenter) + '
-    'String.IsEmpty(Window(Home).Property(Infinity.Home.FirstViewportReady))">'
-    'AlarmClock(infinityFirstViewport,SetProperty(Infinity.Home.FirstViewportReady,true,Home),00:00:02,silent)</onload>\n')
 
 def home(text):
     tree=ET.fromstring(text);parents={c:p for p in tree.iter() for c in p}
@@ -120,7 +123,6 @@ def home(text):
         variables[name]='  <variable name="'+name+'"><value condition="'+condition+'">'+path+'</value><value /></variable>\n'
         replacements.append((match.start(2),match.end(2),'$VAR['+name+']'))
     for a,b,value in reversed(replacements):text=text[:a]+value+text[b:]
-    text=once(text,'  <controls>',ALARM+'  <controls>')
     ET.fromstring(text)
     return text,variables
 
@@ -165,6 +167,7 @@ def skin(before):
     protected.update(skin_version='1.0.5.247',candidate_version='1.0.5.247',candidate=247,candidate_locked=False)
     result[name]=(json.dumps(protected,indent=2,sort_keys=True)+'\n').encode()
     return result,dict(gated_feeds_per_profile=stats,first_viewport_continue_limit=20,
-        remote_first_viewport_fallback_seconds=2,existing_power_controls_unchanged=True,
+        remote_first_viewport_ready='real Continue directory completion or explicit failure',
+        no_new_timer_worker_or_service=True,existing_power_controls_unchanged=True,
         layout_geometry_player_resources_unchanged=True,shutdown_routes_unchanged=True,
         modified_members=sorted(n for n in result if result[n]!=before[n]))

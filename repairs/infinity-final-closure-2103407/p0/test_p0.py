@@ -90,7 +90,7 @@ class P0Tests(unittest.TestCase):
         name='p0_ui';runtime=types.ModuleType(name+'.runtime')
         runtime.addons=lambda:[];runtime.hidden=lambda aid:False;runtime.destination=lambda aid:None
         saved=[{'key':'movie:'+str(i),'synthetic_next':False} for i in range(100)]
-        seen=[];calls=[];properties=[]
+        seen=[];calls=[];properties=[];home_properties=[];directory_results=[]
         class Item:
             def setProperty(self,key,value):properties.append((key,value))
         plugin=types.SimpleNamespace(PROFILE='per-profile',setting_bool=lambda *a:True,
@@ -99,10 +99,10 @@ class P0Tests(unittest.TestCase):
             _list_item=lambda e,*a,**k:(seen.append(e['key']) or 'verified:'+e['key'],Item()))
         access=types.ModuleType(name+'.controller_access');access.load=lambda:plugin
         xb=types.ModuleType('xbmc');xb.log=lambda *a:None;xb.LOGWARNING=2
-        gui=types.ModuleType('xbmcgui');gui.Window=lambda id:types.SimpleNamespace(getProperty=lambda key:'standard')
+        gui=types.ModuleType('xbmcgui');gui.Window=lambda id:types.SimpleNamespace(getProperty=lambda key:'standard',setProperty=lambda k,v:home_properties.append((k,v)))
         native=types.ModuleType('xbmcplugin');native.setContent=lambda *a:None
         native.addDirectoryItems=lambda h,rows,**kw:calls.append((h,rows,kw))
-        native.endOfDirectory=lambda *a,**kw:None
+        native.endOfDirectory=lambda *a,**kw:directory_results.append(kw)
         fake={name:types.ModuleType(name),name+'.runtime':runtime,name+'.controller_access':access,'xbmc':xb,'xbmcgui':gui,'xbmcplugin':native}
         fake[name].__path__=[]
         with patch.dict(sys.modules,fake),patch.object(sys,'argv',['plugin://uirepair','1','?action=continue&media=movie']):
@@ -112,6 +112,8 @@ class P0Tests(unittest.TestCase):
         self.assertEqual(seen,[e['key'] for e in saved[:20]])
         self.assertEqual(len(calls),1);self.assertEqual(calls[0][2],{'totalItems':20})
         self.assertEqual([value for key,value in properties if key=='Infinity.UI.Token'],seen)
+        self.assertEqual(home_properties,[('Infinity.Home.FirstViewportReady','true')])
+        self.assertEqual(directory_results,[{'succeeded':True,'cacheToDisc':False}])
 
     def test_health_resolves_signed_consolidated_code_and_real_extension_shims(self):
         raw=(Path(__file__).parent/'infinity_runtime_identity.py').read_bytes()
