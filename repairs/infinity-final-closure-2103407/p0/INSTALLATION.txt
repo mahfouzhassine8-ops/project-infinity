@@ -1,0 +1,29 @@
+Infinity 2103420 — permanently signed ARM64 install-over P0 correction
+
+1. Install Infinity-2103420-P0-Corrective-SIGNED.apk over the existing Infinity.
+   Keep the installed app and its data. Do not uninstall or clear storage.
+2. The APK contains the matching first-party code and presentation components.
+   For installed component overrides, install these exact ZIPs in this order:
+   a. script.infinity.commandcenter-0.3.5.49-2103420.zip
+   b. script.infinity.uirepair-0.1.23-2103420.zip
+   c. script.infinity.watchedbridge-1.0.21-2103420.zip
+   d. script.infinity.rails-0.2.8-2103420.zip
+   e. skin.infinity.diggz-1.0.5.247.zip
+   f. script.kodihealthcenter-2.5.27.zip
+3. Reload Skin using its existing Power action if installing the skin separately.
+
+Power > ASK EVERY TIME now commits the existing experience preference in one tap.
+It does not show another screen, close Infinity or launch the chooser immediately.
+After your ordinary exit, the next app-icon launch uses the existing chooser.
+
+The 2103419 shutdown implementation and its existing successful evidence are
+preserved. No new shutdown test or repeated experimental installation is requested.
+Cobra and the original native engine/three DEX files are byte-identical to 2103419.
+
+Use SHA256SUMS for the APK and six exact component archives. APK-PRESERVATION.json
+binds the source commit, successful build, permanent signer and every changed member.
+Final acceptance is on your Samsung Galaxy Fold 8 Ultra / Android 17.
+
+Retained compatibility limit: native ELF alignment remains the parent's 4KiB
+alignment. APK ZIP alignment is 16KiB; this does not establish strict 16KiB ELF
+support. Native startup/frame pacing and physical Fold timings are not claimed.

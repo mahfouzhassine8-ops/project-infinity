@@ -177,7 +177,7 @@ jobs:
           assert request['schema']==1 and request['scope'].strip()
           selected=request['selected']
           assert selected in {'search-lifetime','module-trust','installed-modules','module-protocol',
-                              'firstparty-compose','reference-observation','module-bundle','module-complete','internal-apk','internal-service-apk','internal-coordinator-apk','internal-resume-apk','internal-home-entry-apk','internal-disabled-refresh-apk','internal-playback-favourites-apk','internal-continue-completion-apk','internal-continue-fast-home-apk','internal-query-cache-apk','internal-playlist-home-apk','candidate-routing','shutdown-routing','android-routing'}
+                              'firstparty-compose','reference-observation','module-bundle','module-complete','internal-apk','internal-service-apk','internal-coordinator-apk','internal-resume-apk','internal-home-entry-apk','internal-disabled-refresh-apk','internal-playback-favourites-apk','internal-continue-completion-apk','internal-continue-fast-home-apk','internal-query-cache-apk','internal-playlist-home-apk','internal-p0-finish-apk','candidate-routing','shutdown-routing','android-routing'}
           with open(os.environ['GITHUB_OUTPUT'],'a') as output:
               output.write('selection='+selected+'\n')
           if selected=='search-lifetime':
@@ -214,6 +214,9 @@ jobs:
               sys.exit(0)
           elif selected=='internal-service-apk':
               print('Packaging410 only: exact409 engine/DEX/modules remain unchanged. Scoped VersionCheck source and negative checks run below against exact409 on Python3.11 before signing. No application or Close tests.')
+              sys.exit(0)
+          elif selected=='internal-p0-finish-apk':
+              print('P0 source integration, compilation, permanent signature and exact frozen419 member checks only. No behavioral or shutdown suite in packaging.')
               sys.exit(0)
           elif selected=='internal-playlist-home-apk':
               print('Packaging419 only: exact native absent-provider Home route, unchanged first-party modules/native/DEX. No app or Close tests.')
@@ -411,6 +414,46 @@ jobs:
           set -euo pipefail
           python3 repairs/infinity-final-closure-2103407/package_resume_render.py \
             --parent-root resume-parent --sdk "$ANDROID_HOME/build-tools/35.0.0" --out resume-candidate
+      - name: Recover exact signed419 parent for authorized P0 completion
+        if: steps.selected.outputs.selection == 'internal-p0-finish-apk'
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 40396544415
+          name: Infinity-2103419-Home-Playlist-Corrective-Verification-40396544415
+          github-token: ${{ github.token }}
+          path: p0-parent
+      - name: Restore existing Android signature input for isolated preference compilation
+        if: steps.selected.outputs.selection == 'internal-p0-finish-apk'
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39867073954
+          name: Infinity-Receipt-Race-Android17-Investigation
+          github-token: ${{ github.token }}
+          path: p0-tools
+      - name: Integrate P0 runtime sources and sign original identity; frozen shutdown and Cobra
+        if: steps.selected.outputs.selection == 'internal-p0-finish-apk'
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 repairs/infinity-final-closure-2103407/p0/package_p0_finish.py --parent-root p0-parent --sdk "$ANDROID_HOME/build-tools/35.0.0" --android p0-tools/receipt-evidence/android-34.jar --out p0-candidate
+      - uses: actions/upload-artifact@v4
+        if: always() && steps.selected.outputs.selection == 'internal-p0-finish-apk'
+        with:
+          name: Infinity-2103420-P0-Original-Signer-${{ github.run_id }}
+          path: |
+            p0-candidate/*.apk
+            p0-candidate/components/*.zip
+            p0-candidate/*.json
+            p0-candidate/*.txt
+            p0-candidate/REQUIREMENT-LEDGER.md
+            p0-candidate/SHA256SUMS
+            repairs/infinity-final-closure-2103407/p0/P0-PLAN.json
+          retention-days: 90
+          if-no-files-found: error
       - name: Recover exact signed418 for absent-provider Home loading correction
         if: steps.selected.outputs.selection == 'internal-playlist-home-apk'
         uses: actions/download-artifact@v4
@@ -593,7 +636,7 @@ jobs:
             --parent-root signed407 --module-root package-modules --native-root package-native \
             --sdk "$ANDROID_HOME/build-tools/35.0.0" --out internal-candidate
       - uses: actions/upload-artifact@v4
-        if: always() && steps.selected.outputs.selection != 'module-bundle' && steps.selected.outputs.selection != 'internal-apk' && steps.selected.outputs.selection != 'internal-service-apk' && steps.selected.outputs.selection != 'internal-coordinator-apk' && steps.selected.outputs.selection != 'internal-resume-apk' && steps.selected.outputs.selection != 'internal-home-entry-apk' && steps.selected.outputs.selection != 'internal-disabled-refresh-apk' && steps.selected.outputs.selection != 'internal-playback-favourites-apk' && steps.selected.outputs.selection != 'internal-continue-completion-apk' && steps.selected.outputs.selection != 'internal-continue-fast-home-apk' && steps.selected.outputs.selection != 'internal-query-cache-apk' && steps.selected.outputs.selection != 'internal-playlist-home-apk'
+        if: always() && steps.selected.outputs.selection != 'module-bundle' && steps.selected.outputs.selection != 'internal-apk' && steps.selected.outputs.selection != 'internal-service-apk' && steps.selected.outputs.selection != 'internal-coordinator-apk' && steps.selected.outputs.selection != 'internal-resume-apk' && steps.selected.outputs.selection != 'internal-home-entry-apk' && steps.selected.outputs.selection != 'internal-disabled-refresh-apk' && steps.selected.outputs.selection != 'internal-playback-favourites-apk' && steps.selected.outputs.selection != 'internal-continue-completion-apk' && steps.selected.outputs.selection != 'internal-continue-fast-home-apk' && steps.selected.outputs.selection != 'internal-query-cache-apk' && steps.selected.outputs.selection != 'internal-playlist-home-apk' && steps.selected.outputs.selection != 'internal-p0-finish-apk'
         with:
           name: Infinity-Final-Source-Ownership-${{ github.run_id }}-NOT-APK
           path: final-work/
@@ -753,3 +796,4 @@ jobs:
             refresh-candidate/SHA256SUMS
             repairs/infinity-final-closure-2103407/REFRESH-ENABLED-414-PLAN.json
           retention-days: 90
+
