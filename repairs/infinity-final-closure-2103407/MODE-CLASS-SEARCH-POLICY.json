@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "family": "mode-class-json-v1",
+  "reference_provider_id": "plugin.video.redlight",
+  "reference_version": "2.9.1",
+  "reference_zip_sha256": "3556c1c7896f2940ee673a89fbf4f38cea8a598e7322dcc46ef55bf06095db1f",
+  "entrypoint": "resources/lib/redlight.py",
+  "shapes": {
+    "resources/lib/redlight.py": "85a01c7e95a79691c9b71ecd2525b1115d3607c51aa5731c5f1c65a13539c8a0",
+    "resources/lib/modules/router.py": "c47306c9a04f7857918b01d0c23e8c4cdb1e382cb631b90ebc7fb16b60e73d9b",
+    "resources/lib/apis/tmdb_api.py": "02b79d40b93b46516062eb21d9f2718f212ed50f81a1961e7fadffdbecaefffc",
+    "resources/lib/indexers/movies.py": "ccd9b09152e0bd4c5b770042948493cfe3cdf02913d0626b072319ac1267359b",
+    "resources/lib/indexers/tvshows.py": "572653be13efca3f292335dad622099f5511a1c19e2cdc1811b6f6c5bc06af88"
+  },
+  "review": "Actual publisher source. AST structure recognizes comments/docstrings/packaging version variation without executing provider code; semantic changes outside this reviewed family remain unverified. No endpoint is guessed.",
+  "raw_sha256": {
+    "resources/lib/redlight.py": "eff3258041bb8daec747c8d437a9bde415d135c9cb97492e91f4d404608b4d10",
+    "resources/lib/modules/router.py": "d0f6241ac206db95c026bd704a29e984095d91890081ac463460bebd72425a69",
+    "resources/lib/apis/tmdb_api.py": "2670f6e42f42747ecf56003d8f2f9efed6551343ab9cc77fccf0f18065c70097",
+    "resources/lib/indexers/movies.py": "7608fc1f0667a8223ef48715d4f03a67dc474761b5a4496ec09f1ab7d80b7177",
+    "resources/lib/indexers/tvshows.py": "5824b9f9b95c0de362629b570928f21447157c06d4c13b8fc7d1f3bf74f41e37"
+  }
+}

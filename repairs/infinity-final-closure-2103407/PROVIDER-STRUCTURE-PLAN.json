@@ -1,0 +1,84 @@
+{
+  "recorded_before_structural_verifier_implementation": true,
+  "workstream": 1,
+  "authorization": "Oct26priority2: safeversion-awareautomaticcompatibleproviderverification; preserve7existingcontractsandSearchglobalworker/native20secondlease",
+  "publisher_reference_inputs": [
+    {
+      "id": "plugin.video.thecrew",
+      "version": "3.2.2",
+      "zip_sha256": "b60a2f93abf80fd528133c197bb5c7c56cf713eac4ffbf6df5d703d2a0a0f3b7",
+      "url": "https://raw.githubusercontent.com/thecrewwh/zips/master/matrix/_zip/plugin.video.thecrew/plugin.video.thecrew-3.2.2.zip",
+      "files": [
+        "plugin.video.thecrew/addon.xml",
+        "plugin.video.thecrew/thecrew.py"
+      ]
+    },
+    {
+      "id": "script.module.thecrew",
+      "version": "3.2.26",
+      "zip_sha256": "7cfbb1060f617e7b0165d0e3f4ae3c35330d094f64b79a76093664d110b463ce",
+      "url": "https://raw.githubusercontent.com/thecrewwh/zips/master/matrix/_zip/script.module.thecrew/script.module.thecrew-3.2.26.zip",
+      "files": [
+        "script.module.thecrew/addon.xml",
+        "script.module.thecrew/lib/resources/lib/indexers/movies.py",
+        "script.module.thecrew/lib/resources/lib/indexers/navigator.py",
+        "script.module.thecrew/lib/resources/lib/indexers/tvshows.py"
+      ]
+    },
+    {
+      "id": "plugin.video.redlight",
+      "version": "2.9.1",
+      "zip_sha256": "3556c1c7896f2940ee673a89fbf4f38cea8a598e7322dcc46ef55bf06095db1f",
+      "url": "https://repo.redwizard.xyz/redwizardrepo/main/plugin.video.redlight/plugin.video.redlight-2.9.1.zip",
+      "files": [
+        "plugin.video.redlight/addon.xml",
+        "plugin.video.redlight/resources/lib/indexers/movies.py",
+        "plugin.video.redlight/resources/lib/indexers/navigator.py",
+        "plugin.video.redlight/resources/lib/indexers/tvshows.py",
+        "plugin.video.redlight/resources/lib/modules/router.py",
+        "plugin.video.redlight/resources/lib/redlight.py"
+      ]
+    }
+  ],
+  "reference_file_sha256": {
+    "script.module.thecrew/addon.xml": "3f9cad7b0f1b22ee987b21d94f8002d30e466ada5bb0325ab8773a7d9332386a",
+    "plugin.video.thecrew/addon.xml": "17b833c8752fd7c2171939294c6a05f958e82b1e50537721189868e468ae1b91",
+    "plugin.video.thecrew/thecrew.py": "9ee54c130080be01f1fe209384e7cba04add0d09bb8edf72d02e5cbe4a94642d",
+    "plugin.video.redlight/addon.xml": "a2ccceb1e503d3ab06242df149d6d7b87210c48d88177523a8c008e8e25b3f09",
+    "script.module.thecrew/lib/resources/lib/indexers/tvshows.py": "0b41bb739b609ad068ea3b48f403ef422d40eb5fc61b66b0e30344f29892f00e",
+    "script.module.thecrew/lib/resources/lib/indexers/movies.py": "5f80392b631277b2a2c4dda5f736dd52a050bfd50d0aa528de5bcb4295bb9e3c",
+    "script.module.thecrew/lib/resources/lib/indexers/navigator.py": "5e489d7ea2df6936ac4b693aa1497f6f244f2b4d26a07c9f42a18ac479124be6",
+    "script.module.thecrew/lib/resources/lib/modules/utils.py": "b56f1f0b06f5fddc7f88080df6f8bef982ea911360b65261dfbfd78938ed27ea",
+    "script.module.thecrew/lib/resources/lib/modules/crew.py": "caafcf30c7c286345ff3eb98246e42198c1c4990a3f03d9242a3c73138eba7c8",
+    "plugin.video.redlight/resources/lib/redlight.py": "eff3258041bb8daec747c8d437a9bde415d135c9cb97492e91f4d404608b4d10",
+    "plugin.video.redlight/resources/lib/indexers/tvshows.py": "5824b9f9b95c0de362629b570928f21447157c06d4c13b8fc7d1f3bf74f41e37",
+    "plugin.video.redlight/resources/lib/indexers/movies.py": "7608fc1f0667a8223ef48715d4f03a67dc474761b5a4496ec09f1ab7d80b7177",
+    "plugin.video.redlight/resources/lib/indexers/navigator.py": "f3a4695fcb3bd6d95ca5d7a8a0b9e38c6278c610d3895168bdda46121db1cf22",
+    "plugin.video.redlight/resources/lib/apis/tmdb_api.py": "2670f6e42f42747ecf56003d8f2f9efed6551343ab9cc77fccf0f18065c70097",
+    "plugin.video.redlight/resources/lib/modules/utils.py": "8de9be33bf9a1edd3aef9b50fd3724371eed5bd0b922db627b057209f0026a9d",
+    "plugin.video.redlight/resources/lib/modules/router.py": "d0f6241ac206db95c026bd704a29e984095d91890081ac463460bebd72425a69"
+  },
+  "actual_Fold_provider_versions": "NOT COLLECTED; do notclaimthesepublisherversionsareinstalled",
+  "actual_private_source_gap": "Fold030002installed-code lists7addonsbutnoCrew/RedLight; Libraryexact/simplerproviderarchivesearch foundnone.",
+  "proof_plan": "Parse bounded actualinstalledPythonAST, neverimport/eval/execprovider. Deriveonlyreviewedmovie/TVsearch dataflows throughmanifestentrypoint, router/action/params forwarding, receiver/search URL/listing body; rejectunknown/ambiguousdynamicflows. Pinallactualrawsourcehashesandaddon/dependencyversionsandentrypoints, revalidateonupdate/enable/disable/removal andeverydispatch. No newtitle-navigation/trackingcapability fromSearchproof.",
+  "critical_primary_findings": [
+    "Crew3.2.2 entrythecrew.py parsesargv[2] parse_qsl thenresources.lib.modules.crew.router(params) fromscript.module.thecrew3.2.26. routeraction_map movieSearchterm/tvSearchterm callsMovies/TVShows.search_term(p(name)); receivernormalizesquery, parameterizedprivatehistoryDB writes, constructssearch_link andcallsget(search_url). Needdependencyproof; currentroot-onlypinscannotgrantit.",
+    "RedLight2.9.1 resources/lib/redlight.py ->modules.router.routing(sys); exactbuild_movie_list/build_tvshow_list branches callMovies/TVShows(params).fetch_list. specialactions tmdb_movies_search/tmdb_tv_search useparams key_id orquery ->api function(query,page). APIprimarysourceURLs /3/search/movie and/3/search/tv. Routerhasexecforothermodes; onlystaticallyprovenexactbranchesmayqualify, neverexecduringverification."
+  ],
+  "implementation_boundary": [
+    "NewCCinternalstructuralverifier plusprovider_inventory capabilityproof/cachedependencyvalidation",
+    "infinity_search.route checksdependencyproofsinadditiontoexistingownrawpins; _leased_directory/worker/dispatch/order/rememberedroutesunchanged",
+    "DisplayonlyKodiCOLOR/Bmarkupnormalization; actualaddonID/sourceidentityrawdataunchanged"
+  ],
+  "selected_before_execution": [
+    "ActualpublisherreferenceASTpositive fixtures forbothmedia, plusID-renamedcompatibleforkandunrelatedmethod/versionvariation; no sourceexecution",
+    "Negativeambiguousroute,wrongqueryforwarding,mutable/dynamicdispatch,missingdependency/disableddependency,changedsource-afterproof,pathtraversal/symlinks/oversizedsource,category-only filtering; nofalsecapabilitygrant",
+    "Actualexisting7contracts/workingUmbrella/Otaku/Nixtoons remainonoldexactpath; TestSearchAllsourceattribution/concurrencyseparatelyafterintegration"
+  ],
+  "provider_binaries_or_data_changed": false,
+  "remembered_TrackIt_routes_changed": false,
+  "Android17": "NOT RUN",
+  "physical_Fold": "NOT RUN",
+  "status": "PRIMARY_SOURCE_AND_PRE_EDIT_PLAN; IMPLEMENTATION PENDING",
+  "first_isolated_implementation": "Mode/class/query JSON search family first, usingactualRedLight2.9.1 sources: deriveexactliteralroutefromAST, proveparamsforwarding/class specialaction/queryreceiver/APIsearch movie-vs-TV URL. Unknownconditions/ambiguousmappingsremainunverified. No provider execution. Crew requiresseparatedependencyproof andremainsnext."
+}
