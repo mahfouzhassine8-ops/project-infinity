@@ -82,7 +82,7 @@ jobs:
     needs: chooser
     if: github.ref == 'refs/heads/work/chooser-version-labels-from-2103423-20261027'
     permissions:
-      contents: write
+      contents: read
       actions: read
     runs-on: ubuntu-22.04
     timeout-minutes: 15
@@ -97,7 +97,7 @@ jobs:
           ref: work/infinity-cobra-isolation-from-2103420-20261026
           path: integration
           fetch-depth: 0
-          persist-credentials: true
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -118,12 +118,20 @@ jobs:
             echo "REFUSED: non-authority file mutation"; exit 1;
           }
           git -C integration diff --check
-      - name: Commit unsigned proposal to standalone staging branch
+      - name: Emit only reviewed authority delta for connected GitHub update
         run: |
-          set -euo pipefail
-          git -C integration switch -c work/chooser-2103424-release-authority-20261027
-          git -C integration config user.name "github-actions[bot]"
-          git -C integration config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C integration add repairs/dual-experience-isolation-2103420/release-authority.json
-          git -C integration commit -m "release: stage reviewed chooser-only 2103424 authority; preserve both experiences"
-          git -C integration push origin HEAD:refs/heads/work/chooser-2103424-release-authority-20261027
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("integration/repairs/dual-experience-isolation-2103420/release-authority.json")
+          j=json.loads(p.read_text())
+          names=["review_ownership.py","ownership-reviewed-roots.json","release_authority.py","signer-policy.json"]
+          root="repairs/dual-experience-isolation-2103420/"
+          result={"generation":j["generation"],"versionCode":j["candidate_versionCode"],
+            "previous_authority_sha256":j["previous_authority_sha256"],
+            "source_files":{root+k:j["source_files"][root+k] for k in names},
+            "owner":j["owner_update_evidence"]["owner"],
+            "guard_digest_count":len(j["protected_contract"]),
+            "preserved_versions":{k:j["components"][k]["version"] for k in ("INFINITY","COBRA","MINIMAL_ANDROID_CONTRACT")}}
+          print("AUTHORITY_DELTA_JSON="+json.dumps(result,sort_keys=True,separators=(",",":")))
+          PY
