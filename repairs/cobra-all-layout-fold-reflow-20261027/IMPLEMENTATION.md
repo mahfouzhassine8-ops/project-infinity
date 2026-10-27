@@ -1,4 +1,4 @@
-# Cobra all-layout reflow — implementation checkpoint
+# Cobra all-layout reflow — signed delivery checkpoint
 
 The actual signed 2103421 Cobra module supports one player and Multi-View counts
 2–4; `openMultiView` and `CobraTileStore.reconcile` reject larger counts.
@@ -22,13 +22,18 @@ two narrow Activity methods expose the current presentation and existing layout
 operations; a new Cobra helper observes geometry; Cobra's component version is
 advanced. The existing player/retune/seek/audio/shutdown methods are unchanged.
 
-The selected checks are recorded in TEST-SCOPE.json. Initial Android view tests
+The selected checks are recorded in TEST-SCOPE.json. Six focused Android view tests
 reproduced the original defect and passed cover/inner/rotation measurement for
 single-player and all 2–4 tile counts, Fit/Fill, and enlargement. These are
 Robolectric view tests using shipped bytecode; they do not claim real decoded
-stream continuity or physical Fold acceptance. Further production-DEX integration
-and preservation checks are in progress.
+stream continuity or physical Fold acceptance. Production-DEX integration and exact owner-preservation checks passed.
+
+The final attachment check reproduced two observers in the earlier candidate
+and verifies one in the corrected component. Signed 2103423 is delivered; see
+[DELIVERY.md](DELIVERY.md).
 
 The original-key release gate remains binding. The linked brief records 2103421
 as an unaccepted candidate and explicitly forbids silently advancing acceptance.
-Implementation proceeds now; acceptance and any dependent signing remain pending.
+The installed 2103421 component set was retained for integration. The canonical
+release gate passed and original-key signing completed. Accepted pointers remain
+unchanged; the final physical Fold check is pending.
