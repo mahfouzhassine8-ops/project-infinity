@@ -94,4 +94,12 @@ public class CobraMeasuredReflowTest {
   int before=window.calls;FrameLayout replacement=new FrameLayout(window);layout(replacement,480,1000);window.surface=replacement;
   parent.getViewTreeObserver().dispatchOnPreDraw();assertEquals(before+1,window.calls);
  }
+
+ @Test public void packagedActivityBridgeRepairsMeasuredCanvas()throws Exception {
+  InfinityLiveActivity activity=Robolectric.buildActivity(InfinityLiveActivity.class).get();
+  assertTrue(activity instanceof CobraWindowReflow.Owner);
+  FrameLayout parent=new FrameLayout(activity),canvas=new FrameLayout(activity);parent.addView(canvas,new FrameLayout.LayoutParams(-1,-1));activity.setContentView(parent);
+  set(activity,"mMultiOverlay",parent);set(activity,"mCobraMultiCanvas",canvas);CobraWindowReflow.install(activity);
+  for(int[] size:new int[][]{{480,1000},{1800,1500},{480,1000}}){layout(parent,size[0],size[1]);parent.getViewTreeObserver().dispatchOnPreDraw();layout(parent,size[0],size[1]);assertEquals(size[0],canvas.getWidth());assertEquals(size[1],canvas.getHeight());}
+ }
 }
