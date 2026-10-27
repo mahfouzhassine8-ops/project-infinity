@@ -102,7 +102,7 @@
       "version": "isolation-contract.1"
     }
   },
-  "generation": 7,
+  "generation": 8,
   "guard_schema": 2,
   "last_issued_versionCode": 2103423,
   "owner_update_evidence": {
@@ -66265,7 +66265,7 @@
       "sha256": "652f0e3d6276006214b9a64de9ea08b1f2c3a15ca6a1c0265da6822885ba95f6"
     }
   },
-  "previous_authority_sha256": "a5cbf4b6dbdac9bd2d541971f0e9b374ff5de9f72cc754da83a637a1ae218062",
+  "previous_authority_sha256": "2181c539227b9de4978d790b828c989fbb660752fbebfba7e1c18768dc266cfe",
   "proofs": {
     "COMBINATION-CONTROLS.json": "bcb21adb63fefb898a8e8799d9892f76e382315518d8e94b51c42060cc5ece83",
     "OWNER-CONTRACT.json": "dd0fdfdcb7715777007984969bfac45b36f3e4ef04023b5ba1884c67904d0846",
@@ -66436,7 +66436,7 @@
     "repairs/dual-experience-isolation-2103420/prepare_runtime.py": "e59faac2489d7ce3b0d2deae8469d627e8f463b8c445806b3d232ec572c3d1a7",
     "repairs/dual-experience-isolation-2103420/propose_cobra_reflow.py": "31dda989cdf3bc3d3372565fcb44e7dd5d11db935c6961ac3905e4a91df23425",
     "repairs/dual-experience-isolation-2103420/refresh_authority_evidence.py": "a2c0d74a831246bba1b53305d35a5273b8185cf1068c11dceb772df22d6519e5",
-    "repairs/dual-experience-isolation-2103420/release_authority.py": "a8efa1da5bc147fc2bdc5f5d02cc4980ff600c0943c1cb979f56afd076c8c355",
+    "repairs/dual-experience-isolation-2103420/release_authority.py": "63e5b00c4f0d94e6f507dcbfb382c4cb4b78410d47eb9a91a6381c23aaa8079f",
     "repairs/dual-experience-isolation-2103420/release_gate.py": "b2852e3f2b98e1f2f1e9d06e739247b247e15b85f06712d563e151a86556252e",
     "repairs/dual-experience-isolation-2103420/review_ownership.py": "c15ccd51c71fa2055d805a42ef2c8c8d32fac4672e983e61cba31f4be172fb83",
     "repairs/dual-experience-isolation-2103420/run_owner_contract_tests.py": "46e31c7079d5c2278ad0860d1f977b262813ad98065caa7b41bb9921b20f05ca",
@@ -66460,10 +66460,8 @@
     "repairs/dual-experience-isolation-2103420/verify_runtime.py": "b903edd3d6c3402d46613841c9ac44f0103420a64da5dff2897d14c9952e7460"
   },
   "status": "ENGINEERING_REVIEWED_FOLD_PENDING",
-  "target_owners": [
-    "CHOOSER_SHELL"
-  ],
-  "update_kind": "owner_update",
+  "target_owners": [],
+  "update_kind": "evidence_refresh",
   "workflow_sha256": "83c7a4904eb88f083211e3f922c5825a039990fc143e6250f7e1c66d0ab90880",
   "experience_version_labels": {
     "INFINITY": 2103421,
