@@ -7,7 +7,7 @@ from inventory import save,file_sha
 
 def run(args):subprocess.run(list(map(str,args)),check=True)
 def prepare(work,baseline,dex2jar,out):
- out.mkdir();errors=out/'translation-errors';errors.mkdir()
+ out=out.resolve();out.mkdir();errors=out/'translation-errors';errors.mkdir()
  def translate(path,label):
   jar=out/(label+'.jar');run(['java','-cp',str(dex2jar/'lib/*'),'com.googlecode.dex2jar.tools.Dex2jarCmd',path,'-o',jar,'-e',errors/(label+'.zip')]);return jar
  production=[translate(p,'production-'+p.stem) for p in sorted((work/'owner-dex/COBRA').glob('*.dex'))]
