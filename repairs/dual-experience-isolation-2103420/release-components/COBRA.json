@@ -1,11 +1,11 @@
 {
-  "approved_source": "9efaeabee45389b7c919ae1a3d88c394b1804173",
+  "approved_source": "207949de66e09cc8cf4d493cafdb324dbc29475c",
   "contract": "isolation-v1",
   "dex": {
-    "dex/part-0.dex": "8029a9e6addbc0b911d4bc03ed2f932bc174ea8f0938edf225af403d1d40867c",
-    "dex/part-1.dex": "dc3368f5718df58ec0cde8b0f7432bd461fe61f5765c7e4cef63fd465a435a61"
+    "dex/part-0.dex": "37c84838ed0092ab411fba2237bbf8fbf557c0220517b6a09ab10a384a924595",
+    "dex/part-1.dex": "11028fc8f629069015a30baed955755f4de7ba9320fec7dcc7a692ae0f0ba84b"
   },
-  "digest": "307dc767d5e645707c77fb26c55af9c3b34f31710c2cbb732e3cd5ec49ee4d2b",
+  "digest": "7091c30cff244beb75f900236da87d016a14573981aa84b7eee454080c23adf7",
   "members": {
     "META-INF/androidx.exifinterface_exifinterface.version": {
       "compress_type": 0,
@@ -19167,7 +19167,7 @@
     },
     "class:Lcom/projectinfinity/kodi/CobraComponent;": {
       "owner": "COBRA",
-      "sha256": "4cccb8d4a90446607e749c1dc81199a8dd5fbe478b758e0aedfeed7bd0830337"
+      "sha256": "b6e1c38fe35b5084c420f185b8561e8229199105375f024a2809e5e56ec43761"
     },
     "class:Lcom/projectinfinity/kodi/CobraDiagnosticArchive$$ExternalSyntheticLambda0;": {
       "owner": "COBRA",
@@ -19772,6 +19772,14 @@
     "class:Lcom/projectinfinity/kodi/CobraVisualTheme;": {
       "owner": "COBRA",
       "sha256": "ba2205b13185fab2ec2e12a4375ae6cecabb546592e18b7f58c8f4f1cbcd60eb"
+    },
+    "class:Lcom/projectinfinity/kodi/CobraWindowReflow$Owner;": {
+      "owner": "COBRA",
+      "sha256": "f3ecaa1a427f6024f6e3a6ec90145a7f9df8d8318e12c2167e30a92b615a16a3"
+    },
+    "class:Lcom/projectinfinity/kodi/CobraWindowReflow;": {
+      "owner": "COBRA",
+      "sha256": "b98df9a92f586f66dc27021b94f4d72fa24ee6ba8360a748bb9e8aead2a5c7d5"
     },
     "class:Lcom/projectinfinity/kodi/InfinityCobraBootReceiver;": {
       "owner": "COBRA",
@@ -22947,7 +22955,7 @@
     },
     "class:Lcom/projectinfinity/kodi/InfinityLiveActivity;": {
       "owner": "COBRA",
-      "sha256": "14806162cbe033c57a095af57b1139e068ee2140447a07bf8c8255710a537d13"
+      "sha256": "f89d930703343811bfdace4a29c1d025d45f45dd945b68baf11a6385728a74ce"
     },
     "class:Lkotlin/ArrayIntrinsicsKt;": {
       "owner": "COBRA",
@@ -28592,5 +28600,5 @@
   },
   "schema": 1,
   "settings_schema": "original-plus-settings-snapshot-v1",
-  "version": "bundled-2103420.isolation.1"
+  "version": "bundled-2103420.isolation.1.fold-reflow.2"
 }

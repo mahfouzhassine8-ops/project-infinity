@@ -1,3 +1,6 @@
+> **Latest candidate:** signed 2103423 contains the Cobra all-layout reflow correction.
+> See [DELIVERY.md](DELIVERY.md). The foundation checkpoint below remains historical evidence.
+
 # Isolation implementation status
 
 **READY_FOR_FOLD_CHECK — signed 2103421 delivered.**

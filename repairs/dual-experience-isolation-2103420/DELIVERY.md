@@ -1,61 +1,61 @@
-# Signed 2103421 — ready for the Fold check
+# Signed 2103423 — Cobra all-layout window reflow
 
-[Download the signed APK package](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/40447183241/artifacts/12709465093)
-(327 MB ZIP). Extract `Infinity-2103421-Combined-Original-Signer.apk` and install
-it over the existing app. It remains one package, one icon and the original
-Choose Your Experience. No component ZIP is installed separately.
+[Download the signed APK package](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/40486072720/artifacts/12724339360)
+(327 MB ZIP). Extract `Infinity-2103423-Combined-Original-Signer.apk` and install
+over the existing 2103421. One APK, one icon and the original chooser remain.
 
 APK SHA256:
-`a1ea9442cd8ff82be09c34cc7c84887178fb162b8397005bba656ff6e28f5637`
+`4cbbf963be72904de962f434d00ee5f9d5080de6b6b9fd4b3e31ab1d6ac01aff`
 
-Original permanent certificate SHA256:
+Original certificate SHA256:
 `d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7`
 
-The APK is 777,992,848 bytes. Its v1, v2 and v3 signatures, 16 KiB ZIP alignment,
-package/version, single launcher, all 16,526 expected packaged class/member
-identities, and owner dependency boundaries were verified after downloading it.
-The clean production build reproduced the reviewed component bundles exactly.
+The correction observes the current measured window before rendering and invokes
+Cobra's existing panel/tile/guide layout operations. This corrects the shipped
+path that could leave fixed cover-width canvas parameters after the parent grew.
+It applies to single player and every supported Multi-View count, 2–4, including
+existing Fit/Fill and enlarged layouts. The shipped store rejects counts over 4.
+Window bounds, surface replacement, display, insets, padding and density changes
+are observed without requiring a configuration callback. Exactly one observer
+survives Android's transfer of pre-attachment listeners.
 
-| Component | Version | Runtime state |
-| --- | --- | --- |
-| Infinity | `2103420.isolation.1` | Original native/Kodi state, own persistence queue/barrier and background service |
-| Cobra | `bundled-2103420.isolation.1` | Own persistence queue/barrier and background service; existing settings retained, narrow shared settings snapshotted once |
-| Chooser shell | `2103420.container.1` | Original launch preferences and single chooser |
-| Android contract | `isolation-contract.1` | Versioned owner ports and combined termination authorization |
+Infinity, chooser and shared-contract component bundles are byte-for-byte the
+same as in 2103421. Cobra's existing playback, channel, audio, seek, persistence
+and shutdown implementations are unchanged. Only Cobra Activity initialization,
+two view-layout bridge methods, the geometry observer and Cobra's component
+version differ from the installed foundation. There is no data/schema migration.
 
-The approved component source is `9efaeabee45389b7c919ae1a3d88c394b1804173`.
-The signing workflow source is `b69d18637658be676605c61e5a8792ab5ca179cb`,
-authority generation 4. Later guard/distribution evidence updates changed no
-component or APK payload. Three successful signing runs produced the same APK
-hash; the final package uses compression for a smaller download.
+| Check | Result |
+| --- | --- |
+| Original fixed-width failure reproduced using shipped layout code | Reproduced |
+| Counts 2,3,4; Fit/Fill; normal/enlarged; both directions and rotation-sized bounds | Passed: 48 measured geometry fixtures |
+| Single player; cover/inner/rotation/PiP-sized return; replacement presentation | Passed |
+| Actual rebuilt Activity bridge | Passed |
+| Attachment listener transfer | Earlier candidate reproduced 2 observers; final candidate verified 1 |
+| Non-target owners and protected contract | Exact unchanged fingerprints |
+| Higher-version stale Cobra packages | Rejected before signing |
+| Downloaded final APK | Original v1/v2/v3 signatures, package/version, alignment, single launcher and all 16,528 expected class/member identities verified |
 
-[Build and signing run](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/40447183241)
-completed successfully. [Download exact owner bundles](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/40447183241/artifacts/12708932965)
-and [gate evidence](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/40447183241/artifacts/12709062400)
-are available separately for engineering/reproduction.
+Six focused tests passed using actual production DEX translated for Robolectric
+API35. These are Android view-measurement fixtures. Real decoded stream/audio
+continuity, physical folding and actual system PiP/fullscreen transitions remain
+for the user's Fold check; PiP-sized fixtures are not device PiP acceptance.
+No Infinity application or shutdown stress scenario was run.
 
-The source-preservation check covered all 64,143 original methods and 311 copied
-methods. Fifteen owner-contract cases and thirteen focused production-boundary
-cases passed. Real independently built component controls preserved the opposite
-owner. Higher-version stale Infinity/Cobra APKs and an altered common manifest
-were rejected. Fingerprint/proposal controls also rejected cross-owner code,
-protected receipt/native-lease changes and payload changes disguised as an
-evidence refresh. No repetitive shutdown stress test was run.
+Cobra component: `bundled-2103420.isolation.1.fold-reflow.2`, revision 3.
+Infinity remains `2103420.isolation.1`. Authority generation 6 reserves app 2103423.
+The intermediate 2103422 engineering candidate is superseded by this build.
 
-The sole original-key release workflow rechecks the latest remote authority and
-actual APK contents before signing, then rechecks authority before publication.
-All 349 historical workflows with original-key access are disabled; their source,
-runs and artifacts remain. The guarantee applies to this official signing
-pipeline, not arbitrary installers or an administrator deliberately replacing it.
+[Feature source and tests](https://github.com/mahfouzhassine8-ops/project-infinity/tree/207949de66e09cc8cf4d493cafdb324dbc29475c/repairs/cobra-all-layout-fold-reflow-20261027)
+are on the dedicated Cobra branch.
+[Producer CI](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/40485414619)
+and [original-key combined signing](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/40486072720)
+passed. [Local delivery receipt](results/cobra-reflow-2103423/DELIVERY-VERIFICATION.json)
+and [focused results](results/cobra-reflow-2103423) preserve the exact bindings.
 
-The user-approved 2103420 lock is still
-`883c64a4de6f87077893921454de71bba850235b`. Its APK, reference data and accepted
-combined-release registry are unchanged. Existing native libraries, add-ons,
-skin and other assets remain baseline-identical; the six original add-on/skin
-ZIPs still match their APK contents.
+**READY_FOR_FOLD_CHECK.** The user reported installing 2103421. No physical
+acceptance is inferred from installation, and the accepted-release pointer stays
+at the previously approved baseline. The immutable Infinity 2103420 lock remains
+`883c64a4de6f87077893921454de71bba850235b`.
 
-**Physical Fold acceptance is pending.** This candidate has not replaced the
-accepted baseline. The only remaining acceptance step is the user's Fold check.
-See [the data/lifecycle contract](DATA-AND-LIFECYCLE-CONTRACT.md),
-[local delivery verification](results/delivery-2103421/DELIVERY-VERIFICATION.json),
-and [source-bound focused evidence](results/scoped-correction/final).
+The [2103421 foundation delivery](DELIVERY-2103421.md) is retained for reference.

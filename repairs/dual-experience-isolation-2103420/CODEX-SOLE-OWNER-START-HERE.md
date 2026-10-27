@@ -1,3 +1,6 @@
+> **Latest delivered checkpoint:** signed 2103423, Cobra all-layout reflow; see [DELIVERY.md](DELIVERY.md).
+> Continue from that checkpoint. Accepted pointers and the 2103420 lock remain unchanged pending physical acceptance.
+
 > **Completion checkpoint:** Signed 2103421 is delivered and ready for the user’s Fold check.
 > Read [DELIVERY.md](DELIVERY.md) and continue from that checkpoint; do not restart implementation.
 > The accepted 2103420 pointer remains unchanged pending user acceptance.
