@@ -1,0 +1,41 @@
+{
+  "controls": [
+    {
+      "case": "unchanged_runtime_higher_package_version",
+      "result": "UNRESOLVED_RELEASE_BLOCKERS"
+    },
+    {
+      "apk_sha256": "86ce74e1cd2cc768631991b1ee9c3b9739e2f5eca91c565f9ed0a8ac5c373aba",
+      "case": "cobra_settings_dex",
+      "changed_identities": [
+        "class:Lcom/projectinfinity/kodi/CobraSportsPreferences;",
+        "class:Lcom/projectinfinity/kodi/InfinityGlassChooser;",
+        "class:Lcom/projectinfinity/kodi/InfinityGlassHealth;",
+        "class:Lcom/projectinfinity/kodi/InfinityGlassOptions;",
+        "class:Lcom/projectinfinity/kodi/InfinityGlassRecovery;",
+        "class:Lcom/projectinfinity/kodi/InfinityLiveActivity;",
+        "class:Lcom/projectinfinity/kodi/Splash;"
+      ],
+      "changed_owner_set": [
+        "CHOOSER_SHELL",
+        "COBRA"
+      ],
+      "result": "STALE_OR_MUTATED_OWNER:COBRA:class:Lcom/projectinfinity/kodi/CobraSportsPreferences;"
+    },
+    {
+      "apk_sha256": "2c085e5b9254333799cab9edbf223f2087076b9dd0ad69c05ed21634a811325e",
+      "case": "infinity_python",
+      "changed_identities": [
+        "member:assets/addons/script.infinity.commandcenter/infinity_search.py"
+      ],
+      "changed_owner_set": [
+        "INFINITY"
+      ],
+      "result": "STALE_OR_MUTATED_OWNER:INFINITY:member:assets/addons/script.infinity.commandcenter/infinity_search.py"
+    }
+  ],
+  "installed_or_executed": false,
+  "shutdown_runtime_tested": false,
+  "signing_credentials_read": false,
+  "status": "PASS_ACTUAL_APK_NEGATIVE_CONTROLS"
+}

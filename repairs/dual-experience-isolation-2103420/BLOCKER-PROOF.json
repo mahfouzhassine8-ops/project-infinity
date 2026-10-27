@@ -1,0 +1,207 @@
+{
+  "apk_sha256": "ae641e74bbe0b3360d103254d9bc5425fe1558f625466a99f1da9f16414fef26",
+  "classes": {
+    "InfinityCloseGuardService": {
+      "class_sha256": "9c67611d16a1630142a268ad6e5a41d80173ed2b5b046e10151d7fa7a77e066c",
+      "dex": "classes.dex",
+      "methods": {
+        "acceptSafe(Ljava/lang/String;Lorg/json/JSONObject;)V": {
+          "canonical_sha256": "af93b7653b11844e879251a8886d9d35f91e2e9ad2d534026f87f639b6319a44",
+          "disassembly_line": 224,
+          "evidence_instructions": [
+            "const-string v1, \"SAFE_TO_TERMINATE\"",
+            "const-string v0, \"ENGINE_TERMINATING\"",
+            "const-string v2, \"java_save_failed:\"",
+            "const-string p2, \"engine_\"",
+            "invoke-static {v0}, Lcom/projectinfinity/kodi/InfinityJavaWriteBarrier;->sealIfReady(Ljava/lang/String;)Ljava/lang/String;",
+            "invoke-static {}, Lcom/projectinfinity/kodi/InfinityJavaWriteBarrier;->pending()Ljava/lang/String;",
+            "const-string p2, \"coordinator_\"",
+            "const-string p1, \"generation\"",
+            "const-string p1, \"\"",
+            "const-string p2, \"checkpoint_saved\""
+          ]
+        },
+        "onStartCommand(Landroid/content/Intent;II)I": {
+          "canonical_sha256": "4af9cbbc39d42c36fd8bafaf736eaf119463074135aa5c1ca036a415149647f1",
+          "disassembly_line": 4661,
+          "evidence_instructions": [
+            "const-string v1, \"\"",
+            "const-string p1, \"ignored_stale_start\"",
+            "invoke-static {p0}, Lcom/projectinfinity/kodi/InfinityJavaPersistence;->initialize(Landroid/content/Context;)V",
+            "invoke-static {p2}, Lcom/projectinfinity/kodi/InfinityJavaWriteBarrier;->begin(Ljava/lang/String;)Z",
+            "const-string p1, \"coordinator_java_admission_rejected\"",
+            "const-string p1, \"notification\"",
+            "const-string p2, \"infinity_normal_close_v2\"",
+            "const-string p3, \"Infinity closing\"",
+            "const-string p1, \"Preparing to save\"",
+            "const-string p1, \"QUIESCE\"",
+            "const-string p1, \"existing_engine_endpoint_not_bound\"",
+            "const-string p1, \"navigation.deferred_until_confirmed_death\"",
+            "const-string p3, \"coordinator_start_\""
+          ]
+        }
+      }
+    },
+    "InfinityExtendedBackgroundService": {
+      "class_sha256": "d2e8301de99ba0ebaa2443604e32b3f2707f6f9be0085a51c0220e5196c324eb",
+      "dex": "classes.dex",
+      "methods": {
+        "preferences(Landroid/content/Context;)Landroid/content/SharedPreferences;": {
+          "canonical_sha256": "026ed27bc87f29538c2253da4898d3c863d8d6c7ff00c42545b95d58364d213c",
+          "disassembly_line": 1479,
+          "evidence_instructions": [
+            "const-string v0, \"infinity_runtime\"",
+            "invoke-static {p0, v0, v1}, Lcom/projectinfinity/kodi/InfinityJavaPersistence;->preferences(Landroid/content/Context;Ljava/lang/String;I)Landroid/content/SharedPreferences;"
+          ]
+        },
+        "setEnabled(Landroid/app/Activity;Z)Z": {
+          "canonical_sha256": "3b8bfd4cb7ea2fefaaad3a06aa6dd0daf5376c8ca3d9e8bba6d32b9fa86ea9c2",
+          "disassembly_line": 1932,
+          "evidence_instructions": [
+            "const-string v1, \"extended_background\"",
+            "invoke-static {p0}, Lcom/projectinfinity/kodi/InfinityExtendedBackgroundService;->preferences(Landroid/content/Context;)Landroid/content/SharedPreferences;",
+            "sget-object p1, Lcom/projectinfinity/kodi/InfinityExtendedBackgroundService;->sMiniGrant:Lcom/projectinfinity/kodi/InfinityExtendedBackgroundService$MiniGrant;",
+            "invoke-static {p0}, Lcom/projectinfinity/kodi/InfinityExtendedBackgroundService;->stopForExit(Landroid/content/Context;)V",
+            "invoke-static {p0, p1}, Lcom/projectinfinity/kodi/InfinityExtendedBackgroundService;->request(Landroid/content/Context;Landroid/content/Intent;)Z",
+            "invoke-static {p0}, Lcom/projectinfinity/kodi/InfinityExtendedBackgroundService;->notificationsAllowed(Landroid/content/Context;)Z",
+            "invoke-static {p0}, Lcom/projectinfinity/kodi/InfinityExtendedBackgroundService;->preferences(Landroid/content/Context;)Landroid/content/SharedPreferences;",
+            "invoke-static {p0}, Lcom/projectinfinity/kodi/InfinityExtendedBackgroundService;->start(Landroid/content/Context;)Z",
+            "invoke-static {p0}, Lcom/projectinfinity/kodi/InfinityExtendedBackgroundService;->preferences(Landroid/content/Context;)Landroid/content/SharedPreferences;"
+          ]
+        },
+        "startMiniPlayback(Landroid/content/Context;Ljava/lang/String;Lcom/projectinfinity/kodi/InfinityExtendedBackgroundService$MiniPlaybackOwner;)Z": {
+          "canonical_sha256": "a5e649440613246fcdd8b73126954c88fb98002bbd245e7f4a090e898afce742",
+          "disassembly_line": 2067,
+          "evidence_instructions": [
+            "invoke-static {p0}, Lcom/projectinfinity/kodi/InfinityExtendedBackgroundService;->notificationsAllowed(Landroid/content/Context;)Z",
+            "sget-object v1, Lcom/projectinfinity/kodi/InfinityExtendedBackgroundService;->sMiniOwner:Ljava/lang/ref/WeakReference;",
+            "invoke-static {v2}, Lcom/projectinfinity/kodi/InfinityExtendedBackgroundService;->revokeMini(Z)V",
+            "sput-object v1, Lcom/projectinfinity/kodi/InfinityExtendedBackgroundService;->sMiniOwner:Ljava/lang/ref/WeakReference;",
+            "const-string p1, \"Cobra Live\"",
+            "sput-object p1, Lcom/projectinfinity/kodi/InfinityExtendedBackgroundService;->sMiniTitle:Ljava/lang/String;",
+            "sget-object p1, Lcom/projectinfinity/kodi/InfinityExtendedBackgroundService;->sMiniGrant:Lcom/projectinfinity/kodi/InfinityExtendedBackgroundService$MiniGrant;",
+            "const-string v3, \"com.projectinfinity.kodi.action.MINI_BACKGROUND_START\"",
+            "const-string v3, \"mini_generation\"",
+            "invoke-static {p0, p1}, Lcom/projectinfinity/kodi/InfinityExtendedBackgroundService;->request(Landroid/content/Context;Landroid/content/Intent;)Z",
+            "invoke-static {v0}, Lcom/projectinfinity/kodi/InfinityExtendedBackgroundService;->revokeMini(Z)V"
+          ]
+        }
+      }
+    },
+    "InfinityJavaPersistence": {
+      "class_sha256": "33ee18a55934d5fada7b6f9813de5ede22eaf3e81a5a1f17271952d1a7f0eab2",
+      "dex": "classes.dex",
+      "methods": {
+        "preferences(Landroid/content/Context;Ljava/lang/String;I)Landroid/content/SharedPreferences;": {
+          "canonical_sha256": "f29ac5ce70a1a9dad93145f808dfc9db01594393b738dd4e45c9d65195341140",
+          "disassembly_line": 1138,
+          "evidence_instructions": [
+            "const-string v0, \"infinity_chooser_weather\"",
+            "invoke-static {p0}, Lcom/projectinfinity/kodi/InfinityJavaPersistence;->initialize(Landroid/content/Context;)V",
+            "const-string v2, \"shared_prefs\"",
+            "const-string v2, \"/\"",
+            "sget-object v2, Lcom/projectinfinity/kodi/InfinityJavaPersistence;->preferenceWrappers:Ljava/util/Map;"
+          ]
+        },
+        "userEntry(Landroid/content/Context;)V": {
+          "canonical_sha256": "7446b1ce507eb2ecc729e63c56bd04508cd71a2f8659cb7f3aa10d56718311ef",
+          "disassembly_line": 2269,
+          "evidence_instructions": [
+            "invoke-static {p0}, Lcom/projectinfinity/kodi/InfinityJavaPersistence;->initialize(Landroid/content/Context;)V",
+            "invoke-static {}, Lcom/projectinfinity/kodi/InfinityJavaWriteBarrier;->userEntry()V"
+          ]
+        }
+      }
+    },
+    "InfinityJavaWriteBarrier": {
+      "class_sha256": "c42bf836330146b228af63fb590c4ac6316f9f0824cdc89fc0734588013feecd",
+      "dex": "classes.dex",
+      "methods": {
+        "begin(Ljava/lang/String;)Z": {
+          "canonical_sha256": "c74db689aa123136270db5e6933d971f2abd521fc73311addc63924e57cf9952",
+          "disassembly_line": 325,
+          "evidence_instructions": [
+            "sget-object v0, Lcom/projectinfinity/kodi/InfinityJavaWriteBarrier;->LOCK:Ljava/lang/Object;",
+            "sget-boolean v1, Lcom/projectinfinity/kodi/InfinityJavaWriteBarrier;->closing:Z",
+            "sget-object v1, Lcom/projectinfinity/kodi/InfinityJavaWriteBarrier;->session:Ljava/lang/String;",
+            "sput-object p0, Lcom/projectinfinity/kodi/InfinityJavaWriteBarrier;->session:Ljava/lang/String;",
+            "const-string p0, \"\"",
+            "sput-object p0, Lcom/projectinfinity/kodi/InfinityJavaWriteBarrier;->seal:Ljava/lang/String;",
+            "sput-boolean p0, Lcom/projectinfinity/kodi/InfinityJavaWriteBarrier;->closing:Z"
+          ]
+        },
+        "sealIfReady(Ljava/lang/String;)Ljava/lang/String;": {
+          "canonical_sha256": "47788211fdff07db064361bbcddc6c2bc63260bf095b908eb2b51851d2a4cc8d",
+          "disassembly_line": 758,
+          "evidence_instructions": [
+            "sget-object v0, Lcom/projectinfinity/kodi/InfinityJavaWriteBarrier;->LOCK:Ljava/lang/Object;",
+            "sget-boolean v1, Lcom/projectinfinity/kodi/InfinityJavaWriteBarrier;->closing:Z",
+            "sget-object v1, Lcom/projectinfinity/kodi/InfinityJavaWriteBarrier;->session:Ljava/lang/String;",
+            "sget-object p0, Lcom/projectinfinity/kodi/InfinityJavaWriteBarrier;->active:Ljava/util/Map;",
+            "sget-object p0, Lcom/projectinfinity/kodi/InfinityJavaWriteBarrier;->failures:Ljava/util/Map;",
+            "sget-object p0, Lcom/projectinfinity/kodi/InfinityJavaWriteBarrier;->seal:Ljava/lang/String;",
+            "sput-object p0, Lcom/projectinfinity/kodi/InfinityJavaWriteBarrier;->seal:Ljava/lang/String;",
+            "sget-object p0, Lcom/projectinfinity/kodi/InfinityJavaWriteBarrier;->seal:Ljava/lang/String;",
+            "const-string p0, \"\""
+          ]
+        },
+        "userEntry()V": {
+          "canonical_sha256": "592b6a8ea00fc42dc1c282197d7e1796e23e923dffb4e4a5f81ebe3f725d0806",
+          "disassembly_line": 846,
+          "evidence_instructions": [
+            "sget-object v0, Lcom/projectinfinity/kodi/InfinityJavaWriteBarrier;->LOCK:Ljava/lang/Object;",
+            "sput-boolean v1, Lcom/projectinfinity/kodi/InfinityJavaWriteBarrier;->closing:Z",
+            "const-string v1, \"\"",
+            "sput-object v1, Lcom/projectinfinity/kodi/InfinityJavaWriteBarrier;->session:Ljava/lang/String;",
+            "const-string v1, \"\"",
+            "sput-object v1, Lcom/projectinfinity/kodi/InfinityJavaWriteBarrier;->seal:Ljava/lang/String;"
+          ]
+        }
+      }
+    },
+    "InfinityLiveActivity": {
+      "class_sha256": "cc68489343983383749da2f683fbc90138dd7c37e7e1aaa3204ed67c8a40c767",
+      "dex": "classes.dex",
+      "methods": {
+        "cobraStartOwnedMiniPlayback()Z": {
+          "canonical_sha256": "68c1bad40fc75621da07e4f330d55a7f93ca093c96622b7055a384e0e507f9d5",
+          "disassembly_line": 100125,
+          "evidence_instructions": [
+            "const-string v0, \"Cobra Live\"",
+            "invoke-static {p0, v0, v2}, Lcom/projectinfinity/kodi/InfinityExtendedBackgroundService;->startMiniPlayback(Landroid/content/Context;Ljava/lang/String;Lcom/projectinfinity/kodi/InfinityExtendedBackgroundService$MiniPlaybackOwner;)Z"
+          ]
+        },
+        "lambda$showCobraBackgroundModePicker$429$com-projectinfinity-kodi-InfinityLiveActivity()V": {
+          "canonical_sha256": "890c445b7a7731ab747cfc7b7923139d9ce382c5f2498cd0ef516ae65182f2a9",
+          "disassembly_line": 159887,
+          "evidence_instructions": [
+            "invoke-static {p0, v0}, Lcom/projectinfinity/kodi/InfinityExtendedBackgroundService;->setEnabled(Landroid/app/Activity;Z)Z",
+            "const-string v0, \"Infinity background mode \\u2022 Normal\""
+          ]
+        },
+        "onCreate(Landroid/os/Bundle;)V": {
+          "canonical_sha256": "e6c7df6bb5aa2a0db476fce67b63fb67a069bfaaa5367aacbb9731ac2563649a",
+          "disassembly_line": 165073,
+          "evidence_instructions": [
+            "invoke-static {p0}, Lcom/projectinfinity/kodi/InfinityJavaPersistence;->userEntry(Landroid/content/Context;)V",
+            "const-string v1, \"infinity_cobra_live\"",
+            "invoke-static {p0, v1, v2}, Lcom/projectinfinity/kodi/InfinityJavaPersistence;->preferences(Landroid/content/Context;Ljava/lang/String;I)Landroid/content/SharedPreferences;",
+            "const-string v1, \"cobra_diagnostics_picker\"",
+            "const-string v1, \"cobra_diagnostics_snapshot\"",
+            "const-string v1, \"active_source\"",
+            "const-string v3, \"\""
+          ]
+        },
+        "onResume()V": {
+          "canonical_sha256": "356a8407a9501bfbc3e3d626deac4cffc5ea0fa27588cfaf97c95dc11b25f66c",
+          "disassembly_line": 165911,
+          "evidence_instructions": [
+            "invoke-static {p0}, Lcom/projectinfinity/kodi/InfinityExtendedBackgroundService;->sync(Landroid/app/Activity;)V",
+            "const-string v0, \"resume\""
+          ]
+        }
+      }
+    }
+  },
+  "runtime_execution": false
+}

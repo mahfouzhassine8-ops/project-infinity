@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "entry_roots": {
+    "CHOOSER_SHELL": ["Splash", "InfinityAskEveryTimeActivity"],
+    "COBRA": ["InfinityLiveActivity", "InfinityCobraRecordingService", "InfinityCobraReminderReceiver", "InfinityCobraBootReceiver", "CobraSportsReminderJob"],
+    "INFINITY": ["Main", "InfinityKodiEntryActivity", "InfinityBackgroundControlActivity", "InfinityPowerControlActivity", "InfinityCloseGuardService", "InfinityCloseNativeLease", "XBMCBroadcastReceiver", "XBMCSearchableActivity", "channels/SyncChannelJobService", "channels/SyncProgramsJobService", "content/XBMCMediaContentProvider", "content/XBMCFileContentProvider", "content/XBMCYTDLContentProvider"]
+  },
+  "unresolved_families": ["InfinityJavaPersistence", "InfinityJavaWriteBarrier", "InfinityExtendedBackgroundService", "CobraVisualRenderer", "CobraVisualScene", "CobraPresentationSafety", "CobraProUi", "InfinityResponsiveTrace", "InfinityResponsiveness", "InfinityStartupHandoff", "InfinityStartupTrace", "R"],
+  "release_blockers": [
+    {
+      "id": "SHARED_PERSISTENCE_CLOSE_BARRIER",
+      "classes": ["InfinityLiveActivity", "InfinityJavaPersistence", "InfinityJavaWriteBarrier", "InfinityCloseGuardService"],
+      "evidence": "Cobra onCreate/onResume call userEntry; userEntry clears the same static closing/session/seal fields used by the default-process Infinity close coordinator. Cobra writes/work register with the same barrier.",
+      "blocked_operation": "Redirect or clone persistence/barrier calls, change process ownership or split close accounting without changing frozen shutdown semantics",
+      "required_resolution": "Explicit lifecycle scope decision and proof preserving authenticated persistence and close ownership; current authorization freezes this shared behavior"
+    },
+    {
+      "id": "SHARED_EXTENDED_BACKGROUND_SERVICE",
+      "classes": ["InfinityLiveActivity", "InfinityExtendedBackgroundService", "Main"],
+      "evidence": "Cobra starts/stops/refreshes MiniPlaybackOwner, writes background-mode settings and syncs through InfinityExtendedBackgroundService, declared in :kodi; Main also uses the service.",
+      "blocked_operation": "Move or split shared service, mini-player state, settings or lifecycle",
+      "required_resolution": "Trace and authorize a behavior-preserving service contract before relocating mutable ownership"
+    },
+    {
+      "id": "UNRESOLVED_BINARY_OWNERSHIP",
+      "required_resolution": "Complete JNI/native function, dynamic Python, resources, shared presentation and persistent-key ownership review; static reachability alone is insufficient"
+    }
+  ]
+}

@@ -1,0 +1,1498 @@
+{
+  "attributes": {
+    "http://schemas.android.com/apk/res/android:compileSdkVersion": {
+      "type": 16,
+      "value": 35
+    },
+    "http://schemas.android.com/apk/res/android:compileSdkVersionCodename": {
+      "type": 3,
+      "value": "15"
+    },
+    "http://schemas.android.com/apk/res/android:installLocation": {
+      "type": 16,
+      "value": 0
+    },
+    "http://schemas.android.com/apk/res/android:versionCode": {
+      "type": 16,
+      "value": 2103420
+    },
+    "http://schemas.android.com/apk/res/android:versionName": {
+      "type": 3,
+      "value": "1.0.9-Final-Corrections-TEST0011"
+    },
+    "package": {
+      "type": 3,
+      "value": "com.projectinfinity.kodi"
+    },
+    "platformBuildVersionCode": {
+      "type": 16,
+      "value": 35
+    },
+    "platformBuildVersionName": {
+      "type": 16,
+      "value": 15
+    }
+  },
+  "children": [
+    {
+      "attributes": {
+        "http://schemas.android.com/apk/res/android:minSdkVersion": {
+          "type": 16,
+          "value": 21
+        },
+        "http://schemas.android.com/apk/res/android:targetSdkVersion": {
+          "type": 16,
+          "value": 35
+        }
+      },
+      "children": [],
+      "tag": "uses-sdk"
+    },
+    {
+      "attributes": {
+        "http://schemas.android.com/apk/res/android:name": {
+          "type": 3,
+          "value": "android.permission.WRITE_EXTERNAL_STORAGE"
+        }
+      },
+      "children": [],
+      "tag": "uses-permission"
+    },
+    {
+      "attributes": {
+        "http://schemas.android.com/apk/res/android:name": {
+          "type": 3,
+          "value": "android.permission.MANAGE_EXTERNAL_STORAGE"
+        }
+      },
+      "children": [],
+      "tag": "uses-permission"
+    },
+    {
+      "attributes": {
+        "http://schemas.android.com/apk/res/android:name": {
+          "type": 3,
+          "value": "android.permission.INTERNET"
+        }
+      },
+      "children": [],
+      "tag": "uses-permission"
+    },
+    {
+      "attributes": {
+        "http://schemas.android.com/apk/res/android:name": {
+          "type": 3,
+          "value": "android.permission.FOREGROUND_SERVICE"
+        }
+      },
+      "children": [],
+      "tag": "uses-permission"
+    },
+    {
+      "attributes": {
+        "http://schemas.android.com/apk/res/android:name": {
+          "type": 3,
+          "value": "android.permission.FOREGROUND_SERVICE_DATA_SYNC"
+        }
+      },
+      "children": [],
+      "tag": "uses-permission"
+    },
+    {
+      "attributes": {
+        "http://schemas.android.com/apk/res/android:name": {
+          "type": 3,
+          "value": "android.permission.FOREGROUND_SERVICE_SPECIAL_USE"
+        }
+      },
+      "children": [],
+      "tag": "uses-permission"
+    },
+    {
+      "attributes": {
+        "http://schemas.android.com/apk/res/android:name": {
+          "type": 3,
+          "value": "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+        }
+      },
+      "children": [],
+      "tag": "uses-permission"
+    },
+    {
+      "attributes": {
+        "http://schemas.android.com/apk/res/android:name": {
+          "type": 3,
+          "value": "android.permission.POST_NOTIFICATIONS"
+        }
+      },
+      "children": [],
+      "tag": "uses-permission"
+    },
+    {
+      "attributes": {
+        "http://schemas.android.com/apk/res/android:name": {
+          "type": 3,
+          "value": "android.permission.BLUETOOTH"
+        }
+      },
+      "children": [],
+      "tag": "uses-permission"
+    },
+    {
+      "attributes": {
+        "http://schemas.android.com/apk/res/android:name": {
+          "type": 3,
+          "value": "android.permission.RECEIVE_BOOT_COMPLETED"
+        }
+      },
+      "children": [],
+      "tag": "uses-permission"
+    },
+    {
+      "attributes": {
+        "http://schemas.android.com/apk/res/android:name": {
+          "type": 3,
+          "value": "android.permission.MODIFY_AUDIO_SETTINGS"
+        }
+      },
+      "children": [],
+      "tag": "uses-permission"
+    },
+    {
+      "attributes": {
+        "http://schemas.android.com/apk/res/android:name": {
+          "type": 3,
+          "value": "android.permission.ACCESS_NETWORK_STATE"
+        }
+      },
+      "children": [],
+      "tag": "uses-permission"
+    },
+    {
+      "attributes": {
+        "http://schemas.android.com/apk/res/android:name": {
+          "type": 3,
+          "value": "android.permission.RECORD_AUDIO"
+        }
+      },
+      "children": [],
+      "tag": "uses-permission"
+    },
+    {
+      "attributes": {
+        "http://schemas.android.com/apk/res/android:name": {
+          "type": 3,
+          "value": "android.hardware.bluetooth"
+        },
+        "http://schemas.android.com/apk/res/android:required": {
+          "type": 18,
+          "value": 0
+        }
+      },
+      "children": [],
+      "tag": "uses-feature"
+    },
+    {
+      "attributes": {
+        "http://schemas.android.com/apk/res/android:name": {
+          "type": 3,
+          "value": "android.hardware.microphone"
+        },
+        "http://schemas.android.com/apk/res/android:required": {
+          "type": 18,
+          "value": 0
+        }
+      },
+      "children": [],
+      "tag": "uses-feature"
+    },
+    {
+      "attributes": {
+        "http://schemas.android.com/apk/res/android:name": {
+          "type": 3,
+          "value": "android.hardware.screen.landscape"
+        },
+        "http://schemas.android.com/apk/res/android:required": {
+          "type": 18,
+          "value": 4294967295
+        }
+      },
+      "children": [],
+      "tag": "uses-feature"
+    },
+    {
+      "attributes": {
+        "http://schemas.android.com/apk/res/android:name": {
+          "type": 3,
+          "value": "android.hardware.touchscreen"
+        },
+        "http://schemas.android.com/apk/res/android:required": {
+          "type": 18,
+          "value": 0
+        }
+      },
+      "children": [],
+      "tag": "uses-feature"
+    },
+    {
+      "attributes": {
+        "http://schemas.android.com/apk/res/android:name": {
+          "type": 3,
+          "value": "android.hardware.touchscreen.multitouch"
+        },
+        "http://schemas.android.com/apk/res/android:required": {
+          "type": 18,
+          "value": 0
+        }
+      },
+      "children": [],
+      "tag": "uses-feature"
+    },
+    {
+      "attributes": {
+        "http://schemas.android.com/apk/res/android:name": {
+          "type": 3,
+          "value": "android.hardware.type.television"
+        },
+        "http://schemas.android.com/apk/res/android:required": {
+          "type": 18,
+          "value": 0
+        }
+      },
+      "children": [],
+      "tag": "uses-feature"
+    },
+    {
+      "attributes": {
+        "http://schemas.android.com/apk/res/android:name": {
+          "type": 3,
+          "value": "android.hardware.usb.host"
+        },
+        "http://schemas.android.com/apk/res/android:required": {
+          "type": 18,
+          "value": 0
+        }
+      },
+      "children": [],
+      "tag": "uses-feature"
+    },
+    {
+      "attributes": {
+        "http://schemas.android.com/apk/res/android:name": {
+          "type": 3,
+          "value": "android.hardware.wifi"
+        },
+        "http://schemas.android.com/apk/res/android:required": {
+          "type": 18,
+          "value": 0
+        }
+      },
+      "children": [],
+      "tag": "uses-feature"
+    },
+    {
+      "attributes": {
+        "http://schemas.android.com/apk/res/android:name": {
+          "type": 3,
+          "value": "android.software.leanback"
+        },
+        "http://schemas.android.com/apk/res/android:required": {
+          "type": 18,
+          "value": 0
+        }
+      },
+      "children": [],
+      "tag": "uses-feature"
+    },
+    {
+      "attributes": {},
+      "children": [
+        {
+          "attributes": {},
+          "children": [
+            {
+              "attributes": {
+                "http://schemas.android.com/apk/res/android:name": {
+                  "type": 3,
+                  "value": "android.speech.RecognitionService"
+                }
+              },
+              "children": [],
+              "tag": "action"
+            }
+          ],
+          "tag": "intent"
+        },
+        {
+          "attributes": {},
+          "children": [
+            {
+              "attributes": {
+                "http://schemas.android.com/apk/res/android:name": {
+                  "type": 3,
+                  "value": "android.intent.action.MAIN"
+                }
+              },
+              "children": [],
+              "tag": "action"
+            }
+          ],
+          "tag": "intent"
+        }
+      ],
+      "tag": "queries"
+    },
+    {
+      "attributes": {
+        "http://schemas.android.com/apk/res/android:name": {
+          "type": 3,
+          "value": "com.android.providers.tv.permission.WRITE_EPG_DATA"
+        }
+      },
+      "children": [],
+      "tag": "uses-permission"
+    },
+    {
+      "attributes": {
+        "http://schemas.android.com/apk/res/android:name": {
+          "type": 3,
+          "value": "com.android.providers.tv.permission.READ_EPG_DATA"
+        }
+      },
+      "children": [],
+      "tag": "uses-permission"
+    },
+    {
+      "attributes": {
+        "http://schemas.android.com/apk/res/android:appCategory": {
+          "type": 16,
+          "value": 2
+        },
+        "http://schemas.android.com/apk/res/android:appComponentFactory": {
+          "type": 3,
+          "value": "androidx.core.app.CoreComponentFactory"
+        },
+        "http://schemas.android.com/apk/res/android:banner": {
+          "type": 1,
+          "value": 2130968577
+        },
+        "http://schemas.android.com/apk/res/android:extractNativeLibs": {
+          "type": 18,
+          "value": 4294967295
+        },
+        "http://schemas.android.com/apk/res/android:hasCode": {
+          "type": 18,
+          "value": 4294967295
+        },
+        "http://schemas.android.com/apk/res/android:icon": {
+          "type": 1,
+          "value": 2131230720
+        },
+        "http://schemas.android.com/apk/res/android:label": {
+          "type": 1,
+          "value": 2131296256
+        },
+        "http://schemas.android.com/apk/res/android:logo": {
+          "type": 1,
+          "value": 2130968577
+        },
+        "http://schemas.android.com/apk/res/android:requestLegacyExternalStorage": {
+          "type": 18,
+          "value": 4294967295
+        },
+        "http://schemas.android.com/apk/res/android:roundIcon": {
+          "type": 1,
+          "value": 2131230721
+        },
+        "http://schemas.android.com/apk/res/android:usesCleartextTraffic": {
+          "type": 18,
+          "value": 4294967295
+        }
+      },
+      "children": [
+        {
+          "attributes": {
+            "http://schemas.android.com/apk/res/android:configChanges": {
+              "type": 17,
+              "value": 24568
+            },
+            "http://schemas.android.com/apk/res/android:exported": {
+              "type": 18,
+              "value": 4294967295
+            },
+            "http://schemas.android.com/apk/res/android:finishOnTaskLaunch": {
+              "type": 18,
+              "value": 4294967295
+            },
+            "http://schemas.android.com/apk/res/android:launchMode": {
+              "type": 16,
+              "value": 3
+            },
+            "http://schemas.android.com/apk/res/android:name": {
+              "type": 3,
+              "value": "com.projectinfinity.kodi.Splash"
+            },
+            "http://schemas.android.com/apk/res/android:screenOrientation": {
+              "type": 16,
+              "value": 4294967295
+            },
+            "http://schemas.android.com/apk/res/android:theme": {
+              "type": 1,
+              "value": 2131361792
+            }
+          },
+          "children": [
+            {
+              "attributes": {},
+              "children": [
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:name": {
+                      "type": 3,
+                      "value": "android.intent.action.MAIN"
+                    }
+                  },
+                  "children": [],
+                  "tag": "action"
+                },
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:name": {
+                      "type": 3,
+                      "value": "android.intent.category.LAUNCHER"
+                    }
+                  },
+                  "children": [],
+                  "tag": "category"
+                },
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:name": {
+                      "type": 3,
+                      "value": "android.intent.category.LEANBACK_LAUNCHER"
+                    }
+                  },
+                  "children": [],
+                  "tag": "category"
+                }
+              ],
+              "tag": "intent-filter"
+            },
+            {
+              "attributes": {},
+              "children": [
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:name": {
+                      "type": 3,
+                      "value": "android.intent.action.VIEW"
+                    }
+                  },
+                  "children": [],
+                  "tag": "action"
+                },
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:name": {
+                      "type": 3,
+                      "value": "android.intent.category.DEFAULT"
+                    }
+                  },
+                  "children": [],
+                  "tag": "category"
+                },
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:name": {
+                      "type": 3,
+                      "value": "android.intent.category.BROWSABLE"
+                    }
+                  },
+                  "children": [],
+                  "tag": "category"
+                },
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:mimeType": {
+                      "type": 3,
+                      "value": "video/*"
+                    }
+                  },
+                  "children": [],
+                  "tag": "data"
+                },
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:mimeType": {
+                      "type": 3,
+                      "value": "audio/*"
+                    }
+                  },
+                  "children": [],
+                  "tag": "data"
+                },
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:mimeType": {
+                      "type": 3,
+                      "value": "image/*"
+                    }
+                  },
+                  "children": [],
+                  "tag": "data"
+                },
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:scheme": {
+                      "type": 3,
+                      "value": "file"
+                    }
+                  },
+                  "children": [],
+                  "tag": "data"
+                },
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:scheme": {
+                      "type": 3,
+                      "value": "content"
+                    }
+                  },
+                  "children": [],
+                  "tag": "data"
+                },
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:scheme": {
+                      "type": 3,
+                      "value": "http"
+                    }
+                  },
+                  "children": [],
+                  "tag": "data"
+                },
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:scheme": {
+                      "type": 3,
+                      "value": "https"
+                    }
+                  },
+                  "children": [],
+                  "tag": "data"
+                },
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:scheme": {
+                      "type": 3,
+                      "value": "ftp"
+                    }
+                  },
+                  "children": [],
+                  "tag": "data"
+                },
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:scheme": {
+                      "type": 3,
+                      "value": "ftps"
+                    }
+                  },
+                  "children": [],
+                  "tag": "data"
+                },
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:scheme": {
+                      "type": 3,
+                      "value": "rtp"
+                    }
+                  },
+                  "children": [],
+                  "tag": "data"
+                },
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:scheme": {
+                      "type": 3,
+                      "value": "rtsp"
+                    }
+                  },
+                  "children": [],
+                  "tag": "data"
+                },
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:scheme": {
+                      "type": 3,
+                      "value": "mms"
+                    }
+                  },
+                  "children": [],
+                  "tag": "data"
+                },
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:scheme": {
+                      "type": 3,
+                      "value": "dav"
+                    }
+                  },
+                  "children": [],
+                  "tag": "data"
+                },
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:scheme": {
+                      "type": 3,
+                      "value": "davs"
+                    }
+                  },
+                  "children": [],
+                  "tag": "data"
+                },
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:scheme": {
+                      "type": 3,
+                      "value": "ssh"
+                    }
+                  },
+                  "children": [],
+                  "tag": "data"
+                },
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:scheme": {
+                      "type": 3,
+                      "value": "sftp"
+                    }
+                  },
+                  "children": [],
+                  "tag": "data"
+                },
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:scheme": {
+                      "type": 3,
+                      "value": "smb"
+                    }
+                  },
+                  "children": [],
+                  "tag": "data"
+                }
+              ],
+              "tag": "intent-filter"
+            }
+          ],
+          "tag": "activity"
+        },
+        {
+          "attributes": {
+            "http://schemas.android.com/apk/res/android:configChanges": {
+              "type": 17,
+              "value": 24568
+            },
+            "http://schemas.android.com/apk/res/android:excludeFromRecents": {
+              "type": 18,
+              "value": 0
+            },
+            "http://schemas.android.com/apk/res/android:exported": {
+              "type": 18,
+              "value": 4294967295
+            },
+            "http://schemas.android.com/apk/res/android:finishOnTaskLaunch": {
+              "type": 18,
+              "value": 0
+            },
+            "http://schemas.android.com/apk/res/android:launchMode": {
+              "type": 16,
+              "value": 3
+            },
+            "http://schemas.android.com/apk/res/android:name": {
+              "type": 3,
+              "value": "com.projectinfinity.kodi.Main"
+            },
+            "http://schemas.android.com/apk/res/android:process": {
+              "type": 3,
+              "value": ":kodi"
+            },
+            "http://schemas.android.com/apk/res/android:resizeableActivity": {
+              "type": 18,
+              "value": 4294967295
+            },
+            "http://schemas.android.com/apk/res/android:screenOrientation": {
+              "type": 16,
+              "value": 4294967295
+            },
+            "http://schemas.android.com/apk/res/android:supportsPictureInPicture": {
+              "type": 18,
+              "value": 4294967295
+            },
+            "http://schemas.android.com/apk/res/android:taskAffinity": {
+              "type": 3,
+              "value": "com.projectinfinity.kodi.infinity.kodi"
+            },
+            "http://schemas.android.com/apk/res/android:theme": {
+              "type": 1,
+              "value": 2131361792
+            }
+          },
+          "children": [
+            {
+              "attributes": {},
+              "children": [
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:name": {
+                      "type": 3,
+                      "value": "com.projectinfinity.kodi.action.PLAYER_ROTATION_FOLLOW_DEVICE"
+                    }
+                  },
+                  "children": [],
+                  "tag": "action"
+                },
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:name": {
+                      "type": 3,
+                      "value": "com.projectinfinity.kodi.action.PLAYER_ROTATION_UNLOCKED"
+                    }
+                  },
+                  "children": [],
+                  "tag": "action"
+                },
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:name": {
+                      "type": 3,
+                      "value": "android.intent.category.DEFAULT"
+                    }
+                  },
+                  "children": [],
+                  "tag": "category"
+                }
+              ],
+              "tag": "intent-filter"
+            },
+            {
+              "attributes": {
+                "http://schemas.android.com/apk/res/android:name": {
+                  "type": 3,
+                  "value": "android.app.lib_name"
+                },
+                "http://schemas.android.com/apk/res/android:value": {
+                  "type": 3,
+                  "value": "kodi"
+                }
+              },
+              "children": [],
+              "tag": "meta-data"
+            },
+            {
+              "attributes": {
+                "http://schemas.android.com/apk/res/android:name": {
+                  "type": 3,
+                  "value": "android.app.func_name"
+                },
+                "http://schemas.android.com/apk/res/android:value": {
+                  "type": 3,
+                  "value": "InfinityNativeActivity_onCreate"
+                }
+              },
+              "children": [],
+              "tag": "meta-data"
+            }
+          ],
+          "tag": "activity"
+        },
+        {
+          "attributes": {
+            "http://schemas.android.com/apk/res/android:excludeFromRecents": {
+              "type": 18,
+              "value": 4294967295
+            },
+            "http://schemas.android.com/apk/res/android:exported": {
+              "type": 18,
+              "value": 0
+            },
+            "http://schemas.android.com/apk/res/android:launchMode": {
+              "type": 16,
+              "value": 2
+            },
+            "http://schemas.android.com/apk/res/android:name": {
+              "type": 3,
+              "value": "com.projectinfinity.kodi.InfinityKodiEntryActivity"
+            },
+            "http://schemas.android.com/apk/res/android:process": {
+              "type": 3,
+              "value": ":kodi"
+            },
+            "http://schemas.android.com/apk/res/android:theme": {
+              "type": 1,
+              "value": 2131361792
+            }
+          },
+          "children": [],
+          "tag": "activity"
+        },
+        {
+          "attributes": {
+            "http://schemas.android.com/apk/res/android:name": {
+              "type": 3,
+              "value": "android.supports_size_changes"
+            },
+            "http://schemas.android.com/apk/res/android:value": {
+              "type": 18,
+              "value": 4294967295
+            }
+          },
+          "children": [],
+          "tag": "meta-data"
+        },
+        {
+          "attributes": {
+            "http://schemas.android.com/apk/res/android:configChanges": {
+              "type": 17,
+              "value": 1073774588
+            },
+            "http://schemas.android.com/apk/res/android:exported": {
+              "type": 18,
+              "value": 4294967295
+            },
+            "http://schemas.android.com/apk/res/android:launchMode": {
+              "type": 16,
+              "value": 2
+            },
+            "http://schemas.android.com/apk/res/android:name": {
+              "type": 3,
+              "value": "com.projectinfinity.kodi.InfinityLiveActivity"
+            },
+            "http://schemas.android.com/apk/res/android:resizeableActivity": {
+              "type": 18,
+              "value": 4294967295
+            },
+            "http://schemas.android.com/apk/res/android:screenOrientation": {
+              "type": 16,
+              "value": 4294967295
+            },
+            "http://schemas.android.com/apk/res/android:supportsPictureInPicture": {
+              "type": 18,
+              "value": 4294967295
+            },
+            "http://schemas.android.com/apk/res/android:theme": {
+              "type": 1,
+              "value": 2131361792
+            }
+          },
+          "children": [
+            {
+              "attributes": {},
+              "children": [
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:name": {
+                      "type": 3,
+                      "value": "com.projectinfinity.kodi.action.OPEN_LIVE"
+                    }
+                  },
+                  "children": [],
+                  "tag": "action"
+                },
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:name": {
+                      "type": 3,
+                      "value": "android.intent.category.DEFAULT"
+                    }
+                  },
+                  "children": [],
+                  "tag": "category"
+                }
+              ],
+              "tag": "intent-filter"
+            }
+          ],
+          "tag": "activity"
+        },
+        {
+          "attributes": {
+            "http://schemas.android.com/apk/res/android:excludeFromRecents": {
+              "type": 18,
+              "value": 4294967295
+            },
+            "http://schemas.android.com/apk/res/android:exported": {
+              "type": 18,
+              "value": 0
+            },
+            "http://schemas.android.com/apk/res/android:name": {
+              "type": 3,
+              "value": "com.projectinfinity.kodi.InfinityBackgroundControlActivity"
+            },
+            "http://schemas.android.com/apk/res/android:noHistory": {
+              "type": 18,
+              "value": 4294967295
+            },
+            "http://schemas.android.com/apk/res/android:process": {
+              "type": 3,
+              "value": ":kodi"
+            }
+          },
+          "children": [
+            {
+              "attributes": {},
+              "children": [
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:name": {
+                      "type": 3,
+                      "value": "com.projectinfinity.kodi.action.BACKGROUND_MODE_NORMAL"
+                    }
+                  },
+                  "children": [],
+                  "tag": "action"
+                },
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:name": {
+                      "type": 3,
+                      "value": "com.projectinfinity.kodi.action.BACKGROUND_MODE_EXTENDED"
+                    }
+                  },
+                  "children": [],
+                  "tag": "action"
+                },
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:name": {
+                      "type": 3,
+                      "value": "android.intent.category.DEFAULT"
+                    }
+                  },
+                  "children": [],
+                  "tag": "category"
+                }
+              ],
+              "tag": "intent-filter"
+            }
+          ],
+          "tag": "activity"
+        },
+        {
+          "attributes": {
+            "http://schemas.android.com/apk/res/android:excludeFromRecents": {
+              "type": 18,
+              "value": 4294967295
+            },
+            "http://schemas.android.com/apk/res/android:exported": {
+              "type": 18,
+              "value": 0
+            },
+            "http://schemas.android.com/apk/res/android:name": {
+              "type": 3,
+              "value": "com.projectinfinity.kodi.InfinityPowerControlActivity"
+            },
+            "http://schemas.android.com/apk/res/android:noHistory": {
+              "type": 18,
+              "value": 4294967295
+            },
+            "http://schemas.android.com/apk/res/android:process": {
+              "type": 3,
+              "value": ":kodi"
+            },
+            "http://schemas.android.com/apk/res/android:theme": {
+              "type": 1,
+              "value": 16973909
+            }
+          },
+          "children": [],
+          "tag": "activity"
+        },
+        {
+          "attributes": {
+            "http://schemas.android.com/apk/res/android:exported": {
+              "type": 18,
+              "value": 0
+            },
+            "http://schemas.android.com/apk/res/android:foregroundServiceType": {
+              "type": 17,
+              "value": 2048
+            },
+            "http://schemas.android.com/apk/res/android:name": {
+              "type": 3,
+              "value": "com.projectinfinity.kodi.InfinityCloseGuardService"
+            },
+            "http://schemas.android.com/apk/res/android:stopWithTask": {
+              "type": 18,
+              "value": 0
+            }
+          },
+          "children": [],
+          "tag": "service"
+        },
+        {
+          "attributes": {
+            "http://schemas.android.com/apk/res/android:exported": {
+              "type": 18,
+              "value": 0
+            },
+            "http://schemas.android.com/apk/res/android:name": {
+              "type": 3,
+              "value": "com.projectinfinity.kodi.InfinityCloseNativeLease"
+            },
+            "http://schemas.android.com/apk/res/android:process": {
+              "type": 3,
+              "value": ":kodi"
+            },
+            "http://schemas.android.com/apk/res/android:stopWithTask": {
+              "type": 18,
+              "value": 0
+            }
+          },
+          "children": [],
+          "tag": "service"
+        },
+        {
+          "attributes": {
+            "http://schemas.android.com/apk/res/android:exported": {
+              "type": 18,
+              "value": 0
+            },
+            "http://schemas.android.com/apk/res/android:foregroundServiceType": {
+              "type": 17,
+              "value": 1073741826
+            },
+            "http://schemas.android.com/apk/res/android:name": {
+              "type": 3,
+              "value": "com.projectinfinity.kodi.InfinityExtendedBackgroundService"
+            },
+            "http://schemas.android.com/apk/res/android:process": {
+              "type": 3,
+              "value": ":kodi"
+            },
+            "http://schemas.android.com/apk/res/android:stopWithTask": {
+              "type": 18,
+              "value": 0
+            }
+          },
+          "children": [
+            {
+              "attributes": {
+                "http://schemas.android.com/apk/res/android:name": {
+                  "type": 3,
+                  "value": "android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                },
+                "http://schemas.android.com/apk/res/android:value": {
+                  "type": 3,
+                  "value": "User-enabled Infinity media session continuity with visible stop control; ends on explicit task removal."
+                }
+              },
+              "children": [],
+              "tag": "property"
+            }
+          ],
+          "tag": "service"
+        },
+        {
+          "attributes": {
+            "http://schemas.android.com/apk/res/android:exported": {
+              "type": 18,
+              "value": 0
+            },
+            "http://schemas.android.com/apk/res/android:foregroundServiceType": {
+              "type": 17,
+              "value": 1
+            },
+            "http://schemas.android.com/apk/res/android:name": {
+              "type": 3,
+              "value": "com.projectinfinity.kodi.InfinityCobraRecordingService"
+            }
+          },
+          "children": [],
+          "tag": "service"
+        },
+        {
+          "attributes": {
+            "http://schemas.android.com/apk/res/android:exported": {
+              "type": 18,
+              "value": 0
+            },
+            "http://schemas.android.com/apk/res/android:name": {
+              "type": 3,
+              "value": "com.projectinfinity.kodi.InfinityCobraReminderReceiver"
+            }
+          },
+          "children": [],
+          "tag": "receiver"
+        },
+        {
+          "attributes": {
+            "http://schemas.android.com/apk/res/android:exported": {
+              "type": 18,
+              "value": 0
+            },
+            "http://schemas.android.com/apk/res/android:name": {
+              "type": 3,
+              "value": "com.projectinfinity.kodi.CobraSportsReminderJob"
+            },
+            "http://schemas.android.com/apk/res/android:permission": {
+              "type": 3,
+              "value": "android.permission.BIND_JOB_SERVICE"
+            }
+          },
+          "children": [],
+          "tag": "service"
+        },
+        {
+          "attributes": {
+            "http://schemas.android.com/apk/res/android:exported": {
+              "type": 18,
+              "value": 4294967295
+            },
+            "http://schemas.android.com/apk/res/android:name": {
+              "type": 3,
+              "value": "com.projectinfinity.kodi.InfinityCobraBootReceiver"
+            }
+          },
+          "children": [
+            {
+              "attributes": {},
+              "children": [
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:name": {
+                      "type": 3,
+                      "value": "android.intent.action.BOOT_COMPLETED"
+                    }
+                  },
+                  "children": [],
+                  "tag": "action"
+                },
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:name": {
+                      "type": 3,
+                      "value": "android.intent.action.MY_PACKAGE_REPLACED"
+                    }
+                  },
+                  "children": [],
+                  "tag": "action"
+                }
+              ],
+              "tag": "intent-filter"
+            }
+          ],
+          "tag": "receiver"
+        },
+        {
+          "attributes": {
+            "http://schemas.android.com/apk/res/android:exported": {
+              "type": 18,
+              "value": 4294967295
+            },
+            "http://schemas.android.com/apk/res/android:name": {
+              "type": 3,
+              "value": "com.projectinfinity.kodi.XBMCBroadcastReceiver"
+            },
+            "http://schemas.android.com/apk/res/android:process": {
+              "type": 3,
+              "value": ":kodi"
+            }
+          },
+          "children": [
+            {
+              "attributes": {},
+              "children": [
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:name": {
+                      "type": 3,
+                      "value": "android.intent.action.DREAMING_STOPPED"
+                    }
+                  },
+                  "children": [],
+                  "tag": "action"
+                },
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:name": {
+                      "type": 3,
+                      "value": "android.bluetooth.a2dp.profile.action.CONNECTION_STATE_CHANGED"
+                    }
+                  },
+                  "children": [],
+                  "tag": "action"
+                },
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:name": {
+                      "type": 3,
+                      "value": "android.intent.action.MEDIA_BUTTON"
+                    }
+                  },
+                  "children": [],
+                  "tag": "action"
+                },
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:name": {
+                      "type": 3,
+                      "value": "android.intent.action.BOOT_COMPLETED"
+                    }
+                  },
+                  "children": [],
+                  "tag": "action"
+                }
+              ],
+              "tag": "intent-filter"
+            }
+          ],
+          "tag": "receiver"
+        },
+        {
+          "attributes": {
+            "http://schemas.android.com/apk/res/android:authorities": {
+              "type": 3,
+              "value": "com.projectinfinity.kodi.media"
+            },
+            "http://schemas.android.com/apk/res/android:exported": {
+              "type": 18,
+              "value": 4294967295
+            },
+            "http://schemas.android.com/apk/res/android:name": {
+              "type": 3,
+              "value": "com.projectinfinity.kodi.content.XBMCMediaContentProvider"
+            },
+            "http://schemas.android.com/apk/res/android:process": {
+              "type": 3,
+              "value": ":kodi"
+            }
+          },
+          "children": [],
+          "tag": "provider"
+        },
+        {
+          "attributes": {
+            "http://schemas.android.com/apk/res/android:authorities": {
+              "type": 3,
+              "value": "com.projectinfinity.kodi.file"
+            },
+            "http://schemas.android.com/apk/res/android:exported": {
+              "type": 18,
+              "value": 4294967295
+            },
+            "http://schemas.android.com/apk/res/android:name": {
+              "type": 3,
+              "value": "com.projectinfinity.kodi.content.XBMCFileContentProvider"
+            },
+            "http://schemas.android.com/apk/res/android:process": {
+              "type": 3,
+              "value": ":kodi"
+            }
+          },
+          "children": [],
+          "tag": "provider"
+        },
+        {
+          "attributes": {
+            "http://schemas.android.com/apk/res/android:authorities": {
+              "type": 3,
+              "value": "com.projectinfinity.kodi.ytdl"
+            },
+            "http://schemas.android.com/apk/res/android:exported": {
+              "type": 18,
+              "value": 4294967295
+            },
+            "http://schemas.android.com/apk/res/android:name": {
+              "type": 3,
+              "value": "com.projectinfinity.kodi.content.XBMCYTDLContentProvider"
+            },
+            "http://schemas.android.com/apk/res/android:process": {
+              "type": 3,
+              "value": ":kodi"
+            }
+          },
+          "children": [],
+          "tag": "provider"
+        },
+        {
+          "attributes": {
+            "http://schemas.android.com/apk/res/android:exported": {
+              "type": 18,
+              "value": 4294967295
+            },
+            "http://schemas.android.com/apk/res/android:name": {
+              "type": 3,
+              "value": "com.projectinfinity.kodi.XBMCSearchableActivity"
+            },
+            "http://schemas.android.com/apk/res/android:process": {
+              "type": 3,
+              "value": ":kodi"
+            }
+          },
+          "children": [
+            {
+              "attributes": {},
+              "children": [
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:name": {
+                      "type": 3,
+                      "value": "android.intent.action.SEARCH"
+                    }
+                  },
+                  "children": [],
+                  "tag": "action"
+                },
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:name": {
+                      "type": 3,
+                      "value": "android.intent.category.DEFAULT"
+                    }
+                  },
+                  "children": [],
+                  "tag": "category"
+                },
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:name": {
+                      "type": 3,
+                      "value": "android.intent.category.BROWSABLE"
+                    }
+                  },
+                  "children": [],
+                  "tag": "category"
+                }
+              ],
+              "tag": "intent-filter"
+            },
+            {
+              "attributes": {},
+              "children": [
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:name": {
+                      "type": 3,
+                      "value": "com.google.android.gms.actions.SEARCH_ACTION"
+                    }
+                  },
+                  "children": [],
+                  "tag": "action"
+                },
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:name": {
+                      "type": 3,
+                      "value": "android.intent.category.DEFAULT"
+                    }
+                  },
+                  "children": [],
+                  "tag": "category"
+                },
+                {
+                  "attributes": {
+                    "http://schemas.android.com/apk/res/android:name": {
+                      "type": 3,
+                      "value": "android.intent.category.BROWSABLE"
+                    }
+                  },
+                  "children": [],
+                  "tag": "category"
+                }
+              ],
+              "tag": "intent-filter"
+            },
+            {
+              "attributes": {
+                "http://schemas.android.com/apk/res/android:name": {
+                  "type": 3,
+                  "value": "android.app.searchable"
+                },
+                "http://schemas.android.com/apk/res/android:resource": {
+                  "type": 1,
+                  "value": 2131492864
+                }
+              },
+              "children": [],
+              "tag": "meta-data"
+            }
+          ],
+          "tag": "activity"
+        },
+        {
+          "attributes": {
+            "http://schemas.android.com/apk/res/android:exported": {
+              "type": 18,
+              "value": 0
+            },
+            "http://schemas.android.com/apk/res/android:name": {
+              "type": 3,
+              "value": "com.projectinfinity.kodi.channels.SyncChannelJobService"
+            },
+            "http://schemas.android.com/apk/res/android:permission": {
+              "type": 3,
+              "value": "android.permission.BIND_JOB_SERVICE"
+            },
+            "http://schemas.android.com/apk/res/android:process": {
+              "type": 3,
+              "value": ":kodi"
+            }
+          },
+          "children": [],
+          "tag": "service"
+        },
+        {
+          "attributes": {
+            "http://schemas.android.com/apk/res/android:exported": {
+              "type": 18,
+              "value": 0
+            },
+            "http://schemas.android.com/apk/res/android:name": {
+              "type": 3,
+              "value": "com.projectinfinity.kodi.channels.SyncProgramsJobService"
+            },
+            "http://schemas.android.com/apk/res/android:permission": {
+              "type": 3,
+              "value": "android.permission.BIND_JOB_SERVICE"
+            },
+            "http://schemas.android.com/apk/res/android:process": {
+              "type": 3,
+              "value": ":kodi"
+            }
+          },
+          "children": [],
+          "tag": "service"
+        },
+        {
+          "attributes": {
+            "http://schemas.android.com/apk/res/android:excludeFromRecents": {
+              "type": 18,
+              "value": 1
+            },
+            "http://schemas.android.com/apk/res/android:exported": {
+              "type": 18,
+              "value": 0
+            },
+            "http://schemas.android.com/apk/res/android:name": {
+              "type": 3,
+              "value": "com.projectinfinity.kodi.InfinityAskEveryTimeActivity"
+            },
+            "http://schemas.android.com/apk/res/android:noHistory": {
+              "type": 18,
+              "value": 1
+            },
+            "http://schemas.android.com/apk/res/android:theme": {
+              "type": 1,
+              "value": 16973909
+            }
+          },
+          "children": [],
+          "tag": "activity"
+        }
+      ],
+      "tag": "application"
+    }
+  ],
+  "tag": "manifest"
+}

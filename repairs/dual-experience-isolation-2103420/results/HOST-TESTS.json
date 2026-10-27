@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "command": "PYTHONPATH=repairs/dual-experience-isolation-2103420 python3 -m unittest -v test_release_gate",
+  "tests_run": 13,
+  "failures": 0,
+  "errors": 0,
+  "test_scope": "../TEST-SCOPE.json",
+  "application_execution": false,
+  "shutdown_execution": false,
+  "note": "Synthetic registry and parser controls; actual APK controls are recorded separately. GitHub Actions repeats these checks on its exact checkout."
+}
