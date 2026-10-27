@@ -1,0 +1,77 @@
+name: Chooser version labels | unsigned shell-only owner build
+on:
+  push:
+    branches: [work/chooser-version-labels-from-2103423-20261027]
+    paths:
+      - repairs/chooser-version-labels-2103423/**
+      - .github/workflows/chooser-version-labels.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  chooser:
+    if: github.ref == 'refs/heads/work/chooser-version-labels-from-2103423-20261027'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      PYTHONPATH: repairs/dual-experience-isolation-2103420
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40486072720
+          name: Infinity-Combined-Original-Signer-40486072720
+          github-token: ${{ github.token }}
+          path: signed2103423
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40486072720
+          name: Infinity-Combined-Owner-Components-40486072720
+          github-token: ${{ github.token }}
+          path: source-components
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39867073954
+          name: Infinity-Receipt-Race-Android17-Investigation
+          github-token: ${{ github.token }}
+          path: pinned-tools
+      - name: Build shell delta and exact-class preservation proof
+        run: |
+          set -euo pipefail
+          python3 repairs/chooser-version-labels-2103423/build.py \
+            --apk signed2103423/Infinity-2103423-Combined-Original-Signer.apk \
+            --bundles source-components \
+            --jars pinned-tools/receipt-evidence/tool-jars \
+            --out chooser-build \
+            --source "$GITHUB_SHA"
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path('chooser-build/PRESERVATION.json').read_text())
+          assert p['status']=='PASS_TARGETED_SHELL_ONLY'
+          assert p['exact_unchanged_shell_classes']==148
+          assert p['offline_component_history']=={'INFINITY':2103421,'COBRA':2103423}
+          assert Path('chooser-build/CHOOSER_SHELL.zip').exists()
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Chooser-Original-UI-Version-Labels-${{ github.run_id }}
+          path: |
+            chooser-build/CHOOSER_SHELL.zip
+            chooser-build/catalog-row.json
+            chooser-build/component.json
+            chooser-build/PRESERVATION.json
+          if-no-files-found: error
+          retention-days: 90
+          compression-level: 0
