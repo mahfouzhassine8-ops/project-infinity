@@ -1,3 +1,7 @@
+> **Completion checkpoint:** Signed 2103421 is delivered and ready for the user’s Fold check.
+> Read [DELIVERY.md](DELIVERY.md) and continue from that checkpoint; do not restart implementation.
+> The accepted 2103420 pointer remains unchanged pending user acceptance.
+
 # CODEX — ONE OWNER, COMPLETE THE INFINITY / COBRA SEPARATION PROJECT
 
 **AUTHORIZATION: PROCEED — DESIGN, IMPLEMENT, TEST, INTEGRATE, ORIGINAL-KEY SIGN AND DELIVER.**

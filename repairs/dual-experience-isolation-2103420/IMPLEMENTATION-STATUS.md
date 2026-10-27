@@ -1,6 +1,8 @@
 # Isolation implementation status
 
-**OWNER BOUNDARIES IMPLEMENTED; CLEAN PRODUCTION REBUILD VERIFIED; ORIGINAL-KEY DELIVERY IN PROGRESS.**
+**READY_FOR_FOLD_CHECK — signed 2103421 delivered.**
+
+See [the signed APK, exact hashes and verification receipt](DELIVERY.md).
 
 Codex remains the sole engineering owner. The authorized persistence/barrier
 and background-service corrections are implemented. The protected 2103420 lock
