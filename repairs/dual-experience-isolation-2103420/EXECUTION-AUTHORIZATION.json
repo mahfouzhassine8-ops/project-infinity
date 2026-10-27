@@ -1,0 +1,59 @@
+{
+  "schema": 1,
+  "title": "One APK, two independently versioned experiences—user-authorized boundary engineering",
+  "authorized_on": "2026-10-26",
+  "status": "AUTHORIZED_IMPLEMENTATION_PENDING",
+  "implementation_branch": "work/infinity-cobra-isolation-from-2103420-20261026",
+  "protected_baseline": {
+    "lock_branch": "lock/infinity-2103420-user-approved-baseline-20261026",
+    "lock_commit": "883c64a4de6f87077893921454de71bba850235b",
+    "application_source_commit": "ddc054583c5e5f3cd04c328e131cb76af8d4728b",
+    "apk_version_code": 2103420,
+    "apk_sha256": "ae641e74bbe0b3360d103254d9bc5425fe1558f625466a99f1da9f16414fef26",
+    "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "repository": "mahfouzhassine8-ops/project-infinity"
+  },
+  "product_constraints": {
+    "one_package": "com.projectinfinity.kodi",
+    "one_apk": true,
+    "one_launcher_icon": true,
+    "existing_choose_experience_unchanged": true,
+    "original_signer_preserved": true,
+    "install_over_only": true,
+    "no_user_data_wipe": true,
+    "all_infinity_2103420_features_preserved": true,
+    "all_existing_cobra_features_preserved": true,
+    "original_infinity_shutdown_frozen": true
+  },
+  "authorization": {
+    "map_actual_binary_and_calls": true,
+    "create_owner_components_and_stable_shell_contract": true,
+    "restructure_cobra_owned_code_for_isolation_only": true,
+    "create_independent_component_versions": true,
+    "implement_latest_approved_combined_release_gate": true,
+    "integrate_one_signed_apk_after_protections_pass": true,
+    "cobra_feature_repair": false,
+    "infinity_feature_repair": false,
+    "shared_native_rewrite": false,
+    "shutdown_runtime_rewrite": false,
+    "new_shutdown_stress_testing": false,
+    "unapproved_process_manifest_change_affecting_shutdown": false,
+    "second_installed_android_package": false,
+    "second_launcher_icon": false,
+    "unapproved_profile_or_db_migration": false,
+    "unilateral_final_approval": false
+  },
+  "implementation_requires": [
+    "ownership map grounded in actual signed 2103420 binary",
+    "source/module boundaries with no mutual feature implementation imports",
+    "separate stored-state ownership and guards",
+    "actual signer-bound per-owner fingerprint manifests",
+    "latest-approved-combined-release registry, optimistic concurrency and fail-closed anti-rollback",
+    "positive Infinity-only and Cobra-only integration candidates",
+    "negative stale-owner and cross-owner modification rejection",
+    "one original-key install-over APK; app-level version monotonic",
+    "realistic selective representative QA and physical user acceptance"
+  ],
+  "governing_brief": "repairs/dual-experience-isolation-2103420/ASTRA-PRO-MASTER-IMPLEMENTATION-BRIEF-20261026.md",
+  "historical_scope_note": "Old Infinity-only COBRA-OFF-LIMITS applies to the old correction scope; new user authorization permits only behavior-preserving Cobra ownership isolation. It is NOT permission for Cobra feature repairs or Infinity shutdown changes."
+}
