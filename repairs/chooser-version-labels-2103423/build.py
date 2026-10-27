@@ -97,7 +97,7 @@ def build(apk,bundles,jars,android,d8,out,source):
  # view registration). HM slogan text, original geometry and focus code remain.
  orig_stage=a['com/projectinfinity/kodi/InfinityGlassChooser$Stage.smali'].decode()
  next_stage=b['com/projectinfinity/kodi/InfinityGlassChooser$Stage.smali'].decode()
- methods=lambda raw:{m[1].split()[-1]:m[0] for m in re.finditer(r'^\\.method ([^\\n]+)\\n.*?^\\.end method',raw,re.M|re.S)}
+ methods=lambda raw:{m[1].split()[-1]:m[0] for m in re.finditer(r'^\.method ([^\n]+)\n.*?^\.end method',raw,re.M|re.S)}
  original_methods=methods(orig_stage);updated_methods=methods(next_stage)
  require(set(original_methods)==set(updated_methods),'STAGE_METHOD_SET_CHANGED')
  require({k for k in original_methods if original_methods[k]!=updated_methods[k]}==
