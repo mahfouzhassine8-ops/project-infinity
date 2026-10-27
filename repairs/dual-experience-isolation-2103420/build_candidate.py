@@ -26,7 +26,13 @@ def candidate(baseline,jars,android,d8,out):
         for owner,row in catalog['bundles'].items():
             location=authority['bundle_sources'][owner];download=out/('download-'+owner)
             run=json.loads(subprocess.check_output(['gh','api','repos/mahfouzhassine8-ops/project-infinity/actions/runs/'+str(location['run_id'])],text=True))
-            require(run['conclusion']=='success' and run['head_sha']==row['approved_source'],'COMPONENT_BUILD_SOURCE')
+            # A preserved component can be reproduced by a later combined
+            # build. Keep its approved code source unchanged while binding
+            # the actual artifact producer separately.
+            producer=location['build_source']
+            require(run['conclusion']=='success' and run['head_sha']==producer,'COMPONENT_BUILD_SOURCE')
+            require(subprocess.run(['git','merge-base','--is-ancestor',row['approved_source'],producer],
+                    stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL).returncode==0,'COMPONENT_SOURCE_ANCESTRY')
             subprocess.run(['gh','run','download',str(location['run_id']),
                 '--repo','mahfouzhassine8-ops/project-infinity','--name',location['artifact'],
                 '--dir',str(download)],check=True)
