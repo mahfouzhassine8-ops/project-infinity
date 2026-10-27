@@ -38,6 +38,9 @@ def component_digest(payload, owner):
 
 
 def validate_registry(registry):
+    if registry.get('schema') == 2:
+        from release_authority import validate
+        return validate(registry)
     require(registry.get('schema') == 1, 'REGISTRY_SCHEMA')
     require(registry.get('package') == PACKAGE and registry.get('certificate_sha256') == CERT_SHA, 'IDENTITY')
     require(isinstance(registry.get('generation'), int) and registry['generation'] >= 1, 'REGISTRY_GENERATION')
@@ -84,6 +87,9 @@ def verify_approved_payload(registry, actual):
 
 
 def verify_combination(registry, actual, version, expected_generation):
+    if registry.get('schema') == 2:
+        from release_authority import verify
+        return verify(registry, actual, version, expected_generation)
     verify_approved_payload(registry, actual)
     require(expected_generation == registry['generation'], 'STALE_REGISTRY')
     require(type(version) is int and registry['accepted_app_versionCode'] < version <= 2100000000, 'APP_ROLLBACK')
@@ -167,18 +173,62 @@ def remote_authority(repository, expected_head):
     require(refs.get('refs/heads/' + AUTHORITY_BRANCH) == expected_head, 'AUTHORITY_HEAD_RACE')
     require(git('rev-parse', 'HEAD') == expected_head, 'SOURCE_HEAD_MISMATCH')
     require(not git('status', '--porcelain', '--untracked-files=no'), 'DIRTY_TRACKED_SOURCE')
-    authority = json.loads(git('show', expected_head + ':' + REGISTRY_PATH))
+    from release_authority import AUTHORITY_PATH, verify_evidence
+    exists = subprocess.run(['git','-C',str(repository),'cat-file','-e',expected_head+':'+AUTHORITY_PATH],
+                            stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL).returncode == 0
+    path = AUTHORITY_PATH if exists else REGISTRY_PATH
+    authority = json.loads(git('show', expected_head + ':' + path))
+    if exists:
+        verify_evidence(authority, lambda name: subprocess.check_output(['git','-C',str(repository),'show',expected_head+':'+name]))
+        for component in authority['components'].values():
+            require(git('cat-file','-t',component['approved_source'])=='commit','MISSING_COMPONENT_SOURCE_COMMIT')
+        # Compare a changed authority with the actual preceding Git version,
+        # never with a predecessor supplied by a component branch.
+        change = git('log','-1','--format=%H','--',AUTHORITY_PATH)
+        prior = subprocess.run(['git','-C',str(repository),'show',change+'^:'+AUTHORITY_PATH],
+                               capture_output=True,text=True)
+        if prior.returncode == 0:
+            from release_authority import transition
+            previous = json.loads(prior.stdout)
+            require(digest(canonical(previous)) == authority.get('previous_authority_sha256'),'AUTHORITY_LINEAGE')
+            transition(previous,authority,authority.get('target_owners',[]))
+        else:
+            require(authority['generation']==2 and authority.get('bootstrap_authorization')=='SCOPED-CORRECTION-AUTHORIZATION.json',
+                    'SCOPED_BOOTSTRAP_REQUIRED')
     return validate_registry(authority)
 
 
 def pre_sign(apk, jars, work, repository, expected_head, expected_generation):
     registry = remote_authority(repository, expected_head)
     actual, version = inspect_candidate(apk, jars, work)
+    if registry.get('schema') == 2:
+        validate_runtime_ownership(registry,work)
     result = verify_combination(registry, actual, version, expected_generation)
     require(remote_authority(repository, expected_head) == registry, 'AUTHORITY_CHANGED_DURING_AUDIT')
     result.update(status='PRE_SIGN_PAYLOAD_VERIFIED', unsigned_apk_sha256=file_sha(apk), source=expected_head,
                   registry_sha256=digest(canonical(registry)), versionCode=version)
     return result
+
+
+def validate_runtime_ownership(registry,work):
+    """Resolve current packaged dependencies, including verified OS outlines."""
+    from review_ownership import class_owner,member_owner
+    policy=load(HERE/'ownership-reviewed-roots.json')
+    classes,calls,_=parse_dex(work)
+    owners={}
+    for path in Path(work).glob('*-smali/**/*.smali'):
+        raw=path.read_text();name=raw.splitlines()[0].split()[-1]
+        owners[name]=class_owner(name,raw,policy)
+        require(registry['payload'].get('class:'+name,{}).get('owner')==owners[name],'FALSE_CLASS_OWNER:'+name)
+    for key,row in registry['payload'].items():
+        if key.startswith('member:'):require(member_owner(key[7:])==row['owner'],'FALSE_MEMBER_OWNER:'+key)
+    for call in calls:
+        target=call['to'];source=call['from']
+        if target not in owners:continue
+        require({owners[source],owners[target]}!={'INFINITY','COBRA'},'CROSS_FEATURE_IMPORT:'+source)
+        if 'ExternalSyntheticApiModelOutline' in source:
+            require(not ((call['member'] in classes[target]['methods'] and 'ExternalSyntheticApiModelOutline' not in target)
+                         or not call['opcode'].startswith('invoke-')),'FEATURE_BEARING_OS_OUTLINE')
 
 
 if __name__ == '__main__':

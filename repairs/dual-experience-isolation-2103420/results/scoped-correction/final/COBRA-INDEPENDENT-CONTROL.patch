@@ -1,0 +1,20 @@
+commit 6014070a1d54c092b0a714d5f01b6fd8989c1fc3
+Author:     Hassine Mahfouz <mahfouzhassine8@gmail.com>
+AuthorDate: Tue Oct 27 03:21:44 2026 +0000
+Commit:     Hassine Mahfouz <mahfouzhassine8@gmail.com>
+CommitDate: Tue Oct 27 03:21:44 2026 +0000
+
+    Unsigned isolation control: COBRA version method only
+
+diff --git a/repairs/dual-experience-isolation-2103420/runtime/CobraComponent.java b/repairs/dual-experience-isolation-2103420/runtime/CobraComponent.java
+index d625d1a9..7592281d 100644
+--- a/repairs/dual-experience-isolation-2103420/runtime/CobraComponent.java
++++ b/repairs/dual-experience-isolation-2103420/runtime/CobraComponent.java
+@@ -1,6 +1,6 @@
+ package com.projectinfinity.kodi;
+ public final class CobraComponent {
+   private CobraComponent() {}
+-  public static String version(){return "bundled-2103420.isolation.1";}
++  public static String version(){return "bundled-2103420.isolation.1.control2";}
+   public static String persistenceSchema(){return "original-plus-settings-snapshot-v1";}
+ }

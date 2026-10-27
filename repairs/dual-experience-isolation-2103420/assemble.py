@@ -1,7 +1,7 @@
-"""Deterministic, preservation-only assembler and guarded original-key signer.
+"""Historical preservation assembler and current guarded original-key signer.
 
-This initial assembler preserves every runtime member. It cannot resolve the
-shared lifecycle blockers and must not be used to claim feature isolation.
+The historical prepare subcommand is not the isolated-module assembler.
+build_candidate.py and component_bundles.py produce the current owner payloads.
 """
 import argparse
 import base64
@@ -59,8 +59,12 @@ def run(args, env=None):
 
 
 def sign(apk, jars, work, repository, expected_head, expected_generation, sdk, out):
-    # This audit fails with the current registry before any key bytes are read.
+    # Every current payload, owner boundary and authority is audited before keys.
     proof = pre_sign(apk, jars, work, repository, expected_head, expected_generation)
+    from signer_policy import check
+    from inventory import HERE,load
+    policy=load(HERE/'signer-policy.json')
+    signer_routes=check(policy)
     out, sdk = Path(out), Path(sdk)
     out.mkdir(parents=True, exist_ok=False)
     final = out / ('Infinity-' + str(proof['versionCode']) + '-Combined-Original-Signer.apk')
@@ -75,6 +79,7 @@ def sign(apk, jars, work, repository, expected_head, expected_generation, sdk, o
         require(apk_members(staged) == apk_members(aligned), 'ALIGNMENT_CHANGED_PAYLOAD')
         registry = remote_authority(repository, expected_head)
         require(digest(canonical(registry)) == proof['registry_sha256'], 'AUTHORITY_CHANGED_BEFORE_SIGN')
+        require(check(policy)==signer_routes,'SIGNER_ROUTES_CHANGED')
         key = temp / 'original.jks'
         key.touch(mode=0o600)
         key.write_bytes(base64.b64decode(os.environ['INFINITY_KEYSTORE_B64'], validate=True))
@@ -94,6 +99,7 @@ def sign(apk, jars, work, repository, expected_head, expected_generation, sdk, o
         # A registry race after signing quarantines the result: no upload step
         # may run until this function succeeds. No automatic acceptance update.
         require(remote_authority(repository, expected_head) == registry, 'AUTHORITY_CHANGED_QUARANTINE_APK')
+        require(check(policy)==signer_routes,'SIGNER_ROUTES_CHANGED_QUARANTINE_APK')
         proof.update(signed_apk_sha256=file_sha(final), certificate_sha256=CERT_SHA,
                      physical_Fold='PENDING', accepted_pointer_updated=False)
         save(out / 'BUILD-RECEIPT.json', proof)

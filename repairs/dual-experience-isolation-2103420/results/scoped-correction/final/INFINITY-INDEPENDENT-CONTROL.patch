@@ -1,0 +1,20 @@
+commit 1e6b3858aee0c24d2ed961e03fdb7fa76d228eb4
+Author:     Hassine Mahfouz <mahfouzhassine8@gmail.com>
+AuthorDate: Tue Oct 27 03:21:09 2026 +0000
+Commit:     Hassine Mahfouz <mahfouzhassine8@gmail.com>
+CommitDate: Tue Oct 27 03:21:09 2026 +0000
+
+    Unsigned isolation control: INFINITY version method only
+
+diff --git a/repairs/dual-experience-isolation-2103420/runtime/InfinityComponent.java b/repairs/dual-experience-isolation-2103420/runtime/InfinityComponent.java
+index 8f960182..882c71f3 100644
+--- a/repairs/dual-experience-isolation-2103420/runtime/InfinityComponent.java
++++ b/repairs/dual-experience-isolation-2103420/runtime/InfinityComponent.java
+@@ -1,6 +1,6 @@
+ package com.projectinfinity.kodi;
+ public final class InfinityComponent {
+   private InfinityComponent() {}
+-  public static String version(){return "2103420.isolation.1";}
++  public static String version(){return "2103420.isolation.1.control2";}
+   public static String persistenceSchema(){return "original-2103420";}
+ }

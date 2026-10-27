@@ -1,0 +1,87 @@
+{
+  "accepted_pointer_updated": false,
+  "application_executed": false,
+  "base_source": "9efaeabee45389b7c919ae1a3d88c394b1804173",
+  "cases": [
+    {
+      "actual_class_and_member_count": 16526,
+      "apk_sha256": "e2dd2db06ed9897d7bfb391613ec73f27d94a441b6f5d253d5e52cbee359447f",
+      "case": "infinity_new_cobra_preserved",
+      "decision": "ACCEPTED_UNSIGNED_CONTROL",
+      "versionCode": 2103422
+    },
+    {
+      "actual_class_and_member_count": 16526,
+      "apk_sha256": "2220464bd151cf2bcd4c108315b092ee7895a67113151cf4e195ae326837f181",
+      "case": "both_independently_updated",
+      "decision": "ACCEPTED_UNSIGNED_CONTROL",
+      "versionCode": 2103423
+    },
+    {
+      "actual_class_and_member_count": 16526,
+      "apk_sha256": "3691b609c3777cde461d94bc37b356977fdadc0ec5fdcd2636591b1c239e8207",
+      "case": "higher_app_stale_infinity",
+      "decision": "REJECTED:STALE_OR_MUTATED_OWNER:INFINITY:class:Lcom/projectinfinity/kodi/InfinityComponent;",
+      "versionCode": 2103424
+    },
+    {
+      "actual_class_and_member_count": 16526,
+      "apk_sha256": "bb7b3360c0eddd16ebe5c35bdaef703557fe695ef4168585ec19d74fb306d4cc",
+      "case": "higher_app_stale_cobra",
+      "decision": "REJECTED:STALE_OR_MUTATED_OWNER:COBRA:class:Lcom/projectinfinity/kodi/CobraComponent;",
+      "versionCode": 2103424
+    },
+    {
+      "apk_sha256": "c7f1e85f3b5a00b7a3be6316a52a48421bd061f2e01dfb3214c2aacda630e947",
+      "case": "unexpected-common-manifest",
+      "decision": "REJECTED:STALE_OR_MUTATED_OWNER:MINIMAL_ANDROID_CONTRACT:member:AndroidManifest.xml"
+    },
+    {
+      "case": "cobra-only-cross-owner-code",
+      "decision": "REJECTED:CROSS_OWNER_MUTATION:INFINITY"
+    },
+    {
+      "case": "infinity-only-cross-owner-code",
+      "decision": "REJECTED:CROSS_OWNER_MUTATION:COBRA"
+    },
+    {
+      "case": "protected-callback:class:Lcom/projectinfinity/kodi/CobraJavaWriteBarrier;",
+      "decision": "REJECTED:SEPARATE_LIFECYCLE_AUTHORIZATION_REQUIRED"
+    },
+    {
+      "case": "protected-callback:class:Lcom/projectinfinity/kodi/InfinityCloseGuardService;",
+      "decision": "REJECTED:SEPARATE_LIFECYCLE_AUTHORIZATION_REQUIRED"
+    }
+  ],
+  "component_builds": {
+    "COBRA": {
+      "base": "9efaeabee45389b7c919ae1a3d88c394b1804173",
+      "branch": "test/isolation-combination-cobra-9efaeabee4",
+      "changed_classes": [
+        "class:Lcom/projectinfinity/kodi/CobraComponent;"
+      ],
+      "opposite_owner_dex_used_in_component_build": false,
+      "other_class_definitions_exact": 7119,
+      "source": "6014070a1d54c092b0a714d5f01b6fd8989c1fc3"
+    },
+    "INFINITY": {
+      "base": "9efaeabee45389b7c919ae1a3d88c394b1804173",
+      "branch": "test/isolation-combination-infinity-9efaeabee4",
+      "changed_classes": [
+        "class:Lcom/projectinfinity/kodi/InfinityComponent;"
+      ],
+      "opposite_owner_dex_used_in_component_build": false,
+      "other_class_definitions_exact": 577,
+      "source": "1e6b3858aee0c24d2ed961e03fdb7fa76d228eb4"
+    }
+  },
+  "control_artifacts_signed": false,
+  "production_catalog_sha256": "bddc33010e5556d419e3732c8bc7bcfe2454a49bdd2a9e273dd5b4cb4c775414",
+  "source_inputs": {
+    "ModuleDexWriter.java": "f9c1b6da2552d529f27709b5f1c53368cacfab42d83fc947cb3b16cd0416dad2",
+    "component_bundles.py": "1aca1f237a1987998f243d013fde991413c491b9e72706deda4853b1b1d642d6",
+    "release_authority.py": "4732bb14d9c78e9ee3108fd1074e7ff442e3adcbae5e22c3fae19780f5bc1159",
+    "test_component_matrix.py": "65fcf287e5fcbbd03157cfe61d13fdd9b179ceb184d097880d9a032273d7f7eb"
+  },
+  "status": "PASS_ACTUAL_INDEPENDENT_COMPONENT_MATRIX"
+}
