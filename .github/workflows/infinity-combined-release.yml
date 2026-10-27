@@ -1,0 +1,126 @@
+name: Infinity combined release | owner gate before original signing
+on:
+  push:
+    branches: [work/infinity-cobra-isolation-from-2103420-20261026]
+    paths:
+      - repairs/dual-experience-isolation-2103420/*.py
+      - repairs/dual-experience-isolation-2103420/ownership-policy.json
+      - repairs/dual-experience-isolation-2103420/accepted-combined-release.json
+      - .github/workflows/infinity-combined-release.yml
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-combined-original-key-release
+  cancel-in-progress: false
+jobs:
+  combined:
+    if: github.ref == 'refs/heads/work/infinity-cobra-isolation-from-2103420-20261026'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      PYTHONPATH: repairs/dual-experience-isolation-2103420
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Enforce authorized source scope and selected host tests
+        run: |
+          set -euo pipefail
+          mkdir -p release-evidence
+          git diff --name-only 2ffa4ec4 HEAD > release-evidence/CHANGED-PATHS.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          import json
+          allowed = 'repairs/dual-experience-isolation-2103420/'
+          for name in Path('release-evidence/CHANGED-PATHS.txt').read_text().splitlines():
+              if not (name.startswith(allowed) or name == '.github/workflows/infinity-combined-release.yml'):
+                  raise SystemExit('Outside authorized boundary work: ' + name)
+          scope = json.loads(Path(allowed + 'TEST-SCOPE.json').read_text())
+          assert scope['application_tests'] == scope['shutdown_tests'] == 'NOT_SELECTED_NOT_RUN'
+          PY
+          python3 -m unittest -v test_release_gate 2>&1 | tee release-evidence/HOST-NEGATIVE-CONTROLS.txt
+      - name: Recover immutable signed2103420 and all six matching ZIPs
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 40413893227
+          name: Infinity-2103420-P0-Original-Signer-40413893227
+          github-token: ${{ github.token }}
+          path: baseline
+      - name: Recover pinned DEX toolchain
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 39867073954
+          name: Infinity-Receipt-Race-Android17-Investigation
+          github-token: ${{ github.token }}
+          path: tools
+      - name: Reproduce inventory from original signed bytes
+        run: |
+          set -euo pipefail
+          root=repairs/dual-experience-isolation-2103420
+          apk=baseline/p0-candidate/Infinity-2103420-P0-Corrective-SIGNED.apk
+          jars=tools/receipt-evidence/tool-jars
+          python3 "$root/inventory.py" --apk "$apk" --jars "$jars" --work inventory-dex \
+            --components baseline/p0-candidate/components --receipt baseline/p0-candidate/APK-PRESERVATION.json \
+            --out release-evidence/reproduced
+          diff -r "$root/evidence" release-evidence/reproduced
+          python3 "$root/bootstrap_registry.py" --apk "$apk" --evidence release-evidence/reproduced --out registry-reproduction
+          cmp "$root/accepted-combined-release.json" registry-reproduction/accepted-combined-release.json
+          diff -r "$root/modules" registry-reproduction/modules
+          python3 "$root/verify_baseline.py" --apk "$apk" --jars "$jars" \
+            --sdk "$ANDROID_HOME/build-tools/35.0.0" --out release-evidence/BASELINE-VERIFICATION.json
+      - name: Prepare one deterministic unsigned preservation candidate
+        run: |
+          set -euo pipefail
+          python3 repairs/dual-experience-isolation-2103420/assemble.py prepare \
+            --baseline baseline/p0-candidate/Infinity-2103420-P0-Corrective-SIGNED.apk \
+            --version 2103421 --out unsigned-review.apk > release-evidence/ASSEMBLY.json
+      - name: Reject actual Cobra DEX and Infinity asset mutations without application execution
+        run: |
+          set -euo pipefail
+          python3 repairs/dual-experience-isolation-2103420/test_actual_apk.py \
+            --unsigned unsigned-review.apk --jars tools/receipt-evidence/tool-jars \
+            --out release-evidence/ACTUAL-APK-NEGATIVE-CONTROLS.json
+      - name: Hard pre-sign gate - unresolved ownership MUST fail
+        run: |
+          set -euo pipefail
+          python3 repairs/dual-experience-isolation-2103420/release_gate.py \
+            --apk unsigned-review.apk --jars tools/receipt-evidence/tool-jars --work gate-dex \
+            --repository . --expected-head "$GITHUB_SHA" --expected-generation 1 \
+            --out release-evidence/SIGNING-DECISION.json
+      - name: Original signer - reachable only after complete owner verification
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 repairs/dual-experience-isolation-2103420/assemble.py sign \
+            --apk unsigned-review.apk --jars tools/receipt-evidence/tool-jars --work signer-dex \
+            --repository . --expected-head "$GITHUB_SHA" --expected-generation 1 \
+            --sdk "$ANDROID_HOME/build-tools/35.0.0" --out signed-combined
+      - name: Upload signed candidate only after signer success
+        uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-Combined-Original-Signer-${{ github.run_id }}
+          path: signed-combined/
+          if-no-files-found: error
+          retention-days: 90
+      - name: Preserve verification and real refusal evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-Combined-Gate-Evidence-${{ github.run_id }}
+          path: release-evidence/
+          if-no-files-found: error
+          retention-days: 90
