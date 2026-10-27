@@ -8,17 +8,18 @@ import argparse, copy, json, re, sys
 from pathlib import Path
 HERE=Path(__file__).resolve().parent
 SIGNED_2103423='4cbbf963be72904de962f434d00ee5f9d5080de6b6b9fd4b3e31ab1d6ac01aff'
-PRODUCER_RUN=40509014993
-PRODUCER_SOURCE='709e2e43a5c1f4510a2bde0437f56b504177e43b'
-SHELL_ZIP_SHA='5bc9f0541ef073e5792a9428aea87bda601d668f0309653209fdab238d610191'
+PRODUCER_RUN=40590499416
+PRODUCER_SOURCE='67967bc42cd62375f2c4f5f79061630162940046'
+SHELL_ZIP_SHA='c91590042994669599a2670c485b634d3e10391ffbc85c8d653a4a1aaad13e9c'
 MEMBER='member:assets/experience-component-updates.properties'
 COMPONENT_KEY='CHOOSER_SHELL'
 OLD_SHELL_DIGEST='1c27b2bc8a50d86a11e1c9bc3384902ccad9fa21f52b7c569be40e1d5bce3ba8'
 OLD_COBRA_DIGEST='7091c30cff244beb75f900236da87d016a14573981aa84b7eee454080c23adf7'
 OLD_INFINITY_DIGEST='ec27bce6252cbce21eecef0963285db720059e6c4ce27448f9ef441a8cb18f61'
-NEW_SHELL_DIGEST='e09360a6ae8cd4546eef954fc7a5f5ca04e5adaa09d5c3f7e8b7aaa308858c86'
+NEW_SHELL_DIGEST='815da51885ef1e69f3542dd3c273c5fef8de5a64977e714d165e83ffc951996d'
 EXACT_NEW_CLASSES={
  'Lcom/projectinfinity/kodi/ChooserReleaseMetadata;',
+ 'Lcom/projectinfinity/kodi/ChooserReleaseFooter;',
  'Lcom/projectinfinity/kodi/InfinityGlassChooser$Card;',
  'Lcom/projectinfinity/kodi/InfinityGlassChooser$Stage;'
 }
@@ -44,7 +45,9 @@ def promote(checkout,producer):
  require(preservation['status']=='PASS_TARGETED_SHELL_ONLY' and
          preservation['signed_base_sha256']==SIGNED_2103423 and
          preservation['exact_unchanged_shell_classes']==148 and
-         preservation['new_shell_class_count']==151 and
+         preservation['new_shell_class_count']==152 and
+         preservation['original_HM_caption_preserved'] is True and
+         preservation['stage_measure_and_layout_unmodified'] is True and
          preservation['offline_component_history']=={'INFINITY':2103421,'COBRA':2103423},
          'FOCUSED_PRODUCER_PRESERVATION_REQUIRED')
  row=load(producer/'catalog-row.json')
@@ -54,7 +57,8 @@ def promote(checkout,producer):
  meta=read_bundle(producer/'CHOOSER_SHELL.zip',row)
  old_shell={k:v for k,v in old['payload'].items() if v['owner']==COMPONENT_KEY}
  new_shell=meta['payload']
- require(set(new_shell)-set(old_shell)=={'class:Lcom/projectinfinity/kodi/ChooserReleaseMetadata;',MEMBER},
+ require(set(new_shell)-set(old_shell)=={'class:Lcom/projectinfinity/kodi/ChooserReleaseMetadata;',
+                                    'class:Lcom/projectinfinity/kodi/ChooserReleaseFooter;',MEMBER},
          'EXTRA_NEW_MEMBER')
  require(set(old_shell)-set(new_shell)==set(),'MISSING_SHELL_MEMBER')
  require({k for k in old_shell if old_shell[k]!=new_shell[k]}==
@@ -74,7 +78,7 @@ def promote(checkout,producer):
  }
  proposed['bundle_catalog']['bundles'][COMPONENT_KEY]=row
  proposed['bundle_sources'][COMPONENT_KEY]={
-     'artifact':'Chooser-Original-UI-Version-Labels-40509014993',
+     'artifact':'Chooser-Original-UI-Version-Labels-40590499416',
      'build_source':PRODUCER_SOURCE,
      'path':'CHOOSER_SHELL.zip','run_id':PRODUCER_RUN
  }
