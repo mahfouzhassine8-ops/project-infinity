@@ -42,6 +42,21 @@ def validate(authority):
               (authority.get('guard_schema',1)==2 or '/InfinityCloseNativeLease' not in k)}
     require(bool(expected) and authority.get('protected_contract')==expected,'PROTECTED_CONTRACT')
     require(authority.get('accepted_pointer_updated') is False,'PHYSICAL_ACCEPTANCE_REQUIRED')
+    # The three displayed labels come from actual packaged metadata, not UI constants.
+    # The third (app) version is read from Android's signed PackageInfo.
+    labels=authority.get('experience_version_labels')
+    if labels is not None:
+        require(set(labels)=={'INFINITY','COBRA'},'EXACT_EXPERIENCE_LABEL_VECTOR')
+        require(all(type(labels[o]) is int and labels[o]>=2103420 and
+                    labels[o]<=authority['candidate_versionCode'] for o in ('INFINITY','COBRA')),
+                'INVALID_LAST_UPDATED_VERSION')
+        history=('infinity.last_updated_in='+str(labels['INFINITY'])+'\\n'+
+                 'cobra.last_updated_in='+str(labels['COBRA'])+'\\n')
+        # Convert the literal escaped newlines into the file's exact UTF-8 lines.
+        history=history.replace('\\n','\n')
+        expected={'owner':'CHOOSER_SHELL','sha256':digest(history.encode('utf-8'))}
+        require(payload.get('member:assets/experience-component-updates.properties')==expected,
+                'PACKAGED_VERSION_LABELS_MISMATCH')
     return authority
 
 def verify(authority,actual,version,generation):
@@ -67,7 +82,22 @@ def transition(previous,proposed,targets):
         require(all(proposed['protected_contract'].get(k)==v for k,v in previous['protected_contract'].items()),
                 'EVIDENCE_REFRESH_WEAKENED_CONTRACT')
         return True
-    require(bool(targets) and targets<={'INFINITY','COBRA'},'SEPARATE_SHARED_SCOPE_REQUIRED')
+    require(bool(targets) and targets<={'INFINITY','COBRA','CHOOSER_SHELL'},'SEPARATE_SHARED_SCOPE_REQUIRED')
+    # A chooser-only update is independent of both experience owners and the
+    # durability contract. Last-updated numbers must follow owner changes.
+    prior_labels=previous.get('experience_version_labels')
+    if prior_labels is None:
+        require(previous['components']['INFINITY']['digest']=='ec27bce6252cbce21eecef0963285db720059e6c4ce27448f9ef441a8cb18f61' and
+                previous['components']['COBRA']['digest']=='7091c30cff244beb75f900236da87d016a14573981aa84b7eee454080c23adf7',
+                'UNVERIFIED_HISTORICAL_OWNER_VERSION_BINDING')
+        prior_labels={'INFINITY':2103421,'COBRA':2103423}
+    next_labels=proposed.get('experience_version_labels')
+    require(next_labels is not None,'MISSING_VERSION_HISTORY_ON_NEW_RELEASE')
+    for experience in ('INFINITY','COBRA'):
+        expected=proposed['candidate_versionCode'] if experience in targets else prior_labels[experience]
+        require(next_labels[experience]==expected,'LAST_UPDATED_VERSION_ROLLBACK:'+experience)
+    if next_labels!=previous.get('experience_version_labels'):
+        require('CHOOSER_SHELL' in targets,'UPDATED_LABELS_REQUIRE_SHELL_BUNDLE')
     require(proposed['candidate_versionCode']>previous['candidate_versionCode'],'APP_ROLLBACK')
     require(proposed['last_issued_versionCode']>=previous['last_issued_versionCode'],'ISSUED_VERSION_ROLLBACK')
     require(proposed['protected_contract']==previous['protected_contract'],'SEPARATE_LIFECYCLE_AUTHORIZATION_REQUIRED')
