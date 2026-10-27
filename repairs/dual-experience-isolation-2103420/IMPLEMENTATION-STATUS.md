@@ -2,6 +2,13 @@
 
 **BLOCKED_BY_SHARED_PERSISTENCE_AND_BACKGROUND_LIFECYCLE. No signed candidate.**
 
+[GitHub Actions run 40429181073](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/40429181073)
+reproduced the inventory and registry exactly, passed all 13 host tests and the
+actual APK negative controls, then failed at the hard gate with
+`UNRESOLVED_RELEASE_BLOCKERS`. Original-key signing and signed-APK upload were
+skipped. The run's real conclusion is **failure**, as required for a blocked
+release; the receipt is [CI-40429181073.json](results/CI-40429181073.json).
+
 Codex implemented the actual-binary inventory, initial component fingerprint
 partitions, baseline accepted registry, deterministic preservation assembler,
 pre-sign gate, controlled negative tests, and combined-release workflow. This is

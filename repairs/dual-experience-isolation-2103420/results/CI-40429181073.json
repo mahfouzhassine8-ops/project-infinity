@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "status": "BLOCKED_BY_SHARED_PERSISTENCE_AND_BACKGROUND_LIFECYCLE",
+  "repository": "mahfouzhassine8-ops/project-infinity",
+  "source_commit": "3979bcbe4d6eeb210d2ca4f3f9430cff18b98d38",
+  "workflow_run": 40429181073,
+  "workflow_url": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/40429181073",
+  "job_id": 121942410860,
+  "actual_workflow_conclusion": "failure",
+  "host_tests": {"run": 13, "failures": 0, "errors": 0},
+  "exact_inventory_and_registry_reproduction": "success",
+  "original_baseline_certificate_and_payload_verification": "success",
+  "unsigned_preservation_assembly": "success",
+  "actual_apk_negative_controls": "success",
+  "pre_sign_gate": {"conclusion": "failure", "reason": "UNRESOLVED_RELEASE_BLOCKERS"},
+  "original_key_signing_step": "skipped",
+  "signed_apk_upload_step": "skipped",
+  "signed_candidate_produced": false,
+  "evidence_artifact": {
+    "id": 12700479032,
+    "name": "Infinity-Combined-Gate-Evidence-40429181073",
+    "sha256": "c1a8e5f76b0f92aa88ba2e3ca4f50b282a3a0b5734ae17b5477190baab315d15"
+  },
+  "protected_lock_commit": "883c64a4de6f87077893921454de71bba850235b",
+  "accepted_combined_pointer": "UNCHANGED_2103420",
+  "runtime_isolation_complete": false,
+  "application_tests": "NOT_RUN",
+  "shutdown_tests": "NOT_RUN",
+  "physical_Fold": "NOT_REQUESTED_NO_MEANINGFUL_SIGNED_CANDIDATE"
+}
