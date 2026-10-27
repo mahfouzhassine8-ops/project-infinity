@@ -50,10 +50,8 @@ def validate(authority):
         require(all(type(labels[o]) is int and labels[o]>=2103420 and
                     labels[o]<=authority['candidate_versionCode'] for o in ('INFINITY','COBRA')),
                 'INVALID_LAST_UPDATED_VERSION')
-        history=('infinity.last_updated_in='+str(labels['INFINITY'])+'\\n'+
-                 'cobra.last_updated_in='+str(labels['COBRA'])+'\\n')
-        # Convert the literal escaped newlines into the file's exact UTF-8 lines.
-        history=history.replace('\\n','\n')
+        history=('infinity.last_updated_in='+str(labels['INFINITY'])+'\n'+
+                 'cobra.last_updated_in='+str(labels['COBRA'])+'\n')
         expected={'owner':'CHOOSER_SHELL','sha256':digest(history.encode('utf-8'))}
         require(payload.get('member:assets/experience-component-updates.properties')==expected,
                 'PACKAGED_VERSION_LABELS_MISMATCH')
