@@ -6,12 +6,12 @@
   "bundle_catalog": {
     "bundles": {
       "CHOOSER_SHELL": {
-        "approved_source": "9efaeabee45389b7c919ae1a3d88c394b1804173",
-        "digest": "1c27b2bc8a50d86a11e1c9bc3384902ccad9fa21f52b7c569be40e1d5bce3ba8",
+        "approved_source": "709e2e43a5c1f4510a2bde0437f56b504177e43b",
+        "digest": "e09360a6ae8cd4546eef954fc7a5f5ca04e5adaa09d5c3f7e8b7aaa308858c86",
         "file": "CHOOSER_SHELL.zip",
         "settings_schema": "original-launch-preference",
-        "sha256": "d57912e7a7020b0fbc441a067f09e3e6512501f450072c6c6cf71135aab13952",
-        "version": "2103420.container.1"
+        "sha256": "5bc9f0541ef073e5792a9428aea87bda601d668f0309653209fdab238d610191",
+        "version": "2103420.container.2.labels.1"
       },
       "COBRA": {
         "approved_source": "207949de66e09cc8cf4d493cafdb324dbc29475c",
@@ -46,10 +46,10 @@
   },
   "bundle_sources": {
     "CHOOSER_SHELL": {
-      "artifact": "Infinity-Combined-Owner-Components-40447183241",
-      "build_source": "b69d18637658be676605c61e5a8792ab5ca179cb",
+      "artifact": "Chooser-Original-UI-Version-Labels-40509014993",
+      "build_source": "709e2e43a5c1f4510a2bde0437f56b504177e43b",
       "path": "CHOOSER_SHELL.zip",
-      "run_id": 40447183241
+      "run_id": 40509014993
     },
     "COBRA": {
       "artifact": "Cobra-All-Layout-Reflow-Owner-40485414619",
@@ -70,15 +70,15 @@
       "run_id": 40447183241
     }
   },
-  "candidate_versionCode": 2103423,
+  "candidate_versionCode": 2103424,
   "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
   "components": {
     "CHOOSER_SHELL": {
-      "approved_source": "9efaeabee45389b7c919ae1a3d88c394b1804173",
-      "digest": "1c27b2bc8a50d86a11e1c9bc3384902ccad9fa21f52b7c569be40e1d5bce3ba8",
-      "revision": 1,
+      "approved_source": "709e2e43a5c1f4510a2bde0437f56b504177e43b",
+      "digest": "e09360a6ae8cd4546eef954fc7a5f5ca04e5adaa09d5c3f7e8b7aaa308858c86",
+      "revision": 2,
       "settings_schema": "original-launch-preference",
-      "version": "2103420.container.1"
+      "version": "2103420.container.2.labels.1"
     },
     "COBRA": {
       "approved_source": "207949de66e09cc8cf4d493cafdb324dbc29475c",
@@ -102,45 +102,45 @@
       "version": "isolation-contract.1"
     }
   },
-  "generation": 6,
+  "generation": 7,
   "guard_schema": 2,
-  "last_issued_versionCode": 2103420,
+  "last_issued_versionCode": 2103423,
   "owner_update_evidence": {
-    "component_zip_sha256": "eb30afa0e1ab9f50da897db27a604cb79a47059ff355c763dc7d7c955ddbcb6b",
-    "errors": 0,
-    "failures": 0,
-    "geometry_tests": 6,
-    "installed_base_report": "User reported installing 421; accepted pointer is not advanced",
-    "owner": "COBRA",
-    "physical_Fold": "PENDING",
+    "owner": "CHOOSER_SHELL",
+    "producer_source": "709e2e43a5c1f4510a2bde0437f56b504177e43b",
+    "producer_run": 40509014993,
+    "component_zip_sha256": "5bc9f0541ef073e5792a9428aea87bda601d668f0309653209fdab238d610191",
     "preservation": {
-      "baseline_apk_sha256": "a1ea9442cd8ff82be09c34cc7c84887178fb162b8397005bba656ff6e28f5637",
-      "changed_original_activity_methods": [
-        "onCreate(Landroid/os/Bundle;)V"
+      "added_class": [
+        "com/projectinfinity/kodi/ChooserReleaseMetadata.smali"
       ],
-      "changed_original_classes": [
-        "Lcom/projectinfinity/kodi/InfinityLiveActivity;",
-        "Lcom/projectinfinity/kodi/CobraComponent;"
+      "all_other_owner_bundles_unchanged": true,
+      "app_version_source": "Android package manager actual manifest versionCode",
+      "exact_unchanged_shell_classes": 148,
+      "modified_original_classes": [
+        "com/projectinfinity/kodi/InfinityGlassChooser$Card.smali",
+        "com/projectinfinity/kodi/InfinityGlassChooser$Stage.smali"
       ],
-      "existing_activity_methods_verified": 1800,
-      "new_classes": [
-        "Lcom/projectinfinity/kodi/CobraWindowReflow$Owner;",
-        "Lcom/projectinfinity/kodi/CobraWindowReflow;"
-      ],
-      "player_retune_seek_audio_shutdown_methods_changed": false,
-      "status": "PASS_COBRA_DELTA_PRESERVATION",
-      "unchanged_cobra_classes": 7118
-    },
-    "producer_run": 40485414619,
-    "producer_source": "207949de66e09cc8cf4d493cafdb324dbc29475c",
-    "test_inputs": {
-      "production_dex": {
-        "part-0.dex": "37c84838ed0092ab411fba2237bbf8fbf557c0220517b6a09ab10a384a924595",
-        "part-1.dex": "11028fc8f629069015a30baed955755f4de7ba9320fec7dcc7a692ae0f0ba84b"
+      "new_shell_class_count": 151,
+      "offline_component_history": {
+        "COBRA": 2103423,
+        "INFINITY": 2103421
       },
-      "runtime": "Robolectric API35; translated actual production DEX; disposable views and data; no native playback or shutdown scenario",
-      "test_source_sha256": "804116ea7fbfea3d4cdea732b77e17241fb16415f70a296fa10c72ebef641ff1"
-    }
+      "old_shell_class_count": 150,
+      "signed_base_sha256": "4cbbf963be72904de962f434d00ee5f9d5080de6b6b9fd4b3e31ab1d6ac01aff",
+      "status": "PASS_TARGETED_SHELL_ONLY"
+    },
+    "physical_Fold": "PENDING",
+    "accepted_pointer_updated": false,
+    "signed_baseline_2103423_sha256": "4cbbf963be72904de962f434d00ee5f9d5080de6b6b9fd4b3e31ab1d6ac01aff",
+    "changed_owners": [
+      "CHOOSER_SHELL"
+    ],
+    "unchanged_owners": [
+      "INFINITY",
+      "COBRA",
+      "MINIMAL_ANDROID_CONTRACT"
+    ]
   },
   "package": "com.projectinfinity.kodi",
   "payload": {
@@ -25698,7 +25698,7 @@
     },
     "class:Lcom/projectinfinity/kodi/InfinityGlassChooser$Card;": {
       "owner": "CHOOSER_SHELL",
-      "sha256": "a0b9715106f19a2f913b09285c116585a390db47fb1c11037c5e5f52c5e80e1d"
+      "sha256": "00b7aad65f449c0e56d242d7607eece2a482d6c62b0c02416c09b6a90245e773"
     },
     "class:Lcom/projectinfinity/kodi/InfinityGlassChooser$CosmicBackdrop$$ExternalSyntheticLambda0;": {
       "owner": "CHOOSER_SHELL",
@@ -25730,7 +25730,7 @@
     },
     "class:Lcom/projectinfinity/kodi/InfinityGlassChooser$Stage;": {
       "owner": "CHOOSER_SHELL",
-      "sha256": "dd90cd8f81bf024aae88e820e35fc09b8727227bdde7430f6d62774f240dd2f8"
+      "sha256": "0b0f349cb4285485d5668871bef6a17bae62b23103c44e8bdad8c85604d4157d"
     },
     "class:Lcom/projectinfinity/kodi/InfinityGlassChooser;": {
       "owner": "CHOOSER_SHELL",
@@ -66255,9 +66255,17 @@
     "member:resources.arsc": {
       "owner": "MINIMAL_ANDROID_CONTRACT",
       "sha256": "1b8c1788a5a86242635277f063ebdce6b82ed12eafe3cfdf331b902c8eb7e616"
+    },
+    "class:Lcom/projectinfinity/kodi/ChooserReleaseMetadata;": {
+      "owner": "CHOOSER_SHELL",
+      "sha256": "68c45c1a489ffb17094914861cd7c0e6c59a339e7840b02b4de016063cdc6908"
+    },
+    "member:assets/experience-component-updates.properties": {
+      "owner": "CHOOSER_SHELL",
+      "sha256": "652f0e3d6276006214b9a64de9ea08b1f2c3a15ca6a1c0265da6822885ba95f6"
     }
   },
-  "previous_authority_sha256": "9abe238252336cf35e7a1f37653a5de839866b60d149315892c53d219d9625db",
+  "previous_authority_sha256": "a5cbf4b6dbdac9bd2d541971f0e9b374ff5de9f72cc754da83a637a1ae218062",
   "proofs": {
     "COMBINATION-CONTROLS.json": "bcb21adb63fefb898a8e8799d9892f76e382315518d8e94b51c42060cc5ece83",
     "OWNER-CONTRACT.json": "dd0fdfdcb7715777007984969bfac45b36f3e4ef04023b5ba1884c67904d0846",
@@ -66423,14 +66431,14 @@
     "repairs/dual-experience-isolation-2103420/component_bundles.py": "1aca1f237a1987998f243d013fde991413c491b9e72706deda4853b1b1d642d6",
     "repairs/dual-experience-isolation-2103420/create_authority.py": "be6da193e7fbc242fb84996ae7a0b463c7ede025687c7b71db14c8babfbc2672",
     "repairs/dual-experience-isolation-2103420/inventory.py": "574c64b0a15200ba6f9971a2834f6cdb629dddd5ab5418186c4d5255d6e73bcb",
-    "repairs/dual-experience-isolation-2103420/ownership-reviewed-roots.json": "b767f71ea914b70e12e3ae7054d0b79b4bc1220466085ffbf4b13cb879324576",
+    "repairs/dual-experience-isolation-2103420/ownership-reviewed-roots.json": "4bb2276422fdea5ac325c146ec98ba16947d9e0ad83292a692cb29b22e81529b",
     "repairs/dual-experience-isolation-2103420/prepare_host_tests.py": "5d2671de5b361c5dbace42a5567a736226f50957353e77eec5a60042c631a3a7",
     "repairs/dual-experience-isolation-2103420/prepare_runtime.py": "e59faac2489d7ce3b0d2deae8469d627e8f463b8c445806b3d232ec572c3d1a7",
     "repairs/dual-experience-isolation-2103420/propose_cobra_reflow.py": "31dda989cdf3bc3d3372565fcb44e7dd5d11db935c6961ac3905e4a91df23425",
     "repairs/dual-experience-isolation-2103420/refresh_authority_evidence.py": "a2c0d74a831246bba1b53305d35a5273b8185cf1068c11dceb772df22d6519e5",
-    "repairs/dual-experience-isolation-2103420/release_authority.py": "99949c70485f04526fd5755a6492bd7bac5e246820058febeffa02facbc8a332",
+    "repairs/dual-experience-isolation-2103420/release_authority.py": "a8efa1da5bc147fc2bdc5f5d02cc4980ff600c0943c1cb979f56afd076c8c355",
     "repairs/dual-experience-isolation-2103420/release_gate.py": "b2852e3f2b98e1f2f1e9d06e739247b247e15b85f06712d563e151a86556252e",
-    "repairs/dual-experience-isolation-2103420/review_ownership.py": "4390b19529866cb09d16855ce6106aa9395d9f57cbebfa8490a3a182881a694b",
+    "repairs/dual-experience-isolation-2103420/review_ownership.py": "c15ccd51c71fa2055d805a42ef2c8c8d32fac4672e983e61cba31f4be172fb83",
     "repairs/dual-experience-isolation-2103420/run_owner_contract_tests.py": "46e31c7079d5c2278ad0860d1f977b262813ad98065caa7b41bb9921b20f05ca",
     "repairs/dual-experience-isolation-2103420/runtime/CobraBackgroundSettings.java": "261857d5534c27b323ae17d63b006e095c54c49a159401fb970439b6b21a59eb",
     "repairs/dual-experience-isolation-2103420/runtime/CobraComponent.java": "46ea9059c9f59a20de4634d75c3f835e4e39d688ac6769d1cb00bd2d430d7d7a",
@@ -66443,7 +66451,7 @@
     "repairs/dual-experience-isolation-2103420/runtime/ExperienceLaunchPreferences.java": "00628d662820955ffd29a7c82444f922947725d4d94ae91f74360f28588f9d0b",
     "repairs/dual-experience-isolation-2103420/runtime/InfinityComponent.java": "6bc9a7d6a3452761dab7973ff117cebb74794f8bf665a7f4b8550c7a7e1bccb2",
     "repairs/dual-experience-isolation-2103420/runtime/ShellComponent.java": "07eb02e03f5ba4445a4121e614cec62c149699bb76e0630d29e9b204ce633fcc",
-    "repairs/dual-experience-isolation-2103420/signer-policy.json": "bcaa210584f4e1dd0cdc1e0737ca011df5e019e26b95e174eb8aa034c55759f7",
+    "repairs/dual-experience-isolation-2103420/signer-policy.json": "86fdb77f59e724960a502450b8e2bf96bbd73d57b06685d95fb285fe9d3695b3",
     "repairs/dual-experience-isolation-2103420/signer_policy.py": "ee7e23d29858cc40d2a8e15e3b77f2d2299609b0eb2c7bde3b26647a549442bb",
     "repairs/dual-experience-isolation-2103420/test_actual_apk.py": "f9142e5e22f2f44bc8905ade54c4729b4b33f9ea077483e15f170b42caa97442",
     "repairs/dual-experience-isolation-2103420/test_component_matrix.py": "bdc9a3e0211a51801a94607d8a5b07ee11e6229b0cd56783df756d984a6d67b7",
@@ -66453,8 +66461,12 @@
   },
   "status": "ENGINEERING_REVIEWED_FOLD_PENDING",
   "target_owners": [
-    "COBRA"
+    "CHOOSER_SHELL"
   ],
   "update_kind": "owner_update",
-  "workflow_sha256": "83c7a4904eb88f083211e3f922c5825a039990fc143e6250f7e1c66d0ab90880"
+  "workflow_sha256": "83c7a4904eb88f083211e3f922c5825a039990fc143e6250f7e1c66d0ab90880",
+  "experience_version_labels": {
+    "INFINITY": 2103421,
+    "COBRA": 2103423
+  }
 }
