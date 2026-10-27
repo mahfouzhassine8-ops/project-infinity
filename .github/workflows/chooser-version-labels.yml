@@ -85,7 +85,7 @@ jobs:
     needs: chooser
     if: github.ref == 'refs/heads/work/chooser-version-labels-from-2103423-20261027'
     permissions:
-      contents: read
+      contents: write
       actions: read
     runs-on: ubuntu-22.04
     timeout-minutes: 15
@@ -106,14 +106,14 @@ jobs:
           python-version: '3.12'
       - uses: actions/download-artifact@v4
         with:
-          run-id: 40509014993
-          name: Chooser-Original-UI-Version-Labels-40509014993
+          run-id: 40590499416
+          name: Chooser-Original-UI-Version-Labels-40590499416
           github-token: ${{ github.token }}
           path: producer
       - name: Verify exact producer, immutable Infinity and Cobra and reserve 2103424
         run: |
           set -euo pipefail
-          [[ "$(git -C integration rev-parse HEAD)" == "690723bad77a91f3aeaa12e4ae384677f7da2f8c" ]] || {
+          [[ "$(git -C integration rev-parse HEAD)" == "d49d930828d734ef3a63d1039b6dd82862e96708" ]] || {
             echo "REFUSED: integration authority changed since approved review"; exit 1;
           }
           python3 chooser/repairs/chooser-version-labels-2103423/promote.py --checkout integration --producer producer
@@ -138,3 +138,28 @@ jobs:
             "preserved_versions":{k:j["components"][k]["version"] for k in ("INFINITY","COBRA","MINIMAL_ANDROID_CONTRACT")}}
           print("AUTHORITY_DELTA_JSON="+json.dumps(result,sort_keys=True,separators=(",",":")))
           PY
+
+      - name: Stage authority in a new PR branch only; never touch signed integration or protected lock
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EXPECTED_AUTHORITY_SHA: d49d930828d734ef3a63d1039b6dd82862e96708
+          PR_BRANCH: work/chooser-release-authority-2103424-20261027
+        run: |
+          set -euo pipefail
+          current=$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/work/infinity-cobra-isolation-from-2103420-20261026" --jq '.object.sha')
+          candidate=$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/${PR_BRANCH}" --jq '.object.sha')
+          [[ "$current" == "$EXPECTED_AUTHORITY_SHA" && "$candidate" == "$EXPECTED_AUTHORITY_SHA" ]] || {
+            echo "REFUSED: reviewed integration or isolated proposal branch moved"; exit 1;
+          }
+          old_blob=$(gh api "repos/${GITHUB_REPOSITORY}/contents/repairs/dual-experience-isolation-2103420/release-authority.json?ref=${PR_BRANCH}" --jq '.sha')
+          python3 - "$old_blob" <<'PY'
+          import base64,json,os,sys
+          from pathlib import Path
+          p=Path("integration/repairs/dual-experience-isolation-2103420/release-authority.json")
+          payload={
+            "message":"release: stage verified chooser-only 2103424 owner authority; preserve Infinity and Cobra",
+            "content":base64.b64encode(p.read_bytes()).decode("ascii"),
+            "sha":sys.argv[1],"branch":os.environ["PR_BRANCH"]}
+          Path("chooser-authority-upload.json").write_text(json.dumps(payload,separators=(",",":")))
+          PY
+          gh api --method PUT --input chooser-authority-upload.json "repos/${GITHUB_REPOSITORY}/contents/repairs/dual-experience-isolation-2103420/release-authority.json" --jq '.commit.sha'
