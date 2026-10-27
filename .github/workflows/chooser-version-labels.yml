@@ -53,6 +53,8 @@ jobs:
             --apk signed2103423/Infinity-2103423-Combined-Original-Signer.apk \
             --bundles source-components \
             --jars pinned-tools/receipt-evidence/tool-jars \
+            --android pinned-tools/receipt-evidence/android-34.jar \
+            --d8 "$ANDROID_HOME/build-tools/35.0.0/lib/d8.jar" \
             --out chooser-build \
             --source "$GITHUB_SHA"
           python3 - <<'PY'
@@ -61,6 +63,7 @@ jobs:
           p=json.loads(Path('chooser-build/PRESERVATION.json').read_text())
           assert p['status']=='PASS_TARGETED_SHELL_ONLY'
           assert p['exact_unchanged_shell_classes']==148
+          assert p['original_HM_caption_preserved'] and p['stage_measure_and_layout_unmodified']
           assert p['offline_component_history']=={'INFINITY':2103421,'COBRA':2103423}
           assert Path('chooser-build/CHOOSER_SHELL.zip').exists()
           PY
