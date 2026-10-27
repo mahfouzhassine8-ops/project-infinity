@@ -1,0 +1,84 @@
+name: Chooser 2103424 | protected unsigned release authority proposal
+on:
+  push:
+    branches: [work/chooser-version-labels-from-2103423-20261027]
+    paths:
+      - .github/workflows/chooser-promote-release-2103424.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+  actions: read
+concurrency:
+  group: chooser-version-labels-2103424-proposal
+  cancel-in-progress: false
+jobs:
+  propose:
+    if: github.ref == 'refs/heads/work/chooser-version-labels-from-2103423-20261027'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: work/chooser-version-labels-from-2103423-20261027
+          path: chooser
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: work/infinity-cobra-isolation-from-2103420-20261026
+          path: integration
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40509014993
+          name: Chooser-Original-UI-Version-Labels-40509014993
+          github-token: ${{ github.token }}
+          path: producer
+      - name: Validate sole reviewed chooser release authority, never use signing credentials
+        run: |
+          set -euo pipefail
+          [[ "$(git -C integration rev-parse HEAD)" == "690723bad77a91f3aeaa12e4ae384677f7da2f8c" ]] || {
+            echo "REFUSED: integration branch changed since scope review"; exit 1;
+          }
+          [[ "$(git -C chooser rev-parse HEAD)" != "" ]] || exit 1
+          python3 chooser/repairs/chooser-version-labels-2103423/promote.py --checkout integration --producer producer
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('integration/repairs/dual-experience-isolation-2103420/release-authority.json')
+          d=json.loads(p.read_text())
+          assert d['generation']==7 and d['candidate_versionCode']==2103424
+          assert d['target_owners']==['CHOOSER_SHELL']
+          assert d['experience_version_labels']=={'INFINITY':2103421,'COBRA':2103423}
+          assert d['owner_update_evidence']['changed_owners']==['CHOOSER_SHELL']
+          assert d['accepted_pointer_updated'] is False
+          PY
+          [[ "$(git -C integration diff --name-only)" == "repairs/dual-experience-isolation-2103420/release-authority.json" ]] || {
+            echo "REFUSED: unexpected source modification"; exit 1;
+          }
+          git -C integration diff --check
+      - name: Submit unsigned reviewed release authority on a staging branch
+        run: |
+          set -euo pipefail
+          git -C integration switch -c work/chooser-2103424-release-authority-20261027
+          git -C integration config user.name "github-actions[bot]"
+          git -C integration config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C integration add repairs/dual-experience-isolation-2103420/release-authority.json
+          git -C integration diff --cached --exit-code -- . ':(exclude)repairs/dual-experience-isolation-2103420/release-authority.json'
+          git -C integration commit -m "release: stage reviewed chooser-only 2103424 authority; preserve Infinity and Cobra"
+          git -C integration push origin HEAD:refs/heads/work/chooser-2103424-release-authority-20261027
+      - name: Write promotion receipt
+        if: always()
+        run: |
+          echo "Producer: signed2103423 -> exact validated chooser-only owner artifact 40509014993" > chooser-promotion.txt
+          echo "No keystore or signer used in this workflow." >> chooser-promotion.txt
+          echo "Only a staging branch may be pushed; final signed release requires a protected integration merge and the sole official signer." >> chooser-promotion.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Chooser-2103424-Authority-Proposal-Evidence-${{ github.run_id }}
+          path: chooser-promotion.txt
+          if-no-files-found: warn
