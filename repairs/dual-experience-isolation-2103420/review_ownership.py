@@ -30,6 +30,7 @@ def class_owner(name,text,policy):
 def member_owner(name):
     if name in SIGNATURE:return 'MINIMAL_ANDROID_CONTRACT'
     if re.fullmatch(r'classes\d*\.dex',name):return 'DEX_CONTAINER'
+    if name=='assets/experience-component-updates.properties':return 'CHOOSER_SHELL'
     if name.startswith('assets/addons/script.infinity.cobra.theme/'):return 'COBRA'
     if name.startswith(('assets/addons/','assets/python3.11/','assets/system/','assets/media/','assets/userdata/','assets/infinity/','lib/')):return 'INFINITY'
     if re.fullmatch(r'assets/infinity-\d+-components.json',name):return 'INFINITY'
