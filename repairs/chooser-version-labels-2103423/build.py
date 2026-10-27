@@ -108,6 +108,14 @@ def build(apk,bundles,jars,out,source):
  run('java','-cp',str(jars/'*'),'org.jf.baksmali.Main','disassemble','--sequential-labels',out/'old.dex','-o',oldsmali)
  import shutil
  shutil.copytree(oldsmali,newsmali)
+ # Introspect only the actual signed 2103423 layout, not historical previews.
+ stage_inspect=(newsmali/'com/projectinfinity/kodi/InfinityGlassChooser$Stage.smali').read_text()
+ print('CHOOSER_ACTUAL_STAGE_FIELDS', '\\n'.join(x for x in stage_inspect.splitlines() if x.startswith('.field') or x.startswith('.super')))
+ import re as re_inspect
+ for kind,sig in [('constructor',r'constructor <init>\\(Landroid/content/Context;ZLcom/projectinfinity/kodi/InfinityGlassChooser\\$Actions;\\)V'),('measure',r'protected onMeasure\\(II\\)V'),('layout',r'protected onLayout\\(ZIIII\\)V')]:
+  mm=re_inspect.search(r'^\\.method '+sig+r'\\n.*?^\\.end method',stage_inspect,re_inspect.M|re_inspect.S)
+  if mm:
+   print('CHOOSER_ACTUAL_'+kind.upper(), '\\n'.join(mm[0].splitlines()[:150]))
  patch(newsmali)
  run('java','-cp',str(jars/'*'),'org.jf.smali.Main','assemble','--api','21',newsmali,'-o',out/'new.dex')
  verify_smali=out/'verify-smali'
