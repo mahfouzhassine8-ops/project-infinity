@@ -1,0 +1,701 @@
+{
+  "copied_methods_checked": 311,
+  "explicit_original_method_deltas": [
+    {
+      "after": "c848e25ca0068c9a5f58744e0d39d0ee0d2c08c81c08b0bad8d02d282319312e",
+      "before": "71388a711051f4707ccb65ee477a4d64ba1e68f8e27bf74a2edec873813f76a8",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity;",
+      "method": "access$20300(Lcom/projectinfinity/kodi/InfinityLiveActivity;)Lcom/projectinfinity/kodi/InfinityExtendedBackgroundService$MiniPlaybackOwner;"
+    },
+    {
+      "after": "cd8b9ec7a80407b20a11566966e4c0428f2150fa5c7da3280650030fb47d8f8a",
+      "before": "0011de8bd54f067822315e3784c6dd3ab9719bfa25a28188c81d49428aae6e3e",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity;",
+      "method": "closeCobraAsyncWork()V"
+    },
+    {
+      "after": "cdb0268909f2c687c2f8099d2471be0288901ae0e55d49816c31a40ad45f04eb",
+      "before": "bf21cadacf026e366a37b774f16786e7facf32bb251d9010f7f12da6ecb5f806",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity;",
+      "method": "cobraBackgroundModeLabel()Ljava/lang/String;"
+    },
+    {
+      "after": "6a216df54c678a15ba00a00f12aedc8309a983c5b2fdc9d330788369b46168cc",
+      "before": "5376bcc84a498a5265d1ecd6a03f77aa8b0c7fc32c9a2721820d41ac51214302",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity;",
+      "method": "cobraEndMiniBackgroundPlayback()V"
+    },
+    {
+      "after": "6bcd8cdb03f0ceec707a3ece37c1952d4847ac60afac075e864ac5c0f9dbd0d2",
+      "before": "e76cebb105aa5e20fdaed4dc89ddb6ac452286966ee5b956e9a74790a5414268",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity;",
+      "method": "cobraFreshHealthSnapshot()Ljava/lang/String;"
+    },
+    {
+      "after": "9f4adbd0b22caf0426f5172abb9985af5afc69b4822c4b2934fe1bc1ea1aee37",
+      "before": "94dd0d51c1a50d935f9c1b58262d945c1fff535a7e7578da2db2d52778d33260",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity;",
+      "method": "cobraNetworkFamilyMode()I"
+    },
+    {
+      "after": "1763e36299180388dc1ff4469c26d4975aeb762f3c7d4a9ca869904a5a7ab92a",
+      "before": "b367387017e08674a45ae4e09ed62db8aaebf8e7ae3315fa2fd54dcd68521804",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity;",
+      "method": "cobraPlaybackSessionCardSnapshot()Lorg/json/JSONObject;"
+    },
+    {
+      "after": "9b63f37e52c593b077f1cdcae3b5f4e6cc1fe1347eff8b3f484c3a7f2c94e6d5",
+      "before": "d0cc61b6b237960306f937ef4c4a34fb825079237f585d78a4e4924daff785e3",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity;",
+      "method": "cobraPlayerRotationMode()I"
+    },
+    {
+      "after": "4ea2e44d5c4fcfbdbe09fcef1fd8beb35d395128b7941bb1837ea452d64d96b6",
+      "before": "7ad5d5d6d13f9fd6833ad3812c2af47059344dd814ca5fec139aa1052d13ffd4",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity;",
+      "method": "cobraPruneShortGuideCache()V"
+    },
+    {
+      "after": "956fc52b9f92a4c064b18bf6e0bca9ae799e119996e52ccfd1808e1b82baced7",
+      "before": "cd421f08341e948ce0451550c36814bf83761ef06f2210547358c862e66e6a73",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity;",
+      "method": "cobraPruneSourceGuideSnapshots(Ljava/lang/String;Ljava/io/File;)V"
+    },
+    {
+      "after": "706eca095eb6d60eca66bb7e98d18d6ca0c0cf43313f2626f7da406d5423af28",
+      "before": "38cf774a2a43628fc1754112697020a16dd8afb80dbe8739e6d39158d37e60c9",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity;",
+      "method": "cobraPublishMiniState()V"
+    },
+    {
+      "after": "2b2e77b14366fd0520a3963a73c39b038a19aed97b8db7cba40d67b7d9ec8b99",
+      "before": "ed2303b49ee765738cab7af3a26eb5d2483c227026957efec5d9fc599b766174",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity;",
+      "method": "cobraReadEpgCache(Ljava/lang/String;Ljava/lang/String;)Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraEpgData;"
+    },
+    {
+      "after": "e2dba8acc946b13efe97a7d8ff21c4b650abf380e4cbede42d36fd1462759cc5",
+      "before": "fde8cecb6c6918c93570c651a2bed61e9f88de6c644d4a4727ec6b3d9beac357",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity;",
+      "method": "cobraRefreshHealthSummary()V"
+    },
+    {
+      "after": "18185d0a774884f7b2dfc08d3a57fa71696a95087ba48439b42b5696bbd60cf0",
+      "before": "0853783d9a7e5ab3a6b4b1d084c320d8edcec577594923a9b0947625d3a21682",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity;",
+      "method": "cobraSaveNetworkFamilyMode(I)V"
+    },
+    {
+      "after": "04c2ff5ff6def7ef657dd64a55f46f1fcb60da7aa00cab8f69b176500a855b75",
+      "before": "68c1bad40fc75621da07e4f330d55a7f93ca093c96622b7055a384e0e507f9d5",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity;",
+      "method": "cobraStartOwnedMiniPlayback()Z"
+    },
+    {
+      "after": "defc7f43c22752fdcdbfba084138dc28c534130c669c1ea1aad9f12b76600edf",
+      "before": "68a54259a360f83b80ce1d6fc543ff43f707f0979ffa450ff12278ec10d9f119",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity;",
+      "method": "cobraTogglePlayerRotation()V"
+    },
+    {
+      "after": "0303e873f39bb624dd0f294b9aba1b64ad03126daf53980aa6cab0c77e04c910",
+      "before": "609c6d74801e24f5601f33a45efd6b6edaacf98c4754be57788e0d3da521b7ff",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity;",
+      "method": "cobraWriteEpgCache(Ljava/lang/String;Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraEpgData;)V"
+    },
+    {
+      "after": "39b952ec8c0428df5d3124b1bcbe48d703b6add56b79a51a3f6a8c1b831acedc",
+      "before": "7bc8bd881d5740a349501421e8dd643bcc8270a09d4101e4f30af22d8f25dfa4",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity;",
+      "method": "deleteCobraUiTree(Ljava/io/File;)V"
+    },
+    {
+      "after": "7f3d8e7151c0a980f56f71515684ee3466c81bd162ebdcbc89da168426216c93",
+      "before": "dd2d6a771afefefb34bc428f9fbc2cea5f6bf2f6f4bcda99d60a19f1e91ce608",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity;",
+      "method": "saveCobraLibraryCache(Ljava/util/ArrayList;Ljava/util/ArrayList;)V"
+    },
+    {
+      "after": "8922a996fb7891c5e141d402f92edfdd10c5ade4fcaeee4c0ab8ad3d0daa908f",
+      "before": "38df957af18d7ccba46eef2e747139b9263c253c908c265dee5c8e1bce11f309",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity;",
+      "method": "showCobraBackgroundModePicker()V"
+    },
+    {
+      "after": "feb365047880caec43e97d4a2824bd070a5a9b23f53bd812a7393e1c7c585d89",
+      "before": "cb7e7ef60b400a28ba8944f4eaff66378a649f76bfa6301da02fe9167d4cf315",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity;",
+      "method": "submitCobraIo(Ljava/lang/Runnable;)Z"
+    },
+    {
+      "after": "096c82026824ca715b1464e8425e54e036f10529524a542944c0d22ad929660e",
+      "before": "68bebf4f4399aeb673da6a97d782381884cf7b57eee800a5066a4d14ff8f475b",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity;",
+      "method": "writeCobraUiBytes(Ljava/io/File;[B)V"
+    },
+    {
+      "after": "5cdd15bbf486f04f5dc53fe728be9320e36c73588d5161eb865c6dee3b7eee31",
+      "before": "8e0f376f74d78532f2bb23afcac709875b4a11901b0e6dea95e0e6bb012ad95e",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity;",
+      "method": "lambda$cobraShowChannelSwitch$428$com-projectinfinity-kodi-InfinityLiveActivity(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;)V"
+    },
+    {
+      "after": "bec2b1cc930f410d3d9a2d21e1e45f39de7a89aa55374a777b95f7e2864e006f",
+      "before": "890c445b7a7731ab747cfc7b7923139d9ce382c5f2498cd0ef516ae65182f2a9",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity;",
+      "method": "lambda$showCobraBackgroundModePicker$429$com-projectinfinity-kodi-InfinityLiveActivity()V"
+    },
+    {
+      "after": "23c6aea4420ecaba0a4c6c8307a54500b86008f9007a6c3ae44ae186e48185a8",
+      "before": "a41e2005bd97ca74a95999d0221b3eb0ea1b57d5a640f9917fa6f41ea2b2db01",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity;",
+      "method": "lambda$showCobraBackgroundModePicker$430$com-projectinfinity-kodi-InfinityLiveActivity()V"
+    },
+    {
+      "after": "d10ce8bf04c1ef7ec6523ef9622053f8413e87d1136a3bbcf42ec6e1f64d0200",
+      "before": "161dc8207e7fec60031799681465724e0bdc724675ecdb8cb9f55dab43009623",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity;",
+      "method": "lambda$showCobraMiniBackgroundPicker$436$com-projectinfinity-kodi-InfinityLiveActivity()V"
+    },
+    {
+      "after": "1cded7bcb6072da5a7c16e927ab1d186cd83c55e7137eef67813d3c6d5f21350",
+      "before": "a9c45a6a2bb565cd00e1ace8ebac4b4b2b6fc6ec2dd34de37f40e33717494052",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity;",
+      "method": "lambda$showSettings$98$com-projectinfinity-kodi-InfinityLiveActivity(Landroid/view/View;)V"
+    },
+    {
+      "after": "53c68d7fdc00ed15fa7a7340231be955cc7d91b0eef2181529779bdfe3858bb3",
+      "before": "e6c7df6bb5aa2a0db476fce67b63fb67a069bfaaa5367aacbb9731ac2563649a",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity;",
+      "method": "onCreate(Landroid/os/Bundle;)V"
+    },
+    {
+      "after": "159d871291d702174fb4a1bd3d7e1544946942f309074db7008a82075e90802e",
+      "before": "92eb193aecc3eedeeb8b3dd54e35813cc2c82178c50e4ece0d024a976d3d5141",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity;",
+      "method": "onDestroy()V"
+    },
+    {
+      "after": "00cddc9f0ea3ccf407e11af344f79e191f9b60d8fec284c4fe15d9058ca01799",
+      "before": "70a3057c335ee247f72840740da35503fb3988560b12ee0c075b81c1ab5a23bc",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity;",
+      "method": "onNewIntent(Landroid/content/Intent;)V"
+    },
+    {
+      "after": "37905c782188cd38a6fe09d6c284dfa7e847547c7c7db100ebe7e659afec4774",
+      "before": "356a8407a9501bfbc3e3d626deac4cffc5ea0fa27588cfaf97c95dc11b25f66c",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity;",
+      "method": "onResume()V"
+    },
+    {
+      "after": "35a6d0ddc84bd0a5b543bc83056021b1bd01ee36b35a115532d3136be9d4edb2",
+      "before": "0e8b0aa933eafb28c3cce905fc65af90c4b1c8a092fbf4c84976e5b18b0dce86",
+      "class": "Lcom/projectinfinity/kodi/CobraVisualRenderer;",
+      "method": "<init>(Landroid/content/Context;)V"
+    },
+    {
+      "after": "8ed5a05d494d1986adf035dd0db0ccca37b08cb2dc8084c491779c0faec41e06",
+      "before": "69f4435c9ad390fee64ab44ab98001807afb5c1b166ff2980d32243112c434fb",
+      "class": "Lcom/projectinfinity/kodi/CobraVisualRenderer;",
+      "method": "restorePrevious(Landroid/app/Activity;Ljava/lang/Runnable;)V"
+    },
+    {
+      "after": "ea60a6d2197797383df15523a94eb3810147d3cd25644a53938867f2ecd3c876",
+      "before": "0818f6708f6ea21be7dd84f65a676cfae6283aa7161cbb15b3953011d20b569d",
+      "class": "Lcom/projectinfinity/kodi/InfinityGlassHealth;",
+      "method": "<init>(Landroid/app/Activity;Ljava/lang/String;Ljava/lang/String;Lcom/projectinfinity/kodi/InfinityGlassOptions$Appearance;)V"
+    },
+    {
+      "after": "b77a75c1d4360379d61c3309a047560dd535b832ae9367bb7a708605e3130b00",
+      "before": "8bfe64c894ac9f686251980619b3fb6e7632f5d1f1be4c38af427d4112e4d422",
+      "class": "Lcom/projectinfinity/kodi/InfinityStartupPreparation;",
+      "method": "subscribe(Landroid/content/Context;Lcom/projectinfinity/kodi/InfinityStartupTrace;Lcom/projectinfinity/kodi/InfinityStartupPreparation$Callback;)Lcom/projectinfinity/kodi/InfinityStartupPreparation$Ticket;"
+    },
+    {
+      "after": "c838e16c2b0dff7f5de3d94a487eaf8a94740392b67be0340683e6d8b0745d3a",
+      "before": "23402dc33732d00c4aa7e71354f99fc6f69bcbd417b7cdfc3746b63f3f2c865c",
+      "class": "Lcom/projectinfinity/kodi/InfinityCloseGuardService$1;",
+      "method": "onTransact(ILandroid/os/Parcel;Landroid/os/Parcel;I)Z"
+    },
+    {
+      "after": "6746c9ffb7a4f2ec8f1fd874324a0f09c82f78b460a71baa3cb598c6856ddf0b",
+      "before": "e437ede9efc7993830928b4ba4bb015a7c622e1a547bc306fd2cb69f1a62188c",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraLocalTimeshiftSession;",
+      "method": "delete(Ljava/io/File;)V"
+    },
+    {
+      "after": "d7c2bef37d4daa74e519c73f663e8698a2e3393ae57021513f88f0ba3083c9ca",
+      "before": "2b4cb8fd2010966a2e37f6b84c72788ad24b6d02d8bc1bf1eae8a4a27a11be99",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraLocalTimeshiftSession;",
+      "method": "finishSegment(Z)V"
+    },
+    {
+      "after": "5f2805e3a04698d88a97c5bde20a871811a18911f7276ce017c989a42902726e",
+      "before": "f9de0099127894923563ce2e80a1875658cac2e5a815c9edfc05a85b7a4304e2",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraLocalTimeshiftSession;",
+      "method": "openSegment()V"
+    },
+    {
+      "after": "fd7e0c7e4f8efe91511c77805db724f48e634379b563d0ae754bb506ef0c067e",
+      "before": "27cead9896394082310884e0ac2989fa3bbb8caf56fe8d30a79d08e1dc4d818e",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraLocalTimeshiftSession;",
+      "method": "start()V"
+    },
+    {
+      "after": "43bdf5667931f549995609765cd7c7354032b24b06a87fcd6f7283a236da9b43",
+      "before": "09895bfaf48e699a229f29a2d3761261a61f203e02ae386c6031f985a8eaec9a",
+      "class": "Lcom/projectinfinity/kodi/CobraSportsReminderJob;",
+      "method": "lambda$onStartJob$0$com-projectinfinity-kodi-CobraSportsReminderJob(ILandroid/app/job/JobParameters;)V"
+    },
+    {
+      "after": "c9b4a9c92b3422568e3d82e3b5fb4cd5ab3c0ab6d8e8affbdf4b8a1db02538c9",
+      "before": "87aa6e460e1c900cfe85b0ef41a97b28f1d80c43c93c79990dc7d47b8f41dce9",
+      "class": "Lcom/projectinfinity/kodi/CobraSportsReminderJob;",
+      "method": "onStartJob(Landroid/app/job/JobParameters;)Z"
+    },
+    {
+      "after": "cec5b5dae0b662e84cf8a2cc88b64ade2a4b6b7aeb40ef71ecf0cdc6f0c541f8",
+      "before": "d7680e8c020f5861920dea9eb88187feb5774fe9dc08b56f57692dcdb3cbf693",
+      "class": "Lcom/projectinfinity/kodi/InfinityCobraBootReceiver;",
+      "method": "onReceive(Landroid/content/Context;Landroid/content/Intent;)V"
+    },
+    {
+      "after": "6fcc697f33288ab237ad4b92618778c4525627c0fe9878e47dfd7f386f2b8f8f",
+      "before": "860e40b25bc8b3cb08dda99aa7cc2faf94cbdff7dfda51ac5f474ba0c68e35d4",
+      "class": "Lcom/projectinfinity/kodi/Main;",
+      "method": "onCreate(Landroid/os/Bundle;)V"
+    },
+    {
+      "after": "525d2df915e5c6717e667da72ebe8d7fb07c08c724e515bf47bfa914e7af3bcc",
+      "before": "838ddc262a964c0d0c7d95ababeb47a54fddd3503f6d4cdcc187e94289d4fbf1",
+      "class": "Lcom/projectinfinity/kodi/InfinityGlassOptions;",
+      "method": "<init>(Landroid/app/Activity;ZLjava/lang/String;[Ljava/lang/String;Lcom/projectinfinity/kodi/InfinityGlassOptions$Appearance;Landroid/content/DialogInterface$OnClickListener;)V"
+    },
+    {
+      "after": "2380689f2f9382072fd9570e2f8dfb7371efe5fd916b3283d0e5916cbefa1a3e",
+      "before": "5fad8e7844120e01034f761d42ff8e8b744dcac15fed78fd2aafbc9b94bb1a04",
+      "class": "Lcom/projectinfinity/kodi/InfinityCobraReminderReceiver;",
+      "method": "onReceive(Landroid/content/Context;Landroid/content/Intent;)V"
+    },
+    {
+      "after": "bf1d88acfe78c836bc039d401a94beec65c67eda3838262ef4e02e795556164e",
+      "before": "a13492c45d1919d5004a8ed702446e355131e172dc2dd8f3ff0a1a9fdaa2ec63",
+      "class": "Lcom/projectinfinity/kodi/CobraSportsPreferences;",
+      "method": "<init>(Landroid/content/Context;)V"
+    },
+    {
+      "after": "ac98fa74c9ed42f858ba5b8b64fb35593593ad97d7869d16de49423bc55599f1",
+      "before": "ba50db7d66d7f71886585707f4c496100b3fb7aae72afe3df708e67366c8826e",
+      "class": "Lcom/projectinfinity/kodi/InfinityGlassRecovery;",
+      "method": "<init>(Lcom/projectinfinity/kodi/InfinityGlassRecovery$Builder;)V"
+    },
+    {
+      "after": "6a8890c2c8e04ab4eed99b8977d97355d649259767a682f8e0d4ab2d8ab8d7b3",
+      "before": "1317c50311a3e7a08dd09b26dd47b52e33041def0660d7087ac6c649c6a0611d",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraEspnSiteSportsRepository;",
+      "method": "scoreboard(Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraSportsLeagueSpec;JJ)Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraSportsBoardResult;"
+    },
+    {
+      "after": "e6880be9eb7914ce2052e1e74d2f3466682e4a23cdfb90059ee54fef3504bce1",
+      "before": "59f675e6419d86e5af06e36e4b83a1592d55cc4a7331f67cd659b5094fa50eb3",
+      "class": "Lcom/projectinfinity/kodi/InfinityCobraFeatureRuntime;",
+      "method": "<init>(Landroid/content/Context;)V"
+    },
+    {
+      "after": "79d58ec10cf30073af42386d800485a4ad39f3b29dc6e45f5128bd1110e19311",
+      "before": "b2b7eaced1926980154569b2f67c726705c8162ce4e166d6f8426460df1fa5ff",
+      "class": "Lcom/projectinfinity/kodi/InfinityCobraFeatureRuntime;",
+      "method": "deleteRecording(Ljava/lang/String;)Z"
+    },
+    {
+      "after": "39786fc27c5b6559d1602cd0d8056b229bea025e01dffb860c02266c841ab827",
+      "before": "66128814b7ea320f870b482efcc6ead4e635c04627e32c6eac4d2ed9de00515c",
+      "class": "Lcom/projectinfinity/kodi/InfinityCobraFeatureRuntime;",
+      "method": "recordingsDir()Ljava/io/File;"
+    },
+    {
+      "after": "048ce503f09cfd9402d4a6d0ade6077839ed3c85b52f66b43f28f798c2ce34e1",
+      "before": "c24138bfd759cfc1037c970f28cd59223e0666ddb731d91976e7dbe29c834aee",
+      "class": "Lcom/projectinfinity/kodi/InfinityCobraFeatureRuntime;",
+      "method": "renameRecording(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;"
+    },
+    {
+      "after": "97c36e639c086cea345f875d75a139667d3d67d6a5dead339bb2421ec63e6c36",
+      "before": "7d7c6d7896e78e7f37aaf8bbfba8ef3f9e74cf53b416098c39ad177dda86e04c",
+      "class": "Lcom/projectinfinity/kodi/InfinityGlassChooser;",
+      "method": "<init>(Landroid/content/Context;Lcom/projectinfinity/kodi/InfinityGlassChooser$Actions;)V"
+    },
+    {
+      "after": "cb758cd891f4edd8b38d87e36a0c66b758f092422a98d2c58cc6dbbc5f82d6c0",
+      "before": "87bdbf93bf4c4fe1eb948f6d3a326fc09535189ef6bb7d7d7a03984917c22a32",
+      "class": "Lcom/projectinfinity/kodi/CobraVisualTheme;",
+      "method": "deleteTree(Ljava/io/File;)V"
+    },
+    {
+      "after": "fe2b38e42b7027d0879cf0473c60eabd0c70e1849059a295fdc5f874d8043284",
+      "before": "510e998aec9e98696a2257641506f4ef8eb7e4d9ed5f39189e77872aba7b3849",
+      "class": "Lcom/projectinfinity/kodi/CobraVisualTheme;",
+      "method": "discardAbandonedPreviews(Landroid/content/Context;)V"
+    },
+    {
+      "after": "0cd654c4a213ed777f86b1b1f49f11be5e817014ff3793ed7c5e2f75a4759e2f",
+      "before": "100db9d39baaab5eefba96d4d0a6c2a3d0c213668a05da662c3bf8d581df80f8",
+      "class": "Lcom/projectinfinity/kodi/CobraVisualTheme;",
+      "method": "discardPreview(Landroid/content/Context;Lcom/projectinfinity/kodi/CobraVisualTheme;)V"
+    },
+    {
+      "after": "48c4eac26725a6f5265232e051b2d940d502f8dc8147b6195df28b0f76c80985",
+      "before": "8a57c37cda2bf589b53cbc98126c9412a451943a540e5ef23633d59a766cc84a",
+      "class": "Lcom/projectinfinity/kodi/CobraVisualTheme;",
+      "method": "pointer(Landroid/content/Context;)Lcom/projectinfinity/kodi/InfinityJavaPersistence$Atomic;"
+    },
+    {
+      "after": "daf9f32013b150fd586c82ac5e8699eba1a9fa753af2010eb808320ae6a44d9e",
+      "before": "aefc4505a738783f3402803df0610114442a37f46654ab5f3569b4827a439570",
+      "class": "Lcom/projectinfinity/kodi/CobraVisualTheme;",
+      "method": "readPointer(Landroid/content/Context;)Lorg/json/JSONObject;"
+    },
+    {
+      "after": "e9a98bfb14be39440a4ec803122bfe70c32e3c90150bee761199457fc8cdf78b",
+      "before": "d6051891080a065eaae4d62158ea6548328dfd39ceaabc49cced887bfe6163e7",
+      "class": "Lcom/projectinfinity/kodi/CobraVisualTheme;",
+      "method": "reset(Landroid/content/Context;)V"
+    },
+    {
+      "after": "816502002683c8716c3329bf72df4e91e74e97a8ba0e3e23fe245f38c7ee1c58",
+      "before": "1c3cf22df21c3b114c77c9fda92d573f4e90b2d6ede28632f356895868731cac",
+      "class": "Lcom/projectinfinity/kodi/CobraVisualTheme;",
+      "method": "storePrepared(Landroid/content/Context;Ljava/io/InputStream;Z)Lcom/projectinfinity/kodi/CobraVisualTheme;"
+    },
+    {
+      "after": "802a4bbcc90197fdc61abd7fdd14e769b6a5884ba0448c98b17cb56f8b1c09f3",
+      "before": "baffd89e52077c52b1bd2da02ade0e967393722f118caa8c0de38b789f204e5b",
+      "class": "Lcom/projectinfinity/kodi/CobraVisualTheme;",
+      "method": "writePointer(Landroid/content/Context;Lorg/json/JSONObject;)V"
+    },
+    {
+      "after": "a445ddd38d2f8e2235bb2e31544f0e7cce1829a09f91343dd17250432b1520f2",
+      "before": "31b783f505aed86d42fb3cb041393ad3058b09d4161ab835e1ba99c9396b3b76",
+      "class": "Lcom/projectinfinity/kodi/CobraPresentationSafety;",
+      "method": "discard(Lcom/projectinfinity/kodi/CobraPresentationSafety$Lease;)V"
+    },
+    {
+      "after": "2b25d0b67de4406b479c8c1269bc789bf0c1d0bb43d8ef8f66313c93622a339f",
+      "before": "9d68e691691a3e9e97e523072350dca91a248e3d259ea9fd204d28504d60196a",
+      "class": "Lcom/projectinfinity/kodi/CobraPresentationSafety;",
+      "method": "initialize(Landroid/content/Context;)V"
+    },
+    {
+      "after": "31918561b878831538066f1d850a7405b9b353593dbf096e31f537bcaa7994bc",
+      "before": "123aa503c2fccbd70d6845902edd3786a6167707fc5a5226fb529426ced6ace8",
+      "class": "Lcom/projectinfinity/kodi/CobraPresentationSafety;",
+      "method": "keep(Ljava/lang/String;)V"
+    },
+    {
+      "after": "1728f9e57f11e12756dcf6746c0a3f18d727f8a15a5c4f25d79116ad86ac233e",
+      "before": "ed1e0bb15365a9c51d2100678fb07ea90ade7cecd5e79754f7346fa5b342a0c9",
+      "class": "Lcom/projectinfinity/kodi/CobraPresentationSafety;",
+      "method": "lambda$keep$9(Lcom/projectinfinity/kodi/CobraPresentationSafety$Lease;Ljava/lang/String;)V"
+    },
+    {
+      "after": "55b72f3ed4cfb5939661e4ffb34275fceefdf41460bcc9ad6256de2bdfb711f1",
+      "before": "5b8ed46221157216cf37b035164f0dc9471015afe4e631c491c9c94be7b29e53",
+      "class": "Lcom/projectinfinity/kodi/CobraPresentationSafety;",
+      "method": "offer(Landroid/app/Activity;Lcom/projectinfinity/kodi/CobraVisualTheme;Ljava/io/File;)V"
+    },
+    {
+      "after": "84f370da020f29b99d94c944c79dff0959242a9345f210cfa4050bf7f30b8bc8",
+      "before": "0b38e67960419afa9c003f7c16c4fceea457ca012f26fc6cab9d1f57e8e8ea82",
+      "class": "Lcom/projectinfinity/kodi/CobraPresentationSafety;",
+      "method": "previewPrevious(Landroid/app/Activity;)V"
+    },
+    {
+      "after": "e2cdc61b07dcbd991477b49aa9404e3eb262e140ed4821b022c9e7befbe6ecd7",
+      "before": "9c4fe1cc247f08c321b0a97732934b6b96dbda5acb2f4b4565e6822f741c3ab0",
+      "class": "Lcom/projectinfinity/kodi/CobraPresentationSafety;",
+      "method": "refresh(Landroid/app/Activity;)V"
+    },
+    {
+      "after": "87c9449336075115d3428bdac8bcb8b78f85d9e8642fd28ddf110119787896e8",
+      "before": "3bff62fcec5e7c18ddeecdf69312af6a6118907b4bbcb3d64b432dd5970454a7",
+      "class": "Lcom/projectinfinity/kodi/CobraPresentationSafety;",
+      "method": "restoreBuiltIn(Landroid/app/Activity;Ljava/lang/Runnable;)V"
+    },
+    {
+      "after": "7a1f9f5261d8125fe73f6f0e12430fb7d61f21a8d563d8a2ded2bbc6242e7612",
+      "before": "828f097f1ed44d78c1cf964206ec9af9c7cbae236530800cb8bc255a47605273",
+      "class": "Lcom/projectinfinity/kodi/CobraPresentationSafety;",
+      "method": "revert(Ljava/lang/String;Z)V"
+    },
+    {
+      "after": "877ff1b60315b0cd5bafdac9421b1fc8aab16f5e8ef9eab39943a6c8f3c061ef",
+      "before": "402081638ef778d7f6197f9f948c1740339a032001b893c4c017c7a187da0e0c",
+      "class": "Lcom/projectinfinity/kodi/CobraPresentationSafety;",
+      "method": "stageLegacy(Landroid/content/Context;Ljava/util/Map;)Ljava/io/File;"
+    },
+    {
+      "after": "0b6ee2492a772fc69dd1c5b7d745dd51c21d170b59dc8e9c4a8b3a42d7a571c5",
+      "before": "17d8a84fc01c15364065bfb6e22fe0ca48a81cd236d55f1e7bbf7bbd85d05fda",
+      "class": "Lcom/projectinfinity/kodi/CobraPresentationSafety;",
+      "method": "state(Landroid/content/Context;)Lorg/json/JSONObject;"
+    },
+    {
+      "after": "e92782fa44d2c5bf33139999cf323d31591ed7bb4aad4932337879019e5d565f",
+      "before": "450e4f5d4e130f4df574807255a0d87f76f3f5883cc0e3174a05835b1526b866",
+      "class": "Lcom/projectinfinity/kodi/CobraPresentationSafety;",
+      "method": "writeState(Landroid/content/Context;Lorg/json/JSONObject;)V"
+    },
+    {
+      "after": "19a6136343faff86f26d91840c4b21d4ae135737429ce24d10bfcec9ffa11141",
+      "before": "0721e92fa19831acfb5d2c09101800602a8a079532ea42ba028ad0826d169536",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity$33;",
+      "method": "available()Z"
+    },
+    {
+      "after": "3c99a333bdb0b012e31a898025b1dc9a45523d5475349c123fe3e331cde1ffd7",
+      "before": "bffb845eca6afed6bc7f4c63be48f96c87786693c989b38d672463fd40abcbc1",
+      "class": "Lcom/projectinfinity/kodi/InfinityLiveActivity$33;",
+      "method": "unavailable()V"
+    },
+    {
+      "after": "12a09a07fd8036731145e574c9c62a4ca0a7cae0592986e847219bd64bfabe4e",
+      "before": "47b5f89beb117b0fe16cd2bd5e68c21cd2d3b129c4f5d0370167e98cfa7d59da",
+      "class": "Lcom/projectinfinity/kodi/InfinityCloseNativeLease;",
+      "method": "fail(Ljava/lang/String;)V"
+    },
+    {
+      "after": "01474fe779e0f02efcdc3ecb000a9989ac467a6a6d80c993fe9b76e5fdceebe4",
+      "before": "5eee1d3c6cbd66516d145c69c606d4eac191339f2cb29c0a6b7bd9ccdb1a8938",
+      "class": "Lcom/projectinfinity/kodi/InfinityCloseNativeLease;",
+      "method": "poll(Lcom/projectinfinity/kodi/Main;)V"
+    },
+    {
+      "after": "19dc652c490a8c278e18eebf12baa463d217a44d263de6130d2f11dee5ca9569",
+      "before": "34940bc0b52dc0528073991c8f9f1c7ed0fecc3e2705818a38b9f2f33616a63f",
+      "class": "Lcom/projectinfinity/kodi/InfinityCloseNativeLease;",
+      "method": "prepare(Lcom/projectinfinity/kodi/Main;)V"
+    },
+    {
+      "after": "fc86bdbd7cd128b11f841e9e1f100eff31da29621a08df9a6b19d4b2ad075300",
+      "before": "e562fcc9398798745ddb5dbe6283fd992e750a25504b42b1caa8937b61c41c4d",
+      "class": "Lcom/projectinfinity/kodi/InfinityCloseNativeLease;",
+      "method": "send(ILjava/lang/String;)V"
+    },
+    {
+      "after": "06f8317062afc231e50cec45faa4273b50ad53bbeb5fb4b122bfa4a123913496",
+      "before": "faff6f0ffd39ea38d305c9c740c9e2344890e239cc492e0a2e7dbbbace1ba4ad",
+      "class": "Lcom/projectinfinity/kodi/InfinityCloseNativeLease;",
+      "method": "terminate(Lcom/projectinfinity/kodi/Main;JLjava/lang/String;)V"
+    },
+    {
+      "after": "b78e1db07533c2630f130592ee7b9e8fcf23db73b8d2ec495f0601c6d9136abe",
+      "before": "2a01e69936cd4ab2059b053c7408838fb3bcf13ded6b4141b25277107bb56587",
+      "class": "Lcom/projectinfinity/kodi/InfinityCloseNativeLease;",
+      "method": "onDestroy()V"
+    },
+    {
+      "after": "10929214716b95d78c248a782ac1c59367814312a54390bd526c82ec1a61ed00",
+      "before": "3b8bfd4cb7ea2fefaaad3a06aa6dd0daf5376c8ca3d9e8bba6d32b9fa86ea9c2",
+      "class": "Lcom/projectinfinity/kodi/InfinityExtendedBackgroundService;",
+      "method": "setEnabled(Landroid/app/Activity;Z)Z"
+    },
+    {
+      "after": "79065e8137411d4fd72fe0212690af62af761d12176d99681b3aadf507907b99",
+      "before": "dfb9940a1e2a111dcf31532c6eb0b1950077c6ebb1d45ae64b1eddebc5c05630",
+      "class": "Lcom/projectinfinity/kodi/InfinityExtendedBackgroundService;",
+      "method": "onCreate()V"
+    },
+    {
+      "after": "6a82c2c732093882970b2b2949f7bd5da9e24ad43af8633c8e579cdb37ee3f0e",
+      "before": "70493b946dad3502fb01bd3ae1a1d51f578ab18b6ff3b91b15c8b71001f8ddd6",
+      "class": "Lcom/projectinfinity/kodi/Splash;",
+      "method": "chooserAppearanceMode()Ljava/lang/String;"
+    },
+    {
+      "after": "ec749c0584250ff612e71f7bd908f162471545465bdec5ba25a7549012bebfa2",
+      "before": "85ad3fa10c6b8296b79688504fe89960fff36c4eb68ed7c554414a4f7458dec1",
+      "class": "Lcom/projectinfinity/kodi/Splash;",
+      "method": "infinityBeginPreparation()V"
+    },
+    {
+      "after": "bd4f20d9d8092c788f7838f91914c520f0d6dfbe86ba3b70f0af922a492b5133",
+      "before": "f4fc76a916d7e5268d47f8fea994cf5a4fe0250dba9a4c9a9d8b73b255ca9789",
+      "class": "Lcom/projectinfinity/kodi/Splash;",
+      "method": "infinityLaunchPreferredCobra()Z"
+    },
+    {
+      "after": "1da4b86f61addc2411674babc4cde4bca7abb2ab2a1d11cbd39e763d0bffd743",
+      "before": "0048872546f901fac9914e083720c658ca7d66f9e41de7593082b6d88c10c259",
+      "class": "Lcom/projectinfinity/kodi/Splash;",
+      "method": "infinityShouldOfferCrashRecovery()Z"
+    },
+    {
+      "after": "e9bb98620689132115bc976a43f13345664b350da9d1d9ed651613f8073c073b",
+      "before": "f0b828f50b5f28427e3f437ce4a778a2dd71726441e0f2c95dfe03859c542640",
+      "class": "Lcom/projectinfinity/kodi/Splash;",
+      "method": "cobraRefreshSafetyChooser()V"
+    },
+    {
+      "after": "ab3d433c93a30cea348855e3dc7b69840f1283363a17f468039f869d85791394",
+      "before": "aeea9068c368dd58048faead7b2318be2420389288a007f65f7cb479ce408c92",
+      "class": "Lcom/projectinfinity/kodi/Splash;",
+      "method": "lambda$showExperienceCardSettings$0$com-projectinfinity-kodi-Splash(Ljava/lang/String;ZLandroid/content/DialogInterface;I)V"
+    },
+    {
+      "after": "1b1215d581b5a740119b3be04606496e46cecb634be224bab0315922bdc2fb04",
+      "before": "d12b548f359d3b063bbcaedacdf20651df4c47ff6af3d76e4c60468f97cca17f",
+      "class": "Lcom/projectinfinity/kodi/Splash;",
+      "method": "onActivityResult(IILandroid/content/Intent;)V"
+    },
+    {
+      "after": "0dfda455b604c159e0ef3dd4ade85ab6a12430a1f3d8981ab4f5991bfd70c93b",
+      "before": "4320e23577377e20c294e78873bd3e68fa2dd724ed491cfc4238fb9b189f7ec0",
+      "class": "Lcom/projectinfinity/kodi/Splash;",
+      "method": "onCreate(Landroid/os/Bundle;)V"
+    },
+    {
+      "after": "ddfc5cd74a9ee9273226be3ddc44252c5c1ec1f151da612464e0198cdfb5b5ed",
+      "before": "2b35cb0ddfe64e993e9aaeaf9795dfe8f57df31b04e78744585503d71abbcd0b",
+      "class": "Lcom/projectinfinity/kodi/Splash;",
+      "method": "onNewIntent(Landroid/content/Intent;)V"
+    },
+    {
+      "after": "f8195243a80a3196612f5bf0f418330d8eed5e6f741a99ea9089769b7f012de6",
+      "before": "d671c8218792508e971acfef91829e45c749f3c15c40e37c400ff2856a81a233",
+      "class": "Lcom/projectinfinity/kodi/Splash;",
+      "method": "startXBMC()V"
+    },
+    {
+      "after": "2f37d895b8ce8b2e3e9dbc4b168bc1c1d57e752733bff880433ac206fa19a29d",
+      "before": "b688e0a722ad382eac07de0426823cbd9ab50027c0bc267b9cfd239c9ccc7e12",
+      "class": "Lcom/projectinfinity/kodi/InfinityCobraRecordingService;",
+      "method": "record(Lcom/projectinfinity/kodi/InfinityCobraRecordingService$Session;Ljava/lang/String;Ljava/lang/String;Ljava/util/Map;JLjava/lang/String;Ljava/lang/String;)V"
+    },
+    {
+      "after": "72268955d8075806aa8f2e74827e68cb9ae3fc0f32c29180df2319bed6bab277",
+      "before": "b9e685d58344bbd2454c9af2f765dbd8ec6e9cf1e74b79621bf12d112f36e89c",
+      "class": "Lcom/projectinfinity/kodi/InfinityCobraRecordingService;",
+      "method": "recordDirect(Lcom/projectinfinity/kodi/InfinityCobraRecordingService$Session;Ljava/lang/String;Ljava/util/Map;Ljava/io/File;J)V"
+    },
+    {
+      "after": "4e39e4d8edfbc0e0271520d81877bbd812d002a706c76c7f55023ed977766d3b",
+      "before": "4dff4d447e368af760d66bbf58cd9871ea2bad0b4c7ab0b10502e7ba97cc724e",
+      "class": "Lcom/projectinfinity/kodi/InfinityCobraRecordingService;",
+      "method": "recordHls(Lcom/projectinfinity/kodi/InfinityCobraRecordingService$Session;Ljava/lang/String;Ljava/util/Map;Ljava/io/File;J)V"
+    },
+    {
+      "after": "aee417e30e502d2f3c79ec99eb5114a75df7e15348afcfb341c253f0253a8dad",
+      "before": "05f5d1c880d5f862999668d57bcfd79faebef5b45f49aa09e38d4adaf2263d3a",
+      "class": "Lcom/projectinfinity/kodi/InfinityCobraRecordingService;",
+      "method": "onCreate()V"
+    },
+    {
+      "after": "3fc6acb40c31662e8b40550d5e4a37ed6eb18bf7f509e60110ef063d902564c3",
+      "before": "42e1a55706f0b4dfee08266f106a4f79469268eeacf4acf69b2160134eec487e",
+      "class": "Lcom/projectinfinity/kodi/InfinityCobraRecordingService;",
+      "method": "onDestroy()V"
+    },
+    {
+      "after": "96c8279c81b725c4463f3b77827876d29d6a80152a069b3b3ba24d31765dd294",
+      "before": "f4f0c60b3e20cf682904c092c9c8075f7c7b6d8896d9ae515410550c2365a1ed",
+      "class": "Lcom/projectinfinity/kodi/InfinityCobraRecordingService;",
+      "method": "onStartCommand(Landroid/content/Intent;II)I"
+    },
+    {
+      "after": "d84ee274fab0a081f63ea54d6b64be23361ac6f06de318b78c9ae09423cf8005",
+      "before": "af93b7653b11844e879251a8886d9d35f91e2e9ad2d534026f87f639b6319a44",
+      "class": "Lcom/projectinfinity/kodi/InfinityCloseGuardService;",
+      "method": "acceptSafe(Ljava/lang/String;Lorg/json/JSONObject;)V"
+    },
+    {
+      "after": "301957ec91a55e59c8324151d0d55e68582c419254654f5612e6fcd2ad7e235c",
+      "before": "4b37336a71bbd258ee4c5c2a45dd353f98fde6b74ff97b88d76ab520f75187e3",
+      "class": "Lcom/projectinfinity/kodi/InfinityCloseGuardService;",
+      "method": "end()V"
+    },
+    {
+      "after": "8e0719439a2eb1b00b014f6d60003f2bfe553609740305e80b6372836bfe73a5",
+      "before": "30a77e3bd954053c33a01d9f99c210206583f48073b37251bcd11ce757c97068",
+      "class": "Lcom/projectinfinity/kodi/InfinityCloseGuardService;",
+      "method": "finishCoordinatorProcess(Lcom/projectinfinity/kodi/InfinityCloseGuardService$Session;)V"
+    },
+    {
+      "after": "fe99875755f434d87d621d385d5a92fa4e980616acb93851fdc934a087794328",
+      "before": "f08b5c3678751f4b596b066b735ba589c6b70ac9ab8e0f89cc40d9caf761f574",
+      "class": "Lcom/projectinfinity/kodi/InfinityCloseGuardService;",
+      "method": "receipt(Ljava/lang/String;Ljava/lang/String;)Lorg/json/JSONObject;"
+    },
+    {
+      "after": "cc04c26b88d3e81f436a29fa188de2dab2ebdec54922ef98b6ab5c1cfeee1353",
+      "before": "d56fc1e2102946e9e00778aa6d8e74f67e3cdda49bf384a9c83ad9a58f482701",
+      "class": "Lcom/projectinfinity/kodi/InfinityCloseGuardService;",
+      "method": "lambda$acceptSafe$11$com-projectinfinity-kodi-InfinityCloseGuardService()V"
+    },
+    {
+      "after": "a8494e407dda566239a8eb49cceedf3afe95dc5d78a7b40bba4b2da270c30575",
+      "before": "f99b1b032ff1c3e236dc8c8899b66b30d30866566a7b570389b9ce083260bade",
+      "class": "Lcom/projectinfinity/kodi/InfinityCloseGuardService;",
+      "method": "lambda$checkOwner$16$com-projectinfinity-kodi-InfinityCloseGuardService(Lcom/projectinfinity/kodi/InfinityCloseGuardService$Session;)V"
+    },
+    {
+      "after": "3c4f452297cead23fa487d80649454acefb5be63e6553369ac98382362f52dd6",
+      "before": "3217cda93292d61db364d2c1230cd39fb3c7a3115b679e3070e55dacdd2a3159",
+      "class": "Lcom/projectinfinity/kodi/InfinityCloseGuardService;",
+      "method": "lambda$checkOwner$18$com-projectinfinity-kodi-InfinityCloseGuardService(Lcom/projectinfinity/kodi/InfinityCloseGuardService$Session;Ljava/lang/Boolean;)V"
+    },
+    {
+      "after": "0ee6ec3ab5457d0b0b830926fa395ebd6ab5966a91a3613a4da608a5edbb76ce",
+      "before": "4af9cbbc39d42c36fd8bafaf736eaf119463074135aa5c1ca036a415149647f1",
+      "class": "Lcom/projectinfinity/kodi/InfinityCloseGuardService;",
+      "method": "onStartCommand(Landroid/content/Intent;II)I"
+    },
+    {
+      "after": "5ae078a419a079685728f2d1e98a3bca6f853538ed7eaf0babc191f0a834be6c",
+      "before": "9416cde0e727af100b1523ec000a3037cc50a074a25a02c30133e6e76fe07b65",
+      "class": "Lcom/projectinfinity/kodi/InfinityCobraDeviceBridge;",
+      "method": "<init>(Landroid/app/Activity;Lcom/projectinfinity/kodi/InfinityCobraDeviceBridge$PlaybackOwner;)V"
+    },
+    {
+      "after": "b54e7d60543811d449acf5eb369f2f00746a640bee65fdd3f3a437d5724ac45e",
+      "before": "b85b2bdddfecd65bdecd822a10aa96fbb14d28b49b1c0926fd68bcc4a0d11c8a",
+      "class": "Lcom/projectinfinity/kodi/InfinityCobraDeviceBridge;",
+      "method": "applyRotation(Ljava/lang/String;)V"
+    },
+    {
+      "after": "a7c01b3a5322d36f43aefa64500bf7931ccac619be91b4c91db7ceeedce7b44b",
+      "before": "72f278585c50fb4f94fc73aa3c504e7bf1f2bec0d5a76669ed050dcaa225837b",
+      "class": "Lcom/projectinfinity/kodi/InfinityCobraDeviceBridge;",
+      "method": "publishRefreshStatus(Ljava/lang/String;Ljava/lang/String;IFIFZLjava/lang/String;)V"
+    },
+    {
+      "after": "b94f23793382c6230308e33791b736069bfc6290c9ad6377a47658b7476f02c4",
+      "before": "2499fea6ade6cc4ea31394f31e17a180e7ab6bdd2130d897a2011d788f2f4e51",
+      "class": "Lcom/projectinfinity/kodi/InfinityCobraDeviceBridge;",
+      "method": "publishWindow(Ljava/lang/String;)V"
+    },
+    {
+      "after": "3785be1baa9b49251b3db4d3c3ec1400eb6ddaa60a762ff39fa07ddc41433e3a",
+      "before": "cfabcfba54e3500088c24eba240d087eecdae91447e6c9d18a4f3639fe11356d",
+      "class": "Lcom/projectinfinity/kodi/InfinityAskEveryTimeActivity;",
+      "method": "onCreate(Landroid/os/Bundle;)V"
+    }
+  ],
+  "native_termination_callbacks_rewritten": false,
+  "new_source_sha256": {
+    "CobraBackgroundSettings.java": "261857d5534c27b323ae17d63b006e095c54c49a159401fb970439b6b21a59eb",
+    "CobraComponent.java": "46ea9059c9f59a20de4634d75c3f835e4e39d688ac6769d1cb00bd2d430d7d7a",
+    "CobraPreferencePort.java": "077185e7b9879066d3605663878da5b1b68f7ba1428e73556c2111b5e3df8de1",
+    "CobraRefreshFiles.java": "1dd58a5236578e927e166effa309d8a4b467f17fa862a0770192cffe367a24f9",
+    "CobraRuntimeLease.java": "7ea49f33a2f90e7cc5ca2bb25134d31f484ac9839afac688926f2de7ae8127d7",
+    "CombinedDurability.java": "ab68caf7262bb7bd2da1835d4b3169c3063b643f320062993668082d15b88274",
+    "ContainerUpgrade.java": "10ab7cacfb3b92ba793844ff8851a4b7bd6f2a85b12557e533358a5c26b5229f",
+    "ExperienceChooserRefresh.java": "c02c6d3e5ac4260f847bd108a755e86c926144b221ed30b6bb050b153b684828",
+    "ExperienceLaunchPreferences.java": "00628d662820955ffd29a7c82444f922947725d4d94ae91f74360f28588f9d0b",
+    "InfinityComponent.java": "6bc9a7d6a3452761dab7973ff117cebb74794f8bf665a7f4b8550c7a7e1bccb2",
+    "ShellComponent.java": "07eb02e03f5ba4445a4121e614cec62c149699bb76e0630d29e9b204ce633fcc"
+  },
+  "original_methods_checked": 64143,
+  "persistence_sync_readback_rollback_algorithms_rewritten": false,
+  "status": "EXACT_OR_EXPLICIT_BOUNDARY_INSTRUCTIONS_VERIFIED",
+  "untouched_class_definitions_exact": 8833
+}

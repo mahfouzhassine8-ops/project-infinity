@@ -132,6 +132,10 @@ def prepare(smali,out):
         revised=map_types(text,mapping)
         if root in ('InfinityLiveActivity','InfinityCobraDeviceBridge'):
             revised=revised.replace('"infinity_player_rotation"','"cobra_player_rotation"')
+        if short=='InfinityCobraDeviceBridge':
+            revised=revised.replace('".kodi/userdata/addon_data/service.infinity.refresh"','".cobra/refresh"')
+            revised=entry(revised,'<init>(Landroid/app/Activity;'+APP+'InfinityCobraDeviceBridge$PlaybackOwner;)V',
+                          'invoke-static {p1}, '+APP+'CobraRefreshFiles;->directory(Landroid/content/Context;)Ljava/io/File;')
         if root in SHELL_ROOTS:
             for signature,body in list(methods(revised).items()):
                 if '"infinity_cobra_live"' in body:
@@ -169,8 +173,9 @@ def prepare(smali,out):
                                                                   'CombinedDurability;->finishCoordinator('))
         if short=='InfinityJavaWriteBarrier':revised+=barrier_accessors(short)
         if short in ('Splash','Main','InfinityLiveActivity'):
+            hook='CobraBackgroundSettings;->initialize' if short=='InfinityLiveActivity' else 'ContainerUpgrade;->beforeOwnerEntry'
             revised=entry(revised,'onCreate(Landroid/os/Bundle;)V',
-                          'invoke-static {p0}, '+APP+'CobraBackgroundSettings;->initialize(Landroid/content/Context;)V')
+                          'invoke-static {p0}, '+APP+hook+'(Landroid/content/Context;)V')
         if short in ('InfinityLiveActivity','InfinityCobraRecordingService'):
             create='onCreate(Landroid/os/Bundle;)V' if short=='InfinityLiveActivity' else 'onCreate()V'
             revised=entry(revised,create,
@@ -197,7 +202,9 @@ def prepare(smali,out):
             revised=normal_exit(revised,signature,'invoke-static {p0}, '+APP+'CobraRuntimeLease;->release(Ljava/lang/Object;)V')
         if short==SERVICE:
             revised=entry(revised,'setEnabled(Landroid/app/Activity;Z)Z',
-                          'invoke-static {p0}, '+APP+'CobraBackgroundSettings;->initialize(Landroid/content/Context;)V')
+                          'invoke-static {p0}, '+APP+'ContainerUpgrade;->beforeOwnerEntry(Landroid/content/Context;)V')
+            revised=entry(revised,'onCreate()V',
+                          'invoke-static {p0}, '+APP+'ContainerUpgrade;->beforeOwnerEntry(Landroid/content/Context;)V')
         transformed[descriptor]=revised
     # Clone the original, byte-grounded persistence algorithms and all nested
     # types. No sync, rollback, readback or failed-write branch is removed.
@@ -207,6 +214,11 @@ def prepare(smali,out):
             short=descriptor.removeprefix(APP).removesuffix(';');root=short.split('$')[0]
             if root not in PERSISTENCE or not descriptor.startswith(APP):continue
             new=map_types(descriptor,mapping);revised=map_types(text,mapping)
+            if owner=='Cobra' and short=='InfinityJavaPersistence':
+                # Keep the original diagnostic classification safeguards,
+                # including hard-link/canonical-path checks, at Cobra's path.
+                revised=revised.replace('".kodi/userdata/addon_data/service.infinity.refresh/runtime.properties"',
+                                        '".cobra/refresh/runtime.properties"')
             if short=='InfinityJavaWriteBarrier':revised+=barrier_accessors(mapping[short])
             transformed[new]=revised;origins[new]=descriptor
     # Cobra's complete existing background implementation, in its activity's

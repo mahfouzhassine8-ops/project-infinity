@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='utf-8'?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="com.projectinfinity.kodi.ProductionBoundaryTest" time="3.656" tests="13" errors="0" skipped="0" failures="0">
+  <testcase name="refreshDiagnosticExceptionDoesNotExemptUserPolicy" classname="com.projectinfinity.kodi.ProductionBoundaryTest" time="2.948" />
+  <testcase name="playerRotationStartsWithSavedValueAndThenHasOneOwner" classname="com.projectinfinity.kodi.ProductionBoundaryTest" time="0.053" />
+  <testcase name="independentlyWrappedStoresKeepTheirExistingValues" classname="com.projectinfinity.kodi.ProductionBoundaryTest" time="0.016" />
+  <testcase name="infinityNotificationActionSeedsCobraBeforeChangingItsOwnSetting" classname="com.projectinfinity.kodi.ProductionBoundaryTest" time="0.072" />
+  <testcase name="ownerOutputStillWaitsForActualFileAndDirectorySync" classname="com.projectinfinity.kodi.ProductionBoundaryTest" time="0.018" />
+  <testcase name="independentPreferenceQueuesCannotAcknowledgeEachOthersWrites" classname="com.projectinfinity.kodi.ProductionBoundaryTest" time="0.019" />
+  <testcase name="refreshDiagnosticHardlinkCannotTruncateProtectedData" classname="com.projectinfinity.kodi.ProductionBoundaryTest" time="0.014" />
+  <testcase name="refreshFilesPreserveBytesAndStopCrossOwnerWrites" classname="com.projectinfinity.kodi.ProductionBoundaryTest" time="0.018" />
+  <testcase name="snapshotFailureCannotClaimDurability" classname="com.projectinfinity.kodi.ProductionBoundaryTest" time="0.014" />
+  <testcase name="failedDirectorySyncRevokesCombinedSaveProof" classname="com.projectinfinity.kodi.ProductionBoundaryTest" time="0.013" />
+  <testcase name="miniPlaybackCallbacksAndContinuityHaveSeparateOwners" classname="com.projectinfinity.kodi.ProductionBoundaryTest" time="0.281" />
+  <testcase name="chooserPortsReturnTheActualOwnerWrapper" classname="com.projectinfinity.kodi.ProductionBoundaryTest" time="0.015" />
+  <testcase name="backgroundSnapshotPreservesOldValueAndThenSeparatesSettings" classname="com.projectinfinity.kodi.ProductionBoundaryTest" time="0.019" />
+</testsuite>

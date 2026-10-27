@@ -31,6 +31,13 @@ public final class NAME {
 public final class OWNERJavaPersistence {
  public static android.content.SharedPreferences preferences(android.content.Context c,String n,int m){throw new AssertionError();}
  public static void userEntry(android.content.Context c){throw new AssertionError();}
+ public static boolean mkdirs(java.io.File f){throw new AssertionError();}
+ public static class Atomic {
+  public Atomic(java.io.File f){throw new AssertionError();}
+  public java.io.FileOutputStream startWrite()throws java.io.IOException{throw new AssertionError();}
+  public void finishWrite(java.io.FileOutputStream f){throw new AssertionError();}
+  public void failWrite(java.io.FileOutputStream f){throw new AssertionError();}
+ }
  public static class Output extends java.io.FileOutputStream {
   public Output(java.io.File f)throws java.io.FileNotFoundException {super(f);throw new AssertionError();}
  }

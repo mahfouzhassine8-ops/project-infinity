@@ -1,37 +1,30 @@
-"""Build independently addressable owner DEX payloads, preserving unknowns.
+"""Build independently addressable DEX payloads using explicit owner identities.
 
 This is a build operation, not an ownership approval or signing gate bypass.
-Unresolved classes remain visibly UNRESOLVED until separately reviewed.
+Unreviewed identities fail classification; release approval is a separate gate.
 """
 import argparse
 from pathlib import Path
 import subprocess
 from inventory import HERE, APP, load, save, file_sha, digest
-from prepare_runtime import COBRA_ROOTS,SHELL_ROOTS
+from review_ownership import class_owner
 
 def build(work,jars,baseline):
     original=load(HERE/'evidence/DEX-MEMBERS.json.gz');delta=load(work/'DELTA.json')
+    baseline_members=load(HERE/'evidence/OWNERSHIP-MAP.json')['members']
+    expected_dex={n:v['sha256'] for n,v in baseline_members.items() if n.startswith('classes') and n.endswith('.dex')}
+    if {p.name:file_sha(p) for p in baseline.glob('classes*.dex')}!=expected_dex:
+        raise ValueError('Raw DEX inputs must match the signed baseline exactly')
     for p in [work/'changed.dex',work/'helpers/classes.dex']:
         folder=work/(p.parent.name+'-checked-smali' if p.parent.name=='helpers' else 'changed-checked-smali')
         subprocess.run(['java','-cp',str(jars/'*'),'org.jf.baksmali.Main','disassemble','--sequential-labels',
                         str(p),'-o',str(folder)],check=True)
     definitions={p.read_text().splitlines()[0].split()[-1]:p.read_text()
                  for p in work.glob('*-checked-smali/**/*.smali')}
-    owners={n:v['owner'] for n,v in original.items()}
-    for n in definitions:
-        root=n.removeprefix(APP).split('$')[0].removesuffix(';')
-        if root in COBRA_ROOTS or root in ('CobraJavaPersistence','CobraJavaWriteBarrier','CobraBackgroundService',
-                                         'CobraBackgroundSettings','CobraRuntimeLease','CobraBackgroundApiOutline','CobraPreferencePort'):owners[n]='COBRA'
-        elif root in SHELL_ROOTS or root in ('ShellJavaPersistence','ShellJavaWriteBarrier','ExperienceLaunchPreferences'):owners[n]='CHOOSER_SHELL'
-        elif root in ('CombinedDurability','OwnerDurabilityWiring','ExperienceChooserRefresh'):owners[n]='MINIMAL_ANDROID_CONTRACT'
-        elif root in ('InfinityJavaPersistence','InfinityJavaWriteBarrier','InfinityExtendedBackgroundService',
-                       'InfinityCloseNativeLease','InfinityCloseGuardService'):owners[n]='INFINITY'
-        elif n not in owners:raise ValueError('Unowned generated definition: '+n)
-    for n in owners:
-        root=n.removeprefix(APP).split('$')[0].removesuffix(';')
-        if root in SHELL_ROOTS:owners[n]='CHOOSER_SHELL'
-        elif root in COBRA_ROOTS and 'ExternalSyntheticApiModelOutline' not in n:owners[n]='COBRA'
-        if root in ('InfinityJavaPersistence','InfinityJavaWriteBarrier','InfinityExtendedBackgroundService'):owners[n]='INFINITY'
+    selected={p.read_text().splitlines()[0].split()[-1]:p.read_text() for p in baseline.glob('*-smali/**/*.smali')}
+    selected.update(definitions)
+    policy=load(HERE/'ownership-reviewed-roots.json')
+    owners={n:class_owner(n,text,policy) for n,text in selected.items()}
     assignments=work/'ASSIGNMENTS.tsv';assignments.write_text(''.join(n+'\t'+o+'\n' for n,o in sorted(owners.items())))
     origins=work/'ORIGINS.tsv';origins.write_text(''.join(n+'\t'+d['origin']+'\n' for n,d in sorted(delta['classes'].items())))
     host=work/'host';host.mkdir(exist_ok=True)

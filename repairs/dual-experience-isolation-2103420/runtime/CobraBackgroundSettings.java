@@ -17,6 +17,7 @@ public final class CobraBackgroundSettings {
   public static final String ROTATION_STORE="cobra_player_rotation";
   private CobraBackgroundSettings() {}
   public static void initialize(Context context) {
+    CobraRefreshFiles.directory(context);
     synchronized(LOCK) {
       File marker=new File(context.getFilesDir(),"cobra-settings-isolation-v1.ready");
       if(marker.isFile())return;

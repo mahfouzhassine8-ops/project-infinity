@@ -1,0 +1,1188 @@
+[
+  {
+    "class": "Landroidx/versionedparcelable/VersionedParcel;",
+    "literals": [
+      "%s.%sParcelizer"
+    ],
+    "method": "findParcelClass(Ljava/lang/Class;)Ljava/lang/Class;",
+    "owner": "MINIMAL_ANDROID_CONTRACT",
+    "sha256": "9bb4d59fa4db334ba4c8aadcd636489f3ac79e725d205d38bfd4903c62dc5b40"
+  },
+  {
+    "class": "Landroidx/versionedparcelable/VersionedParcel;",
+    "literals": [
+      "read"
+    ],
+    "method": "getReadMethod(Ljava/lang/String;)Ljava/lang/reflect/Method;",
+    "owner": "MINIMAL_ANDROID_CONTRACT",
+    "sha256": "5f9baa4d9a9dc839d9bbbd9ca4b371a9f56c298e26fe27736775e379ee719e40"
+  },
+  {
+    "class": "Landroidx/versionedparcelable/VersionedParcelStream;",
+    "literals": [
+      "UTF-16"
+    ],
+    "method": "<clinit>()V",
+    "owner": "MINIMAL_ANDROID_CONTRACT",
+    "sha256": "f507114ac76313a21c06cfdd75dec3fe12a0fa67f1d553b3521fb4f2bb6e34a0"
+  },
+  {
+    "class": "Landroidx/versionedparcelable/VersionedParcel$1;",
+    "literals": [],
+    "method": "resolveClass(Ljava/io/ObjectStreamClass;)Ljava/lang/Class;",
+    "owner": "MINIMAL_ANDROID_CONTRACT",
+    "sha256": "e4a3d176e78ee6f2bd00dee36d5b6a720b05b2746ae3d2736ebbe49bc9b37e2b"
+  },
+  {
+    "class": "Landroidx/lifecycle/Lifecycling;",
+    "literals": [
+      "",
+      "."
+    ],
+    "method": "generatedConstructor(Ljava/lang/Class;)Ljava/lang/reflect/Constructor;",
+    "owner": "MINIMAL_ANDROID_CONTRACT",
+    "sha256": "41dd7f23787b6d80c28acb6268496ca29947b51fb71fec85ca877727e17beeb4"
+  },
+  {
+    "class": "Landroidx/core/view/DisplayCompat;",
+    "literals": [
+      "android.os.SystemProperties",
+      "get"
+    ],
+    "method": "getSystemProperty(Ljava/lang/String;)Ljava/lang/String;",
+    "owner": "MINIMAL_ANDROID_CONTRACT",
+    "sha256": "dca3378057bfdf827170546a5fc82c6ba5dcf5b0ddfe8f19160e9e43fa84db44"
+  },
+  {
+    "class": "Landroidx/core/view/WindowInsetsCompat$Impl20;",
+    "literals": [
+      "getViewRootImpl",
+      "android.view.View$AttachInfo",
+      "mVisibleInsets",
+      "android.view.ViewRootImpl",
+      "mAttachInfo",
+      "Failed to get visible insets. (Reflection error). ",
+      "WindowInsetsCompat"
+    ],
+    "method": "loadReflectionField()V",
+    "owner": "MINIMAL_ANDROID_CONTRACT",
+    "sha256": "93033afba8ae324ca1aa095c78a13aa053f2f494fe2158e2a449119637203820"
+  },
+  {
+    "class": "Landroidx/core/view/WindowInsetsCompat$Api21ReflectionHolder;",
+    "literals": [
+      "mAttachInfo",
+      "android.view.View$AttachInfo",
+      "mStableInsets",
+      "mContentInsets",
+      "Failed to get visible insets from AttachInfo ",
+      "WindowInsetsCompat"
+    ],
+    "method": "<clinit>()V",
+    "owner": "MINIMAL_ANDROID_CONTRACT",
+    "sha256": "7573fc49d1ba94448ed98f482a3f41dcafbbab510549434a3fee231fd2c8eb7c"
+  },
+  {
+    "class": "Landroidx/core/location/LocationManagerCompat$Api19Impl;",
+    "literals": [
+      "android.location.LocationRequest",
+      "requestLocationUpdates"
+    ],
+    "method": "tryRequestLocationUpdates(Landroid/location/LocationManager;Ljava/lang/String;Landroidx/core/location/LocationRequestCompat;Landroidx/core/location/LocationListenerCompat;Landroid/os/Looper;)Z",
+    "owner": "MINIMAL_ANDROID_CONTRACT",
+    "sha256": "cc699bdfb898f4d8b0f5729ee95fcf4e7f980aa8bc0c598a873913435c183200"
+  },
+  {
+    "class": "Landroidx/core/location/LocationManagerCompat$Api19Impl;",
+    "literals": [
+      "android.location.LocationRequest",
+      "requestLocationUpdates"
+    ],
+    "method": "tryRequestLocationUpdates(Landroid/location/LocationManager;Ljava/lang/String;Landroidx/core/location/LocationRequestCompat;Landroidx/core/location/LocationManagerCompat$LocationListenerTransport;)Z",
+    "owner": "MINIMAL_ANDROID_CONTRACT",
+    "sha256": "c454098ccb9adfff57a7ed7050c90f717cacc7fe0ff50ebb9d86b2023bdbe794"
+  },
+  {
+    "class": "Landroidx/core/location/LocationRequestCompat$Api19Impl;",
+    "literals": [
+      "android.location.LocationRequest",
+      "createFromDeprecatedProvider",
+      "setQuality",
+      "setFastestInterval",
+      "setNumUpdates",
+      "setExpireIn"
+    ],
+    "method": "toLocationRequest(Landroidx/core/location/LocationRequestCompat;Ljava/lang/String;)Ljava/lang/Object;",
+    "owner": "MINIMAL_ANDROID_CONTRACT",
+    "sha256": "87fa0dab8ae623f996204de1c6cdf0e2a250dd83031f58e511758283a127cb43"
+  },
+  {
+    "class": "Landroidx/core/location/LocationManagerCompat$Api30Impl;",
+    "literals": [
+      "android.location.LocationRequest",
+      "requestLocationUpdates"
+    ],
+    "method": "tryRequestLocationUpdates(Landroid/location/LocationManager;Ljava/lang/String;Landroidx/core/location/LocationRequestCompat;Ljava/util/concurrent/Executor;Landroidx/core/location/LocationListenerCompat;)Z",
+    "owner": "MINIMAL_ANDROID_CONTRACT",
+    "sha256": "c8326867fa7d58f9428ccb37a6963f8452848abd662c55ba2e56d845bdbce695"
+  },
+  {
+    "class": "Landroidx/core/graphics/TypefaceCompatApi21Impl;",
+    "literals": [
+      "android.graphics.FontFamily",
+      "addFontWeightStyle",
+      "createFromFamiliesWithDefault",
+      "TypefaceCompatApi21Impl"
+    ],
+    "method": "init()V",
+    "owner": "MINIMAL_ANDROID_CONTRACT",
+    "sha256": "28a324c565fd3dad547da0b39cf900393a6428706ca6ab04069cb1e64cc2d755"
+  },
+  {
+    "class": "Landroidx/core/graphics/TypefaceCompatApi24Impl;",
+    "literals": [
+      "android.graphics.FontFamily",
+      "addFontWeightStyle",
+      "createFromFamiliesWithDefault",
+      "TypefaceCompatApi24Impl"
+    ],
+    "method": "<clinit>()V",
+    "owner": "MINIMAL_ANDROID_CONTRACT",
+    "sha256": "9c6930e8c91310b8ff5c5c1370fb91b35ee247211297a9bcae9a2e21cab48c1d"
+  },
+  {
+    "class": "Landroidx/core/graphics/TypefaceCompatApi26Impl;",
+    "literals": [
+      "android.graphics.FontFamily"
+    ],
+    "method": "obtainFontFamily()Ljava/lang/Class;",
+    "owner": "MINIMAL_ANDROID_CONTRACT",
+    "sha256": "05b0d6612cea0664d143748780c9e01be9f33950faad85915cbdd443fdc6445c"
+  },
+  {
+    "class": "Landroidx/core/widget/TextViewCompat$OreoCallback;",
+    "literals": [
+      "removeItemAt",
+      "com.android.internal.view.menu.MenuBuilder",
+      "android.intent.action.PROCESS_TEXT"
+    ],
+    "method": "recomputeProcessTextMenuItems(Landroid/view/Menu;)V",
+    "owner": "MINIMAL_ANDROID_CONTRACT",
+    "sha256": "16a94ef90eb03bbd94725465deba16928591af64a75fec2f0d43493e4caae5a6"
+  },
+  {
+    "class": "Landroidx/core/app/AppComponentFactory;",
+    "literals": [
+      "Couldn\\'t call constructor"
+    ],
+    "method": "instantiateActivityCompat(Ljava/lang/ClassLoader;Ljava/lang/String;Landroid/content/Intent;)Landroid/app/Activity;",
+    "owner": "MINIMAL_ANDROID_CONTRACT",
+    "sha256": "421eb7c5c9dc4a2087391467817b49ab5ff6a94bcfd205f4f994101b466825de"
+  },
+  {
+    "class": "Landroidx/core/app/AppComponentFactory;",
+    "literals": [
+      "Couldn\\'t call constructor"
+    ],
+    "method": "instantiateApplicationCompat(Ljava/lang/ClassLoader;Ljava/lang/String;)Landroid/app/Application;",
+    "owner": "MINIMAL_ANDROID_CONTRACT",
+    "sha256": "d742563bf7ba6d3eccfd21e3f39171136e9ec579f32ce950a706a47dca99224d"
+  },
+  {
+    "class": "Landroidx/core/app/AppComponentFactory;",
+    "literals": [
+      "Couldn\\'t call constructor"
+    ],
+    "method": "instantiateProviderCompat(Ljava/lang/ClassLoader;Ljava/lang/String;)Landroid/content/ContentProvider;",
+    "owner": "MINIMAL_ANDROID_CONTRACT",
+    "sha256": "98481b39420d54f2b1ef90e57153638bcf11876b8b4d71f1439684d44cd23efd"
+  },
+  {
+    "class": "Landroidx/core/app/AppComponentFactory;",
+    "literals": [
+      "Couldn\\'t call constructor"
+    ],
+    "method": "instantiateReceiverCompat(Ljava/lang/ClassLoader;Ljava/lang/String;Landroid/content/Intent;)Landroid/content/BroadcastReceiver;",
+    "owner": "MINIMAL_ANDROID_CONTRACT",
+    "sha256": "ce3022f1a7948f2ba3afaa8770165d7810b2cf4468e1bcc5cb1960cbb602c3bc"
+  },
+  {
+    "class": "Landroidx/core/app/AppComponentFactory;",
+    "literals": [
+      "Couldn\\'t call constructor"
+    ],
+    "method": "instantiateServiceCompat(Ljava/lang/ClassLoader;Ljava/lang/String;Landroid/content/Intent;)Landroid/app/Service;",
+    "owner": "MINIMAL_ANDROID_CONTRACT",
+    "sha256": "ef54cda65348f7b44b042af32751d512370a12566dfe75b934a8402087dbaf49"
+  },
+  {
+    "class": "Landroidx/core/app/ActivityRecreator;",
+    "literals": [
+      "android.app.ActivityThread"
+    ],
+    "method": "getActivityThreadClass()Ljava/lang/Class;",
+    "owner": "MINIMAL_ANDROID_CONTRACT",
+    "sha256": "094cc74a6f98dc537e328223436e2a70b1df601c563a0b08b603914103b0045b"
+  },
+  {
+    "class": "Landroidx/core/app/NotificationManagerCompat;",
+    "literals": [
+      "appops",
+      "checkOpNoThrow",
+      "OP_POST_NOTIFICATION"
+    ],
+    "method": "areNotificationsEnabled()Z",
+    "owner": "MINIMAL_ANDROID_CONTRACT",
+    "sha256": "2375996545926f837982d3fabbf8c7b0337ca2552f1cc80e94fdcd8572583903"
+  },
+  {
+    "class": "Landroidx/core/app/NotificationCompatJellybean;",
+    "literals": [
+      "Unable to access notification actions",
+      "NotificationCompat",
+      "android.app.Notification$Action",
+      "icon",
+      "title",
+      "actionIntent",
+      "actions"
+    ],
+    "method": "ensureActionReflectionReadyLocked()Z",
+    "owner": "MINIMAL_ANDROID_CONTRACT",
+    "sha256": "143c1663c82d51663d9b60e019ae103c28f2a50deae8a73fb4fef8e18ccdd73d"
+  },
+  {
+    "class": "Landroidx/core/text/ICUCompat;",
+    "literals": [
+      "libcore.icu.ICU",
+      "addLikelySubtags"
+    ],
+    "method": "<clinit>()V",
+    "owner": "MINIMAL_ANDROID_CONTRACT",
+    "sha256": "121cca817daedbf403050437b58059b03a843682536bdb0279518dd023041e2c"
+  },
+  {
+    "class": "Landroidx/core/os/ProcessCompat$Api16Impl;",
+    "literals": [
+      "android.os.UserId",
+      "isApp"
+    ],
+    "method": "isApplicationUid(I)Z",
+    "owner": "MINIMAL_ANDROID_CONTRACT",
+    "sha256": "a8f5543e26432542c768369f46680a8c03850043362e090203ba57869418c1a9"
+  },
+  {
+    "class": "Landroidx/core/graphics/drawable/IconCompat;",
+    "literals": [
+      "UTF-16",
+      ":",
+      "Invalid icon"
+    ],
+    "method": "onPostParceling()V",
+    "owner": "MINIMAL_ANDROID_CONTRACT",
+    "sha256": "1b3e54db46b5c15f50373e7682f455b9dd9757f13ef4c57ea79895de3761d502"
+  },
+  {
+    "class": "Landroidx/core/graphics/drawable/IconCompat;",
+    "literals": [
+      "UTF-16",
+      "Can\\'t serialize Icon created with IconCompat#createFromIcon"
+    ],
+    "method": "onPreParceling(Z)V",
+    "owner": "MINIMAL_ANDROID_CONTRACT",
+    "sha256": "ddd7f88ac1c9c5f54f5126a05687eca77d0259b31019e3c340d7d30c4c57b2cb"
+  },
+  {
+    "class": "Landroidx/core/content/pm/ShortcutManagerCompat;",
+    "literals": [
+      "androidx.core.content.pm.SHORTCUT_LISTENER",
+      "androidx.core.content.pm.shortcut_listener_impl",
+      "getInstance"
+    ],
+    "method": "getShortcutInfoListeners(Landroid/content/Context;)Ljava/util/List;",
+    "owner": "MINIMAL_ANDROID_CONTRACT",
+    "sha256": "71f1c9888e18070441233eeda63487c23eb3ba9355db8ae141555c89aecded33"
+  },
+  {
+    "class": "Landroidx/core/content/pm/ShortcutManagerCompat;",
+    "literals": [
+      "androidx.sharetarget.ShortcutInfoCompatSaverImpl",
+      "getInstance"
+    ],
+    "method": "getShortcutInfoSaverInstance(Landroid/content/Context;)Landroidx/core/content/pm/ShortcutInfoCompatSaver;",
+    "owner": "MINIMAL_ANDROID_CONTRACT",
+    "sha256": "3b7ec5e46809d431ad0c159513eb5b286d7f5bd0e361e3b382adf948dc91c1a9"
+  },
+  {
+    "class": "Lokhttp3/Challenge;",
+    "literals": [
+      "charset",
+      "forName(charset)",
+      "ISO_8859_1"
+    ],
+    "method": "charset()Ljava/nio/charset/Charset;",
+    "owner": "COBRA",
+    "sha256": "4e0914f7dcc0dd39f0df7c99ab3f598117c188ac5bd63c6319d9aeec8b8b860a"
+  },
+  {
+    "class": "Lokhttp3/MediaType;",
+    "literals": [
+      "charset"
+    ],
+    "method": "charset(Ljava/nio/charset/Charset;)Ljava/nio/charset/Charset;",
+    "owner": "COBRA",
+    "sha256": "31c1f978eaefed6195a7af84cc8f9ea0306e9f7ad9890c8f689bdd72cfdf8101"
+  },
+  {
+    "class": "Lcom/google/common/io/TempFileCreator;",
+    "literals": [
+      "java.nio.file.Path",
+      "android.os.Build$VERSION",
+      "SDK_INT",
+      "android.os.Build$VERSION_CODES",
+      "JELLY_BEAN"
+    ],
+    "method": "pickSecureCreator()Lcom/google/common/io/TempFileCreator;",
+    "owner": "COBRA",
+    "sha256": "966c7cc57861859fff479268faa75b8a801c2bda1ac122f2750ef811a666607d"
+  },
+  {
+    "class": "Lcom/google/common/io/TempFileCreator$JavaNioCreator;",
+    "literals": [
+      "java.lang.ProcessHandle",
+      "java.lang.ProcessHandle$Info",
+      "java.util.Optional",
+      "current",
+      "info",
+      "user",
+      "orElse"
+    ],
+    "method": "getUsername()Ljava/lang/String;",
+    "owner": "COBRA",
+    "sha256": "c50c798ce818cd720265c3633f50ae0623bacc37fe101f1d34e362fcfdd46c07"
+  },
+  {
+    "class": "Lcom/google/common/reflect/Reflection;",
+    "literals": [],
+    "method": "initialize([Ljava/lang/Class;)V",
+    "owner": "COBRA",
+    "sha256": "58ba035d13b73024894016c337cb09bb0a18adb285a7c3e3766e0068185f445d"
+  },
+  {
+    "class": "Lcom/google/common/reflect/ClassPath$ClassInfo;",
+    "literals": [],
+    "method": "load()Ljava/lang/Class;",
+    "owner": "COBRA",
+    "sha256": "a1fb6f4de975ae88c3df86a3b3b3855e7769f31bddff2bf261ecc86cd15b23a7"
+  },
+  {
+    "class": "Lcom/google/common/reflect/Invokable;",
+    "literals": [
+      "java.lang.reflect.AnnotatedType"
+    ],
+    "method": "initAnnotatedTypeExists()Z",
+    "owner": "COBRA",
+    "sha256": "ee3218dcadd02afadef3c9cf24ddcd567a3642c499a17978ebfedf036e835b70"
+  },
+  {
+    "class": "Lcom/google/common/primitives/UnsignedBytes$LexicographicalComparatorHolder;",
+    "literals": [],
+    "method": "getBestComparator()Ljava/util/Comparator;",
+    "owner": "COBRA",
+    "sha256": "5ace29d276009a9662ca5673b86f86c6665626d2342fc22d769f332b94a15d71"
+  },
+  {
+    "class": "Lcom/google/common/base/FinalizableReferenceQueue$DecoupledLoader;",
+    "literals": [
+      "com.google.common.base.internal.Finalizer",
+      "Could not load Finalizer in its own class loader. Loading Finalizer in the current class loader instead. As a result, you will not be able to garbage collect this class loader. To support reclaiming this class loader, either resolve the underlying issue, or move Guava to your system class path."
+    ],
+    "method": "loadFinalizer()Ljava/lang/Class;",
+    "owner": "COBRA",
+    "sha256": "9dc809fd50541b3bf51eb4a8cc7d8ebff64e600e79035d27d66caea467a07c9c"
+  },
+  {
+    "class": "Lcom/google/common/base/FinalizableReferenceQueue$SystemLoader;",
+    "literals": [
+      "com.google.common.base.internal.Finalizer",
+      "Not allowed to access system class loader."
+    ],
+    "method": "loadFinalizer()Ljava/lang/Class;",
+    "owner": "COBRA",
+    "sha256": "ba9cdc2ef85180487c4f71eca42d841a514e09ab5a852e1aa4cc3091f7597880"
+  },
+  {
+    "class": "Lcom/google/common/base/FinalizableReferenceQueue$DirectLoader;",
+    "literals": [
+      "com.google.common.base.internal.Finalizer"
+    ],
+    "method": "loadFinalizer()Ljava/lang/Class;",
+    "owner": "COBRA",
+    "sha256": "ab29eee5f4d47333dcc7640c3e3c2b019ab9f17f9bc62cb3f8aa1d60bdb8377f"
+  },
+  {
+    "class": "Lcom/google/common/base/Throwables;",
+    "literals": [
+      "sun.misc.SharedSecrets",
+      "getJavaLangAccess"
+    ],
+    "method": "getJLA()Ljava/lang/Object;",
+    "owner": "COBRA",
+    "sha256": "78cc04fb4ef9cfd8e8e231d31e096438bd2dec92d3455bedf5ca06e22b11fff1"
+  },
+  {
+    "class": "Lcom/google/common/base/Throwables;",
+    "literals": [
+      "sun.misc.JavaLangAccess"
+    ],
+    "method": "getJlaMethod(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;",
+    "owner": "COBRA",
+    "sha256": "c59b03110bee66706f5008a1630e2d7b80e6e26a9537d0694737ae2977db020f"
+  },
+  {
+    "class": "Lcom/google/common/hash/Funnels$StringCharsetFunnel$SerializedForm;",
+    "literals": [],
+    "method": "readResolve()Ljava/lang/Object;",
+    "owner": "COBRA",
+    "sha256": "e95503fd26a1bad48c8260f6bcaaf3e180ab11a864adf4857160a8ab05592f7d"
+  },
+  {
+    "class": "Lcom/google/common/net/MediaType;",
+    "literals": [
+      "charset",
+      "Multiple charset values defined: ",
+      ", "
+    ],
+    "method": "charset()Lcom/google/common/base/Optional;",
+    "owner": "COBRA",
+    "sha256": "659ce22511c839f8783cd9a6be0cfdab534c209e19fcd00d75d3d0ed4754460c"
+  },
+  {
+    "class": "Lcom/google/common/util/concurrent/MoreExecutors;",
+    "literals": [
+      "com.google.appengine.runtime.environment",
+      "com.google.appengine.api.utils.SystemProperty",
+      "com.google.apphosting.api.ApiProxy",
+      "getCurrentEnvironment"
+    ],
+    "method": "isAppEngineWithApiClasses()Z",
+    "owner": "COBRA",
+    "sha256": "173049395bcd8ff377bcaf70103c96482dbe82344ee7a4c879894b4f851f041a"
+  },
+  {
+    "class": "Lcom/google/common/util/concurrent/MoreExecutors;",
+    "literals": [
+      "com.google.appengine.api.ThreadManager",
+      "currentRequestThreadFactory",
+      "Couldn\\'t invoke ThreadManager.currentRequestThreadFactory"
+    ],
+    "method": "platformThreadFactory()Ljava/util/concurrent/ThreadFactory;",
+    "owner": "COBRA",
+    "sha256": "7711de742bef994c024e55a418c3d0dd9dfd9cbcc386e206b529d7fe66265659"
+  },
+  {
+    "class": "Landroidx/exifinterface/media/ExifInterface;",
+    "literals": [
+      "ExifInterface",
+      "VP8X",
+      "VP8L",
+      "VP8 ",
+      "ANIM",
+      "ANMF",
+      "",
+      "BYTE",
+      "STRING",
+      "USHORT",
+      "ULONG",
+      "URATIONAL",
+      "SBYTE",
+      "UNDEFINED",
+      "SSHORT",
+      "SLONG",
+      "SRATIONAL",
+      "SINGLE",
+      "DOUBLE",
+      "IFD",
+      "NewSubfileType",
+      "SubfileType",
+      "ImageWidth",
+      "ImageLength",
+      "BitsPerSample",
+      "Compression",
+      "PhotometricInterpretation",
+      "ImageDescription",
+      "Make",
+      "Model",
+      "StripOffsets",
+      "Orientation",
+      "SamplesPerPixel",
+      "RowsPerStrip",
+      "StripByteCounts",
+      "XResolution",
+      "YResolution",
+      "PlanarConfiguration",
+      "ResolutionUnit",
+      "TransferFunction",
+      "Software",
+      "DateTime",
+      "Artist",
+      "WhitePoint",
+      "PrimaryChromaticities",
+      "SubIFDPointer",
+      "JPEGInterchangeFormat",
+      "JPEGInterchangeFormatLength",
+      "YCbCrCoefficients",
+      "YCbCrSubSampling",
+      "YCbCrPositioning",
+      "ReferenceBlackWhite",
+      "Copyright",
+      "ExifIFDPointer",
+      "GPSInfoIFDPointer",
+      "SensorTopBorder",
+      "SensorLeftBorder",
+      "SensorBottomBorder",
+      "SensorRightBorder",
+      "ISO",
+      "JpgFromRaw",
+      "Xmp",
+      "ExposureTime",
+      "FNumber",
+      "ExposureProgram",
+      "SpectralSensitivity",
+      "PhotographicSensitivity",
+      "OECF",
+      "SensitivityType",
+      "StandardOutputSensitivity",
+      "RecommendedExposureIndex",
+      "ISOSpeed",
+      "ISOSpeedLatitudeyyy",
+      "ISOSpeedLatitudezzz",
+      "ExifVersion",
+      "DateTimeOriginal",
+      "DateTimeDigitized",
+      "OffsetTime",
+      "OffsetTimeOriginal",
+      "OffsetTimeDigitized",
+      "ComponentsConfiguration",
+      "CompressedBitsPerPixel",
+      "ShutterSpeedValue",
+      "ApertureValue",
+      "BrightnessValue",
+      "ExposureBiasValue",
+      "MaxApertureValue",
+      "SubjectDistance",
+      "MeteringMode",
+      "LightSource",
+      "Flash",
+      "FocalLength",
+      "SubjectArea",
+      "MakerNote",
+      "UserComment",
+      "SubSecTime",
+      "SubSecTimeOriginal",
+      "SubSecTimeDigitized",
+      "FlashpixVersion",
+      "ColorSpace",
+      "PixelXDimension",
+      "PixelYDimension",
+      "RelatedSoundFile",
+      "InteroperabilityIFDPointer",
+      "FlashEnergy",
+      "SpatialFrequencyResponse",
+      "FocalPlaneXResolution",
+      "FocalPlaneYResolution",
+      "FocalPlaneResolutionUnit",
+      "SubjectLocation",
+      "ExposureIndex",
+      "SensingMethod",
+      "FileSource",
+      "SceneType",
+      "CFAPattern",
+      "CustomRendered",
+      "ExposureMode",
+      "WhiteBalance",
+      "DigitalZoomRatio",
+      "FocalLengthIn35mmFilm",
+      "SceneCaptureType",
+      "GainControl",
+      "Contrast",
+      "Saturation",
+      "Sharpness",
+      "DeviceSettingDescription",
+      "SubjectDistanceRange",
+      "ImageUniqueID",
+      "CameraOwnerName",
+      "BodySerialNumber",
+      "LensSpecification",
+      "LensMake",
+      "LensModel",
+      "Gamma",
+      "DNGVersion",
+      "DefaultCropSize",
+      "GPSVersionID",
+      "GPSLatitudeRef",
+      "GPSLatitude",
+      "GPSLongitudeRef",
+      "GPSLongitude",
+      "GPSAltitudeRef",
+      "GPSAltitude",
+      "GPSTimeStamp",
+      "GPSSatellites",
+      "GPSStatus",
+      "GPSMeasureMode",
+      "GPSDOP",
+      "GPSSpeedRef",
+      "GPSSpeed",
+      "GPSTrackRef",
+      "GPSTrack",
+      "GPSImgDirectionRef",
+      "GPSImgDirection",
+      "GPSMapDatum",
+      "GPSDestLatitudeRef",
+      "GPSDestLatitude",
+      "GPSDestLongitudeRef",
+      "GPSDestLongitude",
+      "GPSDestBearingRef",
+      "GPSDestBearing",
+      "GPSDestDistanceRef",
+      "GPSDestDistance",
+      "GPSProcessingMethod",
+      "GPSAreaInformation",
+      "GPSDateStamp",
+      "GPSDifferential",
+      "GPSHPositioningError",
+      "InteroperabilityIndex",
+      "NewSubfileType",
+      "SubfileType",
+      "ThumbnailImageWidth",
+      "ThumbnailImageLength",
+      "BitsPerSample",
+      "Compression",
+      "PhotometricInterpretation",
+      "ImageDescription",
+      "Make",
+      "Model",
+      "StripOffsets",
+      "ThumbnailOrientation",
+      "SamplesPerPixel",
+      "RowsPerStrip",
+      "StripByteCounts",
+      "XResolution",
+      "YResolution",
+      "PlanarConfiguration",
+      "ResolutionUnit",
+      "TransferFunction",
+      "Software",
+      "DateTime",
+      "Artist",
+      "WhitePoint",
+      "PrimaryChromaticities",
+      "SubIFDPointer",
+      "JPEGInterchangeFormat",
+      "JPEGInterchangeFormatLength",
+      "YCbCrCoefficients",
+      "YCbCrSubSampling",
+      "YCbCrPositioning",
+      "ReferenceBlackWhite",
+      "Copyright",
+      "ExifIFDPointer",
+      "GPSInfoIFDPointer",
+      "DNGVersion",
+      "DefaultCropSize",
+      "StripOffsets",
+      "ThumbnailImage",
+      "CameraSettingsIFDPointer",
+      "ImageProcessingIFDPointer",
+      "PreviewImageStart",
+      "PreviewImageLength",
+      "AspectFrame",
+      "ColorSpace",
+      "SubIFDPointer",
+      "ExifIFDPointer",
+      "GPSInfoIFDPointer",
+      "InteroperabilityIFDPointer",
+      "CameraSettingsIFDPointer",
+      "ImageProcessingIFDPointer",
+      "SubjectDistance",
+      "GPSTimeStamp",
+      "FNumber",
+      "DigitalZoomRatio",
+      "ExposureTime",
+      "US-ASCII",
+      "Exif\\u0000\\u0000",
+      "http://ns.adobe.com/xap/1.0/\\u0000",
+      "yyyy:MM:dd HH:mm:ss",
+      "UTC",
+      "yyyy-MM-dd HH:mm:ss",
+      "UTC",
+      ".*[1-9].*",
+      "^(\\\\d{2}):(\\\\d{2}):(\\\\d{2})$",
+      "^(\\\\d{4}):(\\\\d{2}):(\\\\d{2})\\\\s(\\\\d{2}):(\\\\d{2}):(\\\\d{2})$",
+      "^(\\\\d{4})-(\\\\d{2})-(\\\\d{2})\\\\s(\\\\d{2}):(\\\\d{2}):(\\\\d{2})$"
+    ],
+    "method": "<clinit>()V",
+    "owner": "COBRA",
+    "sha256": "80b4ce0692a56395c5547e485c87b51cbd9ff1f2b5fecd8e3c40ba4c28b77197"
+  },
+  {
+    "class": "Landroidx/media3/extractor/DefaultExtractorsFactory;",
+    "literals": [
+      "androidx.media3.decoder.flac.FlacLibrary",
+      "isAvailable",
+      "androidx.media3.decoder.flac.FlacExtractor"
+    ],
+    "method": "getFlacExtractorConstructor()Ljava/lang/reflect/Constructor;",
+    "owner": "COBRA",
+    "sha256": "b4d6cbd1543679bae3330a924e4ad30a48bb4da9e0a888c80fd5fffc03da0732"
+  },
+  {
+    "class": "Landroidx/media3/extractor/DefaultExtractorsFactory;",
+    "literals": [
+      "androidx.media3.decoder.midi.MidiExtractor"
+    ],
+    "method": "getMidiExtractorConstructor()Ljava/lang/reflect/Constructor;",
+    "owner": "COBRA",
+    "sha256": "9d82392a0ca01627250deef7a4043d280769cc30abf0660488c89badbb9f401e"
+  },
+  {
+    "class": "Landroidx/media3/exoplayer/DefaultRenderersFactory;",
+    "literals": [
+      "DefaultRenderersFactory",
+      "androidx.media3.decoder.midi.MidiRenderer",
+      "Loaded MidiRenderer.",
+      "Error instantiating MIDI extension",
+      "androidx.media3.decoder.opus.LibopusAudioRenderer",
+      "Loaded LibopusAudioRenderer.",
+      "Error instantiating Opus extension",
+      "androidx.media3.decoder.flac.LibflacAudioRenderer",
+      "Loaded LibflacAudioRenderer.",
+      "Error instantiating FLAC extension",
+      "androidx.media3.decoder.ffmpeg.FfmpegAudioRenderer",
+      "Loaded FfmpegAudioRenderer.",
+      "Error instantiating FFmpeg extension",
+      "androidx.media3.decoder.iamf.LibiamfAudioRenderer",
+      "Loaded LibiamfAudioRenderer.",
+      "Error instantiating IAMF extension",
+      "androidx.media3.decoder.mpegh.MpeghAudioRenderer",
+      "Loaded MpeghAudioRenderer.",
+      "Error instantiating MPEG-H extension"
+    ],
+    "method": "buildAudioRenderers(Landroid/content/Context;ILandroidx/media3/exoplayer/mediacodec/MediaCodecSelector;ZLandroidx/media3/exoplayer/audio/AudioSink;Landroid/os/Handler;Landroidx/media3/exoplayer/audio/AudioRendererEventListener;Ljava/util/ArrayList;)V",
+    "owner": "COBRA",
+    "sha256": "d8083538cf4bea5140c66a46c400e3a255634a58649a7f7ee334c87914b36275"
+  },
+  {
+    "class": "Landroidx/media3/exoplayer/DefaultRenderersFactory;",
+    "literals": [
+      "DefaultRenderersFactory",
+      "androidx.media3.decoder.vp9.LibvpxVideoRenderer",
+      "Loaded LibvpxVideoRenderer.",
+      "Error instantiating VP9 extension",
+      "androidx.media3.decoder.av1.Libgav1VideoRenderer",
+      "Loaded Libgav1VideoRenderer.",
+      "Error instantiating AV1 extension",
+      "androidx.media3.decoder.ffmpeg.ExperimentalFfmpegVideoRenderer",
+      "Loaded FfmpegVideoRenderer.",
+      "Error instantiating FFmpeg extension"
+    ],
+    "method": "buildVideoRenderers(Landroid/content/Context;ILandroidx/media3/exoplayer/mediacodec/MediaCodecSelector;ZLandroid/os/Handler;Landroidx/media3/exoplayer/video/VideoRendererEventListener;JLjava/util/ArrayList;)V",
+    "owner": "COBRA",
+    "sha256": "7cd4375828dc2be3f210fef2698770c8a8f39a8b8c6fa2c1fd0591473ae01c45"
+  },
+  {
+    "class": "Landroidx/media3/exoplayer/ExoPlayerImpl;",
+    "literals": [
+      "androidx.media3.effect.PreviewingSingleInputVideoGraph$Factory",
+      "Could not find required lib-effect dependencies."
+    ],
+    "method": "setVideoEffects(Ljava/util/List;)V",
+    "owner": "COBRA",
+    "sha256": "a49400a594c75bdcd77aaf6b185ea4362aa64e42657725b5c98ddf4486719ff6"
+  },
+  {
+    "class": "Landroidx/media3/common/PlaybackException;",
+    "literals": [],
+    "method": "getCauseFromBundle(Landroid/os/Bundle;)Ljava/lang/Throwable;",
+    "owner": "COBRA",
+    "sha256": "3642b3f5b4054169d450242b40c82cdf51887b034169f76e1704aa8165778850"
+  },
+  {
+    "class": "Landroidx/media3/datasource/DefaultDataSource;",
+    "literals": [
+      "androidx.media3.datasource.rtmp.RtmpDataSource",
+      "Error instantiating RTMP extension",
+      "DefaultDataSource",
+      "Attempting to play RTMP stream without depending on the RTMP extension"
+    ],
+    "method": "getRtmpDataSource()Landroidx/media3/datasource/DataSource;",
+    "owner": "COBRA",
+    "sha256": "538d5bd5fc7e139935f0e237ea80fc3908fb98e1633897c9d06bfc7a59777d28"
+  },
+  {
+    "class": "Landroidx/media3/exoplayer/offline/DefaultDownloaderFactory;",
+    "literals": [
+      "androidx.media3.exoplayer.dash.offline.DashDownloader",
+      "androidx.media3.exoplayer.hls.offline.HlsDownloader",
+      "androidx.media3.exoplayer.smoothstreaming.offline.SsDownloader"
+    ],
+    "method": "createDownloaderConstructors()Landroid/util/SparseArray;",
+    "owner": "COBRA",
+    "sha256": "f6a9f8241c205af8c0edbb637104efba4862adc2d33156664131ea890159d2fe"
+  },
+  {
+    "class": "Landroidx/media3/exoplayer/video/PlaybackVideoGraphWrapper$ReflectivePreviewingSingleInputVideoGraphFactory;",
+    "literals": [
+      "androidx.media3.effect.PreviewingSingleInputVideoGraph$Factory"
+    ],
+    "method": "create(Landroid/content/Context;Landroidx/media3/common/ColorInfo;Landroidx/media3/common/DebugViewProvider;Landroidx/media3/common/VideoGraph$Listener;Ljava/util/concurrent/Executor;Landroidx/media3/common/VideoCompositorSettings;Ljava/util/List;J)Landroidx/media3/common/PreviewingVideoGraph;",
+    "owner": "COBRA",
+    "sha256": "6548406d710e5c41264179123989fb02022d9aca2d42529a650a390ac4036317"
+  },
+  {
+    "class": "Landroidx/media3/exoplayer/video/PlaybackVideoGraphWrapper$ReflectiveDefaultVideoFrameProcessorFactory;",
+    "literals": [
+      "androidx.media3.effect.DefaultVideoFrameProcessor$Factory$Builder",
+      "build"
+    ],
+    "method": "lambda$static$0()Landroidx/media3/common/VideoFrameProcessor$Factory;",
+    "owner": "COBRA",
+    "sha256": "375f83a87b1d1d3f30aead3e2c9b289643d7089249c624dee8e3582d922e0383"
+  },
+  {
+    "class": "Landroidx/media3/exoplayer/source/DefaultMediaSourceFactory$DelegateFactoryLoader;",
+    "literals": [
+      "Unrecognized contentType: ",
+      "androidx.media3.exoplayer.rtsp.RtspMediaSource$Factory",
+      "androidx.media3.exoplayer.hls.HlsMediaSource$Factory",
+      "androidx.media3.exoplayer.smoothstreaming.SsMediaSource$Factory",
+      "androidx.media3.exoplayer.dash.DashMediaSource$Factory"
+    ],
+    "method": "loadSupplier(I)Lcom/google/common/base/Supplier;",
+    "owner": "COBRA",
+    "sha256": "19d61df48e0d5e362fc2728b08b85547e97bd6ee3250383d9713d20cbed3f6fd"
+  },
+  {
+    "class": "Landroidx/media3/common/util/Util;",
+    "literals": [
+      "android.os.SystemProperties",
+      "get",
+      "Failed to read system property ",
+      "Util"
+    ],
+    "method": "getSystemProperty(Ljava/lang/String;)Ljava/lang/String;",
+    "owner": "COBRA",
+    "sha256": "d9f65a654576568d2bf0c47db5834e8f714b3bc070b0c040edb9887401a389b5"
+  },
+  {
+    "class": "Landroidx/media3/common/util/LibraryLoader;",
+    "literals": [
+      "LibraryLoader",
+      "Failed to load "
+    ],
+    "method": "isAvailable()Z",
+    "owner": "COBRA",
+    "sha256": "cdd98eda981ed221995b89f8fb00fa87c6663c2fbcc7e07c155d0159458a81b9"
+  },
+  {
+    "class": "Lkotlin/text/CharsetsKt;",
+    "literals": [
+      "charsetName",
+      "forName(charsetName)"
+    ],
+    "method": "charset(Ljava/lang/String;)Ljava/nio/charset/Charset;",
+    "owner": "COBRA",
+    "sha256": "04541756d0ee58d926c33430de7c327d3ac4bf462b3421af0ef53483bbb1d3a8"
+  },
+  {
+    "class": "Lkotlin/text/Charsets;",
+    "literals": [
+      "UTF-8",
+      "forName(\\\"UTF-8\\\")",
+      "UTF-16",
+      "forName(\\\"UTF-16\\\")",
+      "UTF-16BE",
+      "forName(\\\"UTF-16BE\\\")",
+      "UTF-16LE",
+      "forName(\\\"UTF-16LE\\\")",
+      "US-ASCII",
+      "forName(\\\"US-ASCII\\\")",
+      "ISO-8859-1",
+      "forName(\\\"ISO-8859-1\\\")"
+    ],
+    "method": "<clinit>()V",
+    "owner": "COBRA",
+    "sha256": "411bf35ba871aa65ae4cda6276feb919b35855a856f77533f4e40a8f2151b0b2"
+  },
+  {
+    "class": "Lkotlin/text/Charsets;",
+    "literals": [
+      "UTF-32",
+      "forName(\\\"UTF-32\\\")"
+    ],
+    "method": "UTF32()Ljava/nio/charset/Charset;",
+    "owner": "COBRA",
+    "sha256": "91f9f4ea5b85939008ead694fc391ee2f4e890101a119eab00c09a5c2d3bc8c9"
+  },
+  {
+    "class": "Lkotlin/text/Charsets;",
+    "literals": [
+      "UTF-32BE",
+      "forName(\\\"UTF-32BE\\\")"
+    ],
+    "method": "UTF32_BE()Ljava/nio/charset/Charset;",
+    "owner": "COBRA",
+    "sha256": "428fb5d09e5ac13ab2bb200106b826ec8f811a507fb8d4b68e87736f279b709f"
+  },
+  {
+    "class": "Lkotlin/text/Charsets;",
+    "literals": [
+      "UTF-32LE",
+      "forName(\\\"UTF-32LE\\\")"
+    ],
+    "method": "UTF32_LE()Ljava/nio/charset/Charset;",
+    "owner": "COBRA",
+    "sha256": "5c0ef3cb96a45acb13679e2a45e1e962c1cd2d187ae9f797b7ca4abf23b39099"
+  },
+  {
+    "class": "Lkotlin/internal/jdk8/JDK8PlatformImplementations$ReflectSdkVersion;",
+    "literals": [
+      "android.os.Build$VERSION",
+      "SDK_INT"
+    ],
+    "method": "<clinit>()V",
+    "owner": "COBRA",
+    "sha256": "c1122e0579828b52e83989caed3d18bf7854aea078cc9163d7fc87aaf73eb38b"
+  },
+  {
+    "class": "Lkotlin/internal/jdk7/JDK7PlatformImplementations$ReflectSdkVersion;",
+    "literals": [
+      "android.os.Build$VERSION",
+      "SDK_INT"
+    ],
+    "method": "<clinit>()V",
+    "owner": "COBRA",
+    "sha256": "c93542275307cf0d3e60e666d96cd86a8e89365815f90aa43d8b1cf9087151db"
+  },
+  {
+    "class": "Lkotlin/coroutines/jvm/internal/ModuleNameRetriever;",
+    "literals": [
+      "getModule",
+      "java.lang.Module",
+      "getDescriptor",
+      "java.lang.module.ModuleDescriptor",
+      "name"
+    ],
+    "method": "buildCache(Lkotlin/coroutines/jvm/internal/BaseContinuationImpl;)Lkotlin/coroutines/jvm/internal/ModuleNameRetriever$Cache;",
+    "owner": "COBRA",
+    "sha256": "5f99044647f08d562d60ca177b99d22cebcc14d0afac35458c9676ad08f7472c"
+  },
+  {
+    "class": "Lkotlin/jvm/internal/Intrinsics;",
+    "literals": [
+      "Class ",
+      " is not found. Please update the Kotlin runtime to the latest version"
+    ],
+    "method": "checkHasClass(Ljava/lang/String;)V",
+    "owner": "COBRA",
+    "sha256": "750712097433cf3eb53a81a1f57436147b445eebf95ee25ec2a36893a442d780"
+  },
+  {
+    "class": "Lkotlin/jvm/internal/Intrinsics;",
+    "literals": [
+      "Class ",
+      " is not found: this code requires the Kotlin runtime of version at least "
+    ],
+    "method": "checkHasClass(Ljava/lang/String;Ljava/lang/String;)V",
+    "owner": "COBRA",
+    "sha256": "05afe82cfb9773018c6918d171e8fec55c5cda3d9da260108df7fb5b28636224"
+  },
+  {
+    "class": "Lkotlin/jvm/internal/Reflection;",
+    "literals": [
+      "kotlin.reflect.jvm.internal.ReflectionFactoryImpl"
+    ],
+    "method": "<clinit>()V",
+    "owner": "COBRA",
+    "sha256": "ea2bf3c81c7c1b80e43ab77eb41dafdf54ede813185d420a472975508dc38c8d"
+  },
+  {
+    "class": "Lokhttp3/internal/platform/Platform;",
+    "literals": [
+      "sslSocketFactory",
+      "sun.security.ssl.SSLContextImpl",
+      "sslContextClass",
+      "context",
+      "trustManager",
+      "java.lang.reflect.InaccessibleObjectException"
+    ],
+    "method": "trustManager(Ljavax/net/ssl/SSLSocketFactory;)Ljavax/net/ssl/X509TrustManager;",
+    "owner": "COBRA",
+    "sha256": "74adf2e317a85d52b7246d6afcc54ca73879e3d4dcc9bba3262bd4e3e5909386"
+  },
+  {
+    "class": "Lokhttp3/internal/platform/OpenJSSEPlatform;",
+    "literals": [
+      "org.openjsse.net.ssl.OpenJSSE"
+    ],
+    "method": "<clinit>()V",
+    "owner": "COBRA",
+    "sha256": "234f55cce677da60b560d0ea93600a2006ee955d4b29d11a785496414cfa45de"
+  },
+  {
+    "class": "Lokhttp3/internal/platform/Jdk8WithJettyBootPlatform$Companion;",
+    "literals": [
+      "java.specification.version",
+      "unknown",
+      "jvmVersion",
+      "org.eclipse.jetty.alpn.ALPN",
+      "org.eclipse.jetty.alpn.ALPN$Provider",
+      "org.eclipse.jetty.alpn.ALPN$ClientProvider",
+      "org.eclipse.jetty.alpn.ALPN$ServerProvider",
+      "put",
+      "get",
+      "remove",
+      "putMethod",
+      "getMethod",
+      "removeMethod",
+      "clientProviderClass",
+      "serverProviderClass"
+    ],
+    "method": "buildIfSupported()Lokhttp3/internal/platform/Platform;",
+    "owner": "COBRA",
+    "sha256": "a9a505726cd2bb23f3e07200ac93c5662e10baaf8348be36652341f42ecf8151"
+  },
+  {
+    "class": "Lokhttp3/internal/platform/BouncyCastlePlatform;",
+    "literals": [
+      "org.bouncycastle.jsse.provider.BouncyCastleJsseProvider"
+    ],
+    "method": "<clinit>()V",
+    "owner": "COBRA",
+    "sha256": "885f7519e70df59d5d8ec1214446cedc9c02cd23f2fdf1f4712bb42331437d8c"
+  },
+  {
+    "class": "Lokhttp3/internal/platform/ConscryptPlatform;",
+    "literals": [
+      "org.conscrypt.Conscrypt$Version"
+    ],
+    "method": "<clinit>()V",
+    "owner": "COBRA",
+    "sha256": "be78b013765a668d387bdcab20cff5e12c940bf693e29f35ea943d2409a3cc54"
+  },
+  {
+    "class": "Lokhttp3/internal/platform/android/StandardAndroidSocketAdapter$Companion;",
+    "literals": [
+      "packageName",
+      ".OpenSSLSocketImpl",
+      "null cannot be cast to non-null type java.lang.Class<in javax.net.ssl.SSLSocket>",
+      ".OpenSSLSocketFactoryImpl",
+      "null cannot be cast to non-null type java.lang.Class<in javax.net.ssl.SSLSocketFactory>",
+      ".SSLParametersImpl",
+      "paramsClass",
+      "unable to load android socket classes"
+    ],
+    "method": "buildIfSupported(Ljava/lang/String;)Lokhttp3/internal/platform/android/SocketAdapter;",
+    "owner": "COBRA",
+    "sha256": "62780b4e4db5e3a4bf05956633b7c97f2398b2cb05f5742d0f6e4841d4a3e249"
+  },
+  {
+    "class": "Lokhttp3/internal/platform/android/CloseGuard$Companion;",
+    "literals": [
+      "dalvik.system.CloseGuard",
+      "get",
+      "open",
+      "warnIfOpen"
+    ],
+    "method": "get()Lokhttp3/internal/platform/android/CloseGuard;",
+    "owner": "COBRA",
+    "sha256": "48c669d3751cd241f20cf68e1beaf412a78b2d56f0a6d8300d111630405d4e9a"
+  },
+  {
+    "class": "Lokio/FileSystem;",
+    "literals": [
+      "java.nio.file.Files",
+      "java.io.tmpdir",
+      "getProperty(...)",
+      "getClassLoader(...)"
+    ],
+    "method": "<clinit>()V",
+    "owner": "COBRA",
+    "sha256": "7f67b1ffe3f7efed78515518741424df62ead090be081687e1fee14774d2992b"
+  },
+  {
+    "class": "Lcom/google/gson/internal/UnsafeAllocator;",
+    "literals": [
+      "newInstance",
+      "sun.misc.Unsafe",
+      "theUnsafe",
+      "allocateInstance",
+      "getConstructorId"
+    ],
+    "method": "create()Lcom/google/gson/internal/UnsafeAllocator;",
+    "owner": "INFINITY",
+    "sha256": "ac5fc1a65494c173508e5f6d33b089464ceb4a0356a6ace7e620b09b09fd702b"
+  },
+  {
+    "class": "Lcom/google/gson/internal/sql/SqlTypesSupport;",
+    "literals": [
+      "java.sql.Date"
+    ],
+    "method": "<clinit>()V",
+    "owner": "INFINITY",
+    "sha256": "3fe729af59f29e67e69ee290a2cd4448b0ccd426249421d622ecc03d817d8e53"
+  },
+  {
+    "class": "Lcom/projectinfinity/kodi/InfinityKodiAmbientGate;",
+    "literals": [
+      "infinityambient"
+    ],
+    "method": "<clinit>()V",
+    "owner": "INFINITY",
+    "sha256": "81f1e44a1130322d4d7c949355b0b0b93bda488f07209570dd2024cfab906922"
+  },
+  {
+    "class": "Lcom/projectinfinity/kodi/Main;",
+    "literals": [
+      "main.onCreate.beforeNative",
+      "xbmc.proploaded",
+      "",
+      "kodi",
+      "main.nativeLoaded",
+      "main.kodiNative.loaded",
+      "main.nativeEntry.deferred",
+      "main.afterSuper",
+      "main.onCreate.afterSuper",
+      "infinitycrash",
+      "nativeCrashRecorder.loaded.afterKodiOnCreateOnCreate",
+      "Native crash recorder unavailable: ",
+      "InfinityDiagnostics",
+      "nativeCrashRecorder.unavailable.afterKodiOnCreate",
+      "android.software.leanback",
+      "com.google.android.tvlauncher",
+      "com.google.android.leanbacklauncher",
+      "input",
+      "attach",
+      "main.attach",
+      "main.javaReady",
+      "infinity_kodi_launch_token"
+    ],
+    "method": "onCreate(Landroid/os/Bundle;)V",
+    "owner": "INFINITY",
+    "sha256": "6fcc697f33288ab237ad4b92618778c4525627c0fe9878e47dfd7f386f2b8f8f"
+  },
+  {
+    "class": "Lcom/projectinfinity/kodi/InfinityKodiSurfaceSampler;",
+    "literals": [
+      "infinityambient"
+    ],
+    "method": "<clinit>()V",
+    "owner": "INFINITY",
+    "sha256": "2c610297e9382a761ab9ed9b8be9678286cf024ab34b6cf050fc624bea77c28e"
+  },
+  {
+    "class": "Lcom/projectinfinity/kodi/InfinityInstalledCheckpointInstaller;",
+    "literals": [],
+    "method": "verify([B[B)[Ljava/lang/String;",
+    "owner": "INFINITY",
+    "sha256": "59a32c0834a3efc99c5924088e4c5ba8979954ec49d3d28974bc01bedfa3bfad"
+  }
+]

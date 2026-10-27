@@ -1,0 +1,25 @@
+{
+  "application_executed": false,
+  "cases": [
+    "independent_state",
+    "pending_cobra_write",
+    "pending_shell_write",
+    "failed_durability",
+    "accepted_continuation",
+    "late_write_revokes_receipt",
+    "wrong_receipt",
+    "retained_cobra_keeps_writing",
+    "new_cobra_entry_revokes_kill",
+    "begin_is_atomic",
+    "all_locks_held_during_callback",
+    "cancel_and_reentry",
+    "retained_coordinator_can_close_again",
+    "retained_failure_not_erased",
+    "overlapping_cobra_leases"
+  ],
+  "combined_source_sha256": "ab68caf7262bb7bd2da1835d4b3169c3063b643f320062993668082d15b88274",
+  "status": "PASS_OWNER_DURABILITY_CONTRACT",
+  "termination_callback": "assertions_only_no_process_termination",
+  "test_authority": "SCOPED-CORRECTION-TESTS.json",
+  "unchanged_barrier_source_sha256": "b7d69d9dc1db6d038d32c0e3bbce36b3de2973b64aa08aab80b0d64980c56340"
+}

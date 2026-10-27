@@ -9,9 +9,14 @@ import org.jf.dexlib2.DexFileFactory;
 import org.jf.dexlib2.Opcodes;
 import org.jf.dexlib2.iface.ClassDef;
 import org.jf.dexlib2.iface.Field;
+import org.jf.dexlib2.iface.Method;
+import org.jf.dexlib2.iface.instruction.Instruction;
+import org.jf.dexlib2.iface.instruction.ReferenceInstruction;
+import org.jf.dexlib2.iface.reference.MethodReference;
 import org.jf.dexlib2.iface.value.*;
 import org.jf.dexlib2.immutable.ImmutableClassDef;
 import org.jf.dexlib2.immutable.ImmutableField;
+import org.jf.dexlib2.immutable.ImmutableMethod;
 import org.jf.dexlib2.immutable.value.ImmutableArrayEncodedValue;
 import org.jf.dexlib2.writer.io.FileDataStore;
 import org.jf.dexlib2.writer.pool.*;
@@ -60,6 +65,14 @@ public final class ModuleDexWriter {
       || v instanceof FloatEncodedValue&&Float.floatToRawIntBits(((FloatEncodedValue)v).getValue())==0
       || v instanceof DoubleEncodedValue&&Double.doubleToRawLongBits(((DoubleEncodedValue)v).getValue())==0;
   }
+  static String root(Map<String,String> parent,String name){
+    String p=parent.get(name);if(p.equals(name))return name;
+    p=root(parent,p);parent.put(name,p);return p;
+  }
+  static void join(Map<String,String> parent,String a,String b){
+    a=root(parent,a);b=root(parent,b);if(a.equals(b))return;
+    if(a.compareTo(b)<0)parent.put(b,a);else parent.put(a,b);
+  }
   static ClassDef restoreDefaults(ClassDef original,ClassDef changed){
     Map<String,Field> old=fields(original);List<Field> revised=new ArrayList<>();
     require(old.keySet().equals(fields(changed).keySet()),"Unreviewed field-set mutation "+changed.getType());
@@ -69,8 +82,13 @@ public final class ModuleDexWriter {
       revised.add(new ImmutableField(f.getDefiningClass(),f.getName(),f.getType(),f.getAccessFlags(),value,
                     f.getAnnotations(),f.getHiddenApiRestrictions()));
     }
+    // DexBacked methods share forward-only annotation iterators. Materialize
+    // each definition while traversing it, before the immutable class filters
+    // direct and virtual methods in separate passes.
+    List<Method> methods=new ArrayList<>();
+    for(Method m:changed.getMethods())methods.add(ImmutableMethod.of(m));
     return new ImmutableClassDef(changed.getType(),changed.getAccessFlags(),changed.getSuperclass(),
-          changed.getInterfaces(),changed.getSourceFile(),changed.getAnnotations(),revised,changed.getMethods());
+          changed.getInterfaces(),changed.getSourceFile(),changed.getAnnotations(),revised,methods);
   }
   public static void main(String[] args)throws Exception{
     require(args.length>=5,"out assignments.tsv origins.tsv patch.dex helper.dex originals... required");
@@ -82,7 +100,7 @@ public final class ModuleDexWriter {
     for(int i=5;i<args.length;i++)for(Map.Entry<String,ClassDef> e:read(args[i]).entrySet())
       require(original.put(e.getKey(),e.getValue())==null,"Duplicate original");
     Map<String,ClassDef> selected=new TreeMap<>(original),patched=read(args[3]);
-    for(Map.Entry<String,ClassDef> e:read(args[4]).entrySet())require(patched.put(e.getKey(),e.getValue())==null,"Duplicate patch");
+    if(!args[4].equals("-"))for(Map.Entry<String,ClassDef> e:read(args[4]).entrySet())require(patched.put(e.getKey(),e.getValue())==null,"Duplicate patch");
     for(Map.Entry<String,ClassDef> e:patched.entrySet()){
       String origin=origins.get(e.getKey());
       if(origin!=null){require(original.containsKey(origin),"Unknown origin");selected.put(e.getKey(),restoreDefaults(original.get(origin),e.getValue()));}
@@ -96,14 +114,31 @@ public final class ModuleDexWriter {
       require(group.getKey().matches("[A-Z_]+"),"Invalid owner");
       Path dir=out.resolve(group.getKey());Files.createDirectory(dir);
       List<ClassDef> pending=new ArrayList<>();ExactPool pool=new ExactPool();int part=0;
+      // Keep synthetic accessors with their callers. Besides preserving JVM
+      // linkage, this preserves baksmali's resolved accessor annotations,
+      // whose text otherwise depends on the physical DEX partition.
+      Map<String,String> parent=new TreeMap<>(),first=new TreeMap<>();
+      for(ClassDef c:group.getValue())parent.put(c.getType(),c.getType());
       for(ClassDef c:group.getValue()){
-        pool.mark();pool.internClass(c);
+        String family=c.getType().split("\\$")[0].replace(";","");
+        if(first.containsKey(family))join(parent,c.getType(),first.get(family));else first.put(family,c.getType());
+        for(Method m:c.getMethods())if(m.getImplementation()!=null)
+          for(Instruction instruction:m.getImplementation().getInstructions())
+            if(instruction instanceof ReferenceInstruction && ((ReferenceInstruction)instruction).getReference() instanceof MethodReference){
+              MethodReference target=(MethodReference)((ReferenceInstruction)instruction).getReference();
+              if(target.getName().startsWith("access$")&&parent.containsKey(target.getDefiningClass()))join(parent,c.getType(),target.getDefiningClass());
+            }
+      }
+      Map<String,List<ClassDef>> families=new TreeMap<>();
+      for(ClassDef c:group.getValue())families.computeIfAbsent(root(parent,c.getType()),k->new ArrayList<>()).add(c);
+      for(List<ClassDef> family:families.values()){
+        pool.mark();for(ClassDef c:family)pool.internClass(c);
         if(pool.hasOverflowed(60000)){
-          pool.reset();require(!pending.isEmpty(),"Single class exceeds DEX capacity");
+          pool.reset();require(!pending.isEmpty(),"Class family exceeds DEX capacity");
           write(pool,dir.resolve("part-"+(part++)+".dex"),pending);dexCount++;
-          pending.clear();pool=new ExactPool();pool.internClass(c);require(!pool.hasOverflowed(60000),"Class overflow");
+          pending.clear();pool=new ExactPool();for(ClassDef c:family)pool.internClass(c);require(!pool.hasOverflowed(60000),"Family overflow");
         }
-        pending.add(c);
+        pending.addAll(family);
       }
       if(!pending.isEmpty()){write(pool,dir.resolve("part-"+part+".dex"),pending);dexCount++;}
     }

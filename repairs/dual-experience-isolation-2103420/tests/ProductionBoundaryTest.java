@@ -91,6 +91,38 @@ public class ProductionBoundaryTest {
     assertSame(CobraJavaPersistence.preferences(app,"infinity_cobra_live",0),CobraPreferencePort.preferences(app,"infinity_cobra_live",0));
     assertSame(ShellJavaPersistence.preferences(app,"infinity_experience",0),ExperienceLaunchPreferences.preferences(app,"infinity_experience",0));
   }
+  @Test public void refreshFilesPreserveBytesAndStopCrossOwnerWrites()throws Exception{
+    File original=new File(app.getExternalFilesDir(null),".kodi/userdata/addon_data/service.infinity.refresh");assertTrue(original.mkdirs());
+    byte[] policy="mode=professional\ncustom_user_key=preserved\n".getBytes("UTF-8");
+    byte[] observation="owner=cobra\ngranted=true\n".getBytes("UTF-8");
+    Files.write(new File(original,"policy.properties").toPath(),policy);
+    Files.write(new File(original,"runtime.properties").toPath(),observation);
+    File own=CobraRefreshFiles.directory(app);
+    assertArrayEquals(policy,Files.readAllBytes(new File(own,"policy.properties").toPath()));
+    assertArrayEquals(observation,Files.readAllBytes(new File(own,"runtime.properties").toPath()));
+    Files.write(new File(original,"policy.properties").toPath(),new byte[]{1});
+    assertEquals(own,CobraRefreshFiles.directory(app));
+    assertArrayEquals(policy,Files.readAllBytes(new File(own,"policy.properties").toPath()));
+    try(CobraJavaPersistence.Output output=new CobraJavaPersistence.Output(new File(own,"runtime.properties"))){output.write(2);}
+    assertArrayEquals(observation,Files.readAllBytes(new File(original,"runtime.properties").toPath()));
+  }
+  @Test public void refreshDiagnosticExceptionDoesNotExemptUserPolicy()throws Exception{
+    File own=CobraRefreshFiles.directory(app);CobraJavaPersistence.initialize(app);
+    File policy=new File(own,"policy.properties");Files.write(policy.toPath(),new byte[]{7});
+    assertTrue(CobraJavaWriteBarrier.begin("cobra"));String proof=CobraJavaWriteBarrier.sealIfReady("cobra");
+    try(CobraJavaPersistence.Output output=new CobraJavaPersistence.Output(new File(own,"runtime.properties"))){output.write(1);}
+    assertTrue(CobraJavaWriteBarrier.authorized("cobra",proof));
+    try{new CobraJavaPersistence.Output(policy);fail("refresh policy bypassed protected admission");}catch(CobraJavaWriteBarrier.Closing expected){}
+    assertArrayEquals(new byte[]{7},Files.readAllBytes(policy.toPath()));assertFalse(CobraJavaWriteBarrier.authorized("cobra",proof));
+  }
+  @Test public void refreshDiagnosticHardlinkCannotTruncateProtectedData()throws Exception{
+    File own=CobraRefreshFiles.directory(app);CobraJavaPersistence.initialize(app);
+    File data=new File(app.getFilesDir(),"existing-profile");Files.write(data.toPath(),new byte[]{5});
+    File observation=new File(own,"runtime.properties");Files.createLink(observation.toPath(),data.toPath());
+    assertTrue(CobraJavaWriteBarrier.begin("cobra"));
+    try{new CobraJavaPersistence.Output(observation);fail("hard-linked data became diagnostic");}catch(CobraJavaWriteBarrier.Closing expected){}
+    assertArrayEquals(new byte[]{5},Files.readAllBytes(data.toPath()));assertEquals("",CobraJavaWriteBarrier.sealIfReady("cobra"));
+  }
   @Test public void failedDirectorySyncRevokesCombinedSaveProof()throws Exception{
     CobraJavaPersistence.Output output=new CobraJavaPersistence.Output(new File(app.getFilesDir(),"cobra-failure"));output.write(1);
     assertTrue(CombinedDurability.begin("combined"));HostFilesystemShadow.failDirectorySync=true;
@@ -150,5 +182,15 @@ public class ProductionBoundaryTest {
       assertTrue(InfinityJavaPersistence.preferences(app,"infinity_runtime",0).getBoolean("extended_background",false));
     }finally{cobra.destroy();infinity.destroy();}
     assertFalse(CobraRuntimeLease.active());
+  }
+  @Test public void infinityNotificationActionSeedsCobraBeforeChangingItsOwnSetting(){
+    app.getSharedPreferences("infinity_runtime",0).edit().putBoolean("extended_background",true).commit();
+    org.robolectric.android.controller.ServiceController<InfinityExtendedBackgroundService> infinity=Robolectric.buildService(InfinityExtendedBackgroundService.class).create();
+    try {
+      assertTrue(CobraBackgroundSettings.preferences(app).getBoolean("extended_background",false));
+      infinity.get().onStartCommand(new Intent("com.projectinfinity.kodi.action.DISABLE_EXTENDED_BACKGROUND"),0,1);
+      assertFalse(InfinityExtendedBackgroundService.isEnabled(app));
+      assertTrue(CobraBackgroundSettings.preferences(app).getBoolean("extended_background",false));
+    }finally{infinity.destroy();}
   }
 }
