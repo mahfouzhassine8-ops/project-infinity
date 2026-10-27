@@ -55,5 +55,21 @@
     "realistic selective representative QA and physical user acceptance"
   ],
   "governing_brief": "repairs/dual-experience-isolation-2103420/ASTRA-PRO-MASTER-IMPLEMENTATION-BRIEF-20261026.md",
-  "historical_scope_note": "Old Infinity-only COBRA-OFF-LIMITS applies to the old correction scope; new user authorization permits only behavior-preserving Cobra ownership isolation. It is NOT permission for Cobra feature repairs or Infinity shutdown changes."
+  "historical_scope_note": "Old Infinity-only COBRA-OFF-LIMITS applies to the old correction scope; new user authorization permits only behavior-preserving Cobra ownership isolation. It is NOT permission for Cobra feature repairs or Infinity shutdown changes.",
+  "engineering_owner": {
+    "agent": "Codex",
+    "assignment": "SOLE_END_TO_END_OWNER",
+    "responsibilities": [
+      "architecture and true dependency inventory",
+      "implementation in repository",
+      "focused scenario and negative-control tests",
+      "anti-rollback release pipeline",
+      "original-key signed APK and exact components",
+      "evidence and delivery"
+    ],
+    "split_ownership_allowed": false,
+    "user_final_physical_acceptance_required": true,
+    "signing_requires_legitimate_existing_toolchain": true
+  },
+  "governing_brief_role": "The original ASTRA-PRO-named brief was updated in-place; its owner is solely Codex. Earlier Astra/Work split is superseded."
 }
