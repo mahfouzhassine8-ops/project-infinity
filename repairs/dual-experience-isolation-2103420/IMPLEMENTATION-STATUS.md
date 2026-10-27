@@ -1,6 +1,27 @@
 # Isolation implementation checkpoint
 
-**BLOCKED_BY_SHARED_PERSISTENCE_AND_BACKGROUND_LIFECYCLE. No signed candidate.**
+**IMPLEMENTING_AUTHORIZED_LIFECYCLE_CORRECTION. No signed candidate yet.**
+
+The subsequent user authorization in [SCOPED-CORRECTION-AUTHORIZATION.json](SCOPED-CORRECTION-AUTHORIZATION.json)
+permits the two necessary lifecycle corrections. Codex is implementing them on
+this same branch. The protected lock and accepted registry remain unchanged.
+
+Production persistence/barrier and background definitions are cloned from the
+verified signed DEX. Owner-specific queues, wrappers, locks, mini-player state,
+notification identities and settings snapshots now compile. A narrow combined
+durability adapter keeps the original receipts and final native checks; it never
+terminates a process retained by Cobra. The initial module writer preserved all
+8,834 untouched original class definitions exactly. Fourteen host contract cases
+and eight focused tests using translated production DEX passed; see the
+[source-bound checkpoint receipt](results/scoped-correction/LIFECYCLE-CHECKPOINT.json).
+These are scoped host checks, not device acceptance or a completed release.
+
+Remaining implementation includes the complete ownership/cross-call map,
+reminder entry retention validation, final owner-module assembly and independent
+combination controls, and the original-key signing gate. The old blocked run
+below remains valid historical evidence; it has not been relabeled successful.
+
+## Prior checkpoint (before lifecycle authorization)
 
 [GitHub Actions run 40429181073](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/40429181073)
 reproduced the inventory and registry exactly, passed all 13 host tests and the

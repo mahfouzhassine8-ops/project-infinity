@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "authority": "SCOPED-CORRECTION-AUTHORIZATION.json",
+  "selected_before_execution": [
+    "Per-owner persistence queues, wrappers and barrier state are distinct; all accepted writes remain accounted",
+    "Combined close refuses pending writes, failed durability, wrong/revoked receipts, late writes and owner-entry races",
+    "Atomic all-owner authorization holds each owner's admission lock through the existing termination callback",
+    "Background service callback ownership, settings snapshot inheritance, notification identity and existing player/PiP entry contracts",
+    "Every unchanged DEX method, field initializer, native member and asset remains equivalent to signed2103420",
+    "Actual per-owner module assembly: independent test-only updates, cross-owner preservation and stale-side rejection",
+    "Original certificate, package, one launcher and install-over version checks"
+  ],
+  "not_selected": [
+    "Generic application regression sweep",
+    "Repetitive shutdown cycles",
+    "Physical Fold acceptance"
+  ],
+  "selected_refinements_before_execution": [
+    "Retained Cobra can update the single chooser preference without closing admission",
+    "Overlapping reminder leases release only the completed owner",
+    "Chooser preferences use the actual Cobra wrapper; launch preferences use the actual shell wrapper",
+    "Cobra and Infinity foreground notifications have distinct IDs"
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "status": "FOCUSED_BOUNDARY_CHECKS_PASSED_NOT_RELEASE_APPROVED",
+  "source_state": "continuing_implementation",
+  "apk_installation_or_process_termination_executed": false,
+  "physical_fold": "NOT_RUN",
+  "production_translation_tests": {
+    "count": 8,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "cases": [
+      "playerRotationStartsWithSavedValueAndThenHasOneOwner",
+      "independentlyWrappedStoresKeepTheirExistingValues",
+      "ownerOutputStillWaitsForActualFileAndDirectorySync",
+      "independentPreferenceQueuesCannotAcknowledgeEachOthersWrites",
+      "snapshotFailureCannotClaimDurability",
+      "failedDirectorySyncRevokesCombinedSaveProof",
+      "miniPlaybackCallbacksAndContinuityHaveSeparateOwners",
+      "backgroundSnapshotPreservesOldValueAndThenSeparatesSettings"
+    ],
+    "dex2jar_archive_sha256": "ee7c45eb3c1d2474a6145d8d447e651a736a22d9664b6d3d3be5a5a817dda23a",
+    "transformed_dex_sha256": "b57fab7c98221a9aa2494b56b8e1f1676b01c7e9e680e720081306776fabb409",
+    "transformed_host_jar_sha256": "64f9dd6c203de02213b5072665661b4f22fbf0e386c60775d4c03ce72a26700c",
+    "original_primary_dex_sha256": "71f97a1ea5d8ae60455a2722122db3c5616a563d752885508a8ee4869b016ee6",
+    "source_hashes": {
+      "src/main/java/com/projectinfinity/kodi/CobraBackgroundSettings.java": "5c851f0e1bc8fa5991468f6824a9c5b0945c495ef9b91eb3273a3404ce78e177",
+      "src/main/java/com/projectinfinity/kodi/CobraPreferencePort.java": "077185e7b9879066d3605663878da5b1b68f7ba1428e73556c2111b5e3df8de1",
+      "src/main/java/com/projectinfinity/kodi/CobraRuntimeLease.java": "7ea49f33a2f90e7cc5ca2bb25134d31f484ac9839afac688926f2de7ae8127d7",
+      "src/main/java/com/projectinfinity/kodi/CombinedDurability.java": "ab68caf7262bb7bd2da1835d4b3169c3063b643f320062993668082d15b88274",
+      "src/main/java/com/projectinfinity/kodi/ExperienceLaunchPreferences.java": "00628d662820955ffd29a7c82444f922947725d4d94ae91f74360f28588f9d0b",
+      "src/main/java/com/projectinfinity/kodi/OwnerDurabilityWiring.java": "c6eb25f4104759067194e24f6c963cf10ff7e0d48d82789f5eee4bc6721fef05",
+      "src/test/java/com/projectinfinity/kodi/HostFilesystemShadow.java": "455756d89bafca26cb7606073aecd7a51b827d4973cc46945dc6544b3fa21ec2",
+      "src/test/java/com/projectinfinity/kodi/ProductionBoundaryTest.java": "7fb24d65afddf6a4341ffc60e8b804fa187bf79560fd87cf47edc63cff5e9edf"
+    },
+    "limitations": [
+      "Robolectric API 35 with actual host file/directory fsync; not Android device acceptance",
+      "Only selected persistence/background boundaries executed",
+      "Unrelated baseline translator failures (InfinityCosmicArt/InfinityInstalledCheckpointInstaller) are not covered or claimed passing"
+    ]
+  },
+  "owner_contract_tests": {
+    "application_executed": false,
+    "cases": [
+      "independent_state",
+      "pending_cobra_write",
+      "pending_shell_write",
+      "failed_durability",
+      "accepted_continuation",
+      "late_write_revokes_receipt",
+      "wrong_receipt",
+      "retained_cobra_keeps_writing",
+      "new_cobra_entry_revokes_kill",
+      "begin_is_atomic",
+      "all_locks_held_during_callback",
+      "cancel_and_reentry",
+      "retained_coordinator_can_close_again",
+      "retained_failure_not_erased"
+    ],
+    "combined_source_sha256": "ab68caf7262bb7bd2da1835d4b3169c3063b643f320062993668082d15b88274",
+    "status": "PASS_OWNER_DURABILITY_CONTRACT",
+    "termination_callback": "assertions_only_no_process_termination",
+    "test_authority": "SCOPED-CORRECTION-TESTS.json",
+    "unchanged_barrier_source_sha256": "b7d69d9dc1db6d038d32c0e3bbce36b3de2973b64aa08aab80b0d64980c56340"
+  },
+  "module_packaging_v2": {
+    "untouched_baseline_classes_exact": 8834,
+    "total_classes": 8921,
+    "owner_dex_files": 5,
+    "unresolved_ownership_still_blocks_release": true
+  },
+  "next_delta_not_yet_packaged": [
+    "Cobra reminder job retention until actual worker exit",
+    "Cobra boot/reminder receiver retention for callback lifetime"
+  ]
+}
