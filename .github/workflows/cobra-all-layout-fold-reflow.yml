@@ -1,0 +1,100 @@
+name: Cobra all-layout measured reflow | unsigned owner build
+on:
+  push:
+    branches: [work/cobra-all-layout-fold-reflow-from-2103421-20261027]
+    paths: [repairs/cobra-all-layout-fold-reflow-20261027/**, .github/workflows/cobra-all-layout-fold-reflow.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  cobra:
+    if: github.ref == 'refs/heads/work/cobra-all-layout-fold-reflow-from-2103421-20261027'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40447183241
+          name: Infinity-Combined-Original-Signer-40447183241
+          github-token: ${{ github.token }}
+          path: baseline
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40447183241
+          name: Infinity-Combined-Owner-Components-40447183241
+          github-token: ${{ github.token }}
+          path: base-components
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39867073954
+          name: Infinity-Receipt-Race-Android17-Investigation
+          github-token: ${{ github.token }}
+          path: tools
+      - name: Build the Cobra delta from exact signed bytes
+        run: |
+          set -euo pipefail
+          root=repairs/cobra-all-layout-fold-reflow-20261027
+          export PYTHONPATH=repairs/dual-experience-isolation-2103420
+          python3 - <<'PY'
+          from pathlib import Path
+          from inventory import disassemble
+          disassemble(Path('baseline/Infinity-2103421-Combined-Original-Signer.apk'),Path('tools/receipt-evidence/tool-jars'),Path('base-dex'))
+          PY
+          python3 "$root/build.py" --apk baseline/Infinity-2103421-Combined-Original-Signer.apk --baseline base-dex \
+            --jars tools/receipt-evidence/tool-jars --android tools/receipt-evidence/android-34.jar \
+            --d8 "$ANDROID_HOME/build-tools/35.0.0/lib/d8.jar" --out cobra-build
+          for dex in cobra-build/owner-dex/COBRA/*.dex; do
+            java -cp 'tools/receipt-evidence/tool-jars/*' org.jf.baksmali.Main disassemble --sequential-labels "$dex" -o "${dex%.dex}"
+          done
+          python3 "$root/verify_preservation.py" --baseline base-dex --work cobra-build --out cobra-build/PRESERVATION.json
+      - name: Focused actual production geometry tests
+        run: |
+          set -euo pipefail
+          root=repairs/cobra-all-layout-fold-reflow-20261027
+          curl -fsSL https://github.com/pxb1988/dex2jar/releases/download/v2.4/dex-tools-v2.4.zip -o dex2jar.zip
+          echo 'ee7c45eb3c1d2474a6145d8d447e651a736a22d9664b6d3d3be5a5a817dda23a  dex2jar.zip' | sha256sum -c -
+          unzip -q dex2jar.zip -d dex2jar
+          python3 "$root/host_tests.py" --work cobra-build --baseline base-dex --dex2jar dex2jar/dex-tools-v2.4 --out host-tests
+          mvn -B -q -f host-tests/pom.xml test-compile
+          python3 - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile
+          for name,target in [('monitor','monitor.jar'),('espresso-idling-resource','espresso.jar')]:
+              paths=sorted((Path.home()/'.m2/repository/androidx/test').rglob(name+'-*.aar'))
+              with ZipFile(paths[-1]) as z:(Path('host-tests/android-test-libs')/target).write_bytes(z.read('classes.jar'))
+          PY
+          mvn -B -q -f host-tests/pom.xml test
+      - name: Package immutable unsigned Cobra component
+        run: |
+          set -euo pipefail
+          python3 repairs/cobra-all-layout-fold-reflow-20261027/package_component.py --work cobra-build \
+            --bundles base-components --out cobra-component --source "$GITHUB_SHA"
+          cp cobra-build/PRESERVATION.json cobra-component/
+          cp host-tests/INPUTS.json cobra-component/TEST-INPUTS.json
+          cp host-tests/target/surefire-reports/com.projectinfinity.kodi.CobraMeasuredReflowTest.txt cobra-component/GEOMETRY-RESULTS.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Cobra-All-Layout-Reflow-Owner-${{ github.run_id }}
+          path: cobra-component/
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Cobra-All-Layout-Reflow-Evidence-${{ github.run_id }}
+          path: |
+            host-tests/target/surefire-reports/
+            cobra-build/BUILD.json
+            cobra-build/PRESERVATION.json
+          if-no-files-found: warn
