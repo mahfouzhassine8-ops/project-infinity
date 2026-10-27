@@ -14,12 +14,12 @@
         "version": "2103420.container.1"
       },
       "COBRA": {
-        "approved_source": "73aab4c9937a66f1e25648a578f4ef577433eba7",
-        "digest": "f2edd538bb29a95ed78c8ba5f79ccdf788dce69f0a9f29b31a0f4e9cf7ca83c2",
+        "approved_source": "207949de66e09cc8cf4d493cafdb324dbc29475c",
+        "digest": "7091c30cff244beb75f900236da87d016a14573981aa84b7eee454080c23adf7",
         "file": "COBRA.zip",
         "settings_schema": "original-plus-settings-snapshot-v1",
-        "sha256": "8eb6dc453ccb34e95143f63bf0a8492d9ae08d3d65dfc35ad882fc4efd6fb31b",
-        "version": "bundled-2103420.isolation.1.fold-reflow.1"
+        "sha256": "eb30afa0e1ab9f50da897db27a604cb79a47059ff355c763dc7d7c955ddbcb6b",
+        "version": "bundled-2103420.isolation.1.fold-reflow.2"
       },
       "INFINITY": {
         "approved_source": "9efaeabee45389b7c919ae1a3d88c394b1804173",
@@ -52,10 +52,10 @@
       "run_id": 40447183241
     },
     "COBRA": {
-      "artifact": "Cobra-All-Layout-Reflow-Owner-40483084577",
-      "build_source": "73aab4c9937a66f1e25648a578f4ef577433eba7",
+      "artifact": "Cobra-All-Layout-Reflow-Owner-40485414619",
+      "build_source": "207949de66e09cc8cf4d493cafdb324dbc29475c",
       "path": "COBRA.zip",
-      "run_id": 40483084577
+      "run_id": 40485414619
     },
     "INFINITY": {
       "artifact": "Infinity-Combined-Owner-Components-40447183241",
@@ -70,7 +70,7 @@
       "run_id": 40447183241
     }
   },
-  "candidate_versionCode": 2103422,
+  "candidate_versionCode": 2103423,
   "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
   "components": {
     "CHOOSER_SHELL": {
@@ -81,11 +81,11 @@
       "version": "2103420.container.1"
     },
     "COBRA": {
-      "approved_source": "73aab4c9937a66f1e25648a578f4ef577433eba7",
-      "digest": "f2edd538bb29a95ed78c8ba5f79ccdf788dce69f0a9f29b31a0f4e9cf7ca83c2",
-      "revision": 2,
+      "approved_source": "207949de66e09cc8cf4d493cafdb324dbc29475c",
+      "digest": "7091c30cff244beb75f900236da87d016a14573981aa84b7eee454080c23adf7",
+      "revision": 3,
       "settings_schema": "original-plus-settings-snapshot-v1",
-      "version": "bundled-2103420.isolation.1.fold-reflow.1"
+      "version": "bundled-2103420.isolation.1.fold-reflow.2"
     },
     "INFINITY": {
       "approved_source": "9efaeabee45389b7c919ae1a3d88c394b1804173",
@@ -102,14 +102,14 @@
       "version": "isolation-contract.1"
     }
   },
-  "generation": 5,
+  "generation": 6,
   "guard_schema": 2,
   "last_issued_versionCode": 2103420,
   "owner_update_evidence": {
-    "component_zip_sha256": "8eb6dc453ccb34e95143f63bf0a8492d9ae08d3d65dfc35ad882fc4efd6fb31b",
+    "component_zip_sha256": "eb30afa0e1ab9f50da897db27a604cb79a47059ff355c763dc7d7c955ddbcb6b",
     "errors": 0,
     "failures": 0,
-    "geometry_tests": 5,
+    "geometry_tests": 6,
     "installed_base_report": "User reported installing 421; accepted pointer is not advanced",
     "owner": "COBRA",
     "physical_Fold": "PENDING",
@@ -119,8 +119,8 @@
         "onCreate(Landroid/os/Bundle;)V"
       ],
       "changed_original_classes": [
-        "Lcom/projectinfinity/kodi/CobraComponent;",
-        "Lcom/projectinfinity/kodi/InfinityLiveActivity;"
+        "Lcom/projectinfinity/kodi/InfinityLiveActivity;",
+        "Lcom/projectinfinity/kodi/CobraComponent;"
       ],
       "existing_activity_methods_verified": 1800,
       "new_classes": [
@@ -131,15 +131,15 @@
       "status": "PASS_COBRA_DELTA_PRESERVATION",
       "unchanged_cobra_classes": 7118
     },
-    "producer_run": 40483084577,
-    "producer_source": "73aab4c9937a66f1e25648a578f4ef577433eba7",
+    "producer_run": 40485414619,
+    "producer_source": "207949de66e09cc8cf4d493cafdb324dbc29475c",
     "test_inputs": {
       "production_dex": {
-        "part-0.dex": "322f4f1ebdf3db5f08483f47ed814063198b189d4d0bd1df720ba0fe8f6c73b8",
+        "part-0.dex": "37c84838ed0092ab411fba2237bbf8fbf557c0220517b6a09ab10a384a924595",
         "part-1.dex": "11028fc8f629069015a30baed955755f4de7ba9320fec7dcc7a692ae0f0ba84b"
       },
       "runtime": "Robolectric API35; translated actual production DEX; disposable views and data; no native playback or shutdown scenario",
-      "test_source_sha256": "c6378aa1fffaeb128b71cf410d089dd2a5200838036e6cb3788810f4a4b38ac7"
+      "test_source_sha256": "804116ea7fbfea3d4cdea732b77e17241fb16415f70a296fa10c72ebef641ff1"
     }
   },
   "package": "com.projectinfinity.kodi",
@@ -24382,7 +24382,7 @@
     },
     "class:Lcom/projectinfinity/kodi/CobraComponent;": {
       "owner": "COBRA",
-      "sha256": "7e2cda1a19d854d0c189f5d4c750f3b3de108c96dc674d0db5c7725ab5d70b6b"
+      "sha256": "b6e1c38fe35b5084c420f185b8561e8229199105375f024a2809e5e56ec43761"
     },
     "class:Lcom/projectinfinity/kodi/CobraDiagnosticArchive$$ExternalSyntheticLambda0;": {
       "owner": "COBRA",
@@ -25002,7 +25002,7 @@
     },
     "class:Lcom/projectinfinity/kodi/CobraWindowReflow;": {
       "owner": "COBRA",
-      "sha256": "149850df32e271b5029d043926ef7f9b585ea8c38351124bfb671649f6d11c96"
+      "sha256": "b98df9a92f586f66dc27021b94f4d72fa24ee6ba8360a748bb9e8aead2a5c7d5"
     },
     "class:Lcom/projectinfinity/kodi/CombinedDurability$Group$$ExternalSyntheticLambda0;": {
       "owner": "MINIMAL_ANDROID_CONTRACT",
@@ -66257,7 +66257,7 @@
       "sha256": "1b8c1788a5a86242635277f063ebdce6b82ed12eafe3cfdf331b902c8eb7e616"
     }
   },
-  "previous_authority_sha256": "4257aed80499b1d4c79e134cb113c51b54ece93fc25e63aae981e325bd884507",
+  "previous_authority_sha256": "9abe238252336cf35e7a1f37653a5de839866b60d149315892c53d219d9625db",
   "proofs": {
     "COMBINATION-CONTROLS.json": "bcb21adb63fefb898a8e8799d9892f76e382315518d8e94b51c42060cc5ece83",
     "OWNER-CONTRACT.json": "dd0fdfdcb7715777007984969bfac45b36f3e4ef04023b5ba1884c67904d0846",
@@ -66426,7 +66426,7 @@
     "repairs/dual-experience-isolation-2103420/ownership-reviewed-roots.json": "b767f71ea914b70e12e3ae7054d0b79b4bc1220466085ffbf4b13cb879324576",
     "repairs/dual-experience-isolation-2103420/prepare_host_tests.py": "5d2671de5b361c5dbace42a5567a736226f50957353e77eec5a60042c631a3a7",
     "repairs/dual-experience-isolation-2103420/prepare_runtime.py": "e59faac2489d7ce3b0d2deae8469d627e8f463b8c445806b3d232ec572c3d1a7",
-    "repairs/dual-experience-isolation-2103420/propose_cobra_reflow.py": "bb7fe5f7e1b3ce48b825f74aebe64b3b12046b4f8c9ff8c3a00a0753a7f128f9",
+    "repairs/dual-experience-isolation-2103420/propose_cobra_reflow.py": "31dda989cdf3bc3d3372565fcb44e7dd5d11db935c6961ac3905e4a91df23425",
     "repairs/dual-experience-isolation-2103420/refresh_authority_evidence.py": "a2c0d74a831246bba1b53305d35a5273b8185cf1068c11dceb772df22d6519e5",
     "repairs/dual-experience-isolation-2103420/release_authority.py": "99949c70485f04526fd5755a6492bd7bac5e246820058febeffa02facbc8a332",
     "repairs/dual-experience-isolation-2103420/release_gate.py": "b2852e3f2b98e1f2f1e9d06e739247b247e15b85f06712d563e151a86556252e",
