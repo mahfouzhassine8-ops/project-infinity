@@ -42,59 +42,14 @@ def patch(smali):
  change(stage,r'constructor <init>\(Landroid/content/Context;ZLcom/projectinfinity/kodi/InfinityGlassChooser\$Actions;\)V',
  '    invoke-direct {p0}, Lcom/projectinfinity/kodi/InfinityGlassChooser$Stage;->updateClock()V',
  '''
-    invoke-virtual {p0}, Lcom/projectinfinity/kodi/InfinityGlassChooser$Stage;->getContext()Landroid/content/Context;
-    move-result-object v0
-    invoke-static {v0}, Lcom/projectinfinity/kodi/ChooserReleaseMetadata;->installed(Landroid/content/Context;)Ljava/lang/String;
-    move-result-object v1
-    iget-object v2, p0, Lcom/projectinfinity/kodi/InfinityGlassChooser$Stage;->hmCopy:Lcom/projectinfinity/kodi/InfinityGlassChooser$Label;
-    invoke-virtual {v2, v1}, Lcom/projectinfinity/kodi/InfinityGlassChooser$Label;->setText(Ljava/lang/CharSequence;)V
-    const/4 v1, 0x0
-    invoke-virtual {v2, v1}, Lcom/projectinfinity/kodi/InfinityGlassChooser$Label;->setVisibility(I)V''')
- change(stage,r'protected onMeasure\(II\)V',
- '    invoke-virtual {p0, p1, p2}, Lcom/projectinfinity/kodi/InfinityGlassChooser$Stage;->setMeasuredDimension(II)V',
- '''
-    iget-object v1, p0, Lcom/projectinfinity/kodi/InfinityGlassChooser$Stage;->hmCopy:Lcom/projectinfinity/kodi/InfinityGlassChooser$Label;
-    invoke-virtual {p0}, Lcom/projectinfinity/kodi/InfinityGlassChooser$Stage;->getContext()Landroid/content/Context;
-    move-result-object v3
-    const/high16 v4, 0x41c00000
-    invoke-static {v3, v4}, Lcom/projectinfinity/kodi/InfinityGlassChooser;->access$000(Landroid/content/Context;F)I
-    move-result v3
-    sub-int v2, p1, v3
-    sub-int/2addr v2, v3
-    invoke-virtual {p0}, Lcom/projectinfinity/kodi/InfinityGlassChooser$Stage;->getContext()Landroid/content/Context;
-    move-result-object v3
-    const/high16 v4, 0x41800000
-    invoke-static {v3, v4}, Lcom/projectinfinity/kodi/InfinityGlassChooser;->access$000(Landroid/content/Context;F)I
-    move-result v3
-    invoke-direct {p0, v1, v2, v3}, Lcom/projectinfinity/kodi/InfinityGlassChooser$Stage;->measure(Landroid/view/View;II)V''')
- change(stage,r'protected onLayout\(ZIIII\)V',
- '    invoke-direct {p0, p1, p3, p2}, Lcom/projectinfinity/kodi/InfinityGlassChooser$Stage;->place(Landroid/view/View;II)V',
- '''
-    iget-object p1, p0, Lcom/projectinfinity/kodi/InfinityGlassChooser$Stage;->hmCopy:Lcom/projectinfinity/kodi/InfinityGlassChooser$Label;
-    invoke-virtual {p0}, Lcom/projectinfinity/kodi/InfinityGlassChooser$Stage;->getMeasuredWidth()I
-    move-result p3
-    invoke-virtual {p1}, Lcom/projectinfinity/kodi/InfinityGlassChooser$Label;->getMeasuredWidth()I
-    move-result p4
-    sub-int/2addr p3, p4
-    div-int/lit8 p3, p3, 0x2
-    iget-object p4, p0, Lcom/projectinfinity/kodi/InfinityGlassChooser$Stage;->footer:Lcom/projectinfinity/kodi/InfinityGlassChooser$Label;
-    invoke-virtual {p4}, Lcom/projectinfinity/kodi/InfinityGlassChooser$Label;->getTop()I
-    move-result p4
-    invoke-virtual {p1}, Lcom/projectinfinity/kodi/InfinityGlassChooser$Label;->getMeasuredHeight()I
-    move-result p5
-    sub-int/2addr p4, p5
-    iget-object p5, p0, Lcom/projectinfinity/kodi/InfinityGlassChooser$Stage;->infinity:Lcom/projectinfinity/kodi/InfinityGlassChooser$Card;
-    invoke-virtual {p5}, Lcom/projectinfinity/kodi/InfinityGlassChooser$Card;->getBottom()I
-    move-result p5
-    invoke-static {p4, p5}, Ljava/lang/Math;->max(II)I
-    move-result p4
-    invoke-direct {p0, p1, p3, p4}, Lcom/projectinfinity/kodi/InfinityGlassChooser$Stage;->place(Landroid/view/View;II)V''')
+    iget-boolean v0, p0, Lcom/projectinfinity/kodi/InfinityGlassChooser$Stage;->light:Z
+    invoke-static {p0, v0}, Lcom/projectinfinity/kodi/ChooserReleaseFooter;->install(Landroid/view/ViewGroup;Z)V''')
  (base/'ChooserReleaseMetadata.smali').write_bytes(SOURCE.read_bytes())
 
 def classes(directory):
  return {p.relative_to(directory).as_posix():p.read_bytes() for p in directory.rglob('*.smali')}
 
-def build(apk,bundles,jars,out,source):
+def build(apk,bundles,jars,android,d8,out,source):
  require(file_sha(apk)==SIGNED_SHA,'SIGNED_2103423_REQUIRED')
  require(file_sha(bundles/'CHOOSER_SHELL.zip')==SHELL_ZIP_SHA,'EXACT_SHELL_REQUIRED')
  catalog=load(bundles/'catalog.json')
@@ -108,29 +63,54 @@ def build(apk,bundles,jars,out,source):
  run('java','-cp',str(jars/'*'),'org.jf.baksmali.Main','disassemble','--sequential-labels',out/'old.dex','-o',oldsmali)
  import shutil
  shutil.copytree(oldsmali,newsmali)
- # Introspect only the actual signed 2103423 layout, not historical previews.
- stage_inspect=(newsmali/'com/projectinfinity/kodi/InfinityGlassChooser$Stage.smali').read_text()
- print('CHOOSER_ACTUAL_STAGE_FIELDS', '\\n'.join(x for x in stage_inspect.splitlines() if x.startswith('.field') or x.startswith('.super')))
- import re as re_inspect
- for kind,sig in [('constructor',r'constructor <init>\\(Landroid/content/Context;ZLcom/projectinfinity/kodi/InfinityGlassChooser\\$Actions;\\)V'),('measure',r'protected onMeasure\\(II\\)V'),('layout',r'protected onLayout\\(ZIIII\\)V')]:
-  mm=re_inspect.search(r'^\\.method '+sig+r'\\n.*?^\\.end method',stage_inspect,re_inspect.M|re_inspect.S)
-  if mm:
-   print('CHOOSER_ACTUAL_'+kind.upper(), '\\n'.join(mm[0].splitlines()[:150]))
  patch(newsmali)
+ from compile_runtime import ANDROID_SHA,D8_SHA
+ require(file_sha(android)==ANDROID_SHA and file_sha(d8)==D8_SHA,'PINNED_CHOOSER_COMPILER_REQUIRED')
+ compiler=out/'compiled-java';compiler.mkdir()
+ run('java','-m','jdk.compiler/com.sun.tools.javac.Main','-source','8','-target','8','-g:none','-Xlint:-options',
+     '-cp',android,'-d',compiler,HERE/'runtime/ChooserReleaseFooter.java')
+ helperjar=out/'footer.jar'
+ with ZipFile(helperjar,'w') as z:
+  for p in compiler.rglob('*.class'):z.write(p,p.relative_to(compiler).as_posix())
+ helperdex=out/'footer-dex';helperdex.mkdir()
+ run('java','-cp',d8,'com.android.tools.r8.D8','--min-api','21','--lib',android,
+     '--output',helperdex,helperjar)
+ helpersmali=out/'footer-smali'
+ run('java','-cp',str(jars/'*'),'org.jf.baksmali.Main','disassemble','--sequential-labels',
+     helperdex/'classes.dex','-o',helpersmali)
+ for p in helpersmali.rglob('*.smali'):
+  dest=newsmali/p.relative_to(helpersmali)
+  require(not dest.exists(),'UNEXPECTED_EXISTING_FOOTER_CLASS')
+  dest.parent.mkdir(parents=True,exist_ok=True)
+  dest.write_bytes(p.read_bytes())
  run('java','-cp',str(jars/'*'),'org.jf.smali.Main','assemble','--api','21',newsmali,'-o',out/'new.dex')
  verify_smali=out/'verify-smali'
  run('java','-cp',str(jars/'*'),'org.jf.baksmali.Main','disassemble','--sequential-labels',out/'new.dex','-o',verify_smali)
  a,b=classes(oldsmali),classes(verify_smali)
  expected={'com/projectinfinity/kodi/InfinityGlassChooser$Card.smali','com/projectinfinity/kodi/InfinityGlassChooser$Stage.smali'}
- new={'com/projectinfinity/kodi/ChooserReleaseMetadata.smali'}
+ new={'com/projectinfinity/kodi/ChooserReleaseMetadata.smali','com/projectinfinity/kodi/ChooserReleaseFooter.smali'}
  require(set(b)-set(a)==new and set(a)-set(b)==set(),'UNEXPECTED_CLASS_SET')
  require({k for k in a if a[k]!=b[k]}==expected,'UNRELATED_SHELL_CLASS_MUTATION')
- require(len(a)==150 and len(b)==151,'INCOMPLETE_SHELL_CLASSES')
+ require(len(a)==150 and len(b)==152,'INCOMPLETE_SHELL_CLASSES')
+
+ # The only changed original Stage method must be the constructor (one extra
+ # view registration). HM slogan text, original geometry and focus code remain.
+ orig_stage=a['com/projectinfinity/kodi/InfinityGlassChooser$Stage.smali'].decode()
+ next_stage=b['com/projectinfinity/kodi/InfinityGlassChooser$Stage.smali'].decode()
+ methods=lambda raw:{m[1].split()[-1]:m[0] for m in re.finditer(r'^\\.method ([^\\n]+)\\n.*?^\\.end method',raw,re.M|re.S)}
+ original_methods=methods(orig_stage);updated_methods=methods(next_stage)
+ require(set(original_methods)==set(updated_methods),'STAGE_METHOD_SET_CHANGED')
+ require({k for k in original_methods if original_methods[k]!=updated_methods[k]}==
+         {'<init>(Landroid/content/Context;ZLcom/projectinfinity/kodi/InfinityGlassChooser$Actions;)V'},
+         'ORIGINAL_STAGE_DRAW_MEASURE_LAYOUT_OR_HM_CHANGED')
+ require('"BUILT DIFFERENT' in next_stage or orig_stage.count('hmCopy:')==next_stage.count('hmCopy:'),
+         'HM_COPY_REMOVED')
+
  payload={k:v for k,v in meta['payload'].items() if not k.startswith('class:')}
  for path,data in b.items():
   descriptor=data.decode().splitlines()[0].split()[-1]
   payload['class:'+descriptor]={'owner':'CHOOSER_SHELL','sha256':digest(data)}
- require(len(payload)==151,'UNEXPECTED_SHELL_MEMBER_COUNT')
+ require(len(payload)==152,'UNEXPECTED_SHELL_MEMBER_COUNT')
  history=b'infinity.last_updated_in=2103421\ncobra.last_updated_in=2103423\n'
  member={'owner':'CHOOSER_SHELL','sha256':digest(history)}
  payload['member:'+MEMBER]=member
@@ -158,11 +138,13 @@ def build(apk,bundles,jars,out,source):
   'exact_unchanged_shell_classes':len(a)-len(expected),
   'offline_component_history':{'INFINITY':2103421,'COBRA':2103423},
   'app_version_source':'Android package manager actual manifest versionCode',
+  'original_HM_caption_preserved':True,
+  'stage_measure_and_layout_unmodified':True,
   'all_other_owner_bundles_unchanged':True})
  return row
 
 if __name__=='__main__':
  p=argparse.ArgumentParser()
- for name in ('apk','bundles','jars','out'):p.add_argument('--'+name,type=Path,required=True)
+ for name in ('apk','bundles','jars','android','d8','out'):p.add_argument('--'+name,type=Path,required=True)
  p.add_argument('--source',required=True)
  print(json.dumps(build(**vars(p.parse_args())),indent=2))
