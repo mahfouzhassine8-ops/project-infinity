@@ -35,7 +35,11 @@ public final class CobraWindowReflow implements ViewTreeObserver.OnPreDrawListen
     if(observer==next)return;
     if(observer!=null&&observer.isAlive())observer.removeOnPreDrawListener(this);
     observer=next;
-    if(observer.isAlive())observer.addOnPreDrawListener(this);
+    if(observer.isAlive()){
+      // Android transfers floating observers on attachment. Remove a
+      // transferred registration before registering on the attached tree.
+      observer.removeOnPreDrawListener(this);observer.addOnPreDrawListener(this);
+    }
   }
   @Override public void onViewAttachedToWindow(View view){previous=null;observe();}
   @Override public void onViewDetachedFromWindow(View view){

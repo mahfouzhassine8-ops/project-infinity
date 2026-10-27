@@ -1,1 +1,16 @@
-{"correction":"Cobra universal measured-window reflow","selected_before_execution":["Reproduce stale parent/canvas pixel dimensions using shipped layout methods","Actual Android view measurement for counts 1,2,3,4, both fold directions, rotation, Fit/Fill and enlarged layouts","Bounds/insets/display changes without configuration callback; fullscreen/PiP return and unchanged-bounds surface replacement","Player/channel/paused/audio/timeshift identity and no destructive player calls through resize path","Exact non-Cobra payload preservation and original release gate"],"not_selected":["Infinity application execution","Shutdown scenarios or stress cycles","Physical Fold acceptance"]}
+{
+  "correction": "Cobra universal measured-window reflow",
+  "selected_before_execution": [
+    "Reproduce stale parent/canvas pixel dimensions using shipped layout methods",
+    "Actual Android view measurement for counts 1,2,3,4, both fold directions, rotation, Fit/Fill and enlarged layouts",
+    "Bounds/insets/display changes without configuration callback; fullscreen/PiP return and unchanged-bounds surface replacement",
+    "Player/channel/paused/audio/timeshift identity and no destructive player calls through resize path",
+    "Exact non-Cobra payload preservation and original release gate"
+  ],
+  "not_selected": [
+    "Infinity application execution",
+    "Shutdown scenarios or stress cycles",
+    "Physical Fold acceptance"
+  ],
+  "selected_refinement": "Window attachment transfers floating pre-draw observers: exactly one Cobra observer must remain; announced before the focused execution"
+}

@@ -6,7 +6,7 @@ HERE=Path(__file__).resolve().parent
 ISO=HERE.parent/'dual-experience-isolation-2103420';sys.path.insert(0,str(ISO))
 from inventory import load,save,file_sha,digest,APP
 BASE_SHA='a1ea9442cd8ff82be09c34cc7c84887178fb162b8397005bba656ff6e28f5637'
-VERSION='bundled-2103420.isolation.1.fold-reflow.1'
+VERSION='bundled-2103420.isolation.1.fold-reflow.2'
 def run(args):subprocess.run(list(map(str,args)),check=True)
 def build(apk,baseline,jars,android,d8,out):
  assert file_sha(apk)==BASE_SHA

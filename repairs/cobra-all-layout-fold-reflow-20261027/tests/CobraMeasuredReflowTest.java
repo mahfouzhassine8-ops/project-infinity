@@ -102,4 +102,14 @@ public class CobraMeasuredReflowTest {
   set(activity,"mMultiOverlay",parent);set(activity,"mCobraMultiCanvas",canvas);CobraWindowReflow.install(activity);
   for(int[] size:new int[][]{{480,1000},{1800,1500},{480,1000}}){layout(parent,size[0],size[1]);parent.getViewTreeObserver().dispatchOnPreDraw();layout(parent,size[0],size[1]);assertEquals(size[0],canvas.getWidth());assertEquals(size[1],canvas.getHeight());}
  }
+
+ @Test public void attachingWindowKeepsExactlyOneObserver()throws Exception {
+  org.robolectric.android.controller.ActivityController<OwnerActivity> controller=Robolectric.buildActivity(OwnerActivity.class);
+  OwnerActivity window=controller.get();window.surface=new FrameLayout(window);window.reflow=()->{};
+  window.setContentView(window.surface);CobraWindowReflow.install(window);
+  controller.create().start().resume().visible();
+  View decor=window.getWindow().getDecorView();Object listeners=get(decor.getViewTreeObserver(),"mOnPreDrawListeners");
+  java.util.List data=(java.util.List)get(listeners,"mData");int count=0;for(Object value:data)if(value instanceof CobraWindowReflow)count++;
+  assertEquals("attachment must not duplicate a transferred floating observer",1,count);
+ }
 }
