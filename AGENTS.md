@@ -1,3 +1,11 @@
+# Scoped exception — 2103420 one-APK Infinity/Cobra separation (Codex sole owner)
+
+For branch `work/infinity-cobra-isolation-from-2103420-20261026` **only**, the user has explicitly authorized a **behavior-preserving internal ownership refactor** so Infinity and Cobra become separately versioned, separately owned modules within the SAME Android package, signed with the original key. **Codex is the ONE engineering owner** for architecture, coding, review, targeted test evidence, APK signing, and delivery. Read `repairs/dual-experience-isolation-2103420/ASTRA-PRO-MASTER-IMPLEMENTATION-BRIEF-20261026.md` (historical filename; header explicitly assigns Codex) and `repairs/dual-experience-isolation-2103420/EXECUTION-AUTHORIZATION.json` before editing. The original Cobra-off-limits policy below remains fully binding for all ordinary Infinity fixes and all Cobra *feature* changes; this scoped task permits ONLY necessary Cobra-owned structural partitioning with exactly unchanged Cobra functionality. Do not edit the locked 2103420 branch.
+
+Keep ONE APK/one app icon/one Choose Your Experience; preserve every existing feature of both experiences, original signer and the user's settings/data. Infinity 2103420 Kodi, PiP, playback, Continue, Home and Essential-First shutdown are frozen. No shutdown mutation, new shutdown test, destructive data migration or independently distributed stale-side APK is authorized. A fully implemented latest-approved-combined release gate must reject stale Infinity/Cobra components and unauthorized cross-owner mutations **before signing**. If a protected shared-lifecycle edit is necessary, stop that particular change and report it, do not assume permission. The user alone accepts the finished candidate on the Fold.
+
+---
+
 # Permanent focused testing policy — user approved 2026-10-23
 
 For every new corrective task, run only the tests explicitly authorized for that
