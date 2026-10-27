@@ -75,3 +75,55 @@ jobs:
           if-no-files-found: error
           retention-days: 90
           compression-level: 0
+
+
+  stage_authority:
+    name: Stage reviewed 2103424 chooser-only release authority (never signs)
+    needs: chooser
+    if: github.ref == 'refs/heads/work/chooser-version-labels-from-2103423-20261027'
+    permissions:
+      contents: write
+      actions: read
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: work/chooser-version-labels-from-2103423-20261027
+          path: chooser
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: work/infinity-cobra-isolation-from-2103420-20261026
+          path: integration
+          fetch-depth: 0
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40509014993
+          name: Chooser-Original-UI-Version-Labels-40509014993
+          github-token: ${{ github.token }}
+          path: producer
+      - name: Verify exact producer, immutable Infinity and Cobra and reserve 2103424
+        run: |
+          set -euo pipefail
+          [[ "$(git -C integration rev-parse HEAD)" == "690723bad77a91f3aeaa12e4ae384677f7da2f8c" ]] || {
+            echo "REFUSED: integration authority changed since approved review"; exit 1;
+          }
+          python3 chooser/repairs/chooser-version-labels-2103423/promote.py --checkout integration --producer producer
+          [[ "$(git -C integration diff --name-only)" == "repairs/dual-experience-isolation-2103420/release-authority.json" ]] || {
+            echo "REFUSED: non-authority file mutation"; exit 1;
+          }
+          git -C integration diff --check
+      - name: Commit unsigned proposal to standalone staging branch
+        run: |
+          set -euo pipefail
+          git -C integration switch -c work/chooser-2103424-release-authority-20261027
+          git -C integration config user.name "github-actions[bot]"
+          git -C integration config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C integration add repairs/dual-experience-isolation-2103420/release-authority.json
+          git -C integration commit -m "release: stage reviewed chooser-only 2103424 authority; preserve both experiences"
+          git -C integration push origin HEAD:refs/heads/work/chooser-2103424-release-authority-20261027
