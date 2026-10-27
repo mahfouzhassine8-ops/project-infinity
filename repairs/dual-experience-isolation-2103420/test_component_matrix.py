@@ -16,7 +16,7 @@ def run(args,**kw):return subprocess.check_output(list(map(str,args)),text=True,
 
 def authority(catalog,metas,version=2103421,generation=2):
     payload={k:v for m in metas.values() for k,v in m['payload'].items()}
-    return {'schema':2,'status':'ENGINEERING_REVIEWED_FOLD_PENDING','generation':generation,
+    return {'schema':2,'guard_schema':2,'status':'ENGINEERING_REVIEWED_FOLD_PENDING','generation':generation,
       'package':PACKAGE,'certificate_sha256':CERT_SHA,'last_issued_versionCode':2103420,
       'candidate_versionCode':version,'accepted_registry_sha256':file_sha(HERE/'accepted-combined-release.json'),
       'accepted_pointer_updated':False,'release_blockers':[], 'payload':payload,
@@ -153,7 +153,7 @@ def check(bundles,out,jars,android,d8):
             results.append({'case':target.lower()+'-only-cross-owner-code','decision':'REJECTED:'+str(e)})
         else:raise AssertionError('Cross-owner update accepted')
     # Even a coordinated digest/label change cannot silently rewrite a protected receipt callback.
-    for key in [k for k in b['protected_contract'] if any(n in k for n in ('CobraJavaWriteBarrier;','InfinityCloseGuardService;'))]:
+    for key in [k for k in b['protected_contract'] if any(n in k for n in ('CobraJavaWriteBarrier;','InfinityCloseGuardService;','InfinityCloseNativeLease;'))]:
         proposed=copy.deepcopy(b);proposed['generation']=a['generation']+1
         proposed['payload'][key]['sha256']=digest(b'unapproved lifecycle callback')
         owner=proposed['payload'][key]['owner'];proposed['components'][owner]['digest']=component_digest(proposed['payload'],owner)
@@ -163,6 +163,16 @@ def check(bundles,out,jars,android,d8):
             require('SEPARATE_LIFECYCLE_AUTHORIZATION_REQUIRED' in str(e),'WRONG_CONTRACT_REJECTION')
             results.append({'case':'protected-callback:'+key,'decision':'REJECTED:'+str(e)})
         else:raise AssertionError('Protected contract update accepted')
+    refreshed=copy.deepcopy(b);refreshed.update(generation=5,update_kind='evidence_refresh')
+    transition(b,refreshed,set())
+    changed_refresh=copy.deepcopy(refreshed)
+    changed_refresh['payload']['class:'+APP+'CobraComponent;']['sha256']=original['payload']['class:'+APP+'CobraComponent;']['sha256']
+    changed_refresh['components']['COBRA']['digest']=component_digest(changed_refresh['payload'],'COBRA')
+    try:transition(b,changed_refresh,set())
+    except Rejected as e:
+        require('EVIDENCE_REFRESH_CHANGED_PAYLOAD_OR_VERSION' in str(e),'WRONG_REFRESH_REJECTION')
+        results.append({'case':'evidence-refresh-cannot-change-component','decision':'REJECTED:'+str(e)})
+    else:raise AssertionError('Evidence refresh changed a component')
     save(out/'COMBINATION-CONTROLS.json',{'status':'PASS_ACTUAL_INDEPENDENT_COMPONENT_MATRIX','base_source':source,
        'component_builds':builds,'cases':results,'production_catalog_sha256':file_sha(bundles/'catalog.json'),
        'source_inputs':{p.name:file_sha(p) for p in [HERE/'test_component_matrix.py',HERE/'release_authority.py',HERE/'component_bundles.py',HERE/'ModuleDexWriter.java']},

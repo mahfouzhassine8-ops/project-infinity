@@ -23,7 +23,7 @@ def create(bundles,out):
     paths=list(HERE.glob('*.py'))+list(HERE.glob('*.java'))+list((HERE/'runtime').glob('*.java'))
     paths += [HERE/n for n in ('ownership-reviewed-roots.json','SCOPED-CORRECTION-AUTHORIZATION.json',
                               'SCOPED-CORRECTION-TESTS.json','signer-policy.json')]
-    authority={'schema':2,'status':'ENGINEERING_REVIEWED_FOLD_PENDING','generation':2,
+    authority={'schema':2,'guard_schema':2,'status':'ENGINEERING_REVIEWED_FOLD_PENDING','generation':2,
       'package':PACKAGE,'certificate_sha256':CERT_SHA,'last_issued_versionCode':2103420,
       'candidate_versionCode':2103421,'accepted_registry_sha256':file_sha(HERE/'accepted-combined-release.json'),
       'bootstrap_authorization':'SCOPED-CORRECTION-AUTHORIZATION.json',

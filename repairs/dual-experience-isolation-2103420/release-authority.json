@@ -76,7 +76,8 @@
       "version": "isolation-contract.1"
     }
   },
-  "generation": 2,
+  "generation": 3,
+  "guard_schema": 2,
   "last_issued_versionCode": 2103420,
   "package": "com.projectinfinity.kodi",
   "payload": {
@@ -66185,8 +66186,9 @@
       "sha256": "1b8c1788a5a86242635277f063ebdce6b82ed12eafe3cfdf331b902c8eb7e616"
     }
   },
+  "previous_authority_sha256": "6c54df4ce72e52b405f4125e261971329ef97ae02c682929bac63eea94b1fd08",
   "proofs": {
-    "COMBINATION-CONTROLS.json": "23e8d73d77c0e7e1bb373174beebf4e97430d1d2da6f1b9d5761ada6364c1add",
+    "COMBINATION-CONTROLS.json": "bcb21adb63fefb898a8e8799d9892f76e382315518d8e94b51c42060cc5ece83",
     "OWNER-CONTRACT.json": "dd0fdfdcb7715777007984969bfac45b36f3e4ef04023b5ba1884c67904d0846",
     "OWNERSHIP.json": "df2cad441093658a1cf1a335bbe0e09d3dfcc14ff541b984b539c38a389964a8",
     "PRODUCTION-BOUNDARIES.json": "fd887520038e99a2d51283ac99f1d846c18907d824c82978b611a25c01a215ba",
@@ -66260,6 +66262,17 @@
     "class:Lcom/projectinfinity/kodi/InfinityCloseGuardService$3;": "43ba7da5c19a0f278eed15fee7538b21648ae76fde0189873210a44d94d8fe95",
     "class:Lcom/projectinfinity/kodi/InfinityCloseGuardService$Session;": "ad61e228dad3c88b267cb7631235ddde995ebdead89bc6c347d4cd826ff07432",
     "class:Lcom/projectinfinity/kodi/InfinityCloseGuardService;": "b7b085d04113307192e658c9789311c310cfafa97638530ff74ed161276fc314",
+    "class:Lcom/projectinfinity/kodi/InfinityCloseNativeLease$$ExternalSyntheticLambda10;": "816fec1b4f3242cc27698d6b698b4d04cb1b0e9767e697f27cf2eb58492436eb",
+    "class:Lcom/projectinfinity/kodi/InfinityCloseNativeLease$$ExternalSyntheticLambda1;": "e5c9fdff7491f0a1a4748c157755d73b977f3e2a47c0d24fe84625ef82b116b0",
+    "class:Lcom/projectinfinity/kodi/InfinityCloseNativeLease$$ExternalSyntheticLambda2;": "6f9d1613f0a7d758494f2f3d3552ec4727fc706599e4f51e1451f204d647a851",
+    "class:Lcom/projectinfinity/kodi/InfinityCloseNativeLease$$ExternalSyntheticLambda3;": "da4b3b7f703a431e2d6745015a5353f9345b33427032196ba74c2e2e4497b2e3",
+    "class:Lcom/projectinfinity/kodi/InfinityCloseNativeLease$$ExternalSyntheticLambda4;": "1afdf093de5ccb7409acb5c12f59beca5947dcd1f09d2f36836a80a538d64472",
+    "class:Lcom/projectinfinity/kodi/InfinityCloseNativeLease$$ExternalSyntheticLambda5;": "41b532646102ad5e6c508475fa6c426dbf3a025b1b7d6e4a4f3eac8ad44e8245",
+    "class:Lcom/projectinfinity/kodi/InfinityCloseNativeLease$$ExternalSyntheticLambda6;": "67c19a6d9aa0278316470d1de3cb933640da374bc8faf6ba4ec78d5d1ed5bf43",
+    "class:Lcom/projectinfinity/kodi/InfinityCloseNativeLease$$ExternalSyntheticLambda7;": "0fcbb5e2db19bb1114ef7639d5cedafd5e21f0cb8d0ff0e69de6dcca4a1853d3",
+    "class:Lcom/projectinfinity/kodi/InfinityCloseNativeLease$$ExternalSyntheticLambda8;": "70a71275c7299ed6246af04eda5cbd68eeaf850b61e1a8915beda9855b014067",
+    "class:Lcom/projectinfinity/kodi/InfinityCloseNativeLease$$ExternalSyntheticLambda9;": "ba84339adf543ff92540d571ee751a0b64e09427b0d290d7bca2dd354d8b45bc",
+    "class:Lcom/projectinfinity/kodi/InfinityCloseNativeLease;": "0e363e589e5354f1532c90e444e71231b666b8a80901e6246d7015b63d11de99",
     "class:Lcom/projectinfinity/kodi/InfinityJavaPersistence$$ExternalSyntheticLambda0;": "5edc1b47bc3352b7bededc4c72c1ad396216f286afec1db332cd3a013cfd90c8",
     "class:Lcom/projectinfinity/kodi/InfinityJavaPersistence$1;": "8fa035c036e521b806f7d6e0f168f7b6e2aab4c17c07893c9aec0c7f8bd7e9e3",
     "class:Lcom/projectinfinity/kodi/InfinityJavaPersistence$Atomic;": "fe7b78f850daa475a5034bc2f18a7f6ead38abcad498c8dd2f60460846beca92",
@@ -66337,12 +66350,13 @@
     "repairs/dual-experience-isolation-2103420/build_modules.py": "8494ec6d96058085ca96ede404afbd7e2129da661cf75e9e045beaeb10c6978d",
     "repairs/dual-experience-isolation-2103420/compile_runtime.py": "61168ad8fe07aca4885232b3075e9526a812e0fc32aae6e22dbb6aa9aecd4903",
     "repairs/dual-experience-isolation-2103420/component_bundles.py": "1aca1f237a1987998f243d013fde991413c491b9e72706deda4853b1b1d642d6",
-    "repairs/dual-experience-isolation-2103420/create_authority.py": "b288b60e20878e672d925e0dc590f35c889a97ac081f5094ecee8375e8c4c42a",
+    "repairs/dual-experience-isolation-2103420/create_authority.py": "be6da193e7fbc242fb84996ae7a0b463c7ede025687c7b71db14c8babfbc2672",
     "repairs/dual-experience-isolation-2103420/inventory.py": "574c64b0a15200ba6f9971a2834f6cdb629dddd5ab5418186c4d5255d6e73bcb",
     "repairs/dual-experience-isolation-2103420/ownership-reviewed-roots.json": "5bf9da674777cf5defb376ba668239379b0865446ce74ea168c8f72b2db50a5f",
     "repairs/dual-experience-isolation-2103420/prepare_host_tests.py": "5d2671de5b361c5dbace42a5567a736226f50957353e77eec5a60042c631a3a7",
     "repairs/dual-experience-isolation-2103420/prepare_runtime.py": "e59faac2489d7ce3b0d2deae8469d627e8f463b8c445806b3d232ec572c3d1a7",
-    "repairs/dual-experience-isolation-2103420/release_authority.py": "4732bb14d9c78e9ee3108fd1074e7ff442e3adcbae5e22c3fae19780f5bc1159",
+    "repairs/dual-experience-isolation-2103420/refresh_authority_evidence.py": "a2c0d74a831246bba1b53305d35a5273b8185cf1068c11dceb772df22d6519e5",
+    "repairs/dual-experience-isolation-2103420/release_authority.py": "99949c70485f04526fd5755a6492bd7bac5e246820058febeffa02facbc8a332",
     "repairs/dual-experience-isolation-2103420/release_gate.py": "b2852e3f2b98e1f2f1e9d06e739247b247e15b85f06712d563e151a86556252e",
     "repairs/dual-experience-isolation-2103420/review_ownership.py": "4390b19529866cb09d16855ce6106aa9395d9f57cbebfa8490a3a182881a694b",
     "repairs/dual-experience-isolation-2103420/run_owner_contract_tests.py": "46e31c7079d5c2278ad0860d1f977b262813ad98065caa7b41bb9921b20f05ca",
@@ -66360,11 +66374,13 @@
     "repairs/dual-experience-isolation-2103420/signer-policy.json": "7b3c2aab032638f7f65e4118b14abd2c6dc01c1f7849004ec08d5a9a361ca7c3",
     "repairs/dual-experience-isolation-2103420/signer_policy.py": "ee7e23d29858cc40d2a8e15e3b77f2d2299609b0eb2c7bde3b26647a549442bb",
     "repairs/dual-experience-isolation-2103420/test_actual_apk.py": "f9142e5e22f2f44bc8905ade54c4729b4b33f9ea077483e15f170b42caa97442",
-    "repairs/dual-experience-isolation-2103420/test_component_matrix.py": "65fcf287e5fcbbd03157cfe61d13fdd9b179ceb184d097880d9a032273d7f7eb",
+    "repairs/dual-experience-isolation-2103420/test_component_matrix.py": "bdc9a3e0211a51801a94607d8a5b07ee11e6229b0cd56783df756d984a6d67b7",
     "repairs/dual-experience-isolation-2103420/test_release_gate.py": "5cc7fb135f10b26d65190e8c6a7150bf6df5204eb8b9ce0aefb6d087f09877dd",
     "repairs/dual-experience-isolation-2103420/verify_baseline.py": "757fe8fb274e07aeeab237f792de391f0315643a586ee3f900e0c4da44016f2e",
     "repairs/dual-experience-isolation-2103420/verify_runtime.py": "b903edd3d6c3402d46613841c9ac44f0103420a64da5dff2897d14c9952e7460"
   },
   "status": "ENGINEERING_REVIEWED_FOLD_PENDING",
+  "target_owners": [],
+  "update_kind": "evidence_refresh",
   "workflow_sha256": "4431d9908409da82010e130ecf8da8486282b76ec2d3a02f1aa16e3df9df5150"
 }

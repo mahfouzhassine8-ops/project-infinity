@@ -51,6 +51,14 @@
     {
       "case": "protected-callback:class:Lcom/projectinfinity/kodi/InfinityCloseGuardService;",
       "decision": "REJECTED:SEPARATE_LIFECYCLE_AUTHORIZATION_REQUIRED"
+    },
+    {
+      "case": "protected-callback:class:Lcom/projectinfinity/kodi/InfinityCloseNativeLease;",
+      "decision": "REJECTED:SEPARATE_LIFECYCLE_AUTHORIZATION_REQUIRED"
+    },
+    {
+      "case": "evidence-refresh-cannot-change-component",
+      "decision": "REJECTED:EVIDENCE_REFRESH_CHANGED_PAYLOAD_OR_VERSION:payload"
     }
   ],
   "component_builds": {
@@ -80,8 +88,8 @@
   "source_inputs": {
     "ModuleDexWriter.java": "f9c1b6da2552d529f27709b5f1c53368cacfab42d83fc947cb3b16cd0416dad2",
     "component_bundles.py": "1aca1f237a1987998f243d013fde991413c491b9e72706deda4853b1b1d642d6",
-    "release_authority.py": "4732bb14d9c78e9ee3108fd1074e7ff442e3adcbae5e22c3fae19780f5bc1159",
-    "test_component_matrix.py": "65fcf287e5fcbbd03157cfe61d13fdd9b179ceb184d097880d9a032273d7f7eb"
+    "release_authority.py": "99949c70485f04526fd5755a6492bd7bac5e246820058febeffa02facbc8a332",
+    "test_component_matrix.py": "bdc9a3e0211a51801a94607d8a5b07ee11e6229b0cd56783df756d984a6d67b7"
   },
   "status": "PASS_ACTUAL_INDEPENDENT_COMPONENT_MATRIX"
 }
