@@ -104,7 +104,7 @@ jobs:
           path: signed-combined/
           if-no-files-found: error
           retention-days: 90
-          compression-level: 0
+          compression-level: 6
       - name: Upload exact independently addressable component bundles
         uses: actions/upload-artifact@v4
         with:
