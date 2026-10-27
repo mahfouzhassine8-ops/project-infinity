@@ -11,9 +11,15 @@
       "original_key_access": false,
       "path": ".github/workflows/chooser-version-labels.yml",
       "source": "709e2e43a5c1f4510a2bde0437f56b504177e43b"
+    },
+    {
+      "id": 398401582,
+      "original_key_access": false,
+      "path": ".github/workflows/chooser-promote-release-2103424.yml",
+      "source": "152196bf76c7b8c5b1cfca19c2e1cc7cf9bde36c"
     }
   ],
-  "audit_workflows": 612,
+  "audit_workflows": 614,
   "retired_original_key_workflows": [
     {
       "id": 370925114,
@@ -2723,7 +2729,8 @@
     397576555,
     397702717,
     398072977,
-    398261182
+    398261182,
+    398401582
   ],
   "schema": 1,
   "scope": "Retire historical workflows with access to the original permanent signing secret; preserve their files, runs, artifacts and every locked ref",
