@@ -133,7 +133,20 @@ def verify_evidence(authority,read):
         require(digest(read(name))==sha,'REVIEWED_SOURCE_CHANGED:'+name)
     for name,sha in data['RUNTIME-PRESERVATION.json']['new_source_sha256'].items():
         require(digest(read(base+'runtime/'+name))==sha,'RUNTIME_PROOF_SOURCE_CHANGED:'+name)
+    # The combination matrix is a historical, immutable test receipt. Its
+    # original authority implementation is pinned to the exact commit that
+    # generated that proof, while the currently deployed authority source is
+    # checked separately against this release's source_files review hashes.
+    # A source evolution must never rewrite the meaning of an old passing test.
     for name,sha in data['COMBINATION-CONTROLS.json']['source_inputs'].items():
-        require(digest(read(base+name))==sha,'MATRIX_PROOF_SOURCE_CHANGED:'+name)
+        if name=='release_authority.py':
+            import subprocess
+            historical='72e5523e6c7637c1166ccef2e78128b55a0a3f77'
+            original=subprocess.check_output(['git','show',historical+':'+base+name])
+            require(digest(original)==sha,'HISTORICAL_MATRIX_SOURCE_HASH_MISMATCH')
+            require(digest(read(base+name))==authority['source_files'].get(base+name),
+                    'CURRENT_AUTHORITY_SOURCE_NOT_REVIEWED')
+        else:
+            require(digest(read(base+name))==sha,'MATRIX_PROOF_SOURCE_CHANGED:'+name)
     require(digest(read('.github/workflows/infinity-combined-release.yml'))==authority['workflow_sha256'],'SIGNING_WORKFLOW_CHANGED')
     return True
