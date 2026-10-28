@@ -20,7 +20,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   prepare-infinity-owner:
-    if: github.event_name == 'workflow_dispatch' && inputs.operation == 'prepare-infinity-owner' && github.ref == 'refs/heads/work/infinity-only-stability-speed-from-2103426-20261028'
+    if: github.event_name == 'workflow_dispatch' && inputs.operation == 'prepare-infinity-owner' && github.ref == 'refs/heads/work/infinity-only-stability-speed-from-2103425-20261028'
     runs-on: ubuntu-22.04
     timeout-minutes: 25
     env:
