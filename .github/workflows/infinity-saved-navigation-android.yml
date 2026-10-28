@@ -19,7 +19,7 @@ on:
         required: true
         type: choice
         default: select-a-feature
-        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host]
+        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host, infinity-performance-android]
       candidate_build:
         description: Existing signed build run (no rebuild)
         required: true
@@ -32,6 +32,94 @@ concurrency:
   group: infinity-feature-${{ inputs.source_ref || github.ref }}-${{ inputs.feature || 'explicit-request' }}-${{ github.ref == 'refs/heads/work/infinity-final-corrective-from-2103407-20261025' && github.sha || 'serial' }}
   cancel-in-progress: false
 jobs:
+  performance-android:
+    name: Existing signed2103426 focused Android17 journey
+    if: github.event_name == 'workflow_dispatch' && inputs.feature == 'infinity-performance-android'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      SELECTED_FEATURE: ${{ inputs.feature }}
+      AUTHORIZED_SCOPE: ${{ inputs.authorization }}
+      CANDIDATE_BUILD: ${{ inputs.candidate_build }}
+      INFINITY_EMULATOR_API: '37.1'
+      INFINITY_EMULATOR_TARGET: google_apis_ps16k
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: "${{ inputs.source_ref }}", fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - name: Admit only the existing signed candidate and selected finite test
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,os,subprocess
+          scope=json.loads(Path('repairs/infinity-only-performance-2103425/runtime/SCOPE.json').read_text())
+          assert os.environ['AUTHORIZED_SCOPE'].strip()
+          assert os.environ['CANDIDATE_BUILD']=='40647343407'
+          assert subprocess.check_output(['git','branch','--show-current'],text=True).strip()==scope['branch']
+          assert scope['shutdown']=='FROZEN_NOT_RUN' and scope['unchanged_APK_required'] is True
+          PY
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Focused host transport and workflow isolation controls
+        run: |
+          python3 -m pip install PyYAML==6.0.2
+          PYTHONPATH=repairs/infinity-only-performance-2103425/runtime python3 -m unittest -v test_probe
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40647343407
+          name: Infinity-Combined-Original-Signer-40647343407
+          github-token: ${{ github.token }}
+          path: runtime-signed
+      - uses: android-actions/setup-android@v4
+        with:
+          cmdline-tools-version: '15859902'
+          packages: platform-tools build-tools;35.0.0
+          log-accepted-android-sdk-licenses: false
+      - name: Verify original APK and reuse the documented Android17 environment
+        run: |
+          set -euo pipefail
+          mkdir -p runtime-platform
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs runtime-signed/Infinity-2103426-Combined-Original-Signer.apk > runtime-platform/APK-SIGNATURE.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib
+          p=Path('runtime-signed/Infinity-2103426-Combined-Original-Signer.apk')
+          with p.open('rb') as f: assert hashlib.file_digest(f,'sha256').hexdigest()=='5a9e5702a99606cc51b094f9f786edf091b6852306d9a70eaab2787f256e7f39'
+          assert 'Signer #1 certificate SHA-256 digest: d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' in Path('runtime-platform/APK-SIGNATURE.txt').read_text()
+          PY
+          sudo apt-get update -qq
+          sudo apt-get install -y libpulse0 ffmpeg
+          python3 repairs/infinity-final-closure-2103407/api37_environment_gate.py --sdk-root "$ANDROID_HOME" --out runtime-platform --pin-tools
+          python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out runtime-emulator-setup
+          sudo chmod 666 /dev/kvm
+      - name: Execute only the selected finite journey; leave application running
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: '37.1'
+          arch: x86_64
+          target: google_apis_ps16k
+          profile: pixel_2
+          disk-size: 8G
+          avd-name: infinity-four-repair-api37
+          pre-emulator-launch-script: python3 repairs/infinity-final-closure-2103407/api37_environment_gate.py --sdk-root "$ANDROID_HOME" --out runtime-platform --check-avd
+          disable-animations: false
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: |
+            adb shell getprop > runtime-platform/runtime-properties.txt
+            adb shell getconf PAGE_SIZE > runtime-platform/runtime-pagesize.txt
+            adb shell sha256sum /system/lib64/libndk_translation.so > runtime-platform/native-bridge-sha256.txt
+            python3 repairs/infinity-only-performance-2103425/runtime/probe.py --apk runtime-signed/Infinity-2103426-Combined-Original-Signer.apk --out runtime-results
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-2103426-Focused-Android17-${{ github.run_id }}
+          path: |
+            runtime-platform/
+            runtime-emulator-setup/
+            runtime-results/
+            repairs/infinity-only-performance-2103425/runtime/SCOPE.json
+          retention-days: 90
+          if-no-files-found: error
   performance-host:
     name: Selected Infinity performance source verification (host only)
     if: github.event_name == 'workflow_dispatch' && inputs.feature == 'infinity-performance-host'
@@ -108,7 +196,7 @@ jobs:
           retention-days: 90
           if-no-files-found: error
   android17:
-    if: inputs.feature != 'infinity-performance-host'
+    if: inputs.feature != 'infinity-performance-host' && inputs.feature != 'infinity-performance-android'
     name: Selected feature ${{ inputs.feature || 'explicit baseline Search request' }}
     runs-on: ubuntu-22.04
     timeout-minutes: 150

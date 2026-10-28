@@ -179,7 +179,7 @@ class ScopeControls(unittest.TestCase):
         host = workflow['jobs']['performance-host']
         self.assertIn("github.event_name == 'workflow_dispatch'", host['if'])
         self.assertIn("inputs.feature == 'infinity-performance-host'", host['if'])
-        self.assertEqual(workflow['jobs']['android17']['if'], "inputs.feature != 'infinity-performance-host'")
+        self.assertEqual(workflow['jobs']['android17']['if'], "inputs.feature != 'infinity-performance-host' && inputs.feature != 'infinity-performance-android'")
         self.assertNotIn('needs', host)
         commands = '\n'.join(step.get('run', '') for step in host['steps'])
         for forbidden in ('adb ', 'emulator', 'INFINITY_KEYSTORE_B64', 'assemble.py sign', 'pytest', 'unittest discover'):

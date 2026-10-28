@@ -1,0 +1,25 @@
+{
+  "investigation": "Existing exact logs inspected before selecting a runtime test",
+  "native_startup_failure_run": 40397437746,
+  "native_startup_job": 121834090954,
+  "native_startup_error": "SIGSEGV libkodi.so+0x2bf49fc talloc_lib_init+60, getauxval(AT_RANDOM) pointer+7 read, before Kodi/Python",
+  "strict16K_failure_runs": [
+    40399697939,
+    40399771565
+  ],
+  "strict16K_error": "libc++_shared.so program alignment4096 smaller than systempage16384",
+  "native_ARM_capability_run": 40405405813,
+  "native_ARM_error": "HV_UNSUPPORTED; hypervisor could not initialize before Android boot",
+  "API37_1_compatibility_run": 40407451498,
+  "actual_engine_started": true,
+  "actual_original_feature_passed": true,
+  "initial_saved_card": true,
+  "initial_saved_card_ms": 583.2274920001055,
+  "initial_QA_cached_bitmap_ms": 1437.8663240000833,
+  "later_failed_operation": "stress_resume_card.observe after Player.Stop; card ready20sec timed out",
+  "prior_failure_retained": "Selected stress: RuntimeError: Feature state was not observed before deadline",
+  "correction_scope": "Reuse established OS-compatible emulator; replace old30/20 matrix with bounded diagnostic journey and record actual settled tab, identity and fresh progress. No assertion that a production or native fault was repaired.",
+  "APK_changed": false,
+  "shutdown_tests": "NOT_RUN",
+  "physical_Fold": "NOT_RUN"
+}
