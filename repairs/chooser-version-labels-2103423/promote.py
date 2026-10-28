@@ -8,15 +8,16 @@ import argparse, copy, json, re, sys
 from pathlib import Path
 HERE=Path(__file__).resolve().parent
 SIGNED_2103423='4cbbf963be72904de962f434d00ee5f9d5080de6b6b9fd4b3e31ab1d6ac01aff'
-PRODUCER_RUN=40590499416
-PRODUCER_SOURCE='67967bc42cd62375f2c4f5f79061630162940046'
-SHELL_ZIP_SHA='c91590042994669599a2670c485b634d3e10391ffbc85c8d653a4a1aaad13e9c'
+SIGNED_2103424='e7f23585510ca89f75d50294f3df1a1895a99aec05371486a84e28b4039886fa'
+PRODUCER_RUN=40606096481
+PRODUCER_SOURCE='e9a433a4a999af1af3bd3bb76d230a5e3605e7ed'
+SHELL_ZIP_SHA='c3092e5c251f8cbf2d4d97728c4507433fb8d6b3c932de99fb008cc2a18be094'
 MEMBER='member:assets/experience-component-updates.properties'
 COMPONENT_KEY='CHOOSER_SHELL'
-OLD_SHELL_DIGEST='1c27b2bc8a50d86a11e1c9bc3384902ccad9fa21f52b7c569be40e1d5bce3ba8'
+OLD_SHELL_DIGEST='e09360a6ae8cd4546eef954fc7a5f5ca04e5adaa09d5c3f7e8b7aaa308858c86'
 OLD_COBRA_DIGEST='7091c30cff244beb75f900236da87d016a14573981aa84b7eee454080c23adf7'
 OLD_INFINITY_DIGEST='ec27bce6252cbce21eecef0963285db720059e6c4ce27448f9ef441a8cb18f61'
-NEW_SHELL_DIGEST='815da51885ef1e69f3542dd3c273c5fef8de5a64977e714d165e83ffc951996d'
+NEW_SHELL_DIGEST='52970baaa0782e9ea68f024f44ef34cd6113043d7017b0a49d58ae85c28d18b5'
 EXACT_NEW_CLASSES={
  'Lcom/projectinfinity/kodi/ChooserReleaseMetadata;',
  'Lcom/projectinfinity/kodi/ChooserReleaseFooter;',
@@ -33,8 +34,8 @@ def promote(checkout,producer):
  require((checkout/'.git').exists(),'CHECKOUT_REQUIRED')
  authority=root/'release-authority.json'
  old=load(authority)
- require(old['schema']==2 and old['generation']==6 and old['candidate_versionCode']==2103423,
-         'EXPECTED_SIGNED2103423_AUTHORITY_REQUIRED')
+ require(old['schema']==2 and old['generation']==9 and old['candidate_versionCode']==2103424,
+         'EXPECTED_SIGNED2103424_AUTHORITY_REQUIRED')
  require(old['bundle_catalog']['bundles'][COMPONENT_KEY]['digest']==OLD_SHELL_DIGEST,
          'OLDER_SHELL_MISMATCH')
  require(old['components']['INFINITY']['digest']==OLD_INFINITY_DIGEST and
@@ -53,18 +54,21 @@ def promote(checkout,producer):
  row=load(producer/'catalog-row.json')
  require(row['approved_source']==PRODUCER_SOURCE and
          row['sha256']==SHELL_ZIP_SHA and row['digest']==NEW_SHELL_DIGEST and
-         row['version']=='2103420.container.2.labels.1','PRODUCER_SOURCE_OR_VERSION_MISMATCH')
+         row['version']=='2103420.container.2.labels.2','PRODUCER_SOURCE_OR_VERSION_MISMATCH')
  meta=read_bundle(producer/'CHOOSER_SHELL.zip',row)
  old_shell={k:v for k,v in old['payload'].items() if v['owner']==COMPONENT_KEY}
  new_shell=meta['payload']
- require(set(new_shell)-set(old_shell)=={'class:Lcom/projectinfinity/kodi/ChooserReleaseMetadata;',
-                                    'class:Lcom/projectinfinity/kodi/ChooserReleaseFooter;',MEMBER},
+ require(set(new_shell)-set(old_shell)=={'class:Lcom/projectinfinity/kodi/ChooserReleaseFooter;'},
          'EXTRA_NEW_MEMBER')
  require(set(old_shell)-set(new_shell)==set(),'MISSING_SHELL_MEMBER')
  require({k for k in old_shell if old_shell[k]!=new_shell[k]}==
          {'class:Lcom/projectinfinity/kodi/InfinityGlassChooser$Card;',
           'class:Lcom/projectinfinity/kodi/InfinityGlassChooser$Stage;'},
          'UNRELATED_SHELL_MUTATION')
+ require(new_shell.get('class:Lcom/projectinfinity/kodi/ChooserReleaseMetadata;')==
+         old_shell.get('class:Lcom/projectinfinity/kodi/ChooserReleaseMetadata;'),
+         'PREVIOUS_VERSION_READER_MUTATED')
+ require(new_shell.get(MEMBER)==old_shell.get(MEMBER),'OFFLINE_HISTORY_ASSET_CHANGED')
  require(meta['members']=={'assets/experience-component-updates.properties':
          {'sha256':'652f0e3d6276006214b9a64de9ea08b1f2c3a15ca6a1c0265da6822885ba95f6',
           'compress_type':8,'external_attr':0o100644<<16}},'METADATA_ASSET_MISMATCH')
@@ -74,16 +78,16 @@ def promote(checkout,producer):
  proposed['components'][COMPONENT_KEY]={
     'approved_source':PRODUCER_SOURCE,'digest':NEW_SHELL_DIGEST,
     'revision':old['components'][COMPONENT_KEY]['revision']+1,
-    'settings_schema':'original-launch-preference','version':'2103420.container.2.labels.1'
+    'settings_schema':'original-launch-preference','version':'2103420.container.2.labels.2'
  }
  proposed['bundle_catalog']['bundles'][COMPONENT_KEY]=row
  proposed['bundle_sources'][COMPONENT_KEY]={
-     'artifact':'Chooser-Original-UI-Version-Labels-40590499416',
+     'artifact':'Chooser-Original-UI-Version-Labels-40606096481',
      'build_source':PRODUCER_SOURCE,
      'path':'CHOOSER_SHELL.zip','run_id':PRODUCER_RUN
  }
- proposed['candidate_versionCode']=2103424
- proposed['last_issued_versionCode']=2103423
+ proposed['candidate_versionCode']=2103425
+ proposed['last_issued_versionCode']=2103424
  proposed['generation']=old['generation']+1
  proposed['target_owners']=[COMPONENT_KEY]
  proposed['update_kind']='owner_update'
@@ -94,7 +98,8 @@ def promote(checkout,producer):
      'component_zip_sha256':SHELL_ZIP_SHA,
      'preservation':preservation,
      'physical_Fold':'PENDING','accepted_pointer_updated':False,
-     'signed_baseline_2103423_sha256':SIGNED_2103423,
+     'signed_baseline_2103424_sha256':SIGNED_2103424,
+     'source_component_baseline_2103423_sha256':SIGNED_2103423,
      'changed_owners':[COMPONENT_KEY],
      'unchanged_owners':['INFINITY','COBRA','MINIMAL_ANDROID_CONTRACT']
  }
@@ -119,7 +124,7 @@ def promote(checkout,producer):
  transition(old,proposed,{COMPONENT_KEY})
  save(authority,proposed)
  print(json.dumps({'status':'READY_FOR_SOLE_SIGNER_GATE',
-     'generation':proposed['generation'],'versionCode':2103424,
+     'generation':proposed['generation'],'versionCode':2103425,
      'previous_authority_sha256':proposed['previous_authority_sha256'],
      'unchanged_experience_components':['INFINITY','COBRA'],
      'shell_bundle_sha256':SHELL_ZIP_SHA},indent=2))
