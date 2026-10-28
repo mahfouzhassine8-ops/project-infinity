@@ -19,7 +19,7 @@ on:
         required: true
         type: choice
         default: select-a-feature
-        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter]
+        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host]
       candidate_build:
         description: Existing signed build run (no rebuild)
         required: true
@@ -32,7 +32,83 @@ concurrency:
   group: infinity-feature-${{ inputs.source_ref || github.ref }}-${{ inputs.feature || 'explicit-request' }}-${{ github.ref == 'refs/heads/work/infinity-final-corrective-from-2103407-20261025' && github.sha || 'serial' }}
   cancel-in-progress: false
 jobs:
+  performance-host:
+    name: Selected Infinity performance source verification (host only)
+    if: github.event_name == 'workflow_dispatch' && inputs.feature == 'infinity-performance-host'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      AUTHORIZED_SCOPE: ${{ inputs.authorization }}
+      BASELINE_BUILD: ${{ inputs.candidate_build }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: "${{ inputs.source_ref }}", fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - name: Admit this exact host correction and immutable baseline
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess
+          from pathlib import Path
+          scope=json.loads(Path('repairs/infinity-only-performance-2103425/SCOPE.json').read_text())
+          assert os.environ['AUTHORIZED_SCOPE'].strip()
+          assert os.environ['BASELINE_BUILD']=='40606707330'
+          branch=subprocess.check_output(['git','branch','--show-current'],text=True).strip()
+          assert branch==scope['branch']
+          assert scope['owner']=='INFINITY' and scope['shutdown']=='NOT_RUN_FROZEN'
+          baseline=scope['baseline_source']
+          assert subprocess.check_output(['git','rev-parse','origin/lock/infinity-cobra-2103425-fold-approved-chooser-20261028'],text=True).strip()==baseline
+          paths=subprocess.check_output(['git','diff','--name-only',baseline,'HEAD'],text=True).splitlines()
+          assert all(p.startswith('repairs/infinity-only-performance-2103425/') or p=='.github/workflows/infinity-saved-navigation-android.yml' for p in paths)
+          PY
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40606707330
+          name: Infinity-Combined-Original-Signer-40606707330
+          github-token: ${{ github.token }}
+          path: baseline
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40606707330
+          name: Infinity-Combined-Owner-Components-40606707330
+          github-token: ${{ github.token }}
+          path: baseline-components
+      - name: Reverify baseline original signer; stage exact owned source generation
+        run: |
+          set -euo pipefail
+          mkdir -p performance-results
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs baseline/Infinity-2103425-Combined-Original-Signer.apk > performance-results/BASELINE-SIGNATURE.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          raw=Path('performance-results/BASELINE-SIGNATURE.txt').read_text()
+          assert 'Signer #1 certificate SHA-256 digest: d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' in raw
+          assert 'Verified using v2 scheme (APK Signature Scheme v2): true' in raw
+          PY
+          python3 repairs/infinity-only-performance-2103425/stage.py --baseline baseline/Infinity-2103425-Combined-Original-Signer.apk --bundles baseline-components --out staged-performance
+          cp staged-performance/PRESERVATION.json staged-performance/SIGNING-BLOCKERS.json performance-results/
+      - name: Compare selected actual-source host behavior and allocations
+        run: |
+          set -euo pipefail
+          python3 -m pip install PyYAML==6.0.2
+          target=repairs/infinity-only-performance-2103425
+          original=staged-performance/baseline-addons/script.infinity.commandcenter
+          candidate=staged-performance/candidate-addons/script.infinity.commandcenter
+          python3 "$target/verify.py" --root "$original" --baseline-root "$original" --phase baseline --out performance-results/BASELINE-HOST.json
+          python3 "$target/verify.py" --root "$candidate" --baseline-root "$original" --phase candidate --out performance-results/CANDIDATE-HOST.json
+          python3 "$target/test_edges.py" 2>&1 | tee performance-results/EDGE-CONTROLS.txt
+      - name: Upload source inputs and truthful host-only evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-Performance-Source-Verification-${{ github.run_id }}
+          path: |
+            performance-results/
+            staged-performance/candidate-addons/
+            repairs/infinity-only-performance-2103425/SCOPE.json
+          retention-days: 90
+          if-no-files-found: error
   android17:
+    if: inputs.feature != 'infinity-performance-host'
     name: Selected feature ${{ inputs.feature || 'explicit baseline Search request' }}
     runs-on: ubuntu-22.04
     timeout-minutes: 150

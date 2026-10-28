@@ -1,0 +1,26 @@
+<addon id="script.infinity.commandcenter" name="Infinity Command Center" version="0.3.5.50" provider-name="Project Infinity">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0" />
+  </requires>
+  <extension point="xbmc.python.script" library="default.py" />
+  <extension point="xbmc.python.pluginsource" library="plugin.py">
+    <provides>video</provides>
+  </extension>
+  <extension point="xbmc.service" library="service.py" start="startup" />
+  <extension point="kodi.context.item">
+    <menu id="kodi.core.main">
+      <item library="context.py" args="infinity-item-menu-v1">
+        <label>Infinity Tracked</label>
+        <visible>String.StartsWith(ListItem.FileNameAndPath,plugin://plugin.video.watchnixtoons2/) | String.StartsWith(ListItem.Path,plugin://plugin.video.watchnixtoons2/)</visible>
+      </item>
+      <item library="context.py" args="manage"><label>Infinity Trakt</label><visible>[String.IsEqual(ListItem.DBTYPE,movie) | String.IsEqual(ListItem.DBTYPE,episode) | String.IsEqual(ListItem.DBTYPE,tvshow) | String.IsEqual(ListItem.DBTYPE,season)] + String.IsEmpty(ListItem.Property(Infinity.ResumeHub.Key)) + [!String.IsEmpty(ListItem.UniqueID(tmdb)) | !String.IsEmpty(ListItem.UniqueID(tvdb)) | !String.IsEmpty(ListItem.UniqueID(imdb)) | Integer.IsGreater(ListItem.DBID,0)]</visible></item></menu>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <reuselanguageinvoker>false</reuselanguageinvoker>
+    <summary lang="en_GB">Infinity runtime-aware Command Center, stability guard and diagnostics hub.</summary>
+    <description lang="en_GB">Infinity Resume Hub 2 extends the existing local progress store with watched history, Watched/Unwatched, Watchlist, Collection, ratings, custom lists, Infinity Movies and Infinity TV routes, plus the existing Experience features. Trakt remains optional. Extends the existing progress, audio/subtitle memory, guardian and display controllers. Native Cobra and Kodi playback ownership are preserved.</description>
+    <platform>all</platform>
+    <license>GPL-2.0-or-later</license>
+      <assets><icon>resources/icon.png</icon></assets>
+  </extension>
+</addon>

@@ -1,0 +1,27 @@
+{
+  "blockers": [
+    {
+      "file": "repairs/dual-experience-isolation-2103420/release_authority.py",
+      "function": "transition",
+      "reason": "Infinity update requires candidate_versionCode in the Infinity last-updated label, then UPDATED_LABELS_REQUIRE_SHELL_BUNDLE; validate binds labels to chooser-owned assets/experience-component-updates.properties. Chooser changes are explicitly prohibited."
+    },
+    {
+      "file": "repairs/dual-experience-isolation-2103420/release_gate.py",
+      "function": "remote_authority",
+      "reason": "AUTHORITY_BRANCH is the old work/infinity-cobra-isolation-from-2103420-20261026 branch, while all work is required on work/infinity-only-stability-speed-from-2103425-20261028."
+    },
+    {
+      "file": ".github/workflows/infinity-combined-release.yml",
+      "function": "jobs.combined.if / selected-owner build",
+      "reason": "Sole original-key pipeline is restricted to the old branch and consumes already approved owner ZIPs. New authenticated Infinity module generation needs a guarded original-key manifest-signing stage within that same pipeline before final owner approval. No alternate signer has been added."
+    }
+  ],
+  "installable_APK_produced": false,
+  "physical_Fold": "NOT_RUN",
+  "proposed_Command_Center_version": "0.3.5.50",
+  "proposed_Infinity_component": "2103420.isolation.1.performance.1",
+  "proposed_versionCode": 2103426,
+  "protected_baseline_ref": "lock/infinity-cobra-2103425-fold-approved-chooser-20261028",
+  "protected_baseline_source": "db730100a3bfea7e06d2e6c3434e89aeb6fa8a15",
+  "status": "SIGNING_BLOCKED_BY_EXPLICIT_OWNER_CONFLICT"
+}

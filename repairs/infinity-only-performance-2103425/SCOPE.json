@@ -1,0 +1,27 @@
+{
+  "recorded_before_implementation": true,
+  "branch": "work/infinity-only-stability-speed-from-2103425-20261028",
+  "baseline_source": "db730100a3bfea7e06d2e6c3434e89aeb6fa8a15",
+  "baseline_run": 40606707330,
+  "baseline_apk_sha256": "f6d043d4791cfc851af65c5e705ef2f1b22e8d885c5f0180592f5291b6bc7612",
+  "owner": "INFINITY",
+  "preimages": {
+    "addon.xml": "fe14d9036c26d600277544d500007cecc6db0d05d5664a9ab7ce529065e33107",
+    "resume_hub.py": "12dc15d4977937b58186b09728431c03f0b728566b8a551f3c36b0dc094bec7a",
+    "plugin.py": "1b2f3ea6aa23120de5e67aa50454d2cfe89fc561687d4b8186c8083ffcacf851",
+    "provider_inventory.py": "17d578e9c26069a01ca84ba415e1dbe478c10e2be71c014e0897087d4566937d",
+    "infinity_search.py": "81462066b56e907d3894a70e1e8e3ea6b83178cc51924a6ddc95bc5e3abbe288"
+  },
+  "selected_checks": [
+    "Actual signed-source Resume projection equivalence for movie/TV/history/list, grouping conflicts, hidden rows and bounded deep copies; private copies and unchanged inputs",
+    "Actual signed-source listing retains exact card order, identity, progress, context, folder and cache behavior through one batched native submission",
+    "Selected Search verifies only selected installed provider; Search All, first-tap selection, history and original source/dependency revalidation unchanged",
+    "Search answer cache invalidation on profile, source root, contract/dependency, provider settings, local progress/watched, add-on revision; original 4-entry/300000-byte/300s limits unchanged; cancellation/failure not cached",
+    "Search state change during native request or cache lookup cannot publish/cache stale answer; original lease/admission/worker ownership preserved by exact function comparison",
+    "Complete unchanged APK-member inventory; Cobra/chooser/shared DEX/native/persistence/shutdown source exact; original baseline signature and component digest binding",
+    "Focused CI host verification and unsigned source/module assembly; no signer bypass"
+  ],
+  "shutdown": "NOT_RUN_FROZEN",
+  "physical_Fold": "NOT_AVAILABLE",
+  "release_accepted": false
+}

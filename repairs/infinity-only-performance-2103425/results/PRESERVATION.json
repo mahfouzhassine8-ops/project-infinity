@@ -1,0 +1,152 @@
+{
+  "Cobra": "BYTE_IDENTICAL_INPUT",
+  "accepted_pointer_updated": false,
+  "all_baseline_members_checked": 7598,
+  "baseline_apk_sha256": "f6d043d4791cfc851af65c5e705ef2f1b22e8d885c5f0180592f5291b6bc7612",
+  "baseline_authority_source": "db730100a3bfea7e06d2e6c3434e89aeb6fa8a15",
+  "baseline_original_module_signature": "Verified OK",
+  "candidate_module": {
+    "APK_produced": false,
+    "file_count": 75,
+    "manifest_sha256": "b9589a71cb5c85d84eb5b46d902e75060e21ad693f382b595dee5ee1ea51723a",
+    "package": "0.3.5.50",
+    "protocol": 1,
+    "signed": false,
+    "total_source_bytes": 756635,
+    "user_data_modified": false
+  },
+  "candidate_module_manifest_sha256": "b9589a71cb5c85d84eb5b46d902e75060e21ad693f382b595dee5ee1ea51723a",
+  "candidate_module_signature": "NOT_ISSUED_ORIGINAL_SIGNER_REQUIRED",
+  "changed_application_sources": {
+    "member:assets/addons/script.infinity.commandcenter/addon.xml": {
+      "after_sha256": "f68e921362a2c047409d3c22bcc1dc908293fabc531a478d478b42811a2c1cc5",
+      "before_sha256": "fe14d9036c26d600277544d500007cecc6db0d05d5664a9ab7ce529065e33107",
+      "owner": "INFINITY"
+    },
+    "member:assets/addons/script.infinity.commandcenter/infinity_search.py": {
+      "after_sha256": "fa790e66b5f1fba5c537ba5c5f615f70144d8e926d0640e749ecd6861b756212",
+      "before_sha256": "81462066b56e907d3894a70e1e8e3ea6b83178cc51924a6ddc95bc5e3abbe288",
+      "owner": "INFINITY"
+    },
+    "member:assets/addons/script.infinity.commandcenter/plugin.py": {
+      "after_sha256": "21ff99233e5d338a7c47d9b686e05bfc12ef2492869ae72913ad5610b8954033",
+      "before_sha256": "1b2f3ea6aa23120de5e67aa50454d2cfe89fc561687d4b8186c8083ffcacf851",
+      "owner": "INFINITY"
+    },
+    "member:assets/addons/script.infinity.commandcenter/provider_inventory.py": {
+      "after_sha256": "d9b51790c737f9cfa013806c6bf287ab37bd17cb798644ab0aaaf31ea37ae3e2",
+      "before_sha256": "17d578e9c26069a01ca84ba415e1dbe478c10e2be71c014e0897087d4566937d",
+      "owner": "INFINITY"
+    },
+    "member:assets/addons/script.infinity.commandcenter/resume_hub.py": {
+      "after_sha256": "9269f2e9f64303329386ad44df86f82b55643fd14632a08e19109303ed0b3d59",
+      "before_sha256": "12dc15d4977937b58186b09728431c03f0b728566b8a551f3c36b0dc094bec7a",
+      "owner": "INFINITY"
+    }
+  },
+  "changed_function_review": {
+    "infinity_search.py": {
+      "compilation": "PASS",
+      "selected_definitions": [
+        "_open_search",
+        "_provider_result",
+        "_publish_result",
+        "_query_file_stamp",
+        "_query_signature",
+        "_search_results",
+        "providers"
+      ],
+      "unchanged_definitions": 13
+    },
+    "plugin.py": {
+      "compilation": "PASS",
+      "selected_definitions": [
+        "_values_for",
+        "listing"
+      ],
+      "unchanged_definitions": 32
+    },
+    "provider_inventory.py": {
+      "compilation": "PASS",
+      "selected_definitions": [
+        "eligible",
+        "snapshot"
+      ],
+      "unchanged_definitions": 13
+    },
+    "resume_hub.py": {
+      "compilation": "PASS",
+      "selected_definitions": [
+        "entries"
+      ],
+      "unchanged_definitions": 56
+    }
+  },
+  "chooser": "BYTE_IDENTICAL_INPUT",
+  "installable_APK_produced": false,
+  "native_and_DEX_frozen": {
+    "classes.dex": "57fce906a32b6e5dd0d4f67edbd7188e88b71a1c359016636090ce62bb6bbb55",
+    "classes2.dex": "2e8fa1ae27e670db0525d31a655e93d861893fa20316d5c54a4c6283a97ca304",
+    "classes3.dex": "7e18d8092de33a4d44e299305965e9b9eb943372a9643452f6f78afe209fb215",
+    "classes4.dex": "37c84838ed0092ab411fba2237bbf8fbf557c0220517b6a09ab10a384a924595",
+    "classes5.dex": "11028fc8f629069015a30baed955755f4de7ba9320fec7dcc7a692ae0f0ba84b",
+    "lib/arm64-v8a/libCryptodome_Cipher__ARC4.so": "960db1a5f3c03724d742d02fda0c97f697c7dfc4d96a1308a8795895abc6c038",
+    "lib/arm64-v8a/libCryptodome_Cipher__Salsa20.so": "a6b27534731b443931a50bc081fe89c9bfa3644c0810b26062a79ad11fe66173",
+    "lib/arm64-v8a/libCryptodome_Cipher__chacha20.so": "573bc77521e4c75cda9818b686987af221e9c1738268d88f97218c2c0206148f",
+    "lib/arm64-v8a/libCryptodome_Cipher__pkcs1_decode.so": "d97f07560682a74285510ef67be388be70ff1c28012ec0d2d1ef13546641c409",
+    "lib/arm64-v8a/libCryptodome_Cipher__raw_aes.so": "49dccf26bf84844090778e0d5980ede18f2fdb99c7f28ed57807d50413473aaf",
+    "lib/arm64-v8a/libCryptodome_Cipher__raw_arc2.so": "980074aff64515b3f84432ba0b7ca451230c99f392a8bdc8f6ac4fafbbaeecea",
+    "lib/arm64-v8a/libCryptodome_Cipher__raw_blowfish.so": "e6edc060c2036d5d513508b817c37fc09aa9bd7397f775dacf019ab88c87bf48",
+    "lib/arm64-v8a/libCryptodome_Cipher__raw_cast.so": "0653b0056b5334dd2ea6032a5c68223e1a9436d4190384a48771638379d68f30",
+    "lib/arm64-v8a/libCryptodome_Cipher__raw_cbc.so": "069a680c2643c5a05a77a20cb043070e550d344a268e767ea38b36c2cfd04848",
+    "lib/arm64-v8a/libCryptodome_Cipher__raw_cfb.so": "fb3ab550f9a22f5a043678786f40eb52cffbd306485fe38be17a8ed1c6214f0b",
+    "lib/arm64-v8a/libCryptodome_Cipher__raw_ctr.so": "a08cf702e9341789861d259dd30c4bd3dae3629fabf9de24eb6553681fb1e448",
+    "lib/arm64-v8a/libCryptodome_Cipher__raw_des.so": "1adcc3d3d9c0ae54229cbb7864acf4117b39e8cb13a1c67672ba5892309d90b4",
+    "lib/arm64-v8a/libCryptodome_Cipher__raw_des3.so": "b2bd94ae0694bcf4546db85bba847a57fcbad0f02c85f8b1cc9107c155f28513",
+    "lib/arm64-v8a/libCryptodome_Cipher__raw_ecb.so": "5dcc7bddf9cf7db3b3605a90b390cea3ae6afbda1ddd9209fbabdef21a54f811",
+    "lib/arm64-v8a/libCryptodome_Cipher__raw_eksblowfish.so": "4deb634643329942f6fa94ad99547a5d7a83fc853984c450ef87b372c9865c5d",
+    "lib/arm64-v8a/libCryptodome_Cipher__raw_ocb.so": "966cd086b785d05ce397d733fee8a46e710ff22ece6a6dbda146b69f7a602a1d",
+    "lib/arm64-v8a/libCryptodome_Cipher__raw_ofb.so": "77de679c6932e4ff59db0c58300d7b750fedd0e38d12e9f668988afa5a630869",
+    "lib/arm64-v8a/libCryptodome_Hash__BLAKE2b.so": "5dd23832e1d5757bd6f9356c787d833ae850e4eb2b908efcb47dc67825031b23",
+    "lib/arm64-v8a/libCryptodome_Hash__BLAKE2s.so": "ae590e31568b2706725f7006b583dc593d4c4e6b438f2e56aa01825c1e16c1c2",
+    "lib/arm64-v8a/libCryptodome_Hash__MD2.so": "818feaf7ef08e28d6db90797203ace1186fdc88fbd7a63c3c4cefa75f06a8b32",
+    "lib/arm64-v8a/libCryptodome_Hash__MD4.so": "3e1c009e0c410da07f886e160b66c3a0e1f3c44f6e4ed60c64e70093ced58fb5",
+    "lib/arm64-v8a/libCryptodome_Hash__MD5.so": "5ba9f38a40d6f920cb5a2835c4150adaa9f975ba585cc0d086d4b0288144907c",
+    "lib/arm64-v8a/libCryptodome_Hash__RIPEMD160.so": "c57450feb50414e7c59eb5aed93d55dde9183907f5cfdaa47009799948dc1f5b",
+    "lib/arm64-v8a/libCryptodome_Hash__SHA1.so": "61e8ba022e1ecb79fc8b64a4e60ec67acde9c3b1486c2f839f662e9a6fcd3392",
+    "lib/arm64-v8a/libCryptodome_Hash__SHA224.so": "f2f17c7cbafef1d3229673bdbc4a6242284d418f9fc8924e529f485b12003963",
+    "lib/arm64-v8a/libCryptodome_Hash__SHA256.so": "77aea79e5c4db591467e12b6bffe0fd4c237af3e764404b9db02506d722af434",
+    "lib/arm64-v8a/libCryptodome_Hash__SHA384.so": "80fc2e9672a65dad2aa74789ef77d319b6ade9056843ef151d60d6c17ae2186b",
+    "lib/arm64-v8a/libCryptodome_Hash__SHA512.so": "6031426b650279d8409c9c4394bb3374c7bcc8869dc16b2e5f22df7c965bf9bc",
+    "lib/arm64-v8a/libCryptodome_Hash__ghash_portable.so": "37acc302aff53118835c1b262a159c7d4b6cdb2705b7dc098b8eee4984c29010",
+    "lib/arm64-v8a/libCryptodome_Hash__keccak.so": "66ca417d1b434c151ab5495418bacb8eb8ae563d4f671fa8d4225f13d67c0763",
+    "lib/arm64-v8a/libCryptodome_Hash__poly1305.so": "7716c738b5ab8f3548087d78a77232051b78831061ac04797986dda93f5fdd73",
+    "lib/arm64-v8a/libCryptodome_Math__modexp.so": "0545ca17081a08a9e96f9d681bad8983450fcee01a1321fc3a13bdeb9f006388",
+    "lib/arm64-v8a/libCryptodome_Protocol__scrypt.so": "c695b6a659cf06f9ea03705616663a84ea4a380eefe67d5130dad7198ce1137a",
+    "lib/arm64-v8a/libCryptodome_PublicKey__ec_ws.so": "580c065ece5d3164d60c888616cfa3e1157cb7978c3fae2d005f05712b0cf28d",
+    "lib/arm64-v8a/libCryptodome_Util__cpuid_c.so": "d7a81665ef377989555c89ddc8c3d3b8cce13dfa0255bc6b228964847d11e40d",
+    "lib/arm64-v8a/libCryptodome_Util__strxor.so": "c368ec648f91889d2d4032b401c0ac83cb530dd103291453b572a4b7395540eb",
+    "lib/arm64-v8a/lib_imaging.so": "28a55b715475872f510396cdc4bc089de1344e98054ded16ef3c501f2ad86c79",
+    "lib/arm64-v8a/lib_imagingft.so": "d27a82cbe5d5e08404c9ef6a1b39fb3c697474e460ccd21c0874e95ead0bd6f4",
+    "lib/arm64-v8a/lib_imagingmath.so": "a3fd521072ac8ee1c7c40029b281763962ecb2970f0b27cef598e8d3ae45fb56",
+    "lib/arm64-v8a/lib_imagingmorph.so": "91a4eec5bb308892854b1f4678129c585fde8c6c44dae19ba3455b130a9323d9",
+    "lib/arm64-v8a/lib_imagingtk.so": "a870d048acdc1400f3cf88307547527d91d6d1ca7a91f621c981b55ad6bdfebd",
+    "lib/arm64-v8a/libc++_shared.so": "f1ce8bc0759504421da60393b8654cce473973615416254e68255306ec913222",
+    "lib/arm64-v8a/libdvdnav-aarch64.so": "8f7e5c0aa56e041aef4de35dfc97a9908d040672fcdeabcc8236177ab49ef0ec",
+    "lib/arm64-v8a/libinfinityambient.so": "a876a76abe4faea63046953579899b0b7a67572722c2ed92331e41fcd1475684",
+    "lib/arm64-v8a/libinfinitycrash.so": "039fb1e3cfbb2472f1ca5f441016e15782a68992c892b3b39d63adc027fdf209",
+    "lib/arm64-v8a/libkodi.so": "151128c176b6094f28bb3fc716cc07c3985a9aa38f1fe41e1bb1424f0285a47e",
+    "lib/arm64-v8a/libshairplay.so": "ab402c0b2577c8f128695db53808c0e1b07b7f70d63125655eba37a0be18da9b"
+  },
+  "original_owner_bundles": {
+    "CHOOSER_SHELL": "c3092e5c251f8cbf2d4d97728c4507433fb8d6b3c932de99fb008cc2a18be094",
+    "COBRA": "eb30afa0e1ab9f50da897db27a604cb79a47059ff355c763dc7d7c955ddbcb6b",
+    "INFINITY": "656285de625c859f1d1d3cccc023a20b6dc9d88fff4b5d508d39e000c3b68abc",
+    "MINIMAL_ANDROID_CONTRACT": "6e93a1eb8e47f7fc9bc6f1dbc9208b555e2e62445ca2a3065d4e17a3b473ba33"
+  },
+  "protected_shutdown_sources": "BYTE_IDENTICAL",
+  "shared_contract": "BYTE_IDENTICAL_INPUT",
+  "shutdown_tests": "NOT_RUN",
+  "status": "PASS_SOURCE_AND_IMMUTABLE_BASELINE_INVENTORY",
+  "unchanged_firstparty_sources": 70
+}
