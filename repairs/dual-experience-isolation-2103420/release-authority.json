@@ -6,12 +6,12 @@
   "bundle_catalog": {
     "bundles": {
       "CHOOSER_SHELL": {
-        "approved_source": "709e2e43a5c1f4510a2bde0437f56b504177e43b",
-        "digest": "e09360a6ae8cd4546eef954fc7a5f5ca04e5adaa09d5c3f7e8b7aaa308858c86",
+        "approved_source": "e9a433a4a999af1af3bd3bb76d230a5e3605e7ed",
+        "digest": "52970baaa0782e9ea68f024f44ef34cd6113043d7017b0a49d58ae85c28d18b5",
         "file": "CHOOSER_SHELL.zip",
         "settings_schema": "original-launch-preference",
-        "sha256": "5bc9f0541ef073e5792a9428aea87bda601d668f0309653209fdab238d610191",
-        "version": "2103420.container.2.labels.1"
+        "sha256": "c3092e5c251f8cbf2d4d97728c4507433fb8d6b3c932de99fb008cc2a18be094",
+        "version": "2103420.container.2.labels.2"
       },
       "COBRA": {
         "approved_source": "207949de66e09cc8cf4d493cafdb324dbc29475c",
@@ -46,10 +46,10 @@
   },
   "bundle_sources": {
     "CHOOSER_SHELL": {
-      "artifact": "Chooser-Original-UI-Version-Labels-40509014993",
-      "build_source": "709e2e43a5c1f4510a2bde0437f56b504177e43b",
+      "artifact": "Chooser-Original-UI-Version-Labels-40606096481",
+      "build_source": "e9a433a4a999af1af3bd3bb76d230a5e3605e7ed",
       "path": "CHOOSER_SHELL.zip",
-      "run_id": 40509014993
+      "run_id": 40606096481
     },
     "COBRA": {
       "artifact": "Cobra-All-Layout-Reflow-Owner-40485414619",
@@ -70,15 +70,15 @@
       "run_id": 40447183241
     }
   },
-  "candidate_versionCode": 2103424,
+  "candidate_versionCode": 2103425,
   "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
   "components": {
     "CHOOSER_SHELL": {
-      "approved_source": "709e2e43a5c1f4510a2bde0437f56b504177e43b",
-      "digest": "e09360a6ae8cd4546eef954fc7a5f5ca04e5adaa09d5c3f7e8b7aaa308858c86",
-      "revision": 2,
+      "approved_source": "e9a433a4a999af1af3bd3bb76d230a5e3605e7ed",
+      "digest": "52970baaa0782e9ea68f024f44ef34cd6113043d7017b0a49d58ae85c28d18b5",
+      "revision": 3,
       "settings_schema": "original-launch-preference",
-      "version": "2103420.container.2.labels.1"
+      "version": "2103420.container.2.labels.2"
     },
     "COBRA": {
       "approved_source": "207949de66e09cc8cf4d493cafdb324dbc29475c",
@@ -102,16 +102,24 @@
       "version": "isolation-contract.1"
     }
   },
-  "generation": 9,
+  "experience_version_labels": {
+    "COBRA": 2103423,
+    "INFINITY": 2103421
+  },
+  "generation": 10,
   "guard_schema": 2,
-  "last_issued_versionCode": 2103423,
+  "last_issued_versionCode": 2103424,
   "owner_update_evidence": {
+    "accepted_pointer_updated": false,
+    "changed_owners": [
+      "CHOOSER_SHELL"
+    ],
+    "component_zip_sha256": "c3092e5c251f8cbf2d4d97728c4507433fb8d6b3c932de99fb008cc2a18be094",
     "owner": "CHOOSER_SHELL",
-    "producer_source": "709e2e43a5c1f4510a2bde0437f56b504177e43b",
-    "producer_run": 40509014993,
-    "component_zip_sha256": "5bc9f0541ef073e5792a9428aea87bda601d668f0309653209fdab238d610191",
+    "physical_Fold": "PENDING",
     "preservation": {
       "added_class": [
+        "com/projectinfinity/kodi/ChooserReleaseFooter.smali",
         "com/projectinfinity/kodi/ChooserReleaseMetadata.smali"
       ],
       "all_other_owner_bundles_unchanged": true,
@@ -121,21 +129,21 @@
         "com/projectinfinity/kodi/InfinityGlassChooser$Card.smali",
         "com/projectinfinity/kodi/InfinityGlassChooser$Stage.smali"
       ],
-      "new_shell_class_count": 151,
+      "new_shell_class_count": 152,
       "offline_component_history": {
         "COBRA": 2103423,
         "INFINITY": 2103421
       },
       "old_shell_class_count": 150,
+      "original_HM_caption_preserved": true,
       "signed_base_sha256": "4cbbf963be72904de962f434d00ee5f9d5080de6b6b9fd4b3e31ab1d6ac01aff",
+      "stage_measure_and_layout_unmodified": true,
       "status": "PASS_TARGETED_SHELL_ONLY"
     },
-    "physical_Fold": "PENDING",
-    "accepted_pointer_updated": false,
-    "signed_baseline_2103423_sha256": "4cbbf963be72904de962f434d00ee5f9d5080de6b6b9fd4b3e31ab1d6ac01aff",
-    "changed_owners": [
-      "CHOOSER_SHELL"
-    ],
+    "producer_run": 40606096481,
+    "producer_source": "e9a433a4a999af1af3bd3bb76d230a5e3605e7ed",
+    "signed_baseline_2103424_sha256": "e7f23585510ca89f75d50294f3df1a1895a99aec05371486a84e28b4039886fa",
+    "source_component_baseline_2103423_sha256": "4cbbf963be72904de962f434d00ee5f9d5080de6b6b9fd4b3e31ab1d6ac01aff",
     "unchanged_owners": [
       "INFINITY",
       "COBRA",
@@ -24356,6 +24364,14 @@
       "owner": "COBRA",
       "sha256": "89b93eea924a9f1269fb3dfb362edc28770e35a7f650014e54d9b5ff614b4142"
     },
+    "class:Lcom/projectinfinity/kodi/ChooserReleaseFooter;": {
+      "owner": "CHOOSER_SHELL",
+      "sha256": "a86aa1c1dd98e66b1ab035b4ad8c92504cc5d3dab52cc9069b89a0f6281740ee"
+    },
+    "class:Lcom/projectinfinity/kodi/ChooserReleaseMetadata;": {
+      "owner": "CHOOSER_SHELL",
+      "sha256": "68c45c1a489ffb17094914861cd7c0e6c59a339e7840b02b4de016063cdc6908"
+    },
     "class:Lcom/projectinfinity/kodi/CobraBackgroundApiOutline;": {
       "owner": "COBRA",
       "sha256": "21a002c6efd7c7475d3d2dc4b42e6fbf4b10f5fad8d92079b6aae3e366d57170"
@@ -25698,7 +25714,7 @@
     },
     "class:Lcom/projectinfinity/kodi/InfinityGlassChooser$Card;": {
       "owner": "CHOOSER_SHELL",
-      "sha256": "00b7aad65f449c0e56d242d7607eece2a482d6c62b0c02416c09b6a90245e773"
+      "sha256": "5de1dca483bbc90d6b9efe12b5910f68d14b00d09f03ea18cf669b4b9d3cdad5"
     },
     "class:Lcom/projectinfinity/kodi/InfinityGlassChooser$CosmicBackdrop$$ExternalSyntheticLambda0;": {
       "owner": "CHOOSER_SHELL",
@@ -25730,7 +25746,7 @@
     },
     "class:Lcom/projectinfinity/kodi/InfinityGlassChooser$Stage;": {
       "owner": "CHOOSER_SHELL",
-      "sha256": "0b0f349cb4285485d5668871bef6a17bae62b23103c44e8bdad8c85604d4157d"
+      "sha256": "7c02642b559a9d667f72d9e33b317349f39d46207d78a883e14f4596f968ac51"
     },
     "class:Lcom/projectinfinity/kodi/InfinityGlassChooser;": {
       "owner": "CHOOSER_SHELL",
@@ -57396,6 +57412,10 @@
       "owner": "INFINITY",
       "sha256": "ad6eae0302447fe231175cc28877513402e421204b60fa9be40bbefb31e9b6d9"
     },
+    "member:assets/experience-component-updates.properties": {
+      "owner": "CHOOSER_SHELL",
+      "sha256": "652f0e3d6276006214b9a64de9ea08b1f2c3a15ca6a1c0265da6822885ba95f6"
+    },
     "member:assets/infinity-2103395-components.json": {
       "owner": "INFINITY",
       "sha256": "06e1f7709557b502e22a8bc6da38a9a2564dede6b7cce2ee90bafefaadf7b6c3"
@@ -66255,17 +66275,9 @@
     "member:resources.arsc": {
       "owner": "MINIMAL_ANDROID_CONTRACT",
       "sha256": "1b8c1788a5a86242635277f063ebdce6b82ed12eafe3cfdf331b902c8eb7e616"
-    },
-    "class:Lcom/projectinfinity/kodi/ChooserReleaseMetadata;": {
-      "owner": "CHOOSER_SHELL",
-      "sha256": "68c45c1a489ffb17094914861cd7c0e6c59a339e7840b02b4de016063cdc6908"
-    },
-    "member:assets/experience-component-updates.properties": {
-      "owner": "CHOOSER_SHELL",
-      "sha256": "652f0e3d6276006214b9a64de9ea08b1f2c3a15ca6a1c0265da6822885ba95f6"
     }
   },
-  "previous_authority_sha256": "f1c26c5259f0f98c9ba8bc08a97fd6038eba3ab65c0f80e44d25ae978a9f2d50",
+  "previous_authority_sha256": "c7bf48d408c4642b916badbbf44705f9ff0f36263ca44ddb5bca5ca237840cb8",
   "proofs": {
     "COMBINATION-CONTROLS.json": "bcb21adb63fefb898a8e8799d9892f76e382315518d8e94b51c42060cc5ece83",
     "OWNER-CONTRACT.json": "dd0fdfdcb7715777007984969bfac45b36f3e4ef04023b5ba1884c67904d0846",
@@ -66431,7 +66443,7 @@
     "repairs/dual-experience-isolation-2103420/component_bundles.py": "1aca1f237a1987998f243d013fde991413c491b9e72706deda4853b1b1d642d6",
     "repairs/dual-experience-isolation-2103420/create_authority.py": "be6da193e7fbc242fb84996ae7a0b463c7ede025687c7b71db14c8babfbc2672",
     "repairs/dual-experience-isolation-2103420/inventory.py": "574c64b0a15200ba6f9971a2834f6cdb629dddd5ab5418186c4d5255d6e73bcb",
-    "repairs/dual-experience-isolation-2103420/ownership-reviewed-roots.json": "4bb2276422fdea5ac325c146ec98ba16947d9e0ad83292a692cb29b22e81529b",
+    "repairs/dual-experience-isolation-2103420/ownership-reviewed-roots.json": "a8400e32a28ccd25a86c954a1106071cd6e13d2d69e2207c979d777de2dd8523",
     "repairs/dual-experience-isolation-2103420/prepare_host_tests.py": "5d2671de5b361c5dbace42a5567a736226f50957353e77eec5a60042c631a3a7",
     "repairs/dual-experience-isolation-2103420/prepare_runtime.py": "e59faac2489d7ce3b0d2deae8469d627e8f463b8c445806b3d232ec572c3d1a7",
     "repairs/dual-experience-isolation-2103420/propose_cobra_reflow.py": "31dda989cdf3bc3d3372565fcb44e7dd5d11db935c6961ac3905e4a91df23425",
@@ -66460,11 +66472,9 @@
     "repairs/dual-experience-isolation-2103420/verify_runtime.py": "b903edd3d6c3402d46613841c9ac44f0103420a64da5dff2897d14c9952e7460"
   },
   "status": "ENGINEERING_REVIEWED_FOLD_PENDING",
-  "target_owners": [],
-  "update_kind": "evidence_refresh",
-  "workflow_sha256": "83c7a4904eb88f083211e3f922c5825a039990fc143e6250f7e1c66d0ab90880",
-  "experience_version_labels": {
-    "INFINITY": 2103421,
-    "COBRA": 2103423
-  }
+  "target_owners": [
+    "CHOOSER_SHELL"
+  ],
+  "update_kind": "owner_update",
+  "workflow_sha256": "83c7a4904eb88f083211e3f922c5825a039990fc143e6250f7e1c66d0ab90880"
 }
