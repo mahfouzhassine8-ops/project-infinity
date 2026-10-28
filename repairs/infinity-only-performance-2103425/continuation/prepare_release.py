@@ -16,6 +16,7 @@ from inventory import file_sha
 
 
 def prepare(baseline,bundles,out):
+    baseline,bundles,out=baseline.resolve(),bundles.resolve(),out.resolve()
     permission=load(HERE/'RELEASE-AUTHORIZATION.json')
     scope=load(HERE/'SCOPE.json')
     expected=os.environ['GITHUB_SHA']
