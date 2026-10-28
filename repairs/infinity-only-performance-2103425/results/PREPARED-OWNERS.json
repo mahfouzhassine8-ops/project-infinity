@@ -1,0 +1,66 @@
+{
+  "APK_produced": false,
+  "Cobra": "BYTE_IDENTICAL",
+  "accepted_pointer_updated": false,
+  "catalog": {
+    "bundles": {
+      "CHOOSER_SHELL": {
+        "approved_source": "549f517ca69e15ab70c4d9e687908b4c2cc42a4c",
+        "digest": "74dacf78096e6cf906745c9589d84eac446e21b237bbc21c35490d2472493945",
+        "file": "CHOOSER_SHELL.zip",
+        "settings_schema": "original-launch-preference",
+        "sha256": "8940b6550506a127973c8f7a6f4776802528cd3d0917f1f0511db719ed00f345",
+        "version": "2103420.container.2.labels.2.infinity2103426"
+      },
+      "COBRA": {
+        "approved_source": "207949de66e09cc8cf4d493cafdb324dbc29475c",
+        "digest": "7091c30cff244beb75f900236da87d016a14573981aa84b7eee454080c23adf7",
+        "file": "COBRA.zip",
+        "settings_schema": "original-plus-settings-snapshot-v1",
+        "sha256": "eb30afa0e1ab9f50da897db27a604cb79a47059ff355c763dc7d7c955ddbcb6b",
+        "version": "bundled-2103420.isolation.1.fold-reflow.2"
+      },
+      "INFINITY": {
+        "approved_source": "549f517ca69e15ab70c4d9e687908b4c2cc42a4c",
+        "digest": "01b1b9715d0d0bd05c3df0a81e9fb753a3382dc4f6d2a1ef6f7609216d503817",
+        "file": "INFINITY.zip",
+        "settings_schema": "original-2103420",
+        "sha256": "2a159eb7768e3c6e0a9049dced02f7051bffade2399fceddd5b5e54cbffb73db",
+        "version": "2103420.isolation.1.performance.1"
+      },
+      "MINIMAL_ANDROID_CONTRACT": {
+        "approved_source": "9efaeabee45389b7c919ae1a3d88c394b1804173",
+        "digest": "7443a8645f40e82eac07f6ec732a9dc231f1974416ea3632b5af5d74816f78fb",
+        "file": "MINIMAL_ANDROID_CONTRACT.zip",
+        "settings_schema": "owner-durability-v1",
+        "sha256": "6e93a1eb8e47f7fc9bc6f1dbc9208b555e2e62445ca2a3065d4e17a3b473ba33",
+        "version": "isolation-contract.1"
+      }
+    },
+    "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "package": "com.projectinfinity.kodi",
+    "release_approved": false,
+    "schema": 1,
+    "source": "549f517ca69e15ab70c4d9e687908b4c2cc42a4c"
+  },
+  "changed_payload": [
+    "member:assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1",
+    "member:assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1.sig",
+    "member:assets/addons/script.infinity.commandcenter/addon.xml",
+    "member:assets/addons/script.infinity.commandcenter/infinity_search.py",
+    "member:assets/addons/script.infinity.commandcenter/plugin.py",
+    "member:assets/addons/script.infinity.commandcenter/provider_inventory.py",
+    "member:assets/addons/script.infinity.commandcenter/resume_hub.py",
+    "member:assets/experience-component-updates.properties"
+  ],
+  "chooser": "ONLY_AUTHORIZED_LAST_UPDATED_METADATA",
+  "manifest_sha256": "b9589a71cb5c85d84eb5b46d902e75060e21ad693f382b595dee5ee1ea51723a",
+  "native_DEX_shutdown_shared_contract": "BYTE_IDENTICAL",
+  "original_module_signature": "NATIVE_AND_JCA_VERIFIED",
+  "protected_2103425": "db730100a3bfea7e06d2e6c3434e89aeb6fa8a15",
+  "run_id": 40646873592,
+  "source": "549f517ca69e15ab70c4d9e687908b4c2cc42a4c",
+  "status": "AUTHENTICATED_EXACT_OWNER_INPUTS",
+  "tested_run": 40645958376,
+  "tested_source": "a0d1c0475e0168d28d93587e542a63e7cd44ee2a"
+}

@@ -175,6 +175,19 @@ jobs:
             --sdk "$ANDROID_HOME/build-tools/35.0.0" --out signed-combined
           cp repairs/dual-experience-isolation-2103420/release-authority.json signed-combined/
           cp repairs/dual-experience-isolation-2103420/DATA-AND-LIFECYCLE-CONTRACT.md signed-combined/
+      - name: Recover exact signed2103425 for complete final member comparison
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 40606707330
+          name: Infinity-Combined-Original-Signer-40606707330
+          github-token: ${{ github.token }}
+          path: recovery2103425
+      - name: Verify signed APK and exact matching components; no runtime execution
+        run: |
+          python3 repairs/infinity-only-performance-2103425/verify_delivery.py \
+            --baseline recovery2103425/Infinity-2103425-Combined-Original-Signer.apk \
+            --signed signed-combined --bundles combined-build/components \
+            --sdk "$ANDROID_HOME/build-tools/35.0.0"
       - name: Upload signed install-over candidate
         uses: actions/upload-artifact@v4
         with:
