@@ -169,7 +169,9 @@ class ReleaseGateTests(unittest.TestCase):
     def test_remote_authority_head_race_is_rejected(self):
         with patch.object(gate.subprocess, 'check_output', side_effect=[
                 'https://github.com/mahfouzhassine8-ops/project-infinity.git\n',
-                gate.PROTECTED_COMMIT + '\t' + gate.PROTECTED_REF + '\n' + 'b' * 40 + '\trefs/heads/' + gate.AUTHORITY_BRANCH + '\n']):
+                gate.PROTECTED_COMMIT + '\t' + gate.PROTECTED_REF + '\n' +
+                gate.COMBINED_PROTECTED_COMMIT + '\t' + gate.COMBINED_PROTECTED_REF + '\n' +
+                'b' * 40 + '\trefs/heads/' + gate.AUTHORITY_BRANCH + '\n']):
             with self.assertRaisesRegex(gate.Rejected, 'AUTHORITY_HEAD_RACE'):
                 gate.remote_authority('repo', 'a' * 40)
 

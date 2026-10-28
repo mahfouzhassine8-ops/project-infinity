@@ -1,11 +1,17 @@
 name: Infinity combined release | owner gate before original signing
 on:
   push:
-    branches: [work/infinity-cobra-isolation-from-2103420-20261026]
+    branches: [work/infinity-only-stability-speed-from-2103425-20261028]
     paths:
       - repairs/dual-experience-isolation-2103420/release-authority.json
-      - .github/workflows/infinity-combined-release.yml
   workflow_dispatch:
+    inputs:
+      operation:
+        description: Prepare authenticated Infinity owner inputs, or sign the reviewed combined vector
+        type: choice
+        required: true
+        default: final-combined
+        options: [final-combined, prepare-infinity-owner]
 permissions:
   contents: read
   actions: read
@@ -13,8 +19,75 @@ concurrency:
   group: infinity-combined-original-key-release
   cancel-in-progress: false
 jobs:
+  prepare-infinity-owner:
+    if: github.event_name == 'workflow_dispatch' && inputs.operation == 'prepare-infinity-owner' && github.ref == 'refs/heads/work/infinity-only-stability-speed-from-2103425-20261028'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      PYTHONPATH: repairs/dual-experience-isolation-2103420
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '21'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Focused branch/owner gate controls only
+        run: python3 -m unittest -v test_release_gate
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40606707330
+          name: Infinity-Combined-Original-Signer-40606707330
+          github-token: ${{ github.token }}
+          path: baseline
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40606707330
+          name: Infinity-Combined-Owner-Components-40606707330
+          github-token: ${{ github.token }}
+          path: baseline-components
+      - name: Verify immutable signed2103425 before owner preparation
+        run: |
+          set -euo pipefail
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs baseline/Infinity-2103425-Combined-Original-Signer.apk > baseline/REVERIFIED-SIGNATURE.txt
+          python3 - <<'PY'
+          from pathlib import Path
+          signature=Path('baseline/REVERIFIED-SIGNATURE.txt').read_text()
+          assert 'Signer #1 certificate SHA-256 digest: d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' in signature
+          assert 'Verified using v2 scheme (APK Signature Scheme v2): true' in signature
+          PY
+      - name: Exact source gate then original-key manifest authentication (no APK)
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          python3 repairs/infinity-only-performance-2103425/prepare_release.py \
+            --baseline baseline/Infinity-2103425-Combined-Original-Signer.apk \
+            --bundles baseline-components --out prepared-owners
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-Performance-Prepared-Owners-${{ github.run_id }}
+          path: prepared-owners/components/
+          retention-days: 90
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-Performance-Owner-Evidence-${{ github.run_id }}
+          path: |
+            prepared-owners/PREPARED-OWNERS.json
+            prepared-owners/MODULE-AUTHENTICATION.txt
+            prepared-owners/source/PRESERVATION.json
+            baseline/REVERIFIED-SIGNATURE.txt
+            repairs/infinity-only-performance-2103425/RELEASE-AUTHORIZATION.json
+          retention-days: 90
+          if-no-files-found: error
   combined:
-    if: github.ref == 'refs/heads/work/infinity-cobra-isolation-from-2103420-20261026'
+    if: github.ref == 'refs/heads/work/infinity-only-stability-speed-from-2103425-20261028' && inputs.operation != 'prepare-infinity-owner'
     runs-on: ubuntu-22.04
     timeout-minutes: 45
     env:
@@ -37,13 +110,18 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p release-evidence
-          git diff --name-only 2ffa4ec4 HEAD > release-evidence/CHANGED-PATHS.txt
+          git diff --name-only db730100a3bfea7e06d2e6c3434e89aeb6fa8a15 HEAD > release-evidence/CHANGED-PATHS.txt
           python3 - <<'PY'
           from pathlib import Path
           import os
           from release_gate import remote_authority
           for name in Path('release-evidence/CHANGED-PATHS.txt').read_text().splitlines():
-              if not (name.startswith('repairs/dual-experience-isolation-2103420/') or name == '.github/workflows/infinity-combined-release.yml'):
+              if not (name.startswith('repairs/infinity-only-performance-2103425/') or name in (
+                  'repairs/dual-experience-isolation-2103420/release_gate.py',
+                  'repairs/dual-experience-isolation-2103420/test_release_gate.py',
+                  'repairs/dual-experience-isolation-2103420/release-authority.json',
+                  '.github/workflows/infinity-saved-navigation-android.yml',
+                  '.github/workflows/infinity-combined-release.yml')):
                   raise SystemExit('Outside authorized boundary work: ' + name)
           remote_authority(Path('.'),os.environ['GITHUB_SHA'])
           PY
