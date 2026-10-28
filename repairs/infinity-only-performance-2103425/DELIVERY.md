@@ -1,6 +1,11 @@
 Signed combined **2103426** is ready for the user's physical Fold acceptance.
 Install over the existing 2103425 package, preserving application data.
 
+Subsequent verification checkpoint: [Android17 investigation and requirement status](runtime/OUTCOME.md).
+The SDK prerequisite was corrected, but the current emulator attempt crashed in
+unchanged shared native code before Kodi/Python and feature assertions. The signed
+delivery is unchanged; the broader performance assignment remains partially complete.
+
 - [Signed APK package, signature and verification receipts](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/40647343407/artifacts/12798018789)
 - [Exactly matching four owner component ZIPs](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/40647343407/artifacts/12798318054)
 - [Successful original-key combined build](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/40647343407)
@@ -53,7 +58,9 @@ battery or temperature measurements. Raw samples are in
 Twelve projection comparisons, fourteen focused race/negative controls and
 thirteen release-gate controls passed. The source comparison workflow is
 [40645958376](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/40645958376).
-No Android runtime, unrelated stress matrix or shutdown test was executed.
+At delivery, no Android runtime test had executed. A subsequent focused emulator
+attempt is recorded above; it did not reach application feature verification.
+No unrelated stress matrix or shutdown test was executed in this performance task.
 
 Preservation and release coherence:
 

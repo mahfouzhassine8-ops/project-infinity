@@ -1,0 +1,21 @@
+{
+  "scope": "Read-only actual APK/ELF and captured crash attribution; no application test or patch",
+  "apk_sha256": "5a9e5702a99606cc51b094f9f786edf091b6852306d9a70eaab2787f256e7f39",
+  "libkodi_sha256": "151128c176b6094f28bb3fc716cc07c3985a9aa38f1fe41e1bb1424f0285a47e",
+  "byte_identical_to_2103425": true,
+  "constructor": {
+    "name": "talloc_lib_init",
+    "section": 10,
+    "value": 46090688,
+    "size": 100
+  },
+  "constructor_sha256": "0b6bd4f2206cee0b054a94adf88b6f998593df67d6721c2545fb8dc06eaf8be7",
+  "fault_instruction": "LDR w8, [x19, x8]; offset 60; four-byte read from getauxval(AT_RANDOM) plus rand()%12",
+  "guest_PC": "0x2bf49fc",
+  "fault_address": "0x6ffc1f0b5fc7",
+  "x19": "0x6ffc1f0b5fc0",
+  "x8": 7,
+  "attribution": "AT_RANDOM-derived pointer+7 read failed during dlopen constructor before Kodi/Python",
+  "unresolved": "Why getauxval returned an unreadable pointer is not established; bridge-only and physical-Fold attribution are not established",
+  "APK_modified": false
+}

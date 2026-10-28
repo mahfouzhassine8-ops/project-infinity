@@ -1,0 +1,40 @@
+{
+  "apk_sha256": "5a9e5702a99606cc51b094f9f786edf091b6852306d9a70eaab2787f256e7f39",
+  "passed": false,
+  "cases": [],
+  "snapshots": [],
+  "application_launches": 1,
+  "application_restarts": 0,
+  "app_termination_requested": false,
+  "shutdown": "NOT_RUN",
+  "physical_Fold": "NOT_RUN",
+  "APK_changed": false,
+  "fixture": "Synthetic saved identities, generated local video and cached QA bitmap; no provider-network/content claim",
+  "mode": "EMULATOR_OS16K_BACKCOMPAT_ONLY_NOT_STRICT16K",
+  "platform": {
+    "qemu": "1",
+    "sdk": "37",
+    "release": "17",
+    "abis": "x86_64,arm64-v8a",
+    "serial": "emulator-5554",
+    "page_size": "16384",
+    "uid": "0",
+    "selinux": "Enforcing"
+  },
+  "native_bridge": "91831e6bdcfc3c5968c8165aee6b6ade5adb926c183bcf991efc383de2cd8515  /system/lib64/libndk_translation.so",
+  "OS_compatibility": {
+    "before": {
+      "bionic.linker.16kb.app_compat.enabled": "",
+      "pm.16kb.app_compat.disabled": ""
+    },
+    "after": {
+      "bionic.linker.16kb.app_compat.enabled": "true",
+      "pm.16kb.app_compat.disabled": "false"
+    },
+    "APK_installed_at_configuration": false
+  },
+  "launch": "Starting: Intent { cmp=com.projectinfinity.kodi/.Splash }\nStatus: ok\nLaunchState: COLD\nActivity: com.projectinfinity.kodi/.Splash\nTotalTime: 3477\nWaitTime: 3488\nComplete\n",
+  "failure": "RuntimeError: Feature state was not observed before deadline",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/project-infinity/project-infinity/repairs/infinity-only-performance-2103425/runtime/probe.py\", line 168, in run\n    device.until(ready, 180)\n  File \"/home/runner/work/project-infinity/project-infinity/repairs/save-later-multiimage-20261023/android_feature_device.py\", line 59, in until\n    raise RuntimeError('Feature state was not observed before deadline')\nRuntimeError: Feature state was not observed before deadline\n",
+  "post_execution_APK_sha256": "5a9e5702a99606cc51b094f9f786edf091b6852306d9a70eaab2787f256e7f39"
+}
