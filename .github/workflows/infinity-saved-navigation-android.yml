@@ -70,11 +70,21 @@ jobs:
           name: Infinity-Combined-Original-Signer-40647343407
           github-token: ${{ github.token }}
           path: runtime-signed
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '17'}
+      - name: Record the previously successful SDK Java prerequisite
+        run: |
+          mkdir -p runtime-platform
+          java -version > runtime-platform/JAVA-VERSION.txt 2>&1
       - uses: android-actions/setup-android@v4
         with:
           cmdline-tools-version: '15859902'
           packages: platform-tools build-tools;35.0.0
           log-accepted-android-sdk-licenses: false
+      - name: Preserve SDK bootstrap diagnostics on setup failure
+        if: failure()
+        run: |
+          "$ANDROID_HOME/cmdline-tools/22.0/bin/sdkmanager" --version > runtime-platform/sdkmanager-version.txt 2>&1 || true
       - name: Verify original APK and reuse the documented Android17 environment
         run: |
           set -euo pipefail

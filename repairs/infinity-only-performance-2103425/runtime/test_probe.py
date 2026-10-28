@@ -67,6 +67,10 @@ class HarnessControls(unittest.TestCase):
             self.assertNotIn(forbidden, serialized)
         self.assertIn("inputs.feature != 'infinity-performance-android'", workflow['jobs']['android17']['if'])
         self.assertEqual(job['steps'][-2]['with']['disable-animations'], 'false')
+        java = next(i for i, step in enumerate(job['steps']) if step.get('uses', '').startswith('actions/setup-java'))
+        android = next(i for i, step in enumerate(job['steps']) if step.get('uses', '').startswith('android-actions/setup-android'))
+        self.assertLess(java, android)
+        self.assertEqual(job['steps'][java]['with']['java-version'], '17')
 
     def test_production_and_reset_commands_are_not_selected(self):
         for command in ('force-stop', 'pm clear', 'pm uninstall', 'Application.Quit', 'CLOSE_KODI', 'reboot'):
