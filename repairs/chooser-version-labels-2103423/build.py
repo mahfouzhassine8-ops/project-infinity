@@ -12,7 +12,7 @@ from release_gate import component_digest,require
 SIGNED_SHA='4cbbf963be72904de962f434d00ee5f9d5080de6b6b9fd4b3e31ab1d6ac01aff'
 SHELL_ZIP_SHA='d57912e7a7020b0fbc441a067f09e3e6512501f450072c6c6cf71135aab13952'
 OLD_DEX_SHA='f2cc8dc2484ea388c2e4a981decf25099be32b2f28c415bcef649197e0f58a2f'
-VERSION='2103420.container.2.labels.1'
+VERSION='2103420.container.2.labels.2'
 MEMBER='assets/experience-component-updates.properties'
 SOURCE=HERE/'runtime/ChooserReleaseMetadata.smali'
 
@@ -38,7 +38,9 @@ def patch(smali):
     move-result-object v1
     invoke-virtual {v15, v1}, Lcom/projectinfinity/kodi/InfinityGlassChooser$Label;->setText(Ljava/lang/CharSequence;)V
     const/4 v1, 0x0
-    invoke-virtual {v15, v1}, Lcom/projectinfinity/kodi/InfinityGlassChooser$Label;->setVisibility(I)V''')
+    invoke-virtual {v15, v1}, Lcom/projectinfinity/kodi/InfinityGlassChooser$Label;->setVisibility(I)V
+    const/16 v1, 0x31
+    invoke-virtual {v15, v1}, Lcom/projectinfinity/kodi/InfinityGlassChooser$Label;->setGravity(I)V''')
  change(stage,r'constructor <init>\(Landroid/content/Context;ZLcom/projectinfinity/kodi/InfinityGlassChooser\$Actions;\)V',
  '    invoke-direct {p0}, Lcom/projectinfinity/kodi/InfinityGlassChooser$Stage;->updateClock()V',
  '''
