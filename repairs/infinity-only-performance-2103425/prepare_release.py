@@ -68,6 +68,7 @@ def patch_bundle(source, expected, owner, changes, version, source_commit, targe
 
 
 def prepare(baseline, bundles, out):
+    baseline, bundles, out = baseline.resolve(), bundles.resolve(), out.resolve()
     permission = load(HERE / 'RELEASE-AUTHORIZATION.json')
     expected = os.environ['GITHUB_SHA']
     require(os.environ.get('GITHUB_WORKFLOW') == 'Infinity combined release | owner gate before original signing', 'SOLE_SIGNER_WORKFLOW')
