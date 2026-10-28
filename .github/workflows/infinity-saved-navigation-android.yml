@@ -131,7 +131,6 @@ jobs:
           retention-days: 90
           if-no-files-found: error
   performance-host:
-    name: Selected Infinity performance source verification (host only)
     if: github.event_name == 'workflow_dispatch' && inputs.feature == 'infinity-performance-host'
     runs-on: ubuntu-22.04
     timeout-minutes: 20
@@ -142,67 +141,52 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: {ref: "${{ inputs.source_ref }}", fetch-depth: 0, persist-credentials: false, show-progress: false}
-      - name: Admit this exact host correction and immutable baseline
-        run: |
-          python3 - <<'PY'
-          import json, os, subprocess
-          from pathlib import Path
-          scope=json.loads(Path('repairs/infinity-only-performance-2103425/SCOPE.json').read_text())
-          assert os.environ['AUTHORIZED_SCOPE'].strip()
-          assert os.environ['BASELINE_BUILD']=='40606707330'
-          branch=subprocess.check_output(['git','branch','--show-current'],text=True).strip()
-          assert branch==scope['branch']
-          assert scope['owner']=='INFINITY' and scope['shutdown']=='NOT_RUN_FROZEN'
-          baseline=scope['baseline_source']
-          assert subprocess.check_output(['git','rev-parse','origin/lock/infinity-cobra-2103425-fold-approved-chooser-20261028'],text=True).strip()==baseline
-          paths=subprocess.check_output(['git','diff','--name-only',baseline,'HEAD'],text=True).splitlines()
-          assert all(p.startswith('repairs/infinity-only-performance-2103425/') or p=='.github/workflows/infinity-saved-navigation-android.yml' for p in paths)
-          PY
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '17'}
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
-      - uses: actions/download-artifact@v4
-        with:
-          run-id: 40606707330
-          name: Infinity-Combined-Original-Signer-40606707330
-          github-token: ${{ github.token }}
-          path: baseline
-      - uses: actions/download-artifact@v4
-        with:
-          run-id: 40606707330
-          name: Infinity-Combined-Owner-Components-40606707330
-          github-token: ${{ github.token }}
-          path: baseline-components
-      - name: Reverify baseline original signer; stage exact owned source generation
+      - name: Admit selected continuation and exact signed2103426
         run: |
-          set -euo pipefail
-          mkdir -p performance-results
-          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs baseline/Infinity-2103425-Combined-Original-Signer.apk > performance-results/BASELINE-SIGNATURE.txt
-          python3 - <<'PY'
+          python3 - <<'PYCODE'
+          import json, os, subprocess
           from pathlib import Path
-          raw=Path('performance-results/BASELINE-SIGNATURE.txt').read_text()
-          assert 'Signer #1 certificate SHA-256 digest: d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' in raw
-          assert 'Verified using v2 scheme (APK Signature Scheme v2): true' in raw
-          PY
-          python3 repairs/infinity-only-performance-2103425/stage.py --baseline baseline/Infinity-2103425-Combined-Original-Signer.apk --bundles baseline-components --out staged-performance
-          cp staged-performance/PRESERVATION.json staged-performance/SIGNING-BLOCKERS.json performance-results/
-      - name: Compare selected actual-source host behavior and allocations
+          scope=json.loads(Path('repairs/infinity-only-performance-2103425/continuation/SCOPE.json').read_text())
+          assert os.environ['AUTHORIZED_SCOPE'].strip()
+          assert os.environ['BASELINE_BUILD']=='40647343407'
+          branch=subprocess.check_output(['git','branch','--show-current'],text=True).strip()
+          assert branch==scope['branch']
+          assert scope['shutdown']=='FROZEN_NOT_RUN'
+          assert subprocess.check_output(['git','rev-parse','origin/lock/infinity-cobra-2103425-fold-approved-chooser-20261028'],text=True).strip()=='db730100a3bfea7e06d2e6c3434e89aeb6fa8a15'
+          PYCODE
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40647343407
+          name: Infinity-Combined-Original-Signer-40647343407
+          github-token: ${{ github.token }}
+          path: signed2103426
+      - name: Compile genuine continuation and selected host integration
         run: |
           set -euo pipefail
-          python3 -m pip install PyYAML==6.0.2
-          target=repairs/infinity-only-performance-2103425
-          original=staged-performance/baseline-addons/script.infinity.commandcenter
-          candidate=staged-performance/candidate-addons/script.infinity.commandcenter
-          python3 "$target/verify.py" --root "$original" --baseline-root "$original" --phase baseline --out performance-results/BASELINE-HOST.json
-          python3 "$target/verify.py" --root "$candidate" --baseline-root "$original" --phase candidate --out performance-results/CANDIDATE-HOST.json
-          python3 "$target/test_edges.py" 2>&1 | tee performance-results/EDGE-CONTROLS.txt
-      - name: Upload source inputs and truthful host-only evidence
-        uses: actions/upload-artifact@v4
+          python3 -m pip install lxml==6.0.2 PyYAML==6.0.2
+          target=repairs/infinity-only-performance-2103425/continuation
+          mkdir -p continuation-results
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs signed2103426/Infinity-2103426-Combined-Original-Signer.apk > continuation-results/BASELINE-SIGNATURE.txt
+          python3 "$target/stage.py" --baseline signed2103426/Infinity-2103426-Combined-Original-Signer.apk --out staged-continuation
+          python3 "$target/verify_host.py" --input staged-continuation/input-addons --staged staged-continuation --out continuation-results/HOST.json 2>&1 | tee continuation-results/INTEGRATION.txt
+          PYTHONPATH=repairs/infinity-only-performance-2103425 python3 - <<'PYCODE' 2>&1 | tee continuation-results/RETAINED-EDGE-CONTROLS.txt
+          import unittest
+          from pathlib import Path
+          import test_edges
+          test_edges.ROOT=Path('staged-continuation/candidate-addons/script.infinity.commandcenter')
+          unittest.main(module=test_edges,verbosity=2)
+          PYCODE
+          python3 repairs/infinity-only-performance-2103425/verify.py --root staged-continuation/candidate-addons/script.infinity.commandcenter --baseline-root staged-continuation/input-addons/script.infinity.commandcenter --phase candidate --out continuation-results/RETAINED-PROJECTION.json
+          cp staged-continuation/STAGE.json staged-continuation/SOURCE-PLAN.json continuation-results/
+      - uses: actions/upload-artifact@v4
+        if: always()
         with:
-          name: Infinity-Performance-Source-Verification-${{ github.run_id }}
-          path: |
-            performance-results/
-            staged-performance/candidate-addons/
-            repairs/infinity-only-performance-2103425/SCOPE.json
+          name: Infinity-Performance-Continuation-Host-${{ github.run_id }}
+          path: continuation-results/
           retention-days: 90
           if-no-files-found: error
   android17:
