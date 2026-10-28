@@ -81,9 +81,9 @@ jobs:
 
 
   stage_authority:
-    name: Stage reviewed 2103424 chooser-only release authority (never signs)
+    name: Stage reviewed 2103425 chooser-only release authority (never signs)
     needs: chooser
-    if: github.ref == 'refs/heads/work/chooser-version-labels-from-2103423-20261027'
+    if: github.ref == 'refs/heads/work/chooser-version-labels-from-2103423-20261027' && contains(github.event.head_commit.message, '[stage-authority]')
     permissions:
       contents: write
       actions: read
@@ -110,7 +110,7 @@ jobs:
           name: Chooser-Original-UI-Version-Labels-40590499416
           github-token: ${{ github.token }}
           path: producer
-      - name: Verify exact producer, immutable Infinity and Cobra and reserve 2103424
+      - name: Verify exact producer, immutable Infinity and Cobra and reserve 2103425
         run: |
           set -euo pipefail
           [[ "$(git -C integration rev-parse HEAD)" == "d49d930828d734ef3a63d1039b6dd82862e96708" ]] || {
@@ -157,7 +157,7 @@ jobs:
           from pathlib import Path
           p=Path("integration/repairs/dual-experience-isolation-2103420/release-authority.json")
           payload={
-            "message":"release: stage verified chooser-only 2103424 owner authority; preserve Infinity and Cobra",
+            "message":"release: stage verified chooser-only 2103425 owner authority; preserve Infinity and Cobra",
             "content":base64.b64encode(p.read_bytes()).decode("ascii"),
             "sha":sys.argv[1],"branch":os.environ["PR_BRANCH"]}
           Path("chooser-authority-upload.json").write_text(json.dumps(payload,separators=(",",":")))
