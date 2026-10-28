@@ -1,8 +1,10 @@
-Production source implementation is complete for the four demonstrated paths
-below. Integration inputs compile and pass focused host checks. **No new signed
-APK has been issued.** The existing signer refuses this Infinity-only owner
-transition while the chooser is frozen. This is a release-contract conflict,
-not an Infinity runtime failure or an offline workspace.
+**Signed 2103426 delivered:** see [DELIVERY.md](DELIVERY.md) for the final APK,
+matching components, checksums, original-signature verification and limitations.
+The four production corrections below passed focused host checks and the full
+signed payload gate. The user explicitly authorized the metadata-only chooser
+exception and sole-signer branch/module preparation changes. The earlier
+signing-blocker analysis at the end is retained as the resolved historical
+reason that exception was necessary; no gate was bypassed.
 
 The recovery baseline remains combined **2103425**, source
 `db730100a3bfea7e06d2e6c3434e89aeb6fa8a15`, signed run
@@ -17,9 +19,10 @@ The complete edited production sources are in `overlay/script.infinity.commandce
 baseline, compiles the Python sources, reconstructs the native-authenticated
 75-file module inventory, and removes the obsolete signature. It deliberately
 does **not** attach an old signature to changed code or produce an installable
-APK. The proposed Command Center version is **0.3.5.50**, Infinity component
-`2103420.isolation.1.performance.1`, combined version **2103426**. These are
-reserved implementation proposals, not issued releases.
+APK. The issued Command Center version is **0.3.5.50**, Infinity component
+`2103420.isolation.1.performance.1`, combined version **2103426**. The separate
+authorized `prepare_release.py` authenticates the module in the existing sole
+signer; the final combined gate independently verifies the concrete owner vector.
 
 | Demonstrated baseline behavior | Implemented correction | Focused verification |
 | --- | --- | --- |
@@ -71,7 +74,8 @@ Remaining work and limits:
 - Shutdown is frozen and **NOT RUN**. Cobra/chooser runtime testing, stress
   matrices and destructive data operations are **NOT RUN**.
 
-Signing remains blocked by these exact existing contracts:
+The following original signing conflicts were resolved through the user's
+explicit exception, recorded in `RELEASE-AUTHORIZATION.json`:
 
 1. `release_authority.transition()` requires an updated Infinity last-updated
    label and then raises `UPDATED_LABELS_REQUIRE_SHELL_BUNDLE` unless the
@@ -86,7 +90,9 @@ Signing remains blocked by these exact existing contracts:
    existing sole original-key pipeline before the new Infinity component can
    be registered. No substitute signer or retired signer has been enabled.
 
-See `results/SIGNING-BLOCKERS.json`. No signing authority, signer workflow,
-accepted pointer, protected branch, certificate, manifest or chooser metadata
-has been altered to bypass these blockers. Final physical Fold acceptance is
-exclusively the user's decision after a legitimately signed candidate exists.
+See the historical `results/SIGNING-BLOCKERS.json` and final
+`results/FINAL-CI-RECEIPT.json`. The reviewed authority now selects the exact
+authenticated new Infinity and metadata-only chooser bundles. The original
+payload/ownership/signature checks remain enforced. Accepted pointers,
+protected branches, signing identity, shared runtime and shutdown remain
+unchanged. Final physical Fold acceptance is exclusively the user's decision.
