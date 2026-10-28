@@ -1,0 +1,147 @@
+{
+  "kind": "HOST_MODEL_OF_ACTUAL_GENERATED_URL_BINDINGS_NOT_NATIVE_JOB_MEASUREMENT",
+  "assumptions": "Twelve selected primary-row visits; each response completed and cached, unchanged profile/revision/provider reload properties; only selected control evaluated; no offscreen refresh or failed/empty result model",
+  "sequence": [
+    {
+      "source": "trakt",
+      "media": "movie"
+    },
+    {
+      "source": "infinity",
+      "media": "movie"
+    },
+    {
+      "source": "trakt",
+      "media": "tv"
+    },
+    {
+      "source": "infinity",
+      "media": "tv"
+    },
+    {
+      "source": "trakt",
+      "media": "movie"
+    },
+    {
+      "source": "infinity",
+      "media": "movie"
+    },
+    {
+      "source": "trakt",
+      "media": "tv"
+    },
+    {
+      "source": "infinity",
+      "media": "tv"
+    },
+    {
+      "source": "trakt",
+      "media": "movie"
+    },
+    {
+      "source": "infinity",
+      "media": "movie"
+    },
+    {
+      "source": "trakt",
+      "media": "tv"
+    },
+    {
+      "source": "infinity",
+      "media": "tv"
+    }
+  ],
+  "directory_URL_changes": {
+    "signed2103426": 12,
+    "candidate2103427": 4
+  },
+  "request_destinations": {
+    "signed2103426": [
+      {
+        "source": "trakt",
+        "media": "movie",
+        "control": 8804
+      },
+      {
+        "source": "infinity",
+        "media": "movie",
+        "control": 8804
+      },
+      {
+        "source": "trakt",
+        "media": "tv",
+        "control": 8803
+      },
+      {
+        "source": "infinity",
+        "media": "tv",
+        "control": 8803
+      },
+      {
+        "source": "trakt",
+        "media": "movie",
+        "control": 8804
+      },
+      {
+        "source": "infinity",
+        "media": "movie",
+        "control": 8804
+      },
+      {
+        "source": "trakt",
+        "media": "tv",
+        "control": 8803
+      },
+      {
+        "source": "infinity",
+        "media": "tv",
+        "control": 8803
+      },
+      {
+        "source": "trakt",
+        "media": "movie",
+        "control": 8804
+      },
+      {
+        "source": "infinity",
+        "media": "movie",
+        "control": 8804
+      },
+      {
+        "source": "trakt",
+        "media": "tv",
+        "control": 8803
+      },
+      {
+        "source": "infinity",
+        "media": "tv",
+        "control": 8803
+      }
+    ],
+    "candidate2103427": [
+      {
+        "source": "trakt",
+        "media": "movie",
+        "control": 8804
+      },
+      {
+        "source": "infinity",
+        "media": "movie",
+        "control": 28804
+      },
+      {
+        "source": "trakt",
+        "media": "tv",
+        "control": 8803
+      },
+      {
+        "source": "infinity",
+        "media": "tv",
+        "control": 28803
+      }
+    ]
+  },
+  "reason": "Existing CDirectoryProvider::UpdateURL requests a new directory when the evaluated URL changes; new control instances keep fixed source URLs",
+  "queue_depth_measured": false,
+  "physical_Fold_measured": false
+}

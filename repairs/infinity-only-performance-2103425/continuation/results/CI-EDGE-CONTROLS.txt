@@ -1,0 +1,19 @@
+test_absent_selected_provider_does_not_substitute_another (test_edges.InventoryRaces.test_absent_selected_provider_does_not_substitute_another) ... ok
+test_invalid_provider_id_is_rejected (test_edges.InventoryRaces.test_invalid_provider_id_is_rejected) ... ok
+test_repeated_inventory_change_rejects_stale_scan (test_edges.InventoryRaces.test_repeated_inventory_change_rejects_stale_scan) ... ok
+test_selected_snapshot_preserves_full_cached_inventory (test_edges.InventoryRaces.test_selected_snapshot_preserves_full_cached_inventory) ... ok
+test_cache_hit_still_verifies_before_and_after (test_edges.QueryRaces.test_cache_hit_still_verifies_before_and_after) ... ok
+test_cached_hit_race_is_not_published (test_edges.QueryRaces.test_cached_hit_race_is_not_published) ... ok
+test_cancelled_worker_does_not_cache (test_edges.QueryRaces.test_cancelled_worker_does_not_cache) ... ok
+test_disabled_or_changed_source_after_worker_does_not_cache (test_edges.QueryRaces.test_disabled_or_changed_source_after_worker_does_not_cache) ... ok
+test_failed_and_busy_work_does_not_cache (test_edges.QueryRaces.test_failed_and_busy_work_does_not_cache) ... ok
+test_profile_and_presentation_revision_invalidate (test_edges.QueryRaces.test_profile_and_presentation_revision_invalidate) ... ok
+test_same_sized_atomic_settings_replacement_invalidates (test_edges.QueryRaces.test_same_sized_atomic_settings_replacement_invalidates) ... ok
+test_unknown_or_linked_state_disables_reuse (test_edges.QueryRaces.test_unknown_or_linked_state_disables_reuse) ... ok
+test_only_selected_host_job_can_run_for_host_choice (test_edges.ScopeControls.test_only_selected_host_job_can_run_for_host_choice) ... ok
+test_projection_bounds_and_private_full_results (test_edges.ScopeControls.test_projection_bounds_and_private_full_results) ... ok
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.210s
+
+OK

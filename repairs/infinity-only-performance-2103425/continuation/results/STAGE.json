@@ -1,0 +1,49 @@
+{
+  "APK_produced": false,
+  "changed_members": 32,
+  "input_sha256": "5a9e5702a99606cc51b094f9f786edf091b6852306d9a70eaab2787f256e7f39",
+  "manifest_sha256": "42207a2477a3d0cc14c01c35a1bb12e65fc563c52e87e9cc9bf636d81d56f02b",
+  "module": {
+    "APK_produced": false,
+    "file_count": 75,
+    "manifest_sha256": "42207a2477a3d0cc14c01c35a1bb12e65fc563c52e87e9cc9bf636d81d56f02b",
+    "package": "0.3.5.51",
+    "protocol": 1,
+    "signed": false,
+    "total_source_bytes": 757821,
+    "user_data_modified": false
+  },
+  "module_signature": "ORIGINAL_SIGNER_REQUIRED",
+  "native_DEX_Cobra_shutdown": "BYTE_IDENTICAL_NO_EDIT",
+  "nonselected_functions_byte_exact": {
+    "script.infinity.commandcenter/plugin.py": {
+      "compilation": "PASS",
+      "selected_definitions": [
+        "_values_for",
+        "listing"
+      ],
+      "unchanged_definitions": 32
+    },
+    "script.infinity.commandcenter/resume_hub.py": {
+      "compilation": "PASS",
+      "selected_definitions": [
+        "_entries_projection",
+        "counts",
+        "entries",
+        "next_episodes",
+        "progress_shows"
+      ],
+      "unchanged_definitions": 53
+    },
+    "script.infinity.commandcenter/skin_upgrade.py": {
+      "compilation": "PASS",
+      "selected_definitions": [
+        "_content_path_var",
+        "_patch_home"
+      ],
+      "unchanged_definitions": 7
+    }
+  },
+  "original75_source_files_authenticated": true,
+  "preserved2103426_optimizations": true
+}

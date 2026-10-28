@@ -1,0 +1,47 @@
+{
+  "phase": "candidate",
+  "projection": {
+    "equivalent_projection_cases": 12,
+    "copies_per_20_card_view": 20,
+    "samples_ms": [
+      21.328606999986732,
+      21.158627999966484,
+      21.56348699998034,
+      21.320772999956716,
+      21.24795599996787,
+      21.449723999978687,
+      21.284754999953748,
+      21.211737999976776,
+      21.238007000022208
+    ],
+    "median_ms": 21.284754999953748,
+    "peak_traced_bytes": 1041712,
+    "fixture_rows": 1000,
+    "conditions": "CPython host, local in-memory saved metadata; no Android/native latency"
+  },
+  "listing": {
+    "exact_submitted_rows": 20,
+    "native_submission_calls": 1,
+    "card_builder": "transport sentinel; actual card-builder source must remain exact"
+  },
+  "search": {
+    "native_calls_after_progress_dependency_root_settings_file": [
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "stale_inflight_status": "state_changed",
+    "transport": "Host RPC substitute; not provider/device execution"
+  },
+  "inventory": {
+    "verified_providers_for_selected_search": 1,
+    "all_provider_metadata_rows": 4,
+    "Search_All": "all four still scanned",
+    "transport": "Four-row host inventory; no provider recognition timings"
+  },
+  "shutdown": "NOT_RUN",
+  "Android": "NOT_RUN",
+  "physical_Fold": "NOT_RUN"
+}

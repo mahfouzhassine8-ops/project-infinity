@@ -1,0 +1,88 @@
+{
+  "APK_produced": false,
+  "catalog": {
+    "bundles": {
+      "CHOOSER_SHELL": {
+        "approved_source": "6ca19c1d4152e7809f7040dcbdf7f58bc3df7655",
+        "digest": "6eec0289698956d91d3608e032b1fe172a39e45aef419dca2993c09de388cff3",
+        "file": "CHOOSER_SHELL.zip",
+        "settings_schema": "original-launch-preference",
+        "sha256": "268fdbad636fdef3f1a010cd1d8cdd84c5342184c1da906a232796f834ed04af",
+        "version": "2103420.container.2.labels.2.infinity2103426.infinity2103427"
+      },
+      "COBRA": {
+        "approved_source": "207949de66e09cc8cf4d493cafdb324dbc29475c",
+        "digest": "7091c30cff244beb75f900236da87d016a14573981aa84b7eee454080c23adf7",
+        "file": "COBRA.zip",
+        "settings_schema": "original-plus-settings-snapshot-v1",
+        "sha256": "eb30afa0e1ab9f50da897db27a604cb79a47059ff355c763dc7d7c955ddbcb6b",
+        "version": "bundled-2103420.isolation.1.fold-reflow.2"
+      },
+      "INFINITY": {
+        "approved_source": "6ca19c1d4152e7809f7040dcbdf7f58bc3df7655",
+        "digest": "ab70480429f786f4fbf63592c1a16d8ccea3abaed13bec047474d0730efcbbee",
+        "file": "INFINITY.zip",
+        "settings_schema": "original-2103420",
+        "sha256": "16eeb91a24bf0cf99d558d9e3dd17aedfd127e9a1936dcce413341c48683cd6c",
+        "version": "2103420.isolation.1.performance.2"
+      },
+      "MINIMAL_ANDROID_CONTRACT": {
+        "approved_source": "9efaeabee45389b7c919ae1a3d88c394b1804173",
+        "digest": "7443a8645f40e82eac07f6ec732a9dc231f1974416ea3632b5af5d74816f78fb",
+        "file": "MINIMAL_ANDROID_CONTRACT.zip",
+        "settings_schema": "owner-durability-v1",
+        "sha256": "6e93a1eb8e47f7fc9bc6f1dbc9208b555e2e62445ca2a3065d4e17a3b473ba33",
+        "version": "isolation-contract.1"
+      }
+    },
+    "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "package": "com.projectinfinity.kodi",
+    "release_approved": false,
+    "schema": 1,
+    "source": "6ca19c1d4152e7809f7040dcbdf7f58bc3df7655"
+  },
+  "changed_payload": [
+    "member:assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1",
+    "member:assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1.sig",
+    "member:assets/addons/script.infinity.commandcenter/addon.xml",
+    "member:assets/addons/script.infinity.commandcenter/plugin.py",
+    "member:assets/addons/script.infinity.commandcenter/resume_hub.py",
+    "member:assets/addons/script.infinity.commandcenter/skin_upgrade.py",
+    "member:assets/addons/skin.infinity.diggz/16x9/Home.xml",
+    "member:assets/addons/skin.infinity.diggz/16x9/Includes_InfinityHomeUnified.xml",
+    "member:assets/addons/skin.infinity.diggz/20x9/Home.xml",
+    "member:assets/addons/skin.infinity.diggz/5x6/Home.xml",
+    "member:assets/addons/skin.infinity.diggz/6x5/Home.xml",
+    "member:assets/addons/skin.infinity.diggz/Infinity-Protected-Manifest.json",
+    "member:assets/addons/skin.infinity.diggz/addon.xml",
+    "member:assets/addons/skin.infinity.diggz/fallback/Home.xml",
+    "member:assets/addons/skin.infinity.diggz/fallback/Includes_InfinityHomeUnified.xml",
+    "member:assets/addons/skin.infinity.diggz/infinity-skin.json",
+    "member:assets/addons/skin.infinity.diggz/portrait/Home.xml",
+    "member:assets/addons/skin.infinity.diggz/responsive/base/Home.xml",
+    "member:assets/addons/skin.infinity.diggz/responsive/base/Includes_InfinityHomeUnified.xml",
+    "member:assets/addons/skin.infinity.diggz/responsive/landscape/Home.xml",
+    "member:assets/addons/skin.infinity.diggz/responsive/landscape/Includes_InfinityHomeUnified.xml",
+    "member:assets/addons/skin.infinity.diggz/responsive/portrait/Home.xml",
+    "member:assets/addons/skin.infinity.diggz/responsive/portrait/Includes_InfinityHomeUnified.xml",
+    "member:assets/addons/skin.infinity.diggz/responsive/square/Home.xml",
+    "member:assets/addons/skin.infinity.diggz/responsive/square/Includes_InfinityHomeUnified.xml",
+    "member:assets/addons/skin.infinity.diggz/responsive/tall/Home.xml",
+    "member:assets/addons/skin.infinity.diggz/responsive/tall/Includes_InfinityHomeUnified.xml",
+    "member:assets/addons/skin.infinity.diggz/responsive/ultrawide/Home.xml",
+    "member:assets/addons/skin.infinity.diggz/responsive/ultrawide/Includes_InfinityHomeUnified.xml",
+    "member:assets/addons/skin.infinity.diggz/responsive/wide/Home.xml",
+    "member:assets/addons/skin.infinity.diggz/responsive/wide/Includes_InfinityHomeUnified.xml",
+    "member:assets/addons/skin.infinity.diggz/unified/Home.xml",
+    "member:assets/addons/skin.infinity.diggz/unified/Includes_InfinityHomeUnified.xml",
+    "member:assets/experience-component-updates.properties"
+  ],
+  "manifest_sha256": "42207a2477a3d0cc14c01c35a1bb12e65fc563c52e87e9cc9bf636d81d56f02b",
+  "original_module_signature": "NATIVE_AND_JCA_VERIFIED",
+  "physical_Fold": "PENDING",
+  "run_id": 40768961090,
+  "shutdown": "NOT_RUN",
+  "source": "6ca19c1d4152e7809f7040dcbdf7f58bc3df7655",
+  "tested_run": 40768569301,
+  "tested_source": "01c31342bc0a36efd8ab3eef6ce622678e02a113"
+}
