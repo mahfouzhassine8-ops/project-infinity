@@ -1,3 +1,8 @@
+**Continuation delivered:** [signed2103427](continuation/DELIVERY.md) includes the
+two P0 corrections and further Home/TV/count optimizations while preserving this
+2103426 implementation. The [completion ledger](continuation/COMPLETION-LEDGER.md)
+retains all unfinished original requirements and exact runtime limits.
+
 **Signed 2103426 delivered:** see [DELIVERY.md](DELIVERY.md) for the final APK,
 matching components, checksums, original-signature verification and limitations.
 The four production corrections below passed focused host checks and the full

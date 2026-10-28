@@ -1,0 +1,65 @@
+{
+  "status": "ONE_CONSOLIDATED_SIGNED_CANDIDATE_DELIVERED_DEVICE_ACCEPTANCE_PENDING",
+  "source": "782242090483982c39a78f9c4da932a4751bdafc",
+  "candidate_versionCode": 2103427,
+  "apk_sha256": "cd0c8ab5c77067e508baea0ad7d5207b3d6c73775b86387d4099a67cfe4215ca",
+  "signed_run": 40769526963,
+  "signed_artifact": 12852945082,
+  "signed_artifact_zip_sha256": "0875d7d047f2a94c36d31b559cd52a5fb9761ea63ee11b130e88415642663c4d",
+  "matching_components_artifact": 12852670776,
+  "components_artifact_zip_sha256": "117c83a1cdbea2bb71ade7dfbd7b2a43735224b7c0b178254374ac6d4a19a25f",
+  "host_run": 40768569301,
+  "host_source": "01c31342bc0a36efd8ab3eef6ce622678e02a113",
+  "host_artifact": 12850892939,
+  "host_artifact_sha256": "c96364e2d0de3a30f95f5a02c7aa71c42b4999df79218d469f92c6969b491739",
+  "owner_preparation_run": 40768961090,
+  "owner_source": "6ca19c1d4152e7809f7040dcbdf7f58bc3df7655",
+  "owner_artifact": 12852111867,
+  "owner_artifact_sha256": "97489c95d97a06aceb9668fec47be56d2853f9b95e3526a9e531fc79c8e863fa",
+  "downloaded_artifact_digests_verified": true,
+  "verification": {
+    "actual_generated_source_cases": 9,
+    "retained_negative_race_controls": 14,
+    "retained_projection_equivalence_cases": 12,
+    "release_gate_controls": 13,
+    "independent_component_member_comparisons": 7598,
+    "original_certificate_signatures": "v1_v2_v3_PASS",
+    "actual_module": "NATIVE_VERIFIED_0.3.5.51_75FILES_11ENTRIES"
+  },
+  "retained_attempts": [
+    {
+      "run": 40767544006,
+      "result": "HOST_PASS",
+      "production_payload_same_as_final": true
+    },
+    {
+      "run": 40767869017,
+      "result": "SKIPPED_NO_STEPS",
+      "reason": "Copied version substitution accidentally changed preparation branch guard; corrected to required existing branch"
+    },
+    {
+      "run": 40767999668,
+      "result": "FAILED_NO_APK",
+      "reason": "Strict native verifier refused relative root; restored original canonical absolute staging paths"
+    },
+    {
+      "run": 40768569301,
+      "result": "HOST_PASS_BOUND_TO_CANONICAL_PREPARATION_SOURCE"
+    },
+    {
+      "run": 40768961090,
+      "result": "AUTHENTICATED_OWNER_PREPARATION_PASS"
+    },
+    {
+      "run": 40769526963,
+      "result": "COMBINED_BUILD_SIGNING_AND_FINAL_PAYLOAD_PASS"
+    }
+  ],
+  "APK_build_runs_for_this_continuation": 1,
+  "device_installations": 0,
+  "new_Android_runtime_attempts": 0,
+  "shutdown_tests": "NOT_RUN_FROZEN",
+  "physical_Fold": "USER_ACCEPTANCE_PENDING",
+  "accepted_pointer_updated": false,
+  "overall_original_assignment": "PARTIAL_WITH_EXACT_BLOCKERS_AND_NOT_YET_IMPLEMENTED_ITEMS_IN_COMPLETION_LEDGER"
+}

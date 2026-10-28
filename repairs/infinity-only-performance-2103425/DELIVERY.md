@@ -1,3 +1,6 @@
+Latest consolidated candidate: [signed2103427 delivery, checksums and completion ledger](continuation/DELIVERY.md).
+The signed2103426 delivery below remains preserved as historical evidence.
+
 Signed combined **2103426** is ready for the user's physical Fold acceptance.
 Install over the existing 2103425 package, preserving application data.
 
