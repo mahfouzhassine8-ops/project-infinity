@@ -106,8 +106,8 @@ jobs:
           python-version: '3.12'
       - uses: actions/download-artifact@v4
         with:
-          run-id: 40590499416
-          name: Chooser-Original-UI-Version-Labels-40590499416
+          run-id: 40606096481
+          name: Chooser-Original-UI-Version-Labels-40606096481
           github-token: ${{ github.token }}
           path: producer
       - name: Verify exact producer, immutable Infinity and Cobra and reserve 2103425
@@ -143,7 +143,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           EXPECTED_AUTHORITY_SHA: d49d930828d734ef3a63d1039b6dd82862e96708
-          PR_BRANCH: work/chooser-release-authority-2103424-20261027
+          PR_BRANCH: work/chooser-release-authority-2103425-20261027
         run: |
           set -euo pipefail
           current=$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/heads/work/infinity-cobra-isolation-from-2103420-20261026" --jq '.object.sha')
