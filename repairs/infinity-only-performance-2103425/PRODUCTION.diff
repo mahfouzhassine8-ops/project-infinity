@@ -1,30 +1,17 @@
 --- baseline/script.infinity.commandcenter/addon.xml
 +++ candidate/script.infinity.commandcenter/addon.xml
-@@ -1,4 +1,4 @@
+@@ -1 +1 @@
 -<addon id="script.infinity.commandcenter" name="Infinity Command Center" version="0.3.5.49" provider-name="Project Infinity">
 +<addon id="script.infinity.commandcenter" name="Infinity Command Center" version="0.3.5.50" provider-name="Project Infinity">
-   <requires>
-     <import addon="xbmc.python" version="3.0.0" />
-   </requires>
 --- baseline/script.infinity.commandcenter/infinity_search.py
 +++ candidate/script.infinity.commandcenter/infinity_search.py
-@@ -32,10 +32,10 @@
-     return json.loads(xbmc.executeJSONRPC(json.dumps(dict(jsonrpc='2.0',id=1,method=method,params=params))))
- 
- 
+@@ -35 +35 @@
 -def providers(media, force=False):
 +def providers(media, force=False, provider_id=None):
-     """Shared operation-specific inventory; no independent Search allowlist."""
-     from provider_inventory import eligible
+@@ -38 +38 @@
 -    return eligible(media, operation='search', force=force)
 +    return eligible(media, operation='search', force=force, provider_id=provider_id)
- 
- 
- def route(provider,query=None,history=False):
-@@ -232,23 +232,67 @@
-     return False
- 
- 
+@@ -234,0 +235,42 @@
 +def _query_file_stamp(path):
 +    """Advisory invalidation only; unreadable/linked state disables reuse."""
 +    import stat
@@ -67,154 +54,83 @@
 +    return hashlib.sha256(json.dumps(identity, sort_keys=True, separators=(',', ':')).encode('utf-8')).hexdigest()
 +
 +
- def _provider_result(provider,query,home,cancel,progress=None):
-     try:
-         if cancel.iscanceled():return provider,'cancelled',{},''
-         path=route(provider,query)
+@@ -239 +281 @@
 -        signature=hashlib.sha256((str(xbmcvfs.translatePath('special://profile'))+path+json.dumps(provider['contract']['pins'],sort_keys=True)).encode()).hexdigest()
 +        signature=_query_signature(provider,path,home)
-         cache_key='Infinity.Search.Cache.'+provider['id']
-         cache=_query_cache_entries(home.getProperty(cache_key),time.monotonic())
+@@ -242 +284 @@
 -        hit=next((row for row in cache if row['signature']==signature),None)
 +        hit=next((row for row in cache if signature is not None and row['signature']==signature),None)
-         if hit is not None:
-             answer=hit['answer'];status='completed'
-         else:
-             status,answer=_leased_directory(path,home,_VisibleCancellation(cancel,progress))
+@@ -247,2 +288,0 @@
 -            if status=='completed' and 'error' not in answer and not cancel.iscanceled():
 -                _remember_query_answer(home,cache_key,cache,signature,answer,time.monotonic())
-         # Reject update/disable/removal that raced with the directory request.
-         route(provider,query)
-         if cancel.iscanceled():return provider,'cancelled',{},path
+@@ -251,0 +292,4 @@
 +        if _query_signature(provider,path,home) != signature:
 +            return provider,'state_changed',{},path
 +        if hit is None and signature is not None and status=='completed' and 'error' not in answer:
 +            _remember_query_answer(home,cache_key,cache,signature,answer,time.monotonic())
-         return provider,status,answer,path
-     except (OSError,ValueError,RuntimeError,KeyError,TypeError):
-         return provider,'unavailable',{},''
-@@ -283,7 +327,8 @@
- def _publish_result(handle,provider,status,answer,path):
-     rows=answer.get('result',{}).get('files') or []
-     if not isinstance(rows,list):rows=[];status='invalid_result'
+@@ -286 +330,2 @@
 -    heading=xbmcgui.ListItem(provider['name']+' — '+(str(len(rows))+' results' if status=='completed' else status or 'unavailable'))
 +    heading=xbmcgui.ListItem(provider['name']+' — '+(str(len(rows))+' results' if status=='completed' else
 +        'State changed; search again' if status=='state_changed' else status or 'unavailable'))
-     heading.setProperty('IsPlayable','false')
-     heading.setProperty('Infinity.Search.Provider',provider['id'])
-     xbmcplugin.addDirectoryItem(handle,path,heading,isFolder=bool(path))
-@@ -317,7 +362,7 @@
-     if home.getProperty('Infinity.Search.Protocol')!='1':
-         xbmcgui.Dialog().ok('Infinity Search','Search requires the matching Infinity APK.')
-         return
+@@ -320 +365 @@
 -    try:ready,unsupported=providers(media,force=True)
 +    try:ready,unsupported=providers(media,force=True,provider_id=provider_id)
-     except (OSError,ValueError,RuntimeError) as error:
-         xbmcgui.Dialog().ok('Infinity Search',str(error));return
-     if provider_id is not None:
-@@ -413,7 +458,7 @@
-         legacy_history=choice.get('history') is True
-         if not query.strip() and not legacy_history:return
-         query=query.strip()
+@@ -416 +461 @@
 -        ready,unsupported=providers(media,force=True)
 +        ready,unsupported=providers(media,force=True,provider_id=None if aid=='all' else aid)
-         if aid=='all' and not legacy_history:
-             if not ready:return
-             # Each bounded request revalidates its own source independently.
 --- baseline/script.infinity.commandcenter/plugin.py
 +++ candidate/script.infinity.commandcenter/plugin.py
-@@ -655,21 +655,21 @@
-     return target, li
- 
- 
+@@ -658 +658 @@
 -def _values_for(data, media, bucket, list_name=''):
 +def _values_for(data, media, bucket, list_name='', limit=None):
-     if bucket == 'continue':
+@@ -660 +660 @@
 -        return hub.entries(data, media, 'items')
 +        return hub.entries(data, media, 'items', limit=limit)
-     if bucket in ('history', 'watched'):
+@@ -662 +662 @@
 -        return hub.entries(data, media, 'watched')
 +        return hub.entries(data, media, 'watched', limit=limit)
-     if bucket == 'progress':
-         values = hub.progress_shows(data)
+@@ -665 +665 @@
 -        return [v for v in values if media == 'all' or v.get('media') == media]
 +        return [v for v in values if media == 'all' or v.get('media') == media][:limit]
-     if bucket == 'next':
-         values = hub.next_episodes(data)
+@@ -668 +668 @@
 -        return [v for v in values if media == 'all' or v.get('media') == media]
 +        return [v for v in values if media == 'all' or v.get('media') == media][:limit]
-     if bucket in ('watchlist', 'collection', 'ratings', 'later'):
+@@ -670 +670 @@
 -        return hub.entries(data, media, bucket)
 +        return hub.entries(data, media, bucket, limit=limit)
-     if bucket == 'list':
+@@ -672 +672 @@
 -        return hub.entries(data, media, 'list', list_name)
 +        return hub.entries(data, media, 'list', list_name, limit=limit)
-     return []
- 
- 
-@@ -694,7 +694,8 @@
-     data = hub.load_view(PROFILE, timing_context=timing)
-     hub.trace_timing('saved_state_ready', started, revision=int(data.get('revision') or 0), **timing)
-     filtered = time.monotonic()
+@@ -697 +697,2 @@
 -    values = _values_for(data, media, bucket, list_name)
 +    values = _values_for(data, media, bucket, list_name,
 +                         limit=20 if PARAMS.get('home') == '1' else 100)
-     hub.trace_timing('filter_group', filtered, items=len(values), **timing)
-     render = {'source_memory': setting_bool('source_memory_enabled', True),
-               'tier': xbmcgui.Window(10000).getProperty('Infinity.Artwork.Quality') or 'standard',
-@@ -703,9 +704,12 @@
-     rendered = time.monotonic()
-     visible = values[:20 if PARAMS.get('home') == '1' else 100]
-     render = prepare_render(data, visible, render)
+@@ -705,0 +707 @@
 +    directory_items = []
-     for entry in visible:
-         target, li = _list_item(entry, data, bucket, list_name, render)
+@@ -708 +710,3 @@
 -        xbmcplugin.addDirectoryItem(HANDLE, target, li, isFolder=(hub.entry_identity(entry) or {}).get('kind') in ('tvshow', 'season'))
 +        directory_items.append((target, li, (hub.entry_identity(entry) or {}).get('kind') in ('tvshow', 'season')))
 +    if directory_items:
 +        xbmcplugin.addDirectoryItems(HANDLE, directory_items, len(directory_items))
-     hub.trace_timing('directory_items', rendered, items=len(visible), revision=int(data.get("revision") or 0), **timing)
-     if PARAMS.get('home') == '1':
-         xbmcgui.Window(10000).setProperty('Infinity.Home.FirstViewportReady', 'true')
 --- baseline/script.infinity.commandcenter/provider_inventory.py
 +++ candidate/script.infinity.commandcenter/provider_inventory.py
-@@ -276,8 +276,11 @@
-     return entries, retained
- 
- 
+@@ -279 +279 @@
 -def snapshot(force=False):
 +def snapshot(force=False, provider_id=None):
-     global _cached, _checked_at, _verified, _monitor, _event_revision
+@@ -280,0 +281,3 @@
 +    if provider_id is not None and (not isinstance(provider_id, str) or
 +            not re.fullmatch(r'plugin\.video\.[A-Za-z0-9._-]{1,90}', provider_id)):
 +        raise ValueError('Invalid selected provider identity.')
-     # Invalidation never acquires the scan lock. Native JSONRPC, Home property
-     # access, filesystem IO and large copies run outside the publication lock.
-     if _monitor is None:
-@@ -292,13 +295,18 @@
-             with _lock:
-                 cached, checked, event, generation = _cached, _checked_at, _event_revision, _generation
-                 prior_proofs = dict(_verified)
+@@ -295 +298 @@
 -            if cached is not None and not force and revision == event and 0 <= now - checked < INVENTORY_TTL:
 +            if provider_id is None and cached is not None and not force and revision == event and 0 <= now - checked < INVENTORY_TTL:
-                 return deepcopy(cached)
-             # Omit enabled filter to include disabled installed providers.
-             rows = _rpc('Addons.GetAddons', dict(type='xbmc.addon.video',
-                         properties=['name', 'path', 'version', 'enabled', 'thumbnail'])).get('addons', [])
-             if not isinstance(rows, list):
-                 raise RuntimeError('Installed provider inventory is invalid.')
+@@ -301,0 +305,5 @@
 +            # The chooser and Search All still discover the complete inventory.
 +            # A deliberate selected-provider submission verifies that provider
 +            # only, rather than parsing every unrelated installed provider again.
 +            if provider_id is not None:
 +                rows = [row for row in rows if isinstance(row, dict) and row.get('addonid') == provider_id]
-             specs, digest = _contracts()
-             entries, retained = _scan(rows, specs, digest, prior_proofs)
-             current_revision = xbmcgui.Window(10000).getProperty('Infinity.ProviderInventory.Revision')
-@@ -306,16 +314,18 @@
-             with _lock:
-                 if _generation != generation or current_revision != revision:
-                     continue
+@@ -309,5 +317,7 @@
 -                # Removed/disabled rows lose proofs; no first-N truncation.
 -                _verified = retained
 -                _cached = candidate
@@ -227,30 +143,15 @@
 +                    _cached = candidate
 +                    _checked_at = now
 +                    _event_revision = revision
-             return deepcopy(candidate)
-     raise RuntimeError('Providers changed during discovery. Reopen Search to refresh the available providers.')
- 
- 
+@@ -318 +328 @@
 -def eligible(media, operation='search', force=False):
 +def eligible(media, operation='search', force=False, provider_id=None):
-     """Return exact verified providers for one operation, plus installed status.
- 
-     Caller must use infinity_search.route before dispatch. This function never
-@@ -324,7 +334,7 @@
-     if media not in MEDIA or operation not in ('search', 'title_navigation', 'identity_lookup'):
-         return [], []
-     ready, unavailable = [], []
+@@ -327 +337 @@
 -    for entry in snapshot(force=force)['entries']:
 +    for entry in snapshot(force=force, provider_id=provider_id)['entries']:
-         provider = entry['operations'].get((media, operation))
-         if entry['enabled'] and provider:
-             ready.append(dict(deepcopy(provider), name=entry['name'], icon=entry['icon'],
 --- baseline/script.infinity.commandcenter/resume_hub.py
 +++ candidate/script.infinity.commandcenter/resume_hub.py
-@@ -873,7 +873,15 @@
-     return data, removed
- 
- 
+@@ -876 +876,9 @@
 -def entries(data, media='all', bucket='items', list_name=''):
 +def entries(data, media='all', bucket='items', list_name='', limit=None):
 +    """Project exact saved identities before copying bounded visible metadata.
@@ -261,25 +162,10 @@
 +    """
 +    if limit is not None and (type(limit) is not int or not 0 <= limit <= 100):
 +        raise ValueError('Invalid display projection limit')
-     data = _normalize(data)
-     if bucket == 'list':
-         source = _dict(data['lists'].get(str(list_name)))
-@@ -888,7 +896,8 @@
-         source = {e['key']: e for e in values}
-     else:
-         source = _dict(data.get(bucket))
+@@ -891 +899,2 @@
 -    values = [_entry_copy(value, key) for key, value in source.items()
 +    values = [dict(value, **({'key': str(key)} if key and KEY_RE.fullmatch(str(key)) else {}))
 +              for key, value in source.items()
-               if isinstance(value, dict) and (media == 'all' or value.get('media') == media)]
-     values.sort(key=lambda value: (int(value.get('updated') or value.get('watched_at') or
-                                        value.get('added_at') or 0),
-@@ -903,7 +912,7 @@
-                 seen.add(group)
-                 visible.append(value)
-         values = visible
+@@ -906 +915 @@
 -    return values
 +    return [_entry_copy(value) for value in values[:limit]]
- 
- 
- def continue_series_ids(value):
