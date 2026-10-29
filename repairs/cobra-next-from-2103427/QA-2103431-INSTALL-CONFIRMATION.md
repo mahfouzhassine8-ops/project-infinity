@@ -1,0 +1,7 @@
+# Exact installed-byte confirmation after ADB response timeout
+
+Recorded before the next run of the unchanged signed431 APK. Run40972601469 stopped before Activity launch because `adb install -r` exceeded the generic 30-second subprocess deadline. Preserved PackageInstaller logs show the package installation completed at23:26:39.553 before the client traceback. No icon/button feature checks started; this is not an application crash or native failure.
+
+The QA correction keeps the same 30-second ADB deadline. It catches only this install-client timeout, saves its stdout/stderr and then asks PackageManager for the installed public base-APK path. It confirms that file's SHA256 equals the exact locally verified, originally signed APK. A missing package, multiple APKs, unsafe path or different hash fails. Nonzero installation failures are not caught. It never retries an uncertain installation, resets data or invokes shutdown. Successful install responses also receive the same exact-byte confirmation before launch.
+
+Offline checks selected before Android execution: matching public APK path/hash accepted; missing package, multiple paths, unsafe path and mismatching hash rejected. No adb is executed by those checks. Only after actual installed-byte confirmation may the original UI probe and focused icon/button journey proceed. No production file, signing artifact, timeout value, user device or lock is changed.
