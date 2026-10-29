@@ -1,0 +1,38 @@
+{
+  "activity_class_sha256": "f89d930703343811bfdace4a29c1d025d45f45dd945b68baf11a6385728a74ce",
+  "selected_method_preimages": {
+    "private cobraBuildPlayerChrome()V": "aa93f3dc9bff779a03d5b08a11f08e1b825005107b338354d0bfb61a01ef2ab0",
+    "private cobraLayoutMultiTiles()V": "083b307923b1ace8193015ef309f3bb5d63990191b0620f4d19bbff942a59cad",
+    "private cobraPosition(Landroid/view/View;IIII)V": "a557ca2048f9a2cb6deb5caed46415970d1e9effaa121486263986f95fdcfbf3",
+    "private cobraPreviewPanel(Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;Z)Landroid/widget/FrameLayout;": "9632201b03e0b9feee97106d0a3f3074440a3ce762717d55e5fe2e3bbb42a62f",
+    "private cobraShowMultiLayoutChooser()V": "4e290e8381a03928d289a2e5e2f5112fa033ecb2459d5bd17479677616f6efde",
+    "private showCobraMultiTileActions(I)V": "5dfea0b3734107fe48760d1a570a0d068fe349dae73c65475693b7fad117543c",
+    "public onBackPressed()V": "d55fe92ecd0034b19bfc0ecd5520bfab82ec754c4a897baf4243e688f0020b1f"
+  },
+  "activity_new_fields": [],
+  "other_changed_existing_classes": [
+    "CobraComponent: version only",
+    "ChooserReleaseMetadata: updated() literal only"
+  ],
+  "allowed_new_class_roots": [
+    "CobraArrange",
+    "CobraLayoutCatalog",
+    "CobraPresentation"
+  ],
+  "preserved_class_families": [
+    "CobraProUi",
+    "InfinityLiveActivity$CobraSix",
+    "CobraWindowReflow",
+    "all player/tuning/session/PIp/audio/persistence methods and services outside this exact budget"
+  ],
+  "additional_discovery": [
+    {
+      "id": "D1",
+      "source": "InfinityLiveActivity.cobraPosition",
+      "cause": "Every call allocates FrameLayout.LayoutParams and calls setLayoutParams even with identical bounds",
+      "correction": "Return early only for exact existing default non-relative FrameLayout params with same clamped bounds; retain original changed-bounds behavior",
+      "test": "Actual production method before/after layout request/allocation counts and measured resize geometry"
+    }
+  ],
+  "controller_lifetime": "Weak Activity keys and weak helper values; active UI listeners retain at most4 pane gestures; detach cancels timers and removes listeners; no shared/runtime field mutation"
+}

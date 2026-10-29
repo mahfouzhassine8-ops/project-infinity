@@ -1,0 +1,45 @@
+{
+  "status": "PASS_SELECTED_HOST_ONLY",
+  "runtime": "Robolectric API35 actual rebuilt DEX; inert player proxies; no native decoding",
+  "tests": [
+    {
+      "name": "com.projectinfinity.kodi.CobraArrangeIntegrationTest",
+      "tests": "14",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "10.629"
+    },
+    {
+      "name": "com.projectinfinity.kodi.CobraPositionWorkTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "3.935"
+    },
+    {
+      "name": "com.projectinfinity.kodi.CobraMeasuredReflowTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "5.493"
+    }
+  ],
+  "production_dex": {
+    "owner-dex/CHOOSER_SHELL/part-0.dex": "07b94bfde6dbc3e3a6bfc8436ea65e6a67bdef5ca868379809e20f2fb7ce8efb",
+    "owner-dex/COBRA/part-1.dex": "af03db41f53209de52f5d8609e411da49fee106d0fe544d6ea6e5d8230d88363",
+    "owner-dex/COBRA/part-0.dex": "667a0272510e71d3fcc89a11f3bb8a9740b19dee4c07d0217882305628caeab6"
+  },
+  "runtime_source_sha256": {
+    "CobraArrange.java": "97da94a8ff3609b9a8347275d4002c90412a87a3527d37c0853cd65f1777d3be",
+    "CobraPresentation.java": "6f78397525e417a7a762aa2610b1745ba58624f0a5d2ef3509cd9bbdbfed3cc8",
+    "CobraLayoutCatalog.java": "840f8d826813ecf28e7fcbeef61a5aa801d4a2a5819286ca4d5055af99875f6a"
+  },
+  "baseline_work_output": "COBRA_POSITION_WORK baseline=true repeated_calls=7000 setLayoutParams=7000 p50_ns_per_1000=2980536 min_ns=2061520 max_ns=5469810\n",
+  "candidate_work_output": "COBRA_POSITION_WORK baseline=false repeated_calls=7000 setLayoutParams=0 p50_ns_per_1000=1125547 min_ns=738293 max_ns=4757536\n",
+  "gate_controls": "test_component_claims_cannot_replace_fingerprints (test_release_gate.ReleaseGateTests.test_component_claims_cannot_replace_fingerprints) ... ok\ntest_duplicate_zip_and_traversal_fail_closed (test_release_gate.ReleaseGateTests.test_duplicate_zip_and_traversal_fail_closed) ... /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/zipfile/__init__.py:1625: UserWarning: Duplicate name: 'classes.dex'\n  return self._open_to_write(zinfo, force_zip64=force_zip64)\nok\ntest_higher_package_version_cannot_hide_stale_cobra (test_release_gate.ReleaseGateTests.test_higher_package_version_cannot_hide_stale_cobra) ... ok\ntest_higher_package_version_cannot_hide_stale_infinity (test_release_gate.ReleaseGateTests.test_higher_package_version_cannot_hide_stale_infinity) ... ok\ntest_latest_approved2103427_lock_is_required (test_release_gate.ReleaseGateTests.test_latest_approved2103427_lock_is_required) ... ok\ntest_methods_with_and_without_flags_and_duplicate_class (test_release_gate.ReleaseGateTests.test_methods_with_and_without_flags_and_duplicate_class) ... ok\ntest_owner_reclassification_and_shared_scope_rejected (test_release_gate.ReleaseGateTests.test_owner_reclassification_and_shared_scope_rejected) ... ok\ntest_package_and_registry_rollback_rejected (test_release_gate.ReleaseGateTests.test_package_and_registry_rollback_rejected) ... ok\ntest_remote_authority_head_race_is_rejected (test_release_gate.ReleaseGateTests.test_remote_authority_head_race_is_rejected) ... ok\ntest_settings_payload_rollback_rejected (test_release_gate.ReleaseGateTests.test_settings_payload_rollback_rejected) ... ok\ntest_successive_independent_owner_updates_preserve_other_owner (test_release_gate.ReleaseGateTests.test_successive_independent_owner_updates_preserve_other_owner) ... ok\ntest_target_owner_cannot_change_other_owner_or_common_manifest (test_release_gate.ReleaseGateTests.test_target_owner_cannot_change_other_owner_or_common_manifest) ... ok\ntest_unowned_and_missing_payload_rejected (test_release_gate.ReleaseGateTests.test_unowned_and_missing_payload_rejected) ... ok\ntest_unresolved_blocker_cannot_reach_key_read (test_release_gate.ReleaseGateTests.test_unresolved_blocker_cannot_reach_key_read) ... ok\n\n----------------------------------------------------------------------\nRan 14 tests in 0.009s\n\nOK\n",
+  "shutdown": "NOT_RUN",
+  "physical_Fold": "NOT_RUN"
+}
