@@ -8,7 +8,7 @@ from zipfile import ZipFile
 
 import assemble
 import release_gate as gate
-from inventory import CERT_SHA, OWNERS, PACKAGE, canonical, digest, parse_dex, validate_names
+from inventory import CERT_SHA, OWNERS, PACKAGE, HERE, canonical, digest, parse_dex, validate_names
 
 
 def fixture():
@@ -184,6 +184,200 @@ class ReleaseGateTests(unittest.TestCase):
                 'a'*40+'\trefs/heads/'+gate.AUTHORITY_BRANCH+'\n']):
             with self.assertRaisesRegex(gate.Rejected,'LATEST_APPROVED_LOCK_MOVED'):
                 gate.remote_authority('repo','a'*40)
+
+
+class IconResourceGateTests(unittest.TestCase):
+    """Real pinned icon inputs; these policy fixtures are never owner bundles."""
+
+    @classmethod
+    def setUpClass(cls):
+        import json
+        import release_authority
+        cls.authority = release_authority
+        cls.guard = release_authority.launcher_icon_guard()
+        cls.resources = cls.guard.resources_module()
+        reference = cls.guard.HERE / 'reference'
+        cls.original = {name: (reference / Path(name).name).read_bytes()
+                        for name in cls.resources.BASELINE_SHA256}
+        cls.generated = cls.resources.expected_resources(cls.original)
+        cls.members = {**cls.original, **cls.generated}
+        # Derive a synthetic policy fixture from the real immutable MIN member
+        # vector.  Restore its icon inputs if this test runs after registration.
+        previous = json.loads((HERE / 'release-authority.json').read_text())
+        previous.pop('launcher_icon_exception', None)
+        previous.update(generation=14, candidate_versionCode=2103429, last_issued_versionCode=2103428)
+        previous['payload']['member:resources.arsc'] = {
+            'owner': cls.guard.OWNER, 'sha256': cls.guard.ORIGINAL_TABLE_SHA256}
+        for path in cls.guard.NEW_PATHS:
+            previous['payload'].pop('member:' + path, None)
+        previous['components'][cls.guard.OWNER] = {
+            'approved_source': '9efaeabee45389b7c919ae1a3d88c394b1804173',
+            'digest': cls.guard.ORIGINAL_COMPONENT_DIGEST, 'revision': 1,
+            'settings_schema': 'owner-durability-v1', 'version': 'isolation-contract.1'}
+        previous['experience_version_labels'] = {'INFINITY': 2103427, 'COBRA': 2103429}
+        previous['payload']['member:assets/experience-component-updates.properties']['sha256'] = digest(
+            b'infinity.last_updated_in=2103427\ncobra.last_updated_in=2103429\n')
+        for owner in ('COBRA', 'CHOOSER_SHELL'):
+            previous['components'][owner].update(version='policy-fixture29-' + owner, revision=1,
+                approved_source='a' * 40, digest=gate.component_digest(previous['payload'], owner))
+        cls.previous = previous
+        proposed = copy.deepcopy(previous)
+        proposed.update(generation=15, candidate_versionCode=2103430, last_issued_versionCode=2103429)
+        proposed['experience_version_labels']['COBRA'] = 2103430
+        proposed['payload']['member:assets/experience-component-updates.properties']['sha256'] = digest(
+            b'infinity.last_updated_in=2103427\ncobra.last_updated_in=2103430\n')
+        proposed['payload']['class:Lcom/projectinfinity/kodi/CobraComponent;']['sha256'] = digest(b'policy fixture30')
+        for path, data in cls.generated.items():
+            proposed['payload']['member:' + path] = {'owner': cls.guard.OWNER, 'sha256': digest(data)}
+        for owner in ('COBRA', 'CHOOSER_SHELL', cls.guard.OWNER):
+            proposed['components'][owner].update(version='policy-fixture30-' + owner,
+                revision=previous['components'][owner]['revision'] + 1, approved_source='b' * 40,
+                digest=gate.component_digest(proposed['payload'], owner))
+        proposed['launcher_icon_exception'] = cls.guard.make_exception(proposed['payload'], cls.read)
+        cls.proposed = proposed
+        cls.targets = ['COBRA', 'CHOOSER_SHELL', cls.guard.OWNER]
+
+    @staticmethod
+    def read(name):
+        return (HERE.parents[1] / name).read_bytes()
+
+    def refresh_digest(self, proposed, owner=None):
+        owner = owner or self.guard.OWNER
+        proposed['components'][owner]['digest'] = gate.component_digest(proposed['payload'], owner)
+
+    def write_apk(self, root, members):
+        path = Path(root) / 'policy-fixture-resources.zip'
+        with ZipFile(path, 'w') as z:
+            for name, data in members.items():
+                z.writestr(name, data)
+        return path
+
+    def test_exact_consolidated_icon_transition_and_fresh_resources(self):
+        self.authority.transition(self.previous, self.proposed, self.targets)
+        self.guard.verify_evidence(self.proposed, self.read)
+        with tempfile.TemporaryDirectory() as tmp:
+            report = self.guard.verify_actual_apk(self.write_apk(tmp, self.members), self.proposed)
+        self.assertEqual(report['status'], 'PASS_EXACT_ICON_ONLY_TABLE_TRANSFORM')
+        self.assertEqual(report['new_resource_ids'], 0)
+        self.assertEqual(report['original_dark_assets'], 'ALL_BYTE_IDENTICAL')
+
+    def test_missing_exception_never_authorizes_shared_target(self):
+        proposed = copy.deepcopy(self.proposed)
+        proposed.pop('launcher_icon_exception')
+        with self.assertRaisesRegex(gate.Rejected, 'ICON_EXCEPTION_SCHEMA'):
+            self.authority.transition(self.previous, proposed, self.targets)
+        for targets in ([self.guard.OWNER], ['COBRA', self.guard.OWNER]):
+            with self.subTest(targets=targets), self.assertRaisesRegex(gate.Rejected, 'ICON_CONSOLIDATED_TARGETS'):
+                self.authority.transition(self.previous, self.proposed, targets)
+
+    def test_classes_native_manifest_dark_and_non_icon_members_frozen(self):
+        rows = self.previous['payload']
+        keys = [next(k for k, v in rows.items() if v['owner'] == self.guard.OWNER and k.startswith('class:')),
+                next(k for k in rows if k.endswith('.so')),
+                'member:AndroidManifest.xml', 'member:res/n4.png', 'member:res/za.png',
+                next(k for k in rows if k.startswith('member:res/') and k[7:] not in self.resources.BASELINE_SHA256)]
+        for key in keys:
+            owner = rows[key]['owner']
+            reason = 'ICON_FROZEN_SHARED_PAYLOAD' if owner == self.guard.OWNER else 'CROSS_OWNER_MUTATION:' + owner
+            with self.subTest(key=key, owner=owner), self.assertRaisesRegex(gate.Rejected, reason):
+                proposed = copy.deepcopy(self.proposed)
+                proposed['payload'][key]['sha256'] = digest(b'forbidden shared change')
+                self.refresh_digest(proposed, owner)
+                self.authority.transition(self.previous, proposed, self.targets)
+
+    def test_shared_removal_reclassification_and_extra_path_rejected(self):
+        key = 'member:res/n4.png'
+        for reclassify in (False, True):
+            with self.subTest(reclassify=reclassify), self.assertRaisesRegex(
+                    gate.Rejected, 'ICON_REMOVED_OR_RECLASSIFIED_SHARED_PAYLOAD'):
+                proposed = copy.deepcopy(self.proposed)
+                if reclassify:
+                    proposed['payload'][key]['owner'] = 'CHOOSER_SHELL'
+                    self.refresh_digest(proposed, 'CHOOSER_SHELL')
+                else:
+                    proposed['payload'].pop(key)
+                self.refresh_digest(proposed)
+                self.authority.transition(self.previous, proposed, self.targets)
+        proposed = copy.deepcopy(self.proposed)
+        proposed['payload']['member:res/unreviewed.xml'] = {'owner': self.guard.OWNER, 'sha256': digest(b'extra')}
+        self.refresh_digest(proposed)
+        with self.assertRaisesRegex(gate.Rejected, 'ICON_ONLY_NEW_MEMBERS'):
+            self.authority.transition(self.previous, proposed, self.targets)
+
+    def test_exception_is_single_release_and_keeps_settings_and_contract(self):
+        for kind in ('version', 'settings', 'contract'):
+            proposed = copy.deepcopy(self.proposed)
+            if kind == 'version':
+                proposed['candidate_versionCode'] += 1
+                reason = 'ICON_EXACT_RELEASE_TRANSITION'
+            elif kind == 'settings':
+                proposed['components'][self.guard.OWNER]['settings_schema'] = 'not-authorized'
+                reason = 'ICON_SETTINGS_SCHEMA_FROZEN'
+            else:
+                key = next(iter(proposed['protected_contract']))
+                proposed['protected_contract'][key] = digest(b'changed protected contract')
+                reason = 'PROTECTED_CONTRACT'
+            with self.subTest(kind=kind), self.assertRaisesRegex(gate.Rejected, reason):
+                self.authority.transition(self.previous, proposed, self.targets)
+
+    def test_exception_does_not_trust_unbound_or_replaced_sources(self):
+        for kind in ('missing', 'escape', 'authorization', 'old-table'):
+            proposed = copy.deepcopy(self.proposed)
+            proof = proposed['launcher_icon_exception']
+            if kind == 'missing':
+                proof['source_inputs'].pop(self.guard.PREFIX + 'resources.py')
+                reason = 'ICON_MISSING_SOURCE_BINDING'
+            elif kind == 'escape':
+                proof['source_inputs'][self.guard.PREFIX + 'reference/../outside.png'] = digest(b'x')
+                reason = 'ICON_SOURCE_SCOPE'
+            elif kind == 'authorization':
+                proof['authorization_sha256'] = digest(b'other authorization')
+                reason = 'ICON_AUTHORIZATION_PREIMAGE'
+            else:
+                proof['original_resource_table_sha256'] = digest(b'other old table')
+                reason = 'ICON_ORIGINAL_TABLE'
+            with self.subTest(kind=kind), self.assertRaisesRegex(gate.Rejected, reason):
+                self.authority.transition(self.previous, proposed, self.targets)
+        name = self.guard.PREFIX + 'resources.py'
+        with self.assertRaisesRegex(gate.Rejected, 'ICON_REVIEWED_SOURCE_CHANGED'):
+            self.guard.verify_evidence(self.proposed,
+                lambda path: b'unreviewed source' if path == name else self.read(path))
+
+    def test_fresh_table_and_artwork_cannot_be_reapproved_by_changing_hash(self):
+        for name in ('resources.arsc', self.guard.NEW_PATHS[0]):
+            members = dict(self.members)
+            raw = bytearray(members[name]); raw[-1] ^= 1; members[name] = bytes(raw)
+            proposed = copy.deepcopy(self.proposed)
+            proof = proposed['launcher_icon_exception']
+            if name == 'resources.arsc':
+                proof['candidate_resource_table_sha256'] = digest(members[name])
+            else:
+                proof['added_members'][name] = digest(members[name])
+            proposed['payload']['member:' + name]['sha256'] = digest(members[name])
+            self.refresh_digest(proposed)
+            with tempfile.TemporaryDirectory() as tmp, self.subTest(name=name):
+                apk = self.write_apk(tmp, members)
+                with self.assertRaisesRegex(gate.Rejected, 'ICON_RESOURCE_TRANSFORM'):
+                    self.guard.verify_actual_apk(apk, proposed)
+
+    def test_fresh_icon_failure_precedes_any_signing_key_read(self):
+        members = dict(self.members)
+        raw = bytearray(members['resources.arsc']); raw[-1] ^= 1
+        members['resources.arsc'] = bytes(raw)
+        proposed = copy.deepcopy(self.proposed)
+        proposed['launcher_icon_exception']['candidate_resource_table_sha256'] = digest(raw)
+        proposed['payload']['member:resources.arsc']['sha256'] = digest(raw)
+        self.refresh_digest(proposed)
+        with tempfile.TemporaryDirectory() as tmp:
+            apk = self.write_apk(tmp, members)
+            with patch.object(gate, 'remote_authority', return_value=proposed), \
+                 patch.object(gate, 'inspect_candidate', return_value=(actual(proposed), 2103430)), \
+                 patch.object(gate, 'validate_runtime_ownership'), \
+                 patch.object(assemble.base64, 'b64decode') as key_read:
+                with self.assertRaisesRegex(gate.Rejected, 'ICON_RESOURCE_TRANSFORM'):
+                    assemble.sign(apk, 'jars', 'work', 'repo', 'head', 15, 'sdk', Path(tmp) / 'out')
+                key_read.assert_not_called()
+                self.assertFalse((Path(tmp) / 'out').exists())
 
 
 if __name__ == '__main__':

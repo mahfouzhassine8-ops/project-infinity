@@ -9,7 +9,8 @@
     "private showCobraMultiTileActions(I)V": "5dfea0b3734107fe48760d1a570a0d068fe349dae73c65475693b7fad117543c",
     "public onBackPressed()V": "d55fe92ecd0034b19bfc0ecd5520bfab82ec754c4a897baf4243e688f0020b1f",
     "private cobraSportsLoadLogo(Ljava/lang/String;Landroid/widget/ImageView;)V": "c4cb8ac589c392904b24ef52bc839955fa89652bceb026e5bf8017d6c665c77a",
-    "synthetic lambda$cobraSportsLoadLogo$481$com-projectinfinity-kodi-InfinityLiveActivity(Ljava/lang/String;Landroid/graphics/Bitmap;Landroid/widget/ImageView;)V": "30b57d9e6e95cac2fc9c9c50ca82f0188eae17bb8bf5eb8d4a10d046e7665e87"
+    "synthetic lambda$cobraSportsLoadLogo$481$com-projectinfinity-kodi-InfinityLiveActivity(Ljava/lang/String;Landroid/graphics/Bitmap;Landroid/widget/ImageView;)V": "30b57d9e6e95cac2fc9c9c50ca82f0188eae17bb8bf5eb8d4a10d046e7665e87",
+    "private cobraProControl(I)V": "896c10bc6a16d644eea4ac037703b45eb04748827a023bb9989c9397c118557c"
   },
   "activity_new_fields": [],
   "other_changed_existing_classes": [
@@ -49,6 +50,12 @@
       "before_after_evidence": "CobraLogoReattachTest: exact baseline27 PASS,28 FAIL (null bitmap after reparent)",
       "correction": "Keep only view-owned, weakly indexed URI binding across detach; remove offscreen waiters; on attach restore existing cache or join current URL flight",
       "test": "Same reproduction plus original25 tests; no source-specific player/native/shared/shutdown changes"
+    },
+    {
+      "id": "P0-429-BUTTONS",
+      "cause": "Pro visible control semantic dispatch uses fixed hidden-row child indices; next-generation More-last mutates row while activePro=false before real Proactivation. Fullscreen->index5PiP; More->index4Fullscreen",
+      "correction_budget": "AddstableFullscreenviewtag within existingselectedpreviewcreation; oneProControlgetChildAt replaced by CobraPresentation.proTarget resolvingFullscreen/Moreoriginalviewidentity. Nativeguard/toast/menu/PiP/playerbody preserved; no rowmutationduringdispatch, no modeactivationhook.",
+      "selected_test": "CobraPlayerButtonDispatchTest actual productionHero touch event dispatch including old29reproduction and scrolled/clipped touch targets"
     }
   ],
   "controller_lifetime": "Weak Activity keys and weak helper values; active UI listeners retain at most4 pane gestures; detach cancels timers and removes listeners; no shared/runtime field mutation"

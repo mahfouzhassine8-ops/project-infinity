@@ -210,6 +210,12 @@ def pre_sign(apk, jars, work, repository, expected_head, expected_generation):
     if registry.get('schema') == 2:
         validate_runtime_ownership(registry,work)
     result = verify_combination(registry, actual, version, expected_generation)
+    if registry.get('launcher_icon_exception') is not None:
+        from release_authority import launcher_icon_guard
+        # Recompute the reviewed resource transformation from actual APK bytes,
+        # before any signing credential can be read.  Exact payload hashes alone
+        # cannot establish that an edited table changed only the icon entries.
+        result['launcher_icon_resources'] = launcher_icon_guard().verify_actual_apk(apk,registry)
     require(remote_authority(repository, expected_head) == registry, 'AUTHORITY_CHANGED_DURING_AUDIT')
     result.update(status='PRE_SIGN_PAYLOAD_VERIFIED', unsigned_apk_sha256=file_sha(apk), source=expected_head,
                   registry_sha256=digest(canonical(registry)), versionCode=version)

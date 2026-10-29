@@ -15,16 +15,19 @@ sys.path.insert(0,str(REPO/'repairs/dual-experience-isolation-2103420'))
 from inventory import save,file_sha
 
 
-def prepare(work,apk,dex2jar,out,baseline_measure=False):
+def prepare(work,apk,dex2jar,out,baseline_measure=False,prior_button_reproduction=False):
     out=out.resolve();out.mkdir();errors=out/'translation-errors';errors.mkdir()
     import json
-    assert file_sha(apk)==json.loads((HERE/'SCOPE.json').read_text())['baseline_apk_sha256']
+    scope=json.loads((HERE/'SCOPE.json').read_text())
+    expected=scope['previous_signed_candidate']['sha256'] if prior_button_reproduction else scope['baseline_apk_sha256']
+    assert file_sha(apk)==expected
+    assert not (baseline_measure and prior_button_reproduction)
     def translate(path,name):
         target=out/(name+'.jar')
         subprocess.run(['java','-cp',str(dex2jar/'lib/*'),'com.googlecode.dex2jar.tools.Dex2jarCmd',str(path),'-o',str(target),'-e',str(errors/(name+'.zip'))],check=True)
         return target
     dex_paths=sorted((work/'owner-dex/COBRA').glob('*.dex'))
-    if baseline_measure:
+    if baseline_measure or prior_button_reproduction:
         dex_paths=[]
         with ZipFile(apk) as z:
             for i,name in enumerate(('classes4.dex','classes5.dex')):
@@ -35,7 +38,7 @@ def prepare(work,apk,dex2jar,out,baseline_measure=False):
         for name in ('classes.dex','classes2.dex','classes3.dex'):
             p=out/name;p.write_bytes(z.read(name));support.append(translate(p,'support-'+p.stem))
     # Use the updated, narrowly worded chooser DEX rather than the old one.
-    if not baseline_measure:support[0]=translate(work/'owner-dex/CHOOSER_SHELL/part-0.dex','updated-chooser')
+    if not baseline_measure and not prior_button_reproduction:support[0]=translate(work/'owner-dex/CHOOSER_SHELL/part-0.dex','updated-chooser')
     for label,inputs in (('production',production),('support',support)):
         seen=set()
         with ZipFile(out/(label+'.jar'),'w',ZIP_DEFLATED) as target:
@@ -46,7 +49,8 @@ def prepare(work,apk,dex2jar,out,baseline_measure=False):
                         if label=='support' and not name.startswith(('com/projectinfinity/kodi/','androidx/')):continue
                         seen.add(name);target.writestr(name,z.read(name))
     tests=out/'src/test/java/com/projectinfinity/kodi';tests.mkdir(parents=True)
-    selected=[HERE/'tests/CobraPositionWorkTest.java',HERE/'tests/CobraLogoWorkTest.java',HERE/'tests/CobraLogoReattachTest.java'] if baseline_measure else sorted((HERE/'tests').glob('*.java'))
+    selected=([HERE/'tests/CobraPlayerButtonDispatchTest.java',HERE/'tests/CobraArrangeIntegrationTest.java'] if prior_button_reproduction else
+              [HERE/'tests/CobraPositionWorkTest.java',HERE/'tests/CobraLogoWorkTest.java',HERE/'tests/CobraLogoReattachTest.java'] if baseline_measure else sorted((HERE/'tests').glob('*.java')))
     for path in selected:shutil.copyfile(path,tests/path.name)
     pom=(REPO/'repairs/dual-experience-isolation-2103420/tests/pom.xml').read_text().replace('${runtime.work}/changed-host.jar',str(out/'production.jar')).replace('${baseline.dex}/application-host.jar',str(out/'support.jar'))
     (out/'pom.xml').write_text(pom)
@@ -59,11 +63,12 @@ def prepare(work,apk,dex2jar,out,baseline_measure=False):
     if (sdk/('android-all-instrumented-'+sdk.name+'.jar')).exists():
         (out/'pom.xml').write_text(pom.replace('<systemPropertyVariables>',
           '<systemPropertyVariables><robolectric.offline>true</robolectric.offline><robolectric.dependency.dir>'+str(sdk)+'</robolectric.dependency.dir>'))
-    save(out/'INPUTS.json',dict(runtime='Robolectric API35 HOST; actual production DEX; inert explicitly identified player proxies; no native playback/shutdown',baseline_measure=baseline_measure,production_dex={p.name:file_sha(p) for p in dex_paths},test_sources={p.name:file_sha(p) for p in selected},physical_Fold='NOT_RUN'))
+    save(out/'INPUTS.json',dict(runtime='Robolectric API35 HOST; actual production DEX; inert explicitly identified player proxies; no native playback/shutdown',baseline_measure=baseline_measure,prior_button_reproduction=prior_button_reproduction,APK_sha256=expected,production_dex={p.name:file_sha(p) for p in dex_paths},test_sources={p.name:file_sha(p) for p in selected},physical_Fold='NOT_RUN'))
 
 
 if __name__=='__main__':
     p=argparse.ArgumentParser()
     for name in ('work','apk','dex2jar','out'):p.add_argument('--'+name,type=Path,required=True)
     p.add_argument('--baseline-measure',action='store_true')
+    p.add_argument('--prior-button-reproduction',action='store_true')
     prepare(**vars(p.parse_args()))

@@ -6,5 +6,6 @@
   "physical_Fold": "USER_ONLY_PENDING",
   "CobraLogoWorkTest": "Baseline/candidate actual signed logo requests, executor submission counts, bounded admission/cache reuse, controlled old/current callback and detach; no HTTP or application shutdown",
   "CobraLogoCompletionTest": "Actual original downloader/publish/finish through existing executor wrappers, loopback PNGs,4 bounded pending jobs, fanout, failure no retry-loop, deferred attach; no provider/native decoding or application shutdown",
-  "CobraLogoReattachTest": "Original late logo completion survives temporary detach/reattach of same view: baseline27 pass,28 fail; fixed29 must pass; no app lifecycle/shutdown"
+  "CobraLogoReattachTest": "Original late logo completion survives temporary detach/reattach of same view: baseline27 pass,28 fail; fixed29 must pass; no app lifecycle/shutdown",
+  "CobraPlayerButtonDispatchTest": "P0-2103429: actual production Pro Hero/Action/HorizontalScrollView coordinate or remote view dispatch through real Activity cobraProControl; reproduce first-entry active-flag ordering defect on signed29, then verify Fullscreen/PiP/More separation across scroll/clipping, retained mode state and resize. Only terminal fullscreen/menu/platform PiP boundaries are host spies; actual native dispatcher, labels, hitboxes, scroll and MiniPiP guards run. No shutdown or physical acceptance claim."
 }

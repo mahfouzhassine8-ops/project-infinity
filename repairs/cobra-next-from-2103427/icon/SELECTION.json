@@ -1,0 +1,21 @@
+{
+  "correction": "Approved theme-qualified launcher-icon resource exception; original dark assets remain exact",
+  "selected_before_execution": true,
+  "host": [
+    "Read actual signed2103429 manifest/resource IDs and all launcher configurations",
+    "Deterministic resources.arsc transformation changes only mipmap/ic_launcher and ic_launcher_round paths and uiMode configuration flags",
+    "All original assets and every non-icon resource entry unchanged",
+    "Adaptive light foreground references and tints the existing monochrome mask; alpha equals original colored foreground exactly",
+    "Legacy light icons retain original tile alpha and use the existing adaptive symbol's standard 72/108 inner viewport",
+    "Reject non-icon resource changes, dark-asset changes, wrong originals and missing/changed new icon paths"
+  ],
+  "Android": [
+    "Exact signed2103430 APK after parent signature/hash/version check; empty native Cobra welcome before source import/playback",
+    "Disposable SDK37 emulator: cmd uimode night no/yes; actual framework cmd overlay lookup paths for existing launcher and round launcher resource IDs",
+    "Actual resolved HOME launcher app-drawer frames/native Infinity item bounds before/after theme change and supported Home/app-drawer re-entry; no Infinity icon tap",
+    "Distinct light/dark native-item color observation or explicit partial/cache result; lookup selection is not claimed as drawable inflation or Samsung acceptance",
+    "Restore observed explicit no/yes mode, return to existing exported Cobra Activity, no force-stop/reset/clear/toggle/shutdown"
+  ],
+  "unselected": "Shutdown, Infinity application behavior, data migrations, component toggling and separate CobraTV app",
+  "approval": "APPROVED-INFINITY-ICON-LIGHT-DARK-20261029.md and current explicit user instruction"
+}

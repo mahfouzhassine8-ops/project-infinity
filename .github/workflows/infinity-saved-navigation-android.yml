@@ -33,7 +33,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   cobra-host:
-    name: Cobra next production DEX host integration and exact owner preparation
+    name: Both P0 corrections - production touch dispatch and launcher resources
     if: github.event_name == 'workflow_dispatch' && inputs.feature == 'cobra-owner-host'
     runs-on: ubuntu-22.04
     timeout-minutes: 30
@@ -66,6 +66,13 @@ jobs:
           name: Infinity-Combined-Owner-Components-40769526963
           github-token: ${{ github.token }}
           path: baseline-components
+      - name: Recover exact signed429 for focused wrong-route reproduction
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 40818697397
+          name: Infinity-Combined-Original-Signer-40818697397
+          github-token: ${{ github.token }}
+          path: previous29
       - uses: actions/download-artifact@v4
         with:
           run-id: 39867073954
@@ -81,25 +88,40 @@ jobs:
           echo 'ee7c45eb3c1d2474a6145d8d447e651a736a22d9664b6d3d3be5a5a817dda23a  dex2jar.zip' | sha256sum -c -
           unzip -q dex2jar.zip -d dex2jar
           python3 "$target/host_tests.py" --work cobra-build --apk baseline/Infinity-2103427-Combined-Original-Signer.apk --dex2jar dex2jar/dex-tools-v2.4 --out cobra-host
-          python3 "$target/host_tests.py" --work cobra-build --apk baseline/Infinity-2103427-Combined-Original-Signer.apk --dex2jar dex2jar/dex-tools-v2.4 --out cobra-baseline-host --baseline-measure
-      - name: Execute selected host integration and comparable baseline work count
+          python3 "$target/host_tests.py" --work cobra-build --apk previous29/Infinity-2103429-Combined-Original-Signer.apk --dex2jar dex2jar/dex-tools-v2.4 --out cobra-prior29-host --prior-button-reproduction
+      - name: Execute selected before/after visual button presses and icon checks
         run: |
           set -euo pipefail
           mvn -B -q -f cobra-host/pom.xml dependency:resolve
           python3 - <<'PYCODE'
           from pathlib import Path
           from zipfile import ZipFile
-          for folder in ['cobra-host','cobra-baseline-host']:
+          for folder in ['cobra-host','cobra-prior29-host']:
               for artifact,name in [('monitor','monitor.jar'),('espresso-idling-resource','espresso.jar')]:
                   archives=list((Path.home()/'.m2/repository/androidx/test').rglob(artifact+'-*.aar'))
                   assert len(archives)==1
                   with ZipFile(archives[0]) as z:(Path(folder)/'android-test-libs'/name).write_bytes(z.read('classes.jar'))
           PYCODE
-          mvn -B -q -f cobra-host/pom.xml test 2>&1 | tee cobra-host/TEST-OUTPUT.txt
-          mvn -B -q -f cobra-baseline-host/pom.xml -Dcobra.measure.baseline=true test 2>&1 | tee cobra-baseline-host/TEST-OUTPUT.txt
+          python3 repairs/cobra-next-from-2103427/focused_host_checks.py --candidate cobra-host --previous cobra-prior29-host
+          python3 -m unittest discover -s repairs/cobra-next-from-2103427/icon -p test_resources.py -v 2>&1 | tee cobra-host/ICON-RESOURCE-CHECKS.txt
       - name: Verify exact unchanged code and prepare immutable owners (no APK signing)
         run: |
           python3 repairs/cobra-next-from-2103427/package_owners.py --bundles baseline-components --work cobra-build --jars tools/receipt-evidence/tool-jars --out prepared-owners/components --source "$GITHUB_SHA"
+      - name: Independent Android resource parser on exact unsigned assembled components
+        run: |
+          set -euo pipefail
+          python3 - <<'PYCODE'
+          from pathlib import Path
+          import sys
+          sys.path.insert(0,'repairs/dual-experience-isolation-2103420')
+          from component_bundles import combine
+          from inventory import load
+          combine(Path('prepared-owners/components'),load(Path('prepared-owners/components/catalog.json')),Path('prepared-owners/combined-unsigned.apk'),2103430)
+          PYCODE
+          "$ANDROID_HOME/build-tools/35.0.0/aapt2" dump resources prepared-owners/combined-unsigned.apk > prepared-owners/ANDROID-RESOURCE-TABLE.txt
+          "$ANDROID_HOME/build-tools/35.0.0/aapt2" dump xmltree prepared-owners/combined-unsigned.apk --file res/infinity_launcher_light_v26.xml > prepared-owners/ANDROID-ICON-V26.txt
+          "$ANDROID_HOME/build-tools/35.0.0/aapt2" dump xmltree prepared-owners/combined-unsigned.apk --file res/infinity_launcher_light_v33.xml > prepared-owners/ANDROID-ICON-V33.txt
+          python3 repairs/cobra-next-from-2103427/icon/resources.py --baseline baseline/Infinity-2103427-Combined-Original-Signer.apk --verify prepared-owners/combined-unsigned.apk > prepared-owners/ICON-APK-VERIFICATION.json
       - uses: actions/upload-artifact@v4
         with:
           name: Cobra-Prepared-Owners-${{ github.run_id }}
@@ -114,12 +136,18 @@ jobs:
           path: |
             cobra-host/INPUTS.json
             cobra-host/TEST-OUTPUT.txt
+            cobra-host/FOLLOWUP-RESULT.json
+            cobra-host/ICON-RESOURCE-CHECKS.txt
             cobra-host/target/surefire-reports/
-            cobra-baseline-host/INPUTS.json
-            cobra-baseline-host/TEST-OUTPUT.txt
-            cobra-baseline-host/target/surefire-reports/
+            cobra-prior29-host/INPUTS.json
+            cobra-prior29-host/TEST-OUTPUT.txt
+            cobra-prior29-host/target/surefire-reports/
             cobra-build/BUILD.json
             prepared-owners/CORRECTIVE-PRESERVATION.json
+            prepared-owners/ANDROID-RESOURCE-TABLE.txt
+            prepared-owners/ANDROID-ICON-V26.txt
+            prepared-owners/ANDROID-ICON-V33.txt
+            prepared-owners/ICON-APK-VERIFICATION.json
           retention-days: 90
           if-no-files-found: error
   cobra-android:

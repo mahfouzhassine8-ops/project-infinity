@@ -20,7 +20,7 @@ from inventory import load,file_sha,save,APP
 from component_bundles import read_bundle
 from compile_runtime import ANDROID_SHA,D8_SHA
 
-VERSION='2103429.cobra.1'
+VERSION='2103430.cobra.1'
 HELPER=APP+'CobraArrange;'
 PRESENT=APP+'CobraPresentation;'
 ACTIVITY=APP+'InfinityLiveActivity;'
@@ -66,12 +66,20 @@ def patch_activity(text):
         return s.replace(anchor,anchor+'\n\n    invoke-static {p0, p1, v0}, '+HELPER+'->addActions(Landroid/app/Activity;Landroid/widget/LinearLayout;Ljava/lang/String;)V',1)
     update('showCobraMultiTileActions',actions)
     def preview(s):
+        full='    move-result-object v9\n\n    .line 2286'
+        assert s.count(full)==1
+        s=s.replace(full,'    move-result-object v9\n\n    const-string v10, "cobra_preview_fullscreen"\n\n    invoke-virtual {v9, v10}, Landroid/view/View;->setTag(Ljava/lang/Object;)V\n\n    .line 2286',1)
         anchor='    invoke-virtual {v0, p2, p1}, '+APP+'InfinityLiveActivity$CobraSix;->previewButton(Landroid/widget/LinearLayout;Landroid/widget/FrameLayout;)V'
         assert s.count(anchor)==1
         s=s.replace(anchor,anchor+'\n\n    invoke-static {p0, p2}, '+PRESENT+'->moreLast(Landroid/app/Activity;Landroid/widget/LinearLayout;)V',1)
         assert s.count('    return-object p1')==2
         return s.replace('    return-object p1','    invoke-static {p0, p1}, '+PRESENT+'->previewReused(Landroid/app/Activity;Landroid/widget/FrameLayout;)V\n\n    return-object p1')
     update('cobraPreviewPanel',preview)
+    def pro_control(s):
+        anchor='    invoke-virtual {v1, p1}, Landroid/view/ViewGroup;->getChildAt(I)Landroid/view/View;\n\n    move-result-object p1'
+        assert s.count(anchor)==1
+        return s.replace(anchor,'    invoke-static {v1, p1}, '+PRESENT+'->proTarget(Landroid/view/ViewGroup;I)Landroid/view/View;\n\n    move-result-object p1\n\n    if-eqz p1, :cond_a',1)
+    update('cobraProControl',pro_control)
     def position(s):
         head=s.split('\n',1)[0]
         return head+'''

@@ -9,11 +9,39 @@ from inventory import load,save,file_sha,canonical
 from component_bundles import read_bundle,record
 from release_gate import component_digest,require
 from review_ownership import class_owner
+sys.path.insert(0,str(HERE/'icon'))
+from resources import expected_resources,verify_resources,read_members,NEW_PATHS
+
+def package_icon_owner(original_path,row,dest,source):
+    """Keep shared executable/native/manifest/artwork bytes; add icons only."""
+    old=read_bundle(original_path,row);meta=copy.deepcopy(old)
+    original=read_members(original_path);updated=expected_resources(original)
+    proof=verify_resources(original|updated,original)
+    meta.update(version='isolation-contract.1.launcher-icons.2103430',approved_source=source)
+    with ZipFile(original_path) as before,ZipFile(dest,'w') as target:
+        for name in meta['dex']:
+            target.writestr(record(name),before.read(name))
+        for name in sorted(set(meta['members'])|set(NEW_PATHS)):
+            raw=updated[name] if name in updated else before.read('payload/'+name)
+            if name in updated:
+                if name not in meta['members']:
+                    meta['members'][name]={'compress_type':8 if name.endswith('.xml') else 0,'external_attr':0o100644<<16}
+                meta['members'][name]['sha256']=sha(raw)
+                meta['payload']['member:'+name]={'owner':'MINIMAL_ANDROID_CONTRACT','sha256':sha(raw)}
+            target.writestr(record('payload/'+name),raw)
+        meta['digest']=component_digest(meta['payload'],'MINIMAL_ANDROID_CONTRACT')
+        target.writestr(record('component.json'),canonical(meta))
+    revised={'file':row['file'],'sha256':file_sha(dest),**{k:meta[k] for k in ('version','digest','approved_source','settings_schema')}}
+    read_bundle(dest,revised)
+    require(meta['dex']==old['dex'],'FROZEN_SHARED_DEX')
+    require({k:v for k,v in old['payload'].items() if k!='member:resources.arsc'}==
+            {k:v for k,v in meta['payload'].items() if k!='member:resources.arsc' and k not in {'member:'+n for n in NEW_PATHS}},'FROZEN_NON_ICON_SHARED_PAYLOAD')
+    return revised,proof
 
 def package(bundles,work,jars,out,source):
     bundles,work,jars,out=(p.resolve() for p in (bundles,work,jars,out))
     require(re.fullmatch('[0-9a-f]{40}',source)!=None,'EXACT_SOURCE')
-    for path in [HERE/'build.py',HERE/'SOURCE-BUDGET.json',*sorted((HERE/'runtime').glob('*.java'))]:
+    for path in [HERE/'build.py',HERE/'package_owners.py',HERE/'SOURCE-BUDGET.json',*sorted((HERE/'runtime').glob('*.java')),*sorted((HERE/'icon').glob('*.py')),*sorted((HERE/'icon/reference').glob('*'))]:
         require(subprocess.check_output(['git','show',source+':'+str(path.relative_to(HERE.parents[1]))])==path.read_bytes(),'EXACT_COMMITTED_SOURCE:'+path.name)
     require(not out.exists(),'FRESH_OUTPUT');out.mkdir(parents=True)
     scope=load(HERE/'SCOPE.json')
@@ -63,14 +91,18 @@ def package(bundles,work,jars,out,source):
     require(set(old_methods)==set(new_methods),'EXACT_ACTIVITY_METHOD_SET')
     require({m for m in old_methods if old_methods[m]!=new_methods[m]}==set(selected),'UNCHANGED_ACTIVITY_METHODS')
     result=copy.deepcopy(catalog);result['source']=source
-    metadata=b'infinity.last_updated_in=2103427\ncobra.last_updated_in=2103429\n'
+    metadata=b'infinity.last_updated_in=2103427\ncobra.last_updated_in=2103430\n'
+    icon_proof=None
     for owner,row in catalog['bundles'].items():
         dest=out/row['file']
+        if owner=='MINIMAL_ANDROID_CONTRACT':
+            result['bundles'][owner],icon_proof=package_icon_owner(bundles/row['file'],row,dest,source)
+            continue
         if owner not in metas:
             require(file_sha(bundles/row['file'])==scope['frozen_owner_zips'][owner],'FROZEN_ZIP')
             shutil.copyfile(bundles/row['file'],dest);continue
         old=metas[owner];meta=copy.deepcopy(old)
-        meta.update(version=VERSION if owner=='COBRA' else '2103429.version-wording.1',approved_source=source)
+        meta.update(version=VERSION if owner=='COBRA' else '2103430.version-wording.1',approved_source=source)
         meta['payload']={k:v for k,v in old['payload'].items() if not k.startswith('class:')}
         meta['payload'].update({k:v for k,v in revised.items() if v['owner']==owner});meta['dex']={}
         with ZipFile(bundles/row['file']) as original,ZipFile(dest,'w') as target:
@@ -88,7 +120,7 @@ def package(bundles,work,jars,out,source):
     report=dict(status='EXACT_COBRA_DELTA_AND_VERSION_WORDING_VERIFIED',source=source,baseline=scope['baseline_source'],
         existing_classes_checked=len(originals),unchanged_existing_classes=len(originals)-len(changed),changed_existing_classes=sorted(changed),
         added_classes=sorted(new),selected_activity_methods=selected,unchanged_activity_methods=len(methods(baseline_texts[ACTIVITY]))-len(selected),
-        new_activity_fields=0,Infinity='EXACT_ZIP',minimal_Android='EXACT_ZIP',Pro_Six_reflow_player_services='EXACT_UNCHANGED_CLASS_OR_METHOD_BYTES',
+        new_activity_fields=0,Infinity='EXACT_ZIP',minimal_Android='EXACT_CLASSES_DEX_NATIVE_MANIFEST_AND_NONICON_MEMBERS; REVIEWED_ICON_RESOURCES_ONLY',Pro_Six_reflow_player_services='EXACT_EXCEPT_PINNED_PROCONTROL_IDENTITY_LOOKUP; ORIGINAL_ACTIONS_AND_PLAYER_BODY_PRESERVED',launcher_icons=icon_proof,
         shutdown='FROZEN_NOT_RUN',physical_Fold='PENDING',user_device_operations=False,component_catalog=result)
     save(out.parent/'CORRECTIVE-PRESERVATION.json',report)
     print(report['status'])

@@ -1,0 +1,16 @@
+{
+  "recorded_before_execution": true,
+  "correction": "Explicit launcher-resource-only MINIMAL_ANDROID_CONTRACT exception for consolidated Cobra repair and Infinity theme-aware icon",
+  "selected_host_test": "IconResourceGateTests",
+  "coverage": [
+    "Exact reviewed 2103429 to 2103430 icon-resource transition succeeds",
+    "Missing exception, wrong release, standalone target, changed protected contract or settings schema refuses",
+    "Shared classes, manifest, native libraries, original dark artwork, unrelated resources, member removal or reclassification refuse",
+    "Wrong or extra new icon path, missing source binding, changed original table or verifier input refuses",
+    "Fresh actual APK resource verification rejects table or icon payload tampering"
+  ],
+  "existing_selected_policy_controls": "Existing ReleaseGateTests (14 host negative controls) remain selected for source/signing policy regression",
+  "application_execution": "NOT_SELECTED_BY_THIS_FILE",
+  "shutdown": "NOT_SELECTED_NOT_RUN",
+  "physical_Fold": "NOT_RUN"
+}

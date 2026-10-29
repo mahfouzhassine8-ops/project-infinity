@@ -1,5 +1,5 @@
 {
-  "authorization": "User 2026-10-29: read and execute complete CODEX-FULL-COBRA-IMPLEMENTATION-20261028.md; explicit Cobra production, narrow chooser Version text/metadata, focused verification and one original-key consolidated delivery",
+  "authorization": "User 2026-10-29: implement BOTH P0-2103429-PLAYER-BUTTON-ACTION-MISMATCH and APPROVED-INFINITY-ICON-LIGHT-DARK; one next original-key combined install-over candidate; frozen Infinity2103427, shared executable/native/lifecycle/shutdown; explicit launcher resource-only exception",
   "full_brief_read_lines": 188,
   "full_brief_sha256": "040a9dc86e7b94cf6563b469873ff3a16ad8a1723adada6291cbacf11ab34718",
   "branch": "work/cobra-only-from-2103427-20261028",
@@ -7,18 +7,17 @@
   "baseline_run": 40769526963,
   "baseline_apk_sha256": "cd0c8ab5c77067e508baea0ad7d5207b3d6c73775b86387d4099a67cfe4215ca",
   "protected_ref": "lock/infinity-cobra-2103427-user-approved-20261028",
-  "candidate_versionCode": 2103429,
+  "candidate_versionCode": 2103430,
   "feature_owner": "COBRA",
   "frozen_owner_zips": {
-    "INFINITY": "16eeb91a24bf0cf99d558d9e3dd17aedfd127e9a1936dcce413341c48683cd6c",
-    "MINIMAL_ANDROID_CONTRACT": "6e93a1eb8e47f7fc9bc6f1dbc9208b555e2e62445ca2a3065d4e17a3b473ba33"
+    "INFINITY": "16eeb91a24bf0cf99d558d9e3dd17aedfd127e9a1936dcce413341c48683cd6c"
   },
   "chooser_exception": {
     "class": "ChooserReleaseMetadata",
     "change": "Only updated label const Last updated in -> Version; preserve installed footer and offline metadata parsing",
     "member": "assets/experience-component-updates.properties",
     "Infinity_last_updated": 2103427,
-    "Cobra_last_updated": 2103429
+    "Cobra_last_updated": 2103430
   },
   "initial_class_budget": {
     "COBRA": [
@@ -46,7 +45,7 @@
   "shutdown": "FROZEN_NOT_RUN",
   "user_device_operations": "NONE",
   "physical_acceptance": "USER_ONLY_PENDING",
-  "selected_runtime_journey": "One exact signed baseline Cobra Activity launch on a fresh disposable Android17 API37.1 emulator; no Infinity, shutdown, app restart/reset or user-device operation",
+  "selected_runtime_journey": "Exact signed next candidate only: focused normal-UI source playback/Pro control buttons and Android system day/night launcher resource/appearance switching; no Infinity launch, shutdown, app reset/uninstall or userdevice operation",
   "selected_host_classes": [
     "CobraArrangeIntegrationTest",
     "CobraMeasuredReflowTest",
@@ -64,5 +63,52 @@
     "source": "cc470f81b65defc86bb00186fe8c0ae6425cad70",
     "run": 40810155686,
     "reason": "Final review reproduced logo completion lost across temporary detach/reattach; baseline passes,28 fails; corrected before final delivery"
+  },
+  "followup_briefs": {
+    "P0-2103429-PLAYER-BUTTON-ACTION-MISMATCH-20261029.md": {
+      "lines": 46,
+      "sha256": "71e15a68ece8d41d14c4699eed473eb3c94938c66efc65cb771af5b4a23a5cad",
+      "read_entirely_before_implementation": true
+    },
+    "APPROVED-INFINITY-ICON-LIGHT-DARK-20261029.md": {
+      "lines": 48,
+      "sha256": "cb82b470cd19fc8f91d74355ffc0404dea62bd63c94a5a3f5561be27496ead93",
+      "read_entirely_before_implementation": true
+    }
+  },
+  "launcher_icon_exception": {
+    "owner": "MINIMAL_ANDROID_CONTRACT",
+    "allowed": "Only actual launcher artwork and day/night resource-table entries; retain manifest launcher/icon IDs and original dark artwork bytes. Exact files/IDs and semantic preservation bound in reviewed icon budget before packaging. All MIN classes/native/persistence/shared behavior unchanged.",
+    "prohibited": "No alias/component toggling, no changed app identity/startup/chooser/other app icons",
+    "brief": "APPROVED-INFINITY-ICON-LIGHT-DARK-20261029.md"
+  },
+  "selected_followup_checks": [
+    "CobraPlayerButtonDispatchTest: old signed29 actual Hero coordinate dispatch reproduction; next candidate Fullscreen/PiP/More separation with scroll/clippededge/remote and initial/retained Pro mode entry; actual native terminal callbacks observed",
+    "Existing actualPreviewReuseKeepsCallbacksAndRestoresProOrder, moreMovesOnlyItselfAndProOrderRestoresOnRetainedPreview and original Pro/Sports ordering: focused adjacent regression only; preserve old suite/evidence",
+    "Icon resource-ID/manifest and all nonicon table/value/member preservation; original dark artwork byte hashes, light exact original foreground silhouette and white/black colors, real Android uiMode switch/fresh launcher observation where available; OS launcher cache/monochrome limits disclosed",
+    "Icon-only shared-resource release-authority negative controls plus existing owner/signature/manifest/source/integrity controls; no shutdown tests",
+    "Exactly one signed next combinedAPK matching4ownerZIPs, immutable Infinity27 ZIP, minimal resource-only delta, original cert and install-over version identity"
+  ],
+  "selected_followup_recorded_before_execution": true,
+  "selected_host_classes_followup": [
+    "CobraPlayerButtonDispatchTest",
+    "CobraArrangeIntegrationTest#moreMovesOnlyItselfAndProOrderRestoresOnRetainedPreview+actualPreviewReuseKeepsCallbacksAndRestoresProOrder+existingProSportsAndOtherModeStripsKeepTheirExactOrder"
+  ],
+  "previous_signed_candidate": {
+    "versionCode": 2103429,
+    "source": "f2b76fb76ad4edd87197f9521347295b4e612f26",
+    "run": 40818697397,
+    "sha256": "ad5728d0b884b77cb90a8fc53a0a6e2360b4e9a2506e370db3a4d23b99222977",
+    "status": "USER_REPORTED_BUTTON_DEFECT; unaccepted"
+  },
+  "baseline_owner_zips": {
+    "INFINITY": "16eeb91a24bf0cf99d558d9e3dd17aedfd127e9a1936dcce413341c48683cd6c",
+    "MINIMAL_ANDROID_CONTRACT": "6e93a1eb8e47f7fc9bc6f1dbc9208b555e2e62445ca2a3065d4e17a3b473ba33"
+  },
+  "selected_icon_checks": {
+    "offline": "icon/test_resources.py:9selected resource/parser/bitmap checks",
+    "gate": "test_release_gate.IconResourceGateTests:8 new plus14existing owner/signature controls",
+    "android_format": "build-tools35aapt2 dump resources and XMLtree on actual assembled unsigned candidate before original signing",
+    "runtime": "Exact signed430 systemday/night configuration resource lookup and Launcher3appdrawer screenshots; normalUIPro buttons actualPiP/fullscreen/More asavailable; no phoneoperations"
   }
 }

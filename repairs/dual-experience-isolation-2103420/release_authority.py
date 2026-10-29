@@ -14,6 +14,14 @@ GUARDED_ROOTS=('InfinityJavaPersistence','InfinityJavaWriteBarrier','CobraJavaPe
                'CombinedDurability','OwnerDurabilityWiring','CobraRuntimeLease',
                'InfinityCloseGuardService','InfinityCloseNativeLease')
 
+def launcher_icon_guard():
+    """Fixed reviewed implementation; authority data cannot select executable code."""
+    import importlib.util
+    path=HERE.parent/'cobra-next-from-2103427/icon/release_guard.py'
+    spec=importlib.util.spec_from_file_location('_infinity_launcher_icon_release_guard',path)
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+    return module
+
 def guarded(key):
     if not key.startswith('class:Lcom/projectinfinity/kodi/'):return False
     return key.split('/')[-1].split('$')[0].rstrip(';') in GUARDED_ROOTS
@@ -42,6 +50,8 @@ def validate(authority):
               (authority.get('guard_schema',1)==2 or '/InfinityCloseNativeLease' not in k)}
     require(bool(expected) and authority.get('protected_contract')==expected,'PROTECTED_CONTRACT')
     require(authority.get('accepted_pointer_updated') is False,'PHYSICAL_ACCEPTANCE_REQUIRED')
+    if 'launcher_icon_exception' in authority:
+        launcher_icon_guard().validate(authority)
     # The three displayed labels come from actual packaged metadata, not UI constants.
     # The third (app) version is read from Android's signed PackageInfo.
     labels=authority.get('experience_version_labels')
@@ -80,7 +90,16 @@ def transition(previous,proposed,targets):
         require(all(proposed['protected_contract'].get(k)==v for k,v in previous['protected_contract'].items()),
                 'EVIDENCE_REFRESH_WEAKENED_CONTRACT')
         return True
-    require(bool(targets) and targets<={'INFINITY','COBRA','CHOOSER_SHELL'},'SEPARATE_SHARED_SCOPE_REQUIRED')
+    require(bool(targets) and targets<=set(OWNED),'SEPARATE_SHARED_SCOPE_REQUIRED')
+    if 'MINIMAL_ANDROID_CONTRACT' in targets:
+        # The current user explicitly authorized only launcher artwork and safe
+        # day/night resource selection.  All shared executable/native/manifest
+        # and unrelated resource bytes remain subject to the original freeze.
+        launcher_icon_guard().transition(previous,proposed,targets)
+    else:
+        require(targets<={'INFINITY','COBRA','CHOOSER_SHELL'},'SEPARATE_SHARED_SCOPE_REQUIRED')
+        require(proposed.get('launcher_icon_exception')==previous.get('launcher_icon_exception'),
+                'ICON_EXCEPTION_REQUIRES_EXPLICIT_RESOURCE_TARGET')
     # A chooser-only update is independent of both experience owners and the
     # durability contract. Last-updated numbers must follow owner changes.
     prior_labels=previous.get('experience_version_labels')
@@ -149,4 +168,6 @@ def verify_evidence(authority,read):
         else:
             require(digest(read(base+name))==sha,'MATRIX_PROOF_SOURCE_CHANGED:'+name)
     require(digest(read('.github/workflows/infinity-combined-release.yml'))==authority['workflow_sha256'],'SIGNING_WORKFLOW_CHANGED')
+    if 'launcher_icon_exception' in authority:
+        launcher_icon_guard().verify_evidence(authority,read)
     return True

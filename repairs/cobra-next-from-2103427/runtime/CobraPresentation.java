@@ -46,4 +46,13 @@ public final class CobraPresentation {
     if(root!=null){View controls=root.findViewWithTag("cobra_preview_controls");
       if(controls instanceof LinearLayout)moreLast(owner,(LinearLayout)controls);}
   }
+  /** Pro's visible actions use the legacy logical indices of the hidden native
+   * preview controls. Resolve the two moved controls by identity, not position;
+   * this never changes presentation order or invokes a player/menu callback. */
+  public static View proTarget(ViewGroup row,int originalIndex){
+    if(row==null)return null;
+    if(originalIndex==4)return row.findViewWithTag("cobra_preview_options_anchor");
+    if(originalIndex==5)return row.findViewWithTag("cobra_preview_fullscreen");
+    return row.getChildAt(originalIndex);
+  }
 }

@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       operation:
-        description: Sign the reviewed Cobra2103429 combined owner vector
+        description: Sign both reviewed2103430 button and launcher-icon corrections
         type: choice
         required: true
         default: final-combined
@@ -50,6 +50,7 @@ jobs:
           for name in Path('release-evidence/CHANGED-PATHS.txt').read_text().splitlines():
               if not (name.startswith('repairs/cobra-next-from-2103427/') or name in (
                   'repairs/dual-experience-isolation-2103420/release_gate.py',
+                  'repairs/dual-experience-isolation-2103420/release_authority.py',
                   'repairs/dual-experience-isolation-2103420/ownership-reviewed-roots.json',
                   'repairs/dual-experience-isolation-2103420/test_release_gate.py',
                   'repairs/dual-experience-isolation-2103420/release-authority.json',
