@@ -25,7 +25,7 @@ def journey(out):
   return list(ET.fromstring(raw).iter('node'))
  def labels(nodes):return [n.get('text','') or n.get('content-desc','') for n in nodes]
  def find(pattern,nodes):
-  for n in nodes:
+  for n in reversed(nodes):
    if re.search(pattern,n.get('text','')) or re.search(pattern,n.get('content-desc','')):
     b=bounds(n)
     if len(b)==4 and b[2]>b[0] and b[3]>b[1]:return n
@@ -69,8 +69,12 @@ def journey(out):
    adb('shell','input','text',value);steps.append({'filled_field':index})
   tap('^TEST & SAVE$')
   nodes=wait('QA 1|CobraQA',15)
-  if find('^QA 1$',nodes) is None:tap('CobraQA')
-  tap('^QA 1$');time.sleep(2);shot('one-channel');tap('^Fullscreen$');time.sleep(1);tap('^Multi-View$');tap('^All$');tap('^QA 2$');time.sleep(2);shot('two-playing')
+  # Source validation can already open fullscreen. Its covered Guide remains
+  # in the accessibility tree; never click that background's QA1/details row.
+  if find('^Multi-View$',nodes) is None:
+   if find('^QA 1,',nodes) is None:tap('CobraQA')
+   tap('^QA 1,');time.sleep(2);tap('^Fullscreen$')
+  shot('one-channel');tap('^Multi-View$');wait('^Pick a second screen$');tap('^All$');tap('^QA 2$');time.sleep(2);shot('two-playing')
   for name in ['50/50','Picture in Picture — Bottom Right','Picture in Picture — Bottom Left','Picture in Picture — Top Right','Picture in Picture — Top Left']:arrangement(name,2)
   arrangement('50/50',2);boxes=panes();assert len(boxes)>=2
   boxes=sorted(boxes[:2],key=lambda b:(b[1],b[0]));a,b=center(boxes[0]),center(boxes[1])
