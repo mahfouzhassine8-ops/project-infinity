@@ -4,23 +4,23 @@
 
 **PRIORITY: CRITICAL. This is one comprehensive Cobra production assignment, NOT an audit-only request.**
 
-**Repository:** \`mahfouzhassine8-ops/project-infinity\`  
-**EXISTING engineering branch:** \`work/cobra-only-from-2103427-20261028\`  
-**APPROVED, FROZEN combined baseline:** \`lock/infinity-cobra-2103427-user-approved-20261028\`  
-**Exact signed-source commit:** \`782242090483982c39a78f9c4da932a4751bdafc\`  
-**Signed baseline build:** GitHub Actions \`40769526963\`  
-**Baseline APK:** \`Infinity-2103427-Combined-Original-Signer.apk\`  
-**Baseline APK SHA256:** \`cd0c8ab5c77067e508baea0ad7d5207b3d6c73775b86387d4099a67cfe4215ca\`  
-**Cobra component last updated:** \`2103423\`  
-**Frozen Infinity component last updated:** \`2103427\`  
+**Repository:** `mahfouzhassine8-ops/project-infinity`  
+**EXISTING engineering branch:** `work/cobra-only-from-2103427-20261028`  
+**APPROVED, FROZEN combined baseline:** `lock/infinity-cobra-2103427-user-approved-20261028`  
+**Exact signed-source commit:** `782242090483982c39a78f9c4da932a4751bdafc`  
+**Signed baseline build:** GitHub Actions `40769526963`  
+**Baseline APK:** `Infinity-2103427-Combined-Original-Signer.apk`  
+**Baseline APK SHA256:** `cd0c8ab5c77067e508baea0ad7d5207b3d6c73775b86387d4099a67cfe4215ca`  
+**Cobra component last updated:** `2103423`  
+**Frozen Infinity component last updated:** `2103427`  
 **Acceptance hardware:** Samsung Galaxy Fold 8 Ultra, Android 17 / API 37, cover/inner screen, portrait/landscape, relevant split/window layouts.  
 **Recommended model:** GPT-6.1 Sol, High; selectively use higher effort for difficult player/video-surface and drag concurrency questions rather than automatically switching to Astra.
 
 ## 1. Start from the existing architecture, NEVER restart
 
-Continue the current Cobra branch. Read \`AGENTS.md\`, \`docs/INFINITY-FOCUSED-TESTING-POLICY.md\`, \`repairs/cobra-next-from-2103427/START-HERE.md\`, the current signed Cobra owner inventory, and the owner/combined-release/signer contracts under \`repairs/dual-experience-isolation-2103420/\`.
+Continue the current Cobra branch. Read `AGENTS.md`, `docs/INFINITY-FOCUSED-TESTING-POLICY.md`, `repairs/cobra-next-from-2103427/START-HERE.md`, the current signed Cobra owner inventory, and the owner/combined-release/signer contracts under `repairs/dual-experience-isolation-2103420/`.
 
-Inspect the **actual signed 2103427 APK/component bundle**, not a rejected historical patch, before deciding what exists. Relevant history includes \`repairs/cobra-all-layout-fold-reflow-20261027/\`, \`repairs/dual-experience-isolation-2103420/DELIVERY.md\`, and \`repairs/cobra-clean-restart/DELIVERY-2103372.md\`. Prior tests may prove a historic candidate only; confirm presence in the current signed Cobra payload.
+Inspect the **actual signed 2103427 APK/component bundle**, not a rejected historical patch, before deciding what exists. Relevant history includes `repairs/cobra-all-layout-fold-reflow-20261027/`, `repairs/dual-experience-isolation-2103420/DELIVERY.md`, and `repairs/cobra-clean-restart/DELIVERY-2103372.md`. Prior tests may prove a historic candidate only; confirm presence in the current signed Cobra payload.
 
 The user likes **Cobra's current Multi-View behavior**. Preserve and extend that system: its windows, channel picker, layout selector, streams, Fit/Fill, audio selection, fullscreen, PiP, focus, and Pro Sports functionality. Do not replace working players or impose one mode's visual identity on another.
 
@@ -56,21 +56,21 @@ Maintain the existing player and layout engine; add missing presentation choices
 Supported simultaneous player capacity remains **one to four**. The eleven multi-player arrangement choices are:
 
 **Two screens (5)**
-1. \`50/50\` — two equally sized panes.
-2. \`Picture in Picture — Bottom Right\`.
-3. \`Picture in Picture — Bottom Left\`.
-4. \`Picture in Picture — Top Right\`.
-5. \`Picture in Picture — Top Left\`.
+1. `50/50` — two equally sized panes.
+2. `Picture in Picture — Bottom Right`.
+3. `Picture in Picture — Bottom Left`.
+4. `Picture in Picture — Top Right`.
+5. `Picture in Picture — Top Left`.
 
 **Three screens (3)**
-6. \`Main + Two\` — one primary and two small panes.
-7. \`Main + Two Overlays\` — primary with two in-app floating overlays.
-8. \`Three Columns\` — three side-by-side panes.
+6. `Main + Two` — one primary and two small panes.
+7. `Main + Two Overlays` — primary with two in-app floating overlays.
+8. `Three Columns` — three side-by-side panes.
 
 **Four screens (3)**
-9. \`2×2 Grid\`.
-10. \`Main + Three\`.
-11. \`Main + Three Overlays\`.
+9. `2×2 Grid`.
+10. `Main + Three`.
+11. `Main + Three Overlays`.
 
 Single-player behavior stays exactly as supported and is not counted as a twelfth Multi-View layout. Do not invent five-plus simultaneous players. The in-app PiP-like overlays are NOT Android system PiP and must not break system PiP.
 
@@ -82,11 +82,11 @@ Preserve existing per-layout player order, Fit/Fill, selected audio, controls, s
 
 ### C1. Press-hold and swap panes
 
-Example: \`1 | 2 | 3\`; hold pane 3, drag it onto pane 1, release; resulting pane order \`3 | 2 | 1\`. Positions swap, while the underlying channel/player sessions keep running. The user can swap any valid pair of active panes, including from layouts with primary/secondary regions. Preserve audio focus/selection unless explicitly changed, stream IDs, playback position, timeshift, buffer, caption and paused state. Maintain correct controls, touch targets and focus with the moved session.
+Example: `1 | 2 | 3`; hold pane 3, drag it onto pane 1, release; resulting pane order `3 | 2 | 1`. Positions swap, while the underlying channel/player sessions keep running. The user can swap any valid pair of active panes, including from layouts with primary/secondary regions. Preserve audio focus/selection unless explicitly changed, stream IDs, playback position, timeshift, buffer, caption and paused state. Maintain correct controls, touch targets and focus with the moved session.
 
 ### C2. Drag to transform layouts
 
-Example: from \`Three Columns\`, hold screen 3 and move into a highlighted main-screen target; on release use \`Main + Two\`, with screen 3 as main and 1/2 in the smaller positions. Map valid targets to appropriate transitions among the existing 2-, 3- and 4-screen arrangements. Do not offer mathematically impossible or unauthorized target placements. Keep the regular 11-layout picker as an equally valid alternative.
+Example: from `Three Columns`, hold screen 3 and move into a highlighted main-screen target; on release use `Main + Two`, with screen 3 as main and 1/2 in the smaller positions. Map valid targets to appropriate transitions among the existing 2-, 3- and 4-screen arrangements. Do not offer mathematically impossible or unauthorized target placements. Keep the regular 11-layout picker as an equally valid alternative.
 
 **Distinguish**: simple swap onto a pane; promote-to-main or placement-zone layout transformation; cancellation/invalid drop. The outcome must be predictable and not accidentally select a different channel or stop a stream.
 
@@ -96,18 +96,18 @@ Example: from \`Three Columns\`, hold screen 3 and move into a highlighted main-
 - Show valid targets and a live placement preview; release snaps to chosen layout, cancel/offscreen/gesture interruption restores prior arrangement.
 - Support touch event cancellation, simultaneous pointers, rotation/fold during drag, missing/stopped stream, stale video generation, and tiny cover-screen touch areas.
 - Avoid duplicate listeners and unbounded animation/layout loops; do not repeatedly recreate ExoPlayer or its existing session. Rebind a surface only where the existing supported implementation requires it, proving stable playback.
-- In remote/non-touch modes, offer an accessible equivalent \`Move Screen\` / \`Arrange Screen\` action using existing focus/navigation rather than inventing unsupported touch input.
+- In remote/non-touch modes, offer an accessible equivalent `Move Screen` / `Arrange Screen` action using existing focus/navigation rather than inventing unsupported touch input.
 - Preserve Pro's existing layouts, other controls and Pro Sports context. Don't redesign the player UI.
 
 ## 6. Mandatory workstream D — Fold, rotation and window reflow
 
 The current 2103427 Cobra owner includes the previous 2103423 measured-window resize correction for 1–4 players. **Preserve it; fix only identified gaps.** Verify cover→inner, inner→cover, portrait↔landscape, split/multiwindow/popup resize, fullscreen↔Multi-View, supported PiP return, adding/removing/enlarging panes, drag transforms, mode switching and background return.
 
-Use current measured bounds, insets/density, proper parent/video/overlay/control hit rectangles; don't use stale cover pixel dimensions or rely only on \`onConfigurationChanged\`. Fit may letterbox correctly, Fill may crop per existing policy, but neither may distort video. No left-strip stale-size canvas, clipped controls, unused black parent region due to incorrect layout, wrong input mapping, unwanted audio change or stream restart. Preserve channel order/selection, focus, all player sessions, buffer/timeshift and paused state. Compare actual geometry and session identities before/after.
+Use current measured bounds, insets/density, proper parent/video/overlay/control hit rectangles; don't use stale cover pixel dimensions or rely only on `onConfigurationChanged`. Fit may letterbox correctly, Fill may crop per existing policy, but neither may distort video. No left-strip stale-size canvas, clipped controls, unused black parent region due to incorrect layout, wrong input mapping, unwanted audio change or stream restart. Preserve channel order/selection, focus, all player sessions, buffer/timeshift and paused state. Compare actual geometry and session identities before/after.
 
 ## 7. Mandatory workstream E — Playback, PiP and audio reliability
 
-Inspect and correct **demonstrated Cobra-owned defects** in channel tuning, background/PiP return, mini/fullscreen, channel-picker mute retention, audio focus, paused panes, buffering/timeshift, Fit/Fill, caption state, session lifecycle and inappropriate fullscreen/player restoration. Explicit mute retention applies only to the previously approved fullscreen \`Channels\` tuning path; do not globally propagate mute across unrelated channel operations. Maintain platform PiP and existing in-app overlay separation.
+Inspect and correct **demonstrated Cobra-owned defects** in channel tuning, background/PiP return, mini/fullscreen, channel-picker mute retention, audio focus, paused panes, buffering/timeshift, Fit/Fill, caption state, session lifecycle and inappropriate fullscreen/player restoration. Explicit mute retention applies only to the previously approved fullscreen `Channels` tuning path; do not globally propagate mute across unrelated channel operations. Maintain platform PiP and existing in-app overlay separation.
 
 Prevent repeated player construction where re-layout is sufficient. Avoid speculatively patching shared codecs, native allocators, system player lifecycle or protected services.
 
@@ -130,12 +130,12 @@ Keep non-Sports Pro's pre-existing control set/order (with More at end); no Spor
 
 ## 10. Mandatory workstream H — Narrow Choose Your Experience VERSION wording exception
 
-The user explicitly authorizes replacing \`Last updated in\` underneath BOTH experience cards with the label \`Version\` and the respective actual release number. On the frozen 2103427 baseline the intended wording is:
-- Infinity: \`Version 2103427\`
-- Cobra: \`Version 2103423\`
-- Footer: \`App version 2103427\`
+The user explicitly authorizes replacing `Last updated in` underneath BOTH experience cards with the label `Version` and the respective actual release number. On the frozen 2103427 baseline the intended wording is:
+- Infinity: `Version 2103427`
+- Cobra: `Version 2103423`
+- Footer: `App version 2103427`
 
-For the eventual Cobra update, Infinity stays \`Version 2103427\`, Cobra displays its **actual newly published component update version**, and the footer displays the **actual new combined versionCode**. Use authenticated packaged offline metadata; do not hardcode incorrect future values.
+For the eventual Cobra update, Infinity stays `Version 2103427`, Cobra displays its **actual newly published component update version**, and the footer displays the **actual new combined versionCode**. Use authenticated packaged offline metadata; do not hardcode incorrect future values.
 
 **Everything else in the chooser is unchanged byte-for-byte if possible:** galaxy background, card/logo art, layout, sizing, fonts, colors, controls, focus, Ask Every Time, Just This Time, preferences and navigation. Changes to chooser-owned text/layout/metadata require an explicitly scoped original owner-aware gate; do not weaken it or silently cross protected shell boundaries.
 
@@ -162,7 +162,7 @@ Record changes and correction-specific selected tests before implementation, con
 3. Window: both fold directions, orientation, split/popup/fullscreen/PiP return, accurate parent/video/touch rectangles and live stream identity.
 4. More-last: non-Pro order, overflow and keyboard/remote/touch; Pro unchanged; Pro Sports exact order and capabilities.
 5. Pro: Stats, broadcast choices, versioned context, player behavior, Sports-only isolation, theme/header/ambient correctness.
-6. Chooser: ONLY text \`Version\` replacement and version-field binding; no layout, branding, preferences or selection behavior changes.
+6. Chooser: ONLY text `Version` replacement and version-field binding; no layout, branding, preferences or selection behavior changes.
 7. Performance: source-grounded before/after work counts, host benchmarks and—when an accessible real runtime exists—actual loading, frame timings, resource and thermal observations. Distinguish host, emulator, and physical Fold; report blocked paths honestly.
 8. Complete owner/member preservation and authenticated original-key combined-signing checks; **Infinity 2103427 exact**, unchanged Cobra segments, chooser exception narrowly bounded, shared runtime and shutdown exact.
 
@@ -170,10 +170,10 @@ Do NOT add or require shutdown tests, destructive installs, synthetic quota-driv
 
 ## 13. Engineering order and delivery contract
 
-1. Read this brief and \`START-HERE.md\`, the source owner/signer contracts and actual immutable signed 2103427 Cobra payload. Build a touched-file/member budget, exact source inventory, capability/requirement mapping and baseline evidence.
+1. Read this brief and `START-HERE.md`, the source owner/signer contracts and actual immutable signed 2103427 Cobra payload. Build a touched-file/member budget, exact source inventory, capability/requirement mapping and baseline evidence.
 2. Reuse all already correct Cobra functions (including 2103423 window reflow), implement only absent/new features and demonstrated defects. Focus on real production logic rather than documentation-only patches.
 3. Integrate and prove the new all-mode layout selector, drag swaps/transforms, session continuity, More-last non-Pro order, Pro preservation, narrow chooser wording and evidence-grounded end-to-end corrections.
-4. Conduct the independent final regression review and before/after measurement. Every original workstream and newly found defect receives an honest status: \`IMPLEMENTED AND VERIFIED\`, \`IMPLEMENTED — DEVICE ACCEPTANCE PENDING\`, \`BLOCKED — EXACT TECHNICAL REASON\`, or \`NOT YET IMPLEMENTED\`.
+4. Conduct the independent final regression review and before/after measurement. Every original workstream and newly found defect receives an honest status: `IMPLEMENTED AND VERIFIED`, `IMPLEMENTED — DEVICE ACCEPTANCE PENDING`, `BLOCKED — EXACT TECHNICAL REASON`, or `NOT YET IMPLEMENTED`.
 5. Prepare **ONE** consolidated next-version **original-key permanently signed, install-over combined APK** with preserved Infinity 2103427, updated Cobra, only authorized chooser wording/metadata, original package/certificate, matching owner ZIPs, APK/component SHA256s, exact source commit and GitHub Actions run. Never bypass the existing fail-closed owner, manifest, anti-rollback, source-authentication or signature gates.
 6. Deliver one candidate for user's real Fold acceptance, not repeated diagnostic APKs. No installation/uninstallation or migration on the user's device by Codex; no silent lock/promotion of an unaccepted new release. Keep 2103427 source and artifact rollback available.
 
