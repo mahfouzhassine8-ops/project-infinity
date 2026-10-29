@@ -1,0 +1,9 @@
+# Final native target measurement for the unchanged signed 2103431
+
+Selected before execution: repeat only the existing signed-431 two-P0 Android journey, using APK SHA256 `3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471` from signing run 40971769136. No build, signing, production mutation, user-device installation, shutdown, reset or lock promotion.
+
+Run 40973858059 installed the exact APK and passed native Fullscreen. After a measured More coordinate, Android entered PiP. The failed result remains preserved. The probe had tapped Hero to reveal controls **after** measuring that coordinate. The signed Hero applies visibility and requests layout on reveal; there is no final hierarchy/frame proving which view received the subsequent down event. Source inspection confirms the More identity resolves to its original menu listener, but cannot establish the actual received pointer target.
+
+The QA correction re-observes the native strip and intended button after the last reveal, then presses the fresh clipped bounds with no intervening reveal, scroll or screenshot. It records old/new bounds and measurement duration, and rejects observations exceeding 3.5 seconds within the original four-second visibility window. No application timer or generic deadline changes. A remaining wrong result will stay a failure and require further evidence; this correction does not presume the APK passes.
+
+Icon evidence from run 40973858059 is retained independently: actual Android App Info shows black-on-white in light mode and original navy/cyan in dark mode. Pixel Launcher All Apps initially shows the light variant and retains that bitmap after the dark switch, despite the correct dark framework/App Info selection. This is an observed launcher refresh limitation; Samsung surfaces remain unverified.

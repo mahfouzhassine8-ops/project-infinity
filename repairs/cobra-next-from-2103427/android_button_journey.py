@@ -231,11 +231,26 @@ def journey(out):
             target = snap.find('^'+re.escape(label)+'$', strip.iter('node'), enabled=True, clickable=True)
             if target is not None and positive(intersect(bounds(target), viewport)) and not (force_scroll and attempt == 0):
                 screenshot('before-'+label.lower())
-                # The original strip auto-hides after four seconds. Reveal
-                # immediately before using the measured hitbox; no navigation,
-                # configuration or scroll occurs between measurement and press.
+                # Revealing requests native layout. Never press the rectangle
+                # measured before that operation: re-observe the actual target
+                # afterwards, with no intervening reveal, scroll or screenshot.
                 reveal()
-                press_node(target, 'Pro '+label, viewport)
+                revealed_at = time.monotonic()
+                fresh = ui()
+                fresh_strip = fresh.strip()
+                assert fresh_strip is not None, 'Revealed Pro strip disappeared before final measurement'
+                fresh_viewport = bounds(fresh_strip)
+                fresh_target = fresh.find('^'+re.escape(label)+'$', fresh_strip.iter('node'),
+                                          enabled=True, clickable=True)
+                assert fresh_target is not None, 'Revealed Pro target missing: '+label
+                elapsed = time.monotonic()-revealed_at
+                assert elapsed < 3.5, 'Final target observation exceeded existing four-second visibility window'
+                steps.append({'final_post_reveal_measurement': label,
+                              'previous_bounds': list(bounds(target)),
+                              'current_bounds': list(bounds(fresh_target)),
+                              'viewport': list(fresh_viewport),
+                              'seconds_since_reveal': elapsed})
+                press_node(fresh_target, 'Pro '+label, fresh_viewport)
                 return
             y = (viewport[1]+viewport[3])//2
             inset = max(12, (viewport[2]-viewport[0])//8)
