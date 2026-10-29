@@ -53,7 +53,7 @@ def register(bundles,producer_run):
   proposed['bundle_sources'][owner]=dict(run_id=40769526963,build_source=scope['baseline_source'],artifact='Infinity-Combined-Owner-Components-40769526963',path=owner+'.zip')
  proposed['source_files']={n:file_sha(REPO/n) for n in previous['source_files']}
  proposed['workflow_sha256']=file_sha(REPO/'.github/workflows/infinity-combined-release.yml')
- proposed['owner_update_evidence']=dict(owner='COBRA',changed_owners=['COBRA','CHOOSER_SHELL'],producer_source=source,producer_run=producer_run,focused_host_run=producer_run,
+ proposed['owner_update_evidence']=dict(owner='COBRA',changed_owners=['COBRA','CHOOSER_SHELL','MINIMAL_ANDROID_CONTRACT'],producer_source=source,producer_run=producer_run,focused_host_run=producer_run,
   chooser_change='Preserved Version wording; genuine Cobra2103430 metadata only',changed_payload=sorted(changed|added),frozen_owners=['INFINITY'],
   minimal_owner_change='Only reviewed launcher-resource table/newlighticons; all classes,DEX,existingartwork/native/manifest/persistence frozen',
   protected_contract='EXACT',shutdown_tests='NOT_RUN',physical_Fold='PENDING',accepted_pointer_updated=False,authorization='repairs/cobra-next-from-2103427/P0-2103429-PLAYER-BUTTON-ACTION-MISMATCH-20261029.md',launcher_icon_authorization='repairs/cobra-next-from-2103427/APPROVED-INFINITY-ICON-LIGHT-DARK-20261029.md',tested_source_files={str(p.relative_to(REPO)):file_sha(p) for p in bound})
