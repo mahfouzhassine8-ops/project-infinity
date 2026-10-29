@@ -126,7 +126,7 @@ def journey(out):
 
     def ui():
         nonlocal sequence
-        adb('shell', 'uiautomator', 'dump', '/sdcard/cobra-button-qa.xml')
+        adb('shell', 'uiautomator', 'dump', '--compressed', '/sdcard/cobra-button-qa.xml')
         raw = adb('shell', 'cat', '/sdcard/cobra-button-qa.xml')
         sequence += 1
         (out/('%03d-ui.xml' % sequence)).write_text(raw)
@@ -218,39 +218,30 @@ def journey(out):
     def strip_press(label, direction='left', force_scroll=False):
         # Only scroll the real inline strip. Pointer positions are always
         # derived from its current bounds and intersected with its viewport.
+        if hero_box is not None:
+            reveal()
+        interacted_at = time.monotonic()
         for attempt in range(7):
-            if hero_box is not None:
-                reveal()
             snap = ui()
             strip = snap.strip()
             if strip is None:
-                time.sleep(.5)
+                reveal()
+                interacted_at = time.monotonic()
                 continue
             remember_hero(snap, strip)
             viewport = bounds(strip)
             target = snap.find('^'+re.escape(label)+'$', strip.iter('node'), enabled=True, clickable=True)
             if target is not None and positive(intersect(bounds(target), viewport)) and not (force_scroll and attempt == 0):
-                screenshot('before-'+label.lower())
-                # Revealing requests native layout. Never press the rectangle
-                # measured before that operation: re-observe the actual target
-                # afterwards, with no intervening reveal, scroll or screenshot.
-                reveal()
-                revealed_at = time.monotonic()
-                fresh = ui()
-                fresh_strip = fresh.strip()
-                assert fresh_strip is not None, 'Revealed Pro strip disappeared before final measurement'
-                fresh_viewport = bounds(fresh_strip)
-                fresh_target = fresh.find('^'+re.escape(label)+'$', fresh_strip.iter('node'),
-                                          enabled=True, clickable=True)
-                assert fresh_target is not None, 'Revealed Pro target missing: '+label
-                elapsed = time.monotonic()-revealed_at
+                # This hierarchy follows the last reveal OR strip gesture.
+                # No new input or expensive screenshot may move/expire it
+                # between measurement and the coordinate down event.
+                elapsed = time.monotonic()-interacted_at
                 assert elapsed < 3.5, 'Final target observation exceeded existing four-second visibility window'
-                steps.append({'final_post_reveal_measurement': label,
-                              'previous_bounds': list(bounds(target)),
-                              'current_bounds': list(bounds(fresh_target)),
-                              'viewport': list(fresh_viewport),
-                              'seconds_since_reveal': elapsed})
-                press_node(fresh_target, 'Pro '+label, fresh_viewport)
+                steps.append({'final_native_target_measurement': label,
+                              'bounds': list(bounds(target)),
+                              'viewport': list(viewport),
+                              'seconds_since_last_reveal_or_strip_gesture': elapsed})
+                press_node(target, 'Pro '+label, viewport)
                 return
             y = (viewport[1]+viewport[3])//2
             inset = max(12, (viewport[2]-viewport[0])//8)
@@ -258,6 +249,7 @@ def journey(out):
             a, b = (right, left) if direction == 'left' else (left, right)
             adb('shell', 'input', 'swipe', str(a), str(y), str(b), str(y), '350')
             steps.append({'scroll_pro_strip': direction, 'viewport': list(viewport)})
+            interacted_at = time.monotonic()
         raise RuntimeError('Pro strip action not observed: '+label+'; labels='+repr(snap.labels()))
 
     def pro_ready():
