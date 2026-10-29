@@ -1,0 +1,59 @@
+{
+  "status": "PASS_INDEPENDENT_DOWNLOADED_APK_AND_EXACT_BUNDLES",
+  "source": "f2b76fb76ad4edd87197f9521347295b4e612f26",
+  "signing_run": 40818697397,
+  "versionCode": 2103429,
+  "apk_sha256": "ad5728d0b884b77cb90a8fc53a0a6e2360b4e9a2506e370db3a4d23b99222977",
+  "apk_bytes": 778058476,
+  "component_sha256": {
+    "CHOOSER_SHELL.zip": "af8d781eb54c650472e9c20ae5ebacd63e4a0b928eb92d3fb92751c191ed8570",
+    "MINIMAL_ANDROID_CONTRACT.zip": "6e93a1eb8e47f7fc9bc6f1dbc9208b555e2e62445ca2a3065d4e17a3b473ba33",
+    "INFINITY.zip": "16eeb91a24bf0cf99d558d9e3dd17aedfd127e9a1936dcce413341c48683cd6c",
+    "COBRA.zip": "57994e8ce5621dfcdf846b24fc88206a1298ea03168cc301f157e7090c5a6253"
+  },
+  "original_certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "v1_v2_v3": "INDEPENDENT_APKSIG_API_VERIFIED",
+  "changed_members": [
+    "assets/experience-component-updates.properties",
+    "classes.dex",
+    "classes4.dex",
+    "classes5.dex"
+  ],
+  "manifest": "VERSION_CODE_ONLY",
+  "native_libraries_unchanged": 47,
+  "stored_native_16k_aligned": 3,
+  "all_stored_zip_members_4byte_aligned": true,
+  "ordered_DEX_exact": [
+    {
+      "apk": "classes.dex",
+      "owner": "CHOOSER_SHELL",
+      "sha256": "07b94bfde6dbc3e3a6bfc8436ea65e6a67bdef5ca868379809e20f2fb7ce8efb"
+    },
+    {
+      "apk": "classes2.dex",
+      "owner": "MINIMAL_ANDROID_CONTRACT",
+      "sha256": "2e8fa1ae27e670db0525d31a655e93d861893fa20316d5c54a4c6283a97ca304"
+    },
+    {
+      "apk": "classes3.dex",
+      "owner": "INFINITY",
+      "sha256": "7e18d8092de33a4d44e299305965e9b9eb943372a9643452f6f78afe209fb215"
+    },
+    {
+      "apk": "classes4.dex",
+      "owner": "COBRA",
+      "sha256": "4145273e03132b2214d3f657bb49dd028b8bdcb261bcc003ef3a961194aa13f1"
+    },
+    {
+      "apk": "classes5.dex",
+      "owner": "COBRA",
+      "sha256": "af03db41f53209de52f5d8609e411da49fee106d0fe544d6ea6e5d8230d88363"
+    }
+  ],
+  "frozen_protected_contract": true,
+  "frozen_Infinity_and_MIN_ZIPs": true,
+  "signed_source_equals_tested_source_files": true,
+  "original_Infinity_module_authentication": "OPENSSL_VERIFIED",
+  "physical_Fold": "NOT_RUN",
+  "shutdown": "NOT_RUN"
+}

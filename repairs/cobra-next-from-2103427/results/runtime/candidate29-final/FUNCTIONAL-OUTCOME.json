@@ -1,0 +1,258 @@
+{
+  "scope": "EXACT_SIGNED_COBRA_CANDIDATE_UI_ONLY_SYNTHETIC_STREAMS",
+  "physical_Fold": "NOT_RUN",
+  "shutdown": "NOT_RUN",
+  "steps": [
+    {
+      "tap": "ADD TV SOURCE"
+    },
+    {
+      "tap": "M3U / M3U8 playlist"
+    },
+    {
+      "filled_field": 0
+    },
+    {
+      "filled_field": 1
+    },
+    {
+      "tap": "^TEST & SAVE$"
+    },
+    {
+      "tap": "^Fullscreen$"
+    },
+    {
+      "tap": "^Multi-View$"
+    },
+    {
+      "tap": "^All$"
+    },
+    {
+      "tap": "^QA 2(?:\n|$)"
+    },
+    {
+      "scrolled_native_sheet": [
+        63,
+        570,
+        1016,
+        1830
+      ]
+    },
+    {
+      "tap": "^Multi-View layout$"
+    },
+    {
+      "tap": "^50/50$"
+    },
+    {
+      "applied_arrangement": "50/50",
+      "screen_count": 2
+    },
+    {
+      "scrolled_native_sheet": [
+        63,
+        570,
+        1016,
+        1830
+      ]
+    },
+    {
+      "tap": "^Multi-View layout$"
+    },
+    {
+      "tap": "^Picture\\ in\\ Picture\\ \u2014\\ Bottom\\ Right$"
+    },
+    {
+      "applied_arrangement": "Picture in Picture \u2014 Bottom Right",
+      "screen_count": 2
+    },
+    {
+      "scrolled_native_sheet": [
+        63,
+        570,
+        1016,
+        1830
+      ]
+    },
+    {
+      "tap": "^Multi-View layout$"
+    },
+    {
+      "tap": "^Picture\\ in\\ Picture\\ \u2014\\ Bottom\\ Left$"
+    },
+    {
+      "applied_arrangement": "Picture in Picture \u2014 Bottom Left",
+      "screen_count": 2
+    },
+    {
+      "scrolled_native_sheet": [
+        63,
+        570,
+        1016,
+        1830
+      ]
+    },
+    {
+      "tap": "^Multi-View layout$"
+    },
+    {
+      "tap": "^Picture\\ in\\ Picture\\ \u2014\\ Top\\ Right$"
+    },
+    {
+      "applied_arrangement": "Picture in Picture \u2014 Top Right",
+      "screen_count": 2
+    },
+    {
+      "scrolled_native_sheet": [
+        63,
+        570,
+        1016,
+        1830
+      ]
+    },
+    {
+      "tap": "^Multi-View layout$"
+    },
+    {
+      "tap": "^Picture\\ in\\ Picture\\ \u2014\\ Top\\ Left$"
+    },
+    {
+      "applied_arrangement": "Picture in Picture \u2014 Top Left",
+      "screen_count": 2
+    },
+    {
+      "scrolled_native_sheet": [
+        63,
+        570,
+        1016,
+        1830
+      ]
+    },
+    {
+      "tap": "^Multi-View layout$"
+    },
+    {
+      "tap": "^50/50$"
+    },
+    {
+      "applied_arrangement": "50/50",
+      "screen_count": 2
+    },
+    {
+      "actual_pixel_swap": {
+        "before": [
+          0,
+          1
+        ],
+        "after": [
+          1,
+          0
+        ]
+      }
+    },
+    {
+      "tap": "^Add screen$"
+    },
+    {
+      "tap": "^All$"
+    },
+    {
+      "tap": "^QA\\ 3(?:\n|$)"
+    },
+    {
+      "scrolled_native_sheet": [
+        63,
+        570,
+        1016,
+        1830
+      ]
+    },
+    {
+      "tap": "^Multi-View layout$"
+    },
+    {
+      "tap": "^Main\\ \\+\\ Two$"
+    },
+    {
+      "applied_arrangement": "Main + Two",
+      "screen_count": 3
+    },
+    {
+      "scrolled_native_sheet": [
+        63,
+        570,
+        1016,
+        1830
+      ]
+    },
+    {
+      "tap": "^Multi-View layout$"
+    },
+    {
+      "tap": "^Main\\ \\+\\ Two\\ Overlays$"
+    },
+    {
+      "applied_arrangement": "Main + Two Overlays",
+      "screen_count": 3
+    },
+    {
+      "scrolled_native_sheet": [
+        63,
+        570,
+        1016,
+        1830
+      ]
+    },
+    {
+      "tap": "^Multi-View layout$"
+    },
+    {
+      "tap": "^Three\\ Columns$"
+    },
+    {
+      "applied_arrangement": "Three Columns",
+      "screen_count": 3
+    },
+    {
+      "tap": "^Add screen$"
+    },
+    {
+      "tap": "^All$"
+    },
+    {
+      "tap": "^QA\\ 4(?:\n|$)"
+    },
+    {
+      "tap": "^Multi-View layout$"
+    },
+    {
+      "tap": "^2\u00d72\\ Grid$"
+    },
+    {
+      "applied_arrangement": "2\u00d72 Grid",
+      "screen_count": 4
+    },
+    {
+      "tap": "^Multi-View layout$"
+    },
+    {
+      "tap": "^Main\\ \\+\\ Three$"
+    },
+    {
+      "applied_arrangement": "Main + Three",
+      "screen_count": 4
+    },
+    {
+      "tap": "^Multi-View layout$"
+    },
+    {
+      "tap": "^Main\\ \\+\\ Three\\ Overlays$"
+    },
+    {
+      "applied_arrangement": "Main + Three Overlays",
+      "screen_count": 4
+    }
+  ],
+  "status": "PASS_LIVE_FIXTURE_ALL11_AND_RENDERED_SWAP_MOBILE",
+  "mode_limit": "Mobile actual Android; all5 modes host. No physical/decoder-state identity claim from pixels."
+}

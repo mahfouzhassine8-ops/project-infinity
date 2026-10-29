@@ -1,0 +1,74 @@
+{
+  "run": 40820333003,
+  "QA_source": "1c1efae281a750d9ceb4c09e9ba129f31dd9170c",
+  "artifact": 12874432974,
+  "artifact_sha256": "612447018fbf01bdbe67a3c792192aaba22f3acbc78aee92b6761abc9ebb95d3",
+  "APK_sha256": "ad5728d0b884b77cb90a8fc53a0a6e2360b4e9a2506e370db3a4d23b99222977",
+  "status": "PASS_SELECTED_LIVE_MOBILE_JOURNEY",
+  "visually_inspected": "All11 raw layout frames, before/after rendered swap and native four-screen menu inspected through labeled contact sheet; raw screenshots retained in official artifact",
+  "contact_sheet": "Derived labeled/downscaled evidence only; original frame hashes below",
+  "actual_UI": [
+    "Normal UI imports4 clearly synthetic HTTP M3U/video channels",
+    "All11 native layout choices applied in Mobile;2/3/4 actual video panes",
+    "Deliberate hold+movement swaps rendered QA1/QA2 colors; visible counters continue",
+    "Stationary hold opens original context menu; native Move/Arrange visible",
+    "4screen native menu inspected; max4 capacity/session identity and action callbacks also host verified"
+  ],
+  "app_player_log": {
+    "pid": 2669,
+    "Init_records": 4,
+    "Release_records": 0,
+    "scope": "Entire finite recorded journey;4 streams added; corroborates no player recreation during layout/swap, not a general lifecycle/leak test"
+  },
+  "welcome": {
+    "am_start_TotalTime_ms": 6836,
+    "am_start_WaitTime_ms": 6966,
+    "first_screen_observer_seconds": 12.564,
+    "PSS_KiB": 48991,
+    "RSS_KiB": 177236
+  },
+  "end_four_streams": {
+    "PSS_KiB": 119462,
+    "RSS_KiB": 277276,
+    "scope": "One final snapshot; no matched four-stream baseline or long-running leak/CPU/thermal conclusion"
+  },
+  "limits": [
+    "Mobile rendered Android only; all5 modes covered by actual-DEX host tests",
+    "Move/Arrange callback behavior verified on host; Android native actions visible, not remote-device acceptance",
+    "No direct Android player object instrumentation or full playback-state identity measurement",
+    "No physical Fold, system PiP, live provider/EPG, fold/split-window, FPS/CPU, battery/thermal acceptance"
+  ],
+  "physical_Fold": "NOT_RUN",
+  "Infinity": "NOT_LAUNCHED",
+  "shutdown": "NOT_RUN",
+  "raw_screenshot_sha256": {
+    "four-capacity-native-menu.png": "b9643ceb937d02c724d18a84cbb6a85e96250e6fb56fd33a3a90edacdf253d7d",
+    "last-screen.png": "217af4749612c71a214698c9b6e3995c0eb92942f7bb0d52d93bf4e98de08aa3",
+    "layout-2-50-50.png": "20d2f6a11d45b1a8b4239ec7259bcf7fb78cffc9176f7e4f9dedd3df8807cf1e",
+    "layout-2-Picture-in-Picture-\u2014-Bottom-Left.png": "94e21fd62a4073588c17753aa8a88d560d40a6dbb7238b61dd7ecfd81e15944a",
+    "layout-2-Picture-in-Picture-\u2014-Bottom-Right.png": "29887493dae8e443701f3c4bb629370c0c136339eb088eee44988cc08f790cc2",
+    "layout-2-Picture-in-Picture-\u2014-Top-Left.png": "0c7343778b7be7ebaec335694c9e04bb0be898c7b88a33f6cb1017c8cc256569",
+    "layout-2-Picture-in-Picture-\u2014-Top-Right.png": "4726f756320c1bd355f0f3fccfa1ba2a927b7b6d06cd78f2cc0188897ebdb3ae",
+    "layout-3-Main-+-Two-Overlays.png": "a649046fccd6ab1fc6eed44eb4fc6ed3691951d94ab583813323b34d9ec3c5a1",
+    "layout-3-Main-+-Two.png": "624044761723c18e1ed815d871b65c0ded5529284b7337e68d26dc5ac09309a9",
+    "layout-3-Three-Columns.png": "aeb35228ddc33bbdb9bcdf26b093b9d27dbef79710d29aacfff7db8c19da79fb",
+    "layout-4-2\u00d72-Grid.png": "d5bc95241d18ed0adfcd61fa718c934737a874f9b2c9509b5348db1ff325e1db",
+    "layout-4-Main-+-Three-Overlays.png": "fed0f8bb9c15d3934fd70e55d22892202a3d7bd94ffa0ec6c4459b9f2fb2268e",
+    "layout-4-Main-+-Three.png": "6bc0410caf135a8dcce659622c5a934602ca9fe3b8666da2fef7b204db5d9ca8",
+    "one-channel.png": "0df8484286684b7639026a1389c2b61c3242d26c31c24a954b259fa49ba0c4f2",
+    "picker-2\u00d72-Grid.png": "e786d43f45f58ddfa49a5ca8798c2a6783b05037f371a9763cfeb95a1845c207",
+    "picker-50-50.png": "56f5b0e6e7f9c2835d38630497a30aaaebf08fc99571daa30bdcc15a58882685",
+    "picker-Main-+-Three-Overlays.png": "ecec88c2843b3dc30a5e79300332f65882316f739052538e0dc46d0a6bdffc9b",
+    "picker-Main-+-Three.png": "2dda69e196841f10a2329b81190ba388107bc1d0c07048335d740e3fb13f7b50",
+    "picker-Main-+-Two-Overlays.png": "78db71f05c10a9f9c244de167b2a310800a9c0fd3e65a212417dc69b126bb6e3",
+    "picker-Main-+-Two.png": "828fd81a8804eced4206a13a0f7b3d3a3c4804592164d7697af00f992b6a85f6",
+    "picker-Picture-in-Picture-\u2014-Bottom-Left.png": "8ebc17c8da127a0e51740315d96495fc49829816321223a6925988de8659dce2",
+    "picker-Picture-in-Picture-\u2014-Bottom-Right.png": "8e78e1b4f69149c095daabd317a37001e475b594d05f317e10203d74a36c76e3",
+    "picker-Picture-in-Picture-\u2014-Top-Left.png": "4afb50d243a4018ed626ffc09343b838331274c309dc769b10847560b70e86f5",
+    "picker-Picture-in-Picture-\u2014-Top-Right.png": "8e2a42fb866c3431763d95d2f5dda6402915a069263b659b77e5ea95647baab4",
+    "picker-Three-Columns.png": "0bb021e847834a9a4d5e47d86e8667b00d631c301f0c9cec5acd5d244c1c6aef",
+    "swap-after.png": "96a11d8ae4ae385086f8e107e010903a5f019c6933ed5afcfb2b1a5a97473c3c",
+    "swap-before.png": "59b4c3c4f3232925820a48add34b0b70eea46c6138c0155cea2fc5339797af2a",
+    "two-playing.png": "c78a813f6e6617168087533b4508d7dfe769cc141bfd06be680159f31eaf6fc1"
+  }
+}
