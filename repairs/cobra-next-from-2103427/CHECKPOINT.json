@@ -4,7 +4,7 @@
   "full_brief_read": true,
   "production_implementation_started": true,
   "current_build": "/workspace/cobra-evidence/build-v7",
-  "build_status": "LOCAL25HOST_PASS_WITH_D2; EXACT7274OLDCLASSES_PLUS20HELPERS_VERIFIED; FINAL_CI_NEXT",
+  "build_status": "FINAL25HOST_PLUS4BASELINE_PASS_EXACT_VECTOR_REGISTERED",
   "baseline_apk": "/workspace/infinity-evidence/continuation2103427/signed27-ci/Infinity-2103427-Combined-Original-Signer.apk",
   "baseline_components": "/workspace/infinity-evidence/continuation2103427/components27-ci",
   "actual_baseline_smali": "/workspace/cobra-evidence/baseline/COBRA/smali-0/com/projectinfinity/kodi/InfinityLiveActivity.smali",
@@ -16,7 +16,7 @@
   "maven": "/workspace/cobra-evidence/maven/apache-maven-3.9.9/bin/mvn",
   "selected_scope": "SCOPE.json",
   "source_budget": "SOURCE-BUDGET.json",
-  "next": "Commit complete D2/resource correction and exact SDK setup fix; run final source-bound host owner preparation and baseline Cobra-only API37 retry; inspect actual observations; register and sign one28APK. No APK yet produced/signed/installed.",
+  "next": "Push registered vector to invoke sole signer once. Retry exact baseline Cobra runtime using file entry (prior failure executed shell import, never app). Await real app result, do not infer native crash. Download and independently verify signed28 plus all4ZIPs; update delivery/ledger. No device acceptance or lock promotion.",
   "found_defects": [
     "Existing MultiView chooser has Fit/Fill only; no11arrangements",
     "NonPro preview More precedes Fullscreen/PiP; classic and Pro full strip alreadyMoreLast (preserve)",
@@ -38,5 +38,14 @@
   "baseline_host": "/workspace/cobra-evidence/host-baseline",
   "gate_controls": "14 PASS",
   "prior_host_run": 40807697956,
-  "baseline_android_setup_failure": 40807700925
+  "baseline_android_setup_failure": 40807700925,
+  "producer_source": "6b6ae05c83f0a39eeb02f54e1a3b75f4b24a8656",
+  "producer_run": 40809094407,
+  "owner_components": "/workspace/cobra-evidence/ci-final/components",
+  "owner_evidence": "/workspace/cobra-evidence/ci-final/host",
+  "authority_generation": 13,
+  "baseline_android_setup_runs": [
+    40807700925,
+    40809097504
+  ]
 }

@@ -1,0 +1,63 @@
+{
+  "producer_run": 40809094407,
+  "producer_source": "6b6ae05c83f0a39eeb02f54e1a3b75f4b24a8656",
+  "status": "PASS25_CANDIDATE_AND4_BASELINE_HOST_ONLY",
+  "tests": [
+    {
+      "report": "cobra-baseline-host/target/surefire-reports/TEST-com.projectinfinity.kodi.CobraPositionWorkTest.xml",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "report": "cobra-baseline-host/target/surefire-reports/TEST-com.projectinfinity.kodi.CobraLogoWorkTest.xml",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "report": "cobra-host/target/surefire-reports/TEST-com.projectinfinity.kodi.CobraLogoCompletionTest.xml",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "report": "cobra-host/target/surefire-reports/TEST-com.projectinfinity.kodi.CobraArrangeIntegrationTest.xml",
+      "tests": "14",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "report": "cobra-host/target/surefire-reports/TEST-com.projectinfinity.kodi.CobraPositionWorkTest.xml",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "report": "cobra-host/target/surefire-reports/TEST-com.projectinfinity.kodi.CobraMeasuredReflowTest.xml",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "report": "cobra-host/target/surefire-reports/TEST-com.projectinfinity.kodi.CobraLogoWorkTest.xml",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    }
+  ],
+  "outputs": {
+    "cobra-baseline-host/TEST-OUTPUT.txt": "COBRA_POSITION_WORK baseline=true repeated_calls=7000 setLayoutParams=7000 p50_ns_per_1000=5471891 min_ns=4152614 max_ns=8855037\nCOBRA_LOGO_WORK baseline=true cold_views=100 executor_submissions=100 delivered_after_one_completion=1\n",
+    "cobra-host/TEST-OUTPUT.txt": "COBRA_POSITION_WORK baseline=false repeated_calls=7000 setLayoutParams=0 p50_ns_per_1000=1748077 min_ns=570426 max_ns=2905311\nCOBRA_LOGO_WORK baseline=false cold_views=100 executor_submissions=1 delivered_after_one_completion=100\n"
+  },
+  "shutdown": "NOT_RUN",
+  "physical_Fold": "NOT_RUN",
+  "runtime": "Robolectric API35; inert players and actual original downloader over loopback PNG; controlled IO baseline fixture"
+}

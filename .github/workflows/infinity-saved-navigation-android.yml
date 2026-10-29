@@ -171,17 +171,7 @@ jobs:
           pre-emulator-launch-script: python3 repairs/infinity-final-closure-2103407/api37_environment_gate.py --sdk-root "$ANDROID_HOME" --out runtime-platform --check-avd
           disable-animations: false
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
-          script: |
-            python3 - <<'PYCODE'
-            import json
-            from pathlib import Path
-            from importlib.util import spec_from_file_location,module_from_spec
-            target=Path('repairs/cobra-next-from-2103427');spec=spec_from_file_location('cobra_probe',target/'android_probe.py');m=module_from_spec(spec);spec.loader.exec_module(m)
-            files=list(Path('runtime-signed').glob('Infinity-*-Combined-Original-Signer.apk'));assert len(files)==1
-            receipt=json.loads(Path('runtime-signed/BUILD-RECEIPT.json').read_text());assert receipt['versionCode'] in (2103427,2103428)
-            assert 'Signer #1 certificate SHA-256 digest: d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' in Path('runtime-results/SIGNATURE.txt').read_text()
-            m.probe(files[0],Path('runtime-results/probe'),receipt['signed_apk_sha256'])
-            PYCODE
+          script: python3 repairs/cobra-next-from-2103427/run_android_probe.py --signed runtime-signed --out runtime-results/probe --signature runtime-results/SIGNATURE.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -1,0 +1,93 @@
+{
+  "Infinity": "EXACT_ZIP",
+  "Pro_Six_reflow_player_services": "EXACT_UNCHANGED_CLASS_OR_METHOD_BYTES",
+  "added_classes": [
+    "class:Lcom/projectinfinity/kodi/CobraArrange$$ExternalSyntheticLambda0;",
+    "class:Lcom/projectinfinity/kodi/CobraArrange$$ExternalSyntheticLambda1;",
+    "class:Lcom/projectinfinity/kodi/CobraArrange$$ExternalSyntheticLambda2;",
+    "class:Lcom/projectinfinity/kodi/CobraArrange$$ExternalSyntheticLambda3;",
+    "class:Lcom/projectinfinity/kodi/CobraArrange$$ExternalSyntheticLambda4;",
+    "class:Lcom/projectinfinity/kodi/CobraArrange$1;",
+    "class:Lcom/projectinfinity/kodi/CobraArrange$Gesture$$ExternalSyntheticLambda0;",
+    "class:Lcom/projectinfinity/kodi/CobraArrange$Gesture;",
+    "class:Lcom/projectinfinity/kodi/CobraArrange$Preview;",
+    "class:Lcom/projectinfinity/kodi/CobraArrange$Snapshot;",
+    "class:Lcom/projectinfinity/kodi/CobraArrange$Touch;",
+    "class:Lcom/projectinfinity/kodi/CobraArrange;",
+    "class:Lcom/projectinfinity/kodi/CobraLayoutCatalog;",
+    "class:Lcom/projectinfinity/kodi/CobraLogoRequests$$ExternalSyntheticLambda0;",
+    "class:Lcom/projectinfinity/kodi/CobraLogoRequests$$ExternalSyntheticLambda1;",
+    "class:Lcom/projectinfinity/kodi/CobraLogoRequests$$ExternalSyntheticLambda2;",
+    "class:Lcom/projectinfinity/kodi/CobraLogoRequests$Binding;",
+    "class:Lcom/projectinfinity/kodi/CobraLogoRequests$Flight;",
+    "class:Lcom/projectinfinity/kodi/CobraLogoRequests;",
+    "class:Lcom/projectinfinity/kodi/CobraPresentation;"
+  ],
+  "baseline": "782242090483982c39a78f9c4da932a4751bdafc",
+  "changed_existing_classes": [
+    "class:Lcom/projectinfinity/kodi/ChooserReleaseMetadata;",
+    "class:Lcom/projectinfinity/kodi/CobraComponent;",
+    "class:Lcom/projectinfinity/kodi/InfinityLiveActivity;"
+  ],
+  "component_catalog": {
+    "bundles": {
+      "CHOOSER_SHELL": {
+        "approved_source": "6b6ae05c83f0a39eeb02f54e1a3b75f4b24a8656",
+        "digest": "137f30aabcbb4bb2873a3e593cf9020809560e9b422cf9580e802112f2b9aa6c",
+        "file": "CHOOSER_SHELL.zip",
+        "settings_schema": "original-launch-preference",
+        "sha256": "7a0d3af46db2a53184de741142f32f08ce82f71158b1132548085a3732bb6663",
+        "version": "2103428.version-wording.1"
+      },
+      "COBRA": {
+        "approved_source": "6b6ae05c83f0a39eeb02f54e1a3b75f4b24a8656",
+        "digest": "62b4c39e7cb9cce7c99ea894e4c13db915e6cb682cb5c92cd3f19cedc298873d",
+        "file": "COBRA.zip",
+        "settings_schema": "original-plus-settings-snapshot-v1",
+        "sha256": "dde429be4aaba124f3ccc7b6de9bd9989ace13cca176f5f9271c553d20c97de3",
+        "version": "2103428.cobra.1"
+      },
+      "INFINITY": {
+        "approved_source": "6ca19c1d4152e7809f7040dcbdf7f58bc3df7655",
+        "digest": "ab70480429f786f4fbf63592c1a16d8ccea3abaed13bec047474d0730efcbbee",
+        "file": "INFINITY.zip",
+        "settings_schema": "original-2103420",
+        "sha256": "16eeb91a24bf0cf99d558d9e3dd17aedfd127e9a1936dcce413341c48683cd6c",
+        "version": "2103420.isolation.1.performance.2"
+      },
+      "MINIMAL_ANDROID_CONTRACT": {
+        "approved_source": "9efaeabee45389b7c919ae1a3d88c394b1804173",
+        "digest": "7443a8645f40e82eac07f6ec732a9dc231f1974416ea3632b5af5d74816f78fb",
+        "file": "MINIMAL_ANDROID_CONTRACT.zip",
+        "settings_schema": "owner-durability-v1",
+        "sha256": "6e93a1eb8e47f7fc9bc6f1dbc9208b555e2e62445ca2a3065d4e17a3b473ba33",
+        "version": "isolation-contract.1"
+      }
+    },
+    "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "package": "com.projectinfinity.kodi",
+    "release_approved": false,
+    "schema": 1,
+    "source": "6b6ae05c83f0a39eeb02f54e1a3b75f4b24a8656"
+  },
+  "existing_classes_checked": 7274,
+  "minimal_Android": "EXACT_ZIP",
+  "new_activity_fields": 0,
+  "physical_Fold": "PENDING",
+  "selected_activity_methods": [
+    "private cobraLayoutMultiTiles()V",
+    "private cobraPosition(Landroid/view/View;IIII)V",
+    "private cobraPreviewPanel(Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;Z)Landroid/widget/FrameLayout;",
+    "private cobraShowMultiLayoutChooser()V",
+    "private cobraSportsLoadLogo(Ljava/lang/String;Landroid/widget/ImageView;)V",
+    "private showCobraMultiTileActions(I)V",
+    "public onBackPressed()V",
+    "synthetic lambda$cobraSportsLoadLogo$481$com-projectinfinity-kodi-InfinityLiveActivity(Ljava/lang/String;Landroid/graphics/Bitmap;Landroid/widget/ImageView;)V"
+  ],
+  "shutdown": "FROZEN_NOT_RUN",
+  "source": "6b6ae05c83f0a39eeb02f54e1a3b75f4b24a8656",
+  "status": "EXACT_COBRA_DELTA_AND_VERSION_WORDING_VERIFIED",
+  "unchanged_activity_methods": 1794,
+  "unchanged_existing_classes": 7271,
+  "user_device_operations": false
+}
