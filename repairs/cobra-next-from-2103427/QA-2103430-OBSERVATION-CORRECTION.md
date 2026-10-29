@@ -14,3 +14,7 @@ Selected additional read-only observations, before importing the synthetic playl
 - Preserve errors and partial classifications, return through the existing exported Cobra Activity, and independently run the finite Pro button journey.
 
 No app-icon launch, Infinity execution, reset, uninstall, force-stop, component toggle, launcher-data operation, hidden API/helper APK or shutdown test is selected. Settings App Info is read-only. The original signed APK, four matching components and their checksums remain unchanged. These observations do not establish Samsung/Fold acceptance.
+
+## Independent resource-inflation control
+
+The actual PackageManager fallback also selects a bounded host resource check: use the existing Robolectric API35 environment to load only resources from the actual signed430 APK and original27 APK, with a framework default-icon control. Attempt day/night drawable inflation for the two icon IDs and retain full errors or rendered frames. No application class, Kodi/native runtime, install, production build or signing is selected. An unsupported host asset loader is a harness blocker, not an application failure. This supplements, and cannot replace, the actual Android37 OS-screen observations or physical Samsung acceptance.

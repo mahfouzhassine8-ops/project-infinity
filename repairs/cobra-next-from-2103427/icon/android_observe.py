@@ -21,7 +21,7 @@ from pathlib import Path
 
 PACKAGE = "com.projectinfinity.kodi"
 COBRA = PACKAGE + "/.InfinityLiveActivity"
-VERSION = 2103430
+VERSION = 2103431
 
 
 def observe(out: Path, apk_sha256: str, version_code: int):
@@ -113,7 +113,7 @@ def observe(out: Path, apk_sha256: str, version_code: int):
     failure = None; original_mode = None; safe_Cobra_return = False
     try:
         if version_code != VERSION or not re.fullmatch(r"[0-9a-f]{64}", apk_sha256):
-            raise RuntimeError("Observer requires the exact final2103430 receipt")
+            raise RuntimeError("Observer requires the exact final2103431 receipt")
         serial = text("get-serialno").strip()
         sdk = text("shell", "getprop", "ro.build.version.sdk").strip()
         qemu = text("shell", "getprop", "ro.kernel.qemu").strip()

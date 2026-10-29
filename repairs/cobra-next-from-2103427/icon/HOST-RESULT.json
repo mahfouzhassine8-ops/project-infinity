@@ -1,5 +1,6 @@
 {
-  "status": "PASS9_SELECTED_OFFLINE_RESOURCE_TESTS",
+  "status": "PASS9_OFFLINE_AND_ACTUAL_API35_NATIVE_FRAMEWORK_INFLATION",
+  "correction": "431: nestedwhitebackground shape/solid replaces density-incompatible signed430 inline drawable color; only2XML payloads change",
   "proof": {
     "status": "PASS_EXACT_ICON_ONLY_TABLE_TRANSFORM",
     "original_table_sha256": "1b8c1788a5a86242635277f063ebdce6b82ed12eafe3cfdf331b902c8eb7e616",
@@ -20,8 +21,8 @@
     "new_path_sha256": {
       "res/infinity_launcher_light_hdpi.png": "e059b58ec3af72994725510e2e4e518879ed36eb654b050463b3e98d94685f3c",
       "res/infinity_launcher_light_mdpi.png": "20521d2e6de937d79c4a6e5d9ea6ce1a34a623b2dfbf5827fee3d8e59b2d835f",
-      "res/infinity_launcher_light_v26.xml": "c29d82e2c59edb1170c193c6b90ce47fd89e21924bed5bdfe3286aab837509cd",
-      "res/infinity_launcher_light_v33.xml": "bd03b71c6b912dcc793656e37b182b200087518f14fe70932aab50f77d475550",
+      "res/infinity_launcher_light_v26.xml": "545b354ba229d2d197950801d8740b364238e52b86f0f9f93d779cc9b4abd8e7",
+      "res/infinity_launcher_light_v33.xml": "b894acef7408a8934b2ed989b625e2d1d15bf3c409ca583c15a3bc4a10576c8d",
       "res/infinity_launcher_light_xhdpi.png": "2cf279c8855cb756d4070e1eb532dbdb40d7549a4332fb2ce9aef5e65c47f741",
       "res/infinity_launcher_light_xxhdpi.png": "481b64281afbe845d9f22de796c4d26a7f00825b56b750e9bce41f16d7f920b9",
       "res/infinity_launcher_light_xxxhdpi.png": "0fce20ccd57efa60921c940603b5e0a1d8d740c06fafcf5f8cec783e4cb34622"
@@ -31,9 +32,48 @@
     "physical_Samsung": "NOT_VERIFIED",
     "shutdown": "NOT_RUN"
   },
-  "first_test_attempt": "8pass/1fail: an overspecific legacy48px assertion required an exactly opaque-black destination sample; production black tint/mask was correct. Assertion now checks near-black (<=8), preserving original alpha; no asset transformation changed.",
-  "legacy_preview": "/workspace/cobra-evidence/icon30-resources-v1/legacy-comparison.png",
-  "Android": "NOT_RUN_BY_THIS_AGENT",
-  "Samsung": "NOT_RUN",
+  "framework": {
+    "test": "InfinityLauncherResourceInflationTest",
+    "selected_result": "1test0failures0errors; baseline/candidate2IDs2modes2densities0and420, plusdefaultframeworkcontrol andsigned430 expectednegative",
+    "APK_source_baseline": "Actual signed2103427",
+    "candidate_container": "Unsigned resource-only ZIP from exact signed430 with only2correctedXML payloads; no install/sign/delivery",
+    "output": "/workspace/cobra-evidence/icon431-inflation/framework",
+    "candidate_dark_pixels": "EXACT_EQUAL_TO_SIGNED27_BASELINE_SAME_MODE_AND_DENSITY",
+    "candidate_day_pixels": "WHITE_BACKGROUND_BLACK_ORIGINAL_EMBLEM_NO_CYAN",
+    "actual_rendered_images_personally_inspected": [
+      "candidate-day-7f080000-density420.png",
+      "candidate-night-7f080000-density420.png"
+    ],
+    "rendered_png_sha256": {
+      "baseline-day-7f080000-density0.png": "1066a856cce9bf2e499c8cf044720ef6c7b82830d2dc484b54b25ceb51861916",
+      "baseline-day-7f080000-density420.png": "1066a856cce9bf2e499c8cf044720ef6c7b82830d2dc484b54b25ceb51861916",
+      "baseline-day-7f080001-density0.png": "1066a856cce9bf2e499c8cf044720ef6c7b82830d2dc484b54b25ceb51861916",
+      "baseline-day-7f080001-density420.png": "1066a856cce9bf2e499c8cf044720ef6c7b82830d2dc484b54b25ceb51861916",
+      "baseline-night-7f080000-density0.png": "1066a856cce9bf2e499c8cf044720ef6c7b82830d2dc484b54b25ceb51861916",
+      "baseline-night-7f080000-density420.png": "1066a856cce9bf2e499c8cf044720ef6c7b82830d2dc484b54b25ceb51861916",
+      "baseline-night-7f080001-density0.png": "1066a856cce9bf2e499c8cf044720ef6c7b82830d2dc484b54b25ceb51861916",
+      "baseline-night-7f080001-density420.png": "1066a856cce9bf2e499c8cf044720ef6c7b82830d2dc484b54b25ceb51861916",
+      "candidate-day-7f080000-density0.png": "47e699b35c45c2fb67bc9b3ab0538087ae75c08ba18c0aa4fc1a7271ba695cab",
+      "candidate-day-7f080000-density420.png": "47e699b35c45c2fb67bc9b3ab0538087ae75c08ba18c0aa4fc1a7271ba695cab",
+      "candidate-day-7f080001-density0.png": "47e699b35c45c2fb67bc9b3ab0538087ae75c08ba18c0aa4fc1a7271ba695cab",
+      "candidate-day-7f080001-density420.png": "47e699b35c45c2fb67bc9b3ab0538087ae75c08ba18c0aa4fc1a7271ba695cab",
+      "candidate-night-7f080000-density0.png": "1066a856cce9bf2e499c8cf044720ef6c7b82830d2dc484b54b25ceb51861916",
+      "candidate-night-7f080000-density420.png": "1066a856cce9bf2e499c8cf044720ef6c7b82830d2dc484b54b25ceb51861916",
+      "candidate-night-7f080001-density0.png": "1066a856cce9bf2e499c8cf044720ef6c7b82830d2dc484b54b25ceb51861916",
+      "candidate-night-7f080001-density420.png": "1066a856cce9bf2e499c8cf044720ef6c7b82830d2dc484b54b25ceb51861916",
+      "framework-control.png": "04eb640f13684ec313e757940f841eae49896bb5226d6eb18e6559035685c814"
+    }
+  },
+  "preserved_failure": {
+    "source": "Actual signed430 APK",
+    "stage": "getDrawableForDensity(0x7f080000,420)day",
+    "cause": "Resources.NotFoundException ResourceID0 in TypedArray.getDrawableForDensity ->AdaptiveIconDrawable.updateLayerFromTypedArray",
+    "evidence": "/workspace/cobra-evidence/icon-inflation-host/evidence/FIRST-FAILURE.txt",
+    "negative_control": "Same oldfailure expected and reproduced by corrected verification suite"
+  },
+  "earlier_offline_first_attempt": "Legacy48px overspecific opaque-black pixel assertion corrected to near-black<=8 because exact original alpha is resampled; no artwork transformation changed by that assertion correction",
+  "Android37_signed_final": "Parent verification pending",
+  "physical_Samsung": "NOT_RUN",
+  "Infinity_execution": "NONE",
   "shutdown": "NOT_RUN"
 }

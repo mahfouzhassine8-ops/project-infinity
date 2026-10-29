@@ -1,0 +1,29 @@
+test_classes_native_manifest_dark_and_non_icon_members_frozen (test_release_gate.IconResourceGateTests.test_classes_native_manifest_dark_and_non_icon_members_frozen) ... ok
+test_exact_consolidated_icon_transition_and_fresh_resources (test_release_gate.IconResourceGateTests.test_exact_consolidated_icon_transition_and_fresh_resources) ... ok
+test_exception_does_not_trust_unbound_or_replaced_sources (test_release_gate.IconResourceGateTests.test_exception_does_not_trust_unbound_or_replaced_sources) ... ok
+test_exception_is_single_release_and_keeps_settings_and_contract (test_release_gate.IconResourceGateTests.test_exception_is_single_release_and_keeps_settings_and_contract) ... ok
+test_fresh_icon_failure_precedes_any_signing_key_read (test_release_gate.IconResourceGateTests.test_fresh_icon_failure_precedes_any_signing_key_read) ... ok
+test_fresh_table_and_artwork_cannot_be_reapproved_by_changing_hash (test_release_gate.IconResourceGateTests.test_fresh_table_and_artwork_cannot_be_reapproved_by_changing_hash) ... ok
+test_missing_exception_never_authorizes_shared_target (test_release_gate.IconResourceGateTests.test_missing_exception_never_authorizes_shared_target) ... ok
+test_shared_removal_reclassification_and_extra_path_rejected (test_release_gate.IconResourceGateTests.test_shared_removal_reclassification_and_extra_path_rejected) ... ok
+test_component_claims_cannot_replace_fingerprints (test_release_gate.ReleaseGateTests.test_component_claims_cannot_replace_fingerprints) ... ok
+test_duplicate_zip_and_traversal_fail_closed (test_release_gate.ReleaseGateTests.test_duplicate_zip_and_traversal_fail_closed) ... /opt/hostedtoolcache/Python/3.12.15/x64/lib/python3.12/zipfile/__init__.py:1650: UserWarning: Duplicate name: 'classes.dex'
+  return self._open_to_write(zinfo, force_zip64=force_zip64)
+ok
+test_higher_package_version_cannot_hide_stale_cobra (test_release_gate.ReleaseGateTests.test_higher_package_version_cannot_hide_stale_cobra) ... ok
+test_higher_package_version_cannot_hide_stale_infinity (test_release_gate.ReleaseGateTests.test_higher_package_version_cannot_hide_stale_infinity) ... ok
+test_latest_approved2103427_lock_is_required (test_release_gate.ReleaseGateTests.test_latest_approved2103427_lock_is_required) ... ok
+test_methods_with_and_without_flags_and_duplicate_class (test_release_gate.ReleaseGateTests.test_methods_with_and_without_flags_and_duplicate_class) ... ok
+test_owner_reclassification_and_shared_scope_rejected (test_release_gate.ReleaseGateTests.test_owner_reclassification_and_shared_scope_rejected) ... ok
+test_package_and_registry_rollback_rejected (test_release_gate.ReleaseGateTests.test_package_and_registry_rollback_rejected) ... ok
+test_remote_authority_head_race_is_rejected (test_release_gate.ReleaseGateTests.test_remote_authority_head_race_is_rejected) ... ok
+test_settings_payload_rollback_rejected (test_release_gate.ReleaseGateTests.test_settings_payload_rollback_rejected) ... ok
+test_successive_independent_owner_updates_preserve_other_owner (test_release_gate.ReleaseGateTests.test_successive_independent_owner_updates_preserve_other_owner) ... ok
+test_target_owner_cannot_change_other_owner_or_common_manifest (test_release_gate.ReleaseGateTests.test_target_owner_cannot_change_other_owner_or_common_manifest) ... ok
+test_unowned_and_missing_payload_rejected (test_release_gate.ReleaseGateTests.test_unowned_and_missing_payload_rejected) ... ok
+test_unresolved_blocker_cannot_reach_key_read (test_release_gate.ReleaseGateTests.test_unresolved_blocker_cannot_reach_key_read) ... ok
+
+----------------------------------------------------------------------
+Ran 22 tests in 7.963s
+
+OK

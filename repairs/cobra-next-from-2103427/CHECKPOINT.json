@@ -3,8 +3,8 @@
   "checkpoint_parent": "71d181b1",
   "full_brief_read": true,
   "production_implementation_started": true,
-  "current_build": "/workspace/cobra-evidence/build-v10-30",
-  "build_status": "BOTH_P0_CI_VERIFIED; EXACT_OWNERS_REGISTERED_GEN15; ORIGINAL_SIGNING_NEXT",
+  "current_build": "/workspace/cobra-evidence/build431",
+  "build_status": "431_COMPILED; DENSITY_NATIVE_ICON_CORRECTION_LOCAL_PASS; CI_PRODUCER_NEXT",
   "baseline_apk": "/workspace/infinity-evidence/continuation2103427/signed27-ci/Infinity-2103427-Combined-Original-Signer.apk",
   "baseline_components": "/workspace/infinity-evidence/continuation2103427/components27-ci",
   "actual_baseline_smali": "/workspace/cobra-evidence/baseline/COBRA/smali-0/com/projectinfinity/kodi/InfinityLiveActivity.smali",
@@ -16,7 +16,7 @@
   "maven": "/workspace/cobra-evidence/maven/apache-maven-3.9.9/bin/mvn",
   "selected_scope": "SCOPE.json",
   "source_budget": "SOURCE-BUDGET.json",
-  "next": "Commit registered gen15 and trigger sole original signer once. Verify downloaded APK/fourZIPs, then exact signed430 Android icon/button journey. No shutdown, no lock promotion.",
+  "next": "Commit431source+exactQA/nativeinflation selection; CIproducer6button+3adjacent+9offline+1nativewith430negative. Registergen16fromsuccessartifact, originalsigner, independentAPK4ZIPverify, focusedexact431Android; user-onlyFoldacceptance.",
   "found_defects": [
     "Existing MultiView chooser has Fit/Fill only; no11arrangements",
     "NonPro preview More precedes Fullscreen/PiP; classic and Pro full strip alreadyMoreLast (preserve)",
@@ -35,10 +35,10 @@
   ],
   "shutdown": "NOT_RUN_FROZEN",
   "Infinity": "EXACT_2103427_FROZEN_ZIP",
-  "git_status": "Source-bound CI passed; exact owner catalog matches local packaging; registered gen15 pending commit/signing.",
+  "git_status": "Signed production and two QA observer corrections committed; final reports/evidence pending documentation-only commit.",
   "host_tests": "/workspace/cobra-evidence/host30-v10",
   "baseline_host": "/workspace/cobra-evidence/host-baseline",
-  "gate_controls": "22 PASS; CI signer will freshly verify",
+  "gate_controls": "23 LOCAL PASS; final producer/signing pending",
   "prior_host_run": 40807697956,
   "baseline_android_setup_failure": 40807700925,
   "producer_source": "0e7d200398ab804ea88a68ecc5cc8a328b98b3f8",
@@ -51,7 +51,7 @@
     40809097504,
     40810182108
   ],
-  "candidate_versionCode": 2103430,
+  "candidate_versionCode": 2103431,
   "superseded28": "Signed run40810155686 is superseded; do not deliver/install28",
   "physical_acceptance": "USER_ONLY_PENDING",
   "previous_signed_candidate": {
@@ -61,7 +61,7 @@
     "status": "UNACCEPTED_BUTTON_DEFECT_REPRODUCED"
   },
   "shared_exception": "Onlylaunchericonresource/tableplumbing; allsharedDEX/classes/native/manifest/persistence/shutdown frozen",
-  "launcher_icon_resource_checks": "9 CI PASS; independent aapt2 table/v26/v33 parse PASS; actual Android runtime pending",
+  "launcher_icon_resource_checks": "9offlinePASS; nativeframework16rendercontrolsPASS with430negative; table/5PNGs/darkfrozen",
   "signed29_before_button_reproduction": "CI original signed29 one assertion FAIL / zero errors; [pip,pip,fullscreen]",
   "candidate_initial_button_routes": "CI six interactions +three adjacent PASS; [fullscreen,pip,more]",
   "previous29_signed_source": "f2b76fb76ad4edd87197f9521347295b4e612f26",
@@ -72,5 +72,17 @@
   "previous29_independent_verification": "results/signed2103429/INDEPENDENT-VERIFICATION.json",
   "current_signed_source": null,
   "current_signed_run": null,
-  "current_android_run": null
+  "current_android_run": null,
+  "current_signed_APK_sha256": null,
+  "current_QA_source": "e2db68473d60b033be142a5df11fe2c962293b8e",
+  "independent_verification": "results/signed2103430/INDEPENDENT-VERIFICATION.json",
+  "current_android_previous_runs": [
+    40966613409,
+    40968746929
+  ],
+  "current_android_previous_failures": [
+    "Native M3U picker QA clickable-label assumption before button testing; four framework icon lookupsPASS, Home default-iconfallbackunresolved",
+    "Checkout-only shortref failure; emulator/installneverran"
+  ],
+  "current_signed_candidate": "NONE; unaccepted430 superseded due density420 icon resource failure"
 }

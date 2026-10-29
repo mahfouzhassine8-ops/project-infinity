@@ -73,6 +73,13 @@ jobs:
           name: Infinity-Combined-Original-Signer-40818697397
           github-token: ${{ github.token }}
           path: previous29
+      - name: Recover unaccepted430 for exact density-inflation negative control
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 40966088173
+          name: Infinity-Combined-Original-Signer-40966088173
+          github-token: ${{ github.token }}
+          path: previous430
       - uses: actions/download-artifact@v4
         with:
           run-id: 39867073954
@@ -116,12 +123,26 @@ jobs:
           sys.path.insert(0,'repairs/dual-experience-isolation-2103420')
           from component_bundles import combine
           from inventory import load
-          combine(Path('prepared-owners/components'),load(Path('prepared-owners/components/catalog.json')),Path('prepared-owners/combined-unsigned.apk'),2103430)
+          combine(Path('prepared-owners/components'),load(Path('prepared-owners/components/catalog.json')),Path('prepared-owners/combined-unsigned.apk'),2103431)
           PYCODE
           "$ANDROID_HOME/build-tools/35.0.0/aapt2" dump resources prepared-owners/combined-unsigned.apk > prepared-owners/ANDROID-RESOURCE-TABLE.txt
           "$ANDROID_HOME/build-tools/35.0.0/aapt2" dump xmltree prepared-owners/combined-unsigned.apk --file res/infinity_launcher_light_v26.xml > prepared-owners/ANDROID-ICON-V26.txt
           "$ANDROID_HOME/build-tools/35.0.0/aapt2" dump xmltree prepared-owners/combined-unsigned.apk --file res/infinity_launcher_light_v33.xml > prepared-owners/ANDROID-ICON-V33.txt
           python3 repairs/cobra-next-from-2103427/icon/resources.py --baseline baseline/Infinity-2103427-Combined-Original-Signer.apk --verify prepared-owners/combined-unsigned.apk > prepared-owners/ICON-APK-VERIFICATION.json
+      - name: Inflate actual launcher drawables at default and420density before signing
+        run: |
+          set -euo pipefail
+          python3 - <<'PYCODE'
+          import hashlib
+          from pathlib import Path
+          for name,pin in [('baseline/Infinity-2103427-Combined-Original-Signer.apk','cd0c8ab5c77067e508baea0ad7d5207b3d6c73775b86387d4099a67cfe4215ca'),('previous430/Infinity-2103430-Combined-Original-Signer.apk','ac846c3f6b4a4ccc3f4640de2a0c3dee745b0d198272c64a09a3468819ba400d')]:
+              with Path(name).open('rb') as stream: assert hashlib.file_digest(stream,'sha256').hexdigest()==pin
+          PYCODE
+          mvn -B -q -f cobra-host/pom.xml -Dtest=InfinityLauncherResourceInflationTest \
+            -Dicon.baseline.apk="$PWD/baseline/Infinity-2103427-Combined-Original-Signer.apk" \
+            -Dicon.candidate.apk="$PWD/prepared-owners/combined-unsigned.apk" \
+            -Dicon.negative.apk="$PWD/previous430/Infinity-2103430-Combined-Original-Signer.apk" \
+            -Dicon.output="$PWD/icon-inflation-evidence" test 2>&1 | tee cobra-host/ICON-NATIVE-INFLATION.txt
       - uses: actions/upload-artifact@v4
         with:
           name: Cobra-Prepared-Owners-${{ github.run_id }}
@@ -148,6 +169,8 @@ jobs:
             prepared-owners/ANDROID-ICON-V26.txt
             prepared-owners/ANDROID-ICON-V33.txt
             prepared-owners/ICON-APK-VERIFICATION.json
+            cobra-host/ICON-NATIVE-INFLATION.txt
+            icon-inflation-evidence/
           retention-days: 90
           if-no-files-found: error
   cobra-android:

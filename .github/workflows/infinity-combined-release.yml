@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       operation:
-        description: Sign both reviewed2103430 button and launcher-icon corrections
+        description: Sign both reviewed2103431 button and launcher-icon corrections
         type: choice
         required: true
         default: final-combined
@@ -116,11 +116,19 @@ jobs:
           name: Infinity-Combined-Original-Signer-40769526963
           github-token: ${{ github.token }}
           path: previous2103427
+      - name: Recover unaccepted430 for strict resource-only final comparison
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 40966088173
+          name: Infinity-Combined-Original-Signer-40966088173
+          github-token: ${{ github.token }}
+          path: previous2103430
       - name: Verify signed APK and exact matching components; no runtime execution
         run: |
           python3 repairs/cobra-next-from-2103427/verify_delivery.py \
             --baseline previous2103427/Infinity-2103427-Combined-Original-Signer.apk \
             --signed signed-combined --bundles combined-build/components \
+            --previous430 previous2103430/Infinity-2103430-Combined-Original-Signer.apk \
             --sdk "$ANDROID_HOME/build-tools/35.0.0"
       - name: Upload signed install-over candidate
         uses: actions/upload-artifact@v4

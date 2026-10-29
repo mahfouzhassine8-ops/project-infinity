@@ -1,7 +1,8 @@
 """One reviewed launcher-resource exception, never a shared-code permission.
 
-The existing resource owner is retained.  The only shared-owner transition this
-module permits is the explicitly authorized 2103429 -> 2103430 icon addition.
+The existing resource owner is retained.  It permits the reviewed icon addition
+and the correction of its two adaptive XMLs before a final candidate is handed
+off.  The unaccepted 2103430 bytes are pinned as the corrective predecessor.
 The original typed manifest, every shared class/native member, and every old
 artwork member remain frozen.  The signer re-derives the icon resource result
 from the original table and retained source artwork before reading any key.
@@ -20,12 +21,24 @@ AUTHORIZATION_SHA256 = 'cb82b470cd19fc8f91d74355ffc0404dea62bd63c94a5a3f5561be27
 OWNER = 'MINIMAL_ANDROID_CONTRACT'
 ORIGINAL_TABLE_SHA256 = '1b8c1788a5a86242635277f063ebdce6b82ed12eafe3cfdf331b902c8eb7e616'
 ORIGINAL_COMPONENT_DIGEST = '7443a8645f40e82eac07f6ec732a9dc231f1974416ea3632b5af5d74816f78fb'
+SIGNED30_COMPONENT_DIGEST = 'b3c071d3877308350599a39989c6bf656c8ee96f51bc33961a6f2b83e1142f5d'
+SIGNED30_TABLE_SHA256 = 'cb3a6f25572858e9fb64dd21713ab1e1c1a0965d0e1d3951c59dd690c9551f5c'
 ICON_IDS = [0x7f080000, 0x7f080001]
 NEW_PATHS = tuple('res/infinity_launcher_light_' + density + '.png'
                   for density in ('mdpi', 'hdpi', 'xhdpi', 'xxhdpi', 'xxxhdpi')) + (
     'res/infinity_launcher_light_v26.xml',
     'res/infinity_launcher_light_v33.xml',
 )
+ADAPTIVE_PATHS = ('res/infinity_launcher_light_v26.xml', 'res/infinity_launcher_light_v33.xml')
+SIGNED30_ICON_SHA256 = {
+    'res/infinity_launcher_light_hdpi.png': 'e059b58ec3af72994725510e2e4e518879ed36eb654b050463b3e98d94685f3c',
+    'res/infinity_launcher_light_mdpi.png': '20521d2e6de937d79c4a6e5d9ea6ce1a34a623b2dfbf5827fee3d8e59b2d835f',
+    'res/infinity_launcher_light_v26.xml': 'c29d82e2c59edb1170c193c6b90ce47fd89e21924bed5bdfe3286aab837509cd',
+    'res/infinity_launcher_light_v33.xml': 'bd03b71c6b912dcc793656e37b182b200087518f14fe70932aab50f77d475550',
+    'res/infinity_launcher_light_xhdpi.png': '2cf279c8855cb756d4070e1eb532dbdb40d7549a4332fb2ce9aef5e65c47f741',
+    'res/infinity_launcher_light_xxhdpi.png': '481b64281afbe845d9f22de796c4d26a7f00825b56b750e9bce41f16d7f920b9',
+    'res/infinity_launcher_light_xxxhdpi.png': '0fce20ccd57efa60921c940603b5e0a1d8d740c06fafcf5f8cec783e4cb34622',
+}
 FIELDS = {
     'schema', 'authorization', 'authorization_sha256', 'original_resource_table_sha256',
     'original_minimal_component_digest', 'icon_resource_ids', 'candidate_resource_table_sha256',
@@ -80,16 +93,35 @@ def validate(authority):
 
 def transition(previous, proposed, targets):
     proof = validate(proposed)
-    require(previous['candidate_versionCode'] == 2103429 and proposed['candidate_versionCode'] == 2103430,
-            'ICON_EXACT_RELEASE_TRANSITION')
+    versions = previous['candidate_versionCode'], proposed['candidate_versionCode']
+    require(versions in ((2103429, 2103430), (2103430, 2103431)), 'ICON_EXACT_RELEASE_TRANSITION')
     require(set(targets) == {'COBRA', 'CHOOSER_SHELL', OWNER}, 'ICON_CONSOLIDATED_TARGETS')
-    require(previous.get('launcher_icon_exception') is None, 'ICON_EXCEPTION_ALREADY_USED')
-    require(previous['components'][OWNER]['digest'] == ORIGINAL_COMPONENT_DIGEST, 'ICON_PREVIOUS_OWNER')
     require(proposed['components'][OWNER]['settings_schema'] == previous['components'][OWNER]['settings_schema'],
             'ICON_SETTINGS_SCHEMA_FROZEN')
     old = {k: v for k, v in previous['payload'].items() if v['owner'] == OWNER}
     new = {k: v for k, v in proposed['payload'].items() if v['owner'] == OWNER}
     table = 'member:resources.arsc'
+    if versions == (2103430, 2103431):
+        prior_proof = validate(previous)
+        require(previous['generation'] == 15 and proposed['generation'] == 16, 'ICON_CORRECTION_GENERATION')
+        require(previous['last_issued_versionCode'] == 2103429 and
+                proposed['last_issued_versionCode'] == 2103430, 'ICON_CORRECTION_ISSUED_VERSION')
+        require(previous['components'][OWNER]['digest'] == SIGNED30_COMPONENT_DIGEST,
+                'ICON_CORRECTION_PREVIOUS_OWNER')
+        require(prior_proof['candidate_resource_table_sha256'] == SIGNED30_TABLE_SHA256 and
+                prior_proof['added_members'] == SIGNED30_ICON_SHA256, 'ICON_CORRECTION_PREVIOUS_RESOURCE_PINS')
+        require(set(new) == set(old), 'ICON_DENSITY_CORRECTION_NO_MEMBER_CHANGE')
+        require({k for k in old if old[k] != new[k]} == {'member:' + n for n in ADAPTIVE_PATHS},
+                'ICON_DENSITY_CORRECTION_EXACT_XML_DELTA')
+        require(proof['candidate_resource_table_sha256'] == SIGNED30_TABLE_SHA256,
+                'ICON_DENSITY_CORRECTION_TABLE_FROZEN')
+        # This freezes the entire existing table, five generated density PNGs,
+        # original dark assets, every class/DEX/native/manifest identity and all
+        # other resource members.  Only the two already-present light adaptive
+        # XMLs may change; fresh pre-sign derivation checks their exact bytes.
+        return proof
+    require(previous.get('launcher_icon_exception') is None, 'ICON_EXCEPTION_ALREADY_USED')
+    require(previous['components'][OWNER]['digest'] == ORIGINAL_COMPONENT_DIGEST, 'ICON_PREVIOUS_OWNER')
     require(old.get(table) == {'owner': OWNER, 'sha256': ORIGINAL_TABLE_SHA256}, 'ICON_PREVIOUS_TABLE')
     require(set(old) <= set(new), 'ICON_REMOVED_OR_RECLASSIFIED_SHARED_PAYLOAD')
     require(set(new) - set(old) == {'member:' + n for n in NEW_PATHS}, 'ICON_ONLY_NEW_MEMBERS')

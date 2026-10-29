@@ -379,6 +379,61 @@ class IconResourceGateTests(unittest.TestCase):
                 key_read.assert_not_called()
                 self.assertFalse((Path(tmp) / 'out').exists())
 
+    def test_density_correction_changes_only_two_pinned_existing_adaptive_xmls(self):
+        # Selected 430 -> 431 resource-inflation correction: preserve the exact
+        # signed430 predecessor, permit its two adaptive XMLs only, and recheck
+        # the final bytes against the independently pinned original artwork.
+        previous = copy.deepcopy(self.proposed)
+        for name, pin in self.guard.SIGNED30_ICON_SHA256.items():
+            previous['payload']['member:' + name]['sha256'] = pin
+        previous['payload']['member:resources.arsc']['sha256'] = self.guard.SIGNED30_TABLE_SHA256
+        self.refresh_digest(previous)
+        self.assertEqual(previous['components'][self.guard.OWNER]['digest'], self.guard.SIGNED30_COMPONENT_DIGEST)
+        previous['launcher_icon_exception'] = self.guard.make_exception(previous['payload'], self.read)
+        proposed = copy.deepcopy(previous)
+        proposed.update(generation=16, candidate_versionCode=2103431, last_issued_versionCode=2103430)
+        proposed['experience_version_labels']['COBRA'] = 2103431
+        proposed['payload']['member:assets/experience-component-updates.properties']['sha256'] = digest(
+            b'infinity.last_updated_in=2103427\ncobra.last_updated_in=2103431\n')
+        proposed['payload']['class:Lcom/projectinfinity/kodi/CobraComponent;']['sha256'] = digest(b'policy fixture31')
+        for name in self.guard.ADAPTIVE_PATHS:
+            proposed['payload']['member:' + name]['sha256'] = digest(self.generated[name])
+        for owner in self.targets:
+            proposed['components'][owner].update(version='policy-fixture31-' + owner,
+                revision=previous['components'][owner]['revision'] + 1, approved_source='c' * 40,
+                digest=gate.component_digest(proposed['payload'], owner))
+        proposed['launcher_icon_exception'] = self.guard.make_exception(proposed['payload'], self.read)
+        self.authority.transition(previous, proposed, self.targets)
+        with tempfile.TemporaryDirectory() as tmp:
+            report = self.guard.verify_actual_apk(self.write_apk(tmp, self.members), proposed)
+        self.assertEqual(report['status'], 'PASS_EXACT_ICON_ONLY_TABLE_TRANSFORM')
+        self.assertEqual(report['table_sha256'], self.guard.SIGNED30_TABLE_SHA256)
+        for kind in ('table', 'density-png', 'original-dark', 'new-member', 'one-xml', 'generation', 'issued-version'):
+            bad = copy.deepcopy(proposed); prior = copy.deepcopy(previous)
+            reason = 'ICON_DENSITY_CORRECTION_EXACT_XML_DELTA'
+            if kind == 'table':
+                bad['payload']['member:resources.arsc']['sha256'] = digest(b'unreviewed table')
+            elif kind == 'density-png':
+                bad['payload']['member:res/infinity_launcher_light_mdpi.png']['sha256'] = digest(b'unreviewed density PNG')
+            elif kind == 'original-dark':
+                bad['payload']['member:res/n4.png']['sha256'] = digest(b'unreviewed dark artwork')
+            elif kind == 'new-member':
+                bad['payload']['member:res/another.xml'] = {'owner': self.guard.OWNER, 'sha256': digest(b'new')}
+                reason = 'ICON_DENSITY_CORRECTION_NO_MEMBER_CHANGE'
+            elif kind == 'one-xml':
+                name = self.guard.ADAPTIVE_PATHS[0]
+                bad['payload']['member:' + name]['sha256'] = self.guard.SIGNED30_ICON_SHA256[name]
+            elif kind == 'generation':
+                prior['generation'] = 14; bad['generation'] = 15
+                reason = 'ICON_CORRECTION_GENERATION'
+            else:
+                bad['last_issued_versionCode'] = 2103429
+                reason = 'ICON_CORRECTION_ISSUED_VERSION'
+            self.refresh_digest(bad)
+            bad['launcher_icon_exception'] = self.guard.make_exception(bad['payload'], self.read)
+            with self.subTest(kind=kind), self.assertRaisesRegex(gate.Rejected, reason):
+                self.authority.transition(prior, bad, self.targets)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,4 +1,4 @@
-"""Bounded native icon-surface observations for the unchanged signed430 APK.
+"""Bounded native icon-surface observations for the unchanged signed431 APK.
 
 Only normal Settings App Info, Home/All Apps, system uiMode and read-only shell
 diagnostics are used. No settings action/icon is tapped; no package, alias,
@@ -16,7 +16,7 @@ from pathlib import Path
 
 PACKAGE = 'com.projectinfinity.kodi'
 COBRA = PACKAGE+'/.InfinityLiveActivity'
-VERSION = 2103430
+VERSION = 2103431
 
 
 def _bounds(node):
@@ -50,7 +50,7 @@ def drawer_state(nodes, launcher):
 
 def observe(out: Path, apk_sha256: str, version_code: int):
     out.mkdir(parents=True, exist_ok=False)
-    report = {'scope': 'UNCHANGED_SIGNED430_NORMAL_SETTINGS_AND_NATIVE_ALL_APPS_ICON_SURFACES',
+    report = {'scope': 'UNCHANGED_SIGNED431_NORMAL_SETTINGS_AND_NATIVE_ALL_APPS_ICON_SURFACES',
               'receipt_apk_sha256': apk_sha256, 'versionCode': version_code,
               'APK_binding': 'Parent signature/hash/install probe binds the exact signed APK',
               'Infinity': 'NOT_LAUNCHED', 'shutdown': 'NOT_RUN',
@@ -128,7 +128,7 @@ def observe(out: Path, apk_sha256: str, version_code: int):
 
     try:
         if version_code != VERSION or re.fullmatch(r'[0-9a-f]{64}', apk_sha256) is None:
-            raise RuntimeError('Exact final430 receipt required')
+            raise RuntimeError('Exact final431 receipt required')
         serial = text('get-serialno').strip()
         sdk = text('shell', 'getprop', 'ro.build.version.sdk').strip()
         qemu = text('shell', 'getprop', 'ro.kernel.qemu').strip()
@@ -138,7 +138,7 @@ def observe(out: Path, apk_sha256: str, version_code: int):
         package = text('shell', 'dumpsys', 'package', PACKAGE)
         (out/'installed-package.txt').write_text(package)
         if re.search(r'\bversionCode='+str(VERSION)+r'\b', package) is None:
-            raise RuntimeError('Installed package is not430')
+            raise RuntimeError('Installed package is not431')
         _, report['initial_Cobra_frames'], welcome_guard = state_poll(out, 'initial-Cobra-welcome', empty_cobra)
         if not welcome_guard:
             raise RuntimeError('Empty Cobra welcome required before sources/playback')

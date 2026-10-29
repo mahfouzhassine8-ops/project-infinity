@@ -1,0 +1,10 @@
+{
+  "status": "INITIAL_CHECKER_ASSUMPTION_FAILED_NOT_APPLICATION_FAILURE",
+  "failed_check": "EXACT_CHANGED_MEMBERS_VS_PREVIOUS29",
+  "source": "Root reported first downloaded-byte checker failure and independently streamed raw member differences",
+  "initial_assumption": "Both Cobra DEX parts changed from29 to30",
+  "actual_correction": "Only classes4.dex changes; classes5.dex remains byte-identical to29. Strict previous29 allowlist removes classes5.dex. No APK/build/sign/source change.",
+  "initial_checker_sha256": "85d87e9d5c609e2352f5eb7db8531d1a5562b0721ec42b2de7d01a2bc06ba0b6",
+  "repository_changes": "NONE",
+  "application_failure_claimed": false
+}

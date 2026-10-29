@@ -1,4 +1,4 @@
-"""Finite signed430 UI journey for Pro Fullscreen / More / PiP ownership.
+"""Finite signed431 UI journey for Pro Fullscreen / More / PiP ownership.
 
 Normal UI imports the explicitly synthetic loopback playlist. Every player
 action is an adb coordinate press on its current visible accessibility bounds,
@@ -100,11 +100,25 @@ class Snapshot:
                 return node
         return None
 
+    def pro_hero(self):
+        # Both source arrows are direct children of the real clickable Hero.
+        # WATCHING can already be active with Preview/Unmute and the four-second
+        # player strip hidden, so those controls cannot bootstrap its geometry.
+        previous = self.find(r'^Previous Pro source$', enabled=True, clickable=True)
+        following = self.find(r'^Next Pro source$', enabled=True, clickable=True)
+        hero = self.parents.get(previous) if previous is not None else None
+        if (following is not None and hero is self.parents.get(following) and
+                hero.get('package') == PACKAGE and hero.get('class') == 'android.view.ViewGroup' and
+                hero.get('enabled') == 'true' and hero.get('clickable') == 'true' and
+                positive(bounds(hero))):
+            return hero
+        return None
+
 
 def journey(out):
     out.mkdir(parents=True, exist_ok=False)
     steps = []
-    report = {'scope': 'SIGNED430_PRO_VISIBLE_COORDINATE_BUTTONS_SYNTHETIC_QA1',
+    report = {'scope': 'SIGNED431_PRO_VISIBLE_COORDINATE_BUTTONS_SYNTHETIC_QA1',
               'physical_Fold': 'NOT_RUN', 'Infinity': 'NOT_LAUNCHED',
               'shutdown': 'NOT_RUN', 'steps': steps, 'actions': {}}
     sequence = 0
@@ -251,7 +265,11 @@ def journey(out):
                     press_node(node, 'Pro '+label+' normal watching entry')
                     break
             else:
-                if hero_box is not None:
+                hero = snap.pro_hero()
+                if hero is not None:
+                    hero_box = bounds(hero)
+                    press_node(hero, 'Pro watching Hero to reveal controls')
+                elif hero_box is not None:
                     reveal()
             time.sleep(.5)
         raise RuntimeError('Pro watching controls not observed; labels='+repr(snap.labels()))

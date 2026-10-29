@@ -13,8 +13,8 @@ configuration-change bit. No new resource IDs or changes to non-icon table
 entries are introduced. All original resource files remain byte-identical.
 
 The original foreground and original Android13 monochrome foreground have
-**identical alpha pixels** at 432×432. The new light adaptive icon uses an inline
-white ColorDrawable and a black-tinted BitmapDrawable referencing that existing
+**identical alpha pixels** at 432×432. The new light adaptive icon uses a nested
+white shape/solid background and a black-tinted BitmapDrawable referencing that existing
 monochrome source. It does not trace, redraw or synthesize a replacement emblem.
 The old adaptive XMLs, colored foreground, navy background, monochrome, original
 master and five density pairs remain unchanged for night mode.
@@ -42,3 +42,23 @@ enabled themed-icon setting may use the unchanged monochrome mask and choose its
 own wallpaper palette: those colors cannot promise the approved exact cyan/navy
 or black/white treatment on every system surface. No component toggling, duplicate
 icon, launcher reset, service, polling or unsafe workaround is introduced.
+
+## Density-override correction after signed430 verification
+
+Signed430's inline `android:drawable="#FFFFFFFF"` background had `resourceId0`.
+With a nonzero density override, Android's `TypedArray.getDrawableForDensity`
+tries to resolve that ID and throws before loading the color. The API37
+launcher reported a default-icon fallback; actual API35 framework inflation
+reproduced the same ResourceID0 failure while signed27 controls passed.
+
+The correction uses a nested `<shape><solid android:color="#FFFFFFFF"/></shape>`
+background. It changes only the two existing new adaptive XML payloads: resource
+table, five light legacy PNGs, all original assets, IDs and paths stay exact.
+
+`InfinityLauncherResourceInflationTest` loads compiled APK resources through the
+actual API35 framework with native graphics. Local verification passes both IDs,
+day/night, density0 and density420, with a framework default-icon control. All
+candidate dark pixel arrays exactly match the signed27 baseline; day renders show
+the original black emblem on white. The original signed430 is an explicit
+negative control and still reproduces ResourceID0 at density420. Final combined
+APK and physical Samsung behavior remain separate acceptance steps.

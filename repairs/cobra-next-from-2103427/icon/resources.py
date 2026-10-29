@@ -209,9 +209,10 @@ def light_legacy(original, monochrome):
 def adaptive_xml(sdk):
     # Framework attribute IDs are from the pinned android34 SDK android.R$attr.
     # Inline ColorDrawable/BitmapDrawable require no new app resource IDs.
-    strings = ["drawable", "src", "tint", "android", "http://schemas.android.com/apk/res/android",
-               "adaptive-icon", "background", "foreground", "bitmap", "monochrome"]
-    ix = {s: i for i, s in enumerate(strings)}; no = 0xFFFFFFFF; uri = ix[strings[4]]
+    strings = ["drawable", "src", "tint", "color", "android", "http://schemas.android.com/apk/res/android",
+               "adaptive-icon", "background", "foreground", "bitmap", "monochrome", "shape", "solid"]
+    ix = {s: i for i, s in enumerate(strings)}; no = 0xFFFFFFFF
+    uri = ix["http://schemas.android.com/apk/res/android"]
     def node(kind, extension):
         return struct.pack("<HHIII", kind, 16, 16+len(extension), 1, no) + extension
     def start(name, attributes=()):
@@ -221,10 +222,16 @@ def adaptive_xml(sdk):
         return node(0x102, ext)
     def end(name): return node(0x103, struct.pack("<II", no, ix[name]))
     content = make_pool(strings)
-    content += struct.pack("<HHI3I", 0x180, 8, 20, 0x01010199, 0x01010119, 0x01010121)
+    content += struct.pack("<HHI4I", 0x180, 8, 24, 0x01010199, 0x01010119, 0x01010121, 0x010101A5)
     content += node(0x100, struct.pack("<II", ix["android"], uri))
     content += start("adaptive-icon")
-    content += start("background", (("drawable", 0x1C, 0xFFFFFFFF),)) + end("background")
+    # A literal drawable color has resourceId0. AdaptiveIconDrawable calls
+    # TypedArray.getDrawableForDensity with a nonzero density override, which
+    # tries to resolve that ID and throws. A nested shape uses child inflation
+    # and reads solid color directly, preserving the same white pixels.
+    content += start("background") + start("shape")
+    content += start("solid", (("color", 0x1C, 0xFFFFFFFF),)) + end("solid")
+    content += end("shape") + end("background")
     content += start("foreground")
     content += start("bitmap", (("src", 1, MONO_ID), ("tint", 0x1C, 0xFF000000))) + end("bitmap")
     content += end("foreground")

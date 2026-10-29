@@ -74,7 +74,10 @@ class IconResourcesTest(unittest.TestCase):
                         attr = strings[struct.unpack_from("<I", data, at+4)[0]]
                         attrs[attr] = (data[at+15], struct.unpack_from("<I", data, at+16)[0])
                     starts.append((name, attrs))
-            self.assertIn(("background", {"drawable": (0x1C, 0xFFFFFFFF)}), starts)
+            self.assertIn(("background", {}), starts)
+            self.assertIn(("shape", {}), starts)
+            self.assertIn(("solid", {"color": (0x1C, 0xFFFFFFFF)}), starts)
+            self.assertNotIn(("background", {"drawable": (0x1C, 0xFFFFFFFF)}), starts)
             self.assertIn(("bitmap", {"src": (1, icon.MONO_ID), "tint": (0x1C, 0xFF000000)}), starts)
             self.assertEqual(sdk == 33, any(n == "monochrome" for n, _ in starts))
 

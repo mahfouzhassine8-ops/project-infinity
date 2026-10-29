@@ -17,7 +17,7 @@ def package_icon_owner(original_path,row,dest,source):
     old=read_bundle(original_path,row);meta=copy.deepcopy(old)
     original=read_members(original_path);updated=expected_resources(original)
     proof=verify_resources(original|updated,original)
-    meta.update(version='isolation-contract.1.launcher-icons.2103430',approved_source=source)
+    meta.update(version='isolation-contract.1.launcher-icons.2103431',approved_source=source)
     with ZipFile(original_path) as before,ZipFile(dest,'w') as target:
         for name in meta['dex']:
             target.writestr(record(name),before.read(name))
@@ -91,7 +91,7 @@ def package(bundles,work,jars,out,source):
     require(set(old_methods)==set(new_methods),'EXACT_ACTIVITY_METHOD_SET')
     require({m for m in old_methods if old_methods[m]!=new_methods[m]}==set(selected),'UNCHANGED_ACTIVITY_METHODS')
     result=copy.deepcopy(catalog);result['source']=source
-    metadata=b'infinity.last_updated_in=2103427\ncobra.last_updated_in=2103430\n'
+    metadata=b'infinity.last_updated_in=2103427\ncobra.last_updated_in=2103431\n'
     icon_proof=None
     for owner,row in catalog['bundles'].items():
         dest=out/row['file']
@@ -102,7 +102,7 @@ def package(bundles,work,jars,out,source):
             require(file_sha(bundles/row['file'])==scope['frozen_owner_zips'][owner],'FROZEN_ZIP')
             shutil.copyfile(bundles/row['file'],dest);continue
         old=metas[owner];meta=copy.deepcopy(old)
-        meta.update(version=VERSION if owner=='COBRA' else '2103430.version-wording.1',approved_source=source)
+        meta.update(version=VERSION if owner=='COBRA' else '2103431.version-wording.1',approved_source=source)
         meta['payload']={k:v for k,v in old['payload'].items() if not k.startswith('class:')}
         meta['payload'].update({k:v for k,v in revised.items() if v['owner']==owner});meta['dex']={}
         with ZipFile(bundles/row['file']) as original,ZipFile(dest,'w') as target:
