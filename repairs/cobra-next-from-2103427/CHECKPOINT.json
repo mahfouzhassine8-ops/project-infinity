@@ -4,7 +4,7 @@
   "full_brief_read": true,
   "production_implementation_started": true,
   "current_build": "/workspace/cobra-evidence/build-v7",
-  "build_status": "FINAL25HOST_PLUS4BASELINE_PASS_EXACT_VECTOR_REGISTERED",
+  "build_status": "ONE28APK_SIGNED_AND_CI_VERIFIED; INDEPENDENT_DOWNLOAD_CHECKS_NEXT",
   "baseline_apk": "/workspace/infinity-evidence/continuation2103427/signed27-ci/Infinity-2103427-Combined-Original-Signer.apk",
   "baseline_components": "/workspace/infinity-evidence/continuation2103427/components27-ci",
   "actual_baseline_smali": "/workspace/cobra-evidence/baseline/COBRA/smali-0/com/projectinfinity/kodi/InfinityLiveActivity.smali",
@@ -16,7 +16,7 @@
   "maven": "/workspace/cobra-evidence/maven/apache-maven-3.9.9/bin/mvn",
   "selected_scope": "SCOPE.json",
   "source_budget": "SOURCE-BUDGET.json",
-  "next": "Push registered vector to invoke sole signer once. Retry exact baseline Cobra runtime using file entry (prior failure executed shell import, never app). Await real app result, do not infer native crash. Download and independently verify signed28 plus all4ZIPs; update delivery/ledger. No device acceptance or lock promotion.",
+  "next": "Verify downloaded signed28 and4ZIPs independently; QA-only Python3.12 preflight fix (40810182108 failed at hashlib before adb/app); retry same baselineAPK once with corrected interpreter; no APK rebuild, no native/shutdown edits.",
   "found_defects": [
     "Existing MultiView chooser has Fit/Fill only; no11arrangements",
     "NonPro preview More precedes Fullscreen/PiP; classic and Pro full strip alreadyMoreLast (preserve)",
@@ -46,6 +46,9 @@
   "authority_generation": 13,
   "baseline_android_setup_runs": [
     40807700925,
-    40809097504
-  ]
+    40809097504,
+    40810182108
+  ],
+  "signed_source": "cc470f81b65defc86bb00186fe8c0ae6425cad70",
+  "signed_run": 40810155686
 }

@@ -137,6 +137,12 @@ jobs:
         with: {ref: "${{ inputs.source_ref }}", fetch-depth: 0, persist-credentials: false}
       - uses: actions/setup-java@v4
         with: {distribution: temurin, java-version: '21'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Preflight probe interpreter before SDK/emulator work
+        run: |
+          python3 --version
+          python3 -c 'import hashlib; assert hasattr(hashlib,"file_digest")'
       - uses: actions/download-artifact@v4
         with:
           run-id: ${{ inputs.candidate_build }}
