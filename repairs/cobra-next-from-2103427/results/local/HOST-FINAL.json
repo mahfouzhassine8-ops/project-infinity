@@ -1,0 +1,69 @@
+{
+  "status": "PASS25_SELECTED_HOST_ONLY",
+  "runtime": "Robolectric API35 actual rebuilt DEX; inert players and loopback PNG; no native decoding",
+  "tests": [
+    {
+      "name": "com.projectinfinity.kodi.CobraLogoCompletionTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "4.781"
+    },
+    {
+      "name": "com.projectinfinity.kodi.CobraArrangeIntegrationTest",
+      "tests": "14",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "10.824"
+    },
+    {
+      "name": "com.projectinfinity.kodi.CobraPositionWorkTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "4.121"
+    },
+    {
+      "name": "com.projectinfinity.kodi.CobraMeasuredReflowTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "5.594"
+    },
+    {
+      "name": "com.projectinfinity.kodi.CobraLogoWorkTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "4.974"
+    }
+  ],
+  "production_dex": {
+    "owner-dex/CHOOSER_SHELL/part-0.dex": "07b94bfde6dbc3e3a6bfc8436ea65e6a67bdef5ca868379809e20f2fb7ce8efb",
+    "owner-dex/COBRA/part-1.dex": "af03db41f53209de52f5d8609e411da49fee106d0fe544d6ea6e5d8230d88363",
+    "owner-dex/COBRA/part-0.dex": "827312b5beae4b6dd8b845ee3829b74e8745429ee2bda3917712f5c5bc02095d"
+  },
+  "runtime_source_sha256": {
+    "CobraLogoRequests.java": "d16cbf66ced1defa3d5eefb474b6daa0ea988a0a90029d2dc022085b20bb996b",
+    "CobraArrange.java": "dbfcb846bb69ad427dea612d5eb50894eccc927dbec9ab47c205389bfd9c3c5d",
+    "CobraPresentation.java": "6f78397525e417a7a762aa2610b1745ba58624f0a5d2ef3509cd9bbdbfed3cc8",
+    "CobraLayoutCatalog.java": "840f8d826813ecf28e7fcbeef61a5aa801d4a2a5819286ca4d5055af99875f6a"
+  },
+  "test_source_sha256": {
+    "CobraLogoCompletionTest.java": "274b7e8c9f8b96f8c098ee1dd6837a94a5bf857efc89819fbd4ebe52729ceef3",
+    "CobraMeasuredReflowTest.java": "804116ea7fbfea3d4cdea732b77e17241fb16415f70a296fa10c72ebef641ff1",
+    "CobraArrangeIntegrationTest.java": "0600bd4580b5826bd06f05a1f32a75e04b19fd01f484f03b130488459d331240",
+    "CobraPositionWorkTest.java": "617f58ded7a6a8773c2a4a0d40741db61b799964484b09cec6cec71c1e26b20a",
+    "CobraLogoWorkTest.java": "b826b14ae5dc5fb20a1b4d80d676244a843887ff55ea2664b87fa8d96d83a286"
+  },
+  "baseline_position": "COBRA_POSITION_WORK baseline=true repeated_calls=7000 setLayoutParams=7000 p50_ns_per_1000=2980536 min_ns=2061520 max_ns=5469810\n",
+  "baseline_logo": "COBRA_LOGO_WORK baseline=true cold_views=100 executor_submissions=100 delivered_after_one_completion=1\n",
+  "candidate_work_output": "COBRA_LOGO_WORK baseline=false cold_views=100 executor_submissions=1 delivered_after_one_completion=100\nCOBRA_POSITION_WORK baseline=false repeated_calls=7000 setLayoutParams=0 p50_ns_per_1000=1397187 min_ns=1204316 max_ns=7753014\n",
+  "shutdown": "NOT_RUN",
+  "physical_Fold": "NOT_RUN"
+}

@@ -21,7 +21,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -36,8 +36,8 @@ import java.util.WeakHashMap;
 public final class CobraArrange {
   private static final WeakHashMap<Activity,WeakReference<CobraArrange>> OWNERS=new WeakHashMap<>();
   private final WeakReference<Activity> owner;
-  private final Map<String,Field> fields=new HashMap<>();
-  private final Map<String,Method> methods=new HashMap<>();
+  private final Map<String,Field> fields=new ConcurrentHashMap<>();
+  private final Map<String,Method> methods=new ConcurrentHashMap<>();
   private final IdentityHashMap<View,Touch> listeners=new IdentityHashMap<>();
   private final Handler handler=new Handler(Looper.getMainLooper());
   private FrameLayout attached;
@@ -57,6 +57,8 @@ public final class CobraArrange {
       if(value==null){value=new CobraArrange(a);OWNERS.put(a,new WeakReference<>(value));}return value;
     }
   }
+  static Object ownedField(Activity a,String name){return get(a).read(name);}
+  static Object ownedCall(Activity a,String name,Class<?>[] types,Object...args){return get(a).call(a,name,types,args);}
   private Activity activity(){Activity a=owner.get();if(a==null)throw new IllegalStateException("Cobra owner retired");return a;}
   private Field field(Object object,String name){
     String key=object.getClass().getName()+"#"+name;Field f=fields.get(key);

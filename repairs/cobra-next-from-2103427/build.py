@@ -81,6 +81,12 @@ def patch_activity(text):
 .end method
 '''
     update('cobraPosition',position)
+    def logo_request(s):
+        return s.split('\n',1)[0]+"\n    .registers 3\n    invoke-static {p0, p1, p2}, "+APP+"CobraLogoRequests;->request(Landroid/app/Activity;Ljava/lang/String;Landroid/widget/ImageView;)V\n    return-void\n.end method\n"
+    def logo_deliver(s):
+        return s.split('\n',1)[0]+"\n    .registers 4\n    invoke-static {p0, p1, p2, p3}, "+APP+"CobraLogoRequests;->deliver(Landroid/app/Activity;Ljava/lang/String;Landroid/graphics/Bitmap;Landroid/widget/ImageView;)V\n    return-void\n.end method\n"
+    update('cobraSportsLoadLogo',logo_request)
+    update('lambda$cobraSportsLoadLogo$481$com-projectinfinity-kodi-InfinityLiveActivity',logo_deliver)
     def back(s):
         anchor='    .registers 7\n';assert s.count(anchor)==1
         return s.replace(anchor,anchor+'''
@@ -144,7 +150,7 @@ def build(bundles,jars,android,d8,out):
     host=out/'host';host.mkdir();cp=':'.join(map(str,sorted(jars.glob('*.jar'))))
     run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-source','8','-target','8','-g:none','-Xlint:-options','-cp',cp,'-d',host,ISO/'ModuleDexWriter.java'])
     run(['java','-cp',str(host)+':'+cp,'org.jf.dexlib2.writer.pool.ModuleDexWriter',out/'owner-dex',out/'assignments.tsv',out/'origins.tsv',out/'changed.dex',helper/'classes.dex',*inputs])
-    save(out/'BUILD.json',dict(status='COMPILED_UNSIGNED_COBRA_AND_NARROW_CHOOSER_ONLY',selected_activity_methods=selected,unchanged_activity_methods=len(methods(source[ACTIVITY]))-len(selected),baseline_class_count=len(source),Cobra_version=VERSION,Infinity='EXACT_FROZEN_BUNDLE',shutdown='NOT_RUN_FROZEN',user_data_modified=False))
+    save(out/'BUILD.json',dict(status='COMPILED_UNSIGNED_COBRA_AND_NARROW_CHOOSER_ONLY',selected_activity_methods=selected,unchanged_activity_methods=len(methods(source[ACTIVITY]))-len(selected),baseline_class_count=len(source),Cobra_version=VERSION,runtime_source_sha256={p.name:file_sha(p) for p in sorted((HERE/'runtime').glob('*.java'))},source_budget_sha256=file_sha(HERE/'SOURCE-BUDGET.json'),Infinity='EXACT_FROZEN_BUNDLE',shutdown='NOT_RUN_FROZEN',user_data_modified=False))
 
 
 if __name__=='__main__':

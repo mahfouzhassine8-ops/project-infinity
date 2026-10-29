@@ -7,7 +7,9 @@
     "private cobraPreviewPanel(Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;Z)Landroid/widget/FrameLayout;": "9632201b03e0b9feee97106d0a3f3074440a3ce762717d55e5fe2e3bbb42a62f",
     "private cobraShowMultiLayoutChooser()V": "4e290e8381a03928d289a2e5e2f5112fa033ecb2459d5bd17479677616f6efde",
     "private showCobraMultiTileActions(I)V": "5dfea0b3734107fe48760d1a570a0d068fe349dae73c65475693b7fad117543c",
-    "public onBackPressed()V": "d55fe92ecd0034b19bfc0ecd5520bfab82ec754c4a897baf4243e688f0020b1f"
+    "public onBackPressed()V": "d55fe92ecd0034b19bfc0ecd5520bfab82ec754c4a897baf4243e688f0020b1f",
+    "private cobraSportsLoadLogo(Ljava/lang/String;Landroid/widget/ImageView;)V": "c4cb8ac589c392904b24ef52bc839955fa89652bceb026e5bf8017d6c665c77a",
+    "synthetic lambda$cobraSportsLoadLogo$481$com-projectinfinity-kodi-InfinityLiveActivity(Ljava/lang/String;Landroid/graphics/Bitmap;Landroid/widget/ImageView;)V": "30b57d9e6e95cac2fc9c9c50ca82f0188eae17bb8bf5eb8d4a10d046e7665e87"
   },
   "activity_new_fields": [],
   "other_changed_existing_classes": [
@@ -17,7 +19,8 @@
   "allowed_new_class_roots": [
     "CobraArrange",
     "CobraLayoutCatalog",
-    "CobraPresentation"
+    "CobraPresentation",
+    "CobraLogoRequests"
   ],
   "preserved_class_families": [
     "CobraProUi",
@@ -32,6 +35,13 @@
       "cause": "Every call allocates FrameLayout.LayoutParams and calls setLayoutParams even with identical bounds",
       "correction": "Return early only for exact existing default non-relative FrameLayout params with same clamped bounds; retain original changed-bounds behavior",
       "test": "Actual production method before/after layout request/allocation counts and measured resize geometry"
+    },
+    {
+      "id": "D2",
+      "source": "Actual signed cobraSportsLoadLogo and lambda$cobraSportsLoadLogo$481",
+      "cause": "Cold same-URL logo callers each submit another worker; callback checks attachment only, not current request ownership",
+      "selected_test": "CobraLogoWorkTest baseline and candidate actual entry/callback, recording existing executor, controlled completion; no HTTP/provider/device claim",
+      "correction": "Coalesce same URL; at most4 logo admissions on existing executor; weak view request ownership and existing bounded48 bitmap cache; preserve original download/timeout and worker responsibilities"
     }
   ],
   "controller_lifetime": "Weak Activity keys and weak helper values; active UI listeners retain at most4 pane gestures; detach cancels timers and removes listeners; no shared/runtime field mutation"

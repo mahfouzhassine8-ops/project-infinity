@@ -46,7 +46,7 @@ def prepare(work,apk,dex2jar,out,baseline_measure=False):
                         if label=='support' and not name.startswith(('com/projectinfinity/kodi/','androidx/')):continue
                         seen.add(name);target.writestr(name,z.read(name))
     tests=out/'src/test/java/com/projectinfinity/kodi';tests.mkdir(parents=True)
-    selected=[HERE/'tests/CobraPositionWorkTest.java'] if baseline_measure else sorted((HERE/'tests').glob('*.java'))
+    selected=[HERE/'tests/CobraPositionWorkTest.java',HERE/'tests/CobraLogoWorkTest.java'] if baseline_measure else sorted((HERE/'tests').glob('*.java'))
     for path in selected:shutil.copyfile(path,tests/path.name)
     pom=(REPO/'repairs/dual-experience-isolation-2103420/tests/pom.xml').read_text().replace('${runtime.work}/changed-host.jar',str(out/'production.jar')).replace('${baseline.dex}/application-host.jar',str(out/'support.jar'))
     (out/'pom.xml').write_text(pom)

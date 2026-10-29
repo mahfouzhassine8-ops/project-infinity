@@ -144,6 +144,11 @@ jobs:
           merge-multiple: true
           github-token: ${{ github.token }}
           path: runtime-signed
+      - uses: android-actions/setup-android@v4
+        with:
+          cmdline-tools-version: '15859902'
+          packages: platform-tools build-tools;35.0.0
+          log-accepted-android-sdk-licenses: false
       - name: Prepare exact API37 infrastructure and verify original signing
         run: |
           set -euo pipefail

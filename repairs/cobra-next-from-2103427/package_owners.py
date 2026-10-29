@@ -13,6 +13,8 @@ from review_ownership import class_owner
 def package(bundles,work,jars,out,source):
     bundles,work,jars,out=(p.resolve() for p in (bundles,work,jars,out))
     require(re.fullmatch('[0-9a-f]{40}',source)!=None,'EXACT_SOURCE')
+    for path in [HERE/'build.py',HERE/'SOURCE-BUDGET.json',*sorted((HERE/'runtime').glob('*.java'))]:
+        require(subprocess.check_output(['git','show',source+':'+str(path.relative_to(HERE.parents[1]))])==path.read_bytes(),'EXACT_COMMITTED_SOURCE:'+path.name)
     require(not out.exists(),'FRESH_OUTPUT');out.mkdir(parents=True)
     scope=load(HERE/'SCOPE.json')
     previous=json.loads(subprocess.check_output(['git','show',scope['baseline_source']+':repairs/dual-experience-isolation-2103420/release-authority.json']))
@@ -36,7 +38,7 @@ def package(bundles,work,jars,out,source):
     require(set(originals)<=set(revised),'REMOVED_CLASS')
     expected={APP+n+';' for n in ('InfinityLiveActivity','CobraComponent','ChooserReleaseMetadata')}
     require(changed=={'class:'+n for n in expected},'EXACT_CHANGED_CLASSES')
-    roots={APP+x for x in ('CobraArrange','CobraPresentation','CobraLayoutCatalog')}
+    roots={APP+x for x in ('CobraArrange','CobraPresentation','CobraLayoutCatalog','CobraLogoRequests')}
     require(bool(new) and all(k[6:].split('$')[0].rstrip(';') in roots for k in new),'NARROW_NEW_CLASSES')
     baseline_texts={}
     for p in (work/'baseline').rglob('*.smali'):

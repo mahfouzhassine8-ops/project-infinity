@@ -3,8 +3,8 @@
   "HEAD": "f8298a841c294a630c970bf83071da3c73879570",
   "full_brief_read": true,
   "production_implementation_started": true,
-  "current_build": "/workspace/cobra-evidence/build-v5",
-  "build_status": "LOCAL21HOST_TESTS_PASS; BASELINE_WORK_COUNTS_MATCHED; CI_NEXT",
+  "current_build": "/workspace/cobra-evidence/build-v7",
+  "build_status": "LOCAL25HOST_PASS_WITH_D2; EXACT7274OLDCLASSES_PLUS20HELPERS_VERIFIED; FINAL_CI_NEXT",
   "baseline_apk": "/workspace/infinity-evidence/continuation2103427/signed27-ci/Infinity-2103427-Combined-Original-Signer.apk",
   "baseline_components": "/workspace/infinity-evidence/continuation2103427/components27-ci",
   "actual_baseline_smali": "/workspace/cobra-evidence/baseline/COBRA/smali-0/com/projectinfinity/kodi/InfinityLiveActivity.smali",
@@ -16,7 +16,7 @@
   "maven": "/workspace/cobra-evidence/maven/apache-maven-3.9.9/bin/mvn",
   "selected_scope": "SCOPE.json",
   "source_budget": "SOURCE-BUDGET.json",
-  "next": "Commit source and run existing feature-only workflow Cobra-owner-host and baseline Cobra-android-launch; inspect evidence; register prepared vector and sign one APK only after source/owner gates",
+  "next": "Commit complete D2/resource correction and exact SDK setup fix; run final source-bound host owner preparation and baseline Cobra-only API37 retry; inspect actual observations; register and sign one28APK. No APK yet produced/signed/installed.",
   "found_defects": [
     "Existing MultiView chooser has Fit/Fill only; no11arrangements",
     "NonPro preview More precedes Fullscreen/PiP; classic and Pro full strip alreadyMoreLast (preserve)",
@@ -26,15 +26,17 @@
   "historical_reflow_files": "/workspace/cobra-evidence/history-reflow",
   "first_failed_build": "/workspace/cobra-evidence/build-v1.log (writer refused newfield; fixedbyremovingfield notweakeningguard)",
   "important_pending_reviews": [
-    "Final source menu ownership guard and background/PiP cancellation added afterv4; requires final build/tests",
-    "Stationary long-hold preserves original context menu on release; verify physical interaction acceptance",
-    "Whole unchanged Pro/Six/reflow classes and all remaining Activity methods exact; packaging verified v4c"
+    "Final25 tests PASS; original downloader/executor/protected task wrappers unchanged",
+    "Final owner producer must bind all D2 source; earliera0e8 owner artifact is superseded unsigned evidence, do not register it",
+    "Stationary hold context menu opens on release; physical interaction acceptance pending"
   ],
   "shutdown": "NOT_RUN_FROZEN",
   "Infinity": "FROZEN_EXACT_ZIP",
   "no_newagents": true,
   "git_status": "OnlynewCobra taskfilesuncommitted; do not lose production code",
-  "host_tests": "/workspace/cobra-evidence/host-v5",
+  "host_tests": "/workspace/cobra-evidence/host-v7",
   "baseline_host": "/workspace/cobra-evidence/host-baseline",
-  "gate_controls": "14 PASS"
+  "gate_controls": "14 PASS",
+  "prior_host_run": 40807697956,
+  "baseline_android_setup_failure": 40807700925
 }

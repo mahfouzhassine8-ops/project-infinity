@@ -25,7 +25,7 @@ def register(bundles,producer_run):
  changed={k for k in old if payload[k]!=old[k]}
  expected={'class:Lcom/projectinfinity/kodi/'+n+';' for n in ('InfinityLiveActivity','CobraComponent','ChooserReleaseMetadata')}
  expected.add('member:assets/experience-component-updates.properties');require(changed==expected,'EXACT_CHANGED_EXISTING_PAYLOAD')
- added=set(payload)-set(old);roots={'class:Lcom/projectinfinity/kodi/'+n for n in ('CobraArrange','CobraPresentation','CobraLayoutCatalog')}
+ added=set(payload)-set(old);roots={'class:Lcom/projectinfinity/kodi/'+n for n in ('CobraArrange','CobraPresentation','CobraLayoutCatalog','CobraLogoRequests')}
  require(bool(added) and all(k.split('$')[0].rstrip(';') in roots and payload[k]['owner']=='COBRA' for k in added),'NARROW_NEW_CLASSES')
  proposed=copy.deepcopy(previous)
  proposed.update(generation=13,last_issued_versionCode=2103427,candidate_versionCode=2103428,update_kind='owner_update',target_owners=['COBRA','CHOOSER_SHELL'],previous_authority_sha256=digest(canonical(previous)),payload=payload,bundle_catalog=catalog,experience_version_labels={'INFINITY':2103427,'COBRA':2103428})

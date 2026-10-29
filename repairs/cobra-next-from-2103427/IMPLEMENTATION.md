@@ -17,3 +17,11 @@ The complete 188-line user brief was read before implementation. Continue from s
 Matched host position fixture: baseline7,000 repeated calls ->7,000 setLayoutParams; candidate ->0. Seven samples of1,000 calls: baseline median2.981ms, candidate1.126ms. These are host method observations, not startup, FPS, CPU, thermal or battery results. Full outputs and input hashes: results/local/HOST.json.
 
 No shutdown tests, user-device operations or accepted-lock changes. CI source-bound verification, final owner packaging, original-key signing and physical acceptance remain pending at this checkpoint.
+
+## Integrated resource correction D2
+
+Actual signed baseline cold-logo test:100 views requesting the same URL submit100 existing-executor jobs. A controlled old completion also overwrites an ImageView rebound to another URL. New CobraLogoRequests coalesces same-URL requests, admits at most4 distinct logo jobs on the existing executor, and matches weak view bindings before publishing. It uses the existing bounded48-image cache and the exact unchanged original downloader, byte limit,4s connection/5s read limits and protected task wrapper. It introduces no executor, service, periodic polling or failure-retry loop. Detach removes binding/waiter listeners. At most4 active requests retain an original callback view; the remainder are weakly held and only admitted when attached. Reflection caches use concurrent maps because the existing downloader runs on its worker.
+
+Final local25 tests pass, including a real unchanged downloader over loopback PNGs:9 distinct URLs produce9 fetches with at most4 unfinished admissions, one shared URL fans out one bitmap, HTTP failure finishes without automatic retry, and unattached requests wait for attachment. The controlled100-view fixture changes submissions100→1 and delivery after one completion1→100. These are host work/ownership observations, not live provider or physical performance.
+
+CI40807697956 passed the earlier21-test source and exact owner packaging. API37 launch CI40807700925 failed before emulator/application execution because pinned cmdline-tools22.0 was absent; the Cobra lane now includes the existing setup-android15859902 step before the unchanged SDK gate. No app failure was inferred. Final integrated CI/signing follows.
