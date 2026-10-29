@@ -30,12 +30,20 @@ def journey(out):
     b=bounds(n)
     if len(b)==4 and b[2]>b[0] and b[3]>b[1]:return n
   return None
+ def scroll_menu(nodes):
+  # Native sheets clip offscreen accessibility nodes. Scroll only the top
+  # sheet's ScrollView, never a covered Guide list.
+  for n in reversed(nodes):
+   if n.get('class')=='android.widget.ScrollView' and n.get('scrollable')=='true':
+    b=bounds(n);x=(b[0]+b[2])//2;lo=b[3]-max(30,(b[3]-b[1])//8);hi=b[1]+max(30,(b[3]-b[1])//8)
+    adb('shell','input','swipe',str(x),str(lo),str(x),str(hi),'350');steps.append({'scrolled_native_sheet':list(b)});return True
+  return False
  def tap(pattern,attempts=8):
   for i in range(attempts):
    nodes=ui();n=find(pattern,nodes)
    if n is not None:
     x,y=center(bounds(n));adb('shell','input','tap',str(x),str(y));steps.append({'tap':pattern});return
-   time.sleep(.5)
+   scroll_menu(nodes);time.sleep(.5)
   raise RuntimeError('Visible UI action missing: '+pattern+'; labels='+repr(labels(nodes)))
  def wait(pattern,attempts=10):
   for i in range(attempts):
@@ -49,15 +57,15 @@ def journey(out):
   rects=set()
   for n in ui():
    b=bounds(n)
-   if n.get('class')=='android.widget.FrameLayout' and n.get('long-clickable')=='true' and len(b)==4 and b[2]-b[0]>100 and b[3]-b[1]>100:rects.add(b)
+   if n.get('class')=='android.widget.FrameLayout' and 'hold for channel actions' in n.get('content-desc','') and n.get('long-clickable')=='true' and len(b)==4 and b[2]-b[0]>100 and b[3]-b[1]>100:rects.add(b)
   return sorted(rects,key=lambda b:(b[2]-b[0])*(b[3]-b[1]),reverse=True)
  def menu():
   boxes=panes();assert boxes,'No accessible live pane bounds'
-  x,y=center(boxes[0]);adb('shell','input','swipe',str(x),str(y),str(x),str(y),'700');wait('^Multi-View layout$');return boxes
+  x,y=center(boxes[0]);adb('shell','input','swipe',str(x),str(y),str(x),str(y),'700');wait('^Move Screen$|^Use audio here$');return boxes
  def arrangement(name,count):
-  menu();tap('^Multi-View layout$');wait('^'+re.escape(name)+'$');shot('picker-'+name.replace('/','-').replace(' ','-'));tap('^'+re.escape(name)+'$');time.sleep(.3);shot('layout-'+str(count)+'-'+name.replace('/','-').replace(' ','-'));steps.append({'applied_arrangement':name,'screen_count':count})
+  menu();tap('^Multi-View layout$');wait('^Fit$');shot('picker-'+name.replace('/','-').replace(' ','-'));tap('^'+re.escape(name)+'$');time.sleep(.3);shot('layout-'+str(count)+'-'+name.replace('/','-').replace(' ','-'));steps.append({'applied_arrangement':name,'screen_count':count})
  def add(name):
-  menu();tap('^Add screen$');tap('^All$');tap('^'+name+'$');time.sleep(1)
+  menu();tap('^Add screen$');tap('^All$');tap('^'+re.escape(name)+'(?:\n|$)');time.sleep(1)
  try:
   tap('ADD TV SOURCE');tap('M3U / M3U8 playlist');nodes=ui();fields=[n for n in nodes if n.get('class')=='android.widget.EditText'];assert len(fields)==3
   for index,value in enumerate(['CobraQA','http://10.0.2.2:8765/qa.m3u']):
@@ -74,7 +82,7 @@ def journey(out):
   if find('^Multi-View$',nodes) is None:
    if find('^Pause preview$',nodes) is None:tap('^QA 1,');time.sleep(2)
    tap('^Fullscreen$')
-  shot('one-channel');tap('^Multi-View$');wait('^Pick a second screen$');tap('^All$');tap('^QA 2$');time.sleep(2);shot('two-playing')
+  shot('one-channel');tap('^Multi-View$');wait('^Pick a second screen$');tap('^All$');tap('^QA 2(?:\n|$)');time.sleep(2);shot('two-playing')
   for name in ['50/50','Picture in Picture — Bottom Right','Picture in Picture — Bottom Left','Picture in Picture — Top Right','Picture in Picture — Top Left']:arrangement(name,2)
   arrangement('50/50',2);boxes=panes();assert len(boxes)>=2
   boxes=sorted(boxes[:2],key=lambda b:(b[1],b[0]));a,b=center(boxes[0]),center(boxes[1])
