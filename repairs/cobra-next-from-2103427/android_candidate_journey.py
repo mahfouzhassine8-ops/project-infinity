@@ -18,7 +18,7 @@ def bounds(n):return tuple(map(int,re.findall(r'\d+',n.get('bounds',''))))
 def center(b):return (b[0]+b[2])//2,(b[1]+b[3])//2
 
 def journey(out):
- out.mkdir(parents=True);steps=[];report={'scope':'EXACT_SIGNED2103428_UI_ONLY_SYNTHETIC_STREAMS','physical_Fold':'NOT_RUN','shutdown':'NOT_RUN','steps':steps};seq=0
+ out.mkdir(parents=True);steps=[];report={'scope':'EXACT_SIGNED_COBRA_CANDIDATE_UI_ONLY_SYNTHETIC_STREAMS','physical_Fold':'NOT_RUN','shutdown':'NOT_RUN','steps':steps};seq=0
  def ui():
   nonlocal seq
   adb('shell','uiautomator','dump','/sdcard/cobra-qa-journey.xml');raw=adb('shell','cat','/sdcard/cobra-qa-journey.xml');seq+=1;(out/('%03d-ui.xml'%seq)).write_text(raw)
@@ -68,12 +68,12 @@ def journey(out):
    focused=[n for n in ui() if n.get('class')=='android.widget.EditText'];assert focused[index].get('focused')=='true'
    adb('shell','input','text',value);steps.append({'filled_field':index})
   tap('^TEST & SAVE$')
-  nodes=wait('QA 1|CobraQA',15)
+  nodes=wait('^QA 1,|^Multi-View$',15)
   # Source validation can already open fullscreen. Its covered Guide remains
   # in the accessibility tree; never click that background's QA1/details row.
   if find('^Multi-View$',nodes) is None:
-   if find('^QA 1,',nodes) is None:tap('CobraQA')
-   tap('^QA 1,');time.sleep(2);tap('^Fullscreen$')
+   if find('^Pause preview$',nodes) is None:tap('^QA 1,');time.sleep(2)
+   tap('^Fullscreen$')
   shot('one-channel');tap('^Multi-View$');wait('^Pick a second screen$');tap('^All$');tap('^QA 2$');time.sleep(2);shot('two-playing')
   for name in ['50/50','Picture in Picture — Bottom Right','Picture in Picture — Bottom Left','Picture in Picture — Top Right','Picture in Picture — Top Left']:arrangement(name,2)
   arrangement('50/50',2);boxes=panes();assert len(boxes)>=2

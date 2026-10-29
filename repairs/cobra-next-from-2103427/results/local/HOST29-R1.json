@@ -1,0 +1,61 @@
+{
+  "status": "PASS26_HOST_ONLY",
+  "tests": [
+    {
+      "name": "com.projectinfinity.kodi.CobraLogoReattachTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.projectinfinity.kodi.CobraLogoCompletionTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.projectinfinity.kodi.CobraArrangeIntegrationTest",
+      "tests": "14",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.projectinfinity.kodi.CobraPositionWorkTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.projectinfinity.kodi.CobraMeasuredReflowTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "com.projectinfinity.kodi.CobraLogoWorkTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    }
+  ],
+  "runtime_source_sha256": {
+    "CobraLogoRequests.java": "d11670c06c5c2d7136de80f7837c9238111f7d69d968149ef5fdc52f41e45258",
+    "CobraArrange.java": "dbfcb846bb69ad427dea612d5eb50894eccc927dbec9ab47c205389bfd9c3c5d",
+    "CobraPresentation.java": "6f78397525e417a7a762aa2610b1745ba58624f0a5d2ef3509cd9bbdbfed3cc8",
+    "CobraLayoutCatalog.java": "840f8d826813ecf28e7fcbeef61a5aa801d4a2a5819286ca4d5055af99875f6a"
+  },
+  "production_DEX": {
+    "owner-dex/CHOOSER_SHELL/part-0.dex": "07b94bfde6dbc3e3a6bfc8436ea65e6a67bdef5ca868379809e20f2fb7ce8efb",
+    "owner-dex/COBRA/part-1.dex": "af03db41f53209de52f5d8609e411da49fee106d0fe544d6ea6e5d8230d88363",
+    "owner-dex/COBRA/part-0.dex": "4145273e03132b2214d3f657bb49dd028b8bdcb261bcc003ef3a961194aa13f1"
+  },
+  "output": "COBRA_LOGO_WORK baseline=false cold_views=100 executor_submissions=1 delivered_after_one_completion=100\nCOBRA_POSITION_WORK baseline=false repeated_calls=7000 setLayoutParams=0 p50_ns_per_1000=1374144 min_ns=411260 max_ns=4610408\n",
+  "physical_Fold": "NOT_RUN",
+  "shutdown": "NOT_RUN"
+}

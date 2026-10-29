@@ -7,7 +7,7 @@
   "baseline_run": 40769526963,
   "baseline_apk_sha256": "cd0c8ab5c77067e508baea0ad7d5207b3d6c73775b86387d4099a67cfe4215ca",
   "protected_ref": "lock/infinity-cobra-2103427-user-approved-20261028",
-  "candidate_versionCode": 2103428,
+  "candidate_versionCode": 2103429,
   "feature_owner": "COBRA",
   "frozen_owner_zips": {
     "INFINITY": "16eeb91a24bf0cf99d558d9e3dd17aedfd127e9a1936dcce413341c48683cd6c",
@@ -18,7 +18,7 @@
     "change": "Only updated label const Last updated in -> Version; preserve installed footer and offline metadata parsing",
     "member": "assets/experience-component-updates.properties",
     "Infinity_last_updated": 2103427,
-    "Cobra_last_updated": 2103428
+    "Cobra_last_updated": 2103429
   },
   "initial_class_budget": {
     "COBRA": [
@@ -52,10 +52,17 @@
     "CobraMeasuredReflowTest",
     "CobraPositionWorkTest",
     "CobraLogoWorkTest",
-    "CobraLogoCompletionTest"
+    "CobraLogoCompletionTest",
+    "CobraLogoReattachTest"
   ],
   "additional_demonstrated_Cobra_defects": [
     "D1 identical geometry allocates parameters/requests layout",
     "D2 same-URL cold Sports logos submit duplicate IO jobs; old completion can overwrite rebound image"
-  ]
+  ],
+  "supersedes_unaccepted_signed_candidate": {
+    "versionCode": 2103428,
+    "source": "cc470f81b65defc86bb00186fe8c0ae6425cad70",
+    "run": 40810155686,
+    "reason": "Final review reproduced logo completion lost across temporary detach/reattach; baseline passes,28 fails; corrected before final delivery"
+  }
 }

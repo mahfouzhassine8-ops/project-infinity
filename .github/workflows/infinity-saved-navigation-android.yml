@@ -33,7 +33,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   cobra-host:
-    name: Cobra2103428 production DEX host integration and exact owner preparation
+    name: Cobra next production DEX host integration and exact owner preparation
     if: github.event_name == 'workflow_dispatch' && inputs.feature == 'cobra-owner-host'
     runs-on: ubuntu-22.04
     timeout-minutes: 30
@@ -167,7 +167,7 @@ jobs:
           python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out runtime-emulator-setup
           sudo chmod 666 /dev/kvm
       - name: Prepare only selected signed-candidate synthetic video source
-        if: inputs.candidate_build == '40810155686'
+        if: inputs.candidate_build != '40769526963'
         run: |
           set -euo pipefail
           sudo apt-get install -y ffmpeg

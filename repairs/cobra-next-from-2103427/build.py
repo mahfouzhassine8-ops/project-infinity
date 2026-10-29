@@ -20,7 +20,7 @@ from inventory import load,file_sha,save,APP
 from component_bundles import read_bundle
 from compile_runtime import ANDROID_SHA,D8_SHA
 
-VERSION='2103428.cobra.1'
+VERSION='2103429.cobra.1'
 HELPER=APP+'CobraArrange;'
 PRESENT=APP+'CobraPresentation;'
 ACTIVITY=APP+'InfinityLiveActivity;'

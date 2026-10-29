@@ -34,8 +34,13 @@ public final class CobraLogoRequests {
   @SuppressWarnings("unchecked") private Map<String,Bitmap> cache(){return (Map<String,Bitmap>)field("mCobraSportsLogos");}
   private final class Binding implements View.OnAttachStateChangeListener {
     String url;Binding(String u){url=u;}
-    public void onViewAttachedToWindow(View v){schedule();}
-    public void onViewDetachedFromWindow(View v){waiting.remove(v);bindings.remove(v);v.removeOnAttachStateChangeListener(this);}
+    public void onViewAttachedToWindow(View v){Activity a=owner.get();if(a!=null)request(a,url,(ImageView)v);}
+    public void onViewDetachedFromWindow(View v){
+      // Drop offscreen work, but keep the view-owned, weakly indexed binding.
+      // Retained/reparented views need their current URL restored on attach.
+      // No global strong reference retains the view or its Activity.
+      waiting.remove(v);
+    }
   }
   private static final class Flight {
     final ImageView origin;Flight(ImageView v){origin=v;}

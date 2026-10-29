@@ -3,8 +3,8 @@
   "HEAD": "f8298a841c294a630c970bf83071da3c73879570",
   "full_brief_read": true,
   "production_implementation_started": true,
-  "current_build": "/workspace/cobra-evidence/build-v7",
-  "build_status": "ONE28APK_SIGNED_AND_CI_VERIFIED; INDEPENDENT_DOWNLOAD_CHECKS_NEXT",
+  "current_build": "/workspace/cobra-evidence/build-v9-29",
+  "build_status": "R1_BASELINE27_PASS_28_FAIL; FIXED29_COMPILED_HOST26_RUNNING",
   "baseline_apk": "/workspace/infinity-evidence/continuation2103427/signed27-ci/Infinity-2103427-Combined-Original-Signer.apk",
   "baseline_components": "/workspace/infinity-evidence/continuation2103427/components27-ci",
   "actual_baseline_smali": "/workspace/cobra-evidence/baseline/COBRA/smali-0/com/projectinfinity/kodi/InfinityLiveActivity.smali",
@@ -16,7 +16,7 @@
   "maven": "/workspace/cobra-evidence/maven/apache-maven-3.9.9/bin/mvn",
   "selected_scope": "SCOPE.json",
   "source_budget": "SOURCE-BUDGET.json",
-  "next": "Verify downloaded signed28 and4ZIPs independently; QA-only Python3.12 preflight fix (40810182108 failed at hashlib before adb/app); retry same baselineAPK once with corrected interpreter; no APK rebuild, no native/shutdown edits.",
+  "next": "Finish26 HOST tests including R1; CI new source-bound owner producer with5 baseline tests; register generation14 strictly from previous28 generation13 and locked27 payload budget; sign29 through sole signer once. API37 core journey28 attempts failed at UI observation before new layouts; source-editor now works, last error premature editor match. QA wait corrected; run29 after signing with exact SHA and all11/live swap case.",
   "found_defects": [
     "Existing MultiView chooser has Fit/Fill only; no11arrangements",
     "NonPro preview More precedes Fullscreen/PiP; classic and Pro full strip alreadyMoreLast (preserve)",
@@ -26,15 +26,16 @@
   "historical_reflow_files": "/workspace/cobra-evidence/history-reflow",
   "first_failed_build": "/workspace/cobra-evidence/build-v1.log (writer refused newfield; fixedbyremovingfield notweakeningguard)",
   "important_pending_reviews": [
-    "Final25 tests PASS; original downloader/executor/protected task wrappers unchanged",
-    "Final owner producer must bind all D2 source; earliera0e8 owner artifact is superseded unsigned evidence, do not register it",
-    "Stationary hold context menu opens on release; physical interaction acceptance pending"
+    "R1 fix now weak view binding survives detach; offscreen waiters dropped, cached/current completion restores on attach",
+    "No further28 production installation. No user-device operations. No shutdown/source/native changes",
+    "Register script now exactprevious28gen13; compares allowedcompleteCobra delta againstlocked27 and narrowR1 actualdelta against28",
+    "Sole signer description29 changed; newregistry must refresh source/workflow hashes before signing"
   ],
   "shutdown": "NOT_RUN_FROZEN",
   "Infinity": "FROZEN_EXACT_ZIP",
   "no_newagents": true,
   "git_status": "OnlynewCobra taskfilesuncommitted; do not lose production code",
-  "host_tests": "/workspace/cobra-evidence/host-v7",
+  "host_tests": "/workspace/cobra-evidence/host29-v9",
   "baseline_host": "/workspace/cobra-evidence/host-baseline",
   "gate_controls": "14 PASS",
   "prior_host_run": 40807697956,
@@ -50,5 +51,7 @@
     40810182108
   ],
   "signed_source": "cc470f81b65defc86bb00186fe8c0ae6425cad70",
-  "signed_run": 40810155686
+  "signed_run": 40810155686,
+  "candidate_versionCode": 2103429,
+  "superseded28": "Signed run40810155686 is superseded; do not deliver/install28"
 }

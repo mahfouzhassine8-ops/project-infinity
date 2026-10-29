@@ -1,0 +1,13 @@
+{
+  "status": "SUPERSEDED_NOT_FOR_FINAL_INSTALLATION",
+  "versionCode": 2103428,
+  "signed_run": 40810155686,
+  "signed_source": "cc470f81b65defc86bb00186fe8c0ae6425cad70",
+  "reason": "Independent final review reproduced a new lost-logo completion when the same ImageView temporarily detaches and reattaches; signed baseline passes and28 fails. Corrected in29 before final handoff.",
+  "APK_recovery_baseline": "User-approved27 remains protected;28 was never accepted or installed on user device",
+  "baseline_reproduction": "CobraLogoReattachTest PASS",
+  "candidate28_reproduction": "CobraLogoReattachTest FAIL bitmap null",
+  "replacement_versionCode": 2103429,
+  "user_device_operations": "NONE",
+  "shutdown_tests": "NOT_RUN"
+}

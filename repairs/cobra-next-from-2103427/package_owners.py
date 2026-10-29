@@ -63,14 +63,14 @@ def package(bundles,work,jars,out,source):
     require(set(old_methods)==set(new_methods),'EXACT_ACTIVITY_METHOD_SET')
     require({m for m in old_methods if old_methods[m]!=new_methods[m]}==set(selected),'UNCHANGED_ACTIVITY_METHODS')
     result=copy.deepcopy(catalog);result['source']=source
-    metadata=b'infinity.last_updated_in=2103427\ncobra.last_updated_in=2103428\n'
+    metadata=b'infinity.last_updated_in=2103427\ncobra.last_updated_in=2103429\n'
     for owner,row in catalog['bundles'].items():
         dest=out/row['file']
         if owner not in metas:
             require(file_sha(bundles/row['file'])==scope['frozen_owner_zips'][owner],'FROZEN_ZIP')
             shutil.copyfile(bundles/row['file'],dest);continue
         old=metas[owner];meta=copy.deepcopy(old)
-        meta.update(version=VERSION if owner=='COBRA' else '2103428.version-wording.1',approved_source=source)
+        meta.update(version=VERSION if owner=='COBRA' else '2103429.version-wording.1',approved_source=source)
         meta['payload']={k:v for k,v in old['payload'].items() if not k.startswith('class:')}
         meta['payload'].update({k:v for k,v in revised.items() if v['owner']==owner});meta['dex']={}
         with ZipFile(bundles/row['file']) as original,ZipFile(dest,'w') as target:

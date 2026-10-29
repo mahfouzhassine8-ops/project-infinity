@@ -5,5 +5,6 @@
   "application_shutdown": "NOT_SELECTED_NOT_RUN",
   "physical_Fold": "USER_ONLY_PENDING",
   "CobraLogoWorkTest": "Baseline/candidate actual signed logo requests, executor submission counts, bounded admission/cache reuse, controlled old/current callback and detach; no HTTP or application shutdown",
-  "CobraLogoCompletionTest": "Actual original downloader/publish/finish through existing executor wrappers, loopback PNGs,4 bounded pending jobs, fanout, failure no retry-loop, deferred attach; no provider/native decoding or application shutdown"
+  "CobraLogoCompletionTest": "Actual original downloader/publish/finish through existing executor wrappers, loopback PNGs,4 bounded pending jobs, fanout, failure no retry-loop, deferred attach; no provider/native decoding or application shutdown",
+  "CobraLogoReattachTest": "Original late logo completion survives temporary detach/reattach of same view: baseline27 pass,28 fail; fixed29 must pass; no app lifecycle/shutdown"
 }

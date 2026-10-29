@@ -42,6 +42,13 @@
       "cause": "Cold same-URL logo callers each submit another worker; callback checks attachment only, not current request ownership",
       "selected_test": "CobraLogoWorkTest baseline and candidate actual entry/callback, recording existing executor, controlled completion; no HTTP/provider/device claim",
       "correction": "Coalesce same URL; at most4 logo admissions on existing executor; weak view request ownership and existing bounded48 bitmap cache; preserve original download/timeout and worker responsibilities"
+    },
+    {
+      "id": "R1",
+      "cause": "New28 Binding removed itself and URI ownership on detach, so original completion after reattach could not find its recipient",
+      "before_after_evidence": "CobraLogoReattachTest: exact baseline27 PASS,28 FAIL (null bitmap after reparent)",
+      "correction": "Keep only view-owned, weakly indexed URI binding across detach; remove offscreen waiters; on attach restore existing cache or join current URL flight",
+      "test": "Same reproduction plus original25 tests; no source-specific player/native/shared/shutdown changes"
     }
   ],
   "controller_lifetime": "Weak Activity keys and weak helper values; active UI listeners retain at most4 pane gestures; detach cancels timers and removes listeners; no shared/runtime field mutation"
