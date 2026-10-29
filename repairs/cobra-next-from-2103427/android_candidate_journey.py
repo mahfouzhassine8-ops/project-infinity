@@ -60,8 +60,13 @@ def journey(out):
   menu();tap('^Add screen$');tap('^All$');tap('^'+name+'$');time.sleep(1)
  try:
   tap('ADD TV SOURCE');tap('M3U / M3U8 playlist');nodes=ui();fields=[n for n in nodes if n.get('class')=='android.widget.EditText'];assert len(fields)==3
-  for n,value in zip(fields[:2],['CobraQA','http://10.0.2.2:8765/qa.m3u']):
-   x,y=center(bounds(n));adb('shell','input','tap',str(x),str(y));adb('shell','input','text',value)
+  for index,value in enumerate(['CobraQA','http://10.0.2.2:8765/qa.m3u']):
+   # IME repositions the dialog after focus. Re-read every field rectangle;
+   # never reuse pre-keyboard coordinates (which can hit outside/cancel).
+   current=[n for n in ui() if n.get('class')=='android.widget.EditText'];assert len(current)==3
+   x,y=center(bounds(current[index]));adb('shell','input','tap',str(x),str(y))
+   focused=[n for n in ui() if n.get('class')=='android.widget.EditText'];assert focused[index].get('focused')=='true'
+   adb('shell','input','text',value);steps.append({'filled_field':index})
   tap('^TEST & SAVE$')
   nodes=wait('QA 1|CobraQA',15)
   if find('^QA 1$',nodes) is None:tap('CobraQA')
