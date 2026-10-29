@@ -166,6 +166,14 @@ jobs:
           python3 repairs/infinity-final-closure-2103407/api37_environment_gate.py --sdk-root "$ANDROID_HOME" --out runtime-platform --pin-tools
           python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out runtime-emulator-setup
           sudo chmod 666 /dev/kvm
+      - name: Prepare only selected signed-candidate synthetic video source
+        if: inputs.candidate_build == '40810155686'
+        run: |
+          set -euo pipefail
+          sudo apt-get install -y ffmpeg
+          python3 -m pip install Pillow==11.3.0
+          python3 repairs/cobra-next-from-2103427/android_candidate_journey.py --generate-media runtime-media
+          python3 -m http.server 8765 --bind 0.0.0.0 --directory runtime-media > runtime-results/MEDIA-HTTP.txt 2>&1 &
       - uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
         with:
           api-level: '37.1'
