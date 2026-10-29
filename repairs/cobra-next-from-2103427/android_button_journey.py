@@ -57,6 +57,36 @@ class Snapshot:
         return [n.get('text') or n.get('content-desc') for n in self.nodes
                 if n.get('package') == PACKAGE and (n.get('text') or n.get('content-desc'))]
 
+    def native_dialog_item(self, pattern):
+        # Framework AlertDialog items use ListView.onItemClick: the enabled
+        # text1 label and its ListView need not expose clickable=true. Keep
+        # this exception separate from actual player controls.
+        for node in reversed(self.nodes):
+            if (node.get('resource-id') != 'android:id/text1' or
+                    node.get('class') != 'android.widget.TextView' or
+                    node.get('package') != PACKAGE or
+                    node.get('enabled') != 'true' or
+                    not any(re.search(pattern, node.get(k, ''))
+                            for k in ('text', 'content-desc'))):
+                continue
+            hit = bounds(node)
+            ancestor = self.parents.get(node)
+            dialog_list = False
+            while ancestor is not None and ancestor.tag == 'node':
+                if (ancestor.get('package') != PACKAGE or
+                        ancestor.get('enabled') != 'true' or
+                        ancestor.get('visible-to-user') == 'false'):
+                    hit = (0, 0, 0, 0)
+                    break
+                hit = intersect(hit, bounds(ancestor))
+                if (ancestor.get('resource-id') == 'android:id/select_dialog_listview' and
+                        ancestor.get('class') == 'android.widget.ListView'):
+                    dialog_list = True
+                ancestor = self.parents.get(ancestor)
+            if dialog_list and node.get('visible-to-user') != 'false' and positive(hit):
+                return node, hit
+        return None
+
     def strip(self):
         for node in reversed(self.nodes):
             if node.get('class') != 'android.widget.HorizontalScrollView' or not positive(bounds(node)):
@@ -124,12 +154,17 @@ def journey(out):
             time.sleep(.5)
         raise RuntimeError('UI state not observed: '+pattern+'; labels='+repr(snap.labels()))
 
-    def tap(pattern, attempts=8, sheet_scroll=False):
+    def tap(pattern, attempts=8, sheet_scroll=False, native_dialog_item=False):
         for _ in range(attempts):
             snap = ui()
             node = snap.find(pattern, enabled=True, clickable=True)
             if node is not None:
                 press_node(node, pattern)
+                return
+            item = snap.native_dialog_item(pattern) if native_dialog_item else None
+            if item is not None:
+                node, visible = item
+                press_node(node, 'Native dialog item '+pattern, visible)
                 return
             if sheet_scroll:
                 scroll_sheet(snap)
@@ -223,7 +258,7 @@ def journey(out):
 
     try:
         tap(r'ADD TV SOURCE')
-        tap(r'^M3U / M3U8 playlist$')
+        tap(r'^M3U / M3U8 playlist$', native_dialog_item=True)
         for index, value in enumerate(('CobraQA', 'http://10.0.2.2:8765/qa.m3u')):
             fields = [n for n in ui().nodes if n.get('class') == 'android.widget.EditText']
             assert len(fields) == 3, 'Normal M3U form must have three fields'

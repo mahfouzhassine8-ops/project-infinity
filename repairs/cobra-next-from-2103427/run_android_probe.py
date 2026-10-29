@@ -11,8 +11,29 @@ def main(signed,out,signature):
  if receipt['versionCode']==2103430:
   from icon.android_observe import observe
   observe(out.parent/'icon',receipt['signed_apk_sha256'],receipt['versionCode'])
+  from android_icon_surface_probe import observe as observe_surfaces
+  surface_error=None
+  try:
+   observe_surfaces(out.parent/'icon-surfaces',receipt['signed_apk_sha256'],receipt['versionCode'])
+  except Exception as exc:
+   # Preserve an OS-surface error, but allow independent button presses only
+   # after the observer verified return to the original empty Cobra screen.
+   surface_outcome=out.parent/'icon-surfaces'/'OUTCOME.json'
+   if not surface_outcome.is_file() or not json.loads(surface_outcome.read_text()).get('safe_empty_Cobra_for_independent_buttons'):
+    raise
+   surface_error=str(exc)
   from android_button_journey import journey
-  journey(out.parent/'functional')
+  try:
+   journey(out.parent/'functional')
+  finally:
+   combined={'signed_source':receipt['source'],'APK_sha256':receipt['signed_apk_sha256'],
+             'versionCode':receipt['versionCode'],'icon_surface_error':surface_error,
+             'physical_Fold':'NOT_RUN','shutdown':'NOT_RUN'}
+   for label,folder in (('framework_and_first_launcher','icon'),('native_icon_surfaces','icon-surfaces'),('button_actions','functional')):
+    path=out.parent/folder/'OUTCOME.json'
+    combined[label]=json.loads(path.read_text()) if path.is_file() else 'NOT_COMPLETED'
+   (out.parent/'P0-OBSERVATIONS.json').write_text(json.dumps(combined,indent=2)+'\n')
+  if surface_error:raise RuntimeError('Icon surface operation failed; independent button outcome retained: '+surface_error)
  elif receipt['versionCode']>=2103428:
   from android_candidate_journey import journey
   journey(out.parent/'functional')

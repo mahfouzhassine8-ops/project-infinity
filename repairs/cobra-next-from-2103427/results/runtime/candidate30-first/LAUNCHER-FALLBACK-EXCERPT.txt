@@ -1,0 +1,47 @@
+10-29 22:37:49.352   625  2049 W ApplicationInfo: Large ApplicationInfo parcel: size=19920 package=com.google.android.googlequicksearchbox sharedLibs=3 resDirs=1 overlayPaths=1
+10-29 22:37:49.353  3092  3179 E s.nexuslauncher: Invalid resource ID 0x00000000.
+10-29 22:37:49.353  3092  3179 E s.nexuslauncher: Invalid resource ID 0x00000000.
+10-29 22:37:49.354  3092  3179 W LauncherActivityCachingLogic: loadIcon: Default app icon returned from PackageManager. component=ComponentInfo{com.projectinfinity.kodi/com.projectinfinity.kodi.Splash}, user=UserHandle{0}
+10-29 22:37:49.354  3092  3179 W LauncherActivityCachingLogic: java.lang.Exception
+10-29 22:37:49.354  3092  3179 W LauncherActivityCachingLogic: 	at com.android.launcher3.icons.cache.LauncherActivityCachingLogic.loadIcon(go/retraceme 310aa94f36047b669ee2bf0533c77aed470839681261493972d9bfe3baad38af:59)
+10-29 22:37:49.354  3092  3179 W LauncherActivityCachingLogic: 	at com.android.launcher3.icons.cache.BaseIconCache.loadFallbackIcon(go/retraceme 310aa94f36047b669ee2bf0533c77aed470839681261493972d9bfe3baad38af:8)
+10-29 22:37:49.354  3092  3179 W LauncherActivityCachingLogic: 	at com.android.launcher3.icons.IconCache.loadIconSubsection(go/retraceme 310aa94f36047b669ee2bf0533c77aed470839681261493972d9bfe3baad38af:368)
+10-29 22:37:49.354  3092  3179 W LauncherActivityCachingLogic: 	at com.android.launcher3.icons.IconCache.getTitlesAndIconsInBulk(go/retraceme 310aa94f36047b669ee2bf0533c77aed470839681261493972d9bfe3baad38af:207)
+10-29 22:37:49.354  3092  3179 W LauncherActivityCachingLogic: 	at com.android.launcher3.model.LoaderTask.loadAllApps(go/retraceme 310aa94f36047b669ee2bf0533c77aed470839681261493972d9bfe3baad38af:234)
+10-29 22:37:49.354  3092  3179 W LauncherActivityCachingLogic: 	at com.android.launcher3.model.LoaderTask.loadAllSurfacesOrdered(go/retraceme 310aa94f36047b669ee2bf0533c77aed470839681261493972d9bfe3baad38af:1303)
+10-29 22:37:49.354  3092  3179 W LauncherActivityCachingLogic: 	at com.android.launcher3.model.LoaderTask.run(go/retraceme 310aa94f36047b669ee2bf0533c77aed470839681261493972d9bfe3baad38af:77)
+10-29 22:37:49.354  3092  3179 W LauncherActivityCachingLogic: 	at android.os.Handler.handleCallback(Handler.java:1082)
+10-29 22:37:49.354  3092  3179 W LauncherActivityCachingLogic: 	at android.os.Handler.dispatchMessageImpl(Handler.java:135)
+10-29 22:37:49.354  3092  3179 W LauncherActivityCachingLogic: 	at android.os.Handler.dispatchMessage(Handler.java:126)
+10-29 22:37:49.354  3092  3179 W LauncherActivityCachingLogic: 	at android.os.Looper.loopOnce(Looper.java:295)
+10-29 22:37:49.354  3092  3179 W LauncherActivityCachingLogic: 	at android.os.Looper.loop(Looper.java:398)
+10-29 22:37:49.354  3092  3179 W LauncherActivityCachingLogic: 	at android.os.HandlerThread.run(HandlerThread.java:140)
+10-29 22:37:49.355  3092  3179 D Launcher.IconCache: getTitlesAndIconsInBulk, loading blob fallback for ComponentInfo{com.projectinfinity.kodi/com.projectinfinity.kodi.Splash}
+10-29 22:37:49.355  3092  3179 D IconRequestInfo: loadIconFromDb: icon blob null, returning. Component=ComponentInfo{com.projectinfinity.kodi/com.projectinfinity.kodi.Splash}
+10-29 22:37:49.355  3092  3179 D AlphabeticIndexCompat: computeSectionName: cs: Camera sectionName: C
+10-29 22:37:49.355  3092  3179 D AlphabeticIndexCompat: computeSectionName: cs: Chrome sectionName: C
+10-29 22:37:49.355  3092  3179 D AlphabeticIndexCompat: computeSectionName: cs: Settings sectionName: S
+
+10-29 22:37:54.674  1381  4063 I Fitness : OnPackageChangedOperation got intent: Intent { act=android.intent.action.PACKAGE_CHANGED dat=package: flg=0x5000010 xflg=0x4 pkg=com.google.android.gms cmp=com.google.android.gms/.chimera.PersistentIntentOperationService (has extras) } [CONTEXT service_id=17 ]
+10-29 22:37:54.677  3092  3177 D SsCardRecyclerViewAdapter: Updating Smartspace targets to targets for Lockscreen
+10-29 22:37:54.677  3092  3177 W BcSmartspaceView: Current card is not present in the Adapter; cannot log.
+10-29 22:37:54.678  3092  3179 W LauncherActivityCachingLogic: loadIcon: Default app icon returned from PackageManager. component=ComponentInfo{com.projectinfinity.kodi/com.projectinfinity.kodi.Splash}, user=UserHandle{0}
+10-29 22:37:54.678  3092  3179 W LauncherActivityCachingLogic: java.lang.Exception
+10-29 22:37:54.678  3092  3179 W LauncherActivityCachingLogic: 	at com.android.launcher3.icons.cache.LauncherActivityCachingLogic.loadIcon(go/retraceme 310aa94f36047b669ee2bf0533c77aed470839681261493972d9bfe3baad38af:59)
+10-29 22:37:54.678  3092  3179 W LauncherActivityCachingLogic: 	at com.android.launcher3.icons.cache.BaseIconCache.loadFallbackIcon(go/retraceme 310aa94f36047b669ee2bf0533c77aed470839681261493972d9bfe3baad38af:8)
+10-29 22:37:54.678  3092  3179 W LauncherActivityCachingLogic: 	at com.android.launcher3.icons.cache.BaseIconCache.cacheLocked(go/retraceme 310aa94f36047b669ee2bf0533c77aed470839681261493972d9bfe3baad38af:102)
+10-29 22:37:54.678  3092  3179 W LauncherActivityCachingLogic: 	at com.android.launcher3.icons.IconCache.getTitleAndIcon(go/retraceme 310aa94f36047b669ee2bf0533c77aed470839681261493972d9bfe3baad38af:245)
+10-29 22:37:54.678  3092  3179 W LauncherActivityCachingLogic: 	at com.android.launcher3.icons.IconCache.getTitleAndIcon(go/retraceme 310aa94f36047b669ee2bf0533c77aed470839681261493972d9bfe3baad38af:228)
+10-29 22:37:54.678  3092  3179 W LauncherActivityCachingLogic: 	at com.android.launcher3.model.PredictionUpdateTask$$ExternalSyntheticLambda3.apply(go/retraceme 310aa94f36047b669ee2bf0533c77aed470839681261493972d9bfe3baad38af:12)
+10-29 22:37:54.678  3092  3179 W LauncherActivityCachingLogic: 	at java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:227)
+10-29 22:37:54.678  3092  3179 W LauncherActivityCachingLogic: 	at java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:209)
+10-29 22:37:54.678  3092  3179 W LauncherActivityCachingLogic: 	at java.util.ArrayList$ArrayListSpliterator.tryAdvance(ArrayList.java:1710)
+10-29 22:37:54.678  3092  3179 W LauncherActivityCachingLogic: 	at java.util.stream.ReferencePipeline.forEachWithCancel(ReferencePipeline.java:156)
+10-29 22:37:54.678  3092  3179 W LauncherActivityCachingLogic: 	at java.util.stream.AbstractPipeline.copyIntoWithCancel(AbstractPipeline.java:592)
+10-29 22:37:54.678  3092  3179 W LauncherActivityCachingLogic: 	at java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:578)
+10-29 22:37:54.678  3092  3179 W LauncherActivityCachingLogic: 	at java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:564)
+10-29 22:37:54.678  3092  3179 W LauncherActivityCachingLogic: 	at java.util.stream.FindOps$FindOp.evaluateSequential(FindOps.java:150)
+10-29 22:37:54.678  3092  3179 W LauncherActivityCachingLogic: 	at java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:267)
+10-29 22:37:54.678  3092  3179 W LauncherActivityCachingLogic: 	at java.util.stream.ReferencePipeline.findAny(ReferencePipeline.java:713)
+10-29 22:37:54.678  3092  3179 W LauncherActivityCachingLogic: 	at com.android.launcher3.model.PredictionUpdateTask.execute(go/retraceme 310aa94f36047b669ee2bf0533c77aed470839681261493972d9bfe3baad38af:189)
+10-29 22:37:54.678  3092  3179 W LauncherActivityCachingLogic: 	at com.android.launcher3.LauncherModel$rebindCallbacks$1.run(go/retraceme 310aa94f36047b669ee2bf0533c77aed470839681261493972d9bfe3baad38af:34)
