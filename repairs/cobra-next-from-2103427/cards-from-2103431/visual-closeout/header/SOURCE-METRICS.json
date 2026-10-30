@@ -1,0 +1,69 @@
+{
+  "status": "READ_ONLY_ACTUAL_REFERENCE_AND_CURRENT_RENDER_PIXEL_MEASUREMENTS",
+  "images_personally_viewed": true,
+  "image_editing": "NONE",
+  "private_assets": "Not copied or embedded; only SHA and numeric measurements recorded",
+  "measurements": [
+    {
+      "name": "reference",
+      "source_sha256": "3a718b7731d45819a4d49f9b585725b7c9dd71ac547eb1171123b4acd21f2ff6",
+      "image_pixels": [
+        941,
+        1672
+      ],
+      "ROI": [
+        125,
+        15,
+        300,
+        65
+      ],
+      "threshold": "minRGB>70 and maxRGB-minRGB<40",
+      "bbox": [
+        136,
+        24,
+        250,
+        57
+      ],
+      "weighted_ink": 1332.911,
+      "color_normalized_ink": 1332.911,
+      "minRGB_peak": 255,
+      "threshold_pixels": 1558
+    },
+    {
+      "name": "current432",
+      "source_sha256": "b5c4df2d94b6212b2d132d455b9a1a5f3cdd8b1bd901512dcb7533cc0058342d",
+      "image_pixels": [
+        941,
+        1672
+      ],
+      "ROI": [
+        125,
+        15,
+        300,
+        65
+      ],
+      "threshold": "minRGB>70 and maxRGB-minRGB<40",
+      "bbox": [
+        135,
+        24,
+        245,
+        57
+      ],
+      "weighted_ink": 1398.289,
+      "color_normalized_ink": 1493.627,
+      "minRGB_peak": 240,
+      "threshold_pixels": 1678
+    }
+  ],
+  "criteria": {
+    "preserve_height_pixels": 33,
+    "target_width_pixels": 114,
+    "target_color_normalized_ink": 1332.911,
+    "unchanged": [
+      "header size42px",
+      "header layout/anchor",
+      "all non-header BOLD labels",
+      "native callbacks/settings/other modes"
+    ]
+  }
+}

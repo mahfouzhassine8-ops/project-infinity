@@ -1,0 +1,62 @@
+{
+  "status": "HEADER_ONLY_MEASURED_SOURCE_CHOICE_COMPILES",
+  "source_sha256": "87238c9879c0c5ab1a88c8526e56846b99b2aaecaa7ac52532f68894e50406b2",
+  "font": "Dedicated HEADER_FACE weight500 with API28 overload guard; existing sans-serif-medium fallback for older SDK",
+  "tracking_em": 0.02,
+  "other_BOLD_labels": "UNCHANGED",
+  "selected_native_calibration": {
+    "class": "CobraCardsHeaderCalibrationTest",
+    "method": "compareApprovedHeaderWeights",
+    "JUnit_tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "JUnit_sha256": "792f1a2c2faf9ab644951fc438477fe3bec09d3afa06687bfff68be08d36d890",
+    "report_sha256": "1f8478d85303dc44a70c8e4dac771780c6fa2ff0fc0add92a0d298b8a7c4472a"
+  },
+  "selected_metrics": {
+    "reference_bbox": [
+      136,
+      24,
+      250,
+      57
+    ],
+    "candidate_bbox": [
+      136,
+      24,
+      248,
+      57
+    ],
+    "reference_normalized_ink": 1332.911,
+    "candidate_normalized_ink": 1296.2045454545664,
+    "current700_relative_error": 0.15566311610065797,
+    "candidate500_relative_error": 0.045082423398265584
+  },
+  "limitations": [
+    "Host500/550/600 candidates rasterize identically; font identity is not established",
+    "Candidate glyph bbox remains2px narrower; no pixel-perfect match claim",
+    "Physical OneUI/Fold font rendering not measured",
+    "Full integration and nonCards regression checks require root-selected final owner verification"
+  ],
+  "SDK_compile": {
+    "android_jar_sha256": "6cea1df3efb77103ac3e2beb9bf4718964b0e0869ab16d39d29d5cbae1c147ad",
+    "actual_owner_API_jar_sha256": "926bcc3bcc3b78d424742af38116d86f1f71367e1e429828e42f10e618cea92e",
+    "classes": {
+      "com/projectinfinity/kodi/CobraCardsLayout$AmbientPanel.class": "d194e2270848c9c00f8fe13bcbeb2fcf000ee639f6143a319f345a6b53529453",
+      "com/projectinfinity/kodi/CobraCardsLayout$ButtonSurface.class": "ad6386652c71029582f7bd82f77d78433c2543327449ca8a4f5874c54e3c2501",
+      "com/projectinfinity/kodi/CobraCardsLayout$LiveDot.class": "257bc03cc871b30f4c8cef9fa898f7db8567739c2797279553a1c223535777d0",
+      "com/projectinfinity/kodi/CobraCardsLayout$LiveSurface.class": "8e7cae3e2d60ba9d46340f42701db24b65635d6140e7a40bac592e56c84d065d",
+      "com/projectinfinity/kodi/CobraCardsLayout$PanelSurface.class": "db1b9c26ebaacf75220bf05b58b449897c5c80544475344ce939db05ad5d967f",
+      "com/projectinfinity/kodi/CobraCardsLayout$PreviewBadge.class": "f0dfb602ece62ebb51f9ea209f94d5430e5ef727ee03aa3bd05e2a1af9b99c21",
+      "com/projectinfinity/kodi/CobraCardsLayout$ProgressSurface.class": "3e8fde7ba1fd3f1e8bc66e8b6b1cf5d1199f4b3ccc7f2286b370f70caf7a1dca",
+      "com/projectinfinity/kodi/CobraCardsLayout$Slot.class": "0db9b4e80eceedc36ea9dca50a7b3f24f32cd190e9d185a1707af6e1bb7599aa",
+      "com/projectinfinity/kodi/CobraCardsLayout$Snapshot.class": "70d0af173b92c1bfdf2c47eb04591a74193a116c23eb5ed3578ddba629c140b3",
+      "com/projectinfinity/kodi/CobraCardsLayout$State.class": "a87b88cbed678fddc03cf0e14422e7ce7993fb5a6913ab67af56de01e57d0f6c",
+      "com/projectinfinity/kodi/CobraCardsLayout.class": "0f4cd99ecc0768072fdb07f120b9e29ea6364c1b39763b9c516edb99d740aefb"
+    }
+  },
+  "APK": "NOT_BUILT",
+  "CI": "NOT_RUN",
+  "shutdown": "NOT_RUN",
+  "private_assets": "Original approved images and generated Canvas PNGs remain outside repository; numeric evidence only"
+}

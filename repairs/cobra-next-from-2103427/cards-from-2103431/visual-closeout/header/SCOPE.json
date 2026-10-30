@@ -1,0 +1,38 @@
+{
+  "class": "CobraCardsHeaderCalibrationTest",
+  "methods": [
+    "compareApprovedHeaderWeights"
+  ],
+  "recorded_before_execution": true,
+  "authorization": "Root explicitly selected ONE calibration method/four cases before execution",
+  "cases": [
+    {
+      "weight": 700,
+      "tracking": 0
+    },
+    {
+      "weight": 500,
+      "tracking": 0.02
+    },
+    {
+      "weight": 550,
+      "tracking": 0.02
+    },
+    {
+      "weight": 600,
+      "tracking": 0.02
+    }
+  ],
+  "source_binding_sha256": "a2011f367da1e289646492b8fb5f67e7e8cb17319373b681e3345c6b753773c6",
+  "classpath": {
+    "production.jar": "926bcc3bcc3b78d424742af38116d86f1f71367e1e429828e42f10e618cea92e",
+    "support.jar": "016a9ca405468cbc86fb6da8634e943ada67ffa615a3b804a1d9680fca84f1ad"
+  },
+  "test_sha256": "d4eb5a00d64c4121950a23181c9952597d1c896a914106075d30e91fc7ad331d",
+  "compiled_fixture_only": {
+    "CobraCardsLayoutTest.java": "d282188de62891e8f5aea1213c3c214f7697ce282f2ea8b04441b012f66d2525"
+  },
+  "criteria": "Target bbox114x33 at136,24 and normalized ink1332.911 from personally viewed exact approvedPNG; no pixel-perfect/font-identity claim",
+  "images": "Generated actual native Canvas only; original approved PNG remains private, not copied",
+  "behavioral_scope": "Native header calibration only; no input/provider/player/shutdown/APK/CI"
+}

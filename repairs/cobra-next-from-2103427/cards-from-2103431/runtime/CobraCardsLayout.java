@@ -56,6 +56,7 @@ public final class CobraCardsLayout {
   private static final int CYAN=0xff20cee9, WHITE=0xfff0f3f7, MUTED=0xffafc1d8;
   private static final Typeface NORMAL=Typeface.create("sans-serif",Typeface.NORMAL);
   private static final Typeface BOLD=Typeface.create("sans-serif",Typeface.BOLD);
+  private static final Typeface HEADER_FACE=Build.VERSION.SDK_INT>=28?Typeface.create(NORMAL,500,false):Typeface.create("sans-serif-medium",Typeface.NORMAL);
   private static final Class<?>[] NONE=new Class<?>[0];
   private CobraCardsLayout(){}
 
@@ -329,7 +330,7 @@ public final class CobraCardsLayout {
       TextView name=(TextView)read(a,"mCobraModeTitle"),sub=(TextView)read(a,"mCobraModeSub");
       snapshot(header,name);if(!header.containsKey(sub))nativeSub=sub.getText();snapshot(header,sub);snapshot(header,labelBox);
       labelBox.setPadding(0,0,0,0);if(labelBox instanceof LinearLayout)((LinearLayout)labelBox).setGravity(Gravity.CENTER_VERTICAL);
-      style(name,BOLD,WHITE,42,1);name.setLetterSpacing(0);text(name,"Cobra");
+      style(name,HEADER_FACE,WHITE,42,1);name.setLetterSpacing(.03f);text(name,"Cobra");
       style(sub,NORMAL,MUTED,17,1);sub.setLetterSpacing(.12f);
       headerCount(a,sub);
     }

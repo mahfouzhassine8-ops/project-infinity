@@ -1,0 +1,78 @@
+{
+  "status": "PASS_SELECTED_THREE_NATIVE_HEADER_REFINEMENT_CASES",
+  "cases": [
+    {
+      "bbox": [
+        136,
+        24,
+        249,
+        57
+      ],
+      "width": 113,
+      "height": 33,
+      "threshold_pixels": 1474,
+      "minRGB_peak": 240,
+      "weighted_ink": 1213.4680851064024,
+      "color_normalized_ink": 1296.2045454545664,
+      "relative_geometry_ink_error": 0.03631049357370418,
+      "requested_weight": 500,
+      "actual_weight": 500,
+      "tracking_em": 0.029999999329447746,
+      "size_px": 42,
+      "text_color": -986121,
+      "native_Canvas_PNG": "native-header-refine-1.png"
+    },
+    {
+      "bbox": [
+        136,
+        24,
+        249,
+        57
+      ],
+      "width": 113,
+      "height": 33,
+      "threshold_pixels": 1474,
+      "minRGB_peak": 240,
+      "weighted_ink": 1213.4680851064024,
+      "color_normalized_ink": 1296.2045454545664,
+      "relative_geometry_ink_error": 0.03631049357370418,
+      "requested_weight": 500,
+      "actual_weight": 500,
+      "tracking_em": 0.02500000037252903,
+      "size_px": 42.25,
+      "text_color": -986121,
+      "native_Canvas_PNG": "native-header-refine-2.png"
+    },
+    {
+      "bbox": [
+        136,
+        23,
+        249,
+        57
+      ],
+      "width": 113,
+      "height": 34,
+      "threshold_pixels": 1533,
+      "minRGB_peak": 240,
+      "weighted_ink": 1272.6170212766167,
+      "color_normalized_ink": 1359.386363636386,
+      "relative_geometry_ink_error": 0.05893777440130238,
+      "requested_weight": 500,
+      "actual_weight": 500,
+      "tracking_em": 0.019999999552965164,
+      "size_px": 42.5,
+      "text_color": -986121,
+      "native_Canvas_PNG": "native-header-refine-3.png"
+    }
+  ],
+  "reference_bbox": [
+    136,
+    24,
+    250,
+    57
+  ],
+  "reference_color_normalized_ink": 1332.911,
+  "criteria": "Preserve33pxheight\/anchor first, then minimize width and normalized ink error; no exact-font claim",
+  "Android": "NOT_RUN",
+  "shutdown": "NOT_RUN"
+}

@@ -14,6 +14,8 @@ import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Looper;
+import android.text.Layout;
+import android.text.StaticLayout;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -24,6 +26,7 @@ import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import java.lang.ref.WeakReference;
@@ -54,10 +57,10 @@ public final class CobraCardsTiles {
     Holder h=new Holder(a,card);HOLDERS.put(card,new WeakReference<>(h));
   }
   /** Replaces only native CobraPosterChannelCard.bind; original row binding runs once. */
-  public static void bind(Activity a,LinearLayout card,Object channel){
+  public static void bind(Activity a,LinearLayout card,Object channel,int position){
     mainThread();if(!cards(a))return;
     Holder h=holder(card);if(h==null){created(a,card);h=holder(card);}
-    if(h!=null)h.bind(channel);
+    if(h!=null)h.bind(channel,position);
   }
   /** Replaces only native card refreshPlaying; off-hierarchy dot is not animated. */
   public static void refresh(Activity a,LinearLayout card){
@@ -93,6 +96,18 @@ public final class CobraCardsTiles {
     Class<?>[] channelArgs,rowArgs;
     Field channelName,channelGroup,channelIcon,programmeStart,programmeStop,programmeTitle,layoutColumns,layoutBrowser;
     Object bound;
+    WeakReference<ListAdapter> boundAdapter=new WeakReference<>(null),measuredAdapter=new WeakReference<>(null);
+    int adapterPosition=-1,measuredRow=-1,measuredWidth=-1,configuredHeight=-1;
+    int measuredFlags,measuredMaxLines,requiredNowHeight;
+    float measuredFont=-1;
+    float measuredTextSize,measuredScaleX,measuredSkewX,measuredLetterSpacing,measuredLineSpacing,measuredLineExtra;
+    boolean measuredFontPadding;
+    Typeface measuredTypeface;
+    String measuredFontFeatures;
+    Locale measuredLocale;
+    String[] measuredLabels=new String[0];
+    int[] measuredTextHeights=new int[0];
+    long contentGeneration,configuredContentGeneration=-1;
     String logoUrl="",name="",group="",dateLocale="",dateZone="",scheduleText="";
     long start=Long.MIN_VALUE,stop=Long.MIN_VALUE;
     SimpleDateFormat date;
@@ -146,8 +161,11 @@ public final class CobraCardsTiles {
       channelGroup=field(channelType,"group");channelIcon=field(channelType,"icon");
       channelArgs=new Class<?>[]{channelType};rowArgs=new Class<?>[]{View.class,channelType};
     }
-    void bind(Object channel){
+    void bind(Object channel,int position){
       Activity a=owner.get();if(a==null)return;channelFields(channel);bound=channel;
+      Object list=CobraArrange.ownedField(a,"mCobraGuideList");
+      boundAdapter=new WeakReference<>(list instanceof GridView?((GridView)list).getAdapter():null);
+      adapterPosition=position;
       CobraArrange.ownedCall(a,"cobraBindRow",rowArgs,card,channel);
       Object actualName=value(channelName,channel);name=actualName==null?"":String.valueOf(actualName);group=string(channelGroup,channel);
       text(title,name);text(category,group.toUpperCase(Locale.getDefault()));
@@ -160,7 +178,7 @@ public final class CobraCardsTiles {
         CobraLogoRequests.clear(a,logo);logoUrl=next;logo.setImageDrawable(null);
         if(!next.isEmpty())CobraLogoRequests.request(a,next,logo);
       }else if(!next.isEmpty())CobraLogoRequests.request(a,next,logo);
-      logoChanged();resize(estimateWidth());metadata(a);
+      logoChanged();metadata(a);resize(estimateWidth());
     }
     void refresh(){
       Activity a=owner.get();if(a==null || bound==null || !cards(a))return;
@@ -233,31 +251,104 @@ public final class CobraCardsTiles {
       }
       return card.getWidth();
     }
+    String programmeLabel(Activity a,Object channel){
+      if(channel==bound)return now.getText().toString();
+      Object programme=CobraArrange.ownedCall(a,"cobraCurrentProgram",channelArgs,channel);
+      if(programme==null){
+        Object status=CobraArrange.ownedCall(a,"cobraGuideStatus",channelArgs,channel);
+        return status==null?"":String.valueOf(status);
+      }
+      return string(field(programme.getClass(),"title"),programme);
+    }
+    @SuppressWarnings("deprecation")
+    int textHeight(String label,int width){
+      if(label.isEmpty())return 0;
+      StaticLayout layout=new StaticLayout(label,now.getPaint(),Math.max(1,width),
+        Layout.Alignment.ALIGN_NORMAL,now.getLineSpacingMultiplier(),now.getLineSpacingExtra(),now.getIncludeFontPadding());
+      return layout.getLineBottom(Math.min(now.getMaxLines(),layout.getLineCount())-1);
+    }
+    int rowHeight(Activity a,int width,float font){
+      int count=1,row=-1;ListAdapter adapter=null;
+      Object list=CobraArrange.ownedField(a,"mCobraGuideList");
+      if(bound!=null && list instanceof GridView){
+        GridView grid=(GridView)list;ListAdapter current=grid.getAdapter();
+        // A refresh may arrive after the native projection changed. Never use
+        // the old position to measure a different source/filter's row.
+        if(current!=null && current==boundAdapter.get() && adapterPosition>=0
+          && adapterPosition<current.getCount() && current.getItem(adapterPosition)==bound){
+          int columns=grid.getNumColumns();
+          if(columns>0){adapter=current;row=(adapterPosition/columns)*columns;count=Math.min(columns,current.getCount()-row);}
+        }
+      }
+      Locale locale=now.getTextLocale();
+      Paint paint=now.getPaint();
+      boolean context=measuredAdapter.get()!=adapter || measuredRow!=row || measuredWidth!=width
+        || measuredFont!=font || !locale.equals(measuredLocale) || measuredLabels.length!=count
+        || measuredTypeface!=paint.getTypeface() || measuredTextSize!=paint.getTextSize()
+        || measuredScaleX!=paint.getTextScaleX() || measuredSkewX!=paint.getTextSkewX()
+        || measuredLetterSpacing!=now.getLetterSpacing() || measuredFlags!=paint.getFlags()
+        || !TextUtils.equals(measuredFontFeatures,now.getFontFeatureSettings())
+        || measuredLineSpacing!=now.getLineSpacingMultiplier() || measuredLineExtra!=now.getLineSpacingExtra()
+        || measuredMaxLines!=now.getMaxLines() || measuredFontPadding!=now.getIncludeFontPadding();
+      if(context){
+        measuredAdapter=new WeakReference<>(adapter);measuredRow=row;measuredWidth=width;measuredFont=font;measuredLocale=locale;
+        measuredTypeface=paint.getTypeface();measuredTextSize=paint.getTextSize();measuredScaleX=paint.getTextScaleX();
+        measuredSkewX=paint.getTextSkewX();measuredLetterSpacing=now.getLetterSpacing();measuredFlags=paint.getFlags();
+        measuredFontFeatures=now.getFontFeatureSettings();measuredLineSpacing=now.getLineSpacingMultiplier();
+        measuredLineExtra=now.getLineSpacingExtra();measuredMaxLines=now.getMaxLines();measuredFontPadding=now.getIncludeFontPadding();
+        measuredLabels=new String[count];measuredTextHeights=new int[count];contentGeneration++;
+      }
+      requiredNowHeight=0;
+      int maximum=0,textWidth=Math.max(1,Math.round((448-164-24)*scale));
+      // GridView advances to the next row using its LAST child's bottom. Both
+      // cells therefore resolve the same maximum before either is measured.
+      // getItem is the native adapter's local projection lookup, not inventory
+      // traversal or provider work. Only the current adapter row is visited.
+      for(int offset=0;offset<count;offset++){
+        Object channel=adapter==null?bound:adapter.getItem(row+offset);
+        String label=channel==null?"":programmeLabel(a,channel);
+        if(!TextUtils.equals(label,measuredLabels[offset])){
+          measuredLabels[offset]=label;measuredTextHeights[offset]=textHeight(label,textWidth);contentGeneration++;
+        }
+        if(channel==bound)requiredNowHeight=measuredTextHeights[offset];
+        maximum=Math.max(maximum,measuredTextHeights[offset]);
+      }
+      int base=Math.max(1,Math.round((250+Math.max(0,font-1)*128)*scale));
+      // A normal programme line has a 36-reference-pixel content reserve.
+      // Wrapped real text expands that block and the shared row by its measured
+      // overflow; no particular provider, title or row index controls height.
+      return base+Math.max(0,maximum-Math.round(36*scale*font));
+    }
     void resize(int width){
       Activity a=owner.get();if(a==null || width<=0 || configuring)return;
       float font=a.getResources().getConfiguration().fontScale;if(!(font>0))font=1;
-      float extra=Math.max(0,font-1)*128,refHeight=250+extra;
-      int height=Math.max(1,Math.round(refHeight*width/448f));
-      ViewGroup.LayoutParams parent=card.getLayoutParams();
-      if(parent==null){card.setLayoutParams(new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,height));}
-      else if(parent.height!=height){parent.height=height;card.setLayoutParams(parent);}
-      if(configuredWidth==width && configuredFont==font)return;
       configuring=true;
       try{
-        configuredWidth=width;configuredFont=font;scale=width/448f;
-        category.setTextSize(TypedValue.COMPLEX_UNIT_PX,17*scale*font);
-        title.setTextSize(TypedValue.COMPLEX_UNIT_PX,24*scale*font);
-        now.setTextSize(TypedValue.COMPLEX_UNIT_PX,21*scale*font);
-        time.setTextSize(TypedValue.COMPLEX_UNIT_PX,19.5f*scale*font);
-        fallback.setTextSize(TypedValue.COMPLEX_UNIT_PX,34*scale*font);
-        live.setTextSize(TypedValue.COMPLEX_UNIT_PX,20.5f*scale*font);
+        boolean dimensions=configuredWidth!=width || configuredFont!=font;
+        scale=width/448f;
+        if(dimensions){
+          category.setTextSize(TypedValue.COMPLEX_UNIT_PX,17*scale*font);
+          title.setTextSize(TypedValue.COMPLEX_UNIT_PX,24*scale*font);
+          now.setTextSize(TypedValue.COMPLEX_UNIT_PX,21*scale*font);
+          time.setTextSize(TypedValue.COMPLEX_UNIT_PX,19.5f*scale*font);
+          fallback.setTextSize(TypedValue.COMPLEX_UNIT_PX,34*scale*font);
+          live.setTextSize(TypedValue.COMPLEX_UNIT_PX,20.5f*scale*font);
+        }
+        int height=rowHeight(a,width,font);
+        ViewGroup.LayoutParams parent=card.getLayoutParams();
+        if(parent==null){card.setLayoutParams(new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,height));}
+        else if(parent.height!=height){parent.height=height;card.setLayoutParams(parent);}
+        if(!dimensions && configuredHeight==height && configuredContentGeneration==contentGeneration)return;
+        configuredWidth=width;configuredFont=font;configuredHeight=height;configuredContentGeneration=contentGeneration;
+        float nominalHeight=250+Math.max(0,font-1)*128;
+        float refHeight=nominalHeight+(height-Math.max(1,Math.round(nominalHeight*scale)))/scale;
         liveDot.setBounds(0,0,px(16),px(16));live.setCompoundDrawables(liveDot,null,null,null);live.setCompoundDrawablePadding(px(8));
         float flowFont=Math.max(1,font);
         float titleTop=32+20*flowFont+12,nowTop=titleTop+30*flowFont+14,footer=refHeight-52-26*font;
         place(logo,20,44,122,100);place(fallback,20,44,122,100);place(divider,145,34,1,104);
         place(category,164,32,448-164-80,20*font);
         place(title,164,titleTop,448-164-24,30*font);
-        place(now,164,nowTop,448-164-24,52*font);
+        place(now,164,nowTop,448-164-24,Math.max(52*font,requiredNowHeight/scale));
         float liveWidth=84*font,timeLeft=24+liveWidth+8;
         place(live,24,footer,liveWidth,26*font);place(time,timeLeft,footer+1,Math.max(24,448-timeLeft-24),26*font);
         place(progress,24,refHeight-38,448-48,10);

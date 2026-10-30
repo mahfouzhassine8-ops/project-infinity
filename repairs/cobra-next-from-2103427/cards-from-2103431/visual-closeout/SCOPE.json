@@ -1,0 +1,59 @@
+{
+  "scope": "Complete only two documented Cards visual deviations from delivered432",
+  "authorization": "Existing exact approved Cards design brief; delegated continuation2026-10-30; save code/evidence before signing decision",
+  "branch": "work/cobra-only-from-2103427-20261028",
+  "entire_existing_brief_retained": true,
+  "preserved": {
+    "signed432_source": "b53d4286759cee6707c8c2915cc5a0c9a3260336",
+    "signed432_APK_SHA256": "55671707e7acc8b1c329e5b87bdbe47706607418aa152b11b8889c3081a447c3",
+    "signed431_APK_SHA256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471",
+    "Infinity": "FROZEN2103427",
+    "other_modes_Pro_ProSports_MultiView_PiP": "FROZEN",
+    "chooser_icons_native_shutdown_userdata": "FROZEN"
+  },
+  "implementation_allowlist": [
+    "runtime/CobraCardsLayout.java header font/spacing only",
+    "runtime/CobraCardsTiles.java paired content-measured row sizing and cache inputs only",
+    "cards_patch.py forward existing native bind position only"
+  ],
+  "reference_PNG_SHA256": "3a718b7731d45819a4d49f9b585725b7c9dd71ac547eb1171123b4acd21f2ff6",
+  "selected_before_execution": {
+    "header_probe": "CobraCardsHeaderCalibrationTest#compareApprovedHeaderWeights",
+    "cases": [
+      "original700 tracking0",
+      "500 tracking0.02",
+      "550 tracking0.02",
+      "600 tracking0.02"
+    ],
+    "native_owner_verification": {
+      "class": "CobraCardsVisualCloseoutTest",
+      "methods": [
+        "nativeWrappedMissingScheduleAndLivePeersShareMeasuredRows",
+        "nativeRowRecyclingAndContentChangesPreserveAnchors",
+        "nativeMoreAndRowTargetsKeepTheirCurrentChannelAfterGrowth",
+        "cardsHeaderAndRowsLeaveFourNativeModesUnchanged"
+      ],
+      "execution": "NOT_RUN; wait for root trusted current-owner canonical/source binding",
+      "unselected": [
+        "historicalfull26suite",
+        "Android/emulator",
+        "shutdown",
+        "unrelatedmodesbehaviormatrix"
+      ]
+    },
+    "header_refinement": {
+      "class": "CobraCardsHeaderCalibrationTest",
+      "method": "refineApprovedHeaderMetrics",
+      "cases": [
+        "500 size42 tracking0.03",
+        "500 size42.25 tracking0.025",
+        "500 size42.5 tracking0.02"
+      ],
+      "criterion": "Preserve target glyph height33/anchor136,24; minimize width114 and normalizedink1332.911 errors; no samefont/pixelperfect claim"
+    }
+  },
+  "owner_build": "Unsigned prototype owner DEX only; retain existing32 compiler metadata for local verification, not a new APK/release",
+  "release": "NO_APK_BUILD_SIGNING_REGISTRATION_OR_LOCK; save correction and evidence first",
+  "Android_emulator": "NOT_SELECTED; no rerun",
+  "shutdown_tests": "NOT_AUTHORIZED_NOT_RUN"
+}

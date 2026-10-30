@@ -1,0 +1,109 @@
+{
+  "status": "PASS_SELECTED_FOUR_NATIVE_HEADER_CALIBRATION_CASES",
+  "cases": [
+    {
+      "bbox": [
+        135,
+        24,
+        245,
+        57
+      ],
+      "width": 110,
+      "height": 33,
+      "threshold_pixels": 1678,
+      "minRGB_peak": 240,
+      "weighted_ink": 1398.2893617021534,
+      "color_normalized_ink": 1493.6272727273004,
+      "relative_geometry_ink_error": 0.15566311610065797,
+      "requested_weight": 700,
+      "actual_weight": 700,
+      "tracking_em": 0,
+      "size_px": 42,
+      "text_color": -986121,
+      "native_TextView_class": "android.widget.TextView",
+      "native_Canvas_PNG": "native-header-weight-700.png",
+      "font_same_as_reference": "NOT_CLAIMED"
+    },
+    {
+      "bbox": [
+        136,
+        24,
+        248,
+        57
+      ],
+      "width": 112,
+      "height": 33,
+      "threshold_pixels": 1474,
+      "minRGB_peak": 240,
+      "weighted_ink": 1213.4680851064024,
+      "color_normalized_ink": 1296.2045454545664,
+      "relative_geometry_ink_error": 0.045082423398265584,
+      "requested_weight": 500,
+      "actual_weight": 500,
+      "tracking_em": 0.019999999552965164,
+      "size_px": 42,
+      "text_color": -986121,
+      "native_TextView_class": "android.widget.TextView",
+      "native_Canvas_PNG": "native-header-weight-500.png",
+      "font_same_as_reference": "NOT_CLAIMED"
+    },
+    {
+      "bbox": [
+        136,
+        24,
+        248,
+        57
+      ],
+      "width": 112,
+      "height": 33,
+      "threshold_pixels": 1474,
+      "minRGB_peak": 240,
+      "weighted_ink": 1213.4680851064024,
+      "color_normalized_ink": 1296.2045454545664,
+      "relative_geometry_ink_error": 0.045082423398265584,
+      "requested_weight": 550,
+      "actual_weight": 550,
+      "tracking_em": 0.019999999552965164,
+      "size_px": 42,
+      "text_color": -986121,
+      "native_TextView_class": "android.widget.TextView",
+      "native_Canvas_PNG": "native-header-weight-550.png",
+      "font_same_as_reference": "NOT_CLAIMED"
+    },
+    {
+      "bbox": [
+        136,
+        24,
+        248,
+        57
+      ],
+      "width": 112,
+      "height": 33,
+      "threshold_pixels": 1474,
+      "minRGB_peak": 240,
+      "weighted_ink": 1213.4680851064024,
+      "color_normalized_ink": 1296.2045454545664,
+      "relative_geometry_ink_error": 0.045082423398265584,
+      "requested_weight": 600,
+      "actual_weight": 600,
+      "tracking_em": 0.019999999552965164,
+      "size_px": 42,
+      "text_color": -986121,
+      "native_TextView_class": "android.widget.TextView",
+      "native_Canvas_PNG": "native-header-weight-600.png",
+      "font_same_as_reference": "NOT_CLAIMED"
+    }
+  ],
+  "reference_bbox": [
+    136,
+    24,
+    250,
+    57
+  ],
+  "reference_color_normalized_ink": 1332.911,
+  "criteria": "Minimize relative width\/height\/normalized ink error; area\/bbox do not establish exact font or pixel-perfect identity",
+  "fixture": "Actual current owner native buildShell\/ShowGuideShell header TextView; existing Layout fixture compiled only",
+  "provider_workers": "ADMISSIONS_ONLY; BODIES_NOT_EXECUTED",
+  "Android": "NOT_RUN",
+  "shutdown": "NOT_RUN"
+}

@@ -100,7 +100,7 @@ def patch_card(source):
         elif signature.startswith('bind('):
             revised = replace_body(old, 4,
                 '    iget-object v0, p0, '+CARD+'->this$0:'+APP+'\n'+
-                '    invoke-static {v0, p0, p1}, '+TILES+'->bind(Landroid/app/Activity;Landroid/widget/LinearLayout;Ljava/lang/Object;)V\n'+
+                '    invoke-static {v0, p0, p1, p2}, '+TILES+'->bind(Landroid/app/Activity;Landroid/widget/LinearLayout;Ljava/lang/Object;I)V\n'+
                 '    return-void')
         elif signature == 'refreshPlaying()V':
             revised = replace_body(old, 2,

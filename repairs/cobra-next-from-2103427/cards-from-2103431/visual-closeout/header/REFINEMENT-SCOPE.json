@@ -1,0 +1,38 @@
+{
+  "class": "CobraCardsHeaderCalibrationTest",
+  "methods": [
+    "refineApprovedHeaderMetrics"
+  ],
+  "recorded_before_execution": true,
+  "authorization": "Root explicitly selected ONE additional method/exactlythree refinement cases before execution; no further probes absent actual functional defect",
+  "cases": [
+    {
+      "weight": 500,
+      "size": 42.0,
+      "tracking": 0.03
+    },
+    {
+      "weight": 500,
+      "size": 42.25,
+      "tracking": 0.025
+    },
+    {
+      "weight": 500,
+      "size": 42.5,
+      "tracking": 0.02
+    }
+  ],
+  "source_binding_sha256": "a2011f367da1e289646492b8fb5f67e7e8cb17319373b681e3345c6b753773c6",
+  "classpath": {
+    "production.jar": "926bcc3bcc3b78d424742af38116d86f1f71367e1e429828e42f10e618cea92e",
+    "support.jar": "016a9ca405468cbc86fb6da8634e943ada67ffa615a3b804a1d9680fca84f1ad"
+  },
+  "test_sha256": "ad80ff842f0078449c67fa8e811d9611faa74b7cad7724ab484a335948e5ca15",
+  "compiled_fixture_only": {
+    "CobraCardsLayoutTest.java": "d282188de62891e8f5aea1213c3c214f7697ce282f2ea8b04441b012f66d2525"
+  },
+  "criteria": "Targetbbox114x33@136,24 and normalizedink1332.911; preserve33pxheight/anchor first then width+ink; no exact-font claim",
+  "APK": "NOT_BUILT",
+  "Android": "NOT_RUN",
+  "shutdown": "NOT_RUN"
+}
