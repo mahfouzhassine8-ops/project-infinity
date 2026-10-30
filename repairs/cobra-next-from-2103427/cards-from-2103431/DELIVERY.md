@@ -1,3 +1,5 @@
+Latest final Cards correction candidate: [signed2103433 delivery](release433/DELIVERY.md). The signed2103432 recovery/reference delivery below remains preserved.
+
 # Signed 2103432 Fold testing candidate
 
 One combined original-key signed install-over APK is delivered. This is a physical Fold candidate; it is not accepted or locked. Exact signed2103431 remains protected recovery.
