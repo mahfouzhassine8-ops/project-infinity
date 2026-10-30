@@ -43,7 +43,7 @@ def resolved_preview(preview, layout):
         if ' synthetic access$' in signature:
             body = raw.split('\n', 1)[1]
             mapping[signature.split()[-1]] = hashlib.sha256(body.encode()).hexdigest()
-    pattern = re.compile(r'(Lcom/projectinfinity/kodi/CobraCardsLayout;->)(access\$\d+\([^\n ]+\)[^\n ]+)')
+    pattern = re.compile(r'(Lcom/projectinfinity/kodi/CobraCardsLayout;->)(access\$\d+\([^\n ]*\)[^\n ]+)')
     return pattern.sub(lambda match: match[1] + 'resolved:' + mapping[match[2]], preview)
 
 
