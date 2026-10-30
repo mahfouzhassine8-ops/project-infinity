@@ -19,7 +19,7 @@ on:
         required: true
         type: choice
         default: select-a-feature
-        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host, infinity-performance-android, cobra-owner-host, cobra-android-launch, cobra-cards-baseline, cobra-cards-host, cobra-fold-more433, cobra-rejected434-controls, infinity-seamless-loading434]
+        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host, infinity-performance-android, cobra-owner-host, cobra-android-launch, cobra-cards-baseline, cobra-cards-host, cobra-fold-more433, cobra-rejected434-controls, cobra-corrective435-controls, infinity-seamless-loading434]
       candidate_build:
         description: Existing signed build run (no rebuild)
         required: true
@@ -253,6 +253,100 @@ jobs:
         if: always()
         with:
           name: Cobra-Rejected434-Sun-Fullscreen-More-${{ github.run_id }}
+          path: |
+            runtime-results/
+            runtime-platform/
+            runtime-emulator-setup/
+            runtime-driver/BUILD-RECEIPT.json
+          retention-days: 90
+          if-no-files-found: error
+  cobra-corrective435-controls:
+    if: github.event_name == 'workflow_dispatch' && inputs.feature == 'cobra-corrective435-controls'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      INFINITY_EMULATOR_API: '37.1'
+      INFINITY_EMULATOR_TARGET: google_apis_ps16k
+      AUTHORIZED_SCOPE: ${{ inputs.authorization }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: "${{ inputs.source_ref }}", fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '21'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Admit exact baseline and selected feature
+        run: |
+          test -n "$AUTHORIZED_SCOPE"
+          test "${{ inputs.candidate_build }}" = 41125367621
+          test "$(git branch --show-current)" = work/cobra-only-from-2103427-20261028
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          scope=json.loads(Path('repairs/cobra-next-from-2103427/cards-from-2103431/consolidated435/android-qa/SIGNED435-INPUT.json').read_text())
+          assert scope['selected_before_execution'] is True and scope['shutdown']=='NOT_RUN' and scope['signing_run']==41125367621
+          assert scope['source']=='e0c6153588992001d84076d33fdf8f0d676c0d00'
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 41125367621
+          name: Infinity-Combined-Original-Signer-41125367621
+          github-token: ${{ github.token }}
+          path: runtime-signed
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39867073954
+          name: Infinity-Receipt-Race-Android17-Investigation
+          github-token: ${{ github.token }}
+          path: observer-tools
+      - uses: android-actions/setup-android@v4
+        with:
+          cmdline-tools-version: '15859902'
+          packages: platform-tools build-tools;35.0.0
+          log-accepted-android-sdk-licenses: false
+      - name: Original signature, pinned QA-only bridge and established API37
+        run: |
+          set -euo pipefail
+          mkdir -p runtime-results
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs runtime-signed/Infinity-2103435-Combined-Original-Signer.apk > runtime-results/SIGNATURE.txt
+          sudo apt-get update -qq
+          sudo apt-get install -y libpulse0 ffmpeg
+          python3 -m pip install Pillow==11.3.0
+          python3 repairs/infinity-final-closure-2103407/api37_environment_gate.py --sdk-root "$ANDROID_HOME" --out runtime-platform --pin-tools
+          python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out runtime-emulator-setup
+          sudo chmod 666 /dev/kvm
+          python3 repairs/cobra-next-from-2103427/cards-from-2103431/android-qa/immediate-observer/build.py --android observer-tools/receipt-evidence/android-34.jar --d8 "$ANDROID_HOME/build-tools/35.0.0/lib/d8.jar" --out runtime-observer
+          python3 repairs/cobra-next-from-2103427/cards-from-2103431/consolidated435/android-qa/build_android_driver.py --android observer-tools/receipt-evidence/android-34.jar --d8 "$ANDROID_HOME/build-tools/35.0.0/lib/d8.jar" --out runtime-driver
+          python3 repairs/cobra-next-from-2103427/android_candidate_journey.py --generate-media runtime-media
+          python3 repairs/cobra-next-from-2103427/cards-from-2103431/android-qa/generate_fixture.py --out runtime-media --require-media
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,json
+          p=Path('runtime-media/fold-more.m3u')
+          p.write_text('\n'.join(Path('runtime-media/cards-20226.m3u').read_text().splitlines()[:49])+'\n')
+          Path('runtime-results/FIXTURE.json').write_text(json.dumps(dict(channels=24,playlist_sha256=hashlib.sha256(p.read_bytes()).hexdigest(),synthetic=True)))
+          PY
+          python3 -m http.server 8765 --bind 0.0.0.0 --directory runtime-media > runtime-results/MEDIA-HTTP.txt 2>&1 &
+      - uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: '37.1'
+          arch: x86_64
+          target: google_apis_ps16k
+          profile: pixel_2
+          disk-size: 8G
+          avd-name: infinity-four-repair-api37
+          pre-emulator-launch-script: python3 repairs/infinity-final-closure-2103407/api37_environment_gate.py --sdk-root "$ANDROID_HOME" --out runtime-platform --check-avd
+          disable-animations: false
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: |
+            adb shell wm size 1080x2520
+            adb shell wm density 480
+            python3 repairs/cobra-next-from-2103427/cards-from-2103431/consolidated435/android-qa/run_android_more.py --signed runtime-signed --signature runtime-results/SIGNATURE.txt --driver runtime-driver --observer runtime-observer --out runtime-results/signed435
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Cobra-Signed435-Sun-Fullscreen-More-${{ github.run_id }}
           path: |
             runtime-results/
             runtime-platform/
@@ -814,7 +908,7 @@ jobs:
           retention-days: 90
           if-no-files-found: error
   android17:
-    if: inputs.feature != 'infinity-performance-host' && inputs.feature != 'infinity-performance-android' && inputs.feature != 'cobra-owner-host' && inputs.feature != 'cobra-android-launch' && inputs.feature != 'cobra-cards-baseline' && inputs.feature != 'cobra-cards-host' && inputs.feature != 'cobra-fold-more433' && inputs.feature != 'cobra-rejected434-controls' && inputs.feature != 'infinity-seamless-loading434'
+    if: inputs.feature != 'infinity-performance-host' && inputs.feature != 'infinity-performance-android' && inputs.feature != 'cobra-owner-host' && inputs.feature != 'cobra-android-launch' && inputs.feature != 'cobra-cards-baseline' && inputs.feature != 'cobra-cards-host' && inputs.feature != 'cobra-fold-more433' && inputs.feature != 'cobra-rejected434-controls' && inputs.feature != 'cobra-corrective435-controls' && inputs.feature != 'infinity-seamless-loading434'
     name: Selected feature ${{ inputs.feature || 'explicit baseline Search request' }}
     runs-on: ubuntu-22.04
     timeout-minutes: 150
