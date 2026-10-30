@@ -4,7 +4,7 @@
   "full_brief_read": true,
   "production_implementation_started": true,
   "current_build": "/workspace/cobra-evidence/build431",
-  "build_status": "SIGNED431_ORIGINAL_KEY_AND_INDEPENDENT_BYTES_PASS; NATIVE_QA_JAR_PREPARATION_NO_NEW_RUN",
+  "build_status": "SIGNED431_ORIGINAL_KEY_AND_INDEPENDENT_BYTES_PASS; NATIVE_QA_RUNTIME_IN_PROGRESS",
   "baseline_apk": "/workspace/infinity-evidence/continuation2103427/signed27-ci/Infinity-2103427-Combined-Original-Signer.apk",
   "baseline_components": "/workspace/infinity-evidence/continuation2103427/components27-ci",
   "actual_baseline_smali": "/workspace/cobra-evidence/baseline/COBRA/smali-0/com/projectinfinity/kodi/InfinityLiveActivity.smali",
@@ -16,7 +16,7 @@
   "maven": "/workspace/cobra-evidence/maven/apache-maven-3.9.9/bin/mvn",
   "selected_scope": "SCOPE.json",
   "source_budget": "SOURCE-BUDGET.json",
-  "next": "Compile and inspect supported on-device UIAutomator QA DEX JAR before any further Android run. Query actual native button bounds and coordinate-click in one device process, same signed431. No production/build/sign/shutdown/lock promotion.",
+  "next": "Inspect existing40980338717 evidence; no duplicate run. Sourcef0cc061... disables incremental install after40979186412 IncFSfullSHAprelaunch30sfailure. Alloriginaldeadlines/hashguardsstrict; compilednativeUiAutomator3500ms helper then actualUI/taskverification. Deliver ONLYsigned4319ccc.../40971769136 withhonestmatrix. No build/sign/shutdown/lockpromotion.",
   "found_defects": [
     "Existing MultiView chooser has Fit/Fill only; no11arrangements",
     "NonPro preview More precedes Fullscreen/PiP; classic and Pro full strip alreadyMoreLast (preserve)",
@@ -72,9 +72,9 @@
   "previous29_independent_verification": "results/signed2103429/INDEPENDENT-VERIFICATION.json",
   "current_signed_source": "9ccc4c362a65118eeba38a8e7e4b0de5723c69af",
   "current_signed_run": 40971769136,
-  "current_android_run": 40976739449,
+  "current_android_run": 40980338717,
   "current_signed_APK_sha256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471",
-  "current_QA_source": "8146d518eedecb22cd417785f88aa10ce2a9d608",
+  "current_QA_source": "f0cc061cedd9fedb6e04bbf03dbd6c1d9ea97649",
   "independent_verification": "results/signed2103431/INDEPENDENT-VERIFICATION.json",
   "current_android_previous_runs": [
     40966613409,
@@ -84,7 +84,8 @@
     40973858059,
     40975410956,
     40975572601,
-    40976739449
+    40976739449,
+    40979186412
   ],
   "current_android_previous_failures": [
     "430 initial native M3U picker QA clickable-label assumption; before button actions",
@@ -94,9 +95,17 @@
     "431 Fullscreen passed; measured More coordinate, unobserved intervening native reveal/layout then real systemPiP. Final pointer recipient undetermined; QA fresh final measurement correction",
     "Cancelled invalid source_ref during checkout only; emulator/install skipped",
     "431 fresh-target guard stopped before More press: extraQA reveal moved More from858..1016 to1011..1016(5px) andPiP to853..1011 under old937,827. Fullscreenpassed. CurrentQA removes intervening reveal/screenshot and observes actualscrolled bounds withcompressednativehierarchy; keeps3.5s/4s/30s/7bounds.",
-    "Host native dump+cat exceeded strict3.5s fresh-target interval before firstFullscreen. Nobuttonactions issued; notproductionroutingfailure. SupportednativeUIAutomatorJARpreparation avoids hostbetweenquery/press, noapptimeoutchanges; no newrunyet."
+    "Host native dump+cat exceeded strict3.5s fresh-target interval before firstFullscreen. Nobuttonactions issued; notproductionroutingfailure. SupportednativeUIAutomatorJARpreparation avoids hostbetweenquery/press, noapptimeoutchanges; no newrunyet.",
+    "40979186412 beforeActivitylaunch:installedSHAread30stimeoutafterIncrementalInstallSuccess22401ms; UIhelper/icons/buttonsNOTRUN. --no-incremental streamedfulltransferbeforeSuccess officialAOSPverified; no timeout/hashweakening orinstallretry."
   ],
   "current_signed_candidate": "2103431_UNACCEPTED_DEVICE_QA_PENDING",
   "actual_icon_observation": "431 Android37 AppInfo lightwhiteblack/darknavycyan; PixelLauncher AllApps retains light cached bitmap after dark switch; Samsung unverified",
-  "current_android_result": "40976739449_FAILED_HOST_3_5S_FRESHNESS_GUARD_BEFORE_FULLSCREEN"
+  "current_android_result": "IN_PROGRESS_NATIVE_UIAUTOMATOR_FULL_APK_TRANSFER_SAME_SIGNED_APK",
+  "native_UI_QA_helper": {
+    "source_sha256": "214fc9b74b92f431597bfbd52713725ed3d198791c9419931f48dbe8237fca77",
+    "preflight": "results/runtime/native-agent-preflight/OUTCOME.json",
+    "only_QA_classes": 2,
+    "deadline_ms": 3500,
+    "APK_unchanged": true
+  }
 }
