@@ -18,10 +18,11 @@ def sha(path):
 
 def load(path):return json.loads(path.read_text())
 
-def prepare(classpath,baseline_results,out,header_weight):
+def prepare(classpath,baseline_results,out,header_weight,methods=None):
     classpath,baseline_results,out=(p.resolve() for p in (classpath,baseline_results,out))
     scope=load(HERE/'SCOPE.json');assert scope['selected_before_execution']
     assert len(scope['selected_methods'])==4 and len(set(scope['selected_methods']))==4
+    selected=methods or scope['selected_methods'];assert selected and len(set(selected))==len(selected) and set(selected)<=set(scope['selected_methods'])
     assert 100<=header_weight<=1000,'Explicit independently reference-calibrated header weight required'
     manifest=load(classpath/'SOURCE-BINDINGS.json')
     assert manifest['status'].startswith('PASS_FRESH_SOURCE_BOUND_')
@@ -50,13 +51,13 @@ def prepare(classpath,baseline_results,out,header_weight):
     for name,value in values.items():ET.SubElement(nodes[0],NS+name).text=value
     # Preserve portable project.basedir JAR/library resolution and official deps.
     text=ET.tostring(root,encoding='unicode').replace(str(classpath),str(out))+'\n';(out/'pom.xml').write_text(text)
-    selection=dict(**{'class':'CobraCardsVisualCloseoutTest','methods':scope['selected_methods']},recorded_before_execution=True,scope_sha256=sha(HERE/'SCOPE.json'))
-    selector='CobraCardsVisualCloseoutTest#'+'+'.join(scope['selected_methods'])
+    selection=dict(**{'class':'CobraCardsVisualCloseoutTest','methods':selected},recorded_before_execution=True,scope_sha256=sha(HERE/'SCOPE.json'))
+    selector='CobraCardsVisualCloseoutTest#'+'+'.join(selected)
     receipt=dict(phase='CARDS_VISUAL_CLOSEOUT_FOUR_SELECTED_HOST_CASES_NO_EXECUTION',
       trusted_source_bindings_sha256=sha(classpath/'SOURCE-BINDINGS.json'),source_binding=manifest,
       classpath={n:sha(out/n) for n in ('production.jar','support.jar')},test_sha256=sha(test),
       test_sources={str(p.relative_to(REPO)):sha(p) for p in (test,fixture)},
-      compiled_fixture_only=str(fixture.relative_to(REPO)),selected_methods=scope['selected_methods'],
+      compiled_fixture_only=str(fixture.relative_to(REPO)),selected_methods=selected,
       header_weight=header_weight,baseline_reference_sha256=sha(baseline_results/'SOURCE-BINDING.json'),
       scope_sha256=sha(HERE/'SCOPE.json'),prepare_sha256=sha(Path(__file__)),pom_sha256=sha(out/'pom.xml'),
       maven_selector=selector,behavior='NOT_RUN',APK='NOT_BUILT',shutdown='NOT_RUN',physical_Fold='NOT_RUN')
@@ -66,4 +67,4 @@ def prepare(classpath,baseline_results,out,header_weight):
 if __name__=='__main__':
     p=argparse.ArgumentParser()
     for name in ('classpath','baseline-results','out'):p.add_argument('--'+name,type=Path,required=True)
-    p.add_argument('--header-weight',type=int,required=True);prepare(**vars(p.parse_args()))
+    p.add_argument('--header-weight',type=int,required=True);p.add_argument('--method',action='append',dest='methods');prepare(**vars(p.parse_args()))
