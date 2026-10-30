@@ -1,0 +1,51 @@
+{
+  "status": "PASS_FOCUSED_SIGNED435_COBRA_MENU_INTERACTIONS; PHYSICAL_PENDING",
+  "APK_SHA256": "dc83faed4a8eb1d2e2e116914cf15f2f1c27cc2a8653813fd6701ba300234442",
+  "signing_source": "e0c6153588992001d84076d33fdf8f0d676c0d00",
+  "signing_run": 41125367621,
+  "actual_fullscreen_More": {
+    "run": 41130966901,
+    "source": "bafae2c3216c449434b6ec79a3dc16f1d6bd0415",
+    "artifact": 13012963493,
+    "artifact_sha256": "2a8a389566cbe56a7c1b989e423371d85c0ecdbb4df64ed39d55fc85beb0449a",
+    "real_coordinate_More_presses": 2,
+    "real_Back_presses": 2,
+    "original_menu_heading_and_actions": "OBSERVED_IN_ACTUAL_PNGS_PERSONALLY",
+    "deadline_ms": 3500,
+    "deadline": "UNCHANGED; actual pre/post input guards pass"
+  },
+  "actual_sun": {
+    "run": 41126342663,
+    "case": "Actual sun/menu/NightCinemaOff/reopen/Back observed with actual PNGs; overall run retained FAILED at separate fullscreen readiness observation",
+    "menu_pixels": "PERSONALLY_INSPECTED"
+  },
+  "observer_only_measurements": {
+    "previous_full_tree_queries_ms": [
+      1837,
+      1615
+    ],
+    "actual_native_target_queries_ms": [
+      206,
+      122,
+      120,
+      167
+    ],
+    "interpretation": "QA locator overhead only; not app/phone benchmark"
+  },
+  "pixels": {
+    "fullscreen-more-1-settled.png": "cd13064fd50146ade9081d381cefc3f68b73762f026d90687f70b5f2a082e0f2",
+    "cards-sun-menu-reopened.png": "bfbf06b5dd0c1dc2c85577d5bb886ff44a4044178c4a718bdfff18898f9f13cc",
+    "fullscreen-more-2-settled.png": "cd13064fd50146ade9081d381cefc3f68b73762f026d90687f70b5f2a082e0f2"
+  },
+  "retained_failed_runs": {
+    "r41126342663": "Fullscreen actually opened; observer then searched obsolete inline action",
+    "r41127665715": "No More injection; full-tree query overhead exhausted strict3500ms",
+    "r41129090323": "Before feature; same pending OS notice snapshot misclassified as repeat; final Welcome screenshot proves dismissal"
+  },
+  "playback_scope": "Synthetic streams used; menu interaction checked. Continuous decoder/video output, real providers and thermal/CPU/frame pacing not measured. Second menu capture has black video area; this test does not establish playback continuity.",
+  "Infinity": "NOT_LAUNCHED; existing translated-ARM libkodi constructor blocker before Python",
+  "shutdown": "NOT_RUN",
+  "physical_Fold": "PENDING",
+  "accepted_pointer_updated": false,
+  "lock_promoted": false
+}
