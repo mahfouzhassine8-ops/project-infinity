@@ -111,7 +111,10 @@ jobs:
           pre-emulator-launch-script: python3 repairs/infinity-final-closure-2103407/api37_environment_gate.py --sdk-root "$ANDROID_HOME" --out runtime-platform --check-avd
           disable-animations: false
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
-          script: python3 repairs/cobra-next-from-2103427/cards-from-2103431/consolidated434/run_android_more.py --signed runtime-signed --signature runtime-results/SIGNATURE.txt --driver runtime-driver --observer runtime-observer --out runtime-results/more433
+          script: |
+            adb shell wm size 1080x2520
+            adb shell wm density 480
+            python3 repairs/cobra-next-from-2103427/cards-from-2103431/consolidated434/run_android_more.py --signed runtime-signed --signature runtime-results/SIGNATURE.txt --driver runtime-driver --observer runtime-observer --out runtime-results/more433
       - uses: actions/upload-artifact@v4
         if: always()
         with:

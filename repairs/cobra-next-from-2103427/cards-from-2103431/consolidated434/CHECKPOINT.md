@@ -1,27 +1,33 @@
-# Consolidated434 implementation checkpoint — 2026-10-30
+# Coordinated434 checkpoint — 2026-10-30
 
-This is active implementation, not a release or acceptance claim. Exact signed431/432/433 APKs/components remain immutable. No new product APK or signing run has been produced.
+Active implementation on the same existing owner branches. Signed431/432/433 and their matching components remain unchanged. No new product APK has been built or signed; no recovery pointer or acceptance lock has changed.
 
-## Cobra Cards inner-display work
+## Inner Cards
 
-Production changes are restricted to the Cards layout/tile/reuse helpers. Actual usable logical window dimensions choose an expanded profile only when BOTH dimensions are at least600dp. It uses four columns when at least160dp plus spacing remains per channel, three/two-column fallbacks for narrower/larger-font windows, compact header/preview/Now Playing and content-measured rows. All narrow-to-narrow layout behavior follows433.
+Cards-only expanded layout uses actual usable window dimensions (both at least600dp), four appropriately sized columns at800dp, three at600dp and accessible large-text fallbacks. Header/preview/Now Playing are compact; paired rows remain content measured. Narrow-to-narrow layout follows433 exactly.
 
-SDK compilation passes. Actual433 DEX-translated native views with these source-bound compiled helpers pass exact front433 native PNG/geometry comparison in941×1672/420dpi and1080×2520/480dpi viewports. They pass expanded800dp four-column,600dp three-column and150%/200% text fallbacks. These are HOST native-framework renders, not physical Fold measurements.
-
-The strict fold test caught two implementation defects, retained in evidence: capture after setNumColumns lost the old anchor; capturing on narrow startup affected a row offset. Capture now precedes column mutation and is restricted to expanded transitions. That version retained the anchor, but the next stricter profile/configuration stamp rejects reflow and rebuilds the grid. This is currently FAIL, being investigated before accepting the implementation. No assertion was relaxed.
+Source-bound SDK helper checks passed exact433 front native PNG and full geometry in941×1672/420dpi and1080×2520/480dpi; expanded columns, measured rows and150%/200% text fallback passed. Fold anchor/grid/adapter/texture/job-retention passed in the prior three-method check. Tightened actual descendant focus checks then exposed an inner-start collapse reconstruction: the transition flag was cleared before the new stamp committed. That specific correction is compiled and awaits the recorded strict four-method check on the ACTUAL new owner DEX. Assertions remain unchanged. These are host framework observations, not physical Fold speed/frame measurements.
 
 ## Fullscreen More
 
-Personally opened the actual private front20687/inner20685 images and20689 video frames3.5/8/12.5s. The frame8.0s shows fullscreen More outlined, playback continuing, and no visible menu. Private source pixels are not uploaded to this repository.
+Personally opened private front20687/inner20685 and20689 video frames. No source pixels are published here. The physical symptom is highlighted fullscreen More with no visible menu; internal overlay state/build is not visible.
 
-Exact signed433 native host coordinate presses call the correct fullscreen More handler once, attach the original Player settings sheet to the fullscreen overlay, and preserve the player/channel. The menu becomes visible with Android reduced motion and with explicitly driven native vsync at both tested cover-like viewports. Therefore the physical failure has NOT been reproduced and a production cause has NOT been proved. No dispatcher, Pro, player or speculative native patch has been made.
+Exact signed433 native coordinate input reaches the correct settings callback. A single-layer menu becomes visible with bounded manual native vsync; earlier automatic-vsync host failures are observer limitations, not application crashes. Further source tracing identified a concrete ownership defect: the native promotion path retains a GONE Multi-View overlay beneath a separate fullscreen player, but cobraOpenSheet prefers any non-null Multi-View overlay. The actual433 hidden-retained-layer fixture reproduces one correct pointer callback with the menu attached to the GONE layer (invisible, zero bounds), leaving the player/channel unchanged.
 
-Two normal automatic-vsync host attempts could not complete: the Robolectric root traversal repeatedly reschedules immediate frames, including inside idleFor's internal idle call. One was terminated after a thread dump. This is an observer limitation, not an application crash. The successful manual-frame observations remain valid. A bounded Android17 QA shell driver is being prepared to connect OS UiAutomation once, use actual public UI/coordinates, and observe ONLY Cards fullscreen More on unchanged signed433. It avoids the previous per-command2s observer startup problem and legacy runtest/JUnit. It is not yet run.
+The narrow production correction chooses the attached visible fullscreen player ONLY for front Cards player-settings. All original menu callbacks, body, layout, other menu kinds, inner Cards, Pro, Pro Sports and other modes keep their previous path. The owner compiled; independent canonical proof passes: only the reviewed five existing classes differ from the exact431 compiler baseline, no class disappears, all fields/annotations and every unselected method remain exact. Existing433 work is retained by the compiler. Actual compiled-view pointer/menu/Back/reopen and guard checks are next. This reproducer is a concrete defect, not proof of the recording's hidden state; physical acceptance remains required.
 
-## Infinity loading, separate owner branch
+## Android setup evidence
 
-/workspace/infinity-seamless remains on the existing user-named Infinity loading branch. Local production work includes a bounded per-action owner/target/token state machine; actual Search inventory preparation and first-party directory boundaries; a separate UI monitor on the existing foreground tick; add-only skin frame/explicit-action transformations and a small native animated texture. It is UNVERIFIED and not yet packaged. Protected CheckpointMonitor, worker/persistence functions and the shutdown suffix are unchanged. Native Kodi/Python Android execution retains its documented constructor blocker.
+Run41063134298 stopped at the welcome selector (plus prefix omitted); run41066239229 stopped during M3U setup, with the captured screen still showing source-kind selection rather than the three-field form. Neither reached More. Exact signed433 byte/signature checks passed. Evidence is retained; these are setup failures, not player or native crashes.
 
-## Next gate
+The reviewed QA correction uses OS UiAutomation input/window transaction synchronization and explicit existing destination readiness, preserving field counts and strict3.5s player target validity. No third baseline rerun has been launched. No product timers/permissions/compatibility settings changed.
 
-Finish fold retention, verify Infinity state/source/XML/authentication, reproduce or precisely bound the More failure, then independently reproduce owner DEX/source and use the existing original-key combined release mechanism. All three approved workstreams are retained. No recovery pointer or release lock is changed. Shutdown is NOT CHANGED / NOT RUN.
+## Infinity separate owner
+
+Existing branch work/infinity-only-seamless-loading-from-2103433-20261030 now has published implementation checkpoint079f9de1. The bounded token/state/owner monitor, actual first-party Search/directory preparation, add-only original-frame skin transforms and small native animated texture pass17 focused host/source/generated-XML checks. Protected worker/persistence/CheckpointMonitor/shutdown suffixes remain exact. Notifications use the existing foreground tick; no new worker, polling loop or provider invocation.
+
+Actual monitor/notification encoding, current source identity, final portable staging and original-key module authentication are still being finalized. Unsupported implicit third-party readiness keeps original navigation and a truthful fallback; no duplicate prefetch, synthetic delay or fake readiness. The documented Android native constructor crash before Kodi/Python remains an independent runtime blocker, not a feature pass.
+
+## Remaining gates
+
+Complete the recorded actual owner focus/More checks and Infinity integration; reproduce both owners and protected payloads; use the existing sole original-key combined release mechanism for one consolidated candidate. No shutdown modification or test. No automatic promotion.

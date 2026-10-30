@@ -1,4 +1,4 @@
-"""Fresh CI host-classpath preparation for the single Cards/Cobra432 candidate.
+"""Fresh CI host-classpath preparation for the coordinated Cobra434 candidate.
 
 This performs source/canonical/translation verification only. It cannot register,
 sign, install, accept, lock or promote a release, and runs no behavioral tests.
@@ -23,8 +23,8 @@ BRANCH = 'work/cobra-only-from-2103427-20261028'
 REPOSITORY = 'mahfouzhassine8-ops/project-infinity'
 SIGNED_SOURCE = '9ccc4c362a65118eeba38a8e7e4b0de5723c69af'
 SIGNED_APK = '3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471'
-VERSION = 2103433
-GENERATION = 18  # Target only; registration follows successful producer evidence.
+VERSION = 2103434
+GENERATION = 19  # Target only; registration follows successful producer evidence.
 BASE_DEX = {
     'classes.dex': '07b94bfde6dbc3e3a6bfc8436ea65e6a67bdef5ca868379809e20f2fb7ce8efb',
     'classes2.dex': '2e8fa1ae27e670db0525d31a655e93d861893fa20316d5c54a4c6283a97ca304',
@@ -58,7 +58,8 @@ EXPECTED_COMPILER_FILES = {
     'profile-reads/SOURCE-BUDGET.json', 'profile-reads/runtime/CobraProfileDataReuse.java',
     'cards-reuse/patch.py', 'cards-reuse/SOURCE-BUDGET.json',
     'cards-reuse/runtime/CobraCardsReuse.java', 'runtime/CobraCardsLayout.java',
-    'runtime/CobraCardsTiles.java',
+    'runtime/CobraCardsTiles.java', 'fullscreen-more/patch.py',
+    'fullscreen-more/SOURCE-BUDGET.json',
 }
 EXPECTED_COMPILER_PATHS = {str((OWNER / n).relative_to(REPO)) for n in EXPECTED_COMPILER_FILES} | {
     'repairs/dual-experience-isolation-2103420/ModuleDexWriter.java'}
@@ -196,7 +197,7 @@ def prepare(apk, baseline, build, dex2jar, bundles, jars, out, source):
     require(receipt['candidate_component_version'] == builder.VERSION, 'EXACT_TARGET_VERSION')
     require({descriptor_class(n) for n in receipt['changed_classes']} == CHANGED, 'EXACT_FIVE_CHANGED_CLASSES')
     expected_sources = {p.relative_to(REPO).as_posix(): sha(p) for p in builder.compiler_sources()}
-    require(set(expected_sources) == EXPECTED_COMPILER_PATHS and len(expected_sources) == 20, 'EXACT_REVIEWED_TWENTY_COMPILER_PATHS')
+    require(set(expected_sources) == EXPECTED_COMPILER_PATHS and len(expected_sources) == 22, 'EXACT_REVIEWED_TWENTY_TWO_COMPILER_PATHS')
     require(receipt['compiler_source_files'] == expected_sources, 'COMPLETE_CURRENT_COMPILER_SOURCE_MANIFEST')
     for name, pin in expected_sources.items():
         require(committed(REPO / name, source) == pin, 'COMMITTED_COMPILER_SOURCE:' + name)
@@ -280,7 +281,7 @@ def prepare(apk, baseline, build, dex2jar, bundles, jars, out, source):
         require(proof['unchanged_existing_classes'] == 7137 and proof['baseline_existing_classes'] == len(full_original) == 7142, 'FROZEN_CANONICAL_CLASS_COUNT')
         require({descriptor_class(n) for n in proof['changed_existing_classes']} == CHANGED, 'FRESH_EXACT_FIVE_CLASS_DELTA')
         require({descriptor_class(n) for n in proof['new_classes']} == new_expected and not proof['missing_classes'], 'FRESH_EXACT_HELPER_DELTA')
-        require(len(proof['changed_methods']['Lcom/projectinfinity/kodi/InfinityLiveActivity;']) == 20, 'REVIEWED_TWENTY_ACTIVITY_METHODS')
+        require(len(proof['changed_methods']['Lcom/projectinfinity/kodi/InfinityLiveActivity;']) == 21, 'REVIEWED_TWENTY_ONE_ACTIVITY_METHODS')
         canonical = canonical_classes(scratch / 'independent-canonical')
         for name, raw in helper_smali.items():
             require(canonical[name] == raw, 'ACTUAL_HELPER_MATCHES_COMPILED_SOURCE:' + name)

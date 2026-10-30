@@ -74,7 +74,8 @@ public class CobraFoldDensityTest {
     assertTrue("Compact physical header <=80dp",toolbar.getHeight()<=80*size[2]/160f);assertEquals(video.getTop(),details.getTop());assertEquals(video.getHeight(),details.getHeight());assertTrue(browser.getTop()>=video.getBottom());
     assertTrue("Multiple actual rows below compact panels",grid.getChildCount()>=grid.getNumColumns()*2);
     for(int i=0;i<grid.getChildCount();i++){
-     View card=grid.getChildAt(i);View more=null;for(View v:CobraFoldCorrectiveTest.tree(card))if("More actions for channel".equals(String.valueOf(v.getContentDescription())))more=v;
+     View card=grid.getChildAt(i);View more=null;for(View v:CobraFoldCorrectiveTest.tree(card))if(String.valueOf(v.getContentDescription()).startsWith("Channel actions for "))more=v;
+     assertNotNull(more);assertTrue("48dp actual inner channel menu target",more.getWidth()>=48*size[2]/160f&&more.getHeight()>=48*size[2]/160f);
      TextView now=(TextView)get(card,"now"),title=(TextView)get(card,"title");
      assertTrue(title.getTextSize()>=13*size[2]/160f);assertTrue(now.getTop()>=title.getBottom());
      assertTrue(now.getBottom()<=card.getHeight()-24*size[2]/160f);
@@ -91,13 +92,26 @@ public class CobraFoldDensityTest {
  @Test public void foldReflowRetainsInventoryAndVisibleAnchor()throws Exception{
   assertTrue(candidate());CobraCardsLayoutTest.Fixture f=new CobraCardsLayoutTest.Fixture("cards",1080,2520,480);GridView original=(GridView)get(f.a,"mCobraGuideList");
   original.setSelection(8);f.frames();original.scrollListBy(17);f.frames();int first=original.getFirstVisiblePosition(),top=original.getChildAt(0).getTop();Object adapter=original.getAdapter(),channel=original.getAdapter().getItem(first);set(f.a,"mGuidePreviewChannel",channel);
-  original.getChildAt(0).requestFocus();int jobs=f.io.admitted.size();Object texture=get(f.a,"mCobraPreviewTexture");
+  View focusTarget=null;for(View v:CobraFoldCorrectiveTest.tree(original.getChildAt(0)))if(String.valueOf(v.getContentDescription()).startsWith("Channel actions for "))focusTarget=v;assertNotNull(focusTarget);
+  assertTrue("Actual remote-focusable More target must take framework focus",focusTarget.requestFocusFromTouch());View focused=original.findFocus();assertNotNull(focused);String focusedClass=focused.getClass().getName();int jobs=f.io.admitted.size();Object texture=get(f.a,"mCobraPreviewTexture");
   resize(f,1600,1680,320,1f);GridView inner=(GridView)get(f.a,"mCobraGuideList");
   assertSame("No fold inventory reconstruction",original,inner);assertSame(adapter,inner.getAdapter());assertEquals(4,inner.getNumColumns());assertSame(channel,get(f.a,"mGuidePreviewChannel"));assertSame(texture,get(f.a,"mCobraPreviewTexture"));assertEquals(jobs,f.io.admitted.size());
   write("fold-reflow-preassert",new JSONObject().put("first_before",first).put("top_before",top).put("first_after",inner.getFirstVisiblePosition()).put("top_after",inner.getChildCount()>0?inner.getChildAt(0).getTop():-999).put("events",reflowEvents).put("selected",inner.getSelectedItemPosition()));
   assertTrue("Same anchor belongs to first row",first>=inner.getFirstVisiblePosition()&&first<inner.getFirstVisiblePosition()+inner.getNumColumns());
   assertEquals("Pixel offset retained after reflow",top,inner.getChildAt(first-inner.getFirstVisiblePosition()).getTop());
-  resize(f,1080,2520,480,1f);GridView cover=(GridView)get(f.a,"mCobraGuideList");assertSame(original,cover);assertSame(adapter,cover.getAdapter());assertEquals(2,cover.getNumColumns());assertSame(channel,get(f.a,"mGuidePreviewChannel"));assertEquals(jobs,f.io.admitted.size());
-  write("fold-reflow",new JSONObject().put("first_anchor",first).put("first_top",top).put("inventory_rebuilt",false).put("new_worker_jobs",f.io.admitted.size()-jobs).put("same_preview_texture",true));
+  assertNotNull("Actual focused view survives fold",inner.findFocus());assertEquals(focusedClass,inner.findFocus().getClass().getName());assertSame(channel,inner.getAdapter().getItem(inner.getPositionForView(inner.findFocus())));
+  resize(f,1080,2520,480,1f);GridView cover=(GridView)get(f.a,"mCobraGuideList");assertSame(original,cover);assertSame(adapter,cover.getAdapter());assertEquals(2,cover.getNumColumns());assertSame(channel,get(f.a,"mGuidePreviewChannel"));assertEquals(jobs,f.io.admitted.size());assertNotNull(cover.findFocus());assertEquals(focusedClass,cover.findFocus().getClass().getName());assertSame(channel,cover.getAdapter().getItem(cover.getPositionForView(cover.findFocus())));
+  write("fold-reflow",new JSONObject().put("first_anchor",first).put("first_top",top).put("inventory_rebuilt",false).put("new_worker_jobs",f.io.admitted.size()-jobs).put("same_preview_texture",true).put("focused_role",focusedClass).put("focused_channel",get(channel,"id")));
+ }
+ @Test public void innerChannelMenuTouchAndFocusAcrossFold()throws Exception{
+  assertTrue(candidate());CobraCardsLayoutTest.Fixture f=new CobraCardsLayoutTest.Fixture("cards",1600,1680,320);GridView grid=(GridView)get(f.a,"mCobraGuideList");View card=grid.getChildAt(1),more=null;
+  for(View v:CobraFoldCorrectiveTest.tree(card))if(String.valueOf(v.getContentDescription()).startsWith("Channel actions for "))more=v;
+  assertNotNull(more);assertTrue("Framework exits touch mode for remote focus",more.requestFocusFromTouch());Object expected=grid.getAdapter().getItem(1);set(f.a,"mGuidePreviewChannel",expected);assertSame(more,grid.findFocus());
+  resize(f,1080,2520,480,1f);assertSame(grid,get(f.a,"mCobraGuideList"));View restored=grid.findFocus();assertNotNull("Actual More focus after fold",restored);assertEquals(more.getClass(),restored.getClass());assertSame(expected,grid.getAdapter().getItem(grid.getPositionForView(restored)));
+  resize(f,1600,1680,320,1f);restored=grid.findFocus();assertNotNull(restored);assertEquals(more.getClass(),restored.getClass());assertSame(expected,grid.getAdapter().getItem(grid.getPositionForView(restored)));
+  f.press(restored);f.frames();View sheet=(View)get(f.a,"mCobraActionSheet");assertNotNull("Original CHANNEL menu must open from real inner pointer",sheet);assertTrue(sheet.isAttachedToWindow());
+  boolean title=false,channel=false;for(View v:CobraFoldCorrectiveTest.tree(sheet))if(v instanceof TextView){String text=((TextView)v).getText().toString();title|=text.equals("Channel actions");channel|=text.contains(String.valueOf(get(expected,"name")));}
+  assertTrue(title&&channel);assertNull(get(f.a,"mPlayerOverlay"));assertTrue((Boolean)call(f.a,"closeCobraActionSheet"));
+  write("inner-channel-actions",new JSONObject().put("channel",get(expected,"id")).put("actual_pointer_press",true).put("target_dp",new JSONArray(new int[]{48,48})).put("focus_role",restored.getClass().getName()).put("scope","INNER_CHANNEL_CARD_MENU; NOT_FULLSCREEN_MORE_P0"));
  }
 }

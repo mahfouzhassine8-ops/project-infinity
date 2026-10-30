@@ -89,6 +89,20 @@ public final class CobraCardsLayout {
     }
   }
 
+  /** A fullscreen Cards menu belongs to the visible player, including while
+   * Multi-View deliberately retains its GONE grid underneath that player.
+   * Other modes and menu kinds retain their original native host selection. */
+  public static FrameLayout frontPlayerSheetHost(Activity owner,String kind){
+    if(!"player-settings".equals(kind) || !cards(owner)
+        || Boolean.TRUE.equals(read(owner,"mCobraProSportsActive")))return null;
+    android.content.res.Configuration configuration=owner.getResources().getConfiguration();
+    if(Math.min(configuration.screenWidthDp,configuration.screenHeightDp)>=600)return null;
+    mainThread();Object current=read(owner,"mPlayerOverlay");
+    if(!(current instanceof FrameLayout))return null;
+    FrameLayout player=(FrameLayout)current;
+    return player.isAttachedToWindow() && player.isShown()?player:null;
+  }
+
   /** Hook after native visual-layout overrides. Mutates the EXISTING rect arrays
    * because native cobraLayoutGuide already holds their references in [[I. */
   public static void layout(Activity owner,Object model){

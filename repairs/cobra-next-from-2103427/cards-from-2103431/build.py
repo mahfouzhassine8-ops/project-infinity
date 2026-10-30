@@ -23,7 +23,7 @@ import cards_patch
 import projection_patch
 import presentation_patch
 
-VERSION='2103433.cobra.1'
+VERSION='2103434.cobra.1'
 BASE_SOURCE='9ccc4c362a65118eeba38a8e7e4b0de5723c69af'
 
 
@@ -47,7 +47,7 @@ def compiler_sources():
       HERE/'BASELINE.json',HERE/'SCOPE.json',HERE/'logo-clear/patch.py',HERE/'logo-clear/SOURCE-BUDGET.json',
       HERE/'profile-reads/patch_feature.py',HERE/'profile-reads/SOURCE-BUDGET.json',
       HERE/'profile-reads/runtime/CobraProfileDataReuse.java',HERE/'cards-reuse/patch.py',HERE/'cards-reuse/SOURCE-BUDGET.json',
-      HERE/'cards-reuse/runtime/CobraCardsReuse.java',ISO/'ModuleDexWriter.java']
+      HERE/'cards-reuse/runtime/CobraCardsReuse.java',HERE/'fullscreen-more/patch.py',HERE/'fullscreen-more/SOURCE-BUDGET.json',ISO/'ModuleDexWriter.java']
     return sorted(set(files+list((HERE/'runtime').glob('*.java'))))
 
 
@@ -89,6 +89,7 @@ def build(bundles,jars,android,d8,dex2jar,out):
     presented=presentation_patch.patch_activity(projected)
     staged=cards_patch.patch_activity(presented)
     revised[activity]=module('cards_reuse_patch',HERE/'cards-reuse/patch.py').patch_activity(staged)
+    revised[activity]=module('cards_fullscreen_more_patch',HERE/'fullscreen-more/patch.py').patch(revised[activity])
     revised[card]=cards_patch.patch_card(sources[card])
     revised[feature]=module('cards_profile_patch',HERE/'profile-reads/patch_feature.py').patch(sources[feature])
     revised[logo]=module('cards_logo_clear_patch',HERE/'logo-clear/patch.py').patch(sources[logo])

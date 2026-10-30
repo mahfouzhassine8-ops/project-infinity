@@ -59,7 +59,8 @@ def verify(work,bundles,jars,canonical_leaf='independent-canonical',receipt_leaf
     budgets=json.loads((HERE/'CARDS-SOURCE-BUDGET.json').read_text())
     projection=json.loads((HERE/'PROJECTION-SOURCE-BUDGET.json').read_text())
     reuse=json.loads((HERE/'cards-reuse/SOURCE-BUDGET.json').read_text())
-    activity_allowed=set(budgets['Activity']['selected_preimages'])|set(projection['changed_methods'])|{'private cobraRefreshProgrammeLabels()V'}|set(reuse['allowed_changed_methods'])
+    more=json.loads((HERE/'fullscreen-more/SOURCE-BUDGET.json').read_text())
+    activity_allowed=set(more['allowed_changed_methods'])|set(budgets['Activity']['selected_preimages'])|set(projection['changed_methods'])|{'private cobraRefreshProgrammeLabels()V'}|set(reuse['allowed_changed_methods'])
     allowed={APP+'InfinityLiveActivity;':activity_allowed,APP+'InfinityLiveActivity$CobraPosterChannelCard;':set(budgets['Card']['selected_preimages']),
         APP+'InfinityCobraFeatureRuntime;':{'public adultLocked()Z'}}
     changes={}
@@ -77,7 +78,7 @@ def verify(work,bundles,jars,canonical_leaf='independent-canonical',receipt_leaf
             assert old_meta==new_meta,'Class fields/metadata changed: '+name
         modified={s for s in before if before[s]!=after[s]}
         if name==APP+'CobraComponent;':
-            assert actual[name]==old[name].replace('"2103431.cobra.1"','"2103433.cobra.1"'),'Only genuine component version may change'
+            assert actual[name]==old[name].replace('"2103431.cobra.1"','"2103434.cobra.1"'),'Only genuine component version may change'
         elif name==APP+'CobraLogoRequests;':assert not modified,'Existing logo methods remain exact'
         else:assert modified==allowed[name],'Unreviewed method delta: '+name
         changes[name]=sorted(modified|new_methods)

@@ -15,7 +15,7 @@ import org.robolectric.*;
 import org.robolectric.annotation.*;
 import org.robolectric.shadow.api.Shadow;
 
-/** Actual signed433 Cards fullscreen chrome and original native More sheet.
+/** Actual compiled owner Cards fullscreen chrome and original native More sheet.
  * State-only player, no decoder/provider workers, no application shutdown. */
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk=35,application=Application.class,manifest=Config.NONE,
@@ -52,6 +52,25 @@ public class CobraFoldCorrectiveTest {
   org.robolectric.util.ReflectionHelpers.callStaticMethod(android.animation.ValueAnimator.class,"setDurationScale",org.robolectric.util.ReflectionHelpers.ClassParameter.from(float.class,1f));
   fullscreenTrace(941,1672,420,"MANUAL_VSYNC");fullscreenTrace(1080,2520,480,"TALL_MANUAL_VSYNC");
  }
+ @Test public void signed433HiddenRetainedMultiLayerMoreTrace()throws Exception {fullscreenTrace(1080,2520,480,"HIDDEN_MULTI_MANUAL_VSYNC");}
+ @Test public void correctedFrontFullscreenMoreMenuVisibilityAndBack()throws Exception {
+  assertTrue(Boolean.getBoolean("fold.candidate"));fullscreenTrace(1080,2520,480,"HIDDEN_MULTI_MANUAL_VSYNC");
+ }
+ @Test public void frontCardsOnlySheetHostOwnership()throws Exception {
+  assertTrue(Boolean.getBoolean("fold.candidate"));JSONArray cases=new JSONArray();
+  for(String mode:new String[]{"cards","mobile","compact","grid","focus"}){
+   CobraCardsLayoutTest.Fixture f=new CobraCardsLayoutTest.Fixture(mode,1080,2520,480);
+   FrameLayout overlay=new FrameLayout(f.a);((FrameLayout)f.a.findViewById(android.R.id.content)).addView(overlay,new FrameLayout.LayoutParams(-1,-1));set(f.a,"mPlayerOverlay",overlay);f.frames();
+   assertEquals("Only front Cards owns this host override",mode.equals("cards")?overlay:null,CobraCardsLayout.frontPlayerSheetHost(f.a,"player-settings"));
+   for(String kind:new String[]{"channel-actions","display","multi-settings",""})assertNull(CobraCardsLayout.frontPlayerSheetHost(f.a,kind));
+   set(f.a,"mCobraProActive",true);assertNull(CobraCardsLayout.frontPlayerSheetHost(f.a,"player-settings"));set(f.a,"mCobraProActive",false);
+   set(f.a,"mCobraProSportsActive",true);assertNull(CobraCardsLayout.frontPlayerSheetHost(f.a,"player-settings"));set(f.a,"mCobraProSportsActive",false);
+   overlay.setVisibility(View.GONE);assertNull(CobraCardsLayout.frontPlayerSheetHost(f.a,"player-settings"));
+   cases.put(mode);
+  }
+  CobraCardsLayoutTest.Fixture inner=new CobraCardsLayoutTest.Fixture("cards",1600,1680,320);FrameLayout overlay=new FrameLayout(inner.a);((FrameLayout)inner.a.findViewById(android.R.id.content)).addView(overlay,new FrameLayout.LayoutParams(-1,-1));set(inner.a,"mPlayerOverlay",overlay);inner.frames();assertNull(CobraCardsLayout.frontPlayerSheetHost(inner.a,"player-settings"));
+  Path out=Paths.get(System.getProperty("fold.output"));Files.createDirectories(out);Files.write(out.resolve("FRONT-CARDS-ONLY-HOST-GUARD.json"),(new JSONObject().put("preserved_modes",cases).put("inner_unchanged",true).put("other_menu_kinds_unchanged",true).put("Pro_ProSports_unchanged",true).toString(2)+"\n").getBytes(StandardCharsets.UTF_8));
+ }
  static void framePulse() {
   Shadows.shadowOf(Looper.getMainLooper()).idleFor(java.time.Duration.ofMillis(16));
   Object receiver=org.robolectric.util.ReflectionHelpers.getField(Choreographer.getInstance(),"mDisplayEventReceiver");
@@ -64,6 +83,10 @@ public class CobraFoldCorrectiveTest {
   moreCalls=0;CobraCardsLayoutTest.Fixture f=new CobraCardsLayoutTest.Fixture("cards",w,h,dpi);
   f.player(true);
   Object player=f.player,channel=f.channels.get(0);set(f.a,"mPlayer",player);set(f.a,"mPlaying",channel);set(f.a,"mCobraPreviewPlayer",null);
+  FrameLayout hiddenMulti=null;
+  if(phase.contains("HIDDEN_MULTI")){
+   hiddenMulti=new FrameLayout(f.a);((FrameLayout)f.a.findViewById(android.R.id.content)).addView(hiddenMulti,new FrameLayout.LayoutParams(-1,-1));set(f.a,"mMultiOverlay",hiddenMulti);f.frames();hiddenMulti.setVisibility(View.GONE);set(f.a,"mCobraMultiFullscreenActive",true);
+  }
   FrameLayout overlay=new FrameLayout(f.a);overlay.setBackgroundColor(0xff000000);
   ((FrameLayout)f.a.findViewById(android.R.id.content)).addView(overlay,new FrameLayout.LayoutParams(-1,-1));set(f.a,"mPlayerOverlay",overlay);f.frames();
   call(f.a,"cobraBuildPlayerChrome");f.frames();View chrome=(View)get(f.a,"mPlayerChrome");
@@ -85,11 +108,24 @@ public class CobraFoldCorrectiveTest {
    f.frames();
   }
   View sheet=(View)get(f.a,"mCobraActionSheet"),anchor=(View)get(f.a,"mCobraSheetAnchor"),pane=(View)get(f.a,"mCobraSheetPane");
-  JSONObject report=new JSONObject().put("fixture","ACTUAL_SIGNED433_DEX_NATIVE_FULLSCREEN_CARDS_FRONT; state-onlyExoPlayer")
-   .put("layout_trace",layoutTrace).put("controls",controls).put("more_before",before).put("callback_count",moreCalls).put("sheet_kind",String.valueOf(get(f.a,"mCobraSheetKind"))).put("sheet",visibility(sheet)).put("anchor",visibility(anchor)).put("pane",visibility(pane)).put("anchor_is_fullscreen_overlay",anchor==overlay).put("same_player",player==get(f.a,"mPlayer")).put("same_channel",channel==get(f.a,"mPlaying"));
+  boolean candidate=Boolean.getBoolean("fold.candidate");
+  JSONObject report=new JSONObject().put("fixture",(candidate?"ACTUAL_COMPILED434":"ACTUAL_SIGNED433")+"_DEX_NATIVE_FULLSCREEN_CARDS_FRONT; state-onlyExoPlayer")
+   .put("layout_trace",layoutTrace).put("controls",controls).put("more_before",before).put("callback_count",moreCalls).put("sheet_kind",String.valueOf(get(f.a,"mCobraSheetKind"))).put("sheet",visibility(sheet)).put("anchor",visibility(anchor)).put("pane",visibility(pane)).put("anchor_is_fullscreen_overlay",anchor==overlay).put("sheet_parent_is_player",sheet!=null&&sheet.getParent()==overlay).put("sheet_parent_is_hidden_multi",hiddenMulti!=null&&sheet!=null&&sheet.getParent()==hiddenMulti).put("retained_multi",visibility(hiddenMulti)).put("same_player",player==get(f.a,"mPlayer")).put("same_channel",channel==get(f.a,"mPlaying"));
   JSONArray children=new JSONArray();if(sheet instanceof ViewGroup)for(int i=0;i<((ViewGroup)sheet).getChildCount();i++)children.put(visibility(((ViewGroup)sheet).getChildAt(i)));report.put("sheet_children",children);
-  Path out=Paths.get(System.getProperty("fold.output"));Files.createDirectories(out);Files.write(out.resolve("SIGNED433-FULLSCREEN-MORE-"+phase+".json"),(report.toString(2)+"\n").getBytes(StandardCharsets.UTF_8));
+  Path out=Paths.get(System.getProperty("fold.output"));Files.createDirectories(out);Files.write(out.resolve((candidate?"CANDIDATE434":"SIGNED433")+"-FULLSCREEN-MORE-"+phase+".json"),(report.toString(2)+"\n").getBytes(StandardCharsets.UTF_8));
   org.robolectric.shadows.ShadowChoreographer.setPaused(true);
   assertEquals("Actual coordinate tap reaches existing settings handler once",1,moreCalls);
+  assertSame(player,get(f.a,"mPlayer"));assertSame(channel,get(f.a,"mPlaying"));
+  if(phase.contains("HIDDEN_MULTI")){
+   assertSame(hiddenMulti,get(f.a,"mMultiOverlay"));assertEquals(View.GONE,hiddenMulti.getVisibility());
+   if(!candidate){assertSame("Reproduce original wrong host",hiddenMulti,sheet.getParent());assertFalse("Original hidden-host menu is invisible",sheet.isShown());return;}
+   assertSame("Visible fullscreen player owns original menu",overlay,sheet.getParent());assertTrue(sheet.isShown());assertTrue(((View)get(f.a,"mCobraSheetPanel")).getAlpha()>.99f);
+   boolean heading=false;for(View v:tree(sheet))if(v instanceof TextView)heading|=((TextView)v).getText().toString().equals("Player settings");assertTrue("Original menu content",heading);
+   long t=android.os.SystemClock.uptimeMillis();f.a.dispatchKeyEvent(new KeyEvent(t,t,KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BACK,0));f.a.dispatchKeyEvent(new KeyEvent(t,t+32,KeyEvent.ACTION_UP,KeyEvent.KEYCODE_BACK,0));f.frames();
+   assertNull("Actual Back closes only the sheet",get(f.a,"mCobraActionSheet"));assertSame(overlay,get(f.a,"mPlayerOverlay"));assertSame(player,get(f.a,"mPlayer"));assertSame(channel,get(f.a,"mPlaying"));assertSame(hiddenMulti,get(f.a,"mMultiOverlay"));
+   call(f.a,"showPlayerChromeTemporarily");f.frames();f.press(more);f.frames();for(int i=0;i<20;i++){((View)get(f.a,"mCobraActionSheet")).getViewTreeObserver().dispatchOnGlobalLayout();framePulse();f.frames();}
+   View reopened=(View)get(f.a,"mCobraActionSheet");assertEquals(2,moreCalls);assertSame(overlay,reopened.getParent());assertTrue(reopened.isShown());assertTrue(((View)get(f.a,"mCobraSheetPanel")).getAlpha()>.99f);assertSame(player,get(f.a,"mPlayer"));
+   Files.write(out.resolve("MORE-ACTUAL-TOUCH-BACK-REOPEN.json"),(new JSONObject().put("actual_pointer_presses",2).put("native_Back_closes_only_sheet",true).put("menu_visible_after_both_presses",true).put("player_channel_retained",true).put("hidden_MultiView_untouched",true).toString(2)+"\n").getBytes(StandardCharsets.UTF_8));
+  }
  }
 }

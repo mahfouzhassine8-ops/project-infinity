@@ -104,7 +104,7 @@ public final class CobraCardsReuse {
       if(s.disposed || s.inventory!=s.drawnInventory || s.sources!=s.drawnSources || s.collections!=s.drawnCollections
           || s.hidden!=s.drawnHidden)return false;
       reflow=!s.stamp.same(fresh);
-      if(reflow && !s.stamp.sameDataForReflow(fresh))return false;
+      if(reflow && !s.stamp.sameDataForReflow(fresh,s.expandedReflow))return false;
       String category=string(a,"mCategory");
       if("FAVORITES".equals(category) && s.favorites!=s.drawnFavorites)return false;
       if("RECENT".equals(category) && s.recents!=s.drawnRecents)return false;
@@ -133,6 +133,7 @@ public final class CobraCardsReuse {
     CobraCardsLayout.afterRender(a);
     call(a,"cobraQueueVisibleGuides",NONE); // Existing request scheduler only.
     synchronized(s){s.drawnFavorites=favoriteVersion;s.drawnRecents=recentVersion;s.drawnCustom=customVersion;s.stamp=fresh;}
+    s.finishReflowIfSettled(a);
     return true;
   }
 
@@ -141,8 +142,10 @@ public final class CobraCardsReuse {
     main();State s=existing(a);if(s==null || !cards(a) || s.disposed
         || read(a,"mCobraGuideList")!=s.grid || read(a,"mCobraGuideAdapter")!=s.adapter
         || !s.grid.isAttachedToWindow())return;
-    boolean expandedTransition=Math.min(width,height)>=600 || Math.min(s.stamp.modelWidth,s.stamp.modelHeight)>=600;
-    if(expandedTransition && (width!=s.stamp.modelWidth || height!=s.stamp.modelHeight || columns!=s.grid.getNumColumns()))s.captureReflow(a);
+    Configuration requested=a.getResources().getConfiguration();
+    boolean expandedTransition=Math.min(width,height)>=600 || Math.min(s.stamp.modelWidth,s.stamp.modelHeight)>=600
+        || Math.min(requested.screenWidthDp,requested.screenHeightDp)>=600 || s.expandedReflow;
+    if(expandedTransition && (width!=s.stamp.modelWidth || height!=s.stamp.modelHeight || columns!=s.grid.getNumColumns())){s.expandedReflow=true;s.captureReflow(a);}
   }
   static void columnsApplied(Activity a,GridView grid){
     State s=existing(a);if(s!=null && s.grid==grid && s.anchorPosition>=0 && !s.anchorApplied){
@@ -168,7 +171,8 @@ public final class CobraCardsReuse {
     long inventory,sources,collections,hidden,favorites,recents,custom;
     final long drawnInventory=0,drawnSources=0,drawnCollections=0,drawnHidden=0;
     long drawnFavorites,drawnRecents,drawnCustom;Stamp stamp;boolean disposed;
-    int anchorPosition=-1,anchorTop;boolean anchorApplied;String focusedTag="",focusedClass="";
+    int anchorPosition=-1,anchorTop,focusedPosition=-1;boolean anchorApplied,expandedReflow;String focusedClass="";int[] focusedPath=new int[0];
+    WeakReference<Object> focusedChannel=new WeakReference<>(null);
     WeakReference<Object> reflowSelection=new WeakReference<>(null);
     State(Activity a,ViewGroup shell,LinearLayout browser,GridView grid,BaseAdapter adapter,Stamp current){owner=new WeakReference<>(a);this.shell=shell;this.browser=browser;this.grid=grid;this.adapter=adapter;count=adapter.getCount();stamp=current;}
     void captureReflow(Activity a){
@@ -177,7 +181,11 @@ public final class CobraCardsReuse {
       reflowSelection=new WeakReference<>(read(a,"mGuidePreviewChannel"));
       View focused=grid.findFocus(),row=focused;
       while(row!=null && row.getParent()!=grid)row=row.getParent() instanceof View?(View)row.getParent():null;
-      focusedTag=row==null?"":String.valueOf(row.getTag());focusedClass=focused==null?"":focused.getClass().getName();
+      focusedPosition=row==null?-1:grid.getPositionForView(row);focusedClass=focused==null?"":focused.getClass().getName();
+      ArrayList<Integer> path=new ArrayList<>();View cursor=focused;
+      while(cursor!=null && cursor!=row && cursor.getParent() instanceof ViewGroup){ViewGroup parent=(ViewGroup)cursor.getParent();path.add(parent.indexOfChild(cursor));cursor=parent;}
+      focusedPath=new int[path.size()];for(int i=0;i<path.size();i++)focusedPath[i]=path.get(path.size()-i-1);
+      focusedChannel=new WeakReference<>(focusedPosition>=0 && focusedPosition<adapter.getCount()?adapter.getItem(focusedPosition):null);
       anchorApplied=false;grid.addOnLayoutChangeListener(this);
     }
     public void onLayoutChange(View v,int l,int t,int r,int b,int ol,int ot,int or,int ob){
@@ -186,23 +194,30 @@ public final class CobraCardsReuse {
       if(disposed || a==null || !tree(a,this))return;
       int index=position-grid.getFirstVisiblePosition();
       if(index>=0 && index<grid.getChildCount())grid.scrollListBy(grid.getChildAt(index).getTop()-top);
-      if(!focusedTag.isEmpty() && read(a,"mGuidePreviewChannel")==reflowSelection.get()
-          && read(a,"mPlayerOverlay")==null && read(a,"mCobraActionSheet")==null){
-        View row=grid.findViewWithTag(focusedTag);View target=matchingFocus(row,focusedClass);
+      if(focusedPosition>=0 && focusedPosition<adapter.getCount() && adapter.getItem(focusedPosition)==focusedChannel.get()
+          && read(a,"mGuidePreviewChannel")==reflowSelection.get() && read(a,"mPlayerOverlay")==null && read(a,"mCobraActionSheet")==null){
+        int focusIndex=focusedPosition-grid.getFirstVisiblePosition();
+        View row=focusIndex>=0 && focusIndex<grid.getChildCount()?grid.getChildAt(focusIndex):null;View target=matchingFocus(row,focusedPath,focusedClass);
         if(target!=null)target.requestFocus();
       }
-      focusedTag="";focusedClass="";reflowSelection.clear();
+      focusedPosition=-1;focusedClass="";focusedPath=new int[0];focusedChannel.clear();reflowSelection.clear();
+      finishReflowIfSettled(a);
     }
-    View matchingFocus(View root,String name){
-      if(root==null)return null;if(root.getClass().getName().equals(name))return root;
-      if(root instanceof ViewGroup)for(int i=0;i<((ViewGroup)root).getChildCount();i++){View next=matchingFocus(((ViewGroup)root).getChildAt(i),name);if(next!=null)return next;}
-      return null;
+    void finishReflowIfSettled(Activity a){
+      if(!expandedReflow || anchorPosition>=0)return;Object model=read(a,"mCobraModeLayout");Configuration requested=a.getResources().getConfiguration();
+      // A layout callback may see the final size before tryReuse has committed
+      // its final stamp. Keep the transition through that intermediate render.
+      if(stamp.modelWidth==number(model,"width") && Math.abs(stamp.modelWidth-requested.screenWidthDp)<=1)expandedReflow=false;
+    }
+    View matchingFocus(View root,int[] path,String name){
+      View target=root;for(int index:path){if(!(target instanceof ViewGroup) || index<0 || index>=((ViewGroup)target).getChildCount())return null;target=((ViewGroup)target).getChildAt(index);}
+      return target!=null && target.getClass().getName().equals(name)?target:null;
     }
     public void onViewAttachedToWindow(View view){}
     public void onViewDetachedFromWindow(View view){dispose();}
     void dispose(){
       synchronized(this){if(disposed)return;disposed=true;}
-      shell.removeOnAttachStateChangeListener(this);browser.removeOnAttachStateChangeListener(this);grid.removeOnAttachStateChangeListener(this);grid.removeOnLayoutChangeListener(this);anchorPosition=-1;reflowSelection.clear();
+      shell.removeOnAttachStateChangeListener(this);browser.removeOnAttachStateChangeListener(this);grid.removeOnAttachStateChangeListener(this);grid.removeOnLayoutChangeListener(this);anchorPosition=-1;focusedPosition=-1;focusedPath=new int[0];focusedChannel.clear();reflowSelection.clear();
       Activity a=owner.get();if(a!=null)synchronized(OWNERS){WeakReference<State> ref=OWNERS.get(a);if(ref!=null && ref.get()==this)OWNERS.remove(a);}
     }
   }
@@ -211,11 +226,11 @@ public final class CobraCardsReuse {
    * Native projection/auth runs unchanged whenever its raw inputs change. */
   private static final class Stamp {
     final Object prefs,features,featurePrefs,ui,theme,effective;
-    final String[] text;final int[] geometry;final int modelWidth,modelHeight;
+    final String[] text;final int[] geometry;final int modelWidth,modelHeight;final boolean requestedExpanded;
     Stamp(Activity a,Object currentFeatures,Object currentFeaturePrefs,String[] raw){
       prefs=read(a,"mPrefs");features=currentFeatures;featurePrefs=currentFeaturePrefs;
       ui=read(a,"mUi");theme=read(a,"mTheme");Object renderer=call(a,"vtheme",NONE);effective=call(renderer,"effective",NONE);
-      Configuration config=a.getResources().getConfiguration();DisplayMetrics dm=a.getResources().getDisplayMetrics();
+      Configuration config=a.getResources().getConfiguration();requestedExpanded=Math.min(config.screenWidthDp,config.screenHeightDp)>=600;DisplayMetrics dm=a.getResources().getDisplayMetrics();
       text=new String[]{string(a,"mCobraGuideStyle"),string(a,"mCobraGuideRoute"),string(a,"mCobraGuideSource"),string(a,"mCategory"),string(a,"mSearch"),
           string(a,"mCobraListStateKey"),string(a,"mCobraFocusSchedule"),string(a,"mCobraModeGroupsExpanded"),
           raw[0],raw[1],raw[2],
@@ -228,9 +243,10 @@ public final class CobraCardsReuse {
       values.add(Float.floatToIntBits(dm.density));values.add(Float.floatToIntBits(dm.scaledDensity));values.add(dm.densityDpi);
       geometry=new int[values.size()];for(int i=0;i<geometry.length;i++)geometry[i]=values.get(i);
     }
-    boolean sameDataForReflow(Stamp other){
+    boolean sameDataForReflow(Stamp other){return sameDataForReflow(other,false);}
+    boolean sameDataForReflow(Stamp other,boolean continuingExpanded){
       if(Arrays.equals(geometry,other.geometry))return false;
-      if(Math.min(modelWidth,modelHeight)<600 && Math.min(other.modelWidth,other.modelHeight)<600)return false;
+      if(!continuingExpanded && !requestedExpanded && !other.requestedExpanded && Math.min(modelWidth,modelHeight)<600 && Math.min(other.modelWidth,other.modelHeight)<600)return false;
       if(prefs!=other.prefs || features!=other.features || featurePrefs!=other.featurePrefs || ui!=other.ui || theme!=other.theme || effective!=other.effective || text.length!=other.text.length)return false;
       // Index13 is Configuration.toString(); only ignore it when actual window
       // geometry changed and every projection/policy/theme input stayed equal.
