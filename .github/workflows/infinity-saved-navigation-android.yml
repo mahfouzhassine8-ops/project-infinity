@@ -19,7 +19,7 @@ on:
         required: true
         type: choice
         default: select-a-feature
-        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host, infinity-performance-android, cobra-owner-host, cobra-android-launch, cobra-cards-baseline]
+        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host, infinity-performance-android, cobra-owner-host, cobra-android-launch, cobra-cards-baseline, cobra-cards-host]
       candidate_build:
         description: Existing signed build run (no rebuild)
         required: true
@@ -171,6 +171,93 @@ jobs:
             prepared-owners/ICON-APK-VERIFICATION.json
             cobra-host/ICON-NATIVE-INFLATION.txt
             icon-inflation-evidence/
+          retention-days: 90
+          if-no-files-found: error
+  cobra-cards-host:
+    name: Current Cards and Cobra essential host checks and prepared owners
+    if: github.event_name == 'workflow_dispatch' && inputs.feature == 'cobra-cards-host'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      AUTHORIZED_SCOPE: ${{ inputs.authorization }}
+      SIGNED_BUILD: ${{ inputs.candidate_build }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: "${{ inputs.source_ref }}", fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '21'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Admit the existing authorized branch and exact431 recovery
+        run: |
+          set -euo pipefail
+          test -n "$AUTHORIZED_SCOPE"
+          test "$SIGNED_BUILD" = 40971769136
+          test "$(git branch --show-current)" = work/cobra-only-from-2103427-20261028
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          test "$(git rev-parse origin/lock/infinity-cobra-2103427-user-approved-20261028)" = 782242090483982c39a78f9c4da932a4751bdafc
+          python3 - <<'PYCODE'
+          import json
+          from pathlib import Path
+          p=Path('repairs/cobra-next-from-2103427/cards-from-2103431/PRODUCER-SCOPE.json')
+          scope=json.loads(p.read_text())
+          assert scope['feature']=='cobra-cards-host'
+          assert scope['signing_run']==40971769136 and scope['shutdown']=='NOT_SELECTED_OR_TESTED'
+          PYCODE
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40971769136
+          name: Infinity-Combined-Original-Signer-40971769136
+          github-token: ${{ github.token }}
+          path: cards-signed431
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40971769136
+          name: Infinity-Combined-Owner-Components-40971769136
+          github-token: ${{ github.token }}
+          path: cards-components431
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39867073954
+          name: Infinity-Receipt-Race-Android17-Investigation
+          github-token: ${{ github.token }}
+          path: cards-tools
+      - uses: android-actions/setup-android@v4
+        with:
+          cmdline-tools-version: '15859902'
+          packages: build-tools;35.0.0
+          log-accepted-android-sdk-licenses: false
+      - name: Recover pinned existing dex2jar tooling
+        run: |
+          set -euo pipefail
+          curl -fL https://github.com/pxb1988/dex2jar/releases/download/v2.4/dex-tools-v2.4.zip -o cards-dex2jar.zip
+          echo 'ee7c45eb3c1d2474a6145d8d447e651a736a22d9664b6d3d3be5a5a817dda23a  cards-dex2jar.zip' | sha256sum -c -
+          unzip -q cards-dex2jar.zip -d cards-dex2jar
+      - name: Produce source-bound candidate host evidence and matching owner ZIPs
+        run: |
+          set -euo pipefail
+          export MAVEN_OPTS="-Dmaven.repo.local=$HOME/.m2/repository"
+          python3 repairs/cobra-next-from-2103427/cards-from-2103431/run_producer.py \
+            --apk cards-signed431/Infinity-2103431-Combined-Original-Signer.apk \
+            --bundles cards-components431 --jars cards-tools/receipt-evidence/tool-jars \
+            --android cards-tools/receipt-evidence/android-34.jar \
+            --d8 "$ANDROID_HOME/build-tools/35.0.0/lib/d8.jar" \
+            --dex2jar cards-dex2jar/dex-tools-v2.4 --maven "$(command -v mvn)" \
+            --out cards-producer --source "$GITHUB_SHA" --run-id "$GITHUB_RUN_ID"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Cobra-Cards-Prepared-Owners-${{ github.run_id }}
+          path: cards-producer/prepared-owners/components/
+          retention-days: 90
+          compression-level: 0
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Cobra-Cards-Host-Evidence-${{ github.run_id }}
+          path: cards-producer/evidence/
           retention-days: 90
           if-no-files-found: error
   cobra-cards-baseline:
@@ -499,7 +586,7 @@ jobs:
           retention-days: 90
           if-no-files-found: error
   android17:
-    if: inputs.feature != 'infinity-performance-host' && inputs.feature != 'infinity-performance-android' && inputs.feature != 'cobra-owner-host' && inputs.feature != 'cobra-android-launch' && inputs.feature != 'cobra-cards-baseline'
+    if: inputs.feature != 'infinity-performance-host' && inputs.feature != 'infinity-performance-android' && inputs.feature != 'cobra-owner-host' && inputs.feature != 'cobra-android-launch' && inputs.feature != 'cobra-cards-baseline' && inputs.feature != 'cobra-cards-host'
     name: Selected feature ${{ inputs.feature || 'explicit baseline Search request' }}
     runs-on: ubuntu-22.04
     timeout-minutes: 150

@@ -1,0 +1,28 @@
+{
+  "scope": "MANUAL_FINAL_CARDS_CURRENT_OWNER_HOST_PRODUCER",
+  "feature": "cobra-cards-host",
+  "signing_run": 40971769136,
+  "branch": "work/cobra-only-from-2103427-20261028",
+  "ordered_operations": [
+    "bootstrap existing official Maven host dependencies without tests",
+    "prepare exact signed431 translated baseline without running baseline tests",
+    "compile current Cobra owner only",
+    "independently verify actual owner canonical delta",
+    "prepare fresh portable source-bound current owner classpath",
+    "run seven exact candidate host groups from CI-HOST-SCOPE.json",
+    "package matching original-owner ZIPs only after all essential groups pass",
+    "validate local producer evidence protocol"
+  ],
+  "artifacts": [
+    "Cobra-Cards-Prepared-Owners-RUNID",
+    "Cobra-Cards-Host-Evidence-RUNID"
+  ],
+  "APK": "NOT_BUILT_OR_SIGNED",
+  "Android": "NOT_RUN",
+  "shutdown": "NOT_SELECTED_OR_TESTED",
+  "Infinity": "FROZEN",
+  "signing": "Existing sole signer; root-owned, separate from producer",
+  "release_acceptance": "PHYSICAL_FOLD_PENDING; NO_AUTOMATIC_LOCK_OR_PROMOTION",
+  "selected_before_execution": true,
+  "execution": "NOT_RUN; root review and separate dispatch pending"
+}
