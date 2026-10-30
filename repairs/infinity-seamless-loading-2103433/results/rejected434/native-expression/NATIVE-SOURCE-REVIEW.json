@@ -1,0 +1,9 @@
+{
+  "repository": "xbmc/xbmc",
+  "ref": "Omega",
+  "path": "xbmc/GUIInfoManager.cpp",
+  "file_git_blob_sha": "b54aebd1f674f92118c50362c7ba1306ac2f2c71",
+  "translation": "TranslateSingleString: String.IsEqual data1=TranslateSingleString(prop.param(0),listItemDependent); bool true/false are SYSTEM_ALWAYS_TRUE/FALSE. Unrecognized literal0 has no information-label ID. GetMultiInfoBool gets comparison label using GetImage(data1).",
+  "correction": "Explicit inherited-window boolean replaces constant first info argument. All String.IsEqual first operands now actual Window(Home).Property or Container info. Foreground Favorite suppresses underlying Home global drawer animation.",
+  "limits": "Read public upstream code only; not proof of exact installed native source. No native changes, build or runtime acceptance."
+}

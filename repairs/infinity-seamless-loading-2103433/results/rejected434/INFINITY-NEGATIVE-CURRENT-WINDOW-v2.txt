@@ -1,0 +1,51 @@
+test_actual_favourites_context_uses_dialog_focus_and_frame_capability (test_current_window.CurrentWindowLoadingTest.test_actual_favourites_context_uses_dialog_focus_and_frame_capability) ... FAIL
+test_centered_busy_panel_is_retained_only_as_hidden_native_control (test_current_window.CurrentWindowLoadingTest.test_centered_busy_panel_is_retained_only_as_hidden_native_control) ... FAIL
+test_native_video_frame_keeps_window_focus_and_source_ownership (test_current_window.CurrentWindowLoadingTest.test_native_video_frame_keeps_window_focus_and_source_ownership) ... FAIL
+test_video_drawer_uses_actual_frame_for_native_busy_without_service (test_current_window.CurrentWindowLoadingTest.test_video_drawer_uses_actual_frame_for_native_busy_without_service) ... FAIL
+
+======================================================================
+FAIL: test_actual_favourites_context_uses_dialog_focus_and_frame_capability (test_current_window.CurrentWindowLoadingTest.test_actual_favourites_context_uses_dialog_focus_and_frame_capability)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/infinity-seamless/repairs/infinity-seamless-loading-2103433/tests/test_current_window.py", line 208, in test_actual_favourites_context_uses_dialog_focus_and_frame_capability
+    self.assertEqual([10134], focused)
+AssertionError: Lists differ: [10134] != [10000]
+
+First differing element 0:
+10134
+10000
+
+- [10134]
++ [10000]
+
+======================================================================
+FAIL: test_centered_busy_panel_is_retained_only_as_hidden_native_control (test_current_window.CurrentWindowLoadingTest.test_centered_busy_panel_is_retained_only_as_hidden_native_control)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/infinity-seamless/repairs/infinity-seamless-loading-2103433/tests/test_current_window.py", line 181, in test_centered_busy_panel_is_retained_only_as_hidden_native_control
+    self.assertEqual('false', panel.findtext('visible'))
+AssertionError: 'false' != '!String.IsEqual(Window(Home).Property(Infinity.Loading.DrawerReady),true)'
+- false
++ !String.IsEqual(Window(Home).Property(Infinity.Loading.DrawerReady),true)
+
+
+======================================================================
+FAIL: test_native_video_frame_keeps_window_focus_and_source_ownership (test_current_window.CurrentWindowLoadingTest.test_native_video_frame_keeps_window_focus_and_source_ownership)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/infinity-seamless/repairs/infinity-seamless-loading-2103433/tests/test_current_window.py", line 164, in test_native_video_frame_keeps_window_focus_and_source_ownership
+    self.assertGreater(len(frames), 0, 'The actual native list file must have an owned frame')
+AssertionError: 0 not greater than 0 : The actual native list file must have an owned frame
+
+======================================================================
+FAIL: test_video_drawer_uses_actual_frame_for_native_busy_without_service (test_current_window.CurrentWindowLoadingTest.test_video_drawer_uses_actual_frame_for_native_busy_without_service)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/infinity-seamless/repairs/infinity-seamless-loading-2103433/tests/test_current_window.py", line 139, in test_video_drawer_uses_actual_frame_for_native_busy_without_service
+    self.assertEqual(1, len(frames), 'The actual Videos menu must own its busy feedback')
+AssertionError: 1 != 0 : The actual Videos menu must own its busy feedback
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.062s
+
+FAILED (failures=4)

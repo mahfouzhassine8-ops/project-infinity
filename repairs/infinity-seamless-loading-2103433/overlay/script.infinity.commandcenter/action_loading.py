@@ -165,6 +165,11 @@ def _context(xbmc, gui, foreground=True):
         return empty
     window = gui.getCurrentWindowId()
     dialog = gui.getCurrentWindowDialogId()
+    # Favorites is a native dialog with its own focused list. Reading Home's
+    # focus beneath it can never identify the pressed Favorite or its frame.
+    # Busy/keyboard/provider dialogs still retain their original base owner.
+    if dialog == 10134:
+        window = dialog
     try:
         control = gui.Window(window).getFocusId()
     except RuntimeError:

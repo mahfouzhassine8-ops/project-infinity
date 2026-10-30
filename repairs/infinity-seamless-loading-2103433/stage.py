@@ -12,13 +12,14 @@ from pathlib import Path
 import shutil
 import subprocess
 import sys
+import xml.etree.ElementTree as ET
 from zipfile import ZipFile
 
 HERE=Path(__file__).resolve().parent
 REPO=HERE.parents[1]
 sys.path.insert(0,str(REPO/'repairs/infinity-final-closure-2103407'))
 import module_bundle
-from skin_loading import transform,definitions,glint_textures,SELECTED
+from skin_loading import transform,definitions,glint_textures,SELECTED,VIEW_XMLS
 
 CC='script.infinity.commandcenter'
 SKIN='skin.infinity.diggz'
@@ -59,7 +60,7 @@ def generate(baseline,out):
             if key in original:
                 old=original[key];assert raw!=old
                 if p.suffix=='.py':sources[p.name]=preserved(old,raw,{'main'} if p.name in ('service.py','plugin.py') else {'_open_search'})
-                else:assert old.replace(b'version="0.3.5.51"',b'version="0.3.5.52"',1)==raw
+                else:assert old.replace(b'version="0.3.5.51"',b'version="0.3.5.53"',1)==raw
             else:assert p.name=='action_loading.py';compile(raw,str(p),'exec',dont_inherit=True)
             (candidate/key).write_bytes(raw);changes[PREFIX+key]=raw;before[PREFIX+key]=sha(original[key]) if key in original else None
         # Exact reversible UI insertions, no protected service/checkpoint changes.
@@ -77,28 +78,50 @@ def generate(baseline,out):
         before[PREFIX+CC+'/'+module_bundle.MANIFEST]=sha(manifest)
         imported=[]
         skin_prefix='payload/'+PREFIX+SKIN+'/'
+        # Native lists are defined in files imported by Includes_Views, not in
+        # Includes_Views itself. Register only frames actually emitted by those
+        # files to Videos' window, so the observer can own its selected item.
+        revised_views={}
+        view_controls={}
+        for name in z.namelist():
+            if not name.startswith(skin_prefix):continue
+            rel=name[len(skin_prefix):]
+            if Path(rel).name not in VIEW_XMLS | {'Includes_CinemaBrowse.xml'}:continue
+            raw,count=transform(z.read(name),rel)
+            revised_views[rel]=(raw,count)
+            controls=view_controls.setdefault(str(Path(rel).parent),set())
+            for item in ET.fromstring(raw).iter('include'):
+                if item.get('content')!='InfinityActionLoadingFrame':continue
+                for param in item.findall('param'):
+                    if param.get('name')=='control' and (param.get('value') or '').isdigit():
+                        controls.add(param.get('value'))
         for name in z.namelist():
             if not name.startswith(skin_prefix):continue
             rel=name[len(skin_prefix):]
             if Path(rel).name not in SELECTED:continue
-            old=z.read(name);raw,count=transform(old,rel)
+            old=z.read(name)
+            if rel in revised_views:
+                raw,count=revised_views[rel]
+            else:
+                inherited=view_controls.get(str(Path(rel).parent),()) if Path(rel).name=='MyVideoNav.xml' else ()
+                raw,count=transform(old,rel,inherited_controls=inherited)
             original_skin=out/'input-skin'/SKIN/rel
             original_skin.parent.mkdir(parents=True,exist_ok=True);original_skin.write_bytes(old)
             if raw!=old:
                 key=PREFIX+SKIN+'/'+rel;changes[key]=raw;before[key]=sha(old);xml_counts[rel]=count
-            if Path(rel).name=='Includes.xml':imported.append(str(Path(rel).parent))
+            if Path(rel).name=='Includes.xml' and count['imports']:imported.append(str(Path(rel).parent))
         assert 'unified' in imported
         for folder in imported:
             key=PREFIX+SKIN+'/'+folder+'/Includes_InfinityActionLoading.xml';changes[key]=definitions();before[key]=None
         for leaf,raw in glint_textures().items():
             key=PREFIX+SKIN+'/media/'+leaf;changes[key]=raw;before[key]=None
-        key=PREFIX+SKIN+'/addon.xml';old=z.read('payload/'+key);raw=old.replace(b'version="1.0.5.248"',b'version="1.0.5.249"',1).replace(b'import addon="script.infinity.commandcenter" version="0.3.5.49"',b'import addon="script.infinity.commandcenter" version="0.3.5.52"',1)
+        key=PREFIX+SKIN+'/addon.xml';old=z.read('payload/'+key);raw=old.replace(b'version="1.0.5.248"',b'version="1.0.5.250"',1).replace(b'import addon="script.infinity.commandcenter" version="0.3.5.49"',b'import addon="script.infinity.commandcenter" version="0.3.5.53"',1)
         assert raw!=old;changes[key]=raw;before[key]=sha(old)
         for name in ('infinity-skin.json','Infinity-Protected-Manifest.json'):
             key=PREFIX+SKIN+'/'+name;old=z.read('payload/'+key);meta=json.loads(old)
-            for label in ('candidate',):meta[label]=249
+            for label in ('candidate',):meta[label]=250
             for label in ('version','candidate_version','skin_version'):
-                if label in meta:meta[label]='1.0.5.249'
+                if label in meta:meta[label]='1.0.5.250'
             if 'protected_files' in meta:
                 for rel in meta['protected_files']:
                     member=PREFIX+SKIN+'/'+rel

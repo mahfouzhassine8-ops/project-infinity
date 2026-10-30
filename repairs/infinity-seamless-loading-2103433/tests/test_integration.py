@@ -22,6 +22,7 @@ def remove_loading(node):
         text=child.text or ''
         selected=(child.tag=='include' and (child.get('content')=='InfinityActionLoadingFrame' or child.get('file')=='Includes_InfinityActionLoading.xml') or
                   child.tag=='param' and child.get('name')=='loadingcontrol' or
+                  child.tag=='control' and child.findtext('description')=='INFINITY_ACTION_LOADING_V1 drawer frame' or
                   child.tag in ('onclick','onload','onunload','visible') and 'Infinity.Loading.' in text or
                   child.tag=='onclick' and 'seamless.loading' in text)
         if selected:node.remove(child)
@@ -34,14 +35,20 @@ class SourceAndSkinIntegrationTest(unittest.TestCase):
             if path.is_file():self.assertEqual(path.read_bytes(),(STAGED/'candidate-addons/script.infinity.commandcenter'/path.name).read_bytes(),path.name)
 
     def test_actual_xml_retains_every_original_action_geometry_and_control(self):
-        plan=json.loads((STAGED/'SOURCE-PLAN.json').read_text());count=0
+        plan=json.loads((STAGED/'SOURCE-PLAN.json').read_text());checked=set()
         for key,row in plan.items():
             if not key.endswith('.xml') or not key.startswith('assets/addons/skin.infinity.diggz/') or row['before'] is None or key.endswith('/addon.xml'):continue
             relative=key[len('assets/addons/'):]
             old=ET.parse(SKIN_BASE/relative).getroot();new=ET.parse(STAGED/'members'/key).getroot()
+            if relative.endswith('/DialogBusy.xml'):
+                panel=new.find('controls/control');hidden=panel.find('visible')
+                self.assertIsNotNone(hidden);self.assertEqual('false',hidden.text)
+                panel.remove(hidden)
             remove_loading(new)
-            self.assertEqual(sem(old),sem(new),relative);count+=1
-        self.assertGreater(count,50)
+            self.assertEqual(sem(old),sem(new),relative);checked.add(relative)
+        for name in ('Home.xml','MyVideoNav.xml','Includes.xml','View_50_List.xml','Includes_CinemaBrowse.xml','DialogBusy.xml'):
+            self.assertIn('skin.infinity.diggz/unified/'+name,checked)
+        self.assertTrue(all('/unified/' in name for name in checked),'Unreviewed inactive resolution layouts stay unchanged')
 
     def test_action_payload_owner_ids_and_frame_capabilities_match(self):
         path=STAGED/'members/assets/addons/skin.infinity.diggz/unified/Home.xml';tree=ET.parse(path).getroot()

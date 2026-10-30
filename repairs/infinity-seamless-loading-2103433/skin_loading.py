@@ -16,10 +16,18 @@ import xml.etree.ElementTree as ET
 MARKER = 'INFINITY_ACTION_LOADING_V1'
 TEMPLATES = ('InfinityHomeAddonCardFocused', 'InfinityCompactContinueCardFocused')
 FRAMES = ('infinity_ui/frame.png', 'infinity_ui/osd_focus.png', 'infinity_polish/focus_rim.png',
-          'infinity_glass/focus.png', 'infinity_glass/rim.png')
+          'infinity_glass/focus.png', 'infinity_glass/rim.png', 'infinity_ui/focus.png')
+VIEW_XMLS = frozenset(('View_50_List.xml', 'View_51_InfoWall.xml', 'View_52_Landscape.xml',
+    'View_53_ShowCase.xml', 'View_54_ShowCase.xml', 'View_55_TriPanel.xml', 'View_56_Posters.xml',
+    'View_57_Shift.xml', 'View_58_BannerWall.xml', 'View_59_Logo.xml', 'View_500_Icons.xml',
+    'View_501_LowList.xml', 'View_502_Episode.xml', 'View_503_Wall.xml', 'View_504_Gallery.xml',
+    'View_505_Panel.xml', 'View_506_RightList.xml', 'View_507_BigList.xml', 'View_508_SongList.xml',
+    'View_509_MyFlix.xml', 'View_591_BigFan.xml', 'View_602_FanartList.xml',
+    'View_603_Music_JukeBox.xml', 'View_609_Fullscreen_Wall.xml'))
 SELECTED = frozenset(('Home.xml', 'Includes_InfinityHomeUnified.xml', 'Includes_InfinityRails.xml',
                      'Custom_1193_InfinityBrowse.xml', 'MyVideoNav.xml', 'DialogFavourites.xml',
-                     'Includes_InfinityBrowser223.xml', 'Includes_Views.xml', 'Includes.xml', 'DialogBusy.xml'))
+                     'Includes_InfinityBrowser223.xml', 'Includes_CinemaBrowse.xml',
+                     'Includes_Views.xml', 'Includes.xml', 'DialogBusy.xml')) | VIEW_XMLS
 
 
 @dataclass
@@ -77,18 +85,26 @@ def owner_id(node):
 
 def frame_call(rect, control, *, global_frame=False, window="10000"):
     params = dict(rect)
-    params.update(control=control, window=window, globalframe='true' if global_frame else 'false')
+    params.update(control=control, window=window, globalframe='true' if global_frame else 'false', inheritwindow='true' if window=='0' else 'false')
     return ('\n<!-- ' + MARKER + ' -->\n<include content="InfinityActionLoadingFrame">' +
             ''.join('<param name="%s" value="%s" />' % (k, escape(v, quote=True)) for k, v in params.items()) +
             '</include>\n').encode()
 
 
-def transform(raw, name):
+def transform(raw, name, *, inherited_controls=()):
+    if len(Path(name).parts)>1 and Path(name).parent.name!='unified':
+        # Android's signed active layout is unified. Leave inactive legacy
+        # resolution layouts byte-identical instead of hiding feedback on a
+        # surface whose menu-frame geometry has not been established.
+        return raw, dict(actions=0, frames=0, imports=0)
     if Path(name).name == 'DialogBusy.xml':
         parsed = nodes(raw)
         group = next(n for n in parsed if n.tag == 'control' and n.attrs.get('type') == 'group')
         assert not any(c.tag == 'visible' for c in group.children)
-        note = ('<!-- '+MARKER+' -->\n<visible>!String.IsEqual(Window(Home).Property(Infinity.Loading.DrawerReady),true)</visible>').encode()
+        # Keep native dialog/progress identity and cancellation/lifetime intact.
+        # Feedback is drawn on the CURRENT existing item/menu frame, including
+        # Videos' native busy lifetime; never revive the rejected floating panel.
+        note = ('<!-- '+MARKER+' -->\n<visible>false</visible>').encode()
         return raw[:group.open_end]+note+raw[group.open_end:], dict(actions=0, frames=0, imports=0)
     if Path(name).name not in SELECTED:
         return raw, dict(actions=0, frames=0, imports=0)
@@ -96,10 +112,13 @@ def transform(raw, name):
         raise ValueError('Only exact unmodified signed433 XML may be transformed')
     parsed = nodes(raw)
     window = {'MyVideoNav.xml':'10025','Custom_1193_InfinityBrowse.xml':'11193',
-              'Includes_InfinityBrowser223.xml':'11193','DialogFavourites.xml':'10134'}.get(Path(name).name,'10000')
+              'Includes_InfinityBrowser223.xml':'11193','DialogFavourites.xml':'10134',
+              'Includes_CinemaBrowse.xml':'10025'}.get(Path(name).name,'10000')
+    if Path(name).name in VIEW_XMLS:
+        window = '0'  # Shared native view: bind to the actual supported owner.
     additions = {}
     counts = dict(actions=0, frames=0, imports=0)
-    frame_controls = set()
+    frame_controls = set(inherited_controls)
 
     def add(offset, text):
         additions.setdefault(offset, []).append(text)
@@ -107,8 +126,6 @@ def transform(raw, name):
     if Path(name).name == 'Includes.xml':
         add(parsed[0].open_end, ('\n<!-- ' + MARKER + ' -->\n<include file="Includes_InfinityActionLoading.xml" />\n').encode())
         counts['imports'] += 1
-    if Path(name).name == 'Home.xml':
-        add(parsed[0].open_end, ('\n<!-- '+MARKER+' --><onload>SetProperty(Infinity.Loading.DrawerReady,true,Home)</onload><onunload>ClearProperty(Infinity.Loading.DrawerReady,Home)</onunload>\n').encode())
     for node in parsed:
         if node.tag == 'onclick':
             action = node_text(raw, node).strip()
@@ -166,13 +183,17 @@ def transform(raw, name):
             cid = owner_id(node)
             if frame and cid != '0':
                 rect = {c.tag: node_text(raw, c) for c in frame.children if c.tag in ('left', 'top', 'width', 'height')}
+                # Native image controls commonly omit zero left/top. Respect
+                # Kodi's defaults only when no opposite/center anchor exists.
+                fields = {c.tag for c in frame.children}
+                if not fields & {'left','right','centerleft'}:rect['left']='0'
+                if not fields & {'top','bottom','centertop'}:rect['top']='0'
                 if set(rect) == {'left', 'top', 'width', 'height'}:
-                    # A frame's local coordinate plane must be the layout itself.
-                    # Nested translated groups need their own explicit mapping.
-                    if frame.parent is node:
-                        frame_controls.add(cid)
-                        add(node.close, frame_call(rect, cid, window=window))
-                        counts['frames'] += 1
+                    # Place the decoration in the SAME coordinate/visibility
+                    # parent as its original frame, including translated groups.
+                    frame_controls.add(cid)
+                    add(frame.parent.close, frame_call(rect, cid, window=window))
+                    counts['frames'] += 1
         if node.tag == 'control' and node.attrs.get('type') == 'button' and node.attrs.get('id','').isdigit():
             focus = next((c for c in node.children if c.tag == 'texturefocus'), None)
             if focus and node_text(raw, focus).strip() in FRAMES:
@@ -182,6 +203,16 @@ def transform(raw, name):
                     add(node.end,frame_call(rect,cid,window=window));counts['frames']+=1
         if Path(name).name == 'Home.xml' and node.tag == 'control' and node.attrs.get('id') == '19080':
             add(node.close, frame_call(dict(left='0', top='0', width='100%', height='100%'), '9090', global_frame=True))
+            counts['frames'] += 1
+        if (Path(name).name == 'Includes.xml' and node.tag == 'control'
+                and node.attrs.get('id') == '9001'
+                and any(a.tag == 'include' and a.attrs.get('name') == 'SideBladeLeft' for a in node.ancestors())):
+            rect = {c.tag: node_text(raw, c) for c in node.children if c.tag in ('left','top','width','height')}
+            assert set(rect) == {'left','top','width','height'}
+            # Every instance inherits its actual native window. The original
+            # closed-menu button supplies the geometry and visibility, not Home.
+            add(node.end, ('\n<!-- '+MARKER+' --><control type="group"><description>INFINITY_ACTION_LOADING_V1 drawer frame</description><visible>Control.IsVisible(9001)</visible>').encode()
+                + frame_call(rect, '9001', global_frame=True, window='0') + b'</control>\n')
             counts['frames'] += 1
     if parsed[0].tag == 'window' and frame_controls:
         owner_map = '|' + '|'.join(sorted(frame_controls,key=int)) + '|'
@@ -195,17 +226,22 @@ def transform(raw, name):
 
 def definitions():
     """One shared animated texture, not Python-driven per-frame UI writes."""
+    # Shared native view files have no fixed parent window. A foreground cue
+    # must match an actual supported active window as well as its item identity.
+    current = ' | '.join('[Window.IsActive(%s) + String.IsEqual(Window(Home).Property(Infinity.Loading.Window),%s)]' % (wid,wid)
+                         for wid in ('10000','10025','11193','10134'))
+    owned = '[[!$PARAM[inheritwindow] + String.IsEqual(Window(Home).Property(Infinity.Loading.Window),$PARAM[window])] | [$PARAM[inheritwindow] + [' + current + ']]]'
     return b'''<?xml version="1.0" encoding="utf-8"?>
 <includes>
   <!-- INFINITY_ACTION_LOADING_V1: original frame rectangles, additive glint only -->
   <include name="InfinityActionLoadingFrame">
     <param name="left" /><param name="top" /><param name="width" /><param name="height" />
-    <param name="control" default="0" /><param name="window" default="10000" /><param name="globalframe" default="false" />
+    <param name="control" default="0" /><param name="window" default="10000" /><param name="globalframe" default="false" /><param name="inheritwindow" default="false" />
     <definition>
       <control type="group">
         <description>Infinity current action loading</description>
         <left>$PARAM[left]</left><top>$PARAM[top]</top><width>$PARAM[width]</width><height>$PARAM[height]</height>
-        <visible>Window.IsActive($PARAM[window]) + [[!$PARAM[globalframe] + String.IsEqual(Window(Home).Property(Infinity.Loading.Active),true) + String.IsEqual(Window(Home).Property(Infinity.Loading.Control),$PARAM[control]) + Control.IsVisible($PARAM[control]) + Control.HasFocus($PARAM[control]) + String.IsEqual(Container($PARAM[control]).CurrentItem,Window(Home).Property(Infinity.Loading.Item)) + String.IsEqual(Container($PARAM[control]).ListItem.Property(section),Window(Home).Property(Infinity.Loading.Section)) + String.IsEqual(Container($PARAM[control]).ListItem.Property(hubsource),Window(Home).Property(Infinity.Loading.Source)) + String.IsEqual(Container($PARAM[control]).ListItem.Property(Addon.ID),Window(Home).Property(Infinity.Loading.Addon)) + String.IsEqual(Container($PARAM[control]).ListItem.DBID,Window(Home).Property(Infinity.Loading.Dbid)) + String.IsEqual(Container(9000).ListItem.Property(section),Window(Home).Property(Infinity.Loading.HomeSection)) + String.IsEqual(Container(9000).ListItem.Property(hubsource),Window(Home).Property(Infinity.Loading.HomeSource))] | [$PARAM[globalframe] + !String.IsEqual(Window(Home).Property(Infinity.Loading.Active),true) + [String.IsEqual(Window(Home).Property(Infinity.Loading.Global),true) | Window.IsActive(busydialog) | Window.IsActive(busydialognocancel)]]] + !Player.IsFullscreen</visible>
+        <visible>[$PARAM[inheritwindow] | Window.IsActive($PARAM[window])] + [[!$PARAM[globalframe] + String.IsEqual(Window(Home).Property(Infinity.Loading.Active),true) + OWNED_WINDOW + String.IsEqual(Window(Home).Property(Infinity.Loading.Control),$PARAM[control]) + Control.IsVisible($PARAM[control]) + Control.HasFocus($PARAM[control]) + String.IsEqual(Container($PARAM[control]).CurrentItem,Window(Home).Property(Infinity.Loading.Item)) + String.IsEqual(Container($PARAM[control]).ListItem.Property(section),Window(Home).Property(Infinity.Loading.Section)) + String.IsEqual(Container($PARAM[control]).ListItem.Property(hubsource),Window(Home).Property(Infinity.Loading.Source)) + String.IsEqual(Container($PARAM[control]).ListItem.Property(Addon.ID),Window(Home).Property(Infinity.Loading.Addon)) + String.IsEqual(Container($PARAM[control]).ListItem.DBID,Window(Home).Property(Infinity.Loading.Dbid)) + String.IsEqual(Container(9000).ListItem.Property(section),Window(Home).Property(Infinity.Loading.HomeSection)) + String.IsEqual(Container(9000).ListItem.Property(hubsource),Window(Home).Property(Infinity.Loading.HomeSource))] | [$PARAM[globalframe] + ![String.IsEqual(Window(Home).Property(Infinity.Loading.Active),true) + CURRENT_OWNER_WINDOW] + [String.IsEqual(Window(Home).Property(Infinity.Loading.Global),true) | Window.IsActive(busydialog) | Window.IsActive(busydialognocancel)]]] + !Player.IsFullscreen</visible>
         <control type="image">
           <left>0</left><top>0</top><width>100%</width><height>100%</height>
           <texture border="18" background="true" colordiffuse="$VAR[InfinityCollectiveFrameColor]">infinity_ui/action_loading.gif</texture>
@@ -220,7 +256,7 @@ def definitions():
     </definition>
   </include>
 </includes>
-'''
+'''.replace(b'OWNED_WINDOW', owned.encode()).replace(b'CURRENT_OWNER_WINDOW', ('['+current+']').encode())
 
 
 def glint_textures():

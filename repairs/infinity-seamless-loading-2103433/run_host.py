@@ -17,7 +17,7 @@ def sha(path):
 def sources():
     return sorted(p for p in HERE.rglob('*') if p.is_file() and not set(p.relative_to(HERE).parts)&{'__pycache__','results'} and p.suffix in {'.py','.java','.cpp','.json','.md','.xml'})
 
-def run(baseline,out):
+def run(baseline,out,selection='original'):
     baseline,out=baseline.resolve(),out.resolve()
     assert not out.exists(),'Fresh evidence directory required';out.mkdir(parents=True)
     branch=subprocess.check_output(['git','-C',str(REPO),'branch','--show-current'],text=True).strip()
@@ -32,13 +32,21 @@ def run(baseline,out):
     from stage import generate
     generate(baseline,out/'stage')
     os.environ['INFINITY_STAGED']=str(out/'stage')
+    os.environ['INFINITY_BASE_COMPONENT']=str(baseline)
     os.environ['INFINITY_HOST_MEASUREMENTS']=str(out/'measurements')
     sys.path.insert(0,str(HERE/'tests'))
-    selected=['test_loading.'+name for name in scope['exact_host_methods']]
-    for file,key in [('test_integration','integration_test_selection'),('test_monitor','monitor_integration_selected_before_execution')]:
-        row=scope[key];assert row['selected_before_execution'] is True
-        selected.extend(file+'.'+row['class']+'.'+name for name in row['methods'])
-    assert len(selected)==len(set(selected))==24,'Exact selected loading methods required'
+    if selection=='current-window':
+        row=scope['rejected434_current_window_correction'];assert row['recorded_before_execution'] is True
+        selected=['test_current_window.'+row['class']+'.'+name for name in row['methods']]
+        selected.extend('test_integration.'+row['retained_integration_class']+'.'+name for name in row['retained_integration_methods'])
+        expected=7
+    else:
+        selected=['test_loading.'+name for name in scope['exact_host_methods']]
+        for file,key in [('test_integration','integration_test_selection'),('test_monitor','monitor_integration_selected_before_execution')]:
+            row=scope[key];assert row['selected_before_execution'] is True
+            selected.extend(file+'.'+row['class']+'.'+name for name in row['methods'])
+        expected=24
+    assert len(selected)==len(set(selected))==expected,'Exact selected loading methods required'
     selection=dict(recorded_before_execution=True,source=source,branch=branch,methods=selected,tested_source_files=pins,
                    baseline_component_sha256=sha(baseline),stage_sha256=sha(out/'stage/STAGE.json'),
                    source_plan_sha256=sha(out/'stage/SOURCE-PLAN.json'),APK='NOT_BUILT',shutdown='NOT_RUN')
@@ -47,7 +55,7 @@ def run(baseline,out):
     with (out/'TEST-OUTPUT.txt').open('w') as log:
         result=unittest.TextTestRunner(stream=log,verbosity=2).run(suite)
     assert all(sha(REPO/relative)==pin for relative,pin in pins.items()),'Source mutated during focused tests'
-    success=result.wasSuccessful() and result.testsRun==24 and not result.skipped
+    success=result.wasSuccessful() and result.testsRun==expected and not result.skipped
     record=dict(status='PASS_FOCUSED_INFINITY_LOADING_HOST_ONLY' if success else 'FAIL_FOCUSED_INFINITY_LOADING_HOST_ONLY',
                 source=source,branch=branch,tests=result.testsRun,failures=len(result.failures),errors=len(result.errors),skipped=len(result.skipped),
                 tested_source_files=pins,selected_methods=selected,selection_sha256=sha(out/'SELECTION.json'),
@@ -61,4 +69,5 @@ def run(baseline,out):
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser();parser.add_argument('--baseline',type=Path,required=True);parser.add_argument('--out',type=Path,required=True)
+    parser.add_argument('--selection',choices=['original','current-window'],default='original')
     run(**vars(parser.parse_args()))
