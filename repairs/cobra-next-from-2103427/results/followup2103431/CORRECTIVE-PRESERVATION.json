@@ -1,0 +1,125 @@
+{
+  "Infinity": "EXACT_ZIP",
+  "Pro_Six_reflow_player_services": "EXACT_EXCEPT_PINNED_PROCONTROL_IDENTITY_LOOKUP; ORIGINAL_ACTIONS_AND_PLAYER_BODY_PRESERVED",
+  "added_classes": [
+    "class:Lcom/projectinfinity/kodi/CobraArrange$$ExternalSyntheticLambda0;",
+    "class:Lcom/projectinfinity/kodi/CobraArrange$$ExternalSyntheticLambda1;",
+    "class:Lcom/projectinfinity/kodi/CobraArrange$$ExternalSyntheticLambda2;",
+    "class:Lcom/projectinfinity/kodi/CobraArrange$$ExternalSyntheticLambda3;",
+    "class:Lcom/projectinfinity/kodi/CobraArrange$$ExternalSyntheticLambda4;",
+    "class:Lcom/projectinfinity/kodi/CobraArrange$1;",
+    "class:Lcom/projectinfinity/kodi/CobraArrange$Gesture$$ExternalSyntheticLambda0;",
+    "class:Lcom/projectinfinity/kodi/CobraArrange$Gesture;",
+    "class:Lcom/projectinfinity/kodi/CobraArrange$Preview;",
+    "class:Lcom/projectinfinity/kodi/CobraArrange$Snapshot;",
+    "class:Lcom/projectinfinity/kodi/CobraArrange$Touch;",
+    "class:Lcom/projectinfinity/kodi/CobraArrange;",
+    "class:Lcom/projectinfinity/kodi/CobraLayoutCatalog;",
+    "class:Lcom/projectinfinity/kodi/CobraLogoRequests$$ExternalSyntheticLambda0;",
+    "class:Lcom/projectinfinity/kodi/CobraLogoRequests$$ExternalSyntheticLambda1;",
+    "class:Lcom/projectinfinity/kodi/CobraLogoRequests$$ExternalSyntheticLambda2;",
+    "class:Lcom/projectinfinity/kodi/CobraLogoRequests$Binding;",
+    "class:Lcom/projectinfinity/kodi/CobraLogoRequests$Flight;",
+    "class:Lcom/projectinfinity/kodi/CobraLogoRequests;",
+    "class:Lcom/projectinfinity/kodi/CobraPresentation;"
+  ],
+  "baseline": "782242090483982c39a78f9c4da932a4751bdafc",
+  "changed_existing_classes": [
+    "class:Lcom/projectinfinity/kodi/ChooserReleaseMetadata;",
+    "class:Lcom/projectinfinity/kodi/CobraComponent;",
+    "class:Lcom/projectinfinity/kodi/InfinityLiveActivity;"
+  ],
+  "component_catalog": {
+    "bundles": {
+      "CHOOSER_SHELL": {
+        "approved_source": "b41d51daa8b32dfee265dc9ea0abf844bff8f44e",
+        "digest": "ada80ce1f8b583390c49f66164dca6c8747bf16043a980c3b6b59fecef1a13a0",
+        "file": "CHOOSER_SHELL.zip",
+        "settings_schema": "original-launch-preference",
+        "sha256": "36ca822a886b5df4443c798c933a2c304a30be002c10b4284f6b2ed7934fe912",
+        "version": "2103431.version-wording.1"
+      },
+      "COBRA": {
+        "approved_source": "b41d51daa8b32dfee265dc9ea0abf844bff8f44e",
+        "digest": "09aedb5a1e45ced416958164131556171ec188207f1bd73da357e815db1c9338",
+        "file": "COBRA.zip",
+        "settings_schema": "original-plus-settings-snapshot-v1",
+        "sha256": "98583b7a935103c8d13744fc624a6005f0566b1e3d26a47f240295cafd21cae7",
+        "version": "2103431.cobra.1"
+      },
+      "INFINITY": {
+        "approved_source": "6ca19c1d4152e7809f7040dcbdf7f58bc3df7655",
+        "digest": "ab70480429f786f4fbf63592c1a16d8ccea3abaed13bec047474d0730efcbbee",
+        "file": "INFINITY.zip",
+        "settings_schema": "original-2103420",
+        "sha256": "16eeb91a24bf0cf99d558d9e3dd17aedfd127e9a1936dcce413341c48683cd6c",
+        "version": "2103420.isolation.1.performance.2"
+      },
+      "MINIMAL_ANDROID_CONTRACT": {
+        "approved_source": "b41d51daa8b32dfee265dc9ea0abf844bff8f44e",
+        "digest": "5fb2129e146c90a498a3e9faa118ac849fbdb18a2442aca9c646b002d10c6fb6",
+        "file": "MINIMAL_ANDROID_CONTRACT.zip",
+        "settings_schema": "owner-durability-v1",
+        "sha256": "432bfb7b246a504d9550e1de39368c3b7e0946532f1c695531ed891e74ef03d8",
+        "version": "isolation-contract.1.launcher-icons.2103431"
+      }
+    },
+    "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "package": "com.projectinfinity.kodi",
+    "release_approved": false,
+    "schema": 1,
+    "source": "b41d51daa8b32dfee265dc9ea0abf844bff8f44e"
+  },
+  "existing_classes_checked": 7274,
+  "launcher_icons": {
+    "adaptive_symbol_alpha": "EXACT_ORIGINAL_MONO_AND_COLOR_ALPHA; RESOURCE_BLACK_TINT_ONLY",
+    "launcher_limits": "Launcher caches may retain an old drawable; user-enabled themed-icon palettes control monochrome colors. Resource resolution does not guarantee every Samsung surface refreshes immediately.",
+    "legacy_symbol": "SAME_ORIGINAL_MONO_ALPHA; STANDARD_CENTERED_72_OF_108_ADAPTIVE_VIEWPORT_RESAMPLED_TO_ORIGINAL_DENSITY",
+    "legacy_tile_alpha": "EXACT_ORIGINAL_DENSITY_TILE_ALPHA",
+    "manifest": "NOT_MODIFIED_BY_ICON_IMPLEMENTATION",
+    "new_entries": 1079,
+    "new_path_sha256": {
+      "res/infinity_launcher_light_hdpi.png": "e059b58ec3af72994725510e2e4e518879ed36eb654b050463b3e98d94685f3c",
+      "res/infinity_launcher_light_mdpi.png": "20521d2e6de937d79c4a6e5d9ea6ce1a34a623b2dfbf5827fee3d8e59b2d835f",
+      "res/infinity_launcher_light_v26.xml": "545b354ba229d2d197950801d8740b364238e52b86f0f9f93d779cc9b4abd8e7",
+      "res/infinity_launcher_light_v33.xml": "b894acef7408a8934b2ed989b625e2d1d15bf3c409ca583c15a3bc4a10576c8d",
+      "res/infinity_launcher_light_xhdpi.png": "2cf279c8855cb756d4070e1eb532dbdb40d7549a4332fb2ce9aef5e65c47f741",
+      "res/infinity_launcher_light_xxhdpi.png": "481b64281afbe845d9f22de796c4d26a7f00825b56b750e9bce41f16d7f920b9",
+      "res/infinity_launcher_light_xxxhdpi.png": "0fce20ccd57efa60921c940603b5e0a1d8d740c06fafcf5f8cec783e4cb34622"
+    },
+    "new_resource_ids": 0,
+    "night_config_additions": 14,
+    "non_icon_resource_entries": "EXACT_SEMANTIC_AND_ORIGINAL_CHUNK_IDENTITY",
+    "original_dark_assets": "ALL_BYTE_IDENTICAL",
+    "original_entries": 1065,
+    "original_table_sha256": "1b8c1788a5a86242635277f063ebdce6b82ed12eafe3cfdf331b902c8eb7e616",
+    "physical_Samsung": "NOT_VERIFIED",
+    "resource_ids": [
+      "0x7f080000",
+      "0x7f080001"
+    ],
+    "shutdown": "NOT_RUN",
+    "status": "PASS_EXACT_ICON_ONLY_TABLE_TRANSFORM",
+    "table_sha256": "cb3a6f25572858e9fb64dd21713ab1e1c1a0965d0e1d3951c59dd690c9551f5c"
+  },
+  "minimal_Android": "EXACT_CLASSES_DEX_NATIVE_MANIFEST_AND_NONICON_MEMBERS; REVIEWED_ICON_RESOURCES_ONLY",
+  "new_activity_fields": 0,
+  "physical_Fold": "PENDING",
+  "selected_activity_methods": [
+    "private cobraLayoutMultiTiles()V",
+    "private cobraPosition(Landroid/view/View;IIII)V",
+    "private cobraPreviewPanel(Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;Z)Landroid/widget/FrameLayout;",
+    "private cobraProControl(I)V",
+    "private cobraShowMultiLayoutChooser()V",
+    "private cobraSportsLoadLogo(Ljava/lang/String;Landroid/widget/ImageView;)V",
+    "private showCobraMultiTileActions(I)V",
+    "public onBackPressed()V",
+    "synthetic lambda$cobraSportsLoadLogo$481$com-projectinfinity-kodi-InfinityLiveActivity(Ljava/lang/String;Landroid/graphics/Bitmap;Landroid/widget/ImageView;)V"
+  ],
+  "shutdown": "FROZEN_NOT_RUN",
+  "source": "b41d51daa8b32dfee265dc9ea0abf844bff8f44e",
+  "status": "EXACT_COBRA_DELTA_AND_VERSION_WORDING_VERIFIED",
+  "unchanged_activity_methods": 1793,
+  "unchanged_existing_classes": 7271,
+  "user_device_operations": false
+}

@@ -1,0 +1,96 @@
+{
+  "run": 40975410956,
+  "status": "completed",
+  "conclusion": "cancelled",
+  "reason": "Incorrect source_ref submitted; cancelled during checkout before emulator/install. Superseded by40975572601 with git-derived full source SHA.",
+  "selected_job": {
+    "completedAt": "2026-10-29T23:47:31Z",
+    "conclusion": "cancelled",
+    "databaseId": 123802103989,
+    "name": "Exact signed Cobra-only Android17 launch observation",
+    "startedAt": "2026-10-29T23:46:46Z",
+    "status": "completed",
+    "steps": [
+      {
+        "conclusion": "success",
+        "name": "Set up job",
+        "number": 1,
+        "status": "completed"
+      },
+      {
+        "conclusion": "failure",
+        "name": "Run actions/checkout@v4",
+        "number": 2,
+        "status": "completed"
+      },
+      {
+        "conclusion": "skipped",
+        "name": "Run actions/setup-java@v4",
+        "number": 3,
+        "status": "completed"
+      },
+      {
+        "conclusion": "skipped",
+        "name": "Run actions/setup-python@v5",
+        "number": 4,
+        "status": "completed"
+      },
+      {
+        "conclusion": "skipped",
+        "name": "Preflight probe interpreter before SDK/emulator work",
+        "number": 5,
+        "status": "completed"
+      },
+      {
+        "conclusion": "skipped",
+        "name": "Run actions/download-artifact@v4",
+        "number": 6,
+        "status": "completed"
+      },
+      {
+        "conclusion": "skipped",
+        "name": "Run android-actions/setup-android@v4",
+        "number": 7,
+        "status": "completed"
+      },
+      {
+        "conclusion": "skipped",
+        "name": "Prepare exact API37 infrastructure and verify original signing",
+        "number": 8,
+        "status": "completed"
+      },
+      {
+        "conclusion": "skipped",
+        "name": "Prepare only selected signed-candidate synthetic video source",
+        "number": 9,
+        "status": "completed"
+      },
+      {
+        "conclusion": "skipped",
+        "name": "Run reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d",
+        "number": 10,
+        "status": "completed"
+      },
+      {
+        "conclusion": "failure",
+        "name": "Run actions/upload-artifact@v4",
+        "number": 11,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "name": "Post Run actions/checkout@v4",
+        "number": 22,
+        "status": "completed"
+      },
+      {
+        "conclusion": "success",
+        "name": "Complete job",
+        "number": 23,
+        "status": "completed"
+      }
+    ],
+    "url": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/40975410956/job/123802103989"
+  },
+  "APK_or_user_device_changed": false
+}

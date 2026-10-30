@@ -4,7 +4,7 @@
   "full_brief_read": true,
   "production_implementation_started": true,
   "current_build": "/workspace/cobra-evidence/build431",
-  "build_status": "431_CI_NATIVE_ICON_AND_BUTTONS_PASS; EXACT_OWNER_GEN16_REGISTERED; FINAL_SIGNING_NEXT",
+  "build_status": "SIGNED431_ORIGINAL_KEY_AND_INDEPENDENT_BYTES_PASS; FINAL_TARGET_QA_IN_PROGRESS",
   "baseline_apk": "/workspace/infinity-evidence/continuation2103427/signed27-ci/Infinity-2103427-Combined-Original-Signer.apk",
   "baseline_components": "/workspace/infinity-evidence/continuation2103427/components27-ci",
   "actual_baseline_smali": "/workspace/cobra-evidence/baseline/COBRA/smali-0/com/projectinfinity/kodi/InfinityLiveActivity.smali",
@@ -16,7 +16,7 @@
   "maven": "/workspace/cobra-evidence/maven/apache-maven-3.9.9/bin/mvn",
   "selected_scope": "SCOPE.json",
   "source_budget": "SOURCE-BUDGET.json",
-  "next": "Commitregisteredgen16andtriggerexistingsoleoriginalsigner. Independentlyverifydownloaded431APK+4ZIPs against430/27, thenfocusedexact431Androidicon/buttonjourney. NootherAPKdelivery,shutdownorlockpromotion.",
+  "next": "Inspect existing Android40976739449 evidence before further execution. Same signed431 only; finalize reports, no rebuild/sign/shutdown/lock promotion.",
   "found_defects": [
     "Existing MultiView chooser has Fit/Fill only; no11arrangements",
     "NonPro preview More precedes Fullscreen/PiP; classic and Pro full strip alreadyMoreLast (preserve)",
@@ -35,10 +35,10 @@
   ],
   "shutdown": "NOT_RUN_FROZEN",
   "Infinity": "EXACT_2103427_FROZEN_ZIP",
-  "git_status": "Signed production and two QA observer corrections committed; final reports/evidence pending documentation-only commit.",
+  "git_status": "Signed production frozen. Final QA committed and pushed; documentation/evidence pending final outcome.",
   "host_tests": "/workspace/cobra-evidence/host30-v10",
   "baseline_host": "/workspace/cobra-evidence/host-baseline",
-  "gate_controls": "23 LOCAL PASS; final producer/signing pending",
+  "gate_controls": "23 PASS IN SIGNING40971769136",
   "prior_host_run": 40807697956,
   "baseline_android_setup_failure": 40807700925,
   "producer_source": "b41d51daa8b32dfee265dc9ea0abf844bff8f44e",
@@ -70,19 +70,30 @@
   "previous29_current_android_run": 40820333003,
   "previous29_current_android_result": "SUCCESS_SELECTED_ALL11_AND_RENDERED_SWAP_MOBILE",
   "previous29_independent_verification": "results/signed2103429/INDEPENDENT-VERIFICATION.json",
-  "current_signed_source": null,
-  "current_signed_run": null,
-  "current_android_run": null,
-  "current_signed_APK_sha256": null,
-  "current_QA_source": "e2db68473d60b033be142a5df11fe2c962293b8e",
-  "independent_verification": "results/signed2103430/INDEPENDENT-VERIFICATION.json",
+  "current_signed_source": "9ccc4c362a65118eeba38a8e7e4b0de5723c69af",
+  "current_signed_run": 40971769136,
+  "current_android_run": 40976739449,
+  "current_signed_APK_sha256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471",
+  "current_QA_source": "8146d518eedecb22cd417785f88aa10ce2a9d608",
+  "independent_verification": "results/signed2103431/INDEPENDENT-VERIFICATION.json",
   "current_android_previous_runs": [
     40966613409,
-    40968746929
+    40968746929,
+    40969008032,
+    40972601469,
+    40973858059,
+    40975410956,
+    40975572601
   ],
   "current_android_previous_failures": [
-    "Native M3U picker QA clickable-label assumption before button testing; four framework icon lookupsPASS, Home default-iconfallbackunresolved",
-    "Checkout-only shortref failure; emulator/installneverran"
+    "430 initial native M3U picker QA clickable-label assumption; before button actions",
+    "Checkout-only shortref failure; no emulator/install",
+    "430 real density override ResourceID0; fixed431. Pro hidden-strip QA bootstrap failure separately retained",
+    "431 ADB install response timed out30s; PackageInstaller completed; no Activity launch. QA now confirms installed public APK hash without retrying uncertain install",
+    "431 Fullscreen passed; measured More coordinate, unobserved intervening native reveal/layout then real systemPiP. Final pointer recipient undetermined; QA fresh final measurement correction",
+    "Cancelled invalid source_ref during checkout only; emulator/install skipped",
+    "431 fresh-target guard stopped before More press: extraQA reveal moved More from858..1016 to1011..1016(5px) andPiP to853..1011 under old937,827. Fullscreenpassed. CurrentQA removes intervening reveal/screenshot and observes actualscrolled bounds withcompressednativehierarchy; keeps3.5s/4s/30s/7bounds."
   ],
-  "current_signed_candidate": "NONE; unaccepted430 superseded due density420 icon resource failure"
+  "current_signed_candidate": "2103431_UNACCEPTED_DEVICE_QA_PENDING",
+  "actual_icon_observation": "431 Android37 AppInfo lightwhiteblack/darknavycyan; PixelLauncher AllApps retains light cached bitmap after dark switch; Samsung unverified"
 }

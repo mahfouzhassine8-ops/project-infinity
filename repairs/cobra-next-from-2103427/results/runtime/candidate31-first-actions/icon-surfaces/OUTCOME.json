@@ -1,0 +1,868 @@
+{
+  "scope": "UNCHANGED_SIGNED431_NORMAL_SETTINGS_AND_NATIVE_ALL_APPS_ICON_SURFACES",
+  "receipt_apk_sha256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471",
+  "versionCode": 2103431,
+  "APK_binding": "Parent signature/hash/install probe binds the exact signed APK",
+  "Infinity": "NOT_LAUNCHED",
+  "shutdown": "NOT_RUN",
+  "physical_Samsung": "NOT_RUN",
+  "appearance": "NOT_ASSERTED; INSPECT_NATIVE_FRAMES",
+  "operations": [
+    {
+      "adb": [
+        "get-serialno"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "getprop",
+        "ro.build.version.sdk"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "getprop",
+        "ro.kernel.qemu"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "dumpsys",
+        "package",
+        "com.projectinfinity.kodi"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "uiautomator",
+        "dump",
+        "/sdcard/infinity-icon-surface-qa.xml"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cat",
+        "/sdcard/infinity-icon-surface-qa.xml"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "exec-out",
+        "screencap",
+        "-p"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cmd",
+        "uimode",
+        "night"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cmd",
+        "package",
+        "resolve-activity",
+        "--brief",
+        "-a",
+        "android.intent.action.MAIN",
+        "-c",
+        "android.intent.category.HOME"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cmd",
+        "package",
+        "resolve-activity",
+        "--brief",
+        "-a",
+        "android.settings.APPLICATION_DETAILS_SETTINGS",
+        "-d",
+        "package:com.projectinfinity.kodi"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "wm",
+        "size"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cmd",
+        "uimode",
+        "night",
+        "no"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cmd",
+        "uimode",
+        "night"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "am",
+        "get-config"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cmd",
+        "package",
+        "resolve-activity",
+        "-a",
+        "android.intent.action.MAIN",
+        "-c",
+        "android.intent.category.LAUNCHER",
+        "-p",
+        "com.projectinfinity.kodi"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "am",
+        "start",
+        "-W",
+        "-a",
+        "android.settings.APPLICATION_DETAILS_SETTINGS",
+        "-d",
+        "package:com.projectinfinity.kodi"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "uiautomator",
+        "dump",
+        "/sdcard/infinity-icon-surface-qa.xml"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cat",
+        "/sdcard/infinity-icon-surface-qa.xml"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "exec-out",
+        "screencap",
+        "-p"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "uiautomator",
+        "dump",
+        "/sdcard/infinity-icon-surface-qa.xml"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cat",
+        "/sdcard/infinity-icon-surface-qa.xml"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "exec-out",
+        "screencap",
+        "-p"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "input",
+        "keyevent",
+        "KEYCODE_HOME"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "uiautomator",
+        "dump",
+        "/sdcard/infinity-icon-surface-qa.xml"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cat",
+        "/sdcard/infinity-icon-surface-qa.xml"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "exec-out",
+        "screencap",
+        "-p"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "input",
+        "keyevent",
+        "284"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "uiautomator",
+        "dump",
+        "/sdcard/infinity-icon-surface-qa.xml"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cat",
+        "/sdcard/infinity-icon-surface-qa.xml"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "exec-out",
+        "screencap",
+        "-p"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cmd",
+        "uimode",
+        "night",
+        "yes"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cmd",
+        "uimode",
+        "night"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "am",
+        "get-config"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cmd",
+        "package",
+        "resolve-activity",
+        "-a",
+        "android.intent.action.MAIN",
+        "-c",
+        "android.intent.category.LAUNCHER",
+        "-p",
+        "com.projectinfinity.kodi"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "am",
+        "start",
+        "-W",
+        "-a",
+        "android.settings.APPLICATION_DETAILS_SETTINGS",
+        "-d",
+        "package:com.projectinfinity.kodi"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "uiautomator",
+        "dump",
+        "/sdcard/infinity-icon-surface-qa.xml"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cat",
+        "/sdcard/infinity-icon-surface-qa.xml"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "exec-out",
+        "screencap",
+        "-p"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "input",
+        "keyevent",
+        "KEYCODE_HOME"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "uiautomator",
+        "dump",
+        "/sdcard/infinity-icon-surface-qa.xml"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cat",
+        "/sdcard/infinity-icon-surface-qa.xml"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "exec-out",
+        "screencap",
+        "-p"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "input",
+        "keyevent",
+        "284"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "uiautomator",
+        "dump",
+        "/sdcard/infinity-icon-surface-qa.xml"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cat",
+        "/sdcard/infinity-icon-surface-qa.xml"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "exec-out",
+        "screencap",
+        "-p"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cmd",
+        "uimode",
+        "night",
+        "no"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "am",
+        "start",
+        "-W",
+        "-n",
+        "com.projectinfinity.kodi/.InfinityLiveActivity"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "uiautomator",
+        "dump",
+        "/sdcard/infinity-icon-surface-qa.xml"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cat",
+        "/sdcard/infinity-icon-surface-qa.xml"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "exec-out",
+        "screencap",
+        "-p"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "logcat",
+        "-d",
+        "-v",
+        "threadtime"
+      ],
+      "returncode": 0
+    }
+  ],
+  "modes": {
+    "no": {
+      "requested_night_mode": "no",
+      "appearance": "UNVERIFIED_NATIVE_FRAMES",
+      "AppInfo": {
+        "frames": [
+          {
+            "XML": "Settings-AppInfo-1.xml",
+            "PNG": "Settings-AppInfo-1.png",
+            "dump_returncode": 0,
+            "screenshot_returncode": 0,
+            "XML_parse_error": null,
+            "packages": [
+              "com.projectinfinity.kodi"
+            ]
+          },
+          {
+            "XML": "Settings-AppInfo-2.xml",
+            "PNG": "Settings-AppInfo-2.png",
+            "dump_returncode": 0,
+            "screenshot_returncode": 0,
+            "XML_parse_error": null,
+            "packages": [
+              "com.android.settings"
+            ]
+          }
+        ],
+        "native_Settings_Infinity_heading_observed": true,
+        "native_icon_candidates": [],
+        "labels": [
+          "Infinity",
+          "Archive",
+          "Uninstall",
+          "Force stop",
+          "Notifications",
+          "Off",
+          "Permissions",
+          "Nearby devices",
+          "Storage & cache",
+          "478 MB used in internal storage",
+          "Mobile data usage",
+          "No data used",
+          "Screen time",
+          "Less than 1 minute today",
+          "App battery usage",
+          "Navigate up",
+          "App info",
+          "Open"
+        ]
+      },
+      "AllApps": {
+        "home_frames": [
+          {
+            "XML": "Home-before-AllApps-1.xml",
+            "PNG": "Home-before-AllApps-1.png",
+            "dump_returncode": 0,
+            "screenshot_returncode": 0,
+            "XML_parse_error": null,
+            "packages": [
+              "com.google.android.apps.nexuslauncher",
+              "com.google.android.googlequicksearchbox"
+            ]
+          }
+        ],
+        "native_workspace_observed_before_AllApps": true,
+        "key_frames": [
+          {
+            "XML": "AllApps-key-1.xml",
+            "PNG": "AllApps-key-1.png",
+            "dump_returncode": 0,
+            "screenshot_returncode": 0,
+            "XML_parse_error": null,
+            "packages": [
+              "com.google.android.apps.nexuslauncher",
+              "com.google.android.googlequicksearchbox"
+            ]
+          }
+        ],
+        "native_state": "NATIVE_ALL_APPS",
+        "state_markers": [
+          {
+            "text": "",
+            "content-desc": "",
+            "resource-id": "com.google.android.apps.nexuslauncher:id/apps_view",
+            "class": "android.widget.RelativeLayout",
+            "package": "com.google.android.apps.nexuslauncher",
+            "bounds": "[0,0][1080,1920]",
+            "clickable": "false"
+          },
+          {
+            "text": "",
+            "content-desc": "",
+            "resource-id": "com.google.android.apps.nexuslauncher:id/apps_list_view",
+            "class": "android.widget.GridView",
+            "package": "com.google.android.apps.nexuslauncher",
+            "bounds": "[0,244][1080,1920]",
+            "clickable": "false"
+          },
+          {
+            "text": "",
+            "content-desc": "",
+            "resource-id": "com.google.android.apps.nexuslauncher:id/all_apps_header",
+            "class": "android.widget.LinearLayout",
+            "package": "com.google.android.apps.nexuslauncher",
+            "bounds": "[0,244][1080,376]",
+            "clickable": "false"
+          }
+        ],
+        "native_Infinity_items": [
+          {
+            "text": "Infinity",
+            "content-desc": "Infinity",
+            "resource-id": "com.google.android.apps.nexuslauncher:id/icon",
+            "class": "android.widget.TextView",
+            "package": "com.google.android.apps.nexuslauncher",
+            "bounds": "[285,769][540,984]",
+            "clickable": "true"
+          },
+          {
+            "text": "Infinity",
+            "content-desc": "Infinity",
+            "resource-id": "",
+            "class": "android.widget.TextView",
+            "package": "com.google.android.apps.nexuslauncher",
+            "bounds": "[839,1434][983,1597]",
+            "clickable": "true"
+          }
+        ],
+        "labels": [
+          "Search",
+          "Google app",
+          "Search web and more",
+          "Voice search",
+          "Google Lens",
+          "Calendar",
+          "Camera",
+          "Chrome",
+          "Clock",
+          "Contacts",
+          "Drive",
+          "Files",
+          "Gmail",
+          "Google",
+          "Infinity",
+          "Maps",
+          "Messages",
+          "Phone",
+          "Photos",
+          "Safety",
+          "Settings",
+          "TMoble",
+          "YouTube",
+          "YT Music",
+          "Home",
+          "Phone",
+          "Messages",
+          "Chrome",
+          "Infinity",
+          "Google"
+        ]
+      },
+      "set_night_mode": {
+        "stdout": "Night mode: no\n",
+        "stderr": "",
+        "returncode": 0
+      },
+      "actual_uimode": "Night mode: no\n",
+      "configuration": "config: mcc310-mnc260-en-rUS-ldltr-sw411dp-w411dp-h731dp-normal-long-notround-nowidecg-lowdr-port-notnight-420dpi-finger-keysexposed-qwerty-navhidden-nonav-1920x1080-v37\nabi: x86_64,arm64-v8a\n",
+      "status": "CAPTURED_NATIVE_SURFACES_APPEARANCE_REQUIRES_REVIEW"
+    },
+    "yes": {
+      "requested_night_mode": "yes",
+      "appearance": "UNVERIFIED_NATIVE_FRAMES",
+      "AppInfo": {
+        "frames": [
+          {
+            "XML": "Settings-AppInfo-1.xml",
+            "PNG": "Settings-AppInfo-1.png",
+            "dump_returncode": 0,
+            "screenshot_returncode": 0,
+            "XML_parse_error": null,
+            "packages": [
+              "com.android.settings"
+            ]
+          }
+        ],
+        "native_Settings_Infinity_heading_observed": true,
+        "native_icon_candidates": [],
+        "labels": [
+          "Infinity",
+          "Archive",
+          "Uninstall",
+          "Force stop",
+          "Notifications",
+          "Off",
+          "Permissions",
+          "Nearby devices",
+          "Storage & cache",
+          "478 MB used in internal storage",
+          "Mobile data usage",
+          "No data used",
+          "Screen time",
+          "Less than 1 minute today",
+          "App battery usage",
+          "Navigate up",
+          "App info",
+          "Open"
+        ]
+      },
+      "AllApps": {
+        "home_frames": [
+          {
+            "XML": "Home-before-AllApps-1.xml",
+            "PNG": "Home-before-AllApps-1.png",
+            "dump_returncode": 0,
+            "screenshot_returncode": 0,
+            "XML_parse_error": null,
+            "packages": [
+              "com.google.android.apps.nexuslauncher",
+              "com.google.android.googlequicksearchbox"
+            ]
+          }
+        ],
+        "native_workspace_observed_before_AllApps": true,
+        "key_frames": [
+          {
+            "XML": "AllApps-key-1.xml",
+            "PNG": "AllApps-key-1.png",
+            "dump_returncode": 0,
+            "screenshot_returncode": 0,
+            "XML_parse_error": null,
+            "packages": [
+              "com.google.android.apps.nexuslauncher",
+              "com.google.android.googlequicksearchbox"
+            ]
+          }
+        ],
+        "native_state": "NATIVE_ALL_APPS",
+        "state_markers": [
+          {
+            "text": "",
+            "content-desc": "",
+            "resource-id": "com.google.android.apps.nexuslauncher:id/apps_view",
+            "class": "android.widget.RelativeLayout",
+            "package": "com.google.android.apps.nexuslauncher",
+            "bounds": "[0,0][1080,1920]",
+            "clickable": "false"
+          },
+          {
+            "text": "",
+            "content-desc": "",
+            "resource-id": "com.google.android.apps.nexuslauncher:id/apps_list_view",
+            "class": "android.widget.GridView",
+            "package": "com.google.android.apps.nexuslauncher",
+            "bounds": "[0,244][1080,1920]",
+            "clickable": "false"
+          },
+          {
+            "text": "",
+            "content-desc": "",
+            "resource-id": "com.google.android.apps.nexuslauncher:id/all_apps_header",
+            "class": "android.widget.LinearLayout",
+            "package": "com.google.android.apps.nexuslauncher",
+            "bounds": "[0,244][1080,376]",
+            "clickable": "false"
+          }
+        ],
+        "native_Infinity_items": [
+          {
+            "text": "Infinity",
+            "content-desc": "Infinity",
+            "resource-id": "com.google.android.apps.nexuslauncher:id/icon",
+            "class": "android.widget.TextView",
+            "package": "com.google.android.apps.nexuslauncher",
+            "bounds": "[285,769][540,984]",
+            "clickable": "true"
+          },
+          {
+            "text": "Infinity",
+            "content-desc": "Infinity",
+            "resource-id": "",
+            "class": "android.widget.TextView",
+            "package": "com.google.android.apps.nexuslauncher",
+            "bounds": "[839,1434][983,1597]",
+            "clickable": "true"
+          }
+        ],
+        "labels": [
+          "Search",
+          "Google app",
+          "Search web and more",
+          "Voice search",
+          "Google Lens",
+          "Calendar",
+          "Camera",
+          "Chrome",
+          "Clock",
+          "Contacts",
+          "Drive",
+          "Files",
+          "Gmail",
+          "Google",
+          "Infinity",
+          "Maps",
+          "Messages",
+          "Phone",
+          "Photos",
+          "Safety",
+          "Settings",
+          "TMoble",
+          "YouTube",
+          "YT Music",
+          "Home",
+          "Phone",
+          "Messages",
+          "Chrome",
+          "Infinity",
+          "Google"
+        ]
+      },
+      "set_night_mode": {
+        "stdout": "Night mode: yes\n",
+        "stderr": "",
+        "returncode": 0
+      },
+      "actual_uimode": "Night mode: yes\n",
+      "configuration": "config: mcc310-mnc260-en-rUS-ldltr-sw411dp-w411dp-h731dp-normal-long-notround-nowidecg-lowdr-port-night-420dpi-finger-keysexposed-qwerty-navhidden-nonav-1920x1080-v37\nabi: x86_64,arm64-v8a\n",
+      "status": "CAPTURED_NATIVE_SURFACES_APPEARANCE_REQUIRES_REVIEW"
+    }
+  },
+  "errors": [],
+  "serial": "emulator-5554",
+  "sdk": "37",
+  "initial_Cobra_frames": [
+    {
+      "XML": "initial-Cobra-welcome-1.xml",
+      "PNG": "initial-Cobra-welcome-1.png",
+      "dump_returncode": 0,
+      "screenshot_returncode": 0,
+      "XML_parse_error": null,
+      "packages": [
+        "com.projectinfinity.kodi"
+      ]
+    }
+  ],
+  "launcher_package": "com.google.android.apps.nexuslauncher",
+  "settings_package": "com.android.settings",
+  "display": [
+    1080,
+    1920
+  ],
+  "status": "CAPTURED_BOTH_MODES_NATIVE_APPEARANCE_UNVERIFIED",
+  "restore_initial_mode": {
+    "stdout": "Night mode: no\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  "return_Cobra": {
+    "stdout": "Starting: Intent { cmp=com.projectinfinity.kodi/.InfinityLiveActivity }\nWarning: Activity not started, its current task has been brought to the front\nStatus: ok\nLaunchState: HOT\nActivity: com.projectinfinity.kodi/.InfinityLiveActivity\nTotalTime: 713\nWaitTime: 908\nComplete\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  "returned_Cobra_frames": [
+    {
+      "XML": "returned-Cobra-welcome-1.xml",
+      "PNG": "returned-Cobra-welcome-1.png",
+      "dump_returncode": 0,
+      "screenshot_returncode": 0,
+      "XML_parse_error": null,
+      "packages": [
+        "com.projectinfinity.kodi"
+      ]
+    }
+  ],
+  "safe_empty_Cobra_for_independent_buttons": true,
+  "logcat_capture": {
+    "stderr": "",
+    "returncode": 0
+  }
+}

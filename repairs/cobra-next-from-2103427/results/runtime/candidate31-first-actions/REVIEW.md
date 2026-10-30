@@ -1,0 +1,15 @@
+# Signed 2103431 first action observation
+
+Run [40973858059](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/40973858059) used the unchanged signed 2103431 APK, QA source `9e92cb43c6ad5f2057875f217639dfe1aa361786`. Its overall result is **FAILURE**, preserved without relabeling. The artifact archive was verified against its GitHub SHA256 before extraction; exact bindings and selected-file hashes are in `EVIDENCE.json`. The full raw artifact remains available through that record.
+
+The initial visible Fullscreen coordinate press opened the native fullscreen presentation with Return to preview and Multi-View; the corresponding Activity observation was not pinned. `fullscreen-result.png` preserves the rendered result. The journey then returned to Pro through ordinary Back navigation.
+
+After horizontal scrolling, `021-ui.xml` and `before-more.png` show More at bounds `[858,743][1016,911]`, distinct from PiP at `[700,743][858,911]`. The recorded target coordinate `[937,827]` matches that measured More view. However, the QA script then tapped the Hero to reveal controls **between measuring that target and pressing it**. Signed Hero `performClick()` calls `revealControls()`, which updates visibility and requests layout. No hierarchy or frame records the final button geometry after this intervening reveal. Therefore this run cannot establish which actual view received the subsequent press.
+
+The next hierarchy (`022-ui.xml`) belongs to the launcher, and `last-screen.png` shows actual system PiP. The full raw Activity/logcat evidence corroborates a pinned Cobra task. The failure is consequently more than an empty accessibility dump, but it does not prove More's callback was selected. The wait for Channel playback failed; later PiP, scrolling-back, and menu-reopen assertions did not run.
+
+Read-only source comparison found that `proTarget(...,4)` resolves the tagged native More view and its preserved listener opens channel actions. Hero's only explicit scroll reset occurs when `bind()` changes Sports mode; reveal requests layout without an explicit scroll reset. This evidence supports correcting the QA sequence to obtain fresh bounds after revealing and then press without an intervening reveal, screenshot or layout-triggering action. It does not justify changing production dispatch based on this incomplete target observation.
+
+Native Settings App Info and actual All Apps frames were captured in both system modes; the observer reported no surface-operation error. Their raw status remains `CAPTURED_BOTH_MODES_NATIVE_APPEARANCE_UNVERIFIED`. Appearance review must be stated separately; the mere existence of these captures does not certify Samsung launcher/Finder/suggestions or automatic cache refresh.
+
+This was an Android 17 emulator with synthetic QA1, not physical Fold acceptance. Infinity was not launched. No shutdown test, user-device installation, reset, uninstall, production change, signing change or lock promotion is represented by this evidence.

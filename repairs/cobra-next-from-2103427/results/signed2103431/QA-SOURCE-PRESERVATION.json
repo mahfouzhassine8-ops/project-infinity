@@ -1,0 +1,27 @@
+{
+  "status": "PASS_PRODUCTION_BYTES_UNCHANGED_AFTER_SIGNING",
+  "signed_source": "9ccc4c362a65118eeba38a8e7e4b0de5723c69af",
+  "QA_source": "8146d518eedecb22cd417785f88aa10ce2a9d608",
+  "changed_committed_paths": [
+    "repairs/cobra-next-from-2103427/QA-2103431-FINAL-TOUCH-MEASUREMENT.md",
+    "repairs/cobra-next-from-2103427/QA-2103431-INSTALL-CONFIRMATION.md",
+    "repairs/cobra-next-from-2103427/android_button_journey.py",
+    "repairs/cobra-next-from-2103427/android_probe.py",
+    "repairs/cobra-next-from-2103427/results/runtime/candidate31-install-client/EVIDENCE.json",
+    "repairs/cobra-next-from-2103427/results/runtime/candidate31-install-client/OUTCOME.json",
+    "repairs/cobra-next-from-2103427/results/runtime/candidate31-install-client/PACKAGE-INSTALLER-OUTCOME.txt"
+  ],
+  "all_changes_are_QA_or_its_evidence": true,
+  "production_file_sha256": {
+    "repairs/cobra-next-from-2103427/build.py": "bdac2f4e061208258174035ef5a26af7d45a197c3b48550603040a6b494559e7",
+    "repairs/cobra-next-from-2103427/SOURCE-BUDGET.json": "e39ccdaca198faf65b9df0be8beb77fda104a3cedb3e101f7e95caeb0b725efa",
+    "repairs/cobra-next-from-2103427/runtime/CobraArrange.java": "dbfcb846bb69ad427dea612d5eb50894eccc927dbec9ab47c205389bfd9c3c5d",
+    "repairs/cobra-next-from-2103427/runtime/CobraLayoutCatalog.java": "840f8d826813ecf28e7fcbeef61a5aa801d4a2a5819286ca4d5055af99875f6a",
+    "repairs/cobra-next-from-2103427/runtime/CobraLogoRequests.java": "d11670c06c5c2d7136de80f7837c9238111f7d69d968149ef5fdc52f41e45258",
+    "repairs/cobra-next-from-2103427/runtime/CobraPresentation.java": "87cd1fb27ceafa59ade703b803fa740e8cd4c306db098eafac662e7c2ae8f86e"
+  },
+  "APK_sha256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471",
+  "signing_run": 40971769136,
+  "shutdown": "NOT_RUN",
+  "accepted_pointer_updated": false
+}
