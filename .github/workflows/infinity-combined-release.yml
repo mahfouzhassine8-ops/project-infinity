@@ -6,11 +6,21 @@ on:
   workflow_dispatch:
     inputs:
       operation:
-        description: Sign reviewed2103433 final Cards correction candidate
+        description: Prepare authenticated owners or sign one reviewed coordinated434 candidate
         type: choice
         required: true
         default: final-combined
-        options: [final-combined]
+        options: [final-combined, authenticate-infinity-owner]
+      cobra_producer_run:
+        description: Successful source-bound Cobra434 host producer (authentication only)
+        type: string
+        required: false
+        default: '0'
+      infinity_producer_run:
+        description: Successful separate Infinity loading host producer (authentication only)
+        type: string
+        required: false
+        default: '41076160374'
 permissions:
   contents: read
   actions: read
@@ -18,6 +28,98 @@ concurrency:
   group: infinity-combined-original-key-release
   cancel-in-progress: false
 jobs:
+  authenticate-infinity-owner:
+    name: Authenticate separately verified Infinity434 and prepare coordinated owners only
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/cobra-only-from-2103427-20261028' && inputs.operation == 'authenticate-infinity-owner'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      GH_TOKEN: ${{ github.token }}
+      LOADING_OPERATION: authenticate-infinity-owner
+      COBRA_PRODUCER_RUN: ${{ inputs.cobra_producer_run }}
+      INFINITY_PRODUCER_RUN: ${{ inputs.infinity_producer_run }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '21'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Admit exact selected source and focused release protocol
+        run: |
+          set -euo pipefail
+          test "$COBRA_PRODUCER_RUN" -gt 0
+          test "$INFINITY_PRODUCER_RUN" -gt 0
+          python3 -m pip install Pillow==12.3.0 PyYAML==6.0.3
+          python3 repairs/cobra-next-from-2103427/cards-from-2103431/consolidated434/test_release_protocol.py
+          python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out AUTHENTICATION-SIGNER-ROUTES.json
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 41040277352
+          name: Infinity-Combined-Owner-Components-41040277352
+          github-token: ${{ github.token }}
+          path: protected433-components
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ inputs.cobra_producer_run }}
+          name: Cobra-Cards-Prepared-Owners-${{ inputs.cobra_producer_run }}
+          github-token: ${{ github.token }}
+          path: cobra434-components
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ inputs.cobra_producer_run }}
+          name: Cobra-Cards-Host-Evidence-${{ inputs.cobra_producer_run }}
+          github-token: ${{ github.token }}
+          path: cobra434-evidence
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ inputs.infinity_producer_run }}
+          name: Infinity-Seamless-Loading-Host-Evidence-${{ inputs.infinity_producer_run }}
+          github-token: ${{ github.token }}
+          path: loading434-evidence
+      - name: Recheck both official owner producers before module-key access
+        run: |
+          python3 repairs/cobra-next-from-2103427/cards-from-2103431/consolidated434/prepare_combined.py precheck \
+            --cobra-components cobra434-components --cobra-evidence cobra434-evidence \
+            --cobra-run "$COBRA_PRODUCER_RUN" \
+            --loading-evidence loading434-evidence --loading-run "$INFINITY_PRODUCER_RUN" \
+            --out owner-precheck
+      - name: Authenticate only the tested76-file Infinity source with the original key
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          python3 repairs/infinity-seamless-loading-2103433/authenticate.py \
+            --baseline protected433-components/INFINITY.zip --evidence loading434-evidence \
+            --producer-run "$INFINITY_PRODUCER_RUN" --out infinity434-authenticated
+      - name: Integrate exact authenticated owners and genuine version metadata without APK creation
+        run: |
+          python3 repairs/cobra-next-from-2103427/cards-from-2103431/consolidated434/prepare_combined.py finish \
+            --precheck owner-precheck --authenticated infinity434-authenticated \
+            --loading-evidence loading434-evidence --cobra-components cobra434-components --out prepared434
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Coordinated434-Prepared-Owners-${{ github.run_id }}
+          path: prepared434/
+          if-no-files-found: error
+          retention-days: 90
+          compression-level: 0
+      - name: Preserve preparation diagnostics without private key material
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Coordinated434-Preparation-Evidence-${{ github.run_id }}
+          path: |
+            AUTHENTICATION-SIGNER-ROUTES.json
+            owner-precheck/PRECHECK.json
+            infinity434-authenticated/AUTHENTICATED-OWNER.json
+            infinity434-authenticated/MODULE-AUTHENTICATION.txt
+            prepared434/COORDINATED-OWNERS.json
+          if-no-files-found: warn
+          retention-days: 90
   combined:
     if: github.ref == 'refs/heads/work/cobra-only-from-2103427-20261028' && (github.event_name == 'push' || inputs.operation == 'final-combined')
     runs-on: ubuntu-22.04
@@ -48,7 +150,7 @@ jobs:
           import os
           from release_gate import remote_authority
           for name in Path('release-evidence/CHANGED-PATHS.txt').read_text().splitlines():
-              if not (name.startswith('repairs/cobra-next-from-2103427/') or name in (
+              if not (name.startswith(('repairs/cobra-next-from-2103427/','repairs/infinity-seamless-loading-2103433/')) or name in (
                   'repairs/dual-experience-isolation-2103420/release_gate.py',
                   'repairs/dual-experience-isolation-2103420/release_authority.py',
                   'repairs/dual-experience-isolation-2103420/ownership-reviewed-roots.json',
@@ -86,29 +188,14 @@ jobs:
           cp combined-build/ASSEMBLY.json release-evidence/
           cp repairs/dual-experience-isolation-2103420/release-authority.json release-evidence/
           cp -r repairs/dual-experience-isolation-2103420/results/scoped-correction/final release-evidence/focused-evidence
-      - name: Verify registered Cards producer evidence before keys
+      - name: Verify official coordinated owner and authentication evidence before APK keys
         run: |
           set -euo pipefail
-          python3 - <<'PY'
-          import subprocess
-          from pathlib import Path
-          from zipfile import ZipFile
-          from inventory import load,file_sha,validate_names
-          from release_gate import require
-          a=load(Path('repairs/dual-experience-isolation-2103420/release-authority.json'))
-          e=a['owner_update_evidence']; name='Cobra-Cards-Host-Evidence-'+str(e['producer_run'])
-          row=e['artifacts'][name]; archive=Path('cards-evidence.zip')
-          with archive.open('wb') as stream:
-              subprocess.run(['gh','api','repos/mahfouzhassine8-ops/project-infinity/actions/artifacts/'+str(row['id'])+'/zip'],stdout=stream,check=True)
-          require(file_sha(archive)==row['digest'].removeprefix('sha256:'),'OFFICIAL_CARDS_EVIDENCE')
-          with ZipFile(archive) as z:
-              validate_names(z);z.extractall('reviewed-cards-evidence')
-          PY
-          python3 repairs/cobra-next-from-2103427/cards-from-2103431/register_release.py \
-            --check-registered --bundles combined-build/components \
-            --evidence reviewed-cards-evidence --evidence-archive cards-evidence.zip
-          cp reviewed-cards-evidence/PRODUCER-RESULT.json release-evidence/CARDS-PRODUCER-RESULT.json
-          cp cards-evidence.zip release-evidence/CARDS-PRODUCER-EVIDENCE.zip
+          python3 repairs/cobra-next-from-2103427/cards-from-2103431/consolidated434/register_combined.py check-registered \
+            --bundles combined-build/components --work registered434-evidence
+          cp registered434-evidence/REGISTERED434-CHECK.json release-evidence/
+          cp registered434-evidence/prepared/COORDINATED-OWNERS.json release-evidence/
+          cp registered434-evidence/prepared/MODULE-AUTHENTICATION.txt release-evidence/
       - name: Hard pre-sign gate against fresh actual APK contents
         run: |
           set -euo pipefail
@@ -146,11 +233,19 @@ jobs:
           name: Infinity-Combined-Original-Signer-41021114800
           github-token: ${{ github.token }}
           path: previous2103432
+      - name: Recover protected signed2103433 for full current-owner comparison
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 41040277352
+          name: Infinity-Combined-Original-Signer-41040277352
+          github-token: ${{ github.token }}
+          path: previous2103433
       - name: Verify signed APK and exact matching components; no runtime execution
         run: |
-          python3 repairs/cobra-next-from-2103427/cards-from-2103431/verify_delivery.py \
-            --baseline previous2103431/Infinity-2103431-Combined-Original-Signer.apk \
-            --previous previous2103432/Infinity-2103432-Combined-Original-Signer.apk \
+          python3 repairs/cobra-next-from-2103427/cards-from-2103431/consolidated434/verify_delivery.py \
+            --recovery431 previous2103431/Infinity-2103431-Combined-Original-Signer.apk \
+            --recovery432 previous2103432/Infinity-2103432-Combined-Original-Signer.apk \
+            --baseline433 previous2103433/Infinity-2103433-Combined-Original-Signer.apk \
             --signed signed-combined --bundles combined-build/components \
             --sdk "$ANDROID_HOME/build-tools/35.0.0"
       - name: Upload signed install-over candidate
