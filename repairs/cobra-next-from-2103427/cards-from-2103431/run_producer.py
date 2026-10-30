@@ -183,7 +183,13 @@ def run(apk, bundles, jars, android, d8, dex2jar, maven, out, source, run_id):
         save(evidence / "PRODUCER-RESULT.json", result)
         # Local protocol consumption checks source/DEX/package/selected JUnit;
         # successful GitHub-run/artifact-archive checks occur after upload.
-        previous = register_release.previous_authority()
+        # This unapproved producer envelope intentionally retains immutable433
+        # Infinity. It is not the current release authority and cannot be signed
+        # or registered alone; the combined release validates current434 lineage
+        # and merges the independently authenticated new Infinity owner.
+        previous = register_release.signed432_authority()
+        require(previous["candidate_versionCode"] == 2103433 and previous["generation"] == 18,
+                "Exact immutable433 producer comparison required")
         register_release.validate_payload(previous, read(components / "catalog.json"), components)
         register_release.validate_ci(evidence, components / "catalog.json", run_id, source, previous)
     except Exception as error:
