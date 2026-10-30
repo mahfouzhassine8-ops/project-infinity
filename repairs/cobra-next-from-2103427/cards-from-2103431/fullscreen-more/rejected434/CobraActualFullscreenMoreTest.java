@@ -87,6 +87,10 @@ public class CobraActualFullscreenMoreTest {
  @Test public void actualPreviewFullscreenThenMoreUsesProductionOverlay()throws Exception{
   CobraCardsLayoutTest.Fixture f=fixture();actualPreviewPress(f);View more=icon((View)get(f.a,"mPlayerChrome"),"more");f.press(more);pulses(20);
   save("ACTUAL-PREVIEW-FULLSCREEN-MORE",report(f));assertEquals(1,moreCalls);assertSheetVisible(f,"player-settings");assertSame(f.player,get(f.a,"mPlayer"));
+  View overlay=(View)get(f.a,"mPlayerOverlay");long stamp=android.os.SystemClock.uptimeMillis();
+  f.a.dispatchKeyEvent(new KeyEvent(stamp,stamp,KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_BACK,0));f.a.dispatchKeyEvent(new KeyEvent(stamp,stamp+32,KeyEvent.ACTION_UP,KeyEvent.KEYCODE_BACK,0));pulses(8);
+  assertNull("Back closes only the original sheet",get(f.a,"mCobraActionSheet"));assertSame(overlay,get(f.a,"mPlayerOverlay"));assertSame(f.player,get(f.a,"mPlayer"));
+  more=icon((View)get(f.a,"mPlayerChrome"),"more");f.press(more);pulses(20);assertEquals(2,moreCalls);assertSheetVisible(f,"player-settings");assertSame(f.player,get(f.a,"mPlayer"));save("ACTUAL-REOPENED-FULLSCREEN-MORE",report(f));
  }
  @Test public void actualFullscreenMenuSurvivesNativeChromeRevealAndLayout()throws Exception{
   CobraCardsLayoutTest.Fixture f=fixture();actualPreviewPress(f);View overlay=(View)get(f.a,"mPlayerOverlay");

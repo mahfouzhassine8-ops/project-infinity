@@ -1,0 +1,227 @@
+{
+  "scope": "UNCHANGED_REJECTED434_CARDS_SUN_FULLSCREEN_MORE",
+  "APK_sha256": "16f02a9625c057a3fe4d4b55da8a554fdb2bff0f1b19c8f567bdf56af41eb465",
+  "source": "7bf6f2bddceca6dbc90e696766d9f46e3d8a69b6",
+  "physical_Fold": "NOT_RUN",
+  "Infinity": "NOT_LAUNCHED",
+  "shutdown": "NOT_RUN",
+  "driver_returncode": 137,
+  "native": {
+    "scope": "EXACT_REJECTED434_CARDS_SUN_FULLSCREEN_MORE",
+    "steps": [
+      {
+        "OS_window_input_sync_ms": 56
+      },
+      {
+        "observed": "(?m)^\\+?\\s*ADD TV SOURCE$",
+        "bounds": [
+          36,
+          1599,
+          1044,
+          1773
+        ],
+        "root_query_ms": 34
+      },
+      {
+        "observed": "(?m)^\\+?\\s*ADD TV SOURCE$",
+        "bounds": [
+          36,
+          1599,
+          1044,
+          1773
+        ],
+        "root_query_ms": 2
+      },
+      {
+        "coordinate_press": "(?m)^\\+?\\s*ADD TV SOURCE$",
+        "bounds": [
+          36,
+          1599,
+          1044,
+          1773
+        ],
+        "down_injected": true,
+        "up_injected": true
+      },
+      {
+        "OS_window_input_sync_ms": 21
+      },
+      {
+        "OS_window_input_sync_ms": 24
+      },
+      {
+        "coordinate_press": "Original Android dialog item (?m)^M3U / M3U8 playlist$",
+        "bounds": [
+          27,
+          1246,
+          1053,
+          1390
+        ],
+        "down_injected": true,
+        "up_injected": true
+      },
+      {
+        "OS_window_input_sync_ms": 10
+      },
+      {
+        "OS_window_input_sync_ms": 16
+      },
+      {
+        "normal_source_form_field": 0
+      },
+      {
+        "normal_source_form_field": 1
+      },
+      {
+        "normal_source_form_field": 2
+      },
+      {
+        "OS_window_input_sync_ms": 9
+      },
+      {
+        "observed": "(?m)^TEST & SAVE$",
+        "bounds": [
+          696,
+          1552,
+          1017,
+          1714
+        ],
+        "root_query_ms": 27
+      },
+      {
+        "observed": "(?m)^TEST & SAVE$",
+        "bounds": [
+          696,
+          1552,
+          1017,
+          1714
+        ],
+        "root_query_ms": 2
+      },
+      {
+        "coordinate_press": "(?m)^TEST & SAVE$",
+        "bounds": [
+          696,
+          1552,
+          1017,
+          1714
+        ],
+        "down_injected": true,
+        "up_injected": true
+      },
+      {
+        "OS_window_input_sync_ms": 17
+      },
+      {
+        "OS_window_input_sync_ms": 21
+      },
+      {
+        "observed": "(?m)^Choose one of five view modes$|^Choose view mode$|^Views$",
+        "bounds": [
+          798,
+          2280,
+          1056,
+          2448
+        ],
+        "root_query_ms": 77
+      },
+      {
+        "observed": "(?m)^Choose one of five view modes$|^Choose view mode$|^Views$",
+        "bounds": [
+          798,
+          2280,
+          1056,
+          2448
+        ],
+        "root_query_ms": 22
+      },
+      {
+        "coordinate_press": "(?m)^Choose one of five view modes$|^Choose view mode$|^Views$",
+        "bounds": [
+          798,
+          2280,
+          1056,
+          2448
+        ],
+        "down_injected": true,
+        "up_injected": true
+      },
+      {
+        "OS_window_input_sync_ms": 80
+      },
+      {
+        "OS_window_input_sync_ms": 27
+      },
+      {
+        "real_sheet_swipe": [
+          72,
+          978,
+          1008,
+          2418
+        ]
+      },
+      {
+        "OS_window_input_sync_ms": 68
+      },
+      {
+        "OS_window_input_sync_ms": 58
+      },
+      {
+        "observed": "(?m)^Cards(?:,.*)?$",
+        "bounds": [
+          84,
+          1789,
+          996,
+          2211
+        ],
+        "root_query_ms": 90
+      },
+      {
+        "observed": "(?m)^Cards(?:,.*)?$",
+        "bounds": [
+          84,
+          1789,
+          996,
+          2211
+        ],
+        "root_query_ms": 134
+      },
+      {
+        "coordinate_press": "(?m)^Cards(?:,.*)?$",
+        "bounds": [
+          84,
+          1789,
+          996,
+          2211
+        ],
+        "down_injected": true,
+        "up_injected": true
+      },
+      {
+        "OS_window_input_sync_ms": 12
+      },
+      {
+        "coordinate_press": "Current Cards preview",
+        "bounds": [
+          16,
+          205,
+          562,
+          620
+        ],
+        "down_injected": true,
+        "up_injected": true
+      },
+      {
+        "OS_window_input_sync_ms": 12
+      }
+    ],
+    "physical_Fold": "NOT_RUN",
+    "shutdown": "NOT_RUN",
+    "application_classpath": "/system/framework/android.test.runner.jar:/system/framework/uiautomator.jar:/data/local/tmp/CobraFoldMoreDriver.jar",
+    "BOOTCLASSPATH": "INHERITED_UNCHANGED",
+    "status": "FAILED_CLOSED",
+    "error": "java.lang.IllegalStateException: Original fullscreen chrome did not hide within observation limit"
+  },
+  "status": "BLOCKED_OR_FAILED_FOCUSED_OBSERVATION",
+  "error": "{'scope': 'EXACT_REJECTED434_CARDS_SUN_FULLSCREEN_MORE', 'steps': [{'OS_window_input_sync_ms': 56}, {'observed': '(?m)^\\\\+?\\\\s*ADD TV SOURCE$', 'bounds': [36, 1599, 1044, 1773], 'root_query_ms': 34}, {'observed': '(?m)^\\\\+?\\\\s*ADD TV SOURCE$', 'bounds': [36, 1599, 1044, 1773], 'root_query_ms': 2}, {'coordinate_press': '(?m)^\\\\+?\\\\s*ADD TV SOURCE$', 'bounds': [36, 1599, 1044, 1773], 'down_injected': True, 'up_injected': True}, {'OS_window_input_sync_ms': 21}, {'OS_window_input_sync_ms': 24}, {'coordinate_press': 'Original Android dialog item (?m)^M3U / M3U8 playlist$', 'bounds': [27, 1246, 1053, 1390], 'down_injected': True, 'up_injected': True}, {'OS_window_input_sync_ms': 10}, {'OS_window_input_sync_ms': 16}, {'normal_source_form_field': 0}, {'normal_source_form_field': 1}, {'normal_source_form_field': 2}, {'OS_window_input_sync_ms': 9}, {'observed': '(?m)^TEST & SAVE$', 'bounds': [696, 1552, 1017, 1714], 'root_query_ms': 27}, {'observed': '(?m)^TEST & SAVE$', 'bounds': [696, 1552, 1017, 1714], 'root_query_ms': 2}, {'coordinate_press': '(?m)^TEST & SAVE$', 'bounds': [696, 1552, 1017, 1714], 'down_injected': True, 'up_injected': True}, {'OS_window_input_sync_ms': 17}, {'OS_window_input_sync_ms': 21}, {'observed': '(?m)^Choose one of five view modes$|^Choose view mode$|^Views$', 'bounds': [798, 2280, 1056, 2448], 'root_query_ms': 77}, {'observed': '(?m)^Choose one of five view modes$|^Choose view mode$|^Views$', 'bounds': [798, 2280, 1056, 2448], 'root_query_ms': 22}, {'coordinate_press': '(?m)^Choose one of five view modes$|^Choose view mode$|^Views$', 'bounds': [798, 2280, 1056, 2448], 'down_injected': True, 'up_injected': True}, {'OS_window_input_sync_ms': 80}, {'OS_window_input_sync_ms': 27}, {'real_sheet_swipe': [72, 978, 1008, 2418]}, {'OS_window_input_sync_ms': 68}, {'OS_window_input_sync_ms': 58}, {'observed': '(?m)^Cards(?:,.*)?$', 'bounds': [84, 1789, 996, 2211], 'root_query_ms': 90}, {'observed': '(?m)^Cards(?:,.*)?$', 'bounds': [84, 1789, 996, 2211], 'root_query_ms': 134}, {'coordinate_press': '(?m)^Cards(?:,.*)?$', 'bounds': [84, 1789, 996, 2211], 'down_injected': True, 'up_injected': True}, {'OS_window_input_sync_ms': 12}, {'coordinate_press': 'Current Cards preview', 'bounds': [16, 205, 562, 620], 'down_injected': True, 'up_injected': True}, {'OS_window_input_sync_ms': 12}], 'physical_Fold': 'NOT_RUN', 'shutdown': 'NOT_RUN', 'application_classpath': '/system/framework/android.test.runner.jar:/system/framework/uiautomator.jar:/data/local/tmp/CobraFoldMoreDriver.jar', 'BOOTCLASSPATH': 'INHERITED_UNCHANGED', 'status': 'FAILED_CLOSED', 'error': 'java.lang.IllegalStateException: Original fullscreen chrome did not hide within observation limit'}"
+}

@@ -127,13 +127,13 @@ public final class CobraFoldMoreDriver {
   syncInputs();await("(?m)^Return to preview$",true);
  }
  static void more(int iteration)throws Exception{
-  await("(?m)^Channels$",true);await("(?m)^Display$",true);
-  // Observe the actual original hide transition, then renew it through a real
-  // background tap. This avoids guessing how much of its 4-second life is left.
-  long hiddenStart=SystemClock.uptimeMillis();boolean hidden=iteration>1;
-  for(int i=0;!hidden&&i<16&&SystemClock.uptimeMillis()-hiddenStart<10000;i++){if(!has("(?m)^More$")){hidden=true;break;}SystemClock.sleep(250);}require(hidden,"Original fullscreen chrome did not hide within observation limit");
+  // Automatic hiding is conditional (original cobraChromeCanHide); it is not
+  // a precondition for pressing More. Use the original real background toggle
+  // to establish an observed hidden -> freshly visible transition instead.
   Bitmap display=ui.takeScreenshot();require(display!=null,"Display bounds unavailable");int w=display.getWidth(),h=display.getHeight();display.recycle();
-  Rect reveal=new Rect(w/2-2,h/4-2,w/2+2,h/4+2);long changed=SystemClock.uptimeMillis();if(iteration==1||!has("(?m)^More$"))tap(reveal,"Reveal existing fullscreen chrome");
+  Rect reveal=new Rect(w/2-2,h/4-2,w/2+2,h/4+2);
+  if(has("(?m)^More$")){tap(reveal,"Hide existing fullscreen chrome through native background");syncInputs();await("(?m)^More$",false);}
+  long changed=SystemClock.uptimeMillis();tap(reveal,"Reveal existing fullscreen chrome through native background");
   Rect first=waitBounds("(?m)^More$",PLAYER_PRESS_LIMIT);Rect second=waitBounds("(?m)^More$",PLAYER_PRESS_LIMIT);
   require(first.equals(second),"Fullscreen More changed bounds; no press");require(SystemClock.uptimeMillis()-changed<PLAYER_PRESS_LIMIT,"Fresh fullscreen More exceeded3.5-second visibility interval; no press");
   tap(second,"Cards FULLSCREEN More "+iteration);require(SystemClock.uptimeMillis()-changed<PLAYER_PRESS_LIMIT,"More injection uncertain after visibility deadline; no retry");
