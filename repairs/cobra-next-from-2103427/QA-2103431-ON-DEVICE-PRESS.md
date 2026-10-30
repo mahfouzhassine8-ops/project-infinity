@@ -1,0 +1,17 @@
+# Selected QA correction: native observation and coordinate injection
+
+Selected before runtime execution: the same signed-2103431 Pro Fullscreen/More/PiP coordinate journey, APK SHA256 `3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471`, signing run 40971769136. No production edit, APK rebuild/signing, device acceptance, reset, uninstall, shutdown or accepted-lock change.
+
+Run 40976739449 failed **before the first Fullscreen press**. The host-side launch of `uiautomator dump` followed by a separate ADB XML read exceeded the 3.5-second freshness guard for the existing four-second controls. Its actual failed result is retained at [host timing evidence](results/runtime/candidate31-host-timing/REVIEW.md). The guard and application timing remain strict; this is not a demonstrated production routing failure.
+
+The supported Android legacy UI automation runner can query native public accessibility bounds and inject a real coordinate click in one device process. A small QA DEX JAR, compiled from checked-in source against official Android SDK classes, will use that runner. It is not an application APK and does not replace, instrument or modify the installed signed application. Only a public temporary QA file is pushed; no private app data is accessed.
+
+The helper must verify Cobra's visible Pro context, perform any reveal/strip gesture before measuring, read the exact enabled Button and horizontal viewport bounds, require a valid visible intersection and stable fresh bounds, then immediately inject the coordinate press. It retains the 3.5-second interval, original four-second application behavior and seven-attempt bound. UI automation selector/idle waits are bounded within QA; no application timeout changes. It records the selected label, actual bounds, coordinate, timing and injection result. Actual fullscreen/menu/pinned-task outcomes remain independently checked by the existing observer, never replaced with callback invocation or assumed success.
+
+Before another costly Android run, compile the helper, inspect its DEX entry points and record official SDK/tool inputs and hashes. The next run must reuse the exact signed431 bytes and preserve failed evidence. Physical Fold, Samsung icon caching/Finder/suggestions and populated-device install-over acceptance remain unverified.
+
+## Preflight completed
+
+Local Java compilation and D8 conversion passed. Inspection allows exactly `qa.CobraNativeButtonProbe` and its `Hit` class. The official SDK archive is pinned by SHA256 as well as its published checksum and size. [Tool/source receipt](results/runtime/native-agent-preflight/BUILD-RECEIPT.json) and [preflight result](results/runtime/native-agent-preflight/OUTCOME.json) are retained. A second read-only review found no blocking integration defect; runtime compatibility remains unverified until the selected Android run.
+
+The final native sequence reveals Hero exactly once, observes the native strip, scrolls if needed, observes directly after that gesture, and requires two matching enabled target rectangles before injecting the coordinate. No host process launch, XML read, reveal or screenshot occurs between that final target query and the down event. This directly removes the host overhead responsible for run40976739449 without relaxing the guard. XML and PNG are captured promptly in the same device bridge after the tap; the Python assertions parse the actual captured window and independently inspect Android task state. Successful input injection alone is insufficient to pass any action requirement.

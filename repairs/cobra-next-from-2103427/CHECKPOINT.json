@@ -4,7 +4,7 @@
   "full_brief_read": true,
   "production_implementation_started": true,
   "current_build": "/workspace/cobra-evidence/build431",
-  "build_status": "SIGNED431_ORIGINAL_KEY_AND_INDEPENDENT_BYTES_PASS; FINAL_TARGET_QA_IN_PROGRESS",
+  "build_status": "SIGNED431_ORIGINAL_KEY_AND_INDEPENDENT_BYTES_PASS; NATIVE_QA_JAR_PREPARATION_NO_NEW_RUN",
   "baseline_apk": "/workspace/infinity-evidence/continuation2103427/signed27-ci/Infinity-2103427-Combined-Original-Signer.apk",
   "baseline_components": "/workspace/infinity-evidence/continuation2103427/components27-ci",
   "actual_baseline_smali": "/workspace/cobra-evidence/baseline/COBRA/smali-0/com/projectinfinity/kodi/InfinityLiveActivity.smali",
@@ -16,7 +16,7 @@
   "maven": "/workspace/cobra-evidence/maven/apache-maven-3.9.9/bin/mvn",
   "selected_scope": "SCOPE.json",
   "source_budget": "SOURCE-BUDGET.json",
-  "next": "Inspect existing Android40976739449 evidence before further execution. Same signed431 only; finalize reports, no rebuild/sign/shutdown/lock promotion.",
+  "next": "Compile and inspect supported on-device UIAutomator QA DEX JAR before any further Android run. Query actual native button bounds and coordinate-click in one device process, same signed431. No production/build/sign/shutdown/lock promotion.",
   "found_defects": [
     "Existing MultiView chooser has Fit/Fill only; no11arrangements",
     "NonPro preview More precedes Fullscreen/PiP; classic and Pro full strip alreadyMoreLast (preserve)",
@@ -83,7 +83,8 @@
     40972601469,
     40973858059,
     40975410956,
-    40975572601
+    40975572601,
+    40976739449
   ],
   "current_android_previous_failures": [
     "430 initial native M3U picker QA clickable-label assumption; before button actions",
@@ -92,8 +93,10 @@
     "431 ADB install response timed out30s; PackageInstaller completed; no Activity launch. QA now confirms installed public APK hash without retrying uncertain install",
     "431 Fullscreen passed; measured More coordinate, unobserved intervening native reveal/layout then real systemPiP. Final pointer recipient undetermined; QA fresh final measurement correction",
     "Cancelled invalid source_ref during checkout only; emulator/install skipped",
-    "431 fresh-target guard stopped before More press: extraQA reveal moved More from858..1016 to1011..1016(5px) andPiP to853..1011 under old937,827. Fullscreenpassed. CurrentQA removes intervening reveal/screenshot and observes actualscrolled bounds withcompressednativehierarchy; keeps3.5s/4s/30s/7bounds."
+    "431 fresh-target guard stopped before More press: extraQA reveal moved More from858..1016 to1011..1016(5px) andPiP to853..1011 under old937,827. Fullscreenpassed. CurrentQA removes intervening reveal/screenshot and observes actualscrolled bounds withcompressednativehierarchy; keeps3.5s/4s/30s/7bounds.",
+    "Host native dump+cat exceeded strict3.5s fresh-target interval before firstFullscreen. Nobuttonactions issued; notproductionroutingfailure. SupportednativeUIAutomatorJARpreparation avoids hostbetweenquery/press, noapptimeoutchanges; no newrunyet."
   ],
   "current_signed_candidate": "2103431_UNACCEPTED_DEVICE_QA_PENDING",
-  "actual_icon_observation": "431 Android37 AppInfo lightwhiteblack/darknavycyan; PixelLauncher AllApps retains light cached bitmap after dark switch; Samsung unverified"
+  "actual_icon_observation": "431 Android37 AppInfo lightwhiteblack/darknavycyan; PixelLauncher AllApps retains light cached bitmap after dark switch; Samsung unverified",
+  "current_android_result": "40976739449_FAILED_HOST_3_5S_FRESHNESS_GUARD_BEFORE_FULLSCREEN"
 }

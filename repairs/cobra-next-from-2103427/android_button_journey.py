@@ -6,6 +6,7 @@ including horizontal-strip scrolling. No root, app-data injection, force-stop,
 uninstall, reset, Infinity launch or application shutdown operation exists here.
 """
 import argparse
+import hashlib
 import json
 import re
 import subprocess
@@ -115,13 +116,14 @@ class Snapshot:
         return None
 
 
-def journey(out):
+def journey(out, native_jar):
     out.mkdir(parents=True, exist_ok=False)
     steps = []
     report = {'scope': 'SIGNED431_PRO_VISIBLE_COORDINATE_BUTTONS_SYNTHETIC_QA1',
               'physical_Fold': 'NOT_RUN', 'Infinity': 'NOT_LAUNCHED',
               'shutdown': 'NOT_RUN', 'steps': steps, 'actions': {}}
     sequence = 0
+    native_sequence = 0
     hero_box = None
 
     def ui():
@@ -216,41 +218,39 @@ def journey(out):
         steps.append({'reveal_existing_pro_controls': [x, y], 'hero_bounds': list(hero_box)})
 
     def strip_press(label, direction='left', force_scroll=False):
-        # Only scroll the real inline strip. Pointer positions are always
-        # derived from its current bounds and intersected with its viewport.
-        if hero_box is not None:
-            reveal()
-        interacted_at = time.monotonic()
-        for attempt in range(7):
-            snap = ui()
-            strip = snap.strip()
-            if strip is None:
-                reveal()
-                interacted_at = time.monotonic()
-                continue
-            remember_hero(snap, strip)
-            viewport = bounds(strip)
-            target = snap.find('^'+re.escape(label)+'$', strip.iter('node'), enabled=True, clickable=True)
-            if target is not None and positive(intersect(bounds(target), viewport)) and not (force_scroll and attempt == 0):
-                # This hierarchy follows the last reveal OR strip gesture.
-                # No new input or expensive screenshot may move/expire it
-                # between measurement and the coordinate down event.
-                elapsed = time.monotonic()-interacted_at
-                assert elapsed < 3.5, 'Final target observation exceeded existing four-second visibility window'
-                steps.append({'final_native_target_measurement': label,
-                              'bounds': list(bounds(target)),
-                              'viewport': list(viewport),
-                              'seconds_since_last_reveal_or_strip_gesture': elapsed})
-                press_node(target, 'Pro '+label, viewport)
-                return
-            y = (viewport[1]+viewport[3])//2
-            inset = max(12, (viewport[2]-viewport[0])//8)
-            left, right = viewport[0]+inset, viewport[2]-inset
-            a, b = (right, left) if direction == 'left' else (left, right)
-            adb('shell', 'input', 'swipe', str(a), str(y), str(b), str(y), '350')
-            steps.append({'scroll_pro_strip': direction, 'viewport': list(viewport)})
-            interacted_at = time.monotonic()
-        raise RuntimeError('Pro strip action not observed: '+label+'; labels='+repr(snap.labels()))
+        # Native SDK UI automation reads the current visible target and injects
+        # its coordinate in one process. Host dump latency cannot age this hitbox.
+        nonlocal native_sequence
+        assert hero_box is not None, 'Current Pro Hero geometry is required'
+        assert label in ('Fullscreen', 'More', 'PiP') and direction in ('left', 'right')
+        native_sequence += 1
+        prefix = 'cobra-button-%02d' % native_sequence
+        x = (hero_box[0]+hero_box[2])//2
+        y = hero_box[1]+(hero_box[3]-hero_box[1])//3
+        raw = adb('shell', 'uiautomator', 'runtest', '/data/local/tmp/CobraNativeButtonProbe.jar',
+                  '-c', 'qa.CobraNativeButtonProbe#testPress', '-e', 'label', label,
+                  '-e', 'direction', direction, '-e', 'force', str(force_scroll).lower(),
+                  '-e', 'heroX', str(x), '-e', 'heroY', str(y),
+                  '-e', 'capturePrefix', prefix, check=False)
+        (out/(prefix+'-runner.txt')).write_text(raw)
+        matches = re.findall(r'COBRA_NATIVE_BUTTON_PROBE=(\{[^\r\n]+\})', raw)
+        assert len(matches) == 1, 'One native probe record required; see '+prefix+'-runner.txt'
+        native = json.loads(matches[0])
+        (out/(prefix+'-native.json')).write_text(json.dumps(native, indent=2)+'\n')
+        steps.append({'native_coordinate_press': label, 'record': native})
+        assert native.get('requested_label') == label, 'Native target request mismatch'
+        assert native.get('status') == 'INJECTED_ONE_FRESH_NATIVE_VISIBLE_TARGET', native
+        assert native.get('injection_attempted') and native.get('injection_result'), native
+        assert re.search(r'\bOK\s*\(1 test\)', raw) and 'FAILURES!!!' not in raw, 'Native runner did not pass one test'
+        assert native.get('native_elapsed_ms', 3500) < 3500, 'Native press exceeded unchanged deadline'
+        for suffix, field in (('.xml', 'post_ui_xml'), ('.png', 'post_ui_png')):
+            public = '/data/local/tmp/'+prefix+suffix
+            assert native.get(field) == public, 'Unexpected public QA capture path'
+            adb('pull', public, str(out/(prefix+suffix)))
+            assert (out/(prefix+suffix)).is_file(), 'Native post-action capture missing'
+        # The action assertions below parse the actual captured native window,
+        # separately from the successful input injection and Android task dump.
+        return Snapshot((out/(prefix+'.xml')).read_text())
 
     def pro_ready():
         nonlocal hero_box
@@ -282,6 +282,12 @@ def journey(out):
         raise RuntimeError('Pro watching controls not observed; labels='+repr(snap.labels()))
 
     try:
+        assert native_jar.is_file(), 'Compiled public-UI QA JAR required'
+        native_hash = hashlib.sha256(native_jar.read_bytes()).hexdigest()
+        adb('push', str(native_jar), '/data/local/tmp/CobraNativeButtonProbe.jar')
+        observed = adb('shell', 'sha256sum', '/data/local/tmp/CobraNativeButtonProbe.jar').split()
+        assert observed and observed[0] == native_hash, 'Device QA JAR differs from compiled source artifact'
+        report['native_UI_agent_sha256'] = native_hash
         tap(r'ADD TV SOURCE')
         tap(r'^M3U / M3U8 playlist$', native_dialog_item=True)
         for index, value in enumerate(('CobraQA', 'http://10.0.2.2:8765/qa.m3u')):
@@ -302,8 +308,7 @@ def journey(out):
         screenshot('pro-entry')
         pro_ready()
 
-        strip_press('Fullscreen')
-        snap = wait(r'^Return to preview$')
+        snap = strip_press('Fullscreen')
         assert full_screen(snap), 'Fullscreen press did not expose native fullscreen controls'
         assert not pinned(activity('fullscreen')), 'Fullscreen press entered system PiP'
         screenshot('fullscreen-result')
@@ -312,8 +317,8 @@ def journey(out):
         wait(r'^Pro$|^COBRA LIVE$', absent=r'^Return to preview$')
         pro_ready()
 
-        strip_press('More', direction='left')
-        snap = wait(r'^Channel playback$')
+        snap = strip_press('More', direction='left')
+        assert snap.find(r'^Channel playback$') is not None, 'Native More menu playback entry missing'
         assert snap.find(r'^Channel actions$') is not None, 'Original More menu heading missing'
         assert not pinned(activity('more')), 'More press entered system PiP'
         screenshot('more-result')
@@ -323,8 +328,7 @@ def journey(out):
         pro_ready()
         # Return leftward toward Fullscreen, then scroll rightward again for
         # PiP. This exercises both native horizontal-scroll directions.
-        strip_press('Fullscreen', direction='right', force_scroll=True)
-        snap = wait(r'^Return to preview$')
+        snap = strip_press('Fullscreen', direction='right', force_scroll=True)
         assert full_screen(snap) and not pinned(activity('fullscreen-after-scroll'))
         screenshot('fullscreen-after-scroll-result')
         adb('shell', 'input', 'keyevent', 'KEYCODE_BACK')
@@ -349,8 +353,8 @@ def journey(out):
         assert not pinned(activity('pip-return')), 'Cobra remained pinned after normal foreground return'
         screenshot('pip-return-result')
         pro_ready()
-        strip_press('More', direction='left')
-        wait(r'^Channel playback$')
+        snap = strip_press('More', direction='left')
+        assert snap.find(r'^Channel playback$') is not None, 'Reopened native More menu missing'
         screenshot('more-reopened-after-pip')
         report['status'] = 'PASS_ACTUAL_PRO_FULLSCREEN_MORE_PIP_COORDINATE_JOURNEY'
         report['limits'] = ('Android17 emulator, synthetic QA1, non-Sports Pro. Host tests cover '
@@ -382,4 +386,5 @@ def journey(out):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--out', type=Path, required=True)
+    parser.add_argument('--native-jar', type=Path, required=True)
     journey(**vars(parser.parse_args()))

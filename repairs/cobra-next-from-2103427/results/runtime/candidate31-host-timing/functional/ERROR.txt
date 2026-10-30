@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/home/runner/work/project-infinity/project-infinity/repairs/cobra-next-from-2103427/android_button_journey.py", line 305, in journey
+    strip_press('Fullscreen')
+  File "/home/runner/work/project-infinity/project-infinity/repairs/cobra-next-from-2103427/android_button_journey.py", line 239, in strip_press
+    assert elapsed < 3.5, 'Final target observation exceeded existing four-second visibility window'
+           ^^^^^^^^^^^^^
+AssertionError: Final target observation exceeded existing four-second visibility window

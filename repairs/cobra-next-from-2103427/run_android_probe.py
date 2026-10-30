@@ -1,5 +1,5 @@
 """File entry point: emulator action executes each script line separately."""
-import argparse,json
+import argparse,json,os,shutil
 from pathlib import Path
 from android_probe import probe
 
@@ -22,9 +22,15 @@ def main(signed,out,signature):
    if not surface_outcome.is_file() or not json.loads(surface_outcome.read_text()).get('safe_empty_Cobra_for_independent_buttons'):
     raise
    surface_error=str(exc)
+  from build_native_button_probe import build
+  build_dir=out.parent.parent/'runtime-native-button'
+  build(build_dir,Path(os.environ['ANDROID_HOME'])/'build-tools/35.0.0/lib/d8.jar')
+  native_evidence=out.parent/'native-agent';native_evidence.mkdir(exist_ok=False)
+  for name in ('BUILD-RECEIPT.json','CobraNativeButtonProbe.jar'):
+   shutil.copyfile(build_dir/name,native_evidence/name)
   from android_button_journey import journey
   try:
-   journey(out.parent/'functional')
+   journey(out.parent/'functional',native_evidence/'CobraNativeButtonProbe.jar')
   finally:
    combined={'signed_source':receipt['source'],'APK_sha256':receipt['signed_apk_sha256'],
              'versionCode':receipt['versionCode'],'icon_surface_error':surface_error,

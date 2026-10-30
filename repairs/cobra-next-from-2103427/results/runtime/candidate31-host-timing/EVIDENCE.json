@@ -1,0 +1,56 @@
+{
+  "run": 40976739449,
+  "run_url": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/40976739449",
+  "run_conclusion": "failure",
+  "QA_source": "8146d518eedecb22cd417785f88aa10ce2a9d608",
+  "signed_source": "9ccc4c362a65118eeba38a8e7e4b0de5723c69af",
+  "signed_versionCode": 2103431,
+  "signed_APK_sha256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471",
+  "artifact": 12942644886,
+  "artifact_url": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/40976739449/artifacts/12942644886",
+  "artifact_archive_sha256": "df572ce04a9edf8db1c4c6a3fad87931a3f25e8cf389a8cd4cd158fcae76a0d3",
+  "archive_verified_before_extraction_by": "root",
+  "status": "QA_FRESH_TARGET_3_5_SECOND_GUARD_ABORTED_BEFORE_FIRST_FULLSCREEN_PRESS",
+  "stopped_label": "Fullscreen",
+  "error": "Final target observation exceeded existing four-second visibility window",
+  "elapsed_seconds": "NOT_RECORDED; ASSERTION_ESTABLISHES_ELAPSED_AT_LEAST_3_5",
+  "button_presses_issued": [],
+  "prior_actual_Fullscreen_evidence_runs": [
+    40973858059,
+    40975572601
+  ],
+  "prior_host_button_tests": "SIX_ACTUAL_PRODUCTION_VIEW_DISPATCH_TESTS; TERMINAL_FULLSCREEN_MENU_OS_PIP_BOUNDARIES_USE_SPIES",
+  "physical_Fold": "NOT_RUN",
+  "Infinity": "NOT_LAUNCHED",
+  "shutdown": "NOT_RUN",
+  "files": {
+    "functional/OUTCOME.json": {
+      "sha256": "1d0f11330681da5312366cd0f08ac2283bb1cb3b4978d42a338bbf7cb2c5aecf",
+      "bytes": 3676
+    },
+    "functional/013-ui.xml": {
+      "sha256": "8e46cdb46748b0b516da89225b6b99de0d4c7efe36ce155cdb02ded0b2278872",
+      "bytes": 14890
+    },
+    "functional/014-ui.xml": {
+      "sha256": "84dacfea57da60c3962047b7d1c613657d76f60171c9f442ae73ddc31e5664af",
+      "bytes": 17764
+    },
+    "functional/015-ui.xml": {
+      "sha256": "84dacfea57da60c3962047b7d1c613657d76f60171c9f442ae73ddc31e5664af",
+      "bytes": 17764
+    },
+    "functional/ERROR.txt": {
+      "sha256": "188b6a78fec9f4a95119daecd9c94c977018cad48c1319d900fcdc1a2a799c22",
+      "bytes": 566
+    },
+    "functional/last-screen.png": {
+      "sha256": "f687e947862317fdf450559f55c8a0a35f84fa5c43d65b6515ab2e8b9639537f",
+      "bytes": 129961
+    },
+    "probe/OUTCOME.json": {
+      "sha256": "a5bc26a3563da5413282f636941c00d31ddb8ce0a7f4ba57edd021383ce4a337",
+      "bytes": 1095
+    }
+  }
+}
