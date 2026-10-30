@@ -1,0 +1,11 @@
+InfinityLiveActivity :: private cobraVisualPulseState(Landroidx/media3/exoplayer/ExoPlayer;)Lcom/projectinfinity/kodi/CobraPresentationEffects$PulseState;
+--- standalone
++++ actual-final-owner
+@@ -289,6 +289,7 @@
+     if-eqz v0, :cond_12
+ 
+     .line 14181
++    # getter for: Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraLocalTimeshiftSession;->stopped:Z
+     invoke-static {v0}, Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraLocalTimeshiftSession;->access$22400(Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraLocalTimeshiftSession;)Z
+ 
+     move-result v2

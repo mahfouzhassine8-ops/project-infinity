@@ -1,0 +1,152 @@
+{
+  "InfinityLiveActivity": {
+    "old_method_count": 1802,
+    "actual_method_count": 1802,
+    "standalone_method_count": 1802,
+    "actual_changes": [
+      "private addRecent(Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;)V",
+      "private applyLoadResult(Lcom/projectinfinity/kodi/InfinityLiveActivity$LoadResult;)V",
+      "private cobraAmbientSurface(Landroid/view/View;IIIZ)V",
+      "private cobraChannelsForCurrentView()Ljava/util/ArrayList;",
+      "private cobraGuideChannels()Ljava/util/ArrayList;",
+      "private cobraLayoutGuide()V",
+      "private cobraRefreshModeDetails()V",
+      "private cobraRefreshProgrammeLabels()V",
+      "private cobraRefreshVisualEffects()V",
+      "private cobraRenderGuideBrowser()V",
+      "private cobraRestyleGuide()V",
+      "private cobraShowGuideShell()V",
+      "private hideCobraChannel(Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;)V",
+      "private persistSources()V",
+      "private reloadProfileCollections()V",
+      "private restoreCobraLibraryCache(Ljava/util/ArrayList;)Z",
+      "private toggleFavorite(Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;)V",
+      "synthetic lambda$confirmRemoveSource$96$com-projectinfinity-kodi-InfinityLiveActivity(Lcom/projectinfinity/kodi/InfinityLiveActivity$LiveSource;Landroid/content/DialogInterface;I)V",
+      "synthetic lambda$loadAllEnabledSources$54$com-projectinfinity-kodi-InfinityLiveActivity(Ljava/util/ArrayList;ZLjava/util/ArrayList;Ljava/util/ArrayList;)V",
+      "synthetic lambda$showCobraAddToGroup$74$com-projectinfinity-kodi-InfinityLiveActivity(Landroid/widget/EditText;Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;Landroid/content/DialogInterface;I)V"
+    ],
+    "standalone_intended": [
+      "private addRecent(Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;)V",
+      "private applyLoadResult(Lcom/projectinfinity/kodi/InfinityLiveActivity$LoadResult;)V",
+      "private cobraAmbientSurface(Landroid/view/View;IIIZ)V",
+      "private cobraChannelsForCurrentView()Ljava/util/ArrayList;",
+      "private cobraGuideChannels()Ljava/util/ArrayList;",
+      "private cobraLayoutGuide()V",
+      "private cobraRefreshModeDetails()V",
+      "private cobraRefreshProgrammeLabels()V",
+      "private cobraRefreshVisualEffects()V",
+      "private cobraRenderGuideBrowser()V",
+      "private cobraRestyleGuide()V",
+      "private cobraShowGuideShell()V",
+      "private cobraVisualPulseState(Landroidx/media3/exoplayer/ExoPlayer;)Lcom/projectinfinity/kodi/CobraPresentationEffects$PulseState;",
+      "private hideCobraChannel(Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;)V",
+      "private persistSources()V",
+      "private reloadProfileCollections()V",
+      "private restoreCobraLibraryCache(Ljava/util/ArrayList;)Z",
+      "private toggleFavorite(Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;)V",
+      "synthetic lambda$confirmRemoveSource$96$com-projectinfinity-kodi-InfinityLiveActivity(Lcom/projectinfinity/kodi/InfinityLiveActivity$LiveSource;Landroid/content/DialogInterface;I)V",
+      "synthetic lambda$loadAllEnabledSources$54$com-projectinfinity-kodi-InfinityLiveActivity(Ljava/util/ArrayList;ZLjava/util/ArrayList;Ljava/util/ArrayList;)V",
+      "synthetic lambda$showCobraAddToGroup$74$com-projectinfinity-kodi-InfinityLiveActivity(Landroid/widget/EditText;Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;Landroid/content/DialogInterface;I)V"
+    ],
+    "intended_only": [
+      "private cobraVisualPulseState(Landroidx/media3/exoplayer/ExoPlayer;)Lcom/projectinfinity/kodi/CobraPresentationEffects$PulseState;"
+    ],
+    "changed_only": [],
+    "actual_vs_standalone_mismatch": [
+      "private cobraVisualPulseState(Landroidx/media3/exoplayer/ExoPlayer;)Lcom/projectinfinity/kodi/CobraPresentationEffects$PulseState;"
+    ],
+    "comments_only": [
+      "private cobraVisualPulseState(Landroidx/media3/exoplayer/ExoPlayer;)Lcom/projectinfinity/kodi/CobraPresentationEffects$PulseState;"
+    ],
+    "noncomment_mismatch": [],
+    "files": {
+      "old": "/workspace/cobra-evidence/cards432-owner-publication-final/baseline/COBRA/part-0-smali/com/projectinfinity/kodi/InfinityLiveActivity.smali",
+      "actual": "/workspace/cobra-evidence/cards432-owner-publication-final/independent-canonical/part-0/com/projectinfinity/kodi/InfinityLiveActivity.smali",
+      "standalone": "/workspace/cobra-evidence/cards432-package-canonical-diagnostic/standalone/com/projectinfinity/kodi/InfinityLiveActivity.smali"
+    }
+  },
+  "InfinityLiveActivity$CobraPosterChannelCard": {
+    "old_method_count": 3,
+    "actual_method_count": 3,
+    "standalone_method_count": 3,
+    "actual_changes": [
+      "bind(Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;I)V",
+      "constructor <init>(Lcom/projectinfinity/kodi/InfinityLiveActivity;)V",
+      "refreshPlaying()V"
+    ],
+    "standalone_intended": [
+      "bind(Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;I)V",
+      "constructor <init>(Lcom/projectinfinity/kodi/InfinityLiveActivity;)V",
+      "refreshPlaying()V"
+    ],
+    "intended_only": [],
+    "changed_only": [],
+    "actual_vs_standalone_mismatch": [],
+    "comments_only": [],
+    "noncomment_mismatch": [],
+    "files": {
+      "old": "/workspace/cobra-evidence/cards432-owner-publication-final/baseline/COBRA/part-0-smali/com/projectinfinity/kodi/InfinityLiveActivity$CobraPosterChannelCard.smali",
+      "actual": "/workspace/cobra-evidence/cards432-owner-publication-final/independent-canonical/part-0/com/projectinfinity/kodi/InfinityLiveActivity$CobraPosterChannelCard.smali",
+      "standalone": "/workspace/cobra-evidence/cards432-package-canonical-diagnostic/standalone/com/projectinfinity/kodi/InfinityLiveActivity$CobraPosterChannelCard.smali"
+    }
+  },
+  "InfinityCobraFeatureRuntime": {
+    "old_method_count": 55,
+    "actual_method_count": 55,
+    "standalone_method_count": 55,
+    "actual_changes": [
+      "public adultLocked()Z"
+    ],
+    "standalone_intended": [
+      "public adultLocked()Z"
+    ],
+    "intended_only": [],
+    "changed_only": [],
+    "actual_vs_standalone_mismatch": [],
+    "comments_only": [],
+    "noncomment_mismatch": [],
+    "files": {
+      "old": "/workspace/cobra-evidence/cards432-owner-publication-final/baseline/COBRA/part-0-smali/com/projectinfinity/kodi/InfinityCobraFeatureRuntime.smali",
+      "actual": "/workspace/cobra-evidence/cards432-owner-publication-final/independent-canonical/part-0/com/projectinfinity/kodi/InfinityCobraFeatureRuntime.smali",
+      "standalone": "/workspace/cobra-evidence/cards432-package-canonical-diagnostic/standalone/com/projectinfinity/kodi/InfinityCobraFeatureRuntime.smali"
+    }
+  },
+  "CobraLogoRequests": {
+    "old_method_count": 17,
+    "actual_method_count": 18,
+    "standalone_method_count": 18,
+    "actual_changes": [],
+    "standalone_intended": [],
+    "intended_only": [],
+    "changed_only": [],
+    "actual_vs_standalone_mismatch": [],
+    "comments_only": [],
+    "noncomment_mismatch": [],
+    "files": {
+      "old": "/workspace/cobra-evidence/cards432-owner-publication-final/baseline/COBRA/part-0-smali/com/projectinfinity/kodi/CobraLogoRequests.smali",
+      "actual": "/workspace/cobra-evidence/cards432-owner-publication-final/independent-canonical/part-0/com/projectinfinity/kodi/CobraLogoRequests.smali",
+      "standalone": "/workspace/cobra-evidence/cards432-package-canonical-diagnostic/standalone/com/projectinfinity/kodi/CobraLogoRequests.smali"
+    }
+  },
+  "CobraComponent": {
+    "old_method_count": 3,
+    "actual_method_count": 3,
+    "standalone_method_count": 3,
+    "actual_changes": [
+      "public static version()Ljava/lang/String;"
+    ],
+    "standalone_intended": [
+      "public static version()Ljava/lang/String;"
+    ],
+    "intended_only": [],
+    "changed_only": [],
+    "actual_vs_standalone_mismatch": [],
+    "comments_only": [],
+    "noncomment_mismatch": [],
+    "files": {
+      "old": "/workspace/cobra-evidence/cards432-owner-publication-final/baseline/COBRA/part-0-smali/com/projectinfinity/kodi/CobraComponent.smali",
+      "actual": "/workspace/cobra-evidence/cards432-owner-publication-final/independent-canonical/part-0/com/projectinfinity/kodi/CobraComponent.smali",
+      "standalone": "/workspace/cobra-evidence/cards432-package-canonical-diagnostic/standalone/com/projectinfinity/kodi/CobraComponent.smali"
+    }
+  }
+}

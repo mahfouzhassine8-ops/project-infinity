@@ -26,6 +26,14 @@ EXISTING={APP+n+';' for n in ('InfinityLiveActivity','InfinityLiveActivity$Cobra
 ROOTS={APP+n for n in ('CobraCardsTiles','CobraCardsLayout','CobraProfileDataReuse','CobraCardsReuse')}
 
 
+def standalone_method(text):
+    # Baksmali resolves synthetic field-accessor comments only when the target
+    # class is present. The five-class patch lacks that full-owner context.
+    # Normalize only these generated comments for prediction of the delta;
+    # actual payloads and selected compiled method bodies remain raw/exact.
+    return re.sub(r'^    # (?:getter|setter) for: L[^\s;]+;->[^\s]+\n', '', text, flags=re.M)
+
+
 def bound_sources():
     files=[HERE/'build.py',HERE/'package_owners.py',HERE/'verify_owner_source.py',ISO/'ownership-reviewed-roots.json',HERE/'cards_patch.py',HERE/'projection_patch.py',
       HERE/'presentation_patch.py',HERE/'CARDS-SOURCE-BUDGET.json',HERE/'PROJECTION-SOURCE-BUDGET.json',
@@ -93,7 +101,7 @@ def package(bundles,work,jars,out,source):
         require(added_methods==({'public static clear(Landroid/app/Activity;Landroid/widget/ImageView;)V'} if name==APP+'CobraLogoRequests;' else set()),'NO_UNREVIEWED_METHOD_ADDITION:'+name)
         require(set(old)<=set(new),'NO_METHOD_REMOVAL:'+name)
         changed_methods={m for m in old if old[m]!=new[m]}
-        intended={m for m in old if old[m]!=compiled[m]}
+        intended={m for m in old if standalone_method(old[m])!=standalone_method(compiled[m])}
         require(changed_methods==intended,'EXACT_CHANGED_METHOD_SET:'+name)
         require(changed_methods|added_methods==set(proof['changed_methods'][name]),'INDEPENDENT_REVIEWED_METHOD_POLICY:'+name)
         for m in changed_methods|added_methods:require(new[m]==compiled[m],'EXACT_COMPILED_METHOD:'+name+m)
