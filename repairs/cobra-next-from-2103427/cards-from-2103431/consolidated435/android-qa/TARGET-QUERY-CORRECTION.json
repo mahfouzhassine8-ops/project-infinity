@@ -1,0 +1,15 @@
+{
+  "selected_before_execution": true,
+  "failed_run": 41127665715,
+  "source": "5362170098e1fe92c5c240501de1daf97f29041e",
+  "artifact": 13010829824,
+  "artifact_sha256": "9bb000c5a7169dad09f535f4a103e1efd4d7bb0388963f90d18bf0b72a115b5b",
+  "actual_state": "Fullscreen entry observed2558ms after injected preview input; screenshot personally inspected with actual fullscreen controls and More",
+  "exact_failure": "Two full Tree traversals took1837ms+1615ms=3452ms, leaving no3500ms window for actual input; original guard refused before injection",
+  "more_injection_count": 0,
+  "correction": "Use public Android root.findAccessibilityNodeInfosByText(More), refresh each actual visible/enabled/clickable exact-label node and reject ambiguity; still require two independently obtained equal bounds and original3500ms total reveal-to-input deadline. No cached/hardcoded coordinates, app callbacks or app timer changes.",
+  "query_timing": "Record root_fetch_ms and OS_native_text_query_ms to separate IPC traversal overhead",
+  "selected": "Only same signed435 fullscreen/More/Back; actual sun435 evidence retained41126342663",
+  "product_APK": "UNCHANGED_435",
+  "shutdown": "NOT_RUN"
+}

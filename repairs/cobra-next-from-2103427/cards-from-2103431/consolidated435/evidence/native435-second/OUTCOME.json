@@ -1,0 +1,265 @@
+{
+  "scope": "EXACT_SIGNED435_CARDS_SUN_FULLSCREEN_MORE",
+  "steps": [
+    {
+      "OS_window_input_sync_ms": 19
+    },
+    {
+      "observed": "(?m)^\\+?\\s*ADD TV SOURCE$",
+      "bounds": [
+        36,
+        1599,
+        1044,
+        1773
+      ],
+      "root_query_ms": 4
+    },
+    {
+      "observed": "(?m)^\\+?\\s*ADD TV SOURCE$",
+      "bounds": [
+        36,
+        1599,
+        1044,
+        1773
+      ],
+      "root_query_ms": 7
+    },
+    {
+      "coordinate_press": "(?m)^\\+?\\s*ADD TV SOURCE$",
+      "bounds": [
+        36,
+        1599,
+        1044,
+        1773
+      ],
+      "down_injected": true,
+      "up_injected": true
+    },
+    {
+      "OS_window_input_sync_ms": 20
+    },
+    {
+      "OS_window_input_sync_ms": 13
+    },
+    {
+      "coordinate_press": "Original Android dialog item (?m)^M3U \/ M3U8 playlist$",
+      "bounds": [
+        27,
+        1246,
+        1053,
+        1390
+      ],
+      "down_injected": true,
+      "up_injected": true
+    },
+    {
+      "OS_window_input_sync_ms": 25
+    },
+    {
+      "OS_window_input_sync_ms": 33
+    },
+    {
+      "normal_source_form_field": 0
+    },
+    {
+      "normal_source_form_field": 1
+    },
+    {
+      "normal_source_form_field": 2
+    },
+    {
+      "OS_window_input_sync_ms": 58
+    },
+    {
+      "observed": "(?m)^TEST & SAVE$",
+      "bounds": [
+        696,
+        1552,
+        1017,
+        1714
+      ],
+      "root_query_ms": 10
+    },
+    {
+      "observed": "(?m)^TEST & SAVE$",
+      "bounds": [
+        696,
+        1552,
+        1017,
+        1714
+      ],
+      "root_query_ms": 4
+    },
+    {
+      "coordinate_press": "(?m)^TEST & SAVE$",
+      "bounds": [
+        696,
+        1552,
+        1017,
+        1714
+      ],
+      "down_injected": true,
+      "up_injected": true
+    },
+    {
+      "OS_window_input_sync_ms": 15
+    },
+    {
+      "OS_window_input_sync_ms": 17
+    },
+    {
+      "observed": "(?m)^Choose one of five view modes$|^Choose view mode$|^Views$",
+      "bounds": [
+        798,
+        2280,
+        1056,
+        2448
+      ],
+      "root_query_ms": 156
+    },
+    {
+      "observed": "(?m)^Choose one of five view modes$|^Choose view mode$|^Views$",
+      "bounds": [
+        798,
+        2280,
+        1056,
+        2448
+      ],
+      "root_query_ms": 18
+    },
+    {
+      "coordinate_press": "(?m)^Choose one of five view modes$|^Choose view mode$|^Views$",
+      "bounds": [
+        798,
+        2280,
+        1056,
+        2448
+      ],
+      "down_injected": true,
+      "up_injected": true
+    },
+    {
+      "OS_window_input_sync_ms": 65
+    },
+    {
+      "OS_window_input_sync_ms": 101
+    },
+    {
+      "real_sheet_swipe": [
+        72,
+        978,
+        1008,
+        2418
+      ]
+    },
+    {
+      "OS_window_input_sync_ms": 53
+    },
+    {
+      "OS_window_input_sync_ms": 15
+    },
+    {
+      "observed": "(?m)^Cards(?:,.*)?$",
+      "bounds": [
+        84,
+        1789,
+        996,
+        2211
+      ],
+      "root_query_ms": 58
+    },
+    {
+      "observed": "(?m)^Cards(?:,.*)?$",
+      "bounds": [
+        84,
+        1789,
+        996,
+        2211
+      ],
+      "root_query_ms": 93
+    },
+    {
+      "coordinate_press": "(?m)^Cards(?:,.*)?$",
+      "bounds": [
+        84,
+        1789,
+        996,
+        2211
+      ],
+      "down_injected": true,
+      "up_injected": true
+    },
+    {
+      "OS_window_input_sync_ms": 12
+    },
+    {
+      "coordinate_press": "Current Cards preview",
+      "bounds": [
+        16,
+        205,
+        562,
+        620
+      ],
+      "down_injected": true,
+      "up_injected": true
+    },
+    {
+      "OS_window_input_sync_ms": 23
+    },
+    {
+      "fullscreen_observed_after_real_preview_press": true,
+      "elapsed_ms": 2558
+    },
+    {
+      "coordinate_press": "Hide existing fullscreen chrome through native background",
+      "bounds": [
+        538,
+        628,
+        542,
+        632
+      ],
+      "down_injected": true,
+      "up_injected": true
+    },
+    {
+      "OS_window_input_sync_ms": 19
+    },
+    {
+      "coordinate_press": "Reveal existing fullscreen chrome through native background",
+      "bounds": [
+        538,
+        628,
+        542,
+        632
+      ],
+      "down_injected": true,
+      "up_injected": true
+    },
+    {
+      "observed": "(?m)^More$",
+      "bounds": [
+        835,
+        2244,
+        1032,
+        2400
+      ],
+      "root_query_ms": 1837
+    },
+    {
+      "observed": "(?m)^More$",
+      "bounds": [
+        835,
+        2244,
+        1032,
+        2400
+      ],
+      "root_query_ms": 1615
+    }
+  ],
+  "physical_Fold": "NOT_RUN",
+  "shutdown": "NOT_RUN",
+  "application_classpath": "\/system\/framework\/android.test.runner.jar:\/system\/framework\/uiautomator.jar:\/data\/local\/tmp\/CobraFoldMoreDriver.jar",
+  "BOOTCLASSPATH": "INHERITED_UNCHANGED",
+  "status": "FAILED_CLOSED",
+  "error": "java.lang.IllegalStateException: Fresh fullscreen More exceeded3.5-second visibility interval; no press"
+}

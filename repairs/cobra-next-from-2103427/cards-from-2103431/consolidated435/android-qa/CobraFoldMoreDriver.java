@@ -143,6 +143,28 @@ public final class CobraFoldMoreDriver {
   }
   write("fullscreen-readiness.json",new JSONObject().put("labels",last).put("elapsed_ms",SystemClock.uptimeMillis()-changed));throw new IllegalStateException("Neither actual fullscreen nor current inline Fullscreen observed within original3.5s interval");
  }
+ static Rect currentMoreBounds()throws Exception{
+  long started=SystemClock.uptimeMillis();
+  for(int attempt=0;attempt<20&&SystemClock.uptimeMillis()-started<PLAYER_PRESS_LIMIT;attempt++){
+   long queried=SystemClock.uptimeMillis();AccessibilityNodeInfo root=ui.getRootInActiveWindow();long rooted=SystemClock.uptimeMillis();
+   if(root==null){SystemClock.sleep(100);continue;}
+   List<AccessibilityNodeInfo> matches=null;Rect chosen=null;
+   try{
+    require(PKG.contentEquals(root.getPackageName()),"Unexpected active package for current More");
+    // Android performs the text query on its actual native view tree. Avoid
+    // hundreds of cross-process reads of the covered Guide for a single button.
+    matches=root.findAccessibilityNodeInfosByText("More");
+    if(matches!=null)for(AccessibilityNodeInfo n:matches){
+     if(!n.refresh()||!n.isVisibleToUser()||!n.isEnabled()||!n.isClickable()||!Pattern.compile("(?m)^More$",Pattern.CASE_INSENSITIVE).matcher(text(n)).find())continue;
+     Rect b=new Rect();n.getBoundsInScreen(b);if(b.width()<=12||b.height()<=12)continue;
+     require(chosen==null||chosen.equals(b),"Ambiguous actual visible More bounds; no press");chosen=b;
+    }
+    if(chosen!=null){steps.put(new JSONObject().put("observed","(?m)^More$").put("bounds",box(chosen)).put("OS_native_text_query_ms",SystemClock.uptimeMillis()-queried).put("root_fetch_ms",rooted-queried).put("target_refresh",true));return chosen;}
+   }finally{if(matches!=null)for(AccessibilityNodeInfo n:matches)if(n!=root)n.recycle();root.recycle();}
+   SystemClock.sleep(100);
+  }
+  throw new IllegalStateException("Actual native More text query did not expose a current target within original interval");
+ }
  static void more(int iteration)throws Exception{
   // Automatic hiding is conditional (original cobraChromeCanHide); it is not
   // a precondition for pressing More. Use the original real background toggle
@@ -151,7 +173,7 @@ public final class CobraFoldMoreDriver {
   Rect reveal=new Rect(w/2-2,h/4-2,w/2+2,h/4+2);
   if(has("(?m)^More$")){tap(reveal,"Hide existing fullscreen chrome through native background");syncInputs();await("(?m)^More$",false);}
   long changed=SystemClock.uptimeMillis();tap(reveal,"Reveal existing fullscreen chrome through native background");
-  Rect first=waitBounds("(?m)^More$",PLAYER_PRESS_LIMIT);Rect second=waitBounds("(?m)^More$",PLAYER_PRESS_LIMIT);
+  Rect first=currentMoreBounds();Rect second=currentMoreBounds();
   require(first.equals(second),"Fullscreen More changed bounds; no press");require(SystemClock.uptimeMillis()-changed<PLAYER_PRESS_LIMIT,"Fresh fullscreen More exceeded3.5-second visibility interval; no press");
   tap(second,"Cards FULLSCREEN More "+iteration);require(SystemClock.uptimeMillis()-changed<PLAYER_PRESS_LIMIT,"More injection uncertain after visibility deadline; no retry");
   long tapped=SystemClock.uptimeMillis();SystemClock.sleep(250);screenshot("fullscreen-more-"+iteration+"-250ms");
