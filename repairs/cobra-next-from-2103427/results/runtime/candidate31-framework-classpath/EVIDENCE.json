@@ -1,0 +1,84 @@
+{
+  "run": 40984628762,
+  "run_url": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/40984628762",
+  "run_conclusion": "failure",
+  "QA_source": "4051ee3f535774e2e02a5ab4ba8b4e6bdbfcde1b",
+  "signed_source": "9ccc4c362a65118eeba38a8e7e4b0de5723c69af",
+  "signed_versionCode": 2103431,
+  "signed_APK_sha256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471",
+  "artifact": 12946059788,
+  "artifact_url": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/40984628762/artifacts/12946059788",
+  "artifact_archive_sha256": "694841abe4365bad4ba5e6ec7fa82f7871801e362dd449331efa291cb9bcb21b",
+  "archive_verified_before_extraction": true,
+  "archive_verified_by": "android_final_evidence; delivery_finish_review independently rehashed downloaded archive; root personally reviewed functional/pro-entry.png and functional/last-screen.png",
+  "status": "SIGNED_APK_INSTALL_AND_EXACT_HASH_PASS; SYNTHETIC_QA1_PRO_REACHED; OS_UIAUTOMATOR_RUNNER_MISSING_REPETITIVETEST_BEFORE_TESTPRESS",
+  "install_seconds_including_confirmation": 94.423,
+  "native_QA_JAR_sha256": "d536eb5738453354738acd6fb37ccf55ab4f82b5f0ebe78d55c16d06c3676578",
+  "native_QA_DEX_sha256": "c6046f8938b8c39269e36b22bd8eb1b86927c78e0a1825856dfb15497ab119e7",
+  "native_QA_JAR_push_hash": "PASS",
+  "runner_failure": "java.lang.NoClassDefFoundError: Failed resolution of: Landroid/test/RepetitiveTest; at UiAutomatorTestRunner$WatcherResultPrinter.startTest",
+  "testPress": "NOT_ENTERED",
+  "native_probe_JSON_records": 0,
+  "selected_button_injection": "NOT_ATTEMPTED",
+  "button_actions": {},
+  "strict_guard": "FAILED_ONE_NATIVE_PROBE_RECORD_REQUIRED_DESPITE_MISLEADING_RUNNER_OK_1_TEST",
+  "icon_evidence": "REUSED_EXACT_SIGNED_APK_SOURCE_BOUND_RUN40973858059; NOT_RERUN",
+  "physical_Fold": "NOT_RUN",
+  "Infinity": "NOT_LAUNCHED",
+  "shutdown": "NOT_RUN",
+  "files": {
+    "probe/OUTCOME.json": {
+      "sha256": "cf3ea92d1d8dec279e7b15ba0c7345a3806cb6b6b3f2ec329d02e63e6d885646",
+      "bytes": 8077
+    },
+    "probe/install.txt": {
+      "sha256": "781a31c82430c97897af612ece5e0ca2205e301cb5ff121ce2660541ea5182c7",
+      "bytes": 36
+    },
+    "probe/launch.txt": {
+      "sha256": "5f915897d23a1799cf0806e35bbe5fe63db11111f9401f7ea5cd972bef825222",
+      "bytes": 198
+    },
+    "functional/OUTCOME.json": {
+      "sha256": "3f12978a6607f4dc8ed151814ad51e80665f8f2311acb19591640d61c17be7a5",
+      "bytes": 3594
+    },
+    "functional/ERROR.txt": {
+      "sha256": "dea2a06aeae6bd0efe9d9488fa6c578ad99c1a94e03402cd3bf94151d3c88ebe",
+      "bytes": 597
+    },
+    "functional/cobra-button-01-runner.txt": {
+      "sha256": "254627d3266c426166f1230bbb815c9119bdd0f595a59480a606d70cf967a1e4",
+      "bytes": 1536
+    },
+    "functional/pro-entry.png": {
+      "sha256": "c7e7c934d4b073696bc1808d835c80d004d1b93ab10dcf4b17eca9078a2e5271",
+      "bytes": 129233
+    },
+    "functional/last-screen.png": {
+      "sha256": "b738dfe1dc8a539c0c9afeaf9e3e410cd545708c6c1cc3520643692eab75dd11",
+      "bytes": 130374
+    },
+    "functional/014-ui.xml": {
+      "sha256": "84dacfea57da60c3962047b7d1c613657d76f60171c9f442ae73ddc31e5664af",
+      "bytes": 17764
+    },
+    "native-agent/BUILD-RECEIPT.json": {
+      "sha256": "0191eb919aa3acc075e9a3438d8ffcc261fb4c123148379d77adc40cdf830435",
+      "bytes": 1663
+    },
+    "P0-OBSERVATIONS.json": {
+      "sha256": "af908d92815c5cf099bd3ff53e6f0916fdc3fd1dafc5c16c3b2895144180eebb",
+      "bytes": 5503
+    },
+    "retained-icon-evidence/REUSE.json": {
+      "sha256": "68aebfaf735bebbb16882fe2ba4693651d199cdcc7b50245a6a7bfb67d10ad36",
+      "bytes": 1218
+    },
+    "functional/OS-CLASSPATH-EXCERPT.txt": {
+      "sha256": "01c24fff171b3df04b49b77a93768c3b04d8688aeeba552d9c46234e243a80f5",
+      "bytes": 1172
+    }
+  },
+  "excerpt_source_full_log_sha256": "6269a4b575af24c8c25153a288267e2b603c2052341e9f200c0605ffe983d1a2"
+}

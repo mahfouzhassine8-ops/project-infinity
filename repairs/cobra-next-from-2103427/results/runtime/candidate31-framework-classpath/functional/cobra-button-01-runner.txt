@@ -1,0 +1,27 @@
+Warning: This version of UI Automator is deprecated. New tests should be written using
+UI Automator 2.0 which is available as part of the Android Testing Support Library.
+See https://developer.android.com/training/testing/ui-testing/uiautomator-testing.html
+for more details.
+INSTRUMENTATION_STATUS: stream=
+Test results for WatcherResultPrinter=Test run aborted due to unexpected exception: Failed resolution of: Landroid/test/RepetitiveTest;
+java.lang.NoClassDefFoundError: Failed resolution of: Landroid/test/RepetitiveTest;
+	at com.android.uiautomator.testrunner.UiAutomatorTestRunner$WatcherResultPrinter.startTest(UiAutomatorTestRunner.java:296)
+	at junit.framework.TestResult.startTest(TestResult.java:168)
+	at junit.framework.TestResult.run(TestResult.java:119)
+	at junit.framework.TestCase.run(TestCase.java:130)
+	at com.android.uiautomator.testrunner.UiAutomatorTestRunner.start(UiAutomatorTestRunner.java:159)
+	at com.android.uiautomator.testrunner.UiAutomatorTestRunner.run(UiAutomatorTestRunner.java:95)
+	at com.android.commands.uiautomator.RunTestCommand.run(RunTestCommand.java:91)
+	at com.android.commands.uiautomator.Launcher.main(Launcher.java:83)
+	at com.android.internal.os.RuntimeInit.nativeFinishInit(Native Method)
+	at com.android.internal.os.RuntimeInit.main(RuntimeInit.java:367)
+Caused by: java.lang.ClassNotFoundException: android.test.RepetitiveTest
+	... 10 more
+
+Time: 0.027
+
+OK (1 test)
+
+
+INSTRUMENTATION_STATUS: shortMsg=Failed resolution of: Landroid/test/RepetitiveTest;
+INSTRUMENTATION_STATUS_CODE: -1

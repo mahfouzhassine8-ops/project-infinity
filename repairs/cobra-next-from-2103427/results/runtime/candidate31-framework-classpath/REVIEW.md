@@ -1,0 +1,11 @@
+# Signed 2103431 — native QA framework classpath failure
+
+Run [40984628762](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/40984628762), QA source `4051ee3f535774e2e02a5ab4ba8b4e6bdbfcde1b`, used the unchanged signed 2103431 APK. Its overall result remains **FAILURE**. The downloaded archive SHA256 was verified; exact source/APK/artifact and selected-file hashes are recorded in `EVIDENCE.json`. Root personally reviewed `functional/pro-entry.png` and `functional/last-screen.png`.
+
+The regular installation and exact installed-file SHA256 confirmation passed in **94.423 seconds**. The normal UI imported the synthetic QA1 source, selected Pro and reached its playing preview. The two-class QA JAR compiled, was pushed, and matched its expected SHA256. Its DEX SHA256 remains `c6046f8938b8c39269e36b22bd8eb1b86927c78e0a1825856dfb15497ab119e7`.
+
+The OS legacy UI Automator runner then aborted in `UiAutomatorTestRunner$WatcherResultPrinter.startTest`: `NoClassDefFoundError: android.test.RepetitiveTest`. This occurred **before `testPress` entered**, so no native probe JSON was emitted, no selected Fullscreen/More/PiP press was injected and `actions` remained empty. Its misleading trailing `OK (1 test)` does not constitute success; the Python guard correctly rejected the missing unique JSON record. The runner's missing framework class is a QA process classpath defect, not a demonstrated production route failure or app crash. The preserved OS log excerpt records the runner invocation and classloader mismatch at original line 109897 and adjacent lines.
+
+The next QA-only correction will supply the actual OS `android.test.base.jar` and `android.test.mock.jar` as positional classpath inputs through the official runner flow, and require a unique class-readiness JSON before costly APK installation. The native bounds/visibility, outcome assertions, application timers, original-signature/hash checks and production APK remain unchanged. No next run or button PASS is claimed here.
+
+The prior signed-431 App Info and Pixel Launcher observations were explicitly reused with exact source/APK/file hashes, not rerun or labeled fresh results. Samsung/physical Fold acceptance remains pending. Infinity was not launched, shutdown was not tested, and there was no user-device installation, lock or promotion.

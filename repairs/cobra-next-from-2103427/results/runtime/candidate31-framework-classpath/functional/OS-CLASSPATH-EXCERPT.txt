@@ -1,0 +1,6 @@
+Source: functional/logcat.txt in original artifact; original line numbers retained.
+
+109867: 10-30 01:21:08.226   505   505 I adbd    : adbd service requested 'shell,v2,raw:uiautomator runtest /data/local/tmp/CobraNativeButtonProbe.jar -c qa.CobraNativeButtonProbe#testPress -e label Fullscreen -e direction left -e force false -e heroX 539 -e heroY 490 -e capturePrefix cobra-button-01'
+109897: 10-30 01:21:08.698  8491  8491 W app_process: ClassLoaderContext shared library size mismatch. Expected=2, found=0 (PCL[]{PCL[/system/framework/android.test.base.jar*1579129895]#PCL[/system/framework/android.test.mock.jar*1147775851]} | PCL[])
+109898: 10-30 01:21:08.699  8491  8491 W app_process: ClassLoaderContext classpath size mismatch. expected=0, found=1 (PCL[]{PCL[/system/framework/android.test.runner.jar*2652887513]{PCL[/system/framework/android.test.base.jar*1579129895]#PCL[/system/framework/android.test.mock.jar*1147775851]}#PCL[/system/framework/android.test.base.jar*1579129895]} | PCL[/system/framework/android.test.runner.jar*2652887513])
+109921: 10-30 01:21:08.837  8491  8491 D AndroidRuntime: Calling main entry com.android.commands.uiautomator.Launcher

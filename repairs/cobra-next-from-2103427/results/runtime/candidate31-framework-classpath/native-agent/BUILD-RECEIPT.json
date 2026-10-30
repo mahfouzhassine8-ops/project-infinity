@@ -1,0 +1,30 @@
+{
+  "scope": "QA_ONLY_PUBLIC_UIAUTOMATOR_DEX_JAR_NO_APK",
+  "official_sdk_url": "https://dl.google.com/android/repository/platform-34-ext7_r03.zip",
+  "official_sdk_bytes": 63180081,
+  "official_sdk_sha1": "1f2e9478d6a7601425ceaa553311dc43191f103d",
+  "official_sdk_sha256": "16fdb74c55e59ae3ef52def135aec713508467bd56d7dabcd8c9be31fa8b20f3",
+  "SDK_members": {
+    "android-34/android.jar": "6cea1df3efb77103ac3e2beb9bf4718964b0e0869ab16d39d29d5cbae1c147ad",
+    "android-34/uiautomator.jar": "43613030059983761bfdc31546c29221eedc2dc0364c8ac21fb4726122a28031",
+    "android-34/optional/android.test.base.jar": "7b64af275d49968157d0763c7ac833f609025cf65530061f450b8396388804b6",
+    "android-34/optional/android.test.runner.jar": "b0ed5e396b0d35cb02a6626f3c2a6c0e9d5f69ad1d189e19d426ffb65bfc580d"
+  },
+  "android_jar_sha256": "6cea1df3efb77103ac3e2beb9bf4718964b0e0869ab16d39d29d5cbae1c147ad",
+  "D8_jar_sha256": "305622ad00535684534eb8f742cbf5e628a9abc09d8ea4d39d1babb95bf0cee5",
+  "source_sha256": "214fc9b74b92f431597bfbd52713725ed3d198791c9419931f48dbe8237fca77",
+  "class_files": [
+    "qa/CobraNativeButtonProbe$Hit.class",
+    "qa/CobraNativeButtonProbe.class"
+  ],
+  "inspected_DEX_classes": [
+    "Lqa/CobraNativeButtonProbe$Hit;",
+    "Lqa/CobraNativeButtonProbe;"
+  ],
+  "DEX_sha256": "c6046f8938b8c39269e36b22bd8eb1b86927c78e0a1825856dfb15497ab119e7",
+  "QA_JAR_sha256": "d536eb5738453354738acd6fb37ccf55ab4f82b5f0ebe78d55c16d06c3676578",
+  "runtime_classes": "OS /system/framework/uiautomator.jar and android.test.runner.jar; not bundled",
+  "application_APK": "UNCHANGED_NOT_BUILT_OR_INSTALLED",
+  "shutdown": "NOT_RUN",
+  "CI_runtime": "NOT_RUN"
+}

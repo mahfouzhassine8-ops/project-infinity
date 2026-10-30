@@ -1,0 +1,188 @@
+{
+  "scope": "SIGNED431_PRO_VISIBLE_COORDINATE_BUTTONS_SYNTHETIC_QA1",
+  "physical_Fold": "NOT_RUN",
+  "Infinity": "NOT_LAUNCHED",
+  "shutdown": "NOT_RUN",
+  "steps": [
+    {
+      "coordinate_press": "ADD TV SOURCE",
+      "node_bounds": [
+        32,
+        1257,
+        1048,
+        1409
+      ],
+      "visible_hit_bounds": [
+        32,
+        1257,
+        1048,
+        1409
+      ],
+      "coordinate": [
+        540,
+        1333
+      ],
+      "content_desc": "",
+      "class": "android.widget.Button"
+    },
+    {
+      "coordinate_press": "Native dialog item ^M3U / M3U8 playlist$",
+      "node_bounds": [
+        28,
+        947,
+        1052,
+        1073
+      ],
+      "visible_hit_bounds": [
+        28,
+        947,
+        1052,
+        1073
+      ],
+      "coordinate": [
+        540,
+        1010
+      ],
+      "content_desc": "",
+      "class": "android.widget.TextView"
+    },
+    {
+      "coordinate_press": "M3U field 0",
+      "node_bounds": [
+        75,
+        688,
+        1005,
+        825
+      ],
+      "visible_hit_bounds": [
+        75,
+        688,
+        1005,
+        825
+      ],
+      "coordinate": [
+        540,
+        756
+      ],
+      "content_desc": "",
+      "class": "android.widget.EditText"
+    },
+    {
+      "coordinate_press": "M3U field 1",
+      "node_bounds": [
+        75,
+        453,
+        1005,
+        590
+      ],
+      "visible_hit_bounds": [
+        75,
+        453,
+        1005,
+        590
+      ],
+      "coordinate": [
+        540,
+        521
+      ],
+      "content_desc": "",
+      "class": "android.widget.EditText"
+    },
+    {
+      "coordinate_press": "^TEST & SAVE$",
+      "node_bounds": [
+        736,
+        813,
+        1020,
+        955
+      ],
+      "visible_hit_bounds": [
+        736,
+        813,
+        1020,
+        955
+      ],
+      "coordinate": [
+        878,
+        884
+      ],
+      "content_desc": "",
+      "class": "android.widget.Button"
+    },
+    {
+      "coordinate_press": "^Choose one of five view modes$|^Choose view mode$|^Views$",
+      "node_bounds": [
+        798,
+        1709,
+        1058,
+        1856
+      ],
+      "visible_hit_bounds": [
+        798,
+        1709,
+        1058,
+        1856
+      ],
+      "coordinate": [
+        928,
+        1782
+      ],
+      "content_desc": "Views",
+      "class": "android.widget.Button"
+    },
+    {
+      "scroll_native_sheet": [
+        63,
+        570,
+        1016,
+        1830
+      ]
+    },
+    {
+      "coordinate_press": "^Pro,",
+      "node_bounds": [
+        74,
+        1787,
+        1005,
+        1830
+      ],
+      "visible_hit_bounds": [
+        74,
+        1787,
+        1005,
+        1830
+      ],
+      "coordinate": [
+        539,
+        1808
+      ],
+      "content_desc": "Pro, Pro turns the existing Focus player into a swipeable watch-first hero: Preview muted, Unmute to watch, then fullscreen when you choose.",
+      "class": "android.widget.LinearLayout"
+    },
+    {
+      "coordinate_press": "Pro watching Hero to reveal controls",
+      "node_bounds": [
+        42,
+        231,
+        1037,
+        1008
+      ],
+      "visible_hit_bounds": [
+        42,
+        231,
+        1037,
+        1008
+      ],
+      "coordinate": [
+        539,
+        619
+      ],
+      "content_desc": "",
+      "class": "android.view.ViewGroup"
+    }
+  ],
+  "actions": {},
+  "native_UI_agent_sha256": "d536eb5738453354738acd6fb37ccf55ab4f82b5f0ebe78d55c16d06c3676578",
+  "status": "FAILED_AT_RECORDED_UI_OR_ACTION_OBSERVATION",
+  "error": "One native probe record required; see cobra-button-01-runner.txt"
+}
