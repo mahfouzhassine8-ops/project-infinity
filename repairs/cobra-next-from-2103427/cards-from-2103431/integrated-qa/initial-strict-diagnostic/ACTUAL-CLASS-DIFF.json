@@ -1,0 +1,1986 @@
+{
+  "baseline_full_class_count": 7142,
+  "candidate_full_class_count": 7158,
+  "changed_existing_classes": [
+    "androidx/media3/common/util/Util.class",
+    "com/google/common/hash/Crc32cHashFunction$Crc32cHasher.class",
+    "com/projectinfinity/kodi/CobraComponent.class",
+    "com/projectinfinity/kodi/CobraDiagnosticArchive.class",
+    "com/projectinfinity/kodi/CobraEmbeddedCrop.class",
+    "com/projectinfinity/kodi/CobraEmblem.class",
+    "com/projectinfinity/kodi/CobraImmersiveAmbient$IlluminatedGlass.class",
+    "com/projectinfinity/kodi/CobraImmersiveAmbient.class",
+    "com/projectinfinity/kodi/CobraJavaPersistence$Atomic.class",
+    "com/projectinfinity/kodi/CobraJavaPersistence$Edit.class",
+    "com/projectinfinity/kodi/CobraJavaPersistence$Open.class",
+    "com/projectinfinity/kodi/CobraJavaPersistence.class",
+    "com/projectinfinity/kodi/CobraJavaWriteBarrier.class",
+    "com/projectinfinity/kodi/CobraLayoutCatalog.class",
+    "com/projectinfinity/kodi/CobraLogoRequests.class",
+    "com/projectinfinity/kodi/CobraNetworkIntelligence$Snapshot.class",
+    "com/projectinfinity/kodi/CobraNetworkIntelligence$State.class",
+    "com/projectinfinity/kodi/CobraNetworkIntelligence.class",
+    "com/projectinfinity/kodi/CobraPresentationEffects.class",
+    "com/projectinfinity/kodi/CobraPresentationSafety.class",
+    "com/projectinfinity/kodi/CobraProUi$Action.class",
+    "com/projectinfinity/kodi/CobraProUi$ChannelRow.class",
+    "com/projectinfinity/kodi/CobraProUi$Details.class",
+    "com/projectinfinity/kodi/CobraProUi$Dots.class",
+    "com/projectinfinity/kodi/CobraProUi$Filters$1.class",
+    "com/projectinfinity/kodi/CobraProUi$Filters.class",
+    "com/projectinfinity/kodi/CobraProUi$GameRow.class",
+    "com/projectinfinity/kodi/CobraProUi$Hero.class",
+    "com/projectinfinity/kodi/CobraProUi$Ink.class",
+    "com/projectinfinity/kodi/CobraProUi$Progress.class",
+    "com/projectinfinity/kodi/CobraProUi$SportsTabs.class",
+    "com/projectinfinity/kodi/CobraProUi$TeamRow.class",
+    "com/projectinfinity/kodi/CobraProUi$WeekGameRow.class",
+    "com/projectinfinity/kodi/CobraProUi.class",
+    "com/projectinfinity/kodi/CobraQuickPeekSession$Capacity.class",
+    "com/projectinfinity/kodi/CobraQuickPeekSession.class",
+    "com/projectinfinity/kodi/CobraRefreshFiles.class",
+    "com/projectinfinity/kodi/CobraRuntimeLease.class",
+    "com/projectinfinity/kodi/CobraSmartReturn.class",
+    "com/projectinfinity/kodi/CobraSportsReminderJob.class",
+    "com/projectinfinity/kodi/CobraVisualCatalog.class",
+    "com/projectinfinity/kodi/CobraVisualGeometry.class",
+    "com/projectinfinity/kodi/CobraVisualRenderer$DialogBuilder$1ChoiceTint.class",
+    "com/projectinfinity/kodi/CobraVisualRenderer$DialogBuilder.class",
+    "com/projectinfinity/kodi/CobraVisualRenderer$Glass.class",
+    "com/projectinfinity/kodi/CobraVisualRenderer.class",
+    "com/projectinfinity/kodi/CobraVisualScene.class",
+    "com/projectinfinity/kodi/CobraVisualTheme.class",
+    "com/projectinfinity/kodi/CobraWindowReflow.class",
+    "com/projectinfinity/kodi/InfinityCobraDeviceBridge.class",
+    "com/projectinfinity/kodi/InfinityCobraDiagnostics$Api30.class",
+    "com/projectinfinity/kodi/InfinityCobraDiagnostics.class",
+    "com/projectinfinity/kodi/InfinityCobraFeatureRuntime.class",
+    "com/projectinfinity/kodi/InfinityCobraRecordingService.class",
+    "com/projectinfinity/kodi/InfinityCobraReminderReceiver.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$12.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$16.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$17.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$2.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$25.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$3.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$32.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$6.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$9.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraBroadcastRow.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraCaptionOverlay.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraChannelMark.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraCompactChannelRow.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraEspnSiteSportsRepository.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraFocusProgrammeRow.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraFocusQueueRow.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraFoldAspectPolicy.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraGuideMath.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraGuideRuler.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraGuideViewport.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraIconButton.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraLocalTimeshiftSession.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraModeLayout.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraModeThumbnail.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraMultiLayoutPolicy.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraNetworkFamilyPolicy$FamilyDns.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraNetworkFamilyPolicy.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraPlayerBinding.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraPlayingDot.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraPosterChannelCard.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraSheetGeometry.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraSix$2.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraSix$StatsSession.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraSix.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraSniSocketFactory.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraTileStore.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraTimelineRow.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$LiveSource.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$Theme.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$UiContract.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity.class",
+    "kotlin/DeepRecursiveScopeImpl.class",
+    "kotlin/ExceptionsKt__ExceptionsKt.class",
+    "kotlin/ResultKt.class",
+    "kotlin/UShortArray.class",
+    "kotlin/collections/AbstractIterator.class",
+    "kotlin/collections/AbstractList$Companion.class",
+    "kotlin/collections/AbstractMap.class",
+    "kotlin/collections/ArrayDeque.class",
+    "kotlin/collections/ArraysKt__ArraysKt.class",
+    "kotlin/collections/ArraysKt___ArraysJvmKt.class",
+    "kotlin/collections/ArraysKt___ArraysKt.class",
+    "kotlin/collections/CollectionsKt__CollectionsKt.class",
+    "kotlin/collections/CollectionsKt__IterablesKt.class",
+    "kotlin/collections/CollectionsKt___CollectionsJvmKt.class",
+    "kotlin/collections/CollectionsKt___CollectionsKt.class",
+    "kotlin/collections/GroupingKt__GroupingJVMKt.class",
+    "kotlin/collections/GroupingKt__GroupingKt.class",
+    "kotlin/collections/MapsKt__MapsKt.class",
+    "kotlin/collections/MapsKt___MapsJvmKt.class",
+    "kotlin/collections/MapsKt___MapsKt.class",
+    "kotlin/collections/RingBuffer.class",
+    "kotlin/collections/SetsKt___SetsKt.class",
+    "kotlin/collections/SlidingWindowKt$windowedIterator$1.class",
+    "kotlin/collections/UArraySortingKt.class",
+    "kotlin/collections/builders/ListBuilder.class",
+    "kotlin/collections/builders/MapBuilder.class",
+    "kotlin/collections/builders/SerializedMap.class",
+    "kotlin/collections/unsigned/UArraysKt___UArraysKt.class",
+    "kotlin/comparisons/ComparisonsKt__ComparisonsKt$compareByDescending$2.class",
+    "kotlin/comparisons/ComparisonsKt__ComparisonsKt$thenByDescending$2.class",
+    "kotlin/comparisons/ComparisonsKt___ComparisonsJvmKt.class",
+    "kotlin/comparisons/ComparisonsKt___ComparisonsKt.class",
+    "kotlin/concurrent/LocksKt.class",
+    "kotlin/coroutines/ContinuationKt.class",
+    "kotlin/coroutines/intrinsics/IntrinsicsKt__IntrinsicsJvmKt.class",
+    "kotlin/coroutines/jvm/internal/BaseContinuationImpl.class",
+    "kotlin/coroutines/jvm/internal/DebugMetadataKt.class",
+    "kotlin/internal/PlatformImplementationsKt.class",
+    "kotlin/io/ConsoleKt.class",
+    "kotlin/io/FilePathComponents.class",
+    "kotlin/io/FileTreeWalk$FileTreeWalkIterator.class",
+    "kotlin/io/FilesKt__FileReadWriteKt.class",
+    "kotlin/io/FilesKt__UtilsKt.class",
+    "kotlin/io/LineReader.class",
+    "kotlin/io/TextStreamsKt.class",
+    "kotlin/io/encoding/Base64.class",
+    "kotlin/io/encoding/Base64Kt.class",
+    "kotlin/io/encoding/DecodeInputStream.class",
+    "kotlin/io/encoding/EncodeOutputStream.class",
+    "kotlin/io/path/PathRelativizer.class",
+    "kotlin/io/path/PathTreeWalk$dfsIterator$1.class",
+    "kotlin/io/path/PathsKt__PathReadWriteKt.class",
+    "kotlin/io/path/PathsKt__PathRecursiveFunctionsKt.class",
+    "kotlin/io/path/PathsKt__PathUtilsKt.class",
+    "kotlin/jvm/JvmClassMappingKt.class",
+    "kotlin/jvm/internal/AdaptedFunctionReference.class",
+    "kotlin/jvm/internal/ClassReference$Companion.class",
+    "kotlin/jvm/internal/ClassReference.class",
+    "kotlin/jvm/internal/Intrinsics.class",
+    "kotlin/jvm/internal/SpreadBuilder.class",
+    "kotlin/math/MathKt__MathJVMKt.class",
+    "kotlin/random/Random.class",
+    "kotlin/random/XorWowRandom.class",
+    "kotlin/ranges/LongProgression.class",
+    "kotlin/ranges/RangesKt___RangesKt.class",
+    "kotlin/ranges/ULongProgression.class",
+    "kotlin/ranges/ULongRange.class",
+    "kotlin/ranges/URangesKt___URangesKt.class",
+    "kotlin/reflect/TypeVariableImpl.class",
+    "kotlin/sequences/DistinctIterator.class",
+    "kotlin/sequences/GeneratorSequence$iterator$1.class",
+    "kotlin/sequences/SequenceBuilderIterator.class",
+    "kotlin/sequences/SequencesKt__SequencesKt$flatMapIndexed$1.class",
+    "kotlin/sequences/SequencesKt__SequencesKt$ifEmpty$1.class",
+    "kotlin/sequences/SequencesKt__SequencesKt.class",
+    "kotlin/sequences/SequencesKt___SequencesJvmKt.class",
+    "kotlin/sequences/SequencesKt___SequencesKt$runningReduceIndexed$1.class",
+    "kotlin/sequences/SequencesKt___SequencesKt$zipWithNext$2.class",
+    "kotlin/sequences/SequencesKt___SequencesKt.class",
+    "kotlin/text/CharsKt__CharJVMKt.class",
+    "kotlin/text/HexExtensionsKt.class",
+    "kotlin/text/HexFormat$NumberHexFormat.class",
+    "kotlin/text/Regex$splitToSequence$1.class",
+    "kotlin/text/RegexKt.class",
+    "kotlin/text/StringsKt__IndentKt.class",
+    "kotlin/text/StringsKt__StringNumberConversionsKt.class",
+    "kotlin/text/StringsKt__StringsJVMKt.class",
+    "kotlin/text/StringsKt__StringsKt.class",
+    "kotlin/text/StringsKt___StringsKt.class",
+    "kotlin/text/UStringsKt.class",
+    "kotlin/text/_OneToManyTitlecaseMappingsKt.class",
+    "kotlin/time/AbstractDoubleTimeSource$DoubleTimeMark.class",
+    "kotlin/time/AbstractLongTimeSource$LongTimeMark.class",
+    "kotlin/time/Duration$Companion.class",
+    "kotlin/time/Duration.class",
+    "kotlin/time/DurationKt.class",
+    "kotlin/time/TestTimeSource.class",
+    "okhttp3/Address.class",
+    "okhttp3/Cache$Companion.class",
+    "okhttp3/Cache$Entry.class",
+    "okhttp3/Cache$RealCacheRequest.class",
+    "okhttp3/Cache$urls$1.class",
+    "okhttp3/Cache.class",
+    "okhttp3/CacheControl$Companion.class",
+    "okhttp3/CertificatePinner$Pin.class",
+    "okhttp3/CertificatePinner.class",
+    "okhttp3/ConnectionSpec.class",
+    "okhttp3/Cookie$Builder.class",
+    "okhttp3/Cookie$Companion.class",
+    "okhttp3/Credentials.class",
+    "okhttp3/Dispatcher.class",
+    "okhttp3/Headers.class",
+    "okhttp3/HttpUrl$Builder.class",
+    "okhttp3/HttpUrl$Companion.class",
+    "okhttp3/HttpUrl.class",
+    "okhttp3/MediaType$Companion.class",
+    "okhttp3/MultipartBody.class",
+    "okhttp3/MultipartReader.class",
+    "okhttp3/OkHttpClient$Builder.class",
+    "okhttp3/RequestBody$Companion.class",
+    "okhttp3/ResponseBody.class",
+    "okhttp3/internal/HostnamesKt.class",
+    "okhttp3/internal/Util.class",
+    "okhttp3/internal/authenticator/JavaNetAuthenticator$WhenMappings.class",
+    "okhttp3/internal/cache/CacheInterceptor.class",
+    "okhttp3/internal/cache/CacheStrategy$Factory.class",
+    "okhttp3/internal/cache/DiskLruCache$Editor.class",
+    "okhttp3/internal/cache/DiskLruCache$newJournalWriter$faultHidingSink$1.class",
+    "okhttp3/internal/cache/DiskLruCache.class",
+    "okhttp3/internal/cache2/FileOperator.class",
+    "okhttp3/internal/cache2/Relay$Companion.class",
+    "okhttp3/internal/cache2/Relay$RelaySource.class",
+    "okhttp3/internal/concurrent/TaskLoggerKt.class",
+    "okhttp3/internal/concurrent/TaskQueue.class",
+    "okhttp3/internal/concurrent/TaskRunner$runnable$1.class",
+    "okhttp3/internal/connection/Exchange$ResponseBodySource.class",
+    "okhttp3/internal/connection/ExchangeFinder.class",
+    "okhttp3/internal/connection/RealCall$AsyncCall.class",
+    "okhttp3/internal/connection/RealCall.class",
+    "okhttp3/internal/connection/RealConnection$connectTls$2.class",
+    "okhttp3/internal/connection/RealConnection.class",
+    "okhttp3/internal/connection/RealConnectionPool.class",
+    "okhttp3/internal/connection/RouteSelector.class",
+    "okhttp3/internal/http/CallServerInterceptor.class",
+    "okhttp3/internal/http/RetryAndFollowUpInterceptor.class",
+    "okhttp3/internal/http1/Http1ExchangeCodec$ChunkedSource.class",
+    "okhttp3/internal/http1/Http1ExchangeCodec$FixedLengthSource.class",
+    "okhttp3/internal/http1/Http1ExchangeCodec.class",
+    "okhttp3/internal/http2/Hpack$Reader.class",
+    "okhttp3/internal/http2/Hpack$Writer.class",
+    "okhttp3/internal/http2/Http2.class",
+    "okhttp3/internal/http2/Http2Connection$ReaderRunnable$headers$lambda$2$$inlined$execute$default$1.class",
+    "okhttp3/internal/http2/Http2Connection$ReaderRunnable.class",
+    "okhttp3/internal/http2/Http2Connection$pushHeadersLater$$inlined$execute$default$1.class",
+    "okhttp3/internal/http2/Http2Connection$pushRequestLater$$inlined$execute$default$1.class",
+    "okhttp3/internal/http2/Http2Connection$special$$inlined$schedule$1.class",
+    "okhttp3/internal/http2/Http2Connection.class",
+    "okhttp3/internal/http2/Http2ExchangeCodec$Companion.class",
+    "okhttp3/internal/http2/Http2Reader.class",
+    "okhttp3/internal/http2/Http2Stream$FramingSink.class",
+    "okhttp3/internal/http2/Http2Writer.class",
+    "okhttp3/internal/http2/Huffman.class",
+    "okhttp3/internal/platform/AndroidPlatform.class",
+    "okhttp3/internal/platform/BouncyCastlePlatform.class",
+    "okhttp3/internal/platform/ConscryptPlatform$Companion.class",
+    "okhttp3/internal/platform/Jdk8WithJettyBootPlatform$Companion.class",
+    "okhttp3/internal/platform/Jdk8WithJettyBootPlatform.class",
+    "okhttp3/internal/platform/OpenJSSEPlatform.class",
+    "okhttp3/internal/platform/Platform$Companion.class",
+    "okhttp3/internal/platform/Platform.class",
+    "okhttp3/internal/platform/android/AndroidCertificateChainCleaner.class",
+    "okhttp3/internal/platform/android/AndroidLog.class",
+    "okhttp3/internal/platform/android/AndroidLogHandler.class",
+    "okhttp3/internal/platform/android/AndroidSocketAdapter$Companion$factory$1.class",
+    "okhttp3/internal/platform/android/AndroidSocketAdapter.class",
+    "okhttp3/internal/platform/android/CloseGuard$Companion.class",
+    "okhttp3/internal/platform/android/CloseGuard.class",
+    "okhttp3/internal/platform/android/StandardAndroidSocketAdapter$Companion.class",
+    "okhttp3/internal/publicsuffix/PublicSuffixDatabase.class",
+    "okhttp3/internal/tls/BasicTrustRootIndex.class",
+    "okhttp3/internal/tls/OkHostnameVerifier.class",
+    "okhttp3/internal/ws/MessageDeflater.class",
+    "okhttp3/internal/ws/MessageInflater.class",
+    "okhttp3/internal/ws/RealWebSocket.class",
+    "okhttp3/internal/ws/WebSocketExtensions$Companion.class",
+    "okhttp3/internal/ws/WebSocketReader.class",
+    "okhttp3/internal/ws/WebSocketWriter.class",
+    "okio/AsyncTimeout$Watchdog.class",
+    "okio/Buffer$UnsafeCursor.class",
+    "okio/Buffer.class",
+    "okio/ByteString.class",
+    "okio/CipherSink.class",
+    "okio/DeflaterSink.class",
+    "okio/FileHandle.class",
+    "okio/FileMetadata.class",
+    "okio/FileSystem.class",
+    "okio/GzipSink.class",
+    "okio/GzipSource.class",
+    "okio/InflaterSource.class",
+    "okio/JvmFileHandle.class",
+    "okio/JvmSystemFileSystem.class",
+    "okio/NioFileSystemWrappingFileSystem.class",
+    "okio/NioSystemFileSystem.class",
+    "okio/Okio__JvmOkioKt.class",
+    "okio/Okio__OkioKt.class",
+    "okio/Options$Companion.class",
+    "okio/Path.class",
+    "okio/Pipe$sink$1.class",
+    "okio/Pipe.class",
+    "okio/RealBufferedSink.class",
+    "okio/RealBufferedSource.class",
+    "okio/Segment.class",
+    "okio/SegmentPool.class",
+    "okio/SegmentedByteString.class",
+    "okio/SocketAsyncTimeout.class",
+    "okio/Throttler.class",
+    "okio/Timeout.class",
+    "okio/Utf8.class",
+    "okio/ZipFileSystem.class",
+    "okio/_Base64.class",
+    "okio/internal/FixedLengthSource.class",
+    "okio/internal/ResourceFileSystem.class",
+    "okio/internal/ZipFilesKt.class",
+    "okio/internal/_Buffer.class",
+    "okio/internal/_ByteString.class",
+    "okio/internal/_FileSystem$commonDeleteRecursively$sequence$1.class",
+    "okio/internal/_FileSystem$commonListRecursively$1.class",
+    "okio/internal/_FileSystem.class",
+    "okio/internal/_Path.class",
+    "okio/internal/_RealBufferedSource.class",
+    "okio/internal/_SegmentedByteString.class"
+  ],
+  "unexpected_changed_existing_classes": [
+    "androidx/media3/common/util/Util.class",
+    "com/google/common/hash/Crc32cHashFunction$Crc32cHasher.class",
+    "com/projectinfinity/kodi/CobraDiagnosticArchive.class",
+    "com/projectinfinity/kodi/CobraEmbeddedCrop.class",
+    "com/projectinfinity/kodi/CobraEmblem.class",
+    "com/projectinfinity/kodi/CobraImmersiveAmbient$IlluminatedGlass.class",
+    "com/projectinfinity/kodi/CobraImmersiveAmbient.class",
+    "com/projectinfinity/kodi/CobraJavaPersistence$Atomic.class",
+    "com/projectinfinity/kodi/CobraJavaPersistence$Edit.class",
+    "com/projectinfinity/kodi/CobraJavaPersistence$Open.class",
+    "com/projectinfinity/kodi/CobraJavaPersistence.class",
+    "com/projectinfinity/kodi/CobraJavaWriteBarrier.class",
+    "com/projectinfinity/kodi/CobraLayoutCatalog.class",
+    "com/projectinfinity/kodi/CobraNetworkIntelligence$Snapshot.class",
+    "com/projectinfinity/kodi/CobraNetworkIntelligence$State.class",
+    "com/projectinfinity/kodi/CobraNetworkIntelligence.class",
+    "com/projectinfinity/kodi/CobraPresentationEffects.class",
+    "com/projectinfinity/kodi/CobraPresentationSafety.class",
+    "com/projectinfinity/kodi/CobraProUi$Action.class",
+    "com/projectinfinity/kodi/CobraProUi$ChannelRow.class",
+    "com/projectinfinity/kodi/CobraProUi$Details.class",
+    "com/projectinfinity/kodi/CobraProUi$Dots.class",
+    "com/projectinfinity/kodi/CobraProUi$Filters$1.class",
+    "com/projectinfinity/kodi/CobraProUi$Filters.class",
+    "com/projectinfinity/kodi/CobraProUi$GameRow.class",
+    "com/projectinfinity/kodi/CobraProUi$Hero.class",
+    "com/projectinfinity/kodi/CobraProUi$Ink.class",
+    "com/projectinfinity/kodi/CobraProUi$Progress.class",
+    "com/projectinfinity/kodi/CobraProUi$SportsTabs.class",
+    "com/projectinfinity/kodi/CobraProUi$TeamRow.class",
+    "com/projectinfinity/kodi/CobraProUi$WeekGameRow.class",
+    "com/projectinfinity/kodi/CobraProUi.class",
+    "com/projectinfinity/kodi/CobraQuickPeekSession$Capacity.class",
+    "com/projectinfinity/kodi/CobraQuickPeekSession.class",
+    "com/projectinfinity/kodi/CobraRefreshFiles.class",
+    "com/projectinfinity/kodi/CobraRuntimeLease.class",
+    "com/projectinfinity/kodi/CobraSmartReturn.class",
+    "com/projectinfinity/kodi/CobraSportsReminderJob.class",
+    "com/projectinfinity/kodi/CobraVisualCatalog.class",
+    "com/projectinfinity/kodi/CobraVisualGeometry.class",
+    "com/projectinfinity/kodi/CobraVisualRenderer$DialogBuilder$1ChoiceTint.class",
+    "com/projectinfinity/kodi/CobraVisualRenderer$DialogBuilder.class",
+    "com/projectinfinity/kodi/CobraVisualRenderer$Glass.class",
+    "com/projectinfinity/kodi/CobraVisualRenderer.class",
+    "com/projectinfinity/kodi/CobraVisualScene.class",
+    "com/projectinfinity/kodi/CobraVisualTheme.class",
+    "com/projectinfinity/kodi/CobraWindowReflow.class",
+    "com/projectinfinity/kodi/InfinityCobraDeviceBridge.class",
+    "com/projectinfinity/kodi/InfinityCobraDiagnostics$Api30.class",
+    "com/projectinfinity/kodi/InfinityCobraDiagnostics.class",
+    "com/projectinfinity/kodi/InfinityCobraRecordingService.class",
+    "com/projectinfinity/kodi/InfinityCobraReminderReceiver.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$12.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$16.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$17.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$2.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$25.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$3.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$32.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$6.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$9.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraBroadcastRow.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraCaptionOverlay.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraChannelMark.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraCompactChannelRow.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraEspnSiteSportsRepository.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraFocusProgrammeRow.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraFocusQueueRow.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraFoldAspectPolicy.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraGuideMath.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraGuideRuler.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraGuideViewport.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraIconButton.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraLocalTimeshiftSession.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraModeLayout.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraModeThumbnail.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraMultiLayoutPolicy.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraNetworkFamilyPolicy$FamilyDns.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraNetworkFamilyPolicy.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraPlayerBinding.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraPlayingDot.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraSheetGeometry.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraSix$2.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraSix$StatsSession.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraSix.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraSniSocketFactory.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraTileStore.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraTimelineRow.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$LiveSource.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$Theme.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity$UiContract.class",
+    "kotlin/DeepRecursiveScopeImpl.class",
+    "kotlin/ExceptionsKt__ExceptionsKt.class",
+    "kotlin/ResultKt.class",
+    "kotlin/UShortArray.class",
+    "kotlin/collections/AbstractIterator.class",
+    "kotlin/collections/AbstractList$Companion.class",
+    "kotlin/collections/AbstractMap.class",
+    "kotlin/collections/ArrayDeque.class",
+    "kotlin/collections/ArraysKt__ArraysKt.class",
+    "kotlin/collections/ArraysKt___ArraysJvmKt.class",
+    "kotlin/collections/ArraysKt___ArraysKt.class",
+    "kotlin/collections/CollectionsKt__CollectionsKt.class",
+    "kotlin/collections/CollectionsKt__IterablesKt.class",
+    "kotlin/collections/CollectionsKt___CollectionsJvmKt.class",
+    "kotlin/collections/CollectionsKt___CollectionsKt.class",
+    "kotlin/collections/GroupingKt__GroupingJVMKt.class",
+    "kotlin/collections/GroupingKt__GroupingKt.class",
+    "kotlin/collections/MapsKt__MapsKt.class",
+    "kotlin/collections/MapsKt___MapsJvmKt.class",
+    "kotlin/collections/MapsKt___MapsKt.class",
+    "kotlin/collections/RingBuffer.class",
+    "kotlin/collections/SetsKt___SetsKt.class",
+    "kotlin/collections/SlidingWindowKt$windowedIterator$1.class",
+    "kotlin/collections/UArraySortingKt.class",
+    "kotlin/collections/builders/ListBuilder.class",
+    "kotlin/collections/builders/MapBuilder.class",
+    "kotlin/collections/builders/SerializedMap.class",
+    "kotlin/collections/unsigned/UArraysKt___UArraysKt.class",
+    "kotlin/comparisons/ComparisonsKt__ComparisonsKt$compareByDescending$2.class",
+    "kotlin/comparisons/ComparisonsKt__ComparisonsKt$thenByDescending$2.class",
+    "kotlin/comparisons/ComparisonsKt___ComparisonsJvmKt.class",
+    "kotlin/comparisons/ComparisonsKt___ComparisonsKt.class",
+    "kotlin/concurrent/LocksKt.class",
+    "kotlin/coroutines/ContinuationKt.class",
+    "kotlin/coroutines/intrinsics/IntrinsicsKt__IntrinsicsJvmKt.class",
+    "kotlin/coroutines/jvm/internal/BaseContinuationImpl.class",
+    "kotlin/coroutines/jvm/internal/DebugMetadataKt.class",
+    "kotlin/internal/PlatformImplementationsKt.class",
+    "kotlin/io/ConsoleKt.class",
+    "kotlin/io/FilePathComponents.class",
+    "kotlin/io/FileTreeWalk$FileTreeWalkIterator.class",
+    "kotlin/io/FilesKt__FileReadWriteKt.class",
+    "kotlin/io/FilesKt__UtilsKt.class",
+    "kotlin/io/LineReader.class",
+    "kotlin/io/TextStreamsKt.class",
+    "kotlin/io/encoding/Base64.class",
+    "kotlin/io/encoding/Base64Kt.class",
+    "kotlin/io/encoding/DecodeInputStream.class",
+    "kotlin/io/encoding/EncodeOutputStream.class",
+    "kotlin/io/path/PathRelativizer.class",
+    "kotlin/io/path/PathTreeWalk$dfsIterator$1.class",
+    "kotlin/io/path/PathsKt__PathReadWriteKt.class",
+    "kotlin/io/path/PathsKt__PathRecursiveFunctionsKt.class",
+    "kotlin/io/path/PathsKt__PathUtilsKt.class",
+    "kotlin/jvm/JvmClassMappingKt.class",
+    "kotlin/jvm/internal/AdaptedFunctionReference.class",
+    "kotlin/jvm/internal/ClassReference$Companion.class",
+    "kotlin/jvm/internal/ClassReference.class",
+    "kotlin/jvm/internal/Intrinsics.class",
+    "kotlin/jvm/internal/SpreadBuilder.class",
+    "kotlin/math/MathKt__MathJVMKt.class",
+    "kotlin/random/Random.class",
+    "kotlin/random/XorWowRandom.class",
+    "kotlin/ranges/LongProgression.class",
+    "kotlin/ranges/RangesKt___RangesKt.class",
+    "kotlin/ranges/ULongProgression.class",
+    "kotlin/ranges/ULongRange.class",
+    "kotlin/ranges/URangesKt___URangesKt.class",
+    "kotlin/reflect/TypeVariableImpl.class",
+    "kotlin/sequences/DistinctIterator.class",
+    "kotlin/sequences/GeneratorSequence$iterator$1.class",
+    "kotlin/sequences/SequenceBuilderIterator.class",
+    "kotlin/sequences/SequencesKt__SequencesKt$flatMapIndexed$1.class",
+    "kotlin/sequences/SequencesKt__SequencesKt$ifEmpty$1.class",
+    "kotlin/sequences/SequencesKt__SequencesKt.class",
+    "kotlin/sequences/SequencesKt___SequencesJvmKt.class",
+    "kotlin/sequences/SequencesKt___SequencesKt$runningReduceIndexed$1.class",
+    "kotlin/sequences/SequencesKt___SequencesKt$zipWithNext$2.class",
+    "kotlin/sequences/SequencesKt___SequencesKt.class",
+    "kotlin/text/CharsKt__CharJVMKt.class",
+    "kotlin/text/HexExtensionsKt.class",
+    "kotlin/text/HexFormat$NumberHexFormat.class",
+    "kotlin/text/Regex$splitToSequence$1.class",
+    "kotlin/text/RegexKt.class",
+    "kotlin/text/StringsKt__IndentKt.class",
+    "kotlin/text/StringsKt__StringNumberConversionsKt.class",
+    "kotlin/text/StringsKt__StringsJVMKt.class",
+    "kotlin/text/StringsKt__StringsKt.class",
+    "kotlin/text/StringsKt___StringsKt.class",
+    "kotlin/text/UStringsKt.class",
+    "kotlin/text/_OneToManyTitlecaseMappingsKt.class",
+    "kotlin/time/AbstractDoubleTimeSource$DoubleTimeMark.class",
+    "kotlin/time/AbstractLongTimeSource$LongTimeMark.class",
+    "kotlin/time/Duration$Companion.class",
+    "kotlin/time/Duration.class",
+    "kotlin/time/DurationKt.class",
+    "kotlin/time/TestTimeSource.class",
+    "okhttp3/Address.class",
+    "okhttp3/Cache$Companion.class",
+    "okhttp3/Cache$Entry.class",
+    "okhttp3/Cache$RealCacheRequest.class",
+    "okhttp3/Cache$urls$1.class",
+    "okhttp3/Cache.class",
+    "okhttp3/CacheControl$Companion.class",
+    "okhttp3/CertificatePinner$Pin.class",
+    "okhttp3/CertificatePinner.class",
+    "okhttp3/ConnectionSpec.class",
+    "okhttp3/Cookie$Builder.class",
+    "okhttp3/Cookie$Companion.class",
+    "okhttp3/Credentials.class",
+    "okhttp3/Dispatcher.class",
+    "okhttp3/Headers.class",
+    "okhttp3/HttpUrl$Builder.class",
+    "okhttp3/HttpUrl$Companion.class",
+    "okhttp3/HttpUrl.class",
+    "okhttp3/MediaType$Companion.class",
+    "okhttp3/MultipartBody.class",
+    "okhttp3/MultipartReader.class",
+    "okhttp3/OkHttpClient$Builder.class",
+    "okhttp3/RequestBody$Companion.class",
+    "okhttp3/ResponseBody.class",
+    "okhttp3/internal/HostnamesKt.class",
+    "okhttp3/internal/Util.class",
+    "okhttp3/internal/authenticator/JavaNetAuthenticator$WhenMappings.class",
+    "okhttp3/internal/cache/CacheInterceptor.class",
+    "okhttp3/internal/cache/CacheStrategy$Factory.class",
+    "okhttp3/internal/cache/DiskLruCache$Editor.class",
+    "okhttp3/internal/cache/DiskLruCache$newJournalWriter$faultHidingSink$1.class",
+    "okhttp3/internal/cache/DiskLruCache.class",
+    "okhttp3/internal/cache2/FileOperator.class",
+    "okhttp3/internal/cache2/Relay$Companion.class",
+    "okhttp3/internal/cache2/Relay$RelaySource.class",
+    "okhttp3/internal/concurrent/TaskLoggerKt.class",
+    "okhttp3/internal/concurrent/TaskQueue.class",
+    "okhttp3/internal/concurrent/TaskRunner$runnable$1.class",
+    "okhttp3/internal/connection/Exchange$ResponseBodySource.class",
+    "okhttp3/internal/connection/ExchangeFinder.class",
+    "okhttp3/internal/connection/RealCall$AsyncCall.class",
+    "okhttp3/internal/connection/RealCall.class",
+    "okhttp3/internal/connection/RealConnection$connectTls$2.class",
+    "okhttp3/internal/connection/RealConnection.class",
+    "okhttp3/internal/connection/RealConnectionPool.class",
+    "okhttp3/internal/connection/RouteSelector.class",
+    "okhttp3/internal/http/CallServerInterceptor.class",
+    "okhttp3/internal/http/RetryAndFollowUpInterceptor.class",
+    "okhttp3/internal/http1/Http1ExchangeCodec$ChunkedSource.class",
+    "okhttp3/internal/http1/Http1ExchangeCodec$FixedLengthSource.class",
+    "okhttp3/internal/http1/Http1ExchangeCodec.class",
+    "okhttp3/internal/http2/Hpack$Reader.class",
+    "okhttp3/internal/http2/Hpack$Writer.class",
+    "okhttp3/internal/http2/Http2.class",
+    "okhttp3/internal/http2/Http2Connection$ReaderRunnable$headers$lambda$2$$inlined$execute$default$1.class",
+    "okhttp3/internal/http2/Http2Connection$ReaderRunnable.class",
+    "okhttp3/internal/http2/Http2Connection$pushHeadersLater$$inlined$execute$default$1.class",
+    "okhttp3/internal/http2/Http2Connection$pushRequestLater$$inlined$execute$default$1.class",
+    "okhttp3/internal/http2/Http2Connection$special$$inlined$schedule$1.class",
+    "okhttp3/internal/http2/Http2Connection.class",
+    "okhttp3/internal/http2/Http2ExchangeCodec$Companion.class",
+    "okhttp3/internal/http2/Http2Reader.class",
+    "okhttp3/internal/http2/Http2Stream$FramingSink.class",
+    "okhttp3/internal/http2/Http2Writer.class",
+    "okhttp3/internal/http2/Huffman.class",
+    "okhttp3/internal/platform/AndroidPlatform.class",
+    "okhttp3/internal/platform/BouncyCastlePlatform.class",
+    "okhttp3/internal/platform/ConscryptPlatform$Companion.class",
+    "okhttp3/internal/platform/Jdk8WithJettyBootPlatform$Companion.class",
+    "okhttp3/internal/platform/Jdk8WithJettyBootPlatform.class",
+    "okhttp3/internal/platform/OpenJSSEPlatform.class",
+    "okhttp3/internal/platform/Platform$Companion.class",
+    "okhttp3/internal/platform/Platform.class",
+    "okhttp3/internal/platform/android/AndroidCertificateChainCleaner.class",
+    "okhttp3/internal/platform/android/AndroidLog.class",
+    "okhttp3/internal/platform/android/AndroidLogHandler.class",
+    "okhttp3/internal/platform/android/AndroidSocketAdapter$Companion$factory$1.class",
+    "okhttp3/internal/platform/android/AndroidSocketAdapter.class",
+    "okhttp3/internal/platform/android/CloseGuard$Companion.class",
+    "okhttp3/internal/platform/android/CloseGuard.class",
+    "okhttp3/internal/platform/android/StandardAndroidSocketAdapter$Companion.class",
+    "okhttp3/internal/publicsuffix/PublicSuffixDatabase.class",
+    "okhttp3/internal/tls/BasicTrustRootIndex.class",
+    "okhttp3/internal/tls/OkHostnameVerifier.class",
+    "okhttp3/internal/ws/MessageDeflater.class",
+    "okhttp3/internal/ws/MessageInflater.class",
+    "okhttp3/internal/ws/RealWebSocket.class",
+    "okhttp3/internal/ws/WebSocketExtensions$Companion.class",
+    "okhttp3/internal/ws/WebSocketReader.class",
+    "okhttp3/internal/ws/WebSocketWriter.class",
+    "okio/AsyncTimeout$Watchdog.class",
+    "okio/Buffer$UnsafeCursor.class",
+    "okio/Buffer.class",
+    "okio/ByteString.class",
+    "okio/CipherSink.class",
+    "okio/DeflaterSink.class",
+    "okio/FileHandle.class",
+    "okio/FileMetadata.class",
+    "okio/FileSystem.class",
+    "okio/GzipSink.class",
+    "okio/GzipSource.class",
+    "okio/InflaterSource.class",
+    "okio/JvmFileHandle.class",
+    "okio/JvmSystemFileSystem.class",
+    "okio/NioFileSystemWrappingFileSystem.class",
+    "okio/NioSystemFileSystem.class",
+    "okio/Okio__JvmOkioKt.class",
+    "okio/Okio__OkioKt.class",
+    "okio/Options$Companion.class",
+    "okio/Path.class",
+    "okio/Pipe$sink$1.class",
+    "okio/Pipe.class",
+    "okio/RealBufferedSink.class",
+    "okio/RealBufferedSource.class",
+    "okio/Segment.class",
+    "okio/SegmentPool.class",
+    "okio/SegmentedByteString.class",
+    "okio/SocketAsyncTimeout.class",
+    "okio/Throttler.class",
+    "okio/Timeout.class",
+    "okio/Utf8.class",
+    "okio/ZipFileSystem.class",
+    "okio/_Base64.class",
+    "okio/internal/FixedLengthSource.class",
+    "okio/internal/ResourceFileSystem.class",
+    "okio/internal/ZipFilesKt.class",
+    "okio/internal/_Buffer.class",
+    "okio/internal/_ByteString.class",
+    "okio/internal/_FileSystem$commonDeleteRecursively$sequence$1.class",
+    "okio/internal/_FileSystem$commonListRecursively$1.class",
+    "okio/internal/_FileSystem.class",
+    "okio/internal/_Path.class",
+    "okio/internal/_RealBufferedSource.class",
+    "okio/internal/_SegmentedByteString.class"
+  ],
+  "new_classes": [
+    "com/projectinfinity/kodi/CobraCardsLayout$ButtonSurface.class",
+    "com/projectinfinity/kodi/CobraCardsLayout$PanelSurface.class",
+    "com/projectinfinity/kodi/CobraCardsLayout$ProgressSurface.class",
+    "com/projectinfinity/kodi/CobraCardsLayout$Slot.class",
+    "com/projectinfinity/kodi/CobraCardsLayout$Snapshot.class",
+    "com/projectinfinity/kodi/CobraCardsLayout$State.class",
+    "com/projectinfinity/kodi/CobraCardsLayout.class",
+    "com/projectinfinity/kodi/CobraCardsTiles$CardSurface.class",
+    "com/projectinfinity/kodi/CobraCardsTiles$Holder.class",
+    "com/projectinfinity/kodi/CobraCardsTiles$LiveDot.class",
+    "com/projectinfinity/kodi/CobraCardsTiles$MoreView.class",
+    "com/projectinfinity/kodi/CobraCardsTiles$OwnedLogo.class",
+    "com/projectinfinity/kodi/CobraCardsTiles$RoundedProgress.class",
+    "com/projectinfinity/kodi/CobraCardsTiles.class",
+    "com/projectinfinity/kodi/CobraProfileDataReuse$Entry.class",
+    "com/projectinfinity/kodi/CobraProfileDataReuse.class"
+  ],
+  "missing_classes": [],
+  "changed_class_sha256": {
+    "androidx/media3/common/util/Util.class": {
+      "accepted431": "987588fae1c07fbf0c9a031ff21b924d897042371e33d1a3df8414267ab81a6a",
+      "owner_v2": "6b9300dfbd1762d3519d4153335f7f42543d552f7d08d294e7615421b078e360"
+    },
+    "com/google/common/hash/Crc32cHashFunction$Crc32cHasher.class": {
+      "accepted431": "7d463d172f0c942bb08b0f50cde50e5d93a4cb5e453396cf34530205d6f87a07",
+      "owner_v2": "c6053a633fb60482218f3f107bc840f367c8e5ff3631a091f0af41895d35ceef"
+    },
+    "com/projectinfinity/kodi/CobraComponent.class": {
+      "accepted431": "362c30ddca06d12bcbc2364f5f5224d295015b9b95db6d5f88918c736486a24e",
+      "owner_v2": "b4f41da9bd40197067b881feb6e386826c8e87d22deaaaa76628ac2e0afafe8b"
+    },
+    "com/projectinfinity/kodi/CobraDiagnosticArchive.class": {
+      "accepted431": "ddc6155c99fb5c26dc10a3717299832a44d39ce2d809f5b405fa5ef28476c343",
+      "owner_v2": "164ebee757badd8fbfa473c0a7f90a8b586f71cbf75042d548daa9430caf1cb8"
+    },
+    "com/projectinfinity/kodi/CobraEmbeddedCrop.class": {
+      "accepted431": "51c8658df1fb9f01ab77b91b9b46fc35cb3726907a3a1853cc4d7298d489325c",
+      "owner_v2": "f93cafe931c35bf0d22665abd27eaf262605eb0a247b76eea9c4b28f885f4389"
+    },
+    "com/projectinfinity/kodi/CobraEmblem.class": {
+      "accepted431": "4988be80222239b57dfd0d31818084e990af540536e409c60032cdceecfcca3a",
+      "owner_v2": "c4cd0a4030052233386850e3743cdf5beb9018bda4d853b3e78f8d5a226fc441"
+    },
+    "com/projectinfinity/kodi/CobraImmersiveAmbient$IlluminatedGlass.class": {
+      "accepted431": "1d2f6d79dea9c899ffc8aa707fd6017ca45366079f8488e4de44a54e25698627",
+      "owner_v2": "ede66e9a3f89123d19abaed2fc6ce74d85fdfa78f382732ba7d6b99d286f090c"
+    },
+    "com/projectinfinity/kodi/CobraImmersiveAmbient.class": {
+      "accepted431": "d56ba9a4bac8079a2794042961f65c3ecc6200634ddb6e30743ccf6ab4138085",
+      "owner_v2": "3dbb3a04b1b611ac21ef038d418300d4e2fcfebb10f5e2bfeb6c45fe5f642cbc"
+    },
+    "com/projectinfinity/kodi/CobraJavaPersistence$Atomic.class": {
+      "accepted431": "11e6385ae36d9210a353c4a1cdaab48fff1c5a7098a379e7916087cc1bd07dee",
+      "owner_v2": "960c3fe39cc0bba755445b82ece4c5d84442b46d9f99a35e7424159f80e185d8"
+    },
+    "com/projectinfinity/kodi/CobraJavaPersistence$Edit.class": {
+      "accepted431": "b1a6e3af71e1ea99bbf5e5d2632d3c89bf4ce9f165e9c6af620ab41021f472ac",
+      "owner_v2": "f597ead4b434f3f22e28d802ca647f35a30e817d14603cb633048d6bc073446b"
+    },
+    "com/projectinfinity/kodi/CobraJavaPersistence$Open.class": {
+      "accepted431": "e32c0c39e9555c0698648a764980945a0a046e09fee76c3ffac768fd3b8bb3c6",
+      "owner_v2": "4b36c9c7b44a90882b58bc64a575128b4ea0e195371b2a1ab4fd79af4d187e6d"
+    },
+    "com/projectinfinity/kodi/CobraJavaPersistence.class": {
+      "accepted431": "f067288c4e4440b5838baf40a5c80de8abedecb26e1022343091c4d1d16543f4",
+      "owner_v2": "f3b0f87832a32342b877f97bf9a42a0883058ca32a87c1927b920feb1e29755d"
+    },
+    "com/projectinfinity/kodi/CobraJavaWriteBarrier.class": {
+      "accepted431": "875086b6aeb8d4808c022eaf48c44008282eef5966e9975a3313155d8aec1c60",
+      "owner_v2": "129f7e9e5802b4fab68099b770f41038561bcb30b4cd004f503bb47d571a8fa2"
+    },
+    "com/projectinfinity/kodi/CobraLayoutCatalog.class": {
+      "accepted431": "87b16a3bd3faa08b908eddf86bab3c542f0a9ed698c8ec0a055bd98a52afdd25",
+      "owner_v2": "e9cebbfe26de1d2e8580f1b592b4aba06147dfe2ce7c3ba551dd5004801de862"
+    },
+    "com/projectinfinity/kodi/CobraLogoRequests.class": {
+      "accepted431": "0ab38e11ab926c9dd51064db11d38f06460c24c7b4a4533d2fb8688d46970ace",
+      "owner_v2": "f73e289778acbeffe234e98af687f5e92a12d6a3547a9691e5cda1cc672ba362"
+    },
+    "com/projectinfinity/kodi/CobraNetworkIntelligence$Snapshot.class": {
+      "accepted431": "35f31497cd68b965e4b70f58e571de919a5299b50c0565a8acbb9443ff68bec9",
+      "owner_v2": "4fb6916106c39b701288488597b5d053e4f4dd8532fd08362cbc077fd30718c8"
+    },
+    "com/projectinfinity/kodi/CobraNetworkIntelligence$State.class": {
+      "accepted431": "1a441bd3363fe96ed195afd2e16cddf1842cd3ceb0bb0fe9a7c03cfdbf0f97f6",
+      "owner_v2": "393f116a9faf75031ea759266bb60bc90c00c1a5e86c27a502e55db2f1a84f3c"
+    },
+    "com/projectinfinity/kodi/CobraNetworkIntelligence.class": {
+      "accepted431": "af88647ea7a16dca7791311c8c491397d2ce872d49df2fdf12a0ac60dcec8223",
+      "owner_v2": "113e285f46b165acf83e33100fc668c40e47086fa0c97800715876a1eb201d04"
+    },
+    "com/projectinfinity/kodi/CobraPresentationEffects.class": {
+      "accepted431": "acc400343a5063006a4ef2ffa847509a6e66ce652bb6631f7d1bf7bb9058f86e",
+      "owner_v2": "661bb650672f2fa3217f32f1ff8ccd8ca93bd382551bafada25c55269fa1c19c"
+    },
+    "com/projectinfinity/kodi/CobraPresentationSafety.class": {
+      "accepted431": "35b2748681e68903c52646b520f1e6d080a3bd67a77df2b40efa21a19823c884",
+      "owner_v2": "bdc7d8a8d1558ee6e4b7dc1b9eac998def2bf085a0435fdf2a05f7c895667895"
+    },
+    "com/projectinfinity/kodi/CobraProUi$Action.class": {
+      "accepted431": "f910200398710840b775df338ba157d132433f9da282c5d3f8aa9ec9eddf2ea3",
+      "owner_v2": "29b9b885f8a15e4f1e9e1da0d93feef920dc1d302cef372b1901313e0b0ee98b"
+    },
+    "com/projectinfinity/kodi/CobraProUi$ChannelRow.class": {
+      "accepted431": "e80705b07d31c314e5d387be49b9ea52bb078cdf62a455a927f66d22f20708dd",
+      "owner_v2": "7697cd95d47ad2435f008bdc9dd3c5db99a82ba045f870f9f8bacc3eb7574578"
+    },
+    "com/projectinfinity/kodi/CobraProUi$Details.class": {
+      "accepted431": "7bdd03ebd6e38b911b3635bb24703718cfbea930f9e2e53a68cbbc783528ed98",
+      "owner_v2": "8778a9ffc063c2bf68dafb0112a64c89a0aa01e91a819406a22444e9d045c1b2"
+    },
+    "com/projectinfinity/kodi/CobraProUi$Dots.class": {
+      "accepted431": "2ce8d57991b4b69553f516c728fc1f4342748971b8107c385b66d3603b103bc3",
+      "owner_v2": "32d4965e2de0e60e5b7673dcab7f5872b15c51b5c00c45f58cd8aa4b5f98b528"
+    },
+    "com/projectinfinity/kodi/CobraProUi$Filters$1.class": {
+      "accepted431": "c915d909474bd01108b4e783439a9b2572ea1e5fd6863d32950071a1e3e448b0",
+      "owner_v2": "8794056376d36b94eb9acae8294529784002158bcbc638974f251c77c620a43e"
+    },
+    "com/projectinfinity/kodi/CobraProUi$Filters.class": {
+      "accepted431": "3ab9ee62d04caa6bc107519cce20d2ff8f5aa873ad311abe152eff6ec943e34d",
+      "owner_v2": "55f33a50b1723390ac2d7d1dc1a4925c46d2f567c72ef2f5de07f4356cf06ccf"
+    },
+    "com/projectinfinity/kodi/CobraProUi$GameRow.class": {
+      "accepted431": "11339e8e7d6765e2150e068d00d0a86df99f42f97522eb06ba9515beb44d43ab",
+      "owner_v2": "c36319303cdca3e58e2ca366877d31395ab19bb94c1301fb4bfe10871b03f2eb"
+    },
+    "com/projectinfinity/kodi/CobraProUi$Hero.class": {
+      "accepted431": "53847a3e71758a0be1e9694e07a2e24436c63fc990c72dfc95f6f92a560b8602",
+      "owner_v2": "54e1e99ee7a528f45873381d4f20b10fbc0a5aaae46eeb0324d8fd9ec18be1be"
+    },
+    "com/projectinfinity/kodi/CobraProUi$Ink.class": {
+      "accepted431": "b5172a65279f7ca469de3787a2f232637ed702f745b317ca53b4901479a3c5f2",
+      "owner_v2": "1fe2ea523ab23ece09b2cf56f0ffe84ff59872e79f16650c56572418bfe2a1f4"
+    },
+    "com/projectinfinity/kodi/CobraProUi$Progress.class": {
+      "accepted431": "e8d798e0162cea4d282d8dfd33247351a6bdf733859663b78a6bb933ec3a2fc9",
+      "owner_v2": "1f53df46335d96f04aeb1d4278030c50afb8ea8aa86196bd28bcbe92f0c3d44e"
+    },
+    "com/projectinfinity/kodi/CobraProUi$SportsTabs.class": {
+      "accepted431": "4d139ab3bbe7a17944abd034c5ce4aebfdbad3804129d6602d6a4e7921dc4147",
+      "owner_v2": "c4a353d92812f89747ce4a61d9d48623b0c6c7800c7968ab40912e13f60d0f0b"
+    },
+    "com/projectinfinity/kodi/CobraProUi$TeamRow.class": {
+      "accepted431": "9c6c342c30705b37d7f38d8b1f209af5eb5d356a3a66379e730a2159406464c5",
+      "owner_v2": "8642c4e7efd389205e3b06fe84b16b6f160ccea9f94598eb52d51c2954d20be6"
+    },
+    "com/projectinfinity/kodi/CobraProUi$WeekGameRow.class": {
+      "accepted431": "5a57a204904faa2c2c3c76f36a7362561e33acb167edad1e816ad4be2d91bf52",
+      "owner_v2": "b17b71499dbd22b9897b18d23cfdc6c87b5c52348374380b96802ecca338e91f"
+    },
+    "com/projectinfinity/kodi/CobraProUi.class": {
+      "accepted431": "abf6884cdbbc2aaab4e2021a556e58f9e4fce50cfb8924817aae826bf0ea469c",
+      "owner_v2": "8a0e37bc9abb94fc9a66ddca9860bd9949eb3e38fbb3175d34f51970f2d37df2"
+    },
+    "com/projectinfinity/kodi/CobraQuickPeekSession$Capacity.class": {
+      "accepted431": "1dba9400dc80a33a6b46d0b0b96ffe2a910cd1037287f054524ff35aa0045e3d",
+      "owner_v2": "0a257d8b0b075873de826a74c0659b8a4bd7ab4444222a74626ee561f84094df"
+    },
+    "com/projectinfinity/kodi/CobraQuickPeekSession.class": {
+      "accepted431": "cccc4156e524fe047d48ce7c428f24b00a0b3b002dbb14dc5a9f97bbffabebb5",
+      "owner_v2": "8d03af80c6de7db7ba331f7213b08634d52150118aa5d7dea29d1816d793af1c"
+    },
+    "com/projectinfinity/kodi/CobraRefreshFiles.class": {
+      "accepted431": "7ffd894234840929519ce08444be26dd70b6ee0688d80f943bc30c8b62260575",
+      "owner_v2": "497a3f62acc1328f7fcb64a46aea5dd88386408c765e28bec70c2a9d71ba04b9"
+    },
+    "com/projectinfinity/kodi/CobraRuntimeLease.class": {
+      "accepted431": "b59cac3a9baca2a3093e35e020801860277b81f0b688ca29c11fb11e896d339b",
+      "owner_v2": "d058fa7f8f5223d6d2a9dff03c35ce8b8a07168688e1b22507ffaf40bc2ee582"
+    },
+    "com/projectinfinity/kodi/CobraSmartReturn.class": {
+      "accepted431": "e674a1bad86efcaab939bca4d4d625b6773d895a4b9c3ae371f4a623ae53da09",
+      "owner_v2": "bc4af369ba338c918a4e180b80e201dca3e405d4a6df6814c8cc79412fc355e9"
+    },
+    "com/projectinfinity/kodi/CobraSportsReminderJob.class": {
+      "accepted431": "8bcf15b88659638d95aac7065c69be6f7cdfe312b99995984b52fdeca6c3522d",
+      "owner_v2": "734872d9a6f62845c631525392dc1e42e0601c2b6290777a6048cf5f0d918ab5"
+    },
+    "com/projectinfinity/kodi/CobraVisualCatalog.class": {
+      "accepted431": "5a67c8fc6a70875448f0b181a3eb0416f21444d0c0cccfc4503f04b9268df4b8",
+      "owner_v2": "66010f2b4aff72ddf9d352c015dbe42e8b945871890e665c01ff9f6c82d42c75"
+    },
+    "com/projectinfinity/kodi/CobraVisualGeometry.class": {
+      "accepted431": "ef24b1961908e1657319f611b01942538906818d646539b25732d844b11243dc",
+      "owner_v2": "a24336611e82956e27be74730e8de7b919fc2fb6b459f76c9b567378598e4bae"
+    },
+    "com/projectinfinity/kodi/CobraVisualRenderer$DialogBuilder$1ChoiceTint.class": {
+      "accepted431": "458fdac9eb20e4ff73dfb945ee7d634c7c5d38d9301484a8220af0a927f6c4cd",
+      "owner_v2": "874943e3f7452ae05cc7c2ac8acd0dbcd05fbc3142a1ee48be5894a1598faa26"
+    },
+    "com/projectinfinity/kodi/CobraVisualRenderer$DialogBuilder.class": {
+      "accepted431": "37546b4104a165ca297c22c11f64a8120e28b3129c3ebdb807931229cb969ec9",
+      "owner_v2": "7b0e7ae5038722f16358fb84e391f79da3a99c12a5960a27828ac45c49d6bb90"
+    },
+    "com/projectinfinity/kodi/CobraVisualRenderer$Glass.class": {
+      "accepted431": "530f16c7474cdb374f3ed07c5caac2b5342fb701a48537b5b42aace66bb558c6",
+      "owner_v2": "dd1c009df4b5a7930b0e86b4eab7e5e25fd45dc95bca3682e71ec2145a5a43d8"
+    },
+    "com/projectinfinity/kodi/CobraVisualRenderer.class": {
+      "accepted431": "175200f2f807f77168328560b8e127bb781b3f093651b407b02c751854ca7555",
+      "owner_v2": "7fe889e4127255ae1e72cfc23b8f0be6f041734c92bffca8024ae7c5822b42b8"
+    },
+    "com/projectinfinity/kodi/CobraVisualScene.class": {
+      "accepted431": "d5e1be91430d585e1b70b121bc8b3376bcaf68d5dd7dad6adbd600fca7b6e390",
+      "owner_v2": "83e97a91910ed87fcca53c4c1e106802f93395f9338364c43cd1603ebded88c6"
+    },
+    "com/projectinfinity/kodi/CobraVisualTheme.class": {
+      "accepted431": "bf797081af23581c933c3588868b94fbbe93c557d2dee6dfacc7d83b8244a840",
+      "owner_v2": "e1d20d05c0e88efa03190002b5a5e4962044dad34dc2f7df4a419946f7308c8f"
+    },
+    "com/projectinfinity/kodi/CobraWindowReflow.class": {
+      "accepted431": "bfc7bf7dfc9e392903882fe098c85897fd5e994874cba6409569de30397bf58f",
+      "owner_v2": "764579448096f245bec8948bbb4ca0ed67b0ec6a5067e7a0837ba500c73b357d"
+    },
+    "com/projectinfinity/kodi/InfinityCobraDeviceBridge.class": {
+      "accepted431": "0debc369f95432969d87b2106f0be925e06a6a43356cb492561d7681a359e8a6",
+      "owner_v2": "8b36011d9ed04c9636909037eff609302f513c302eaa91ffdd97bc451e91094d"
+    },
+    "com/projectinfinity/kodi/InfinityCobraDiagnostics$Api30.class": {
+      "accepted431": "8d99e1eef45977ca972abeb5b3dc98693a2d2d7589dbd885928c4cdb9935f13b",
+      "owner_v2": "2fb7d170ae7232642d2f32bd333c2c05015cb72f8de9aa09d64d355f018ebb0d"
+    },
+    "com/projectinfinity/kodi/InfinityCobraDiagnostics.class": {
+      "accepted431": "327618b317f94ed4f7c2143f37d543b95dcabedfeacb8f25a7d89e1fb1931bcb",
+      "owner_v2": "7fd2c7797438c8ed7253e9e240a09e63f4500947254e824facd4259baaac39ed"
+    },
+    "com/projectinfinity/kodi/InfinityCobraFeatureRuntime.class": {
+      "accepted431": "098795641e1cc11d56823ce5dce922288c566235d08fefad48faf5bdc36f073e",
+      "owner_v2": "380b59b95aeb9d7aa3610725e327a1a758c725add7fbdea11a1ad251f58c887c"
+    },
+    "com/projectinfinity/kodi/InfinityCobraRecordingService.class": {
+      "accepted431": "d8419504d8711029b6d11bdb02f2d47f29eb9cf474233177cc760016003b3a52",
+      "owner_v2": "770ae67fad6f8a6cf05ce4c78316cccd784f426c82b9d79d26600292578d9738"
+    },
+    "com/projectinfinity/kodi/InfinityCobraReminderReceiver.class": {
+      "accepted431": "0830243cf077acdee31970dc8d5bb69afa4379b86ae0db386d28bb23f0c4b84b",
+      "owner_v2": "0c199371e3e13d08edaed2d02c4779eb3e42a9ea4bbaa4d82237de8df0572241"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$12.class": {
+      "accepted431": "1acb99b2b410145ef9295744e5205569d823d385569d2165c5e43c4ce131cb63",
+      "owner_v2": "eb0a840cb549fecca049f8edd1db39dbf98237f1c3617deb1ff60f301db4abce"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$16.class": {
+      "accepted431": "e7ec5b5b246e1f3793a55afd86871af15c0600eb124bd0d91d40ddb7c542d36d",
+      "owner_v2": "5d664ae76546d94cef9d734a44cc806b6e3c1e46af196d871b6888422361dc89"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$17.class": {
+      "accepted431": "4a59b00d813c064afb334ea5cbc46ba9b51322815744d4c60478c1f00f69bb62",
+      "owner_v2": "61c6ed260d8b877e05516fe68e1dc6b7444b7bf071dbe7f4ce37ca626b44b7cf"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$2.class": {
+      "accepted431": "e2d709d988d3f0125af7aa011cc86299ae77c8138e0d2402404a1a1ce68d5c27",
+      "owner_v2": "d32f5a5c1b27902e30b7d667a049a7be87a4b6aff09e1093ebe05499009dce52"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$25.class": {
+      "accepted431": "e0ef37606232eb0ffeea9fec18bf918a9d1cefc4d6fabac7af0b323564fc4eb9",
+      "owner_v2": "3aed819936fa6fece5e397c8e134cd6e3624d9f200c158b1583ed18013ed810a"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$3.class": {
+      "accepted431": "1d15b659805a33dd7dd33cc2fd327c4d516849077c7447a6a2ce7dcce6da8ce2",
+      "owner_v2": "629fbc44d248b3b17e2c8af75bac578f39c43b27294f6337fc787ac3a61eb65f"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$32.class": {
+      "accepted431": "221d9926e27bf7c23964d71fe1d0def48715121d1fa5a448b7447a9444cbc4e3",
+      "owner_v2": "7d03e9b31f8a4b25cbbd629d6f53aaa5288b249606408af6c8e03c43fd8c05d3"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$6.class": {
+      "accepted431": "a86780f9e0df0f4daed235cfad7181bb789b8867713cdb344ec5f16948c26c99",
+      "owner_v2": "13c46d8e6ab50fc0bf980ed9faca047923691d01488148553b3df3029a13180a"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$9.class": {
+      "accepted431": "e6197622a591dcee818cc19281f8507de1785a4fb887369e6e0b657e1e9ac5f1",
+      "owner_v2": "bbad88286277fd32ce84f5fe2197102613a5abcb737b83ec4710caddd939c852"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraBroadcastRow.class": {
+      "accepted431": "f73bc710df5712976a667721944a57b589c8e7d022afe9f93d5a5cc6ad66d4f7",
+      "owner_v2": "b934b7431bc2dfc1347077d7d72ba309f5a7b5639b291fc2c3c8dcd49f66948d"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraCaptionOverlay.class": {
+      "accepted431": "a489281eb83b0473c65185f586621bb1e699c248bf39c056d214ca65c1d89bdd",
+      "owner_v2": "57def6084fbe22d022e903f704f47683343b6b80ad27d635d3957f2e8b61ca5c"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraChannelMark.class": {
+      "accepted431": "86a9714fa8d8068d0860aec7e8c8205525134597a5ec9b512f1f2d80d5053904",
+      "owner_v2": "00ff3d743552886cc47fc410b1fe3ec0624df0cb52b71a9937e1f12703353e43"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraCompactChannelRow.class": {
+      "accepted431": "aeeb12400ba3c4bcd3deebdf561c6882a65d903264c2f85cb332cb620f3983b6",
+      "owner_v2": "d88f09bdb996405639ddb8747990926d0bdafc63b6178c7d67990572f9cc92b0"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraEspnSiteSportsRepository.class": {
+      "accepted431": "0dbfc8e6bcd011b98dacaa8c530a4205f1e046c33ded644638a0eea6207ad804",
+      "owner_v2": "6972fedbc7de89999e9985f37faa1289dce00011636cc3290b28622ce92498c4"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraFocusProgrammeRow.class": {
+      "accepted431": "0936490cf394449189f941a2aebca7086c7e3ae8ae4eb60732275eb6e63ee2e0",
+      "owner_v2": "50c417623eec60a3f88fd47d19a8b229908017b66258617848dfed969078cc28"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraFocusQueueRow.class": {
+      "accepted431": "e8085c245d9f454d5191b2bcd01746c55f278f8dafdc7f73185a551710936a57",
+      "owner_v2": "0c51da58154c6fb825cb0d2017a851aa85f81b38e0354ef290384a76974199b7"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraFoldAspectPolicy.class": {
+      "accepted431": "d5523282b475550adc1bd47d7ee2a010bb171d556ae066ae9c57a6117fe57ac8",
+      "owner_v2": "7c52cad8ea84cafaddf4703eee56a3663d07be18953873153ef05541655cf2b6"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraGuideMath.class": {
+      "accepted431": "0068ddc0fbd5a09bd85d62234431dd34aabb0efea2c2838f66aa7d3d3c9eeb34",
+      "owner_v2": "b6249311513b3d5f3740a4b7f3c06447c8067aff3eadd1620eb9af078060897c"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraGuideRuler.class": {
+      "accepted431": "ab8181f7ecabeb73a026975c7967caab524655433a10472175e4bda0051c0562",
+      "owner_v2": "9d5e321c80a0a68821c65391df2f84758c394c115d7e89560fd3a1b41e087145"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraGuideViewport.class": {
+      "accepted431": "4d4d64ddfb0dd56e8f8325a040361f342c737ba73e28103921d1713accd5590e",
+      "owner_v2": "a097ccd0b890a01aa862f691b87f34667038e4e4dd6d8c3192e6761d7a4bdb44"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraIconButton.class": {
+      "accepted431": "f274bac2402fbcb7392993b6615b65ab5c9a0557a03c53e5e24e34039030ec2f",
+      "owner_v2": "7e1cbce97de64ffa5113b495374da17a366630a6c4aba5aa6a66ec0b4ddeb451"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraLocalTimeshiftSession.class": {
+      "accepted431": "162b356492203f581c6d7f066a5f9fc84d691d22450ef0be138b0d2cf28eabc8",
+      "owner_v2": "4444dcb3b1dd9158f09ee7de6a497d27dbb4f4732743b40131faa1cb763641dc"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraModeLayout.class": {
+      "accepted431": "43a295c570525b0b887093809e86d1bcff5185e44e5c308e2afc42f6868915d5",
+      "owner_v2": "073a0a38cb9de99df43390b30201862c28b892c6da66b9da8f44561662959d78"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraModeThumbnail.class": {
+      "accepted431": "655277713975daccc2e5fe3eb3dfd509b02f7e579bfd9d3b878d832b52df0f64",
+      "owner_v2": "4e853c382a54d0ea3470b4dcd3765613c7e00ad9a53c0e8ff7ac0aff09776b3f"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraMultiLayoutPolicy.class": {
+      "accepted431": "f53c9376184a2fc6b1651eb1b41e6340a11942ef279e96616c6adbfbc2bb021f",
+      "owner_v2": "852466e4d07914e9e6a499cc11869b8214c2c20a91bee209ee27e211cfdc4a64"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraNetworkFamilyPolicy$FamilyDns.class": {
+      "accepted431": "ea436a14d8671ef27f7de6ba8998c740a22314242d5651a749077dbf72deb0bb",
+      "owner_v2": "7c18f47bd94756f81d6e6da8dd1cfd7780496a0bf6a38b115a78d8cf474ac50f"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraNetworkFamilyPolicy.class": {
+      "accepted431": "6ef2bcf8f48a44045766e53b4b47c8f102a6d83ebc786fde9bff869c51b52c84",
+      "owner_v2": "70140232c99f29e48b22fd5cae390e39b2caa80338e0dba72cd7f2d7de4a817c"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraPlayerBinding.class": {
+      "accepted431": "62eec05054277f5a266546fb125ce000455e11294af8278adf84abb263f0109a",
+      "owner_v2": "d8e8922404e8d217c13fc9fe758e1c1ebfff4a33554e3c5b9c3c1bfbceb322ad"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraPlayingDot.class": {
+      "accepted431": "c7a540e5c007f2e4fd3fca4d07ffd71f2731f81f5eaeea28d2dc4808b9019c22",
+      "owner_v2": "01cb700df55a4184a48fdd34cc6f873f7afe47a5a4fc3d78efb631f1e26d21fb"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraPosterChannelCard.class": {
+      "accepted431": "7d862716a9515d5e351bca88ecb55b09f3686aa499f291d7091db33f62703cd3",
+      "owner_v2": "64f21d049064ca0b3ac8e30b545a6e5b32b06477f34cac5b0e18ab1251e60565"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraSheetGeometry.class": {
+      "accepted431": "8bd0fee02c72752890a92c9380c40d48df67e3cc0b648c12ae39837193c631dc",
+      "owner_v2": "addfdf3136d05fe5a6f6e153f8af032a90ef85c543482768b25f066597f09934"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraSix$2.class": {
+      "accepted431": "d11446f158f877aa558757fd33351eba779b719973e103d908021301b4fa5f03",
+      "owner_v2": "d8dc7cc0b88e902dfa4cfab8ce40ab26968001706f69767a3882b06ab279f775"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraSix$StatsSession.class": {
+      "accepted431": "f066a719c31dc2d559022e0da14bab0d9459b5235664bb5880fabe19425c093e",
+      "owner_v2": "9884f94db34f2ca6206a055631f46fff662dccca438b480f8223ce96b0e2e86a"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraSix.class": {
+      "accepted431": "e25b5b1700eb2c90ccfa4f877cf73b807e1da5410ff2b16138d10e177758d9e5",
+      "owner_v2": "f7860ae28d178642b605061a87f532674e82889a305d3527d337b41255d551d2"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraSniSocketFactory.class": {
+      "accepted431": "d4651e25fb60b6dd0529b1fed5c072ba85b4d0baf2efa2890ac50abdb0f012e9",
+      "owner_v2": "1cf0d1003428f6d65ec5e2da25284c30044eeaa411a16f20c5bb498acd857f18"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraTileStore.class": {
+      "accepted431": "a9d1f2cc9a32c815c586fa884aa68c8832917c58a31359b424e1f59403cb1822",
+      "owner_v2": "a5f7ba7b9fb342aed45d019d912ee538ee8a04f196421936df1e2762d649415b"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$CobraTimelineRow.class": {
+      "accepted431": "c66c75d2bb999f15897bf4dace0808343c9e00f958a6dc3204c10d88f8446b9f",
+      "owner_v2": "f3bbf6b280348f8bd2a2f42b3d1b2031061c605b3b5479b4e6f63fea9e518b5c"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$LiveSource.class": {
+      "accepted431": "7444a468e2e77d4b076db48118c18a0170d69128d04fea411a76d2e6058130dd",
+      "owner_v2": "f326fe82ad5c65e876777a2aaa72a1c2484b80d0e7e00cc62e08b1c8c74f3a66"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$Theme.class": {
+      "accepted431": "59912f1a9b17bc61bc6247379b7afcf338a770cecf3d61903611b4d5993d0753",
+      "owner_v2": "53559ffd967c0f5a8cf24c8410b09a040685574bdc9c03c4b75e581288dd7c18"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity$UiContract.class": {
+      "accepted431": "437ee0d3625db0f76b7840afec053f049f6255c5c14f9f2c028419ac1679349c",
+      "owner_v2": "b9eec39539b0bc768db73bb03aa26bd4964ac44e065f573f67daeac5193343a8"
+    },
+    "com/projectinfinity/kodi/InfinityLiveActivity.class": {
+      "accepted431": "13fc41d86b98cf93dc674c44165a9bbcd3924ba9131f94c33ba10da3c6b1338f",
+      "owner_v2": "1aa9b2a3e53398205f2ff5740ca6d3c721d3b9fb8dd40a68c5b8dda984a56be1"
+    },
+    "kotlin/DeepRecursiveScopeImpl.class": {
+      "accepted431": "c83c3a4b630e5fb7d059fd60cff47193ac4758be6f8ed5d72bd9276120e613b1",
+      "owner_v2": "cf02ffa3cbe66044bc6969ee10816894df442ee2fa714788d5c6a33a303b4b9d"
+    },
+    "kotlin/ExceptionsKt__ExceptionsKt.class": {
+      "accepted431": "c9d716aa925d1803856f473c66efae8995f45bf73152cfe4fcb6f345d4451012",
+      "owner_v2": "496962c5b2d82da868693532cb1965af0bf3c56d0a4b8e29d641e233f3adaea4"
+    },
+    "kotlin/ResultKt.class": {
+      "accepted431": "1c1e082d983ec6160be9f71a627226515901efdb3683338e6a5e364baab69e88",
+      "owner_v2": "7c0f43cdbde43b92a6eb459270b3e3053a3fb73f84adecf78d5b20df3b3574ad"
+    },
+    "kotlin/UShortArray.class": {
+      "accepted431": "565fea37578c8e10aabd6295be21773f42bc3da1ad5d2dfbb869ccc0d6777605",
+      "owner_v2": "69ecd33dc60493eaec07470042cfea5a91e216177489ebb229b8be179612e3b4"
+    },
+    "kotlin/collections/AbstractIterator.class": {
+      "accepted431": "9ba20bf77e17a5511dbcb3d60140aeeb8ae4295c5d8d2cfa776e96fe2c6fcb65",
+      "owner_v2": "a49d784c6c08457443efd5a96c0bd0c3083cf9e0d60f485b8afccd19edbc1991"
+    },
+    "kotlin/collections/AbstractList$Companion.class": {
+      "accepted431": "c969b0c0d2c5f16fb018582ee15df534e19ee8c89bc770f06007d77f61f4aeb1",
+      "owner_v2": "0c9c68f596b3534c20a749ff984680ab5a3adbb80671a8795d67a05e53f08f57"
+    },
+    "kotlin/collections/AbstractMap.class": {
+      "accepted431": "f42e3562dff99644145964634767031188124cc168a9120cf5f01a31db723baa",
+      "owner_v2": "3535de7b5a875ca10c1b37ceb0032454b8e9d06e2bd7af671f99e31eb7cbd2ff"
+    },
+    "kotlin/collections/ArrayDeque.class": {
+      "accepted431": "993567d4abf0c01e763614a1832b38467b2d61266d66a92dd534c50a5cc44d08",
+      "owner_v2": "bee3b827c9cdc2bcea3bb15893ee4d714d18fbaa4cb7c373ae4227d115c61b7d"
+    },
+    "kotlin/collections/ArraysKt__ArraysKt.class": {
+      "accepted431": "cf3e235148c86a3f84ca6ff4c91427c78fc3f0d44276c0bfd8ddd704fe7fb3f1",
+      "owner_v2": "a61bb90b3413fe63354e12f26aeb4b1ffaa44d1ce821cd144511d4eb3d14a881"
+    },
+    "kotlin/collections/ArraysKt___ArraysJvmKt.class": {
+      "accepted431": "9903e8b7be9efedd54f0c1b0f16c071e4643c240ce958ba8f12d55d0b5ace127",
+      "owner_v2": "8c42c3ec599643407ec3697f0bde383550cefe8d882f643023881e75b76f0ddb"
+    },
+    "kotlin/collections/ArraysKt___ArraysKt.class": {
+      "accepted431": "39da04e0c9651deb86e8fb1cd28eedb9d285b65a0b40c205f81068337185c653",
+      "owner_v2": "b8f29d5f0b7804c6bb37dba224148653d511ad4cdd5d838b465343b81728d5a3"
+    },
+    "kotlin/collections/CollectionsKt__CollectionsKt.class": {
+      "accepted431": "aac6c3f6e2278b0ec83472400a0b866d0f54a63d7f3caee403f0252a4e1a30ab",
+      "owner_v2": "2f11eba742ea2336fb6506592bba21869581742a7333a8036a8a1f1b7a68a66c"
+    },
+    "kotlin/collections/CollectionsKt__IterablesKt.class": {
+      "accepted431": "667fe0f9a01b6e632290edf4784ea1cb24c017f453bdffcc0c6b45b709354027",
+      "owner_v2": "0b432ed33aa9d54b00a425e0d09877c8149dc0922d32bda8addee348e0aaedb1"
+    },
+    "kotlin/collections/CollectionsKt___CollectionsJvmKt.class": {
+      "accepted431": "ebb4ec8196c0f7d2a4f4ee66b711021a746093a88e4a466a8fec77409045019a",
+      "owner_v2": "c961aedf8d1e98ed1006eb5f49d564def7b8c135298e53d65289772f225e0e83"
+    },
+    "kotlin/collections/CollectionsKt___CollectionsKt.class": {
+      "accepted431": "8e306c730a83bcb0810013aea613309acd2f960d9c8900458711b1c09606ba9f",
+      "owner_v2": "26c759b56892ba0385d8255e0c3c0c32a792f3e697af65331b1a1aea002e5935"
+    },
+    "kotlin/collections/GroupingKt__GroupingJVMKt.class": {
+      "accepted431": "03f3e45652fb7ba225bd7af2d4ac2c592e67eb97c657937ae19086db07d3ca16",
+      "owner_v2": "8fdb98679764f68a7f1d6caa76b04579aa5a4efa57d78fa993ac64319bbbde78"
+    },
+    "kotlin/collections/GroupingKt__GroupingKt.class": {
+      "accepted431": "5e82df3cb39db039e9b7f01676ad1ae862cbabe962ee7998165d2b55c7f0f5c5",
+      "owner_v2": "7d03d9e4345960b71bf1de481737b38bae641ef56f6609cf815eb1f5f4cfbbac"
+    },
+    "kotlin/collections/MapsKt__MapsKt.class": {
+      "accepted431": "27483a1f9ed016f0c79d97dc74fcc43c90f2fe6c4da30fb5e1d1167d4ca5eaaf",
+      "owner_v2": "2bafd9ceb7695bbb1138a71da4b91553ce40bd52e06a8bdfe11ff02069166a54"
+    },
+    "kotlin/collections/MapsKt___MapsJvmKt.class": {
+      "accepted431": "076a22498e671b51ceb1b3fad97cf5b8543b0dd6aa457933d41fc21c72e67990",
+      "owner_v2": "df12758d1ceda1c2216d7f30edd64c9e99c586278578a341cb5160d4d2848883"
+    },
+    "kotlin/collections/MapsKt___MapsKt.class": {
+      "accepted431": "3290d1d56aec7366ff21bdccb00cdb6855498d6b1cc0518221ad035f3dff2289",
+      "owner_v2": "20916d8a6e8939eab3789c1df3b1dec9fee3202cd01ba59d486ddda31f352853"
+    },
+    "kotlin/collections/RingBuffer.class": {
+      "accepted431": "b7f56d3832d5a77c1b9c18b98fc7285ebf0faa7cb727bd099569c84319baad5a",
+      "owner_v2": "3138efcb4c71ecc655ff594fc5fe1abe50e818378ac4bca4a3fc4906f9514514"
+    },
+    "kotlin/collections/SetsKt___SetsKt.class": {
+      "accepted431": "5b6910196242aaad8db5090c2306cae1f03a9adc056f1d10f1560463f9f5f3a3",
+      "owner_v2": "39befc2660abcd11c66d508238ea882affc16d22bb6c67439b234645794f69db"
+    },
+    "kotlin/collections/SlidingWindowKt$windowedIterator$1.class": {
+      "accepted431": "ba3fbb7e2d8b709b07338a72d0808131b7f295bddd85217d9167e9de0f0514e1",
+      "owner_v2": "0f0f86d24e817d22e4ca361bd1807716be84e5c7f70eb07519f6a47e1f8191e8"
+    },
+    "kotlin/collections/UArraySortingKt.class": {
+      "accepted431": "dc093003760b48379e400cc2fb61bd3ed28055e8a5056cddce4b0a13d74201cb",
+      "owner_v2": "dc117a24ceed47af6c18c4e3e09ecba17abc7e59e859677a933d45b3c6d4fc9f"
+    },
+    "kotlin/collections/builders/ListBuilder.class": {
+      "accepted431": "9aa703cabec08f3c74fbb3523e92d397242fada8a59262c3c2d66f71b87caf09",
+      "owner_v2": "a7ba3f2e53a132225dd09ad88791f564d0b6ec4f95d29c4f36787d348052b035"
+    },
+    "kotlin/collections/builders/MapBuilder.class": {
+      "accepted431": "572d34fd860f7c4abd4782cc766f22ac4d677c70af83290354c1a41d601d5828",
+      "owner_v2": "7afd8c9a9eb6d6cbbff326cbc27d6e8ea97918ae0019db9f755cb5154609c4b1"
+    },
+    "kotlin/collections/builders/SerializedMap.class": {
+      "accepted431": "eb3c4b0208be4d882626193b2d02832615f94907316f5dce9d1d5ac721e8232d",
+      "owner_v2": "c961ba33a0889480918401732248088155de9556af752baa0f941e03af132a71"
+    },
+    "kotlin/collections/unsigned/UArraysKt___UArraysKt.class": {
+      "accepted431": "af3e44991b76ba4ca296fcc6d778a74529853c73ad072dcb03c6034d2a34fdd0",
+      "owner_v2": "85b24cce85645424355221a5bd5887a543d1326a4ef564812855c1949a9c2604"
+    },
+    "kotlin/comparisons/ComparisonsKt__ComparisonsKt$compareByDescending$2.class": {
+      "accepted431": "6c566e15b72e8c3ce8d38567338b540642e7c41d79ec1235e3727b0ad877a1f7",
+      "owner_v2": "b9bf4285695fc6ac8f017002c71bdecb6509431ef58ffdd7a4e9a8fac1def607"
+    },
+    "kotlin/comparisons/ComparisonsKt__ComparisonsKt$thenByDescending$2.class": {
+      "accepted431": "10020fdc9bd1ba005b27dcf04ddcd279deecf0a4bcfb729ab6d4281dca6be873",
+      "owner_v2": "083ccb10892bb47e1617949f021c09eba31a75cadd4541033df9fa745004f81f"
+    },
+    "kotlin/comparisons/ComparisonsKt___ComparisonsJvmKt.class": {
+      "accepted431": "f27f920b9d9902ee58a98190e9ea4f7c15ec6419227c380e1dd9cf68f9bb2d26",
+      "owner_v2": "45349f54953a15a8bc1c00573413e48e2cae4cdea6d915564f44cab84f387b03"
+    },
+    "kotlin/comparisons/ComparisonsKt___ComparisonsKt.class": {
+      "accepted431": "15e42cf950d6d37a97b32cf9d640422df28b5eb7f1720f183d4638ffd249d777",
+      "owner_v2": "ed0e33cf227a4dc8b9fcca38a8cfa105e1dc78253ad6bc46769950f37f9a323d"
+    },
+    "kotlin/concurrent/LocksKt.class": {
+      "accepted431": "5c0e52c3f1f6857f886176c7367a93e32996946c1616aa049332bb98e165f9c5",
+      "owner_v2": "dbf73474a0373ce0dcf21c66e89bf69a302be0bd61b85d025c3aa5c6ea525452"
+    },
+    "kotlin/coroutines/ContinuationKt.class": {
+      "accepted431": "c2d63c270c983506aaa9ab93979d2a1455a4d6607b507f0d1b018ceecc39f6b5",
+      "owner_v2": "75addd094be2bd32567cf2ea183ccccb8832d4865de25b5dc0728df9b92a3a28"
+    },
+    "kotlin/coroutines/intrinsics/IntrinsicsKt__IntrinsicsJvmKt.class": {
+      "accepted431": "eeaa36b30aaff346653309336dda01b0cb888b0e585afdbd2b20f1ad25f8ff98",
+      "owner_v2": "c8189b0de0db97e55f8de4c49c23e8d2e98a3751096851a069b8f4d385e859a6"
+    },
+    "kotlin/coroutines/jvm/internal/BaseContinuationImpl.class": {
+      "accepted431": "79a7a09465c59bd5a591fe01a7469c89c853b5e3925a40a0b1bcb83d0a0c9be1",
+      "owner_v2": "adc5ec63947365caccf2d27d69958c6e75db43eaaae0122644d5ef49be8aa0aa"
+    },
+    "kotlin/coroutines/jvm/internal/DebugMetadataKt.class": {
+      "accepted431": "9afe207bcf38929663cad57838df321e8f700dec6e806c853b54222ca996aad1",
+      "owner_v2": "1ae83c1f2b1c3c326b26c2f5ac3c75e088d5fb3056ac0be8d99e34c15249dfae"
+    },
+    "kotlin/internal/PlatformImplementationsKt.class": {
+      "accepted431": "399868efe1aa69a8fa983e714e9486aee06a3aca52ccc2a399b4da5ca5c3c79f",
+      "owner_v2": "296d0095cfd11627c51f710c200f4700d66e8e9fcd700f7506564ac300f675fd"
+    },
+    "kotlin/io/ConsoleKt.class": {
+      "accepted431": "d8446e2a732b0db54f8da24f0d02d37496f8e3be50291d4216fb7dda74f9bd09",
+      "owner_v2": "bac38e18f9fb3da586f4ee4dc2fab588dae3c5744098afcd2b27b773200779e5"
+    },
+    "kotlin/io/FilePathComponents.class": {
+      "accepted431": "b7fa4591ab6f29ea441ac342d84b4132f328e3a764b28445b66273b7621430f2",
+      "owner_v2": "209461044f343e68575e53770381e48307c1b18bc523046bf714001028c86fe0"
+    },
+    "kotlin/io/FileTreeWalk$FileTreeWalkIterator.class": {
+      "accepted431": "ad4187f9805544c90e25633b7cfc21271273556f5c525756891d16051800c991",
+      "owner_v2": "3a7f6b1d71cfed2e69de908905b25b7deab2b7c3575c6af07553489d8cd095ea"
+    },
+    "kotlin/io/FilesKt__FileReadWriteKt.class": {
+      "accepted431": "c292c6e4eceb071e89991abb35616aa45e77624fac7ec3ac1b39e829754b7d6b",
+      "owner_v2": "f7a2c770c954927e8d9f9a0a65dc7a380206babca53b8694839de3b8795a0ad1"
+    },
+    "kotlin/io/FilesKt__UtilsKt.class": {
+      "accepted431": "f3db5dcbe97ad2a4bdd9de2ecd336557d33c5af491c84cc5d81bafd5eae37fde",
+      "owner_v2": "6280529d2c5edccb8c85ac41ca909e6a3cc30d288f2286db02d02992c0488d26"
+    },
+    "kotlin/io/LineReader.class": {
+      "accepted431": "50bf60f10b7300c14b8027dd3c700ea97f95aa2341b635b69f101eac9104d259",
+      "owner_v2": "3167ca4f1dfd91985fd8b11a5c790a5780ab45c2d5ec1dd9280483289cf1b4d9"
+    },
+    "kotlin/io/TextStreamsKt.class": {
+      "accepted431": "1bd97c4149cc06f14bb9e8c0f4534f26b4d39777e6949708a1693baf5f22c75a",
+      "owner_v2": "2c5e32865a7e4da56cfe505709803b97154c37226e6f94a32740afc96754d43e"
+    },
+    "kotlin/io/encoding/Base64.class": {
+      "accepted431": "837e35f7b29e63e5d44b3301fb63dfb515d8ffb060ef43395713b5f4d61de852",
+      "owner_v2": "f89589c690e556ca228ee3c69828880bf770cac5ac3c1dbc0420647ca862ed34"
+    },
+    "kotlin/io/encoding/Base64Kt.class": {
+      "accepted431": "396cb1e7dc8678f5deb0353fb10d8aa42463a6574a44170513aa14c64eacea3e",
+      "owner_v2": "fdc936eb799a5c68935984d5485988d4f9339a5141f7c0ca96a4912b02cbad29"
+    },
+    "kotlin/io/encoding/DecodeInputStream.class": {
+      "accepted431": "8c7c5e15a7f7c4f38f8db89f4c1046ff54a36f4d49e5534dea0b774becb48c72",
+      "owner_v2": "aff4d8c97f3a49668ab9dd7917caa0d654cb90a89441b0ac8c6cc38daf3d09b2"
+    },
+    "kotlin/io/encoding/EncodeOutputStream.class": {
+      "accepted431": "fbc912c0ad37630554b53fbd32d4e3c76b9f5ab5db262d9f4aeaa578af96f911",
+      "owner_v2": "4aaf0b5d8dc2b64402dbf10d801bd71cc1467256a34df7b9961995c7a9ffe930"
+    },
+    "kotlin/io/path/PathRelativizer.class": {
+      "accepted431": "fc704378733fe471173a6ddfe0c722bf70c0445485d83773755d3656146ad17e",
+      "owner_v2": "95a0d1e0ab945d1589758f7491e54da0210688fc0e866934e373a02b958c6f2b"
+    },
+    "kotlin/io/path/PathTreeWalk$dfsIterator$1.class": {
+      "accepted431": "5b9ca401e5502fa55bdfbbd7a062aabfa92e403054fe9db0c4d892d67404ed72",
+      "owner_v2": "53748d026d915c8632ba9940715660b65a29f55cdabcd85136473010a25ae776"
+    },
+    "kotlin/io/path/PathsKt__PathReadWriteKt.class": {
+      "accepted431": "caa7a37821cb35253ece05a1d68edf3a0425168146ead27ed3ce64c219e1f355",
+      "owner_v2": "7a741690720011013db0b389a79bdbaa2de8d9e6c69357c8d15d16568fbae3a1"
+    },
+    "kotlin/io/path/PathsKt__PathRecursiveFunctionsKt.class": {
+      "accepted431": "9b51ed676f26e8e90b3bf09b4caced54d3904ec796a5709db0f2643b0e36cd88",
+      "owner_v2": "b44f9d3116cdc61027719cda0b4aa1ad34c9602ef3f2bf898d4daf989bec62b3"
+    },
+    "kotlin/io/path/PathsKt__PathUtilsKt.class": {
+      "accepted431": "56865ca89674973dc3e4a3fbebd7861ada4576b09b502f3ca0c12478d3a24134",
+      "owner_v2": "107df5da21b80a7b9b815997979c10d86e7353a21be396c4e19209eeb1b5abdf"
+    },
+    "kotlin/jvm/JvmClassMappingKt.class": {
+      "accepted431": "9e17888fe4c6758affb5c8c6303efc91300de6a7278ffb44aa7c81f546e346a7",
+      "owner_v2": "a6603d4779bb6af863d1a31c00ac596d8b76feecd2830bded60fd622ba59fe89"
+    },
+    "kotlin/jvm/internal/AdaptedFunctionReference.class": {
+      "accepted431": "9b17d57cdee2608701b1eaaf178a7fc39560db0b999cdb28ed9943e9d565248f",
+      "owner_v2": "072eb8fcc2aa1de00bc09a514e4141bbeb149476037419a1b07248e35cfc3dbc"
+    },
+    "kotlin/jvm/internal/ClassReference$Companion.class": {
+      "accepted431": "0df7cda069f84d8a1e757eccf4b7fc743909f45e5ba9e66e8aade08887eb16f8",
+      "owner_v2": "276a5a7dcfdfdcfb95c07b8c939cec0f8257ddcbb3fb9e4e3caf59d14da44efa"
+    },
+    "kotlin/jvm/internal/ClassReference.class": {
+      "accepted431": "02966ad58827742d9e3f5f6a76d528af77a11b1541588c7b9be6893b0d31d002",
+      "owner_v2": "5660f415ec95661061c8c44be74114593c86a490f77f63e6dc5d8c932855ea83"
+    },
+    "kotlin/jvm/internal/Intrinsics.class": {
+      "accepted431": "9ca14be6495f5f042a472ee0a803ec7f0afd8339b938332c407440fa15c38f43",
+      "owner_v2": "05f5bf41c23c91844fc63b9e24173352f86035cdcd2854e58469a2e2ea16e3b7"
+    },
+    "kotlin/jvm/internal/SpreadBuilder.class": {
+      "accepted431": "85de69bee98c432f3435aa355d625a881af2d0596bc0fe813f8e887a7b933cc0",
+      "owner_v2": "1351ac0461439ccbd4ea65a6ec269aa48a44399888996e48cd22e5c8ab59a978"
+    },
+    "kotlin/math/MathKt__MathJVMKt.class": {
+      "accepted431": "b4570ce590399c686d112925d0238841cb29f8b3374fbff3b603083f06834ec0",
+      "owner_v2": "60d70f549960b4b652d967ed91d7e55077276cef04e31789758ba5777a7f7da5"
+    },
+    "kotlin/random/Random.class": {
+      "accepted431": "acd2692761c90541d800e5dca2cd2ecc766e5136b8a19197e9a6959672d1e038",
+      "owner_v2": "a9b66d2fa9429445d59127abbd5d1f43bc3cb58acfae928b2c0b37f800a48217"
+    },
+    "kotlin/random/XorWowRandom.class": {
+      "accepted431": "9c782839bef9056c16e1c3571fdfda0e489592c24e0cd465f9a67441a74bbdad",
+      "owner_v2": "25b484b863bfa9ca5467288cb0758547b33c919c72fa606babac1c763cfdf140"
+    },
+    "kotlin/ranges/LongProgression.class": {
+      "accepted431": "6e0b3ef1c9244338d0dc701e3667a0ef1e79a32c50e2871caf1e4060c1081996",
+      "owner_v2": "48a6a5bddd40912ebccdc1fa7645adc2e1bb1c8f2f490ab037667b0a6317072c"
+    },
+    "kotlin/ranges/RangesKt___RangesKt.class": {
+      "accepted431": "2b7ea18e06728898612fc25abf8ad44997c1b5e47ef03ecc8041100f492c420d",
+      "owner_v2": "ccee21325ce6a4e6b0721a523be898d4cb5b63164d8c56f7cf9e79f126f16779"
+    },
+    "kotlin/ranges/ULongProgression.class": {
+      "accepted431": "43d1af437f6b1e86d653d5cd7152f14bd89e2c23cc5008d0b50ff61f09289132",
+      "owner_v2": "6fc6eb0d3af4baf167b42d31809dc63e051e7bd383f4c07821b36c771d3a14c1"
+    },
+    "kotlin/ranges/ULongRange.class": {
+      "accepted431": "4748e06de886dd4e632bcc589277be9f86972cb0d8553a090956991e6d470414",
+      "owner_v2": "4e752ca649deaca22e2933110760a72177545ccf29233b73cefc57efa83ae51d"
+    },
+    "kotlin/ranges/URangesKt___URangesKt.class": {
+      "accepted431": "6a864f307050af33177bbf79c418683ae306df289a937e0c92e5b2d9d58724d5",
+      "owner_v2": "6e7f1acd415a0ba9ac80aa32faf5b083dfdedfad12f89f1e06cd6bd484f9fa77"
+    },
+    "kotlin/reflect/TypeVariableImpl.class": {
+      "accepted431": "dfd0777bc0d5918cdd2ebc55e79646e52bf4039037e8c894117b98bc5a09be90",
+      "owner_v2": "7a1c885bdd52685e187339a55f96973e59eda10ed73a154a64dd1158ff61b8e4"
+    },
+    "kotlin/sequences/DistinctIterator.class": {
+      "accepted431": "28151ac83cd8d00d5f5919cd6bbb9e89b6d28c737ef27abb374523ba9422bfe8",
+      "owner_v2": "c49c98f278ff0157d7dcfbf57c450321383850948557bf79d543f6c12191478b"
+    },
+    "kotlin/sequences/GeneratorSequence$iterator$1.class": {
+      "accepted431": "efef7611cc72712285f1525391ce7477802969e3a777b0a9783ba24782ec1a1c",
+      "owner_v2": "5ab1ea541df95ff77bfa8af81407419914e4dc90fd074fcb6f502e474f79a98c"
+    },
+    "kotlin/sequences/SequenceBuilderIterator.class": {
+      "accepted431": "70b19f43f51205033ef0f82fd895e3a748460b8395a32eca599def09109d58dd",
+      "owner_v2": "76e7e0be8c19747531bbf8be8055aef8874e37b06132dc2cf2a637f5e9205df1"
+    },
+    "kotlin/sequences/SequencesKt__SequencesKt$flatMapIndexed$1.class": {
+      "accepted431": "f0c0cfa841dbcf38050fb1ae61137dde580dd5c84e5551222b564516db50aa3e",
+      "owner_v2": "0b1e4b2cc029bf7f96fd9c9ce9a4e25c8c9d22bfda6d2c35bbe1ad5761f2cb99"
+    },
+    "kotlin/sequences/SequencesKt__SequencesKt$ifEmpty$1.class": {
+      "accepted431": "eed21a259449376b26ce64fd4d19670b27034dd2078d5e2ca73ad1bb2a450fa3",
+      "owner_v2": "7dcbaec646c7e639fed63d83f26fd7ec3c559bc2e8127ad7f7a48403d42fc48f"
+    },
+    "kotlin/sequences/SequencesKt__SequencesKt.class": {
+      "accepted431": "a045478305181a271961cd38d6c53f30f47180b9b7df30c934f46ce9813ad34d",
+      "owner_v2": "938d71d2954cc18e93db914058cbfbcbeb2ea926f36fcd5b490117f7d871d2d8"
+    },
+    "kotlin/sequences/SequencesKt___SequencesJvmKt.class": {
+      "accepted431": "d2bd128138f6c56a3981ee0b733cb24fc692db2f41e50ef76341600e2b3f2b2c",
+      "owner_v2": "7f1c8828bfb30401b91f1b20a1e2191509b0d0c02538886a061e18bbcaeb4f7a"
+    },
+    "kotlin/sequences/SequencesKt___SequencesKt$runningReduceIndexed$1.class": {
+      "accepted431": "2d02d9bac23026fe28d20a276aee9d68562d21523d8e49d9c3b04e308e000920",
+      "owner_v2": "009f6401e571ad62232172668b5b639b5776f366af178f9aefcfff7b503bb3d1"
+    },
+    "kotlin/sequences/SequencesKt___SequencesKt$zipWithNext$2.class": {
+      "accepted431": "2c9a7fc6a39632c8faf3bf4fbdfc55eb3702da1cf4180aa821b0ade70e9a0cd3",
+      "owner_v2": "c00d396296cb12ede3c0c90cbba0c15a1dc6dc32ee686498d951c96c1e5da1af"
+    },
+    "kotlin/sequences/SequencesKt___SequencesKt.class": {
+      "accepted431": "6d107960969c9385cd90b09f465b61196b0efde0ecf5b8a33bc7db2fa677ad65",
+      "owner_v2": "0bdadce6e41f4ae44f9fa578879b12847f08af59fcf625ff81ec7eb04b89491f"
+    },
+    "kotlin/text/CharsKt__CharJVMKt.class": {
+      "accepted431": "d82a90de791e261579a1ffcbad9b0b3c9f58853cde3cc9a7ef9471d7a8c18324",
+      "owner_v2": "ffc48a750c6b14b6be5c680532c07f1fabb31dbcc198420d54aec29c0db7a9c4"
+    },
+    "kotlin/text/HexExtensionsKt.class": {
+      "accepted431": "7ed42821887a89e07f8092c00d3e61179e39bf2f7ffa8dbacd4329f5ab761970",
+      "owner_v2": "aed14834107696a9ced26704b9ee50f0434ce7a43908cc77cd6a6110e5d0b570"
+    },
+    "kotlin/text/HexFormat$NumberHexFormat.class": {
+      "accepted431": "f54ce16ca99007b26554983933805d6830ecf99584bf7dfc2fedbf9b02253ffd",
+      "owner_v2": "df053e593c0c732ca2a3f90015dfc7ae22360a5293b105982c4d6a5dca5293de"
+    },
+    "kotlin/text/Regex$splitToSequence$1.class": {
+      "accepted431": "584659429befab0079438a1039aae9b19e14c4d8ffe6198a5b43110bc617d2ab",
+      "owner_v2": "a2e5f6c877f849254bd27a12341cd5a35d1b1b784bbabc6124ff5c08613ddac0"
+    },
+    "kotlin/text/RegexKt.class": {
+      "accepted431": "4bebd003f8b19c39b974e9838f898cd0f7ea62dc7e2aeb15e1e5397981e99b1e",
+      "owner_v2": "4994dd785878f798ebfc0358a551ecf92d58f2d6586947e06d48eabd20631947"
+    },
+    "kotlin/text/StringsKt__IndentKt.class": {
+      "accepted431": "405b7879ca8a1314fa430dc122b223c4cc5a1f183252ef08d3be2d969a4563fe",
+      "owner_v2": "2d17e1ec7d0426b6ced3455afc2823632ee4f11ecb260e15fd436a56a361a438"
+    },
+    "kotlin/text/StringsKt__StringNumberConversionsKt.class": {
+      "accepted431": "09c194acf8c4a6a9be728af534eae56bbde395acf1a74484e7e093f75f2537a8",
+      "owner_v2": "1d0b272bc0f47d5c0d6f0e0e0d040de5bc1ff07fdadf1d360c2309e56280518d"
+    },
+    "kotlin/text/StringsKt__StringsJVMKt.class": {
+      "accepted431": "bf66dc77ade27933c2dad815526aeb9fa1813d140f314297a83e9e6f8ee6a7d3",
+      "owner_v2": "838df8e2e7a496c94435c6c6bc5953b78076566870e201f2ab13c3874a5f4cce"
+    },
+    "kotlin/text/StringsKt__StringsKt.class": {
+      "accepted431": "a805a95a500bb6059955f3a12bb1ef330c6dab6e8f7c3b88b99252d2df6dd8da",
+      "owner_v2": "a6b6d59500325d8a15219b2214860797e2364e960234b70f15bc4339e63a5a08"
+    },
+    "kotlin/text/StringsKt___StringsKt.class": {
+      "accepted431": "ca6b2fa8f4d283b0c584c211c65169e4fb6164ab974a2b40826ea346a32c1a81",
+      "owner_v2": "905e5388ca2a9da4a113bb3cddc40e5ccca0ac93a1d52d59288dc7b5fea8cf67"
+    },
+    "kotlin/text/UStringsKt.class": {
+      "accepted431": "f5e7c511c4860668bcc3c12becf34b3da346e7e84fbef0457516da0edbc91143",
+      "owner_v2": "ccb848973491eb923a498775fcb4ffcdd3e2c7114d403ec994361795e433094e"
+    },
+    "kotlin/text/_OneToManyTitlecaseMappingsKt.class": {
+      "accepted431": "aa23c49d1123d1d058e802511d905a207d69c5f209f745c18f1653de9fe2a807",
+      "owner_v2": "8d0d0845f0770471ef73cfc3f8a8dbbb69e1e467bb97433a153949d1d88dc0fb"
+    },
+    "kotlin/time/AbstractDoubleTimeSource$DoubleTimeMark.class": {
+      "accepted431": "f55d104258ce450243dd1ef4af94b6552bd831c76c764379f85dcbb112508a91",
+      "owner_v2": "851797146b1e651e0e60da268252b5b3da9eef7d6e4a5e189b7252b6a2c2ba6c"
+    },
+    "kotlin/time/AbstractLongTimeSource$LongTimeMark.class": {
+      "accepted431": "6d64f3621c858b2c2570533be35a959b0d2d53ac62c9f3192c19b637d694c28a",
+      "owner_v2": "0da91e562e3c5a7632e6b13498146ee9167f21159c80c1a984b4fd9cbed7f8ab"
+    },
+    "kotlin/time/Duration$Companion.class": {
+      "accepted431": "2fd90dc4011cd829830a155ce0bd028904fc5d75fad4d2d0749e1f1161a35d9e",
+      "owner_v2": "13004e4a3f6768fef6aeeca17ada108e7e3750c9e81136db3f7b37304c2e8fe8"
+    },
+    "kotlin/time/Duration.class": {
+      "accepted431": "44622c461b74db7036bbe3237b754226c213796f0eced822c2242d882e67687e",
+      "owner_v2": "52d6300ea43c5f25275550c34b902a7212d9ae015c3ab6cd441c29c50624daba"
+    },
+    "kotlin/time/DurationKt.class": {
+      "accepted431": "ae81421c3e036ff9d6a66dbdeee8c28098bb01dbae33ee0155c95511222a8a41",
+      "owner_v2": "c34a2f4cf3b202ae3ca97491496e27a85e423a5501edcf58d27222492ac83d32"
+    },
+    "kotlin/time/TestTimeSource.class": {
+      "accepted431": "b2653fa3d553660991f54f422015a6529e18f31d6ac52e33aafbe7fa7b04cb97",
+      "owner_v2": "3f4098f2de0b2ad98b4a027b83060f541ba54876725156d6e85807943bf6a54f"
+    },
+    "okhttp3/Address.class": {
+      "accepted431": "a6c1643b3f2af1aa123a9263d32082e98fe3bef225db61afd2690c1d2ade380c",
+      "owner_v2": "e47996febfd06b857f5d3a0a11b0d487cbcb4e916d239774edd9c3f4762325ca"
+    },
+    "okhttp3/Cache$Companion.class": {
+      "accepted431": "e082dd234d3cbe428d34b0de9bf2a01e438f307c699538345f4765ff53cb28de",
+      "owner_v2": "56c083a958b0a13381bec0a392377389d7f9065caf7e176205faf8f4dda431dd"
+    },
+    "okhttp3/Cache$Entry.class": {
+      "accepted431": "9f59b5f879ea8839e26fe491617d806407570c8eb72540d12a9b6b6d3557719d",
+      "owner_v2": "0bf5df4a750555aaa2b36b9902b12d4ac5e6464452dcb229042c65647754d0ae"
+    },
+    "okhttp3/Cache$RealCacheRequest.class": {
+      "accepted431": "16260898e306db60eff300c1efd73eb44267b16b7910669f6117b582e3ad47ce",
+      "owner_v2": "99de60b8eaaf71f0b47b8e2ac753e5b21148932d0d6fbce7bbb844b8df2a40ae"
+    },
+    "okhttp3/Cache$urls$1.class": {
+      "accepted431": "82296e499a9e940e421fbfb1d086fdb2fe0e8a82fde9b01e04a2ec5aca490b67",
+      "owner_v2": "6e24acb9dd992cd8149e80853ebaef79f089e58bc21b0225be1567925b2c245a"
+    },
+    "okhttp3/Cache.class": {
+      "accepted431": "1f0c56bf621bd156daae34cb133b4b7e547024b5abe4fa04a57066fc480312d0",
+      "owner_v2": "41a7e82aa25283444a24f10ffbf5e79a0bf57a6e93586902d1d7a4d46aea55cb"
+    },
+    "okhttp3/CacheControl$Companion.class": {
+      "accepted431": "47c1d64686692fe9f46cfa9d2d58e64a3cbdfcebbdb041770516c414bf66e44d",
+      "owner_v2": "0e04ad4fc31c9b0c89d415562bdb82c8d81b3b7eda59b99a0ab04e928d3b2c42"
+    },
+    "okhttp3/CertificatePinner$Pin.class": {
+      "accepted431": "5fb42fe97024e10f2f8e4e4207f3e86fd0e136fb2ecc36f4c5f4c4d78f338934",
+      "owner_v2": "9708cdb2451f1bcc0d8ea81ffc7ce817d12df9a6168e6878321a849aa1e17586"
+    },
+    "okhttp3/CertificatePinner.class": {
+      "accepted431": "9fce5c1665310859bea77aa2a40fca085e0f1ae75c0ebf29583eb7f823e52af0",
+      "owner_v2": "5ef376d19c2ca6a4ca928b18f2990ab79d2935f976279c2417c119a779c9f4e6"
+    },
+    "okhttp3/ConnectionSpec.class": {
+      "accepted431": "facb4b8fac9e7f3074d2ac1cbde4237f2b18e114c731689f9e663385fc26b433",
+      "owner_v2": "bdd7f258e6f039e5a3348e8fb055f82989ef24d1aea2ecf17217e458d8c0ec80"
+    },
+    "okhttp3/Cookie$Builder.class": {
+      "accepted431": "f82dd6067c106d3933cccfb1e102eac88fa9eb3eada7368774286bc486b1dab1",
+      "owner_v2": "672d89a2df0a9108faf0a9bfdc3b7a764cb680fb980b38c2ce7a217992e642b1"
+    },
+    "okhttp3/Cookie$Companion.class": {
+      "accepted431": "85c6bab73aa2871d8e7915bf0798b3e6124c42764ce1dd1c4fb48fd79826eb76",
+      "owner_v2": "03d370a286bd3c1cdec2f1d04d3bfab166f3df18332a14867095fd0c5432ff1f"
+    },
+    "okhttp3/Credentials.class": {
+      "accepted431": "11be0783b5d8c2d6c0a15ceb52a9439db70a3c8c56fd9377da6643bb2cb803ee",
+      "owner_v2": "e4cb38f1510c03e448c0b0a9e5b0f5ad4ac197b8b266e2178bbdc55a2437b680"
+    },
+    "okhttp3/Dispatcher.class": {
+      "accepted431": "8d40e6e8e38ca803fdafd392b36d2f3166d5c4ee2cca9e8bf0cf105bdc01020f",
+      "owner_v2": "ff70048aa1966962e946039276ee210692f6d04faac3c7a09c08e2a179689e73"
+    },
+    "okhttp3/Headers.class": {
+      "accepted431": "9a6ca91a40d3cb06bee896e44956c78b19243d2fdce06e7a10fe5e2e7031dc39",
+      "owner_v2": "bac233fec46b526247e2f7efb81fd1eb618ec7d27335771df7f5e3b867748025"
+    },
+    "okhttp3/HttpUrl$Builder.class": {
+      "accepted431": "bfa5b1bcb622f5795ea8e013f20b865ef2742fd5e1c279cd0e9bf55b90397a6c",
+      "owner_v2": "b5cc4a021063c419ff06b658cd89c57f504392990e0adc81e44dbf140f260c51"
+    },
+    "okhttp3/HttpUrl$Companion.class": {
+      "accepted431": "c02968f7de7e3838a8046af2bce253df6c943c805240b67587e2b282beb5abcb",
+      "owner_v2": "baa2abcd84b20f9286d05246c406c5666de77970a3b4437a6795dc91e93c5c98"
+    },
+    "okhttp3/HttpUrl.class": {
+      "accepted431": "7ab888fcbece607b3f19f0a84bf7718639e52f6639695d8bcde7d3dba3ccd73f",
+      "owner_v2": "5541c532f13d88dcc9a351d7e3fb2e78ea74ed385f8a9639ddaecfe765edd753"
+    },
+    "okhttp3/MediaType$Companion.class": {
+      "accepted431": "31d41a22c61d6dbbbb7824cfc3aeae86b6e1d6ca32a159b456b3cd443085b1f0",
+      "owner_v2": "7523e3323e883a5d6b43efc6ae764fda993be28befe02a1eb33ccd9e86e5f0d6"
+    },
+    "okhttp3/MultipartBody.class": {
+      "accepted431": "ed1cb9a8d245f06b681b0b0e39434fb265246d2b666a9a4f7d38331bda30aa85",
+      "owner_v2": "12427587d35925a6dd750143fa060129a6a03ff2cb52a89d35898bd411b7ee12"
+    },
+    "okhttp3/MultipartReader.class": {
+      "accepted431": "2c641c4fcc92fc2cb879d63c3e26e9e00608f4b0981ad600b98b462b321ef854",
+      "owner_v2": "94788b1308271f499990c2c995df20fa894a18b31842ce968d92d13da21135b1"
+    },
+    "okhttp3/OkHttpClient$Builder.class": {
+      "accepted431": "9f0ad186ca38a3e0f2d8e1b56c8698034b25a3bcb0ec4e572728cafb76071804",
+      "owner_v2": "59b0628b4ae4a99b9a6d7ccdbd902de6c439268dba24793033d133d25efb8c8f"
+    },
+    "okhttp3/RequestBody$Companion.class": {
+      "accepted431": "b6c00eeaeb601a1199e580fec00751b7d8729f7c4f1d3ded84656c8f7930b489",
+      "owner_v2": "5a2ed77db886686ea8646b3a9e36a7ba9f5cefdef1adfab46b8710534de7576a"
+    },
+    "okhttp3/ResponseBody.class": {
+      "accepted431": "73185dce26d7bb004547c957c52c490b95a61db953186938cca404fb2eb94caf",
+      "owner_v2": "539eda3322e2b150d8cb28a4bce859a28c0f5b2ae25dccbb33aa7968c9e12a85"
+    },
+    "okhttp3/internal/HostnamesKt.class": {
+      "accepted431": "d76d02628d9b8fd7bee5b4d1901d6872291d4f01a91d2e0e46bdf18a02da5d7e",
+      "owner_v2": "21431cf87e96fbc59178cd6745a50f6a627cc6c2ddb998cde51ce1bd447e1f26"
+    },
+    "okhttp3/internal/Util.class": {
+      "accepted431": "e24579cb9770ba1703233d88deee3a0c241346cf5c0ae6a5c77dda6fb6f4ad2f",
+      "owner_v2": "8d66730c81c83934d13378768cf3d5ab275b53938f104a6610e1d1411676450d"
+    },
+    "okhttp3/internal/authenticator/JavaNetAuthenticator$WhenMappings.class": {
+      "accepted431": "49b104cad13a99bc0ded1020c9cbd228bb9ca4a9da17559fff328495b8720964",
+      "owner_v2": "dd9116c487d9c7992e98694281a2f1087b20233609a6aa08c92b15856ad310db"
+    },
+    "okhttp3/internal/cache/CacheInterceptor.class": {
+      "accepted431": "416d258d8bf8eb26d7b2e279ad086f251770f54833e17a1f5b2678727aea367b",
+      "owner_v2": "064cd37925ec0442c488a869d5b985fe47d58fbf91291473795d460c917ee9fa"
+    },
+    "okhttp3/internal/cache/CacheStrategy$Factory.class": {
+      "accepted431": "7cae2aaa7b71212ba5cfb35514982df4d1dfa3f82e3a03714db812d83243aa1d",
+      "owner_v2": "cd2dde6ea2df08e51e48dcf3dc6fe6e07ebff5812ca15b5b43f6a0ddf3dde8e0"
+    },
+    "okhttp3/internal/cache/DiskLruCache$Editor.class": {
+      "accepted431": "5c05fd25ff85de65c6da8860f2a16b55791eb7a6f299319225e7c89f483d3055",
+      "owner_v2": "d9af97b1e0a37bf9809d3578484652103149f1fe7ccc6523b25963b1a3f06e4a"
+    },
+    "okhttp3/internal/cache/DiskLruCache$newJournalWriter$faultHidingSink$1.class": {
+      "accepted431": "b37ad9cd7a9c583b9024aaa94d3e696b55bd4d6c52f1313a7fb66bd6d404d054",
+      "owner_v2": "9607a6838138a83540f7288170baac11a0e8c51386bc9da6aba793322d2d6069"
+    },
+    "okhttp3/internal/cache/DiskLruCache.class": {
+      "accepted431": "6d915a557bb94479e1bd8ec052ddbea19d861c246f483f04d14ba4f4a3a7ba2c",
+      "owner_v2": "c9db9c45de89d829882315b5457efd7c869660174fa94dcb0ac4008a7370d140"
+    },
+    "okhttp3/internal/cache2/FileOperator.class": {
+      "accepted431": "397eed3010f6810ed5e9281b2002ac57ebfed6b3edb1f2f7909154d07fec2179",
+      "owner_v2": "4a0f2fcbcccba9aee2488b2de76c0f519f5447a519a12ebb5f4ba9b2b0220b77"
+    },
+    "okhttp3/internal/cache2/Relay$Companion.class": {
+      "accepted431": "84b4adc24353a90a8f05f34a38af70ffbbae79ea8f6b26e87883cb2e753bb056",
+      "owner_v2": "a24f20f05d4f214260d20e4691b5f339685753016b05b7e851f21e7ced188d1d"
+    },
+    "okhttp3/internal/cache2/Relay$RelaySource.class": {
+      "accepted431": "ddfc1fa167fbe9a26a9143730bf2c85c8ec045360bda587bc0e72f74bec020bc",
+      "owner_v2": "d0d53b4d998a51f3074ebc262cca3e8fdd25d7cbabe9bce851041fdbbaa41bbb"
+    },
+    "okhttp3/internal/concurrent/TaskLoggerKt.class": {
+      "accepted431": "08ade0c1b12c61877ee8d35b886a4c0975ed77c11e5185f50ce56988523540d0",
+      "owner_v2": "73fef7e535a443f80b229479a38feb4407f8f15190bc3a431f09a5dd72193d7b"
+    },
+    "okhttp3/internal/concurrent/TaskQueue.class": {
+      "accepted431": "c14dc1af2ff4aeb2498dc20ac968bed1c74be578bf3bf5797ecd4d4c4935b42e",
+      "owner_v2": "44590411e4e4d251e47c2d3126b9b28230f60bd971613e571c0f54122237bd27"
+    },
+    "okhttp3/internal/concurrent/TaskRunner$runnable$1.class": {
+      "accepted431": "8888168e6e92f70d36e015b78296d85213c4208b04eae1914e1720491d947840",
+      "owner_v2": "230ddd1338c6f80ce963583c1d10818eba882212b8d8aae2c27d5026c503cf87"
+    },
+    "okhttp3/internal/connection/Exchange$ResponseBodySource.class": {
+      "accepted431": "3cc1fb4e998ea824bdde06605fd15bfa5bb7015ccdf1af65d94f623d415ce655",
+      "owner_v2": "44fefa3622b283f98a564f46045bcb440db42cd7a6977bdc885723310d7820eb"
+    },
+    "okhttp3/internal/connection/ExchangeFinder.class": {
+      "accepted431": "ba25b7f97e891c330e40fc86f8d7d6c992eabee0238ee9778ba5f93e4def8dec",
+      "owner_v2": "a7a84258a2fe1318112631bb0d1dd0afbde72306328dbd019b6821d23efef0a2"
+    },
+    "okhttp3/internal/connection/RealCall$AsyncCall.class": {
+      "accepted431": "7b18365f1d33d7c1d6405ab8f7751b9d5817c0cfcd4352951c9b2c2a394f3248",
+      "owner_v2": "4947aa83ef0a3ae5f385936dcab9d33d070c28a0c59e79ff3a69f3ea5924317e"
+    },
+    "okhttp3/internal/connection/RealCall.class": {
+      "accepted431": "c64fafcf6031b846b1daa545691cd1d156847c48123a829aff44e9dbba2ac913",
+      "owner_v2": "14c6da31e811c0a255bf79364cf5566cf53c69aabf93ae9e3a63caa4ed077c52"
+    },
+    "okhttp3/internal/connection/RealConnection$connectTls$2.class": {
+      "accepted431": "e4c8bc35453e05d2491f420aadb04e7630925c52b4318b4728e85c20b35be39c",
+      "owner_v2": "ac912a25c233134b0dd3dbbca01487567d58cbe7a60c55d7edabce9052061cd4"
+    },
+    "okhttp3/internal/connection/RealConnection.class": {
+      "accepted431": "773fed5757a2258957cfadaf833a3988a4031c68750ae1e286aa1a6726e9a108",
+      "owner_v2": "8a372b45a54b8dfe0466cb9134cc052727339935c1d38cf7a15b87945e1572ff"
+    },
+    "okhttp3/internal/connection/RealConnectionPool.class": {
+      "accepted431": "780d15d91fa4417f89df444fa23fc2e49b30ddc0b0a9454b7c726a8aac283d3d",
+      "owner_v2": "f91b59693dee3561bc8940558e464032e861442b990bc241807a91ec4d7e9c27"
+    },
+    "okhttp3/internal/connection/RouteSelector.class": {
+      "accepted431": "865d08380affc3ec3433967657319214ca4f6f67caca84cc2cbb3e2ebbd75bdc",
+      "owner_v2": "5aa18679df3d5ca77046548d8fd8706c96cb75e3f240758669f5a2d43c347791"
+    },
+    "okhttp3/internal/http/CallServerInterceptor.class": {
+      "accepted431": "07056d0ec5f509c9cc17d45e988387a44fd4eb4b105cf2ad03855bc59becc71a",
+      "owner_v2": "e3e6a87910e01f70e6a1cdc6fc72fff5ee5ebc44381da269f22062d070a29e48"
+    },
+    "okhttp3/internal/http/RetryAndFollowUpInterceptor.class": {
+      "accepted431": "df8d8faa959a08ecc825606afc0022b36ab4fd0ecae9244fb9e65ec068dce23e",
+      "owner_v2": "ae52723c259fbbd37e25d087302cc0b99ddd7f2353f3f1cfb784fae608b9b950"
+    },
+    "okhttp3/internal/http1/Http1ExchangeCodec$ChunkedSource.class": {
+      "accepted431": "161652659fa5a8cf58ca833c44a3c1067762c3bafc2e4dcf29a46cf53bc62cdb",
+      "owner_v2": "2b7b853fa8082fe63da848de57d6db8cad9aad754777c8ddcd6f0e7cbb85137f"
+    },
+    "okhttp3/internal/http1/Http1ExchangeCodec$FixedLengthSource.class": {
+      "accepted431": "e76142124a53f30c43e5e0a947913357b59102fc5052f71ec700d6fe009c5dbc",
+      "owner_v2": "b6c1c4a7baf4f1d7a24798927a52672bbbbb28a38e6d61169588028e2dd8d7cb"
+    },
+    "okhttp3/internal/http1/Http1ExchangeCodec.class": {
+      "accepted431": "29a5fceaae841f83fae780a5f062337197366840eb2563233f912621cf1a579f",
+      "owner_v2": "365343faac8365c36541211e441abb9e28cad549944865d8d68f08f5611f7e33"
+    },
+    "okhttp3/internal/http2/Hpack$Reader.class": {
+      "accepted431": "3c455702ae5b2ac024d327c0adcb977ddbd859a6dcbbfc66407817c492d307f1",
+      "owner_v2": "6be9f787f32f08f5537bcf7ca96fc1e95ce85561252715cefca887852202733f"
+    },
+    "okhttp3/internal/http2/Hpack$Writer.class": {
+      "accepted431": "2985e1f1da45c4a17618056fb4d4ac7ef682db32a14a23169bf3821fa660c09d",
+      "owner_v2": "09b2871a4bc0a879ccfdcffb79429eee3a22bf71b82a9888f0a24575cff30528"
+    },
+    "okhttp3/internal/http2/Http2.class": {
+      "accepted431": "596a8ceeef6ec438b0aa59238f6ba9748cf6989b95c27bad92f5886d50a37898",
+      "owner_v2": "9bd89775c1b3fc5ab737ac59ee3cfa72a7d249c471a4145e83d78d6d6f8d92fa"
+    },
+    "okhttp3/internal/http2/Http2Connection$ReaderRunnable$headers$lambda$2$$inlined$execute$default$1.class": {
+      "accepted431": "2af77d4070804e4115dcff6715bd8e1a52b7141c6e1089639a7fefd888b766aa",
+      "owner_v2": "1fc9339ece08e7459f03c200021e5e90b22b4b3afc4712e2760f000a9f7ded7c"
+    },
+    "okhttp3/internal/http2/Http2Connection$ReaderRunnable.class": {
+      "accepted431": "d26492ab174da3e837b0b9bf3baf831795e2be45ed9e959c101d1f8b11c0dcdf",
+      "owner_v2": "946a38b4d38a610bf58fde56fabf4f1166bbb7131ddcbb6a1265093ef984ef7f"
+    },
+    "okhttp3/internal/http2/Http2Connection$pushHeadersLater$$inlined$execute$default$1.class": {
+      "accepted431": "8109ceab790a1b47a95e6da16b9e336c8a5f42ffb14c8ad0011e54555f1c5da7",
+      "owner_v2": "98054bf13375268d39301274e88a3534b4660b87fc8419068339914a7db39f4c"
+    },
+    "okhttp3/internal/http2/Http2Connection$pushRequestLater$$inlined$execute$default$1.class": {
+      "accepted431": "1d308508c5dabf6ab1f47da9becc249f5d21f4a3b59138e89875a26ec7e52f2d",
+      "owner_v2": "18ccef352eaae32afcf8d97026105d40555bd9f4d9f7aa4ec2867baa5febeb25"
+    },
+    "okhttp3/internal/http2/Http2Connection$special$$inlined$schedule$1.class": {
+      "accepted431": "6e59b3f8d5f7e4016809b4b030812e014fef61f8226e32f9d7155255c819cc45",
+      "owner_v2": "2d472b9429b198e1b73a06aa396b3f797d2a01533828a34437b8e95e2d4742d8"
+    },
+    "okhttp3/internal/http2/Http2Connection.class": {
+      "accepted431": "25f674810c53ac77a4df0fbded8916019d4949aa6b16523586dc289a7cc09056",
+      "owner_v2": "1471a8a293a2fc0301a9e7808c35a3e4df39ff784ef39327f7c51108ff4b0b1e"
+    },
+    "okhttp3/internal/http2/Http2ExchangeCodec$Companion.class": {
+      "accepted431": "975a5da23de539c3c43022072c00a4dc4241f38452bb2ae7d6f0ebac42fff461",
+      "owner_v2": "3e7b1f5caac2dec6db7385eab6db3047b0790ba699ce4a9cf62bbee65d6ab327"
+    },
+    "okhttp3/internal/http2/Http2Reader.class": {
+      "accepted431": "66ec0f6dee7dd798627d32195f061a0aaf2f9d36b599b0261910645a8dfd2853",
+      "owner_v2": "e503e0c09685989e633daef3e775e1d62d862a9e28ac81dbbebd280bf815c35f"
+    },
+    "okhttp3/internal/http2/Http2Stream$FramingSink.class": {
+      "accepted431": "e6e6fa9725637d58b4ef6cbd38eeded4ec1674576726609ff9a31020ae0b46d9",
+      "owner_v2": "286ae901803120701e6736dcae51ddd48c9cf88f8de86965c14e59584cd9d840"
+    },
+    "okhttp3/internal/http2/Http2Writer.class": {
+      "accepted431": "b8253cbed506054d241ad40197cd2074c0d3da5e6a3139d417466a529f3e85f4",
+      "owner_v2": "a9f5a2d4e6719343078a59f90e7a1f19a7a55df47f7809545bfc01595a68b7ba"
+    },
+    "okhttp3/internal/http2/Huffman.class": {
+      "accepted431": "9cc12025a593ca975e7214696db404f4ce27f711d2b03b697d4e24d4ba80e312",
+      "owner_v2": "9166b8edbb6f49cafd22d41645b8fd7aa32f57d3575d0ee248e22bd7816c23ee"
+    },
+    "okhttp3/internal/platform/AndroidPlatform.class": {
+      "accepted431": "74a0b53fec01fdd98f803b0749b055c2249ce485cfb5cf2ce0af3ba01ee7c307",
+      "owner_v2": "c650065ba19121e7cd430d6ee91f44356142050d3a8eb023f41623214b1e2a88"
+    },
+    "okhttp3/internal/platform/BouncyCastlePlatform.class": {
+      "accepted431": "c58e4f33cf995dd5ba72d7546aad96bb5197e89622ec53b815a5f6231bb20c8a",
+      "owner_v2": "c20c366c9516d7b1d5655c8d8874e4d1ab28afc39e219b5c41d4393bad40f3da"
+    },
+    "okhttp3/internal/platform/ConscryptPlatform$Companion.class": {
+      "accepted431": "36a14319878c2797e17a61925b4408d7db52da483fe54f68b4dd4f101726331e",
+      "owner_v2": "2249fe6a887997d6d90a45cd29ecf6325f6b30e42570bb285d3543f7636f42e3"
+    },
+    "okhttp3/internal/platform/Jdk8WithJettyBootPlatform$Companion.class": {
+      "accepted431": "55cb91cd09f83506f7cef6b56c0e200aa8dfc05399a4cb95b2db3a7bec52335c",
+      "owner_v2": "947bf8856c90217f895abc7884a952a5ab179b5ee5b5486955fbd9f9fa69724c"
+    },
+    "okhttp3/internal/platform/Jdk8WithJettyBootPlatform.class": {
+      "accepted431": "c7ed2354b965c2e57bc884ce55e981401e2ee2db43c5b192d9c99edcc7105816",
+      "owner_v2": "aeb9cc4a773cb0aeece16bbc502c6053bee07d89f1225bc5356e8d301952272a"
+    },
+    "okhttp3/internal/platform/OpenJSSEPlatform.class": {
+      "accepted431": "0cdaf2b6b68030a887ff0b4431d8d57aed94b56dbe304d8a5b0b915aaaed0283",
+      "owner_v2": "fea0adbad048029b3f39a0f0672b45afe1e782fc439e2d136ce8100fab74acc2"
+    },
+    "okhttp3/internal/platform/Platform$Companion.class": {
+      "accepted431": "bd9ea57f72fffaf301c0c1236b66dbf7a79bd5a5f053f8fd69dd169c28a5e9fb",
+      "owner_v2": "616724bdeebae39fd20ec61c229f55ee252db94a7dfcaa36a0f89209f25966ef"
+    },
+    "okhttp3/internal/platform/Platform.class": {
+      "accepted431": "7efd35c7a4325c3f5b90c25db1a0e2df1a518cff5f54d8ad1447cc6a2fe341e1",
+      "owner_v2": "1a3750eb3bd66bcaab626b70401f583a952702e7f95f696543101c1a514a0ea5"
+    },
+    "okhttp3/internal/platform/android/AndroidCertificateChainCleaner.class": {
+      "accepted431": "a48119845828d520ccc5f0ea33f57ab5511a2decdf1bd43e4ffc781912675d51",
+      "owner_v2": "93b384831360fef39a0fac186f26464d7af1adc085029478829743c5b6d8e6b3"
+    },
+    "okhttp3/internal/platform/android/AndroidLog.class": {
+      "accepted431": "08eb0ccd569897afae158cb532be67fe4d1aada8576693c507229560f157a8ff",
+      "owner_v2": "9b753abb176977d0f94af066bbee32ad0d0df00d77448b1dffb6b34e31727b51"
+    },
+    "okhttp3/internal/platform/android/AndroidLogHandler.class": {
+      "accepted431": "83a93c1f61c2b340838fc9bb40975e47d8e1e6f82d48993cdbf53d11e0eddc97",
+      "owner_v2": "31b1c72897018acfdd86f029227573b204329fd6f92d0e8ae723db5bbbe9606f"
+    },
+    "okhttp3/internal/platform/android/AndroidSocketAdapter$Companion$factory$1.class": {
+      "accepted431": "35ea9d4cf6532b0f22a83f8e0993bcde9c85fa9d1b25c49dfa03df5454e912f7",
+      "owner_v2": "29417fa33acc90490e59ae1e444f3d7f4f5aa96d3f830783c2592633fbe7dd5c"
+    },
+    "okhttp3/internal/platform/android/AndroidSocketAdapter.class": {
+      "accepted431": "76296d5cf26f381e61eec8ea862fd2bb4c89325def03703a4e52908824d9da5e",
+      "owner_v2": "e6d7ce7f56931d55eafb900eba7be455a7e27aa83f80e89dd7d3523aa84d0886"
+    },
+    "okhttp3/internal/platform/android/CloseGuard$Companion.class": {
+      "accepted431": "064dfcbc59d7631bc360203c963e99bac2616cc6d195d12e743a785e81624e7e",
+      "owner_v2": "657ec41e0438004578eec5ea95b72c239f0bfd799bd4bc46a2f3dccb3561a559"
+    },
+    "okhttp3/internal/platform/android/CloseGuard.class": {
+      "accepted431": "fa9d65bc09dfa1855b50a8e56fc222ab78d304ea9581d904b92f05bf9db95bf8",
+      "owner_v2": "6fb2809a295249e7dc272fb5f4a09f905527b51939349d5bec2c06c9618d7eb3"
+    },
+    "okhttp3/internal/platform/android/StandardAndroidSocketAdapter$Companion.class": {
+      "accepted431": "8641ca63fcb7c4c2f546c584bb7268ae5e08888a56f8d20aed37ac56311d8ae3",
+      "owner_v2": "45994d4fa501e4fbef6d1841bd02c8cc0fd212a79ac1bb681ff3da3e929bcf4c"
+    },
+    "okhttp3/internal/publicsuffix/PublicSuffixDatabase.class": {
+      "accepted431": "891dfa711bdc22a7280e9a17f8e8758829107d85c36c24ea2bd144366caf9b8e",
+      "owner_v2": "6dd34cca0e9bf38153774aee8186e4655183638dd577cc513482432314090afa"
+    },
+    "okhttp3/internal/tls/BasicTrustRootIndex.class": {
+      "accepted431": "4826ec9733dd1c83952355df42320f9b897c36950217d57f8818f02e28edc7b2",
+      "owner_v2": "732733ab0f2bb60dd611d1164274dcb0fd603e3f58282871998eb157564576b4"
+    },
+    "okhttp3/internal/tls/OkHostnameVerifier.class": {
+      "accepted431": "a8b5c9e73835ff1bdce3c309af83763fb22f31dbe828f348013b5977ec88cf7c",
+      "owner_v2": "a9db984e00a1623b0564d50630a5d7c33fcea207eaf74b73eab3e4210e545e56"
+    },
+    "okhttp3/internal/ws/MessageDeflater.class": {
+      "accepted431": "be12605f17c3975cdd4beeadc56c680a445435447a5f33601220bfea3b000031",
+      "owner_v2": "df6d1dd96f247fe624b1a78888a67a8179eaaace8a84bf5ddf5c98d1bd72e792"
+    },
+    "okhttp3/internal/ws/MessageInflater.class": {
+      "accepted431": "985b5cf68309914ba14af0df07d135984fcbe90c4d781098dd06ec0fd81686fa",
+      "owner_v2": "fcc9623047f6cbc9d3bab6b8f49c0d039df923dd56a3ae61c01eaf397cd5ba09"
+    },
+    "okhttp3/internal/ws/RealWebSocket.class": {
+      "accepted431": "82ca4a8486f0e13379761c14e4be7656d615a6858c6db91bc64c760bd5a288e3",
+      "owner_v2": "843cd69a99f2f4aea757d7ebe91acac6b15030e088dca190fa6c10ef619e1e13"
+    },
+    "okhttp3/internal/ws/WebSocketExtensions$Companion.class": {
+      "accepted431": "5cd765bf1f9bbc8197ea1824893b991634744e083723ff54cc97a4d9254ed92c",
+      "owner_v2": "628d8f1cd71ba5008e680fc7d90bc7aaa68cb0c9a1906fb86b0a74b3625ff9b3"
+    },
+    "okhttp3/internal/ws/WebSocketReader.class": {
+      "accepted431": "2bc231814fa473f1248cb3667ab88b59e2a205c973c94e0595ba17d90519dc45",
+      "owner_v2": "8a1a7f6cc3a84502c55e9d31de4bd99ef5ab3f6bf959ae22ad935a8484b9aaaf"
+    },
+    "okhttp3/internal/ws/WebSocketWriter.class": {
+      "accepted431": "a6969aa908e59eab5f8f018bce9497de092a32668a74228f4fe91c5d3c2dcdea",
+      "owner_v2": "7e4179fffaafc6a3b4cd33c0a4201ccbb58a2ef6f62ef20821973477fd45b9a4"
+    },
+    "okio/AsyncTimeout$Watchdog.class": {
+      "accepted431": "2312b28fb9304d9f08f9be849ef6bbaabeedd7ddeeded25fafedf22f1532b3bc",
+      "owner_v2": "6a234a8a4373ef65a0fddef08bbb1a74de55eaa3bcdc2d9e68bf558b7452ebac"
+    },
+    "okio/Buffer$UnsafeCursor.class": {
+      "accepted431": "983ef785f2a4d0b0a4701a5c2b5381b4cf8f15d8fc73e72cdd007433c76e99be",
+      "owner_v2": "8d9d0020c3d6014cfbc649a89279cde6d559041fcd47b92a25c272383f53c317"
+    },
+    "okio/Buffer.class": {
+      "accepted431": "23b9291867250c668ec384efff577127d86a238fcdc147b3d82ea33429491df3",
+      "owner_v2": "d25c94657a8d2d76ce52c0c75681403f9ef7101aa7baa8f57a8e7505cf87a913"
+    },
+    "okio/ByteString.class": {
+      "accepted431": "4d9bcb46519c2503fbf76f67c56172696751f27a7d53c60bb821de45ee476f2f",
+      "owner_v2": "9f0556a0bf18258b8c478624fe2a5e036dfcf38a235bfb8fb5f61d1ff34f31bc"
+    },
+    "okio/CipherSink.class": {
+      "accepted431": "d32d92d789f58cd94b9efbf444b5aac3f0699af26c64af339f32ab12eec4f7d0",
+      "owner_v2": "b03e1f483d6121c7c796e01da8024657efae855bcb1beffc0c8e62986ca575d4"
+    },
+    "okio/DeflaterSink.class": {
+      "accepted431": "8d230faf4c4d3d2ec4902f37251bca5c7c204a9a5b2f3a78b11d0bb5ed39577f",
+      "owner_v2": "2d5c286d8071df29228be767fbdadf7df3f8490bb134d03e59b484edf5aa67a5"
+    },
+    "okio/FileHandle.class": {
+      "accepted431": "e5436ca32d95bbc3053742f8bf59e9726c43836dcadd64e1cacc6e4cc2056904",
+      "owner_v2": "5747412628d20c182ac316767d7f1b1195aaaa19747962292539c4828e41e079"
+    },
+    "okio/FileMetadata.class": {
+      "accepted431": "280001d3738a86c9cc573cbc2ef7f50c656d17b7cc9d70a499947a43506eddcf",
+      "owner_v2": "963e0831fd17613f2213018e8e345dade083d791c5aa110d111608c39f115577"
+    },
+    "okio/FileSystem.class": {
+      "accepted431": "be3cfcc270340a5675bc43a29939bac88fc3bff8a06e4a31f00d952602a88733",
+      "owner_v2": "c8f774255b6902f0576af286d692ae87c0636dbba0a53eab21855d7f16e9f8b7"
+    },
+    "okio/GzipSink.class": {
+      "accepted431": "f682bc2c15605923d2e6de588208b8c5a1fa13c22d0944d235ad719c607dbacd",
+      "owner_v2": "8ce9c41035ab475e8d0eb9cef478fa2988826fc1d64da5b80542736316e0f8f4"
+    },
+    "okio/GzipSource.class": {
+      "accepted431": "eea32a55db034434500c4d2fd8e35f0dd6116d1505714f85a762eb0dca42f85d",
+      "owner_v2": "86a063f5c7908832b2380dd1fb799288bb41d851438903c501d2f7635222d3c0"
+    },
+    "okio/InflaterSource.class": {
+      "accepted431": "7d2dbb3285a76b4507e04f31d6c41129592395e8158b9cb843be1da2aed6a476",
+      "owner_v2": "48a604dd0c2e310d38c8ce438e0c192e5a2ffbab06e95a648bb32296c93c62ba"
+    },
+    "okio/JvmFileHandle.class": {
+      "accepted431": "8f164b581b8f0aaf56902d71e7ff469048e761d600e9fca5a91a07a8f010c336",
+      "owner_v2": "2ebc3613af1671231af96b91387954fe58a381a23675bbc585a1d44ec0ff32e9"
+    },
+    "okio/JvmSystemFileSystem.class": {
+      "accepted431": "ca58f927b2151ea0d3be3eefc28f7397158678a24798bc3e5c387dc8c6151cd5",
+      "owner_v2": "9d02d9a378fddce2b2fcde6524a67aead6cde5810879466a4e45864e6a44e8f5"
+    },
+    "okio/NioFileSystemWrappingFileSystem.class": {
+      "accepted431": "a18bd8c264a0f240c99bcd137ef0a1307f2c7380d5409c165b82b6c19b731d60",
+      "owner_v2": "25e52ab1e8891b50ba8f5c315a15dac48153e5639ddea67ce9c4f7c0f04f284e"
+    },
+    "okio/NioSystemFileSystem.class": {
+      "accepted431": "7cdb314752def4b4bf857085318be75409efc44095ea3f9da2f5a11d371942d6",
+      "owner_v2": "1d8f098b0870eed8b2284b99835f68e6e85084d2dfcf2b574c0f3766189ea068"
+    },
+    "okio/Okio__JvmOkioKt.class": {
+      "accepted431": "cce27cff487602ecc9435f58153785676c0cb122eaa4cbff81991fe56f5bc9ca",
+      "owner_v2": "2fdf6d40b820b9be5c966482e5b702ca869079819cf749436ba0621c3128d576"
+    },
+    "okio/Okio__OkioKt.class": {
+      "accepted431": "11d0c36daf308f9c6e0bbe4c44f9ea07b37a65f07dbb653d317cd28f7119f1f0",
+      "owner_v2": "4841d50c1b189365a6d33ae7e558918028d3c9d5d1b5bedf9061af86aff5ddce"
+    },
+    "okio/Options$Companion.class": {
+      "accepted431": "69b8f65a0889b1f1841729bb2b3a63e1978c3dc86f461ddbab4fd8528a5f9148",
+      "owner_v2": "a8afbc3313dd15d581644c61a05eb5476c0d980f31f1cf7bb43b6e4ca8c52a60"
+    },
+    "okio/Path.class": {
+      "accepted431": "52e9ea7166615a28318eb8b26d1a7477652c529ffadf7b1f55b9ec8448f3c6f0",
+      "owner_v2": "66e6d53f06925bd2875bb3c5578cc8ecf814733d39ca992e3160fb01dbbcf7c2"
+    },
+    "okio/Pipe$sink$1.class": {
+      "accepted431": "805859a22713d83078ae200be0c8c6e08a735779a068137e2defa82b5a6e1893",
+      "owner_v2": "e4fabc50e4219b8e75ba23e3694945b109c9924bb0138b8d880e099c316b3e14"
+    },
+    "okio/Pipe.class": {
+      "accepted431": "d9ffac82b10d8745a1bcc87451d45e342df4f6c55ba279fb11ca3c5b970d4b12",
+      "owner_v2": "6f9499e1a4d51f169c399f9ca9dc875637f70d9b0a33d80473c6a37bc9308a4c"
+    },
+    "okio/RealBufferedSink.class": {
+      "accepted431": "b570eacbdeb6548b9fd7c636c1796ec62c1cd6b3c0c04f660c85eeed1eb87c37",
+      "owner_v2": "c4db18e6cdd56202945473f7b021eeb5fdf6121c8a3681624430ce66598166fb"
+    },
+    "okio/RealBufferedSource.class": {
+      "accepted431": "e04fc0a2ea6dd25559aceb2de5cb4f835e6e7c617854d8a1ec7d65e6071903dc",
+      "owner_v2": "c47815024e2c01a512b1f24158d0a7586c90d2834dd3c1025d59f688e50e34e0"
+    },
+    "okio/Segment.class": {
+      "accepted431": "0fc7c0180cce0479f51a8150f5f2ff80c81a6a151ac20466d1611a2b17753af3",
+      "owner_v2": "7e4396cb26f6053eb665b7f840e6c660da21c72f241d290648987ef2bdbf104a"
+    },
+    "okio/SegmentPool.class": {
+      "accepted431": "cf3aa8b683524d4f6dd3f1602c7b9f997c47dcf39acf6cf03e85d6c536ab156b",
+      "owner_v2": "d16c6e548182c6495b1716937058dcfcd861966acc3d9f184d61cf6c696e582a"
+    },
+    "okio/SegmentedByteString.class": {
+      "accepted431": "67af5dab19069b19361e86a642d35a1e5d617559b2f391a1dd1755f648759e36",
+      "owner_v2": "d9a101f8afe909e3bf289ec57720135a603900355796f69c3da4bed362581cc6"
+    },
+    "okio/SocketAsyncTimeout.class": {
+      "accepted431": "5bb60e9c5537a478fdbf98008666fdca2b5d096a9a6aef5233a91ac1155085ad",
+      "owner_v2": "b2166403f75e4d54767ca34f5ee8d2e882e622fea81671d7ed0506be395a3e21"
+    },
+    "okio/Throttler.class": {
+      "accepted431": "ae9e64ae5be0af3f71de2d706b40ad213852fcddb49482b020aa9a95d757cafe",
+      "owner_v2": "995fc9d7db093568713fb9ecf3703c32ab23aa3d317fb443d41fb8ff9efcfa2b"
+    },
+    "okio/Timeout.class": {
+      "accepted431": "e170b3b3307cbd4da520cb106c988e85110270c8a49c2381bceb4309ae654404",
+      "owner_v2": "050eb927d9ff6a804ac243f5619d4bdc251999847f53cf6021f611bc40d30b57"
+    },
+    "okio/Utf8.class": {
+      "accepted431": "8521f47434f2f38db6f20c22bfe3415997e3309499d39e077a0906578be9667c",
+      "owner_v2": "6e4471a1f24010a1df0c508826d0b53af8d6d196044cb0e59f4c5ededebfed78"
+    },
+    "okio/ZipFileSystem.class": {
+      "accepted431": "dd71a5ac61ae89ca6c9e8e64e8c15b7a22a14ac416b084faf9a73be65cc71934",
+      "owner_v2": "aecf556d87222a5a5621530430a37a2a2db6c92e55efa85d16c89e8599fbe92a"
+    },
+    "okio/_Base64.class": {
+      "accepted431": "93720762333f8c48c2304d360a5d02be4bfe4bce44b6a89a1e1c44235136e676",
+      "owner_v2": "4cba6a47bb48f86c3b2f9e6288a3e6d3c3ac2def5a74754d7c3e92562cf38210"
+    },
+    "okio/internal/FixedLengthSource.class": {
+      "accepted431": "9e8c0a40edbc3c9a4d7d0646d512899e99130b2c2f588cb3e8509078abbd33d8",
+      "owner_v2": "1fb8d0467934f77de97782acb81218fb5785145299d17ffadcdeca0a707abd14"
+    },
+    "okio/internal/ResourceFileSystem.class": {
+      "accepted431": "72b407ea794e31d765d7613d514ce5c51eb8f63a91770891623c03e798bad682",
+      "owner_v2": "1ed43eefa0eddb3ae0bd00fe9676706fec82db0b68000b73d8e2a3936940500e"
+    },
+    "okio/internal/ZipFilesKt.class": {
+      "accepted431": "e4a2bbf9b7c69fb8f4a64fc58dd72745ec01e2b520fb7bf442903d1b65bfa11f",
+      "owner_v2": "0e11198d2d9996d6d76a8404c9eadff85868479e7990b30497dac0ecba757775"
+    },
+    "okio/internal/_Buffer.class": {
+      "accepted431": "aff781ff006f23721563db8f365023a45ffde867bd37f8073f82dc3ef4cdca51",
+      "owner_v2": "f6f7c285e19dbf51f651c24fbbefa9aab13ea95d0df414200f8c12c4b5616d9b"
+    },
+    "okio/internal/_ByteString.class": {
+      "accepted431": "f70f9d2c4bbf7ca266eb1cb4968dc5ab85a78ede047a545e2a389c4d4f323f82",
+      "owner_v2": "06fef22bfed92c07de2c2f146d7a1cb67ae96bb51b1dd456a904fbf68d50987e"
+    },
+    "okio/internal/_FileSystem$commonDeleteRecursively$sequence$1.class": {
+      "accepted431": "0727e5953752f9fa46c5c216d474c1ae142c10110429bd2abfbfd0022939196f",
+      "owner_v2": "709d7051880ac11c71b647d0c8cb4a8b1e40fed06c7daba3e328b5b116b46284"
+    },
+    "okio/internal/_FileSystem$commonListRecursively$1.class": {
+      "accepted431": "872f4e974fe8402021dddaa09870e7253be612b9edc79dfe3144dd14c9114239",
+      "owner_v2": "52e0c0fbf4884a3728ae88cf9366e9149aa21715bc196c34569973723e17ed2d"
+    },
+    "okio/internal/_FileSystem.class": {
+      "accepted431": "6c62856bb893f416d9774792a88380ecc2584dd09d3d84a5d928178296815d75",
+      "owner_v2": "eeb8359317a0ce3b0ffb22758d91611ab09255771d27471b6acf0ce921f02886"
+    },
+    "okio/internal/_Path.class": {
+      "accepted431": "90478a68d4da78cfa539bac7e802619795c2c609d73f0eefeaa68ca3af5df3bb",
+      "owner_v2": "0dc764580666cc4b9de2590631a0927c969c4e0316e550c32fa9fe3a3ee67cf8"
+    },
+    "okio/internal/_RealBufferedSource.class": {
+      "accepted431": "ca30b210695fc502fd5bda6477a6d1202a352c7aede5b2b9d24800010f9983fd",
+      "owner_v2": "583daf1097160bb038e98f6a7f43ad3bb31da05b28359f9cb4c341a9e921e2cd"
+    },
+    "okio/internal/_SegmentedByteString.class": {
+      "accepted431": "c7161736dacd4816ecd961bd1c8523f7f80de5de7a8f4992410546456235d84c",
+      "owner_v2": "94bdda3620aa429ad722089bf3b6d5f0a45869561b67ac5f0838959bcbe3b9fd"
+    }
+  }
+}

@@ -41,9 +41,20 @@ def classes(path):
     with ZipFile(path) as z:return {n:z.read(n) for n in z.namelist() if n.endswith('.class')}
 
 
+def compiler_sources():
+    files=[HERE/'build.py',HERE/'cards_patch.py',HERE/'projection_patch.py',HERE/'presentation_patch.py',
+      HERE/'CARDS-SOURCE-BUDGET.json',HERE/'PROJECTION-SOURCE-BUDGET.json',HERE/'DEX2JAR-LIB-PINS.json',
+      HERE/'BASELINE.json',HERE/'SCOPE.json',HERE/'logo-clear/patch.py',HERE/'logo-clear/SOURCE-BUDGET.json',
+      HERE/'profile-reads/patch_feature.py',HERE/'profile-reads/SOURCE-BUDGET.json',
+      HERE/'profile-reads/runtime/CobraProfileDataReuse.java',HERE/'cards-reuse/patch.py',HERE/'cards-reuse/SOURCE-BUDGET.json',
+      HERE/'cards-reuse/runtime/CobraCardsReuse.java',ISO/'ModuleDexWriter.java']
+    return sorted(set(files+list((HERE/'runtime').glob('*.java'))))
+
+
 def build(bundles,jars,android,d8,dex2jar,out):
     bundles,jars,android,d8,dex2jar,out=(p.resolve() for p in (bundles,jars,android,d8,dex2jar,out))
     assert not out.exists();out.mkdir()
+    source_files={str(p.relative_to(REPO)):file_sha(p) for p in compiler_sources()}
     assert file_sha(android)==ANDROID_SHA and file_sha(d8)==D8_SHA
     assert {p.name:file_sha(p) for p in jars.glob('*.jar')}==load(REPO/'repairs/universal-persistence-2103401/RECEIPT-TOOL-PINS.json')
     assert {p.name:file_sha(p) for p in (dex2jar/'lib').glob('*.jar')}==load(HERE/'DEX2JAR-LIB-PINS.json')
@@ -72,7 +83,8 @@ def build(bundles,jars,android,d8,dex2jar,out):
     revised={}
     projected=projection_patch.patch_activity(sources[activity])
     presented=presentation_patch.patch_activity(projected)
-    revised[activity]=cards_patch.patch_activity(presented)
+    staged=cards_patch.patch_activity(presented)
+    revised[activity]=module('cards_reuse_patch',HERE/'cards-reuse/patch.py').patch_activity(staged)
     revised[card]=cards_patch.patch_card(sources[card])
     revised[feature]=module('cards_profile_patch',HERE/'profile-reads/patch_feature.py').patch(sources[feature])
     revised[logo]=module('cards_logo_clear_patch',HERE/'logo-clear/patch.py').patch(sources[logo])
@@ -99,20 +111,26 @@ def build(bundles,jars,android,d8,dex2jar,out):
     api_jar=out/'compile-api.jar'
     with ZipFile(api_jar,'w',ZIP_DEFLATED) as z:
         for name,raw in api.items():z.writestr(name,raw)
-    helpers=[HERE/'runtime/CobraCardsTiles.java',HERE/'runtime/CobraCardsLayout.java',HERE/'profile-reads/runtime/CobraProfileDataReuse.java']
+    helpers=[HERE/'runtime/CobraCardsTiles.java',HERE/'runtime/CobraCardsLayout.java',HERE/'profile-reads/runtime/CobraProfileDataReuse.java',HERE/'cards-reuse/runtime/CobraCardsReuse.java']
     assert all(p.is_file() for p in helpers),'No substitute for incomplete approved Cards implementation'
+    helper_sources={str(p.relative_to(REPO)):file_sha(p) for p in helpers}
     compiled=out/'compiled';compiled.mkdir()
     run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-source','8','-target','8','-g:none','-Xlint:all,-options,-deprecation',
          '-cp',str(android)+':'+str(api_jar),'-d',compiled,*helpers])
-    roots={'CobraCardsTiles','CobraCardsLayout','CobraProfileDataReuse'}
+    roots={'CobraCardsTiles','CobraCardsLayout','CobraProfileDataReuse','CobraCardsReuse'}
     assert all(p.stem.split('$')[0] in roots for p in compiled.rglob('*.class'))
     with ZipFile(out/'helpers.jar','w',ZIP_DEFLATED) as z:
         for p in compiled.rglob('*.class'):z.write(p,p.relative_to(compiled).as_posix())
     helper_dex=out/'helper-dex';helper_dex.mkdir()
     run(['java','-cp',d8,'com.android.tools.r8.D8','--min-api','21','--lib',android,'--output',helper_dex,out/'helpers.jar'])
+    assert helper_sources=={str(p.relative_to(REPO)):file_sha(p) for p in helpers},'Source mutation during compilation refused'
     assert {p.name for p in helper_dex.iterdir()}=={'classes.dex'}
     helper_smali=out/'helper-smali'
     run(['java','-cp',jars/'*','org.jf.baksmali.Main','disassemble','--sequential-labels',helper_dex/'classes.dex','-o',helper_smali])
+    layout_methods=projection_patch.methods((helper_smali/'com/projectinfinity/kodi/CobraCardsLayout.smali').read_text())
+    assert {'public static beforeShell(Landroid/app/Activity;)V','public static layout(Landroid/app/Activity;Ljava/lang/Object;)V',
+        'public static afterRender(Landroid/app/Activity;)V','public static refreshDetails(Landroid/app/Activity;)Z',
+        'public static refreshPreview(Landroid/app/Activity;)V'}<=set(layout_methods),'Exact Cards native hook API required'
     assignments={name:'COBRA' for name in sources}
     for p in helper_smali.rglob('*.smali'):
         name=p.read_text().splitlines()[0].split()[-1];assert name not in assignments;assignments[name]='COBRA'
@@ -121,9 +139,14 @@ def build(bundles,jars,android,d8,dex2jar,out):
     host=out/'host';host.mkdir();cp=':'.join(map(str,sorted(jars.glob('*.jar'))))
     run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-source','8','-target','8','-g:none','-Xlint:-options','-cp',cp,'-d',host,ISO/'ModuleDexWriter.java'])
     run(['java','-cp',str(host)+':'+cp,'org.jf.dexlib2.writer.pool.ModuleDexWriter',out/'owner-dex',out/'assignments.tsv',out/'origins.tsv',out/'changed.dex',helper_dex/'classes.dex',*inputs])
+    method_changes={}
+    for name,raw in revised.items():
+        old_methods=projection_patch.methods(sources[name]);new_methods=projection_patch.methods(raw)
+        method_changes[name]=sorted(s for s in old_methods if old_methods[s]!=new_methods.get(s))
+    assert source_files=={str(p.relative_to(REPO)):file_sha(p) for p in compiler_sources()},'Source mutation during owner compilation refused'
     save(out/'BUILD.json',dict(status='COMPILED_UNSIGNED_COBRA_OWNER_ONLY',baseline_signed_source=BASE_SOURCE,baseline_components=catalog,
-         candidate_component_version=VERSION,changed_classes=sorted(revised),source_method_changes={n:sorted(s for s in projection_patch.methods(sources[n]) if projection_patch.methods(sources[n])[s]!=projection_patch.methods(revised[n]).get(s)) for n in revised},
-         new_classes=sorted(set(assignments)-set(sources)),helper_sources={str(p.relative_to(REPO)):file_sha(p) for p in helpers},
+         candidate_component_version=VERSION,changed_classes=sorted(revised),source_method_changes=method_changes,
+         new_classes=sorted(set(assignments)-set(sources)),helper_sources=helper_sources,compiler_source_files=source_files,
          compile_API_jar_sha256=file_sha(api_jar),Infinity='FROZEN_ZIP',minimal_Android='FROZEN_ZIP',chooser='NO_CODE_OR_DEX_CHANGE; later genuine-version metadata only',shutdown='FROZEN_NOT_RUN',APK='NOT_BUILT'))
 
 

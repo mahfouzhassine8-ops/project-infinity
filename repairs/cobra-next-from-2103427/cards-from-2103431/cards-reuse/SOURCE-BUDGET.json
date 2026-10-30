@@ -1,0 +1,87 @@
+{
+  "phase": "REVIEWED_SOURCE_PATCH_NOT_EXECUTED_OR_COMPILED",
+  "input_stage": "Accepted431 plus already reviewed projection -> presentation -> Cards patches",
+  "input_source": "/workspace/cobra-evidence/cards431-activity-combined-patch/smali/com/projectinfinity/kodi/InfinityLiveActivity.smali",
+  "input_source_sha256": "773cf2da05931830e649ef86db5521364835a6a3ce7250391b03cb0df653f531",
+  "input_method_count": 1802,
+  "class_metadata_sha256": "d33503dedc362b839934a9059d949c0371a99483ea6457c7df57e56caf4b8c39",
+  "selected_method_preimages": {
+    "private cobraRenderGuideBrowser()V": "a55cb8c0cde821f54763b9eb17ae62864643735fa2e04958614eb61ec5d6783e",
+    "private cobraRestyleGuide()V": "0826445b559d471ffd833d6c55143cff69b5608a4462015e363fb8d90339aa04",
+    "private applyLoadResult(Lcom/projectinfinity/kodi/InfinityLiveActivity$LoadResult;)V": "593cba675092a085b25ace7a3dfc756d74f001274b4895e2cdd033481693496b",
+    "private restoreCobraLibraryCache(Ljava/util/ArrayList;)Z": "d1537adfb35d1e39d1f4a9ce22480e7603d5b4e081f2771866f767a4062c4d69",
+    "synthetic lambda$confirmRemoveSource$96$com-projectinfinity-kodi-InfinityLiveActivity(Lcom/projectinfinity/kodi/InfinityLiveActivity$LiveSource;Landroid/content/DialogInterface;I)V": "e9b6eddd717b569a8e683b84e58fe2528a646e2e6a35a658ef1d79909a3eb675",
+    "synthetic lambda$loadAllEnabledSources$54$com-projectinfinity-kodi-InfinityLiveActivity(Ljava/util/ArrayList;ZLjava/util/ArrayList;Ljava/util/ArrayList;)V": "a154ff7f98682d312b6b7fbfd7702841d74063184ba28849f8ba29858e20eece",
+    "private persistSources()V": "6eb11d8cb9c1e51492a673aea04b21c1ea1c707e6dc091c41fb217f7b809cfb7",
+    "private toggleFavorite(Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;)V": "da19c2fbad6d84012bb918c1ae1ed487d274792ef10a6baf5912f2a9ca40e0dc",
+    "private reloadProfileCollections()V": "32082d46942d2b795323430e786656c455ab333b5daadc1d1d88221fd871b5b8",
+    "private hideCobraChannel(Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;)V": "7b3ba58193b0776e532c6e1771c029468c02cd9060496f27067fdc9e7470d100",
+    "synthetic lambda$showCobraAddToGroup$74$com-projectinfinity-kodi-InfinityLiveActivity(Landroid/widget/EditText;Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;Landroid/content/DialogInterface;I)V": "2055edc1ddf94cd09cf294ad8cb8f0f9d2e757a619dd37ef9bc768593f1b2f71",
+    "private addRecent(Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;)V": "0b5d955a991ad17f86fa0b04123263f4ff9695825db16aa8489ddcf1740eb979"
+  },
+  "mutators_match_original431": {
+    "private applyLoadResult(Lcom/projectinfinity/kodi/InfinityLiveActivity$LoadResult;)V": true,
+    "private restoreCobraLibraryCache(Ljava/util/ArrayList;)Z": true,
+    "synthetic lambda$confirmRemoveSource$96$com-projectinfinity-kodi-InfinityLiveActivity(Lcom/projectinfinity/kodi/InfinityLiveActivity$LiveSource;Landroid/content/DialogInterface;I)V": true,
+    "synthetic lambda$loadAllEnabledSources$54$com-projectinfinity-kodi-InfinityLiveActivity(Ljava/util/ArrayList;ZLjava/util/ArrayList;Ljava/util/ArrayList;)V": true,
+    "private persistSources()V": true,
+    "private toggleFavorite(Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;)V": true,
+    "private reloadProfileCollections()V": true,
+    "private hideCobraChannel(Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;)V": true,
+    "synthetic lambda$showCobraAddToGroup$74$com-projectinfinity-kodi-InfinityLiveActivity(Landroid/widget/EditText;Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;Landroid/content/DialogInterface;I)V": true,
+    "private addRecent(Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;)V": true
+  },
+  "allowed_changed_methods": [
+    "private cobraRenderGuideBrowser()V",
+    "private cobraRestyleGuide()V",
+    "private applyLoadResult(Lcom/projectinfinity/kodi/InfinityLiveActivity$LoadResult;)V",
+    "private restoreCobraLibraryCache(Ljava/util/ArrayList;)Z",
+    "synthetic lambda$confirmRemoveSource$96$com-projectinfinity-kodi-InfinityLiveActivity(Lcom/projectinfinity/kodi/InfinityLiveActivity$LiveSource;Landroid/content/DialogInterface;I)V",
+    "synthetic lambda$loadAllEnabledSources$54$com-projectinfinity-kodi-InfinityLiveActivity(Ljava/util/ArrayList;ZLjava/util/ArrayList;Ljava/util/ArrayList;)V",
+    "private persistSources()V",
+    "private toggleFavorite(Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;)V",
+    "private reloadProfileCollections()V",
+    "private hideCobraChannel(Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;)V",
+    "synthetic lambda$showCobraAddToGroup$74$com-projectinfinity-kodi-InfinityLiveActivity(Landroid/widget/EditText;Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;Landroid/content/DialogInterface;I)V",
+    "private addRecent(Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;)V"
+  ],
+  "new_activity_fields_or_methods": false,
+  "allowed_new_helper_class_root": "Lcom/projectinfinity/kodi/CobraCardsReuse",
+  "inventory_clear_hooks": [
+    {
+      "method": "private applyLoadResult(Lcom/projectinfinity/kodi/InfinityLiveActivity$LoadResult;)V",
+      "owner_register": "p0",
+      "list_register": "v0"
+    },
+    {
+      "method": "private restoreCobraLibraryCache(Ljava/util/ArrayList;)Z",
+      "owner_register": "v0",
+      "list_register": "v2"
+    },
+    {
+      "method": "synthetic lambda$confirmRemoveSource$96$com-projectinfinity-kodi-InfinityLiveActivity(Lcom/projectinfinity/kodi/InfinityLiveActivity$LiveSource;Landroid/content/DialogInterface;I)V",
+      "owner_register": "p0",
+      "list_register": "p1"
+    },
+    {
+      "method": "synthetic lambda$loadAllEnabledSources$54$com-projectinfinity-kodi-InfinityLiveActivity(Ljava/util/ArrayList;ZLjava/util/ArrayList;Ljava/util/ArrayList;)V",
+      "owner_register": "v0",
+      "list_register": "v7"
+    }
+  ],
+  "installed_hook": "Exactly two calls, immediately after existing CobraCardsLayout.afterRender in Render only",
+  "restyle_hook": "Exactly one beforeShell, immediately after existing CobraCardsLayout.beforeShell",
+  "production_contract": "All other canonical methods, fields/class metadata and existing Cards hooks exact; no register-count changes",
+  "protected_controls": "Original431 Fullscreen/PiP/More, Pro/Sports, decoder/player/native/source/auth/persistence/shutdown bodies unchanged",
+  "shutdown": "NOT_RUN_FROZEN",
+  "previous_staged_source_sha256": "668531a18982797a50f24acd3134fd26894592b6d3b7e2cdb2f986ffa4fafe4e",
+  "input_source_path": "/workspace/cobra-evidence/cards432-staged-with-preview-effect-hook.smali",
+  "composition_note": "After projection -> presentation -> Cards hooks plus independent post-native preview-effects hook. All12reuse-method preimages unchanged; class metadata unchanged; oldbudgetretained.",
+  "read_only_theme_class_assumptions": {
+    "CobraVisualTheme": "ba2205b13185fab2ec2e12a4375ae6cecabb546592e18b7f58c8f4f1cbcd60eb",
+    "CobraVisualRenderer": "dec308e9eb7eed3dc04343198f4771aef6874331762ec5d70753d07d0676db28",
+    "CobraVisualGeometry": "de8efd7542af974d35a16e8f73c0e36162a8386431a2c362648341381b9fa108",
+    "CobraPresentationSafety": "2cfd7b660b4af686da91775cb25ba487b2193460913003a6ea0613a3154a297e"
+  },
+  "theme_source_review": "THEME-SOURCE-PROOF.json"
+}

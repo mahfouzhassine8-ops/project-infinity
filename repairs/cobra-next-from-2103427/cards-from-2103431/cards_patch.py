@@ -55,7 +55,12 @@ def patch_activity(source):
                 anchor = '    .registers 12\n'
                 assert old.count(anchor) == 1
                 revised = revised.replace(anchor, anchor+'\n    invoke-static/range {p0 .. p0}, '+LAYOUT+'->beforeShell(Landroid/app/Activity;)V\n', 1)
-            api = 'refreshDetails(Landroid/app/Activity;)Z' if 'cobraRefreshModeDetails(' in signature else 'afterRender(Landroid/app/Activity;)V'
+            if 'cobraRefreshModeDetails(' in signature:
+                api = 'refreshDetails(Landroid/app/Activity;)Z'
+            elif 'cobraRefreshVisualEffects(' in signature:
+                api = 'refreshPreview(Landroid/app/Activity;)V'
+            else:
+                api = 'afterRender(Landroid/app/Activity;)V'
             assert revised.count('    return-void') >= 1
             revised = revised.replace('    return-void',
                 '    invoke-static/range {p0 .. p0}, '+LAYOUT+'->'+api+'\n\n    return-void')

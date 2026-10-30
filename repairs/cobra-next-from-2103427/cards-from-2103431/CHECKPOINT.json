@@ -6,7 +6,7 @@
   "baseline": "BASELINE.json",
   "scope": "SCOPE.json",
   "reference": "RESOLVED; both exact images SHA256 verified and visually inspected; private files outside repository",
-  "next": "Finish Cards layout/tile integration and exact941\u00d71672native-rendercomparison; preservebaselineCIresult; checkcompleteinvalidationsforretainedCardsreturn; runonlynewpathfocusedverification; oneconsolidatednextsignedcandidateafterallrequiredchecks.",
+  "next": "Finish Cards visual/ambient/native restoration corrections; next trusted owner integration and scoped checks; one consolidated original-key signed APK only after pass.",
   "agents": {
     "qa_preflight_review": "Profile parity and projection correctness only",
     "delivery_finish_review": "Presentation candidate parity and player progress path",
@@ -31,7 +31,10 @@
     "Profile correctness:6baseline+6candidate API/data parity and2candidate projection semantics/count cases PASS",
     "Combined profile+projection fixedABBA:8selected executionsPASS,42samples per variant/entry",
     "Presentation candidate15cases finalFULLtick state matches431, player text/progress writes preserved",
-    "Cards logo unbind4actualcoordinator casesPASS"
+    "Cards logo unbind4actualcoordinator casesPASS",
+    "Integrated ownerV3:7142existingclasses,5changed,7137canonicalidentical,22newhelpers,20compiler-source bindings",
+    "NativeCardsreuse5cases+actualfocuscheckPASS: sameGrid/adapter240references,index80+5pxoffset,0rebuilds,freshEPG/policy/collection checks",
+    "NativeMoremenu/rowtap/longpresscoordinatedactualMotionEventchecksPASS; newtypographyfinalrenderpending"
   ],
   "measurements": {
     "host_only": true,
@@ -46,14 +49,19 @@
     "general_speedup_established": false,
     "profile_data_prototype": "Correctness tests starting after independent review; no timing result yet",
     "Android_new_scope": {
-      "run": 41001477356,
-      "source": "bfb27f1f09a9fa8eaf962504cf2ed649273e4aa0",
-      "APK": "exactaccepted431",
-      "status": "FIRST_RUN_FAILED_IN_UI_OBSERVER_AFTER_IMPORT_STARTED; no Cards/warm/scroll/resource samples; root-reviewed bounded harness correction passes10controls, next run uses same431bytes",
-      "selected_job": "cobra-cards-baseline",
-      "other_jobs": "ALL5_SKIPPED",
-      "scope": "android-qa/SCOPE.json",
-      "failure_diagnostics": "android-qa/results/signed431-baseline"
+      "prior_runs": [
+        41001477356,
+        41002818185
+      ],
+      "actual_confirmed": "Exact431signature/install/20226sourceimport/MobilevideoEPG",
+      "not_reached": [
+        "Cardsselection",
+        "warmCardsreturns",
+        "scroll/resourcecomparison"
+      ],
+      "current_run": 41007107893,
+      "source": "a531f123d1fcccfac4bc9023395351e97e023b31",
+      "status": "IN_PROGRESS; source-proven current-root observer preflight; no outcome yet"
     },
     "combined_profile_projection": {
       "host_fixture_channels": 20226,
@@ -87,5 +95,10 @@
       "fresh_raw_profile_and_active_ID_reads_each_entry": 40452,
       "policy_decisions_cached": false
     }
-  }
+  },
+  "production_candidate_sources_written": true,
+  "global_accepted431_production_sources_changed": false,
+  "new_application_APK_built": false,
+  "checkpoint_report": "CHECKPOINT-20261030-V3.md",
+  "visual_status": "FULLNATIVEV3RENDERNOTPARITY; concretegeometry/glyph/description/progress/restoration correctionswritten,pendingnextintegration; activeambientwrapperchurnunderfocusedbaseline investigation"
 }

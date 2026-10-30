@@ -1,0 +1,20 @@
+{
+  "status": "READ_ONLY_SOURCE_REVIEW_NO_POST_CONSTRUCTION_THEME_DATA_MUTATOR_FOUND",
+  "source": "Exact signed431 verified COBRA part-0 canonical smali; child review plus parent filehash verification",
+  "class_file_sha256": {
+    "CobraVisualTheme": "ba2205b13185fab2ec2e12a4375ae6cecabb546592e18b7f58c8f4f1cbcd60eb",
+    "CobraVisualRenderer": "dec308e9eb7eed3dc04343198f4771aef6874331762ec5d70753d07d0676db28",
+    "CobraVisualGeometry": "de8efd7542af974d35a16e8f73c0e36162a8386431a2c362648341381b9fa108",
+    "CobraPresentationSafety": "2cfd7b660b4af686da91775cb25ba487b2193460913003a6ea0613a3154a297e"
+  },
+  "facts": [
+    "CobraVisualTheme.data is assigned only in its private constructor. Its three callers builtin/loadGeneration/storePrepared construct/load private JSON.",
+    "After construction, the actual data consumers Theme.value, Renderer.displayName, Safety.effectiveManifest and Activity.cobraBrowseSystemBarSurfaceColor only read it.",
+    "Renderer get/guideLayout exposes JSON aliases but actual consumers only read them; Geometry.guide copies values into model arrays. Renderer.stylesFor writes only its new result JSONObject.",
+    "Theme store/keep/reset/rollback pointer mutations concern separate newly-created pointer JSON, not the active theme data.",
+    "Renderer.active is written only in class initialization and its publish callback; publication swaps the theme then refreshes clients.",
+    "Fresh effective theme identity plus palette, loaded UI contract identity/stamp and computed configuration/geometry therefore validate the current431 immutable-after-construction contract. No JSON/inventory hash or new disk poll is needed."
+  ],
+  "required_for_next_owner": "These four existing classes remain canonically exact; do not silently retain this proof after changing them.",
+  "tests_or_runtime": "NOT_RUN_BY_THIS_SOURCE_REVIEW"
+}

@@ -1,0 +1,94 @@
+{
+  "status": "PASS_ACTUAL_NATIVE_NON_NULL_FOCUS_IDENTITY",
+  "JUnit": {
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "purpose": "One previously selected case repeated with mandatory successful focus request, non-null focus, and unconditional same-view assertion; original five-case evidence retained separately.",
+  "production_source_changes": "NONE; same actual-v3 owner DEX and host jars",
+  "inputs": {
+    "phase": "candidate",
+    "baseline_signed_source": "9ccc4c362a65118eeba38a8e7e4b0de5723c69af",
+    "baseline_APK_sha256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471",
+    "baseline_DEX_sha256": {
+      "classes.dex": "07b94bfde6dbc3e3a6bfc8436ea65e6a67bdef5ca868379809e20f2fb7ce8efb",
+      "classes2.dex": "2e8fa1ae27e670db0525d31a655e93d861893fa20316d5c54a4c6283a97ca304",
+      "classes3.dex": "7e18d8092de33a4d44e299305965e9b9eb943372a9643452f6f78afe209fb215",
+      "classes4.dex": "9f82b0420b32ad8bdda7ef042e44bb975c8c01663f66506eaf33d22123f49b82",
+      "classes5.dex": "af03db41f53209de52f5d8609e411da49fee106d0fe544d6ea6e5d8230d88363"
+    },
+    "trusted_source_bindings_sha256": "aa411b0837d028c19eea7190362bbd4ae3e9189090f59731e301e759aac13d0e",
+    "trusted_actual_owner_BUILD_sha256": "c71a792cc166f0e5c9f5cd83b8af83f85d1c6886f12ce9c85451da5b169cc970",
+    "trusted_owner_DEX_sha256": {
+      "part-0.dex": "7d27a7a73b78599f2fa08a3451b24be27ea2a4b4404b8666cf9862cb6bad0c46",
+      "part-1.dex": "2cccda92792bc5a3827b0e5f15bd5c214b1ac9c1697988f2d762629de4dd12fa"
+    },
+    "production_jar_sha256": "f56e2684bb179821f092a57e3768c9a603c7b93192a511e22a3375c44fb60a2d",
+    "support_jar_sha256": "016a9ca405468cbc86fb6da8634e943ada67ffa615a3b804a1d9680fca84f1ad",
+    "fixture_sha256": "054b4aae8b87c5c975ba5c9c26b7c5cf1ec4ac7858a09a2d936276702eccd062",
+    "test_sha256": "be9c3598424cad812161d22e17ebd2393e09d32066e54004ed936d23ab82181a",
+    "scope_sha256": "6b38e9dd6551936d8c8adab7e022ce148a22c856375501ac4cc4439282da7e8e",
+    "prepare_sha256": "b7125b0e32162de97f14503f1c73fcaa56137621fb885cdc2204c60e0bf22da7",
+    "selected_tests": [
+      "nativeReusePreservesScrollSelectionAndCurrentProgramme",
+      "nativeImmediateSecondRenderPreservesPendingPosition",
+      "nativeSelectiveCollectionsAndFreshDirectory",
+      "nativePolicyTypesAndContextInvalidation",
+      "revisionHooksAllowBackgroundAndModeExitDisposes"
+    ],
+    "core_method_stubs": "NONE; actual native buildShell/ShowGuideShell/Layout/Render/projection/auth",
+    "provider_workers": "ADMISSIONS_RECORDED; WORKER_BODIES_NOT_EXECUTED",
+    "Activity_lifecycle": "NOT_CALLED; native visible/measure fixture only",
+    "application_APK": "NOT_BUILT_OR_INSTALLED",
+    "timing_FPS": "NOT_MEASURED",
+    "physical_Fold": "NOT_RUN",
+    "shutdown": "NOT_RUN"
+  },
+  "observed": {
+    "focused_view_identity_before": 2113455629,
+    "focused_view_identity_after": 2113455629,
+    "first_visible_position": 80,
+    "first_child_top": 5,
+    "Grid_additions": 0,
+    "Grid_removals": 0
+  },
+  "files": {
+    "ACTUAL-FIXTURE-SOURCE.java": {
+      "sha256": "054b4aae8b87c5c975ba5c9c26b7c5cf1ec4ac7858a09a2d936276702eccd062",
+      "bytes": 12804
+    },
+    "INPUTS.json": {
+      "sha256": "a57350507f195726af88734c142871f280c45a6666fcc425024e48d0b35c4b22",
+      "bytes": 2299
+    },
+    "JUNIT.xml": {
+      "sha256": "697944bed993fcd9cb6eb48b7c0a3470152c7c728e0df6010e79960d8205e89e",
+      "bytes": 12720
+    },
+    "RETAINED-RETURN.json": {
+      "sha256": "6435e55db0202fee25a0936a8f2dcf7cf4c8630a214efb0c98decba7dd9fb2a8",
+      "bytes": 4888
+    },
+    "SCOPE-EXECUTED.json": {
+      "sha256": "6b38e9dd6551936d8c8adab7e022ce148a22c856375501ac4cc4439282da7e8e",
+      "bytes": 4884
+    },
+    "SELECTION.json": {
+      "sha256": "44a4403debf765116949d59216e30b31fe1bb10297963e2627e62a3554fb7cd8",
+      "bytes": 398
+    },
+    "TEST-OUTPUT.txt": {
+      "sha256": "9e45b9a0f6cd1b25a5c5fe2803d63ef9614f755921ba2d8bf01ad75a05c3f152",
+      "bytes": 99
+    },
+    "TEST-SOURCE.java": {
+      "sha256": "be9c3598424cad812161d22e17ebd2393e09d32066e54004ed936d23ab82181a",
+      "bytes": 14006
+    }
+  },
+  "timing_FPS_thermal_claim": "NONE",
+  "APK_CI_install_sign_shutdown": "NOT_RUN",
+  "physical_Fold": "NOT_RUN"
+}

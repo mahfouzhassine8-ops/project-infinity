@@ -1,0 +1,147 @@
+{
+  "status": "PASS_ACTUAL_OWNER_V3_BOUNDED_CARDS_REUSE",
+  "JUnit": {
+    "tests": 5,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "host_suite_seconds_NOT_BENCHMARK": 10.736,
+  "inputs": {
+    "phase": "candidate",
+    "baseline_signed_source": "9ccc4c362a65118eeba38a8e7e4b0de5723c69af",
+    "baseline_APK_sha256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471",
+    "baseline_DEX_sha256": {
+      "classes.dex": "07b94bfde6dbc3e3a6bfc8436ea65e6a67bdef5ca868379809e20f2fb7ce8efb",
+      "classes2.dex": "2e8fa1ae27e670db0525d31a655e93d861893fa20316d5c54a4c6283a97ca304",
+      "classes3.dex": "7e18d8092de33a4d44e299305965e9b9eb943372a9643452f6f78afe209fb215",
+      "classes4.dex": "9f82b0420b32ad8bdda7ef042e44bb975c8c01663f66506eaf33d22123f49b82",
+      "classes5.dex": "af03db41f53209de52f5d8609e411da49fee106d0fe544d6ea6e5d8230d88363"
+    },
+    "trusted_source_bindings_sha256": "aa411b0837d028c19eea7190362bbd4ae3e9189090f59731e301e759aac13d0e",
+    "trusted_actual_owner_BUILD_sha256": "c71a792cc166f0e5c9f5cd83b8af83f85d1c6886f12ce9c85451da5b169cc970",
+    "trusted_owner_DEX_sha256": {
+      "part-0.dex": "7d27a7a73b78599f2fa08a3451b24be27ea2a4b4404b8666cf9862cb6bad0c46",
+      "part-1.dex": "2cccda92792bc5a3827b0e5f15bd5c214b1ac9c1697988f2d762629de4dd12fa"
+    },
+    "production_jar_sha256": "f56e2684bb179821f092a57e3768c9a603c7b93192a511e22a3375c44fb60a2d",
+    "support_jar_sha256": "016a9ca405468cbc86fb6da8634e943ada67ffa615a3b804a1d9680fca84f1ad",
+    "fixture_sha256": "054b4aae8b87c5c975ba5c9c26b7c5cf1ec4ac7858a09a2d936276702eccd062",
+    "test_sha256": "02dbd723bd33b00af3f378b3983281629684b80c292609905b68ffda961eab17",
+    "scope_sha256": "fc1f1bdd8c3dc0a4e48f00ba7eb370c5c83f55c33e116555adaa85145b5d9fc1",
+    "prepare_sha256": "b7125b0e32162de97f14503f1c73fcaa56137621fb885cdc2204c60e0bf22da7",
+    "selected_tests": [
+      "nativeReusePreservesScrollSelectionAndCurrentProgramme",
+      "nativeImmediateSecondRenderPreservesPendingPosition",
+      "nativeSelectiveCollectionsAndFreshDirectory",
+      "nativePolicyTypesAndContextInvalidation",
+      "revisionHooksAllowBackgroundAndModeExitDisposes"
+    ],
+    "core_method_stubs": "NONE; actual native buildShell/ShowGuideShell/Layout/Render/projection/auth",
+    "provider_workers": "ADMISSIONS_RECORDED; WORKER_BODIES_NOT_EXECUTED",
+    "Activity_lifecycle": "NOT_CALLED; native visible/measure fixture only",
+    "application_APK": "NOT_BUILT_OR_INSTALLED",
+    "timing_FPS": "NOT_MEASURED",
+    "physical_Fold": "NOT_RUN",
+    "shutdown": "NOT_RUN",
+    "fixture_negative_case_cleanup": "Before first execution: restore only the controlled malformed policy values between same-test fixtures; no production source change"
+  },
+  "files": {
+    "INPUTS.json": {
+      "sha256": "a21dfd3a7651487e55b3cc2e89ae3d701a8cffab3073a012989d29783e1a97b5",
+      "bytes": 2469
+    },
+    "SELECTION.json": {
+      "sha256": "44a4403debf765116949d59216e30b31fe1bb10297963e2627e62a3554fb7cd8",
+      "bytes": 398
+    },
+    "TEST-OUTPUT.txt": {
+      "sha256": "25ba95bfbb3b7360e9e62d289bbf5dfa0a9742e20814e8d9faa5c09f86883b4b",
+      "bytes": 522
+    },
+    "TEST-SOURCE.java": {
+      "sha256": "02dbd723bd33b00af3f378b3983281629684b80c292609905b68ffda961eab17",
+      "bytes": 13714
+    },
+    "ACTUAL-FIXTURE-SOURCE.java": {
+      "sha256": "054b4aae8b87c5c975ba5c9c26b7c5cf1ec4ac7858a09a2d936276702eccd062",
+      "bytes": 12804
+    },
+    "JUNIT.xml": {
+      "sha256": "d524db649c24f22859ded925044851e68bb6647f6866f2aa9874a5a3f7e9936a",
+      "bytes": 14066
+    },
+    "CONTEXT-INVALIDATION.json": {
+      "sha256": "cc253fa1c92a62f33165f577b9b4fcbb93718c38614b62c5dade780cc103f943",
+      "bytes": 968
+    },
+    "PENDING-RESTORATION.json": {
+      "sha256": "ef60c11d58cd0f5f70e542ab1c3d2d925409a08521fac7f9f82d75c2cb53126f",
+      "bytes": 4947
+    },
+    "RETAINED-RETURN.json": {
+      "sha256": "5385e9269170cec4f312c6c6f27c4b39701326898060a0144b4afd182367d67c",
+      "bytes": 4797
+    },
+    "SELECTIVE-COLLECTIONS.json": {
+      "sha256": "116c70151dec3b215ff003be74a2ea6b97479fd7b3a31b947bc947350fe077e4",
+      "bytes": 171
+    },
+    "THREAD-AND-EXIT.json": {
+      "sha256": "a26a67981e1f1d771b50a46808ef54ee31d6bd847e20088e0ec4ee4c886b401f",
+      "bytes": 133
+    },
+    "RUNTIME-SOURCE.java": {
+      "sha256": "6da97a198c89a6113d5643faa6267d3835c9a6a44e2c3b1300fcfa1b9051b6f3",
+      "bytes": 13215
+    },
+    "PATCH-SOURCE.py": {
+      "sha256": "d78f99af8bbc7c1484e1ec38bb61816df0a47eb0fa8798bc4a0c1e423c569d25",
+      "bytes": 8022
+    },
+    "SOURCE-BUDGET.json": {
+      "sha256": "6174ec9ddf95c2fdddeef28270d20d8a284d10f657624ccf8a668332d8259d20",
+      "bytes": 7229
+    },
+    "SCOPE-EXECUTED.json": {
+      "sha256": "fc1f1bdd8c3dc0a4e48f00ba7eb370c5c83f55c33e116555adaa85145b5d9fc1",
+      "bytes": 4433
+    },
+    "THEME-SOURCE-PROOF.json": {
+      "sha256": "00c834830e709fa9779ba51bcb3d37d963c7f6350140bc3ff5d7f38d405ea61a",
+      "bytes": 1871
+    },
+    "TRUSTED-SOURCE-BINDINGS.json": {
+      "sha256": "aa411b0837d028c19eea7190362bbd4ae3e9189090f59731e301e759aac13d0e",
+      "bytes": 23470
+    },
+    "TRUSTED-OWNER-BUILD.json": {
+      "sha256": "c71a792cc166f0e5c9f5cd83b8af83f85d1c6886f12ce9c85451da5b169cc970",
+      "bytes": 9890
+    },
+    "REVIEW.md": {
+      "sha256": "e7398ff3b57a63d1ad14a9287313486deee6ba31ea340d83f7e810e1949fd4b2",
+      "bytes": 3079
+    }
+  },
+  "APK_CI_install_sign_shutdown": "NOT_RUN",
+  "physical_Fold": "NOT_RUN",
+  "timing_FPS_thermal_claim": "NONE",
+  "observed": {
+    "ordinary_return_Grid_adds": 0,
+    "ordinary_return_Grid_removes": 0,
+    "first_visible_position": 80,
+    "first_child_top": 5,
+    "native_focus_request": true,
+    "fresh_current_programme_and_accessibility": "ASSERTED_ACTUAL_NATIVE_BIND_AFTER_CLOCK_ADVANCE",
+    "original_Channel_references": "ALL240_IDENTICAL",
+    "pending_grid_children_before_layout": 0,
+    "pending80_preserved": true,
+    "native_directory_recent_and_favorites_counts": "2/2",
+    "policy_and_membership_cases": 7,
+    "event_background_thread_check": "PASS; runtime adds no worker",
+    "source_read_only_contract": "Four theme/geometry/safety classes remain exact; no postconstruct data mutation found"
+  },
+  "runtime_limits": "Native UI methods and current owner host DEX; no actual fullscreen/player/decoder construction or physical Fold return, visual parity, latency or frames benchmark. Core ShowShell/Render/Layout/auth not stubbed. Original provider executor admissions recorded; worker bodies not executed.",
+  "additional_focus_proof": "../focus-identity-proof/OUTCOME.json"
+}

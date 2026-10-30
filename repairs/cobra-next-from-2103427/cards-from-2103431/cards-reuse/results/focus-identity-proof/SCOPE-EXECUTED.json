@@ -1,0 +1,66 @@
+{
+  "authorization": "Parent/root explicitly selected bounded retained Cards Grid reuse and approved source composition after the three staged patches; proposal/scope/budget saved before writing patch.py",
+  "status": "PASS_ACTUAL_NATIVE_431_BASELINE_AND_OWNER_V3_FIVE_SELECTED_TESTS",
+  "baseline_signed_source": "9ccc4c362a65118eeba38a8e7e4b0de5723c69af",
+  "baseline_APK_sha256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471",
+  "source_budget": "SOURCE-BUDGET.json",
+  "proposal": "PROPOSAL.md",
+  "owner": "COBRA",
+  "files_owned_by_this_subtask": [
+    "patch.py",
+    "SOURCE-BUDGET.json",
+    "SCOPE.json",
+    "PROPOSAL.md",
+    "runtime/CobraCardsReuse.java",
+    "tests and host-only preparation/evidence under this cards-reuse directory"
+  ],
+  "patch_function": "patch_activity(text) -> str; exact staged preimages and post-boundary guards",
+  "helper_API": {
+    "tryReuse(Activity)Z": "Render entry before original body; true returns immediately because helper itself performs required metadata/styles work",
+    "installed(Activity)V": "After each of two existing CardsLayout.afterRender calls in Render only",
+    "beforeShell(Activity)V": "After existing CardsLayout.beforeShell call in Restyle; invalidate on mode exit",
+    "inventory(Activity)V": "Immediately before each of four actual mChannels.clear publications, never function-entry prefix",
+    "sources(Activity)V": "persistSources entry",
+    "favorites(Activity)V": "toggleFavorite entry",
+    "collections(Activity)V": "reloadProfileCollections entry",
+    "hidden(Activity)V": "hideCobraChannel entry",
+    "custom(Activity)V": "custom-group mutation lambda entry",
+    "recent(Activity,Object)V": "addRecent entry with original p0/p1 range"
+  },
+  "eligibility": "Cards only, non-Pro, channel route, same current attached Grid/adapter/shell and hidden/inactive directory; all other paths use original renderer",
+  "freshness": "Existing UI-owned weak state with inventory/source/membership epochs; fresh profile/raw profiles/source_meta/effective-theme/configuration/geometry guard; existing EPG/metadata visible rows rebound via actual getView",
+  "selectivity": "Recent changes dirty RECENT projection only; the hook conservatively increments without reading a mutable list or view on any thread. ALL retains membership; shown directory/group/source routes always use original fresh counts. Favorites/custom collections have context-appropriate revisions.",
+  "prohibited": [
+    "No 20k inventory hash or arbitrary TTL",
+    "No authorization/policy cache, preference/file/worker writes or new worker",
+    "No off-mode appearance/control/order changes",
+    "No protected player/fullscreen/PiP/More/native/auth/persistence/shutdown edits",
+    "No APK, signing, CI, emulator, shutdown or commit; selected actual native host verification requires parent runtime/budget review before execution"
+  ],
+  "parent_review_guard": "Parent owns runtime helper and focused test preparation; this patch may execute only with the matching reviewed budget and helper API. No verification result is presumed.",
+  "shutdown": "FROZEN_NOT_RUN",
+  "event_thread_contract": "All mutation hooks only perform weak-owner lookup and short synchronized revision increments; no main-thread assertion, view/list/prefs access, queue or callback. UI APIs require main thread.",
+  "selected_native_tests": {
+    "accepted431": [
+      "actualAccepted431ReturnBaseline"
+    ],
+    "candidate": [
+      "nativeReusePreservesScrollSelectionAndCurrentProgramme",
+      "nativeImmediateSecondRenderPreservesPendingPosition",
+      "nativeSelectiveCollectionsAndFreshDirectory",
+      "nativePolicyTypesAndContextInvalidation",
+      "revisionHooksAllowBackgroundAndModeExitDisposes"
+    ]
+  },
+  "selected_native_fixture": "Exact proven CobraSettingsReturnBaselineTest.Fixture from trusted integrated host SOURCE-BINDINGS; shared fixture test methods are not executed",
+  "selected_before_native_execution": true,
+  "runtime_admission_review": "Root fixes applied: raw-policy ClassCastException caught only at its three getString reads, exact final native Card child types checked before any getView; independent review found no blocking issue",
+  "theme_source_proof": "THEME-SOURCE-PROOF.json",
+  "measurement_limits": "Native host Grid rebuild/identity/selection/pixel offset and final content/correctness only, no latency/FPS/device/visual parity claims",
+  "results": [
+    "results/accepted431-native-baseline/OUTCOME.json",
+    "results/verified-native-v3/OUTCOME.json"
+  ],
+  "selected_additional_focus_verification": "Rerun only nativeReusePreservesScrollSelectionAndCurrentProgramme after strengthening its actual non-null focus precondition and unconditional identity assertion; original five passing results retained. No production change.",
+  "additional_focus_selected_before_execution": true
+}

@@ -1,0 +1,59 @@
+{
+  "selected_before_execution": true,
+  "authorization": "Root selected exact431 Settings-return native baseline; production candidate not yet authorized",
+  "baseline_source": "9ccc4c362a65118eeba38a8e7e4b0de5723c69af",
+  "baseline_APK_sha256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471",
+  "selected_test": "CobraSettingsReturnBaselineTest#actual431LoadedCardsSettingsReturn",
+  "foundation": "Actual buildShell, cobraShowGuideShell, cobraLayoutGuide, cobraRenderGuideBrowser, captureSettingsReturn and returnFromSettings; actual native GridView and original adapter. No production-method stubs.",
+  "bounded_followup_cases_after_foundation": [
+    "null preview selection",
+    "uncached EPG loading state with recording-only executor",
+    "changed favorites/profile while covered",
+    "theme/geometry change"
+  ],
+  "measurements": [
+    "real browser hierarchy added/removed native GridViews",
+    "final mode/context/selected channel/filter/adapter IDs",
+    "scroll/focus native state and stored map",
+    "source request map/recorded jobs",
+    "current native labels/geometry"
+  ],
+  "I_O": "Executor records real submitted Runnable objects without executing HTTP. Autoplay disabled; no player/decoder created.",
+  "runtime": "Robolectric API35 host; Activity.get/visible only, no application lifecycle/create/start/resume/stop/destroy",
+  "prototype": "NONE",
+  "timing": "NOT_MEASURED",
+  "APK_build": "NOT_RUN",
+  "CI": "NOT_RUN",
+  "shutdown": "NOT_RUN",
+  "physical_Fold": "NOT_RUN",
+  "execution": {
+    "status": "BASELINE_OBSERVATIONS_VERIFIED; SCROLL_RETENTION_DEFECT_REPRODUCED",
+    "selected_five_case_method": "PASS_0_FAILURES_0_ERRORS_0_SKIPS",
+    "cases": 5,
+    "source_return_method_modified": false,
+    "evidence": "results/five-native-cases",
+    "candidate_acceptance": "Real240item nativefirstVisible80 mustsurviveCardsreuse includingpendingrestorebeforefirstlayout"
+  },
+  "prior_execution": "Initialstrictnative-windowattachmentpreconditionfailed;featureSettingsReturnnotreached;preservedresults/initial-window-not-attached",
+  "next_selected_execution_reason": "ExistingpassingnonProFixture usesvisible+400msnativeframeopportunity; applysameQAwindowhandoffandretainstrictattachmentguard",
+  "native_foundation_result": {
+    "status": "PASS_ACTUAL_FULL_SHELL_AND_SETTINGS_RETURN",
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "GridView_adds_in_synchronous_return": 2,
+    "GridView_removals_in_synchronous_return": 2,
+    "I_O": "1initiallegitimateguiderequestrecorded;noHTTPexecution",
+    "evidence": "results/native-foundation-and-return"
+  },
+  "next_selected_test": "CobraSettingsReturnBaselineTest#actual431BoundedCardsSettingsReturnSideEffects",
+  "next_selected_cases": [
+    "freshEPG/nonzero native scroll or explicit unsupported-precondition report",
+    "null preview selection with freshEPG",
+    "uncached source schedule Loadingguide state",
+    "changed favorites plus active profile while covered",
+    "appearance and native measuredgeometry change"
+  ],
+  "prior_five_case_failure": "Finalfixtureinheritedpreviouslockedprofile;correctAdultfiltermade23not24. Exactfailure/sourcepreservedresults/cross-case-profile-precondition",
+  "selected_fixture_correction": "EachfixtureselectsdefaultthroughunchangedpublicprofileAPI;allpolicychecksretained;writepercaseJSONimmediately"
+}

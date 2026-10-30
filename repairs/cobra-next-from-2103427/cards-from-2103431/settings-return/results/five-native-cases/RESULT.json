@@ -1,0 +1,68 @@
+{
+  "status": "BASELINE_OBSERVATIONS_VERIFIED; SCROLL_RETENTION_DEFECT_REPRODUCED",
+  "test_methods": 1,
+  "native_scenarios": 5,
+  "test_failures": 0,
+  "test_errors": 0,
+  "test_skips": 0,
+  "actual_production_methods": "buildShell,ShowGuideShell,LayoutGuide,RenderGuideBrowser,CaptureSettingsReturn,ReturnFromSettings and policy/adapter methods; no stubs",
+  "observations": [
+    {
+      "scenario": "changed-favorites-profile",
+      "GridView_adds_synchronous": 2,
+      "GridView_removals_synchronous": 2,
+      "native_first_visible_before": 0,
+      "native_first_visible_after": 0,
+      "final_adapter_count": 2,
+      "source_jobs_before": 0,
+      "source_jobs_after": 0
+    },
+    {
+      "scenario": "loaded-nonzero-scroll",
+      "GridView_adds_synchronous": 2,
+      "GridView_removals_synchronous": 2,
+      "native_first_visible_before": 80,
+      "native_first_visible_after": 0,
+      "final_adapter_count": 240,
+      "source_jobs_before": 0,
+      "source_jobs_after": 0
+    },
+    {
+      "scenario": "null-preview",
+      "GridView_adds_synchronous": 2,
+      "GridView_removals_synchronous": 2,
+      "native_first_visible_before": 0,
+      "native_first_visible_after": 0,
+      "final_adapter_count": 24,
+      "source_jobs_before": 0,
+      "source_jobs_after": 0
+    },
+    {
+      "scenario": "theme-geometry",
+      "GridView_adds_synchronous": 2,
+      "GridView_removals_synchronous": 2,
+      "native_first_visible_before": 0,
+      "native_first_visible_after": 0,
+      "final_adapter_count": 24,
+      "source_jobs_before": 0,
+      "source_jobs_after": 0
+    },
+    {
+      "scenario": "uncached-EPG",
+      "GridView_adds_synchronous": 2,
+      "GridView_removals_synchronous": 2,
+      "native_first_visible_before": 0,
+      "native_first_visible_after": 0,
+      "final_adapter_count": 24,
+      "source_jobs_before": 1,
+      "source_jobs_after": 1
+    }
+  ],
+  "scroll_defect": "Real nativeGridView firstVisiblePosition80 beforecapture becomes0 afteractualSettingsReturn+measure. Immediate secondRender remembersunlaidoutnewGridView0 and overwritesmap[0,0]. This is HOST reproduction, not physicalFold evidence.",
+  "candidate_patch": "NONE; awaitingreviewofCardsreuse integration rather than separateReturnmethodchange",
+  "timing": "NOT_MEASURED",
+  "APK_build": "NOT_RUN",
+  "CI": "NOT_RUN",
+  "shutdown": "NOT_RUN",
+  "physical_Fold": "NOT_RUN"
+}

@@ -1,0 +1,39 @@
+{
+  "status": "PASS_EXACT_FIVE_CLASS_DELTA",
+  "baseline_signed_source": "9ccc4c362a65118eeba38a8e7e4b0de5723c69af",
+  "baseline_existing_classes": 7142,
+  "unchanged_existing_classes": 7137,
+  "changed_existing_classes": [
+    "Lcom/projectinfinity/kodi/CobraComponent;",
+    "Lcom/projectinfinity/kodi/CobraLogoRequests;",
+    "Lcom/projectinfinity/kodi/InfinityCobraFeatureRuntime;",
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraPosterChannelCard;",
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity;"
+  ],
+  "new_classes": [
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$ButtonSurface;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$PanelSurface;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$ProgressSurface;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$Slot;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$Snapshot;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$State;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout;",
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$CardSurface;",
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$Holder;",
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$LiveDot;",
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$MoreView;",
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$OwnedLogo;",
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$RoundedProgress;",
+    "Lcom/projectinfinity/kodi/CobraCardsTiles;",
+    "Lcom/projectinfinity/kodi/CobraProfileDataReuse$Entry;",
+    "Lcom/projectinfinity/kodi/CobraProfileDataReuse;"
+  ],
+  "missing_classes": [],
+  "new_DEX_sha256": {
+    "part-1.dex": "be8e25e898a95a42a552b161ae52f399cb562c3cbcf7273ed4a10f7ad7e1acae",
+    "part-0.dex": "1454943187ff782b48908bfa5aaf1c240b6db1fa99396f4ee0ed86e5215c0230"
+  },
+  "proof": "actual new owner DEX disassembled with pinned baksmali; original source already matched exact431 component payload class SHA256 on import",
+  "APK": "NOT_BUILT",
+  "shutdown": "NOT_RUN"
+}

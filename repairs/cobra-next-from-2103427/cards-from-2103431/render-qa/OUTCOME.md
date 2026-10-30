@@ -1,0 +1,21 @@
+# Actual native Cards host verification
+
+These checks use the signed accepted 2103431 DEX translations and real native Activity/Card/GridView classes under Robolectric API 35 NativeGraphics. They are host evidence, not Android emulator or physical Fold acceptance. No APK was built, installed, signed, locked, or promoted by this fixture. Shutdown was not selected.
+
+## Passing evidence
+
+- `cards431-render-baseline-settled-window`: one selected accepted431 native full-shell render passed. Actual host Display and window are 941 × 1672 pixels, 420 dpi, font scale 1. The real native adapter contains 20,226 synthetic channels; four old-style cards are visible. Existing browser fade reached alpha 1 through bounded 16 ms host frame advances, without forcing production alpha.
+- `cards431-render-tiles-prototype-v2`: native rendering, channel/EPG recycle, and real logo cache/binding/clear/delayed-publication checks passed on Tiles source `bb7c829546c42e6735861773de90337ad35cc47109e1573baab8f945baaeb5a6`. Current, missing, expired, and same-day schedule cases were covered. The initial combined input case failed and was investigated separately.
+- `cards431-render-tiles-native-events-final`: one selected combined geometry/input case passed, with no failures/errors. Actual native Cards widths 328/448 and font scales 1/2 have no More/category/title/programme pointer overlap. A fresh native More corner DOWN/UP opens the original native menu naming the current rebound channel. Actual row tap and held pointer events reach the native listeners with the current rebound channel. Only preview and QuickPeek terminal boundaries are spies; the original More menu body executes.
+
+The latest Cards-only title/footer typeface correction is source `65abd608e6948d6cceee08fab0d0f1c9dceba8da0d9349237e77201f3f843989`, compiled against the pinned real accepted431 plus add-only logo-clear API into `cards431-tiles-compile-v3`. A final current-owner render is pending. The prior input/EPG/logo passes must not be described as having tested this later source revision.
+
+## Preserved failed evidence and corrections to the fixture
+
+- `cards431-render-baseline`: initial QA Java compilation failed on a checked JSON constructor exception; no production test ran. The JSON rectangle writer was corrected.
+- `cards431-render-baseline-v2` and `cards431-render-tiles-prototype-v2`: earlier renders used a manual 941-pixel measure while the rounded host window was 942 pixels, and captured the native fade before it settled. They remain diagnostic evidence and are superseded for static comparison by the settled-window baseline.
+- `cards431-render-tiles-more-diagnostic`, `cards431-render-tiles-more-frame`, `cards431-render-tiles-more-bounded`, and `cards431-render-tiles-more-receipts`: actual More receipt and native handler state were inspected. The detailed receipt proves the framework cancelled DOWN when the mismatched host window relaid out and replaced the card before UP. An unpaused-vsync diagnostic kept draining native traversals between DOWN and UP; its thread dump was preserved and only that confirmed host QA worker was stopped. No production callback was called directly to force success.
+- `cards431-render-tiles-more-window`: after configuring the real Display/window pixels and settling native frames, More and row click passed. The remaining assertion concerned the QuickPeek terminal spy.
+- `cards431-render-tiles-native-hold`: native long-press dispatch was proven by the framework setting its performed-long-press flag, but the mixed Object/View loose-signature spy did not intercept the original QuickPeek method. The native body attempted host player setup and encountered the missing host media_metrics service. This failure is preserved. The intended terminal boundary was corrected to Object/Object; the final event case then passed. No production long-press or playback implementation was changed.
+
+All generated renders and original approved reference images remain private under `/workspace/cobra-evidence/`. Reference assets were not embedded in production code, copied into the repository, or uploaded. Synthetic channel/EPG text and missing-logo fallbacks are dynamic test data. Host test duration is not an application loading or frame-rate benchmark.

@@ -1,0 +1,566 @@
+Classfile jar:file:///workspace/cobra-evidence/cards432-integrated-host-v2/part-0-translated.jar!/com/projectinfinity/kodi/CobraEmblem.class
+  Last modified Oct 30, 2026; size 3369 bytes
+  SHA-256 checksum c4cd0a4030052233386850e3743cdf5beb9018bda4d853b3e78f8d5a226fc441
+final class com.projectinfinity.kodi.CobraEmblem
+  minor version: 0
+  major version: 50
+  flags: (0x0030) ACC_FINAL, ACC_SUPER
+  this_class: #2                          // com/projectinfinity/kodi/CobraEmblem
+  super_class: #4                         // java/lang/Object
+  interfaces: 0, fields: 2, methods: 5, attributes: 1
+Constant pool:
+    #1 = Utf8               com/projectinfinity/kodi/CobraEmblem
+    #2 = Class              #1            // com/projectinfinity/kodi/CobraEmblem
+    #3 = Utf8               java/lang/Object
+    #4 = Class              #3            // java/lang/Object
+    #5 = Utf8               com/projectinfinity/kodi/CobraEmblem$1
+    #6 = Class              #5            // com/projectinfinity/kodi/CobraEmblem$1
+    #7 = Utf8               com/projectinfinity/kodi/CobraEmblem$Artwork
+    #8 = Class              #7            // com/projectinfinity/kodi/CobraEmblem$Artwork
+    #9 = Utf8               Artwork
+   #10 = Utf8               com/projectinfinity/kodi/CobraEmblem$Drawing
+   #11 = Class              #10           // com/projectinfinity/kodi/CobraEmblem$Drawing
+   #12 = Utf8               Drawing
+   #13 = Utf8               DRAWING
+   #14 = Utf8               Ljava/lang/ThreadLocal;
+   #15 = Utf8               Ljava/lang/ThreadLocal<Lcom/projectinfinity/kodi/CobraEmblem$Drawing;>;
+   #16 = Utf8               artwork
+   #17 = Utf8               Lcom/projectinfinity/kodi/CobraEmblem$Artwork;
+   #18 = Utf8               <clinit>
+   #19 = Utf8               ()V
+   #20 = Utf8               <init>
+   #21 = NameAndType        #20:#19       // "<init>":()V
+   #22 = Methodref          #6.#21        // com/projectinfinity/kodi/CobraEmblem$1."<init>":()V
+   #23 = NameAndType        #13:#14       // DRAWING:Ljava/lang/ThreadLocal;
+   #24 = Fieldref           #2.#23        // com/projectinfinity/kodi/CobraEmblem.DRAWING:Ljava/lang/ThreadLocal;
+   #25 = Utf8               Code
+   #26 = Methodref          #4.#21        // java/lang/Object."<init>":()V
+   #27 = Utf8               contentBounds
+   #28 = Utf8               (Landroid/graphics/Bitmap;)Landroid/graphics/Rect;
+   #29 = Utf8               android/graphics/Bitmap
+   #30 = Class              #29           // android/graphics/Bitmap
+   #31 = Utf8               getWidth
+   #32 = Utf8               ()I
+   #33 = NameAndType        #31:#32       // getWidth:()I
+   #34 = Methodref          #30.#33       // android/graphics/Bitmap.getWidth:()I
+   #35 = Utf8               getHeight
+   #36 = NameAndType        #35:#32       // getHeight:()I
+   #37 = Methodref          #30.#36       // android/graphics/Bitmap.getHeight:()I
+   #38 = Utf8               getPixels
+   #39 = Utf8               ([IIIIIII)V
+   #40 = NameAndType        #38:#39       // getPixels:([IIIIIII)V
+   #41 = Methodref          #30.#40       // android/graphics/Bitmap.getPixels:([IIIIIII)V
+   #42 = Utf8               android/graphics/Color
+   #43 = Class              #42           // android/graphics/Color
+   #44 = Utf8               alpha
+   #45 = Utf8               (I)I
+   #46 = NameAndType        #44:#45       // alpha:(I)I
+   #47 = Methodref          #43.#46       // android/graphics/Color.alpha:(I)I
+   #48 = Utf8               java/lang/Math
+   #49 = Class              #48           // java/lang/Math
+   #50 = Utf8               min
+   #51 = Utf8               (II)I
+   #52 = NameAndType        #50:#51       // min:(II)I
+   #53 = Methodref          #49.#52       // java/lang/Math.min:(II)I
+   #54 = Utf8               max
+   #55 = NameAndType        #54:#51       // max:(II)I
+   #56 = Methodref          #49.#55       // java/lang/Math.max:(II)I
+   #57 = Utf8               android/graphics/Rect
+   #58 = Class              #57           // android/graphics/Rect
+   #59 = Utf8               (IIII)V
+   #60 = NameAndType        #20:#59       // "<init>":(IIII)V
+   #61 = Methodref          #58.#60       // android/graphics/Rect."<init>":(IIII)V
+   #62 = Methodref          #58.#21       // android/graphics/Rect."<init>":()V
+   #63 = Utf8               draw
+   #64 = Utf8               (Landroid/graphics/Canvas;Landroid/graphics/RectF;II)V
+   #65 = NameAndType        #16:#17       // artwork:Lcom/projectinfinity/kodi/CobraEmblem$Artwork;
+   #66 = Fieldref           #2.#65        // com/projectinfinity/kodi/CobraEmblem.artwork:Lcom/projectinfinity/kodi/CobraEmblem$Artwork;
+   #67 = Utf8               android/graphics/RectF
+   #68 = Class              #67           // android/graphics/RectF
+   #69 = Utf8               width
+   #70 = Utf8               ()F
+   #71 = NameAndType        #69:#70       // width:()F
+   #72 = Methodref          #68.#71       // android/graphics/RectF.width:()F
+   #73 = Utf8               height
+   #74 = NameAndType        #73:#70       // height:()F
+   #75 = Methodref          #68.#74       // android/graphics/RectF.height:()F
+   #76 = Utf8               java/lang/ThreadLocal
+   #77 = Class              #76           // java/lang/ThreadLocal
+   #78 = Utf8               get
+   #79 = Utf8               ()Ljava/lang/Object;
+   #80 = NameAndType        #78:#79       // get:()Ljava/lang/Object;
+   #81 = Methodref          #77.#80       // java/lang/ThreadLocal.get:()Ljava/lang/Object;
+   #82 = Utf8               content
+   #83 = Utf8               Landroid/graphics/Rect;
+   #84 = NameAndType        #82:#83       // content:Landroid/graphics/Rect;
+   #85 = Fieldref           #8.#84        // com/projectinfinity/kodi/CobraEmblem$Artwork.content:Landroid/graphics/Rect;
+   #86 = NameAndType        #69:#32       // width:()I
+   #87 = Methodref          #58.#86       // android/graphics/Rect.width:()I
+   #88 = NameAndType        #73:#32       // height:()I
+   #89 = Methodref          #58.#88       // android/graphics/Rect.height:()I
+   #90 = Utf8               (FF)F
+   #91 = NameAndType        #50:#90       // min:(FF)F
+   #92 = Methodref          #49.#91       // java/lang/Math.min:(FF)F
+   #93 = Utf8               round
+   #94 = Utf8               (F)I
+   #95 = NameAndType        #93:#94       // round:(F)I
+   #96 = Methodref          #49.#95       // java/lang/Math.round:(F)I
+   #97 = NameAndType        #54:#90       // max:(FF)F
+   #98 = Methodref          #49.#97       // java/lang/Math.max:(FF)F
+   #99 = Utf8               centerX
+  #100 = NameAndType        #99:#70       // centerX:()F
+  #101 = Methodref          #68.#100      // android/graphics/RectF.centerX:()F
+  #102 = Utf8               centerY
+  #103 = NameAndType        #102:#70      // centerY:()F
+  #104 = Methodref          #68.#103      // android/graphics/RectF.centerY:()F
+  #105 = Utf8               destination
+  #106 = Utf8               Landroid/graphics/RectF;
+  #107 = NameAndType        #105:#106     // destination:Landroid/graphics/RectF;
+  #108 = Fieldref           #11.#107      // com/projectinfinity/kodi/CobraEmblem$Drawing.destination:Landroid/graphics/RectF;
+  #109 = Utf8               set
+  #110 = Utf8               (FFFF)V
+  #111 = NameAndType        #109:#110     // set:(FFFF)V
+  #112 = Methodref          #68.#111      // android/graphics/RectF.set:(FFFF)V
+  #113 = Utf8               paint
+  #114 = Utf8               Landroid/graphics/Paint;
+  #115 = NameAndType        #113:#114     // paint:Landroid/graphics/Paint;
+  #116 = Fieldref           #11.#115      // com/projectinfinity/kodi/CobraEmblem$Drawing.paint:Landroid/graphics/Paint;
+  #117 = Utf8               android/graphics/Paint
+  #118 = Class              #117          // android/graphics/Paint
+  #119 = Utf8               setAlpha
+  #120 = Utf8               (I)V
+  #121 = NameAndType        #119:#120     // setAlpha:(I)V
+  #122 = Methodref          #118.#121     // android/graphics/Paint.setAlpha:(I)V
+  #123 = Utf8               setColorFilter
+  #124 = Utf8               (Landroid/graphics/ColorFilter;)Landroid/graphics/ColorFilter;
+  #125 = NameAndType        #123:#124     // setColorFilter:(Landroid/graphics/ColorFilter;)Landroid/graphics/ColorFilter;
+  #126 = Methodref          #118.#125     // android/graphics/Paint.setColorFilter:(Landroid/graphics/ColorFilter;)Landroid/graphics/ColorFilter;
+  #127 = Utf8               bitmap
+  #128 = Utf8               Landroid/graphics/Bitmap;
+  #129 = NameAndType        #127:#128     // bitmap:Landroid/graphics/Bitmap;
+  #130 = Fieldref           #8.#129       // com/projectinfinity/kodi/CobraEmblem$Artwork.bitmap:Landroid/graphics/Bitmap;
+  #131 = Utf8               android/graphics/Canvas
+  #132 = Class              #131          // android/graphics/Canvas
+  #133 = Utf8               drawBitmap
+  #134 = Utf8               (Landroid/graphics/Bitmap;Landroid/graphics/Rect;Landroid/graphics/RectF;Landroid/graphics/Paint;)V
+  #135 = NameAndType        #133:#134     // drawBitmap:(Landroid/graphics/Bitmap;Landroid/graphics/Rect;Landroid/graphics/RectF;Landroid/graphics/Paint;)V
+  #136 = Methodref          #132.#135     // android/graphics/Canvas.drawBitmap:(Landroid/graphics/Bitmap;Landroid/graphics/Rect;Landroid/graphics/RectF;Landroid/graphics/Paint;)V
+  #137 = Utf8               prepare
+  #138 = Utf8               (Landroid/content/Context;)V
+  #139 = Utf8               android/content/Context
+  #140 = Class              #139          // android/content/Context
+  #141 = Utf8               getResources
+  #142 = Utf8               ()Landroid/content/res/Resources;
+  #143 = NameAndType        #141:#142     // getResources:()Landroid/content/res/Resources;
+  #144 = Methodref          #140.#143     // android/content/Context.getResources:()Landroid/content/res/Resources;
+  #145 = Utf8               infinity_splash_icon
+  #146 = String             #145          // infinity_splash_icon
+  #147 = Utf8               drawable
+  #148 = String             #147          // drawable
+  #149 = Utf8               getPackageName
+  #150 = Utf8               ()Ljava/lang/String;
+  #151 = NameAndType        #149:#150     // getPackageName:()Ljava/lang/String;
+  #152 = Methodref          #140.#151     // android/content/Context.getPackageName:()Ljava/lang/String;
+  #153 = Utf8               android/content/res/Resources
+  #154 = Class              #153          // android/content/res/Resources
+  #155 = Utf8               getIdentifier
+  #156 = Utf8               (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
+  #157 = NameAndType        #155:#156     // getIdentifier:(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
+  #158 = Methodref          #154.#157     // android/content/res/Resources.getIdentifier:(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
+  #159 = Utf8               android/graphics/BitmapFactory$Options
+  #160 = Class              #159          // android/graphics/BitmapFactory$Options
+  #161 = Methodref          #160.#21      // android/graphics/BitmapFactory$Options."<init>":()V
+  #162 = Utf8               inScaled
+  #163 = Utf8               Z
+  #164 = NameAndType        #162:#163     // inScaled:Z
+  #165 = Fieldref           #160.#164     // android/graphics/BitmapFactory$Options.inScaled:Z
+  #166 = Utf8               android/graphics/Bitmap$Config
+  #167 = Class              #166          // android/graphics/Bitmap$Config
+  #168 = Utf8               ARGB_8888
+  #169 = Utf8               Landroid/graphics/Bitmap$Config;
+  #170 = NameAndType        #168:#169     // ARGB_8888:Landroid/graphics/Bitmap$Config;
+  #171 = Fieldref           #167.#170     // android/graphics/Bitmap$Config.ARGB_8888:Landroid/graphics/Bitmap$Config;
+  #172 = Utf8               inPreferredConfig
+  #173 = NameAndType        #172:#169     // inPreferredConfig:Landroid/graphics/Bitmap$Config;
+  #174 = Fieldref           #160.#173     // android/graphics/BitmapFactory$Options.inPreferredConfig:Landroid/graphics/Bitmap$Config;
+  #175 = Utf8               android/graphics/BitmapFactory
+  #176 = Class              #175          // android/graphics/BitmapFactory
+  #177 = Utf8               decodeResource
+  #178 = Utf8               (Landroid/content/res/Resources;ILandroid/graphics/BitmapFactory$Options;)Landroid/graphics/Bitmap;
+  #179 = NameAndType        #177:#178     // decodeResource:(Landroid/content/res/Resources;ILandroid/graphics/BitmapFactory$Options;)Landroid/graphics/Bitmap;
+  #180 = Methodref          #176.#179     // android/graphics/BitmapFactory.decodeResource:(Landroid/content/res/Resources;ILandroid/graphics/BitmapFactory$Options;)Landroid/graphics/Bitmap;
+  #181 = Utf8               setDensity
+  #182 = NameAndType        #181:#120     // setDensity:(I)V
+  #183 = Methodref          #30.#182      // android/graphics/Bitmap.setDensity:(I)V
+  #184 = NameAndType        #27:#28       // contentBounds:(Landroid/graphics/Bitmap;)Landroid/graphics/Rect;
+  #185 = Methodref          #2.#184       // com/projectinfinity/kodi/CobraEmblem.contentBounds:(Landroid/graphics/Bitmap;)Landroid/graphics/Rect;
+  #186 = Utf8               isEmpty
+  #187 = Utf8               ()Z
+  #188 = NameAndType        #186:#187     // isEmpty:()Z
+  #189 = Methodref          #58.#188      // android/graphics/Rect.isEmpty:()Z
+  #190 = Utf8               recycle
+  #191 = NameAndType        #190:#19      // recycle:()V
+  #192 = Methodref          #30.#191      // android/graphics/Bitmap.recycle:()V
+  #193 = Utf8               (Landroid/graphics/Bitmap;Landroid/graphics/Rect;)V
+  #194 = NameAndType        #20:#193      // "<init>":(Landroid/graphics/Bitmap;Landroid/graphics/Rect;)V
+  #195 = Methodref          #8.#194       // com/projectinfinity/kodi/CobraEmblem$Artwork."<init>":(Landroid/graphics/Bitmap;Landroid/graphics/Rect;)V
+  #196 = Utf8               Signature
+  #197 = Utf8               InnerClasses
+{
+  private static final java.lang.ThreadLocal<com.projectinfinity.kodi.CobraEmblem$Drawing> DRAWING;
+    descriptor: Ljava/lang/ThreadLocal;
+    flags: (0x001a) ACC_PRIVATE, ACC_STATIC, ACC_FINAL
+    Signature: #15                          // Ljava/lang/ThreadLocal<Lcom/projectinfinity/kodi/CobraEmblem$Drawing;>;
+
+  private static volatile com.projectinfinity.kodi.CobraEmblem$Artwork artwork;
+    descriptor: Lcom/projectinfinity/kodi/CobraEmblem$Artwork;
+    flags: (0x004a) ACC_PRIVATE, ACC_STATIC, ACC_VOLATILE
+
+  static {};
+    descriptor: ()V
+    flags: (0x0008) ACC_STATIC
+    Code:
+      stack=2, locals=0, args_size=0
+         0: new           #6                  // class com/projectinfinity/kodi/CobraEmblem$1
+         3: dup
+         4: invokespecial #22                 // Method com/projectinfinity/kodi/CobraEmblem$1."<init>":()V
+         7: putstatic     #24                 // Field DRAWING:Ljava/lang/ThreadLocal;
+        10: return
+
+  private com.projectinfinity.kodi.CobraEmblem();
+    descriptor: ()V
+    flags: (0x0002) ACC_PRIVATE
+    Code:
+      stack=1, locals=1, args_size=1
+         0: aload_0
+         1: invokespecial #26                 // Method java/lang/Object."<init>":()V
+         4: return
+
+  private static android.graphics.Rect contentBounds(android.graphics.Bitmap);
+    descriptor: (Landroid/graphics/Bitmap;)Landroid/graphics/Rect;
+    flags: (0x000a) ACC_PRIVATE, ACC_STATIC
+    Code:
+      stack=8, locals=8, args_size=1
+         0: aload_0
+         1: invokevirtual #34                 // Method android/graphics/Bitmap.getWidth:()I
+         4: istore        6
+         6: aload_0
+         7: invokevirtual #37                 // Method android/graphics/Bitmap.getHeight:()I
+        10: istore        5
+        12: aload_0
+        13: invokevirtual #34                 // Method android/graphics/Bitmap.getWidth:()I
+        16: aload_0
+        17: invokevirtual #37                 // Method android/graphics/Bitmap.getHeight:()I
+        20: imul
+        21: newarray       int
+        23: astore        7
+        25: aload_0
+        26: aload         7
+        28: iconst_0
+        29: aload_0
+        30: invokevirtual #34                 // Method android/graphics/Bitmap.getWidth:()I
+        33: iconst_0
+        34: iconst_0
+        35: aload_0
+        36: invokevirtual #34                 // Method android/graphics/Bitmap.getWidth:()I
+        39: aload_0
+        40: invokevirtual #37                 // Method android/graphics/Bitmap.getHeight:()I
+        43: invokevirtual #41                 // Method android/graphics/Bitmap.getPixels:([IIIIIII)V
+        46: iconst_0
+        47: istore_1
+        48: iconst_0
+        49: istore        4
+        51: iconst_0
+        52: istore_3
+        53: iload_1
+        54: aload_0
+        55: invokevirtual #37                 // Method android/graphics/Bitmap.getHeight:()I
+        58: if_icmpge     138
+        61: iconst_0
+        62: istore_2
+        63: iload_2
+        64: aload_0
+        65: invokevirtual #34                 // Method android/graphics/Bitmap.getWidth:()I
+        68: if_icmpge     132
+        71: aload         7
+        73: aload_0
+        74: invokevirtual #34                 // Method android/graphics/Bitmap.getWidth:()I
+        77: iload_1
+        78: imul
+        79: iload_2
+        80: iadd
+        81: iaload
+        82: invokestatic  #47                 // Method android/graphics/Color.alpha:(I)I
+        85: iconst_2
+        86: if_icmpgt     92
+        89: goto          126
+        92: iload         6
+        94: iload_2
+        95: invokestatic  #53                 // Method java/lang/Math.min:(II)I
+        98: istore        6
+       100: iload         5
+       102: iload_1
+       103: invokestatic  #53                 // Method java/lang/Math.min:(II)I
+       106: istore        5
+       108: iload         4
+       110: iload_2
+       111: iconst_1
+       112: iadd
+       113: invokestatic  #56                 // Method java/lang/Math.max:(II)I
+       116: istore        4
+       118: iload_3
+       119: iload_1
+       120: iconst_1
+       121: iadd
+       122: invokestatic  #56                 // Method java/lang/Math.max:(II)I
+       125: istore_3
+       126: iinc          2, 1
+       129: goto          63
+       132: iinc          1, 1
+       135: goto          53
+       138: iload         6
+       140: iload         4
+       142: if_icmpge     172
+       145: iload         5
+       147: iload_3
+       148: if_icmplt     154
+       151: goto          172
+       154: new           #58                 // class android/graphics/Rect
+       157: dup
+       158: iload         6
+       160: iload         5
+       162: iload         4
+       164: iload_3
+       165: invokespecial #61                 // Method android/graphics/Rect."<init>":(IIII)V
+       168: astore_0
+       169: goto          180
+       172: new           #58                 // class android/graphics/Rect
+       175: dup
+       176: invokespecial #62                 // Method android/graphics/Rect."<init>":()V
+       179: astore_0
+       180: aload_0
+       181: areturn
+
+  static void draw(android.graphics.Canvas, android.graphics.RectF, int, int);
+    descriptor: (Landroid/graphics/Canvas;Landroid/graphics/RectF;II)V
+    flags: (0x0008) ACC_STATIC
+    Code:
+      stack=6, locals=10, args_size=4
+         0: getstatic     #66                 // Field artwork:Lcom/projectinfinity/kodi/CobraEmblem$Artwork;
+         3: astore        9
+         5: aload_0
+         6: ifnull        241
+         9: aload_1
+        10: ifnull        241
+        13: aload         9
+        15: ifnull        241
+        18: aload_1
+        19: invokevirtual #72                 // Method android/graphics/RectF.width:()F
+        22: fconst_0
+        23: fcmpg
+        24: ifle          241
+        27: aload_1
+        28: invokevirtual #75                 // Method android/graphics/RectF.height:()F
+        31: fconst_0
+        32: fcmpg
+        33: ifle          241
+        36: iload_3
+        37: ifgt          43
+        40: goto          241
+        43: getstatic     #24                 // Field DRAWING:Ljava/lang/ThreadLocal;
+        46: invokevirtual #81                 // Method java/lang/ThreadLocal.get:()Ljava/lang/Object;
+        49: checkcast     #11                 // class com/projectinfinity/kodi/CobraEmblem$Drawing
+        52: astore        8
+        54: aload_1
+        55: invokevirtual #72                 // Method android/graphics/RectF.width:()F
+        58: aload         9
+        60: getfield      #85                 // Field com/projectinfinity/kodi/CobraEmblem$Artwork.content:Landroid/graphics/Rect;
+        63: invokevirtual #87                 // Method android/graphics/Rect.width:()I
+        66: i2f
+        67: fdiv
+        68: aload_1
+        69: invokevirtual #75                 // Method android/graphics/RectF.height:()F
+        72: aload         9
+        74: getfield      #85                 // Field com/projectinfinity/kodi/CobraEmblem$Artwork.content:Landroid/graphics/Rect;
+        77: invokevirtual #89                 // Method android/graphics/Rect.height:()I
+        80: i2f
+        81: fdiv
+        82: invokestatic  #92                 // Method java/lang/Math.min:(FF)F
+        85: fstore        5
+        87: fconst_1
+        88: aload         9
+        90: getfield      #85                 // Field com/projectinfinity/kodi/CobraEmblem$Artwork.content:Landroid/graphics/Rect;
+        93: invokevirtual #87                 // Method android/graphics/Rect.width:()I
+        96: i2f
+        97: fload         5
+        99: fmul
+       100: invokestatic  #96                 // Method java/lang/Math.round:(F)I
+       103: i2f
+       104: invokestatic  #98                 // Method java/lang/Math.max:(FF)F
+       107: fstore        4
+       109: fconst_1
+       110: aload         9
+       112: getfield      #85                 // Field com/projectinfinity/kodi/CobraEmblem$Artwork.content:Landroid/graphics/Rect;
+       115: invokevirtual #89                 // Method android/graphics/Rect.height:()I
+       118: i2f
+       119: fload         5
+       121: fmul
+       122: invokestatic  #96                 // Method java/lang/Math.round:(F)I
+       125: i2f
+       126: invokestatic  #98                 // Method java/lang/Math.max:(FF)F
+       129: fstore        7
+       131: aload_1
+       132: invokevirtual #101                // Method android/graphics/RectF.centerX:()F
+       135: fload         4
+       137: fconst_2
+       138: fdiv
+       139: fsub
+       140: invokestatic  #96                 // Method java/lang/Math.round:(F)I
+       143: i2f
+       144: fstore        6
+       146: aload_1
+       147: invokevirtual #104                // Method android/graphics/RectF.centerY:()F
+       150: fload         7
+       152: fconst_2
+       153: fdiv
+       154: fsub
+       155: invokestatic  #96                 // Method java/lang/Math.round:(F)I
+       158: i2f
+       159: fstore        5
+       161: aload         8
+       163: getfield      #108                // Field com/projectinfinity/kodi/CobraEmblem$Drawing.destination:Landroid/graphics/RectF;
+       166: fload         6
+       168: fload         5
+       170: fload         4
+       172: fload         6
+       174: fadd
+       175: fload         7
+       177: fload         5
+       179: fadd
+       180: invokevirtual #112                // Method android/graphics/RectF.set:(FFFF)V
+       183: aload         8
+       185: getfield      #116                // Field com/projectinfinity/kodi/CobraEmblem$Drawing.paint:Landroid/graphics/Paint;
+       188: sipush        255
+       191: iload_3
+       192: invokestatic  #53                 // Method java/lang/Math.min:(II)I
+       195: iload_2
+       196: invokestatic  #47                 // Method android/graphics/Color.alpha:(I)I
+       199: imul
+       200: sipush        255
+       203: idiv
+       204: invokevirtual #122                // Method android/graphics/Paint.setAlpha:(I)V
+       207: aload         8
+       209: getfield      #116                // Field com/projectinfinity/kodi/CobraEmblem$Drawing.paint:Landroid/graphics/Paint;
+       212: aconst_null
+       213: invokevirtual #126                // Method android/graphics/Paint.setColorFilter:(Landroid/graphics/ColorFilter;)Landroid/graphics/ColorFilter;
+       216: pop
+       217: aload_0
+       218: aload         9
+       220: getfield      #130                // Field com/projectinfinity/kodi/CobraEmblem$Artwork.bitmap:Landroid/graphics/Bitmap;
+       223: aload         9
+       225: getfield      #85                 // Field com/projectinfinity/kodi/CobraEmblem$Artwork.content:Landroid/graphics/Rect;
+       228: aload         8
+       230: getfield      #108                // Field com/projectinfinity/kodi/CobraEmblem$Drawing.destination:Landroid/graphics/RectF;
+       233: aload         8
+       235: getfield      #116                // Field com/projectinfinity/kodi/CobraEmblem$Drawing.paint:Landroid/graphics/Paint;
+       238: invokevirtual #136                // Method android/graphics/Canvas.drawBitmap:(Landroid/graphics/Bitmap;Landroid/graphics/Rect;Landroid/graphics/RectF;Landroid/graphics/Paint;)V
+       241: return
+
+  static void prepare(android.content.Context);
+    descriptor: (Landroid/content/Context;)V
+    flags: (0x0008) ACC_STATIC
+    Code:
+      stack=4, locals=4, args_size=1
+         0: getstatic     #66                 // Field artwork:Lcom/projectinfinity/kodi/CobraEmblem$Artwork;
+         3: ifnonnull     136
+         6: aload_0
+         7: ifnonnull     13
+        10: goto          136
+        13: ldc           #2                  // class com/projectinfinity/kodi/CobraEmblem
+        15: monitorenter
+        16: getstatic     #66                 // Field artwork:Lcom/projectinfinity/kodi/CobraEmblem$Artwork;
+        19: ifnull        26
+        22: ldc           #2                  // class com/projectinfinity/kodi/CobraEmblem
+        24: monitorexit
+        25: return
+        26: aload_0
+        27: invokevirtual #144                // Method android/content/Context.getResources:()Landroid/content/res/Resources;
+        30: astore_2
+        31: aload_2
+        32: ldc           #146                // String infinity_splash_icon
+        34: ldc           #148                // String drawable
+        36: aload_0
+        37: invokevirtual #152                // Method android/content/Context.getPackageName:()Ljava/lang/String;
+        40: invokevirtual #158                // Method android/content/res/Resources.getIdentifier:(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I
+        43: istore_1
+        44: iload_1
+        45: ifne          52
+        48: ldc           #2                  // class com/projectinfinity/kodi/CobraEmblem
+        50: monitorexit
+        51: return
+        52: new           #160                // class android/graphics/BitmapFactory$Options
+        55: astore_0
+        56: aload_0
+        57: invokespecial #161                // Method android/graphics/BitmapFactory$Options."<init>":()V
+        60: aload_0
+        61: iconst_0
+        62: putfield      #165                // Field android/graphics/BitmapFactory$Options.inScaled:Z
+        65: aload_0
+        66: getstatic     #171                // Field android/graphics/Bitmap$Config.ARGB_8888:Landroid/graphics/Bitmap$Config;
+        69: putfield      #174                // Field android/graphics/BitmapFactory$Options.inPreferredConfig:Landroid/graphics/Bitmap$Config;
+        72: aload_2
+        73: iload_1
+        74: aload_0
+        75: invokestatic  #180                // Method android/graphics/BitmapFactory.decodeResource:(Landroid/content/res/Resources;ILandroid/graphics/BitmapFactory$Options;)Landroid/graphics/Bitmap;
+        78: astore_0
+        79: aload_0
+        80: ifnonnull     87
+        83: ldc           #2                  // class com/projectinfinity/kodi/CobraEmblem
+        85: monitorexit
+        86: return
+        87: aload_0
+        88: iconst_0
+        89: invokevirtual #183                // Method android/graphics/Bitmap.setDensity:(I)V
+        92: aload_0
+        93: invokestatic  #185                // Method contentBounds:(Landroid/graphics/Bitmap;)Landroid/graphics/Rect;
+        96: astore_2
+        97: aload_2
+        98: invokevirtual #189                // Method android/graphics/Rect.isEmpty:()Z
+       101: ifeq          112
+       104: aload_0
+       105: invokevirtual #192                // Method android/graphics/Bitmap.recycle:()V
+       108: ldc           #2                  // class com/projectinfinity/kodi/CobraEmblem
+       110: monitorexit
+       111: return
+       112: new           #8                  // class com/projectinfinity/kodi/CobraEmblem$Artwork
+       115: astore_3
+       116: aload_3
+       117: aload_0
+       118: aload_2
+       119: invokespecial #195                // Method com/projectinfinity/kodi/CobraEmblem$Artwork."<init>":(Landroid/graphics/Bitmap;Landroid/graphics/Rect;)V
+       122: aload_3
+       123: putstatic     #66                 // Field artwork:Lcom/projectinfinity/kodi/CobraEmblem$Artwork;
+       126: ldc           #2                  // class com/projectinfinity/kodi/CobraEmblem
+       128: monitorexit
+       129: return
+       130: astore_0
+       131: ldc           #2                  // class com/projectinfinity/kodi/CobraEmblem
+       133: monitorexit
+       134: aload_0
+       135: athrow
+       136: return
+      Exception table:
+         from    to  target type
+            16    25   130   any
+            26    44   130   any
+            48    51   130   any
+            52    79   130   any
+            83    86   130   any
+            87   111   130   any
+           112   129   130   any
+           131   134   130   any
+}
+InnerClasses:
+  #6;                                     // class com/projectinfinity/kodi/CobraEmblem$1
+  private static final #9= #8 of #2;      // Artwork=class com/projectinfinity/kodi/CobraEmblem$Artwork of class com/projectinfinity/kodi/CobraEmblem
+  private static final #12= #11 of #2;    // Drawing=class com/projectinfinity/kodi/CobraEmblem$Drawing of class com/projectinfinity/kodi/CobraEmblem

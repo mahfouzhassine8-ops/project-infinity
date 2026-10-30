@@ -1,0 +1,10 @@
+{
+  "status": "FAILED_STRICT_NATIVE_WINDOW_ATTACHMENT_PRECONDITION",
+  "tests": 1,
+  "failures": 1,
+  "errors": 0,
+  "actual_buildShell_and_ShowGuideShell": "RETURNED_WITH_REAL_GRID_ADAPTER_COUNT24",
+  "failed_assertion": "mCobraGuideShell.isAttachedToWindow aftercontroller.visible withoutpausedmainloopframehandoff",
+  "settings_return_feature_calls": "NOT_REACHED",
+  "correction": "Use priorverifiednonPro hostfixture visible+400msframehandoff; keep strictattachmentguard, no app timers/productionchanges"
+}
