@@ -32,7 +32,7 @@ public final class CobraFoldMoreDriver {
   final long started=SystemClock.uptimeMillis();final AccessibilityNodeInfo root;final ArrayList<AccessibilityNodeInfo> nodes=new ArrayList<>();
   Tree(){root=ui.getRootInActiveWindow();if(root==null)return;require(PKG.contentEquals(root.getPackageName()),"Unexpected active package");nodes.add(root);for(int i=0;i<nodes.size();i++){require(nodes.size()<1600,"Bounded public UI tree exceeded");AccessibilityNodeInfo n=nodes.get(i);for(int c=0;c<n.getChildCount();c++){AccessibilityNodeInfo child=n.getChild(c);if(child!=null)nodes.add(child);}}}
   AccessibilityNodeInfo find(String regex,boolean clickable){Pattern p=Pattern.compile(regex,Pattern.CASE_INSENSITIVE);for(AccessibilityNodeInfo n:nodes){Rect r=new Rect();n.getBoundsInScreen(r);if(n.isVisibleToUser()&&n.isEnabled()&&(!clickable||n.isClickable())&&r.width()>12&&r.height()>12&&p.matcher(text(n)).find())return n;}return null;}
-  JSONArray labels()throws Exception{JSONArray a=new JSONArray();for(AccessibilityNodeInfo n:nodes){String t=text(n).trim();if(!t.isEmpty())a.put(new JSONObject().put("label",t).put("visible",n.isVisibleToUser()).put("class",String.valueOf(n.getClassName())));}return a;}
+  JSONArray labels()throws Exception{JSONArray a=new JSONArray();for(AccessibilityNodeInfo n:nodes){String t=text(n).trim();if(!t.isEmpty())a.put(new JSONObject().put("label",t).put("visible",n.isVisibleToUser()).put("class",String.valueOf(n.getClassName())).put("resource_id",String.valueOf(n.getViewIdResourceName())).put("clickable",n.isClickable()).put("enabled",n.isEnabled()));}return a;}
   void close(){for(AccessibilityNodeInfo n:nodes)n.recycle();}
  }
  static void screenshot(String name)throws Exception{Bitmap b=ui.takeScreenshot();require(b!=null,"Native screenshot unavailable");try(FileOutputStream out=new FileOutputStream(new File(dir,name+".png"))){require(b.compress(Bitmap.CompressFormat.PNG,100,out),"Screenshot failed");}finally{b.recycle();}}
@@ -54,13 +54,13 @@ public final class CobraFoldMoreDriver {
   }throw new IllegalStateException("Original native dialog item not observed");
  }
  static void enterSource()throws Exception{
-  tap("(?m)^ADD TV SOURCE$");nativeList("(?m)^M3U / M3U8 playlist$");
+  tap("(?m)^\\+?\\s*ADD TV SOURCE$");nativeList("(?m)^M3U / M3U8 playlist$");
   String[] values={"CobraFoldMoreQA","http://10.0.2.2:8765/fold-more.m3u","http://10.0.2.2:8765/cards-epg.xml"};
   for(int index=0;index<3;index++){
    Tree t=new Tree();try{ArrayList<AccessibilityNodeInfo> fields=new ArrayList<>();for(AccessibilityNodeInfo n:t.nodes)if("android.widget.EditText".contentEquals(n.getClassName())&&n.isVisibleToUser())fields.add(n);require(fields.size()==3,"Original M3U form must expose three fields");Bundle a=new Bundle();a.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE,values[index]);require(fields.get(index).performAction(AccessibilityNodeInfo.ACTION_SET_TEXT,a),"Public input text failed");steps.put(new JSONObject().put("normal_source_form_field",index));}finally{t.close();}
   }tap("(?m)^TEST & SAVE$");
   for(int i=0;i<24;i++){if(has("(?m)^Return to preview$")){back();break;}if(has("Cards QA 00001"))break;SystemClock.sleep(250);}
-  tap("(?m)^Choose one of five view modes$|^Choose view mode$|^Views$");tap("(?m)^Cards,.*");
+  tap("(?m)^Choose one of five view modes$|^Choose view mode$|^Views$");tap("(?m)^Cards(?:,.*)?$");
   require(has("(?m)^CARDS.*"),"Cards public heading not observed");require(!has("(?m)^Previous Pro source$"),"Pro is not the target");screenshot("cards-before-fullscreen");
  }
  static Rect preview()throws Exception{Tree t=new Tree();try{for(AccessibilityNodeInfo n:t.nodes)if("android.view.TextureView".contentEquals(n.getClassName())&&n.isVisibleToUser()){Rect r=new Rect();n.getBoundsInScreen(r);if(r.width()>120&&r.height()>100)return r;}throw new IllegalStateException("Current Cards video texture not observed");}finally{t.close();}}
@@ -95,6 +95,7 @@ public final class CobraFoldMoreDriver {
    File jar=new File("/data/local/tmp/CobraFoldMoreDriver.jar");try(FileInputStream in=new FileInputStream(jar);ByteArrayOutputStream bytes=new ByteArrayOutputStream()){byte[] b=new byte[8192];int n;while((n=in.read(b))!=-1)bytes.write(b,0,n);require(hash(bytes.toByteArray()).equals(args[1]),"QA JAR differs from compiled receipt");}
    require(System.getProperty("java.class.path").equals("/system/framework/android.test.runner.jar:/system/framework/uiautomator.jar:"+jar),"Original OS wrapper application classpath required");
    Class<?> c=Class.forName("com.android.uiautomator.core.UiAutomationShellWrapper");wrapper=c.getConstructor().newInstance();c.getMethod("connect").invoke(wrapper);disconnect=c.getMethod("disconnect");c.getMethod("setCompressedLayoutHierarchy",boolean.class).invoke(wrapper,true);ui=(UiAutomation)c.getMethod("getUiAutomation").invoke(wrapper);
+   android.accessibilityservice.AccessibilityServiceInfo info=ui.getServiceInfo();info.flags|=android.accessibilityservice.AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS;ui.setServiceInfo(info);
    enterSource();fullscreen();more(1);more(2);report.put("status","SIGNED433_BASELINE_MORE_REPRODUCED_AS_WORKING; NOT_A_FIX_CLAIM");
   }catch(Throwable e){report.put("status","FAILED_CLOSED").put("error",e.toString());if(ui!=null)try{screenshot("failure");}catch(Throwable ignored){}if(e instanceof Exception)throw (Exception)e;throw (Error)e;}
   finally{write("OUTCOME.json",report);if(disconnect!=null)disconnect.invoke(wrapper);}

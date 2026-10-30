@@ -1,0 +1,53 @@
+{
+  "run": 41063134298,
+  "status": "SETUP_SELECTOR_FAILURE_BEFORE_ANY_PLAYER_INPUT",
+  "APK": "EXACT433_UNCHANGED",
+  "error": "java.lang.IllegalStateException: Current public target not observed: (?m)^ADD TV SOURCE$",
+  "observed_source_button": "+  ADD TV SOURCE",
+  "correction": "Accept exact existing optionalplus/spacing; preflightremainingselectors against433canonicalActivitystrings; publicREPORT_VIEW_IDS enabledfornativeListView validation",
+  "selectors": {
+    "source": [
+      "Add TV source",
+      "+  ADD TV SOURCE",
+      "+  ADD TV SOURCE"
+    ],
+    "m3u": [
+      "M3U / M3U8 playlist"
+    ],
+    "save": [
+      "TEST & SAVE",
+      "TEST & SAVE"
+    ],
+    "views": [
+      "Choose one of five view modes"
+    ],
+    "cards": [
+      "cards",
+      "cards",
+      "Cards",
+      "cards",
+      "Cards",
+      "cards",
+      "cards",
+      "cards"
+    ],
+    "back": [
+      "Return to preview"
+    ],
+    "menu": [
+      "Player settings"
+    ],
+    "channel": [
+      "Channel playback",
+      "Channel playback",
+      "Channel playback"
+    ],
+    "health": [
+      "Health Center"
+    ]
+  },
+  "source_sha256": "380759f64a28114c6f0a8011621aadb33ebe84b548f23f80b19a0dc3b5736918",
+  "original_player_visibility_deadline_ms": 3500,
+  "no_timeout_increase": true,
+  "shutdown": "NOT_RUN"
+}
