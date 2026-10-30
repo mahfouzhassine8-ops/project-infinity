@@ -1,0 +1,15 @@
+# Rejected434 corrective checkpoint — 2026-10-30
+
+User rejects signed434 after reporting Cobra fullscreen/More failure, Infinity loading mismatch/failure, and Cards sun/Visual settings not opening (apparently stuck dark).434 is NOT accepted.431/432/433 remain protected; signed434 and its evidence are retained. No recovery pointer or signing identity changed.
+
+No production code has been changed in this checkpoint. The old passing434 host sheet test created a substitute player overlay and manually dispatched global-layout notifications; that did not exercise the real fullscreen entry/listeners. Its PASS is not evidence against the user’s physical result.
+
+The replacement host fixture uses actual signed434-derived production UI classes, original preview->fullscreen handoff, original Decor overlay, real coordinate input and original callbacks. No replacement promotion/overlay, no manual global-layout, no forced alpha. Three selected methods executed: initial fullscreen More and sun reach the expected handlers but remain alpha0; timed chrome reveal does not reach More. Passive before/after layout tracing shows stable measured/actual geometry, repeated position callbacks and alpha0. Exact protected433 produces the same initial More/sun alpha0 result. Thus the host evidence does not identify a434 regression or establish the phone’s root cause. All failures are retained. The433 comparison initially failed to compile an unused434-only fixture; that fixture was removed before the actual comparison ran.
+
+Next selected Android observation uses ONLY the exact rejected signed434 APK from successful signing run41084477130 (APK SHA25616f02a9625c057a3fe4d4b55da8a554fdb2bff0f1b19c8f567bdf56af41eb465), original signature and installed-byte verification. Existing finite driver’s unexecuted OS-input synchronization/form-readiness correction is retained. New selection is front Cards sun->original Ambient/Night Cinema sheet->Off/Back/reopen, actual preview->fullscreen->More->Back/reopen. Original3.5s touch-target validity is unchanged. No product APK build, shutdown, uninstall, clear, private data injection or Infinity launch. This is not physical Fold acceptance.
+
+The sun’s shipped content description and handler explicitly open Ambient Mode/Night Cinema, not a replacement Light/Dark/OLED chooser. Preserve its original contents. The screenshot establishes the actual dark appearance but cannot prove a failed theme preference by itself.
+
+Infinity has a separately demonstrated source/design defect: DialogBusy’s centered panel is only hidden while Home.DrawerReady is true; Home unload clears that flag, and Videos lacks a current drawer-frame fallback. The user’s Videos screenshot matches the old panel exactly. Correct the Infinity-owned current-window cue rather than hiding all busy feedback. No native/persistence/installer/shutdown edits are authorized or needed for this source defect. Installed activation of the new observer is still unverified on device.
+
+Release remains withheld until concrete corrections and focused verification. No new acceptance claim, APK, automatic lock or promotion.
