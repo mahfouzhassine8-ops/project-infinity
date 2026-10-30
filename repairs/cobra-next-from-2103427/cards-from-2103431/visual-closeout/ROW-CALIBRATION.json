@@ -1,0 +1,23 @@
+{
+  "reference_wrapped_row": {
+    "top": 914,
+    "bottom": 1178,
+    "height": 264
+  },
+  "actual_first_run": {
+    "normal_height": 249,
+    "wrapped_height": 262,
+    "actual_two_line_layout_height": 49,
+    "reference_reserve": 36
+  },
+  "bounded_correction": {
+    "reference_reserve": 34,
+    "height_rule": "rounded normal height plus max(0, measured current paired-row text height minus scaled reserve)",
+    "expected_reference_geometry_height": 264,
+    "normal_row_coordinates": "unchanged"
+  },
+  "evidence": "qa-v3 native mixed-paired rows; raw result retained outside repo pending final evidence collection",
+  "production_text": "Actual native guideStatus/programme data; no provider/title hardcode",
+  "APK": "NOT_BUILT",
+  "signing": "NOT_RUN"
+}

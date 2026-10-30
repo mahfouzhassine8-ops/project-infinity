@@ -314,10 +314,11 @@ public final class CobraCardsTiles {
         maximum=Math.max(maximum,measuredTextHeights[offset]);
       }
       int base=Math.max(1,Math.round((250+Math.max(0,font-1)*128)*scale));
-      // A normal programme line has a 36-reference-pixel content reserve.
+      // A 34-reference-pixel reserve preserves normal rows and calibrates
+      // measured native two-line overflow to the approved row geometry.
       // Wrapped real text expands that block and the shared row by its measured
       // overflow; no particular provider, title or row index controls height.
-      return base+Math.max(0,maximum-Math.round(36*scale*font));
+      return base+Math.max(0,maximum-Math.round(34*scale*font));
     }
     void resize(int width){
       Activity a=owner.get();if(a==null || width<=0 || configuring)return;
