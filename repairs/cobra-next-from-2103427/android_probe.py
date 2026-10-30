@@ -1,20 +1,20 @@
 """One finite exact-APK Cobra launch on a fresh disposable API37 emulator.
 No Infinity launch, root/data injection, restart, clear, teardown or shutdown.
 """
-import argparse,hashlib,json,re,subprocess,time,xml.etree.ElementTree as ET
+import argparse,hashlib,json,math,re,subprocess,time,xml.etree.ElementTree as ET
 from pathlib import Path
 PACKAGE='com.projectinfinity.kodi'
-def adb(*args,check=True):
- p=subprocess.run(['adb',*args],capture_output=True,text=True,timeout=30)
+def adb(*args,check=True,timeout=30):
+ p=subprocess.run(['adb',*args],capture_output=True,text=True,timeout=timeout)
  if check and p.returncode:raise RuntimeError('adb '+str(args[:2])+': '+p.stderr[-1500:])
  return p.stdout
 
-def confirm_installed_apk(expected):
+def confirm_installed_apk(expected,apk_io_timeout=30):
  paths=adb('shell','pm','path',PACKAGE).strip().splitlines()
  assert len(paths)==1 and paths[0].startswith('package:'),'One installed base APK required'
  path=paths[0][len('package:'):]
  assert re.fullmatch(r'/data/app/[A-Za-z0-9_~+./=-]+/base\.apk',path) and '..' not in path.split('/'),'Unexpected installed APK path'
- observed=adb('shell','sha256sum',path).split()
+ observed=adb('shell','sha256sum',path,timeout=apk_io_timeout).split()
  assert observed and observed[0]==expected,'Installed APK does not match the exact signed artifact'
  return {'installed_base_apk':path,'installed_apk_sha256':observed[0]}
 
@@ -27,19 +27,23 @@ def probe(apk,out,expected):
   assert not adb('shell','pm','path',PACKAGE,check=False).strip(),'Existing application refused; never clear or replace data'
   report.update(serial=serial,sdk=sdk,abis=adb('shell','getprop','ro.product.cpu.abilist').strip(),page_size=adb('shell','getconf','PAGE_SIZE').strip(),apk_sha256=expected)
   install_started=time.monotonic()
+  # Large-file QA I/O is separate from the unchanged short ADB/UI limits.
+  # At measured18MB/s, transfer alone needs43s. Budget conservative10MiB/s
+  # plus45s PackageManager/verification headroom, capped at120s.
+  apk_io_timeout=min(120,max(30,math.ceil(apk.stat().st_size/(10*1024*1024))+45))
+  report['APK_IO_timeout_seconds']=apk_io_timeout
+  report['short_ADB_timeout_seconds']=30
   try:
-   # IncFS may report success before every APK block arrives. This probe
-   # immediately verifies the entire installed file; require full transfer.
-   (out/'install.txt').write_text(adb('install','--no-incremental','-r',str(apk)))
+   (out/'install.txt').write_text(adb('install','--no-incremental','-r',str(apk),timeout=apk_io_timeout))
    report['install_client']='COMPLETED'
   except subprocess.TimeoutExpired as exc:
    # PackageInstaller may finish while the streamed-install client still waits.
    # Never retry an uncertain install or increase the generic ADB deadline.
    def decoded(value):return value.decode(errors='replace') if isinstance(value,bytes) else value or ''
-   report['install_client']='TIMEOUT_30_SECONDS; EXACT_INSTALLED_BYTES_REQUIRED'
+   report['install_client']='TIMEOUT_%d_SECONDS; EXACT_INSTALLED_BYTES_REQUIRED'%apk_io_timeout
    (out/'install-client-timeout.json').write_text(json.dumps({'command':'adb install --no-incremental -r',
      'timeout_seconds':exc.timeout,'stdout':decoded(exc.stdout),'stderr':decoded(exc.stderr)},indent=2)+'\n')
-  report['install_confirmation']=confirm_installed_apk(expected)
+  report['install_confirmation']=confirm_installed_apk(expected,apk_io_timeout)
   report['install_seconds_including_confirmation']=round(time.monotonic()-install_started,3)
   start=time.monotonic();result=adb('shell','am','start','-W','-n',PACKAGE+'/.InfinityLiveActivity');(out/'launch.txt').write_text(result)
   assert 'Error' not in result,result
