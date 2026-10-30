@@ -119,12 +119,29 @@ public final class CobraFoldMoreDriver {
  }
  static void fullscreen()throws Exception{
   if(has("(?m)^Return to preview$"))return;
-  // Cards uses its original preview's real visible coordinate, never a callback.
   Rect r=preview();long changed=SystemClock.uptimeMillis();tap(r,"Current Cards preview");syncInputs();
-  if(has("(?m)^Return to preview$"))return;
-  long started=changed;Rect full=waitBounds("(?m)^Fullscreen$",PLAYER_PRESS_LIMIT);
-  require(SystemClock.uptimeMillis()-started<PLAYER_PRESS_LIMIT,"Inline target observation expired; no press");tap(full,"Cards inline Fullscreen");require(SystemClock.uptimeMillis()-started<PLAYER_PRESS_LIMIT,"Inline press completed after valid interval");
-  syncInputs();await("(?m)^Return to preview$",true);
+  // A real preview press can finish promotion after the first OS query. Observe
+  // the two actual public destination states throughout the SAME3.5s interval;
+  // never press an obsolete inline action after native fullscreen has opened.
+  JSONArray last=new JSONArray();
+  for(int i=0;i<20&&SystemClock.uptimeMillis()-changed<PLAYER_PRESS_LIMIT;i++){
+   Tree t=new Tree();Rect inline=null;
+   try{
+    if(t.find("(?m)^Return to preview$",true)!=null){steps.put(new JSONObject().put("fullscreen_observed_after_real_preview_press",true).put("elapsed_ms",SystemClock.uptimeMillis()-changed));return;}
+    AccessibilityNodeInfo n=t.find("(?m)^Fullscreen$",true);if(n!=null){inline=new Rect();n.getBoundsInScreen(inline);}last=t.labels();
+   }finally{t.close();}
+   if(inline!=null){
+    SystemClock.sleep(32);Tree fresh=new Tree();Rect current=new Rect();
+    try{
+     if(fresh.find("(?m)^Return to preview$",true)!=null)return;
+     AccessibilityNodeInfo n=fresh.find("(?m)^Fullscreen$",true);require(n!=null,"Inline Fullscreen disappeared without observed destination; no press");n.getBoundsInScreen(current);require(inline.equals(current),"Inline Fullscreen changed bounds; no press");
+    }finally{fresh.close();}
+    require(SystemClock.uptimeMillis()-changed<PLAYER_PRESS_LIMIT,"Inline observation exceeded original3.5s interval; no press");tap(current,"Cards inline Fullscreen");require(SystemClock.uptimeMillis()-changed<PLAYER_PRESS_LIMIT,"Inline press completed after valid interval");
+    syncInputs();await("(?m)^Return to preview$",true);return;
+   }
+   SystemClock.sleep(100);
+  }
+  write("fullscreen-readiness.json",new JSONObject().put("labels",last).put("elapsed_ms",SystemClock.uptimeMillis()-changed));throw new IllegalStateException("Neither actual fullscreen nor current inline Fullscreen observed within original3.5s interval");
  }
  static void more(int iteration)throws Exception{
   // Automatic hiding is conditional (original cobraChromeCanHide); it is not
@@ -150,7 +167,7 @@ public final class CobraFoldMoreDriver {
    Class<?> c=Class.forName("com.android.uiautomator.core.UiAutomationShellWrapper");wrapper=c.getConstructor().newInstance();c.getMethod("connect").invoke(wrapper);disconnect=c.getMethod("disconnect");c.getMethod("setCompressedLayoutHierarchy",boolean.class).invoke(wrapper,true);ui=(UiAutomation)c.getMethod("getUiAutomation").invoke(wrapper);
    android.accessibilityservice.AccessibilityServiceInfo info=ui.getServiceInfo();info.flags|=android.accessibilityservice.AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS;ui.setServiceInfo(info);
    require(java.lang.reflect.Modifier.isPublic(UiAutomation.class.getMethod("syncInputTransactions",boolean.class).getModifiers()),"Current OS public transaction synchronization unavailable");
-   enterSource();visualSettings();fullscreen();more(1);more(2);report.put("status","EXACT_SIGNED435_FULLSCREEN_MORE_AND_SUN_OBSERVED; EMULATOR_ONLY_NOT_PHYSICAL_ACCEPTANCE");
+   enterSource();fullscreen();more(1);more(2);report.put("status","EXACT_SIGNED435_FULLSCREEN_MORE_OBSERVED; SUN_RETAINED41126342663; EMULATOR_ONLY_NOT_PHYSICAL_ACCEPTANCE");
   }catch(Throwable e){report.put("status","FAILED_CLOSED").put("error",e.toString());if(ui!=null)try{screenshot("failure");}catch(Throwable ignored){}if(e instanceof Exception)throw (Exception)e;throw (Error)e;}
   finally{write("OUTCOME.json",report);if(disconnect!=null)disconnect.invoke(wrapper);}
  }

@@ -1,0 +1,13 @@
+{
+  "selected_before_execution": true,
+  "failed_run": 41126342663,
+  "source": "3e54cbd6e0351fc0b80c661aff48cc1cd46dc3f9",
+  "artifact": 13010783419,
+  "artifact_sha256": "4f983ddb699316b740e9b866a1ebe7fde5dab2c18a148b4bee2df061958fdaaa",
+  "exact_failure": "After real preview input, initial Return-to-preview query raced native transition; fallback searched only obsolete inline Fullscreen label. Missing-target evidence already contains Return to preview and More; failure.png shows real fullscreen.",
+  "classification": "FAILED_HARNESS_OBSERVATION_AFTER_ACTUAL_FULLSCREEN_ENTRY; NOT_PROVEN_APP_ROUTING_FAILURE",
+  "correction": "Observe original destination and original inline control together throughout existing3500ms; current matching target bounds before any inline press. Keep original More deadline and every menu/action assertion.",
+  "retained": "Sun opening/Off/reopen/Back pixels41126342663; not rerun",
+  "product_APK": "SAME_ONCE_SIGNED435",
+  "shutdown": "NOT_RUN"
+}

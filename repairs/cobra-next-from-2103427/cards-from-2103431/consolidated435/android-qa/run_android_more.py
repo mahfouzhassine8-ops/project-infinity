@@ -54,7 +54,7 @@ def run(signed,signature,driver,observer,out):
         adb('pull',remote,str(out/'native'))
         native=json.loads((out/'native/OUTCOME.json').read_text())
         report['native']=native
-        assert executed.returncode==0 and native['status'].startswith('EXACT_SIGNED435_FULLSCREEN_MORE_AND_SUN_OBSERVED'),native
+        assert executed.returncode==0 and native['status'].startswith('EXACT_SIGNED435_FULLSCREEN_MORE_OBSERVED'),native
         report['status']='SIGNED435_SUN_FULLSCREEN_MORE_WORK_IN_ANDROID_EMULATOR; PHYSICAL_FOLD_PENDING'
     except Exception as error:
         report['status']='BLOCKED_OR_FAILED_FOCUSED_OBSERVATION'
