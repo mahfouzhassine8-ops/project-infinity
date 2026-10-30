@@ -112,7 +112,7 @@ public final class CobraCardsTiles {
     long start=Long.MIN_VALUE,stop=Long.MIN_VALUE;
     SimpleDateFormat date;
     float configuredWidth=-1,configuredFont=-1,scale=1;
-    boolean hasLive,configuring;
+    boolean hasLive,configuring,rowSyncPending;
 
     Holder(Activity a,LinearLayout root){
       owner=new WeakReference<>(a);card=root;Class<?> nativeCard=root.getClass();
@@ -320,6 +320,33 @@ public final class CobraCardsTiles {
       // overflow; no particular provider, title or row index controls height.
       return base+Math.max(0,maximum-Math.round(34*scale*font));
     }
+    boolean synchronizeAttachedRow(Activity a){
+      Object list=CobraArrange.ownedField(a,"mCobraGuideList");
+      if(!(list instanceof GridView))return true;
+      GridView grid=(GridView)list;
+      if(card.getParent()!=grid || !card.isAttachedToWindow())return false;
+      ListAdapter adapter=grid.getAdapter();int columns=grid.getNumColumns();
+      if(adapter==null || adapter!=measuredAdapter.get() || adapter!=boundAdapter.get() || columns<=0
+        || adapterPosition<0 || adapterPosition>=adapter.getCount()
+        || grid.getPositionForView(card)!=adapterPosition || adapter.getItem(adapterPosition)!=bound)return true;
+      int row=(adapterPosition/columns)*columns;
+      if(row!=measuredRow)return true;
+      int end=Math.min(row+columns,adapter.getCount()),first=grid.getFirstVisiblePosition();
+      // GridView can retain an active peer without asking getView/bind again.
+      // Synchronize only this changed row; each peer uses its own real metadata
+      // and normal resize. The originating configuring guard stops recursion.
+      for(int position=row;position<end;position++){
+        View child=grid.getChildAt(position-first);
+        if(!(child instanceof LinearLayout))continue;
+        Holder peer=holder((LinearLayout)child);
+        if(peer==null || peer==this || peer.configuring || peer.owner.get()!=a
+          || peer.card.getParent()!=grid || !peer.card.isAttachedToWindow()
+          || peer.boundAdapter.get()!=adapter || peer.adapterPosition!=position
+          || adapter.getItem(position)!=peer.bound)continue;
+        peer.refresh();
+      }
+      return true;
+    }
     void resize(int width){
       Activity a=owner.get();if(a==null || width<=0 || configuring)return;
       float font=a.getResources().getConfiguration().fontScale;if(!(font>0))font=1;
@@ -336,10 +363,14 @@ public final class CobraCardsTiles {
           live.setTextSize(TypedValue.COMPLEX_UNIT_PX,20.5f*scale*font);
         }
         int height=rowHeight(a,width,font);
+        if(bound!=null && configuredHeight!=height)rowSyncPending=true;
         ViewGroup.LayoutParams parent=card.getLayoutParams();
         if(parent==null){card.setLayoutParams(new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,height));}
         else if(parent.height!=height){parent.height=height;card.setLayoutParams(parent);}
-        if(!dimensions && configuredHeight==height && configuredContentGeneration==contentGeneration)return;
+        if(!dimensions && configuredHeight==height && configuredContentGeneration==contentGeneration){
+          if(rowSyncPending)rowSyncPending=!synchronizeAttachedRow(a);
+          return;
+        }
         configuredWidth=width;configuredFont=font;configuredHeight=height;configuredContentGeneration=contentGeneration;
         float nominalHeight=250+Math.max(0,font-1)*128;
         float refHeight=nominalHeight+(height-Math.max(1,Math.round(nominalHeight*scale)))/scale;
@@ -359,6 +390,7 @@ public final class CobraCardsTiles {
         moreParams.width=px(56);moreParams.height=px(44);
         moreParams.leftMargin=Math.max(0,width-px(12)-moreParams.width);moreParams.topMargin=px(14);more.setLayoutParams(moreParams);
         more.scale=scale;more.invalidate();
+        if(rowSyncPending)rowSyncPending=!synchronizeAttachedRow(a);
       }finally{configuring=false;}
     }
     int px(float value){return Math.max(1,Math.round(value*scale));}
