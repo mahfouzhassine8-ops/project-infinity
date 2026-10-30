@@ -19,6 +19,7 @@ from inventory import load,save,file_sha,canonical
 from component_bundles import read_bundle,record
 from release_gate import require,component_digest
 from review_ownership import class_owner
+from verify_owner_source import verify as verify_canonical_owner
 
 EXISTING={APP+n+';' for n in ('InfinityLiveActivity','InfinityLiveActivity$CobraPosterChannelCard',
     'InfinityCobraFeatureRuntime','CobraLogoRequests','CobraComponent')}
@@ -26,7 +27,7 @@ ROOTS={APP+n for n in ('CobraCardsTiles','CobraCardsLayout','CobraProfileDataReu
 
 
 def bound_sources():
-    files=[HERE/'build.py',HERE/'package_owners.py',HERE/'cards_patch.py',HERE/'projection_patch.py',
+    files=[HERE/'build.py',HERE/'package_owners.py',HERE/'verify_owner_source.py',ISO/'ownership-reviewed-roots.json',HERE/'cards_patch.py',HERE/'projection_patch.py',
       HERE/'presentation_patch.py',HERE/'CARDS-SOURCE-BUDGET.json',HERE/'PROJECTION-SOURCE-BUDGET.json',
       HERE/'DEX2JAR-LIB-PINS.json',HERE/'BASELINE.json',HERE/'SCOPE.json',
       HERE/'logo-clear/patch.py',HERE/'logo-clear/SOURCE-BUDGET.json',
@@ -60,6 +61,12 @@ def package(bundles,work,jars,out,source):
     metas={owner:read_bundle(bundles/row['file'],row) for owner,row in catalog['bundles'].items()}
     for owner,row in catalog['bundles'].items():
         require(file_sha(bundles/row['file'])==baseline['component_sha256'][row['file']],'EXACT431_BUNDLE:'+owner)
+    # Recompute the independent policy from the actual owner DEX here. A prior
+    # mutable receipt or changed.dex is not an authorization for method changes.
+    proof=verify_canonical_owner(work,bundles,jars,'package-canonical','PACKAGE-CANONICAL-RESULT.json')
+    require(proof['build_receipt_sha256']==file_sha(work/'BUILD.json'),'CANONICAL_BUILD_BINDING')
+    require(proof['compiler_source_files']==built['compiler_source_files'],'CANONICAL_COMPILER_SOURCE_BINDING')
+    require(proof['new_DEX_sha256']=={p.name:file_sha(p) for p in (work/'owner-dex/COBRA').glob('*.dex')},'CANONICAL_ACTUAL_DEX_BINDING')
     original=texts(work/'baseline/COBRA');actual={}
     verified=work/'verified/COBRA';require(not verified.exists(),'FRESH_CLASS_VERIFICATION')
     for p in sorted((work/'owner-dex/COBRA').glob('*.dex')):
@@ -88,8 +95,13 @@ def package(bundles,work,jars,out,source):
         changed_methods={m for m in old if old[m]!=new[m]}
         intended={m for m in old if old[m]!=compiled[m]}
         require(changed_methods==intended,'EXACT_CHANGED_METHOD_SET:'+name)
+        require(changed_methods|added_methods==set(proof['changed_methods'][name]),'INDEPENDENT_REVIEWED_METHOD_POLICY:'+name)
         for m in changed_methods|added_methods:require(new[m]==compiled[m],'EXACT_COMPILED_METHOD:'+name+m)
-        require(strip(original[name])==strip(actual[name]),'FROZEN_CLASS_FIELDS_METADATA:'+name)
+        old_meta,new_meta=strip(original[name]),strip(actual[name])
+        if added_methods:
+            require([line for line in old_meta.splitlines() if line.strip()]==[line for line in new_meta.splitlines() if line.strip()],
+                'FROZEN_CLASS_FIELDS_METADATA:'+name)
+        else:require(old_meta==new_meta,'FROZEN_CLASS_FIELDS_METADATA:'+name)
         changes[name]=sorted(changed_methods|added_methods)
     helper_expected=texts(work/'helper-smali')
     require(set(helper_expected)==added,'EXACT_HELPER_SET')
@@ -131,6 +143,7 @@ def package(bundles,work,jars,out,source):
       baseline_signed_source=BASE_SOURCE,changed_classes=sorted(changed),added_classes=sorted(added),method_changes=changes,
       unchanged_Cobra_class_count=len(original)-len(changed),unchanged_Cobra_class_bodies='EXACT',
       original_Activity_fields='EXACT',Pro_player_preview_controls='EXACT431_ORIGINAL_METHODS',
+      independent_policy_receipt_sha256=file_sha(work/'PACKAGE-CANONICAL-RESULT.json'),
       Infinity='EXACT431_ZIP',minimal_Android_native_icons='EXACT431_ZIP',chooser='EXACT_DEX_AND_UI_MEMBERS; genuineversionmetadataonly',
       shutdown='FROZEN_NOT_RUN',physical_Fold='PENDING',accepted_pointer_updated=False,component_catalog=result))
 

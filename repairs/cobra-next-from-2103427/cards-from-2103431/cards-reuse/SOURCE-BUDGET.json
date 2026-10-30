@@ -1,8 +1,8 @@
 {
   "phase": "REVIEWED_SOURCE_PATCH_NOT_EXECUTED_OR_COMPILED",
   "input_stage": "Accepted431 plus already reviewed projection -> presentation -> Cards patches",
-  "input_source": "/workspace/cobra-evidence/cards431-activity-combined-patch/smali/com/projectinfinity/kodi/InfinityLiveActivity.smali",
-  "input_source_sha256": "773cf2da05931830e649ef86db5521364835a6a3ce7250391b03cb0df653f531",
+  "input_source": "/workspace/cobra-evidence/cards432-staged-v4-ownership-and-ambient.smali",
+  "input_source_sha256": "d3597a5659eb278554ab9053189ee78d086b8c76ff8cd90dc712f1a27a6074e9",
   "input_method_count": 1802,
   "class_metadata_sha256": "d33503dedc362b839934a9059d949c0371a99483ea6457c7df57e56caf4b8c39",
   "selected_method_preimages": {
@@ -83,5 +83,6 @@
     "CobraVisualGeometry": "de8efd7542af974d35a16e8f73c0e36162a8386431a2c362648341381b9fa108",
     "CobraPresentationSafety": "2cfd7b660b4af686da91775cb25ba487b2193460913003a6ea0613a3154a297e"
   },
-  "theme_source_review": "THEME-SOURCE-PROOF.json"
+  "theme_source_review": "THEME-SOURCE-PROOF.json",
+  "additional_unselected_Cards_hooks": "Root added original-guard-preserving ShowGuideShell restoration boundary and exact native-parameter Cards ambient wrapper API; all12reuse-selected method preimages/class metadata unchanged"
 }

@@ -50,6 +50,23 @@ def patch_activity(source):
                 '    iget-object v0, v6, '+APP+'->mCobraModeLayout:Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraModeLayout;\n'+
                 '    invoke-static {v6, v0}, '+LAYOUT+'->layout(Landroid/app/Activity;Ljava/lang/Object;)V\n'+
                 anchor.split('\n', 1)[1], 1)
+        elif 'cobraShowGuideShell(' in signature:
+            # Preserve the original Stage/aliveness eligibility checks. Restore
+            # Cards ownership before the destination mode writes Stage padding.
+            anchor='    :cond_0\n    iget-boolean v0, p0, '+APP+'->mCobraProActive:Z'
+            assert old.count(anchor)==1
+            revised=old.replace(anchor,'    :cond_0\n'+
+                '    invoke-static/range {p0 .. p0}, '+LAYOUT+'->beforeShell(Landroid/app/Activity;)V\n\n'+
+                anchor.split('\n',1)[1],1)
+        elif 'cobraAmbientSurface(' in signature:
+            anchor='    .registers 14\n'
+            assert old.count(anchor)==1 and ':cobra_cards_original_ambient' not in old
+            revised=old.replace(anchor,anchor+'\n'+
+                '    invoke-static/range {p0 .. p5}, '+LAYOUT+'->ambientSurface(Landroid/app/Activity;Landroid/view/View;IIIZ)Z\n'+
+                '    move-result v0\n'+
+                '    if-eqz v0, :cobra_cards_original_ambient\n'+
+                '    return-void\n'+
+                '    :cobra_cards_original_ambient\n',1)
         else:
             if 'cobraRestyleGuide(' in signature:
                 anchor = '    .registers 12\n'

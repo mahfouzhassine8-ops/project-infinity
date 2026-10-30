@@ -7,11 +7,17 @@
       "private cobraRestyleGuide()V": "9e4f5bc68035595046e6f7754f871bc543008a06219f2c3e3ee95747f1851235",
       "private cobraRenderGuideBrowser()V": "6397b0a15c7631cc82495b550b4bce6912cd541fbf86ed124d0be3fa1f3c4655",
       "private cobraRefreshModeDetails()V": "b2b6ad3345f824345a3f29b1cc48b85af2975e36864f0ae4329bb0464eac1056",
-      "private cobraRefreshVisualEffects()V": "49d2f10438827b1c29b1921f778ab3caede79312d632605eb9439cbfe103c2e2"
+      "private cobraRefreshVisualEffects()V": "49d2f10438827b1c29b1921f778ab3caede79312d632605eb9439cbfe103c2e2",
+      "private cobraShowGuideShell()V": "c7b871572e5bbc8974add26f61bdd76cfd8dfaaec321e32ccd0c6c9140a91a9a",
+      "private cobraAmbientSurface(Landroid/view/View;IIIZ)V": "c5ed17b69b3f2a2cdbaf3f03f3110ced78454c6c66378d9b4e9cbe286d13dc21"
     },
-    "unchanged_methods": 1797,
+    "unchanged_methods": 1795,
     "fields_and_class_annotations": "MUST_REMAIN_EXACT",
-    "preview_badge_scope": "Cards-only post-native-effects actual preview LIVE label styling; original effects/player/control body preserved"
+    "preview_badge_scope": "Cards-only post-native-effects actual preview LIVE label styling; original effects/player/control body preserved",
+    "additional_scope": {
+      "ShowGuideShell": "Restore Cards-owned shared widgets after original eligibility guards, before destination padding writes",
+      "ambientSurface": "Cards-owned wrapper reuse using exact native effect parameters; false retains original body for all other modes/views"
+    }
   },
   "Card": {
     "baseline_signed_source": "9ccc4c362a65118eeba38a8e7e4b0de5723c69af",

@@ -1,0 +1,55 @@
+{
+  "scope": "QA_ONLY_IMMEDIATE_PLATFORM_ROOT_OBSERVER_NO_APK",
+  "source_sha256": "46c317e7d696b3b49cb673c24ae172ac64b5815c6aceb36340577bb15eb957b1",
+  "compiled_source_snapshot_sha256": "46c317e7d696b3b49cb673c24ae172ac64b5815c6aceb36340577bb15eb957b1",
+  "build_script_sha256": "9ca5b58c523a0283a839cd03ae0638d0c38591ef1e17cb2c551a26aeb6fa2e94",
+  "android_jar_sha256": "6cea1df3efb77103ac3e2beb9bf4718964b0e0869ab16d39d29d5cbae1c147ad",
+  "D8_jar_sha256": "305622ad00535684534eb8f742cbf5e628a9abc09d8ea4d39d1babb95bf0cee5",
+  "compiler_command": [
+    "/opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.13-9/x64/bin/javac",
+    "-source",
+    "8",
+    "-target",
+    "8",
+    "-cp",
+    "/home/runner/work/project-infinity/project-infinity/observer-tools/receipt-evidence/android-34.jar",
+    "-d",
+    "/home/runner/work/project-infinity/project-infinity/runtime-observer/classes",
+    "/home/runner/work/project-infinity/project-infinity/runtime-observer/source/qa/CobraImmediateHierarchy.java"
+  ],
+  "D8_command": [
+    "/opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.13-9/x64/bin/java",
+    "-cp",
+    "/usr/local/lib/android/sdk/build-tools/35.0.0/lib/d8.jar",
+    "com.android.tools.r8.D8",
+    "--min-api",
+    "23",
+    "--lib",
+    "/home/runner/work/project-infinity/project-infinity/observer-tools/receipt-evidence/android-34.jar",
+    "--output",
+    "/home/runner/work/project-infinity/project-infinity/runtime-observer/dex",
+    "/home/runner/work/project-infinity/project-infinity/runtime-observer/observer-classes.jar"
+  ],
+  "class_files_sha256": {
+    "qa/CobraImmediateHierarchy$RootReadiness.class": "98d805704ef81db604d8c6accbc1a0c99c5a3bdcf5bda001ce44b4012c0a58bc",
+    "qa/CobraImmediateHierarchy.class": "b8e7b01f076e1cf2de26d97d2f19d23bbf5dd7acbccda9048d850c434b85ec36",
+    "qa/CobraImmediateHierarchy$ReadinessSignal.class": "59d290d0580a5c9ec163160a2d2be960cf1f26d5c3a60612bd6e1021a9f811d9"
+  },
+  "inspected_DEX_classes": [
+    "Lqa/CobraImmediateHierarchy$ReadinessSignal;",
+    "Lqa/CobraImmediateHierarchy$RootReadiness;",
+    "Lqa/CobraImmediateHierarchy;"
+  ],
+  "DEX_sha256": "571f451f4986d4ed38be53645968c151db5eabb58fad3156315e1b8df6da6d27",
+  "QA_JAR_sha256": "92bc97b01e0907c3a4e51763f51d7101f5166973fe6273ec93d1a67997f7d158",
+  "QA_JAR_bytes": 19320,
+  "platform_source_provenance_sha256": "00e3f0c784feab6db424430511ec87b326417857e17923b30f77dfbdc736552b",
+  "runtime_application_classpath_prefix": "/system/framework/android.test.runner.jar:/system/framework/uiautomator.jar",
+  "runtime_BOOTCLASSPATH": "INHERITED_OS_UNCHANGED",
+  "platform_classes": "REFLECT_EXISTING_SYSTEM_ARCHIVE_ONLY; NOT_BUNDLED",
+  "API_surface": "FAIL_CLOSED_DEVICE_PREFLIGHT_REQUIRED_BEFORE_OBSERVATION",
+  "APK_build_or_install": "NONE",
+  "application_or_device_execution": "NOT_RUN",
+  "CI": "NOT_DISPATCHED",
+  "shutdown": "NOT_RUN"
+}

@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       operation:
-        description: Sign both reviewed2103431 button and launcher-icon corrections
+        description: Sign reviewed2103432 Cards and Cobra performance candidate
         type: choice
         required: true
         default: final-combined
@@ -86,6 +86,29 @@ jobs:
           cp combined-build/ASSEMBLY.json release-evidence/
           cp repairs/dual-experience-isolation-2103420/release-authority.json release-evidence/
           cp -r repairs/dual-experience-isolation-2103420/results/scoped-correction/final release-evidence/focused-evidence
+      - name: Verify registered Cards producer evidence before keys
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import subprocess
+          from pathlib import Path
+          from zipfile import ZipFile
+          from inventory import load,file_sha,validate_names
+          from release_gate import require
+          a=load(Path('repairs/dual-experience-isolation-2103420/release-authority.json'))
+          e=a['owner_update_evidence']; name='Cobra-Cards-Host-Evidence-'+str(e['producer_run'])
+          row=e['artifacts'][name]; archive=Path('cards-evidence.zip')
+          with archive.open('wb') as stream:
+              subprocess.run(['gh','api','repos/mahfouzhassine8-ops/project-infinity/actions/artifacts/'+str(row['id'])+'/zip'],stdout=stream,check=True)
+          require(file_sha(archive)==row['digest'].removeprefix('sha256:'),'OFFICIAL_CARDS_EVIDENCE')
+          with ZipFile(archive) as z:
+              validate_names(z);z.extractall('reviewed-cards-evidence')
+          PY
+          python3 repairs/cobra-next-from-2103427/cards-from-2103431/register_release.py \
+            --check-registered --bundles combined-build/components \
+            --evidence reviewed-cards-evidence --evidence-archive cards-evidence.zip
+          cp reviewed-cards-evidence/PRODUCER-RESULT.json release-evidence/CARDS-PRODUCER-RESULT.json
+          cp cards-evidence.zip release-evidence/CARDS-PRODUCER-EVIDENCE.zip
       - name: Hard pre-sign gate against fresh actual APK contents
         run: |
           set -euo pipefail
@@ -109,26 +132,18 @@ jobs:
             --sdk "$ANDROID_HOME/build-tools/35.0.0" --out signed-combined
           cp repairs/dual-experience-isolation-2103420/release-authority.json signed-combined/
           cp repairs/dual-experience-isolation-2103420/DATA-AND-LIFECYCLE-CONTRACT.md signed-combined/
-      - name: Recover exact signed2103427 for complete final member comparison
+      - name: Recover exact signed2103431 for complete final member comparison
         uses: actions/download-artifact@v4
         with:
-          run-id: 40769526963
-          name: Infinity-Combined-Original-Signer-40769526963
+          run-id: 40971769136
+          name: Infinity-Combined-Original-Signer-40971769136
           github-token: ${{ github.token }}
-          path: previous2103427
-      - name: Recover unaccepted430 for strict resource-only final comparison
-        uses: actions/download-artifact@v4
-        with:
-          run-id: 40966088173
-          name: Infinity-Combined-Original-Signer-40966088173
-          github-token: ${{ github.token }}
-          path: previous2103430
+          path: previous2103431
       - name: Verify signed APK and exact matching components; no runtime execution
         run: |
-          python3 repairs/cobra-next-from-2103427/verify_delivery.py \
-            --baseline previous2103427/Infinity-2103427-Combined-Original-Signer.apk \
+          python3 repairs/cobra-next-from-2103427/cards-from-2103431/verify_delivery.py \
+            --baseline previous2103431/Infinity-2103431-Combined-Original-Signer.apk \
             --signed signed-combined --bundles combined-build/components \
-            --previous430 previous2103430/Infinity-2103430-Combined-Original-Signer.apk \
             --sdk "$ANDROID_HOME/build-tools/35.0.0"
       - name: Upload signed install-over candidate
         uses: actions/upload-artifact@v4

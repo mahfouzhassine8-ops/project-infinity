@@ -1,0 +1,17 @@
+Traceback (most recent call last):
+  File "/home/runner/work/project-infinity/project-infinity/repairs/cobra-next-from-2103427/cards-from-2103431/android-qa/baseline.py", line 320, in run
+    snap = observation.ui("source-save-return")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/project-infinity/project-infinity/repairs/cobra-next-from-2103427/cards-from-2103431/android-qa/baseline.py", line 143, in ui
+    raw, metadata, capture_started = self.observer.capture(stem, remote)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/project-infinity/project-infinity/repairs/cobra-next-from-2103427/cards-from-2103431/android-qa/immediate_observer.py", line 109, in capture
+    assert result.returncode in (0, 3) and metadata.get("status") != "ERROR", "Platform observer failed: %s; native stderr=%s" % (metadata.get("error", metadata.get("status")), result.stderr[-1500:])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Platform observer failed: java.lang.IllegalStateException: Current-root query exceeded bounded readiness budget; late result discarded; native stderr=java.lang.IllegalStateException: Current-root query exceeded bounded readiness budget; late result discarded
+	at qa.CobraImmediateHierarchy.acquire(CobraImmediateHierarchy.java:184)
+	at qa.CobraImmediateHierarchy.capture(CobraImmediateHierarchy.java:225)
+	at qa.CobraImmediateHierarchy.main(CobraImmediateHierarchy.java:276)
+	at com.android.internal.os.RuntimeInit.nativeFinishInit(Native Method)
+	at com.android.internal.os.RuntimeInit.main(RuntimeInit.java:367)
+

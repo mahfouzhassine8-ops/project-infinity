@@ -1,0 +1,125 @@
+{
+  "selected_before_execution": true,
+  "authorization": "Root selected Cards-only native render/restoration, truthful existing status label, actual PiP nonoverlap/callback and one active-ambient observation; no general behavior suite",
+  "baseline_signed_source": "9ccc4c362a65118eeba38a8e7e4b0de5723c69af",
+  "baseline_APK_sha256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471",
+  "viewport": {
+    "content_pixels": [
+      941,
+      1672
+    ],
+    "density_dpi": 420,
+    "font_scale": 1,
+    "system_bars": "host content only; no physical Fold equivalence"
+  },
+  "selected_baseline_method": "CobraCardsLayoutTest#recordNativeSharedModeBaselines",
+  "selected_candidate_methods": [
+    "CobraCardsLayoutTest#actualCardsRenderAtReferenceViewport",
+    "CobraCardsLayoutTest#cardsRestoresSharedNativeViewsInOtherModes",
+    "CobraCardsLayoutTest#truthfulLiveBadgeUsesNativeStatusAndPreservesActualPipPress",
+    "CobraCardsLayoutTest#activeAmbientPreservesNativeEffectsAndRecordsWrapping"
+  ],
+  "foundation": "Actual native Activity, buildShell, show/layout/render/restyle, switchMode, effects/StatusSlot, programme/state publication and original native PiP avoidance/click wiring. No source-method stubs; only fullscreen/PiP terminal boundaries observed.",
+  "I_O": "Records real executor submissions without HTTP; native autoplay disabled. State-only ExoPlayer proxy and actual CobraPlayerBinding used solely for the selected LIVE/Pause/Buffer/native-live/session cases; no decoder/network/physical playback claims.",
+  "unselected": [
+    "shutdown",
+    "application lifecycle teardown",
+    "full feature matrix",
+    "new APK",
+    "CI",
+    "physical acceptance"
+  ],
+  "status": "WAITING_TRUSTED_FINAL_475F_MINIMUM_CAPTURE_FIX",
+  "execution_v3": {
+    "candidate": "3 PASS / 1 FAIL",
+    "restoration_failure": "Fresh431Mobile versus candidateCards\u2192Mobile details background differs; same-journey431 baseline required before attribution",
+    "evidence": "/workspace/cobra-evidence/cards432-layout-native-v3"
+  },
+  "next_selected_baseline_method": "CobraCardsLayoutTest#recordNativeCardsAmbientWrapping",
+  "next_baseline_reason": "Compare exactly equivalent native Cards\u2192Mobile/Compact/Grid/Pro journeys to distinguish existing native transition rendering from helper leakage; preserve existing fresh-mode PASS and candidate failure.",
+  "ambient_baseline_reason": "V3 custom Cards PanelSurface falls into native new-LayerDrawable path every effects tick, unlike original Glass fast-path. Same four unchanged ambient publications determine introduced allocation regression without timing/extra behavior.",
+  "ambient_correction_selected_before_execution": {
+    "baseline": "Exact431 andv3 each produced4 distinct native LayerDrawable wrappers across4 unchanged subtle publications; existingbehavior, notintroducedregression",
+    "authorized_implementation": "Cards-owned exact-native wrapper cache only toolbar/details, fresh native tint/mode/radius/night+density; preserve body for all other views/modes",
+    "selected_extended_verification": "Same existing activeAmbient method plus off/subtle/immersive/night changes, exact native drawable pixel equivalence, native maps restoration; no broader mode suite",
+    "native_method_preimage_sha256": "c5ed17b69b3f2a2cdbaf3f03f3110ced78454c6c66378d9b4e9cbe286d13dc21"
+  },
+  "Pro_hidden_exception": {
+    "precondition": "Both exact431 andcandidate mCobraGuideDetails nativevisibility GONE in focus mode",
+    "allowed_differences": [
+      "mCobraGuideDetails.bounds",
+      "mCobraGuideDetails.layout"
+    ],
+    "all_other_properties": "exact comparison retained; excluded inherited geometry recorded explicitly"
+  },
+  "baseline_execution": {
+    "fresh_mode_shared": {
+      "status": "PASS",
+      "method": "recordNativeSharedModeBaselines",
+      "evidence": "/workspace/cobra-evidence/cards431-layout-native-baseline-v2"
+    },
+    "same_Cards_exit_shared": {
+      "status": "PASS",
+      "method": "recordNativeCardsExitModeBaselines",
+      "evidence": "/workspace/cobra-evidence/cards431-layout-native-exit-baseline"
+    },
+    "same_Cards_ambient": {
+      "status": "PASS",
+      "method": "recordNativeCardsAmbientWrapping",
+      "evidence": "/workspace/cobra-evidence/cards431-layout-native-ambient-baseline",
+      "unchanged_publications": 4,
+      "wrapper_identities": 4
+    }
+  },
+  "candidate_v3_same_journey": {
+    "status": "FAIL_HONESTLY_RETAINED",
+    "method": "cardsRestoresSharedNativeViewsInOtherModes",
+    "evidence": "/workspace/cobra-evidence/cards432-layout-native-v3-exit-compare",
+    "first_difference_each_mode": [
+      "Mobile eyebrow letterspacing",
+      "Compact nativePiP position",
+      "Grid stage padding",
+      "Pro nativelyGONE details inherited geometry (subsequently approved narrow exclusion)"
+    ]
+  },
+  "preview_inset_correction": {
+    "observed_v3": "Native PiP126px LP but111px visible width; new outer padding clipped original control plane",
+    "source_proof": "/workspace/cobra-evidence/cards431-preview-inset-preimages/PREIMAGES.json",
+    "implementation": "Outer native hostpadding0; equivalent only-original-TextureView checked margins; LP-only ownership restore. No transforms, aspect preferences, listener or player operations changed. Existing native layout listener computes fit from actual texture width/height and keeps captions aligned.",
+    "selected_assertions": [
+      "full PiP visible size equals actual button width and height",
+      "LIVE badge actualglobalRect41,414,130,452",
+      "Texture actual contentinsets10,14,10,10 andunchanged player/control instances"
+    ],
+    "host_limit": "No decodedvideo/Rotate/physicalacceptance claim"
+  },
+  "named_GONE_geometry_exclusions": {
+    "precondition": "Both baseline/candidate natively GONE or descendants of same nativelyGONE guideDetails; native original hide path skips layout/reposition",
+    "exact_fields": [
+      "mCobraGuideDetails whenGONE includingeffectivelyGONE descendants",
+      "mCobraGuideNextLabel whenGONE",
+      "mCobraGuideProgress whenGONE",
+      "mCobraModeDescription whenGONE",
+      "cobra_preview_pip_small whenGONE"
+    ],
+    "excludes_only": "bounds and numerical LP geometry; each differing field recorded withreason",
+    "strict_unchanged": [
+      "LPclass",
+      "hierarchy",
+      "visibility",
+      "glyph/listener",
+      "text",
+      "styles/padding",
+      "allvisible geometry includingfullPiP"
+    ]
+  },
+  "reference_render_fixture": {
+    "inventory": 20226,
+    "actual_native_favorites": 6,
+    "native_category": "FAVORITES",
+    "seeding": "Actual native Channel objects/mFavorites then originalNativeShowGuideShell; original currentprojection/contextinvalidates by category+size",
+    "caption_count_fake": "NONE",
+    "nonrender_24_item_fixtures": "unchanged",
+    "player": "existingdeclared state-onlyplayer proxy; dynamicdecode notclaimed"
+  }
+}

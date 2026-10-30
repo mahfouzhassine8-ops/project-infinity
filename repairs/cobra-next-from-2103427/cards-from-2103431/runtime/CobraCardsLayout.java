@@ -3,6 +3,7 @@ package com.projectinfinity.kodi;
 import android.app.Activity;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
+import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Outline;
 import android.graphics.Paint;
@@ -13,6 +14,8 @@ import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
 import android.os.Looper;
 import android.os.Build;
 import android.view.WindowInsets;
@@ -124,7 +127,7 @@ public final class CobraCardsLayout {
    * Returns true only when the actual Cards views are ready for formatting. */
   public static boolean refreshDetails(Activity owner){
     mainThread();if(!cards(owner))return false;
-    if(read(owner,"mCobraModeLayout")==null)return false;State s=state(owner);if(s==null)return false;
+    if(read(owner,"mCobraModeLayout")==null)return false;State s=existing(owner);if(s==null)return false;
     s.captureNativeMetadata();s.apply();s.metadata();return true;
   }
 
@@ -132,8 +135,17 @@ public final class CobraCardsLayout {
    * native player state and binding remain the sole playback truth. */
   public static void refreshPreview(Activity owner){
     mainThread();if(!cards(owner)){beforeShell(owner);return;}
-    if(read(owner,"mCobraModeLayout")==null)return;State s=state(owner);if(s==null)return;
+    if(read(owner,"mCobraModeLayout")==null)return;State s=existing(owner);if(s==null)return;
     s.refreshPreview();
+  }
+
+  /** Optional native cobraAmbientSurface prefix. Every parameter is computed by
+   * its original caller; all other views/modes execute the unchanged body. */
+  public static boolean ambientSurface(Activity owner,View view,int tint,int mode,int radius,boolean night){
+    mainThread();if(!cards(owner) || view==null)return false;
+    State s=existing(owner);if(s==null || s.restoring || read(owner,"mCobraGuideShell")!=s.shell)return false;
+    AmbientPanel panel=view==s.toolbar?s.toolbarAmbient:view==s.details?s.detailsAmbient:null;
+    return panel!=null && panel.apply(tint,mode,radius,night,owner.getResources().getDisplayMetrics().density);
   }
 
   private static final class Slot {
@@ -178,11 +190,11 @@ public final class CobraCardsLayout {
 
   private static final class State implements View.OnAttachStateChangeListener,View.OnLayoutChangeListener {
     final WeakReference<Activity> owner;final View shell;final LinearLayout toolbar,details,browser;
-    final View preview;final TextView eyebrow,title,time,description,remaining;
+    final View preview,texture;final ViewGroup.LayoutParams textureParams;ViewGroup.LayoutParams ownedTextureParams;final TextView eyebrow,title,time,description,remaining;
     final ProgressBar progress;final FrameLayout frame;
     final ArrayList<Slot> originalDetails=new ArrayList<>();
     final IdentityHashMap<View,Snapshot> shared=new IdentityHashMap<>(),header=new IdentityHashMap<>(),browserHeader=new IdentityHashMap<>();
-    final Snapshot stage;final View stageView;
+    final Snapshot stage;final View stageView;final AmbientPanel toolbarAmbient,detailsAmbient;
     PreviewBadge badge;
     View headerFirst,headerLast,browserFirst,browserSpacer;float scale=1,font=1;boolean restoring,hasNativeMetadata;
     final PanelSurface headerSurface=new PanelSurface(24,0),detailSurface=new PanelSurface(24,12),previewSurface=new PanelSurface(24,0),filterSurface=new PanelSurface(24,0);
@@ -194,12 +206,13 @@ public final class CobraCardsLayout {
     long start=Long.MIN_VALUE,stop=Long.MIN_VALUE,remainingMinutes=Long.MIN_VALUE;String locale="",zone="",endDatePrefix="",startDatePrefix="",scheduleSource="",scheduleText="",eyebrowSource="",countLocale="";
     CharSequence eyebrowText;SpannableString countText;int shownCount=-1;
     State(Activity a,View nativeShell){
-      owner=new WeakReference<>(a);shell=nativeShell;toolbar=(LinearLayout)read(a,"mCobraModeToolbar");details=(LinearLayout)read(a,"mCobraGuideDetails");browser=(LinearLayout)read(a,"mCobraGuideBrowser");preview=(View)read(a,"mCobraGuideVideo");
+      owner=new WeakReference<>(a);shell=nativeShell;toolbar=(LinearLayout)read(a,"mCobraModeToolbar");details=(LinearLayout)read(a,"mCobraGuideDetails");browser=(LinearLayout)read(a,"mCobraGuideBrowser");preview=(View)read(a,"mCobraGuideVideo");texture=(View)read(a,"mCobraPreviewTexture");textureParams=texture==null?null:texture.getLayoutParams();
       eyebrow=(TextView)read(a,"mCobraModeEyebrow");title=(TextView)read(a,"mCobraGuideNowLabel");time=(TextView)read(a,"mCobraGuideNextLabel");description=(TextView)read(a,"mCobraModeDescription");progress=(ProgressBar)read(a,"mCobraGuideProgress");
+      toolbarAmbient=new AmbientPanel(a,toolbar,headerSurface);detailsAmbient=new AmbientPanel(a,details,detailSurface);
       stageView=(View)read(a,"mStage");stage=stageView==null?null:new Snapshot(stageView);
       for(View v:new View[]{shell,toolbar,details,browser,preview,eyebrow,title,time,description,progress})if(v!=null)shared.put(v,new Snapshot(v));
       for(int i=0;i<details.getChildCount();i++)originalDetails.add(new Slot(details.getChildAt(i)));
-      nativeEyebrow=eyebrow.getText();nativeTitle=title.getText();nativeTime=time.getText();nativeDescription=description.getText();nativeProgressVisibility=progress.getVisibility();
+      nativeEyebrow=eyebrow.getText();nativeTitle=title.getText();nativeTime=time.getText();nativeDescription=description.getText();nativeProgressVisibility=progress.getVisibility();hasNativeMetadata=true;
       details.removeAllViews();frame=new FrameLayout(a);frame.setClipChildren(true);frame.setClipToPadding(true);
       details.addView(frame,new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
       remaining=new TextView(a);remaining.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
@@ -219,8 +232,9 @@ public final class CobraCardsLayout {
     void restore(){
       if(restoring)return;restoring=true;
       shell.removeOnAttachStateChangeListener(this);details.removeOnLayoutChangeListener(this);restoreStage();if(badge!=null){badge.restore();badge=null;}
+      if(texture!=null && texture.getParent()==preview && texture.getLayoutParams()==ownedTextureParams && textureParams!=null)texture.setLayoutParams(textureParams);ownedTextureParams=null;
       for(Slot slot:originalDetails)slot.restore();detach(frame);
-      restoreSnapshots(header);restoreBrowser();restoreSnapshots(shared);
+      toolbarAmbient.restore();detailsAmbient.restore();restoreSnapshots(header);restoreBrowser();restoreSnapshots(shared);
       text(eyebrow,nativeEyebrow);text(title,nativeTitle);text(time,nativeTime);text(description,nativeDescription);progress.setVisibility(nativeProgressVisibility);
       Activity a=owner.get();if(a!=null && nativeSub!=null){Object sub=read(a,"mCobraModeSub");if(sub instanceof TextView)text((TextView)sub,nativeSub);}
     }
@@ -233,10 +247,18 @@ public final class CobraCardsLayout {
       if(stageView!=null && read(a,"mStage")==stageView && (stageView.getPaddingLeft()!=0 || stageView.getPaddingTop()!=0 || stageView.getPaddingRight()!=0 || stageView.getPaddingBottom()!=0))stageView.setPadding(0,0,0,0);
       if(shell.getBackground()==null || !(shell.getBackground() instanceof android.graphics.drawable.ColorDrawable) || ((android.graphics.drawable.ColorDrawable)shell.getBackground()).getColor()!=0xff000000)shell.setBackgroundColor(0xff000000);
       if(browser.getBackground()==null || !(browser.getBackground() instanceof android.graphics.drawable.ColorDrawable) || ((android.graphics.drawable.ColorDrawable)browser.getBackground()).getColor()!=0xff000000)browser.setBackgroundColor(0xff000000);if(browser.getPaddingLeft()!=0 || browser.getPaddingTop()!=0 || browser.getPaddingRight()!=0 || browser.getPaddingBottom()!=0)browser.setPadding(0,0,0,0);
-      if(toolbar.getPaddingLeft()!=0 || toolbar.getPaddingTop()!=0 || toolbar.getPaddingRight()!=0 || toolbar.getPaddingBottom()!=0)toolbar.setPadding(0,0,0,0);if(toolbar.getGravity()!=Gravity.CENTER_VERTICAL)toolbar.setGravity(Gravity.CENTER_VERTICAL);headerSurface.scale=scale;if(toolbar.getBackground()!=headerSurface)toolbar.setBackground(headerSurface);
-      if(details.getPaddingLeft()!=0 || details.getPaddingTop()!=0 || details.getPaddingRight()!=0 || details.getPaddingBottom()!=0)details.setPadding(0,0,0,0);detailSurface.scale=scale;if(details.getBackground()!=detailSurface)details.setBackground(detailSurface);
-      previewSurface.scale=scale;if(preview.getBackground()!=previewSurface)preview.setBackground(previewSurface);if(preview.getOutlineProvider()!=ViewOutlineProvider.BACKGROUND)preview.setOutlineProvider(ViewOutlineProvider.BACKGROUND);if(!preview.getClipToOutline())preview.setClipToOutline(true);if(preview.getPaddingLeft()!=px(10) || preview.getPaddingTop()!=px(14) || preview.getPaddingRight()!=px(10) || preview.getPaddingBottom()!=px(10))preview.setPadding(px(10),px(14),px(10),px(10));
+      if(toolbar.getPaddingLeft()!=0 || toolbar.getPaddingTop()!=0 || toolbar.getPaddingRight()!=0 || toolbar.getPaddingBottom()!=0)toolbar.setPadding(0,0,0,0);if(toolbar.getGravity()!=Gravity.CENTER_VERTICAL)toolbar.setGravity(Gravity.CENTER_VERTICAL);headerSurface.scale=scale;if(toolbar.getBackground()!=headerSurface && !toolbarAmbient.valid())toolbar.setBackground(headerSurface);
+      if(details.getPaddingLeft()!=0 || details.getPaddingTop()!=0 || details.getPaddingRight()!=0 || details.getPaddingBottom()!=0)details.setPadding(0,0,0,0);detailSurface.scale=scale;if(details.getBackground()!=detailSurface && !detailsAmbient.valid())details.setBackground(detailSurface);
+      previewSurface.scale=scale;if(preview.getBackground()!=previewSurface)preview.setBackground(previewSurface);if(preview.getOutlineProvider()!=ViewOutlineProvider.BACKGROUND)preview.setOutlineProvider(ViewOutlineProvider.BACKGROUND);if(!preview.getClipToOutline())preview.setClipToOutline(true);if(preview.getPaddingLeft()!=0 || preview.getPaddingTop()!=0 || preview.getPaddingRight()!=0 || preview.getPaddingBottom()!=0)preview.setPadding(0,0,0,0);textureInset();
       styleHeader(a);styleBrowser(a);styleDetails();
+    }
+    void textureInset(){
+      // Inset the original video only. Native controls/status/PiP use the full
+      // host coordinate plane and must not inherit video padding or clipping.
+      if(texture==null || texture.getParent()!=preview)return;
+      int left=px(10),top=px(14),right=px(10),bottom=px(10);ViewGroup.LayoutParams old=texture.getLayoutParams();
+      if(old instanceof FrameLayout.LayoutParams){FrameLayout.LayoutParams p=(FrameLayout.LayoutParams)old;if(p.width==ViewGroup.LayoutParams.MATCH_PARENT && p.height==ViewGroup.LayoutParams.MATCH_PARENT && p.leftMargin==left && p.topMargin==top && p.rightMargin==right && p.bottomMargin==bottom){ownedTextureParams=p;return;}}
+      FrameLayout.LayoutParams p=new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT);p.leftMargin=left;p.topMargin=top;p.rightMargin=right;p.bottomMargin=bottom;texture.setLayoutParams(p);ownedTextureParams=p;
     }
     void physicalLayout(Activity a,Object model){
       if(shell.getWidth()<=0 || shell.getHeight()<=0)return;
@@ -385,6 +407,43 @@ public final class CobraCardsLayout {
     public void onViewDetachedFromWindow(View view){restoreStage();}
   }
 
+  /** One bounded native wrapper per owned panel. Types, alpha, orientation,
+   * radius and stroke match accepted cobraAmbientSurface exactly. */
+  private static final class AmbientPanel {
+    final View view;final PanelSurface panel;final Map<View,Drawable> base,applied;
+    final boolean hadBase,hadApplied;final Drawable originalBase,originalApplied;
+    LayerDrawable wrapper;int tint,mode,radius,densityBits;boolean night,handled;
+    @SuppressWarnings("unchecked") AmbientPanel(Activity a,View view,PanelSurface panel){
+      this.view=view;this.panel=panel;base=(Map<View,Drawable>)read(a,"mCobraAmbientSurfaceBase");applied=(Map<View,Drawable>)read(a,"mCobraAmbientSurfaceApplied");
+      hadBase=base.containsKey(view);hadApplied=applied.containsKey(view);originalBase=base.get(view);originalApplied=applied.get(view);
+    }
+    boolean valid(){return wrapper!=null && view.getBackground()==wrapper && base.get(view)==panel && applied.get(view)==wrapper;}
+    boolean apply(int nextTint,int nextMode,int nextRadius,boolean nextNight,float density){
+      Drawable current=view.getBackground();if(current!=panel && !valid())return false;
+      handled=true;
+      if(nextMode==0 && !nextNight){if(current!=panel)view.setBackground(panel);base.remove(view);applied.remove(view);return true;}
+      int bits=Float.floatToIntBits(density);
+      if(wrapper==null || tint!=nextTint || mode!=nextMode || radius!=nextRadius || night!=nextNight || densityBits!=bits){
+        int lineAlpha=nextNight?230:nextMode==2?245:150,fillAlpha=nextNight?218:nextMode==2?30:13;
+        int lineColor=Color.argb(lineAlpha,Color.red(nextTint),Color.green(nextTint),Color.blue(nextTint));
+        int fillColor=nextNight?Color.argb(fillAlpha,0,0,0):Color.argb(fillAlpha,Color.red(nextTint),Color.green(nextTint),Color.blue(nextTint));
+        GradientDrawable gradient=new GradientDrawable(GradientDrawable.Orientation.TL_BR,new int[]{fillColor,0,0});gradient.setCornerRadius(Math.max(1,Math.round(nextRadius*density)));
+        GradientDrawable stroke=new GradientDrawable();stroke.setColor(0);stroke.setCornerRadius(Math.max(1,Math.round(nextRadius*density)));stroke.setStroke(Math.max(1,Math.round((nextMode!=2 && !nextNight?1:2)*density)),lineColor);
+        wrapper=new LayerDrawable(new Drawable[]{panel,gradient,stroke});if(Build.VERSION.SDK_INT>=23)wrapper.setPaddingMode(LayerDrawable.PADDING_MODE_STACK);
+        tint=nextTint;mode=nextMode;radius=nextRadius;night=nextNight;densityBits=bits;
+      }
+      base.put(view,panel);applied.put(view,wrapper);if(view.getBackground()!=wrapper)view.setBackground(wrapper);return true;
+    }
+    void restore(){
+      // Restore only mappings still owned by us, never a newer native writer.
+      if(handled && (valid() || !base.containsKey(view) && !applied.containsKey(view))){
+        if(hadBase)base.put(view,originalBase);else base.remove(view);
+        if(hadApplied)applied.put(view,originalApplied);else applied.remove(view);
+      }
+      wrapper=null;
+    }
+  }
+
   /** Owns presentation only. The original native legacy label and StatusSlot
    * remain in place, with their native listeners, pulse state and accessibility. */
   private static final class PreviewBadge implements View.OnLayoutChangeListener {
@@ -443,18 +502,18 @@ public final class CobraCardsLayout {
       active=true;background.scale=owner.scale;
       if(label.getBackground()!=background)label.setBackground(background);
       if(label.getTypeface()!=BOLD)label.setTypeface(BOLD);if(label.getCurrentTextColor()!=WHITE)label.setTextColor(WHITE);
-      float textSize=18*owner.scale*owner.font;if(label.getTextSize()!=textSize)label.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
+      float textSize=17*owner.scale*owner.font;if(label.getTextSize()!=textSize)label.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
       if(label.getIncludeFontPadding())label.setIncludeFontPadding(false);if(label.getGravity()!=(Gravity.CENTER_VERTICAL|Gravity.LEFT))label.setGravity(Gravity.CENTER_VERTICAL|Gravity.LEFT);
-      if(label.getMaxLines()!=1)label.setMaxLines(1);if(label.getLetterSpacing()!=.06f)label.setLetterSpacing(.06f);label.setEllipsize(null);
-      int padding=owner.px(12),diameter=owner.px(9),gap=owner.px(9);dot.setBounds(0,0,diameter,diameter);
+      if(label.getMaxLines()!=1)label.setMaxLines(1);if(label.getLetterSpacing()!=0)label.setLetterSpacing(0);label.setEllipsize(null);
+      int padding=owner.px(14),diameter=owner.px(14),gap=owner.px(11);dot.setBounds(0,0,diameter,diameter);
       if(label.getPaddingLeft()!=padding || label.getPaddingTop()!=0 || label.getPaddingRight()!=padding || label.getPaddingBottom()!=0)label.setPadding(padding,0,padding,0);
       if(!drawableOwned){label.setCompoundDrawablesRelative(dot,null,null,null);drawableOwned=true;}
       if(label.getCompoundDrawablePadding()!=gap)label.setCompoundDrawablePadding(gap);
       text(label,"LIVE");if(label.getAlpha()!=1)label.setAlpha(1);if(label.getVisibility()!=View.VISIBLE)label.setVisibility(View.VISIBLE);
       if(pulse!=null && pulse.getVisibility()!=View.GONE)pulse.setVisibility(View.GONE);
-      int bottom=owner.px(14);View controls=owner.preview.findViewWithTag("cobra_preview_controls");
+      int bottom=owner.px(26);View controls=owner.preview.findViewWithTag("cobra_preview_controls");
       if(controls!=null && controls.getVisibility()==View.VISIBLE){int height=controls.getHeight();if(height<=0 && controls.getLayoutParams()!=null)height=Math.max(0,controls.getLayoutParams().height);bottom=Math.max(bottom,height+owner.px(6));}
-      int width=owner.px(89*owner.font),height=owner.px(38*owner.font),left=owner.px(17);
+      int width=owner.px(89*owner.font),height=owner.px(38*owner.font),left=owner.px(27);
       FrameLayout.LayoutParams old=(FrameLayout.LayoutParams)container.getLayoutParams();
       if(old.width!=width || old.height!=height || old.gravity!=(Gravity.BOTTOM|Gravity.LEFT) || old.leftMargin!=left || old.bottomMargin!=bottom || old.topMargin!=0 || old.rightMargin!=0){
         FrameLayout.LayoutParams p=new FrameLayout.LayoutParams(width,height,Gravity.BOTTOM|Gravity.LEFT);p.leftMargin=left;p.bottomMargin=bottom;container.setLayoutParams(p);

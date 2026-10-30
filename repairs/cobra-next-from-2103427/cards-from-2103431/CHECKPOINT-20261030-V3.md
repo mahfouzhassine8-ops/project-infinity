@@ -14,7 +14,7 @@ Signed431 remains exact, original-key recovery. No new application APK, release 
 
 Both actual approved PNG and before JPG were inspected and SHA256 verified. Full native941×1672/420dpi render exposes real remaining parity defects:126pxheader rather than104, resulting21–23pxrail shift; duplicate native glyphs; missing genuine description and unfilled rendered progress; shared-style restoration differences on mode exit. Corrections are implemented in the current Layout source and await the next integrated render. Cards typography refinement is also source-complete. The native working floatingPiP control is preserved and remains an additional visible element versus the mockup; it is not hidden by the dynamic-video comparison region.
 
-LIVE/nativePiP nonoverlap and actual coordinatePiP callback, state/session gates and active ambient checks pass in V3. However the custom Cards panel introduces ambient-wrapper churn under active ambient mode; a matching431baseline is being measured before the smallest Cards-owned correction. No ambient suppression or unrelated mode patch is authorized or implemented.
+LIVE/nativePiP nonoverlap and actual coordinatePiP callback, state/session gates and active ambient checks pass in V3. The matching431baseline later confirmed the same ambient-wrapper churn already exists in431. A Cards-owned exact native-wrapper cache is now implemented and awaiting pixel/settings/off/restoration verification. No ambient suppression or unrelated mode patch is authorized or implemented.
 
 ## Android baseline
 

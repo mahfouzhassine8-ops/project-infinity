@@ -1,4 +1,4 @@
-"""Prepare the pinned actual owner-v3 host overlay. No behavioral execution.
+"""Prepare the pinned actual owner-v5 host overlay. No behavioral execution.
 
 Only five intentionally changed existing classes and the exact BUILD-declared
 helpers may replace/extend accepted431. All other host bytes stay exact431.
@@ -24,11 +24,11 @@ BASE_DEX = {
     'classes5.dex': 'af03db41f53209de52f5d8609e411da49fee106d0fe544d6ea6e5d8230d88363',
 }
 ACCEPTED_COBRA_ZIP = '98583b7a935103c8d13744fc624a6005f0566b1e3d26a47f240295cafd21cae7'
-BUILD_PIN = 'c71a792cc166f0e5c9f5cd83b8af83f85d1c6886f12ce9c85451da5b169cc970'
-CANONICAL_PIN = '236000df80d6534d210659354b022e830d5e916e3d584f38920c724ab20ac192'
+BUILD_PIN = 'b2d0cdbac187ebdd4e58eec6092d37f6cd30921c4f2f8581fad0b22835911b51'
+CANONICAL_PIN = '1e93bcc590ff5e1cc0389b141bdc4014f9ffe2e6dc9e40931ecd7af21904542a'
 OWNER_DEX = {
-    'part-0.dex': '7d27a7a73b78599f2fa08a3451b24be27ea2a4b4404b8666cf9862cb6bad0c46',
-    'part-1.dex': '2cccda92792bc5a3827b0e5f15bd5c214b1ac9c1697988f2d762629de4dd12fa',
+    'part-0.dex': 'd96ba2dd968f6232da150eeed53c3042c9dab54856e4e72a514881da41ce9db1',
+    'part-1.dex': '54be04edbd5a95d41fd9711ae9846bfadc753f65dd919762e4476f1ff6eb3602',
 }
 CHANGED = {
     'com/projectinfinity/kodi/InfinityLiveActivity.class',
@@ -100,11 +100,12 @@ def prepare(baseline, build, dex2jar, accepted_component, out):
     for name, pin in OWNER_DEX.items():
         assert sha(build / 'owner-dex/COBRA' / name) == pin, name
     compiler_sources = receipt['compiler_source_files']
-    assert len(compiler_sources) == 20, 'Pinned v3 complete compiler-source manifest required'
+    assert len(compiler_sources) == 20, 'Pinned v5 complete compiler-source manifest required'
     for name, pin in compiler_sources.items():
         source = (REPO / name).resolve()
         assert source.is_relative_to(REPO), 'Source manifest escaped repository'
         assert sha(source) == pin, 'Compiler source changed after owner build: ' + name
+        assert sha(build / 'compiler-source-snapshot' / name) == pin, 'Frozen compiler snapshot mismatch: ' + name
     helpers = receipt['helper_sources']
     assert len(helpers) == len(HELPER_ROOTS) == 4
     for name, pin in helpers.items():
@@ -134,6 +135,7 @@ def prepare(baseline, build, dex2jar, accepted_component, out):
     assert canonical['new_DEX_sha256'] == OWNER_DEX
     assert canonical['build_receipt_sha256'] == BUILD_PIN
     assert canonical['compiler_source_files'] == compiler_sources
+    assert canonical['verifier_source_sha256'] == sha(HERE.parent / 'verify_owner_source.py'), 'Independent verifier source changed'
     assert {class_name(n) for n in canonical['changed_existing_classes']} == CHANGED
     assert {class_name(n) for n in canonical['new_classes']} == new_expected
     assert not canonical['missing_classes']
@@ -166,11 +168,12 @@ def prepare(baseline, build, dex2jar, accepted_component, out):
     out.mkdir(parents=True)
     binding = {
         'status': 'PREPARING_ACTUAL_OWNER_DEX_CLASSPATH',
-        'phase': 'UNSIGNED_COBRA_OWNER_PROTOTYPE_V3_NO_APK',
+        'phase': 'UNSIGNED_COBRA_OWNER_PROTOTYPE_V5_NO_APK',
         'baseline_signed_source': SIGNED_SOURCE, 'baseline_APK_sha256': SIGNED_APK,
         'baseline_DEX_sha256': BASE_DEX, 'owner_DEX_sha256': OWNER_DEX,
         'owner_BUILD_sha256': BUILD_PIN, 'owner_BUILD': receipt,
-        'compiler_source_files': compiler_sources, 'helper_source_sha256': helpers,
+        'compiler_source_files': compiler_sources, 'frozen_compiler_snapshot': 'ALL_MANIFEST_FILES_BYTE_VERIFIED',
+        'helper_source_sha256': helpers, 'verifier_source_sha256': canonical['verifier_source_sha256'],
         'allowed_changed_existing_classes': sorted(CHANGED),
         'expected_new_helper_classes': sorted(new_expected),
         'canonical_chain': {

@@ -55,6 +55,10 @@ def build(bundles,jars,android,d8,dex2jar,out):
     bundles,jars,android,d8,dex2jar,out=(p.resolve() for p in (bundles,jars,android,d8,dex2jar,out))
     assert not out.exists();out.mkdir()
     source_files={str(p.relative_to(REPO)):file_sha(p) for p in compiler_sources()}
+    for relative,pin in source_files.items():
+        frozen=out/'compiler-source-snapshot'/relative
+        frozen.parent.mkdir(parents=True,exist_ok=True);frozen.write_bytes((REPO/relative).read_bytes())
+        assert file_sha(frozen)==pin,'Exact immutable compiler input snapshot required'
     assert file_sha(android)==ANDROID_SHA and file_sha(d8)==D8_SHA
     assert {p.name:file_sha(p) for p in jars.glob('*.jar')}==load(REPO/'repairs/universal-persistence-2103401/RECEIPT-TOOL-PINS.json')
     assert {p.name:file_sha(p) for p in (dex2jar/'lib').glob('*.jar')}==load(HERE/'DEX2JAR-LIB-PINS.json')
@@ -130,7 +134,8 @@ def build(bundles,jars,android,d8,dex2jar,out):
     layout_methods=projection_patch.methods((helper_smali/'com/projectinfinity/kodi/CobraCardsLayout.smali').read_text())
     assert {'public static beforeShell(Landroid/app/Activity;)V','public static layout(Landroid/app/Activity;Ljava/lang/Object;)V',
         'public static afterRender(Landroid/app/Activity;)V','public static refreshDetails(Landroid/app/Activity;)Z',
-        'public static refreshPreview(Landroid/app/Activity;)V'}<=set(layout_methods),'Exact Cards native hook API required'
+        'public static refreshPreview(Landroid/app/Activity;)V',
+        'public static ambientSurface(Landroid/app/Activity;Landroid/view/View;IIIZ)Z'}<=set(layout_methods),'Exact Cards native hook API required'
     assignments={name:'COBRA' for name in sources}
     for p in helper_smali.rglob('*.smali'):
         name=p.read_text().splitlines()[0].split()[-1];assert name not in assignments;assignments[name]='COBRA'
