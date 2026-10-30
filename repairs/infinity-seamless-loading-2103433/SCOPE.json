@@ -62,7 +62,8 @@
       "test_notification_overflow_filters_and_stale_epoch_clear_only_ui",
       "test_original_dispatch_ends_only_its_launch_cue_without_fake_readiness"
     ],
-    "purpose": "Actual staged loading client/monitor using host-built exact upstream Kodi SplitParams parser and generated XML. Checks source identity, privacy, native JSON transport, original exception propagation, bounded lost-event cleanup, no new threads or background focus queries. Does not execute application native libraries or imply physical acceptance."
+    "purpose": "Actual staged loading client/monitor using host-built exact upstream Kodi SplitParams parser and generated XML. Checks source identity, privacy, native JSON transport, original exception propagation, bounded lost-event cleanup, no new threads or background focus queries. Does not execute application native libraries or imply physical acceptance.",
+    "selected_before_execution": true
   },
   "additional_identity_cases": "Same-index section/provider/home-section/source/dbid and locally hashed path change clear the old item cue; original navigation unchanged.",
   "unsupported_route_cleanup": "Record actual original builtin dispatch completion, cancel only matching native launch token. Never invent third-party ready; independent actual preparation survives. Actual XML action order/count and completion/error/cancel rechecked.",
