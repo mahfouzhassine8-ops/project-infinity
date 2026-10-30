@@ -54,5 +54,14 @@
     "artifact": 13006320963,
     "artifact_sha256": "14cd416d7f56542b3408f3aea0366af5546f52a31afa676dcd29b77c3ae91eba",
     "selected_before_execution": true
+  },
+  "android41116655432": {
+    "source": "1fcc877f47fd39ab9c9e907104a0bafc16fe825a",
+    "outcome": "CARDS_SUN_REAL_PRESS_OPENS_ORIGINAL_MENU; NIGHT_OFF_PRESS_DISMISSES; REOPEN_BACK_WORK; FULLSCREEN_NOT_ATTEMPTED",
+    "artifact": 13005244735,
+    "artifact_sha256": "a2d4135f30da3954f220a4d3f4908d8257313b4b96cc01dbd5e9b82f652eb011",
+    "proof": "Actual captured pixels show original Visual settings menu; current native accessibility labels and injected coordinates retained. Does not refute physical phone report.",
+    "failure": "QA assumed a TextureView accessibility node. Native compressed public tree does not expose the video texture; the actual preview is visible and its PiP button is exposed. Test stopped before pressing preview/fullscreen.",
+    "next_selected_before_execution": "Reuse same434 bytes and source/mode setup. Derive original clickable preview host through actual visible PiP button public ancestry with strict containment/dimensions and center outside PiP. No private app state, guessed coordinates, callback invocation, timeout change or production mutation. Run only actual fullscreen->More->Back/reopen. Retain passing sun evidence; do not repeat it."
   }
 }

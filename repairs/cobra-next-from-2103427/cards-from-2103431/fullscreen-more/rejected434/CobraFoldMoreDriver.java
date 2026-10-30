@@ -103,11 +103,24 @@ public final class CobraFoldMoreDriver {
   require(off!=null,"Original Night Cinema Off row must have current visible touch bounds");tap(off,"Original Night Cinema Off row");syncInputs();await("(?m)^Visual settings$",false);
   tap("(?m)^Visual settings(?:,|:).*");await("(?m)^Night Cinema$",true);screenshot("cards-sun-menu-reopened");back();syncInputs();await("(?m)^Visual settings$",false);
  }
- static Rect preview()throws Exception{Tree t=new Tree();try{for(AccessibilityNodeInfo n:t.nodes)if("android.view.TextureView".contentEquals(n.getClassName())&&n.isVisibleToUser()){Rect r=new Rect();n.getBoundsInScreen(r);if(r.width()>120&&r.height()>100)return r;}throw new IllegalStateException("Current Cards video texture not observed");}finally{t.close();}}
+ static Rect preview()throws Exception{
+  Tree t=new Tree();AccessibilityNodeInfo parent=null;JSONArray chain=new JSONArray();
+  try{
+   AccessibilityNodeInfo pip=t.find("(?m)^Picture-in-Picture$",true);require(pip!=null,"Actual current Cards small PiP anchor required");Rect child=new Rect();pip.getBoundsInScreen(child);parent=pip.getParent();
+   for(int depth=0;parent!=null&&depth<6;depth++){
+    Rect r=new Rect();parent.getBoundsInScreen(r);chain.put(new JSONObject().put("class",String.valueOf(parent.getClassName())).put("bounds",box(r)).put("visible",parent.isVisibleToUser()).put("clickable",parent.isClickable()));
+    if(parent.isVisibleToUser()&&parent.isClickable()&&r.contains(child)&&r.width()>child.width()*2&&r.height()>child.height()){
+     require(!child.contains(r.centerX(),r.centerY()),"Preview center must not overlap small PiP button");write("actual-preview-public-ancestry.json",new JSONObject().put("PiP_anchor",box(child)).put("original_clickable_host",box(r)).put("chain",chain));return r;
+    }
+    AccessibilityNodeInfo next=parent.getParent();parent.recycle();parent=next;
+   }
+   write("missing-preview-public-ancestry.json",new JSONObject().put("chain",chain).put("labels",t.labels()));throw new IllegalStateException("Original clickable Cards preview host not exposed through actual PiP ancestry");
+  }finally{if(parent!=null)parent.recycle();t.close();}
+ }
  static void fullscreen()throws Exception{
   if(has("(?m)^Return to preview$"))return;
   // Cards uses its original preview's real visible coordinate, never a callback.
-  Rect r=preview();long changed=SystemClock.uptimeMillis();tap(r,"Current Cards preview");
+  Rect r=preview();long changed=SystemClock.uptimeMillis();tap(r,"Current Cards preview");syncInputs();
   if(has("(?m)^Return to preview$"))return;
   long started=changed;Rect full=waitBounds("(?m)^Fullscreen$",PLAYER_PRESS_LIMIT);
   require(SystemClock.uptimeMillis()-started<PLAYER_PRESS_LIMIT,"Inline target observation expired; no press");tap(full,"Cards inline Fullscreen");require(SystemClock.uptimeMillis()-started<PLAYER_PRESS_LIMIT,"Inline press completed after valid interval");
@@ -137,7 +150,7 @@ public final class CobraFoldMoreDriver {
    Class<?> c=Class.forName("com.android.uiautomator.core.UiAutomationShellWrapper");wrapper=c.getConstructor().newInstance();c.getMethod("connect").invoke(wrapper);disconnect=c.getMethod("disconnect");c.getMethod("setCompressedLayoutHierarchy",boolean.class).invoke(wrapper,true);ui=(UiAutomation)c.getMethod("getUiAutomation").invoke(wrapper);
    android.accessibilityservice.AccessibilityServiceInfo info=ui.getServiceInfo();info.flags|=android.accessibilityservice.AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS;ui.setServiceInfo(info);
    require(java.lang.reflect.Modifier.isPublic(UiAutomation.class.getMethod("syncInputTransactions",boolean.class).getModifiers()),"Current OS public transaction synchronization unavailable");
-   enterSource();visualSettings();fullscreen();more(1);more(2);report.put("status","EXACT_REJECTED434_SUN_FULLSCREEN_MORE_OBSERVED; EMULATOR_ONLY_NOT_PHYSICAL_ACCEPTANCE");
+   enterSource();fullscreen();more(1);more(2);report.put("status","EXACT_REJECTED434_FULLSCREEN_MORE_OBSERVED; SUN_RETAINED41116655432; EMULATOR_ONLY_NOT_PHYSICAL_ACCEPTANCE");
   }catch(Throwable e){report.put("status","FAILED_CLOSED").put("error",e.toString());if(ui!=null)try{screenshot("failure");}catch(Throwable ignored){}if(e instanceof Exception)throw (Exception)e;throw (Error)e;}
   finally{write("OUTCOME.json",report);if(disconnect!=null)disconnect.invoke(wrapper);}
  }
