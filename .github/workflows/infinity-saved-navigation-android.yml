@@ -33,7 +33,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   infinity-loading-host:
-    name: Infinity434 seamless loading source and actual generated skin checks
+    name: Infinity current-window loading correction and actual generated skin checks
     if: github.event_name == 'workflow_dispatch' && inputs.feature == 'infinity-seamless-loading434'
     runs-on: ubuntu-22.04
     timeout-minutes: 15
@@ -63,7 +63,7 @@ jobs:
       - name: Stage exact signed source and execute only selected loading checks
         run: |
           python3 repairs/infinity-seamless-loading-2103433/run_host.py \
-            --baseline loading433-components/INFINITY.zip --out loading-host
+            --baseline loading433-components/INFINITY.zip --out loading-host --selection current-window
       - name: Preserve loading source and exact host evidence
         if: always()
         uses: actions/upload-artifact@v4

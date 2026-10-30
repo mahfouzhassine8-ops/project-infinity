@@ -22,7 +22,9 @@ def remove_loading(node):
         text=child.text or ''
         selected=(child.tag=='include' and (child.get('content')=='InfinityActionLoadingFrame' or child.get('file')=='Includes_InfinityActionLoading.xml') or
                   child.tag=='param' and child.get('name')=='loadingcontrol' or
+                  child.tag=='control' and child.findtext('description')=='INFINITY_ACTION_LOADING_V1 drawer frame' or
                   child.tag in ('onclick','onload','onunload','visible') and 'Infinity.Loading.' in text or
+                  child.tag=='visible' and text=='false' and node.findtext("control[@type='label']/label")=='Loading…' or
                   child.tag=='onclick' and 'seamless.loading' in text)
         if selected:node.remove(child)
         else:remove_loading(child)
