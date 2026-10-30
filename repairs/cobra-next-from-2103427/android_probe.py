@@ -1,7 +1,7 @@
 """One finite exact-APK Cobra launch on a fresh disposable API37 emulator.
 No Infinity launch, root/data injection, restart, clear, teardown or shutdown.
 """
-import argparse,hashlib,json,math,re,subprocess,time,xml.etree.ElementTree as ET
+import argparse,hashlib,json,math,re,subprocess,time,zipfile,xml.etree.ElementTree as ET
 from pathlib import Path
 PACKAGE='com.projectinfinity.kodi'
 def adb(*args,check=True,timeout=30):
@@ -17,6 +17,27 @@ def confirm_installed_apk(expected,apk_io_timeout=30):
  observed=adb('shell','sha256sum',path,timeout=apk_io_timeout).split()
  assert observed and observed[0]==expected,'Installed APK does not match the exact signed artifact'
  return {'installed_base_apk':path,'installed_apk_sha256':observed[0]}
+
+def compatibility_notice_ok(tree,native_paths):
+ nodes=list(tree.iter('node'))
+ def one(resource,text=None):
+  matches=[n for n in nodes if n.get('package')=='android' and n.get('resource-id')==resource and (text is None or n.get('text')==text)]
+  return matches[0] if len(matches)==1 else None
+ title=one('android:id/alertTitle','Android App Compatibility')
+ message=one('android:id/message');ok=one('android:id/button2','OK')
+ persistent=one('android:id/button1',"Don't Show Again")
+ if title is None or message is None or ok is None or persistent is None:return None
+ body=message.get('text','')
+ if ('This app will be run using page size compatible mode.' not in body or
+     'LOAD segment and RELRO segment alignment checks failed.' not in body):return None
+ libraries=set(re.findall(r'lib/arm64-v8a/[A-Za-z0-9_.+-]+\.so',body))
+ if not libraries or not libraries<=native_paths:return None
+ if ok.get('clickable')!='true' or ok.get('enabled')!='true':return None
+ values=list(map(int,re.findall(r'\d+',ok.get('bounds',''))))
+ if len(values)!=4 or values[2]-values[0]<32 or values[3]-values[1]<32:return None
+ return {'coordinate':[(values[0]+values[2])//2,(values[1]+values[3])//2],
+  'button_bounds':values,'warning':body,'native_members':sorted(libraries),
+  'action':'ANDROID_INFORMATIONAL_OK_ONLY; NO_DONT_SHOW_AGAIN_OR_COMPAT_SETTING_CHANGE'}
 
 def probe(apk,out,expected):
  out.mkdir(parents=True);report={'runtime':'DISPOSABLE_ANDROID17_API37_X86_64_EMULATOR','physical_Fold':'NOT_RUN','shutdown':'NOT_RUN','Infinity':'NOT_LAUNCHED'}
@@ -47,12 +68,24 @@ def probe(apk,out,expected):
   report['install_seconds_including_confirmation']=round(time.monotonic()-install_started,3)
   start=time.monotonic();result=adb('shell','am','start','-W','-n',PACKAGE+'/.InfinityLiveActivity');(out/'launch.txt').write_text(result)
   assert 'Error' not in result,result
+  assert 'Status: ok' in result and (PACKAGE+'/.InfinityLiveActivity' in result or PACKAGE+'/'+PACKAGE+'.InfinityLiveActivity' in result),'Expected Cobra Activity launch required'
+  with zipfile.ZipFile(apk) as source:native_paths={n for n in source.namelist() if n.startswith('lib/arm64-v8a/') and n.endswith('.so')}
   for i in range(30):
    adb('shell','uiautomator','dump','/sdcard/cobra-qa-ui.xml',check=False)
    raw=adb('shell','cat','/sdcard/cobra-qa-ui.xml',check=False)
    (out/'last-ui.xml').write_text(raw)
    try:tree=ET.fromstring(raw)
    except ET.ParseError:time.sleep(.5);continue
+   notice=compatibility_notice_ok(tree,native_paths)
+   if notice is not None:
+    assert 'Android_compatibility_notice' not in report,'Repeated compatibility notice refused'
+    (out/'android-compatibility-notice.xml').write_text(raw)
+    capture=subprocess.run(['adb','exec-out','screencap','-p'],capture_output=True,timeout=15)
+    assert capture.returncode==0 and capture.stdout,'Compatibility notice capture required before acknowledgement'
+    (out/'android-compatibility-notice.png').write_bytes(capture.stdout)
+    report['Android_compatibility_notice']=notice
+    adb('shell','input','tap',*[str(v) for v in notice['coordinate']])
+    continue
    labels=[n.get('text','') or n.get('content-desc','') for n in tree.iter('node')]
    own=any(n.get('package')==PACKAGE for n in tree.iter('node'))
    if own and any(re.search(r'Channels|Guide|Add source|Add Source|Live TV|M3U|Sources',s) for s in labels):

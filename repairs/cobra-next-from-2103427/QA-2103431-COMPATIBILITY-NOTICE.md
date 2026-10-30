@@ -1,0 +1,9 @@
+# Preserve and acknowledge the known Android compatibility notice
+
+Run40981874553 completed the normal full APK installation and verified its exact installed SHA256. Installation and verification took94.241 seconds within the size-appropriate120-second infrastructure budget. The exported Cobra Activity returned `Status: ok`, cold launch4090ms. Feature observation then stopped because an Android-owned **Android App Compatibility** informational dialog covered the Activity. No icon or player-button test ran.
+
+The captured notice states that the app **will be run using page size compatible mode**, and lists LOAD/RELRO alignment warnings for the preserved ARM64 native libraries. These ELF segment properties are distinct from the independently verified APK ZIP member offsets/alignment. No claim of native16KB compatibility or native repair is made. All47 original native files remain frozen.
+
+Selected QA correction for the same signed431 candidate: after verifying the expected Cobra Activity launch, recognize only this exact Android title/message/button combination, validate every listed native path against the actual signed APK, and capture the full XML and PNG. Select the native **OK** coordinate once, then observe Cobra normally. Never select **Don't Show Again**, alter compatibility settings/system properties, modify native files or mark any feature passed from this acknowledgement. Repeated or unrecognized dialogs fail the existing observation path.
+
+This is a normal informational acknowledgement in the fresh disposable emulator. The OS-selected compatibility mode remains in force. The complete warning remains in the final evidence and limitations. Player visibility, freshness guards, original signatures, exact APK checks and protected shutdown remain unchanged; physical Fold acceptance is not established.
