@@ -52,6 +52,25 @@ public class CobraCardsReuseNativeTest {
   static List<Object> adapterItems(GridView g){List<Object> items=new ArrayList<>();for(int i=0;i<g.getCount();i++)items.add(g.getAdapter().getItem(i));return items;}
   static void sameItems(List<Object> before,GridView after){assertEquals(before.size(),after.getCount());for(int i=0;i<before.size();i++)assertSame("Original Channel reference "+i,before.get(i),after.getAdapter().getItem(i));}
   static void shellReturn(CobraSettingsReturnBaselineTest.Fixture f)throws Exception{call(f.a,"cobraShowGuideShell");f.layout();}
+  static JSONObject retainedCardDiagnostic(CobraSettingsReturnBaselineTest.Fixture f,View card,Object selected)throws Exception{
+    Class<?> tiles=Class.forName("com.projectinfinity.kodi.CobraCardsTiles");Method method=tiles.getDeclaredMethod("holder",LinearLayout.class);method.setAccessible(true);
+    Object holder=method.invoke(null,card),bound=get(holder,"bound"),preview=get(f.a,"mGuidePreviewChannel");GridView grid=grid(f);View focus=grid.findFocus();
+    JSONObject metrics=new JSONObject();for(String field:new String[]{"adapterPosition","measuredRow","measuredWidth","configuredHeight","measuredFont","configuredWidth","configuredFont","requiredNowHeight","contentGeneration","configuredContentGeneration","configuring","rowSyncPending","selectionAfterResize","hasLive","start","stop"})metrics.put(field,get(holder,field));
+    Object boundAdapter=((java.lang.ref.WeakReference<?>)get(holder,"boundAdapter")).get(),measuredAdapter=((java.lang.ref.WeakReference<?>)get(holder,"measuredAdapter")).get();
+    metrics.put("measuredLabels",new JSONArray((String[])get(holder,"measuredLabels"))).put("measuredTextHeights",new JSONArray((int[])get(holder,"measuredTextHeights")));
+    ViewGroup.LayoutParams params=card.getLayoutParams();Object programme=call(f.a,"cobraCurrentProgram",selected);android.graphics.drawable.Drawable surface=card.getBackground();
+    return new JSONObject().put("card_identity",System.identityHashCode(card)).put("card_class",card.getClass().getName()).put("tag",card.getTag())
+      .put("bound_channel_id",bound==null?JSONObject.NULL:get(bound,"id")).put("selected_variable_id",get(selected,"id")).put("preview_channel_id",preview==null?JSONObject.NULL:get(preview,"id"))
+      .put("native_selected_variable",call(f.a,"cobraModeSelected",selected)).put("native_selected_bound",bound==null?JSONObject.NULL:call(f.a,"cobraModeSelected",bound)).put("view_selected",card.isSelected())
+      .put("view_focused",card.isFocused()).put("view_has_focus",card.hasFocus()).put("focus_identity",focus==null?JSONObject.NULL:System.identityHashCode(focus)).put("focus_tag",focus==null?JSONObject.NULL:focus.getTag())
+      .put("surface_class",surface.getClass().getName()).put("surface_selected",get(surface,"selected")).put("surface_focused",get(surface,"focus")).put("drawable_state",new JSONArray(card.getDrawableState()))
+      .put("native_current_programme",programme==null?JSONObject.NULL:get(programme,"title")).put("actual_now_text",String.valueOf(((TextView)get(card,"now")).getText())).put("actual_time_text",String.valueOf(((TextView)get(card,"time")).getText())).put("actual_accessibility",String.valueOf(card.getContentDescription()))
+      .put("actual_size",new JSONArray(new int[]{card.getWidth(),card.getHeight()})).put("layout_params_size",params==null?JSONObject.NULL:new JSONArray(new int[]{params.width,params.height}))
+      .put("card_layout_requested",card.isLayoutRequested()).put("grid_layout_requested",grid.isLayoutRequested()).put("card_attached",card.isAttachedToWindow()).put("card_parent_is_current_grid",card.getParent()==grid)
+      .put("first_visible",grid.getFirstVisiblePosition()).put("first_child_top",grid.getChildAt(0).getTop()).put("grid_selected_position",grid.getSelectedItemPosition()).put("card_adapter_position",grid.getPositionForView(card))
+      .put("native_adapter_class",grid.getAdapter().getClass().getName()).put("native_adapter_identity",System.identityHashCode(grid.getAdapter())).put("bound_adapter_identity",boundAdapter==null?JSONObject.NULL:System.identityHashCode(boundAdapter)).put("measured_adapter_identity",measuredAdapter==null?JSONObject.NULL:System.identityHashCode(measuredAdapter))
+      .put("holder",metrics);
+  }
 
   @Test public void actualAccepted431ReturnBaseline()throws Exception{
     CobraSettingsReturnBaselineTest.Fixture f=fixture(240);GridView before=grid(f);List<Object> refs=adapterItems(before);
@@ -69,13 +88,26 @@ public class CobraCardsReuseNativeTest {
     int first=before.getFirstVisiblePosition(),top=before.getChildAt(0).getTop();View child=before.getChildAt(0);
     boolean focused=child.requestFocus();View oldFocus=before.findFocus();assertTrue("Actual native focus request must succeed",focused);assertNotNull("Actual focused native view required",oldFocus);Object adapter=before.getAdapter();List<Object> refs=adapterItems(before);
     Object selected=before.getAdapter().getItem(first);set(f.a,"mGuidePreviewChannel",selected);
+    List<int[]> cardLayouts=new ArrayList<>(),gridLayouts=new ArrayList<>();
+    View.OnLayoutChangeListener cardObserver=(v,l,t,r,b,ol,ot,or,ob)->cardLayouts.add(new int[]{l,t,r,b,ol,ot,or,ob,v.isSelected()?1:0});
+    View.OnLayoutChangeListener gridObserver=(v,l,t,r,b,ol,ot,or,ob)->gridLayouts.add(new int[]{l,t,r,b,ol,ot,or,ob});
+    child.addOnLayoutChangeListener(cardObserver);before.addOnLayoutChangeListener(gridObserver);
+    JSONObject beforeClock=retainedCardDiagnostic(f,child,selected);
     // Advance the actual controlled Android clock without dispatching worker bodies.
     ShadowSystemClock.advanceBy(Duration.ofMinutes(61));
     Object current=call(f.a,"cobraCurrentProgram",selected);assertNotNull(current);assertTrue(String.valueOf(get(current,"title")).startsWith("Next "));
-    f.observeBrowser();shellReturn(f);
+    JSONObject beforeReturn=retainedCardDiagnostic(f,child,selected);
+    f.observeBrowser();call(f.a,"cobraShowGuideShell");JSONObject synchronousReturn=retainedCardDiagnostic(f,child,selected);f.layout();
     assertSame(before,grid(f));assertSame(adapter,grid(f).getAdapter());sameItems(refs,grid(f));
     assertEquals(first,before.getFirstVisiblePosition());assertEquals(top,before.getChildAt(0).getTop());
     assertSame(child,before.getChildAt(0));assertSame("Actual native focus identity retained",oldFocus,before.findFocus());
+    JSONObject afterReturn=retainedCardDiagnostic(f,child,selected);child.removeOnLayoutChangeListener(cardObserver);before.removeOnLayoutChangeListener(gridObserver);
+    write("REUSE-PREASSERT-DIAGNOSTIC",new JSONObject().put("status","OBSERVED_BEFORE_UNCHANGED_STRICT_SELECTION_ASSERTION")
+      .put("before_clock_advance",beforeClock).put("after_clock_before_return",beforeReturn).put("synchronous_shell_return",synchronousReturn).put("after_return_layout_before_assert",afterReturn)
+      .put("expected_current_programme",get(current,"title")).put("captured_first_visible",first).put("captured_first_top",top).put("original_native_adapter_identity",System.identityHashCode(adapter))
+      .put("card_layout_change_events",new JSONArray(cardLayouts)).put("grid_layout_change_events",new JSONArray(gridLayouts))
+      .put("layout_observation_limit","Additive OnLayoutChangeListener observes bounds changes or layout-required callbacks; it does not intercept every GridView layoutChildren/setupChild invocation")
+      .put("strict_selectedflag_assertion","UNCHANGED").put("production_or_global_state_mutation","NONE_BY_DIAGNOSTIC"));
     assertTrue("Original native bind refreshes selection",child.isSelected());
     assertTrue("Original native bind refreshes current EPG/accessibility",String.valueOf(child.getContentDescription()).contains(String.valueOf(get(current,"title"))));
     assertEquals(0,f.addedGrids);assertEquals(0,f.removedGrids);assertNull(get(f.a,"mPlayer"));assertNull(get(f.a,"mCobraPreviewPlayer"));
