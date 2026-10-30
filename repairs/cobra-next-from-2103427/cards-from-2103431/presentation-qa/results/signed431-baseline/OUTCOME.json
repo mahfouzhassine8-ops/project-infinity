@@ -1,0 +1,89 @@
+{
+  "status": "PASS_ACTUAL_SIGNED431_NATIVE_SETTER_BASELINE",
+  "selected_test": "CobraProgrammePresentationBaselineTest#actual431RefreshWritesAndFinalState",
+  "JUnit_tests": 1,
+  "JUnit_failures": 0,
+  "JUnit_errors": 0,
+  "cases": 12,
+  "active_mode_details_cases": 10,
+  "inactive_guard_cases": 2,
+  "actual_current_next_identity_preconditions": "PASS_ALL_CASES",
+  "current_clock_domain": "Controlled Robolectric Android/ShadowSystem wallclock 1793318400000",
+  "actual_full_refresh_vs_direct_mode_details_final_guide_state": "EXACT_EQUAL_ALL10_ACTIVE_CASES",
+  "text_writes_with_active_guard": {
+    "guide_now_full": 2,
+    "guide_next_full": 2,
+    "guide_now_direct_details": 1,
+    "guide_next_direct_details": 1
+  },
+  "valid_current_progress_writes": {
+    "full": 2,
+    "values": [
+      500,
+      500
+    ],
+    "direct_details": 1
+  },
+  "no_current_progress_visibility_writes": {
+    "full": [
+      4,
+      8
+    ],
+    "direct_details": [
+      8
+    ]
+  },
+  "guard_false_preliminary_fallback": {
+    "guide_now": 1,
+    "guide_next": 1,
+    "valid_progress": 1
+  },
+  "native_guide_next_requestLayout_calls": {
+    "cards_current_only_full": 2,
+    "cards_current_only_direct_details": 0,
+    "cards_current_plus_next_full": 1,
+    "cards_current_plus_next_direct_details": 1
+  },
+  "layout_count_limit": "Native framework requestLayout invocations in this standalone fixture, not frames/jank or actual Cards screen rendering",
+  "other_styles": "mobile/grid/compact/focus with Pro disabled; no Pro Hero rendering claim",
+  "timing_benchmark": false,
+  "physical_Fold": "NOT_RUN",
+  "production_changes": "NONE",
+  "candidate_patch": "NOT_IMPLEMENTED_BY_THIS_QA_TASK",
+  "network_player_Activity_lifecycle": "NOT_RUN",
+  "shutdown": "NOT_RUN",
+  "files": {
+    "INPUTS.json": {
+      "sha256": "3aa46fb99863be35e30df2147af5d9ce358cc82b736b674ca7a0d59aec0be01c",
+      "bytes": 5562
+    },
+    "TEST-OUTPUT.txt": {
+      "sha256": "cff386df086082f2d6d8b9d8dc23849260071e5095fc594697d19f29b6b27de6",
+      "bytes": 58150
+    },
+    "TEST-SOURCE.java": {
+      "sha256": "2430d9555962ffe87fe3c0b21025c22469f1585590044aefc4e9e337923d78e0",
+      "bytes": 14965
+    },
+    "JUNIT.xml": {
+      "sha256": "bf257cbb7d01eaa4384da95954e5b335f37aa762b2e0e4d508fd5292e51b683d",
+      "bytes": 70887
+    },
+    "BASELINE.json": {
+      "sha256": "afe37ff8ed00a442ee240efe425413df0cc9d57acb397993939844c16bab763d",
+      "bytes": 94176
+    },
+    "FULL-FINAL-STATE-HASHES.json": {
+      "sha256": "0c9861c52777aaefa8e2832437117ed1140a08ad41a922968a5756c7aa282628",
+      "bytes": 26186
+    },
+    "ACTUAL-CLASS-INPUTS.json": {
+      "sha256": "5f7df801890ebf5707c97a5f9767552b7798c753caab9a98c88b11c4b6122534",
+      "bytes": 1496
+    }
+  },
+  "rejected_attempts": [
+    "../initial-fixture-signature-error/REVIEW.json",
+    "../invalid-current-data-fixture/REVIEW.json"
+  ]
+}

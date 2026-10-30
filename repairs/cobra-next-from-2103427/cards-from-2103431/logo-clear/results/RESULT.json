@@ -1,0 +1,17 @@
+{
+  "status": "PASS_FOUR_SELECTED_CARDS_UNBIND_CASES",
+  "tests": 4,
+  "errors": 0,
+  "failures": 0,
+  "skipped": 0,
+  "actual_classes": "accepted431 translated dependencies, only add-only CobraLogoRequests.clear overlay",
+  "old_methods_fields_annotations": "EXACT_UNCHANGED",
+  "guarantees": [
+    "No new owner or worker without prior logo owner",
+    "Cleared A binding/listener cannot requeue on reattach or receive old A",
+    "Clear then B delivers only B",
+    "Existing shared A flight and other waiter preserved"
+  ],
+  "APK": "NOT_BUILT",
+  "shutdown": "NOT_RUN"
+}

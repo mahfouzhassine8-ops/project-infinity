@@ -1,0 +1,2950 @@
+{
+  "scope": "ACTUAL_SIGNED431_NATIVE_VIEW_PRESENTATION_BASELINE",
+  "status": "PASS_ACTUAL_NATIVE_WRITE_COUNTS_AND_FINAL_STATE",
+  "cases": [
+    {
+      "style": "cards",
+      "scenario": "current-next",
+      "full_refresh": {
+        "style": "cards",
+        "mode_details_guard_active": true,
+        "labels": {
+          "mCobraGuideNowLabel": {
+            "setText_calls": 2,
+            "written_values": [
+              "Synthetic channel  ·  Current programme",
+              "Current programme"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Current programme",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraGuideNextLabel": {
+            "setText_calls": 2,
+            "written_values": [
+              "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM  ·  720 min left\nNext  Next programme",
+              "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM\nNext  Next programme"
+            ],
+            "requestLayout_calls": 1,
+            "text": "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM\nNext  Next programme",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeDescription": {
+            "setText_calls": 1,
+            "written_values": [
+              "Actual current description"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Actual current description",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeEyebrow": {
+            "setText_calls": 1,
+            "written_values": [
+              "NOW PLAYING  \/  Synthetic channel"
+            ],
+            "requestLayout_calls": 0,
+            "text": "NOW PLAYING  \/  Synthetic channel",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeSub": {
+            "setText_calls": 1,
+            "written_values": [
+              "COBRA LIVE  ·  1 CHANNELS"
+            ],
+            "requestLayout_calls": 0,
+            "text": "COBRA LIVE  ·  1 CHANNELS",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerProgram": {
+            "setText_calls": 1,
+            "written_values": [
+              "Current programme"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Current programme",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerSchedule": {
+            "setText_calls": 1,
+            "written_values": [
+              "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM   ·   720 min left"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM   ·   720 min left",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerUpcoming": {
+            "setText_calls": 1,
+            "written_values": [
+              "Next  Next programme"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Next  Next programme",
+            "content_description": "",
+            "visibility": 0
+          }
+        },
+        "guide_progress": {
+          "setProgress_calls": 2,
+          "written_values": [
+            500,
+            500
+          ],
+          "setVisibility_calls": 2,
+          "visibility_values": [
+            0,
+            0
+          ],
+          "requestLayout_calls": 0,
+          "progress": 500,
+          "max": 1000,
+          "visibility": 0,
+          "content_description": ""
+        },
+        "details_content_description": "Synthetic channel, Current programme, open programme details",
+        "computed_mode_details_box": [
+          345,
+          56,
+          596,
+          190
+        ],
+        "actual_programme_identity_preconditions": {
+          "cobraCurrentProgram": "Current programme",
+          "cobraNextProgram": "Next programme"
+        },
+        "lifecycle": "NOT_CALLED",
+        "player_network": "NOT_CONSTRUCTED"
+      },
+      "direct_mode_details": {
+        "style": "cards",
+        "mode_details_guard_active": true,
+        "labels": {
+          "mCobraGuideNowLabel": {
+            "setText_calls": 1,
+            "written_values": [
+              "Current programme"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Current programme",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraGuideNextLabel": {
+            "setText_calls": 1,
+            "written_values": [
+              "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM\nNext  Next programme"
+            ],
+            "requestLayout_calls": 1,
+            "text": "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM\nNext  Next programme",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeDescription": {
+            "setText_calls": 1,
+            "written_values": [
+              "Actual current description"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Actual current description",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeEyebrow": {
+            "setText_calls": 1,
+            "written_values": [
+              "NOW PLAYING  \/  Synthetic channel"
+            ],
+            "requestLayout_calls": 0,
+            "text": "NOW PLAYING  \/  Synthetic channel",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeSub": {
+            "setText_calls": 1,
+            "written_values": [
+              "COBRA LIVE  ·  1 CHANNELS"
+            ],
+            "requestLayout_calls": 0,
+            "text": "COBRA LIVE  ·  1 CHANNELS",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerProgram": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraPlayerProgram",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerSchedule": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraPlayerSchedule",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerUpcoming": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraPlayerUpcoming",
+            "content_description": "",
+            "visibility": 0
+          }
+        },
+        "guide_progress": {
+          "setProgress_calls": 1,
+          "written_values": [
+            500
+          ],
+          "setVisibility_calls": 1,
+          "visibility_values": [
+            0
+          ],
+          "requestLayout_calls": 0,
+          "progress": 500,
+          "max": 1000,
+          "visibility": 0,
+          "content_description": ""
+        },
+        "details_content_description": "Synthetic channel, Current programme, open programme details",
+        "computed_mode_details_box": [
+          345,
+          56,
+          596,
+          190
+        ],
+        "actual_programme_identity_preconditions": {
+          "cobraCurrentProgram": "Current programme",
+          "cobraNextProgram": "Next programme"
+        },
+        "lifecycle": "NOT_CALLED",
+        "player_network": "NOT_CONSTRUCTED"
+      },
+      "final_guide_state_equal": true,
+      "final_guide_state": {
+        "mCobraGuideNowLabel": {
+          "text": "Current programme",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraGuideNextLabel": {
+          "text": "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM\nNext  Next programme",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeDescription": {
+          "text": "Actual current description",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeEyebrow": {
+          "text": "NOW PLAYING  \/  Synthetic channel",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeSub": {
+          "text": "COBRA LIVE  ·  1 CHANNELS",
+          "content_description": "",
+          "visibility": 0
+        },
+        "progress": {
+          "progress": 500,
+          "max": 1000,
+          "visibility": 0,
+          "content_description": ""
+        },
+        "details_content_description": "Synthetic channel, Current programme, open programme details"
+      },
+      "final_guide_state_sha256": "d51fa1370c8d42acd6925630d7725b557663c24a31cc5ca6086786fcdd02368d"
+    },
+    {
+      "style": "cards",
+      "scenario": "current-only",
+      "full_refresh": {
+        "style": "cards",
+        "mode_details_guard_active": true,
+        "labels": {
+          "mCobraGuideNowLabel": {
+            "setText_calls": 2,
+            "written_values": [
+              "Synthetic channel  ·  Current programme",
+              "Current programme"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Current programme",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraGuideNextLabel": {
+            "setText_calls": 2,
+            "written_values": [
+              "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM  ·  720 min left\nUpcoming schedule unavailable",
+              "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM"
+            ],
+            "requestLayout_calls": 2,
+            "text": "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeDescription": {
+            "setText_calls": 1,
+            "written_values": [
+              "Actual current description"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Actual current description",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeEyebrow": {
+            "setText_calls": 1,
+            "written_values": [
+              "NOW PLAYING  \/  Synthetic channel"
+            ],
+            "requestLayout_calls": 0,
+            "text": "NOW PLAYING  \/  Synthetic channel",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeSub": {
+            "setText_calls": 1,
+            "written_values": [
+              "COBRA LIVE  ·  1 CHANNELS"
+            ],
+            "requestLayout_calls": 0,
+            "text": "COBRA LIVE  ·  1 CHANNELS",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerProgram": {
+            "setText_calls": 1,
+            "written_values": [
+              "Current programme"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Current programme",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerSchedule": {
+            "setText_calls": 1,
+            "written_values": [
+              "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM   ·   720 min left"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM   ·   720 min left",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerUpcoming": {
+            "setText_calls": 1,
+            "written_values": [
+              ""
+            ],
+            "requestLayout_calls": 0,
+            "text": "",
+            "content_description": "",
+            "visibility": 0
+          }
+        },
+        "guide_progress": {
+          "setProgress_calls": 2,
+          "written_values": [
+            500,
+            500
+          ],
+          "setVisibility_calls": 2,
+          "visibility_values": [
+            0,
+            0
+          ],
+          "requestLayout_calls": 0,
+          "progress": 500,
+          "max": 1000,
+          "visibility": 0,
+          "content_description": ""
+        },
+        "details_content_description": "Synthetic channel, Current programme, open programme details",
+        "computed_mode_details_box": [
+          345,
+          56,
+          596,
+          190
+        ],
+        "actual_programme_identity_preconditions": {
+          "cobraCurrentProgram": "Current programme",
+          "cobraNextProgram": null
+        },
+        "lifecycle": "NOT_CALLED",
+        "player_network": "NOT_CONSTRUCTED"
+      },
+      "direct_mode_details": {
+        "style": "cards",
+        "mode_details_guard_active": true,
+        "labels": {
+          "mCobraGuideNowLabel": {
+            "setText_calls": 1,
+            "written_values": [
+              "Current programme"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Current programme",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraGuideNextLabel": {
+            "setText_calls": 1,
+            "written_values": [
+              "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeDescription": {
+            "setText_calls": 1,
+            "written_values": [
+              "Actual current description"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Actual current description",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeEyebrow": {
+            "setText_calls": 1,
+            "written_values": [
+              "NOW PLAYING  \/  Synthetic channel"
+            ],
+            "requestLayout_calls": 0,
+            "text": "NOW PLAYING  \/  Synthetic channel",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeSub": {
+            "setText_calls": 1,
+            "written_values": [
+              "COBRA LIVE  ·  1 CHANNELS"
+            ],
+            "requestLayout_calls": 0,
+            "text": "COBRA LIVE  ·  1 CHANNELS",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerProgram": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraPlayerProgram",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerSchedule": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraPlayerSchedule",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerUpcoming": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraPlayerUpcoming",
+            "content_description": "",
+            "visibility": 0
+          }
+        },
+        "guide_progress": {
+          "setProgress_calls": 1,
+          "written_values": [
+            500
+          ],
+          "setVisibility_calls": 1,
+          "visibility_values": [
+            0
+          ],
+          "requestLayout_calls": 0,
+          "progress": 500,
+          "max": 1000,
+          "visibility": 0,
+          "content_description": ""
+        },
+        "details_content_description": "Synthetic channel, Current programme, open programme details",
+        "computed_mode_details_box": [
+          345,
+          56,
+          596,
+          190
+        ],
+        "actual_programme_identity_preconditions": {
+          "cobraCurrentProgram": "Current programme",
+          "cobraNextProgram": null
+        },
+        "lifecycle": "NOT_CALLED",
+        "player_network": "NOT_CONSTRUCTED"
+      },
+      "final_guide_state_equal": true,
+      "final_guide_state": {
+        "mCobraGuideNowLabel": {
+          "text": "Current programme",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraGuideNextLabel": {
+          "text": "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeDescription": {
+          "text": "Actual current description",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeEyebrow": {
+          "text": "NOW PLAYING  \/  Synthetic channel",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeSub": {
+          "text": "COBRA LIVE  ·  1 CHANNELS",
+          "content_description": "",
+          "visibility": 0
+        },
+        "progress": {
+          "progress": 500,
+          "max": 1000,
+          "visibility": 0,
+          "content_description": ""
+        },
+        "details_content_description": "Synthetic channel, Current programme, open programme details"
+      },
+      "final_guide_state_sha256": "c404653231a92ccaae3b235563504f41bb86718d9ebfe7e80a485171c8227475"
+    },
+    {
+      "style": "cards",
+      "scenario": "expired",
+      "full_refresh": {
+        "style": "cards",
+        "mode_details_guard_active": true,
+        "labels": {
+          "mCobraGuideNowLabel": {
+            "setText_calls": 2,
+            "written_values": [
+              "Synthetic channel",
+              "Synthetic channel"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Synthetic channel",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraGuideNextLabel": {
+            "setText_calls": 2,
+            "written_values": [
+              "No programme scheduled for this time",
+              "No programme scheduled for this time"
+            ],
+            "requestLayout_calls": 0,
+            "text": "No programme scheduled for this time",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeDescription": {
+            "setText_calls": 1,
+            "written_values": [
+              ""
+            ],
+            "requestLayout_calls": 0,
+            "text": "",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeEyebrow": {
+            "setText_calls": 1,
+            "written_values": [
+              "NOW PLAYING  \/  Synthetic channel"
+            ],
+            "requestLayout_calls": 0,
+            "text": "NOW PLAYING  \/  Synthetic channel",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeSub": {
+            "setText_calls": 1,
+            "written_values": [
+              "COBRA LIVE  ·  1 CHANNELS"
+            ],
+            "requestLayout_calls": 0,
+            "text": "COBRA LIVE  ·  1 CHANNELS",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerProgram": {
+            "setText_calls": 1,
+            "written_values": [
+              "Synthetic channel"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Synthetic channel",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerSchedule": {
+            "setText_calls": 1,
+            "written_values": [
+              "No programme scheduled for this time"
+            ],
+            "requestLayout_calls": 0,
+            "text": "No programme scheduled for this time",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerUpcoming": {
+            "setText_calls": 1,
+            "written_values": [
+              ""
+            ],
+            "requestLayout_calls": 0,
+            "text": "",
+            "content_description": "",
+            "visibility": 0
+          }
+        },
+        "guide_progress": {
+          "setProgress_calls": 0,
+          "written_values": [],
+          "setVisibility_calls": 2,
+          "visibility_values": [
+            4,
+            8
+          ],
+          "requestLayout_calls": 1,
+          "progress": 0,
+          "max": 1000,
+          "visibility": 8,
+          "content_description": ""
+        },
+        "details_content_description": "Synthetic channel, No programme scheduled for this time, open programme details",
+        "computed_mode_details_box": [
+          345,
+          56,
+          596,
+          190
+        ],
+        "actual_programme_identity_preconditions": {
+          "cobraCurrentProgram": null,
+          "cobraNextProgram": null
+        },
+        "lifecycle": "NOT_CALLED",
+        "player_network": "NOT_CONSTRUCTED"
+      },
+      "direct_mode_details": {
+        "style": "cards",
+        "mode_details_guard_active": true,
+        "labels": {
+          "mCobraGuideNowLabel": {
+            "setText_calls": 1,
+            "written_values": [
+              "Synthetic channel"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Synthetic channel",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraGuideNextLabel": {
+            "setText_calls": 1,
+            "written_values": [
+              "No programme scheduled for this time"
+            ],
+            "requestLayout_calls": 0,
+            "text": "No programme scheduled for this time",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeDescription": {
+            "setText_calls": 1,
+            "written_values": [
+              ""
+            ],
+            "requestLayout_calls": 0,
+            "text": "",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeEyebrow": {
+            "setText_calls": 1,
+            "written_values": [
+              "NOW PLAYING  \/  Synthetic channel"
+            ],
+            "requestLayout_calls": 0,
+            "text": "NOW PLAYING  \/  Synthetic channel",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeSub": {
+            "setText_calls": 1,
+            "written_values": [
+              "COBRA LIVE  ·  1 CHANNELS"
+            ],
+            "requestLayout_calls": 0,
+            "text": "COBRA LIVE  ·  1 CHANNELS",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerProgram": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraPlayerProgram",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerSchedule": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraPlayerSchedule",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerUpcoming": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraPlayerUpcoming",
+            "content_description": "",
+            "visibility": 0
+          }
+        },
+        "guide_progress": {
+          "setProgress_calls": 0,
+          "written_values": [],
+          "setVisibility_calls": 1,
+          "visibility_values": [
+            8
+          ],
+          "requestLayout_calls": 1,
+          "progress": 0,
+          "max": 1000,
+          "visibility": 8,
+          "content_description": ""
+        },
+        "details_content_description": "Synthetic channel, No programme scheduled for this time, open programme details",
+        "computed_mode_details_box": [
+          345,
+          56,
+          596,
+          190
+        ],
+        "actual_programme_identity_preconditions": {
+          "cobraCurrentProgram": null,
+          "cobraNextProgram": null
+        },
+        "lifecycle": "NOT_CALLED",
+        "player_network": "NOT_CONSTRUCTED"
+      },
+      "final_guide_state_equal": true,
+      "final_guide_state": {
+        "mCobraGuideNowLabel": {
+          "text": "Synthetic channel",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraGuideNextLabel": {
+          "text": "No programme scheduled for this time",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeDescription": {
+          "text": "",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeEyebrow": {
+          "text": "NOW PLAYING  \/  Synthetic channel",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeSub": {
+          "text": "COBRA LIVE  ·  1 CHANNELS",
+          "content_description": "",
+          "visibility": 0
+        },
+        "progress": {
+          "progress": 0,
+          "max": 1000,
+          "visibility": 8,
+          "content_description": ""
+        },
+        "details_content_description": "Synthetic channel, No programme scheduled for this time, open programme details"
+      },
+      "final_guide_state_sha256": "96502d4b6f0c18f1eab5045c9547fb78bba9442ad9d98a9a0e8fca9a5236aa7a"
+    },
+    {
+      "style": "cards",
+      "scenario": "absent",
+      "full_refresh": {
+        "style": "cards",
+        "mode_details_guard_active": true,
+        "labels": {
+          "mCobraGuideNowLabel": {
+            "setText_calls": 2,
+            "written_values": [
+              "Synthetic channel",
+              "Synthetic channel"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Synthetic channel",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraGuideNextLabel": {
+            "setText_calls": 2,
+            "written_values": [
+              "Guide not loaded yet",
+              "Guide not loaded yet"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Guide not loaded yet",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeDescription": {
+            "setText_calls": 1,
+            "written_values": [
+              ""
+            ],
+            "requestLayout_calls": 0,
+            "text": "",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeEyebrow": {
+            "setText_calls": 1,
+            "written_values": [
+              "NOW PLAYING  \/  Synthetic channel"
+            ],
+            "requestLayout_calls": 0,
+            "text": "NOW PLAYING  \/  Synthetic channel",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeSub": {
+            "setText_calls": 1,
+            "written_values": [
+              "COBRA LIVE  ·  1 CHANNELS"
+            ],
+            "requestLayout_calls": 0,
+            "text": "COBRA LIVE  ·  1 CHANNELS",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerProgram": {
+            "setText_calls": 1,
+            "written_values": [
+              "Synthetic channel"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Synthetic channel",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerSchedule": {
+            "setText_calls": 1,
+            "written_values": [
+              "Guide not loaded yet"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Guide not loaded yet",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerUpcoming": {
+            "setText_calls": 1,
+            "written_values": [
+              ""
+            ],
+            "requestLayout_calls": 0,
+            "text": "",
+            "content_description": "",
+            "visibility": 0
+          }
+        },
+        "guide_progress": {
+          "setProgress_calls": 0,
+          "written_values": [],
+          "setVisibility_calls": 2,
+          "visibility_values": [
+            4,
+            8
+          ],
+          "requestLayout_calls": 1,
+          "progress": 0,
+          "max": 1000,
+          "visibility": 8,
+          "content_description": ""
+        },
+        "details_content_description": "Synthetic channel, Guide not loaded yet, open programme details",
+        "computed_mode_details_box": [
+          345,
+          56,
+          596,
+          190
+        ],
+        "actual_programme_identity_preconditions": {
+          "cobraCurrentProgram": null,
+          "cobraNextProgram": null
+        },
+        "lifecycle": "NOT_CALLED",
+        "player_network": "NOT_CONSTRUCTED"
+      },
+      "direct_mode_details": {
+        "style": "cards",
+        "mode_details_guard_active": true,
+        "labels": {
+          "mCobraGuideNowLabel": {
+            "setText_calls": 1,
+            "written_values": [
+              "Synthetic channel"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Synthetic channel",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraGuideNextLabel": {
+            "setText_calls": 1,
+            "written_values": [
+              "Guide not loaded yet"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Guide not loaded yet",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeDescription": {
+            "setText_calls": 1,
+            "written_values": [
+              ""
+            ],
+            "requestLayout_calls": 0,
+            "text": "",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeEyebrow": {
+            "setText_calls": 1,
+            "written_values": [
+              "NOW PLAYING  \/  Synthetic channel"
+            ],
+            "requestLayout_calls": 0,
+            "text": "NOW PLAYING  \/  Synthetic channel",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeSub": {
+            "setText_calls": 1,
+            "written_values": [
+              "COBRA LIVE  ·  1 CHANNELS"
+            ],
+            "requestLayout_calls": 0,
+            "text": "COBRA LIVE  ·  1 CHANNELS",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerProgram": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraPlayerProgram",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerSchedule": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraPlayerSchedule",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerUpcoming": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraPlayerUpcoming",
+            "content_description": "",
+            "visibility": 0
+          }
+        },
+        "guide_progress": {
+          "setProgress_calls": 0,
+          "written_values": [],
+          "setVisibility_calls": 1,
+          "visibility_values": [
+            8
+          ],
+          "requestLayout_calls": 1,
+          "progress": 0,
+          "max": 1000,
+          "visibility": 8,
+          "content_description": ""
+        },
+        "details_content_description": "Synthetic channel, Guide not loaded yet, open programme details",
+        "computed_mode_details_box": [
+          345,
+          56,
+          596,
+          190
+        ],
+        "actual_programme_identity_preconditions": {
+          "cobraCurrentProgram": null,
+          "cobraNextProgram": null
+        },
+        "lifecycle": "NOT_CALLED",
+        "player_network": "NOT_CONSTRUCTED"
+      },
+      "final_guide_state_equal": true,
+      "final_guide_state": {
+        "mCobraGuideNowLabel": {
+          "text": "Synthetic channel",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraGuideNextLabel": {
+          "text": "Guide not loaded yet",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeDescription": {
+          "text": "",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeEyebrow": {
+          "text": "NOW PLAYING  \/  Synthetic channel",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeSub": {
+          "text": "COBRA LIVE  ·  1 CHANNELS",
+          "content_description": "",
+          "visibility": 0
+        },
+        "progress": {
+          "progress": 0,
+          "max": 1000,
+          "visibility": 8,
+          "content_description": ""
+        },
+        "details_content_description": "Synthetic channel, Guide not loaded yet, open programme details"
+      },
+      "final_guide_state_sha256": "eb2f3aa365981f7042dcb48d4c6933a78ee833637387a165b4d17dda01996a88"
+    },
+    {
+      "style": "cards",
+      "scenario": "unmatched",
+      "full_refresh": {
+        "style": "cards",
+        "mode_details_guard_active": true,
+        "labels": {
+          "mCobraGuideNowLabel": {
+            "setText_calls": 2,
+            "written_values": [
+              "Synthetic channel",
+              "Synthetic channel"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Synthetic channel",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraGuideNextLabel": {
+            "setText_calls": 2,
+            "written_values": [
+              "No matching programme ID",
+              "No matching programme ID"
+            ],
+            "requestLayout_calls": 0,
+            "text": "No matching programme ID",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeDescription": {
+            "setText_calls": 1,
+            "written_values": [
+              ""
+            ],
+            "requestLayout_calls": 0,
+            "text": "",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeEyebrow": {
+            "setText_calls": 1,
+            "written_values": [
+              "NOW PLAYING  \/  Synthetic channel"
+            ],
+            "requestLayout_calls": 0,
+            "text": "NOW PLAYING  \/  Synthetic channel",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeSub": {
+            "setText_calls": 1,
+            "written_values": [
+              "COBRA LIVE  ·  1 CHANNELS"
+            ],
+            "requestLayout_calls": 0,
+            "text": "COBRA LIVE  ·  1 CHANNELS",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerProgram": {
+            "setText_calls": 1,
+            "written_values": [
+              "Synthetic channel"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Synthetic channel",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerSchedule": {
+            "setText_calls": 1,
+            "written_values": [
+              "No matching programme ID"
+            ],
+            "requestLayout_calls": 0,
+            "text": "No matching programme ID",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerUpcoming": {
+            "setText_calls": 1,
+            "written_values": [
+              ""
+            ],
+            "requestLayout_calls": 0,
+            "text": "",
+            "content_description": "",
+            "visibility": 0
+          }
+        },
+        "guide_progress": {
+          "setProgress_calls": 0,
+          "written_values": [],
+          "setVisibility_calls": 2,
+          "visibility_values": [
+            4,
+            8
+          ],
+          "requestLayout_calls": 1,
+          "progress": 0,
+          "max": 1000,
+          "visibility": 8,
+          "content_description": ""
+        },
+        "details_content_description": "Synthetic channel, No matching programme ID, open programme details",
+        "computed_mode_details_box": [
+          345,
+          56,
+          596,
+          190
+        ],
+        "actual_programme_identity_preconditions": {
+          "cobraCurrentProgram": null,
+          "cobraNextProgram": null
+        },
+        "lifecycle": "NOT_CALLED",
+        "player_network": "NOT_CONSTRUCTED"
+      },
+      "direct_mode_details": {
+        "style": "cards",
+        "mode_details_guard_active": true,
+        "labels": {
+          "mCobraGuideNowLabel": {
+            "setText_calls": 1,
+            "written_values": [
+              "Synthetic channel"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Synthetic channel",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraGuideNextLabel": {
+            "setText_calls": 1,
+            "written_values": [
+              "No matching programme ID"
+            ],
+            "requestLayout_calls": 0,
+            "text": "No matching programme ID",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeDescription": {
+            "setText_calls": 1,
+            "written_values": [
+              ""
+            ],
+            "requestLayout_calls": 0,
+            "text": "",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeEyebrow": {
+            "setText_calls": 1,
+            "written_values": [
+              "NOW PLAYING  \/  Synthetic channel"
+            ],
+            "requestLayout_calls": 0,
+            "text": "NOW PLAYING  \/  Synthetic channel",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeSub": {
+            "setText_calls": 1,
+            "written_values": [
+              "COBRA LIVE  ·  1 CHANNELS"
+            ],
+            "requestLayout_calls": 0,
+            "text": "COBRA LIVE  ·  1 CHANNELS",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerProgram": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraPlayerProgram",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerSchedule": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraPlayerSchedule",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerUpcoming": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraPlayerUpcoming",
+            "content_description": "",
+            "visibility": 0
+          }
+        },
+        "guide_progress": {
+          "setProgress_calls": 0,
+          "written_values": [],
+          "setVisibility_calls": 1,
+          "visibility_values": [
+            8
+          ],
+          "requestLayout_calls": 1,
+          "progress": 0,
+          "max": 1000,
+          "visibility": 8,
+          "content_description": ""
+        },
+        "details_content_description": "Synthetic channel, No matching programme ID, open programme details",
+        "computed_mode_details_box": [
+          345,
+          56,
+          596,
+          190
+        ],
+        "actual_programme_identity_preconditions": {
+          "cobraCurrentProgram": null,
+          "cobraNextProgram": null
+        },
+        "lifecycle": "NOT_CALLED",
+        "player_network": "NOT_CONSTRUCTED"
+      },
+      "final_guide_state_equal": true,
+      "final_guide_state": {
+        "mCobraGuideNowLabel": {
+          "text": "Synthetic channel",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraGuideNextLabel": {
+          "text": "No matching programme ID",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeDescription": {
+          "text": "",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeEyebrow": {
+          "text": "NOW PLAYING  \/  Synthetic channel",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeSub": {
+          "text": "COBRA LIVE  ·  1 CHANNELS",
+          "content_description": "",
+          "visibility": 0
+        },
+        "progress": {
+          "progress": 0,
+          "max": 1000,
+          "visibility": 8,
+          "content_description": ""
+        },
+        "details_content_description": "Synthetic channel, No matching programme ID, open programme details"
+      },
+      "final_guide_state_sha256": "35c03cced4a856a68755bf5284e9a00edc1f3e4918bd4d3cde0dafb50533a349"
+    },
+    {
+      "style": "cards",
+      "scenario": "null-channel",
+      "full_refresh": {
+        "style": "cards",
+        "mode_details_guard_active": true,
+        "labels": {
+          "mCobraGuideNowLabel": {
+            "setText_calls": 2,
+            "written_values": [
+              "Select a channel",
+              "Choose a channel"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Choose a channel",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraGuideNextLabel": {
+            "setText_calls": 2,
+            "written_values": [
+              "Choose a channel",
+              "Choose a channel"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Choose a channel",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeDescription": {
+            "setText_calls": 1,
+            "written_values": [
+              ""
+            ],
+            "requestLayout_calls": 0,
+            "text": "",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeEyebrow": {
+            "setText_calls": 1,
+            "written_values": [
+              "LIVE TELEVISION"
+            ],
+            "requestLayout_calls": 0,
+            "text": "LIVE TELEVISION",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeSub": {
+            "setText_calls": 1,
+            "written_values": [
+              "COBRA LIVE  ·  1 CHANNELS"
+            ],
+            "requestLayout_calls": 0,
+            "text": "COBRA LIVE  ·  1 CHANNELS",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerProgram": {
+            "setText_calls": 1,
+            "written_values": [
+              ""
+            ],
+            "requestLayout_calls": 0,
+            "text": "",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerSchedule": {
+            "setText_calls": 1,
+            "written_values": [
+              "Choose a channel"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Choose a channel",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerUpcoming": {
+            "setText_calls": 1,
+            "written_values": [
+              ""
+            ],
+            "requestLayout_calls": 0,
+            "text": "",
+            "content_description": "",
+            "visibility": 0
+          }
+        },
+        "guide_progress": {
+          "setProgress_calls": 0,
+          "written_values": [],
+          "setVisibility_calls": 2,
+          "visibility_values": [
+            4,
+            8
+          ],
+          "requestLayout_calls": 1,
+          "progress": 0,
+          "max": 1000,
+          "visibility": 8,
+          "content_description": ""
+        },
+        "details_content_description": "Programme information",
+        "computed_mode_details_box": [
+          345,
+          56,
+          596,
+          190
+        ],
+        "actual_programme_identity_preconditions": {
+          "cobraCurrentProgram": null,
+          "cobraNextProgram": null
+        },
+        "lifecycle": "NOT_CALLED",
+        "player_network": "NOT_CONSTRUCTED"
+      },
+      "direct_mode_details": {
+        "style": "cards",
+        "mode_details_guard_active": true,
+        "labels": {
+          "mCobraGuideNowLabel": {
+            "setText_calls": 1,
+            "written_values": [
+              "Choose a channel"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Choose a channel",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraGuideNextLabel": {
+            "setText_calls": 1,
+            "written_values": [
+              "Choose a channel"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Choose a channel",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeDescription": {
+            "setText_calls": 1,
+            "written_values": [
+              ""
+            ],
+            "requestLayout_calls": 0,
+            "text": "",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeEyebrow": {
+            "setText_calls": 1,
+            "written_values": [
+              "LIVE TELEVISION"
+            ],
+            "requestLayout_calls": 0,
+            "text": "LIVE TELEVISION",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeSub": {
+            "setText_calls": 1,
+            "written_values": [
+              "COBRA LIVE  ·  1 CHANNELS"
+            ],
+            "requestLayout_calls": 0,
+            "text": "COBRA LIVE  ·  1 CHANNELS",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerProgram": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraPlayerProgram",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerSchedule": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraPlayerSchedule",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerUpcoming": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraPlayerUpcoming",
+            "content_description": "",
+            "visibility": 0
+          }
+        },
+        "guide_progress": {
+          "setProgress_calls": 0,
+          "written_values": [],
+          "setVisibility_calls": 1,
+          "visibility_values": [
+            8
+          ],
+          "requestLayout_calls": 1,
+          "progress": 0,
+          "max": 1000,
+          "visibility": 8,
+          "content_description": ""
+        },
+        "details_content_description": "Programme information",
+        "computed_mode_details_box": [
+          345,
+          56,
+          596,
+          190
+        ],
+        "actual_programme_identity_preconditions": {
+          "cobraCurrentProgram": null,
+          "cobraNextProgram": null
+        },
+        "lifecycle": "NOT_CALLED",
+        "player_network": "NOT_CONSTRUCTED"
+      },
+      "final_guide_state_equal": true,
+      "final_guide_state": {
+        "mCobraGuideNowLabel": {
+          "text": "Choose a channel",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraGuideNextLabel": {
+          "text": "Choose a channel",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeDescription": {
+          "text": "",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeEyebrow": {
+          "text": "LIVE TELEVISION",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeSub": {
+          "text": "COBRA LIVE  ·  1 CHANNELS",
+          "content_description": "",
+          "visibility": 0
+        },
+        "progress": {
+          "progress": 0,
+          "max": 1000,
+          "visibility": 8,
+          "content_description": ""
+        },
+        "details_content_description": "Programme information"
+      },
+      "final_guide_state_sha256": "d0462733a2f1c3169001cfcee3e9ab23afdadbd94febb3edc4488cf67ea74053"
+    },
+    {
+      "style": "cards",
+      "scenario": "current-next",
+      "full_refresh": {
+        "style": "cards",
+        "mode_details_guard_active": false,
+        "labels": {
+          "mCobraGuideNowLabel": {
+            "setText_calls": 1,
+            "written_values": [
+              "Synthetic channel  ·  Current programme"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Synthetic channel  ·  Current programme",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraGuideNextLabel": {
+            "setText_calls": 1,
+            "written_values": [
+              "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM  ·  720 min left\nNext  Next programme"
+            ],
+            "requestLayout_calls": 1,
+            "text": "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM  ·  720 min left\nNext  Next programme",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeDescription": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraModeDescription",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeEyebrow": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraModeEyebrow",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeSub": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraModeSub",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerProgram": {
+            "setText_calls": 1,
+            "written_values": [
+              "Current programme"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Current programme",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerSchedule": {
+            "setText_calls": 1,
+            "written_values": [
+              "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM   ·   720 min left"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM   ·   720 min left",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerUpcoming": {
+            "setText_calls": 1,
+            "written_values": [
+              "Next  Next programme"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Next  Next programme",
+            "content_description": "",
+            "visibility": 0
+          }
+        },
+        "guide_progress": {
+          "setProgress_calls": 1,
+          "written_values": [
+            500
+          ],
+          "setVisibility_calls": 1,
+          "visibility_values": [
+            0
+          ],
+          "requestLayout_calls": 0,
+          "progress": 500,
+          "max": 1000,
+          "visibility": 0,
+          "content_description": ""
+        },
+        "details_content_description": "",
+        "computed_mode_details_box": [
+          345,
+          56,
+          596,
+          190
+        ],
+        "actual_programme_identity_preconditions": {
+          "cobraCurrentProgram": "Current programme",
+          "cobraNextProgram": "Next programme"
+        },
+        "lifecycle": "NOT_CALLED",
+        "player_network": "NOT_CONSTRUCTED"
+      },
+      "direct_mode_details": "NOT_SELECTED_GUARD_FALSE; ORIGINAL_PRELIMINARY_FALLBACK_RETAINED",
+      "final_guide_state": {
+        "mCobraGuideNowLabel": {
+          "text": "Synthetic channel  ·  Current programme",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraGuideNextLabel": {
+          "text": "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM  ·  720 min left\nNext  Next programme",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeDescription": {
+          "text": "BEFORE mCobraModeDescription",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeEyebrow": {
+          "text": "BEFORE mCobraModeEyebrow",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeSub": {
+          "text": "BEFORE mCobraModeSub",
+          "content_description": "",
+          "visibility": 0
+        },
+        "progress": {
+          "progress": 500,
+          "max": 1000,
+          "visibility": 0,
+          "content_description": ""
+        },
+        "details_content_description": ""
+      },
+      "final_guide_state_sha256": "a01148ec883aa99be4198471de5dfac473c2f48d4bd981f69eea714703d4242b"
+    },
+    {
+      "style": "cards",
+      "scenario": "current-next",
+      "full_refresh": {
+        "style": "cards",
+        "mode_details_guard_active": false,
+        "labels": {
+          "mCobraGuideNowLabel": {
+            "setText_calls": 1,
+            "written_values": [
+              "Synthetic channel  ·  Current programme"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Synthetic channel  ·  Current programme",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraGuideNextLabel": {
+            "setText_calls": 1,
+            "written_values": [
+              "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM  ·  720 min left\nNext  Next programme"
+            ],
+            "requestLayout_calls": 1,
+            "text": "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM  ·  720 min left\nNext  Next programme",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeDescription": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraModeDescription",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeEyebrow": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraModeEyebrow",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeSub": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraModeSub",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerProgram": {
+            "setText_calls": 1,
+            "written_values": [
+              "Current programme"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Current programme",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerSchedule": {
+            "setText_calls": 1,
+            "written_values": [
+              "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM   ·   720 min left"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM   ·   720 min left",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerUpcoming": {
+            "setText_calls": 1,
+            "written_values": [
+              "Next  Next programme"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Next  Next programme",
+            "content_description": "",
+            "visibility": 0
+          }
+        },
+        "guide_progress": {
+          "setProgress_calls": 1,
+          "written_values": [
+            500
+          ],
+          "setVisibility_calls": 1,
+          "visibility_values": [
+            0
+          ],
+          "requestLayout_calls": 0,
+          "progress": 500,
+          "max": 1000,
+          "visibility": 0,
+          "content_description": ""
+        },
+        "details_content_description": "",
+        "computed_mode_details_box": [
+          345,
+          56,
+          596,
+          190
+        ],
+        "actual_programme_identity_preconditions": {
+          "cobraCurrentProgram": "Current programme",
+          "cobraNextProgram": "Next programme"
+        },
+        "lifecycle": "NOT_CALLED",
+        "player_network": "NOT_CONSTRUCTED"
+      },
+      "direct_mode_details": "NOT_SELECTED_GUARD_FALSE; ORIGINAL_PRELIMINARY_FALLBACK_RETAINED",
+      "final_guide_state": {
+        "mCobraGuideNowLabel": {
+          "text": "Synthetic channel  ·  Current programme",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraGuideNextLabel": {
+          "text": "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM  ·  720 min left\nNext  Next programme",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeDescription": {
+          "text": "BEFORE mCobraModeDescription",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeEyebrow": {
+          "text": "BEFORE mCobraModeEyebrow",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeSub": {
+          "text": "BEFORE mCobraModeSub",
+          "content_description": "",
+          "visibility": 0
+        },
+        "progress": {
+          "progress": 500,
+          "max": 1000,
+          "visibility": 0,
+          "content_description": ""
+        },
+        "details_content_description": ""
+      },
+      "final_guide_state_sha256": "a01148ec883aa99be4198471de5dfac473c2f48d4bd981f69eea714703d4242b"
+    },
+    {
+      "style": "mobile",
+      "scenario": "current-next",
+      "full_refresh": {
+        "style": "mobile",
+        "mode_details_guard_active": true,
+        "labels": {
+          "mCobraGuideNowLabel": {
+            "setText_calls": 2,
+            "written_values": [
+              "Synthetic channel  ·  Current programme",
+              "Current programme"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Current programme",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraGuideNextLabel": {
+            "setText_calls": 2,
+            "written_values": [
+              "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM  ·  720 min left\nNext  Next programme",
+              "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM\nNext  Next programme"
+            ],
+            "requestLayout_calls": 1,
+            "text": "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM\nNext  Next programme",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeDescription": {
+            "setText_calls": 1,
+            "written_values": [
+              "Actual current description"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Actual current description",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeEyebrow": {
+            "setText_calls": 1,
+            "written_values": [
+              "NOW PLAYING  \/  Synthetic channel"
+            ],
+            "requestLayout_calls": 0,
+            "text": "NOW PLAYING  \/  Synthetic channel",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeSub": {
+            "setText_calls": 1,
+            "written_values": [
+              "COBRA LIVE  ·  1 CHANNELS"
+            ],
+            "requestLayout_calls": 0,
+            "text": "COBRA LIVE  ·  1 CHANNELS",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerProgram": {
+            "setText_calls": 1,
+            "written_values": [
+              "Current programme"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Current programme",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerSchedule": {
+            "setText_calls": 1,
+            "written_values": [
+              "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM   ·   720 min left"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM   ·   720 min left",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerUpcoming": {
+            "setText_calls": 1,
+            "written_values": [
+              "Next  Next programme"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Next  Next programme",
+            "content_description": "",
+            "visibility": 0
+          }
+        },
+        "guide_progress": {
+          "setProgress_calls": 2,
+          "written_values": [
+            500,
+            500
+          ],
+          "setVisibility_calls": 2,
+          "visibility_values": [
+            0,
+            0
+          ],
+          "requestLayout_calls": 0,
+          "progress": 500,
+          "max": 1000,
+          "visibility": 0,
+          "content_description": ""
+        },
+        "details_content_description": "Synthetic channel, Current programme, open programme details",
+        "computed_mode_details_box": [
+          0,
+          525,
+          941,
+          96
+        ],
+        "actual_programme_identity_preconditions": {
+          "cobraCurrentProgram": "Current programme",
+          "cobraNextProgram": "Next programme"
+        },
+        "lifecycle": "NOT_CALLED",
+        "player_network": "NOT_CONSTRUCTED"
+      },
+      "direct_mode_details": {
+        "style": "mobile",
+        "mode_details_guard_active": true,
+        "labels": {
+          "mCobraGuideNowLabel": {
+            "setText_calls": 1,
+            "written_values": [
+              "Current programme"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Current programme",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraGuideNextLabel": {
+            "setText_calls": 1,
+            "written_values": [
+              "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM\nNext  Next programme"
+            ],
+            "requestLayout_calls": 1,
+            "text": "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM\nNext  Next programme",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeDescription": {
+            "setText_calls": 1,
+            "written_values": [
+              "Actual current description"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Actual current description",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeEyebrow": {
+            "setText_calls": 1,
+            "written_values": [
+              "NOW PLAYING  \/  Synthetic channel"
+            ],
+            "requestLayout_calls": 0,
+            "text": "NOW PLAYING  \/  Synthetic channel",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeSub": {
+            "setText_calls": 1,
+            "written_values": [
+              "COBRA LIVE  ·  1 CHANNELS"
+            ],
+            "requestLayout_calls": 0,
+            "text": "COBRA LIVE  ·  1 CHANNELS",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerProgram": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraPlayerProgram",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerSchedule": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraPlayerSchedule",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerUpcoming": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraPlayerUpcoming",
+            "content_description": "",
+            "visibility": 0
+          }
+        },
+        "guide_progress": {
+          "setProgress_calls": 1,
+          "written_values": [
+            500
+          ],
+          "setVisibility_calls": 1,
+          "visibility_values": [
+            0
+          ],
+          "requestLayout_calls": 0,
+          "progress": 500,
+          "max": 1000,
+          "visibility": 0,
+          "content_description": ""
+        },
+        "details_content_description": "Synthetic channel, Current programme, open programme details",
+        "computed_mode_details_box": [
+          0,
+          525,
+          941,
+          96
+        ],
+        "actual_programme_identity_preconditions": {
+          "cobraCurrentProgram": "Current programme",
+          "cobraNextProgram": "Next programme"
+        },
+        "lifecycle": "NOT_CALLED",
+        "player_network": "NOT_CONSTRUCTED"
+      },
+      "final_guide_state_equal": true,
+      "final_guide_state": {
+        "mCobraGuideNowLabel": {
+          "text": "Current programme",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraGuideNextLabel": {
+          "text": "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM\nNext  Next programme",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeDescription": {
+          "text": "Actual current description",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeEyebrow": {
+          "text": "NOW PLAYING  \/  Synthetic channel",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeSub": {
+          "text": "COBRA LIVE  ·  1 CHANNELS",
+          "content_description": "",
+          "visibility": 0
+        },
+        "progress": {
+          "progress": 500,
+          "max": 1000,
+          "visibility": 0,
+          "content_description": ""
+        },
+        "details_content_description": "Synthetic channel, Current programme, open programme details"
+      },
+      "final_guide_state_sha256": "d51fa1370c8d42acd6925630d7725b557663c24a31cc5ca6086786fcdd02368d"
+    },
+    {
+      "style": "grid",
+      "scenario": "current-next",
+      "full_refresh": {
+        "style": "grid",
+        "mode_details_guard_active": true,
+        "labels": {
+          "mCobraGuideNowLabel": {
+            "setText_calls": 2,
+            "written_values": [
+              "Synthetic channel  ·  Current programme",
+              "Current programme"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Current programme",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraGuideNextLabel": {
+            "setText_calls": 2,
+            "written_values": [
+              "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM  ·  720 min left\nNext  Next programme",
+              "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM\nNext  Next programme"
+            ],
+            "requestLayout_calls": 1,
+            "text": "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM\nNext  Next programme",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeDescription": {
+            "setText_calls": 1,
+            "written_values": [
+              "Actual current description"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Actual current description",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeEyebrow": {
+            "setText_calls": 1,
+            "written_values": [
+              "NOW PLAYING  \/  Synthetic channel"
+            ],
+            "requestLayout_calls": 0,
+            "text": "NOW PLAYING  \/  Synthetic channel",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeSub": {
+            "setText_calls": 1,
+            "written_values": [
+              "COBRA LIVE  ·  1 CHANNELS"
+            ],
+            "requestLayout_calls": 0,
+            "text": "COBRA LIVE  ·  1 CHANNELS",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerProgram": {
+            "setText_calls": 1,
+            "written_values": [
+              "Current programme"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Current programme",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerSchedule": {
+            "setText_calls": 1,
+            "written_values": [
+              "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM   ·   720 min left"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM   ·   720 min left",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerUpcoming": {
+            "setText_calls": 1,
+            "written_values": [
+              "Next  Next programme"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Next  Next programme",
+            "content_description": "",
+            "visibility": 0
+          }
+        },
+        "guide_progress": {
+          "setProgress_calls": 2,
+          "written_values": [
+            500,
+            500
+          ],
+          "setVisibility_calls": 2,
+          "visibility_values": [
+            0,
+            0
+          ],
+          "requestLayout_calls": 0,
+          "progress": 500,
+          "max": 1000,
+          "visibility": 0,
+          "content_description": ""
+        },
+        "details_content_description": "Synthetic channel, Current programme, open programme details",
+        "computed_mode_details_box": [
+          281,
+          56,
+          660,
+          154
+        ],
+        "actual_programme_identity_preconditions": {
+          "cobraCurrentProgram": "Current programme",
+          "cobraNextProgram": "Next programme"
+        },
+        "lifecycle": "NOT_CALLED",
+        "player_network": "NOT_CONSTRUCTED"
+      },
+      "direct_mode_details": {
+        "style": "grid",
+        "mode_details_guard_active": true,
+        "labels": {
+          "mCobraGuideNowLabel": {
+            "setText_calls": 1,
+            "written_values": [
+              "Current programme"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Current programme",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraGuideNextLabel": {
+            "setText_calls": 1,
+            "written_values": [
+              "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM\nNext  Next programme"
+            ],
+            "requestLayout_calls": 1,
+            "text": "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM\nNext  Next programme",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeDescription": {
+            "setText_calls": 1,
+            "written_values": [
+              "Actual current description"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Actual current description",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeEyebrow": {
+            "setText_calls": 1,
+            "written_values": [
+              "NOW PLAYING  \/  Synthetic channel"
+            ],
+            "requestLayout_calls": 0,
+            "text": "NOW PLAYING  \/  Synthetic channel",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeSub": {
+            "setText_calls": 1,
+            "written_values": [
+              "COBRA LIVE  ·  1 CHANNELS"
+            ],
+            "requestLayout_calls": 0,
+            "text": "COBRA LIVE  ·  1 CHANNELS",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerProgram": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraPlayerProgram",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerSchedule": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraPlayerSchedule",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerUpcoming": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraPlayerUpcoming",
+            "content_description": "",
+            "visibility": 0
+          }
+        },
+        "guide_progress": {
+          "setProgress_calls": 1,
+          "written_values": [
+            500
+          ],
+          "setVisibility_calls": 1,
+          "visibility_values": [
+            0
+          ],
+          "requestLayout_calls": 0,
+          "progress": 500,
+          "max": 1000,
+          "visibility": 0,
+          "content_description": ""
+        },
+        "details_content_description": "Synthetic channel, Current programme, open programme details",
+        "computed_mode_details_box": [
+          281,
+          56,
+          660,
+          154
+        ],
+        "actual_programme_identity_preconditions": {
+          "cobraCurrentProgram": "Current programme",
+          "cobraNextProgram": "Next programme"
+        },
+        "lifecycle": "NOT_CALLED",
+        "player_network": "NOT_CONSTRUCTED"
+      },
+      "final_guide_state_equal": true,
+      "final_guide_state": {
+        "mCobraGuideNowLabel": {
+          "text": "Current programme",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraGuideNextLabel": {
+          "text": "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM\nNext  Next programme",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeDescription": {
+          "text": "Actual current description",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeEyebrow": {
+          "text": "NOW PLAYING  \/  Synthetic channel",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeSub": {
+          "text": "COBRA LIVE  ·  1 CHANNELS",
+          "content_description": "",
+          "visibility": 0
+        },
+        "progress": {
+          "progress": 500,
+          "max": 1000,
+          "visibility": 0,
+          "content_description": ""
+        },
+        "details_content_description": "Synthetic channel, Current programme, open programme details"
+      },
+      "final_guide_state_sha256": "d51fa1370c8d42acd6925630d7725b557663c24a31cc5ca6086786fcdd02368d"
+    },
+    {
+      "style": "compact",
+      "scenario": "current-next",
+      "full_refresh": {
+        "style": "compact",
+        "mode_details_guard_active": true,
+        "labels": {
+          "mCobraGuideNowLabel": {
+            "setText_calls": 2,
+            "written_values": [
+              "Synthetic channel  ·  Current programme",
+              "Current programme"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Current programme",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraGuideNextLabel": {
+            "setText_calls": 2,
+            "written_values": [
+              "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM  ·  720 min left\nNext  Next programme",
+              "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM\nNext  Next programme"
+            ],
+            "requestLayout_calls": 1,
+            "text": "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM\nNext  Next programme",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeDescription": {
+            "setText_calls": 1,
+            "written_values": [
+              "Actual current description"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Actual current description",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeEyebrow": {
+            "setText_calls": 1,
+            "written_values": [
+              "NOW PLAYING  \/  Synthetic channel"
+            ],
+            "requestLayout_calls": 0,
+            "text": "NOW PLAYING  \/  Synthetic channel",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeSub": {
+            "setText_calls": 1,
+            "written_values": [
+              "COBRA LIVE  ·  1 CHANNELS"
+            ],
+            "requestLayout_calls": 0,
+            "text": "COBRA LIVE  ·  1 CHANNELS",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerProgram": {
+            "setText_calls": 1,
+            "written_values": [
+              "Current programme"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Current programme",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerSchedule": {
+            "setText_calls": 1,
+            "written_values": [
+              "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM   ·   720 min left"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM   ·   720 min left",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerUpcoming": {
+            "setText_calls": 1,
+            "written_values": [
+              "Next  Next programme"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Next  Next programme",
+            "content_description": "",
+            "visibility": 0
+          }
+        },
+        "guide_progress": {
+          "setProgress_calls": 2,
+          "written_values": [
+            500,
+            500
+          ],
+          "setVisibility_calls": 2,
+          "visibility_values": [
+            0,
+            0
+          ],
+          "requestLayout_calls": 0,
+          "progress": 500,
+          "max": 1000,
+          "visibility": 0,
+          "content_description": ""
+        },
+        "details_content_description": "Synthetic channel, Current programme, open programme details",
+        "computed_mode_details_box": [
+          0,
+          56,
+          761,
+          104
+        ],
+        "actual_programme_identity_preconditions": {
+          "cobraCurrentProgram": "Current programme",
+          "cobraNextProgram": "Next programme"
+        },
+        "lifecycle": "NOT_CALLED",
+        "player_network": "NOT_CONSTRUCTED"
+      },
+      "direct_mode_details": {
+        "style": "compact",
+        "mode_details_guard_active": true,
+        "labels": {
+          "mCobraGuideNowLabel": {
+            "setText_calls": 1,
+            "written_values": [
+              "Current programme"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Current programme",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraGuideNextLabel": {
+            "setText_calls": 1,
+            "written_values": [
+              "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM\nNext  Next programme"
+            ],
+            "requestLayout_calls": 1,
+            "text": "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM\nNext  Next programme",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeDescription": {
+            "setText_calls": 1,
+            "written_values": [
+              "Actual current description"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Actual current description",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeEyebrow": {
+            "setText_calls": 1,
+            "written_values": [
+              "NOW PLAYING  \/  Synthetic channel"
+            ],
+            "requestLayout_calls": 0,
+            "text": "NOW PLAYING  \/  Synthetic channel",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeSub": {
+            "setText_calls": 1,
+            "written_values": [
+              "COBRA LIVE  ·  1 CHANNELS"
+            ],
+            "requestLayout_calls": 0,
+            "text": "COBRA LIVE  ·  1 CHANNELS",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerProgram": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraPlayerProgram",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerSchedule": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraPlayerSchedule",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerUpcoming": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraPlayerUpcoming",
+            "content_description": "",
+            "visibility": 0
+          }
+        },
+        "guide_progress": {
+          "setProgress_calls": 1,
+          "written_values": [
+            500
+          ],
+          "setVisibility_calls": 1,
+          "visibility_values": [
+            0
+          ],
+          "requestLayout_calls": 0,
+          "progress": 500,
+          "max": 1000,
+          "visibility": 0,
+          "content_description": ""
+        },
+        "details_content_description": "Synthetic channel, Current programme, open programme details",
+        "computed_mode_details_box": [
+          0,
+          56,
+          761,
+          104
+        ],
+        "actual_programme_identity_preconditions": {
+          "cobraCurrentProgram": "Current programme",
+          "cobraNextProgram": "Next programme"
+        },
+        "lifecycle": "NOT_CALLED",
+        "player_network": "NOT_CONSTRUCTED"
+      },
+      "final_guide_state_equal": true,
+      "final_guide_state": {
+        "mCobraGuideNowLabel": {
+          "text": "Current programme",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraGuideNextLabel": {
+          "text": "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM\nNext  Next programme",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeDescription": {
+          "text": "Actual current description",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeEyebrow": {
+          "text": "NOW PLAYING  \/  Synthetic channel",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeSub": {
+          "text": "COBRA LIVE  ·  1 CHANNELS",
+          "content_description": "",
+          "visibility": 0
+        },
+        "progress": {
+          "progress": 500,
+          "max": 1000,
+          "visibility": 0,
+          "content_description": ""
+        },
+        "details_content_description": "Synthetic channel, Current programme, open programme details"
+      },
+      "final_guide_state_sha256": "d51fa1370c8d42acd6925630d7725b557663c24a31cc5ca6086786fcdd02368d"
+    },
+    {
+      "style": "focus",
+      "scenario": "current-next",
+      "full_refresh": {
+        "style": "focus",
+        "mode_details_guard_active": true,
+        "labels": {
+          "mCobraGuideNowLabel": {
+            "setText_calls": 2,
+            "written_values": [
+              "Synthetic channel  ·  Current programme",
+              "Current programme"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Current programme",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraGuideNextLabel": {
+            "setText_calls": 2,
+            "written_values": [
+              "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM  ·  720 min left\nNext  Next programme",
+              "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM\nNext  Next programme"
+            ],
+            "requestLayout_calls": 1,
+            "text": "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM\nNext  Next programme",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeDescription": {
+            "setText_calls": 1,
+            "written_values": [
+              "Actual current description"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Actual current description",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeEyebrow": {
+            "setText_calls": 1,
+            "written_values": [
+              "NOW PLAYING  \/  Synthetic channel"
+            ],
+            "requestLayout_calls": 0,
+            "text": "NOW PLAYING  \/  Synthetic channel",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeSub": {
+            "setText_calls": 1,
+            "written_values": [
+              "COBRA LIVE  ·  1 CHANNELS"
+            ],
+            "requestLayout_calls": 0,
+            "text": "COBRA LIVE  ·  1 CHANNELS",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerProgram": {
+            "setText_calls": 1,
+            "written_values": [
+              "Current programme"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Current programme",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerSchedule": {
+            "setText_calls": 1,
+            "written_values": [
+              "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM   ·   720 min left"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM   ·   720 min left",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerUpcoming": {
+            "setText_calls": 1,
+            "written_values": [
+              "Next  Next programme"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Next  Next programme",
+            "content_description": "",
+            "visibility": 0
+          }
+        },
+        "guide_progress": {
+          "setProgress_calls": 2,
+          "written_values": [
+            500,
+            500
+          ],
+          "setVisibility_calls": 2,
+          "visibility_values": [
+            0,
+            0
+          ],
+          "requestLayout_calls": 0,
+          "progress": 500,
+          "max": 1000,
+          "visibility": 0,
+          "content_description": ""
+        },
+        "details_content_description": "Synthetic channel, Current programme, open programme details",
+        "computed_mode_details_box": [
+          0,
+          585,
+          941,
+          118
+        ],
+        "actual_programme_identity_preconditions": {
+          "cobraCurrentProgram": "Current programme",
+          "cobraNextProgram": "Next programme"
+        },
+        "lifecycle": "NOT_CALLED",
+        "player_network": "NOT_CONSTRUCTED"
+      },
+      "direct_mode_details": {
+        "style": "focus",
+        "mode_details_guard_active": true,
+        "labels": {
+          "mCobraGuideNowLabel": {
+            "setText_calls": 1,
+            "written_values": [
+              "Current programme"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Current programme",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraGuideNextLabel": {
+            "setText_calls": 1,
+            "written_values": [
+              "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM\nNext  Next programme"
+            ],
+            "requestLayout_calls": 1,
+            "text": "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM\nNext  Next programme",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeDescription": {
+            "setText_calls": 1,
+            "written_values": [
+              "Actual current description"
+            ],
+            "requestLayout_calls": 0,
+            "text": "Actual current description",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeEyebrow": {
+            "setText_calls": 1,
+            "written_values": [
+              "NOW PLAYING  \/  Synthetic channel"
+            ],
+            "requestLayout_calls": 0,
+            "text": "NOW PLAYING  \/  Synthetic channel",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraModeSub": {
+            "setText_calls": 1,
+            "written_values": [
+              "COBRA LIVE  ·  1 CHANNELS"
+            ],
+            "requestLayout_calls": 0,
+            "text": "COBRA LIVE  ·  1 CHANNELS",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerProgram": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraPlayerProgram",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerSchedule": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraPlayerSchedule",
+            "content_description": "",
+            "visibility": 0
+          },
+          "mCobraPlayerUpcoming": {
+            "setText_calls": 0,
+            "written_values": [],
+            "requestLayout_calls": 0,
+            "text": "BEFORE mCobraPlayerUpcoming",
+            "content_description": "",
+            "visibility": 0
+          }
+        },
+        "guide_progress": {
+          "setProgress_calls": 1,
+          "written_values": [
+            500
+          ],
+          "setVisibility_calls": 1,
+          "visibility_values": [
+            0
+          ],
+          "requestLayout_calls": 0,
+          "progress": 500,
+          "max": 1000,
+          "visibility": 0,
+          "content_description": ""
+        },
+        "details_content_description": "Synthetic channel, Current programme, open programme details",
+        "computed_mode_details_box": [
+          0,
+          585,
+          941,
+          118
+        ],
+        "actual_programme_identity_preconditions": {
+          "cobraCurrentProgram": "Current programme",
+          "cobraNextProgram": "Next programme"
+        },
+        "lifecycle": "NOT_CALLED",
+        "player_network": "NOT_CONSTRUCTED"
+      },
+      "final_guide_state_equal": true,
+      "final_guide_state": {
+        "mCobraGuideNowLabel": {
+          "text": "Current programme",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraGuideNextLabel": {
+          "text": "Thu Oct 29 • 12:00 PM – Fri Oct 30 • 12:00 PM\nNext  Next programme",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeDescription": {
+          "text": "Actual current description",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeEyebrow": {
+          "text": "NOW PLAYING  \/  Synthetic channel",
+          "content_description": "",
+          "visibility": 0
+        },
+        "mCobraModeSub": {
+          "text": "COBRA LIVE  ·  1 CHANNELS",
+          "content_description": "",
+          "visibility": 0
+        },
+        "progress": {
+          "progress": 500,
+          "max": 1000,
+          "visibility": 0,
+          "content_description": ""
+        },
+        "details_content_description": "Synthetic channel, Current programme, open programme details"
+      },
+      "final_guide_state_sha256": "d51fa1370c8d42acd6925630d7725b557663c24a31cc5ca6086786fcdd02368d"
+    }
+  ],
+  "case_count": 12,
+  "clock_anchor_ms": 1793318400000,
+  "clock_domain": "Controlled Robolectric Android\/ShadowSystem wallclock; actual programme identity preconditions required",
+  "timing_benchmark": false,
+  "render_or_frame_measurement": false,
+  "physical_Fold": "NOT_RUN",
+  "shutdown": "NOT_RUN",
+  "production_changes": "NONE"
+}

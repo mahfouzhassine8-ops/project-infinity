@@ -1,0 +1,40 @@
+{
+  "selected_before_execution": true,
+  "parent_authorization": "Correctness14PASS and root coordination confirms no other local heavy benchmark; one materially new combined profile-data optimization ABBA only",
+  "baseline": "Exact accepted signed431 DEX",
+  "candidate": "Activity projectionV2 plus one-method FeatureRuntime wrapper plus2Cobra helperclasses; no authdecisioncache",
+  "order": [
+    "B431",
+    "C3",
+    "C3",
+    "B431"
+  ],
+  "warmups_per_entry_per_run": 21,
+  "samples_per_entry_per_run": 21,
+  "aggregate_samples_per_variant_per_entry": 42,
+  "selected_test": "CobraProjectionBenchmarkTest (same2existingtests andfixtureSHA aspriorABBA)",
+  "test_sha256": "3cecece1e5d9ed1e907dfe2f48673f2ac057a575853075097c7dacf6c343517f",
+  "candidate_production_jar_sha256": "24f1ab00277966c0f3ca3bbee894a6e7bc264fd9f2eebe12d2bb3cfccc5d0f2c",
+  "candidate_feature_DEX_sha256": "0b27e6272f49908a1d1238ec45052c23a6687d4873688f2fac259cd4c5df0148",
+  "candidate_helper_DEX_sha256": "2bd2c311cc736c438d7de9f7629b1d4180582b00b534369577b373f314f23ee8",
+  "baseline_production_jar_sha256": "a34f66aa1f83946d2a1d3dde2743d4af7a06829293a973dd0f5d59483b4a4234",
+  "fresh_profiles_raw_and_active_profile_reads_per_projection": 40452,
+  "hidden_reads_defaults": "baseline20226; candidate1",
+  "adaptive_stopping": "NONE; fixed counts/order; genuine test failures preserved",
+  "execution": {
+    "status": "COMPLETED_FIXED_ABBA; SELECTED_CORRECTNESS_AND_COUNTS_PASS",
+    "test_executions": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "effective_samples_per_variant_per_entry": 42,
+    "evidence": "results/combined-profile-abba",
+    "interpretation": "Measured host projection p50/p95 reduction with fresh raw/profile reads unchanged; no device gain claim"
+  },
+  "APK_build": "NOT_RUN",
+  "CI": "NOT_RUN",
+  "emulator": "NOT_RUN",
+  "signing": "NOT_RUN",
+  "shutdown": "NOT_RUN",
+  "physical_Fold": "NOT_RUN"
+}

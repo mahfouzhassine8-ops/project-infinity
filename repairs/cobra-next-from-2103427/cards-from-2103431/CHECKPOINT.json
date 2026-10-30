@@ -6,7 +6,7 @@
   "baseline": "BASELINE.json",
   "scope": "SCOPE.json",
   "reference": "RESOLVED; both exact images SHA256 verified and visually inspected; private files outside repository",
-  "next": "Finish profile and presentation focused parity tests, Cards tile/header/layout implementation and actual visual comparison; run selected exact431 Android baseline, then integrate only passing measured changes; one consolidated signed candidate after focused verification.",
+  "next": "Finish Cards layout/tile integration and exact941\u00d71672native-rendercomparison; preservebaselineCIresult; checkcompleteinvalidationsforretainedCardsreturn; runonlynewpathfocusedverification; oneconsolidatednextsignedcandidateafterallrequiredchecks.",
   "agents": {
     "qa_preflight_review": "Profile parity and projection correctness only",
     "delivery_finish_review": "Presentation candidate parity and player progress path",
@@ -14,7 +14,7 @@
     "nonpro_actual_view_test": "Cards-only header/layout/details helper"
   },
   "physical_Fold": "USER_ACCEPTED431; new work not tested",
-  "APK_or_registry_changes": "NONE; no new app APK, signer, release registration, CI run or lock",
+  "APK_or_registry_changes": "NONE; no new app APK, signer, release registration or lock. One focused Android baseline run uses exact431.",
   "shutdown": "FROZEN_NOT_RUN",
   "production_source_status": "Accepted431 global builder/runtime unchanged; isolated next-version helper/patch sources and host prototypes in this folder only",
   "implemented_local": [
@@ -27,7 +27,11 @@
     "Exact431 recovery hashes and signed-source bindings",
     "Projection semantics/freshness/input identity in all four ABBA runs; 8 selected tests pass",
     "Projection work count 20226 hidden reads/default sets to1; mixed latency honestly retained",
-    "Presentation baseline 12 cases demonstrates duplicate Now/Next/progress writes; candidate test underway"
+    "Presentation baseline 12 cases demonstrates duplicate Now/Next/progress writes; candidate test underway",
+    "Profile correctness:6baseline+6candidate API/data parity and2candidate projection semantics/count cases PASS",
+    "Combined profile+projection fixedABBA:8selected executionsPASS,42samples per variant/entry",
+    "Presentation candidate15cases finalFULLtick state matches431, player text/progress writes preserved",
+    "Cards logo unbind4actualcoordinator casesPASS"
   ],
   "measurements": {
     "host_only": true,
@@ -41,6 +45,46 @@
     ],
     "general_speedup_established": false,
     "profile_data_prototype": "Correctness tests starting after independent review; no timing result yet",
-    "Android_new_scope": "Harness prepared; no CI/emulator run yet"
+    "Android_new_scope": {
+      "run": 41001477356,
+      "source": "bfb27f1f09a9fa8eaf962504cf2ed649273e4aa0",
+      "APK": "exactaccepted431",
+      "status": "IN_PROGRESS; no feature result yet",
+      "selected_job": "cobra-cards-baseline",
+      "other_jobs": "ALL5_SKIPPED",
+      "scope": "android-qa/SCOPE.json"
+    },
+    "combined_profile_projection": {
+      "host_fixture_channels": 20226,
+      "fixed_order": [
+        "B431",
+        "C3",
+        "C3",
+        "B431"
+      ],
+      "samples_per_variant_entry": 42,
+      "current_view_p50_p95_ms": {
+        "signed431": [
+          16.10825,
+          18.689908
+        ],
+        "prototype": [
+          2.167379,
+          3.203121
+        ]
+      },
+      "guide_p50_p95_ms": {
+        "signed431": [
+          17.179647,
+          22.652607
+        ],
+        "prototype": [
+          2.129261,
+          2.408302
+        ]
+      },
+      "fresh_raw_profile_and_active_ID_reads_each_entry": 40452,
+      "policy_decisions_cached": false
+    }
   }
 }

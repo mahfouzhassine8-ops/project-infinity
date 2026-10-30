@@ -1,0 +1,25 @@
+{
+  "status": "FIXTURE_ERROR_BEFORE_PRODUCTION_REFRESH_ENTRY",
+  "error": "NoSuchMethodException CobraModeLayout.compute(String,int,int,float,float)",
+  "actual_source_signature": "CobraModeLayout.solve(String,int,int,float,boolean)",
+  "baseline_count_or_semantics_result": "NONE; production refresh entries not reached",
+  "correction": "Use exact existing solve signature and arguments; no constructor fallback or production mock",
+  "files": {
+    "INPUTS.json": {
+      "sha256": "d6e7d55365fb601e0647b291c18c04a91ee584d5c786e86181e9d1a1c40330bf",
+      "bytes": 5562
+    },
+    "TEST-OUTPUT.txt": {
+      "sha256": "819cf283c0606e9aca6b83566b907160696ce47468c1ef24b24d4495de11aa28",
+      "bytes": 3108
+    },
+    "TEST-SOURCE.java": {
+      "sha256": "507bcb890dd6e7383755dd395fcb929a0e681e5acc02d2295ca576ca6ef132b6",
+      "bytes": 13573
+    },
+    "JUNIT.xml": {
+      "sha256": "ff32a109407e5a698d62c9069cebbcab89508f34c1dcb9d9c724959810811a93",
+      "bytes": 14584
+    }
+  }
+}

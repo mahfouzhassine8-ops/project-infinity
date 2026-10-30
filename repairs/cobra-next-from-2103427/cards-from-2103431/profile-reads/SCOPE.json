@@ -15,7 +15,7 @@
     "threadseparation",
     "nohelperpreferencewrites"
   ],
-  "tests": "SOURCES_PREPARED_ONLY; await peer review before selected host execution/timing",
+  "tests": "PASS_14_SELECTED_CORRECTNESS_CASES_AND8_FIXED_ABBA_TEST_EXECUTIONS; HOST_ONLY",
   "APK_build": "NOT_RUN",
   "CI": "NOT_RUN",
   "emulator": "NOT_RUN",
@@ -41,5 +41,11 @@
     "feature_DEX_sha256": "0b27e6272f49908a1d1238ec45052c23a6687d4873688f2fac259cd4c5df0148",
     "helper_DEX_sha256": "2bd2c311cc736c438d7de9f7629b1d4180582b00b534369577b373f314f23ee8",
     "evidence": "results/preparation-only"
+  },
+  "timing": {
+    "status": "PASS_FIXED_HOST_COMPARISON",
+    "protocol": "SamefixtureSHA3cecece...;21warmups+21samples/run/entry;ABBA;N42variant/entry",
+    "evidence": "results/combined-profile-abba",
+    "scope": "Measured host projection only; no device/startup/frame/thermal claim"
   }
 }

@@ -1,0 +1,92 @@
+{
+  "status": "PREPARED_ONLY_NOT_EXECUTED",
+  "scope": {
+    "authorization": "Root-selected independent 431 presentation baseline: actual cobraRefreshProgrammeLabels and cobraRefreshModeDetails; no production change",
+    "selected_before_execution": true,
+    "status": "BASELINE_EXECUTION_SELECTED_AFTER_ROOT_CPU_CLEARANCE",
+    "execution_authorization": "Root explicitly cleared the completed ABBA window before compilation and this one selected baseline test",
+    "baseline_source": "9ccc4c362a65118eeba38a8e7e4b0de5723c69af",
+    "baseline_versionCode": 2103431,
+    "baseline_APK_sha256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471",
+    "baseline_host": "/workspace/cobra-evidence/cards431-projection-baseline",
+    "selected_test": "CobraProgrammePresentationBaselineTest#actual431RefreshWritesAndFinalState",
+    "actual_methods": [
+      "cobraRefreshProgrammeLabels()V",
+      "cobraRefreshModeDetails()V",
+      "CobraModeLayout.compute(String,int,int,float,float)"
+    ],
+    "fixture": "Robolectric API35; Activity.get only, no lifecycle. Actual Channel, GuideProgram, CobraEpgData and mode-layout objects. Native TextView/ProgressBar subclasses count then call super; no production method stub or fake render.",
+    "selected_cases": [
+      "Cards valid current and next programme",
+      "Cards valid current programme without next",
+      "Cards expired-only schedule",
+      "Cards source without loaded EPG",
+      "Cards loaded EPG without a channel match",
+      "Cards null preview channel",
+      "Cards no mode-eyebrow guard: original preliminary-label fallback",
+      "Cards no mode-layout guard: original preliminary-label fallback",
+      "Each other guide-style string with Pro disabled: current and next programme, direct-final-writer equivalence"
+    ],
+    "observations": [
+      "Every counted native TextView setText call and ordered written values",
+      "Native TextView requestLayout calls; fixture-level calls only, not rendered frames",
+      "ProgressBar setProgress/setVisibility calls and written values",
+      "Final text, view visibility, progress/max, accessibility descriptions and mode geometry",
+      "Actual full-refresh final state compared with direct actual mode-details state when its guard is active",
+      "Final-state JSON SHA256 and exact DEX/translated JAR/test input hashes"
+    ],
+    "excluded": [
+      "Activity onCreate/onStart/onResume/showGuide/render methods",
+      "Player construction or callbacks, HTTP/provider operations, Android CI/emulator",
+      "Timing/FPS/smoothness/thermal or physical Fold claims",
+      "Production patch, APK/build/signing, release registry or branch changes"
+    ],
+    "shutdown": "FROZEN_NOT_RUN",
+    "user_data": "NOT_ACCESSED",
+    "approved_Cards_image": "UNAVAILABLE; NOT_NEEDED_FOR_THIS_INDEPENDENT_WRITE_COUNT_BASELINE"
+  },
+  "original_baseline_receipt": {
+    "runtime": "Robolectric API35 HOST actual accepted431 DEX; no Activity.onCreate/network/player/shutdown",
+    "source": "9ccc4c362a65118eeba38a8e7e4b0de5723c69af",
+    "versionCode": 2103431,
+    "APK_sha256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471",
+    "DEX_sha256": {
+      "classes.dex": "07b94bfde6dbc3e3a6bfc8436ea65e6a67bdef5ca868379809e20f2fb7ce8efb",
+      "classes2.dex": "2e8fa1ae27e670db0525d31a655e93d861893fa20316d5c54a4c6283a97ca304",
+      "classes3.dex": "7e18d8092de33a4d44e299305965e9b9eb943372a9643452f6f78afe209fb215",
+      "classes4.dex": "9f82b0420b32ad8bdda7ef042e44bb975c8c01663f66506eaf33d22123f49b82",
+      "classes5.dex": "af03db41f53209de52f5d8609e411da49fee106d0fe544d6ea6e5d8230d88363"
+    },
+    "test_SHA256": "24e843f8fc18a75a80654dfe20ae22aa6d65e645307b4fdbf3adfcafedcd5f94",
+    "prepare_SHA256": "7259ebbd9b0ad53848069b8862de84445ef7c7b2b75b05b3d15322e9733213ba",
+    "translated_jar_SHA256": {
+      "classes.dex": "3b0771b06c0570d1fe3b8b99c8c6c9e2aab2903f8e08d51d3ec2891fa671fc2f",
+      "classes2.dex": "24557ce2aff5b54328104fe5ee954ea8de32a7b7100e4a0f72c1b739ab0e6e48",
+      "classes3.dex": "4997ce3217d3af2f018fbd13ab948a44bffb0c8b8e49aaec52fb6f67fbfaf2a9",
+      "classes4.dex": "a7a8275b20a8380194397b6c18215ce3d2ba3e4c844aa1e77088013693df4d68",
+      "classes5.dex": "b106fd54add7276445ed70a77526f9518dfee6d412f939dd9b2b0299f768fdb9"
+    },
+    "translation_error_archives": [
+      "classes.zip",
+      "classes3.zip"
+    ],
+    "physical_Fold": "NOT_RUN",
+    "shutdown": "NOT_RUN",
+    "production_changes": "NONE"
+  },
+  "baseline_receipt_sha256": "4be4dd8fe93205bd4569cfd9eb219727356af10c5060d5d26e76f4b53e1ccbc9",
+  "DEX_sha256": {
+    "classes.dex": "07b94bfde6dbc3e3a6bfc8436ea65e6a67bdef5ca868379809e20f2fb7ce8efb",
+    "classes2.dex": "2e8fa1ae27e670db0525d31a655e93d861893fa20316d5c54a4c6283a97ca304",
+    "classes3.dex": "7e18d8092de33a4d44e299305965e9b9eb943372a9643452f6f78afe209fb215",
+    "classes4.dex": "9f82b0420b32ad8bdda7ef042e44bb975c8c01663f66506eaf33d22123f49b82",
+    "classes5.dex": "af03db41f53209de52f5d8609e411da49fee106d0fe544d6ea6e5d8230d88363"
+  },
+  "test_sha256": "507bcb890dd6e7383755dd395fcb929a0e681e5acc02d2295ca576ca6ef132b6",
+  "prepare_sha256": "7daf95e5e4ce2906d1085503c6a84180be1f79d88cb257eab58578ec569f2853",
+  "production_jar_sha256": "a34f66aa1f83946d2a1d3dde2743d4af7a06829293a973dd0f5d59483b4a4234",
+  "support_jar_sha256": "016a9ca405468cbc86fb6da8634e943ada67ffa615a3b804a1d9680fca84f1ad",
+  "pom_sha256": "708dc23404c8251a65ba90cfa313e3ffb5eec268534ee23787c5498246fbb3ba",
+  "shutdown": "NOT_RUN",
+  "production_changes": "NONE"
+}

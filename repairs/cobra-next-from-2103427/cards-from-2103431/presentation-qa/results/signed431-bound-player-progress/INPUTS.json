@@ -1,0 +1,75 @@
+{
+  "status": "PREPARED_ONLY_NOT_EXECUTED",
+  "scope": {
+    "authorization": "Root selected review then verification of its one-method presentation prototype, retaining accepted431 and all previous baseline evidence",
+    "selected_before_execution": true,
+    "baseline_source": "9ccc4c362a65118eeba38a8e7e4b0de5723c69af",
+    "baseline_APK_sha256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471",
+    "prototype_DEX_sha256": "6354ea6cdc1dfde1745b4463d1e8b17e714ac3a6b52119f597b32c18deab746d",
+    "changed_method": "private cobraRefreshProgrammeLabels()V",
+    "original_method_sha256": "5d02c9f97fc5c7c5332c234d606fa7e63441ea7a8c07f5e761407b75318a98de",
+    "frozen_final_writer_sha256": "b2b6ad3345f824345a3f29b1cc48b85af2975e36864f0ae4329bb0464eac1056",
+    "overlay": "Only InfinityLiveActivity.class in the exact signed431 production host JAR; support and all other classes exact. Actual canonical smali fields/method set/all other method bodies must match accepted431.",
+    "review_gate": "Register liveness and unchanged downstream call order independently reviewed before execution; see REGISTER-LIVENESS-REVIEW.md",
+    "selected_additional_baseline_test": "CobraProgrammePresentationBaselineTest#actual431BoundPlayerProgressBaseline",
+    "additional_baseline_cases": [
+      "Valid current/next with actual bound playerProgrammeProgress and active details guard",
+      "Same current/next with missing layout guard preserving original path",
+      "Absent EPG with actual bound playerProgrammeProgress and active details guard"
+    ],
+    "selected_candidate_test": "CobraProgrammePresentationBaselineTest#actualCandidateFinalStateParityAndBoundPlayerProgress",
+    "candidate_cases": "Original12 cases compared against preserved accepted431 FULL tick; additional3 cases compared against genuine new accepted431 bound-progress baseline",
+    "all_final_state": "Guide and all three player text labels, visibility, accessibility descriptions, guide progress/max and actual bound player progress/max/visibility; original input programme identities required",
+    "expected_work": "Active-guard guide Now/Next/progress each1 write; fallback each1 original write. Original player progress path must execute and match original431 with nonzero500 progress; bound case also exercises nonintegral minutes-left rounding.",
+    "old12_baseline": "PRESERVED_NOT_RERUN",
+    "measurement_scope": "Native host setter/requestLayout invocation counts only; no latency/FPS/frame/physical/thermal claim",
+    "application_APK": "NOT_BUILT_OR_INSTALLED",
+    "shutdown": "FROZEN_NOT_RUN",
+    "user_data": "NOT_ACCESSED"
+  },
+  "scope_sha256": "45dd8e0609d6d98b01fa6a2bb866d8753d3305f8d3c696161cb8eae5149edcb0",
+  "original_baseline_receipt": {
+    "runtime": "Robolectric API35 HOST actual accepted431 DEX; no Activity.onCreate/network/player/shutdown",
+    "source": "9ccc4c362a65118eeba38a8e7e4b0de5723c69af",
+    "versionCode": 2103431,
+    "APK_sha256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471",
+    "DEX_sha256": {
+      "classes.dex": "07b94bfde6dbc3e3a6bfc8436ea65e6a67bdef5ca868379809e20f2fb7ce8efb",
+      "classes2.dex": "2e8fa1ae27e670db0525d31a655e93d861893fa20316d5c54a4c6283a97ca304",
+      "classes3.dex": "7e18d8092de33a4d44e299305965e9b9eb943372a9643452f6f78afe209fb215",
+      "classes4.dex": "9f82b0420b32ad8bdda7ef042e44bb975c8c01663f66506eaf33d22123f49b82",
+      "classes5.dex": "af03db41f53209de52f5d8609e411da49fee106d0fe544d6ea6e5d8230d88363"
+    },
+    "test_SHA256": "24e843f8fc18a75a80654dfe20ae22aa6d65e645307b4fdbf3adfcafedcd5f94",
+    "prepare_SHA256": "7259ebbd9b0ad53848069b8862de84445ef7c7b2b75b05b3d15322e9733213ba",
+    "translated_jar_SHA256": {
+      "classes.dex": "3b0771b06c0570d1fe3b8b99c8c6c9e2aab2903f8e08d51d3ec2891fa671fc2f",
+      "classes2.dex": "24557ce2aff5b54328104fe5ee954ea8de32a7b7100e4a0f72c1b739ab0e6e48",
+      "classes3.dex": "4997ce3217d3af2f018fbd13ab948a44bffb0c8b8e49aaec52fb6f67fbfaf2a9",
+      "classes4.dex": "a7a8275b20a8380194397b6c18215ce3d2ba3e4c844aa1e77088013693df4d68",
+      "classes5.dex": "b106fd54add7276445ed70a77526f9518dfee6d412f939dd9b2b0299f768fdb9"
+    },
+    "translation_error_archives": [
+      "classes.zip",
+      "classes3.zip"
+    ],
+    "physical_Fold": "NOT_RUN",
+    "shutdown": "NOT_RUN",
+    "production_changes": "NONE"
+  },
+  "baseline_receipt_sha256": "4be4dd8fe93205bd4569cfd9eb219727356af10c5060d5d26e76f4b53e1ccbc9",
+  "DEX_sha256": {
+    "classes.dex": "07b94bfde6dbc3e3a6bfc8436ea65e6a67bdef5ca868379809e20f2fb7ce8efb",
+    "classes2.dex": "2e8fa1ae27e670db0525d31a655e93d861893fa20316d5c54a4c6283a97ca304",
+    "classes3.dex": "7e18d8092de33a4d44e299305965e9b9eb943372a9643452f6f78afe209fb215",
+    "classes4.dex": "9f82b0420b32ad8bdda7ef042e44bb975c8c01663f66506eaf33d22123f49b82",
+    "classes5.dex": "af03db41f53209de52f5d8609e411da49fee106d0fe544d6ea6e5d8230d88363"
+  },
+  "test_sha256": "b00d6017451f61d44265ce431cb0bae63abf0c172a12f96bb8d4325e30e6613c",
+  "prepare_sha256": "828b02c74d5306f0fdded2bfcd8b4bfafa71c7c50636c527699139bb97795b87",
+  "production_jar_sha256": "a34f66aa1f83946d2a1d3dde2743d4af7a06829293a973dd0f5d59483b4a4234",
+  "support_jar_sha256": "016a9ca405468cbc86fb6da8634e943ada67ffa615a3b804a1d9680fca84f1ad",
+  "pom_sha256": "874a103196ea9d033932f95e6076635242793f5ad590e05813c2a5518632a2c2",
+  "shutdown": "NOT_RUN",
+  "production_changes": "NONE"
+}

@@ -1,4 +1,4 @@
-# Private parsed-profile data reuse — host prototype awaiting review
+# Private parsed-profile data reuse — reviewed host prototype
 
 The accepted signed431 projection baseline makes40,452 fresh `profiles` preference reads per20,226-channel projection. The original `adultLocked()` reparses that raw JSON on every call. This prototype retains both fresh preference reads and the original lookup policy; it reuses only the private parsed representation when the current raw string is identical.
 
@@ -10,4 +10,4 @@ A private ThreadLocal holds one entry containing only raw String and private JSO
 
 Prepared host classes admit only the existing Activity projectionV2, the one-method FeatureRuntime wrapper, and two helper classes. All4,988 other existing translated production class entries and support dependencies are byte-identical to accepted431. The initial preparation lacked a standalone `javac`; its failure is preserved. The corrected preparation uses the already installed JDK compiler module and the pinned Android/D8 inputs.
 
-Six focused new API/data-parity test sources and the existing two projection test sources are prepared. **No host tests or timing have run for this prototype; independent review is required first.** No candidate APK, CI, Android emulator, signing, shutdown test or physical Fold claim.
+After independent root review, the six new API/data-parity cases passed on baseline and prototype; two count/semantic cases also passed without timing. The subsequent fixed21warmup/21sample ABBA comparison passed all8 selected executions and observed lower host projection p50/p95 while all40452 fresh raw/profile reads remain. See results/correctness and results/combined-profile-abba/REPORT.md. These are host results; no candidate APK, CI, Android emulator, signing, shutdown test or physical Fold claim.

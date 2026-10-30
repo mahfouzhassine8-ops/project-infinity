@@ -1,0 +1,60 @@
+{
+  "status": "PASS_GENUINE_ACCEPTED431_BOUND_PLAYER_PROGRESS_BASELINE",
+  "JUnit_tests": 1,
+  "JUnit_failures": 0,
+  "JUnit_errors": 0,
+  "cases": 3,
+  "old12": "NOT_RERUN_OR_REPLACED",
+  "actual_mFeatures": "Original InfinityCobraFeatureRuntime default sandbox profile; no profile method stub",
+  "actual_timeline_available": false,
+  "player_objects": "NOT_CONSTRUCTED",
+  "shutdown": "NOT_RUN",
+  "cases_summary": [
+    {
+      "scenario": "current-next",
+      "layout_guard": true,
+      "player_setProgress_calls": 1,
+      "player_progress": 500,
+      "player_visibility": 0,
+      "schedule": "Thu Oct 29 \u2022 12:00 PM \u2013 Fri Oct 30 \u2022 12:00 PM   \u00b7   721 min left"
+    },
+    {
+      "scenario": "current-next",
+      "layout_guard": false,
+      "player_setProgress_calls": 1,
+      "player_progress": 500,
+      "player_visibility": 0,
+      "schedule": "Thu Oct 29 \u2022 12:00 PM \u2013 Fri Oct 30 \u2022 12:00 PM   \u00b7   721 min left"
+    },
+    {
+      "scenario": "absent",
+      "layout_guard": true,
+      "player_setProgress_calls": 0,
+      "player_progress": 0,
+      "player_visibility": 4,
+      "schedule": "Guide not loaded yet"
+    }
+  ],
+  "files": {
+    "INPUTS.json": {
+      "sha256": "e2c0cec4f314e20fc2460d9b0385431722805ef71e5629f1550ec31e92a88b5e",
+      "bytes": 5424
+    },
+    "TEST-OUTPUT.txt": {
+      "sha256": "c89c553efa3149128aefefbd7b343375c20d3f9c0f490ae0d4db418df5c44edb",
+      "bytes": 105
+    },
+    "TEST-SOURCE.java": {
+      "sha256": "b00d6017451f61d44265ce431cb0bae63abf0c172a12f96bb8d4325e30e6613c",
+      "bytes": 23674
+    },
+    "JUNIT.xml": {
+      "sha256": "eed7b79523cb315b727ec67421ab8152ba67202aa2c6cdcf794bc54ad007c7d8",
+      "bytes": 12916
+    },
+    "BASELINE-PLAYER-PROGRESS.json": {
+      "sha256": "600cf86ba8958517a16f0519bf8a6040348acbb1984ce1f714fc2ec7c65eb383",
+      "bytes": 18175
+    }
+  }
+}

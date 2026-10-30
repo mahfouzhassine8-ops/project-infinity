@@ -1,0 +1,90 @@
+{
+  "status": "PASS_SINGLE_METHOD_PRESENTATION_PROTOTYPE_15_FULL_TICK_PARITY_CASES",
+  "JUnit_tests": 1,
+  "JUnit_failures": 0,
+  "JUnit_errors": 0,
+  "cases": 15,
+  "original12_baseline": "REUSED_NOT_RERUN",
+  "additional_genuine431_baseline_cases": 3,
+  "full_final_state": "EXACT_ALL15_CASES_INCLUDING_THREE_PLAYER_TEXT_LABELS_AND_BOUND_PLAYER_PROGRESS",
+  "active_guard_cases": 12,
+  "fallback_cases": 3,
+  "prototype_DEX_sha256": "6354ea6cdc1dfde1745b4463d1e8b17e714ac3a6b52119f597b32c18deab746d",
+  "changed_methods": [
+    "private cobraRefreshProgrammeLabels()V"
+  ],
+  "all_other_canonical_method_bodies_fields_and_class_metadata": "EXACT",
+  "unchanged_translated_production_classes": 4989,
+  "all_other_translated_class_bytes": "EXACT",
+  "support_jar": "EXACT",
+  "aggregate_fixture_counts_before_after": {
+    "guide_now": [
+      27,
+      15
+    ],
+    "guide_next": [
+      27,
+      15
+    ],
+    "guide_setProgress": [
+      17,
+      10
+    ],
+    "guide_setVisibility": [
+      27,
+      15
+    ],
+    "three_player_text_writes": [
+      45,
+      45
+    ],
+    "player_setProgress": [
+      2,
+      2
+    ],
+    "guide_next_requestLayout": [
+      11,
+      9
+    ]
+  },
+  "latency_FPS_frame_battery_thermal_claim": "NONE; counts are selected host fixture invocations",
+  "register_review": "NO_BLOCKING_LIVENESS_OR_ORDER_ISSUE; original player float1000/Next/empty/59999L/endash continuation exercised",
+  "application_APK": "NOT_BUILT_OR_INSTALLED",
+  "production_patch_source": "PARENT_OWNED_LOCAL_PROTOTYPE_ONLY; NO_QA_TASK_PRODUCTION_EDITS",
+  "shutdown": "NOT_RUN",
+  "physical_Fold": "NOT_RUN",
+  "files": {
+    "INPUTS.json": {
+      "sha256": "03e03316f20e8b471928718c2e3da6b6c85ee4a02eea22b396ff47ba59e00704",
+      "bytes": 9519
+    },
+    "TEST-OUTPUT.txt": {
+      "sha256": "61711ec957f57db255322fa13f5bef2987858ff65355cbdad97c8e9986562d1e",
+      "bytes": 96
+    },
+    "TEST-SOURCE.java": {
+      "sha256": "b00d6017451f61d44265ce431cb0bae63abf0c172a12f96bb8d4325e30e6613c",
+      "bytes": 23674
+    },
+    "JUNIT.xml": {
+      "sha256": "42ed1a6865bda242593a7c0a9ab33302f71632b85ac0e6dca752a4b7f6a63c7c",
+      "bytes": 13258
+    },
+    "CANDIDATE.json": {
+      "sha256": "08ee475bafde6210b6b4a34f98f526afdc797eb437f6a27dedcf097ba764e92b",
+      "bytes": 57515
+    },
+    "FULL-FINAL-STATE-PARITY.json": {
+      "sha256": "bb2a10e22266ac525a5371e4bb81ac8e3d241459835074b95f5f29aabd836d03",
+      "bytes": 29821
+    },
+    "SELECTED-METHODS.smali": {
+      "sha256": "86bf0260c7e3cfd1dbad36e3cb44be0bc872b731e06fa823d3341724af3e877e",
+      "bytes": 33317
+    },
+    "REVIEW.md": {
+      "sha256": "d429ecf02beacc932ca81acaf72dfdf0297d870421a983ac8e4da9dcb52c138b",
+      "bytes": 3147
+    }
+  }
+}

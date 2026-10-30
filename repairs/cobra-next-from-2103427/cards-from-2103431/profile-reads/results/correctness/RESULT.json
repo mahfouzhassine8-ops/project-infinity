@@ -1,0 +1,45 @@
+{
+  "status": "PASS_14_SELECTED_CORRECTNESS_EXECUTIONS",
+  "stages": [
+    {
+      "stage": "baseline-six",
+      "test": "CobraProfileDataReuseTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "command": "mvn -B -q -f /workspace/cobra-evidence/cards431-profile-data-prototype-v1/baseline-parity/pom.xml -Dtest=CobraProfileDataReuseTest test"
+    },
+    {
+      "stage": "prototype-six",
+      "test": "CobraProfileDataReuseTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "command": "mvn -B -q -f /workspace/cobra-evidence/cards431-profile-data-prototype-v1/pom.xml -Dtest=CobraProfileDataReuseTest test"
+    },
+    {
+      "stage": "prototype-projection-two",
+      "test": "CobraProjectionCorrectnessTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "command": "mvn -B -q -f /workspace/cobra-evidence/cards431-profile-data-prototype-v1/pom.xml -Dtest=CobraProjectionCorrectnessTest test"
+    }
+  ],
+  "baseline_signed_APK_sha256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471",
+  "prototype_feature_DEX_sha256": "0b27e6272f49908a1d1238ec45052c23a6687d4873688f2fac259cd4c5df0148",
+  "prototype_helper_DEX_sha256": "2bd2c311cc736c438d7de9f7629b1d4180582b00b534369577b373f314f23ee8",
+  "projection_V2_DEX_sha256": "f3fe97407023881be8457c60d61da8189c93b0546010fb8dc34787869aa88dd1",
+  "projection_measurements": "NO_TIMING; actual20226count/identity/freshnessonly",
+  "timing": "NOT_RUN_IN_THIS_CORRECTNESS_SELECTION",
+  "new_auth_decision_cache": false,
+  "fresh_profiles_raw_and_active_profile_reads_per_projection": 40452,
+  "hidden_preference_reads_and_default_sets_per_projection": 1,
+  "source_policy_parity": "publicfinalclass;54nonselectedFeaturemethods/publicprofiles/PIN/source/getters andfields exact;fresh IDthenraw +same firstmatch loop",
+  "physical_Fold": "NOT_RUN",
+  "APK_build": "NOT_RUN",
+  "shutdown": "NOT_RUN"
+}

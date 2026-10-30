@@ -1,0 +1,28 @@
+{
+  "status": "JUNIT_PASS_BUT_CURRENT_EPG_CASES_INVALID; NOT_ACCEPTED_AS_VALID_CURRENT_PROGRESS_PROOF",
+  "error": "Host test wallclock seeded EPG while instrumented production uses Robolectric ShadowSystem wallclock. Purported current programme was treated as future; progress set calls zero.",
+  "missing_assertion": "Actual current/next programme identity preconditions were not checked.",
+  "correction": "Use controlled Android/Robolectric wallclock; assert actual cobraCurrentProgram and cobraNextProgram identities before measuring setters. No production method shadow or fake render.",
+  "files": {
+    "INPUTS.json": {
+      "sha256": "30456002f72baf0e691e93ae15187f224c0041990d48ff0b61915f45c1244b9e",
+      "bytes": 5562
+    },
+    "TEST-OUTPUT.txt": {
+      "sha256": "5cd6c9fb696f1b9755a8b2d8f10470d8e290e71770555998e8ad0e168f085571",
+      "bytes": 52665
+    },
+    "TEST-SOURCE.java": {
+      "sha256": "8cbf666bb6ff4e69bfa481af873e2a6274a72ae6bf759e833c55e4d352c9e1f5",
+      "bytes": 13570
+    },
+    "JUNIT.xml": {
+      "sha256": "5a7f75eff20ccd141a4222e9b5c16ddcbbde0e08c9882bd448d0f105242b4e5a",
+      "bytes": 65402
+    },
+    "BASELINE.json": {
+      "sha256": "a5d3f6c6afa51f2f1cad0a0fec42c8254acfc68cacdc6a4f12d3d1e7fd3589ca",
+      "bytes": 87327
+    }
+  }
+}

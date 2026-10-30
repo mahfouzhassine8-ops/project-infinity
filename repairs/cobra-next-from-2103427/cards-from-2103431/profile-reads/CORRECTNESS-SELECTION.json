@@ -1,0 +1,49 @@
+{
+  "selected_before_execution": true,
+  "parent_peer_review": "Root independently reviewed and cleared helper/wrapper for correctness only",
+  "phase": "UNSIGNED_PROFILE_DATA_REUSE_PROTOTYPE_NO_APK",
+  "order": [
+    {
+      "classpath": "baseline-parity exact signed431",
+      "selected": "CobraProfileDataReuseTest",
+      "test_count": 6
+    },
+    {
+      "classpath": "prototype ActivityV2+Featurewrapper+2helpers",
+      "selected": "CobraProfileDataReuseTest",
+      "test_count": 6
+    },
+    {
+      "classpath": "same prototype",
+      "selected": "CobraProjectionCorrectnessTest",
+      "test_count": 2
+    }
+  ],
+  "projection_fixture": "Same prior fixture/semantic method; benchmark body replaced by actual count+identity/order assertions only. Prior QA source untouched.",
+  "warmups": 0,
+  "timing_samples": 0,
+  "timing": "NOT_MEASURED",
+  "profile_reads_per_projection": "40452 raw profiles and active-profile reads remain mandatory",
+  "prototype_INPUTS_sha256": "54325db0a79f3d5284114538e2651ded31625833a13c7fbfc7d9b2df780dfb99",
+  "Feature_DEX_sha256": "0b27e6272f49908a1d1238ec45052c23a6687d4873688f2fac259cd4c5df0148",
+  "helper_DEX_sha256": "2bd2c311cc736c438d7de9f7629b1d4180582b00b534369577b373f314f23ee8",
+  "test_sources_sha256": {
+    "CobraProjectionCorrectnessTest.java": "d5af41e1510f1d4ce85b0a454ea60e157d793d0c41b93740fa12f1d29fab1da5",
+    "CobraProfileDataReuseTest.java": "fc5a4890d27ffb25a0f339c4b1cdfc7f9e1e05f8593ff1462a514268b1831312"
+  },
+  "execution": {
+    "status": "PASS_14_SELECTED_CORRECTNESS_EXECUTIONS",
+    "tests": 14,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "timing": "NOT_MEASURED",
+    "evidence": "results/correctness"
+  },
+  "APK_build": "NOT_RUN",
+  "CI": "NOT_RUN",
+  "emulator": "NOT_RUN",
+  "signing": "NOT_RUN",
+  "shutdown": "NOT_RUN",
+  "physical_Fold": "NOT_RUN"
+}

@@ -8,10 +8,10 @@ The complete brief is read. Exact original-key signed431 remains the protected r
 | Exact approved references | IMPLEMENTED AND VERIFIED | Both actual PNG/JPG opened; expected dimensions and SHA256 match ASSET-ACCESS.json. |
 | Cards visual implementation | IN PROGRESS; NOT RELEASE VERIFIED | Cards tile helper source implemented; isolated header/layout/details helper underway. No visual parity claim before actual rendering/region comparison. |
 | Inventory projection | IMPLEMENTED HOST PROTOTYPE; MIXED LATENCY | 8 selected tests across fixed ABBA pass. Hidden preference reads/default sets20226→1. Guide median17.170→15.544ms; current-view15.785→16.662ms. No general speedup claim. |
-| Parsed profile data reuse | IMPLEMENTED HOST PROTOTYPE; CORRECTNESS TESTS ACTIVE | Fresh active ID/raw JSON every call; only private parse reused. Other54Feature methods exact. No authorization decision cached; no measured gain yet. |
-| Periodic presentation updates | IMPLEMENTED HOST PROTOTYPE; CANDIDATE PARITY ACTIVE | Actual431 baseline12cases verifies duplicate guide writes. Candidate retains fallback and final native writer; checking player labels/progress too. |
+| Parsed profile data reuse | IMPLEMENTED HOST PROTOTYPE AND VERIFIED; DEVICE ACCEPTANCE PENDING | Fresh active ID/raw JSON every call; only private parse reused. Other54Feature methods exact. No authorization decision cached; fixed combined host ABBA median16–17→2.1–2.2ms. |
+| Periodic presentation updates | IMPLEMENTED HOST PROTOTYPE AND VERIFIED; DEVICE ACCEPTANCE PENDING | Actual431 baseline12cases verifies duplicate guide writes. Candidate15cases preserve full-tick labels/progress/accessibility, original player writes and fallback. |
 | Return/list reconstruction | INVESTIGATED; NOT YET IMPLEMENTED | Existing native tokens do not cover inventory/favorite/recent/custom/profile changes. Safe reuse requires explicit invalidations; no stale-cache shortcut committed. |
-| Android startup/scroll/resources | NOT YET MEASURED FOR NEW SCOPE | Finite Cards-only baseline harness prepared/offline fixture checks pass; no CI execution yet. |
+| Android startup/scroll/resources | NOT YET MEASURED FOR NEW SCOPE | Finite Cards-only baseline harness prepared/offline fixture checks pass; one exact431 finite baseline run41001477356 active; no feature outcome yet. |
 | Non-Cards/player/owner isolation | REQUIRED BEFORE RELEASE | Existing431 controls/Pro not rewritten. Exact untouched methods/classes/owners and selected changed-path regression required after integration. |
 | One consolidated next signed release | NOT YET BUILT | Blocked on completing Cards visual and focused verification. No new app APK, signer, registry, or promotion. Physical Fold acceptance remains required. |
 

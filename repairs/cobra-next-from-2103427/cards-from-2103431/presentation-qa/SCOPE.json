@@ -1,0 +1,46 @@
+{
+  "authorization": "Root-selected independent 431 presentation baseline: actual cobraRefreshProgrammeLabels and cobraRefreshModeDetails; no production change",
+  "selected_before_execution": true,
+  "status": "BASELINE_VERIFIED_12_CASES_NO_PRODUCTION_CHANGE",
+  "execution_authorization": "Root explicitly cleared the completed ABBA window before compilation and this one selected baseline test",
+  "baseline_source": "9ccc4c362a65118eeba38a8e7e4b0de5723c69af",
+  "baseline_versionCode": 2103431,
+  "baseline_APK_sha256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471",
+  "baseline_host": "/workspace/cobra-evidence/cards431-projection-baseline",
+  "selected_test": "CobraProgrammePresentationBaselineTest#actual431RefreshWritesAndFinalState",
+  "actual_methods": [
+    "cobraRefreshProgrammeLabels()V",
+    "cobraRefreshModeDetails()V",
+    "CobraModeLayout.solve(String,int,int,float,boolean)"
+  ],
+  "fixture": "Robolectric API35; Activity.get only, no lifecycle. Actual Channel, GuideProgram, CobraEpgData and mode-layout objects. Native TextView/ProgressBar subclasses count then call super; no production method stub or fake render.",
+  "selected_cases": [
+    "Cards valid current and next programme",
+    "Cards valid current programme without next",
+    "Cards expired-only schedule",
+    "Cards source without loaded EPG",
+    "Cards loaded EPG without a channel match",
+    "Cards null preview channel",
+    "Cards no mode-eyebrow guard: original preliminary-label fallback",
+    "Cards no mode-layout guard: original preliminary-label fallback",
+    "Each other guide-style string with Pro disabled: current and next programme, direct-final-writer equivalence"
+  ],
+  "observations": [
+    "Every counted native TextView setText call and ordered written values",
+    "Native TextView requestLayout calls; fixture-level calls only, not rendered frames",
+    "ProgressBar setProgress/setVisibility calls and written values",
+    "Final text, view visibility, progress/max, accessibility descriptions and mode geometry",
+    "Actual full-refresh final state compared with direct actual mode-details state when its guard is active",
+    "Final-state JSON SHA256 and exact DEX/translated JAR/test input hashes"
+  ],
+  "excluded": [
+    "Activity onCreate/onStart/onResume/showGuide/render methods",
+    "Player construction or callbacks, HTTP/provider operations, Android CI/emulator",
+    "Timing/FPS/smoothness/thermal or physical Fold claims",
+    "Production patch, APK/build/signing, release registry or branch changes"
+  ],
+  "shutdown": "FROZEN_NOT_RUN",
+  "user_data": "NOT_ACCESSED",
+  "approved_Cards_image": "UNAVAILABLE; NOT_NEEDED_FOR_THIS_INDEPENDENT_WRITE_COUNT_BASELINE",
+  "result": "results/signed431-baseline/OUTCOME.json"
+}

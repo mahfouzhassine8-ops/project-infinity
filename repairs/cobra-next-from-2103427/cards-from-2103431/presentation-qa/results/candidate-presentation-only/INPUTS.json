@@ -1,0 +1,128 @@
+{
+  "status": "PREPARED_ONLY_NOT_EXECUTED",
+  "scope": {
+    "authorization": "Root selected review then verification of its one-method presentation prototype, retaining accepted431 and all previous baseline evidence",
+    "selected_before_execution": true,
+    "baseline_source": "9ccc4c362a65118eeba38a8e7e4b0de5723c69af",
+    "baseline_APK_sha256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471",
+    "prototype_DEX_sha256": "6354ea6cdc1dfde1745b4463d1e8b17e714ac3a6b52119f597b32c18deab746d",
+    "changed_method": "private cobraRefreshProgrammeLabels()V",
+    "original_method_sha256": "5d02c9f97fc5c7c5332c234d606fa7e63441ea7a8c07f5e761407b75318a98de",
+    "frozen_final_writer_sha256": "b2b6ad3345f824345a3f29b1cc48b85af2975e36864f0ae4329bb0464eac1056",
+    "overlay": "Only InfinityLiveActivity.class in the exact signed431 production host JAR; support and all other classes exact. Actual canonical smali fields/method set/all other method bodies must match accepted431.",
+    "review_gate": "Register liveness and unchanged downstream call order independently reviewed before execution; see REGISTER-LIVENESS-REVIEW.md",
+    "selected_additional_baseline_test": "CobraProgrammePresentationBaselineTest#actual431BoundPlayerProgressBaseline",
+    "additional_baseline_cases": [
+      "Valid current/next with actual bound playerProgrammeProgress and active details guard",
+      "Same current/next with missing layout guard preserving original path",
+      "Absent EPG with actual bound playerProgrammeProgress and active details guard"
+    ],
+    "selected_candidate_test": "CobraProgrammePresentationBaselineTest#actualCandidateFinalStateParityAndBoundPlayerProgress",
+    "candidate_cases": "Original12 cases compared against preserved accepted431 FULL tick; additional3 cases compared against genuine new accepted431 bound-progress baseline",
+    "all_final_state": "Guide and all three player text labels, visibility, accessibility descriptions, guide progress/max and actual bound player progress/max/visibility; original input programme identities required",
+    "expected_work": "Active-guard guide Now/Next/progress each1 write; fallback each1 original write. Original player progress path must execute and match original431 with nonzero500 progress; bound case also exercises nonintegral minutes-left rounding.",
+    "old12_baseline": "PRESERVED_NOT_RERUN",
+    "measurement_scope": "Native host setter/requestLayout invocation counts only; no latency/FPS/frame/physical/thermal claim",
+    "application_APK": "NOT_BUILT_OR_INSTALLED",
+    "shutdown": "FROZEN_NOT_RUN",
+    "user_data": "NOT_ACCESSED"
+  },
+  "scope_sha256": "45dd8e0609d6d98b01fa6a2bb866d8753d3305f8d3c696161cb8eae5149edcb0",
+  "original_baseline_receipt": {
+    "runtime": "Robolectric API35 HOST actual accepted431 DEX; no Activity.onCreate/network/player/shutdown",
+    "source": "9ccc4c362a65118eeba38a8e7e4b0de5723c69af",
+    "versionCode": 2103431,
+    "APK_sha256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471",
+    "DEX_sha256": {
+      "classes.dex": "07b94bfde6dbc3e3a6bfc8436ea65e6a67bdef5ca868379809e20f2fb7ce8efb",
+      "classes2.dex": "2e8fa1ae27e670db0525d31a655e93d861893fa20316d5c54a4c6283a97ca304",
+      "classes3.dex": "7e18d8092de33a4d44e299305965e9b9eb943372a9643452f6f78afe209fb215",
+      "classes4.dex": "9f82b0420b32ad8bdda7ef042e44bb975c8c01663f66506eaf33d22123f49b82",
+      "classes5.dex": "af03db41f53209de52f5d8609e411da49fee106d0fe544d6ea6e5d8230d88363"
+    },
+    "test_SHA256": "24e843f8fc18a75a80654dfe20ae22aa6d65e645307b4fdbf3adfcafedcd5f94",
+    "prepare_SHA256": "7259ebbd9b0ad53848069b8862de84445ef7c7b2b75b05b3d15322e9733213ba",
+    "translated_jar_SHA256": {
+      "classes.dex": "3b0771b06c0570d1fe3b8b99c8c6c9e2aab2903f8e08d51d3ec2891fa671fc2f",
+      "classes2.dex": "24557ce2aff5b54328104fe5ee954ea8de32a7b7100e4a0f72c1b739ab0e6e48",
+      "classes3.dex": "4997ce3217d3af2f018fbd13ab948a44bffb0c8b8e49aaec52fb6f67fbfaf2a9",
+      "classes4.dex": "a7a8275b20a8380194397b6c18215ce3d2ba3e4c844aa1e77088013693df4d68",
+      "classes5.dex": "b106fd54add7276445ed70a77526f9518dfee6d412f939dd9b2b0299f768fdb9"
+    },
+    "translation_error_archives": [
+      "classes.zip",
+      "classes3.zip"
+    ],
+    "physical_Fold": "NOT_RUN",
+    "shutdown": "NOT_RUN",
+    "production_changes": "NONE"
+  },
+  "baseline_receipt_sha256": "4be4dd8fe93205bd4569cfd9eb219727356af10c5060d5d26e76f4b53e1ccbc9",
+  "DEX_sha256": {
+    "classes.dex": "07b94bfde6dbc3e3a6bfc8436ea65e6a67bdef5ca868379809e20f2fb7ce8efb",
+    "classes2.dex": "2e8fa1ae27e670db0525d31a655e93d861893fa20316d5c54a4c6283a97ca304",
+    "classes3.dex": "7e18d8092de33a4d44e299305965e9b9eb943372a9643452f6f78afe209fb215",
+    "classes4.dex": "9f82b0420b32ad8bdda7ef042e44bb975c8c01663f66506eaf33d22123f49b82",
+    "classes5.dex": "af03db41f53209de52f5d8609e411da49fee106d0fe544d6ea6e5d8230d88363"
+  },
+  "test_sha256": "b00d6017451f61d44265ce431cb0bae63abf0c172a12f96bb8d4325e30e6613c",
+  "prepare_sha256": "828b02c74d5306f0fdded2bfcd8b4bfafa71c7c50636c527699139bb97795b87",
+  "production_jar_sha256": "a34f66aa1f83946d2a1d3dde2743d4af7a06829293a973dd0f5d59483b4a4234",
+  "support_jar_sha256": "016a9ca405468cbc86fb6da8634e943ada67ffa615a3b804a1d9680fca84f1ad",
+  "pom_sha256": "b88033cda4a3de3aa37cc0ff715b4fbc50e834b4dff92b8e0973f07fe702dfb8",
+  "shutdown": "NOT_RUN",
+  "production_changes": "NONE",
+  "phase": "UNSIGNED_SINGLE_METHOD_PRESENTATION_PROTOTYPE_NO_APK",
+  "prototype_DEX_sha256": "6354ea6cdc1dfde1745b4463d1e8b17e714ac3a6b52119f597b32c18deab746d",
+  "prototype_smali_sha256": "8bf12e4847ec38f0cd4bb8c388b23b93c16416e76b0a7b981bb5d8041381cbd6",
+  "fresh_accepted_smali_sha256": "1a1f54d8310b352826d12f338c23fdd6bcaaf1b89993aa5d4e1ef54e6432b1d5",
+  "changed_methods": [
+    "private cobraRefreshProgrammeLabels()V"
+  ],
+  "method_count": 1802,
+  "all_other_canonical_method_bodies_and_class_metadata": "EXACT",
+  "selected_original_method_sha256": "5d02c9f97fc5c7c5332c234d606fa7e63441ea7a8c07f5e761407b75318a98de",
+  "selected_revised_method_sha256": "7151bd0c64866e8bcce0a6770b170282840321be1fab0ec70f2bccba6caf2613",
+  "frozen_final_writer_sha256": "b2b6ad3345f824345a3f29b1cc48b85af2975e36864f0ae4329bb0464eac1056",
+  "register_review_sha256": "4c4901976be3e126dfd3df1c31dd26c53b21d58718988c20389c3649a532f948",
+  "candidate_prepare_sha256": "580106d0f59241a324a7526540eca7a4926eefe8c1eddb5a1ccb66b87ee422ee",
+  "parent_patch_source_sha256": "458eaa460d4dc78394f191f5d54e8ef6eca07a638f0a39ff72c3b68e9fdf1d04",
+  "tool_pins": {
+    "baksmali-2.5.2.jar": "1ed236266d7dc4907aade0b19a34f77efac25342b63c8ace52e579039941b389",
+    "dexlib2-2.5.2.jar": "5a5c8982d8bd7d6e3bb1a0713049e3c78b719ec32b20f6b619885cec30a0dd61"
+  },
+  "dex2jar_libraries": {
+    "ST4-4.3.1.jar": "ebc9d9bcdb67571c0835ff441ead5c1de90a25a0d3fa840654a144e8fa0410d4",
+    "antlr-3.5.2.jar": "5ac36c2acfb0a0f3d37dafe20b5b570f2643e2d000c648d44503c2738be643df",
+    "antlr-runtime-3.5.2.jar": "ce3fc8ecb10f39e9a3cddcbb2ce350d272d9cd3d0b1e18e6fe73c3b9389c8734",
+    "antlr4-4.9.3.jar": "386fec520b8962fe37f448af383920ea33d7a532314b36d7ba9ccec1ba95eb37",
+    "antlr4-runtime-4.9.3.jar": "131a6594969bc4f321d652ea2a33bc0e378ca312685ef87791b2c60b29d01ea5",
+    "asm-9.5.jar": "b62e84b5980729751b0458c534cf1366f727542bb8d158621335682a460f0353",
+    "asm-analysis-9.5.jar": "39f1cf1791335701c3b02cae7b2bc21057ec9a55b2240789cb6d552b2b2c62fa",
+    "asm-commons-9.5.jar": "72eee9fbafb9de8d9463f20dd584a48ceeb7e5152ad4c987bfbe17dd4811c9ae",
+    "asm-tree-9.5.jar": "3c33a648191079aeaeaeb7c19a49b153952f9e40fe86fbac5205554ddd9acd94",
+    "asm-util-9.5.jar": "c467f1bb3c08888f47243e2d475209b34a772d627e44fca06752e18bb038bd74",
+    "d2j-base-cmd-v2.4.jar": "7ca943b6bb4d475b0d3941eab51d1ea9d6326a626572aa5ce699dda4ea52b048",
+    "d2j-jasmin-v2.4.jar": "d316c9f04e9129f78c57baaeedf2de3b4f4922b36f7f7bf3b1874771207c666f",
+    "d2j-smali-v2.4.jar": "21c80ff4438d47aee2b3939bea50e811570557b0f1d4363c7f68545f81dac9e6",
+    "dex-ir-v2.4.jar": "1e715a5bedd11cfaa53702976acf6bdb1f6b749fc03f998125cf5488964b1192",
+    "dex-reader-api-v2.4.jar": "16ffb4756fa363d9728f22a113a429933f8a9ba2ff345c14f7ff2eea444ee167",
+    "dex-reader-v2.4.jar": "8a02e63f394c4a60b8c7947fdc03cf91ca6e2843fb12475e5c87896bd3551481",
+    "dex-tools-v2.4.jar": "93b2adf1e39448dc1f1ba9268096f1bf3e05813f1fcbde7a883eace70cceed02",
+    "dex-translator-v2.4.jar": "fb64bbf0eb9b37031ddeb78803d48f0826ce057cb251d28aa50e7b601a0f6f8c",
+    "dex-writer-v2.4.jar": "a5c03ce36f5c9bdc89ed27dc2becd542f87d94519202e91fd30ec8f9192d8e24",
+    "dx-30.0.2.jar": "5f37023cdab507f4f2ece1c80dabd056254e30cc9f4aef39dd84c4e0a0031615",
+    "icu4j-69.1.jar": "98286f3d538bc7bde87d70bf2cac3acc9ed7b7fe941db5e94a8c3fa13516f963",
+    "javax.json-1.0.4.jar": "0e1dec40a1ede965941251eda968aeee052cc4f50378bc316cc48e8159bdbeb4",
+    "org.abego.treelayout.core-1.0.3.jar": "fa5e31395c39c2e7d46aca0f81f72060931607b2fa41bd36038eb2cb6fb93326"
+  },
+  "changed_translated_classes": [
+    "com/projectinfinity/kodi/InfinityLiveActivity.class"
+  ],
+  "unchanged_translated_class_count": 4989,
+  "candidate_production_jar_sha256": "f92f19e266a1d5953c03369d6fa6f2850d37db6362329eba4ef4b83010e9a934",
+  "support_jar_unchanged": true,
+  "accepted431_full_tick_reference_sha256": "afe37ff8ed00a442ee240efe425413df0cc9d57acb397993939844c16bab763d",
+  "accepted431_bound_progress_reference_sha256": "600cf86ba8958517a16f0519bf8a6040348acbb1984ce1f714fc2ec7c65eb383",
+  "application_APK": "NOT_BUILT_OR_INSTALLED"
+}
