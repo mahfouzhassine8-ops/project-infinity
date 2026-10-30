@@ -109,7 +109,7 @@ def generate(baseline,out):
             original_skin.parent.mkdir(parents=True,exist_ok=True);original_skin.write_bytes(old)
             if raw!=old:
                 key=PREFIX+SKIN+'/'+rel;changes[key]=raw;before[key]=sha(old);xml_counts[rel]=count
-            if Path(rel).name=='Includes.xml':imported.append(str(Path(rel).parent))
+            if Path(rel).name=='Includes.xml' and count['imports']:imported.append(str(Path(rel).parent))
         assert 'unified' in imported
         for folder in imported:
             key=PREFIX+SKIN+'/'+folder+'/Includes_InfinityActionLoading.xml';changes[key]=definitions();before[key]=None

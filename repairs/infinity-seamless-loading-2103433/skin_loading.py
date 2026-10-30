@@ -92,6 +92,11 @@ def frame_call(rect, control, *, global_frame=False, window="10000"):
 
 
 def transform(raw, name, *, inherited_controls=()):
+    if len(Path(name).parts)>1 and Path(name).parent.name!='unified':
+        # Android's signed active layout is unified. Leave inactive legacy
+        # resolution layouts byte-identical instead of hiding feedback on a
+        # surface whose menu-frame geometry has not been established.
+        return raw, dict(actions=0, frames=0, imports=0)
     if Path(name).name == 'DialogBusy.xml':
         parsed = nodes(raw)
         group = next(n for n in parsed if n.tag == 'control' and n.attrs.get('type') == 'group')
@@ -178,6 +183,11 @@ def transform(raw, name, *, inherited_controls=()):
             cid = owner_id(node)
             if frame and cid != '0':
                 rect = {c.tag: node_text(raw, c) for c in frame.children if c.tag in ('left', 'top', 'width', 'height')}
+                # Native image controls commonly omit zero left/top. Respect
+                # Kodi's defaults only when no opposite/center anchor exists.
+                fields = {c.tag for c in frame.children}
+                if not fields & {'left','right','centerleft'}:rect['left']='0'
+                if not fields & {'top','bottom','centertop'}:rect['top']='0'
                 if set(rect) == {'left', 'top', 'width', 'height'}:
                     # Place the decoration in the SAME coordinate/visibility
                     # parent as its original frame, including translated groups.

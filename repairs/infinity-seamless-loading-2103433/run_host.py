@@ -32,6 +32,7 @@ def run(baseline,out,selection='original'):
     from stage import generate
     generate(baseline,out/'stage')
     os.environ['INFINITY_STAGED']=str(out/'stage')
+    os.environ['INFINITY_BASE_COMPONENT']=str(baseline)
     os.environ['INFINITY_HOST_MEASUREMENTS']=str(out/'measurements')
     sys.path.insert(0,str(HERE/'tests'))
     if selection=='current-window':
