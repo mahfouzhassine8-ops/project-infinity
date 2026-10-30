@@ -1,0 +1,13 @@
+# Corrective435 integration checkpoint
+
+434 is physically rejected, not an acceptance baseline. Signed431/432/433 and434 bytes are retained. Current authority remains issued434/generation19 until a source-bound435 proposal passes every owner gate. No accepted pointer or lock moves.
+
+Cobra current owner21a9b8e5: three actual-entry host checks pass in41123338394, including original fullscreen promotion, original More and sun menus and Back/reopen. The narrow front-Cards once-start guard prevents validated repeated layout callbacks from continually restarting the existing reveal animation. All original native Activity instructions match433 after removing only the two reviewed host/reveal guards. Pro/other-mode actions, colors and layout are unchanged. Source/host vulnerability is demonstrated; the exact private state on the physical Fold is not proved.
+
+Unchanged signed434 native Android baseline41121877518 now reaches real fullscreen, opens More, uses Back and reopens. Settled original menu pixels were personally inspected. The first250ms capture has no visible sheet, so this is not a latency benchmark. Original sun menu pixels in41116655432 are retained. These emulator results do not supersede the user's physical failure or verify435.
+
+Infinity owner8ecadea1: seven strict current-window/native-expression checks pass in41123338242. The active unified Videos drawer has its own existing-frame busy cue; real native view frames retain current-window/source ownership. Inactive resolution layouts remain433. Superseded constant-as-info-label conditions are rejected by the tightened host evaluator, based on read-only upstream Kodi expression review. Native Kodi/Python startup remains blocked by the existing translated-ARM constructor crash; no identical rerun or native change.
+
+Separate owner histories are integrated without modifying any of their passing tested-source bytes. The main feature workflow remains exactly Cobra-producer-bound; the independently tested Infinity branch retains its selected current-window job. Release435 preparation uses the immutable433 source base and issued434 registry lineage separately, exact3/7 source-bound producer evidence and nine focused protocol checks. New authentication code is versioned in this release directory so the tested Infinity production source stays unchanged. Final assembly must include both owners and original-key source authentication. No single-owner registration, APK yet, private key access or shutdown execution occurred locally.
+
+Workspace space was reclaimed only from reproducible unsigned old disassembly caches, with per-file SHA256 manifests and a pruning receipt. Signed APKs, component ZIPs, test reports, runtime evidence and compiler source snapshots remain.
