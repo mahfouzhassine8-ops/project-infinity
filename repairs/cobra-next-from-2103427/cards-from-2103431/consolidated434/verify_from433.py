@@ -46,17 +46,24 @@ def verify(work,out):
     # that method's sequential hexadecimal names, not any native instruction.
     inverse=re.sub(r':cond_([0-9a-f]+)',lambda m:':cond_'+format(int(m[1],16)-1,'x') if int(m[1],16)>=3 else m[0],inverse)
     assert digest(inverse.encode())==budget['preimage_sha256'],'Original native menu instructions must remain exact'
-    assert digest(raw.replace(method,inverse,1).encode())==expected[key]['sha256'],'Entire433 Activity must match after only approved prefix removal'
+    reveal=methods(raw)[budget['reveal']['signature']]
+    reveal_prefix=('    invoke-static {v0, v2}, Lcom/projectinfinity/kodi/CobraCardsLayout;->beginFrontCardsSheetReveal(Landroid/app/Activity;Landroid/view/View;)Z\n\n'
+                   '    move-result v1\n\n    if-eqz v1, :cond_d\n\n')
+    assert reveal.count(reveal_prefix)==1,'Exactly one once-start guard in native validated reveal path'
+    reveal_inverse=reveal.replace(reveal_prefix,'',1)
+    assert digest(reveal_inverse.encode())==budget['reveal']['preimage_sha256'],'Original native sheet geometry/animation instructions must remain exact'
+    restored=raw.replace(method,inverse,1).replace(reveal,reveal_inverse,1)
+    assert digest(restored.encode())==expected[key]['sha256'],'Entire433 Activity must match after only the two reviewed guard removals'
     key='class:Lcom/projectinfinity/kodi/CobraComponent;'
-    assert actual[key].count('"2103434.cobra.1"')==1
-    assert digest(actual[key].replace('"2103434.cobra.1"','"2103433.cobra.1"',1).encode())==expected[key]['sha256'],'Only genuine owner version changes'
+    assert actual[key].count('"2103435.cobra.1"')==1
+    assert digest(actual[key].replace('"2103435.cobra.1"','"2103433.cobra.1"',1).encode())==expected[key]['sha256'],'Only genuine owner version changes'
     proof=dict(status='PASS_EXACT_SIGNED433_COBRA_DELTA',baseline_source=SOURCE,
       baseline_APK_sha256='874db7007b9fc79478844e5b37d4795d43c4c58de770c553d943734e1014b986',
       changed_classes=sorted(changed),added_classes=sorted(added),unchanged_existing_classes=len(expected)-len(changed),
-      Activity='ENTIRE433_CLASS_EXACT_AFTER_ONLY_MENU_HOST_PREFIX_REMOVAL',all_existing_menu_instructions_and_callbacks='EXACT433',
+      Activity='ENTIRE433_CLASS_EXACT_AFTER_ONLY_HOST_AND_ONCE_START_GUARD_REMOVAL',all_existing_menu_instructions_and_callbacks='EXACT433_AFTER_ONLY_TWO_REVIEWED_GUARDS_REMOVED',
       Pro_ProSports_MultiView_playback_PiP_shared_shutdown='EXACT433_METHODS_AND_FIELDS',
       scoped_helper_families=['CobraCardsLayout','CobraCardsTiles','CobraCardsReuse'],
-      metadata='GENUINE_COBRA434_COMPONENT_VERSION_ONLY',APK='NOT_BUILT',runtime='NOT_RUN',shutdown='NOT_RUN')
+      metadata='GENUINE_COBRA435_COMPONENT_VERSION_ONLY',APK='NOT_BUILT',runtime='NOT_RUN',shutdown='NOT_RUN')
     out.write_text(json.dumps(proof,indent=2)+'\n');print(json.dumps(proof,indent=2));return proof
 
 if __name__=='__main__':

@@ -9,7 +9,7 @@
     2103433
   ],
   "accepted_pointer_updated": false,
-  "production_changes": "NONE until actual defect reproduced/source ownership established",
+  "production_changes": "Candidate correction of source-proven repeated-start animation race in front Cards player-settings/visual-settings only. Physical cause is not claimed from host evidence.",
   "selected_before_execution": true,
   "Cobra_selected_host_methods": [
     "actualPreviewFullscreenThenMoreUsesProductionOverlay",
@@ -63,5 +63,17 @@
     "proof": "Actual captured pixels show original Visual settings menu; current native accessibility labels and injected coordinates retained. Does not refute physical phone report.",
     "failure": "QA assumed a TextureView accessibility node. Native compressed public tree does not expose the video texture; the actual preview is visible and its PiP button is exposed. Test stopped before pressing preview/fullscreen.",
     "next_selected_before_execution": "Reuse same434 bytes and source/mode setup. Derive original clickable preview host through actual visible PiP button public ancestry with strict containment/dimensions and center outside PiP. No private app state, guessed coordinates, callback invocation, timeout change or production mutation. Run only actual fullscreen->More->Back/reopen. Retain passing sun evidence; do not repeat it."
+  },
+  "physical_sun_clarification": "User confirms NO menu opens; appearance-option redesign is not requested.",
+  "reveal_correction_selected_before_execution": {
+    "evidence": "Exact434 and433 original real-entry host traces: positioned attached panels stayalpha0, stable actual/desired bounds, isLayoutRequested=false and60/61 native global-layout position callbacks over640ms. Source tests alpha==0 as not-started and resets/cancels/restarts190ms animator on EACH callback before its first nonzero frame. A legitimate intervening layout can restart the animation; zero opacity is not a lifecycle marker. Clean Android sun shows normal single-flight path works.",
+    "change": "Per-panel weak once-started state, only front Cards original player-settings or visual-settings; native valid-geometry gate, original opacity/animation/geometry/actions remain unchanged. All nonselected modes/kinds and Pro/ProSports return original behavior. No callbacks/timeouts/native code/appearance changes.",
+    "selected_methods": [
+      "actualPreviewFullscreenThenMoreUsesProductionOverlay",
+      "actualCardsSunOpensOriginalMenuAndAppliesNightCinemaOff",
+      "frontCardsRevealStartsOnceAndPreservesOtherModes"
+    ],
+    "selection_note": "Initial actual-pointer host methods plus pure guard matrix; retain old timed-chrome host failure as unresolved host-observation, verified separately by focused exact434 Android attempt. Do not replace original native promotion, overlay, callbacks, global-layout, or alpha.",
+    "new_APK": "NOT_BUILT; one eventual consolidated release only after relevant source/actual input/preservation checks"
   }
 }

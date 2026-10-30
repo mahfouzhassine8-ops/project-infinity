@@ -53,6 +53,7 @@ import java.util.WeakHashMap;
  * preference, control-listener or persistence operation is owned here. */
 public final class CobraCardsLayout {
   private static final WeakHashMap<Activity,WeakReference<State>> OWNERS=new WeakHashMap<>();
+  private static final WeakHashMap<View,Boolean> SHEET_REVEALS=new WeakHashMap<>();
   private static final int CYAN=0xff20cee9, WHITE=0xfff0f3f7, MUTED=0xffafc1d8;
   private static final Typeface NORMAL=Typeface.create("sans-serif",Typeface.NORMAL);
   private static final Typeface BOLD=Typeface.create("sans-serif",Typeface.BOLD);
@@ -101,6 +102,21 @@ public final class CobraCardsLayout {
     if(!(current instanceof FrameLayout))return null;
     FrameLayout player=(FrameLayout)current;
     return player.isAttachedToWindow() && player.isShown()?player:null;
+  }
+
+  /** Alpha zero can persist until the animator's first frame. A second layout
+   * callback in that interval must not cancel and restart the same reveal.
+   * Native geometry validation still runs on every callback, and the original
+   * animation/opacity remain the sole presentation owner. */
+  public static boolean beginFrontCardsSheetReveal(Activity owner,View panel){
+    if(!cards(owner) || Boolean.TRUE.equals(read(owner,"mCobraProSportsActive")))return true;
+    Object kind=read(owner,"mCobraSheetKind");
+    if(!"player-settings".equals(kind) && !"visual-settings".equals(kind))return true;
+    android.content.res.Configuration configuration=owner.getResources().getConfiguration();
+    if(Math.min(configuration.screenWidthDp,configuration.screenHeightDp)>=600)return true;
+    mainThread();
+    if(panel==null || panel!=read(owner,"mCobraSheetPanel"))return true;
+    return SHEET_REVEALS.put(panel,Boolean.TRUE)==null;
   }
 
   /** Hook after native visual-layout overrides. Mutates the EXISTING rect arrays

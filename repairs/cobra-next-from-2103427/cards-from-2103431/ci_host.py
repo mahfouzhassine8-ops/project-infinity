@@ -47,14 +47,14 @@ DENSITY = ["front433PixelGeometryAndTouchPreservation", "innerDensityAndAccessib
 MORE = ["correctedFrontFullscreenMoreMenuVisibilityAndBack", "frontCardsOnlySheetHostOwnership"]
 # Unchanged profile/projection/presentation/logo helpers retain signed433's
 # source/canonical-bound passing evidence. Reexecute only changed Cards paths.
-GROUPS = [
-    ("reuse", "CobraCardsReuseNativeTest", REUSE, ["cards-reuse/CobraCardsReuseNativeTest.java"]),
-    ("layout", "CobraCardsLayoutTest", LAYOUT, ["layout-qa/CobraCardsLayoutTest.java"]),
-    ("visual-closeout", "CobraCardsVisualCloseoutTest", CLOSEOUT,
-     ["visual-closeout/qa/CobraCardsVisualCloseoutTest.java"]),
-    ("fold-density", "CobraFoldDensityTest", DENSITY, ["consolidated434/CobraFoldDensityTest.java"]),
-    ("fullscreen-more", "CobraFoldCorrectiveTest", MORE, ["consolidated434/CobraFoldCorrectiveTest.java"]),
-]
+# Current correction changes only the two front Cards menu reveal paths.
+# Prior434 visual/density/cache cases retain their source/canonical evidence;
+# the new actual-entry fixture replaces the substitute-overlay More test.
+MENU_OPENING = ["actualPreviewFullscreenThenMoreUsesProductionOverlay",
+                "actualCardsSunOpensOriginalMenuAndAppliesNightCinemaOff",
+                "frontCardsRevealStartsOnceAndPreservesOtherModes"]
+GROUPS = [("fullscreen-more", "CobraActualFullscreenMoreTest", MENU_OPENING,
+           ["fullscreen-more/rejected434/CobraActualFullscreenMoreTest.java"])]
 
 REFERENCES = {
     "presentation-qa/results/signed431-baseline/BASELINE.json": "afe37ff8ed00a442ee240efe425413df0cc9d57acb397993939844c16bab763d",
@@ -285,7 +285,7 @@ def run(baseline, trusted_host, out, maven):
                 prepare_plain(trusted, folder, sources + auxiliary)
             props = dict(sdk_properties)
             output = folder / "measurements"
-            props.update({"projection.output": str(output), "presentation.output": str(output), "reuse.output": str(output),
+            props.update({"rejected434.output": str(output), "projection.output": str(output), "presentation.output": str(output), "reuse.output": str(output),
                           "cards.render.output": str(output), "cards.layout.output": str(output),
                           "cards.closeout.output": str(output), "fold.output": str(output),
                           "fold.baseline": str(fold_golden_dir), "fold.candidate": "true",

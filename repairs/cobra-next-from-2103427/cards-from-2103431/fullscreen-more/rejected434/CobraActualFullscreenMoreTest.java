@@ -101,4 +101,21 @@ public class CobraActualFullscreenMoreTest {
   f.press(button);pulses(20);save("ACTUAL-CARDS-SUN-VISUALS",report(f));assertEquals(1,visualCalls);assertSheetVisible(f,"visual-settings");
   View sheet=(View)get(f.a,"mCobraActionSheet"),off=sheet.findViewWithTag("cobra-visual-night:off");assertNotNull("Original Night Cinema off action",off);f.press(off);pulses(10);assertFalse(f.prefs.getBoolean("cobra_night_cinema",true));
  }
+ @Test public void frontCardsRevealStartsOnceAndPreservesOtherModes()throws Exception{
+  JSONArray evidence=new JSONArray();
+  for(String mode:new String[]{"cards","mobile","compact","grid","focus"}){
+   CobraCardsLayoutTest.Fixture f=new CobraCardsLayoutTest.Fixture(mode,1080,2520,480);
+   LinearLayout panel=new LinearLayout(f.a);CobraCardsLayoutTest.set(f.a,"mCobraSheetPanel",panel);CobraCardsLayoutTest.set(f.a,"mCobraSheetKind","player-settings");
+   assertTrue(CobraCardsLayout.beginFrontCardsSheetReveal(f.a,panel));assertEquals(!mode.equals("cards"),CobraCardsLayout.beginFrontCardsSheetReveal(f.a,panel));
+   if(mode.equals("cards")){
+    LinearLayout next=new LinearLayout(f.a);CobraCardsLayoutTest.set(f.a,"mCobraSheetPanel",next);assertTrue("New native panel has independent reveal",CobraCardsLayout.beginFrontCardsSheetReveal(f.a,next));assertFalse(CobraCardsLayout.beginFrontCardsSheetReveal(f.a,next));
+    for(String kind:new String[]{"channel-actions","view-mode","display","multi-settings"}){CobraCardsLayoutTest.set(f.a,"mCobraSheetKind",kind);assertTrue(CobraCardsLayout.beginFrontCardsSheetReveal(f.a,next));assertTrue(CobraCardsLayout.beginFrontCardsSheetReveal(f.a,next));}
+    CobraCardsLayoutTest.set(f.a,"mCobraSheetKind","visual-settings");CobraCardsLayoutTest.set(f.a,"mCobraProActive",true);assertTrue(CobraCardsLayout.beginFrontCardsSheetReveal(f.a,next));CobraCardsLayoutTest.set(f.a,"mCobraProActive",false);CobraCardsLayoutTest.set(f.a,"mCobraProSportsActive",true);assertTrue(CobraCardsLayout.beginFrontCardsSheetReveal(f.a,next));
+   }
+   evidence.put(mode);
+  }
+  CobraCardsLayoutTest.Fixture inner=new CobraCardsLayoutTest.Fixture("cards",1600,1680,320);LinearLayout panel=new LinearLayout(inner.a);CobraCardsLayoutTest.set(inner.a,"mCobraSheetPanel",panel);CobraCardsLayoutTest.set(inner.a,"mCobraSheetKind","visual-settings");assertTrue(CobraCardsLayout.beginFrontCardsSheetReveal(inner.a,panel));assertTrue(CobraCardsLayout.beginFrontCardsSheetReveal(inner.a,panel));
+  save("FRONT-CARDS-REVEAL-ISOLATION",new JSONObject().put("modes",evidence).put("inner_original_behavior",true).put("Pro_ProSports_original_behavior",true).put("pure_guard_case_not_button_proof",true));
+ }
+
 }

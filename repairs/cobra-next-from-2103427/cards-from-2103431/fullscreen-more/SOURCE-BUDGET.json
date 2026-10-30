@@ -5,8 +5,14 @@
   "preimage_sha256": "12eb10724b3ff5030133e214704cf161c431dbdef600e777daf76b2e89c2919c",
   "scope": "FrontCardsplayer-settingsvisibleplayerhost; Pro/allothermodes/kinds executeexactoldnativebranch",
   "allowed_changed_methods": [
-    "private cobraOpenSheet(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Landroid/widget/LinearLayout;"
+    "private cobraOpenSheet(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Landroid/widget/LinearLayout;",
+    "private cobraPositionAnchoredSheet(Landroid/widget/FrameLayout;Landroid/widget/LinearLayout;Landroid/view/View;Landroid/view/View;)V"
   ],
   "same_action_dispatch_and_menu_body": true,
-  "shutdown": "NOT_CHANGED_NOT_RUN"
+  "shutdown": "NOT_CHANGED_NOT_RUN",
+  "reveal": {
+    "signature": "private cobraPositionAnchoredSheet(Landroid/widget/FrameLayout;Landroid/widget/LinearLayout;Landroid/view/View;Landroid/view/View;)V",
+    "preimage_sha256": "32032c37a0f019dae597103ea8d196c8bf73c88c124cca9afc99e4aa5528101e",
+    "scope": "Once per actual front Cards player-settings/visual-settings panel after existing native geometry validation; Pro/other kinds/modes original. No native player/callback or appearance change."
+  }
 }

@@ -1,4 +1,4 @@
-"""Front Cards Player settings host only; preserve native callbacks/menu body."""
+"""Front Cards menu ownership/reveal only; native callbacks/body preserved."""
 from hashlib import sha256
 import json
 from pathlib import Path
@@ -23,7 +23,21 @@ def patch(source):
     new=old.replace(anchor,added,1)
     assert new.replace(added,anchor,1)==old
     result=source.replace(old,new,1)
+    reveal=budget['reveal']
+    reveal_old=methods[reveal['signature']]
+    assert sha256(reveal_old.encode()).hexdigest()==reveal['preimage_sha256']
+    reveal_anchor=('    .line 11868\n'
+       '    invoke-direct {v0, v2}, Lcom/projectinfinity/kodi/InfinityLiveActivity;->cobraResetMotion(Landroid/view/View;)V')
+    reveal_added=('    .line 11868\n'
+       '    invoke-static {v0, v2}, Lcom/projectinfinity/kodi/CobraCardsLayout;->beginFrontCardsSheetReveal(Landroid/app/Activity;Landroid/view/View;)Z\n'
+       '    move-result v1\n'
+       '    if-eqz v1, :cond_d\n'
+       '    invoke-direct {v0, v2}, Lcom/projectinfinity/kodi/InfinityLiveActivity;->cobraResetMotion(Landroid/view/View;)V')
+    assert reveal_old.count(reveal_anchor)==1
+    reveal_new=reveal_old.replace(reveal_anchor,reveal_added,1)
+    assert reveal_new.replace(reveal_added,reveal_anchor,1)==reveal_old
+    result=result.replace(reveal_old,reveal_new,1)
     after={m[1]:m[0]+'\n' for m in pattern.finditer(result)}
-    assert set(after)==set(methods) and {k for k in methods if methods[k]!=after[k]}=={SIGNATURE}
+    assert set(after)==set(methods) and {k for k in methods if methods[k]!=after[k]}=={SIGNATURE,reveal['signature']}
     assert pattern.sub('',source)==pattern.sub('',result)
     return result
