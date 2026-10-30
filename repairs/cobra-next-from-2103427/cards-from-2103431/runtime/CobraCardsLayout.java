@@ -95,6 +95,9 @@ public final class CobraCardsLayout {
     mainThread();if(!cards(owner) || model==null)return;
     int width=integer(model,"width"),height=integer(model,"height");if(width<=0 || height<=0)return;
     float unit=width/941f,font=Math.max(1f,Math.min(2f,owner.getResources().getConfiguration().fontScale));
+    DensityProfile densityProfile=new DensityProfile(width,height,owner.getResources().getConfiguration().fontScale);
+    CobraCardsReuse.beforeLayout(owner,width,height,densityProfile.columns);
+    if(densityProfile.expanded){expandedBoxes(model,width,height,font,densityProfile);return;}
     int columns=width<280?1:width>height && width>=1100?3:2;
     float header=Math.min(height*.22f,Math.max(1,104*unit*font));
     float rowTop=header+12*unit, toolbar=Math.max(48,122*unit*Math.min(1.25f,font));
@@ -111,6 +114,37 @@ public final class CobraCardsLayout {
     box(model,"details",Math.round(497*unit),rowY,Math.max(1,width-Math.round(513*unit)),rowH);
     box(model,"browser",0,browserY,width,Math.max(1,height-browserY));
     integer(model,"columns",columns);
+  }
+  /** Profile selection uses the real usable logical window in dp. A narrow
+   * dimension preserves the entire433 cover/phone path, including landscape. */
+  static final class DensityProfile {
+    final boolean expanded;final int columns;final float unit;
+    DensityProfile(int width,int height,float font){
+      expanded=Math.min(width,height)>=600;
+      if(expanded){
+        float minimum=160*Math.max(1,font);
+        columns=Math.max(1,Math.min(4,(int)((width-24)/(minimum+8))));
+        unit=.62f;
+      }else{columns=width<280?1:width>height && width>=1100?3:2;unit=width/941f;}
+    }
+  }
+  static boolean expanded(Activity a){
+    if(!cards(a))return false;Object model=read(a,"mCobraModeLayout");
+    return model!=null && Math.min(integer(model,"width"),integer(model,"height"))>=600;
+  }
+  private static void expandedBoxes(Object model,int width,int height,float font,DensityProfile profile){
+    float u=profile.unit,header=Math.min(height*.22f,104*u*font),top=header+12*u;
+    float videoWidth=width*.5f-21*u,bar=Math.max(48,122*u*Math.min(1.25f,font));
+    float reserve=bar+22*u+Math.max(112,160+(font-1)*96);
+    float h=Math.min(Math.min(362*u,videoWidth*9/16+24*u),Math.max(96,height-top-reserve-18*u));
+    int y=Math.round(top),rowHeight=Math.max(1,Math.round(h));
+    box(model,"toolbar",0,0,width,Math.max(1,Math.round(header)));
+    box(model,"rail",0,0,0,0);box(model,"directory",0,0,0,0);box(model,"footer",0,0,0,0);
+    box(model,"video",Math.round(14*u),y,Math.round(videoWidth),rowHeight);
+    int detailX=Math.round(width*.5f+6*u);
+    box(model,"details",detailX,y,width-detailX-Math.round(14*u),rowHeight);
+    int browserY=Math.min(height-1,Math.round(top+h+18*u));
+    box(model,"browser",0,browserY,width,Math.max(1,height-browserY));integer(model,"columns",profile.columns);
   }
   private static void box(Object model,String name,int x,int y,int width,int height){
     int[] rect=(int[])value(model,name);
@@ -297,6 +331,18 @@ public final class CobraCardsLayout {
       float density=a.getResources().getDisplayMetrics().density;
       int width=Math.max(1,shell.getWidth()-insetLeft-insetRight),height=Math.max(1,shell.getHeight()-insetTop-insetBottom);
       int working=Math.round(integer(model,"height")*density);if(height-working>density)height=Math.min(height,working);
+      if(expanded(a)){
+        scale=density*.62f;float headerHeight=Math.min(height*.22f,104*scale*font),top=headerHeight+12*scale;
+        float videoWidth=width*.5f-21*scale,bar=Math.max(48*density,122*scale*Math.min(1.25f,font));
+        float reserve=bar+22*scale+Math.max(112*density,(160+(font-1)*96)*density);
+        float h=Math.min(Math.min(362*scale,videoWidth*9/16+24*scale),Math.max(96*density,height-top-reserve-18*scale));
+        int y=Math.round(top),rowHeight=Math.max(1,Math.round(h)),detailX=Math.round(width*.5f+6*scale);
+        int browserY=Math.min(height-1,Math.round(top+h+18*scale));
+        physical(toolbar,insetLeft,insetTop,width,Math.round(headerHeight));
+        physical(preview,insetLeft+Math.round(14*scale),insetTop+y,Math.round(videoWidth),rowHeight);
+        physical(details,insetLeft+detailX,insetTop+y,width-detailX-Math.round(14*scale),rowHeight);
+        physical(browser,insetLeft,insetTop+browserY,width,height-browserY);return;
+      }
       scale=width/941f;float headerHeight=Math.min(height*.22f,Math.max(1,104*scale*font)),rowTop=headerHeight+12*scale;
       float barHeight=Math.max(48*density,122*scale*Math.min(1.25f,font));int columns=integer(model,"columns");
       float cell=(width-32*scale-16*scale*(columns-1))/columns,firstCard=Math.max(72*density,250*cell/448f);
@@ -360,7 +406,7 @@ public final class CobraCardsLayout {
       linear(selector,434,82,0,0,0);styleIcon(source,browserHeader,5);styleIcon(search,browserHeader,6);linear(source,94,82,0,0,18);linear(search,94,82,0,0,0);
       for(int i=1;i<browser.getChildCount();i++)if(browser.getChildAt(i) instanceof GridView){
         GridView grid=(GridView)browser.getChildAt(i);snapshot(browserHeader,grid);int columns=integer(read(a,"mCobraModeLayout"),"columns");
-        if(grid.getNumColumns()!=columns)grid.setNumColumns(columns);if(grid.getHorizontalSpacing()!=px(16))grid.setHorizontalSpacing(px(16));if(grid.getVerticalSpacing()!=px(24))grid.setVerticalSpacing(px(24));
+        if(grid.getNumColumns()!=columns)grid.setNumColumns(columns);CobraCardsReuse.columnsApplied(a,grid);if(grid.getHorizontalSpacing()!=px(16))grid.setHorizontalSpacing(px(16));if(grid.getVerticalSpacing()!=px(24))grid.setVerticalSpacing(px(24));
         if(grid.getPaddingLeft()!=px(16) || grid.getPaddingTop()!=px(22) || grid.getPaddingRight()!=px(16) || grid.getPaddingBottom()!=px(24))grid.setPadding(px(16),px(22),px(16),px(24));
       }
     }

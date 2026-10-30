@@ -88,9 +88,12 @@ public class CobraCardsLayoutTest {
   }
   static final class Fixture {
     final ActivityController<InfinityLiveActivity> controller;final InfinityLiveActivity a;final SharedPreferences prefs;final RecordIo io=new RecordIo();
-    final List<Object> channels;final int width=941,height=1672;Playback input;Object player,binding;
-    Fixture(String mode)throws Exception{
-      ShadowDisplay display=Shadows.shadowOf(ShadowDisplay.getDefaultDisplay());display.setDensityDpi(420);display.setWidth(width);display.setHeight(height);display.setRealWidth(width);display.setRealHeight(height);
+    final List<Object> channels;final int width,height,densityDpi;Playback input;Object player,binding;
+    Fixture(String mode)throws Exception{this(mode,941,1672,420);}
+    Fixture(String mode,int pixelWidth,int pixelHeight,int dpi)throws Exception{
+      width=pixelWidth;height=pixelHeight;densityDpi=dpi;
+      RuntimeEnvironment.setQualifiers("w"+(width*160/dpi)+"dp-h"+(height*160/dpi)+"dp-"+(width>height?"land":"port")+"-"+dpi+"dpi");
+      ShadowDisplay display=Shadows.shadowOf(ShadowDisplay.getDefaultDisplay());display.setDensityDpi(dpi);display.setWidth(width);display.setHeight(height);display.setRealWidth(width);display.setRealHeight(height);
       controller=Robolectric.buildActivity(InfinityLiveActivity.class);a=controller.get();a.setTheme(android.R.style.Theme_Material_NoActionBar);
       a.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,WindowManager.LayoutParams.FLAG_FULLSCREEN);
       prefs=a.getSharedPreferences("cards-layout-"+UUID.randomUUID(),Context.MODE_PRIVATE);prefs.edit().putString("cobra_appearance_mode","dark").putString("guide_view_mode",mode).putString("cobra_primary_view","guide").putString("cobra_ambient_mode","off").commit();
@@ -101,7 +104,7 @@ public class CobraCardsLayoutTest {
       ((List<Object>)get(a,"mSources")).add(construct("LiveSource","qa","m3u","Synthetic QA","","","","https://example.invalid/playlist",""));
       channels=(List<Object>)get(a,"mChannels");for(int i=0;i<24;i++)channels.add(construct("Channel","qa:"+i,"Synthetic channel "+i,"Group","epg"+i,"","https://example.invalid/video/"+i,"qa",Collections.emptyMap()));seedEpg();
       set(a,"mGuidePreviewChannel",channels.get(0));call(a,"buildShell");call(a,"cobraShowGuideShell");controller.visible();frames();
-      assertTrue(((View)get(a,"mCobraGuideShell")).isAttachedToWindow());assertEquals(420,a.getResources().getDisplayMetrics().densityDpi);
+      assertTrue(((View)get(a,"mCobraGuideShell")).isAttachedToWindow());assertEquals(densityDpi,a.getResources().getDisplayMetrics().densityDpi);
       assertTrue(((View)get(a,"mCobraPreviewHost")).findViewWithTag("cobra_preview_label").getParent().getClass().getName().endsWith("$StatusSlot"));
       assertNull(get(a,"mPlayer"));assertNull(get(a,"mCobraPreviewPlayer"));
     }

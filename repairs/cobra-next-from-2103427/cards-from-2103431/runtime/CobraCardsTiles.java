@@ -98,7 +98,7 @@ public final class CobraCardsTiles {
     Object bound;
     WeakReference<ListAdapter> boundAdapter=new WeakReference<>(null),measuredAdapter=new WeakReference<>(null);
     int adapterPosition=-1,measuredRow=-1,measuredWidth=-1,configuredHeight=-1,configuredNowHeight=-1;
-    int measuredFlags,measuredMaxLines,requiredNowHeight;
+    int measuredFlags,measuredMaxLines,requiredNowHeight,measuredTextWidth=-1;
     float measuredFont=-1;
     float measuredTextSize,measuredScaleX,measuredSkewX,measuredLetterSpacing,measuredLineSpacing,measuredLineExtra;
     boolean measuredFontPadding;
@@ -112,7 +112,7 @@ public final class CobraCardsTiles {
     long start=Long.MIN_VALUE,stop=Long.MIN_VALUE;
     SimpleDateFormat date;
     float configuredWidth=-1,configuredFont=-1,scale=1;
-    boolean hasLive,configuring,rowSyncPending,selectionAfterResize;
+    boolean hasLive,configuring,rowSyncPending,selectionAfterResize,expanded,configuredExpanded;
 
     Holder(Activity a,LinearLayout root){
       owner=new WeakReference<>(a);card=root;Class<?> nativeCard=root.getClass();
@@ -280,10 +280,11 @@ public final class CobraCardsTiles {
           if(columns>0){adapter=current;row=(adapterPosition/columns)*columns;count=Math.min(columns,current.getCount()-row);}
         }
       }
+      int textWidth=expanded?Math.max(1,width-Math.round(60*a.getResources().getDisplayMetrics().density)):Math.max(1,Math.round((448-164-24)*scale));
       Locale locale=now.getTextLocale();
       Paint paint=now.getPaint();
       boolean context=measuredAdapter.get()!=adapter || measuredRow!=row || measuredWidth!=width
-        || measuredFont!=font || !locale.equals(measuredLocale) || measuredLabels.length!=count
+        || measuredTextWidth!=textWidth || measuredFont!=font || !locale.equals(measuredLocale) || measuredLabels.length!=count
         || measuredTypeface!=paint.getTypeface() || measuredTextSize!=paint.getTextSize()
         || measuredScaleX!=paint.getTextScaleX() || measuredSkewX!=paint.getTextSkewX()
         || measuredLetterSpacing!=now.getLetterSpacing() || measuredFlags!=paint.getFlags()
@@ -291,7 +292,7 @@ public final class CobraCardsTiles {
         || measuredLineSpacing!=now.getLineSpacingMultiplier() || measuredLineExtra!=now.getLineSpacingExtra()
         || measuredMaxLines!=now.getMaxLines() || measuredFontPadding!=now.getIncludeFontPadding();
       if(context){
-        measuredAdapter=new WeakReference<>(adapter);measuredRow=row;measuredWidth=width;measuredFont=font;measuredLocale=locale;
+        measuredAdapter=new WeakReference<>(adapter);measuredRow=row;measuredWidth=width;measuredTextWidth=textWidth;measuredFont=font;measuredLocale=locale;
         measuredTypeface=paint.getTypeface();measuredTextSize=paint.getTextSize();measuredScaleX=paint.getTextScaleX();
         measuredSkewX=paint.getTextSkewX();measuredLetterSpacing=now.getLetterSpacing();measuredFlags=paint.getFlags();
         measuredFontFeatures=now.getFontFeatureSettings();measuredLineSpacing=now.getLineSpacingMultiplier();
@@ -299,7 +300,7 @@ public final class CobraCardsTiles {
         measuredLabels=new String[count];measuredTextHeights=new int[count];contentGeneration++;
       }
       requiredNowHeight=0;
-      int maximum=0,textWidth=Math.max(1,Math.round((448-164-24)*scale));
+      int maximum=0;
       // GridView advances to the next row using its LAST child's bottom. Both
       // cells therefore resolve the same maximum before either is measured.
       // getItem is the native adapter's local projection lookup, not inventory
@@ -313,6 +314,7 @@ public final class CobraCardsTiles {
         if(channel==bound)requiredNowHeight=measuredTextHeights[offset];
         maximum=Math.max(maximum,measuredTextHeights[offset]);
       }
+      if(expanded){float d=a.getResources().getDisplayMetrics().density;return Math.max(1,Math.round((160+Math.max(0,font-1)*96)*d))+Math.max(0,maximum-Math.round(36*d*font));}
       int base=Math.max(1,Math.round((250+Math.max(0,font-1)*128)*scale));
       // A 34-reference-pixel reserve preserves normal rows and calibrates
       // measured native two-line overflow to the approved row geometry.
@@ -375,9 +377,14 @@ public final class CobraCardsTiles {
       float font=a.getResources().getConfiguration().fontScale;if(!(font>0))font=1;
       configuring=true;
       try{
-        boolean dimensions=configuredWidth!=width || configuredFont!=font;
+        expanded=CobraCardsLayout.expanded(a);
+        boolean dimensions=configuredWidth!=width || configuredFont!=font || configuredExpanded!=expanded;
         scale=width/448f;
-        if(dimensions){
+        if(dimensions && expanded){
+          category.setTextSize(TypedValue.COMPLEX_UNIT_SP,11);title.setTextSize(TypedValue.COMPLEX_UNIT_SP,14);now.setTextSize(TypedValue.COMPLEX_UNIT_SP,12);time.setTextSize(TypedValue.COMPLEX_UNIT_SP,11);fallback.setTextSize(TypedValue.COMPLEX_UNIT_SP,20);live.setTextSize(TypedValue.COMPLEX_UNIT_SP,11);
+          time.setSingleLine(false);time.setMaxLines(2);
+        }else if(dimensions){
+          if(time.getMaxLines()!=1){time.setSingleLine(true);time.setMaxLines(1);}
           category.setTextSize(TypedValue.COMPLEX_UNIT_PX,17*scale*font);
           title.setTextSize(TypedValue.COMPLEX_UNIT_PX,24*scale*font);
           now.setTextSize(TypedValue.COMPLEX_UNIT_PX,21*scale*font);
@@ -387,7 +394,7 @@ public final class CobraCardsTiles {
         }
         int height=rowHeight(a,width,font);
         float nowHeight=Math.max(52*font,requiredNowHeight/scale);
-        int nowPixels=px(nowHeight);
+        int nowPixels=expanded?Math.max(Math.round(32*a.getResources().getDisplayMetrics().density*font),requiredNowHeight):px(nowHeight);
         boolean geometry=dimensions || configuredHeight!=height || configuredNowHeight!=nowPixels;
         if(bound!=null && configuredHeight!=height)rowSyncPending=true;
         if(bound!=null && geometry)selectionAfterResize=true;
@@ -402,7 +409,9 @@ public final class CobraCardsTiles {
           if(rowSyncPending)rowSyncPending=!synchronizeAttachedRow(a);
           return;
         }
-        configuredWidth=width;configuredFont=font;configuredHeight=height;configuredNowHeight=nowPixels;
+        configuredWidth=width;configuredFont=font;configuredHeight=height;configuredNowHeight=nowPixels;configuredExpanded=expanded;
+        if(expanded){expandedGeometry(a,width,height,font,nowPixels);if(rowSyncPending)rowSyncPending=!synchronizeAttachedRow(a);return;}
+        more.compact=false;
         float nominalHeight=250+Math.max(0,font-1)*128;
         float refHeight=nominalHeight+(height-Math.max(1,Math.round(nominalHeight*scale)))/scale;
         liveDot.setBounds(0,0,px(16),px(16));live.setCompoundDrawables(liveDot,null,null,null);live.setCompoundDrawablePadding(px(8));
@@ -423,6 +432,25 @@ public final class CobraCardsTiles {
         more.scale=scale;more.invalidate();
         if(rowSyncPending)rowSyncPending=!synchronizeAttachedRow(a);
       }finally{configuring=false;}
+    }
+    void expandedGeometry(Activity a,int width,int height,float font,int nowPixels){
+      float d=a.getResources().getDisplayMetrics().density;
+      float titleY=48*d,titleH=18*d*font,nowY=titleY+titleH+4*d,footer=height-44*d*font;
+      rectangle(logo,8*d,48*d,36*d,36*d);rectangle(fallback,8*d,48*d,36*d,36*d);
+      rectangle(divider,46*d,48*d,Math.max(1,d*.5f),42*d);
+      rectangle(category,52*d,10*d,Math.max(1,width-108*d),16*d*font);
+      rectangle(title,52*d,titleY,Math.max(1,width-60*d),titleH);
+      rectangle(now,52*d,nowY,Math.max(1,width-60*d),nowPixels);
+      float liveWidth=42*d*font,timeLeft=8*d+liveWidth+6*d;
+      rectangle(live,8*d,footer,liveWidth,28*d*font);
+      rectangle(time,timeLeft,footer,Math.max(1,width-timeLeft-8*d),28*d*font);
+      rectangle(progress,8*d,height-10*d,Math.max(1,width-16*d),3*d);
+      liveDot.setBounds(0,0,Math.round(8*d),Math.round(8*d));live.setCompoundDrawables(liveDot,null,null,null);live.setCompoundDrawablePadding(Math.round(4*d));
+      rectangle(more,Math.max(0,width-48*d),0,48*d,48*d);more.compact=true;more.scale=d;more.invalidate();
+    }
+    void rectangle(View view,float x,float y,float w,float h){
+      FrameLayout.LayoutParams p=(FrameLayout.LayoutParams)view.getLayoutParams();
+      p.leftMargin=Math.round(x);p.topMargin=Math.round(y);p.width=Math.max(1,Math.round(w));p.height=Math.max(1,Math.round(h));view.setLayoutParams(p);
     }
     int px(float value){return Math.max(1,Math.round(value*scale));}
     void place(View view,float left,float top,float width,float height){
@@ -450,13 +478,13 @@ public final class CobraCardsTiles {
     @Override public void setImageDrawable(Drawable drawable){super.setImageDrawable(drawable);if(holder!=null)holder.logoChanged();}
   }
   private static final class MoreView extends View {
-    final Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG);float scale=1;
+    final Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG);float scale=1;boolean compact;
     MoreView(Activity a){super(a);setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);}
     @Override protected void drawableStateChanged(){super.drawableStateChanged();invalidate();}
     @Override protected void onDraw(Canvas canvas){
       super.onDraw(canvas);paint.setColor(isPressed() || isFocused() || isHovered()?WHITE:0xffaabbd0);
-      float x=getWidth()-18*scale;
-      for(int i=0;i<3;i++)canvas.drawCircle(x,(14+i*7)*scale,2.2f*scale,paint);
+      float x=compact?getWidth()/2f:getWidth()-18*scale;
+      for(int i=0;i<3;i++)canvas.drawCircle(x,compact?getHeight()/2f+(i-1)*4*scale:(14+i*7)*scale,(compact?1.35f:2.2f)*scale,paint);
       if(isFocused()){paint.setStyle(Paint.Style.STROKE);paint.setStrokeWidth(Math.max(1,scale));
         canvas.drawRoundRect(1,1,getWidth()-1,getHeight()-1,10*scale,10*scale,paint);paint.setStyle(Paint.Style.FILL);}
     }

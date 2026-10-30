@@ -99,16 +99,19 @@ public final class CobraCardsReuse {
     if(!tree(a,s)){s.dispose();return false;}
     if(!string(a,"mCobraModePendingFocus").isEmpty())return false;
     Stamp fresh=stamp(a);if(fresh==null)return false;
-    long favoriteVersion,recentVersion,customVersion;
+    long favoriteVersion,recentVersion,customVersion;boolean reflow;
     synchronized(s){
       if(s.disposed || s.inventory!=s.drawnInventory || s.sources!=s.drawnSources || s.collections!=s.drawnCollections
-          || s.hidden!=s.drawnHidden || !s.stamp.same(fresh))return false;
+          || s.hidden!=s.drawnHidden)return false;
+      reflow=!s.stamp.same(fresh);
+      if(reflow && !s.stamp.sameDataForReflow(fresh))return false;
       String category=string(a,"mCategory");
       if("FAVORITES".equals(category) && s.favorites!=s.drawnFavorites)return false;
       if("RECENT".equals(category) && s.recents!=s.drawnRecents)return false;
       if(category.startsWith("MY:") && s.custom!=s.drawnCustom)return false;
       favoriteVersion=s.favorites;recentVersion=s.recents;customVersion=s.custom;
     }
+    if(reflow){s.captureReflow(a);CobraCardsLayout.afterRender(a);}
     int first=s.grid.getFirstVisiblePosition(),visible=s.grid.getChildCount();
     // No list reconstruction or notifyDataSetChanged: bind just the native
     // visible convertViews, retaining grid/adapter/child/selection identities.
@@ -133,6 +136,20 @@ public final class CobraCardsReuse {
     return true;
   }
 
+  /** Capture before GridView.setNumColumns can reset its pending position. */
+  static void beforeLayout(Activity a,int width,int height,int columns){
+    main();State s=existing(a);if(s==null || !cards(a) || s.disposed
+        || read(a,"mCobraGuideList")!=s.grid || read(a,"mCobraGuideAdapter")!=s.adapter
+        || !s.grid.isAttachedToWindow())return;
+    boolean expandedTransition=Math.min(width,height)>=600 || Math.min(s.stamp.modelWidth,s.stamp.modelHeight)>=600;
+    if(expandedTransition && (width!=s.stamp.modelWidth || height!=s.stamp.modelHeight || columns!=s.grid.getNumColumns()))s.captureReflow(a);
+  }
+  static void columnsApplied(Activity a,GridView grid){
+    State s=existing(a);if(s!=null && s.grid==grid && s.anchorPosition>=0 && !s.anchorApplied){
+      s.anchorApplied=true;grid.setSelection(s.anchorPosition);
+    }
+  }
+
   public static void beforeShell(Activity a){main();State s=existing(a);if(s!=null && (!cards(a) || read(a,"mCobraGuideShell")!=s.shell))s.dispose();}
   public static void inventory(Activity a){State s=existing(a);if(s!=null)synchronized(s){s.inventory++;}}
   public static void sources(Activity a){State s=existing(a);if(s!=null)synchronized(s){s.sources++;}}
@@ -146,17 +163,46 @@ public final class CobraCardsReuse {
     State s=existing(a);if(s!=null)synchronized(s){s.recents++;}
   }
 
-  private static final class State implements View.OnAttachStateChangeListener {
+  private static final class State implements View.OnAttachStateChangeListener,View.OnLayoutChangeListener {
     final WeakReference<Activity> owner;final ViewGroup shell;final LinearLayout browser;final GridView grid;final BaseAdapter adapter;final int count;
     long inventory,sources,collections,hidden,favorites,recents,custom;
     final long drawnInventory=0,drawnSources=0,drawnCollections=0,drawnHidden=0;
     long drawnFavorites,drawnRecents,drawnCustom;Stamp stamp;boolean disposed;
+    int anchorPosition=-1,anchorTop;boolean anchorApplied;String focusedTag="",focusedClass="";
+    WeakReference<Object> reflowSelection=new WeakReference<>(null);
     State(Activity a,ViewGroup shell,LinearLayout browser,GridView grid,BaseAdapter adapter,Stamp current){owner=new WeakReference<>(a);this.shell=shell;this.browser=browser;this.grid=grid;this.adapter=adapter;count=adapter.getCount();stamp=current;}
+    void captureReflow(Activity a){
+      if(anchorPosition>=0 || grid.getChildCount()==0)return;
+      anchorPosition=grid.getFirstVisiblePosition();anchorTop=grid.getChildAt(0).getTop();
+      reflowSelection=new WeakReference<>(read(a,"mGuidePreviewChannel"));
+      View focused=grid.findFocus(),row=focused;
+      while(row!=null && row.getParent()!=grid)row=row.getParent() instanceof View?(View)row.getParent():null;
+      focusedTag=row==null?"":String.valueOf(row.getTag());focusedClass=focused==null?"":focused.getClass().getName();
+      anchorApplied=false;grid.addOnLayoutChangeListener(this);
+    }
+    public void onLayoutChange(View v,int l,int t,int r,int b,int ol,int ot,int or,int ob){
+      Activity a=owner.get();if(anchorPosition<0)return;
+      int position=anchorPosition,top=anchorTop;anchorPosition=-1;grid.removeOnLayoutChangeListener(this);
+      if(disposed || a==null || !tree(a,this))return;
+      int index=position-grid.getFirstVisiblePosition();
+      if(index>=0 && index<grid.getChildCount())grid.scrollListBy(grid.getChildAt(index).getTop()-top);
+      if(!focusedTag.isEmpty() && read(a,"mGuidePreviewChannel")==reflowSelection.get()
+          && read(a,"mPlayerOverlay")==null && read(a,"mCobraActionSheet")==null){
+        View row=grid.findViewWithTag(focusedTag);View target=matchingFocus(row,focusedClass);
+        if(target!=null)target.requestFocus();
+      }
+      focusedTag="";focusedClass="";reflowSelection.clear();
+    }
+    View matchingFocus(View root,String name){
+      if(root==null)return null;if(root.getClass().getName().equals(name))return root;
+      if(root instanceof ViewGroup)for(int i=0;i<((ViewGroup)root).getChildCount();i++){View next=matchingFocus(((ViewGroup)root).getChildAt(i),name);if(next!=null)return next;}
+      return null;
+    }
     public void onViewAttachedToWindow(View view){}
     public void onViewDetachedFromWindow(View view){dispose();}
     void dispose(){
       synchronized(this){if(disposed)return;disposed=true;}
-      shell.removeOnAttachStateChangeListener(this);browser.removeOnAttachStateChangeListener(this);grid.removeOnAttachStateChangeListener(this);
+      shell.removeOnAttachStateChangeListener(this);browser.removeOnAttachStateChangeListener(this);grid.removeOnAttachStateChangeListener(this);grid.removeOnLayoutChangeListener(this);anchorPosition=-1;reflowSelection.clear();
       Activity a=owner.get();if(a!=null)synchronized(OWNERS){WeakReference<State> ref=OWNERS.get(a);if(ref!=null && ref.get()==this)OWNERS.remove(a);}
     }
   }
@@ -165,7 +211,7 @@ public final class CobraCardsReuse {
    * Native projection/auth runs unchanged whenever its raw inputs change. */
   private static final class Stamp {
     final Object prefs,features,featurePrefs,ui,theme,effective;
-    final String[] text;final int[] geometry;
+    final String[] text;final int[] geometry;final int modelWidth,modelHeight;
     Stamp(Activity a,Object currentFeatures,Object currentFeaturePrefs,String[] raw){
       prefs=read(a,"mPrefs");features=currentFeatures;featurePrefs=currentFeaturePrefs;
       ui=read(a,"mUi");theme=read(a,"mTheme");Object renderer=call(a,"vtheme",NONE);effective=call(renderer,"effective",NONE);
@@ -174,12 +220,22 @@ public final class CobraCardsReuse {
           string(a,"mCobraListStateKey"),string(a,"mCobraFocusSchedule"),string(a,"mCobraModeGroupsExpanded"),
           raw[0],raw[1],raw[2],
           String.valueOf(read(ui,"sourceStamp")),String.valueOf(call(renderer,"palette",NONE)),config.toString(),
-          String.valueOf(call(a,"cobraStaticAmbientMode",NONE)),String.valueOf(call(a,"cobraNightCinemaActive",NONE))};
-      Object model=read(a,"mCobraModeLayout");ArrayList<Integer> values=new ArrayList<>();
+          String.valueOf(call(a,"cobraStaticAmbientMode",NONE)),String.valueOf(call(a,"cobraNightCinemaActive",NONE)),
+          String.valueOf(config.locale),String.valueOf(config.getLayoutDirection())};
+      Object model=read(a,"mCobraModeLayout");modelWidth=number(model,"width");modelHeight=number(model,"height");ArrayList<Integer> values=new ArrayList<>();
       for(String name:new String[]{"toolbar","rail","directory","video","details","browser","footer"})for(int v:(int[])read(model,name))values.add(v);
       for(String name:new String[]{"width","height","columns","channelWidth"})values.add(number(model,name));
       values.add(Float.floatToIntBits(dm.density));values.add(Float.floatToIntBits(dm.scaledDensity));values.add(dm.densityDpi);
       geometry=new int[values.size()];for(int i=0;i<geometry.length;i++)geometry[i]=values.get(i);
+    }
+    boolean sameDataForReflow(Stamp other){
+      if(Arrays.equals(geometry,other.geometry))return false;
+      if(Math.min(modelWidth,modelHeight)<600 && Math.min(other.modelWidth,other.modelHeight)<600)return false;
+      if(prefs!=other.prefs || features!=other.features || featurePrefs!=other.featurePrefs || ui!=other.ui || theme!=other.theme || effective!=other.effective || text.length!=other.text.length)return false;
+      // Index13 is Configuration.toString(); only ignore it when actual window
+      // geometry changed and every projection/policy/theme input stayed equal.
+      for(int i=0;i<text.length;i++)if(i!=13 && !text[i].equals(other.text[i]))return false;
+      return true;
     }
     boolean same(Stamp other){return prefs==other.prefs && features==other.features && featurePrefs==other.featurePrefs
         && ui==other.ui && theme==other.theme && effective==other.effective && Arrays.equals(text,other.text) && Arrays.equals(geometry,other.geometry);}
