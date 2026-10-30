@@ -1,0 +1,127 @@
+{
+  "Infinity": "EXACT431_ZIP",
+  "Pro_player_preview_controls": "EXACT431_ORIGINAL_METHODS",
+  "accepted_pointer_updated": false,
+  "added_classes": [
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$AmbientPanel;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$ButtonSurface;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$LiveDot;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$LiveSurface;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$PanelSurface;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$PreviewBadge;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$ProgressSurface;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$Slot;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$Snapshot;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$State;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout;",
+    "Lcom/projectinfinity/kodi/CobraCardsReuse$Stamp;",
+    "Lcom/projectinfinity/kodi/CobraCardsReuse$State;",
+    "Lcom/projectinfinity/kodi/CobraCardsReuse;",
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$CardSurface;",
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$Holder;",
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$LiveDot;",
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$MoreView;",
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$OwnedLogo;",
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$RoundedProgress;",
+    "Lcom/projectinfinity/kodi/CobraCardsTiles;",
+    "Lcom/projectinfinity/kodi/CobraProfileDataReuse$Entry;",
+    "Lcom/projectinfinity/kodi/CobraProfileDataReuse;"
+  ],
+  "baseline_signed_source": "9ccc4c362a65118eeba38a8e7e4b0de5723c69af",
+  "changed_classes": [
+    "Lcom/projectinfinity/kodi/CobraComponent;",
+    "Lcom/projectinfinity/kodi/CobraLogoRequests;",
+    "Lcom/projectinfinity/kodi/InfinityCobraFeatureRuntime;",
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraPosterChannelCard;",
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity;"
+  ],
+  "chooser": "EXACT_DEX_AND_UI_MEMBERS; genuineversionmetadataonly",
+  "component_catalog": {
+    "bundles": {
+      "CHOOSER_SHELL": {
+        "approved_source": "3b0bbc08429eac16705247652a07891596f777d0",
+        "digest": "29d3a19f9362a16d38eeb900d20071aafa4dd2a06e8c50bdc9443a8966eb7b98",
+        "file": "CHOOSER_SHELL.zip",
+        "settings_schema": "original-launch-preference",
+        "sha256": "17861e1c2c9fdb99bd62e6ed287937a2c9dce2f28af80f2f84c083c633332dd3",
+        "version": "2103433.version-metadata.1"
+      },
+      "COBRA": {
+        "approved_source": "3b0bbc08429eac16705247652a07891596f777d0",
+        "digest": "d3fcd8dfafe82e4d2fc511f61e07e4c67e4a58bf527c20fb732b8d6f44355bf1",
+        "file": "COBRA.zip",
+        "settings_schema": "original-plus-settings-snapshot-v1",
+        "sha256": "fb33f99a8ce134952536f8763396492c7accd26dfade9b9741665785daac932d",
+        "version": "2103433.cobra.1"
+      },
+      "INFINITY": {
+        "approved_source": "6ca19c1d4152e7809f7040dcbdf7f58bc3df7655",
+        "digest": "ab70480429f786f4fbf63592c1a16d8ccea3abaed13bec047474d0730efcbbee",
+        "file": "INFINITY.zip",
+        "settings_schema": "original-2103420",
+        "sha256": "16eeb91a24bf0cf99d558d9e3dd17aedfd127e9a1936dcce413341c48683cd6c",
+        "version": "2103420.isolation.1.performance.2"
+      },
+      "MINIMAL_ANDROID_CONTRACT": {
+        "approved_source": "b41d51daa8b32dfee265dc9ea0abf844bff8f44e",
+        "digest": "5fb2129e146c90a498a3e9faa118ac849fbdb18a2442aca9c646b002d10c6fb6",
+        "file": "MINIMAL_ANDROID_CONTRACT.zip",
+        "settings_schema": "owner-durability-v1",
+        "sha256": "432bfb7b246a504d9550e1de39368c3b7e0946532f1c695531ed891e74ef03d8",
+        "version": "isolation-contract.1.launcher-icons.2103431"
+      }
+    },
+    "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "package": "com.projectinfinity.kodi",
+    "release_approved": false,
+    "schema": 1,
+    "source": "3b0bbc08429eac16705247652a07891596f777d0"
+  },
+  "independent_policy_receipt_sha256": "5a30d368215e8236e91a357e7dfc96ee9502217dc2e5c7182e564e4c70166383",
+  "method_changes": {
+    "Lcom/projectinfinity/kodi/CobraComponent;": [
+      "public static version()Ljava/lang/String;"
+    ],
+    "Lcom/projectinfinity/kodi/CobraLogoRequests;": [
+      "public static clear(Landroid/app/Activity;Landroid/widget/ImageView;)V"
+    ],
+    "Lcom/projectinfinity/kodi/InfinityCobraFeatureRuntime;": [
+      "public adultLocked()Z"
+    ],
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraPosterChannelCard;": [
+      "bind(Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;I)V",
+      "constructor <init>(Lcom/projectinfinity/kodi/InfinityLiveActivity;)V",
+      "refreshPlaying()V"
+    ],
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity;": [
+      "private addRecent(Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;)V",
+      "private applyLoadResult(Lcom/projectinfinity/kodi/InfinityLiveActivity$LoadResult;)V",
+      "private cobraAmbientSurface(Landroid/view/View;IIIZ)V",
+      "private cobraChannelsForCurrentView()Ljava/util/ArrayList;",
+      "private cobraGuideChannels()Ljava/util/ArrayList;",
+      "private cobraLayoutGuide()V",
+      "private cobraRefreshModeDetails()V",
+      "private cobraRefreshProgrammeLabels()V",
+      "private cobraRefreshVisualEffects()V",
+      "private cobraRenderGuideBrowser()V",
+      "private cobraRestyleGuide()V",
+      "private cobraShowGuideShell()V",
+      "private hideCobraChannel(Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;)V",
+      "private persistSources()V",
+      "private reloadProfileCollections()V",
+      "private restoreCobraLibraryCache(Ljava/util/ArrayList;)Z",
+      "private toggleFavorite(Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;)V",
+      "synthetic lambda$confirmRemoveSource$96$com-projectinfinity-kodi-InfinityLiveActivity(Lcom/projectinfinity/kodi/InfinityLiveActivity$LiveSource;Landroid/content/DialogInterface;I)V",
+      "synthetic lambda$loadAllEnabledSources$54$com-projectinfinity-kodi-InfinityLiveActivity(Ljava/util/ArrayList;ZLjava/util/ArrayList;Ljava/util/ArrayList;)V",
+      "synthetic lambda$showCobraAddToGroup$74$com-projectinfinity-kodi-InfinityLiveActivity(Landroid/widget/EditText;Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;Landroid/content/DialogInterface;I)V"
+    ]
+  },
+  "minimal_Android_native_icons": "EXACT431_ZIP",
+  "original_Activity_fields": "EXACT",
+  "physical_Fold": "PENDING",
+  "shutdown": "FROZEN_NOT_RUN",
+  "source": "3b0bbc08429eac16705247652a07891596f777d0",
+  "status": "VERIFIED_CARDS_COBRA_ONLY_DELTA_AND_GENUINE_VERSION_METADATA",
+  "unchanged_Cobra_class_bodies": "EXACT",
+  "unchanged_Cobra_class_count": 7137
+}
