@@ -19,7 +19,7 @@ on:
         required: true
         type: choice
         default: select-a-feature
-        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host, infinity-performance-android, cobra-owner-host, cobra-android-launch, cobra-cards-baseline, cobra-cards-host]
+        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host, infinity-performance-android, cobra-owner-host, cobra-android-launch, cobra-cards-baseline, cobra-cards-host, infinity-seamless-loading434]
       candidate_build:
         description: Existing signed build run (no rebuild)
         required: true
@@ -32,6 +32,46 @@ concurrency:
   group: infinity-feature-${{ inputs.source_ref || github.ref }}-${{ inputs.feature || 'explicit-request' }}-${{ github.ref == 'refs/heads/work/infinity-final-corrective-from-2103407-20261025' && github.sha || 'serial' }}
   cancel-in-progress: false
 jobs:
+  infinity-loading-host:
+    name: Infinity434 seamless loading source and actual generated skin checks
+    if: github.event_name == 'workflow_dispatch' && inputs.feature == 'infinity-seamless-loading434'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      AUTHORIZED_SCOPE: ${{ inputs.authorization }}
+      SIGNED_BUILD: ${{ inputs.candidate_build }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: "${{ inputs.source_ref }}", fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Admit selected separate owner branch and immutable433 component
+        run: |
+          set -euo pipefail
+          test -n "$AUTHORIZED_SCOPE"
+          test "$SIGNED_BUILD" = 41040277352
+          test "$(git branch --show-current)" = work/infinity-only-seamless-loading-from-2103433-20261030
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          python3 -m pip install Pillow==12.3.0
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 41040277352
+          name: Infinity-Combined-Owner-Components-41040277352
+          github-token: ${{ github.token }}
+          path: loading433-components
+      - name: Stage exact signed source and execute only selected loading checks
+        run: |
+          python3 repairs/infinity-seamless-loading-2103433/run_host.py \
+            --baseline loading433-components/INFINITY.zip --out loading-host
+      - name: Preserve loading source and exact host evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-Seamless-Loading-Host-Evidence-${{ github.run_id }}
+          path: loading-host/
+          if-no-files-found: error
+          retention-days: 90
   cobra-host:
     name: Both P0 corrections - production touch dispatch and launcher resources
     if: github.event_name == 'workflow_dispatch' && inputs.feature == 'cobra-owner-host'
@@ -586,7 +626,7 @@ jobs:
           retention-days: 90
           if-no-files-found: error
   android17:
-    if: inputs.feature != 'infinity-performance-host' && inputs.feature != 'infinity-performance-android' && inputs.feature != 'cobra-owner-host' && inputs.feature != 'cobra-android-launch' && inputs.feature != 'cobra-cards-baseline' && inputs.feature != 'cobra-cards-host'
+    if: inputs.feature != 'infinity-performance-host' && inputs.feature != 'infinity-performance-android' && inputs.feature != 'cobra-owner-host' && inputs.feature != 'cobra-android-launch' && inputs.feature != 'cobra-cards-baseline' && inputs.feature != 'cobra-cards-host' && inputs.feature != 'infinity-seamless-loading434'
     name: Selected feature ${{ inputs.feature || 'explicit baseline Search request' }}
     runs-on: ubuntu-22.04
     timeout-minutes: 150

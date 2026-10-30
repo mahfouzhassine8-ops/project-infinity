@@ -2,6 +2,7 @@ import ast
 from io import BytesIO
 import importlib.util
 import json
+import os
 from pathlib import Path
 import sys
 import types
@@ -9,8 +10,9 @@ import unittest
 import xml.etree.ElementTree as ET
 
 ROOT=Path(__file__).resolve().parents[1]
-STAGED=Path('/workspace/cobra-evidence/consolidated434/infinity-stage-v2')
-BASE=Path('/workspace/cobra-evidence/infinity434-baseline')
+STAGED=Path(os.environ.get('INFINITY_STAGED','/workspace/cobra-evidence/consolidated434/infinity-stage-v3'))
+SKIN_BASE=STAGED/'input-skin'
+BASE=STAGED/'input-addons'
 
 def sem(node):
     return node.tag,tuple(sorted(node.attrib.items())),(node.text or '').strip(),tuple(sem(c) for c in node)
@@ -26,12 +28,17 @@ def remove_loading(node):
         else:remove_loading(child)
 
 class SourceAndSkinIntegrationTest(unittest.TestCase):
+    def test_every_staged_python_source_matches_tested_overlay(self):
+        overlay=ROOT/'overlay/script.infinity.commandcenter'
+        for path in overlay.iterdir():
+            if path.is_file():self.assertEqual(path.read_bytes(),(STAGED/'candidate-addons/script.infinity.commandcenter'/path.name).read_bytes(),path.name)
+
     def test_actual_xml_retains_every_original_action_geometry_and_control(self):
         plan=json.loads((STAGED/'SOURCE-PLAN.json').read_text());count=0
         for key,row in plan.items():
             if not key.endswith('.xml') or not key.startswith('assets/addons/skin.infinity.diggz/') or row['before'] is None or key.endswith('/addon.xml'):continue
             relative=key[len('assets/addons/'):]
-            old=ET.parse(BASE/relative).getroot();new=ET.parse(STAGED/'members'/key).getroot()
+            old=ET.parse(SKIN_BASE/relative).getroot();new=ET.parse(STAGED/'members'/key).getroot()
             remove_loading(new)
             self.assertEqual(sem(old),sem(new),relative);count+=1
         self.assertGreater(count,50)
@@ -44,14 +51,15 @@ class SourceAndSkinIntegrationTest(unittest.TestCase):
             command=n.text
             raw=command.split('seamless.loading,"',1)[1][:-2]
             raw=raw.replace('\\"','"').replace('\\\\','\\')
-            data=json.loads(raw);self.assertEqual('action',data['state']);self.assertEqual(64,len(data['target']))
+            data=json.loads(raw);self.assertIn(data['state'],('action','dispatched'));self.assertEqual(64,len(data['target']))
             self.assertIn('epoch',data['owner'])
+            for field in ('section','source','addon','home_section','home_source','dbid'):self.assertIn(field,data['owner'])
             self.assertNotIn('plugin://',command)
         capabilities=next(n.text for n in tree.findall('onload') if 'FrameControls.10000' in (n.text or ''))
         for cid in ('9000','9200','9100'):self.assertIn('|'+cid+'|',capabilities)
         # Implicit native media lists get decorations, never a new onclick that
         # could swallow their built-in folder/play behavior.
-        originals=ET.parse(BASE/'skin.infinity.diggz/unified/Home.xml').getroot()
+        originals=ET.parse(SKIN_BASE/'skin.infinity.diggz/unified/Home.xml').getroot()
         old={n.get('id'):n for n in originals.iter('control') if n.get('id')}
         for n in tree.iter('control'):
             if n.get('id') in old and n.get('type') in ('list','wraplist','panel','fixedlist') and not old[n.get('id')].findall('onclick'):

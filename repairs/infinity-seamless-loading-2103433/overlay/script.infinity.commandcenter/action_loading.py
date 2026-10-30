@@ -25,8 +25,13 @@ MAX_EVENT_BYTES = 1536
 THRESHOLD = .18
 OBSERVATION_LIMIT = 120.0  # Retires UI observation only, never times out a provider.
 PREFIX = 'Infinity.Loading.'
+IDENTITY = ('window', 'control', 'item', 'profile', 'geometry', 'section',
+            'source', 'addon', 'home_section', 'home_source', 'dbid', 'selection')
+PUBLIC_IDENTITY = ('section', 'source', 'addon', 'home_section', 'home_source', 'dbid')
 PROPERTIES = ('Token', 'State', 'Window', 'Control', 'Item', 'Target',
-              'Active', 'Global', 'Status')
+              'Active', 'Global', 'Status', 'Section', 'Source', 'Addon',
+              'HomeSection', 'HomeSource', 'Dbid')
+IDENTITY_PROPERTIES = dict(zip(PUBLIC_IDENTITY, PROPERTIES[-6:]))
 
 
 class LoadingState:
@@ -82,8 +87,7 @@ class LoadingState:
             owner = {}
         # A delayed event must never attach itself to the current, different
         # screen/row/profile. Missing UI ownership may only become a global job.
-        matches = all(str(owner.get(key, '')) == str(context.get(key, ''))
-                      for key in ('window', 'control', 'item', 'profile', 'geometry'))
+        matches = all(str(owner.get(key, '')) == str(context.get(key, '')) for key in IDENTITY)
         foreground = value.get('foreground') is True and matches
         target = value.get('target', '')
         if not isinstance(target, str) or len(target) != 64 or any(c not in '0123456789abcdef' for c in target):
@@ -111,8 +115,7 @@ class LoadingState:
         action = self.action
         if action:
             before = action['context']
-            same = all(context.get(k) == before.get(k)
-                       for k in ('window', 'control', 'item', 'profile', 'geometry'))
+            same = all(context.get(k) == before.get(k) for k in IDENTITY)
             same = same and (context.get('dialog') in (0, 10101, 10138, 10160) or context.get('dialog') == before.get('dialog'))
             if not same or context.get('playback') != before.get('playback') or now - action['started'] >= OBSERVATION_LIMIT:
                 self.retired_before = max(self.retired_before, now)
@@ -141,14 +144,25 @@ class LoadingState:
         if not visible:
             return dict(Token='', State='idle', Window='', Control='', Item='', Target='',
                         Active='false', Global='true' if global_visible else 'false',
-                        Status='Loading' if global_visible else '')
+                        Status='Loading' if global_visible else '',
+                        **{key:'' for key in IDENTITY_PROPERTIES.values()})
         owner = action['owner']
         return dict(Token=action['token'], State='preparing', Window=str(owner['window']),
                     Control=str(owner['control']), Item=str(owner['item']), Target=action['target'],
-                    Active='true', Global='false', Status='Loading')
+                    Active='true', Global='false', Status='Loading',
+                    **{prop:str(owner.get(key, '')) for key,prop in IDENTITY_PROPERTIES.items()})
 
 
 def _context(xbmc, gui, foreground=True):
+    empty = dict(window=0, control=0, item='', profile='', geometry='', dialog=0,
+                 playback='', busy=False, framed=False, allowed=False,
+                 **{key:'' for key in (*PUBLIC_IDENTITY, 'selection')})
+    if not foreground:
+        return empty  # No background focus/artwork/provider/window queries.
+    home = gui.Window(10000)
+    experience = home.getProperty('Infinity.Experience') or home.getProperty('Infinity.NativeExperience')
+    if xbmc.getSkinDir() != 'skin.infinity.diggz' or experience.lower() == 'cobra':
+        return empty
     window = gui.getCurrentWindowId()
     dialog = gui.getCurrentWindowDialogId()
     try:
@@ -156,14 +170,19 @@ def _context(xbmc, gui, foreground=True):
     except RuntimeError:
         control = 0
     item = xbmc.getInfoLabel('Container(%d).CurrentItem' % control) if control else ''
+    # Retain source/section ownership even if an asynchronous rail replaces the
+    # selected index in place. Raw paths stay local and are never announced.
+    label = lambda key: xbmc.getInfoLabel('Container(%d).ListItem.%s' % (control, key)) if control else ''
+    identity = dict(section=label('Property(section)'), source=label('Property(hubsource)'),
+                    addon=label('Property(Addon.ID)'), dbid=label('DBID'),
+                    home_section=xbmc.getInfoLabel('Container(9000).ListItem.Property(section)'),
+                    home_source=xbmc.getInfoLabel('Container(9000).ListItem.Property(hubsource)'))
+    identity['selection'] = hashlib.sha256((label('FolderPath')+'\0'+label('FilenameAndPath')).encode('utf-8')).hexdigest()
     profile = xbmc.getInfoLabel('System.ProfileName')
     geometry = '|'.join(str(xbmc.getInfoLabel(k)) for k in ('System.ScreenWidth', 'System.ScreenHeight'))
-    home = gui.Window(10000)
-    experience = home.getProperty('Infinity.Experience') or home.getProperty('Infinity.NativeExperience')
-    allowed = foreground and xbmc.getSkinDir() == 'skin.infinity.diggz' and experience.lower() != 'cobra'
     framed = '|%d|' % control in home.getProperty(PREFIX + 'FrameControls.' + str(window)) if control else False
     return dict(window=window, control=control, item=item, profile=profile, framed=framed,
-                geometry=geometry, dialog=dialog, allowed=bool(allowed),
+                geometry=geometry, dialog=dialog, allowed=True, **identity,
                 playback=str(xbmc.getInfoLabel('Player.Filenameandpath')),
                 busy=bool(xbmc.getCondVisibility('Window.IsActive(busydialog) | Window.IsActive(busydialognocancel) | Window.IsActive(progressdialog)')))
 
@@ -191,7 +210,7 @@ def preparation(target, *, background=False):
     if active:
         _send(xbmc, dict(token=token, born=born, state='preparing', foreground=not background and bool(context['control']),
                         target=hashlib.sha256(target.encode('utf-8')).hexdigest(),
-                        owner={key:context[key] for key in ('window','control','item','profile','geometry')}))
+                        owner={key:context[key] for key in IDENTITY}))
     try:
         yield token
     except BaseException:
@@ -252,16 +271,33 @@ def make_monitor(xbmc, gui):
                 self.overflow = False
             if overflow:
                 self.state.cancel_all()
+                self.state.retired_before = max(self.state.retired_before, now)
+                self.epoch = uuid.uuid4().hex
+                self.home.setProperty(PREFIX + 'Context', self.epoch)
+                events = []  # Lost terminal events must not leave phantom work.
             for value in events:
                 if value.get('state') == 'cancel':
                     self.state.event(dict(value, state='canceled'), now, context)
+                elif value.get('state') == 'dispatched':
+                    # A builtin returning means the original operation started,
+                    # never provider readiness. Do not clear an independent
+                    # first-party preparation or another item/target's cue.
+                    action = self.state.action
+                    supplied = value.get('owner', {})
+                    if (action and action['navigation'] and isinstance(supplied, dict)
+                            and supplied.get('epoch') == self.epoch
+                            and action['target'] == value.get('target')
+                            and all(str(action['owner'].get(key, '')) == str(supplied.get(key, ''))
+                                    for key in ('window', 'control', 'item', *PUBLIC_IDENTITY))):
+                        self.state.cancel_action()
                 elif value.get('state') == 'action':
                     # Static XML reports only original explicit actions. No
                     # generic onclick is added to an implicit Kodi list route.
                     supplied = value.get('owner', {})
                     if not isinstance(supplied, dict) or supplied.get('epoch') != self.epoch:
                         continue
-                    owner = dict(supplied, profile=context['profile'], geometry=context['geometry'])
+                    owner = dict(supplied, profile=context['profile'], geometry=context['geometry'],
+                                 selection=context['selection'])
                     value = dict(value, state='preparing', token=uuid.uuid4().hex,
                                  foreground=True, owner=owner, navigation=True, born=value['_arrival'])
                     self.state.event(value, now, context)

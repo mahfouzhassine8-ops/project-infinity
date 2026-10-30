@@ -82,6 +82,8 @@ def generate(baseline,out):
             rel=name[len(skin_prefix):]
             if Path(rel).name not in SELECTED:continue
             old=z.read(name);raw,count=transform(old,rel)
+            original_skin=out/'input-skin'/SKIN/rel
+            original_skin.parent.mkdir(parents=True,exist_ok=True);original_skin.write_bytes(old)
             if raw!=old:
                 key=PREFIX+SKIN+'/'+rel;changes[key]=raw;before[key]=sha(old);xml_counts[rel]=count
             if Path(rel).name=='Includes.xml':imported.append(str(Path(rel).parent))

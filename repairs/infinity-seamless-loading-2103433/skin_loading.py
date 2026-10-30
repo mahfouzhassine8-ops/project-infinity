@@ -123,12 +123,25 @@ def transform(raw, name):
                 control=owner_id(node) if owner_id(node) != '0' else '$INFO[System.CurrentControlID]',
                 item='$INFO[Container(%s).CurrentItem]' % owner_id(node) if owner_id(node) != '0' else '$INFO[Container.CurrentItem]',
                 epoch='$INFO[Window(Home).Property(Infinity.Loading.Context)]'))
+            container = 'Container(%s)' % owner_id(node) if owner_id(node) != '0' else 'Container'
+            for key, label in (('section','Property(section)'), ('source','Property(hubsource)'),
+                               ('addon','Property(Addon.ID)'), ('dbid','DBID')):
+                payload['owner'][key] = '$INFO[%s.ListItem.%s]' % (container, label)
+            payload['owner']['home_section'] = '$INFO[Container(9000).ListItem.Property(section)]'
+            payload['owner']['home_source'] = '$INFO[Container(9000).ListItem.Property(hubsource)]'
             data = json.dumps(payload, separators=(',', ':')).replace('\\', '\\\\').replace('"', '\\"')
             command = 'NotifyAll(script.infinity.commandcenter,seamless.loading,"' + data + '")'
             condition = node.attrs.get('condition')
             condition = '[' + condition + '] + ' if condition else ''
             condition += 'System.AddonIsEnabled(script.infinity.commandcenter)'
             add(node.start, ('<!-- ' + MARKER + ' -->\n<onclick condition="' + escape(condition, quote=True) + '">' + escape(command) + '</onclick>\n').encode())
+            # Kodi has started this original action, not necessarily prepared a
+            # third-party destination. End only this unobservable launch cue;
+            # genuine first-party preparation has its own independent token.
+            dispatched = dict(payload, state='dispatched')
+            data = json.dumps(dispatched, separators=(',', ':')).replace('\\', '\\\\').replace('"', '\\"')
+            command = 'NotifyAll(script.infinity.commandcenter,seamless.loading,"' + data + '")'
+            add(node.end, ('\n<!-- ' + MARKER + ' -->\n<onclick condition="' + escape(condition, quote=True) + '">' + escape(command) + '</onclick>\n').encode())
             counts['actions'] += 1
         if node.tag == 'include' and node.attrs.get('content') in TEMPLATES:
             cid = owner_id(node)
@@ -192,7 +205,7 @@ def definitions():
       <control type="group">
         <description>Infinity current action loading</description>
         <left>$PARAM[left]</left><top>$PARAM[top]</top><width>$PARAM[width]</width><height>$PARAM[height]</height>
-        <visible>Window.IsActive($PARAM[window]) + [[!$PARAM[globalframe] + String.IsEqual(Window(Home).Property(Infinity.Loading.Active),true) + String.IsEqual(Window(Home).Property(Infinity.Loading.Control),$PARAM[control]) + Control.IsVisible($PARAM[control]) + Control.HasFocus($PARAM[control]) + String.IsEqual(Container($PARAM[control]).CurrentItem,Window(Home).Property(Infinity.Loading.Item))] | [$PARAM[globalframe] + !String.IsEqual(Window(Home).Property(Infinity.Loading.Active),true) + [String.IsEqual(Window(Home).Property(Infinity.Loading.Global),true) | Window.IsActive(busydialog) | Window.IsActive(busydialognocancel)]]] + !Player.IsFullscreen</visible>
+        <visible>Window.IsActive($PARAM[window]) + [[!$PARAM[globalframe] + String.IsEqual(Window(Home).Property(Infinity.Loading.Active),true) + String.IsEqual(Window(Home).Property(Infinity.Loading.Control),$PARAM[control]) + Control.IsVisible($PARAM[control]) + Control.HasFocus($PARAM[control]) + String.IsEqual(Container($PARAM[control]).CurrentItem,Window(Home).Property(Infinity.Loading.Item)) + String.IsEqual(Container($PARAM[control]).ListItem.Property(section),Window(Home).Property(Infinity.Loading.Section)) + String.IsEqual(Container($PARAM[control]).ListItem.Property(hubsource),Window(Home).Property(Infinity.Loading.Source)) + String.IsEqual(Container($PARAM[control]).ListItem.Property(Addon.ID),Window(Home).Property(Infinity.Loading.Addon)) + String.IsEqual(Container($PARAM[control]).ListItem.DBID,Window(Home).Property(Infinity.Loading.Dbid)) + String.IsEqual(Container(9000).ListItem.Property(section),Window(Home).Property(Infinity.Loading.HomeSection)) + String.IsEqual(Container(9000).ListItem.Property(hubsource),Window(Home).Property(Infinity.Loading.HomeSource))] | [$PARAM[globalframe] + !String.IsEqual(Window(Home).Property(Infinity.Loading.Active),true) + [String.IsEqual(Window(Home).Property(Infinity.Loading.Global),true) | Window.IsActive(busydialog) | Window.IsActive(busydialognocancel)]]] + !Player.IsFullscreen</visible>
         <control type="image">
           <left>0</left><top>0</top><width>100%</width><height>100%</height>
           <texture border="18" background="true" colordiffuse="$VAR[InfinityCollectiveFrameColor]">infinity_ui/action_loading.gif</texture>

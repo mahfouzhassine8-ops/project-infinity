@@ -40,7 +40,9 @@ class LoadingOwnershipTest(unittest.TestCase):
 
     def test_back_context_focus_profile_fold_and_new_playback_clear(self):
         for changed in (dict(window=10025),dict(control=9200),dict(item='2'),dict(profile='Kids'),
-                        dict(geometry='2208|1840'),dict(dialog=10100),dict(playback='playing-new-title'),dict(allowed=False)):
+                        dict(geometry='2208|1840'),dict(dialog=10100),dict(playback='playing-new-title'),dict(allowed=False),
+                        dict(section='tv'),dict(source='trakt'),dict(addon='different.provider'),
+                        dict(home_section='tv'),dict(home_source='trakt'),dict(dbid='99'),dict(selection='different-path-hash')):
             with self.subTest(changed=changed):
                 s=loading.LoadingState();c=context();s.event(start(),0,c)
                 self.assertEqual('false',s.tick(.5,context(**changed))['Active'])
