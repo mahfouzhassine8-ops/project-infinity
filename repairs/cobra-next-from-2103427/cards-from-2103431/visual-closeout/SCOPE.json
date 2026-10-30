@@ -13,7 +13,7 @@
   },
   "implementation_allowlist": [
     "runtime/CobraCardsLayout.java header font/spacing only",
-    "runtime/CobraCardsTiles.java paired content-measured row sizing and cache inputs only",
+    "runtime/CobraCardsTiles.java paired content-measured row sizing/cache inputs and preserving native selection through its resulting layout only",
     "cards_patch.py forward existing native bind position only"
   ],
   "reference_PNG_SHA256": "3a718b7731d45819a4d49f9b585725b7c9dd71ac547eb1171123b4acd21f2ff6",
@@ -55,5 +55,11 @@
   "owner_build": "Unsigned prototype owner DEX only; retain existing32 compiler metadata for local verification, not a new APK/release",
   "release": "NO_APK_BUILD_SIGNING_REGISTRATION_OR_LOCK; save correction and evidence first",
   "Android_emulator": "NOT_SELECTED; no rerun",
-  "shutdown_tests": "NOT_AUTHORIZED_NOT_RUN"
+  "shutdown_tests": "NOT_AUTHORIZED_NOT_RUN",
+  "focused_failure_followup": {
+    "evidence": "qa-v6: paired8/9 grows264/264 and focus/scroll/native selected ID preserved; View.isSelected cleared unlike fixed signed432 control",
+    "demonstrated_operation": "Cached official API35 GridView.setupChild sets View.selected from framework selector BEFORE child.layout, without rebinding active cells",
+    "bounded_correction": "Existing holder OnLayoutChangeListener restores existing native cobraModeSelected after genuine height change and validated current row ownership; no focus-derived state, timer, worker or native edit",
+    "selected_test": "same nativeRowRecyclingAndContentChangesPreserveAnchors, strict selected-state assertion unchanged"
+  }
 }

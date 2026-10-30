@@ -112,7 +112,7 @@ public final class CobraCardsTiles {
     long start=Long.MIN_VALUE,stop=Long.MIN_VALUE;
     SimpleDateFormat date;
     float configuredWidth=-1,configuredFont=-1,scale=1;
-    boolean hasLive,configuring,rowSyncPending;
+    boolean hasLive,configuring,rowSyncPending,selectionAfterResize;
 
     Holder(Activity a,LinearLayout root){
       owner=new WeakReference<>(a);card=root;Class<?> nativeCard=root.getClass();
@@ -347,6 +347,29 @@ public final class CobraCardsTiles {
       }
       return true;
     }
+    void restoreSelectionAfterResize(){
+      if(!selectionAfterResize)return;
+      Activity a=owner.get();
+      if(a==null || bound==null || !cards(a)){selectionAfterResize=false;return;}
+      Object list=CobraArrange.ownedField(a,"mCobraGuideList");
+      if(!(list instanceof GridView)){selectionAfterResize=false;return;}
+      GridView grid=(GridView)list;
+      if(!card.isAttachedToWindow())return;
+      ListAdapter adapter=grid.getAdapter();
+      if(card.getParent()!=grid || adapter==null || adapter!=boundAdapter.get()
+        || adapterPosition<0 || adapterPosition>=adapter.getCount()
+        || grid.getPositionForView(card)!=adapterPosition || adapter.getItem(adapterPosition)!=bound){
+        selectionAfterResize=false;return;
+      }
+      ViewGroup.LayoutParams params=card.getLayoutParams();
+      if(card.getHeight()!=configuredHeight || params==null || params.height!=configuredHeight)return;
+      // GridView.setupChild applies its selector state before View.layout,
+      // overwriting Cobra's independent preview selection during row resize.
+      // Restore only the current native channel identity after that layout.
+      selectionAfterResize=false;
+      boolean selected=Boolean.TRUE.equals(CobraArrange.ownedCall(a,"cobraModeSelected",channelArgs,bound));
+      if(card.isSelected()!=selected)card.setSelected(selected);
+    }
     void resize(int width){
       Activity a=owner.get();if(a==null || width<=0 || configuring)return;
       float font=a.getResources().getConfiguration().fontScale;if(!(font>0))font=1;
@@ -363,7 +386,7 @@ public final class CobraCardsTiles {
           live.setTextSize(TypedValue.COMPLEX_UNIT_PX,20.5f*scale*font);
         }
         int height=rowHeight(a,width,font);
-        if(bound!=null && configuredHeight!=height)rowSyncPending=true;
+        if(bound!=null && configuredHeight!=height){rowSyncPending=true;selectionAfterResize=true;}
         ViewGroup.LayoutParams parent=card.getLayoutParams();
         if(parent==null){card.setLayoutParams(new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,height));}
         else if(parent.height!=height){parent.height=height;card.setLayoutParams(parent);}
@@ -399,7 +422,9 @@ public final class CobraCardsTiles {
       params.leftMargin=Math.round(left*scale);params.topMargin=Math.round(top*scale);
       params.width=Math.max(1,Math.round(width*scale));params.height=Math.max(1,Math.round(height*scale));view.setLayoutParams(params);
     }
-    public void onLayoutChange(View v,int l,int t,int r,int b,int ol,int ot,int or,int ob){if(r>l)resize(r-l);}
+    public void onLayoutChange(View v,int l,int t,int r,int b,int ol,int ot,int or,int ob){
+      if(r>l){resize(r-l);restoreSelectionAfterResize();}
+    }
     public void onViewAttachedToWindow(View v){
       Activity a=owner.get();if(a!=null && cards(a) && bound!=null){refresh();if(!logoUrl.isEmpty())CobraLogoRequests.request(a,logoUrl,logo);}
     }
