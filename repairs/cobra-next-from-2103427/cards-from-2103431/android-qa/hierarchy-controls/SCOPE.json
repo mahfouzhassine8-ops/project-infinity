@@ -1,0 +1,23 @@
+{
+  "scope": "BOUNDED_QA_HIERARCHY_OBSERVATION_CORRECTION_ONLY",
+  "authorization": "Root approved exact bounded observer fix after run41001477356; no further CI until independent review",
+  "baseline_py_before_sha256": "46132351bbfff3b7cd47e0c7216e64b895363fad53160e35025a31057c65cbf8",
+  "production_APK": "UNCHANGED_EXACT_SIGNED431",
+  "selected_host_controls": [
+    "Code0/no fresh XML records stdout/stderr and raises observation miss without cat",
+    "Nonzero dump command remains fatal with exact error",
+    "Valid fresh nonempty XML returns actual Snapshot",
+    "Existing finite source-save15 and Cards-ready10 attempts consume missing observations without stale XML or added deadline",
+    "Unbounded action/source-form remains strict",
+    "Terminal PNG attempted independently when terminal hierarchy fails"
+  ],
+  "protected": [
+    "All production/player/EPG timers",
+    "Strict Cards state/action assertions",
+    "Existing poll attempt counts and pauses",
+    "Original signing and installed-byte checks",
+    "No APK/native changes",
+    "No application/emulator/CI/shutdown execution"
+  ],
+  "execution": "NOT_STARTED_AT_SCOPE_RECORDING"
+}

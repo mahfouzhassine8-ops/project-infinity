@@ -117,11 +117,16 @@ def validate_inputs(signed, signature, fixtures):
     return apks[0], receipt, manifest
 
 
+class MissingHierarchy(RuntimeError):
+    """A completed dump produced no fresh nonempty hierarchy, never app PASS."""
+
+
 class CardsObservation:
     def __init__(self, out):
         self.out = out
         self.sequence = 0
         self.events = []
+        self.remote_prefix = "/sdcard/cobra-cards-baseline-%d-" % time.monotonic_ns()
 
     def screenshot(self, name):
         raw = subprocess.check_output(["adb", "exec-out", "screencap", "-p"], timeout=15)
@@ -131,9 +136,35 @@ class CardsObservation:
     def ui(self, name="ui"):
         self.sequence += 1
         stem = "%03d-%s" % (self.sequence, name)
-        remote = "/sdcard/cobra-cards-baseline-%03d.xml" % self.sequence
+        remote = self.remote_prefix + "%03d.xml" % self.sequence
         started = time.monotonic()
-        adb("shell", "uiautomator", "dump", "--compressed", remote)
+        command = ["adb", "shell", "uiautomator", "dump", "--compressed", remote]
+        diagnostic = {"command": command, "remote_fresh_path": remote}
+        try:
+            result = subprocess.run(command, capture_output=True, text=True, timeout=30)
+        except subprocess.TimeoutExpired as error:
+            decode = lambda value: value.decode(errors="replace") if isinstance(value, bytes) else value or ""
+            diagnostic.update(exit_code=None, timed_out=True, stdout=decode(error.stdout), stderr=decode(error.stderr))
+            (self.out / (stem + "-dump.json")).write_text(json.dumps(diagnostic, indent=2) + "\n")
+            raise
+        diagnostic.update(exit_code=result.returncode, stdout=result.stdout, stderr=result.stderr)
+        (self.out / (stem + "-dump.json")).write_text(json.dumps(diagnostic, indent=2) + "\n")
+        if result.returncode:
+            raise RuntimeError("Hierarchy dump command failed (%d): %s; see %s-dump.json" %
+                               (result.returncode, result.stderr[-1500:], stem))
+        present = subprocess.run(["adb", "shell", "test", "-s", remote],
+                                 capture_output=True, text=True, timeout=30)
+        diagnostic.update(nonempty_check_exit_code=present.returncode,
+                          nonempty_check_stdout=present.stdout, nonempty_check_stderr=present.stderr)
+        (self.out / (stem + "-dump.json")).write_text(json.dumps(diagnostic, indent=2) + "\n")
+        if present.returncode == 1 and not present.stdout.strip() and not present.stderr.strip():
+            self.events.append({"observation_miss": stem, "reason": "NO_FRESH_NONEMPTY_XML",
+                                "dump_exit_code": result.returncode,
+                                "native_hierarchy_seconds": round(time.monotonic() - started, 3)})
+            raise MissingHierarchy("No fresh nonempty hierarchy: %s; dump stdout=%r stderr=%r; see %s-dump.json" %
+                                   (remote, result.stdout, result.stderr, stem))
+        if present.returncode:
+            raise RuntimeError("Hierarchy file check failed (%d): %s" % (present.returncode, present.stderr[-1500:]))
         raw = adb("shell", "cat", remote)
         (self.out / (stem + ".xml")).write_text(raw)
         snap = Snapshot(raw)
@@ -196,13 +227,19 @@ class CardsObservation:
                                         for node in grid.iter("node"))
 
     def wait_cards(self, attempts=10):
+        last_labels = []
         for attempt in range(attempts):
-            snap = self.ui("cards-state")
-            if self.cards_ready(snap):
-                return snap
+            try:
+                snap = self.ui("cards-state")
+            except MissingHierarchy:
+                pass  # Consume this existing finite observation attempt.
+            else:
+                last_labels = snap.labels()
+                if self.cards_ready(snap):
+                    return snap
             if attempt + 1 != attempts:
                 time.sleep(.5)
-        raise RuntimeError("Exact Cards / 20,226 / All-channels grid was not observed; labels=" + repr(snap.labels()))
+        raise RuntimeError("Exact Cards / 20,226 / All-channels grid was not observed; labels=" + repr(last_labels))
 
     def hints(self, snap):
         grid = self.grid(snap)
@@ -274,13 +311,17 @@ def run(signed, signature, fixtures, out):
             adb("shell", "input", "text", value)
         saved_at = observation.tap(r"^TEST & SAVE$")
         for attempt in range(15):
-            snap = observation.ui("source-save-return")
-            if snap.find(r"^Return to preview$") is not None and snap.find(r"^Multi-View$") is not None:
-                adb("shell", "input", "keyevent", "KEYCODE_BACK")
-                observation.events.append({"navigation": "ONE_BACK_FROM_SOURCE_VALIDATION_AUTO_FULLSCREEN; NO_FULLSCREEN_BUTTON_TEST"})
-                break
-            if snap.find(r"^Cards QA \d{5},") is not None:
-                break
+            try:
+                snap = observation.ui("source-save-return")
+            except MissingHierarchy:
+                pass  # Consume this existing finite observation attempt.
+            else:
+                if snap.find(r"^Return to preview$") is not None and snap.find(r"^Multi-View$") is not None:
+                    adb("shell", "input", "keyevent", "KEYCODE_BACK")
+                    observation.events.append({"navigation": "ONE_BACK_FROM_SOURCE_VALIDATION_AUTO_FULLSCREEN; NO_FULLSCREEN_BUTTON_TEST"})
+                    break
+                if snap.find(r"^Cards QA \d{5},") is not None:
+                    break
             if attempt != 14:
                 time.sleep(.5)
         else:
@@ -358,9 +399,12 @@ def run(signed, signature, fixtures, out):
                 report.setdefault("diagnostic_errors", []).append(name + ": " + str(error))
         try:
             observation.ui("terminal")
+        except Exception as error:
+            report.setdefault("diagnostic_errors", []).append("terminal hierarchy: " + str(error))
+        try:
             observation.screenshot("terminal")
         except Exception as error:
-            report.setdefault("diagnostic_errors", []).append("terminal capture: " + str(error))
+            report.setdefault("diagnostic_errors", []).append("terminal screenshot: " + str(error))
         report.setdefault("status", "FAILED_BEFORE_COMPLETION")
         (out / "OUTCOME.json").write_text(json.dumps(report, indent=2) + "\n")
 

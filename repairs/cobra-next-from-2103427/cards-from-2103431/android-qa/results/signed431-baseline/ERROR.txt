@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "/home/runner/work/project-infinity/project-infinity/repairs/cobra-next-from-2103427/cards-from-2103431/android-qa/baseline.py", line 277, in run
+    snap = observation.ui("source-save-return")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/project-infinity/project-infinity/repairs/cobra-next-from-2103427/cards-from-2103431/android-qa/baseline.py", line 137, in ui
+    raw = adb("shell", "cat", remote)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/project-infinity/project-infinity/repairs/cobra-next-from-2103427/android_probe.py", line 9, in adb
+    if check and p.returncode:raise RuntimeError('adb '+str(args[:2])+': '+p.stderr[-1500:])
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: adb ('shell', 'cat'): cat: /sdcard/cobra-cards-baseline-011.xml: No such file or directory
+

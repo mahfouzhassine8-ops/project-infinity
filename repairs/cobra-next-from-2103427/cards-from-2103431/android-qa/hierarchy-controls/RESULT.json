@@ -1,0 +1,38 @@
+{
+  "status": "PASS_10_FOCUSED_HOST_QA_CONTROLS",
+  "source_before": "bfb27f1f09a9fa8eaf962504cf2ed649273e4aa0",
+  "baseline_py_sha256": "78e372e68269d2f03cc49014e4652349c342c3a91606d9f7e9d4c70960a950a9",
+  "test_sha256": "83ec4de1ed3be7abac73d267044fe4c5612b11a012e259e24f83d76fc0a54e55",
+  "selected_scope_sha256": "4237ca03d71ccede928206e8c067a63a126ca513515e88ba60554b3e8a6c5e71",
+  "host_test_output": "TEST-OUTPUT-FINAL.txt",
+  "tests": 10,
+  "failures": 0,
+  "errors": 0,
+  "initial_9_control_pass": "TEST-OUTPUT.txt; then explicit file-check transport-error guard/control added and10cases passed",
+  "unchanged_CardsObservation_methods": [
+    "cards_ready",
+    "channel_count",
+    "grid",
+    "hints",
+    "press",
+    "screenshot",
+    "tap"
+  ],
+  "changed_CardsObservation_methods": [
+    "__init__",
+    "ui",
+    "wait_cards"
+  ],
+  "changed_top_level_functions": [
+    "run"
+  ],
+  "Cards_ready_action_input_and_signature_assertions": "AST_IDENTICAL",
+  "polls": "EXISTING15source-saveand10Cards attempts; existing0.5s pauses; no app timer or retry deadline increase",
+  "dump_commands": "Same30s shortADBlimit; eachattempt records stdout/stderr/exit, unique freshremote path, verifies nonempty before cat; no stale XML reuse",
+  "optional_observation_miss": "ONLYsilent test-s status1 within two existing finite polls; real dump/file-check transport error remains fatal",
+  "terminal_capture": "PNG independent of hierarchy result",
+  "application_tests": "NOT_RUN",
+  "CI_reruns": "NONE",
+  "APK_or_native_changes": "NONE",
+  "shutdown": "NOT_RUN"
+}
