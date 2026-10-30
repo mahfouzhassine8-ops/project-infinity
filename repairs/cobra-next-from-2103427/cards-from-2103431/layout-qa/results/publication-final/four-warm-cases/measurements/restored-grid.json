@@ -1,0 +1,1400 @@
+{
+  "mCobraModeToolbar": {
+    "class": "android.widget.LinearLayout",
+    "tag": "null",
+    "bounds": [
+      0,
+      0,
+      940,
+      126
+    ],
+    "padding": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "visibility": 0,
+    "alpha": 1,
+    "elevation": 0,
+    "clip_outline": false,
+    "focusable": false,
+    "clickable": false,
+    "long_clickable": false,
+    "background": "com.projectinfinity.kodi.CobraVisualRenderer$Glass:d74906249b214d263a3156c3f89625442259ee97b8f913be2efe598ba3e41814",
+    "layout": {
+      "class": "android.widget.FrameLayout$LayoutParams",
+      "width": 940,
+      "height": 126,
+      "margins": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "gravity": -1
+    },
+    "clip_children": true,
+    "clip_padding": true,
+    "orientation": 0,
+    "gravity": 8388627,
+    "children": [
+      {
+        "class": "com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton",
+        "tag": "null",
+        "bounds": [
+          0,
+          0,
+          126,
+          126
+        ],
+        "padding": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "visibility": 0,
+        "alpha": 1,
+        "elevation": 0,
+        "clip_outline": false,
+        "focusable": true,
+        "clickable": true,
+        "long_clickable": false,
+        "background": "com.projectinfinity.kodi.CobraVisualRenderer$Glass:0464cca8709281fc7a7952b65951dd52a6db98fa6c4659258835c280fd2f9084",
+        "layout": {
+          "class": "android.widget.LinearLayout$LayoutParams",
+          "width": 126,
+          "height": -1,
+          "margins": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "weight": 0,
+          "gravity": -1
+        },
+        "text": "",
+        "size_px": 37,
+        "color": -1,
+        "typeface_style": 0,
+        "max_lines": 2147483647,
+        "min_lines": -1,
+        "gravity": 17,
+        "letter_spacing": 0,
+        "font_padding": true,
+        "line_extra": 0,
+        "line_multiplier": 1,
+        "ellipsize": "null",
+        "compound_padding": 0,
+        "compounds": [
+          "null",
+          "null",
+          "null",
+          "null"
+        ],
+        "glyph": "guide",
+        "caption": ""
+      },
+      {
+        "class": "android.widget.LinearLayout",
+        "tag": "null",
+        "bounds": [
+          126,
+          0,
+          562,
+          126
+        ],
+        "padding": [
+          21,
+          0,
+          0,
+          0
+        ],
+        "visibility": 0,
+        "alpha": 1,
+        "elevation": 0,
+        "clip_outline": false,
+        "focusable": true,
+        "clickable": true,
+        "long_clickable": false,
+        "background": "null",
+        "layout": {
+          "class": "android.widget.LinearLayout$LayoutParams",
+          "width": 0,
+          "height": -1,
+          "margins": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "weight": 1,
+          "gravity": -1
+        },
+        "clip_children": true,
+        "clip_padding": true,
+        "orientation": 1,
+        "gravity": 8388627,
+        "children": [
+          {
+            "class": "android.widget.TextView",
+            "tag": "null",
+            "bounds": [
+              21,
+              19,
+              541,
+              58
+            ],
+            "padding": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "visibility": 0,
+            "alpha": 1,
+            "elevation": 0,
+            "clip_outline": false,
+            "focusable": false,
+            "clickable": false,
+            "long_clickable": false,
+            "background": "null",
+            "layout": {
+              "class": "android.widget.LinearLayout$LayoutParams",
+              "width": -1,
+              "height": -2,
+              "margins": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "weight": 0,
+              "gravity": -1
+            },
+            "text": "TV Grid",
+            "size_px": 49.875,
+            "color": -525569,
+            "typeface_style": 0,
+            "max_lines": 1,
+            "min_lines": 1,
+            "gravity": 8388627,
+            "letter_spacing": 0,
+            "font_padding": false,
+            "line_extra": 0,
+            "line_multiplier": 1,
+            "ellipsize": "END",
+            "compound_padding": 0,
+            "compounds": [
+              "null",
+              "null",
+              "null",
+              "null"
+            ]
+          },
+          {
+            "class": "android.widget.TextView",
+            "tag": "null",
+            "bounds": [
+              21,
+              77,
+              541,
+              30
+            ],
+            "padding": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "visibility": 0,
+            "alpha": 1,
+            "elevation": 0,
+            "clip_outline": false,
+            "focusable": false,
+            "clickable": false,
+            "long_clickable": false,
+            "background": "null",
+            "layout": {
+              "class": "android.widget.LinearLayout$LayoutParams",
+              "width": -1,
+              "height": -2,
+              "margins": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "weight": 0,
+              "gravity": -1
+            },
+            "text": "COBRA LIVE  ·  24 CHANNELS",
+            "size_px": 26.25,
+            "color": -5128238,
+            "typeface_style": 0,
+            "max_lines": 1,
+            "min_lines": 1,
+            "gravity": 8388627,
+            "letter_spacing": 0.10000000149011612,
+            "font_padding": false,
+            "line_extra": 0,
+            "line_multiplier": 1,
+            "ellipsize": "END",
+            "compound_padding": 0,
+            "compounds": [
+              "null",
+              "null",
+              "null",
+              "null"
+            ]
+          }
+        ]
+      },
+      {
+        "class": "com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton",
+        "tag": "cobra_mode_visuals",
+        "bounds": [
+          688,
+          0,
+          126,
+          126
+        ],
+        "padding": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "visibility": 0,
+        "alpha": 1,
+        "elevation": 0,
+        "clip_outline": false,
+        "focusable": true,
+        "clickable": true,
+        "long_clickable": false,
+        "background": "com.projectinfinity.kodi.CobraVisualRenderer$Glass:0464cca8709281fc7a7952b65951dd52a6db98fa6c4659258835c280fd2f9084",
+        "layout": {
+          "class": "android.widget.LinearLayout$LayoutParams",
+          "width": 126,
+          "height": -1,
+          "margins": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "weight": 0,
+          "gravity": -1
+        },
+        "text": "",
+        "size_px": 37,
+        "color": -1,
+        "typeface_style": 0,
+        "max_lines": 2147483647,
+        "min_lines": -1,
+        "gravity": 17,
+        "letter_spacing": 0,
+        "font_padding": true,
+        "line_extra": 0,
+        "line_multiplier": 1,
+        "ellipsize": "null",
+        "compound_padding": 0,
+        "compounds": [
+          "null",
+          "null",
+          "null",
+          "null"
+        ],
+        "glyph": "visuals",
+        "caption": ""
+      },
+      {
+        "class": "com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton",
+        "tag": "null",
+        "bounds": [
+          814,
+          0,
+          126,
+          126
+        ],
+        "padding": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "visibility": 0,
+        "alpha": 1,
+        "elevation": 0,
+        "clip_outline": false,
+        "focusable": true,
+        "clickable": true,
+        "long_clickable": false,
+        "background": "com.projectinfinity.kodi.CobraVisualRenderer$Glass:0464cca8709281fc7a7952b65951dd52a6db98fa6c4659258835c280fd2f9084",
+        "layout": {
+          "class": "android.widget.LinearLayout$LayoutParams",
+          "width": 126,
+          "height": -1,
+          "margins": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "weight": 0,
+          "gravity": -1
+        },
+        "text": "",
+        "size_px": 37,
+        "color": -1,
+        "typeface_style": 0,
+        "max_lines": 2147483647,
+        "min_lines": -1,
+        "gravity": 17,
+        "letter_spacing": 0,
+        "font_padding": true,
+        "line_extra": 0,
+        "line_multiplier": 1,
+        "ellipsize": "null",
+        "compound_padding": 0,
+        "compounds": [
+          "null",
+          "null",
+          "null",
+          "null"
+        ],
+        "glyph": "multi",
+        "caption": ""
+      }
+    ]
+  },
+  "mCobraGuideDetails": {
+    "class": "android.widget.LinearLayout",
+    "tag": "null",
+    "bounds": [
+      0,
+      572,
+      940,
+      184
+    ],
+    "padding": [
+      32,
+      21,
+      32,
+      21
+    ],
+    "visibility": 0,
+    "alpha": 1,
+    "elevation": 0,
+    "clip_outline": false,
+    "focusable": true,
+    "clickable": true,
+    "long_clickable": false,
+    "background": "com.projectinfinity.kodi.CobraVisualRenderer$Glass:d74906249b214d263a3156c3f89625442259ee97b8f913be2efe598ba3e41814",
+    "layout": {
+      "class": "android.widget.FrameLayout$LayoutParams",
+      "width": 940,
+      "height": 184,
+      "margins": [
+        0,
+        572,
+        0,
+        0
+      ],
+      "gravity": -1
+    },
+    "clip_children": true,
+    "clip_padding": true,
+    "orientation": 1,
+    "gravity": 8388659,
+    "children": [
+      {
+        "class": "android.widget.TextView",
+        "tag": "null",
+        "bounds": [
+          32,
+          21,
+          876,
+          30
+        ],
+        "padding": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "visibility": 0,
+        "alpha": 1,
+        "elevation": 0,
+        "clip_outline": false,
+        "focusable": false,
+        "clickable": false,
+        "long_clickable": false,
+        "background": "null",
+        "layout": {
+          "class": "android.widget.LinearLayout$LayoutParams",
+          "width": -1,
+          "height": -2,
+          "margins": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "weight": 0,
+          "gravity": -1
+        },
+        "text": "NOW PLAYING  \/  Synthetic channel 0",
+        "size_px": 26.25,
+        "color": -10310913,
+        "typeface_style": 0,
+        "max_lines": 1,
+        "min_lines": 1,
+        "gravity": 8388627,
+        "letter_spacing": 0.10000000149011612,
+        "font_padding": false,
+        "line_extra": 0,
+        "line_multiplier": 1,
+        "ellipsize": "END",
+        "compound_padding": 0,
+        "compounds": [
+          "null",
+          "null",
+          "null",
+          "null"
+        ]
+      },
+      {
+        "class": "android.widget.TextView",
+        "tag": "null",
+        "bounds": [
+          32,
+          62,
+          876,
+          47
+        ],
+        "padding": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "visibility": 0,
+        "alpha": 1,
+        "elevation": 0,
+        "clip_outline": false,
+        "focusable": false,
+        "clickable": false,
+        "long_clickable": false,
+        "background": "null",
+        "layout": {
+          "class": "android.widget.LinearLayout$LayoutParams",
+          "width": -1,
+          "height": -2,
+          "margins": [
+            0,
+            11,
+            0,
+            0
+          ],
+          "weight": 0,
+          "gravity": -1
+        },
+        "text": "Current 0",
+        "size_px": 39.375,
+        "color": -525569,
+        "typeface_style": 0,
+        "max_lines": 1,
+        "min_lines": 0,
+        "gravity": 8388627,
+        "letter_spacing": 0,
+        "font_padding": false,
+        "line_extra": 0,
+        "line_multiplier": 1,
+        "ellipsize": "END",
+        "compound_padding": 0,
+        "compounds": [
+          "null",
+          "null",
+          "null",
+          "null"
+        ]
+      },
+      {
+        "class": "android.widget.TextView",
+        "tag": "null",
+        "bounds": [
+          24,
+          74,
+          380,
+          26
+        ],
+        "padding": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "visibility": 8,
+        "alpha": 1,
+        "elevation": 0,
+        "clip_outline": false,
+        "focusable": false,
+        "clickable": false,
+        "long_clickable": false,
+        "background": "null",
+        "layout": {
+          "class": "android.widget.LinearLayout$LayoutParams",
+          "width": -1,
+          "height": -2,
+          "margins": [
+            0,
+            11,
+            0,
+            0
+          ],
+          "weight": 0,
+          "gravity": -1
+        },
+        "text": "Wed Jan 1 • 11:00 AM – Wed Jan 1 • 1:00 PM\nNext  Next 0",
+        "size_px": 31.5,
+        "color": -5128238,
+        "typeface_style": 0,
+        "max_lines": 1,
+        "min_lines": 0,
+        "gravity": 8388627,
+        "letter_spacing": 0,
+        "font_padding": false,
+        "line_extra": 0,
+        "line_multiplier": 1,
+        "ellipsize": "END",
+        "compound_padding": 0,
+        "compounds": [
+          "null",
+          "null",
+          "null",
+          "null"
+        ]
+      },
+      {
+        "class": "android.widget.ProgressBar",
+        "tag": "null",
+        "bounds": [
+          24,
+          170,
+          286,
+          10
+        ],
+        "padding": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "visibility": 8,
+        "alpha": 1,
+        "elevation": 0,
+        "clip_outline": false,
+        "focusable": false,
+        "clickable": false,
+        "long_clickable": false,
+        "background": "null",
+        "layout": {
+          "class": "android.widget.LinearLayout$LayoutParams",
+          "width": -1,
+          "height": 8,
+          "margins": [
+            0,
+            21,
+            0,
+            21
+          ],
+          "weight": 0,
+          "gravity": -1
+        },
+        "progress": 500,
+        "max": 1000,
+        "drawable_level": 0,
+        "progress_drawable": "android.graphics.drawable.LayerDrawable:1c85ebae24804db9be0191cc24441b64ffadcf567c100a45b13fd55e31abd197",
+        "progress_tint": "ColorStateList{mThemeAttrs=nullmChangingConfigurations=0mStateSpecs=[[]]mColors=[-12465937]mDefaultColor=-12465937}",
+        "progress_background_tint": "ColorStateList{mThemeAttrs=nullmChangingConfigurations=0mStateSpecs=[[]]mColors=[-12167835]mDefaultColor=-12167835}"
+      },
+      {
+        "class": "android.widget.TextView",
+        "tag": "null",
+        "bounds": [
+          24,
+          217,
+          380,
+          125
+        ],
+        "padding": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "visibility": 8,
+        "alpha": 1,
+        "elevation": 0,
+        "clip_outline": false,
+        "focusable": false,
+        "clickable": false,
+        "long_clickable": false,
+        "background": "null",
+        "layout": {
+          "class": "android.widget.LinearLayout$LayoutParams",
+          "width": -1,
+          "height": -2,
+          "margins": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "weight": 0,
+          "gravity": -1
+        },
+        "text": "Synthetic programme description 0",
+        "size_px": 34.125,
+        "color": -5128238,
+        "typeface_style": 0,
+        "max_lines": 5,
+        "min_lines": 0,
+        "gravity": 8388627,
+        "letter_spacing": 0,
+        "font_padding": false,
+        "line_extra": 0,
+        "line_multiplier": 1,
+        "ellipsize": "END",
+        "compound_padding": 0,
+        "compounds": [
+          "null",
+          "null",
+          "null",
+          "null"
+        ]
+      }
+    ]
+  },
+  "mCobraGuideVideo": {
+    "class": "android.widget.FrameLayout",
+    "tag": "cobra_preview_host",
+    "bounds": [
+      0,
+      147,
+      940,
+      425
+    ],
+    "padding": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "visibility": 0,
+    "alpha": 1,
+    "elevation": 0,
+    "clip_outline": false,
+    "focusable": true,
+    "clickable": true,
+    "long_clickable": true,
+    "background": "android.graphics.drawable.ColorDrawable:0f675a2a912d79e4f7eeb6840a6d58f98876372f69f06d4d8060f52c8dbd3e57",
+    "layout": {
+      "class": "android.widget.FrameLayout$LayoutParams",
+      "width": 940,
+      "height": 425,
+      "margins": [
+        0,
+        147,
+        0,
+        0
+      ],
+      "gravity": -1
+    },
+    "clip_children": true,
+    "clip_padding": true,
+    "children": [
+      {
+        "class": "android.view.TextureView",
+        "tag": "null",
+        "bounds": [
+          0,
+          0,
+          940,
+          425
+        ],
+        "padding": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "visibility": 0,
+        "alpha": 1,
+        "elevation": 0,
+        "clip_outline": false,
+        "focusable": false,
+        "clickable": false,
+        "long_clickable": false,
+        "background": "null",
+        "layout": {
+          "class": "android.widget.FrameLayout$LayoutParams",
+          "width": -1,
+          "height": -1,
+          "margins": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "gravity": -1
+        }
+      },
+      {
+        "class": "com.projectinfinity.kodi.CobraPresentationEffects$StatusSlot",
+        "tag": "cobra_pulse_slot",
+        "bounds": [
+          663,
+          21,
+          256,
+          74
+        ],
+        "padding": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "visibility": 0,
+        "alpha": 1,
+        "elevation": 0,
+        "clip_outline": false,
+        "focusable": false,
+        "clickable": false,
+        "long_clickable": false,
+        "background": "null",
+        "layout": {
+          "class": "android.widget.FrameLayout$LayoutParams",
+          "width": -2,
+          "height": 74,
+          "margins": [
+            21,
+            21,
+            21,
+            0
+          ],
+          "gravity": 53
+        },
+        "clip_children": true,
+        "clip_padding": true,
+        "children": [
+          {
+            "class": "android.widget.TextView",
+            "tag": "cobra_preview_label",
+            "bounds": [
+              0,
+              0,
+              256,
+              74
+            ],
+            "padding": [
+              26,
+              11,
+              26,
+              11
+            ],
+            "visibility": 0,
+            "alpha": 1,
+            "elevation": 0,
+            "clip_outline": false,
+            "focusable": false,
+            "clickable": false,
+            "long_clickable": false,
+            "background": "android.graphics.drawable.ColorDrawable:9a75a4bcd051cd5619ac0c888903e119ba9c3acbcd790eb50ea544f64ee794a5",
+            "layout": {
+              "class": "android.widget.FrameLayout$LayoutParams",
+              "width": -1,
+              "height": -1,
+              "margins": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "gravity": -1
+            },
+            "text": "Select a channel",
+            "size_px": 28.875,
+            "color": -1,
+            "typeface_style": 0,
+            "max_lines": 2147483647,
+            "min_lines": 0,
+            "gravity": 8388627,
+            "letter_spacing": 0,
+            "font_padding": false,
+            "line_extra": 0,
+            "line_multiplier": 1,
+            "ellipsize": "END",
+            "compound_padding": 0,
+            "compounds": [
+              "null",
+              "null",
+              "null",
+              "null"
+            ]
+          },
+          {
+            "class": "com.projectinfinity.kodi.CobraPresentationEffects$PulseView",
+            "tag": "cobra_pulse_emblem",
+            "bounds": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "padding": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "visibility": 8,
+            "alpha": 1,
+            "elevation": 0,
+            "clip_outline": false,
+            "focusable": false,
+            "clickable": false,
+            "long_clickable": false,
+            "background": "null",
+            "layout": {
+              "class": "android.widget.FrameLayout$LayoutParams",
+              "width": 68,
+              "height": 68,
+              "margins": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "gravity": 8388629
+            }
+          }
+        ]
+      },
+      {
+        "class": "com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton",
+        "tag": "cobra_preview_pip_small",
+        "bounds": [
+          5,
+          231,
+          126,
+          126
+        ],
+        "padding": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "visibility": 8,
+        "alpha": 1,
+        "elevation": 0,
+        "clip_outline": false,
+        "focusable": true,
+        "clickable": true,
+        "long_clickable": false,
+        "background": "com.projectinfinity.kodi.CobraVisualRenderer$Glass:0464cca8709281fc7a7952b65951dd52a6db98fa6c4659258835c280fd2f9084",
+        "layout": {
+          "class": "android.widget.FrameLayout$LayoutParams",
+          "width": 126,
+          "height": 126,
+          "margins": [
+            5,
+            231,
+            0,
+            0
+          ],
+          "gravity": 51
+        },
+        "text": "",
+        "size_px": 37,
+        "color": -1,
+        "typeface_style": 0,
+        "max_lines": 2147483647,
+        "min_lines": -1,
+        "gravity": 17,
+        "letter_spacing": 0,
+        "font_padding": true,
+        "line_extra": 0,
+        "line_multiplier": 1,
+        "ellipsize": "null",
+        "compound_padding": 0,
+        "compounds": [
+          "null",
+          "null",
+          "null",
+          "null"
+        ],
+        "glyph": "pip",
+        "caption": ""
+      },
+      {
+        "class": "android.widget.LinearLayout",
+        "tag": "cobra_preview_controls",
+        "bounds": [
+          0,
+          294,
+          940,
+          131
+        ],
+        "padding": [
+          16,
+          0,
+          16,
+          0
+        ],
+        "visibility": 0,
+        "alpha": 1,
+        "elevation": 0,
+        "clip_outline": false,
+        "focusable": false,
+        "clickable": false,
+        "long_clickable": false,
+        "background": "android.graphics.drawable.GradientDrawable:e243a931fd0dc8011ca59514b53a48a455e78eced6901bdeba22026b6727763a",
+        "layout": {
+          "class": "android.widget.FrameLayout$LayoutParams",
+          "width": -1,
+          "height": 131,
+          "margins": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "gravity": 80
+        },
+        "clip_children": true,
+        "clip_padding": true,
+        "orientation": 0,
+        "gravity": 8388627,
+        "children": [
+          {
+            "class": "com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton",
+            "tag": "cobra_preview_play_pause",
+            "bounds": [
+              16,
+              2,
+              129,
+              126
+            ],
+            "padding": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "visibility": 0,
+            "alpha": 1,
+            "elevation": 0,
+            "clip_outline": false,
+            "focusable": true,
+            "clickable": true,
+            "long_clickable": false,
+            "background": "com.projectinfinity.kodi.CobraVisualRenderer$Glass:0464cca8709281fc7a7952b65951dd52a6db98fa6c4659258835c280fd2f9084",
+            "layout": {
+              "class": "android.widget.LinearLayout$LayoutParams",
+              "width": 0,
+              "height": 126,
+              "margins": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "weight": 1,
+              "gravity": -1
+            },
+            "text": "",
+            "size_px": 37,
+            "color": -1,
+            "typeface_style": 0,
+            "max_lines": 2147483647,
+            "min_lines": -1,
+            "gravity": 17,
+            "letter_spacing": 0,
+            "font_padding": true,
+            "line_extra": 0,
+            "line_multiplier": 1,
+            "ellipsize": "null",
+            "compound_padding": 0,
+            "compounds": [
+              "null",
+              "null",
+              "null",
+              "null"
+            ],
+            "glyph": "pause",
+            "caption": ""
+          },
+          {
+            "class": "com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton",
+            "tag": "cobra_preview_favorite",
+            "bounds": [
+              145,
+              2,
+              129,
+              126
+            ],
+            "padding": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "visibility": 0,
+            "alpha": 1,
+            "elevation": 0,
+            "clip_outline": false,
+            "focusable": true,
+            "clickable": true,
+            "long_clickable": false,
+            "background": "com.projectinfinity.kodi.CobraVisualRenderer$Glass:0464cca8709281fc7a7952b65951dd52a6db98fa6c4659258835c280fd2f9084",
+            "layout": {
+              "class": "android.widget.LinearLayout$LayoutParams",
+              "width": 0,
+              "height": 126,
+              "margins": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "weight": 1,
+              "gravity": -1
+            },
+            "text": "",
+            "size_px": 37,
+            "color": -1,
+            "typeface_style": 0,
+            "max_lines": 2147483647,
+            "min_lines": -1,
+            "gravity": 17,
+            "letter_spacing": 0,
+            "font_padding": true,
+            "line_extra": 0,
+            "line_multiplier": 1,
+            "ellipsize": "null",
+            "compound_padding": 0,
+            "compounds": [
+              "null",
+              "null",
+              "null",
+              "null"
+            ],
+            "glyph": "favorite",
+            "caption": ""
+          },
+          {
+            "class": "com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton",
+            "tag": "cobra_preview_captions",
+            "bounds": [
+              274,
+              2,
+              130,
+              126
+            ],
+            "padding": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "visibility": 0,
+            "alpha": 1,
+            "elevation": 0,
+            "clip_outline": false,
+            "focusable": true,
+            "clickable": true,
+            "long_clickable": false,
+            "background": "com.projectinfinity.kodi.CobraVisualRenderer$Glass:0464cca8709281fc7a7952b65951dd52a6db98fa6c4659258835c280fd2f9084",
+            "layout": {
+              "class": "android.widget.LinearLayout$LayoutParams",
+              "width": 0,
+              "height": 126,
+              "margins": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "weight": 1,
+              "gravity": -1
+            },
+            "text": "",
+            "size_px": 37,
+            "color": -1,
+            "typeface_style": 0,
+            "max_lines": 2147483647,
+            "min_lines": -1,
+            "gravity": 17,
+            "letter_spacing": 0,
+            "font_padding": true,
+            "line_extra": 0,
+            "line_multiplier": 1,
+            "ellipsize": "null",
+            "compound_padding": 0,
+            "compounds": [
+              "null",
+              "null",
+              "null",
+              "null"
+            ],
+            "glyph": "cc",
+            "caption": ""
+          },
+          {
+            "class": "com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton",
+            "tag": "cobra_preview_mute",
+            "bounds": [
+              404,
+              2,
+              130,
+              126
+            ],
+            "padding": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "visibility": 0,
+            "alpha": 1,
+            "elevation": 0,
+            "clip_outline": false,
+            "focusable": true,
+            "clickable": true,
+            "long_clickable": false,
+            "background": "com.projectinfinity.kodi.CobraVisualRenderer$Glass:0464cca8709281fc7a7952b65951dd52a6db98fa6c4659258835c280fd2f9084",
+            "layout": {
+              "class": "android.widget.LinearLayout$LayoutParams",
+              "width": 0,
+              "height": 126,
+              "margins": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "weight": 1,
+              "gravity": -1
+            },
+            "text": "",
+            "size_px": 37,
+            "color": -1,
+            "typeface_style": 0,
+            "max_lines": 2147483647,
+            "min_lines": -1,
+            "gravity": 17,
+            "letter_spacing": 0,
+            "font_padding": true,
+            "line_extra": 0,
+            "line_multiplier": 1,
+            "ellipsize": "null",
+            "compound_padding": 0,
+            "compounds": [
+              "null",
+              "null",
+              "null",
+              "null"
+            ],
+            "glyph": "audio",
+            "caption": ""
+          },
+          {
+            "class": "com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton",
+            "tag": "cobra_preview_fullscreen",
+            "bounds": [
+              534,
+              2,
+              130,
+              126
+            ],
+            "padding": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "visibility": 0,
+            "alpha": 1,
+            "elevation": 0,
+            "clip_outline": false,
+            "focusable": true,
+            "clickable": true,
+            "long_clickable": false,
+            "background": "com.projectinfinity.kodi.CobraVisualRenderer$Glass:0464cca8709281fc7a7952b65951dd52a6db98fa6c4659258835c280fd2f9084",
+            "layout": {
+              "class": "android.widget.LinearLayout$LayoutParams",
+              "width": 0,
+              "height": 126,
+              "margins": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "weight": 1,
+              "gravity": -1
+            },
+            "text": "",
+            "size_px": 37,
+            "color": -1,
+            "typeface_style": 0,
+            "max_lines": 2147483647,
+            "min_lines": -1,
+            "gravity": 17,
+            "letter_spacing": 0,
+            "font_padding": true,
+            "line_extra": 0,
+            "line_multiplier": 1,
+            "ellipsize": "null",
+            "compound_padding": 0,
+            "compounds": [
+              "null",
+              "null",
+              "null",
+              "null"
+            ],
+            "glyph": "fullscreen",
+            "caption": ""
+          },
+          {
+            "class": "com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton",
+            "tag": "cobra_preview_pip",
+            "bounds": [
+              664,
+              2,
+              130,
+              126
+            ],
+            "padding": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "visibility": 0,
+            "alpha": 1,
+            "elevation": 0,
+            "clip_outline": false,
+            "focusable": true,
+            "clickable": true,
+            "long_clickable": false,
+            "background": "com.projectinfinity.kodi.CobraVisualRenderer$Glass:0464cca8709281fc7a7952b65951dd52a6db98fa6c4659258835c280fd2f9084",
+            "layout": {
+              "class": "android.widget.LinearLayout$LayoutParams",
+              "width": 0,
+              "height": 126,
+              "margins": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "weight": 1,
+              "gravity": -1
+            },
+            "text": "",
+            "size_px": 37,
+            "color": -1,
+            "typeface_style": 0,
+            "max_lines": 2147483647,
+            "min_lines": -1,
+            "gravity": 17,
+            "letter_spacing": 0,
+            "font_padding": true,
+            "line_extra": 0,
+            "line_multiplier": 1,
+            "ellipsize": "null",
+            "compound_padding": 0,
+            "compounds": [
+              "null",
+              "null",
+              "null",
+              "null"
+            ],
+            "glyph": "pip",
+            "caption": ""
+          },
+          {
+            "class": "com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton",
+            "tag": "cobra_preview_options_anchor",
+            "bounds": [
+              794,
+              2,
+              130,
+              126
+            ],
+            "padding": [
+              0,
+              0,
+              0,
+              0
+            ],
+            "visibility": 0,
+            "alpha": 1,
+            "elevation": 0,
+            "clip_outline": false,
+            "focusable": true,
+            "clickable": true,
+            "long_clickable": false,
+            "background": "com.projectinfinity.kodi.CobraVisualRenderer$Glass:0464cca8709281fc7a7952b65951dd52a6db98fa6c4659258835c280fd2f9084",
+            "layout": {
+              "class": "android.widget.LinearLayout$LayoutParams",
+              "width": 0,
+              "height": 126,
+              "margins": [
+                0,
+                0,
+                0,
+                0
+              ],
+              "weight": 1,
+              "gravity": -1
+            },
+            "text": "",
+            "size_px": 37,
+            "color": -1,
+            "typeface_style": 0,
+            "max_lines": 2147483647,
+            "min_lines": -1,
+            "gravity": 17,
+            "letter_spacing": 0,
+            "font_padding": true,
+            "line_extra": 0,
+            "line_multiplier": 1,
+            "ellipsize": "null",
+            "compound_padding": 0,
+            "compounds": [
+              "null",
+              "null",
+              "null",
+              "null"
+            ],
+            "glyph": "more",
+            "caption": ""
+          }
+        ]
+      }
+    ]
+  },
+  "stage_padding": [
+    0,
+    0,
+    0,
+    0
+  ]
+}

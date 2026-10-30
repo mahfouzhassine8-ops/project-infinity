@@ -125,8 +125,8 @@ def run(apk, bundles, jars, android, d8, dex2jar, maven, out, source, run_id):
         execute("selected-candidate-host-checks", [sys.executable, HERE / "ci_host.py", "--baseline", baseline,
                 "--trusted-host", trusted, "--out", checks, "--maven", maven])
         host_result = read(checks / "HOST-RESULT.json")
-        require(host_result["status"] == "PASS_FOCUSED_CANDIDATE_HOST_ONLY" and host_result["selected_JUnit_methods"] == 25
-                and host_result["selected_groups"] == 7, "All exact essential candidate groups must pass before packaging")
+        require(host_result["status"] == "PASS_FOCUSED_CANDIDATE_HOST_ONLY" and host_result["selected_JUnit_methods"] == 26
+                and host_result["selected_groups"] == 8, "All exact essential candidate groups must pass before packaging")
         execute("package-tested-current-owners-no-apk", [sys.executable, HERE / "package_owners.py", "--bundles", bundles,
                 "--work", owner, "--jars", jars, "--out", components, "--source", source])
         for src, name in ((owner / "BUILD.json", "BUILD.json"),
@@ -163,6 +163,7 @@ def run(apk, bundles, jars, android, d8, dex2jar, maven, out, source, run_id):
         paths.add(HERE.parent / "tests/CobraLogoWorkTest.java")
         paths.add(ISO / "tests/pom.xml")
         paths |= set((HERE / "layout-qa/goldens/accepted431").glob("*.json"))
+        paths |= set((HERE / "layout-qa/goldens/native431-theme-order").glob("*.json"))
         paths |= {HERE / name for name in ("presentation-qa/results/signed431-baseline/BASELINE.json",
                   "presentation-qa/results/signed431-bound-player-progress/BASELINE-PLAYER-PROGRESS.json")}
         tested.update({str(p.relative_to(REPO)): sha(p) for p in paths})

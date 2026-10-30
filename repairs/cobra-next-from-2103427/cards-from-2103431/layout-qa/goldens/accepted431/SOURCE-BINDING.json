@@ -31,9 +31,9 @@
       "production_changes": "NONE"
     },
     "source_binding_sha256": "4be4dd8fe93205bd4569cfd9eb219727356af10c5060d5d26e76f4b53e1ccbc9",
-    "test_sha256": "2a497a08c15027820d88fd63162d48cc0a59ce05ae45b42e364a88fab41d4917",
-    "prepare_sha256": "3e2bb39f79f235df351ebed655bfb59aed4e8c9dcb788ee7e49fb7c60e6b960e",
-    "scope_sha256": "1f36dc96f2193c22c8f992f9b9d7131597ef42323e33597ca93711f8d4ef9b63",
+    "test_sha256": "d282188de62891e8f5aea1213c3c214f7697ce282f2ea8b04441b012f66d2525",
+    "prepare_sha256": "e9e9c3b6b10ddcb0d751cb8b640790e49dc15f80ef786d5651d2bedacc1285db",
+    "scope_sha256": "b0f22d4d0cb0548d045c6a07d6bb1b2fce67398bdd869ea90862c469e7eba287",
     "classpath": {
       "production.jar": "a34f66aa1f83946d2a1d3dde2743d4af7a06829293a973dd0f5d59483b4a4234",
       "support.jar": "016a9ca405468cbc86fb6da8634e943ada67ffa615a3b804a1d9680fca84f1ad"
@@ -47,11 +47,22 @@
     "CI": "NOT_RUN",
     "shutdown": "NOT_RUN"
   },
-  "comparison": "Exact signed431 same Cards\u2192mode journey; native API35 host; synthetic24channels+realnativeEffects; nativebgdraw raster64px",
-  "test_result": "1 selected method PASS,4goldens; 0failures/errors/skips",
+  "comparison": "Exactsigned431sameCards\u2192modejourneyafteractualnativeone-timeThemeIO+MAINpublicationBEFOREguideviews; samewarmsetuponcandidate",
+  "native_phase_proof": {
+    "phase": "native_theme_published_before_guide_views",
+    "before_status": "Built-in appearance",
+    "after_status": "Loaded visual theme",
+    "active_identity": 743930667,
+    "loading_once": true,
+    "native_global_fields_reset": false,
+    "native_renderer_created": "com.projectinfinity.kodi.CobraVisualRenderer"
+  },
+  "old_mixed_startup_history": "../accepted431-mixed-startup-history",
+  "test_result": "ONE selectedbaseline method PASS,4independentwarmnativegoldens; 0failures/errors/skips",
   "files": {
-    "shared-transition-mobile.json": "013ab728f6632496032250c156c5d9cce358f86254c67976219300719b2a6b5f",
+    "shared-transition-mobile.json": "62228c93948174147d491324237c9d49c7c28f29c449123f6a9744952ba9adee",
     "shared-transition-compact.json": "014a7af0119bb560e4ceb3ecbbf447be755626731310546af4c4a9b5e95a501b",
+    "NATIVE-WARM-SETUP.json": "8cffbfba27b0745293a759c6ee43366d7330f2e94f8bb2bcb53e26f242c79a05",
     "shared-transition-grid.json": "af6bbd2f63f2682431a7c7dcb058d0319d44ebebbc89840253eb8ace80f3d18f",
     "shared-transition-focus.json": "4c4237ab669a9c1e87db2fb77da119b1f838dabb2289e37910b4fb1c6ec66a14"
   }

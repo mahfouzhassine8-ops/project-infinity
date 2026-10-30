@@ -395,7 +395,7 @@
         "max_lines": 1,
         "min_lines": 1,
         "gravity": 8388627,
-        "letter_spacing": 0,
+        "letter_spacing": 0.10000000149011612,
         "font_padding": false,
         "line_extra": 0,
         "line_multiplier": 1,
@@ -699,9 +699,9 @@
         "class": "com.projectinfinity.kodi.CobraPresentationEffects$StatusSlot",
         "tag": "cobra_pulse_slot",
         "bounds": [
-          673,
+          621,
           21,
-          204,
+          256,
           74
         ],
         "padding": [
@@ -739,14 +739,14 @@
             "bounds": [
               0,
               0,
-              204,
+              256,
               74
             ],
             "padding": [
-              0,
-              0,
-              0,
-              0
+              26,
+              11,
+              26,
+              11
             ],
             "visibility": 0,
             "alpha": 1,
@@ -755,7 +755,7 @@
             "focusable": false,
             "clickable": false,
             "long_clickable": false,
-            "background": "null",
+            "background": "android.graphics.drawable.ColorDrawable:9a75a4bcd051cd5619ac0c888903e119ba9c3acbcd790eb50ea544f64ee794a5",
             "layout": {
               "class": "android.widget.FrameLayout$LayoutParams",
               "width": -1,

@@ -154,13 +154,25 @@ public class CobraCardsLayoutTest {
     }
     if(expected.has("children") && actual.has("children")){JSONArray a=expected.getJSONArray("children"),b=actual.getJSONArray("children");if(a.length()==b.length())for(int i=0;i<a.length();i++)normalizeNamedGone(a.getJSONObject(i),b.getJSONObject(i),path+".children["+i+"]",details,details && effectiveGone,recorded);}
   }
+  static Object nativeGlobal(Class<?> type,String name)throws Exception{Field field=type.getDeclaredField(name);field.setAccessible(true);return field.get(null);}
+  static JSONObject nativeWarmThemeSetup()throws Exception{
+    Class<?> type=Class.forName("com.projectinfinity.kodi.CobraVisualRenderer");String before=String.valueOf(nativeGlobal(type,"loadStatus"));
+    // Initialize the ORIGINAL one-time theme loader before creating any guide
+    // views. The fence awaits its real work; MAIN publishes and refreshes its
+    // bindings normally. No native fields, application timers or globals reset.
+    Object renderer=type.getConstructor(Context.class).newInstance(RuntimeEnvironment.getApplication());
+    ((ExecutorService)nativeGlobal(type,"IO")).submit(()->{}).get(5,TimeUnit.SECONDS);
+    android.os.Handler main=(android.os.Handler)nativeGlobal(type,"MAIN");assertSame("native publication uses current host MAIN",Looper.getMainLooper(),main.getLooper());
+    Shadows.shadowOf(main.getLooper()).idleFor(Duration.ofMillis(32));
+    return new JSONObject().put("phase","native_theme_published_before_guide_views").put("before_status",before).put("after_status",String.valueOf(nativeGlobal(type,"loadStatus"))).put("active_identity",System.identityHashCode(nativeGlobal(type,"active"))).put("loading_once",((java.util.concurrent.atomic.AtomicBoolean)nativeGlobal(type,"loading")).get()).put("native_global_fields_reset",false).put("native_renderer_created",renderer.getClass().getName());
+  }
   static JSONObject baseline(String mode)throws Exception{return new JSONObject(new String(Files.readAllBytes(Paths.get(System.getProperty("cards.layout.baseline")).resolve("shared-transition-"+mode+".json")),StandardCharsets.UTF_8));}
   @Test public void recordNativeSharedModeBaselines()throws Exception{
     assertFalse("baseline method uses exact signed431 only",candidate());
     for(String mode:MODES){Fixture f=new Fixture(mode);write("shared-"+mode,f.shared());write("geometry-"+mode,f.geometry());}
   }
   @Test public void recordNativeCardsExitModeBaselines()throws Exception{
-    assertFalse("same-journey baseline uses exact signed431 only",candidate());
+    assertFalse("same-journey baseline uses exact signed431 only",candidate());write("NATIVE-WARM-SETUP",nativeWarmThemeSetup());
     for(String mode:MODES){Fixture f=new Fixture("cards");f.mode(mode);write("shared-transition-"+mode,f.shared());write("geometry-transition-"+mode,f.geometry());}
   }
   @Test public void recordNativeCardsAmbientWrapping()throws Exception{
@@ -177,7 +189,7 @@ public class CobraCardsLayoutTest {
     assertEquals(104,((View)get(f.a,"mCobraModeToolbar")).getHeight());assertEquals(14,preview.getLeft());assertEquals(116,preview.getTop());assertEquals(476,preview.getWidth());assertEquals(362,preview.getHeight());assertEquals(496,browser.getTop());
   }
   @Test public void cardsRestoresSharedNativeViewsInOtherModes()throws Exception{
-    assertTrue(candidate());List<String> differences=new ArrayList<>();for(String mode:MODES){Fixture f=new Fixture("cards");Object preview=get(f.a,"mCobraGuideVideo"),texture=get(f.a,"mCobraPreviewTexture"),title=get(f.a,"mCobraGuideNowLabel");f.mode(mode);for(String shared:SHARED)noOwnedCardsForeground((View)get(f.a,shared));assertSame(preview,get(f.a,"mCobraGuideVideo"));assertSame(texture,get(f.a,"mCobraPreviewTexture"));assertSame(title,get(f.a,"mCobraGuideNowLabel"));JSONObject actual=f.shared(),expected=baseline(mode);write("restored-"+mode,actual);JSONArray historical=new JSONArray();for(String field:SHARED)normalizeNamedGone(expected.getJSONObject(field),actual.getJSONObject(field),mode+"."+field,false,false,historical);write("ignored-native-gone-geometry-"+mode,new JSONObject().put("differences",historical).put("scope","only approved exact named metadata/Pro details/tagged smallPiP; numeric geometry only; LPclass/styles/visibility remain strict"));String difference=diff(expected,actual,mode);if(difference!=null)differences.add(difference);}assertEquals("shared native properties/hierarchy restored; see exact JSON",Collections.emptyList(),differences);
+    assertTrue(candidate());write("NATIVE-WARM-SETUP",nativeWarmThemeSetup());List<String> differences=new ArrayList<>();for(String mode:MODES){Fixture f=new Fixture("cards");Object preview=get(f.a,"mCobraGuideVideo"),texture=get(f.a,"mCobraPreviewTexture"),title=get(f.a,"mCobraGuideNowLabel");f.mode(mode);for(String shared:SHARED)noOwnedCardsForeground((View)get(f.a,shared));assertSame(preview,get(f.a,"mCobraGuideVideo"));assertSame(texture,get(f.a,"mCobraPreviewTexture"));assertSame(title,get(f.a,"mCobraGuideNowLabel"));JSONObject actual=f.shared(),expected=baseline(mode);write("restored-"+mode,actual);JSONArray historical=new JSONArray();for(String field:SHARED)normalizeNamedGone(expected.getJSONObject(field),actual.getJSONObject(field),mode+"."+field,false,false,historical);write("ignored-native-gone-geometry-"+mode,new JSONObject().put("differences",historical).put("scope","only approved exact named metadata/Pro details/tagged smallPiP; numeric geometry only; LPclass/styles/visibility remain strict"));String difference=diff(expected,actual,mode);if(difference!=null)differences.add(difference);}assertEquals("shared native properties/hierarchy restored; see exact JSON",Collections.emptyList(),differences);
   }
   @Test public void truthfulLiveBadgeUsesNativeStatusAndPreservesActualPipPress()throws Exception{
     assertTrue(candidate());Fixture f=new Fixture("cards");View preview=(View)get(f.a,"mCobraPreviewHost");TextView label=preview.findViewWithTag("cobra_preview_label");Object parent=label.getParent();assertNotNull(get(f.a,"mCobraEffects"));f.player(true);assertEquals("LIVE",call(f.a,"cobraPlayerState",f.player));assertEquals("LIVE",label.getText().toString());assertEquals(View.VISIBLE,label.getVisibility());assertSame(parent,label.getParent());

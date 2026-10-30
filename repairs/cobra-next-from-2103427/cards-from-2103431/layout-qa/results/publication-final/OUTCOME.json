@@ -1,0 +1,67 @@
+{
+  "status": "PASS_CURRENT_PUBLICATION_SAFE_OWNER_COLD_AND_WARM_FOCUSED_HOST",
+  "helper_source_sha256": "81eeb3a8e1c9f426d404f7e931c1b1c4a40c8983a8feaba28140ef6e214f2a33",
+  "main_test_source_sha256": "d282188de62891e8f5aea1213c3c214f7697ce282f2ea8b04441b012f66d2525",
+  "control_test_source_sha256": "7bc8742f9ce71cea0e0e3c2b21d63118f26ec9dcf25fcb39d857f63b507c3c87",
+  "trusted_owner_host_production_jar_sha256": "926bcc3bcc3b78d424742af38116d86f1f71367e1e429828e42f10e618cea92e",
+  "baseline_APK_sha256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471",
+  "native_warm_goldens_source_binding_sha256": "242fb2c0752c4930e95aaabd41e935507ecee5724ea3f0a56af84dbfbc312e70",
+  "independent_cold_warm_reference_sha256": "c435dcc449c4aec8b783a973698621cd4f30c822c5b58a34c6ba045693a46691",
+  "tests": [
+    {
+      "group": "cold-warm-control",
+      "count": 1,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "independent431_style_differences": [],
+      "cold_mobile_spacing": 0,
+      "warm_mobile_spacing": 0.1
+    },
+    {
+      "group": "four-warm-cases",
+      "count": 4,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0,
+      "same_Maven_JVM": true,
+      "cases": [
+        "reference20226inventory/6nativeFavorites",
+        "strictwarmCards→Mobile/Compact/Grid/Pro",
+        "nativeLIVE/full126×126PiP+actualcoordinatepress",
+        "exactnativeambientraster/cache/off/density/restore"
+      ]
+    }
+  ],
+  "cause_and_correction": {
+    "CI_original_failure": "41014445180 was24/25PASS; cold-onlygoldenagainstwarmnativephase pluscontrolledcoldreproductionfoundrealimmutableSnapshotrace",
+    "independent431": "ColdpostpublicationMobile0; newlyconstructedwarmMobile.1. Nativeone-timeIO+MAINrefresh restoresbindingoriginalstyles.",
+    "candidate475f": "ControlledcoldMobileincorrectlyrestored.1; warmmatchednative. Failedcontrolpreserved.",
+    "current81eeb3": "Beforeownstylewritesandrestore, actualrenderer/activeThemeidentitychange rebasesONLYnativeBinding-owned bg/padding/elevation/textstylefromgenuinepublishedvalues. StructuralSnapshots unchanged; no globals/waits/callbacks/nativebodypatch/hardcode.",
+    "QA_alignment": "ActualnativeThemeIO+MAINreadybeforeguideviews forbothwarmbaselineandcandidate; coldprotocol separatelyretainedinownfreshJVM; allstyles remainstrict."
+  },
+  "ignored_named_GONE_numeric_geometry_count": {
+    "mobile": 3,
+    "compact": 3,
+    "grid": 5,
+    "focus": 8
+  },
+  "ignored_scope": "ExactapprovednamedGONEmetadata/Prodetails/taggedsmallPiP only; numericbounds/LPgeometry. LPclass/hierarchy/text/styles/visibility/foreground/allvisiblegeometrystrict.",
+  "old_goldens_retained": "goldens/accepted431-mixed-startup-history",
+  "failed_control_retained": "results/native-theme-order/candidate475f-failure",
+  "CI_failure_retained": "Official41014445180artifact sha256 dacf1db917389fcb4110857394f4268d176943f58183e15f00153cfb3821e93b",
+  "final_private_native_reference_png": {
+    "path": "/workspace/cobra-evidence/cards432-layout-native-publication-final/measurements/cards-native-reference-favorites.png",
+    "sha256": "b5c4df2d94b6212b2d132d455b9a1a5f3cdd8b1bd901512dcb7533cc0058342d"
+  },
+  "runtime_limit": "Robolectric API35 nativegraphicsHOST, actualnativeclasses; state-onlyplayerproxy/terminalOSspy. No physicalFold/decodedvideo/OSPiP/FPS/thermalclaims.",
+  "static_reference_variations": [
+    "PreservednativeworkingPiPadditionalversusmockup",
+    "CobraBOLDheaderheavier; exactreferencefontassetunknown",
+    "Uniformscaled250pxtilesvsreferencewrappednoEPGrow",
+    "Syntheticmissinglogos/nativeproviderdatavaries/no decodedvideo; no byte-perfectwholeimageclaim"
+  ],
+  "shutdown": "NOT_RUN",
+  "APK": "NOT_BUILT_BY_THIS_SUBTASK",
+  "CI26": "PENDING_ROOT_PRODUCER; local5notCIreleasePASS"
+}

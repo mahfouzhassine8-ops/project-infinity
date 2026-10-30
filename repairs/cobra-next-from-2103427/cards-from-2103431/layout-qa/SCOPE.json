@@ -29,13 +29,13 @@
     "CI",
     "physical acceptance"
   ],
-  "status": "PASS_ALL_FOUR_SELECTED_CURRENT_OWNER_CASES",
+  "status": "PASS_CURRENT81EEB3_COLD_CONTROL_AND_FOUR_WARM_HOST_CASES_CI26_PENDING",
   "execution_v3": {
     "candidate": "3 PASS / 1 FAIL",
     "restoration_failure": "Fresh431Mobile versus candidateCards\u2192Mobile details background differs; same-journey431 baseline required before attribution",
     "evidence": "/workspace/cobra-evidence/cards432-layout-native-v3"
   },
-  "next_selected_baseline_method": "CobraCardsLayoutTest#recordNativeCardsAmbientWrapping",
+  "next_selected_baseline_method": "CobraCardsLayoutTest#recordNativeCardsExitModeBaselines",
   "next_baseline_reason": "Compare exactly equivalent native Cards\u2192Mobile/Compact/Grid/Pro journeys to distinguish existing native transition rendering from helper leakage; preserve existing fresh-mode PASS and candidate failure.",
   "ambient_baseline_reason": "V3 custom Cards PanelSurface falls into native new-LayerDrawable path every effects tick, unlike original Glass fast-path. Same four unchanged ambient publications determine introduced allocation regression without timing/extra behavior.",
   "ambient_correction_selected_before_execution": {
@@ -121,6 +121,75 @@
     "nonrender_24_item_fixtures": "unchanged",
     "player": "existingdeclared state-onlyplayer proxy; dynamicdecode notclaimed"
   },
-  "final_result": "results/final/OUTCOME.json",
-  "final_helper_sha256": "475f70f9811ec5bdfc5695e644f4e0661a4de5cbf7bd48bf8013bb6348133cad"
+  "final_result": "results/publication-final/OUTCOME.json",
+  "final_helper_sha256": "81eeb3a8e1c9f426d404f7e931c1b1c4a40c8983a8feaba28140ef6e214f2a33",
+  "ci_41014445180": "24of25PASS; strictMobileconstructorstylefailure; releaseHOLD",
+  "cold_warm_control_selected_before_execution": {
+    "scope": "ONE exact431 baseline method, originalnativeRendererIO gate/fence andMAIN publication ordering, no fieldreset/productionstubs/lifecycle teardown/sign",
+    "gate": "Originalsingle-threadIO holdsactualone-time loader untilconstructednativecoldvaluescaptured; QA only30s failbound, releasedinfinally; subsequentnativeIO fences5s; noapptimerschanged",
+    "observations": "native active/loadStatus/loading; binding original/currentspacing/padding/background/aliases/attach; coldpublication thenwarmCards\u2192Mobile",
+    "purpose": "Distinguish legitimate431cold/warmvariation fromcandidateSnapshotownershipbug beforeanypatch"
+  },
+  "baseline_cold_warm_result": {
+    "status": "PASS",
+    "evidence": "/workspace/cobra-evidence/cards431-native-theme-order-control",
+    "cold_prepub_spacing": 0.1,
+    "cold_postpub_mobile_spacing": 0,
+    "warm_mobile_spacing": 0.1,
+    "warm_legacy_padding": [
+      26,
+      11,
+      26,
+      11
+    ],
+    "cause_proved": "Cold-onlygoldenisnotvalidforwarmnativecontext"
+  },
+  "candidate_companion_selected_before_execution": "Exactly same originalnativeIO gate/fence+MAIN protocol with actual475f owner, compare independent431cold/warm currentstylefields, no globals reset/hardcodes/lifecycle/shutdown/sign",
+  "strict_warm_goldens_selected_before_execution": {
+    "scope": "ExactlyexistingfourCards\u2192nativeothermodebaselinejourneys afteroriginalnativeThemeIO+MAINpublication readiness; samewarmsetupbeforecandidatecomparison",
+    "authority": "Independentexact431nativewarmvalues, no expectedvalueadjustment/hardcode/globalsreset/productionchange",
+    "readiness": "ActualnativeRenderer(ApplicationContext)constructsone-timeloader, originalIO5sfence+finite32msMAIN publication beforeguideviews",
+    "oldgoldens": "Retainedasoriginalmixed-startuphistory; canonicalaccepted431replacedonlybyindependentwarm4JSON+sourcephaseproof"
+  },
+  "candidate_companion_result": {
+    "status": "FAIL_COLD_ONLY_PRODUCTION_SNAPSHOT_RESTORE",
+    "cold_431_spacing": 0,
+    "cold_475f_spacing": 0.1,
+    "warm_both_spacing": 0.1,
+    "evidence": "/workspace/cobra-evidence/cards432-native-theme-order-control"
+  },
+  "production_generation_rebase_source": "81eeb3a8e1c9f426d404f7e931c1b1c4a40c8983a8feaba28140ef6e214f2a33",
+  "warm_431_goldens_result": {
+    "status": "PASS_ONE_METHOD_FOUR_INDEPENDENT_NATIVE_WARM_JOURNEYS",
+    "evidence": "results/native-theme-order/baseline431-warm-goldens",
+    "canonical": "goldens/accepted431",
+    "old_mixed_history": "goldens/accepted431-mixed-startup-history",
+    "native_phase": "originalThemeIOcompleted+MAINpublicationbeforeguideviews; noglobalfieldsreset",
+    "eyebrow_spacing_all_modes": 0.1
+  },
+  "current_control_selected_before_execution": {
+    "source_helper_sha256": "81eeb3a8e1c9f426d404f7e931c1b1c4a40c8983a8feaba28140ef6e214f2a33",
+    "trusted_classpath": "cards432-integrated-host-publication-final",
+    "comparison": "Independent431cold/warmactualIOpublication JSON; sameoriginalnativeprotocol; failfastbeforefourwarmcases"
+  },
+  "current_cold_companion_result": {
+    "status": "PASS",
+    "source_helper_sha256": "81eeb3a8e1c9f426d404f7e931c1b1c4a40c8983a8feaba28140ef6e214f2a33",
+    "independent_431_differences": [],
+    "cold_mobile_spacing": 0,
+    "warm_mobile_spacing": 0.1,
+    "evidence": "/workspace/cobra-evidence/cards432-native-theme-publication-final-control"
+  },
+  "current_warm_four_selected_before_execution": {
+    "methods": [
+      "CobraCardsLayoutTest#actualCardsRenderAtReferenceViewport",
+      "CobraCardsLayoutTest#cardsRestoresSharedNativeViewsInOtherModes",
+      "CobraCardsLayoutTest#truthfulLiveBadgeUsesNativeStatusAndPreservesActualPipPress",
+      "CobraCardsLayoutTest#activeAmbientPreservesNativeEffectsAndRecordsWrapping"
+    ],
+    "same_Maven_JVM": true,
+    "source": "81eeb3currenttrustedowner",
+    "reference": "strictindependentwarm431canonicalgoldens; actualnativeWarmsetup beforeModeExitFixture",
+    "purpose": "Essentialcurrentrender/modeexit/LIVEPiP/ambientregression afterboundedpublicationrebase"
+  }
 }

@@ -2,6 +2,8 @@
 
 The exact accepted original-key 2103431 APK and four matching ZIPs remain protected recovery. The next 2103432 candidate is **NOT YET BUILT** as an APK, signed, accepted or locked. Host verification and physical acceptance are separate. Numerical evidence and limitations are in [IMPLEMENTATION-AND-PERFORMANCE.md](IMPLEMENTATION-AND-PERFORMANCE.md).
 
+Source-bound CI run 41014445180 passed24/25 and exposed a cold/warm reference mismatch. Independent431 controls then demonstrated a separate cold-publication stale-snapshot defect. The corrected helper81eeb3 now passes the independent cold/warm companion and all four layout cases together against native warm references. The next producer requires26 methods across8 groups, including the cold/warm control. Prior failures remain preserved; final CI, packaging and signing are pending.
+
 | Workstream | State | Completed evidence / exact remaining limit |
 | --- | --- | --- |
 | Accepted 431 recovery and approved reference assets | IMPLEMENTED AND VERIFIED | Exact APK, component and original-key bindings retained; actual approved PNG and original JPG were inspected and hash-matched. Recovery and historic 2103427 lock unchanged. |

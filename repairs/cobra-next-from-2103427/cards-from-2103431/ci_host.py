@@ -36,6 +36,7 @@ REUSE = ["nativeReusePreservesScrollSelectionAndCurrentProgramme", "nativeImmedi
          "nativeSelectiveCollectionsAndFreshDirectory", "nativePolicyTypesAndContextInvalidation", "revisionHooksAllowBackgroundAndModeExitDisposes"]
 LAYOUT = ["actualCardsRenderAtReferenceViewport", "cardsRestoresSharedNativeViewsInOtherModes",
           "truthfulLiveBadgeUsesNativeStatusAndPreservesActualPipPress", "activeAmbientPreservesNativeEffectsAndRecordsWrapping"]
+THEME = ["nativeCandidateColdAndWarmThemeCardsMobileControl"]
 GROUPS = [
     ("profile", "CobraProfileDataReuseTest", PROFILE, ["profile-reads/tests/CobraProfileDataReuseTest.java"]),
     ("projection", "CobraProjectionCorrectnessTest", PROJECTION, ["profile-reads/tests/CobraProjectionCorrectnessTest.java"]),
@@ -44,11 +45,15 @@ GROUPS = [
     ("native-cards", "CobraCardsNativeRenderTest", NATIVE, ["render-qa/CobraCardsNativeRenderTest.java"]),
     ("reuse", "CobraCardsReuseNativeTest", REUSE, ["cards-reuse/CobraCardsReuseNativeTest.java"]),
     ("layout", "CobraCardsLayoutTest", LAYOUT, ["layout-qa/CobraCardsLayoutTest.java"]),
+    ("theme-publication", "CobraCardsThemeOrderControlTest", THEME,
+     ["layout-qa/CobraCardsThemeOrderControlTest.java"]),
 ]
 REFERENCES = {
     "presentation-qa/results/signed431-baseline/BASELINE.json": "afe37ff8ed00a442ee240efe425413df0cc9d57acb397993939844c16bab763d",
     "presentation-qa/results/signed431-bound-player-progress/BASELINE-PLAYER-PROGRESS.json": "600cf86ba8958517a16f0519bf8a6040348acbb1984ce1f714fc2ec7c65eb383",
 }
+THEME_REFERENCE = "layout-qa/goldens/native431-theme-order/NATIVE431-COLD-WARM-THEME.json"
+THEME_REFERENCE_SHA = "c435dcc449c4aec8b783a973698621cd4f30c822c5b58a34c6ba045693a46691"
 
 
 def require(condition, reason):
@@ -228,6 +233,8 @@ def run(baseline, trusted_host, out, maven):
     for name, pin in REFERENCES.items():
         require(sha(HERE / name) == pin, "Frozen presentation reference changed: " + name)
         source_pins[str((HERE / name).relative_to(REPO))] = pin
+    require(sha(HERE / THEME_REFERENCE) == THEME_REFERENCE_SHA, "Independent native431 theme-order reference changed")
+    source_pins[str((HERE / THEME_REFERENCE).relative_to(REPO))] = THEME_REFERENCE_SHA
     out.mkdir(parents=True)
     result = {"status": "RUNNING_FOCUSED_CANDIDATE_HOST_ONLY", "source_binding_sha256": source_binding,
               "baseline_signed_source": SOURCE, "baseline_APK_sha256": APK, "groups": [],
@@ -247,6 +254,8 @@ def run(baseline, trusted_host, out, maven):
             else:
                 if name == "logo":
                     auxiliary = [HERE.parent / "tests/CobraLogoWorkTest.java"]
+                elif name == "theme-publication":
+                    auxiliary = [HERE / "layout-qa/CobraCardsLayoutTest.java"]
                 prepare_plain(trusted, folder, sources + auxiliary)
             props = dict(sdk_properties)
             output = folder / "measurements"
@@ -256,6 +265,7 @@ def run(baseline, trusted_host, out, maven):
                           "projection.phase": "FINAL_CURRENT_OWNER_CANDIDATE_CORRECTNESS_NO_TIMING",
                           "cards.render.phase": "CARDS_TILE_PROTOTYPE", "cards.candidate": "true",
                           "cards.layout.baseline": str(golden_dir),
+                          "cards.theme.baseline": str(HERE / THEME_REFERENCE),
                           "presentation.reference.baseline": str(HERE / next(iter(REFERENCES))),
                           "presentation.reference.player": str(HERE / list(REFERENCES)[1])})
             set_properties(folder, props)
