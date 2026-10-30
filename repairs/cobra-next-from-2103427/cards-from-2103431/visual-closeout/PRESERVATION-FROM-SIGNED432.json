@@ -1,0 +1,32 @@
+{
+  "status": "PASS_EXACT_CLOSEOUT_DELTA_FROM_ACTUAL_SIGNED432",
+  "protected432_source": "b53d4286759cee6707c8c2915cc5a0c9a3260336",
+  "protected432_owner_DEX": {
+    "classes4.dex": "47c9635ce03485013d19200db15ee7a703d5e4368197f35f084d0cc9a8afcde6",
+    "classes5.dex": "3360d86366c77771c21af868db10dabe95503fd876977c5ecf201a32af2c384e"
+  },
+  "prototype_existing_classes": 7165,
+  "unchanged_classes": 7159,
+  "changed_classes": [
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$PreviewBadge;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$State;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout;",
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$Holder;",
+    "Lcom/projectinfinity/kodi/CobraCardsTiles;",
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraPosterChannelCard;"
+  ],
+  "existing_native_method_changes": {
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraPosterChannelCard;": [
+      "bind(Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;I)V"
+    ]
+  },
+  "new_or_removed_classes": [],
+  "prototype_DEX": {
+    "part-1.dex": "caf0d327f48da3d066d36376b86a01b0ec0acd87693e96384de9abdfa3c770e0",
+    "part-0.dex": "538773a37a00e993b18a4ed6c276c71573c3880277ae1383a41c536dd1881489"
+  },
+  "APK": "NOT_BUILT",
+  "signing": "NOT_RUN",
+  "shutdown": "NOT_RUN",
+  "PreviewBadge_change": "Compiler synthetic-accessor renumbering only; resolved getter/method bodies and remaining class text compare exactly"
+}
