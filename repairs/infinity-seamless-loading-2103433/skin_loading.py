@@ -230,7 +230,7 @@ def definitions():
     # must match an actual supported active window as well as its item identity.
     current = ' | '.join('[Window.IsActive(%s) + String.IsEqual(Window(Home).Property(Infinity.Loading.Window),%s)]' % (wid,wid)
                          for wid in ('10000','10025','11193','10134'))
-    owned = '[[!$PARAM[inheritwindow] + String.IsEqual(Window(Home).Property(Infinity.Loading.Window),$PARAM[window])] | [$PARAM[inheritwindow] + [' + current + ']]]' 
+    owned = '[[!$PARAM[inheritwindow] + String.IsEqual(Window(Home).Property(Infinity.Loading.Window),$PARAM[window])] | [$PARAM[inheritwindow] + [' + current + ']]]'
     return b'''<?xml version="1.0" encoding="utf-8"?>
 <includes>
   <!-- INFINITY_ACTION_LOADING_V1: original frame rectangles, additive glint only -->
