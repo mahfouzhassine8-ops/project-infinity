@@ -6,20 +6,20 @@
   "bundle_catalog": {
     "bundles": {
       "CHOOSER_SHELL": {
-        "approved_source": "b41d51daa8b32dfee265dc9ea0abf844bff8f44e",
-        "digest": "ada80ce1f8b583390c49f66164dca6c8747bf16043a980c3b6b59fecef1a13a0",
+        "approved_source": "ee8fcb807a9d6c1927967182dec343d08d17cb0a",
+        "digest": "34143a251861531692e72cc816800607c6121020576089e15c774166e641c225",
         "file": "CHOOSER_SHELL.zip",
         "settings_schema": "original-launch-preference",
-        "sha256": "36ca822a886b5df4443c798c933a2c304a30be002c10b4284f6b2ed7934fe912",
-        "version": "2103431.version-wording.1"
+        "sha256": "75833e83f04fb8ebd18690387f49213df2fbb44f85e3a0815bb5782f51e74096",
+        "version": "2103432.version-metadata.1"
       },
       "COBRA": {
-        "approved_source": "b41d51daa8b32dfee265dc9ea0abf844bff8f44e",
-        "digest": "09aedb5a1e45ced416958164131556171ec188207f1bd73da357e815db1c9338",
+        "approved_source": "ee8fcb807a9d6c1927967182dec343d08d17cb0a",
+        "digest": "22c1665b24af43829ebf300b80650c1c5944d3c69662f4fae6407218b5eb1696",
         "file": "COBRA.zip",
         "settings_schema": "original-plus-settings-snapshot-v1",
-        "sha256": "98583b7a935103c8d13744fc624a6005f0566b1e3d26a47f240295cafd21cae7",
-        "version": "2103431.cobra.1"
+        "sha256": "361313a03263a1b2f84e1062fea9699b6dfe9678c2544cbd6cd5873d8bf5635a",
+        "version": "2103432.cobra.1"
       },
       "INFINITY": {
         "approved_source": "6ca19c1d4152e7809f7040dcbdf7f58bc3df7655",
@@ -42,20 +42,20 @@
     "package": "com.projectinfinity.kodi",
     "release_approved": false,
     "schema": 1,
-    "source": "b41d51daa8b32dfee265dc9ea0abf844bff8f44e"
+    "source": "ee8fcb807a9d6c1927967182dec343d08d17cb0a"
   },
   "bundle_sources": {
     "CHOOSER_SHELL": {
-      "artifact": "Cobra-Prepared-Owners-40971144336",
-      "build_source": "b41d51daa8b32dfee265dc9ea0abf844bff8f44e",
+      "artifact": "Cobra-Cards-Prepared-Owners-41020108886",
+      "build_source": "ee8fcb807a9d6c1927967182dec343d08d17cb0a",
       "path": "CHOOSER_SHELL.zip",
-      "run_id": 40971144336
+      "run_id": 41020108886
     },
     "COBRA": {
-      "artifact": "Cobra-Prepared-Owners-40971144336",
-      "build_source": "b41d51daa8b32dfee265dc9ea0abf844bff8f44e",
+      "artifact": "Cobra-Cards-Prepared-Owners-41020108886",
+      "build_source": "ee8fcb807a9d6c1927967182dec343d08d17cb0a",
       "path": "COBRA.zip",
-      "run_id": 40971144336
+      "run_id": 41020108886
     },
     "INFINITY": {
       "artifact": "Infinity-Combined-Owner-Components-40769526963",
@@ -70,22 +70,22 @@
       "run_id": 40971144336
     }
   },
-  "candidate_versionCode": 2103431,
+  "candidate_versionCode": 2103432,
   "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
   "components": {
     "CHOOSER_SHELL": {
-      "approved_source": "b41d51daa8b32dfee265dc9ea0abf844bff8f44e",
-      "digest": "ada80ce1f8b583390c49f66164dca6c8747bf16043a980c3b6b59fecef1a13a0",
-      "revision": 9,
+      "approved_source": "ee8fcb807a9d6c1927967182dec343d08d17cb0a",
+      "digest": "34143a251861531692e72cc816800607c6121020576089e15c774166e641c225",
+      "revision": 10,
       "settings_schema": "original-launch-preference",
-      "version": "2103431.version-wording.1"
+      "version": "2103432.version-metadata.1"
     },
     "COBRA": {
-      "approved_source": "b41d51daa8b32dfee265dc9ea0abf844bff8f44e",
-      "digest": "09aedb5a1e45ced416958164131556171ec188207f1bd73da357e815db1c9338",
-      "revision": 7,
+      "approved_source": "ee8fcb807a9d6c1927967182dec343d08d17cb0a",
+      "digest": "22c1665b24af43829ebf300b80650c1c5944d3c69662f4fae6407218b5eb1696",
+      "revision": 8,
       "settings_schema": "original-plus-settings-snapshot-v1",
-      "version": "2103431.cobra.1"
+      "version": "2103432.cobra.1"
     },
     "INFINITY": {
       "approved_source": "6ca19c1d4152e7809f7040dcbdf7f58bc3df7655",
@@ -103,12 +103,12 @@
     }
   },
   "experience_version_labels": {
-    "COBRA": 2103431,
+    "COBRA": 2103432,
     "INFINITY": 2103427
   },
-  "generation": 16,
+  "generation": 17,
   "guard_schema": 2,
-  "last_issued_versionCode": 2103430,
+  "last_issued_versionCode": 2103431,
   "launcher_icon_exception": {
     "added_members": {
       "res/infinity_launcher_light_hdpi.png": "e059b58ec3af72994725510e2e4e518879ed36eb654b050463b3e98d94685f3c",
@@ -155,102 +155,626 @@
   },
   "owner_update_evidence": {
     "accepted_pointer_updated": false,
-    "authorization": "repairs/cobra-next-from-2103427/P0-2103429-PLAYER-BUTTON-ACTION-MISMATCH-20261029.md",
+    "artifacts": {
+      "Cobra-Cards-Host-Evidence-41020108886": {
+        "digest": "sha256:92c0b4d66b7c6098e1dcdae134b371f48cdfe8c7d54542cf6071c5dcab9d2520",
+        "id": 12960609286,
+        "name": "Cobra-Cards-Host-Evidence-41020108886",
+        "size_in_bytes": 966434
+      },
+      "Cobra-Cards-Prepared-Owners-41020108886": {
+        "digest": "sha256:56f96f77ef339ded40527de5e71c1854d6e5052a0151b7c294fd3f611311e4a3",
+        "id": 12961476665,
+        "name": "Cobra-Cards-Prepared-Owners-41020108886",
+        "size_in_bytes": 318881753
+      }
+    },
+    "authorization": "repairs/cobra-next-from-2103427/CARDS-ONLY-VISUAL-AND-COBRA-END-TO-END-STABILITY-SPEED-20261029.md",
     "changed_owners": [
       "COBRA",
-      "CHOOSER_SHELL",
-      "MINIMAL_ANDROID_CONTRACT"
+      "CHOOSER_SHELL"
     ],
     "changed_payload": [
-      "class:Lcom/projectinfinity/kodi/ChooserReleaseMetadata;",
-      "class:Lcom/projectinfinity/kodi/CobraArrange$$ExternalSyntheticLambda0;",
-      "class:Lcom/projectinfinity/kodi/CobraArrange$$ExternalSyntheticLambda1;",
-      "class:Lcom/projectinfinity/kodi/CobraArrange$$ExternalSyntheticLambda2;",
-      "class:Lcom/projectinfinity/kodi/CobraArrange$$ExternalSyntheticLambda3;",
-      "class:Lcom/projectinfinity/kodi/CobraArrange$$ExternalSyntheticLambda4;",
-      "class:Lcom/projectinfinity/kodi/CobraArrange$1;",
-      "class:Lcom/projectinfinity/kodi/CobraArrange$Gesture$$ExternalSyntheticLambda0;",
-      "class:Lcom/projectinfinity/kodi/CobraArrange$Gesture;",
-      "class:Lcom/projectinfinity/kodi/CobraArrange$Preview;",
-      "class:Lcom/projectinfinity/kodi/CobraArrange$Snapshot;",
-      "class:Lcom/projectinfinity/kodi/CobraArrange$Touch;",
-      "class:Lcom/projectinfinity/kodi/CobraArrange;",
+      "class:Lcom/projectinfinity/kodi/CobraCardsLayout$AmbientPanel;",
+      "class:Lcom/projectinfinity/kodi/CobraCardsLayout$ButtonSurface;",
+      "class:Lcom/projectinfinity/kodi/CobraCardsLayout$LiveDot;",
+      "class:Lcom/projectinfinity/kodi/CobraCardsLayout$LiveSurface;",
+      "class:Lcom/projectinfinity/kodi/CobraCardsLayout$PanelSurface;",
+      "class:Lcom/projectinfinity/kodi/CobraCardsLayout$PreviewBadge;",
+      "class:Lcom/projectinfinity/kodi/CobraCardsLayout$ProgressSurface;",
+      "class:Lcom/projectinfinity/kodi/CobraCardsLayout$Slot;",
+      "class:Lcom/projectinfinity/kodi/CobraCardsLayout$Snapshot;",
+      "class:Lcom/projectinfinity/kodi/CobraCardsLayout$State;",
+      "class:Lcom/projectinfinity/kodi/CobraCardsLayout;",
+      "class:Lcom/projectinfinity/kodi/CobraCardsReuse$Stamp;",
+      "class:Lcom/projectinfinity/kodi/CobraCardsReuse$State;",
+      "class:Lcom/projectinfinity/kodi/CobraCardsReuse;",
+      "class:Lcom/projectinfinity/kodi/CobraCardsTiles$CardSurface;",
+      "class:Lcom/projectinfinity/kodi/CobraCardsTiles$Holder;",
+      "class:Lcom/projectinfinity/kodi/CobraCardsTiles$LiveDot;",
+      "class:Lcom/projectinfinity/kodi/CobraCardsTiles$MoreView;",
+      "class:Lcom/projectinfinity/kodi/CobraCardsTiles$OwnedLogo;",
+      "class:Lcom/projectinfinity/kodi/CobraCardsTiles$RoundedProgress;",
+      "class:Lcom/projectinfinity/kodi/CobraCardsTiles;",
       "class:Lcom/projectinfinity/kodi/CobraComponent;",
-      "class:Lcom/projectinfinity/kodi/CobraLayoutCatalog;",
-      "class:Lcom/projectinfinity/kodi/CobraLogoRequests$$ExternalSyntheticLambda0;",
-      "class:Lcom/projectinfinity/kodi/CobraLogoRequests$$ExternalSyntheticLambda1;",
-      "class:Lcom/projectinfinity/kodi/CobraLogoRequests$$ExternalSyntheticLambda2;",
-      "class:Lcom/projectinfinity/kodi/CobraLogoRequests$Binding;",
-      "class:Lcom/projectinfinity/kodi/CobraLogoRequests$Flight;",
       "class:Lcom/projectinfinity/kodi/CobraLogoRequests;",
-      "class:Lcom/projectinfinity/kodi/CobraPresentation;",
+      "class:Lcom/projectinfinity/kodi/CobraProfileDataReuse$Entry;",
+      "class:Lcom/projectinfinity/kodi/CobraProfileDataReuse;",
+      "class:Lcom/projectinfinity/kodi/InfinityCobraFeatureRuntime;",
+      "class:Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraPosterChannelCard;",
       "class:Lcom/projectinfinity/kodi/InfinityLiveActivity;",
-      "member:assets/experience-component-updates.properties",
-      "member:res/infinity_launcher_light_hdpi.png",
-      "member:res/infinity_launcher_light_mdpi.png",
-      "member:res/infinity_launcher_light_v26.xml",
-      "member:res/infinity_launcher_light_v33.xml",
-      "member:res/infinity_launcher_light_xhdpi.png",
-      "member:res/infinity_launcher_light_xxhdpi.png",
-      "member:res/infinity_launcher_light_xxxhdpi.png",
-      "member:resources.arsc"
+      "member:assets/experience-component-updates.properties"
     ],
-    "chooser_change": "Preserved Version wording; genuine Cobra2103431 metadata only",
-    "focused_host_run": 40971144336,
+    "chooser_change": "Exact431 DEX/UI; cobra.last_updated_in=2103432 only",
+    "compiler_source_files": {
+      "repairs/cobra-next-from-2103427/cards-from-2103431/BASELINE.json": "58e07a7cb2357c844c7bf2e839938d3def01ac874188cb64f139dd0c9efa86c8",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/CARDS-SOURCE-BUDGET.json": "842899947ceede11ca495a9feec7201d9ed27906d46c1e64322d0b929750892b",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/DEX2JAR-LIB-PINS.json": "e614ff51068b77908f8a01d5c9e66b8736bdd6fe5945dfb25538784feba78062",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/PROJECTION-SOURCE-BUDGET.json": "8a6078ff90a856cbf24432feec0fdb3a8f8f2ae1885493c3383197a9f2fc18a3",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/SCOPE.json": "a7e3a13f9257543e8ae2fcb5387001e7d3364b202d279f280fdee64af60afe47",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/build.py": "6710e24fa9266c6a8a5033aa099cb935ec0283bd28551a9f133aa58d6d761dd4",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/cards-reuse/SOURCE-BUDGET.json": "4fa6f7cf0bef69191fbe178407f65a4c6ed3dd7596904bd514ac59c81d89b48e",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/cards-reuse/patch.py": "d78f99af8bbc7c1484e1ec38bb61816df0a47eb0fa8798bc4a0c1e423c569d25",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/cards-reuse/runtime/CobraCardsReuse.java": "6da97a198c89a6113d5643faa6267d3835c9a6a44e2c3b1300fcfa1b9051b6f3",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/cards_patch.py": "b4fcc308486b60db093014853f1a2c33ba024d6bdaf437151980749d6c59b8e5",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/logo-clear/SOURCE-BUDGET.json": "3a2304344f6fe2effb23f927386b6a16eaf3b7b7d25f75f142d36cd2009261cf",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/logo-clear/patch.py": "8167e0f769ab25225d0c2eb36b4d29af0b5e2d404549838d51ff0b4f3cdcde87",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/presentation_patch.py": "458eaa460d4dc78394f191f5d54e8ef6eca07a638f0a39ff72c3b68e9fdf1d04",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/profile-reads/SOURCE-BUDGET.json": "4b63efbc99fb814961793f184b101ecd46602d05af8172b331f7adecda9a4fe2",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/profile-reads/patch_feature.py": "b11453a4777dfd356e5581c9bbb21c39dd9e7e32ad5ddef5dc9a1c159abcb92c",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/profile-reads/runtime/CobraProfileDataReuse.java": "8fb9c9c9cb6fe99a99fff3c4417e575359061953afac52f56255ed76f52560ca",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/projection_patch.py": "4698d792d0e05848a58b22deb9dbc2d3997b30c460fb6df290978b9d1bcbb1e1",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/runtime/CobraCardsLayout.java": "81eeb3a8e1c9f426d404f7e931c1b1c4a40c8983a8feaba28140ef6e214f2a33",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/runtime/CobraCardsTiles.java": "65abd608e6948d6cceee08fab0d0f1c9dceba8da0d9349237e77201f3f843989",
+      "repairs/dual-experience-isolation-2103420/ModuleDexWriter.java": "f9c1b6da2552d529f27709b5f1c53368cacfab42d83fc947cb3b16cd0416dad2"
+    },
+    "evidence_files": {
+      "BUILD.json": "3bf88d590e1e4537153e4c4fa9cd235fb4739c7aab5491f3ff4425617bbf7763",
+      "CORRECTIVE-PRESERVATION.json": "bfe91fdb283f1fd6f16d76863553ee520f727c0b6abeca2e9c4b5ee08b2f49c9",
+      "HOST-RESULT.json": "2d0804fb28336e10ffa6771ad222465402f64992e10252b7e70143bc6b7401d1",
+      "PACKAGE-CANONICAL-RESULT.json": "c21ad5136dde8161cf6faaa7861201df9196763c6b5c0197f8470a53f54cd68a",
+      "SOURCE-BINDINGS.json": "2d03951091e99701481029ff66a42095eabbac1730c12b75ee2f2134930b7953",
+      "checks/layout/COMPILE-OUTPUT.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "checks/layout/COMPILE-RESULT.json": "3c219767e9f00af547be9033d6b489dbcb9e4162977ae29675b7e5e1a27b0e99",
+      "checks/layout/INPUTS.json": "b3e290118d30981a0248cc8198b1e05c47d0302ac4fb64a031e973edaeeef8ed",
+      "checks/layout/RESOLVED-NATIVE-DEPENDENCIES.json": "3a95bb94bed8838fb2dcf0d0b429beec2a4bdda4077d9e5aa018d536c4a7767b",
+      "checks/layout/RESULT.json": "a76c78e3a5ba6e0a8f2f0e0a68ff51dcd980b8486eed706a941b404a83ecaa10",
+      "checks/layout/SELECTION.json": "29441b57fb5fa5674f79ca4b91da834394963a6d8d209cf3cb541c5eb61616bb",
+      "checks/layout/TEST-OUTPUT.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "checks/layout/measurements/NATIVE-WARM-SETUP.json": "3d128dbd6934a10d0dca748ef0dc188450ea66e63782c085e270199a547c30da",
+      "checks/layout/measurements/active-ambient.json": "57f2808f7076d653208021ac7e627a4db0efcc45742db4a9dc0359bcecc6e31b",
+      "checks/layout/measurements/ambient-native-equivalence-and-restoration.json": "17f315bd89c45d31d2cb5535b315a3a7e5b90ed0df4608f292bbcbe53c3e6ea3",
+      "checks/layout/measurements/cards-geometry.json": "1c472c633560044dc04e05c15c4ff89503a67af82acd0ee471185dde2d4841e5",
+      "checks/layout/measurements/cards-native-live.png": "b944ddc76b6ed4ea57af170c1d70dd563743ede984c7ece9bce305f511e5ea4d",
+      "checks/layout/measurements/cards-native-reference-favorites.png": "b5c4df2d94b6212b2d132d455b9a1a5f3cdd8b1bd901512dcb7533cc0058342d",
+      "checks/layout/measurements/ignored-native-gone-geometry-compact.json": "290c6da78c73cd17bab38d1cb3a09c0c66b3ec1c734d15b9a1c513f563902480",
+      "checks/layout/measurements/ignored-native-gone-geometry-focus.json": "eb968b87a0ab0fa3a355e5a89a1b1bccf481e4d1a06e4f52c54a76a7b533f970",
+      "checks/layout/measurements/ignored-native-gone-geometry-grid.json": "719a39e7721bdcab20b5dc7cdcc0c465348d0fb4384f712749308b581e894215",
+      "checks/layout/measurements/ignored-native-gone-geometry-mobile.json": "4dd07d4fab4cebbefd456dacb7370cde71387b505a1f9782cf03ac68514cfda3",
+      "checks/layout/measurements/live-native-status.json": "d171bf153b91d24ff46a3a071881aa5f89555cc3e9037e1f60fcaf78fef912ef",
+      "checks/layout/measurements/native-pip-and-status-cases.json": "a579f8382dca6f762fe38633900fe84b0a20d8e1566bb81f389d8446c1afeb7d",
+      "checks/layout/measurements/restored-compact.json": "533ab9f477742cbaf2bf942456db4ebb77aca4c17f143e5e47843b7c69cf9c25",
+      "checks/layout/measurements/restored-focus.json": "29dc5f78ab3b121cc4addeddda85184dc5d60a7c7dabe076c8a3ccab110f309c",
+      "checks/layout/measurements/restored-grid.json": "5a94c66be16bbc72430c6623a5332fa2567678453f0a5236b3fc340c5d6e8c57",
+      "checks/layout/measurements/restored-mobile.json": "cff664353f1616b878f8a202cd6e74e39e86042851e3152b66324578f1ad101c",
+      "checks/layout/pom.xml": "56f4f53a2d182a2048787cbf2a7888b212ea94ad24539f8c2248a147dff7ee6a",
+      "checks/layout/target/surefire-reports/TEST-com.projectinfinity.kodi.CobraCardsLayoutTest.xml": "2978cecc9f43c1fe300acc8e183b83a72bfc08f57c2a9b1ddd92b85e1158f1b1",
+      "checks/layout/target/surefire-reports/com.projectinfinity.kodi.CobraCardsLayoutTest.txt": "0c48e9c581c585191ba0ca2519dafad998d0c6457a661ca868a46b52e131e56c",
+      "checks/logo/COMPILE-OUTPUT.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "checks/logo/COMPILE-RESULT.json": "d64cde1e27bbe333bd4f3efbc5c99b91ca8f1fb31545ec4f2d1ce682eb120460",
+      "checks/logo/INPUTS.json": "78d1ec69c994b68b73ee542a81892f11410b4993f3ae5ba59624d3242afe0555",
+      "checks/logo/RESOLVED-NATIVE-DEPENDENCIES.json": "3a95bb94bed8838fb2dcf0d0b429beec2a4bdda4077d9e5aa018d536c4a7767b",
+      "checks/logo/RESULT.json": "e6f876f209c65d267bb9edee315ca2dddedf32f6e536b9b95cd7cd4161a82504",
+      "checks/logo/SELECTION.json": "20f44ca6c9b1253ad6e03a94c38bb8162847386a6123d85143765e6c1b0cf48e",
+      "checks/logo/TEST-OUTPUT.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "checks/logo/pom.xml": "2f4a1d3a6b9c206a7eec09cace0e541e0e3d2bc7b15d78dd41e9be69704d93ff",
+      "checks/logo/target/surefire-reports/TEST-com.projectinfinity.kodi.CobraCardsLogoUnbindTest.xml": "ff23e80eb0c39c03fdd3ed0bcbc984a4b45fe05d4ad8d131dd92074693e0645f",
+      "checks/logo/target/surefire-reports/com.projectinfinity.kodi.CobraCardsLogoUnbindTest.txt": "4e890d1a24d95ee51f8d01ee4e1ea8f32603b1b231d73722914668ab4bf7c464",
+      "checks/native-cards/COMPILE-OUTPUT.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "checks/native-cards/COMPILE-RESULT.json": "83148490b32a5da51c3c3d25c7280cc971a19a8971d597641853c9987ff4ac9b",
+      "checks/native-cards/INPUTS.json": "b724d11e03eb742ce2ffdf964c1d90a023de83ac8603aa1421d80f77c1d61c1c",
+      "checks/native-cards/RESOLVED-NATIVE-DEPENDENCIES.json": "3a95bb94bed8838fb2dcf0d0b429beec2a4bdda4077d9e5aa018d536c4a7767b",
+      "checks/native-cards/RESULT.json": "45f5d6b5d46dde426fb502538947e5ad96dd966973c62efe7e2201a2f956b20c",
+      "checks/native-cards/SELECTION.json": "fe3439246060ba8b0cc653ccacb7c76d15eb344f1e0232efe819060897738b8a",
+      "checks/native-cards/TEST-OUTPUT.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "checks/native-cards/measurements/CARD-BOUND-TARGETS.json": "e4fddd06c9364ae96d290f608736d211c0c7efd268b311cd52eb10ec4ac65e8c",
+      "checks/native-cards/measurements/CARD-LOGO-RECYCLE.json": "ddce0a4a46e59766eda0bb5c01e2fe79c8da923aa8aa008655857ced9688aac3",
+      "checks/native-cards/measurements/MORE-AFTER.json": "db8703e3c0f6216124d724798a02eec98a7c0700812fa36af755a51c068cd59d",
+      "checks/native-cards/measurements/MORE-BEFORE.json": "24a0a99ec7c3c96e47cfbc0861c1781bead67732b66e03c1146080d3fda9c920",
+      "checks/native-cards/measurements/MORE-EVENT-0.json": "c9310f4846e9d7abcb51d1a49adbab897d38213aa79d8c617717d368ed59a436",
+      "checks/native-cards/measurements/MORE-EVENT-1.json": "f1eca2ca2ff1ad8fe5957cc6d449fbb69a5887cf52f7d03ba6a0079e2e1ba553",
+      "checks/native-cards/measurements/NATIVE-ROW-LONGPRESS.json": "25ca62eba6b4aa1ff268ab8a3e661e669a65640b456d9b07ff58832df4851749",
+      "checks/native-cards/measurements/after-corner-press.png": "a65c79dcdec28cb7020f80629c26e57aad5eaab5366354af101d7258b6e9539a",
+      "checks/native-cards/measurements/before-corner-press.png": "2481b35c344eeee2ca0ebe80fc514bed557368ab0b3dd8a5555d3a226d76bc5a",
+      "checks/native-cards/measurements/native-more-menu.png": "a65c79dcdec28cb7020f80629c26e57aad5eaab5366354af101d7258b6e9539a",
+      "checks/native-cards/measurements/tile-recycled-missing.png": "1d3cbc1f45850b1eb5626463224b7d1edd50d2db0e096188c3ba567492b27ac5",
+      "checks/native-cards/pom.xml": "02047ac29f5a6d2dfd7b064bf7c235d3851cc585ea53a334d4bb8fb36da1a50c",
+      "checks/native-cards/target/surefire-reports/TEST-com.projectinfinity.kodi.CobraCardsNativeRenderTest.xml": "c5f90f56aaf41d26d84c7a83726da44a3ffffa5aad9be8dc6b92f3288f67648e",
+      "checks/native-cards/target/surefire-reports/com.projectinfinity.kodi.CobraCardsNativeRenderTest.txt": "ff37d0182d3fc5fabfac965affee291079739e89c093edb8a78b491ff59cccb2",
+      "checks/presentation/COMPILE-OUTPUT.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "checks/presentation/COMPILE-RESULT.json": "8de528bc3d83ae27f435a6424f6ba4b224f3fc714e205686f9f58fb709981d2b",
+      "checks/presentation/INPUTS.json": "d02cbfd099ad5cd47021a29b91a03666a4d8aa11afb98d71c1eb68b5bfe74b40",
+      "checks/presentation/RESOLVED-NATIVE-DEPENDENCIES.json": "3a95bb94bed8838fb2dcf0d0b429beec2a4bdda4077d9e5aa018d536c4a7767b",
+      "checks/presentation/RESULT.json": "19a7b4cf3299c09460e6705d41b58fa234139856dddb1e149e0041ddf24d62ba",
+      "checks/presentation/SELECTION.json": "ff353b5adc36cabf2863bece3cf82f993289cebfc90561afafedd1948756e50d",
+      "checks/presentation/TEST-OUTPUT.txt": "61711ec957f57db255322fa13f5bef2987858ff65355cbdad97c8e9986562d1e",
+      "checks/presentation/measurements/CANDIDATE.json": "08ee475bafde6210b6b4a34f98f526afdc797eb437f6a27dedcf097ba764e92b",
+      "checks/presentation/pom.xml": "912ce1c365bf17275507c4ba65b238514dc7008a68d7a943a7ddc64d0f980176",
+      "checks/presentation/target/surefire-reports/TEST-com.projectinfinity.kodi.CobraProgrammePresentationBaselineTest.xml": "890dcbf8033e992232eb477892556061a264757b2197a1f9200cb19bee7afb02",
+      "checks/presentation/target/surefire-reports/com.projectinfinity.kodi.CobraProgrammePresentationBaselineTest.txt": "827e1d49cdd0741f3a2bc1376e29c4546b2c85e14fe091682ea6d16eab4713e6",
+      "checks/profile/COMPILE-OUTPUT.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "checks/profile/COMPILE-RESULT.json": "36cdc150fdeb7cb79af4ef181cad506d446efcc366fd9b68c8e35c1baf6ade0d",
+      "checks/profile/INPUTS.json": "2e844fb12b10f31da378201b36b8e952b5f66b790c68e62154bfccb5e3ca742e",
+      "checks/profile/RESOLVED-NATIVE-DEPENDENCIES.json": "3a95bb94bed8838fb2dcf0d0b429beec2a4bdda4077d9e5aa018d536c4a7767b",
+      "checks/profile/RESULT.json": "780535a081a3e918b7aa31d4204a72864d8f52d8ea0f16c363f31cd4de55a1dd",
+      "checks/profile/SELECTION.json": "e54b7d50d02e22fbc9b14e3b9b6a88b6c9156256db64d1b78a79c8ce459e70bf",
+      "checks/profile/TEST-OUTPUT.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "checks/profile/pom.xml": "2515d27756692dafaed866b8b4881a9311d9fbe8203649c17a9e284f9f4b7978",
+      "checks/profile/target/surefire-reports/TEST-com.projectinfinity.kodi.CobraProfileDataReuseTest.xml": "4550868b7053b239f5a9303acb6319fe386c2b67df1dd7ecec0297242229967e",
+      "checks/profile/target/surefire-reports/com.projectinfinity.kodi.CobraProfileDataReuseTest.txt": "0e6e57df7c09c865c32dcb26b00bc911ee024f482f56b7d597471638a1265b8d",
+      "checks/projection/COMPILE-OUTPUT.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "checks/projection/COMPILE-RESULT.json": "409a4fd95582379ed3325ec91c1b1a63c7e087dd6e5a6ddda5e81fdf268956fd",
+      "checks/projection/INPUTS.json": "01606624bec56002e887b0b6103b960ae62e1f4bf2e7949bd80ed69c0b94d369",
+      "checks/projection/RESOLVED-NATIVE-DEPENDENCIES.json": "3a95bb94bed8838fb2dcf0d0b429beec2a4bdda4077d9e5aa018d536c4a7767b",
+      "checks/projection/RESULT.json": "1a5e9a46da09b7f88a009a1221f0ec0eaf3ccab1b6e196e23a3b71813b581ae3",
+      "checks/projection/SELECTION.json": "0db45a16699e1d6de19643e0cf882e10cf1a0f2bf2fdeb367ade7a537a49703a",
+      "checks/projection/TEST-OUTPUT.txt": "85a1846c8bc4cd831e72591e75a09377110cb76dda8431a72f9fdd6bc8083a18",
+      "checks/projection/measurements/CORRECTNESS_COUNTS.json": "08b75f57f1e1879cd7f3293278fdd5f04056d036c0c616bd2a98e989de9b206d",
+      "checks/projection/measurements/SEMANTICS.json": "91f20bc3c3dc7778555b229e596f958a50edfccefc2009d950e695716216861b",
+      "checks/projection/pom.xml": "27f7b29ec209a71fb131a0ee0271ae7d761cbfc36b51981a635147be39ccbadd",
+      "checks/projection/target/surefire-reports/TEST-com.projectinfinity.kodi.CobraProjectionCorrectnessTest.xml": "d9ceb80a606cf3ff475394b21c058dbd8df097da1553ef5bb58ed9b72f3c663c",
+      "checks/projection/target/surefire-reports/com.projectinfinity.kodi.CobraProjectionCorrectnessTest.txt": "0f0a8f2d011022ec0e4aeb31a38287fe578dbab32f530fd5d40c2a6548742820",
+      "checks/reuse/COMPILE-OUTPUT.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "checks/reuse/COMPILE-RESULT.json": "04a6ca35cf2a6b8d3a453899073d40fcd027f3f47b1364d5db7792afe594be2c",
+      "checks/reuse/INPUTS.json": "bf2c47e03e3dc90ca313aafda2c3f22a96ffe0f57ce1f44ab30447ad29b7c526",
+      "checks/reuse/RESOLVED-NATIVE-DEPENDENCIES.json": "3a95bb94bed8838fb2dcf0d0b429beec2a4bdda4077d9e5aa018d536c4a7767b",
+      "checks/reuse/RESULT.json": "ecb37bef88d14dbc63dcd59045aac2ba9ab7f4a75a5fe69d8840685b4a96c5e7",
+      "checks/reuse/SELECTION.json": "56ce2b340a228a8bb9e147f0d8a8c559cd5d89008e62606ed166dc60d9feeab3",
+      "checks/reuse/TEST-OUTPUT.txt": "25ba95bfbb3b7360e9e62d289bbf5dfa0a9742e20814e8d9faa5c09f86883b4b",
+      "checks/reuse/measurements/CONTEXT-INVALIDATION.json": "cc253fa1c92a62f33165f577b9b4fcbb93718c38614b62c5dade780cc103f943",
+      "checks/reuse/measurements/PENDING-RESTORATION.json": "ef60c11d58cd0f5f70e542ab1c3d2d925409a08521fac7f9f82d75c2cb53126f",
+      "checks/reuse/measurements/RETAINED-RETURN.json": "fb84973dfa946fa2a93519456bf980f57657c41149e7a9d1d0e40a7dd20127e2",
+      "checks/reuse/measurements/SELECTIVE-COLLECTIONS.json": "116c70151dec3b215ff003be74a2ea6b97479fd7b3a31b947bc947350fe077e4",
+      "checks/reuse/measurements/THREAD-AND-EXIT.json": "a26a67981e1f1d771b50a46808ef54ee31d6bd847e20088e0ec4ee4c886b401f",
+      "checks/reuse/pom.xml": "b35e6ff49965b2e80ce817e6776798304cb2a04da8eb8dda44c6ddec93756fa7",
+      "checks/reuse/target/surefire-reports/TEST-com.projectinfinity.kodi.CobraCardsReuseNativeTest.xml": "af6e2e2ef3c01f6a1cbad8d88552c2aee237a8590db8eb67bd3ce7a237ccc5c2",
+      "checks/reuse/target/surefire-reports/com.projectinfinity.kodi.CobraCardsReuseNativeTest.txt": "aeecf01b49fcc7811a56675c35791e4c977007d4cce0bf4807ecd36f9988f4dd",
+      "checks/theme-publication/COMPILE-OUTPUT.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "checks/theme-publication/COMPILE-RESULT.json": "02e5318d8b61e2621c439e374635356fc4044eddb87ba83fa53404a52be3e151",
+      "checks/theme-publication/INPUTS.json": "665205aedcbd9df1de60d0ce63a549d574d8e22b22c795b04f5bf081256a77e6",
+      "checks/theme-publication/RESOLVED-NATIVE-DEPENDENCIES.json": "3a95bb94bed8838fb2dcf0d0b429beec2a4bdda4077d9e5aa018d536c4a7767b",
+      "checks/theme-publication/RESULT.json": "4f7fbd9a2079cd49c8151d46415962691bebe50047ff1d65ad14cfe8665c4608",
+      "checks/theme-publication/SELECTION.json": "bff74d22b56e4f064e8e0a8cca050b29e6fc90bf97e4492eef7a9f5a4f85bf3e",
+      "checks/theme-publication/TEST-OUTPUT.txt": "0bd8aec148a6de4f2dcafb83d4187425752ff0afb92cbb02204225e90d92f304",
+      "checks/theme-publication/measurements/CANDIDATE-COLD-WARM-THEME.json": "f313592cf11959d157f0c147228b58fb74e692cf9b028f9f844b6f4626ba3aaa",
+      "checks/theme-publication/pom.xml": "bc3ce04db9f9b19c406db7674282359401845a61e22715c5e6c64d43026fdc26",
+      "checks/theme-publication/target/surefire-reports/TEST-com.projectinfinity.kodi.CobraCardsThemeOrderControlTest.xml": "f02cc930d27b9d4bb337a0542a9a0e7239a737dc43499ef16aaf6541d65ec966",
+      "checks/theme-publication/target/surefire-reports/com.projectinfinity.kodi.CobraCardsThemeOrderControlTest.txt": "ac686c40f0f4ab01fe9910ec82dcb311194485e393835d25f99fe9042aa5bce3",
+      "steps/bootstrap-dependencies-no-tests-COMMAND.json": "79ef4250bff7ba0b89af554de77333d63045d213b3eaf508d84b5fab3ddc277f",
+      "steps/bootstrap-dependencies-no-tests-RESULT.json": "73a8022b265beb8a3e2e9ea8b60e609f4b86f90b081299e5859064350610d777",
+      "steps/bootstrap-dependencies-no-tests.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "steps/compile-current-owner-no-apk-COMMAND.json": "7f658f008dd9a4461a92e1d7185e6c5855cfdf634c1fe5965ff9126c80189832",
+      "steps/compile-current-owner-no-apk-RESULT.json": "b37b31bc1138145db226d26493276e61a711b9b1ab56a1262c317aec9aaacbb8",
+      "steps/compile-current-owner-no-apk.txt": "cedb5e9cd9770c94f5fbb9886962a1f702edcfa60ffb67a8c6331efc66d65780",
+      "steps/independent-current-owner-canonical-COMMAND.json": "581a68177709e9b3adb25c842c9d4e9e9e23e8934051cd021b51ead88996ebbc",
+      "steps/independent-current-owner-canonical-RESULT.json": "7a031cef8adcf0d4bc1796b2cf82dfdd8526755da04d8d6fb703ebfbb8a03a94",
+      "steps/independent-current-owner-canonical.txt": "d9dcdcc2ac05ec4f75bd38bd644b8b44b3e5051d20ac5f5a5b563aa723df1044",
+      "steps/package-tested-current-owners-no-apk-COMMAND.json": "d537bf83e9caf8aa01d5e76f7004b54def3adeb2a4862921c6059da9697c739e",
+      "steps/package-tested-current-owners-no-apk-RESULT.json": "7a031cef8adcf0d4bc1796b2cf82dfdd8526755da04d8d6fb703ebfbb8a03a94",
+      "steps/package-tested-current-owners-no-apk.txt": "d9dcdcc2ac05ec4f75bd38bd644b8b44b3e5051d20ac5f5a5b563aa723df1044",
+      "steps/prepare-exact431-no-tests-COMMAND.json": "520e158e7fa0b7ffe0488c1dcf782b97bade9123fb7337daf670160f4db375c0",
+      "steps/prepare-exact431-no-tests-RESULT.json": "ed8313976fbb5c85697f76c4fefe84ad705a6303aedbb4cd8d229e8505be5789",
+      "steps/prepare-exact431-no-tests.txt": "d6cb01ee90e1f79a1ca8d002dce09b735391ad59154abd78c9e64cad1750d786",
+      "steps/prepare-fresh-source-bound-host-no-tests-COMMAND.json": "ffc8bf63525ee183c8e8588d9f943572ae2418596c56f203a82dd6ad9805edfe",
+      "steps/prepare-fresh-source-bound-host-no-tests-RESULT.json": "a17448e6f884bc826a4648ac55b5f59bc9ed7e80d6f3105ee3a2c2aca29e2336",
+      "steps/prepare-fresh-source-bound-host-no-tests.txt": "8673fd6e09382dec53507ba08de3d617c3166e830eb82c003eb2f19ed51e46af",
+      "steps/selected-candidate-host-checks-COMMAND.json": "e023a5b2f67343771c894f434316aa8bdc0f70013f068c590c1d2dbbeb45e483",
+      "steps/selected-candidate-host-checks-RESULT.json": "3823ff3638c95a0a92b358a9fb2c87bd030ca7cbf8b99b85e518a5f7779d0eb4",
+      "steps/selected-candidate-host-checks.txt": "c147ca9ec2532f581705f3a92766b15aa3ad120c1b6ad9839e7fbc098206ee8e"
+    },
+    "focused_host_run": 41020108886,
     "frozen_owners": [
-      "INFINITY"
+      "INFINITY",
+      "MINIMAL_ANDROID_CONTRACT"
     ],
-    "launcher_icon_authorization": "repairs/cobra-next-from-2103427/APPROVED-INFINITY-ICON-LIGHT-DARK-20261029.md",
-    "minimal_owner_change": "Only two reviewed light adaptive XML backgrounds change from unaccepted430 to density-safe nested white shape; table,5lightPNGs,alloriginaldark/sharedclassesDEX/native/manifest/persistence exact",
     "owner": "COBRA",
     "physical_Fold": "PENDING",
-    "producer_run": 40971144336,
-    "producer_source": "b41d51daa8b32dfee265dc9ea0abf844bff8f44e",
-    "protected_contract": "EXACT",
+    "producer_result_sha256": "f99420d760a4e89b8c508cf1f2e18b6b9c02351abe0fc26766fffc3bd3675c38",
+    "producer_run": 41020108886,
+    "producer_source": "ee8fcb807a9d6c1927967182dec343d08d17cb0a",
+    "protected_contract": "EXACT431",
+    "runtime_limits": "Host correctness/work counts only; physical Fold acceptance pending; no Android or shutdown tests",
+    "selected_checks": [
+      {
+        "inputs_file": "checks/profile/INPUTS.json",
+        "junit_files": [
+          "checks/profile/target/surefire-reports/TEST-com.projectinfinity.kodi.CobraProfileDataReuseTest.xml"
+        ],
+        "name": "profile",
+        "selection_file": "checks/profile/SELECTION.json",
+        "status": "PASS"
+      },
+      {
+        "inputs_file": "checks/projection/INPUTS.json",
+        "junit_files": [
+          "checks/projection/target/surefire-reports/TEST-com.projectinfinity.kodi.CobraProjectionCorrectnessTest.xml"
+        ],
+        "name": "projection",
+        "selection_file": "checks/projection/SELECTION.json",
+        "status": "PASS"
+      },
+      {
+        "inputs_file": "checks/presentation/INPUTS.json",
+        "junit_files": [
+          "checks/presentation/target/surefire-reports/TEST-com.projectinfinity.kodi.CobraProgrammePresentationBaselineTest.xml"
+        ],
+        "name": "presentation",
+        "selection_file": "checks/presentation/SELECTION.json",
+        "status": "PASS"
+      },
+      {
+        "inputs_file": "checks/logo/INPUTS.json",
+        "junit_files": [
+          "checks/logo/target/surefire-reports/TEST-com.projectinfinity.kodi.CobraCardsLogoUnbindTest.xml"
+        ],
+        "name": "logo",
+        "selection_file": "checks/logo/SELECTION.json",
+        "status": "PASS"
+      },
+      {
+        "inputs_file": "checks/native-cards/INPUTS.json",
+        "junit_files": [
+          "checks/native-cards/target/surefire-reports/TEST-com.projectinfinity.kodi.CobraCardsNativeRenderTest.xml"
+        ],
+        "name": "native-cards",
+        "selection_file": "checks/native-cards/SELECTION.json",
+        "status": "PASS"
+      },
+      {
+        "inputs_file": "checks/reuse/INPUTS.json",
+        "junit_files": [
+          "checks/reuse/target/surefire-reports/TEST-com.projectinfinity.kodi.CobraCardsReuseNativeTest.xml"
+        ],
+        "name": "reuse",
+        "selection_file": "checks/reuse/SELECTION.json",
+        "status": "PASS"
+      },
+      {
+        "inputs_file": "checks/layout/INPUTS.json",
+        "junit_files": [
+          "checks/layout/target/surefire-reports/TEST-com.projectinfinity.kodi.CobraCardsLayoutTest.xml"
+        ],
+        "name": "layout",
+        "selection_file": "checks/layout/SELECTION.json",
+        "status": "PASS"
+      },
+      {
+        "inputs_file": "checks/theme-publication/INPUTS.json",
+        "junit_files": [
+          "checks/theme-publication/target/surefire-reports/TEST-com.projectinfinity.kodi.CobraCardsThemeOrderControlTest.xml"
+        ],
+        "name": "theme-publication",
+        "selection_file": "checks/theme-publication/SELECTION.json",
+        "status": "PASS"
+      }
+    ],
+    "selections": {
+      "layout": {
+        "baseline_or_timing_tests": "NONE",
+        "class": "CobraCardsLayoutTest",
+        "command": [
+          "/usr/share/apache-maven-3.10.0/bin/mvn",
+          "-B",
+          "-q",
+          "-f",
+          "/home/runner/work/project-infinity/project-infinity/cards-producer/checks/layout/pom.xml",
+          "-Dmaven.repo.local=/home/runner/.m2/repository",
+          "-Dtest=CobraCardsLayoutTest#actualCardsRenderAtReferenceViewport+cardsRestoresSharedNativeViewsInOtherModes+truthfulLiveBadgeUsesNativeStatusAndPreservesActualPipPress+activeAmbientPreservesNativeEffectsAndRecordsWrapping",
+          "test"
+        ],
+        "compile_only_command": [
+          "/usr/share/apache-maven-3.10.0/bin/mvn",
+          "-B",
+          "-q",
+          "-f",
+          "/home/runner/work/project-infinity/project-infinity/cards-producer/checks/layout/pom.xml",
+          "-Dmaven.repo.local=/home/runner/.m2/repository",
+          "-DskipTests",
+          "test-compile"
+        ],
+        "compiled_only_fixture_classes": [],
+        "methods": [
+          "actualCardsRenderAtReferenceViewport",
+          "cardsRestoresSharedNativeViewsInOtherModes",
+          "truthfulLiveBadgeUsesNativeStatusAndPreservesActualPipPress",
+          "activeAmbientPreservesNativeEffectsAndRecordsWrapping"
+        ],
+        "recorded_before_execution": true
+      },
+      "logo": {
+        "baseline_or_timing_tests": "NONE",
+        "class": "CobraCardsLogoUnbindTest",
+        "command": [
+          "/usr/share/apache-maven-3.10.0/bin/mvn",
+          "-B",
+          "-q",
+          "-f",
+          "/home/runner/work/project-infinity/project-infinity/cards-producer/checks/logo/pom.xml",
+          "-Dmaven.repo.local=/home/runner/.m2/repository",
+          "-Dtest=CobraCardsLogoUnbindTest#clearWithoutOwnerCreatesNoServiceOrWork+clearedBlankViewRejectsOldCompletionAndDoesNotRequeueOnAttach+clearThenRebindPublishesOnlyTheCurrentLogo+clearingOneViewPreservesSharedFlightAndOtherWaiter",
+          "test"
+        ],
+        "compile_only_command": [
+          "/usr/share/apache-maven-3.10.0/bin/mvn",
+          "-B",
+          "-q",
+          "-f",
+          "/home/runner/work/project-infinity/project-infinity/cards-producer/checks/logo/pom.xml",
+          "-Dmaven.repo.local=/home/runner/.m2/repository",
+          "-DskipTests",
+          "test-compile"
+        ],
+        "compiled_only_fixture_classes": [
+          "CobraLogoWorkTest"
+        ],
+        "methods": [
+          "clearWithoutOwnerCreatesNoServiceOrWork",
+          "clearedBlankViewRejectsOldCompletionAndDoesNotRequeueOnAttach",
+          "clearThenRebindPublishesOnlyTheCurrentLogo",
+          "clearingOneViewPreservesSharedFlightAndOtherWaiter"
+        ],
+        "recorded_before_execution": true
+      },
+      "native-cards": {
+        "baseline_or_timing_tests": "NONE",
+        "class": "CobraCardsNativeRenderTest",
+        "command": [
+          "/usr/share/apache-maven-3.10.0/bin/mvn",
+          "-B",
+          "-q",
+          "-f",
+          "/home/runner/work/project-infinity/project-infinity/cards-producer/checks/native-cards/pom.xml",
+          "-Dmaven.repo.local=/home/runner/.m2/repository",
+          "-Dtest=CobraCardsNativeRenderTest#nativeCardRecycleAndCurrentProgramme+nativeCardDimensionsAndCornerTouch+nativeCardLogoRecycle",
+          "test"
+        ],
+        "compile_only_command": [
+          "/usr/share/apache-maven-3.10.0/bin/mvn",
+          "-B",
+          "-q",
+          "-f",
+          "/home/runner/work/project-infinity/project-infinity/cards-producer/checks/native-cards/pom.xml",
+          "-Dmaven.repo.local=/home/runner/.m2/repository",
+          "-DskipTests",
+          "test-compile"
+        ],
+        "compiled_only_fixture_classes": [],
+        "methods": [
+          "nativeCardRecycleAndCurrentProgramme",
+          "nativeCardDimensionsAndCornerTouch",
+          "nativeCardLogoRecycle"
+        ],
+        "recorded_before_execution": true
+      },
+      "presentation": {
+        "baseline_or_timing_tests": "NONE",
+        "class": "CobraProgrammePresentationBaselineTest",
+        "command": [
+          "/usr/share/apache-maven-3.10.0/bin/mvn",
+          "-B",
+          "-q",
+          "-f",
+          "/home/runner/work/project-infinity/project-infinity/cards-producer/checks/presentation/pom.xml",
+          "-Dmaven.repo.local=/home/runner/.m2/repository",
+          "-Dtest=CobraProgrammePresentationBaselineTest#actualCandidateFinalStateParityAndBoundPlayerProgress",
+          "test"
+        ],
+        "compile_only_command": [
+          "/usr/share/apache-maven-3.10.0/bin/mvn",
+          "-B",
+          "-q",
+          "-f",
+          "/home/runner/work/project-infinity/project-infinity/cards-producer/checks/presentation/pom.xml",
+          "-Dmaven.repo.local=/home/runner/.m2/repository",
+          "-DskipTests",
+          "test-compile"
+        ],
+        "compiled_only_fixture_classes": [],
+        "methods": [
+          "actualCandidateFinalStateParityAndBoundPlayerProgress"
+        ],
+        "recorded_before_execution": true
+      },
+      "profile": {
+        "baseline_or_timing_tests": "NONE",
+        "class": "CobraProfileDataReuseTest",
+        "command": [
+          "/usr/share/apache-maven-3.10.0/bin/mvn",
+          "-B",
+          "-q",
+          "-f",
+          "/home/runner/work/project-infinity/project-infinity/cards-producer/checks/profile/pom.xml",
+          "-Dmaven.repo.local=/home/runner/.m2/repository",
+          "-Dtest=CobraProfileDataReuseTest#currentRawAndActiveIdAreReadFreshInOriginalOrder+publicProfilesRemainIndependentMutableCopies+malformedWrongTypeAndNullableDataRecoverOnNextCall+firstMatchOptBooleanMissingIdsAndNullActiveIdMatchOriginalLoop+validOversizeIsEvaluatedUncachedAndAdmissionIsBounded+privateDataSnapshotsAreSeparatePerThread",
+          "test"
+        ],
+        "compile_only_command": [
+          "/usr/share/apache-maven-3.10.0/bin/mvn",
+          "-B",
+          "-q",
+          "-f",
+          "/home/runner/work/project-infinity/project-infinity/cards-producer/checks/profile/pom.xml",
+          "-Dmaven.repo.local=/home/runner/.m2/repository",
+          "-DskipTests",
+          "test-compile"
+        ],
+        "compiled_only_fixture_classes": [],
+        "methods": [
+          "currentRawAndActiveIdAreReadFreshInOriginalOrder",
+          "publicProfilesRemainIndependentMutableCopies",
+          "malformedWrongTypeAndNullableDataRecoverOnNextCall",
+          "firstMatchOptBooleanMissingIdsAndNullActiveIdMatchOriginalLoop",
+          "validOversizeIsEvaluatedUncachedAndAdmissionIsBounded",
+          "privateDataSnapshotsAreSeparatePerThread"
+        ],
+        "recorded_before_execution": true
+      },
+      "projection": {
+        "baseline_or_timing_tests": "NONE",
+        "class": "CobraProjectionCorrectnessTest",
+        "command": [
+          "/usr/share/apache-maven-3.10.0/bin/mvn",
+          "-B",
+          "-q",
+          "-f",
+          "/home/runner/work/project-infinity/project-infinity/cards-producer/checks/projection/pom.xml",
+          "-Dmaven.repo.local=/home/runner/.m2/repository",
+          "-Dtest=CobraProjectionCorrectnessTest#actualProjectionCounts20226WithoutTiming+nextProjectionReflectsFiltersHiddenFavoritesRecentsInventoryAndProfile",
+          "test"
+        ],
+        "compile_only_command": [
+          "/usr/share/apache-maven-3.10.0/bin/mvn",
+          "-B",
+          "-q",
+          "-f",
+          "/home/runner/work/project-infinity/project-infinity/cards-producer/checks/projection/pom.xml",
+          "-Dmaven.repo.local=/home/runner/.m2/repository",
+          "-DskipTests",
+          "test-compile"
+        ],
+        "compiled_only_fixture_classes": [],
+        "methods": [
+          "actualProjectionCounts20226WithoutTiming",
+          "nextProjectionReflectsFiltersHiddenFavoritesRecentsInventoryAndProfile"
+        ],
+        "recorded_before_execution": true
+      },
+      "reuse": {
+        "baseline_or_timing_tests": "NONE",
+        "class": "CobraCardsReuseNativeTest",
+        "command": [
+          "/usr/share/apache-maven-3.10.0/bin/mvn",
+          "-B",
+          "-q",
+          "-f",
+          "/home/runner/work/project-infinity/project-infinity/cards-producer/checks/reuse/pom.xml",
+          "-Dmaven.repo.local=/home/runner/.m2/repository",
+          "-Dtest=CobraCardsReuseNativeTest#nativeReusePreservesScrollSelectionAndCurrentProgramme+nativeImmediateSecondRenderPreservesPendingPosition+nativeSelectiveCollectionsAndFreshDirectory+nativePolicyTypesAndContextInvalidation+revisionHooksAllowBackgroundAndModeExitDisposes",
+          "test"
+        ],
+        "compile_only_command": [
+          "/usr/share/apache-maven-3.10.0/bin/mvn",
+          "-B",
+          "-q",
+          "-f",
+          "/home/runner/work/project-infinity/project-infinity/cards-producer/checks/reuse/pom.xml",
+          "-Dmaven.repo.local=/home/runner/.m2/repository",
+          "-DskipTests",
+          "test-compile"
+        ],
+        "compiled_only_fixture_classes": [
+          "CobraSettingsReturnBaselineTest"
+        ],
+        "methods": [
+          "nativeReusePreservesScrollSelectionAndCurrentProgramme",
+          "nativeImmediateSecondRenderPreservesPendingPosition",
+          "nativeSelectiveCollectionsAndFreshDirectory",
+          "nativePolicyTypesAndContextInvalidation",
+          "revisionHooksAllowBackgroundAndModeExitDisposes"
+        ],
+        "recorded_before_execution": true
+      },
+      "theme-publication": {
+        "baseline_or_timing_tests": "NONE",
+        "class": "CobraCardsThemeOrderControlTest",
+        "command": [
+          "/usr/share/apache-maven-3.10.0/bin/mvn",
+          "-B",
+          "-q",
+          "-f",
+          "/home/runner/work/project-infinity/project-infinity/cards-producer/checks/theme-publication/pom.xml",
+          "-Dmaven.repo.local=/home/runner/.m2/repository",
+          "-Dtest=CobraCardsThemeOrderControlTest#nativeCandidateColdAndWarmThemeCardsMobileControl",
+          "test"
+        ],
+        "compile_only_command": [
+          "/usr/share/apache-maven-3.10.0/bin/mvn",
+          "-B",
+          "-q",
+          "-f",
+          "/home/runner/work/project-infinity/project-infinity/cards-producer/checks/theme-publication/pom.xml",
+          "-Dmaven.repo.local=/home/runner/.m2/repository",
+          "-DskipTests",
+          "test-compile"
+        ],
+        "compiled_only_fixture_classes": [
+          "CobraCardsLayoutTest"
+        ],
+        "methods": [
+          "nativeCandidateColdAndWarmThemeCardsMobileControl"
+        ],
+        "recorded_before_execution": true
+      }
+    },
     "shutdown_tests": "NOT_RUN",
     "tested_source_files": {
-      "repairs/cobra-next-from-2103427/SCOPE.json": "6d011298a978ad13eeb176bd28480ede069a0504cb98c1de2d75a63215f60d75",
-      "repairs/cobra-next-from-2103427/SOURCE-BUDGET.json": "e39ccdaca198faf65b9df0be8beb77fda104a3cedb3e101f7e95caeb0b725efa",
-      "repairs/cobra-next-from-2103427/build.py": "bdac2f4e061208258174035ef5a26af7d45a197c3b48550603040a6b494559e7",
-      "repairs/cobra-next-from-2103427/focused_host_checks.py": "88da70267f6616b35159051bace939aa4ccddf7ad5b3b084610d3690fd612966",
-      "repairs/cobra-next-from-2103427/host_tests.py": "6dc727c61feaca37904e71894bb2d2d529e5cc027b29256099561081650b7600",
-      "repairs/cobra-next-from-2103427/icon/android_observe.py": "75d20c12c5bdf51895d987c4f7211063e34c05560a001ef8970cb46b8c4f7339",
-      "repairs/cobra-next-from-2103427/icon/reference/0K.xml": "72178fe886f9ccd3eaa4fa161ab7222b4a7afaa2112ed249375821f463966ec9",
-      "repairs/cobra-next-from-2103427/icon/reference/6H.xml": "f0af3fdd93c92162f7ead31dd5747bf4fb2220e1bb2a6f6fd4f1a5f3813359e4",
-      "repairs/cobra-next-from-2103427/icon/reference/8c.png": "de9a26f502d1eed776837c02ddaa988484f00c6970f9070a7838bba159df92c3",
-      "repairs/cobra-next-from-2103427/icon/reference/9w.png": "e6029cd5772e320359c86499ba2033598e6cc79bdb94cf2c3a063f72a6a3bb16",
-      "repairs/cobra-next-from-2103427/icon/reference/BW.xml": "72178fe886f9ccd3eaa4fa161ab7222b4a7afaa2112ed249375821f463966ec9",
-      "repairs/cobra-next-from-2103427/icon/reference/FS.png": "84c03ad5d79da937dcef2f93ccea5a6012d6f26e04bc9c7a5274827a878ded22",
-      "repairs/cobra-next-from-2103427/icon/reference/Gc.png": "296c75e912271576af5014d5a14120bff1295bebf4c87791f676888aef226506",
-      "repairs/cobra-next-from-2103427/icon/reference/HA.png": "b974f18e6449a830e26e68f783464721cec3c02983b66dc9ed894de4fe93319f",
-      "repairs/cobra-next-from-2103427/icon/reference/IG.xml": "f0af3fdd93c92162f7ead31dd5747bf4fb2220e1bb2a6f6fd4f1a5f3813359e4",
-      "repairs/cobra-next-from-2103427/icon/reference/RJ.png": "72e7286d8931746d817424f429c626a265184add24d829f62cec70eabbd0a7e5",
-      "repairs/cobra-next-from-2103427/icon/reference/fO.png": "72e7286d8931746d817424f429c626a265184add24d829f62cec70eabbd0a7e5",
-      "repairs/cobra-next-from-2103427/icon/reference/n4.png": "9348747bebff15426671ac156ff2824a4de2b7736d07e68c36f014ab3a73c788",
-      "repairs/cobra-next-from-2103427/icon/reference/o-.png": "296c75e912271576af5014d5a14120bff1295bebf4c87791f676888aef226506",
-      "repairs/cobra-next-from-2103427/icon/reference/resources.arsc": "1b8c1788a5a86242635277f063ebdce6b82ed12eafe3cfdf331b902c8eb7e616",
-      "repairs/cobra-next-from-2103427/icon/reference/wb.png": "84c03ad5d79da937dcef2f93ccea5a6012d6f26e04bc9c7a5274827a878ded22",
-      "repairs/cobra-next-from-2103427/icon/reference/yn.png": "de9a26f502d1eed776837c02ddaa988484f00c6970f9070a7838bba159df92c3",
-      "repairs/cobra-next-from-2103427/icon/reference/zR.png": "e6029cd5772e320359c86499ba2033598e6cc79bdb94cf2c3a063f72a6a3bb16",
-      "repairs/cobra-next-from-2103427/icon/reference/za.png": "7a2c6f9de711c859244eee484d627f7d92c0ee7f3dee8bc1dba55d9b92fe89e2",
-      "repairs/cobra-next-from-2103427/icon/reference/zp.png": "c692b219dbbe4bd711f7922757d5d294574775c964b94b9595b291ebc3e429f8",
-      "repairs/cobra-next-from-2103427/icon/release_guard.py": "27ffb47f33f8bd69a827510636ec39d67ea35f3df59a4168860e061643f6726d",
-      "repairs/cobra-next-from-2103427/icon/resources.py": "77997b45135bedbac0b8e5df9f0bf4d3efb9c6c43c9d46a5d4c899429e3182ee",
-      "repairs/cobra-next-from-2103427/icon/test_resources.py": "a78d6890e7aa7b9b1f3834f662fad78541dc9449a3118b338d3a2e5da0a245a7",
-      "repairs/cobra-next-from-2103427/package_owners.py": "04ef8790bafb440fef2e72938b56874b5143c84f5eb13d00d2b4957b3efe5001",
-      "repairs/cobra-next-from-2103427/runtime/CobraArrange.java": "dbfcb846bb69ad427dea612d5eb50894eccc927dbec9ab47c205389bfd9c3c5d",
-      "repairs/cobra-next-from-2103427/runtime/CobraLayoutCatalog.java": "840f8d826813ecf28e7fcbeef61a5aa801d4a2a5819286ca4d5055af99875f6a",
-      "repairs/cobra-next-from-2103427/runtime/CobraLogoRequests.java": "d11670c06c5c2d7136de80f7837c9238111f7d69d968149ef5fdc52f41e45258",
-      "repairs/cobra-next-from-2103427/runtime/CobraPresentation.java": "87cd1fb27ceafa59ade703b803fa740e8cd4c306db098eafac662e7c2ae8f86e",
-      "repairs/cobra-next-from-2103427/tests/CobraArrangeIntegrationTest.java": "0600bd4580b5826bd06f05a1f32a75e04b19fd01f484f03b130488459d331240",
-      "repairs/cobra-next-from-2103427/tests/CobraLogoCompletionTest.java": "274b7e8c9f8b96f8c098ee1dd6837a94a5bf857efc89819fbd4ebe52729ceef3",
-      "repairs/cobra-next-from-2103427/tests/CobraLogoReattachTest.java": "e2fc85d634177dcefc30e40a23fed839ee9176bf84bda4e29a871cfe953fda83",
+      ".github/workflows/infinity-saved-navigation-android.yml": "8dfefcadfd3155a95f6ffe4f0d33c76a793fe468e4651ee90117d2b120b50983",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/BASELINE.json": "58e07a7cb2357c844c7bf2e839938d3def01ac874188cb64f139dd0c9efa86c8",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/CARDS-SOURCE-BUDGET.json": "842899947ceede11ca495a9feec7201d9ed27906d46c1e64322d0b929750892b",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/CI-HOST-SCOPE.json": "70579b8f24ab65612b1f7d02a96435bed4fe63c6222a59983096ec925939b6c2",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/DEX2JAR-LIB-PINS.json": "e614ff51068b77908f8a01d5c9e66b8736bdd6fe5945dfb25538784feba78062",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/PRODUCER-SCOPE.json": "000b7edbba473b20af72c3d3524723cd85f1617d2761491951ab2163995f9864",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/PROJECTION-SOURCE-BUDGET.json": "8a6078ff90a856cbf24432feec0fdb3a8f8f2ae1885493c3383197a9f2fc18a3",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/SCOPE.json": "a7e3a13f9257543e8ae2fcb5387001e7d3364b202d279f280fdee64af60afe47",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/build.py": "6710e24fa9266c6a8a5033aa099cb935ec0283bd28551a9f133aa58d6d761dd4",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/cards-reuse/CobraCardsReuseNativeTest.java": "be9c3598424cad812161d22e17ebd2393e09d32066e54004ed936d23ab82181a",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/cards-reuse/SCOPE.json": "60ce07d8da0c3f557b8be31e5d7649a7a2f7a5ddc750761d365e603856f61a4f",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/cards-reuse/SOURCE-BUDGET.json": "4fa6f7cf0bef69191fbe178407f65a4c6ed3dd7596904bd514ac59c81d89b48e",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/cards-reuse/patch.py": "d78f99af8bbc7c1484e1ec38bb61816df0a47eb0fa8798bc4a0c1e423c569d25",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/cards-reuse/prepare_native.py": "b7125b0e32162de97f14503f1c73fcaa56137621fb885cdc2204c60e0bf22da7",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/cards-reuse/runtime/CobraCardsReuse.java": "6da97a198c89a6113d5643faa6267d3835c9a6a44e2c3b1300fcfa1b9051b6f3",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/cards_patch.py": "b4fcc308486b60db093014853f1a2c33ba024d6bdaf437151980749d6c59b8e5",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/ci_host.py": "9518c820d39783def7a4be6811af88ce1374e801a4c38a44f502f105047d31cb",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/integrated-qa/prepare_release.py": "87099154a5ff27d8b057bfff60ef72e70c3125ffcbce43b9376c288d1e5177ab",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/layout-qa/CobraCardsLayoutTest.java": "d282188de62891e8f5aea1213c3c214f7697ce282f2ea8b04441b012f66d2525",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/layout-qa/CobraCardsThemeOrderControlTest.java": "7bc8742f9ce71cea0e0e3c2b21d63118f26ec9dcf25fcb39d857f63b507c3c87",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/layout-qa/SCOPE.json": "ed2142719b0f258c6cf5ed1fbf2574038e836bcd579a42dd9cea96940c77cf46",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/layout-qa/goldens/accepted431/NATIVE-WARM-SETUP.json": "8cffbfba27b0745293a759c6ee43366d7330f2e94f8bb2bcb53e26f242c79a05",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/layout-qa/goldens/accepted431/SOURCE-BINDING.json": "242fb2c0752c4930e95aaabd41e935507ecee5724ea3f0a56af84dbfbc312e70",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/layout-qa/goldens/accepted431/shared-transition-compact.json": "014a7af0119bb560e4ceb3ecbbf447be755626731310546af4c4a9b5e95a501b",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/layout-qa/goldens/accepted431/shared-transition-focus.json": "4c4237ab669a9c1e87db2fb77da119b1f838dabb2289e37910b4fb1c6ec66a14",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/layout-qa/goldens/accepted431/shared-transition-grid.json": "af6bbd2f63f2682431a7c7dcb058d0319d44ebebbc89840253eb8ace80f3d18f",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/layout-qa/goldens/accepted431/shared-transition-mobile.json": "62228c93948174147d491324237c9d49c7c28f29c449123f6a9744952ba9adee",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/layout-qa/goldens/native431-theme-order/NATIVE431-COLD-WARM-THEME.json": "c435dcc449c4aec8b783a973698621cd4f30c822c5b58a34c6ba045693a46691",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/layout-qa/prepare.py": "e9e9c3b6b10ddcb0d751cb8b640790e49dc15f80ef786d5651d2bedacc1285db",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/logo-clear/CobraCardsLogoUnbindTest.java": "f55426125102763a8ae7ab5fc4f82ad35df10d852df8e7fc1fb8b4b9260bb84f",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/logo-clear/SOURCE-BUDGET.json": "3a2304344f6fe2effb23f927386b6a16eaf3b7b7d25f75f142d36cd2009261cf",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/logo-clear/patch.py": "8167e0f769ab25225d0c2eb36b4d29af0b5e2d404549838d51ff0b4f3cdcde87",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/package_owners.py": "db20be941af10f1de685a999b49a3b77638eb3fd859c28755a41680feb70f213",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/presentation-qa/CobraProgrammePresentationBaselineTest.java": "b00d6017451f61d44265ce431cb0bae63abf0c172a12f96bb8d4325e30e6613c",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/presentation-qa/results/signed431-baseline/BASELINE.json": "afe37ff8ed00a442ee240efe425413df0cc9d57acb397993939844c16bab763d",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/presentation-qa/results/signed431-bound-player-progress/BASELINE-PLAYER-PROGRESS.json": "600cf86ba8958517a16f0519bf8a6040348acbb1984ce1f714fc2ec7c65eb383",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/presentation_patch.py": "458eaa460d4dc78394f191f5d54e8ef6eca07a638f0a39ff72c3b68e9fdf1d04",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/profile-reads/SOURCE-BUDGET.json": "4b63efbc99fb814961793f184b101ecd46602d05af8172b331f7adecda9a4fe2",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/profile-reads/patch_feature.py": "b11453a4777dfd356e5581c9bbb21c39dd9e7e32ad5ddef5dc9a1c159abcb92c",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/profile-reads/runtime/CobraProfileDataReuse.java": "8fb9c9c9cb6fe99a99fff3c4417e575359061953afac52f56255ed76f52560ca",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/profile-reads/tests/CobraProfileDataReuseTest.java": "fc5a4890d27ffb25a0f339c4b1cdfc7f9e1e05f8593ff1462a514268b1831312",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/profile-reads/tests/CobraProjectionCorrectnessTest.java": "d5af41e1510f1d4ce85b0a454ea60e157d793d0c41b93740fa12f1d29fab1da5",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/projection_patch.py": "4698d792d0e05848a58b22deb9dbc2d3997b30c460fb6df290978b9d1bcbb1e1",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/qa/prepare_host.py": "7259ebbd9b0ad53848069b8862de84445ef7c7b2b75b05b3d15322e9733213ba",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/register_release.py": "4349f83cf3105e88a6a530709e6dd375c035cf85e418ac3c1c7b26b064d26dd3",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/render-qa/CobraCardsNativeRenderTest.java": "9b2e5b5a741cb9421b4dceafbc29846c5ea9abed615875e0c1c42d4e5a586e81",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/render-qa/SCOPE.json": "a2f9f495b257be5f8c809a771eb8a44f68ae5031d69cdd04d4e0386ee9036003",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/run_producer.py": "275335adfe958f4b98994d4dd7482ae42b1f6c17e5037ee7a70ae2d54e1bd3a4",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/runtime/CobraCardsLayout.java": "81eeb3a8e1c9f426d404f7e931c1b1c4a40c8983a8feaba28140ef6e214f2a33",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/runtime/CobraCardsTiles.java": "65abd608e6948d6cceee08fab0d0f1c9dceba8da0d9349237e77201f3f843989",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/settings-return/CobraSettingsReturnBaselineTest.java": "054b4aae8b87c5c975ba5c9c26b7c5cf1ec4ac7858a09a2d936276702eccd062",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/verify_delivery.py": "abe3aac7d2387fadf56b37bce450c3d559f8ea5a025ffea79ec4ed22cebc7f0a",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/verify_owner_source.py": "e3bdc1a0d8a5ae573aa0dea3a0314c71c081a46c1a8e69ec0f412aa352344f80",
       "repairs/cobra-next-from-2103427/tests/CobraLogoWorkTest.java": "b826b14ae5dc5fb20a1b4d80d676244a843887ff55ea2664b87fa8d96d83a286",
-      "repairs/cobra-next-from-2103427/tests/CobraMeasuredReflowTest.java": "804116ea7fbfea3d4cdea732b77e17241fb16415f70a296fa10c72ebef641ff1",
-      "repairs/cobra-next-from-2103427/tests/CobraPlayerButtonDispatchTest.java": "4f2a169529c338efdbefdaa64cfa6fe63857df1d23dbd1ead63ef082c22cae33",
-      "repairs/cobra-next-from-2103427/tests/CobraPositionWorkTest.java": "617f58ded7a6a8773c2a4a0d40741db61b799964484b09cec6cec71c1e26b20a",
-      "repairs/cobra-next-from-2103427/tests/InfinityLauncherResourceInflationTest.java": "f46726ad6af63108e653a59dc8d101573a3ad5282626ca1bfd5535214f59234b",
-      "repairs/cobra-next-from-2103427/tests/SELECTION.json": "bfc01617935cb263961ef7a6af0d606398a9bcf0ba36e9885c4a946ba639544b"
+      "repairs/dual-experience-isolation-2103420/ModuleDexWriter.java": "f9c1b6da2552d529f27709b5f1c53368cacfab42d83fc947cb3b16cd0416dad2",
+      "repairs/dual-experience-isolation-2103420/ownership-reviewed-roots.json": "56620a07d1507db5220021cc32a29fe485f8f97424b9e9501c8e6a83f9e93f31",
+      "repairs/dual-experience-isolation-2103420/tests/pom.xml": "687fe26b902648718b232cd3655819da3fccae68be69b0f0d0ab2d755ac0a468"
     }
   },
   "package": "com.projectinfinity.kodi",
@@ -24547,9 +25071,93 @@
       "owner": "COBRA",
       "sha256": "299147dbd5bc1bc152ddcd58e71f5782d888a80972aa2b821cf19d2c53ff5e6d"
     },
+    "class:Lcom/projectinfinity/kodi/CobraCardsLayout$AmbientPanel;": {
+      "owner": "COBRA",
+      "sha256": "8b130c3a34fa20c4047d26b62710f2989b68fa5620a9b28999f8380c3212b54c"
+    },
+    "class:Lcom/projectinfinity/kodi/CobraCardsLayout$ButtonSurface;": {
+      "owner": "COBRA",
+      "sha256": "1e00e6973ec7932e459c648657dde131afdaaf17293f516640d7204234eba0e2"
+    },
+    "class:Lcom/projectinfinity/kodi/CobraCardsLayout$LiveDot;": {
+      "owner": "COBRA",
+      "sha256": "d58cbafe66d662499b695583a121095c7fe5661d81ffc6c952f3b476fa5df9d4"
+    },
+    "class:Lcom/projectinfinity/kodi/CobraCardsLayout$LiveSurface;": {
+      "owner": "COBRA",
+      "sha256": "a734e4ffff4b9b67b0426ac9f7ce5b5f93c98b5b64f4b05901ab8f8149379258"
+    },
+    "class:Lcom/projectinfinity/kodi/CobraCardsLayout$PanelSurface;": {
+      "owner": "COBRA",
+      "sha256": "f37e260d53b69a96c82dc788072ba9995eb9ca75c08dd77577fe105bbaeb353c"
+    },
+    "class:Lcom/projectinfinity/kodi/CobraCardsLayout$PreviewBadge;": {
+      "owner": "COBRA",
+      "sha256": "3b939be6ba57a759c8afbac9f1290e392866b981370382119afd920756a34eec"
+    },
+    "class:Lcom/projectinfinity/kodi/CobraCardsLayout$ProgressSurface;": {
+      "owner": "COBRA",
+      "sha256": "f95854637b9dceda611f69f7fb37eb52d2689c07512a59aaa96fb833e6bf71d4"
+    },
+    "class:Lcom/projectinfinity/kodi/CobraCardsLayout$Slot;": {
+      "owner": "COBRA",
+      "sha256": "cdcc1668d5c30085e265d12e5f4500ebb64d3aac0e38e17adda4ae4c2c86e0e0"
+    },
+    "class:Lcom/projectinfinity/kodi/CobraCardsLayout$Snapshot;": {
+      "owner": "COBRA",
+      "sha256": "04d6ce9bb50196fd851cdb3137caeff8f4193db815040ef33692d9ebefa6a9c7"
+    },
+    "class:Lcom/projectinfinity/kodi/CobraCardsLayout$State;": {
+      "owner": "COBRA",
+      "sha256": "eb901951bce955305a0277d4b2496438a26e27067a982e3b71c99d7295951c55"
+    },
+    "class:Lcom/projectinfinity/kodi/CobraCardsLayout;": {
+      "owner": "COBRA",
+      "sha256": "4005b2e71572ed6f0315e3f55a355fa4957e6118b5dfb963346ec1a638f01a9c"
+    },
+    "class:Lcom/projectinfinity/kodi/CobraCardsReuse$Stamp;": {
+      "owner": "COBRA",
+      "sha256": "45b4aeea97d145f1a21f8e6825ad0276235abee60ccea61d0b30c0f229b54a0e"
+    },
+    "class:Lcom/projectinfinity/kodi/CobraCardsReuse$State;": {
+      "owner": "COBRA",
+      "sha256": "e165248a0807490afdaff7fe4a8280248e694d39bcba60e9fe50e4e89403756c"
+    },
+    "class:Lcom/projectinfinity/kodi/CobraCardsReuse;": {
+      "owner": "COBRA",
+      "sha256": "a11dc433d1c6ec81ed198734c138b1ade05f9af46b7cf13a3c80d02e99af4e07"
+    },
+    "class:Lcom/projectinfinity/kodi/CobraCardsTiles$CardSurface;": {
+      "owner": "COBRA",
+      "sha256": "f8d4aa7ccea97c4badf968cf03500060fbe4747176cf1fe317cfddd4d834ab9b"
+    },
+    "class:Lcom/projectinfinity/kodi/CobraCardsTiles$Holder;": {
+      "owner": "COBRA",
+      "sha256": "7f7f10d03bc06bd2ca04f398f2d9115168e6d06e273eb2ac6b50e6d6eb26f709"
+    },
+    "class:Lcom/projectinfinity/kodi/CobraCardsTiles$LiveDot;": {
+      "owner": "COBRA",
+      "sha256": "a94309ce04328f33d6c8dbf6ec7368e32dbb7abb597c3fc3382323a310aa80fb"
+    },
+    "class:Lcom/projectinfinity/kodi/CobraCardsTiles$MoreView;": {
+      "owner": "COBRA",
+      "sha256": "be02bdbd667bc3cdd6113eb86833656a9ca384262c55f552a51cf656b0b01d2d"
+    },
+    "class:Lcom/projectinfinity/kodi/CobraCardsTiles$OwnedLogo;": {
+      "owner": "COBRA",
+      "sha256": "d42c9f3504b5d13969ec02e0427435b1ef87c0dd38da131978044aa22a47a9dd"
+    },
+    "class:Lcom/projectinfinity/kodi/CobraCardsTiles$RoundedProgress;": {
+      "owner": "COBRA",
+      "sha256": "38edddbaee2913f0526ba2795df20f2b2f12e4b452b0aa1ffab12a129397f25d"
+    },
+    "class:Lcom/projectinfinity/kodi/CobraCardsTiles;": {
+      "owner": "COBRA",
+      "sha256": "7e19d553089113d184c1212ccd7663d2b17e6802863018b1c8e4aad6b7f30c08"
+    },
     "class:Lcom/projectinfinity/kodi/CobraComponent;": {
       "owner": "COBRA",
-      "sha256": "37473c5095b6cdc5f3c47d29ea46f60ea64199880c0d3a17eb2fd553a06b323d"
+      "sha256": "eb162ec244d8581a230a1648e1420c9c6ee6738bf57fa433fb29222a4d68142f"
     },
     "class:Lcom/projectinfinity/kodi/CobraDiagnosticArchive$$ExternalSyntheticLambda0;": {
       "owner": "COBRA",
@@ -24705,7 +25313,7 @@
     },
     "class:Lcom/projectinfinity/kodi/CobraLogoRequests;": {
       "owner": "COBRA",
-      "sha256": "522f73506612c1b6c9c890bebbcefed5e54363b79098e0d88e76a252faf3c1ae"
+      "sha256": "f9092977804b02734fa1894f0d4072017ff3016511e5aa6f7866cb0826dc15fe"
     },
     "class:Lcom/projectinfinity/kodi/CobraNetworkIntelligence$$ExternalSyntheticLambda2;": {
       "owner": "COBRA",
@@ -25042,6 +25650,14 @@
     "class:Lcom/projectinfinity/kodi/CobraProUi;": {
       "owner": "COBRA",
       "sha256": "89b888c426ce9c04fb99052a4e7ab11505de3032312d10c9e48be4e1204f617e"
+    },
+    "class:Lcom/projectinfinity/kodi/CobraProfileDataReuse$Entry;": {
+      "owner": "COBRA",
+      "sha256": "c6083f7df382dcaad3f26115cfc20aea44bee0b8ba4b08d93c776d3edd8e4d9b"
+    },
+    "class:Lcom/projectinfinity/kodi/CobraProfileDataReuse;": {
+      "owner": "COBRA",
+      "sha256": "03b2233979468ba9ae6b99d1f0783747632b403a77df97aa14e8fccff70b8c46"
     },
     "class:Lcom/projectinfinity/kodi/CobraQuickPeekSession$$ExternalSyntheticLambda0;": {
       "owner": "COBRA",
@@ -25713,7 +26329,7 @@
     },
     "class:Lcom/projectinfinity/kodi/InfinityCobraFeatureRuntime;": {
       "owner": "COBRA",
-      "sha256": "f93c0ef10380e71937d97d9f427412d8e14230aa10413909a31451cf0f4b7b34"
+      "sha256": "e0ac914ffab15b4f63d32022f9a472ccd16d7c575ceff14c19005b20ff8a5ae4"
     },
     "class:Lcom/projectinfinity/kodi/InfinityCobraRecordingService$$ExternalSyntheticLambda1;": {
       "owner": "COBRA",
@@ -29065,7 +29681,7 @@
     },
     "class:Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraPosterChannelCard;": {
       "owner": "COBRA",
-      "sha256": "cde381e43e9007b51647ac5c159e499cdf9c3acc69235fc3e0c82f9e19ace9b2"
+      "sha256": "6ba2055c9e9ce0a26d3667972763e286ff0583a59e05402eca7d699abe82fd4d"
     },
     "class:Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraPreferencePolicy;": {
       "owner": "COBRA",
@@ -29401,7 +30017,7 @@
     },
     "class:Lcom/projectinfinity/kodi/InfinityLiveActivity;": {
       "owner": "COBRA",
-      "sha256": "1a1f54d8310b352826d12f338c23fdd6bcaaf1b89993aa5d4e1ef54e6432b1d5"
+      "sha256": "380759f64a28114c6f0a8011621aadb33ebe84b548f23f80b19a0dc3b5736918"
     },
     "class:Lcom/projectinfinity/kodi/InfinityNativeTaskEntry;": {
       "owner": "INFINITY",
@@ -57597,7 +58213,7 @@
     },
     "member:assets/experience-component-updates.properties": {
       "owner": "CHOOSER_SHELL",
-      "sha256": "ec9ac12bdaa796147758649c19df70a46156338b362cba11ffb4c5e463e256e4"
+      "sha256": "feb1bb0edd4bf5e0ab48d87b36877f22fce4651ddb45c0e099439c0a2273ee84"
     },
     "member:assets/infinity-2103395-components.json": {
       "owner": "INFINITY",
@@ -66488,7 +67104,7 @@
       "sha256": "cb3a6f25572858e9fb64dd21713ab1e1c1a0965d0e1d3951c59dd690c9551f5c"
     }
   },
-  "previous_authority_sha256": "8ac5a3a1c5a785d36e6aa3121a81aea12f3184180af666ae9a90f68811d58a80",
+  "previous_authority_sha256": "96470eac85e2c897c0b95bd9861cc1f6cc624e730db58fe7c37bc984948b8f9e",
   "proofs": {
     "COMBINATION-CONTROLS.json": "bcb21adb63fefb898a8e8799d9892f76e382315518d8e94b51c42060cc5ece83",
     "OWNER-CONTRACT.json": "dd0fdfdcb7715777007984969bfac45b36f3e4ef04023b5ba1884c67904d0846",
@@ -66654,7 +67270,7 @@
     "repairs/dual-experience-isolation-2103420/component_bundles.py": "1aca1f237a1987998f243d013fde991413c491b9e72706deda4853b1b1d642d6",
     "repairs/dual-experience-isolation-2103420/create_authority.py": "be6da193e7fbc242fb84996ae7a0b463c7ede025687c7b71db14c8babfbc2672",
     "repairs/dual-experience-isolation-2103420/inventory.py": "574c64b0a15200ba6f9971a2834f6cdb629dddd5ab5418186c4d5255d6e73bcb",
-    "repairs/dual-experience-isolation-2103420/ownership-reviewed-roots.json": "f9ddc3cb1509a847137b441d92d6816d03b4baed651460bc2844ed8cbacf7071",
+    "repairs/dual-experience-isolation-2103420/ownership-reviewed-roots.json": "56620a07d1507db5220021cc32a29fe485f8f97424b9e9501c8e6a83f9e93f31",
     "repairs/dual-experience-isolation-2103420/prepare_host_tests.py": "5d2671de5b361c5dbace42a5567a736226f50957353e77eec5a60042c631a3a7",
     "repairs/dual-experience-isolation-2103420/prepare_runtime.py": "e59faac2489d7ce3b0d2deae8469d627e8f463b8c445806b3d232ec572c3d1a7",
     "repairs/dual-experience-isolation-2103420/propose_cobra_reflow.py": "31dda989cdf3bc3d3372565fcb44e7dd5d11db935c6961ac3905e4a91df23425",
@@ -66685,9 +67301,8 @@
   "status": "ENGINEERING_REVIEWED_FOLD_PENDING",
   "target_owners": [
     "COBRA",
-    "CHOOSER_SHELL",
-    "MINIMAL_ANDROID_CONTRACT"
+    "CHOOSER_SHELL"
   ],
   "update_kind": "owner_update",
-  "workflow_sha256": "9eae318b7f13620bdf6dc47d7c092d9da5f51662bd377e2d9cee7604e027e911"
+  "workflow_sha256": "3aa2db9135b48c8b763883191db806799aad646e11fc2458de1fe79decd87ccb"
 }
