@@ -125,8 +125,8 @@ def run(apk, bundles, jars, android, d8, dex2jar, maven, out, source, run_id):
         execute("selected-candidate-host-checks", [sys.executable, HERE / "ci_host.py", "--baseline", baseline,
                 "--trusted-host", trusted, "--out", checks, "--maven", maven])
         host_result = read(checks / "HOST-RESULT.json")
-        require(host_result["status"] == "PASS_FOCUSED_CANDIDATE_HOST_ONLY" and host_result["selected_JUnit_methods"] == 26
-                and host_result["selected_groups"] == 8, "All exact essential candidate groups must pass before packaging")
+        require(host_result["status"] == "PASS_FOCUSED_CANDIDATE_HOST_ONLY" and host_result["selected_JUnit_methods"] == 30
+                and host_result["selected_groups"] == 9, "All exact essential candidate groups and final visual closeout must pass before packaging")
         execute("package-tested-current-owners-no-apk", [sys.executable, HERE / "package_owners.py", "--bundles", bundles,
                 "--work", owner, "--jars", jars, "--out", components, "--source", source])
         for src, name in ((owner / "BUILD.json", "BUILD.json"),
@@ -158,7 +158,8 @@ def run(apk, bundles, jars, android, d8, dex2jar, maven, out, source, run_id):
         tested = register_release.repository_source_files()
         paths = {HERE / name for name in ("run_producer.py", "ci_host.py", "CI-HOST-SCOPE.json", "PRODUCER-SCOPE.json",
             "qa/prepare_host.py", "cards-reuse/prepare_native.py", "cards-reuse/SCOPE.json", "layout-qa/prepare.py",
-            "layout-qa/SCOPE.json", "render-qa/SCOPE.json", "settings-return/CobraSettingsReturnBaselineTest.java")}
+            "layout-qa/SCOPE.json", "render-qa/SCOPE.json", "settings-return/CobraSettingsReturnBaselineTest.java",
+            "visual-closeout/qa/prepare.py", "visual-closeout/qa/SCOPE.json")}
         paths |= {REPO / name for name in test_sources}
         paths.add(HERE.parent / "tests/CobraLogoWorkTest.java")
         paths.add(ISO / "tests/pom.xml")

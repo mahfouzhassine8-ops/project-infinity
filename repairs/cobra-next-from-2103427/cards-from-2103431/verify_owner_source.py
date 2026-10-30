@@ -77,7 +77,7 @@ def verify(work,bundles,jars,canonical_leaf='independent-canonical',receipt_leaf
             assert old_meta==new_meta,'Class fields/metadata changed: '+name
         modified={s for s in before if before[s]!=after[s]}
         if name==APP+'CobraComponent;':
-            assert actual[name]==old[name].replace('"2103431.cobra.1"','"2103432.cobra.1"'),'Only genuine component version may change'
+            assert actual[name]==old[name].replace('"2103431.cobra.1"','"2103433.cobra.1"'),'Only genuine component version may change'
         elif name==APP+'CobraLogoRequests;':assert not modified,'Existing logo methods remain exact'
         else:assert modified==allowed[name],'Unreviewed method delta: '+name
         changes[name]=sorted(modified|new_methods)

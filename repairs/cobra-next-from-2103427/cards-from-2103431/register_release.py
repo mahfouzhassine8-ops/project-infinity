@@ -27,16 +27,16 @@ from package_owners import bound_sources
 
 REPOSITORY = 'mahfouzhassine8-ops/project-infinity'
 BRANCH = 'work/cobra-only-from-2103427-20261028'
-VERSION = 2103432
-GENERATION = 17
+VERSION = 2103433
+GENERATION = 18
+PREVIOUS_RELEASE_SOURCE = 'b53d4286759cee6707c8c2915cc5a0c9a3260336'
 TARGETS = ('COBRA', 'CHOOSER_SHELL')
 FROZEN = ('INFINITY', 'MINIMAL_ANDROID_CONTRACT')
 METADATA = 'assets/experience-component-updates.properties'
 CHANGED_CLASSES = {'class:Lcom/projectinfinity/kodi/' + n + ';' for n in (
-    'InfinityLiveActivity', 'InfinityLiveActivity$CobraPosterChannelCard',
-    'InfinityCobraFeatureRuntime', 'CobraLogoRequests', 'CobraComponent')}
-NEW_ROOTS = {'class:Lcom/projectinfinity/kodi/' + n for n in (
-    'CobraCardsTiles', 'CobraCardsLayout', 'CobraProfileDataReuse', 'CobraCardsReuse')}
+    'CobraCardsLayout$PreviewBadge', 'CobraCardsLayout$State', 'CobraCardsLayout',
+    'CobraCardsTiles$Holder', 'CobraCardsTiles',
+    'InfinityLiveActivity$CobraPosterChannelCard', 'CobraComponent')}
 
 
 def git_bytes(source, path):
@@ -47,10 +47,15 @@ def signed431_authority():
     return json.loads(git_bytes(BASE_SOURCE, str((ISO / 'release-authority.json').relative_to(REPO))))
 
 
+def signed432_authority():
+    return json.loads(git_bytes(PREVIOUS_RELEASE_SOURCE,
+        str((ISO / 'release-authority.json').relative_to(REPO))))
+
+
 def previous_authority():
-    previous, signed = load(ISO / 'release-authority.json'), signed431_authority()
-    require(previous == signed, 'EXACT_SIGNED431_AUTHORITY_REQUIRED')
-    require(previous['candidate_versionCode'] == 2103431 and previous['generation'] == 16,
+    previous, signed = load(ISO / 'release-authority.json'), signed432_authority()
+    require(previous == signed, 'EXACT_SIGNED432_AUTHORITY_REQUIRED')
+    require(previous['candidate_versionCode'] == 2103432 and previous['generation'] == 17,
             'EXACT_PREVIOUS_AUTHORITY')
     return previous
 
@@ -93,18 +98,18 @@ def validate_payload(previous, catalog, bundles):
         else:
             require(row['approved_source'] == catalog['source'], 'EXACT_UPDATED_OWNER_SOURCE')
     old = previous['payload']
-    require(set(old) <= set(payload), 'REMOVED_PAYLOAD')
+    require(set(old) == set(payload), 'EXACT_SIGNED432_PAYLOAD_SET')
     changed = {k for k in old if old[k] != payload[k]}
     added = set(payload) - set(old)
-    require(changed == CHANGED_CLASSES | {'member:' + METADATA}, 'EXACT_FIVE_CLASS_AND_VERSION_DELTA')
-    require(added and all(k.startswith('class:') and k.split('$')[0].rstrip(';') in NEW_ROOTS and
-                         payload[k]['owner'] == 'COBRA' for k in added), 'BOUNDED_NEW_COBRA_HELPERS')
+    require(changed == CHANGED_CLASSES | {'member:' + METADATA}, 'EXACT_SEVEN_CLASS_AND_VERSION_DELTA_FROM432')
+    require(not added and all(payload[k]['owner'] == 'COBRA' for k in CHANGED_CLASSES),
+            'NO_NEW_CLASSES_OR_CROSS_OWNER_DELTA')
     chooser = metas['CHOOSER_SHELL']
-    require(chooser['version'] == '2103432.version-metadata.1', 'GENUINE_CHOOSER_VERSION')
-    require(metas['COBRA']['version'] == '2103432.cobra.1', 'GENUINE_COBRA_VERSION')
+    require(chooser['version'] == '2103433.version-metadata.1', 'GENUINE_CHOOSER_VERSION')
+    require(metas['COBRA']['version'] == '2103433.cobra.1', 'GENUINE_COBRA_VERSION')
     with ZipFile(bundles / 'CHOOSER_SHELL.zip') as archive:
         require(archive.read('payload/' + METADATA) ==
-                b'infinity.last_updated_in=2103427\ncobra.last_updated_in=2103432\n', 'GENUINE_VERSION_LABELS')
+                b'infinity.last_updated_in=2103427\ncobra.last_updated_in=2103433\n', 'GENUINE_VERSION_LABELS')
     return payload, metas, changed, added
 
 
@@ -132,9 +137,9 @@ def validate_ci(evidence, catalog, producer_run, source, previous):
     built = load(evidence / 'BUILD.json')
     require(built['status'] == 'COMPILED_UNSIGNED_COBRA_OWNER_ONLY' and
             built['baseline_signed_source'] == BASE_SOURCE and
-            built['candidate_component_version'] == '2103432.cobra.1', 'COMPILED_OWNER_IDENTITY')
+            built['candidate_component_version'] == '2103433.cobra.1', 'COMPILED_OWNER_IDENTITY')
     require(built['compiler_source_files'] == compiler, 'COMPILED_SOURCE_BINDING')
-    require(built['baseline_components'] == previous['bundle_catalog'], 'EXACT431_COMPILE_BASE')
+    require(built['baseline_components'] == signed431_authority()['bundle_catalog'], 'EXACT431_COMPILE_BASE')
     proof = load(evidence / 'PACKAGE-CANONICAL-RESULT.json')
     require(proof['status'] == 'PASS_EXACT_FIVE_CLASS_DELTA' and
             proof['baseline_signed_source'] == BASE_SOURCE and not proof['missing_classes'], 'CANONICAL_PRESERVATION')
@@ -239,9 +244,10 @@ def bind_archive(archive_path, artifact, folder, required_files):
 
 def check_registered(bundles, evidence, evidence_archive):
     """Extra pre-key guard; generic authority verification remains unchanged."""
-    authority, previous = load(ISO / 'release-authority.json'), signed431_authority()
+    authority, previous = load(ISO / 'release-authority.json'), signed432_authority()
     require(authority['generation'] == GENERATION and authority['candidate_versionCode'] == VERSION and
-            set(authority['target_owners']) == set(TARGETS), 'REGISTERED432_AUTHORITY_REQUIRED')
+            set(authority['target_owners']) == set(TARGETS), 'REGISTERED433_AUTHORITY_REQUIRED')
+    require(authority['previous_authority_sha256'] == digest(canonical(previous)), 'EXACT_SIGNED432_LINEAGE')
     transition(previous, authority, TARGETS)
     catalog = load(bundles / 'catalog.json')
     require(catalog == authority['bundle_catalog'], 'REGISTERED_COMPONENT_CATALOG')
@@ -260,7 +266,7 @@ def check_registered(bundles, evidence, evidence_archive):
             receipt['files'] == expected['evidence_files'] and receipt['selected_checks'] == expected['selected_checks'] and
             selections == expected['selections'], 'REGISTERED_CI_RECEIPT_CHANGED')
     verify_evidence(authority, lambda n: (REPO / n).read_bytes())
-    print('PASS registered432 actual producer, selected CI, compiler and packaging sources; no signing or acceptance operation.')
+    print('PASS registered433 actual producer, selected CI, compiler and packaging sources; no signing or acceptance operation.')
 
 
 def register(bundles, evidence, owners_archive, evidence_archive, producer_run, out, apply=False):
@@ -284,7 +290,7 @@ def register(bundles, evidence, owners_archive, evidence_archive, producer_run, 
     bind_archive(evidence_archive, selected_artifacts[artifact_names[1]], evidence,
         {'PRODUCER-RESULT.json'} | set(receipt['files']))
     proposed = copy.deepcopy(previous)
-    proposed.update(generation=GENERATION, last_issued_versionCode=2103431, candidate_versionCode=VERSION,
+    proposed.update(generation=GENERATION, last_issued_versionCode=2103432, candidate_versionCode=VERSION,
         update_kind='owner_update', target_owners=list(TARGETS), previous_authority_sha256=digest(canonical(previous)),
         payload=payload, bundle_catalog=catalog, experience_version_labels={'INFINITY': 2103427, 'COBRA': VERSION})
     for owner in TARGETS:
@@ -299,9 +305,9 @@ def register(bundles, evidence, owners_archive, evidence_archive, producer_run, 
     proposed['owner_update_evidence'] = dict(owner='COBRA', changed_owners=list(TARGETS),
         producer_source=source, producer_run=producer_run, focused_host_run=producer_run,
         changed_payload=sorted(changed | added), frozen_owners=list(FROZEN),
-        chooser_change='Exact431 DEX/UI; cobra.last_updated_in=2103432 only',
-        protected_contract='EXACT431', shutdown_tests='NOT_RUN', physical_Fold='PENDING', accepted_pointer_updated=False,
-        authorization='repairs/cobra-next-from-2103427/CARDS-ONLY-VISUAL-AND-COBRA-END-TO-END-STABILITY-SPEED-20261029.md',
+        chooser_change='Exact432 DEX/UI; cobra.last_updated_in=2103433 only',
+        protected_contract='EXACT432', shutdown_tests='NOT_RUN', physical_Fold='PENDING', accepted_pointer_updated=False,
+        authorization='repairs/cobra-next-from-2103427/cards-from-2103431/release433/SCOPE.json',
         tested_source_files=receipt['tested_source_files'], compiler_source_files=receipt['compiler_source_files'],
         producer_result_sha256=file_sha(evidence / 'PRODUCER-RESULT.json'), evidence_files=receipt['files'],
         selected_checks=receipt['selected_checks'], selections=selections, artifacts=selected_artifacts,

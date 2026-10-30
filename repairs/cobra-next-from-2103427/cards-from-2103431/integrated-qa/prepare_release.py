@@ -23,8 +23,8 @@ BRANCH = 'work/cobra-only-from-2103427-20261028'
 REPOSITORY = 'mahfouzhassine8-ops/project-infinity'
 SIGNED_SOURCE = '9ccc4c362a65118eeba38a8e7e4b0de5723c69af'
 SIGNED_APK = '3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471'
-VERSION = 2103432
-GENERATION = 17  # Target only; registration follows successful producer evidence.
+VERSION = 2103433
+GENERATION = 18  # Target only; registration follows successful producer evidence.
 BASE_DEX = {
     'classes.dex': '07b94bfde6dbc3e3a6bfc8436ea65e6a67bdef5ca868379809e20f2fb7ce8efb',
     'classes2.dex': '2e8fa1ae27e670db0525d31a655e93d861893fa20316d5c54a4c6283a97ca304',

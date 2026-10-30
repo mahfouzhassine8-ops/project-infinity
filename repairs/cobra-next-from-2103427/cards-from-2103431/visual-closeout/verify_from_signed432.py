@@ -63,8 +63,14 @@ def verify(apk, prototype, jars, out):
                 'disassemble', '--sequential-labels', str(dex), '-o', str(out / 'signed432' / dex.stem)], check=True)
     old, new = classes(out / 'signed432'), classes(prototype / 'independent-canonical')
     assert set(old) == set(new) and len(old) == 7165
+    component_version = json.loads((prototype/'BUILD.json').read_text())['candidate_component_version']
+    assert component_version in {'2103432.cobra.1', '2103433.cobra.1'}
+    component = APP + 'CobraComponent;'
+    expected = CHANGED | ({component} if component_version == '2103433.cobra.1' else set())
     changed = {name for name in old if old[name] != new[name]}
-    assert changed == CHANGED, sorted(changed)
+    assert changed == expected, sorted(changed)
+    if component in expected:
+        assert new[component] == old[component].replace('"2103432.cobra.1"', '"2103433.cobra.1"')
     card = APP + 'InfinityLiveActivity$CobraPosterChannelCard;'
     before, after = methods(old[card]), methods(new[card])
     assert set(before) == set(after)
@@ -73,10 +79,14 @@ def verify(apk, prototype, jars, out):
     assert METHOD.sub('', old[card]) == METHOD.sub('', new[card])
     preview, layout = APP + 'CobraCardsLayout$PreviewBadge;', APP + 'CobraCardsLayout;'
     assert resolved_preview(old[preview], old[layout]) == resolved_preview(new[preview], new[layout])
+    native_changes = {card: delta}
+    if component in expected:
+        native_changes[component] = ['public static version()Ljava/lang/String;']
     proof = dict(status='PASS_EXACT_CLOSEOUT_DELTA_FROM_ACTUAL_SIGNED432',
         protected432_source='b53d4286759cee6707c8c2915cc5a0c9a3260336', protected432_APK_SHA256=APK_SHA,
         protected432_owner_DEX=DEX, prototype_existing_classes=len(old), unchanged_classes=len(old)-len(changed),
-        changed_classes=sorted(changed), existing_native_method_changes={card: delta}, new_or_removed_classes=[],
+        changed_classes=sorted(changed), existing_native_method_changes=native_changes, new_or_removed_classes=[],
+        candidate_component_version=component_version,
         prototype_DEX={p.name: sha(p) for p in (prototype/'owner-dex/COBRA').glob('*.dex')},
         compiler_source_files=json.loads((prototype/'BUILD.json').read_text())['compiler_source_files'],
         prototype_canonical_receipt_sha256=sha(prototype/'INDEPENDENT-CANONICAL-RESULT.json'),

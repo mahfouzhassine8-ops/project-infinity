@@ -37,6 +37,11 @@ REUSE = ["nativeReusePreservesScrollSelectionAndCurrentProgramme", "nativeImmedi
 LAYOUT = ["actualCardsRenderAtReferenceViewport", "cardsRestoresSharedNativeViewsInOtherModes",
           "truthfulLiveBadgeUsesNativeStatusAndPreservesActualPipPress", "activeAmbientPreservesNativeEffectsAndRecordsWrapping"]
 THEME = ["nativeCandidateColdAndWarmThemeCardsMobileControl"]
+CLOSEOUT = ["nativeWrappedMissingScheduleAndLivePeersShareMeasuredRows",
+            "nativeRowRecyclingAndContentChangesPreserveAnchors",
+            "nativeMoreAndRowTargetsKeepTheirCurrentChannelAfterGrowth",
+            "cardsHeaderAndRowsLeaveFourNativeModesUnchanged"]
+CLOSEOUT_HEADER_WEIGHT = 500
 GROUPS = [
     ("profile", "CobraProfileDataReuseTest", PROFILE, ["profile-reads/tests/CobraProfileDataReuseTest.java"]),
     ("projection", "CobraProjectionCorrectnessTest", PROJECTION, ["profile-reads/tests/CobraProjectionCorrectnessTest.java"]),
@@ -47,6 +52,8 @@ GROUPS = [
     ("layout", "CobraCardsLayoutTest", LAYOUT, ["layout-qa/CobraCardsLayoutTest.java"]),
     ("theme-publication", "CobraCardsThemeOrderControlTest", THEME,
      ["layout-qa/CobraCardsThemeOrderControlTest.java"]),
+    ("visual-closeout", "CobraCardsVisualCloseoutTest", CLOSEOUT,
+     ["visual-closeout/qa/CobraCardsVisualCloseoutTest.java"]),
 ]
 REFERENCES = {
     "presentation-qa/results/signed431-baseline/BASELINE.json": "afe37ff8ed00a442ee240efe425413df0cc9d57acb397993939844c16bab763d",
@@ -221,7 +228,8 @@ def run(baseline, trusted_host, out, maven):
     source_binding = sha(trusted / "SOURCE-BINDINGS.json")
     source_pins = dict(manifest["compiler_source_files"])
     source_pins[str(Path(__file__).resolve().relative_to(REPO))] = sha(Path(__file__))
-    for relative in ("cards-reuse/prepare_native.py", "cards-reuse/SCOPE.json", "layout-qa/prepare.py", "layout-qa/SCOPE.json"):
+    for relative in ("cards-reuse/prepare_native.py", "cards-reuse/SCOPE.json", "layout-qa/prepare.py", "layout-qa/SCOPE.json",
+                     "visual-closeout/qa/prepare.py", "visual-closeout/qa/SCOPE.json"):
         source_pins[str((HERE / relative).relative_to(REPO))] = sha(HERE / relative)
     golden_dir = HERE / "layout-qa/goldens/accepted431"
     golden_binding = read(golden_dir / "SOURCE-BINDING.json")
@@ -251,6 +259,11 @@ def run(baseline, trusted_host, out, maven):
                 require(read(folder / "SELECTION.json")["methods"] == methods, "Reuse selection changed")
             elif name == "layout":
                 module("cards_ci_layout_prepare", HERE / "layout-qa/prepare.py").prepare(trusted, folder, True, golden_dir)
+            elif name == "visual-closeout":
+                module("cards_ci_closeout_prepare", HERE / "visual-closeout/qa/prepare.py").prepare(
+                    trusted, golden_dir, folder, CLOSEOUT_HEADER_WEIGHT)
+                auxiliary = [HERE / "layout-qa/CobraCardsLayoutTest.java"]
+                require(read(folder / "SELECTION.json")["methods"] == methods, "Visual closeout selection changed")
             else:
                 if name == "logo":
                     auxiliary = [HERE.parent / "tests/CobraLogoWorkTest.java"]
@@ -261,6 +274,7 @@ def run(baseline, trusted_host, out, maven):
             output = folder / "measurements"
             props.update({"projection.output": str(output), "presentation.output": str(output), "reuse.output": str(output),
                           "cards.render.output": str(output), "cards.layout.output": str(output),
+                          "cards.closeout.output": str(output),
                           "profile.helper.expected": "true", "projection.expected.hidden.reads": "1",
                           "projection.phase": "FINAL_CURRENT_OWNER_CANDIDATE_CORRECTNESS_NO_TIMING",
                           "cards.render.phase": "CARDS_TILE_PROTOTYPE", "cards.candidate": "true",

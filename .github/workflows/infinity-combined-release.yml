@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       operation:
-        description: Sign reviewed2103432 Cards and Cobra performance candidate
+        description: Sign reviewed2103433 final Cards correction candidate
         type: choice
         required: true
         default: final-combined
@@ -139,10 +139,18 @@ jobs:
           name: Infinity-Combined-Original-Signer-40971769136
           github-token: ${{ github.token }}
           path: previous2103431
+      - name: Recover protected signed2103432 for final preservation comparison
+        uses: actions/download-artifact@v4
+        with:
+          run-id: 41021114800
+          name: Infinity-Combined-Original-Signer-41021114800
+          github-token: ${{ github.token }}
+          path: previous2103432
       - name: Verify signed APK and exact matching components; no runtime execution
         run: |
           python3 repairs/cobra-next-from-2103427/cards-from-2103431/verify_delivery.py \
             --baseline previous2103431/Infinity-2103431-Combined-Original-Signer.apk \
+            --previous previous2103432/Infinity-2103432-Combined-Original-Signer.apk \
             --signed signed-combined --bundles combined-build/components \
             --sdk "$ANDROID_HOME/build-tools/35.0.0"
       - name: Upload signed install-over candidate

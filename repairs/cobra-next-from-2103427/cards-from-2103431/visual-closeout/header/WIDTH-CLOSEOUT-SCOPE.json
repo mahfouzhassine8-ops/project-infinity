@@ -1,0 +1,44 @@
+{
+  "class": "CobraCardsHeaderCalibrationTest",
+  "methods": [
+    "finishApprovedHeaderWidth"
+  ],
+  "recorded_before_execution": true,
+  "checkpoint": "a6f7299f41e3e64055678681b3d65fbd0f2c91e9",
+  "authorization": "User explicitly authorized resolving final1px header width; root delegated genuine header typography-only calibration and surrounding geometry verification.",
+  "cases": [
+    {
+      "weight": 500,
+      "size_px": 42,
+      "tracking_em": 0.03
+    },
+    {
+      "weight": 500,
+      "size_px": 42,
+      "tracking_em": 0.0325
+    },
+    {
+      "weight": 500,
+      "size_px": 42,
+      "tracking_em": 0.035
+    },
+    {
+      "weight": 500,
+      "size_px": 42,
+      "tracking_em": 0.0375
+    }
+  ],
+  "criteria": "Referenceglyphbbox[136,24,250,57]; unchanged native entirehierarchygeometry and allpixels outsideheaderROI[125,15,300,65]; no widthscale, pixel/crop manipulation, or surroundinglayout changes. Choose smallesttrackingdelta amongexactgeometry equivalents.",
+  "source_binding_sha256": "a2011f367da1e289646492b8fb5f67e7e8cb17319373b681e3345c6b753773c6",
+  "classpath": {
+    "production.jar": "926bcc3bcc3b78d424742af38116d86f1f71367e1e429828e42f10e618cea92e",
+    "support.jar": "016a9ca405468cbc86fb6da8634e943ada67ffa615a3b804a1d9680fca84f1ad"
+  },
+  "test_sha256": "cf692824fc0de1df22b43a02c4601a62e352b519ff796b51fdeabf5b052fffa4",
+  "compiled_fixture_only": {
+    "CobraCardsLayoutTest.java": "d282188de62891e8f5aea1213c3c214f7697ce282f2ea8b04441b012f66d2525"
+  },
+  "production_source_before_sha256": "d125ac424595cf91bcea193f7c75bee6f68b824a2ab552a4770046eaba70d85f",
+  "POM_sha256": "9ccff74876f3483b69ed18fe8c717b964d6548d8592f9a124230c0acad25e2ad",
+  "selection_limit": "Exactlyone selectedJUnitmethod/fourfixedtrackingcases; oldmethods/fixture compileonly. NoAPK, Android, shutdown, unrelatedbehavior or performancebenchmarks."
+}

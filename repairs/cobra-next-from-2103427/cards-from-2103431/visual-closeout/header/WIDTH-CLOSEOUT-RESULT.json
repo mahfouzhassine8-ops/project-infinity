@@ -1,0 +1,99 @@
+{
+  "status": "FINAL_ONE_PIXEL_WIDTH_CORRECTED_HEADER_SOURCE_FROZEN",
+  "checkpoint": "a6f7299f41e3e64055678681b3d65fbd0f2c91e9",
+  "source": "runtime/CobraCardsLayout.java",
+  "source_before_sha256": "d125ac424595cf91bcea193f7c75bee6f68b824a2ab552a4770046eaba70d85f",
+  "source_sha256": "a93d8761c4bc9325afd259d02d2b94efe881b74d22769a27ece60db1cbc9422b",
+  "change": "Cards header name only: genuine native TextView letter spacing .030f\u2192.0325f; existing dedicated500face,42pxsize,color,anchor and surroundinglayout preserved.",
+  "selected_method": "CobraCardsHeaderCalibrationTest#finishApprovedHeaderWidth",
+  "JUnit": {
+    "tests": 1,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "exact_fixed_cases": 4,
+    "scope_sha256": "8c5e7cc53bab400b411a20b7729152b25cad73931a568256acbca2d950713839",
+    "test_sha256": "cf692824fc0de1df22b43a02c4601a62e352b519ff796b51fdeabf5b052fffa4",
+    "report_sha256": "207b5ce2333daff2e0c86a8d18e472763f2cf0765a1603cd312dfb940df35fc0",
+    "JUnit_sha256": "a319ea379c22c69a2f0cd6ddd902ae9ca09ace6cf0c3d11583b439235e225c9d"
+  },
+  "chosen": {
+    "bbox": [
+      136,
+      24,
+      250,
+      57
+    ],
+    "width": 114,
+    "height": 33,
+    "threshold_pixels": 1474,
+    "minRGB_peak": 240,
+    "weighted_ink": 1213.4680851064024,
+    "color_normalized_ink": 1296.2045454545664,
+    "relative_geometry_ink_error": 0.027538563749142774,
+    "requested_weight": 500,
+    "actual_weight": 500,
+    "tracking_em": 0.032499998807907104,
+    "size_px": 42,
+    "text_color": -986121,
+    "native_Canvas_PNG": "native-header-width-2.png",
+    "unchanged_geometry_nodes": 146,
+    "outside_header_ROI_changed_pixels": 0,
+    "exact_reference_bbox": true
+  },
+  "reference": {
+    "original_private_asset_sha256": "3a718b7731d45819a4d49f9b585725b7c9dd71ac547eb1171123b4acd21f2ff6",
+    "bbox": [
+      136,
+      24,
+      250,
+      57
+    ],
+    "normalized_ink": 1332.911
+  },
+  "proof": {
+    "genuine_native_Canvas": true,
+    "unchanged_native_geometry_nodes": 146,
+    "outside_header_ROI_changed_pixels": 0,
+    "ROI": [
+      125,
+      15,
+      300,
+      65
+    ],
+    "full_native_viewport": [
+      941,
+      1672
+    ],
+    "density_dpi": 420,
+    "criterion": "Choose smallesttrackingdifference amongcaseswith exacttargetbbox, unchanged surroundinggeometry andpixels.",
+    "chosen_actual_render_private": "/workspace/cobra-evidence/cards-header-width-closeout-a6f7299f/private-render/native-header-width-2.png"
+  },
+  "limits": "Native host calibration candidates on pinned previously verified owner interface, not finalcurrentowner integration or physicalSamsungacceptance. Glyphshape/exactfontidentity/pixelperfectidentity not claimed; normalizedink remains\u22122.75%.",
+  "SDK_compile": {
+    "status": "PASS",
+    "android_jar_sha256": "6cea1df3efb77103ac3e2beb9bf4718964b0e0869ab16d39d29d5cbae1c147ad",
+    "actual_owner_API_jar_sha256": "926bcc3bcc3b78d424742af38116d86f1f71367e1e429828e42f10e618cea92e",
+    "compiler_output_sha256": "ffa49de4cd17289c1067daecacfbf093ee256a2f58883f438cab2e70e24164df",
+    "class_count": 11,
+    "classes": {
+      "com/projectinfinity/kodi/CobraCardsLayout$AmbientPanel.class": "d194e2270848c9c00f8fe13bcbeb2fcf000ee639f6143a319f345a6b53529453",
+      "com/projectinfinity/kodi/CobraCardsLayout$ButtonSurface.class": "ad6386652c71029582f7bd82f77d78433c2543327449ca8a4f5874c54e3c2501",
+      "com/projectinfinity/kodi/CobraCardsLayout$LiveDot.class": "257bc03cc871b30f4c8cef9fa898f7db8567739c2797279553a1c223535777d0",
+      "com/projectinfinity/kodi/CobraCardsLayout$LiveSurface.class": "8e7cae3e2d60ba9d46340f42701db24b65635d6140e7a40bac592e56c84d065d",
+      "com/projectinfinity/kodi/CobraCardsLayout$PanelSurface.class": "db1b9c26ebaacf75220bf05b58b449897c5c80544475344ce939db05ad5d967f",
+      "com/projectinfinity/kodi/CobraCardsLayout$PreviewBadge.class": "f0dfb602ece62ebb51f9ea209f94d5430e5ef727ee03aa3bd05e2a1af9b99c21",
+      "com/projectinfinity/kodi/CobraCardsLayout$ProgressSurface.class": "3e8fde7ba1fd3f1e8bc66e8b6b1cf5d1199f4b3ccc7f2286b370f70caf7a1dca",
+      "com/projectinfinity/kodi/CobraCardsLayout$Slot.class": "0db9b4e80eceedc36ea9dca50a7b3f24f32cd190e9d185a1707af6e1bb7599aa",
+      "com/projectinfinity/kodi/CobraCardsLayout$Snapshot.class": "70d0af173b92c1bfdf2c47eb04591a74193a116c23eb5ed3578ddba629c140b3",
+      "com/projectinfinity/kodi/CobraCardsLayout$State.class": "97132c6f043fb5b9efffa8aaa1b729469ee2912101e3fd58f567a84aef2d7fdb",
+      "com/projectinfinity/kodi/CobraCardsLayout.class": "0f4cd99ecc0768072fdb07f120b9e29ea6364c1b39763b9c516edb99d740aefb"
+    }
+  },
+  "private_images": "Approvedoriginal andgeneratednativePNGsstayprivate; nonecopiedtorepository.",
+  "source_readiness": "Frozen andreadyforroot-selectedownerintegration; nofurtherheaderprobes.",
+  "APK": "NOT_BUILT",
+  "Android": "NOT_RUN",
+  "CI": "NOT_RUN",
+  "shutdown": "NOT_RUN"
+}

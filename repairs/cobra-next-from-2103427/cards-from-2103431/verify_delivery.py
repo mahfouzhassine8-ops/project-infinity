@@ -1,4 +1,4 @@
-"""Verify one original-key 432 install-over APK and its exact owner ZIPs.
+"""Verify one original-key 433 install-over APK and its exact owner ZIPs.
 
 No application execution, installation, acceptance update or shutdown test.
 ZIP page alignment is checked separately from frozen native ELF compatibility.
@@ -22,7 +22,11 @@ from inventory import CERT_SHA, PACKAGE, SIGNATURE, canonical, digest, file_sha,
 from component_bundles import read_bundle
 from release_gate import normalize_manifest, require
 from release_authority import launcher_icon_guard, transition
-from register_release import BASE_SOURCE, FROZEN, GENERATION, METADATA, TARGETS, VERSION, validate_payload
+from register_release import (BASE_SOURCE, PREVIOUS_RELEASE_SOURCE, FROZEN, GENERATION,
+    METADATA, TARGETS, VERSION, validate_payload)
+
+PREVIOUS_APK_SHA256 = '55671707e7acc8b1c329e5b87bdbe47706607418aa152b11b8889c3081a447c3'
+PREVIOUS_APK_BYTES = 778382638
 
 
 def run(args):
@@ -34,25 +38,31 @@ def member_sha(archive, name):
         return hashlib.file_digest(stream, 'sha256').hexdigest()
 
 
-def verify(baseline, signed, bundles, sdk):
+def verify(baseline, previous, signed, bundles, sdk):
     recovery = load(HERE / 'BASELINE.json')
     authority = load(signed / 'release-authority.json')
     receipt = load(signed / 'BUILD-RECEIPT.json')
-    previous = json.loads(run(['git', '-C', REPO, 'show', BASE_SOURCE +
+    prior_authority = json.loads(run(['git', '-C', REPO, 'show', PREVIOUS_RELEASE_SOURCE +
         ':repairs/dual-experience-isolation-2103420/release-authority.json']))
     require(authority == load(ISO / 'release-authority.json'), 'EXACT_CURRENT_AUTHORITY')
     require(authority['generation'] == GENERATION and authority['candidate_versionCode'] == VERSION and
-            set(authority['target_owners']) == set(TARGETS), 'EXACT432_OWNER_AUTHORITY')
-    transition(previous, authority, TARGETS)
+            set(authority['target_owners']) == set(TARGETS), 'EXACT433_OWNER_AUTHORITY')
+    require(prior_authority['generation'] == 17 and prior_authority['candidate_versionCode'] == 2103432,
+            'EXACT_SIGNED432_PREDECESSOR')
+    require(authority['previous_authority_sha256'] == digest(canonical(prior_authority)), 'EXACT_SIGNED432_LINEAGE')
+    transition(prior_authority, authority, TARGETS)
     require(receipt['registry_sha256'] == digest(canonical(authority)), 'AUTHORITY_RECEIPT_BINDING')
     require(receipt['versionCode'] == VERSION and receipt['source'] == os.environ.get('GITHUB_SHA', receipt['source']),
             'SIGNING_SOURCE_AND_VERSION')
     require(receipt['accepted_pointer_updated'] is False, 'NO_AUTOMATIC_ACCEPTANCE')
     require(file_sha(baseline) == recovery['APK_sha256'] and baseline.stat().st_size == recovery['APK_bytes'],
             'EXACT_ACCEPTED431_APK')
+    require(file_sha(previous) == PREVIOUS_APK_SHA256 and previous.stat().st_size == PREVIOUS_APK_BYTES,
+            'EXACT_PROTECTED432_APK')
     apk = signed / ('Infinity-' + str(VERSION) + '-Combined-Original-Signer.apk')
     require(file_sha(apk) == receipt['signed_apk_sha256'], 'SIGNED_APK_HASH')
-    for path, leaf in ((baseline, 'ACCEPTED431-ORIGINAL-SIGNATURE.txt'), (apk, 'ORIGINAL-SIGNATURE.txt')):
+    for path, leaf in ((baseline, 'ACCEPTED431-ORIGINAL-SIGNATURE.txt'),
+                       (previous, 'PROTECTED432-ORIGINAL-SIGNATURE.txt'), (apk, 'ORIGINAL-SIGNATURE.txt')):
         signature = run([sdk / 'apksigner', 'verify', '--verbose', '--print-certs', path])
         (signed / leaf).write_text(signature)
         require(re.findall(r'Signer #[0-9]+ certificate SHA-256 digest: ([0-9a-f]+)', signature) == [CERT_SHA],
@@ -63,7 +73,7 @@ def verify(baseline, signed, bundles, sdk):
     run([sdk / 'zipalign', '-c', '-P', '16', '4', apk])
     catalog = load(bundles / 'catalog.json')
     require(catalog == authority['bundle_catalog'], 'EXACT_MATCHING_COMPONENT_CATALOG')
-    payload, metas, changed_payload, added_payload = validate_payload(previous, catalog, bundles)
+    payload, metas, changed_payload, added_payload = validate_payload(prior_authority, catalog, bundles)
     require(payload == authority['payload'], 'EXACT_AUTHORITY_COMPONENT_PAYLOAD')
     for owner in FROZEN:
         row = catalog['bundles'][owner]
@@ -79,7 +89,7 @@ def verify(baseline, signed, bundles, sdk):
         for name, pin in sorted(meta['dex'].items()):
             dex_index += 1
             expected_dex['classes' + (str(dex_index) if dex_index > 1 else '') + '.dex'] = (owner, pin)
-    changed_members, native = set(), {}
+    changed_members, previous_changes, native, actual_hashes = set(), set(), {}, {}
     with ZipFile(baseline) as old, ZipFile(apk) as new:
         old_names = set(validate_names(old)) - SIGNATURE
         new_names = set(validate_names(new)) - SIGNATURE
@@ -91,13 +101,14 @@ def verify(baseline, signed, bundles, sdk):
                 'MANIFEST_TYPED_VERSION_ONLY')
         for name in sorted(new_names - {'AndroidManifest.xml'}):
             after = member_sha(new, name)
+            actual_hashes[name] = after
             if name in expected_dex:
                 owner, pin = expected_dex[name]
                 require(after == pin, 'COMPONENT_APK_DEX_MISMATCH:' + name)
                 if owner != 'COBRA':
                     require(name in old_names and member_sha(old, name) == after, 'FROZEN_OWNER_APK_DEX:' + owner)
             elif name == METADATA:
-                require(new.read(name) == b'infinity.last_updated_in=2103427\ncobra.last_updated_in=2103432\n',
+                require(new.read(name) == b'infinity.last_updated_in=2103427\ncobra.last_updated_in=2103433\n',
                         'GENUINE_COMPONENT_LABELS')
             else:
                 require(name in old_names and member_sha(old, name) == after, 'FROZEN_APK_MEMBER:' + name)
@@ -116,7 +127,7 @@ def verify(baseline, signed, bundles, sdk):
                     require(a == b, 'COMPONENT_APK_MEMBER_MISMATCH:' + name)
         # Preserve authenticated first-party Infinity bytes and verify the same
         # detached original-key module signature independently of APK signing.
-        with tempfile.TemporaryDirectory(prefix='infinity432-module-verification-') as temporary:
+        with tempfile.TemporaryDirectory(prefix='infinity433-module-verification-') as temporary:
             temp = Path(temporary)
             for leaf in ('INFINITY-MODULES.v1', 'INFINITY-MODULES.v1.sig'):
                 name = 'assets/addons/script.infinity.commandcenter/' + leaf
@@ -125,23 +136,42 @@ def verify(baseline, signed, bundles, sdk):
             run(['openssl', 'dgst', '-sha256', '-verify',
                 REPO / 'repairs/infinity-final-closure-2103407/ORIGINAL-INFINITY-PUBLIC-KEY.pem',
                 '-signature', temp / 'INFINITY-MODULES.v1.sig', temp / 'INFINITY-MODULES.v1'])
+        # The compiler still reproduces the reviewed owner from exact431.
+        # Independently check install-over and preservation against delivered432.
+        with ZipFile(previous) as prior:
+            require(set(validate_names(prior)) - SIGNATURE == new_names, 'EXACT432_TO433_APK_MEMBER_SET')
+            prior_manifest, prior_version = normalize_manifest(prior.read('AndroidManifest.xml'))
+            require(prior_version == 2103432 and normalize_manifest(new.read('AndroidManifest.xml')) ==
+                    (prior_manifest, VERSION) and VERSION > prior_version, 'INSTALL_OVER432_MANIFEST_VERSION_ONLY')
+            require(prior.read(METADATA) == b'infinity.last_updated_in=2103427\ncobra.last_updated_in=2103432\n',
+                    'EXACT432_COMPONENT_LABELS')
+            allowed = {name for name, (owner, _) in expected_dex.items() if owner == 'COBRA'} | {METADATA}
+            for name, after in actual_hashes.items():
+                if member_sha(prior, name) != after:
+                    require(name in allowed, 'FROZEN432_APK_MEMBER:' + name)
+                    previous_changes.add(name)
+            require(METADATA in previous_changes and any(expected_dex.get(name, (None,))[0] == 'COBRA'
+                    for name in previous_changes), 'EXACT432_CARDS_AND_VERSION_DELTA_PRESENT')
     icon_proof = launcher_icon_guard().verify_actual_apk(apk, authority)
-    require(authority['launcher_icon_exception'] == previous['launcher_icon_exception'], 'FROZEN_APPROVED_ICON_EXCEPTION')
-    require(authority['protected_contract'] == previous['protected_contract'], 'FROZEN_PROTECTED_CONTRACT')
-    report = dict(status='SIGNED432_INSTALL_OVER_OWNER_COMPONENTS_VERIFIED', versionCode=VERSION,
+    require(authority['launcher_icon_exception'] == prior_authority['launcher_icon_exception'], 'FROZEN_APPROVED_ICON_EXCEPTION')
+    require(authority['protected_contract'] == prior_authority['protected_contract'], 'FROZEN_PROTECTED_CONTRACT')
+    report = dict(status='SIGNED433_INSTALL_OVER_OWNER_COMPONENTS_VERIFIED', versionCode=VERSION,
         signing_source=receipt['source'], producer_source=authority['owner_update_evidence']['producer_source'],
         producer_run=authority['owner_update_evidence']['producer_run'], build_run=os.environ.get('GITHUB_RUN_ID'),
         package=PACKAGE, certificate_sha256=CERT_SHA, signature_schemes=['v1', 'v2', 'v3'],
         apk_sha256=file_sha(apk), apk_bytes=apk.stat().st_size, component_sha256=component_sha,
         recovery_versionCode=2103431, recovery_source=BASE_SOURCE, recovery_APK_sha256=recovery['APK_sha256'],
+        previous_versionCode=2103432, previous_source=PREVIOUS_RELEASE_SOURCE,
+        previous_APK_sha256=PREVIOUS_APK_SHA256, changed_APK_members_from432=sorted(previous_changes),
         changed_APK_members=sorted(changed_members), changed_existing_payload=sorted(changed_payload),
         added_Cobra_helpers=sorted(added_payload), manifest_change='Typed versionCode only',
         Infinity='EXACT_ACCEPTED431_ZIP; Infinity implementation remains2103427',
-        minimal_Android_native_and_icons='EXACT_ACCEPTED431_ZIP', chooser='EXACT431_DEX_UI; Cobra last-updated metadata only',
+        minimal_Android_native_and_icons='EXACT_ACCEPTED431_AND_PROTECTED432_ZIP',
+        chooser='EXACT432_DEX_UI; Cobra last-updated metadata only',
         unchanged_native_libraries=len(native), launcher_icons=icon_proof,
         zip_alignment='PASS zipalign -P16; does not establish ELF segment compatibility',
         native_ELF_compatibility='UNCHANGED431; no native patch or new ELF compatibility claim',
-        protected_contract='EXACT431', shutdown_tests='NOT_RUN', actual_device_install='NOT_RUN',
+        protected_contract='EXACT432', shutdown_tests='NOT_RUN', actual_device_install='NOT_RUN',
         physical_Fold='USER_ACCEPTANCE_PENDING', accepted_pointer_updated=False, lock_promoted=False)
     save(signed / 'DELIVERY-VERIFICATION.json', report)
     (signed / 'SHA256SUMS').write_text(file_sha(apk) + '  ' + apk.name + '\n')
@@ -151,6 +181,6 @@ def verify(baseline, signed, bundles, sdk):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    for name in ('baseline', 'signed', 'bundles', 'sdk'):
+    for name in ('baseline', 'previous', 'signed', 'bundles', 'sdk'):
         parser.add_argument('--' + name, type=Path, required=True)
     verify(**vars(parser.parse_args()))

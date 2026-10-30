@@ -330,7 +330,7 @@ public final class CobraCardsLayout {
       TextView name=(TextView)read(a,"mCobraModeTitle"),sub=(TextView)read(a,"mCobraModeSub");
       snapshot(header,name);if(!header.containsKey(sub))nativeSub=sub.getText();snapshot(header,sub);snapshot(header,labelBox);
       labelBox.setPadding(0,0,0,0);if(labelBox instanceof LinearLayout)((LinearLayout)labelBox).setGravity(Gravity.CENTER_VERTICAL);
-      style(name,HEADER_FACE,WHITE,42,1);name.setLetterSpacing(.03f);text(name,"Cobra");
+      style(name,HEADER_FACE,WHITE,42,1);name.setLetterSpacing(.0325f);text(name,"Cobra");
       style(sub,NORMAL,MUTED,17,1);sub.setLetterSpacing(.12f);
       headerCount(a,sub);
     }

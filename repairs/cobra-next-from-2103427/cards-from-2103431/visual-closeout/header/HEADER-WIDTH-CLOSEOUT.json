@@ -1,0 +1,113 @@
+{
+  "status": "EXACT_REFERENCE_BBOX_AVAILABLE",
+  "cases": [
+    {
+      "bbox": [
+        136,
+        24,
+        249,
+        57
+      ],
+      "width": 113,
+      "height": 33,
+      "threshold_pixels": 1474,
+      "minRGB_peak": 240,
+      "weighted_ink": 1213.4680851064024,
+      "color_normalized_ink": 1296.2045454545664,
+      "relative_geometry_ink_error": 0.03631049357370418,
+      "requested_weight": 500,
+      "actual_weight": 500,
+      "tracking_em": 0.029999999329447746,
+      "size_px": 42,
+      "text_color": -986121,
+      "native_Canvas_PNG": "native-header-width-1.png",
+      "unchanged_geometry_nodes": 146,
+      "outside_header_ROI_changed_pixels": 0,
+      "exact_reference_bbox": false
+    },
+    {
+      "bbox": [
+        136,
+        24,
+        250,
+        57
+      ],
+      "width": 114,
+      "height": 33,
+      "threshold_pixels": 1474,
+      "minRGB_peak": 240,
+      "weighted_ink": 1213.4680851064024,
+      "color_normalized_ink": 1296.2045454545664,
+      "relative_geometry_ink_error": 0.027538563749142774,
+      "requested_weight": 500,
+      "actual_weight": 500,
+      "tracking_em": 0.032499998807907104,
+      "size_px": 42,
+      "text_color": -986121,
+      "native_Canvas_PNG": "native-header-width-2.png",
+      "unchanged_geometry_nodes": 146,
+      "outside_header_ROI_changed_pixels": 0,
+      "exact_reference_bbox": true
+    },
+    {
+      "bbox": [
+        136,
+        24,
+        250,
+        57
+      ],
+      "width": 114,
+      "height": 33,
+      "threshold_pixels": 1474,
+      "minRGB_peak": 240,
+      "weighted_ink": 1213.4680851064024,
+      "color_normalized_ink": 1296.2045454545664,
+      "relative_geometry_ink_error": 0.027538563749142774,
+      "requested_weight": 500,
+      "actual_weight": 500,
+      "tracking_em": 0.03500000014901161,
+      "size_px": 42,
+      "text_color": -986121,
+      "native_Canvas_PNG": "native-header-width-3.png",
+      "unchanged_geometry_nodes": 146,
+      "outside_header_ROI_changed_pixels": 0,
+      "exact_reference_bbox": true
+    },
+    {
+      "bbox": [
+        136,
+        24,
+        251,
+        57
+      ],
+      "width": 115,
+      "height": 33,
+      "threshold_pixels": 1474,
+      "minRGB_peak": 240,
+      "weighted_ink": 1213.4680851064024,
+      "color_normalized_ink": 1296.2045454545664,
+      "relative_geometry_ink_error": 0.03631049357370418,
+      "requested_weight": 500,
+      "actual_weight": 500,
+      "tracking_em": 0.03750000149011612,
+      "size_px": 42,
+      "text_color": -986121,
+      "native_Canvas_PNG": "native-header-width-4.png",
+      "unchanged_geometry_nodes": 146,
+      "outside_header_ROI_changed_pixels": 0,
+      "exact_reference_bbox": false
+    }
+  ],
+  "reference_bbox": [
+    136,
+    24,
+    250,
+    57
+  ],
+  "reference_color_normalized_ink": 1332.911,
+  "criteria": "Preserve anchor136,24 andheight33, matchwidth114; allnativehierarchygeometry and allpixelsoutsideheaderROI mustremainidentical; smallesttrackingdelta wins amongsamegeometry\/ink",
+  "fixture": "Actual native Cards shell and header TextView, real native Canvas; four declared tracking cases only",
+  "Android": "NOT_RUN",
+  "shutdown": "NOT_RUN",
+  "exact_font_identity": "NOT_CLAIMED"
+}

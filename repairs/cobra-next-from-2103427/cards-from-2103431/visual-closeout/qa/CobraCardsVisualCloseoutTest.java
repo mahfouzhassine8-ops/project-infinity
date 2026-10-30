@@ -1,6 +1,9 @@
 package com.projectinfinity.kodi;
 
 import android.app.Application;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Looper;
 import android.os.SystemClock;
@@ -9,6 +12,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
@@ -49,6 +53,27 @@ public class CobraCardsVisualCloseoutTest {
   static View more(View card){View result=null;for(View v:descendants(card))if(v.getClass().getName().endsWith("CobraCardsTiles$MoreView")){assertNull(result);result=v;}assertNotNull("actual Cards More target",result);return result;}
   static TextView brand(CobraCardsLayoutTest.Fixture f)throws Exception{for(View v:descendants((View)get(f.a,"mCobraModeToolbar")))if(v instanceof TextView&&((TextView)v).getText().toString().equals("Cobra"))return (TextView)v;throw new AssertionError("Native header brand missing");}
   static void header(CobraCardsLayoutTest.Fixture f)throws Exception{TextView title=brand(f);int expected=Integer.getInteger("cards.closeout.header.weight",-1);assertTrue("Root's reference-calibrated header weight must be recorded",expected>0);assertEquals("Only reference-calibrated Cards brand face",expected,title.getTypeface().getWeight());}
+  static void headerRaster(CobraCardsLayoutTest.Fixture f)throws Exception{
+    TextView title=brand(f);View decor=f.a.getWindow().getDecorView();assertEquals(941,decor.getWidth());assertEquals(1672,decor.getHeight());
+    Bitmap bitmap=Bitmap.createBitmap(decor.getWidth(),decor.getHeight(),Bitmap.Config.ARGB_8888);
+    try{
+      Canvas canvas=new Canvas(bitmap);canvas.drawColor(Color.BLACK);decor.draw(canvas);
+      int left=bitmap.getWidth(),top=bitmap.getHeight(),right=0,bottom=0,count=0;
+      // Root-selected global ROI includes x125..264/y15..64. Maxima below
+      // are exclusive, exactly as in the independent native calibration.
+      for(int y=15;y<65;y++)for(int x=125;x<265;x++){
+        int pixel=bitmap.getPixel(x,y),low=Math.min(Color.red(pixel),Math.min(Color.green(pixel),Color.blue(pixel))),high=Math.max(Color.red(pixel),Math.max(Color.green(pixel),Color.blue(pixel)));
+        if(low>70&&high-low<40){left=Math.min(left,x);top=Math.min(top,y);right=Math.max(right,x+1);bottom=Math.max(bottom,y+1);count++;}
+      }
+      Rect actual=new Rect(left,top,right,bottom),expected=new Rect(136,24,250,57);Files.createDirectories(output());
+      try(OutputStream stream=Files.newOutputStream(output().resolve("native-final-header-decor.png"))){assertTrue(bitmap.compress(Bitmap.CompressFormat.PNG,100,stream));}
+      write("native-final-header-raster",new JSONObject().put("bbox",new JSONArray(new int[]{left,top,right,bottom})).put("expected_bbox",new JSONArray(new int[]{136,24,250,57})).put("roi_inclusive",new JSONArray(new int[]{125,15,264,64})).put("mask","minRGB>70 && maxRGB-minRGB<40").put("threshold_pixels",count).put("size_px",title.getTextSize()).put("tracking_em",title.getLetterSpacing()).put("weight",title.getTypeface().getWeight()).put("native_Canvas_root",decor.getClass().getName()).put("reference_png_in_repository",false));
+      assertTrue("Actual current-owner header glyph pixels required",count>0);
+      assertEquals("Reference-calibrated native header text size",42f,title.getTextSize(),.0001f);
+      assertEquals("Reference-calibrated final native header tracking",.0325f,title.getLetterSpacing(),.000001f);
+      assertEquals("Current-owner native raster matches approved header anchor and114x33px extent",expected,actual);
+    }finally{bitmap.recycle();}
+  }
   @Before public void controlledNativeSetup()throws Exception{
     assertTrue("Explicit authorized closeout candidate phase",Boolean.getBoolean("cards.closeout.candidate"));
     new CobraCardsLayoutTest().frames();previews.clear();peeks.clear();guideProjections=0;currentProjections=0;
@@ -110,7 +135,7 @@ public class CobraCardsVisualCloseoutTest {
     return report.put("actual_content_and_footer",content);
   }
   @Test public void nativeWrappedMissingScheduleAndLivePeersShareMeasuredRows()throws Exception{
-    Rows r=new Rows();header(r.f);Object missing=r.items.get(0);assertNull(call(r.f.a,"cobraCurrentProgram",missing));String status=String.valueOf(call(r.f.a,"cobraGuideStatus",missing));TextView label=(TextView)get(r.card(0),"now");assertEquals("actual native status, no fabricated text",status,label.getText().toString());assertTrue("reference-like genuine missing status wraps",label.getLayout().getLineCount()>=2);assertEquals(0,label.getLayout().getEllipsisCount(label.getLayout().getLineCount()-1));
+    Rows r=new Rows();header(r.f);headerRaster(r.f);Object missing=r.items.get(0);assertNull(call(r.f.a,"cobraCurrentProgram",missing));String status=String.valueOf(call(r.f.a,"cobraGuideStatus",missing));TextView label=(TextView)get(r.card(0),"now");assertEquals("actual native status, no fabricated text",status,label.getText().toString());assertTrue("reference-like genuine missing status wraps",label.getLayout().getLineCount()>=2);assertEquals(0,label.getLayout().getEllipsisCount(label.getLayout().getLineCount()-1));
     View first=r.card(0),peer=r.card(1);JSONObject report=row(first,peer);assertTrue("next row starts below taller pair",r.card(2).getTop()>=first.getBottom()+r.grid.getVerticalSpacing());assertTrue("wrapped row grows beyond short row",first.getHeight()>r.card(2).getHeight());
     assertEquals(View.GONE,((View)get(first,"progress")).getVisibility());assertEquals(View.VISIBLE,((View)get(peer,"progress")).getVisibility());
     report.put("native_status",status).put("native_live_title",((TextView)get(peer,"now")).getText()).put("next_pair",row(r.card(2),r.card(3))).put("geometry",r.f.geometry()).put("header_weight",brand(r.f).getTypeface().getWeight()).put("private_reference_png_in_repository",false);write("native-mixed-paired-rows",report);r.f.image("native-mixed-reference-length-rows");
