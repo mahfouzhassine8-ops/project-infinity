@@ -85,7 +85,7 @@ def owner_id(node):
 
 def frame_call(rect, control, *, global_frame=False, window="10000"):
     params = dict(rect)
-    params.update(control=control, window=window, globalframe='true' if global_frame else 'false')
+    params.update(control=control, window=window, globalframe='true' if global_frame else 'false', inheritwindow='true' if window=='0' else 'false')
     return ('\n<!-- ' + MARKER + ' -->\n<include content="InfinityActionLoadingFrame">' +
             ''.join('<param name="%s" value="%s" />' % (k, escape(v, quote=True)) for k, v in params.items()) +
             '</include>\n').encode()
@@ -230,18 +230,18 @@ def definitions():
     # must match an actual supported active window as well as its item identity.
     current = ' | '.join('[Window.IsActive(%s) + String.IsEqual(Window(Home).Property(Infinity.Loading.Window),%s)]' % (wid,wid)
                          for wid in ('10000','10025','11193','10134'))
-    owned = '[[!String.IsEqual($PARAM[window],0) + String.IsEqual(Window(Home).Property(Infinity.Loading.Window),$PARAM[window])] | [String.IsEqual($PARAM[window],0) + [' + current + ']]]'
+    owned = '[[!$PARAM[inheritwindow] + String.IsEqual(Window(Home).Property(Infinity.Loading.Window),$PARAM[window])] | [$PARAM[inheritwindow] + [' + current + ']]]' 
     return b'''<?xml version="1.0" encoding="utf-8"?>
 <includes>
   <!-- INFINITY_ACTION_LOADING_V1: original frame rectangles, additive glint only -->
   <include name="InfinityActionLoadingFrame">
     <param name="left" /><param name="top" /><param name="width" /><param name="height" />
-    <param name="control" default="0" /><param name="window" default="10000" /><param name="globalframe" default="false" />
+    <param name="control" default="0" /><param name="window" default="10000" /><param name="globalframe" default="false" /><param name="inheritwindow" default="false" />
     <definition>
       <control type="group">
         <description>Infinity current action loading</description>
         <left>$PARAM[left]</left><top>$PARAM[top]</top><width>$PARAM[width]</width><height>$PARAM[height]</height>
-        <visible>[String.IsEqual($PARAM[window],0) | Window.IsActive($PARAM[window])] + [[!$PARAM[globalframe] + String.IsEqual(Window(Home).Property(Infinity.Loading.Active),true) + OWNED_WINDOW + String.IsEqual(Window(Home).Property(Infinity.Loading.Control),$PARAM[control]) + Control.IsVisible($PARAM[control]) + Control.HasFocus($PARAM[control]) + String.IsEqual(Container($PARAM[control]).CurrentItem,Window(Home).Property(Infinity.Loading.Item)) + String.IsEqual(Container($PARAM[control]).ListItem.Property(section),Window(Home).Property(Infinity.Loading.Section)) + String.IsEqual(Container($PARAM[control]).ListItem.Property(hubsource),Window(Home).Property(Infinity.Loading.Source)) + String.IsEqual(Container($PARAM[control]).ListItem.Property(Addon.ID),Window(Home).Property(Infinity.Loading.Addon)) + String.IsEqual(Container($PARAM[control]).ListItem.DBID,Window(Home).Property(Infinity.Loading.Dbid)) + String.IsEqual(Container(9000).ListItem.Property(section),Window(Home).Property(Infinity.Loading.HomeSection)) + String.IsEqual(Container(9000).ListItem.Property(hubsource),Window(Home).Property(Infinity.Loading.HomeSource))] | [$PARAM[globalframe] + ![String.IsEqual(Window(Home).Property(Infinity.Loading.Active),true) + OWNED_WINDOW] + [String.IsEqual(Window(Home).Property(Infinity.Loading.Global),true) | Window.IsActive(busydialog) | Window.IsActive(busydialognocancel)]]] + !Player.IsFullscreen</visible>
+        <visible>[$PARAM[inheritwindow] | Window.IsActive($PARAM[window])] + [[!$PARAM[globalframe] + String.IsEqual(Window(Home).Property(Infinity.Loading.Active),true) + OWNED_WINDOW + String.IsEqual(Window(Home).Property(Infinity.Loading.Control),$PARAM[control]) + Control.IsVisible($PARAM[control]) + Control.HasFocus($PARAM[control]) + String.IsEqual(Container($PARAM[control]).CurrentItem,Window(Home).Property(Infinity.Loading.Item)) + String.IsEqual(Container($PARAM[control]).ListItem.Property(section),Window(Home).Property(Infinity.Loading.Section)) + String.IsEqual(Container($PARAM[control]).ListItem.Property(hubsource),Window(Home).Property(Infinity.Loading.Source)) + String.IsEqual(Container($PARAM[control]).ListItem.Property(Addon.ID),Window(Home).Property(Infinity.Loading.Addon)) + String.IsEqual(Container($PARAM[control]).ListItem.DBID,Window(Home).Property(Infinity.Loading.Dbid)) + String.IsEqual(Container(9000).ListItem.Property(section),Window(Home).Property(Infinity.Loading.HomeSection)) + String.IsEqual(Container(9000).ListItem.Property(hubsource),Window(Home).Property(Infinity.Loading.HomeSource))] | [$PARAM[globalframe] + ![String.IsEqual(Window(Home).Property(Infinity.Loading.Active),true) + CURRENT_OWNER_WINDOW] + [String.IsEqual(Window(Home).Property(Infinity.Loading.Global),true) | Window.IsActive(busydialog) | Window.IsActive(busydialognocancel)]]] + !Player.IsFullscreen</visible>
         <control type="image">
           <left>0</left><top>0</top><width>100%</width><height>100%</height>
           <texture border="18" background="true" colordiffuse="$VAR[InfinityCollectiveFrameColor]">infinity_ui/action_loading.gif</texture>
@@ -256,7 +256,7 @@ def definitions():
     </definition>
   </include>
 </includes>
-'''.replace(b'OWNED_WINDOW', owned.encode())
+'''.replace(b'OWNED_WINDOW', owned.encode()).replace(b'CURRENT_OWNER_WINDOW', ('['+current+']').encode())
 
 
 def glint_textures():

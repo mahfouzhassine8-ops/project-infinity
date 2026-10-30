@@ -101,5 +101,13 @@
     },
     "preservation_tests": "Exactly4 current-window cases plus3 listed actual XML/action/service-source preservation checks. Original token/parser/provider/worker suites retain434 bound evidence; they are not rerun as an unrelated matrix.",
     "first_positive_result": "5PASS/1FAIL/1ERROR retained. Actual native frame omitted left/top (Kodi default0), so generator skipped it; accept zero defaults only absent opposite/center anchors. Inactive16x9Busy differs from current unified geometry: leave ALL inactive resolution XML byte-identical to signed433, rather than remove its feedback. Semantic preservation now checks every touched actual unified file and requires native list + Home/Videos/Includes/CinemaBrowse/Busy explicitly, replacing irrelevant duplicate-layout count. Same7checks remain selected."
+  },
+  "native_expression_review_selected_before_execution": {
+    "source": "xbmc/xbmc Omega xbmc/GUIInfoManager.cpp",
+    "file_git_blob_sha": "b54aebd1f674f92118c50362c7ba1306ac2f2c71",
+    "actual_source_review": "TranslateSingleString String.IsEqual translates its FIRST argument as an info label; literal0 is not a valid first info. Existing host condition reader incorrectly treated it as a literal. New unshipped generator uses String.IsEqual($PARAM[window],0), which expands to invalid native String.IsEqual(0,0).",
+    "correction": "Use explicit inherited-window boolean include parameter, native literal true/false expressions, keep String.IsEqual first operands real Window/Container info labels. Honor foreground primary precedence for Home behind native Favorites dialog.",
+    "selected": "Same7 current-window/integration methods, refine actual-expression model to reject literal first info arguments; first run against previously staged506e7033 to retain negative evidence. No new runtime/native test or installed-native-source equivalence claim.",
+    "native_libraries": "UNCHANGED"
   }
 }

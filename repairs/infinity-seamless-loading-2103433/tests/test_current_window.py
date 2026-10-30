@@ -50,7 +50,10 @@ class Conditions:
             for index, char in enumerate(raw):
                 depth += (char == '(') - (char == ')')
                 if char == ',' and depth == 0:
-                    return self.value(raw[:index]) == self.value(raw[index+1:])
+                    first = raw[:index].strip()
+                    if not first.startswith(('Window(Home).Property(', 'Container(')):
+                        raise AssertionError('Kodi String.IsEqual first argument must be a real info label: ' + first)
+                    return self.value(first).lower() == self.value(raw[index+1:]).lower()
         raise AssertionError('Unmodeled generated skin condition: ' + text)
 
     def evaluate(self, text):
@@ -149,6 +152,12 @@ class CurrentWindowLoadingTest(unittest.TestCase):
             'Infinity.Loading.Active': 'true', 'Infinity.Loading.Window': '10025'})))
         self.assertTrue(frame_visible(call, Conditions((10025, 'busydialog'), properties={
             'Infinity.Loading.Active': 'true', 'Infinity.Loading.Window': '10000'})))
+        home = ET.parse(SKIN / 'Home.xml').getroot()
+        drawer = next(n for n in home.iter('include') if n.get('content') == 'InfinityActionLoadingFrame'
+                      and parameters(n)['globalframe'] == 'true')
+        self.assertFalse(frame_visible(drawer, Conditions((10000,10134,'busydialog'), properties={
+            'Infinity.Loading.Active':'true','Infinity.Loading.Window':'10134'})),
+            'Visible foreground Favorite owns the cue; underlying Home drawer must stay quiet')
 
     def test_native_video_frame_keeps_window_focus_and_source_ownership(self):
         path = SKIN / 'View_50_List.xml'
