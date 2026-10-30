@@ -1,0 +1,153 @@
+{
+  "scope": "QA_ONLY_ACTUAL_SAVED_XML_WITH_MOCKED_ADB; NO_APP_EXECUTION",
+  "fixture_modal_sha256": "68a58a27a77b5522ad322a1ac957b5b8bda608be6c1e569280957bf2c6a36ce1",
+  "fixture_welcome_sha256": "854d179ba7444b7053b95ab1efd8b714e3bf899772d3776d9d335576b179d86b",
+  "cases": [
+    {
+      "case": "actual_modal_once_then_actual_welcome",
+      "result": "PASS",
+      "expected_status": "KNOWN_NOTICE_ACKNOWLEDGED_ONCE",
+      "injected_OK_presses": 1,
+      "observed_error": null,
+      "evidence_files": [
+        "OUTCOME.json",
+        "after-OK.xml",
+        "fresh-before-OK.xml",
+        "observed.png",
+        "observed.xml"
+      ]
+    },
+    {
+      "case": "actual_welcome_no_dialog",
+      "result": "PASS",
+      "expected_status": "NO_KNOWN_NOTICE_OBSERVED",
+      "injected_OK_presses": 0,
+      "observed_error": null,
+      "evidence_files": [
+        "OUTCOME.json",
+        "observed.xml"
+      ]
+    },
+    {
+      "case": "missing_authenticated_native_paths",
+      "result": "PASS",
+      "expected_status": "REJECTED",
+      "injected_OK_presses": 0,
+      "observed_error": "Unrecognized Android dialog refused after Cobra launch",
+      "evidence_files": [
+        "OUTCOME.json",
+        "observed.xml"
+      ]
+    },
+    {
+      "case": "unrecognized_title",
+      "result": "PASS",
+      "expected_status": "REJECTED",
+      "injected_OK_presses": 0,
+      "observed_error": "Unrecognized Android dialog refused after Cobra launch",
+      "evidence_files": [
+        "OUTCOME.json",
+        "observed.xml"
+      ]
+    },
+    {
+      "case": "unrecognized_message",
+      "result": "PASS",
+      "expected_status": "REJECTED",
+      "injected_OK_presses": 0,
+      "observed_error": "Unrecognized Android dialog refused after Cobra launch",
+      "evidence_files": [
+        "OUTCOME.json",
+        "observed.xml"
+      ]
+    },
+    {
+      "case": "wrong_OK_identity",
+      "result": "PASS",
+      "expected_status": "REJECTED",
+      "injected_OK_presses": 0,
+      "observed_error": "Unrecognized Android dialog refused after Cobra launch",
+      "evidence_files": [
+        "OUTCOME.json",
+        "observed.xml"
+      ]
+    },
+    {
+      "case": "unknown_native_library",
+      "result": "PASS",
+      "expected_status": "REJECTED",
+      "injected_OK_presses": 0,
+      "observed_error": "Unrecognized Android dialog refused after Cobra launch",
+      "evidence_files": [
+        "OUTCOME.json",
+        "observed.xml"
+      ]
+    },
+    {
+      "case": "repeated_notice_after_one_OK",
+      "result": "PASS",
+      "expected_status": "REJECTED",
+      "injected_OK_presses": 1,
+      "observed_error": "Repeated or unrecognized Android dialog refused after one OK",
+      "evidence_files": [
+        "OUTCOME.json",
+        "after-OK.xml",
+        "fresh-before-OK.xml",
+        "observed.png",
+        "observed.xml"
+      ]
+    },
+    {
+      "case": "unexpected_dialog_after_OK",
+      "result": "PASS",
+      "expected_status": "REJECTED",
+      "injected_OK_presses": 1,
+      "observed_error": "Repeated or unrecognized Android dialog refused after one OK",
+      "evidence_files": [
+        "OUTCOME.json",
+        "after-OK.xml",
+        "fresh-before-OK.xml",
+        "observed.png",
+        "observed.xml"
+      ]
+    },
+    {
+      "case": "fresh_bounds_change_no_press",
+      "result": "PASS",
+      "expected_status": "REJECTED",
+      "injected_OK_presses": 0,
+      "observed_error": "Compatibility notice changed before acknowledgement; no press injected",
+      "evidence_files": [
+        "OUTCOME.json",
+        "fresh-before-OK.xml",
+        "observed.png",
+        "observed.xml"
+      ]
+    },
+    {
+      "case": "non_PNG_capture_no_press",
+      "result": "PASS",
+      "expected_status": "REJECTED",
+      "injected_OK_presses": 0,
+      "observed_error": "Compatibility notice PNG required before acknowledgement",
+      "evidence_files": [
+        "OUTCOME.json",
+        "observed.xml"
+      ]
+    },
+    {
+      "case": "wrong_launch_no_observation",
+      "result": "PASS",
+      "expected_status": "REJECTED",
+      "injected_OK_presses": 0,
+      "observed_error": "Expected Cobra Activity launch required"
+    },
+    {
+      "case": "unsuccessful_launch_no_observation",
+      "result": "PASS",
+      "expected_status": "REJECTED",
+      "injected_OK_presses": 0,
+      "observed_error": "Successful Cobra launch required before OS notice observation"
+    }
+  ]
+}

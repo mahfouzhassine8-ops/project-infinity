@@ -1,0 +1,171 @@
+{
+  "scope": "UNCHANGED_SIGNED431_NORMAL_SETTINGS_AND_NATIVE_ALL_APPS_ICON_SURFACES",
+  "receipt_apk_sha256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471",
+  "versionCode": 2103431,
+  "APK_binding": "Parent signature/hash/install probe binds the exact signed APK",
+  "Infinity": "NOT_LAUNCHED",
+  "shutdown": "NOT_RUN",
+  "physical_Samsung": "NOT_RUN",
+  "appearance": "NOT_ASSERTED; INSPECT_NATIVE_FRAMES",
+  "operations": [
+    {
+      "adb": [
+        "get-serialno"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "getprop",
+        "ro.build.version.sdk"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "getprop",
+        "ro.kernel.qemu"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "dumpsys",
+        "package",
+        "com.projectinfinity.kodi"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "uiautomator",
+        "dump",
+        "/sdcard/infinity-icon-surface-qa.xml"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cat",
+        "/sdcard/infinity-icon-surface-qa.xml"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "exec-out",
+        "screencap",
+        "-p"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "uiautomator",
+        "dump",
+        "/sdcard/infinity-icon-surface-qa.xml"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cat",
+        "/sdcard/infinity-icon-surface-qa.xml"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "exec-out",
+        "screencap",
+        "-p"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "uiautomator",
+        "dump",
+        "/sdcard/infinity-icon-surface-qa.xml"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cat",
+        "/sdcard/infinity-icon-surface-qa.xml"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "exec-out",
+        "screencap",
+        "-p"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "logcat",
+        "-d",
+        "-v",
+        "threadtime"
+      ],
+      "returncode": 0
+    }
+  ],
+  "modes": {},
+  "errors": [
+    "Empty Cobra welcome required before sources/playback"
+  ],
+  "serial": "emulator-5554",
+  "sdk": "37",
+  "initial_Cobra_frames": [
+    {
+      "XML": "initial-Cobra-welcome-1.xml",
+      "PNG": "initial-Cobra-welcome-1.png",
+      "dump_returncode": 0,
+      "screenshot_returncode": 0,
+      "XML_parse_error": null,
+      "packages": [
+        "android"
+      ]
+    },
+    {
+      "XML": "initial-Cobra-welcome-2.xml",
+      "PNG": "initial-Cobra-welcome-2.png",
+      "dump_returncode": 0,
+      "screenshot_returncode": 0,
+      "XML_parse_error": null,
+      "packages": [
+        "android"
+      ]
+    },
+    {
+      "XML": "initial-Cobra-welcome-3.xml",
+      "PNG": "initial-Cobra-welcome-3.png",
+      "dump_returncode": 0,
+      "screenshot_returncode": 0,
+      "XML_parse_error": null,
+      "packages": [
+        "android"
+      ]
+    }
+  ],
+  "status": "FAIL_AT_ICON_SURFACE_GUARD",
+  "return_Cobra": "NOT_RUN; initial welcome guard failed",
+  "logcat_capture": {
+    "stderr": "",
+    "returncode": 0
+  }
+}

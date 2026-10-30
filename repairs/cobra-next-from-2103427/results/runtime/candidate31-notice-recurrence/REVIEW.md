@@ -1,0 +1,13 @@
+# Signed 2103431 — recurring Android compatibility notice
+
+Run [40983247126](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/40983247126) used the unchanged signed 2103431 APK and QA source `560d54b1c3d99f7e7256b4b326706144fa341585`. Its overall result is **FAILURE**. Archive and selected-file bindings are recorded in `EVIDENCE.json`; root personally reviewed the initial Cobra welcome screenshot and first recurrence screenshot.
+
+Full nonincremental installation and exact installed-APK SHA256 confirmation passed in **94.551 seconds**. Cobra launch returned `Status: ok`, TotalTime **3914ms**, WaitTime **3957ms**. The exact Android App Compatibility notice was preserved and acknowledged with one actual coordinate press on **OK**. The subsequent native screenshot shows Cobra's welcome screen. The 12.488-second first-screen observation includes the notice and acknowledgement, so it is not a clean startup benchmark.
+
+The icon resource observer passed normal framework day/night selection for both existing icon IDs. Its launcher frames were unobservable by the exact native-item classifier; no new launcher-appearance PASS is inferred. After that observer restored light mode and returned to Cobra, the Android-owned compatibility notice appeared again. The following icon-surface observer required the empty Cobra welcome screen and stopped with `FAIL_AT_ICON_SURFACE_GUARD` / `Empty Cobra welcome required before sources/playback`. Its three captured initial frames belong to package `android`, not Cobra. The preserved first recurrence XML/PNG shows the notice. The native button helper and Fullscreen/More/PiP journey **did not execute**.
+
+The initial notice acknowledgement worked; the QA failure arose because its one-location handling did not cover subsequent QA return boundaries. No production button defect, crash, authentication failure or ELF repair is demonstrated by this result. All 47 native libraries remain frozen. Their observed ELF LOAD/RELRO warning is distinct from APK ZIP-offset alignment.
+
+The next bounded QA correction will consolidate recognition and evidence-preserving **OK** acknowledgement at all QA return boundaries, without `Don't Show Again`, compatibility-property changes or native changes. The already-bound icon/App Info and Pixel Launcher cache evidence from run 40973858059 will be reused rather than repeating those observations. No next run is claimed here. The APK, production timers, strict button assertions and original-signature/hash checks remain unchanged.
+
+This is disposable Android 17 emulator evidence, not physical Fold acceptance. Infinity was not launched, shutdown was not tested, and no user-device installation, accepted lock or promotion occurred.

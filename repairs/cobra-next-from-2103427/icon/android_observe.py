@@ -19,12 +19,18 @@ import time
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
+# Preserve the existing direct-script CLI as well as run_android_probe imports.
+import sys
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from android_probe import acknowledge_known_notice_after_launch
+
 PACKAGE = "com.projectinfinity.kodi"
 COBRA = PACKAGE + "/.InfinityLiveActivity"
 VERSION = 2103431
 
 
-def observe(out: Path, apk_sha256: str, version_code: int):
+def observe(out: Path, apk_sha256: str, version_code: int, native_paths=None):
     out.mkdir(parents=True, exist_ok=False)
     report = {
         "scope": "EXACT_FINAL_COMBINED_APK_ANDROID37_THEME_AND_LAUNCHER_OBSERVATION_ONLY",
@@ -193,6 +199,14 @@ def observe(out: Path, apk_sha256: str, version_code: int):
             report["restore_initial_mode"] = command("shell","cmd","uimode","night",original_mode,check=False)
         if safe_Cobra_return:
             report["return_Cobra"] = command("shell","am","start","-W","-n",COBRA,check=False)
+            try:
+                report["return_Cobra_OS_notice"] = acknowledge_known_notice_after_launch(
+                    report["return_Cobra"]["stdout"], out/"return-Cobra-OS-notice", native_paths)
+            except Exception as e:
+                report["return_Cobra_OS_notice_error"] = str(e)
+                if failure is None:
+                    failure = e
+                    report["status"] = "FAIL_AT_COBRA_RETURN_OS_NOTICE"
         else:
             report["return_Cobra"] = "NOT_RUN; receipt/environment/welcome guard did not pass"
         (out/"OUTCOME.json").write_text(json.dumps(report,indent=2)+"\n")

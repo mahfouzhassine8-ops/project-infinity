@@ -14,6 +14,8 @@ import traceback
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
+from android_probe import acknowledge_known_notice_after_launch
+
 PACKAGE = 'com.projectinfinity.kodi'
 COBRA = PACKAGE+'/.InfinityLiveActivity'
 VERSION = 2103431
@@ -48,7 +50,7 @@ def drawer_state(nodes, launcher):
     return 'UNOBSERVED_NATIVE_LAUNCHER_STATE', []
 
 
-def observe(out: Path, apk_sha256: str, version_code: int):
+def observe(out: Path, apk_sha256: str, version_code: int, native_paths=None):
     out.mkdir(parents=True, exist_ok=False)
     report = {'scope': 'UNCHANGED_SIGNED431_NORMAL_SETTINGS_AND_NATIVE_ALL_APPS_ICON_SURFACES',
               'receipt_apk_sha256': apk_sha256, 'versionCode': version_code,
@@ -245,6 +247,8 @@ def observe(out: Path, apk_sha256: str, version_code: int):
         if welcome_guard:
             report['return_Cobra'] = command('shell', 'am', 'start', '-W', '-n', COBRA, check=False)
             try:
+                report['return_Cobra_OS_notice'] = acknowledge_known_notice_after_launch(
+                    report['return_Cobra']['stdout'], out/'return-Cobra-OS-notice', native_paths)
                 _, frames, ready = state_poll(out, 'returned-Cobra-welcome', empty_cobra)
                 report['returned_Cobra_frames'] = frames
                 report['safe_empty_Cobra_for_independent_buttons'] = ready

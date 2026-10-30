@@ -1,0 +1,536 @@
+{
+  "scope": "EXACT_FINAL_COMBINED_APK_ANDROID37_THEME_AND_LAUNCHER_OBSERVATION_ONLY",
+  "versionCode": 2103431,
+  "receipt_apk_sha256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471",
+  "APK_binding": "Parent verified signed APK/signature/hash and installed it before this observer",
+  "physical_Samsung": "NOT_RUN",
+  "shutdown": "NOT_RUN",
+  "Infinity": "NOT_LAUNCHED",
+  "lookup_limit": "Framework Res_value selection only; not a direct Drawable.inflate test",
+  "launcher_limit": "Only this disposable emulator launcher and refresh/re-entry sequence; Samsung/Finder/suggestions and monochrome palettes remain OS-managed",
+  "operations": [
+    {
+      "adb": [
+        "get-serialno"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "getprop",
+        "ro.build.version.sdk"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "getprop",
+        "ro.kernel.qemu"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "dumpsys",
+        "package",
+        "com.projectinfinity.kodi"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "uiautomator",
+        "dump",
+        "/sdcard/infinity-icon-qa.xml"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cat",
+        "/sdcard/infinity-icon-qa.xml"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "exec-out",
+        "screencap",
+        "-p"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cmd",
+        "uimode",
+        "night"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cmd",
+        "package",
+        "resolve-activity",
+        "--brief",
+        "-a",
+        "android.intent.action.MAIN",
+        "-c",
+        "android.intent.category.HOME"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "wm",
+        "size"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cmd",
+        "uimode",
+        "night",
+        "no"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cmd",
+        "overlay",
+        "lookup",
+        "--verbose",
+        "com.projectinfinity.kodi",
+        "com.projectinfinity.kodi:mipmap/ic_launcher"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cmd",
+        "overlay",
+        "lookup",
+        "--verbose",
+        "com.projectinfinity.kodi",
+        "com.projectinfinity.kodi:mipmap/ic_launcher_round"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cmd",
+        "uimode",
+        "night"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "am",
+        "get-config"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "input",
+        "keyevent",
+        "KEYCODE_HOME"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "input",
+        "swipe",
+        "540",
+        "1728",
+        "540",
+        "384",
+        "450"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "uiautomator",
+        "dump",
+        "/sdcard/infinity-icon-qa.xml"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cat",
+        "/sdcard/infinity-icon-qa.xml"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "exec-out",
+        "screencap",
+        "-p"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "input",
+        "keyevent",
+        "KEYCODE_HOME"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "input",
+        "swipe",
+        "540",
+        "1728",
+        "540",
+        "384",
+        "450"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "uiautomator",
+        "dump",
+        "/sdcard/infinity-icon-qa.xml"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cat",
+        "/sdcard/infinity-icon-qa.xml"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "exec-out",
+        "screencap",
+        "-p"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cmd",
+        "uimode",
+        "night",
+        "yes"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cmd",
+        "overlay",
+        "lookup",
+        "--verbose",
+        "com.projectinfinity.kodi",
+        "com.projectinfinity.kodi:mipmap/ic_launcher"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cmd",
+        "overlay",
+        "lookup",
+        "--verbose",
+        "com.projectinfinity.kodi",
+        "com.projectinfinity.kodi:mipmap/ic_launcher_round"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cmd",
+        "uimode",
+        "night"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "am",
+        "get-config"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "input",
+        "keyevent",
+        "KEYCODE_HOME"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "input",
+        "swipe",
+        "540",
+        "1728",
+        "540",
+        "384",
+        "450"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "uiautomator",
+        "dump",
+        "/sdcard/infinity-icon-qa.xml"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cat",
+        "/sdcard/infinity-icon-qa.xml"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "exec-out",
+        "screencap",
+        "-p"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "input",
+        "keyevent",
+        "KEYCODE_HOME"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "input",
+        "swipe",
+        "540",
+        "1728",
+        "540",
+        "384",
+        "450"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "uiautomator",
+        "dump",
+        "/sdcard/infinity-icon-qa.xml"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cat",
+        "/sdcard/infinity-icon-qa.xml"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "exec-out",
+        "screencap",
+        "-p"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "cmd",
+        "uimode",
+        "night",
+        "no"
+      ],
+      "returncode": 0
+    },
+    {
+      "adb": [
+        "shell",
+        "am",
+        "start",
+        "-W",
+        "-n",
+        "com.projectinfinity.kodi/.InfinityLiveActivity"
+      ],
+      "returncode": 0
+    }
+  ],
+  "modes": {
+    "no": {
+      "requested_night_mode": "no",
+      "resource_lookups": {
+        "ic_launcher": {
+          "expected_path": "res/infinity_launcher_light_v33.xml",
+          "samples": [
+            {
+              "stdout": "Resolution for 0x7f080000 com.projectinfinity.kodi:mipmap/ic_launcher\n\tFor config - mcc310-mnc260-en-rUS-ldltr-sw411dp-w411dp-h731dp-normal-long-notround-nowidecg-lowdr-port-uiModeType=2-notnight-420dpi-finger-keysexposed-qwerty-nonav-1920x1080-v37.1\n\tFound initial: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - mdpi\n\tFound better: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - hdpi\n\tFound better: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - xhdpi\n\tFound better: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - xxhdpi\n\tSkipped: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - xxxhdpi\n\tFound better: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - anydpi-v26\n\tFound better: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - anydpi-v33\nBest matching is from anydpi-v33 configuration of com.projectinfinity.kodi\nres/infinity_launcher_light_v33.xml\n",
+              "stderr": "",
+              "returncode": 0
+            }
+          ],
+          "status": "PASS"
+        },
+        "ic_launcher_round": {
+          "expected_path": "res/infinity_launcher_light_v33.xml",
+          "samples": [
+            {
+              "stdout": "Resolution for 0x7f080001 com.projectinfinity.kodi:mipmap/ic_launcher_round\n\tFor config - mcc310-mnc260-en-rUS-ldltr-sw411dp-w411dp-h731dp-normal-long-notround-nowidecg-lowdr-port-uiModeType=2-notnight-420dpi-finger-keysexposed-qwerty-nonav-1920x1080-v37.1\n\tFound initial: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - mdpi\n\tFound better: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - hdpi\n\tFound better: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - xhdpi\n\tFound better: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - xxhdpi\n\tSkipped: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - xxxhdpi\n\tFound better: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - anydpi-v26\n\tFound better: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - anydpi-v33\nBest matching is from anydpi-v33 configuration of com.projectinfinity.kodi\nres/infinity_launcher_light_v33.xml\n",
+              "stderr": "",
+              "returncode": 0
+            }
+          ],
+          "status": "PASS"
+        }
+      },
+      "launcher_frames": [
+        {
+          "exact_Infinity_labels": 0,
+          "classification": "UNOBSERVABLE",
+          "reason": "A single visible native Infinity launcher item was not observed"
+        },
+        {
+          "exact_Infinity_labels": 0,
+          "classification": "UNOBSERVABLE",
+          "reason": "A single visible native Infinity launcher item was not observed"
+        }
+      ],
+      "set_night_mode": {
+        "stdout": "Night mode: no\n",
+        "stderr": "",
+        "returncode": 0
+      },
+      "actual_uimode": "Night mode: no\n",
+      "configuration": "config: mcc310-mnc260-en-rUS-ldltr-sw411dp-w411dp-h731dp-normal-long-notround-nowidecg-lowdr-port-notnight-420dpi-finger-keysexposed-qwerty-navhidden-nonav-1920x1080-v37\nabi: x86_64,arm64-v8a\n",
+      "launcher_observation": {
+        "exact_Infinity_labels": 0,
+        "classification": "UNOBSERVABLE",
+        "reason": "A single visible native Infinity launcher item was not observed"
+      }
+    },
+    "yes": {
+      "requested_night_mode": "yes",
+      "resource_lookups": {
+        "ic_launcher": {
+          "expected_path": "res/IG.xml",
+          "samples": [
+            {
+              "stdout": "Resolution for 0x7f080000 com.projectinfinity.kodi:mipmap/ic_launcher\n\tFor config - mcc310-mnc260-en-rUS-ldltr-sw411dp-w411dp-h731dp-normal-long-notround-nowidecg-lowdr-port-uiModeType=2-night-420dpi-finger-keysexposed-qwerty-nonav-1920x1080-v37.1\n\tFound initial: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - mdpi\n\tFound better: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - night-mdpi\n\tSkipped: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - hdpi\n\tFound better: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - night-hdpi\n\tSkipped: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - xhdpi\n\tFound better: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - night-xhdpi\n\tSkipped: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - xxhdpi\n\tFound better: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - night-xxhdpi\n\tSkipped: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - xxxhdpi\n\tSkipped: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - night-xxxhdpi\n\tSkipped: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - anydpi-v26\n\tFound better: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - night-anydpi-v26\n\tSkipped: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - anydpi-v33\n\tFound better: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - night-anydpi-v33\nBest matching is from night-anydpi-v33 configuration of com.projectinfinity.kodi\nres/IG.xml\n",
+              "stderr": "",
+              "returncode": 0
+            }
+          ],
+          "status": "PASS"
+        },
+        "ic_launcher_round": {
+          "expected_path": "res/6H.xml",
+          "samples": [
+            {
+              "stdout": "Resolution for 0x7f080001 com.projectinfinity.kodi:mipmap/ic_launcher_round\n\tFor config - mcc310-mnc260-en-rUS-ldltr-sw411dp-w411dp-h731dp-normal-long-notround-nowidecg-lowdr-port-uiModeType=2-night-420dpi-finger-keysexposed-qwerty-nonav-1920x1080-v37.1\n\tFound initial: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - mdpi\n\tFound better: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - night-mdpi\n\tSkipped: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - hdpi\n\tFound better: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - night-hdpi\n\tSkipped: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - xhdpi\n\tFound better: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - night-xhdpi\n\tSkipped: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - xxhdpi\n\tFound better: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - night-xxhdpi\n\tSkipped: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - xxxhdpi\n\tSkipped: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - night-xxxhdpi\n\tSkipped: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - anydpi-v26\n\tFound better: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - night-anydpi-v26\n\tSkipped: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - anydpi-v33\n\tFound better: /data/app/~~xss_wbwrhPckZErVb9DiSg==/com.projectinfinity.kodi-RzxMeH5x1RDGJwaO_yGPcA==/base.apk #8 - night-anydpi-v33\nBest matching is from night-anydpi-v33 configuration of com.projectinfinity.kodi\nres/6H.xml\n",
+              "stderr": "",
+              "returncode": 0
+            }
+          ],
+          "status": "PASS"
+        }
+      },
+      "launcher_frames": [
+        {
+          "exact_Infinity_labels": 0,
+          "classification": "UNOBSERVABLE",
+          "reason": "A single visible native Infinity launcher item was not observed"
+        },
+        {
+          "exact_Infinity_labels": 0,
+          "classification": "UNOBSERVABLE",
+          "reason": "A single visible native Infinity launcher item was not observed"
+        }
+      ],
+      "set_night_mode": {
+        "stdout": "Night mode: yes\n",
+        "stderr": "",
+        "returncode": 0
+      },
+      "actual_uimode": "Night mode: yes\n",
+      "configuration": "config: mcc310-mnc260-en-rUS-ldltr-sw411dp-w411dp-h731dp-normal-long-notround-nowidecg-lowdr-port-night-420dpi-finger-keysexposed-qwerty-navhidden-nonav-1920x1080-v37\nabi: x86_64,arm64-v8a\n",
+      "launcher_observation": {
+        "exact_Infinity_labels": 0,
+        "classification": "UNOBSERVABLE",
+        "reason": "A single visible native Infinity launcher item was not observed"
+      }
+    }
+  },
+  "serial": "emulator-5554",
+  "sdk": "37",
+  "launcher_package": "com.google.android.apps.nexuslauncher",
+  "launcher_component": "com.google.android.apps.nexuslauncher/.NexusLauncherActivity",
+  "display": [
+    1080,
+    1920
+  ],
+  "framework_resource_selection": "PASS",
+  "launcher_observation": "PARTIAL_NATIVE_ICON_NOT_CONCLUSIVELY_CLASSIFIED; INSPECT_ACTUAL_FRAMES",
+  "status": "PASS_FRAMEWORK_SELECTION_LAUNCHER_PARTIAL",
+  "restore_initial_mode": {
+    "stdout": "Night mode: no\n",
+    "stderr": "",
+    "returncode": 0
+  },
+  "return_Cobra": {
+    "stdout": "Starting: Intent { cmp=com.projectinfinity.kodi/.InfinityLiveActivity }\nWarning: Activity not started, its current task has been brought to the front\nStatus: ok\nLaunchState: COLD\nActivity: com.projectinfinity.kodi/.InfinityLiveActivity\nTotalTime: 3172\nWaitTime: 3226\nComplete\n",
+    "stderr": "",
+    "returncode": 0
+  }
+}

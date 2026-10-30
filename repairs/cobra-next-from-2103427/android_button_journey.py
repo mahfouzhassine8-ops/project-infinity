@@ -15,7 +15,7 @@ import traceback
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-from android_probe import PACKAGE, adb
+from android_probe import PACKAGE, adb, acknowledge_known_notice_after_launch
 
 
 def bounds(node):
@@ -116,7 +116,7 @@ class Snapshot:
         return None
 
 
-def journey(out, native_jar):
+def journey(out, native_jar, native_paths=None):
     out.mkdir(parents=True, exist_ok=False)
     steps = []
     report = {'scope': 'SIGNED431_PRO_VISIBLE_COORDINATE_BUTTONS_SYNTHETIC_QA1',
@@ -347,8 +347,10 @@ def journey(out, native_jar):
         report['actions']['PiP'] = 'SYSTEM_PINNED_COBRA_TASK'
         # Existing activity is manifest singleTask. Normal explicit foreground
         # return neither recreates the package nor clears/stops its data/player.
-        (out/'pip-normal-return.txt').write_text(adb('shell', 'am', 'start', '-W', '-n',
-                                                   PACKAGE+'/.InfinityLiveActivity'))
+        return_launch = adb('shell', 'am', 'start', '-W', '-n', PACKAGE+'/.InfinityLiveActivity')
+        (out/'pip-normal-return.txt').write_text(return_launch)
+        report['pip_return_OS_notice'] = acknowledge_known_notice_after_launch(
+            return_launch, out/'pip-return-OS-notice', native_paths)
         wait(r'^Pro$|^COBRA LIVE$', absent=r'^Return to preview$')
         assert not pinned(activity('pip-return')), 'Cobra remained pinned after normal foreground return'
         screenshot('pip-return-result')

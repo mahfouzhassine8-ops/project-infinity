@@ -1,0 +1,86 @@
+{
+  "run": 40983247126,
+  "run_url": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/40983247126",
+  "run_conclusion": "failure",
+  "QA_source": "560d54b1c3d99f7e7256b4b326706144fa341585",
+  "signed_source": "9ccc4c362a65118eeba38a8e7e4b0de5723c69af",
+  "signed_versionCode": 2103431,
+  "signed_APK_sha256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471",
+  "artifact": 12946091836,
+  "artifact_url": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/40983247126/artifacts/12946091836",
+  "artifact_archive_sha256": "4960c4e85b223e7172045580a2ccfe3980af726cbf06ca247c36c4227e347cc9",
+  "archive_verified_before_extraction": true,
+  "archive_verified_by": "android_final_evidence; delivery_finish_review independently rehashed downloaded archive; root personally reviewed probe/screen.png and icon-surfaces/initial-Cobra-welcome-1.png",
+  "status": "INSTALL_EXACT_HASH_INITIAL_NOTICE_ACK_AND_WELCOME_PASS; FRAMEWORK_ICON_SELECTION_PASS; RECURRENT_ANDROID_NOTICE_BLOCKED_ICON_SURFACE_WELCOME_GUARD_BEFORE_BUTTONS",
+  "install_seconds_including_confirmation": 94.551,
+  "install_client": "COMPLETED",
+  "installed_APK_sha256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471",
+  "Activity_launch_status": "ok",
+  "Activity_launch_TotalTime_ms": 3914,
+  "Activity_launch_WaitTime_ms": 3957,
+  "first_screen_seconds": 12.488,
+  "first_screen_measurement_limit": "Includes Android informational notice and acknowledgement; not a clean startup benchmark",
+  "initial_Android_notice_action": "One actual OK coordinate [547,1733]; no DontShowAgain/settings change",
+  "framework_resource_selection": "PASS_BOTH_IDS_DAY_NIGHT",
+  "launcher_classification": "UNOBSERVABLE_IN_THIS_RUN",
+  "icon_surface_status": "FAIL_AT_ICON_SURFACE_GUARD",
+  "icon_surface_error": "Empty Cobra welcome required before sources/playback",
+  "recurrence_package": "android",
+  "native_libraries": "ALL47_FROZEN; ELF_LOAD_RELRO_WARNING_NOT_REPAIRED",
+  "ZIP_vs_ELF": "APK_MEMBER_OFFSET_ALIGNMENT_IS_DISTINCT_FROM_ELF_LOAD_AND_RELRO_SEGMENT_ALIGNMENT",
+  "native_button_helper": "NOT_RUN",
+  "button_actions": "NOT_RUN",
+  "physical_Fold": "NOT_RUN",
+  "Infinity": "NOT_LAUNCHED",
+  "shutdown": "NOT_RUN",
+  "files": {
+    "probe/OUTCOME.json": {
+      "sha256": "73bb1825dea235b4fbbfcf53f677c3f23050addd9f9a609f9b528ab11bfa7536",
+      "bytes": 8078
+    },
+    "probe/install.txt": {
+      "sha256": "781a31c82430c97897af612ece5e0ca2205e301cb5ff121ce2660541ea5182c7",
+      "bytes": 36
+    },
+    "probe/launch.txt": {
+      "sha256": "99300cefd66ccdaec292dc11252ab414c6e6fdfa5975e28e3c1735deb5859977",
+      "bytes": 198
+    },
+    "probe/android-compatibility-notice.xml": {
+      "sha256": "68a58a27a77b5522ad322a1ac957b5b8bda608be6c1e569280957bf2c6a36ce1",
+      "bytes": 10108
+    },
+    "probe/android-compatibility-notice.png": {
+      "sha256": "510cbe86a2629bab32ac1f91440d02ca21aa1705c074eedfe5c0abc10b64b8d9",
+      "bytes": 273049
+    },
+    "probe/screen.png": {
+      "sha256": "2142a09ce1f7fd8c7689a1263c3b7c434bf31eea662a2f5c3229c097fad8d931",
+      "bytes": 76634
+    },
+    "probe/last-ui.xml": {
+      "sha256": "854d179ba7444b7053b95ab1efd8b714e3bf899772d3776d9d335576b179d86b",
+      "bytes": 4946
+    },
+    "icon/OUTCOME.json": {
+      "sha256": "5782d8c9aa2d13e59c71dc7b8f3c87c00b315027b0dd6c657bbcc793932d337c",
+      "bytes": 17853
+    },
+    "icon-surfaces/OUTCOME.json": {
+      "sha256": "3b9de6df9038451bef17e56822439520433f91c3a51a76f211fc306e0d23b946",
+      "bytes": 3350
+    },
+    "icon-surfaces/ERROR.txt": {
+      "sha256": "420bde31dae2c907a57aab0d51424a98d9d00aeb7efe473fa610073ea0105409",
+      "bytes": 326
+    },
+    "icon-surfaces/initial-Cobra-welcome-1.xml": {
+      "sha256": "68a58a27a77b5522ad322a1ac957b5b8bda608be6c1e569280957bf2c6a36ce1",
+      "bytes": 10108
+    },
+    "icon-surfaces/initial-Cobra-welcome-1.png": {
+      "sha256": "08675724793ec3b852675e9027c93e6ed58f27339822dbce0f6858c1101950ce",
+      "bytes": 273534
+    }
+  }
+}

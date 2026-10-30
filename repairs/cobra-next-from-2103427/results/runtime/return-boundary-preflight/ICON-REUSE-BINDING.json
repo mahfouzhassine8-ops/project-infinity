@@ -1,0 +1,30 @@
+{
+  "scope": "QA_ONLY_OFFLINE_RETAINED_ICON_APK_BINDING",
+  "status": "PASS",
+  "positive": {
+    "status": "REUSED_PREVIOUS_EXACT_SIGNED_APK_ICON_EVIDENCE; NOT_RERUN",
+    "run": 40973858059,
+    "APK_sha256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471",
+    "source": "9ccc4c362a65118eeba38a8e7e4b0de5723c69af",
+    "verified_file_SHA256": {
+      "icon-surfaces/OUTCOME.json": "adf40487a3b8ab12dd38af4249e4fd72ef1bfe9e546b07f702fdfabfbcdc153b",
+      "icon-surfaces/light/Settings-AppInfo-1.png": "9215b1255ecd52462052293b3fb9b44e5398957ade0b0e29bc9568b9f9cb52c3",
+      "icon-surfaces/light/Settings-AppInfo-2.png": "9215b1255ecd52462052293b3fb9b44e5398957ade0b0e29bc9568b9f9cb52c3",
+      "icon-surfaces/light/AllApps-key-1.png": "815ed2e4614fcca41a242b8226b8215c5180c32a4320b2d0d7ca962af2e71486",
+      "icon-surfaces/dark/Settings-AppInfo-1.png": "b68511450a831567a33bcc9c5459364023b7820dd38df11957571a42fd8d0c4b",
+      "icon-surfaces/dark/AllApps-key-1.png": "f0616f1055d7a0e4795660fc624e6369665cd43093a31343fe1b9773ec7b0b83"
+    },
+    "AppInfo_light": "ORIGINAL_EMBLEM_BLACK_ON_WHITE",
+    "AppInfo_dark": "ORIGINAL_NAVY_CYAN",
+    "PixelLauncher_after_dark_switch": "RETAINED_LIGHT_BITMAP_DESPITE_DARK_FRAMEWORK_AND_APPINFO",
+    "Samsung_Finder_suggestions": "NOT_VERIFIED",
+    "physical_Fold": "NOT_RUN"
+  },
+  "rejected_mismatches": [
+    "signed_apk_sha256",
+    "source",
+    "versionCode"
+  ],
+  "ADB_or_application_execution": "NONE",
+  "shutdown": "NOT_RUN"
+}

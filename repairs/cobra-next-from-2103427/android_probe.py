@@ -39,6 +39,53 @@ def compatibility_notice_ok(tree,native_paths):
   'button_bounds':values,'warning':body,'native_members':sorted(libraries),
   'action':'ANDROID_INFORMATIONAL_OK_ONLY; NO_DONT_SHOW_AGAIN_OR_COMPAT_SETTING_CHANGE'}
 
+def acknowledge_known_notice_after_launch(launch_text,out,native_paths=None):
+ """Observe one successful Cobra launch; acknowledge only its known OS notice.
+
+ Each caller owns a distinct successful am-start boundary. No persistent warning
+ suppression or compatibility setting is changed. Normal app-state/action guards
+ remain the responsibility of the caller after this finite OS-only observation.
+ """
+ assert 'Error' not in launch_text and 'Status: ok' in launch_text,'Successful Cobra launch required before OS notice observation'
+ assert (PACKAGE+'/.InfinityLiveActivity' in launch_text or PACKAGE+'/'+PACKAGE+'.InfinityLiveActivity' in launch_text),'Expected Cobra Activity launch required'
+ out=Path(out);out.mkdir(parents=True,exist_ok=False)
+ report={'scope':'ONE_SUCCESSFUL_COBRA_LAUNCH_OS_NOTICE_ONLY','action':'NO_ACKNOWLEDGEMENT',
+         'shutdown':'NOT_RUN','compatibility_settings':'UNCHANGED'}
+ def observe(name):
+  adb('shell','uiautomator','dump','/sdcard/cobra-launch-notice-qa.xml')
+  raw=adb('shell','cat','/sdcard/cobra-launch-notice-qa.xml')
+  (out/(name+'.xml')).write_text(raw)
+  return ET.fromstring(raw)
+ def android_dialog(tree):
+  return any(n.get('package')=='android' and n.get('resource-id') in
+   ('android:id/alertTitle','android:id/message','android:id/button1','android:id/button2') for n in tree.iter('node'))
+ try:
+  tree=observe('observed')
+  notice=compatibility_notice_ok(tree,set(native_paths or ()))
+  if notice is None:
+   assert not android_dialog(tree),'Unrecognized Android dialog refused after Cobra launch'
+   report['status']='NO_KNOWN_NOTICE_OBSERVED'
+   return report
+  # Keep the full warning and screenshot before touching anything. Refresh its
+  # exact identity and bounds after screenshot I/O, then press only that OK.
+  capture=subprocess.run(['adb','exec-out','screencap','-p'],capture_output=True,timeout=15)
+  assert capture.returncode==0 and capture.stdout.startswith(b'\x89PNG\r\n\x1a\n'),'Compatibility notice PNG required before acknowledgement'
+  (out/'observed.png').write_bytes(capture.stdout)
+  fresh=compatibility_notice_ok(observe('fresh-before-OK'),set(native_paths or ()))
+  assert fresh is not None and fresh==notice,'Compatibility notice changed before acknowledgement; no press injected'
+  report['notice']=fresh
+  adb('shell','input','tap',*[str(v) for v in fresh['coordinate']])
+  report['action']='ONE_ANDROID_INFORMATIONAL_OK_ONLY'
+  after=observe('after-OK')
+  assert not android_dialog(after),'Repeated or unrecognized Android dialog refused after one OK'
+  report['status']='KNOWN_NOTICE_ACKNOWLEDGED_ONCE'
+  return report
+ except Exception as exc:
+  report['status']='FAILED_OS_NOTICE_OBSERVATION';report['error']=str(exc)
+  raise
+ finally:
+  (out/'OUTCOME.json').write_text(json.dumps(report,indent=2)+'\n')
+
 def probe(apk,out,expected):
  out.mkdir(parents=True);report={'runtime':'DISPOSABLE_ANDROID17_API37_X86_64_EMULATOR','physical_Fold':'NOT_RUN','shutdown':'NOT_RUN','Infinity':'NOT_LAUNCHED'}
  try:
