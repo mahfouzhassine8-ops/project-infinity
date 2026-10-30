@@ -1,0 +1,258 @@
+[
+  {
+    "attempt": "qa-v1",
+    "directory": "/workspace/cobra-evidence/cards-visual-closeout-qa-v1",
+    "junit": {},
+    "selected_methods": [
+      "nativeWrappedMissingScheduleAndLivePeersShareMeasuredRows",
+      "nativeRowRecyclingAndContentChangesPreserveAnchors",
+      "nativeMoreAndRowTargetsKeepTheirCurrentChannelAfterGrowth",
+      "cardsHeaderAndRowsLeaveFourNativeModesUnchanged"
+    ],
+    "test_result": "COMPILATION_FAILED_BEFORE_FEATURE_EXECUTION",
+    "files": {
+      "INPUTS.json": "acd6a046d03f8bc1ca0aacbcc716b2a4124c2d477d1c7b83b347239a5e368fb5",
+      "SELECTION.json": "3d842bf8486fa9f3796bbcc66361869813298a1ef9d63804143a164baf20425a",
+      "COMPILE-RESULT.json": "7ddc339293b43cbbfd2edbd4c408a575daa1773fc55b860b6bfc50d794089beb"
+    }
+  },
+  {
+    "attempt": "qa-v2",
+    "directory": "/workspace/cobra-evidence/cards-visual-closeout-qa-v2",
+    "junit": {
+      "TEST-com.projectinfinity.kodi.CobraCardsVisualCloseoutTest.xml": {
+        "tests": "4",
+        "failures": "0",
+        "errors": "4",
+        "skipped": "0",
+        "cases": [
+          {
+            "name": "nativeMoreAndRowTargetsKeepTheirCurrentChannelAfterGrowth",
+            "failure": null,
+            "error": "channels"
+          },
+          {
+            "name": "cardsHeaderAndRowsLeaveFourNativeModesUnchanged",
+            "failure": null,
+            "error": "channels"
+          },
+          {
+            "name": "nativeRowRecyclingAndContentChangesPreserveAnchors",
+            "failure": null,
+            "error": "channels"
+          },
+          {
+            "name": "nativeWrappedMissingScheduleAndLivePeersShareMeasuredRows",
+            "failure": null,
+            "error": "channels"
+          }
+        ]
+      }
+    },
+    "selected_methods": [
+      "nativeWrappedMissingScheduleAndLivePeersShareMeasuredRows",
+      "nativeRowRecyclingAndContentChangesPreserveAnchors",
+      "nativeMoreAndRowTargetsKeepTheirCurrentChannelAfterGrowth",
+      "cardsHeaderAndRowsLeaveFourNativeModesUnchanged"
+    ],
+    "test_result": {
+      "exit_code": 1,
+      "output_sha256": "d26aabafdfa068598f46780339cd6be5ed765fc89d65a73de24204e38e02d050",
+      "selected_methods": [
+        "nativeWrappedMissingScheduleAndLivePeersShareMeasuredRows",
+        "nativeRowRecyclingAndContentChangesPreserveAnchors",
+        "nativeMoreAndRowTargetsKeepTheirCurrentChannelAfterGrowth",
+        "cardsHeaderAndRowsLeaveFourNativeModesUnchanged"
+      ]
+    },
+    "files": {
+      "INPUTS.json": "a682932f139fd162957030cd80f8cea36c8cd51928d36b891ef48147a5c88825",
+      "SELECTION.json": "3d842bf8486fa9f3796bbcc66361869813298a1ef9d63804143a164baf20425a",
+      "COMPILE-RESULT.json": "9d13f8d4d28d2b443a873b2d5301a5738937c13754282d52076f09e3174ed99e",
+      "TEST-RESULT.json": "3efc5b098177ee14ecee91013e3e11f5f96e40213c7ab153eec9fd2b0e2406fb"
+    }
+  },
+  {
+    "attempt": "qa-v3",
+    "directory": "/workspace/cobra-evidence/cards-visual-closeout-qa-v3",
+    "junit": {
+      "TEST-com.projectinfinity.kodi.CobraCardsVisualCloseoutTest.xml": {
+        "tests": "4",
+        "failures": "2",
+        "errors": "0",
+        "skipped": "0",
+        "cases": [
+          {
+            "name": "nativeMoreAndRowTargetsKeepTheirCurrentChannelAfterGrowth",
+            "failure": null,
+            "error": null
+          },
+          {
+            "name": "cardsHeaderAndRowsLeaveFourNativeModesUnchanged",
+            "failure": "current mixed-data programme preserved",
+            "error": null
+          },
+          {
+            "name": "nativeRowRecyclingAndContentChangesPreserveAnchors",
+            "failure": null,
+            "error": null
+          },
+          {
+            "name": "nativeWrappedMissingScheduleAndLivePeersShareMeasuredRows",
+            "failure": null,
+            "error": null
+          }
+        ]
+      }
+    },
+    "selected_methods": [
+      "nativeWrappedMissingScheduleAndLivePeersShareMeasuredRows",
+      "nativeRowRecyclingAndContentChangesPreserveAnchors",
+      "nativeMoreAndRowTargetsKeepTheirCurrentChannelAfterGrowth",
+      "cardsHeaderAndRowsLeaveFourNativeModesUnchanged"
+    ],
+    "test_result": {
+      "exit_code": 1,
+      "output_sha256": "1a54585e9c23614bb37215dc72bb685ac022710aa2a0e879f3f14079453a2cc5",
+      "selected_methods": [
+        "nativeWrappedMissingScheduleAndLivePeersShareMeasuredRows",
+        "nativeRowRecyclingAndContentChangesPreserveAnchors",
+        "nativeMoreAndRowTargetsKeepTheirCurrentChannelAfterGrowth",
+        "cardsHeaderAndRowsLeaveFourNativeModesUnchanged"
+      ],
+      "QA_change": "Inherited native adapter channels field only"
+    },
+    "files": {
+      "INPUTS.json": "e1f5fdddfb4c798fd85b8725b9e69d563b5854e65adc09032c10673463a11d91",
+      "SELECTION.json": "3d842bf8486fa9f3796bbcc66361869813298a1ef9d63804143a164baf20425a",
+      "COMPILE-RESULT.json": "73df4823bfa2dad9a210c028cd2573e933cca69f11a3ef1a9f6b15befb3676a4",
+      "TEST-RESULT.json": "a7aaf9c78ca3bbaf8d5825dfcc746fe61059a0355bd702c0081b797f179c46b2"
+    }
+  },
+  {
+    "attempt": "qa-v4",
+    "directory": "/workspace/cobra-evidence/cards-visual-closeout-qa-v4",
+    "junit": {
+      "TEST-com.projectinfinity.kodi.CobraCardsVisualCloseoutTest.xml": {
+        "tests": "4",
+        "failures": "1",
+        "errors": "0",
+        "skipped": "0",
+        "cases": [
+          {
+            "name": "nativeMoreAndRowTargetsKeepTheirCurrentChannelAfterGrowth",
+            "failure": null,
+            "error": null
+          },
+          {
+            "name": "cardsHeaderAndRowsLeaveFourNativeModesUnchanged",
+            "failure": null,
+            "error": null
+          },
+          {
+            "name": "nativeRowRecyclingAndContentChangesPreserveAnchors",
+            "failure": null,
+            "error": null
+          },
+          {
+            "name": "nativeWrappedMissingScheduleAndLivePeersShareMeasuredRows",
+            "failure": null,
+            "error": null
+          }
+        ]
+      }
+    },
+    "selected_methods": [
+      "nativeWrappedMissingScheduleAndLivePeersShareMeasuredRows",
+      "nativeRowRecyclingAndContentChangesPreserveAnchors",
+      "nativeMoreAndRowTargetsKeepTheirCurrentChannelAfterGrowth",
+      "cardsHeaderAndRowsLeaveFourNativeModesUnchanged"
+    ],
+    "test_result": {
+      "exit_code": 1,
+      "output_sha256": "c6599955567a1187f69c089743148fd75b2a0f60aec5742805681cc7f49a6b78",
+      "selected_methods": [
+        "nativeWrappedMissingScheduleAndLivePeersShareMeasuredRows",
+        "nativeRowRecyclingAndContentChangesPreserveAnchors",
+        "nativeMoreAndRowTargetsKeepTheirCurrentChannelAfterGrowth",
+        "cardsHeaderAndRowsLeaveFourNativeModesUnchanged"
+      ]
+    },
+    "files": {
+      "INPUTS.json": "89cd2a30baba98f98bfe0937c98f3bec779a1bce94e51f80ef24705e55544f26",
+      "SELECTION.json": "3d842bf8486fa9f3796bbcc66361869813298a1ef9d63804143a164baf20425a",
+      "COMPILE-RESULT.json": "946fcd0e3a9637d9248a7745eb221367473c8bdee4346312d21ec19f5e684165",
+      "TEST-RESULT.json": "fe88b408bba49ac61bbb2615e89b98b625f77b9380d1c96f2387d9a77f7ac2fb"
+    }
+  },
+  {
+    "attempt": "qa-v5",
+    "directory": "/workspace/cobra-evidence/cards-visual-closeout-qa-v5",
+    "junit": {
+      "TEST-com.projectinfinity.kodi.CobraCardsVisualCloseoutTest.xml": {
+        "tests": "1",
+        "failures": "1",
+        "errors": "0",
+        "skipped": "0",
+        "cases": [
+          {
+            "name": "nativeRowRecyclingAndContentChangesPreserveAnchors",
+            "failure": "native row selected flag after metadata growth",
+            "error": null
+          }
+        ]
+      }
+    },
+    "selected_methods": [
+      "nativeRowRecyclingAndContentChangesPreserveAnchors"
+    ],
+    "test_result": {
+      "exit_code": 1,
+      "output_sha256": "156f7406b7782c975a9b9423119011387d8c3c93e1089e7f8d3ce6261f4ae097",
+      "selected_methods": [
+        "nativeRowRecyclingAndContentChangesPreserveAnchors"
+      ]
+    },
+    "files": {
+      "INPUTS.json": "7d726a1d1cce6cece656f7f36448e30c0c55a9bb9128540f949471aaa7e4b42a",
+      "SELECTION.json": "6a2cd06b22ea3a1861c3a1cf01b001dab47b6235bb1087bb07f70dd9d729b212",
+      "COMPILE-RESULT.json": "946fcd0e3a9637d9248a7745eb221367473c8bdee4346312d21ec19f5e684165",
+      "TEST-RESULT.json": "6be7c2fb3085176d9464f6b9c4f1f62f6ca26214c136880c22b6d7a7b90be9ca"
+    }
+  },
+  {
+    "attempt": "qa-v6",
+    "directory": "/workspace/cobra-evidence/cards-visual-closeout-qa-v6",
+    "junit": {
+      "TEST-com.projectinfinity.kodi.CobraCardsVisualCloseoutTest.xml": {
+        "tests": "1",
+        "failures": "1",
+        "errors": "0",
+        "skipped": "0",
+        "cases": [
+          {
+            "name": "nativeRowRecyclingAndContentChangesPreserveAnchors",
+            "failure": "native row selected flag after metadata growth",
+            "error": null
+          }
+        ]
+      }
+    },
+    "selected_methods": [
+      "nativeRowRecyclingAndContentChangesPreserveAnchors"
+    ],
+    "test_result": {
+      "exit_code": 1,
+      "output_sha256": "102aeac59acc077463fb45ea55686ff801e708e5073690babe8c6921c52717b0",
+      "selected_methods": [
+        "nativeRowRecyclingAndContentChangesPreserveAnchors"
+      ]
+    },
+    "files": {
+      "INPUTS.json": "165c9484416f01f7835b7369bace22f2f275a069ba5973b9be2fa6a9181192f9",
+      "SELECTION.json": "6a2cd06b22ea3a1861c3a1cf01b001dab47b6235bb1087bb07f70dd9d729b212",
+      "COMPILE-RESULT.json": "946fcd0e3a9637d9248a7745eb221367473c8bdee4346312d21ec19f5e684165",
+      "TEST-RESULT.json": "527d72d6685270736cf7f0247da5fc4ba482410273296cb78dd75685d9768d4b"
+    }
+  }
+]

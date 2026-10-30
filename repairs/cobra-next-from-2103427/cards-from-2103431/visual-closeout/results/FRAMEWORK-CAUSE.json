@@ -1,0 +1,58 @@
+{
+  "purpose": "Read-only official cached API35 cause of selected flag cleared after Cards row height layout",
+  "framework_jar": "/home/agent/.m2/repository/org/robolectric/android-all/15-robolectric-12650502/android-all-15-robolectric-12650502.jar",
+  "framework_jar_sha256": "6c0670454f6fcee9f1b17aa393e81d71bf26e7e6ae7c5777ed3924b062191d5b",
+  "artifacts": {
+    "GridView.javap.txt": "7130024200878599fed1f9243f63e6d0ea7486d999ee1b259d5a8ada79528ac6",
+    "AbsListView.javap.txt": "994612e20a03892b6658e896e01920eb866363ccd131d92a895398e14bb3b8e4",
+    "View-layout-callback-order-excerpt.txt": "7e54f3b31773c1479619204b030e005b8ae78ffc823a001882f53061238b0ad1"
+  },
+  "operations": [
+    {
+      "class": "GridView",
+      "method": "makeAndAddView",
+      "bytecodes": "7\u201340",
+      "operation": "Active card reused via getActiveView\u2192setupChild; no obtainView/adapter bind"
+    },
+    {
+      "class": "GridView",
+      "method": "makeRow",
+      "bytecodes": "186\u2013256",
+      "operation": "Pass position==mSelectedPosition to makeAndAddView"
+    },
+    {
+      "class": "GridView",
+      "method": "setupChild",
+      "bytecodes": "9\u201326,169\u2013177",
+      "operation": "Compute selected=framework-selected-position && shouldShowSelector; overwrite View.setSelected when different"
+    },
+    {
+      "class": "AbsListView",
+      "method": "shouldShowSelector",
+      "bytecodes": "0\u201333",
+      "operation": "Grid focus/touch/pressed policy, independent of Cobra preview channel identity"
+    },
+    {
+      "class": "GridView",
+      "method": "setupChild",
+      "bytecodes": "334\u2013381,538\u2013547",
+      "operation": "Height change requests measure and View.layout after selected reset; existing card OnLayoutChangeListener follows layout"
+    },
+    {
+      "class": "GridView",
+      "method": "setupChild",
+      "bytecodes": "553\u2013572",
+      "operation": "Offset-only branch may skip card callback; no broad new listener added because correction is pending only for actual resolved-height change"
+    },
+    {
+      "class": "View",
+      "method": "layout",
+      "bytecodes": "153\u2013298",
+      "operation": "Virtual onLayout at161 precedes additive OnLayoutChangeListener dispatch269\u2013293; official excerpt independently read by framework agent"
+    }
+  ],
+  "native_authority": "InfinityLiveActivity.cobraModeSelected compares bound channel.id with mGuidePreviewChannel.id; no focus-derived selection",
+  "SDK_compile": "PASS",
+  "behavioral_tests": "NOT_RUN_BY_THIS_AGENT",
+  "source_sha256": "899905e672ff5f9330773ad0a500bdaa5354080205170335a7e62e494e438eaa"
+}

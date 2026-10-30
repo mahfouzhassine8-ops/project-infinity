@@ -1,0 +1,25 @@
+{
+  "command": [
+    "/workspace/cobra-evidence/maven/apache-maven-3.9.9/bin/mvn",
+    "-B",
+    "-q",
+    "-f",
+    "/workspace/cobra-evidence/cards-visual-closeout-qa-v7/pom.xml",
+    "-Dtest=CobraCardsVisualCloseoutTest#nativeWrappedMissingScheduleAndLivePeersShareMeasuredRows+nativeRowRecyclingAndContentChangesPreserveAnchors+nativeMoreAndRowTargetsKeepTheirCurrentChannelAfterGrowth+cardsHeaderAndRowsLeaveFourNativeModesUnchanged",
+    "test"
+  ],
+  "selection": {
+    "class": "CobraCardsVisualCloseoutTest",
+    "methods": [
+      "nativeWrappedMissingScheduleAndLivePeersShareMeasuredRows",
+      "nativeRowRecyclingAndContentChangesPreserveAnchors",
+      "nativeMoreAndRowTargetsKeepTheirCurrentChannelAfterGrowth",
+      "cardsHeaderAndRowsLeaveFourNativeModesUnchanged"
+    ],
+    "recorded_before_execution": true,
+    "scope_sha256": "20367eb7f33fc85c044ccb1c56e58c8cc883768157524c9987fbc5ced96591ae"
+  },
+  "input_sha256": "441583d89b35da208016f1880363157b23f5d341486fb8201a1ca7c4609b86d3",
+  "reason": "Root final four-method selection after reviewed existing-layout selected-state restoration; assertions unchanged",
+  "recorded_before_execution": true
+}

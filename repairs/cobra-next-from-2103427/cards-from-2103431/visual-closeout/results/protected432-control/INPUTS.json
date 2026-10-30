@@ -1,0 +1,25 @@
+{
+  "phase": "PROTECTED432_FIXED_BINARY_OBSERVATIONAL_CONTROL",
+  "production_jar_sha256": "926bcc3bcc3b78d424742af38116d86f1f71367e1e429828e42f10e618cea92e",
+  "support_jar_sha256": "016a9ca405468cbc86fb6da8634e943ada67ffa615a3b804a1d9680fca84f1ad",
+  "actual_owner_DEX_sha256": {
+    "part-0.dex": "47c9635ce03485013d19200db15ee7a703d5e4368197f35f084d0cc9a8afcde6",
+    "part-1.dex": "3360d86366c77771c21af868db10dabe95503fd876977c5ecf201a32af2c384e"
+  },
+  "protected_source_bindings_sha256": "a2011f367da1e289646492b8fb5f67e7e8cb17319373b681e3345c6b753773c6",
+  "canonical_proof_sha256": "ca283a0caf5b465cba9d8e6e5422ad41ba4ef35dfd7e8fdcc73b47b68f6cac05",
+  "test_sources": {
+    "repairs/cobra-next-from-2103427/cards-from-2103431/visual-closeout/qa/CobraCardsSigned432SelectionControlTest.java": "72f1c9130c7d7a732c25da0b96d8dea20e1f47dc3e65e90edf36d02029df657b",
+    "repairs/cobra-next-from-2103427/cards-from-2103431/visual-closeout/qa/CobraCardsVisualCloseoutTest.java": "3afa28e2b53d281deb774e883c076f0ecc603374ea7a3d4ec93e390e7dad92ac",
+    "repairs/cobra-next-from-2103427/cards-from-2103431/layout-qa/CobraCardsLayoutTest.java": "d282188de62891e8f5aea1213c3c214f7697ce282f2ea8b04441b012f66d2525"
+  },
+  "test_sha256": "72f1c9130c7d7a732c25da0b96d8dea20e1f47dc3e65e90edf36d02029df657b",
+  "prepare_sha256": "5f968d293232d1599582b7b677498f204a29a652072f13839512f795ebc4c301",
+  "selected_methods": [
+    "nativeSigned432SingleBindSelectionControl"
+  ],
+  "historical_tests": "COMPILED_ONLY_NOT_SELECTED",
+  "behavior": "NOT_RUN",
+  "shutdown": "NOT_RUN",
+  "physical_Fold": "NOT_RUN"
+}

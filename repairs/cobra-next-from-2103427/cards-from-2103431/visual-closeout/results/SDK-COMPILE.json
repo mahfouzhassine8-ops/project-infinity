@@ -1,0 +1,34 @@
+{
+  "purpose": "SDK-only compile for authorized Cards paired content-measured row height and original native bind-position forwarding",
+  "behavioral_tests": "NOT_RUN",
+  "APK_signing_build_version_change": "NOT_PERFORMED",
+  "source": {
+    "repairs/cobra-next-from-2103427/cards-from-2103431/runtime/CobraCardsTiles.java": "899905e672ff5f9330773ad0a500bdaa5354080205170335a7e62e494e438eaa",
+    "repairs/cobra-next-from-2103427/cards-from-2103431/cards_patch.py": "eb0b66e4f710a0146dd9167f78775492d260f00f2adb0c01189b2b31b1d2d260"
+  },
+  "compile": "PASS",
+  "sdk": "/workspace/cobra-evidence/tools/receipt-evidence/android-34.jar",
+  "sdk_sha256": "6cea1df3efb77103ac3e2beb9bf4718964b0e0869ab16d39d29d5cbae1c147ad",
+  "classes": {
+    "com/projectinfinity/kodi/CobraCardsTiles$CardSurface.class": "84f516efd6285982c9bcd9452e86b6a1eebf05b316ddc94bee2c5081076d32c0",
+    "com/projectinfinity/kodi/CobraCardsTiles$Holder.class": "b5d1b5734bedfbb865979ba991b509dfeb712625234a21fafc1411f1429595f4",
+    "com/projectinfinity/kodi/CobraCardsTiles$LiveDot.class": "31677b648f8012117bb34fc27687c83d8f3f5b7d3ea5c090fd011da0acb0ef74",
+    "com/projectinfinity/kodi/CobraCardsTiles$MoreView.class": "1f18f48b9f89d43a45c759063f932c15bba8916c11d7898be465d1fe5eeaa19f",
+    "com/projectinfinity/kodi/CobraCardsTiles$OwnedLogo.class": "3647cc6ef2b100ad30f0fb742d8ba57976494d1a1c2dbca7878075715e0c9044",
+    "com/projectinfinity/kodi/CobraCardsTiles$RoundedProgress.class": "c97ff7a93cf02d85cb438fe739714babc802dc2fe38965c4ebd429a7b0837cd9",
+    "com/projectinfinity/kodi/CobraCardsTiles.class": "da3bc26563d713efb41b524faf9dd8bcf26d68ba6515ab95aa76c5e6728e7673"
+  },
+  "reference_sha256": "3a718b7731d45819a4d49f9b585725b7c9dd71ac547eb1171123b4acd21f2ff6",
+  "source_review_constraints": [
+    "Only actual adapter row is visited",
+    "Weak adapter references and per-view bounded metric arrays",
+    "Metadata before resize",
+    "Native row and More callbacks unchanged",
+    "Original maxLines retained",
+    "Geometry changes driven by actual wrapped native programme/status text"
+  ],
+  "review": "Independent bounded source review PASS against exact899905e672ff5f9330773ad0a500bdaa5354080205170335a7e62e494e438eaa; no source blocker. Height-change-only pending, strict attached current Grid/adapter/position/item and expected actual+LP height before authoritative native selection restore verified. Selected final behavior remains pending.",
+  "calibration": "Only programme reserve36\u219234 after actual native measurement49px produced262px paired row versus approved264px; final behavior check remains pending",
+  "retained_peer_correction": "When computed height changes, synchronize only attached actual-adapter-row peers via existing metadata/resize; strict ownership/current position/item guards, per-holder configuring stops recursion; a pending flag carries an off-grid height change until attachment",
+  "selection_after_height_change": "Existing card OnLayoutChangeListener after resize rechecks attached current Grid/adapter/position/item and actual/LP expected height, then native cobraModeSelected\u2192setSelected once; pending only from real resolved-height change, no focus-derived state/timer/shared patch"
+}

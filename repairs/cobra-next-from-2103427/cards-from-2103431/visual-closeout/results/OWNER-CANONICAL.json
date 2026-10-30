@@ -1,0 +1,108 @@
+{
+  "status": "PASS_EXACT_FIVE_CLASS_DELTA",
+  "baseline_signed_source": "9ccc4c362a65118eeba38a8e7e4b0de5723c69af",
+  "baseline_existing_classes": 7142,
+  "unchanged_existing_classes": 7137,
+  "changed_existing_classes": [
+    "Lcom/projectinfinity/kodi/CobraComponent;",
+    "Lcom/projectinfinity/kodi/CobraLogoRequests;",
+    "Lcom/projectinfinity/kodi/InfinityCobraFeatureRuntime;",
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraPosterChannelCard;",
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity;"
+  ],
+  "new_classes": [
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$AmbientPanel;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$ButtonSurface;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$LiveDot;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$LiveSurface;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$PanelSurface;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$PreviewBadge;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$ProgressSurface;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$Slot;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$Snapshot;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$State;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout;",
+    "Lcom/projectinfinity/kodi/CobraCardsReuse$Stamp;",
+    "Lcom/projectinfinity/kodi/CobraCardsReuse$State;",
+    "Lcom/projectinfinity/kodi/CobraCardsReuse;",
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$CardSurface;",
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$Holder;",
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$LiveDot;",
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$MoreView;",
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$OwnedLogo;",
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$RoundedProgress;",
+    "Lcom/projectinfinity/kodi/CobraCardsTiles;",
+    "Lcom/projectinfinity/kodi/CobraProfileDataReuse$Entry;",
+    "Lcom/projectinfinity/kodi/CobraProfileDataReuse;"
+  ],
+  "missing_classes": [],
+  "changed_methods": {
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraPosterChannelCard;": [
+      "bind(Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;I)V",
+      "constructor <init>(Lcom/projectinfinity/kodi/InfinityLiveActivity;)V",
+      "refreshPlaying()V"
+    ],
+    "Lcom/projectinfinity/kodi/InfinityCobraFeatureRuntime;": [
+      "public adultLocked()Z"
+    ],
+    "Lcom/projectinfinity/kodi/CobraComponent;": [
+      "public static version()Ljava/lang/String;"
+    ],
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity;": [
+      "private addRecent(Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;)V",
+      "private applyLoadResult(Lcom/projectinfinity/kodi/InfinityLiveActivity$LoadResult;)V",
+      "private cobraAmbientSurface(Landroid/view/View;IIIZ)V",
+      "private cobraChannelsForCurrentView()Ljava/util/ArrayList;",
+      "private cobraGuideChannels()Ljava/util/ArrayList;",
+      "private cobraLayoutGuide()V",
+      "private cobraRefreshModeDetails()V",
+      "private cobraRefreshProgrammeLabels()V",
+      "private cobraRefreshVisualEffects()V",
+      "private cobraRenderGuideBrowser()V",
+      "private cobraRestyleGuide()V",
+      "private cobraShowGuideShell()V",
+      "private hideCobraChannel(Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;)V",
+      "private persistSources()V",
+      "private reloadProfileCollections()V",
+      "private restoreCobraLibraryCache(Ljava/util/ArrayList;)Z",
+      "private toggleFavorite(Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;)V",
+      "synthetic lambda$confirmRemoveSource$96$com-projectinfinity-kodi-InfinityLiveActivity(Lcom/projectinfinity/kodi/InfinityLiveActivity$LiveSource;Landroid/content/DialogInterface;I)V",
+      "synthetic lambda$loadAllEnabledSources$54$com-projectinfinity-kodi-InfinityLiveActivity(Ljava/util/ArrayList;ZLjava/util/ArrayList;Ljava/util/ArrayList;)V",
+      "synthetic lambda$showCobraAddToGroup$74$com-projectinfinity-kodi-InfinityLiveActivity(Landroid/widget/EditText;Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;Landroid/content/DialogInterface;I)V"
+    ],
+    "Lcom/projectinfinity/kodi/CobraLogoRequests;": [
+      "public static clear(Landroid/app/Activity;Landroid/widget/ImageView;)V"
+    ]
+  },
+  "unchanged_class_fields_and_annotations": true,
+  "new_DEX_sha256": {
+    "part-1.dex": "caf0d327f48da3d066d36376b86a01b0ec0acd87693e96384de9abdfa3c770e0",
+    "part-0.dex": "cbda185e663144240e55c11d85aed126ca94bf9e96885110682fabe16b8d8caa"
+  },
+  "build_receipt_sha256": "cf0812edd81f2a48e94285f67ba674eb08f920cc14589895965ec8410dd73c56",
+  "compiler_source_files": {
+    "repairs/cobra-next-from-2103427/cards-from-2103431/BASELINE.json": "58e07a7cb2357c844c7bf2e839938d3def01ac874188cb64f139dd0c9efa86c8",
+    "repairs/cobra-next-from-2103427/cards-from-2103431/CARDS-SOURCE-BUDGET.json": "842899947ceede11ca495a9feec7201d9ed27906d46c1e64322d0b929750892b",
+    "repairs/cobra-next-from-2103427/cards-from-2103431/DEX2JAR-LIB-PINS.json": "e614ff51068b77908f8a01d5c9e66b8736bdd6fe5945dfb25538784feba78062",
+    "repairs/cobra-next-from-2103427/cards-from-2103431/PROJECTION-SOURCE-BUDGET.json": "8a6078ff90a856cbf24432feec0fdb3a8f8f2ae1885493c3383197a9f2fc18a3",
+    "repairs/cobra-next-from-2103427/cards-from-2103431/SCOPE.json": "a7e3a13f9257543e8ae2fcb5387001e7d3364b202d279f280fdee64af60afe47",
+    "repairs/cobra-next-from-2103427/cards-from-2103431/build.py": "6710e24fa9266c6a8a5033aa099cb935ec0283bd28551a9f133aa58d6d761dd4",
+    "repairs/cobra-next-from-2103427/cards-from-2103431/cards-reuse/SOURCE-BUDGET.json": "4fa6f7cf0bef69191fbe178407f65a4c6ed3dd7596904bd514ac59c81d89b48e",
+    "repairs/cobra-next-from-2103427/cards-from-2103431/cards-reuse/patch.py": "d78f99af8bbc7c1484e1ec38bb61816df0a47eb0fa8798bc4a0c1e423c569d25",
+    "repairs/cobra-next-from-2103427/cards-from-2103431/cards-reuse/runtime/CobraCardsReuse.java": "6da97a198c89a6113d5643faa6267d3835c9a6a44e2c3b1300fcfa1b9051b6f3",
+    "repairs/cobra-next-from-2103427/cards-from-2103431/cards_patch.py": "eb0b66e4f710a0146dd9167f78775492d260f00f2adb0c01189b2b31b1d2d260",
+    "repairs/cobra-next-from-2103427/cards-from-2103431/logo-clear/SOURCE-BUDGET.json": "3a2304344f6fe2effb23f927386b6a16eaf3b7b7d25f75f142d36cd2009261cf",
+    "repairs/cobra-next-from-2103427/cards-from-2103431/logo-clear/patch.py": "8167e0f769ab25225d0c2eb36b4d29af0b5e2d404549838d51ff0b4f3cdcde87",
+    "repairs/cobra-next-from-2103427/cards-from-2103431/presentation_patch.py": "458eaa460d4dc78394f191f5d54e8ef6eca07a638f0a39ff72c3b68e9fdf1d04",
+    "repairs/cobra-next-from-2103427/cards-from-2103431/profile-reads/SOURCE-BUDGET.json": "4b63efbc99fb814961793f184b101ecd46602d05af8172b331f7adecda9a4fe2",
+    "repairs/cobra-next-from-2103427/cards-from-2103431/profile-reads/patch_feature.py": "b11453a4777dfd356e5581c9bbb21c39dd9e7e32ad5ddef5dc9a1c159abcb92c",
+    "repairs/cobra-next-from-2103427/cards-from-2103431/profile-reads/runtime/CobraProfileDataReuse.java": "8fb9c9c9cb6fe99a99fff3c4417e575359061953afac52f56255ed76f52560ca",
+    "repairs/cobra-next-from-2103427/cards-from-2103431/projection_patch.py": "4698d792d0e05848a58b22deb9dbc2d3997b30c460fb6df290978b9d1bcbb1e1",
+    "repairs/cobra-next-from-2103427/cards-from-2103431/runtime/CobraCardsLayout.java": "d125ac424595cf91bcea193f7c75bee6f68b824a2ab552a4770046eaba70d85f",
+    "repairs/cobra-next-from-2103427/cards-from-2103431/runtime/CobraCardsTiles.java": "899905e672ff5f9330773ad0a500bdaa5354080205170335a7e62e494e438eaa",
+    "repairs/dual-experience-isolation-2103420/ModuleDexWriter.java": "f9c1b6da2552d529f27709b5f1c53368cacfab42d83fc947cb3b16cd0416dad2"
+  },
+  "verifier_source_sha256": "e3bdc1a0d8a5ae573aa0dea3a0314c71c081a46c1a8e69ec0f412aa352344f80",
+  "APK": "NOT_BUILT",
+  "shutdown": "NOT_RUN"
+}

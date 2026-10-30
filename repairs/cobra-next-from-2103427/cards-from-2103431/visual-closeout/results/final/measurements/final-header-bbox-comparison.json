@@ -1,0 +1,52 @@
+{
+  "method": "Same previously selected calibration threshold: minRGB>70 and maxRGB-minRGB<40; in-memory x125..264,y15..64; no reference image/crop saved",
+  "results": {
+    "reference": {
+      "bbox": [
+        136,
+        24,
+        250,
+        57
+      ],
+      "width": 114,
+      "height": 33
+    },
+    "final_native_render": {
+      "bbox": [
+        136,
+        24,
+        249,
+        57
+      ],
+      "width": 113,
+      "height": 33
+    }
+  },
+  "supplementary_high_threshold_check": {
+    "method": "Local in-memory pixel analysis; white-like minRGB>100 and max-min<35 within x125..264,y15..64; no reference crop saved",
+    "results": {
+      "reference": {
+        "bbox": [
+          136,
+          24,
+          249,
+          56
+        ],
+        "width": 113,
+        "height": 32
+      },
+      "final_native_render": {
+        "bbox": [
+          136,
+          24,
+          249,
+          57
+        ],
+        "width": 113,
+        "height": 33
+      }
+    },
+    "exact_font_or_pixel_parity": "NOT_CLAIMED"
+  },
+  "exact_font_or_pixel_parity": "NOT_CLAIMED"
+}
