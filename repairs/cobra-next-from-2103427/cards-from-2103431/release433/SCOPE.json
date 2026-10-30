@@ -21,5 +21,12 @@
   "focused_selection": "CI-HOST-SCOPE.json and PRODUCER-SCOPE.json updated before execution; header-specific calibration scope independently recorded",
   "Android_emulator": "NOT_SELECTED; previous observer-budget failure retained, no identical retry",
   "shutdown": "NOT_CHANGED_NOT_TESTED",
-  "physical_acceptance": "USER_ONLY_PENDING"
+  "physical_acceptance": "USER_ONLY_PENDING",
+  "confirmed_followup": {
+    "evidence": "failed41035278314/REUSE-PREASSERT-DIAGNOSTIC.json",
+    "cause": "Unchanged EPG geometry was re-applied solely because contentGeneration changed, forcing Android layout and clearing native bound selection",
+    "correction": "Keep metadata and row measurement fresh; apply rectangles/drawables only when width,font,rowheight or actualnowboxpixelheight changes; retain native selection across genuine geometry updates",
+    "local_selected_before_execution": "One strict failing return case and existingfourvisualcloseoutmethods; newactualownerrequired",
+    "next_producer_reason": "Changed productiongeometrycache, prevalidatedlocally; same30mandatorychecks, no unchanged blindretry"
+  }
 }

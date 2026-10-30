@@ -1,0 +1,32 @@
+{
+  "class": "CobraCardsReuseNativeTest",
+  "methods": [
+    "nativeReusePreservesScrollSelectionAndCurrentProgramme"
+  ],
+  "recorded_before_execution": true,
+  "command": [
+    "/workspace/cobra-evidence/maven/apache-maven-3.9.9/bin/mvn",
+    "-B",
+    "-q",
+    "-f",
+    "/workspace/cobra-evidence/cards433-reuse-preassert-diagnostic-v1/pom.xml",
+    "-Dmaven.repo.local=/home/agent/.m2/repository",
+    "-Dtest=CobraCardsReuseNativeTest#nativeReusePreservesScrollSelectionAndCurrentProgramme",
+    "test"
+  ],
+  "compile_only_command": [
+    "/workspace/cobra-evidence/maven/apache-maven-3.9.9/bin/mvn",
+    "-B",
+    "-q",
+    "-f",
+    "/workspace/cobra-evidence/cards433-reuse-preassert-diagnostic-v1/pom.xml",
+    "-Dmaven.repo.local=/home/agent/.m2/repository",
+    "-DskipTests",
+    "test-compile"
+  ],
+  "compiled_only_fixture_classes": [
+    "CobraSettingsReturnBaselineTest"
+  ],
+  "scope_sha256": "e2ab283c0b93a73af867086f0c6129293c2b7b4a8218f776395baa1bd3a165e3",
+  "production_source": "30f840bab7eb21eee8255ff349d3f7eb61fc8202"
+}

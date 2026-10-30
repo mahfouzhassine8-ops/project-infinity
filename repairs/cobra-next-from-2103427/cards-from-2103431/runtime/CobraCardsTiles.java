@@ -97,7 +97,7 @@ public final class CobraCardsTiles {
     Field channelName,channelGroup,channelIcon,programmeStart,programmeStop,programmeTitle,layoutColumns,layoutBrowser;
     Object bound;
     WeakReference<ListAdapter> boundAdapter=new WeakReference<>(null),measuredAdapter=new WeakReference<>(null);
-    int adapterPosition=-1,measuredRow=-1,measuredWidth=-1,configuredHeight=-1;
+    int adapterPosition=-1,measuredRow=-1,measuredWidth=-1,configuredHeight=-1,configuredNowHeight=-1;
     int measuredFlags,measuredMaxLines,requiredNowHeight;
     float measuredFont=-1;
     float measuredTextSize,measuredScaleX,measuredSkewX,measuredLetterSpacing,measuredLineSpacing,measuredLineExtra;
@@ -386,15 +386,23 @@ public final class CobraCardsTiles {
           live.setTextSize(TypedValue.COMPLEX_UNIT_PX,20.5f*scale*font);
         }
         int height=rowHeight(a,width,font);
-        if(bound!=null && configuredHeight!=height){rowSyncPending=true;selectionAfterResize=true;}
+        float nowHeight=Math.max(52*font,requiredNowHeight/scale);
+        int nowPixels=px(nowHeight);
+        boolean geometry=dimensions || configuredHeight!=height || configuredNowHeight!=nowPixels;
+        if(bound!=null && configuredHeight!=height)rowSyncPending=true;
+        if(bound!=null && geometry)selectionAfterResize=true;
         ViewGroup.LayoutParams parent=card.getLayoutParams();
         if(parent==null){card.setLayoutParams(new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,height));}
         else if(parent.height!=height){parent.height=height;card.setLayoutParams(parent);}
-        if(!dimensions && configuredHeight==height && configuredContentGeneration==contentGeneration){
+        // Fresh content still invalidates/recomputes row measurement. If its
+        // resolved geometry is equal, consume it without identical setters:
+        // Android requests layout even for the same LP/drawable values.
+        configuredContentGeneration=contentGeneration;
+        if(!geometry){
           if(rowSyncPending)rowSyncPending=!synchronizeAttachedRow(a);
           return;
         }
-        configuredWidth=width;configuredFont=font;configuredHeight=height;configuredContentGeneration=contentGeneration;
+        configuredWidth=width;configuredFont=font;configuredHeight=height;configuredNowHeight=nowPixels;
         float nominalHeight=250+Math.max(0,font-1)*128;
         float refHeight=nominalHeight+(height-Math.max(1,Math.round(nominalHeight*scale)))/scale;
         liveDot.setBounds(0,0,px(16),px(16));live.setCompoundDrawables(liveDot,null,null,null);live.setCompoundDrawablePadding(px(8));
@@ -403,7 +411,7 @@ public final class CobraCardsTiles {
         place(logo,20,44,122,100);place(fallback,20,44,122,100);place(divider,145,34,1,104);
         place(category,164,32,448-164-80,20*font);
         place(title,164,titleTop,448-164-24,30*font);
-        place(now,164,nowTop,448-164-24,Math.max(52*font,requiredNowHeight/scale));
+        place(now,164,nowTop,448-164-24,nowHeight);
         float liveWidth=84*font,timeLeft=24+liveWidth+8;
         place(live,24,footer,liveWidth,26*font);place(time,timeLeft,footer+1,Math.max(24,448-timeLeft-24),26*font);
         place(progress,24,refHeight-38,448-48,10);
