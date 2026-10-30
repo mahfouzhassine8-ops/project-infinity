@@ -1,0 +1,46 @@
+{
+  "phase": "UNSIGNED_SINGLE_ACTIVITY_PROTOTYPE_NO_APK",
+  "baseline_signed_source": "9ccc4c362a65118eeba38a8e7e4b0de5723c69af",
+  "baseline_APK_sha256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471",
+  "baseline_INPUTS_sha256": "4be4dd8fe93205bd4569cfd9eb219727356af10c5060d5d26e76f4b53e1ccbc9",
+  "baseline_DEX_sha256": {
+    "classes.dex": "07b94bfde6dbc3e3a6bfc8436ea65e6a67bdef5ca868379809e20f2fb7ce8efb",
+    "classes2.dex": "2e8fa1ae27e670db0525d31a655e93d861893fa20316d5c54a4c6283a97ca304",
+    "classes3.dex": "7e18d8092de33a4d44e299305965e9b9eb943372a9643452f6f78afe209fb215",
+    "classes4.dex": "9f82b0420b32ad8bdda7ef042e44bb975c8c01663f66506eaf33d22123f49b82",
+    "classes5.dex": "af03db41f53209de52f5d8609e411da49fee106d0fe544d6ea6e5d8230d88363"
+  },
+  "prototype_DEX_sha256": "6897d90af7f6003dad2bd7e0ec57e5ef5d937f28889bdf98013d33d8e302487c",
+  "prototype_smali_sha256": "2ef964ce959b57dba6f7db6f6a5cc54d45b5e463b3255031bdcb7616ad11d138",
+  "baseline_smali_sha256": "1a1f54d8310b352826d12f338c23fdd6bcaaf1b89993aa5d4e1ef54e6432b1d5",
+  "fresh_accepted_DEX_disassembly_sha256": "1a1f54d8310b352826d12f338c23fdd6bcaaf1b89993aa5d4e1ef54e6432b1d5",
+  "baksmali_tool_sha256": {
+    "baksmali-2.5.2.jar": "1ed236266d7dc4907aade0b19a34f77efac25342b63c8ace52e579039941b389",
+    "dexlib2-2.5.2.jar": "5a5c8982d8bd7d6e3bb1a0713049e3c78b719ec32b20f6b619885cec30a0dd61"
+  },
+  "patch_source_sha256": "fb586cfb2d122c1b6bf91216a51556d38fe2fb299f45f002a7c055f096efadca",
+  "method_budget_sha256": "8a6078ff90a856cbf24432feec0fdb3a8f8f2ae1885493c3383197a9f2fc18a3",
+  "changed_methods": [
+    "private cobraChannelsForCurrentView()Ljava/util/ArrayList;",
+    "private cobraGuideChannels()Ljava/util/ArrayList;"
+  ],
+  "method_count": 1802,
+  "all_other_method_and_class_metadata_identical": true,
+  "changed_translated_classes": [
+    "com/projectinfinity/kodi/InfinityLiveActivity.class"
+  ],
+  "all_other_translated_production_class_bytes_identical": true,
+  "unchanged_translated_class_count": 4989,
+  "support_jar_exact": "016a9ca405468cbc86fb6da8634e943ada67ffa615a3b804a1d9680fca84f1ad",
+  "original_baseline_test_sha256": "24e843f8fc18a75a80654dfe20ae22aa6d65e645307b4fdbf3adfcafedcd5f94",
+  "test_sha256": "eb111d2dffc655e9f8d1f68246d9c51c6d8fc416e95f37265325d1afc9239a41",
+  "semantic_scenarios_unchanged": true,
+  "additional_non_timed_assertion": "Input inventory size, order and object identities unchanged after each semantic projection",
+  "expected_hidden_reads": 1,
+  "expected_default_sets": 1,
+  "warmups_per_entry": 2,
+  "timed_samples_per_entry": 7,
+  "application_APK": "NOT_BUILT_OR_MODIFIED",
+  "physical_Fold": "NOT_RUN",
+  "shutdown": "NOT_RUN"
+}

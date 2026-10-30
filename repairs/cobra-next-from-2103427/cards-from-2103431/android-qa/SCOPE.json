@@ -1,0 +1,40 @@
+{
+  "selection": "ACCEPTED_SIGNED_2103431_CARDS_BASELINE_ONLY",
+  "signed_source": "9ccc4c362a65118eeba38a8e7e4b0de5723c69af",
+  "signing_run": 40971769136,
+  "APK_sha256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471",
+  "environment": "FRESH_DISPOSABLE_ANDROID17_API37_EMULATOR_ONLY",
+  "fixture": {
+    "channels": 20226,
+    "groups": 12,
+    "EPG_channels": 32,
+    "programmes_per_EPG_channel": 2,
+    "logos": "OMITTED",
+    "media": "EXISTING_FOUR_LOCAL_SYNTHETIC_CLIPS; HASHED_BEFORE_IMPORT"
+  },
+  "runtime_selection": [
+    "One cold Welcome am-start-W observation through existing exact-APK installer/probe",
+    "Normal M3U source form imports local inventory plus XMLTV",
+    "Source TEST_AND_SAVE through first confirmed Cards/All-channels/20226/grid state, as observer upper bound",
+    "Three HOME/normal-Cobra-foreground returns with strict known-notice acknowledgement",
+    "Eight visible native Cards-grid swipes with before/after public UI hints",
+    "Raw Android HWUI framestats, configured display/power settings, finite PSS/RSS and CPU snapshots"
+  ],
+  "local_preflight_selection": [
+    "AST syntax checks",
+    "Offline deterministic text fixture generation/count/uniqueness/XML/hash checks, outside concurrent host timing window"
+  ],
+  "protected": {
+    "application_build": "NOT_SELECTED",
+    "legacy_native_runner": "NOT_SELECTED",
+    "Pro_or_fullscreen_button_scenarios": "NOT_SELECTED",
+    "Infinity": "NOT_LAUNCHED",
+    "shutdown": "NOT_SELECTED_OR_TESTED",
+    "uninstall_data_reset_private_data_injection": "PROHIBITED",
+    "user_device_installation": "NOT_SELECTED"
+  },
+  "verification_status": "QA_SOURCE_PREPARED; NO_ANDROID_OR_CI_EXECUTION_BY_AUTHOR",
+  "visual_reference": "APPROVED_IMAGE_NOT_USED_OR_SUBSTITUTED; THIS_MEASURES_OLD_ACCEPTED_CARDS_ONLY",
+  "local_preflight_status": "PASS_AST_SYNTAX_AND_OFFLINE_FIXTURE_COUNTS_HASHES_DETERMINISM",
+  "offline_evidence": "OFFLINE-FIXTURE-CHECKS.json"
+}

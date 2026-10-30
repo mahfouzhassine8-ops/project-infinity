@@ -1,0 +1,48 @@
+{
+  "scope": "ACTUAL_PRODUCTION_DEX_HOST_PROJECTION",
+  "phase": "UNSIGNED_SINGLE_ACTIVITY_PROTOTYPE_NO_APK",
+  "inventory": 20226,
+  "sources": 2,
+  "warmups_per_entry": 2,
+  "samples_per_entry": 7,
+  "timing_includes_read_counter_proxy": false,
+  "physical_Fold": "NOT_RUN",
+  "startup_or_frame_metric": false,
+  "shutdown": "NOT_RUN",
+  "cobraChannelsForCurrentView": {
+    "samples_ms": [
+      34.292571,
+      31.255884,
+      20.333349,
+      46.744856,
+      45.495527,
+      37.858496,
+      43.532228
+    ],
+    "median_ms": 37.858496,
+    "min_ms": 20.333349,
+    "max_ms": 46.744856,
+    "hidden_preference_reads_separate_count_call": 1,
+    "distinct_hidden_default_sets_separate_count_call": 1,
+    "feature_profiles_JSON_reads_separate_count_call": 40452,
+    "feature_active_profile_reads_separate_count_call": 40452
+  },
+  "cobraGuideChannels": {
+    "samples_ms": [
+      15.314304,
+      17.193837,
+      18.934461,
+      18.700558,
+      21.338504,
+      18.080614,
+      24.733512
+    ],
+    "median_ms": 18.700558,
+    "min_ms": 15.314304,
+    "max_ms": 24.733512,
+    "hidden_preference_reads_separate_count_call": 1,
+    "distinct_hidden_default_sets_separate_count_call": 1,
+    "feature_profiles_JSON_reads_separate_count_call": 40452,
+    "feature_active_profile_reads_separate_count_call": 40452
+  }
+}

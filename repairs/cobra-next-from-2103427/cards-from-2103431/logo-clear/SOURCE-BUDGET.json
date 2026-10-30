@@ -1,0 +1,14 @@
+{
+  "baseline_signed_source": "9ccc4c362a65118eeba38a8e7e4b0de5723c69af",
+  "baseline_class_sha256": "522f73506612c1b6c9c890bebbcefed5e54363b79098e0d88e76a252faf3c1ae",
+  "new_method": "public static clear(Landroid/app/Activity;Landroid/widget/ImageView;)V",
+  "existing_methods_fields_annotations": "MUST_REMAIN_EXACT",
+  "purpose": "Cards recycled tile URL to blank clears only that view binding and listener; existing shared flight/cache unchanged",
+  "tests_selected": [
+    "No service or worker creation when no owner exists",
+    "Clear in-flight A then attach/rebind blank never delivers or requeues A",
+    "Clear then B permits only B delivery to cleared view",
+    "Independent A waiter continues unchanged"
+  ],
+  "shutdown": "NOT_SELECTED"
+}

@@ -1,0 +1,40 @@
+{
+  "selected_before_execution": true,
+  "reason": "V1 correctness/work reduction passed but 2-warmup/7-sample host medians regressed; investigate remaining V1 compaction scan and control observed JIT/order trends",
+  "baseline": "Exact accepted original-key signed2103431 DEX; no APK rebuild",
+  "candidate": "Unsigned two-method Activity prototypeV2; no-filter fast return",
+  "candidate_DEX_sha256": "f3fe97407023881be8457c60d61da8189c93b0546010fb8dc34787869aa88dd1",
+  "selected_test": "CobraProjectionBenchmarkTest",
+  "tests_per_run": 2,
+  "fixed_run_order": [
+    "B431",
+    "C2",
+    "C2",
+    "B431"
+  ],
+  "warmups_per_entry_per_run": 21,
+  "samples_per_entry_per_run": 21,
+  "aggregate_samples_per_entry_per_variant": 42,
+  "adaptive_stopping": "NONE; fixed counts/order, genuine test errors remain failures",
+  "same_fixture_source_and_configuration": true,
+  "timing_counters": "Read counters disabled during timing; separate count call requires hidden/defaults20226 baseline versus1 candidate and40452 profile JSON/active-profile checks unchanged",
+  "correctness": "Same selected semantic cases and input inventory immutability assertions",
+  "metrics": "Raw samples; per-run and pooled p50 midpoint; p95 nearest rank. Host-only, finite sample, no device speed/frame/power claim",
+  "peer_source_review": "V2 returns original fresh filtered list only when hidden set is empty/null and no MY filter; original auth/filter method unchanged; exact two-method guard required",
+  "execution": {
+    "status": "COMPLETED_FIXED_ABBA; SELECTED_CORRECTNESS_AND_COUNTS_PASS",
+    "test_executions": 8,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "output": "results/abba-projection-v2",
+    "same_fixture_SHA256": "3cecece1e5d9ed1e907dfe2f48673f2ac057a575853075097c7dacf6c343517f",
+    "result_interpretation": "MIXED_LATENCY; Guide p50/p95 lower, current-view p50 higher; no blanket speedup claim",
+    "effective_counts": "Fixed21warmups+21samples eachentry eachrun; aggregate42pervariant/entry; preparedV2default2/7 were overridden equally in all four effective runPOMs"
+  },
+  "APK_build": "NOT_RUN",
+  "CI": "NOT_RUN",
+  "emulator": "NOT_RUN",
+  "shutdown": "NOT_RUN",
+  "physical_Fold": "NOT_RUN"
+}

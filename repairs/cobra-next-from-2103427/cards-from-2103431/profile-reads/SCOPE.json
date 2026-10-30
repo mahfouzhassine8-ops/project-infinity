@@ -1,0 +1,45 @@
+{
+  "scope": "HOST_ONLY_PRIVATE_PARSED_PROFILE_DATA_REUSE_PROTOTYPE",
+  "selected_before_execution": true,
+  "source_review": "Actualaccepted431canonicalFeatureRuntime; adultLocked readsactiveProfileId thenprofiles; profiles catchesException toemptyJSONArray; exactid/optBoolean loop preserved",
+  "prototype_mutations": "OnlyFeatureRuntime.adultLocked wrapper plus two-class Cobra helper; Activity projectionV2 admitted separately. No public profiles/auth/PIN/source getter or persistence method changes.",
+  "fresh_reads": "activeProfileId and SharedPreferences profiles rawJSONString both fresh every adultLocked invocation in original order",
+  "cache": "ThreadLocal one private Entry(rawString,JSONArray); maxadmittedrawlength65536UTF16chars; oversizealwaysparseuncached; no boolean/decision cache, TTL, polling, owner or SharedPreferences reference",
+  "parity_requirements": [
+    "missing/duplicateids",
+    "nullactiveidexceptionbehavior",
+    "malformed/wrongtype/nullraw",
+    "validoversize",
+    "publicprofilesfreshmutablecopies",
+    "nextcallrawedit/idswitch/lock/unlock",
+    "threadseparation",
+    "nohelperpreferencewrites"
+  ],
+  "tests": "SOURCES_PREPARED_ONLY; await peer review before selected host execution/timing",
+  "APK_build": "NOT_RUN",
+  "CI": "NOT_RUN",
+  "emulator": "NOT_RUN",
+  "signing": "NOT_RUN",
+  "shutdown": "NOT_RUN",
+  "physical_Fold": "NOT_RUN",
+  "extension_dispatch": "Accepted431FeatureRuntime is public final, pinnedclassSHAf93c0ef10380e71937d97d9f427412d8e14230aa10413909a31451cf0f4b7b34; publicprofiles cannot be overridden by subclasses",
+  "selected_future_tests": [
+    "CobraProfileDataReuseTest (6 bounded data/API parity cases)",
+    "CobraProjectionBenchmarkTest (existing exact semantic scenarios and fresh preference-read counts; same fixed timing protocol only after review)"
+  ],
+  "preparation": {
+    "status": "PASS_HOST_CLASS_PREPARATION_ONLY",
+    "helper_class_count": 2,
+    "Feature_method_count": 55,
+    "existing_changed_classes": [
+      "com/projectinfinity/kodi/InfinityCobraFeatureRuntime.class",
+      "com/projectinfinity/kodi/InfinityLiveActivity.class"
+    ],
+    "all_other_existing_class_count_byte_exact": 4988,
+    "host_tests": "NOT_RUN_AWAITING_PEER_REVIEW",
+    "work": "/workspace/cobra-evidence/cards431-profile-data-prototype-v1",
+    "feature_DEX_sha256": "0b27e6272f49908a1d1238ec45052c23a6687d4873688f2fac259cd4c5df0148",
+    "helper_DEX_sha256": "2bd2c311cc736c438d7de9f7629b1d4180582b00b534369577b373f314f23ee8",
+    "evidence": "results/preparation-only"
+  }
+}

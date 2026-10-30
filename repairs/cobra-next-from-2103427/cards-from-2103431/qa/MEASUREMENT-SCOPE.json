@@ -1,0 +1,28 @@
+{
+  "selected_before_execution": true,
+  "scope": "Exact signed 2103431 Cobra inventory projection baseline only",
+  "accepted_signed_source": "9ccc4c362a65118eeba38a8e7e4b0de5723c69af",
+  "accepted_APK_sha256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471",
+  "selected_test": "com.projectinfinity.kodi.CobraProjectionBenchmarkTest",
+  "methods": [
+    "actualSigned431ProjectionBaseline20226",
+    "nextProjectionReflectsFiltersHiddenFavoritesRecentsInventoryAndProfile"
+  ],
+  "fixture": "20226 synthetic Channel instances, two synthetic sources; actual production methods and actual feature-runtime profile parsing; forwarding SharedPreferences read counters",
+  "timings": "2 warmups then 7 samples per actual projection entry; work-count observation separate from timed samples",
+  "runtime": "Robolectric API35 host, no Activity.onCreate, player, network, Android emulator, APK build, signing or shutdown",
+  "physical_Fold": "NOT_RUN",
+  "production_changes": "NONE",
+  "execution": {
+    "status": "PASS_SELECTED_TWO_HOST_TESTS",
+    "tests": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "work_path": "/workspace/cobra-evidence/cards431-projection-baseline",
+    "command": "/workspace/cobra-evidence/maven/apache-maven-3.9.9/bin/mvn -B -q -f /workspace/cobra-evidence/cards431-projection-baseline/pom.xml -Dtest=CobraProjectionBenchmarkTest test",
+    "production_changes": "NONE",
+    "evidence": "results/signed431-baseline",
+    "support_translation_warnings": "Preserved support-only warnings: classes.dex InfinityCosmicArt.light/dark UTF8 string too large; classes3.dex ASM ArrayIndexOutOfBoundsException. Cobra classes4/classes5 translate without error archives; selected actual projection methods execute and pass."
+  }
+}

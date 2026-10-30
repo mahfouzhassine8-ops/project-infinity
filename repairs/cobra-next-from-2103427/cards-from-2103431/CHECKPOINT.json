@@ -1,0 +1,46 @@
+{
+  "status": "ACTIVE_EXISTING_TASK_CARDS_AND_COBRA_PERFORMANCE",
+  "branch": "work/cobra-only-from-2103427-20261028",
+  "entire_brief_read": true,
+  "production_changed": false,
+  "baseline": "BASELINE.json",
+  "scope": "SCOPE.json",
+  "reference": "RESOLVED; both exact images SHA256 verified and visually inspected; private files outside repository",
+  "next": "Finish profile and presentation focused parity tests, Cards tile/header/layout implementation and actual visual comparison; run selected exact431 Android baseline, then integrate only passing measured changes; one consolidated signed candidate after focused verification.",
+  "agents": {
+    "qa_preflight_review": "Profile parity and projection correctness only",
+    "delivery_finish_review": "Presentation candidate parity and player progress path",
+    "native_framework_classpath": "Cards-only tile helper",
+    "nonpro_actual_view_test": "Cards-only header/layout/details helper"
+  },
+  "physical_Fold": "USER_ACCEPTED431; new work not tested",
+  "APK_or_registry_changes": "NONE; no new app APK, signer, release registration, CI run or lock",
+  "shutdown": "FROZEN_NOT_RUN",
+  "production_source_status": "Accepted431 global builder/runtime unchanged; isolated next-version helper/patch sources and host prototypes in this folder only",
+  "implemented_local": [
+    "Guarded two-method inventory projection prototype V2, with actual431 class preservation",
+    "Bounded private parsed-profile-data helper and one adultLocked wrapper; policy decisions remain fresh",
+    "Guarded presentation update patch to eliminate duplicate guide writes when final writer is active",
+    "Cards-only tile helper source; header/layout implementation active"
+  ],
+  "verified": [
+    "Exact431 recovery hashes and signed-source bindings",
+    "Projection semantics/freshness/input identity in all four ABBA runs; 8 selected tests pass",
+    "Projection work count 20226 hidden reads/default sets to1; mixed latency honestly retained",
+    "Presentation baseline 12 cases demonstrates duplicate Now/Next/progress writes; candidate test underway"
+  ],
+  "measurements": {
+    "host_only": true,
+    "projection_current_ms_p50": [
+      15.7854685,
+      16.6616565
+    ],
+    "projection_guide_ms_p50": [
+      17.1696595,
+      15.5438345
+    ],
+    "general_speedup_established": false,
+    "profile_data_prototype": "Correctness tests starting after independent review; no timing result yet",
+    "Android_new_scope": "Harness prepared; no CI/emulator run yet"
+  }
+}

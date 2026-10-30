@@ -1,0 +1,13 @@
+# Private parsed-profile data reuse — host prototype awaiting review
+
+The accepted signed431 projection baseline makes40,452 fresh `profiles` preference reads per20,226-channel projection. The original `adultLocked()` reparses that raw JSON on every call. This prototype retains both fresh preference reads and the original lookup policy; it reuses only the private parsed representation when the current raw string is identical.
+
+`InfinityCobraFeatureRuntime` is `public final` in the pinned accepted431 DEX. Its public `profiles()` therefore has no subclass provider to preserve, and it remains byte-identical, returning independent mutable arrays. PIN/unlock, profile/source getters, all other54 FeatureRuntime methods, fields and annotations remain exact. The replacement `adultLocked` wrapper calls original `activeProfileId()` first, then supplies the existing final preference object to the helper.
+
+The helper reads `profiles` with the same `[]` default every call, matching the old catch-Exception-to-empty behavior for getters or parsing. It uses the same `optJSONObject`, first matching `activeId.equals(optString("id"))`, and `optBoolean("adult_locked",false)` loop. Null active IDs retain the original exception behavior when an object is reached. No boolean or authorization result is cached.
+
+A private ThreadLocal holds one entry containing only raw String and private JSONArray. Admission is at most65,536 UTF16 code units. Larger valid data is always parsed and evaluated uncached; null/oversize/read failures drop the prior entry. No owner, SharedPreferences, Activity or public-array reference is stored. No TTL, timer, thread, service, persistent write or public cache API is added.
+
+Prepared host classes admit only the existing Activity projectionV2, the one-method FeatureRuntime wrapper, and two helper classes. All4,988 other existing translated production class entries and support dependencies are byte-identical to accepted431. The initial preparation lacked a standalone `javac`; its failure is preserved. The corrected preparation uses the already installed JDK compiler module and the pinned Android/D8 inputs.
+
+Six focused new API/data-parity test sources and the existing two projection test sources are prepared. **No host tests or timing have run for this prototype; independent review is required first.** No candidate APK, CI, Android emulator, signing, shutdown test or physical Fold claim.

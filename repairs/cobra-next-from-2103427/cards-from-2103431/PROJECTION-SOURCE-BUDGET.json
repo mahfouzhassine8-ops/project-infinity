@@ -1,0 +1,22 @@
+{
+  "baseline_signed_source": "9ccc4c362a65118eeba38a8e7e4b0de5723c69af",
+  "baseline_COBRA_part0_sha256": "9f82b0420b32ad8bdda7ef042e44bb975c8c01663f66506eaf33d22123f49b82",
+  "selected_method_preimages": {
+    "private cobraChannelsForCurrentView()Ljava/util/ArrayList;": "6d06922e2be98cfd229206c965cceb0f71609207836e24c43d8d95b7b479e4fe",
+    "private cobraGuideChannels()Ljava/util/ArrayList;": "fbca05b1580498c2e4cc9f4cb3d48ede74bf61c00455b88fc0fa39c3262c44d0"
+  },
+  "read_only_assumption_preimages": {
+    "private filteredChannels(ZZ)Ljava/util/List;": "94814ec4f83dbf5ef868215b05b10051519e69a85738acca7be42bd53fa82341",
+    "private isCobraHidden(Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;)Z": "50eb4082bf310c1dca79b13eedc4f50f582f2dd08925dd11b04d2438d37c2a72"
+  },
+  "changed_methods": [
+    "private cobraChannelsForCurrentView()Ljava/util/ArrayList;",
+    "private cobraGuideChannels()Ljava/util/ArrayList;"
+  ],
+  "new_fields_or_methods": false,
+  "profile_auth_and_filteredChannels": "UNCHANGED",
+  "visible_UI_changes": "NONE",
+  "cross_call_cache": "NONE",
+  "private_fresh_list_compaction": "Order and same Channel objects retained; no mutation of inventory or preference sets; bulk-tail clear avoids repeated removal shifts",
+  "shutdown": "UNCHANGED_NOT_TESTED"
+}

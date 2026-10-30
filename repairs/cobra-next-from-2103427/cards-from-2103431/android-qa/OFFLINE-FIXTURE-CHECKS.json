@@ -1,0 +1,48 @@
+{
+  "Android_or_application_execution": "NONE",
+  "EPG_channels": 32,
+  "EPG_programmes": 64,
+  "XMLTV_channel_declarations_before_programmes": true,
+  "anchor_epoch": 1793332800,
+  "channel_count": 20226,
+  "deterministic_files_at_same_anchor": [
+    "cards-20226.m3u",
+    "cards-epg.xml",
+    "FIXTURE.json"
+  ],
+  "files": {
+    "cards-20226.m3u": {
+      "bytes": 2588983,
+      "sha256": "cff5abedcd20104609372287dc740d7cd1d97c4bb711f21a485fff98f4747c8f"
+    },
+    "cards-epg.xml": {
+      "bytes": 24199,
+      "sha256": "88cb408596429897c7af06219c0747992731c468688d8adaca211604306e8e4e"
+    }
+  },
+  "generator_source_sha256": "90119dbe4af47b476e7fd0272b7ab011eec8f2ca17f20aa436d4548819174d9c",
+  "group_count": 12,
+  "group_sizes": {
+    "Cards QA Group 01": 1686,
+    "Cards QA Group 02": 1686,
+    "Cards QA Group 03": 1686,
+    "Cards QA Group 04": 1686,
+    "Cards QA Group 05": 1686,
+    "Cards QA Group 06": 1686,
+    "Cards QA Group 07": 1685,
+    "Cards QA Group 08": 1685,
+    "Cards QA Group 09": 1685,
+    "Cards QA Group 10": 1685,
+    "Cards QA Group 11": 1685,
+    "Cards QA Group 12": 1685
+  },
+  "logos": "OMITTED",
+  "media_generation": "NONE",
+  "remaining_channels_without_schedule": 20194,
+  "require_media_missing_rejected": "Existing nonempty synthetic media required: qa1.mp4",
+  "scope": "OFFLINE_TEXT_FIXTURE_ONLY_NO_ANDROID_MEDIA_OR_BENCHMARK",
+  "shutdown": "NOT_RUN",
+  "status": "PASS",
+  "unique_IDs": 20226,
+  "unique_URLs": 20226
+}

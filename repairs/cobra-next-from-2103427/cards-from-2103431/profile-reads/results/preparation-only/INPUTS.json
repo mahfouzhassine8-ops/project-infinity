@@ -1,0 +1,51 @@
+{
+  "phase": "HOST_ONLY_UNSIGNED_PARSED_PROFILE_DATA_REUSE_PROTOTYPE",
+  "baseline_source": "9ccc4c362a65118eeba38a8e7e4b0de5723c69af",
+  "baseline_APK_sha256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471",
+  "baseline_DEX_sha256": {
+    "classes.dex": "07b94bfde6dbc3e3a6bfc8436ea65e6a67bdef5ca868379809e20f2fb7ce8efb",
+    "classes2.dex": "2e8fa1ae27e670db0525d31a655e93d861893fa20316d5c54a4c6283a97ca304",
+    "classes3.dex": "7e18d8092de33a4d44e299305965e9b9eb943372a9643452f6f78afe209fb215",
+    "classes4.dex": "9f82b0420b32ad8bdda7ef042e44bb975c8c01663f66506eaf33d22123f49b82",
+    "classes5.dex": "af03db41f53209de52f5d8609e411da49fee106d0fe544d6ea6e5d8230d88363"
+  },
+  "projection_V2_DEX_sha256": "f3fe97407023881be8457c60d61da8189c93b0546010fb8dc34787869aa88dd1",
+  "Feature_class_canonical_sha256": "f93c0ef10380e71937d97d9f427412d8e14230aa10413909a31451cf0f4b7b34",
+  "Feature_final_modifier_verified": true,
+  "Feature_method_count": 55,
+  "Feature_changed_methods": [
+    "public adultLocked()Z"
+  ],
+  "Feature_all_other_methods_fields_annotations_exact": true,
+  "public_profiles_method_exact": true,
+  "feature_DEX_sha256": "0b27e6272f49908a1d1238ec45052c23a6687d4873688f2fac259cd4c5df0148",
+  "helper_DEX_sha256": "2bd2c311cc736c438d7de9f7629b1d4180582b00b534369577b373f314f23ee8",
+  "helper_source_sha256": "8fb9c9c9cb6fe99a99fff3c4417e575359061953afac52f56255ed76f52560ca",
+  "helper_classes": [
+    "com/projectinfinity/kodi/CobraProfileDataReuse$Entry.class",
+    "com/projectinfinity/kodi/CobraProfileDataReuse.class"
+  ],
+  "changed_existing_translated_classes": [
+    "com/projectinfinity/kodi/InfinityCobraFeatureRuntime.class",
+    "com/projectinfinity/kodi/InfinityLiveActivity.class"
+  ],
+  "all_other_existing_class_bytes_exact": true,
+  "unchanged_existing_class_count": 4988,
+  "new_classes": [
+    "com/projectinfinity/kodi/CobraProfileDataReuse$Entry.class",
+    "com/projectinfinity/kodi/CobraProfileDataReuse.class"
+  ],
+  "runtime_policy": "Fresh activeProfileId then fresh profiles raw preference on EVERY call; private parsed data only; no policy boolean cache",
+  "compiler_inputs": {
+    "android_jar_sha256": "6cea1df3efb77103ac3e2beb9bf4718964b0e0869ab16d39d29d5cbae1c147ad",
+    "D8_jar_sha256": "305622ad00535684534eb8f742cbf5e628a9abc09d8ea4d39d1babb95bf0cee5"
+  },
+  "test_sources_sha256": {
+    "CobraProfileDataReuseTest.java": "fc5a4890d27ffb25a0f339c4b1cdfc7f9e1e05f8593ff1462a514268b1831312",
+    "CobraProjectionBenchmarkTest.java": "3cecece1e5d9ed1e907dfe2f48673f2ac057a575853075097c7dacf6c343517f"
+  },
+  "application_APK": "NOT_BUILT_OR_MODIFIED",
+  "tests": "NOT_RUN_AWAITING_PEER_REVIEW",
+  "physical_Fold": "NOT_RUN",
+  "shutdown": "NOT_RUN"
+}

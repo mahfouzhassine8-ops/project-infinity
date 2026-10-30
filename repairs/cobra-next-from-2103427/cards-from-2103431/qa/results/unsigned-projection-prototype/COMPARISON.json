@@ -1,0 +1,64 @@
+{
+  "status": "PASS_CORRECTNESS_AND_WORK_REDUCTION; HOST_TIMING_GAIN_NOT_ESTABLISHED",
+  "baseline_signed_source": "9ccc4c362a65118eeba38a8e7e4b0de5723c69af",
+  "baseline_APK_sha256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471",
+  "prototype": "UNSIGNED_SINGLE_ACTIVITY_PROTOTYPE_NO_APK",
+  "prototype_DEX_sha256": "6897d90af7f6003dad2bd7e0ec57e5ef5d937f28889bdf98013d33d8e302487c",
+  "correctness": {
+    "tests": 2,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "same_semantic_test_scenarios": true,
+    "input_inventory_size_order_identity_preserved": true
+  },
+  "semantic_raw_status_label": "The raw SEMANTICS.json retains the original baseline test method label. Prototype INPUTS and this receipt bind its actual modified Activity; it does not certify a newly signed APK.",
+  "timing_limit": "Two separate JVM executions; 2 warmups and 7 samples per entry. JIT/GC variation and overlapping ranges; no latency improvement is established and no startup/FPS/physical claim is made.",
+  "entries": {
+    "cobraChannelsForCurrentView": {
+      "baseline_median_ms": 29.48444,
+      "prototype_median_ms": 37.858496,
+      "observed_median_change_percent": 28.401611154900696,
+      "hidden_preference_reads": {
+        "before": 20226,
+        "after": 1
+      },
+      "distinct_default_sets": {
+        "before": 20226,
+        "after": 1
+      },
+      "profile_JSON_reads": {
+        "before": 40452,
+        "after": 40452
+      },
+      "active_profile_reads": {
+        "before": 40452,
+        "after": 40452
+      }
+    },
+    "cobraGuideChannels": {
+      "baseline_median_ms": 17.643241,
+      "prototype_median_ms": 18.700558,
+      "observed_median_change_percent": 5.992759493564703,
+      "hidden_preference_reads": {
+        "before": 20226,
+        "after": 1
+      },
+      "distinct_default_sets": {
+        "before": 20226,
+        "after": 1
+      },
+      "profile_JSON_reads": {
+        "before": 40452,
+        "after": 40452
+      },
+      "active_profile_reads": {
+        "before": 40452,
+        "after": 40452
+      }
+    }
+  },
+  "physical_Fold": "NOT_RUN",
+  "APK_build": "NOT_RUN",
+  "shutdown": "NOT_RUN"
+}
