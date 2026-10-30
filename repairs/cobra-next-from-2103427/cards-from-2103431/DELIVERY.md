@@ -7,7 +7,7 @@ One combined original-key signed install-over APK is delivered. This is a physic
 - [Successful original signing run41021114800](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/41021114800); [successful focused producer41020108886](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/41020108886).
 - Signing source `b53d4286759cee6707c8c2915cc5a0c9a3260336`; tested/packaged owner source `ee8fcb807a9d6c1927967182dec343d08d17cb0a` on the existing engineering branch.
 - APK SHA256: `55671707e7acc8b1c329e5b87bdbe47706607418aa152b11b8889c3081a447c3`.
-- Original certificate SHA256: `d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7`. v1/v2/v3 verification passes, package remains `com.projectinfinity.kodi`, and versionCode increases31→32. No actual phone installation is claimed.
+- Original certificate SHA256: `d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7`. v1/v2/v3 verification passes, package remains `com.projectinfinity.kodi`, and versionCode increases2103431→2103432. No actual phone installation is claimed.
 
 Cards-only visual/layout changes, native Grid/selection reuse, fresh profile parsing/projection, duplicate guide-write reduction, safe logo cleanup and bounded ambient reuse are integrated. A demonstrated cold native-theme publication race now refreshes only the helper's native-style baseline; it preserves correct cold and warm native restoration without changing native workers or theme globals. All working431 button corrections and unrelated Cobra improvements remain.
 
