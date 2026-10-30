@@ -1,0 +1,56 @@
+{
+  "scope": "QA_BOOTSTRAP_ONLY_REDUNDANT_AAR_DECLARATION_REMOVAL",
+  "run_id": 41014021276,
+  "job_id": 123926112688,
+  "source": "aba16d183283bff17cd19ef7705dc36f2edb9d22",
+  "conclusion": "failure",
+  "failed_operation": "bootstrap-dependencies-no-tests",
+  "artifact": {
+    "id": 12957914505,
+    "name": "Cobra-Cards-Host-Evidence-41014021276",
+    "bytes": 2207,
+    "sha256": "4a9f090babbe9eedd9bbef67d6deb0b78cd30f65712f089d1ef2481d18b52bac",
+    "source": "Official supported GitHub artifact connector; archive bytes verified against GitHub artifact digest"
+  },
+  "error": "Could not resolve androidx.tracing:tracing:jar:1.1.0; Central prefix disallowed; no matching .jar in Google repository",
+  "source_before_sha256": "06d6ef8ba2ff3ecd1b8374a6ce864ab8e3d71e873edb41ceef5c41fadc662e72",
+  "source_after_sha256": "42622f8a34af12b768e7c95381bf3b21f47e5258949e4c0cf1269d4c46323f0e",
+  "production_changes": "NONE",
+  "selected_host_tests": "NOT_STARTED_IN_FAILED_RUN; NOT_RUN_FOR_FIX",
+  "Android": "NOT_RUN",
+  "shutdown": "NOT_RUN",
+  "dispatch": "NONE_BY_CHILD",
+  "static_check": "Python AST syntax parsed; exact two tuple entries removed only",
+  "official_robolectric_POM": {
+    "coordinate": "org.robolectric:robolectric:4.14.1",
+    "sha256": "b20ffb1ba1a84a89b67b30a573dbaed48549a62592476d1fe336b94068592ef8",
+    "cached_official_POM_read_only": true,
+    "verified_dependencies": [
+      {
+        "groupId": "androidx.test",
+        "artifactId": "monitor",
+        "version": "1.7.2",
+        "type": "aar",
+        "exclusions": [
+          [
+            "*",
+            "*"
+          ]
+        ]
+      },
+      {
+        "groupId": "androidx.test.espresso",
+        "artifactId": "espresso-idling-resource",
+        "version": "3.6.1",
+        "type": "aar",
+        "exclusions": [
+          [
+            "*",
+            "*"
+          ]
+        ]
+      }
+    ]
+  },
+  "preserved_error_sha256": "d7b18c5497aeee3d3bc5595ff52e01abc65454e064f462bb6160ee5813d8b7b8"
+}

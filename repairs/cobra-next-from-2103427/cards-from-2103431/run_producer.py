@@ -62,8 +62,6 @@ def bootstrap_pom(out):
         ("nativeruntime", "4.14.1", None, "org.robolectric"),
         ("nativeruntime-dist-compat", "1.0.16", None, "org.robolectric"),
         ("android-all-instrumented", "15-robolectric-12650502-i7", None, "org.robolectric"),
-        ("monitor", "1.7.2", "aar", "androidx.test"),
-        ("espresso-idling-resource", "3.6.1", "aar", "androidx.test.espresso"),
     ):
         dependency = ET.SubElement(deps, NS + "dependency")
         for name, value in (("groupId", group), ("artifactId", artifact), ("version", version), ("scope", "test")):
