@@ -13,7 +13,7 @@ HERE=Path(__file__).resolve().parent
 OWNER=next(p for p in HERE.parents if (p/"android_probe.py").is_file())
 sys.path.insert(0,str(OWNER))
 sys.path.insert(0,str(OWNER/'cards-from-2103431/android-qa'))
-from android_probe import adb,probe
+from android_probe435 import adb,probe
 from immediate_observer import ImmediateObserver
 
 APK_SHA='dc83faed4a8eb1d2e2e116914cf15f2f1c27cc2a8653813fd6701ba300234442'

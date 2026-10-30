@@ -1,0 +1,18 @@
+{
+  "selected_before_execution": true,
+  "failed_run": 41129090323,
+  "artifact": 13012472352,
+  "artifact_sha256": "3d6d54103df79d8ee5c8b00922f2a113c35ef9a66f9d4066d98a6474a0a9a07a",
+  "classification": "SETUP_OBSERVATION_FAILURE_BEFORE_FEATURE; NOT_PRODUCT_CRASH",
+  "evidence": "Initial and last XML same known OS warning/bounds; one AppWarnings showing record; final screen.png personally inspected and already shows actual Cobra Welcome after one OK. No More press.",
+  "correction": "Scoped QA probe copy waits for the same notice dismissal after one freshly validated OK; original45s/30-observation bounds retained, no second OK, genuine repeated notice after confirmed absence still rejected, native settings and DontShowAgain untouched",
+  "original_shared_QA_probe_sha256": "828e7e634dfc7e11cae1ca16c227a724849277e2abaffdc863cf2d8ef48aca9f",
+  "original_shared_QA_probe": "UNCHANGED",
+  "selected_QA_protocol_tests": [
+    "test_same_notice_pending_then_actual_first_screen_accepts_one_OK",
+    "test_new_notice_after_observed_dismissal_refuses_second_OK"
+  ],
+  "application_tests": "NONE_IN_PROTOCOL_SIMULATION; SAME_SIGNED435_NATIVE_MORE_STILL_SELECTED",
+  "APK": "UNCHANGED_435",
+  "shutdown": "NOT_RUN"
+}
