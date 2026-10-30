@@ -1,0 +1,34 @@
+# Cards implementation and measured Cobra performance
+
+The next 2103432 APK is **NOT YET BUILT OR SIGNED**. This report records completed implementation and saved host evidence; final source-bound integration, packaging and physical Fold acceptance remain pending. Exact original-key signed 2103431 remains protected recovery (source `9ccc4c362a65118eeba38a8e7e4b0de5723c69af`, APK SHA256 `3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471`). No new candidate is accepted or locked.
+
+Cards now has dedicated layout/tile styling based on the actual approved 941×1672 PNG: balanced two-column cards, corrected preview/toolbar/header geometry, typography, genuine programme description/progress, provider logos and native selection/accessibility feedback. Existing channel menus, playback and working 431 controls remain. The native floating PiP control and LIVE affordance are preserved visible additions versus the mockup. Real provider logos, video frames, schedules and text can differ from the reference; no sample channels or EPG are hardcoded. Host comparison of the actual 20,226-channel/six-Favorites render against the target matches major layout anchors. The synthetic render lacks real provider video/logos/data. The raster does not identify the exact header font, and Cards uses a consistent 250-scaled row height while the target's wrapped no-EPG row is taller. These are disclosed variations; pixel-perfect parity and physical Fold rendering are unverified.
+
+The latest local owner checkpoint, layout-helper SHA256 prefix `475f`, reports 7,137 unchanged existing Cobra class bodies, five reviewed changed classes and 23 new helpers, with 20 compiler inputs bound. All four [final native host layout tests](layout-qa/results/final/OUTCOME.json) passed: rendering/status, PiP, ambient and leaving Cards for Mobile, Compact, TV Grid and Pro. The actual mode-exit comparison restores the accepted 431 style and hierarchy. Final source-bound producer/signing checks remain pending. Infinity, chooser executable/UI, approved launcher icons, minimal Android/native components, protected persistence and shutdown remain frozen inputs. The chooser's eventual release change is genuine Cobra version metadata only. Final signed APK/member/component comparison is still required.
+
+## Measured projection work
+
+The [fixed ABBA evidence](profile-reads/results/combined-profile-abba/RESULT.json) compares exact signed 431 production DEX with the isolated combined projection/profile-data-reuse prototype. It uses 20,226 controlled channels, 21 warmups per entry/run and 42 measured samples per entry/variant aggregated from B431→candidate→candidate→B431. Percentiles use midpoint p50 and nearest-rank p95.
+
+| Host production operation | Signed431 p50 / p95, ms | Prototype p50 / p95, ms |
+| --- | --- | --- |
+| `cobraChannelsForCurrentView` | 16.108250 /18.689908 | 2.167379 /3.203121 |
+| `cobraGuideChannels` | 17.179647 /22.652607 | 2.129261 /2.408302 |
+
+The correction reads the hidden set once per projection instead of 20,226 times and reuses private parsed profile JSON. Fresh active-profile and raw-profile preference reads remain 40,452 each per count call; authorization decisions are not cached. Fourteen profile/count correctness cases passed. These finite host timings include JIT/GC/order variation and measure the isolated production methods, not startup, scrolling, final APK performance or a physical Fold speedup.
+
+## Less repeated presentation and UI construction
+
+[Presentation evidence](presentation-qa/README.md) covers 15 actual full-tick final-state parity cases, including bound player progress. Redundant preliminary guide writes are removed only when the original final writer is active. Final guide/player text, progress, accessibility and fallback remain equal; player writes are unchanged. This is a write-count reduction, not a measured frame-rate gain.
+
+[Cards reuse evidence](cards-reuse/README.md) shows one original shell-return Grid reconstruction versus zero for the validated current attached Cards Grid. The candidate retains the same Grid, adapter and all 240 Channel objects, position 80, 5 px offset, selection and actual non-null focus. Original visible-row binding refreshes EPG/accessibility after the controlled clock advances. A newly published Grid with no children keeps pending position 80 through a second render. Real collection/profile/source/hidden/custom mutations invalidate affected content; ALL avoids reconstruction for recent/favorite-only changes, and original directory counts stay fresh. Wrong-typed raw policy values retain native fallback. There is no extra page cache, arbitrary TTL, inventory-sized hash, cached policy decision, new worker or preference write. These fixtures execute real shell/layout/render/auth methods; provider worker bodies and player/decoder lifecycle are not executed.
+
+The native tile checks exercise actual coordinate taps/holds/More and recycling, including refreshed-channel menu routing. Bounded ambient-wrapper reuse addresses churn already reproduced in signed 431 while retaining effects; the latest native render/status/PiP/ambient checks passed. No latency, heap, battery or thermal result is inferred from reduced allocations/work counts.
+
+## Android and physical limits
+
+The existing Android17/API37 verification loop is closed at [run 41010523836](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/41010523836). It installed the unchanged signed 431 APK and imported20,226 synthetic channels; retained Mobile evidence shows video, controls and current/next EPG. An accessibility root query took 2867 ms; its 3426 ms readiness phase exceeded the retained 2000 ms QA budget. The late result was discarded before Cards selection. This is an observation-budget failure, not a demonstrated app crash or a Cards failure. See [the exact runtime limit](android-qa/RUNTIME-LIMITATIONS.md). No further run or timeout expansion is planned.
+
+Candidate cold/warm launch, first usable Cards, playback/PiP return, Android scrolling/FPS/jank, CPU/PSS trends, memory growth, battery and thermal behavior are unmeasured. No physical Fold result or native crash repair is claimed. Host evidence cannot establish long-running stability, all-mode runtime acceptance or exact Fold pixel parity. Shutdown is unchanged and untested.
+
+The remaining release steps are the already selected final integration/producer checks, generation 17 registration, the sole original-key signer and exact APK/component verification. Deliver one install-over candidate with matching ZIPs, source/run and hashes after those gates pass; the user decides physical acceptance and any subsequent promotion.

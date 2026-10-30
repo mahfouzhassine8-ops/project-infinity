@@ -1,0 +1,109 @@
+{
+  "status": "PASS_ALL_FOUR_SELECTED_CURRENT_OWNER_CASES",
+  "production_helper_sha256": "475f70f9811ec5bdfc5695e644f4e0661a4de5cbf7bd48bf8013bb6348133cad",
+  "test_source_sha256": "cd024e83fc62b49f971d13c8636e2ae3ed62a88294764353adb0b908eb590f02",
+  "trusted_owner_host_production_jar_sha256": "3f4dbfeda36def1bf80d817976f029c696b78939aa336c3d3a809c3a18030aea",
+  "runtime": "Robolectric API35 native graphics HOST; actual accepted431/native candidate classes; no decodedvideo or AndroidOS PiP acceptance",
+  "selected_groups": [
+    {
+      "method": "cardsRestoresSharedNativeViewsInOtherModes",
+      "tests": 1,
+      "native_mode_journeys": [
+        "mobile",
+        "compact",
+        "grid",
+        "focus"
+      ],
+      "failures": 0,
+      "errors": 0,
+      "skips": 0
+    },
+    {
+      "methods": [
+        "actualCardsRenderAtReferenceViewport",
+        "truthfulLiveBadgeUsesNativeStatusAndPreservesActualPipPress",
+        "activeAmbientPreservesNativeEffectsAndRecordsWrapping"
+      ],
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "skips": 0
+    }
+  ],
+  "reference_viewport_pixels": [
+    941,
+    1672
+  ],
+  "density_dpi": 420,
+  "reference_state": {
+    "native_inventory": 20226,
+    "native_Favorites": 6,
+    "category": "FAVORITES",
+    "player": "declared state-only ExoPlayer proxy; nativeLIVE state; no decodedvideo"
+  },
+  "major_physical_rectangles": {
+    "header": [
+      0,
+      0,
+      941,
+      104
+    ],
+    "preview": [
+      14,
+      116,
+      476,
+      362
+    ],
+    "details": [
+      497,
+      116,
+      428,
+      362
+    ],
+    "browser_top": 496,
+    "LIVE_chip_global": [
+      41,
+      414,
+      130,
+      452
+    ],
+    "PiP": "Full native126x126 actual visible rect and original coordinatepress endpoint sequence fullscreen→pip verified"
+  },
+  "ambient_evidence": {
+    "baseline_unchanged_native_publications": 4,
+    "baseline_distinct_wrappers": 4,
+    "candidate_unchanged_native_publications": 4,
+    "candidate_distinct_wrappers": 1,
+    "native_fallback_pixel_equivalence": "PASS five fresh tint/mode/night/off tuples plus density change; uses original native method as oracle on a nonowned panel",
+    "off_mapping_clear": "PASS",
+    "native_mode_exit_mapping_restore": "PASS"
+  },
+  "restoration": "Every visible shared geometry and all hierarchy/LPclass/text/styles/padding/visibility/foreground strict against exact431samejourney. Only approved exact named GONE historical numeric bounds/LPs excluded; all differences separately recorded.",
+  "ignored_historical_geometry_count": {
+    "mobile": 3,
+    "compact": 3,
+    "grid": 5,
+    "focus": 8
+  },
+  "static_parity": "Major geometry/LIVE cyan dot anchors exact; no byte-perfect whole-image claim",
+  "remaining_differences": [
+    "Existing native workingPiP control is additional versus mockup; kept intact",
+    "Actual native sans-serif BOLD Cobra header appears heavier than reference; target font asset/family not supplied",
+    "Fixed scaled250px tile height differs from reference content-dependent secondrow approximately264px",
+    "Synthetic missing-logo fallback and no decodedvideo; provider text/logos/programs vary",
+    "LIVE white foreground threshold bbox differs one left antialias pixel in V5 samevisualsource; native font raster varies by platform"
+  ],
+  "final_native_reference_capture": {
+    "private_workspace_path": "/workspace/cobra-evidence/cards432-layout-native-final/measurements/cards-native-reference-favorites.png",
+    "sha256": "b5c4df2d94b6212b2d132d455b9a1a5f3cdd8b1bd901512dcb7533cc0058342d"
+  },
+  "preserved_history": [
+    "/workspace/cobra-evidence/cards432-layout-native-v3",
+    "/workspace/cobra-evidence/cards432-layout-native-v3-exit-compare",
+    "/workspace/cobra-evidence/cards432-layout-native-v5"
+  ],
+  "APK": "NOT_BUILT_BY_THIS_HELPER_TASK",
+  "CI": "NOT_RUN_BY_THIS_HELPER_TASK",
+  "shutdown": "NOT_RUN",
+  "physical_Fold": "NOT_RUN; acceptance remains user-only"
+}

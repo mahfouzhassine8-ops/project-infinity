@@ -1,0 +1,53 @@
+{
+  "differences": [
+    {
+      "path": "compact.mCobraGuideDetails.children[4].bounds",
+      "baseline": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "candidate": [
+        24,
+        217,
+        380,
+        125
+      ],
+      "native_reason": "Native GONE\/effectively GONE retains prior Cards geometry; no draw\/layout"
+    },
+    {
+      "path": "compact.mCobraGuideVideo.children[2].bounds",
+      "baseline": [
+        5,
+        121,
+        126,
+        126
+      ],
+      "candidate": [
+        5,
+        231,
+        126,
+        126
+      ],
+      "native_reason": "Native GONE\/effectively GONE retains prior Cards geometry; no draw\/layout"
+    },
+    {
+      "path": "compact.mCobraGuideVideo.children[2].layout.margins",
+      "baseline": [
+        5,
+        121,
+        0,
+        0
+      ],
+      "candidate": [
+        5,
+        231,
+        0,
+        0
+      ],
+      "native_reason": "Native hide path does not reposition its previous Cards LP"
+    }
+  ],
+  "scope": "only approved exact named metadata\/Pro details\/tagged smallPiP; numeric geometry only; LPclass\/styles\/visibility remain strict"
+}

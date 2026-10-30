@@ -29,7 +29,7 @@
     "CI",
     "physical acceptance"
   ],
-  "status": "WAITING_TRUSTED_FINAL_475F_MINIMUM_CAPTURE_FIX",
+  "status": "PASS_ALL_FOUR_SELECTED_CURRENT_OWNER_CASES",
   "execution_v3": {
     "candidate": "3 PASS / 1 FAIL",
     "restoration_failure": "Fresh431Mobile versus candidateCards\u2192Mobile details background differs; same-journey431 baseline required before attribution",
@@ -47,8 +47,7 @@
   "Pro_hidden_exception": {
     "precondition": "Both exact431 andcandidate mCobraGuideDetails nativevisibility GONE in focus mode",
     "allowed_differences": [
-      "mCobraGuideDetails.bounds",
-      "mCobraGuideDetails.layout"
+      "numeric bounds/LP geometry only; LPclass remains strict"
     ],
     "all_other_properties": "exact comparison retained; excluded inherited geometry recorded explicitly"
   },
@@ -121,5 +120,7 @@
     "caption_count_fake": "NONE",
     "nonrender_24_item_fixtures": "unchanged",
     "player": "existingdeclared state-onlyplayer proxy; dynamicdecode notclaimed"
-  }
+  },
+  "final_result": "results/final/OUTCOME.json",
+  "final_helper_sha256": "475f70f9811ec5bdfc5695e644f4e0661a4de5cbf7bd48bf8013bb6348133cad"
 }
