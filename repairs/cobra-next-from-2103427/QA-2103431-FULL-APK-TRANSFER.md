@@ -1,0 +1,11 @@
+# Complete APK transfer before installed-byte verification
+
+Recorded before the next selected exact-signed431 two-P0 Android run. Run40979186412 stopped before Activity launch because `sha256sum` of the public installed 778,358,062-byte APK exceeded the unchanged 30-second ADB deadline. The UI automation helper and icon/button checks never ran. The failed run remains preserved.
+
+Its `install.txt` identifies the install mode: `Serving... Performing Incremental Install`, followed by success in22,401ms. Incremental installation can commit while APK blocks are still supplied on demand. Immediately reading the entire APK for an exact checksum therefore demands all deferred blocks while the incremental server is active. The probe requires a fully materialized installed file before launching features.
+
+The narrow QA correction is `adb install --no-incremental -r` for this same originally signed APK. This uses standard complete transfer and retains install-over behavior. The existing 30-second client deadline, installed-public-APK SHA256 equality, package/path checks and uncertain-install handling remain unchanged. There is no automatic installation retry, timeout increase, source/signature bypass, uninstall, data clear or production mutation.
+
+After exact installed-byte confirmation, the compiled/inspected on-device UI automation helper may perform the already-selected Fullscreen/More/PiP journey within its original 3.5-second freshness guard. No further native-button result is presumed from this prelaunch correction. Physical Fold acceptance, Samsung launcher/Finder/suggestions and populated-device upgrade remain pending.
+
+Read-only review against [official AOSP adb_install.cpp](https://android.googlesource.com/platform/packages/modules/adb/+/refs/heads/main/client/adb_install.cpp) confirms the flag disables incremental selection/fallback. The regular streamed path copies the complete APK before reading Success; the incremental path starts its serving process and can return before serving completes. Full transfer can still exceed the client deadline; the existing uncertainty handler and exact installed hash remain mandatory. This is a supported installation-mode correction, not an increase to an application or QA timeout.

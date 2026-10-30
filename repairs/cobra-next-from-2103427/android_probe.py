@@ -28,14 +28,16 @@ def probe(apk,out,expected):
   report.update(serial=serial,sdk=sdk,abis=adb('shell','getprop','ro.product.cpu.abilist').strip(),page_size=adb('shell','getconf','PAGE_SIZE').strip(),apk_sha256=expected)
   install_started=time.monotonic()
   try:
-   (out/'install.txt').write_text(adb('install','-r',str(apk)))
+   # IncFS may report success before every APK block arrives. This probe
+   # immediately verifies the entire installed file; require full transfer.
+   (out/'install.txt').write_text(adb('install','--no-incremental','-r',str(apk)))
    report['install_client']='COMPLETED'
   except subprocess.TimeoutExpired as exc:
    # PackageInstaller may finish while the streamed-install client still waits.
    # Never retry an uncertain install or increase the generic ADB deadline.
    def decoded(value):return value.decode(errors='replace') if isinstance(value,bytes) else value or ''
    report['install_client']='TIMEOUT_30_SECONDS; EXACT_INSTALLED_BYTES_REQUIRED'
-   (out/'install-client-timeout.json').write_text(json.dumps({'command':'adb install -r',
+   (out/'install-client-timeout.json').write_text(json.dumps({'command':'adb install --no-incremental -r',
      'timeout_seconds':exc.timeout,'stdout':decoded(exc.stdout),'stderr':decoded(exc.stderr)},indent=2)+'\n')
   report['install_confirmation']=confirm_installed_apk(expected)
   report['install_seconds_including_confirmation']=round(time.monotonic()-install_started,3)
