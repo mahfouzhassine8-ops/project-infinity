@@ -145,7 +145,8 @@ public final class CobraCardsLayout {
     mainThread();if(!cards(owner) || view==null)return false;
     State s=existing(owner);if(s==null || s.restoring || read(owner,"mCobraGuideShell")!=s.shell)return false;
     AmbientPanel panel=view==s.toolbar?s.toolbarAmbient:view==s.details?s.detailsAmbient:null;
-    return panel!=null && panel.apply(tint,mode,radius,night,owner.getResources().getDisplayMetrics().density);
+    if(panel==null)return false;s.rebasePublishedNativeStyles();
+    return panel.apply(tint,mode,radius,night,owner.getResources().getDisplayMetrics().density);
   }
 
   private static final class Slot {
@@ -154,11 +155,11 @@ public final class CobraCardsLayout {
     void restore(){detach(view);parent.addView(view,Math.min(index,parent.getChildCount()),params);}
   }
   private static final class Snapshot {
-    final View view;final Drawable background,foreground;final int foregroundGravity;final ViewGroup.LayoutParams params;
-    final int left,top,right,bottom,visibility;final float elevation,alpha;final ViewOutlineProvider outline;final boolean clip;
+    final View view;Drawable background;final Drawable foreground;final int foregroundGravity;final ViewGroup.LayoutParams params;
+    int left,top,right,bottom;final int visibility;float elevation;final float alpha;final ViewOutlineProvider outline;final boolean clip;
     final boolean group,clipChildren,clipPadding;final int orientation,linearGravity;
-    final boolean isText;final float textSize,letterSpacing,lineExtra,lineMultiplier;final int maxLines,minLines,gravity;
-    final boolean fontPadding;final Drawable[] compounds;final int compoundPadding;final Typeface typeface;final android.content.res.ColorStateList textColors;
+    final boolean isText;float textSize,letterSpacing;final float lineExtra,lineMultiplier;final int maxLines,minLines,gravity;
+    final boolean fontPadding;final Drawable[] compounds;final int compoundPadding;Typeface typeface;android.content.res.ColorStateList textColors;
     final TextUtils.TruncateAt ellipsize;final TransformationMethod transformation;
     final boolean nativeIcon;final CharSequence originalText;
     final Drawable barDrawable;final android.content.res.ColorStateList barTint,barBackgroundTint;
@@ -177,6 +178,12 @@ public final class CobraCardsLayout {
       typeface=t==null?null:t.getTypeface();textColors=t==null?null:t.getTextColors();ellipsize=t==null?null:t.getEllipsize();transformation=t==null?null:t.getTransformationMethod();
       nativeIcon=v.getClass().getName().endsWith("$CobraIconButton");
     }
+    /** Only properties the native renderer restores/applies on publication.
+     * Parent/LP/clip/lines/selection and all other Cards-owned state stay original. */
+    void publishedNativeStyle(){
+      background=view.getBackground();left=view.getPaddingLeft();top=view.getPaddingTop();right=view.getPaddingRight();bottom=view.getPaddingBottom();elevation=view.getElevation();
+      if(isText){TextView text=(TextView)view;textSize=text.getTextSize();letterSpacing=text.getLetterSpacing();typeface=text.getTypeface();textColors=text.getTextColors();}
+    }
     void restore(){
       view.setBackground(background);if(Build.VERSION.SDK_INT>=23){view.setForeground(foreground);view.setForegroundGravity(foregroundGravity);}view.setPadding(left,top,right,bottom);view.setElevation(elevation);view.setAlpha(alpha);view.setOutlineProvider(outline);view.setClipToOutline(clip);
       if(params!=null)view.setLayoutParams(params);view.setVisibility(visibility);
@@ -194,7 +201,7 @@ public final class CobraCardsLayout {
     final ProgressBar progress;final FrameLayout frame;
     final ArrayList<Slot> originalDetails=new ArrayList<>();
     final IdentityHashMap<View,Snapshot> shared=new IdentityHashMap<>(),header=new IdentityHashMap<>(),browserHeader=new IdentityHashMap<>();
-    final Snapshot stage;final View stageView;final AmbientPanel toolbarAmbient,detailsAmbient;
+    final Snapshot stage;final View stageView;Object nativeRenderer,nativeTheme;Field nativeActiveField,nativeBindingsField;final AmbientPanel toolbarAmbient,detailsAmbient;
     PreviewBadge badge;
     View headerFirst,headerLast,browserFirst,browserSpacer;float scale=1,font=1;boolean restoring,hasNativeMetadata;
     final PanelSurface headerSurface=new PanelSurface(24,0),detailSurface=new PanelSurface(24,12),previewSurface=new PanelSurface(24,0),filterSurface=new PanelSurface(24,0);
@@ -217,12 +224,34 @@ public final class CobraCardsLayout {
       details.addView(frame,new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT));
       remaining=new TextView(a);remaining.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
       for(View v:new View[]{eyebrow,time,title,progress,remaining,description}){detach(v);frame.addView(v,new FrameLayout.LayoutParams(1,1));}
-      shell.addOnAttachStateChangeListener(this);details.addOnLayoutChangeListener(this);
+      captureRendererGeneration(a);shell.addOnAttachStateChangeListener(this);details.addOnLayoutChangeListener(this);
     }
+    void captureRendererGeneration(Activity a){
+      nativeRenderer=read(a,"mVisualTheme");if(nativeRenderer==null)return;
+      nativeActiveField=field(nativeRenderer.getClass(),"active");nativeBindingsField=field(nativeRenderer.getClass(),"bindings");
+      try{nativeTheme=nativeActiveField.get(null);}catch(IllegalAccessException e){throw new IllegalStateException(e);}
+    }
+    void rebasePublishedNativeStyles(){
+      Activity a=owner.get();if(a==null || restoring)return;Object renderer=read(a,"mVisualTheme");if(renderer==null)return;
+      if(nativeActiveField==null || renderer.getClass()!=nativeActiveField.getDeclaringClass()){nativeActiveField=field(renderer.getClass(),"active");nativeBindingsField=field(renderer.getClass(),"bindings");}
+      try{
+        Object theme=nativeActiveField.get(null);if(renderer==nativeRenderer && theme==nativeTheme)return;
+        // publish/refreshClients executes atomically on the UI thread. Its
+        // current native binding-owned properties are authoritative, not the
+        // constructor snapshot from before that publication.
+        Map<?,?> bindings=(Map<?,?>)nativeBindingsField.get(renderer);
+        rebaseStyles(shared,bindings);rebaseStyles(header,bindings);rebaseStyles(browserHeader,bindings);
+        if(stage!=null && bindings.containsKey(stage.view))stage.publishedNativeStyle();
+        if(badge!=null){if(bindings.containsKey(badge.originalLabel.view))badge.originalLabel.publishedNativeStyle();if(badge.originalContainer!=null && bindings.containsKey(badge.originalContainer.view))badge.originalContainer.publishedNativeStyle();}
+        nativeRenderer=renderer;nativeTheme=theme;
+      }catch(IllegalAccessException e){throw new IllegalStateException("Cards native publication",e);}
+    }
+    void rebaseStyles(IdentityHashMap<View,Snapshot> snapshots,Map<?,?> bindings){for(Snapshot snapshot:snapshots.values())if(bindings.containsKey(snapshot.view))snapshot.publishedNativeStyle();}
     Snapshot snapshot(IdentityHashMap<View,Snapshot> snapshots,View view){Snapshot old=snapshots.get(view);if(old==null){old=new Snapshot(view);snapshots.put(view,old);}return old;}
     void restoreSnapshots(IdentityHashMap<View,Snapshot> snapshots){for(Snapshot s:snapshots.values())s.restore();snapshots.clear();}
     void restoreBrowser(){if(browserSpacer!=null){detach(browserSpacer);browserSpacer=null;}restoreSnapshots(browserHeader);}
     void restoreStage(){
+      rebasePublishedNativeStyles();
       // Native clearStage writes its own padding BEFORE detaching the guide.
       // Never overwrite that newer destination layout during this callback.
       Activity a=owner.get();
@@ -230,7 +259,7 @@ public final class CobraCardsLayout {
         stageView.setPadding(stage.left,stage.top,stage.right,stage.bottom);
     }
     void restore(){
-      if(restoring)return;restoring=true;
+      if(restoring)return;rebasePublishedNativeStyles();restoring=true;
       shell.removeOnAttachStateChangeListener(this);details.removeOnLayoutChangeListener(this);restoreStage();if(badge!=null){badge.restore();badge=null;}
       if(texture!=null && texture.getParent()==preview && texture.getLayoutParams()==ownedTextureParams && textureParams!=null)texture.setLayoutParams(textureParams);ownedTextureParams=null;
       for(Slot slot:originalDetails)slot.restore();detach(frame);
@@ -239,7 +268,7 @@ public final class CobraCardsLayout {
       Activity a=owner.get();if(a!=null && nativeSub!=null){Object sub=read(a,"mCobraModeSub");if(sub instanceof TextView)text((TextView)sub,nativeSub);}
     }
     void apply(){
-      Activity a=owner.get();if(a==null || !cards(a) || restoring)return;
+      Activity a=owner.get();if(a==null || !cards(a) || restoring)return;rebasePublishedNativeStyles();
       Object model=read(a,"mCobraModeLayout");if(model==null)return;
       scale=(shell.getWidth()>0?shell.getWidth():integer(model,"width")*a.getResources().getDisplayMetrics().density)/941f;
       font=Math.max(1f,Math.min(2f,a.getResources().getConfiguration().fontScale));
@@ -281,7 +310,7 @@ public final class CobraCardsLayout {
       FrameLayout.LayoutParams p=new FrameLayout.LayoutParams(Math.max(1,width),Math.max(1,height));p.leftMargin=x;p.topMargin=y;view.setLayoutParams(p);
     }
     void refreshPreview(){
-      Activity a=owner.get();if(a==null || restoring)return;
+      Activity a=owner.get();if(a==null || restoring)return;rebasePublishedNativeStyles();
       View host=(View)read(a,"mCobraPreviewHost");
       if(host!=preview){if(badge!=null){badge.restore();badge=null;}return;}
       View label=host.findViewWithTag("cobra_preview_label");
@@ -352,6 +381,7 @@ public final class CobraCardsLayout {
       if(view.getIncludeFontPadding())view.setIncludeFontPadding(false);if(!preservePadding && (view.getPaddingLeft()!=0 || view.getPaddingTop()!=0 || view.getPaddingRight()!=0 || view.getPaddingBottom()!=0))view.setPadding(0,0,0,0);if(view.getLetterSpacing()!=0)view.setLetterSpacing(0);if(view.getMaxLines()!=lines)view.setMaxLines(lines);if(view.getEllipsize()!=TextUtils.TruncateAt.END)view.setEllipsize(TextUtils.TruncateAt.END);if(view.getGravity()!=(Gravity.TOP|Gravity.LEFT))view.setGravity(Gravity.TOP|Gravity.LEFT);if(view.getLineSpacingExtra()!=0 || view.getLineSpacingMultiplier()!=1.06f)view.setLineSpacing(0,1.06f);
     }
     void styleDetails(){
+      rebasePublishedNativeStyles();
       style(eyebrow,NORMAL,MUTED,18,1);style(time,NORMAL,MUTED,22,1);style(title,BOLD,WHITE,29,1);style(description,NORMAL,MUTED,21,5);style(remaining,NORMAL,MUTED,16,1);remaining.setGravity(Gravity.CENTER_VERTICAL|Gravity.RIGHT);
       if(progress.getPaddingLeft()!=0 || progress.getPaddingTop()!=0 || progress.getPaddingRight()!=0 || progress.getPaddingBottom()!=0)progress.setPadding(0,0,0,0);if(progress.getProgressTintList()!=null)progress.setProgressTintList(null);if(progress.getProgressBackgroundTintList()!=null)progress.setProgressBackgroundTintList(null);if(progress.getProgressDrawable()!=progressSurface)progress.setProgressDrawable(progressSurface);int max=progress.getMax();progressSurface.setLevel(max<=0?0:(int)Math.max(0,Math.min(10000,Math.round(progress.getProgress()*10000d/max))));
       float timeY=32+22*font+20,titleY=timeY+26*font+8,progressY=titleY+36*font+26,descriptionY=progressY+47;
@@ -403,7 +433,7 @@ public final class CobraCardsLayout {
     public void onLayoutChange(View view,int left,int top,int right,int bottom,int oldLeft,int oldTop,int oldRight,int oldBottom){
       Activity a=owner.get();if(!restoring && a!=null && cards(a) && (right-left!=oldRight-oldLeft || bottom-top!=oldBottom-oldTop))styleDetails();
     }
-    public void onViewAttachedToWindow(View view){Activity a=owner.get();if(a!=null && cards(a) && read(a,"mCobraGuideShell")==shell && stageView!=null && read(a,"mStage")==stageView)stageView.setPadding(0,0,0,0);}
+    public void onViewAttachedToWindow(View view){rebasePublishedNativeStyles();Activity a=owner.get();if(a!=null && cards(a) && read(a,"mCobraGuideShell")==shell && stageView!=null && read(a,"mStage")==stageView)stageView.setPadding(0,0,0,0);}
     public void onViewDetachedFromWindow(View view){restoreStage();}
   }
 
