@@ -19,7 +19,7 @@ on:
         required: true
         type: choice
         default: select-a-feature
-        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host, infinity-performance-android, cobra-owner-host, cobra-android-launch]
+        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host, infinity-performance-android, cobra-owner-host, cobra-android-launch, cobra-cards-baseline]
       candidate_build:
         description: Existing signed build run (no rebuild)
         required: true
@@ -171,6 +171,89 @@ jobs:
             prepared-owners/ICON-APK-VERIFICATION.json
             cobra-host/ICON-NATIVE-INFLATION.txt
             icon-inflation-evidence/
+          retention-days: 90
+          if-no-files-found: error
+  cobra-cards-baseline:
+    name: Accepted431 finite Cards Android17 baseline
+    if: github.event_name == 'workflow_dispatch' && inputs.feature == 'cobra-cards-baseline'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      INFINITY_EMULATOR_API: '37.1'
+      INFINITY_EMULATOR_TARGET: google_apis_ps16k
+      AUTHORIZED_SCOPE: ${{ inputs.authorization }}
+      SIGNED_BUILD: ${{ inputs.candidate_build }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: "${{ inputs.source_ref }}", fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '21'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Admit the protected431 baseline and finite Cards scope
+        run: |
+          set -euo pipefail
+          test -n "$AUTHORIZED_SCOPE"
+          test "$SIGNED_BUILD" = 40971769136
+          test "$(git branch --show-current)" = work/cobra-only-from-2103427-20261028
+          test "$(git rev-parse origin/lock/infinity-cobra-2103427-user-approved-20261028)" = 782242090483982c39a78f9c4da932a4751bdafc
+          python3 - <<'PYCODE'
+          from pathlib import Path
+          import ast,json
+          root=Path('repairs/cobra-next-from-2103427/cards-from-2103431/android-qa')
+          scope=json.loads((root/'SCOPE.json').read_text())
+          assert scope['signing_run']==40971769136
+          assert scope['protected']['shutdown']=='NOT_SELECTED_OR_TESTED'
+          for name in ['baseline.py','generate_fixture.py']: ast.parse((root/name).read_text())
+          PYCODE
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 40971769136
+          name: Infinity-Combined-Original-Signer-40971769136
+          github-token: ${{ github.token }}
+          path: runtime-signed
+      - uses: android-actions/setup-android@v4
+        with:
+          cmdline-tools-version: '15859902'
+          packages: platform-tools build-tools;35.0.0
+          log-accepted-android-sdk-licenses: false
+      - name: Verify original signature and prepare the existing API37 environment
+        run: |
+          set -euo pipefail
+          mkdir -p runtime-results
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs runtime-signed/Infinity-2103431-Combined-Original-Signer.apk > runtime-results/SIGNATURE.txt
+          sudo apt-get update -qq
+          sudo apt-get install -y libpulse0 ffmpeg
+          python3 -m pip install Pillow==11.3.0
+          python3 repairs/infinity-final-closure-2103407/api37_environment_gate.py --sdk-root "$ANDROID_HOME" --out runtime-platform --pin-tools
+          python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out runtime-emulator-setup
+          sudo chmod 666 /dev/kvm
+          python3 repairs/cobra-next-from-2103427/android_candidate_journey.py --generate-media runtime-media
+          python3 -m http.server 8765 --bind 0.0.0.0 --directory runtime-media > runtime-results/MEDIA-HTTP.txt 2>&1 &
+      - uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: '37.1'
+          arch: x86_64
+          target: google_apis_ps16k
+          profile: pixel_2
+          disk-size: 8G
+          avd-name: infinity-four-repair-api37
+          pre-emulator-launch-script: python3 repairs/infinity-final-closure-2103407/api37_environment_gate.py --sdk-root "$ANDROID_HOME" --out runtime-platform --check-avd
+          disable-animations: false
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: |
+            python3 repairs/cobra-next-from-2103427/cards-from-2103431/android-qa/generate_fixture.py --out runtime-media --require-media
+            python3 repairs/cobra-next-from-2103427/cards-from-2103431/android-qa/baseline.py --signed runtime-signed --signature runtime-results/SIGNATURE.txt --fixtures runtime-media --out runtime-results/cards-baseline
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Cobra-Cards-431-Baseline-${{ github.run_id }}
+          path: |
+            runtime-results/
+            runtime-platform/
+            runtime-emulator-setup/
+            runtime-media/FIXTURE.json
           retention-days: 90
           if-no-files-found: error
   cobra-android:
@@ -405,7 +488,7 @@ jobs:
           retention-days: 90
           if-no-files-found: error
   android17:
-    if: inputs.feature != 'infinity-performance-host' && inputs.feature != 'infinity-performance-android' && inputs.feature != 'cobra-owner-host' && inputs.feature != 'cobra-android-launch'
+    if: inputs.feature != 'infinity-performance-host' && inputs.feature != 'infinity-performance-android' && inputs.feature != 'cobra-owner-host' && inputs.feature != 'cobra-android-launch' && inputs.feature != 'cobra-cards-baseline'
     name: Selected feature ${{ inputs.feature || 'explicit baseline Search request' }}
     runs-on: ubuntu-22.04
     timeout-minutes: 150

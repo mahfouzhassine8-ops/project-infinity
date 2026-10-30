@@ -1,0 +1,24 @@
+{
+  "scope": "STATIC_QA_ORCHESTRATION_ONLY_NEW_CARDS_BASELINE",
+  "authorization": "Root selected independent read-only workflow/YAML/AST/routing contract checks before one possible CI dispatch",
+  "workflow": ".github/workflows/infinity-saved-navigation-android.yml",
+  "workflow_before_review_sha256": "0a4adc6e566a94abbc04ed1fed8264d47ad6d734630f1ad598021558ab6397ca",
+  "selected_checks": [
+    "YAML parse of actual edited workflow",
+    "Exactly one job selects workflow_dispatch/cobra-cards-baseline",
+    "Fixed original431 artifact and signature path",
+    "Source/baseline AST parse and absence of legacy journey/application shutdown invocation",
+    "Fixture generation inside emulator script immediately before baseline",
+    "API37 prelaunch AVD identity matches existing gate",
+    "Existing local synthetic media HTTP server preparation pattern"
+  ],
+  "prohibited": [
+    "Application tests",
+    "Emulator",
+    "CI dispatch",
+    "APK build",
+    "Production edits",
+    "Shutdown tests"
+  ],
+  "execution": "NOT_STARTED_AT_SCOPE_RECORDING"
+}

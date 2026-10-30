@@ -1,0 +1,10 @@
+{
+  "status": "BLOCKING_SOURCE_REVIEW_FINDING",
+  "workflow_sha256": "0a4adc6e566a94abbc04ed1fed8264d47ad6d734630f1ad598021558ab6397ca",
+  "actual_avd_name": "infinity-cards-baseline-api37",
+  "required_by_unchanged_api37_gate": "infinity-four-repair-api37",
+  "failing_operation": "pre-emulator-launch-script check_avd reads fixed infinity-four-repair-api37.ini",
+  "smallest_correction": "Use existing AVD name in new job; no gate changes",
+  "tests": "NOT_RUN_YET",
+  "CI": "NOT_DISPATCHED"
+}

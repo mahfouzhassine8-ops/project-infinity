@@ -1,0 +1,141 @@
+{
+  "status": "PASS_STATIC_QA_ORCHESTRATION_CONTRACT",
+  "workflow_sha256": "0a4adc6e566a94abbc04ed1fed8264d47ad6d734630f1ad598021558ab6397ca",
+  "checks": [
+    {
+      "check": "Actual edited workflow YAML parses",
+      "passed": true
+    },
+    {
+      "check": "One new explicit feature; existing options unchanged",
+      "passed": true
+    },
+    {
+      "check": "Exactly one new job",
+      "passed": true
+    },
+    {
+      "check": "New feature selects only new job",
+      "passed": true,
+      "detail": [
+        "cobra-cards-baseline"
+      ]
+    },
+    {
+      "check": "New feature cannot select a push job",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "check": "Existing job preserved: cobra-host",
+      "passed": true
+    },
+    {
+      "check": "Existing job preserved: cobra-android",
+      "passed": true
+    },
+    {
+      "check": "Existing job preserved: performance-android",
+      "passed": true
+    },
+    {
+      "check": "Existing job preserved: performance-host",
+      "passed": true
+    },
+    {
+      "check": "Catch-all exclusion appended",
+      "passed": true
+    },
+    {
+      "check": "Existing job preserved: android17",
+      "passed": true
+    },
+    {
+      "check": "Only manual finite job with no needs",
+      "passed": true
+    },
+    {
+      "check": "Only fixed signed431 downloaded",
+      "passed": true
+    },
+    {
+      "check": "Pinned established emulator runner",
+      "passed": true
+    },
+    {
+      "check": "Existing exact AVD name satisfies unchanged gate",
+      "passed": true
+    },
+    {
+      "check": "Exact same API37.1 ps16k configuration",
+      "passed": true
+    },
+    {
+      "check": "EPG generated immediately before baseline",
+      "passed": true
+    },
+    {
+      "check": "Original signature verified before emulator",
+      "passed": true
+    },
+    {
+      "check": "Fixed build admission and protected branch/lock",
+      "passed": true
+    },
+    {
+      "check": "Local media HTTP setup uses existing proven pattern",
+      "passed": true
+    },
+    {
+      "check": "Only media generation entry called, not old journey",
+      "passed": true
+    },
+    {
+      "check": "Selected Cards source AST parses",
+      "passed": true
+    },
+    {
+      "check": "Historical button module imports utilities only",
+      "passed": true
+    },
+    {
+      "check": "Actual APK hash and installed bytes guarded",
+      "passed": true
+    },
+    {
+      "check": "Exact431 source/version/hash and original key expected",
+      "passed": true
+    },
+    {
+      "check": "No application-reset/stop/shutdown/legacy command",
+      "passed": true
+    },
+    {
+      "check": "Known notice acknowledged per warm return",
+      "passed": true
+    },
+    {
+      "check": "Fresh emulator rejects existing app data",
+      "passed": true
+    },
+    {
+      "check": "Evidence uploads even after failure",
+      "passed": true
+    },
+    {
+      "check": "Workflow unchanged during review",
+      "passed": true
+    }
+  ],
+  "check_count": 30,
+  "initial_mismatch": "Initial new AVD name failed existing hardcoded AVD gate; root corrected only job name before static execution",
+  "runtime_limits": [
+    "No application/emulator/CI execution",
+    "HTTP serving is source-reviewed established pattern, not currently measured availability",
+    "Actual Cards UI/import/first-frame/runtime remains unverified",
+    "Native ELF and protected application bytes untouched"
+  ],
+  "application_tests": "NOT_RUN",
+  "CI": "NOT_DISPATCHED",
+  "shutdown": "NOT_RUN"
+}
