@@ -14,8 +14,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.*;
 import org.robolectric.annotation.*;
 
-/** Actual signed433 native shell, with only source-bound Cards helpers replaced
- * in candidate runs. Synthetic inventory; provider/decoder/shutdown not run. */
+/** Actual owner DEX native shell. Synthetic inventory; provider/decoder/shutdown not run. */
 @RunWith(RobolectricTestRunner.class)
 @Config(sdk=35,application=Application.class,manifest=Config.NONE,
  qualifiers="w358dp-h637dp-port-420dpi",instrumentedPackages={"com.projectinfinity.kodi"},
@@ -35,6 +34,9 @@ public class CobraFoldDensityTest {
   RuntimeEnvironment.setQualifiers("w"+(w*160/dpi)+"dp-h"+(h*160/dpi)+"dp-"+(w>h?"land":"port")+"-"+dpi+"dpi");
   org.robolectric.shadows.ShadowDisplay d=Shadows.shadowOf(org.robolectric.shadows.ShadowDisplay.getDefaultDisplay());d.setDensityDpi(dpi);d.setWidth(w);d.setHeight(h);d.setRealWidth(w);d.setRealHeight(h);
   f.a.getResources().getConfiguration().fontScale=font;
+  // Resize the host Window as well as its Display; otherwise automatic native
+  // traversals keep the old inner pixel frame while manual layout uses cover.
+  f.a.getWindow().setLayout(w,h);
   call(f.a,"cobraLayoutGuide");
   Class<?> reuse=Class.forName("com.projectinfinity.kodi.CobraCardsReuse");java.lang.reflect.Method existing=reuse.getDeclaredMethod("existing",android.app.Activity.class),stamp=reuse.getDeclaredMethod("stamp",android.app.Activity.class);existing.setAccessible(true);stamp.setAccessible(true);Object state=existing.invoke(null,f.a),fresh=stamp.invoke(null,f.a);
   JSONObject why=new JSONObject().put("pending_focus",String.valueOf(get(f.a,"mCobraModePendingFocus"))).put("state_exists",state!=null);

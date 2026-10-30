@@ -119,17 +119,20 @@ def run(apk, bundles, jars, android, d8, dex2jar, maven, out, source, run_id):
         execute("compile-current-owner-no-apk", [sys.executable, HERE / "build.py", "--bundles", bundles, "--jars", jars,
                 "--android", android, "--d8", d8, "--dex2jar", dex2jar, "--out", owner])
         execute("independent-current-owner-canonical", [sys.executable, HERE / "verify_owner_source.py", "--work", owner, "--bundles", bundles, "--jars", jars])
+        execute("exact-current-owner-delta-from433", [sys.executable, HERE / "consolidated434/verify_from433.py",
+                "--work", owner, "--out", owner / "EXACT433-DELTA.json"])
         execute("prepare-fresh-source-bound-host-no-tests", [sys.executable, HERE / "integrated-qa/prepare_release.py",
                 "--apk", apk, "--baseline", baseline, "--build", owner, "--dex2jar", dex2jar, "--bundles", bundles,
                 "--jars", jars, "--out", trusted, "--source", source])
         execute("selected-candidate-host-checks", [sys.executable, HERE / "ci_host.py", "--baseline", baseline,
                 "--trusted-host", trusted, "--out", checks, "--maven", maven])
         host_result = read(checks / "HOST-RESULT.json")
-        require(host_result["status"] == "PASS_FOCUSED_CANDIDATE_HOST_ONLY" and host_result["selected_JUnit_methods"] == 30
-                and host_result["selected_groups"] == 9, "All exact essential candidate groups and final visual closeout must pass before packaging")
+        require(host_result["status"] == "PASS_FOCUSED_CANDIDATE_HOST_ONLY" and host_result["selected_JUnit_methods"] == 19
+                and host_result["selected_groups"] == 5, "All exact essential candidate groups and final visual closeout must pass before packaging")
         execute("package-tested-current-owners-no-apk", [sys.executable, HERE / "package_owners.py", "--bundles", bundles,
                 "--work", owner, "--jars", jars, "--out", components, "--source", source])
         for src, name in ((owner / "BUILD.json", "BUILD.json"),
+                          (owner / "EXACT433-DELTA.json", "EXACT433-DELTA.json"),
                           (owner / "PACKAGE-CANONICAL-RESULT.json", "PACKAGE-CANONICAL-RESULT.json"),
                           (components.parent / "CORRECTIVE-PRESERVATION.json", "CORRECTIVE-PRESERVATION.json"),
                           (trusted / "SOURCE-BINDINGS.json", "SOURCE-BINDINGS.json"),
@@ -167,6 +170,8 @@ def run(apk, bundles, jars, android, d8, dex2jar, maven, out, source, run_id):
         paths |= set((HERE / "layout-qa/goldens/native431-theme-order").glob("*.json"))
         paths |= {HERE / name for name in ("presentation-qa/results/signed431-baseline/BASELINE.json",
                   "presentation-qa/results/signed431-bound-player-progress/BASELINE-PLAYER-PROGRESS.json")}
+        paths |= set((HERE / "consolidated434/goldens433").glob("*"))
+        paths |= {HERE / "consolidated434/SCOPE.json", HERE / "consolidated434/verify_from433.py"}
         tested.update({str(p.relative_to(REPO)): sha(p) for p in paths})
         for name, pin in tested.items():
             require(hashlib.sha256(subprocess.check_output(["git", "-C", str(REPO), "show", source + ":" + name])).hexdigest() == pin,

@@ -31,3 +31,13 @@ Actual monitor/notification encoding, current source identity, final portable st
 ## Remaining gates
 
 Complete the recorded actual owner focus/More checks and Infinity integration; reproduce both owners and protected payloads; use the existing sole original-key combined release mechanism for one consolidated candidate. No shutdown modification or test. No automatic promotion.
+
+## Verified closeout before independent Cobra producer
+
+Actual compiled434 owner passed both fullscreen More methods: real pointer opens the original menu visibly on the player despite the retained GONE Multi-View, real Back closes only the sheet, second real press reopens; guard is inactive for other modes/menu kinds/Pro/Pro Sports/inner Cards. All four density methods now pass with consistent actual host Window/Display resizing. The retained failed focus trace proved533/360dp oscillation came from an old1600px Robolectric Window, not changing data; public Window resize resolved it without another production change.
+
+Exact canonical comparison to signed433 passes:7156 existing Cobra classes unchanged, nine reviewed Cards/helper/version/Activity classes changed and one Cards density helper added. Removing only the admitted menu-host prefix (and its generated canonical label) reproduces the ENTIRE signed433 Activity class hash. Every existing player/Pro/Multi-View/callback/shutdown method and field is exact433.
+
+The independent Cobra CI selection is19 methods in five relevant Cards/cache/layout/fold/More groups. Unchanged profile/projection/logo/presentation helper classes retain their existing433 passing evidence, rather than repeating unrelated tests. Front433 goldens are synthetic native framework renders bound to actual433 owner DEX; no user image is committed.
+
+Separate Infinity source56b9a620 has successful CI41076160374:24/24 loading/source/actual generated XML/notification-codec checks. Artifact12987168332 SHA2569b7b92ca261ad4bc52931fb753d49dadc142ad1cf70c6d5a3efa79af646c227b. Host measurement:13 extra info-label queries per existing foreground tick, zero unchanged property writes, zero background/Cobra label queries, no new worker/timer/provider invocation. No speed, battery, frame or physical acceptance claim.

@@ -27,16 +27,14 @@ from package_owners import bound_sources
 
 REPOSITORY = 'mahfouzhassine8-ops/project-infinity'
 BRANCH = 'work/cobra-only-from-2103427-20261028'
-VERSION = 2103433
-GENERATION = 18
-PREVIOUS_RELEASE_SOURCE = 'b53d4286759cee6707c8c2915cc5a0c9a3260336'
+VERSION = 2103434
+GENERATION = 19
+PREVIOUS_RELEASE_SOURCE = '6f6abe78fae65046e1ef475c558957eae873130f'
 TARGETS = ('COBRA', 'CHOOSER_SHELL')
 FROZEN = ('INFINITY', 'MINIMAL_ANDROID_CONTRACT')
 METADATA = 'assets/experience-component-updates.properties'
-CHANGED_CLASSES = {'class:Lcom/projectinfinity/kodi/' + n + ';' for n in (
-    'CobraCardsLayout$PreviewBadge', 'CobraCardsLayout$State', 'CobraCardsLayout',
-    'CobraCardsTiles$Holder', 'CobraCardsTiles',
-    'InfinityLiveActivity$CobraPosterChannelCard', 'CobraComponent')}
+from consolidated434.verify_from433 import CHANGED as CHANGED_CLASSES, ADDED as ADDED_CLASSES
+
 
 
 def git_bytes(source, path):
@@ -55,7 +53,7 @@ def signed432_authority():
 def previous_authority():
     previous, signed = load(ISO / 'release-authority.json'), signed432_authority()
     require(previous == signed, 'EXACT_SIGNED432_AUTHORITY_REQUIRED')
-    require(previous['candidate_versionCode'] == 2103432 and previous['generation'] == 17,
+    require(previous['candidate_versionCode'] == 2103433 and previous['generation'] == 18,
             'EXACT_PREVIOUS_AUTHORITY')
     return previous
 
@@ -98,18 +96,18 @@ def validate_payload(previous, catalog, bundles):
         else:
             require(row['approved_source'] == catalog['source'], 'EXACT_UPDATED_OWNER_SOURCE')
     old = previous['payload']
-    require(set(old) == set(payload), 'EXACT_SIGNED432_PAYLOAD_SET')
+    require(set(old) <= set(payload), 'NO_SIGNED433_PAYLOAD_REMOVAL')
     changed = {k for k in old if old[k] != payload[k]}
     added = set(payload) - set(old)
-    require(changed == CHANGED_CLASSES | {'member:' + METADATA}, 'EXACT_SEVEN_CLASS_AND_VERSION_DELTA_FROM432')
-    require(not added and all(payload[k]['owner'] == 'COBRA' for k in CHANGED_CLASSES),
-            'NO_NEW_CLASSES_OR_CROSS_OWNER_DELTA')
+    require(changed == CHANGED_CLASSES | {'member:' + METADATA}, 'EXACT_REVIEWED_NINE_CLASS_AND_VERSION_DELTA_FROM433')
+    require(added == ADDED_CLASSES and all(payload[k]['owner'] == 'COBRA' for k in CHANGED_CLASSES | added),
+            'EXACT_REVIEWED_DENSITY_CLASS_AND_NO_CROSS_OWNER_DELTA')
     chooser = metas['CHOOSER_SHELL']
-    require(chooser['version'] == '2103433.version-metadata.1', 'GENUINE_CHOOSER_VERSION')
-    require(metas['COBRA']['version'] == '2103433.cobra.1', 'GENUINE_COBRA_VERSION')
+    require(chooser['version'] == '2103434.version-metadata.1', 'GENUINE_CHOOSER_VERSION')
+    require(metas['COBRA']['version'] == '2103434.cobra.1', 'GENUINE_COBRA_VERSION')
     with ZipFile(bundles / 'CHOOSER_SHELL.zip') as archive:
         require(archive.read('payload/' + METADATA) ==
-                b'infinity.last_updated_in=2103427\ncobra.last_updated_in=2103433\n', 'GENUINE_VERSION_LABELS')
+                b'infinity.last_updated_in=2103427\ncobra.last_updated_in=2103434\n', 'GENUINE_VERSION_LABELS')
     return payload, metas, changed, added
 
 
@@ -121,13 +119,13 @@ def validate_ci(evidence, catalog, producer_run, source, previous):
     require(receipt['catalog_sha256'] == file_sha(catalog), 'PRODUCER_CATALOG_BINDING')
     files = receipt['files']
     required = {'BUILD.json', 'CORRECTIVE-PRESERVATION.json',
-                'PACKAGE-CANONICAL-RESULT.json', 'SOURCE-BINDINGS.json'}
+                'PACKAGE-CANONICAL-RESULT.json', 'SOURCE-BINDINGS.json', 'EXACT433-DELTA.json'}
     require(required <= set(files), 'MISSING_PRODUCER_PROOF')
     for name, pin in files.items():
         require(re.fullmatch('[0-9a-f]{64}', pin) is not None, 'EVIDENCE_HASH_FORMAT')
         require(file_sha(evidence_path(evidence, name)) == pin, 'EVIDENCE_CHANGED:' + name)
     compiler = {str(p.relative_to(REPO)): file_sha(p) for p in compiler_sources()}
-    require(len(compiler) == 20 and receipt['compiler_source_files'] == compiler, 'COMPLETE_COMPILER_INPUTS')
+    require(len(compiler) == 22 and receipt['compiler_source_files'] == compiler, 'COMPLETE_COMPILER_INPUTS')
     tested = receipt['tested_source_files']
     require(repository_source_files().items() <= tested.items(), 'MISSING_SOURCE_BINDING')
     for name, pin in tested.items():
@@ -137,7 +135,7 @@ def validate_ci(evidence, catalog, producer_run, source, previous):
     built = load(evidence / 'BUILD.json')
     require(built['status'] == 'COMPILED_UNSIGNED_COBRA_OWNER_ONLY' and
             built['baseline_signed_source'] == BASE_SOURCE and
-            built['candidate_component_version'] == '2103433.cobra.1', 'COMPILED_OWNER_IDENTITY')
+            built['candidate_component_version'] == '2103434.cobra.1', 'COMPILED_OWNER_IDENTITY')
     require(built['compiler_source_files'] == compiler, 'COMPILED_SOURCE_BINDING')
     require(built['baseline_components'] == signed431_authority()['bundle_catalog'], 'EXACT431_COMPILE_BASE')
     proof = load(evidence / 'PACKAGE-CANONICAL-RESULT.json')
@@ -169,6 +167,10 @@ def validate_ci(evidence, catalog, producer_run, source, previous):
     require(proof['new_DEX_sha256'] == bindings['owner_DEX_sha256'] == dex, 'TESTED_PACKAGED_DEX_BINDING')
     checks = receipt['selected_checks']
     require(isinstance(checks, list) and checks, 'NO_SELECTED_CI_CHECKS')
+    require({c['name'] for c in checks} == {'reuse','layout','visual-closeout','fold-density','fullscreen-more'}, 'EXACT_CHANGED_CARDS_FIVE_GROUPS')
+    require(sum(len(load(evidence_path(evidence,c['selection_file']))['methods']) for c in checks)==19, 'EXACT_NINETEEN_SELECTED_METHODS')
+    proof433=load(evidence/'EXACT433-DELTA.json')
+    require(proof433['status']=='PASS_EXACT_SIGNED433_COBRA_DELTA' and set(proof433['changed_classes'])==CHANGED_CLASSES and set(proof433['added_classes'])==ADDED_CLASSES,'EXACT433_NATIVE_MENU_AND_PRESERVATION')
     names, junit_seen, selections = set(), set(), {}
     for check in checks:
         require(check['name'] not in names and check['status'] == 'PASS', 'SELECTED_CHECK_FAILED_OR_DUPLICATE')

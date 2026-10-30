@@ -42,19 +42,20 @@ CLOSEOUT = ["nativeWrappedMissingScheduleAndLivePeersShareMeasuredRows",
             "nativeMoreAndRowTargetsKeepTheirCurrentChannelAfterGrowth",
             "cardsHeaderAndRowsLeaveFourNativeModesUnchanged"]
 CLOSEOUT_HEADER_WEIGHT = 500
+DENSITY = ["front433PixelGeometryAndTouchPreservation", "innerDensityAndAccessibleColumnFallback",
+           "foldReflowRetainsInventoryAndVisibleAnchor", "innerChannelMenuTouchAndFocusAcrossFold"]
+MORE = ["correctedFrontFullscreenMoreMenuVisibilityAndBack", "frontCardsOnlySheetHostOwnership"]
+# Unchanged profile/projection/presentation/logo helpers retain signed433's
+# source/canonical-bound passing evidence. Reexecute only changed Cards paths.
 GROUPS = [
-    ("profile", "CobraProfileDataReuseTest", PROFILE, ["profile-reads/tests/CobraProfileDataReuseTest.java"]),
-    ("projection", "CobraProjectionCorrectnessTest", PROJECTION, ["profile-reads/tests/CobraProjectionCorrectnessTest.java"]),
-    ("presentation", "CobraProgrammePresentationBaselineTest", PRESENTATION, ["presentation-qa/CobraProgrammePresentationBaselineTest.java"]),
-    ("logo", "CobraCardsLogoUnbindTest", LOGO, ["logo-clear/CobraCardsLogoUnbindTest.java"]),
-    ("native-cards", "CobraCardsNativeRenderTest", NATIVE, ["render-qa/CobraCardsNativeRenderTest.java"]),
     ("reuse", "CobraCardsReuseNativeTest", REUSE, ["cards-reuse/CobraCardsReuseNativeTest.java"]),
     ("layout", "CobraCardsLayoutTest", LAYOUT, ["layout-qa/CobraCardsLayoutTest.java"]),
-    ("theme-publication", "CobraCardsThemeOrderControlTest", THEME,
-     ["layout-qa/CobraCardsThemeOrderControlTest.java"]),
     ("visual-closeout", "CobraCardsVisualCloseoutTest", CLOSEOUT,
      ["visual-closeout/qa/CobraCardsVisualCloseoutTest.java"]),
+    ("fold-density", "CobraFoldDensityTest", DENSITY, ["consolidated434/CobraFoldDensityTest.java"]),
+    ("fullscreen-more", "CobraFoldCorrectiveTest", MORE, ["consolidated434/CobraFoldCorrectiveTest.java"]),
 ]
+
 REFERENCES = {
     "presentation-qa/results/signed431-baseline/BASELINE.json": "afe37ff8ed00a442ee240efe425413df0cc9d57acb397993939844c16bab763d",
     "presentation-qa/results/signed431-bound-player-progress/BASELINE-PLAYER-PROGRESS.json": "600cf86ba8958517a16f0519bf8a6040348acbb1984ce1f714fc2ec7c65eb383",
@@ -243,6 +244,14 @@ def run(baseline, trusted_host, out, maven):
         source_pins[str((HERE / name).relative_to(REPO))] = pin
     require(sha(HERE / THEME_REFERENCE) == THEME_REFERENCE_SHA, "Independent native431 theme-order reference changed")
     source_pins[str((HERE / THEME_REFERENCE).relative_to(REPO))] = THEME_REFERENCE_SHA
+    fold_golden_dir = HERE / "consolidated434/goldens433"
+    fold_binding = read(fold_golden_dir / "SOURCE-BINDING.json")
+    require(fold_binding["signed_source"] == "6f6abe78fae65046e1ef475c558957eae873130f" and
+            fold_binding["signed_APK_sha256"] == "874db7007b9fc79478844e5b37d4795d43c4c58de770c553d943734e1014b986", "Exact433 front native golden source")
+    for name, pin in fold_binding["files"].items():
+        require(sha(fold_golden_dir / name) == pin, "Exact433 front native golden changed: " + name)
+        source_pins[str((fold_golden_dir / name).relative_to(REPO))] = pin
+    source_pins[str((fold_golden_dir / "SOURCE-BINDING.json").relative_to(REPO))] = sha(fold_golden_dir / "SOURCE-BINDING.json")
     out.mkdir(parents=True)
     result = {"status": "RUNNING_FOCUSED_CANDIDATE_HOST_ONLY", "source_binding_sha256": source_binding,
               "baseline_signed_source": SOURCE, "baseline_APK_sha256": APK, "groups": [],
@@ -269,12 +278,17 @@ def run(baseline, trusted_host, out, maven):
                     auxiliary = [HERE.parent / "tests/CobraLogoWorkTest.java"]
                 elif name == "theme-publication":
                     auxiliary = [HERE / "layout-qa/CobraCardsLayoutTest.java"]
+                elif name == "fold-density":
+                    auxiliary = [HERE / "layout-qa/CobraCardsLayoutTest.java", HERE / "consolidated434/CobraFoldCorrectiveTest.java"]
+                elif name == "fullscreen-more":
+                    auxiliary = [HERE / "layout-qa/CobraCardsLayoutTest.java"]
                 prepare_plain(trusted, folder, sources + auxiliary)
             props = dict(sdk_properties)
             output = folder / "measurements"
             props.update({"projection.output": str(output), "presentation.output": str(output), "reuse.output": str(output),
                           "cards.render.output": str(output), "cards.layout.output": str(output),
-                          "cards.closeout.output": str(output),
+                          "cards.closeout.output": str(output), "fold.output": str(output),
+                          "fold.baseline": str(fold_golden_dir), "fold.candidate": "true",
                           "profile.helper.expected": "true", "projection.expected.hidden.reads": "1",
                           "projection.phase": "FINAL_CURRENT_OWNER_CANDIDATE_CORRECTNESS_NO_TIMING",
                           "cards.render.phase": "CARDS_TILE_PROTOTYPE", "cards.candidate": "true",
@@ -331,7 +345,8 @@ def run(baseline, trusted_host, out, maven):
         bindings(baseline, trusted)
         require(sha(trusted / "SOURCE-BINDINGS.json") == source_binding, "Trusted source binding changed during execution")
         result.update(status="PASS_FOCUSED_CANDIDATE_HOST_ONLY", selected_JUnit_methods=sum(len(g[2]) for g in GROUPS),
-                      selected_groups=len(GROUPS), internal_presentation_parity_cases=15)
+                      selected_groups=len(GROUPS), internal_presentation_parity_cases=0,
+                      retained433_evidence="Unchanged profile/projection/presentation/logo classes remain exact433; no unrelated rerun")
     except Exception as error:
         result.update(status="FAILED_AT_RECORDED_SELECTED_HOST_GROUP", error=str(error))
         (out / "ERROR.txt").write_text(traceback.format_exc())

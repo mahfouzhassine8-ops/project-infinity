@@ -42,6 +42,7 @@ def bound_sources():
       HERE/'profile-reads/patch_feature.py',HERE/'profile-reads/SOURCE-BUDGET.json',
       HERE/'profile-reads/runtime/CobraProfileDataReuse.java']
     files+=sorted((HERE/'runtime').glob('*.java'))
+    files.append(HERE/'consolidated434/verify_from433.py')
     return sorted(set(files+compiler_sources()))
 
 
@@ -115,13 +116,13 @@ def package(bundles,work,jars,out,source):
     require(set(helper_expected)==added,'EXACT_HELPER_SET')
     for name in added:require(actual[name]==helper_expected[name],'EXACT_COMPILED_HELPER:'+name)
     result=copy.deepcopy(catalog);result['source']=source
-    metadata=b'infinity.last_updated_in=2103427\ncobra.last_updated_in=2103433\n'
+    metadata=b'infinity.last_updated_in=2103427\ncobra.last_updated_in=2103434\n'
     for owner,row in catalog['bundles'].items():
         dest=out/row['file']
         if owner in ('INFINITY','MINIMAL_ANDROID_CONTRACT'):
             shutil.copyfile(bundles/row['file'],dest);require(file_sha(dest)==row['sha256'],'FROZEN_ZIP:'+owner);continue
         old=metas[owner];meta=copy.deepcopy(old)
-        meta.update(approved_source=source,version=VERSION if owner=='COBRA' else '2103433.version-metadata.1')
+        meta.update(approved_source=source,version=VERSION if owner=='COBRA' else '2103434.version-metadata.1')
         if owner=='COBRA':
             meta['payload']={k:v for k,v in old['payload'].items() if not k.startswith('class:')}
             meta['payload'].update({'class:'+n:{'owner':'COBRA','sha256':sha(raw.encode())} for n,raw in actual.items()});meta['dex']={}
