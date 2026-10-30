@@ -1,0 +1,18 @@
+{
+  "exit_code": 0,
+  "command": [
+    "/workspace/cobra-evidence/maven/apache-maven-3.9.9/bin/mvn",
+    "-B",
+    "-q",
+    "-f",
+    "/workspace/cobra-evidence/cards433-postfix-qa-v1/reuse/pom.xml",
+    "-Dmaven.repo.local=/home/agent/.m2/repository",
+    "-Dtest=CobraCardsReuseNativeTest#nativeReusePreservesScrollSelectionAndCurrentProgramme",
+    "test"
+  ],
+  "log_sha256": "7853b74bc450e9c12f531c62552b6b7568e9a73f70d8afb13d15196088659549",
+  "selected_methods": [
+    "nativeReusePreservesScrollSelectionAndCurrentProgramme"
+  ],
+  "strict_assertions": "UNCHANGED"
+}

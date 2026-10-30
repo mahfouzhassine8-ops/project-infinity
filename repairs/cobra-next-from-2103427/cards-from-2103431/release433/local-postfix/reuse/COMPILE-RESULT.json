@@ -1,0 +1,15 @@
+{
+  "exit_code": 0,
+  "command": [
+    "/workspace/cobra-evidence/maven/apache-maven-3.9.9/bin/mvn",
+    "-B",
+    "-q",
+    "-f",
+    "/workspace/cobra-evidence/cards433-postfix-qa-v1/reuse/pom.xml",
+    "-Dmaven.repo.local=/home/agent/.m2/repository",
+    "-DskipTests",
+    "test-compile"
+  ],
+  "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "behavioral_tests": "NOT_RUN"
+}

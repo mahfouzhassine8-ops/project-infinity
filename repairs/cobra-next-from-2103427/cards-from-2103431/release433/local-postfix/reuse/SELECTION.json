@@ -1,0 +1,31 @@
+{
+  "class": "CobraCardsReuseNativeTest",
+  "methods": [
+    "nativeReusePreservesScrollSelectionAndCurrentProgramme"
+  ],
+  "recorded_before_execution": true,
+  "command": [
+    "/workspace/cobra-evidence/maven/apache-maven-3.9.9/bin/mvn",
+    "-B",
+    "-q",
+    "-f",
+    "/workspace/cobra-evidence/cards433-postfix-qa-v1/reuse/pom.xml",
+    "-Dmaven.repo.local=/home/agent/.m2/repository",
+    "-Dtest=CobraCardsReuseNativeTest#nativeReusePreservesScrollSelectionAndCurrentProgramme",
+    "test"
+  ],
+  "compile_only_command": [
+    "/workspace/cobra-evidence/maven/apache-maven-3.9.9/bin/mvn",
+    "-B",
+    "-q",
+    "-f",
+    "/workspace/cobra-evidence/cards433-postfix-qa-v1/reuse/pom.xml",
+    "-Dmaven.repo.local=/home/agent/.m2/repository",
+    "-DskipTests",
+    "test-compile"
+  ],
+  "compiled_only_fixture_classes": [
+    "CobraSettingsReturnBaselineTest"
+  ],
+  "scope_sha256": "43a7fae2545de1866ab99127b97895e2f518bd5e5eabe5621669883750698229"
+}
