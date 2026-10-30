@@ -1,0 +1,51 @@
+COBRA_NONPRO_NATIVE_BUTTON mode=mobile glyph=fullscreen index=4 bounds=Rect(158, 191 - 196, 239) via=coordinate endpoints=[fullscreen] Pro=false
+COBRA_NONPRO_NATIVE_BUTTON mode=mobile glyph=pip index=5 bounds=Rect(196, 191 - 235, 239) via=coordinate endpoints=[fullscreen, pip] Pro=false
+COBRA_NONPRO_NATIVE_BUTTON mode=mobile glyph=more index=6 bounds=Rect(235, 191 - 274, 239) via=coordinate endpoints=[more] Pro=false
+COBRA_NONPRO_NATIVE_BUTTON mode=compact glyph=fullscreen index=4 bounds=Rect(273, 191 - 340, 239) via=coordinate endpoints=[fullscreen] Pro=false
+COBRA_NONPRO_NATIVE_BUTTON mode=compact glyph=pip index=5 bounds=Rect(340, 191 - 407, 239) via=coordinate endpoints=[fullscreen, pip] Pro=false
+COBRA_NONPRO_NATIVE_BUTTON mode=compact glyph=more index=6 bounds=Rect(407, 191 - 474, 239) via=coordinate endpoints=[more] Pro=false
+COBRA_NONPRO_NATIVE_BUTTON mode=cards glyph=fullscreen index=4 bounds=Rect(273, 191 - 340, 239) via=coordinate endpoints=[fullscreen] Pro=false
+COBRA_NONPRO_NATIVE_BUTTON mode=cards glyph=pip index=5 bounds=Rect(340, 191 - 407, 239) via=coordinate endpoints=[fullscreen, pip] Pro=false
+COBRA_NONPRO_NATIVE_BUTTON mode=cards glyph=more index=6 bounds=Rect(407, 191 - 474, 239) via=coordinate endpoints=[more] Pro=false
+COBRA_NONPRO_NATIVE_BUTTON mode=grid glyph=fullscreen index=4 bounds=Rect(273, 191 - 340, 239) via=coordinate endpoints=[fullscreen] Pro=false
+COBRA_NONPRO_NATIVE_BUTTON mode=grid glyph=pip index=5 bounds=Rect(340, 191 - 407, 239) via=coordinate endpoints=[fullscreen, pip] Pro=false
+COBRA_NONPRO_NATIVE_BUTTON mode=grid glyph=more index=6 bounds=Rect(407, 191 - 474, 239) via=coordinate endpoints=[more] Pro=false
+COBRA_NONPRO_NATIVE_BUTTON mode=mobile glyph=fullscreen index=4 bounds=Rect(273, 191 - 340, 239) via=coordinate endpoints=[fullscreen] Pro=false
+COBRA_NONPRO_NATIVE_BUTTON mode=mobile glyph=pip index=5 bounds=Rect(340, 191 - 407, 239) via=coordinate endpoints=[fullscreen, pip] Pro=false
+COBRA_NONPRO_NATIVE_BUTTON mode=mobile glyph=more index=6 bounds=Rect(407, 191 - 474, 239) via=coordinate endpoints=[more] Pro=false
+[ERROR] Tests run: 2, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 7.076 s <<< FAILURE! -- in com.projectinfinity.kodi.CobraNonProButtonDispatchTest
+[ERROR] com.projectinfinity.kodi.CobraNonProButtonDispatchTest.nativeNarrowWideAndRemoteTargetsRemainModeOwned -- Time elapsed: 6.662 s <<< FAILURE!
+java.lang.AssertionError: actual visible target bounds: CobraIconButton 101x48 measured=101x48 vis=0 at=410,1 attached=true | LinearLayout 720x50 measured=720x50 vis=0 at=0,190 attached=true | FrameLayout 720x240 measured=720x240 vis=0 at=0,0 attached=true | FrameLayout 720x420 measured=720x420 vis=0 at=0,0 attached=true | FrameLayout 720x420 measured=720x420 vis=0 at=0,0 attached=true | LinearLayout 720x420 measured=720x420 vis=0 at=0,0 attached=true | DecorView 720x420 measured=720x420 vis=0 at=0,0 attached=true | 
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.assertTrue(Assert.java:42)
+	at com.projectinfinity.kodi.CobraNonProButtonDispatchTest$Fixture.press(CobraNonProButtonDispatchTest.java:125)
+	at com.projectinfinity.kodi.CobraNonProButtonDispatchTest.nativeNarrowWideAndRemoteTargetsRemainModeOwned(CobraNonProButtonDispatchTest.java:153)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.robolectric.RobolectricTestRunner$HelperTestRunner$1.evaluate(RobolectricTestRunner.java:502)
+	at org.robolectric.internal.SandboxTestRunner$2.lambda$evaluate$2(SandboxTestRunner.java:285)
+	at org.robolectric.internal.bytecode.Sandbox.lambda$runOnMainThread$0(Sandbox.java:104)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+
+[ERROR] Failures: 
+[ERROR]   CobraNonProButtonDispatchTest.nativeNarrowWideAndRemoteTargetsRemainModeOwned:153 actual visible target bounds: CobraIconButton 101x48 measured=101x48 vis=0 at=410,1 attached=true | LinearLayout 720x50 measured=720x50 vis=0 at=0,190 attached=true | FrameLayout 720x240 measured=720x240 vis=0 at=0,0 attached=true | FrameLayout 720x420 measured=720x420 vis=0 at=0,0 attached=true | FrameLayout 720x420 measured=720x420 vis=0 at=0,0 attached=true | LinearLayout 720x420 measured=720x420 vis=0 at=0,0 attached=true | DecorView 720x420 measured=720x420 vis=0 at=0,0 attached=true | 
+[ERROR] Tests run: 2, Failures: 1, Errors: 0, Skipped: 0
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.2:test (default-test) on project isolation-boundary-tests: There are test failures.
+[ERROR] 
+[ERROR] See /workspace/cobra-evidence/nonpro-native-host/signed429/target/surefire-reports for the individual test results.
+[ERROR] See dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

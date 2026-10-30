@@ -1,0 +1,480 @@
+{
+  "status": "REPORTED_NONPRO_INLINE_MISMATCH_NOT_REPRODUCED_IN_AVAILABLE_HOST_VIEW_DISPATCH",
+  "selected_methods": [
+    "nativeCoordinatesInEveryNonProModeReachTheirOwnActions",
+    "reusedNativePreviewAcrossNonProModesKeepsViewAndListenerIdentity",
+    "nativeNarrowWideAndRemoteTargetsRemainModeOwned"
+  ],
+  "current_test_source_sha256": "09563311fc510bd24cdcddb87f8cdddc7459f625f9f6e659f7b6848b03393a95",
+  "Pro": "NEVER_ENTERED; mCobraProActive=false and matching active/saved non-Pro mode asserted before and after every press",
+  "production_changes": "NONE_BY_THIS_CHECK",
+  "scope": "Robolectric API35 host; actual signed production native preview views and listeners, measured visible hit rectangles and root MotionEvent/remote KeyEvent dispatch. Inert player proxy; only fullscreen/menu/OS-PiP terminal boundaries are spies.",
+  "limitations": [
+    "No physical Fold or actual Android platform PiP/decoder acceptance",
+    "No full rendered-mode screen, startup, persistence, provider or end-to-end lifecycle claim",
+    "Narrow/wide use separately attached correctly sized host windows; no dynamic fold/window resize acceptance"
+  ],
+  "fixture_failures": "Preserved: initial Choreographer window not attached before any button press; then manually enlarged root exceeded existing280px WindowManager clipping. A host frame opportunity and separate correctly configured attached windows correct QA-only fixture setup; no application timeout or production code changed.",
+  "shutdown": "NOT_RUN",
+  "physical_Fold": "NOT_RUN",
+  "results": {
+    "signed429": {
+      "status": "PASS_ALL_THREE_SELECTED_HOST_METHODS; USER_REPRODUCTION_NOT_OBSERVED",
+      "total": {
+        "presses": 60,
+        "coordinates": 48,
+        "remote": 12,
+        "counts": {
+          "mobile": {
+            "fullscreen": 5,
+            "pip": 5,
+            "more": 5
+          },
+          "compact": {
+            "fullscreen": 5,
+            "pip": 5,
+            "more": 5
+          },
+          "cards": {
+            "fullscreen": 5,
+            "pip": 5,
+            "more": 5
+          },
+          "grid": {
+            "fullscreen": 5,
+            "pip": 5,
+            "more": 5
+          }
+        },
+        "indices": {
+          "fullscreen": [
+            4
+          ],
+          "pip": [
+            5
+          ],
+          "more": [
+            6
+          ]
+        }
+      },
+      "phases": {
+        "initial": {
+          "presses": 12,
+          "coordinates": 12,
+          "remote": 0,
+          "counts": {
+            "mobile": {
+              "fullscreen": 1,
+              "pip": 1,
+              "more": 1
+            },
+            "compact": {
+              "fullscreen": 1,
+              "pip": 1,
+              "more": 1
+            },
+            "cards": {
+              "fullscreen": 1,
+              "pip": 1,
+              "more": 1
+            },
+            "grid": {
+              "fullscreen": 1,
+              "pip": 1,
+              "more": 1
+            }
+          },
+          "indices": {
+            "fullscreen": [
+              4
+            ],
+            "pip": [
+              5
+            ],
+            "more": [
+              6
+            ]
+          }
+        },
+        "retained": {
+          "presses": 12,
+          "coordinates": 12,
+          "remote": 0,
+          "counts": {
+            "mobile": {
+              "fullscreen": 1,
+              "pip": 1,
+              "more": 1
+            },
+            "compact": {
+              "fullscreen": 1,
+              "pip": 1,
+              "more": 1
+            },
+            "cards": {
+              "fullscreen": 1,
+              "pip": 1,
+              "more": 1
+            },
+            "grid": {
+              "fullscreen": 1,
+              "pip": 1,
+              "more": 1
+            }
+          },
+          "indices": {
+            "fullscreen": [
+              4
+            ],
+            "pip": [
+              5
+            ],
+            "more": [
+              6
+            ]
+          }
+        },
+        "geometry_remote": {
+          "presses": 36,
+          "coordinates": 24,
+          "remote": 12,
+          "counts": {
+            "mobile": {
+              "fullscreen": 3,
+              "pip": 3,
+              "more": 3
+            },
+            "compact": {
+              "fullscreen": 3,
+              "pip": 3,
+              "more": 3
+            },
+            "cards": {
+              "fullscreen": 3,
+              "pip": 3,
+              "more": 3
+            },
+            "grid": {
+              "fullscreen": 3,
+              "pip": 3,
+              "more": 3
+            }
+          },
+          "indices": {
+            "fullscreen": [
+              4
+            ],
+            "pip": [
+              5
+            ],
+            "more": [
+              6
+            ]
+          }
+        }
+      },
+      "initial_and_retained_source_sha256": "765e63075373219cbd63948284f19bc04c6e0bab08fc3909c797e5f087b47abb",
+      "geometry_source_sha256": "09563311fc510bd24cdcddb87f8cdddc7459f625f9f6e659f7b6848b03393a95",
+      "production_dex": {
+        "part-0.dex": "4145273e03132b2214d3f657bb49dd028b8bdcb261bcc003ef3a961194aa13f1",
+        "part-1.dex": "af03db41f53209de52f5d8609e411da49fee106d0fe544d6ea6e5d8230d88363"
+      },
+      "production_jar_sha256": "9722782b024d99b8c237a49fff65ab1f83c7d94b8563c72bf14b721e289d954b",
+      "support_jar_sha256": "f576a059ed7b8436576232324177f7a54a0243c7ddc7e550216122fe26aaa343",
+      "retained_method_evidence": "PASS testcase in an overall FAIL run whose other method hit a host viewport fixture error; entire original FAIL XML retained"
+    },
+    "baseline27": {
+      "status": "PASS_ALL_THREE_SELECTED_HOST_METHODS; USER_REPRODUCTION_NOT_OBSERVED",
+      "total": {
+        "presses": 60,
+        "coordinates": 48,
+        "remote": 12,
+        "counts": {
+          "mobile": {
+            "fullscreen": 5,
+            "pip": 5,
+            "more": 5
+          },
+          "compact": {
+            "fullscreen": 5,
+            "pip": 5,
+            "more": 5
+          },
+          "cards": {
+            "fullscreen": 5,
+            "pip": 5,
+            "more": 5
+          },
+          "grid": {
+            "fullscreen": 5,
+            "pip": 5,
+            "more": 5
+          }
+        },
+        "indices": {
+          "fullscreen": [
+            5
+          ],
+          "pip": [
+            6
+          ],
+          "more": [
+            4
+          ]
+        }
+      },
+      "phases": {
+        "initial": {
+          "presses": 12,
+          "coordinates": 12,
+          "remote": 0,
+          "counts": {
+            "mobile": {
+              "fullscreen": 1,
+              "pip": 1,
+              "more": 1
+            },
+            "compact": {
+              "fullscreen": 1,
+              "pip": 1,
+              "more": 1
+            },
+            "cards": {
+              "fullscreen": 1,
+              "pip": 1,
+              "more": 1
+            },
+            "grid": {
+              "fullscreen": 1,
+              "pip": 1,
+              "more": 1
+            }
+          },
+          "indices": {
+            "fullscreen": [
+              5
+            ],
+            "pip": [
+              6
+            ],
+            "more": [
+              4
+            ]
+          }
+        },
+        "retained": {
+          "presses": 12,
+          "coordinates": 12,
+          "remote": 0,
+          "counts": {
+            "mobile": {
+              "fullscreen": 1,
+              "pip": 1,
+              "more": 1
+            },
+            "compact": {
+              "fullscreen": 1,
+              "pip": 1,
+              "more": 1
+            },
+            "cards": {
+              "fullscreen": 1,
+              "pip": 1,
+              "more": 1
+            },
+            "grid": {
+              "fullscreen": 1,
+              "pip": 1,
+              "more": 1
+            }
+          },
+          "indices": {
+            "fullscreen": [
+              5
+            ],
+            "pip": [
+              6
+            ],
+            "more": [
+              4
+            ]
+          }
+        },
+        "geometry_remote": {
+          "presses": 36,
+          "coordinates": 24,
+          "remote": 12,
+          "counts": {
+            "mobile": {
+              "fullscreen": 3,
+              "pip": 3,
+              "more": 3
+            },
+            "compact": {
+              "fullscreen": 3,
+              "pip": 3,
+              "more": 3
+            },
+            "cards": {
+              "fullscreen": 3,
+              "pip": 3,
+              "more": 3
+            },
+            "grid": {
+              "fullscreen": 3,
+              "pip": 3,
+              "more": 3
+            }
+          },
+          "indices": {
+            "fullscreen": [
+              5
+            ],
+            "pip": [
+              6
+            ],
+            "more": [
+              4
+            ]
+          }
+        }
+      },
+      "initial_and_retained_source_sha256": "765e63075373219cbd63948284f19bc04c6e0bab08fc3909c797e5f087b47abb",
+      "geometry_source_sha256": "09563311fc510bd24cdcddb87f8cdddc7459f625f9f6e659f7b6848b03393a95",
+      "production_dex": {
+        "baseline-part-0.dex": "37c84838ed0092ab411fba2237bbf8fbf557c0220517b6a09ab10a384a924595",
+        "baseline-part-1.dex": "11028fc8f629069015a30baed955755f4de7ba9320fec7dcc7a692ae0f0ba84b"
+      },
+      "production_jar_sha256": "d52942f36249ad3b140bc6836ffa6ce88956dbc8ac74cb47304ab4214de4dad5",
+      "support_jar_sha256": "1c8f8d89c462bf5a1acaa5a420cd69c17980ec073aa9ae0cdbda318154dbd98f",
+      "retained_method_evidence": "PASS testcase in an overall FAIL run whose other method hit a host viewport fixture error; entire original FAIL XML retained"
+    }
+  },
+  "files": {
+    "baseline27/CURRENT-SOURCE.java": {
+      "bytes": 11572,
+      "sha256": "09563311fc510bd24cdcddb87f8cdddc7459f625f9f6e659f7b6848b03393a95"
+    },
+    "baseline27/FIRST-FIXTURE-FAIL.txt": {
+      "bytes": 2914,
+      "sha256": "17e684d132a357b9526178b0d65e085d74d5912f1d499cf58d90c673748ee23b"
+    },
+    "baseline27/GEOMETRY-CONFIG-FIXTURE-FAIL-JUNIT.xml": {
+      "bytes": 15616,
+      "sha256": "9b02a2e89564aa44d09dc086b95bcf286fa5cc256d4f97539d32d29d13926759"
+    },
+    "baseline27/GEOMETRY-CONFIG-FIXTURE-FAIL.txt": {
+      "bytes": 4250,
+      "sha256": "6f8af2334f0bc610640a2056c229a318256b1e43150dedcc276477b219d341da"
+    },
+    "baseline27/GEOMETRY-CONFIG-FIXTURE-SOURCE.java": {
+      "bytes": 11505,
+      "sha256": "d8975cac60e1ff1b0b73dcccf0884c431efa61ee4f10e46e5d9425c1c9ddc347"
+    },
+    "baseline27/GEOMETRY-INPUTS.json": {
+      "bytes": 1276,
+      "sha256": "1bbc298404e83b9cc6399b86f1f95e1a67994d38163764343878113da5eda9e8"
+    },
+    "baseline27/GEOMETRY-JUNIT.xml": {
+      "bytes": 17527,
+      "sha256": "8fe31a2126bc344cfd37137b40d9ea9bf8ed19fd3d7097e4479d0d007247ddff"
+    },
+    "baseline27/GEOMETRY-TEST.txt": {
+      "bytes": 4986,
+      "sha256": "5fe3977f834336afdf6eccff0fb09a8308cb63388bcb205e5a709969004c13ad"
+    },
+    "baseline27/INITIAL-INPUTS.json": {
+      "bytes": 1095,
+      "sha256": "3e3f4587326471c76d46d45a5e3b1d3c8c34ce7d7bd981da2895985a4475be12"
+    },
+    "baseline27/INITIAL-JUNIT.xml": {
+      "bytes": 14233,
+      "sha256": "83ac8276b7d8d737443c40681ad959db673c01593be0df0b6ddb4fffeab68b91"
+    },
+    "baseline27/INITIAL-SOURCE.java": {
+      "bytes": 11414,
+      "sha256": "765e63075373219cbd63948284f19bc04c6e0bab08fc3909c797e5f087b47abb"
+    },
+    "baseline27/INITIAL-TEST.txt": {
+      "bytes": 1678,
+      "sha256": "c6bfef50a01168c213d2a64f4d990c70e6edac3361f9e46295988cd7f32ebcf5"
+    },
+    "baseline27/RETAINED-AND-FIRST-GEOMETRY-FAIL-JUNIT.xml": {
+      "bytes": 17578,
+      "sha256": "0c69b8142f33af339b4a50cc44326cdc707908785c6aeb862dbac80a7bf7bf8b"
+    },
+    "baseline27/RETAINED-AND-FIRST-GEOMETRY-FAIL.txt": {
+      "bytes": 5928,
+      "sha256": "bf482d5adf8574a32bd1645a3b631a6591fdf79f0b63c42f1777c27d6357cfe2"
+    },
+    "baseline27/RETAINED-METHOD-OUTPUT.txt": {
+      "bytes": 1678,
+      "sha256": "0460633290627387b51f41706b096a084ebde6ae744d6f2639a95861327dbe38"
+    },
+    "signed429/CURRENT-SOURCE.java": {
+      "bytes": 11572,
+      "sha256": "09563311fc510bd24cdcddb87f8cdddc7459f625f9f6e659f7b6848b03393a95"
+    },
+    "signed429/FIRST-FIXTURE-FAIL.txt": {
+      "bytes": 2913,
+      "sha256": "bd955b84325e3dd3cf85f5735d5d26d25dc8f2cbd7403574dda97f5a2f47f6d8"
+    },
+    "signed429/GEOMETRY-CONFIG-FIXTURE-FAIL-JUNIT.xml": {
+      "bytes": 15599,
+      "sha256": "5449f31e9508c84550bf71b536bac7644bbe2e99868285b96c8a5b245b5b724e"
+    },
+    "signed429/GEOMETRY-CONFIG-FIXTURE-FAIL.txt": {
+      "bytes": 4249,
+      "sha256": "c16b06864c0dae1d75d0088a8de7192d2500e54806f35808df0ecfb6432a5988"
+    },
+    "signed429/GEOMETRY-CONFIG-FIXTURE-SOURCE.java": {
+      "bytes": 11505,
+      "sha256": "d8975cac60e1ff1b0b73dcccf0884c431efa61ee4f10e46e5d9425c1c9ddc347"
+    },
+    "signed429/GEOMETRY-INPUTS.json": {
+      "bytes": 1785,
+      "sha256": "5e38f97267e932c8f8ee992ae1dc1863d4256cd0f566aa1645fabf93e7cacaab"
+    },
+    "signed429/GEOMETRY-JUNIT.xml": {
+      "bytes": 17511,
+      "sha256": "1969908837d9b349cee9bdba2a5d588cd6fdb6e737cff8b073bddc320316c839"
+    },
+    "signed429/GEOMETRY-TEST.txt": {
+      "bytes": 4986,
+      "sha256": "d7bff4f857ce689940c3e89bbca66250c740c031288a9404c744377dbc99f663"
+    },
+    "signed429/INITIAL-ATTACHMENT-DIAGNOSIS.txt": {
+      "bytes": 3859,
+      "sha256": "674502dd3ef181bc899c88d5fe0d6ec36bb2fb017d012adfb67dfac7b51882e5"
+    },
+    "signed429/INITIAL-INPUTS.json": {
+      "bytes": 1604,
+      "sha256": "73fc15d1014a61722d97d00e01411d74b7f54b676f324c10a0225211fdc11798"
+    },
+    "signed429/INITIAL-JUNIT.xml": {
+      "bytes": 14217,
+      "sha256": "a2092ae750358c871e0142aacee3feb5b8383f36bae529783044f67539016db3"
+    },
+    "signed429/INITIAL-SOURCE.java": {
+      "bytes": 11414,
+      "sha256": "765e63075373219cbd63948284f19bc04c6e0bab08fc3909c797e5f087b47abb"
+    },
+    "signed429/INITIAL-TEST.txt": {
+      "bytes": 1678,
+      "sha256": "4d218028fd29352f6673ab0d3b2352ecc36b8fdf3fca89320f64923fb282b5ec"
+    },
+    "signed429/RETAINED-AND-FIRST-GEOMETRY-FAIL-JUNIT.xml": {
+      "bytes": 17563,
+      "sha256": "ff2b230ff88cdd9f623e016bef01007b7665e4b3874540987ead367b5a6d46b4"
+    },
+    "signed429/RETAINED-AND-FIRST-GEOMETRY-FAIL.txt": {
+      "bytes": 5927,
+      "sha256": "e8883cd99b89a924e509be0e4f01504c40d9c825818a7a9143a51d070f082d78"
+    },
+    "signed429/RETAINED-METHOD-OUTPUT.txt": {
+      "bytes": 1678,
+      "sha256": "881af535c3eebe9179b175f7924576daa9d7985405e0e634f2b5736f30260ea0"
+    }
+  }
+}

@@ -1,0 +1,375 @@
+diff --git a/repairs/cobra-next-from-2103427/SOURCE-BUDGET.json b/repairs/cobra-next-from-2103427/SOURCE-BUDGET.json
+index 10e0848d..e472244e 100644
+--- a/repairs/cobra-next-from-2103427/SOURCE-BUDGET.json
++++ b/repairs/cobra-next-from-2103427/SOURCE-BUDGET.json
+@@ -9,8 +9,7 @@
+     "private showCobraMultiTileActions(I)V": "5dfea0b3734107fe48760d1a570a0d068fe349dae73c65475693b7fad117543c",
+     "public onBackPressed()V": "d55fe92ecd0034b19bfc0ecd5520bfab82ec754c4a897baf4243e688f0020b1f",
+     "private cobraSportsLoadLogo(Ljava/lang/String;Landroid/widget/ImageView;)V": "c4cb8ac589c392904b24ef52bc839955fa89652bceb026e5bf8017d6c665c77a",
+-    "synthetic lambda$cobraSportsLoadLogo$481$com-projectinfinity-kodi-InfinityLiveActivity(Ljava/lang/String;Landroid/graphics/Bitmap;Landroid/widget/ImageView;)V": "30b57d9e6e95cac2fc9c9c50ca82f0188eae17bb8bf5eb8d4a10d046e7665e87",
+-    "private cobraProControl(I)V": "896c10bc6a16d644eea4ac037703b45eb04748827a023bb9989c9397c118557c"
++    "synthetic lambda$cobraSportsLoadLogo$481$com-projectinfinity-kodi-InfinityLiveActivity(Ljava/lang/String;Landroid/graphics/Bitmap;Landroid/widget/ImageView;)V": "30b57d9e6e95cac2fc9c9c50ca82f0188eae17bb8bf5eb8d4a10d046e7665e87"
+   },
+   "activity_new_fields": [],
+   "other_changed_existing_classes": [
+@@ -50,12 +49,6 @@
+       "before_after_evidence": "CobraLogoReattachTest: exact baseline27 PASS,28 FAIL (null bitmap after reparent)",
+       "correction": "Keep only view-owned, weakly indexed URI binding across detach; remove offscreen waiters; on attach restore existing cache or join current URL flight",
+       "test": "Same reproduction plus original25 tests; no source-specific player/native/shared/shutdown changes"
+-    },
+-    {
+-      "id": "P0-429-BUTTONS",
+-      "cause": "Pro visible control semantic dispatch uses fixed hidden-row child indices; next-generation More-last mutates row while activePro=false before real Proactivation. Fullscreen->index5PiP; More->index4Fullscreen",
+-      "correction_budget": "AddstableFullscreenviewtag within existingselectedpreviewcreation; oneProControlgetChildAt replaced by CobraPresentation.proTarget resolvingFullscreen/Moreoriginalviewidentity. Nativeguard/toast/menu/PiP/playerbody preserved; no rowmutationduringdispatch, no modeactivationhook.",
+-      "selected_test": "CobraPlayerButtonDispatchTest actual productionHero touch event dispatch including old29reproduction and scrolled/clipped touch targets"
+     }
+   ],
+   "controller_lifetime": "Weak Activity keys and weak helper values; active UI listeners retain at most4 pane gestures; detach cancels timers and removes listeners; no shared/runtime field mutation"
+diff --git a/repairs/cobra-next-from-2103427/android_button_journey.py b/repairs/cobra-next-from-2103427/android_button_journey.py
+index 6907d323..2ea55e3c 100644
+--- a/repairs/cobra-next-from-2103427/android_button_journey.py
++++ b/repairs/cobra-next-from-2103427/android_button_journey.py
+@@ -18,6 +18,63 @@ from pathlib import Path
+ from android_probe import PACKAGE, adb, acknowledge_known_notice_after_launch
+ 
+ 
++NATIVE_FRAMEWORK_JARS = ('/system/framework/android.test.base.jar',
++                         '/system/framework/android.test.mock.jar')
++NATIVE_QA_JAR = '/data/local/tmp/CobraNativeButtonProbe.jar'
++
++
++def native_runner_args(method, *parameters):
++    assert method in ('testFrameworkReady', 'testPress')
++    # AOSP's existing launcher appends each positional runtest JAR to CLASSPATH.
++    # These are real selected-image OS implementations, never SDK API stubs.
++    return ('shell', 'uiautomator', 'runtest', *NATIVE_FRAMEWORK_JARS, NATIVE_QA_JAR,
++            '-c', 'qa.CobraNativeButtonProbe#'+method, *parameters)
++
++
++def prepare_native_framework(native_jar, out):
++    """Fail before APK installation if the legacy OS runner cannot load its deps."""
++    out.mkdir(parents=True, exist_ok=False)
++    report = {'scope': 'QA_FRAMEWORK_ONLY_BEFORE_APK_INSTALL; NO_INPUT',
++              'status': 'NOT_COMPLETED', 'shutdown': 'NOT_RUN'}
++    try:
++        serial = adb('get-serialno').strip()
++        sdk = adb('shell', 'getprop', 'ro.build.version.sdk').strip()
++        qemu = adb('shell', 'getprop', 'ro.kernel.qemu').strip()
++        assert serial.startswith('emulator-') and sdk == '37' and qemu == '1', 'Fresh API37 emulator required'
++        assert not adb('shell', 'pm', 'path', PACKAGE, check=False).strip(), 'Existing application refused; never clear data'
++        report.update(serial=serial, sdk=sdk)
++        script = adb('shell', 'cat', '/system/bin/uiautomator')
++        (out/'OS-uiautomator-script.txt').write_text(script)
++        assert '/system/framework/android.test.runner.jar' in script and '/system/framework/uiautomator.jar' in script
++        inventory = {}
++        for path in (*NATIVE_FRAMEWORK_JARS, '/system/framework/android.test.runner.jar', '/system/framework/uiautomator.jar'):
++            fields = adb('shell', 'sha256sum', path).split()
++            assert len(fields) == 2 and re.fullmatch(r'[0-9a-f]{64}', fields[0]) and fields[1] == path, 'Missing OS framework JAR: '+path
++            inventory[path] = fields[0]
++        report['actual_OS_framework_sha256'] = inventory
++        expected = hashlib.sha256(native_jar.read_bytes()).hexdigest()
++        adb('push', str(native_jar), NATIVE_QA_JAR)
++        fields = adb('shell', 'sha256sum', NATIVE_QA_JAR).split()
++        assert fields and fields[0] == expected, 'Native QA JAR transfer mismatch'
++        report['native_QA_JAR_sha256'] = expected
++        raw = adb(*native_runner_args('testFrameworkReady'), check=False)
++        (out/'runner.txt').write_text(raw)
++        matches = re.findall(r'COBRA_NATIVE_FRAMEWORK_READY=(\{[^\r\n]+\})', raw)
++        assert len(matches) == 1, 'One OS framework readiness record required; see runner.txt'
++        ready = json.loads(matches[0]);report['readiness'] = ready
++        assert ready.get('status') == 'FRAMEWORK_CLASSES_RESOLVED' and ready.get('scope') == 'QA_FRAMEWORK_ONLY_NO_INPUT', ready
++        assert re.search(r'\bOK\s*\(1 test\)', raw) and 'FAILURES!!!' not in raw and 'shortMsg=' not in raw and 'Test run aborted' not in raw, 'Native framework runner aborted'
++        assert {'android.test.RepetitiveTest', 'android.test.mock.MockContext',
++                'com.android.uiautomator.core.UiDevice', 'com.android.uiautomator.testrunner.UiAutomatorTestCase'} <= set(ready.get('classes', [])), ready
++        report['status'] = 'PASS_ACTUAL_OS_DEPENDENCIES_RESOLVED_BEFORE_APK_INSTALL'
++        return report
++    except Exception as exc:
++        report['status'] = 'FAILED_BEFORE_APK_INSTALL';report['error'] = str(exc)
++        raise
++    finally:
++        (out/'OUTCOME.json').write_text(json.dumps(report, indent=2)+'\n')
++
++
+ def bounds(node):
+     values = tuple(map(int, re.findall(r'-?\d+', node.get('bounds', ''))))
+     return values if len(values) == 4 else (0, 0, 0, 0)
+@@ -227,11 +284,10 @@ def journey(out, native_jar, native_paths=None):
+         prefix = 'cobra-button-%02d' % native_sequence
+         x = (hero_box[0]+hero_box[2])//2
+         y = hero_box[1]+(hero_box[3]-hero_box[1])//3
+-        raw = adb('shell', 'uiautomator', 'runtest', '/data/local/tmp/CobraNativeButtonProbe.jar',
+-                  '-c', 'qa.CobraNativeButtonProbe#testPress', '-e', 'label', label,
++        raw = adb(*native_runner_args('testPress', '-e', 'label', label,
+                   '-e', 'direction', direction, '-e', 'force', str(force_scroll).lower(),
+                   '-e', 'heroX', str(x), '-e', 'heroY', str(y),
+-                  '-e', 'capturePrefix', prefix, check=False)
++                  '-e', 'capturePrefix', prefix), check=False)
+         (out/(prefix+'-runner.txt')).write_text(raw)
+         matches = re.findall(r'COBRA_NATIVE_BUTTON_PROBE=(\{[^\r\n]+\})', raw)
+         assert len(matches) == 1, 'One native probe record required; see '+prefix+'-runner.txt'
+@@ -241,7 +297,7 @@ def journey(out, native_jar, native_paths=None):
+         assert native.get('requested_label') == label, 'Native target request mismatch'
+         assert native.get('status') == 'INJECTED_ONE_FRESH_NATIVE_VISIBLE_TARGET', native
+         assert native.get('injection_attempted') and native.get('injection_result'), native
+-        assert re.search(r'\bOK\s*\(1 test\)', raw) and 'FAILURES!!!' not in raw, 'Native runner did not pass one test'
++        assert re.search(r'\bOK\s*\(1 test\)', raw) and 'FAILURES!!!' not in raw and 'shortMsg=' not in raw and 'Test run aborted' not in raw, 'Native runner did not pass one test'
+         assert native.get('native_elapsed_ms', 3500) < 3500, 'Native press exceeded unchanged deadline'
+         for suffix, field in (('.xml', 'post_ui_xml'), ('.png', 'post_ui_png')):
+             public = '/data/local/tmp/'+prefix+suffix
+diff --git a/repairs/cobra-next-from-2103427/build.py b/repairs/cobra-next-from-2103427/build.py
+index f29d4f9d..ac0f79ee 100644
+--- a/repairs/cobra-next-from-2103427/build.py
++++ b/repairs/cobra-next-from-2103427/build.py
+@@ -66,20 +66,12 @@ def patch_activity(text):
+         return s.replace(anchor,anchor+'\n\n    invoke-static {p0, p1, v0}, '+HELPER+'->addActions(Landroid/app/Activity;Landroid/widget/LinearLayout;Ljava/lang/String;)V',1)
+     update('showCobraMultiTileActions',actions)
+     def preview(s):
+-        full='    move-result-object v9\n\n    .line 2286'
+-        assert s.count(full)==1
+-        s=s.replace(full,'    move-result-object v9\n\n    const-string v10, "cobra_preview_fullscreen"\n\n    invoke-virtual {v9, v10}, Landroid/view/View;->setTag(Ljava/lang/Object;)V\n\n    .line 2286',1)
+         anchor='    invoke-virtual {v0, p2, p1}, '+APP+'InfinityLiveActivity$CobraSix;->previewButton(Landroid/widget/LinearLayout;Landroid/widget/FrameLayout;)V'
+         assert s.count(anchor)==1
+         s=s.replace(anchor,anchor+'\n\n    invoke-static {p0, p2}, '+PRESENT+'->moreLast(Landroid/app/Activity;Landroid/widget/LinearLayout;)V',1)
+         assert s.count('    return-object p1')==2
+         return s.replace('    return-object p1','    invoke-static {p0, p1}, '+PRESENT+'->previewReused(Landroid/app/Activity;Landroid/widget/FrameLayout;)V\n\n    return-object p1')
+     update('cobraPreviewPanel',preview)
+-    def pro_control(s):
+-        anchor='    invoke-virtual {v1, p1}, Landroid/view/ViewGroup;->getChildAt(I)Landroid/view/View;\n\n    move-result-object p1'
+-        assert s.count(anchor)==1
+-        return s.replace(anchor,'    invoke-static {v1, p1}, '+PRESENT+'->proTarget(Landroid/view/ViewGroup;I)Landroid/view/View;\n\n    move-result-object p1\n\n    if-eqz p1, :cond_a',1)
+-    update('cobraProControl',pro_control)
+     def position(s):
+         head=s.split('\n',1)[0]
+         return head+'''
+diff --git a/repairs/cobra-next-from-2103427/build_native_button_probe.py b/repairs/cobra-next-from-2103427/build_native_button_probe.py
+index 9b553987..208b0919 100644
+--- a/repairs/cobra-next-from-2103427/build_native_button_probe.py
++++ b/repairs/cobra-next-from-2103427/build_native_button_probe.py
+@@ -117,7 +117,7 @@ def build(out, d8, android=None, sdk_archive=None):
+         "source_sha256": digest(source), "class_files": [str(p.relative_to(classes)) for p in class_files],
+         "inspected_DEX_classes": dex_classes,
+         "DEX_sha256": digest(dex / "classes.dex"), "QA_JAR_sha256": digest(result),
+-        "runtime_classes": "OS /system/framework/uiautomator.jar and android.test.runner.jar; not bundled",
++        "runtime_classes": "OS /system/framework/uiautomator.jar, android.test.runner.jar, android.test.base.jar and android.test.mock.jar; not bundled",
+         "application_APK": "UNCHANGED_NOT_BUILT_OR_INSTALLED",
+         "shutdown": "NOT_RUN", "CI_runtime": "NOT_RUN",
+     }
+diff --git a/repairs/cobra-next-from-2103427/qa/android/CobraNativeButtonProbe.java b/repairs/cobra-next-from-2103427/qa/android/CobraNativeButtonProbe.java
+index 72065b73..d80b0e23 100644
+--- a/repairs/cobra-next-from-2103427/qa/android/CobraNativeButtonProbe.java
++++ b/repairs/cobra-next-from-2103427/qa/android/CobraNativeButtonProbe.java
+@@ -80,6 +80,159 @@ public final class CobraNativeButtonProbe extends UiAutomatorTestCase {
+         return new JSONArray().put(value.left).put(value.top).put(value.right).put(value.bottom);
+     }
+ 
++    /** Resolves the real OS runner dependencies before any application UI test. */
++    public void testFrameworkReady() throws Exception {
++        JSONObject report = new JSONObject().put("scope", "QA_FRAMEWORK_ONLY_NO_INPUT")
++                .put("status", "FAILED_CLOSED").put("classes", new JSONArray());
++        String[] names = {
++                "android.test.RepetitiveTest", "android.test.FlakyTest", "android.test.UiThreadTest",
++                "android.test.mock.MockContext", "junit.framework.TestCase",
++                "com.android.uiautomator.testrunner.UiAutomatorTestCase",
++                "com.android.uiautomator.testrunner.UiAutomatorTestRunner",
++                "com.android.uiautomator.core.UiDevice", "com.android.uiautomator.core.Configurator",
++                "com.android.uiautomator.core.UiObject", "com.android.uiautomator.core.UiSelector"
++        };
++        try {
++            for (String name : names) {
++                report.put("resolving", name);
++                Class<?> resolved = Class.forName(name);
++                assertEquals("Unexpected runtime class identity", name, resolved.getName());
++                report.getJSONArray("classes").put(resolved.getName());
++            }
++            Class<?> repetitive = Class.forName("android.test.RepetitiveTest");
++            assertTrue("OS RepetitiveTest must remain an annotation", repetitive.isAnnotation());
++            assertEquals("OS RepetitiveTest default changed", Integer.valueOf(1),
++                    repetitive.getMethod("numIterations").getDefaultValue());
++            report.put("RepetitiveTest_is_annotation", true)
++                    .put("RepetitiveTest_default_iterations", 1)
++                    .put("status", "FRAMEWORK_CLASSES_RESOLVED");
++        } finally {
++            System.out.println("COBRA_NATIVE_FRAMEWORK_READY=" + report.toString());
++        }
++    }
++
++    private void guardNonProPreview(UiDevice device, String mode) throws Exception {
++        assertEquals("Wrong foreground package", PACKAGE, device.getCurrentPackageName());
++        assertTrue("Exact non-Pro mode heading missing", new UiObject(new UiSelector()
++                .packageName(PACKAGE).text(mode)).exists());
++        assertFalse("Pro heading must not be present", new UiObject(new UiSelector()
++                .packageName(PACKAGE).text("Pro")).exists());
++        assertFalse("Pro source control must not be present", new UiObject(new UiSelector()
++                .packageName(PACKAGE).description("Previous Pro source")).exists());
++        assertFalse("Fullscreen preview-return control must not be present", new UiObject(new UiSelector()
++                .packageName(PACKAGE).description("Return to preview")).exists());
++        assertFalse("Fullscreen preview-return label must not be present", new UiObject(new UiSelector()
++                .packageName(PACKAGE).text("Return to preview")).exists());
++    }
++
++    private Rect[] nonProPreviewBounds(UiDevice device, String mode) throws Exception {
++        guardNonProPreview(device, mode);
++        String[] descriptions = {"Fullscreen", "Picture-in-Picture", "Channel actions"};
++        Rect[] result = new Rect[descriptions.length];
++        for (int index = 0; index < descriptions.length; index++) {
++            UiSelector selector = action(descriptions[index]);
++            UiObject target = new UiObject(selector.instance(0));
++            assertTrue("Required native non-Pro preview button missing: " + descriptions[index], target.exists());
++            assertFalse("Ambiguous native non-Pro preview button: " + descriptions[index],
++                    new UiObject(selector.instance(1)).exists());
++            assertEquals("Native button identity changed", descriptions[index], target.getContentDescription());
++            Rect visible = new Rect(target.getVisibleBounds());
++            assertTrue("Native non-Pro preview target is too small: " + descriptions[index],
++                    visible.width() >= MIN_HIT_PX && visible.height() >= MIN_HIT_PX);
++            assertTrue("Native non-Pro target extends outside the display", visible.left >= 0
++                    && visible.top >= 0 && visible.right <= device.getDisplayWidth()
++                    && visible.bottom <= device.getDisplayHeight());
++            result[index] = visible;
++        }
++        int bandTop = Math.max(result[0].top, Math.max(result[1].top, result[2].top));
++        int bandBottom = Math.min(result[0].bottom, Math.min(result[1].bottom, result[2].bottom));
++        assertTrue("Native preview buttons do not share a usable horizontal band",
++                bandBottom - bandTop >= MIN_HIT_PX);
++        assertTrue("Native preview button order or hitbox separation changed",
++                result[0].left < result[1].left && result[1].left < result[2].left
++                && result[0].right <= result[1].left && result[1].right <= result[2].left);
++        return result;
++    }
++
++    /** One actual press on the visible native non-Pro preview action row. */
++    public void testNonProPress() throws Exception {
++        final String mode = getParams().getString("mode", "");
++        final String label = getParams().getString("label", "");
++        final String capturePrefix = getParams().getString("capturePrefix", "");
++        JSONObject report = new JSONObject().put("scope", "ON_DEVICE_PUBLIC_NONPRO_PREVIEW_COORDINATE_TAP")
++                .put("package", PACKAGE).put("mode", mode).put("requested_label", label)
++                .put("press_deadline_ms", PRESS_DEADLINE_MS).put("injection_attempted", false)
++                .put("status", "FAILED_CLOSED").put("shutdown", "NOT_RUN");
++        UiDevice device = getUiDevice();
++        Configurator config = Configurator.getInstance();
++        long oldIdle = config.getWaitForIdleTimeout(), oldSelector = config.getWaitForSelectorTimeout();
++        try {
++            assertTrue("Unsupported non-Pro mode", mode.equals("Mobile") || mode.equals("Compact")
++                    || mode.equals("Cards") || mode.equals("TV Grid"));
++            assertTrue("Unsupported non-Pro target", label.equals("Fullscreen") || label.equals("PiP")
++                    || label.equals("More"));
++            assertTrue("Unsafe or missing public QA capture basename",
++                    capturePrefix.matches("[A-Za-z0-9][A-Za-z0-9_-]{0,63}"));
++            final File beforeXml = new File("/data/local/tmp", capturePrefix + "-before.xml");
++            final File beforePng = new File("/data/local/tmp", capturePrefix + "-before.png");
++            final File postXml = new File("/data/local/tmp", capturePrefix + ".xml");
++            final File postPng = new File("/data/local/tmp", capturePrefix + ".png");
++            assertFalse("Refuse stale public QA before XML", beforeXml.exists());
++            assertFalse("Refuse stale public QA before PNG", beforePng.exists());
++            assertFalse("Refuse stale public QA post XML", postXml.exists());
++            assertFalse("Refuse stale public QA post PNG", postPng.exists());
++            // QA bridge timeouts only. No app timer, control, scroll or reveal is changed.
++            config.setWaitForIdleTimeout(0).setWaitForSelectorTimeout(0);
++            nonProPreviewBounds(device, mode);
++            report.put("pre_ui_xml", beforeXml.getAbsolutePath()).put("pre_ui_png", beforePng.getAbsolutePath());
++            device.dumpWindowHierarchy(capturePrefix + "-before.xml");
++            assertTrue("Native before-press XML capture missing", beforeXml.isFile() && beforeXml.length() > 0);
++            assertTrue("Native before-press PNG capture failed", device.takeScreenshot(beforePng)
++                    && beforePng.isFile() && beforePng.length() > 0);
++
++            long freshStarted = SystemClock.uptimeMillis();
++            Rect[] first = nonProPreviewBounds(device, mode);
++            SystemClock.sleep(32);
++            Rect[] second = nonProPreviewBounds(device, mode);
++            for (int index = 0; index < first.length; index++) {
++                assertEquals("Native preview bounds changed after first fresh observation", first[index], second[index]);
++            }
++            int selected = label.equals("Fullscreen") ? 0 : label.equals("PiP") ? 1 : 2;
++            String description = selected == 0 ? "Fullscreen" : selected == 1 ? "Picture-in-Picture" : "Channel actions";
++            Rect hit = second[selected];
++            report.put("observed_native_label", description).put("visible_hit_bounds", rect(hit))
++                    .put("all_preview_bounds", new JSONObject().put("Fullscreen", rect(second[0]))
++                            .put("PiP", rect(second[1])).put("More", rect(second[2])))
++                    .put("coordinate", new JSONArray().put(hit.centerX()).put(hit.centerY()))
++                    .put("native_elapsed_before_injection_ms", SystemClock.uptimeMillis() - freshStarted);
++            assertTrue("Native non-Pro target exceeded unchanged freshness deadline",
++                    SystemClock.uptimeMillis() - freshStarted < PRESS_DEADLINE_MS);
++            report.put("injection_attempted", true);
++            boolean injected = device.click(hit.centerX(), hit.centerY());
++            long elapsed = SystemClock.uptimeMillis() - freshStarted;
++            report.put("injection_result", injected).put("native_elapsed_ms", elapsed);
++            assertTrue("Coordinate injection failed; do not retry uncertain press", injected);
++            assertTrue("Press completed after unchanged deadline; do not retry uncertain press",
++                    elapsed < PRESS_DEADLINE_MS);
++            report.put("post_ui_xml", postXml.getAbsolutePath()).put("post_ui_png", postPng.getAbsolutePath());
++            SystemClock.sleep(80);
++            device.dumpWindowHierarchy(capturePrefix + ".xml");
++            assertTrue("Native post-press XML capture missing; do not retry press",
++                    postXml.isFile() && postXml.length() > 0);
++            assertTrue("Native post-press PNG capture failed; do not retry press",
++                    device.takeScreenshot(postPng) && postPng.isFile() && postPng.length() > 0);
++            report.put("status", "INJECTED_ONE_FRESH_NONPRO_PREVIEW_TARGET");
++        } catch (Throwable failure) {
++            report.put("error", failure.toString());
++            if (failure instanceof Exception) throw (Exception) failure;
++            if (failure instanceof Error) throw (Error) failure;
++            throw new RuntimeException(failure);
++        } finally {
++            config.setWaitForIdleTimeout(oldIdle).setWaitForSelectorTimeout(oldSelector);
++            System.out.println("COBRA_NATIVE_NONPRO_PROBE=" + report.toString());
++        }
++    }
++
+     public void testPress() throws Exception {
+         final String label = getParams().getString("label", "");
+         final String direction = getParams().getString("direction", "left");
+diff --git a/repairs/cobra-next-from-2103427/run_android_probe.py b/repairs/cobra-next-from-2103427/run_android_probe.py
+index 6ff8bf03..6a1b24a1 100644
+--- a/repairs/cobra-next-from-2103427/run_android_probe.py
++++ b/repairs/cobra-next-from-2103427/run_android_probe.py
+@@ -49,24 +49,25 @@ def main(signed,out,signature):
+  retained_icons=None
+  if receipt['versionCode']==2103431:
+   retained_icons=reuse_icon_evidence(out.parent/'retained-icon-evidence',receipt)
+- probe(files[0],out,receipt['signed_apk_sha256'])
+- if receipt['versionCode']==2103431:
+-  # The exact signed431 icon frames were already independently reviewed.
+-  # Keep their original failed-run binding and observed launcher-cache limit.
+-  with zipfile.ZipFile(files[0]) as apk:
+-   native_paths={name for name in apk.namelist() if name.startswith('lib/arm64-v8a/') and name.endswith('.so')}
++  # Resolve the actual OS runner dependencies before any APK installation.
+   from build_native_button_probe import build
+   build_dir=out.parent.parent/'runtime-native-button'
+   build(build_dir,Path(os.environ['ANDROID_HOME'])/'build-tools/35.0.0/lib/d8.jar')
+   native_evidence=out.parent/'native-agent';native_evidence.mkdir(exist_ok=False)
+   for name in ('BUILD-RECEIPT.json','CobraNativeButtonProbe.jar'):
+    shutil.copyfile(build_dir/name,native_evidence/name)
++  from android_button_journey import prepare_native_framework
++  framework=prepare_native_framework(native_evidence/'CobraNativeButtonProbe.jar',out.parent/'framework-preflight')
++ probe(files[0],out,receipt['signed_apk_sha256'])
++ if receipt['versionCode']==2103431:
++  with zipfile.ZipFile(files[0]) as apk:
++   native_paths={name for name in apk.namelist() if name.startswith('lib/arm64-v8a/') and name.endswith('.so')}
+   from android_button_journey import journey
+   try:
+    journey(out.parent/'functional',native_evidence/'CobraNativeButtonProbe.jar',native_paths=native_paths)
+   finally:
+    combined={'signed_source':receipt['source'],'APK_sha256':receipt['signed_apk_sha256'],
+-             'versionCode':receipt['versionCode'],'retained_icon_evidence':retained_icons,
++             'versionCode':receipt['versionCode'],'retained_icon_evidence':retained_icons,'OS_framework_preflight':framework,
+              'physical_Fold':'NOT_RUN','shutdown':'NOT_RUN'}
+    for label,folder in (('button_actions','functional'),):
+     path=out.parent/folder/'OUTCOME.json'
+diff --git a/repairs/cobra-next-from-2103427/runtime/CobraPresentation.java b/repairs/cobra-next-from-2103427/runtime/CobraPresentation.java
+index 60a7bbc7..72b5918f 100644
+--- a/repairs/cobra-next-from-2103427/runtime/CobraPresentation.java
++++ b/repairs/cobra-next-from-2103427/runtime/CobraPresentation.java
+@@ -46,13 +46,4 @@ public final class CobraPresentation {
+     if(root!=null){View controls=root.findViewWithTag("cobra_preview_controls");
+       if(controls instanceof LinearLayout)moreLast(owner,(LinearLayout)controls);}
+   }
+-  /** Pro's visible actions use the legacy logical indices of the hidden native
+-   * preview controls. Resolve the two moved controls by identity, not position;
+-   * this never changes presentation order or invokes a player/menu callback. */
+-  public static View proTarget(ViewGroup row,int originalIndex){
+-    if(row==null)return null;
+-    if(originalIndex==4)return row.findViewWithTag("cobra_preview_options_anchor");
+-    if(originalIndex==5)return row.findViewWithTag("cobra_preview_fullscreen");
+-    return row.getChildAt(originalIndex);
+-  }
+ }
