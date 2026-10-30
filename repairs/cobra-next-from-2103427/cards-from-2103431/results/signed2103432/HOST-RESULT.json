@@ -1,0 +1,341 @@
+{
+  "status": "PASS_FOCUSED_CANDIDATE_HOST_ONLY",
+  "source_binding_sha256": "2d03951091e99701481029ff66a42095eabbac1730c12b75ee2f2134930b7953",
+  "baseline_signed_source": "9ccc4c362a65118eeba38a8e7e4b0de5723c69af",
+  "baseline_APK_sha256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471",
+  "groups": [
+    {
+      "name": "profile",
+      "class": "CobraProfileDataReuseTest",
+      "methods": [
+        "currentRawAndActiveIdAreReadFreshInOriginalOrder",
+        "publicProfilesRemainIndependentMutableCopies",
+        "malformedWrongTypeAndNullableDataRecoverOnNextCall",
+        "firstMatchOptBooleanMissingIdsAndNullActiveIdMatchOriginalLoop",
+        "validOversizeIsEvaluatedUncachedAndAdmissionIsBounded",
+        "privateDataSnapshotsAreSeparatePerThread"
+      ],
+      "maven_exit_code": 0,
+      "inputs_sha256": "2e844fb12b10f31da378201b36b8e952b5f66b790c68e62154bfccb5e3ca742e",
+      "selection_sha256": "e54b7d50d02e22fbc9b14e3b9b6a88b6c9156256db64d1b78a79c8ce459e70bf",
+      "raw_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "resolved_native_dependencies": {
+        "nativeruntime": {
+          "file": "/home/runner/.m2/repository/org/robolectric/nativeruntime/4.14.1/nativeruntime-4.14.1.jar",
+          "version": "4.14.1",
+          "sha256": "c07b66d315aec3272a7c64aa5f154b4194be2cc6030a733d16f2ee87330232a8"
+        },
+        "nativeruntime-dist-compat": {
+          "file": "/home/runner/.m2/repository/org/robolectric/nativeruntime-dist-compat/1.0.16/nativeruntime-dist-compat-1.0.16.jar",
+          "version": "1.0.16",
+          "sha256": "2f4e879b00eed634d0e43353ecff80db4d5ce24b3b213d1e6053cb21b0ced10f"
+        }
+      },
+      "JUnit": {
+        "class": "com.projectinfinity.kodi.CobraProfileDataReuseTest",
+        "methods": [
+          "malformedWrongTypeAndNullableDataRecoverOnNextCall",
+          "firstMatchOptBooleanMissingIdsAndNullActiveIdMatchOriginalLoop",
+          "validOversizeIsEvaluatedUncachedAndAdmissionIsBounded",
+          "publicProfilesRemainIndependentMutableCopies",
+          "currentRawAndActiveIdAreReadFreshInOriginalOrder",
+          "privateDataSnapshotsAreSeparatePerThread"
+        ],
+        "tests": 6,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "reports": {
+          "target/surefire-reports/TEST-com.projectinfinity.kodi.CobraProfileDataReuseTest.xml": "4550868b7053b239f5a9303acb6319fe386c2b67df1dd7ecec0297242229967e"
+        }
+      }
+    },
+    {
+      "name": "projection",
+      "class": "CobraProjectionCorrectnessTest",
+      "methods": [
+        "actualProjectionCounts20226WithoutTiming",
+        "nextProjectionReflectsFiltersHiddenFavoritesRecentsInventoryAndProfile"
+      ],
+      "maven_exit_code": 0,
+      "inputs_sha256": "01606624bec56002e887b0b6103b960ae62e1f4bf2e7949bd80ed69c0b94d369",
+      "selection_sha256": "0db45a16699e1d6de19643e0cf882e10cf1a0f2bf2fdeb367ade7a537a49703a",
+      "raw_log_sha256": "85a1846c8bc4cd831e72591e75a09377110cb76dda8431a72f9fdd6bc8083a18",
+      "resolved_native_dependencies": {
+        "nativeruntime": {
+          "file": "/home/runner/.m2/repository/org/robolectric/nativeruntime/4.14.1/nativeruntime-4.14.1.jar",
+          "version": "4.14.1",
+          "sha256": "c07b66d315aec3272a7c64aa5f154b4194be2cc6030a733d16f2ee87330232a8"
+        },
+        "nativeruntime-dist-compat": {
+          "file": "/home/runner/.m2/repository/org/robolectric/nativeruntime-dist-compat/1.0.16/nativeruntime-dist-compat-1.0.16.jar",
+          "version": "1.0.16",
+          "sha256": "2f4e879b00eed634d0e43353ecff80db4d5ce24b3b213d1e6053cb21b0ced10f"
+        }
+      },
+      "JUnit": {
+        "class": "com.projectinfinity.kodi.CobraProjectionCorrectnessTest",
+        "methods": [
+          "actualProjectionCounts20226WithoutTiming",
+          "nextProjectionReflectsFiltersHiddenFavoritesRecentsInventoryAndProfile"
+        ],
+        "tests": 2,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "reports": {
+          "target/surefire-reports/TEST-com.projectinfinity.kodi.CobraProjectionCorrectnessTest.xml": "d9ceb80a606cf3ff475394b21c058dbd8df097da1553ef5bb58ed9b72f3c663c"
+        }
+      }
+    },
+    {
+      "name": "presentation",
+      "class": "CobraProgrammePresentationBaselineTest",
+      "methods": [
+        "actualCandidateFinalStateParityAndBoundPlayerProgress"
+      ],
+      "maven_exit_code": 0,
+      "inputs_sha256": "d02cbfd099ad5cd47021a29b91a03666a4d8aa11afb98d71c1eb68b5bfe74b40",
+      "selection_sha256": "ff353b5adc36cabf2863bece3cf82f993289cebfc90561afafedd1948756e50d",
+      "raw_log_sha256": "61711ec957f57db255322fa13f5bef2987858ff65355cbdad97c8e9986562d1e",
+      "resolved_native_dependencies": {
+        "nativeruntime": {
+          "file": "/home/runner/.m2/repository/org/robolectric/nativeruntime/4.14.1/nativeruntime-4.14.1.jar",
+          "version": "4.14.1",
+          "sha256": "c07b66d315aec3272a7c64aa5f154b4194be2cc6030a733d16f2ee87330232a8"
+        },
+        "nativeruntime-dist-compat": {
+          "file": "/home/runner/.m2/repository/org/robolectric/nativeruntime-dist-compat/1.0.16/nativeruntime-dist-compat-1.0.16.jar",
+          "version": "1.0.16",
+          "sha256": "2f4e879b00eed634d0e43353ecff80db4d5ce24b3b213d1e6053cb21b0ced10f"
+        }
+      },
+      "JUnit": {
+        "class": "com.projectinfinity.kodi.CobraProgrammePresentationBaselineTest",
+        "methods": [
+          "actualCandidateFinalStateParityAndBoundPlayerProgress"
+        ],
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "reports": {
+          "target/surefire-reports/TEST-com.projectinfinity.kodi.CobraProgrammePresentationBaselineTest.xml": "890dcbf8033e992232eb477892556061a264757b2197a1f9200cb19bee7afb02"
+        }
+      },
+      "internal_parity_cases": 15
+    },
+    {
+      "name": "logo",
+      "class": "CobraCardsLogoUnbindTest",
+      "methods": [
+        "clearWithoutOwnerCreatesNoServiceOrWork",
+        "clearedBlankViewRejectsOldCompletionAndDoesNotRequeueOnAttach",
+        "clearThenRebindPublishesOnlyTheCurrentLogo",
+        "clearingOneViewPreservesSharedFlightAndOtherWaiter"
+      ],
+      "maven_exit_code": 0,
+      "inputs_sha256": "78d1ec69c994b68b73ee542a81892f11410b4993f3ae5ba59624d3242afe0555",
+      "selection_sha256": "20f44ca6c9b1253ad6e03a94c38bb8162847386a6123d85143765e6c1b0cf48e",
+      "raw_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "resolved_native_dependencies": {
+        "nativeruntime": {
+          "file": "/home/runner/.m2/repository/org/robolectric/nativeruntime/4.14.1/nativeruntime-4.14.1.jar",
+          "version": "4.14.1",
+          "sha256": "c07b66d315aec3272a7c64aa5f154b4194be2cc6030a733d16f2ee87330232a8"
+        },
+        "nativeruntime-dist-compat": {
+          "file": "/home/runner/.m2/repository/org/robolectric/nativeruntime-dist-compat/1.0.16/nativeruntime-dist-compat-1.0.16.jar",
+          "version": "1.0.16",
+          "sha256": "2f4e879b00eed634d0e43353ecff80db4d5ce24b3b213d1e6053cb21b0ced10f"
+        }
+      },
+      "JUnit": {
+        "class": "com.projectinfinity.kodi.CobraCardsLogoUnbindTest",
+        "methods": [
+          "clearingOneViewPreservesSharedFlightAndOtherWaiter",
+          "clearThenRebindPublishesOnlyTheCurrentLogo",
+          "clearWithoutOwnerCreatesNoServiceOrWork",
+          "clearedBlankViewRejectsOldCompletionAndDoesNotRequeueOnAttach"
+        ],
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "reports": {
+          "target/surefire-reports/TEST-com.projectinfinity.kodi.CobraCardsLogoUnbindTest.xml": "ff23e80eb0c39c03fdd3ed0bcbc984a4b45fe05d4ad8d131dd92074693e0645f"
+        }
+      }
+    },
+    {
+      "name": "native-cards",
+      "class": "CobraCardsNativeRenderTest",
+      "methods": [
+        "nativeCardRecycleAndCurrentProgramme",
+        "nativeCardDimensionsAndCornerTouch",
+        "nativeCardLogoRecycle"
+      ],
+      "maven_exit_code": 0,
+      "inputs_sha256": "b724d11e03eb742ce2ffdf964c1d90a023de83ac8603aa1421d80f77c1d61c1c",
+      "selection_sha256": "fe3439246060ba8b0cc653ccacb7c76d15eb344f1e0232efe819060897738b8a",
+      "raw_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "resolved_native_dependencies": {
+        "nativeruntime": {
+          "file": "/home/runner/.m2/repository/org/robolectric/nativeruntime/4.14.1/nativeruntime-4.14.1.jar",
+          "version": "4.14.1",
+          "sha256": "c07b66d315aec3272a7c64aa5f154b4194be2cc6030a733d16f2ee87330232a8"
+        },
+        "nativeruntime-dist-compat": {
+          "file": "/home/runner/.m2/repository/org/robolectric/nativeruntime-dist-compat/1.0.16/nativeruntime-dist-compat-1.0.16.jar",
+          "version": "1.0.16",
+          "sha256": "2f4e879b00eed634d0e43353ecff80db4d5ce24b3b213d1e6053cb21b0ced10f"
+        }
+      },
+      "JUnit": {
+        "class": "com.projectinfinity.kodi.CobraCardsNativeRenderTest",
+        "methods": [
+          "nativeCardDimensionsAndCornerTouch",
+          "nativeCardRecycleAndCurrentProgramme",
+          "nativeCardLogoRecycle"
+        ],
+        "tests": 3,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "reports": {
+          "target/surefire-reports/TEST-com.projectinfinity.kodi.CobraCardsNativeRenderTest.xml": "c5f90f56aaf41d26d84c7a83726da44a3ffffa5aad9be8dc6b92f3288f67648e"
+        }
+      }
+    },
+    {
+      "name": "reuse",
+      "class": "CobraCardsReuseNativeTest",
+      "methods": [
+        "nativeReusePreservesScrollSelectionAndCurrentProgramme",
+        "nativeImmediateSecondRenderPreservesPendingPosition",
+        "nativeSelectiveCollectionsAndFreshDirectory",
+        "nativePolicyTypesAndContextInvalidation",
+        "revisionHooksAllowBackgroundAndModeExitDisposes"
+      ],
+      "maven_exit_code": 0,
+      "inputs_sha256": "bf2c47e03e3dc90ca313aafda2c3f22a96ffe0f57ce1f44ab30447ad29b7c526",
+      "selection_sha256": "56ce2b340a228a8bb9e147f0d8a8c559cd5d89008e62606ed166dc60d9feeab3",
+      "raw_log_sha256": "25ba95bfbb3b7360e9e62d289bbf5dfa0a9742e20814e8d9faa5c09f86883b4b",
+      "resolved_native_dependencies": {
+        "nativeruntime": {
+          "file": "/home/runner/.m2/repository/org/robolectric/nativeruntime/4.14.1/nativeruntime-4.14.1.jar",
+          "version": "4.14.1",
+          "sha256": "c07b66d315aec3272a7c64aa5f154b4194be2cc6030a733d16f2ee87330232a8"
+        },
+        "nativeruntime-dist-compat": {
+          "file": "/home/runner/.m2/repository/org/robolectric/nativeruntime-dist-compat/1.0.16/nativeruntime-dist-compat-1.0.16.jar",
+          "version": "1.0.16",
+          "sha256": "2f4e879b00eed634d0e43353ecff80db4d5ce24b3b213d1e6053cb21b0ced10f"
+        }
+      },
+      "JUnit": {
+        "class": "com.projectinfinity.kodi.CobraCardsReuseNativeTest",
+        "methods": [
+          "nativeReusePreservesScrollSelectionAndCurrentProgramme",
+          "nativeImmediateSecondRenderPreservesPendingPosition",
+          "nativeSelectiveCollectionsAndFreshDirectory",
+          "revisionHooksAllowBackgroundAndModeExitDisposes",
+          "nativePolicyTypesAndContextInvalidation"
+        ],
+        "tests": 5,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "reports": {
+          "target/surefire-reports/TEST-com.projectinfinity.kodi.CobraCardsReuseNativeTest.xml": "af6e2e2ef3c01f6a1cbad8d88552c2aee237a8590db8eb67bd3ce7a237ccc5c2"
+        }
+      }
+    },
+    {
+      "name": "layout",
+      "class": "CobraCardsLayoutTest",
+      "methods": [
+        "actualCardsRenderAtReferenceViewport",
+        "cardsRestoresSharedNativeViewsInOtherModes",
+        "truthfulLiveBadgeUsesNativeStatusAndPreservesActualPipPress",
+        "activeAmbientPreservesNativeEffectsAndRecordsWrapping"
+      ],
+      "maven_exit_code": 0,
+      "inputs_sha256": "b3e290118d30981a0248cc8198b1e05c47d0302ac4fb64a031e973edaeeef8ed",
+      "selection_sha256": "29441b57fb5fa5674f79ca4b91da834394963a6d8d209cf3cb541c5eb61616bb",
+      "raw_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "resolved_native_dependencies": {
+        "nativeruntime": {
+          "file": "/home/runner/.m2/repository/org/robolectric/nativeruntime/4.14.1/nativeruntime-4.14.1.jar",
+          "version": "4.14.1",
+          "sha256": "c07b66d315aec3272a7c64aa5f154b4194be2cc6030a733d16f2ee87330232a8"
+        },
+        "nativeruntime-dist-compat": {
+          "file": "/home/runner/.m2/repository/org/robolectric/nativeruntime-dist-compat/1.0.16/nativeruntime-dist-compat-1.0.16.jar",
+          "version": "1.0.16",
+          "sha256": "2f4e879b00eed634d0e43353ecff80db4d5ce24b3b213d1e6053cb21b0ced10f"
+        }
+      },
+      "JUnit": {
+        "class": "com.projectinfinity.kodi.CobraCardsLayoutTest",
+        "methods": [
+          "actualCardsRenderAtReferenceViewport",
+          "activeAmbientPreservesNativeEffectsAndRecordsWrapping",
+          "cardsRestoresSharedNativeViewsInOtherModes",
+          "truthfulLiveBadgeUsesNativeStatusAndPreservesActualPipPress"
+        ],
+        "tests": 4,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "reports": {
+          "target/surefire-reports/TEST-com.projectinfinity.kodi.CobraCardsLayoutTest.xml": "2978cecc9f43c1fe300acc8e183b83a72bfc08f57c2a9b1ddd92b85e1158f1b1"
+        }
+      }
+    },
+    {
+      "name": "theme-publication",
+      "class": "CobraCardsThemeOrderControlTest",
+      "methods": [
+        "nativeCandidateColdAndWarmThemeCardsMobileControl"
+      ],
+      "maven_exit_code": 0,
+      "inputs_sha256": "665205aedcbd9df1de60d0ce63a549d574d8e22b22c795b04f5bf081256a77e6",
+      "selection_sha256": "bff74d22b56e4f064e8e0a8cca050b29e6fc90bf97e4492eef7a9f5a4f85bf3e",
+      "raw_log_sha256": "0bd8aec148a6de4f2dcafb83d4187425752ff0afb92cbb02204225e90d92f304",
+      "resolved_native_dependencies": {
+        "nativeruntime": {
+          "file": "/home/runner/.m2/repository/org/robolectric/nativeruntime/4.14.1/nativeruntime-4.14.1.jar",
+          "version": "4.14.1",
+          "sha256": "c07b66d315aec3272a7c64aa5f154b4194be2cc6030a733d16f2ee87330232a8"
+        },
+        "nativeruntime-dist-compat": {
+          "file": "/home/runner/.m2/repository/org/robolectric/nativeruntime-dist-compat/1.0.16/nativeruntime-dist-compat-1.0.16.jar",
+          "version": "1.0.16",
+          "sha256": "2f4e879b00eed634d0e43353ecff80db4d5ce24b3b213d1e6053cb21b0ced10f"
+        }
+      },
+      "JUnit": {
+        "class": "com.projectinfinity.kodi.CobraCardsThemeOrderControlTest",
+        "methods": [
+          "nativeCandidateColdAndWarmThemeCardsMobileControl"
+        ],
+        "tests": 1,
+        "failures": 0,
+        "errors": 0,
+        "skipped": 0,
+        "reports": {
+          "target/surefire-reports/TEST-com.projectinfinity.kodi.CobraCardsThemeOrderControlTest.xml": "f02cc930d27b9d4bb337a0542a9a0e7239a737dc43499ef16aaf6541d65ec966"
+        }
+      }
+    }
+  ],
+  "timing_benchmarks": "NOT_RUN",
+  "Android": "NOT_RUN",
+  "physical_Fold": "NOT_RUN",
+  "APK": "NOT_BUILT",
+  "shutdown": "NOT_RUN",
+  "selected_JUnit_methods": 26,
+  "selected_groups": 8,
+  "internal_presentation_parity_cases": 15
+}
