@@ -197,6 +197,7 @@ jobs:
           test -n "$AUTHORIZED_SCOPE"
           test "$SIGNED_BUILD" = 40971769136
           test "$(git branch --show-current)" = work/cobra-only-from-2103427-20261028
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
           test "$(git rev-parse origin/lock/infinity-cobra-2103427-user-approved-20261028)" = 782242090483982c39a78f9c4da932a4751bdafc
           python3 - <<'PYCODE'
           from pathlib import Path

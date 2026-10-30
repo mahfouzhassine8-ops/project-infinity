@@ -21,6 +21,16 @@ ANDROID_SHA256 = "6cea1df3efb77103ac3e2beb9bf4718964b0e0869ab16d39d29d5cbae1c147
 D8_SHA256 = "305622ad00535684534eb8f742cbf5e628a9abc09d8ea4d39d1babb95bf0cee5"
 OWN_CLASS = "qa/CobraImmediateHierarchy.class"
 OWN_DESCRIPTOR = "Lqa/CobraImmediateHierarchy;"
+OWN_CLASSES = {
+    OWN_CLASS,
+    "qa/CobraImmediateHierarchy$ReadinessSignal.class",
+    "qa/CobraImmediateHierarchy$RootReadiness.class",
+}
+OWN_DESCRIPTORS = sorted([
+    OWN_DESCRIPTOR,
+    "Lqa/CobraImmediateHierarchy$ReadinessSignal;",
+    "Lqa/CobraImmediateHierarchy$RootReadiness;",
+])
 PLATFORM_CLASS_PATH = (
     "/system/framework/android.test.runner.jar:"
     "/system/framework/uiautomator.jar"
@@ -117,7 +127,7 @@ def build(android: Path, d8: Path, out: Path) -> dict:
     compile_command = compiler + ["-source", "8", "-target", "8", "-cp", str(android), "-d", str(classes), str(snapshot)]
     subprocess.run(compile_command, check=True)
     class_files = {str(path.relative_to(classes)): path for path in classes.rglob("*.class")}
-    assert set(class_files) == {OWN_CLASS}, "Only the single QA observer class may be compiled"
+    assert set(class_files) == OWN_CLASSES, "Only the three explicitly approved QA observer classes may be compiled"
     program = out / "observer-classes.jar"
     write_jar(program, {name: path.read_bytes() for name, path in class_files.items()})
     dex = out / "dex"
@@ -127,7 +137,7 @@ def build(android: Path, d8: Path, out: Path) -> dict:
     assert sorted(path.name for path in dex.iterdir()) == ["classes.dex"], "Single observer DEX required"
     raw = (dex / "classes.dex").read_bytes()
     descriptors = dex_descriptors(raw)
-    assert descriptors == [OWN_DESCRIPTOR], "Foreign or extra classes must not be bundled"
+    assert descriptors == OWN_DESCRIPTORS, "Foreign or extra classes must not be bundled"
     result = out / "CobraImmediateHierarchy.jar"
     write_jar(result, {"classes.dex": raw})
     assert digest(source) == source_sha256, "Reviewed Java source changed during compilation"

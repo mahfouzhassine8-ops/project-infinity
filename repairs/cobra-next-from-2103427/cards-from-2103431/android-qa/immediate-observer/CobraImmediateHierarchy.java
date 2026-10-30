@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.SystemClock;
 import android.view.Display;
 import android.view.accessibility.AccessibilityNodeInfo;
+import android.view.accessibility.AccessibilityEvent;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,6 +16,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -25,7 +29,55 @@ public final class CobraImmediateHierarchy {
   private static final String PREFIX = "/system/framework/android.test.runner.jar:/system/framework/uiautomator.jar:";
   private static final String WRAPPER = "com.android.uiautomator.core.UiAutomationShellWrapper";
   private static final String DUMPER = "com.android.uiautomator.core.AccessibilityNodeInfoDumper";
+  private static final long ROOT_READINESS_BUDGET_MS = 2000;
+  private static final int MAX_ROOT_QUERIES = 16;
   private CobraImmediateHierarchy() {}
+
+  /** Pure Java signal: no framework node/event is retained between queries. */
+  static class ReadinessSignal {
+    private long sequence;
+    private int dropped;
+    private final ArrayDeque<Object[]> pulses = new ArrayDeque<>();
+    synchronized long generation() { return sequence; }
+    synchronized void pulse(int type, int window, String name, long arrival, long eventTime) {
+      sequence++;
+      if (pulses.size() < 16) pulses.add(new Object[]{sequence, type, window, name, arrival, eventTime});
+      else dropped++;
+      notifyAll();
+    }
+    synchronized List<Object[]> drain() {
+      List<Object[]> result = new ArrayList<>(pulses); pulses.clear(); return result;
+    }
+    synchronized int dropped() { return dropped; }
+    synchronized boolean awaitAfter(long observed, long maxWaitMillis) throws InterruptedException {
+      long deadline = System.nanoTime() + maxWaitMillis * 1000000L;
+      while (sequence == observed) {
+        long remaining = deadline - System.nanoTime();
+        if (remaining <= 0) return false;
+        wait(remaining / 1000000L, (int) (remaining % 1000000L));
+      }
+      return true;
+    }
+  }
+
+  private static final class RootReadiness extends ReadinessSignal implements UiAutomation.OnAccessibilityEventListener {
+    private final boolean knownNotice;
+    RootReadiness(boolean knownNotice) { this.knownNotice = knownNotice; }
+    @Override public void onAccessibilityEvent(AccessibilityEvent event) {
+      try {
+        int type = event.getEventType();
+        String name = event.getPackageName() == null ? "" : event.getPackageName().toString();
+        boolean owned = PACKAGE.equals(name) || knownNotice && "android".equals(name);
+        boolean content = type == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED
+            || type == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED || type == AccessibilityEvent.TYPE_VIEW_FOCUSED;
+        if (type == AccessibilityEvent.TYPE_WINDOWS_CHANGED || owned && content)
+          pulse(type, event.getWindowId(), name, SystemClock.uptimeMillis(), event.getEventTime());
+      } finally {
+        // UiAutomation delivers an obtained copy; its documented owner is this listener.
+        event.recycle();
+      }
+    }
+  }
 
   private static void require(boolean condition, String reason) {
     if (!condition) throw new IllegalStateException(reason);
@@ -100,28 +152,81 @@ public final class CobraImmediateHierarchy {
         && root.isVisibleToUser() && root.getWindowId() >= 0
         && Rect.intersects(bounds, new Rect(0, 0, display.x, display.y)) && bounds.width() > 0 && bounds.height() > 0;
   }
+  private static AccessibilityNodeInfo acquire(UiAutomation automation, RootReadiness readiness,
+      Point display, boolean knownNotice, JSONObject report) throws Exception {
+    long started = SystemClock.uptimeMillis();
+    JSONArray queries = new JSONArray(), events = new JSONArray();
+    String outcome = "BUDGET_EXHAUSTED";
+    try {
+      for (int attempt = 1; attempt <= MAX_ROOT_QUERIES; attempt++) {
+        if (SystemClock.uptimeMillis() - started >= ROOT_READINESS_BUDGET_MS) break;
+        // Read before querying. awaitAfter compares under the same signal lock,
+        // so a callback between null-return and waiting cannot be lost.
+        long generation = readiness.generation();
+        long before = SystemClock.uptimeMillis();
+        AccessibilityNodeInfo root = automation.getRootInActiveWindow();
+        long after = SystemClock.uptimeMillis();
+        JSONObject query = new JSONObject().put("attempt", attempt).put("event_generation_before", generation)
+            .put("query_started_uptime_ms", before).put("query_finished_uptime_ms", after)
+            .put("available", root != null);
+        queries.put(query);
+        if (root != null) {
+          Rect bounds = new Rect(); root.getBoundsInScreen(bounds);
+          String name = root.getPackageName() == null ? "" : root.getPackageName().toString();
+          query.put("root_package", name).put("window_id", root.getWindowId()).put("root_bounds", rect(bounds));
+          boolean owned = PACKAGE.equals(name) || knownNotice && "android".equals(name);
+          if (!owned || !root.isVisibleToUser() || root.getWindowId() < 0 || bounds.width() <= 0
+              || bounds.height() <= 0 || !Rect.intersects(bounds, new Rect(0, 0, display.x, display.y))) {
+            root.recycle(); throw new IllegalStateException("Current root package/visibility/window/bounds invalid");
+          }
+          if (after - started >= ROOT_READINESS_BUDGET_MS) {
+            root.recycle(); outcome = "LATE_ROOT_DISCARDED";
+            throw new IllegalStateException("Current-root query exceeded bounded readiness budget; late result discarded");
+          }
+          outcome = "CURRENT_ROOT_AVAILABLE";
+          return root;
+        }
+        long remaining = ROOT_READINESS_BUDGET_MS - (SystemClock.uptimeMillis() - started);
+        if (remaining <= 0) break;
+        if (attempt == MAX_ROOT_QUERIES) { outcome = "QUERY_CEILING"; break; }
+        if (!readiness.awaitAfter(generation, remaining)) break;
+      }
+      return null;
+    } finally {
+      for (Object[] pulse : readiness.drain()) events.put(new JSONObject()
+          .put("arrival_sequence", pulse[0]).put("event_type", pulse[1]).put("window_id", pulse[2])
+          .put("package", pulse[3]).put("callback_uptime_ms", pulse[4]).put("source_event_time_ms", pulse[5]));
+      report.put("root_readiness_budget_ms", ROOT_READINESS_BUDGET_MS).put("root_query_ceiling", MAX_ROOT_QUERIES)
+          .put("root_readiness_elapsed_ms", SystemClock.uptimeMillis() - started)
+          .put("root_readiness_outcome", outcome).put("root_queries", queries).put("readiness_events", events)
+          .put("readiness_events_dropped", readiness.dropped());
+    }
+  }
   private static int capture(File xml, JSONObject report, boolean knownNotice) throws Exception {
     require(xml.getAbsolutePath().matches("/sdcard/cobra-cards-baseline-[0-9]+-[0-9]+\\.xml"), "Unexpected unique XML path");
     require(!xml.exists(), "Existing XML refused");
     Class<?> wrapperClass = Class.forName(WRAPPER);
     Object wrapper = wrapperClass.getConstructor().newInstance();
     boolean connected = false;
+    UiAutomation automation = null;
     AccessibilityNodeInfo root = null, current = null;
     try {
       method(wrapperClass, "connect").invoke(wrapper); connected = true;
       method(wrapperClass, "setCompressedLayoutHierarchy", boolean.class).invoke(wrapper, true);
-      UiAutomation automation = (UiAutomation) method(wrapperClass, "getUiAutomation").invoke(wrapper);
+      automation = (UiAutomation) method(wrapperClass, "getUiAutomation").invoke(wrapper);
+      RootReadiness readiness = new RootReadiness(knownNotice);
+      automation.setOnAccessibilityEventListener(readiness);
       Class<?> manager = Class.forName("android.hardware.display.DisplayManagerGlobal");
       Object displays = method(manager, "getInstance").invoke(null);
       Display display = (Display) method(manager, "getRealDisplay", int.class).invoke(displays, Display.DEFAULT_DISPLAY);
       require(display != null, "No current default display");
       Point size = new Point(); display.getRealSize(size); int rotation = display.getRotation();
       report.put("root_acquire_started_uptime_ms", SystemClock.uptimeMillis());
-      root = automation.getRootInActiveWindow();
+      root = acquire(automation, readiness, size, knownNotice, report);
       report.put("root_acquired_uptime_ms", SystemClock.uptimeMillis());
       if (root == null) {
         report.put("status", "ROOT_MISSING"); report.put("reason", "NULL_CURRENT_ACTIVE_ROOT");
-        System.err.println("ERROR: null current active root; no XML produced"); return 3;
+        System.err.println("ERROR: null current active root after bounded event readiness; no XML produced"); return 3;
       }
       Rect bounds = new Rect(); root.getBoundsInScreen(bounds);
       require(valid(root, bounds, size, knownNotice), "Current root package/visibility/window/bounds invalid");
@@ -149,6 +254,7 @@ public final class CobraImmediateHierarchy {
       report.put("active_window_revalidated", true); report.put("status", "ROOT_CAPTURED");
       return 0;
     } finally {
+      if (automation != null) automation.setOnAccessibilityEventListener(null);
       if (root != null) root.recycle(); if (current != null) current.recycle();
       if (connected) method(wrapperClass, "disconnect").invoke(wrapper);
     }

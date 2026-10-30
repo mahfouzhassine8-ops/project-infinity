@@ -1,0 +1,11 @@
+# Event-driven current-root readiness proposal
+
+The verified API37 shell client connection can initialize before the focused app/dialog ViewRoot has asynchronously installed its RemoteAccessibilityConnection. The exact Android17 ViewRoot code synchronously registers that connection, then emits WINDOW_STATE_CHANGED and VIEW_FOCUSED. A scoped UiAutomation listener can therefore wake a fresh main-thread root query on positive window/content/focus events without waiting for idle.
+
+Register the listener before the initial query. Copy only package/type/window and callback-arrival uptime plus an arrival sequence; recycle the listener-owned event copy in finally. The listener performs no root queries. Main reads the generation before querying and compares it under the same signal lock before waiting, so an event between null-return and waiting is not lost. Source event timestamps may arrive out of order and never drive freshness ordering.
+
+Use one2s native initialization budget and a16query ceiling. Return immediately on the first valid current root; no unconditional pause or quiet-period wait. Record every query/event reason and elapsed time. Root queries themselves can block in the Android framework for up to5s, so a hard post-query budget check must discard a late result and issue no further query after expiry; a2s setting is not a promise that an uninterruptible Binder call always returns within2s. The unchanged30s command cap and strict3.5s host action-age guard remain authoritative.
+
+Current package/window/bounds failures are fatal; genuine null roots remain explicit misses. A missing root may consume an already-existing bounded tap attempt (8), while source/Card polling retain15/10. Direct source-form observations use the same bounded initialization inside the producer. Every eventual input still requires the latest revalidated root/target with fresh age; no previous XML or old coordinates are reused. No getWindows wait, retrieve-window flag, permission change, app timer change or new application artifact is needed.
+
+Prepare pinned QA compilation, direct JVM signal controls, focused host transport/action controls and independent review before root considers another runtime run. All three prior official artifacts remain unchanged.

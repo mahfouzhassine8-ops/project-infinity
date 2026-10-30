@@ -1,0 +1,66 @@
+{
+  "Android_or_application_execution": "NONE",
+  "anchor_epoch": 1793337060,
+  "anchor_utc": "2026-10-30T05:11:00+00:00",
+  "channel_count": 20226,
+  "channel_id_pattern": "cards-%05d",
+  "channel_name_pattern": "Cards QA %05d",
+  "channels_without_epg": 20194,
+  "clock_limit": "Current/next labels are valid only for the recorded anchor windows; do not claim current EPG after expiry.",
+  "current_programme_window_epoch": [
+    1793337060,
+    1793340660
+  ],
+  "epg_channel_count": 32,
+  "epg_limit": "Only first 32 channels have two synthetic programmes; all others have no schedule.",
+  "epg_programme_count": 64,
+  "epg_url": "http://10.0.2.2:8765/cards-epg.xml",
+  "files": {
+    "cards-20226.m3u": {
+      "bytes": 2588983,
+      "sha256": "cff5abedcd20104609372287dc740d7cd1d97c4bb711f21a485fff98f4747c8f"
+    },
+    "cards-epg.xml": {
+      "bytes": 24199,
+      "sha256": "057d87b33fa8c6de5509331e8a36c92cace37636b3d9811dfabf441c29ff4edc"
+    }
+  },
+  "generator_source_sha256": "90119dbe4af47b476e7fd0272b7ab011eec8f2ca17f20aa436d4548819174d9c",
+  "group_count": 12,
+  "group_name_pattern": "Cards QA Group %02d",
+  "logos": "OMITTED; provider-logo latency and visual parity are not measured by this fixture.",
+  "media": {
+    "qa1.mp4": {
+      "bytes": 15648390,
+      "sha256": "a0fee6446ac0a4f53c9023568d726eddf4fd55bf965ae168b6cd4fe1baea8fdf",
+      "status": "PRESENT_HASHED"
+    },
+    "qa2.mp4": {
+      "bytes": 15334697,
+      "sha256": "0ba33ed3a9a312be4f2893ec7970d94c483b9faf664f1678bc509f260d22e317",
+      "status": "PRESENT_HASHED"
+    },
+    "qa3.mp4": {
+      "bytes": 14842618,
+      "sha256": "cc38147951e5def10fc59de448e3eb6d3ab5b9b28bf721f4e2d457b8ded36fd2",
+      "status": "PRESENT_HASHED"
+    },
+    "qa4.mp4": {
+      "bytes": 15714526,
+      "sha256": "993cb99b84f8996f758b11ab6d8695879d6f48477abb819b7fcc127144b3c151",
+      "status": "PRESENT_HASHED"
+    }
+  },
+  "media_complete": true,
+  "media_validation_limit": "Hashes identify supplied files; this generator does not validate playback or generate media.",
+  "network_operations": "NONE",
+  "next_programme_window_epoch": [
+    1793340660,
+    1793344260
+  ],
+  "playlist_url": "http://10.0.2.2:8765/cards-20226.m3u",
+  "schema": 1,
+  "scope": "FINITE_LOCAL_CARDS_QA_FIXTURE_NO_PRODUCTION_ASSETS",
+  "shutdown": "NOT_RUN",
+  "unique_stream_url_count": 20226
+}

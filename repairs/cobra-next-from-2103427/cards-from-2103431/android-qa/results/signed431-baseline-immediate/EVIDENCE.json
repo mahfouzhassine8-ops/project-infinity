@@ -1,0 +1,284 @@
+{
+  "run_id": 41007107893,
+  "run_url": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/41007107893",
+  "harness_source": "a531f123d1fcccfac4bc9023395351e97e023b31",
+  "baseline_signed_source": "9ccc4c362a65118eeba38a8e7e4b0de5723c69af",
+  "APK_sha256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471",
+  "run_conclusion": "failure",
+  "job_id": 123904397738,
+  "other_jobs": "ALL_FIVE_SKIPPED",
+  "artifact": {
+    "id": 12956142737,
+    "name": "Cobra-Cards-431-Baseline-41007107893",
+    "bytes": 2593475,
+    "sha256": "a98ab55eb7d8b1bb194971cef84346d7b247c0c058798af4e2afe05dc92a9503",
+    "downloaded_actual_bytes_hash_verified": true
+  },
+  "artifact_files": {
+    "runtime-emulator-setup/EMULATOR-PREPARATION.json": {
+      "bytes": 1221,
+      "sha256": "e6fcc66a51790318473e5e98cab0246778c2a502f9701552e47e72a5eed6c6c5"
+    },
+    "runtime-emulator-setup/emulator-loader-dependencies.log": {
+      "bytes": 160,
+      "sha256": "f398e74a0db3d5c11a285010a12ffa3797e8346bd761ba1476caa7330fc3f114"
+    },
+    "runtime-emulator-setup/emulator-version.log": {
+      "bytes": 655,
+      "sha256": "1a523c9091747b7bf48a755396278f2eca455352b40c281336f1c3e075607b54"
+    },
+    "runtime-emulator-setup/sdkmanager-attempt-1.log": {
+      "bytes": 14274,
+      "sha256": "bcb12cbcd38fb1ef1b7f9c0dd5c41890025bfbeb1d0bca7aa5deeaa87e5598ea"
+    },
+    "runtime-media/FIXTURE.json": {
+      "bytes": 2359,
+      "sha256": "a41766e898208accd688e83151086e2a22a754fc43e72df64b673a6886cbad67"
+    },
+    "runtime-observer/BUILD-RECEIPT.json": {
+      "bytes": 2520,
+      "sha256": "9f42c8a4a9bc0b4a011b2af5d07f1b00048993c621a95e4575621b3d856b3991"
+    },
+    "runtime-observer/CobraImmediateHierarchy.jar": {
+      "bytes": 12904,
+      "sha256": "ab2683944184a1488f76d8cdef14a717bd0036a4f11daea14c13ba8fbadfde50"
+    },
+    "runtime-platform/API37-ENVIRONMENT-COMPARISON.json": {
+      "bytes": 419,
+      "sha256": "5f1f885933077f7f6f0b24a57d17e54bfefe533bd275acaed045c065dd1dc912"
+    },
+    "runtime-platform/API37-SUPPORT.json": {
+      "bytes": 2990,
+      "sha256": "43f21f9a3ee1c105995c8e8451b9d1aee05ccde0f28b5ad01aa0fffeca80e112"
+    },
+    "runtime-platform/SDK-TOOLS.json": {
+      "bytes": 349,
+      "sha256": "98cc9b7e14d3681d99edbeca9518dfb0b5a1d7e0daab228e4ffc3a67732e3bfc"
+    },
+    "runtime-platform/api37-avd-config.ini.txt": {
+      "bytes": 3650,
+      "sha256": "f38f2520642b24e1005803c7d50b1139a249077cf7cc7ef2153c9efd348603fb"
+    },
+    "runtime-platform/api37-avd.ini.txt": {
+      "bytes": 149,
+      "sha256": "bc2fc5bd647367c4a75b456aecda4fc4cedc41ce1389aeea48e6a786b8bf06ac"
+    },
+    "runtime-platform/sdkmanager-list.stderr.txt": {
+      "bytes": 340,
+      "sha256": "33414add6da35520d5a84e032882487bbb8835eae8767d88e1853859f196bf15"
+    },
+    "runtime-platform/sdkmanager-list.stdout.txt": {
+      "bytes": 118961,
+      "sha256": "8de998bf8547726975226d0cc1e818ac87cac0abd6e0ab83144f159e25776129"
+    },
+    "runtime-results/MEDIA-HTTP.txt": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "runtime-results/SIGNATURE.txt": {
+      "bytes": 2607,
+      "sha256": "daf0259134728e4bc6a7f29d66e669f8312ef87c0ed4627c2d95adebc21421b2"
+    },
+    "runtime-results/cards-baseline/BUILD-RECEIPT.json": {
+      "bytes": 3236,
+      "sha256": "5dc96c47c1b7fe65998b3747169abad89886c943e4907cc7015bc608d8e4a3b4"
+    },
+    "runtime-results/cards-baseline/ERROR.txt": {
+      "bytes": 1238,
+      "sha256": "104bff6d5c057e5f62fadef5d9d0726aff8d307b593b61d015a3b75e35f90d51"
+    },
+    "runtime-results/cards-baseline/FIXTURE.json": {
+      "bytes": 2359,
+      "sha256": "a41766e898208accd688e83151086e2a22a754fc43e72df64b673a6886cbad67"
+    },
+    "runtime-results/cards-baseline/ORIGINAL-SIGNATURE.txt": {
+      "bytes": 2607,
+      "sha256": "daf0259134728e4bc6a7f29d66e669f8312ef87c0ed4627c2d95adebc21421b2"
+    },
+    "runtime-results/cards-baseline/OUTCOME.json": {
+      "bytes": 10597,
+      "sha256": "0c51cda471efa052de0e5bcb99de03418f4e34cf75374fb767d6a99f9252a9b2"
+    },
+    "runtime-results/cards-baseline/cold-probe/OUTCOME.json": {
+      "bytes": 8079,
+      "sha256": "c0b2477f5f4075a08eef1bd9ead8de5129e85fdc29c739f2eaef0cbca807517c"
+    },
+    "runtime-results/cards-baseline/cold-probe/activity.txt": {
+      "bytes": 31705,
+      "sha256": "ccc3bc153f9a859d9bea730ef6c1224d1d3a0ad4e7e83b542b621e370e384fbf"
+    },
+    "runtime-results/cards-baseline/cold-probe/android-compatibility-notice.png": {
+      "bytes": 273454,
+      "sha256": "f94ed81f0577de3783575591d2a596b568b3bcb8e96a6c0ce30a6300849501c9"
+    },
+    "runtime-results/cards-baseline/cold-probe/android-compatibility-notice.xml": {
+      "bytes": 10108,
+      "sha256": "68a58a27a77b5522ad322a1ac957b5b8bda608be6c1e569280957bf2c6a36ce1"
+    },
+    "runtime-results/cards-baseline/cold-probe/install.txt": {
+      "bytes": 36,
+      "sha256": "781a31c82430c97897af612ece5e0ca2205e301cb5ff121ce2660541ea5182c7"
+    },
+    "runtime-results/cards-baseline/cold-probe/last-ui.xml": {
+      "bytes": 4946,
+      "sha256": "854d179ba7444b7053b95ab1efd8b714e3bf899772d3776d9d335576b179d86b"
+    },
+    "runtime-results/cards-baseline/cold-probe/launch.txt": {
+      "bytes": 198,
+      "sha256": "555558efb79fb7208cf7aa3b486429b5679e09095d990df9a7ae3792760f6eb3"
+    },
+    "runtime-results/cards-baseline/cold-probe/logcat.txt": {
+      "bytes": 13388164,
+      "sha256": "bc6b2b521943d2ede233773e631dcb2e400a801641c805d457fcebedffb7e98c"
+    },
+    "runtime-results/cards-baseline/cold-probe/meminfo.txt": {
+      "bytes": 3457,
+      "sha256": "ab003ac268a8b14630f108377c530aefac03d39baff51cd8b5d5dc88b12fdf84"
+    },
+    "runtime-results/cards-baseline/cold-probe/screen.png": {
+      "bytes": 77031,
+      "sha256": "49fe006abd096af2953c9797a563fff03552addb035210dfa12c412bf39e9364"
+    },
+    "runtime-results/cards-baseline/configuration.txt": {
+      "bytes": 192,
+      "sha256": "0e624b77b9e4807084aaf932be3ef1fc8a32aa7464e5be6f911db98c84a98eaa"
+    },
+    "runtime-results/cards-baseline/display.txt": {
+      "bytes": 29620,
+      "sha256": "ffed10adb63be13e62903addf3553c035d6502e69bb0144dfbfa43a993918e0e"
+    },
+    "runtime-results/cards-baseline/fixture/cards-20226.m3u": {
+      "bytes": 2588983,
+      "sha256": "cff5abedcd20104609372287dc740d7cd1d97c4bb711f21a485fff98f4747c8f"
+    },
+    "runtime-results/cards-baseline/fixture/cards-epg.xml": {
+      "bytes": 24199,
+      "sha256": "057d87b33fa8c6de5509331e8a36c92cace37636b3d9811dfabf441c29ff4edc"
+    },
+    "runtime-results/cards-baseline/immediate-observer/001-target-XML-read-command.json": {
+      "bytes": 2848,
+      "sha256": "9d8e1aeb6486c3e6dff4064819a9309a2b9a3c282dd754bec3f6e06ac4344b49"
+    },
+    "runtime-results/cards-baseline/immediate-observer/001-target-capture-command.json": {
+      "bytes": 6213,
+      "sha256": "c67e39c7193d60845ba45d82ec9bedfa99419c5492e552bc0f21510a3bcd9884"
+    },
+    "runtime-results/cards-baseline/immediate-observer/001-target-metadata-read-command.json": {
+      "bytes": 6064,
+      "sha256": "88bc3e31ad2c5824c4713a36e7bb63bd854fc1c965f2cce045720c75e1b53810"
+    },
+    "runtime-results/cards-baseline/immediate-observer/001-target-native.json": {
+      "bytes": 5499,
+      "sha256": "ea34b5812a6a65ed7e7fc9761a874da03c8c51e495d3a11c51c8176ae29aed2a"
+    },
+    "runtime-results/cards-baseline/immediate-observer/001-target-nonempty-check-command.json": {
+      "bytes": 211,
+      "sha256": "2f4cee4ab294a25c52c9c60882e005c16683f5576eb916ba6de21b829583ae69"
+    },
+    "runtime-results/cards-baseline/immediate-observer/002-target-capture-command.json": {
+      "bytes": 5953,
+      "sha256": "3662efaae8a6a39fdb29694417ba54a28175d061570e1c3f94d77603a7827e19"
+    },
+    "runtime-results/cards-baseline/immediate-observer/002-target-metadata-read-command.json": {
+      "bytes": 5665,
+      "sha256": "1acbd1a12a53745b1452891884186ab9c53426c696296c85ce97c937d5c197c0"
+    },
+    "runtime-results/cards-baseline/immediate-observer/002-target-missing-check-command.json": {
+      "bytes": 211,
+      "sha256": "187ca61310c8db23131252ec2432d592216f9e4a4f2b0db4db4728a59b6a7da2"
+    },
+    "runtime-results/cards-baseline/immediate-observer/002-target-native.json": {
+      "bytes": 5137,
+      "sha256": "cbb98af612a135146cd1c3088d3574ea31ab5a9c21e334c8210905770a30b864"
+    },
+    "runtime-results/cards-baseline/immediate-observer/003-terminal-capture-command.json": {
+      "bytes": 5953,
+      "sha256": "11d9e93b8a529865f3be2deea343614e97cea2a7428f8ae25a78dd0c593083cc"
+    },
+    "runtime-results/cards-baseline/immediate-observer/003-terminal-metadata-read-command.json": {
+      "bytes": 5665,
+      "sha256": "87fae5425287b381c2496bc3639947a3ebda76319ec38d528810bd910f60d749"
+    },
+    "runtime-results/cards-baseline/immediate-observer/003-terminal-missing-check-command.json": {
+      "bytes": 211,
+      "sha256": "55cf8e9d00dc25c650b5591e9f934fc9c970dfff187899027b3ab32150df93d4"
+    },
+    "runtime-results/cards-baseline/immediate-observer/003-terminal-native.json": {
+      "bytes": 5137,
+      "sha256": "5cf7e8671f8853d8300f948caa82144eb13a54e1a49cca241314ff22172cfaff"
+    },
+    "runtime-results/cards-baseline/immediate-observer/OS-UIAUTOMATOR.sh": {
+      "bytes": 4173,
+      "sha256": "588f4e89975e626c1ae185c350389e4fad005b2cb9525834a42dfa7dfd548545"
+    },
+    "runtime-results/cards-baseline/immediate-observer/OS-script-read-command.json": {
+      "bytes": 4538,
+      "sha256": "52e7d71f6ff63989ed9c94b790ae5b7ba491c2dc67463c2798a7682c5a634d84"
+    },
+    "runtime-results/cards-baseline/immediate-observer/PLATFORM-PREFLIGHT.json": {
+      "bytes": 5018,
+      "sha256": "12e79025aa5a36554459b73d491b53f3843123cdb31567af3765e0cd56829454"
+    },
+    "runtime-results/cards-baseline/immediate-observer/device-jar-hash-command.json": {
+      "bytes": 311,
+      "sha256": "063ee3a82acc94d1395b7f32769a18e198c99b43dccf1ce11303ed94a3f099df"
+    },
+    "runtime-results/cards-baseline/immediate-observer/preflight-command.json": {
+      "bytes": 5740,
+      "sha256": "6c4d733f0a5fa0932cb4a72a993573ed63220197dd56c55653d677553846f007"
+    },
+    "runtime-results/cards-baseline/immediate-observer/preflight-read-command.json": {
+      "bytes": 5539,
+      "sha256": "ec859dc2aba2d27ef0d302b0cc127ec9a25376f25536bbfcc37bd0f6d35ac507"
+    },
+    "runtime-results/cards-baseline/immediate-observer/push-command.json": {
+      "bytes": 342,
+      "sha256": "8655140e8789addb92d9a9bbc775485839f5d703729a43d633f375d4e7a69ca1"
+    },
+    "runtime-results/cards-baseline/journey/001-target.xml": {
+      "bytes": 2412,
+      "sha256": "f2dd28387254bcc651f477970a8921b85e85ff73ad69567207c9c7b1d966b3a9"
+    },
+    "runtime-results/cards-baseline/journey/terminal.png": {
+      "bytes": 72393,
+      "sha256": "7a78743aa80e62cc99de7f817f17bf156b4208d2e89b756e38cb1f6849cbdb33"
+    },
+    "runtime-results/cards-baseline/power-saving.txt": {
+      "bytes": 2,
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    "runtime-results/cards-baseline/terminal-activity.txt": {
+      "bytes": 32049,
+      "sha256": "f567c18a21fbc80b099eee82086bc928c551638246d2f5317aaa911ae8ff33f8"
+    },
+    "runtime-results/cards-baseline/terminal-logcat.txt": {
+      "bytes": 604343,
+      "sha256": "953b802578bcb91fcc1326b82865d9233e436821739773eafafeb2b53ccb13df"
+    }
+  },
+  "decoded_job_log_sha256": "8005d2472f02322a907b90238e8049024932ae7c7885f8b2742b3b8ace743a97",
+  "API37_platform_surface": "ACTUALLY_VERIFIED_IN_DEVICE_PREFLIGHT; all7publicmethods and OSscript/JARs recorded",
+  "OS_script_matches_reviewed_source_sha256": "588f4e89975e626c1ae185c350389e4fad005b2cb9525834a42dfa7dfd548545",
+  "QA_JAR_sha256": "ab2683944184a1488f76d8cdef14a717bd0036a4f11daea14c13ba8fbadfde50",
+  "terminal_image": {
+    "path_in_artifact": "runtime-results/cards-baseline/journey/terminal.png",
+    "sha256": "7a78743aa80e62cc99de7f817f17bf156b4208d2e89b756e38cb1f6849cbdb33",
+    "actual_visual_inspection": true,
+    "observed": "Normal Add TV source native dialog with Xtream/M3U choices over Welcome; no crash UI; M3U not pressed"
+  },
+  "first_root": {
+    "actual_capture": "Welcome root; active window30;1080x1920; revalidated",
+    "host_observation_seconds": 0.82,
+    "native_capture_sequence_ms": {
+      "root_acquire": 8,
+      "acquired_to_dump_complete": 26
+    },
+    "limit": "One QA observation; not app first-frame or performance improvement"
+  },
+  "classification": "FRESH_ROOT_UNAVAILABLE_ON_DIALOG_TRANSITION; STRICT_ACTION_STOPPED",
+  "Cards_or_source_import": "NOT_REACHED_THIS_RUN",
+  "crash_or_ANR": "NO_MARKERS_IN_RETAINED_FINITE_LOG; NO_STABILITY_PASS_CLAIM",
+  "further_dispatch": "NONE_BY_MONITOR",
+  "app_native_shutdown_changes": "NONE",
+  "physical_Fold": "NOT_RUN"
+}

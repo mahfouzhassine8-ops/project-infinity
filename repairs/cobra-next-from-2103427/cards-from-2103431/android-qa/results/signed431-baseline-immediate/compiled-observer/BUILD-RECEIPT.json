@@ -1,0 +1,51 @@
+{
+  "scope": "QA_ONLY_IMMEDIATE_PLATFORM_ROOT_OBSERVER_NO_APK",
+  "source_sha256": "82f822952a5904265d73848f34bc2a0e71a9249f2185518f2c28481963e1c3ed",
+  "compiled_source_snapshot_sha256": "82f822952a5904265d73848f34bc2a0e71a9249f2185518f2c28481963e1c3ed",
+  "build_script_sha256": "20d9693ab3dfb245fbf3b5f43d2e1ee0249dbaec0c1050de5d8f6b5bb2de7fdf",
+  "android_jar_sha256": "6cea1df3efb77103ac3e2beb9bf4718964b0e0869ab16d39d29d5cbae1c147ad",
+  "D8_jar_sha256": "305622ad00535684534eb8f742cbf5e628a9abc09d8ea4d39d1babb95bf0cee5",
+  "compiler_command": [
+    "/opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.13-9/x64/bin/javac",
+    "-source",
+    "8",
+    "-target",
+    "8",
+    "-cp",
+    "/home/runner/work/project-infinity/project-infinity/observer-tools/receipt-evidence/android-34.jar",
+    "-d",
+    "/home/runner/work/project-infinity/project-infinity/runtime-observer/classes",
+    "/home/runner/work/project-infinity/project-infinity/runtime-observer/source/qa/CobraImmediateHierarchy.java"
+  ],
+  "D8_command": [
+    "/opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.13-9/x64/bin/java",
+    "-cp",
+    "/usr/local/lib/android/sdk/build-tools/35.0.0/lib/d8.jar",
+    "com.android.tools.r8.D8",
+    "--min-api",
+    "23",
+    "--lib",
+    "/home/runner/work/project-infinity/project-infinity/observer-tools/receipt-evidence/android-34.jar",
+    "--output",
+    "/home/runner/work/project-infinity/project-infinity/runtime-observer/dex",
+    "/home/runner/work/project-infinity/project-infinity/runtime-observer/observer-classes.jar"
+  ],
+  "class_files_sha256": {
+    "qa/CobraImmediateHierarchy.class": "a071543092df4f9d804de66dfda0c9aac38c514d1b2137c94ac1e8067a41ce69"
+  },
+  "inspected_DEX_classes": [
+    "Lqa/CobraImmediateHierarchy;"
+  ],
+  "DEX_sha256": "f1c67c1c7793ea505369b69aad12db7b96f1214ca4d0bbc90cbdbc314f829f0f",
+  "QA_JAR_sha256": "ab2683944184a1488f76d8cdef14a717bd0036a4f11daea14c13ba8fbadfde50",
+  "QA_JAR_bytes": 12904,
+  "platform_source_provenance_sha256": "00e3f0c784feab6db424430511ec87b326417857e17923b30f77dfbdc736552b",
+  "runtime_application_classpath_prefix": "/system/framework/android.test.runner.jar:/system/framework/uiautomator.jar",
+  "runtime_BOOTCLASSPATH": "INHERITED_OS_UNCHANGED",
+  "platform_classes": "REFLECT_EXISTING_SYSTEM_ARCHIVE_ONLY; NOT_BUNDLED",
+  "API_surface": "FAIL_CLOSED_DEVICE_PREFLIGHT_REQUIRED_BEFORE_OBSERVATION",
+  "APK_build_or_install": "NONE",
+  "application_or_device_execution": "NOT_RUN",
+  "CI": "NOT_DISPATCHED",
+  "shutdown": "NOT_RUN"
+}

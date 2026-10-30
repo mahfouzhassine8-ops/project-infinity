@@ -175,28 +175,34 @@ class CardsObservation:
         return started
 
     def tap(self, pattern, native_dialog=False, sheet_scroll=False, attempts=8):
+        last_labels, last_miss = [], None
         for attempt in range(attempts):
-            snap = self.ui("target")
-            node = snap.find(pattern, enabled=True, clickable=True)
-            if node is not None:
-                return self.press(node, pattern)
-            item = snap.native_dialog_item(pattern) if native_dialog else None
-            if item is not None:
-                return self.press(item[0], "Native dialog item " + pattern, item[1])
-            if sheet_scroll:
-                for candidate in reversed(snap.nodes):
-                    if candidate.get("class") == "android.widget.ScrollView" and candidate.get("scrollable") == "true":
-                        box = intersect(bounds(candidate), snap.active_bounds)
-                        if positive(box):
-                            inset = max(30, (box[3] - box[1]) // 8)
-                            x = (box[0] + box[2]) // 2
-                            self.guard_snapshot(snap)
-                            adb("shell", "input", "swipe", str(x), str(box[3] - inset), str(x), str(box[1] + inset), "350")
-                            self.events.append({"native_sheet_scroll": list(box)})
-                            break
+            try:
+                snap = self.ui("target")
+            except MissingHierarchy as error:
+                last_miss = str(error)  # Consume only this existing bounded action attempt.
+            else:
+                last_labels = snap.labels()
+                node = snap.find(pattern, enabled=True, clickable=True)
+                if node is not None:
+                    return self.press(node, pattern)
+                item = snap.native_dialog_item(pattern) if native_dialog else None
+                if item is not None:
+                    return self.press(item[0], "Native dialog item " + pattern, item[1])
+                if sheet_scroll:
+                    for candidate in reversed(snap.nodes):
+                        if candidate.get("class") == "android.widget.ScrollView" and candidate.get("scrollable") == "true":
+                            box = intersect(bounds(candidate), snap.active_bounds)
+                            if positive(box):
+                                inset = max(30, (box[3] - box[1]) // 8)
+                                x = (box[0] + box[2]) // 2
+                                self.guard_snapshot(snap)
+                                adb("shell", "input", "swipe", str(x), str(box[3] - inset), str(x), str(box[1] + inset), "350")
+                                self.events.append({"native_sheet_scroll": list(box)})
+                                break
             if attempt + 1 != attempts:
                 time.sleep(.5)
-        raise RuntimeError("Visible action not observed: " + pattern + "; labels=" + repr(snap.labels()))
+        raise RuntimeError("Visible action not observed: " + pattern + "; labels=" + repr(last_labels) + "; last_root_miss=" + repr(last_miss))
 
     @staticmethod
     def grid(snap):

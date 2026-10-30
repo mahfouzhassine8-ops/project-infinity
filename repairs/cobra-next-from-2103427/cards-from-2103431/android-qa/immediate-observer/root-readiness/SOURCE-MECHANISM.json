@@ -1,0 +1,68 @@
+{
+  "phase": "READ_ONLY_ANDROID17_ROOT_READINESS_MECHANISM_REVIEW",
+  "commit": "94b4c163b7dfe5ce3607f7bb8456f9573f7de57d",
+  "source_files": {
+    "UiAutomationManager.java": {
+      "bytes": 16330,
+      "sha256": "dd0cf09555bdac2ee33ef636eeb8fdb4d7cc14627e50a56def74f263be01e5b8"
+    },
+    "ViewRootImpl.java": {
+      "bytes": 637641,
+      "sha256": "ea114069943ffcc8a6c8b87c85ee194213951637716fddd453ff4ec4341f80dd"
+    },
+    "AccessibilityNodeInfo.java": {
+      "bytes": 363979,
+      "sha256": "347dde063a512e37a2f7752f0ea4bf6e8e362054c79154b0448852c936d30b56"
+    },
+    "AbstractAccessibilityServiceConnection.java": {
+      "bytes": 122888,
+      "sha256": "a904abaa330030317667faf20304a983141d1e3cb7618af772a0d82d781092bd"
+    },
+    "AccessibilitySecurityPolicy.java": {
+      "bytes": 34350,
+      "sha256": "966973965e2806afb3bc719424257aacb52fe201f2f46f9e6b2371fb501311a2"
+    },
+    "AccessibilityManager.java": {
+      "bytes": 100719,
+      "sha256": "16d74408a803fb9cab5eab12abaaaaffd440d43166113afb9c4f9ab4ac6c4a7b"
+    },
+    "AccessibilityInteractionClient.java": {
+      "bytes": 79970,
+      "sha256": "f2057d7e4fdd393317d8b3767f8aa61f5d694cc1c589dc5df9564afa10742352"
+    },
+    "AccessibilityManagerService.java": {
+      "bytes": 353209,
+      "sha256": "af582db2e2d37fabb41d3eb329d9b7417e0ae58c8b9f32aed1b71019a16d79d8"
+    },
+    "AccessibilityWindowManager.java": {
+      "bytes": 102156,
+      "sha256": "e7c68f37e87a79eee3cbf408d2f963c9a1387d90fa0ee7a50c886e46fc2f24c5"
+    }
+  },
+  "source_supported_race": [
+    "UiAutomation init establishes service connection, not app ViewRoot registration readiness (parent review)",
+    "AccessibilityManager.notifyAccessibilityStateChanged2473-2489 posts app listeners asynchronously",
+    "ViewRootImpl.onAccessibilityStateChanged13117-13126 registers connection via ensureConnection before focused WINDOW_STATE_CHANGED/VIEW_FOCUSED events",
+    "AccessibilityWindowManager.addAccessibilityInteractionConnection1312-1378 installs remote connection/token before returning ID",
+    "Direct active-root request does not ensure windows available and returns null when resolved connection absent"
+  ],
+  "getWindows_alternative": {
+    "required_flag": "FLAG_RETRIEVE_INTERACTIVE_WINDOWS, in addition to already-granted retrieve-content capability",
+    "server_wait": "AbstractAccessibilityServiceConnection.ensureWindowsAvailableTimedLocked up to5000ms; waits only non-null window list, not allowed active root",
+    "window_filter": "Only IDs registered to accessibility are included; choose unique active root, never background/covered fallback",
+    "cache": "AIC caches window lists; fresh connection starts separate cache; any later requery must account for event-driven cache invalidation"
+  },
+  "event_driven_option": {
+    "trigger_proof": "Focused ViewRoot emits WINDOW_STATE_CHANGED only after synchronous ensureConnection completes",
+    "listener_thread": "UiAutomation posts obtained event copy to constructor-supplied looper; wrapper supplies its HandlerThread",
+    "ownership": "Callback must recycle received event; copy primitive fields and signal main only",
+    "race_guard": "Install listener before initial root request; snapshot generation before request; compare under lock before await",
+    "clock": "Use monotonic callback arrival; platform explicitly disclaims event timestamp ordering",
+    "timeout_limit": "AIC synchronous root request may itself take5000ms. A2s readiness budget must reject results returned after deadline, not claim guaranteed2s return. Existing30s command and3.5s action-age caps unchanged"
+  },
+  "runtime_causality_limit": "Source supports registration race but no proof of exact actual-device timing; other null causes remain possible",
+  "code_changes": "NONE",
+  "tests": "NOT_RUN",
+  "CI": "NOT_DISPATCHED",
+  "APK_native_shutdown": "UNCHANGED"
+}

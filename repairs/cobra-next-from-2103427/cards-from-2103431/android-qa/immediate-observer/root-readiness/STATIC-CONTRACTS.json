@@ -1,0 +1,20 @@
+{
+  "status": "PASS_SOURCE_READINESS_CONTRACTS",
+  "checks": {
+    "listener_registered_before_acquisition": true,
+    "generation_read_before_root_query": true,
+    "late_framework_return_rejected": true,
+    "condition_uses_same_synchronized_generation": true,
+    "event_copy_recycled_in_finally": true,
+    "event_arrival_order_independent_of_source_time": true,
+    "bounded_primitives_only": true,
+    "no_idle_sleep_window_wait": true,
+    "scoped_listener_removed": true,
+    "exact2s16limits": true,
+    "Cards_direct_paths_same_producer": true,
+    "warm_notice_same_producer": true
+  },
+  "application_tests": "NOT_RUN",
+  "CI": "NOT_DISPATCHED",
+  "java_sha256": "46c317e7d696b3b49cb673c24ae172ac64b5815c6aceb36340577bb15eb957b1"
+}

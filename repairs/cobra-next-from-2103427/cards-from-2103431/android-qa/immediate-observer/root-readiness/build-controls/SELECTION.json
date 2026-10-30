@@ -1,0 +1,21 @@
+{
+  "selection": "DIRECT_HOST_JVM_ACTUAL_COMPILED_READINESS_SIGNAL_ONLY",
+  "actual_observer_source_sha256": "46c317e7d696b3b49cb673c24ae172ac64b5815c6aceb36340577bb15eb957b1",
+  "actual_signal_class_sha256": "59d290d0580a5c9ec163160a2d2be960cf1f26d5c3a60612bd6e1021a9f811d9",
+  "control_source_sha256": "68d8ef65a5abf7182e5acbb7a822b49196eb5aff788219d5d8ef426d9f99cbfc",
+  "testcases": [
+    "event-before-wait with zero remaining wait still observes changed generation",
+    "asynchronous event wakes actual timed condition wait",
+    "zero budget without new event returns false",
+    "queue admits16 copied primitive arrays and reports8 drops for24arrivals",
+    "source event timestamps out of order preserve arrival generation"
+  ],
+  "runtime_classpath": [
+    "actual built observer classes",
+    "host control classes"
+  ],
+  "Android_JAR_on_runtime_classpath": false,
+  "Android_methods_or_devices": "NOT_SELECTED",
+  "CI": "NOT_SELECTED",
+  "execution": "NOT_STARTED_AT_SELECTION_RECORDING"
+}

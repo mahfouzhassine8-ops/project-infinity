@@ -28,7 +28,9 @@ class ImmediateObserver:
         self.receipt = json.loads(self.receipt_path.read_text())
         self.expected = self.receipt["QA_JAR_sha256"]
         assert sha256(self.jar) == self.expected, "Compiled QA JAR differs from its receipt"
-        assert self.receipt["inspected_DEX_classes"] == ["Lqa/CobraImmediateHierarchy;"], "Only the QA main is allowed"
+        assert self.receipt["inspected_DEX_classes"] == [
+            "Lqa/CobraImmediateHierarchy$ReadinessSignal;", "Lqa/CobraImmediateHierarchy$RootReadiness;",
+            "Lqa/CobraImmediateHierarchy;"], "Only the QA main and two named readiness helpers are allowed"
         assert self.receipt["android_jar_sha256"] == "6cea1df3efb77103ac3e2beb9bf4718964b0e0869ab16d39d29d5cbae1c147ad"
         assert self.receipt["D8_jar_sha256"] == "305622ad00535684534eb8f742cbf5e628a9abc09d8ea4d39d1babb95bf0cee5"
         self.out.mkdir(parents=True, exist_ok=False)
@@ -106,14 +108,21 @@ class ImmediateObserver:
         metadata = json.loads(raw_metadata)
         assert result.returncode in (0, 3) and metadata.get("status") != "ERROR", "Platform observer failed: %s; native stderr=%s" % (metadata.get("error", metadata.get("status")), result.stderr[-1500:])
         self.shared_metadata(metadata)
+        assert metadata["root_readiness_budget_ms"] == 2000 and metadata["root_query_ceiling"] == 16
+        queries = metadata["root_queries"]
+        assert 1 <= len(queries) <= 16 and [query["attempt"] for query in queries] == list(range(1, len(queries) + 1))
+        assert all(query["query_started_uptime_ms"] <= query["query_finished_uptime_ms"] for query in queries)
         if result.returncode == 3 and metadata.get("status") == "ROOT_MISSING" and metadata.get("exit_code") == 3:
             assert metadata.get("reason") in {"NULL_CURRENT_ACTIVE_ROOT", "CURRENT_ACTIVE_WINDOW_CHANGED_DURING_DUMP"}
+            if metadata["reason"] == "NULL_CURRENT_ACTIVE_ROOT":
+                assert metadata["root_readiness_outcome"] in {"BUDGET_EXHAUSTED", "QUERY_CEILING"} and not any(query["available"] for query in queries)
             absent = self.command(name + "-missing-check", ["adb", "shell", "test", "-s", remote])
             assert absent.returncode == 1 and not absent.stdout.strip() and not absent.stderr.strip(), "Missing-root result retained XML or transport failed"
             self.last = None
             raise MissingHierarchy("%s; native stderr=%r; metadata=%s" % (metadata["reason"], result.stderr, metadata_path))
         assert result.returncode == 0 and metadata.get("status") == "ROOT_CAPTURED" and metadata.get("exit_code") == 0, "Platform observer failed: " + result.stderr[-1500:]
         assert metadata["active_window_revalidated"] is True
+        assert metadata["root_readiness_outcome"] == "CURRENT_ROOT_AVAILABLE" and metadata["root_readiness_elapsed_ms"] < 2000
         assert metadata["root_package"] in ({PACKAGE, "android"} if known_notice else {PACKAGE}), "Unexpected active package"
         assert type(metadata["window_id"]) is int and metadata["window_id"] >= 0
         box = metadata["root_bounds"]; display = metadata["display_size"]

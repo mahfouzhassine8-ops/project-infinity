@@ -1,0 +1,55 @@
+{
+  "status": "PASS_PREPARATION_PENDING_ROOT_REVIEW_NO_FOURTH_CI",
+  "scope_sha256": "4f65676e75216dd72a1e5b6c9172c594e2cf163b427d585775b6b73e017c8224",
+  "source_mechanism": "SOURCE-MECHANISM.json",
+  "proposed_policy": "PROPOSAL.md",
+  "runtime_journey_unchanged_from": "a531f123d1fcccfac4bc9023395351e97e023b31",
+  "baseline_top_level_journey_AST": "EXACT;8swipes/15source/10Cards unchanged",
+  "CardsObservation_changed_method": "tap only; genuineNULL consumes existing8attempts; no staleinput; othererrorsfatal",
+  "host_transport_tests": {
+    "count": 23,
+    "failures": 0,
+    "errors": 0,
+    "output": "TRANSPORT-TEST-OUTPUT.txt"
+  },
+  "actual_compiled_signal_JVM_tests": {
+    "count": 5,
+    "failures": 0,
+    "Android_runtime_JAR": "NOT_REQUIRED_OR_USED",
+    "evidence": "build-controls/TEST-OUTPUT.txt"
+  },
+  "source_contracts": {
+    "count": 12,
+    "status": "PASS",
+    "evidence": "STATIC-CONTRACTS.json"
+  },
+  "QA_JAR_sha256": "92bc97b01e0907c3a4e51763f51d7101f5166973fe6273ec93d1a67997f7d158",
+  "QA_JAR_bytes": 19320,
+  "Java_source_sha256": "46c317e7d696b3b49cb673c24ae172ac64b5815c6aceb36340577bb15eb957b1",
+  "DEX_own_classes": [
+    "Lqa/CobraImmediateHierarchy$ReadinessSignal;",
+    "Lqa/CobraImmediateHierarchy$RootReadiness;",
+    "Lqa/CobraImmediateHierarchy;"
+  ],
+  "pinned_SDK_and_D8": "PASS; BUILD-RECEIPT-v3.json",
+  "host_source_SHA256": {
+    "repairs/cobra-next-from-2103427/cards-from-2103431/android-qa/baseline.py": "899a74b948e7497f7c0b4f32e6ae067db85781fb1917138362bc106d31000c89",
+    "repairs/cobra-next-from-2103427/cards-from-2103431/android-qa/immediate_observer.py": "19f654cd996d205e37405e98ce93facb0dc64fb191981670f135bc361575f140",
+    "repairs/cobra-next-from-2103427/cards-from-2103431/android-qa/immediate-observer/test_transport.py": "dd7327037b2dc13b74740b375032d4884a268565c7f966ea6713a8b01631a15e"
+  },
+  "workflow": "UNCHANGED_FROM_REVIEWED_a531; existing pinned build compiles new QA source",
+  "limits": {
+    "conditional_readiness_ms": 2000,
+    "root_queries_max": 16,
+    "strict_action_age_seconds_exclusive": 3.5,
+    "ADB_command_cap_seconds": 30,
+    "tap_attempts": 8,
+    "source_polls": 15,
+    "Cards_polls": 10
+  },
+  "blocking_framework_call_limit": "Android root request may block up to5s intrinsically; late result is rejected and no further query/input occurs after budget; native2s is not a guaranteed2s return from uninterruptible Binder",
+  "runtime": "NOT_RUN_FOR_V3; actual seven-method API37 preflight was verified in41007107893",
+  "prior_artifacts": "ALL_THREE_FAILURES_UNCHANGED",
+  "APK_native_app_timers_shutdown_changes": "NONE",
+  "CI_dispatch": "NONE_BY_CHILD"
+}

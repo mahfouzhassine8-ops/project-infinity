@@ -1,0 +1,33 @@
+{
+  "scope": "QA_ONLY_EVENT_DRIVEN_CURRENT_ROOT_READINESS",
+  "authorization": "Root explicitly approved2s/16query event-driven phase within existing3.5s action age and30s command cap; no fourth CI before root review",
+  "source": "Android17 frameworks/base commit94b4c163b7dfe5ce3607f7bb8456f9573f7de57d; SOURCE-MECHANISM.json",
+  "selected_host_controls": [
+    "Actual Java sequence/condition race: event arrives between null query and wait",
+    "Actual Java condition wakes for new event; zero budget does not wait",
+    "Bounded copied primitive event metadata and out-of-order source timestamps",
+    "Pinned compilation and exact own-class DEX list/source binding",
+    "Native query readiness budget checks before and after potentially blocking framework query",
+    "Transport still rejects invalid roots, reflection failures and stale inputs",
+    "Explicit root-null can consume only preexisting8tap/15source/10Cards attempt limits",
+    "Uniform acquisition handles source form, picker, modes, notices and terminal without staleXML fallback"
+  ],
+  "limits": {
+    "native_readiness_budget_ms": 2000,
+    "root_query_ceiling": 16,
+    "command_cap_seconds": 30,
+    "input_age_exclusive_seconds": 3.5,
+    "existing_tap_attempts": 8,
+    "existing_source_polls": 15,
+    "existing_Cards_polls": 10
+  },
+  "prohibited": [
+    "waitForIdle",
+    "unconditional sleep",
+    "getWindows5s readiness wait",
+    "app/native/timer changes",
+    "new permissions or bootclasspath changes",
+    "CI dispatch by child"
+  ],
+  "execution": "NOT_STARTED_AT_SCOPE_RECORDING"
+}

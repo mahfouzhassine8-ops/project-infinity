@@ -16,7 +16,7 @@ import immediate_observer as io
 import baseline as qa
 import android_probe as probe
 
-BUILD = Path("/workspace/cobra-evidence/cards431-immediate-observer-build-v2")
+BUILD = Path("/workspace/cobra-evidence/cards431-immediate-observer-build-v3")
 XML = '<hierarchy rotation="0"><node package="com.projectinfinity.kodi" text="Views" clickable="true" enabled="true" bounds="[-5,0][80,90]" /></hierarchy>'
 
 
@@ -44,6 +44,10 @@ class ObserverTransport(unittest.TestCase):
             "started_uptime_ms": 10, "root_acquire_started_uptime_ms": 11,
             "root_acquired_uptime_ms": 12, "dump_completed_uptime_ms": 13, "finished_uptime_ms": 14,
             "XML_sha256": hashlib.sha256(XML.encode()).hexdigest(), "XML_bytes": len(XML.encode()),
+            "root_readiness_budget_ms": 2000, "root_query_ceiling": 16,
+            "root_readiness_outcome": "CURRENT_ROOT_AVAILABLE", "root_readiness_elapsed_ms": 1,
+            "root_queries": [{"attempt": 1, "query_started_uptime_ms": 11,
+                              "query_finished_uptime_ms": 12, "available": True}],
         }
         self.path = "/sdcard/cobra-cards-baseline-123-001.xml"
 
@@ -61,6 +65,9 @@ class ObserverTransport(unittest.TestCase):
         self.fail("Unexpected command: " + name)
 
     def capture(self, **kwargs):
+        if self.metadata.get("reason") == "NULL_CURRENT_ACTIVE_ROOT":
+            self.metadata["root_readiness_outcome"] = "BUDGET_EXHAUSTED"
+            self.metadata["root_queries"][0]["available"] = False
         with patch.object(self.observer, "command", side_effect=self.response):
             return self.observer.capture("001-test", self.path, **kwargs)
 
@@ -109,6 +116,8 @@ class ObserverTransport(unittest.TestCase):
 
     def test_missing_root_with_transport_error_is_fatal(self):
         self.metadata.update(status="ROOT_MISSING", exit_code=3, reason="NULL_CURRENT_ACTIVE_ROOT")
+        self.metadata["root_readiness_outcome"] = "BUDGET_EXHAUSTED"
+        self.metadata["root_queries"][0]["available"] = False
         original = self.response
         def response(name, arguments):
             return completed(1, stderr="device offline") if name.endswith("-missing-check") else original(name, arguments)
@@ -212,13 +221,36 @@ class ObserverTransport(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "Exact Cards"):
                 observation.wait_cards()
         self.assertEqual(10, ui.call_count)
-        with patch.object(observation, "ui", side_effect=io.MissingHierarchy("missing")) as ui, patch.object(observation, "press") as press:
-            with self.assertRaises(io.MissingHierarchy):
+        with patch.object(observation, "ui", side_effect=io.MissingHierarchy("missing")) as ui, patch.object(observation, "press") as press, patch.object(qa.time, "sleep"):
+            with self.assertRaisesRegex(RuntimeError, "Visible action not observed"):
                 observation.tap("Views")
-        self.assertEqual(1, ui.call_count); press.assert_not_called()
+        self.assertEqual(8, ui.call_count); press.assert_not_called()
         tree = ast.parse((ROOT / "baseline.py").read_text())
         loops = [n for n in ast.walk(tree) if isinstance(n, ast.For) and isinstance(n.iter, ast.Call) and isinstance(n.iter.func, ast.Name) and n.iter.func.id == "range"]
         self.assertTrue(any(ast.dump(n.iter) == ast.dump(ast.parse("range(15)", mode="eval").body) for n in loops))
+
+    def test_null_root_then_fresh_target_uses_existing_action_poll_without_stale_input(self):
+        out = self.folder / "journey"; out.mkdir()
+        observation = qa.CardsObservation(out, self.observer)
+        with patch.object(self.observer, "capture", side_effect=[io.MissingHierarchy("readiness not yet available"), (XML, self.metadata, 8)]), patch.object(io.time, "monotonic", return_value=10), patch.object(qa.time, "sleep"), patch.object(qa, "adb") as adb:
+            observation.tap("Views")
+        self.assertEqual(2, observation.sequence)
+        adb.assert_called_once_with("shell", "input", "tap", "40", "45")
+
+    def test_transport_error_is_never_an_optional_action_poll_miss(self):
+        out = self.folder / "journey"; out.mkdir()
+        observation = qa.CardsObservation(out, self.observer)
+        with patch.object(observation, "ui", side_effect=RuntimeError("device offline")) as ui, patch.object(qa, "adb") as adb, self.assertRaisesRegex(RuntimeError, "device offline"):
+            observation.tap("Views")
+        self.assertEqual(1, ui.call_count); adb.assert_not_called()
+
+    def test_native_readiness_budget_or_query_limit_cannot_be_inflated(self):
+        for key, value in [("root_readiness_budget_ms", 10000), ("root_query_ceiling", 17), ("root_readiness_elapsed_ms", 2000)]:
+            old = self.metadata[key]
+            with self.subTest(key=key), self.assertRaises(AssertionError):
+                self.metadata[key] = value
+                self.capture()
+            self.metadata[key] = old
 
 
 if __name__ == "__main__":

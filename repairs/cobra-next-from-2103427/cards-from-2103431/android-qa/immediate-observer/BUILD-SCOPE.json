@@ -3,10 +3,14 @@
   "authorization": "Root approved standalone platform-root observer; parent delegated only this builder and focused build contracts",
   "source": "CobraImmediateHierarchy.java; owned by parent agent",
   "allowed_output_classes": [
-    "qa/CobraImmediateHierarchy.class"
+    "qa/CobraImmediateHierarchy.class",
+    "qa/CobraImmediateHierarchy$ReadinessSignal.class",
+    "qa/CobraImmediateHierarchy$RootReadiness.class"
   ],
   "allowed_DEX_classes": [
-    "Lqa/CobraImmediateHierarchy;"
+    "Lqa/CobraImmediateHierarchy;",
+    "Lqa/CobraImmediateHierarchy$ReadinessSignal;",
+    "Lqa/CobraImmediateHierarchy$RootReadiness;"
   ],
   "required_inputs": {
     "android34_jar_sha256": "6cea1df3efb77103ac3e2beb9bf4718964b0e0869ab16d39d29d5cbae1c147ad",
@@ -24,5 +28,7 @@
   "application_build_install_execution": "NOT_SELECTED",
   "CI": "NOT_SELECTED",
   "shutdown": "NOT_SELECTED",
-  "compilation_and_tests": "PINNED_V1_AND_V2_BUILDS_PASS;5SELECTED_HOST_CONTROLS_PASS;V2SOURCE_BYTE_BINDING_PASS"
+  "compilation_and_tests": "PINNED_V1_AND_V2_BUILDS_PASS;5SELECTED_HOST_CONTROLS_PASS;V2SOURCE_BYTE_BINDING_PASS",
+  "v3_selection": "Pinned three-class observer build plus direct JVM tests of actual compiled ReadinessSignal: event-before-wait, async signal, zero budget, bounded queue/drop count, out-of-order source timestamps",
+  "v3_status": "PINNED3CLASS_BUILD_PASS_AND5DIRECT_JVM_SIGNAL_CONTROLS_PASS"
 }
