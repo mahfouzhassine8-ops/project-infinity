@@ -125,7 +125,7 @@ def validate_ci(evidence, catalog, producer_run, source, previous):
         require(re.fullmatch('[0-9a-f]{64}', pin) is not None, 'EVIDENCE_HASH_FORMAT')
         require(file_sha(evidence_path(evidence, name)) == pin, 'EVIDENCE_CHANGED:' + name)
     compiler = {str(p.relative_to(REPO)): file_sha(p) for p in compiler_sources()}
-    require(len(compiler) == 22 and receipt['compiler_source_files'] == compiler, 'COMPLETE_COMPILER_INPUTS')
+    require(len(compiler) == 23 and receipt['compiler_source_files'] == compiler, 'COMPLETE_COMPILER_INPUTS')
     tested = receipt['tested_source_files']
     require(repository_source_files().items() <= tested.items(), 'MISSING_SOURCE_BINDING')
     for name, pin in tested.items():
