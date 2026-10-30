@@ -27,3 +27,7 @@ Android setup runs41063134298/41066239229 never reached More. The fixed host Win
 ## Remaining release gates
 
 Authenticate the exact tested Infinity manifest with the permanent original key in the existing sole workflow, join the exact tested Cobra owner, update only genuine component metadata, inspect the concrete owner vector and register generation19. Then run the original hard actual-APK ownership/integrity/signature/preservation gates and deliver one434 install-over candidate with exact component ZIPs, source/run/hashes. Signed431/432/433 and user data remain unchanged. No automatic baseline promotion or shutdown changes/tests.
+
+## Packaging-only correction after original module authentication
+
+Run41080720431 passed both official owner checks and original permanent RSA/native authentication of the exact76-file manifest. It stopped before any APK at a release check that incorrectly compared a pretty JSON file with a separately compacted serialization. The official catalog bytes are now pinned by their already-verified producer SHA256, and exact parsed values are checked independently. Seven protocol checks pass, including rejection of reserialized bytes and altered values. The actual official catalog and real chooser ZIP handoff also pass locally; authenticated source-plan changed/added sets agree exactly. Failed run and original authentication evidence are retained. No application source change, relaxed gate, timeout increase or repeated feature test. One corrected no-APK owner preparation is required before final registration/signing.

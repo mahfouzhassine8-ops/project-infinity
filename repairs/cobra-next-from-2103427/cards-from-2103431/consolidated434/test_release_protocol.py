@@ -1,4 +1,4 @@
-"""Six selected release-protocol checks only; no application or shutdown test."""
+"""Seven selected release-protocol checks only; no application or shutdown test."""
 import io
 import json
 from pathlib import Path
@@ -11,6 +11,15 @@ from combined_owners import *
 from release_gate import Rejected
 
 class CoordinatedReleaseProtocolTest(unittest.TestCase):
+    def test_catalog_uses_official_raw_bytes_and_rejects_reserialized_or_changed_input(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path=Path(temp)/'catalog.json';expected=dict(schema=1,source='a'*40,bundles={})
+            path.write_text(json.dumps(expected,indent=2)+'\n');pin=file_sha(path)
+            self.assertEqual(expected,checked_catalog(path,pin,expected))
+            path.write_bytes(canonical(expected))
+            with self.assertRaisesRegex(Rejected,'EXACT_VERIFIED_COBRA_CATALOG_BYTES'):checked_catalog(path,pin,expected)
+            path.write_text(json.dumps(dict(expected,source='b'*40),indent=2)+'\n')
+            with self.assertRaisesRegex(Rejected,'EXACT_VERIFIED_COBRA_CATALOG_VALUES'):checked_catalog(path,file_sha(path),expected)
     def bundle(self,root,owner='CHOOSER_SHELL',labels=b'infinity.last_updated_in=2103427\ncobra.last_updated_in=2103434\n'):
         source=root/'input.zip';dex=b'HOST_FIXTURE_NOT_AN_APPLICATION_DEX';ui=b'HOST_FIXTURE_FROZEN_CHOOSER_UI'
         files={METADATA:labels,'assets/fixture-chooser-ui':ui}
@@ -79,7 +88,7 @@ class CoordinatedReleaseProtocolTest(unittest.TestCase):
 
 if __name__=='__main__':
     scope=load(HERE/'RELEASE-SCOPE.json');names=scope['selected_protocol_methods']
-    assert scope['selected_before_execution'] is True and len(set(names))==6
+    assert scope['selected_before_execution'] is True and len(set(names))==7
     suite=unittest.TestSuite(CoordinatedReleaseProtocolTest(name) for name in names)
     result=unittest.TextTestRunner(verbosity=2).run(suite)
-    if not result.wasSuccessful() or result.testsRun!=6 or result.skipped:raise SystemExit(1)
+    if not result.wasSuccessful() or result.testsRun!=7 or result.skipped:raise SystemExit(1)

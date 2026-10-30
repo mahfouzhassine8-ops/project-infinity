@@ -14,7 +14,8 @@
     "test_metadata_refuses_stale_or_unverified_label_preimage",
     "test_official_archive_tampering_fails_before_extraction_or_network",
     "test_extracted_evidence_tampering_is_rejected",
-    "test_original_key_roles_remain_conditional_and_after_real_gates"
+    "test_original_key_roles_remain_conditional_and_after_real_gates",
+    "test_catalog_uses_official_raw_bytes_and_rejects_reserialized_or_changed_input"
   ],
   "required_release_checks": [
     "Successful official separate-owner producers and exact selected19/24 results",
@@ -28,5 +29,6 @@
   "physical_Fold": "USER_ACCEPTANCE_PENDING",
   "shutdown": "NOT_CHANGED_NOT_RUN",
   "accepted_pointer_updated": false,
-  "automatic_promotion": false
+  "automatic_promotion": false,
+  "preparation_failure_41080720431": "Both owner evidence and original-key76-file module authentication passed. Final join rejected because catalog bytes were compared with a different canonical serialization. Correction pins official actual catalog SHA256 plus exact parsed values; preserves every test/component gate, no APK produced."
 }

@@ -1,0 +1,17 @@
+{
+  "run": 41080720431,
+  "source": "98552353c678da265d44a575e5b9a038289d4068",
+  "status": "PREPARATION_FAILED_AFTER_SUCCESSFUL_ORIGINAL_MODULE_AUTHENTICATION",
+  "failed_operation": "prepare_combined.finish EXACT_VERIFIED_COBRA_CATALOG",
+  "cause": "Compared official pretty JSON file hash with hash of compact canonical JSON, despite identical parsed catalog.",
+  "actual_catalog_sha256": "f70736fc41540f7888404094002e01ab91bb27a7b9041c24dc2bf40b9b1f730c",
+  "incorrect_reconstruction_sha256": "31573cba31cfa2554afa3f544f388f9bdd1eeabe1606dc0e4a64252395f8389a",
+  "correction": "Pin actual official producer raw catalog SHA256 and independently require identical parsed values; normalized/altered bytes and changed values each reject in regression test.",
+  "protocol_tests": "7_PASS",
+  "Cobra19": "RETAINED_PASS_UNCHANGED",
+  "Infinity24": "RETAINED_PASS_UNCHANGED",
+  "native_module_authentication": "ORIGINAL_PERMANENT_RSA_AND_NATIVE_VERIFIED_76_FILES",
+  "source_plan_matches_actual_authenticated_delta": true,
+  "APK": "NOT_BUILT_OR_SIGNED",
+  "shutdown": "NOT_CHANGED_NOT_RUN"
+}

@@ -48,7 +48,7 @@ def finish(precheck,authenticated,loading_evidence,cobra_components,out):
     require(auth['status']=='PASS_AUTHENTICATED_INFINITY_LOADING_OWNER' and auth['source']==source and auth['run_id']==before['run_id'],'ACTUAL_SAME_JOB_AUTHENTICATED_INFINITY')
     require(auth['owner_producer_run']==before['loading']['producer_run'] and auth['host_result_sha256']==before['loading']['host_result_sha256'],'EXACT_VERIFIED_LOADING_OWNER')
     require(file_sha(authenticated/'INFINITY.zip')==auth['bundle']['sha256'],'AUTHENTICATED_OWNER_BYTES')
-    require(file_sha(cobra_components/'catalog.json')==digest(canonical(before['cobra']['catalog'])),'EXACT_VERIFIED_COBRA_CATALOG')
+    checked_catalog(cobra_components/'catalog.json',before['cobra']['catalog_sha256'],before['cobra']['catalog'])
     require(not out.exists(),'FRESH_PREPARED_COMBINED_OWNER_OUTPUT');out.mkdir(parents=True)
     dest=out/'components';dest.mkdir();catalog=copy.deepcopy(before['cobra']['catalog']);catalog['source']=source
     for owner,row in catalog['bundles'].items():

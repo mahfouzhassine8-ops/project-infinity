@@ -80,6 +80,13 @@ def bind_files(path,folder,names):
             with z.open(name) as stream:pin=hashlib.file_digest(stream,'sha256').hexdigest()
             require(file_sha(folder/name)==pin,'LOCAL_EVIDENCE_CHANGED:'+name)
 
+def checked_catalog(path,raw_sha256,expected):
+    # Producer JSON is intentionally preserved as published. Whitespace is not
+    # reconstructed from an object: bind both official bytes and parsed values.
+    require(file_sha(path)==raw_sha256,'EXACT_VERIFIED_COBRA_CATALOG_BYTES')
+    require(load(path)==expected,'EXACT_VERIFIED_COBRA_CATALOG_VALUES')
+    return expected
+
 def check_cobra(components,evidence,run_id,work):
     row=successful_run(run_id,BRANCH,'.github/workflows/infinity-saved-navigation-android.yml')
     source=row['head_sha'];catalog=load(components/'catalog.json')
@@ -94,7 +101,7 @@ def check_cobra(components,evidence,run_id,work):
     return dict(producer_run=run_id,producer_source=source,artifacts=artifacts,
                 producer_result_sha256=file_sha(evidence/'PRODUCER-RESULT.json'),tested_source_files=receipt['tested_source_files'],
                 compiler_source_files=receipt['compiler_source_files'],selected_checks=receipt['selected_checks'],selections=selections,
-                evidence_files=receipt['files'],catalog=catalog)
+                evidence_files=receipt['files'],catalog=catalog,catalog_sha256=file_sha(components/'catalog.json'))
 
 def check_loading(evidence,run_id,work):
     row=successful_run(run_id,LOADING_BRANCH,'.github/workflows/infinity-saved-navigation-android.yml')
