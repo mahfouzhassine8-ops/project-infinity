@@ -65,6 +65,18 @@ public final class CobraFoldMoreDriver {
    }finally{t.close();}SystemClock.sleep(150);
   }throw new IllegalStateException("Original native dialog item not observed");
  }
+ static void scrollVisibleSheet()throws Exception{
+  syncInputs();Tree tree=new Tree();Rect r=null;
+  try{int matches=0;for(AccessibilityNodeInfo n:tree.nodes)if(n.isVisibleToUser()&&n.isScrollable()&&"android.widget.ScrollView".contentEquals(n.getClassName())){Rect b=new Rect();n.getBoundsInScreen(b);if(b.width()>100&&b.height()>100){r=b;matches++;}}require(matches==1,"Exactly one current visible sheet scroller required");}finally{tree.close();}
+  int x=r.centerX(),from=r.top+r.height()*4/5,to=r.top+r.height()/5;long stamp=SystemClock.uptimeMillis();
+  for(int i=0;i<=11;i++){int action=i==0?MotionEvent.ACTION_DOWN:i==11?MotionEvent.ACTION_UP:MotionEvent.ACTION_MOVE;float y=from+(to-from)*Math.min(i,10)/10f;MotionEvent event=MotionEvent.obtain(stamp,SystemClock.uptimeMillis(),action,x,y,0);event.setSource(InputDevice.SOURCE_TOUCHSCREEN);try{require(ui.injectInputEvent(event,true),"Sheet scroll injection uncertain; no retry");}finally{event.recycle();}SystemClock.sleep(24);}
+  steps.put(new JSONObject().put("real_sheet_swipe",box(r)));syncInputs();
+ }
+ static void cardsChoice()throws Exception{
+  await("(?m)^View$",true);
+  for(int i=0;i<3;i++){Tree t=new Tree();boolean ready;try{ready=t.find("(?m)^Cards(?:,.*)?$",true)!=null;}finally{t.close();}if(ready){tap("(?m)^Cards(?:,.*)?$");return;}scrollVisibleSheet();}
+  throw new IllegalStateException("Cards choice not visible after bounded actual sheet swipes");
+ }
  static void enterSource()throws Exception{
   tap("(?m)^\\+?\\s*ADD TV SOURCE$");nativeList("(?m)^M3U / M3U8 playlist$");awaitForm();
   String[] values={"CobraFoldMoreQA","http://10.0.2.2:8765/fold-more.m3u","http://10.0.2.2:8765/cards-epg.xml"};
@@ -72,24 +84,24 @@ public final class CobraFoldMoreDriver {
    Tree t=new Tree();try{ArrayList<AccessibilityNodeInfo> fields=new ArrayList<>();for(AccessibilityNodeInfo n:t.nodes)if("android.widget.EditText".contentEquals(n.getClassName())&&n.isVisibleToUser())fields.add(n);require(fields.size()==3,"Original M3U form must expose three fields");Bundle a=new Bundle();a.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE,values[index]);require(fields.get(index).performAction(AccessibilityNodeInfo.ACTION_SET_TEXT,a),"Public input text failed");steps.put(new JSONObject().put("normal_source_form_field",index));}finally{t.close();}
   }tap("(?m)^TEST & SAVE$");
   for(int i=0;i<24;i++){if(has("(?m)^Return to preview$")){back();break;}if(has("Cards QA 00001"))break;SystemClock.sleep(250);}
-  tap("(?m)^Choose one of five view modes$|^Choose view mode$|^Views$");tap("(?m)^Cards(?:,.*)?$");
+  tap("(?m)^Choose one of five view modes$|^Choose view mode$|^Views$");cardsChoice();
   await("(?m)^CARDS.*",true);require(!has("(?m)^Previous Pro source$"),"Pro is not the target");screenshot("cards-before-fullscreen");
  }
  static void visualSettings()throws Exception{
-  tap("(?m)^Visual settings: Ambient Mode and Night Cinema$");
+  tap("(?m)^Visual settings(?:,|:).*");
   await("(?m)^Visual settings$",true);await("(?m)^Ambient Mode$",true);await("(?m)^Night Cinema$",true);
   screenshot("cards-sun-menu-before");
   Tree t=new Tree();Rect off=null;
   try{
    write("cards-sun-menu-nodes.json",new JSONObject().put("labels",t.labels()));
    AccessibilityNodeInfo header=t.find("(?m)^Night Cinema$",false);require(header!=null,"Original Night Cinema section required");Rect h=new Rect();header.getBoundsInScreen(h);
-   for(AccessibilityNodeInfo n:t.nodes){Rect r=new Rect();n.getBoundsInScreen(r);if(!n.isVisibleToUser()||!n.isEnabled()||r.top<h.bottom||!Pattern.compile("(?m)^Off$",Pattern.CASE_INSENSITIVE).matcher(text(n)).find())continue;
+   for(AccessibilityNodeInfo n:t.nodes){Rect r=new Rect();n.getBoundsInScreen(r);if(!n.isVisibleToUser()||!n.isEnabled()||r.top<h.bottom||!Pattern.compile("(?m)^Off(?:,.*)?$",Pattern.CASE_INSENSITIVE).matcher(text(n)).find())continue;
     AccessibilityNodeInfo row=n;boolean owned=false;
     try{for(int depth=0;depth<5&&!row.isClickable();depth++){AccessibilityNodeInfo parent=row.getParent();if(owned)row.recycle();row=parent;owned=true;if(row==null)break;}if(row!=null&&row.isClickable()&&row.isVisibleToUser()){Rect b=new Rect();row.getBoundsInScreen(b);if(off==null||b.top<off.top)off=b;}}finally{if(owned&&row!=null)row.recycle();}
    }
   }finally{t.close();}
   require(off!=null,"Original Night Cinema Off row must have current visible touch bounds");tap(off,"Original Night Cinema Off row");syncInputs();await("(?m)^Visual settings$",false);
-  tap("(?m)^Visual settings: Ambient Mode and Night Cinema$");await("(?m)^Night Cinema$",true);screenshot("cards-sun-menu-reopened");back();syncInputs();await("(?m)^Visual settings$",false);
+  tap("(?m)^Visual settings(?:,|:).*");await("(?m)^Night Cinema$",true);screenshot("cards-sun-menu-reopened");back();syncInputs();await("(?m)^Visual settings$",false);
  }
  static Rect preview()throws Exception{Tree t=new Tree();try{for(AccessibilityNodeInfo n:t.nodes)if("android.view.TextureView".contentEquals(n.getClassName())&&n.isVisibleToUser()){Rect r=new Rect();n.getBoundsInScreen(r);if(r.width()>120&&r.height()>100)return r;}throw new IllegalStateException("Current Cards video texture not observed");}finally{t.close();}}
  static void fullscreen()throws Exception{

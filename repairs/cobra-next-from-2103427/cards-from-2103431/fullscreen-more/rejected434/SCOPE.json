@@ -44,5 +44,15 @@
     "no_shutdown": true,
     "no_uninstall_or_data_clear": true
   },
-  "workflow_routing_selected_before_execution": "Parse routing: rejected434 selector must exclusively select its focused job and exclude generic Android17 job. Existing run41115066018 incorrectly also selected generic validator; it failed before any generic emulator/application action. Focused434 job is independent and continues; do not rerun merely to recolor aggregate status."
+  "workflow_routing_selected_before_execution": "Parse routing: rejected434 selector must exclusively select its focused job and exclude generic Android17 job. Existing run41115066018 incorrectly also selected generic validator; it failed before any generic emulator/application action. Focused434 job is independent and continues; do not rerun merely to recolor aggregate status.",
+  "android41115066018": {
+    "outcome": "FAILED_SETUP_BEFORE_CARDS_SUN_FULLSCREEN_MORE",
+    "APK_install_bytes": "EXACT434_SHA256_CONFIRMED",
+    "native_process": "Cobra launch, source form/save and real stream successful; real Mobile View menu visible in captured screenshot",
+    "failure": "Cards mode option has visible=false bounds[84,2566,996,2418] below the native sheet viewport. Test wrongly awaited it without scrolling. Not a product crash or a More result.",
+    "next_execution": "Same exact434 bytes; add bounded actual touch swipe in unique visible native sheet ScrollView, then fresh current Cards bounds. Correct sun lookup to its actual dynamic accessibility label Visual settings, Ambient Mode Off, Night Cinema off. Preserve assertions and3.5s player target interval.",
+    "artifact": 13006320963,
+    "artifact_sha256": "14cd416d7f56542b3408f3aea0366af5546f52a31afa676dcd29b77c3ae91eba",
+    "selected_before_execution": true
+  }
 }

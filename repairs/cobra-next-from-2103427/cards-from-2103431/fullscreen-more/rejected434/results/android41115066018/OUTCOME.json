@@ -1,0 +1,165 @@
+{
+  "scope": "UNCHANGED_REJECTED434_CARDS_SUN_FULLSCREEN_MORE",
+  "APK_sha256": "16f02a9625c057a3fe4d4b55da8a554fdb2bff0f1b19c8f567bdf56af41eb465",
+  "source": "7bf6f2bddceca6dbc90e696766d9f46e3d8a69b6",
+  "physical_Fold": "NOT_RUN",
+  "Infinity": "NOT_LAUNCHED",
+  "shutdown": "NOT_RUN",
+  "driver_returncode": 137,
+  "native": {
+    "scope": "EXACT_REJECTED434_CARDS_SUN_FULLSCREEN_MORE",
+    "steps": [
+      {
+        "OS_window_input_sync_ms": 22
+      },
+      {
+        "observed": "(?m)^\\+?\\s*ADD TV SOURCE$",
+        "bounds": [
+          36,
+          1599,
+          1044,
+          1773
+        ],
+        "root_query_ms": 5
+      },
+      {
+        "observed": "(?m)^\\+?\\s*ADD TV SOURCE$",
+        "bounds": [
+          36,
+          1599,
+          1044,
+          1773
+        ],
+        "root_query_ms": 2
+      },
+      {
+        "coordinate_press": "(?m)^\\+?\\s*ADD TV SOURCE$",
+        "bounds": [
+          36,
+          1599,
+          1044,
+          1773
+        ],
+        "down_injected": true,
+        "up_injected": true
+      },
+      {
+        "OS_window_input_sync_ms": 14
+      },
+      {
+        "OS_window_input_sync_ms": 15
+      },
+      {
+        "coordinate_press": "Original Android dialog item (?m)^M3U / M3U8 playlist$",
+        "bounds": [
+          27,
+          1246,
+          1053,
+          1390
+        ],
+        "down_injected": true,
+        "up_injected": true
+      },
+      {
+        "OS_window_input_sync_ms": 43
+      },
+      {
+        "OS_window_input_sync_ms": 21
+      },
+      {
+        "normal_source_form_field": 0
+      },
+      {
+        "normal_source_form_field": 1
+      },
+      {
+        "normal_source_form_field": 2
+      },
+      {
+        "OS_window_input_sync_ms": 24
+      },
+      {
+        "observed": "(?m)^TEST & SAVE$",
+        "bounds": [
+          696,
+          1552,
+          1017,
+          1714
+        ],
+        "root_query_ms": 104
+      },
+      {
+        "observed": "(?m)^TEST & SAVE$",
+        "bounds": [
+          696,
+          1552,
+          1017,
+          1714
+        ],
+        "root_query_ms": 3
+      },
+      {
+        "coordinate_press": "(?m)^TEST & SAVE$",
+        "bounds": [
+          696,
+          1552,
+          1017,
+          1714
+        ],
+        "down_injected": true,
+        "up_injected": true
+      },
+      {
+        "OS_window_input_sync_ms": 12
+      },
+      {
+        "OS_window_input_sync_ms": 9
+      },
+      {
+        "observed": "(?m)^Choose one of five view modes$|^Choose view mode$|^Views$",
+        "bounds": [
+          798,
+          2280,
+          1056,
+          2448
+        ],
+        "root_query_ms": 105
+      },
+      {
+        "observed": "(?m)^Choose one of five view modes$|^Choose view mode$|^Views$",
+        "bounds": [
+          798,
+          2280,
+          1056,
+          2448
+        ],
+        "root_query_ms": 90
+      },
+      {
+        "coordinate_press": "(?m)^Choose one of five view modes$|^Choose view mode$|^Views$",
+        "bounds": [
+          798,
+          2280,
+          1056,
+          2448
+        ],
+        "down_injected": true,
+        "up_injected": true
+      },
+      {
+        "OS_window_input_sync_ms": 38
+      },
+      {
+        "OS_window_input_sync_ms": 18
+      }
+    ],
+    "physical_Fold": "NOT_RUN",
+    "shutdown": "NOT_RUN",
+    "application_classpath": "/system/framework/android.test.runner.jar:/system/framework/uiautomator.jar:/data/local/tmp/CobraFoldMoreDriver.jar",
+    "BOOTCLASSPATH": "INHERITED_UNCHANGED",
+    "status": "FAILED_CLOSED",
+    "error": "java.lang.IllegalStateException: Current public target not observed: (?m)^Cards(?:,.*)?$"
+  },
+  "status": "BLOCKED_OR_FAILED_FOCUSED_OBSERVATION",
+  "error": "{'scope': 'EXACT_REJECTED434_CARDS_SUN_FULLSCREEN_MORE', 'steps': [{'OS_window_input_sync_ms': 22}, {'observed': '(?m)^\\\\+?\\\\s*ADD TV SOURCE$', 'bounds': [36, 1599, 1044, 1773], 'root_query_ms': 5}, {'observed': '(?m)^\\\\+?\\\\s*ADD TV SOURCE$', 'bounds': [36, 1599, 1044, 1773], 'root_query_ms': 2}, {'coordinate_press': '(?m)^\\\\+?\\\\s*ADD TV SOURCE$', 'bounds': [36, 1599, 1044, 1773], 'down_injected': True, 'up_injected': True}, {'OS_window_input_sync_ms': 14}, {'OS_window_input_sync_ms': 15}, {'coordinate_press': 'Original Android dialog item (?m)^M3U / M3U8 playlist$', 'bounds': [27, 1246, 1053, 1390], 'down_injected': True, 'up_injected': True}, {'OS_window_input_sync_ms': 43}, {'OS_window_input_sync_ms': 21}, {'normal_source_form_field': 0}, {'normal_source_form_field': 1}, {'normal_source_form_field': 2}, {'OS_window_input_sync_ms': 24}, {'observed': '(?m)^TEST & SAVE$', 'bounds': [696, 1552, 1017, 1714], 'root_query_ms': 104}, {'observed': '(?m)^TEST & SAVE$', 'bounds': [696, 1552, 1017, 1714], 'root_query_ms': 3}, {'coordinate_press': '(?m)^TEST & SAVE$', 'bounds': [696, 1552, 1017, 1714], 'down_injected': True, 'up_injected': True}, {'OS_window_input_sync_ms': 12}, {'OS_window_input_sync_ms': 9}, {'observed': '(?m)^Choose one of five view modes$|^Choose view mode$|^Views$', 'bounds': [798, 2280, 1056, 2448], 'root_query_ms': 105}, {'observed': '(?m)^Choose one of five view modes$|^Choose view mode$|^Views$', 'bounds': [798, 2280, 1056, 2448], 'root_query_ms': 90}, {'coordinate_press': '(?m)^Choose one of five view modes$|^Choose view mode$|^Views$', 'bounds': [798, 2280, 1056, 2448], 'down_injected': True, 'up_injected': True}, {'OS_window_input_sync_ms': 38}, {'OS_window_input_sync_ms': 18}], 'physical_Fold': 'NOT_RUN', 'shutdown': 'NOT_RUN', 'application_classpath': '/system/framework/android.test.runner.jar:/system/framework/uiautomator.jar:/data/local/tmp/CobraFoldMoreDriver.jar', 'BOOTCLASSPATH': 'INHERITED_UNCHANGED', 'status': 'FAILED_CLOSED', 'error': 'java.lang.IllegalStateException: Current public target not observed: (?m)^Cards(?:,.*)?$'}"
+}
