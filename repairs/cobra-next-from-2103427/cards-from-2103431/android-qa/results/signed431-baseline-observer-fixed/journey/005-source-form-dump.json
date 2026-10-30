@@ -1,0 +1,17 @@
+{
+  "command": [
+    "adb",
+    "shell",
+    "uiautomator",
+    "dump",
+    "--compressed",
+    "/sdcard/cobra-cards-baseline-624801502922-005.xml"
+  ],
+  "remote_fresh_path": "/sdcard/cobra-cards-baseline-624801502922-005.xml",
+  "exit_code": 0,
+  "stdout": "UI hierchary dumped to: /sdcard/cobra-cards-baseline-624801502922-005.xml\n",
+  "stderr": "",
+  "nonempty_check_exit_code": 0,
+  "nonempty_check_stdout": "",
+  "nonempty_check_stderr": ""
+}

@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "/home/runner/work/project-infinity/project-infinity/repairs/cobra-next-from-2103427/cards-from-2103431/android-qa/baseline.py", line 329, in run
+    observation.tap(r"^Choose one of five view modes$|^Choose view mode$|^Views$")
+  File "/home/runner/work/project-infinity/project-infinity/repairs/cobra-next-from-2103427/cards-from-2103431/android-qa/baseline.py", line 185, in tap
+    snap = self.ui("target")
+           ^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/project-infinity/project-infinity/repairs/cobra-next-from-2103427/cards-from-2103431/android-qa/baseline.py", line 164, in ui
+    raise MissingHierarchy("No fresh nonempty hierarchy: %s; dump stdout=%r stderr=%r; see %s-dump.json" %
+MissingHierarchy: No fresh nonempty hierarchy: /sdcard/cobra-cards-baseline-624801502922-017.xml; dump stdout='' stderr='ERROR: could not get idle state.\n'; see 017-target-dump.json

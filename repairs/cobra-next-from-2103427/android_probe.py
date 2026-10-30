@@ -39,7 +39,7 @@ def compatibility_notice_ok(tree,native_paths):
   'button_bounds':values,'warning':body,'native_members':sorted(libraries),
   'action':'ANDROID_INFORMATIONAL_OK_ONLY; NO_DONT_SHOW_AGAIN_OR_COMPAT_SETTING_CHANGE'}
 
-def acknowledge_known_notice_after_launch(launch_text,out,native_paths=None):
+def acknowledge_known_notice_after_launch(launch_text,out,native_paths=None,capture_ui=None,before_notice_press=None):
  """Observe one successful Cobra launch; acknowledge only its known OS notice.
 
  Each caller owns a distinct successful am-start boundary. No persistent warning
@@ -52,8 +52,11 @@ def acknowledge_known_notice_after_launch(launch_text,out,native_paths=None):
  report={'scope':'ONE_SUCCESSFUL_COBRA_LAUNCH_OS_NOTICE_ONLY','action':'NO_ACKNOWLEDGEMENT',
          'shutdown':'NOT_RUN','compatibility_settings':'UNCHANGED'}
  def observe(name):
-  adb('shell','uiautomator','dump','/sdcard/cobra-launch-notice-qa.xml')
-  raw=adb('shell','cat','/sdcard/cobra-launch-notice-qa.xml')
+  if capture_ui is None:
+   adb('shell','uiautomator','dump','/sdcard/cobra-launch-notice-qa.xml')
+   raw=adb('shell','cat','/sdcard/cobra-launch-notice-qa.xml')
+  else:
+   raw=capture_ui(name)
   (out/(name+'.xml')).write_text(raw)
   return ET.fromstring(raw)
  def android_dialog(tree):
@@ -74,6 +77,7 @@ def acknowledge_known_notice_after_launch(launch_text,out,native_paths=None):
   fresh=compatibility_notice_ok(observe('fresh-before-OK'),set(native_paths or ()))
   assert fresh is not None and fresh==notice,'Compatibility notice changed before acknowledgement; no press injected'
   report['notice']=fresh
+  if before_notice_press is not None:before_notice_press(fresh)
   adb('shell','input','tap',*[str(v) for v in fresh['coordinate']])
   report['action']='ONE_ANDROID_INFORMATIONAL_OK_ONLY'
   after=observe('after-OK')

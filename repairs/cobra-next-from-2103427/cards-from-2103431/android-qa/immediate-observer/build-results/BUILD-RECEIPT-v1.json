@@ -1,0 +1,52 @@
+{
+  "scope": "QA_ONLY_IMMEDIATE_PLATFORM_ROOT_OBSERVER_NO_APK",
+  "source_sha256": "6b2243f226553bb4df8fc18fe54c1fddcf1fbe4d5dc8ee04bf2ae4c17cc51549",
+  "build_script_sha256": "9d7f11a9a0b09413634647dd0a4a80d817d932c5737dcceb5db3154519f502ae",
+  "android_jar_sha256": "6cea1df3efb77103ac3e2beb9bf4718964b0e0869ab16d39d29d5cbae1c147ad",
+  "D8_jar_sha256": "305622ad00535684534eb8f742cbf5e628a9abc09d8ea4d39d1babb95bf0cee5",
+  "compiler_command": [
+    "/usr/bin/java",
+    "-m",
+    "jdk.compiler/com.sun.tools.javac.Main",
+    "-source",
+    "8",
+    "-target",
+    "8",
+    "-cp",
+    "/workspace/cobra-evidence/tools/receipt-evidence/android-34.jar",
+    "-d",
+    "/workspace/cobra-evidence/cards431-immediate-observer-build-v1/classes",
+    "/workspace/project-infinity/repairs/cobra-next-from-2103427/cards-from-2103431/android-qa/immediate-observer/CobraImmediateHierarchy.java"
+  ],
+  "D8_command": [
+    "/usr/bin/java",
+    "-cp",
+    "/workspace/cobra-evidence/tools/d8.jar",
+    "com.android.tools.r8.D8",
+    "--min-api",
+    "23",
+    "--lib",
+    "/workspace/cobra-evidence/tools/receipt-evidence/android-34.jar",
+    "--output",
+    "/workspace/cobra-evidence/cards431-immediate-observer-build-v1/dex",
+    "/workspace/cobra-evidence/cards431-immediate-observer-build-v1/observer-classes.jar"
+  ],
+  "class_files_sha256": {
+    "qa/CobraImmediateHierarchy.class": "750175da901d31032cda6f5db974e9032f7f60c4415da567c88f1de0fd46c8ff"
+  },
+  "inspected_DEX_classes": [
+    "Lqa/CobraImmediateHierarchy;"
+  ],
+  "DEX_sha256": "7de520459438716e4b2066e51fa7e97c2f34b4edd8a243b778753a9e07e347db",
+  "QA_JAR_sha256": "1f86f8cef9302e1d3c4b982be9aa348f5564b1a7066acb73b7f9ab1d89a99d4a",
+  "QA_JAR_bytes": 12620,
+  "platform_source_provenance_sha256": "00e3f0c784feab6db424430511ec87b326417857e17923b30f77dfbdc736552b",
+  "runtime_application_classpath_prefix": "/system/framework/android.test.runner.jar:/system/framework/uiautomator.jar",
+  "runtime_BOOTCLASSPATH": "INHERITED_OS_UNCHANGED",
+  "platform_classes": "REFLECT_EXISTING_SYSTEM_ARCHIVE_ONLY; NOT_BUNDLED",
+  "API_surface": "FAIL_CLOSED_DEVICE_PREFLIGHT_REQUIRED_BEFORE_OBSERVATION",
+  "APK_build_or_install": "NONE",
+  "application_or_device_execution": "NOT_RUN",
+  "CI": "NOT_DISPATCHED",
+  "shutdown": "NOT_RUN"
+}

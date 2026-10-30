@@ -1,0 +1,17 @@
+{
+  "command": [
+    "adb",
+    "shell",
+    "uiautomator",
+    "dump",
+    "--compressed",
+    "/sdcard/cobra-cards-baseline-624801502922-011.xml"
+  ],
+  "remote_fresh_path": "/sdcard/cobra-cards-baseline-624801502922-011.xml",
+  "exit_code": 0,
+  "stdout": "",
+  "stderr": "ERROR: null root node returned by UiTestAutomationBridge.\n",
+  "nonempty_check_exit_code": 1,
+  "nonempty_check_stdout": "",
+  "nonempty_check_stderr": ""
+}

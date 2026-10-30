@@ -1,0 +1,29 @@
+{
+  "status": "PASS_SELECTED_HOST_PREPARATION_PENDING_ROOT_REVIEW",
+  "scope_sha256": "10ba3fb0a34fa6b7bfe3af341b6ee7d32e0b331a774210fb7d485d93639a4531",
+  "transport_tests": 20,
+  "transport_failures": 0,
+  "transport_errors": 0,
+  "transport_test_output": "TRANSPORT-TEST-OUTPUT-v3.txt",
+  "earlier_outputs": "v1:16PASS; v2:19PASS after independent swipe clipping/notice controls; v3:20PASS after explicit native-error preservation control",
+  "builder_controls": "Five focused contracts PASS plus immutable source/DEX/JAR binding controls; build-results/",
+  "JAVA_source_sha256": "82f822952a5904265d73848f34bc2a0e71a9249f2185518f2c28481963e1c3ed",
+  "QA_JAR_sha256": "ab2683944184a1488f76d8cdef14a717bd0036a4f11daea14c13ba8fbadfde50",
+  "QA_JAR_bytes": 12904,
+  "DEX_classes": [
+    "Lqa/CobraImmediateHierarchy;"
+  ],
+  "python_SHA256": {
+    "repairs/cobra-next-from-2103427/cards-from-2103431/android-qa/baseline.py": "3d0c1400f31c61c9f09f2318297f4e92e23004338c0a1c71eebb3483361dfe2f",
+    "repairs/cobra-next-from-2103427/cards-from-2103431/android-qa/immediate_observer.py": "7652ba8e20b6e38000fc9d2a1cb5e8f2e7e0862cb05566b5bf31125be85b0178",
+    "repairs/cobra-next-from-2103427/cards-from-2103431/android-qa/immediate-observer/test_transport.py": "a6bdbe6c622a711e82bdce64413218e2e6a1217885da5b95bfa2edf513692191",
+    "repairs/cobra-next-from-2103427/android_probe.py": "828e7e634dfc7e11cae1ca16c227a724849277e2abaffdc863cf2d8ef48aca9f"
+  },
+  "workflow_sha256": "eafa2168dcc6d7fe615b405853cf3935ac664d6553121faf00f045300d2e23b8",
+  "workflow_contract": "Only Cards baseline job changed; fixed431/receipt tools, matching API37 AVD; fresh EPG immediately before same finite journey; new observer source build and evidence upload",
+  "protected_QA_functions": "Original APK probe and known-notice identity parser AST exact; other modes/job routing unchanged",
+  "device_preflight": "NOT_RUN; actual OS script/JAR bytes/public methods must fail-closed verify in future selected runtime",
+  "application_emulator_CI_execution": "NONE_BY_THIS_PREPARATION",
+  "app_native_shutdown_changes": "NONE",
+  "prior_failures": "Both official attempts retained separately, not overwritten"
+}

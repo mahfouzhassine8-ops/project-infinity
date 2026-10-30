@@ -1,0 +1,76 @@
+{
+  "phase": "READ_ONLY_FEASIBILITY_NO_CODE_OR_EXECUTION",
+  "official_android_branch": "android17-release",
+  "official_commit": "94b4c163b7dfe5ce3607f7bb8456f9573f7de57d",
+  "actual_fetched_files": [
+    {
+      "repo": "platform/frameworks/base",
+      "commit": "94b4c163b7dfe5ce3607f7bb8456f9573f7de57d",
+      "path": "cmds/uiautomator/cmds/uiautomator/uiautomator.sh",
+      "local_name": "uiautomator.sh",
+      "bytes": 4173,
+      "sha256": "588f4e89975e626c1ae185c350389e4fad005b2cb9525834a42dfa7dfd548545",
+      "url": "https://android.googlesource.com/platform/frameworks/base/+/94b4c163b7dfe5ce3607f7bb8456f9573f7de57d/cmds/uiautomator/cmds/uiautomator/uiautomator.sh"
+    },
+    {
+      "repo": "platform/frameworks/base",
+      "commit": "94b4c163b7dfe5ce3607f7bb8456f9573f7de57d",
+      "path": "cmds/uiautomator/cmds/uiautomator/Android.bp",
+      "local_name": "Android.bp",
+      "bytes": 1099,
+      "sha256": "ad68b6757c74ea5e9488394969d70c0530af7bbbce5b5e59defc1f67c7a6699c",
+      "url": "https://android.googlesource.com/platform/frameworks/base/+/94b4c163b7dfe5ce3607f7bb8456f9573f7de57d/cmds/uiautomator/cmds/uiautomator/Android.bp"
+    },
+    {
+      "repo": "platform/frameworks/base",
+      "commit": "94b4c163b7dfe5ce3607f7bb8456f9573f7de57d",
+      "path": "cmds/uiautomator/cmds/uiautomator/src/com/android/commands/uiautomator/DumpCommand.java",
+      "local_name": "DumpCommand.java",
+      "bytes": 4681,
+      "sha256": "da9ff50b21ea60d79c339e9c482c35b2a9b8a2677abc5efa7445acfa83897f03",
+      "url": "https://android.googlesource.com/platform/frameworks/base/+/94b4c163b7dfe5ce3607f7bb8456f9573f7de57d/cmds/uiautomator/cmds/uiautomator/src/com/android/commands/uiautomator/DumpCommand.java"
+    },
+    {
+      "repo": "platform/frameworks/base",
+      "commit": "94b4c163b7dfe5ce3607f7bb8456f9573f7de57d",
+      "path": "cmds/uiautomator/library/testrunner-src/com/android/uiautomator/core/UiAutomationShellWrapper.java",
+      "local_name": "UiAutomationShellWrapper.java",
+      "bytes": 4654,
+      "sha256": "80e87baf1d506344048d1aa392bda6e0d883c585a0c333d1575506ccbe8c3568",
+      "url": "https://android.googlesource.com/platform/frameworks/base/+/94b4c163b7dfe5ce3607f7bb8456f9573f7de57d/cmds/uiautomator/library/testrunner-src/com/android/uiautomator/core/UiAutomationShellWrapper.java"
+    },
+    {
+      "repo": "platform/frameworks/base",
+      "commit": "94b4c163b7dfe5ce3607f7bb8456f9573f7de57d",
+      "path": "cmds/uiautomator/library/core-src/com/android/uiautomator/core/AccessibilityNodeInfoDumper.java",
+      "local_name": "AccessibilityNodeInfoDumper.java",
+      "bytes": 16147,
+      "sha256": "c35f6b78d724a516d4da84007c57def319643b7384e5b9ce90b0a102ab42118c",
+      "url": "https://android.googlesource.com/platform/frameworks/base/+/94b4c163b7dfe5ce3607f7bb8456f9573f7de57d/cmds/uiautomator/library/core-src/com/android/uiautomator/core/AccessibilityNodeInfoDumper.java"
+    },
+    {
+      "repo": "platform/frameworks/base",
+      "commit": "94b4c163b7dfe5ce3607f7bb8456f9573f7de57d",
+      "path": "cmds/uiautomator/library/Android.bp",
+      "local_name": "library-Android.bp",
+      "bytes": 2598,
+      "sha256": "13d10e164aa6c6f6b2419d4e5a2d01b77fcc8db4cf241afadcabdfa7e177055c",
+      "url": "https://android.googlesource.com/platform/frameworks/base/+/94b4c163b7dfe5ce3607f7bb8456f9573f7de57d/cmds/uiautomator/library/Android.bp"
+    },
+    {
+      "repo": "platform/frameworks/base",
+      "commit": "94b4c163b7dfe5ce3607f7bb8456f9573f7de57d",
+      "path": "cmds/uiautomator/Android.bp",
+      "local_name": "uiautomator-Android.bp",
+      "bytes": 740,
+      "sha256": "c47ebd2b3b1f8b7d2205e3fd17e7ef63f3f54d846d84173a28ce987cc5972ee5",
+      "url": "https://android.googlesource.com/platform/frameworks/base/+/94b4c163b7dfe5ce3607f7bb8456f9573f7de57d/cmds/uiautomator/Android.bp"
+    }
+  ],
+  "existing_device_evidence": "results/signed431-baseline-observer-fixed; actual idle/root errors match official DumpCommand; earlier framework-classpath log confirms OS JAR paths",
+  "actual_device_JAR_bytes": "NOT_UPLOADED_BY_PRIOR_RUNS; runtime reflection surface not yet directly inspected",
+  "archived_sources_rejected": "frameworks/testing and frameworks/uiautomator main are 2014/2013 archives and were not used as Android17 proof",
+  "third_CI_run": "NOT_STARTED",
+  "compilation": "NOT_RUN",
+  "app_native_shutdown_changes": "NONE"
+}

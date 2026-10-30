@@ -1,0 +1,19 @@
+{
+  "status": "PASS_V2_SOURCE_BYTE_BINDING_AFTER_KNOWN_NOTICE_ROOT_UPDATE",
+  "checks": {
+    "immutable_source_snapshot_matches_reviewed_source": true,
+    "receipt_binds_current_build_script": true,
+    "actual_D8_and_SDK_pins_retained": true,
+    "actual_DEX_only_own_class": true,
+    "transport_JAR_only_exact_DEX": true,
+    "actual_output_hashes_match_receipt": true
+  },
+  "QA_JAR_sha256": "ab2683944184a1488f76d8cdef14a717bd0036a4f11daea14c13ba8fbadfde50",
+  "QA_JAR_bytes": 12904,
+  "source_sha256": "82f822952a5904265d73848f34bc2a0e71a9249f2185518f2c28481963e1c3ed",
+  "v1_receipt_preserved": "BUILD-RECEIPT-v1.json",
+  "initial_five_build_controls": "PASS_IN_CONTROLS-v1.json; unchanged guard/archive/descriptor behavior not broadly rerun",
+  "APK_or_application_or_device": "NOT_BUILT_OR_EXECUTED",
+  "CI": "NOT_DISPATCHED",
+  "shutdown": "NOT_RUN"
+}

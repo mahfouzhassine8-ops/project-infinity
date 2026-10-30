@@ -1,0 +1,44 @@
+diff --git a/.github/workflows/infinity-saved-navigation-android.yml b/.github/workflows/infinity-saved-navigation-android.yml
+index 9641b085..8346d571 100644
+--- a/.github/workflows/infinity-saved-navigation-android.yml
++++ b/.github/workflows/infinity-saved-navigation-android.yml
+@@ -213,6 +213,13 @@ jobs:
+           name: Infinity-Combined-Original-Signer-40971769136
+           github-token: ${{ github.token }}
+           path: runtime-signed
++      - name: Recover existing pinned official Android compiler API
++        uses: actions/download-artifact@v4
++        with:
++          run-id: 39867073954
++          name: Infinity-Receipt-Race-Android17-Investigation
++          github-token: ${{ github.token }}
++          path: observer-tools
+       - uses: android-actions/setup-android@v4
+         with:
+           cmdline-tools-version: '15859902'
+@@ -229,6 +236,7 @@ jobs:
+           python3 repairs/infinity-final-closure-2103407/api37_environment_gate.py --sdk-root "$ANDROID_HOME" --out runtime-platform --pin-tools
+           python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out runtime-emulator-setup
+           sudo chmod 666 /dev/kvm
++          python3 repairs/cobra-next-from-2103427/cards-from-2103431/android-qa/immediate-observer/build.py --android observer-tools/receipt-evidence/android-34.jar --d8 "$ANDROID_HOME/build-tools/35.0.0/lib/d8.jar" --out runtime-observer
+           python3 repairs/cobra-next-from-2103427/android_candidate_journey.py --generate-media runtime-media
+           python3 -m http.server 8765 --bind 0.0.0.0 --directory runtime-media > runtime-results/MEDIA-HTTP.txt 2>&1 &
+       - uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+@@ -244,7 +252,7 @@ jobs:
+           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+           script: |
+             python3 repairs/cobra-next-from-2103427/cards-from-2103431/android-qa/generate_fixture.py --out runtime-media --require-media
+-            python3 repairs/cobra-next-from-2103427/cards-from-2103431/android-qa/baseline.py --signed runtime-signed --signature runtime-results/SIGNATURE.txt --fixtures runtime-media --out runtime-results/cards-baseline
++            python3 repairs/cobra-next-from-2103427/cards-from-2103431/android-qa/baseline.py --signed runtime-signed --signature runtime-results/SIGNATURE.txt --fixtures runtime-media --out runtime-results/cards-baseline --observer-jar runtime-observer/CobraImmediateHierarchy.jar --observer-receipt runtime-observer/BUILD-RECEIPT.json
+       - uses: actions/upload-artifact@v4
+         if: always()
+         with:
+@@ -254,6 +262,8 @@ jobs:
+             runtime-platform/
+             runtime-emulator-setup/
+             runtime-media/FIXTURE.json
++            runtime-observer/BUILD-RECEIPT.json
++            runtime-observer/CobraImmediateHierarchy.jar
+           retention-days: 90
+           if-no-files-found: error
+   cobra-android:

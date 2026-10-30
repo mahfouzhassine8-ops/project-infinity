@@ -21,8 +21,10 @@ from pathlib import Path
 
 OWNER = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(OWNER))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 from android_probe import PACKAGE, adb, acknowledge_known_notice_after_launch, probe
 from android_button_journey import Snapshot, bounds, center, intersect, positive
+from immediate_observer import ImmediateObserver, MissingHierarchy
 
 VERSION = 2103431
 SOURCE = "9ccc4c362a65118eeba38a8e7e4b0de5723c69af"
@@ -117,13 +119,11 @@ def validate_inputs(signed, signature, fixtures):
     return apks[0], receipt, manifest
 
 
-class MissingHierarchy(RuntimeError):
-    """A completed dump produced no fresh nonempty hierarchy, never app PASS."""
-
-
 class CardsObservation:
-    def __init__(self, out):
+    def __init__(self, out, observer=None):
         self.out = out
+        self.observer = observer
+        self.latest_snapshot = None
         self.sequence = 0
         self.events = []
         self.remote_prefix = "/sdcard/cobra-cards-baseline-%d-" % time.monotonic_ns()
@@ -134,45 +134,39 @@ class CardsObservation:
         (self.out / (name + ".png")).write_bytes(raw)
 
     def ui(self, name="ui"):
+        assert self.observer is not None, "Reviewed immediate observer required"
         self.sequence += 1
         stem = "%03d-%s" % (self.sequence, name)
         remote = self.remote_prefix + "%03d.xml" % self.sequence
         started = time.monotonic()
-        command = ["adb", "shell", "uiautomator", "dump", "--compressed", remote]
-        diagnostic = {"command": command, "remote_fresh_path": remote}
         try:
-            result = subprocess.run(command, capture_output=True, text=True, timeout=30)
-        except subprocess.TimeoutExpired as error:
-            decode = lambda value: value.decode(errors="replace") if isinstance(value, bytes) else value or ""
-            diagnostic.update(exit_code=None, timed_out=True, stdout=decode(error.stdout), stderr=decode(error.stderr))
-            (self.out / (stem + "-dump.json")).write_text(json.dumps(diagnostic, indent=2) + "\n")
-            raise
-        diagnostic.update(exit_code=result.returncode, stdout=result.stdout, stderr=result.stderr)
-        (self.out / (stem + "-dump.json")).write_text(json.dumps(diagnostic, indent=2) + "\n")
-        if result.returncode:
-            raise RuntimeError("Hierarchy dump command failed (%d): %s; see %s-dump.json" %
-                               (result.returncode, result.stderr[-1500:], stem))
-        present = subprocess.run(["adb", "shell", "test", "-s", remote],
-                                 capture_output=True, text=True, timeout=30)
-        diagnostic.update(nonempty_check_exit_code=present.returncode,
-                          nonempty_check_stdout=present.stdout, nonempty_check_stderr=present.stderr)
-        (self.out / (stem + "-dump.json")).write_text(json.dumps(diagnostic, indent=2) + "\n")
-        if present.returncode == 1 and not present.stdout.strip() and not present.stderr.strip():
-            self.events.append({"observation_miss": stem, "reason": "NO_FRESH_NONEMPTY_XML",
-                                "dump_exit_code": result.returncode,
+            raw, metadata, capture_started = self.observer.capture(stem, remote)
+        except MissingHierarchy as error:
+            self.latest_snapshot = None
+            self.events.append({"observation_miss": stem, "reason": str(error),
                                 "native_hierarchy_seconds": round(time.monotonic() - started, 3)})
-            raise MissingHierarchy("No fresh nonempty hierarchy: %s; dump stdout=%r stderr=%r; see %s-dump.json" %
-                                   (remote, result.stdout, result.stderr, stem))
-        if present.returncode:
-            raise RuntimeError("Hierarchy file check failed (%d): %s" % (present.returncode, present.stderr[-1500:]))
-        raw = adb("shell", "cat", remote)
+            raise
         (self.out / (stem + ".xml")).write_text(raw)
         snap = Snapshot(raw)
-        self.events.append({"observation": stem, "native_hierarchy_seconds": round(time.monotonic() - started, 3)})
+        snap.capture_started = capture_started
+        snap.active_bounds = intersect(tuple(metadata["root_bounds"]), (0, 0, *metadata["display_size"]))
+        snap.active_window_id = metadata["window_id"]
+        self.latest_snapshot = snap
+        self.events.append({"observation": stem, "native_hierarchy_seconds": round(time.monotonic() - started, 3),
+                            "active_window_id": snap.active_window_id})
         return snap
 
+    def guard_snapshot(self, snap):
+        assert snap is self.latest_snapshot, "Only the latest current hierarchy may drive input"
+        self.observer.guard_age(snap.capture_started)
+
     def press(self, node, purpose, clip=None):
-        hit = intersect(bounds(node), clip) if clip else bounds(node)
+        snap = self.latest_snapshot
+        assert snap is not None and node in snap.nodes, "Target is not from the latest current hierarchy"
+        self.guard_snapshot(snap)
+        hit = intersect(bounds(node), snap.active_bounds)
+        if clip:
+            hit = intersect(hit, clip)
         assert positive(hit), "No visible target: " + purpose
         coordinate = center(hit)
         started = time.monotonic()
@@ -192,10 +186,11 @@ class CardsObservation:
             if sheet_scroll:
                 for candidate in reversed(snap.nodes):
                     if candidate.get("class") == "android.widget.ScrollView" and candidate.get("scrollable") == "true":
-                        box = bounds(candidate)
+                        box = intersect(bounds(candidate), snap.active_bounds)
                         if positive(box):
                             inset = max(30, (box[3] - box[1]) // 8)
                             x = (box[0] + box[2]) // 2
+                            self.guard_snapshot(snap)
                             adb("shell", "input", "swipe", str(x), str(box[3] - inset), str(x), str(box[1] + inset), "350")
                             self.events.append({"native_sheet_scroll": list(box)})
                             break
@@ -271,7 +266,7 @@ def snapshot_resources(out, name):
             "limit": "Finite process snapshots with Android's reported CPU averaging window; no leak, battery or thermal conclusion"}
 
 
-def run(signed, signature, fixtures, out):
+def run(signed, signature, fixtures, out, observer_jar, observer_receipt):
     apk, receipt, manifest = validate_inputs(signed, signature, fixtures)
     assert not out.exists(), "Fresh result directory required"
     out.mkdir(parents=True)
@@ -285,7 +280,8 @@ def run(signed, signature, fixtures, out):
               "signed_source": SOURCE, "APK_sha256": APK_SHA256, "fixture_manifest_sha256": sha256(fixtures / "FIXTURE.json"),
               "physical_Fold": "NOT_RUN", "Infinity": "NOT_LAUNCHED", "shutdown": "NOT_RUN",
               "warm_returns": [], "scroll_swipes": [], "resource_snapshots": [], "state_differences": []}
-    observation = CardsObservation(out / "journey")
+    observer = ImmediateObserver(observer_jar, observer_receipt, out / "immediate-observer")
+    observation = CardsObservation(out / "journey", observer)
     observation.out.mkdir()
     try:
         probe(apk, out / "cold-probe", APK_SHA256)
@@ -293,6 +289,7 @@ def run(signed, signature, fixtures, out):
         report["cold_welcome"] = {"sample_count": 1, "am_start_W": activity_times(cold_raw),
                                   "first_screen_observer": json.loads((out / "cold-probe/OUTCOME.json").read_text()),
                                   "limit": "Single fresh sample. Accessibility/notice observer includes overhead; no p50/p95 or clean first-frame claim."}
+        observer.prepare()
         for name, args in (("display.txt", ("shell", "dumpsys", "display")),
                            ("configuration.txt", ("shell", "am", "get-config")),
                            ("power-saving.txt", ("shell", "settings", "get", "global", "low_power"))):
@@ -306,8 +303,10 @@ def run(signed, signature, fixtures, out):
             fields = [node for node in observation.ui("source-form").nodes if node.get("class") == "android.widget.EditText"]
             assert len(fields) == 3, "Normal M3U source form must have three fields"
             observation.press(fields[index], "M3U source field " + str(index))
-            focused = [node for node in observation.ui("focused-source-form").nodes if node.get("class") == "android.widget.EditText"]
+            focused_snap = observation.ui("focused-source-form")
+            focused = [node for node in focused_snap.nodes if node.get("class") == "android.widget.EditText"]
             assert len(focused) == 3 and focused[index].get("focused") == "true", "IME moved the expected input field"
+            observation.guard_snapshot(focused_snap)
             adb("shell", "input", "text", value)
         saved_at = observation.tap(r"^TEST & SAVE$")
         for attempt in range(15):
@@ -317,6 +316,7 @@ def run(signed, signature, fixtures, out):
                 pass  # Consume this existing finite observation attempt.
             else:
                 if snap.find(r"^Return to preview$") is not None and snap.find(r"^Multi-View$") is not None:
+                    observation.guard_snapshot(snap)
                     adb("shell", "input", "keyevent", "KEYCODE_BACK")
                     observation.events.append({"navigation": "ONE_BACK_FROM_SOURCE_VALIDATION_AUTO_FULLSCREEN; NO_FULLSCREEN_BUTTON_TEST"})
                     break
@@ -335,12 +335,15 @@ def run(signed, signature, fixtures, out):
         observation.screenshot("first-cards")
         report["resource_snapshots"].append(snapshot_resources(out, "cards-initial"))
         for sample in range(1, 4):
-            before = observation.hints(observation.wait_cards())
+            home_snap = observation.wait_cards()
+            before = observation.hints(home_snap)
+            observation.guard_snapshot(home_snap)
             adb("shell", "input", "keyevent", "KEYCODE_HOME")
             started = time.monotonic()
             launch = adb("shell", "am", "start", "-W", "-n", COBRA)
             (out / ("warm-%d-launch.txt" % sample)).write_text(launch)
-            notice = acknowledge_known_notice_after_launch(launch, out / ("warm-%d-notice" % sample), native_paths)
+            notice = acknowledge_known_notice_after_launch(launch, out / ("warm-%d-notice" % sample), native_paths,
+                capture_ui=observer.notice_capture, before_notice_press=observer.guard_notice_press)
             after = observation.hints(observation.wait_cards())
             elapsed = time.monotonic() - started
             same_visible = before["visible_cards"] == after["visible_cards"]
@@ -363,11 +366,12 @@ def run(signed, signature, fixtures, out):
         for step in range(1, 9):
             snap = observation.wait_cards()
             before = observation.hints(snap)
-            box = bounds(observation.grid(snap))
+            box = intersect(bounds(observation.grid(snap)), snap.active_bounds)
             assert box[2] - box[0] >= 64 and box[3] - box[1] >= 96, "Usable native grid viewport required"
             inset = max(24, (box[3] - box[1]) // 6)
             x = (box[0] + box[2]) // 2
             started = time.monotonic()
+            observation.guard_snapshot(snap)
             adb("shell", "input", "swipe", str(x), str(box[3] - inset), str(x), str(box[1] + inset), "350")
             after = observation.hints(observation.wait_cards())
             before_positions = [(row["fixture_channel_number"], *row["bounds"]) for row in before["visible_cards"]]
@@ -411,6 +415,6 @@ def run(signed, signature, fixtures, out):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    for name in ("signed", "signature", "fixtures", "out"):
+    for name in ("signed", "signature", "fixtures", "out", "observer-jar", "observer-receipt"):
         parser.add_argument("--" + name, type=Path, required=True)
     run(**vars(parser.parse_args()))

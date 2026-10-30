@@ -36,5 +36,16 @@
   "verification_status": "QA_SOURCE_PREPARED; NO_ANDROID_OR_CI_EXECUTION_BY_AUTHOR",
   "visual_reference": "APPROVED_IMAGE_NOT_USED_OR_SUBSTITUTED; THIS_MEASURES_OLD_ACCEPTED_CARDS_ONLY",
   "local_preflight_status": "PASS_AST_SYNTAX_AND_OFFLINE_FIXTURE_COUNTS_HASHES_DETERMINISM",
-  "offline_evidence": "OFFLINE-FIXTURE-CHECKS.json"
+  "offline_evidence": "OFFLINE-FIXTURE-CHECKS.json",
+  "observer": {
+    "mode": "IMMEDIATE_EXISTING_PLATFORM_CURRENT_ROOT",
+    "source_provenance": "immediate-observer/SOURCE-PROVENANCE.json",
+    "preflight": "Required actual OS script/JAR/descriptor and exact QA JAR checks before use",
+    "action_age_seconds_max_exclusive": 3.5,
+    "BOOTCLASSPATH": "INHERITED_UNCHANGED",
+    "runtest": "NEVER_INVOKED",
+    "root_missing": "Only original bounded15source-save/10Cards polls can consume explicit null/changed-root misses",
+    "host_preparation": "20focusedtransportcontrolsPASS; build/class/source proof PASS",
+    "CI_status": "NOT_DISPATCHED; ROOT_REVIEW_PENDING"
+  }
 }

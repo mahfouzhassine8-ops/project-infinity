@@ -1,0 +1,293 @@
+{
+  "scope": "ACCEPTED_SIGNED431_FINITE_CARDS_ANDROID_BASELINE",
+  "versionCode": 2103431,
+  "signed_source": "9ccc4c362a65118eeba38a8e7e4b0de5723c69af",
+  "APK_sha256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471",
+  "fixture_manifest_sha256": "914caee752d5b9935d994d8026034e728c0dd11b804acfd71a275db7a0ce9ca7",
+  "physical_Fold": "NOT_RUN",
+  "Infinity": "NOT_LAUNCHED",
+  "shutdown": "NOT_RUN",
+  "warm_returns": [],
+  "scroll_swipes": [],
+  "resource_snapshots": [],
+  "state_differences": [],
+  "cold_welcome": {
+    "sample_count": 1,
+    "am_start_W": {
+      "TotalTime": 4556,
+      "WaitTime": 4561,
+      "LaunchState": "COLD"
+    },
+    "first_screen_observer": {
+      "runtime": "DISPOSABLE_ANDROID17_API37_X86_64_EMULATOR",
+      "physical_Fold": "NOT_RUN",
+      "shutdown": "NOT_RUN",
+      "Infinity": "NOT_LAUNCHED",
+      "serial": "emulator-5554",
+      "sdk": "37",
+      "abis": "x86_64,arm64-v8a",
+      "page_size": "16384",
+      "apk_sha256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471",
+      "APK_IO_timeout_seconds": 120,
+      "short_ADB_timeout_seconds": 30,
+      "install_client": "COMPLETED",
+      "install_confirmation": {
+        "installed_base_apk": "/data/app/~~oj7axwHCV00VXHjN6KBC6g==/com.projectinfinity.kodi-cmkVYA4v4LBA87FIN0Yl2g==/base.apk",
+        "installed_apk_sha256": "3fbf5abebdbdd9f96f30a69a213f086c617d2a9395f892dd1ce0142bf1b64471"
+      },
+      "install_seconds_including_confirmation": 98.862,
+      "Android_compatibility_notice": {
+        "coordinate": [
+          547,
+          1733
+        ],
+        "button_bounds": [
+          463,
+          1662,
+          631,
+          1804
+        ],
+        "warning": "This app isn\u2019t 16 KB compatible. LOAD segment and RELRO segment alignment checks failed. This app will be run using page size compatible mode. For best compatibility, please recompile the application with 16 KB support. For more information, see https://developer.android.com/16kb-page-size \n\nThe following libraries are not 16 KB aligned: \n\n\u2022 lib/arm64-v8a/libCryptodome_Cipher__raw_aes.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/libCryptodome_Hash__SHA1.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/libCryptodome_Cipher__raw_cast.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/libCryptodome_Hash__MD5.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/lib_imagingmath.so : LOAD segment and RELRO segment are not aligned\n\u2022 lib/arm64-v8a/libCryptodome_Hash__BLAKE2b.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/libCryptodome_Hash__MD2.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/libCryptodome_Hash__MD4.so : LOAD segment and RELRO segment are not aligned\n\u2022 lib/arm64-v8a/libdvdnav-aarch64.so : LOAD segment and RELRO segment are not aligned\n\u2022 lib/arm64-v8a/libinfinityambient.so : RELRO segment not aligned\n\u2022 lib/arm64-v8a/libCryptodome_Util__cpuid_c.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/libCryptodome_Hash__SHA224.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/lib_imagingmorph.so : LOAD segment and RELRO segment are not aligned\n\u2022 lib/arm64-v8a/libCryptodome_Math__modexp.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/libCryptodome_Util__strxor.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/libCryptodome_Hash__poly1305.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/libCryptodome_Cipher__raw_ecb.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/libinfinitycrash.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/libCryptodome_Cipher__Salsa20.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/libCryptodome_Hash__RIPEMD160.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/libshairplay.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/libCryptodome_Cipher__raw_eksblowfish.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/libCryptodome_Cipher__ARC4.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/libCryptodome_Cipher__raw_blowfish.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/libkodi.so : LOAD segment and RELRO segment are not aligned\n\u2022 lib/arm64-v8a/libCryptodome_Hash__ghash_portable.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/libCryptodome_Cipher__raw_cfb.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/lib_imagingft.so : LOAD segment and RELRO segment are not aligned\n\u2022 lib/arm64-v8a/libCryptodome_Hash__SHA384.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/libCryptodome_Cipher__raw_ofb.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/libCryptodome_Cipher__raw_ocb.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/libCryptodome_Cipher__raw_ctr.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/libCryptodome_Hash__SHA512.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/libCryptodome_Cipher__chacha20.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/libCryptodome_Cipher__raw_cbc.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/libCryptodome_Protocol__scrypt.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/libc++_shared.so : LOAD segment and RELRO segment are not aligned\n\u2022 lib/arm64-v8a/libCryptodome_PublicKey__ec_ws.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/libCryptodome_Cipher__pkcs1_decode.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/libCryptodome_Hash__keccak.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/libCryptodome_Cipher__raw_des.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/libCryptodome_Hash__SHA256.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/libCryptodome_Hash__BLAKE2s.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/lib_imagingtk.so : LOAD segment and RELRO segment are not aligned\n\u2022 lib/arm64-v8a/libCryptodome_Cipher__raw_des3.so : LOAD segment not aligned\n\u2022 lib/arm64-v8a/lib_imaging.so : LOAD segment and RELRO segment are not aligned\n\u2022 lib/arm64-v8a/libCryptodome_Cipher__raw_arc2.so : LOAD segment not aligned\n",
+        "native_members": [
+          "lib/arm64-v8a/libCryptodome_Cipher__ARC4.so",
+          "lib/arm64-v8a/libCryptodome_Cipher__Salsa20.so",
+          "lib/arm64-v8a/libCryptodome_Cipher__chacha20.so",
+          "lib/arm64-v8a/libCryptodome_Cipher__pkcs1_decode.so",
+          "lib/arm64-v8a/libCryptodome_Cipher__raw_aes.so",
+          "lib/arm64-v8a/libCryptodome_Cipher__raw_arc2.so",
+          "lib/arm64-v8a/libCryptodome_Cipher__raw_blowfish.so",
+          "lib/arm64-v8a/libCryptodome_Cipher__raw_cast.so",
+          "lib/arm64-v8a/libCryptodome_Cipher__raw_cbc.so",
+          "lib/arm64-v8a/libCryptodome_Cipher__raw_cfb.so",
+          "lib/arm64-v8a/libCryptodome_Cipher__raw_ctr.so",
+          "lib/arm64-v8a/libCryptodome_Cipher__raw_des.so",
+          "lib/arm64-v8a/libCryptodome_Cipher__raw_des3.so",
+          "lib/arm64-v8a/libCryptodome_Cipher__raw_ecb.so",
+          "lib/arm64-v8a/libCryptodome_Cipher__raw_eksblowfish.so",
+          "lib/arm64-v8a/libCryptodome_Cipher__raw_ocb.so",
+          "lib/arm64-v8a/libCryptodome_Cipher__raw_ofb.so",
+          "lib/arm64-v8a/libCryptodome_Hash__BLAKE2b.so",
+          "lib/arm64-v8a/libCryptodome_Hash__BLAKE2s.so",
+          "lib/arm64-v8a/libCryptodome_Hash__MD2.so",
+          "lib/arm64-v8a/libCryptodome_Hash__MD4.so",
+          "lib/arm64-v8a/libCryptodome_Hash__MD5.so",
+          "lib/arm64-v8a/libCryptodome_Hash__RIPEMD160.so",
+          "lib/arm64-v8a/libCryptodome_Hash__SHA1.so",
+          "lib/arm64-v8a/libCryptodome_Hash__SHA224.so",
+          "lib/arm64-v8a/libCryptodome_Hash__SHA256.so",
+          "lib/arm64-v8a/libCryptodome_Hash__SHA384.so",
+          "lib/arm64-v8a/libCryptodome_Hash__SHA512.so",
+          "lib/arm64-v8a/libCryptodome_Hash__ghash_portable.so",
+          "lib/arm64-v8a/libCryptodome_Hash__keccak.so",
+          "lib/arm64-v8a/libCryptodome_Hash__poly1305.so",
+          "lib/arm64-v8a/libCryptodome_Math__modexp.so",
+          "lib/arm64-v8a/libCryptodome_Protocol__scrypt.so",
+          "lib/arm64-v8a/libCryptodome_PublicKey__ec_ws.so",
+          "lib/arm64-v8a/libCryptodome_Util__cpuid_c.so",
+          "lib/arm64-v8a/libCryptodome_Util__strxor.so",
+          "lib/arm64-v8a/lib_imaging.so",
+          "lib/arm64-v8a/lib_imagingft.so",
+          "lib/arm64-v8a/lib_imagingmath.so",
+          "lib/arm64-v8a/lib_imagingmorph.so",
+          "lib/arm64-v8a/lib_imagingtk.so",
+          "lib/arm64-v8a/libc++_shared.so",
+          "lib/arm64-v8a/libdvdnav-aarch64.so",
+          "lib/arm64-v8a/libinfinityambient.so",
+          "lib/arm64-v8a/libinfinitycrash.so",
+          "lib/arm64-v8a/libkodi.so",
+          "lib/arm64-v8a/libshairplay.so"
+        ],
+        "action": "ANDROID_INFORMATIONAL_OK_ONLY; NO_DONT_SHOW_AGAIN_OR_COMPAT_SETTING_CHANGE"
+      },
+      "status": "COBRA_FIRST_SCREEN_OBSERVED",
+      "first_screen_seconds": 14.327,
+      "labels": [
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "\u2630  COBRA \u2022 WELCOME",
+        "Add a TV source to begin.",
+        "",
+        "LIVE TV. FAST. FOCUSED.",
+        "Connect an Xtream-compatible service or an M3U playlist. Cobra will validate it before saving it.",
+        "+  ADD TV SOURCE"
+      ]
+    },
+    "limit": "Single fresh sample. Accessibility/notice observer includes overhead; no p50/p95 or clean first-frame claim."
+  },
+  "status": "FAILED_AT_RECORDED_BASELINE_OPERATION",
+  "error": "No fresh nonempty hierarchy: /sdcard/cobra-cards-baseline-624801502922-017.xml; dump stdout='' stderr='ERROR: could not get idle state.\\n'; see 017-target-dump.json",
+  "UI_events": [
+    {
+      "observation": "001-target",
+      "native_hierarchy_seconds": 2.546
+    },
+    {
+      "coordinate_press": "ADD TV SOURCE",
+      "bounds": [
+        32,
+        1257,
+        1048,
+        1409
+      ],
+      "coordinate": [
+        540,
+        1333
+      ]
+    },
+    {
+      "observation": "002-target",
+      "native_hierarchy_seconds": 3.619
+    },
+    {
+      "coordinate_press": "Native dialog item ^M3U / M3U8 playlist$",
+      "bounds": [
+        28,
+        947,
+        1052,
+        1073
+      ],
+      "coordinate": [
+        540,
+        1010
+      ]
+    },
+    {
+      "observation": "003-source-form",
+      "native_hierarchy_seconds": 3.344
+    },
+    {
+      "coordinate_press": "M3U source field 0",
+      "bounds": [
+        75,
+        688,
+        1005,
+        825
+      ],
+      "coordinate": [
+        540,
+        756
+      ]
+    },
+    {
+      "observation": "004-focused-source-form",
+      "native_hierarchy_seconds": 4.523
+    },
+    {
+      "observation": "005-source-form",
+      "native_hierarchy_seconds": 2.39
+    },
+    {
+      "coordinate_press": "M3U source field 1",
+      "bounds": [
+        75,
+        453,
+        1005,
+        590
+      ],
+      "coordinate": [
+        540,
+        521
+      ]
+    },
+    {
+      "observation": "006-focused-source-form",
+      "native_hierarchy_seconds": 2.45
+    },
+    {
+      "observation": "007-source-form",
+      "native_hierarchy_seconds": 2.244
+    },
+    {
+      "coordinate_press": "M3U source field 2",
+      "bounds": [
+        75,
+        622,
+        1005,
+        759
+      ],
+      "coordinate": [
+        540,
+        690
+      ]
+    },
+    {
+      "observation": "008-focused-source-form",
+      "native_hierarchy_seconds": 2.139
+    },
+    {
+      "observation": "009-target",
+      "native_hierarchy_seconds": 2.155
+    },
+    {
+      "coordinate_press": "^TEST & SAVE$",
+      "bounds": [
+        736,
+        813,
+        1020,
+        955
+      ],
+      "coordinate": [
+        878,
+        884
+      ]
+    },
+    {
+      "observation": "010-source-save-return",
+      "native_hierarchy_seconds": 2.78
+    },
+    {
+      "observation_miss": "011-source-save-return",
+      "reason": "NO_FRESH_NONEMPTY_XML",
+      "dump_exit_code": 0,
+      "native_hierarchy_seconds": 2.945
+    },
+    {
+      "observation_miss": "012-source-save-return",
+      "reason": "NO_FRESH_NONEMPTY_XML",
+      "dump_exit_code": 0,
+      "native_hierarchy_seconds": 12.54
+    },
+    {
+      "observation_miss": "013-source-save-return",
+      "reason": "NO_FRESH_NONEMPTY_XML",
+      "dump_exit_code": 0,
+      "native_hierarchy_seconds": 11.936
+    },
+    {
+      "observation_miss": "014-source-save-return",
+      "reason": "NO_FRESH_NONEMPTY_XML",
+      "dump_exit_code": 0,
+      "native_hierarchy_seconds": 11.897
+    },
+    {
+      "observation_miss": "015-source-save-return",
+      "reason": "NO_FRESH_NONEMPTY_XML",
+      "dump_exit_code": 0,
+      "native_hierarchy_seconds": 11.889
+    },
+    {
+      "observation": "016-source-save-return",
+      "native_hierarchy_seconds": 2.841
+    },
+    {
+      "observation_miss": "017-target",
+      "reason": "NO_FRESH_NONEMPTY_XML",
+      "dump_exit_code": 0,
+      "native_hierarchy_seconds": 12.227
+    },
+    {
+      "observation_miss": "018-terminal",
+      "reason": "NO_FRESH_NONEMPTY_XML",
+      "dump_exit_code": 0,
+      "native_hierarchy_seconds": 11.769
+    }
+  ],
+  "diagnostic_errors": [
+    "terminal hierarchy: No fresh nonempty hierarchy: /sdcard/cobra-cards-baseline-624801502922-018.xml; dump stdout='' stderr='ERROR: could not get idle state.\\n'; see 018-terminal-dump.json"
+  ]
+}
