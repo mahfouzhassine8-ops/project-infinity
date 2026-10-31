@@ -91,6 +91,8 @@
     "test_authorized_release_route_and_frozen_guards",
     "test_workflow_keys_follow_payload_gates",
     "test_exact_member_comparison_rejects_extra_change",
-    "test_original_signed_input_required"
-  ]
+    "test_original_signed_input_required",
+    "test_native_verifier_receives_absolute_root"
+  ],
+  "preparation_correction": "Run41193823006 stopped in frozen native module verifier before any APK creation because the packaging call used relative addonsRoot. Resolve inputs/output before invoking the unchanged verifier; no signature/payload check bypassed."
 }

@@ -99,6 +99,7 @@ def compare(baseline,candidate,plan,out,sdk=None):
     return report
 
 def prepare(bundles,baseline,sdk,out):
+    bundles,baseline,sdk,out=[p.resolve() for p in (bundles,baseline,sdk,out)]
     source=head_check();prior=previous()
     require(prior['candidate_versionCode']==2103436,'PROTECTED_PREDECESSOR')
     require(not out.exists(),'FRESH_PREPARATION');out.mkdir(parents=True)

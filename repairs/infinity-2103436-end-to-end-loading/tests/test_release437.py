@@ -53,6 +53,14 @@ class ReleaseTests(unittest.TestCase):
                 self.assertEqual(report['status'],'PASS_EXACT436_APK_MEMBER_COMPARISON')
                 members['classes4.dex']=b'changed Cobra';write()
                 with self.assertRaisesRegex(Exception,'EXACT_APK_DELTA'):release.compare(base,cand,plan,d/'fail')
+    def test_native_verifier_receives_absolute_root(self):
+        # Fail before touching files, but inspect the paths as prepare admits
+        # them: the unchanged C++ verifier rejects relative addonsRoot values.
+        import inspect
+        source=inspect.getsource(release.prepare)
+        self.assertIn('bundles,baseline,sdk,out=[p.resolve() for p in (bundles,baseline,sdk,out)]',source)
+        native=(release.FIRST/'isolated-native/InfinityModuleManifest.cpp').read_text()
+        self.assertIn("addonsRoot.front() != '/'",native)
     def test_original_signed_input_required(self):
         with tempfile.TemporaryDirectory() as d:
             p=Path(d)/'wrong.apk';p.write_bytes(b'wrong baseline')
