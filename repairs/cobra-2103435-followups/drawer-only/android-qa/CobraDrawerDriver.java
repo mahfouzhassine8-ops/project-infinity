@@ -100,9 +100,16 @@ public final class CobraDrawerDriver {
    write("missing-preview-public-ancestry.json",new JSONObject().put("chain",chain).put("labels",t.labels()));throw new IllegalStateException("Original clickable Cards preview host not exposed through actual PiP ancestry");
   }finally{if(parent!=null)parent.recycle();t.close();}
  }
- static String shell(String command)throws Exception{
-  try(InputStream in=new android.os.ParcelFileDescriptor.AutoCloseInputStream(ui.executeShellCommand(command));ByteArrayOutputStream out=new ByteArrayOutputStream()){
-   byte[] buffer=new byte[8192];int n;while((n=in.read(buffer))!=-1){require(out.size()+n<8*1024*1024,"Bounded public OS dump exceeded");out.write(buffer,0,n);}return new String(out.toByteArray(),StandardCharsets.UTF_8);
+ static String shell(String... command)throws Exception{
+  // This QA main already runs as Android's shell UID. Read the child process
+  // directly: the API37 UiAutomation relay returned empty diagnostic/display
+  // streams in run41182990993. Do not infer display state from empty output.
+  Process child=new ProcessBuilder(command).redirectErrorStream(true).start();
+  try(InputStream in=child.getInputStream();ByteArrayOutputStream out=new ByteArrayOutputStream()){
+   byte[] buffer=new byte[8192];int n;while((n=in.read(buffer))!=-1){require(out.size()+n<8*1024*1024,"Bounded public OS dump exceeded");out.write(buffer,0,n);}
+   String result=new String(out.toByteArray(),StandardCharsets.UTF_8);int exit=child.waitFor();
+   steps.put(new JSONObject().put("public_OS_command",new JSONArray(Arrays.asList(command))).put("exit",exit).put("output_bytes",out.size()));
+   require(exit==0,"Public OS command failed: "+Arrays.toString(command)+" exit="+exit+" output="+result);require(!result.trim().isEmpty(),"Empty public OS command output: "+Arrays.toString(command));return result;
   }
  }
  static void raw(String name,String value)throws Exception{try(FileOutputStream out=new FileOutputStream(new File(dir,name))){out.write(value.getBytes(StandardCharsets.UTF_8));}}
@@ -137,8 +144,8 @@ public final class CobraDrawerDriver {
   }finally{if(browser!=null)browser.recycle();if(toolbar!=null)toolbar.recycle();if(preview!=null)preview.recycle();}
  }
  static void snapshot(String phase,boolean drawer)throws Exception{
-  syncInputs();String dump=shell("dumpsys activity top");raw(phase+"-activity.txt",dump);
-  raw(phase+"-display.txt",shell("wm size; wm density"));
+  syncInputs();String dump=shell("dumpsys","activity","top");raw(phase+"-activity.txt",dump);
+  raw(phase+"-display.txt",shell("wm","size")+"\n"+shell("wm","density"));
   boolean observedDrawer=nativeTextBounds("My List")!=null;require(observedDrawer==drawer,"Actual drawer state differs from selected scenario; no assumed state or further Back input");
   Tree t=new Tree();try{JSONObject state=new JSONObject().put("phase",phase).put("expected_drawer",drawer).put("actual_drawer_observed",observedDrawer).put("nodes",nodes(t)).put("structure",structure(t)).put("at_ms",SystemClock.uptimeMillis());
    if(!drawer)state.put("preview_frame",box(preview()));write(phase+"-nodes.json",state);
@@ -177,8 +184,13 @@ public final class CobraDrawerDriver {
   // Density is fixed once before app installation. A window-size transition
   // must not add a separate, potentially recreating density change to the
   // selected fold-size scenario.
-  require(shell("wm density").contains("Override density: "+density),"Expected stable test display density required");
-  raw("resize-"+width+".txt",shell("wm size "+width+"x"+height));syncInputs();
+  String reportedDensity=shell("wm","density");raw("density-before-resize-"+width+".txt",reportedDensity);
+  java.util.regex.Matcher dm=Pattern.compile("(?m)^(Physical|Override) density: ([0-9]+)\\s*$").matcher(reportedDensity);int effectiveDensity=-1;while(dm.find())effectiveDensity=Integer.parseInt(dm.group(2));
+  require(effectiveDensity==density,"Expected stable effective test display density required");
+  // wm's successful setter intentionally has no stdout. Keep its exit code,
+  // then require the nonempty independent query and actual window bounds.
+  Process resize=new ProcessBuilder("wm","size",width+"x"+height).redirectErrorStream(true).start();ByteArrayOutputStream resizeOutput=new ByteArrayOutputStream();try(InputStream in=resize.getInputStream()){byte[] b=new byte[1024];int n;while((n=in.read(b))!=-1){require(resizeOutput.size()+n<8192,"Unexpected resize output");resizeOutput.write(b,0,n);}}int resizeExit=resize.waitFor();require(resizeExit==0,"WindowManager resize failed: "+resizeOutput.toString("UTF-8"));
+  String display=shell("wm","size");raw("resize-"+width+".txt",display);require(display.contains("Override size: "+width+"x"+height)||display.contains("Physical size: "+width+"x"+height),"Actual WindowManager size query must match requested viewport");syncInputs();
   long start=SystemClock.uptimeMillis();boolean observed=false;
   for(int i=0;i<30&&SystemClock.uptimeMillis()-start<12000;i++){
    AccessibilityNodeInfo root=ui.getRootInActiveWindow();if(root!=null){Rect r=new Rect();root.getBoundsInScreen(r);boolean own=PKG.contentEquals(root.getPackageName());root.recycle();if(own&&r.width()==width){observed=true;break;}}SystemClock.sleep(100);
