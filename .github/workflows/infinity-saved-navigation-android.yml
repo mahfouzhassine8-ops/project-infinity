@@ -19,7 +19,7 @@ on:
         required: true
         type: choice
         default: select-a-feature
-        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host, infinity-performance-android, cobra-owner-host, cobra-android-launch, cobra-cards-baseline, cobra-cards-host, cobra-fold-more433, cobra-rejected434-controls, infinity-seamless-loading434]
+        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host, infinity-performance-android, cobra-owner-host, cobra-android-launch, cobra-cards-baseline, cobra-cards-host, cobra-fold-more433, cobra-rejected434-controls, infinity-seamless-loading434, cobra-drawer436-prepare, cobra-drawer436-android]
       candidate_build:
         description: Existing signed build run (no rebuild)
         required: true
@@ -32,6 +32,77 @@ concurrency:
   group: infinity-feature-${{ inputs.source_ref || github.ref }}-${{ inputs.feature || 'explicit-request' }}-${{ github.ref == 'refs/heads/work/infinity-final-corrective-from-2103407-20261025' && github.sha || 'serial' }}
   cancel-in-progress: false
 jobs:
+  cobra-drawer436-prepare:
+    name: Exact435 drawer-only owner preparation; reuse five passed host cases
+    if: github.event_name == 'workflow_dispatch' && inputs.feature == 'cobra-drawer436-prepare'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      GH_TOKEN: ${{ github.token }}
+      AUTHORIZED_SCOPE: ${{ inputs.authorization }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: "${{ inputs.source_ref }}", fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '21'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Admit exact drawer scope; no behavioral rerun or signer access
+        run: |
+          test -n "$AUTHORIZED_SCOPE"
+          test "${{ inputs.candidate_build }}" = 41125367621
+          test "$GITHUB_REF" = refs/heads/work/cobra-only-from-2103435-20261031
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git merge-base --is-ancestor 70c0e3e0ad6cf3100cce6bc599be4e79d424e803 HEAD
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 41125367621
+          name: Infinity-Combined-Owner-Components-41125367621
+          github-token: ${{ github.token }}
+          path: drawer435-components
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 41125367621
+          name: Infinity-Combined-Original-Signer-41125367621
+          github-token: ${{ github.token }}
+          path: drawer435-signed
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39867073954
+          name: Infinity-Receipt-Race-Android17-Investigation
+          github-token: ${{ github.token }}
+          path: drawer-tools
+      - uses: android-actions/setup-android@v4
+        with:
+          cmdline-tools-version: '15859902'
+          packages: build-tools;35.0.0
+          log-accepted-android-sdk-licenses: false
+      - name: Prepare exact owner and complete unsigned APK comparison
+        run: |
+          set -euo pipefail
+          curl -fL https://github.com/pxb1988/dex2jar/releases/download/v2.4/dex-tools-v2.4.zip -o drawer-dex2jar.zip
+          echo 'ee7c45eb3c1d2474a6145d8d447e651a736a22d9664b6d3d3be5a5a817dda23a  drawer-dex2jar.zip' | sha256sum -c -
+          unzip -q drawer-dex2jar.zip -d drawer-dex2jar
+          export DRAWER_DEX2JAR="$PWD/drawer-dex2jar/dex-tools-v2.4"
+          python3 repairs/cobra-2103435-followups/drawer-only/release-stage/produce.py \
+            --baseline drawer435-components --signed435 drawer435-signed/Infinity-2103435-Combined-Original-Signer.apk \
+            --jars drawer-tools/receipt-evidence/tool-jars --android drawer-tools/receipt-evidence/android-34.jar \
+            --d8 "$ANDROID_HOME/build-tools/35.0.0/lib/d8.jar" --sdk "$ANDROID_HOME/build-tools/35.0.0" --out drawer436-producer
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Cobra-Drawer436-Mutable-Owners-${{ github.run_id }}
+          path: drawer436-producer/mutable/
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 90
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Cobra-Drawer436-Preparation-Evidence-${{ github.run_id }}
+          path: drawer436-producer/evidence/
+          if-no-files-found: warn
+          retention-days: 90
   infinity-loading-host:
     name: Infinity434 seamless loading source and actual generated skin checks
     if: github.event_name == 'workflow_dispatch' && inputs.feature == 'infinity-seamless-loading434'

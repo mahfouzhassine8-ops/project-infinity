@@ -155,16 +155,19 @@ def package(baseline,owner,jars,canonical_archive,out,source):
     save(out/'PREPARATION.json',receipt)
     return receipt
 
-def compare(prepared,signed435,sdk,out,apk_out=None):
+def compare(prepared,signed435,sdk,out,apk_out=None,candidate=None):
     receipt=load(prepared/'PREPARATION.json');components=prepared/'components';catalog=load(components/'catalog.json');assert catalog==receipt['component_catalog']
     assert not out.exists();out.mkdir(parents=True)
     # Original signed bytes are streamed to a RAM fd to preserve the protected
     # baseline and avoid needing an extra780MB of workspace disk.
     fd=os.memfd_create('protected-signed435',0)
     try:
-        with ZipFile(signed435) as z:
-            names=validate_names(z);name='Infinity-2103435-Combined-Original-Signer.apk';assert name in names
-            with z.open(name) as stream:
+        with contextlib.ExitStack() as stack:
+            if signed435.suffix=='.apk':stream=stack.enter_context(signed435.open('rb'))
+            else:
+                z=stack.enter_context(ZipFile(signed435));names=validate_names(z);name='Infinity-2103435-Combined-Original-Signer.apk';assert name in names
+                stream=stack.enter_context(z.open(name))
+            with stream:
                 h=hashlib.sha256()
                 while raw:=stream.read(4*1024*1024):
                     remaining=memoryview(raw)
@@ -175,7 +178,15 @@ def compare(prepared,signed435,sdk,out,apk_out=None):
         assert re.findall(r'Signer #[0-9]+ certificate SHA-256 digest: ([0-9a-f]+)',signature)==[CERT_SHA]
         for scheme in ['v1','v2','v3']:assert re.search('Verified using '+scheme+r' scheme.*: true',signature)
         (out/'ORIGINAL435-SIGNATURE.txt').write_text(signature)
-        apk=apk_out if apk_out else MemoryAPK();assembled=combine(components,catalog,apk,VERSION)
+        if candidate:
+            apk=candidate
+            verified=subprocess.check_output([str(sdk/'apksigner'),'verify','--verbose','--print-certs',str(candidate)],text=True)
+            assert re.findall(r'Signer #[0-9]+ certificate SHA-256 digest: ([0-9a-f]+)',verified)==[CERT_SHA]
+            for scheme in ['v1','v2','v3']:assert re.search('Verified using '+scheme+r' scheme.*: true',verified)
+            run(sdk/'zipalign','-c','-P','16','4',candidate)
+            (out/'CANDIDATE-SIGNATURE.txt').write_text(verified);assembled={'unsigned_apk_sha256':None}
+        else:
+            apk=apk_out if apk_out else MemoryAPK();assembled=combine(components,catalog,apk,VERSION)
         metas={o:read_bundle(components/r['file'],r) for o,r in catalog['bundles'].items()}
         dex={};i=0
         for o in ['CHOOSER_SHELL','MINIMAL_ANDROID_CONTRACT','INFINITY','COBRA']:
@@ -183,7 +194,7 @@ def compare(prepared,signed435,sdk,out,apk_out=None):
         assert i==5
         os.lseek(fd,0,os.SEEK_SET)
         with os.fdopen(os.dup(fd),'rb') as baseline_stream,ZipFile(baseline_stream) as old,ZipFile(apk) as new:
-            old_names=set(validate_names(old))-SIGNATURE;new_names=set(validate_names(new));assert old_names==new_names
+            old_names=set(validate_names(old))-SIGNATURE;new_names=set(validate_names(new))-SIGNATURE;assert old_names==new_names
             inventory={};changed=[];native=[]
             for n in sorted(new_names):
                 with old.open(n) as a,new.open(n) as b:before=hashlib.file_digest(a,'sha256').hexdigest();after=hashlib.file_digest(b,'sha256').hexdigest()
@@ -204,6 +215,9 @@ def compare(prepared,signed435,sdk,out,apk_out=None):
             save(out/'ALL-APK-MEMBERS.json',inventory)
             result=dict(status='PASS_ACTUAL_UNSIGNED436_VS_ORIGINAL_SIGNED435_FULL_MEMBER_COMPARISON',source=receipt['source'],baseline_signed_APK_sha256=APK_SHA,baseline_original_certificate_sha256=CERT_SHA,baseline_signature_schemes=['v1','v2','v3'],prospective_versionCode=VERSION,unsigned_apk_sha256=assembled['unsigned_apk_sha256'],actual_serialized_APK_location=str(apk_out) if apk_out else 'RAM_ONLY; not persisted or installable without original signing',changed_unsigned_members=changed,unchanged_members=len(new_names)-len(changed),unchanged_native_libraries=len(native),component_zip_sha256={o:r['sha256'] for o,r in catalog['bundles'].items()},all_members_inventory_sha256=file_sha(out/'ALL-APK-MEMBERS.json'),Infinity='EXACT435_ZIP_DEX_AND_EVERY_MEMBER',Minimal_Android='EXACT435_ZIP_DEX_AND_EVERY_MEMBER',chooser='EXACT435_DEX_UI; truthful Cobra version metadata only',shutdown='NOT_CHANGED_NOT_RUN',signed_successor_APK_comparison='PENDING; no successor signed APK exists',Android_runtime='NOT_RUN',media_review='NOT_ACCESSED',registry_updated=False,accepted_pointer_updated=False)
             save(out/'APK-PRESERVATION.json',result)
+            if candidate:
+                result.update(status='PASS_SIGNED436_ORIGINAL_KEY_EXACT435_MEMBER_AND_COMPONENT_COMPARISON',signed_apk_sha256=file_sha(candidate),candidate_original_certificate_sha256=CERT_SHA,candidate_signature_schemes=['v1','v2','v3'],signed_successor_APK_comparison='PASS',actual_serialized_APK_location=str(candidate))
+                save(out/'APK-PRESERVATION.json',result)
             print(json.dumps({k:result[k] for k in ['status','changed_unsigned_members','unchanged_members','unchanged_native_libraries','signed_successor_APK_comparison']},indent=2))
     finally:
         os.close(fd)
@@ -217,4 +231,5 @@ if __name__=='__main__':
     a=sub.add_parser('compare')
     for n in ['prepared','signed435','sdk','out']:a.add_argument('--'+n,type=Path,required=True)
     a.add_argument('--apk-out',type=Path)
+    a.add_argument('--candidate',type=Path)
     args=vars(p.parse_args());phase=args.pop('phase');(package if phase=='package' else compare)(**args)
