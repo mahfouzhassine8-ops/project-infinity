@@ -14,7 +14,7 @@
     "test_background_old_profile_is_rejected",
     "test_monitor_window_change_preserves_background_until_terminal"
   ],
-  "runtime": "NOT_YET_RUN",
+  "runtime": "Linux Kodi21.2 minimal fixture PASS; signed Android application/Fold NOT VERIFIED",
   "shutdown": "FROZEN; NOT_SELECTED",
   "Cobra": "FROZEN436",
   "signing": "NOT_SELECTED_UNTIL_REMAINING_IMPLEMENTATION_AND_GATES_PASS",
@@ -31,5 +31,48 @@
     "test_cancellation_before_start_and_duplicate_start_are_idempotent",
     "test_evicted_terminal_token_still_cannot_revive_old_work",
     "test_observation_budget_bounds_memory_without_work_or_fake_success"
-  ]
+  ],
+  "coverage_functional_allowlist": [
+    "action_loading.py:_context",
+    "action_loading.py:make_monitor.LoadingMonitor.__init__",
+    "action_loading.py:make_monitor.LoadingMonitor.tick",
+    "unified/Includes_InfinityActionLoading.xml:window-local ownership expression only",
+    "unified/DialogBusy.xml:remove unconditional invisible fallback",
+    "unified XML: observer notifications for existing explicit non-protected actions; same-rectangle border includes; local frame capability onload only",
+    "action_loading.py:LoadingState.__init__",
+    "action_loading.py:LoadingState.cancel_action",
+    "action_loading.py:LoadingState.event",
+    "action_loading.py:LoadingState.tick"
+  ],
+  "selected_coverage_tests": [
+    "test_original_actions_controls_and_geometry_preserved",
+    "test_protected_xml_members_identical",
+    "test_native_busy_fallback_retains_controls",
+    "test_frame_motion_and_reduced_motion_unchanged",
+    "test_duplicate_route_is_instrumented_per_control",
+    "test_registered_windows_match_reachable_frames",
+    "test_window_local_token_isolation_and_cleanup",
+    "test_busy_dispatch_remains_observed_until_native_end",
+    "test_dispatch_without_busy_does_not_fake_readiness",
+    "test_modal_context_owns_its_controls",
+    "test_no_modal_native_sentinel_keeps_active_window"
+  ],
+  "coverage_test_kind": "Host generated-source integration and Python monitor fixtures, not native expression or Android rendering verification",
+  "selected_linux_renderer_probe": [
+    "actual_window_local_property_condition",
+    "actual_home_and_custom_window_selected_frame",
+    "actual_background_frame",
+    "actual_reduced_motion_static_frame",
+    "actual_terminal_cleanup",
+    "actual_kodi_select_dispatch_once",
+    "actual_kodi_back_retires_foreground_without_reinvocation",
+    "actual_xml_action_dispatched_notifications"
+  ],
+  "linux_probe_limits": "Isolated Debian Kodi21.2 skin fixture using exact staged include, textures and monitor. Not signed Android APK, full production skin, providers, Fold or timing benchmark. No protected services or shutdown tests.",
+  "selected_cancellation_test": "test_foreground_cancel_keeps_delayed_same_profile_background",
+  "state_regression_rerun_reason": "The focused cancellation regression reproduced global retirement rejecting another same-profile background task. Separate foreground retirement changes state lifetime logic, requiring the existing 16 selected state/monitor cases once against this source.",
+  "selected_staging_check": "unsigned_infinity_staging_roundtrip_member_comparison",
+  "selected_source_check": "python_ast_allowlist_comparison",
+  "current_status": "IMPLEMENTATION_PARTIAL_RELEASE_BLOCKED",
+  "native_fallback_limit": "Unconditional suppression removed; original panel restored, approved drawer-only universal fallback not completed"
 }

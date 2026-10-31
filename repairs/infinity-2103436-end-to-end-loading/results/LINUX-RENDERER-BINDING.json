@@ -1,0 +1,20 @@
+{
+  "overlay/script.infinity.commandcenter/action_loading.py": "8b758bba6eabd7a051213834c136a81d52c6af819ff9c6d7d1f456a45be4474f",
+  "tests/renderer_probe.py": "1a11d1d7e7ee30d19038b1eb1ca4ae63ac7a8636bbd3413e757430ed708b3c8f",
+  "tests/renderer_work.py": "24b4390f3300e3a524e2d9d183b744818157f056640b48d201037e79a35a707d",
+  "tests/prepare_renderer_fixture.py": "03196ffb517b06bbb04e8d2b141e51346f749114ffd61c824ade834e06061a1c",
+  "exact_rendered_include_sha256": "fe27f5d73dc830d184ec3cdb7793841ce0e0ddd3e06b7a57018567a4286e07e3",
+  "checks": 25,
+  "cyan_pixel_counts": {
+    "00-idle.png": 0,
+    "10-custom-selected.png": 116,
+    "10-home-selected.png": 116,
+    "11-custom-reduced-motion.png": 113,
+    "11-home-reduced-motion.png": 113,
+    "12-custom-completed.png": 0,
+    "12-home-completed.png": 0,
+    "20-background.png": 90,
+    "21-background-completed.png": 0
+  },
+  "limits": "Linux fixture only, two window owners. Fixture base frame geometry is illustrative; not an approved full-skin visual-parity test. No Android provider/Fold/timing acceptance."
+}

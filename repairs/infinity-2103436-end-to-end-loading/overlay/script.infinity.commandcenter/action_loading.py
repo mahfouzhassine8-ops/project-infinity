@@ -41,6 +41,7 @@ class LoadingState:
         self.jobs = OrderedDict()
         self.retired = OrderedDict()
         self.retired_before = -1.0
+        self.foreground_retired_before = -1.0
 
     def _retire(self, token, state="canceled"):
         if token:
@@ -51,7 +52,7 @@ class LoadingState:
 
     def cancel_action(self):
         if self.action:
-            self.retired_before = max(self.retired_before, self.action['born'])
+            self.foreground_retired_before = max(self.foreground_retired_before, self.action['born'])
             self._retire(self.action['token'])
             self.action = None
 
@@ -77,6 +78,8 @@ class LoadingState:
             return
         born = value.get('born')
         if not isinstance(born, (float, int)) or isinstance(born, bool) or not self.retired_before <= born <= now or now - born >= OBSERVATION_LIMIT:
+            return
+        if value.get('foreground') is True and born < self.foreground_retired_before:
             return
         if not context['allowed']:
             self._retire(token)
@@ -120,7 +123,9 @@ class LoadingState:
             same = all(context.get(k) == before.get(k) for k in IDENTITY)
             same = same and (context.get('dialog') in (0, 10101, 10138, 10160) or context.get('dialog') == before.get('dialog'))
             if not same or context.get('playback') != before.get('playback') or now - action['started'] >= OBSERVATION_LIMIT:
-                self.retired_before = max(self.retired_before, now)
+                # Leaving an item retires its foreground lease, not independent
+                # background starts still queued in another Python invocation.
+                self.foreground_retired_before = max(self.foreground_retired_before, now)
                 self.cancel_action()
             elif action['navigation']:
                 if context.get('busy'):
@@ -166,10 +171,9 @@ def _context(xbmc, gui, foreground=True):
         return empty
     window = gui.getCurrentWindowId()
     dialog = gui.getCurrentWindowDialogId()
-    # Favorites is a native dialog with its own focused list. Reading Home's
-    # focus beneath it can never identify the pressed Favorite or its frame.
-    # Busy/keyboard/provider dialogs still retain their original base owner.
-    if dialog == 10134:
+    # Content/input dialogs own their controls; never read a hidden Home item
+    # beneath them. Native busy/progress leases retain the initiating owner.
+    if dialog not in (0, 9999, 10101, 10138, 10160):
         window = dialog
     try:
         control = gui.Window(window).getFocusId()
@@ -186,7 +190,9 @@ def _context(xbmc, gui, foreground=True):
     identity['selection'] = hashlib.sha256((label('FolderPath')+'\0'+label('FilenameAndPath')).encode('utf-8')).hexdigest()
     profile = xbmc.getInfoLabel('System.ProfileName')
     geometry = '|'.join(str(xbmc.getInfoLabel(k)) for k in ('System.ScreenWidth', 'System.ScreenHeight'))
-    framed = '|%d|' % control in home.getProperty(PREFIX + 'FrameControls.' + str(window)) if control else False
+    local_frames = gui.Window(window).getProperty(PREFIX + 'FrameControls')
+    frames = local_frames or home.getProperty(PREFIX + 'FrameControls.' + str(window))
+    framed = '|%d|' % control in frames if control else False
     return dict(window=window, control=control, item=item, profile=profile, framed=framed,
                 geometry=geometry, dialog=dialog, allowed=True, **identity,
                 playback=str(xbmc.getInfoLabel('Player.Filenameandpath')),
@@ -238,6 +244,7 @@ def make_monitor(xbmc, gui):
             self.lock = threading.Lock()
             self.home = gui.Window(10000)
             self.published = {}
+            self.owner_window = None
             self.overflow = False
             self.epoch = uuid.uuid4().hex
             self.fingerprint = None
@@ -301,7 +308,10 @@ def make_monitor(xbmc, gui):
                             and action['target'] == value.get('target')
                             and all(str(action['owner'].get(key, '')) == str(supplied.get(key, ''))
                                     for key in ('window', 'control', 'item', *PUBLIC_IDENTITY))):
-                        self.state.cancel_action()
+                        if context.get('busy'):
+                            action['busy_seen'] = True
+                        else:
+                            self.state.cancel_action()
                 elif value.get('state') == 'action':
                     # Static XML reports only original explicit actions. No
                     # generic onclick is added to an implicit Kodi list route.
@@ -316,6 +326,20 @@ def make_monitor(xbmc, gui):
                 else:
                     self.state.event(value, now, context)
             presentation = self.state.tick(now, context)
+            owner_window = context['window'] if presentation['Active'] == 'true' else None
+            owner_changed = owner_window != self.owner_window
+            if owner_changed:
+                if self.owner_window is not None:
+                    try:
+                        gui.Window(self.owner_window).clearProperty(PREFIX + 'OwnerToken')
+                    except RuntimeError:
+                        pass  # Destroyed window cannot display the retired token.
+                self.owner_window = owner_window
+            if owner_window is not None and (owner_changed or self.published.get('Token') != presentation['Token']):
+                # Window.Property resolves in the skin control's own window.
+                # Matching its token supports all mapped native/custom windows
+                # without confusing an identically numbered control elsewhere.
+                gui.Window(owner_window).setProperty(PREFIX + 'OwnerToken', presentation['Token'])
             for key in PROPERTIES:
                 next_value = presentation[key]
                 if self.published.get(key) != next_value:

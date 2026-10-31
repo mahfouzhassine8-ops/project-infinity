@@ -1,0 +1,190 @@
+{
+  "platform": "Debian Kodi21.2 fixture, not signed APK",
+  "checks": [
+    {
+      "name": "home_native_window",
+      "passed": true
+    },
+    {
+      "name": "home_registered_existing_border",
+      "passed": true
+    },
+    {
+      "name": "home_selected_active",
+      "passed": true
+    },
+    {
+      "name": "home_local_token",
+      "passed": true
+    },
+    {
+      "name": "home_native_condition",
+      "passed": true
+    },
+    {
+      "name": "home_terminal_cleared",
+      "passed": true
+    },
+    {
+      "name": "custom_native_window",
+      "passed": true
+    },
+    {
+      "name": "custom_registered_existing_border",
+      "passed": true
+    },
+    {
+      "name": "custom_selected_active",
+      "passed": true
+    },
+    {
+      "name": "custom_local_token",
+      "passed": true
+    },
+    {
+      "name": "custom_native_condition",
+      "passed": true
+    },
+    {
+      "name": "custom_terminal_cleared",
+      "passed": true
+    },
+    {
+      "name": "background_global",
+      "passed": true
+    },
+    {
+      "name": "background_terminal",
+      "passed": true
+    },
+    {
+      "name": "xml_original_addon_guard_enabled",
+      "passed": true
+    },
+    {
+      "name": "native_click_complete_pending",
+      "passed": true
+    },
+    {
+      "name": "native_click_complete_cleared",
+      "passed": true
+    },
+    {
+      "name": "native_click_back_pending",
+      "passed": true
+    },
+    {
+      "name": "native_back_changed_window",
+      "passed": true
+    },
+    {
+      "name": "native_back_cleared_selected",
+      "passed": true
+    },
+    {
+      "name": "native_click_back_cleared",
+      "passed": true
+    },
+    {
+      "name": "one_original_invocation_per_click",
+      "passed": true
+    },
+    {
+      "name": "both_handlers_completed",
+      "passed": true
+    },
+    {
+      "name": "two_xml_start_notifications",
+      "passed": true
+    },
+    {
+      "name": "two_xml_dispatch_notifications",
+      "passed": true
+    }
+  ],
+  "startup_ids": [
+    10000,
+    9999
+  ],
+  "home_context": {
+    "window": 10000,
+    "control": 45,
+    "item": "",
+    "profile": "Master user",
+    "framed": true,
+    "geometry": "1280|720",
+    "dialog": 9999,
+    "allowed": true,
+    "section": "",
+    "source": "",
+    "addon": "",
+    "dbid": "",
+    "home_section": "",
+    "home_source": "",
+    "selection": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+    "playback": "",
+    "busy": false
+  },
+  "custom_context": {
+    "window": 11190,
+    "control": 45,
+    "item": "",
+    "profile": "Master user",
+    "framed": true,
+    "geometry": "1280|720",
+    "dialog": 9999,
+    "allowed": true,
+    "section": "",
+    "source": "",
+    "addon": "",
+    "dbid": "",
+    "home_section": "",
+    "home_source": "",
+    "selection": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+    "playback": "",
+    "busy": false
+  },
+  "native_notification_states": [
+    "preparing",
+    "ready",
+    "preparing",
+    "ready",
+    "preparing",
+    "ready",
+    "action",
+    "dispatched",
+    "preparing",
+    "ready",
+    "action",
+    "dispatched",
+    "preparing",
+    "ready"
+  ],
+  "fixture_trace": [
+    {
+      "state": "invoked",
+      "time": 238118.725867557
+    },
+    {
+      "state": "preparing",
+      "time": 238118.726494112
+    },
+    {
+      "state": "completed",
+      "time": 238120.526762318
+    },
+    {
+      "state": "invoked",
+      "time": 238121.914724342
+    },
+    {
+      "state": "preparing",
+      "time": 238121.915448634
+    },
+    {
+      "state": "completed",
+      "time": 238123.715914515
+    }
+  ],
+  "status": "PASS_NATIVE_STATE_AND_CAPTURE; VISUAL_PIXEL_REVIEW_SEPARATE"
+}

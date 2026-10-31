@@ -1,61 +1,59 @@
-# Signed436 loading coverage — incomplete implementation, no release claim
+# Signed436 navigation and readiness coverage
 
-The exact signed Infinity ZIP is bound in SCOPE.json. The generated
-results/SIGNED436-ACTION-INVENTORY.json contains all201 active unified skin XML
-files,4529 action/content declarations,155 existing loading-frame instances,
-and relevant calls from25 Command Center Python members. Every entry remains
-explicitly runtime-unverified. Includes, dynamic expressions and implicit Kodi
-list actions mean these counts are not a count of independently tested routes.
+`results/SIGNED436-ACTION-INVENTORY.json` remains the exact baseline inventory:
+201 active unified XML files,4,529 action/content declarations,155 original
+loading-frame instances and relevant calls from25 Command Center Python members.
+`results/READINESS-COVERAGE.json` now classifies every indexed declaration and
+binds that inventory by SHA256. `results/SCRIPT-WINDOWS.json` supplements it with
+four first-party Python-dialog XMLs. Source counts are not independently tested
+routes, and static include reachability does not prove current visibility.
 
-| Category | Actual signed source / ownership | Reliable signal and current limitation | Status |
-| --- | --- | --- | --- |
-| Home, Movies/TV/anime rails, Cinema, View All | Home.xml, Includes_InfinityHomeUnified.xml, Includes_InfinityRails.xml, Includes_CinemaBrowse.xml; explicit builtins and implicit directory lists | XML action/dispatched identifies dispatch only. It cannot prove native directory readiness. Registered item frames exist; real Kodi busy state drives drawer fallback. | Existing partial coverage; expansion/visual verification unfinished |
-| First-party library, Resume/Continue, custom lists, navigator, commands | Command Center plugin.py main wrapper, routes movies/movie-navigator/tv/tv-navigator/custom-lists/library/continue/resume/commands | Existing preparation context terminates on Python return/exception; endOfDirectory publishes results, including empty results. Publication is not proof of viewport painting. | Independent task ownership corrected and host-tested; navigation/render integration pending |
-| Search entry, provider selection, Search All/history | infinity_search.py _open_search and plugin search-provider/search-all routes | Search inventory preparation has an explicit context before modal entry. Selecting a provider is not executing a search. External execution and source resolution retain their original contracts. | Existing semantics preserved; representative runtime and broader readiness work pending |
-| Native directories, details, seasons/episodes, external providers | MyVideoNav.xml and native View_* includes; original add-on paths | Native busy lifetime is observable; arbitrary provider completion cannot be inferred from list length or builtin return. No second provider invocation or prefetch is introduced. | Safe original routing retained; fallback coverage incomplete |
-| Favorites, drawer, system settings, profile/add-on browser | DialogFavourites.xml, Custom_1198_InfinityNav.xml, Settings.xml and Kodi windows | Dialog identity and real loading ownership must be matched before hiding native feedback. These windows do not all use SideBladeLeft. | Additional frame/readiness integration unfinished |
-| Command Palette, Health/Command Center, information and settings dialogs | Custom_1190_InfinityPalette.xml; default.py, information.py, infinity_settings.py; external health add-ons | Opening a modal is not its completion. Health launch belongs to its installed add-on. Current preparation coverage cannot be generalized to these controls without mapping the actual dialog. | Safe original actions retained; new integration unfinished |
-| Playback startup, fullscreen/PiP return, recovery, subtitles/audio | Existing Kodi/player and provider contracts | Player callbacks and provider resolution are not equivalent to directory readiness. Playback/persistence code remains frozen. | No new playback behavior; current-device verification pending |
-| Background refresh, overlapping directories and resize | action_loading.LoadingState and existing service tick | Terminal events belong to individual tokens. Same-profile window/geometry changes do not finish background tasks. Profile mismatch rejects delayed work. | Four new host regressions and12 existing state regressions PASS; runtime pending |
-| Other background artwork/metadata work | Native Kodi/third-party loaders and existing first-party publishers | No authoritative universal artwork-completion callback has been established. Do not invent a counter or timer for unobservable work. | Native/external fallback; no universal coverage claim |
+| Category | Actual source/contract | Implemented coverage and remaining limit |
+| --- | --- | --- |
+| Home, Movies/TV/anime, Cinema, View All, Genres, Arcade and Sports routes where installed | Home.xml, shared Home/rail/view includes; original explicit actions or implicit content URLs | Existing border geometry retained; shared token ownership extended, explicit notification pairs added where eligible. Implicit lists remain native. Full production-screen rendering and actual providers unverified. |
+| First-party library, Resume/Continue, lists, navigators and commands | plugin.py preparation context around its existing observed route allowlist | Return/exception terminates preparation; endOfDirectory publishes including empty results. Task/window/cancel ownership corrected. Publication is not proof of viewport painting. No speculative prefetch/delayed activation. |
+| Search, provider choice, Search All/history | infinity_search.py _open_search preparation before native keyboard; plugin search-provider/search-all | Original provider-first/second-tap behavior and external source contracts unchanged. Actual notifications/preparation validated in a native fixture, not the production Search/provider UI. |
+| Native folders, details, seasons/episodes, add-on results | MyVideoNav.xml, View_* and external plugin URLs | Eligible shared frames use actual window ownership; genuine busy state retained. No result-count heuristic, extra execution, or fake readiness. Native DialogBusy fallback restored; approved all-surface presentation remains incomplete. |
+| Favorites, drawer, settings, profiles and add-on browser | DialogFavourites.xml, Custom_1198_InfinityNav.xml, Settings*, AddonBrowser.xml | Per-window capabilities and eligible existing border/explicit action coverage. Modals own their own controls, except native busy/progress leases. Not every surface has an existing drawer frame; native UI retained. |
+| Palette, Health/Command Center and information | Custom_1190/1188/1194, default.py open_health_center, information.py | Skin-owned eligible controls receive observations. Health launches its original installed add-on; no completion guessed from RunAddon. Python information dialog preparation/user interaction remains original. No wrap around doModal that would falsely animate during user input. |
+| First-party Python dialogs and native Search keyboard | InfinityInformation/ItemOptions/Search/TraktNotice XML; information.py, infinity_settings.py, native IME | Four XMLs inventoried and unchanged. No generic loading-state contract added to local option selection, error/notice display or keyboard interaction. Extended modal ownership can observe genuine preparation, but these full production dialogs were not rendered/tested here. |
+| Playback startup, fullscreen/PiP return, audio/subtitles, recovery | Existing player/provider/native contracts | Original actions and protected player/OSD/audio/subtitle/seek/volume XML preserved. No player recreation or callback change. Native feedback retained; playback/return-to-Home device verification unavailable. |
+| Background overlap, window/profile/fold changes | action_loading state and existing service cadence | Independent tasks survive same-profile window/geometry changes and foreground cancellation; wrong-profile work rejected. Host regressions pass. Linux fixture confirms global cue/terminal cleanup; Android fold/PiP behavior not tested. |
+| Artwork/metadata work without authoritative callbacks | Native and external loaders | No invented global task counter, timer or polling. Original native behavior retained. Cannot claim universal background coverage for unobservable work. |
 
-## Proven defects versus unresolved delay
+## Classification totals
 
-The signed action_loading.py globally advanced a retirement watermark on any
-task completion, discarded background jobs on window/geometry changes, and
-accepted delayed background tasks from another profile. Focused regressions
-reproduce these defects against the exact signed source; the candidate corrects
-the three affected methods. No new worker, poll interval, native action,
-provider execution, persistence operation or navigation delay is added.
+- 2,882 original local UI or dynamic actions.
+- 1,165 dispatch/native-fallback declarations.
+- 235 native navigation cleanup declarations.
+- 190 native/add-on directory content declarations.
+- 45 protected declarations.
+- 7 literal Search preparation/native-modal declarations.
+- 5 literal first-party directory-preparation declarations.
 
-Signed DialogBusy.xml sets its entire content group invisible unconditionally.
-The replacement frame is not installed on every native/dialog surface. This
-requires a separately verified availability/fallback correction; the current
-checkpoint does not falsely mark it repaired or expose the old large panel.
+Dynamic URLs and shared includes mean the literal first-party totals are not
+counts of all first-party destinations. Unknown dynamic providers are explicitly
+classified with native fallback, not promoted to a verified completion contract.
 
-Two actual plain `ActivateWindow(Videos)` routes occur in
-Custom_1198_InfinityNav.xml: Library1198104 and Discover1198109. This does not
-identify the recorded tap. A focused POV item is not proof of the executed
-route. The75second delay is not reproduced, measured or repaired at this
-checkpoint. No performance gain is claimed from these host state tests.
+## Verification boundary
 
-## Runtime and media access limits
+Current evidence:28 distinct focused host cases pass;25 real Linux Kodi fixture
+assertions pass;9 screenshot cue/cleanup checks pass. The fixture proves two
+window owners, native Select/Back, XML notification delivery and actual rendering.
+It does not prove65 production windows, every provider, all themes, Fold geometry,
+frame pacing or the signed Android app. No physical timing improvement is claimed.
 
-No20741 media bytes are exposed in the workspace or current attachment tools;
-no original video/static-frame inspection is claimed. The supplied scope's
-description is secondhand evidence only.
+The signed436 DialogBusy group was unconditionally invisible. Staging removes
+that suppression while preserving native controls. Its old panel may now appear;
+this is truthful fallback, **not fulfillment of drawer-only loading everywhere**.
+No unsafe visibility shortcut is used to suppress it.
 
-The workspace has no adb, Kodi executable, /dev/kvm or attached native-ARM
-Android target. The prior authorized API37.1 x86_64 native-bridge route failed
-inside unchanged libkodi.so constructors before Kodi/Python/readiness tests
-(run40726662543; see the existing Infinity performance runtime/OUTCOME.md).
-That historical failure is not a newly executed436 result. Repeating it or
-modifying protected native libraries is not a valid substitute for a working
-runtime target. Current436 Kodi/skin execution must still be established before
-the required end-to-end visual/readiness gate can pass.
+Two plain `ActivateWindow(Videos)` declarations exist in Library1198104 and
+Discover1198109. Source does not establish either as the20741 recording's action.
+The recording remains inaccessible; no playback or static-frame review is claimed.
+The reported75-second delay is neither reproduced nor repaired by an animation.
 
-No successor version is reserved, no component is reauthenticated, no APK is
-built/signed, and no recovery baseline is changed by this checkpoint. The work
-is incomplete: remaining frame coverage, truthful native fallback, complete
-route classification, timing/runtime verification and final package gates must
-be completed before a consolidated candidate can be delivered.
+Full production Android readiness/visual acceptance, approved fallback integration,
+legitimate module authentication, signed-APK owner comparisons and signing remain
+open. See `IMPLEMENTATION.md` for the exact blockers and retained evidence. Do not
+label this continuation complete or distribute its unsigned staging ZIP.

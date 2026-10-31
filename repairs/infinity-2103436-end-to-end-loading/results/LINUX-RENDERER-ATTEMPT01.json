@@ -1,0 +1,6 @@
+{
+  "platform": "Debian Kodi21.2 fixture, not signed APK",
+  "checks": [],
+  "status": "FAIL",
+  "error": "Traceback (most recent call last):\n  File \"/workspace/project-infinity/repairs/infinity-2103436-end-to-end-loading/tests/renderer_probe.py\", line 30, in <module>\n    monitor.tick()\n    ~~~~~~~~~~~~^^\n  File \"/workspace/project-infinity/repairs/infinity-2103436-end-to-end-loading/overlay/script.infinity.commandcenter/action_loading.py\", line 266, in tick\n    context = _context(xbmc, gui, foreground)\n  File \"/workspace/project-infinity/repairs/infinity-2103436-end-to-end-loading/overlay/script.infinity.commandcenter/action_loading.py\", line 188, in _context\n    local_frames = gui.Window(window).getProperty(PREFIX + 'FrameControls')\n                   ~~~~~~~~~~^^^^^^^^\nRuntimeError: Window id does not exist\n"
+}

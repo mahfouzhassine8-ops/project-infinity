@@ -1,0 +1,15 @@
+{
+  "status": "PASS_AST_OUTSIDE_ALLOWLIST_IDENTICAL",
+  "baseline_sha256": "8f9cb8ca143f5ce3708beaadad5ca73ad69fda001be592a7f871cfbd4db736b7",
+  "candidate_sha256": "8b758bba6eabd7a051213834c136a81d52c6af819ff9c6d7d1f456a45be4474f",
+  "methods": [
+    "LoadingState.__init__",
+    "LoadingState.cancel_action",
+    "LoadingState.event",
+    "LoadingState.tick",
+    "_context",
+    "make_monitor.LoadingMonitor.__init__",
+    "make_monitor.LoadingMonitor.tick"
+  ],
+  "provider_search_plugin_service_shutdown": "Original members unchanged; no behavioral shutdown test"
+}
