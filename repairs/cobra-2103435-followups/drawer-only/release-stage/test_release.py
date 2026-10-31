@@ -22,6 +22,7 @@ class Release436ProtocolTests(unittest.TestCase):
     self.assertEqual(current['concurrency']['cancel-in-progress'],'false')
     feature=workflow(REPO/'.github/workflows/infinity-saved-navigation-android.yml')
     for selected in ['cobra-drawer436-prepare','cobra-drawer436-android']:self.assertIn("inputs.feature != '"+selected+"'",feature['jobs']['android17']['if'])
+    for job in ['cobra-drawer436-prepare','cobra-drawer436-android']:self.assertNotIn('secrets.INFINITY_',str(feature['jobs'][job]))
  def test_two_method_correction_and_five_host_tests_remain_exact70c(self):
     names=['repairs/cobra-next-from-2103427/cards-from-2103431/runtime/CobraCardsLayout.java','repairs/cobra-2103435-followups/drawer-only/runtime/CobraCardsDrawerViewport.java','repairs/cobra-2103435-followups/drawer-only/patch.py','repairs/cobra-2103435-followups/drawer-only/compile_owner.py','repairs/cobra-2103435-followups/drawer-only/CobraDrawerCorrectionTest.java','repairs/cobra-2103435-followups/drawer-only/correction-host/JUNIT.xml']
     for n in names:self.assertEqual((REPO/n).read_bytes(),frozen(CORRECTION,n),n)

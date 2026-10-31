@@ -1,0 +1,13 @@
+{
+ "selected_before_execution": true,
+ "application": "Exact once-signed436 candidate installed over original signed435 in disposable Android17 API37 emulator",
+ "setup": "Original435 normal UI creates24 synthetic channels and Cards preference, and measures required cover/inner/rotated CLOSED geometry for preservation. No drawer opened on baseline, no original-defect replay or host-test rerun.",
+ "runtime": ["cover drawer open then actual inner window change", "inner repeated drawer open/close", "scroll anchor retention", "interrupted real pointer/Back motion", "rotated inner window and cover return", "visible known decoded preview and channel continuity"],
+ "measurement": "Original OS View drawing bounds and EXTRA_DATA_RENDERING_INFO_KEY plus collection/identity/window/screenshot capture; clipped screen bounds are not raw layout width. No app callbacks or private storage injection.",
+ "platform": "Existing API37.1 google_apis_ps16k x86_64; density320 fixed before installation. Only genuine WindowManager size changes while running; these simulate usable viewports, not a physical hinge.",
+ "selected_offline_observer_tests": ["test_unclipped_native_sizes_are_independent_of_screen_occlusion", "test_drawn_and_native_layout_parameters_must_agree", "test_missing_native_collection_measurement_is_not_a_pass"],
+ "reused": "Exact70c five host cases;435 original fullscreenMore/sun/PiP and non-Cards preserved method evidence",
+ "driver": "QA-only app_process JAR; no instrumented or alternative-signed application APK",
+ "physical_Fold": "NOT_RUN; user acceptance only",
+ "shutdown": "NOT_CHANGED_NOT_RUN"
+}

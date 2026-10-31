@@ -1,0 +1,72 @@
+{
+  "accepted_pointer_updated": false,
+  "baseline_source": "e0c6153588992001d84076d33fdf8f0d676c0d00",
+  "component_catalog": {
+    "bundles": {
+      "CHOOSER_SHELL": {
+        "approved_source": "7699909ba2d70669fb9b43a2b109c1d9d31440fa",
+        "digest": "f0a8b8ed92bec639270743c1f550ae96379df11ff693e1765647be0817be9ee3",
+        "file": "CHOOSER_SHELL.zip",
+        "settings_schema": "original-launch-preference",
+        "sha256": "59981594315842d156d32ecde27d1b3b817858da48daa88f49383a273a398185",
+        "version": "2103436.version-metadata.1"
+      },
+      "COBRA": {
+        "approved_source": "7699909ba2d70669fb9b43a2b109c1d9d31440fa",
+        "digest": "556d2cec4ceac4355272c4890d896a62349d3ae4ceb5d0ed9b0979b73a717d2f",
+        "file": "COBRA.zip",
+        "settings_schema": "original-plus-settings-snapshot-v1",
+        "sha256": "41d812863992d9200bbd7708cc03c4a4c048354ccb67cc4ff73ec8c5fb6bb0cb",
+        "version": "2103436.cobra.1"
+      },
+      "INFINITY": {
+        "approved_source": "3f6944a1c919ae7dad53aba3f69b9aeecb2de769",
+        "digest": "43de4ac75dcc6fcf67757837753312380ec85dee483bae059bb617e5d7afc72f",
+        "file": "INFINITY.zip",
+        "settings_schema": "original-2103420",
+        "sha256": "a99e7bb789a0817fdfc9cc10b4e1649d52a2c78f0e3375f0735c55f4a91a0336",
+        "version": "2103435.infinity.loading.1"
+      },
+      "MINIMAL_ANDROID_CONTRACT": {
+        "approved_source": "b41d51daa8b32dfee265dc9ea0abf844bff8f44e",
+        "digest": "5fb2129e146c90a498a3e9faa118ac849fbdb18a2442aca9c646b002d10c6fb6",
+        "file": "MINIMAL_ANDROID_CONTRACT.zip",
+        "settings_schema": "owner-durability-v1",
+        "sha256": "432bfb7b246a504d9550e1de39368c3b7e0946532f1c695531ed891e74ef03d8",
+        "version": "isolation-contract.1.launcher-icons.2103431"
+      }
+    },
+    "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "package": "com.projectinfinity.kodi",
+    "release_approved": false,
+    "schema": 1,
+    "source": "7699909ba2d70669fb9b43a2b109c1d9d31440fa"
+  },
+  "files": {
+    "owner-dex/COBRA/part-0.dex": "eb1d5683664924fcaebe70251822f470af7360bae504bdcf7cdb0614386e867f",
+    "owner-dex/COBRA/part-1.dex": "cf1f796e1e1c5ddb208ad9a6fe79328f40161ce07a2f69923f8aff69b136252e"
+  },
+  "functional_method_changes": {
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$State;": [
+      "physicalLayout(Landroid/app/Activity;Ljava/lang/Object;)V"
+    ],
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity;": [
+      "private cobraLayoutGuide()V"
+    ]
+  },
+  "metadata_only_method": "CobraComponent.version:2103435.cobra.1->2103436.cobra.1",
+  "new_classes": [
+    "Lcom/projectinfinity/kodi/CobraCardsDrawerViewport$Journey;",
+    "Lcom/projectinfinity/kodi/CobraCardsDrawerViewport;"
+  ],
+  "owner_build_sha256": "6f3f9e8971bc22fb20867b0ad6ce58ec246fb214e549d6c7836f6f30d3f538ed",
+  "part1_byte_identical": true,
+  "release_authority_mutated": false,
+  "shutdown": "NOT_CHANGED_NOT_RUN",
+  "signature": "NOT_INVOKED",
+  "source": "7699909ba2d70669fb9b43a2b109c1d9d31440fa",
+  "status": "PASS_PROSPECTIVE436_PREPARED_COMPONENTS_NOT_RESERVED_OR_SIGNED",
+  "unchanged_existing_Cobra_classes": 7163,
+  "verified_functional_source": "70c0e3e0ad6cf3100cce6bc599be4e79d424e803",
+  "versionCode": 2103436
+}

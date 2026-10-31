@@ -1,0 +1,72 @@
+{
+  "accepted_pointer_updated": false,
+  "baseline_APK_sha256": "dc83faed4a8eb1d2e2e116914cf15f2f1c27cc2a8653813fd6701ba300234442",
+  "baseline_signing_run": 41125367621,
+  "baseline_source": "e0c6153588992001d84076d33fdf8f0d676c0d00",
+  "component_catalog": {
+    "bundles": {
+      "CHOOSER_SHELL": {
+        "approved_source": "7699909ba2d70669fb9b43a2b109c1d9d31440fa",
+        "digest": "f0a8b8ed92bec639270743c1f550ae96379df11ff693e1765647be0817be9ee3",
+        "file": "CHOOSER_SHELL.zip",
+        "settings_schema": "original-launch-preference",
+        "sha256": "59981594315842d156d32ecde27d1b3b817858da48daa88f49383a273a398185",
+        "version": "2103436.version-metadata.1"
+      },
+      "COBRA": {
+        "approved_source": "7699909ba2d70669fb9b43a2b109c1d9d31440fa",
+        "digest": "556d2cec4ceac4355272c4890d896a62349d3ae4ceb5d0ed9b0979b73a717d2f",
+        "file": "COBRA.zip",
+        "settings_schema": "original-plus-settings-snapshot-v1",
+        "sha256": "41d812863992d9200bbd7708cc03c4a4c048354ccb67cc4ff73ec8c5fb6bb0cb",
+        "version": "2103436.cobra.1"
+      },
+      "INFINITY": {
+        "approved_source": "3f6944a1c919ae7dad53aba3f69b9aeecb2de769",
+        "digest": "43de4ac75dcc6fcf67757837753312380ec85dee483bae059bb617e5d7afc72f",
+        "file": "INFINITY.zip",
+        "settings_schema": "original-2103420",
+        "sha256": "a99e7bb789a0817fdfc9cc10b4e1649d52a2c78f0e3375f0735c55f4a91a0336",
+        "version": "2103435.infinity.loading.1"
+      },
+      "MINIMAL_ANDROID_CONTRACT": {
+        "approved_source": "b41d51daa8b32dfee265dc9ea0abf844bff8f44e",
+        "digest": "5fb2129e146c90a498a3e9faa118ac849fbdb18a2442aca9c646b002d10c6fb6",
+        "file": "MINIMAL_ANDROID_CONTRACT.zip",
+        "settings_schema": "owner-durability-v1",
+        "sha256": "432bfb7b246a504d9550e1de39368c3b7e0946532f1c695531ed891e74ef03d8",
+        "version": "isolation-contract.1.launcher-icons.2103431"
+      }
+    },
+    "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "package": "com.projectinfinity.kodi",
+    "release_approved": false,
+    "schema": 1,
+    "source": "7699909ba2d70669fb9b43a2b109c1d9d31440fa"
+  },
+  "files": {
+    "ALL-APK-MEMBERS.json": "b085bdae9051eee6f25933bc5e5d05fabd385e5b9474c33c4197b198e467d05f",
+    "APK-PRESERVATION.json": "357cd822a1de6a0392e6e155ca1b8ad35a383c371c345bbbd3bb6c6b5bcaf9e5",
+    "ORIGINAL435-SIGNATURE.txt": "daf0259134728e4bc6a7f29d66e669f8312ef87c0ed4627c2d95adebc21421b2",
+    "OWNER-BUILD.json": "6f3f9e8971bc22fb20867b0ad6ce58ec246fb214e549d6c7836f6f30d3f538ed",
+    "PREPARATION.json": "2bec8c51d07f58c5b4f184dfd4e3fb01ae9e2ac322002ca690dbca06383d18a5"
+  },
+  "host_tests_rerun": false,
+  "original_key": "NOT_ACCESSED",
+  "physical_Fold": "NOT_RUN",
+  "reused_host_tests": 5,
+  "run_id": 41178024937,
+  "shutdown": "NOT_CHANGED_NOT_RUN",
+  "source": "7699909ba2d70669fb9b43a2b109c1d9d31440fa",
+  "source_files": {
+    "repairs/cobra-2103435-followups/drawer-only/compile_owner.py": "3d125eb374d5bc12e4919a5f6eda6f3712219f724291553e7a3d330e9570a6e2",
+    "repairs/cobra-2103435-followups/drawer-only/patch.py": "2a37c918effec89e99496f69b1d31ed3c7c37e4d161c6dc44dddb633ffe3e8b0",
+    "repairs/cobra-2103435-followups/drawer-only/release-stage/SCOPE.json": "e1002e7d18a6b7189f9bcf0dd3135b0856b7e31633dbd4d862e01fac3656bb4a",
+    "repairs/cobra-2103435-followups/drawer-only/release-stage/prepare.py": "3d57ebbf5c1f79823ba380322567109a433ef99686debf0d166c41dbc5861ffe",
+    "repairs/cobra-2103435-followups/drawer-only/release-stage/produce.py": "ea8a818f30f2f91247faa9fc00956aa77b7ac32b643dfe0abf6b4fa6cba1854e",
+    "repairs/cobra-2103435-followups/drawer-only/release-stage/register.py": "c652490923de4d82b4ce437f8799856e015a2b063d294540f966b8269c92acf8",
+    "repairs/cobra-2103435-followups/drawer-only/runtime/CobraCardsDrawerViewport.java": "f9d8ea19cff084008cad3d2c0e9b17c64757d4f3a70ec9df9db3ce6bc04ed214",
+    "repairs/cobra-next-from-2103427/cards-from-2103431/runtime/CobraCardsLayout.java": "eb46d91a8f9c6ccd907cbe012fd7976b535b9348b54bd508f89b26ffdd1fa92a"
+  },
+  "status": "PASS_DRAWER436_EXACT_OWNER_AND_UNSIGNED_APK_PREPARATION"
+}
