@@ -1,0 +1,42 @@
+{
+  "baseline": "a5f721578c53e026a26cf21d929fbdad530f6d17",
+  "baseline_apk_sha256": "a1907acbcb3a36f5b2312f8a11cd4e38d8fcdbed2f435b6ab45d369adc8e9f35",
+  "selected_before_execution": true,
+  "selected_tests": [
+    "real preview to fullscreen Display press, original callbacks and visible sheet, Back/reopen",
+    "enumerate actual signed438 mode ids/labels/order",
+    "all exposed modes: matrix geometry across source ratios/pixel aspect and viewports",
+    "mode selection persistence global/channel/custom and surface/player identity",
+    "Display menu host/reveal negative controls for unrelated modes",
+    "actual candidate DEX translated to JVM host, same selected tests",
+    "global default all14 modes and global custom editor",
+    "remote DPAD activation",
+    "exact class/method and APK-member preservation"
+  ],
+  "functional_allowlist": [
+    "CobraCardsLayout.frontPlayerSheetHost",
+    "CobraCardsLayout.beginFrontCardsSheetReveal",
+    "CobraCardsLayout.displaySheetKind (new private predicate)",
+    "CobraCardsLayout.visibleDisplayPlayer (new private predicate)"
+  ],
+  "Infinity": "FROZEN437",
+  "shutdown": "FROZEN_NOT_SELECTED",
+  "root_cause": "Real input reaches original channel-aspect picker; native panel remains alpha0. Existing duplicate reveal guard excludes Display pickers. Active-player host is also not selected for these kinds when a hidden Multi-View host exists.",
+  "Java_preimage_sha256": "b7959f1b01a6cd0968b6a9f3939bb6034780162fe01f0fed1aa1541fa0c32b35",
+  "selected_release_tests": [
+    "test_authorized_release_route_and_frozen_guards",
+    "test_workflow_keys_follow_payload_gates",
+    "test_exact_member_comparison_rejects_extra_change",
+    "test_original_signed_input_required"
+  ],
+  "selected_host_methods": [
+    "fullscreenDisplayRealPress",
+    "hiddenMultiHostInnerAndNonCardsIsolation",
+    "all14TransformsSourceParResizeLateSizeAndPip",
+    "everyModeRealSelectionAndPreferenceInheritance",
+    "customSlidersPersistResetAndKeyboardActivation",
+    "globalDefaultsEveryModeAndGlobalCustom",
+    "actualWindowResizeMenuAndPlayerIdentity"
+  ],
+  "build_gate": "Exact actual438 DEX definitions; two changed classes only, no added classes, exact method budget; frozen part1"
+}

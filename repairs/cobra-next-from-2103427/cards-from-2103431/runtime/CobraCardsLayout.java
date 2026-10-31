@@ -94,14 +94,27 @@ public final class CobraCardsLayout {
    * Multi-View deliberately retains its GONE grid underneath that player.
    * Other modes and menu kinds retain their original native host selection. */
   public static FrameLayout frontPlayerSheetHost(Activity owner,String kind){
-    if(!"player-settings".equals(kind) || !cards(owner)
+    boolean display=displaySheetKind(kind);
+    if((!"player-settings".equals(kind) && !display) || !cards(owner)
         || Boolean.TRUE.equals(read(owner,"mCobraProSportsActive")))return null;
     android.content.res.Configuration configuration=owner.getResources().getConfiguration();
-    if(Math.min(configuration.screenWidthDp,configuration.screenHeightDp)>=600)return null;
+    if(Math.min(configuration.screenWidthDp,configuration.screenHeightDp)>=600 && !display)return null;
     mainThread();Object current=read(owner,"mPlayerOverlay");
     if(!(current instanceof FrameLayout))return null;
     FrameLayout player=(FrameLayout)current;
     return player.isAttachedToWindow() && player.isShown()?player:null;
+  }
+
+  /** Existing Display pickers/editors only; no channel-card or other menus. */
+  private static boolean displaySheetKind(String kind){
+    return "aspect".equals(kind) || "channel-aspect".equals(kind)
+        || "default-aspect".equals(kind) || "custom-aspect".equals(kind)
+        || "channel-custom-aspect".equals(kind);
+  }
+  private static boolean visibleDisplayPlayer(Activity owner){
+    Object value=read(owner,"mPlayerOverlay");
+    return value instanceof FrameLayout && ((FrameLayout)value).isAttachedToWindow()
+        && ((FrameLayout)value).isShown();
   }
 
   /** Alpha zero can persist until the animator's first frame. A second layout
@@ -111,9 +124,10 @@ public final class CobraCardsLayout {
   public static boolean beginFrontCardsSheetReveal(Activity owner,View panel){
     if(!cards(owner) || Boolean.TRUE.equals(read(owner,"mCobraProSportsActive")))return true;
     Object kind=read(owner,"mCobraSheetKind");
-    if(!"player-settings".equals(kind) && !"visual-settings".equals(kind))return true;
+    boolean display=displaySheetKind(String.valueOf(kind)) && visibleDisplayPlayer(owner);
+    if(!"player-settings".equals(kind) && !"visual-settings".equals(kind) && !display)return true;
     android.content.res.Configuration configuration=owner.getResources().getConfiguration();
-    if(Math.min(configuration.screenWidthDp,configuration.screenHeightDp)>=600)return true;
+    if(Math.min(configuration.screenWidthDp,configuration.screenHeightDp)>=600 && !display)return true;
     mainThread();
     if(panel==null || panel!=read(owner,"mCobraSheetPanel"))return true;
     return SHEET_REVEALS.put(panel,Boolean.TRUE)==null;

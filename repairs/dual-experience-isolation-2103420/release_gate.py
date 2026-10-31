@@ -17,7 +17,9 @@ from inventory import (APK_SHA, CERT_SHA, OWNERS, PACKAGE, SIGNATURE, HERE,
                        apk_members, canonical, digest, disassemble, file_sha,
                        load, manifest_tree, parse_dex, save, chunks, string_pool)
 
-AUTHORITY_BRANCH = 'work/cobra-only-from-2103437-20261031'
+AUTHORITY_BRANCH = 'work/cobra-fullscreen-display-from-2103438-20261031'
+DISPLAY_PROTECTED_REF = 'refs/heads/lock/infinity-cobra-2103438-user-approved-pending-one-fix-20261031'
+DISPLAY_PROTECTED_COMMIT = 'a5f721578c53e026a26cf21d929fbdad530f6d17'
 CARDS_THEME_PROTECTED_REF = 'refs/heads/lock/infinity-cobra-2103437-user-approved-20261031'
 CARDS_THEME_PROTECTED_COMMIT = '31d55543e3a01a37975c396c0291ff26d98cc4b8'
 LOADING_PROTECTED_REF = 'refs/heads/lock/infinity-cobra-2103436-user-approved-20261031'
@@ -177,8 +179,9 @@ def remote_authority(repository, expected_head):
         return subprocess.check_output(['git', '-C', str(repository), *args], text=True).strip()
     origin = git('remote', 'get-url', 'origin')
     require(origin.removesuffix('.git') == 'https://github.com/mahfouzhassine8-ops/project-infinity', 'AUTHORITY_ORIGIN')
-    remote = git('ls-remote', 'origin', 'refs/heads/' + AUTHORITY_BRANCH, PROTECTED_REF, COMBINED_PROTECTED_REF, LATEST_PROTECTED_REF, DRAWER_PROTECTED_REF, LOADING_PROTECTED_REF, CARDS_THEME_PROTECTED_REF)
+    remote = git('ls-remote', 'origin', 'refs/heads/' + AUTHORITY_BRANCH, PROTECTED_REF, COMBINED_PROTECTED_REF, LATEST_PROTECTED_REF, DRAWER_PROTECTED_REF, LOADING_PROTECTED_REF, CARDS_THEME_PROTECTED_REF, DISPLAY_PROTECTED_REF)
     refs = dict(reversed(line.split()) for line in remote.splitlines())
+    require(refs.get(DISPLAY_PROTECTED_REF) == DISPLAY_PROTECTED_COMMIT, 'DISPLAY438_APPROVED_LOCK_MOVED')
     require(refs.get(PROTECTED_REF) == PROTECTED_COMMIT, 'PROTECTED_LOCK_MOVED')
     require(refs.get(COMBINED_PROTECTED_REF) == COMBINED_PROTECTED_COMMIT, 'COMBINED_PROTECTED_LOCK_MOVED')
     require(refs.get(LATEST_PROTECTED_REF) == LATEST_PROTECTED_COMMIT, 'LATEST_APPROVED_LOCK_MOVED')

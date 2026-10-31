@@ -1,0 +1,28 @@
+{
+  "status": "PASS_DISPLAY_FOCUSED_HOST",
+  "candidate_tests": [
+    "fullscreenDisplayRealPress",
+    "hiddenMultiHostInnerAndNonCardsIsolation",
+    "all14TransformsSourceParResizeLateSizeAndPip",
+    "everyModeRealSelectionAndPreferenceInheritance",
+    "customSlidersPersistResetAndKeyboardActivation",
+    "globalDefaultsEveryModeAndGlobalCustom",
+    "actualWindowResizeMenuAndPlayerIdentity"
+  ],
+  "pass": 7,
+  "baseline_reproduction": "original panel alpha0, one original callback, actual438 DEX translated to JVM",
+  "geometry_observations": 280,
+  "actual438_baseline_bundle_sha256": "2229274553616f4febb7ef80925eddc23f6f2346bddf4eeabee18e819158399e",
+  "candidate_owner_dex": {
+    "part-0.dex": "e5d310d290de8fe7592d130161f786793d989cad2cd095b3b8496e0336997b73",
+    "part-1.dex": "70dc429bff4d2df7fe19907100d5df39d5ade973aa2679328b42d567b3d5aee1"
+  },
+  "candidate_translated_jar_sha256": "fe2e82d2070806adbcb9edd81efddd6a10b12d397a5a783779c3b4ad05897f93",
+  "baseline_translated_jar_sha256": "4f825f164210dd0e74553ec7a0859234815ac6dd9b4bd2058d913068aa56f129",
+  "test_source_sha256": "5bffce3e4ea87a04c2bb3e2cc4b09c70bea721d890c5028a281e4c055221b2d0",
+  "environment": "Robolectric API35 native graphics; DEX translated by dex2jar2.4; controlled ExoPlayer metadata/state, no decoder/network",
+  "Android_device": "NOT_RUN; no attached Android runtime/adb in workspace",
+  "physical_Fold": "PENDING",
+  "shutdown": "NOT_RUN_UNCHANGED",
+  "historical_attempts": "Retained; global test initially used wrong prefs key and assumed Custom in default menu; corrected from actual438 list (13 defaults,14 fullscreen choices). UI sheet persists after choice; harness now closes before reopening. Remote focus enters non-touch mode via requestFocusFromTouch. These harness corrections change no APK code."
+}
