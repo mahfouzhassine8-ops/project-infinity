@@ -1,0 +1,27 @@
+{
+  "status": "PASS_REVIEWED_FULL_SKIN_LOADING",
+  "android": "NOT_TESTED_FOLD_PENDING",
+  "definitions_sha256": "e50f7ec81064076fddb58dfd9c9dbe15e1a161087a299a24b5a46dd92aa1e5b0",
+  "busy_xml_sha256": "69c85c61818cc4e4fca2eaf54954d68e25b0885d3a59919728ada489fba7c499",
+  "native_assertions": 15,
+  "review": "Actual full skin Videos drawer cue, source-screen Home/Videos/Settings and native progress captures visually inspected. Overlapping foreground token does not hide native projection. Original progress with Cancel remains visible.",
+  "base_windows": {
+    "home_busy_base_window": 10025,
+    "videos_busy_base_window": 10025,
+    "settings_busy_base_window": 10025
+  },
+  "limitations": [
+    "Upstream Linux21.2, QA directory and no-op dependency registration; no production providers or protected services executed",
+    "All three origins navigate to Videos before busy; Home projection and unsupported-window fallback are source checked, not runtime accepted",
+    "Historical minimal fixture25 assertions/9 image checks retained; modified native-priority expression verified by this additional full-skin run",
+    "Full Android skin, providers, Fold, theme/multiwindow/playback acceptance pending",
+    "20741.mp4 bytes unavailable; 75-second delay neither reproduced nor claimed repaired"
+  ],
+  "failed_setup": "FULL-SKIN-FAILED-SETUP.zip is FAIL: directly opening a busy dialog had no live native lease; optimized Kodi Python ignored assert. Corrected explicit RuntimeError checks and actual directory loader used afterward.",
+  "fixture_wait": "4.5-second artificial directory delay belongs only to QA. No measured real-provider speed gain.",
+  "source_files": {
+    "skin_coverage.py": "aad4064a203c9d846546ae1f4989b97beca24247a851012804ec8a4320c85ce4",
+    "tests/full_skin_probe.py": "7f6884f765124bac742fc2dea3aaf51bfb3d46d376b522ba148c701953d4d0f1",
+    "tests/full_skin_directory.py": "8d18c1412c74ba23e6d0b045b68feffa85a4568189a0f2033208b50dbe0595d3"
+  }
+}

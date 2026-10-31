@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 from zipfile import ZipFile
 import xml.etree.ElementTree as ET
-from inventory import EXPECTED,SKIN,CC
+from baseline_contract import EXPECTED,SKIN,CC
 import skin_coverage
 
 def digest(raw):return hashlib.sha256(raw).hexdigest()
@@ -15,6 +15,24 @@ def stage(component,out):
     assert not out.exists();out.mkdir(parents=True)
     roots={};originals={};changed={};counts={}
     with ZipFile(component) as archive:
+        # Native projections must match exact signed drawer geometry, including
+        # the Videos parent offset. Never infer coordinates from screen size.
+        home=ET.fromstring(archive.read(SKIN+'unified/Home.xml'))
+        drawer=home.find('./controls/control[@id="19080"]')
+        assert drawer is not None
+        assert {k:drawer.findtext(k) for k in ('left','top','width','height')}==dict(left='10',top='6',width='78',height='122')
+        assert drawer.find('animation') is None and drawer.find('visible') is None
+        includes=ET.fromstring(archive.read(SKIN+'unified/Includes.xml'))
+        button=includes.find('./include[@name="SideBladeLeft"]/definition/control[@id="9001"]')
+        assert {k:button.findtext(k) for k in ('left','top','width','height')}==dict(left='0',top='142',width='96',height='100')
+        assert button.findtext('visible')=='String.IsEmpty(Window(Home).Property(MediaMenu))'
+        video=ET.fromstring(archive.read(SKIN+'unified/MyVideoNav.xml'));parents={c:p for p in video.iter() for c in p}
+        calls=[n for n in video.iter('include') if (n.text or '').strip()=='SideBladeLeft'];assert len(calls)==1
+        parent=parents[calls[0]];assert parent.findtext('left')=='18' and parent.findtext('top')=='18'
+        assert parent.find('animation') is None and parent.find('visible') is None
+        outer=parents[parent];assert outer.findtext('visible')=='true'
+        assert not any(outer.find(k) is not None for k in ('left','top','animation'))
+        assert parents[outer].tag=='controls'
         for name in archive.namelist():
             if name.startswith(SKIN+'unified/') and name.endswith('.xml'):
                 raw=archive.read(name);originals[name]=raw

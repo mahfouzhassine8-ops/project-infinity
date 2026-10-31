@@ -4,7 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 from zipfile import ZipFile, ZIP_STORED
-from inventory import EXPECTED, SKIN, CC
+from baseline_contract import EXPECTED, SKIN, CC
 
 def sha(data):return hashlib.sha256(data).hexdigest()
 

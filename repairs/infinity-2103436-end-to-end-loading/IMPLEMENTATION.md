@@ -1,118 +1,83 @@
-# Continuation from 925a87e3 — implementation saved, release blocked
+# Infinity loading 2.0 — final testing-candidate implementation
 
-The authoritative input remains original-key signed 2103436, source
-`7bbe08363b493146ca7ed67cb872e9a98b1d888b`. Its lock and artifacts are unchanged.
-This continuation does not reserve a version, authenticate a replacement module,
-create an APK, invoke a signer, or promote a baseline.
+Continues `04bdae87`; protected original-key 2103436 and its lock remain unchanged.
+The latest user instruction explicitly permits a testing APK with Android-only
+verification deferred to the physical Fold. No integrity gate is waived.
 
-## Production changes implemented
+## Completed functional scope
 
-- Preserve the previous independent-completion, profile ownership and background
-  resize corrections. Separate foreground retirement from the all-work cutoff:
-  leaving an item must not discard an independently queued background start.
-  A focused test first reproduced that remaining defect, then passed the fix.
-- Bind selected loading to a window-local token, rather than a fixed list of
-  four window IDs. Read local frame capabilities and the actual modal owner.
-  Real Linux Kodi exposed `9999` as the no-modal sentinel; the implementation
-  now explicitly preserves the base window for that value. That error was
-  caught in unshipped code, not introduced into signed436.
-- Keep an observed navigation cue through actual Kodi busy state. Dispatch
-  without observable busy work still clears; a returning builtin is never
-  treated as destination readiness or a reason for a fabricated wait.
-- Extend the existing shared border include to existing eligible bordered
-  buttons/focused layouts. Register 65 window XMLs through static include
-  reachability. Add 219 border instances and 913 notification pairs around
-  existing explicit actions. These are source counts, not tested workflows.
-  Duplicate routes are checked per control, not suppressed file-wide.
-- Restore native `DialogBusy.xml` fallback by removing its unconditional
-  `visible=false`. Its original controls and progress identity remain intact.
-  **This is a safety correction, not a completed drawer-only visual solution.**
-  The original panel can still appear, including alongside a frame. There is
-  no proven all-window visibility contract that safely permits hiding it.
+Retains all prior independent task completion, foreground cancellation, profile
+ownership, background resize, actual modal/window ownership and bounded cleanup
+corrections. The observer's Python source is identical to the checkpoint that
+passed 28 focused host tests and 25 Linux minimal-fixture assertions. Its seven
+allowlisted methods and unchanged remainder are recorded in PYTHON-PRESERVATION.
 
-There is no provider prefetch, duplicate original action, new worker, new poll
-interval, navigation timer, forced destination-ready event, or stored-data change.
-Implicit Kodi list navigation is not intercepted. Progress/error dialogs retain
-native behavior. Player/OSD/audio/subtitle/seek/volume/visualisation and shutdown
-XML paths are excluded from the expansion. Native libraries and services are
-not edited. Search selection, providers, plugin routes, service.py, playback and
-persistence remain original signed members.
+Shared existing border instances cover eligible explicit controls and focused
+layouts across 65 statically reachable windows: 219 additive frame calls and 913
+observer pairs. Every original action executes unchanged; no provider prefetch,
+new worker, fabricated readiness, added navigation delay or user-data operation.
+These source counts are not counts of device-tested workflows. COVERAGE.md and
+READINESS-COVERAGE.json classify all 4,529 inventoried declarations, including
+native/third-party contracts and unobservable background work.
 
-## Focused evidence
+The final native DialogBusy fallback uses its own actual native lifetime to
+project a single cyan cue at the existing Home or Videos drawer rectangle.
+Geometry is asserted against exact signed436 controls and their parent offsets.
+A matching foreground token cannot suppress this native projection. Ordinary
+selected/background frames yield while native busy or progress owns feedback.
+Other windows retain the original native busy panel. Required native progress,
+Cancel and errors are preserved. No global/native code or mandatory dialog is
+suppressed. Existing texture, color, reduced-motion and battery-saver rules stay.
 
-- Original 16 host cases preserved and rerun once after the new cancellation
-  boundary changed the state machine: all pass. The rerun reason is in SCOPE.
-- Eleven new generated-source/monitor checks pass, plus the new cancellation
-  regression: **28 distinct focused host cases** in total. This is not a broad
-  application regression matrix.
-- A real, isolated **Debian Kodi21.2 Linux renderer fixture** passes 25 assertions:
-  Home/custom-window ownership, selected/background state, actual Kodi Select
-  dispatch, one original handler per press, Back and terminal cleanup. Nine
-  pixel-presence/absence checks confirm captured cues and cleanup. Actual native
-  action/dispatched notifications were received, not directly invoked callbacks.
-- The fixture uses exact staged border definitions/textures and current observer
-  source. It does not load the full production skin, signed Android host, user
-  profiles, providers, protected services or shutdown. Its illustrative controls
-  are not approved UI screenshots; no exact full-skin visual parity is claimed.
-- Reduced-motion capture uses the existing still texture. No production animation
-  asset, geometry, font, color or optional-motion rule was changed.
-- Final unsigned Infinity round-trip: **7,518 members; 90 changed, 7,428 identical;
-  zero added/removed**. Every changed member is enumerated in
-  `results/STAGING-PRESERVATION.json`. Original XML actions/control geometry are
-  preserved after removing only the new marker-bound observers/frame calls.
-  Python AST outside seven explicitly allowed functions is identical.
+## Focused verification and honest limits
 
-The unsigned component is deliberately **not installable**: original module
-manifests/signatures are retained until the legitimate authentication pipeline
-runs. These checks do not substitute for final signed-APK member comparison,
-Cobra component equality, original-key signing or install-over gates.
+The 28 host results, 25 minimal Linux assertions and nine cue-image checks from
+the checkpoint are retained. Eleven generated-source integration checks were
+rerun for the changed fallback/priority expression and pass. Four selected
+release-protocol checks pass. No shutdown test ran.
 
-## Runtime evidence provenance
+A real upstream Linux Kodi21.2 renderer loads the full signed skin XML, media
+and fonts plus the staged loading changes. QA dependency registrations and a
+controlled directory are isolated from production providers and protected
+services. Fifteen assertions pass: actual skin/origin windows, actual native
+busy, completed directories, cleanup and separate progress lifetime. Captured
+Videos drawer cues and progress/Cancel were visually reviewed, including an
+overlapping selected ownership token. This is full-skin Linux evidence, not
+Android acceptance, every-theme parity or all-provider verification.
 
-Official Debian packages were downloaded through the inherited proxy with APT's
-signed repository verification into `/tmp/infinity-kodi-renderer`; packages were
-extracted locally, not installed into the system. No APK/native library was
-replaced. A disposable Xvfb/Kodi profile ran the finite fixture. Disposal is not
-an application shutdown test. The original recordings were not accessible and
-were not inspected.
+All three tested origins activate Videos before the directory finishes. Thus
+these captures verify Videos fallback, not busy projected over Home/Settings.
+Home projection and the original unsupported-surface fallback are source checked.
+The first full-skin setup attempt did not hold a native busy lease; its ineffective
+Python asserts were replaced with explicit checks. That attempt is preserved as
+FAIL and is not counted. Subsequent tests use a genuine Kodi directory loader.
 
-The native fixture attempts are retained rather than overwritten:
-1. New dialog-owner implementation failed on actual no-modal ID9999; corrected.
-2. State checks passed; screenshots taken immediately after property changes
-   captured the preceding rendered frame. No production timing was changed.
-3. A fixture-only rendering turn before capture resolved that observation issue.
-4. Added actual Kodi Select/Back dispatch and invocation counting.
-5. Enabled a non-service QA add-on registration to exercise the original XML
-   enabled-addon guard and prove native NotifyAll delivery.
-6. Current source rerun after foreground retirement was separated; all25 pass.
+The controlled provider sleeps 4.5 seconds only in QA; it is not a benchmark or
+production delay. The user's 20741.mp4 bytes are inaccessible. The approximately
+75-second delay has not been reproduced, attributed or claimed fixed. Native
+routes that require immediate window activation retain it; retaining the prior
+screen would require an unsafe change to their native/provider contract.
 
-No repeated Android emulator attempt, diagnostic APK or signing run was used.
-`LINUX-RENDERER-BINDING.json` binds the current Python and exact rendered include.
-The original failed attempt and intermediate successes remain separately labeled.
+## Preservation and release
 
-## Remaining release-critical work
+MEMBER-SCOPE-REVIEW.json individually enumerates all 90 functional member
+changes with before/after hashes and allowed operations. Original XML actions,
+control geometry and protected player/shutdown XML compare unchanged after
+removing only marked loading additions. All provider/service/persistence source,
+DEX, fonts, images, native libraries and other owner payload stay frozen.
 
-1. **Native fallback design is incomplete.** Restoring truthful native feedback
-   prevents invisible busy UI, but does not establish the approved drawer-only
-   appearance on all native/dialog surfaces. Control.IsVisible alone does not
-   prove ancestor visibility or clipping; a stale service property is not a safe
-   basis for hiding required Kodi feedback. Do not ship this as visually complete.
-2. **Full Android workflow readiness/visual tests are unavailable.** This workspace
-   has no attached compatible ARM Android target or local adb/KVM. The existing
-   API37.1 x86 native-bridge evidence failed inside unchanged libkodi.so constructors
-   before Python (run40726662543). That is historical evidence, not a new436 test.
-   Linux fixture success does not clear this Android gate. No blind retry was made.
-3. **The reported approximately75-second delay remains unmeasured and unresolved.**
-   Video20741 bytes are unavailable. Static source does not identify its tap or
-   provider execution. Two plain Videos routes exist in Library/Discover, but
-   neither is proven to be the recorded action. No delay reduction is claimed.
-4. **Release integration/authentication and signed binary gates remain NOT RUN.**
-   Do not invoke the signer while the implementation/readiness gates above remain
-   open. A candidate APK therefore cannot yet have matching signed components,
-   a build URL or new checksums. Signed436 remains the protected recovery release.
+Required packaging exceptions: Command Center/skin version metadata, skin
+integrity manifests, original-key module manifest/signature, truthful Infinity
+last-updated label and typed APK versionCode. The chooser executable/UI and
+icons stay unchanged. Cobra and minimal/shared component ZIPs must be exact436.
 
-The next meaningful runtime step requires a reachable compatible native-ARM
-Android target running the signed baseline and the owner-authenticated candidate
-through the established release mechanism. No shared/native repair or relaxation
-of integrity checks is authorized or proposed. Physical Fold acceptance remains
-exclusively the user's; this checkpoint is not acceptance and must not be locked.
+The existing sole release workflow prepares and authenticates the changed
+Infinity module, verifies actual unsigned APK members against original signed436,
+then publishes immutable components. Registration binds official artifact digest,
+source and all components. Final signing rechecks those bindings, original owner
+payload gates and remote head before the original key can sign one APK. A final
+signed436-to-candidate member and certificate comparison is mandatory. No
+accepted pointer, lock, installation, database or physical device is changed.
+
+Packaging/signing status is pending until DELIVERY.md records an actual successful
+run and hashes. The next candidate is reserved as 2103437 only through that gate.

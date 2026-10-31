@@ -12,7 +12,7 @@ import xml.etree.ElementTree as ET
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 import skin_coverage
-from inventory import SKIN
+from baseline_contract import SKIN
 from test_task_ownership import loading, context
 
 class Window:
@@ -90,6 +90,10 @@ class CoverageTests(unittest.TestCase):
         before = ET.fromstring(self.archive.read(name)); after = ET.fromstring(self.candidate(name))
         group = before.find('./controls/control'); hidden = group.find('visible')
         self.assertEqual(hidden.text, 'false'); group.remove(hidden)
+        candidate_group=after.find('./controls/control')
+        self.assertIn('Window.IsActive(10025)',candidate_group.findtext('visible'))
+        candidate_group.remove(candidate_group.find('visible'))
+        for extra in list(after.find('controls'))[1:]:after.find('controls').remove(extra)
         self.assertEqual(tree_shape(before), tree_shape(after))
         self.assertIsNotNone(after.find('.//control[@type="progress"][@id="10"]'))
 
@@ -99,6 +103,10 @@ class CoverageTests(unittest.TestCase):
         vb = before.findall('.//visible'); va = after.findall('.//visible')
         self.assertEqual(len(vb), len(va))
         self.assertIn('Window.Property(Infinity.Loading.OwnerToken)', va[0].text)
+        self.assertIn('!Window.IsActive(progressdialog)',va[0].text)
+        param=after.find('.//param[@name="nativebusy"]')
+        self.assertEqual(param.get('default'),'false')
+        after.find('include').remove(param)
         va[0].text = vb[0].text
         self.assertEqual(tree_shape(before), tree_shape(after))
 

@@ -17,7 +17,9 @@ from inventory import (APK_SHA, CERT_SHA, OWNERS, PACKAGE, SIGNATURE, HERE,
                        apk_members, canonical, digest, disassemble, file_sha,
                        load, manifest_tree, parse_dex, save, chunks, string_pool)
 
-AUTHORITY_BRANCH = 'work/cobra-only-from-2103435-20261031'
+AUTHORITY_BRANCH = 'work/infinity-only-from-2103436-20261031'
+LOADING_PROTECTED_REF = 'refs/heads/lock/infinity-cobra-2103436-user-approved-20261031'
+LOADING_PROTECTED_COMMIT = '7bbe08363b493146ca7ed67cb872e9a98b1d888b'
 PROTECTED_REF = 'refs/heads/lock/infinity-2103420-user-approved-baseline-20261026'
 PROTECTED_COMMIT = '883c64a4de6f87077893921454de71bba850235b'
 COMBINED_PROTECTED_REF = 'refs/heads/lock/infinity-cobra-2103425-fold-approved-chooser-20261028'
@@ -173,12 +175,13 @@ def remote_authority(repository, expected_head):
         return subprocess.check_output(['git', '-C', str(repository), *args], text=True).strip()
     origin = git('remote', 'get-url', 'origin')
     require(origin.removesuffix('.git') == 'https://github.com/mahfouzhassine8-ops/project-infinity', 'AUTHORITY_ORIGIN')
-    remote = git('ls-remote', 'origin', 'refs/heads/' + AUTHORITY_BRANCH, PROTECTED_REF, COMBINED_PROTECTED_REF, LATEST_PROTECTED_REF, DRAWER_PROTECTED_REF)
+    remote = git('ls-remote', 'origin', 'refs/heads/' + AUTHORITY_BRANCH, PROTECTED_REF, COMBINED_PROTECTED_REF, LATEST_PROTECTED_REF, DRAWER_PROTECTED_REF, LOADING_PROTECTED_REF)
     refs = dict(reversed(line.split()) for line in remote.splitlines())
     require(refs.get(PROTECTED_REF) == PROTECTED_COMMIT, 'PROTECTED_LOCK_MOVED')
     require(refs.get(COMBINED_PROTECTED_REF) == COMBINED_PROTECTED_COMMIT, 'COMBINED_PROTECTED_LOCK_MOVED')
     require(refs.get(LATEST_PROTECTED_REF) == LATEST_PROTECTED_COMMIT, 'LATEST_APPROVED_LOCK_MOVED')
     require(refs.get(DRAWER_PROTECTED_REF) == DRAWER_PROTECTED_COMMIT, 'DRAWER435_APPROVED_LOCK_MOVED')
+    require(refs.get(LOADING_PROTECTED_REF) == LOADING_PROTECTED_COMMIT, 'LOADING436_APPROVED_LOCK_MOVED')
     require(refs.get('refs/heads/' + AUTHORITY_BRANCH) == expected_head, 'AUTHORITY_HEAD_RACE')
     require(git('rev-parse', 'HEAD') == expected_head, 'SOURCE_HEAD_MISMATCH')
     require(not git('status', '--porcelain', '--untracked-files=no'), 'DIRTY_TRACKED_SOURCE')

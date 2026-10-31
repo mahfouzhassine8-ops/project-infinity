@@ -23,7 +23,17 @@ def definitions(raw):
     owned='[[!$PARAM[inheritwindow] + String.IsEqual(Window(Home).Property(Infinity.Loading.Window),$PARAM[window])] | [$PARAM[inheritwindow] + ['+current+']]]'
     local='String.IsEqual(Window.Property(Infinity.Loading.OwnerToken),Window(Home).Property(Infinity.Loading.Token))'
     text=raw.decode();assert owned in text and '['+current+']' in text
-    return text.replace(owned,local).replace('['+current+']',local).encode()
+    text=text.replace(owned,local).replace('['+current+']',local)
+    # A native-owned projection remains visible even while the observer still
+    # owns the selected item beneath the modal. Native lifetime is authoritative.
+    old_global='!'+ '[String.IsEqual(Window(Home).Property(Infinity.Loading.Active),true) + '+local+']'
+    assert old_global in text
+    text=text.replace(old_global,'[$PARAM[nativebusy] | '+old_global+']')
+    text=text.replace('<param name="inheritwindow" default="false" />','<param name="inheritwindow" default="false" /><param name="nativebusy" default="false" />')
+    # The native modal owns its one visible cue. A selected/background cue must
+    # not compete with native busy/progress UI underneath it.
+    gate='[$PARAM[nativebusy] | [!Window.IsActive(busydialog) + !Window.IsActive(busydialognocancel) + !Window.IsActive(progressdialog)]] + '
+    return text.replace('<visible>','<visible>'+gate,1).encode()
 
 def transform(raw,name):
     leaf=Path(name).name
@@ -86,10 +96,21 @@ def transform(raw,name):
     return result,counts
 
 def native_busy_fallback(raw):
-    """Keep Kodi's own required busy UI whenever no safe native replacement
-    has been demonstrated. No Close/Back/cancel/progress callback is changed.
-    A service's stale visibility property may never suppress this modal lease.
+    """Native-owned drawer projection; native panel remains for other surfaces.
+
+    Both replacement and fallback are in this same native dialog, so neither
+    depends on a Python visibility lease or on an occluded underlying control.
+    Native lifetime, Back and the independent progress/error dialogs are intact.
     """
     marker=b'<!-- INFINITY_ACTION_LOADING_V1 -->\n<visible>false</visible>'
     assert raw.count(marker)==1
-    return raw.replace(marker,b'<!-- INFINITY_LOADING_V2: preserve native busy fallback; no unconditional suppression -->',1)
+    home='Window.IsActive(10000) + !Player.IsFullscreen'
+    videos='Window.IsActive(10025) + String.IsEmpty(Window(Home).Property(MediaMenu)) + !Player.IsFullscreen'
+    result=raw.replace(marker,('<!-- INFINITY_LOADING_V2 native-owned fallback -->\n<visible>![['+home+'] | ['+videos+']]</visible>').encode(),1)
+    decorations=[]
+    for condition,rect in [(home,dict(left='10',top='6',width='78',height='122')),
+                           (videos,dict(left='18',top='160',width='96',height='100'))]:
+        frame=legacy.frame_call(rect,'0',global_frame=True,window='0').decode()
+        frame=frame.replace('</include>','<param name="nativebusy" value="true" /></include>')
+        decorations.append('<control type="group"><description>Infinity native busy drawer projection</description><visible>'+escape(condition)+'</visible>'+frame+'</control>')
+    return result.replace(b'</controls>',('\n'+''.join(decorations)+'\n</controls>').encode(),1)
