@@ -1,0 +1,15 @@
+{
+  "kind": "READ_ONLY_ACTUAL_SIGNED435_METHOD_TRACE; NO_ADDITIONAL_APPLICATION_TEST",
+  "methods": {
+    "private cobraLayoutGuide()V": "1631bfaf16a463f317a238982187eb92b7c9e7a8caa1de3cf6ddc63f4f1498aa",
+    "public onConfigurationChanged(Landroid/content/res/Configuration;)V": "5950c322436c78e40838756975718be7ac24c46677808ddda0ce1c3cc79e51a6"
+  },
+  "native_layout": "cobraLayoutGuide subtracts max(0, translatedShellX+shellWidth-(decorWidth-systemInsetRight)) before deriving logical model.width",
+  "Cards_helper": "State.physicalLayout independently repeats translated-window-position right inset calculation",
+  "persistent_guide_configuration": "Attached guide branch calls cobraLayoutGuide, cobraRenderGuideBrowser and cobraRestyleGuide; it returns before later generic branch closeCobraExperienceDrawer",
+  "drawer_window_listener": "lambda$toggleCobraDrawer$41 updates the overlay panel width on root width changes; it does not normalize stage translation",
+  "implication": "Guarding only helper physicalLayout would leave native model width and column selection exposed; correcting only one initial drawer-open call would not establish open-drawer fold correctness",
+  "source_cause": "Host source defect demonstrated; mapping to complete physical recordings remains unverified",
+  "physical_video": "NOT_PERSONALLY_VIEWED: original ZIP is not exposed to current file tools/workspace",
+  "shutdown": "NOT_RUN"
+}
