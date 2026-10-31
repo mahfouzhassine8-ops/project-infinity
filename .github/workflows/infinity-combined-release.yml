@@ -1,8 +1,5 @@
 name: Infinity combined release | owner gate before original signing
 on:
-  push:
-    branches: [work/cobra-only-from-2103427-20261028]
-    paths: [repairs/dual-experience-isolation-2103420/release-authority.json]
   workflow_dispatch:
     inputs:
       operation:
@@ -123,89 +120,89 @@ jobs:
           if-no-files-found: warn
           retention-days: 90
   combined:
-    if: github.ref == 'refs/heads/work/cobra-only-from-2103427-20261028' && (github.event_name == 'push' || inputs.operation == 'final-combined')
+    name: Drawer436 original-key candidate; frozen435 Infinity and shared payload
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/cobra-only-from-2103435-20261031' && inputs.operation == 'final-combined'
     runs-on: ubuntu-22.04
-    timeout-minutes: 45
+    timeout-minutes: 40
     env:
       PYTHONDONTWRITEBYTECODE: '1'
       PYTHONPATH: repairs/dual-experience-isolation-2103420
       GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          persist-credentials: false
+        with: {fetch-depth: 0, persist-credentials: false}
       - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '21'
+        with: {distribution: temurin, java-version: '21'}
       - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Validate scope, remote authority, evidence and retired signers
+        with: {python-version: '3.12'}
+      - name: Admit exact436 authority and selected release protocol before any keys
+        id: selected
         run: |
           set -euo pipefail
-          mkdir -p release-evidence
-          git diff --name-only 782242090483982c39a78f9c4da932a4751bdafc HEAD > release-evidence/CHANGED-PATHS.txt
-          python3 - <<'PY'
+          python3 -m pip install Pillow==12.3.0 PyYAML==6.0.3
+          python3 repairs/cobra-2103435-followups/drawer-only/release-stage/test_release.py
+          python3 - <<'PYCODE'
+          import json,os
           from pathlib import Path
-          import os
           from release_gate import remote_authority
-          for name in Path('release-evidence/CHANGED-PATHS.txt').read_text().splitlines():
-              if not (name.startswith(('repairs/cobra-next-from-2103427/','repairs/infinity-seamless-loading-2103433/')) or name in (
-                  'repairs/dual-experience-isolation-2103420/release_gate.py',
-                  'repairs/dual-experience-isolation-2103420/release_authority.py',
-                  'repairs/dual-experience-isolation-2103420/ownership-reviewed-roots.json',
-                  'repairs/dual-experience-isolation-2103420/test_release_gate.py',
-                  'repairs/dual-experience-isolation-2103420/release-authority.json',
-                  '.github/workflows/infinity-saved-navigation-android.yml',
-                  '.github/workflows/infinity-combined-release.yml')):
-                  raise SystemExit('Outside authorized boundary work: ' + name)
-          remote_authority(Path('.'),os.environ['GITHUB_SHA'])
-          PY
-          python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out release-evidence/SIGNER-ROUTES.json
-          python3 -m unittest -v test_release_gate 2>&1 | tee release-evidence/HOST-NEGATIVE-CONTROLS.txt
-      - name: Recover immutable signed2103420 and matching ZIPs
-        uses: actions/download-artifact@v4
+          a=remote_authority(Path('.'),os.environ['GITHUB_SHA'])
+          assert a['candidate_versionCode']==2103436 and a['generation']==21
+          assert a['target_owners']==['COBRA','CHOOSER_SHELL']
+          run=a['owner_update_evidence']['producer_run']
+          with open(os.environ['GITHUB_OUTPUT'],'a') as out:out.write('producer_run='+str(run)+'\n')
+          PYCODE
+          python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out SIGNER-ROUTES.json
+      - uses: actions/download-artifact@v4
         with:
-          run-id: 40413893227
-          name: Infinity-2103420-P0-Original-Signer-40413893227
+          run-id: 41125367621
+          name: Infinity-Combined-Owner-Components-41125367621
           github-token: ${{ github.token }}
-          path: baseline
-      - name: Recover pinned DEX toolchain
-        uses: actions/download-artifact@v4
+          path: combined-build/components
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 41125367621
+          name: Infinity-Combined-Original-Signer-41125367621
+          github-token: ${{ github.token }}
+          path: protected435
+      - uses: actions/download-artifact@v4
         with:
           run-id: 39867073954
           name: Infinity-Receipt-Race-Android17-Investigation
           github-token: ${{ github.token }}
           path: tools
-      - name: Rebuild and verify the selected owner modules
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ steps.selected.outputs.producer_run }}
+          name: Cobra-Drawer436-Mutable-Owners-${{ steps.selected.outputs.producer_run }}
+          github-token: ${{ github.token }}
+          path: drawer436-mutable
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ steps.selected.outputs.producer_run }}
+          name: Cobra-Drawer436-Preparation-Evidence-${{ steps.selected.outputs.producer_run }}
+          github-token: ${{ github.token }}
+          path: drawer436-evidence
+      - name: Verify exact official source-bound owners and assemble original container
         run: |
           set -euo pipefail
-          python3 repairs/dual-experience-isolation-2103420/build_candidate.py \
-            --baseline baseline/p0-candidate/Infinity-2103420-P0-Corrective-SIGNED.apk \
-            --jars tools/receipt-evidence/tool-jars \
-            --android tools/receipt-evidence/android-34.jar \
-            --d8 "$ANDROID_HOME/build-tools/35.0.0/lib/d8.jar" --out combined-build
-          cp combined-build/ASSEMBLY.json release-evidence/
-          cp repairs/dual-experience-isolation-2103420/release-authority.json release-evidence/
-          cp -r repairs/dual-experience-isolation-2103420/results/scoped-correction/final release-evidence/focused-evidence
-      - name: Verify official coordinated owner and authentication evidence before APK keys
+          cp drawer436-mutable/COBRA.zip drawer436-mutable/CHOOSER_SHELL.zip drawer436-mutable/catalog.json combined-build/components/
+          python3 repairs/cobra-2103435-followups/drawer-only/release-stage/register.py check-registered \
+            --run-id "${{ steps.selected.outputs.producer_run }}" --evidence drawer436-evidence \
+            --mutable drawer436-mutable --bundles combined-build/components --out REGISTERED436-CHECK.json
+          python3 repairs/dual-experience-isolation-2103420/component_bundles.py combine \
+            --bundles combined-build/components --catalog combined-build/components/catalog.json \
+            --out combined-build/combined-unsigned.apk --version 2103436
+          python3 - <<'PYCODE'
+          import hashlib,json
+          from pathlib import Path
+          with Path('combined-build/combined-unsigned.apk').open('rb') as f:actual=hashlib.file_digest(f,'sha256').hexdigest()
+          assert actual==json.loads(Path('drawer436-evidence/APK-PRESERVATION.json').read_text())['unsigned_apk_sha256']
+          PYCODE
+      - name: Hard original pre-sign payload ownership and source guard
         run: |
-          set -euo pipefail
-          python3 repairs/cobra-next-from-2103427/cards-from-2103431/consolidated435/register_combined.py check-registered \
-            --bundles combined-build/components --work registered435-evidence
-          cp registered435-evidence/REGISTERED435-CHECK.json release-evidence/
-          cp registered435-evidence/prepared/COORDINATED-OWNERS.json release-evidence/
-          cp registered435-evidence/prepared/MODULE-AUTHENTICATION.txt release-evidence/
-      - name: Hard pre-sign gate against fresh actual APK contents
-        run: |
-          set -euo pipefail
-          generation=$(python3 -c 'from inventory import HERE,load; print(load(HERE/"release-authority.json")["generation"])')
           python3 repairs/dual-experience-isolation-2103420/release_gate.py \
             --apk combined-build/combined-unsigned.apk --jars tools/receipt-evidence/tool-jars --work gate-dex \
-            --repository . --expected-head "$GITHUB_SHA" --expected-generation "$generation" \
-            --out release-evidence/SIGNING-DECISION.json
+            --repository . --expected-head "$GITHUB_SHA" --expected-generation 21 --out SIGNING-DECISION.json
       - name: Original signer - reachable only after complete owner verification
         env:
           INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
@@ -213,72 +210,49 @@ jobs:
           INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
           INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
         run: |
-          set -euo pipefail
-          generation=$(python3 -c 'from inventory import HERE,load; print(load(HERE/"release-authority.json")["generation"])')
           python3 repairs/dual-experience-isolation-2103420/assemble.py sign \
             --apk combined-build/combined-unsigned.apk --jars tools/receipt-evidence/tool-jars --work signer-dex \
-            --repository . --expected-head "$GITHUB_SHA" --expected-generation "$generation" \
+            --repository . --expected-head "$GITHUB_SHA" --expected-generation 21 \
             --sdk "$ANDROID_HOME/build-tools/35.0.0" --out signed-combined
-          cp repairs/dual-experience-isolation-2103420/release-authority.json signed-combined/
-          cp repairs/dual-experience-isolation-2103420/DATA-AND-LIFECYCLE-CONTRACT.md signed-combined/
-      - name: Recover exact signed2103431 for complete final member comparison
-        uses: actions/download-artifact@v4
-        with:
-          run-id: 40971769136
-          name: Infinity-Combined-Original-Signer-40971769136
-          github-token: ${{ github.token }}
-          path: previous2103431
-      - name: Recover protected signed2103432 for final preservation comparison
-        uses: actions/download-artifact@v4
-        with:
-          run-id: 41021114800
-          name: Infinity-Combined-Original-Signer-41021114800
-          github-token: ${{ github.token }}
-          path: previous2103432
-      - name: Recover protected signed2103433 for full current-owner comparison
-        uses: actions/download-artifact@v4
-        with:
-          run-id: 41040277352
-          name: Infinity-Combined-Original-Signer-41040277352
-          github-token: ${{ github.token }}
-          path: previous2103433
-      - name: Recover exact rejected434 for monotonic install-over and payload comparison
-        uses: actions/download-artifact@v4
-        with:
-          run-id: 41084477130
-          name: Infinity-Combined-Original-Signer-41084477130
-          github-token: ${{ github.token }}
-          path: rejected2103434
-      - name: Verify signed APK and exact matching components; no runtime execution
+      - name: Full signed435-to-signed436 member, original certificate and matching ZIP check
         run: |
-          python3 repairs/cobra-next-from-2103427/cards-from-2103431/consolidated435/verify_delivery.py \
-            --recovery431 previous2103431/Infinity-2103431-Combined-Original-Signer.apk \
-            --recovery432 previous2103432/Infinity-2103432-Combined-Original-Signer.apk \
-            --baseline433 previous2103433/Infinity-2103433-Combined-Original-Signer.apk \
-            --rejected434 rejected2103434/Infinity-2103434-Combined-Original-Signer.apk \
-            --signed signed-combined --bundles combined-build/components \
-            --sdk "$ANDROID_HOME/build-tools/35.0.0"
-      - name: Upload signed install-over candidate
-        uses: actions/upload-artifact@v4
+          mkdir -p signed436-review
+          cp -r combined-build/components signed436-review/
+          cp drawer436-evidence/PREPARATION.json signed436-review/
+          python3 repairs/cobra-2103435-followups/drawer-only/release-stage/prepare.py compare \
+            --prepared signed436-review --signed435 protected435/Infinity-2103435-Combined-Original-Signer.apk \
+            --sdk "$ANDROID_HOME/build-tools/35.0.0" --out signed-combined/preservation \
+            --candidate signed-combined/Infinity-2103436-Combined-Original-Signer.apk
+          cp repairs/dual-experience-isolation-2103420/release-authority.json signed-combined/
+          cp SIGNING-DECISION.json REGISTERED436-CHECK.json SIGNER-ROUTES.json signed-combined/
+          python3 - <<'PYCODE'
+          from pathlib import Path
+          import hashlib
+          p=Path('combined-build/components')
+          (p/'SHA256SUMS').write_text(''.join(hashlib.sha256((p/n).read_bytes()).hexdigest()+'  '+n+'\n' for n in ['COBRA.zip','INFINITY.zip','MINIMAL_ANDROID_CONTRACT.zip','CHOOSER_SHELL.zip']))
+          PYCODE
+      - uses: actions/upload-artifact@v4
         with:
           name: Infinity-Combined-Original-Signer-${{ github.run_id }}
           path: signed-combined/
           if-no-files-found: error
           retention-days: 90
           compression-level: 6
-      - name: Upload exact independently addressable component bundles
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: Infinity-Combined-Owner-Components-${{ github.run_id }}
           path: combined-build/components/
           if-no-files-found: error
           retention-days: 90
           compression-level: 0
-      - name: Preserve verification and real refusal evidence
+      - uses: actions/upload-artifact@v4
         if: always()
-        uses: actions/upload-artifact@v4
         with:
-          name: Infinity-Combined-Gate-Evidence-${{ github.run_id }}
-          path: release-evidence/
-          if-no-files-found: error
+          name: Cobra-Drawer436-Signing-Evidence-${{ github.run_id }}
+          path: |
+            SIGNING-DECISION.json
+            REGISTERED436-CHECK.json
+            SIGNER-ROUTES.json
+            signed-combined/preservation/
+          if-no-files-found: warn
           retention-days: 90
