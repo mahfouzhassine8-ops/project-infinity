@@ -1,0 +1,23 @@
+{
+  "status": "PASS_HOST_SOURCE_OVERLAY_ONLY",
+  "comparison": {
+    "dark": {
+      "baseline_png_sha256": "3edd1b45f952e81ac4c2d58582d673a799d0b4f1dd2a5224f5d59cda5037d4e3",
+      "candidate_png_sha256": "3edd1b45f952e81ac4c2d58582d673a799d0b4f1dd2a5224f5d59cda5037d4e3",
+      "pixels_equal": true,
+      "shared_views_equal": true
+    },
+    "oled": {
+      "baseline_png_sha256": "27b387c6f0bef64c57bea7571fc3ef5e6d4e7e540d83280c66e7b2ce9ded06ee",
+      "candidate_png_sha256": "27b387c6f0bef64c57bea7571fc3ef5e6d4e7e540d83280c66e7b2ce9ded06ee",
+      "pixels_equal": true,
+      "shared_views_equal": true
+    }
+  },
+  "scope": "Robolectric API35 source overlays on prior native435 host. Not signed438 execution or physical Fold acceptance.",
+  "focused_tests": [
+    "nativePaletteAndLiveRestyle",
+    "coverAndInnerGeometrySurviveThemeChanges",
+    "captureDarkAndOledRaster"
+  ]
+}

@@ -40,3 +40,37 @@ extracted from verified437 components under /tmp/cards438/baseline-dex, disassem
 to canonical0 and canonical1. Existing pinned Android34 jar and D8 are under
 /workspace/cobra-evidence/tools; host compiler can use the existing native435
 production/support jars. Reference source remains signed437 commit31d55543.
+
+## Follow-up verified progress
+
+Final source-overlay host tests pass native palette/live restyle and cover/inner
+geometry. Geometry comparison excludes only the intentionally changed background
+paint; bounds, margins, padding, focus/clickability, model and other properties
+remain checked. Initial assertions wrongly compared loading-entry alpha and
+Light/Dark background hashes; those failed logs remain evidence. The final test
+compares the same native restyle phase and tests native colors independently.
+
+Dark and OLED each have byte-identical PNG output and identical complete shared
+view snapshots between baseline437 Java and candidate Java overlays. These are
+controlled host renders using the existing native435 fixture classpath, not APK
+or device acceptance. Final Light capture inspected after the heading-span fix.
+
+Owner compilation from actual437 component DEX succeeds: seven Cards classes
+changed, two palette-adapter classes added, 7,161 original classes exact. The
+signed drawer physicalLayout method is copied byte-for-byte into the patch
+because recompiling identical Java otherwise renumbers registers. All remaining
+method-level changes still need final review. No candidate APK is created.
+
+The original immutable ModuleDexWriter rejected the five new palette-reference
+fields. It remains unchanged. A task-local build adapter admits exactly that one
+field/name/type in five explicit Cards classes, rejects every other addition and
+all removals, and does not ship. Its exact admission and four negative cases pass
+FieldGuardTest. These changes and source pins are recorded in SCOPE/OWNER-BUILD.
+No failed original gate is relabeled PASS; the admitted field delta requires the
+final independent method/field and APK-preservation checks before signing.
+
+Current owner output: /tmp/cards438/owner-build03/owner-dex/COBRA. Remaining work:
+finish method/field review, current-owner runtime binding and responsive/lifecycle
+negative controls, matching components/unsigned APK, exact437 comparison, original
+signer workflow registration and one signed testing APK. Infinity/shared/chooser
+and the accepted437 baseline have not been changed. No release run dispatched.

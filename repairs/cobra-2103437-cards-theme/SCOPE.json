@@ -1,1 +1,30 @@
-{"baseline":"31d55543e3a01a37975c396c0291ff26d98cc4b8","baseline_apk_sha256":"6852a7e50003648e56a9f6f0f9e185a1f80f341b4bad9c4c6be7e2f02856b88c","selected_before_execution":true,"functional_scope":"Cards palette binding only; native resolver and other modes frozen","selected_tests":["signed437 light/dark/oled palette and painted Cards baseline","candidate light/dark/oled actual rendering","dark/oled pixel and geometry parity","live theme publication and recycled tiles","front/inner geometry and mode restoration"],"shutdown":"FROZEN_NOT_SELECTED","signing":"ONLY_AFTER_RENDERING_AND_EXACT_MEMBER_GATES"}
+{
+  "baseline": "31d55543e3a01a37975c396c0291ff26d98cc4b8",
+  "baseline_apk_sha256": "6852a7e50003648e56a9f6f0f9e185a1f80f341b4bad9c4c6be7e2f02856b88c",
+  "selected_before_execution": true,
+  "functional_scope": "Cards palette binding only; native resolver and other modes frozen",
+  "selected_tests": [
+    "signed437 light/dark/oled palette and painted Cards baseline",
+    "candidate light/dark/oled actual rendering",
+    "dark/oled pixel and geometry parity",
+    "live theme publication and recycled tiles",
+    "front/inner geometry and mode restoration",
+    "captureDarkAndOledRaster baseline/candidate source-overlay comparison",
+    "FieldGuardTest: exact Cards palette field plus four rejected mutations"
+  ],
+  "shutdown": "FROZEN_NOT_SELECTED",
+  "signing": "ONLY_AFTER_RENDERING_AND_EXACT_MEMBER_GATES",
+  "build_only_field_exception": {
+    "classes": [
+      "CobraCardsLayout$State",
+      "CobraCardsLayout$PanelSurface",
+      "CobraCardsTiles$Holder",
+      "CobraCardsTiles$MoreView",
+      "CobraCardsTiles$CardSurface"
+    ],
+    "only_added_field": "palette:Lcom/projectinfinity/kodi/CobraCardsTheme$Colors;",
+    "removed_fields": [],
+    "shared_writer": "UNCHANGED",
+    "reason": "Exact reviewed Cards palette references; task-local builder must reject all other field additions/removals"
+  }
+}

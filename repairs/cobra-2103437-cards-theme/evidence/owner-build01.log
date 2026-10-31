@@ -1,0 +1,18 @@
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Exception in thread "main" java.lang.IllegalStateException: Unreviewed field-set mutation Lcom/projectinfinity/kodi/CobraCardsLayout$PanelSurface;
+	at org.jf.dexlib2.writer.pool.ModuleDexWriter.require(Unknown Source)
+	at org.jf.dexlib2.writer.pool.ModuleDexWriter.restoreDefaults(Unknown Source)
+	at org.jf.dexlib2.writer.pool.ModuleDexWriter.main(Unknown Source)
+Traceback (most recent call last):
+  File "/workspace/project-infinity/repairs/cobra-2103437-cards-theme/build_owner.py", line 58, in <module>
+    if __name__=='__main__':build(Path(sys.argv[1]))
+                            ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/project-infinity/repairs/cobra-2103437-cards-theme/build_owner.py", line 48, in build
+    run('java','-cp',str(writer)+':'+jc,'org.jf.dexlib2.writer.pool.ModuleDexWriter',out/'owner-dex',out/'assignments.tsv',out/'origins.tsv',generated/'classes.dex',out/'empty.dex',*inputs)
+  File "/workspace/project-infinity/repairs/cobra-2103437-cards-theme/build_owner.py", line 9, in run
+    def run(*args):subprocess.run(list(map(str,args)),check=True)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['java', '-cp', '/tmp/cards438/owner-build01/writer:/workspace/cobra-evidence/tools/receipt-evidence/tool-jars/ST4-4.0.8.jar:/workspace/cobra-evidence/tools/receipt-evidence/tool-jars/animal-sniffer-annotations-1.17.jar:/workspace/cobra-evidence/tools/receipt-evidence/tool-jars/antlr-2.7.7.jar:/workspace/cobra-evidence/tools/receipt-evidence/tool-jars/antlr-3.5.2.jar:/workspace/cobra-evidence/tools/receipt-evidence/tool-jars/antlr-runtime-3.5.2.jar:/workspace/cobra-evidence/tools/receipt-evidence/tool-jars/baksmali-2.5.2.jar:/workspace/cobra-evidence/tools/receipt-evidence/tool-jars/checker-compat-qual-2.5.2.jar:/workspace/cobra-evidence/tools/receipt-evidence/tool-jars/dexlib2-2.5.2.jar:/workspace/cobra-evidence/tools/receipt-evidence/tool-jars/error_prone_annotations-2.2.0.jar:/workspace/cobra-evidence/tools/receipt-evidence/tool-jars/failureaccess-1.0.1.jar:/workspace/cobra-evidence/tools/receipt-evidence/tool-jars/guava-27.1-android.jar:/workspace/cobra-evidence/tools/receipt-evidence/tool-jars/j2objc-annotations-1.1.jar:/workspace/cobra-evidence/tools/receipt-evidence/tool-jars/jcommander-1.64.jar:/workspace/cobra-evidence/tools/receipt-evidence/tool-jars/jsr305-3.0.2.jar:/workspace/cobra-evidence/tools/receipt-evidence/tool-jars/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar:/workspace/cobra-evidence/tools/receipt-evidence/tool-jars/smali-2.5.2.jar:/workspace/cobra-evidence/tools/receipt-evidence/tool-jars/stringtemplate-3.2.1.jar:/workspace/cobra-evidence/tools/receipt-evidence/tool-jars/util-2.5.2.jar', 'org.jf.dexlib2.writer.pool.ModuleDexWriter', '/tmp/cards438/owner-build01/owner-dex', '/tmp/cards438/owner-build01/assignments.tsv', '/tmp/cards438/owner-build01/origins.tsv', '/tmp/cards438/owner-build01/generated/classes.dex', '/tmp/cards438/owner-build01/empty.dex', '/tmp/cards438/owner-build01/part-0.dex', '/tmp/cards438/owner-build01/part-1.dex']' returned non-zero exit status 1.
