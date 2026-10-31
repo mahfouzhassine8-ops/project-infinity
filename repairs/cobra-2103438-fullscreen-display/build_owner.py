@@ -78,7 +78,7 @@ def build(out):
   for p in target.rglob('*.smali'):
    raw=p.read_text();name=raw.splitlines()[0].split()[-1];assert name not in observed;observed[name]=raw
  assert observed.keys()==originals.keys()|changes.keys()
- altered=[n for n in originals if originals[n]!=observed[n]]
+ altered=sorted(n for n in originals if originals[n]!=observed[n])
  assert all(n in changes for n in altered)
  assert observed[component]==changes[component]
  budget=load(H/'METHOD-ALLOWLIST.json');actual={}
