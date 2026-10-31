@@ -106,7 +106,7 @@
     "COBRA": 2103438,
     "INFINITY": 2103437
   },
-  "generation": 23,
+  "generation": 24,
   "guard_schema": 2,
   "last_issued_versionCode": 2103437,
   "launcher_icon_exception": {
@@ -66554,7 +66554,20 @@
       "sha256": "cb3a6f25572858e9fb64dd21713ab1e1c1a0965d0e1d3951c59dd690c9551f5c"
     }
   },
-  "previous_authority_sha256": "1f12684942cad023ebecdbd9aebe4c75bbc074e2e9d0db76b84a0802e8fa3000",
+  "policy_review_evidence": {
+    "APK_signed_in_refused_run": false,
+    "expected_classes": [
+      "Lcom/projectinfinity/kodi/CobraCardsTheme;",
+      "Lcom/projectinfinity/kodi/CobraCardsTheme$Colors;"
+    ],
+    "owner": "COBRA",
+    "prepared_run": 41248722422,
+    "prior_signing_refusal": 41249025549,
+    "reason": "Classify exactly the reviewed Cards palette adapter; no payload or runtime changes",
+    "root": "CobraCardsTheme",
+    "source_sha256": "58bd661ed94a2a949b459bab470c095bfb48d6d84d1e3fddc178f8ea21851864"
+  },
+  "previous_authority_sha256": "ac06d127d4259b566f0687f31a3604170246f264e1b2029001f326c63785d622",
   "proofs": {
     "COMBINATION-CONTROLS.json": "bcb21adb63fefb898a8e8799d9892f76e382315518d8e94b51c42060cc5ece83",
     "OWNER-CONTRACT.json": "dd0fdfdcb7715777007984969bfac45b36f3e4ef04023b5ba1884c67904d0846",
@@ -66720,7 +66733,7 @@
     "repairs/dual-experience-isolation-2103420/component_bundles.py": "1aca1f237a1987998f243d013fde991413c491b9e72706deda4853b1b1d642d6",
     "repairs/dual-experience-isolation-2103420/create_authority.py": "be6da193e7fbc242fb84996ae7a0b463c7ede025687c7b71db14c8babfbc2672",
     "repairs/dual-experience-isolation-2103420/inventory.py": "574c64b0a15200ba6f9971a2834f6cdb629dddd5ab5418186c4d5255d6e73bcb",
-    "repairs/dual-experience-isolation-2103420/ownership-reviewed-roots.json": "abaa8b933de5921514f269fffbf1c2f103fa549fe98f286519b8aefeb4a247da",
+    "repairs/dual-experience-isolation-2103420/ownership-reviewed-roots.json": "e69445c86e276708a06465a58be7cd8d7324d5a5a63ccc27d8d07225895c1cf1",
     "repairs/dual-experience-isolation-2103420/prepare_host_tests.py": "5d2671de5b361c5dbace42a5567a736226f50957353e77eec5a60042c631a3a7",
     "repairs/dual-experience-isolation-2103420/prepare_runtime.py": "e59faac2489d7ce3b0d2deae8469d627e8f463b8c445806b3d232ec572c3d1a7",
     "repairs/dual-experience-isolation-2103420/propose_cobra_reflow.py": "31dda989cdf3bc3d3372565fcb44e7dd5d11db935c6961ac3905e4a91df23425",
@@ -66749,10 +66762,7 @@
     "repairs/dual-experience-isolation-2103420/verify_runtime.py": "b903edd3d6c3402d46613841c9ac44f0103420a64da5dff2897d14c9952e7460"
   },
   "status": "ENGINEERING_REVIEWED_FOLD_PENDING",
-  "target_owners": [
-    "COBRA",
-    "CHOOSER_SHELL"
-  ],
-  "update_kind": "owner_update",
-  "workflow_sha256": "2f60b0570c8a3d0ff68710252f7955b872cecd066f15a33769fb21758b3b01fc"
+  "target_owners": [],
+  "update_kind": "evidence_refresh",
+  "workflow_sha256": "4202defedf0a26fbe3523a6937a59987aadee1a176e968b9db619af739e880d9"
 }

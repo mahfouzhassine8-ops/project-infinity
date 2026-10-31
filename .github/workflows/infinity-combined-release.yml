@@ -34,6 +34,7 @@ jobs:
         run: |
           python3 -m pip install PyYAML==6.0.3
           python3 repairs/cobra-2103437-cards-theme/tests/test_release438.py
+          python3 repairs/cobra-2103437-cards-theme/tests/test_policy438.py
           python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out SIGNER-ROUTES.json
       - uses: actions/download-artifact@v4
         with:
@@ -102,13 +103,14 @@ jobs:
           set -euo pipefail
           python3 -m pip install PyYAML==6.0.3
           python3 repairs/cobra-2103437-cards-theme/tests/test_release438.py
+          python3 repairs/cobra-2103437-cards-theme/tests/test_policy438.py
           python3 - <<'PYCODE'
           import os
           from pathlib import Path
           from release_gate import remote_authority,require
           a=remote_authority(Path('.'),os.environ['GITHUB_SHA'])
-          require(a['candidate_versionCode']==2103438 and a['generation']==23,'EXACT438_AUTHORITY')
-          require(a['target_owners']==['COBRA','CHOOSER_SHELL'],'CARDS_ONLY')
+          require(a['candidate_versionCode']==2103438 and a['generation']==24,'EXACT438_AUTHORITY')
+          require(a['target_owners']==[] and a['update_kind']=='evidence_refresh','CARDS_ONLY')
           with open(os.environ['GITHUB_OUTPUT'],'a') as f:f.write('producer_run='+str(a['owner_update_evidence']['producer_run'])+'\n')
           PYCODE
           python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out SIGNER-ROUTES.json
@@ -133,7 +135,7 @@ jobs:
       - name: Verify official artifact bytes, registered source and exact437 preservation before keys
         run: |
           set -euo pipefail
-          python3 repairs/cobra-2103437-cards-theme/release438.py check_registered \
+          python3 repairs/cobra-2103437-cards-theme/check_registered_policy.py \
             --prepared prepared438 --run-id "${{ steps.selected.outputs.producer_run }}" --out REGISTERED438-CHECK.json
           mkdir -p combined-build
           cp -r prepared438/components combined-build/
@@ -150,7 +152,7 @@ jobs:
         run: |
           python3 repairs/dual-experience-isolation-2103420/release_gate.py \
             --apk combined-build/combined-unsigned.apk --jars tools/receipt-evidence/tool-jars --work gate-dex \
-            --repository . --expected-head "$GITHUB_SHA" --expected-generation 23 --out SIGNING-DECISION.json
+            --repository . --expected-head "$GITHUB_SHA" --expected-generation 24 --out SIGNING-DECISION.json
       - name: Original signer after all source and payload gates
         env:
           INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
@@ -160,7 +162,7 @@ jobs:
         run: |
           python3 repairs/dual-experience-isolation-2103420/assemble.py sign \
             --apk combined-build/combined-unsigned.apk --jars tools/receipt-evidence/tool-jars --work signer-dex \
-            --repository . --expected-head "$GITHUB_SHA" --expected-generation 23 \
+            --repository . --expected-head "$GITHUB_SHA" --expected-generation 24 \
             --sdk "$ANDROID_HOME/build-tools/35.0.0" --out signed-combined
       - name: Signed437-to-signed438 exact member and original certificate comparison
         run: |
