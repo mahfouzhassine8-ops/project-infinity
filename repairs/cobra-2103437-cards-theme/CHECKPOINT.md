@@ -99,3 +99,8 @@ frozen Infinity437/shared owners and the new immutable437 lock check. Its focuse
 release protocol tests pass, including wrong baseline and extra APK-member
 rejection. The actual signed437-to-candidate member comparison still must pass
 before the APK can be signed. No preparation/signing run yet exists at this note.
+
+Preparation run41248454616 failed before owner compilation/APK creation because
+the older tool archive lacks tools/d8.jar. CI now copies the existing SDK35 D8
+JAR to that path, retaining the exact pinned SHA256 assertion. No application
+source or integrity check changes for this correction.

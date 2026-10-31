@@ -57,6 +57,7 @@ jobs:
         env:
           CARDS_TOOLS_ROOT: ${{ github.workspace }}/tools
         run: |
+          cp "$ANDROID_HOME/build-tools/35.0.0/lib/d8.jar" tools/d8.jar
           python3 repairs/cobra-2103437-cards-theme/release438.py prepare \
             --bundles protected437-components --baseline protected437/Infinity-2103437-Combined-Original-Signer.apk \
             --sdk "$ANDROID_HOME/build-tools/35.0.0" --out prepared438
