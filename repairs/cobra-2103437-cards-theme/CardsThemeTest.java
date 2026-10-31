@@ -18,6 +18,17 @@ public class CardsThemeTest {
   return value;
  }
  @Before public void setup(){new CobraCardsLayoutTest().frames();}
+ @Test public void recycledLightCardsKeepNativeTextAndSelection()throws Exception{
+  CobraCardsLayoutTest.Fixture f=new CobraCardsLayoutTest.Fixture("cards");
+  f.prefs.edit().putString("cobra_appearance_mode","light").commit();CobraCardsLayoutTest.call(f.a,"cobraRestyleGuide");f.frames();
+  Object selected=CobraCardsLayoutTest.get(f.a,"mGuidePreviewChannel");
+  android.widget.GridView grid=(android.widget.GridView)CobraCardsLayoutTest.get(f.a,"mCobraGuideList");
+  int expected=((Number)CobraCardsLayoutTest.call(f.a,"cobraModeColor","text")).intValue();
+  for(int pos:new int[]{15,0}){grid.setSelection(pos);f.frames();assertTrue(grid.getChildCount()>0);
+   for(int i=0;i<grid.getChildCount();i++){View row=grid.getChildAt(i);TextView title=(TextView)CobraCardsLayoutTest.get(row,"title");assertEquals(expected,title.getCurrentTextColor());}
+   assertSame(selected,CobraCardsLayoutTest.get(f.a,"mGuidePreviewChannel"));
+  }
+ }
  @Test public void captureDarkAndOledRaster()throws Exception{
   for(String mode:new String[]{"dark","oled"}){
    CobraCardsLayoutTest.Fixture f=new CobraCardsLayoutTest.Fixture("cards");
@@ -30,6 +41,7 @@ public class CardsThemeTest {
    CobraCardsLayoutTest.Fixture f=new CobraCardsLayoutTest.Fixture("cards",size[0],size[1],size[2]);
    CobraCardsLayoutTest.call(f.a,"cobraRestyleGuide");f.frames();
    org.json.JSONObject before=geometryOnly(f.geometry());
+   assertEquals(size[0]==941?2:4,before.getJSONObject("model_dp").getInt("columns"));
    for(String mode:new String[]{"light","oled","dark"}){
     f.prefs.edit().putString("cobra_appearance_mode",mode).commit();CobraCardsLayoutTest.call(f.a,"cobraRestyleGuide");f.frames();
     assertNull("theme must not change layout "+mode,CobraCardsLayoutTest.diff(before,geometryOnly(f.geometry()),"geometry"));

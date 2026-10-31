@@ -74,3 +74,28 @@ finish method/field review, current-owner runtime binding and responsive/lifecyc
 negative controls, matching components/unsigned APK, exact437 comparison, original
 signer workflow registration and one signed testing APK. Infinity/shared/chooser
 and the accepted437 baseline have not been changed. No release run dispatched.
+
+## Release preparation handoff
+
+Current source Java remains bound to the passing host evidence. Light recycled
+rows retain native text color and selected channel identity. Explicit column
+assertions pass: cover2, inner4. No extra application regression was selected.
+
+The owner builder is now portable to the existing CI tools artifact. Compile-only
+signatures are excluded from program DEX and reproduce exactly the tested owner
+DEX. CobraComponent.version receives only the required literal version update to
+2103438.cobra.1; all non-Cards functionality remains exact. The new compile-only
+API initially had the wrong beforeLayout argument count, failed compilation, and
+was corrected against actual signed method descriptors; this was build tooling,
+not a production failure. Source API and output fingerprint checks remain strict.
+
+METHOD-ALLOWLIST now explicitly bounds every changed method; the exact signed
+drawer physicalLayout method is restored before assembly. All other original
+class/method bodies are checked. The immutable shared writer remains unchanged;
+the narrow task-local field adapter has explicit negative admission tests.
+
+Original sole signer workflow is adapted for Cards438 preparation/signing, with
+frozen Infinity437/shared owners and the new immutable437 lock check. Its focused
+release protocol tests pass, including wrong baseline and extra APK-member
+rejection. The actual signed437-to-candidate member comparison still must pass
+before the APK can be signed. No preparation/signing run yet exists at this note.

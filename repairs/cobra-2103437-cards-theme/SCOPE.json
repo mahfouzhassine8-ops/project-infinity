@@ -10,7 +10,8 @@
     "live theme publication and recycled tiles",
     "front/inner geometry and mode restoration",
     "captureDarkAndOledRaster baseline/candidate source-overlay comparison",
-    "FieldGuardTest: exact Cards palette field plus four rejected mutations"
+    "FieldGuardTest: exact Cards palette field plus four rejected mutations",
+    "recycledLightCardsKeepNativeTextAndSelection and explicit two/four-column assertions"
   ],
   "shutdown": "FROZEN_NOT_SELECTED",
   "signing": "ONLY_AFTER_RENDERING_AND_EXACT_MEMBER_GATES",
@@ -26,5 +27,12 @@
     "removed_fields": [],
     "shared_writer": "UNCHANGED",
     "reason": "Exact reviewed Cards palette references; task-local builder must reject all other field additions/removals"
-  }
+  },
+  "selected_release_tests": [
+    "test_authorized_release_route_and_frozen_guards",
+    "test_workflow_keys_follow_payload_gates",
+    "test_exact_member_comparison_rejects_extra_change",
+    "test_original_signed_input_required"
+  ],
+  "mandatory_component_metadata": "CobraComponent.version literal only: 2103436.cobra.1 -> 2103438.cobra.1; all other methods exact"
 }
