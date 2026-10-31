@@ -1,0 +1,39 @@
+{
+  "status": "PASS_EXACT435_DRAWER_DELTA_OWNER_ONLY",
+  "baseline_source": "e0c6153588992001d84076d33fdf8f0d676c0d00",
+  "baseline_Cobra_ZIP_sha256": "e67dd28dab95206dcda8cb88903828453da57670468c532a32cd1db077663893",
+  "baseline_DEX": {
+    "dex/part-0.dex": "eb79d5947836cf46e375e00841d0c982b7c7708e5ea38b6c872401bf8f957fb1",
+    "dex/part-1.dex": "cf1f796e1e1c5ddb208ad9a6fe79328f40161ce07a2f69923f8aff69b136252e"
+  },
+  "source_sha256": "f9d8ea19cff084008cad3d2c0e9b17c64757d4f3a70ec9df9db3ce6bc04ed214",
+  "compiler_sources": {
+    "repairs/cobra-2103435-followups/drawer-only/compile_owner.py": "3d125eb374d5bc12e4919a5f6eda6f3712219f724291553e7a3d330e9570a6e2",
+    "repairs/cobra-2103435-followups/drawer-only/patch.py": "2a37c918effec89e99496f69b1d31ed3c7c37e4d161c6dc44dddb633ffe3e8b0",
+    "repairs/cobra-2103435-followups/drawer-only/runtime/CobraCardsDrawerViewport.java": "f9d8ea19cff084008cad3d2c0e9b17c64757d4f3a70ec9df9db3ce6bc04ed214",
+    "repairs/cobra-next-from-2103427/cards-from-2103431/runtime/CobraCardsLayout.java": "eb46d91a8f9c6ccd907cbe012fd7976b535b9348b54bd508f89b26ffdd1fa92a",
+    "repairs/dual-experience-isolation-2103420/ModuleDexWriter.java": "f9c1b6da2552d529f27709b5f1c53368cacfab42d83fc947cb3b16cd0416dad2"
+  },
+  "changed_methods": {
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$State;": [
+      "physicalLayout(Landroid/app/Activity;Ljava/lang/Object;)V"
+    ],
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity;": [
+      "private cobraLayoutGuide()V"
+    ]
+  },
+  "new_classes": [
+    "Lcom/projectinfinity/kodi/CobraCardsDrawerViewport$Journey;",
+    "Lcom/projectinfinity/kodi/CobraCardsDrawerViewport;"
+  ],
+  "unchanged_classes": 7164,
+  "output_DEX": {
+    "part-0.dex": "56c030dd52d55dae7b5b2e77d86d860b49a8866b52ba2103bd0d2f4bcb429f09",
+    "part-1.dex": "cf1f796e1e1c5ddb208ad9a6fe79328f40161ce07a2f69923f8aff69b136252e"
+  },
+  "APK": "NOT_BUILT",
+  "release_version": "NOT_RESERVED",
+  "Infinity": "UNTOUCHED",
+  "shutdown": "NOT_CHANGED_NOT_RUN",
+  "physical_Fold": "NOT_RUN"
+}

@@ -1,0 +1,60 @@
+{
+  "status": "PASS_TARGETED_SOURCE_OWNER_AND_FIVE_HOST_CASES_ONLY",
+  "source_parent": "b7e17d4e07b2e958706ecfbb740bea44e7c15e6d",
+  "baseline_source": "e0c6153588992001d84076d33fdf8f0d676c0d00",
+  "protected_lock": "e0c6153588992001d84076d33fdf8f0d676c0d00",
+  "owner_build_sha256": "24e89b8fb61c767f91ae44fe53f0bdf8c7f8ada0fe6c6be5d355dad72f3592b9",
+  "actual_owner_diff": {
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$State;": [
+      "physicalLayout(Landroid/app/Activity;Ljava/lang/Object;)V"
+    ],
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity;": [
+      "private cobraLayoutGuide()V"
+    ]
+  },
+  "new_Cobra_classes": [
+    "Lcom/projectinfinity/kodi/CobraCardsDrawerViewport$Journey;",
+    "Lcom/projectinfinity/kodi/CobraCardsDrawerViewport;"
+  ],
+  "unchanged_Cobra_classes": 7164,
+  "baseline_components": {
+    "COBRA.zip": "e67dd28dab95206dcda8cb88903828453da57670468c532a32cd1db077663893",
+    "INFINITY.zip": "a99e7bb789a0817fdfc9cc10b4e1649d52a2c78f0e3375f0735c55f4a91a0336",
+    "MINIMAL_ANDROID_CONTRACT.zip": "432bfb7b246a504d9550e1de39368c3b7e0946532f1c695531ed891e74ef03d8",
+    "CHOOSER_SHELL.zip": "30589df7f2459a133b8fdd34f0bc56f8a5dc363d4f36accbb523a7ae47185f14"
+  },
+  "unchanged_owner_payloads": [
+    "INFINITY",
+    "MINIMAL_ANDROID",
+    "CHOOSER_SHELL"
+  ],
+  "existing_functional_source_changes": [
+    "repairs/cobra-next-from-2103427/cards-from-2103431/runtime/CobraCardsLayout.java"
+  ],
+  "source_budget": "Exactly one Java coordinate-read call; two exact native/State calls in original DEX; new Cobra-only journey helper",
+  "drawer_animation": "Original methods unchanged; no layout dimensions or animator mutations in helper",
+  "JUnit_methods": [
+    "innerDrawerFramesRetainWidthAndState",
+    "drawerOpenFoldAndRotationUseRealViewport",
+    "insetsAndOwnershipGuardsRemainStrict",
+    "coverAndOtherModesMatchSigned435",
+    "rapidInterruptedDrawerAndClosingTail"
+  ],
+  "JUnit_sha256": "53da29a3b25447bb4957a5eb24154bb41bde341af7acf7dc23a9ce6db6b553dc",
+  "measurements": {
+    "fold-rotation.json": "65937b6202e62bc6689160796e4811b758c44c3609f9d03cc2b5b401b2c15197",
+    "inner-animation.json": "7aaa35859c1831aa11acece4d328186148cd011943a7f7d1ad315fd798dba212",
+    "interrupted.json": "587584f8b92cf200d9f3eabbf0a7b8a7cc23a35646109638d1debbae6a5ec599",
+    "negative-controls.json": "a7a9ece30796628463640e9a50076ea6736f28dca51b7700c0ba1d07389ef179",
+    "ownership-insets.json": "47ab81a9dc602bf446da39b61dcd86d6fbc0878232eef1016d6bb89e7a393c8f"
+  },
+  "media_review": "BLOCKED: supplied timestamped PDF bytes/reference inaccessible; neither static frames nor full playback reviewed",
+  "Android_device_runtime": "NOT_RUN",
+  "APK_member_comparison": "PENDING: no successor APK has been created",
+  "signature": "NOT_INVOKED; protected435 original identity unchanged",
+  "version": "NOT_RESERVED",
+  "physical_Fold": "USER_ACCEPTANCE_PENDING",
+  "shutdown": "NOT_CHANGED_NOT_RUN",
+  "candidate_signed": false,
+  "promoted": false
+}

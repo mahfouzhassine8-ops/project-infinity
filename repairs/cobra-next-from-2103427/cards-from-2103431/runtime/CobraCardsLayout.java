@@ -357,7 +357,7 @@ public final class CobraCardsLayout {
     void physicalLayout(Activity a,Object model){
       if(shell.getWidth()<=0 || shell.getHeight()<=0)return;
       int insetLeft=0,insetTop=0,insetRight=0,insetBottom=0;
-      if(Build.VERSION.SDK_INT>=23){WindowInsets insets=shell.getRootWindowInsets();if(insets!=null){int[] location=new int[2];shell.getLocationInWindow(location);View decor=a.getWindow().getDecorView();insetLeft=Math.max(0,insets.getSystemWindowInsetLeft()-location[0]);insetTop=Math.max(0,insets.getSystemWindowInsetTop()-location[1]);insetRight=Math.max(0,location[0]+shell.getWidth()-decor.getWidth()+insets.getSystemWindowInsetRight());insetBottom=Math.max(0,location[1]+shell.getHeight()-decor.getHeight()+insets.getSystemWindowInsetBottom());}}
+      if(Build.VERSION.SDK_INT>=23){WindowInsets insets=shell.getRootWindowInsets();if(insets!=null){int[] location=new int[2];CobraCardsDrawerViewport.location(a,shell,location);View decor=a.getWindow().getDecorView();insetLeft=Math.max(0,insets.getSystemWindowInsetLeft()-location[0]);insetTop=Math.max(0,insets.getSystemWindowInsetTop()-location[1]);insetRight=Math.max(0,location[0]+shell.getWidth()-decor.getWidth()+insets.getSystemWindowInsetRight());insetBottom=Math.max(0,location[1]+shell.getHeight()-decor.getHeight()+insets.getSystemWindowInsetBottom());}}
       float density=a.getResources().getDisplayMetrics().density;
       int width=Math.max(1,shell.getWidth()-insetLeft-insetRight),height=Math.max(1,shell.getHeight()-insetTop-insetBottom);
       int working=Math.round(integer(model,"height")*density);if(height-working>density)height=Math.min(height,working);

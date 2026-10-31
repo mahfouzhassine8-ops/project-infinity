@@ -1,5 +1,9 @@
 # Cards drawer-only435 continuation checkpoint
 
+**The sections below this notice retain the historical b7e17d4e read-only
+checkpoint. Current implementation/evidence status is in
+[CORRECTION-CHECKPOINT.md](CORRECTION-CHECKPOINT.md).**
+
 The two required repository contracts were read in full. Existing development branch `work/cobra-only-from-2103435-20261031` is operational; its protected lock resolves to exact signed source `e0c6153588992001d84076d33fdf8f0d676c0d00`. No existing production/build/release file was modified. Infinity, all other Cobra functionality, chooser, native components and shutdown remain unchanged. No APK/version reservation/signing occurred.
 
 The actual official435 signed archive and complete APK stream were rehashed, together with the matching Cobra ZIP/DEX identities. The reused435 host translation is the source/canonical-bound actual owner from the preceding delivery, not an older architecture or the historical drawer snippet.
