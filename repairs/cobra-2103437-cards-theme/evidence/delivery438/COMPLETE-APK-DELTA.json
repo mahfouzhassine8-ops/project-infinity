@@ -1,0 +1,52 @@
+{
+  "added": [],
+  "baseline_sha256": "6852a7e50003648e56a9f6f0f9e185a1f80f341b4bad9c4c6be7e2f02856b88c",
+  "candidate_sha256": "a1907acbcb3a36f5b2312f8a11cd4e38d8fcdbed2f435b6ab45d369adc8e9f35",
+  "changes": {
+    "AndroidManifest.xml": {
+      "after": "e9aa3cab2e4955498c26874486dd1451eadbdcf6e093d06f29c85d2b5fafe0e5",
+      "before": "3d7f3e07ba91229855d777226a0dcfb944f3d49bc312d198026cf1dc848d4332",
+      "owner": "APK_VERSION_METADATA",
+      "reason": "Typed install-over versionCode only"
+    },
+    "META-INF/INFINITY.RSA": {
+      "after": "2c0153a3b77bafba19f62e639cb516d4034093b1efaac069efefd2e49b287a52",
+      "before": "5a0deea845b339237bea98f8bed4f2ad206042741df991639c4502d16f8d9b62",
+      "owner": "ORIGINAL_APK_SIGNER",
+      "reason": "Required regenerated original-key APK v1 signature metadata"
+    },
+    "META-INF/INFINITY.SF": {
+      "after": "ee434f5533c1263c1dbe0f69c8ad08ef07d63b0ebc022fe9443a060db49e7a8e",
+      "before": "0b8e35c143f4297a412ea9062e2ca4a63b04e967f26085c999eb74fa8e8db5b7",
+      "owner": "ORIGINAL_APK_SIGNER",
+      "reason": "Required regenerated original-key APK v1 signature metadata"
+    },
+    "META-INF/MANIFEST.MF": {
+      "after": "ccef8a4cf81e01ae42c164130cef8f3d6c1f5d76c6e2018862bafed0ffb86abc",
+      "before": "3394f357195051b0753cee0d85def7111e884181f3b9465420eb67d50234bb40",
+      "owner": "ORIGINAL_APK_SIGNER",
+      "reason": "Required regenerated original-key APK v1 signature metadata"
+    },
+    "assets/experience-component-updates.properties": {
+      "after": "9bb3544f574a1d167fdf7d14c0d55863d00a27c85625af4f549c167202ef32ea",
+      "before": "0a0469c627092c8d3730aa706efb9ec0422f4b3d6bc4f699e820733f95c87daa",
+      "owner": "CHOOSER_SHELL",
+      "reason": "Truthful Cobra last-updated label only"
+    },
+    "classes4.dex": {
+      "after": "af8a55708344d9e67bb6e9ddd8d0ca01d937091225a6ca8e88c4cc2c7956afc6",
+      "before": "eb1d5683664924fcaebe70251822f470af7360bae504bdcf7cdb0614386e867f",
+      "owner": "COBRA",
+      "reason": "Reviewed Cards theme DEX or mandatory version metadata"
+    },
+    "classes5.dex": {
+      "after": "70dc429bff4d2df7fe19907100d5df39d5ade973aa2679328b42d567b3d5aee1",
+      "before": "cf1f796e1e1c5ddb208ad9a6fe79328f40161ce07a2f69923f8aff69b136252e",
+      "owner": "COBRA",
+      "reason": "Reviewed Cards theme DEX or mandatory version metadata"
+    }
+  },
+  "removed": [],
+  "signing_block": "Original-key APK signing block is outside ZIP members; apksigner v1/v2/v3 verification passed",
+  "status": "PASS_INDEPENDENT_ALL_MEMBERS_INCLUDING_SIGNATURES"
+}

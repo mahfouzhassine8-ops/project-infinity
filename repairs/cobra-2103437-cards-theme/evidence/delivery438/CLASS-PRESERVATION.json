@@ -1,0 +1,136 @@
+{
+  "added": [
+    "class:Lcom/projectinfinity/kodi/CobraCardsTheme$Colors;",
+    "class:Lcom/projectinfinity/kodi/CobraCardsTheme;"
+  ],
+  "all_other_owners_unchanged_except_truthful_label": true,
+  "changed": {
+    "class:Lcom/projectinfinity/kodi/CobraCardsLayout$ButtonSurface;": {
+      "after": {
+        "owner": "COBRA",
+        "sha256": "1c68a2ca715e1b5aa8dbce28422d2667cba4301ece92b28d7b02e70e257d7b80"
+      },
+      "before": {
+        "owner": "COBRA",
+        "sha256": "1e00e6973ec7932e459c648657dde131afdaaf17293f516640d7204234eba0e2"
+      }
+    },
+    "class:Lcom/projectinfinity/kodi/CobraCardsLayout$PanelSurface;": {
+      "after": {
+        "owner": "COBRA",
+        "sha256": "639d34812fa33642882b5bf23cd2fc8ddef3f961bdd31b121251e03aafcf85a1"
+      },
+      "before": {
+        "owner": "COBRA",
+        "sha256": "f37e260d53b69a96c82dc788072ba9995eb9ca75c08dd77577fe105bbaeb353c"
+      }
+    },
+    "class:Lcom/projectinfinity/kodi/CobraCardsLayout$State;": {
+      "after": {
+        "owner": "COBRA",
+        "sha256": "b63d24bda6474c2b3ba8e141b7afbb027633de7831ca59fc3243df983ac47c88"
+      },
+      "before": {
+        "owner": "COBRA",
+        "sha256": "5bc8067b9d902f2fede9f40d55a48aab8bdb8d062ccae01d35f7c8913891c398"
+      }
+    },
+    "class:Lcom/projectinfinity/kodi/CobraCardsTiles$CardSurface;": {
+      "after": {
+        "owner": "COBRA",
+        "sha256": "d169169134a5e15e0109fa0b335ce8da1d9bfa5e149f17ae2e19217c61e32361"
+      },
+      "before": {
+        "owner": "COBRA",
+        "sha256": "f8d4aa7ccea97c4badf968cf03500060fbe4747176cf1fe317cfddd4d834ab9b"
+      }
+    },
+    "class:Lcom/projectinfinity/kodi/CobraCardsTiles$Holder;": {
+      "after": {
+        "owner": "COBRA",
+        "sha256": "c9e876001b790fe05eda6d83610289066d75c2e15eadb9067e5332c0b7bed817"
+      },
+      "before": {
+        "owner": "COBRA",
+        "sha256": "03a91ecedf58bec73af043a8133b81ceed291be5526714ee958b753d7a32bdbf"
+      }
+    },
+    "class:Lcom/projectinfinity/kodi/CobraCardsTiles$MoreView;": {
+      "after": {
+        "owner": "COBRA",
+        "sha256": "29b8be844f7f1e9e5a9161fee4aff4e149b663249d189ac3d99be349c7f0a1d7"
+      },
+      "before": {
+        "owner": "COBRA",
+        "sha256": "989a5b978d728d042cf0b8eb1e8e590149b4c6a520d23c7a7c83874f02a2fdba"
+      }
+    },
+    "class:Lcom/projectinfinity/kodi/CobraCardsTiles;": {
+      "after": {
+        "owner": "COBRA",
+        "sha256": "0ab0a8aa2ee398c582e64e88863346ff2a9ee0064aecd87cae7f0b6be319e6c1"
+      },
+      "before": {
+        "owner": "COBRA",
+        "sha256": "f90dc420fd845c08efcb519e5bd768f6ea39cf98b1447137e1b6610ef528da91"
+      }
+    },
+    "class:Lcom/projectinfinity/kodi/CobraComponent;": {
+      "after": {
+        "owner": "COBRA",
+        "sha256": "3d6805a04091eadc35cc247707a4bcfe370e3279fff0c5c09142e2ee397267f3"
+      },
+      "before": {
+        "owner": "COBRA",
+        "sha256": "89e69ec506d2b2da6e1cddcf8009d2ff29e28e3c096beb326edbd08a8815dd11"
+      }
+    }
+  },
+  "method_allowlist": {
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$ButtonSurface;": [
+      "public draw(Landroid/graphics/Canvas;)V"
+    ],
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$PanelSurface;": [
+      "constructor <init>(FF)V",
+      "protected onBoundsChange(Landroid/graphics/Rect;)V",
+      "public draw(Landroid/graphics/Canvas;)V",
+      "theme(Lcom/projectinfinity/kodi/CobraCardsTheme$Colors;)V"
+    ],
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$State;": [
+      "apply()V",
+      "constructor <init>(Landroid/app/Activity;Landroid/view/View;)V",
+      "headerCount(Landroid/app/Activity;Landroid/widget/TextView;)V",
+      "metadata()V",
+      "styleBrowser(Landroid/app/Activity;)V",
+      "styleDetails()V",
+      "styleHeader(Landroid/app/Activity;)V",
+      "styleIcon(Landroid/view/View;Ljava/util/IdentityHashMap;I)V"
+    ],
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$CardSurface;": [
+      "constructor <init>()V",
+      "protected onBoundsChange(Landroid/graphics/Rect;)V",
+      "public draw(Landroid/graphics/Canvas;)V",
+      "theme(Lcom/projectinfinity/kodi/CobraCardsTheme$Colors;)V"
+    ],
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$Holder;": [
+      "bind(Ljava/lang/Object;I)V",
+      "constructor <init>(Landroid/app/Activity;Landroid/widget/LinearLayout;)V",
+      "refresh()V",
+      "theme()V"
+    ],
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$MoreView;": [
+      "constructor <init>(Landroid/app/Activity;)V",
+      "protected onDraw(Landroid/graphics/Canvas;)V"
+    ],
+    "Lcom/projectinfinity/kodi/CobraCardsTiles;": [
+      "static retheme(Landroid/app/Activity;)V"
+    ],
+    "Lcom/projectinfinity/kodi/CobraComponent;": [
+      "public static version()Ljava/lang/String;"
+    ]
+  },
+  "physical_Fold": "PENDING",
+  "removed": [],
+  "status": "PASS_EXACT_REVIEWED_CLASS_DELTA",
+  "unchanged_Cobra_classes": 7160
+}
