@@ -1,0 +1,408 @@
+{
+  "added": [],
+  "all_DEX_identical": true,
+  "baseline_sha256": "ff8e7ec16cb10028aef50579161de92b205e97ca8131195098753fb3821bdbc6",
+  "candidate_sha256": "6852a7e50003648e56a9f6f0f9e185a1f80f341b4bad9c4c6be7e2f02856b88c",
+  "changed_members": {
+    "AndroidManifest.xml": {
+      "after": "3d7f3e07ba91229855d777226a0dcfb944f3d49bc312d198026cf1dc848d4332",
+      "before": "63fa0e9690608abee0642e00294d416c347c4d9ae519933647eec3f8ce769eb4"
+    },
+    "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1": {
+      "after": "2d4d794aa5e858791e119ecd09ac090cad48fb0ebc1653e42b7e16bb08e0d64b",
+      "before": "16c3c69305ff22eb37dcf31a2ee272914ad2df125693acf0eb6905368ea234f9"
+    },
+    "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1.sig": {
+      "after": "c3c391c4cd472bfa100b6b90a47035450b233b82200ff547353db197a6b419d3",
+      "before": "6900c35afefe941818d88c2a28746762e83628fe69004007942d8610ea91676f"
+    },
+    "assets/addons/script.infinity.commandcenter/action_loading.py": {
+      "after": "8b758bba6eabd7a051213834c136a81d52c6af819ff9c6d7d1f456a45be4474f",
+      "before": "8f9cb8ca143f5ce3708beaadad5ca73ad69fda001be592a7f871cfbd4db736b7"
+    },
+    "assets/addons/script.infinity.commandcenter/addon.xml": {
+      "after": "c7a41cda0cabc0bc818846ca4018b85093eeb5d4b4d3eb9878919ff5ecd939c1",
+      "before": "7e91c7de682a1d17c933c1f6490f4fc0f8ddc349ad9a23c5b1a7e5e4d0d4bf2f"
+    },
+    "assets/addons/skin.infinity.diggz/Infinity-Protected-Manifest.json": {
+      "after": "3d80a411c654dc339eaaf0a03022a2b8e7082dcd1c559752b169bce0ab1abf95",
+      "before": "f7bacad127402e877b4420adc8a49f88e2e9f5f229cec9d1944055376bc2f423"
+    },
+    "assets/addons/skin.infinity.diggz/addon.xml": {
+      "after": "ac5cd495e283101e0226672c58b624cdb0330f87712bde04a906377ee42b7438",
+      "before": "7f232426f3559550d2c39e7f6423653be1c28f29262a6d64d03bfc4b1eff2d39"
+    },
+    "assets/addons/skin.infinity.diggz/infinity-skin.json": {
+      "after": "4773fa8a36dff24549db940aac9394c66e0eb6233129d0dcdf268182586f62c5",
+      "before": "a3a9fca4da1aff3c3c4a27bda05a5e1f350d2c933109ee757e611324706a983b"
+    },
+    "assets/addons/skin.infinity.diggz/unified/AddonBrowser.xml": {
+      "after": "8519c5b49534b1eed24727227f587e3ed11d2568c725f319e1ef577a92917726",
+      "before": "326a4a32cfb2121fa500bc0bc70bb0ec7c9f2aec0b949e86441afa922d3b8cdf"
+    },
+    "assets/addons/skin.infinity.diggz/unified/Custom_1188_InfinityHealthCenter.xml": {
+      "after": "080f63e416b8ec2e2f0c5e2109d8636b95d1e15d43c8979dff50a0eda7b85a7f",
+      "before": "aed28fbf3c13aca0eeacb7c28355cb6229472ea8310fff54214aed52523c4bd3"
+    },
+    "assets/addons/skin.infinity.diggz/unified/Custom_1190_InfinityPalette.xml": {
+      "after": "d5d2eae53ddf4f7be014bf2933b928123c0c99ef679d00c21b8bdcf76cbaf1c2",
+      "before": "f4646975af2484119d1c7cba20d6656f09ace40a0fd7cc15bacdb072f2c25c72"
+    },
+    "assets/addons/skin.infinity.diggz/unified/Custom_1191_InfinitySystemHub.xml": {
+      "after": "52d3713f1c5b57080048be13d9216909fccf6e01ec24d02b112e4eb14d28e164",
+      "before": "2abf9350fb2517ebca2574ef9d4f76cbf2d956f5556be748ba2c20e3fd2924fe"
+    },
+    "assets/addons/skin.infinity.diggz/unified/Custom_1192_InfinityPerformance.xml": {
+      "after": "2f1b6181b72c62e2e251eae351201051f46511ca05fa976818b02e8379c493ad",
+      "before": "e957e175cbafd28386d83089cbf59ba04e76ff6d06e24b5d4fabc1f9245439db"
+    },
+    "assets/addons/skin.infinity.diggz/unified/Custom_1193_InfinityBrowse.xml": {
+      "after": "36a1d72777fef0b364b120defbb9a306428164217f498428e75a2d68d0cb984a",
+      "before": "f0752e69557cde39b2d393b0491afb8ebb24aeb957920f36c5b5fe19fa3265e2"
+    },
+    "assets/addons/skin.infinity.diggz/unified/Custom_1194_InfinityCommandCenter.xml": {
+      "after": "05dbaf9ec6412afe33256c740338dca3a68185395649e4eca2c3457bb2244efa",
+      "before": "35fb45a26de220256aad5e4ac58c6c8069535466e947744ba430d14b4ecbc678"
+    },
+    "assets/addons/skin.infinity.diggz/unified/Custom_1196_InfinityPlaybackSpeed.xml": {
+      "after": "7f2e34a383dc7b94a83c885cd556ccb9bad6b46b83b42d41d4e09064c5304965",
+      "before": "8c3c7f29172e8be3dabf3ea1be65ce5723878fe0e2789edc6ddc69b1de6b1950"
+    },
+    "assets/addons/skin.infinity.diggz/unified/Custom_1197_InfinityDisplayMode.xml": {
+      "after": "65bad2c336bffd5ae3b4d0f74fd052bdc23dadf87658030b40d7122a4fa8e607",
+      "before": "6627fc3b7ee5b4cf50b0d819c0a21cb7bad3d739d024712a8745f8b24f83e8f8"
+    },
+    "assets/addons/skin.infinity.diggz/unified/Custom_1198_InfinityNav.xml": {
+      "after": "5372022ded234687f7ecbb376bff6bca13a82aa88657a7ef1fa8b5411f63c214",
+      "before": "f4919fbea5385de30b1532aac16afd44c6ad991deeaaf74cc7d741d18cb49fc9"
+    },
+    "assets/addons/skin.infinity.diggz/unified/Custom_5001_skins.xml": {
+      "after": "0a5ed37e7160311ff7615530aa7585e210a79afcb8dd836784aac6bf52354e98",
+      "before": "b916a3c16c1ad9fb529d915f1ad5113473bbb735593566e7dff61db4c105478f"
+    },
+    "assets/addons/skin.infinity.diggz/unified/Custom_5002.xml": {
+      "after": "dbf1eb59a962857db9fc5effe6f7ff772cbdc14f20ccc420533a2db1b6ac9fc6",
+      "before": "ab4306e2b3f28abcfa8548ae762193788ca09de58356fee435066fcb8f6bf0cb"
+    },
+    "assets/addons/skin.infinity.diggz/unified/DialogAddonInfo.xml": {
+      "after": "a68e6730cf0a6efee0da4856c99332528b4aefb18a9093a664dd29be4f668b18",
+      "before": "fb63f6e1251cc2734990a2c3a4a1de2acb80fe4e87e94e9c30a30ed0b1d96115"
+    },
+    "assets/addons/skin.infinity.diggz/unified/DialogBusy.xml": {
+      "after": "69c85c61818cc4e4fca2eaf54954d68e25b0885d3a59919728ada489fba7c499",
+      "before": "e729e49b7215b1fc3deeabb4d4797eb854b7b28733e1699ce9ba5c0513cb82c1"
+    },
+    "assets/addons/skin.infinity.diggz/unified/DialogContextMenu.xml": {
+      "after": "b962cf5aff5997f8eba5f106261753eb93692941e4b6ffd857f036f21f7a0ad8",
+      "before": "314cce3067ea010af75260dbe0f55470a574cad17ecbbeff11d3d4b7abf3a462"
+    },
+    "assets/addons/skin.infinity.diggz/unified/DialogGameControllers.xml": {
+      "after": "a923ac95b6b7561e4ec51b779c72594ff2ff750a497aa16c208c47399c148d46",
+      "before": "dd91fe656824ad9f077c6485e0d3a76aed9b99ae9fd1140b7b2cca9ab84aeb4c"
+    },
+    "assets/addons/skin.infinity.diggz/unified/DialogMediaSource.xml": {
+      "after": "ce649aca4289cff359f45adfb040288136585783e1553c8a0f0c16bc86a0ea68",
+      "before": "8f246e30631f89953c93be433131cdf46e346597b09eaa61e6118629b34d92ba"
+    },
+    "assets/addons/skin.infinity.diggz/unified/DialogMusicInfo.xml": {
+      "after": "91260819baf7c44c29c6347a44bbbd664b8a43d48f68688fb4a967d0e68e8e66",
+      "before": "b4d61ef903d58811217d30908cdc0d34534af6d876c7ae42c2253ab1ebd677d3"
+    },
+    "assets/addons/skin.infinity.diggz/unified/DialogNumeric.xml": {
+      "after": "c7866c8dd7fe85fd663af4c6fdce834f79afd3b87856b6824e014c6aa6186d69",
+      "before": "2937bca2a5888740aa1ef3d73fdbc3570942acfb70c7ef7ca9e4b54dc51f939a"
+    },
+    "assets/addons/skin.infinity.diggz/unified/DialogPVRChannelGuide.xml": {
+      "after": "5541c56e06c7a422bb23843aebe67036814005858ceee6410b39f25cd58b646c",
+      "before": "da1b40da43b8c2f2bee53a1acf6e23b6f9ddc1484d11450a1e41cac7a22572f3"
+    },
+    "assets/addons/skin.infinity.diggz/unified/DialogPVRChannelManager.xml": {
+      "after": "9815e0616203c7258edd1db72f7ce0786d1573760c0b31d53a94aa2441270642",
+      "before": "1dbbdb650367db2dda4131bc312138b265920f64df634136a21277e91c3d3584"
+    },
+    "assets/addons/skin.infinity.diggz/unified/DialogPVRGroupManager.xml": {
+      "after": "8f088a4d6f3c7b0bb526452a59d18c3bd5e6c4270df515668657e92e68a586c6",
+      "before": "fffc555a9adc641c7656e847edf2b3648fe9e83a0bf215301241566eb4465563"
+    },
+    "assets/addons/skin.infinity.diggz/unified/DialogPVRInfo.xml": {
+      "after": "4da6dfb418ef4dbfe1778734196672b11c1a97905c078a1d1e89c637fec2286c",
+      "before": "ab2b6b19543af527b9e90db4b0e01cb632d6d0dfa1c39ae9898ecd0307f12927"
+    },
+    "assets/addons/skin.infinity.diggz/unified/DialogPVRRadioRDSInfo.xml": {
+      "after": "93ee5bf5510922511de07f1fbe01b5885491a324d6d1f2702b5caef1a8b6f457",
+      "before": "a3b495d95cf687b14b81f4302d9f84d199e39f73b8e303eb50118972bac06d9b"
+    },
+    "assets/addons/skin.infinity.diggz/unified/DialogPictureInfo.xml": {
+      "after": "0126ae83bcc93f9c0010c478469e22ce181f617002be4e92b76486932d9373ff",
+      "before": "f45897e53baf58e55706d5a9467a25f119f00d138f3437656d16dac514b2230a"
+    },
+    "assets/addons/skin.infinity.diggz/unified/DialogSelect.xml": {
+      "after": "766c78c4c4498d7b7a776ff01413f41e62d4a0daa756acdd44d8bf7c425c1527",
+      "before": "5f2864d0d177b7d3479b20f8e505028da271fda7af2c83d02d70c2853a79b734"
+    },
+    "assets/addons/skin.infinity.diggz/unified/DialogVideoInfo.xml": {
+      "after": "39bb6ad5c0b7c5a75da697e139b5c8b20622d94a63de17f041150d207d2650fb",
+      "before": "f17f7d609e8bbff9cb8c0c7b72d0d0aec413be5fe84e71f677240876236a41b4"
+    },
+    "assets/addons/skin.infinity.diggz/unified/DialogVideoManager.xml": {
+      "after": "1a56c8c7784198e771f463db356c2ad9eea1a6d1ed904bd7ab4163ded12aad69",
+      "before": "c0ac8923415ede7054414121dbb170eee88d6427b7cb60e9e0062fa3172efe7a"
+    },
+    "assets/addons/skin.infinity.diggz/unified/EventLog.xml": {
+      "after": "526d47a0d6dc8f6a814e2b5bb5b2fe35e3531308c3b7f6533da7e6e6ae6b7ca9",
+      "before": "8e1d7c666911ac5d3661b76ca4a8abc006ca34c56adced700c704481110b0bf9"
+    },
+    "assets/addons/skin.infinity.diggz/unified/FileManager.xml": {
+      "after": "9caaf2cc63d364ae695fdd82303ad0f60e359b08852286eb2871e595346c9d04",
+      "before": "6a44f46628c2c87ffbbcfc9224cd3f01af3e23733c80180978e9bba97e7c4dd0"
+    },
+    "assets/addons/skin.infinity.diggz/unified/Home.xml": {
+      "after": "2e0300daff6d5e2d70055f705abb634de70f4df30d577457484cd559958619d1",
+      "before": "c9fef751b8d82f7080dfa777abe14b3d77d44a06292ab99e1ed4bdd8ef559fac"
+    },
+    "assets/addons/skin.infinity.diggz/unified/IncludesDialogSelect.xml": {
+      "after": "de0937f8230dee3de7aaf3f3f08637e71eab7910e8dac58bec9986b5ac71335d",
+      "before": "fce7c2ed1cbc5e1cc9e4c487f0a96138c522c838ded26d3f6a11ef78e90a328a"
+    },
+    "assets/addons/skin.infinity.diggz/unified/IncludesNowPlaying.xml": {
+      "after": "9c226a7948ba5f7601cce075a99552b715530f11c4b851947b85642b9b45e21f",
+      "before": "07cc723f92d8ec0659ece093eab6232dba7c9130a4b5dca46436c1079b0128c4"
+    },
+    "assets/addons/skin.infinity.diggz/unified/Includes_CommonValues.xml": {
+      "after": "91f4efcc6a20bd22676969a3c050baf6f85c2367b312367892843ac943b8c038",
+      "before": "0e920616809f17459fcf71b8f8c9b372940635104e399e2f859c5d352f05db66"
+    },
+    "assets/addons/skin.infinity.diggz/unified/Includes_DialogInfo.xml": {
+      "after": "3349d15b759824eab2fb71ce9ef025d188283b7343a94cbd8b53b4e1e487f57b",
+      "before": "810790ad52170131c3f09d1e6ba5c90682250bcc414a3d1e12bfba365dc081ca"
+    },
+    "assets/addons/skin.infinity.diggz/unified/Includes_DialogSettings.xml": {
+      "after": "7b0a84650946f4cef1ce50fa1fe601706ed75e6cc4119e62f506876b5fa97729",
+      "before": "e6c9ee9be3cf5e25d35358a371e5e35793e2b35c421b03bcfe8b761b955f3faf"
+    },
+    "assets/addons/skin.infinity.diggz/unified/Includes_Home.xml": {
+      "after": "c021c6bf2933ce78261a1d826687501c09b9c61c34956aad8fafa80fd3778fa6",
+      "before": "08e7a6d221c0156f3cfbf761c71c8c7ae091af087698dcf8058869169762818e"
+    },
+    "assets/addons/skin.infinity.diggz/unified/Includes_InfinityActionLoading.xml": {
+      "after": "e50f7ec81064076fddb58dfd9c9dbe15e1a161087a299a24b5a46dd92aa1e5b0",
+      "before": "cd271454ef42dfba8471fd24f736263ebb0563dd6d7696131ad2f2af77d8682c"
+    },
+    "assets/addons/skin.infinity.diggz/unified/Includes_InfinityHomePlayback.xml": {
+      "after": "768d14ae4f7d492b615ef7f40b6ba11f66ea65d66a6c6f9a5aa60255f209f65e",
+      "before": "7725b07388e543f51f433691a659fed57eba8c5884384c7cc3be0a74e95c8b35"
+    },
+    "assets/addons/skin.infinity.diggz/unified/Includes_InfinityLegacy.xml": {
+      "after": "64756d520a673efd1aa392f37d0ad51afde56e467ed51dd652cf67bba4404385",
+      "before": "c3b4ab56e3b081aa08f597319eca2367bb3d3d3c2cdef4ea10e99f33fcb5f408"
+    },
+    "assets/addons/skin.infinity.diggz/unified/Includes_PVR.xml": {
+      "after": "f9f7275f7718cc1fc74e7f7cae87ccddb0570a2a7c57dccd3b9235f1fb9dca27",
+      "before": "d1424209a0184ad0be89c449e3ca111ac380b646a5c0020c4a0ffc15325156e5"
+    },
+    "assets/addons/skin.infinity.diggz/unified/Includes_PVR_Views.xml": {
+      "after": "c8223915d2e880ebdea00c97c2c8c3e91f70a078e5305b352617206fc9da30df",
+      "before": "ef1fc8f86eeda7eb5d8eeb99bc2ef3b13d52030745398ed22e8c5bc504e32c96"
+    },
+    "assets/addons/skin.infinity.diggz/unified/Includes_Select.xml": {
+      "after": "ef1726ca9c70b6f2208022d24b2e85fcc0bbac593a344784a84faa966c058de0",
+      "before": "9fe7a807f7e97759ca8ffb00e5e35efd7c0f06b77e3c26913d8f35a7be1cebfc"
+    },
+    "assets/addons/skin.infinity.diggz/unified/Includes_ViewSettings.xml": {
+      "after": "b37a296cde4774fa1be4749f088c4d5449411ee0ab6b8574c8543459f2c52235",
+      "before": "eaf14278fd7204f129a3f2254fb0f6bf18fd98f14738e7224194b895bedecf78"
+    },
+    "assets/addons/skin.infinity.diggz/unified/InfinityItemOptions.xml": {
+      "after": "592c83144e69375a8b159f6e5a846c949b451aeb06442aa9777aac134fe783c7",
+      "before": "201125d0d7bdda987d92523c04882f19e03560d361f70e52508cd4783e071db6"
+    },
+    "assets/addons/skin.infinity.diggz/unified/LoginScreen.xml": {
+      "after": "97cdf767ae9c3bc97c3e4584a27d63c851173ad2dd2c7738aa667fea5d4e9e7b",
+      "before": "4869ce536fe2f045a1225ccd73981e6a75d4f4b15b6e0d7c1f682cb872754cc7"
+    },
+    "assets/addons/skin.infinity.diggz/unified/MyGames.xml": {
+      "after": "69010f31750c13be82133856bb8d964cb046661a54eafad65940a17ce9439e48",
+      "before": "39d0307d574796f3db5864aabec19cefd5cde0962cb47a87fc553fc3a4379626"
+    },
+    "assets/addons/skin.infinity.diggz/unified/MyMusicNav.xml": {
+      "after": "9e755613b8d92888701143b05c969e1aa632f00aded0431912cc376c8c2c948a",
+      "before": "9d463f45abe3d78a5d78d9cf27d15d85d66f8240af5e123f116dff336f23f208"
+    },
+    "assets/addons/skin.infinity.diggz/unified/MyMusicPlaylistEditor.xml": {
+      "after": "3eb8304a8132a0491913bcf38bc21aea1526149b334de91be212b7b73c50692b",
+      "before": "daef5f30ca0cc0445e773227e3bae903bf4014873b312fff6f3cbacb59882e29"
+    },
+    "assets/addons/skin.infinity.diggz/unified/MyPVRChannels.xml": {
+      "after": "9cceb25320dc00fbace92d59e60fd9c51cdcbc96f3f6a0532c50eaab35ed285b",
+      "before": "2f873c30fb620862986e3584d95d9a846e65f386a08c9cbf710dbb34fe089e76"
+    },
+    "assets/addons/skin.infinity.diggz/unified/MyPVRGuide.xml": {
+      "after": "90f71c02c8c3eb4e78f6119647fa996629cd007444d616e323172e8dc9f2d8a7",
+      "before": "98efb45d082e45561cab0f28e42f2deb781e6ffc584759fac2d53cd15540a048"
+    },
+    "assets/addons/skin.infinity.diggz/unified/MyPVRRecordings.xml": {
+      "after": "3ffad94f19096d1627c566c9ef27f79b95869678faec761e8fa98df2c2058970",
+      "before": "40328747d7c55fe6d20820fafee36c711f6891cc989633c51b8430f72762f6b5"
+    },
+    "assets/addons/skin.infinity.diggz/unified/MyPVRSearch.xml": {
+      "after": "7a43ed5c50ad4a61c5b0996f2c893fd852b5e34ac40e1db31a309be3475cd8eb",
+      "before": "40a05c39e1bc21600fbe1f9e8205775dd17001582a51a84d25797145cde2f599"
+    },
+    "assets/addons/skin.infinity.diggz/unified/MyPVRTimers.xml": {
+      "after": "94d6c89471a36c57f51441032cdf50e5e9d06c173bd5fb62a6439f0e182a8643",
+      "before": "8d6a2f69e5fd71e3d3a0e385462ed548253126ef02a3ad40ff404f90af9b6784"
+    },
+    "assets/addons/skin.infinity.diggz/unified/MyPics.xml": {
+      "after": "d563d1b494d9c60f68cc9d12948e6e1729a48057f3fafbd3cc70d4a5445180d0",
+      "before": "cb0d92fe99eebde4522411f22b720afc843655e47b1e0d32c82181cfd752a6a2"
+    },
+    "assets/addons/skin.infinity.diggz/unified/MyPlaylist.xml": {
+      "after": "4be4568be17ff5a9258641901fc7620f5f7d4dbb8fde1f424955a7b1360e6295",
+      "before": "944c0d727bb6b80c44d5df19da5c26df4ac7707d0d6a33e904af233ab0707d61"
+    },
+    "assets/addons/skin.infinity.diggz/unified/MyPrograms.xml": {
+      "after": "faa3c7a7444ea0a10a65b47ee892000a7729d60b7bf9b4e8b5e6986c826c5921",
+      "before": "3e674c9bc7eb618b587434c893d16df718e24275d0d2ab7c1e143d13cd3c2e67"
+    },
+    "assets/addons/skin.infinity.diggz/unified/MyVideoNav.xml": {
+      "after": "f6a65dce19db29db6a7577cc92afb60140f9199e2b671bbaf92a129df3c97ad4",
+      "before": "8903071c1e38eb36c7ae1ad10928aecf9585a9c19535cd69d23fa3f426b01940"
+    },
+    "assets/addons/skin.infinity.diggz/unified/MyWeather.xml": {
+      "after": "584f555abfa74022307e990c4c0c4059feaa6605b433e7294eca37a12c9e2079",
+      "before": "e770db44b17d38b0b10da516180d727c8a4b198ced374f5b0da913536c930217"
+    },
+    "assets/addons/skin.infinity.diggz/unified/Settings.xml": {
+      "after": "814855cf6934261203eee073d39d459c10b1f29d65e404c69c22e8317136b622",
+      "before": "084a09813352342d9aa0d763cd3c01b6d336113f8fef14b828bcef3cb88f74d7"
+    },
+    "assets/addons/skin.infinity.diggz/unified/SettingsProfile.xml": {
+      "after": "a16d5803a58ee58640b968029cf58736d18f226b80afd92f82ae7c097379e19b",
+      "before": "252bb888bc1c7235bbe63f2376e194b83813858608932d580c1fdf7953996f7f"
+    },
+    "assets/addons/skin.infinity.diggz/unified/SkinSettings.xml": {
+      "after": "64541799ebca9d2f4a1d9f3bd54ba5b5d3eeabe7874229c482ce92a93c84b12a",
+      "before": "8c79438b7abbe0779fbf8f16287d2647bd5c01f958030994fb9a3d1cc0736e54"
+    },
+    "assets/addons/skin.infinity.diggz/unified/SmartPlaylistEditor.xml": {
+      "after": "8ae6cd0536a37e8f84766f2ebad006a9a986f2741c3c2055955a1b3414800ea7",
+      "before": "b15e142c66d81da522e1eea010be2f0c87717a4e59f3a7471b9fe898207a3f3d"
+    },
+    "assets/addons/skin.infinity.diggz/unified/SmartPlaylistRule.xml": {
+      "after": "03cddb662c0d2d68ba4830add5a7c2662610beccc8848ee7ff696c8258745ff1",
+      "before": "e27b1fc931c16025285d1c1458872f0cc6ed36d90710a19dae3d2b02e5a0bdc2"
+    },
+    "assets/addons/skin.infinity.diggz/unified/custom_1117_AddonStatus.xml": {
+      "after": "c9898fece19083a384101ee467a7c7a8e21deec61704773b86727bfbea7b42f5",
+      "before": "b18c05cbf85f3d121c86377985368066f361a415f0ecd9f1d315902e4cb34245"
+    },
+    "assets/addons/skin.infinity.diggz/unified/custom_1119_ExtrasDialog.xml": {
+      "after": "a88c48724963139f7276997aac965e38f4903f1b4bcf3caa0704407f77e2e7d6",
+      "before": "e74391405a20fb6d074fb60c7912a837a573cc956b169004392ecf1404002d55"
+    },
+    "assets/addons/skin.infinity.diggz/unified/custom_1126_Confirm.xml": {
+      "after": "b46996e0cd0a03a372f6b55408898df8c61ba54797ad7c754e8c9a79fb3e1514",
+      "before": "a47953344a276bee85d01d0129b021aa895e3466fadb52701ea9a59b2c1a14ff"
+    },
+    "assets/addons/skin.infinity.diggz/unified/custom_1127_OverlayIcons.xml": {
+      "after": "c5c376791d07ea0c26bad12b922eeb0d3d7e8882d118778fbb37f2bd25d8f864",
+      "before": "1d1808a27dbbe011f780777c06fbdfd84c1e60fd56ba861c5925fb06dcc671e0"
+    },
+    "assets/addons/skin.infinity.diggz/unified/custom_1128_WindowCustomizer.xml": {
+      "after": "54b8891f5f3748c7f1268ba82e9b428cc20ccef3b9a531dfa79ea0d47eea46d3",
+      "before": "3d6e0064e51e2859c1465ed2858e3769a861f753ebf2fef0e0716ae6d40de10c"
+    },
+    "assets/addons/skin.infinity.diggz/unified/custom_1129_Select.xml": {
+      "after": "b054b82824de54faed97b3d9c0c322816003d848723414a38ad8947446720fc8",
+      "before": "256dacc56560c2a94542008006890b796dcdd1f5cb3fc609d2ce78bc0bb5c38f"
+    },
+    "assets/addons/skin.infinity.diggz/unified/custom_1130_Views.xml": {
+      "after": "175eccb1c770ed3268dbfeba8b954a429c4aea66dc6d1fd3031b77d60cb5e380",
+      "before": "5f4b3b2a14a92477285fe85ee5acb176376ef502bf03722a641907bd52a8eab4"
+    },
+    "assets/addons/skin.infinity.diggz/unified/custom_1131_ViewSettings.xml": {
+      "after": "1f3ab55a3141ae5bba41c9010c409d9a6d166253bb0d0bd63fc64079d1dfc16a",
+      "before": "ef563a6fd1de36a934ddd53a91fbbed0f85bbf59f009af18104edb5a3eb0de12"
+    },
+    "assets/addons/skin.infinity.diggz/unified/custom_1133_Apps.xml": {
+      "after": "75c7fda63cfa87eafab3e5489f3e88016a915a370a2a4cb515ae9953a8224543",
+      "before": "16aaa4e5d7d9175227c6c7d93304dfb1912f18712437343a595978299cfb77f9"
+    },
+    "assets/addons/skin.infinity.diggz/unified/custom_1140_Colors.xml": {
+      "after": "ac04e18135a97d60cfa30fb3c75c4b3a586bd11152b0ce0cef366b3f00c0613f",
+      "before": "4ba557e8987df7ade47c36eee92e8e4cdf4925723c19d740a7754a55016b18ad"
+    },
+    "assets/addons/skin.infinity.diggz/unified/custom_1142_Skins2.xml": {
+      "after": "8a4a3db82b8a1c908830ee9e69a2df311803bac02608d9c24d5f59c13b7b0261",
+      "before": "2256a8438a18945b83e89e3504b103631a09ac24056856d6be86782d7e27b1d9"
+    },
+    "assets/addons/skin.infinity.diggz/unified/custom_1199_InfinityVideoLock.xml": {
+      "after": "38e6fb69b28759ddd567d429664623600ba7c9e2f3e57588f1715bc729be915b",
+      "before": "46334d03f397931857e1f4e0bdb5197b7fac77e63e0e0155de84767155ed37df"
+    },
+    "assets/addons/skin.infinity.diggz/unified/script-RSS_Editor-rssEditor.xml": {
+      "after": "34ca75fd993aa2c26e39d94778d90eb9eae968a57fed5ad680025a469cc4fa4a",
+      "before": "cf12326da7f2f60b39b99b94fdb105756cfda457ff3d17934652e1c0a70d0a4f"
+    },
+    "assets/addons/skin.infinity.diggz/unified/script-RSS_Editor-setEditor.xml": {
+      "after": "34ca75fd993aa2c26e39d94778d90eb9eae968a57fed5ad680025a469cc4fa4a",
+      "before": "cf12326da7f2f60b39b99b94fdb105756cfda457ff3d17934652e1c0a70d0a4f"
+    },
+    "assets/addons/skin.infinity.diggz/unified/script-XBMC_Lyrics-main.xml": {
+      "after": "31af007a1ddc10888e5bd03dd3a1b18fc4f932cc3274591fea8b236df7345017",
+      "before": "84c11a2df620c74e28bea4c9b4515170f96266c7c476bb06fd532981068bd7d2"
+    },
+    "assets/addons/skin.infinity.diggz/unified/script-embuary-person.xml": {
+      "after": "53dbdb0994a233f562db52022814ca788d1bb364d7d76f367e8243fd61c4bda9",
+      "before": "686923228c095a64442c2c7564e45b139709492e6809741ce12e0a57ef057dc2"
+    },
+    "assets/addons/skin.infinity.diggz/unified/script-embuary-video.xml": {
+      "after": "1e3a76b94dceeebfd56fdb5b1e3ba9a5714921d003760de451a92a6f1cff1b32",
+      "before": "f7e128834526c5c289c5275544e6e518632e696e8d24b8893cfc8d477ff5911b"
+    },
+    "assets/addons/skin.infinity.diggz/unified/script-globalsearch-main.xml": {
+      "after": "b87c7266c81ebff7f7fef716a30e7218d87be6573829cd85ffe4a4249755493c",
+      "before": "8b413bb9c9c17807a12e4945e33cd9bdaa33ddc51ca528b6062f3c86aae46f55"
+    },
+    "assets/addons/skin.infinity.diggz/unified/script-globalsearch.xml": {
+      "after": "874d0475379ac152538d14e3c9a79390c5e59fa4bc356f4147f85607cf6c9023",
+      "before": "955078e0967c0314afbefd6989722688433ef4d5ecb5dc79f2f3ac8f1707e6cc"
+    },
+    "assets/addons/skin.infinity.diggz/unified/script-infinity-rails-select.xml": {
+      "after": "a379d82f77e20ac360cc25d7c71f3d764f7ca069e199888cf4970d116fb352b7",
+      "before": "57f433eacb863be4c707547e0b8c8f760d75cbad8c9cda35ae3839e85495eafb"
+    },
+    "assets/addons/skin.infinity.diggz/unified/script-script.module.t9.search-Main.xml": {
+      "after": "6aaab1de0eabb2b59a01db790694e95d2537886172cd97ff06d0d195f34abfa9",
+      "before": "da0b4bbf944cae8f473adf6cdb1ae3b467b0c6ba693956e54665cc9862606ebc"
+    },
+    "assets/addons/skin.infinity.diggz/unified/script-skinshortcuts-includes.xml": {
+      "after": "544425b90d3cdccbf21b01b2cfff0f673fc592091dd8e3e8b83f53d5411dea18",
+      "before": "f4b5f4a1d9429ca73ff6c222f3c2a5583a4347d98a5d2f1dc0317ff926faab32"
+    },
+    "assets/addons/skin.infinity.diggz/unified/script-skinshortcuts.xml": {
+      "after": "2ae4fcd8f8a449fba38e699b2fa33c9d8fd897c91f6478114dc4f04a2a220689",
+      "before": "afc07289dac12bf86ebb363a7e08596f0b9bada848e59783db0b9c508c03883a"
+    },
+    "assets/addons/skin.infinity.diggz/unified/service-CoreELEC-Settings-mainWindow.xml": {
+      "after": "206508a816b94a6233dba782f5a6eff351d269082325c8caf438c089ff556d7b",
+      "before": "2e0ca2a272cc64806044383f6d8f39b746a06c007187e298137f6c13d75a8119"
+    },
+    "assets/addons/skin.infinity.diggz/unified/service-LibreELEC-Settings-mainWindow.xml": {
+      "after": "1bc202c1d8168eb73773cf82a9534485a1aa6b365a0a98f111cb202b12d4deaf",
+      "before": "bd6843d7142e5488af5cbf768f0bdae9d3d12975bb90cbed821953512b2a9cea"
+    },
+    "assets/experience-component-updates.properties": {
+      "after": "0a0469c627092c8d3730aa706efb9ec0422f4b3d6bc4f699e820733f95c87daa",
+      "before": "c7510e6440624c57c260466d3802f15aba4bb37071e26c561443155fa919c34e"
+    }
+  },
+  "native_libraries_unchanged": 47,
+  "original_certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "physical_Fold": "PENDING",
+  "removed": [],
+  "shutdown": "UNCHANGED_NOT_TESTED",
+  "status": "PASS_EXACT436_APK_MEMBER_COMPARISON",
+  "unchanged_members": 7516,
+  "user_data": "NO_ACCESS"
+}
