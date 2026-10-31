@@ -67,6 +67,10 @@ public final class CobraCardsTiles {
     mainThread();if(!cards(a))return;Holder h=holder(card);
     if(h!=null && card.isAttachedToWindow())h.refresh();
   }
+  static void retheme(Activity a){
+    if(!cards(a))return;
+    for(WeakReference<Holder> ref:HOLDERS.values()){Holder h=ref.get();if(h!=null && h.owner.get()==a && !h.palette.same(CobraCardsTheme.resolve(a)))h.theme();}
+  }
   private static Field field(Class<?> type,String name){
     try{Field f=type.getDeclaredField(name);f.setAccessible(true);return f;}
     catch(ReflectiveOperationException e){throw new IllegalStateException("Cards field: "+name,e);}
@@ -92,6 +96,13 @@ public final class CobraCardsTiles {
     final CardSurface surface=new CardSurface();
     final RoundedProgress progressShape=new RoundedProgress();
     final LiveDot liveDot=new LiveDot();
+    CobraCardsTheme.Colors palette=CobraCardsTheme.DARK;
+    void theme(){
+      Activity a=owner.get();if(a==null)return;CobraCardsTheme.Colors next=CobraCardsTheme.resolve(a);
+      palette=next;category.setTextColor(next.muted(MUTED));title.setTextColor(next.text(WHITE));now.setTextColor(next.muted(MUTED));time.setTextColor(next.muted(MUTED));fallback.setTextColor(next.text(WHITE));live.setTextColor(next.accent(CYAN));
+      divider.setBackgroundColor(next.edge(0xff123642));more.palette=next;more.invalidate();
+      surface.theme(next);progressShape.track.setColor(next.edge(0xff2d4051));progressShape.fill.setColor(next.accent(0xff29c9ea));progressShape.invalidateSelf();liveDot.paint.setColor(next.accent(CYAN));liveDot.invalidateSelf();
+    }
     Class<?> channelType,programmeType,layoutType;
     Class<?>[] channelArgs,rowArgs;
     Field channelName,channelGroup,channelIcon,programmeStart,programmeStop,programmeTitle,layoutColumns,layoutBrowser;
@@ -147,7 +158,7 @@ public final class CobraCardsTiles {
       progress.setPadding(0,0,0,0);progress.setMinimumHeight(0);progress.setIndeterminate(false);
       progress.setProgressTintList(null);progress.setProgressBackgroundTintList(null);progress.setProgressDrawable(progressShape);
       root.addOnLayoutChangeListener(this);root.addOnAttachStateChangeListener(this);
-      resize(estimateWidth());
+      theme();resize(estimateWidth());
     }
     void style(TextView view,Typeface face,int color,int lines){
       view.setTypeface(face);view.setTextColor(color);view.setIncludeFontPadding(false);
@@ -178,13 +189,13 @@ public final class CobraCardsTiles {
         CobraLogoRequests.clear(a,logo);logoUrl=next;logo.setImageDrawable(null);
         if(!next.isEmpty())CobraLogoRequests.request(a,next,logo);
       }else if(!next.isEmpty())CobraLogoRequests.request(a,next,logo);
-      logoChanged();metadata(a);resize(estimateWidth());
+      theme();logoChanged();metadata(a);resize(estimateWidth());
     }
     void refresh(){
       Activity a=owner.get();if(a==null || bound==null || !cards(a))return;
       boolean selected=Boolean.TRUE.equals(CobraArrange.ownedCall(a,"cobraModeSelected",channelArgs,bound));
       if(card.isSelected()!=selected)card.setSelected(selected);
-      metadata(a);resize(estimateWidth());
+      theme();metadata(a);resize(estimateWidth());
     }
     void metadata(Activity a){
       Object programme=CobraArrange.ownedCall(a,"cobraCurrentProgram",channelArgs,bound);
@@ -479,10 +490,11 @@ public final class CobraCardsTiles {
   }
   private static final class MoreView extends View {
     final Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG);float scale=1;boolean compact;
+    CobraCardsTheme.Colors palette=CobraCardsTheme.DARK;
     MoreView(Activity a){super(a);setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);}
     @Override protected void drawableStateChanged(){super.drawableStateChanged();invalidate();}
     @Override protected void onDraw(Canvas canvas){
-      super.onDraw(canvas);paint.setColor(isPressed() || isFocused() || isHovered()?WHITE:0xffaabbd0);
+      super.onDraw(canvas);paint.setColor(isPressed() || isFocused() || isHovered()?palette.text(WHITE):palette.muted(0xffaabbd0));
       float x=compact?getWidth()/2f:getWidth()-18*scale;
       for(int i=0;i<3;i++)canvas.drawCircle(x,compact?getHeight()/2f+(i-1)*4*scale:(14+i*7)*scale,(compact?1.35f:2.2f)*scale,paint);
       if(isFocused()){paint.setStyle(Paint.Style.STROKE);paint.setStrokeWidth(Math.max(1,scale));
@@ -492,12 +504,14 @@ public final class CobraCardsTiles {
   private static final class CardSurface extends Drawable {
     final Paint fill=new Paint(Paint.ANTI_ALIAS_FLAG),line=new Paint(Paint.ANTI_ALIAS_FLAG),glow=new Paint(Paint.ANTI_ALIAS_FLAG);
     final RectF rect=new RectF();float radius,scale=1;boolean selected,focus,pressed,hover;
+    CobraCardsTheme.Colors palette=CobraCardsTheme.DARK;
+    void theme(CobraCardsTheme.Colors next){if(palette.same(next))return;palette=next;onBoundsChange(getBounds());invalidateSelf();}
     CardSurface(){line.setStyle(Paint.Style.STROKE);glow.setStyle(Paint.Style.STROKE);}
     @Override protected void onBoundsChange(Rect bounds){
       scale=bounds.width()/448f;radius=24*scale;float inset=Math.max(1,scale)*.75f;
       rect.set(bounds.left+inset,bounds.top+inset,bounds.right-inset,bounds.bottom-inset);
       fill.setShader(new LinearGradient(bounds.left,bounds.top,bounds.right,bounds.bottom,
-        new int[]{0xff010a0e,0xff01070a,0xff001016},new float[]{0,.55f,1},Shader.TileMode.CLAMP));
+        palette.gradient(0xff010a0e,0xff01070a,0xff001016),new float[]{0,.55f,1},Shader.TileMode.CLAMP));
     }
     @Override public void draw(Canvas canvas){
       canvas.drawRoundRect(rect,radius,radius,fill);
@@ -505,7 +519,7 @@ public final class CobraCardsTiles {
         glow.setColor(0x1920d8f7);glow.setStrokeWidth(Math.max(1,10*scale));canvas.drawRoundRect(rect,radius,radius,glow);
         glow.setColor(0x4020d8f7);glow.setStrokeWidth(Math.max(1,6*scale));canvas.drawRoundRect(rect,radius,radius,glow);
       }
-      line.setColor(selected || focus?0xff08d5f5:(pressed || hover)?0xff54c5d9:0xff0a657d);
+      line.setColor(selected || focus?palette.accent(0xff08d5f5):(pressed || hover)?palette.accent(0xff54c5d9):palette.edge(0xff0a657d));
       line.setStrokeWidth(Math.max(1,(selected || focus?3.2f:1.3f)*scale));canvas.drawRoundRect(rect,radius,radius,line);
     }
     @Override public boolean isStateful(){return true;}

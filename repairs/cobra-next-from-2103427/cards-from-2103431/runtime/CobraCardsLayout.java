@@ -267,6 +267,7 @@ public final class CobraCardsLayout {
     final ArrayList<Slot> originalDetails=new ArrayList<>();
     final IdentityHashMap<View,Snapshot> shared=new IdentityHashMap<>(),header=new IdentityHashMap<>(),browserHeader=new IdentityHashMap<>();
     final Snapshot stage;final View stageView;Object nativeRenderer,nativeTheme;Field nativeActiveField,nativeBindingsField;final AmbientPanel toolbarAmbient,detailsAmbient;
+    CobraCardsTheme.Colors palette=CobraCardsTheme.DARK;
     PreviewBadge badge;
     View headerFirst,headerLast,browserFirst,browserSpacer;float scale=1,font=1;boolean restoring,hasNativeMetadata;
     final PanelSurface headerSurface=new PanelSurface(24,0),detailSurface=new PanelSurface(24,12),previewSurface=new PanelSurface(24,0),filterSurface=new PanelSurface(24,0);
@@ -335,12 +336,18 @@ public final class CobraCardsLayout {
     void apply(){
       Activity a=owner.get();if(a==null || !cards(a) || restoring)return;rebasePublishedNativeStyles();
       Object model=read(a,"mCobraModeLayout");if(model==null)return;
+      CobraCardsTheme.Colors next=CobraCardsTheme.resolve(a);
+      boolean themeChanged=!palette.same(next);
+      if(themeChanged){palette=next;countText=null;eyebrowSource="";}
+      for(PanelSurface surface:new PanelSurface[]{headerSurface,detailSurface,previewSurface,filterSurface})surface.theme(palette);
+      if(themeChanged){progressSurface.track.setColor(palette.edge(0xff2d4051));progressSurface.fill.setColor(palette.accent(0xff29c9ea));progressSurface.invalidateSelf();CobraCardsTiles.retheme(a);}
+      int background=palette.light?palette.background:0xff000000;
       scale=(shell.getWidth()>0?shell.getWidth():integer(model,"width")*a.getResources().getDisplayMetrics().density)/941f;
       font=Math.max(1f,Math.min(2f,a.getResources().getConfiguration().fontScale));
       physicalLayout(a,model);
       if(stageView!=null && read(a,"mStage")==stageView && (stageView.getPaddingLeft()!=0 || stageView.getPaddingTop()!=0 || stageView.getPaddingRight()!=0 || stageView.getPaddingBottom()!=0))stageView.setPadding(0,0,0,0);
-      if(shell.getBackground()==null || !(shell.getBackground() instanceof android.graphics.drawable.ColorDrawable) || ((android.graphics.drawable.ColorDrawable)shell.getBackground()).getColor()!=0xff000000)shell.setBackgroundColor(0xff000000);
-      if(browser.getBackground()==null || !(browser.getBackground() instanceof android.graphics.drawable.ColorDrawable) || ((android.graphics.drawable.ColorDrawable)browser.getBackground()).getColor()!=0xff000000)browser.setBackgroundColor(0xff000000);if(browser.getPaddingLeft()!=0 || browser.getPaddingTop()!=0 || browser.getPaddingRight()!=0 || browser.getPaddingBottom()!=0)browser.setPadding(0,0,0,0);
+      if(shell.getBackground()==null || !(shell.getBackground() instanceof android.graphics.drawable.ColorDrawable) || ((android.graphics.drawable.ColorDrawable)shell.getBackground()).getColor()!=background)shell.setBackgroundColor(background);
+      if(browser.getBackground()==null || !(browser.getBackground() instanceof android.graphics.drawable.ColorDrawable) || ((android.graphics.drawable.ColorDrawable)browser.getBackground()).getColor()!=background)browser.setBackgroundColor(background);if(browser.getPaddingLeft()!=0 || browser.getPaddingTop()!=0 || browser.getPaddingRight()!=0 || browser.getPaddingBottom()!=0)browser.setPadding(0,0,0,0);
       if(toolbar.getPaddingLeft()!=0 || toolbar.getPaddingTop()!=0 || toolbar.getPaddingRight()!=0 || toolbar.getPaddingBottom()!=0)toolbar.setPadding(0,0,0,0);if(toolbar.getGravity()!=Gravity.CENTER_VERTICAL)toolbar.setGravity(Gravity.CENTER_VERTICAL);headerSurface.scale=scale;if(toolbar.getBackground()!=headerSurface && !toolbarAmbient.valid())toolbar.setBackground(headerSurface);
       if(details.getPaddingLeft()!=0 || details.getPaddingTop()!=0 || details.getPaddingRight()!=0 || details.getPaddingBottom()!=0)details.setPadding(0,0,0,0);detailSurface.scale=scale;if(details.getBackground()!=detailSurface && !detailsAmbient.valid())details.setBackground(detailSurface);
       previewSurface.scale=scale;if(preview.getBackground()!=previewSurface)preview.setBackground(previewSurface);if(preview.getOutlineProvider()!=ViewOutlineProvider.BACKGROUND)preview.setOutlineProvider(ViewOutlineProvider.BACKGROUND);if(!preview.getClipToOutline())preview.setClipToOutline(true);if(preview.getPaddingLeft()!=0 || preview.getPaddingTop()!=0 || preview.getPaddingRight()!=0 || preview.getPaddingBottom()!=0)preview.setPadding(0,0,0,0);textureInset();
@@ -406,8 +413,8 @@ public final class CobraCardsLayout {
       TextView name=(TextView)read(a,"mCobraModeTitle"),sub=(TextView)read(a,"mCobraModeSub");
       snapshot(header,name);if(!header.containsKey(sub))nativeSub=sub.getText();snapshot(header,sub);snapshot(header,labelBox);
       labelBox.setPadding(0,0,0,0);if(labelBox instanceof LinearLayout)((LinearLayout)labelBox).setGravity(Gravity.CENTER_VERTICAL);
-      style(name,HEADER_FACE,WHITE,42,1);name.setLetterSpacing(.0325f);text(name,"Cobra");
-      style(sub,NORMAL,MUTED,17,1);sub.setLetterSpacing(.12f);
+      style(name,HEADER_FACE,palette.text(WHITE),42,1);name.setLetterSpacing(.0325f);text(name,"Cobra");
+      style(sub,NORMAL,palette.muted(MUTED),17,1);sub.setLetterSpacing(.12f);
       headerCount(a,sub);
     }
     void headerCount(Activity a,TextView sub){
@@ -415,7 +422,7 @@ public final class CobraCardsLayout {
       String currentLocale=Locale.getDefault().toLanguageTag();
       if(countText==null || count!=shownCount || !currentLocale.equals(countLocale)){
         String label="CARDS    |    "+String.format(Locale.getDefault(),"%,d",count)+" CHANNELS";
-        countText=new SpannableString(label);countText.setSpan(new ForegroundColorSpan(CYAN),0,5,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);countText.setSpan(new StyleSpan(Typeface.BOLD),0,5,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);shownCount=count;countLocale=currentLocale;
+        countText=new SpannableString(label);countText.setSpan(new ForegroundColorSpan(palette.accent(CYAN)),0,5,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);countText.setSpan(new StyleSpan(Typeface.BOLD),0,5,Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);shownCount=count;countLocale=currentLocale;
       }
       text(sub,countText);
     }
@@ -432,7 +439,7 @@ public final class CobraCardsLayout {
       snapshot(browserHeader,selector);snapshot(browserHeader,source);snapshot(browserHeader,search);
       if(row.getChildCount()==3){View blank=new View(a);blank.setTag("cobra_cards_toolbar_spacer");blank.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);row.addView(blank,1,new LinearLayout.LayoutParams(0,1,1));browserSpacer=blank;}
       styleIcon(selector,browserHeader,4);
-      if(selector instanceof TextView){TextView label=(TextView)selector;style(label,BOLD,WHITE,24,1,true);label.setGravity(Gravity.CENTER_VERTICAL|Gravity.LEFT);label.setPadding(px(88),0,px(42),0);String value=label.getText().toString().replace(" / Channel wall"," / Channel Wall").replace("  \u25be","");text(label,value);}
+      if(selector instanceof TextView){TextView label=(TextView)selector;style(label,BOLD,palette.text(WHITE),24,1,true);label.setGravity(Gravity.CENTER_VERTICAL|Gravity.LEFT);label.setPadding(px(88),0,px(42),0);String value=label.getText().toString().replace(" / Channel wall"," / Channel Wall").replace("  \u25be","");text(label,value);}
       linear(selector,434,82,0,0,0);styleIcon(source,browserHeader,5);styleIcon(search,browserHeader,6);linear(source,94,82,0,0,18);linear(search,94,82,0,0,0);
       for(int i=1;i<browser.getChildCount();i++)if(browser.getChildAt(i) instanceof GridView){
         GridView grid=(GridView)browser.getChildAt(i);snapshot(browserHeader,grid);int columns=integer(read(a,"mCobraModeLayout"),"columns");
@@ -447,8 +454,9 @@ public final class CobraCardsLayout {
       // API21/22 retain the original native glyph with the Cards panel surface.
       boolean foreground=capture.nativeIcon && Build.VERSION.SDK_INT>=23;
       Drawable current=foreground?view.getForeground():view.getBackground();
-      if(!(current instanceof ButtonSurface) || ((ButtonSurface)current).kind!=kind){ButtonSurface shape=new ButtonSurface(kind);shape.scale=scale;shape.drawIcon=!capture.nativeIcon || foreground;if(foreground)view.setForeground(shape);else view.setBackground(shape);}
+      if(!(current instanceof ButtonSurface) || ((ButtonSurface)current).kind!=kind){ButtonSurface shape=new ButtonSurface(kind);shape.theme(palette);shape.scale=scale;shape.drawIcon=!capture.nativeIcon || foreground;if(foreground)view.setForeground(shape);else view.setBackground(shape);}
       else if(((ButtonSurface)current).scale!=scale){((ButtonSurface)current).scale=scale;view.invalidate();}
+      Drawable themed=foreground?view.getForeground():view.getBackground();if(themed instanceof ButtonSurface)((ButtonSurface)themed).theme(palette);
       if(foreground && view.getBackground()!=null)view.setBackground(null);
       if(kind!=4 && (view.getPaddingLeft()!=0 || view.getPaddingTop()!=0 || view.getPaddingRight()!=0 || view.getPaddingBottom()!=0))view.setPadding(0,0,0,0);
     }
@@ -459,7 +467,7 @@ public final class CobraCardsLayout {
     }
     void styleDetails(){
       rebasePublishedNativeStyles();
-      style(eyebrow,NORMAL,MUTED,18,1);style(time,NORMAL,MUTED,22,1);style(title,BOLD,WHITE,29,1);style(description,NORMAL,MUTED,21,5);style(remaining,NORMAL,MUTED,16,1);remaining.setGravity(Gravity.CENTER_VERTICAL|Gravity.RIGHT);
+      style(eyebrow,NORMAL,palette.muted(MUTED),18,1);style(time,NORMAL,palette.muted(MUTED),22,1);style(title,BOLD,palette.text(WHITE),29,1);style(description,NORMAL,palette.muted(MUTED),21,5);style(remaining,NORMAL,palette.muted(MUTED),16,1);remaining.setGravity(Gravity.CENTER_VERTICAL|Gravity.RIGHT);
       if(progress.getPaddingLeft()!=0 || progress.getPaddingTop()!=0 || progress.getPaddingRight()!=0 || progress.getPaddingBottom()!=0)progress.setPadding(0,0,0,0);if(progress.getProgressTintList()!=null)progress.setProgressTintList(null);if(progress.getProgressBackgroundTintList()!=null)progress.setProgressBackgroundTintList(null);if(progress.getProgressDrawable()!=progressSurface)progress.setProgressDrawable(progressSurface);int max=progress.getMax();progressSurface.setLevel(max<=0?0:(int)Math.max(0,Math.min(10000,Math.round(progress.getProgress()*10000d/max))));
       float timeY=32+22*font+20,titleY=timeY+26*font+8,progressY=titleY+36*font+26,descriptionY=progressY+47;
       float width=details.getWidth()>0?details.getWidth()/scale:428;
@@ -475,7 +483,12 @@ public final class CobraCardsLayout {
     void metadata(){
       Activity a=owner.get();if(a==null || !cards(a) || !hasNativeMetadata)return;
       String label=nativeEyebrow==null?"":nativeEyebrow.toString();int slash=label.indexOf("  /  ");
-      if(slash>0){if(!label.equals(eyebrowSource)){String heading=label.substring(0,slash),channel=label.substring(slash+5);String line=heading+"   |   "+channel;SpannableString span=new SpannableString(line);span.setSpan(new ForegroundColorSpan(CYAN),0,heading.length(),Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);span.setSpan(new StyleSpan(Typeface.BOLD),0,heading.length(),Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);eyebrowSource=label;eyebrowText=span;}text(eyebrow,eyebrowText);}
+      if(slash>0){if(!label.equals(eyebrowSource)){String heading=label.substring(0,slash),channel=label.substring(slash+5);String line=heading+"   |   "+channel;SpannableString span=new SpannableString(line);span.setSpan(new ForegroundColorSpan(palette.accent(CYAN)),0,heading.length(),Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);span.setSpan(new StyleSpan(Typeface.BOLD),0,heading.length(),Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);eyebrowSource=label;eyebrowText=span;}text(eyebrow,eyebrowText);}
+      if(palette.light && eyebrow.getText() instanceof Spanned){
+        SpannableString tinted=new SpannableString(eyebrow.getText());boolean changed=false;
+        for(ForegroundColorSpan old:tinted.getSpans(0,tinted.length(),ForegroundColorSpan.class))if(old.getForegroundColor()!=palette.accent){int from=tinted.getSpanStart(old),to=tinted.getSpanEnd(old),flags=tinted.getSpanFlags(old);tinted.removeSpan(old);tinted.setSpan(new ForegroundColorSpan(palette.accent),from,to,flags);changed=true;}
+        if(changed)eyebrow.setText(tinted);
+      }
       Object channel=read(a,"mGuidePreviewChannel"),programme=null;
       if(channel!=null){
         if(channelClass!=channel.getClass()){channelClass=channel.getClass();channelArgs=new Class<?>[]{channelClass};}
@@ -658,10 +671,12 @@ public final class CobraCardsLayout {
 
   private static class PanelSurface extends Drawable {
     final Paint fill=new Paint(Paint.ANTI_ALIAS_FLAG),line=new Paint(Paint.ANTI_ALIAS_FLAG);final RectF box=new RectF();
+    CobraCardsTheme.Colors palette=CobraCardsTheme.DARK;
+    void theme(CobraCardsTheme.Colors next){if(palette.same(next))return;palette=next;onBoundsChange(getBounds());invalidateSelf();}
     final float radius,topInset;float scale=1;boolean divider;
     PanelSurface(float radius,float top){this.radius=radius;topInset=top;line.setStyle(Paint.Style.STROKE);}
-    @Override protected void onBoundsChange(Rect bounds){fill.setShader(new LinearGradient(bounds.left,bounds.top,bounds.right,bounds.bottom,new int[]{0xff00090d,0xff000203,0xff001016},new float[]{0,.6f,1},Shader.TileMode.CLAMP));}
-    @Override public void draw(Canvas canvas){Rect b=getBounds();box.set(b.left+.75f*scale,b.top+topInset*scale+.75f*scale,b.right-.75f*scale,b.bottom-.75f*scale);canvas.drawRoundRect(box,radius*scale,radius*scale,fill);line.setColor(0xff08667e);line.setStrokeWidth(Math.max(1,1.4f*scale));canvas.drawRoundRect(box,radius*scale,radius*scale,line);if(divider){line.setColor(0xff173b49);line.setStrokeWidth(Math.max(1,scale));float x=b.left+491*scale;canvas.drawLine(x,b.top+32*scale,x,b.top+94*scale,line);}}
+    @Override protected void onBoundsChange(Rect bounds){fill.setShader(new LinearGradient(bounds.left,bounds.top,bounds.right,bounds.bottom,palette.gradient(0xff00090d,0xff000203,0xff001016),new float[]{0,.6f,1},Shader.TileMode.CLAMP));}
+    @Override public void draw(Canvas canvas){Rect b=getBounds();box.set(b.left+.75f*scale,b.top+topInset*scale+.75f*scale,b.right-.75f*scale,b.bottom-.75f*scale);canvas.drawRoundRect(box,radius*scale,radius*scale,fill);line.setColor(palette.edge(0xff08667e));line.setStrokeWidth(Math.max(1,1.4f*scale));canvas.drawRoundRect(box,radius*scale,radius*scale,line);if(divider){line.setColor(palette.edge(0xff173b49));line.setStrokeWidth(Math.max(1,scale));float x=b.left+491*scale;canvas.drawLine(x,b.top+32*scale,x,b.top+94*scale,line);}}
     @Override public void getOutline(Outline out){Rect b=getBounds();out.setRoundRect(b.left,b.top+Math.round(topInset*scale),b.right,b.bottom,radius*scale);}
     @Override public void setAlpha(int alpha){fill.setAlpha(alpha);line.setAlpha(alpha);invalidateSelf();}
     @Override public void setColorFilter(ColorFilter filter){}
@@ -673,13 +688,13 @@ public final class CobraCardsLayout {
     @Override public boolean isStateful(){return true;}
     @Override protected boolean onStateChange(int[] states){boolean f=false,p=false;for(int state:states){f|=state==android.R.attr.state_focused;p|=state==android.R.attr.state_pressed;}if(f==focused && p==pressed)return false;focused=f;pressed=p;invalidateSelf();return true;}
     @Override public void draw(Canvas canvas){
-      super.draw(canvas);if(!drawIcon)return;Rect r=getBounds();float x=r.exactCenterX(),y=r.exactCenterY(),s=scale;icon.setColor(kind==3 || kind==4?CYAN:WHITE);icon.setStrokeWidth(Math.max(1,4*s));
+      super.draw(canvas);if(!drawIcon)return;Rect r=getBounds();float x=r.exactCenterX(),y=r.exactCenterY(),s=scale;icon.setColor(kind==3 || kind==4?palette.accent(CYAN):palette.text(WHITE));icon.setStrokeWidth(Math.max(1,4*s));
       if(kind==1 || kind==5){for(int i=0;i<3;i++){float length=(kind==5?34-i*8:38)*s;canvas.drawLine(x-19*s,y+(i-1)*15*s,x-19*s+length,y+(i-1)*15*s,icon);}}
       else if(kind==2){canvas.drawCircle(x,y,11*s,icon);for(int i=0;i<8;i++){double angle=i*Math.PI/4;float dx=(float)Math.cos(angle),dy=(float)Math.sin(angle);canvas.drawLine(x+dx*20*s,y+dy*20*s,x+dx*27*s,y+dy*27*s,icon);}shape.reset();shape.moveTo(x+17*s,y+22*s);shape.lineTo(x+24*s,y+29*s);shape.lineTo(x+32*s,y+19*s);canvas.drawPath(shape,icon);}
       else if(kind==3){for(int row=0;row<2;row++)for(int col=0;col<2;col++){float left=x+(col==0?-20:4)*s,top=y+(row==0?-20:4)*s;canvas.drawRoundRect(left,top,left+16*s,top+16*s,3*s,3*s,icon);}}
-      else if(kind==4){x=r.left+43*s;shape.reset();for(int i=0;i<10;i++){double angle=-Math.PI/2+i*Math.PI/5;float radius=(i%2==0?20:9)*s;float px=x+(float)Math.cos(angle)*radius,py=y+(float)Math.sin(angle)*radius;if(i==0)shape.moveTo(px,py);else shape.lineTo(px,py);}shape.close();canvas.drawPath(shape,icon);icon.setColor(WHITE);icon.setStyle(Paint.Style.FILL);shape.reset();shape.moveTo(r.right-40*s,y-4*s);shape.lineTo(r.right-26*s,y-4*s);shape.lineTo(r.right-33*s,y+6*s);shape.close();canvas.drawPath(shape,icon);icon.setStyle(Paint.Style.STROKE);}
+      else if(kind==4){x=r.left+43*s;shape.reset();for(int i=0;i<10;i++){double angle=-Math.PI/2+i*Math.PI/5;float radius=(i%2==0?20:9)*s;float px=x+(float)Math.cos(angle)*radius,py=y+(float)Math.sin(angle)*radius;if(i==0)shape.moveTo(px,py);else shape.lineTo(px,py);}shape.close();canvas.drawPath(shape,icon);icon.setColor(palette.text(WHITE));icon.setStyle(Paint.Style.FILL);shape.reset();shape.moveTo(r.right-40*s,y-4*s);shape.lineTo(r.right-26*s,y-4*s);shape.lineTo(r.right-33*s,y+6*s);shape.close();canvas.drawPath(shape,icon);icon.setStyle(Paint.Style.STROKE);}
       else if(kind==6){canvas.drawCircle(x-3*s,y-4*s,15*s,icon);canvas.drawLine(x+8*s,y+7*s,x+21*s,y+21*s,icon);}
-      if(focused || pressed){icon.setColor(CYAN);icon.setStrokeWidth(Math.max(1,2*scale));box.inset(3*scale,3*scale);canvas.drawRoundRect(box,18*scale,18*scale,icon);}
+      if(focused || pressed){icon.setColor(palette.accent(CYAN));icon.setStrokeWidth(Math.max(1,2*scale));box.inset(3*scale,3*scale);canvas.drawRoundRect(box,18*scale,18*scale,icon);}
     }
   }
   private static final class ProgressSurface extends Drawable {
