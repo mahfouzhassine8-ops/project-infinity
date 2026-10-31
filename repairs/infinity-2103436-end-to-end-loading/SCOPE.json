@@ -1,0 +1,35 @@
+{
+  "baseline": "7bbe08363b493146ca7ed67cb872e9a98b1d888b",
+  "baseline_infinity_zip_sha256": "a99e7bb789a0817fdfc9cc10b4e1649d52a2c78f0e3375f0735c55f4a91a0336",
+  "selected_before_execution": true,
+  "first_correction": "Independent completion must not invalidate unrelated pending task; background ownership persists across window/geometry changes within same profile",
+  "initial_functional_allowlist": [
+    "script.infinity.commandcenter/action_loading.py:LoadingState.event",
+    "script.infinity.commandcenter/action_loading.py:LoadingState.tick",
+    "script.infinity.commandcenter/action_loading.py:make_monitor.LoadingMonitor.tick"
+  ],
+  "selected_tests": [
+    "test_other_task_completion_does_not_discard_delayed_start",
+    "test_background_resize_keeps_pending_work",
+    "test_background_old_profile_is_rejected",
+    "test_monitor_window_change_preserves_background_until_terminal"
+  ],
+  "runtime": "NOT_YET_RUN",
+  "shutdown": "FROZEN; NOT_SELECTED",
+  "Cobra": "FROZEN436",
+  "signing": "NOT_SELECTED_UNTIL_REMAINING_IMPLEMENTATION_AND_GATES_PASS",
+  "selected_existing_state_regressions": [
+    "test_fast_and_completed_empty_never_flash",
+    "test_slow_exact_item_and_failed_state_retire",
+    "test_superseded_completion_cannot_clear_new_action",
+    "test_back_context_focus_profile_fold_and_new_playback_clear",
+    "test_existing_background_playback_is_not_canceled",
+    "test_busy_dialog_does_not_steal_owner_native_end_clears_navigation",
+    "test_background_overlap_drawer_and_primary_precedence",
+    "test_no_suitable_item_frame_uses_truthful_global_cue",
+    "test_stale_owner_never_becomes_a_global_job",
+    "test_cancellation_before_start_and_duplicate_start_are_idempotent",
+    "test_evicted_terminal_token_still_cannot_revive_old_work",
+    "test_observation_budget_bounds_memory_without_work_or_fake_success"
+  ]
+}

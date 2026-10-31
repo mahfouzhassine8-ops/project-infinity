@@ -1,0 +1,47 @@
+--- signed436/action_loading.py
++++ candidate/action_loading.py
+@@ -66,9 +66,8 @@
+         if not isinstance(token, str) or not (len(token) == 32 and all(c in '0123456789abcdef' for c in token)):
+             return
+         if state in TERMINAL:
+-            sent = value.get('sent', now)
+-            if isinstance(sent, (float, int)) and not isinstance(sent, bool) and 0 <= sent <= now:
+-                self.retired_before = max(self.retired_before, sent)
++            # Completion belongs to this token, not every operation that
++            # started earlier in another Python invocation.
+             self.jobs.pop(token, None)
+             if self.action and self.action['token'] == token:
+                 self.action = None
+@@ -85,6 +84,9 @@
+         owner = value.get('owner')
+         if not isinstance(owner, dict):
+             owner = {}
++        if value.get('foreground') is not True and str(owner.get('profile', '')) != str(context.get('profile', '')):
++            self._retire(token)
++            return  # Delayed background work cannot acquire a different profile.
+         # A delayed event must never attach itself to the current, different
+         # screen/row/profile. Missing UI ownership may only become a global job.
+         matches = all(str(owner.get(key, '')) == str(context.get(key, '')) for key in IDENTITY)
+@@ -130,7 +132,6 @@
+         for token, job in list(self.jobs.items()):
+             before = job['context']
+             if (context.get('profile') != before.get('profile') or
+-                    context.get('geometry') != before.get('geometry') or
+                     now - job['started'] >= OBSERVATION_LIMIT):
+                 self.jobs.pop(token, None)
+                 self._retire(token)
+@@ -264,7 +265,13 @@
+             now = time.monotonic()
+             fingerprint = tuple(context[key] for key in ('profile', 'geometry', 'window', 'allowed'))
+             if fingerprint != self.fingerprint:
+-                self.state.cancel_all()
++                if (self.fingerprint is None or fingerprint[0] != self.fingerprint[0]
++                        or fingerprint[3] != self.fingerprint[3]):
++                    self.state.cancel_all()
++                else:
++                    # Destination/fold changes invalidate the selected control,
++                    # but do not complete independent work in this profile.
++                    self.state.cancel_action()
+                 self.epoch = uuid.uuid4().hex
+                 self.fingerprint = fingerprint
+                 self.home.setProperty(PREFIX + 'Context', self.epoch)
