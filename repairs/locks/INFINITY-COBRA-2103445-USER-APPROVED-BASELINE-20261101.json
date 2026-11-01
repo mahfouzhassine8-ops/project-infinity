@@ -1,0 +1,59 @@
+{
+  "status": "USER_APPROVED_LOCK",
+  "versionCode": 2103445,
+  "reference": "lock/infinity-cobra-2103445-user-approved-20261101",
+  "exact_signed_source": "6cf75639a46ec6b0c858ae32abc102450fdc0974",
+  "apk": {
+    "filename": "Infinity-2103445-Combined-Original-Signer.apk",
+    "sha256": "b7e78393ade7e52d8653823a0ad72ae99614a5a8e0b6cdedf5d5d15a9e643400",
+    "package": "com.projectinfinity.kodi",
+    "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "original_signing_run": 41349763470,
+    "artifact_id": 13100188760
+  },
+  "components": {
+    "COBRA": {
+      "version": "2103445",
+      "sha256": "f63d4c1e491dc94591c5623bf02be90d4f9c187b91a0511b36398ee96745f8a8"
+    },
+    "INFINITY": {
+      "version": "2103437",
+      "sha256": "d03b4d5e845dfb5e1d6bb75c1967c7b6a2e55c5b17a7c65d66d43d43abd2e73d",
+      "unchanged_from_2103444": true
+    },
+    "MINIMAL_ANDROID_CONTRACT": {
+      "sha256": "432bfb7b246a504d9550e1de39368c3b7e0946532f1c695531ed891e74ef03d8",
+      "unchanged_from_2103444": true
+    },
+    "CHOOSER_SHELL": {
+      "sha256": "2a0d5f73a0289f64f2caa8fe8f7ce1f2e3234116ff76e699f2f773bab0aa14ba",
+      "note": "truthful Cobra metadata change; chooser executable unchanged"
+    }
+  },
+  "approval": {
+    "user_words": "Lock it",
+    "date": "2026-11-01",
+    "physical_fold_test_claim": false
+  },
+  "tests": {
+    "focused_host": "PASS",
+    "original_key_and_member_preservation": "PASS",
+    "android_2103445_runtime_matrix": "NOT_RUN",
+    "physical_fold": "NOT_TESTED",
+    "historical_known_failure": "UNCHANGED_2103444_BASELINE_REPRODUCES"
+  },
+  "previous_baselines": [
+    {
+      "versionCode": 2103444,
+      "ref": "lock/infinity-cobra-2103444-user-approved-20261101",
+      "source": "1b7a4ef16524854fab77a1c974538aee8a1132bb"
+    },
+    {
+      "versionCode": 2103442,
+      "ref": "lock/infinity-cobra-2103442-user-approved-20261101",
+      "source": "2e88f85250ef2e46952192cf0fdb42ac5af7c9c8"
+    }
+  ],
+  "locked_branch_github_ruleset_verified": false,
+  "artifact_expiry_utc": "2027-01-30T21:00:54Z"
+}
