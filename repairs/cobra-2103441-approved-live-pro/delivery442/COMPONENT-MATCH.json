@@ -1,0 +1,40 @@
+{
+  "status": "PASS_DOWNLOADED_SIGNED_APK_MATCHES_EXACT_COMPONENTS_AND_TESTED_DEX",
+  "source": "2e88f85250ef2e46952192cf0fdb42ac5af7c9c8",
+  "versionCode": 2103442,
+  "apk_sha256": "88f968c53eb3d306db57de72419744f427554f7146f4f86e147b192f4f5e0bf5",
+  "payload_members_checked": 7614,
+  "components": {
+    "CHOOSER_SHELL": {
+      "members": 1,
+      "dex": 1,
+      "zip_sha256": "df3d0110091fe7397a19dfed9cf7d0a0bdf80ddb34b60fd25de2b43c031a4d70"
+    },
+    "MINIMAL_ANDROID_CONTRACT": {
+      "members": 81,
+      "dex": 1,
+      "zip_sha256": "432bfb7b246a504d9550e1de39368c3b7e0946532f1c695531ed891e74ef03d8"
+    },
+    "INFINITY": {
+      "members": 7516,
+      "dex": 1,
+      "zip_sha256": "d03b4d5e845dfb5e1d6bb75c1967c7b6a2e55c5b17a7c65d66d43d43abd2e73d"
+    },
+    "COBRA": {
+      "members": 11,
+      "dex": 2,
+      "zip_sha256": "9435546ad399b7d464340ca54b3208f8db15a7c3f63bc5dee0bdb2c99989ee7e"
+    }
+  },
+  "dex_mapping": {
+    "classes.dex": "CHOOSER_SHELL:dex/part-0.dex",
+    "classes2.dex": "MINIMAL_ANDROID_CONTRACT:dex/part-0.dex",
+    "classes3.dex": "INFINITY:dex/part-0.dex",
+    "classes4.dex": "COBRA:dex/part-0.dex",
+    "classes5.dex": "COBRA:dex/part-1.dex"
+  },
+  "Infinity_and_shared_zip_bytes_identical_to_438": true,
+  "Cards_and_Pro_tested_DEX_exact": true,
+  "physical_Fold": "PENDING",
+  "accepted_pointer_updated": false
+}
