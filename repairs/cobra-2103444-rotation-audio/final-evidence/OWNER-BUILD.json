@@ -1,0 +1,30 @@
+{
+  "added": [
+    "Lcom/projectinfinity/kodi/CobraFullscreenAudio$$ExternalSyntheticLambda0;",
+    "Lcom/projectinfinity/kodi/CobraFullscreenAudio;",
+    "Lcom/projectinfinity/kodi/CobraRotationPolicy;"
+  ],
+  "baseline_component_sha256": "f00c5e887cd221b12ee37a1e2a801dd61e60ecf555e0cfc1bb38974fd41ba690",
+  "changed": [
+    "Lcom/projectinfinity/kodi/CobraComponent;",
+    "Lcom/projectinfinity/kodi/InfinityCobraDeviceBridge;",
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity$29;",
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraPlayerBinding;",
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraSix;",
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity;"
+  ],
+  "dex": {
+    "part-0.dex": "8286747329a4f1a572dc5e85c27239c3cfef24d8be81f1fbee770be4ba1e9584",
+    "part-1.dex": "70dc429bff4d2df7fe19907100d5df39d5ade973aa2679328b42d567b3d5aee1"
+  },
+  "sources": {
+    "repairs/cobra-2103444-rotation-audio/PreserveCobraDexPartition.java": "73333ed7bc4e67dec1c9ad2ba41a6dca48b9ed2f4e26c96a28099b1ddae3c705",
+    "repairs/cobra-2103444-rotation-audio/build_owner.py": "9afbd01b6f71c3f7cce69f3c1e2b0adde5bed4011b3c9b60d6ddd377ab88d04c",
+    "repairs/cobra-2103444-rotation-audio/patch_native.py": "4f188c469cc32e2ce02e1dce0fee48cbb4f18fe07b5d9c8c857e89ce62b186ff",
+    "repairs/cobra-2103444-rotation-audio/runtime/CobraFullscreenAudio.java": "de782933b8a830a7cf8367cf62a6f990f6a5ee0ebd6cf7f6255951f59ec01a45",
+    "repairs/cobra-2103444-rotation-audio/runtime/CobraRotationPolicy.java": "f5b7f2ca310f727f86480110371a73b9de23b4317fa409267f84e63055fe5a70",
+    "repairs/dual-experience-isolation-2103420/ModuleDexWriter.java": "f9c1b6da2552d529f27709b5f1c53368cacfab42d83fc947cb3b16cd0416dad2"
+  },
+  "status": "PASS_ROTATION_AUDIO_EXACT444_METHOD_DELTA",
+  "unchanged": 7175
+}

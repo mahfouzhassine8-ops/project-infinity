@@ -1,0 +1,117 @@
+# Created at 2026-11-01T20:48:12.609
+ForkStarter IOException: Unable to create file for report: No space left on device.
+org.apache.maven.plugin.surefire.booterclient.output.MultipleFailureException: Unable to create file for report: No space left on device
+	at org.apache.maven.plugin.surefire.booterclient.output.ThreadedStreamConsumer$Pumper.<init>(ThreadedStreamConsumer.java:59)
+	at org.apache.maven.plugin.surefire.booterclient.output.ThreadedStreamConsumer.<init>(ThreadedStreamConsumer.java:107)
+	at org.apache.maven.plugin.surefire.booterclient.ForkStarter.fork(ForkStarter.java:546)
+	at org.apache.maven.plugin.surefire.booterclient.ForkStarter.lambda$null$7(ForkStarter.java:401)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+	Suppressed: org.apache.maven.surefire.api.report.ReporterException: Unable to create file for report: No space left on device
+		at org.apache.maven.plugin.surefire.report.FileReporter.testSetCompleted(FileReporter.java:98)
+		at org.apache.maven.plugin.surefire.report.FileReporter.testSetCompleted(FileReporter.java:42)
+		at org.apache.maven.plugin.surefire.report.TestSetRunListener.testSetCompleted(TestSetRunListener.java:192)
+		at org.apache.maven.plugin.surefire.booterclient.output.ForkClient$TestSetCompletedListener.handle(ForkClient.java:143)
+		at org.apache.maven.plugin.surefire.booterclient.output.ForkClient$TestSetCompletedListener.handle(ForkClient.java:127)
+		at org.apache.maven.plugin.surefire.booterclient.output.ForkedProcessEventNotifier.notifyEvent(ForkedProcessEventNotifier.java:197)
+		at org.apache.maven.plugin.surefire.booterclient.output.ForkClient.handleEvent(ForkClient.java:303)
+		at org.apache.maven.plugin.surefire.booterclient.output.ForkClient.handleEvent(ForkClient.java:59)
+		at org.apache.maven.plugin.surefire.booterclient.output.ThreadedStreamConsumer$Pumper.run(ThreadedStreamConsumer.java:86)
+		... 1 more
+	Caused by: java.io.IOException: No space left on device
+		at java.base/java.io.FileOutputStream.writeBytes(Native Method)
+		at java.base/java.io.FileOutputStream.write(FileOutputStream.java:367)
+		at java.base/sun.nio.cs.StreamEncoder.writeBytes(StreamEncoder.java:309)
+		at java.base/sun.nio.cs.StreamEncoder.implWrite(StreamEncoder.java:381)
+		at java.base/sun.nio.cs.StreamEncoder.implWrite(StreamEncoder.java:357)
+		at java.base/sun.nio.cs.StreamEncoder.lockedWrite(StreamEncoder.java:158)
+		at java.base/sun.nio.cs.StreamEncoder.write(StreamEncoder.java:139)
+		at java.base/java.io.OutputStreamWriter.write(OutputStreamWriter.java:219)
+		at java.base/java.io.BufferedWriter.implFlushBuffer(BufferedWriter.java:178)
+		at java.base/java.io.BufferedWriter.flushBuffer(BufferedWriter.java:163)
+		at java.base/java.io.BufferedWriter.implClose(BufferedWriter.java:397)
+		at java.base/java.io.BufferedWriter.close(BufferedWriter.java:380)
+		at org.apache.maven.plugin.surefire.report.FileReporter.testSetCompleted(FileReporter.java:97)
+		... 9 more
+
+
+# Created at 2026-11-01T20:48:15.399
+ForkStarter IOException: Unable to create file for report: No space left on device.
+org.apache.maven.plugin.surefire.booterclient.output.MultipleFailureException: Unable to create file for report: No space left on device
+	at org.apache.maven.plugin.surefire.booterclient.output.ThreadedStreamConsumer$Pumper.<init>(ThreadedStreamConsumer.java:59)
+	at org.apache.maven.plugin.surefire.booterclient.output.ThreadedStreamConsumer.<init>(ThreadedStreamConsumer.java:107)
+	at org.apache.maven.plugin.surefire.booterclient.ForkStarter.fork(ForkStarter.java:546)
+	at org.apache.maven.plugin.surefire.booterclient.ForkStarter.lambda$null$7(ForkStarter.java:401)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+	Suppressed: org.apache.maven.surefire.api.report.ReporterException: Unable to create file for report: No space left on device
+		at org.apache.maven.plugin.surefire.report.FileReporter.testSetCompleted(FileReporter.java:98)
+		at org.apache.maven.plugin.surefire.report.FileReporter.testSetCompleted(FileReporter.java:42)
+		at org.apache.maven.plugin.surefire.report.TestSetRunListener.testSetCompleted(TestSetRunListener.java:192)
+		at org.apache.maven.plugin.surefire.booterclient.output.ForkClient$TestSetCompletedListener.handle(ForkClient.java:143)
+		at org.apache.maven.plugin.surefire.booterclient.output.ForkClient$TestSetCompletedListener.handle(ForkClient.java:127)
+		at org.apache.maven.plugin.surefire.booterclient.output.ForkedProcessEventNotifier.notifyEvent(ForkedProcessEventNotifier.java:197)
+		at org.apache.maven.plugin.surefire.booterclient.output.ForkClient.handleEvent(ForkClient.java:303)
+		at org.apache.maven.plugin.surefire.booterclient.output.ForkClient.handleEvent(ForkClient.java:59)
+		at org.apache.maven.plugin.surefire.booterclient.output.ThreadedStreamConsumer$Pumper.run(ThreadedStreamConsumer.java:86)
+		... 1 more
+	Caused by: java.io.IOException: No space left on device
+		at java.base/java.io.FileOutputStream.writeBytes(Native Method)
+		at java.base/java.io.FileOutputStream.write(FileOutputStream.java:367)
+		at java.base/sun.nio.cs.StreamEncoder.writeBytes(StreamEncoder.java:309)
+		at java.base/sun.nio.cs.StreamEncoder.implWrite(StreamEncoder.java:381)
+		at java.base/sun.nio.cs.StreamEncoder.implWrite(StreamEncoder.java:357)
+		at java.base/sun.nio.cs.StreamEncoder.lockedWrite(StreamEncoder.java:158)
+		at java.base/sun.nio.cs.StreamEncoder.write(StreamEncoder.java:139)
+		at java.base/java.io.OutputStreamWriter.write(OutputStreamWriter.java:219)
+		at java.base/java.io.BufferedWriter.implFlushBuffer(BufferedWriter.java:178)
+		at java.base/java.io.BufferedWriter.flushBuffer(BufferedWriter.java:163)
+		at java.base/java.io.BufferedWriter.implClose(BufferedWriter.java:397)
+		at java.base/java.io.BufferedWriter.close(BufferedWriter.java:380)
+		at org.apache.maven.plugin.surefire.report.FileReporter.testSetCompleted(FileReporter.java:97)
+		... 9 more
+
+
+# Created at 2026-11-01T20:48:18.095
+ForkStarter IOException: Unable to create file for report: No space left on device.
+org.apache.maven.plugin.surefire.booterclient.output.MultipleFailureException: Unable to create file for report: No space left on device
+	at org.apache.maven.plugin.surefire.booterclient.output.ThreadedStreamConsumer$Pumper.<init>(ThreadedStreamConsumer.java:59)
+	at org.apache.maven.plugin.surefire.booterclient.output.ThreadedStreamConsumer.<init>(ThreadedStreamConsumer.java:107)
+	at org.apache.maven.plugin.surefire.booterclient.ForkStarter.fork(ForkStarter.java:546)
+	at org.apache.maven.plugin.surefire.booterclient.ForkStarter.lambda$null$7(ForkStarter.java:401)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+	Suppressed: org.apache.maven.surefire.api.report.ReporterException: Unable to create file for report: No space left on device
+		at org.apache.maven.plugin.surefire.report.FileReporter.testSetCompleted(FileReporter.java:98)
+		at org.apache.maven.plugin.surefire.report.FileReporter.testSetCompleted(FileReporter.java:42)
+		at org.apache.maven.plugin.surefire.report.TestSetRunListener.testSetCompleted(TestSetRunListener.java:192)
+		at org.apache.maven.plugin.surefire.booterclient.output.ForkClient$TestSetCompletedListener.handle(ForkClient.java:143)
+		at org.apache.maven.plugin.surefire.booterclient.output.ForkClient$TestSetCompletedListener.handle(ForkClient.java:127)
+		at org.apache.maven.plugin.surefire.booterclient.output.ForkedProcessEventNotifier.notifyEvent(ForkedProcessEventNotifier.java:197)
+		at org.apache.maven.plugin.surefire.booterclient.output.ForkClient.handleEvent(ForkClient.java:303)
+		at org.apache.maven.plugin.surefire.booterclient.output.ForkClient.handleEvent(ForkClient.java:59)
+		at org.apache.maven.plugin.surefire.booterclient.output.ThreadedStreamConsumer$Pumper.run(ThreadedStreamConsumer.java:86)
+		... 1 more
+	Caused by: java.io.IOException: No space left on device
+		at java.base/java.io.FileOutputStream.writeBytes(Native Method)
+		at java.base/java.io.FileOutputStream.write(FileOutputStream.java:367)
+		at java.base/sun.nio.cs.StreamEncoder.writeBytes(StreamEncoder.java:309)
+		at java.base/sun.nio.cs.StreamEncoder.implWrite(StreamEncoder.java:381)
+		at java.base/sun.nio.cs.StreamEncoder.implWrite(StreamEncoder.java:357)
+		at java.base/sun.nio.cs.StreamEncoder.lockedWrite(StreamEncoder.java:158)
+		at java.base/sun.nio.cs.StreamEncoder.write(StreamEncoder.java:139)
+		at java.base/java.io.OutputStreamWriter.write(OutputStreamWriter.java:219)
+		at java.base/java.io.BufferedWriter.implFlushBuffer(BufferedWriter.java:178)
+		at java.base/java.io.BufferedWriter.flushBuffer(BufferedWriter.java:163)
+		at java.base/java.io.BufferedWriter.implClose(BufferedWriter.java:397)
+		at java.base/java.io.BufferedWriter.close(BufferedWriter.java:380)
+		at org.apache.maven.plugin.surefire.report.FileReporter.testSetCompleted(FileReporter.java:97)
+		... 9 more
+
+

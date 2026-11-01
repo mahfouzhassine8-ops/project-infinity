@@ -1,0 +1,38 @@
+{
+  "Cards_Pro_Sports_MultiView_themes": "EXACT_ORIGINAL_CLASSES",
+  "CobraSix_other_unchanged_method_count": 46,
+  "Infinity": "OWNER_BUILD_NEVER_ACCESSES_INFINITY; FINAL_APK_COMPARISON_REQUIRED",
+  "PlayerBindings": "ONLY_VOLUME_CALLBACK_UI_REFRESH",
+  "changed_methods": {
+    "Lcom/projectinfinity/kodi/CobraComponent;": [
+      "public static version()Ljava/lang/String;"
+    ],
+    "Lcom/projectinfinity/kodi/InfinityCobraDeviceBridge;": [
+      "private applyRotation(Ljava/lang/String;)V"
+    ],
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity$29;": [
+      "public synthetic onVolumeChanged(F)V"
+    ],
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraPlayerBinding;": [
+      "public synthetic onVolumeChanged(F)V"
+    ],
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraSix;": [
+      "controls(Landroid/widget/LinearLayout;I)Landroid/view/View;"
+    ],
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity;": [
+      "private cobraPlayerRotationDescription()Ljava/lang/String;",
+      "private cobraRefreshCallControls()V",
+      "private cobraTogglePlayerRotation()V"
+    ]
+  },
+  "native_activity_unchanged_method_count": 1801,
+  "new_classes": [
+    "Lcom/projectinfinity/kodi/CobraFullscreenAudio$$ExternalSyntheticLambda0;",
+    "Lcom/projectinfinity/kodi/CobraFullscreenAudio;",
+    "Lcom/projectinfinity/kodi/CobraRotationPolicy;"
+  ],
+  "original_fields_annotations": "IDENTICAL",
+  "shutdown": "UNCHANGED_NOT_TESTED",
+  "status": "PASS_EXACT444_ROTATION_AUDIO_OWNER_PRESERVATION",
+  "unchanged_classes": 7175
+}
