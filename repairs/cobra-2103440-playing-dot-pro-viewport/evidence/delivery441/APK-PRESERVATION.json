@@ -1,0 +1,82 @@
+{
+  "status": "PASS_INDEPENDENT_SIGNED441_PRESERVATION",
+  "versionCode": 2103441,
+  "apk_sha256": "da311a0b7105cdee5c4e129c73a8a3fd22dd25b9055f124aea03bb542e070610",
+  "source_commit": "1044ece3a1cb67f3d992c156d3b421106cbe1392",
+  "original_certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "signature_v1_v2_v3": true,
+  "zipalign16KB": true,
+  "comparisons": {
+    "438": {
+      "baseline_sha256": "a1907acbcb3a36f5b2312f8a11cd4e38d8fcdbed2f435b6ab45d369adc8e9f35",
+      "changed_members": {
+        "AndroidManifest.xml": {
+          "before": "e9aa3cab2e4955498c26874486dd1451eadbdcf6e093d06f29c85d2b5fafe0e5",
+          "after": "38285d4b38dd6abfc94c69137a968620179ac3b35ee08a328a29e90f775d63e5"
+        },
+        "assets/experience-component-updates.properties": {
+          "before": "9bb3544f574a1d167fdf7d14c0d55863d00a27c85625af4f549c167202ef32ea",
+          "after": "49f596684c6d6dec330d0ec5d20e6018823b129d9234a1deefee9702f6aa5615"
+        },
+        "classes4.dex": {
+          "before": "af8a55708344d9e67bb6e9ddd8d0ca01d937091225a6ca8e88c4cc2c7956afc6",
+          "after": "374ce9f50ffb29502fdc4d2edda300d2625a02631c2fde14d728e8429df414ae"
+        },
+        "META-INF/INFINITY.SF": {
+          "before": "ee434f5533c1263c1dbe0f69c8ad08ef07d63b0ebc022fe9443a060db49e7a8e",
+          "after": "9abaf254c211a900cc29288886caf5510ec5b721728f094842451237b1a57a77"
+        },
+        "META-INF/INFINITY.RSA": {
+          "before": "2c0153a3b77bafba19f62e639cb516d4034093b1efaac069efefd2e49b287a52",
+          "after": "6fbaa2e82fa50c452a04b14d3c334b0c76212c53bc0c4602228e58da219893ed"
+        },
+        "META-INF/MANIFEST.MF": {
+          "before": "ccef8a4cf81e01ae42c164130cef8f3d6c1f5d76c6e2018862bafed0ffb86abc",
+          "after": "a72e3df6cc18b5aeca0d24230e580f60c957400a9cf6f15b63d3d0b0e767024c"
+        }
+      },
+      "unchanged_members": 7611,
+      "native_libraries_unchanged": 47,
+      "added": [],
+      "removed": []
+    },
+    "440": {
+      "baseline_sha256": "c34b466fb335a273331221a2e963c189747f15811f5b75c59862ad71b2719a4c",
+      "changed_members": {
+        "AndroidManifest.xml": {
+          "before": "815fb28c269dff330400e2e01e8f654fdeda4f3161a7c461db56fe5f2a3b1719",
+          "after": "38285d4b38dd6abfc94c69137a968620179ac3b35ee08a328a29e90f775d63e5"
+        },
+        "assets/experience-component-updates.properties": {
+          "before": "9b228bcb067b49bf07ff886183ac411f6dcbc1a6c4ddab3ef693d8f2d90e4e41",
+          "after": "49f596684c6d6dec330d0ec5d20e6018823b129d9234a1deefee9702f6aa5615"
+        },
+        "classes4.dex": {
+          "before": "1e00aba303dd62ad3889b2fecc52674d0750fbc025c326febb8744f6d4d86671",
+          "after": "374ce9f50ffb29502fdc4d2edda300d2625a02631c2fde14d728e8429df414ae"
+        },
+        "META-INF/INFINITY.SF": {
+          "before": "94813f9b0619da62f7731638e9090a359ece24eb0bf981d24c647d4e02719838",
+          "after": "9abaf254c211a900cc29288886caf5510ec5b721728f094842451237b1a57a77"
+        },
+        "META-INF/INFINITY.RSA": {
+          "before": "e74974a143f57011bf0932daa135574727e49feb8bb2a79b48571a0cef76fa5e",
+          "after": "6fbaa2e82fa50c452a04b14d3c334b0c76212c53bc0c4602228e58da219893ed"
+        },
+        "META-INF/MANIFEST.MF": {
+          "before": "d2e1d0bfd9e31dfae15420298fdf17ace1609e1465f2ab2560645450a96087fc",
+          "after": "a72e3df6cc18b5aeca0d24230e580f60c957400a9cf6f15b63d3d0b0e767024c"
+        }
+      },
+      "unchanged_members": 7611,
+      "native_libraries_unchanged": 47,
+      "added": [],
+      "removed": []
+    }
+  },
+  "host_tested_Cobra_DEX_exact": true,
+  "Infinity": "FROZEN",
+  "user_data": "NO_ACCESS",
+  "shutdown": "UNCHANGED_NOT_RUN",
+  "physical_Fold": "PENDING_USER_ACCEPTANCE"
+}

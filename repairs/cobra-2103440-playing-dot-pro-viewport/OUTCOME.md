@@ -1,3 +1,5 @@
+Delivered as original-key signed testing candidate2103441. See [DELIVERY441.md](DELIVERY441.md) for downloads, final verification and checksums. No automatic lock or promotion. The following records the implementation checkpoint and its resolved access blocker.
+
 The remaining Cards indicator and the newly authorized Pro inner-display sizing correction are implemented and host-verified. No new signed APK has been produced. Physical Fold acceptance remains pending.
 
 The user's latest screenshots resolve the earlier indicator attribution error. The requested marker is the original blue playing-channel dot shown on Mobile's Boomerang row. It is separate from the cyan LIVE metadata dots and the preview's Cobra emblem. The screenshots were visually inspected as static images; they do not establish animation timing. The user confirms the 440 Preview-menu repair works.
