@@ -1,0 +1,333 @@
+[ERROR] Tests run: 6, Failures: 6, Errors: 0, Skipped: 0, Time elapsed: 9.485 s <<< FAILURE! -- in com.projectinfinity.kodi.PreviewRestorationTest
+[ERROR] com.projectinfinity.kodi.PreviewRestorationTest.restoredPreviewAcrossThemesAndViewports -- Time elapsed: 5.930 s <<< FAILURE!
+org.junit.ComparisonFailure: async=true binding=true ready=true state=3 error= closed=false expected:<[LIV]E> but was:<[NON]E>
+	at org.junit.Assert.assertEquals(Assert.java:117)
+	at com.projectinfinity.kodi.PreviewRestorationTest.liveTimeline(PreviewRestorationTest.java:25)
+	at com.projectinfinity.kodi.PreviewRestorationTest.fixture(PreviewRestorationTest.java:19)
+	at com.projectinfinity.kodi.PreviewRestorationTest.restoredPreviewAcrossThemesAndViewports(PreviewRestorationTest.java:32)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.robolectric.RobolectricTestRunner$HelperTestRunner$1.evaluate(RobolectricTestRunner.java:502)
+	at org.robolectric.internal.SandboxTestRunner$2.lambda$evaluate$2(SandboxTestRunner.java:285)
+	at org.robolectric.internal.bytecode.Sandbox.lambda$runOnMainThread$0(Sandbox.java:104)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+
+[ERROR] com.projectinfinity.kodi.PreviewRestorationTest.channelSelectionUsesOriginalPreviewRoute -- Time elapsed: 0.861 s <<< FAILURE!
+org.junit.ComparisonFailure: async=true binding=true ready=true state=3 error= closed=false expected:<[LIV]E> but was:<[NON]E>
+	at org.junit.Assert.assertEquals(Assert.java:117)
+	at com.projectinfinity.kodi.PreviewRestorationTest.liveTimeline(PreviewRestorationTest.java:25)
+	at com.projectinfinity.kodi.PreviewRestorationTest.fixture(PreviewRestorationTest.java:19)
+	at com.projectinfinity.kodi.PreviewRestorationTest.channelSelectionUsesOriginalPreviewRoute(PreviewRestorationTest.java:67)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.robolectric.RobolectricTestRunner$HelperTestRunner$1.evaluate(RobolectricTestRunner.java:502)
+	at org.robolectric.internal.SandboxTestRunner$2.lambda$evaluate$2(SandboxTestRunner.java:285)
+	at org.robolectric.internal.bytecode.Sandbox.lambda$runOnMainThread$0(Sandbox.java:104)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+
+[ERROR] com.projectinfinity.kodi.PreviewRestorationTest.originalLongPressAndFullscreenReturn -- Time elapsed: 0.601 s <<< FAILURE!
+org.junit.ComparisonFailure: async=true binding=true ready=true state=3 error= closed=false expected:<[LIV]E> but was:<[NON]E>
+	at org.junit.Assert.assertEquals(Assert.java:117)
+	at com.projectinfinity.kodi.PreviewRestorationTest.liveTimeline(PreviewRestorationTest.java:25)
+	at com.projectinfinity.kodi.PreviewRestorationTest.fixture(PreviewRestorationTest.java:19)
+	at com.projectinfinity.kodi.PreviewRestorationTest.originalLongPressAndFullscreenReturn(PreviewRestorationTest.java:39)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.robolectric.RobolectricTestRunner$HelperTestRunner$1.evaluate(RobolectricTestRunner.java:502)
+	at org.robolectric.internal.SandboxTestRunner$2.lambda$evaluate$2(SandboxTestRunner.java:285)
+	at org.robolectric.internal.bytecode.Sandbox.lambda$runOnMainThread$0(Sandbox.java:104)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+
+[ERROR] com.projectinfinity.kodi.PreviewRestorationTest.modeExitRestoresOriginalStatusOwnership -- Time elapsed: 0.677 s <<< FAILURE!
+org.junit.ComparisonFailure: async=true binding=true ready=true state=3 error= closed=false expected:<[LIV]E> but was:<[NON]E>
+	at org.junit.Assert.assertEquals(Assert.java:117)
+	at com.projectinfinity.kodi.PreviewRestorationTest.liveTimeline(PreviewRestorationTest.java:25)
+	at com.projectinfinity.kodi.PreviewRestorationTest.fixture(PreviewRestorationTest.java:19)
+	at com.projectinfinity.kodi.PreviewRestorationTest.modeExitRestoresOriginalStatusOwnership(PreviewRestorationTest.java:63)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.robolectric.RobolectricTestRunner$HelperTestRunner$1.evaluate(RobolectricTestRunner.java:502)
+	at org.robolectric.internal.SandboxTestRunner$2.lambda$evaluate$2(SandboxTestRunner.java:285)
+	at org.robolectric.internal.bytecode.Sandbox.lambda$runOnMainThread$0(Sandbox.java:104)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+
+[ERROR] com.projectinfinity.kodi.PreviewRestorationTest.activeResizeThemeAndMotionRestoration -- Time elapsed: 0.698 s <<< FAILURE!
+org.junit.ComparisonFailure: async=true binding=true ready=true state=3 error= closed=false expected:<[LIV]E> but was:<[NON]E>
+	at org.junit.Assert.assertEquals(Assert.java:117)
+	at com.projectinfinity.kodi.PreviewRestorationTest.liveTimeline(PreviewRestorationTest.java:25)
+	at com.projectinfinity.kodi.PreviewRestorationTest.fixture(PreviewRestorationTest.java:19)
+	at com.projectinfinity.kodi.PreviewRestorationTest.activeResizeThemeAndMotionRestoration(PreviewRestorationTest.java:75)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.robolectric.RobolectricTestRunner$HelperTestRunner$1.evaluate(RobolectricTestRunner.java:502)
+	at org.robolectric.internal.SandboxTestRunner$2.lambda$evaluate$2(SandboxTestRunner.java:285)
+	at org.robolectric.internal.bytecode.Sandbox.lambda$runOnMainThread$0(Sandbox.java:104)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+
+[ERROR] com.projectinfinity.kodi.PreviewRestorationTest.everySizeKeepsOriginalPreviewMenuAndSession -- Time elapsed: 0.544 s <<< FAILURE!
+org.junit.ComparisonFailure: async=true binding=true ready=true state=3 error= closed=false expected:<[LIV]E> but was:<[NON]E>
+	at org.junit.Assert.assertEquals(Assert.java:117)
+	at com.projectinfinity.kodi.PreviewRestorationTest.liveTimeline(PreviewRestorationTest.java:25)
+	at com.projectinfinity.kodi.PreviewRestorationTest.fixture(PreviewRestorationTest.java:19)
+	at com.projectinfinity.kodi.PreviewRestorationTest.everySizeKeepsOriginalPreviewMenuAndSession(PreviewRestorationTest.java:49)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.robolectric.RobolectricTestRunner$HelperTestRunner$1.evaluate(RobolectricTestRunner.java:502)
+	at org.robolectric.internal.SandboxTestRunner$2.lambda$evaluate$2(SandboxTestRunner.java:285)
+	at org.robolectric.internal.bytecode.Sandbox.lambda$runOnMainThread$0(Sandbox.java:104)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+
+[ERROR] Tests run: 7, Failures: 7, Errors: 0, Skipped: 0, Time elapsed: 10.74 s <<< FAILURE! -- in com.projectinfinity.kodi.DisplayTest
+[ERROR] com.projectinfinity.kodi.DisplayTest.fullscreenDisplayRealPress -- Time elapsed: 6.538 s <<< FAILURE!
+java.lang.AssertionError: Production handoff must execute, not TerminalActions shadow expected:<1> but was:<0>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at com.projectinfinity.kodi.CobraActualFullscreenMoreTest.actualPreviewPress(CobraActualFullscreenMoreTest.java:67)
+	at com.projectinfinity.kodi.DisplayTest.fullscreenDisplayRealPress(DisplayTest.java:32)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.robolectric.RobolectricTestRunner$HelperTestRunner$1.evaluate(RobolectricTestRunner.java:502)
+	at org.robolectric.internal.SandboxTestRunner$2.lambda$evaluate$2(SandboxTestRunner.java:285)
+	at org.robolectric.internal.bytecode.Sandbox.lambda$runOnMainThread$0(Sandbox.java:104)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+
+[ERROR] com.projectinfinity.kodi.DisplayTest.everyModeRealSelectionAndPreferenceInheritance -- Time elapsed: 0.912 s <<< FAILURE!
+java.lang.AssertionError: expected same:<null> was not:<null>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotSame(Assert.java:829)
+	at org.junit.Assert.assertSame(Assert.java:772)
+	at org.junit.Assert.assertSame(Assert.java:783)
+	at com.projectinfinity.kodi.DisplayTest.videoFixture(DisplayTest.java:56)
+	at com.projectinfinity.kodi.DisplayTest.everyModeRealSelectionAndPreferenceInheritance(DisplayTest.java:80)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.robolectric.RobolectricTestRunner$HelperTestRunner$1.evaluate(RobolectricTestRunner.java:502)
+	at org.robolectric.internal.SandboxTestRunner$2.lambda$evaluate$2(SandboxTestRunner.java:285)
+	at org.robolectric.internal.bytecode.Sandbox.lambda$runOnMainThread$0(Sandbox.java:104)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+
+[ERROR] com.projectinfinity.kodi.DisplayTest.customSlidersPersistResetAndKeyboardActivation -- Time elapsed: 0.676 s <<< FAILURE!
+java.lang.AssertionError: expected same:<null> was not:<null>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotSame(Assert.java:829)
+	at org.junit.Assert.assertSame(Assert.java:772)
+	at org.junit.Assert.assertSame(Assert.java:783)
+	at com.projectinfinity.kodi.DisplayTest.videoFixture(DisplayTest.java:56)
+	at com.projectinfinity.kodi.DisplayTest.customSlidersPersistResetAndKeyboardActivation(DisplayTest.java:86)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.robolectric.RobolectricTestRunner$HelperTestRunner$1.evaluate(RobolectricTestRunner.java:502)
+	at org.robolectric.internal.SandboxTestRunner$2.lambda$evaluate$2(SandboxTestRunner.java:285)
+	at org.robolectric.internal.bytecode.Sandbox.lambda$runOnMainThread$0(Sandbox.java:104)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+
+[ERROR] com.projectinfinity.kodi.DisplayTest.globalDefaultsEveryModeAndGlobalCustom -- Time elapsed: 0.632 s <<< FAILURE!
+java.lang.AssertionError: expected same:<null> was not:<null>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotSame(Assert.java:829)
+	at org.junit.Assert.assertSame(Assert.java:772)
+	at org.junit.Assert.assertSame(Assert.java:783)
+	at com.projectinfinity.kodi.DisplayTest.videoFixture(DisplayTest.java:56)
+	at com.projectinfinity.kodi.DisplayTest.globalDefaultsEveryModeAndGlobalCustom(DisplayTest.java:93)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.robolectric.RobolectricTestRunner$HelperTestRunner$1.evaluate(RobolectricTestRunner.java:502)
+	at org.robolectric.internal.SandboxTestRunner$2.lambda$evaluate$2(SandboxTestRunner.java:285)
+	at org.robolectric.internal.bytecode.Sandbox.lambda$runOnMainThread$0(Sandbox.java:104)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+
+[ERROR] com.projectinfinity.kodi.DisplayTest.hiddenMultiHostInnerAndNonCardsIsolation -- Time elapsed: 0.538 s <<< FAILURE!
+java.lang.AssertionError: Production handoff must execute, not TerminalActions shadow expected:<1> but was:<0>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:120)
+	at com.projectinfinity.kodi.CobraActualFullscreenMoreTest.actualPreviewPress(CobraActualFullscreenMoreTest.java:67)
+	at com.projectinfinity.kodi.DisplayTest.hiddenMultiHostInnerAndNonCardsIsolation(DisplayTest.java:44)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.robolectric.RobolectricTestRunner$HelperTestRunner$1.evaluate(RobolectricTestRunner.java:502)
+	at org.robolectric.internal.SandboxTestRunner$2.lambda$evaluate$2(SandboxTestRunner.java:285)
+	at org.robolectric.internal.bytecode.Sandbox.lambda$runOnMainThread$0(Sandbox.java:104)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+
+[ERROR] com.projectinfinity.kodi.DisplayTest.all14TransformsSourceParResizeLateSizeAndPip -- Time elapsed: 0.591 s <<< FAILURE!
+java.lang.AssertionError: expected same:<null> was not:<null>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotSame(Assert.java:829)
+	at org.junit.Assert.assertSame(Assert.java:772)
+	at org.junit.Assert.assertSame(Assert.java:783)
+	at com.projectinfinity.kodi.DisplayTest.videoFixture(DisplayTest.java:56)
+	at com.projectinfinity.kodi.DisplayTest.all14TransformsSourceParResizeLateSizeAndPip(DisplayTest.java:73)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.robolectric.RobolectricTestRunner$HelperTestRunner$1.evaluate(RobolectricTestRunner.java:502)
+	at org.robolectric.internal.SandboxTestRunner$2.lambda$evaluate$2(SandboxTestRunner.java:285)
+	at org.robolectric.internal.bytecode.Sandbox.lambda$runOnMainThread$0(Sandbox.java:104)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+
+[ERROR] com.projectinfinity.kodi.DisplayTest.actualWindowResizeMenuAndPlayerIdentity -- Time elapsed: 0.652 s <<< FAILURE!
+java.lang.AssertionError: expected same:<null> was not:<null>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotSame(Assert.java:829)
+	at org.junit.Assert.assertSame(Assert.java:772)
+	at org.junit.Assert.assertSame(Assert.java:783)
+	at com.projectinfinity.kodi.DisplayTest.videoFixture(DisplayTest.java:56)
+	at com.projectinfinity.kodi.DisplayTest.actualWindowResizeMenuAndPlayerIdentity(DisplayTest.java:108)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:26)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.robolectric.RobolectricTestRunner$HelperTestRunner$1.evaluate(RobolectricTestRunner.java:502)
+	at org.robolectric.internal.SandboxTestRunner$2.lambda$evaluate$2(SandboxTestRunner.java:285)
+	at org.robolectric.internal.bytecode.Sandbox.lambda$runOnMainThread$0(Sandbox.java:104)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+
+COBRA_PROJECTION_SEMANTICS={"status":"PASS_ACTUAL_SIGNED431_NEXT_CALL_FRESHNESS","checks":["original_object_identity_order","source_filter","category","trimmed_casefolded_search","hidden_set_changes","favorites_changes","recents_order_missing_and_duplicates","custom_group_changes","profile_adult_lock_and_unlock","inventory_object_replacement"],"state":"SYNTHETIC_HOST_PREFERENCES_ONLY","physical_Fold":"NOT_RUN","shutdown":"NOT_RUN"}
+COBRA_CARDS_REUSE=REUSE-PREASSERT-DIAGNOSTIC OBSERVED_BEFORE_UNCHANGED_STRICT_SELECTION_ASSERTION
+COBRA_CARDS_REUSE=RETAINED-RETURN PASS_REAL_NATIVE_GRID_ADAPTER_CHANNEL_SCROLL_FOCUS_AND_EPG_REUSE
+COBRA_CARDS_REUSE=PENDING-RESTORATION PASS_ACTUAL_NEW_GRID_PENDING80_RETAINED_ON_SECOND_NATIVE_RENDER
+COBRA_CARDS_REUSE=SELECTIVE-COLLECTIONS PASS_ACTUAL_COLLECTION_MUTATORS_CONTEXT_SELECTIVITY_AND_NATIVE_DIRECTORY_COUNTS
+COBRA_CARDS_REUSE=THREAD-AND-EXIT PASS_REVISION_ONLY_BACKGROUND_HOOKS_AND_NATIVE_MODE_EXIT
+COBRA_CARDS_REUSE=CONTEXT-INVALIDATION PASS_NATIVE_POLICY_TYPE_PROFILE_HIDDEN_CUSTOM_SOURCE_PUBLICATION_CASES
+[ERROR] Failures:
+[ERROR]   DisplayTest.actualWindowResizeMenuAndPlayerIdentity:108->videoFixture:56 expected same:<null> was not:<null>
+[ERROR]   DisplayTest.all14TransformsSourceParResizeLateSizeAndPip:73->videoFixture:56 expected same:<null> was not:<null>
+[ERROR]   DisplayTest.customSlidersPersistResetAndKeyboardActivation:86->videoFixture:56 expected same:<null> was not:<null>
+[ERROR]   DisplayTest.everyModeRealSelectionAndPreferenceInheritance:80->videoFixture:56 expected same:<null> was not:<null>
+[ERROR]   DisplayTest.fullscreenDisplayRealPress:32 Production handoff must execute, not TerminalActions shadow expected:<1> but was:<0>
+[ERROR]   DisplayTest.globalDefaultsEveryModeAndGlobalCustom:93->videoFixture:56 expected same:<null> was not:<null>
+[ERROR]   DisplayTest.hiddenMultiHostInnerAndNonCardsIsolation:44 Production handoff must execute, not TerminalActions shadow expected:<1> but was:<0>
+[ERROR]   PreviewRestorationTest.activeResizeThemeAndMotionRestoration:75->fixture:19->liveTimeline:25 async=true binding=true ready=true state=3 error= closed=false expected:<[LIV]E> but was:<[NON]E>
+[ERROR]   PreviewRestorationTest.channelSelectionUsesOriginalPreviewRoute:67->fixture:19->liveTimeline:25 async=true binding=true ready=true state=3 error= closed=false expected:<[LIV]E> but was:<[NON]E>
+[ERROR]   PreviewRestorationTest.everySizeKeepsOriginalPreviewMenuAndSession:49->fixture:19->liveTimeline:25 async=true binding=true ready=true state=3 error= closed=false expected:<[LIV]E> but was:<[NON]E>
+[ERROR]   PreviewRestorationTest.modeExitRestoresOriginalStatusOwnership:63->fixture:19->liveTimeline:25 async=true binding=true ready=true state=3 error= closed=false expected:<[LIV]E> but was:<[NON]E>
+[ERROR]   PreviewRestorationTest.originalLongPressAndFullscreenReturn:39->fixture:19->liveTimeline:25 async=true binding=true ready=true state=3 error= closed=false expected:<[LIV]E> but was:<[NON]E>
+[ERROR]   PreviewRestorationTest.restoredPreviewAcrossThemesAndViewports:32->fixture:19->liveTimeline:25 async=true binding=true ready=true state=3 error= closed=false expected:<[LIV]E> but was:<[NON]E>
+[ERROR] Tests run: 30, Failures: 13, Errors: 0, Skipped: 0
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.5.2:test (default-test) on project isolation-boundary-tests: There are test failures.
+[ERROR]
+[ERROR] See /tmp/cobra443/host/target/surefire-reports for the individual test results.
+[ERROR] See dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR]
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR]
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException

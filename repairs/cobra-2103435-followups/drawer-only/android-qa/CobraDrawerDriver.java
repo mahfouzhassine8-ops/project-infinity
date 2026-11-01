@@ -65,8 +65,24 @@ public final class CobraDrawerDriver {
   }throw new IllegalStateException("Original native dialog item not observed");
  }
  static void scrollVisibleSheet()throws Exception{
-  syncInputs();Tree tree=new Tree();Rect r=null;
-  try{int matches=0;for(AccessibilityNodeInfo n:tree.nodes)if(n.isVisibleToUser()&&n.isScrollable()&&"android.widget.ScrollView".contentEquals(n.getClassName())){Rect b=new Rect();n.getBoundsInScreen(b);if(b.width()>100&&b.height()>100){r=b;matches++;}}require(matches==1,"Exactly one current visible sheet scroller required");}finally{tree.close();}
+  syncInputs();Rect r=null,previous=null;long deadline=SystemClock.uptimeMillis()+12000;JSONArray observations=new JSONArray();
+  for(int attempt=0;attempt<40&&SystemClock.uptimeMillis()<deadline;attempt++){
+   Tree tree=new Tree();Rect current=null;
+   try{
+    AccessibilityNodeInfo title=tree.find("(?m)^View$",false),choice=tree.find("(?m)^(?:Mobile|TV Grid|Compact|Cards|Pro),.+$",true);
+    int matches=0;
+    if(title!=null&&choice!=null&&"android.widget.LinearLayout".contentEquals(choice.getClassName())){
+     java.util.HashSet<Integer> ancestors=new java.util.HashSet<>();Integer parent=tree.parents.get(choice.hashCode());
+     while(parent!=null){require(ancestors.add(parent),"Cycle in current sheet ownership");parent=tree.parents.get(parent);}
+     for(AccessibilityNodeInfo n:tree.nodes)if(ancestors.contains(n.hashCode())&&n.isVisibleToUser()&&n.isScrollable()&&"android.widget.ScrollView".contentEquals(n.getClassName())){Rect b=new Rect();n.getBoundsInScreen(b);if(b.width()>100&&b.height()>100){current=b;matches++;}}
+    }
+    require(matches<=1,"Ambiguous current mode-sheet ancestor scroller");
+    observations.put(new JSONObject().put("mode_row_visible",choice!=null).put("matching_ancestor_scrollers",matches).put("bounds",current==null?JSONObject.NULL:box(current)));
+   }finally{tree.close();}
+   if(current!=null&&current.equals(previous)){r=current;break;}previous=current;SystemClock.sleep(150);
+  }
+  write("mode-sheet-owner-observation.json",new JSONObject().put("observations",observations));
+  require(r!=null,"Stable actual mode-sheet ancestor scroller required within original twelve-second window");
   int x=r.centerX(),from=r.top+r.height()*4/5,to=r.top+r.height()/5;long stamp=SystemClock.uptimeMillis();
   for(int i=0;i<=11;i++){int action=i==0?MotionEvent.ACTION_DOWN:i==11?MotionEvent.ACTION_UP:MotionEvent.ACTION_MOVE;float y=from+(to-from)*Math.min(i,10)/10f;MotionEvent event=MotionEvent.obtain(stamp,SystemClock.uptimeMillis(),action,x,y,0);event.setSource(InputDevice.SOURCE_TOUCHSCREEN);try{require(ui.injectInputEvent(event,true),"Sheet scroll injection uncertain; no retry");}finally{event.recycle();}SystemClock.sleep(24);}
   steps.put(new JSONObject().put("real_sheet_swipe",box(r)));syncInputs();

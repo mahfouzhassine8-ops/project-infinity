@@ -1,0 +1,13 @@
+{
+  "first_result": {
+    "tests": 39,
+    "assertion_failures": 0,
+    "output_or_fixture_errors": 7
+  },
+  "cause": [
+    "New host directory omitted accepted baseline geometry JSON",
+    "Existing reuse.output and projection.output properties were not supplied"
+  ],
+  "correction": "Reuse exact accepted fixture and required output properties; rerun only seven affected cases",
+  "selection": "ProApprovedLayoutTest#proApprovedInnerAndFrontPreservation,CobraCardsReuseNativeTest#nativeReusePreservesScrollSelectionAndCurrentProgramme+nativeImmediateSecondRenderPreservesPendingPosition+nativeSelectiveCollectionsAndFreshDirectory+revisionHooksAllowBackgroundAndModeExitDisposes+nativePolicyTypesAndContextInvalidation,CobraProjectionCorrectnessTest#nextProjectionReflectsFiltersHiddenFavoritesRecentsInventoryAndProfile"
+}

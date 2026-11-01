@@ -1,0 +1,32 @@
+{
+  "Cards_Pro_Sports_MultiView_themes_PlayerBindings": "EXACT_ORIGINAL_CLASSES",
+  "CobraSix_other_unchanged_method_count": 46,
+  "Infinity": "OWNER_BUILD_NEVER_ACCESSES_INFINITY; FINAL_APK_COMPARISON_REQUIRED",
+  "changed_methods": {
+    "Lcom/projectinfinity/kodi/CobraComponent;": [
+      "public static version()Ljava/lang/String;"
+    ],
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraSix;": [
+      "smallPreviewPip()V"
+    ],
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity;": [
+      "private cobraNextProgram(Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;)Lcom/projectinfinity/kodi/InfinityLiveActivity$GuideProgram;",
+      "private cobraNextProgramList(Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;)Ljava/util/ArrayList;",
+      "private formatTime(J)Ljava/lang/String;"
+    ]
+  },
+  "native_activity_unchanged_method_count": 1801,
+  "new_classes": [
+    "Lcom/projectinfinity/kodi/CobraGuidePresentation$ClockFormat;",
+    "Lcom/projectinfinity/kodi/CobraGuidePresentation$Entry;",
+    "Lcom/projectinfinity/kodi/CobraGuidePresentation$Pair;",
+    "Lcom/projectinfinity/kodi/CobraGuidePresentation$ProgramFields;",
+    "Lcom/projectinfinity/kodi/CobraGuidePresentation$Snapshot;",
+    "Lcom/projectinfinity/kodi/CobraGuidePresentation$State;",
+    "Lcom/projectinfinity/kodi/CobraGuidePresentation;"
+  ],
+  "original_fields_annotations": "IDENTICAL",
+  "shutdown": "UNCHANGED_NOT_TESTED",
+  "status": "PASS_EXACT442_COBRA_OWNER_PRESERVATION",
+  "unchanged_classes": 7171
+}

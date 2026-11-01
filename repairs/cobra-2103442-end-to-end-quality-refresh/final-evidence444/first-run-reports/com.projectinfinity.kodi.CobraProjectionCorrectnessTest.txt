@@ -1,0 +1,26 @@
+-------------------------------------------------------------------------------
+Test set: com.projectinfinity.kodi.CobraProjectionCorrectnessTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 4.277 s <<< FAILURE! -- in com.projectinfinity.kodi.CobraProjectionCorrectnessTest
+com.projectinfinity.kodi.CobraProjectionCorrectnessTest.nextProjectionReflectsFiltersHiddenFavoritesRecentsInventoryAndProfile -- Time elapsed: 4.091 s <<< ERROR!
+java.lang.NullPointerException
+	at java.base/java.util.Objects.requireNonNull(Objects.java:233)
+	at java.base/sun.nio.fs.UnixFileSystem.getPath(UnixFileSystem.java:297)
+	at java.base/java.nio.file.Path.of(Path.java:148)
+	at java.base/java.nio.file.Paths.get(Paths.java:69)
+	at com.projectinfinity.kodi.CobraProjectionCorrectnessTest.write(CobraProjectionCorrectnessTest.java:110)
+	at com.projectinfinity.kodi.CobraProjectionCorrectnessTest.nextProjectionReflectsFiltersHiddenFavoritesRecentsInventoryAndProfile(CobraProjectionCorrectnessTest.java:163)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.InvokeMethod.evaluate(InvokeMethod.java:17)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.robolectric.RobolectricTestRunner$HelperTestRunner$1.evaluate(RobolectricTestRunner.java:502)
+	at org.robolectric.internal.SandboxTestRunner$2.lambda$evaluate$2(SandboxTestRunner.java:285)
+	at org.robolectric.internal.bytecode.Sandbox.lambda$runOnMainThread$0(Sandbox.java:104)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)

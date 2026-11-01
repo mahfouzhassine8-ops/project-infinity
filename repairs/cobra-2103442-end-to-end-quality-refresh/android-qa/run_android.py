@@ -28,8 +28,8 @@ def run(baseline,driver,sdk,out,candidate_dir):
   with zipfile.ZipFile(baseline) as z:native={n for n in z.namelist() if n.startswith('lib/arm64-v8a/') and n.endswith('.so')}
   report['baseline_warm_notice']=probe.acknowledge_known_notice_after_launch(warm,out/'baseline-warm-notice',native)
   if candidate_dir.is_dir():
-   apk=candidate_dir/'Infinity-2103443-Combined-Original-Signer.apk';receipt=json.loads((candidate_dir/'BUILD-RECEIPT.json').read_text());expected=hashlib.file_digest(apk.open('rb'),'sha256').hexdigest()
-   assert receipt['versionCode']==2103443 and receipt['signed_apk_sha256']==expected
+   apk=candidate_dir/'Infinity-2103444-Combined-Original-Signer.apk';receipt=json.loads((candidate_dir/'BUILD-RECEIPT.json').read_text());expected=hashlib.file_digest(apk.open('rb'),'sha256').hexdigest()
+   assert receipt['versionCode']==2103444 and receipt['signed_apk_sha256']==expected
    signature=subprocess.check_output([str(sdk/'apksigner'),'verify','--verbose','--print-certs',str(apk)],text=True)
    assert 'Signer #1 certificate SHA-256 digest: '+CERT in signature;(out/'CANDIDATE-SIGNATURE.txt').write_text(signature)
    uid=probe.adb('shell','pm','list','packages','-U',probe.PACKAGE).strip()

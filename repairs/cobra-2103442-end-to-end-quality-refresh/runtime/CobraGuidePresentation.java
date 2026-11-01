@@ -1,6 +1,9 @@
 package com.projectinfinity.kodi;
 
 import android.app.Activity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import java.lang.reflect.Field;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -12,9 +15,20 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.WeakHashMap;
 
-/** Cobra presentation only. No player, provider, persistence, worker or view ownership. */
+/** Cobra presentation only. No player, provider, persistence or worker ownership. */
 public final class CobraGuidePresentation {
  private CobraGuidePresentation() {}
+ /** Keep native placement/visibility decisions; skip only identical absolute parameters. */
+ public static void previewLayout(View view,ViewGroup.LayoutParams wanted) {
+  ViewGroup.LayoutParams old=view.getLayoutParams();
+  if(old!=null&&old.getClass()==FrameLayout.LayoutParams.class&&wanted.getClass()==FrameLayout.LayoutParams.class){
+   FrameLayout.LayoutParams a=(FrameLayout.LayoutParams)old,b=(FrameLayout.LayoutParams)wanted;
+   if(a.width==b.width&&a.height==b.height&&a.gravity==b.gravity&&
+      a.leftMargin==b.leftMargin&&a.topMargin==b.topMargin&&a.rightMargin==b.rightMargin&&a.bottomMargin==b.bottomMargin&&
+      !a.isMarginRelative()&&!b.isMarginRelative()&&a.layoutAnimationParameters==b.layoutAnimationParameters)return;
+  }
+  view.setLayoutParams(wanted);
+ }
  private static final ThreadLocal<ClockFormat> CLOCK = new ThreadLocal<ClockFormat>();
  static final class ClockFormat {
   final SimpleDateFormat format = new SimpleDateFormat("EEE MMM d • h:mm a", Locale.US);

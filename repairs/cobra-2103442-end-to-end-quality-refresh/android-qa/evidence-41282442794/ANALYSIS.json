@@ -1,0 +1,13 @@
+{
+  "status": "BASELINE_MODE_SHEET_SCROLLER_OBSERVATION_FAILED",
+  "run": 41282442794,
+  "artifact": 13073916560,
+  "artifact_sha256": "8f6f224f3ab2055ea3a399ae55ef617cf88183b8b9a20a04527047045229d822",
+  "candidate_installed": false,
+  "exact_error": "Exactly one current visible sheet scroller required",
+  "actual_screen_inspected": "Accepted442 Mobile with live loopback video, 20,226 channels and original View menu visibly open",
+  "observed_count": "Old assertion did not record its count; no count is invented",
+  "source_problem": "QA counts all visible ScrollViews, including background guide viewport when scrollable, without menu ownership or layout-readiness discrimination",
+  "correction": "Identify the visible mode-choice row, require exactly one scrollable ScrollView ancestor and stable bounds within the existing 12-second readiness window. Keep strict package/input ownership. Capture full node hierarchy in future evidence.",
+  "production_change_for_QA": false
+}

@@ -1,0 +1,152 @@
+{
+  "phase": "baseline",
+  "shutdown": "NOT_RUN",
+  "Infinity": "NOT_LAUNCHED",
+  "steps": [
+    {
+      "OS_window_input_sync_ms": 53
+    },
+    {
+      "observed": "(?m)^\\+?\\s*ADD TV SOURCE$",
+      "bounds": [
+        24,
+        1493,
+        1056,
+        1609
+      ],
+      "root_query_ms": 8
+    },
+    {
+      "observed": "(?m)^\\+?\\s*ADD TV SOURCE$",
+      "bounds": [
+        24,
+        1493,
+        1056,
+        1609
+      ],
+      "root_query_ms": 21
+    },
+    {
+      "coordinate_press": "(?m)^\\+?\\s*ADD TV SOURCE$",
+      "bounds": [
+        24,
+        1493,
+        1056,
+        1609
+      ],
+      "down_injected": true,
+      "up_injected": true
+    },
+    {
+      "OS_window_input_sync_ms": 18
+    },
+    {
+      "OS_window_input_sync_ms": 18
+    },
+    {
+      "coordinate_press": "Original Android dialog item (?m)^M3U \/ M3U8 playlist$",
+      "bounds": [
+        100,
+        1258,
+        980,
+        1354
+      ],
+      "down_injected": true,
+      "up_injected": true
+    },
+    {
+      "OS_window_input_sync_ms": 7
+    },
+    {
+      "OS_window_input_sync_ms": 62
+    },
+    {
+      "normal_source_form_field": 0
+    },
+    {
+      "normal_source_form_field": 1
+    },
+    {
+      "normal_source_form_field": 2
+    },
+    {
+      "OS_window_input_sync_ms": 28
+    },
+    {
+      "observed": "(?m)^TEST & SAVE$",
+      "bounds": [
+        731,
+        1462,
+        947,
+        1570
+      ],
+      "root_query_ms": 57
+    },
+    {
+      "observed": "(?m)^TEST & SAVE$",
+      "bounds": [
+        731,
+        1462,
+        947,
+        1570
+      ],
+      "root_query_ms": 16
+    },
+    {
+      "coordinate_press": "(?m)^TEST & SAVE$",
+      "bounds": [
+        731,
+        1462,
+        947,
+        1570
+      ],
+      "down_injected": true,
+      "up_injected": true
+    },
+    {
+      "OS_window_input_sync_ms": 21
+    },
+    {
+      "OS_window_input_sync_ms": 48
+    },
+    {
+      "observed": "(?m)^Choose one of five view modes$|^Choose view mode$|^Views$",
+      "bounds": [
+        802,
+        2361,
+        1064,
+        2472
+      ],
+      "root_query_ms": 26
+    },
+    {
+      "observed": "(?m)^Choose one of five view modes$|^Choose view mode$|^Views$",
+      "bounds": [
+        802,
+        2361,
+        1064,
+        2472
+      ],
+      "root_query_ms": 65
+    },
+    {
+      "coordinate_press": "(?m)^Choose one of five view modes$|^Choose view mode$|^Views$",
+      "bounds": [
+        802,
+        2361,
+        1064,
+        2472
+      ],
+      "down_injected": true,
+      "up_injected": true
+    },
+    {
+      "OS_window_input_sync_ms": 47
+    },
+    {
+      "OS_window_input_sync_ms": 19
+    }
+  ],
+  "status": "FAILED_CLOSED",
+  "error": "java.lang.IllegalStateException: Exactly one current visible sheet scroller required"
+}

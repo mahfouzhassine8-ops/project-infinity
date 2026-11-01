@@ -1,0 +1,18 @@
+{
+  "status": "LEGACY_FIXTURE_NOT_COUNTED_AS_PASS",
+  "assertion": "PreviewRestorationTest common setup expects LIVE but receives NONE",
+  "candidate_failures": 6,
+  "accepted442_control": "Same common setup assertion reproduced on exact accepted442 owner",
+  "current_442_cards_and_pro_preview_checks": "PASS",
+  "production_change_for_old_fixture": false,
+  "host_jars": [
+    {
+      "path": "/tmp/cobra443/baseline-control/production.jar",
+      "sha256": "001e59471298db82e220f8a37c30bf3ae81a04b8f184c5f9acc07614877823ca"
+    },
+    {
+      "path": "/tmp/cobra443/host/production.jar",
+      "sha256": "1392b136bf5f83359b6c15cfa49c505bda4c33a402b0a118386426adecdb251c"
+    }
+  ]
+}

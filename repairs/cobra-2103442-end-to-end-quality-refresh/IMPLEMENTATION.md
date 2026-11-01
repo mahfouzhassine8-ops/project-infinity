@@ -1,7 +1,9 @@
 # Cobra quality refresh from accepted 2103442
 
-Two measured presentation hot paths changed. No view, layout, theme, player,
-provider, lifecycle, persistence or background-job implementation changed.
+Three measured Cobra presentation hot paths changed. Layout calculations,
+themes, player callbacks, providers, lifecycle, persistence and background jobs
+retain their accepted behavior. The final candidate is2103444; internally signed
+2103443 is withheld after the additional layout finding below.
 
 1. `InfinityLiveActivity.formatTime` now uses `CobraGuidePresentation.time`.
    A per-thread formatter and Date replace construction per label. The original
@@ -17,13 +19,20 @@ provider, lifecycle, persistence or background-job implementation changed.
    implementation. The next programme is still selected against the clock on
    every query. Cached lists are private to this read path; all other callers
    receive the original independent list behavior.
+3. `CobraSix.smallPreviewPip` routes its existing `setLayoutParams` operation
+   through an equality guard. Android baseline logs showed repeated layout
+   requests; an actual-owner host check reproduced32 requests for32 identical
+   rectangles. The guard produces zero. Native placement, obstacle avoidance,
+   visibility, touch and PiP callbacks are unchanged. Genuine resizing and
+   visibility transitions, Pro exclusion and player/texture identity pass.
 
-Source/class proof:7172 of7174 original Cobra classes are identical. Only two
-original activity methods, one added private lookup and Cobra version metadata
-change; seven new helper/nested classes implement the bounded presentation work.
-All1801 other original activity methods, original fields/annotations and the
-second Cobra DEX remain exact. Cards LIVE, Preview, layouts, themes, Pro/Sports,
-Multi-View, display transforms, provider execution and all shutdown code are exact.
+Source/class proof:7171 of7174 original Cobra classes are identical. Two original
+activity methods, one added private lookup, the one PiP placement call and Cobra
+version metadata change; seven helper/nested classes implement the presentation
+work. All1801 other activity methods, all46 other CobraSix methods, original
+fields/annotations and the second Cobra DEX remain exact. Cards LIVE/Preview
+callbacks, layout calculations, themes, Pro/Sports, Multi-View, display transforms,
+provider execution and shutdown remain exact.
 
 ## Measured host outcome
 
@@ -33,8 +42,11 @@ Android decoder latency measurements.
 
 | Operation |442 p50 / p95|candidate p50 / p95|allocated bytes per batch, before → after|
 |---|---:|---:|---:|
-|500 programme time labels|1.253 /3.158ms|0.288 /0.392ms|1,580,000 →780,000|
-|100 next-programme queries,168 full +14 short entries|4.667 /12.731ms|0.735 /0.999ms|9,136,800 →36,000|
+|500 programme time labels|1.253 /3.158ms|0.265 /0.336ms|1,580,000 →780,000|
+|100 next-programme queries,168 full +14 short entries|4.667 /12.731ms|0.620 /1.050ms|9,136,800 →36,000|
+
+The layout observation measures32 identical placement calls:32 layout requests
+before, zero after, with the same final rectangle. This is not an Android FPS claim.
 
 No claim is made that these microbenchmarks predict whole-app speedups, battery,
 thermal behavior or decoder throughput. Existing432 profile/cache gains are retained,
@@ -42,13 +54,21 @@ not counted as new improvements. No native crash repair is claimed.
 
 ## Verification and historical fixtures
 
-37 current focused host checks pass, including75 mode/screen/theme combinations,
+39 current focused host checks pass, including75 mode/screen/theme combinations,
 90 font/screen/theme combinations, generation-safe publication,120 mutable-guide
 edits,100 replacement publications, cache bounds, original Cards LIVE state/touch,
 approved Pro geometry/touch, all11 Multi-View arrangements, profile/filter freshness,
 Cards reuse/scroll/focus and all14 existing display-size modes/custom controls.
 Actual full rendered Cards/Pro images were visually inspected; native image/video
 decoding and Samsung rendering remain distinct from these host results.
+Six matching full Pro renders have zero changed pixels against accepted442.
+
+The fresh444 host directory initially omitted the existing baseline geometry
+fixture and two evidence-output properties. Seven checks ended in those setup/
+output errors, with no assertion failures; the other32 passed. After restoring
+the exact fixture and output configuration, only those seven were rerun and
+passed. Both runs and the configuration correction are retained in
+`final-evidence444`; no production code was changed to address these errors.
 
 The old439 Display fixture tapped the small preview and expected immediate
 fullscreen. Accepted440/442 opens the preview menu first. QA now presses the actual
@@ -82,6 +102,21 @@ will compare accepted442 and the sole signed candidate by install-over, without
 diagnostic APKs. Both prior failures remain failures in their original run.
 
 Artifact: https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/41280005762/artifacts/13073182144
+
+Run41281620906 then reached accepted442 TV Grid. The injected test swipe began
+too close to Android's bottom system-gesture area; InputDispatcher explicitly
+records Home taking that gesture. Cobra remained alive; the fatal exception was
+in the QA process. The correction uses the measured list's interior and retains
+strict package/input assertions.
+
+Run41282442794 stopped on accepted442's visibly open View menu because the old QA
+helper assumed exactly one ScrollView anywhere on screen. It did not distinguish
+the menu from a scrollable page beneath it or wait for its layout readiness. The
+corrected helper follows the actual mode row's parent chain, requires one stable
+ancestor scroller within the existing12-second window, and records observations.
+The old assertion did not record its count; none is inferred as a measured result.
+Neither run installed the candidate, and neither is counted as a candidate PASS.
+The final444 check will use the same corrected harness and original-key APK.
 
 ## Release boundary
 

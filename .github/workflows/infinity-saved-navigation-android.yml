@@ -19,7 +19,7 @@ on:
         required: true
         type: choice
         default: select-a-feature
-        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host, infinity-performance-android, cobra-owner-host, cobra-android-launch, cobra-cards-baseline, cobra-cards-host, cobra-fold-more433, cobra-rejected434-controls, infinity-seamless-loading434, cobra-drawer436-prepare, cobra-drawer436-android, cobra-quality443-baseline]
+        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host, infinity-performance-android, cobra-owner-host, cobra-android-launch, cobra-cards-baseline, cobra-cards-host, cobra-fold-more433, cobra-rejected434-controls, infinity-seamless-loading434, cobra-drawer436-prepare, cobra-drawer436-android, cobra-quality444-final]
       candidate_build:
         description: Existing signed build run (no rebuild)
         required: true
@@ -32,9 +32,9 @@ concurrency:
   group: infinity-feature-${{ inputs.source_ref || github.ref }}-${{ inputs.feature || 'explicit-request' }}-${{ github.ref == 'refs/heads/work/infinity-final-corrective-from-2103407-20261025' && github.sha || 'serial' }}
   cancel-in-progress: false
 jobs:
-  cobra-quality443-baseline:
-    name: Exact signed442 Cobra quality baseline; no shutdown
-    if: github.event_name == 'workflow_dispatch' && inputs.feature == 'cobra-quality443-baseline'
+  cobra-quality444-final:
+    name: Signed442 to signed444 quality comparison; no shutdown
+    if: github.event_name == 'workflow_dispatch' && inputs.feature == 'cobra-quality444-final'
     runs-on: ubuntu-22.04
     timeout-minutes: 35
     env:
@@ -74,7 +74,7 @@ jobs:
           run-id: ${{ inputs.candidate_build }}
           name: Infinity-Combined-Original-Signer-${{ inputs.candidate_build }}
           github-token: ${{ github.token }}
-          path: runtime443
+          path: runtime444
       - uses: actions/download-artifact@v4
         with:
           run-id: 39867073954
@@ -119,7 +119,7 @@ jobs:
           script: |
             adb shell wm size 1080x2520
             adb shell wm density 320
-            python3 repairs/cobra-2103442-end-to-end-quality-refresh/android-qa/run_android.py --baseline runtime442/Infinity-2103442-Combined-Original-Signer.apk --driver runtime-driver --sdk "$ANDROID_HOME/build-tools/35.0.0" --out runtime-results/quality442 --candidate-dir runtime443
+            python3 repairs/cobra-2103442-end-to-end-quality-refresh/android-qa/run_android.py --baseline runtime442/Infinity-2103442-Combined-Original-Signer.apk --driver runtime-driver --sdk "$ANDROID_HOME/build-tools/35.0.0" --out runtime-results/quality444 --candidate-dir runtime444
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -1082,7 +1082,7 @@ jobs:
           retention-days: 90
           if-no-files-found: error
   android17:
-    if: inputs.feature != 'infinity-performance-host' && inputs.feature != 'infinity-performance-android' && inputs.feature != 'cobra-owner-host' && inputs.feature != 'cobra-android-launch' && inputs.feature != 'cobra-cards-baseline' && inputs.feature != 'cobra-cards-host' && inputs.feature != 'cobra-fold-more433' && inputs.feature != 'cobra-rejected434-controls' && inputs.feature != 'infinity-seamless-loading434' && inputs.feature != 'cobra-drawer436-prepare' && inputs.feature != 'cobra-drawer436-android' && inputs.feature != 'cobra-quality443-baseline'
+    if: inputs.feature != 'infinity-performance-host' && inputs.feature != 'infinity-performance-android' && inputs.feature != 'cobra-owner-host' && inputs.feature != 'cobra-android-launch' && inputs.feature != 'cobra-cards-baseline' && inputs.feature != 'cobra-cards-host' && inputs.feature != 'cobra-fold-more433' && inputs.feature != 'cobra-rejected434-controls' && inputs.feature != 'infinity-seamless-loading434' && inputs.feature != 'cobra-drawer436-prepare' && inputs.feature != 'cobra-drawer436-android' && inputs.feature != 'cobra-quality444-final'
     name: Selected feature ${{ inputs.feature || 'explicit baseline Search request' }}
     runs-on: ubuntu-22.04
     timeout-minutes: 150

@@ -7,8 +7,8 @@ sys.path[:0]=[str(ISO),str(H),str(R/'repairs/cobra-next-from-2103427/cards-from-
 from inventory import file_sha,load,save,digest
 from compile_runtime import ANDROID_SHA,D8_SHA
 from projection_patch import methods
-from patch_native import APP,patch,CHANNEL,HELPER
-VERSION=2103443
+from patch_native import APP,patch,patch_preview,SIX,CHANNEL,HELPER
+VERSION=2103444
 BASELINE_SHA='9435546ad399b7d464340ca54b3208f8db15a7c3f63bc5dee0bdb2c99989ee7e'
 def run(*args):subprocess.run(list(map(str,args)),check=True)
 def header(raw):
@@ -43,6 +43,7 @@ def build(out):
  expected={HELPER[:-1]+suffix+';' for suffix in ('','$ClockFormat','$State','$Pair','$ProgramFields','$Snapshot','$Entry')}
  assert set(changes)==expected and not expected&originals.keys(),set(changes)
  changes[APP]=patch(originals[APP]);component='Lcom/projectinfinity/kodi/CobraComponent;'
+ changes[SIX]=patch_preview(originals[SIX])
  old=originals[component];assert old.count('"2103442.cobra.1"')==1
  changes[component]=old.replace('"2103442.cobra.1"','"'+str(VERSION)+'.cobra.1"',1)
  for name,raw in changes.items():
@@ -63,7 +64,7 @@ def build(out):
   assert header(raw)==header(observed[name]),('ORIGINAL_FIELDS_ANNOTATIONS',name)
   if raw==observed[name]:continue
   before,after=methods(raw),methods(observed[name]);actual[name]=sorted(k for k in before.keys()|after.keys() if before.get(k)!=after.get(k))
- budget={APP:sorted(['private formatTime(J)Ljava/lang/String;','private cobraNextProgram('+CHANNEL+')'+APP[:-1]+'$GuideProgram;','private cobraNextProgramList('+CHANNEL+')Ljava/util/ArrayList;']),component:['public static version()Ljava/lang/String;']}
+ budget={APP:sorted(['private formatTime(J)Ljava/lang/String;','private cobraNextProgram('+CHANNEL+')'+APP[:-1]+'$GuideProgram;','private cobraNextProgramList('+CHANNEL+')Ljava/util/ArrayList;']),SIX:['smallPreviewPip()V'],component:['public static version()Ljava/lang/String;']}
  assert actual==budget,('UNREVIEWED_METHOD_DELTA',actual)
  added={name:sorted(methods(observed[name])) for name in observed.keys()-originals.keys()}
  save(out/'METHOD-DELTA.json',actual);save(out/'NEW-CLASS-METHODS.json',added)

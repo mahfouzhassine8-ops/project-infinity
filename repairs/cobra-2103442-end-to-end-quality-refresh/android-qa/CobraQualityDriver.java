@@ -15,7 +15,7 @@ public final class CobraQualityDriver {
  static JSONArray cases=new JSONArray();
  static void capture(String name)throws Exception {
   screenshot(name); // Preserve the actual foreground even if ownership assertion fails.
-  Tree t=new Tree();try{write(name+"-nodes.json",new JSONObject().put("labels",t.labels()).put("query_ms",SystemClock.uptimeMillis()-t.started));}finally{t.close();}
+  Tree t=new Tree();try{write(name+"-nodes.json",new JSONObject().put("labels",t.labels()).put("nodes",nodes(t)).put("query_ms",SystemClock.uptimeMillis()-t.started));}finally{t.close();}
  }
  static void mode(String label)throws Exception {
   tap("(?m)^Choose one of five view modes$|^Choose view mode$|^Views$");await("(?m)^View$",true);

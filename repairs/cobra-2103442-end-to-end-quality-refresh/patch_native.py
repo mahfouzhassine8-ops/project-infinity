@@ -1,4 +1,4 @@
-"""Exact signed442 method preimages; no player/lifecycle/layout modifications."""
+"""Exact signed442 preimages; preserve player, lifecycle and layout calculations."""
 import sys
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'cobra-next-from-2103427/cards-from-2103431'))
@@ -6,6 +6,14 @@ from projection_patch import methods
 APP='Lcom/projectinfinity/kodi/InfinityLiveActivity;'
 HELPER='Lcom/projectinfinity/kodi/CobraGuidePresentation;'
 CHANNEL=APP[:-1]+'$Channel;'
+SIX=APP[:-1]+'$CobraSix;'
+
+def patch_preview(raw):
+    before=methods(raw);sig='smallPreviewPip()V';original=before[sig]
+    old='invoke-virtual {v1, v0}, Landroid/view/View;->setLayoutParams(Landroid/view/ViewGroup$LayoutParams;)V'
+    assert original.count(old)==1 and 'invoke-virtual {v1, v0}, Landroid/view/View;->setVisibility(I)V' in original
+    new='invoke-static {v1, v0}, '+HELPER+'->previewLayout(Landroid/view/View;Landroid/view/ViewGroup$LayoutParams;)V'
+    return raw.replace(original,original.replace(old,new))
 
 def patch(raw):
     before=methods(raw)

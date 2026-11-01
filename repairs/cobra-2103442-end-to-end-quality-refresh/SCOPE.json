@@ -30,11 +30,13 @@
     "Public-UI Android 17 baseline/candidate journey: original signed APKs, real input, local synthetic streams/EPG, cold/warm/frame/memory metrics, five modes, Pro Sports, eleven Multi-View arrangements, player controls, resize/theme/foreground",
     "Release-only route, original signer, class/method allowlist, exact component and APK-member preservation, monotonic version and matching component checks",
     "QualityLifecycleTest.generationErrorsAndFreshPublication",
-    "QualityLifecycleTest.fontScaleAndProSportsIsolation"
+    "QualityLifecycleTest.fontScaleAndProSportsIsolation",
+    "PreviewLayoutObservationTest.unchangedPreviewPlacementRequestsLayout: reproduced repeated accepted442 placement requests; assert guard removes identical work",
+    "PreviewLayoutObservationTest.genuineResizeVisibilityAndProExclusionRemainNative: preserve new geometry, native visibility, player/texture and Pro exclusion"
   ],
   "shutdown_tests": "NOT_SELECTED_NOT_RUN",
   "physical_Fold": "USER_ACCEPTANCE_REQUIRED; never inferred from host or emulator",
-  "release_status": "37_CURRENT_HOST_CHECKS_PASS; EXACT442_OWNER_PRESERVATION_PASS; ORIGINAL_SIGNER_PREPARATION_NEXT",
+  "release_status": "39_CURRENT_HOST_CHECKS_PASS; EXACT442_OWNER_PRESERVATION_PASS; FINAL444_ORIGINAL_SIGNER_PREPARATION_NEXT",
   "selected_regression_methods": {
     "DisplayTest": [
       "fullscreenDisplayRealPress",
