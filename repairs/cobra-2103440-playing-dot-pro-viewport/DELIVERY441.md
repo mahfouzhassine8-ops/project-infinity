@@ -1,4 +1,6 @@
-Original-key signed install-over testing candidate **2103441** is delivered. Physical Galaxy Fold acceptance remains pending; no baseline was locked, promoted or replaced.
+**Rejected by the user on 2026-11-01.** Retain these exact signed bytes and historical verification as evidence only. Release441 is not an approved baseline. The newly authorized Cards LIVE-dot and Pro inner-layout continuation is tracked in [the current scope](../cobra-2103441-approved-live-pro/SCOPE.json).
+
+Original-key signed install-over testing candidate **2103441** was delivered. No baseline was locked, promoted or replaced. The following records describe that historical delivery, not acceptance.
 
 - [Signed APK package](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/41261904615/artifacts/13065846534): extract `Infinity-2103441-Combined-Original-Signer.apk` from the ZIP.
 - [Exact matching individual component ZIPs](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/41261904615/artifacts/13065985521): COBRA, INFINITY, MINIMAL_ANDROID_CONTRACT and CHOOSER_SHELL.

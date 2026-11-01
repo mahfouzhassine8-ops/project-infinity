@@ -1,0 +1,49 @@
+{
+  "status": "PASS_CARDS_PARTIAL_OWNER_PRESERVATION",
+  "baseline": "actual signed2103438",
+  "rejected441": "not_used_as_baseline",
+  "unchanged_classes": 7165,
+  "changed_methods": {
+    "Lcom/projectinfinity/kodi/CobraCardsLayout;": [
+      "private static displaySheetKind(Ljava/lang/String;)Z",
+      "private static previewSheetOwner(Landroid/app/Activity;)Z",
+      "private static visibleDisplayPlayer(Landroid/app/Activity;)Z",
+      "public static beginFrontCardsSheetReveal(Landroid/app/Activity;Landroid/view/View;)Z",
+      "public static frontPlayerSheetHost(Landroid/app/Activity;Ljava/lang/String;)Landroid/widget/FrameLayout;"
+    ],
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$Holder;": [
+      "bind(Ljava/lang/Object;I)V",
+      "constructor <init>(Landroid/app/Activity;Landroid/widget/LinearLayout;)V",
+      "playing(Z)V",
+      "refresh()V"
+    ],
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$LiveDot;": [
+      "protected onBoundsChange(Landroid/graphics/Rect;)V",
+      "public draw(Landroid/graphics/Canvas;)V"
+    ],
+    "Lcom/projectinfinity/kodi/CobraComponent;": [
+      "public static version()Ljava/lang/String;"
+    ],
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity;": [
+      "private cobraCardsLivePulse(Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;)Z",
+      "synthetic lambda$cobraPreviewPanel$71$com-projectinfinity-kodi-InfinityLiveActivity(Landroid/view/View;)V"
+    ]
+  },
+  "new_class": "CobraCardsTiles$LivePlayback; weak-reference bridge to unchanged native effect",
+  "original_class_fields_annotations": "IDENTICAL",
+  "cards_geometry_menu_methods": "BYTE_IDENTICAL_TO438",
+  "native_playing_effect_policy_binding": "BYTE_IDENTICAL_TO438",
+  "working_preview_tap": "BYTE_IDENTICAL_TO440",
+  "frozen_classes_checked": [
+    "CobraProUi",
+    "CobraCardsTheme",
+    "CobraCardsDrawerViewport",
+    "InfinityLiveActivity$CobraPlayingDot",
+    "InfinityLiveActivity$CobraPlayingIndicatorPolicy",
+    "InfinityLiveActivity$CobraPlayerBinding"
+  ],
+  "Pro": "ORIGINAL438_IN_PARTIAL_OWNER; APPROVED_INNER_IMPLEMENTATION_PENDING_IMAGE",
+  "Infinity": "NO_SOURCE_OR_COMPONENT_CHANGE; FINAL_APK_NOT_BUILT",
+  "shutdown": "UNCHANGED_NOT_TESTED",
+  "final_signed_APK_preservation": "NOT_RUN_NO_CANDIDATE"
+}

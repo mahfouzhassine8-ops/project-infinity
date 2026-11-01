@@ -150,7 +150,10 @@ public final class CobraCardsTiles {
       live.setGravity(Gravity.CENTER_VERTICAL);live.setIncludeFontPadding(false);
       live.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
       more=new MoreView(a);more.setOnClickListener(this);more.setClickable(true);more.setFocusable(true);
-      for(View child:new View[]{fallback,logo,divider,category,title,now,live,time,progress,more,playing})
+      // Render the original effect through the existing LIVE drawable. The
+      // native renderer stays detached, so there is no second activity dot.
+      LivePlayback.bind(liveDot,playing,live);
+      for(View child:new View[]{fallback,logo,divider,category,title,now,live,time,progress,more})
         body.addView(child,new FrameLayout.LayoutParams(1,1,Gravity.TOP|Gravity.LEFT));
       style(category,NORMAL,MUTED,1);style(title,BOLD,WHITE,1);
       style(now,NORMAL,MUTED,2);style(time,NORMAL,MUTED,1);
@@ -199,13 +202,16 @@ public final class CobraCardsTiles {
       playing(false);
       theme();metadata(a);resize(estimateWidth());
     }
-    /** Reuse native bind/sync, including actual session identity, handoff and OLED/Night Cinema paint. */
+    /** Reuse native identity/paint; Cards alone stops its LIVE pulse on buffering. */
     void playing(boolean bind){
       try{
         java.lang.reflect.Method method=bind?playing.getClass().getDeclaredMethod("bind",channelArgs):playing.getClass().getDeclaredMethod("sync");
         method.setAccessible(true);
         if(bind)method.invoke(playing,bound);else method.invoke(playing);
       }catch(ReflectiveOperationException e){throw new IllegalStateException("Cards native playing indicator",e);}
+      Activity a=owner.get();
+      boolean pulse=a!=null && Boolean.TRUE.equals(CobraArrange.ownedCall(a,"cobraCardsLivePulse",channelArgs,bound));
+      LivePlayback.update(liveDot,pulse);
     }
     void metadata(Activity a){
       Object programme=CobraArrange.ownedCall(a,"cobraCurrentProgram",channelArgs,bound);
@@ -445,8 +451,6 @@ public final class CobraCardsTiles {
         float liveWidth=84*font,timeLeft=24+liveWidth+8;
         place(live,24,footer,liveWidth,26*font);place(time,timeLeft,footer+1,Math.max(24,448-timeLeft-24),26*font);
         place(progress,24,refHeight-38,448-48,10);
-        // Existing trailing gutter; no title, metadata, row or touch bounds change.
-        place(playing,426,(refHeight-18)/2,18,18);
         // Keep the actual pointer target in the empty header corner. Expanding it
         // by display density would cover the native card-title/program targets.
         FrameLayout.LayoutParams moreParams=(FrameLayout.LayoutParams)more.getLayoutParams();
@@ -470,8 +474,6 @@ public final class CobraCardsTiles {
       rectangle(progress,8*d,height-10*d,Math.max(1,width-16*d),3*d);
       liveDot.setBounds(0,0,Math.round(8*d),Math.round(8*d));live.setCompoundDrawables(liveDot,null,null,null);live.setCompoundDrawablePadding(Math.round(4*d));
       rectangle(more,Math.max(0,width-48*d),0,48*d,48*d);more.compact=true;more.scale=d;more.invalidate();
-      // Empty header band between category and title, separate from More's target.
-      rectangle(playing,Math.max(0,width-80*d),30*d,16*d,16*d);
     }
     void rectangle(View view,float x,float y,float w,float h){
       FrameLayout.LayoutParams p=(FrameLayout.LayoutParams)view.getLayoutParams();
@@ -560,10 +562,46 @@ public final class CobraCardsTiles {
     @Override public void setColorFilter(ColorFilter colorFilter){}
     @Override public int getOpacity(){return PixelFormat.TRANSLUCENT;}
   }
+  /** Cards-only bridge to the unchanged native effect; no added fields on shipped views. */
+  private static final class LivePlayback {
+    private static final WeakHashMap<LiveDot,LivePlayback> STATES=new WeakHashMap<>();
+    final WeakReference<View> nativeDot;
+    final WeakReference<TextView> target;
+    boolean pulse;
+    LivePlayback(View dot,TextView label){nativeDot=new WeakReference<>(dot);target=new WeakReference<>(label);}
+    static void bind(LiveDot dot,View nativeDot,TextView label){STATES.put(dot,new LivePlayback(nativeDot,label));}
+    static void update(LiveDot dot,boolean active){
+      LivePlayback state=STATES.get(dot);
+      if(state!=null && state.pulse!=active){state.pulse=active;dot.invalidateSelf();}
+    }
+    static void bounds(LiveDot dot){
+      LivePlayback state=STATES.get(dot);View nativeDot=state==null?null:state.nativeDot.get();
+      if(nativeDot==null)return;
+      int size=Math.max(1,Math.round(18*nativeDot.getResources().getDisplayMetrics().density));
+      nativeDot.measure(View.MeasureSpec.makeMeasureSpec(size,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(size,View.MeasureSpec.EXACTLY));
+      nativeDot.layout(0,0,size,size);
+    }
+    static boolean draw(LiveDot dot,Canvas canvas){
+      LivePlayback state=STATES.get(dot);
+      if(state==null || !state.pulse)return false;
+      View nativeDot=state.nativeDot.get();TextView label=state.target.get();
+      if(nativeDot==null || label==null || !label.isShown() || nativeDot.getWidth()<=0)return false;
+      Rect r=dot.getBounds();int saved=canvas.save();
+      canvas.translate(r.left,r.top);
+      canvas.scale(r.width()/(float)nativeDot.getWidth(),r.height()/(float)nativeDot.getHeight());
+      nativeDot.draw(canvas);canvas.restoreToCount(saved);
+      // Only the visible active label requests another display-paced frame.
+      // Detached native view invalidation schedules no independent UI work.
+      label.postInvalidateOnAnimation();return true;
+    }
+  }
   private static final class LiveDot extends Drawable {
     final Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG);
     LiveDot(){paint.setColor(CYAN);}
-    @Override public void draw(Canvas canvas){Rect r=getBounds();canvas.drawCircle(r.exactCenterX(),r.exactCenterY(),Math.min(r.width(),r.height())*.45f,paint);}
+    @Override protected void onBoundsChange(Rect bounds){LivePlayback.bounds(this);}
+    @Override public void draw(Canvas canvas){
+      if(!LivePlayback.draw(this,canvas)){Rect r=getBounds();canvas.drawCircle(r.exactCenterX(),r.exactCenterY(),Math.min(r.width(),r.height())*.45f,paint);}
+    }
     @Override public void setAlpha(int alpha){paint.setAlpha(alpha);invalidateSelf();}
     @Override public void setColorFilter(ColorFilter colorFilter){}
     @Override public int getOpacity(){return PixelFormat.TRANSLUCENT;}

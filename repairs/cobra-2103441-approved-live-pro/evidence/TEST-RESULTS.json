@@ -1,0 +1,40 @@
+{
+  "status": "PASS_FOUR_CARDS_HOST_CHECKS_PRO_AND_MOCKUP_PENDING",
+  "source": "accepted438 plus retained440 Preview/439 Display; rejected441 not baseline",
+  "owner_dex": {
+    "part-0.dex": "2a2f4162ab249b54e0455d06614092b275bf8014ab13a4d7cdb30d11b37bdbf8",
+    "part-1.dex": "70dc429bff4d2df7fe19907100d5df39d5ade973aa2679328b42d567b3d5aee1"
+  },
+  "tests": [
+    {
+      "name": "cardsLiveDotPlaybackStatesAndIdentity",
+      "seconds": "9.205",
+      "status": "PASS"
+    },
+    {
+      "name": "cardsPreviewAndContextRealPresses",
+      "seconds": "5.009",
+      "status": "PASS"
+    },
+    {
+      "name": "cardsLiveDotCyclesAndOriginalGeometry",
+      "seconds": "3.349",
+      "status": "PASS"
+    },
+    {
+      "name": "cardsNativePlaybackEventsAndRenderedRows",
+      "seconds": "9.515",
+      "status": "PASS"
+    }
+  ],
+  "host": "Robolectric API35 native graphics; controlled ExoPlayer; no media decoder",
+  "native_callbacks_verified": true,
+  "Preview_real_touch_presses": 56,
+  "channel_menu_real_touch_presses": 4,
+  "mockup_visual_match": "BLOCKED_NO_IMAGE_BYTES",
+  "Pro_approved_layout": "NOT_YET_IMPLEMENTED_PENDING_MOCKUP",
+  "physical_Fold": "NOT_TESTED",
+  "signed_APK": "NOT_BUILT",
+  "Infinity": "NO_SOURCE_OR_COMPONENT_CHANGE",
+  "shutdown": "NOT_RUN"
+}
