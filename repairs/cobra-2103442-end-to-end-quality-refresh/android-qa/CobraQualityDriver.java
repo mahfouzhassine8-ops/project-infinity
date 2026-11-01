@@ -13,6 +13,13 @@ import static qa.CobraDrawerDriver.*;
 /** Finite public-input journey on the exact signed APK, no application instrumentation. */
 public final class CobraQualityDriver {
  static JSONArray cases=new JSONArray();
+ static void preflight()throws Exception{
+  String density=shell("wm density"),size=shell("wm size"),sdk=shell("getprop ro.build.version.sdk");
+  raw("preflight-density.txt",density);raw("preflight-size.txt",size);raw("preflight-sdk.txt",sdk);
+  require(density.contains("Override density: 320"),"Exact320dpi OS command preflight required: "+density);
+  require(size.contains("Override size: 1080x2520"),"Exact front window OS command preflight required: "+size);
+  require(sdk.trim().equals("37"),"Selected API37 OS command preflight required: "+sdk);
+ }
  static void capture(String name)throws Exception {
   screenshot(name); // Preserve the actual foreground even if ownership assertion fails.
   Tree t=new Tree();try{write(name+"-nodes.json",new JSONObject().put("labels",t.labels()).put("nodes",nodes(t)).put("query_ms",SystemClock.uptimeMillis()-t.started));}finally{t.close();}
@@ -52,13 +59,14 @@ public final class CobraQualityDriver {
  }
  public static void main(String[] args)throws Exception {
   require(args.length==3,"Phase, fresh public output directory and exact QA JAR digest required");
-  require(args[0].equals("baseline")||args[0].equals("candidate"),"Selected baseline/candidate only");
-  require(args[1].matches("/sdcard/cobra-quality-(baseline|candidate)-[0-9]+"),"Fresh selected output only");
+  require(args[0].equals("baseline")||args[0].equals("candidate")||args[0].equals("preflight"),"Selected baseline/candidate/preflight only");
+  require(args[1].matches("/sdcard/cobra-quality-(baseline|candidate|preflight)-[0-9]+"),"Fresh selected output only");
   dir=new File(args[1]);require(!dir.exists()&&dir.mkdir(),"Fresh evidence directory required");
   JSONObject result=new JSONObject().put("phase",args[0]).put("shutdown","NOT_RUN").put("Infinity","NOT_LAUNCHED").put("steps",steps);Object wrapper=null;Method disconnect=null;
   try{
    File jar=new File("/data/local/tmp/CobraQualityDriver.jar");ByteArrayOutputStream bytes=new ByteArrayOutputStream();try(InputStream in=new FileInputStream(jar)){byte[] b=new byte[8192];int n;while((n=in.read(b))!=-1)bytes.write(b,0,n);}require(hash(bytes.toByteArray()).equals(args[2]),"Exact QA driver SHA required");
    require(System.getProperty("java.class.path").equals("/system/framework/android.test.runner.jar:/system/framework/uiautomator.jar:"+jar),"OS-only classpath required");
+   if(args[0].equals("preflight")){preflight();result.put("status","PASS_EXACT_OS_COMMAND_PREFLIGHT");return;}
    Class<?> c=Class.forName("com.android.uiautomator.core.UiAutomationShellWrapper");wrapper=c.getConstructor().newInstance();c.getMethod("connect").invoke(wrapper);disconnect=c.getMethod("disconnect");c.getMethod("setCompressedLayoutHierarchy",boolean.class).invoke(wrapper,false);ui=(UiAutomation)c.getMethod("getUiAutomation").invoke(wrapper);
    android.accessibilityservice.AccessibilityServiceInfo info=ui.getServiceInfo();info.flags|=android.accessibilityservice.AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS;ui.setServiceInfo(info);
    journey(args[0].equals("baseline"));result.put("status","PASS_SELECTED_PUBLIC_INPUT_MODE_SCROLL_RESIZE");

@@ -1,0 +1,90 @@
+11-01 07:31:33.798  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ......I. 446,315-542,411} during layout: running second layout pass
+11-01 07:31:33.862  5400  5400 W View    : requestLayout() improperly called by android.widget.FrameLayout{576e7b1 VFE...CL. ........ 16,133-562,548} during second layout pass: posting in next frame
+11-01 07:31:33.862  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ........ 446,315-542,411} during second layout pass: posting in next frame
+11-01 07:31:33.864  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ......I. 446,315-542,411} during layout: running second layout pass
+11-01 07:31:33.924  5400  5400 W View    : requestLayout() improperly called by android.widget.FrameLayout{576e7b1 VFE...CL. .......D 16,133-562,548} during second layout pass: posting in next frame
+11-01 07:31:33.924  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ........ 446,315-542,411} during second layout pass: posting in next frame
+11-01 07:31:33.926  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ......I. 446,315-542,411} during layout: running second layout pass
+11-01 07:31:34.009  5400  5400 W View    : requestLayout() improperly called by android.widget.FrameLayout{576e7b1 VFE...CL. ......ID 16,133-562,548} during second layout pass: posting in next frame
+11-01 07:31:34.009  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ........ 446,315-542,411} during second layout pass: posting in next frame
+11-01 07:31:34.017  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ......I. 446,315-542,411} during layout: running second layout pass
+11-01 07:31:34.026  5969  5969 E AndroidRuntime: FATAL EXCEPTION: main
+11-01 07:31:34.026  5969  5969 E AndroidRuntime: PID: 5969
+11-01 07:31:34.026  5969  5969 E AndroidRuntime: java.lang.IllegalStateException: Expected stable test display density required
+11-01 07:31:34.026  5969  5969 E AndroidRuntime: 	at qa.CobraDrawerDriver.require(dex-id-e8a642f111017d5f5e8a72525a80ddfb7f0e3b41:5)
+11-01 07:31:34.026  5969  5969 E AndroidRuntime: 	at qa.CobraDrawerDriver.resize(dex-id-e8a642f111017d5f5e8a72525a80ddfb7f0e3b41:31)
+11-01 07:31:34.026  5969  5969 E AndroidRuntime: 	at qa.CobraQualityDriver.journey(dex-id-e8a642f111017d5f5e8a72525a80ddfb7f0e3b41:92)
+11-01 07:31:34.026  5969  5969 E AndroidRuntime: 	at qa.CobraQualityDriver.main(dex-id-e8a642f111017d5f5e8a72525a80ddfb7f0e3b41:323)
+11-01 07:31:34.026  5969  5969 E AndroidRuntime: 	at com.android.internal.os.RuntimeInit.nativeFinishInit(Native Method)
+11-01 07:31:34.026  5969  5969 E AndroidRuntime: 	at com.android.internal.os.RuntimeInit.main(RuntimeInit.java:367)
+11-01 07:31:34.044  5969  5969 E AndroidRuntime: Couldn't report crash. Here's the crash:
+11-01 07:31:34.044  5969  5969 E AndroidRuntime: java.lang.IllegalStateException: Expected stable test display density required
+11-01 07:31:34.044  5969  5969 E AndroidRuntime: 	at qa.CobraDrawerDriver.require(dex-id-e8a642f111017d5f5e8a72525a80ddfb7f0e3b41:5)
+11-01 07:31:34.044  5969  5969 E AndroidRuntime: 	at qa.CobraDrawerDriver.resize(dex-id-e8a642f111017d5f5e8a72525a80ddfb7f0e3b41:31)
+11-01 07:31:34.044  5969  5969 E AndroidRuntime: 	at qa.CobraQualityDriver.journey(dex-id-e8a642f111017d5f5e8a72525a80ddfb7f0e3b41:92)
+11-01 07:31:34.044  5969  5969 E AndroidRuntime: 	at qa.CobraQualityDriver.main(dex-id-e8a642f111017d5f5e8a72525a80ddfb7f0e3b41:323)
+11-01 07:31:34.044  5969  5969 E AndroidRuntime: 	at com.android.internal.os.RuntimeInit.nativeFinishInit(Native Method)
+11-01 07:31:34.044  5969  5969 E AndroidRuntime: 	at com.android.internal.os.RuntimeInit.main(RuntimeInit.java:367)
+11-01 07:31:34.045  5969  5969 E AndroidRuntime: Error reporting crash. Here's the error:
+11-01 07:31:34.045  5969  5969 E AndroidRuntime: java.lang.RuntimeException: Bad file descriptor
+11-01 07:31:34.045  5969  5969 E AndroidRuntime: 	at android.os.BinderProxy.transactNative(Native Method)
+11-01 07:31:34.045  5969  5969 E AndroidRuntime: 	at android.os.BinderProxy.transact(BinderProxy.java:674)
+11-01 07:31:34.045  5969  5969 E AndroidRuntime: 	at android.app.IActivityManager$Stub$Proxy.handleApplicationCrash(IActivityManager.java:6214)
+11-01 07:31:34.045  5969  5969 E AndroidRuntime: 	at com.android.internal.os.RuntimeInit$KillApplicationHandler.uncaughtException(RuntimeInit.java:166)
+11-01 07:31:34.045  5969  5969 E AndroidRuntime: 	at java.lang.ThreadGroup.uncaughtException(ThreadGroup.java:1098)
+11-01 07:31:34.045  5969  5969 E AndroidRuntime: 	at java.lang.ThreadGroup.uncaughtException(ThreadGroup.java:1093)
+11-01 07:31:34.045  5969  5969 E AndroidRuntime: 	at java.lang.Thread.dispatchUncaughtException(Thread.java:3380)
+11-01 07:31:34.118  5400  5400 W View    : requestLayout() improperly called by android.widget.FrameLayout{576e7b1 VFE...CL. ........ 16,133-562,548} during second layout pass: posting in next frame
+11-01 07:31:34.119  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ........ 446,315-542,411} during second layout pass: posting in next frame
+11-01 07:31:34.119  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ......I. 446,315-542,411} during layout: running second layout pass
+11-01 07:31:34.195  5400  5400 W View    : requestLayout() improperly called by android.widget.FrameLayout{576e7b1 VFE...CL. .......D 16,133-562,548} during second layout pass: posting in next frame
+11-01 07:31:34.195  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ........ 446,315-542,411} during second layout pass: posting in next frame
+11-01 07:31:34.196  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ......I. 446,315-542,411} during layout: running second layout pass
+11-01 07:31:34.265  5400  5400 W View    : requestLayout() improperly called by android.widget.FrameLayout{576e7b1 VFE...CL. ........ 16,133-562,548} during second layout pass: posting in next frame
+11-01 07:31:34.270  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ........ 446,315-542,411} during second layout pass: posting in next frame
+11-01 07:31:34.270  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ......I. 446,315-542,411} during layout: running second layout pass
+11-01 07:31:34.326  5400  5400 W View    : requestLayout() improperly called by android.widget.FrameLayout{576e7b1 VFE...CL. ........ 16,133-562,548} during second layout pass: posting in next frame
+11-01 07:31:34.326  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ........ 446,315-542,411} during second layout pass: posting in next frame
+11-01 07:31:34.326  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ......I. 446,315-542,411} during layout: running second layout pass
+11-01 07:31:34.445  5400  5400 W View    : requestLayout() improperly called by android.widget.FrameLayout{576e7b1 VFE...CL. ........ 16,133-562,548} during second layout pass: posting in next frame
+11-01 07:31:34.445  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ........ 446,315-542,411} during second layout pass: posting in next frame
+11-01 07:31:34.447  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ......I. 446,315-542,411} during layout: running second layout pass
+11-01 07:31:34.455  5400  5400 W View    : requestLayout() improperly called by android.widget.FrameLayout{576e7b1 VFE...CL. .......D 16,133-562,548} during second layout pass: posting in next frame
+11-01 07:31:34.463  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ........ 446,315-542,411} during second layout pass: posting in next frame
+11-01 07:31:34.465  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ......I. 446,315-542,411} during layout: running second layout pass
+11-01 07:31:34.543  5400  5400 W View    : requestLayout() improperly called by android.widget.FrameLayout{576e7b1 VFE...CL. ........ 16,133-562,548} during second layout pass: posting in next frame
+11-01 07:31:34.544  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ........ 446,315-542,411} during second layout pass: posting in next frame
+11-01 07:31:34.550  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ......I. 446,315-542,411} during layout: running second layout pass
+11-01 07:31:34.643  5400  5400 W View    : requestLayout() improperly called by android.widget.FrameLayout{576e7b1 VFE...CL. ........ 16,133-562,548} during second layout pass: posting in next frame
+11-01 07:31:34.643  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ........ 446,315-542,411} during second layout pass: posting in next frame
+11-01 07:31:34.643  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ......I. 446,315-542,411} during layout: running second layout pass
+11-01 07:31:34.769  5400  5400 W View    : requestLayout() improperly called by android.widget.FrameLayout{576e7b1 VFE...CL. .......D 16,133-562,548} during second layout pass: posting in next frame
+11-01 07:31:34.770  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ........ 446,315-542,411} during second layout pass: posting in next frame
+11-01 07:31:34.770  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ......I. 446,315-542,411} during layout: running second layout pass
+11-01 07:31:34.779  5400  5400 W View    : requestLayout() improperly called by android.widget.FrameLayout{576e7b1 VFE...CL. ........ 16,133-562,548} during second layout pass: posting in next frame
+11-01 07:31:34.779  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ........ 446,315-542,411} during second layout pass: posting in next frame
+11-01 07:31:34.786  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ......I. 446,315-542,411} during layout: running second layout pass
+11-01 07:31:34.846  5400  5400 W View    : requestLayout() improperly called by android.widget.FrameLayout{576e7b1 VFE...CL. .......D 16,133-562,548} during second layout pass: posting in next frame
+11-01 07:31:34.862  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ........ 446,315-542,411} during second layout pass: posting in next frame
+11-01 07:31:34.863  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ......I. 446,315-542,411} during layout: running second layout pass
+11-01 07:31:34.947  5400  5400 W View    : requestLayout() improperly called by android.widget.FrameLayout{576e7b1 VFE...CL. ........ 16,133-562,548} during second layout pass: posting in next frame
+11-01 07:31:34.948  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ........ 446,315-542,411} during second layout pass: posting in next frame
+11-01 07:31:34.949  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ......I. 446,315-542,411} during layout: running second layout pass
+11-01 07:31:35.013  5400  5400 W View    : requestLayout() improperly called by android.widget.FrameLayout{576e7b1 VFE...CL. ........ 16,133-562,548} during second layout pass: posting in next frame
+11-01 07:31:35.020  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ........ 446,315-542,411} during second layout pass: posting in next frame
+11-01 07:31:35.021  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ......I. 446,315-542,411} during layout: running second layout pass
+11-01 07:31:35.110  5400  5400 W View    : requestLayout() improperly called by android.widget.FrameLayout{576e7b1 VFE...CL. ......ID 16,133-562,548} during second layout pass: posting in next frame
+11-01 07:31:35.111  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ........ 446,315-542,411} during second layout pass: posting in next frame
+11-01 07:31:35.111  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ......I. 446,315-542,411} during layout: running second layout pass
+11-01 07:31:35.176  5400  5400 W View    : requestLayout() improperly called by android.widget.FrameLayout{576e7b1 VFE...CL. .......D 16,133-562,548} during second layout pass: posting in next frame
+11-01 07:31:35.176  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ........ 446,315-542,411} during second layout pass: posting in next frame
+11-01 07:31:35.176  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ......I. 446,315-542,411} during layout: running second layout pass
+11-01 07:31:35.368  5400  5400 W View    : requestLayout() improperly called by android.widget.FrameLayout{576e7b1 VFE...CL. ........ 16,133-562,548} during second layout pass: posting in next frame
+11-01 07:31:35.374  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ........ 446,315-542,411} during second layout pass: posting in next frame
+11-01 07:31:35.376  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ......I. 446,315-542,411} during layout: running second layout pass
+11-01 07:31:35.379  5400  5400 W View    : requestLayout() improperly called by android.widget.FrameLayout{576e7b1 VFE...CL. .......D 16,133-562,548} during second layout pass: posting in next frame
+11-01 07:31:35.379  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ........ 446,315-542,411} during second layout pass: posting in next frame
+11-01 07:31:35.380  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ......I. 446,315-542,411} during layout: running second layout pass
+11-01 07:31:35.486  5400  5400 W View    : requestLayout() improperly called by android.widget.FrameLayout{576e7b1 VFE...CL. ........ 16,133-562,548} during second layout pass: posting in next frame
+11-01 07:31:35.486  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ........ 446,315-542,411} during second layout pass: posting in next frame
+11-01 07:31:35.486  5400  5400 W View    : requestLayout() improperly called by com.projectinfinity.kodi.InfinityLiveActivity$CobraIconButton{1ce27b8 VFED..C.. ......I. 446,315-542,411} during layout: running second layout pass

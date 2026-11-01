@@ -14,10 +14,14 @@ def run(baseline,driver,sdk,out,candidate_dir):
  (out/'SIGNATURE.txt').write_text(signature)
  report=dict(phase='SIGNED442_BASELINE',physical_Fold='NOT_RUN',Infinity='NOT_LAUNCHED',shutdown='NOT_RUN')
  try:
-  probe.probe(baseline,out/'first-screen',APK_SHA)
   jar=driver/'CobraQualityDriver.jar';build=json.loads((driver/'BUILD.json').read_text());pin=hashlib.sha256(jar.read_bytes()).hexdigest();assert pin==build['jar_sha256']
   for name,want in build['sources'].items():assert hashlib.sha256((R/name).read_bytes()).hexdigest()==want
   probe.adb('push',str(jar),'/data/local/tmp/CobraQualityDriver.jar');assert probe.adb('shell','sha256sum','/data/local/tmp/CobraQualityDriver.jar').split()[0]==pin
+  remote='/sdcard/cobra-quality-preflight-'+str(time.monotonic_ns())
+  result=subprocess.run(['adb','shell','CLASSPATH=/system/framework/android.test.runner.jar:/system/framework/uiautomator.jar:/data/local/tmp/CobraQualityDriver.jar','ANDROID_DATA=/data/local/tmp','/system/bin/app_process','/system/bin','qa.CobraQualityDriver','preflight',remote,pin],capture_output=True,text=True,timeout=30)
+  (out/'preflight-stdout.txt').write_text(result.stdout);(out/'preflight-stderr.txt').write_text(result.stderr);probe.adb('pull',remote,str(out/'preflight'),check=False,timeout=30)
+  assert result.returncode==0,'OS command preflight failed before APK installation; inspect preserved evidence'
+  probe.probe(baseline,out/'first-screen',APK_SHA)
   remote='/sdcard/cobra-quality-baseline-'+str(time.monotonic_ns())
   result=subprocess.run(['adb','shell','CLASSPATH=/system/framework/android.test.runner.jar:/system/framework/uiautomator.jar:/data/local/tmp/CobraQualityDriver.jar','ANDROID_DATA=/data/local/tmp','/system/bin/app_process','/system/bin','qa.CobraQualityDriver','baseline',remote,pin],capture_output=True,text=True,timeout=600)
   (out/'stdout.txt').write_text(result.stdout);(out/'stderr.txt').write_text(result.stderr);probe.adb('pull',remote,str(out/'native'),check=False,timeout=90)

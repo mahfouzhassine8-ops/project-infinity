@@ -117,9 +117,16 @@ public final class CobraDrawerDriver {
   }finally{if(parent!=null)parent.recycle();t.close();}
  }
  static String shell(String command)throws Exception{
-  try(InputStream in=new android.os.ParcelFileDescriptor.AutoCloseInputStream(ui.executeShellCommand(command));ByteArrayOutputStream out=new ByteArrayOutputStream()){
-   byte[] buffer=new byte[8192];int n;while((n=in.read(buffer))!=-1){require(out.size()+n<8*1024*1024,"Bounded public OS dump exceeded");out.write(buffer,0,n);}return new String(out.toByteArray(),StandardCharsets.UTF_8);
-  }
+  // QA already runs as the adb shell UID. The API37 UiAutomation command
+  // pipe yielded an empty graphics dump and did not report the observed
+  // 320dpi state. Use the same shell UID directly and check the exit status.
+  Process process=new ProcessBuilder("/system/bin/sh","-c",command).redirectErrorStream(true).start();
+  try(InputStream in=process.getInputStream();ByteArrayOutputStream out=new ByteArrayOutputStream()){
+   byte[] buffer=new byte[8192];int n;while((n=in.read(buffer))!=-1){require(out.size()+n<8*1024*1024,"Bounded public OS dump exceeded");out.write(buffer,0,n);}
+   String result=new String(out.toByteArray(),StandardCharsets.UTF_8);int status=process.waitFor();
+   steps.put(new JSONObject().put("OS_command",command).put("exit_code",status).put("output_bytes",out.size()));
+   require(status==0,"OS command failed: "+command+" : "+result);return result;
+  }finally{process.destroy();}
  }
  static void raw(String name,String value)throws Exception{try(FileOutputStream out=new FileOutputStream(new File(dir,name))){out.write(value.getBytes(StandardCharsets.UTF_8));}}
  static JSONArray nodes(Tree t)throws Exception{
@@ -193,7 +200,8 @@ public final class CobraDrawerDriver {
   // Density is fixed once before app installation. A window-size transition
   // must not add a separate, potentially recreating density change to the
   // selected fold-size scenario.
-  require(shell("wm density").contains("Override density: "+density),"Expected stable test display density required");
+  String actualDensity=shell("wm density");raw("resize-"+width+"-density.txt",actualDensity);
+  require(actualDensity.contains("Override density: "+density),"Expected stable test display density required: "+actualDensity);
   raw("resize-"+width+".txt",shell("wm size "+width+"x"+height));syncInputs();
   long start=SystemClock.uptimeMillis();boolean observed=false;
   for(int i=0;i<30&&SystemClock.uptimeMillis()-start<12000;i++){
