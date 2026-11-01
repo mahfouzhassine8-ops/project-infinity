@@ -1,0 +1,36 @@
+{
+  "authorization": "2026-11-01 user-approved entire-Cobra quality refresh; EXECUTION-BRIEF.md",
+  "branch": "work/cobra-2103442-end-to-end-quality-refresh-20261101",
+  "baseline": {
+    "version": 2103442,
+    "source": "2e88f85250ef2e46952192cf0fdb42ac5af7c9c8",
+    "apk_sha256": "88f968c53eb3d306db57de72419744f427554f7146f4f86e147b192f4f5e0bf5"
+  },
+  "allowed": [
+    "Measured and reproduced Cobra-owned performance, stability, refresh, interaction and accessibility defects",
+    "Required truthful Cobra version and original-workflow release binding"
+  ],
+  "frozen": [
+    "Infinity 2103437 owner",
+    "all native libraries",
+    "shared Android runtime",
+    "chooser behavior",
+    "launcher and packaged resources",
+    "shutdown",
+    "user data and security contracts",
+    "accepted 2103442 layouts and features"
+  ],
+  "selected_before_execution": true,
+  "selected_tests": [
+    "QualityRefreshTest.formattingAndGuideBaseline: actual signed-owner formatter/EPG queries; host p50/p95 and allocated bytes",
+    "QualityRefreshTest.modeScreenThemeMatrix: actual registered Mobile, Compact, TV Grid, Cards, normal Pro and Pro Sports; front, inner, landscape, compact window; Light/Dark/OLED; bounds, identity, scrolling and refresh",
+    "QualityRefreshTest.formattingFreshnessAndConcurrency: exact original text across timestamps, timezones, DST and concurrent callers",
+    "QualityRefreshTest.refreshOwnershipAndLifecycle: source/EPG publication, stale generations, mode/foreground restoration; no shutdown",
+    "ApprovedLiveProTest and ProApprovedLayoutTest: reuse exact unchanged class/method evidence; execute only portions affected by newly changed presentation hot paths",
+    "Public-UI Android 17 baseline/candidate journey: original signed APKs, real input, local synthetic streams/EPG, cold/warm/frame/memory metrics, five modes, Pro Sports, eleven Multi-View arrangements, player controls, resize/theme/foreground",
+    "Release-only route, original signer, class/method allowlist, exact component and APK-member preservation, monotonic version and matching component checks"
+  ],
+  "shutdown_tests": "NOT_SELECTED_NOT_RUN",
+  "physical_Fold": "USER_ACCEPTANCE_REQUIRED; never inferred from host or emulator",
+  "release_status": "NOT_BUILT; implementation and mandatory evidence pending"
+}
