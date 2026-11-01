@@ -117,7 +117,9 @@ def prepare(bundles,baseline,sdk,out):
     require(load(out/'owner/CLASS-HASHES.json')==load(HERE/'final-evidence/CLASS-HASHES.json'),'EXACT_HOST_TESTED_CLASS_DEFINITIONS')
     import verify_owner
     verify_owner.verify(out/'owner',out/'owner-preservation')
-    require(load(out/'owner-preservation/OWNER-PRESERVATION.json')==load(HERE/'final-evidence/OWNER-PRESERVATION.json'),'EXACT_REVIEWED_OWNER_PRESERVATION')
+    preservation=load(out/'owner-preservation/OWNER-PRESERVATION.json');reviewed=load(HERE/'final-evidence/OWNER-PRESERVATION.json')
+    print('OWNER_PRESERVATION_DIFFERENCES',{k:dict(expected=reviewed.get(k),actual=preservation.get(k)) for k in reviewed.keys()|preservation.keys() if reviewed.get(k)!=preservation.get(k)},flush=True)
+    require(preservation==reviewed,'EXACT_REVIEWED_OWNER_PRESERVATION')
     require(observed['dex']['part-1.dex']==read_bundle(bundles/'COBRA.zip',catalog['bundles']['COBRA'])['dex']['dex/part-1.dex'],'UNRELATED_SECOND_DEX_FROZEN')
     require(observed['unchanged']==7164,'EXACT_NON_CARDS_AND_METADATA_BOUNDARY')
     dest=out/'components';dest.mkdir();catalog['source']=source

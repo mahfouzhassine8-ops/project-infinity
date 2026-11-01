@@ -1,0 +1,5 @@
+Preparation run41269356489 stopped before packaging/signing at EXACT_REVIEWED_OWNER_PRESERVATION. Its actual owner receipt, all7174 class hashes and method deltas are exactly equal to the host-tested version. Every source/class preservation assertion passed; OWNER_RECEIPT_DIFFERENCES was empty.
+
+The additional full-report equality gate included an unsorted list populated by filesystem traversal (cards_tested_classes_exact). Other report fields are deterministic dictionaries, sorted lists, counts or constants. Normalize this report list at generation by sorting it on both host and CI; retain the exact equality assertion and all actual byte/method/hash checks. Locally verified that this is the only saved-report change and the class set is identical. Capture generated owner-preservation reports in failure artifacts and print differing fields for future diagnosis.
+
+This correction changes verification/reporting only. Production source and tested DEX hashes are unchanged. No original key was accessed and no signed candidate was created by the failed preparation. No application tests need repeating for this reporting correction.

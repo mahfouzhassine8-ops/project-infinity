@@ -49,7 +49,7 @@ def verify(root,out):
     result=dict(status='PASS_EXACT438_OWNER_AND_CARDS_CHECK_REUSE',changed_methods=actual,
                 unchanged_original_classes=sum(before[n]==after[n] for n in before),
                 new_classes=sorted(after.keys()-before.keys()),fields_annotations='EXACT_ORIGINAL',
-                cards_tested_classes_exact=reused,Pro_controls_adapters_navigation_Sports='BYTE_IDENTICAL',
+                cards_tested_classes_exact=sorted(reused),Pro_controls_adapters_navigation_Sports='BYTE_IDENTICAL',
                 Cards_layout_themes_drawer='BYTE_IDENTICAL',second_Cobra_DEX='BYTE_IDENTICAL',
                 Infinity='NOT_ACCESSED_BY_OWNER_BUILD;_FINAL_APK_CHECK_REQUIRED',shutdown='UNCHANGED_NOT_TESTED')
     out.mkdir(parents=True,exist_ok=True)
