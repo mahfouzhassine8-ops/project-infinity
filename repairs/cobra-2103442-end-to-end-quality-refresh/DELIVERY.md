@@ -1,5 +1,12 @@
 # Cobra 2103444 quality-refresh testing candidate
 
+**Acceptance update, 2026-11-01:** The user subsequently instructed “Lock it”.
+[2103444 is now the user-approved baseline](../locks/INFINITY-COBRA-2103444-USER-APPROVED-BASELINE-20261101.md),
+with an exact-source lock reference and 2103442 retained for recovery. The report
+below preserves the original delivery-time status and verification limitations;
+no APK was rebuilt and no historical test result was changed. GitHub-enforced
+branch protection still requires repository-administrator permission.
+
 Original-key signed **2103444** contains three measured Cobra presentation fixes:
 reuse programme-time formatting machinery, reuse bounded and content-validated
 next-programme projections, and skip identical preview layout assignments. Existing

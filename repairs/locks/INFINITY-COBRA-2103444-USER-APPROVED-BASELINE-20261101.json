@@ -1,0 +1,76 @@
+{
+  "status": "USER_APPROVED_BASELINE",
+  "recorded_date_utc": "2026-11-01",
+  "user_statement": "Lock it",
+  "acceptance_basis": "Explicit user acceptance and lock instruction for the delivered signed 2103444 APK; no individual physical-device test results were supplied or inferred.",
+  "versionCode": 2103444,
+  "package": "com.projectinfinity.kodi",
+  "signed_source": "1b7a4ef16524854fab77a1c974538aee8a1132bb",
+  "signed_apk": "Infinity-2103444-Combined-Original-Signer.apk",
+  "signed_apk_sha256": "38dff935ffc0967e2c16e8d61e6e4bfd693fcb73bbaa130e8fa354e468b85a76",
+  "original_certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "signing_run": 41284148114,
+  "signing_run_conclusion": "success",
+  "component_producer_source": "3544e741871d1a9f79a21c193cc75fbc5973e839",
+  "baseline_ref": "refs/heads/lock/infinity-cobra-2103444-user-approved-20261101",
+  "baseline_ref_sha": "1b7a4ef16524854fab77a1c974538aee8a1132bb",
+  "prior_recovery_baseline": {
+    "versionCode": 2103442,
+    "source": "2e88f85250ef2e46952192cf0fdb42ac5af7c9c8",
+    "ref": "refs/heads/lock/infinity-cobra-2103442-user-approved-20261101",
+    "apk_sha256": "88f968c53eb3d306db57de72419744f427554f7146f4f86e147b192f4f5e0bf5",
+    "retained": true
+  },
+  "components": {
+    "COBRA": {
+      "version": "2103444.cobra.1",
+      "source": "3544e741871d1a9f79a21c193cc75fbc5973e839",
+      "zip_sha256": "f00c5e887cd221b12ee37a1e2a801dd61e60ecf555e0cfc1bb38974fd41ba690"
+    },
+    "INFINITY": {
+      "version": "2103437.infinity.loading.2",
+      "source": "116d7146d0ceeaa3d6b3b1b98799c62b515fea0a",
+      "zip_sha256": "d03b4d5e845dfb5e1d6bb75c1967c7b6a2e55c5b17a7c65d66d43d43abd2e73d"
+    },
+    "MINIMAL_ANDROID_CONTRACT": {
+      "version": "isolation-contract.1.launcher-icons.2103431",
+      "source": "b41d51daa8b32dfee265dc9ea0abf844bff8f44e",
+      "zip_sha256": "432bfb7b246a504d9550e1de39368c3b7e0946532f1c695531ed891e74ef03d8"
+    },
+    "CHOOSER_SHELL": {
+      "version": "2103444.version-metadata.1",
+      "source": "3544e741871d1a9f79a21c193cc75fbc5973e839",
+      "zip_sha256": "cfc83c9caf57bc4978d8a12625537e90515be400a48d0f6359695c962d20f1da"
+    }
+  },
+  "downloads": {
+    "signed_apk_artifact": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/41284148114/artifacts/13074830138",
+    "matching_components_artifact": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/41284148114/artifacts/13074134837",
+    "signing_evidence_artifact": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/41284148114/artifacts/13074652626",
+    "artifact_expiration_utc": "2027-01-30T07:16:50Z"
+  },
+  "verification_evidence": {
+    "delivery_evidence_commit": "9b8536e344bf3d92c5210bac15824c294f1e6471",
+    "delivery_report": "repairs/cobra-2103442-end-to-end-quality-refresh/DELIVERY.md",
+    "static_release_gates": "PASS_DOWNLOADED_SIGNED_STATIC_RELEASE_GATES",
+    "Android_install_over": "PASS_ACTUAL_SIGNED442_TO_SIGNED444_INSTALLED_HASH_AND_UID",
+    "Android_candidate_functional_matrix": "BLOCKED_OBSERVER_READINESS_DEADLINE; NOT_A_PASS",
+    "Android_runtime_run": 41286787645,
+    "physical_device_test_details": "NOT_PROVIDED_BY_USER",
+    "historical_results_preserved": true
+  },
+  "gitHub_enforced_protection": {
+    "status": "NOT_ENABLED_PERMISSION_LIMITATION",
+    "branch_api_protected": false,
+    "prior_ruleset_creation_http_status": 403,
+    "prior_ruleset_creation_reason": "Resource not accessible by integration",
+    "prior_permission_evidence": "repairs/locks/INFINITY-COBRA-2103442-USER-APPROVED-BASELINE-20261101.json",
+    "ruleset_creation_retried": false,
+    "required_admin_action": "Settings > Rules > Rulesets: restrict updates and deletions for refs/heads/lock/infinity-cobra-2103444-user-approved-20261101."
+  },
+  "application_changes": false,
+  "rebuilt_or_resigned": false,
+  "application_tests_run": false,
+  "shutdown_tests_run": false,
+  "future_work_policy": "Use this exact accepted signed source and component vector for future user-authorized work. Preserve 2103442 and all older recovery references. Never move or overwrite this accepted reference. This record supersedes delivery-time candidate status, not any recorded verification limitation."
+}
