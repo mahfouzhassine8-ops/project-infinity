@@ -3,11 +3,11 @@ on:
   workflow_dispatch:
     inputs:
       operation:
-        description: Prepare verified Cards Approved442 or sign its exact reviewed combined candidate
+        description: Prepare measured Cobra Quality443 or sign its exact reviewed combined candidate
         type: choice
         required: true
         default: final-combined
-        options: [final-combined, prepare-approved442]
+        options: [final-combined, prepare-quality443]
 permissions:
   contents: read
   actions: read
@@ -15,9 +15,9 @@ concurrency:
   group: infinity-combined-original-key-release
   cancel-in-progress: false
 jobs:
-  prepare-approved442:
-    name: Cards Approved442 owner preparation; frozen Infinity437/shared payload
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/cobra-fullscreen-display-from-2103438-20261031' && inputs.operation == 'prepare-approved442'
+  prepare-quality443:
+    name: Cobra Quality443 owner preparation; frozen Infinity437/shared payload
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/cobra-2103442-end-to-end-quality-refresh-20261101' && inputs.operation == 'prepare-quality443'
     runs-on: ubuntu-22.04
     timeout-minutes: 35
     env:
@@ -33,58 +33,58 @@ jobs:
       - name: Focused release protocol and sole signer checks before key access
         run: |
           python3 -m pip install PyYAML==6.0.3
-          python3 repairs/cobra-2103441-approved-live-pro/tests/test_release442.py
+          python3 repairs/cobra-2103442-end-to-end-quality-refresh/tests/test_release443.py
           python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out SIGNER-ROUTES.json
       - uses: actions/download-artifact@v4
         with:
-          run-id: 41250066560
-          name: Infinity-Combined-Owner-Components-41250066560
+          run-id: 41270516686
+          name: Infinity-Combined-Owner-Components-41270516686
           github-token: ${{ github.token }}
-          path: protected438-components
+          path: protected442-components
       - uses: actions/download-artifact@v4
         with:
-          run-id: 41250066560
-          name: Infinity-Combined-Original-Signer-41250066560
+          run-id: 41270516686
+          name: Infinity-Combined-Original-Signer-41270516686
           github-token: ${{ github.token }}
-          path: protected438
+          path: protected442
       - uses: actions/download-artifact@v4
         with:
           run-id: 39867073954
           name: Infinity-Receipt-Race-Android17-Investigation
           github-token: ${{ github.token }}
           path: tools
-      - name: Prepare approved LIVE/Pro owners and verify exact signed438 preservation
+      - name: Prepare measured presentation owners and verify exact signed442 preservation
         env:
           CARDS_TOOLS_ROOT: ${{ github.workspace }}/tools
         run: |
           cp "$ANDROID_HOME/build-tools/35.0.0/lib/d8.jar" tools/d8.jar
-          python3 repairs/cobra-2103441-approved-live-pro/release442.py prepare \
-            --bundles protected438-components --baseline protected438/Infinity-2103438-Combined-Original-Signer.apk \
-            --sdk "$ANDROID_HOME/build-tools/35.0.0" --out prepared442
+          python3 repairs/cobra-2103442-end-to-end-quality-refresh/release443.py prepare \
+            --bundles protected442-components --baseline protected442/Infinity-2103442-Combined-Original-Signer.apk \
+            --sdk "$ANDROID_HOME/build-tools/35.0.0" --out prepared443
       - uses: actions/upload-artifact@v4
         with:
-          name: Infinity442-Prepared-${{ github.run_id }}
-          path: prepared442/publish/
+          name: Infinity443-Prepared-${{ github.run_id }}
+          path: prepared443/publish/
           if-no-files-found: error
           retention-days: 90
           compression-level: 0
       - if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: Infinity442-Preparation-Evidence-${{ github.run_id }}
+          name: Infinity443-Preparation-Evidence-${{ github.run_id }}
           path: |
             SIGNER-ROUTES.json
-            prepared442/*.log
-            prepared442/*.json
-            prepared442/owner/*.json
-            prepared442/owner-preservation/*.json
-            prepared442/*.txt
-            prepared442/preservation/
+            prepared443/*.log
+            prepared443/*.json
+            prepared443/owner/*.json
+            prepared443/owner-preservation/*.json
+            prepared443/*.txt
+            prepared443/preservation/
           if-no-files-found: warn
           retention-days: 90
   combined:
-    name: Cards Approved442 original-key testing APK; frozen Infinity437
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/cobra-fullscreen-display-from-2103438-20261031' && inputs.operation == 'final-combined'
+    name: Cobra Quality443 original-key testing APK; frozen Infinity437
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/cobra-2103442-end-to-end-quality-refresh-20261101' && inputs.operation == 'final-combined'
     runs-on: ubuntu-22.04
     timeout-minutes: 40
     env:
@@ -98,29 +98,29 @@ jobs:
         with: {distribution: temurin, java-version: '21'}
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
-      - name: Admit exact442 authority and sole signer before keys
+      - name: Admit exact443 authority and sole signer before keys
         id: selected
         run: |
           set -euo pipefail
           python3 -m pip install PyYAML==6.0.3
-          python3 repairs/cobra-2103441-approved-live-pro/tests/test_release442.py
+          python3 repairs/cobra-2103442-end-to-end-quality-refresh/tests/test_release443.py
           python3 - <<'PYCODE'
           import os
           from pathlib import Path
           from release_gate import remote_authority,require
           a=remote_authority(Path('.'),os.environ['GITHUB_SHA'])
-          require(a['candidate_versionCode']==2103442 and a['generation']==29,'EXACT442_AUTHORITY')
-          require(a['target_owners']==[] and a['update_kind']=='evidence_refresh','EXACT442_REGISTRATION_REFRESH_ONLY')
-          require(a['owner_update_evidence']['owner']=='COBRA_APPROVED_LIVE_DOT_AND_PRO_TWO_COLUMNS','APPROVED_CARDS_LIVE_PRO_INNER_ONLY')
+          require(a['candidate_versionCode']==2103443 and a['generation']==30,'EXACT443_AUTHORITY')
+          require(a['target_owners']==['COBRA','CHOOSER_SHELL'] and a['update_kind']=='owner_update','EXACT443_COBRA_OWNER_UPDATE')
+          require(a['owner_update_evidence']['owner']=='COBRA_QUALITY_PRESENTATION_REFRESH','APPROVED_COBRA_QUALITY_ONLY')
           with open(os.environ['GITHUB_OUTPUT'],'a') as f:f.write('producer_run='+str(a['owner_update_evidence']['producer_run'])+'\n')
           PYCODE
           python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out SIGNER-ROUTES.json
       - uses: actions/download-artifact@v4
         with:
-          run-id: 41250066560
-          name: Infinity-Combined-Original-Signer-41250066560
+          run-id: 41270516686
+          name: Infinity-Combined-Original-Signer-41270516686
           github-token: ${{ github.token }}
-          path: protected438
+          path: protected442
       - uses: actions/download-artifact@v4
         with:
           run-id: 39867073954
@@ -130,50 +130,35 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           run-id: ${{ steps.selected.outputs.producer_run }}
-          name: Infinity442-Prepared-${{ steps.selected.outputs.producer_run }}
+          name: Infinity443-Prepared-${{ steps.selected.outputs.producer_run }}
           github-token: ${{ github.token }}
-          path: prepared442
-      - name: Verify official artifact bytes, registered source and exact438 preservation before keys
+          path: prepared443
+      - name: Verify official artifact bytes, registered source and exact442 preservation before keys
         run: |
           set -euo pipefail
           python3 - "${{ steps.selected.outputs.producer_run }}" <<'PYCODE'
-          import copy,json,sys
+          import sys
           from pathlib import Path
-          sys.path.insert(0,'repairs/cobra-2103441-approved-live-pro')
-          import release442 as r
-          def check_registered():
-              # Reuse the exact official prepared payload, with only its reviewed
-              # ownership registration evidence advanced through the existing protocol.
-              prior=json.loads(r.cmd('git','show','4fbc7dd7bbccf5ac2d6bcb4eb7e7accae1caf13f:'+str(r.AUTH.relative_to(r.REPO))))
-              reviewed=r.proposed(Path('prepared442'),int(sys.argv[1]))
-              reviewed['workflow_sha256']=prior['workflow_sha256']
-              r.require(reviewed==prior,'EXACT_PRIOR_OFFICIAL442_REGISTRATION')
-              expected=copy.deepcopy(prior)
-              expected.update(generation=29,update_kind='evidence_refresh',target_owners=[],
-                  previous_authority_sha256=r.digest(r.canonical(prior)),
-                  workflow_sha256=r.file_sha(r.REPO/'.github/workflows/infinity-combined-release.yml'))
-              r.transition(prior,expected,[])
-              r.require(r.load(r.AUTH)==expected,'EXACT442_EVIDENCE_REFRESH_NO_PAYLOAD_CHANGE')
-              r.save('REGISTERED442-CHECK.json',dict(status='PASS_OFFICIAL_SOURCE_AND_OWNER_PREPARATION',
-                  run_id=int(sys.argv[1]),generation=29,payload_changed=False,Android='FOLD_PENDING'))
-          check_registered()
+          sys.path.insert(0,'repairs/cobra-2103442-end-to-end-quality-refresh')
+          import release443 as r
+          r.check_registered(Path('prepared443'),int(sys.argv[1]),Path('REGISTERED443-CHECK.json'))
           PYCODE
           mkdir -p combined-build
-          cp -r prepared442/components combined-build/
+          cp -r prepared443/components combined-build/
           python3 repairs/dual-experience-isolation-2103420/component_bundles.py combine \
             --bundles combined-build/components --catalog combined-build/components/catalog.json \
-            --out combined-build/combined-unsigned.apk --version 2103442
+            --out combined-build/combined-unsigned.apk --version 2103443
           python3 - <<'PYCODE'
           from pathlib import Path
           from inventory import file_sha,load
           from release_gate import require
-          require(file_sha('combined-build/combined-unsigned.apk')==load('prepared442/preservation/APK-PRESERVATION.json')['candidate_sha256'],'EXACT_VERIFIED_UNSIGNED_APK')
+          require(file_sha('combined-build/combined-unsigned.apk')==load('prepared443/preservation/APK-PRESERVATION.json')['candidate_sha256'],'EXACT_VERIFIED_UNSIGNED_APK')
           PYCODE
       - name: Hard original pre-sign payload ownership and source guard
         run: |
           python3 repairs/dual-experience-isolation-2103420/release_gate.py \
             --apk combined-build/combined-unsigned.apk --jars tools/receipt-evidence/tool-jars --work gate-dex \
-            --repository . --expected-head "$GITHUB_SHA" --expected-generation 29 --out SIGNING-DECISION.json
+            --repository . --expected-head "$GITHUB_SHA" --expected-generation 30 --out SIGNING-DECISION.json
       - name: Original signer after all source and payload gates
         env:
           INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
@@ -183,16 +168,16 @@ jobs:
         run: |
           python3 repairs/dual-experience-isolation-2103420/assemble.py sign \
             --apk combined-build/combined-unsigned.apk --jars tools/receipt-evidence/tool-jars --work signer-dex \
-            --repository . --expected-head "$GITHUB_SHA" --expected-generation 29 \
+            --repository . --expected-head "$GITHUB_SHA" --expected-generation 30 \
             --sdk "$ANDROID_HOME/build-tools/35.0.0" --out signed-combined
-      - name: Signed438-to-signed442 exact member and original certificate comparison
+      - name: Signed442-to-signed443 exact member and original certificate comparison
         run: |
-          python3 repairs/cobra-2103441-approved-live-pro/release442.py compare \
-            --baseline protected438/Infinity-2103438-Combined-Original-Signer.apk \
-            --candidate signed-combined/Infinity-2103442-Combined-Original-Signer.apk \
-            --plan prepared442/PREPARATION.json --out signed-combined/preservation --sdk "$ANDROID_HOME/build-tools/35.0.0"
+          python3 repairs/cobra-2103442-end-to-end-quality-refresh/release443.py compare \
+            --baseline protected442/Infinity-2103442-Combined-Original-Signer.apk \
+            --candidate signed-combined/Infinity-2103443-Combined-Original-Signer.apk \
+            --plan prepared443/PREPARATION.json --out signed-combined/preservation --sdk "$ANDROID_HOME/build-tools/35.0.0"
           cp repairs/dual-experience-isolation-2103420/release-authority.json signed-combined/
-          cp SIGNING-DECISION.json REGISTERED442-CHECK.json SIGNER-ROUTES.json signed-combined/
+          cp SIGNING-DECISION.json REGISTERED443-CHECK.json SIGNER-ROUTES.json signed-combined/
           python3 - <<'PYCODE'
           from pathlib import Path
           from inventory import file_sha
@@ -216,10 +201,10 @@ jobs:
       - if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: Infinity442-Signing-Evidence-${{ github.run_id }}
+          name: Infinity443-Signing-Evidence-${{ github.run_id }}
           path: |
             SIGNING-DECISION.json
-            REGISTERED442-CHECK.json
+            REGISTERED443-CHECK.json
             SIGNER-ROUTES.json
             signed-combined/preservation/
           if-no-files-found: warn

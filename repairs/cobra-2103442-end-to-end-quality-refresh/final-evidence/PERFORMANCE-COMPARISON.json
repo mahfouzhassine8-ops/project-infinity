@@ -1,0 +1,46 @@
+{
+  "runtime": "Host API35/Robolectric native graphics; synthetic data; no decoder",
+  "measurements": {
+    "format_500_labels": {
+      "baseline": {
+        "batch": 500,
+        "warmups": 21,
+        "samples": 42,
+        "p50_ms": 1.253168,
+        "p95_ms": 3.158183,
+        "median_allocated_bytes": 1580000,
+        "result_nonnull": true
+      },
+      "candidate": {
+        "batch": 500,
+        "warmups": 21,
+        "samples": 42,
+        "p50_ms": 0.288363,
+        "p95_ms": 0.391929,
+        "median_allocated_bytes": 780000,
+        "result_nonnull": true
+      }
+    },
+    "next_program_100_queries": {
+      "baseline": {
+        "batch": 100,
+        "warmups": 21,
+        "samples": 42,
+        "p50_ms": 4.666664,
+        "p95_ms": 12.73142,
+        "median_allocated_bytes": 9136800,
+        "result_nonnull": true
+      },
+      "candidate": {
+        "batch": 100,
+        "warmups": 21,
+        "samples": 42,
+        "p50_ms": 0.735434,
+        "p95_ms": 0.999,
+        "median_allocated_bytes": 36000,
+        "result_nonnull": true
+      }
+    }
+  },
+  "device_performance_claimed": false
+}

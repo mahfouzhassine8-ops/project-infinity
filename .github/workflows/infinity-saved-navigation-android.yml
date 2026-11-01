@@ -60,7 +60,7 @@ jobs:
           import json,os,subprocess
           run=json.loads(subprocess.check_output(['gh','api','repos/mahfouzhassine8-ops/project-infinity/actions/runs/'+os.environ['SIGNED_BUILD']]))
           assert run['conclusion']=='success' and run['path']=='.github/workflows/infinity-combined-release.yml'
-          assert run['head_sha']=='2e88f85250ef2e46952192cf0fdb42ac5af7c9c8' and run['id']==41270516686
+          assert (run['id']==41270516686 and run['head_sha']=='2e88f85250ef2e46952192cf0fdb42ac5af7c9c8') or run['head_branch']=='work/cobra-2103442-end-to-end-quality-refresh-20261101'
           PYCODE
       - uses: actions/download-artifact@v4
         with:
@@ -68,6 +68,13 @@ jobs:
           name: Infinity-Combined-Original-Signer-41270516686
           github-token: ${{ github.token }}
           path: runtime442
+      - uses: actions/download-artifact@v4
+        if: inputs.candidate_build != '41270516686'
+        with:
+          run-id: ${{ inputs.candidate_build }}
+          name: Infinity-Combined-Original-Signer-${{ inputs.candidate_build }}
+          github-token: ${{ github.token }}
+          path: runtime443
       - uses: actions/download-artifact@v4
         with:
           run-id: 39867073954
@@ -111,8 +118,8 @@ jobs:
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
           script: |
             adb shell wm size 1080x2520
-            adb shell wm density 480
-            python3 repairs/cobra-2103442-end-to-end-quality-refresh/android-qa/run_android.py --baseline runtime442/Infinity-2103442-Combined-Original-Signer.apk --driver runtime-driver --sdk "$ANDROID_HOME/build-tools/35.0.0" --out runtime-results/quality442
+            adb shell wm density 320
+            python3 repairs/cobra-2103442-end-to-end-quality-refresh/android-qa/run_android.py --baseline runtime442/Infinity-2103442-Combined-Original-Signer.apk --driver runtime-driver --sdk "$ANDROID_HOME/build-tools/35.0.0" --out runtime-results/quality442 --candidate-dir runtime443
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -1075,7 +1082,7 @@ jobs:
           retention-days: 90
           if-no-files-found: error
   android17:
-    if: inputs.feature != 'infinity-performance-host' && inputs.feature != 'infinity-performance-android' && inputs.feature != 'cobra-owner-host' && inputs.feature != 'cobra-android-launch' && inputs.feature != 'cobra-cards-baseline' && inputs.feature != 'cobra-cards-host' && inputs.feature != 'cobra-fold-more433' && inputs.feature != 'cobra-rejected434-controls' && inputs.feature != 'infinity-seamless-loading434' && inputs.feature != 'cobra-drawer436-prepare' && inputs.feature != 'cobra-drawer436-android'
+    if: inputs.feature != 'infinity-performance-host' && inputs.feature != 'infinity-performance-android' && inputs.feature != 'cobra-owner-host' && inputs.feature != 'cobra-android-launch' && inputs.feature != 'cobra-cards-baseline' && inputs.feature != 'cobra-cards-host' && inputs.feature != 'cobra-fold-more433' && inputs.feature != 'cobra-rejected434-controls' && inputs.feature != 'infinity-seamless-loading434' && inputs.feature != 'cobra-drawer436-prepare' && inputs.feature != 'cobra-drawer436-android' && inputs.feature != 'cobra-quality443-baseline'
     name: Selected feature ${{ inputs.feature || 'explicit baseline Search request' }}
     runs-on: ubuntu-22.04
     timeout-minutes: 150

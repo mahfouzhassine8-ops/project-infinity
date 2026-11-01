@@ -23,7 +23,7 @@ public final class CobraQualityDriver {
   for(int i=0;i<5;i++){
    Tree t=new Tree();boolean ready;try{ready=t.find(pattern,true)!=null;}finally{t.close();}
    if(ready){long started=SystemClock.uptimeMillis();tap(pattern);await("(?m)^View$",false);await("Cards QA",true);
-    cases.put(new JSONObject().put("mode",label).put("tap_to_observed_guide_ms",SystemClock.uptimeMillis()-started).put("includes_observer_overhead",true));return;}
+    cases.put(new JSONObject().put("mode",label).put("tap_to_observed_guide_ms",SystemClock.uptimeMillis()-started).put("includes_observer_overhead",true));write("MATRIX.json",new JSONObject().put("cases",cases).put("status","IN_PROGRESS_PARTIAL"));return;}
    scrollVisibleSheet();
   }throw new IllegalStateException("Original mode choice not visible: "+label);
  }
@@ -40,9 +40,9 @@ public final class CobraQualityDriver {
   for(String label:new String[]{"Mobile","TV Grid","Compact","Cards","Pro"}){
    mode(label);capture("front-"+label.replace(' ','-'));swipeList();
   }
-  mode("Cards");resize(1600,1800,240);capture("inner-cards");openDrawer();capture("inner-drawer-open");back();await("(?m)^My List$",false);
+  mode("Cards");resize(1600,1800,320);capture("inner-cards");openDrawer();capture("inner-drawer-open");back();await("(?m)^My List$",false);
   for(String label:new String[]{"Mobile","TV Grid","Compact","Cards","Pro"}){mode(label);capture("inner-"+label.replace(' ','-'));swipeList();}
-  mode("Cards");resize(1080,2520,480);capture("cover-return");
+  mode("Cards");resize(1080,2520,320);capture("cover-return");
   raw("gfx-after.txt",shell("dumpsys gfxinfo "+PKG+" framestats"));
   raw("memory-after.txt",shell("dumpsys meminfo "+PKG));raw("cpu-after.txt",shell("dumpsys cpuinfo"));
   write("MATRIX.json",new JSONObject().put("cases",cases).put("state","PUBLIC_INPUT_MODE_SCROLL_RESIZE_JOURNEY").put("physical_Fold","NOT_TESTED"));

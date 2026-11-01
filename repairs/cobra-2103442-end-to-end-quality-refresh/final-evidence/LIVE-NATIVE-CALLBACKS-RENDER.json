@@ -1,0 +1,46 @@
+{
+  "cases": [
+    {
+      "viewport": [
+        1080,
+        2520,
+        480
+      ],
+      "theme": "light",
+      "native_callback": "CobraPlayerBinding.onIsPlayingChanged -> cobraUpdatePlaybackLabels -> existing indicator refresh",
+      "render": "live-render-1080-light.png"
+    },
+    {
+      "viewport": [
+        1080,
+        2520,
+        480
+      ],
+      "theme": "dark",
+      "native_callback": "CobraPlayerBinding.onIsPlayingChanged -> cobraUpdatePlaybackLabels -> existing indicator refresh",
+      "render": "live-render-1080-dark.png"
+    },
+    {
+      "viewport": [
+        1600,
+        1800,
+        240
+      ],
+      "theme": "light",
+      "native_callback": "CobraPlayerBinding.onIsPlayingChanged -> cobraUpdatePlaybackLabels -> existing indicator refresh",
+      "render": "live-render-1600-light.png"
+    },
+    {
+      "viewport": [
+        1600,
+        1800,
+        240
+      ],
+      "theme": "dark",
+      "native_callback": "CobraPlayerBinding.onIsPlayingChanged -> cobraUpdatePlaybackLabels -> existing indicator refresh",
+      "render": "live-render-1600-dark.png"
+    }
+  ],
+  "mockup_match": "PENDING_ACCESS",
+  "physical_Fold": "NOT_TESTED"
+}
