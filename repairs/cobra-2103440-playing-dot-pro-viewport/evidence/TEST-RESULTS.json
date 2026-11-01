@@ -1,0 +1,26 @@
+{
+  "status": "PASS_CARDS_PLAYING_DOT_AND_PRO_VIEWPORT_FOCUSED_HOST",
+  "implementation": "Compiled actual owner DEX, translated by pinned local Dex2Jar tool into JVM; Android35 Robolectric native graphics; controlled ExoPlayer state/no media decoder",
+  "candidate_checks": {
+    "cardsUsesOriginalPlayingDotAcrossThemesAndViewports": "PASS: six front/inner Light/Dark/OLED cases; existing native dot visible and changing actual pixels",
+    "actualSessionOwnershipPauseRetuneAndRecycling": "PASS: selection-independent actual binding, pause/buffer/end, native handoff and recycled row identity",
+    "previewMenuAndSizeModesRemainWorking": "PASS: 56 actual decor DOWN/UP presses across14 existing modes, front/inner light/dark, original menu/player/texture/scroll retained",
+    "proInnerViewportAndFrontPreservation": "PASS: front exact measured geometry; inner native channel list visible/full-height; Pro Sports original geometry; actual synthetic render inspected",
+    "resizeModeReturnAndGeometryPreservation": "PASS: Cards/Mobile round trip and active Pro inner/landscape/cover/pop-up geometry; same preview player/texture/channel"
+  },
+  "baseline_checks": {
+    "baselineCardsOmitsNativeDotMobileHasIt": "PASS_REPRODUCTION_ON440: native dot unbound/detached in Cards, attached/bound/active in Mobile",
+    "baselineProInnerStarvesChannels": "PASS_REPRODUCTION_ON440: unfolded portrait stays vertical stack"
+  },
+  "run_history": {
+    "initial_candidate": "5 checks:4 pass,1 test observation failed until rendering original180ms handoff",
+    "followup": "session check passed; Pro screenshot utility assumed edge-to-edge shell width and failed on existing native margins",
+    "final": "2 newly targeted Pro/render/resize checks passed; no production change was needed for observation fixes"
+  },
+  "release_protocol_checks": "4/4 PASS; mandatory original signer and payload guards retained",
+  "physical_Fold": "NOT_RUN_USER_ACCEPTANCE_REQUIRED",
+  "Android_emulator": "NOT_RUN_KNOWN_INCOMPATIBLE_NATIVE_RUNTIME",
+  "media_decoder": "NOT_TESTED_CONTROLLED_PLAYER",
+  "final_APK": "NOT_BUILT_NOT_SIGNED: CLI GitHub authentication invalid and connected GitHub API has no workflow_dispatch action",
+  "shutdown": "UNCHANGED_NOT_SELECTED_NOT_RUN"
+}

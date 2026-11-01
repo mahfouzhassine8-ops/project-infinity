@@ -3,11 +3,11 @@ on:
   workflow_dispatch:
     inputs:
       operation:
-        description: Prepare verified Cards Preview440 or sign its exact reviewed combined candidate
+        description: Prepare verified Cards Playing441 or sign its exact reviewed combined candidate
         type: choice
         required: true
         default: final-combined
-        options: [final-combined, prepare-preview440]
+        options: [final-combined, prepare-playing441]
 permissions:
   contents: read
   actions: read
@@ -15,9 +15,9 @@ concurrency:
   group: infinity-combined-original-key-release
   cancel-in-progress: false
 jobs:
-  prepare-preview440:
-    name: Cards Preview440 owner preparation; frozen Infinity437/shared payload
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/cobra-fullscreen-display-from-2103438-20261031' && inputs.operation == 'prepare-preview440'
+  prepare-playing441:
+    name: Cards Playing441 owner preparation; frozen Infinity437/shared payload
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/cobra-fullscreen-display-from-2103438-20261031' && inputs.operation == 'prepare-playing441'
     runs-on: ubuntu-22.04
     timeout-minutes: 35
     env:
@@ -33,7 +33,7 @@ jobs:
       - name: Focused release protocol and sole signer checks before key access
         run: |
           python3 -m pip install PyYAML==6.0.3
-          python3 repairs/cobra-2103438-preview-restoration/tests/test_release440.py
+          python3 repairs/cobra-2103440-playing-dot-pro-viewport/tests/test_release441.py
           python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out SIGNER-ROUTES.json
       - uses: actions/download-artifact@v4
         with:
@@ -58,31 +58,31 @@ jobs:
           CARDS_TOOLS_ROOT: ${{ github.workspace }}/tools
         run: |
           cp "$ANDROID_HOME/build-tools/35.0.0/lib/d8.jar" tools/d8.jar
-          python3 repairs/cobra-2103438-preview-restoration/release440.py prepare \
+          python3 repairs/cobra-2103440-playing-dot-pro-viewport/release441.py prepare \
             --bundles protected438-components --baseline protected438/Infinity-2103438-Combined-Original-Signer.apk \
-            --sdk "$ANDROID_HOME/build-tools/35.0.0" --out prepared440
+            --sdk "$ANDROID_HOME/build-tools/35.0.0" --out prepared441
       - uses: actions/upload-artifact@v4
         with:
-          name: Infinity440-Prepared-${{ github.run_id }}
-          path: prepared440/publish/
+          name: Infinity441-Prepared-${{ github.run_id }}
+          path: prepared441/publish/
           if-no-files-found: error
           retention-days: 90
           compression-level: 0
       - if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: Infinity440-Preparation-Evidence-${{ github.run_id }}
+          name: Infinity441-Preparation-Evidence-${{ github.run_id }}
           path: |
             SIGNER-ROUTES.json
-            prepared440/*.log
-            prepared440/*.json
-            prepared440/owner/*.json
-            prepared440/*.txt
-            prepared440/preservation/
+            prepared441/*.log
+            prepared441/*.json
+            prepared441/owner/*.json
+            prepared441/*.txt
+            prepared441/preservation/
           if-no-files-found: warn
           retention-days: 90
   combined:
-    name: Cards Preview440 original-key testing APK; frozen Infinity437
+    name: Cards Playing441 original-key testing APK; frozen Infinity437
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/cobra-fullscreen-display-from-2103438-20261031' && inputs.operation == 'final-combined'
     runs-on: ubuntu-22.04
     timeout-minutes: 40
@@ -97,19 +97,19 @@ jobs:
         with: {distribution: temurin, java-version: '21'}
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
-      - name: Admit exact440 authority and sole signer before keys
+      - name: Admit exact441 authority and sole signer before keys
         id: selected
         run: |
           set -euo pipefail
           python3 -m pip install PyYAML==6.0.3
-          python3 repairs/cobra-2103438-preview-restoration/tests/test_release440.py
+          python3 repairs/cobra-2103440-playing-dot-pro-viewport/tests/test_release441.py
           python3 - <<'PYCODE'
           import os
           from pathlib import Path
           from release_gate import remote_authority,require
           a=remote_authority(Path('.'),os.environ['GITHUB_SHA'])
-          require(a['candidate_versionCode']==2103440 and a['generation']==26,'EXACT440_AUTHORITY')
-          require(a['target_owners']==['COBRA','CHOOSER_SHELL'] and a['update_kind']=='owner_update','CARDS_ONLY')
+          require(a['candidate_versionCode']==2103441 and a['generation']==27,'EXACT441_AUTHORITY')
+          require(a['target_owners']==['COBRA','CHOOSER_SHELL'] and a['update_kind']=='owner_update','CARDS_DOT_PRO_INNER_ONLY')
           with open(os.environ['GITHUB_OUTPUT'],'a') as f:f.write('producer_run='+str(a['owner_update_evidence']['producer_run'])+'\n')
           PYCODE
           python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out SIGNER-ROUTES.json
@@ -128,30 +128,30 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           run-id: ${{ steps.selected.outputs.producer_run }}
-          name: Infinity440-Prepared-${{ steps.selected.outputs.producer_run }}
+          name: Infinity441-Prepared-${{ steps.selected.outputs.producer_run }}
           github-token: ${{ github.token }}
-          path: prepared440
+          path: prepared441
       - name: Verify official artifact bytes, registered source and exact438 preservation before keys
         run: |
           set -euo pipefail
-          python3 repairs/cobra-2103438-preview-restoration/release440.py check_registered \
-            --prepared prepared440 --run-id "${{ steps.selected.outputs.producer_run }}" --out REGISTERED440-CHECK.json
+          python3 repairs/cobra-2103440-playing-dot-pro-viewport/release441.py check_registered \
+            --prepared prepared441 --run-id "${{ steps.selected.outputs.producer_run }}" --out REGISTERED441-CHECK.json
           mkdir -p combined-build
-          cp -r prepared440/components combined-build/
+          cp -r prepared441/components combined-build/
           python3 repairs/dual-experience-isolation-2103420/component_bundles.py combine \
             --bundles combined-build/components --catalog combined-build/components/catalog.json \
-            --out combined-build/combined-unsigned.apk --version 2103440
+            --out combined-build/combined-unsigned.apk --version 2103441
           python3 - <<'PYCODE'
           from pathlib import Path
           from inventory import file_sha,load
           from release_gate import require
-          require(file_sha('combined-build/combined-unsigned.apk')==load('prepared440/preservation/APK-PRESERVATION.json')['candidate_sha256'],'EXACT_VERIFIED_UNSIGNED_APK')
+          require(file_sha('combined-build/combined-unsigned.apk')==load('prepared441/preservation/APK-PRESERVATION.json')['candidate_sha256'],'EXACT_VERIFIED_UNSIGNED_APK')
           PYCODE
       - name: Hard original pre-sign payload ownership and source guard
         run: |
           python3 repairs/dual-experience-isolation-2103420/release_gate.py \
             --apk combined-build/combined-unsigned.apk --jars tools/receipt-evidence/tool-jars --work gate-dex \
-            --repository . --expected-head "$GITHUB_SHA" --expected-generation 26 --out SIGNING-DECISION.json
+            --repository . --expected-head "$GITHUB_SHA" --expected-generation 27 --out SIGNING-DECISION.json
       - name: Original signer after all source and payload gates
         env:
           INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
@@ -161,16 +161,16 @@ jobs:
         run: |
           python3 repairs/dual-experience-isolation-2103420/assemble.py sign \
             --apk combined-build/combined-unsigned.apk --jars tools/receipt-evidence/tool-jars --work signer-dex \
-            --repository . --expected-head "$GITHUB_SHA" --expected-generation 26 \
+            --repository . --expected-head "$GITHUB_SHA" --expected-generation 27 \
             --sdk "$ANDROID_HOME/build-tools/35.0.0" --out signed-combined
-      - name: Signed438-to-signed440 exact member and original certificate comparison
+      - name: Signed438-to-signed441 exact member and original certificate comparison
         run: |
-          python3 repairs/cobra-2103438-preview-restoration/release440.py compare \
+          python3 repairs/cobra-2103440-playing-dot-pro-viewport/release441.py compare \
             --baseline protected438/Infinity-2103438-Combined-Original-Signer.apk \
-            --candidate signed-combined/Infinity-2103440-Combined-Original-Signer.apk \
-            --plan prepared440/PREPARATION.json --out signed-combined/preservation --sdk "$ANDROID_HOME/build-tools/35.0.0"
+            --candidate signed-combined/Infinity-2103441-Combined-Original-Signer.apk \
+            --plan prepared441/PREPARATION.json --out signed-combined/preservation --sdk "$ANDROID_HOME/build-tools/35.0.0"
           cp repairs/dual-experience-isolation-2103420/release-authority.json signed-combined/
-          cp SIGNING-DECISION.json REGISTERED440-CHECK.json SIGNER-ROUTES.json signed-combined/
+          cp SIGNING-DECISION.json REGISTERED441-CHECK.json SIGNER-ROUTES.json signed-combined/
           python3 - <<'PYCODE'
           from pathlib import Path
           from inventory import file_sha
@@ -194,10 +194,10 @@ jobs:
       - if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: Infinity440-Signing-Evidence-${{ github.run_id }}
+          name: Infinity441-Signing-Evidence-${{ github.run_id }}
           path: |
             SIGNING-DECISION.json
-            REGISTERED440-CHECK.json
+            REGISTERED441-CHECK.json
             SIGNER-ROUTES.json
             signed-combined/preservation/
           if-no-files-found: warn

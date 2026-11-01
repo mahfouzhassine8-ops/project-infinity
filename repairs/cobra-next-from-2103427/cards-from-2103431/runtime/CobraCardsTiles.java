@@ -62,7 +62,7 @@ public final class CobraCardsTiles {
     Holder h=holder(card);if(h==null){created(a,card);h=holder(card);}
     if(h!=null)h.bind(channel,position);
   }
-  /** Replaces only native card refreshPlaying; off-hierarchy dot is not animated. */
+  /** Replaces only native card refreshPlaying; retain the original session-owned dot. */
   public static void refresh(Activity a,LinearLayout card){
     mainThread();if(!cards(a))return;Holder h=holder(card);
     if(h!=null && card.isAttachedToWindow())h.refresh();
@@ -136,7 +136,7 @@ public final class CobraCardsTiles {
       mark=(View)value(field(nativeCard,"mark"),root);
       playing=(View)value(field(nativeCard,"playing"),root);
       // The final native fields remain valid; only their Cards hierarchy changes.
-      detach(category);detach(title);detach(now);detach(time);detach(progress);
+      detach(category);detach(title);detach(now);detach(time);detach(progress);detach(playing);
       root.removeAllViews();root.setOrientation(LinearLayout.VERTICAL);root.setPadding(0,0,0,0);
       root.setClipToOutline(true);root.setBackground(surface);
       body=new FrameLayout(a);body.setClipChildren(true);body.setClipToPadding(true);
@@ -150,7 +150,7 @@ public final class CobraCardsTiles {
       live.setGravity(Gravity.CENTER_VERTICAL);live.setIncludeFontPadding(false);
       live.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_NO);
       more=new MoreView(a);more.setOnClickListener(this);more.setClickable(true);more.setFocusable(true);
-      for(View child:new View[]{fallback,logo,divider,category,title,now,live,time,progress,more})
+      for(View child:new View[]{fallback,logo,divider,category,title,now,live,time,progress,more,playing})
         body.addView(child,new FrameLayout.LayoutParams(1,1,Gravity.TOP|Gravity.LEFT));
       style(category,NORMAL,MUTED,1);style(title,BOLD,WHITE,1);
       style(now,NORMAL,MUTED,2);style(time,NORMAL,MUTED,1);
@@ -178,6 +178,7 @@ public final class CobraCardsTiles {
       boundAdapter=new WeakReference<>(list instanceof GridView?((GridView)list).getAdapter():null);
       adapterPosition=position;
       CobraArrange.ownedCall(a,"cobraBindRow",rowArgs,card,channel);
+      playing(true);
       Object actualName=value(channelName,channel);name=actualName==null?"":String.valueOf(actualName);group=string(channelGroup,channel);
       text(title,name);text(category,group.toUpperCase(Locale.getDefault()));
       String initials=actualName==null?"TV":name.trim();int colon=initials.indexOf(':');
@@ -195,7 +196,16 @@ public final class CobraCardsTiles {
       Activity a=owner.get();if(a==null || bound==null || !cards(a))return;
       boolean selected=Boolean.TRUE.equals(CobraArrange.ownedCall(a,"cobraModeSelected",channelArgs,bound));
       if(card.isSelected()!=selected)card.setSelected(selected);
+      playing(false);
       theme();metadata(a);resize(estimateWidth());
+    }
+    /** Reuse native bind/sync, including actual session identity, handoff and OLED/Night Cinema paint. */
+    void playing(boolean bind){
+      try{
+        java.lang.reflect.Method method=bind?playing.getClass().getDeclaredMethod("bind",channelArgs):playing.getClass().getDeclaredMethod("sync");
+        method.setAccessible(true);
+        if(bind)method.invoke(playing,bound);else method.invoke(playing);
+      }catch(ReflectiveOperationException e){throw new IllegalStateException("Cards native playing indicator",e);}
     }
     void metadata(Activity a){
       Object programme=CobraArrange.ownedCall(a,"cobraCurrentProgram",channelArgs,bound);
@@ -435,6 +445,8 @@ public final class CobraCardsTiles {
         float liveWidth=84*font,timeLeft=24+liveWidth+8;
         place(live,24,footer,liveWidth,26*font);place(time,timeLeft,footer+1,Math.max(24,448-timeLeft-24),26*font);
         place(progress,24,refHeight-38,448-48,10);
+        // Existing trailing gutter; no title, metadata, row or touch bounds change.
+        place(playing,426,(refHeight-18)/2,18,18);
         // Keep the actual pointer target in the empty header corner. Expanding it
         // by display density would cover the native card-title/program targets.
         FrameLayout.LayoutParams moreParams=(FrameLayout.LayoutParams)more.getLayoutParams();
@@ -458,6 +470,8 @@ public final class CobraCardsTiles {
       rectangle(progress,8*d,height-10*d,Math.max(1,width-16*d),3*d);
       liveDot.setBounds(0,0,Math.round(8*d),Math.round(8*d));live.setCompoundDrawables(liveDot,null,null,null);live.setCompoundDrawablePadding(Math.round(4*d));
       rectangle(more,Math.max(0,width-48*d),0,48*d,48*d);more.compact=true;more.scale=d;more.invalidate();
+      // Empty header band between category and title, separate from More's target.
+      rectangle(playing,Math.max(0,width-80*d),30*d,16*d,16*d);
     }
     void rectangle(View view,float x,float y,float w,float h){
       FrameLayout.LayoutParams p=(FrameLayout.LayoutParams)view.getLayoutParams();

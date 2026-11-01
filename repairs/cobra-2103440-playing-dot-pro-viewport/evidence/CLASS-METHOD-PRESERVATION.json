@@ -1,0 +1,73 @@
+{
+  "status": "PASS_EXACT_COBRA_CLASS_METHOD_PRESERVATION",
+  "baseline": "actual signed438 component; manifest/signer verified in existing438 evidence",
+  "retained_working_candidate": "440 5967f480",
+  "unchanged_classes": 7165,
+  "total_classes": 7170,
+  "added_classes": [],
+  "removed_classes": [],
+  "changed_methods_from438": {
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity;": [
+      "private cobraAdjustProLayout(Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraModeLayout;)V",
+      "synthetic lambda$cobraPreviewPanel$71$com-projectinfinity-kodi-InfinityLiveActivity(Landroid/view/View;)V"
+    ],
+    "Lcom/projectinfinity/kodi/CobraProUi;": [
+      "static innerGeometry(IIFI)[[I"
+    ],
+    "Lcom/projectinfinity/kodi/CobraComponent;": [
+      "public static version()Ljava/lang/String;"
+    ],
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$Holder;": [
+      "bind(Ljava/lang/Object;I)V",
+      "constructor <init>(Landroid/app/Activity;Landroid/widget/LinearLayout;)V",
+      "expandedGeometry(Landroid/app/Activity;IIFI)V",
+      "playing(Z)V",
+      "refresh()V",
+      "resize(I)V"
+    ],
+    "Lcom/projectinfinity/kodi/CobraCardsLayout;": [
+      "private static displaySheetKind(Ljava/lang/String;)Z",
+      "private static previewSheetOwner(Landroid/app/Activity;)Z",
+      "private static visibleDisplayPlayer(Landroid/app/Activity;)Z",
+      "public static beginFrontCardsSheetReveal(Landroid/app/Activity;Landroid/view/View;)Z",
+      "public static frontPlayerSheetHost(Landroid/app/Activity;Ljava/lang/String;)Landroid/widget/FrameLayout;"
+    ]
+  },
+  "changed_methods_from440": {
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity;": [
+      "private cobraAdjustProLayout(Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraModeLayout;)V",
+      "private cobraVisualPulseState(Landroidx/media3/exoplayer/ExoPlayer;)Lcom/projectinfinity/kodi/CobraPresentationEffects$PulseState;"
+    ],
+    "Lcom/projectinfinity/kodi/CobraProUi;": [
+      "static innerGeometry(IIFI)[[I"
+    ],
+    "Lcom/projectinfinity/kodi/CobraPresentationEffects$PulseView;": [
+      "private restart()V"
+    ],
+    "Lcom/projectinfinity/kodi/CobraComponent;": [
+      "public static version()Ljava/lang/String;"
+    ],
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$Holder;": [
+      "bind(Ljava/lang/Object;I)V",
+      "constructor <init>(Landroid/app/Activity;Landroid/widget/LinearLayout;)V",
+      "expandedGeometry(Landroid/app/Activity;IIFI)V",
+      "playing(Z)V",
+      "refresh()V",
+      "resize(I)V"
+    ],
+    "Lcom/projectinfinity/kodi/CobraCardsLayout;": [
+      "public static previewPulseAnimated(Landroid/view/View;)Z"
+    ],
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$PreviewBadge;": [
+      "refresh()V",
+      "release()V"
+    ]
+  },
+  "confirmed_working_preview_tap_byte_identical_to440": true,
+  "wrong_emblem_changes_restored_to438": true,
+  "original_native_playing_dot_and_policy_byte_identical_to438": true,
+  "fields_and_class_annotations_unchanged": true,
+  "Infinity": "NO_MODIFIED_SOURCE_OR_COMPONENT; final APK comparison NOT_RUN_NO_SIGNED_CANDIDATE",
+  "shutdown": "UNCHANGED_NOT_TESTED",
+  "physical_Fold": "PENDING"
+}

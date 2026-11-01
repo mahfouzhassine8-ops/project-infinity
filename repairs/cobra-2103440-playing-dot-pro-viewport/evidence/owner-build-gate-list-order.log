@@ -1,0 +1,11 @@
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+CLASSES=7170 OWNER_DEX_FILES=2
+Traceback (most recent call last):
+  File "/workspace/project-infinity/repairs/cobra-2103440-playing-dot-pro-viewport/build_owner.py", line 96, in <module>
+    if __name__=='__main__':build(Path(sys.argv[1]))
+                            ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/project-infinity/repairs/cobra-2103440-playing-dot-pro-viewport/build_owner.py", line 92, in build
+    assert actual==budget,('UNREVIEWED_METHOD_DELTA',actual)
+           ^^^^^^^^^^^^^^
+AssertionError: ('UNREVIEWED_METHOD_DELTA', {'Lcom/projectinfinity/kodi/CobraCardsLayout;': ['private static displaySheetKind(Ljava/lang/String;)Z', 'private static previewSheetOwner(Landroid/app/Activity;)Z', 'private static visibleDisplayPlayer(Landroid/app/Activity;)Z', 'public static beginFrontCardsSheetReveal(Landroid/app/Activity;Landroid/view/View;)Z', 'public static frontPlayerSheetHost(Landroid/app/Activity;Ljava/lang/String;)Landroid/widget/FrameLayout;'], 'Lcom/projectinfinity/kodi/CobraCardsTiles$Holder;': ['bind(Ljava/lang/Object;I)V', 'constructor <init>(Landroid/app/Activity;Landroid/widget/LinearLayout;)V', 'expandedGeometry(Landroid/app/Activity;IIFI)V', 'playing(Z)V', 'refresh()V', 'resize(I)V'], 'Lcom/projectinfinity/kodi/CobraComponent;': ['public static version()Ljava/lang/String;'], 'Lcom/projectinfinity/kodi/CobraProUi;': ['static innerGeometry(IIFI)[[I'], 'Lcom/projectinfinity/kodi/InfinityLiveActivity;': ['private cobraAdjustProLayout(Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraModeLayout;)V', 'synthetic lambda$cobraPreviewPanel$71$com-projectinfinity-kodi-InfinityLiveActivity(Landroid/view/View;)V']})
