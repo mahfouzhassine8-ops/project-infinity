@@ -1,27 +1,62 @@
 {
   "authorization": "2026-11-01 user rejects441 and authorizes exactly Cards LIVE-dot playback pulse and Pro expanded inner-display approved layout; deliver one original-key install-over candidate after checks, no automatic lock.",
   "branch": "work/cobra-fullscreen-display-from-2103438-20261031",
-  "accepted_baseline": {"version": 2103438, "source": "a5f721578c53e026a26cf21d929fbdad530f6d17", "lock": "lock/infinity-cobra-2103438-user-approved-pending-one-fix-20261031", "apk_sha256": "a1907acbcb3a36f5b2312f8a11cd4e38d8fcdbed2f435b6ab45d369adc8e9f35"},
+  "accepted_baseline": {
+    "version": 2103438,
+    "source": "a5f721578c53e026a26cf21d929fbdad530f6d17",
+    "lock": "lock/infinity-cobra-2103438-user-approved-pending-one-fix-20261031",
+    "apk_sha256": "a1907acbcb3a36f5b2312f8a11cd4e38d8fcdbed2f435b6ab45d369adc8e9f35"
+  },
   "rejected_reference": "2103441 / 1044ece3; ac5c5255 is source reference only, never accepted baseline",
-  "retained_repairs": ["439 original Display menu visibility", "440 confirmed working Cards Preview tap/menu and single reveal"],
-  "visual_authority": ["Cobra_Cards_Approved_LIVE_Dot.png", "Cobra_Pro_Inner_Display_Approved.png"],
-  "visual_access": "Filenames received; actual PNG bytes not yet exposed in workspace, task attachment handles or accessible reference Page. Exact visual comparison remains blocked, not PASS.",
-  "allowed": ["Cards existing LIVE compound dot only: native blue effect for actual currently playing ready session, static cyan otherwise; remove441 separate dot", "Pro expanded inner only: player left/details right above existing navigation and two-column native channel rows; original front path unchanged", "original signing route and truthful required version metadata"],
-  "frozen": ["Infinity source/ZIP/DEX/resources/runtime", "native libraries", "shared runtime", "chooser behavior", "launcher", "shutdown", "user data", "Cards geometry/themes and all unrelated Cobra modes/controls"],
+  "retained_repairs": [
+    "439 original Display menu visibility",
+    "440 confirmed working Cards Preview tap/menu and single reveal"
+  ],
+  "visual_authority": [
+    "Cobra_Cards_Approved_LIVE_Dot.png",
+    "Cobra_Pro_Inner_Display_Approved.png"
+  ],
+  "visual_access": "RESOLVED: both original PNGs downloaded from user-provided GitHub raw URLs; PNG signatures, dimensions and expected SHA256 verified; actual image content visually inspected. See REFERENCES.json.",
+  "allowed": [
+    "Cards existing LIVE compound dot only: native blue effect for actual currently playing ready session, static cyan otherwise; remove441 separate dot",
+    "Pro expanded inner only: player left/details right above existing navigation and two-column native channel rows; original front path unchanged",
+    "original signing route and truthful required version metadata"
+  ],
+  "frozen": [
+    "Infinity source/ZIP/DEX/resources/runtime",
+    "native libraries",
+    "shared runtime",
+    "chooser behavior",
+    "launcher",
+    "shutdown",
+    "user data",
+    "Cards geometry/themes and all unrelated Cobra modes/controls"
+  ],
   "selected_before_execution": true,
   "selected_tests": [
     "ApprovedLiveProTest.cardsLiveDotPlaybackStatesAndIdentity",
     "ApprovedLiveProTest.cardsLiveDotCyclesAndOriginalGeometry",
     "ApprovedLiveProTest.cardsPreviewAndContextRealPresses",
     "ApprovedLiveProTest.cardsNativePlaybackEventsAndRenderedRows",
-    "ApprovedLiveProTest.proApprovedInnerAndFrontPreservation",
-    "ApprovedLiveProTest.proNavigationRowsAndRealTouch",
-    "ApprovedLiveProTest.foldOrientationAndThemeRestoration",
+    "ProApprovedLayoutTest.proApprovedInnerAndFrontPreservation",
+    "ProApprovedLayoutTest.proNavigationRowsAndRealTouch",
+    "ProApprovedLayoutTest.foldOrientationAndThemeRestoration",
     "exact accepted438/candidate class-method and APK-member preservation",
     "reuse unchanged Preview/Display size-mode and player-control evidence only when tested methods remain exact",
     "original signer, component matching, package identity and higher version checks"
   ],
   "shutdown_tests": "NOT_SELECTED_NOT_RUN",
   "physical_Fold": "USER_ACCEPTANCE_PENDING; host controlled-player rendering is not Android17 hardware verification",
-  "release": "BLOCKED_UNTIL_IMPLEMENTATION_VISUAL_AND_FUNCTIONAL_GATES_PASS"
+  "release": "IMPLEMENTATION_HOST_CHECKS_PASSED; ORIGINAL_SIGNER_PREPARATION_NEXT",
+  "selected_release_tests": [
+    "test_authorized_release_route_and_frozen_guards",
+    "test_workflow_keys_follow_payload_gates",
+    "test_exact_member_comparison_rejects_extra_change",
+    "test_original_signed_input_required"
+  ],
+  "selected_release_checks": [
+    "original sole signer policy check",
+    "next legitimate442 authority after issued441; accepted438 unchanged",
+    "exact signed438-to-final-candidate members and original certificate"
+  ]
 }

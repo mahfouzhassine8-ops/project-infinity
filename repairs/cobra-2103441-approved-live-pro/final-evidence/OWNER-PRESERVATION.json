@@ -1,0 +1,88 @@
+{
+  "status": "PASS_EXACT438_OWNER_AND_CARDS_CHECK_REUSE",
+  "changed_methods": {
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity;": [
+      "private cobraAdjustProLayout(Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraModeLayout;)V",
+      "private cobraCardsLivePulse(Lcom/projectinfinity/kodi/InfinityLiveActivity$Channel;)Z",
+      "private cobraRenderFocusMode(Landroid/widget/LinearLayout;Ljava/util/ArrayList;)V",
+      "private cobraRestoreModeScroll()V",
+      "synthetic lambda$cobraPreviewPanel$71$com-projectinfinity-kodi-InfinityLiveActivity(Landroid/view/View;)V"
+    ],
+    "Lcom/projectinfinity/kodi/CobraProUi$ChannelRow;": [
+      "protected onLayout(ZIIII)V",
+      "protected onMeasure(II)V"
+    ],
+    "Lcom/projectinfinity/kodi/CobraComponent;": [
+      "public static version()Ljava/lang/String;"
+    ],
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$LiveDot;": [
+      "protected onBoundsChange(Landroid/graphics/Rect;)V",
+      "public draw(Landroid/graphics/Canvas;)V"
+    ],
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$Holder;": [
+      "bind(Ljava/lang/Object;I)V",
+      "constructor <init>(Landroid/app/Activity;Landroid/widget/LinearLayout;)V",
+      "playing(Z)V",
+      "refresh()V"
+    ],
+    "Lcom/projectinfinity/kodi/CobraCardsLayout;": [
+      "private static displaySheetKind(Ljava/lang/String;)Z",
+      "private static previewSheetOwner(Landroid/app/Activity;)Z",
+      "private static visibleDisplayPlayer(Landroid/app/Activity;)Z",
+      "public static beginFrontCardsSheetReveal(Landroid/app/Activity;Landroid/view/View;)Z",
+      "public static frontPlayerSheetHost(Landroid/app/Activity;Ljava/lang/String;)Landroid/widget/FrameLayout;"
+    ]
+  },
+  "unchanged_original_classes": 7164,
+  "new_classes": [
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$LivePlayback;",
+    "Lcom/projectinfinity/kodi/CobraProExpandedLayout$Channels;",
+    "Lcom/projectinfinity/kodi/CobraProExpandedLayout$Focus;",
+    "Lcom/projectinfinity/kodi/CobraProExpandedLayout;"
+  ],
+  "fields_annotations": "EXACT_ORIGINAL",
+  "cards_tested_classes_exact": [
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraPlayingIndicatorPolicy;",
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraPlayingDot;",
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraPlayerBinding;",
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraPlayerBinding$$ExternalSyntheticLambda6;",
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraPlayerBinding$$ExternalSyntheticLambda4;",
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraPlayerBinding$$ExternalSyntheticLambda5;",
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraPlayerBinding$$ExternalSyntheticLambda3;",
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraPlayerBinding$$ExternalSyntheticLambda2;",
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraPlayerBinding$$ExternalSyntheticLambda1;",
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity$CobraPlayerBinding$$ExternalSyntheticLambda0;",
+    "Lcom/projectinfinity/kodi/CobraCardsTiles;",
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$RoundedProgress;",
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$OwnedLogo;",
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$MoreView;",
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$LivePlayback;",
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$LiveDot;",
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$Holder;",
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$CardSurface;",
+    "Lcom/projectinfinity/kodi/CobraCardsTheme;",
+    "Lcom/projectinfinity/kodi/CobraCardsTheme$Colors;",
+    "Lcom/projectinfinity/kodi/CobraCardsReuse;",
+    "Lcom/projectinfinity/kodi/CobraCardsReuse$State;",
+    "Lcom/projectinfinity/kodi/CobraCardsReuse$Stamp;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$State;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$Snapshot;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$Slot;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$ProgressSurface;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$PreviewBadge;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$PanelSurface;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$LiveSurface;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$LiveDot;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$DensityProfile;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$ButtonSurface;",
+    "Lcom/projectinfinity/kodi/CobraCardsLayout$AmbientPanel;",
+    "Lcom/projectinfinity/kodi/CobraCardsDrawerViewport;",
+    "Lcom/projectinfinity/kodi/CobraCardsDrawerViewport$Journey;"
+  ],
+  "Pro_controls_adapters_navigation_Sports": "BYTE_IDENTICAL",
+  "Cards_layout_themes_drawer": "BYTE_IDENTICAL",
+  "second_Cobra_DEX": "BYTE_IDENTICAL",
+  "Infinity": "NOT_ACCESSED_BY_OWNER_BUILD;_FINAL_APK_CHECK_REQUIRED",
+  "shutdown": "UNCHANGED_NOT_TESTED"
+}

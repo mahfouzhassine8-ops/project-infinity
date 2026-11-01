@@ -1,0 +1,32 @@
+{
+  "added": [
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$LivePlayback;",
+    "Lcom/projectinfinity/kodi/CobraProExpandedLayout$Channels;",
+    "Lcom/projectinfinity/kodi/CobraProExpandedLayout$Focus;",
+    "Lcom/projectinfinity/kodi/CobraProExpandedLayout;"
+  ],
+  "changed": [
+    "Lcom/projectinfinity/kodi/CobraCardsLayout;",
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$Holder;",
+    "Lcom/projectinfinity/kodi/CobraCardsTiles$LiveDot;",
+    "Lcom/projectinfinity/kodi/CobraComponent;",
+    "Lcom/projectinfinity/kodi/CobraProUi$ChannelRow;",
+    "Lcom/projectinfinity/kodi/InfinityLiveActivity;"
+  ],
+  "dex": {
+    "part-0.dex": "1c4be5e5d116d288dbd570dc0bea1e6a97cd7fcd10a3dcbaf7c9bed98629c05c",
+    "part-1.dex": "70dc429bff4d2df7fe19907100d5df39d5ade973aa2679328b42d567b3d5aee1"
+  },
+  "sources": {
+    "repairs/cobra-2103435-followups/drawer-only/runtime/CobraCardsDrawerViewport.java": "f9d8ea19cff084008cad3d2c0e9b17c64757d4f3a70ec9df9db3ce6bc04ed214",
+    "repairs/cobra-2103441-approved-live-pro/PreserveCobraDexPartition.java": "cf6bd95362e117ccab520fc593c447fb27c6f9daaa43d592430daa64076f2fc9",
+    "repairs/cobra-2103441-approved-live-pro/patch_native.py": "ca77734061b3143aa2c1a58941997c6d9d3cd92ce99f8f567c104d02639758b3",
+    "repairs/cobra-2103441-approved-live-pro/runtime/CobraProExpandedLayout.java": "3953cc2c26c3f5f57c4b50ff582c9d1a2e8db3a1885131319c58e27079522c8d",
+    "repairs/cobra-next-from-2103427/cards-from-2103431/runtime/CobraCardsLayout.java": "d988ebf2d173da44810ced1c33f9cbdc9a21a0e37ed0f9a1f33ae16a26b1ea96",
+    "repairs/cobra-next-from-2103427/cards-from-2103431/runtime/CobraCardsTheme.java": "58bd661ed94a2a949b459bab470c095bfb48d6d84d1e3fddc178f8ea21851864",
+    "repairs/cobra-next-from-2103427/cards-from-2103431/runtime/CobraCardsTiles.java": "2117a9b605301565dfb00930a701e909338d0b8f3c549858d320994c05529a4e",
+    "repairs/dual-experience-isolation-2103420/ModuleDexWriter.java": "f9c1b6da2552d529f27709b5f1c53368cacfab42d83fc947cb3b16cd0416dad2"
+  },
+  "status": "PASS_APPROVED_LIVE_PRO_METHOD_DELTA",
+  "unchanged": 7164
+}

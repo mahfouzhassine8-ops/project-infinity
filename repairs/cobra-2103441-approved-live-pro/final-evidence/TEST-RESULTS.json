@@ -1,0 +1,80 @@
+{
+  "status": "PASS_APPROVED_CARDS_LIVE_PRO_FOCUSED_HOST",
+  "owner_dex": {
+    "part-0.dex": "1c4be5e5d116d288dbd570dc0bea1e6a97cd7fcd10a3dcbaf7c9bed98629c05c",
+    "part-1.dex": "70dc429bff4d2df7fe19907100d5df39d5ade973aa2679328b42d567b3d5aee1"
+  },
+  "Cards": {
+    "status": "4_CHECKS_REUSED_EXACT_TESTED_CLASSES",
+    "tests": [
+      {
+        "name": "cardsLiveDotPlaybackStatesAndIdentity",
+        "seconds": "9.205",
+        "status": "PASS"
+      },
+      {
+        "name": "cardsPreviewAndContextRealPresses",
+        "seconds": "5.009",
+        "status": "PASS"
+      },
+      {
+        "name": "cardsLiveDotCyclesAndOriginalGeometry",
+        "seconds": "3.349",
+        "status": "PASS"
+      },
+      {
+        "name": "cardsNativePlaybackEventsAndRenderedRows",
+        "seconds": "9.515",
+        "status": "PASS"
+      }
+    ],
+    "evidence": "evidence/TEST-RESULTS.json",
+    "real_preview_presses": 56,
+    "real_context_presses": 4
+  },
+  "Pro": {
+    "status": "3_CHECKS_PASS",
+    "tests": [
+      {
+        "name": "proApprovedInnerAndFrontPreservation",
+        "seconds": "12.138",
+        "status": "PASS"
+      },
+      {
+        "name": "foldOrientationAndThemeRestoration",
+        "seconds": "4.827",
+        "status": "PASS"
+      },
+      {
+        "name": "proNavigationRowsAndRealTouch",
+        "seconds": "2.111",
+        "status": "PASS"
+      }
+    ]
+  },
+  "runtime": "Robolectric API35 native graphics; actual owner DEX translated to JVM; controlled ExoPlayer with synthetic channel/EPG data",
+  "physical_Fold": "NOT_TESTED_USER_ACCEPTANCE_REQUIRED",
+  "reference_files": [
+    {
+      "name": "Cobra_Cards_Approved_LIVE_Dot.png",
+      "path": "/workspace/cobra-evidence/approved442/reference/Cobra_Cards_Approved_LIVE_Dot.png",
+      "sha256": "4c4bce3f96b64f53c489748af59d68c0544d9d44638bb258bc876d54409989e6",
+      "bytes": 1718229,
+      "width": 1366,
+      "height": 1151,
+      "source": "https://raw.githubusercontent.com/mahfouzhassine8-ops/project-infinity/cobra-approved-mockups-reference-20261031/approved-mockups/Cobra_Cards_Approved_LIVE_Dot.png"
+    },
+    {
+      "name": "Cobra_Pro_Inner_Display_Approved.png",
+      "path": "/workspace/cobra-evidence/approved442/reference/Cobra_Pro_Inner_Display_Approved.png",
+      "sha256": "deb2e9f38ecc8d03ab5454675fc5d773303bc1cd54de8c7a97b940c510680840",
+      "bytes": 1717583,
+      "width": 1536,
+      "height": 1024,
+      "source": "https://raw.githubusercontent.com/mahfouzhassine8-ops/project-infinity/cobra-approved-mockups-reference-20261031/approved-mockups/Cobra_Pro_Inner_Display_Approved.png"
+    }
+  ],
+  "visual_review": "Actual PNG references and full rendered views inspected; approved structural arrangement, existing original typography/controls/styles retained. No pixel-perfect or hardware-video claim.",
+  "preservation": "7164 of7170 original Cobra classes exact; 6 reviewed original class changes and4 new scoped classes; second Cobra DEX exact",
+  "shutdown": "UNCHANGED_NOT_TESTED"
+}

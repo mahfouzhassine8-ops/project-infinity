@@ -6,5 +6,25 @@
     "static constructor <clinit>()V",
     "static draw(Lcom/projectinfinity/kodi/CobraCardsTiles$LiveDot;Landroid/graphics/Canvas;)Z",
     "static update(Lcom/projectinfinity/kodi/CobraCardsTiles$LiveDot;Z)V"
+  ],
+  "Lcom/projectinfinity/kodi/CobraProExpandedLayout;": [
+    "private constructor <init>()V",
+    "private static dimension(Ljava/lang/Object;Ljava/lang/String;)I",
+    "private static expanded(Landroid/app/Activity;Ljava/lang/Object;)Z",
+    "private static field(Landroid/app/Activity;Ljava/lang/String;)Ljava/lang/Object;",
+    "private static pro(Landroid/app/Activity;)Z",
+    "public static layout(Landroid/app/Activity;[[ILjava/lang/Object;)[[I",
+    "public static restoreSelection(Landroid/widget/AbsListView;II)V",
+    "public static rowHeight(Landroid/view/View;I)I",
+    "public static rowWide(Landroid/view/View;Z)Z",
+    "public static sync(Landroid/app/Activity;)V"
+  ],
+  "Lcom/projectinfinity/kodi/CobraProExpandedLayout$Channels;": [
+    "constructor <init>(Landroid/app/Activity;)V"
+  ],
+  "Lcom/projectinfinity/kodi/CobraProExpandedLayout$Focus;": [
+    "constructor <init>(ILjava/lang/CharSequence;)V",
+    "private static named(Landroid/view/View;Ljava/lang/CharSequence;)Landroid/view/View;",
+    "public onLayoutChange(Landroid/view/View;IIIIIIII)V"
   ]
 }

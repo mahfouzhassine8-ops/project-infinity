@@ -1,4 +1,4 @@
-"""Cards existing LIVE-dot renderer; accepted438 baseline and confirmed working Preview/Display fixes."""
+"""Approved Cards LIVE and Pro expanded layout from accepted438 plus retained Preview/Display fixes."""
 import hashlib,json,subprocess,sys,os
 from pathlib import Path
 from zipfile import ZipFile,ZIP_DEFLATED
@@ -30,6 +30,7 @@ def build(out):
  sources=[source/(n+'.java') for n in ('CobraCardsLayout',)]
  sources+=[source/'CobraCardsTheme.java',source/'CobraCardsTiles.java']
  sources+=[R/'repairs/cobra-2103435-followups/drawer-only/runtime/CobraCardsDrawerViewport.java']
+ sources+=[H/'runtime/CobraProExpandedLayout.java']
  classes=out/'classes';classes.mkdir()
  # Compile-only native signatures. No stub class enters cards.jar/DEX.
  stubs=out/'compile-only';stubs.mkdir()
@@ -40,7 +41,7 @@ def build(out):
  for name,body in definitions.items():(stubs/(name+'.java')).write_text('package com.projectinfinity.kodi; public final class '+name+'{'+body+'}')
  cp=str(android)
  run('java','-m','jdk.compiler/com.sun.tools.javac.Main','-source','8','-target','8','-g:none','-Xlint:-options','-cp',cp,'-d',classes,*sources,*stubs.glob('*.java'))
- roots=('CobraCardsLayout','CobraCardsTiles')
+ roots=('CobraCardsLayout','CobraCardsTiles','CobraProExpandedLayout')
  with ZipFile(out/'cards.jar','w',ZIP_DEFLATED) as z:
   for p in classes.rglob('*.class'):
    if p.stem.split('$')[0] in roots:z.write(p,p.relative_to(classes).as_posix())
@@ -59,13 +60,19 @@ def build(out):
    if sig in old:original=original.replace(old[sig],new[sig])
    else:original+='\n'+new[sig]+'\n'
   merged[name]=original
- from patch_native import patch,APP
+ from patch_native import patch,patch_row,APP
  merged[APP]=patch(originals[APP])
+ row='Lcom/projectinfinity/kodi/CobraProUi$ChannelRow;'
+ merged[row]=patch_row(originals[row])
  live='Lcom/projectinfinity/kodi/CobraCardsTiles$LiveDot;'
  merged[live]=changes[live]
  new_live='Lcom/projectinfinity/kodi/CobraCardsTiles$LivePlayback;'
  assert new_live not in originals
  merged[new_live]=changes[new_live]
+ for name,raw in changes.items():
+  if name.startswith('Lcom/projectinfinity/kodi/CobraProExpandedLayout'):
+   assert name not in originals
+   merged[name]=raw
  sources+=[H/'patch_native.py']
  changes=merged
  for p in smali.rglob('*.smali'):p.unlink()
@@ -80,8 +87,10 @@ def build(out):
  (out/'origins.tsv').write_text(''.join(n+'\t'+n+'\n' for n in sorted(changes.keys()&originals.keys())))
  empty=out/'empty';empty.mkdir();run('java','-cp',jars/'*','org.jf.smali.Main','assemble',empty,'-o',out/'empty.dex')
  writer=out/'writer';writer.mkdir();jc=':'.join(str(p) for p in sorted(jars.glob('*.jar')))
- run('java','-m','jdk.compiler/com.sun.tools.javac.Main','-source','8','-target','8','-g:none','-Xlint:-options','-cp',jc,'-d',writer,ISO/'ModuleDexWriter.java')
- run('java','-cp',str(writer)+':'+jc,'org.jf.dexlib2.writer.pool.ModuleDexWriter',out/'owner-dex',out/'assignments.tsv',out/'origins.tsv',out/'versioned-patch.dex',out/'empty.dex',*inputs)
+ run('java','-m','jdk.compiler/com.sun.tools.javac.Main','-source','8','-target','8','-g:none','-Xlint:-options','-cp',jc,'-d',writer,ISO/'ModuleDexWriter.java',H/'PreserveCobraDexPartition.java')
+ run('java','-cp',str(writer)+':'+jc,'org.jf.dexlib2.writer.pool.PreserveCobraDexPartition',out/'owner-dex/COBRA',out/'versioned-patch.dex',*inputs)
+ assert file_sha(out/'owner-dex/COBRA/part-1.dex')==file_sha(inputs[1]),'UNTOUCHED_SECOND_DEX'
+ sources+=[H/'PreserveCobraDexPartition.java',ISO/'ModuleDexWriter.java']
  observed={}
  for dex in sorted((out/'owner-dex/COBRA').glob('*.dex')):
   target=out/('verify-'+dex.stem);run('java','-cp',jars/'*','org.jf.baksmali.Main','disassemble','--sequential-labels',dex,'-o',target)
@@ -99,5 +108,5 @@ def build(out):
  assert added==load(H/'NEW-CLASS-METHODS.json'),('UNREVIEWED_NEW_CLASS',added)
  save(out/'METHOD-DELTA.json',actual)
  save(out/'CLASS-HASHES.json',{name:digest(raw.encode()) for name,raw in observed.items()})
- save(out/'OWNER-BUILD.json',dict(status='PASS_CARDS_LIVE_METHOD_DELTA_PRO_PENDING',changed=altered,added=sorted(observed.keys()-originals.keys()),unchanged=len(originals)-len(altered),sources={str(p.relative_to(R)):file_sha(p) for p in sources},dex={p.name:file_sha(p) for p in (out/'owner-dex/COBRA').glob('*.dex')}))
+ save(out/'OWNER-BUILD.json',dict(status='PASS_APPROVED_LIVE_PRO_METHOD_DELTA',changed=altered,added=sorted(observed.keys()-originals.keys()),unchanged=len(originals)-len(altered),sources={str(p.relative_to(R)):file_sha(p) for p in sources},dex={p.name:file_sha(p) for p in (out/'owner-dex/COBRA').glob('*.dex')}))
 if __name__=='__main__':build(Path(sys.argv[1]))
