@@ -14,8 +14,8 @@ import static qa.CobraDrawerDriver.*;
 public final class CobraQualityDriver {
  static JSONArray cases=new JSONArray();
  static void capture(String name)throws Exception {
+  screenshot(name); // Preserve the actual foreground even if ownership assertion fails.
   Tree t=new Tree();try{write(name+"-nodes.json",new JSONObject().put("labels",t.labels()).put("query_ms",SystemClock.uptimeMillis()-t.started));}finally{t.close();}
-  screenshot(name);
  }
  static void mode(String label)throws Exception {
   tap("(?m)^Choose one of five view modes$|^Choose view mode$|^Views$");await("(?m)^View$",true);
@@ -28,10 +28,13 @@ public final class CobraQualityDriver {
   }throw new IllegalStateException("Original mode choice not visible: "+label);
  }
  static void swipeList()throws Exception {
-  Tree tree=new Tree();Rect target=null;
-  try{for(AccessibilityNodeInfo node:tree.nodes)if(node.isVisibleToUser()&&node.isScrollable()&&("android.widget.GridView".contentEquals(node.getClassName())||"android.widget.ListView".contentEquals(node.getClassName()))){Rect r=new Rect();node.getBoundsInScreen(r);if(r.height()>160&&r.width()>160){require(target==null,"One channel-list scroll owner");target=r;}}}finally{tree.close();}
+  Tree tree=new Tree();Rect target=null,window=new Rect();
+  try{require(tree.root!=null,"Current Cobra window required");tree.root.getBoundsInScreen(window);for(AccessibilityNodeInfo node:tree.nodes)if(node.isVisibleToUser()&&node.isScrollable()&&("android.widget.GridView".contentEquals(node.getClassName())||"android.widget.ListView".contentEquals(node.getClassName()))){Rect r=new Rect();node.getBoundsInScreen(r);if(r.intersect(window)&&r.height()>160&&r.width()>160){require(target==null,"One channel-list scroll owner");target=r;}}}finally{tree.close();}
   require(target!=null,"Actual scrollable channel list required");
-  int x=target.centerX(),y=target.bottom-30,end=target.top+30;long stamp=SystemClock.uptimeMillis();
+  // Use the list interior: TV Grid reaches the bottom system-gesture region.
+  // The former bottom-30 start invoked Android Home, not an application scroll.
+  int x=target.centerX(),y=target.top+target.height()*3/4,end=target.top+target.height()/4;long stamp=SystemClock.uptimeMillis();
+  steps.put(new JSONObject().put("channel_list_swipe",box(target)).put("window",box(window)).put("start",new JSONArray(new int[]{x,y})).put("end",new JSONArray(new int[]{x,end})));
   for(int i=0;i<=12;i++){int action=i==0?0:i==12?1:2;android.view.MotionEvent e=android.view.MotionEvent.obtain(stamp,SystemClock.uptimeMillis(),action,x,y+(end-y)*Math.min(i,11)/11f,0);e.setSource(android.view.InputDevice.SOURCE_TOUCHSCREEN);try{require(ui.injectInputEvent(e,true),"Uncertain scroll input; no retry");}finally{e.recycle();}SystemClock.sleep(24);}syncInputs();
  }
  static void journey(boolean setup)throws Exception {

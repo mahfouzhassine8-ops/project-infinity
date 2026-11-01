@@ -1,0 +1,23 @@
+11-01 06:44:36.450  7282  7282 D AndroidRuntime: Calling main entry qa.CobraQualityDriver
+11-01 06:46:24.950  1367  1367 D RecentsView: onGestureAnimationStart - groupedTaskInfo: Desk ID= -1, Desk Display ID=-1, Tasks=[id=9 winMode=fullscreen visReq=true vis=true excluded=false baseIntent=com.projectinfinity.kodi/.InfinityLiveActivity], Type=FULLSCREEN, Minimized Task IDs=null, Task Extras={}
+11-01 06:46:24.950  1367  1367 D RecentsView: showCurrentTask(onGestureAnimationStart) - groupedTaskInfo: Desk ID= -1, Desk Display ID=-1, Tasks=[id=9 winMode=fullscreen visReq=true vis=true excluded=false baseIntent=com.projectinfinity.kodi/.InfinityLiveActivity], Type=FULLSCREEN, Minimized Task IDs=null, Task Extras={}
+11-01 06:46:25.001  1367  1367 D RecentsView: onGestureAnimationStart - groupedTaskInfo: Desk ID= -1, Desk Display ID=-1, Tasks=[id=9 winMode=fullscreen visReq=true vis=true excluded=false baseIntent=com.projectinfinity.kodi/.InfinityLiveActivity], Type=FULLSCREEN, Minimized Task IDs=null, Task Extras={}
+11-01 06:46:25.001  1367  1367 D RecentsView: showCurrentTask(onGestureAnimationStart) - groupedTaskInfo: Desk ID= -1, Desk Display ID=-1, Tasks=[id=9 winMode=fullscreen visReq=true vis=true excluded=false baseIntent=com.projectinfinity.kodi/.InfinityLiveActivity], Type=FULLSCREEN, Minimized Task IDs=null, Task Extras={}
+11-01 06:46:25.009   626  1451 I InputDispatcher: Channel [Gesture Monitor] swipe-up is stealing input gesture for device -1 from [3bd430f com.projectinfinity.kodi/com.projectinfinity.kodi.InfinityLiveActivity, [Gesture Monitor] edge-swipe]
+11-01 06:46:28.097  7282  7282 E AndroidRuntime: FATAL EXCEPTION: main
+11-01 06:46:28.097  7282  7282 E AndroidRuntime: java.lang.IllegalStateException: Unexpected active package
+11-01 06:46:28.097  7282  7282 E AndroidRuntime: 	at qa.CobraDrawerDriver.require(dex-id-0e431dffbf2aa0597f05dbb206db92610c99b278:5)
+11-01 06:46:28.097  7282  7282 E AndroidRuntime: 	at qa.CobraDrawerDriver$Tree.<init>(dex-id-0e431dffbf2aa0597f05dbb206db92610c99b278:50)
+11-01 06:46:28.097  7282  7282 E AndroidRuntime: 	at qa.CobraDrawerDriver.waitBounds(dex-id-0e431dffbf2aa0597f05dbb206db92610c99b278:25)
+11-01 06:46:28.097  7282  7282 E AndroidRuntime: 	at qa.CobraDrawerDriver.tap(dex-id-0e431dffbf2aa0597f05dbb206db92610c99b278:5)
+11-01 06:46:28.097  7282  7282 E AndroidRuntime: 	at qa.CobraQualityDriver.mode(dex-id-0e431dffbf2aa0597f05dbb206db92610c99b278:2)
+11-01 06:46:28.097  7282  7282 E AndroidRuntime: 	at qa.CobraQualityDriver.journey(dex-id-0e431dffbf2aa0597f05dbb206db92610c99b278:48)
+11-01 06:46:28.097  7282  7282 E AndroidRuntime: 	at qa.CobraQualityDriver.main(dex-id-0e431dffbf2aa0597f05dbb206db92610c99b278:323)
+11-01 06:46:28.097  7282  7282 E AndroidRuntime: java.lang.IllegalStateException: Unexpected active package
+11-01 06:46:28.097  7282  7282 E AndroidRuntime: 	at qa.CobraDrawerDriver.require(dex-id-0e431dffbf2aa0597f05dbb206db92610c99b278:5)
+11-01 06:46:28.097  7282  7282 E AndroidRuntime: 	at qa.CobraDrawerDriver$Tree.<init>(dex-id-0e431dffbf2aa0597f05dbb206db92610c99b278:50)
+11-01 06:46:28.097  7282  7282 E AndroidRuntime: 	at qa.CobraDrawerDriver.waitBounds(dex-id-0e431dffbf2aa0597f05dbb206db92610c99b278:25)
+11-01 06:46:28.097  7282  7282 E AndroidRuntime: 	at qa.CobraDrawerDriver.tap(dex-id-0e431dffbf2aa0597f05dbb206db92610c99b278:5)
+11-01 06:46:28.097  7282  7282 E AndroidRuntime: 	at qa.CobraQualityDriver.mode(dex-id-0e431dffbf2aa0597f05dbb206db92610c99b278:2)
+11-01 06:46:28.097  7282  7282 E AndroidRuntime: 	at qa.CobraQualityDriver.journey(dex-id-0e431dffbf2aa0597f05dbb206db92610c99b278:48)
+11-01 06:46:28.097  7282  7282 E AndroidRuntime: 	at qa.CobraQualityDriver.main(dex-id-0e431dffbf2aa0597f05dbb206db92610c99b278:323)

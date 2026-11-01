@@ -1,0 +1,20 @@
+{
+  "status": "FAILED_BASELINE_QA_HOME_GESTURE_NOT_CANDIDATE_RESULT",
+  "run": 41281620906,
+  "artifact": 13074265331,
+  "artifact_sha256": "733e9138ed2fef77a196e68b24e0a852ccd1ccfbf718970028a38db20a427bf8",
+  "baseline_apk_sha256": "88f968c53eb3d306db57de72419744f427554f7146f4f86e147b192f4f5e0bf5",
+  "candidate_installed": false,
+  "app_pid": 6651,
+  "app_alive_after_failure": true,
+  "fatal_exception_pid": 7282,
+  "fatal_exception_owner": "QA app_process driver",
+  "active_package": "com.google.android.apps.nexuslauncher",
+  "InputDispatcher": "Android swipe-up monitor stole QA scroll gesture",
+  "baseline_app_fatal_signal_count": 0,
+  "baseline_ANR_in_count": 0,
+  "fix": "Intersect current list bounds with active window and swipe through interior quartiles; log exact endpoints; screenshot before strict package assertion",
+  "production_bytes_changed": false,
+  "timeouts_or_assertions_weakened": false,
+  "additional_observation": "Repeated baseline CobraIconButton layout warnings preserved in original full log; not a demonstrated app crash or attributed root cause."
+}
