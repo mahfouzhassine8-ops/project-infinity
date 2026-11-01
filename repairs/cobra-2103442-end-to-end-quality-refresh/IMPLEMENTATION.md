@@ -118,6 +118,40 @@ The old assertion did not record its count; none is inferred as a measured resul
 Neither run installed the candidate, and neither is counted as a candidate PASS.
 The final444 check will use the same corrected harness and original-key APK.
 
+Run41284441609 completed all five accepted442 front modes and their interior
+scroll gestures, then stopped at the QA stable-density assertion before resizing
+or installing444. The captured Android configuration is correctly320dpi. The QA
+UiAutomation command route produced an empty graphics dump and did not return
+the expected density text; its original raw density response was not retained.
+QA PID5969 threw the assertion while Cobra PID5400 remained active with decoded
+loopback video. The evidence is in `android-qa/evidence-41284441609`.
+`android-qa/OS-COMMAND-CORRECTION.md` records the narrow command-output correction
+and strict preflight before the next installation. Signed444 production bytes
+remain unchanged. This failed baseline run is not a candidate PASS.
+
+Run41285455894 passed the OS-command preflight and the full accepted442 public
+mode/scroll/drawer/resize/cover-return journey. It failed later in the legacy
+warm-return observer because CLI UIAutomator produced no XML file. The successful
+journey is retained separately from that failed overall workflow. The existing
+reviewed live-root observer is now connected through the original notice-capture
+callback for all relaunch paths; its source, strict preflight, root budget and
+target-age guard are unchanged. The completed baseline matrix is reused with
+exact APK, outcome and journey-source hashes. The remaining candidate run does
+normal baseline setup, warm return, original-key install-over and the complete
+candidate matrix; it does not repeat the passing baseline journey. See
+`android-qa/WARM-OBSERVER-CORRECTION.md` and `android-qa/evidence-41285455894`.
+
+Run41286787645 closed baseline warm observation and verified actual original-key
+444-over442 installation, exact installed APK bytes and unchanged UID. Candidate
+launch reached the existing Android compatibility notice; its exact informational
+OK was pressed once. The post-notice root query completed at2084ms against the
+unchanged2000ms observer budget, so its late result was discarded and the run
+failed before the candidate journey. The app was resumed in the retained activity
+dump; that is not a passing functional matrix. No further native attempt, timeout
+change or APK rebuild followed. `delivery444/android-41286787645` preserves the
+exact failure and install-over evidence. The testing candidate is delivered with
+this limitation; full native interaction and physical Fold acceptance remain open.
+
 ## Release boundary
 
 The sole original signer is retained. Only its authorized branch/version/baseline

@@ -1,0 +1,46 @@
+[
+  {
+    "component": "CHOOSER_SHELL.zip",
+    "status": "PASS_EXACT_COMPONENT_TO_APK",
+    "exact_payload_members": 1,
+    "dex": {
+      "dex/part-0.dex": "classes.dex"
+    },
+    "assembly_exceptions": []
+  },
+  {
+    "component": "COBRA.zip",
+    "status": "PASS_EXACT_COMPONENT_TO_APK",
+    "exact_payload_members": 11,
+    "dex": {
+      "dex/part-0.dex": "classes4.dex",
+      "dex/part-1.dex": "classes5.dex"
+    },
+    "assembly_exceptions": []
+  },
+  {
+    "component": "INFINITY.zip",
+    "status": "PASS_EXACT_COMPONENT_TO_APK",
+    "exact_payload_members": 7516,
+    "dex": {
+      "dex/part-0.dex": "classes3.dex"
+    },
+    "assembly_exceptions": []
+  },
+  {
+    "component": "MINIMAL_ANDROID_CONTRACT.zip",
+    "status": "PASS_EXACT_COMPONENT_TO_APK",
+    "exact_payload_members": 80,
+    "dex": {
+      "dex/part-0.dex": "classes2.dex"
+    },
+    "assembly_exceptions": [
+      {
+        "member": "AndroidManifest.xml",
+        "reason": "Exact typed versionCode-only assembly update",
+        "component_versionCode": 2103421,
+        "APK_versionCode": 2103444
+      }
+    ]
+  }
+]
