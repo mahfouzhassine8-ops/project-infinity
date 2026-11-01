@@ -65,6 +65,19 @@ public class PlayingRowAndProViewportTest {
  static void image(View view,String name)throws Exception {
   assertTrue(view.getWidth()>0 && view.getHeight()>0);Bitmap b=Bitmap.createBitmap(view.getWidth(),view.getHeight(),Bitmap.Config.ARGB_8888);view.draw(new Canvas(b));java.io.ByteArrayOutputStream bytes=new java.io.ByteArrayOutputStream();assertTrue(b.compress(Bitmap.CompressFormat.PNG,100,bytes));Files.write(Paths.get(System.getProperty("cards.layout.output"),name+".png"),bytes.toByteArray());b.recycle();
  }
+ @Test public void steadyNativePulseRepeatsAfterHandoff()throws Exception {
+  JSONArray cases=new JSONArray();for(int[] dim:new int[][]{{1080,2520,480},{1600,1800,240}})for(String theme:new String[]{"light","dark","oled"})for(boolean cinema:new boolean[]{false,true}){
+   CobraCardsLayoutTest.Fixture f=fixture("cards",dim[0],dim[1],dim[2],theme);View d=dot(grid(f).getChildAt(0));f.prefs.edit().putBoolean("cobra_night_cinema",cinema).commit();pixels(d);
+   // Let native180ms handoff and240ms color morph settle. Sample the unmodified
+   // onDraw path at repeated phases through THREE complete genuine pulse cycles.
+   Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(2000));
+   long period=InfinityLiveActivity.CobraPlayingIndicatorPolicy.pulsePeriodMs(cinema);long now=SystemClock.uptimeMillis();Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(period-now%period));
+   List<String> phases=new ArrayList<>();for(int sample=0;sample<12;sample++){phases.add(pixels(d));Shadows.shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(period/4));}
+   for(int cycle=0;cycle<3;cycle++)assertTrue("Steady-state native dot must pulse in every cycle",new HashSet<>(phases.subList(cycle*4,cycle*4+4)).size()>=3);
+   for(int phase=0;phase<4;phase++){assertEquals("Pulse repeats at same phase",phases.get(phase),phases.get(4+phase));assertEquals(phases.get(phase),phases.get(8+phase));}
+   assertTrue(d.isShown());assertTrue((Boolean)get(d,"active"));cases.put(new JSONObject().put("viewport",new JSONArray(dim)).put("theme",theme).put("night_cinema",cinema).put("period_ms",period).put("steady_cycles",3).put("phase_pixel_sha256",new JSONArray(phases)));
+  }save("STEADY-NATIVE-PULSE",new JSONObject().put("cases",cases).put("native_onDraw_and_policy","UNCHANGED").put("physical_Fold","PENDING"));
+ }
  @Test public void cardsUsesOriginalPlayingDotAcrossThemesAndViewports()throws Exception {
   JSONArray cases=new JSONArray();for(int[] dim:new int[][]{{1080,2520,480},{1600,1800,240}})for(String theme:new String[]{"light","dark","oled"}){
    CobraCardsLayoutTest.Fixture f=fixture("cards",dim[0],dim[1],dim[2],theme);View row=grid(f).getChildAt(0),d=dot(row);

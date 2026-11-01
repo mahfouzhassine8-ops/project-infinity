@@ -6,7 +6,8 @@
     "actualSessionOwnershipPauseRetuneAndRecycling": "PASS: selection-independent actual binding, pause/buffer/end, native handoff and recycled row identity",
     "previewMenuAndSizeModesRemainWorking": "PASS: 56 actual decor DOWN/UP presses across14 existing modes, front/inner light/dark, original menu/player/texture/scroll retained",
     "proInnerViewportAndFrontPreservation": "PASS: front exact measured geometry; inner native channel list visible/full-height; Pro Sports original geometry; actual synthetic render inspected",
-    "resizeModeReturnAndGeometryPreservation": "PASS: Cards/Mobile round trip and active Pro inner/landscape/cover/pop-up geometry; same preview player/texture/channel"
+    "resizeModeReturnAndGeometryPreservation": "PASS: Cards/Mobile round trip and active Pro inner/landscape/cover/pop-up geometry; same preview player/texture/channel",
+    "steadyNativePulseRepeatsAfterHandoff": "PASS:12 cover/inner Light/Dark/OLED/Night-Cinema cases,3 complete settled cycles each; repeated phase pixels match; native periods1320ms and1900ms"
   },
   "baseline_checks": {
     "baselineCardsOmitsNativeDotMobileHasIt": "PASS_REPRODUCTION_ON440: native dot unbound/detached in Cards, attached/bound/active in Mobile",
@@ -21,6 +22,7 @@
   "physical_Fold": "NOT_RUN_USER_ACCEPTANCE_REQUIRED",
   "Android_emulator": "NOT_RUN_KNOWN_INCOMPATIBLE_NATIVE_RUNTIME",
   "media_decoder": "NOT_TESTED_CONTROLLED_PLAYER",
-  "final_APK": "NOT_BUILT_NOT_SIGNED: CLI GitHub authentication invalid and connected GitHub API has no workflow_dispatch action",
-  "shutdown": "UNCHANGED_NOT_SELECTED_NOT_RUN"
+  "final_APK": "PENDING_OFFICIAL_PREPARATION_AND_ORIGINAL_SIGNER",
+  "shutdown": "UNCHANGED_NOT_SELECTED_NOT_RUN",
+  "release_access": "Restored provisioned GH_TOKEN now returnsHTTP200; account mahfouzhassine8-ops; no user reauthorization required"
 }
