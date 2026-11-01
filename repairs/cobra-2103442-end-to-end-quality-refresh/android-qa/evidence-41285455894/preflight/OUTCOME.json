@@ -1,0 +1,23 @@
+{
+  "phase": "preflight",
+  "shutdown": "NOT_RUN",
+  "Infinity": "NOT_LAUNCHED",
+  "steps": [
+    {
+      "OS_command": "wm density",
+      "exit_code": 0,
+      "output_bytes": 44
+    },
+    {
+      "OS_command": "wm size",
+      "exit_code": 0,
+      "output_bytes": 50
+    },
+    {
+      "OS_command": "getprop ro.build.version.sdk",
+      "exit_code": 0,
+      "output_bytes": 3
+    }
+  ],
+  "status": "PASS_EXACT_OS_COMMAND_PREFLIGHT"
+}

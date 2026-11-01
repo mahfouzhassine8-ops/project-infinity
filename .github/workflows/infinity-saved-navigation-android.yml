@@ -98,6 +98,8 @@ jobs:
           sudo chmod 666 /dev/kvm
           python3 repairs/cobra-2103442-end-to-end-quality-refresh/android-qa/build.py \
             --android runtime-tools/receipt-evidence/android-34.jar --d8 "$ANDROID_HOME/build-tools/35.0.0/lib/d8.jar" --out runtime-driver
+          python3 repairs/cobra-next-from-2103427/cards-from-2103431/android-qa/immediate-observer/build.py \
+            --android runtime-tools/receipt-evidence/android-34.jar --d8 "$ANDROID_HOME/build-tools/35.0.0/lib/d8.jar" --out runtime-observer
           python3 repairs/cobra-next-from-2103427/android_candidate_journey.py --generate-media runtime-media
           python3 repairs/cobra-next-from-2103427/cards-from-2103431/android-qa/generate_fixture.py --out runtime-media --require-media
           python3 - <<'PYCODE'
@@ -119,7 +121,7 @@ jobs:
           script: |
             adb shell wm size 1080x2520
             adb shell wm density 320
-            python3 repairs/cobra-2103442-end-to-end-quality-refresh/android-qa/run_android.py --baseline runtime442/Infinity-2103442-Combined-Original-Signer.apk --driver runtime-driver --sdk "$ANDROID_HOME/build-tools/35.0.0" --out runtime-results/quality444 --candidate-dir runtime444
+            python3 repairs/cobra-2103442-end-to-end-quality-refresh/android-qa/run_android.py --baseline runtime442/Infinity-2103442-Combined-Original-Signer.apk --driver runtime-driver --sdk "$ANDROID_HOME/build-tools/35.0.0" --out runtime-results/quality444 --candidate-dir runtime444 --observer-jar runtime-observer/CobraImmediateHierarchy.jar --observer-receipt runtime-observer/BUILD-RECEIPT.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -129,6 +131,7 @@ jobs:
             runtime-platform/
             runtime-emulator-setup/
             runtime-driver/BUILD.json
+            runtime-observer/BUILD-RECEIPT.json
           retention-days: 90
           if-no-files-found: error
   cobra-drawer436-android:

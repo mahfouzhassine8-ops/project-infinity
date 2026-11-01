@@ -59,8 +59,8 @@ public final class CobraQualityDriver {
  }
  public static void main(String[] args)throws Exception {
   require(args.length==3,"Phase, fresh public output directory and exact QA JAR digest required");
-  require(args[0].equals("baseline")||args[0].equals("candidate")||args[0].equals("preflight"),"Selected baseline/candidate/preflight only");
-  require(args[1].matches("/sdcard/cobra-quality-(baseline|candidate|preflight)-[0-9]+"),"Fresh selected output only");
+  require(args[0].equals("baseline")||args[0].equals("candidate")||args[0].equals("preflight")||args[0].equals("setup"),"Selected baseline/candidate/preflight/setup only");
+  require(args[1].matches("/sdcard/cobra-quality-(baseline|candidate|preflight|setup)-[0-9]+"),"Fresh selected output only");
   dir=new File(args[1]);require(!dir.exists()&&dir.mkdir(),"Fresh evidence directory required");
   JSONObject result=new JSONObject().put("phase",args[0]).put("shutdown","NOT_RUN").put("Infinity","NOT_LAUNCHED").put("steps",steps);Object wrapper=null;Method disconnect=null;
   try{
@@ -69,6 +69,7 @@ public final class CobraQualityDriver {
    if(args[0].equals("preflight")){preflight();result.put("status","PASS_EXACT_OS_COMMAND_PREFLIGHT");return;}
    Class<?> c=Class.forName("com.android.uiautomator.core.UiAutomationShellWrapper");wrapper=c.getConstructor().newInstance();c.getMethod("connect").invoke(wrapper);disconnect=c.getMethod("disconnect");c.getMethod("setCompressedLayoutHierarchy",boolean.class).invoke(wrapper,false);ui=(UiAutomation)c.getMethod("getUiAutomation").invoke(wrapper);
    android.accessibilityservice.AccessibilityServiceInfo info=ui.getServiceInfo();info.flags|=android.accessibilityservice.AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS;ui.setServiceInfo(info);
+   if(args[0].equals("setup")){enterSource();capture("baseline-source-setup");result.put("status","PASS_NORMAL_SOURCE_SETUP_BASELINE_JOURNEY_REUSED");return;}
    journey(args[0].equals("baseline"));result.put("status","PASS_SELECTED_PUBLIC_INPUT_MODE_SCROLL_RESIZE");
   }catch(Throwable error){result.put("status","FAILED_CLOSED").put("error",error.toString());if(ui!=null)try{capture("failure");}catch(Throwable capture){result.put("capture_error",capture.toString());}if(error instanceof Exception)throw (Exception)error;throw (Error)error;}
   finally{write("OUTCOME.json",result);if(disconnect!=null)disconnect.invoke(wrapper);}
