@@ -1,0 +1,59 @@
+{
+  "status": "USER_APPROVED_BASELINE",
+  "recorded_date_utc": "2026-11-01",
+  "user_statement": "This will be our new bace",
+  "versionCode": 2103442,
+  "package": "com.projectinfinity.kodi",
+  "signed_source": "2e88f85250ef2e46952192cf0fdb42ac5af7c9c8",
+  "signed_apk_sha256": "88f968c53eb3d306db57de72419744f427554f7146f4f86e147b192f4f5e0bf5",
+  "original_certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "signing_run": 41270516686,
+  "component_producer_source": "159deb90895dcfd5d847f4d101a6de54ea06beb0",
+  "baseline_ref": "refs/heads/lock/infinity-cobra-2103442-user-approved-20261101",
+  "baseline_ref_sha": "2e88f85250ef2e46952192cf0fdb42ac5af7c9c8",
+  "prior_recovery_baseline": {
+    "versionCode": 2103438,
+    "source": "a5f721578c53e026a26cf21d929fbdad530f6d17",
+    "ref": "refs/heads/lock/infinity-cobra-2103438-user-approved-pending-one-fix-20261031",
+    "retained": true
+  },
+  "components": {
+    "CHOOSER_SHELL": {
+      "members": 1,
+      "dex": 1,
+      "zip_sha256": "df3d0110091fe7397a19dfed9cf7d0a0bdf80ddb34b60fd25de2b43c031a4d70"
+    },
+    "MINIMAL_ANDROID_CONTRACT": {
+      "members": 81,
+      "dex": 1,
+      "zip_sha256": "432bfb7b246a504d9550e1de39368c3b7e0946532f1c695531ed891e74ef03d8"
+    },
+    "INFINITY": {
+      "members": 7516,
+      "dex": 1,
+      "zip_sha256": "d03b4d5e845dfb5e1d6bb75c1967c7b6a2e55c5b17a7c65d66d43d43abd2e73d"
+    },
+    "COBRA": {
+      "members": 11,
+      "dex": 2,
+      "zip_sha256": "9435546ad399b7d464340ca54b3208f8db15a7c3f63bc5dee0bdb2c99989ee7e"
+    }
+  },
+  "downloads": {
+    "signed_apk_artifact": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/41270516686/artifacts/13069261267",
+    "matching_components_artifact": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/41270516686/artifacts/13069470783"
+  },
+  "gitHub_enforced_protection": {
+    "status": "BLOCKED_PERMISSION",
+    "attempted_action": "Create exact-branch ruleset restricting updates and deletion",
+    "http_status": 403,
+    "reason": "Resource not accessible by integration",
+    "ruleset_created": false
+  },
+  "acceptance_basis": "Explicit user designation as new baseline; no new individual device-test results claimed",
+  "application_changes": false,
+  "rebuilt_or_resigned": false,
+  "application_tests_run": false,
+  "shutdown_tests_run": false,
+  "future_work_policy": "Preserve this exact combined APK and owner component vector. Future changes require user-authorized scope and comparison against2103442. Never move or overwrite this accepted reference."
+}

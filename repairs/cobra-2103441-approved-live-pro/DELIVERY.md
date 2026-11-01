@@ -1,3 +1,5 @@
+**Acceptance update — 2026-11-01:** The user has designated 2103442 as the new approved baseline. See the [authoritative acceptance record](../locks/INFINITY-COBRA-2103442-USER-APPROVED-BASELINE-20261101.md). The report below describes the earlier delivery-time candidate status and preserves its original evidence.
+
 **2103442 — original-key signed install-over testing candidate. Physical Fold acceptance is pending; no promotion or lock.**
 
 - [Download signed combined APK artifact (ZIP)](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/41270516686/artifacts/13069261267). Extract `Infinity-2103442-Combined-Original-Signer.apk`.

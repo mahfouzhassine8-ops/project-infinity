@@ -1,3 +1,5 @@
+**Acceptance update — 2026-11-01:** The user has designated 2103442 as the new approved baseline. See the [authoritative acceptance record](../locks/INFINITY-COBRA-2103442-USER-APPROVED-BASELINE-20261101.md). The report below describes the earlier delivery-time candidate status and preserves its original evidence.
+
 Implementation, focused host checks and original-key delivery are complete. Signed testing candidate **2103442** is available through [DELIVERY.md](DELIVERY.md), with exact downloaded APK/component verification. Physical Fold acceptance remains pending; no lock or promotion.
 
 Both original approved PNGs were downloaded from the user's GitHub links, checked as readable PNGs, matched to both supplied SHA-256 values, and visually inspected. REFERENCES.json records their provenance. The Cards behavior board confirms the existing LIVE position as the sole playback indicator. The Pro reference defines player-left/information-right, full-width existing navigation, and two spacious columns underneath. Example content and newly depicted Record/More Info buttons are not added to production.
