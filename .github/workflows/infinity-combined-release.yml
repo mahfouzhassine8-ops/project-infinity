@@ -3,11 +3,11 @@ on:
   workflow_dispatch:
     inputs:
       operation:
-        description: Prepare verified Display439 or sign its exact reviewed combined candidate
+        description: Prepare verified Cards Preview440 or sign its exact reviewed combined candidate
         type: choice
         required: true
         default: final-combined
-        options: [final-combined, prepare-display439]
+        options: [final-combined, prepare-preview440]
 permissions:
   contents: read
   actions: read
@@ -15,9 +15,9 @@ concurrency:
   group: infinity-combined-original-key-release
   cancel-in-progress: false
 jobs:
-  prepare-display439:
-    name: Display439 owner preparation; frozen Infinity437/shared payload
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/cobra-fullscreen-display-from-2103438-20261031' && inputs.operation == 'prepare-display439'
+  prepare-preview440:
+    name: Cards Preview440 owner preparation; frozen Infinity437/shared payload
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/cobra-fullscreen-display-from-2103438-20261031' && inputs.operation == 'prepare-preview440'
     runs-on: ubuntu-22.04
     timeout-minutes: 35
     env:
@@ -33,7 +33,7 @@ jobs:
       - name: Focused release protocol and sole signer checks before key access
         run: |
           python3 -m pip install PyYAML==6.0.3
-          python3 repairs/cobra-2103438-fullscreen-display/tests/test_release439.py
+          python3 repairs/cobra-2103438-preview-restoration/tests/test_release440.py
           python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out SIGNER-ROUTES.json
       - uses: actions/download-artifact@v4
         with:
@@ -53,36 +53,36 @@ jobs:
           name: Infinity-Receipt-Race-Android17-Investigation
           github-token: ${{ github.token }}
           path: tools
-      - name: Prepare Display-only owner and verify exact signed438 preservation
+      - name: Prepare Preview-only owner and verify exact signed438 preservation
         env:
           CARDS_TOOLS_ROOT: ${{ github.workspace }}/tools
         run: |
           cp "$ANDROID_HOME/build-tools/35.0.0/lib/d8.jar" tools/d8.jar
-          python3 repairs/cobra-2103438-fullscreen-display/release439.py prepare \
+          python3 repairs/cobra-2103438-preview-restoration/release440.py prepare \
             --bundles protected438-components --baseline protected438/Infinity-2103438-Combined-Original-Signer.apk \
-            --sdk "$ANDROID_HOME/build-tools/35.0.0" --out prepared439
+            --sdk "$ANDROID_HOME/build-tools/35.0.0" --out prepared440
       - uses: actions/upload-artifact@v4
         with:
-          name: Infinity439-Prepared-${{ github.run_id }}
-          path: prepared439/publish/
+          name: Infinity440-Prepared-${{ github.run_id }}
+          path: prepared440/publish/
           if-no-files-found: error
           retention-days: 90
           compression-level: 0
       - if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: Infinity439-Preparation-Evidence-${{ github.run_id }}
+          name: Infinity440-Preparation-Evidence-${{ github.run_id }}
           path: |
             SIGNER-ROUTES.json
-            prepared439/*.log
-            prepared439/*.json
-            prepared439/owner/*.json
-            prepared439/*.txt
-            prepared439/preservation/
+            prepared440/*.log
+            prepared440/*.json
+            prepared440/owner/*.json
+            prepared440/*.txt
+            prepared440/preservation/
           if-no-files-found: warn
           retention-days: 90
   combined:
-    name: Display439 original-key testing APK; frozen Infinity437
+    name: Cards Preview440 original-key testing APK; frozen Infinity437
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/cobra-fullscreen-display-from-2103438-20261031' && inputs.operation == 'final-combined'
     runs-on: ubuntu-22.04
     timeout-minutes: 40
@@ -97,18 +97,18 @@ jobs:
         with: {distribution: temurin, java-version: '21'}
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
-      - name: Admit exact439 authority and sole signer before keys
+      - name: Admit exact440 authority and sole signer before keys
         id: selected
         run: |
           set -euo pipefail
           python3 -m pip install PyYAML==6.0.3
-          python3 repairs/cobra-2103438-fullscreen-display/tests/test_release439.py
+          python3 repairs/cobra-2103438-preview-restoration/tests/test_release440.py
           python3 - <<'PYCODE'
           import os
           from pathlib import Path
           from release_gate import remote_authority,require
           a=remote_authority(Path('.'),os.environ['GITHUB_SHA'])
-          require(a['candidate_versionCode']==2103439 and a['generation']==25,'EXACT439_AUTHORITY')
+          require(a['candidate_versionCode']==2103440 and a['generation']==26,'EXACT440_AUTHORITY')
           require(a['target_owners']==['COBRA','CHOOSER_SHELL'] and a['update_kind']=='owner_update','CARDS_ONLY')
           with open(os.environ['GITHUB_OUTPUT'],'a') as f:f.write('producer_run='+str(a['owner_update_evidence']['producer_run'])+'\n')
           PYCODE
@@ -128,30 +128,30 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           run-id: ${{ steps.selected.outputs.producer_run }}
-          name: Infinity439-Prepared-${{ steps.selected.outputs.producer_run }}
+          name: Infinity440-Prepared-${{ steps.selected.outputs.producer_run }}
           github-token: ${{ github.token }}
-          path: prepared439
+          path: prepared440
       - name: Verify official artifact bytes, registered source and exact438 preservation before keys
         run: |
           set -euo pipefail
-          python3 repairs/cobra-2103438-fullscreen-display/release439.py check_registered \
-            --prepared prepared439 --run-id "${{ steps.selected.outputs.producer_run }}" --out REGISTERED439-CHECK.json
+          python3 repairs/cobra-2103438-preview-restoration/release440.py check_registered \
+            --prepared prepared440 --run-id "${{ steps.selected.outputs.producer_run }}" --out REGISTERED440-CHECK.json
           mkdir -p combined-build
-          cp -r prepared439/components combined-build/
+          cp -r prepared440/components combined-build/
           python3 repairs/dual-experience-isolation-2103420/component_bundles.py combine \
             --bundles combined-build/components --catalog combined-build/components/catalog.json \
-            --out combined-build/combined-unsigned.apk --version 2103439
+            --out combined-build/combined-unsigned.apk --version 2103440
           python3 - <<'PYCODE'
           from pathlib import Path
           from inventory import file_sha,load
           from release_gate import require
-          require(file_sha('combined-build/combined-unsigned.apk')==load('prepared439/preservation/APK-PRESERVATION.json')['candidate_sha256'],'EXACT_VERIFIED_UNSIGNED_APK')
+          require(file_sha('combined-build/combined-unsigned.apk')==load('prepared440/preservation/APK-PRESERVATION.json')['candidate_sha256'],'EXACT_VERIFIED_UNSIGNED_APK')
           PYCODE
       - name: Hard original pre-sign payload ownership and source guard
         run: |
           python3 repairs/dual-experience-isolation-2103420/release_gate.py \
             --apk combined-build/combined-unsigned.apk --jars tools/receipt-evidence/tool-jars --work gate-dex \
-            --repository . --expected-head "$GITHUB_SHA" --expected-generation 25 --out SIGNING-DECISION.json
+            --repository . --expected-head "$GITHUB_SHA" --expected-generation 26 --out SIGNING-DECISION.json
       - name: Original signer after all source and payload gates
         env:
           INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
@@ -161,16 +161,16 @@ jobs:
         run: |
           python3 repairs/dual-experience-isolation-2103420/assemble.py sign \
             --apk combined-build/combined-unsigned.apk --jars tools/receipt-evidence/tool-jars --work signer-dex \
-            --repository . --expected-head "$GITHUB_SHA" --expected-generation 25 \
+            --repository . --expected-head "$GITHUB_SHA" --expected-generation 26 \
             --sdk "$ANDROID_HOME/build-tools/35.0.0" --out signed-combined
-      - name: Signed438-to-signed439 exact member and original certificate comparison
+      - name: Signed438-to-signed440 exact member and original certificate comparison
         run: |
-          python3 repairs/cobra-2103438-fullscreen-display/release439.py compare \
+          python3 repairs/cobra-2103438-preview-restoration/release440.py compare \
             --baseline protected438/Infinity-2103438-Combined-Original-Signer.apk \
-            --candidate signed-combined/Infinity-2103439-Combined-Original-Signer.apk \
-            --plan prepared439/PREPARATION.json --out signed-combined/preservation --sdk "$ANDROID_HOME/build-tools/35.0.0"
+            --candidate signed-combined/Infinity-2103440-Combined-Original-Signer.apk \
+            --plan prepared440/PREPARATION.json --out signed-combined/preservation --sdk "$ANDROID_HOME/build-tools/35.0.0"
           cp repairs/dual-experience-isolation-2103420/release-authority.json signed-combined/
-          cp SIGNING-DECISION.json REGISTERED439-CHECK.json SIGNER-ROUTES.json signed-combined/
+          cp SIGNING-DECISION.json REGISTERED440-CHECK.json SIGNER-ROUTES.json signed-combined/
           python3 - <<'PYCODE'
           from pathlib import Path
           from inventory import file_sha
@@ -194,10 +194,10 @@ jobs:
       - if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: Infinity439-Signing-Evidence-${{ github.run_id }}
+          name: Infinity440-Signing-Evidence-${{ github.run_id }}
           path: |
             SIGNING-DECISION.json
-            REGISTERED439-CHECK.json
+            REGISTERED440-CHECK.json
             SIGNER-ROUTES.json
             signed-combined/preservation/
           if-no-files-found: warn

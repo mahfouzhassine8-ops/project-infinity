@@ -1,0 +1,42 @@
+{
+  "Cobra_classes_unchanged": 7165,
+  "Infinity": "FROZEN437",
+  "active_resize_theme_cases": 8,
+  "all_size_cases": 56,
+  "dex": {
+    "part-0.dex": "1e00aba303dd62ad3889b2fecc52674d0750fbc025c326febb8744f6d4d86671",
+    "part-1.dex": "70dc429bff4d2df7fe19907100d5df39d5ade973aa2679328b42d567b3d5aee1"
+  },
+  "environment": "Host Robolectric API35 native graphics; real native views/listeners/menus/handoff and controlled player metadata/decoder factory; no physical decoder/Android17 acceptance",
+  "front_inner_theme_cases": 6,
+  "geometry_pixel_parity_cases": 4,
+  "pass": 8,
+  "physical_Fold": "PENDING",
+  "prior439_Display_fix": "RETAINED",
+  "runs": [
+    "final-owner-tests01.log:7 passing cases; active-resize failed because stock Robolectric caps INFINITE at1",
+    "final-resize02.log:active resize/light-dark/system reduced-motion passes after QA-only infinite-repeat correction",
+    "final-all-sizes02.log:56 cases include active native pulse and original menu for all14 sizes across front/inner,light/dark"
+  ],
+  "shutdown": "UNCHANGED_NOT_RUN",
+  "sources": {
+    "repairs/cobra-2103435-followups/drawer-only/runtime/CobraCardsDrawerViewport.java": "f9d8ea19cff084008cad3d2c0e9b17c64757d4f3a70ec9df9db3ce6bc04ed214",
+    "repairs/cobra-2103438-preview-restoration/patch_native.py": "39fdac023d9516aa1c66fd15b1ed255d1a4af45c28400ccabe19672e1a996687",
+    "repairs/cobra-next-from-2103427/cards-from-2103431/runtime/CobraCardsLayout.java": "ee470938a214a053fa226ad8166cfdf9329eacac43ea6f5910df582007125d1b",
+    "repairs/cobra-next-from-2103427/cards-from-2103431/runtime/CobraCardsTheme.java": "58bd661ed94a2a949b459bab470c095bfb48d6d84d1e3fddc178f8ea21851864",
+    "repairs/cobra-next-from-2103427/cards-from-2103431/runtime/CobraCardsTiles.java": "923becacb5e127a50319c55586e2e870426cef72056fd71a20753ae600b9fbb7"
+  },
+  "status": "PASS_CARDS_PREVIEW_FOCUSED_HOST",
+  "test_source_sha256": "56083a3beb39e837cdddf85cfcbb53b4fea834d74b426f12bd84a75c0150f118",
+  "tests": [
+    "restoredPreviewAcrossThemesAndViewports",
+    "originalLongPressAndFullscreenReturn",
+    "everySizeKeepsOriginalPreviewMenuAndSession",
+    "originalControlsPulseLifecycleAndPip",
+    "modeExitRestoresOriginalStatusOwnership",
+    "channelSelectionUsesOriginalPreviewRoute",
+    "captureGeometryAndBadgePixels",
+    "activeResizeThemeAndMotionRestoration"
+  ],
+  "translated_owner_jar_sha256": "daf8e6d74b70b4f32b29e91bcd92011874fea076ce735f07824e5033f07796bb"
+}

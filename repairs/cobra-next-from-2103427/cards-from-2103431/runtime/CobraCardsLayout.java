@@ -117,6 +117,32 @@ public final class CobraCardsLayout {
         && ((FrameLayout)value).isShown();
   }
 
+  /** Re-enable the original emblem animator only in the Cards mini-player.
+   * All existing attachment, foreground and reduced-motion checks remain native. */
+  public static boolean previewPulseAnimated(View pulse){
+    if(pulse==null || !(pulse.getContext() instanceof Activity))return false;
+    Activity owner=(Activity)pulse.getContext();
+    if(!"com.projectinfinity.kodi.InfinityLiveActivity".equals(owner.getClass().getName()))return false;
+    if(!cards(owner) || Boolean.TRUE.equals(read(owner,"mCobraProSportsActive"))
+        || read(owner,"mCobraPreviewPlayer")==null || read(owner,"mPlayerOverlay")!=null
+        || read(owner,"mMultiOverlay")!=null)return false;
+    Object host=read(owner,"mCobraPreviewHost");
+    if(!(pulse.getParent() instanceof View) || ((View)pulse.getParent()).getParent()!=host)return false;
+    String state=String.valueOf(value(pulse,"state"));
+    return "LIVE".equals(state) || "NORMAL".equals(state);
+  }
+
+  /** Native child menus retain their original preview anchor. Keep the same
+   * one-reveal rule for that owner only, including Channel actions/settings. */
+  private static boolean previewSheetOwner(Activity owner){
+    Object host=read(owner,"mCobraPreviewHost"),anchor=read(owner,"mCobraSheetAnchor");
+    if(!(host instanceof View) || !(anchor instanceof View)
+        || read(owner,"mPlayerOverlay")!=null || read(owner,"mMultiOverlay")!=null)return false;
+    for(View cursor=(View)anchor;cursor!=null;cursor=cursor.getParent() instanceof View?(View)cursor.getParent():null)
+      if(cursor==host)return true;
+    return false;
+  }
+
   /** Alpha zero can persist until the animator's first frame. A second layout
    * callback in that interval must not cancel and restart the same reveal.
    * Native geometry validation still runs on every callback, and the original
@@ -125,9 +151,10 @@ public final class CobraCardsLayout {
     if(!cards(owner) || Boolean.TRUE.equals(read(owner,"mCobraProSportsActive")))return true;
     Object kind=read(owner,"mCobraSheetKind");
     boolean display=displaySheetKind(String.valueOf(kind)) && visibleDisplayPlayer(owner);
-    if(!"player-settings".equals(kind) && !"visual-settings".equals(kind) && !display)return true;
+    boolean preview=previewSheetOwner(owner);
+    if(!"player-settings".equals(kind) && !"visual-settings".equals(kind) && !display && !preview)return true;
     android.content.res.Configuration configuration=owner.getResources().getConfiguration();
-    if(Math.min(configuration.screenWidthDp,configuration.screenHeightDp)>=600 && !display)return true;
+    if(Math.min(configuration.screenWidthDp,configuration.screenHeightDp)>=600 && !display && !preview)return true;
     mainThread();
     if(panel==null || panel!=read(owner,"mCobraSheetPanel"))return true;
     return SHEET_REVEALS.put(panel,Boolean.TRUE)==null;
@@ -634,6 +661,11 @@ public final class CobraCardsLayout {
           && liveBinding(a,player,channel);
       if(!show){if(active)release();return;}
       active=true;background.scale=owner.scale;
+      // Keep the original native pulse slot in its original corner. Only its
+      // existing legacy label becomes the Cards LIVE badge; no replacement views.
+      if(container!=label && label.getParent()==container){
+        ((ViewGroup)container).removeView(label);((ViewGroup)owner.preview).addView(label);
+      }
       if(label.getBackground()!=background)label.setBackground(background);
       if(label.getTypeface()!=BOLD)label.setTypeface(BOLD);if(label.getCurrentTextColor()!=WHITE)label.setTextColor(WHITE);
       float textSize=17*owner.scale*owner.font;if(label.getTextSize()!=textSize)label.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
@@ -644,16 +676,18 @@ public final class CobraCardsLayout {
       if(!drawableOwned){label.setCompoundDrawablesRelative(dot,null,null,null);drawableOwned=true;}
       if(label.getCompoundDrawablePadding()!=gap)label.setCompoundDrawablePadding(gap);
       text(label,"LIVE");if(label.getAlpha()!=1)label.setAlpha(1);if(label.getVisibility()!=View.VISIBLE)label.setVisibility(View.VISIBLE);
-      if(pulse!=null && pulse.getVisibility()!=View.GONE)pulse.setVisibility(View.GONE);
       int bottom=owner.px(26);View controls=owner.preview.findViewWithTag("cobra_preview_controls");
       if(controls!=null && controls.getVisibility()==View.VISIBLE){int height=controls.getHeight();if(height<=0 && controls.getLayoutParams()!=null)height=Math.max(0,controls.getLayoutParams().height);bottom=Math.max(bottom,height+owner.px(6));}
       int width=owner.px(89*owner.font),height=owner.px(38*owner.font),left=owner.px(27);
-      FrameLayout.LayoutParams old=(FrameLayout.LayoutParams)container.getLayoutParams();
+      FrameLayout.LayoutParams old=(FrameLayout.LayoutParams)label.getLayoutParams();
       if(old.width!=width || old.height!=height || old.gravity!=(Gravity.BOTTOM|Gravity.LEFT) || old.leftMargin!=left || old.bottomMargin!=bottom || old.topMargin!=0 || old.rightMargin!=0){
-        FrameLayout.LayoutParams p=new FrameLayout.LayoutParams(width,height,Gravity.BOTTOM|Gravity.LEFT);p.leftMargin=left;p.bottomMargin=bottom;container.setLayoutParams(p);
+        FrameLayout.LayoutParams p=new FrameLayout.LayoutParams(width,height,Gravity.BOTTOM|Gravity.LEFT);p.leftMargin=left;p.bottomMargin=bottom;label.setLayoutParams(p);
       }
     }
     void release(){
+      if(container!=label && label.getParent()==owner.preview){
+        ((ViewGroup)owner.preview).removeView(label);((ViewGroup)container).addView(label,0);
+      }
       originalLabel.restore();if(originalContainer!=null)originalContainer.restore();text(label,nativeText);
       // Match native StatusSlot.show semantics for the current publication.
       int visibility=pulse!=null && pulseVisibility==View.VISIBLE?View.INVISIBLE:TextUtils.isEmpty(status(nativeText))?View.GONE:View.VISIBLE;

@@ -1,0 +1,65 @@
+{
+  "authorization": "2026-11-01 user targeted Cards Preview restoration; small preview tap explicitly confirmed",
+  "branch": "work/cobra-fullscreen-display-from-2103438-20261031",
+  "locked_baseline": "a5f721578c53e026a26cf21d929fbdad530f6d17",
+  "baseline_apk_sha256": "a1907acbcb3a36f5b2312f8a11cd4e38d8fcdbed2f435b6ab45d369adc8e9f35",
+  "retained_signed_candidate": "2103439 source1e067768; Display fix frozen and retained",
+  "selected_before_execution": true,
+  "selected_tests": [
+    "actual Cards preview tap and long press; original controls, fullscreen button, no false menu/retune",
+    "existing native PulseView versus LIVE dot, foreground/reduced-motion/paused behavior",
+    "channel selection and fullscreen-to-preview return preserve source/player identity",
+    "front/inner and light/dark/OLED preview controls, 14 existing size modes, selection/focus/scroll preservation",
+    "exact class/method and component/APK preservation; other modes as negative controls",
+    "paired actual438/candidate Cards outer geometry and exact LIVE badge pixels in front/inner light/dark",
+    "active host window cover/inner/orientation/split resize and live light/dark restyle; preserve player/texture/channel and original menu"
+  ],
+  "functional_allowlist": [
+    "CobraCardsLayout.beginFrontCardsSheetReveal / previewSheetOwner: original preview-owned sheet and inherited child menu anchors only",
+    "CobraCardsLayout$PreviewBadge.refresh/release: restore existing native emblem ownership while retaining LIVE badge",
+    "InfinityLiveActivity.lambda$cobraPreviewPanel$71: Cards-only small-preview tap to original menu",
+    "InfinityLiveActivity.cobraVisualPulseState: restore original NORMAL/LIVE states only for Cards preview",
+    "CobraPresentationEffects$PulseView.restart: retain all native guards/animator; allow original NORMAL/LIVE motion only for Cards preview",
+    "CobraCardsLayout.previewPulseAnimated: new Cards-preview-only predicate"
+  ],
+  "frozen": [
+    "Infinity437 ZIP/DEX/assets",
+    "all unrelated Cobra methods/classes and layouts",
+    "fullscreen/PiP/More controls",
+    "chooser/native/shared/launcher",
+    "shutdown/user data"
+  ],
+  "shutdown_tests": "NOT_SELECTED_NOT_RUN",
+  "physical_Fold": "REQUIRED_USER_ACCEPTANCE",
+  "owner_note": "InfinityLiveActivity is an existing COBRA DEX owner, not the protected INFINITY component. Native .so/shared/Infinity DEX remain frozen.",
+  "selected_host_methods": [
+    "restoredPreviewAcrossThemesAndViewports",
+    "originalLongPressAndFullscreenReturn",
+    "everySizeKeepsOriginalPreviewMenuAndSession",
+    "originalControlsPulseLifecycleAndPip",
+    "modeExitRestoresOriginalStatusOwnership",
+    "channelSelectionUsesOriginalPreviewRoute",
+    "captureGeometryAndBadgePixels",
+    "activeResizeThemeAndMotionRestoration"
+  ],
+  "QA_only": "Native ValueAnimator INFINITE repeat retained in test shadow; stock Robolectric caps it at1. All frame advances bounded. System durationScale0 and foreground cleanup tested; no production timer or timeout changes.",
+  "selected_release_tests": [
+    "test_authorized_release_route_and_frozen_guards",
+    "test_workflow_keys_follow_payload_gates",
+    "test_exact_member_comparison_rejects_extra_change",
+    "test_original_signed_input_required"
+  ],
+  "target_release": {
+    "versionCode": 2103440,
+    "generation": 26,
+    "previous_authority": "1e067768a63e90d8bd534f8b70ca30d367d6635b",
+    "locked_comparison": "2103438 a5f721578c53e026a26cf21d929fbdad530f6d17",
+    "baseline_replaced": false,
+    "prior439_Display_fix": "Retained original host/private predicates; begin guard extended only for preview-owned anchors",
+    "frozen_owners": [
+      "INFINITY",
+      "MINIMAL_ANDROID_CONTRACT"
+    ],
+    "metadata_only": "Ordinary required app/component/chooser version labels through existing original signer"
+  }
+}
