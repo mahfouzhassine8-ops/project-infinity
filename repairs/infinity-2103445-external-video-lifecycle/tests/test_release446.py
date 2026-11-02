@@ -91,6 +91,7 @@ class ReleaseTests(unittest.TestCase):
 
     def test_reused_host_receipts_and_production_sources(self):
         receipt=r.reused_receipts()
+        self.assertEqual(Path(r.owner_builder().__file__).resolve(),H/'build_owner.py')
         self.assertEqual(receipt['onResume_onPause_onStop_onDestroy_other_methods'],'EXACT')
         self.assertEqual(len(receipt['changed_methods']),2)
         self.assertEqual(sum(map(len,receipt['changed_methods'].values())),3)

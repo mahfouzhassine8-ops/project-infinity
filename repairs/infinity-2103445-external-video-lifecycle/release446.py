@@ -2,6 +2,7 @@
 import argparse
 import copy
 import hashlib
+import importlib.util
 import json
 import os
 from pathlib import Path
@@ -59,6 +60,14 @@ def reused_receipts():
     require(file_sha(HERE/'BaselineExternalIntentOrderTest.java')==tests['baseline_test_source'],'BASELINE_TEST_SOURCE')
     return owner
 
+def owner_builder():
+    # Historical release helpers also import a module named build_owner. Bind
+    # this preparation to the reviewed Infinity file, independent of sys.path.
+    spec=importlib.util.spec_from_file_location('_infinity_external_owner446',HERE/'build_owner.py')
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+    require(Path(module.__file__).resolve()==HERE/'build_owner.py','EXACT_INFINITY_BUILDER')
+    return module
+
 def compare(baseline,candidate,plan,out,sdk=None):
     require(file_sha(baseline)==APK_SHA,'EXACT_SIGNED445_APK')
     expected={'classes3.dex',LABEL,'AndroidManifest.xml'}
@@ -103,8 +112,7 @@ def prepare(bundles,baseline,sdk,out):
     catalog=copy.deepcopy(prior['bundle_catalog'])
     for owner,row in catalog['bundles'].items():read_bundle(bundles/row['file'],row)
     expected=reused_receipts()
-    import build_owner
-    build_owner.build(out/'owner')
+    owner_builder().build(out/'owner')
     require(load(out/'owner/OWNER-PRESERVATION.json')==expected,'EXACT_HOST_TESTED_OWNER_REBUILD')
     require(file_sha(out/'owner/candidate.dex')==DEX_SHA,'EXACT_OWNER_DEX')
     dest=out/'components';dest.mkdir();catalog['source']=source
