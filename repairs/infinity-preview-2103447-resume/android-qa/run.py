@@ -93,7 +93,10 @@ def source():q.shell('am','start','-W','-n',q.SOURCE+'/qa.external.SourceActivit
 def setup(a):
  q.check(q.shell('getprop','ro.kernel.qemu').strip()=='1','Disposable emulator only')
  q.check(not q.shell('pm','list','packages',q.P).strip(),'No existing installation may be replaced in this fixture')
- q.adb('root');q.adb('wait-for-device');q.check('uid=0' in q.shell('id'),'Read-only synthetic history observation requires emulator root')
+ if a.segment=='full':
+  q.adb('root');q.adb('wait-for-device');q.check('uid=0' in q.shell('id'),'Read-only synthetic history observation requires emulator root')
+ # Remaining public-input checks never read private storage or inject process
+ # loss, so they do not need an adbd privilege restart.
  for name in ('candidate','source'):
   apk=a.prepared/(name+'-qa.apk');started=time.monotonic();q.adb('install','--no-streaming',apk,timeout=240)
   q.record('fresh_fixture_install',name=name,seconds=time.monotonic()-started,sha256=hashlib.sha256(apk.read_bytes()).hexdigest())
