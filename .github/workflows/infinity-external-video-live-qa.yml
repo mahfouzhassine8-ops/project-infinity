@@ -103,22 +103,7 @@ jobs:
           pre-emulator-launch-script: python3 repairs/infinity-final-closure-2103407/api37_environment_gate.py --sdk-root "$ANDROID_HOME" --out android-evidence/platform --check-avd
           disable-animations: false
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
-          script: |
-            set +e
-            BASE="$(find runtime-445 -name Infinity-2103445-Combined-Original-Signer.apk -type f -print -quit)"
-            python3 repairs/infinity-2103445-external-video-lifecycle/android_qa/live_external_qa.py play \
-              --apk "$BASE" --media android-evidence/fixture \
-              --phase baseline --out android-evidence/baseline-playback
-            BASE_RESULT=$?
-            # QA emulator only: no user application/data and no shutdown acceptance.
-            adb uninstall com.projectinfinity.kodi > android-evidence/qa-only-reinstall.txt 2>&1
-            python3 repairs/infinity-2103445-external-video-lifecycle/android_qa/live_external_qa.py play \
-              --apk android-evidence/disposable-package/qa-DISCARD-DO-NOT-INSTALL-ON-PHONE.apk \
-              --media android-evidence/fixture \
-              --phase candidate --out android-evidence/corrected-playback
-            CANDIDATE_RESULT=$?
-            printf 'Baseline=%s Candidate=%s\n' "$BASE_RESULT" "$CANDIDATE_RESULT" | tee android-evidence/ADB-RESULTS.txt
-            exit 0
+          script: bash repairs/infinity-2103445-external-video-lifecycle/android_qa/launch.sh
       - name: Report evidence honestly (not automatic playback PASS)
         if: always()
         run: |
