@@ -1,0 +1,18 @@
+# User directive — produce a focused signed Infinity testing APK now
+
+**2026-11-01, user request:** “I dont want to spend all day trying to diagnose when the fix could simply be what is already corrected and waiting to baked Into the apk. Is this going to produce an apk”
+
+**Interpretation / requested outcome:** Prioritize delivery of one **signed install-over *testing candidate*** containing the **already implemented, host-tested Infinity external-video request-order correction** at `1a7cfc89`, carried forward unchanged through read-only `e4eb93c9`. Do **not** continue an open-ended investigation of the unrelated overlay/Stop/native observations as a release prerequisite, but do not claim any such unresolved symptom was fixed.
+
+## Strict packaging scope and testing contract
+
+1. **Starting baseline**: locked, original-key-signed combined **2103445**, exact signed source `6cf75639a46ec6b0c858ae32abc102450fdc0974`; recovery APK/locks unchanged. **Use versionCode 2103446** only if confirmed unused and monotonic at signing.
+2. **One scoped Infinity correction only**: preserve exactly the approved request-ticket stale-intent elimination from `1a7cfc89` and its nine passing focused tests; no broader `ACTION_VIEW` policy change to guess MiXplorer MIME, no new Stop/back/Loading behavior, no speculative Android/Java/native edits.
+3. **Absolute preservation**: COBRA 2103445 component untouched, including approved universal rotation/fullscreen audio; chooser/Splash untouched; native Kodi `libkodi.so` and every other native library untouched; shared Android/Media3, all unrelated Infinity, skin, add-ons/providers, saved states, command center, essential-first shutdown, and data untouched. Preserve original certificate/signing policy, package identity `com.projectinfinity.kodi`, recovery artifact and all user data. No uninstall, clearing data, migration or fallback signer.
+4. **Candidate gates**: execute the already selected focused tests plus exact component/DEX/member preservation, strict original-signing, package version, alignment and integrity checks. No unrelated shutdown-suite gate; **do not bypass any mandatory security, payload-preservation or signing check**. If a genuine hard technical gate fails, report its exact error instead of mislabeling an artifact signed.
+5. **Deliver**: one actual original-key-signed combined **2103446 testing APK**, matching four component ZIPs, hashes, GitHub Action run/artifact links and a short physical Galaxy Fold test checklist (play local file A, immediately select B, Stop, back, reopen, confirm no stale A; observe Loading dialog with actual content). Preserve 2103445 and do not automatically lock or promote 2103446.
+6. **Candid limits**: nine host tests are not physical Android confirmation. MiXplorer's actual intent MIME/URI is not yet captured, so the scoped fix might not exercise this device's route. The Loading overlay remains unidentified, native playback callback drain stalled for unknown reasons, SIGSEGV/screen-off ANR producer not definitively bound. The candidate **does not purport to repair those**. Clearly report any persistent loading/freeze to inform an optional separate targeted follow-up after physical testing.
+
+**Decision:** The user prioritizes a real, narrowly scoped APK testing candidate now rather than indefinitely delaying for an investigation into unproven extra causes. The authorization does not license native/chooser/Cobra/shutdown code changes or acceptance of failed signing/security gates. No user-device test is required to *call it a candidate*; it remains unaccepted until the user tests it on the Fold.
+
+**Status at note creation:** authorization/handoff only. No APK yet built or signed by creation of this file.
