@@ -22,6 +22,14 @@ def launcher_icon_guard():
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
     return module
 
+def external_player_manifest_guard():
+    """Fixed user-authorized445 manifest transformer; never arbitrary authority code."""
+    import importlib.util
+    path=HERE.parent/'infinity-2103445-standalone-external-player/release_guard.py'
+    spec=importlib.util.spec_from_file_location('_infinity_external_player_manifest_guard',path)
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+    return module
+
 def guarded(key):
     if not key.startswith('class:Lcom/projectinfinity/kodi/'):return False
     return key.split('/')[-1].split('$')[0].rstrip(';') in GUARDED_ROOTS
@@ -52,6 +60,8 @@ def validate(authority):
     require(authority.get('accepted_pointer_updated') is False,'PHYSICAL_ACCEPTANCE_REQUIRED')
     if 'launcher_icon_exception' in authority:
         launcher_icon_guard().validate(authority)
+    if 'external_player_manifest_exception' in authority:
+        external_player_manifest_guard().validate(authority)
     # The three displayed labels come from actual packaged metadata, not UI constants.
     # The third (app) version is read from Android's signed PackageInfo.
     labels=authority.get('experience_version_labels')
@@ -95,7 +105,10 @@ def transition(previous,proposed,targets):
         # The current user explicitly authorized only launcher artwork and safe
         # day/night resource selection.  All shared executable/native/manifest
         # and unrelated resource bytes remain subject to the original freeze.
-        launcher_icon_guard().transition(previous,proposed,targets)
+        if 'external_player_manifest_exception' in proposed:
+            external_player_manifest_guard().transition(previous,proposed,targets)
+        else:
+            launcher_icon_guard().transition(previous,proposed,targets)
     else:
         require(targets<={'INFINITY','COBRA','CHOOSER_SHELL'},'SEPARATE_SHARED_SCOPE_REQUIRED')
         require(proposed.get('launcher_icon_exception')==previous.get('launcher_icon_exception'),
@@ -170,4 +183,6 @@ def verify_evidence(authority,read):
     require(digest(read('.github/workflows/infinity-combined-release.yml'))==authority['workflow_sha256'],'SIGNING_WORKFLOW_CHANGED')
     if 'launcher_icon_exception' in authority:
         launcher_icon_guard().verify_evidence(authority,read)
+    if 'external_player_manifest_exception' in authority:
+        external_player_manifest_guard().verify_evidence(authority,read)
     return True

@@ -14,6 +14,20 @@ METHODS={'onCreate(Landroid/os/Bundle;)V','onNewIntent(Landroid/content/Intent;)
 def run(*args):subprocess.run(list(map(str,args)),check=True)
 def classes(directory):return {p.read_text().splitlines()[0].split()[-1]:p for p in directory.rglob('*.smali')}
 def methods(raw):return {m.group(1).split()[-1]:m.group(0) for m in re.finditer(r'^\.method ([^\n]+)\n.*?^\.end method',raw,re.M|re.S)}
+def canonical_body(body):
+    names={}
+    def name(m):
+        label=m.group(0)
+        if label not in names:names[label]=':label_'+str(len(names))
+        return names[label]
+    return '\n'.join(line.strip() for line in re.sub(r':[A-Za-z_]+_[0-9a-f]+',name,body).splitlines() if line.strip())
+def original_instructions_preserved(original,revised):
+    # Cut exactly the new early routing block, then compare the complete old
+    # method body with labels normalized for baksmali's sequential renumbering.
+    old=original[original.index('\n',original.index('    .registers'))+1:]
+    marker=re.search(r'    invoke-static \{p0, v0\}, Lcom/projectinfinity/kodi/ExternalVideoRoute;->open\(Landroid/app/Activity;Landroid/content/Intent;\)V\s+return-void\s*((?:\.line \d+\s*)*):cond_[0-9a-f]+\n',revised)
+    assert marker is not None
+    assert canonical_body(old)==canonical_body(marker.group(1)+revised[marker.end():])
 def patch_splash(raw):
     before=methods(raw)
     for name in METHODS:
@@ -84,6 +98,7 @@ def build(out,bundles):
                 # after removing only its approved prefix then normalize labels.
                 a=methods(old);b=methods(new);assert a.keys()==b.keys()
                 altered={k for k in a if a[k]!=b[k]};assert altered==METHODS
+                for k in METHODS:original_instructions_preserved(a[k],b[k])
                 for k in a.keys()-METHODS:assert a[k]==b[k]
                 assert re.sub(r'^\.method [^\n]+\n.*?^\.end method','',old,flags=re.M|re.S)==re.sub(r'^\.method [^\n]+\n.*?^\.end method','',new,flags=re.M|re.S)
                 changed.append(n)

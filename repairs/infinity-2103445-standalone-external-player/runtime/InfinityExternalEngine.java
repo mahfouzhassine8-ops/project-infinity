@@ -35,6 +35,7 @@ public final class InfinityExternalEngine {
     private volatile boolean prepared;
     private boolean buffering;
     private Runnable deadline;
+    private Runnable ticker;
     private float volume = 1f;
     private android.view.Surface surface;
     private long startPosition;
@@ -166,11 +167,18 @@ public final class InfinityExternalEngine {
         if (!current(id, p) || !prepared) return;
         try {
             position(id, p);
-            if (p.isPlaying()) worker.postDelayed(() -> tick(id, p), 500);
+            if (p.isPlaying() && ticker != null) worker.postDelayed(ticker, 500);
         } catch (IllegalStateException invalid) { emit(id, "error", "Playback is no longer available. Reopen the video."); }
     }
-    public void play() { command(p -> { p.start(); emit(epoch, buffering ? "buffering" : "playing", ""); tick(epoch, p); }); }
-    public void pause() { command(p -> { p.pause(); position(epoch, p); emit(epoch, "paused", ""); }); }
+    public void play() { command(p -> {
+        if (ticker != null) worker.removeCallbacks(ticker);
+        final long id = epoch; ticker = () -> tick(id, p);
+        p.start(); emit(id, buffering ? "buffering" : "playing", ""); ticker.run();
+    }); }
+    public void pause() { command(p -> {
+        if (ticker != null) worker.removeCallbacks(ticker);
+        p.pause(); position(epoch, p); emit(epoch, "paused", "");
+    }); }
     public void seek(int ms) { command(p -> { p.seekTo(Math.max(0, ms)); }); }
     private interface Operation { void run(MediaPlayer player); }
     private void command(Operation operation) {
@@ -216,6 +224,7 @@ public final class InfinityExternalEngine {
     public void suspend() { ++epoch; worker.post(this::releasePlayer); }
     private void releasePlayer() {
         if (deadline != null) { ui.removeCallbacks(deadline); deadline = null; }
+        if (ticker != null) { worker.removeCallbacks(ticker); ticker = null; }
         prepared = false; buffering = false;
         if (player != null) { player.setOnErrorListener(null); player.release(); player = null; }
     }

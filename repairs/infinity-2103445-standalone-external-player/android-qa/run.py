@@ -14,7 +14,7 @@ def adb(*args,timeout=45):return run('adb',*args,timeout=timeout)
 def shell(*args,timeout=45):return adb('shell',*args,timeout=timeout).decode(errors='replace')
 def check(ok,why):
  if not ok:raise AssertionError(why)
-def record(name,**values):steps.append(dict(check=name,**values))
+def record(check_name,**values):steps.append(dict(check=check_name,**values))
 def screenshot(name):
  raw=adb('exec-out','screencap','-p');(out/(name+'.png')).write_bytes(raw);return Image.open(io.BytesIO(raw)).convert('RGB')
 def nodes():
@@ -97,8 +97,9 @@ def body(a):
  tap('Pause');await_text('Play');paused=text(nodes());time.sleep(1.2);check(text(nodes())==paused,'Paused clock changed');record('pause_stops_clock')
  tap('Play');await_text('Pause')
  tree=nodes();s=find(tree,'Seek video');check(s is not None,'Actual seekbar');b=bounds(s)
- shell('input','tap',str(b[0]+(b[2]-b[0])//3),str((b[1]+b[3])//2));time.sleep(.5)
- clock=text(nodes());check(re.search(r'\b[1-2]:\d\d / 3:00',clock) is not None,'Seek changes actual playback position');record('seek_changes_position')
+ shell('input','tap',str(b[0]+(b[2]-b[0])//4),str((b[1]+b[3])//2));time.sleep(.5)
+ clock=text(nodes());match=re.search(r'\b(\d+):(\d\d) / 10:00',clock)
+ check(match is not None and 130<=int(match[1])*60+int(match[2])<=175,'Seek changes actual playback position');record('seek_changes_position')
  strip_to('Mute');tap('Mute');await_text('Unmute');tap('Unmute');await_text('Mute');record('mute_toggle')
  strip_to('Audio');tap('Audio');await_text('Audio');screenshot('audio-menu');shell('input','keyevent','4')
  strip_to('Subtitles');tap('Subtitles');await_text('Subtitles');screenshot('subtitle-menu');shell('input','keyevent','4')

@@ -10,7 +10,7 @@ def run(*a):subprocess.run(list(map(str,a)),check=True)
 def main(a):
  a.out.mkdir(parents=True);media=a.out/'media';media.mkdir()
  for name,color,tone in [('a','red',440),('b','green',660),('c','blue',880),('end','yellow',550)]:
-  run('ffmpeg','-hide_banner','-loglevel','error','-f','lavfi','-i',f'color=c={color}:s=640x360:r=24','-f','lavfi','-i',f'sine=frequency={tone}:sample_rate=48000','-t','3' if name=='end' else '180','-c:v','libx264','-preset','ultrafast','-pix_fmt','yuv420p','-c:a','aac','-movflags','+faststart',media/(name+'.mp4'))
+  run('ffmpeg','-hide_banner','-loglevel','error','-f','lavfi','-i',f'color=c={color}:s=640x360:r=24','-f','lavfi','-i',f'sine=frequency={tone}:sample_rate=48000','-t','3' if name=='end' else '600','-c:v','libx264','-preset','ultrafast','-pix_fmt','yuv420p','-c:a','aac','-movflags','+faststart',media/(name+'.mp4'))
  run('ffmpeg','-hide_banner','-loglevel','error','-f','lavfi','-i','sine=frequency=440:sample_rate=48000','-t','10','-c:a','aac',media/'audio.mp4')
  (media/'bad.mp4').write_bytes(b'not a video\n')
  assert file_sha(a.baseline)=='b7e78393ade7e52d8653823a0ad72ae99614a5a8e0b6cdedf5d5d15a9e643400'
