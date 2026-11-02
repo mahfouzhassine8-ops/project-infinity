@@ -28,6 +28,12 @@ public final class SourceActivity extends Activity {
         add("Denied A",()->open("denied.mp4",false,false,false));
         add("HTTP A",()->open("a.mp4",false,false,true));
         add("Handler labels",()->labels());
+        if(saved==null) requestedOpen(getIntent());
+    }
+    @Override protected void onNewIntent(Intent request){super.onNewIntent(request);setIntent(request);requestedOpen(request);}
+    void requestedOpen(Intent request){
+        String file=request.getStringExtra("resume.fixture.open");request.removeExtra("resume.fixture.open");
+        if(file!=null && file.matches("(a|b|c)\\.mp4"))open(file,true,false,false);
     }
     void add(String text,Runnable action){Button b=new Button(this);b.setText(text);b.setAllCaps(false);b.setOnClickListener(v->action.run());list.addView(b);}
     void open(String file,boolean grant,boolean send,boolean http){

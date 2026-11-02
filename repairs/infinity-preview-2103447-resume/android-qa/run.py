@@ -26,7 +26,8 @@ def seek(fraction):
   time.sleep(.2)
  raise AssertionError('Actual seek did not reach expected region')
 def offer(label,expected,choice='Resume'):
- q.await_text(label);q.tap(label);q.await_text('Resume video?')
+ if label is not None:q.await_text(label);q.tap(label)
+ q.await_text('Resume video?')
  words=q.text(q.nodes());m=re.search(r'Continue from (\d+:\d\d(?::\d\d)?)\?',words)
  q.check(m is not None and abs(seconds(m[1])-expected)<=2,'Wrong per-video offered time: '+words)
  q.check('Loading' not in words,'Loading obscures prepared resume choice')
@@ -55,7 +56,7 @@ def stop_observer():
   try:q.observer.stdin.write(b'QUIT\n');q.observer.stdin.flush();q.observer.wait(timeout=5)
   except Exception:q.observer.terminate()
   q.observer=None
-def source():q.shell('am','start','-n',q.SOURCE+'/qa.external.SourceActivity');q.await_text('Open A')
+def source():q.shell('am','start','-W','-n',q.SOURCE+'/qa.external.SourceActivity');q.await_text('Open A')
 def body(a):
  q.check(q.shell('getprop','ro.kernel.qemu').strip()=='1','Disposable emulator only')
  q.check(not q.shell('pm','list','packages',q.P).strip(),'No existing installation may be replaced in this fixture')
@@ -115,8 +116,14 @@ def body(a):
   if q.shell('getprop','sys.boot_completed').strip()=='1':break
   time.sleep(1)
  q.check(q.shell('getprop','sys.boot_completed').strip()=='1','Reboot not completed')
- q.shell('input','keyevent','224');q.shell('wm','dismiss-keyguard');q.start_observer(a.prepared);source()
- offer('Open B',b_position);b_position=pause();q.source_return();q.record('reboot_keeps_private_resume_database',B=b_position)
+ q.shell('input','keyevent','224');q.shell('wm','dismiss-keyguard');q.start_observer(a.prepared)
+ # The previous reboot exposed the source window but its input was not
+ # delivered; no Infinity launch existed in logcat. Send an explicit request
+ # to the disposable source Activity, which issues its original granted
+ # ACTION_VIEW through the unchanged Splash gateway. Resume/Start Over remain
+ # actual button presses; no private Activity or production callback is invoked.
+ q.shell('am','start','-W','-n',q.SOURCE+'/qa.external.SourceActivity','--es','resume.fixture.open','b.mp4')
+ offer(None,b_position);b_position=pause();q.source_return();q.record('reboot_keeps_private_resume_database',B=b_position)
  # Cover, inner and landscape dimensions: actual observed screenshot bounds,
  # real seek/control-strip gestures; no claim of physical Fold hardware.
  for viewport in ('1080x2520','1600x1680','2520x1080'):
