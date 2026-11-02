@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-preview-2103447-resume/android-qa/run.py", line 174, in <module>
+    try:(body_remaining if a.segment=='remaining' else body)(a);status='PASS'
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-preview-2103447-resume/android-qa/run.py", line 154, in body_remaining
+    remaining(b_position)
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-preview-2103447-resume/android-qa/run.py", line 159, in remaining
+    q.shell('wm','size',viewport);source();q.open_video('Open C','blue','c.mp4')
+                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-2103445-standalone-external-player/android-qa/run.py", line 120, in open_video
+    await_text(label);tap(label);await_text(title);strip_to('Pause');await_text('Pause')
+                                 ^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-2103445-standalone-external-player/android-qa/run.py", line 102, in await_text
+    raise AssertionError('UI target not observed: '+label)
+AssertionError: UI target not observed: c.mp4

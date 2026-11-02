@@ -8,6 +8,20 @@ from pathlib import Path
 H=Path(__file__).resolve().parents[1];R=H.parents[1]
 spec=importlib.util.spec_from_file_location('external_observer',R/'repairs/infinity-2103445-standalone-external-player/android-qa/run.py')
 q=importlib.util.module_from_spec(spec);spec.loader.exec_module(q)
+original_tap=q.tap
+def unobscured_tap(label):
+ # Android's resize snapshot blocks otherwise-correct input coordinates.
+ # Run 41438660016 logged BLOCK_UNTRUSTED and dropped the source tap while
+ # that system layer existed. Observe its removal; do not disable animations
+ # or touch security, sleep for a guessed duration, or change the player.
+ deadline=q.feature_time()+18
+ while q.feature_time()<deadline:
+  layers=q.shell('dumpsys','SurfaceFlinger','--list')
+  if 'transition snapshot: Display' not in layers:
+   original_tap(label);return
+  time.sleep(.1)
+ raise AssertionError('System resize snapshot still obscures requested input')
+q.tap=unobscured_tap
 def observed_strip_to(label):
  # Keep the original four-swipe budget. The old helper failed immediately
  # after its fourth swipe, without observing the control that it revealed.
