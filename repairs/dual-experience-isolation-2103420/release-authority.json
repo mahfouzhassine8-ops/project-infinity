@@ -6,12 +6,12 @@
   "bundle_catalog": {
     "bundles": {
       "CHOOSER_SHELL": {
-        "approved_source": "73edb4f25b9e25d67cd8e0c41d44e74931f2b8ef",
-        "digest": "56a9ed696aa1e9335b690ea2c6eeb1ff12259ae57bfb3c27e409f742502d1847",
+        "approved_source": "e79993aee24dde6372d16f756633473dcdb2b5bb",
+        "digest": "0448227d8bba306deb9595d2bdfef1310a9045d8923655acdd7765d46933ea2e",
         "file": "CHOOSER_SHELL.zip",
         "settings_schema": "original-launch-preference",
-        "sha256": "2a0d5f73a0289f64f2caa8fe8f7ce1f2e3234116ff76e699f2f773bab0aa14ba",
-        "version": "2103445.version-metadata.1"
+        "sha256": "6abdc79211df73a95fe1a0828c6e149121d2eef90f1a4b70217d269d258892c4",
+        "version": "2103446.version-metadata.1"
       },
       "COBRA": {
         "approved_source": "73edb4f25b9e25d67cd8e0c41d44e74931f2b8ef",
@@ -22,12 +22,12 @@
         "version": "2103445.cobra.1"
       },
       "INFINITY": {
-        "approved_source": "116d7146d0ceeaa3d6b3b1b98799c62b515fea0a",
-        "digest": "b772edc974ad9889a8d50f6a82792eed2e0c73e67c7f7069c279912ac1ac4235",
+        "approved_source": "e79993aee24dde6372d16f756633473dcdb2b5bb",
+        "digest": "df4dfb12689e9714f3e05d28ee522945532f228fb0ca534c1d59cebe31e7df43",
         "file": "INFINITY.zip",
         "settings_schema": "original-2103420",
-        "sha256": "d03b4d5e845dfb5e1d6bb75c1967c7b6a2e55c5b17a7c65d66d43d43abd2e73d",
-        "version": "2103437.infinity.loading.2"
+        "sha256": "b1d96232b15318765a9ebe052634b0f866225db76bce69f3a188b0795fe8919a",
+        "version": "2103446.infinity.external-request-race.1"
       },
       "MINIMAL_ANDROID_CONTRACT": {
         "approved_source": "b41d51daa8b32dfee265dc9ea0abf844bff8f44e",
@@ -42,14 +42,14 @@
     "package": "com.projectinfinity.kodi",
     "release_approved": false,
     "schema": 1,
-    "source": "73edb4f25b9e25d67cd8e0c41d44e74931f2b8ef"
+    "source": "e79993aee24dde6372d16f756633473dcdb2b5bb"
   },
   "bundle_sources": {
     "CHOOSER_SHELL": {
-      "artifact": "Infinity445-Prepared-41349307267",
-      "build_source": "73edb4f25b9e25d67cd8e0c41d44e74931f2b8ef",
+      "artifact": "Infinity446-Prepared-41381663222",
+      "build_source": "e79993aee24dde6372d16f756633473dcdb2b5bb",
       "path": "components/CHOOSER_SHELL.zip",
-      "run_id": 41349307267
+      "run_id": 41381663222
     },
     "COBRA": {
       "artifact": "Infinity445-Prepared-41349307267",
@@ -58,10 +58,10 @@
       "run_id": 41349307267
     },
     "INFINITY": {
-      "artifact": "Infinity437-Prepared-41193983471",
-      "build_source": "116d7146d0ceeaa3d6b3b1b98799c62b515fea0a",
+      "artifact": "Infinity446-Prepared-41381663222",
+      "build_source": "e79993aee24dde6372d16f756633473dcdb2b5bb",
       "path": "components/INFINITY.zip",
-      "run_id": 41193983471
+      "run_id": 41381663222
     },
     "MINIMAL_ANDROID_CONTRACT": {
       "artifact": "Cobra-Prepared-Owners-40971144336",
@@ -70,15 +70,15 @@
       "run_id": 40971144336
     }
   },
-  "candidate_versionCode": 2103445,
+  "candidate_versionCode": 2103446,
   "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
   "components": {
     "CHOOSER_SHELL": {
-      "approved_source": "73edb4f25b9e25d67cd8e0c41d44e74931f2b8ef",
-      "digest": "56a9ed696aa1e9335b690ea2c6eeb1ff12259ae57bfb3c27e409f742502d1847",
-      "revision": 23,
+      "approved_source": "e79993aee24dde6372d16f756633473dcdb2b5bb",
+      "digest": "0448227d8bba306deb9595d2bdfef1310a9045d8923655acdd7765d46933ea2e",
+      "revision": 24,
       "settings_schema": "original-launch-preference",
-      "version": "2103445.version-metadata.1"
+      "version": "2103446.version-metadata.1"
     },
     "COBRA": {
       "approved_source": "73edb4f25b9e25d67cd8e0c41d44e74931f2b8ef",
@@ -88,11 +88,11 @@
       "version": "2103445.cobra.1"
     },
     "INFINITY": {
-      "approved_source": "116d7146d0ceeaa3d6b3b1b98799c62b515fea0a",
-      "digest": "b772edc974ad9889a8d50f6a82792eed2e0c73e67c7f7069c279912ac1ac4235",
-      "revision": 6,
+      "approved_source": "e79993aee24dde6372d16f756633473dcdb2b5bb",
+      "digest": "df4dfb12689e9714f3e05d28ee522945532f228fb0ca534c1d59cebe31e7df43",
+      "revision": 7,
       "settings_schema": "original-2103420",
-      "version": "2103437.infinity.loading.2"
+      "version": "2103446.infinity.external-request-race.1"
     },
     "MINIMAL_ANDROID_CONTRACT": {
       "approved_source": "b41d51daa8b32dfee265dc9ea0abf844bff8f44e",
@@ -104,11 +104,11 @@
   },
   "experience_version_labels": {
     "COBRA": 2103445,
-    "INFINITY": 2103437
+    "INFINITY": 2103446
   },
-  "generation": 32,
+  "generation": 33,
   "guard_schema": 2,
-  "last_issued_versionCode": 2103444,
+  "last_issued_versionCode": 2103445,
   "launcher_icon_exception": {
     "added_members": {
       "res/infinity_launcher_light_hdpi.png": "e059b58ec3af72994725510e2e4e518879ed36eb654b050463b3e98d94685f3c",
@@ -154,43 +154,65 @@
     }
   },
   "owner_update_evidence": {
-    "Android": "DEFERRED_TO_USER_FOLD_BY_EXPLICIT_AUTHORIZATION",
+    "Android": "UNVERIFIED_SCOPED_TESTING_CANDIDATE_EXPLICITLY_AUTHORIZED",
     "accepted_pointer_updated": false,
     "artifact": {
-      "digest": "sha256:d3617043207e770909f5ad8cb08c6705ca5162068d3ce4c5cefea1cec7467df5",
-      "id": 13100831220,
-      "name": "Infinity445-Prepared-41349307267",
-      "size_in_bytes": 320940635
+      "digest": "sha256:8da73a51a4dea53d7f7502f926c760430ea592eaa9d6ee56bd0d101045eb0a1f",
+      "id": 13113409158,
+      "name": "Infinity446-Prepared-41381663222",
+      "size_in_bytes": 320946685
     },
     "frozen_owners": [
-      "INFINITY",
+      "COBRA",
       "MINIMAL_ANDROID_CONTRACT"
     ],
-    "owner": "COBRA_ROTATION_FULLSCREEN_AUDIO",
-    "preparation_sha256": "a40dc6b1e03cce94c64768c96c0595fdf449fc9f2dc6d922f06ac1a2af50741c",
-    "producer_run": 41349307267,
-    "producer_source": "73edb4f25b9e25d67cd8e0c41d44e74931f2b8ef",
+    "limitations": [
+      "Actual MiXplorer MIME/URI not captured; scoped video-MIME local ACTION_VIEW applicability unverified",
+      "Loading overlay owner and automatic dismissal not repaired or verified",
+      "Native Stop/ANR and separate SIGSEGV remain unresolved, historical producer versions unbound",
+      "Android observation stopped at first-launch prompts; no real playback PASS",
+      "Physical Fold acceptance pending; no lock or promotion"
+    ],
+    "owner": "INFINITY_EXTERNAL_REQUEST_RACE",
+    "preparation_sha256": "02249b65ecf0095273cc49491a3eaef17810f9987e3aa4f4e264e91df3db6c70",
+    "producer_run": 41381663222,
+    "producer_source": "e79993aee24dde6372d16f756633473dcdb2b5bb",
+    "reused_host_tests": 9,
     "source_files": {
-      "repairs/cobra-2103444-rotation-audio/METHOD-ALLOWLIST.json": "9aeba0ab1b0befb45a2b5f2528c016cf6c95cb31b347b5012135eeda2cd93518",
-      "repairs/cobra-2103444-rotation-audio/NEW-CLASS-METHODS.json": "c17022dfe1cd8f11faabec489a0b384f9d3c04ce4d736d265f05c1f233bbb763",
-      "repairs/cobra-2103444-rotation-audio/PreserveCobraDexPartition.java": "73333ed7bc4e67dec1c9ad2ba41a6dca48b9ed2f4e26c96a28099b1ddae3c705",
-      "repairs/cobra-2103444-rotation-audio/RotationAudioTest.java": "d258f3d2275140ad9cff0b10883a0f4e66a45d088c111496325fb27cb6dc1a01",
-      "repairs/cobra-2103444-rotation-audio/SCOPE.json": "691db84976b885a4db11a721dd4f56708a5e41d3b09820d75e2495806641a391",
-      "repairs/cobra-2103444-rotation-audio/build_owner.py": "9afbd01b6f71c3f7cce69f3c1e2b0adde5bed4011b3c9b60d6ddd377ab88d04c",
-      "repairs/cobra-2103444-rotation-audio/evidence/initial-host/INTERPRETATION.json": "7135f01026be637886f7bfff6a5b7779e843ba02fa7a151a5063bdb6bf322e40",
-      "repairs/cobra-2103444-rotation-audio/final-evidence/CLASS-HASHES.json": "532a10981727da8401184694f83166fef1bab24d6084d6f1e506931ef93d2532",
-      "repairs/cobra-2103444-rotation-audio/final-evidence/OWNER-BUILD.json": "8d5226a138e854bedf48406b5ff0ed275b7a89fa7d88104415b33df097064d5a",
-      "repairs/cobra-2103444-rotation-audio/final-evidence/OWNER-PRESERVATION.json": "4775f8de6633a302e41cd84562b1df40c5bdfa4fbd982aac35365405139e3988",
-      "repairs/cobra-2103444-rotation-audio/final-evidence/TEST-RESULTS.json": "a4634785d462c23a85fe7e7316bc8bf0999712b7d15bb0ee65e5a6efd39405e8",
-      "repairs/cobra-2103444-rotation-audio/final-evidence/UNCHANGED-ACTIVITY-METHODS.json": "5f74461d14022a000b3b5f303dc98833fa733665895febc6467ab3e4cc8e8af3",
-      "repairs/cobra-2103444-rotation-audio/final-evidence/UNCHANGED-PREVIEW-OWNER-METHODS.json": "49b780450d055d31a14fdbcefd9b0b59b690a0bd41f191f8e0f9f57b5ebbb268",
-      "repairs/cobra-2103444-rotation-audio/patch_native.py": "4f188c469cc32e2ce02e1dce0fee48cbb4f18fe07b5d9c8c857e89ce62b186ff",
+      ".github/workflows/infinity-combined-release.yml": "ff205fe3446a765acbbbf615512c3f1da9683d29a83bea7eb6ef8be38f1017f9",
       "repairs/cobra-2103444-rotation-audio/release445.py": "a2cc0760c114581a9000e249bc4d8f390b80005335da87e84bd9314d8c317e37",
-      "repairs/cobra-2103444-rotation-audio/runtime/CobraFullscreenAudio.java": "de782933b8a830a7cf8367cf62a6f990f6a5ee0ebd6cf7f6255951f59ec01a45",
-      "repairs/cobra-2103444-rotation-audio/runtime/CobraRotationPolicy.java": "f5b7f2ca310f727f86480110371a73b9de23b4317fa409267f84e63055fe5a70",
-      "repairs/cobra-2103444-rotation-audio/tests/test_release445.py": "7b0c1c2b0e781e2d9ff7d050ab5004ccaa9eacdb38f707fd3b25c44bcf19a6cf",
-      "repairs/cobra-2103444-rotation-audio/verify_owner.py": "e67e113c7ec9e6f4dd7ad0d7b52410e0c184fb1a6f4f1e6d2ec7c550c1d2b9e9",
-      "repairs/dual-experience-isolation-2103420/ModuleDexWriter.java": "f9c1b6da2552d529f27709b5f1c53368cacfab42d83fc947cb3b16cd0416dad2"
+      "repairs/infinity-2103445-external-video-lifecycle/ANDROID-QA-41379038225-READ-ONLY-OUTCOME.md": "48554478d66b27b3cc77e52127554bdef9b45549a265e9c27ffc064dd0219c26",
+      "repairs/infinity-2103445-external-video-lifecycle/ANDROID-QA-41379570028-READ-ONLY-OUTCOME.md": "77ad23fa48f68b19b4b5734fb9efb56417f0d9399402c561c74496f62ad2f4aa",
+      "repairs/infinity-2103445-external-video-lifecycle/AUTHORIZATION-2103446-FOCUSED-TEST-APK.md": "35df8013e47caad3fb5d5114b20776072805ca58ee4f2def61f16998d4245f8e",
+      "repairs/infinity-2103445-external-video-lifecycle/BaselineExternalIntentOrderTest.java": "84465fa5f0d340ad44b03a0f7b0c31ca379d92724070184489b997ef1b092bef",
+      "repairs/infinity-2103445-external-video-lifecycle/DIAGNOSTIC-AND-TARGETED-CORRECTION-BRIEF.md": "ae27d8833188571c5f116bcdf34672dbe95edb12dccbe82d9d4780dcd6f936de",
+      "repairs/infinity-2103445-external-video-lifecycle/ExternalVideoIntentPolicyTest.java": "3145f6ca575b1e41fadb1a8e01a70ce84f53daf76434995ca335a7f8f0e5db86",
+      "repairs/infinity-2103445-external-video-lifecycle/INVESTIGATION-AND-BLOCKERS.md": "a4076bd61d77ee48ff1db967301c0a9d9cd590cd71647bf490d3b61bc8dbe2ec",
+      "repairs/infinity-2103445-external-video-lifecycle/PreserveInfinityExternalDex.java": "2779cae90585b0eed401ecaf0dbbd5ba584c49bdb2c2e8fcbf3a97e55b9e970b",
+      "repairs/infinity-2103445-external-video-lifecycle/READ-ONLY-DIAGNOSTIC-FOLLOWUP.md": "cbc2e9d6cad0014081c8869c6a661565cce3ab3ffde974c85cb639573e46063b",
+      "repairs/infinity-2103445-external-video-lifecycle/READ-ONLY-WORKER-DEPENDENCIES.md": "f24b89e382237e92b32f6f6a7525fea76c62029a75f03b35c3c49a9b5fafd5f5",
+      "repairs/infinity-2103445-external-video-lifecycle/RELEASE-2103446-AUTHORIZATION.md": "efd5471e4398abba88326fa49d317f050a76fd22fd976fc3c64e8cc591abf58e",
+      "repairs/infinity-2103445-external-video-lifecycle/RELEASE-PREPARATION-NOTES.md": "b30a4e37666b4c024b298854b13e641bec975fac9d67e2d0e3d43f2199150902",
+      "repairs/infinity-2103445-external-video-lifecycle/RELEASE-SCOPE.json": "796987d51caf18eb5a41c9066030fb735bb46fdf084d3b1ece24addc725f4cd3",
+      "repairs/infinity-2103445-external-video-lifecycle/VERIFICATION-SELECTION.md": "8b205f610e79798abda36300056a8fd4f5c74fdacfc4a3d4216ffc69637f8741",
+      "repairs/infinity-2103445-external-video-lifecycle/android_qa/live_external_qa.py": "4c0b96ade33e6c969b7ee0af0666d49917c0e369debb7dd1449770aff57acb3e",
+      "repairs/infinity-2103445-external-video-lifecycle/build_owner.py": "73a08b8db15c2a7c8fa4c302f7914d5e64e8c1c8c7ec3a03678ec65730e41cc3",
+      "repairs/infinity-2103445-external-video-lifecycle/evidence/BASELINE-BINDING.json": "db3c845dc556940c694d5dee1e70d0bceb88eaa0a65c101a4ab34fffbb92a182",
+      "repairs/infinity-2103445-external-video-lifecycle/evidence/BASELINE-REPRODUCTION.xml": "12304fd3d8d15816425c467d2b1c57263a0f1d1687a9fbd3bf4227d656b8a480",
+      "repairs/infinity-2103445-external-video-lifecycle/evidence/CORRECTED-POLICY.xml": "02ff3ff74d922fccb03ca81396557af45aa132a11aa2404ebcdb65b2d1bae5e2",
+      "repairs/infinity-2103445-external-video-lifecycle/evidence/NATIVE-STOP-REFERENCE-MAPPING.json": "023b9230bb3fe2ca4c066534bcb96a5ca2cb14a4e218e55d515ac314cf96bce3",
+      "repairs/infinity-2103445-external-video-lifecycle/evidence/OWNER-PRESERVATION.json": "f392e0d72d9ff93a80dad197eb1ffdeb043da6b00657a9aca530a2cfea6bd1da",
+      "repairs/infinity-2103445-external-video-lifecycle/evidence/PRIVATE-DIAGNOSTIC-ACCESS-STATUS.json": "fdc39c0738f5c2593e5d2a4f542c397ca8df3f2dfd58072541ac5e1cd4e7a4ee",
+      "repairs/infinity-2103445-external-video-lifecycle/evidence/READ-ONLY-WORKER-DEPENDENCIES.json": "9fe4f39817f909406f03f9249543f887edd6095d2f519bbaf297b250917d5838",
+      "repairs/infinity-2103445-external-video-lifecycle/evidence/TEST-RESULTS.json": "b3dce0270ffa755c8d9744dee744443315861551d924da26683e9360f696ff6d",
+      "repairs/infinity-2103445-external-video-lifecycle/evidence/UNCHANGED-MAIN-METHODS.json": "3a85f97585de1baadce715eac77358be1e7825ed9a5139241a81415412118d7c",
+      "repairs/infinity-2103445-external-video-lifecycle/evidence/initial-candidate/TEST-com.projectinfinity.kodi.ExternalVideoIntentPolicyTest.xml": "16d9e753017d9a7936233251f772b48755d83d43701f04409fe763aad2e39544",
+      "repairs/infinity-2103445-external-video-lifecycle/inspection/inspect_reference_elf.py": "1c6c0e72a467818ec3bd71f63afa03fc4ef118dbe5a832bbe49853cb39c92166",
+      "repairs/infinity-2103445-external-video-lifecycle/inspection/inspect_worker_reference_elf.py": "dc73d65b469340955af3bb9b4b2dd932886c74509c9f197e405d03ff33e5e45c",
+      "repairs/infinity-2103445-external-video-lifecycle/patch_external_intents.py": "30e8490a3d4bdbfc28a27369257586220b3fdd9848dc1ff8ec379277c9b069c0",
+      "repairs/infinity-2103445-external-video-lifecycle/release446.py": "81af7ef9c2a8eeb624be543ba6ae03cf256bda3499cff43ee2e702e6f46f4a8e",
+      "repairs/infinity-2103445-external-video-lifecycle/runtime/InfinityExternalVideoIntents.java": "2f00971d632e6814cbeb828579d84eb3303e10a735056d25ca4146c3a33c6604",
+      "repairs/infinity-2103445-external-video-lifecycle/tests/test_release446.py": "71c57b23b7705586a52c94422f3f0f8f70cb53e8d8ef932f6e7a411239fe0624"
     }
   },
   "package": "com.projectinfinity.kodi",
@@ -25971,6 +25993,14 @@
       "owner": "INFINITY",
       "sha256": "9943c8de3f9b0d1c569ccdef7e2719492804e02447e6073e671004c79d58f306"
     },
+    "class:Lcom/projectinfinity/kodi/InfinityExternalVideoIntents$State;": {
+      "owner": "INFINITY",
+      "sha256": "1802344bfa1626fe4cd8874f5fa017eed434189322feae2f4450779e6c208623"
+    },
+    "class:Lcom/projectinfinity/kodi/InfinityExternalVideoIntents;": {
+      "owner": "INFINITY",
+      "sha256": "99d7d4d3610b81fd11e04388352cd41fadd71ccac3dd09363dbd9f72367ef7eb"
+    },
     "class:Lcom/projectinfinity/kodi/InfinityGlassArt;": {
       "owner": "CHOOSER_SHELL",
       "sha256": "dc6d66247b3b073102299a338543200daaff25b2d0349ee729e6e4aea21b5473"
@@ -29813,7 +29843,7 @@
     },
     "class:Lcom/projectinfinity/kodi/Main$3;": {
       "owner": "INFINITY",
-      "sha256": "e45e35fd0e3c1134fe6cbaf66992659e6bfe74f8bc093ee334c562573b5511bd"
+      "sha256": "65a77f940f29143cd1eb7e6693e92339e6733d3b77f4024a94818c4d28b9d470"
     },
     "class:Lcom/projectinfinity/kodi/Main$4;": {
       "owner": "INFINITY",
@@ -29829,7 +29859,7 @@
     },
     "class:Lcom/projectinfinity/kodi/Main;": {
       "owner": "INFINITY",
-      "sha256": "be1f22866428991d9f3566884526fd600da397ba3d7ca5bffc9f6d4c3bd3d0f9"
+      "sha256": "42bed80f6be9ddf4776bbb11aaf02a49002a60e4a1fe288e899ad56b3df46f66"
     },
     "class:Lcom/projectinfinity/kodi/OwnerDurabilityWiring$1;": {
       "owner": "MINIMAL_ANDROID_CONTRACT",
@@ -57721,7 +57751,7 @@
     },
     "member:assets/experience-component-updates.properties": {
       "owner": "CHOOSER_SHELL",
-      "sha256": "bb0ecd01a5073a8434554fe31ed56b3a9ccd74e463a8ac601ac09af4ebd1e723"
+      "sha256": "1a111c597d60a0a017025686d951dcb9369e6dfb83b8e9fc7c0a98d255b4eb4a"
     },
     "member:assets/infinity-2103395-components.json": {
       "owner": "INFINITY",
@@ -66625,7 +66655,7 @@
     "root": "CobraCardsTheme",
     "source_sha256": "58bd661ed94a2a949b459bab470c095bfb48d6d84d1e3fddc178f8ea21851864"
   },
-  "previous_authority_sha256": "9f6a3b6d7096735143b51ea5e7ed01fb1984f6fbd40dacc1688a79079f57e77a",
+  "previous_authority_sha256": "6abbe82203ab8ecd2bdd29fc3b3d622245484b2b6ea1580ab0b00c696f847766",
   "proofs": {
     "COMBINATION-CONTROLS.json": "bcb21adb63fefb898a8e8799d9892f76e382315518d8e94b51c42060cc5ece83",
     "OWNER-CONTRACT.json": "dd0fdfdcb7715777007984969bfac45b36f3e4ef04023b5ba1884c67904d0846",
@@ -66791,13 +66821,13 @@
     "repairs/dual-experience-isolation-2103420/component_bundles.py": "1aca1f237a1987998f243d013fde991413c491b9e72706deda4853b1b1d642d6",
     "repairs/dual-experience-isolation-2103420/create_authority.py": "be6da193e7fbc242fb84996ae7a0b463c7ede025687c7b71db14c8babfbc2672",
     "repairs/dual-experience-isolation-2103420/inventory.py": "574c64b0a15200ba6f9971a2834f6cdb629dddd5ab5418186c4d5255d6e73bcb",
-    "repairs/dual-experience-isolation-2103420/ownership-reviewed-roots.json": "6f3c14d2f079c29be2610d864b57bcd1440028be4e9147efa6ad573d018745a7",
+    "repairs/dual-experience-isolation-2103420/ownership-reviewed-roots.json": "ad846ada1a74a19db81dc76e116f5eee076b6fc5ba0c82766d3765751420c96c",
     "repairs/dual-experience-isolation-2103420/prepare_host_tests.py": "5d2671de5b361c5dbace42a5567a736226f50957353e77eec5a60042c631a3a7",
     "repairs/dual-experience-isolation-2103420/prepare_runtime.py": "e59faac2489d7ce3b0d2deae8469d627e8f463b8c445806b3d232ec572c3d1a7",
     "repairs/dual-experience-isolation-2103420/propose_cobra_reflow.py": "31dda989cdf3bc3d3372565fcb44e7dd5d11db935c6961ac3905e4a91df23425",
     "repairs/dual-experience-isolation-2103420/refresh_authority_evidence.py": "a2c0d74a831246bba1b53305d35a5273b8185cf1068c11dceb772df22d6519e5",
     "repairs/dual-experience-isolation-2103420/release_authority.py": "2bcc137d7220097a7a6bb0c2667e62bd8af7c1fb911eaa11291c2727b6f18878",
-    "repairs/dual-experience-isolation-2103420/release_gate.py": "745b4f4c18985c6385e352717153c018597f0465e45c72400063c73313fef20c",
+    "repairs/dual-experience-isolation-2103420/release_gate.py": "848a1db7e8df5c6cbf3064bccee59bcbdc03be374f8e538ee22c7eb7076149a9",
     "repairs/dual-experience-isolation-2103420/review_ownership.py": "c15ccd51c71fa2055d805a42ef2c8c8d32fac4672e983e61cba31f4be172fb83",
     "repairs/dual-experience-isolation-2103420/run_owner_contract_tests.py": "46e31c7079d5c2278ad0860d1f977b262813ad98065caa7b41bb9921b20f05ca",
     "repairs/dual-experience-isolation-2103420/runtime/CobraBackgroundSettings.java": "261857d5534c27b323ae17d63b006e095c54c49a159401fb970439b6b21a59eb",
@@ -66811,7 +66841,7 @@
     "repairs/dual-experience-isolation-2103420/runtime/ExperienceLaunchPreferences.java": "00628d662820955ffd29a7c82444f922947725d4d94ae91f74360f28588f9d0b",
     "repairs/dual-experience-isolation-2103420/runtime/InfinityComponent.java": "6bc9a7d6a3452761dab7973ff117cebb74794f8bf665a7f4b8550c7a7e1bccb2",
     "repairs/dual-experience-isolation-2103420/runtime/ShellComponent.java": "07eb02e03f5ba4445a4121e614cec62c149699bb76e0630d29e9b204ce633fcc",
-    "repairs/dual-experience-isolation-2103420/signer-policy.json": "554e1a4b0e7b455b2f374c4f6e1edf52224458c1565ea8338f75120941af63a2",
+    "repairs/dual-experience-isolation-2103420/signer-policy.json": "dd04206fc487986a0f01fdbc16e925e4a73d768c8987230c1e6f2e8c667a0f61",
     "repairs/dual-experience-isolation-2103420/signer_policy.py": "ee7e23d29858cc40d2a8e15e3b77f2d2299609b0eb2c7bde3b26647a549442bb",
     "repairs/dual-experience-isolation-2103420/test_actual_apk.py": "f9142e5e22f2f44bc8905ade54c4729b4b33f9ea077483e15f170b42caa97442",
     "repairs/dual-experience-isolation-2103420/test_component_matrix.py": "bdc9a3e0211a51801a94607d8a5b07ee11e6229b0cd56783df756d984a6d67b7",
@@ -66821,9 +66851,9 @@
   },
   "status": "ENGINEERING_REVIEWED_FOLD_PENDING",
   "target_owners": [
-    "COBRA",
+    "INFINITY",
     "CHOOSER_SHELL"
   ],
   "update_kind": "owner_update",
-  "workflow_sha256": "48020950ac4b03342668d2c3876e90ab5efe93786ac47f38cb2f6b045d241c69"
+  "workflow_sha256": "ff205fe3446a765acbbbf615512c3f1da9683d29a83bea7eb6ef8be38f1017f9"
 }

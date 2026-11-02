@@ -1,0 +1,35 @@
+{
+  "Cobra_shared_chooser_DEX_identical": true,
+  "added": [],
+  "all_nonversion_assets_resources_identical": true,
+  "baseline_sha256": "b7e78393ade7e52d8653823a0ad72ae99614a5a8e0b6cdedf5d5d15a9e643400",
+  "candidate_sha256": "e05b46b282ae94e4e7815fd9452f2cae1613b88df2459c901be1ef788b0d9451",
+  "changed_members": {
+    "AndroidManifest.xml": {
+      "after": "e37bec254ac435c9c16a71e6a8a85a97b8cb2465ae9cd7b10f84c1d6769eec31",
+      "before": "f53e75db187bbf0d2e47f4260db6e0235c8c265735274f14fb5495a932123a18"
+    },
+    "assets/experience-component-updates.properties": {
+      "after": "1a111c597d60a0a017025686d951dcb9369e6dfb83b8e9fc7c0a98d255b4eb4a",
+      "before": "bb0ecd01a5073a8434554fe31ed56b3a9ccd74e463a8ac601ac09af4ebd1e723"
+    },
+    "classes3.dex": {
+      "after": "d4f5f5003afe9e890d947505515f54d2ad507bf4b4fd3126ed5e2cdab751afe6",
+      "before": "7e18d8092de33a4d44e299305965e9b9eb943372a9643452f6f78afe209fb215"
+    }
+  },
+  "limitations": [
+    "Actual MiXplorer MIME/URI not captured; scoped video-MIME local ACTION_VIEW applicability unverified",
+    "Loading overlay owner and automatic dismissal not repaired or verified",
+    "Native Stop/ANR and separate SIGSEGV remain unresolved, historical producer versions unbound",
+    "Android observation stopped at first-launch prompts; no real playback PASS",
+    "Physical Fold acceptance pending; no lock or promotion"
+  ],
+  "native_libraries_unchanged": 47,
+  "physical_Fold": "PENDING",
+  "removed": [],
+  "shutdown": "UNCHANGED_NOT_TESTED",
+  "status": "PASS_EXACT445_APK_MEMBER_COMPARISON",
+  "unchanged_members": 7611,
+  "user_data": "NO_ACCESS"
+}
