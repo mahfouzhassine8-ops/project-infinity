@@ -106,10 +106,16 @@ def source_return(action='Back'):
  await_text('External video source fixture');record('originating_activity_return',action=action)
 def strip_to(label):
  for _ in range(4):
-  tree=nodes()
-  if find(tree,label) is not None:return
-  strips=[n for n in tree.iter('node') if n.attrib.get('class')=='android.widget.HorizontalScrollView']
+  deadline=time.monotonic()+18;strips=[]
+  # A selection callback dismisses its dialog asynchronously. Observe the real
+  # player strip before looking for a control or issuing another swipe.
+  while time.monotonic()<deadline:
+   tree=nodes()
+   strips=[n for n in tree.iter('node') if n.attrib.get('class')=='android.widget.HorizontalScrollView' and n.attrib.get('package')==P]
+   if strips:break
+   time.sleep(.1)
   check(strips,'Playback control scroll owner missing');b=bounds(strips[0]);y=(b[1]+b[3])//2
+  if find(tree,label) is not None:return
   # The previous right-30 origin entered Android's Back edge and exited the
   # player. Use the actual strip's interior, preserving system gesture policy.
   left=b[0]+(b[2]-b[0])//4;right=b[0]+(b[2]-b[0])*3//4

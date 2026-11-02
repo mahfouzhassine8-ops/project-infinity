@@ -122,7 +122,11 @@ def runtime_binding(build):
     require(load(build/'CLASS-HASHES.json')==load(H/'final-evidence/CLASS-HASHES.json'),'EXACT_TESTED_CLASS_DEFINITIONS')
     result=load(H/'final-evidence/ANDROID-RESULT.json')
     require(result['status']=='PASS','ACTUAL_ANDROID_DECODING_REQUIRED')
-    require(load(H/'final-evidence/HOST-RESULT.json')['tests']==11,'REQUEST_STATE_HOST_TESTS_REQUIRED')
+    host=load(H/'final-evidence/HOST-RESULT.json')
+    require(host['status']=='PASS' and host['tests']==11,'REQUEST_STATE_HOST_TESTS_REQUIRED')
+    binding=load(H/'final-evidence/HOST-SOURCE-BINDING.json')
+    require(binding['status']=='PASS_RETAINED_HOST_SOURCE_UNCHANGED','RETAINED_HOST_BINDING')
+    for name,pin in binding['sha256'].items():require(file_sha(REPO/name)==pin,'RETAINED_HOST_SOURCE_CHANGED:'+name)
     actual=result['source_build']['replaced']
     require(actual['classes.dex']==observed['deltas']['CHOOSER_SHELL']['dex_sha256'] and actual['classes3.dex']==observed['deltas']['INFINITY']['dex_sha256'],'RUNTIME_INSTALLED_DEX_BINDING')
     require(actual['AndroidManifest.xml']==observed['manifest_sha256'],'RUNTIME_INSTALLED_MANIFEST_BINDING')

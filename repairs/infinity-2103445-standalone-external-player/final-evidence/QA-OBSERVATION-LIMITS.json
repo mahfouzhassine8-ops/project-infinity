@@ -25,5 +25,13 @@
     ],
     "failure": "Next horizontal control swipe started at right-30, inside Android Back edge; source Activity became foreground",
     "correction": "Use measured strip quarter-to-three-quarter interior, log current coordinates; production unchanged"
+  },
+  "menu_transition": {
+    "run": 41403873183,
+    "artifact": 13122856853,
+    "sha256": "6e530e4970f2c87600af0592113f798ceaeede291a693e1dfd6bea8916535f5a",
+    "additional_pass": "Real Audio 2 selection",
+    "failure": "Immediate next hierarchy still owned by dismissing Audio dialog; screenshot afterward shows continuing player with dialog closed",
+    "correction": "Bounded actual player-strip ownership observation after all menu transitions; no arbitrary sleep or product changes"
   }
 }
