@@ -1,0 +1,8 @@
+{
+  "run": 41469905950,
+  "conclusion": "failure",
+  "artifact_id": 13154759008,
+  "artifact_sha256": "b4367fe4abb22aaf9901d59337790b07e35ec6abd4f7a07c3098af8b32c0bfe0",
+  "source": "51b3c914fdcfca3caf4e8b772918bde2207ea79c",
+  "finding": "Pause removes the existing position ticker; the regular seek callback publishes no paused position. The test observed the drag label rather than decoder state. Preserved Engine lines244-264 and callback contract identify this inherited behavior. QA will observe real playback ticks; production DEX unchanged."
+}

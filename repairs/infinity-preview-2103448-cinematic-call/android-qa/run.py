@@ -80,7 +80,10 @@ def synthetic_call(a,saved):
 def body(a):
     a.segment='remaining';resume.setup(a)
     q.open_video('Open A','red','a.mp4');advancing();p=resume.pause();time.sleep(1.1);q.check(clock()==p,'User pause did not hold position');control('Play');advancing()
-    resume.pause();resume.seek(.2);skip(-10);skip(10);control('Play');advancing()
+    # Signed448 only publishes its recurring decoder clock while playing.
+    # Observe a real post-seek tick before testing relative skips; do not treat
+    # the SeekBar's immediate drag label as an actual decoder completion event.
+    resume.seek(.2);advancing();skip(-10);skip(10);advancing()
     control('Mute');q.await_text('Unmute');q.tap('Unmute');q.await_text('Mute');q.record('real_mute_toggle')
     control('Audio');track=q.await_prefix('Audio 2');q.screenshot('audio-menu');q.tap(track);q.record('existing_audio_choice',track=track)
     control('Subtitles');track=q.await_prefix('Subtitle 1');q.tap(track);q.await_text('External subtitle fixture');q.screenshot('subtitle-rendered');q.record('subtitle_actually_rendered')

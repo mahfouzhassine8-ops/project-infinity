@@ -1,0 +1,126 @@
+{
+  "status": "FAIL",
+  "checks": [
+    {
+      "check": "fresh_fixture_install",
+      "name": "candidate",
+      "seconds": 60.48586387499995,
+      "sha256": "d96b923b33759f1fa259d5d95fc596b117b0f44b7e4bbd91fd393b39a322400f"
+    },
+    {
+      "check": "fresh_fixture_install",
+      "name": "source",
+      "seconds": 1.3583350160000123,
+      "sha256": "56e97c469e4bff7c024ae31839d52c584d6763f4b432c641013c80dc9724c7f5"
+    },
+    {
+      "check": "fresh_persistent_OS_observer",
+      "sha256": "69be8496487ee057d536ec5b9e4e83094aee7c0a5c560383b49663c2d24f6712"
+    },
+    {
+      "check": "real_touch",
+      "label": "Open A",
+      "bounds": [
+        0,
+        51,
+        1080,
+        177
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "15",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "no_kodi_process",
+      "kodi_pid": "",
+      "external_pid": "9557"
+    },
+    {
+      "check": "actual_video_decoded",
+      "title": "a.mp4",
+      "color_samples": 90
+    },
+    {
+      "check": "actual_media_clock_advances",
+      "before": 2,
+      "after": 3
+    },
+    {
+      "check": "real_touch",
+      "label": "Pause",
+      "bounds": [
+        61,
+        2217,
+        198,
+        2354
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Play",
+      "bounds": [
+        61,
+        2217,
+        198,
+        2354
+      ]
+    },
+    {
+      "check": "actual_media_clock_advances",
+      "before": 3,
+      "after": 4
+    },
+    {
+      "check": "real_touch",
+      "label": "Pause",
+      "bounds": [
+        61,
+        2217,
+        198,
+        2354
+      ]
+    },
+    {
+      "check": "real_seekbar_input",
+      "fraction": 0.2,
+      "actual_seconds": 109,
+      "bounds": [
+        142,
+        2068,
+        948,
+        2178
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "\u221210 s",
+      "bounds": [
+        340,
+        2217,
+        477,
+        2354
+      ]
+    }
+  ],
+  "source_build": {
+    "status": "DISPOSABLE_QA_ONLY",
+    "source": "51b3c914fdcfca3caf4e8b772918bde2207ea79c",
+    "candidate_sha256": "d96b923b33759f1fa259d5d95fc596b117b0f44b7e4bbd91fd393b39a322400f",
+    "original_key": false,
+    "replaced": {
+      "classes3.dex": "a8ce31bebd92e4ad096b8d54e3f9442ecd55b85197f56edf9ef6bf2b87c50387"
+    },
+    "baseline_sha256": "2c20613f9056e84fea402cf67729939a205b7d9afb87ec1b6fab800a641efbd3"
+  },
+  "physical_Fold": "NOT_TESTED",
+  "call_audio": "Host policy plus separately reported emulator observation; physical carrier/VoIP audio pending",
+  "shutdown": "NOT_RUN"
+}
