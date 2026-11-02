@@ -115,8 +115,10 @@ def runtime_binding(build):
     observed=load(build/'OWNER-BUILD.json');tested=load(H/'final-evidence/OWNER-BUILD.json')
     require(observed==tested,'EXACT_ANDROID_TESTED_SOURCE_AND_OWNER_OUTPUT')
     require(load(build/'CLASS-HASHES.json')==load(H/'final-evidence/CLASS-HASHES.json'),'EXACT_TESTED_CLASS_DEFINITIONS')
-    result=load(H/'final-evidence/ANDROID-RESULT.json')
-    require(result['status']=='PASS','REAL_RESUME_ANDROID_DECODING_REQUIRED')
+    from runtime_evidence import summarize
+    result=summarize()
+    require(result==load(H/'final-evidence/ANDROID-RESULT.json'),'EXACT_SELECTED_RUNTIME_EVIDENCE')
+    require(result['status']=='PASS_SELECTED_RESUME_CHECKS','REAL_RESUME_ANDROID_DECODING_REQUIRED')
     require(result['source_build']['replaced']=={'classes3.dex':observed['dex_sha256']},'ANDROID_INSTALLED_DEX_BINDING')
     host=load(H/'host-evidence/HOST-RESULT.json');require(host['status']=='PASS' and host['tests']==12,'RESUME_STORAGE_HOST_CHECKS')
     boundary=load(H/'host-evidence/BOUNDARY-RESULT.json');require(boundary['status']=='PASS' and boundary['tests']==3,'RESUME_SCHEDULING_AND_PROVIDER_BOUNDARIES')

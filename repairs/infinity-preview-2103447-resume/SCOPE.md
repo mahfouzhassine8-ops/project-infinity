@@ -42,3 +42,9 @@ resume record. A checkpoint every 10 seconds bounds abrupt-process-loss exposure
 explicit lifecycle checkpoints read the decoder's actual position.
 
 Runtime continuation: retain run 41436653854 as FAIL with completed core checkpoints through real reboot; execute only unfinished three-viewport/system-theme/control-strip, rapid switching, near-end reset and error-cleanup checks after adding the missing final scroll observation. Exact production DEX remains unchanged. Release evidence must retain both raw results and require every selected checkpoint; no failed run is relabeled PASS.
+
+Release-only evidence validation additionally rejects missing selected checkpoints, a failed remaining segment, mismatched tested DEX, or incomplete viewport/theme coverage. It retains the original full-run FAIL and its exact raw result; the aggregate means selected checks completed across source-identical runs, not all workflows succeeded. No application tests are added by this gate check.
+
+Known resize-input harness correction: run 41438660016 explicitly dropped the tap under Android's transition snapshot (BLOCK_UNTRUSTED). Observe removal of that active system layer before input; keep Android security, animation settings, existing observation bound and production bytes unchanged. Repeat only the still-unfinished remaining segment.
+
+Run 41440049694 stopped before installation at adb root (connection closed/offline). The remaining public-input segment does not require privileged private-history reads or process loss, so its setup omits that unnecessary privilege restart. Full-core checks retain their root prerequisite. This is an emulator setup correction, not a production change.

@@ -1,0 +1,76 @@
+{
+  "status": "PASS_SELECTED_RESUME_CHECKS",
+  "source_build": {
+    "replaced": {
+      "classes3.dex": "001cb13a340c513fbd05fb955532716e1902c012fee6e86bdce5e58eaebc9eb4"
+    },
+    "baseline_sha256": "e94adcbefaee9cd42d25097f779fc28da80bb0cc90b43681a7fe36b12d5cf30e"
+  },
+  "core_checks": [
+    "background_progress_preserved",
+    "periodic_real_decoder_checkpoint",
+    "process_restart_keeps_progress",
+    "real_SAF_plain_and_tree_document_identity",
+    "reboot_keeps_private_resume_database",
+    "separate_A_B_A_B",
+    "source_resumed_and_decoder_released",
+    "start_over_clears_all_video_aliases",
+    "two_authorities_same_granted_file_share_identity"
+  ],
+  "remaining_checks": [
+    "near_end_resets_progress",
+    "rapid_replacement_keeps_latest_video",
+    "resume_journey_complete",
+    "source_resumed_and_decoder_released"
+  ],
+  "viewport_theme_checks": [
+    [
+      "1080x2520",
+      "no"
+    ],
+    [
+      "1080x2520",
+      "yes"
+    ],
+    [
+      "1600x1680",
+      "no"
+    ],
+    [
+      "1600x1680",
+      "yes"
+    ],
+    [
+      "2520x1080",
+      "no"
+    ],
+    [
+      "2520x1080",
+      "yes"
+    ]
+  ],
+  "runs": {
+    "core": {
+      "run_id": 41436653854,
+      "source": "3a06cb11f3acc5afbef15c3b629617cb73a13579",
+      "conclusion": "failure",
+      "artifact_id": 13136818635,
+      "artifact_sha256": "fa2d2934a2dd6c6aeda8e2cd0e25c60cac4eb2b6cda7acde87b0e6f6c5b6f5f0",
+      "result_sha256": "b01e3ec781fe45005cb9ef1527f7d61aea12c309225d586f4ca4231af6bc783a",
+      "scope": "Only completed core prefix through real reboot; original later scroll-helper failure retained"
+    },
+    "remaining": {
+      "run_id": 41440829875,
+      "source": "dbc5ee5a017cc00fa060e71077d6fb6f0b111373",
+      "conclusion": "success",
+      "artifact_id": 13141001299,
+      "artifact_sha256": "84c4457c235db4f890db0830d110e7dded48ee1f0f8b35701ca6554585529df4",
+      "result_sha256": "21723ce0c67f397127f00fcebb2cd06b53aaa0c44d3ecf8de3f2a52de5741334",
+      "scope": "All remaining viewport/theme/control-strip, rapid switching, near-end reset, permission/error and decoder cleanup checks"
+    }
+  },
+  "failed_full_run_relabelled": false,
+  "physical_Fold": "NOT_TESTED",
+  "proprietary_file_managers": "NOT_TESTED",
+  "shutdown": "NOT_RUN"
+}

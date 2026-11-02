@@ -1,5 +1,5 @@
 """Selected release/preservation negative checks; no application or shutdown suite."""
-import copy,json,re,sys,tempfile,unittest
+import copy,hashlib,json,re,shutil,sys,tempfile,unittest
 from pathlib import Path
 from unittest.mock import patch
 from zipfile import ZipFile
@@ -64,4 +64,25 @@ class Preservation(unittest.TestCase):
   prior=r.previous();external_player_manifest_guard().verify_evidence(prior,lambda n:(r.REPO/n).read_bytes())
   self.assertNotIn('MINIMAL_ANDROID_CONTRACT',r.TARGETS)
   self.assertEqual(prior['candidate_versionCode'],2103447)
+ def test_selected_runtime_coverage_cannot_hide_failures_or_missing_checks(self):
+  from runtime_evidence import summarize
+  expected=summarize()
+  self.assertEqual(expected,json.loads(json.dumps(expected)))
+  self.assertEqual(expected['status'],'PASS_SELECTED_RESUME_CHECKS')
+  self.assertFalse(expected['failed_full_run_relabelled'])
+  with tempfile.TemporaryDirectory() as tmp:
+   d=Path(tmp);(d/'runtime-attempts/fourth').mkdir(parents=True);(d/'final-evidence').mkdir()
+   shutil.copyfile(H/'runtime-attempts/fourth/RESULT.json',d/'runtime-attempts/fourth/RESULT.json')
+   tail=json.loads((H/'final-evidence/ANDROID-REMAINING.json').read_text())
+   binding=json.loads((H/'final-evidence/RUNTIME-BINDING.json').read_text())
+   cases=[]
+   bad=copy.deepcopy(tail);bad['status']='FAIL';cases.append((bad,'Remaining runtime segment must pass'))
+   bad=copy.deepcopy(tail);bad['checks']=[c for c in bad['checks'] if c['check']!='near_end_resets_progress'];cases.append((bad,'Missing selected runtime checkpoint'))
+   bad=copy.deepcopy(tail);bad['source_build']['replaced']['classes3.dex']='untested';cases.append((bad,'identical production DEX'))
+   bad=copy.deepcopy(tail);bad['checks']=[c for c in bad['checks'] if not(c['check']=='existing_dark_UI_controls_preserved_under_system_theme' and c['viewport']=='1600x1680')];cases.append((bad,'All selected viewport/theme'))
+   for bad,error in cases:
+    p=d/'final-evidence/ANDROID-REMAINING.json';p.write_text(json.dumps(bad))
+    binding['remaining']['result_sha256']=hashlib.sha256(p.read_bytes()).hexdigest()
+    (d/'final-evidence/RUNTIME-BINDING.json').write_text(json.dumps(binding))
+    with self.assertRaisesRegex(RuntimeError,error):summarize(d)
 if __name__=='__main__':unittest.main(verbosity=2)

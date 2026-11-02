@@ -1,0 +1,903 @@
+{
+  "status": "PASS",
+  "segment": "remaining",
+  "checks": [
+    {
+      "check": "fresh_fixture_install",
+      "name": "candidate",
+      "seconds": 81.33650912600001,
+      "sha256": "7dbad1d513d62f0b5b26cf61e762abf5e8fc68d96a31ae911b1f1adb0bb5ca51"
+    },
+    {
+      "check": "fresh_fixture_install",
+      "name": "source",
+      "seconds": 2.2551133220000565,
+      "sha256": "194007f6e0c4aa38c9dfe7e7234f41aff57fc651f9872c0d352dbece8436395f"
+    },
+    {
+      "check": "fresh_persistent_OS_observer",
+      "sha256": "1f457178138885c5c17eacabf44e49cdca33b77ff753e5977ca6e41c5da3b2a2"
+    },
+    {
+      "check": "real_touch",
+      "label": "Open B",
+      "bounds": [
+        0,
+        177,
+        1080,
+        303
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "16",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "no_kodi_process",
+      "kodi_pid": "",
+      "external_pid": "10224"
+    },
+    {
+      "check": "actual_video_decoded",
+      "title": "b.mp4",
+      "color_samples": 105
+    },
+    {
+      "check": "real_seekbar_input",
+      "fraction": 0.4,
+      "actual_seconds": 229,
+      "bounds": [
+        21,
+        2205,
+        1059,
+        2310
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Pause",
+      "bounds": [
+        29,
+        2310,
+        260,
+        2436
+      ]
+    },
+    {
+      "check": "real_android_back"
+    },
+    {
+      "check": "originating_activity_return",
+      "action": "Back"
+    },
+    {
+      "check": "real_touch",
+      "label": "Open C",
+      "bounds": [
+        0,
+        303,
+        1080,
+        429
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "23",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "no_kodi_process",
+      "kodi_pid": "",
+      "external_pid": "10224"
+    },
+    {
+      "check": "actual_video_decoded",
+      "title": "c.mp4",
+      "color_samples": 105
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        21,
+        2310,
+        1059,
+        2436
+      ],
+      "start": [
+        799,
+        2373
+      ],
+      "end": [
+        280,
+        2373
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        21,
+        2310,
+        1059,
+        2436
+      ],
+      "start": [
+        799,
+        2373
+      ],
+      "end": [
+        280,
+        2373
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        21,
+        2310,
+        1059,
+        2436
+      ],
+      "start": [
+        799,
+        2373
+      ],
+      "end": [
+        280,
+        2373
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Display",
+      "bounds": [
+        601,
+        2310,
+        832,
+        2436
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Best Fit",
+      "bounds": [
+        70,
+        1121,
+        1010,
+        1247
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        21,
+        2310,
+        1059,
+        2436
+      ],
+      "start": [
+        280,
+        2373
+      ],
+      "end": [
+        799,
+        2373
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        21,
+        2310,
+        1059,
+        2436
+      ],
+      "start": [
+        280,
+        2373
+      ],
+      "end": [
+        799,
+        2373
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        21,
+        2310,
+        1059,
+        2436
+      ],
+      "start": [
+        280,
+        2373
+      ],
+      "end": [
+        799,
+        2373
+      ]
+    },
+    {
+      "check": "existing_dark_UI_controls_preserved_under_system_theme",
+      "viewport": "1080x2520",
+      "system_night": "yes"
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        21,
+        2310,
+        1059,
+        2436
+      ],
+      "start": [
+        799,
+        2373
+      ],
+      "end": [
+        280,
+        2373
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        21,
+        2310,
+        1059,
+        2436
+      ],
+      "start": [
+        799,
+        2373
+      ],
+      "end": [
+        280,
+        2373
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        21,
+        2310,
+        1059,
+        2436
+      ],
+      "start": [
+        799,
+        2373
+      ],
+      "end": [
+        280,
+        2373
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Display",
+      "bounds": [
+        998,
+        2310,
+        1059,
+        2436
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Best Fit",
+      "bounds": [
+        70,
+        1121,
+        1010,
+        1247
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        21,
+        2310,
+        1059,
+        2436
+      ],
+      "start": [
+        280,
+        2373
+      ],
+      "end": [
+        799,
+        2373
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        21,
+        2310,
+        1059,
+        2436
+      ],
+      "start": [
+        280,
+        2373
+      ],
+      "end": [
+        799,
+        2373
+      ]
+    },
+    {
+      "check": "existing_dark_UI_controls_preserved_under_system_theme",
+      "viewport": "1080x2520",
+      "system_night": "no"
+    },
+    {
+      "check": "real_seekbar_input",
+      "fraction": 0.01,
+      "actual_seconds": 0,
+      "bounds": [
+        21,
+        2205,
+        1059,
+        2310
+      ]
+    },
+    {
+      "check": "real_android_back"
+    },
+    {
+      "check": "originating_activity_return",
+      "action": "Back"
+    },
+    {
+      "check": "real_touch",
+      "label": "Open C",
+      "bounds": [
+        0,
+        303,
+        1600,
+        429
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "33",
+      "bounds": [
+        972,
+        1417,
+        1140,
+        1543
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "no_kodi_process",
+      "kodi_pid": "",
+      "external_pid": "10224"
+    },
+    {
+      "check": "actual_video_decoded",
+      "title": "c.mp4",
+      "color_samples": 160
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        21,
+        1449,
+        1579,
+        1575
+      ],
+      "start": [
+        1189,
+        1512
+      ],
+      "end": [
+        410,
+        1512
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        21,
+        1449,
+        1579,
+        1575
+      ],
+      "start": [
+        1189,
+        1512
+      ],
+      "end": [
+        410,
+        1512
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Display",
+      "bounds": [
+        1081,
+        1449,
+        1312,
+        1575
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Best Fit",
+      "bounds": [
+        81,
+        699,
+        1519,
+        825
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        21,
+        1449,
+        1579,
+        1575
+      ],
+      "start": [
+        410,
+        1512
+      ],
+      "end": [
+        1189,
+        1512
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        21,
+        1449,
+        1579,
+        1575
+      ],
+      "start": [
+        410,
+        1512
+      ],
+      "end": [
+        1189,
+        1512
+      ]
+    },
+    {
+      "check": "existing_dark_UI_controls_preserved_under_system_theme",
+      "viewport": "1600x1680",
+      "system_night": "yes"
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        21,
+        1449,
+        1579,
+        1575
+      ],
+      "start": [
+        1189,
+        1512
+      ],
+      "end": [
+        410,
+        1512
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        21,
+        1449,
+        1579,
+        1575
+      ],
+      "start": [
+        1189,
+        1512
+      ],
+      "end": [
+        410,
+        1512
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Display",
+      "bounds": [
+        1272,
+        1449,
+        1503,
+        1575
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Best Fit",
+      "bounds": [
+        81,
+        699,
+        1519,
+        825
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        21,
+        1449,
+        1579,
+        1575
+      ],
+      "start": [
+        410,
+        1512
+      ],
+      "end": [
+        1189,
+        1512
+      ]
+    },
+    {
+      "check": "existing_dark_UI_controls_preserved_under_system_theme",
+      "viewport": "1600x1680",
+      "system_night": "no"
+    },
+    {
+      "check": "real_seekbar_input",
+      "fraction": 0.01,
+      "actual_seconds": 0,
+      "bounds": [
+        21,
+        1344,
+        1579,
+        1449
+      ]
+    },
+    {
+      "check": "real_android_back"
+    },
+    {
+      "check": "originating_activity_return",
+      "action": "Back"
+    },
+    {
+      "check": "real_touch",
+      "label": "Open C",
+      "bounds": [
+        0,
+        303,
+        2520,
+        429
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "44",
+      "bounds": [
+        1490,
+        838,
+        1658,
+        964
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "no_kodi_process",
+      "kodi_pid": "",
+      "external_pid": "10224"
+    },
+    {
+      "check": "actual_video_decoded",
+      "title": "c.mp4",
+      "color_samples": 150
+    },
+    {
+      "check": "real_touch",
+      "label": "Display",
+      "bounds": [
+        2005,
+        870,
+        2236,
+        996
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Best Fit",
+      "bounds": [
+        483,
+        409,
+        2037,
+        535
+      ]
+    },
+    {
+      "check": "existing_dark_UI_controls_preserved_under_system_theme",
+      "viewport": "2520x1080",
+      "system_night": "yes"
+    },
+    {
+      "check": "real_touch",
+      "label": "Display",
+      "bounds": [
+        2005,
+        870,
+        2236,
+        996
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Best Fit",
+      "bounds": [
+        483,
+        409,
+        2037,
+        535
+      ]
+    },
+    {
+      "check": "existing_dark_UI_controls_preserved_under_system_theme",
+      "viewport": "2520x1080",
+      "system_night": "no"
+    },
+    {
+      "check": "real_seekbar_input",
+      "fraction": 0.01,
+      "actual_seconds": 0,
+      "bounds": [
+        21,
+        765,
+        2499,
+        870
+      ]
+    },
+    {
+      "check": "real_android_back"
+    },
+    {
+      "check": "originating_activity_return",
+      "action": "Back"
+    },
+    {
+      "check": "real_touch",
+      "label": "Rapid A B C",
+      "bounds": [
+        0,
+        1185,
+        1080,
+        1311
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "55",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "no_kodi_process",
+      "kodi_pid": "",
+      "external_pid": "10224"
+    },
+    {
+      "check": "actual_video_decoded",
+      "title": "c.mp4",
+      "color_samples": 105
+    },
+    {
+      "check": "real_android_back"
+    },
+    {
+      "check": "originating_activity_return",
+      "action": "Back"
+    },
+    {
+      "check": "rapid_replacement_keeps_latest_video"
+    },
+    {
+      "check": "real_touch",
+      "label": "Open B",
+      "bounds": [
+        0,
+        177,
+        1080,
+        303
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "61",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "real_touch",
+      "label": "RESUME",
+      "bounds": [
+        773,
+        1321,
+        978,
+        1463
+      ]
+    },
+    {
+      "check": "real_resume_choice",
+      "label": "RESUME",
+      "choice": "Resume",
+      "expected": 230,
+      "actual": 230
+    },
+    {
+      "check": "no_kodi_process",
+      "kodi_pid": "",
+      "external_pid": "10224"
+    },
+    {
+      "check": "real_seekbar_input",
+      "fraction": 0.98,
+      "actual_seconds": 600,
+      "bounds": [
+        21,
+        2205,
+        1059,
+        2310
+      ]
+    },
+    {
+      "check": "real_android_back"
+    },
+    {
+      "check": "originating_activity_return",
+      "action": "Back"
+    },
+    {
+      "check": "real_touch",
+      "label": "Open B",
+      "bounds": [
+        0,
+        177,
+        1080,
+        303
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "68",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "no_kodi_process",
+      "kodi_pid": "",
+      "external_pid": "10224"
+    },
+    {
+      "check": "actual_video_decoded",
+      "title": "b.mp4",
+      "color_samples": 105
+    },
+    {
+      "check": "real_android_back"
+    },
+    {
+      "check": "originating_activity_return",
+      "action": "Back"
+    },
+    {
+      "check": "near_end_resets_progress"
+    },
+    {
+      "check": "real_touch",
+      "label": "Denied A",
+      "bounds": [
+        0,
+        1437,
+        1080,
+        1563
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "74",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "real_android_back"
+    },
+    {
+      "check": "originating_activity_return",
+      "action": "Back"
+    },
+    {
+      "check": "real_touch",
+      "label": "Open BAD",
+      "bounds": [
+        0,
+        555,
+        1080,
+        681
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "80",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "real_android_back"
+    },
+    {
+      "check": "originating_activity_return",
+      "action": "Back"
+    },
+    {
+      "check": "source_resumed_and_decoder_released"
+    },
+    {
+      "check": "resume_journey_complete"
+    }
+  ],
+  "source_build": {
+    "status": "DISPOSABLE_QA_ONLY",
+    "source": "dbc5ee5a017cc00fa060e71077d6fb6f0b111373",
+    "candidate_sha256": "7dbad1d513d62f0b5b26cf61e762abf5e8fc68d96a31ae911b1f1adb0bb5ca51",
+    "original_key": false,
+    "replaced": {
+      "classes3.dex": "001cb13a340c513fbd05fb955532716e1902c012fee6e86bdce5e58eaebc9eb4"
+    },
+    "baseline_sha256": "e94adcbefaee9cd42d25097f779fc28da80bb0cc90b43681a7fe36b12d5cf30e"
+  },
+  "physical_Fold": "NOT_TESTED",
+  "proprietary_file_managers": "NOT_TESTED",
+  "cinematic_design": "UNIMPLEMENTED_PRESERVED_SEPARATELY",
+  "shutdown": "NOT_RUN"
+}

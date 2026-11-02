@@ -4,7 +4,7 @@ Baseline: exact locked, signed 2103447. Cinematic Light/Dark is a separate retai
 
 ## Implementation
 
-- New `InfinityExternalResume` owns `infinity_preview_resume_v1.db` only. Its bounded SQLite records contain keyed hashes, technical media metadata and millisecond positions; no URI strings, credentials, media bytes or persisted provider grants.
+- New `InfinityExternalResume` owns `infinity_preview_resume_v1.db` only. It retains up to 1,000 recent video records and 4,000 aliases. Its SQLite records contain keyed hashes, technical media metadata and millisecond positions; no URI strings, credentials, media bytes or persisted provider grants.
 - The existing decoder worker performs identity checks and transactional saves. No extra worker, service, polling loop, native patch or UI-thread database operation is added. Active playback uses its existing ticker for a checkpoint every 10 seconds; Pause and decoder release read and save the actual current position. The outgoing video is checkpointed before a new request takes ownership.
 - A prepared, seekable video with meaningful saved progress offers Resume or Start Over. Resume waits for actual seek completion before playback. Request generations and the Activity choice token reject superseded requests. Back closes a pending choice without overwriting the prior progress; Start Over removes this logical video's record and aliases.
 - A minimum 30 seconds of progress is required for the prompt. The last 30 seconds or 95% of the video resets it, as does completion. Live/nonseekable media does not receive a resume prompt.
