@@ -1,0 +1,35 @@
+{
+  "Cobra_DEX_and_payload_identical": true,
+  "added": [],
+  "baseline_sha256": "b7e78393ade7e52d8653823a0ad72ae99614a5a8e0b6cdedf5d5d15a9e643400",
+  "candidate_sha256": "e94adcbefaee9cd42d25097f779fc28da80bb0cc90b43681a7fe36b12d5cf30e",
+  "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "changed_members": {
+    "AndroidManifest.xml": {
+      "after": "053f522fe1e46e1dd56f95a9a3c6028b3696c15f5ca02061a4b4180fe5d4aaaa",
+      "before": "f53e75db187bbf0d2e47f4260db6e0235c8c265735274f14fb5495a932123a18"
+    },
+    "assets/experience-component-updates.properties": {
+      "after": "c3de7ad908d27df61f2dd5a75e51a7096b93d454629aeacd663c91f62b5838f9",
+      "before": "bb0ecd01a5073a8434554fe31ed56b3a9ccd74e463a8ac601ac09af4ebd1e723"
+    },
+    "classes.dex": {
+      "after": "8cbfe62eae167e4441462cf5be970dbfbb2cc96e068134a39e12b61c64223118",
+      "before": "07b94bfde6dbc3e3a6bfc8436ea65e6a67bdef5ca868379809e20f2fb7ce8efb"
+    },
+    "classes3.dex": {
+      "after": "066f3081bea8338f0e12c5b6a14f8604078596b99c3f6a147290fa84de13c2d5",
+      "before": "7e18d8092de33a4d44e299305965e9b9eb943372a9643452f6f78afe209fb215"
+    }
+  },
+  "native_libraries_unchanged": 47,
+  "normal_Splash_instructions_preserved": true,
+  "original_Infinity_classes_unchanged": 578,
+  "physical_Fold": "PENDING",
+  "removed": [],
+  "shared_DEX_resources_and_shutdown_identical": true,
+  "shutdown": "UNCHANGED_NOT_TESTED",
+  "status": "PASS_EXACT_SIGNED445_PRESERVATION",
+  "unchanged_members": 7610,
+  "user_data": "NO_ACCESS"
+}

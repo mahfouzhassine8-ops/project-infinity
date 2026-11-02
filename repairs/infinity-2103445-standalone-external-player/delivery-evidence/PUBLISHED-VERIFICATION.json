@@ -1,0 +1,88 @@
+{
+  "status": "PASS_EXACT_SIGNED445_PRESERVATION",
+  "baseline_sha256": "b7e78393ade7e52d8653823a0ad72ae99614a5a8e0b6cdedf5d5d15a9e643400",
+  "candidate_sha256": "e94adcbefaee9cd42d25097f779fc28da80bb0cc90b43681a7fe36b12d5cf30e",
+  "changed_members": {
+    "AndroidManifest.xml": {
+      "before": "f53e75db187bbf0d2e47f4260db6e0235c8c265735274f14fb5495a932123a18",
+      "after": "053f522fe1e46e1dd56f95a9a3c6028b3696c15f5ca02061a4b4180fe5d4aaaa"
+    },
+    "assets/experience-component-updates.properties": {
+      "before": "bb0ecd01a5073a8434554fe31ed56b3a9ccd74e463a8ac601ac09af4ebd1e723",
+      "after": "c3de7ad908d27df61f2dd5a75e51a7096b93d454629aeacd663c91f62b5838f9"
+    },
+    "classes.dex": {
+      "before": "07b94bfde6dbc3e3a6bfc8436ea65e6a67bdef5ca868379809e20f2fb7ce8efb",
+      "after": "8cbfe62eae167e4441462cf5be970dbfbb2cc96e068134a39e12b61c64223118"
+    },
+    "classes3.dex": {
+      "before": "7e18d8092de33a4d44e299305965e9b9eb943372a9643452f6f78afe209fb215",
+      "after": "066f3081bea8338f0e12c5b6a14f8604078596b99c3f6a147290fa84de13c2d5"
+    }
+  },
+  "unchanged_members": 7610,
+  "added": [],
+  "removed": [],
+  "native_libraries_unchanged": 47,
+  "original_Infinity_classes_unchanged": 578,
+  "Cobra_DEX_and_payload_identical": true,
+  "shared_DEX_resources_and_shutdown_identical": true,
+  "normal_Splash_instructions_preserved": true,
+  "user_data": "NO_ACCESS",
+  "shutdown": "UNCHANGED_NOT_TESTED",
+  "physical_Fold": "PENDING",
+  "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "package_identity": {
+    "http://schemas.android.com/apk/res/android:versionCode": {
+      "type": 16,
+      "value": 2103447
+    },
+    "http://schemas.android.com/apk/res/android:versionName": {
+      "type": 3,
+      "value": "1.0.9-Final-Corrections-TEST0011"
+    },
+    "package": {
+      "type": 3,
+      "value": "com.projectinfinity.kodi"
+    }
+  },
+  "published_artifact_sha256": "23ad1a7fbcd6971c73d1fddfef4c79e3ff45f5e2c6c9d129aa1bf1913d992804",
+  "published_apk_bytes": 778579713,
+  "all_changed_members_including_signatures": {
+    "AndroidManifest.xml": {
+      "before": "f53e75db187bbf0d2e47f4260db6e0235c8c265735274f14fb5495a932123a18",
+      "after": "053f522fe1e46e1dd56f95a9a3c6028b3696c15f5ca02061a4b4180fe5d4aaaa",
+      "signature_metadata": false
+    },
+    "META-INF/INFINITY.RSA": {
+      "before": "7b0ae71154ec96566e64c6f69ae77f1aeed51950e9f054a50302a22901297d5e",
+      "after": "0aef57a7e11f33f5f5525290833036575b887e1da82c2569e85917aa03ec7956",
+      "signature_metadata": true
+    },
+    "META-INF/INFINITY.SF": {
+      "before": "57c1d84137514a56bd665975e5442bb7b91d327d7f3e541cecbabf8576134c4e",
+      "after": "54314094c294bd2bd0f76c65b7ac250193aa9a6af2b979ca3931baaddf788efd",
+      "signature_metadata": true
+    },
+    "META-INF/MANIFEST.MF": {
+      "before": "6f2105e62e6cd79aab823f12623fbf71900507fd0cab3096d245033e63543cae",
+      "after": "8755a9e8b2f9ea0dc587458aad7380b592681934b62059db035a9b87da559624",
+      "signature_metadata": true
+    },
+    "assets/experience-component-updates.properties": {
+      "before": "bb0ecd01a5073a8434554fe31ed56b3a9ccd74e463a8ac601ac09af4ebd1e723",
+      "after": "c3de7ad908d27df61f2dd5a75e51a7096b93d454629aeacd663c91f62b5838f9",
+      "signature_metadata": false
+    },
+    "classes.dex": {
+      "before": "07b94bfde6dbc3e3a6bfc8436ea65e6a67bdef5ca868379809e20f2fb7ce8efb",
+      "after": "8cbfe62eae167e4441462cf5be970dbfbb2cc96e068134a39e12b61c64223118",
+      "signature_metadata": false
+    },
+    "classes3.dex": {
+      "before": "7e18d8092de33a4d44e299305965e9b9eb943372a9643452f6f78afe209fb215",
+      "after": "066f3081bea8338f0e12c5b6a14f8604078596b99c3f6a147290fa84de13c2d5",
+      "signature_metadata": false
+    }
+  }
+}
