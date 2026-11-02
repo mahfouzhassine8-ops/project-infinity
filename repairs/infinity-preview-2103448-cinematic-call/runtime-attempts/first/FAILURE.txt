@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-preview-2103448-cinematic-call/android-qa/run.py", line 104, in <module>
+    try:body(a);status='PASS'
+        ^^^^^^^
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-preview-2103448-cinematic-call/android-qa/run.py", line 75, in body
+    resume.seek(.2);control('−10 s');position=clock();q.check(100<=position<=122,'Back ten-second control');control('+10 s');q.check(clock()>=position+8,'Forward ten-second control')
+                                                                                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-2103445-standalone-external-player/android-qa/run.py", line 17, in check
+    if not ok:raise AssertionError(why)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Forward ten-second control

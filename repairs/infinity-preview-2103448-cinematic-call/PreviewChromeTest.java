@@ -106,6 +106,12 @@ public class PreviewChromeTest {
         create(AudioManager.MODE_IN_CALL,false);int plays=Decoder.last.plays;mode(AudioManager.MODE_NORMAL);
         assertEquals(plays,Decoder.last.plays);assertEquals(0,Decoder.last.volume,0);assertFalse((Boolean)get(a,"wantsPlay"));
     }
+    @Test public void lateCallModeNotificationCannotRestartPausedBackgroundActivity(){
+        create(AudioManager.MODE_NORMAL,true);controller.pause();int plays=Decoder.last.plays;
+        audio.setMode(AudioManager.MODE_IN_CALL);
+        AudioManager.OnModeChangedListener listener=get(a,"callModeListener");listener.onModeChanged(AudioManager.MODE_IN_CALL);
+        shadowOf(Looper.getMainLooper()).idle();assertEquals("Call callback must preserve existing background pause",plays,Decoder.last.plays);
+    }
     @Test public void realViewInputPreservesExistingActionsAndResumeDialog(){
         create(AudioManager.MODE_NORMAL,true);press("Pause");press("Play");a.position(20000,300000);press("−10 s");assertEquals(10000,Decoder.last.lastSeek);press("+10 s");assertEquals(30000,Decoder.last.lastSeek);
         press("Display");AlertDialog d=ShadowAlertDialog.getLatestAlertDialog();assertTrue(d.isShowing());d.getListView().performItemClick(d.getListView().getChildAt(1),1,1);assertTrue((Boolean)get(a,"filling"));
@@ -128,6 +134,7 @@ public class PreviewChromeTest {
             RuntimeEnvironment.setQualifiers(dimensions);a.onConfigurationChanged(a.getResources().getConfiguration());measure();
             for(int theme:new int[]{1,2}){
                 ReflectionHelpers.setField(a,"appearance",theme);call(a,"applyChrome");measure();FrameLayout picture=get(a,"picture");View top=get(a,"top"),controls=get(a,"controls");
+                assertEquals("Control hitboxes follow actual density",Math.round(52*a.getResources().getDisplayMetrics().density),find(root,"Pause").getHeight());
                 assertTrue(picture.getTop()>=top.getBottom());assertTrue(picture.getBottom()<=controls.getTop());assertTrue(picture.getWidth()>0&&picture.getHeight()>0);
                 Bitmap image=Bitmap.createBitmap(root.getWidth(),root.getHeight(),Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(image);root.draw(canvas);
                 // Mark the otherwise unavailable SurfaceView with explicitly synthetic bars.

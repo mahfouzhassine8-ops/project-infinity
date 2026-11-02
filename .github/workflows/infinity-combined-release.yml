@@ -3,11 +3,11 @@ on:
   workflow_dispatch:
     inputs:
       operation:
-        description: Prepare Preview resume448 or sign its exact reviewed combined candidate
+        description: Prepare Preview 449 or sign its exact reviewed combined candidate
         type: choice
         required: true
         default: final-combined
-        options: [final-combined, prepare-resume448]
+        options: [final-combined, prepare-preview449]
 permissions:
   contents: read
   actions: read
@@ -15,9 +15,9 @@ concurrency:
   group: infinity-combined-original-key-release
   cancel-in-progress: false
 jobs:
-  prepare-resume448:
-    name: Preview resume448 owner preparation; exact447 frozen payload
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/infinity-preview-2103447-per-video-resume-20261102' && inputs.operation == 'prepare-resume448'
+  prepare-preview449:
+    name: Preview 449 owner preparation; exact448 frozen payload
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/infinity-preview-2103448-cinematic-call-20261102' && inputs.operation == 'prepare-preview449'
     runs-on: ubuntu-22.04
     timeout-minutes: 35
     env:
@@ -33,58 +33,58 @@ jobs:
       - name: Focused release protocol and sole signer checks before key access
         run: |
           python3 -m pip install PyYAML==6.0.3
-          python3 repairs/infinity-preview-2103447-resume/test_release448.py
+          python3 repairs/infinity-preview-2103448-cinematic-call/test_release449.py
           python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out SIGNER-ROUTES.json
       - uses: actions/download-artifact@v4
         with:
-          run-id: 41413552513
-          name: Infinity-Combined-Owner-Components-41413552513
+          run-id: 41442869656
+          name: Infinity-Combined-Owner-Components-41442869656
           github-token: ${{ github.token }}
-          path: protected447-components
+          path: protected448-components
       - uses: actions/download-artifact@v4
         with:
-          run-id: 41413552513
-          name: Infinity-Combined-Original-Signer-41413552513
+          run-id: 41442869656
+          name: Infinity-Combined-Original-Signer-41442869656
           github-token: ${{ github.token }}
-          path: protected447
+          path: protected448
       - uses: actions/download-artifact@v4
         with:
           run-id: 39867073954
           name: Infinity-Receipt-Race-Android17-Investigation
           github-token: ${{ github.token }}
           path: tools
-      - name: Prepare tested Preview resume memory and verify exact signed447 preservation
+      - name: Prepare tested Preview presentation and call audio and verify exact signed448 preservation
         env:
           CARDS_TOOLS_ROOT: ${{ github.workspace }}/tools
         run: |
           cp "$ANDROID_HOME/build-tools/35.0.0/lib/d8.jar" tools/d8.jar
-          python3 repairs/infinity-preview-2103447-resume/release448.py prepare \
-            --bundles protected447-components --baseline protected447/Infinity-2103447-Combined-Original-Signer.apk \
-            --sdk "$ANDROID_HOME/build-tools/35.0.0" --out prepared448
+          python3 repairs/infinity-preview-2103448-cinematic-call/release449.py prepare \
+            --bundles protected448-components --baseline protected448/Infinity-2103448-Combined-Original-Signer.apk \
+            --sdk "$ANDROID_HOME/build-tools/35.0.0" --out prepared449
       - uses: actions/upload-artifact@v4
         with:
-          name: Infinity448-Prepared-${{ github.run_id }}
-          path: prepared448/publish/
+          name: Infinity449-Prepared-${{ github.run_id }}
+          path: prepared449/publish/
           if-no-files-found: error
           retention-days: 90
           compression-level: 0
       - if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: Infinity448-Preparation-Evidence-${{ github.run_id }}
+          name: Infinity449-Preparation-Evidence-${{ github.run_id }}
           path: |
             SIGNER-ROUTES.json
-            prepared448/*.log
-            prepared448/*.json
-            prepared448/owner/*.json
-            prepared448/owner-preservation/*.json
-            prepared448/*.txt
-            prepared448/preservation/
+            prepared449/*.log
+            prepared449/*.json
+            prepared449/owner/*.json
+            prepared449/owner-preservation/*.json
+            prepared449/*.txt
+            prepared449/preservation/
           if-no-files-found: warn
           retention-days: 90
   combined:
-    name: Preview resume448 original-key testing APK; exact signed447 preservation
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/infinity-preview-2103447-per-video-resume-20261102' && inputs.operation == 'final-combined'
+    name: Preview 449 original-key testing APK; exact signed448 preservation
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/infinity-preview-2103448-cinematic-call-20261102' && inputs.operation == 'final-combined'
     runs-on: ubuntu-22.04
     timeout-minutes: 40
     env:
@@ -98,29 +98,29 @@ jobs:
         with: {distribution: temurin, java-version: '21'}
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
-      - name: Admit exact448 authority and sole signer before keys
+      - name: Admit exact449 authority and sole signer before keys
         id: selected
         run: |
           set -euo pipefail
           python3 -m pip install PyYAML==6.0.3
-          python3 repairs/infinity-preview-2103447-resume/test_release448.py
+          python3 repairs/infinity-preview-2103448-cinematic-call/test_release449.py
           python3 - <<'PYCODE'
           import os
           from pathlib import Path
           from release_gate import remote_authority,require
           a=remote_authority(Path('.'),os.environ['GITHUB_SHA'])
-          require(a['candidate_versionCode']==2103448 and a['generation']==34,'EXACT448_AUTHORITY')
-          require(a['target_owners']==['INFINITY','CHOOSER_SHELL'] and a['update_kind']=='owner_update','EXACT448_EXTERNAL_OWNER_UPDATE')
-          require(a['owner_update_evidence']['owner']=='INFINITY_PREVIEW_RESUME_MEMORY','APPROVED_PREVIEW_RESUME_ONLY')
+          require(a['candidate_versionCode']==2103449 and a['generation']==35,'EXACT449_AUTHORITY')
+          require(a['target_owners']==['INFINITY','CHOOSER_SHELL'] and a['update_kind']=='owner_update','EXACT449_EXTERNAL_OWNER_UPDATE')
+          require(a['owner_update_evidence']['owner']=='INFINITY_PREVIEW_CHROME_AND_CALL_AUDIO','APPROVED_PREVIEW_CHROME_CALL_ONLY')
           with open(os.environ['GITHUB_OUTPUT'],'a') as f:f.write('producer_run='+str(a['owner_update_evidence']['producer_run'])+'\n')
           PYCODE
           python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out SIGNER-ROUTES.json
       - uses: actions/download-artifact@v4
         with:
-          run-id: 41413552513
-          name: Infinity-Combined-Original-Signer-41413552513
+          run-id: 41442869656
+          name: Infinity-Combined-Original-Signer-41442869656
           github-token: ${{ github.token }}
-          path: protected447
+          path: protected448
       - uses: actions/download-artifact@v4
         with:
           run-id: 39867073954
@@ -130,35 +130,35 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           run-id: ${{ steps.selected.outputs.producer_run }}
-          name: Infinity448-Prepared-${{ steps.selected.outputs.producer_run }}
+          name: Infinity449-Prepared-${{ steps.selected.outputs.producer_run }}
           github-token: ${{ github.token }}
-          path: prepared448
-      - name: Verify official artifact bytes, registered source and exact447 preservation before keys
+          path: prepared449
+      - name: Verify official artifact bytes, registered source and exact448 preservation before keys
         run: |
           set -euo pipefail
           python3 - "${{ steps.selected.outputs.producer_run }}" <<'PYCODE'
           import sys
           from pathlib import Path
-          sys.path.insert(0,'repairs/infinity-preview-2103447-resume')
-          import release448 as r
-          r.check_registered(Path('prepared448'),int(sys.argv[1]),Path('REGISTERED448-CHECK.json'))
+          sys.path.insert(0,'repairs/infinity-preview-2103448-cinematic-call')
+          import release449 as r
+          r.check_registered(Path('prepared449'),int(sys.argv[1]),Path('REGISTERED449-CHECK.json'))
           PYCODE
           mkdir -p combined-build
-          cp -r prepared448/components combined-build/
+          cp -r prepared449/components combined-build/
           python3 repairs/dual-experience-isolation-2103420/component_bundles.py combine \
             --bundles combined-build/components --catalog combined-build/components/catalog.json \
-            --out combined-build/combined-unsigned.apk --version 2103448
+            --out combined-build/combined-unsigned.apk --version 2103449
           python3 - <<'PYCODE'
           from pathlib import Path
           from inventory import file_sha,load
           from release_gate import require
-          require(file_sha('combined-build/combined-unsigned.apk')==load('prepared448/preservation/APK-PRESERVATION.json')['candidate_sha256'],'EXACT_VERIFIED_UNSIGNED_APK')
+          require(file_sha('combined-build/combined-unsigned.apk')==load('prepared449/preservation/APK-PRESERVATION.json')['candidate_sha256'],'EXACT_VERIFIED_UNSIGNED_APK')
           PYCODE
       - name: Hard original pre-sign payload ownership and source guard
         run: |
           python3 repairs/dual-experience-isolation-2103420/release_gate.py \
             --apk combined-build/combined-unsigned.apk --jars tools/receipt-evidence/tool-jars --work gate-dex \
-            --repository . --expected-head "$GITHUB_SHA" --expected-generation 34 --out SIGNING-DECISION.json
+            --repository . --expected-head "$GITHUB_SHA" --expected-generation 35 --out SIGNING-DECISION.json
       - name: Original signer after all source and payload gates
         env:
           INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
@@ -168,16 +168,16 @@ jobs:
         run: |
           python3 repairs/dual-experience-isolation-2103420/assemble.py sign \
             --apk combined-build/combined-unsigned.apk --jars tools/receipt-evidence/tool-jars --work signer-dex \
-            --repository . --expected-head "$GITHUB_SHA" --expected-generation 34 \
+            --repository . --expected-head "$GITHUB_SHA" --expected-generation 35 \
             --sdk "$ANDROID_HOME/build-tools/35.0.0" --out signed-combined
-      - name: Signed447-to-signed448 exact member and original certificate comparison
+      - name: Signed448-to-signed449 exact member and original certificate comparison
         run: |
-          python3 repairs/infinity-preview-2103447-resume/release448.py compare \
-            --baseline protected447/Infinity-2103447-Combined-Original-Signer.apk \
-            --candidate signed-combined/Infinity-2103448-Combined-Original-Signer.apk \
-            --plan prepared448/PREPARATION.json --out signed-combined/preservation --sdk "$ANDROID_HOME/build-tools/35.0.0"
+          python3 repairs/infinity-preview-2103448-cinematic-call/release449.py compare \
+            --baseline protected448/Infinity-2103448-Combined-Original-Signer.apk \
+            --candidate signed-combined/Infinity-2103449-Combined-Original-Signer.apk \
+            --plan prepared449/PREPARATION.json --out signed-combined/preservation --sdk "$ANDROID_HOME/build-tools/35.0.0"
           cp repairs/dual-experience-isolation-2103420/release-authority.json signed-combined/
-          cp SIGNING-DECISION.json REGISTERED448-CHECK.json SIGNER-ROUTES.json signed-combined/
+          cp SIGNING-DECISION.json REGISTERED449-CHECK.json SIGNER-ROUTES.json signed-combined/
           python3 - <<'PYCODE'
           from pathlib import Path
           from inventory import file_sha
@@ -201,10 +201,10 @@ jobs:
       - if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: Infinity448-Signing-Evidence-${{ github.run_id }}
+          name: Infinity449-Signing-Evidence-${{ github.run_id }}
           path: |
             SIGNING-DECISION.json
-            REGISTERED448-CHECK.json
+            REGISTERED449-CHECK.json
             SIGNER-ROUTES.json
             signed-combined/preservation/
           if-no-files-found: warn

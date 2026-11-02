@@ -15,10 +15,18 @@ def clock():
     raise AssertionError('Actual cinematic elapsed-time node unavailable')
 resume.clock=clock
 def control(label):q.strip_to(label);q.tap(label)
+def skip(delta):
+    before=clock();control('−10 s' if delta<0 else '+10 s');deadline=q.feature_time()+18
+    while q.feature_time()<deadline:
+        actual=clock()
+        if abs(actual-(before+delta))<=2:
+            q.record('real_skip_completed',delta=delta,before=before,after=actual);return
+        time.sleep(.2)
+    raise AssertionError('Seek completion did not reach the ten-second target')
 def visible_surface_tap():
     previous=None;deadline=q.feature_time()+3.5
     while q.feature_time()<deadline:
-        nodes=[n for n in q.nodes().iter('node') if n.attrib.get('class')=='android.view.SurfaceView' and n.attrib.get('package')==q.P and n.attrib.get('clickable')=='true']
+        nodes=[n for n in q.nodes().iter('node') if n.attrib.get('class')=='android.view.SurfaceView' and n.attrib.get('package')==q.P and n.attrib.get('enabled')=='true']
         q.check(len(nodes)==1,'One actual clickable video surface required');b=q.bounds(nodes[0])
         if b==previous:
             q.shell('input','tap',str((b[0]+b[2])//2),str((b[1]+b[3])//2));q.record('real_video_surface_tap',bounds=b);return
@@ -57,7 +65,7 @@ def synthetic_call(a,saved):
         while q.feature_time()<deadline:
             dump=q.shell('dumpsys','audio');(q.out/'call-audio-policy.txt').write_text(dump)
             # Require observed platform mode, not just modem's fictional call.
-            m=re.search(r'(?:mMode|Actual mode|Mode|mode)\s*(?:=|:)\s*(MODE_IN_CALL|MODE_IN_COMMUNICATION|2|3)\b',dump)
+            m=re.search(r'^\s*(?:-\s*)?(?:mMode|Actual mode)\s*(?:=|:)\s*(MODE_IN_CALL|MODE_IN_COMMUNICATION|2|3)\b',dump,re.M)
             if m:mode=m[0];break
             time.sleep(.3)
         if not mode:
@@ -72,7 +80,7 @@ def synthetic_call(a,saved):
 def body(a):
     a.segment='remaining';resume.setup(a)
     q.open_video('Open A','red','a.mp4');advancing();p=resume.pause();time.sleep(1.1);q.check(clock()==p,'User pause did not hold position');control('Play');advancing()
-    resume.seek(.2);control('−10 s');position=clock();q.check(100<=position<=122,'Back ten-second control');control('+10 s');q.check(clock()>=position+8,'Forward ten-second control')
+    resume.pause();resume.seek(.2);skip(-10);skip(10);control('Play');advancing()
     control('Mute');q.await_text('Unmute');q.tap('Unmute');q.await_text('Mute');q.record('real_mute_toggle')
     control('Audio');track=q.await_prefix('Audio 2');q.screenshot('audio-menu');q.tap(track);q.record('existing_audio_choice',track=track)
     control('Subtitles');track=q.await_prefix('Subtitle 1');q.tap(track);q.await_text('External subtitle fixture');q.screenshot('subtitle-rendered');q.record('subtitle_actually_rendered')

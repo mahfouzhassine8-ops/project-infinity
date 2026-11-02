@@ -85,7 +85,7 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
         callActive=isCallMode(audio.getMode());
         callMuted=callActive && !(saved!=null && saved.getBoolean("preview.callActive") && !saved.getBoolean("preview.callMuted",true));
         if(Build.VERSION.SDK_INT>=31){
-            callModeListener=mode->{if(!isFinishing()&&engine!=null)syncCallMode(true);};
+            callModeListener=mode->{if(!isFinishing()&&engine!=null)syncCallMode(hasWindowFocus());};
             audio.addOnModeChangedListener(getMainExecutor(),callModeListener);
         }
         buildUi(); accept(getIntent(), restored);
@@ -283,10 +283,11 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
     }
     private void addControl(View child, int widthDp) {
         float fontScale = Math.max(1f, getResources().getConfiguration().fontScale);
+        child.setTag(new int[]{widthDp,52});
         controlRow.addView(child,new LinearLayout.LayoutParams(dp(Math.round(widthDp*fontScale)),dp(52)));
     }
     private void separator(int before, int after) {
-        View line = new View(this); line.setTag("preview.divider"); line.setBackgroundColor(chrome.track);
+        View line = new View(this); line.setTag(new int[]{1,24,before,after}); line.setBackgroundColor(chrome.track);
         LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(dp(1),dp(24));p.setMargins(dp(before),0,dp(after),0);controlRow.addView(line,p);
     }
     private void buildUi() {
@@ -389,6 +390,7 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
     }
     private void applyChrome() {
         if(root==null)return;chrome=new InfinityPreviewChrome(this,isLight());root.setBackground(chrome.backdrop());
+        resizeChromeControls();
         top.setBackground(new android.graphics.drawable.InsetDrawable(chrome.glass(14,false),0,dp(4),0,dp(4)));toolbar.setBackground(chrome.glass(16,false));picture.setForeground(chrome.glass(10,true));
         tintTree(top);tintTree(controlRow);title.setTextColor(chrome.ink);message.setTextColor(chrome.ink);times.setTextColor(chrome.secondary);totalTime.setTextColor(chrome.secondary);
         ((InfinityPreviewChrome.Control)retry).theme(chrome);brand.theme(chrome);chrome.seek(seek);chrome.seek(inlineVolume);busy.setIndeterminateTintList(android.content.res.ColorStateList.valueOf(chrome.accent));
@@ -398,8 +400,27 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
     }
     private void tintTree(View view) {
         if(view instanceof InfinityPreviewChrome.Control)((InfinityPreviewChrome.Control)view).theme(chrome);
-        else if("preview.divider".equals(view.getTag()))view.setBackgroundColor(chrome.track);
+        else if("preview.divider".equals(view.getTag())||(view.getTag() instanceof int[]&&((int[])view.getTag()).length==4))view.setBackgroundColor(chrome.track);
         if(view instanceof ViewGroup)for(int i=0;i<((ViewGroup)view).getChildCount();i++)tintTree(((ViewGroup)view).getChildAt(i));
+    }
+    private void resizeChromeControls() {
+        // Android reports density changes in-place for this existing Activity.
+        // Re-measure the same controls; do not replace the surface or decoder.
+        float scale=Math.max(1f,getResources().getConfiguration().fontScale);
+        for(int i=0;i<controlRow.getChildCount();i++){
+            View child=controlRow.getChildAt(i);int[] d=(int[])child.getTag();
+            LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(dp(d.length==2?Math.round(d[0]*scale):d[0]),dp(d[1]));
+            if(d.length==4)p.setMargins(dp(d[2]),0,dp(d[3]),0);child.setLayoutParams(p);
+        }
+        top.setPadding(dp(10),0,dp(8),0);top.getChildAt(0).setLayoutParams(new LinearLayout.LayoutParams(dp(68),dp(48)));
+        LinearLayout.LayoutParams divider=new LinearLayout.LayoutParams(dp(1),dp(14));divider.setMargins(dp(13),0,dp(15),0);top.getChildAt(1).setLayoutParams(divider);
+        toolbar.setPadding(dp(12),0,dp(4),0);timeline.setPadding(dp(11),0,dp(12),0);
+        title.setTextSize(12);message.setTextSize(16);times.setTextSize(10);totalTime.setTextSize(10);subtitles.setTextSize(20);
+        times.setLayoutParams(new LinearLayout.LayoutParams(dp(Math.round(32*scale)),-2));totalTime.setLayoutParams(new LinearLayout.LayoutParams(dp(Math.round(27*scale)),-2));
+        seek.setPadding(dp(8),0,dp(8),0);seek.setLayoutParams(new LinearLayout.LayoutParams(0,dp(42),1));
+        notice.setPadding(dp(20),dp(12),dp(20),dp(12));busy.setLayoutParams(new LinearLayout.LayoutParams(dp(32),dp(32)));retry.setLayoutParams(new LinearLayout.LayoutParams(dp(88),dp(48)));
+        FrameLayout.LayoutParams sub=(FrameLayout.LayoutParams)subtitles.getLayoutParams();sub.bottomMargin=dp(12);subtitles.setLayoutParams(sub);
+        GradientDrawable black=new GradientDrawable();black.setColor(Color.BLACK);black.setCornerRadius(dp(10));picture.setBackground(black);
     }
     private void place(View child,int w,int h,int left,int topMargin,int gravity,int bottom) {
         FrameLayout.LayoutParams old=(FrameLayout.LayoutParams)child.getLayoutParams();

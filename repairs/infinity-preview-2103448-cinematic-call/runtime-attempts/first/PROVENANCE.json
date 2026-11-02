@@ -1,0 +1,8 @@
+{
+  "run": 41466776501,
+  "conclusion": "failure",
+  "artifact_id": 13154115858,
+  "artifact_sha256": "b6204a978076c257e9e96dbc391685a6f08b6db2134339c98e7f038586376b22",
+  "source": "f60a043faee8de8cf397aa733bf1e405b0f279c8",
+  "finding": "Actual decoded red video, clock, pause, and seek taps observed. Test read stale position immediately after asynchronous seek. Failure XML elapsed 1:34, later screenshot 1:44. Final assertions now wait for observed seek completion using existing bounded observation interval. Synthetic fixture now uses one-second keyframes; decoder remains exact signed448."
+}

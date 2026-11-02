@@ -15,7 +15,7 @@ def main(a):
  for name,color,tone in [('a','red',440),('b','green',660),('c','blue',880),('end','yellow',550)]:
   args=['ffmpeg','-hide_banner','-loglevel','error','-f','lavfi','-i',f'color=c={color}:s=640x360:r=24','-f','lavfi','-i',f'sine=frequency={tone}:sample_rate=48000']
   if name=='a':args+=['-f','lavfi','-i','sine=frequency=990:sample_rate=48000','-i',str(subtitle),'-map','0:v','-map','1:a','-map','2:a','-map','3:s','-c:s','mov_text','-metadata:s:a:0','language=eng','-metadata:s:a:1','language=fra','-metadata:s:s:0','language=eng']
-  args+=['-t','3' if name=='end' else '600','-c:v','libx264','-preset','ultrafast','-pix_fmt','yuv420p','-c:a','aac','-movflags','+faststart',media/(name+'.mp4')]
+  args+=['-t','3' if name=='end' else '600','-c:v','libx264','-preset','ultrafast','-g','24','-pix_fmt','yuv420p','-c:a','aac','-movflags','+faststart',media/(name+'.mp4')]
   run(*args)
  run('ffmpeg','-hide_banner','-loglevel','error','-f','lavfi','-i','sine=frequency=440:sample_rate=48000','-t','10','-c:a','aac',media/'audio.mp4')
  (media/'bad.mp4').write_bytes(b'not a video\n')

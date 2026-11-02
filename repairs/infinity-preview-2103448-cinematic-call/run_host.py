@@ -12,5 +12,5 @@ cp=':'.join(paths);classes=a.out/'classes';classes.mkdir()
 subprocess.run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-source','8','-target','8','-cp',cp,'-d',str(classes),str(H/'PreviewChromeTest.java')],check=True)
 r=subprocess.run(['java','--add-opens','java.base/sun.nio.ch=ALL-UNNAMED','-Drobolectric.dependency.repo.url=https://repo.maven.apache.org/maven2','-Dpreview.render.out='+str(a.out/'renders'),'-cp',str(classes)+':'+cp,'org.junit.runner.JUnitCore','com.projectinfinity.kodi.PreviewChromeTest'],text=True,capture_output=True)
 (a.out/'OUTPUT.txt').write_text(r.stdout+r.stderr);print(r.stdout+r.stderr)
-assert r.returncode==0 and 'OK (7 tests)' in r.stdout
-(a.out/'HOST-RESULT.json').write_text(json.dumps(dict(status='PASS',tests=7,runtime='Robolectric API35 actual Activity/View input and native Canvas; decoder terminal spy, not actual media decoding'),indent=2)+'\n')
+assert r.returncode==0 and 'OK (8 tests)' in r.stdout
+(a.out/'HOST-RESULT.json').write_text(json.dumps(dict(status='PASS',tests=8,runtime='Robolectric API35 actual Activity/View input and native Canvas; decoder terminal spy, not actual media decoding'),indent=2)+'\n')

@@ -1,0 +1,28 @@
+warning: [options] bootstrap class path not set in conjunction with -source 8
+warning: [options] source value 8 is obsolete and will be removed in a future release
+warning: [options] target value 8 is obsolete and will be removed in a future release
+warning: [options] To suppress warnings about obsolete options, use -Xlint:-options.
+Note: /workspace/project-infinity/repairs/infinity-preview-2103448-cinematic-call/PreviewChromeTest.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+4 warnings
+JUnit version 4.13.2
+....E....
+Time: 11.746
+There was 1 failure:
+1) renderBothThemesAndResponsiveWindows(com.projectinfinity.kodi.PreviewChromeTest)
+java.lang.AssertionError: Control hitboxes follow actual density expected:<137> but was:<104>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:647)
+	at com.projectinfinity.kodi.PreviewChromeTest.renderBothThemesAndResponsiveWindows(PreviewChromeTest.java:137)
+	Suppressed: org.robolectric.android.internal.AndroidTestEnvironment$UnExecutedRunnablesException: Main looper has queued unexecuted runnables. This might be the cause of the test failure. You might need a shadowOf(Looper.getMainLooper()).idle() call.
+
+FAILURES!!!
+Tests run: 8,  Failures: 1
+
+
+Traceback (most recent call last):
+  File "/workspace/project-infinity/repairs/infinity-preview-2103448-cinematic-call/run_host.py", line 15, in <module>
+    assert r.returncode==0 and 'OK (8 tests)' in r.stdout
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError
