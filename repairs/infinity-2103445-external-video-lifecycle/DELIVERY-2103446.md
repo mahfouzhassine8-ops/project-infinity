@@ -1,0 +1,80 @@
+# Infinity2103446 — original-key signed scoped testing candidate
+
+The actual signed install-over candidate contains the previously verified external local-video request-order correction. Nine existing host tests were retained, and the rebuilt production DEX exactly matches their recorded owner receipt. The user explicitly authorized packaging this scoped correction while retaining the separate unresolved Loading/Stop/native/runtime limitations below.
+
+**Downloads**
+
+- [Signed APK artifact](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/41382219186/artifacts/13113880989): extract `Infinity-2103446-Combined-Original-Signer.apk` from the GitHub download ZIP. It also contains signature, build and complete member-comparison receipts.
+- [Exact matching component ZIPs](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/41382219186/artifacts/13113269140): INFINITY.zip, COBRA.zip, CHOOSER_SHELL.zip and MINIMAL_ANDROID_CONTRACT.zip, plus catalog and SHA256SUMS.
+- [Signing evidence](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/41382219186/artifacts/13113653842).
+- [Successful original-key build/signing run41382219186](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/41382219186).
+- [Successful owner preparation41381663222](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/41381663222).
+
+**Exact identity**
+
+| Field | Value |
+|---|---|
+|Package|`com.projectinfinity.kodi`|
+|versionCode|`2103446`|
+|Signed source|`56a6dcdee56232d04f3a7bfc4de897ff0667ebb7`|
+|Component producer source|`e79993aee24dde6372d16f756633473dcdb2b5bb`|
+|APK size|778,559,233 bytes|
+|Original certificate SHA256|`d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7`|
+|Original-signature checks|apksigner v1/v2/v3 verification PASS; exact original certificate; zipalign verification PASS|
+|Install-over basis|Same package/certificate, higher versionCode; manifest unchanged outside its typed versionCode|
+|Experience versions|Infinity446; Cobra445|
+|Acceptance|Physical Fold pending; accepted pointer unchanged; no new lock/promotion|
+
+**SHA256**
+
+| File | SHA256 |
+|---|---|
+|Infinity-2103446-Combined-Original-Signer.apk|`a2f083b36f9bc1cd79a44a261ecb83bcd7ddd0bd4cb418c03952e86af9df641d`|
+|INFINITY.zip|`b1d96232b15318765a9ebe052634b0f866225db76bce69f3a188b0795fe8919a`|
+|COBRA.zip|`f63d4c1e491dc94591c5623bf02be90d4f9c187b91a0511b36398ee96745f8a8`|
+|CHOOSER_SHELL.zip|`6abdc79211df73a95fe1a0828c6e149121d2eef90f1a4b70217d269d258892c4`|
+|MINIMAL_ANDROID_CONTRACT.zip|`432bfb7b246a504d9550e1de39368c3b7e0946532f1c695531ed891e74ef03d8`|
+
+Machine-readable [SHA256SUMS](release-evidence/SHA256SUMS) and [published-component verification](release-evidence/COMPONENT-DOWNLOAD-VERIFICATION.json) are retained.
+
+**Implemented behavior and exact preservation**
+
+The request ticket prevents an older cold-start/paused external-video callback from superseding the latest accepted local video. Repeated delivery of one accepted ticket is suppressed; deliberately opening the same URI again remains allowed. Original intent data/type, flags, ClipData semantics and caller extras remain preserved. There is no additional worker, timer, persistence, engine restart, generic dialog dismissal or Stop/Back interception.
+
+The correction remains exactly the four source/build files and nine-test policy at1a7cfc89. Actual DEX changes are Main.onCreate, Main.onNewIntent and Main$3.run, plus the two InfinityExternalVideoIntents helper classes. All576 other original Infinity classes, original fields/annotations, remaining Main methods, pause/resume/stop/destroy behavior and native linkage policy are unchanged.
+
+The release workflow preserves the existing sole original-key signer. Packaging-only changes select this branch, add a445 recovery-lock assertion while retaining every previous guard, classify the new Infinity helper, and register the inspected unsigned QA workflow without granting it original-key access. Authority generation33 binds the exact official preparation. No signing-policy check was removed or skipped.
+
+The published signed APK was independently downloaded, hashed, and compared against the exact signed445 APK using an in-memory file; no Android application execution was involved. The published component artifact was independently downloaded and every component ZIP hash matched the registered preparation.
+
+| Actual signed APK member changes | Reason |
+|---|---|
+|`classes3.dex`|Exact host-tested request-race DEX, SHA256 `d4f5f5003afe9e890d947505515f54d2ad507bf4b4fd3126ed5e2cdab751afe6`|
+|`AndroidManifest.xml`|Typed versionCode only,445→446; normalized manifest identical|
+|`assets/experience-component-updates.properties`|Truthful Infinity446/Cobra445 version metadata; chooser code unchanged|
+|`META-INF/INFINITY.RSA`, `META-INF/INFINITY.SF`, `META-INF/MANIFEST.MF`|Required regenerated original-key v1 signing members; APK v2/v3 signing blocks regenerated by the guarded original signer|
+
+Every other payload member is byte-identical: **7,611 unchanged members; all47 native libraries unchanged**. Cobra ZIP and minimal Android contract ZIP remain byte-identical to445. All chooser/shared/Cobra DEX, launcher resources, skin, add-ons/providers and unrelated assets are unchanged. Shutdown/durability guards are unchanged and were not tested. No user data was accessed, cleared, reset or migrated.
+
+See [signed CI comparison](release-evidence/SIGNED-APK-PRESERVATION.json), [independent published-APK comparison including signing members](release-evidence/INDEPENDENT-DOWNLOAD-VERIFICATION.json), [owner method/class receipt](release-evidence/OWNER-PRESERVATION.json), [pre-sign decision](release-evidence/SIGNING-DECISION.json), [build receipt](release-evidence/BUILD-RECEIPT.json) and [public certificate/signature output](release-evidence/SIGNATURE.txt). The APK artifact includes the complete `preservation/ALL-APK-MEMBERS.json` hash vector.
+
+**Verification and limits**
+
+- Nine focused host policy tests PASS, reused unchanged: Robolectric/API35, actual delayed callback with a recording JNI endpoint. They establish dispatch ordering and preserved intent semantics; native decoding is unverified.
+- Five focused release-protocol tests PASS. Exact rebuilt owner equality, official artifact/source binding, protected-lock/authority lineage, owner boundaries, original signing identity, alignment, APK integrity, signed payload and exact member/component preservation PASS.
+- Android observation41379570028 remained at compatibility/media-access startup prompts in both phases. All eight screenshots were inspected; it supplies no video-player, Loading dismissal, Stop/Back or reopen PASS. No additional emulator test was started for this release.
+- Actual MiXplorer MIME/URI remains uncaptured. The correction applies to ACTION_VIEW with supplied `video/` MIME and local `file://`/`content://`; other routes retain original behavior. Applicability to the actual physical route remains pending.
+- The lingering Loading-overlay owner, automatic dismissal and native Stop/return freeze remain unresolved. The worker-starvation dependency is conditional; queued playback work/import-lock ownership is unknown. Historical screen-off ANR and separate SIGSEGV are not definitively bound to a producer version. None is claimed repaired by446.
+- No measured physical performance improvement or Fold acceptance is claimed.
+
+The earlier read-only reports accurately describe their historical blocked state; the later explicit scoped-candidate authorization and this actual signed delivery supersede that release status, without changing the unresolved diagnostic findings.
+
+**Physical Fold acceptance procedure**
+
+1. Install the combined APK over445 using Android's normal update flow. Retain recovery445; no uninstall, clearing data or resetting preferences.
+2. From MiXplorer, open local videoA through Infinity(Splash), then selectB while the earlier launch is pending. Confirm the final playing identity remainsB without oldA replacing it.
+3. Observe Loading dismissal independently; check Stop and Back responsiveness, then openC and deliberately reopen the same file. Record any remaining symptom against build446.
+4. Check ordinary background/foreground return and playback continuity during the selected local-file sequence.
+5. Confirm the existing profile/settings remain. These are user acceptance steps; no shutdown test is requested.
+
+The user alone accepts446 on the physical Galaxy Fold. Locked signed445 and all prior protected recovery baselines remain untouched.
