@@ -1,0 +1,31 @@
+{
+  "status": "PASS_TARGETED_HOST_POLICY_ONLY; RELEASE_BLOCKED",
+  "baseline_bug_reproductions": 2,
+  "corrected_policy_tests": 9,
+  "framework": "Robolectric4.14.1 API35; actual baseline/patched Main$3 callback with recording JNI endpoint",
+  "baseline_observed_order": [
+    "B.mp4",
+    "A.mp4"
+  ],
+  "corrected_observed_order": [
+    "B.mp4"
+  ],
+  "rapid_paused_selections": "three inputs; only latest C reaches recording JNI endpoint",
+  "initial_grant_test_failure": "Fixture asserted ClipData object identity; Android Intent copying preserves value, not identity. Corrected semantic grant/URI/ClipData check passes; full9 final tests pass. Original failed run retained.",
+  "native_decode_UI_or_Stop": "NOT_TESTED",
+  "stuck_loading_owner": "NOT_IDENTIFIED",
+  "user_diagnostic_zip_bytes": "NOT_ACCESSIBLE; brief summary only; no screenshot/recording exists per user",
+  "Android17": "NO_ATTACHED_NATIVE_ARM_RUNTIME; historical translated emulator constructor failure not rerun",
+  "native_crash": "UNRESOLVED_NOT_REPAIRED",
+  "screen_off_ANR": "NATIVE_DISPLAY_WAIT_REPORTED_IN_BRIEF; RAW_TRACE_UNAVAILABLE; PROTECTED_CODE_UNCHANGED",
+  "shutdown": "FROZEN_NOT_TESTED",
+  "candidate_APK": "NOT_BUILT_NOT_SIGNED_NOT_DELIVERED",
+  "physical_Fold": "NOT_TESTED",
+  "source_test_inputs": {
+    "baseline_DEX": "7e18d8092de33a4d44e299305965e9b9eb943372a9643452f6f78afe209fb215",
+    "baseline_JAR": "a9f2dba1b76f3e10aa6c4cdcc23b999e0787066eaa6844efc4d92ccd9b7e06ee",
+    "candidate_JAR": "be460c39f63331f56706c3e255b98bf702c3cd658a04ba6bd0dacab2f9d30cb1",
+    "baseline_test_source": "84465fa5f0d340ad44b03a0f7b0c31ca379d92724070184489b997ef1b092bef",
+    "candidate_test_source": "3145f6ca575b1e41fadb1a8e01a70ce84f53daf76434995ca335a7f8f0e5db86"
+  }
+}

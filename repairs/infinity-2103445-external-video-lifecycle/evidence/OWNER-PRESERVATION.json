@@ -1,0 +1,29 @@
+{
+  "APK": "NOT_BUILT",
+  "baseline_dex_sha256": "7e18d8092de33a4d44e299305965e9b9eb943372a9643452f6f78afe209fb215",
+  "candidate_dex_sha256": "d4f5f5003afe9e890d947505515f54d2ad507bf4b4fd3126ed5e2cdab751afe6",
+  "changed_methods": {
+    "Lcom/projectinfinity/kodi/Main$3;": [
+      "public run()V"
+    ],
+    "Lcom/projectinfinity/kodi/Main;": [
+      "protected onNewIntent(Landroid/content/Intent;)V",
+      "public onCreate(Landroid/os/Bundle;)V"
+    ]
+  },
+  "native_Cobra_chooser_shared_shutdown": "NOT_MODIFIED_NOT_TESTED",
+  "new_classes": [
+    "Lcom/projectinfinity/kodi/InfinityExternalVideoIntents$State;",
+    "Lcom/projectinfinity/kodi/InfinityExternalVideoIntents;"
+  ],
+  "onResume_onPause_onStop_onDestroy_other_methods": "EXACT",
+  "original_fields_annotations": "EXACT",
+  "sources": {
+    "repairs/infinity-2103445-external-video-lifecycle/PreserveInfinityExternalDex.java": "2779cae90585b0eed401ecaf0dbbd5ba584c49bdb2c2e8fcbf3a97e55b9e970b",
+    "repairs/infinity-2103445-external-video-lifecycle/build_owner.py": "73a08b8db15c2a7c8fa4c302f7914d5e64e8c1c8c7ec3a03678ec65730e41cc3",
+    "repairs/infinity-2103445-external-video-lifecycle/patch_external_intents.py": "30e8490a3d4bdbfc28a27369257586220b3fdd9848dc1ff8ec379277c9b069c0",
+    "repairs/infinity-2103445-external-video-lifecycle/runtime/InfinityExternalVideoIntents.java": "2f00971d632e6814cbeb828579d84eb3303e10a735056d25ca4146c3a33c6604"
+  },
+  "status": "PASS_EXACT445_EXTERNAL_INTENT_ONLY_DEX_DELTA",
+  "unchanged_classes": 576
+}
