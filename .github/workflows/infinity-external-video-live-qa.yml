@@ -1,0 +1,161 @@
+name: Infinity | selected external video A-B Stop Back Android QA only
+on:
+  push:
+    branches: [work/infinity-2103445-external-video-lifecycle-20261101]
+    paths: ['.github/workflows/infinity-external-video-live-qa.yml']
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-external-video-445-android-qa
+  cancel-in-progress: false
+jobs:
+  selected-android-reproduction:
+    name: Disposable Android37 local video reproduction; no shutdown
+    runs-on: ubuntu-22.04
+    timeout-minutes: 55
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      INFINITY_EMULATOR_API: '37.1'
+      INFINITY_EMULATOR_TARGET: google_apis_ps16k
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false}
+      - name: Enforce locked source and selected Infinity-only scope
+        run: |
+          set -euo pipefail
+          git cat-file -e 6cf75639a46ec6b0c858ae32abc102450fdc0974^{commit}
+          git diff --name-only 6cf75639a46ec6b0c858ae32abc102450fdc0974 HEAD | tee /tmp/infinity-qa-scope
+          if grep -Ev '^(repairs/infinity-2103445-external-video-lifecycle/|\.github/workflows/infinity-external-video-live-qa\.yml$)' /tmp/infinity-qa-scope; then
+            echo 'Out-of-scope repository change'; exit 1
+          fi
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '21'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 41349763470
+          name: Infinity-Combined-Original-Signer-41349763470
+          github-token: ${{ github.token }}
+          path: runtime-445
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 41349763470
+          name: Infinity-Combined-Owner-Components-41349763470
+          github-token: ${{ github.token }}
+          path: runtime-components
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39867073954
+          name: Infinity-Receipt-Race-Android17-Investigation
+          github-token: ${{ github.token }}
+          path: runtime-tools
+      - uses: android-actions/setup-android@v4
+        with:
+          cmdline-tools-version: '15859902'
+          packages: platform-tools build-tools;35.0.0
+          log-accepted-android-sdk-licenses: false
+      - name: Build exact corrected DEX and ephemeral Android QA APK
+        run: |
+          set -euo pipefail
+          mkdir -p android-evidence
+          BASE="$(find runtime-445 -name 'Infinity-2103445-Combined-Original-Signer.apk' -type f -print -quit)"
+          COMPONENT="$(find runtime-components -name INFINITY.zip -type f -print -quit)"
+          test -n "$BASE" && test -n "$COMPONENT"
+          echo 'b7e78393ade7e52d8653823a0ad72ae99614a5a8e0b6cdedf5d5d15a9e643400  '"$BASE" | sha256sum -c
+          echo 'd03b4d5e845dfb5e1d6bb75c1967c7b6a2e55c5b17a7c65d66d43d43abd2e73d  '"$COMPONENT" | sha256sum -c
+          test -f runtime-tools/receipt-evidence/android-34.jar
+          test -d runtime-tools/receipt-evidence/tool-jars
+          test -f "$ANDROID_HOME/build-tools/35.0.0/lib/d8.jar"
+          sudo mkdir -p /workspace/cobra-evidence
+          sudo ln -s "$GITHUB_WORKSPACE/runtime-tools" /workspace/cobra-evidence/tools
+          cp "$ANDROID_HOME/build-tools/35.0.0/lib/d8.jar" runtime-tools/d8.jar
+          mkdir -p /tmp/cobra445-prepared/components
+          cp "$COMPONENT" /tmp/cobra445-prepared/components/INFINITY.zip
+          python3 repairs/infinity-2103445-external-video-lifecycle/build_owner.py android-evidence/corrected-owner
+          python3 repairs/infinity-2103445-external-video-lifecycle/android_qa/live_external_qa.py pack \
+            --baseline "$BASE" --dex android-evidence/corrected-owner/candidate.dex \
+            --sdk "$ANDROID_HOME/build-tools/35.0.0" --out android-evidence/disposable-package
+          sudo apt-get update -qq
+          sudo apt-get install -y libpulse0 ffmpeg
+          mkdir -p android-evidence/fixture
+          ffmpeg -hide_banner -loglevel error -f lavfi -i testsrc2=size=640x360:rate=24 \
+            -f lavfi -i sine=frequency=300:sample_rate=48000 -t 20 \
+            -c:v libx264 -preset ultrafast -pix_fmt yuv420p -c:a aac -y android-evidence/fixture/QA_A.mp4
+          ffmpeg -hide_banner -loglevel error -f lavfi -i smptebars=size=640x360:rate=24 \
+            -f lavfi -i sine=frequency=600:sample_rate=48000 -t 20 \
+            -c:v libx264 -preset ultrafast -pix_fmt yuv420p -c:a aac -y android-evidence/fixture/QA_B.mp4
+          python3 repairs/infinity-final-closure-2103407/api37_environment_gate.py \
+            --sdk-root "$ANDROID_HOME" --out android-evidence/platform --pin-tools
+          python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py \
+            --out android-evidence/emulator-preflight
+          sudo chmod 666 /dev/kvm
+      - name: Exercise baseline and corrected DEX on disposable Android 37 emulator
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: '37.1'
+          arch: x86_64
+          target: google_apis_ps16k
+          profile: pixel_2
+          avd-name: infinity-four-repair-api37
+          disk-size: 8G
+          pre-emulator-launch-script: python3 repairs/infinity-final-closure-2103407/api37_environment_gate.py --sdk-root "$ANDROID_HOME" --out android-evidence/platform --check-avd
+          disable-animations: false
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: |
+            set +e
+            BASE="$(find runtime-445 -name Infinity-2103445-Combined-Original-Signer.apk -type f -print -quit)"
+            python3 repairs/infinity-2103445-external-video-lifecycle/android_qa/live_external_qa.py play \
+              --apk "$BASE" --media android-evidence/fixture \
+              --phase baseline --out android-evidence/baseline-playback
+            BASE_RESULT=$?
+            # QA emulator only: no user application/data and no shutdown acceptance.
+            adb uninstall com.projectinfinity.kodi > android-evidence/qa-only-reinstall.txt 2>&1
+            python3 repairs/infinity-2103445-external-video-lifecycle/android_qa/live_external_qa.py play \
+              --apk android-evidence/disposable-package/qa-DISCARD-DO-NOT-INSTALL-ON-PHONE.apk \
+              --media android-evidence/fixture \
+              --phase candidate --out android-evidence/corrected-playback
+            CANDIDATE_RESULT=$?
+            printf 'Baseline=%s Candidate=%s\n' "$BASE_RESULT" "$CANDIDATE_RESULT" | tee android-evidence/ADB-RESULTS.txt
+            exit 0
+      - name: Report evidence honestly (not automatic playback PASS)
+        if: always()
+        run: |
+          mkdir -p android-evidence
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          paths=[Path('android-evidence/baseline-playback/RESULT.json'),
+                 Path('android-evidence/corrected-playback/RESULT.json')]
+          cases=[]
+          for p in paths:
+            if not p.exists(): cases.append({'file':str(p),'result':'NOT_RUN_OR_PREPARATION_BLOCKED'})
+            else:
+              r=json.loads(p.read_text())
+              cases.append({'phase':r['phase'],'result':r['result'],
+                'observations':r.get('observations',{}),
+                'fatal_strings':r.get('fatal_strings'),'errors':r.get('errors')})
+          summary={'purpose':'Android37 synthetic local-video ACTION_VIEW A-B Stop Back',
+            'status':'EVIDENCE_ONLY_NOT_FULL_KODI_PLAYBACK_PASS','cases':cases,
+            'physical_fold':False,'miXplorer_content_uri':False,
+            'stop_input':'KEYCODE_MEDIA_STOP; not UI tap',
+            'qa_debug_signing_is_not_original_release_signing':True,
+            'shutdown_test':False,'no_user_data':True}
+          Path('android-evidence/SUMMARY.json').write_text(json.dumps(summary,indent=2)+'\n')
+          print(json.dumps(summary,indent=2))
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-External-Video-Android-QA-${{ github.run_id }}
+          path: |
+            android-evidence/SUMMARY.json
+            android-evidence/ADB-RESULTS.txt
+            android-evidence/baseline-playback/
+            android-evidence/corrected-playback/
+            android-evidence/corrected-owner/OWNER-PRESERVATION.json
+            android-evidence/disposable-package/QA-PACK.json
+            android-evidence/platform/
+          retention-days: 30
+          if-no-files-found: warn
