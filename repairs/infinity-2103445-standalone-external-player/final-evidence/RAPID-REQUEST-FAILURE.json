@@ -1,0 +1,19 @@
+{
+  "run_id": 41405154404,
+  "source": "20cc69b6acb551bfe098db7bc9045e819110faa1",
+  "artifact_id": 13123506592,
+  "artifact_sha256": "d461b94dfcb77ea9ffa963c9ad58724be5927b0f456b47de570d52fa0275ccb6",
+  "result": "FAIL",
+  "observed": "Android accepted A, B and C for singleInstance Splash; only A reached the private player and remained visible. Gateway finished in onCreate before queued intent callbacks.",
+  "preserved_passing_evidence": [
+    "real video and audio decode",
+    "native audio and subtitle selection",
+    "real Stop and Back return",
+    "background replacement",
+    "viewport resize",
+    "no Kodi process"
+  ],
+  "selected_correction": "One queued main-loop handoff, latest intent per gateway; no timer or additional player; original onResume unchanged.",
+  "new_host_tests": 14,
+  "shutdown": "NOT_RUN"
+}
