@@ -1,0 +1,18 @@
+{
+  "baseline_versionCode": 2103445,
+  "candidate_versionCode": 2103446,
+  "correction": "Previously host-verified stale external local-video request elimination only",
+  "production_checkpoint": "1a7cfc89ef3695ae9ee85b963666f9a154005c5c",
+  "selected_release_tests": [
+    "test_authority_route_preserves_all_existing_guards",
+    "test_original_signer_after_exact_payload_gates",
+    "test_exact_member_delta_rejects_unrelated_changes",
+    "test_original_baseline_and_member_set_required",
+    "test_reused_host_receipts_and_production_sources"
+  ],
+  "reused_host_tests": 9,
+  "new_application_tests": [],
+  "shutdown": "FROZEN_NOT_TESTED",
+  "physical_Fold": "USER_ACCEPTANCE_PENDING",
+  "accepted_pointer_updated": false
+}

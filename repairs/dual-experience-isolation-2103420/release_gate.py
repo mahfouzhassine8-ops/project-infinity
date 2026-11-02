@@ -17,7 +17,9 @@ from inventory import (APK_SHA, CERT_SHA, OWNERS, PACKAGE, SIGNATURE, HERE,
                        apk_members, canonical, digest, disassemble, file_sha,
                        load, manifest_tree, parse_dex, save, chunks, string_pool)
 
-AUTHORITY_BRANCH = 'work/cobra-2103444-rotation-audio-preserved-20261101'
+AUTHORITY_BRANCH = 'work/infinity-2103445-external-video-lifecycle-20261101'
+EXTERNAL_PROTECTED_REF = 'refs/heads/lock/infinity-cobra-2103445-user-approved-20261101'
+EXTERNAL_PROTECTED_COMMIT = '6cf75639a46ec6b0c858ae32abc102450fdc0974'
 ROTATION_PROTECTED_REF = 'refs/heads/lock/infinity-cobra-2103444-user-approved-20261101'
 ROTATION_PROTECTED_COMMIT = '1b7a4ef16524854fab77a1c974538aee8a1132bb'
 QUALITY_PROTECTED_REF = 'refs/heads/lock/infinity-cobra-2103442-user-approved-20261101'
@@ -183,8 +185,9 @@ def remote_authority(repository, expected_head):
         return subprocess.check_output(['git', '-C', str(repository), *args], text=True).strip()
     origin = git('remote', 'get-url', 'origin')
     require(origin.removesuffix('.git') == 'https://github.com/mahfouzhassine8-ops/project-infinity', 'AUTHORITY_ORIGIN')
-    remote = git('ls-remote', 'origin', 'refs/heads/' + AUTHORITY_BRANCH, PROTECTED_REF, COMBINED_PROTECTED_REF, LATEST_PROTECTED_REF, DRAWER_PROTECTED_REF, LOADING_PROTECTED_REF, CARDS_THEME_PROTECTED_REF, DISPLAY_PROTECTED_REF, QUALITY_PROTECTED_REF, ROTATION_PROTECTED_REF)
+    remote = git('ls-remote', 'origin', 'refs/heads/' + AUTHORITY_BRANCH, PROTECTED_REF, COMBINED_PROTECTED_REF, LATEST_PROTECTED_REF, DRAWER_PROTECTED_REF, LOADING_PROTECTED_REF, CARDS_THEME_PROTECTED_REF, DISPLAY_PROTECTED_REF, QUALITY_PROTECTED_REF, ROTATION_PROTECTED_REF, EXTERNAL_PROTECTED_REF)
     refs = dict(reversed(line.split()) for line in remote.splitlines())
+    require(refs.get(EXTERNAL_PROTECTED_REF) == EXTERNAL_PROTECTED_COMMIT, 'EXTERNAL445_APPROVED_LOCK_MOVED')
     require(refs.get(ROTATION_PROTECTED_REF) == ROTATION_PROTECTED_COMMIT, 'ROTATION444_APPROVED_LOCK_MOVED')
     require(refs.get(QUALITY_PROTECTED_REF) == QUALITY_PROTECTED_COMMIT, 'QUALITY442_APPROVED_LOCK_MOVED')
     require(refs.get(DISPLAY_PROTECTED_REF) == DISPLAY_PROTECTED_COMMIT, 'DISPLAY438_APPROVED_LOCK_MOVED')
