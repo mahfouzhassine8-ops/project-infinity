@@ -49,8 +49,13 @@ def find(tree,label):
  return None
 def text(tree):return '\n'.join(n.attrib.get('text','') for n in tree.iter('node'))
 def tap(label):
- tree=nodes();n=find(tree,label);check(n is not None,'Visible actual target: '+label)
- b=bounds(n);shell('input','tap',str((b[0]+b[2])//2),str((b[1]+b[3])//2));record('real_touch',label=label,bounds=b)
+ previous=None;deadline=time.monotonic()+3.5
+ while time.monotonic()<deadline:
+  tree=nodes();n=find(tree,label);b=bounds(n) if n is not None else None
+  if b is not None and b==previous:
+   shell('input','tap',str((b[0]+b[2])//2),str((b[1]+b[3])//2));record('real_touch',label=label,bounds=b);return
+  previous=b;time.sleep(.1)
+ raise AssertionError('Stable current touch target unavailable: '+label)
 def await_text(label,seconds=18):
  start=time.monotonic();last=None;notices=0
  while time.monotonic()-start<seconds:
