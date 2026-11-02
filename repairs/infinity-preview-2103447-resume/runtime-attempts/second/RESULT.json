@@ -1,0 +1,498 @@
+{
+  "status": "FAIL",
+  "checks": [
+    {
+      "check": "fresh_fixture_install",
+      "name": "candidate",
+      "seconds": 103.124841533,
+      "sha256": "fb5c716baf0a8f44cd80b96f5da817d208d9bd3cff5961b90f839574f3eeb7ae"
+    },
+    {
+      "check": "fresh_fixture_install",
+      "name": "source",
+      "seconds": 2.0632487889999993,
+      "sha256": "4c5398da177935fca4c63d5602f2a39b1409002dd6c478d6a65412946226ef96"
+    },
+    {
+      "check": "fresh_persistent_OS_observer",
+      "sha256": "7979e10e651a82aeb9269ec49c00f4ec7fbea989c6bca87b4bc56e4ea8a92c44"
+    },
+    {
+      "check": "real_touch",
+      "label": "Open A",
+      "bounds": [
+        0,
+        51,
+        1080,
+        177
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "16",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "no_kodi_process",
+      "kodi_pid": "",
+      "external_pid": "12480"
+    },
+    {
+      "check": "actual_video_decoded",
+      "title": "a.mp4",
+      "color_samples": 105
+    },
+    {
+      "check": "real_touch",
+      "label": "Pause",
+      "bounds": [
+        29,
+        2310,
+        260,
+        2436
+      ]
+    },
+    {
+      "check": "real_android_back"
+    },
+    {
+      "check": "originating_activity_return",
+      "action": "Back"
+    },
+    {
+      "check": "real_touch",
+      "label": "Open B",
+      "bounds": [
+        0,
+        177,
+        1080,
+        303
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "22",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "no_kodi_process",
+      "kodi_pid": "",
+      "external_pid": "12480"
+    },
+    {
+      "check": "actual_video_decoded",
+      "title": "b.mp4",
+      "color_samples": 105
+    },
+    {
+      "check": "real_touch",
+      "label": "Pause",
+      "bounds": [
+        29,
+        2310,
+        260,
+        2436
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Stop",
+      "bounds": [
+        276,
+        2310,
+        507,
+        2436
+      ]
+    },
+    {
+      "check": "originating_activity_return",
+      "action": "Stop"
+    },
+    {
+      "check": "real_touch",
+      "label": "Open A",
+      "bounds": [
+        0,
+        51,
+        1080,
+        177
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "28",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "real_touch",
+      "label": "RESUME",
+      "bounds": [
+        773,
+        1321,
+        978,
+        1463
+      ]
+    },
+    {
+      "check": "real_resume_choice",
+      "label": "RESUME",
+      "choice": "Resume",
+      "expected": 139,
+      "actual": 139
+    },
+    {
+      "check": "no_kodi_process",
+      "kodi_pid": "",
+      "external_pid": "12480"
+    },
+    {
+      "check": "real_touch",
+      "label": "Pause",
+      "bounds": [
+        29,
+        2310,
+        260,
+        2436
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Close",
+      "bounds": [
+        0,
+        68,
+        231,
+        194
+      ]
+    },
+    {
+      "check": "originating_activity_return",
+      "action": "Close"
+    },
+    {
+      "check": "real_touch",
+      "label": "Open B",
+      "bounds": [
+        0,
+        177,
+        1080,
+        303
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "35",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "real_touch",
+      "label": "RESUME",
+      "bounds": [
+        773,
+        1321,
+        978,
+        1463
+      ]
+    },
+    {
+      "check": "real_resume_choice",
+      "label": "RESUME",
+      "choice": "Resume",
+      "expected": 230,
+      "actual": 230
+    },
+    {
+      "check": "no_kodi_process",
+      "kodi_pid": "",
+      "external_pid": "12480"
+    },
+    {
+      "check": "real_touch",
+      "label": "Pause",
+      "bounds": [
+        29,
+        2310,
+        260,
+        2436
+      ]
+    },
+    {
+      "check": "real_android_back"
+    },
+    {
+      "check": "originating_activity_return",
+      "action": "Back"
+    },
+    {
+      "check": "separate_A_B_A_B",
+      "A": 140,
+      "B": 231
+    },
+    {
+      "check": "real_touch",
+      "label": "Alias A",
+      "bounds": [
+        0,
+        807,
+        1080,
+        933
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "42",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "real_touch",
+      "label": "RESUME",
+      "bounds": [
+        773,
+        1321,
+        978,
+        1463
+      ]
+    },
+    {
+      "check": "real_resume_choice",
+      "label": "RESUME",
+      "choice": "Resume",
+      "expected": 140,
+      "actual": 140
+    },
+    {
+      "check": "no_kodi_process",
+      "kodi_pid": "",
+      "external_pid": "12480"
+    },
+    {
+      "check": "real_touch",
+      "label": "Pause",
+      "bounds": [
+        29,
+        2310,
+        260,
+        2436
+      ]
+    },
+    {
+      "check": "real_android_back"
+    },
+    {
+      "check": "originating_activity_return",
+      "action": "Back"
+    },
+    {
+      "check": "two_authorities_same_granted_file_share_identity",
+      "A": 141
+    },
+    {
+      "check": "real_touch",
+      "label": "Open A",
+      "bounds": [
+        0,
+        51,
+        1080,
+        177
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "49",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "real_touch",
+      "label": "RESUME",
+      "bounds": [
+        773,
+        1321,
+        978,
+        1463
+      ]
+    },
+    {
+      "check": "real_resume_choice",
+      "label": "RESUME",
+      "choice": "Resume",
+      "expected": 141,
+      "actual": 142
+    },
+    {
+      "check": "no_kodi_process",
+      "kodi_pid": "",
+      "external_pid": "12480"
+    },
+    {
+      "check": "periodic_real_decoder_checkpoint",
+      "clock_seconds": 303,
+      "stored_positions": [
+        [
+          300372,
+          600000
+        ],
+        [
+          231006,
+          600000
+        ]
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Open A",
+      "bounds": [
+        0,
+        51,
+        1080,
+        177
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "52",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "real_touch",
+      "label": "RESUME",
+      "bounds": [
+        773,
+        1321,
+        978,
+        1463
+      ]
+    },
+    {
+      "check": "real_resume_choice",
+      "label": "RESUME",
+      "choice": "Resume",
+      "expected": 303,
+      "actual": 304
+    },
+    {
+      "check": "no_kodi_process",
+      "kodi_pid": "",
+      "external_pid": "12480"
+    },
+    {
+      "check": "real_touch",
+      "label": "Pause",
+      "bounds": [
+        29,
+        2310,
+        260,
+        2436
+      ]
+    },
+    {
+      "check": "real_android_back"
+    },
+    {
+      "check": "originating_activity_return",
+      "action": "Back"
+    },
+    {
+      "check": "background_progress_preserved",
+      "position": 304
+    },
+    {
+      "check": "real_touch",
+      "label": "Open A",
+      "bounds": [
+        0,
+        51,
+        1080,
+        177
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "61",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "real_touch",
+      "label": "RESUME",
+      "bounds": [
+        773,
+        1321,
+        978,
+        1463
+      ]
+    },
+    {
+      "check": "real_resume_choice",
+      "label": "RESUME",
+      "choice": "Resume",
+      "expected": 304,
+      "actual": 305
+    },
+    {
+      "check": "no_kodi_process",
+      "kodi_pid": "",
+      "external_pid": "12480"
+    }
+  ],
+  "source_build": {
+    "status": "DISPOSABLE_QA_ONLY",
+    "source": "8b426281db476470beaf8d400fe0638a2a182910",
+    "candidate_sha256": "fb5c716baf0a8f44cd80b96f5da817d208d9bd3cff5961b90f839574f3eeb7ae",
+    "original_key": false,
+    "replaced": {
+      "classes3.dex": "0b556fec7d029f83e15ad944fb2cc88fa94e06d5a7ea06a20dc6060f3ac982a7"
+    },
+    "baseline_sha256": "e94adcbefaee9cd42d25097f779fc28da80bb0cc90b43681a7fe36b12d5cf30e"
+  },
+  "physical_Fold": "NOT_TESTED",
+  "proprietary_file_managers": "NOT_TESTED",
+  "cinematic_design": "UNIMPLEMENTED_PRESERVED_SEPARATELY",
+  "shutdown": "NOT_RUN"
+}

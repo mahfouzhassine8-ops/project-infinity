@@ -21,6 +21,7 @@ class Preservation(unittest.TestCase):
   self.assertEqual(roots,r.load(r.ISO/'ownership-reviewed-roots.json'))
  def test_sole_signer_after_all_gates_and_exact_new_branch(self):
   raw=(r.REPO/'.github/workflows/infinity-combined-release.yml').read_text();data=yaml.safe_load(raw)
+  self.assertNotIn("sys.path.insert(0,'repairs/infinity-2103445-standalone-external-player')",raw)
   self.assertEqual(set(data['jobs']),{'prepare-resume448','combined'})
   for name,job in data['jobs'].items():
    self.assertIn(r.BRANCH,job['if']);keys=[i for i,s in enumerate(job['steps']) if 'INFINITY_KEYSTORE_B64' in s.get('env',{})]

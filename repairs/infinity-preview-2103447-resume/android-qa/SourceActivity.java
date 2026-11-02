@@ -21,6 +21,8 @@ public final class SourceActivity extends Activity {
         }}catch(Exception e){throw new RuntimeException(e);}
         for(String s:new String[]{"A","B","C","END","BAD","AUDIO"}) add("Open "+s,()->open(s.toLowerCase()+".mp4",true,false,false));
         add("Alias A",()->openUri(Uri.parse("content://qa.external.alias/a.mp4"),true,false));
+        add("Document A",()->openUri(Uri.parse("content://qa.external.documents/document/a.mp4"),true,false));
+        add("Tree A",()->openUri(Uri.parse("content://qa.external.documents/tree/root/document/a.mp4"),true,false));
         add("Rapid A B C",()->{for(String s:new String[]{"a.mp4","b.mp4","c.mp4"})open(s,true,false,false);});
         add("Share B",()->open("b.mp4",true,true,false));
         add("Denied A",()->open("denied.mp4",false,false,false));

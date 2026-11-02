@@ -1,0 +1,21 @@
+JUnit version 4.13.2
+.E.E
+Time: 3.995
+There were 2 failures:
+1) unregisteredProviderCannotMergeDifferentQueryResourcesByDocumentPath(com.projectinfinity.kodi.PreviewResumeBoundaryTest)
+java.lang.AssertionError: Only a real Android document provider can use document-ID canonicalization. Actual: 889282f8c096711f549a6cbacc2e5a83c7570a3bda40e85e41d613dc9c0826a3
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failEquals(Assert.java:187)
+	at org.junit.Assert.assertNotEquals(Assert.java:163)
+	at com.projectinfinity.kodi.PreviewResumeBoundaryTest.unregisteredProviderCannotMergeDifferentQueryResourcesByDocumentPath(PreviewResumeBoundaryTest.java:41)
+2) restoredDecoderUsesCommittedProgressEvenWhenUiPositionIsStillZero(com.projectinfinity.kodi.PreviewResumeBoundaryTest)
+java.lang.AssertionError: expected:<139581> but was:<0>
+	at org.junit.Assert.fail(Assert.java:89)
+	at org.junit.Assert.failNotEquals(Assert.java:835)
+	at org.junit.Assert.assertEquals(Assert.java:647)
+	at org.junit.Assert.assertEquals(Assert.java:633)
+	at com.projectinfinity.kodi.PreviewResumeBoundaryTest.restoredDecoderUsesCommittedProgressEvenWhenUiPositionIsStillZero(PreviewResumeBoundaryTest.java:64)
+
+FAILURES!!!
+Tests run: 2,  Failures: 2
+

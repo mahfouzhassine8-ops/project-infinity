@@ -17,10 +17,17 @@ Selected checks, recorded before execution:
 - Decoder/request integration: outgoing-player checkpoint, pause/background/
   close/interruption/periodic save, stale request and resume-choice rejection,
   no autoplay before choice, seek completion before resumed playback.
+- Boundary regressions: the committed decoder checkpoint takes precedence over
+  an unupdated zero-position UI cache on restoration; arbitrary provider paths
+  containing `document` do not gain SAF identity semantics unless Android
+  recognizes that authority as a document provider.
 - Focused Android API37.1 fixture: actual decoded A/B, real Resume/Start Over
   presses and seekbar/control-strip interaction, granted provider aliases,
   rapid switching, app-process restart and emulator reboot without data reset,
   background return, front/inner viewport and rotation. No shutdown suite.
+  Process loss is injected only into the identified, already inactive private
+  Preview process on the disposable emulator, after Activity/decoder cleanup;
+  no package-wide termination or Kodi/Cobra/shutdown API is used.
 - Exact signed447 source/class/member comparison, original certificate,
   component matching, same package and increasing install-over version.
 

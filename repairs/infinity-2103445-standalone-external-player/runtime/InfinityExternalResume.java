@@ -22,6 +22,7 @@ final class InfinityExternalResume extends SQLiteOpenHelper {
     static final String DATABASE = "infinity_preview_resume_v1.db";
     static final int LIMIT = 1000;
     static final long INTERVAL = 10000;
+    private final Context context;
     private byte[] salt;
 
     static final class Identity {
@@ -40,7 +41,9 @@ final class InfinityExternalResume extends SQLiteOpenHelper {
             this.id = id; this.identity = identity; this.duration = duration; this.position = position;
         }
     }
-    InfinityExternalResume(Context context) { super(context, DATABASE, null, 1); }
+    InfinityExternalResume(Context context) {
+        super(context, DATABASE, null, 1); this.context = context.getApplicationContext();
+    }
     @Override public void onConfigure(SQLiteDatabase db) { db.setForeignKeyConstraintsEnabled(true); }
     @Override public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE secret (value BLOB NOT NULL)");
@@ -99,7 +102,10 @@ final class InfinityExternalResume extends SQLiteOpenHelper {
             // Stable document/URI identity still works; no guessed aliases.
             file = ""; sample = ""; size = -1; modified = -1;
         }
-        return new Identity(key(documentIdentity(uri)), file, sample, size, modified);
+        boolean document = false;
+        try { document = DocumentsContract.isDocumentUri(context, uri); }
+        catch (RuntimeException unavailableProviderMetadata) { /* Retain the full URI identity. */ }
+        return new Identity(key(document ? documentIdentity(uri) : "uri:" + uri.normalizeScheme().toString()), file, sample, size, modified);
     }
     static boolean resumable(long position, long duration) {
         return duration > 0 && position >= 30000 && position < duration

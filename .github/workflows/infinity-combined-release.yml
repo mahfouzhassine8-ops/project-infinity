@@ -139,7 +139,7 @@ jobs:
           python3 - "${{ steps.selected.outputs.producer_run }}" <<'PYCODE'
           import sys
           from pathlib import Path
-          sys.path.insert(0,'repairs/infinity-2103445-standalone-external-player')
+          sys.path.insert(0,'repairs/infinity-preview-2103447-resume')
           import release448 as r
           r.check_registered(Path('prepared448'),int(sys.argv[1]),Path('REGISTERED448-CHECK.json'))
           PYCODE

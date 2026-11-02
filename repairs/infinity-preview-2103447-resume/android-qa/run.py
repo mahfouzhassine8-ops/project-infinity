@@ -3,7 +3,7 @@
 Reuses the proven immediate OS observer and compatibility-notice handling.
 Only a fresh disposable emulator: no user data, shutdown suite or app test hooks.
 """
-import argparse,hashlib,importlib.util,json,re,sqlite3,time,traceback
+import argparse,hashlib,hmac,importlib.util,json,re,sqlite3,subprocess,time,traceback
 from pathlib import Path
 H=Path(__file__).resolve().parents[1];R=H.parents[1]
 spec=importlib.util.spec_from_file_location('external_observer',R/'repairs/infinity-2103445-standalone-external-player/android-qa/run.py')
@@ -21,7 +21,8 @@ def seek(fraction):
  deadline=q.feature_time()+18
  while q.feature_time()<deadline:
   value=clock()
-  if abs(value-600*fraction)<12:return value
+  if abs(value-600*fraction)<=12:
+   q.record('real_seekbar_input',fraction=fraction,actual_seconds=value,bounds=b);return value
   time.sleep(.2)
  raise AssertionError('Actual seek did not reach expected region')
 def offer(label,expected,choice='Resume'):
@@ -39,11 +40,15 @@ def offer(label,expected,choice='Resume'):
  value=clock();q.check(abs(value-(expected if choice=='Resume' else 0))<=3,'Actual chosen seek position: '+str(value))
  q.record('real_resume_choice',label=label,choice=choice,expected=expected,actual=value)
  q.no_kodi();return value
-def history():
+def history(document_check=False):
  # Read only this new synthetic fixture namespace; no Kodi/Cobra data access.
  raw=q.adb('exec-out','cat','/data/user/0/'+q.P+'/databases/infinity_preview_resume_v1.db')
  db=sqlite3.connect(':memory:');db.deserialize(raw)
  q.check(db.execute('pragma quick_check').fetchone()[0]=='ok','Consistent history snapshot')
+ if document_check:
+  salt=db.execute('select value from secret').fetchone()[0]
+  key=hmac.new(salt,b'document:qa.external.documents:a.mp4',hashlib.sha256).hexdigest()
+  q.check(db.execute('select count(*) from alias where key=?',(key,)).fetchone()[0]==1,'Android-recognized SAF identity must be stored')
  rows=db.execute('select position,duration from video').fetchall();db.close();return rows
 def stop_observer():
  if q.observer is not None:
@@ -68,6 +73,8 @@ def body(a):
  q.record('separate_A_B_A_B',A=a_position,B=b_position)
  offer('Alias A',a_position);a_position=pause();q.source_return()
  q.record('two_authorities_same_granted_file_share_identity',A=a_position)
+ offer('Document A',a_position);a_position=pause();q.source_return();history(document_check=True)
+ offer('Tree A',a_position);a_position=pause();q.source_return();q.record('real_SAF_plain_and_tree_document_identity',A=a_position)
  # Periodic save is observed while the real decoder is still playing, before
  # Pause/Back/background could create a lifecycle checkpoint.
  offer('Open A',a_position);seek(.5);time.sleep(11.5)
@@ -79,10 +86,19 @@ def body(a):
  saved=max(p for p,d in history())//1000;source();offer('Open A',saved)
  q.check(clock()>=now-2,'Background progress lost');a_position=pause();q.source_return()
  q.record('background_progress_preserved',position=a_position)
- pid=q.shell('pidof',q.P+':externalplayer').strip();q.shell('am','kill',q.P)
+ q.final_cleanup()
+ pid=q.shell('pidof',q.P+':externalplayer').strip()
+ q.check(pid.isdecimal(),'One cached Preview fixture process required')
+ command=q.adb('exec-out','cat','/proc/'+pid+'/cmdline').decode().rstrip('\x00')
+ q.check(command==q.P+':externalplayer','Exact private process identity before selected loss injection')
+ # Explicitly selected process-restart persistence test, after decoder and
+ # Activity cleanup. Kill only this disposable Preview PID, never the package,
+ # Kodi, Cobra, a real device or user data. No application shutdown API.
+ q.shell('kill','-9',pid)
  deadline=time.monotonic()+18
  while time.monotonic()<deadline:
-  p=q.shell('sh','-c','pidof '+q.P+':externalplayer || true').strip()
+  probe=subprocess.run(['adb','shell','pidof',q.P+':externalplayer'],capture_output=True,text=True,timeout=15)
+  q.check(probe.returncode in (0,1),'PID observation failed');p=probe.stdout.strip()
   if not p:break
   time.sleep(.2)
  q.check(not p,'Stopped Preview process was not reclaimed')

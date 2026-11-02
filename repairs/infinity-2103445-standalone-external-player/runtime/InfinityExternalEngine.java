@@ -82,9 +82,12 @@ public final class InfinityExternalEngine {
                 choosingResume = offerResume && memory != null && memory.position > 0;
                 remember = !choosingResume;
                 if (choosingResume) emit(id, "resume", Long.toString(memory.position));
+                // A lifecycle checkpoint can precede its queued UI position
+                // callback. The committed decoder position is authoritative.
+                if (!offerResume && memory != null && memory.position > 0) startPosition = memory.position;
                 if (!choosingResume && startPosition > 0) {
                     initialSeek = true;
-                    beginSeek(id, mp, !offerResume && memory != null && memory.position > 0 ? memory.position : startPosition);
+                    beginSeek(id, mp, startPosition);
                 } else emit(id, "ready", "");
                 postSize(id, mp.getVideoWidth(), mp.getVideoHeight());
                 position(id, mp);

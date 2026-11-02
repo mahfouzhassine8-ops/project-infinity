@@ -4,5 +4,8 @@
   <application android:label="CI external source" android:theme="@android:style/Theme.Material.Light.NoActionBar">
     <activity android:name="qa.external.SourceActivity" android:exported="true"/>
     <provider android:name="qa.external.SourceProvider" android:authorities="qa.external.source;qa.external.alias" android:exported="false" android:grantUriPermissions="true"/>
+    <provider android:name="qa.external.ResumeDocuments" android:authorities="qa.external.documents" android:exported="true" android:grantUriPermissions="true" android:permission="android.permission.MANAGE_DOCUMENTS">
+      <intent-filter><action android:name="android.content.action.DOCUMENTS_PROVIDER"/></intent-filter>
+    </provider>
   </application>
 </manifest>

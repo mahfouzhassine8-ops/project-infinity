@@ -119,6 +119,7 @@ def runtime_binding(build):
     require(result['status']=='PASS','REAL_RESUME_ANDROID_DECODING_REQUIRED')
     require(result['source_build']['replaced']=={'classes3.dex':observed['dex_sha256']},'ANDROID_INSTALLED_DEX_BINDING')
     host=load(H/'host-evidence/HOST-RESULT.json');require(host['status']=='PASS' and host['tests']==12,'RESUME_STORAGE_HOST_CHECKS')
+    boundary=load(H/'host-evidence/BOUNDARY-RESULT.json');require(boundary['status']=='PASS' and boundary['tests']==3,'RESUME_SCHEDULING_AND_PROVIDER_BOUNDARIES')
     for name,pin in load(H/'host-evidence/HOST-SOURCE-BINDING.json').items():
         require(file_sha(REPO/name)==pin,'HOST_TESTED_SOURCE_CHANGED:'+name)
     for name,pin in observed['sources'].items():require(file_sha(REPO/name)==pin,'ANDROID_TESTED_RUNTIME_CHANGED:'+name)
