@@ -62,8 +62,29 @@ position ticker while paused, and ordinary seek completion does not publish a
 new position until playback resumes. The immediate seekbar label is not decoder
 readiness evidence. The final existing-control check therefore observes a real
 playing tick after seeking and then waits for each relative skip to complete.
-The decoder is kept byte-identical; no new paused-clock behavior is claimed.
+The decoder source and complete class definitions are unchanged; no new
+paused-clock behavior is claimed. DEX indexes can move when the containing
+Infinity DEX is rebuilt, so this is not a claim about isolated raw DEX offsets.
 
-Final Android, exact signed-APK comparison and original-key signing results are
-reported in the delivery evidence once complete. Neither host rendering nor an
-emulator constitutes physical Fold acceptance. No new release lock is automatic.
+The third Android run completed the selected UI, control, Resume/Start Over,
+subtitle, theme, viewport, request-replacement and error/retry checks. It remains
+a FAILED workflow: its subsequent call setup incorrectly expected a Resume
+prompt after six seconds, below the unchanged 30-second storage threshold. The
+completed observations are retained without relabeling that run as successful.
+
+The remaining call and exit checks passed in run 41475018882, using exactly the
+same production classes3.dex as the completed UI checks. The emulator reported
+MODE_IN_CALL. Video advanced with private player volume 0.0, then continued after
+an actual Unmute tap with volume 1.0. Android media-player dumps identify the same
+PID, UID and player connection on both sides of the tap. Video continued after
+the call ended; Back returned to the source application and released the private
+decoder. Kodi did not start. These are real Android API 37.1 emulator decoding and
+audio-policy observations, not acoustic evidence from a carrier or VoIP call.
+
+Actual Light and Dark app renders were inspected at cover, inner, landscape and
+short-window sizes. The combined evidence gate binds both runs to their exact
+artifacts and the same final production DEX. All six focused release-protocol
+checks pass. Exact signed-APK comparison and original-key signing results are
+reported in the delivery evidence once complete. Samsung call muting, physical
+Fold transitions and final visual acceptance remain device checks. No new
+release lock is automatic.

@@ -1,0 +1,116 @@
+{
+  "status": "PASS",
+  "segment": "call",
+  "checks": [
+    {
+      "check": "fresh_fixture_install",
+      "name": "candidate",
+      "seconds": 72.599982334,
+      "sha256": "63c6e073cfa764667883afe45ee133db9fe3d5cea96a258152b0480f06ce0dd0"
+    },
+    {
+      "check": "fresh_fixture_install",
+      "name": "source",
+      "seconds": 0.43156409599998824,
+      "sha256": "149f3085d09e6c45fd47c2b103e55a55d0a711248e1a432f529a624a1309b4d9"
+    },
+    {
+      "check": "fresh_persistent_OS_observer",
+      "sha256": "ae01e9be8bc062d6d613cfa90be607c5b40e8ff55540a4911b2d67e9308ef26a"
+    },
+    {
+      "check": "real_touch",
+      "label": "Open C",
+      "bounds": [
+        0,
+        303,
+        1080,
+        429
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "19",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "no_kodi_process",
+      "kodi_pid": "",
+      "external_pid": "9634"
+    },
+    {
+      "check": "actual_video_decoded",
+      "title": "c.mp4",
+      "color_samples": 90
+    },
+    {
+      "check": "actual_media_clock_advances",
+      "before": 5,
+      "after": 6
+    },
+    {
+      "check": "call_default_muted_video",
+      "mode": "- Actual mode = MODE_IN_CALL",
+      "observation": "Unmute UI and real decoding; no acoustic audio assertion"
+    },
+    {
+      "check": "real_touch",
+      "label": "Unmute",
+      "bounds": [
+        641,
+        2217,
+        767,
+        2354
+      ]
+    },
+    {
+      "check": "actual_media_clock_advances",
+      "before": 8,
+      "after": 9
+    },
+    {
+      "check": "call_manual_unmute_video",
+      "platform_audio": "Android may enforce media muting"
+    },
+    {
+      "check": "actual_media_clock_advances",
+      "before": 10,
+      "after": 11
+    },
+    {
+      "check": "real_android_back"
+    },
+    {
+      "check": "originating_activity_return",
+      "action": "Back"
+    },
+    {
+      "check": "call_end_keeps_video"
+    },
+    {
+      "check": "source_resumed_and_decoder_released"
+    },
+    {
+      "check": "selected_call_journey_complete"
+    }
+  ],
+  "source_build": {
+    "status": "DISPOSABLE_QA_ONLY",
+    "source": "bbdcae15076b32d48dff8b487d0f2bbd73ad3e32",
+    "candidate_sha256": "63c6e073cfa764667883afe45ee133db9fe3d5cea96a258152b0480f06ce0dd0",
+    "original_key": false,
+    "replaced": {
+      "classes3.dex": "a8ce31bebd92e4ad096b8d54e3f9442ecd55b85197f56edf9ef6bf2b87c50387"
+    },
+    "baseline_sha256": "2c20613f9056e84fea402cf67729939a205b7d9afb87ec1b6fab800a641efbd3"
+  },
+  "physical_Fold": "NOT_TESTED",
+  "call_audio": "Host policy plus separately reported emulator observation; physical carrier/VoIP audio pending",
+  "shutdown": "NOT_RUN"
+}
