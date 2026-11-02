@@ -32,17 +32,31 @@ def tap(label):
  tree=nodes();n=find(tree,label);check(n is not None,'Visible actual target: '+label)
  b=bounds(n);shell('input','tap',str((b[0]+b[2])//2),str((b[1]+b[3])//2));record('real_touch',label=label,bounds=b)
 def await_text(label,seconds=18):
- start=time.monotonic();last=None
+ start=time.monotonic();last=None;notices=0
  while time.monotonic()-start<seconds:
   last=nodes()
   if find(last,label) is not None:return last
   # Preserve the already known platform warning. Dismiss OK only, never disable.
   t=text(last)
   if ('page size' in t.lower() or '16 kb' in t.lower()) and find(last,'OK') is not None:
-   screenshot('platform-page-size-notice');tap('OK');record('platform_notice_dismissed_once')
+   check(notices<2,'Unexpected additional compatibility prompt')
+   screenshot('platform-page-size-notice-'+str(len(steps)));tap('OK');notices+=1
+   record('platform_notice_dismissed',ordinal=notices)
+   # Splash and the separate Activity each get this OS notice. Setup time is
+   # separate from the unchanged eighteen-second feature-observation budget.
+   start=time.monotonic()
   time.sleep(.2)
  if last is not None:(out/'missing-target.xml').write_bytes(ET.tostring(last))
  raise AssertionError('UI target not observed: '+label)
+def await_prefix(prefix):
+ start=time.monotonic()
+ while time.monotonic()-start<18:
+  tree=nodes()
+  for n in tree.iter('node'):
+   value=n.attrib.get('text','')
+   if value.startswith(prefix):return value
+  time.sleep(.2)
+ raise AssertionError('Track choice unavailable: '+prefix)
 def no_kodi():
  probe=subprocess.run(['adb','shell','pidof',P+':kodi'],capture_output=True,text=True,timeout=15)
  check(probe.returncode in (0,1),'Process observation failed')
@@ -101,8 +115,9 @@ def body(a):
  clock=text(nodes());match=re.search(r'\b(\d+):(\d\d) / 10:00',clock)
  check(match is not None and 130<=int(match[1])*60+int(match[2])<=175,'Seek changes actual playback position');record('seek_changes_position')
  strip_to('Mute');tap('Mute');await_text('Unmute');tap('Unmute');await_text('Mute');record('mute_toggle')
- strip_to('Audio');tap('Audio');await_text('Audio');screenshot('audio-menu');shell('input','keyevent','4')
- strip_to('Subtitles');tap('Subtitles');await_text('Subtitles');screenshot('subtitle-menu');shell('input','keyevent','4')
+ strip_to('Audio');tap('Audio');track=await_prefix('Audio 2');screenshot('audio-menu');tap(track);record('audio_track_selected',track=track)
+ strip_to('Subtitles');tap('Subtitles');track=await_prefix('Subtitle 1');screenshot('subtitle-menu');tap(track)
+ await_text('External subtitle fixture');screenshot('rendered-subtitle');record('text_subtitle_actually_rendered')
  strip_to('Display');tap('Display');await_text('Fill (crop)');tap('Fill (crop)');record('display_real_choice')
  strip_to('Auto rotate');tap('Auto rotate');await_text('Rotation locked');tap('Rotation locked');await_text('Auto rotate');record('rotation_toggle')
  # Real viewport change uses the same Activity and current request.

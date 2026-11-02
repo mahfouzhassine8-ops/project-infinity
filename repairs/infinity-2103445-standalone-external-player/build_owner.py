@@ -85,7 +85,7 @@ def build(out,bundles):
             if owner==selected:
                 dest=target/(n[1:-1]+'.smali');dest.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(p,dest)
         dex=out/(owner+'-new.dex')
-        run('java','-cp',jars/'*','org.jf.smali.Main','assemble','--api','21',target,'-o',dex)
+        run('java','-cp',jars/'*','org.jf.smali.Main','assemble','--api','21','--jobs','1',target,'-o',dex)
         verify=out/('verify-'+owner)
         run('java','-cp',jars/'*','org.jf.baksmali.Main','disassemble','--sequential-labels',dex,'-o',verify)
         current=classes(verify);before=originals[owner];changed=[]

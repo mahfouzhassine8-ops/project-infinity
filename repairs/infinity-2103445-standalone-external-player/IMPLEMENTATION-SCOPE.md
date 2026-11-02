@@ -64,3 +64,13 @@ service or notification keeps decoding in the background.
 Physical Samsung source applications, grants and Fold acceptance remain the
 user's final checks. Host tests do not prove decoding; Android fixture results
 will be reported separately.
+
+## Selected final release protocol checks
+
+Run `tests/test_release447.py` for exact protected-source guard preservation,
+sole signer ordering, narrow manifest exception and negative tamper rejection,
+unchanged original signer/assembler, and exact APK member allowlist rejection.
+The existing eleven request/state checks are retained; no unrelated runtime or
+shutdown checks are added. The next selected Android run corrects the observed
+two-notice setup accounting, verifies deterministic DEX output, and adds real
+audio-track and timed-text selection on the same synthetic granted MP4.

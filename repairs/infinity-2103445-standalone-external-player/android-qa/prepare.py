@@ -9,8 +9,14 @@ from inventory import file_sha,SIGNATURE
 def run(*a):subprocess.run(list(map(str,a)),check=True)
 def main(a):
  a.out.mkdir(parents=True);media=a.out/'media';media.mkdir()
+ subtitle=a.out/'fixture.srt'
+ def stamp(s,ms=0):return f'{s//3600:02}:{s//60%60:02}:{s%60:02},{ms:03}'
+ subtitle.write_text(''.join(f'{i+1}\n{stamp(i*5)} --> {stamp(i*5+4,900)}\nExternal subtitle fixture\n\n' for i in range(120)))
  for name,color,tone in [('a','red',440),('b','green',660),('c','blue',880),('end','yellow',550)]:
-  run('ffmpeg','-hide_banner','-loglevel','error','-f','lavfi','-i',f'color=c={color}:s=640x360:r=24','-f','lavfi','-i',f'sine=frequency={tone}:sample_rate=48000','-t','3' if name=='end' else '600','-c:v','libx264','-preset','ultrafast','-pix_fmt','yuv420p','-c:a','aac','-movflags','+faststart',media/(name+'.mp4'))
+  args=['ffmpeg','-hide_banner','-loglevel','error','-f','lavfi','-i',f'color=c={color}:s=640x360:r=24','-f','lavfi','-i',f'sine=frequency={tone}:sample_rate=48000']
+  if name=='a':args+=['-f','lavfi','-i','sine=frequency=990:sample_rate=48000','-i',str(subtitle),'-map','0:v','-map','1:a','-map','2:a','-map','3:s','-c:s','mov_text','-metadata:s:a:0','language=eng','-metadata:s:a:1','language=fra','-metadata:s:s:0','language=eng']
+  args+=['-t','3' if name=='end' else '600','-c:v','libx264','-preset','ultrafast','-pix_fmt','yuv420p','-c:a','aac','-movflags','+faststart',media/(name+'.mp4')]
+  run(*args)
  run('ffmpeg','-hide_banner','-loglevel','error','-f','lavfi','-i','sine=frequency=440:sample_rate=48000','-t','10','-c:a','aac',media/'audio.mp4')
  (media/'bad.mp4').write_bytes(b'not a video\n')
  assert file_sha(a.baseline)=='b7e78393ade7e52d8653823a0ad72ae99614a5a8e0b6cdedf5d5d15a9e643400'

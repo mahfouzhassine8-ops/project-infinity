@@ -121,6 +121,11 @@ public final class InfinityExternalEngine {
                 if (uri == null || uri.getScheme() == null) throw new IllegalArgumentException("Missing video URI");
                 String scheme = uri.getScheme().toLowerCase(Locale.ROOT);
                 if (scheme.equals("content")) {
+                    String authority = uri.getAuthority();
+                    if ("com.projectinfinity.kodi.media".equals(authority)
+                            || "com.projectinfinity.kodi.file".equals(authority)
+                            || "com.projectinfinity.kodi.ytdl".equals(authority))
+                        throw new IllegalArgumentException("A Kodi-owned provider cannot be opened independently");
                     // Use a granted descriptor directly, preserving offset/length.
                     // Never convert a provider URI to a guessed /storage path.
                     try (AssetFileDescriptor fd = context.getContentResolver().openAssetFileDescriptor(uri, "r")) {

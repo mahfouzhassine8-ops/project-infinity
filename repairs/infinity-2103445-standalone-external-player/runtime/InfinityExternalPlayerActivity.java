@@ -247,7 +247,7 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
         play = button("Pause", () -> {
             wantsPlay = !wantsPlay;
             if (wantsPlay) {
-                if (state.phase() == InfinityExternalState.Phase.ENDED) { position = 0; engine.seek(0); }
+                if (state.phase() == InfinityExternalState.Phase.ENDED || (duration > 0 && position >= duration-250)) { position = 0; engine.seek(0); }
                 startPlayback();
             } else { engine.pause(); abandonFocus(); }
             updateButtons();
