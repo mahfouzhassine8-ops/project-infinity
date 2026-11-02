@@ -3,15 +3,18 @@ import android.app.Activity;
 import android.content.ClipData;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Looper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
+import org.robolectric.annotation.LooperMode;
 import static org.junit.Assert.*;
 import static org.robolectric.Shadows.shadowOf;
 
 @RunWith(RobolectricTestRunner.class) @Config(manifest=Config.NONE,sdk=35)
+@LooperMode(LooperMode.Mode.PAUSED)
 public class ExternalPlayerContractTest {
     Intent view(String uri,String type) { return new Intent(Intent.ACTION_VIEW).setDataAndType(Uri.parse(uri),type); }
     @Test public void videoSchemesReachIsolatedPlayerIncludingUnsupportedErrors() {
@@ -95,5 +98,37 @@ public class ExternalPlayerContractTest {
             InfinityExternalState s=new InfinityExternalState();long t=s.begin("x");assertTrue(s.loading());
             s.set(t,phase);assertFalse(s.loading());
         }
+    }
+    @Test public void queuedGatewayIntentsSelectOnlyLatestAfterDelivery() {
+        Activity a=Robolectric.buildActivity(Activity.class).setup().get();
+        for (String name:new String[]{"a","b","c"}) ExternalVideoRoute.stage(a,view("content://source/"+name,"video/mp4"));
+        assertFalse(a.isFinishing());assertNull(shadowOf(a).getNextStartedActivity());
+        shadowOf(Looper.getMainLooper()).idle();
+        assertEquals("content://source/c",shadowOf(a).getNextStartedActivity().getDataString());
+        assertNull(shadowOf(a).getNextStartedActivity());
+    }
+    @Test public void normalRequestCanSupersedeUnlaunchedVideoWithoutBecomingPlayer() {
+        Activity a=Robolectric.buildActivity(Activity.class).setup().get();
+        Intent main=new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER);
+        assertFalse(ExternalVideoRoute.captures(a,main));
+        ExternalVideoRoute.stage(a,view("content://source/a","video/mp4"));
+        assertTrue(ExternalVideoRoute.captures(a,main));ExternalVideoRoute.stage(a,main);
+        shadowOf(Looper.getMainLooper()).idle();
+        Intent out=shadowOf(a).getNextStartedActivity();
+        assertEquals(Intent.ACTION_MAIN,out.getAction());assertTrue(out.hasCategory(Intent.CATEGORY_LAUNCHER));
+        assertEquals("com.projectinfinity.kodi.Splash",out.getComponent().getClassName());
+        assertNull(out.getStringExtra("infinity.external.request"));assertFalse(ExternalVideoRoute.captures(a,main));
+    }
+    @Test public void pendingGatewayOwnershipDoesNotCrossActivityInstances() {
+        Activity a=Robolectric.buildActivity(Activity.class).setup().get(),b=Robolectric.buildActivity(Activity.class).setup().get();
+        ExternalVideoRoute.stage(a,view("content://source/a","video/mp4"));
+        ExternalVideoRoute.stage(b,view("content://source/b","video/mp4"));
+        Activity canceled=Robolectric.buildActivity(Activity.class).setup().get();
+        ExternalVideoRoute.stage(canceled,view("content://source/canceled","video/mp4"));canceled.finish();
+        shadowOf(Looper.getMainLooper()).idle();
+        assertEquals("content://source/b",shadowOf(b).getNextStartedActivity().getDataString());
+        assertEquals("content://source/a",shadowOf(a).getNextStartedActivity().getDataString());
+        assertNull(shadowOf(a).getNextStartedActivity());assertNull(shadowOf(b).getNextStartedActivity());
+        assertNull(shadowOf(canceled).getNextStartedActivity());
     }
 }

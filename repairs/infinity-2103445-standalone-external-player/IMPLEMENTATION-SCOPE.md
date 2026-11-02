@@ -30,8 +30,10 @@ The actual signed APK has no custom Application class. All three Kodi content
 providers are explicitly assigned to `:kodi`. Splash is a singleInstance
 Activity in the default process. Its constructor only initializes fields and an
 idle Handler. onCreate calls ContainerUpgrade and ShellJavaPersistence before
-starting the chooser bootstrap; onNewIntent can call startXBMC. These two
-methods are the required narrow interception points. Existing pause/resume/
+starting the chooser bootstrap; onNewIntent can call startXBMC. Actual Android burst testing proved that finishing in onCreate drops queued
+onNewIntent deliveries. A single main-queue handoff lets the already queued
+requests arrive first, while retaining the two-method interception. Normal
+original method instructions remain unchanged. Existing pause/resume/
 destroy cleanup tolerates absent bootstrap/watch objects and is retained.
 
 The Android framework player requires none of the existing Cobra-owned Media3
@@ -74,3 +76,20 @@ The existing eleven request/state checks are retained; no unrelated runtime or
 shutdown checks are added. The next selected Android run corrects the observed
 two-notice setup accounting, verifies deterministic DEX output, and adds real
 audio-track and timed-text selection on the same synthetic granted MP4.
+
+## Reproduced gateway delivery defect and selected correction
+
+Run 41405154404 passed real audio/subtitle controls, view resizing, background
+replacement, Stop and Back source return. Its rapid A/B/C case showed all three
+Android START requests accepted (later requests returned delivered-to-top), but
+only A reached the private player. Splash finished inside onCreate before Android
+delivered pending onNewIntent callbacks. The screenshot showed A still playing.
+
+Stage the latest request per gateway and consume it in one main-queue handoff,
+after the current launch and already queued new-intent transactions. The
+onResume method stays unchanged. No timer/debounce, new public handler or native
+change is introduced.
+Add three host checks for latest-only consumption, independent gateway ownership
+and a normal request superseding an unlaunched video. Re-run the affected routing
+contract tests (14 total), compiled original-instruction preservation, and the
+same selected actual Android journey. The existing native/player owner is frozen.

@@ -123,9 +123,9 @@ def runtime_binding(build):
     result=load(H/'final-evidence/ANDROID-RESULT.json')
     require(result['status']=='PASS','ACTUAL_ANDROID_DECODING_REQUIRED')
     host=load(H/'final-evidence/HOST-RESULT.json')
-    require(host['status']=='PASS' and host['tests']==11,'REQUEST_STATE_HOST_TESTS_REQUIRED')
+    require(host['status']=='PASS' and host['tests']==14,'REQUEST_STATE_HOST_TESTS_REQUIRED')
     binding=load(H/'final-evidence/HOST-SOURCE-BINDING.json')
-    require(binding['status']=='PASS_RETAINED_HOST_SOURCE_UNCHANGED','RETAINED_HOST_BINDING')
+    require(binding['status']=='PASS_HOST_SOURCE_BINDING','RETAINED_HOST_BINDING')
     for name,pin in binding['sha256'].items():require(file_sha(REPO/name)==pin,'RETAINED_HOST_SOURCE_CHANGED:'+name)
     actual=result['source_build']['replaced']
     require(actual['classes.dex']==observed['deltas']['CHOOSER_SHELL']['dex_sha256'] and actual['classes3.dex']==observed['deltas']['INFINITY']['dex_sha256'],'RUNTIME_INSTALLED_DEX_BINDING')

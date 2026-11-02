@@ -1,4 +1,4 @@
-"""Compile the new feature; preserve every original class except two Splash methods."""
+"""Compile the new feature; preserve every original class except two scoped Splash methods."""
 import hashlib,json,os,re,shutil,subprocess,sys
 from pathlib import Path
 from zipfile import ZipFile,ZIP_DEFLATED
@@ -25,7 +25,7 @@ def original_instructions_preserved(original,revised):
     # Cut exactly the new early routing block, then compare the complete old
     # method body with labels normalized for baksmali's sequential renumbering.
     old=original[original.index('\n',original.index('    .registers'))+1:]
-    marker=re.search(r'    invoke-static \{p0, v0\}, Lcom/projectinfinity/kodi/ExternalVideoRoute;->open\(Landroid/app/Activity;Landroid/content/Intent;\)V\s+return-void\s*((?:\.line \d+\s*)*):cond_[0-9a-f]+\n',revised)
+    marker=re.search(r'    invoke-static \{p0, v0\}, Lcom/projectinfinity/kodi/ExternalVideoRoute;->(?:open|stage)\(Landroid/app/Activity;Landroid/content/Intent;\)V\s+return-void\s*((?:\.line \d+\s*)*):cond_[0-9a-f]+\n',revised)
     assert marker is not None
     assert canonical_body(old)==canonical_body(marker.group(1)+revised[marker.end():])
 def patch_splash(raw):
@@ -34,15 +34,10 @@ def patch_splash(raw):
         method=before[name]
         at=method.index('\n',method.index('    .registers'))+1
         prefix='\n    invoke-virtual {p0}, Landroid/app/Activity;->getIntent()Landroid/content/Intent;\n    move-result-object v0\n' if name.startswith('onCreate') else '\n    move-object v0, p1\n'
-        prefix+='''    invoke-static {v0}, Lcom/projectinfinity/kodi/ExternalVideoRoute;->accepts(Landroid/content/Intent;)Z
-    move-result v1
-    if-eqz v1, :external_original_path
-'''
-        prefix+= '    invoke-super {p0, p1}, Landroid/app/Activity;->'+name+'\n'
-        prefix+='''    invoke-static {p0, v0}, Lcom/projectinfinity/kodi/ExternalVideoRoute;->open(Landroid/app/Activity;Landroid/content/Intent;)V
-    return-void
-    :external_original_path
-'''
+        prefix+=('    invoke-static {v0}, Lcom/projectinfinity/kodi/ExternalVideoRoute;->accepts(Landroid/content/Intent;)Z\n' if name.startswith('onCreate') else '    invoke-static {p0, v0}, Lcom/projectinfinity/kodi/ExternalVideoRoute;->captures(Landroid/app/Activity;Landroid/content/Intent;)Z\n')
+        prefix+='    move-result v1\n    if-eqz v1, :external_original_path\n'
+        prefix+='    invoke-super {p0, p1}, Landroid/app/Activity;->'+name+'\n'
+        prefix+='    invoke-static {p0, v0}, Lcom/projectinfinity/kodi/ExternalVideoRoute;->stage(Landroid/app/Activity;Landroid/content/Intent;)V\n    return-void\n    :external_original_path\n'
         raw=raw.replace(method,method[:at]+prefix+method[at:],1)
     assert set(methods(raw))==set(before)
     return raw

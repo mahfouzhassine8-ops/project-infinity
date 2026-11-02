@@ -6,9 +6,10 @@ included. The existing Kodi player and every original Infinity class are retaine
 
 ## Android ownership and naming
 
-Only Splash `onCreate` and `onNewIntent` gain an early video route. The complete
+Only Splash `onCreate` and `onNewIntent` gain an external-video route. The complete
 original instructions remain on their existing non-video paths. The gateway
-hands a single request to one nonexported Activity in `:externalplayer`, using
+stages the latest request in one main-queue handoff, allowing already queued
+Android intent transactions to be delivered before handing it to one nonexported Activity in `:externalplayer`, using
 Android framework MediaPlayer. It does not load Kodi, use Cobra Media3, start an
 experience service or access a user database. The native/shared executable,
 resource table, icons, original player and shutdown code are unchanged.
@@ -63,8 +64,9 @@ signed 2103445 manifest; it cannot authorize shared executable or artwork change
 The sole original signer is retained behind the existing source and ownership
 gates. The accepted registry and recovery lock are unchanged.
 
-Eleven focused host request/state tests and six release-guard/negative-tamper
-checks pass. Actual Android journey results and source binding are recorded
+Fourteen focused host request/state tests and six release-guard/negative-tamper
+checks pass. The three new host checks cover queued latest-request ownership,
+normal-launch replacement and independent/canceled gateway cleanup. Actual Android journey results and source binding are recorded
 separately in final evidence; no incomplete journey is treated as a PASS. Early
 QA failures and platform compatibility notices are retained. Physical Fold
 acceptance and named third-party app/account checks are distinct from emulator

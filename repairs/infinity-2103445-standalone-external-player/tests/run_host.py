@@ -15,5 +15,5 @@ subprocess.run(['java','-m','jdk.compiler/com.sun.tools.javac.Main','-source','8
 result=subprocess.run(['java','--add-opens','java.base/sun.nio.ch=ALL-UNNAMED','-Drobolectric.dependency.repo.url=https://repo.maven.apache.org/maven2','-cp',str(out)+':'+classpath,'org.junit.runner.JUnitCore','com.projectinfinity.kodi.ExternalPlayerContractTest'],capture_output=True,text=True)
 (a.out/'HOST-OUTPUT.txt').write_text(result.stdout+result.stderr)
 print(result.stdout+result.stderr)
-assert result.returncode==0 and 'OK (11 tests)' in result.stdout
-(a.out/'HOST-RESULT.json').write_text(json.dumps({'status':'PASS','tests':11,'runtime':'Robolectric API35, request/state contracts only','actual_decoding':False},indent=2)+'\n')
+assert result.returncode==0 and 'OK (14 tests)' in result.stdout
+(a.out/'HOST-RESULT.json').write_text(json.dumps({'status':'PASS','tests':14,'runtime':'Robolectric API35, request/state contracts only','actual_decoding':False},indent=2)+'\n')
