@@ -54,6 +54,7 @@ public final class ImmediateHierarchy {
                 AccessibilityNodeInfo root=ui.getRootInActiveWindow();
                 StringWriter out=new StringWriter(); XmlSerializer xml=Xml.newSerializer(); xml.setOutput(out);
                 xml.startTag(null,"hierarchy"); count=0;
+                xml.attribute(null,"window-id",root==null ? "none" : Integer.toString(root.getWindowId()));
                 if (root!=null) try {
                     root.refresh(); Rect window=new Rect(); root.getBoundsInScreen(window);
                     node(xml,root,window,0);

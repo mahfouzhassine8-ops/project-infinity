@@ -1,0 +1,11 @@
+{
+  "run_id": 41409811099,
+  "source": "9e0bc09d2e0c1942c4ef2e8c5b08d66ed8fc1f27",
+  "artifact_id": 13124903312,
+  "artifact_sha256": "82378f3246bc650ea903163af94a59d7242eaea6e44bc50493cc56baf449139d",
+  "status": "FAIL",
+  "cause": "Captured active window is Android App Compatibility after a.mp4 had briefly appeared. Only await_text handled this known OS notice; strip observation did not.",
+  "correction": "All hierarchy consumers share bounded known-OS-notice handling, fresh window identity and stable OK bounds. Application errors and Dont Show Again are excluded. Existing control observation limits unchanged; notice time is recorded separately.",
+  "production_bytes_changed": false,
+  "selected_verification": "Same finite external player journey, final source and decoder cleanup; no shutdown"
+}

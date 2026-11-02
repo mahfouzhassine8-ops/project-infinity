@@ -8,7 +8,8 @@ from pathlib import Path
 from PIL import Image
 import io
 P='com.projectinfinity.kodi';SOURCE='qa.external.source'
-steps=[];sequence=0;out=None;observer=None
+steps=[];sequence=0;out=None;observer=None;notice_seconds=0
+def feature_time():return time.monotonic()-notice_seconds
 def run(*args,timeout=45):return subprocess.check_output(list(map(str,args)),timeout=timeout)
 def adb(*args,timeout=45):return run('adb',*args,timeout=timeout)
 def shell(*args,timeout=45):return adb('shell',*args,timeout=timeout).decode(errors='replace')
@@ -33,7 +34,7 @@ def start_observer(prepared):
  observer=subprocess.Popen(['adb','shell','CLASSPATH=/system/framework/android.test.runner.jar:/system/framework/uiautomator.jar:'+remote,
   'ANDROID_DATA=/data/local/tmp','/system/bin/app_process','/system/bin','qa.external.ImmediateHierarchy'],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=(out/'observer-stderr.txt').open('wb'),bufsize=0)
  observer_line('EXTERNAL_READY');record('fresh_persistent_OS_observer',sha256=hashlib.sha256(jar.read_bytes()).hexdigest())
-def nodes():
+def raw_nodes():
  global sequence
  sequence+=1;observer.stdin.write(('SNAP '+str(sequence)+'\n').encode());observer.stdin.flush()
  raw=base64.b64decode(observer_line('EXTERNAL_'+str(sequence)+' '),validate=True)
@@ -48,34 +49,60 @@ def find(tree,label):
    if len(b)==4 and b[2]>b[0] and b[3]>b[1] and n.attrib.get('enabled')=='true':return n
  return None
 def text(tree):return '\n'.join(n.attrib.get('text','') for n in tree.iter('node'))
+def page_notice(tree):
+ title=find(tree,'Android App Compatibility');ok=find(tree,'OK');t=text(tree).lower()
+ return (title is not None and title.attrib.get('package')=='android'
+  and ok is not None and ok.attrib.get('resource-id')=='android:id/button2'
+  and ('16 kb' in t or 'page size' in t))
+def nodes():
+ global notice_seconds
+ tree=raw_nodes()
+ # The same platform notice can arrive after an Activity's title is visible.
+ # Handle it for every observation, not only one launch/title wait. Never
+ # acknowledge application errors or select Don't Show Again.
+ for ordinal in range(3):
+  if not page_notice(tree):return tree
+  started=time.monotonic()
+  try:
+   screenshot('platform-page-size-notice-'+str(len(steps)))
+   deadline=time.monotonic()+3.5;previous=None;window=None
+   while time.monotonic()<deadline:
+    tree=raw_nodes()
+    if not page_notice(tree):return tree
+    b=bounds(find(tree,'OK'));current=(tree.attrib['window-id'],b)
+    if current==previous:
+     window=current[0];shell('input','tap',str((b[0]+b[2])//2),str((b[1]+b[3])//2))
+     record('platform_notice_dismissed',window=window,bounds=b,button='OK');break
+    previous=current;time.sleep(.1)
+   check(window is not None,'Stable known platform notice target unavailable')
+   deadline=time.monotonic()+18
+   while time.monotonic()<deadline:
+    tree=raw_nodes()
+    if tree.attrib.get('window-id')!=window or not page_notice(tree):break
+    time.sleep(.1)
+   else:raise AssertionError('Acknowledged platform notice did not close')
+  finally:notice_seconds+=time.monotonic()-started
+ check(not page_notice(tree),'Unexpected repeated platform notices')
+ return tree
 def tap(label):
- previous=None;deadline=time.monotonic()+3.5
- while time.monotonic()<deadline:
+ previous=None;deadline=feature_time()+3.5
+ while feature_time()<deadline:
   tree=nodes();n=find(tree,label);b=bounds(n) if n is not None else None
   if b is not None and b==previous:
    shell('input','tap',str((b[0]+b[2])//2),str((b[1]+b[3])//2));record('real_touch',label=label,bounds=b);return
   previous=b;time.sleep(.1)
  raise AssertionError('Stable current touch target unavailable: '+label)
 def await_text(label,seconds=18):
- start=time.monotonic();last=None;notices=0
- while time.monotonic()-start<seconds:
+ start=feature_time();last=None
+ while feature_time()-start<seconds:
   last=nodes()
   if find(last,label) is not None:return last
-  # Preserve the already known platform warning. Dismiss OK only, never disable.
-  t=text(last)
-  if ('page size' in t.lower() or '16 kb' in t.lower()) and find(last,'OK') is not None:
-   check(notices<2,'Unexpected additional compatibility prompt')
-   screenshot('platform-page-size-notice-'+str(len(steps)));tap('OK');notices+=1
-   record('platform_notice_dismissed',ordinal=notices)
-   # Splash and the separate Activity each get this OS notice. Setup time is
-   # separate from the unchanged eighteen-second feature-observation budget.
-   start=time.monotonic()
   time.sleep(.2)
  if last is not None:(out/'missing-target.xml').write_bytes(ET.tostring(last))
  raise AssertionError('UI target not observed: '+label)
 def await_prefix(prefix):
- start=time.monotonic()
- while time.monotonic()-start<18:
+ start=feature_time()
+ while feature_time()-start<18:
   tree=nodes()
   for n in tree.iter('node'):
    value=n.attrib.get('text','')
@@ -124,10 +151,10 @@ def final_cleanup():
  raise AssertionError('Source focus, external Activity removal or decoder release not observed')
 def strip_to(label):
  for _ in range(4):
-  deadline=time.monotonic()+18;strips=[]
+  deadline=feature_time()+18;strips=[]
   # A selection callback dismisses its dialog asynchronously. Observe the real
   # player strip before looking for a control or issuing another swipe.
-  while time.monotonic()<deadline:
+  while feature_time()<deadline:
    tree=nodes()
    strips=[n for n in tree.iter('node') if n.attrib.get('class')=='android.widget.HorizontalScrollView' and n.attrib.get('package')==P]
    if strips:break
