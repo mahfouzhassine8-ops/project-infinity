@@ -253,7 +253,7 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
         seek.setEnabled(ready && total > 0);
         if (!dragging) { seek.setMax(Math.max(total, 1)); seek.setProgress(Math.max(0, now)); }
     }
-    @Override public void size(int w, int h) { width = w; height = h; fitVideo(); }
+    @Override public void size(int w, int h) { width = w; height = h; layoutChrome(); }
     @Override public void subtitle(String text) { subtitles.setText(text); }
     @Override public void tracks(String[] labels, int[] indexes, int selected, boolean caption) {
         if (isFinishing() || !started) return;
@@ -310,7 +310,7 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
         picture.addOnLayoutChangeListener((v,l,t,r,b,ol,ot,or,ob) -> {if(r-l!=or-ol||b-t!=ob-ot)fitVideo();});
         video.setOnClickListener(v -> {
             boolean visible=controls.getVisibility()==View.VISIBLE;
-            controls.setVisibility(visible?View.GONE:View.VISIBLE);top.setVisibility(visible?View.GONE:View.VISIBLE);
+            controls.setVisibility(visible?View.GONE:View.VISIBLE);top.setVisibility(visible?View.GONE:View.VISIBLE);layoutChrome();
         });
         subtitles=text(20);subtitles.setTextColor(Color.WHITE);subtitles.setGravity(Gravity.CENTER);subtitles.setShadowLayer(3,1,1,Color.BLACK);
         FrameLayout.LayoutParams sub=new FrameLayout.LayoutParams(-1,-2,Gravity.BOTTOM);sub.bottomMargin=dp(12);picture.addView(subtitles,sub);
@@ -362,19 +362,11 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
         });addControl(inlineVolume,104);separator(14,12);
         addControl(button("Audio",()->engine.listTracks(false)),52);addControl(button("Subtitles",()->engine.listTracks(true)),64);
         addControl(button("Display",()->dialog().setTitle("Display")
-                .setSingleChoiceItems(new String[]{"Best Fit","Fill (crop)"},filling?1:0,(d,which)->{filling=which==1;fitVideo();d.dismiss();})
+                .setSingleChoiceItems(new String[]{"Best Fit","Fill (crop)"},filling?1:0,(d,which)->{filling=which==1;layoutChrome();d.dismiss();})
                 .setNeutralButton("Appearance",(d,which)->showAppearance()).setNegativeButton("Cancel",null).show()),56);
         rotation=button("Auto rotate",()->{
             locked=!locked;setRequestedOrientation(locked?android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LOCKED:android.content.pm.ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);updateButtons();
         });addControl(rotation,72);
-        // Keep the original Volume dialog available after the primary mockup controls.
-        addControl(button("Volume",()->{
-            SeekBar volume=new SeekBar(this);volume.setMax(100);volume.setProgress(Math.round(level*100));volume.setContentDescription("Player volume");chrome.seek(volume);
-            volume.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
-                public void onStartTrackingTouch(SeekBar s){}public void onStopTrackingTouch(SeekBar s){}
-                public void onProgressChanged(SeekBar s,int value,boolean user){if(user){level=value/100f;inlineVolume.setProgress(value);engine.volume(effectiveMuted()?0:level);}}
-            });dialog().setTitle("Player volume").setView(volume).setPositiveButton("Done",null).show();
-        }),52);
         toolbar.addView(strip,new LinearLayout.LayoutParams(-1,-1));LinearLayout.LayoutParams bar=new LinearLayout.LayoutParams(-1,dp(70));bar.topMargin=dp(6);controls.addView(toolbar,bar);
         root.addView(controls,new FrameLayout.LayoutParams(-1,dp(118),Gravity.BOTTOM));
         root.addOnLayoutChangeListener((v,l,t,r,b,ol,ot,or,ob)->{if(r-l!=or-ol||b-t!=ob-ot)layoutChrome();});
@@ -435,10 +427,20 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
         LinearLayout.LayoutParams b=(LinearLayout.LayoutParams)toolbar.getLayoutParams();if(b.height!=barH||b.topMargin!=gap){b.height=barH;b.topMargin=gap;toolbar.setLayoutParams(b);}
         place(top,w-dp(20),dp(48),dp(10),dp(5),Gravity.TOP|Gravity.LEFT,0);
         int brandW=dp(w>=dp(520)?108:28);if(brand.getLayoutParams().width!=brandW){brand.getLayoutParams().width=brandW;brand.requestLayout();}
-        place(controls,w-dp(22),controlsH,dp(11),0,Gravity.BOTTOM|Gravity.LEFT,bottom);
-        int upper=dp(69),lower=h-bottom-controlsH-dp(16),pw=Math.max(dp(48),w-dp(32));
-        int ph=Math.max(1,Math.min(Math.round(pw*9f/16f),lower-upper));
-        place(picture,pw,ph,dp(16),Math.max(dp(53),upper+(lower-upper-ph)/2),Gravity.TOP|Gravity.LEFT,0);
+        // Fit the actual media inside the usable viewport; keep its controls
+        // adjacent rather than separated by the remaining portrait whitespace.
+        boolean chromeVisible=controls.getVisibility()==View.VISIBLE;
+        int upper=chromeVisible?dp(69):0,maxW=Math.max(1,w-(chromeVisible?dp(32):0)),videoGap=dp(shortWindow?6:12);
+        int maxH=Math.max(1,h-upper-(chromeVisible?bottom+controlsH+videoGap:0));
+        double ratio=width>0&&height>0?(double)width/height:16d/9d;
+        int pw=maxW,ph=maxH;
+        if(!filling){
+            pw=Math.max(1,Math.min(maxW,(int)Math.round(maxH*ratio)));
+            ph=Math.max(1,Math.min(maxH,(int)Math.round(pw/ratio)));
+        }
+        int groupTop=upper+Math.max(0,(maxH-ph)/2);
+        place(picture,pw,ph,(w-pw)/2,groupTop,Gravity.TOP|Gravity.LEFT,0);
+        place(controls,w-dp(22),controlsH,dp(11),groupTop+ph+videoGap,Gravity.TOP|Gravity.LEFT,0);
         fitVideo();
     }
     private void showTimes(int now,int total) {
@@ -454,6 +456,8 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
         if (play == null) return;
         String p = wantsPlay ? "Pause" : "Play"; play.setText(p); play.setContentDescription(p); play.setEnabled(ready);
         String m = effectiveMuted() ? "Unmute" : "Mute"; mute.setText(m); mute.setContentDescription(m);
+        rotation.setSelected(!locked);
+        if(Build.VERSION.SDK_INT>=30)rotation.setStateDescription(locked?"Rotation locked":"Automatic rotation enabled");
         rotation.setText(locked ? "Rotation locked" : "Auto rotate");
         rotation.setContentDescription(locked ? "Rotation locked" : "Auto rotate");
     }

@@ -122,6 +122,7 @@ public final class InfinityPreviewChrome {
         InfinityPreviewChrome c;final Paint p=new Paint(3);final Path path=new Path();
         public Control(Context context,InfinityPreviewChrome c){super(context);theme(c);setMinWidth(0);setMinHeight(0);setMinimumWidth(0);setMinimumHeight(0);setPadding(0,0,0,0);setBackgroundColor(Color.TRANSPARENT);}
         public void theme(InfinityPreviewChrome value){c=value;setTypeface(c.font);setTextColor(c.ink);invalidate();}
+        @Override protected void drawableStateChanged(){super.drawableStateChanged();invalidate();}
         protected void onDraw(Canvas canvas){
             String action=getText().toString();boolean transport=action.equals("Pause")||action.equals("Play");
             boolean close=action.equals("Close");float w=getWidth(),h=getHeight(),d=c.density;
@@ -140,11 +141,15 @@ public final class InfinityPreviewChrome {
                 canvas.drawRoundRect(b,c.dp(close?12:10),c.dp(close?12:10),p);p.setShader(null);
                 p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(Math.max(1,d*.5f));p.setColor(close?c.accent:c.light?0xffa1bdc3:0xff365057);canvas.drawRoundRect(b,c.dp(close?12:10),c.dp(close?12:10),p);
             }
-            if(isPressed()||isFocused()){
+            if(isSelected()){
+                p.setStyle(Paint.Style.FILL);p.setColor(c.accent);p.setAlpha(c.light?30:40);
+                canvas.drawRoundRect(new RectF(d,d,w-d,h-d),c.dp(12),c.dp(12),p);p.setAlpha(255);
+            }
+            if(isSelected()||isPressed()||isFocused()){
                 p.setStyle(Paint.Style.STROKE);p.setColor(c.accent);p.setStrokeWidth(d*1.5f);
                 canvas.drawRoundRect(new RectF(d,d,w-d,h-d),c.dp(12),c.dp(12),p);
             }
-            p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(d*1.2f);p.setStrokeCap(Paint.Cap.ROUND);p.setStrokeJoin(Paint.Join.ROUND);p.setColor(c.ink);
+            p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(d*1.2f);p.setStrokeCap(Paint.Cap.ROUND);p.setStrokeJoin(Paint.Join.ROUND);p.setColor(isSelected()?c.accent:c.ink);
             boolean caption=action.equals("Audio")||action.equals("Subtitles")||action.equals("Display")||action.contains("10")||action.contains("rotate")||action.contains("locked")||action.equals("Volume");
             float iy=caption?y-c.dp(7):y;
             canvas.save();canvas.translate(x,iy);canvas.scale(d,d);
@@ -153,7 +158,12 @@ public final class InfinityPreviewChrome {
             else if(action.equals("Pause")){p.setStyle(Paint.Style.FILL);canvas.drawRoundRect(new RectF(-6,-7,-2,7),1,1,p);canvas.drawRoundRect(new RectF(2,-7,6,7),1,1,p);}
             else if(action.equals("Play")){path.reset();path.moveTo(-4,-8);path.lineTo(8,0);path.lineTo(-4,8);path.close();p.setStyle(Paint.Style.FILL);canvas.drawPath(path,p);}
             else if(action.equals("Stop")){p.setStyle(Paint.Style.FILL);canvas.drawRoundRect(new RectF(-5,-5,5,5),1,1,p);}
-            else if(action.contains("10")||action.contains("rotate")||action.contains("locked")){
+            else if(action.contains("10")){
+                canvas.save();if(action.startsWith("−"))canvas.scale(-1,1);
+                path.reset();path.moveTo(-6,3);path.cubicTo(-10,-7,4,-11,7,-3);canvas.drawPath(path,p);
+                path.reset();path.moveTo(3,-4);path.lineTo(7,-3);path.lineTo(8,-7);canvas.drawPath(path,p);canvas.restore();
+            }
+            else if(action.contains("rotate")||action.contains("locked")){
                 boolean back=action.startsWith("−");canvas.drawArc(new RectF(-6,-6,6,6),back?205:335,285,false,p);
                 path.reset();if(back){path.moveTo(-8,-4);path.lineTo(-7,1);path.lineTo(-2,-1);}else{path.moveTo(8,-4);path.lineTo(7,1);path.lineTo(2,-1);}canvas.drawPath(path,p);
             }else if(action.equals("Mute")||action.equals("Unmute")){
@@ -163,7 +173,7 @@ public final class InfinityPreviewChrome {
             else if(action.equals("Subtitles")){canvas.drawRoundRect(new RectF(-8,-6,8,6),2,2,p);p.setStyle(Paint.Style.FILL);p.setTypeface(c.font);p.setTextSize(7);p.setTextAlign(Paint.Align.CENTER);canvas.drawText("CC",0,2.5f,p);}
             else if(action.equals("Display")){canvas.drawRoundRect(new RectF(-8,-6,8,4),1,1,p);canvas.drawLine(0,4,0,7,p);canvas.drawLine(-4,7,4,7,p);}
             else if(action.equals("Volume")){canvas.drawLine(-7,5,-7,0,p);canvas.drawLine(-2,5,-2,-4,p);canvas.drawLine(3,5,3,-7,p);canvas.drawLine(8,5,8,-2,p);}
-            canvas.restore();p.setStyle(Paint.Style.FILL);p.setTypeface(c.font);p.setTextAlign(Paint.Align.CENTER);p.setColor(c.ink);
+            canvas.restore();p.setStyle(Paint.Style.FILL);p.setTypeface(c.font);p.setTextAlign(Paint.Align.CENTER);p.setColor(isSelected()?c.accent:c.ink);
             if(close){p.setTextSize(c.sp(11));canvas.drawText("Close",x+c.dp(4),y+c.dp(4),p);}
             else if(caption){String label=action.contains("locked")?"Locked":action.startsWith("−")?"−10s":action.startsWith("+")?"+10s":action;p.setTextSize(c.sp(8));canvas.drawText(label,x,y+c.dp(14),p);}
             else if(action.equals("Retry")){p.setTextSize(c.sp(11));canvas.drawText(action,x,y+c.dp(4),p);}

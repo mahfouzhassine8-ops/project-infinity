@@ -1,0 +1,3 @@
+Authorized Preview corrections over signed449, preserving signed448 recovery: actual-video/viewport responsive frame, adjacent timeline and control strip, Auto/Locked visual state, remove duplicate Volume button while retaining inline slider. Only Activity and Chrome drawing helper may change. No engine/resume/Splash/Cobra/Kodi/shared/native/shutdown edits. Focused host input/Canvas and actual Android selected controls/layout/decoding; package/source/class/member/signature checks. No shutdown tests.
+
+User also selected polish of the +10s glyph. Match the −10s glyph size/alignment with mirrored round arrows; preserve exact seek callbacks.
