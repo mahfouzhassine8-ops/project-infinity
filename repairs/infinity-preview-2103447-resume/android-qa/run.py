@@ -8,6 +8,25 @@ from pathlib import Path
 H=Path(__file__).resolve().parents[1];R=H.parents[1]
 spec=importlib.util.spec_from_file_location('external_observer',R/'repairs/infinity-2103445-standalone-external-player/android-qa/run.py')
 q=importlib.util.module_from_spec(spec);spec.loader.exec_module(q)
+def observed_strip_to(label):
+ # Keep the original four-swipe budget. The old helper failed immediately
+ # after its fourth swipe, without observing the control that it revealed.
+ for attempt in range(5):
+  deadline=q.feature_time()+18;strips=[]
+  while q.feature_time()<deadline:
+   tree=q.nodes()
+   strips=[n for n in tree.iter('node') if n.attrib.get('class')=='android.widget.HorizontalScrollView' and n.attrib.get('package')==q.P]
+   if strips:break
+   time.sleep(.1)
+  q.check(strips,'Playback control scroll owner missing')
+  if q.find(tree,label) is not None:return
+  if attempt==4:break
+  b=q.bounds(strips[0]);y=(b[1]+b[3])//2;left=b[0]+(b[2]-b[0])//4;right=b[0]+(b[2]-b[0])*3//4
+  start,end=(left,right) if label in ('Pause','Play','Stop') else (right,left)
+  q.shell('input','swipe',str(start),str(y),str(end),str(y),'250')
+  q.record('real_control_strip_swipe',bounds=b,start=[start,y],end=[end,y])
+ raise AssertionError('Control not reachable after final observation: '+label)
+q.strip_to=observed_strip_to
 def seconds(value):
  parts=list(map(int,value.split(':')));return sum(n*60**i for i,n in enumerate(reversed(parts)))
 def clock():
@@ -57,7 +76,7 @@ def stop_observer():
   except Exception:q.observer.terminate()
   q.observer=None
 def source():q.shell('am','start','-W','-n',q.SOURCE+'/qa.external.SourceActivity');q.await_text('Open A')
-def body(a):
+def setup(a):
  q.check(q.shell('getprop','ro.kernel.qemu').strip()=='1','Disposable emulator only')
  q.check(not q.shell('pm','list','packages',q.P).strip(),'No existing installation may be replaced in this fixture')
  q.adb('root');q.adb('wait-for-device');q.check('uid=0' in q.shell('id'),'Read-only synthetic history observation requires emulator root')
@@ -67,6 +86,8 @@ def body(a):
  remote=q.shell('pm','path',q.P).strip().split('package:')[-1]
  q.check(q.shell('sha256sum',remote).split()[0]==hashlib.sha256((a.prepared/'candidate-qa.apk').read_bytes()).hexdigest(),'Installed exact tested bytes')
  q.start_observer(a.prepared);source()
+def body(a):
+ setup(a)
  q.open_video('Open A','red','a.mp4');seek(.25);a_position=pause();q.source_return()
  q.open_video('Open B','green','b.mp4');seek(.4);b_position=pause();q.source_return('Stop')
  offer('Open A',a_position);a_position=pause();q.source_return('Close')
@@ -124,6 +145,14 @@ def body(a):
  # actual button presses; no private Activity or production callback is invoked.
  q.shell('am','start','-W','-n',q.SOURCE+'/qa.external.SourceActivity','--es','resume.fixture.open','b.mp4')
  offer(None,b_position);b_position=pause();q.source_return();q.record('reboot_keeps_private_resume_database',B=b_position)
+ remaining(b_position)
+def body_remaining(a):
+ setup(a)
+ # Reuse the exact-v2 core evidence from run 41436653854. Set up only the
+ # independent B record needed by the remaining completion-reset check.
+ q.open_video('Open B','green','b.mp4');seek(.4);b_position=pause();q.source_return()
+ remaining(b_position)
+def remaining(b_position):
  # Cover, inner and landscape dimensions: actual observed screenshot bounds,
  # real seek/control-strip gestures; no claim of physical Fold hardware.
  for viewport in ('1080x2520','1600x1680','2520x1080'):
@@ -141,12 +170,12 @@ def body(a):
  q.final_cleanup();logs=q.shell('logcat','-d','-v','threadtime');(q.out/'logcat.txt').write_text(logs)
  q.check('FATAL EXCEPTION' not in logs,'Crash in selected journey');q.record('resume_journey_complete')
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--prepared',type=Path,required=True);p.add_argument('--out',type=Path,required=True);a=p.parse_args();a.out.mkdir(parents=True);q.out=a.out;status='FAIL'
- try:body(a);status='PASS'
+ p=argparse.ArgumentParser();p.add_argument('--prepared',type=Path,required=True);p.add_argument('--out',type=Path,required=True);p.add_argument('--segment',choices=('full','remaining'),default='full');a=p.parse_args();a.out.mkdir(parents=True);q.out=a.out;status='FAIL'
+ try:(body_remaining if a.segment=='remaining' else body)(a);status='PASS'
  except Exception:
   (a.out/'FAILURE.txt').write_text(traceback.format_exc())
   try:q.screenshot('failure');(a.out/'failure-logcat.txt').write_text(q.shell('logcat','-d','-v','threadtime'))
   except Exception:pass
   raise
  finally:
-  stop_observer();(a.out/'RESULT.json').write_text(json.dumps(dict(status=status,checks=q.steps,source_build=json.loads((a.prepared/'BUILD.json').read_text()),physical_Fold='NOT_TESTED',proprietary_file_managers='NOT_TESTED',cinematic_design='UNIMPLEMENTED_PRESERVED_SEPARATELY',shutdown='NOT_RUN'),indent=2)+'\n')
+  stop_observer();(a.out/'RESULT.json').write_text(json.dumps(dict(status=status,segment=a.segment,checks=q.steps,source_build=json.loads((a.prepared/'BUILD.json').read_text()),physical_Fold='NOT_TESTED',proprietary_file_managers='NOT_TESTED',cinematic_design='UNIMPLEMENTED_PRESERVED_SEPARATELY',shutdown='NOT_RUN'),indent=2)+'\n')

@@ -40,3 +40,5 @@ Storage is a new Preview-only SQLite namespace on its existing decoder worker.
 No existing database is read, reset or migrated. Start Over clears this video's
 resume record. A checkpoint every 10 seconds bounds abrupt-process-loss exposure;
 explicit lifecycle checkpoints read the decoder's actual position.
+
+Runtime continuation: retain run 41436653854 as FAIL with completed core checkpoints through real reboot; execute only unfinished three-viewport/system-theme/control-strip, rapid switching, near-end reset and error-cleanup checks after adding the missing final scroll observation. Exact production DEX remains unchanged. Release evidence must retain both raw results and require every selected checkpoint; no failed run is relabeled PASS.

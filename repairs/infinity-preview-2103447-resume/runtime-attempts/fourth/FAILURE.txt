@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-preview-2103447-resume/android-qa/run.py", line 145, in <module>
+    try:body(a);status='PASS'
+        ^^^^^^^
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-preview-2103447-resume/android-qa/run.py", line 133, in body
+    q.shell('cmd','uimode','night',theme);q.await_text('Pause');q.strip_to('Display');q.tap('Display');q.await_text('Best Fit');q.tap('Best Fit');q.strip_to('Pause')
+                                                                                                                                                  ^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-2103445-standalone-external-player/android-qa/run.py", line 170, in strip_to
+    raise AssertionError('Control not reachable: '+label)
+AssertionError: Control not reachable: Pause

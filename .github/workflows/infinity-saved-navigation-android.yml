@@ -109,7 +109,7 @@ jobs:
           script: |
             adb shell wm size 1080x2520
             adb shell wm density 420
-            python3 repairs/infinity-preview-2103447-resume/android-qa/run.py --prepared external-qa --out external-results
+            python3 repairs/infinity-preview-2103447-resume/android-qa/run.py --prepared external-qa --out external-results --segment remaining
       - uses: actions/upload-artifact@v4
         if: always()
         with:
