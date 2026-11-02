@@ -66,7 +66,7 @@ class Preservation(unittest.TestCase):
   from runtime_evidence import summarize
   self.assertEqual(summarize()['status'],'PASS_SELECTED_PREVIEW_LAYOUT_CHECKS')
   with tempfile.TemporaryDirectory() as tmp:
-   d=Path(tmp);(d/'final-evidence').mkdir()
+   d=Path(tmp);(d/'final-evidence').mkdir();(d/'runtime-attempts/second').mkdir(parents=True);shutil.copyfile(H/'runtime-attempts/second/RESULT.json',d/'runtime-attempts/second/RESULT.json')
    raw=json.loads((H/'final-evidence/ANDROID-RAW.json').read_text());binding=json.loads((H/'final-evidence/RUNTIME-BINDING.json').read_text())
    for failure in ('status','missing'):
     bad=copy.deepcopy(raw)

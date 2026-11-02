@@ -1,0 +1,9 @@
+{
+  "run_id": 41538194686,
+  "conclusion": "failure",
+  "source": "dac5c777b7c50bc3ee4ada8ff3c5678eb99ac489",
+  "artifact_id": 13184069888,
+  "artifact_sha256": "9993cace429c0ae1e6a9e5ed4dc8064e6c7196b571537945602eea12f13bd849",
+  "result_sha256": "f2bc6f8864aac06094d10f74a0fd5841f4491608df63ae965f53a1be211b0647",
+  "finding": "Actual decoding, clock and both real seeks completed. Observer does not serialize selected at all, so None failed the false assertion. Retain FAIL; add selected to QA observer and continue remaining UI checks on same production DEX."
+}

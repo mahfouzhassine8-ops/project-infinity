@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-preview-2103449-layout-controls/android-qa/run.py", line 115, in <module>
+    try:body(a);status='PASS'
+        ^^^^^^^
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-preview-2103449-layout-controls/android-qa/run.py", line 89, in body
+    control('Auto rotate');q.await_text('Rotation locked');q.check(q.find(q.nodes(),'Rotation locked').attrib.get('selected')=='false','Auto highlight must clear while locked')
+                                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-2103445-standalone-external-player/android-qa/run.py", line 17, in check
+    if not ok:raise AssertionError(why)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Auto highlight must clear while locked

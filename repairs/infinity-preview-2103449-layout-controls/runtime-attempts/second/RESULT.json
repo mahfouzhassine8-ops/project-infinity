@@ -1,0 +1,148 @@
+{
+  "status": "FAIL",
+  "checks": [
+    {
+      "check": "fresh_fixture_install",
+      "name": "candidate",
+      "seconds": 90.32732769999996,
+      "sha256": "5f3eceb95cc1b241389b0ad46f9c0c99b41aefdc10f287f7029c27cd0ca9afe9"
+    },
+    {
+      "check": "fresh_fixture_install",
+      "name": "source",
+      "seconds": 1.536188827999979,
+      "sha256": "cde07a6a40cda12cc100940e42b4efe71bff3c2dc157f2292b912392978cb95b"
+    },
+    {
+      "check": "fresh_persistent_OS_observer",
+      "sha256": "0a5d7d23aeef26f62f4e81ae502f3d3520289fc6457f0c334cbdcd9ebfc456d6"
+    },
+    {
+      "check": "real_touch",
+      "label": "Open A",
+      "bounds": [
+        0,
+        51,
+        1080,
+        177
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "16",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "no_kodi_process",
+      "kodi_pid": "",
+      "external_pid": "8422"
+    },
+    {
+      "check": "actual_video_decoded",
+      "title": "a.mp4",
+      "color_samples": 90
+    },
+    {
+      "check": "actual_media_clock_advances",
+      "before": 5,
+      "after": 6
+    },
+    {
+      "check": "real_touch",
+      "label": "+10 s",
+      "bounds": [
+        477,
+        1601,
+        614,
+        1738
+      ]
+    },
+    {
+      "check": "real_skip_completed",
+      "delta": 10,
+      "before": 6,
+      "after": 16
+    },
+    {
+      "check": "real_touch",
+      "label": "\u221210 s",
+      "bounds": [
+        340,
+        1601,
+        477,
+        1738
+      ]
+    },
+    {
+      "check": "real_skip_completed",
+      "delta": -10,
+      "before": 16,
+      "after": 6
+    },
+    {
+      "check": "seek_actions_preserved"
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        1578,
+        1040,
+        1762
+      ],
+      "start": [
+        795,
+        1670
+      ],
+      "end": [
+        305,
+        1670
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        1578,
+        1040,
+        1762
+      ],
+      "start": [
+        795,
+        1670
+      ],
+      "end": [
+        305,
+        1670
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Auto rotate",
+      "bounds": [
+        865,
+        1601,
+        1040,
+        1738
+      ]
+    }
+  ],
+  "source_build": {
+    "status": "DISPOSABLE_QA_ONLY",
+    "source": "dac5c777b7c50bc3ee4ada8ff3c5678eb99ac489",
+    "candidate_sha256": "5f3eceb95cc1b241389b0ad46f9c0c99b41aefdc10f287f7029c27cd0ca9afe9",
+    "original_key": false,
+    "replaced": {
+      "classes3.dex": "6692252f1c8b6c6c18b9d1e60af2a4c1ab3624214f3a9123cfb724686b0ef8f2"
+    },
+    "baseline_sha256": "e190c17b3f337133df66e5531d4983e48ce3544c90965db6911936f0db65ec5c"
+  },
+  "physical_Fold": "NOT_TESTED",
+  "shutdown": "NOT_RUN"
+}

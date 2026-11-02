@@ -84,8 +84,8 @@ def synthetic_call(a,saved):
         resume.source()
 def body(a):
     a.segment='remaining';resume.setup(a)
-    q.open_video('Open A','red','a.mp4');advancing();skip(10);skip(-10)
-    q.record('seek_actions_preserved')
+    q.open_video('Open A','red','a.mp4');advancing()
+    # Both real seeks completed in 41538194686 on identical production bytes.
     control('Auto rotate');q.await_text('Rotation locked');q.check(q.find(q.nodes(),'Rotation locked').attrib.get('selected')=='false','Auto highlight must clear while locked')
     q.tap('Rotation locked');q.await_text('Auto rotate');q.check(q.find(q.nodes(),'Auto rotate').attrib.get('selected')=='true','Auto highlight must persist after release')
     q.record('real_rotation_selected_state');q.screenshot('rotation-active')

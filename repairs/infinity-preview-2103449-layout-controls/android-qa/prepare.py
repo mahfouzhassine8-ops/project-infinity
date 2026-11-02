@@ -34,7 +34,7 @@ def main(a):
   for p in classes.rglob('*.class'):z.write(p,p.relative_to(classes))
  run('java','-cp',a.sdk/'lib/d8.jar','com.android.tools.r8.D8','--min-api','23','--lib',a.android,'--output',dex,a.out/'source.jar')
  observer=a.out/'observer-classes';observer.mkdir();observer_dex=a.out/'observer-dex';observer_dex.mkdir()
- run('java','-m','jdk.compiler/com.sun.tools.javac.Main','-source','8','-target','8','-cp',a.android,'-d',observer,R/'repairs/infinity-2103445-standalone-external-player/android-qa/observer/ImmediateHierarchy.java')
+ run('java','-m','jdk.compiler/com.sun.tools.javac.Main','-source','8','-target','8','-cp',a.android,'-d',observer,H/'android-qa/observer/ImmediateHierarchy.java')
  with ZipFile(a.out/'observer-classes.jar','w',ZIP_DEFLATED) as z:
   for p in observer.rglob('*.class'):z.write(p,p.relative_to(observer))
  run('java','-cp',a.sdk/'lib/d8.jar','com.android.tools.r8.D8','--min-api','23','--lib',a.android,'--output',observer_dex,a.out/'observer-classes.jar')
