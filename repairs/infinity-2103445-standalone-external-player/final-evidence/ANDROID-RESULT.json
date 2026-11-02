@@ -1,0 +1,703 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "check": "fresh_fixture_install",
+      "name": "candidate",
+      "seconds": 82.66160965699999,
+      "bytes": 778571509,
+      "sha256": "dad072e947bb506cc5589b4ea669cf31d627e3f82030a98753ff5baea739f0b2"
+    },
+    {
+      "check": "fresh_fixture_install",
+      "name": "source",
+      "seconds": 1.9240551709999636,
+      "bytes": 23208683,
+      "sha256": "e1fcce73f907e16aa100cec31e9995df1523875fc213b52af2e3531fb4a21236"
+    },
+    {
+      "check": "fresh_persistent_OS_observer",
+      "sha256": "58b5a039e39b99d948d6b87fb6f4f77de0e76a949bda8b7880a3a91e3fd77110"
+    },
+    {
+      "check": "real_touch",
+      "label": "Handler labels",
+      "bounds": [
+        0,
+        1311,
+        1080,
+        1437
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "OK",
+      "bounds": [
+        810,
+        1321,
+        978,
+        1463
+      ]
+    },
+    {
+      "check": "one_handler_label",
+      "application": "Infinity",
+      "handler": "Infinity Preview"
+    },
+    {
+      "check": "real_touch",
+      "label": "Open A",
+      "bounds": [
+        0,
+        51,
+        1080,
+        177
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "17",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "no_kodi_process",
+      "kodi_pid": "",
+      "external_pid": "8508"
+    },
+    {
+      "check": "actual_video_decoded",
+      "title": "a.mp4",
+      "color_samples": 105
+    },
+    {
+      "check": "advancing_media_clock"
+    },
+    {
+      "check": "real_touch",
+      "label": "Pause",
+      "bounds": [
+        29,
+        2310,
+        260,
+        2436
+      ]
+    },
+    {
+      "check": "pause_stops_clock"
+    },
+    {
+      "check": "real_touch",
+      "label": "Play",
+      "bounds": [
+        29,
+        2310,
+        260,
+        2436
+      ]
+    },
+    {
+      "check": "seek_changes_position"
+    },
+    {
+      "check": "real_touch",
+      "label": "Mute",
+      "bounds": [
+        1017,
+        2310,
+        1059,
+        2436
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Unmute",
+      "bounds": [
+        1017,
+        2310,
+        1059,
+        2436
+      ]
+    },
+    {
+      "check": "mute_toggle"
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        21,
+        2310,
+        1059,
+        2436
+      ],
+      "start": [
+        799,
+        2373
+      ],
+      "end": [
+        280,
+        2373
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Audio",
+      "bounds": [
+        1054,
+        2310,
+        1059,
+        2436
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Audio 2 \u00b7 fra",
+      "bounds": [
+        70,
+        1247,
+        1010,
+        1373
+      ]
+    },
+    {
+      "check": "audio_track_selected",
+      "track": "Audio 2 \u00b7 fra"
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        21,
+        2310,
+        1059,
+        2436
+      ],
+      "start": [
+        799,
+        2373
+      ],
+      "end": [
+        280,
+        2373
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Subtitles",
+      "bounds": [
+        840,
+        2310,
+        1059,
+        2436
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Subtitle 1 \u00b7 eng",
+      "bounds": [
+        70,
+        1247,
+        1010,
+        1373
+      ]
+    },
+    {
+      "check": "text_subtitle_actually_rendered"
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        21,
+        2310,
+        1059,
+        2436
+      ],
+      "start": [
+        799,
+        2373
+      ],
+      "end": [
+        280,
+        2373
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Display",
+      "bounds": [
+        707,
+        2310,
+        938,
+        2436
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Fill (crop)",
+      "bounds": [
+        70,
+        1247,
+        1010,
+        1373
+      ]
+    },
+    {
+      "check": "display_real_choice"
+    },
+    {
+      "check": "real_touch",
+      "label": "Auto rotate",
+      "bounds": [
+        954,
+        2310,
+        1059,
+        2436
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Rotation locked",
+      "bounds": [
+        954,
+        2310,
+        1059,
+        2436
+      ]
+    },
+    {
+      "check": "rotation_toggle"
+    },
+    {
+      "check": "no_kodi_process",
+      "kodi_pid": "",
+      "external_pid": "8508"
+    },
+    {
+      "check": "inner_resize"
+    },
+    {
+      "check": "landscape_resize"
+    },
+    {
+      "check": "real_touch",
+      "label": "Open B",
+      "bounds": [
+        0,
+        177,
+        1080,
+        303
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "24",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        21,
+        2310,
+        1059,
+        2436
+      ],
+      "start": [
+        280,
+        2373
+      ],
+      "end": [
+        799,
+        2373
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        21,
+        2310,
+        1059,
+        2436
+      ],
+      "start": [
+        280,
+        2373
+      ],
+      "end": [
+        799,
+        2373
+      ]
+    },
+    {
+      "check": "no_kodi_process",
+      "kodi_pid": "",
+      "external_pid": "8508"
+    },
+    {
+      "check": "actual_video_decoded",
+      "title": "b.mp4",
+      "color_samples": 150
+    },
+    {
+      "check": "real_touch",
+      "label": "Stop",
+      "bounds": [
+        276,
+        2310,
+        507,
+        2436
+      ]
+    },
+    {
+      "check": "originating_activity_return",
+      "action": "Stop"
+    },
+    {
+      "check": "real_touch",
+      "label": "Share B",
+      "bounds": [
+        0,
+        933,
+        1080,
+        1059
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "34",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "no_kodi_process",
+      "kodi_pid": "",
+      "external_pid": "8508"
+    },
+    {
+      "check": "actual_video_decoded",
+      "title": "b.mp4",
+      "color_samples": 105
+    },
+    {
+      "check": "real_android_back"
+    },
+    {
+      "check": "originating_activity_return",
+      "action": "Back"
+    },
+    {
+      "check": "real_touch",
+      "label": "Rapid A B C",
+      "bounds": [
+        0,
+        807,
+        1080,
+        933
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "40",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "no_kodi_process",
+      "kodi_pid": "",
+      "external_pid": "8508"
+    },
+    {
+      "check": "actual_video_decoded",
+      "title": "c.mp4",
+      "color_samples": 105
+    },
+    {
+      "check": "real_android_back"
+    },
+    {
+      "check": "originating_activity_return",
+      "action": "Back"
+    },
+    {
+      "check": "real_touch",
+      "label": "Open A",
+      "bounds": [
+        0,
+        51,
+        1080,
+        177
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "46",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "no_kodi_process",
+      "kodi_pid": "",
+      "external_pid": "8508"
+    },
+    {
+      "check": "actual_video_decoded",
+      "title": "a.mp4",
+      "color_samples": 105
+    },
+    {
+      "check": "real_android_back"
+    },
+    {
+      "check": "originating_activity_return",
+      "action": "Back"
+    },
+    {
+      "check": "real_touch",
+      "label": "Open A",
+      "bounds": [
+        0,
+        51,
+        1080,
+        177
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "52",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "no_kodi_process",
+      "kodi_pid": "",
+      "external_pid": "8508"
+    },
+    {
+      "check": "actual_video_decoded",
+      "title": "a.mp4",
+      "color_samples": 105
+    },
+    {
+      "check": "real_android_back"
+    },
+    {
+      "check": "originating_activity_return",
+      "action": "Back"
+    },
+    {
+      "check": "real_touch",
+      "label": "HTTP A",
+      "bounds": [
+        0,
+        1185,
+        1080,
+        1311
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "58",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "no_kodi_process",
+      "kodi_pid": "",
+      "external_pid": "8508"
+    },
+    {
+      "check": "actual_video_decoded",
+      "title": "a.mp4",
+      "color_samples": 105
+    },
+    {
+      "check": "real_android_back"
+    },
+    {
+      "check": "originating_activity_return",
+      "action": "Back"
+    },
+    {
+      "check": "real_touch",
+      "label": "Denied A",
+      "bounds": [
+        0,
+        1059,
+        1080,
+        1185
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "64",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "real_android_back"
+    },
+    {
+      "check": "originating_activity_return",
+      "action": "Back"
+    },
+    {
+      "check": "source_failure",
+      "source": "Denied A"
+    },
+    {
+      "check": "real_touch",
+      "label": "Open BAD",
+      "bounds": [
+        0,
+        555,
+        1080,
+        681
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "70",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "real_android_back"
+    },
+    {
+      "check": "originating_activity_return",
+      "action": "Back"
+    },
+    {
+      "check": "source_failure",
+      "source": "Open BAD"
+    },
+    {
+      "check": "real_touch",
+      "label": "Open AUDIO",
+      "bounds": [
+        0,
+        681,
+        1080,
+        807
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "76",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "real_android_back"
+    },
+    {
+      "check": "originating_activity_return",
+      "action": "Back"
+    },
+    {
+      "check": "source_failure",
+      "source": "Open AUDIO"
+    },
+    {
+      "check": "real_touch",
+      "label": "Open END",
+      "bounds": [
+        0,
+        429,
+        1080,
+        555
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "82",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "real_android_back"
+    },
+    {
+      "check": "originating_activity_return",
+      "action": "Back"
+    },
+    {
+      "check": "natural_end"
+    },
+    {
+      "check": "source_resumed_and_decoder_released"
+    },
+    {
+      "check": "journey_complete"
+    }
+  ],
+  "source_build": {
+    "status": "DISPOSABLE_QA_ONLY",
+    "source": "963fab094f3a6bb8438a366a6d803209e9df6f18",
+    "candidate_sha256": "dad072e947bb506cc5589b4ea669cf31d627e3f82030a98753ff5baea739f0b2",
+    "original_key": false,
+    "replaced": {
+      "classes.dex": "8cbfe62eae167e4441462cf5be970dbfbb2cc96e068134a39e12b61c64223118",
+      "classes3.dex": "066f3081bea8338f0e12c5b6a14f8604078596b99c3f6a147290fa84de13c2d5",
+      "AndroidManifest.xml": "a535a219329f808fa9e37bf06de6396e2b5fac8e11c1e6e00a6cab99a4ead086"
+    },
+    "baseline_sha256": "b7e78393ade7e52d8653823a0ad72ae99614a5a8e0b6cdedf5d5d15a9e643400"
+  },
+  "physical_fold": "NOT_TESTED",
+  "third_party_accounts": "NOT_TESTED",
+  "shutdown": "NOT_RUN"
+}

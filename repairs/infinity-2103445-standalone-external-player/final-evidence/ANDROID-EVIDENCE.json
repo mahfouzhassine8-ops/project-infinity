@@ -1,0 +1,33 @@
+{
+  "status": "PASS_ACTUAL_ANDROID_EXTERNAL_PLAYER",
+  "run_id": 41411542660,
+  "source": "963fab094f3a6bb8438a366a6d803209e9df6f18",
+  "artifact_id": 13126735993,
+  "artifact_sha256": "12e36b519091f91baebd37e99f683b8c05baf127ddae5b5f4fa8f86b5425af7c",
+  "artifact_bytes": 7895729,
+  "crc_verified": true,
+  "sha256": {
+    "external-results/RESULT.json": "c834efbc1b8de0c88858ffe91444e47c0bc67d93ec5b4d239dc719ed9e421014",
+    "external-results/final-activities.txt": "e139491923b4e98c0dedb4c636450f1905824b0c0b0bc81154d1e660a0666289",
+    "external-results/media.player.txt": "82bc148ed8c54048c3b627664f127ea893acc332d570698efe4ddfbb340ebd88",
+    "external-results/media.audio_flinger.txt": "0ca7ba782d68e2288e9fae6ff775616886176aff43b540fc940af95c1d0da19b",
+    "external-results/final-media.player.txt": "87c89f18bd697d84522be5239148318e0e43a301e31a44d46747ac5706a75141",
+    "external-results/final-media.audio_flinger.txt": "1fc401b8b07ad913483b7f7dc328303251a4ef63e41babb8a2f5099926eac99a",
+    "external-results/logcat.txt": "b45857b37133698ccf9e8a1d99baa1d6dd1a4dd0e499729e16d9c9ab4cac338b",
+    "external-results/handler-labels.png": "a984a8739d46522e4a3f402a10bdcc413712eae850e9b49f55d47d3c12552e32",
+    "external-results/inner-video.png": "9c73033e58893dab8b1f9eefea18fc4fb3bc26e541dc215c8157d2ae35941730",
+    "external-results/landscape-video.png": "0f1580cf3b996c99cc62b5500eb1318f4de8e4fd702fc47708c0891ad2d9913c",
+    "external-owner/OWNER-BUILD.json": "1c8d1f9f223393e5aff296b223ca9181285c9a4fc8dd217b121a2429718aba4d",
+    "external-owner/CLASS-HASHES.json": "3741662fb60f66a8d04fcebe12c894de5abc6038e3ff2c2667377f0668ef6823"
+  },
+  "real_control_touches": 26,
+  "decoded_sessions": 7,
+  "video": "H264 c2.goldfish decoder; actual pixels and media clock",
+  "audio": "AAC c2.android decoder; active 48kHz AudioFlinger track; host audio output disabled",
+  "final_external_decoder_clients": 0,
+  "physical_Fold": "PENDING",
+  "named_third_party_app_UIs": "NOT_TESTED",
+  "orientation_limit": "wm requests and rotation toggle executed; both larger screenshots were 1600x1680, so actual landscape geometry is not asserted.",
+  "native_coexistence": "Preserved original payload and isolated source; actual already-running Kodi/Cobra session remains physical check.",
+  "shutdown": "NOT_RUN"
+}
