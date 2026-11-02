@@ -49,9 +49,13 @@ class Preservation(unittest.TestCase):
     for n in set(members)-{'AndroidManifest.xml',r.LABEL,'classes3.dex'}:
      bad=dict(changed);bad[n]=b'tampered';self.fixture(candidate,bad)
      with self.assertRaisesRegex(Exception,'UNEXPECTED_APK_MEMBER_DELTA'):r.compare(base,candidate,plan,d/'bad')
+    bad=dict(changed);bad['classes3.dex']=b'not the Android-tested decoder';self.fixture(candidate,bad)
+    with self.assertRaisesRegex(Exception,'EXACT_ANDROID_TESTED_DEX'):r.compare(base,candidate,plan,d/'wrong-dex')
+    bad=dict(changed);bad['AndroidManifest.xml']=set_version(manifest,r.VERSION+1);self.fixture(candidate,bad)
+    with self.assertRaisesRegex(Exception,'EXACT_AUTHORIZED_MANIFEST_AND_VERSION'):r.compare(base,candidate,plan,d/'wrong-version')
     bad=dict(changed);bad['new/unowned']=b'added';self.fixture(candidate,bad)
     with self.assertRaisesRegex(Exception,'EXACT_APK_MEMBER_SET'):r.compare(base,candidate,plan,d/'added')
- def test_wrong_baseline_and_wrong_compiled_decoder_rejected(self):
+ def test_wrong_baseline_rejected(self):
   with tempfile.TemporaryDirectory() as tmp:
    p=Path(tmp)/'wrong.apk';p.write_bytes(b'not signed447')
    with self.assertRaisesRegex(Exception,'EXACT_SIGNED447_APK'):r.compare(p,p,p,Path(tmp))

@@ -11,6 +11,14 @@ Baseline: exact locked, signed 2103447. Cinematic Light/Dark is a separate retai
 - URI/document identity works across callers that pass the same stable identity. An already-granted regular-file descriptor supplies a device/inode/extent alias, allowing different provider authorities for the same backing file. Size, duration, modification time for the same file and a bounded first/last 32 KiB validation fingerprint reject observable media changes. Sampling never merges distinct files by content or name.
 - Preview lifecycle restores and explicit new file requests are distinguished. Resume choices do not reopen a provider or create another MediaPlayer. A storage failure reports that memory is unavailable and retains ordinary playback/error handling.
 
+Two boundary regressions were reproduced and repaired before release: a
+committed decoder checkpoint now overrides an unupdated zero-valued UI position
+on restoration, and document-ID canonicalization requires Android to recognize
+the authority as a document provider. Arbitrary provider paths retain their
+complete hashed URI, including distinguishing query parameters. The 12 storage
+tests and three provider/scheduling boundary tests pass; they are host evidence,
+not physical decoding acceptance.
+
 ## Limits to verify/disclose
 
 Abrupt process or power loss can lose the interval since the last committed checkpoint (normally at most about 10 seconds, subject to OS scheduling). An orderly Pause/Stop/Back/background checkpoint uses the decoder's actual position; resume decoding remains limited by the format and Android's seek support.
