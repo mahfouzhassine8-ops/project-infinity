@@ -70,9 +70,14 @@ def synthetic_call(a,saved):
             time.sleep(.3)
         if not mode:
             q.record('synthetic_call_platform_limit',reason='Emulator modem call did not publish active call/communication AudioManager mode; no runtime call PASS claimed',modem=q.adb('emu','gsm','list').decode());return
-        resume.source();resume.offer('Open C',saved);q.strip_to('Pause');q.strip_to('Unmute');q.await_text('Unmute');advancing()
+        resume.source()
+        if saved is None:q.open_video('Open C','blue','c.mp4')
+        else:resume.offer('Open C',saved)
+        q.strip_to('Pause');q.strip_to('Unmute');q.await_text('Unmute');advancing()
+        (q.out/'call-default-media.player.txt').write_text(q.shell('dumpsys','media.player'))
         q.screenshot('call-default-muted');q.record('call_default_muted_video',mode=mode,observation='Unmute UI and real decoding; no acoustic audio assertion')
         q.tap('Unmute');q.await_text('Mute');advancing();q.screenshot('call-manual-unmute');q.record('call_manual_unmute_video',platform_audio='Android may enforce media muting')
+        (q.out/'call-unmuted-media.player.txt').write_text(q.shell('dumpsys','media.player'))
         q.adb('emu','gsm','cancel',number);started=False;advancing();q.source_return();q.record('call_end_keeps_video')
     finally:
         if started:q.adb('emu','gsm','cancel',number)
@@ -106,17 +111,23 @@ def body(a):
     q.source_return();q.shell('wm','size','1080x2520');q.shell('wm','density','420');resume.source()
     # Preserve rapid request replacement and retained resume store. The store's
     # persistence/reboot/identity evidence from 448 is reused, not rerun.
-    q.open_video('Rapid A B C','blue','c.mp4');resume.seek(.03);call_saved=resume.pause();q.source_return();q.record('rapid_replacement_still_latest_request')
+    q.open_video('Rapid A B C','blue','c.mp4');resume.seek(.15);advancing();call_saved=resume.pause();q.source_return();q.record('rapid_replacement_still_latest_request')
     q.tap('Open BAD');q.await_text('Retry');q.check('Loading' not in q.text(q.nodes()),'Error left stale loading');q.screenshot('error-ui');q.source_return();q.record('error_and_retry_preserved')
     synthetic_call(a,call_saved)
     q.final_cleanup();logs=q.shell('logcat','-d','-v','threadtime');(q.out/'logcat.txt').write_text(logs);q.check('FATAL EXCEPTION' not in logs,'Android crash in selected journey');q.record('selected_chrome_journey_complete')
+def call_only(a):
+    # All preceding UI checks completed on the exact same production DEX in
+    # 41471747914. Fresh call video has no resume entry; no fixture data reset.
+    a.segment='remaining';resume.setup(a);synthetic_call(a,None)
+    q.final_cleanup();logs=q.shell('logcat','-d','-v','threadtime');(q.out/'logcat.txt').write_text(logs)
+    q.check('FATAL EXCEPTION' not in logs,'Android crash in selected call journey');q.record('selected_call_journey_complete')
 if __name__=='__main__':
-    p=argparse.ArgumentParser();p.add_argument('--prepared',type=Path,required=True);p.add_argument('--out',type=Path,required=True);a=p.parse_args();a.out.mkdir(parents=True);q.out=a.out;status='FAIL'
-    try:body(a);status='PASS'
+    p=argparse.ArgumentParser();p.add_argument('--prepared',type=Path,required=True);p.add_argument('--out',type=Path,required=True);p.add_argument('--segment',choices=('full','call'),default='full');a=p.parse_args();a.out.mkdir(parents=True);q.out=a.out;status='FAIL';selected=a.segment
+    try:(call_only if selected=='call' else body)(a);status='PASS'
     except Exception:
         (a.out/'FAILURE.txt').write_text(traceback.format_exc())
         try:q.screenshot('failure');(a.out/'failure-logcat.txt').write_text(q.shell('logcat','-d','-v','threadtime'))
         except Exception:pass
         raise
     finally:
-        resume.stop_observer();(a.out/'RESULT.json').write_text(json.dumps(dict(status=status,checks=q.steps,source_build=json.loads((a.prepared/'BUILD.json').read_text()),physical_Fold='NOT_TESTED',call_audio='Host policy plus separately reported emulator observation; physical carrier/VoIP audio pending',shutdown='NOT_RUN'),indent=2)+'\n')
+        resume.stop_observer();(a.out/'RESULT.json').write_text(json.dumps(dict(status=status,segment=selected,checks=q.steps,source_build=json.loads((a.prepared/'BUILD.json').read_text()),physical_Fold='NOT_TESTED',call_audio='Host policy plus separately reported emulator observation; physical carrier/VoIP audio pending',shutdown='NOT_RUN'),indent=2)+'\n')

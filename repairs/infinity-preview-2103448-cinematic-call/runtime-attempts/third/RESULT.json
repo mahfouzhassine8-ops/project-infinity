@@ -1,0 +1,2042 @@
+{
+  "status": "FAIL",
+  "checks": [
+    {
+      "check": "fresh_fixture_install",
+      "name": "candidate",
+      "seconds": 91.39202787300002,
+      "sha256": "ba555ddfeb229dd8f9094fe834609b801b87a70367dff854e45cc703cf331765"
+    },
+    {
+      "check": "fresh_fixture_install",
+      "name": "source",
+      "seconds": 2.0076414309999677,
+      "sha256": "30bb6e53e4509486dc37b0ae885ba226993ce7ef7cba0b5b7c28b981e1f73b18"
+    },
+    {
+      "check": "fresh_persistent_OS_observer",
+      "sha256": "dc2ff9b88c8722f2c28c4a7ff3113ceea25f2eeb3c2ed5983ff6a6e78500bccc"
+    },
+    {
+      "check": "real_touch",
+      "label": "Open A",
+      "bounds": [
+        0,
+        51,
+        1080,
+        177
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "15",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "no_kodi_process",
+      "kodi_pid": "",
+      "external_pid": "9523"
+    },
+    {
+      "check": "actual_video_decoded",
+      "title": "a.mp4",
+      "color_samples": 90
+    },
+    {
+      "check": "actual_media_clock_advances",
+      "before": 5,
+      "after": 6
+    },
+    {
+      "check": "real_touch",
+      "label": "Pause",
+      "bounds": [
+        61,
+        2217,
+        198,
+        2354
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Play",
+      "bounds": [
+        61,
+        2217,
+        198,
+        2354
+      ]
+    },
+    {
+      "check": "actual_media_clock_advances",
+      "before": 7,
+      "after": 8
+    },
+    {
+      "check": "real_seekbar_input",
+      "fraction": 0.2,
+      "actual_seconds": 109,
+      "bounds": [
+        142,
+        2068,
+        948,
+        2178
+      ]
+    },
+    {
+      "check": "actual_media_clock_advances",
+      "before": 109,
+      "after": 110
+    },
+    {
+      "check": "real_touch",
+      "label": "\u221210 s",
+      "bounds": [
+        340,
+        2217,
+        477,
+        2354
+      ]
+    },
+    {
+      "check": "real_skip_completed",
+      "delta": -10,
+      "before": 110,
+      "after": 100
+    },
+    {
+      "check": "real_touch",
+      "label": "+10 s",
+      "bounds": [
+        477,
+        2217,
+        614,
+        2354
+      ]
+    },
+    {
+      "check": "real_skip_completed",
+      "delta": 10,
+      "before": 100,
+      "after": 110
+    },
+    {
+      "check": "actual_media_clock_advances",
+      "before": 110,
+      "after": 111
+    },
+    {
+      "check": "real_touch",
+      "label": "Mute",
+      "bounds": [
+        641,
+        2217,
+        767,
+        2354
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Unmute",
+      "bounds": [
+        641,
+        2217,
+        767,
+        2354
+      ]
+    },
+    {
+      "check": "real_mute_toggle"
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        2194,
+        1040,
+        2378
+      ],
+      "start": [
+        795,
+        2286
+      ],
+      "end": [
+        305,
+        2286
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Audio",
+      "bounds": [
+        686,
+        2217,
+        823,
+        2354
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Audio 2 \u00b7 fra",
+      "bounds": [
+        70,
+        1247,
+        1010,
+        1373
+      ]
+    },
+    {
+      "check": "existing_audio_choice",
+      "track": "Audio 2 \u00b7 fra"
+    },
+    {
+      "check": "real_touch",
+      "label": "Subtitles",
+      "bounds": [
+        823,
+        2217,
+        991,
+        2354
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Subtitle 1 \u00b7 eng",
+      "bounds": [
+        70,
+        1247,
+        1010,
+        1373
+      ]
+    },
+    {
+      "check": "subtitle_actually_rendered"
+    },
+    {
+      "check": "real_touch",
+      "label": "Display",
+      "bounds": [
+        991,
+        2217,
+        1040,
+        2354
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Fill (crop)",
+      "bounds": [
+        70,
+        1247,
+        1010,
+        1373
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Display",
+      "bounds": [
+        991,
+        2217,
+        1040,
+        2354
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Best Fit",
+      "bounds": [
+        70,
+        1121,
+        1010,
+        1247
+      ]
+    },
+    {
+      "check": "display_modes_preserved"
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        2194,
+        1040,
+        2378
+      ],
+      "start": [
+        795,
+        2286
+      ],
+      "end": [
+        305,
+        2286
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Auto rotate",
+      "bounds": [
+        999,
+        2217,
+        1040,
+        2354
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Rotation locked",
+      "bounds": [
+        999,
+        2217,
+        1040,
+        2354
+      ]
+    },
+    {
+      "check": "rotation_preserved"
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        2194,
+        1040,
+        2378
+      ],
+      "start": [
+        795,
+        2286
+      ],
+      "end": [
+        305,
+        2286
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Volume",
+      "bounds": [
+        977,
+        2217,
+        1040,
+        2354
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "DONE",
+      "bounds": [
+        810,
+        1311,
+        978,
+        1453
+      ]
+    },
+    {
+      "check": "original_volume_dialog_preserved"
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        2194,
+        1040,
+        2378
+      ],
+      "start": [
+        305,
+        2286
+      ],
+      "end": [
+        795,
+        2286
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        2194,
+        1040,
+        2378
+      ],
+      "start": [
+        305,
+        2286
+      ],
+      "end": [
+        795,
+        2286
+      ]
+    },
+    {
+      "check": "real_video_surface_tap",
+      "bounds": [
+        42,
+        855,
+        1038,
+        1415
+      ]
+    },
+    {
+      "check": "real_video_surface_tap",
+      "bounds": [
+        42,
+        855,
+        1038,
+        1415
+      ]
+    },
+    {
+      "check": "actual_video_tap_hide_and_show"
+    },
+    {
+      "check": "real_touch",
+      "label": "Pause",
+      "bounds": [
+        61,
+        2217,
+        114,
+        2354
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Close",
+      "bounds": [
+        26,
+        76,
+        205,
+        202
+      ]
+    },
+    {
+      "check": "originating_activity_return",
+      "action": "Close"
+    },
+    {
+      "check": "real_touch",
+      "label": "Open A",
+      "bounds": [
+        0,
+        51,
+        1080,
+        177
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "29",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "real_touch",
+      "label": "RESUME",
+      "bounds": [
+        773,
+        1321,
+        978,
+        1463
+      ]
+    },
+    {
+      "check": "real_resume_choice",
+      "label": "RESUME",
+      "choice": "Resume",
+      "expected": 143,
+      "actual": 143
+    },
+    {
+      "check": "no_kodi_process",
+      "kodi_pid": "",
+      "external_pid": "9523"
+    },
+    {
+      "check": "real_touch",
+      "label": "Pause",
+      "bounds": [
+        61,
+        2217,
+        198,
+        2354
+      ]
+    },
+    {
+      "check": "real_android_back"
+    },
+    {
+      "check": "originating_activity_return",
+      "action": "Back"
+    },
+    {
+      "check": "real_touch",
+      "label": "Open A",
+      "bounds": [
+        0,
+        51,
+        1080,
+        177
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "36",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "real_touch",
+      "label": "START OVER",
+      "bounds": [
+        496,
+        1321,
+        773,
+        1463
+      ]
+    },
+    {
+      "check": "real_resume_choice",
+      "label": "START OVER",
+      "choice": "Start Over",
+      "expected": 144,
+      "actual": 0
+    },
+    {
+      "check": "no_kodi_process",
+      "kodi_pid": "",
+      "external_pid": "9523"
+    },
+    {
+      "check": "real_touch",
+      "label": "Stop",
+      "bounds": [
+        198,
+        2217,
+        324,
+        2354
+      ]
+    },
+    {
+      "check": "originating_activity_return",
+      "action": "Stop"
+    },
+    {
+      "check": "new_chrome_resume_and_start_over_preserved"
+    },
+    {
+      "check": "real_touch",
+      "label": "Open B",
+      "bounds": [
+        0,
+        177,
+        1080,
+        303
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "43",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "no_kodi_process",
+      "kodi_pid": "",
+      "external_pid": "9523"
+    },
+    {
+      "check": "actual_video_decoded",
+      "title": "b.mp4",
+      "color_samples": 90
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        2194,
+        1040,
+        2378
+      ],
+      "start": [
+        795,
+        2286
+      ],
+      "end": [
+        305,
+        2286
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        2194,
+        1040,
+        2378
+      ],
+      "start": [
+        795,
+        2286
+      ],
+      "end": [
+        305,
+        2286
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Display",
+      "bounds": [
+        734,
+        2217,
+        881,
+        2354
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "APPEARANCE",
+      "bounds": [
+        102,
+        1384,
+        402,
+        1526
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Dark",
+      "bounds": [
+        70,
+        1310,
+        1010,
+        1436
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        2194,
+        1040,
+        2378
+      ],
+      "start": [
+        305,
+        2286
+      ],
+      "end": [
+        795,
+        2286
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        2194,
+        1040,
+        2378
+      ],
+      "start": [
+        305,
+        2286
+      ],
+      "end": [
+        795,
+        2286
+      ]
+    },
+    {
+      "check": "actual_theme_geometry",
+      "name": "1080x2520-dark",
+      "light": false,
+      "viewport": [
+        1080,
+        2520
+      ],
+      "video": [
+        42,
+        855,
+        1038,
+        1415
+      ],
+      "seek": [
+        142,
+        2068,
+        948,
+        2178
+      ],
+      "close": [
+        26,
+        76,
+        205,
+        202
+      ],
+      "background_rgb": [
+        0,
+        13,
+        17
+      ]
+    },
+    {
+      "check": "actual_media_clock_advances",
+      "before": 8,
+      "after": 9
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        2194,
+        1040,
+        2378
+      ],
+      "start": [
+        795,
+        2286
+      ],
+      "end": [
+        305,
+        2286
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        2194,
+        1040,
+        2378
+      ],
+      "start": [
+        795,
+        2286
+      ],
+      "end": [
+        305,
+        2286
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Volume",
+      "bounds": [
+        903,
+        2217,
+        1040,
+        2354
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "DONE",
+      "bounds": [
+        810,
+        1311,
+        978,
+        1453
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        2194,
+        1040,
+        2378
+      ],
+      "start": [
+        305,
+        2286
+      ],
+      "end": [
+        795,
+        2286
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        2194,
+        1040,
+        2378
+      ],
+      "start": [
+        305,
+        2286
+      ],
+      "end": [
+        795,
+        2286
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        2194,
+        1040,
+        2378
+      ],
+      "start": [
+        305,
+        2286
+      ],
+      "end": [
+        795,
+        2286
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        2194,
+        1040,
+        2378
+      ],
+      "start": [
+        795,
+        2286
+      ],
+      "end": [
+        305,
+        2286
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Display",
+      "bounds": [
+        1028,
+        2217,
+        1040,
+        2354
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "APPEARANCE",
+      "bounds": [
+        102,
+        1384,
+        402,
+        1526
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Light",
+      "bounds": [
+        70,
+        1184,
+        1010,
+        1310
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        2194,
+        1040,
+        2378
+      ],
+      "start": [
+        305,
+        2286
+      ],
+      "end": [
+        795,
+        2286
+      ]
+    },
+    {
+      "check": "actual_theme_geometry",
+      "name": "1080x2520-light",
+      "light": true,
+      "viewport": [
+        1080,
+        2520
+      ],
+      "video": [
+        42,
+        855,
+        1038,
+        1415
+      ],
+      "seek": [
+        142,
+        2068,
+        948,
+        2178
+      ],
+      "close": [
+        26,
+        76,
+        205,
+        202
+      ],
+      "background_rgb": [
+        242,
+        247,
+        249
+      ]
+    },
+    {
+      "check": "actual_media_clock_advances",
+      "before": 19,
+      "after": 20
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        2194,
+        1040,
+        2378
+      ],
+      "start": [
+        795,
+        2286
+      ],
+      "end": [
+        305,
+        2286
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Volume",
+      "bounds": [
+        1031,
+        2217,
+        1040,
+        2354
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "DONE",
+      "bounds": [
+        810,
+        1311,
+        978,
+        1453
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        2194,
+        1040,
+        2378
+      ],
+      "start": [
+        305,
+        2286
+      ],
+      "end": [
+        795,
+        2286
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        2194,
+        1040,
+        2378
+      ],
+      "start": [
+        305,
+        2286
+      ],
+      "end": [
+        795,
+        2286
+      ]
+    },
+    {
+      "check": "viewport_controls_and_decoding",
+      "viewport": "1080x2520"
+    },
+    {
+      "check": "real_touch",
+      "label": "Display",
+      "bounds": [
+        1076,
+        1434,
+        1188,
+        1538
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "APPEARANCE",
+      "bounds": [
+        216,
+        927,
+        445,
+        1035
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Dark",
+      "bounds": [
+        192,
+        871,
+        1407,
+        967
+      ]
+    },
+    {
+      "check": "actual_theme_geometry",
+      "name": "1600x1680-dark",
+      "light": false,
+      "viewport": [
+        1600,
+        1680
+      ],
+      "video": [
+        32,
+        305,
+        1568,
+        1169
+      ],
+      "seek": [
+        108,
+        1320,
+        1500,
+        1404
+      ],
+      "close": [
+        20,
+        58,
+        156,
+        154
+      ],
+      "background_rgb": [
+        0,
+        15,
+        19
+      ]
+    },
+    {
+      "check": "actual_media_clock_advances",
+      "before": 35,
+      "after": 36
+    },
+    {
+      "check": "real_touch",
+      "label": "Volume",
+      "bounds": [
+        1332,
+        1434,
+        1436,
+        1538
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "DONE",
+      "bounds": [
+        1255,
+        871,
+        1383,
+        979
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Display",
+      "bounds": [
+        1076,
+        1434,
+        1188,
+        1538
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "APPEARANCE",
+      "bounds": [
+        216,
+        927,
+        445,
+        1035
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Light",
+      "bounds": [
+        192,
+        775,
+        1407,
+        871
+      ]
+    },
+    {
+      "check": "actual_theme_geometry",
+      "name": "1600x1680-light",
+      "light": true,
+      "viewport": [
+        1600,
+        1680
+      ],
+      "video": [
+        32,
+        305,
+        1568,
+        1169
+      ],
+      "seek": [
+        108,
+        1320,
+        1500,
+        1404
+      ],
+      "close": [
+        20,
+        58,
+        156,
+        154
+      ],
+      "background_rgb": [
+        240,
+        246,
+        248
+      ]
+    },
+    {
+      "check": "actual_media_clock_advances",
+      "before": 42,
+      "after": 43
+    },
+    {
+      "check": "real_touch",
+      "label": "Volume",
+      "bounds": [
+        1332,
+        1434,
+        1436,
+        1538
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "DONE",
+      "bounds": [
+        1255,
+        871,
+        1383,
+        979
+      ]
+    },
+    {
+      "check": "viewport_controls_and_decoding",
+      "viewport": "1600x1680"
+    },
+    {
+      "check": "real_touch",
+      "label": "Display",
+      "bounds": [
+        1417,
+        854,
+        1564,
+        991
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "APPEARANCE",
+      "bounds": [
+        515,
+        672,
+        815,
+        798
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Dark",
+      "bounds": [
+        483,
+        598,
+        2037,
+        724
+      ]
+    },
+    {
+      "check": "actual_theme_geometry",
+      "name": "2520x1080-dark",
+      "light": false,
+      "viewport": [
+        2520,
+        1080
+      ],
+      "video": [
+        854,
+        244,
+        1666,
+        701
+      ],
+      "seek": [
+        142,
+        743,
+        2388,
+        838
+      ],
+      "close": [
+        26,
+        76,
+        205,
+        202
+      ],
+      "background_rgb": [
+        0,
+        17,
+        21
+      ]
+    },
+    {
+      "check": "actual_media_clock_advances",
+      "before": 52,
+      "after": 53
+    },
+    {
+      "check": "real_touch",
+      "label": "Volume",
+      "bounds": [
+        1753,
+        854,
+        1890,
+        991
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "DONE",
+      "bounds": [
+        1837,
+        599,
+        2005,
+        725
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Display",
+      "bounds": [
+        1417,
+        854,
+        1564,
+        991
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "APPEARANCE",
+      "bounds": [
+        515,
+        672,
+        815,
+        798
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Light",
+      "bounds": [
+        483,
+        472,
+        2037,
+        598
+      ]
+    },
+    {
+      "check": "actual_theme_geometry",
+      "name": "2520x1080-light",
+      "light": true,
+      "viewport": [
+        2520,
+        1080
+      ],
+      "video": [
+        854,
+        244,
+        1666,
+        701
+      ],
+      "seek": [
+        142,
+        743,
+        2388,
+        838
+      ],
+      "close": [
+        26,
+        76,
+        205,
+        202
+      ],
+      "background_rgb": [
+        238,
+        245,
+        247
+      ]
+    },
+    {
+      "check": "actual_media_clock_advances",
+      "before": 58,
+      "after": 59
+    },
+    {
+      "check": "real_touch",
+      "label": "Volume",
+      "bounds": [
+        1753,
+        854,
+        1890,
+        991
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "DONE",
+      "bounds": [
+        1837,
+        599,
+        2005,
+        725
+      ]
+    },
+    {
+      "check": "viewport_controls_and_decoding",
+      "viewport": "2520x1080"
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        729,
+        1040,
+        876
+      ],
+      "start": [
+        795,
+        802
+      ],
+      "end": [
+        305,
+        802
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        729,
+        1040,
+        876
+      ],
+      "start": [
+        795,
+        802
+      ],
+      "end": [
+        305,
+        802
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Display",
+      "bounds": [
+        676,
+        734,
+        823,
+        871
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "APPEARANCE",
+      "bounds": [
+        194,
+        612,
+        494,
+        738
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Dark",
+      "bounds": [
+        162,
+        538,
+        918,
+        664
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        729,
+        1040,
+        876
+      ],
+      "start": [
+        305,
+        802
+      ],
+      "end": [
+        795,
+        802
+      ]
+    },
+    {
+      "check": "actual_theme_geometry",
+      "name": "1080x960-dark",
+      "light": false,
+      "viewport": [
+        1080,
+        960
+      ],
+      "video": [
+        240,
+        244,
+        839,
+        581
+      ],
+      "seek": [
+        142,
+        623,
+        948,
+        718
+      ],
+      "close": [
+        26,
+        76,
+        205,
+        202
+      ],
+      "background_rgb": [
+        0,
+        16,
+        20
+      ]
+    },
+    {
+      "check": "actual_media_clock_advances",
+      "before": 66,
+      "after": 67
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        729,
+        1040,
+        876
+      ],
+      "start": [
+        795,
+        802
+      ],
+      "end": [
+        305,
+        802
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        729,
+        1040,
+        876
+      ],
+      "start": [
+        795,
+        802
+      ],
+      "end": [
+        305,
+        802
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Volume",
+      "bounds": [
+        918,
+        734,
+        1040,
+        871
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "DONE",
+      "bounds": [
+        648,
+        539,
+        816,
+        665
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        729,
+        1040,
+        876
+      ],
+      "start": [
+        305,
+        802
+      ],
+      "end": [
+        795,
+        802
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        729,
+        1040,
+        876
+      ],
+      "start": [
+        305,
+        802
+      ],
+      "end": [
+        795,
+        802
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        729,
+        1040,
+        876
+      ],
+      "start": [
+        795,
+        802
+      ],
+      "end": [
+        305,
+        802
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Display",
+      "bounds": [
+        691,
+        734,
+        838,
+        871
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "APPEARANCE",
+      "bounds": [
+        194,
+        612,
+        494,
+        738
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Light",
+      "bounds": [
+        162,
+        412,
+        918,
+        538
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        729,
+        1040,
+        876
+      ],
+      "start": [
+        305,
+        802
+      ],
+      "end": [
+        795,
+        802
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        729,
+        1040,
+        876
+      ],
+      "start": [
+        305,
+        802
+      ],
+      "end": [
+        795,
+        802
+      ]
+    },
+    {
+      "check": "actual_theme_geometry",
+      "name": "1080x960-light",
+      "light": true,
+      "viewport": [
+        1080,
+        960
+      ],
+      "video": [
+        240,
+        244,
+        839,
+        581
+      ],
+      "seek": [
+        142,
+        623,
+        948,
+        718
+      ],
+      "close": [
+        26,
+        76,
+        205,
+        202
+      ],
+      "background_rgb": [
+        239,
+        246,
+        248
+      ]
+    },
+    {
+      "check": "actual_media_clock_advances",
+      "before": 75,
+      "after": 76
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        729,
+        1040,
+        876
+      ],
+      "start": [
+        795,
+        802
+      ],
+      "end": [
+        305,
+        802
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        729,
+        1040,
+        876
+      ],
+      "start": [
+        795,
+        802
+      ],
+      "end": [
+        305,
+        802
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Volume",
+      "bounds": [
+        903,
+        734,
+        1040,
+        871
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "DONE",
+      "bounds": [
+        648,
+        539,
+        816,
+        665
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        729,
+        1040,
+        876
+      ],
+      "start": [
+        305,
+        802
+      ],
+      "end": [
+        795,
+        802
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        729,
+        1040,
+        876
+      ],
+      "start": [
+        305,
+        802
+      ],
+      "end": [
+        795,
+        802
+      ]
+    },
+    {
+      "check": "viewport_controls_and_decoding",
+      "viewport": "1080x960"
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        729,
+        1040,
+        876
+      ],
+      "start": [
+        795,
+        802
+      ],
+      "end": [
+        305,
+        802
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Display",
+      "bounds": [
+        681,
+        734,
+        828,
+        871
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "APPEARANCE",
+      "bounds": [
+        194,
+        612,
+        494,
+        738
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "System",
+      "bounds": [
+        162,
+        286,
+        918,
+        412
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        729,
+        1040,
+        876
+      ],
+      "start": [
+        305,
+        802
+      ],
+      "end": [
+        795,
+        802
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        729,
+        1040,
+        876
+      ],
+      "start": [
+        305,
+        802
+      ],
+      "end": [
+        795,
+        802
+      ]
+    },
+    {
+      "check": "actual_theme_geometry",
+      "name": "system-night-yes",
+      "light": false,
+      "viewport": [
+        1080,
+        960
+      ],
+      "video": [
+        240,
+        244,
+        839,
+        581
+      ],
+      "seek": [
+        142,
+        623,
+        948,
+        718
+      ],
+      "close": [
+        26,
+        76,
+        205,
+        202
+      ],
+      "background_rgb": [
+        0,
+        16,
+        20
+      ]
+    },
+    {
+      "check": "actual_theme_geometry",
+      "name": "system-night-no",
+      "light": true,
+      "viewport": [
+        1080,
+        960
+      ],
+      "video": [
+        240,
+        244,
+        839,
+        581
+      ],
+      "seek": [
+        142,
+        623,
+        948,
+        718
+      ],
+      "close": [
+        26,
+        76,
+        205,
+        202
+      ],
+      "background_rgb": [
+        239,
+        246,
+        248
+      ]
+    },
+    {
+      "check": "real_android_back"
+    },
+    {
+      "check": "originating_activity_return",
+      "action": "Back"
+    },
+    {
+      "check": "real_touch",
+      "label": "Rapid A B C",
+      "bounds": [
+        0,
+        1185,
+        1080,
+        1311
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "81",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "no_kodi_process",
+      "kodi_pid": "",
+      "external_pid": "9523"
+    },
+    {
+      "check": "actual_video_decoded",
+      "title": "c.mp4",
+      "color_samples": 90
+    },
+    {
+      "check": "real_seekbar_input",
+      "fraction": 0.03,
+      "actual_seconds": 6,
+      "bounds": [
+        142,
+        2068,
+        948,
+        2178
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Pause",
+      "bounds": [
+        61,
+        2217,
+        198,
+        2354
+      ]
+    },
+    {
+      "check": "real_android_back"
+    },
+    {
+      "check": "originating_activity_return",
+      "action": "Back"
+    },
+    {
+      "check": "rapid_replacement_still_latest_request"
+    },
+    {
+      "check": "real_touch",
+      "label": "Open BAD",
+      "bounds": [
+        0,
+        555,
+        1080,
+        681
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "87",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "real_android_back"
+    },
+    {
+      "check": "originating_activity_return",
+      "action": "Back"
+    },
+    {
+      "check": "error_and_retry_preserved"
+    },
+    {
+      "check": "real_touch",
+      "label": "Open C",
+      "bounds": [
+        0,
+        303,
+        1080,
+        429
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "94",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    }
+  ],
+  "source_build": {
+    "status": "DISPOSABLE_QA_ONLY",
+    "source": "4a6c2e964430c4b87de9565cec8a99b1fb6b40b1",
+    "candidate_sha256": "ba555ddfeb229dd8f9094fe834609b801b87a70367dff854e45cc703cf331765",
+    "original_key": false,
+    "replaced": {
+      "classes3.dex": "a8ce31bebd92e4ad096b8d54e3f9442ecd55b85197f56edf9ef6bf2b87c50387"
+    },
+    "baseline_sha256": "2c20613f9056e84fea402cf67729939a205b7d9afb87ec1b6fab800a641efbd3"
+  },
+  "physical_Fold": "NOT_TESTED",
+  "call_audio": "Host policy plus separately reported emulator observation; physical carrier/VoIP audio pending",
+  "shutdown": "NOT_RUN"
+}

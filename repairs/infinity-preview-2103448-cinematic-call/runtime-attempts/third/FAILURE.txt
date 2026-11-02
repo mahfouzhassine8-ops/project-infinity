@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-preview-2103448-cinematic-call/android-qa/run.py", line 115, in <module>
+    try:body(a);status='PASS'
+        ^^^^^^^
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-preview-2103448-cinematic-call/android-qa/run.py", line 111, in body
+    synthetic_call(a,call_saved)
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-preview-2103448-cinematic-call/android-qa/run.py", line 73, in synthetic_call
+    resume.source();resume.offer('Open C',saved);q.strip_to('Pause');q.strip_to('Unmute');q.await_text('Unmute');advancing()
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-preview-2103447-resume/android-qa/run.py", line 63, in offer
+    q.await_text('Resume video?')
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-2103445-standalone-external-player/android-qa/run.py", line 102, in await_text
+    raise AssertionError('UI target not observed: '+label)
+AssertionError: UI target not observed: Resume video?
