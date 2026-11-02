@@ -1,0 +1,67 @@
+{
+  "status": "READ_ONLY_SIGNED445_REFERENCE_SYMBOL_MAPPING; HISTORICAL_ANR_PRODUCER_NOT_BOUND",
+  "reference_library_sha256": "151128c176b6094f28bb3fc716cc07c3985a9aa38f1fe41e1bb1424f0285a47e",
+  "gnu_build_id_section": null,
+  "reference_destructor_symbol": "_ZN12CVideoPlayerD1Ev",
+  "reference_destructor_address": "0x17aea78",
+  "reference_destructor_size": 896,
+  "calls_near_wait": [
+    {
+      "offset": 148,
+      "return_offset": 152,
+      "target": 24830972,
+      "symbols": [
+        "_ZN12CVideoPlayer14DestroyPlayersEv"
+      ]
+    },
+    {
+      "offset": 164,
+      "return_offset": 168,
+      "target": 24904020,
+      "symbols": [
+        "$x.107",
+        "_ZNKSt6__ndk110unique_ptrI9CJobQueueNS_14default_deleteIS1_EEEptEv"
+      ]
+    },
+    {
+      "offset": 168,
+      "return_offset": 172,
+      "target": 26742160,
+      "symbols": [
+        "_ZNK9CJobQueue12IsProcessingEv"
+      ]
+    },
+    {
+      "offset": 180,
+      "return_offset": 184,
+      "target": 21705240,
+      "symbols": [
+        "$x.105",
+        "_ZNSt6__ndk18literals15chrono_literalsli2msEy"
+      ]
+    },
+    {
+      "offset": 192,
+      "return_offset": 196,
+      "target": 24904044,
+      "symbols": [
+        "$x.108",
+        "_ZN7CThread5SleepIxNSt6__ndk15ratioILl1ELl1000EEEEEvNS1_6chrono8durationIT_T0_EE"
+      ]
+    }
+  ],
+  "source_wait_condition": "while(m_outboundEvents->IsProcessing()) CThread::Sleep(10ms)",
+  "queue_description": "CJobQueue(false,1,normal,playback); serial queue, pending or processing work",
+  "normal_processing_condition": "JobManager running AND (pending OR processing)",
+  "protected_checkpoint_processing_condition": "pending OR processing; existing code read only, never executed or modified",
+  "possible_queued_work": [
+    "StoreVideoSettings",
+    "OnPlayerCloseFile/bookmark state",
+    "OnPlayBackStopped/Ended/Error"
+  ],
+  "why_queue_did_not_drain": "UNRESOLVED; matching job-worker/thread and ownership evidence needed",
+  "historical_stack": "Supplied secondhand: destructor+192 during ClosePlayer/StopPlaying in modal GUI loop; original ANR file not accessible here",
+  "historical_version": "UNKNOWN; exporter currently installed445 does not identify historical exit producer",
+  "application_or_shutdown_tests_run": false,
+  "native_or_protected_changes": false
+}

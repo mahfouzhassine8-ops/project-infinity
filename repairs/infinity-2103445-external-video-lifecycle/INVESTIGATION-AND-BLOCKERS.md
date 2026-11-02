@@ -2,6 +2,8 @@
 
 Continue this existing branch. Protected signed2103445 source is `6cf75639a46ec6b0c858ae32abc102450fdc0974`; APK SHA256 `b7e78393ade7e52d8653823a0ad72ae99614a5a8e0b6cdedf5d5d15a9e643400`. The lock resolves to that source. No recovery APK, lock, user data, signing policy or protected component was modified. **No successor APK has been built, signed or delivered. This assignment is not complete.**
 
+Read-only continuation: [native Stop-wait reference mapping and precise private-file access status](READ-ONLY-DIAGNOSTIC-FOLLOWUP.md). The supplied ANR stack lead is more specific; its original bytes and historical producer remain unverified on this executor. No production change or new test accompanies that continuation.
+
 ## What was actually inspected
 
 Commands/network/GitHub are operational. The authorized branch starts at the approved signed source plus its task brief. Main and Splash canonical disassembly were checked against the signed authority: Main is INFINITY-owned; Splash is CHOOSER_SHELL-owned and remains frozen. The INFINITY DEX extracted from the actual signed APK equals the component input, SHA256 `7e18d8092de33a4d44e299305965e9b9eb943372a9643452f6f78afe209fb215`.
