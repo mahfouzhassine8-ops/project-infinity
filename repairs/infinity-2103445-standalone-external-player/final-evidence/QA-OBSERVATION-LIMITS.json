@@ -1,0 +1,13 @@
+{
+  "run": 41401250052,
+  "artifact": 13122146285,
+  "artifact_sha256": "bed301b336a929c27cef96e91f1c510f49ea63dd8be0899b50a1f1e4a3eaccf1",
+  "outcome": "FAILED_OBSERVATION_STALE_UIAUTOMATOR_XML",
+  "actual_video_frame_and_advancing_time": "OBSERVED_SCREENSHOT_0:32",
+  "actual_decoder_log": "opening/preparing/ready/playing/frame in externalplayer",
+  "mandatory_journey": "NOT_COMPLETED",
+  "cause": "uiautomator dump reported could not get idle state and left prior compatibility-dialog XML; subsequent read reused old file",
+  "correction": "Persistent existing OS UiAutomation wrapper, immediate fresh hierarchy with request sequence, no idle wait and no old-file fallback",
+  "production_changes_for_observer": "NONE",
+  "shutdown": "NOT_RUN"
+}

@@ -32,6 +32,12 @@ def main(a):
  with ZipFile(a.out/'source.jar','w',ZIP_DEFLATED) as z:
   for p in classes.rglob('*.class'):z.write(p,p.relative_to(classes))
  run('java','-cp',a.sdk/'lib/d8.jar','com.android.tools.r8.D8','--min-api','23','--lib',a.android,'--output',dex,a.out/'source.jar')
+ observer=a.out/'observer-classes';observer.mkdir();observer_dex=a.out/'observer-dex';observer_dex.mkdir()
+ run('java','-m','jdk.compiler/com.sun.tools.javac.Main','-source','8','-target','8','-cp',a.android,'-d',observer,H/'android-qa/observer/ImmediateHierarchy.java')
+ with ZipFile(a.out/'observer-classes.jar','w',ZIP_DEFLATED) as z:
+  for p in observer.rglob('*.class'):z.write(p,p.relative_to(observer))
+ run('java','-cp',a.sdk/'lib/d8.jar','com.android.tools.r8.D8','--min-api','23','--lib',a.android,'--output',observer_dex,a.out/'observer-classes.jar')
+ with ZipFile(a.out/'InfinityExternalObserver.jar','w',ZIP_DEFLATED) as z:z.write(observer_dex/'classes.dex','classes.dex')
  run(a.sdk/'aapt2','link','-I',a.android,'--manifest',H/'android-qa/AndroidManifest.xml','-A',media,'-o',a.out/'source-unsigned.apk')
  with ZipFile(a.out/'source-unsigned.apk','a') as z:z.write(dex/'classes.dex','classes.dex')
  run('keytool','-genkeypair','-keystore',a.out/'qa-only.jks','-storepass','qa-only-password','-keypass','qa-only-password','-alias','qa','-keyalg','RSA','-dname','CN=Disposable external player QA, O=Not for installation','-validity','2')

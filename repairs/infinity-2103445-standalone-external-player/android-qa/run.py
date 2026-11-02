@@ -3,12 +3,12 @@
 Only a fresh emulator, QA-key copy, public input, OS evidence and synthetic media.
 No callbacks are invoked directly. No app shutdown, force-stop, clear or uninstall.
 """
-import argparse,hashlib,json,re,subprocess,time,traceback,xml.etree.ElementTree as ET
+import argparse,base64,hashlib,json,re,select,subprocess,time,traceback,xml.etree.ElementTree as ET
 from pathlib import Path
 from PIL import Image
 import io
 P='com.projectinfinity.kodi';SOURCE='qa.external.source'
-steps=[];sequence=0;out=None
+steps=[];sequence=0;out=None;observer=None
 def run(*args,timeout=45):return subprocess.check_output(list(map(str,args)),timeout=timeout)
 def adb(*args,timeout=45):return run('adb',*args,timeout=timeout)
 def shell(*args,timeout=45):return adb('shell',*args,timeout=timeout).decode(errors='replace')
@@ -17,9 +17,29 @@ def check(ok,why):
 def record(check_name,**values):steps.append(dict(check=check_name,**values))
 def screenshot(name):
  raw=adb('exec-out','screencap','-p');(out/(name+'.png')).write_bytes(raw);return Image.open(io.BytesIO(raw)).convert('RGB')
+def observer_line(prefix):
+ deadline=time.monotonic()+8
+ while time.monotonic()<deadline:
+  if not select.select([observer.stdout],[],[],max(0,deadline-time.monotonic()))[0]:break
+  line=observer.stdout.readline().decode(errors='replace').strip()
+  check(line,'Immediate observer exited')
+  if line.startswith(prefix):return line[len(prefix):]
+ raise AssertionError('Fresh OS hierarchy observation unavailable: '+prefix)
+def start_observer(prepared):
+ global observer
+ jar=prepared/'InfinityExternalObserver.jar';remote='/data/local/tmp/InfinityExternalObserver.jar'
+ adb('push',str(jar),remote)
+ check(shell('sha256sum',remote).split()[0]==hashlib.sha256(jar.read_bytes()).hexdigest(),'Exact observer JAR')
+ observer=subprocess.Popen(['adb','shell','CLASSPATH=/system/framework/android.test.runner.jar:/system/framework/uiautomator.jar:'+remote,
+  'ANDROID_DATA=/data/local/tmp','/system/bin/app_process','/system/bin','qa.external.ImmediateHierarchy'],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=(out/'observer-stderr.txt').open('wb'),bufsize=0)
+ observer_line('EXTERNAL_READY');record('fresh_persistent_OS_observer',sha256=hashlib.sha256(jar.read_bytes()).hexdigest())
 def nodes():
- shell('uiautomator','dump','/sdcard/external-player-window.xml',timeout=20)
- raw=shell('cat','/sdcard/external-player-window.xml');return ET.fromstring(raw)
+ global sequence
+ sequence+=1;observer.stdin.write(('SNAP '+str(sequence)+'\n').encode());observer.stdin.flush()
+ raw=base64.b64decode(observer_line('EXTERNAL_'+str(sequence)+' '),validate=True)
+ tree=ET.fromstring(raw)
+ (out/'latest-current-window.xml').write_bytes(raw)
+ return tree
 def bounds(n):return list(map(int,re.findall(r'\d+',n.attrib.get('bounds',''))))
 def find(tree,label):
  for n in tree.iter('node'):
@@ -99,7 +119,7 @@ def body(a):
  remote=shell('pm','path',P).strip().split('package:')[-1]
  installed=shell('sha256sum',remote).split()[0]
  check(installed==hashlib.sha256((a.prepared/'candidate-qa.apk').read_bytes()).hexdigest(),'Installed APK exact bytes')
- shell('am','start','-n',SOURCE+'/qa.external.SourceActivity');await_text('Open A')
+ shell('am','start','-n',SOURCE+'/qa.external.SourceActivity');start_observer(a.prepared);await_text('Open A')
  tap('Handler labels');await_text('Handlers: 1');check('Infinity Preview | Infinity' in text(nodes()),'Global video handler/application labels')
  screenshot('handler-labels');tap('OK');record('one_handler_label',application='Infinity',handler='Infinity Preview')
  open_video('Open A','red','a.mp4')
@@ -151,4 +171,7 @@ if __name__=='__main__':
   except Exception:pass
   raise
  finally:
+  if observer is not None:
+   try:observer.stdin.write(b'QUIT\n');observer.stdin.flush();observer.wait(timeout=5)
+   except Exception:observer.terminate()
   (out/'RESULT.json').write_text(json.dumps({'status':status,'checks':steps,'source_build':json.loads((a.prepared/'BUILD.json').read_text()),'physical_fold':'NOT_TESTED','third_party_accounts':'NOT_TESTED','shutdown':'NOT_RUN'},indent=2)+'\n')
