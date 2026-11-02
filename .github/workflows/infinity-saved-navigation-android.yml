@@ -19,7 +19,7 @@ on:
         required: true
         type: choice
         default: select-a-feature
-        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host, infinity-performance-android, cobra-owner-host, cobra-android-launch, cobra-cards-baseline, cobra-cards-host, cobra-fold-more433, cobra-rejected434-controls, infinity-seamless-loading434, cobra-drawer436-prepare, cobra-drawer436-android, cobra-quality444-final]
+        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host, infinity-performance-android, cobra-owner-host, cobra-android-launch, cobra-cards-baseline, cobra-cards-host, cobra-fold-more433, cobra-rejected434-controls, infinity-seamless-loading434, cobra-drawer436-prepare, cobra-drawer436-android, cobra-quality444-final, external-player447-android]
       candidate_build:
         description: Existing signed build run (no rebuild)
         required: true
@@ -32,6 +32,99 @@ concurrency:
   group: infinity-feature-${{ inputs.source_ref || github.ref }}-${{ inputs.feature || 'explicit-request' }}-${{ github.ref == 'refs/heads/work/infinity-final-corrective-from-2103407-20261025' && github.sha || 'serial' }}
   cancel-in-progress: false
 jobs:
+  external-player447-android:
+    name: Isolated external-player actual Android decoding and source return
+    if: github.event_name == 'workflow_dispatch' && inputs.feature == 'external-player447-android'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      GH_TOKEN: ${{ github.token }}
+      INFINITY_EMULATOR_API: '37.1'
+      INFINITY_EMULATOR_TARGET: google_apis_ps16k
+    steps:
+      - uses: actions/checkout@v4
+        with: {ref: "${{ inputs.source_ref }}", fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '21'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Admit selected external-only scope
+        env:
+          SELECTED_AUTHORIZATION: ${{ inputs.authorization }}
+        run: |
+          test -n "$SELECTED_AUTHORIZATION"
+          test "$GITHUB_REF" = refs/heads/work/infinity-2103445-standalone-external-player-20261101
+          test "${{ inputs.source_ref }}" = work/infinity-2103445-standalone-external-player-20261101
+          test "${{ inputs.candidate_build }}" = 41349763470
+          git merge-base --is-ancestor 6cf75639a46ec6b0c858ae32abc102450fdc0974 HEAD
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 41349763470
+          name: Infinity-Combined-Original-Signer-41349763470
+          github-token: ${{ github.token }}
+          path: baseline445
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 41349763470
+          name: Infinity-Combined-Owner-Components-41349763470
+          github-token: ${{ github.token }}
+          path: baseline445-components
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 39867073954
+          name: Infinity-Receipt-Race-Android17-Investigation
+          github-token: ${{ github.token }}
+          path: runtime-tools
+      - uses: android-actions/setup-android@v4
+        with:
+          cmdline-tools-version: '15859902'
+          packages: platform-tools build-tools;35.0.0
+          log-accepted-android-sdk-licenses: false
+      - name: Compile isolated player, real source provider and synthetic video fixtures
+        env:
+          CARDS_TOOLS_ROOT: ${{ github.workspace }}/runtime-tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y libpulse0 ffmpeg
+          python3 -m pip install Pillow==11.3.0
+          cp "$ANDROID_HOME/build-tools/35.0.0/lib/d8.jar" runtime-tools/d8.jar
+          python3 repairs/infinity-2103445-standalone-external-player/build_owner.py --bundles baseline445-components --out external-owner
+          python3 repairs/infinity-2103445-standalone-external-player/android-qa/prepare.py --baseline baseline445/Infinity-2103445-Combined-Original-Signer.apk --owner external-owner --android runtime-tools/receipt-evidence/android-34.jar --sdk "$ANDROID_HOME/build-tools/35.0.0" --out external-qa
+          python3 repairs/infinity-final-closure-2103407/api37_environment_gate.py --sdk-root "$ANDROID_HOME" --out runtime-platform --pin-tools
+          python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out runtime-emulator-setup
+          sudo chmod 666 /dev/kvm
+          python3 -m http.server 8765 --bind 0.0.0.0 --directory external-qa/media > external-qa/http.txt 2>&1 &
+      - uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: '37.1'
+          arch: x86_64
+          target: google_apis_ps16k
+          profile: pixel_2
+          disk-size: 8G
+          avd-name: infinity-four-repair-api37
+          pre-emulator-launch-script: python3 repairs/infinity-final-closure-2103407/api37_environment_gate.py --sdk-root "$ANDROID_HOME" --out runtime-platform --check-avd
+          disable-animations: false
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: |
+            adb shell wm size 1080x2520
+            adb shell wm density 420
+            python3 repairs/infinity-2103445-standalone-external-player/android-qa/run.py --prepared external-qa --out external-results
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-External447-Android-${{ github.run_id }}
+          path: |
+            external-results/
+            external-owner/OWNER-BUILD.json
+            external-owner/CLASS-HASHES.json
+            external-owner/*-new.dex
+            external-owner/AndroidManifest.xml
+            external-qa/BUILD.json
+            external-qa/http.txt
+            runtime-platform/
+          retention-days: 90
+          if-no-files-found: error
   cobra-quality444-final:
     name: Signed442 to signed444 quality comparison; no shutdown
     if: github.event_name == 'workflow_dispatch' && inputs.feature == 'cobra-quality444-final'
@@ -1082,7 +1175,7 @@ jobs:
           retention-days: 90
           if-no-files-found: error
   android17:
-    if: inputs.feature != 'infinity-performance-host' && inputs.feature != 'infinity-performance-android' && inputs.feature != 'cobra-owner-host' && inputs.feature != 'cobra-android-launch' && inputs.feature != 'cobra-cards-baseline' && inputs.feature != 'cobra-cards-host' && inputs.feature != 'cobra-fold-more433' && inputs.feature != 'cobra-rejected434-controls' && inputs.feature != 'infinity-seamless-loading434' && inputs.feature != 'cobra-drawer436-prepare' && inputs.feature != 'cobra-drawer436-android' && inputs.feature != 'cobra-quality444-final'
+    if: inputs.feature != 'external-player447-android' && inputs.feature != 'infinity-performance-host' && inputs.feature != 'infinity-performance-android' && inputs.feature != 'cobra-owner-host' && inputs.feature != 'cobra-android-launch' && inputs.feature != 'cobra-cards-baseline' && inputs.feature != 'cobra-cards-host' && inputs.feature != 'cobra-fold-more433' && inputs.feature != 'cobra-rejected434-controls' && inputs.feature != 'infinity-seamless-loading434' && inputs.feature != 'cobra-drawer436-prepare' && inputs.feature != 'cobra-drawer436-android' && inputs.feature != 'cobra-quality444-final'
     name: Selected feature ${{ inputs.feature || 'explicit baseline Search request' }}
     runs-on: ubuntu-22.04
     timeout-minutes: 150

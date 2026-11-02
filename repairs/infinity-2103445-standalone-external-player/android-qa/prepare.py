@@ -1,0 +1,40 @@
+"""Build one disposable QA-signed copy of exact candidate payload plus source fixture."""
+import argparse,hashlib,json,os,subprocess,sys
+from pathlib import Path
+from zipfile import ZipFile,ZIP_DEFLATED
+H=Path(__file__).resolve().parents[1];R=H.parents[1]
+sys.path.insert(0,str(R/'repairs/dual-experience-isolation-2103420'))
+from component_bundles import set_version
+from inventory import file_sha,SIGNATURE
+def run(*a):subprocess.run(list(map(str,a)),check=True)
+def main(a):
+ a.out.mkdir(parents=True);media=a.out/'media';media.mkdir()
+ for name,color,tone in [('a','red',440),('b','green',660),('c','blue',880),('end','yellow',550)]:
+  run('ffmpeg','-hide_banner','-loglevel','error','-f','lavfi','-i',f'color=c={color}:s=640x360:r=24','-f','lavfi','-i',f'sine=frequency={tone}:sample_rate=48000','-t','3' if name=='end' else '180','-c:v','libx264','-preset','ultrafast','-pix_fmt','yuv420p','-c:a','aac','-movflags','+faststart',media/(name+'.mp4'))
+ run('ffmpeg','-hide_banner','-loglevel','error','-f','lavfi','-i','sine=frequency=440:sample_rate=48000','-t','10','-c:a','aac',media/'audio.mp4')
+ (media/'bad.mp4').write_bytes(b'not a video\n')
+ assert file_sha(a.baseline)=='b7e78393ade7e52d8653823a0ad72ae99614a5a8e0b6cdedf5d5d15a9e643400'
+ replaced={'classes.dex':a.owner/'CHOOSER_SHELL-new.dex','classes3.dex':a.owner/'INFINITY-new.dex','AndroidManifest.xml':a.owner/'AndroidManifest.xml'}
+ with ZipFile(a.baseline) as old,ZipFile(a.out/'candidate-unsigned.apk','w') as new:
+  for info in old.infolist():
+   if info.filename in SIGNATURE:continue
+   raw=replaced[info.filename].read_bytes() if info.filename in replaced else old.read(info.filename)
+   if info.filename=='AndroidManifest.xml':raw=set_version(raw,2103447)
+   new.writestr(info,raw)
+ classes=a.out/'source-classes';classes.mkdir();dex=a.out/'source-dex';dex.mkdir()
+ run('java','-m','jdk.compiler/com.sun.tools.javac.Main','-source','8','-target','8','-cp',a.android,'-d',classes,*sorted((H/'android-qa').glob('*.java')))
+ with ZipFile(a.out/'source.jar','w',ZIP_DEFLATED) as z:
+  for p in classes.rglob('*.class'):z.write(p,p.relative_to(classes))
+ run('java','-cp',a.sdk/'lib/d8.jar','com.android.tools.r8.D8','--min-api','23','--lib',a.android,'--output',dex,a.out/'source.jar')
+ run(a.sdk/'aapt2','link','-I',a.android,'--manifest',H/'android-qa/AndroidManifest.xml','-A',media,'-o',a.out/'source-unsigned.apk')
+ with ZipFile(a.out/'source-unsigned.apk','a') as z:z.write(dex/'classes.dex','classes.dex')
+ run('keytool','-genkeypair','-keystore',a.out/'qa-only.jks','-storepass','qa-only-password','-keypass','qa-only-password','-alias','qa','-keyalg','RSA','-dname','CN=Disposable external player QA, O=Not for installation','-validity','2')
+ for name in ('candidate','source'):
+  run(a.sdk/'zipalign','-p','4',a.out/(name+'-unsigned.apk'),a.out/(name+'-aligned.apk'))
+  run(a.sdk/'apksigner','sign','--ks',a.out/'qa-only.jks','--ks-pass','pass:qa-only-password','--key-pass','pass:qa-only-password','--out',a.out/(name+'-qa.apk'),a.out/(name+'-aligned.apk'))
+  (a.out/(name+'-unsigned.apk')).unlink();(a.out/(name+'-aligned.apk')).unlink()
+ (a.out/'BUILD.json').write_text(json.dumps({'status':'DISPOSABLE_QA_ONLY','source':os.environ.get('GITHUB_SHA'),'candidate_sha256':file_sha(a.out/'candidate-qa.apk'),'original_key':False,'replaced':{n:file_sha(p) for n,p in replaced.items()},'baseline_sha256':file_sha(a.baseline)},indent=2)+'\n')
+if __name__=='__main__':
+ p=argparse.ArgumentParser()
+ for n in ('baseline','owner','android','sdk','out'):p.add_argument('--'+n,type=Path,required=True)
+ main(p.parse_args())
