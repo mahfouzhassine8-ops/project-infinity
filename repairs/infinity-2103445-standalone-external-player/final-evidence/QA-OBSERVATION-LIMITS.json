@@ -9,5 +9,21 @@
   "cause": "uiautomator dump reported could not get idle state and left prior compatibility-dialog XML; subsequent read reused old file",
   "correction": "Persistent existing OS UiAutomation wrapper, immediate fresh hierarchy with request sequence, no idle wait and no old-file fallback",
   "production_changes_for_observer": "NONE",
-  "shutdown": "NOT_RUN"
+  "shutdown": "NOT_RUN",
+  "next_run": {
+    "run": 41402672560,
+    "artifact": 13122675933,
+    "sha256": "d74c8f51dc1f00e8bc2e5e2262660b407c064e2e4ea460fb98ef977006c0c4d3",
+    "passed": [
+      "resolver label",
+      "actual decoded red video",
+      "no Kodi process",
+      "advancing clock",
+      "pause/resume",
+      "seek",
+      "mute/unmute"
+    ],
+    "failure": "Next horizontal control swipe started at right-30, inside Android Back edge; source Activity became foreground",
+    "correction": "Use measured strip quarter-to-three-quarter interior, log current coordinates; production unchanged"
+  }
 }

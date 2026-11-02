@@ -105,9 +105,12 @@ def strip_to(label):
   if find(tree,label) is not None:return
   strips=[n for n in tree.iter('node') if n.attrib.get('class')=='android.widget.HorizontalScrollView']
   check(strips,'Playback control scroll owner missing');b=bounds(strips[0]);y=(b[1]+b[3])//2
-  left=b[0]+30;right=b[2]-30
+  # The previous right-30 origin entered Android's Back edge and exited the
+  # player. Use the actual strip's interior, preserving system gesture policy.
+  left=b[0]+(b[2]-b[0])//4;right=b[0]+(b[2]-b[0])*3//4
   start,end=(left,right) if label in ('Pause','Play','Stop') else (right,left)
   shell('input','swipe',str(start),str(y),str(end),str(y),'250')
+  record('real_control_strip_swipe',bounds=b,start=[start,y],end=[end,y])
  raise AssertionError('Control not reachable: '+label)
 def body(a):
  serial=shell('getprop','ro.kernel.qemu').strip();check(serial=='1','Fresh Android emulator only')
@@ -159,6 +162,8 @@ def body(a):
  activity=shell('dumpsys','activity','activities');(out/'final-activities.txt').write_text(activity)
  check('mResumedActivity' in activity and 'qa.external.SourceActivity' in activity,'Source remains active')
  logs=shell('logcat','-d','-v','threadtime');(out/'logcat.txt').write_text(logs)
+ for service in ['media.player','media.audio_flinger','activity processes']:
+  (out/('final-'+service.replace(' ','-')+'.txt')).write_text(shell('dumpsys',*service.split()))
  check('FATAL EXCEPTION' not in logs,'Android crash in selected journey')
  record('journey_complete')
 if __name__=='__main__':
