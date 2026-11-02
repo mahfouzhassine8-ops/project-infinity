@@ -1,0 +1,123 @@
+{
+  "status": "READ_ONLY_SIGNED445_REFERENCE; HISTORICAL_PRODUCER_UNBOUND",
+  "library_sha256": "151128c176b6094f28bb3fc716cc07c3985a9aa38f1fe41e1bb1424f0285a47e",
+  "provided_PC_matches": [
+    {
+      "provided_reference": "job_worker",
+      "pc": "0x197f298",
+      "symbol": "_ZN10CJobWorker7ProcessEv",
+      "base": "0x197f1a4",
+      "offset": 244,
+      "size": 860
+    },
+    {
+      "provided_reference": "directory_worker",
+      "pc": "0x1a705a4",
+      "symbol": "_ZN13CDirectoryJob6DoWorkEv",
+      "base": "0x1a70490",
+      "offset": 276,
+      "size": 2088
+    },
+    {
+      "provided_reference": "weather_worker",
+      "pc": "0x1927b24",
+      "symbol": "_ZN11CWeatherJob6DoWorkEv",
+      "base": "0x19279a8",
+      "offset": 380,
+      "size": 748
+    },
+    {
+      "provided_reference": "script_result_wait",
+      "pc": "0x21ecb38",
+      "symbol": "_ZN13CScriptRunner18WaitOnScriptResultEiRKNSt6__ndk112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEES8_",
+      "base": "0x21eca7c",
+      "offset": 188,
+      "size": 936
+    }
+  ],
+  "capacity_function": [
+    {
+      "name": "_ZN11CJobManager13GetMaxWorkersEN4CJob8PRIORITYE",
+      "address": "0x1981b1c",
+      "size": 20,
+      "arm64_words": [
+        "0x11000808",
+        "0x7100101f",
+        "0x5284e209",
+        "0x1a880120",
+        "0xd65f03c0"
+      ]
+    }
+  ],
+  "capacity_function_decoded": [
+    "add w8,w0,#2",
+    "cmp w0,#4",
+    "mov w9,#10000",
+    "csel w0,w9,w8,eq",
+    "ret"
+  ],
+  "source_priority_values": {
+    "LOW_PAUSABLE": 0,
+    "LOW": 1,
+    "NORMAL": 2,
+    "HIGH": 3,
+    "DEDICATED": 4
+  },
+  "derived_reference_limits": {
+    "NORMAL": 4,
+    "HIGH": 5,
+    "DEDICATED": 10000
+  },
+  "playback_queue_source": "CJobQueue(false,1,PRIORITY_NORMAL,playback)",
+  "admission_rule_source": "StartWorkers and PopJob require global m_processing.size() < GetMaxWorkers(priority)",
+  "archive_observations_provenance": "Private archive review supplied as task messages; original bytes not accessible in this executor",
+  "reported_workers": [
+    {
+      "tid": 7901,
+      "ANR_lines": "728-745",
+      "state": "CWeatherJob::DoWork+380 sleep"
+    },
+    {
+      "tid": 7956,
+      "ANR_lines": "749-781",
+      "state": "Directory plugin WaitOnScriptResult"
+    },
+    {
+      "tid": 8124,
+      "ANR_lines": "3494-3523",
+      "state": "Directory plugin WaitOnScriptResult"
+    },
+    {
+      "tid": 12318,
+      "ANR_lines": "4221-4250",
+      "state": "Directory plugin WaitOnScriptResult"
+    }
+  ],
+  "reported_python_waits": {
+    "global_import_lock_waiters": 28,
+    "example_tids": [
+      7955,
+      7950
+    ],
+    "example_lines": [
+      "865-907",
+      "910-956"
+    ],
+    "separate_import_initialization_waiter": {
+      "tid": 7968,
+      "lines": "2241-2299"
+    },
+    "lock_or_module_owner": "NOT_ESTABLISHED"
+  },
+  "reported_announcement_thread": {
+    "tid": 7791,
+    "lines": "804-824",
+    "state": "CEvent::Wait / CAnnouncementManager::Process+188",
+    "interpretation": "Idle-compatible event wait; pending announcement state unknown"
+  },
+  "conclusion": "CONDITIONAL_SHARED_POOL_STARVATION_SUPPORTED; NOT_PROVEN: pending playback job, shared manager processing count/priorities, import owner, historical producer and temporal consistency absent",
+  "metadata_limits": "Archive textual entries reported to omit MiXplorer/ACTION_VIEW/content:// and video/mp4; Loading hits only class-loading stats. Missing entries in truncated histories do not prove successful/absent events.",
+  "protected_changes": false,
+  "application_or_shutdown_tests_run": false,
+  "signed_successor": false
+}

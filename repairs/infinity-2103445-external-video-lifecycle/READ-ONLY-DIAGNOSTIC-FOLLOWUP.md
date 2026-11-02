@@ -2,6 +2,8 @@
 
 The request-order correction and nine passing host tests at1a7cfc89 are retained, not restarted or rerun. No production, native/shared, Cobra, chooser or shutdown code is changed by this follow-up. No successor APK is signed.
 
+Further read-only findings: [four-worker admission and playback-drain dependency](READ-ONLY-WORKER-DEPENDENCIES.md). These narrow the starvation hypothesis while preserving the raw-evidence and historical-version limits below.
+
 ## Consuming-executor access confirmation
 
 The coordinator supplied the verified identity of the original private archive:1,067,923bytes, SHA256 `874a8df7ae1798a86e5b8e30555529e7caeca44381ffeb72ab7b25586680697a`. That verification belongs to the coordinator's inspection. **This executor still cannot read the archive or the newly attached readable records as actual file bytes.** There is no matching local file; tool discovery and the available skill catalog expose no Library materialization workflow. The available `download_file` tool accepts Sediment-backed files only, not the supplied Library File Service backing ID. The Pages file reader does not support ZIP archives, and no exact authorized private extracted-text Page reference was supplied. No guessed URL, wrong-provider download or public transfer was attempted. No repeated upload or nonexistent recording is requested.
