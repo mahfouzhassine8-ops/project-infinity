@@ -38,8 +38,22 @@ were visually inspected at cover, inner and landscape in Light/Dark.
 The first Android attempt compiled production successfully, then failed while
 installing the emulator SDK before any app execution. This remains FAIL. The
 next bounded setup attempt prints and uploads installation logs. No Android
-behavior PASS is inferred from compilation. Runtime/signature/member results
-are recorded in final delivery evidence when complete.
+behavior PASS is inferred from compilation. The second attempt decoded video and completed both real ten-second seeks, then
+failed because the QA observer did not export AccessibilityNodeInfo.selected.
+The observer was corrected without changing production code. That run remains
+FAIL and its exact completed seek evidence is reused.
+
+The remaining selected Android checks passed in run41539406515 on the same
+production DEX. Actual input confirms Auto selected/Locked unselected, no duplicate
+Volume button, real inline volume changes, Light/Dark rendering and non-overlap
+at1080x2520,1600x1680,2520x1080 and1080x960, unobstructed video after hiding chrome,
+and actual portrait/square decoding with corresponding frame proportions. Back
+returns to the source and releases the decoder; Kodi did not start. Actual app
+renders were visually inspected. All six release-protection checks pass.
+
+Signature and actual APK-member results are recorded in delivery evidence after
+original-key packaging. No failed workflow is relabeled PASS. Android emulator
+results do not constitute physical Fold, carrier-call or final visual acceptance.
 
 The compiler reports 637 complete class definitions unchanged from signed449.
 Only the two now-unreachable duplicate Volume handlers are removed. The source

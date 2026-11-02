@@ -1,0 +1,39 @@
+{
+  "status": "PASS_SELECTED_PREVIEW_LAYOUT_CHECKS",
+  "source_build": {
+    "status": "DISPOSABLE_QA_ONLY",
+    "source": "85a5b6180fda6e93a56c502133d678f6e05c8a66",
+    "candidate_sha256": "82013475604dde82d836256f9003506ec5f0b2988f2c95eae0b6defb74b8df82",
+    "original_key": false,
+    "replaced": {
+      "classes3.dex": "6692252f1c8b6c6c18b9d1e60af2a4c1ab3624214f3a9123cfb724686b0ef8f2"
+    },
+    "baseline_sha256": "e190c17b3f337133df66e5531d4983e48ce3544c90965db6911936f0db65ec5c"
+  },
+  "selected_checks": [
+    "actual_media_aspect",
+    "actual_media_clock_advances",
+    "actual_video_decoded",
+    "duplicate_volume_removed",
+    "hidden_chrome_releases_viewport",
+    "real_inline_volume",
+    "real_rotation_selected_state",
+    "responsive_landscape_media",
+    "seek_actions_preserved",
+    "selected_layout_controls_complete",
+    "source_resumed_and_decoder_released"
+  ],
+  "run": {
+    "run_id": 41539406515,
+    "conclusion": "success",
+    "head_sha": "85a5b6180fda6e93a56c502133d678f6e05c8a66",
+    "artifact_id": 13186906727,
+    "artifact_sha256": "56e6b13b08c3c7ce2a07829f801bbc9c7a18453d1c60c724d448c463649c6cc2",
+    "result_sha256": "70c5a3a043e76c9816575927a977131f942594bf5efa9257dc9ad40e66d45acf"
+  },
+  "completed_seek_source": 41538194686,
+  "failed_workflow_relabelled": false,
+  "physical_Fold": "NOT_TESTED",
+  "shutdown": "NOT_RUN",
+  "unchanged_call_resume_engine": "REUSE_SIGNED449_EVIDENCE_ONLY_WHEN_SOURCE_AND_CLASS_PRESERVED"
+}

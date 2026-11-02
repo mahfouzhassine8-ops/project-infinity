@@ -18,6 +18,8 @@ def summarize(root=H):
  need('seek_actions_preserved' in {x['check'] for x in core['checks']},'Original real seek observations required')
  need(CHECKS<={x['check'] for r in (raw,core) for x in r['checks']},'All selected checks required')
  need({x['name'] for x in raw['checks'] if x['check']=='actual_theme_geometry'}=={v+'-'+t for v in ('1080x2520','1600x1680','2520x1080','1080x960') for t in ('light','dark')},'Every selected viewport/theme required')
+ for x in raw['checks']:
+  if x['check']=='actual_theme_geometry':need(x['viewport']==[int(n) for n in x['name'].split('-')[0].split('x')],'Observed actual viewport must match selected size')
  need({x['name'] for x in raw['checks'] if x['check']=='actual_media_aspect'}=={'b','c'},'Portrait and square actual decoding required')
  need(all(not x['kodi_pid'] for x in raw['checks'] if x['check']=='no_kodi_process'),'Kodi must not launch')
  need(raw['physical_Fold']=='NOT_TESTED' and raw['shutdown']=='NOT_RUN','Preserve evidence limits')
