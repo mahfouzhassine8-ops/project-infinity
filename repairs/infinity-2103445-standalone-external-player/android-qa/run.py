@@ -104,6 +104,24 @@ def source_return(action='Back'):
  if action=='Back':shell('input','keyevent','4');record('real_android_back')
  else:strip_to(action);tap(action)
  await_text('External video source fixture');record('originating_activity_return',action=action)
+def source_resumed(activity):
+ component=re.escape(SOURCE+'/qa.external.SourceActivity')
+ return (re.search(r'^\s*topResumedActivity=ActivityRecord\{[^\n]*'+component+r'\b',activity,re.M) is not None
+  and re.search(r'^\s*mCurrentFocus=Window\{[^\n]*'+component+r'\b',activity,re.M) is not None)
+def final_cleanup():
+ # API37 names the actual owner topResumedActivity, not mResumedActivity.
+ # A closing window may still be STOPPING after the source is visible. Observe
+ # real removal and decoder release, without changing application timing.
+ deadline=time.monotonic()+18
+ while time.monotonic()<deadline:
+  activity=shell('dumpsys','activity','activities');media=shell('dumpsys','media.player')
+  (out/'final-activities.txt').write_text(activity);(out/'final-media.player.txt').write_text(media)
+  private_record=re.search(r'^\s*mActivityComponent=[^\n]*InfinityExternalPlayerActivity\b',activity,re.M)
+  private_decoder=re.search(r'AttributionSource[^\n]*packageName: '+re.escape(P)+r'\b',media)
+  if source_resumed(activity) and not private_record and not private_decoder:
+   record('source_resumed_and_decoder_released');return
+  time.sleep(.2)
+ raise AssertionError('Source focus, external Activity removal or decoder release not observed')
 def strip_to(label):
  for _ in range(4):
   deadline=time.monotonic()+18;strips=[]
@@ -170,8 +188,7 @@ def body(a):
   tap(label);await_text('Retry');check('Loading' not in text(nodes()),'Error must remove loading');screenshot(label.replace(' ','-'));source_return();record('source_failure',source=label)
  tap('Open END');await_text('Video ended',20);check('Loading' not in text(nodes()),'Natural completion loading');source_return();record('natural_end')
  # All external Activities have finished; OS may retain an idle process.
- activity=shell('dumpsys','activity','activities');(out/'final-activities.txt').write_text(activity)
- check('mResumedActivity' in activity and 'qa.external.SourceActivity' in activity,'Source remains active')
+ final_cleanup()
  logs=shell('logcat','-d','-v','threadtime');(out/'logcat.txt').write_text(logs)
  for service in ['media.player','media.audio_flinger','activity processes']:
   (out/('final-'+service.replace(' ','-')+'.txt')).write_text(shell('dumpsys',*service.split()))
