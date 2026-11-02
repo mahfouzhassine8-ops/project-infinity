@@ -27,7 +27,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import java.util.Locale;
 
-/** Private external-video UI. Has no Kodi/Cobra/service/persistence dependencies. */
+/** Private external-video UI. Resume history has no Kodi/Cobra/service dependencies. */
 public final class InfinityExternalPlayerActivity extends Activity implements InfinityExternalEngine.Observer {
     private final InfinityExternalState state = new InfinityExternalState();
     private InfinityExternalEngine engine;
@@ -46,6 +46,9 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
     private AudioManager audio;
     private AudioFocusRequest focusRequest;
     private String requestId;
+    private boolean offerResume = true;
+    private long resumePosition;
+    private AlertDialog resumeDialog;
     private final AudioManager.OnAudioFocusChangeListener focus = change -> runOnUiThread(() -> {
         if (engine == null || isFinishing()) return;
         if (change == AudioManager.AUDIOFOCUS_GAIN) {
@@ -67,7 +70,10 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
             wantsPlay = saved.getBoolean("play"); level = saved.getFloat("level", 1f);
             filling = saved.getBoolean("fill"); locked = saved.getBoolean("locked");
         }
-        buildUi(); accept(getIntent(), saved != null);
+        boolean restored = saved != null && saved.getString("preview.request") != null
+                && saved.getString("preview.request").equals(getIntent().getStringExtra("infinity.external.request"));
+        if (restored) offerResume = saved.getBoolean("preview.offerResume", true);
+        buildUi(); accept(getIntent(), restored);
     }
     private boolean existingExperiencePresent() {
         ActivityManager manager = (ActivityManager)getSystemService(ACTIVITY_SERVICE);
@@ -85,9 +91,10 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
         String id = request == null ? null : request.getStringExtra("infinity.external.request");
         if (id == null) id = java.util.UUID.randomUUID().toString();
         long next = state.begin(id); if (next < 0) return;
+        dismissResume(); resumePosition = 0;
         token = next; requestId = id; ready = false;
         setIntent(request);
-        if (!restored) { position = 0; wantsPlay = true; }
+        if (!restored) { position = 0; wantsPlay = true; offerResume = true; }
         duration = 0; width = height = 0; subtitles.setText(""); seek.setProgress(0); seek.setEnabled(false);
         String name = request != null && request.getData() != null ? request.getData().getLastPathSegment() : null;
         title.setText(name == null || name.isEmpty() ? "Infinity video" : name);
@@ -96,13 +103,15 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
     @Override protected void onNewIntent(Intent intent) { super.onNewIntent(intent); accept(intent, false); }
     private void load() {
         ready = false; state.set(token, InfinityExternalState.Phase.OPENING); showStatus("Loading…", true);
-        engine.volume(muted ? 0f : level); engine.open(getIntent(), position); updateButtons();
+        resumePosition = 0;
+        engine.volume(muted ? 0f : level); engine.open(getIntent(), position, offerResume); updateButtons();
     }
     @Override protected void onStart() { super.onStart(); started = true; load(); }
     @Override protected void onPause() {
         engine.pause(); abandonFocus(); super.onPause();
     }
     @Override protected void onStop() {
+        dismissResume();
         started = false; ready = false; engine.suspend(); abandonFocus();
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); super.onStop();
     }
@@ -110,11 +119,13 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
     @Override protected void onSaveInstanceState(Bundle out) {
         out.putInt("position", position); out.putBoolean("muted", muted); out.putBoolean("play", wantsPlay);
         out.putFloat("level", level); out.putBoolean("fill", filling); out.putBoolean("locked", locked);
+        out.putString("preview.request", requestId); out.putBoolean("preview.offerResume", offerResume);
         super.onSaveInstanceState(out);
     }
     @Override public void onConfigurationChanged(Configuration config) { super.onConfigurationChanged(config); fitVideo(); }
     @Override public void onBackPressed() { close(); }
     private void close() {
+        dismissResume();
         wantsPlay = false; state.release(); engine.suspend(); abandonFocus(); finish();
     }
     private boolean obtainFocus() {
@@ -136,9 +147,26 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
         focusRequest = null; focusHeld = false;
     }
     private void startPlayback() {
-        if (!ready || !started || !wantsPlay) return;
+        if (!ready || !started || !wantsPlay || resumePosition > 0) return;
         if (!obtainFocus()) { wantsPlay = false; showStatus("Audio is in use. Press Play to retry.", false); updateButtons(); return; }
         engine.play();
+    }
+    private void dismissResume() {
+        if (resumeDialog != null) { resumeDialog.dismiss(); resumeDialog = null; }
+    }
+    private void showResume() {
+        dismissResume(); final long choiceToken = token;
+        resumeDialog = new AlertDialog.Builder(this).setTitle("Resume video?")
+                .setMessage("Continue from " + time((int)resumePosition) + "?")
+                .setPositiveButton("Resume", (dialog, which) -> chooseResume(choiceToken, true))
+                .setNegativeButton("Start Over", (dialog, which) -> chooseResume(choiceToken, false))
+                .setOnCancelListener(dialog -> { if (choiceToken == token) close(); }).create();
+        resumeDialog.setCanceledOnTouchOutside(false); resumeDialog.show();
+    }
+    private void chooseResume(long choiceToken, boolean restore) {
+        if (choiceToken != token || !started || !ready) return;
+        resumeDialog = null; offerResume = false;
+        showStatus("Seeking…", true); engine.chooseResume(restore);
     }
     @Override public void event(String event, String detail) {
         if (!started || isFinishing()) return;
@@ -148,7 +176,15 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
             case "preparing": state.set(token, InfinityExternalState.Phase.PREPARING); showStatus("Loading…", true); break;
             case "ready":
                 ready = true; state.set(token, InfinityExternalState.Phase.READY); showStatus("", false);
-                if (wantsPlay) startPlayback(); else event("paused", ""); break;
+                if (resumePosition > 0) showResume();
+                else { offerResume = false; if (wantsPlay) startPlayback(); else event("paused", ""); } break;
+            case "resume": resumePosition = Long.parseLong(detail); break;
+            case "resume_ready": case "resume_unavailable":
+                dismissResume(); resumePosition = 0; offerResume = false;
+                showStatus("", false);
+                if (ready && wantsPlay) startPlayback(); break;
+            case "history_unavailable":
+                android.widget.Toast.makeText(this, detail, android.widget.Toast.LENGTH_LONG).show(); break;
             case "frame": case "playing":
                 state.set(token, InfinityExternalState.Phase.PLAYING); showStatus("", false);
                 getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); break;
@@ -160,6 +196,7 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
                 wantsPlay = false; state.set(token, InfinityExternalState.Phase.ENDED); showStatus("Video ended", false);
                 abandonFocus(); getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); break;
             case "error":
+                dismissResume(); resumePosition = 0;
                 ready = false; wantsPlay = false; state.set(token, InfinityExternalState.Phase.ERROR);
                 showStatus(detail, false); abandonFocus();
                 getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); break;

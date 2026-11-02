@@ -39,17 +39,23 @@ public final class InfinityExternalEngine {
     private float volume = 1f;
     private android.view.Surface surface;
     private long startPosition;
+    private final InfinityExternalResume resume;
+    private InfinityExternalResume.Identity identity;
+    private InfinityExternalResume.Entry memory;
+    private boolean remember, choosingResume, seekingResume, initialSeek, seekable = true, resumeWarning;
+    private long lastCheckpoint;
     private static final int PREPARE_LIMIT_MS = 45000;
 
     public InfinityExternalEngine(Context context, Observer observer) {
         this.context = context.getApplicationContext(); this.observer = observer;
+        resume = new InfinityExternalResume(this.context);
         thread.start(); worker = new Handler(thread.getLooper());
     }
     private boolean current(long id, MediaPlayer p) { return !destroyed && epoch == id && player == p; }
     private void emit(long id, String event, String detail) {
         ui.post(() -> { if (!destroyed && epoch == id) observer.event(event, detail); });
     }
-    public void open(Intent request, long position) {
+    public void open(Intent request, long position, boolean offerResume) {
         final long id = ++epoch;
         if (deadline != null) ui.removeCallbacks(deadline);
         final Intent copy = new Intent(request);
@@ -70,8 +76,16 @@ public final class InfinityExternalEngine {
                     if (track.getTrackType() == MediaPlayer.TrackInfo.MEDIA_TRACK_TYPE_VIDEO) hasVideo = true;
                 if (!hasVideo) { emit(id, "error", "This source has no supported video track."); releasePlayer(); return; }
                 prepared = true;
-                if (startPosition > 0) mp.seekTo((int)Math.min(startPosition, Integer.MAX_VALUE));
-                emit(id, "ready", "");
+                if (identity != null && seekable && mp.getDuration() > 0) try {
+                    memory = resume.load(identity, mp.getDuration());
+                } catch (RuntimeException unavailable) { historyUnavailable(id); }
+                choosingResume = offerResume && memory != null && memory.position > 0;
+                remember = !choosingResume;
+                if (choosingResume) emit(id, "resume", Long.toString(memory.position));
+                if (!choosingResume && startPosition > 0) {
+                    initialSeek = true;
+                    beginSeek(id, mp, !offerResume && memory != null && memory.position > 0 ? memory.position : startPosition);
+                } else emit(id, "ready", "");
                 postSize(id, mp.getVideoWidth(), mp.getVideoHeight());
                 position(id, mp);
             });
@@ -84,14 +98,27 @@ public final class InfinityExternalEngine {
                 if (what == MediaPlayer.MEDIA_INFO_BUFFERING_END) {
                     buffering = false; emit(id, mp.isPlaying() ? "playing" : "paused", "");
                 }
-                if (what == MediaPlayer.MEDIA_INFO_NOT_SEEKABLE) emit(id, "not_seekable", "");
+                if (what == MediaPlayer.MEDIA_INFO_NOT_SEEKABLE) {
+                    seekable = false; remember = false; emit(id, "not_seekable", "");
+                    if (choosingResume) { choosingResume = false; emit(id, "resume_unavailable", ""); }
+                }
                 return true;
             });
             p.setOnVideoSizeChangedListener((mp, width, height) -> {
                 if (current(id, mp)) postSize(id, width, height);
             });
             p.setOnCompletionListener(mp -> {
-                if (current(id, mp)) { position(id, mp); emit(id, "ended", ""); }
+                if (current(id, mp)) {
+                    remember = false; clearMemory(id); position(id, mp); emit(id, "ended", "");
+                }
+            });
+            p.setOnSeekCompleteListener(mp -> {
+                if (current(id, mp) && seekingResume) {
+                    seekingResume = false; remember = true;
+                    if (deadline != null) { ui.removeCallbacks(deadline); deadline = null; }
+                    checkpoint(); position(id, mp);
+                    emit(id, initialSeek ? "ready" : "resume_ready", ""); initialSeek = false;
+                }
             });
             p.setOnErrorListener((mp, what, extra) -> {
                 if (current(id, mp)) {
@@ -130,13 +157,19 @@ public final class InfinityExternalEngine {
                     // Never convert a provider URI to a guessed /storage path.
                     try (AssetFileDescriptor fd = context.getContentResolver().openAssetFileDescriptor(uri, "r")) {
                         if (fd == null) throw new java.io.FileNotFoundException();
+                        identify(id, uri, fd.getFileDescriptor(), fd.getStartOffset(), fd.getDeclaredLength());
                         if (fd.getDeclaredLength() < 0) p.setDataSource(fd.getFileDescriptor());
                         else p.setDataSource(fd.getFileDescriptor(), fd.getStartOffset(), fd.getDeclaredLength());
                     }
-                } else if (scheme.equals("file")) p.setDataSource(context, uri);
-                else if (scheme.equals("http") || scheme.equals("https"))
+                } else if (scheme.equals("file")) {
+                    p.setDataSource(context, uri);
+                    try (AssetFileDescriptor fd = context.getContentResolver().openAssetFileDescriptor(uri, "r")) {
+                        identify(id, uri, fd == null ? null : fd.getFileDescriptor(), 0, -1);
+                    } catch (Exception inaccessibleMetadata) { identify(id, uri, null, 0, -1); }
+                } else if (scheme.equals("http") || scheme.equals("https")) {
+                    identify(id, uri, null, 0, -1);
                     p.setDataSource(context, uri, headers(copy));
-                else throw new IllegalArgumentException("Unsupported video protocol");
+                } else throw new IllegalArgumentException("Unsupported video protocol");
                 if (!current(id, p)) { releasePlayer(); return; }
                 emit(id, "preparing", ""); p.prepareAsync();
             } catch (Exception failure) {
@@ -148,6 +181,43 @@ public final class InfinityExternalEngine {
                 }
             }
         });
+    }
+    private void identify(long id, Uri uri, java.io.FileDescriptor fd, long offset, long length) {
+        try { identity = resume.identify(uri, fd, offset, length); }
+        catch (RuntimeException unavailable) { identity = null; historyUnavailable(id); }
+    }
+    private void historyUnavailable(long id) {
+        if (!resumeWarning) { resumeWarning = true; emit(id, "history_unavailable", "Resume memory is unavailable. Playback can continue."); }
+    }
+    private void clearMemory(long id) {
+        try { resume.clear(memory); } catch (RuntimeException unavailable) { historyUnavailable(id); }
+    }
+    private void checkpoint() {
+        if (!prepared || player == null || !remember || !seekable || memory == null) return;
+        try {
+            resume.save(memory, player.getCurrentPosition());
+            lastCheckpoint = android.os.SystemClock.elapsedRealtime();
+        } catch (RuntimeException unavailable) { historyUnavailable(epoch); }
+    }
+    public void chooseResume(boolean restore) { command(p -> {
+        if (!choosingResume || memory == null) return;
+        choosingResume = false;
+        if (!restore) clearMemory(epoch);
+        beginSeek(epoch, p, restore ? memory.position : 0);
+    }); }
+    private void beginSeek(long id, MediaPlayer p, long target) {
+        seekingResume = true; remember = false;
+        // Ready is emitted only by actual seek completion, never this deadline.
+        deadline = () -> {
+            if (!destroyed && epoch == id) {
+                final long canceled = ++epoch;
+                observer.event("error", "The resume seek did not complete. Reopen the video to retry or start over.");
+                worker.post(() -> { if (epoch == canceled) releasePlayer(); });
+            }
+        };
+        ui.postDelayed(deadline, PREPARE_LIMIT_MS);
+        if (android.os.Build.VERSION.SDK_INT >= 26) p.seekTo(target, MediaPlayer.SEEK_CLOSEST);
+        else p.seekTo((int)Math.min(target, Integer.MAX_VALUE));
     }
     private Map<String,String> headers(Intent intent) {
         Map<String,String> result = new HashMap<>();
@@ -172,17 +242,21 @@ public final class InfinityExternalEngine {
         if (!current(id, p) || !prepared) return;
         try {
             position(id, p);
+            if (android.os.SystemClock.elapsedRealtime() - lastCheckpoint >= InfinityExternalResume.INTERVAL) checkpoint();
             if (p.isPlaying() && ticker != null) worker.postDelayed(ticker, 500);
         } catch (IllegalStateException invalid) { emit(id, "error", "Playback is no longer available. Reopen the video."); }
     }
     public void play() { command(p -> {
+        if (choosingResume || seekingResume) return;
+        remember = true;
         if (ticker != null) worker.removeCallbacks(ticker);
         final long id = epoch; ticker = () -> tick(id, p);
         p.start(); emit(id, buffering ? "buffering" : "playing", ""); ticker.run();
     }); }
     public void pause() { command(p -> {
+        if (choosingResume || seekingResume) return;
         if (ticker != null) worker.removeCallbacks(ticker);
-        p.pause(); position(epoch, p); emit(epoch, "paused", "");
+        p.pause(); checkpoint(); position(epoch, p); emit(epoch, "paused", "");
     }); }
     public void seek(int ms) { command(p -> { p.seekTo(Math.max(0, ms)); }); }
     private interface Operation { void run(MediaPlayer player); }
@@ -228,13 +302,16 @@ public final class InfinityExternalEngine {
     }
     public void suspend() { ++epoch; worker.post(this::releasePlayer); }
     private void releasePlayer() {
+        checkpoint();
         if (deadline != null) { ui.removeCallbacks(deadline); deadline = null; }
         if (ticker != null) { worker.removeCallbacks(ticker); ticker = null; }
         prepared = false; buffering = false;
+        identity = null; memory = null; remember = choosingResume = seekingResume = initialSeek = false;
+        seekable = true; resumeWarning = false; lastCheckpoint = 0;
         if (player != null) { player.setOnErrorListener(null); player.release(); player = null; }
     }
     public void destroy() {
         destroyed = true; ++epoch; ui.removeCallbacksAndMessages(null);
-        worker.post(() -> { releasePlayer(); surface = null; thread.quitSafely(); });
+        worker.post(() -> { releasePlayer(); resume.close(); surface = null; thread.quitSafely(); });
     }
 }

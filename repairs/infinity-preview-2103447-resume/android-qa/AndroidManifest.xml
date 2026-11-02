@@ -1,0 +1,8 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="qa.external.source">
+  <uses-sdk android:minSdkVersion="23" android:targetSdkVersion="35"/>
+  <queries><package android:name="com.projectinfinity.kodi"/></queries>
+  <application android:label="CI external source" android:theme="@android:style/Theme.Material.Light.NoActionBar">
+    <activity android:name="qa.external.SourceActivity" android:exported="true"/>
+    <provider android:name="qa.external.SourceProvider" android:authorities="qa.external.source;qa.external.alias" android:exported="false" android:grantUriPermissions="true"/>
+  </application>
+</manifest>
