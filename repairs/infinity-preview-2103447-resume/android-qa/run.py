@@ -29,7 +29,13 @@ def offer(label,expected,choice='Resume'):
  words=q.text(q.nodes());m=re.search(r'Continue from (\d+:\d\d(?::\d\d)?)\?',words)
  q.check(m is not None and abs(seconds(m[1])-expected)<=2,'Wrong per-video offered time: '+words)
  q.check('Loading' not in words,'Loading obscures prepared resume choice')
- q.screenshot('resume-choice-'+str(len(q.steps)));q.tap(choice);q.await_text('Pause');time.sleep(.3)
+ q.screenshot('resume-choice-'+str(len(q.steps)))
+ # This baseline's native Material dialog presents action labels in capitals.
+ # Require its actual button ID as well as the visible label, then use the
+ # unchanged two-fresh-bounds real-touch helper.
+ label=choice.upper();button=q.find(q.nodes(),label)
+ q.check(button is not None and button.attrib.get('resource-id')==('android:id/button1' if choice=='Resume' else 'android:id/button2'),'Native resume choice identity')
+ q.tap(label);q.await_text('Pause');time.sleep(.3)
  value=clock();q.check(abs(value-(expected if choice=='Resume' else 0))<=3,'Actual chosen seek position: '+str(value))
  q.record('real_resume_choice',label=label,choice=choice,expected=expected,actual=value)
  q.no_kodi();return value
