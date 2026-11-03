@@ -12,7 +12,7 @@
 | Original signed-451 access | RESTORED — Actions41726452356 verified the actual APK SHA/certificate, exact matching ZIPs and native member | Actions verification succeeded; exact signed451 APK has now also materialized through the supported GitHub artifact broker with archive SHA/CRC and APK SHA verified. The earlier CLI redirect denial was not bypassed |
 | Native source provenance/build | COMPILED — complete matching9411 source, exact five-file delta, original dependency/toolchain guard, full ARM64 engine and ABI pass in41729462691; native artifact independently SHA/CRC checked | No compilation failure; actual Android execution remains a separate gate |
 | Android and Fold verification | NOT RUN for this correction | Local executor has no adb/emulator/KVM; Actions runner is x86_64 with adb/KVM but no installed system image or emulator executable; known translated Android17 constructor failure is not rerun; self-hosted runner inventory is403 to the integration; compatible authorized Android target required; physical Fold acceptance remains the user's |
-| Combined APK/component/signature delivery | NOT BUILT / NOT SIGNED | Android verification is BLOCKED with no connected authorized target; final versioned packaging, owner ZIP, signed-member and signature gates remain NOT RUN |
+| Combined APK/component/signature delivery | Internal unsigned assembly verified; no versioned or signed successor | Android verification is BLOCKED with no connected authorized target; final versioned packaging, owner ZIP, signed-member and signature gates remain NOT RUN |
 
 Host successes cover the selected queue/control-flow and SQLite-backed job
 adapter cases. Native-window and EGL operations are controlled peers; no real
