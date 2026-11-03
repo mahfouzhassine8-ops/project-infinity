@@ -92,3 +92,12 @@ was a partially updated old frame while the failure screenshot and OS dump show
 completed fullscreen. QA now observes two complete hidden-chrome trees within the
 existing3.5-second input deadline before continuing. This is bounded observation
 of asynchronous public input, no app timing change and no weakened assertion.
+
+Attempt41557296965 confirms stable hidden chrome in0.599s, but the first-use OS
+tutorial arrived after its initial check. The captured WMS touch region was still
+animating from top-252 to0. QA now checks that exact overlay after screenshot,
+waits for a stable measured current target within the same eight-second OS
+observation limit, and recaptures once after genuine acknowledgement. Actual
+video assertions remain unchanged. Three selected capture-protocol checks pass:
+late arrival recaptures, no overlay uses one capture, repeated overlays fail.
+This addresses the observed asynchronous platform setup, not production behavior.

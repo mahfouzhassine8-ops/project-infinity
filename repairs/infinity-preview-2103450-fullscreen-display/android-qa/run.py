@@ -123,7 +123,14 @@ def immersive_education():
             visible=[r for r in re.split(r'(?m)^  Window #\d+ ',current) if 'ImmersiveModeConfirmation}' in r.split('\n')[0] and 'isVisible=true' in r]
             q.check(len(visible)==1,'Only the currently visible OS immersive tutorial may be acknowledged')
             region=re.search(r'touchable region=SkRegion\(\((-?\d+),(-?\d+),(-?\d+),(-?\d+)\)\)',visible[0]);q.check(region,'Actual OS tutorial touchable bounds required')
-            im=q.screenshot('platform-immersive-target-'+str(q.sequence));target=('ImmersiveModeConfirmation',tutorial_target(im,list(map(int,region.groups()))));observation='current_screenshot_OCR_and_OS_window'
+            region=list(map(int,region.groups()));im=q.screenshot('platform-immersive-target-'+str(q.sequence))
+            try:target=('ImmersiveModeConfirmation',tutorial_target(im,region),region)
+            except AssertionError:
+                # The OS tutorial itself slides in; its reported touch region
+                # can still be negative or not yet contain the visible button.
+                # Observe a real stable target within the existing eight seconds.
+                previous=None;time.sleep(.1);continue
+            observation='current_screenshot_OCR_and_OS_window'
         if target is not None and target==previous:
             b=target[1];q.shell('input','tap',str((b[0]+b[2])//2),str((b[1]+b[3])//2));q.record('platform_immersive_education_acknowledged',window=target[0],bounds=b,observation=observation)
             break
@@ -134,6 +141,14 @@ def immersive_education():
         if not any('ImmersiveModeConfirmation}' in r.split('\n')[0] and 'isVisible=true' in r for r in re.split(r'(?m)^  Window #\d+ ',dump)):return True
         time.sleep(.1)
     raise AssertionError('Acknowledged OS immersive tutorial did not close')
+def unobscured_bars_snapshot():
+    # The tutorial may arrive between the pre-capture OS dump and screenshot.
+    # Check after capture, acknowledge only the exact observed OS overlay, and
+    # recapture once. Never retry or relax a genuine video/pixel assertion.
+    for attempt in range(2):
+        im=bars_snapshot('immersive-'+str(len(q.steps)))
+        if not immersive_education():return im
+    raise AssertionError('Unexpected repeated OS immersive tutorials')
 def enter_fullscreen():
     control('Fullscreen');started=q.feature_time();deadline=started+3.5;stable=0
     # Public input returns before Android publishes the new accessibility frame.
@@ -148,7 +163,7 @@ def enter_fullscreen():
     else:raise AssertionError('Fullscreen header/toolbar did not become hidden within existing input deadline')
     elapsed=q.feature_time()-started;q.check(elapsed<3.5,'Fullscreen observation exceeded existing input deadline')
     q.record('actual_fullscreen_chrome_hidden',seconds=elapsed,consecutive_frames=stable)
-    hidden_video_progress();immersive_education();im=bars_snapshot('immersive-'+str(len(q.steps)))
+    hidden_video_progress();im=unobscured_bars_snapshot()
     title=[c['title'] for c in q.steps if c['check']=='actual_video_decoded'][-1];color={'a.mp4':'red','b.mp4':'green','c.mp4':'blue'}[title];w,h=im.size;matches=0
     for x in (.03,.1,.9,.97):
         for y in (.03,.1,.9,.97):
