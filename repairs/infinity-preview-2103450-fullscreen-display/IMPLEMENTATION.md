@@ -73,3 +73,14 @@ see the non-focusable SystemUI window. QA now requests interactive windows and
 queries only that exact OS tutorial, uses two fresh matching Got it bounds, then
 observes dismissal before the unchanged edge-pixel assertion. Observer compilation
 and Python syntax pass; no production code, app timers or native behavior changed.
+
+API37's non-focusable tutorial was also absent from interactive accessibility
+windows (attempt41554934790, retained FAIL with its empty root and visible OS
+screenshot). The QA-only fallback now verifies the live ImmersiveModeConfirmation
+window/touchable region, measures the blue button from current screenshot pixels,
+and requires OCR text Got it plus two fresh equal bounds. It sends ordinary touch
+input and observes dismissal; no settings, app timers or assertions are changed.
+On both retained real screenshots it located [836,436,1018,562] in about0.14s; a
+negative red frame was rejected. The QA image installs Ubuntu's tesseract-ocr;
+production and original-key signing have no such dependency. Runtime remains
+pending until all remaining selected checks actually pass.

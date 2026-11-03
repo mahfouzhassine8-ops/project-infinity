@@ -5,6 +5,7 @@ resize-snapshot input guard. No private Activity invocation or production hooks.
 """
 import argparse,base64,importlib.util,json,re,time,traceback
 from pathlib import Path
+from immersive_prompt import locate as tutorial_target
 H=Path(__file__).resolve().parents[1];R=H.parents[1]
 spec=importlib.util.spec_from_file_location('resume_fixture',R/'repairs/infinity-preview-2103447-resume/android-qa/run.py')
 resume=importlib.util.module_from_spec(spec);spec.loader.exec_module(resume);q=resume.q
@@ -113,8 +114,18 @@ def immersive_education():
         (q.out/'platform-immersive-education.xml').write_bytes(raw)
         node=next((q.find(tree,label) for label in ('Got it','GOT IT') if q.find(tree,label) is not None),None)
         target=(tree.attrib.get('window-id'),q.bounds(node)) if node is not None and node.attrib.get('package')=='com.android.systemui' else None
+        observation='OS_accessibility'
+        if target is None:
+            # This API37 SystemUI tutorial is visible but absent from getWindows.
+            # Measure its actual blue Got it button and recognize its text, only
+            # inside the current trusted OS window's reported touchable region.
+            current=q.shell('dumpsys','window','windows')
+            visible=[r for r in re.split(r'(?m)^  Window #\d+ ',current) if 'ImmersiveModeConfirmation}' in r.split('\n')[0] and 'isVisible=true' in r]
+            q.check(len(visible)==1,'Only the currently visible OS immersive tutorial may be acknowledged')
+            region=re.search(r'touchable region=SkRegion\(\((-?\d+),(-?\d+),(-?\d+),(-?\d+)\)\)',visible[0]);q.check(region,'Actual OS tutorial touchable bounds required')
+            im=q.screenshot('platform-immersive-target-'+str(q.sequence));target=('ImmersiveModeConfirmation',tutorial_target(im,list(map(int,region.groups()))));observation='current_screenshot_OCR_and_OS_window'
         if target is not None and target==previous:
-            b=target[1];q.shell('input','tap',str((b[0]+b[2])//2),str((b[1]+b[3])//2));q.record('platform_immersive_education_acknowledged',window=target[0],bounds=b)
+            b=target[1];q.shell('input','tap',str((b[0]+b[2])//2),str((b[1]+b[3])//2));q.record('platform_immersive_education_acknowledged',window=target[0],bounds=b,observation=observation)
             break
         previous=target;time.sleep(.1)
     else:raise AssertionError('Observed OS immersive tutorial has no stable accessibility target')

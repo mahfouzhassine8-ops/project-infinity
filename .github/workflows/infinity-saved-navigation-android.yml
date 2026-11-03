@@ -86,7 +86,8 @@ jobs:
           CARDS_TOOLS_ROOT: ${{ github.workspace }}/runtime-tools
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y libpulse0 ffmpeg
+          sudo apt-get install -y libpulse0 ffmpeg tesseract-ocr
+          tesseract --version | head -1
           python3 -m pip install Pillow==11.3.0
           cp "$ANDROID_HOME/build-tools/35.0.0/lib/d8.jar" runtime-tools/d8.jar
           python3 repairs/infinity-preview-2103450-fullscreen-display/build_owner.py --bundles baseline450-components --out external-owner
