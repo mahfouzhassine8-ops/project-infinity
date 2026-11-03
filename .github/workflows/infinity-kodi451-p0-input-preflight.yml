@@ -1,0 +1,122 @@
+name: Kodi 451 P0 authenticated input preflight - no signing or application run
+on:
+  workflow_dispatch:
+  push:
+    branches: [work/infinity-kodi-2103451-checkpoint-anr-20261103]
+    paths:
+      - repairs/infinity-kodi-2103451-checkpoint-anr/ARTIFACT-PREFLIGHT-REQUEST.json
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: infinity-kodi451-p0-input-preflight-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  inputs:
+    if: github.ref == 'refs/heads/work/infinity-kodi-2103451-checkpoint-anr-20261103'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # existing v4
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - name: Verify branch, protected-source boundary and all exact artifact identities
+        run: python3 repairs/infinity-kodi-2103451-checkpoint-anr/artifact_preflight.py metadata
+      - name: Retrieve exact signed451 recovery APK
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # existing v4
+        with:
+          artifact-ids: '13200361701'
+          run-id: '41568721264'
+          merge-multiple: true
+          github-token: ${{ github.token }}
+          path: p0-inputs/signed451
+      - name: Retrieve exact matching451 owner components
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          artifact-ids: '13200925524'
+          run-id: '41568721264'
+          merge-multiple: true
+          github-token: ${{ github.token }}
+          path: p0-inputs/components451
+      - name: Retrieve compiled native451 identity, proof and complete source map
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          artifact-ids: '12636606216'
+          run-id: '40287479124'
+          merge-multiple: true
+          github-token: ${{ github.token }}
+          path: p0-inputs/native451
+      - name: Verify actual signed451 bytes, original certificate and matching components
+        run: |
+          set -euo pipefail
+          python3 repairs/infinity-kodi-2103451-checkpoint-anr/artifact_preflight.py verify --sdk "$ANDROID_HOME/build-tools/35.0.0"
+      - name: Retrieve verified native source foundation
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          artifact-ids: '12558054743'
+          run-id: '40089463702'
+          merge-multiple: true
+          github-token: ${{ github.token }}
+          path: p0-inputs/foundation
+      - name: Retrieve exact native source ownership input
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          artifact-ids: '12583100246'
+          run-id: '40149635167'
+          merge-multiple: true
+          github-token: ${{ github.token }}
+          path: p0-inputs/owner
+      - name: Retrieve original compiled source-binding evidence
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          artifact-ids: '12586095094'
+          run-id: '40158384817'
+          merge-multiple: true
+          github-token: ${{ github.token }}
+          path: p0-inputs/compiled
+      - name: Retrieve immutable native hash-slot lineage input
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          artifact-ids: '12613590219'
+          run-id: '40230842944'
+          merge-multiple: true
+          github-token: ${{ github.token }}
+          path: p0-inputs/signed407
+      - name: Read exact last-built native producer without replacing the451 application foundation
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: '89300fa6690015f17378657f96230040bb4766ea'
+          path: retained-native-producer
+          fetch-depth: 1
+          persist-credentials: false
+          show-progress: false
+      - name: Restore complete matching native source and stage exactly five P0 edits
+        run: python3 repairs/infinity-kodi-2103451-checkpoint-anr/artifact_preflight.py source --producer retained-native-producer
+      - name: Retrieve existing verified compiler dependency transfer
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          artifact-ids: '11698374892'
+          run-id: '38132105717'
+          merge-multiple: true
+          github-token: ${{ github.token }}
+          path: p0-inputs/dependencies
+      - name: Check original dependency archives without extracting or building
+        run: python3 repairs/infinity-kodi-2103451-checkpoint-anr/artifact_preflight.py dependencies
+      - name: Record actual runner capability without launching an emulator or application
+        if: always()
+        run: python3 repairs/infinity-kodi-2103451-checkpoint-anr/artifact_preflight.py capabilities
+      - name: Preserve verified candidate source for the subsequent original native build
+        run: |
+          set -euo pipefail
+          tar -czf p0-proof/verified-p0-native-source.tar.gz -C kodi .
+          sha256sum p0-proof/verified-p0-native-source.tar.gz > p0-proof/verified-p0-native-source.tar.gz.sha256
+      - name: Publish read-only recovery/source evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-Kodi451-P0-Verified-Input-Evidence-${{ github.run_id }}
+          path: p0-proof/
+          if-no-files-found: error
+          retention-days: 90
