@@ -158,13 +158,17 @@ def immersive_education():
                 previous=None;time.sleep(.1);continue
             observation='current_screenshot_OCR_and_OS_window'
         if target is not None and target==previous:
-            b=target[1];q.shell('input','tap',str((b[0]+b[2])//2),str((b[1]+b[3])//2));q.record('platform_immersive_education_acknowledged',window=target[0],bounds=b,observation=observation)
+            b=target[1];q.shell('input','tap',str((b[0]+b[2])//2),str((b[1]+b[3])//2));q.record('real_platform_tutorial_touch',window=target[0],bounds=b,observation=observation)
             break
         previous=target;time.sleep(.1)
     else:raise AssertionError('Observed OS immersive tutorial has no stable accessibility target')
+    # Acquisition/OCR may consume its eight seconds. Dismissal is a distinct
+    # observed response after real input, within the existing short input limit.
+    deadline=q.feature_time()+3.5
     while q.feature_time()<deadline:
         dump=q.shell('dumpsys','window','windows')
-        if not any('ImmersiveModeConfirmation}' in r.split('\n')[0] and 'isVisible=true' in r for r in re.split(r'(?m)^  Window #\d+ ',dump)):return True
+        if not any('ImmersiveModeConfirmation}' in r.split('\n')[0] and 'isVisible=true' in r for r in re.split(r'(?m)^  Window #\d+ ',dump)):
+            q.record('platform_immersive_education_acknowledged',window=target[0],bounds=b,observation=observation);return True
         time.sleep(.1)
     raise AssertionError('Acknowledged OS immersive tutorial did not close')
 def unobscured_bars_snapshot():

@@ -1,0 +1,204 @@
+{
+  "status": "FAIL",
+  "checks": [
+    {
+      "check": "fresh_fixture_install",
+      "name": "candidate",
+      "seconds": 104.98353708100001,
+      "sha256": "1fafe9abeb29e97967b6d1af641fe6ee5a9979dfae6c5aae70dda20e784bccf5"
+    },
+    {
+      "check": "fresh_fixture_install",
+      "name": "source",
+      "seconds": 2.237648154999988,
+      "sha256": "ed19916d79d23c12138d8d46efe894be5f8a0249c59a0b9f5b2b791a7fd9b887"
+    },
+    {
+      "check": "fresh_persistent_OS_observer",
+      "sha256": "3316aeb365ee8ecfe50aa11dc68669437939cc056ba1e7dc28b930de1d889194"
+    },
+    {
+      "check": "real_touch",
+      "label": "Open A",
+      "bounds": [
+        0,
+        51,
+        1080,
+        177
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "15",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "no_kodi_process",
+      "kodi_pid": "",
+      "external_pid": "9789"
+    },
+    {
+      "check": "actual_video_decoded",
+      "title": "a.mp4",
+      "color_samples": 90
+    },
+    {
+      "check": "actual_media_clock_advances",
+      "before": 2,
+      "after": 3
+    },
+    {
+      "check": "actual_window_bar_observation",
+      "name": "initial-normal"
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        1578,
+        1040,
+        1762
+      ],
+      "start": [
+        795,
+        1670
+      ],
+      "end": [
+        305,
+        1670
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Display",
+      "bounds": [
+        978,
+        1601,
+        1040,
+        1738
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Appearance",
+      "bounds": [
+        84,
+        1669,
+        524,
+        1800
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Light",
+      "bounds": [
+        70,
+        1184,
+        1010,
+        1310
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Done",
+      "bounds": [
+        556,
+        1669,
+        996,
+        1800
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Display",
+      "bounds": [
+        978,
+        1601,
+        1040,
+        1738
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Done",
+      "bounds": [
+        556,
+        1669,
+        996,
+        1800
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        1578,
+        1040,
+        1762
+      ],
+      "start": [
+        795,
+        1670
+      ],
+      "end": [
+        305,
+        1670
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Fullscreen",
+      "bounds": [
+        727,
+        1601,
+        937,
+        1738
+      ]
+    },
+    {
+      "check": "actual_fullscreen_chrome_hidden",
+      "seconds": 0.7492351810000173,
+      "consecutive_frames": 2
+    },
+    {
+      "check": "actual_hidden_video_progress",
+      "connection": "1",
+      "before": 588,
+      "after": 591
+    },
+    {
+      "check": "actual_window_bar_observation",
+      "name": "immersive-20"
+    },
+    {
+      "check": "platform_immersive_education_acknowledged",
+      "window": "ImmersiveModeConfirmation",
+      "bounds": [
+        836,
+        436,
+        1018,
+        562
+      ],
+      "observation": "current_screenshot_OCR_and_OS_window"
+    }
+  ],
+  "source_build": {
+    "status": "DISPOSABLE_QA_ONLY",
+    "source": "baeb2bb0e5b287aa7abd35978bc34f38dba17763",
+    "candidate_sha256": "1fafe9abeb29e97967b6d1af641fe6ee5a9979dfae6c5aae70dda20e784bccf5",
+    "original_key": false,
+    "replaced": {
+      "classes3.dex": "49fca4038f1b4ad5ffb7c984648f7ecf5b50d34d96d15c20542569d875ef6064"
+    },
+    "baseline_sha256": "01cb1b35ded45ca4124a1e0feed5029554fee51ca0f14c1b3d72bf9e50460161"
+  },
+  "physical_Fold": "NOT_TESTED",
+  "approved_visual_reference": "NOT_ACCESSIBLE_MATCH_PENDING",
+  "shutdown": "NOT_RUN"
+}

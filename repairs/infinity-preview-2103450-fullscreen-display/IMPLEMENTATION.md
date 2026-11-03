@@ -159,3 +159,11 @@ Open A control and the existing strict source_resumed foreground/focus proof.
 It sends Back once and keeps the same18-second observation limit; no production
 change, no forced source launch and no falsely claimed return. Final decoder
 release remains independently required at the end.
+
+Attempt41563759951 actually dismisses the OS tutorial (failure screenshot shows
+unobstructed full video; OCR timings0.552s and0.161s), but QA exhausted its shared
+eight-second acquisition deadline before observing the post-input response.
+Acquisition remains bounded at8s; dismissal now gets the existing short3.5s input
+response interval starting after the real tap. Acknowledgement is recorded only
+once the exact OS window is absent. The focused near-acquisition-deadline protocol
+case passes. No player timer, video assertion or production code changed.
