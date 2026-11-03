@@ -187,3 +187,28 @@ The producer cuts the inherited script before APK creation and never calls its
 `prepare()` suites. No app/Android/shutdown execution, APK or signing is selected
 by this build workflow. Native output is internal evidence, not a deliverable.
 Real Android correction verification remains an independent mandatory gate.
+
+## Pre-sign native-only APK-member comparison — selected after native success
+
+Run41729462691 completed successfully. Native artifact13276398254 has been
+SHA/CRC verified locally; its complete9411 source map equals the verified
+candidate map, all reviewed source bytes remained unchanged during compilation,
+and the retained module ABI passed. The exact signed451 APK is now independently
+materialized through the supported GitHub artifact broker and matches its
+previously verified cryptographic identity. No proxy/ACL bypass was used.
+
+Select one local unsigned assembly/member comparison:
+
+```
+PYTHONDONTWRITEBYTECODE=1 python3 repairs/infinity-kodi-2103451-checkpoint-anr/verify_native_assembly.py --baseline /tmp/kodi451-signed-baseline/Infinity-2103451-Combined-Original-Signer.apk --native-artifact /tmp/kodi451-native-41729462691.zip --source-map /tmp/kodi451-restored-proof/CANDIDATE-NATIVE-SOURCE-MAP.json --out /tmp/kodi451-native-preservation
+```
+
+Authenticate original APK and compiled-native artifact pins, verify native
+source/producer/proof, assemble only the new libkodi member into a local unsigned
+fixture, then require identical member inventory and byte hashes for every
+other nonsignature payload. Keep451 version/manifest/labels unchanged in this
+internal fixture; no release version, install, app execution or signing is
+selected. Save the complete per-member hashes and changed-member verdict.
+A final higher-version/signed APK comparison and matching owner-component checks
+remain mandatory when runtime/release gates can proceed. This unsigned assembly
+is internal evidence, not an installable or delivered testing candidate.

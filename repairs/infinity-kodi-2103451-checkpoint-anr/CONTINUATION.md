@@ -221,3 +221,34 @@ boundary and the old Unknown obligation; see HISTORICAL-JOB-ROUTE.md. A separate
 request for an existing authorized ARM64 Android target is pending. See
 ANDROID-ACCESS-BLOCKER.md. Do not claim the historical route fixed or Android
 ANR clearance from compilation/host evidence, and do not sign prematurely.
+
+
+## Native integration and available preservation complete; Android BLOCKED
+
+Run41729462691 completed successfully. The full ARM64 engine contains the exact
+five reviewed edits over the matching9411 source tree; no reviewed source changed
+during compilation. The13 additions are the unchanged producer's generated
+configure/toolchain/cache files. Retained native-module ABI and ARM64 ELF checks
+passed. Artifact13276398254 archive SHA/CRC and actual native bytes were then
+independently checked locally. Engine SHA is
+f89a40b5653c0091a06edd44f6ac5cdf056a649301b6751ee638c8ba88db9674.
+
+The exact signed451 APK also materialized locally through the supported GitHub
+artifact broker, matching archive and APK SHA/CRC. Its original certificate
+verification remains bound to the identical bytes in41726452356; no replacement
+credential, proxy/ACL bypass or signing occurred.
+
+Selected internal unsigned native-only assembly passed:7613 of7614 nonsignature
+payload members exact, with only lib/arm64-v8a/libkodi.so changed; all five DEX and
+46 other native libraries match baseline byte-for-byte. Full per-member hashes
+are saved. This is a baseline-version internal fixture, not a releasable or
+installed testing APK. No higher version or matching successor owner ZIPs were
+issued. Final versioned/signed/component checks remain NOT RUN.
+
+The user confirms no verified ARM64 self-hosted runner exists and the physical
+Fold is not connected. Supported device-farm/ADB options were investigated;
+current managed environment has no configured cloud identities, project, device
+capability, VPN or TCP grants. See ANDROID-ACCESS-BLOCKER.md. Actual Android
+checkpoint/database/display/ANR scenarios are BLOCKED. Do not repeat the known
+translated-constructor failure or sign a successor based on compilation alone.
+Preserve the native build/tests, Unknown historical job973/token976 and all locks.

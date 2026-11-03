@@ -34,3 +34,39 @@ acceptance. Preserve the independent selected test boundaries in AGENTS.md.
 Do not make a shutdown run a CI dependency of compilation/signing or label a
 blocked gate PASS. No successor is signed/delivered until the user-required
 verification gates are satisfied; no automatic lock is authorized.
+
+## Supported options investigated after native compilation
+
+The user explicitly confirms there is no verified self-hosted ARM64 runner label
+and the Samsung Fold is not connected. Do not invent a runner or expose the
+phone's debugging port publicly.
+
+The managed environment was rechecked: running/connected with no configured
+capabilities, cloud identities or secret bindings. `adb`, `gcloud` and
+`tailscale` are absent. The enforced network configuration has no VPN, no
+automatic Tailscale access, and empty permitted TCP domains/IP ranges. Ordinary
+HTTPS access is not an authorized ADB connection.
+
+- Firebase Test Lab is a supported service with physical and Arm virtual device
+  options. Its official CLI documentation requires authenticated Google Cloud
+  access and a configured Firebase project. Models and supported OS versions
+  must be selected from the actual authorized catalog. No project/identity is
+  configured here, and Android17/API37 availability has not been established.
+  No device/model/ABI or account permission is invented. No paid service or
+  new project was provisioned, and no credentials were requested.
+  Source: https://firebase.google.com/docs/test-lab/android/command-line
+- Android's official wireless ADB workflow requires an authorized paired
+  workstation/device connection, ordinarily on the same wireless network,
+  using a QR/pairing code and `adb pair`. The remote Fold is not attached or
+  paired to this workspace, and no approved network path is configured. A
+  user-controlled paired workstation/runner or properly authorized environment
+  connection would be needed. No port scan, guessed address, unapproved tunnel
+  or access-control workaround was attempted.
+  Source: https://developer.android.com/tools/adb
+
+Both official pages were fetched/read successfully through the existing HTTPS
+proxy on2026-11-03. These are supported options, not newly available test targets.
+The next action is to arrange an authorized device-farm project/identity with a
+verified native ARM64/API-compatible catalog entry, or a legitimate connected
+ARM64 Android device/runner. Signing credentials are not needed for this access
+step. Until then Android verification remains BLOCKED and no successor is signed.
