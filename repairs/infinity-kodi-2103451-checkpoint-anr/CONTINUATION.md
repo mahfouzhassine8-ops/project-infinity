@@ -91,6 +91,15 @@ artifact before the environment interruption. Required artifact identity:
 - Archive SHA-256:
   `98fd817ea50e3a4246903067d6518b43a53aadf9305330737a5ba194265c9b0f`.
 
+During recovery at 12:58 UTC, GitHub authenticated branch push and artifact
+metadata reads succeeded. A CLI attempt to restore signed-451 artifact
+`13200361701` failed at its redirected Azure Blob download with HTTP Forbidden;
+the temporary output was zero bytes. The redirect's reported validity interval
+included the current executor time, so expiration was not established as the
+cause. No replacement credentials, altered trust, or repeated transfer was
+attempted. Do not mistake this artifact-transfer failure for a failed GitHub
+branch backup or claim a fresh local signed-baseline copy exists.
+
 The original November 3 Health Center ZIP is still not exposed to this executor.
 Bounded workspace/temp/attachment-path searches returned no diagnostics archive;
 connected Page searches returned only existing unrelated reference Pages. No
