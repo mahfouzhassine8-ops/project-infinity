@@ -135,7 +135,19 @@ def immersive_education():
         time.sleep(.1)
     raise AssertionError('Acknowledged OS immersive tutorial did not close')
 def enter_fullscreen():
-    control('Fullscreen');q.check(q.find(q.nodes(),'Close') is None,'Fullscreen must hide header');q.check(q.find(q.nodes(),'Seek video') is None,'Fullscreen must hide toolbar');hidden_video_progress();immersive_education();im=bars_snapshot('immersive-'+str(len(q.steps)))
+    control('Fullscreen');started=q.feature_time();deadline=started+3.5;stable=0
+    # Public input returns before Android publishes the new accessibility frame.
+    # Observe two complete hidden-chrome frames within the original short input
+    # deadline; never accept the partially updated tree immediately after tap.
+    while q.feature_time()<deadline:
+        tree=q.nodes();surface=[n for n in tree.iter('node') if n.attrib.get('class')=='android.view.SurfaceView' and n.attrib.get('package')==q.P]
+        hidden=q.find(tree,'Close') is None and q.find(tree,'Seek video') is None and len(surface)==1
+        stable=stable+1 if hidden else 0
+        if stable>=2:break
+        time.sleep(.1)
+    else:raise AssertionError('Fullscreen header/toolbar did not become hidden within existing input deadline')
+    q.record('actual_fullscreen_chrome_hidden',seconds=q.feature_time()-started,consecutive_frames=stable)
+    hidden_video_progress();immersive_education();im=bars_snapshot('immersive-'+str(len(q.steps)))
     title=[c['title'] for c in q.steps if c['check']=='actual_video_decoded'][-1];color={'a.mp4':'red','b.mp4':'green','c.mp4':'blue'}[title];w,h=im.size;matches=0
     for x in (.03,.1,.9,.97):
         for y in (.03,.1,.9,.97):

@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-preview-2103450-fullscreen-display/android-qa/run.py", line 172, in <module>
+    try:body(a);status='PASS'
+        ^^^^^^^
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-preview-2103450-fullscreen-display/android-qa/run.py", line 156, in body
+    enter_fullscreen();q.shell('input','keyevent','4');q.await_text('Close');advancing();q.record('fullscreen_back_exits_only_mode');resume.seek(.2);advancing();first_a_position=resume.pause();q.source_return()
+    ^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-preview-2103450-fullscreen-display/android-qa/run.py", line 138, in enter_fullscreen
+    control('Fullscreen');q.check(q.find(q.nodes(),'Close') is None,'Fullscreen must hide header');q.check(q.find(q.nodes(),'Seek video') is None,'Fullscreen must hide toolbar');hidden_video_progress();immersive_education();im=bars_snapshot('immersive-'+str(len(q.steps)))
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-2103445-standalone-external-player/android-qa/run.py", line 17, in check
+    if not ok:raise AssertionError(why)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Fullscreen must hide header

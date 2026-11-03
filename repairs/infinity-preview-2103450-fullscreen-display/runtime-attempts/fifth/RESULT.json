@@ -1,0 +1,359 @@
+{
+  "status": "FAIL",
+  "checks": [
+    {
+      "check": "fresh_fixture_install",
+      "name": "candidate",
+      "seconds": 67.14416905600001,
+      "sha256": "472e975b00bfccb267b4e95d29894179ebe149023d6b69eee0cca04cc9ffbf9d"
+    },
+    {
+      "check": "fresh_fixture_install",
+      "name": "source",
+      "seconds": 1.3216082999999799,
+      "sha256": "5559cece1f247021b48cedcb0fa5456e742d0c84e3b476a53197241db69a1d04"
+    },
+    {
+      "check": "fresh_persistent_OS_observer",
+      "sha256": "c77e2ed920dfdde3349c3b95fdb64aa86abb2c38d168bde1cdbd9ff1758454dd"
+    },
+    {
+      "check": "real_touch",
+      "label": "Open A",
+      "bounds": [
+        0,
+        51,
+        1080,
+        177
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "15",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "no_kodi_process",
+      "kodi_pid": "",
+      "external_pid": "9442"
+    },
+    {
+      "check": "actual_video_decoded",
+      "title": "a.mp4",
+      "color_samples": 90
+    },
+    {
+      "check": "actual_media_clock_advances",
+      "before": 2,
+      "after": 3
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        1578,
+        1040,
+        1762
+      ],
+      "start": [
+        795,
+        1670
+      ],
+      "end": [
+        305,
+        1670
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Display",
+      "bounds": [
+        991,
+        1601,
+        1040,
+        1738
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Appearance",
+      "bounds": [
+        84,
+        1669,
+        524,
+        1800
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Light",
+      "bounds": [
+        70,
+        1184,
+        1010,
+        1310
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Done",
+      "bounds": [
+        556,
+        1669,
+        996,
+        1800
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Display",
+      "bounds": [
+        991,
+        1601,
+        1040,
+        1738
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Done",
+      "bounds": [
+        556,
+        1669,
+        996,
+        1800
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        1578,
+        1040,
+        1762
+      ],
+      "start": [
+        795,
+        1670
+      ],
+      "end": [
+        305,
+        1670
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Fullscreen",
+      "bounds": [
+        852,
+        1601,
+        1040,
+        1738
+      ]
+    },
+    {
+      "check": "actual_hidden_video_progress",
+      "connection": "1",
+      "before": 556,
+      "after": 562
+    },
+    {
+      "check": "platform_immersive_education_acknowledged",
+      "window": "ImmersiveModeConfirmation",
+      "bounds": [
+        836,
+        436,
+        1018,
+        562
+      ],
+      "observation": "current_screenshot_OCR_and_OS_window"
+    },
+    {
+      "check": "actual_window_bar_observation",
+      "name": "immersive-19"
+    },
+    {
+      "check": "actual_fullscreen_edge_pixels",
+      "matches": 16,
+      "total": 16,
+      "color": "red"
+    },
+    {
+      "check": "real_video_surface_tap",
+      "bounds": [
+        0,
+        0,
+        1080,
+        2520
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Exit fullscreen",
+      "bounds": [
+        852,
+        2280,
+        1040,
+        2417
+      ]
+    },
+    {
+      "check": "actual_media_clock_advances",
+      "before": 36,
+      "after": 37
+    },
+    {
+      "check": "actual_window_bar_observation",
+      "name": "restored-24"
+    },
+    {
+      "check": "fullscreen_reversible_without_restart"
+    },
+    {
+      "check": "real_touch",
+      "label": "Display",
+      "bounds": [
+        705,
+        1601,
+        852,
+        1738
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Appearance",
+      "bounds": [
+        84,
+        1669,
+        524,
+        1800
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Dark",
+      "bounds": [
+        70,
+        1310,
+        1010,
+        1436
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Done",
+      "bounds": [
+        556,
+        1669,
+        996,
+        1800
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Display",
+      "bounds": [
+        705,
+        1601,
+        852,
+        1738
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Done",
+      "bounds": [
+        556,
+        1669,
+        996,
+        1800
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Fullscreen",
+      "bounds": [
+        852,
+        1601,
+        1040,
+        1738
+      ]
+    },
+    {
+      "check": "actual_hidden_video_progress",
+      "connection": "1",
+      "before": 1395,
+      "after": 1396
+    },
+    {
+      "check": "actual_window_bar_observation",
+      "name": "immersive-34"
+    },
+    {
+      "check": "actual_fullscreen_edge_pixels",
+      "matches": 16,
+      "total": 16,
+      "color": "red"
+    },
+    {
+      "check": "real_video_surface_tap",
+      "bounds": [
+        0,
+        0,
+        1080,
+        2520
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Exit fullscreen",
+      "bounds": [
+        852,
+        2280,
+        1040,
+        2417
+      ]
+    },
+    {
+      "check": "actual_media_clock_advances",
+      "before": 60,
+      "after": 61
+    },
+    {
+      "check": "actual_window_bar_observation",
+      "name": "restored-39"
+    },
+    {
+      "check": "fullscreen_reversible_without_restart"
+    },
+    {
+      "check": "real_touch",
+      "label": "Fullscreen",
+      "bounds": [
+        852,
+        1601,
+        1040,
+        1738
+      ]
+    }
+  ],
+  "source_build": {
+    "status": "DISPOSABLE_QA_ONLY",
+    "source": "18a6c779fc5f6d0868ddc1dbe91159c5796d23e9",
+    "candidate_sha256": "472e975b00bfccb267b4e95d29894179ebe149023d6b69eee0cca04cc9ffbf9d",
+    "original_key": false,
+    "replaced": {
+      "classes3.dex": "a7be69f9175cbe86db7a877377c3bf37767d99134d57c7f6d3b547ee2bbfa722"
+    },
+    "baseline_sha256": "01cb1b35ded45ca4124a1e0feed5029554fee51ca0f14c1b3d72bf9e50460161"
+  },
+  "physical_Fold": "NOT_TESTED",
+  "approved_visual_reference": "NOT_ACCESSIBLE_MATCH_PENDING",
+  "shutdown": "NOT_RUN"
+}

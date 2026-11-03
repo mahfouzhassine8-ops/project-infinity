@@ -84,3 +84,11 @@ On both retained real screenshots it located [836,436,1018,562] in about0.14s; a
 negative red frame was rejected. The QA image installs Ubuntu's tesseract-ocr;
 production and original-key signing have no such dependency. Runtime remains
 pending until all remaining selected checks actually pass.
+
+Attempt41556201704 proves the measured tutorial handling works and records actual
+Light/Dark fullscreen entry/reveal/exit, 16/16 video edge samples each and decoder
+continuity. It remains FAIL overall: on the third entry, the immediate hierarchy
+was a partially updated old frame while the failure screenshot and OS dump show
+completed fullscreen. QA now observes two complete hidden-chrome trees within the
+existing3.5-second input deadline before continuing. This is bounded observation
+of asynchronous public input, no app timing change and no weakened assertion.
