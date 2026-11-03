@@ -1,0 +1,7 @@
+{
+  "scope": "Private Preview fullscreen exit restores all normal system-bar request types, not actual transient visibility",
+  "before_host": "FAIL expected519 restored0",
+  "native_before": "restored non-default visibility captionBar systemOverlays; retained in ninth-complete-before-bars",
+  "new_native_requirement": "initial normal requested types equals every restored snapshot",
+  "shared_native_Cobra_Kodi": "UNCHANGED"
+}

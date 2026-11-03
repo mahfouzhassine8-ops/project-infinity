@@ -188,7 +188,7 @@ def magenta_ratio(name):
     im=q.screenshot(name);r,g,b=im.split()[:3];mask=ImageChops.multiply(ImageChops.multiply(r.point(lambda x:255 if x>150 else 0),b.point(lambda x:255 if x>150 else 0)),g.point(lambda x:255 if x<90 else 0));bounds=mask.getbbox();q.check(bounds is not None,'Decoded scaling patch must be visible');ratio=(bounds[2]-bounds[0])/(bounds[3]-bounds[1]);q.record('actual_decoded_patch_ratio',name=name,bounds=bounds,ratio=ratio);return ratio
 def body(a):
     a.segment='remaining';resume.setup(a)
-    q.open_video('Open A','red','a.mp4');advancing()
+    q.open_video('Open A','red','a.mp4');advancing();bars_snapshot('initial-normal')
     for theme in ('Light','Dark'):
         panel_theme(theme);control('Display');q.await_text('Show the entire video with no cropping.');q.screenshot('display-'+theme.lower());q.tap('Done');enter_fullscreen();exit_fullscreen()
     # Back first leaves immersive mode; the source is reached only on normal Back.

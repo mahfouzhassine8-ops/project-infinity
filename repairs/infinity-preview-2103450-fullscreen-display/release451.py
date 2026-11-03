@@ -122,7 +122,7 @@ def runtime_binding(build):
     require(result==load(H/'final-evidence/ANDROID-RESULT.json'),'EXACT_SELECTED_RUNTIME_EVIDENCE')
     require(result['status']=='PASS_SELECTED_PREVIEW_FULLSCREEN_DISPLAY_CHECKS','REAL_PREVIEW_ANDROID_DECODING_REQUIRED')
     require(result['source_build']['replaced']=={'classes3.dex':observed['dex_sha256']},'ANDROID_INSTALLED_DEX_BINDING')
-    host=load(H/'host-evidence/HOST-RESULT.json');require(host['status']=='PASS' and host['tests']==14,'PREVIEW_CHROME_AND_CALL_HOST_CHECKS')
+    host=load(H/'host-evidence/HOST-RESULT.json');require(host['status']=='PASS' and host['tests']==15,'PREVIEW_CHROME_AND_CALL_HOST_CHECKS')
     for name,pin in load(H/'host-evidence/SOURCE-BINDING.json').items():
         require(file_sha(REPO/name)==pin,'HOST_TESTED_SOURCE_CHANGED:'+name)
     for name,pin in observed['sources'].items():require(file_sha(REPO/name)==pin,'ANDROID_TESTED_RUNTIME_CHANGED:'+name)

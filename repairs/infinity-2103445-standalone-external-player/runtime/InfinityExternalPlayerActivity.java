@@ -45,7 +45,7 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
     private Button play, mute, rotation, retry;
     private Button fullscreenButton;
     private boolean fullscreen, stretching, restoreChromeVisible = true;
-    private int restoreUiFlags, restoreBars = 3, restoreBarBehavior, restoreDisplayMode;
+    private int restoreUiFlags, restoreBarBehavior, restoreDisplayMode;
     private InfinityPreviewDisplayDialog displayDialog;
     private SeekBar seek;
     private boolean started, ready, wantsPlay = true, muted, dragging, filling, locked;
@@ -147,7 +147,7 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
         out.putBoolean("preview.stretch",stretching);out.putBoolean("preview.fullscreen",fullscreen);
         out.putBoolean("preview.chromeVisible",controls.getVisibility()==View.VISIBLE);
         out.putBoolean("preview.restoreChrome",restoreChromeVisible);out.putInt("preview.restoreUiFlags",restoreUiFlags);
-        out.putInt("preview.restoreBars",restoreBars);out.putInt("preview.restoreBarBehavior",restoreBarBehavior);out.putInt("preview.restoreDisplayMode",restoreDisplayMode);
+        out.putInt("preview.restoreBarBehavior",restoreBarBehavior);out.putInt("preview.restoreDisplayMode",restoreDisplayMode);
         super.onSaveInstanceState(out);
     }
     @Override public void onConfigurationChanged(Configuration config) { super.onConfigurationChanged(config); applyChrome(); layoutChrome(); fitVideo(); if(displayDialog!=null&&displayDialog.isShowing())showDisplay(); }
@@ -386,9 +386,6 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
         if(!fullscreen){
             restoreChromeVisible=controls.getVisibility()==View.VISIBLE;restoreUiFlags=getWindow().getDecorView().getSystemUiVisibility()&IMMERSIVE_FLAGS;
             if(Build.VERSION.SDK_INT>=30){
-                android.view.WindowInsets insets=root.getRootWindowInsets();restoreBars=0;
-                if(insets==null||insets.isVisible(android.view.WindowInsets.Type.statusBars()))restoreBars|=1;
-                if(insets==null||insets.isVisible(android.view.WindowInsets.Type.navigationBars()))restoreBars|=2;
                 android.view.WindowInsetsController c=getWindow().getInsetsController();if(c!=null)restoreBarBehavior=c.getSystemBarsBehavior();
             }
             restoreDisplayMode=stretching?2:filling?1:0;filling=true;stretching=false;
@@ -411,9 +408,10 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
             android.view.WindowInsetsController c=getWindow().getInsetsController();
             if(c!=null){
                 c.setSystemBarsBehavior(restoreBarBehavior);
-                int status=android.view.WindowInsets.Type.statusBars(),nav=android.view.WindowInsets.Type.navigationBars();
-                if((restoreBars&1)!=0)c.show(status);else c.hide(status);
-                if((restoreBars&2)!=0)c.show(nav);else c.hide(nav);
+                // Normal Preview requests the standard system bars. Actual
+                // visibility can be suppressed by Android's window mode; using
+                // that as saved intent leaves caption/overlay requests hidden.
+                c.show(android.view.WindowInsets.Type.systemBars());
             }
         }else{
             int flags=getWindow().getDecorView().getSystemUiVisibility();getWindow().getDecorView().setSystemUiVisibility((flags&~IMMERSIVE_FLAGS)|restoreUiFlags);
@@ -426,7 +424,7 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
         if(saved==null)return;
         stretching=saved.getBoolean("preview.stretch");if(stretching)filling=false;
         fullscreen=saved.getBoolean("preview.fullscreen");restoreChromeVisible=saved.getBoolean("preview.restoreChrome",true);
-        restoreUiFlags=saved.getInt("preview.restoreUiFlags");restoreBars=saved.getInt("preview.restoreBars",3);restoreBarBehavior=saved.getInt("preview.restoreBarBehavior");restoreDisplayMode=saved.getInt("preview.restoreDisplayMode");
+        restoreUiFlags=saved.getInt("preview.restoreUiFlags");restoreBarBehavior=saved.getInt("preview.restoreBarBehavior");restoreDisplayMode=saved.getInt("preview.restoreDisplayMode");
         setChromeVisible(saved.getBoolean("preview.chromeVisible",true));if(fullscreen)applyFullscreenBars();updateButtons();
     }
     private void showDisplay() {

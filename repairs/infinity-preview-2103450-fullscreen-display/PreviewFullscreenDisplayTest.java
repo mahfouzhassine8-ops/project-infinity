@@ -181,6 +181,13 @@ public class PreviewFullscreenDisplayTest {
         RuntimeEnvironment.setQualifiers("w960dp-h411dp-320dpi");a.onConfigurationChanged(a.getResources().getConfiguration());measure();assertTrue((Boolean)get(a,"fullscreen"));assertFalse((Boolean)get(a,"stretching"));assertTrue((Boolean)get(a,"filling"));assertEquals(opens,Decoder.last.opens);
         ReflectionHelpers.callInstanceMethod(a,"restoreDisplayState",from(Bundle.class,saved));measure();assertEquals(View.GONE,((View)get(a,"controls")).getVisibility());a.onBackPressed();assertTrue((Boolean)get(a,"stretching"));assertFalse((Boolean)get(a,"fullscreen"));
     }
+    @Test public void fullscreenRestoresEverySystemBarRequest() {
+        create(AudioManager.MODE_NORMAL,true);WindowInsetsController bars=a.getWindow().getInsetsController();assertNotNull(bars);
+        int initial=ReflectionHelpers.getField(bars,"mRequestedVisibleTypes");
+        press("Fullscreen");int hidden=ReflectionHelpers.getField(bars,"mRequestedVisibleTypes");assertEquals(0,hidden&WindowInsets.Type.systemBars());
+        actualTouch(root,(View)get(a,"video"));press("Exit fullscreen");int restored=ReflectionHelpers.getField(bars,"mRequestedVisibleTypes");
+        assertEquals("Fullscreen must restore caption/system overlay requests as well as status/navigation",initial&WindowInsets.Type.systemBars(),restored&WindowInsets.Type.systemBars());
+    }
     @Test public void displayModesFitCropOrStretchOnlyByDeliberateSelection() {
         create(AudioManager.MODE_NORMAL,true);int opens=Decoder.last.opens;
         for(int[] size:new int[][]{{1920,1080},{1080,1920},{1080,1080}}){a.size(size[0],size[1]);

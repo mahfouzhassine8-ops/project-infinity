@@ -134,3 +134,17 @@ BestFit,1.00465 Fill and8.64 Stretch, proving only explicit Stretch distorts.
 The tested production DEX is still a7be69f9175cbe86db7a877377c3bf37767d99134d57c7f6d3b547ee2bbfa722;
 all prior failures/cancellation remain preserved separately. No production code
 was changed to satisfy QA.14 host cases and6 release/preservation checks pass.
+
+PRE-SIGN RESTORATION REVIEW: successful unsigned preparation41561935876 is held,
+not registered or signed. Actual restored API37 dumps still requested captionBar
+and systemOverlays hidden, unlike normal Preview's default system-bar policy.
+The added actual-input host case reproduces initial mask519 versus restored0.
+The private API30+ exit now shows the normal system-bar type set and restores its
+saved behavior; it no longer mistakes temporarily invisible bars for requested
+policy. Legacy visibility flags remain exact. No global/shared/native code changes.
+All15 focused host cases now pass, including that formerly failing mask check;
+630 unrelated complete classes stay identical. New DEX SHA256:
+49fca4038f1b4ad5ffb7c984648f7ecf5b50d34d96d15c20542569d875ef6064.
+The earlier complete Android PASS and14 host cases are retained as prior-source
+evidence. Current Android verification additionally must compare every restored
+system-bar request with the initial normal window before signing is admitted.

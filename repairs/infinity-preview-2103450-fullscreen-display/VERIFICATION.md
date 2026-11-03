@@ -1,5 +1,9 @@
 # Preview fullscreen and Display — verification boundary
 
+Current status:15 focused host cases PASS after the pre-sign system-bar restoration
+correction. Earlier Android PASS is retained in runtime-attempts/ninth-complete-before-bars;
+new Android source/DEX and initial-to-restored bar policy evidence are required before signing.
+
 Protected signed2103450 remains the recovery baseline. Production changes are
 limited to Preview Activity UI/window state, Chrome.Control's Fullscreen drawing
 and the new private Display Dialog. No engine, resume database, URI routing,

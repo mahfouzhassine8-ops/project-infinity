@@ -20,7 +20,7 @@ def verify(build):
  for name in added:after=after.replace(prior.method(after,name),'')
  fields="""    private Button fullscreenButton;
     private boolean fullscreen, stretching, restoreChromeVisible = true;
-    private int restoreUiFlags, restoreBars = 3, restoreBarBehavior, restoreDisplayMode;
+    private int restoreUiFlags, restoreBarBehavior, restoreDisplayMode;
     private InfinityPreviewDisplayDialog displayDialog;
 """
  after=after.replace(fields,'')

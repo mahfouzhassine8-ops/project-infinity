@@ -20,4 +20,4 @@ else:entry=['org.junit.runner.JUnitCore']+entry
 r=subprocess.run(['java','--add-opens','java.base/sun.nio.ch=ALL-UNNAMED','-Drobolectric.dependency.repo.url=https://repo.maven.apache.org/maven2','-Dpreview.render.out='+str(a.out/'renders'),'-cp',str(classes)+':'+cp]+entry,text=True,capture_output=True)
 (a.out/'OUTPUT.txt').write_text(r.stdout+r.stderr);print(r.stdout+r.stderr)
 assert r.returncode==0
-(a.out/'HOST-RESULT.json').write_text(json.dumps(dict(status='PASS',tests=1 if a.method else 14,selected=a.method or 'all selected fullscreen/display fixtures',runtime='Robolectric API35 actual Activity/View input and native Canvas; decoder terminal spy, not actual media decoding'),indent=2)+'\n')
+(a.out/'HOST-RESULT.json').write_text(json.dumps(dict(status='PASS',tests=1 if a.method else 15,selected=a.method or 'all selected fullscreen/display fixtures',runtime='Robolectric API35 actual Activity/View input and native Canvas; decoder terminal spy, not actual media decoding'),indent=2)+'\n')
