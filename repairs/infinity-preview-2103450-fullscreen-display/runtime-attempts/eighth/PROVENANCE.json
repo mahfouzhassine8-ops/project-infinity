@@ -1,0 +1,8 @@
+{
+  "run_id": 41559319998,
+  "source": "0237d36e7f5a3f5a3141163548f95950b9624168",
+  "conclusion": "failure",
+  "artifact_id": 13195668791,
+  "artifact_sha256": "ff9d48fb8879428d3ac7e2699c0642e61041a2d609f0b376856aba7194f4e81d",
+  "finding": "OCR preflight and runtime OS acknowledgement work. All four actual cover/inner portrait/landscape viewports pass proportional video/Fullscreen16of16edge samples. Native decoded marker ratio BestFit0.96 and Fill1.00465, both restore. Harness then tries Stretch offscreen in short landscape ScrollView. Add measured real vertical panel swipe, including later restored Stretch radio, keep all checks strict. No production change."
+}

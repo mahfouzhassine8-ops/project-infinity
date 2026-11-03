@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-preview-2103450-fullscreen-display/android-qa/run.py", line 200, in <module>
+    try:body(a);status='PASS'
+        ^^^^^^^
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-preview-2103450-fullscreen-display/android-qa/run.py", line 191, in body
+    panel_mode(name);advancing();ratio=magenta_ratio('actual-scale-'+name.replace(' ','-'))
+    ^^^^^^^^^^^^^^^^
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-preview-2103450-fullscreen-display/android-qa/run.py", line 87, in panel_mode
+    control('Display');q.await_text('Best Fit');q.tap(name);q.tap('Done');q.await_text('Seek video')
+                                                ^^^^^^^^^^^
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-preview-2103447-resume/android-qa/run.py", line 21, in unobscured_tap
+    original_tap(label);return
+    ^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-2103445-standalone-external-player/android-qa/run.py", line 94, in tap
+    raise AssertionError('Stable current touch target unavailable: '+label)
+AssertionError: Stable current touch target unavailable: Stretch

@@ -83,8 +83,19 @@ def synthetic_call(a,saved):
     finally:
         if started:q.adb('emu','gsm','cancel',number)
         resume.source()
+def panel_reach(label):
+    # The native choices intentionally scroll in short landscape windows while
+    # Appearance/Done remain fixed. Reveal the actual row before touching it.
+    for attempt in range(5):
+        tree=q.nodes();node=q.find(tree,label);b=q.bounds(node) if node is not None else None
+        if b is not None and b[2]-b[0]>=40 and b[3]-b[1]>=36:return
+        if attempt==4:break
+        scroll=[n for n in tree.iter('node') if n.attrib.get('class')=='android.widget.ScrollView' and n.attrib.get('package')==q.P]
+        q.check(len(scroll)==1,'One actual Display choices scroll owner required');b=q.bounds(scroll[0]);x=(b[0]+b[2])//2;start=b[1]+(b[3]-b[1])*3//4;end=b[1]+(b[3]-b[1])//4
+        q.shell('input','swipe',str(x),str(start),str(x),str(end),'250');q.record('real_display_choices_scroll',target=label,bounds=b,start=[x,start],end=[x,end])
+    raise AssertionError('Display choice not reachable through real scrolling: '+label)
 def panel_mode(name):
-    control('Display');q.await_text('Best Fit');q.tap(name);q.tap('Done');q.await_text('Seek video')
+    control('Display');q.await_text('Best Fit');panel_reach(name);q.tap(name);q.tap('Done');q.await_text('Seek video')
 def panel_theme(name):
     control('Display');q.await_text('Best Fit');q.tap('Appearance');q.await_text('Preview appearance');q.tap(name);q.await_text('Best Fit');q.tap('Done');q.await_text('Seek video')
 def bars_snapshot(name):
@@ -190,7 +201,7 @@ def body(a):
     for name in ('Best Fit','Fill (crop)','Stretch'):
         panel_mode(name);advancing();ratio=magenta_ratio('actual-scale-'+name.replace(' ','-'))
         q.check(.65<ratio<1.5 if name!='Stretch' else ratio>3,'Best Fit/Fill must preserve source geometry; Stretch alone distorts')
-        enter_fullscreen();visible_surface_tap();q.await_text('Seek video');control('Display');q.await_text('Fill (crop) selection');q.check(q.find(q.nodes(),'Fill (crop) selection').attrib.get('checked')=='true','Fullscreen must temporarily select Fill');q.screenshot('retained-'+name.replace(' ','-'));q.tap('Done');control('Exit fullscreen');advancing();control('Display');q.await_text(name+' selection');q.check(q.find(q.nodes(),name+' selection').attrib.get('checked')=='true','Exit must restore previous Display mode');q.tap('Done');q.record('actual_display_mode_restored',mode=name)
+        enter_fullscreen();visible_surface_tap();q.await_text('Seek video');control('Display');q.await_text('Fill (crop) selection');q.check(q.find(q.nodes(),'Fill (crop) selection').attrib.get('checked')=='true','Fullscreen must temporarily select Fill');q.screenshot('retained-'+name.replace(' ','-'));q.tap('Done');control('Exit fullscreen');advancing();control('Display');q.await_text('Best Fit');panel_reach(name+' selection');q.check(q.find(q.nodes(),name+' selection').attrib.get('checked')=='true','Exit must restore previous Display mode');q.tap('Done');q.record('actual_display_mode_restored',mode=name)
     panel_mode('Best Fit');q.record('actual_bestfit_fill_stretch_decoding');q.source_return()
     q.shell('wm','size','1600x1680');q.shell('wm','density','320');q.open_video('Open C','blue','c.mp4');advancing();enter_fullscreen();exit_fullscreen();q.source_return()
     q.shell('wm','size','1080x2520');q.shell('wm','density','420');resume.offer('Open A',first_a_position);advancing();saved=resume.pause();q.source_return();resume.offer('Open A',saved,'Start Over');advancing();q.source_return();q.record('existing_resume_retained')

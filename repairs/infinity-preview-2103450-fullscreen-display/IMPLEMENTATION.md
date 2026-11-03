@@ -110,3 +110,14 @@ bound, and preflights actual retained images before emulator setup. Three actual
 captures resolve locally in0.20–0.22s with the negative frame rejected. OCR crop,
 text, duration and thread count are retained for the next runtime observation.
 No production or app-response deadline changed.
+
+Attempt41559319998 passes native OCR preflight/runtime acknowledgement, both
+themes, Back-first-exits-mode, all four actual viewport/orientation sizes and
+16/16 edge points on every entry. Decoded square-marker ratios are BestFit0.96 and
+Fill1.00465, both prior choices restored. Overall FAIL is retained because QA
+tried Stretch below the visible short-landscape ScrollView without scrolling.
+The actual tree shows its row clipped below791px while footer remains reachable.
+QA now swipes that measured native scroll owner and observes a reachable target,
+including the later restored Stretch radio. Two scroll-protocol checks pass:
+reveal then final observation; unavailable choice rejects after four swipes.
+The existing production scrolling panel and14 host checks remain unchanged.
