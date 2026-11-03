@@ -16,6 +16,21 @@ def clock():
     raise AssertionError('Actual cinematic elapsed-time node unavailable')
 resume.clock=clock
 def control(label):q.strip_to(label);q.tap(label)
+def source_return(action='Back'):
+    if action=='Back':q.shell('input','keyevent','4');q.record('real_android_back')
+    else:control(action)
+    # Target35's disposable source is edge-to-edge and its decorative first
+    # title can be covered by the restored status bar. Verify actual source
+    # ownership, usable controls and foreground/focus rather than that label.
+    deadline=q.feature_time()+18
+    while q.feature_time()<deadline:
+        tree=q.nodes();node=q.find(tree,'Open A');activity=q.shell('dumpsys','activity','activities')
+        if node is not None and node.attrib.get('package')==q.SOURCE and q.source_resumed(activity):
+            q.record('originating_activity_return',action=action,source_package=q.SOURCE,source_control='Open A',foreground_and_focus=True);return
+        time.sleep(.1)
+    (q.out/'source-return-activities.txt').write_text(activity);(q.out/'source-return-window.xml').write_bytes(q.ET.tostring(tree))
+    raise AssertionError('Actual source package/control/foreground ownership not restored')
+q.source_return=source_return
 def skip(delta):
     before=clock();control('−10 s' if delta<0 else '+10 s');deadline=q.feature_time()+18
     while q.feature_time()<deadline:

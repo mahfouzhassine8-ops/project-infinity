@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-preview-2103450-fullscreen-display/android-qa/run.py", line 211, in <module>
+    try:body(a);status='PASS'
+        ^^^^^^^
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-preview-2103450-fullscreen-display/android-qa/run.py", line 195, in body
+    enter_fullscreen();q.shell('input','keyevent','4');q.await_text('Close');advancing();q.record('fullscreen_back_exits_only_mode');resume.seek(.2);advancing();first_a_position=resume.pause();q.source_return()
+                                                                                                                                                                                                 ^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-2103445-standalone-external-player/android-qa/run.py", line 133, in source_return
+    await_text('External video source fixture');record('originating_activity_return',action=action)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-2103445-standalone-external-player/android-qa/run.py", line 102, in await_text
+    raise AssertionError('UI target not observed: '+label)
+AssertionError: UI target not observed: External video source fixture

@@ -148,3 +148,14 @@ All15 focused host cases now pass, including that formerly failing mask check;
 The earlier complete Android PASS and14 host cases are retained as prior-source
 evidence. Current Android verification additionally must compare every restored
 system-bar request with the initial normal window before signing is admitted.
+
+Attempt41562785765 confirms initial-normal and restored Light/Dark native windows
+have identical default system-bar request policy after the correction. Its overall
+FAIL is a source-fixture observation error: Back returns to qa.external.source,
+whose tree has usable Open A/B controls and whose OS window is visible, but its
+first decorative title is covered by status bars in that target35 edge-to-edge
+fixture. The private QA helper now requires the correct source package, usable
+Open A control and the existing strict source_resumed foreground/focus proof.
+It sends Back once and keeps the same18-second observation limit; no production
+change, no forced source launch and no falsely claimed return. Final decoder
+release remains independently required at the end.
