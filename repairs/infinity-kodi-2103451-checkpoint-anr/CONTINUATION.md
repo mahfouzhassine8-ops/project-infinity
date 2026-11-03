@@ -1,0 +1,133 @@
+# Infinity Kodi 2103451 P0 repair continuation
+
+## Foundation and authorization
+
+Continue on `work/infinity-kodi-2103451-checkpoint-anr-20261103`.
+The branch was restored and pushed on 2026-11-03 before further investigation.
+Its initial HEAD is `0b3450433adc3349056167a6697dae92dad63d86`, the
+`lock/infinity-preview-2103451-user-frozen-20261103` checkpoint.
+
+Protected signed source: `e50e68dad4c50690601bacbe1724507912b70fbd`.
+Protected APK version: `2103451`, package `com.projectinfinity.kodi`.
+APK SHA-256: `d77c31c458c4571212022bea7cea1e76c1d415cd5792b780b3c655fba97c6399`.
+Original certificate SHA-256:
+`d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7`.
+Signing run: `41568721264`; signed artifact: `13200361701`;
+matching component artifact: `13200925524`.
+
+The user's November 3 P0 instruction authorizes only confirmed Infinity Kodi
+watched-job persistence/checkpoint and native lifecycle/ANR repairs, with focused
+shutdown testing for those failures. It supersedes historical shutdown freezes
+only for those targets. Preview, Cobra, chooser/Splash, unrelated Kodi behavior,
+data, providers, and unrelated native/shared components remain frozen.
+
+The latest continuation explicitly requires both evidence and execution access
+before proceeding with the investigation/implementation. Do not sign until both
+repairs and the mandatory verification/preservation requirements are satisfied.
+No automatic release lock or promotion is authorized.
+
+## Preserved investigation state
+
+No production file has been changed and no new application/host test has run.
+No successor APK has been built or signed for this task.
+
+Before the environment interruption, the actual signed 2103451 archive was read:
+
+- `lib/arm64-v8a/libkodi.so`: 637,890,632 bytes.
+- SHA-256: `151128c176b6094f28bb3fc716cc07c3985a9aa38f1fe41e1bb1424f0285a47e`.
+- No GNU BuildId was found in its ELF note sections. Do not invent one for
+  attribution or bind historical diagnostic events by installation path alone.
+- That SHA matches the recorded final-native build `40287479124`, artifact
+  `12636606216`. The final source-map inspection remains outstanding.
+
+Five upstream Kodi 21.3 source files were fetched read-only and their hashes
+matched both the before/after entries of the existing
+`repairs/android-checkpoint-shutdown/runtime/native/manifest.json`:
+
+| Source | SHA-256 |
+| --- | --- |
+| `xbmc/video/jobs/VideoLibraryMarkWatchedJob.cpp` | `4acc7acb650dca3b5b99c5ff71ee9c76fc7ccadb162f9fc2f0485b32cd8e1e69` |
+| `xbmc/video/jobs/VideoLibraryMarkWatchedJob.h` | `be989bc5d0fca626c5c43d2e3ca9273fad6c0e25162ee2f49399bfbecf7d429d` |
+| `xbmc/video/jobs/VideoLibraryJob.cpp` | `67b802726fdbe8501d07069dd7c0daac2ae4df7c2579f7adf807fdc37914a7a2` |
+| `xbmc/video/jobs/VideoLibraryJob.h` | `40ae24d0709b6b9a3293ae4d7d6529fc77fb15a8439331c23dc29f54d7eaab49` |
+| `xbmc/video/VideoLibraryQueue.cpp` | `7ae1ae19bbf419190c40fe2b45d69be457a91967cf753c4c3c6f0ac62576a0dc` |
+
+Source findings, not a diagnosis of the unavailable November 3 event:
+
+1. `CVideoLibraryMarkWatchedJob::Work` does not check the result of
+   `db.CommitTransaction()` before returning `true`. Its class does not provide a
+   verified job-completion receipt contract. The checkpoint ledger intentionally
+   retains unclassified work after ordinary job completion; a true work result
+   is not proof of saved watched/progress state.
+2. This job also supports recursive directories, UPnP and PVR recording updates.
+   Local SQLite durability cannot certify remote-provider persistence. Do not
+   blanket-exempt the class or erase an unresolved obligation based on its name.
+3. The Android source overlay synchronously calls
+   `surfaceDestroyed -> XBMC_DestroyDisplay -> SendMsg(TMSG_DISPLAY_DESTROY)`.
+   The video-player destructor drains its outbound callback queue. These are
+   dependencies to trace, not proof of the current ANR's blocked callback, lock,
+   worker starvation or a shutdown relationship.
+4. Earlier November 1 diagnostic observations belong to a different archive.
+   They must not substitute for the November 3 evidence or establish its APK
+   producer/version.
+
+## Environment recovery and evidence gate
+
+The previous environment became offline. On resumption, the status tool reported
+current `connectivity: connected`; an actual shell command and the branch push
+succeeded. This confirms execution access, not Android runtime readiness.
+
+`/workspace/project-infinity` and its pre-existing untracked files survived.
+The `/tmp` mount was reset: previous temporary signed archives, source reads and
+any incomplete native-artifact download are absent. Their old paths must not be
+claimed as accessible evidence. Protected signed releases remain available from
+their recorded GitHub artifacts. Verify re-materialized bytes before use.
+
+The previous native-artifact connector failed with `ServerBusy`, "Ingress is
+over the account limit"; its fallback transfer did not produce a verified
+artifact before the environment interruption. Required artifact identity:
+
+- Artifact `12636606216`, size 184,980,906 bytes.
+- Archive SHA-256:
+  `98fd817ea50e3a4246903067d6518b43a53aadf9305330737a5ba194265c9b0f`.
+
+The original November 3 Health Center ZIP is still not exposed to this executor.
+Bounded workspace/temp/attachment-path searches returned no diagnostics archive;
+connected Page searches returned only existing unrelated reference Pages. No
+current attachment file ID, path or download reference has been received.
+This is an access limitation, not a claim that the user did not supply the file.
+Do not request another export, substitute a converter error, guess a file URL,
+publish private diagnostics, or claim the archive has been inspected.
+
+## Resume sequence and focused verification
+
+1. Establish a supported local/private reference to the already-supplied original
+   November 3 ZIP; verify its ZIP structure/CRC, SHA-256 and readable contents.
+   Keep raw diagnostics private and out of the repository.
+2. Bind relevant events to timestamps, producer identity where available, native
+   symbols and exact source. Distinguish missing receipt from failed writes;
+   trace the ANR separately before asserting a common dependency.
+3. Before each test execution, record the exact test command and source/APK
+   binding under this repair directory. No broad discovery or inherited suites.
+4. Select focused host cases from the confirmed mechanism: checked local commit,
+   rollback/failure refusal, receipt completion/callback ordering and remote-path
+   preservation. For the hang, reproduce the actual dependency with the existing
+   callbacks and persistence work intact before implementing a correction.
+5. Independently select the authorized Android scenarios: normal shutdown and
+   restart; pending watched updates with reopened-database readback; Stop/Back/
+   Home; screen-off/on and background/foreground; supported display/Fold lifecycle
+   changes; and the combined failure case. Record NOT RUN or exact blockers when
+   unavailable. Host simulation is not Android evidence or physical acceptance.
+6. Keep shutdown results independent from feature/build orchestration per
+   `AGENTS.md`. Do not weaken validation, discard callbacks, add arbitrary timeout
+   extensions, or repeat the known native-constructor emulator failure blindly.
+7. Enumerate all authorized source/method/APK-member differences against actual
+   signed 2103451. Preview, Cobra and every unrelated payload must be unchanged.
+   Verify original certificate, package/version, install-over compatibility and
+   matching components before delivery. Physical Fold acceptance remains pending.
+
+## Current release status
+
+**BLOCKED — actual November 3 evidence access.** Execution access and branch backup
+have been restored. Both requested repairs, focused runtime verification and
+successor signing remain unperformed; no PASS or delivery is implied.
