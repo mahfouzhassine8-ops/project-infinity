@@ -111,6 +111,19 @@ class ForeignWatched:public CVideoLibraryMarkWatchedJob {public:using CVideoLibr
 TRACKING_BODIES
 int main(int argc,char** argv){
  assert(argc==3);fixtureMode=argv[1];fixturePath=argv[2];
+#if defined(P0_PROTECTED_RESOURCE_PEER)
+ if(fixtureMode=="protected-resource-refusal"){
+  assert(InfinityDatabaseBarrier::Begin(1));
+  assert(InfinityDatabaseBarrier::GetSnapshot().Ready());
+  fixtureProtectedResources=1;
+  const auto blocked=InfinityDatabaseBarrier::GetSnapshot();
+  assert(blocked.protectedResourceBlockers==1 && !blocked.Ready());
+  fixtureProtectedResources=0;
+  assert(InfinityDatabaseBarrier::GetSnapshot().Ready());
+  std::cout<<"HOST_PASS protected-resource-refusal; snapshot predicate only, no shutdown saved\n";
+  return 0;
+ }
+#endif
  const bool remote=fixtureMode=="unknown-upnp",pvr=fixtureMode=="unknown-pvr",folder=fixtureMode=="unknown-folder";
  const bool foreignCallback=fixtureMode=="unknown-callback",foreignJob=fixtureMode=="unknown-job";
  const bool unknown=remote||pvr||folder||foreignCallback||foreignJob;
@@ -161,6 +174,9 @@ def main():
     p.add_argument('--inputs', type=Path, required=True)
     p.add_argument('--out', type=Path, required=True)
     p.add_argument('--cases', nargs='+', help='Run only named remaining cases; retain already-passing evidence separately')
+    p.add_argument('--database-barrier', type=Path, help='Use the actual restored native header')
+    p.add_argument('--full-native-map', type=Path, help='Bind retained job support to the restored native map')
+    p.add_argument('--test-protected-resources', action='store_true', help='Exercise the current snapshot guard with a controlled resource provider')
     a = p.parse_args()
     a.out.mkdir(parents=True, exist_ok=True)
     if (a.out / 'RESULTS.json').exists():
@@ -187,16 +203,30 @@ def main():
     baseline_report = json.loads(Path('/tmp/kodi451-p0-host/RESULTS.json').read_text())
     manager = manager_root / 'utils/JobManager.cpp'
     assert sha(manager) == baseline_report['source_sha256']['reconstructed_JobManager.cpp']
+    native_map = json.loads(a.full_native_map.read_text()) if a.full_native_map else None
+    if native_map:
+        assert sha(manager) == native_map['xbmc/utils/JobManager.cpp']
     for relative in ('utils/Job.h', 'utils/JobManager.h', 'utils/JobCheckpoint.h', 'threads/Thread.h', 'threads/CriticalSection.h'):
         original = manager_root / relative
         destination = source / relative
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(original, destination)
         bindings['retained/' + relative] = sha(original)
+        if native_map and not relative.startswith('threads/'):
+            assert sha(original) == native_map['xbmc/' + relative]
     barrier = ROOT / 'repairs/android-checkpoint-shutdown/runtime/native/overlay/xbmc/dbwrappers/InfinityDatabaseBarrier.h'
+    if a.database_barrier:
+        barrier = a.database_barrier
+        assert native_map and sha(barrier) == native_map['xbmc/dbwrappers/InfinityDatabaseBarrier.h']
     (source / 'dbwrappers').mkdir()
     shutil.copyfile(barrier, source / 'dbwrappers/InfinityDatabaseBarrier.h')
-    bindings[str(barrier.relative_to(ROOT))] = sha(barrier)
+    bindings['actual_database_barrier' if a.database_barrier else str(barrier.relative_to(ROOT))] = sha(barrier)
+    if a.test_protected_resources:
+        assert a.database_barrier and 'protectedResourceBlockers' in barrier.read_text()
+        peer = source / 'platform/android/activity/InfinityProtectedWrites.h'
+        peer.parent.mkdir(parents=True, exist_ok=True)
+        peer.write_text('#pragma once\n#include <cstddef>\ninline std::size_t fixtureProtectedResources=0;\n'
+                        'namespace InfinityScriptPersistence {inline std::size_t ActiveProtectedResources(){return fixtureProtectedResources;}}\n')
     (source / 'test_peers.h').write_text(PEERS)
     wrappers = ['FileItem.h', 'ServiceBroker.h', 'Util.h', 'filesystem/Directory.h',
                 'profiles/ProfileManager.h', 'pvr/PVRManager.h', 'pvr/recordings/PVRRecordings.h',
@@ -219,6 +249,8 @@ def main():
                '-Wall', '-Wextra', '-Werror', '-Wno-unused-parameter', '-pthread', '-I', str(source),
                str(source / 'video/jobs/VideoLibraryMarkWatchedJob.cpp'),
                str(source / 'video/jobs/VideoLibraryJob.cpp'), str(unit), '-l:' + library, '-o', str(executable)]
+    if a.test_protected_resources:
+        command.insert(1, '-DP0_PROTECTED_RESOURCE_PEER')
     built = subprocess.run(command, capture_output=True, text=True)
     (a.out / 'COMPILE.txt').write_text(built.stdout + built.stderr)
     if built.returncode:
@@ -226,6 +258,8 @@ def main():
     cases = ['mark-watched', 'mark-unwatched', 'unchanged', 'begin-failure', 'commit-failure',
              'resume-read-error', 'count-read-error', 'close-failure', 'unknown-upnp',
              'unknown-folder', 'unknown-callback', 'unknown-job', 'callback-failure', 'unknown-pvr']
+    if a.test_protected_resources:
+        cases.append('protected-resource-refusal')
     if a.cases:
         assert len(set(a.cases)) == len(a.cases) and set(a.cases).issubset(cases)
         cases = a.cases
@@ -247,7 +281,7 @@ def main():
         with sqlite3.connect(database) as reopened:
             count = reopened.execute('SELECT playCount FROM media WHERE path=?', (path,)).fetchone()[0]
             bookmarks = reopened.execute('SELECT COUNT(*) FROM bookmark').fetchone()[0]
-        untouched = case in ('unchanged', 'begin-failure', 'commit-failure', 'unknown-upnp', 'unknown-folder')
+        untouched = case in ('unchanged', 'begin-failure', 'commit-failure', 'unknown-upnp', 'unknown-folder', 'protected-resource-refusal')
         expected_count = initial if untouched else 0 if case == 'mark-unwatched' else initial + 1
         assert (count, bookmarks) == (expected_count, 1 if untouched or case == 'unknown-pvr' else 0), (case, count, bookmarks)
         results.append({'case': case, 'status': 'HOST_PASS', 'output': run.stdout,
@@ -262,6 +296,8 @@ def main():
               'full_kodi_database_implementation': False, 'actual_queue_callback_executed': False,
               'final_native_database_checkpoint_fence_executed': False,
               'reported_historical_item_route_confirmed': False,
+              'actual_native_support_map_checked': native_map is not None,
+              'independent_protected_resource_provider_stubbed': a.test_protected_resources,
               'android_execution': False, 'physical_fold_acceptance': False, 'apk_built_or_signed': False}
     (a.out / 'RESULTS.json').write_text(json.dumps(report, indent=2) + '\n')
 

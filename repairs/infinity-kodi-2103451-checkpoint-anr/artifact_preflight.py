@@ -98,8 +98,9 @@ def metadata(out):
     require(all(request[key] is False for key in ('apk_build_allowed', 'signing_allowed',
             'android_execution_allowed', 'application_shutdown_test_allowed')), 'Unselected operation')
     changed = subprocess.check_output(['git', 'diff', '--name-only', LOCK, 'HEAD'], text=True).splitlines()
-    workflow = '.github/workflows/infinity-kodi451-p0-input-preflight.yml'
-    require(changed and all(p.startswith('repairs/infinity-kodi-2103451-checkpoint-anr/') or p == workflow
+    workflows = {'.github/workflows/infinity-kodi451-p0-input-preflight.yml',
+                 '.github/workflows/infinity-kodi451-p0-native-build.yml'}
+    require(changed and all(p.startswith('repairs/infinity-kodi-2103451-checkpoint-anr/') or p in workflows
                            for p in changed), 'Protected source or workflow changed')
     receipts = {}
     for key, (identity, *_rest) in ASSETS.items():

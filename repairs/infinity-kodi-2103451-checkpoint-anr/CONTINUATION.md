@@ -174,3 +174,33 @@ preservation. This executor has no adb, emulator or exposed KVM; do not rerun th
 known translated-native constructor failure as if it could verify these changes.
 Original diagnostic bytes and historical item-route/producer attribution remain
 unavailable here. No successor build/signing or automatic lock is implied.
+
+
+## 2026-11-03 authenticated recovery and integrated source checkpoint
+
+The earlier asset-access/full-source blockers above are resolved by read-only
+Actions run41726452356. It verified the actual signed451 APK/certificate, four
+matching components and retained native SHA; restored the full9411 source map
+exactly; and integrated only the five reviewed source edits. Both original
+compiler transfer tar hashes passed. Source artifact13274901825 was independently
+SHA/CRC checked locally, then all9411 candidate source hashes verified after
+safe extraction. No production APK or key was changed/accessed.
+
+The sole host-support mismatch was the actual native database barrier's existing
+protected-resource predicate. Its write-observation bodies are unchanged. All14
+watched cases passed with the actual header, plus one explicit protected-resource
+refusal case; the separate provider is a controlled host peer. The seven
+lifecycle tests are unchanged and retained. Full CVideoDatabase, callback/final
+checkpoint and Android assertions remain NOT RUN. The original historical item
+route is UNKNOWN; no reported-case fix is claimed for unclassified remote work.
+
+A separate native-only build is selected in SELECTED-TESTS.md. The original
+producer, patch, dependency verifier, NDK installer and inherited shell script
+remain byte-identical to the last matching native producer. Only compile_engine
+is invoked; its inherited script is cut before APK creation. No behavioral
+suite, application run, signing key or release lock is part of this workflow.
+
+Compatible Android runtime remains unproven. The accessible hosted runner is
+x86_64; it does not establish an ARM device. The runner inventory API returned
+403 Resource not accessible by integration. Do not use alternate credentials,
+modify native constructors, repeat known-broken emulators or claim Android PASS.

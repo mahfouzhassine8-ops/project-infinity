@@ -140,3 +140,50 @@ method, so select all 14 watched cases once against fresh candidate `-v3` and
 host output `-final`, adding an explicit unknown-operation-result assertion.
 Prior v2 results remain historical. The lifecycle source/tests are unchanged and
 are not repeated. No Android run is selected by this correction.
+
+## Restored source binding — actual signed451 database barrier
+
+Actions run 41726452356 restored the complete matching 9411-file native map and
+verified all five repair preimages. One prior host support header differs: the
+actual InfinityDatabaseBarrier.h includes the existing protected-write provider
+and protectedResourceBlockers snapshot predicate. ThreadFailureSerial,
+RecordFailure, ForgetOwner and the entire WriteObservation body compare unchanged.
+The actual JobManager.cpp and other job-support headers match prior host inputs.
+
+Select only the 14 watched cases against the actual restored header, plus one
+snapshot-predicate refusal case. Stub only the independent resource-count provider
+in the host peer (zero during isolated SQLite cases; one in the refusal case),
+with the boundary explicitly reported. Do not assert complete shutdown saving.
+No production source or lifecycle code changes, so the seven lifecycle cases
+are retained without rerun.
+
+```
+PYTHONDONTWRITEBYTECODE=1 python3 repairs/infinity-kodi-2103451-checkpoint-anr/test_watched_repair.py --source /tmp/kodi451-p0-watched-candidate-v3 --inputs /tmp/kodi451-p0-inputs --out /tmp/kodi451-p0-watched-native-bound --database-barrier /tmp/kodi451-restored-native/xbmc/dbwrappers/InfinityDatabaseBarrier.h --full-native-map /tmp/kodi451-restored-proof/BASELINE-NATIVE-SOURCE-MAP.json --test-protected-resources
+```
+
+## Full native integration/build — selected 2026-11-03
+
+Input preflight run41726452356 succeeded. The signed451 APK and components,
+complete9411 native source and exact five-file candidate map are authenticated.
+The actual-native-header watched recheck passed14 cases plus one subordinate
+protected-resource refusal case; no full saved receipt was claimed. The seven
+lifecycle cases are retained without rerun.
+
+Before the single complete ARM64 compilation, select only these local release
+orchestration checks (three tests each), and validate the new workflow syntax:
+
+```
+PYTHONDONTWRITEBYTECODE=1 python3 repairs/infinity-kodi-2103451-checkpoint-anr/test_artifact_preflight.py
+PYTHONDONTWRITEBYTECODE=1 python3 repairs/infinity-kodi-2103451-checkpoint-anr/test_native_build_policy.py
+```
+
+Select `native_build.py metadata`, `restore`, then `compile` on the exact branch
+through `infinity-kodi451-p0-native-build.yml`. Use authenticated source artifact
+13274901825/run41726452356 and original dependency artifact11698374892/run38132105717.
+Verify all9411 source bytes, unchanged original producer/toolchain guard and
+exact five-file delta. Restore pinnedNDK21.4.7075529, run unchanged
+`compile_engine()` only, verify resulting ARM64 ELF and retained module ABI.
+The producer cuts the inherited script before APK creation and never calls its
+`prepare()` suites. No app/Android/shutdown execution, APK or signing is selected
+by this build workflow. Native output is internal evidence, not a deliverable.
+Real Android correction verification remains an independent mandatory gate.
