@@ -141,7 +141,7 @@ def stage(source, out):
         target.write_bytes(raw)
         patch.extend(difflib.unified_diff(originals[name].decode().splitlines(True),
                                         raw.decode().splitlines(True),
-                                        fromfile='a/' + name, tofile='b/' + name))
+                                        fromfile='a/' + name, tofile='b/' + name, n=0))
     proof = {'kind': 'staged checkpoint-only native display dispatch correction',
              'before': PINS, 'after': {name: sha(raw) for name, raw in changed.items()},
              'changed_methods': ['CApplication::Process checkpoint branch',
