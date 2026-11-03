@@ -167,3 +167,16 @@ Acquisition remains bounded at8s; dismissal now gets the existing short3.5s inpu
 response interval starting after the real tap. Acknowledgement is recorded only
 once the exact OS window is absent. The focused near-acquisition-deadline protocol
 case passes. No player timer, video assertion or production code changed.
+
+Final49fca-source Android verification41564899588 PASSES234 observations, including
+exact initial-to-restored system-bar policy, all scaling/Fullscreen modes, resume
+and actual source ownership/decoder release.15 host and6 release checks pass.
+Its full evidence is retained in runtime-attempts/twelfth-complete-before-footer.
+Independent direct PNG/native-render comparison then identified specific approved
+Display-only differences (documented in REFERENCE-PROVENANCE.md). They are now
+corrected: left radios, selected-only tint/outline, palette Appearance action,
+footer divider and filled cyan Done pill.15 host cases pass with explicit visual
+structure/color assertions; the Activity, Chrome, engine, resume and route source
+hashes remain exactly as in that complete functional PASS. New DEX5634f237...;
+630 unrelated complete classes remain exact. Updated native byte binding is
+required before final preparation/signing. No prior passing evidence discarded.

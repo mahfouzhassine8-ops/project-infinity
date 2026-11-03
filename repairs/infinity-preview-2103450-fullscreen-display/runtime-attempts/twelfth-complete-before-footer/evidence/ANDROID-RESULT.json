@@ -1,0 +1,131 @@
+{
+  "status": "PASS_SELECTED_PREVIEW_FULLSCREEN_DISPLAY_CHECKS",
+  "source_build": {
+    "status": "DISPOSABLE_QA_ONLY",
+    "source": "57b05ef1168fcdcbc8b0e752a2ffa7df8e5c67bc",
+    "candidate_sha256": "a7c223b54761be2b18ab9ec5b06d9884b90e8c766ebeaed48995d5c4bfb38212",
+    "original_key": false,
+    "replaced": {
+      "classes3.dex": "49fca4038f1b4ad5ffb7c984648f7ecf5b50d34d96d15c20542569d875ef6064"
+    },
+    "baseline_sha256": "01cb1b35ded45ca4124a1e0feed5029554fee51ca0f14c1b3d72bf9e50460161"
+  },
+  "selected_checks": [
+    "actual_bestfit_fill_stretch_decoding",
+    "actual_display_mode_restored",
+    "actual_fullscreen_edge_pixels",
+    "actual_hidden_video_progress",
+    "actual_media_clock_advances",
+    "actual_video_decoded",
+    "actual_viewport_fullscreen_fit",
+    "actual_window_bar_observation",
+    "existing_resume_retained",
+    "fullscreen_back_exits_only_mode",
+    "fullscreen_reversible_without_restart",
+    "selected_fullscreen_display_functional_complete",
+    "source_resumed_and_decoder_released"
+  ],
+  "actual_scaling": {
+    "actual-scale-Best-Fit": 0.96,
+    "actual-scale-Fill-(crop)": 1.0046511627906978,
+    "actual-scale-Stretch": 8.64
+  },
+  "window_observations": {
+    "restored-44-window.txt": {
+      "hidden_system_bars": false,
+      "non_default_visibility": ""
+    },
+    "restored-28-window.txt": {
+      "hidden_system_bars": false,
+      "non_default_visibility": ""
+    },
+    "restored-210-window.txt": {
+      "hidden_system_bars": false,
+      "non_default_visibility": ""
+    },
+    "initial-normal-window.txt": {
+      "hidden_system_bars": false,
+      "non_default_visibility": ""
+    },
+    "immersive-95-window.txt": {
+      "hidden_system_bars": true,
+      "non_default_visibility": "statusBars navigationBars captionBar systemOverlays"
+    },
+    "immersive-79-window.txt": {
+      "hidden_system_bars": true,
+      "non_default_visibility": "statusBars navigationBars captionBar systemOverlays"
+    },
+    "immersive-49-window.txt": {
+      "hidden_system_bars": true,
+      "non_default_visibility": "statusBars navigationBars captionBar systemOverlays"
+    },
+    "immersive-39-window.txt": {
+      "hidden_system_bars": true,
+      "non_default_visibility": "statusBars navigationBars captionBar systemOverlays"
+    },
+    "immersive-23-window.txt": {
+      "hidden_system_bars": true,
+      "non_default_visibility": "statusBars navigationBars captionBar systemOverlays"
+    },
+    "immersive-205-window.txt": {
+      "hidden_system_bars": true,
+      "non_default_visibility": "statusBars navigationBars captionBar systemOverlays"
+    },
+    "immersive-20-window.txt": {
+      "hidden_system_bars": true,
+      "non_default_visibility": "statusBars navigationBars captionBar systemOverlays"
+    },
+    "immersive-180-window.txt": {
+      "hidden_system_bars": true,
+      "non_default_visibility": "statusBars navigationBars captionBar systemOverlays"
+    },
+    "immersive-161-window.txt": {
+      "hidden_system_bars": true,
+      "non_default_visibility": "statusBars navigationBars captionBar systemOverlays"
+    },
+    "immersive-143-window.txt": {
+      "hidden_system_bars": true,
+      "non_default_visibility": "statusBars navigationBars captionBar systemOverlays"
+    },
+    "immersive-127-window.txt": {
+      "hidden_system_bars": true,
+      "non_default_visibility": "statusBars navigationBars captionBar systemOverlays"
+    },
+    "immersive-111-window.txt": {
+      "hidden_system_bars": true,
+      "non_default_visibility": "statusBars navigationBars captionBar systemOverlays"
+    }
+  },
+  "run": {
+    "run_id": 41564899588,
+    "conclusion": "success",
+    "head_sha": "57b05ef1168fcdcbc8b0e752a2ffa7df8e5c67bc",
+    "run_url": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/41564899588",
+    "artifact_id": 13199795720,
+    "artifact_digest": "sha256:cda123c7d000d9c285cb19cdaeda70e9ddccbd49a4d8646aa630a5017f893a5c",
+    "artifact_size": 7479863,
+    "result_sha256": "efcb84a9fefe7542b36bf2100986704f04f4c4ee4acb58d9d2cda5731644df4c",
+    "window_evidence": {
+      "restored-44-window.txt": "10d9c0575c4fa7271a485bfd2085b7f66c9df122370d448e86b89f1b33bdd7ca",
+      "restored-28-window.txt": "eef9c8d48f9444ff32e29a6a981f3e5070a65a01718109829c97df5875393c9b",
+      "restored-210-window.txt": "03644544259b0c656e53ae27bca7cc7a9f7ef8dd6d0e8dea0f936e712da43ee6",
+      "initial-normal-window.txt": "751e2f4ea4b0bf618342086106f0d1477a252319a1bf64564741ba4ada231f5a",
+      "immersive-95-window.txt": "04828ae4325295f5b772398b2c8b46c988acc1f95f3ae28c2af5f340c44fb2b6",
+      "immersive-79-window.txt": "f0d79ce3c9fc1a6ac83b7986de1d201cc9e606319a1f39729f3b22a9e09ab7d7",
+      "immersive-49-window.txt": "bc5f2e4f29311c2c81b64aec7a4a7da32ba91be846c1f842d4c14ddba6057f93",
+      "immersive-39-window.txt": "3b4efc694a49b91be8a209d67284cd4a1f699f3c106a7d2d853790e3b970da42",
+      "immersive-23-window.txt": "5f861c47d50646ca6603b576d152fb281e8836f34bf5372b8ddf2f722cfbec62",
+      "immersive-205-window.txt": "aee2c39ab34e0f1c934db3aeb6148d95be394334aadcfdb8ef579ff171a63f9e",
+      "immersive-20-window.txt": "c6154ffc104ca87dcebc41946329738828b74b9ffdc06ef0ea5a17aa836714d0",
+      "immersive-180-window.txt": "39d12b306f111820f56f7d18a4c52f9b0e4e6270c5c7c58a65a3ac60a01467a0",
+      "immersive-161-window.txt": "0f80104dcfa673913b1027a386446456c2c3b8e4d8322c6f1e3da79658396bf4",
+      "immersive-143-window.txt": "cc1153514a46b648a222129e8fc539a4ab93c72f7684129492278cefb2557294",
+      "immersive-127-window.txt": "3c8f4926a7a7a0623f5701d14f15f651b7e2e874df45ed43eec804a44e492eda",
+      "immersive-111-window.txt": "d651cfae93a6f072429237cd2ef5556cfc7fc6642a28f23cd483c48db5fc4f37"
+    }
+  },
+  "approved_visual_reference": "NOT_ACCESSIBLE_MATCH_UNVERIFIED; IMPLEMENTED_FROM_FROZEN_WRITTEN_DESIGN",
+  "physical_Fold": "NOT_TESTED",
+  "shutdown": "NOT_RUN",
+  "preserved_resume_and_call": "SOURCE_AND_CLASS_FROZEN; prior evidence retained"
+}
