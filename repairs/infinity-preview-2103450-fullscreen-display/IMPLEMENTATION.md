@@ -121,3 +121,16 @@ QA now swipes that measured native scroll owner and observes a reachable target,
 including the later restored Stretch radio. Two scroll-protocol checks pass:
 reveal then final observation; unavailable choice rejects after four swipes.
 The existing production scrolling panel and14 host checks remain unchanged.
+
+FINAL SELECTED RUNTIME: PASS in41560863335 at source
+8db52e19a32ce014a92b7f7c8bb8f9649571c44d. Exact published evidence archive SHA256
+5051ca80137b9a734502c34c5404361efdf7a60f3846762eded7b61781f4c127.
+The232 observations include11 actual fullscreen entries, every selected viewport,
+16/16 decoded video edge points on each entry, all three previous Display choices
+restored, real Stretch selection through panel scrolling, Resume/Start Over and
+source return with decoder release. Largest observed hidden-chrome completion is
+0.6043s within the unchanged3.5s input limit. Real square-marker ratios are0.96
+BestFit,1.00465 Fill and8.64 Stretch, proving only explicit Stretch distorts.
+The tested production DEX is still a7be69f9175cbe86db7a877377c3bf37767d99134d57c7f6d3b547ee2bbfa722;
+all prior failures/cancellation remain preserved separately. No production code
+was changed to satisfy QA.14 host cases and6 release/preservation checks pass.
