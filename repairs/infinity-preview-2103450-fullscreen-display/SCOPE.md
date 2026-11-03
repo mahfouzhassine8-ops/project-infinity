@@ -26,3 +26,10 @@ Evidence access: approved written design is available on design branch b3106c8.
 Actual mockup image and cover recording are not currently exposed by workspace or
 accessible Pages; an existing path/link was requested. Do not claim image/video
 inspection or exact visual equivalence without actual bytes.
+
+Latest user steering supersedes the initial independent-scaling entry rule:
+entering Fullscreen temporarily selects proportion-preserving Fill (crop), with
+edge-to-edge video and controls as overlays. Exit restores the prior Display
+mode, including Stretch if previously selected. Rotation remains independent.
+The provided recording is cover-display evidence, not inner-display evidence.
+No actual reference bytes are exposed yet; do not claim to have inspected them.

@@ -45,7 +45,7 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
     private Button play, mute, rotation, retry;
     private Button fullscreenButton;
     private boolean fullscreen, stretching, restoreChromeVisible = true;
-    private int restoreUiFlags, restoreBars = 3, restoreBarBehavior;
+    private int restoreUiFlags, restoreBars = 3, restoreBarBehavior, restoreDisplayMode;
     private InfinityPreviewDisplayDialog displayDialog;
     private SeekBar seek;
     private boolean started, ready, wantsPlay = true, muted, dragging, filling, locked;
@@ -147,7 +147,7 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
         out.putBoolean("preview.stretch",stretching);out.putBoolean("preview.fullscreen",fullscreen);
         out.putBoolean("preview.chromeVisible",controls.getVisibility()==View.VISIBLE);
         out.putBoolean("preview.restoreChrome",restoreChromeVisible);out.putInt("preview.restoreUiFlags",restoreUiFlags);
-        out.putInt("preview.restoreBars",restoreBars);out.putInt("preview.restoreBarBehavior",restoreBarBehavior);
+        out.putInt("preview.restoreBars",restoreBars);out.putInt("preview.restoreBarBehavior",restoreBarBehavior);out.putInt("preview.restoreDisplayMode",restoreDisplayMode);
         super.onSaveInstanceState(out);
     }
     @Override public void onConfigurationChanged(Configuration config) { super.onConfigurationChanged(config); applyChrome(); layoutChrome(); fitVideo(); if(displayDialog!=null&&displayDialog.isShowing())showDisplay(); }
@@ -391,9 +391,11 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
                 if(insets==null||insets.isVisible(android.view.WindowInsets.Type.navigationBars()))restoreBars|=2;
                 android.view.WindowInsetsController c=getWindow().getInsetsController();if(c!=null)restoreBarBehavior=c.getSystemBarsBehavior();
             }
+            restoreDisplayMode=stretching?2:filling?1:0;filling=true;stretching=false;
             fullscreen=true;setChromeVisible(false);applyFullscreenBars();
         }else{
-            fullscreen=false;restoreFullscreenBars();setChromeVisible(restoreChromeVisible);
+            fullscreen=false;filling=restoreDisplayMode==1;stretching=restoreDisplayMode==2;
+            restoreFullscreenBars();setChromeVisible(restoreChromeVisible);
         }
         updateButtons();root.requestApplyInsets();
     }
@@ -424,7 +426,7 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
         if(saved==null)return;
         stretching=saved.getBoolean("preview.stretch");if(stretching)filling=false;
         fullscreen=saved.getBoolean("preview.fullscreen");restoreChromeVisible=saved.getBoolean("preview.restoreChrome",true);
-        restoreUiFlags=saved.getInt("preview.restoreUiFlags");restoreBars=saved.getInt("preview.restoreBars",3);restoreBarBehavior=saved.getInt("preview.restoreBarBehavior");
+        restoreUiFlags=saved.getInt("preview.restoreUiFlags");restoreBars=saved.getInt("preview.restoreBars",3);restoreBarBehavior=saved.getInt("preview.restoreBarBehavior");restoreDisplayMode=saved.getInt("preview.restoreDisplayMode");
         setChromeVisible(saved.getBoolean("preview.chromeVisible",true));if(fullscreen)applyFullscreenBars();updateButtons();
     }
     private void showDisplay() {
@@ -447,13 +449,13 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
     private void applyChrome() {
         if(root==null)return;chrome=new InfinityPreviewChrome(this,isLight());root.setBackground(chrome.backdrop());
         resizeChromeControls();
-        top.setBackground(new android.graphics.drawable.InsetDrawable(chrome.glass(14,false),0,dp(4),0,dp(4)));toolbar.setBackground(chrome.glass(16,false));picture.setForeground(chrome.glass(10,true));
+        top.setBackground(new android.graphics.drawable.InsetDrawable(chrome.glass(14,false),0,dp(4),0,dp(4)));toolbar.setBackground(chrome.glass(16,false));picture.setForeground(fullscreen?null:chrome.glass(10,true));
         tintTree(top);tintTree(controlRow);title.setTextColor(chrome.ink);message.setTextColor(chrome.ink);times.setTextColor(chrome.secondary);totalTime.setTextColor(chrome.secondary);
         ((InfinityPreviewChrome.Control)retry).theme(chrome);brand.theme(chrome);chrome.seek(seek);chrome.seek(inlineVolume);busy.setIndeterminateTintList(android.content.res.ColorStateList.valueOf(chrome.accent));
         int color=chrome.light?0xffedf5f7:0xff001014;getWindow().setStatusBarColor(color);getWindow().setNavigationBarColor(color);
         int mask=View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;if(Build.VERSION.SDK_INT>=26)mask|=View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
         int flags=getWindow().getDecorView().getSystemUiVisibility();getWindow().getDecorView().setSystemUiVisibility((flags&~mask)|(chrome.light?mask:0));
-        if(fullscreen)applyFullscreenBars();
+        if(fullscreen){layoutChrome();applyFullscreenBars();}
     }
     private void tintTree(View view) {
         if(view instanceof InfinityPreviewChrome.Control)((InfinityPreviewChrome.Control)view).theme(chrome);
@@ -494,7 +496,7 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
         int brandW=dp(w>=dp(520)?108:28);if(brand.getLayoutParams().width!=brandW){brand.getLayoutParams().width=brandW;brand.requestLayout();}
         // Fit the actual media inside the usable viewport; keep its controls
         // adjacent rather than separated by the remaining portrait whitespace.
-        boolean chromeVisible=controls.getVisibility()==View.VISIBLE;
+        boolean chromeVisible=controls.getVisibility()==View.VISIBLE&&!fullscreen;
         int upper=chromeVisible?dp(69):0,maxW=Math.max(1,w-(chromeVisible?dp(32):0)),videoGap=dp(shortWindow?6:12);
         int maxH=Math.max(1,h-upper-(chromeVisible?bottom+controlsH+videoGap:0));
         double ratio=width>0&&height>0?(double)width/height:16d/9d;
@@ -505,7 +507,10 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
         }
         int groupTop=upper+Math.max(0,(maxH-ph)/2);
         place(picture,pw,ph,(w-pw)/2,groupTop,Gravity.TOP|Gravity.LEFT,0);
-        place(controls,w-dp(22),controlsH,dp(11),groupTop+ph+videoGap,Gravity.TOP|Gravity.LEFT,0);
+        place(controls,w-dp(22),controlsH,dp(11),fullscreen?h-bottom-controlsH:groupTop+ph+videoGap,Gravity.TOP|Gravity.LEFT,0);
+        if(picture.getClipToOutline()==fullscreen){picture.setClipToOutline(!fullscreen);picture.setForeground(fullscreen?null:chrome.glass(10,true));}
+        FrameLayout.LayoutParams caption=(FrameLayout.LayoutParams)subtitles.getLayoutParams();int captionBottom=fullscreen&&controls.getVisibility()==View.VISIBLE?controlsH+bottom+dp(12):dp(12);
+        if(caption.bottomMargin!=captionBottom){caption.bottomMargin=captionBottom;subtitles.setLayoutParams(caption);}
         fitVideo();
         if(displayDialog!=null&&displayDialog.isShowing())displayDialog.resize(w,h);
     }

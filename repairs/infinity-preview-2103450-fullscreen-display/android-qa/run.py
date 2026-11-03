@@ -26,12 +26,12 @@ def skip(delta):
 def visible_surface_tap():
     previous=None;deadline=q.feature_time()+3.5
     while q.feature_time()<deadline:
-        nodes=[n for n in q.nodes().iter('node') if n.attrib.get('class')=='android.view.SurfaceView' and n.attrib.get('package')==q.P and n.attrib.get('enabled')=='true']
-        q.check(len(nodes)==1,'One actual clickable video surface required');b=q.bounds(nodes[0])
-        if b==previous:
-            q.shell('input','tap',str((b[0]+b[2])//2),str((b[1]+b[3])//2));q.record('real_video_surface_tap',bounds=b);return
+        tree=q.nodes();nodes=[n for n in tree.iter('node') if n.attrib.get('class')=='android.view.SurfaceView' and n.attrib.get('package')==q.P and n.attrib.get('enabled')=='true']
+        q.check(len(nodes)==1,'One actual clickable video surface required');b=list(map(int,re.findall(r'-?\d+',nodes[0].attrib['bounds'])));viewport=list(map(int,re.findall(r'-?\d+',tree.find('node').attrib['bounds'])))
+        b=[max(b[0],viewport[0]),max(b[1],viewport[1]),min(b[2],viewport[2]),min(b[3],viewport[3])];q.check(b[2]>b[0] and b[3]>b[1],'Visible cropped video intersection required')
+        if b==previous:q.shell('input','tap',str((b[0]+b[2])//2),str((b[1]+b[3])//2));q.record('real_video_surface_tap',bounds=b);return
         previous=b;time.sleep(.1)
-    raise AssertionError('Stable video touch bounds unavailable')
+    raise AssertionError('Stable visible video touch bounds unavailable')
 def appearance(choice):
     control('Display');q.await_text('Best Fit');q.tap('APPEARANCE');q.await_text('Preview appearance');q.tap(choice);q.await_text('Seek video')
 def screenshot_geometry(name,light):
@@ -88,7 +88,7 @@ def panel_theme(name):
     control('Display');q.await_text('Best Fit');q.tap('Appearance');q.await_text('Preview appearance');q.tap(name);q.await_text('Best Fit');q.tap('Done');q.await_text('Seek video')
 def bars_snapshot(name):
     data=q.shell('dumpsys','window','windows');(q.out/(name+'-window.txt')).write_text(data)
-    q.screenshot(name);q.record('actual_window_bar_observation',name=name)
+    im=q.screenshot(name);q.record('actual_window_bar_observation',name=name);return im
 def hidden_video_progress():
     def sample():
         dump=q.shell('dumpsys','media.player');clients=[c for c in re.split(r'(?m)^ Client\n',dump) if 'packageName: '+q.P+',' in c and 'mime(video/' in c];q.check(len(clients)==1,'One actual owned video decoder required');c=clients[0]
@@ -101,8 +101,20 @@ def hidden_video_progress():
             (q.out/('fullscreen-player-'+str(len(q.steps))+'.txt')).write_text(dump);q.record('actual_hidden_video_progress',connection=conn,before=before,after=after);return
         time.sleep(.2)
     raise AssertionError('Real fullscreen decoder frames did not advance')
+def immersive_education():
+    tree=q.nodes()
+    for label in ('Got it','GOT IT'):
+        node=q.find(tree,label)
+        if node is not None and node.attrib.get('package')=='com.android.systemui':
+            dump=q.shell('dumpsys','window','windows');q.check('ImmersiveModeConfirmation' in dump,'Only the observed OS fullscreen tutorial may be acknowledged');q.screenshot('platform-immersive-education');q.tap(label);q.record('platform_immersive_education_acknowledged');return
 def enter_fullscreen():
-    control('Fullscreen');q.check(q.find(q.nodes(),'Close') is None,'Fullscreen must hide header');q.check(q.find(q.nodes(),'Seek video') is None,'Fullscreen must hide toolbar');hidden_video_progress();bars_snapshot('immersive-'+str(len(q.steps)))
+    control('Fullscreen');immersive_education();q.check(q.find(q.nodes(),'Close') is None,'Fullscreen must hide header');q.check(q.find(q.nodes(),'Seek video') is None,'Fullscreen must hide toolbar');hidden_video_progress();im=bars_snapshot('immersive-'+str(len(q.steps)))
+    title=[c['title'] for c in q.steps if c['check']=='actual_video_decoded'][-1];color={'a.mp4':'red','b.mp4':'green','c.mp4':'blue'}[title];w,h=im.size;matches=0
+    for x in (.03,.1,.9,.97):
+        for y in (.03,.1,.9,.97):
+            r,g,b=im.getpixel((int(w*x),int(h*y)))
+            if (color=='red' and r>70 and r>g*2 and r>b*2) or (color=='green' and g>50 and g>r*2 and g>b*2) or (color=='blue' and b>70 and b>r*2 and b>g*2):matches+=1
+    q.check(matches>=12,'Fullscreen must cover viewport edges with proportion-preserving crop');q.record('actual_fullscreen_edge_pixels',matches=matches,total=16,color=color)
 def exit_fullscreen():
     visible_surface_tap();q.await_text('Seek video');control('Exit fullscreen');q.await_text('Close');advancing();bars_snapshot('restored-'+str(len(q.steps)));q.record('fullscreen_reversible_without_restart')
 def magenta_ratio(name):
@@ -114,7 +126,7 @@ def body(a):
     for theme in ('Light','Dark'):
         panel_theme(theme);control('Display');q.await_text('Show the entire video with no cropping.');q.screenshot('display-'+theme.lower());q.tap('Done');enter_fullscreen();exit_fullscreen()
     # Back first leaves immersive mode; the source is reached only on normal Back.
-    enter_fullscreen();q.shell('input','keyevent','4');q.await_text('Close');advancing();q.record('fullscreen_back_exits_only_mode');q.source_return()
+    enter_fullscreen();q.shell('input','keyevent','4');q.await_text('Close');advancing();q.record('fullscreen_back_exits_only_mode');resume.seek(.2);advancing();first_a_position=resume.pause();q.source_return()
     q.open_video('Open B','green','b.mp4');advancing()
     for viewport,density in [('1080x2520','420'),('1600x1680','320'),('2520x1080','420'),('1680x1600','320')]:
         q.shell('wm','size',viewport);q.shell('wm','density',density);q.await_text('b.mp4');panel_mode('Best Fit');q.strip_to('Pause');screenshot_geometry(viewport+'-fit',False);advancing()
@@ -123,10 +135,10 @@ def body(a):
     for name in ('Best Fit','Fill (crop)','Stretch'):
         panel_mode(name);advancing();ratio=magenta_ratio('actual-scale-'+name.replace(' ','-'))
         q.check(.65<ratio<1.5 if name!='Stretch' else ratio>3,'Best Fit/Fill must preserve source geometry; Stretch alone distorts')
-        enter_fullscreen();visible_surface_tap();q.await_text('Seek video');control('Display');q.await_text(name+' selection');q.check(q.find(q.nodes(),name+' selection').attrib.get('checked')=='true','Fullscreen must retain selected Display mode');q.screenshot('retained-'+name.replace(' ','-'));q.tap('Done');control('Exit fullscreen');advancing()
+        enter_fullscreen();visible_surface_tap();q.await_text('Seek video');control('Display');q.await_text('Fill (crop) selection');q.check(q.find(q.nodes(),'Fill (crop) selection').attrib.get('checked')=='true','Fullscreen must temporarily select Fill');q.screenshot('retained-'+name.replace(' ','-'));q.tap('Done');control('Exit fullscreen');advancing();control('Display');q.await_text(name+' selection');q.check(q.find(q.nodes(),name+' selection').attrib.get('checked')=='true','Exit must restore previous Display mode');q.tap('Done');q.record('actual_display_mode_restored',mode=name)
     panel_mode('Best Fit');q.record('actual_bestfit_fill_stretch_decoding');q.source_return()
     q.shell('wm','size','1600x1680');q.shell('wm','density','320');q.open_video('Open C','blue','c.mp4');advancing();enter_fullscreen();exit_fullscreen();q.source_return()
-    q.shell('wm','size','1080x2520');q.shell('wm','density','420');q.open_video('Open A','red','a.mp4');resume.seek(.2);advancing();saved=resume.pause();q.source_return();resume.offer('Open A',saved);advancing();q.source_return();q.record('existing_resume_retained')
+    q.shell('wm','size','1080x2520');q.shell('wm','density','420');resume.offer('Open A',first_a_position);advancing();saved=resume.pause();q.source_return();resume.offer('Open A',saved,'Start Over');advancing();q.source_return();q.record('existing_resume_retained')
     q.final_cleanup();logs=q.shell('logcat','-d','-v','threadtime');(q.out/'logcat.txt').write_text(logs);q.check('FATAL EXCEPTION' not in logs,'Android crash');q.record('selected_fullscreen_display_functional_complete')
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--prepared',type=Path,required=True);p.add_argument('--out',type=Path,required=True);a=p.parse_args();a.out.mkdir(parents=True);q.out=a.out;status='FAIL'

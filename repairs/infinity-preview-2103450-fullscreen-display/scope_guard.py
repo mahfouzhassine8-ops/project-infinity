@@ -12,6 +12,23 @@ def verify(build):
  for name in protected:assert prior.method(a,name)==prior.method(b,name),'Protected Activity method '+name
  assert prior.method(b,'onCreate').replace('buildUi(); restoreDisplayState(saved); accept','buildUi(); accept')==prior.method(a,'onCreate')
  assert prior.method(b,'onDestroy').replace('        if(displayDialog!=null)displayDialog.dismiss();\n','')==prior.method(a,'onDestroy')
+ # Check every untouched declaration and field as well as protected operations.
+ before=a;after=b
+ changed=('onCreate','onSaveInstanceState','onDestroy','onConfigurationChanged','onBackPressed','buildUi','showAppearance','applyChrome','layoutChrome','updateButtons','fitVideo')
+ added=('setChromeVisible','toggleFullscreen','applyFullscreenBars','restoreFullscreenBars','onWindowFocusChanged','restoreDisplayState','showDisplay')
+ for name in changed:before=before.replace(prior.method(before,name),'');after=after.replace(prior.method(after,name),'')
+ for name in added:after=after.replace(prior.method(after,name),'')
+ fields="""    private Button fullscreenButton;
+    private boolean fullscreen, stretching, restoreChromeVisible = true;
+    private int restoreUiFlags, restoreBars = 3, restoreBarBehavior, restoreDisplayMode;
+    private InfinityPreviewDisplayDialog displayDialog;
+"""
+ after=after.replace(fields,'')
+ constant="""    private static final int IMMERSIVE_FLAGS=View.SYSTEM_UI_FLAG_FULLSCREEN|View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+            |View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY|View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION|View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+"""
+ after=after.replace(constant,'')
+ assert ''.join(before.split())==''.join(after.split()),'Unauthorized declarations outside selected UI methods'
  p=OLD/'InfinityPreviewChrome.java';marker='    public static final class Control extends Button {'
  assert original(p).split(marker)[0]==p.read_text().split(marker)[0],'Unrelated Chrome drawable changed'
  proof=json.loads((build/'OWNER-BUILD.json').read_text());assert proof['baseline']==BASE
