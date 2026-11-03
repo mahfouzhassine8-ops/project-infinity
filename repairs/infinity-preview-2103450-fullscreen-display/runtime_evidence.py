@@ -12,6 +12,8 @@ def summarize(root=H):
  need(raw['source_build']['source']==binding['head_sha'],'Actual source binding')
  need(raw['source_build']['baseline_sha256']=='01cb1b35ded45ca4124a1e0feed5029554fee51ca0f14c1b3d72bf9e50460161','Exact signed450 baseline')
  need(CHECKS<={c['check'] for c in raw['checks']},'All selected fullscreen/scaling checks required')
+ hidden=[c for c in raw['checks'] if c['check']=='actual_fullscreen_chrome_hidden']
+ need(len(hidden)>=10 and all(c['consecutive_frames']>=2 and 0<c['seconds']<3.5 for c in hidden),'Actual stable hidden chrome must meet existing short input deadline')
  need({c['mode'] for c in raw['checks'] if c['check']=='actual_display_mode_restored'}=={'Best Fit','Fill (crop)','Stretch'},'Every previous Display mode must be restored after fullscreen')
  need(all(c['matches']>=12 for c in raw['checks'] if c['check']=='actual_fullscreen_edge_pixels'),'Decoded video must reach viewport edges')
  need({c['viewport'] for c in raw['checks'] if c['check']=='actual_viewport_fullscreen_fit'}=={'1080x2520','1600x1680','2520x1080','1680x1600'},'Every selected cover/inner/orientation viewport required')

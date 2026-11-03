@@ -146,7 +146,8 @@ def enter_fullscreen():
         if stable>=2:break
         time.sleep(.1)
     else:raise AssertionError('Fullscreen header/toolbar did not become hidden within existing input deadline')
-    q.record('actual_fullscreen_chrome_hidden',seconds=q.feature_time()-started,consecutive_frames=stable)
+    elapsed=q.feature_time()-started;q.check(elapsed<3.5,'Fullscreen observation exceeded existing input deadline')
+    q.record('actual_fullscreen_chrome_hidden',seconds=elapsed,consecutive_frames=stable)
     hidden_video_progress();immersive_education();im=bars_snapshot('immersive-'+str(len(q.steps)))
     title=[c['title'] for c in q.steps if c['check']=='actual_video_decoded'][-1];color={'a.mp4':'red','b.mp4':'green','c.mp4':'blue'}[title];w,h=im.size;matches=0
     for x in (.03,.1,.9,.97):
