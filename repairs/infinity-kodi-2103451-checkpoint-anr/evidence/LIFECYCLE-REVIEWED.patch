@@ -1,0 +1,99 @@
+--- a/xbmc/application/Application.cpp
++++ b/xbmc/application/Application.cpp
+@@ -1476,8 +1476,9 @@
+ void CApplication::OnApplicationMessage(ThreadMessage* pMsg)
+ {
+ #if defined(TARGET_ANDROID)
+-  if (InfinityAndroidCheckpoint::IsActive())
+-    return; // A checkpoint never enters legacy Stop/Cleanup through a queued quit.
++  if (InfinityAndroidCheckpoint::IsActive() &&
++      pMsg->dwMessage != TMSG_DISPLAY_SETUP && pMsg->dwMessage != TMSG_DISPLAY_DESTROY)
++    return; // Keep ordinary actions and legacy Stop/Cleanup outside the checkpoint.
+ #endif
+   uint32_t msg = pMsg->dwMessage;
+   if (msg == TMSG_SYSTEM_POWERDOWN)
+@@ -3416,6 +3417,10 @@
+ #if defined(TARGET_ANDROID)
+   if (InfinityAndroidCheckpoint::IsActive())
+   {
++    // Android can synchronously await surface cleanup while a checkpoint is
++    // draining or failed. Service only its real display messages, not general
++    // queued actions/callbacks or legacy teardown.
++    CServiceBroker::GetAppMessenger()->ProcessCheckpointDisplayMessages();
+     InfinityAndroidCheckpoint::Pump(*this);
+     return;
+   }
+--- a/xbmc/messaging/ApplicationMessenger.cpp
++++ b/xbmc/messaging/ApplicationMessenger.cpp
+@@ -9,6 +9,7 @@
+ #include "ApplicationMessenger.h"
+ #if defined(TARGET_ANDROID)
+ #include "platform/android/activity/InfinityShutdownTrace.h"
++#include "platform/android/activity/InfinityAndroidCheckpoint.h"
+ #endif
+ 
+ #include "guilib/GUIMessage.h"
+@@ -215,6 +216,50 @@
+           false);
+ }
+ 
++#if defined(TARGET_ANDROID)
++void CApplicationMessenger::ProcessCheckpointDisplayMessages()
++{
++  // Only Kodi's process thread may touch its native display. The checkpoint
++  // continues to reject ordinary actions/writes, including after a failure.
++  if (!IsProcessThread() || !InfinityAndroidCheckpoint::IsActive())
++    return;
++
++  std::unique_lock<CCriticalSection> lock(m_critSection);
++  // Bound one pass to the initially queued population. New lifecycle events
++  // remain owned by the same queue and can run on a later application frame.
++  std::size_t remaining = m_vecMessages.size();
++  while (remaining > 0 && !m_bStop)
++  {
++    --remaining;
++    ThreadMessage* selected = nullptr;
++    std::queue<ThreadMessage*> retained;
++    while (!m_vecMessages.empty())
++    {
++      ThreadMessage* message = m_vecMessages.front();
++      m_vecMessages.pop();
++      if (!selected && (message->dwMessage == TMSG_DISPLAY_SETUP ||
++                        message->dwMessage == TMSG_DISPLAY_DESTROY))
++        selected = message;
++      else
++        retained.push(message);
++    }
++    m_vecMessages.swap(retained);
++    if (!selected)
++      return;
++
++    // Retain the real callback, payload lifetime and acknowledgment ordering.
++    // Do not wake Android before its display operation has actually returned.
++    const std::shared_ptr<CEvent> waitEvent = selected->waitEvent;
++    lock.unlock();
++    ProcessMessage(selected);
++    if (waitEvent)
++      waitEvent->Set();
++    delete selected;
++    lock.lock();
++  }
++}
++#endif
++
+ void CApplicationMessenger::ProcessMessages()
+ {
+   // process threadmessages
+--- a/xbmc/messaging/ApplicationMessenger.h
++++ b/xbmc/messaging/ApplicationMessenger.h
+@@ -382,6 +382,10 @@
+    * \brief Called from any thread to dispatch messages
+    */
+   void ProcessMessages();
++#if defined(TARGET_ANDROID)
++  // Required native lifecycle dispatch while Infinity checkpoint admission is closed.
++  void ProcessCheckpointDisplayMessages();
++#endif
+ 
+   /*!
+    * \brief Called from the UI thread to dispatch UI messages

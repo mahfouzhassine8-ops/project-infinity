@@ -1,0 +1,698 @@
+{
+  "engine_sha256": "151128c176b6094f28bb3fc716cc07c3985a9aa38f1fe41e1bb1424f0285a47e",
+  "method": "ELF64 symbol/section parsing and ARM64 direct BL immediate decoding only; no full disassembly",
+  "functions": {
+    "CApplication::Run": {
+      "address": "0x1bdd47c",
+      "size": 576,
+      "selected_instructions": [
+        {
+          "offset": 52,
+          "pc": "0x1bdd4b0",
+          "word": "0x97e356bf",
+          "kind": "BL",
+          "target": "0x14b2fac",
+          "symbols": [
+            "_ZNSt6__ndk117basic_string_viewIcNS_11char_traitsIcEEEC2EPKc"
+          ]
+        },
+        {
+          "offset": 64,
+          "pc": "0x1bdd4bc",
+          "word": "0x97e356b3",
+          "kind": "BL",
+          "target": "0x14b2f88",
+          "symbols": [
+            "_ZN4CLog3LogIJEEEviRKNSt6__ndk117basic_string_viewIcNS1_11char_traitsIcEEEEDpOT_"
+          ]
+        },
+        {
+          "offset": 72,
+          "pc": "0x1bdd4c4",
+          "word": "0x97e4aa86",
+          "kind": "BL",
+          "target": "0x1507edc",
+          "symbols": [
+            "_ZNSt6__ndk16chrono10time_pointINS0_12steady_clockENS0_8durationIxNS_5ratioILl1ELl1000000000EEEEEEC2Ev"
+          ]
+        },
+        {
+          "offset": 80,
+          "pc": "0x1bdd4cc",
+          "word": "0x94073af9",
+          "kind": "BL",
+          "target": "0x1dac0b0",
+          "symbols": [
+            "_ZN14CServiceBroker12GetAppParamsEv"
+          ]
+        },
+        {
+          "offset": 88,
+          "pc": "0x1bdd4d4",
+          "word": "0x97f95e2e",
+          "kind": "BL",
+          "target": "0x1a34d8c",
+          "symbols": [
+            "_ZNKSt6__ndk110shared_ptrI10CAppParamsEptEv"
+          ]
+        },
+        {
+          "offset": 92,
+          "pc": "0x1bdd4d8",
+          "word": "0x94001a51",
+          "kind": "BL",
+          "target": "0x1be3e1c",
+          "symbols": [
+            "_ZNK10CAppParams11GetPlaylistEv"
+          ]
+        },
+        {
+          "offset": 104,
+          "pc": "0x1bdd4e4",
+          "word": "0x97e356ef",
+          "kind": "BL",
+          "target": "0x14b30a0",
+          "symbols": [
+            "_ZNSt6__ndk110shared_ptrI10CAppParamsED2Ev"
+          ]
+        },
+        {
+          "offset": 112,
+          "pc": "0x1bdd4ec",
+          "word": "0x94063be6",
+          "kind": "BL",
+          "target": "0x1d6c484",
+          "symbols": [
+            "_ZNK13CFileItemList4SizeEv"
+          ]
+        },
+        {
+          "offset": 124,
+          "pc": "0x1bdd4f8",
+          "word": "0x94073bb2",
+          "kind": "BL",
+          "target": "0x1dac3c0",
+          "symbols": [
+            "_ZN14CServiceBroker17GetPlaylistPlayerEv"
+          ]
+        },
+        {
+          "offset": 136,
+          "pc": "0x1bdd504",
+          "word": "0x94070e5a",
+          "kind": "BL",
+          "target": "0x1da0e6c",
+          "symbols": [
+            "_ZN8PLAYLIST15CPlayListPlayer3AddEiRK13CFileItemList"
+          ]
+        },
+        {
+          "offset": 140,
+          "pc": "0x1bdd508",
+          "word": "0x94073bae",
+          "kind": "BL",
+          "target": "0x1dac3c0",
+          "symbols": [
+            "_ZN14CServiceBroker17GetPlaylistPlayerEv"
+          ]
+        },
+        {
+          "offset": 148,
+          "pc": "0x1bdd510",
+          "word": "0x94070b82",
+          "kind": "BL",
+          "target": "0x1da0318",
+          "symbols": [
+            "_ZN8PLAYLIST15CPlayListPlayer18SetCurrentPlaylistEi"
+          ]
+        },
+        {
+          "offset": 156,
+          "pc": "0x1bdd518",
+          "word": "0x94073d65",
+          "kind": "BL",
+          "target": "0x1dacaac",
+          "symbols": [
+            "_ZN14CServiceBroker15GetAppMessengerEv"
+          ]
+        },
+        {
+          "offset": 164,
+          "pc": "0x1bdd520",
+          "word": "0x97e353ee",
+          "kind": "BL",
+          "target": "0x14b24d8",
+          "symbols": [
+            "_ZNKSt6__ndk110shared_ptrIN4KODI9MESSAGING21CApplicationMessengerEEptEv"
+          ]
+        },
+        {
+          "offset": 184,
+          "pc": "0x1bdd534",
+          "word": "0x97fa1f3d",
+          "kind": "BL",
+          "target": "0x1a65228",
+          "symbols": [
+            "_ZN4KODI9MESSAGING21CApplicationMessenger7PostMsgEjiiPv"
+          ]
+        },
+        {
+          "offset": 192,
+          "pc": "0x1bdd53c",
+          "word": "0x97e35454",
+          "kind": "BL",
+          "target": "0x14b268c",
+          "symbols": [
+            "_ZNSt6__ndk110shared_ptrIN4KODI9MESSAGING21CApplicationMessengerEED2Ev"
+          ]
+        },
+        {
+          "offset": 248,
+          "pc": "0x1bdd574",
+          "word": "0x97e1a9f7",
+          "kind": "BL",
+          "target": "0x1447d50",
+          "symbols": []
+        },
+        {
+          "offset": 280,
+          "pc": "0x1bdd594",
+          "word": "0x97e353ab",
+          "kind": "BL",
+          "target": "0x14b2440",
+          "symbols": [
+            "_ZN19CComponentContainerI21IApplicationComponentE12GetComponentI25CApplicationPowerHandlingEENSt6__ndk110shared_ptrIT_EEv"
+          ]
+        },
+        {
+          "offset": 288,
+          "pc": "0x1bdd59c",
+          "word": "0x97e353c2",
+          "kind": "BL",
+          "target": "0x14b24a4",
+          "symbols": [
+            "_ZNKSt6__ndk110shared_ptrI25CApplicationPowerHandlingEptEv"
+          ]
+        },
+        {
+          "offset": 292,
+          "pc": "0x1bdd5a0",
+          "word": "0x940019e5",
+          "kind": "BL",
+          "target": "0x1be3d34",
+          "symbols": [
+            "_ZNK25CApplicationPowerHandling12GetRenderGUIEv"
+          ]
+        },
+        {
+          "offset": 304,
+          "pc": "0x1bdd5ac",
+          "word": "0x97e353c0",
+          "kind": "BL",
+          "target": "0x14b24ac",
+          "symbols": [
+            "_ZNSt6__ndk110shared_ptrI25CApplicationPowerHandlingED2Ev"
+          ]
+        },
+        {
+          "offset": 352,
+          "pc": "0x1bdd5dc",
+          "word": "0x97e1a9dd",
+          "kind": "BL",
+          "target": "0x1447d50",
+          "symbols": []
+        },
+        {
+          "offset": 368,
+          "pc": "0x1bdd5ec",
+          "word": "0x97e3a277",
+          "kind": "BL",
+          "target": "0x14c5fc8",
+          "symbols": [
+            "_ZNSt6__ndk16chronomiINS0_12steady_clockENS0_8durationIxNS_5ratioILl1ELl1000000000EEEEES6_EENS_11common_typeIJT0_T1_EE4typeERKNS0_10time_pointIT_S8_EERKNSC_ISD_S9_EE"
+          ]
+        },
+        {
+          "offset": 380,
+          "pc": "0x1bdd5f8",
+          "word": "0x97e390da",
+          "kind": "BL",
+          "target": "0x14c1960",
+          "symbols": [
+            "_ZNSt6__ndk16chrono13duration_castINS0_8durationIxNS_5ratioILl1ELl1000EEEEExNS3_ILl1ELl1000000000EEEEENS_9enable_ifIXsr13__is_durationIT_EE5valueES8_E4typeERKNS2_IT0_T1_EE"
+          ]
+        },
+        {
+          "offset": 392,
+          "pc": "0x1bdd604",
+          "word": "0x97e390ec",
+          "kind": "BL",
+          "target": "0x14c19b4",
+          "symbols": [
+            "_ZNKSt6__ndk16chrono8durationIxNS_5ratioILl1ELl1000EEEE5countEv"
+          ]
+        },
+        {
+          "offset": 408,
+          "pc": "0x1bdd614",
+          "word": "0x97e390e8",
+          "kind": "BL",
+          "target": "0x14c19b4",
+          "symbols": [
+            "_ZNKSt6__ndk16chrono8durationIxNS_5ratioILl1ELl1000EEEE5countEv"
+          ]
+        },
+        {
+          "offset": 432,
+          "pc": "0x1bdd62c",
+          "word": "0x97e369a4",
+          "kind": "BL",
+          "target": "0x14b7cbc",
+          "symbols": [
+            "_ZNSt6__ndk16chrono8durationIxNS_5ratioILl1ELl1000EEEEC2IxEERKT_PNS_9enable_ifIXaasr14is_convertibleIS6_xEE5valueooL_ZNS_17integral_constantIbLb0EE5valueEEntsr23treat_as_floating_pointIS6_EE5valueEvE4typeE"
+          ]
+        },
+        {
+          "offset": 436,
+          "pc": "0x1bdd630",
+          "word": "0xf94007e0",
+          "kind": "raw instruction near reported return PC"
+        },
+        {
+          "offset": 440,
+          "pc": "0x1bdd634",
+          "word": "0x97e8f34b",
+          "kind": "BL",
+          "target": "0x161a360",
+          "symbols": [
+            "_ZN4KODI4TIME5SleepIxNSt6__ndk15ratioILl1ELl1000EEEEEvNS2_6chrono8durationIT_T0_EE"
+          ]
+        },
+        {
+          "offset": 444,
+          "pc": "0x1bdd638",
+          "word": "0x39488268",
+          "kind": "raw instruction near reported return PC"
+        },
+        {
+          "offset": 456,
+          "pc": "0x1bdd644",
+          "word": "0x9400001e",
+          "kind": "BL",
+          "target": "0x1bdd6bc",
+          "symbols": [
+            "_ZN12CApplication7CleanupEv"
+          ]
+        },
+        {
+          "offset": 472,
+          "pc": "0x1bdd654",
+          "word": "0x97e35656",
+          "kind": "BL",
+          "target": "0x14b2fac",
+          "symbols": [
+            "_ZNSt6__ndk117basic_string_viewIcNS_11char_traitsIcEEEC2EPKc"
+          ]
+        },
+        {
+          "offset": 484,
+          "pc": "0x1bdd660",
+          "word": "0x97e3564a",
+          "kind": "BL",
+          "target": "0x14b2f88",
+          "symbols": [
+            "_ZN4CLog3LogIJEEEviRKNSt6__ndk117basic_string_viewIcNS1_11char_traitsIcEEEEDpOT_"
+          ]
+        },
+        {
+          "offset": 532,
+          "pc": "0x1bdd690",
+          "word": "0x97e1a470",
+          "kind": "BL",
+          "target": "0x1446850",
+          "symbols": []
+        },
+        {
+          "offset": 544,
+          "pc": "0x1bdd69c",
+          "word": "0x97e353fc",
+          "kind": "BL",
+          "target": "0x14b268c",
+          "symbols": [
+            "_ZNSt6__ndk110shared_ptrIN4KODI9MESSAGING21CApplicationMessengerEED2Ev"
+          ]
+        },
+        {
+          "offset": 552,
+          "pc": "0x1bdd6a4",
+          "word": "0x9496503f",
+          "kind": "BL",
+          "target": "0x41717a0",
+          "symbols": [
+            "_Unwind_Resume"
+          ]
+        },
+        {
+          "offset": 564,
+          "pc": "0x1bdd6b0",
+          "word": "0x97e3567c",
+          "kind": "BL",
+          "target": "0x14b30a0",
+          "symbols": [
+            "_ZNSt6__ndk110shared_ptrI10CAppParamsED2Ev"
+          ]
+        },
+        {
+          "offset": 572,
+          "pc": "0x1bdd6b8",
+          "word": "0x9496503a",
+          "kind": "BL",
+          "target": "0x41717a0",
+          "symbols": [
+            "_Unwind_Resume"
+          ]
+        }
+      ]
+    },
+    "CApplication::Process": {
+      "address": "0x1be163c",
+      "size": 324,
+      "selected_instructions": [
+        {
+          "offset": 36,
+          "pc": "0x1be1660",
+          "word": "0x941ffe4b",
+          "kind": "BL",
+          "target": "0x23e0f8c",
+          "symbols": [
+            "_ZN25InfinityAndroidCheckpoint8IsActiveEv"
+          ]
+        },
+        {
+          "offset": 48,
+          "pc": "0x1be166c",
+          "word": "0x942017d8",
+          "kind": "BL",
+          "target": "0x23e75cc",
+          "symbols": [
+            "_ZN25InfinityAndroidCheckpoint4PumpER12CApplication"
+          ]
+        },
+        {
+          "offset": 56,
+          "pc": "0x1be1674",
+          "word": "0x94072c5b",
+          "kind": "BL",
+          "target": "0x1dac7e0",
+          "symbols": [
+            "_ZN14CServiceBroker6GetGUIEv"
+          ]
+        },
+        {
+          "offset": 60,
+          "pc": "0x1be1678",
+          "word": "0x97fb731a",
+          "kind": "BL",
+          "target": "0x1abe2e0",
+          "symbols": [
+            "_ZN13CGUIComponent16GetWindowManagerEv"
+          ]
+        },
+        {
+          "offset": 64,
+          "pc": "0x1be167c",
+          "word": "0x97fd9b1f",
+          "kind": "BL",
+          "target": "0x1b482f8",
+          "symbols": [
+            "_ZN17CGUIWindowManager22DispatchThreadMessagesEv"
+          ]
+        },
+        {
+          "offset": 72,
+          "pc": "0x1be1684",
+          "word": "0x94072d0a",
+          "kind": "BL",
+          "target": "0x1dacaac",
+          "symbols": [
+            "_ZN14CServiceBroker15GetAppMessengerEv"
+          ]
+        },
+        {
+          "offset": 80,
+          "pc": "0x1be168c",
+          "word": "0x97e34393",
+          "kind": "BL",
+          "target": "0x14b24d8",
+          "symbols": [
+            "_ZNKSt6__ndk110shared_ptrIN4KODI9MESSAGING21CApplicationMessengerEEptEv"
+          ]
+        },
+        {
+          "offset": 84,
+          "pc": "0x1be1690",
+          "word": "0x97fa0f81",
+          "kind": "BL",
+          "target": "0x1a65494",
+          "symbols": [
+            "_ZN4KODI9MESSAGING21CApplicationMessenger21ProcessWindowMessagesEv"
+          ]
+        },
+        {
+          "offset": 92,
+          "pc": "0x1be1698",
+          "word": "0x97e343fd",
+          "kind": "BL",
+          "target": "0x14b268c",
+          "symbols": [
+            "_ZNSt6__ndk110shared_ptrIN4KODI9MESSAGING21CApplicationMessengerEED2Ev"
+          ]
+        },
+        {
+          "offset": 96,
+          "pc": "0x1be169c",
+          "word": "0x94072bd2",
+          "kind": "BL",
+          "target": "0x1dac5e4",
+          "symbols": [
+            "_ZN14CServiceBroker12GetWinSystemEv"
+          ]
+        },
+        {
+          "offset": 120,
+          "pc": "0x1be16b4",
+          "word": "0x97e8e4e4",
+          "kind": "BL",
+          "target": "0x161aa44",
+          "symbols": [
+            "_ZN11CSingleExitC2ER16CCriticalSection"
+          ]
+        },
+        {
+          "offset": 132,
+          "pc": "0x1be16c0",
+          "word": "0x97e380f2",
+          "kind": "BL",
+          "target": "0x14c1a88",
+          "symbols": [
+            "_ZN11XbmcThreads16CountingLockableINS_15CRecursiveMutexEE6unlockEv"
+          ]
+        },
+        {
+          "offset": 136,
+          "pc": "0x1be16c4",
+          "word": "0x9417f254",
+          "kind": "BL",
+          "target": "0x21de014",
+          "symbols": [
+            "_ZN24CScriptInvocationManager11GetInstanceEv"
+          ]
+        },
+        {
+          "offset": 140,
+          "pc": "0x1be16c8",
+          "word": "0x9417f277",
+          "kind": "BL",
+          "target": "0x21de0a4",
+          "symbols": [
+            "_ZN24CScriptInvocationManager7ProcessEv"
+          ]
+        },
+        {
+          "offset": 148,
+          "pc": "0x1be16d0",
+          "word": "0x97e37edc",
+          "kind": "BL",
+          "target": "0x14c1240",
+          "symbols": [
+            "_ZN11XbmcThreads16CountingLockableINS_15CRecursiveMutexEE4lockEv"
+          ]
+        },
+        {
+          "offset": 156,
+          "pc": "0x1be16d8",
+          "word": "0x97e8e4e7",
+          "kind": "BL",
+          "target": "0x161aa74",
+          "symbols": [
+            "_ZN11CSingleExitD2Ev"
+          ]
+        },
+        {
+          "offset": 164,
+          "pc": "0x1be16e0",
+          "word": "0x94072cf3",
+          "kind": "BL",
+          "target": "0x1dacaac",
+          "symbols": [
+            "_ZN14CServiceBroker15GetAppMessengerEv"
+          ]
+        },
+        {
+          "offset": 172,
+          "pc": "0x1be16e8",
+          "word": "0x97e3437c",
+          "kind": "BL",
+          "target": "0x14b24d8",
+          "symbols": [
+            "_ZNKSt6__ndk110shared_ptrIN4KODI9MESSAGING21CApplicationMessengerEEptEv"
+          ]
+        },
+        {
+          "offset": 176,
+          "pc": "0x1be16ec",
+          "word": "0x97fa0f29",
+          "kind": "BL",
+          "target": "0x1a65390",
+          "symbols": [
+            "_ZN4KODI9MESSAGING21CApplicationMessenger15ProcessMessagesEv"
+          ]
+        },
+        {
+          "offset": 184,
+          "pc": "0x1be16f4",
+          "word": "0x97e343e6",
+          "kind": "BL",
+          "target": "0x14b268c",
+          "symbols": [
+            "_ZNSt6__ndk110shared_ptrIN4KODI9MESSAGING21CApplicationMessengerEED2Ev"
+          ]
+        },
+        {
+          "offset": 204,
+          "pc": "0x1be1708",
+          "word": "0x97fb45bd",
+          "kind": "BL",
+          "target": "0x1ab2dfc",
+          "symbols": [
+            "_ZNK10CStopWatch22GetElapsedMillisecondsEv"
+          ]
+        },
+        {
+          "offset": 228,
+          "pc": "0x1be1720",
+          "word": "0x97f55f13",
+          "kind": "BL",
+          "target": "0x193936c",
+          "symbols": [
+            "_ZN10CStopWatch5ResetEv"
+          ]
+        },
+        {
+          "offset": 236,
+          "pc": "0x1be1728",
+          "word": "0x94000016",
+          "kind": "BL",
+          "target": "0x1be1780",
+          "symbols": [
+            "_ZN12CApplication11ProcessSlowEv"
+          ]
+        },
+        {
+          "offset": 276,
+          "pc": "0x1be1750",
+          "word": "0x97e19440",
+          "kind": "BL",
+          "target": "0x1446850",
+          "symbols": []
+        },
+        {
+          "offset": 292,
+          "pc": "0x1be1760",
+          "word": "0x97e343cb",
+          "kind": "BL",
+          "target": "0x14b268c",
+          "symbols": [
+            "_ZNSt6__ndk110shared_ptrIN4KODI9MESSAGING21CApplicationMessengerEED2Ev"
+          ]
+        },
+        {
+          "offset": 300,
+          "pc": "0x1be1768",
+          "word": "0x9496400e",
+          "kind": "BL",
+          "target": "0x41717a0",
+          "symbols": [
+            "_Unwind_Resume"
+          ]
+        },
+        {
+          "offset": 312,
+          "pc": "0x1be1774",
+          "word": "0x97e8e4c0",
+          "kind": "BL",
+          "target": "0x161aa74",
+          "symbols": [
+            "_ZN11CSingleExitD2Ev"
+          ]
+        },
+        {
+          "offset": 320,
+          "pc": "0x1be177c",
+          "word": "0x94964009",
+          "kind": "BL",
+          "target": "0x41717a0",
+          "symbols": [
+            "_Unwind_Resume"
+          ]
+        }
+      ]
+    },
+    "CApplication::OnApplicationMessage": {
+      "address": "0x1bdb20c",
+      "size": 4620,
+      "selected_instructions": [
+        {
+          "offset": 56,
+          "pc": "0x1bdb244",
+          "word": "0x94201752",
+          "kind": "BL",
+          "target": "0x23e0f8c",
+          "symbols": [
+            "_ZN25InfinityAndroidCheckpoint8IsActiveEv"
+          ]
+        },
+        {
+          "offset": 88,
+          "pc": "0x1bdb264",
+          "word": "0x9407443b",
+          "kind": "BL",
+          "target": "0x1dac350",
+          "symbols": [
+            "_ZN14CServiceBroker13GetPVRManagerEv"
+          ]
+        },
+        {
+          "offset": 92,
+          "pc": "0x1bdb268",
+          "word": "0x97f4b53f",
+          "kind": "BL",
+          "target": "0x1908764",
+          "symbols": [
+            "_ZN3PVR11CPVRManager3GetINS_29CPVRGUIActionsPowerManagementEEERT_v"
+          ]
+        }
+      ]
+    }
+  }
+}

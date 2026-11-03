@@ -1,0 +1,60 @@
+{
+  "Process": [
+    {
+      "offset": 36,
+      "instruction": "0x941ffe4b"
+    },
+    {
+      "offset": 40,
+      "instruction": "0x36000080",
+      "kind": "TBZ",
+      "register": 0,
+      "bit": 0,
+      "target_offset": 56
+    },
+    {
+      "offset": 44,
+      "instruction": "0xaa1303e0"
+    },
+    {
+      "offset": 48,
+      "instruction": "0x942017d8"
+    },
+    {
+      "offset": 52,
+      "instruction": "0x1400002f",
+      "kind": "B",
+      "target_offset": 240
+    }
+  ],
+  "OnApplicationMessage": [
+    {
+      "offset": 56,
+      "instruction": "0x94201752"
+    },
+    {
+      "offset": 60,
+      "instruction": "0x37006f20",
+      "kind": "TBNZ",
+      "register": 0,
+      "bit": 0,
+      "target_offset": 3616
+    },
+    {
+      "offset": 64,
+      "instruction": "0xb9400288"
+    },
+    {
+      "offset": 68,
+      "instruction": "0x528003c9"
+    },
+    {
+      "offset": 72,
+      "instruction": "0x72a80009"
+    },
+    {
+      "offset": 76,
+      "instruction": "0x6b09011f"
+    }
+  ]
+}

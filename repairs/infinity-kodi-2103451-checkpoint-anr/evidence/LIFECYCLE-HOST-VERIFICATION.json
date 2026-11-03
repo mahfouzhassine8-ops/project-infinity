@@ -1,0 +1,112 @@
+{
+  "purpose": "isolated checkpoint lifecycle repair host verification",
+  "compiler": [
+    "g++",
+    "-std=c++17",
+    "-pthread",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-DTARGET_ANDROID",
+    "/tmp/kodi451-p0-lifecycle-host/lifecycle.cpp",
+    "-o",
+    "/tmp/kodi451-p0-lifecycle-host/lifecycle"
+  ],
+  "cases": [
+    {
+      "case": "synchronous-display",
+      "status": "HOST_PASS",
+      "exit_code": 0,
+      "output": "HOST_PASS synchronous-display; native window and EGL are stubbed\n"
+    },
+    {
+      "case": "ack-after-handler",
+      "status": "HOST_PASS",
+      "exit_code": 0,
+      "output": "HOST_PASS ack-after-handler; native window and EGL are stubbed\n"
+    },
+    {
+      "case": "unrelated-fifo",
+      "status": "HOST_PASS",
+      "exit_code": 0,
+      "output": "HOST_PASS unrelated-fifo; native window and EGL are stubbed\n"
+    },
+    {
+      "case": "wrong-thread",
+      "status": "HOST_PASS",
+      "exit_code": 0,
+      "output": "HOST_PASS wrong-thread; native window and EGL are stubbed\n"
+    },
+    {
+      "case": "inactive-normal",
+      "status": "HOST_PASS",
+      "exit_code": 0,
+      "output": "HOST_PASS inactive-normal; native window and EGL are stubbed\n"
+    },
+    {
+      "case": "ordered-bounded-burst",
+      "status": "HOST_PASS",
+      "exit_code": 0,
+      "output": "HOST_PASS ordered-bounded-burst; native window and EGL are stubbed\n"
+    },
+    {
+      "case": "stopped-cleanup",
+      "status": "HOST_PASS",
+      "exit_code": 0,
+      "output": "HOST_PASS stopped-cleanup; native window and EGL are stubbed\n"
+    }
+  ],
+  "unchanged_method_sha256": {
+    "void CApplicationMessenger::Cleanup()": "560720dc5fc9fced42cb977ccf9fca5b0f658109fbd14ae82d0ecffc26650345",
+    "int CApplicationMessenger::SendMsg(ThreadMessage&& message, bool wait)": "24a8ef4d706a98b5a2087cb762412111471299282b9f5dbd9daf3d4c7db1fbf9",
+    "void CApplicationMessenger::ProcessMessages()": "8a7319b53f3e2b19ea210a23ccce81b58b810a083819097c428fbba6828fd951",
+    "void CApplicationMessenger::ProcessWindowMessages()": "16bf87ed90eea37adf1be1e052e65e7a2aa54302b54851a6f4e12a88c885690f",
+    "void CApplicationMessenger::ProcessMessage(": "11aacfa6324c3f91c744acf9de602a2bb7b06e24781485bb85372d610a49b5ac",
+    "bool CApplicationMessenger::IsProcessThread() const": "3ea167d711cf3a5d35b840aa1098a2668ae17bb2e437257002bd02f8ade40eae",
+    "int CApplication::Run()": "66518dc712fd44b0b49e9cee7fdb8187b4cf59c7c9d971619becf7d86f67d3c9",
+    "bool CApplication::Stop(": "9a7868c850ff2377926e4062d1ab9f5a90f738c54a7539418bc05dd8446e79fb",
+    "bool CApplication::Cleanup()": "205e524ed67509ef557a2aa7dd16105276ed749863f526ae0f6f24ae275435d8",
+    "void CApplication::FrameMove(": "b3a1a3dd82b4066f828e66893c36ed9579bc58a41ac9f90998a55175b63d7e2e",
+    "void CApplication::StopPlaying()": "1997b6fb29e3b9a4a8e7d7164c6331e2fb77e07adaf82dc26421e61e4949f1ca",
+    "bool CApplication::PlayFile(": "c8dfd3b23c4bd5a03a399534147d9f0e81ed1ea108cbb3631c6029ffdb245252",
+    "bool CApplication::PlayMedia(": "663af4717a07aa498466678e6213af7c18313637d85902e9df667834e6155937"
+  },
+  "source_delta": {
+    "kind": "staged checkpoint-only native display dispatch correction",
+    "before": {
+      "xbmc/application/Application.cpp": "fb5167b4fd7cb7fa16357fe367c9d212ae9440b4821870e4fd2d90018d9b4356",
+      "xbmc/messaging/ApplicationMessenger.cpp": "e998192278d6f5d99783647a1f16a4fdb71be791a826cbe4b5db31b67b2e50a5",
+      "xbmc/messaging/ApplicationMessenger.h": "c89c0b7c5cf53349ac6c739b9d6f3365a40ddcf4fdbf8c4cc438b52c561fa251"
+    },
+    "after": {
+      "xbmc/application/Application.cpp": "d266a16ef3f56ee91ce82c8e7e1da9a868d853b22b48e773cad3b1e24331f307",
+      "xbmc/messaging/ApplicationMessenger.cpp": "c565bf9dad1f5dcbdca3d81a6d3dc5a42c4d8fd8151dac2f20766caaeb4ef0c8",
+      "xbmc/messaging/ApplicationMessenger.h": "2326742d7bb60b46a8b3521542445c2d3109cefab15ff105423731b78b7367ec"
+    },
+    "changed_methods": [
+      "CApplication::Process checkpoint branch",
+      "CApplication::OnApplicationMessage checkpoint guard",
+      "CApplicationMessenger::ProcessCheckpointDisplayMessages (new, Android only)"
+    ],
+    "unchanged_message_methods": [
+      "SendMsg",
+      "Cleanup",
+      "ProcessMessages",
+      "ProcessWindowMessages",
+      "ProcessMessage",
+      "Stop"
+    ],
+    "queue_payloads_or_waiters_discarded": false,
+    "persistence_or_termination_authorization_changed": false,
+    "normal_noncheckpoint_dispatch_changed": false,
+    "full_native_source_map_verified": false,
+    "android_verified": false,
+    "apk_built_or_signed": false
+  },
+  "real_sender_wait_and_consumer_threads": true,
+  "GUI_and_native_window_peers_stubbed": true,
+  "android_execution": false,
+  "physical_fold_acceptance": false,
+  "watched_job_persistence_repaired": false,
+  "apk_built_or_signed": false
+}

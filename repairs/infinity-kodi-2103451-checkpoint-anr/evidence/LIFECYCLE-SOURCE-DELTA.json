@@ -1,0 +1,32 @@
+{
+  "kind": "staged checkpoint-only native display dispatch correction",
+  "before": {
+    "xbmc/application/Application.cpp": "fb5167b4fd7cb7fa16357fe367c9d212ae9440b4821870e4fd2d90018d9b4356",
+    "xbmc/messaging/ApplicationMessenger.cpp": "e998192278d6f5d99783647a1f16a4fdb71be791a826cbe4b5db31b67b2e50a5",
+    "xbmc/messaging/ApplicationMessenger.h": "c89c0b7c5cf53349ac6c739b9d6f3365a40ddcf4fdbf8c4cc438b52c561fa251"
+  },
+  "after": {
+    "xbmc/application/Application.cpp": "d266a16ef3f56ee91ce82c8e7e1da9a868d853b22b48e773cad3b1e24331f307",
+    "xbmc/messaging/ApplicationMessenger.cpp": "c565bf9dad1f5dcbdca3d81a6d3dc5a42c4d8fd8151dac2f20766caaeb4ef0c8",
+    "xbmc/messaging/ApplicationMessenger.h": "2326742d7bb60b46a8b3521542445c2d3109cefab15ff105423731b78b7367ec"
+  },
+  "changed_methods": [
+    "CApplication::Process checkpoint branch",
+    "CApplication::OnApplicationMessage checkpoint guard",
+    "CApplicationMessenger::ProcessCheckpointDisplayMessages (new, Android only)"
+  ],
+  "unchanged_message_methods": [
+    "SendMsg",
+    "Cleanup",
+    "ProcessMessages",
+    "ProcessWindowMessages",
+    "ProcessMessage",
+    "Stop"
+  ],
+  "queue_payloads_or_waiters_discarded": false,
+  "persistence_or_termination_authorization_changed": false,
+  "normal_noncheckpoint_dispatch_changed": false,
+  "full_native_source_map_verified": false,
+  "android_verified": false,
+  "apk_built_or_signed": false
+}

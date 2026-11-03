@@ -1,0 +1,101 @@
+{
+  "purpose": "source-bound baseline failure reproduction",
+  "cases": [
+    {
+      "case": "watched-unknown-completion",
+      "command": [
+        "/tmp/kodi451-p0-host/watched"
+      ],
+      "compiler": [
+        "g++",
+        "-std=c++17",
+        "-DTARGET_ANDROID",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unused-parameter",
+        "-pthread",
+        "-I",
+        "/tmp/kodi451-p0-host/source/xbmc",
+        "/tmp/kodi451-p0-host/watched.cpp",
+        "-o",
+        "/tmp/kodi451-p0-host/watched"
+      ],
+      "status": "BASELINE_DEFECT_REPRODUCED",
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "case": "failed-dispatch",
+      "command": [
+        "/tmp/kodi451-p0-host/lifecycle",
+        "failed-dispatch"
+      ],
+      "compiler": [
+        "g++",
+        "-std=c++17",
+        "-DTARGET_ANDROID",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unused-parameter",
+        "-pthread",
+        "-I",
+        "/tmp/kodi451-p0-host/source/xbmc",
+        "/tmp/kodi451-p0-host/lifecycle.cpp",
+        "-o",
+        "/tmp/kodi451-p0-host/lifecycle"
+      ],
+      "status": "BASELINE_DEFECT_REPRODUCED",
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "case": "message-rejection",
+      "command": [
+        "/tmp/kodi451-p0-host/lifecycle",
+        "message-rejection"
+      ],
+      "compiler": [
+        "g++",
+        "-std=c++17",
+        "-DTARGET_ANDROID",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-Wno-unused-parameter",
+        "-pthread",
+        "-I",
+        "/tmp/kodi451-p0-host/source/xbmc",
+        "/tmp/kodi451-p0-host/lifecycle.cpp",
+        "-o",
+        "/tmp/kodi451-p0-host/lifecycle"
+      ],
+      "status": "BASELINE_DEFECT_REPRODUCED",
+      "exit_code": 0,
+      "output": ""
+    }
+  ],
+  "source_sha256": {
+    "repairs/android-checkpoint-shutdown/runtime/native/overlay/xbmc/utils/Job.h": "3c4433e98f3fd4a34375a4a637d0a681a137752f14e7e6c3c0e18cf420dd0436",
+    "repairs/android-checkpoint-shutdown/runtime/native/overlay/xbmc/utils/JobManager.h": "bad01292a7ea1e8c650db3286f6ae9aa8d1e8da23ff03e7e4ec8765bdbe58641",
+    "repairs/android-checkpoint-shutdown/runtime/native/overlay/xbmc/utils/JobManager.cpp": "3db886aa40c3cb0d77a0a42d197be6e2bbe3aaf6e3ec27777ea5aa49640756be",
+    "repairs/android-checkpoint-shutdown/runtime/native/overlay/xbmc/platform/android/activity/InfinityAndroidCheckpoint.cpp": "e2997a2a3ee58ad92d0835ee1031920e587bdd5b97d07274ebfdee553b26acdc",
+    "repairs/essential-first-2103377/runtime/xbmc/utils/JobCheckpoint.h": "ecda8b68872b2e5cc873fd43580e8772f126913dba605c03a11d3abb2345c939",
+    "reconstructed_JobManager.cpp": "7c51c1329b5867a9b89924e0da0cd68ad8b8ab91c3664b152362f00375c6dced",
+    "pinned_upstream/xbmc/video/jobs/VideoLibraryJob.h": "40ae24d0709b6b9a3293ae4d7d6529fc77fb15a8439331c23dc29f54d7eaab49",
+    "pinned_upstream/xbmc/video/jobs/VideoLibraryMarkWatchedJob.h": "be989bc5d0fca626c5c43d2e3ca9273fad6c0e25162ee2f49399bfbecf7d429d",
+    "repairs/android-checkpoint-shutdown/runtime/native/overlay/xbmc/application/Application.cpp": "3f064f1a6dd941d78c1a58383b29fce8c0c553ed5cb030e319c9955c4ae4be06"
+  },
+  "production_files_modified": false,
+  "real_database_operations": false,
+  "android_execution": false,
+  "physical_fold_acceptance": false,
+  "repairs_implemented": false,
+  "exact_final_native_source_map_recovered": false,
+  "limitations": [
+    "Work and DB boundaries are stubbed; no durability success is asserted.",
+    "Lifecycle probes compile exact early branches with controlled peers, not the whole application.",
+    "Final native source-map provenance, full diagnostics access and Android runtime verification remain open."
+  ]
+}

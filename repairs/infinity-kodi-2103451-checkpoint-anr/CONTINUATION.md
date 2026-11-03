@@ -137,6 +137,25 @@ publish private diagnostics, or claim the archive has been inspected.
 
 ## Current release status
 
-**BLOCKED — actual November 3 evidence access.** Execution access and branch backup
-have been restored. Both requested repairs, focused runtime verification and
-successor signing remain unperformed; no PASS or delivery is implied.
+Execution and branch backup are restored. A separate private reader has now
+supplied CRC/hash-verified November 3 observations; see CORROBORATED-EVIDENCE.md.
+This executor still has not accessed the original diagnostic archive.
+
+Three bounded source-bound host reproductions and read-only inspection of an
+exact-hash retained native member now corroborate the missing-contract and
+checkpoint/display-message starvation mechanisms. See MECHANISM-FINDINGS.md and
+the bounded evidence JSON. These are BASELINE_DEFECT_REPRODUCED results, not
+repaired-runtime passes.
+
+A checkpoint-only lifecycle correction is now implemented as a guarded staging
+producer, with exact three-file preimages and a reviewed source patch. Seven
+selected host cases passed using actual sender/queue bodies and corrected
+application branches, with native-window/EGL boundaries stubbed. Existing sender,
+cleanup and normal-dispatch methods plus seven unrelated Application methods
+were byte-compared unchanged. This is not full-engine integration or Android
+verification. See evidence/LIFECYCLE-HOST-VERIFICATION.json and the reviewed patch.
+
+**Release blocked:** reviewed watched-job persistence-contract correction,
+lifecycle repair integration, final native source-map provenance, full signed-451
+APK access and Android runtime verification remain outstanding. No successor
+build/signing or automatic lock is implied by the host results.
