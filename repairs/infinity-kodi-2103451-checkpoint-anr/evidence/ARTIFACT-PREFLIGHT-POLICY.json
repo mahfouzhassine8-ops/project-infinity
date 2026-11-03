@@ -2,10 +2,11 @@
   "selected_command": "PYTHONDONTWRITEBYTECODE=1 python3 repairs/infinity-kodi-2103451-checkpoint-anr/test_artifact_preflight.py",
   "passed_cases": 3,
   "source_sha256": {
-    ".github/workflows/infinity-kodi451-p0-input-preflight.yml": "5dfbb92f5ec585d742d0dd8541285023d6720ad9ce13882c6cd4dfb30430da50",
-    "repairs/infinity-kodi-2103451-checkpoint-anr/artifact_preflight.py": "0b3cbda4f9428598e359de41f3872b25193a9e5225c9f58cb91ad425cfd337f2",
+    ".github/workflows/infinity-kodi451-p0-input-preflight.yml": "d66448126540777881af8594b408aef02d3cc026da1d5464d01db5ee0e326cbe",
+    "repairs/infinity-kodi-2103451-checkpoint-anr/artifact_preflight.py": "49f876d03bbf22a7bd5883fc1fef7cefa96b3ec4f8e14ea5944f965975fcd3dd",
     "repairs/infinity-kodi-2103451-checkpoint-anr/test_artifact_preflight.py": "11b9f26b0bc4362f6ba579e22d94c1bccab2c90c00b77ff0beb1654b084ff148"
   },
   "application_tests_run": false,
-  "signing_secrets_used": false
+  "signing_secrets_used": false,
+  "reason_for_recheck": "Correct documented default-Python3.10 mismatch using approved existing release tools"
 }

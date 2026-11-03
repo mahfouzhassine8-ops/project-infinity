@@ -49,3 +49,17 @@ No signing secrets or private diagnostic archive may be uploaded in its report.
 The historical watched-job item route remains UNKNOWN until actual evidence or
 a supported runtime observation identifies it; source recovery does not supply
 that missing event attribution.
+
+## First actual run and targeted environment correction
+
+Run 41725221213 securely retrieved the three exact signed451/components/native
+artifacts through the official downloader. Verification stopped before hashing
+the APK because default Python 3.10 has no hashlib.file_digest. No signature or
+native-source verification PASS was recorded. No app or signing key was used.
+
+Restore the already approved release versions (Python 3.12, Temurin 21 and
+build-tools 35.0.0) via the same existing official setup actions, then require
+their readiness before downloads. Rerun only the three preflight policy cases
+because infrastructure source changed. A subsequent read-only Actions run is
+selected for this specific environment correction; no 14+7 application-source
+host cases or known-broken emulator are repeated.

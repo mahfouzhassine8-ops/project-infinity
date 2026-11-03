@@ -88,6 +88,10 @@ def one(root, filename):
 def metadata(out):
     require(os.environ.get('GITHUB_REPOSITORY') == REPO, 'Wrong repository authority')
     require(os.environ.get('GITHUB_REF') == 'refs/heads/' + BRANCH, 'Wrong P0 branch')
+    require(sys.version_info >= (3, 11), 'Restore the approved release Python before downloading inputs')
+    sdk = Path(os.environ.get('ANDROID_HOME', '/nonexistent')) / 'build-tools/35.0.0'
+    require((sdk / 'apksigner').is_file() and shutil.which('java') is not None,
+            'Approved signature-verification tools unavailable before input transfer')
     request = json.loads((HERE / 'ARTIFACT-PREFLIGHT-REQUEST.json').read_text())
     require(request['operation'] == 'restore-verified-kodi451-inputs' and request['branch'] == BRANCH,
             'Wrong input-recovery request')
@@ -243,6 +247,8 @@ def capabilities(out):
     images = sorted(str(p.relative_to(sdk)) for p in (sdk / 'system-images').glob('*/*/*') if p.is_dir())
     save(out / 'RUNNER-CAPABILITIES.json', {
         'host_arch': platform.machine(), 'kvm_exposed': Path('/dev/kvm').exists(),
+        'python_version': platform.python_version(),
+        'approved_apksigner_available': (sdk / 'build-tools/35.0.0/apksigner').is_file(),
         'adb_available': shutil.which('adb') is not None or (sdk / 'platform-tools/adb').exists(),
         'emulator_available': (sdk / 'emulator/emulator').exists(), 'installed_system_images': images,
         'emulator_launched': False, 'application_run': False,
