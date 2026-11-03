@@ -1,0 +1,184 @@
+{
+  "status": "FAIL",
+  "checks": [
+    {
+      "check": "fresh_fixture_install",
+      "name": "candidate",
+      "seconds": 71.64812886499999,
+      "sha256": "e576b78ffa18b646d45912081f3d9e748c830e87257b7a6c74b083b9b3d6cf3d"
+    },
+    {
+      "check": "fresh_fixture_install",
+      "name": "source",
+      "seconds": 2.254594011999984,
+      "sha256": "8115c2a78ad11d02cfe3b8bbda126af11645f05e87116ae99c3bb203eb99c084"
+    },
+    {
+      "check": "fresh_persistent_OS_observer",
+      "sha256": "d9126272432e675f0c1e506cf8bfc48a2634c69ca603f28cbc5b763a3f486da0"
+    },
+    {
+      "check": "real_touch",
+      "label": "Open A",
+      "bounds": [
+        0,
+        51,
+        1080,
+        177
+      ]
+    },
+    {
+      "check": "platform_notice_dismissed",
+      "window": "15",
+      "bounds": [
+        463,
+        2262,
+        631,
+        2404
+      ],
+      "button": "OK"
+    },
+    {
+      "check": "no_kodi_process",
+      "kodi_pid": "",
+      "external_pid": "7953"
+    },
+    {
+      "check": "actual_video_decoded",
+      "title": "a.mp4",
+      "color_samples": 90
+    },
+    {
+      "check": "actual_media_clock_advances",
+      "before": 4,
+      "after": 5
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        1578,
+        1040,
+        1762
+      ],
+      "start": [
+        795,
+        1670
+      ],
+      "end": [
+        305,
+        1670
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Display",
+      "bounds": [
+        1009,
+        1601,
+        1040,
+        1738
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Appearance",
+      "bounds": [
+        84,
+        1669,
+        524,
+        1800
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Light",
+      "bounds": [
+        70,
+        1184,
+        1010,
+        1310
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Done",
+      "bounds": [
+        556,
+        1669,
+        996,
+        1800
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Display",
+      "bounds": [
+        1009,
+        1601,
+        1040,
+        1738
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Done",
+      "bounds": [
+        556,
+        1669,
+        996,
+        1800
+      ]
+    },
+    {
+      "check": "real_control_strip_swipe",
+      "bounds": [
+        61,
+        1578,
+        1040,
+        1762
+      ],
+      "start": [
+        795,
+        1670
+      ],
+      "end": [
+        305,
+        1670
+      ]
+    },
+    {
+      "check": "real_touch",
+      "label": "Fullscreen",
+      "bounds": [
+        719,
+        1601,
+        929,
+        1738
+      ]
+    },
+    {
+      "check": "actual_hidden_video_progress",
+      "connection": "1",
+      "before": 599,
+      "after": 601
+    },
+    {
+      "check": "actual_window_bar_observation",
+      "name": "immersive-18"
+    }
+  ],
+  "source_build": {
+    "status": "DISPOSABLE_QA_ONLY",
+    "source": "369c64638a2245860fc7bd05fc90bb06aa4ecf94",
+    "candidate_sha256": "e576b78ffa18b646d45912081f3d9e748c830e87257b7a6c74b083b9b3d6cf3d",
+    "original_key": false,
+    "replaced": {
+      "classes3.dex": "a7be69f9175cbe86db7a877377c3bf37767d99134d57c7f6d3b547ee2bbfa722"
+    },
+    "baseline_sha256": "01cb1b35ded45ca4124a1e0feed5029554fee51ca0f14c1b3d72bf9e50460161"
+  },
+  "physical_Fold": "NOT_TESTED",
+  "approved_visual_reference": "NOT_ACCESSIBLE_MATCH_PENDING",
+  "shutdown": "NOT_RUN"
+}

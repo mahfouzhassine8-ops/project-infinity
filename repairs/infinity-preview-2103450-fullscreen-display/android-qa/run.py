@@ -3,7 +3,7 @@
 Reuse the previously corrected immediate observer, grants, notice handling and
 resize-snapshot input guard. No private Activity invocation or production hooks.
 """
-import argparse,importlib.util,json,re,time,traceback
+import argparse,base64,importlib.util,json,re,time,traceback
 from pathlib import Path
 H=Path(__file__).resolve().parents[1];R=H.parents[1]
 spec=importlib.util.spec_from_file_location('resume_fixture',R/'repairs/infinity-preview-2103447-resume/android-qa/run.py')
@@ -102,13 +102,29 @@ def hidden_video_progress():
         time.sleep(.2)
     raise AssertionError('Real fullscreen decoder frames did not advance')
 def immersive_education():
-    tree=q.nodes()
-    for label in ('Got it','GOT IT'):
-        node=q.find(tree,label)
-        if node is not None and node.attrib.get('package')=='com.android.systemui':
-            dump=q.shell('dumpsys','window','windows');q.check('ImmersiveModeConfirmation' in dump,'Only the observed OS fullscreen tutorial may be acknowledged');q.screenshot('platform-immersive-education');q.tap(label);q.record('platform_immersive_education_acknowledged');return
+    dump=q.shell('dumpsys','window','windows')
+    rows=[r for r in re.split(r'(?m)^  Window #\d+ ',dump) if 'ImmersiveModeConfirmation}' in r.split('\n')[0] and 'isVisible=true' in r]
+    if not rows:return False
+    (q.out/'platform-immersive-education-window.txt').write_text(dump);q.screenshot('platform-immersive-education')
+    deadline=q.feature_time()+8;previous=None
+    while q.feature_time()<deadline:
+        q.sequence+=1;q.observer.stdin.write(('SYSTEM '+str(q.sequence)+'\n').encode());q.observer.stdin.flush()
+        raw=base64.b64decode(q.observer_line('EXTERNAL_'+str(q.sequence)+' '),validate=True);tree=q.ET.fromstring(raw)
+        (q.out/'platform-immersive-education.xml').write_bytes(raw)
+        node=next((q.find(tree,label) for label in ('Got it','GOT IT') if q.find(tree,label) is not None),None)
+        target=(tree.attrib.get('window-id'),q.bounds(node)) if node is not None and node.attrib.get('package')=='com.android.systemui' else None
+        if target is not None and target==previous:
+            b=target[1];q.shell('input','tap',str((b[0]+b[2])//2),str((b[1]+b[3])//2));q.record('platform_immersive_education_acknowledged',window=target[0],bounds=b)
+            break
+        previous=target;time.sleep(.1)
+    else:raise AssertionError('Observed OS immersive tutorial has no stable accessibility target')
+    while q.feature_time()<deadline:
+        dump=q.shell('dumpsys','window','windows')
+        if not any('ImmersiveModeConfirmation}' in r.split('\n')[0] and 'isVisible=true' in r for r in re.split(r'(?m)^  Window #\d+ ',dump)):return True
+        time.sleep(.1)
+    raise AssertionError('Acknowledged OS immersive tutorial did not close')
 def enter_fullscreen():
-    control('Fullscreen');immersive_education();q.check(q.find(q.nodes(),'Close') is None,'Fullscreen must hide header');q.check(q.find(q.nodes(),'Seek video') is None,'Fullscreen must hide toolbar');hidden_video_progress();im=bars_snapshot('immersive-'+str(len(q.steps)))
+    control('Fullscreen');q.check(q.find(q.nodes(),'Close') is None,'Fullscreen must hide header');q.check(q.find(q.nodes(),'Seek video') is None,'Fullscreen must hide toolbar');hidden_video_progress();immersive_education();im=bars_snapshot('immersive-'+str(len(q.steps)))
     title=[c['title'] for c in q.steps if c['check']=='actual_video_decoded'][-1];color={'a.mp4':'red','b.mp4':'green','c.mp4':'blue'}[title];w,h=im.size;matches=0
     for x in (.03,.1,.9,.97):
         for y in (.03,.1,.9,.97):

@@ -63,3 +63,13 @@ and latest explicit crop behavior. Do not claim actual PNG/video inspection or
 exact image parity. The supplied recording is explicitly COVER-display evidence,
 not an inner-display observation. Final visual comparison and physical Fold
 acceptance remain the user's. No new candidate lock is automatic.
+
+The crop Android attempt41553789436 is retained as FAIL, not acceptance. Real
+frames advanced and the cropped picture covered the viewport, but Android's
+first-use ImmersiveModeConfirmation tutorial covered the upper edge during the
+pixel assertion. Its screenshot and exact OS window dump are retained. The
+active-window accessibility root stayed Preview, so the initial helper could not
+see the non-focusable SystemUI window. QA now requests interactive windows and
+queries only that exact OS tutorial, uses two fresh matching Got it bounds, then
+observes dismissal before the unchanged edge-pixel assertion. Observer compilation
+and Python syntax pass; no production code, app timers or native behavior changed.

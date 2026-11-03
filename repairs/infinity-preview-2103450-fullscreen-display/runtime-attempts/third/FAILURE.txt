@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-preview-2103450-fullscreen-display/android-qa/run.py", line 145, in <module>
+    try:body(a);status='PASS'
+        ^^^^^^^
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-preview-2103450-fullscreen-display/android-qa/run.py", line 127, in body
+    panel_theme(theme);control('Display');q.await_text('Show the entire video with no cropping.');q.screenshot('display-'+theme.lower());q.tap('Done');enter_fullscreen();exit_fullscreen()
+                                                                                                                                                       ^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-preview-2103450-fullscreen-display/android-qa/run.py", line 117, in enter_fullscreen
+    q.check(matches>=12,'Fullscreen must cover viewport edges with proportion-preserving crop');q.record('actual_fullscreen_edge_pixels',matches=matches,total=16,color=color)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-2103445-standalone-external-player/android-qa/run.py", line 17, in check
+    if not ok:raise AssertionError(why)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Fullscreen must cover viewport edges with proportion-preserving crop

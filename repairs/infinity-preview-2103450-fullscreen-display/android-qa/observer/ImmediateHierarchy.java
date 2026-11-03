@@ -5,6 +5,7 @@ import android.graphics.Rect;
 import android.util.Base64;
 import android.util.Xml;
 import android.view.accessibility.AccessibilityNodeInfo;
+import android.view.accessibility.AccessibilityWindowInfo;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
@@ -46,14 +47,22 @@ public final class ImmediateHierarchy {
             c.getMethod("setCompressedLayoutHierarchy",boolean.class).invoke(wrapper,false);
             UiAutomation ui=(UiAutomation)c.getMethod("getUiAutomation").invoke(wrapper);
             android.accessibilityservice.AccessibilityServiceInfo info=ui.getServiceInfo();
-            info.flags|=android.accessibilityservice.AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS;
+            info.flags|=android.accessibilityservice.AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS
+                    |android.accessibilityservice.AccessibilityServiceInfo.FLAG_RETRIEVE_INTERACTIVE_WINDOWS;
             ui.setServiceInfo(info);
             System.out.println("EXTERNAL_READY"); System.out.flush();
             BufferedReader input=new BufferedReader(new InputStreamReader(System.in));
             String command;
             while ((command=input.readLine())!=null && !command.equals("QUIT")) {
-                if (!command.matches("SNAP [0-9]+")) throw new IllegalArgumentException("Snapshot only");
-                AccessibilityNodeInfo root=ui.getRootInActiveWindow();
+                if (!command.matches("(SNAP|SYSTEM) [0-9]+")) throw new IllegalArgumentException("Snapshot only");
+                boolean system=command.startsWith("SYSTEM ");
+                AccessibilityNodeInfo root=system ? null : ui.getRootInActiveWindow();
+                // The first-use immersive tutorial is non-focusable: it can
+                // cover video while getRootInActiveWindow still returns Preview.
+                // Query only the observed OS window, never an app's dialogs.
+                if (system) for (AccessibilityWindowInfo w:ui.getWindows()) try {
+                    if ("ImmersiveModeConfirmation".equals(value(w.getTitle()))) root=w.getRoot();
+                } finally { w.recycle(); }
                 StringWriter out=new StringWriter(); XmlSerializer xml=Xml.newSerializer(); xml.setOutput(out);
                 xml.startTag(null,"hierarchy"); count=0;
                 xml.attribute(null,"window-id",root==null ? "none" : Integer.toString(root.getWindowId()));
@@ -63,7 +72,7 @@ public final class ImmediateHierarchy {
                 } finally { root.recycle(); }
                 xml.endTag(null,"hierarchy"); xml.flush();
                 String encoded=Base64.encodeToString(out.toString().getBytes("UTF-8"),Base64.NO_WRAP);
-                System.out.println("EXTERNAL_"+command.substring(5)+" "+encoded); System.out.flush();
+                System.out.println("EXTERNAL_"+command.substring(command.indexOf(' ')+1)+" "+encoded); System.out.flush();
             }
         } finally { disconnect.invoke(wrapper); }
     }
