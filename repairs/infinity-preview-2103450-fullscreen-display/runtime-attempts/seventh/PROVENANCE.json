@@ -1,0 +1,8 @@
+{
+  "run_id": 41558303016,
+  "source": "e23a5abe54ef5908d01138e4099d5f169650b73e",
+  "conclusion": "failure",
+  "artifact_id": 13195379944,
+  "artifact_sha256": "50fa7007fd7a9c9b14174646f2f8f6f704799b6a4f3e9a78caa3c53976f22db6",
+  "finding": "Bounded tesseract subprocess exceeded3seconds on two-core emulator host. Actual screenshot is valid same Got it target. QA now restricts this tiny OCR task to one OpenMP thread, adds actual-image preflight before emulator, and retains crop/OCR/timing diagnostics. Same three actual screenshots locally resolve in0.20-0.22seconds with negative image rejected. No app timing, assertion or production change."
+}

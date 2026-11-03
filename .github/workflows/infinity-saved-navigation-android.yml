@@ -89,6 +89,7 @@ jobs:
           sudo apt-get install -y libpulse0 ffmpeg tesseract-ocr
           tesseract --version | head -1
           python3 -m pip install Pillow==11.3.0
+          python3 repairs/infinity-preview-2103450-fullscreen-display/android-qa/immersive_prompt.py
           cp "$ANDROID_HOME/build-tools/35.0.0/lib/d8.jar" runtime-tools/d8.jar
           python3 repairs/infinity-preview-2103450-fullscreen-display/build_owner.py --bundles baseline450-components --out external-owner
           python3 repairs/infinity-preview-2103450-fullscreen-display/android-qa/prepare.py --baseline baseline450/Infinity-2103450-Combined-Original-Signer.apk --owner external-owner --android runtime-tools/receipt-evidence/android-34.jar --sdk "$ANDROID_HOME/build-tools/35.0.0" --out external-qa

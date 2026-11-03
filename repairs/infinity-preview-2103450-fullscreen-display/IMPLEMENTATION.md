@@ -101,3 +101,12 @@ observation limit, and recaptures once after genuine acknowledgement. Actual
 video assertions remain unchanged. Three selected capture-protocol checks pass:
 late arrival recaptures, no overlay uses one capture, repeated overlays fail.
 This addresses the observed asynchronous platform setup, not production behavior.
+
+Attempt41558303016 stopped in the auxiliary Tesseract process after its bounded
+three seconds. The actual timeout screenshot contains the same measured target;
+this is not a player failure. QA limits that small OCR task to one OpenMP thread
+instead of competing with the two-core emulator, retains the same subprocess
+bound, and preflights actual retained images before emulator setup. Three actual
+captures resolve locally in0.20–0.22s with the negative frame rejected. OCR crop,
+text, duration and thread count are retained for the next runtime observation.
+No production or app-response deadline changed.

@@ -124,7 +124,7 @@ def immersive_education():
             q.check(len(visible)==1,'Only the currently visible OS immersive tutorial may be acknowledged')
             region=re.search(r'touchable region=SkRegion\(\((-?\d+),(-?\d+),(-?\d+),(-?\d+)\)\)',visible[0]);q.check(region,'Actual OS tutorial touchable bounds required')
             region=list(map(int,region.groups()));im=q.screenshot('platform-immersive-target-'+str(q.sequence))
-            try:target=('ImmersiveModeConfirmation',tutorial_target(im,region),region)
+            try:target=('ImmersiveModeConfirmation',tutorial_target(im,region,q.out/('platform-ocr-'+str(q.sequence))),region)
             except AssertionError:
                 # The OS tutorial itself slides in; its reported touch region
                 # can still be negative or not yet contain the visible button.
