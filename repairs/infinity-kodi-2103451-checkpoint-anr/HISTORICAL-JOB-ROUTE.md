@@ -16,7 +16,7 @@ stack or confirmation that the historical producer was451:
   provider ID or route discriminator. The numeric difference proves no route.
 - `CJobManager::TrackCheckpointJob`, lines509–579, records responsibility,
   owner, operation, RTTI class, and the optional `GetCheckpointResource()`.
-  The baseline watched class has no resource override; `utils/Job.h:128`
+  The baseline watched class has no resource override; `utils/Job.h:127`
   defaults to an empty resource. The ledger has no `CFileItem`, item path,
   media type, recursive/PVR/UPnP flags, callback RTTI or originating UI field.
 - The reviewed core source has one construction site for the exact class:

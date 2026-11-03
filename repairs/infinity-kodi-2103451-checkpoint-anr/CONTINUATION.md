@@ -204,3 +204,20 @@ Compatible Android runtime remains unproven. The accessible hosted runner is
 x86_64; it does not establish an ARM device. The runner inventory API returned
 403 Resource not accessible by integration. Do not use alternate credentials,
 modify native constructors, repeat known-broken emulators or claim Android PASS.
+
+
+## Native build request now executing
+
+The selected request commit is765b92bc8af1452ffc2bbb19a03a3de229a90255.
+Native-only run41729462691 has passed exact artifact/source/producer/lock gates,
+restored original dependency archives and pinnedNDK, and entered complete ARM64
+compilation. At this checkpoint it is IN_PROGRESS, not PASS; job126242718633.
+Retrieve that existing result once terminal; do not launch another build.
+`evidence/NATIVE-BUILD-RUN1.json` records the actual observed step status.
+No successor APK has been created/signed or version allocated.
+
+The user explicitly cannot classify the historical watched item. Preserve that
+boundary and the old Unknown obligation; see HISTORICAL-JOB-ROUTE.md. A separate
+request for an existing authorized ARM64 Android target is pending. See
+ANDROID-ACCESS-BLOCKER.md. Do not claim the historical route fixed or Android
+ANR clearance from compilation/host evidence, and do not sign prematurely.

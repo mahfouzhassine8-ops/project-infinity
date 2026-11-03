@@ -1,0 +1,104 @@
+{
+  "run": 41729462691,
+  "source_commit": "765b92bc8af1452ffc2bbb19a03a3de229a90255",
+  "url": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/41729462691",
+  "observed_utc": "2026-11-03T22:25:56.763449+00:00",
+  "status": "in_progress",
+  "conclusion": null,
+  "steps": [
+    {
+      "name": "Set up job",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Verify authorized build boundary and authenticated immutable inputs",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Retrieve the already verified complete P0 source and original451 receipts",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Restore exact9411 source with only the five reviewed P0 changes",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Retrieve the existing verified compiler dependencies",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Restore unchanged dependency transfer through the existing recipe",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Run actions/cache@v4",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Restore original pinned NDK without changing toolchain policy",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "Compile full ARM64 engine using the unchanged producer and retained dependency guard",
+      "status": "in_progress",
+      "conclusion": null
+    },
+    {
+      "name": "Preserve native output and build proof; no application or signing step",
+      "status": "pending",
+      "conclusion": null
+    },
+    {
+      "name": "Post Run actions/cache@v4",
+      "status": "pending",
+      "conclusion": null
+    },
+    {
+      "name": "Post Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3",
+      "status": "pending",
+      "conclusion": null
+    },
+    {
+      "name": "Post Run actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065",
+      "status": "pending",
+      "conclusion": null
+    },
+    {
+      "name": "Post Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262",
+      "status": "pending",
+      "conclusion": null
+    }
+  ],
+  "apk_built_or_signed": false,
+  "android_executed": false,
+  "historical_watched_route": "UNKNOWN",
+  "final_lock": false
+}
