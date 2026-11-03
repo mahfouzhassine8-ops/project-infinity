@@ -23,9 +23,23 @@
       "original_key_access": false,
       "path": ".github/workflows/infinity-external-video-live-qa.yml",
       "source": "b2db7578264fb1151d9258a7fd833b500a8e41ed"
+    },
+    {
+      "id": 406247408,
+      "original_key_access": false,
+      "path": ".github/workflows/infinity-kodi451-p0-input-preflight.yml",
+      "source": "7bcc698d5b89f1cfe9d020bafc89b85a78f94c7c",
+      "workflow_sha256": "d66448126540777881af8594b408aef02d3cc026da1d5464d01db5ee0e326cbe"
+    },
+    {
+      "id": 406270295,
+      "original_key_access": false,
+      "path": ".github/workflows/infinity-kodi451-p0-native-build.yml",
+      "source": "7bcc698d5b89f1cfe9d020bafc89b85a78f94c7c",
+      "workflow_sha256": "20146190d32597abc4d17db2db6160e307e249834f487940bc1338dee4335f74"
     }
   ],
-  "audit_workflows": 615,
+  "audit_workflows": 617,
   "retired_original_key_workflows": [
     {
       "id": 370925114,
@@ -2737,7 +2751,9 @@
     398072977,
     398261182,
     398401582,
-    404063472
+    404063472,
+    406247408,
+    406270295
   ],
   "schema": 1,
   "scope": "Retire historical workflows with access to the original permanent signing secret; preserve their files, runs, artifacts and every locked ref",

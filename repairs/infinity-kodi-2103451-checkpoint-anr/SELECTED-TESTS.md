@@ -212,3 +212,37 @@ selected. Save the complete per-member hashes and changed-member verdict.
 A final higher-version/signed APK comparison and matching owner-component checks
 remain mandatory when runtime/release gates can proceed. This unsigned assembly
 is internal evidence, not an installable or delivered testing candidate.
+
+## Physical-test candidate release continuation — selected 2026-11-03
+
+Read FOLD-CANDIDATE-AUTHORIZATION.md and the latest user instruction. Select
+read-only `signer_policy.py check --out /tmp/kodi452-signer-routes-before.json`
+first to identify any exact existing signing-route blocker. Do not call retire,
+enable/disable workflows, alter credentials, run app/shutdown suites or rebuild
+native source. Record its actual refusal if a new unsigned workflow is not yet
+in the reviewed inventory; audit/register only the actual P0 workflow IDs.
+
+Subsequent selected checks will cover only candidate release/preservation policy,
+exact component assembly, original-key signing and post-sign preservation.
+Android shutdown/ANR runtime results remain BLOCKED/PENDING, never PASS.
+
+Select the five correction-specific release contracts in `test_release452.py`
+before preparation and again at the mandatory pre-key stage. They verify frozen
+signer/runtime producers, exact reviewed inventory additions, sole-key ordering,
+strict three-member negative controls, artifact pins and truthful Android-pending
+status. This does not repeat the21 native host cases or execute Android/shutdown.
+
+```
+PYTHONDONTWRITEBYTECODE=1 python3 repairs/infinity-kodi-2103451-checkpoint-anr/test_release452.py
+PYTHONDONTWRITEBYTECODE=1 python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out /tmp/kodi452-signer-routes-after.json
+```
+
+After those checks pass, manually select `prepare-kodi452` on the existing
+sole combined signer workflow at the exact P0 branch. Reuse native41729462691;
+no native compile runs. Verify native/source/official artifact and exact451
+member/component preservation, then register only that official preparation
+through the existing generation transition. Manually select `final-combined`
+only after registration passes. Original pre-sign ownership, source/authority,
+sole-signer, certificate, alignment and post-sign payload checks remain mandatory.
+No Android/shutdown workflow is selected by packaging; physical testing follows
+the independently supplied procedure. No release lock/promotion is selected.

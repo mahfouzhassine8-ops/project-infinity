@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "/workspace/project-infinity/repairs/dual-experience-isolation-2103420/signer_policy.py", line 45, in <module>
+    save(args.out,(check if args.command=='check' else retire)(load(HERE/'signer-policy.json')))
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/project-infinity/repairs/dual-experience-isolation-2103420/signer_policy.py", line 26, in check
+    require(not [i for i,r in actual.items() if r['state']=='active' and i not in known],'UNREVIEWED_NEW_WORKFLOW')
+  File "/workspace/project-infinity/repairs/dual-experience-isolation-2103420/release_gate.py", line 53, in require
+    raise Rejected(reason)
+release_gate.Rejected: UNREVIEWED_NEW_WORKFLOW

@@ -3,11 +3,11 @@ on:
   workflow_dispatch:
     inputs:
       operation:
-        description: Prepare Preview 451 or sign its exact reviewed combined candidate
+        description: Prepare an exact owner candidate or sign the registered combined payload
         type: choice
         required: true
         default: final-combined
-        options: [final-combined, prepare-preview451]
+        options: [final-combined, prepare-preview451, prepare-kodi452]
 permissions:
   contents: read
   actions: read
@@ -82,9 +82,80 @@ jobs:
             prepared451/preservation/
           if-no-files-found: warn
           retention-days: 90
+  prepare-kodi452:
+    name: Kodi 452 native-only owner preparation; exact451 frozen payload
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/infinity-kodi-2103451-checkpoint-anr-20261103' && inputs.operation == 'prepare-kodi452'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '21'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with:
+          packages: 'build-tools;35.0.0'
+          log-accepted-android-sdk-licenses: false
+      - name: Selected Kodi release contracts and sole signer check before preparation
+        run: |
+          set -euo pipefail
+          python3 -m pip install PyYAML==6.0.3
+          python3 repairs/infinity-kodi-2103451-checkpoint-anr/test_release452.py
+          python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out SIGNER-ROUTES.json
+          python3 repairs/infinity-kodi-2103451-checkpoint-anr/release452.py metadata --out INPUT-METADATA.json
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          artifact-ids: '13200361701'
+          run-id: '41568721264'
+          merge-multiple: true
+          github-token: ${{ github.token }}
+          path: protected451
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          artifact-ids: '13200925524'
+          run-id: '41568721264'
+          merge-multiple: true
+          github-token: ${{ github.token }}
+          path: protected451-components
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          artifact-ids: '13276398254'
+          run-id: '41729462691'
+          merge-multiple: true
+          github-token: ${{ github.token }}
+          path: compiled-native
+      - name: Assemble only the existing compiled Kodi repair and truthful version metadata
+        run: |
+          python3 repairs/infinity-kodi-2103451-checkpoint-anr/release452.py prepare \
+            --bundles protected451-components --baseline protected451/Infinity-2103451-Combined-Original-Signer.apk \
+            --native compiled-native --sdk "$ANDROID_HOME/build-tools/35.0.0" --out prepared452
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity452-Prepared-${{ github.run_id }}
+          path: prepared452/publish/
+          if-no-files-found: error
+          retention-days: 90
+          compression-level: 0
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Infinity452-Preparation-Evidence-${{ github.run_id }}
+          path: |
+            SIGNER-ROUTES.json
+            INPUT-METADATA.json
+            prepared452/BASELINE-SIGNATURE.txt
+            prepared452/PREPARATION.json
+            prepared452/preservation/
+          if-no-files-found: warn
+          retention-days: 90
   combined:
-    name: Preview 451 original-key testing APK; exact signed450 preservation
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/infinity-preview-2103450-fullscreen-display-20261102' && inputs.operation == 'final-combined'
+    name: Registered combined original-key testing APK; exact owner preservation
+    if: github.event_name == 'workflow_dispatch' && inputs.operation == 'final-combined' && (github.ref == 'refs/heads/work/infinity-preview-2103450-fullscreen-display-20261102' || github.ref == 'refs/heads/work/infinity-kodi-2103451-checkpoint-anr-20261103')
     runs-on: ubuntu-22.04
     timeout-minutes: 40
     env:
@@ -98,29 +169,42 @@ jobs:
         with: {distribution: temurin, java-version: '21'}
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
-      - name: Admit exact451 authority and sole signer before keys
+      - name: Admit exact registered authority and sole signer before keys
         id: selected
         run: |
           set -euo pipefail
           python3 -m pip install PyYAML==6.0.3
-          python3 repairs/infinity-preview-2103450-fullscreen-display/test_release451.py
+          if [ "$GITHUB_REF" = 'refs/heads/work/infinity-kodi-2103451-checkpoint-anr-20261103' ]; then
+            python3 repairs/infinity-kodi-2103451-checkpoint-anr/test_release452.py
+          else
+            python3 repairs/infinity-preview-2103450-fullscreen-display/test_release451.py
+          fi
           python3 - <<'PYCODE'
           import os
           from pathlib import Path
           from release_gate import remote_authority,require
           a=remote_authority(Path('.'),os.environ['GITHUB_SHA'])
-          require(a['candidate_versionCode']==2103451 and a['generation']==37,'EXACT451_AUTHORITY')
-          require(a['target_owners']==['INFINITY','CHOOSER_SHELL'] and a['update_kind']=='owner_update','EXACT451_EXTERNAL_OWNER_UPDATE')
-          require(a['owner_update_evidence']['owner']=='INFINITY_PREVIEW_FULLSCREEN_DISPLAY','APPROVED_PREVIEW_CHROME_CALL_ONLY')
-          with open(os.environ['GITHUB_OUTPUT'],'a') as f:f.write('producer_run='+str(a['owner_update_evidence']['producer_run'])+'\n')
+          p0=os.environ['GITHUB_REF']=='refs/heads/work/infinity-kodi-2103451-checkpoint-anr-20261103'
+          version,generation,baseline,owner=(2103452,38,2103451,'INFINITY_KODI_P0_NATIVE') if p0 else (2103451,37,2103450,'INFINITY_PREVIEW_FULLSCREEN_DISPLAY')
+          require(a['candidate_versionCode']==version and a['generation']==generation,'EXACT_SELECTED_AUTHORITY')
+          require(a['target_owners']==['INFINITY','CHOOSER_SHELL'] and a['update_kind']=='owner_update','EXACT_OWNER_UPDATE')
+          require(a['owner_update_evidence']['owner']==owner,'EXACT_APPROVED_SCOPE')
+          if p0:
+              require(a['owner_update_evidence']['Android']=='BLOCKED_NO_AUTHORIZED_COMPATIBLE_TARGET','TRUTHFUL_ANDROID_PENDING')
+              require(a['owner_update_evidence']['native_sha256']=='f89a40b5653c0091a06edd44f6ac5cdf056a649301b6751ee638c8ba88db9674','EXACT_COMPILED_NATIVE')
+          with open(os.environ['GITHUB_OUTPUT'],'a') as f:
+              f.write('producer_run='+str(a['owner_update_evidence']['producer_run'])+'\n')
+              f.write('version='+str(version)+'\ngeneration='+str(generation)+'\nbaseline='+str(baseline)+'\n')
+              f.write('baseline_run='+str(41568721264 if p0 else 41541654995)+'\n')
+              f.write('prepared_prefix='+('Infinity452' if p0 else 'Infinity451')+'\n')
           PYCODE
           python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out SIGNER-ROUTES.json
       - uses: actions/download-artifact@v4
         with:
-          run-id: 41541654995
-          name: Infinity-Combined-Original-Signer-41541654995
+          run-id: ${{ steps.selected.outputs.baseline_run }}
+          name: Infinity-Combined-Original-Signer-${{ steps.selected.outputs.baseline_run }}
           github-token: ${{ github.token }}
-          path: protected450
+          path: protected-baseline
       - uses: actions/download-artifact@v4
         with:
           run-id: 39867073954
@@ -130,35 +214,36 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           run-id: ${{ steps.selected.outputs.producer_run }}
-          name: Infinity451-Prepared-${{ steps.selected.outputs.producer_run }}
+          name: ${{ steps.selected.outputs.prepared_prefix }}-Prepared-${{ steps.selected.outputs.producer_run }}
           github-token: ${{ github.token }}
-          path: prepared451
-      - name: Verify official artifact bytes, registered source and exact450 preservation before keys
+          path: prepared-owner
+      - name: Verify official artifact bytes, source and exact predecessor preservation before keys
         run: |
           set -euo pipefail
           python3 - "${{ steps.selected.outputs.producer_run }}" <<'PYCODE'
-          import sys
+          import os,sys
           from pathlib import Path
-          sys.path.insert(0,'repairs/infinity-preview-2103450-fullscreen-display')
-          import release451 as r
-          r.check_registered(Path('prepared451'),int(sys.argv[1]),Path('REGISTERED451-CHECK.json'))
+          p0=os.environ['GITHUB_REF']=='refs/heads/work/infinity-kodi-2103451-checkpoint-anr-20261103'
+          sys.path.insert(0,'repairs/infinity-kodi-2103451-checkpoint-anr' if p0 else 'repairs/infinity-preview-2103450-fullscreen-display')
+          if p0: import release452 as r
+          else: import release451 as r
+          r.check_registered(Path('prepared-owner'),int(sys.argv[1]),Path('REGISTERED-CANDIDATE-CHECK.json'))
           PYCODE
           mkdir -p combined-build
-          cp -r prepared451/components combined-build/
+          cp -r prepared-owner/components combined-build/
           python3 repairs/dual-experience-isolation-2103420/component_bundles.py combine \
             --bundles combined-build/components --catalog combined-build/components/catalog.json \
-            --out combined-build/combined-unsigned.apk --version 2103451
+            --out combined-build/combined-unsigned.apk --version "${{ steps.selected.outputs.version }}"
           python3 - <<'PYCODE'
-          from pathlib import Path
           from inventory import file_sha,load
           from release_gate import require
-          require(file_sha('combined-build/combined-unsigned.apk')==load('prepared451/preservation/APK-PRESERVATION.json')['candidate_sha256'],'EXACT_VERIFIED_UNSIGNED_APK')
+          require(file_sha('combined-build/combined-unsigned.apk')==load('prepared-owner/preservation/APK-PRESERVATION.json')['candidate_sha256'],'EXACT_VERIFIED_UNSIGNED_APK')
           PYCODE
       - name: Hard original pre-sign payload ownership and source guard
         run: |
           python3 repairs/dual-experience-isolation-2103420/release_gate.py \
             --apk combined-build/combined-unsigned.apk --jars tools/receipt-evidence/tool-jars --work gate-dex \
-            --repository . --expected-head "$GITHUB_SHA" --expected-generation 37 --out SIGNING-DECISION.json
+            --repository . --expected-head "$GITHUB_SHA" --expected-generation "${{ steps.selected.outputs.generation }}" --out SIGNING-DECISION.json
       - name: Original signer after all source and payload gates
         env:
           INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
@@ -168,21 +253,32 @@ jobs:
         run: |
           python3 repairs/dual-experience-isolation-2103420/assemble.py sign \
             --apk combined-build/combined-unsigned.apk --jars tools/receipt-evidence/tool-jars --work signer-dex \
-            --repository . --expected-head "$GITHUB_SHA" --expected-generation 37 \
+            --repository . --expected-head "$GITHUB_SHA" --expected-generation "${{ steps.selected.outputs.generation }}" \
             --sdk "$ANDROID_HOME/build-tools/35.0.0" --out signed-combined
-      - name: Signed450-to-signed451 exact member and original certificate comparison
+      - name: Signed predecessor-to-candidate exact member and original certificate comparison
         run: |
-          python3 repairs/infinity-preview-2103450-fullscreen-display/release451.py compare \
-            --baseline protected450/Infinity-2103450-Combined-Original-Signer.apk \
-            --candidate signed-combined/Infinity-2103451-Combined-Original-Signer.apk \
-            --plan prepared451/PREPARATION.json --out signed-combined/preservation --sdk "$ANDROID_HOME/build-tools/35.0.0"
+          set -euo pipefail
+          if [ "$GITHUB_REF" = 'refs/heads/work/infinity-kodi-2103451-checkpoint-anr-20261103' ]; then
+            python3 repairs/infinity-kodi-2103451-checkpoint-anr/release452.py compare \
+              --baseline protected-baseline/Infinity-2103451-Combined-Original-Signer.apk \
+              --candidate signed-combined/Infinity-2103452-Combined-Original-Signer.apk \
+              --out signed-combined/preservation --sdk "$ANDROID_HOME/build-tools/35.0.0"
+          else
+            python3 repairs/infinity-preview-2103450-fullscreen-display/release451.py compare \
+              --baseline protected-baseline/Infinity-2103450-Combined-Original-Signer.apk \
+              --candidate signed-combined/Infinity-2103451-Combined-Original-Signer.apk \
+              --plan prepared-owner/PREPARATION.json --out signed-combined/preservation --sdk "$ANDROID_HOME/build-tools/35.0.0"
+          fi
           cp repairs/dual-experience-isolation-2103420/release-authority.json signed-combined/
-          cp SIGNING-DECISION.json REGISTERED451-CHECK.json SIGNER-ROUTES.json signed-combined/
+          cp SIGNING-DECISION.json REGISTERED-CANDIDATE-CHECK.json SIGNER-ROUTES.json signed-combined/
+          cp prepared-owner/PREPARATION.json signed-combined/
           python3 - <<'PYCODE'
           from pathlib import Path
-          from inventory import file_sha
+          from inventory import file_sha,load,save
           p=Path('combined-build/components')
           (p/'SHA256SUMS').write_text(''.join(file_sha(p/n)+'  '+n+'\n' for n in ['COBRA.zip','INFINITY.zip','MINIMAL_ANDROID_CONTRACT.zip','CHOOSER_SHELL.zip']))
+          evidence=load('prepared-owner/PREPARATION.json')
+          save('signed-combined/VERIFICATION-STATUS.json',dict(Android=evidence['Android'],physical_Fold='PENDING',application_tests_run_in_packaging=False,shutdown_tests_run_in_packaging=False,accepted_pointer_updated=False))
           PYCODE
       - uses: actions/upload-artifact@v4
         with:
@@ -201,10 +297,10 @@ jobs:
       - if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: Infinity451-Signing-Evidence-${{ github.run_id }}
+          name: Infinity-Combined-Signing-Evidence-${{ github.run_id }}
           path: |
             SIGNING-DECISION.json
-            REGISTERED451-CHECK.json
+            REGISTERED-CANDIDATE-CHECK.json
             SIGNER-ROUTES.json
             signed-combined/preservation/
           if-no-files-found: warn

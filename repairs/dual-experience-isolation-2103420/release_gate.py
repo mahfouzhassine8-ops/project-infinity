@@ -21,7 +21,9 @@ EXTERNAL_BASELINE_REF = 'refs/heads/lock/infinity-cobra-2103445-user-approved-20
 EXTERNAL_BASELINE_COMMIT = '6cf75639a46ec6b0c858ae32abc102450fdc0974'
 PREVIEW_BASELINE_REF = 'refs/heads/lock/infinity-cobra-2103447-user-locked-20261102'
 PREVIEW_BASELINE_COMMIT = '1fe75deaebdbf71d5873dc69ba3e21c0526954f0'
-AUTHORITY_BRANCH = 'work/infinity-preview-2103450-fullscreen-display-20261102'
+KODI451_BASELINE_REF = 'refs/heads/lock/infinity-preview-2103451-user-frozen-20261103'
+KODI451_BASELINE_COMMIT = '0b3450433adc3349056167a6697dae92dad63d86'
+AUTHORITY_BRANCH = 'work/infinity-kodi-2103451-checkpoint-anr-20261103'
 ROTATION_PROTECTED_REF = 'refs/heads/lock/infinity-cobra-2103444-user-approved-20261101'
 ROTATION_PROTECTED_COMMIT = '1b7a4ef16524854fab77a1c974538aee8a1132bb'
 QUALITY_PROTECTED_REF = 'refs/heads/lock/infinity-cobra-2103442-user-approved-20261101'
@@ -187,9 +189,10 @@ def remote_authority(repository, expected_head):
         return subprocess.check_output(['git', '-C', str(repository), *args], text=True).strip()
     origin = git('remote', 'get-url', 'origin')
     require(origin.removesuffix('.git') == 'https://github.com/mahfouzhassine8-ops/project-infinity', 'AUTHORITY_ORIGIN')
-    remote = git('ls-remote', 'origin', 'refs/heads/' + AUTHORITY_BRANCH, PROTECTED_REF, COMBINED_PROTECTED_REF, LATEST_PROTECTED_REF, DRAWER_PROTECTED_REF, LOADING_PROTECTED_REF, CARDS_THEME_PROTECTED_REF, DISPLAY_PROTECTED_REF, QUALITY_PROTECTED_REF, ROTATION_PROTECTED_REF, EXTERNAL_BASELINE_REF, PREVIEW_BASELINE_REF)
+    remote = git('ls-remote', 'origin', 'refs/heads/' + AUTHORITY_BRANCH, PROTECTED_REF, COMBINED_PROTECTED_REF, LATEST_PROTECTED_REF, DRAWER_PROTECTED_REF, LOADING_PROTECTED_REF, CARDS_THEME_PROTECTED_REF, DISPLAY_PROTECTED_REF, QUALITY_PROTECTED_REF, ROTATION_PROTECTED_REF, EXTERNAL_BASELINE_REF, PREVIEW_BASELINE_REF, KODI451_BASELINE_REF)
     refs = dict(reversed(line.split()) for line in remote.splitlines())
     require(refs.get(PREVIEW_BASELINE_REF) == PREVIEW_BASELINE_COMMIT, 'PREVIEW447_APPROVED_LOCK_MOVED')
+    require(refs.get(KODI451_BASELINE_REF) == KODI451_BASELINE_COMMIT, 'KODI451_APPROVED_LOCK_MOVED')
     require(refs.get(EXTERNAL_BASELINE_REF) == EXTERNAL_BASELINE_COMMIT, 'EXTERNAL445_APPROVED_LOCK_MOVED')
     require(refs.get(ROTATION_PROTECTED_REF) == ROTATION_PROTECTED_COMMIT, 'ROTATION444_APPROVED_LOCK_MOVED')
     require(refs.get(QUALITY_PROTECTED_REF) == QUALITY_PROTECTED_COMMIT, 'QUALITY442_APPROVED_LOCK_MOVED')
