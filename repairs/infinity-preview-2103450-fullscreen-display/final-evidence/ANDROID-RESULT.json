@@ -1,0 +1,131 @@
+{
+  "status": "PASS_SELECTED_PREVIEW_FULLSCREEN_DISPLAY_CHECKS",
+  "source_build": {
+    "status": "DISPOSABLE_QA_ONLY",
+    "source": "e6bb2a9eed361803d0e90f03c2ae808a18c6d290",
+    "candidate_sha256": "5059d089089dfdd66b8129c404c8075bbc6e9ab5c143ec1188a11162337321de",
+    "original_key": false,
+    "replaced": {
+      "classes3.dex": "5634f2376e5d0bf6176ebef6fa1ac16bb22fdecc1d018ac078f266bb757fe9b8"
+    },
+    "baseline_sha256": "01cb1b35ded45ca4124a1e0feed5029554fee51ca0f14c1b3d72bf9e50460161"
+  },
+  "selected_checks": [
+    "actual_bestfit_fill_stretch_decoding",
+    "actual_display_mode_restored",
+    "actual_fullscreen_edge_pixels",
+    "actual_hidden_video_progress",
+    "actual_media_clock_advances",
+    "actual_video_decoded",
+    "actual_viewport_fullscreen_fit",
+    "actual_window_bar_observation",
+    "existing_resume_retained",
+    "fullscreen_back_exits_only_mode",
+    "fullscreen_reversible_without_restart",
+    "selected_fullscreen_display_functional_complete",
+    "source_resumed_and_decoder_released"
+  ],
+  "actual_scaling": {
+    "actual-scale-Best-Fit": 0.96,
+    "actual-scale-Fill-(crop)": 1.0046511627906978,
+    "actual-scale-Stretch": 8.64
+  },
+  "window_observations": {
+    "restored-44-window.txt": {
+      "hidden_system_bars": false,
+      "non_default_visibility": ""
+    },
+    "restored-28-window.txt": {
+      "hidden_system_bars": false,
+      "non_default_visibility": ""
+    },
+    "restored-209-window.txt": {
+      "hidden_system_bars": false,
+      "non_default_visibility": ""
+    },
+    "initial-normal-window.txt": {
+      "hidden_system_bars": false,
+      "non_default_visibility": ""
+    },
+    "immersive-94-window.txt": {
+      "hidden_system_bars": true,
+      "non_default_visibility": "statusBars navigationBars captionBar systemOverlays"
+    },
+    "immersive-78-window.txt": {
+      "hidden_system_bars": true,
+      "non_default_visibility": "statusBars navigationBars captionBar systemOverlays"
+    },
+    "immersive-49-window.txt": {
+      "hidden_system_bars": true,
+      "non_default_visibility": "statusBars navigationBars captionBar systemOverlays"
+    },
+    "immersive-39-window.txt": {
+      "hidden_system_bars": true,
+      "non_default_visibility": "statusBars navigationBars captionBar systemOverlays"
+    },
+    "immersive-23-window.txt": {
+      "hidden_system_bars": true,
+      "non_default_visibility": "statusBars navigationBars captionBar systemOverlays"
+    },
+    "immersive-204-window.txt": {
+      "hidden_system_bars": true,
+      "non_default_visibility": "statusBars navigationBars captionBar systemOverlays"
+    },
+    "immersive-20-window.txt": {
+      "hidden_system_bars": true,
+      "non_default_visibility": "statusBars navigationBars captionBar systemOverlays"
+    },
+    "immersive-179-window.txt": {
+      "hidden_system_bars": true,
+      "non_default_visibility": "statusBars navigationBars captionBar systemOverlays"
+    },
+    "immersive-160-window.txt": {
+      "hidden_system_bars": true,
+      "non_default_visibility": "statusBars navigationBars captionBar systemOverlays"
+    },
+    "immersive-142-window.txt": {
+      "hidden_system_bars": true,
+      "non_default_visibility": "statusBars navigationBars captionBar systemOverlays"
+    },
+    "immersive-126-window.txt": {
+      "hidden_system_bars": true,
+      "non_default_visibility": "statusBars navigationBars captionBar systemOverlays"
+    },
+    "immersive-110-window.txt": {
+      "hidden_system_bars": true,
+      "non_default_visibility": "statusBars navigationBars captionBar systemOverlays"
+    }
+  },
+  "run": {
+    "run_id": 41567002286,
+    "conclusion": "success",
+    "head_sha": "e6bb2a9eed361803d0e90f03c2ae808a18c6d290",
+    "run_url": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/41567002286",
+    "artifact_id": 13199259635,
+    "artifact_digest": "sha256:f780ee448f45acf63fd69082011477e833e0d79fc141ede9d751752f57824309",
+    "artifact_size": 6909783,
+    "result_sha256": "f07fae928a49fa84b0cddd06ed4f5416e6fb2ed04dc5528343b2e400b8620a30",
+    "window_evidence": {
+      "restored-44-window.txt": "e24b90023b3be6d1ea851cc1cd6f25a29ef7560e94c9cb20aa9111225660b79d",
+      "restored-28-window.txt": "59349507a4db449721618feebc6659c45007e329efb1c6d5141ed8813e6a674c",
+      "restored-209-window.txt": "d1656827491560cfbe84a7a7ff7131095bace56cd1d60802b9c5e51e07b01bb6",
+      "initial-normal-window.txt": "33934d930e848fe129c3b4b231d393329fbd3609818f2d839a1319898601641f",
+      "immersive-94-window.txt": "fd18643308c00a24912db3ff0a5ff5e23e7feeb89b5a2f19f5f4404bae21e9f3",
+      "immersive-78-window.txt": "5214d95d6432fcea62786ca9d6b80f58ff0361f76d4612320a79dfcf0cf18921",
+      "immersive-49-window.txt": "a5e4ec4ccfafd6e89e20b6d417a57685ca27520ca644252d0297e99277da8fd7",
+      "immersive-39-window.txt": "5a95849c316aeadd01fdcedc66ca7f31d0f3f0b7dd7820dbe95b6e8067ddaf92",
+      "immersive-23-window.txt": "9b3eb6b7fdb477f8b74ab3a65edbc86c9e7e01ac21f154763cac608b3779bc8b",
+      "immersive-204-window.txt": "8a08516088352427362c4c12ff2b9918167d3f4d243a9a66f412237b29e0c02c",
+      "immersive-20-window.txt": "c42b977ef0925a4d933f501411bce80db1af5c734f26f84194440dce402bd963",
+      "immersive-179-window.txt": "4aeb1c6f714ecc40ad822aff00f2d2f6cf165d017629b67b9e809d5d3ee5c73e",
+      "immersive-160-window.txt": "642c24af096fd8f78dd531820234d1994372ba8e0d95828a5b8be580ce36860e",
+      "immersive-142-window.txt": "f85b93d95eef206db645994ca12634ffb4b1cac540ee70e827108e50aa58b6a7",
+      "immersive-126-window.txt": "44c8bb5e0a36cfcc50021f0767f3b805667382ed710c7f40b586b9e9ffdffec8",
+      "immersive-110-window.txt": "9f52ab446af037dd0c776aad88356d781bea976b875ba11f2dd436c2e0cd038b"
+    }
+  },
+  "approved_visual_reference": "INDEPENDENT_ORIGINAL_PNG_AND_NATIVE_RENDER_REVIEW; IDENTIFIED_DIFFERENCES_CORRECTED; PERSONAL_ORIGINAL_ACCESS_UNAVAILABLE; PIXEL_PARITY_AND_PHYSICAL_ACCEPTANCE_PENDING",
+  "physical_Fold": "NOT_TESTED",
+  "shutdown": "NOT_RUN",
+  "preserved_resume_and_call": "SOURCE_AND_CLASS_FROZEN; prior evidence retained"
+}

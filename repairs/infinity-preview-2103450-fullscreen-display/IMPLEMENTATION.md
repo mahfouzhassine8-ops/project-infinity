@@ -180,3 +180,15 @@ structure/color assertions; the Activity, Chrome, engine, resume and route sourc
 hashes remain exactly as in that complete functional PASS. New DEX5634f237...;
 630 unrelated complete classes remain exact. Updated native byte binding is
 required before final preparation/signing. No prior passing evidence discarded.
+
+FINAL REFERENCE-CORRECTED BYTE BINDING: Android41567002286 PASSES on source
+e6bb2a9eed361803d0e90f03c2ae808a18c6d290, DEX5634f237... exactly matching the15
+passing host cases and630 preserved unrelated classes.233 real observations cover
+left-radio/updated footer input, all11 Fullscreen entries16/16 edges, all4viewport
+sizes, Fit/Fill/Stretch decoding/restoration, all normal bar requests restored,
+Resume/Start Over and actual source ownership with decoder release. Maximum
+hidden-chrome observation0.623s. Evidence archive SHA256:
+f780ee448f45acf63fd69082011477e833e0d79fc141ede9d751752f57824309.
+Six release-protocol checks pass. No broad suite, protected feature or shutdown
+test was invoked. Remaining acceptance is physical Fold and final visual/device
+review; no automatic lock. Proceed to fresh preparation/original-key packaging.

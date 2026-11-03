@@ -46,3 +46,10 @@ The earlier234-observation complete Android PASS is retained separately; updated
 UI byte binding and focused Android recheck are still required before signing.
 
 No pixel-perfect claim is made without final comparison/physical acceptance.
+
+Updated reference-corrected DEX actual Android verification41567002286 succeeds.
+Its native Display screenshots confirm the implemented structure in both themes;
+all actual input/scaling/restoration/resume/source-return checks pass. Raw evidence
+and digest/source bindings are in final-evidence. This closes available functional
+and rendering checks, without claiming personal original-media access or physical
+Fold/pixel-perfect acceptance. Final user review remains required.
