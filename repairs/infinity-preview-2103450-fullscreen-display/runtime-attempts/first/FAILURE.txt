@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-preview-2103450-fullscreen-display/android-qa/run.py", line 121, in <module>
+    try:body(a);status='PASS'
+        ^^^^^^^
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-preview-2103450-fullscreen-display/android-qa/run.py", line 103, in body
+    panel_theme(theme);control('Display');q.await_text('Show the entire video with no cropping.');q.screenshot('display-'+theme.lower());q.tap('Done');enter_fullscreen();exit_fullscreen()
+                                                                                                                                                       ^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-preview-2103450-fullscreen-display/android-qa/run.py", line 93, in enter_fullscreen
+    control('Fullscreen');q.check(q.find(q.nodes(),'Close') is None,'Fullscreen must hide header');q.check(q.find(q.nodes(),'Seek video') is None,'Fullscreen must hide toolbar');advancing();bars_snapshot('immersive-'+str(len(q.steps)))
+                                                                                                                                                                                  ^^^^^^^^^^^
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-preview-2103450-fullscreen-display/android-qa/run.py", line 51, in advancing
+    before=clock();deadline=q.feature_time()+4
+           ^^^^^^^
+  File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-preview-2103450-fullscreen-display/android-qa/run.py", line 15, in clock
+    raise AssertionError('Actual cinematic elapsed-time node unavailable')
+AssertionError: Actual cinematic elapsed-time node unavailable

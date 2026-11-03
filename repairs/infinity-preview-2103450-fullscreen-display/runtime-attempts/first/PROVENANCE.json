@@ -1,0 +1,8 @@
+{
+  "run_id": 41550674951,
+  "source": "30cd34f2e7ddf4ccb9638c9982de25b4f3719f12",
+  "conclusion": "failure",
+  "artifact_id": 13192216418,
+  "artifact_sha256": "a39ea5db420def61d2f931dac648552332b0c3a65e04c3ebca30d265a26b372e",
+  "finding": "Fullscreen correctly hid header/timeline, but test then tried to read hidden clock. Preserve FAIL; observe real owned decoder frame progress while chrome hidden; no production change."
+}

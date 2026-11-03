@@ -89,10 +89,22 @@ def panel_theme(name):
 def bars_snapshot(name):
     data=q.shell('dumpsys','window','windows');(q.out/(name+'-window.txt')).write_text(data)
     q.screenshot(name);q.record('actual_window_bar_observation',name=name)
+def hidden_video_progress():
+    def sample():
+        dump=q.shell('dumpsys','media.player');clients=[c for c in re.split(r'(?m)^ Client\n',dump) if 'packageName: '+q.P+',' in c and 'mime(video/' in c];q.check(len(clients)==1,'One actual owned video decoder required');c=clients[0]
+        q.check('renderer(paused(0)' in c and 'state(5)' in c,'Actual decoder must remain playing in fullscreen')
+        connection=re.search(r'connId\((\d+)\)',c);frames=re.search(r'mime\(video/[^)]+\).*?numFramesTotal\((\d+)\)',c,re.S);q.check(connection and frames,'Actual decoder counters unavailable');return connection[1],int(frames[1]),dump
+    conn,before,dump=sample();deadline=q.feature_time()+4
+    while q.feature_time()<deadline:
+        current,after,dump=sample();q.check(current==conn,'Fullscreen must not replace the decoder')
+        if after>before:
+            (q.out/('fullscreen-player-'+str(len(q.steps))+'.txt')).write_text(dump);q.record('actual_hidden_video_progress',connection=conn,before=before,after=after);return
+        time.sleep(.2)
+    raise AssertionError('Real fullscreen decoder frames did not advance')
 def enter_fullscreen():
-    control('Fullscreen');q.check(q.find(q.nodes(),'Close') is None,'Fullscreen must hide header');q.check(q.find(q.nodes(),'Seek video') is None,'Fullscreen must hide toolbar');advancing();bars_snapshot('immersive-'+str(len(q.steps)))
+    control('Fullscreen');q.check(q.find(q.nodes(),'Close') is None,'Fullscreen must hide header');q.check(q.find(q.nodes(),'Seek video') is None,'Fullscreen must hide toolbar');hidden_video_progress();bars_snapshot('immersive-'+str(len(q.steps)))
 def exit_fullscreen():
-    visible_surface_tap();q.await_text('Seek video');control('Exit fullscreen');q.await_text('Close');advancing();q.record('fullscreen_reversible_without_restart')
+    visible_surface_tap();q.await_text('Seek video');control('Exit fullscreen');q.await_text('Close');advancing();bars_snapshot('restored-'+str(len(q.steps)));q.record('fullscreen_reversible_without_restart')
 def magenta_ratio(name):
     from PIL import ImageChops
     im=q.screenshot(name);r,g,b=im.split()[:3];mask=ImageChops.multiply(ImageChops.multiply(r.point(lambda x:255 if x>150 else 0),b.point(lambda x:255 if x>150 else 0)),g.point(lambda x:255 if x<90 else 0));bounds=mask.getbbox();q.check(bounds is not None,'Decoded scaling patch must be visible');ratio=(bounds[2]-bounds[0])/(bounds[3]-bounds[1]);q.record('actual_decoded_patch_ratio',name=name,bounds=bounds,ratio=ratio);return ratio
