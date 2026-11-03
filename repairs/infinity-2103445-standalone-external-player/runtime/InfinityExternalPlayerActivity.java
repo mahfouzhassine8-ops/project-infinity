@@ -43,6 +43,10 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
     private TextView title, message, times, subtitles;
     private ProgressBar busy;
     private Button play, mute, rotation, retry;
+    private Button fullscreenButton;
+    private boolean fullscreen, stretching, restoreChromeVisible = true;
+    private int restoreUiFlags, restoreBars = 3, restoreBarBehavior;
+    private InfinityPreviewDisplayDialog displayDialog;
     private SeekBar seek;
     private boolean started, ready, wantsPlay = true, muted, dragging, filling, locked;
     private boolean focusHeld, focusResume;
@@ -88,7 +92,7 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
             callModeListener=mode->{if(!isFinishing()&&engine!=null)syncCallMode(hasWindowFocus());};
             audio.addOnModeChangedListener(getMainExecutor(),callModeListener);
         }
-        buildUi(); accept(getIntent(), restored);
+        buildUi(); restoreDisplayState(saved); accept(getIntent(), restored);
     }
     private boolean existingExperiencePresent() {
         ActivityManager manager = (ActivityManager)getSystemService(ACTIVITY_SERVICE);
@@ -131,6 +135,7 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON); super.onStop();
     }
     @Override protected void onDestroy() {
+        if(displayDialog!=null)displayDialog.dismiss();
         if(Build.VERSION.SDK_INT>=31 && callModeListener!=null)audio.removeOnModeChangedListener(callModeListener);
         state.release(); engine.destroy(); abandonFocus(); super.onDestroy();
     }
@@ -139,10 +144,14 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
         out.putFloat("level", level); out.putBoolean("fill", filling); out.putBoolean("locked", locked);
         out.putBoolean("preview.callActive",callActive);out.putBoolean("preview.callMuted",callMuted);
         out.putString("preview.request", requestId); out.putBoolean("preview.offerResume", offerResume);
+        out.putBoolean("preview.stretch",stretching);out.putBoolean("preview.fullscreen",fullscreen);
+        out.putBoolean("preview.chromeVisible",controls.getVisibility()==View.VISIBLE);
+        out.putBoolean("preview.restoreChrome",restoreChromeVisible);out.putInt("preview.restoreUiFlags",restoreUiFlags);
+        out.putInt("preview.restoreBars",restoreBars);out.putInt("preview.restoreBarBehavior",restoreBarBehavior);
         super.onSaveInstanceState(out);
     }
-    @Override public void onConfigurationChanged(Configuration config) { super.onConfigurationChanged(config); applyChrome(); layoutChrome(); fitVideo(); }
-    @Override public void onBackPressed() { close(); }
+    @Override public void onConfigurationChanged(Configuration config) { super.onConfigurationChanged(config); applyChrome(); layoutChrome(); fitVideo(); if(displayDialog!=null&&displayDialog.isShowing())showDisplay(); }
+    @Override public void onBackPressed() { if(fullscreen)toggleFullscreen();else close(); }
     private void close() {
         dismissResume();
         wantsPlay = false; state.release(); engine.suspend(); abandonFocus(); finish();
@@ -308,10 +317,7 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
             public void surfaceDestroyed(SurfaceHolder h) { engine.surface(null); }
         });
         picture.addOnLayoutChangeListener((v,l,t,r,b,ol,ot,or,ob) -> {if(r-l!=or-ol||b-t!=ob-ot)fitVideo();});
-        video.setOnClickListener(v -> {
-            boolean visible=controls.getVisibility()==View.VISIBLE;
-            controls.setVisibility(visible?View.GONE:View.VISIBLE);top.setVisibility(visible?View.GONE:View.VISIBLE);layoutChrome();
-        });
+        video.setOnClickListener(v -> setChromeVisible(controls.getVisibility()!=View.VISIBLE));
         subtitles=text(20);subtitles.setTextColor(Color.WHITE);subtitles.setGravity(Gravity.CENTER);subtitles.setShadowLayer(3,1,1,Color.BLACK);
         FrameLayout.LayoutParams sub=new FrameLayout.LayoutParams(-1,-2,Gravity.BOTTOM);sub.bottomMargin=dp(12);picture.addView(subtitles,sub);
         top=new LinearLayout(this);top.setGravity(Gravity.CENTER_VERTICAL);top.setPadding(dp(10),0,dp(8),0);
@@ -361,9 +367,8 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
             public void onProgressChanged(SeekBar s,int value,boolean user){if(user){level=value/100f;engine.volume(effectiveMuted()?0:level);}}
         });addControl(inlineVolume,104);separator(14,12);
         addControl(button("Audio",()->engine.listTracks(false)),52);addControl(button("Subtitles",()->engine.listTracks(true)),64);
-        addControl(button("Display",()->dialog().setTitle("Display")
-                .setSingleChoiceItems(new String[]{"Best Fit","Fill (crop)"},filling?1:0,(d,which)->{filling=which==1;layoutChrome();d.dismiss();})
-                .setNeutralButton("Appearance",(d,which)->showAppearance()).setNegativeButton("Cancel",null).show()),56);
+        addControl(button("Display",this::showDisplay),56);
+        fullscreenButton=button("Fullscreen",this::toggleFullscreen);addControl(fullscreenButton,80);
         rotation=button("Auto rotate",()->{
             locked=!locked;setRequestedOrientation(locked?android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LOCKED:android.content.pm.ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR);updateButtons();
         });addControl(rotation,72);
@@ -372,13 +377,72 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
         root.addOnLayoutChangeListener((v,l,t,r,b,ol,ot,or,ob)->{if(r-l!=or-ol||b-t!=ob-ot)layoutChrome();});
         root.requestApplyInsets();applyChrome();showTimes(position,duration);updateButtons();
     }
+    private void setChromeVisible(boolean visible) {
+        controls.setVisibility(visible?View.VISIBLE:View.GONE);top.setVisibility(visible?View.VISIBLE:View.GONE);layoutChrome();
+    }
+    private static final int IMMERSIVE_FLAGS=View.SYSTEM_UI_FLAG_FULLSCREEN|View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+            |View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY|View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION|View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+    private void toggleFullscreen() {
+        if(!fullscreen){
+            restoreChromeVisible=controls.getVisibility()==View.VISIBLE;restoreUiFlags=getWindow().getDecorView().getSystemUiVisibility()&IMMERSIVE_FLAGS;
+            if(Build.VERSION.SDK_INT>=30){
+                android.view.WindowInsets insets=root.getRootWindowInsets();restoreBars=0;
+                if(insets==null||insets.isVisible(android.view.WindowInsets.Type.statusBars()))restoreBars|=1;
+                if(insets==null||insets.isVisible(android.view.WindowInsets.Type.navigationBars()))restoreBars|=2;
+                android.view.WindowInsetsController c=getWindow().getInsetsController();if(c!=null)restoreBarBehavior=c.getSystemBarsBehavior();
+            }
+            fullscreen=true;setChromeVisible(false);applyFullscreenBars();
+        }else{
+            fullscreen=false;restoreFullscreenBars();setChromeVisible(restoreChromeVisible);
+        }
+        updateButtons();root.requestApplyInsets();
+    }
+    private void applyFullscreenBars() {
+        if(!fullscreen)return;
+        if(Build.VERSION.SDK_INT>=30){
+            android.view.WindowInsetsController c=getWindow().getInsetsController();
+            if(c!=null){c.setSystemBarsBehavior(android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);c.hide(android.view.WindowInsets.Type.systemBars());}
+        }else getWindow().getDecorView().setSystemUiVisibility(getWindow().getDecorView().getSystemUiVisibility()|IMMERSIVE_FLAGS);
+    }
+    private void restoreFullscreenBars() {
+        if(Build.VERSION.SDK_INT>=30){
+            android.view.WindowInsetsController c=getWindow().getInsetsController();
+            if(c!=null){
+                c.setSystemBarsBehavior(restoreBarBehavior);
+                int status=android.view.WindowInsets.Type.statusBars(),nav=android.view.WindowInsets.Type.navigationBars();
+                if((restoreBars&1)!=0)c.show(status);else c.hide(status);
+                if((restoreBars&2)!=0)c.show(nav);else c.hide(nav);
+            }
+        }else{
+            int flags=getWindow().getDecorView().getSystemUiVisibility();getWindow().getDecorView().setSystemUiVisibility((flags&~IMMERSIVE_FLAGS)|restoreUiFlags);
+        }
+    }
+    @Override public void onWindowFocusChanged(boolean focus) {
+        super.onWindowFocusChanged(focus);if(focus&&fullscreen)applyFullscreenBars();
+    }
+    private void restoreDisplayState(Bundle saved) {
+        if(saved==null)return;
+        stretching=saved.getBoolean("preview.stretch");if(stretching)filling=false;
+        fullscreen=saved.getBoolean("preview.fullscreen");restoreChromeVisible=saved.getBoolean("preview.restoreChrome",true);
+        restoreUiFlags=saved.getInt("preview.restoreUiFlags");restoreBars=saved.getInt("preview.restoreBars",3);restoreBarBehavior=saved.getInt("preview.restoreBarBehavior");
+        setChromeVisible(saved.getBoolean("preview.chromeVisible",true));if(fullscreen)applyFullscreenBars();updateButtons();
+    }
+    private void showDisplay() {
+        if(displayDialog!=null)displayDialog.dismiss();
+        final InfinityPreviewDisplayDialog panel=new InfinityPreviewDisplayDialog(this,chrome,stretching?2:filling?1:0,new InfinityPreviewDisplayDialog.Actions(){
+            public void mode(int mode){filling=mode==1;stretching=mode==2;layoutChrome();}
+            public void appearance(){if(displayDialog!=null)displayDialog.dismiss();showAppearance();}
+        });
+        displayDialog=panel;panel.setOnDismissListener(d->{if(displayDialog==panel)displayDialog=null;});panel.show();
+        panel.resize(root.getWidth()-root.getPaddingLeft()-root.getPaddingRight(),root.getHeight()-root.getPaddingTop()-root.getPaddingBottom());
+    }
     private boolean isLight() {
         return appearance==1||(appearance==0&&(getResources().getConfiguration().uiMode&Configuration.UI_MODE_NIGHT_MASK)!=Configuration.UI_MODE_NIGHT_YES);
     }
     private void showAppearance() {
         dialog().setTitle("Preview appearance").setSingleChoiceItems(new String[]{"System","Light","Dark"},appearance,(d,which)->{
-            appearance=which;getSharedPreferences("infinity_preview_ui",MODE_PRIVATE).edit().putInt("appearance",which).apply();applyChrome();d.dismiss();
-        }).setNegativeButton("Cancel",null).show();
+            appearance=which;getSharedPreferences("infinity_preview_ui",MODE_PRIVATE).edit().putInt("appearance",which).apply();applyChrome();d.dismiss();showDisplay();
+        }).setNegativeButton("Cancel",(d,which)->showDisplay()).show();
     }
     private void applyChrome() {
         if(root==null)return;chrome=new InfinityPreviewChrome(this,isLight());root.setBackground(chrome.backdrop());
@@ -389,6 +453,7 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
         int color=chrome.light?0xffedf5f7:0xff001014;getWindow().setStatusBarColor(color);getWindow().setNavigationBarColor(color);
         int mask=View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;if(Build.VERSION.SDK_INT>=26)mask|=View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
         int flags=getWindow().getDecorView().getSystemUiVisibility();getWindow().getDecorView().setSystemUiVisibility((flags&~mask)|(chrome.light?mask:0));
+        if(fullscreen)applyFullscreenBars();
     }
     private void tintTree(View view) {
         if(view instanceof InfinityPreviewChrome.Control)((InfinityPreviewChrome.Control)view).theme(chrome);
@@ -434,7 +499,7 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
         int maxH=Math.max(1,h-upper-(chromeVisible?bottom+controlsH+videoGap:0));
         double ratio=width>0&&height>0?(double)width/height:16d/9d;
         int pw=maxW,ph=maxH;
-        if(!filling){
+        if(!filling&&!stretching){
             pw=Math.max(1,Math.min(maxW,(int)Math.round(maxH*ratio)));
             ph=Math.max(1,Math.min(maxH,(int)Math.round(pw/ratio)));
         }
@@ -442,6 +507,7 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
         place(picture,pw,ph,(w-pw)/2,groupTop,Gravity.TOP|Gravity.LEFT,0);
         place(controls,w-dp(22),controlsH,dp(11),groupTop+ph+videoGap,Gravity.TOP|Gravity.LEFT,0);
         fitVideo();
+        if(displayDialog!=null&&displayDialog.isShowing())displayDialog.resize(w,h);
     }
     private void showTimes(int now,int total) {
         if(times==null)return;times.setText(time(now));totalTime.setText(total>0?time(total):"Live");
@@ -456,6 +522,7 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
         if (play == null) return;
         String p = wantsPlay ? "Pause" : "Play"; play.setText(p); play.setContentDescription(p); play.setEnabled(ready);
         String m = effectiveMuted() ? "Unmute" : "Mute"; mute.setText(m); mute.setContentDescription(m);
+        String full=fullscreen?"Exit fullscreen":"Fullscreen";fullscreenButton.setText(full);fullscreenButton.setContentDescription(full);fullscreenButton.setSelected(fullscreen);
         rotation.setSelected(!locked);
         if(Build.VERSION.SDK_INT>=30)rotation.setStateDescription(locked?"Rotation locked":"Automatic rotation enabled");
         rotation.setText(locked ? "Rotation locked" : "Auto rotate");
@@ -467,7 +534,7 @@ public final class InfinityExternalPlayerActivity extends Activity implements In
         if (availableW <= 0 || availableH <= 0) return;
         double scale = filling ? Math.max((double)availableW/width, (double)availableH/height)
                 : Math.min((double)availableW/width, (double)availableH/height);
-        int w = Math.max(1,(int)Math.round(width*scale)), h = Math.max(1,(int)Math.round(height*scale));
+        int w = stretching?availableW:Math.max(1,(int)Math.round(width*scale)), h = stretching?availableH:Math.max(1,(int)Math.round(height*scale));
         FrameLayout.LayoutParams old = (FrameLayout.LayoutParams)video.getLayoutParams();
         if (old.width != w || old.height != h) video.setLayoutParams(new FrameLayout.LayoutParams(w,h,Gravity.CENTER));
     }
