@@ -1,0 +1,143 @@
+{
+  "purpose": "bounded local watched receipt host verification",
+  "compiler": [
+    "g++",
+    "-std=c++17",
+    "-DTARGET_ANDROID",
+    "-DHAS_UPNP",
+    "-DINFINITY_DATABASE_BARRIER_TEST",
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-Wno-unused-parameter",
+    "-pthread",
+    "-I",
+    "/tmp/kodi451-p0-watched-host-v3/source",
+    "/tmp/kodi451-p0-watched-host-v3/source/video/jobs/VideoLibraryMarkWatchedJob.cpp",
+    "/tmp/kodi451-p0-watched-host-v3/source/video/jobs/VideoLibraryJob.cpp",
+    "/tmp/kodi451-p0-watched-host-v3/test.cpp",
+    "-l:libsqlite3.so.0",
+    "-o",
+    "/tmp/kodi451-p0-watched-host-v3/watched"
+  ],
+  "cases": [
+    {
+      "case": "mark-unwatched",
+      "status": "HOST_PASS",
+      "output": "HOST_PASS mark-unwatched; SQLite 3.46.1; full Kodi database/Android not executed\n",
+      "reopened_playcount": 0,
+      "reopened_resume_rows": 0,
+      "full_shutdown_saved_asserted": false
+    },
+    {
+      "case": "unchanged",
+      "status": "HOST_PASS",
+      "output": "HOST_PASS unchanged; SQLite 3.46.1; full Kodi database/Android not executed\n",
+      "reopened_playcount": 1,
+      "reopened_resume_rows": 1,
+      "full_shutdown_saved_asserted": false
+    },
+    {
+      "case": "begin-failure",
+      "status": "HOST_PASS",
+      "output": "HOST_PASS begin-failure; SQLite 3.46.1; full Kodi database/Android not executed\n",
+      "reopened_playcount": 0,
+      "reopened_resume_rows": 1,
+      "full_shutdown_saved_asserted": false
+    },
+    {
+      "case": "commit-failure",
+      "status": "HOST_PASS",
+      "output": "HOST_PASS commit-failure; SQLite 3.46.1; full Kodi database/Android not executed\n",
+      "reopened_playcount": 0,
+      "reopened_resume_rows": 1,
+      "full_shutdown_saved_asserted": false
+    },
+    {
+      "case": "resume-read-error",
+      "status": "HOST_PASS",
+      "output": "HOST_PASS resume-read-error; SQLite 3.46.1; full Kodi database/Android not executed\n",
+      "reopened_playcount": 1,
+      "reopened_resume_rows": 0,
+      "full_shutdown_saved_asserted": false
+    },
+    {
+      "case": "count-read-error",
+      "status": "HOST_PASS",
+      "output": "HOST_PASS count-read-error; SQLite 3.46.1; full Kodi database/Android not executed\n",
+      "reopened_playcount": 1,
+      "reopened_resume_rows": 0,
+      "full_shutdown_saved_asserted": false
+    },
+    {
+      "case": "close-failure",
+      "status": "HOST_PASS",
+      "output": "HOST_PASS close-failure; SQLite 3.46.1; full Kodi database/Android not executed\n",
+      "reopened_playcount": 1,
+      "reopened_resume_rows": 0,
+      "full_shutdown_saved_asserted": false
+    },
+    {
+      "case": "unknown-upnp",
+      "status": "HOST_PASS",
+      "output": "HOST_PASS unknown-upnp; SQLite 3.46.1; full Kodi database/Android not executed\n",
+      "reopened_playcount": 0,
+      "reopened_resume_rows": 1,
+      "full_shutdown_saved_asserted": false
+    },
+    {
+      "case": "unknown-folder",
+      "status": "HOST_PASS",
+      "output": "HOST_PASS unknown-folder; SQLite 3.46.1; full Kodi database/Android not executed\n",
+      "reopened_playcount": 0,
+      "reopened_resume_rows": 1,
+      "full_shutdown_saved_asserted": false
+    },
+    {
+      "case": "unknown-callback",
+      "status": "HOST_PASS",
+      "output": "HOST_PASS unknown-callback; SQLite 3.46.1; full Kodi database/Android not executed\n",
+      "reopened_playcount": 1,
+      "reopened_resume_rows": 0,
+      "full_shutdown_saved_asserted": false
+    },
+    {
+      "case": "unknown-job",
+      "status": "HOST_PASS",
+      "output": "HOST_PASS unknown-job; SQLite 3.46.1; full Kodi database/Android not executed\n",
+      "reopened_playcount": 1,
+      "reopened_resume_rows": 0,
+      "full_shutdown_saved_asserted": false
+    },
+    {
+      "case": "callback-failure",
+      "status": "HOST_PASS",
+      "output": "HOST_PASS callback-failure; SQLite 3.46.1; full Kodi database/Android not executed\n",
+      "reopened_playcount": 1,
+      "reopened_resume_rows": 0,
+      "full_shutdown_saved_asserted": false
+    }
+  ],
+  "source_sha256": {
+    "candidate/xbmc/video/jobs/VideoLibraryMarkWatchedJob.cpp": "21b02301a621d5ea3e58a98a91e36280194b5989cea3adffdca12f34ccc800f2",
+    "candidate/xbmc/video/jobs/VideoLibraryMarkWatchedJob.h": "b48e086c09c1c535ed139bc067dc16b86639b33d3e95f579dab1f2ff0bdf9a19",
+    "retained/video/jobs/VideoLibraryJob.h": "40ae24d0709b6b9a3293ae4d7d6529fc77fb15a8439331c23dc29f54d7eaab49",
+    "retained/video/jobs/VideoLibraryJob.cpp": "67b802726fdbe8501d07069dd7c0daac2ae4df7c2579f7adf807fdc37914a7a2",
+    "retained/utils/Job.h": "3c4433e98f3fd4a34375a4a637d0a681a137752f14e7e6c3c0e18cf420dd0436",
+    "retained/utils/JobManager.h": "a7d53038e15456bcd30bb5a866f342ed1ce24f6c4bbab69a3bf8060715b9c56b",
+    "retained/utils/JobCheckpoint.h": "ecda8b68872b2e5cc873fd43580e8772f126913dba605c03a11d3abb2345c939",
+    "retained/threads/Thread.h": "4bebe0748c34cc7c95e5662329ddced700fb114cdda86bdf82855629931ab91a",
+    "retained/threads/CriticalSection.h": "4478ee7834b5497756650499cd3d0bbd8fff068a4cd9d6b867669a0d56bcd332",
+    "repairs/android-checkpoint-shutdown/runtime/native/overlay/xbmc/dbwrappers/InfinityDatabaseBarrier.h": "14a0f855a218995ff091d89a7ca8040dd81d7df830c5b9aa04a8193a4002973d"
+  },
+  "actual_watched_work_and_receipt_code_compiled": true,
+  "actual_job_tracking_and_database_observation_code": true,
+  "real_file_sqlite_commit_and_reopen": true,
+  "full_kodi_database_implementation": false,
+  "actual_queue_callback_executed": false,
+  "final_native_database_checkpoint_fence_executed": false,
+  "reported_historical_item_route_confirmed": false,
+  "android_execution": false,
+  "physical_fold_acceptance": false,
+  "apk_built_or_signed": false
+}

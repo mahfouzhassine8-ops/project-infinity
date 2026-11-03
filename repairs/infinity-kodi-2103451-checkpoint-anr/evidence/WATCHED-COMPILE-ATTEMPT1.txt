@@ -1,0 +1,73 @@
+In file included from /tmp/kodi451-p0-watched-host/source/video/jobs/VideoLibraryMarkWatchedJob.cpp:9:
+/tmp/kodi451-p0-watched-host/source/video/jobs/VideoLibraryMarkWatchedJob.h:52:3: error: ‘CJobDurability’ does not name a type
+   52 |   CJobDurability m_infinityDurability{CJobDurability::Pending};
+      |   ^~~~~~~~~~~~~~
+In file included from /tmp/kodi451-p0-watched-host/source/video/VideoLibraryQueue.h:2,
+                 from /tmp/kodi451-p0-watched-host/source/video/jobs/VideoLibraryMarkWatchedJob.cpp:13:
+/tmp/kodi451-p0-watched-host/source/test_peers.h: In member function ‘bool CVideoDatabase::execute(const std::string&)’:
+/tmp/kodi451-p0-watched-host/source/test_peers.h:53:3: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+   53 |   if(!ok)InfinityDatabaseBarrier::RecordFailure("fixture.sqlite.execute");return ok;}
+      |   ^~
+/tmp/kodi451-p0-watched-host/source/test_peers.h:53:75: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   53 |   if(!ok)InfinityDatabaseBarrier::RecordFailure("fixture.sqlite.execute");return ok;}
+      |                                                                           ^~~~~~
+/tmp/kodi451-p0-watched-host/source/test_peers.h: In member function ‘int CVideoDatabase::query(const std::string&)’:
+/tmp/kodi451-p0-watched-host/source/test_peers.h:58:3: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+   58 |   if(sqlite3_finalize(statement)!=0)InfinityDatabaseBarrier::RecordFailure("fixture.sqlite.finalize");return value;}
+      |   ^~
+/tmp/kodi451-p0-watched-host/source/test_peers.h:58:103: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   58 |   if(sqlite3_finalize(statement)!=0)InfinityDatabaseBarrier::RecordFailure("fixture.sqlite.finalize");return value;}
+      |                                                                                                       ^~~~~~
+/tmp/kodi451-p0-watched-host/source/video/jobs/VideoLibraryMarkWatchedJob.cpp: In member function ‘virtual bool CVideoLibraryMarkWatchedJob::operator==(const CJob*) const’:
+/tmp/kodi451-p0-watched-host/source/video/jobs/VideoLibraryMarkWatchedJob.cpp:43:7: error: ‘strcmp’ was not declared in this scope
+   43 |   if (strcmp(job->GetType(), GetType()) != 0)
+      |       ^~~~~~
+/tmp/kodi451-p0-watched-host/source/video/jobs/VideoLibraryMarkWatchedJob.cpp:14:1: note: ‘strcmp’ is defined in header ‘<cstring>’; this is probably fixable by adding ‘#include <cstring>’
+   13 | #include "video/VideoLibraryQueue.h"
+  +++ |+#include <cstring>
+   14 | #include <typeinfo>
+/tmp/kodi451-p0-watched-host/source/video/jobs/VideoLibraryMarkWatchedJob.cpp: In member function ‘virtual bool CVideoLibraryMarkWatchedJob::DoWork()’:
+/tmp/kodi451-p0-watched-host/source/video/jobs/VideoLibraryMarkWatchedJob.cpp:91:3: error: ‘m_infinityDurability’ was not declared in this scope
+   91 |   m_infinityDurability = CJobDurability::Pending;
+      |   ^~~~~~~~~~~~~~~~~~~~
+/tmp/kodi451-p0-watched-host/source/video/jobs/VideoLibraryMarkWatchedJob.cpp: In member function ‘virtual bool CVideoLibraryMarkWatchedJob::Work(CVideoDatabase&)’:
+/tmp/kodi451-p0-watched-host/source/video/jobs/VideoLibraryMarkWatchedJob.cpp:155:7: error: ‘m_infinityDurability’ was not declared in this scope
+  155 |       m_infinityDurability = CJobDurability::VerifiedUnchanged;
+      |       ^~~~~~~~~~~~~~~~~~~~
+/tmp/kodi451-p0-watched-host/source/video/jobs/VideoLibraryMarkWatchedJob.cpp:221:5: error: ‘m_infinityDurability’ was not declared in this scope
+  221 |     m_infinityDurability = CJobDurability::VerifiedCommitted;
+      |     ^~~~~~~~~~~~~~~~~~~~
+cc1plus: all warnings being treated as errors
+In file included from /tmp/kodi451-p0-watched-host/source/video/VideoDatabase.h:2,
+                 from /tmp/kodi451-p0-watched-host/source/video/jobs/VideoLibraryJob.cpp:11:
+/tmp/kodi451-p0-watched-host/source/test_peers.h: In member function ‘bool CVideoDatabase::execute(const std::string&)’:
+/tmp/kodi451-p0-watched-host/source/test_peers.h:53:3: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+   53 |   if(!ok)InfinityDatabaseBarrier::RecordFailure("fixture.sqlite.execute");return ok;}
+      |   ^~
+/tmp/kodi451-p0-watched-host/source/test_peers.h:53:75: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   53 |   if(!ok)InfinityDatabaseBarrier::RecordFailure("fixture.sqlite.execute");return ok;}
+      |                                                                           ^~~~~~
+/tmp/kodi451-p0-watched-host/source/test_peers.h: In member function ‘int CVideoDatabase::query(const std::string&)’:
+/tmp/kodi451-p0-watched-host/source/test_peers.h:58:3: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+   58 |   if(sqlite3_finalize(statement)!=0)InfinityDatabaseBarrier::RecordFailure("fixture.sqlite.finalize");return value;}
+      |   ^~
+/tmp/kodi451-p0-watched-host/source/test_peers.h:58:103: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   58 |   if(sqlite3_finalize(statement)!=0)InfinityDatabaseBarrier::RecordFailure("fixture.sqlite.finalize");return value;}
+      |                                                                                                       ^~~~~~
+cc1plus: all warnings being treated as errors
+In file included from /tmp/kodi451-p0-watched-host/test.cpp:2:
+/tmp/kodi451-p0-watched-host/source/test_peers.h: In member function ‘bool CVideoDatabase::execute(const std::string&)’:
+/tmp/kodi451-p0-watched-host/source/test_peers.h:53:3: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+   53 |   if(!ok)InfinityDatabaseBarrier::RecordFailure("fixture.sqlite.execute");return ok;}
+      |   ^~
+/tmp/kodi451-p0-watched-host/source/test_peers.h:53:75: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   53 |   if(!ok)InfinityDatabaseBarrier::RecordFailure("fixture.sqlite.execute");return ok;}
+      |                                                                           ^~~~~~
+/tmp/kodi451-p0-watched-host/source/test_peers.h: In member function ‘int CVideoDatabase::query(const std::string&)’:
+/tmp/kodi451-p0-watched-host/source/test_peers.h:58:3: error: this ‘if’ clause does not guard... [-Werror=misleading-indentation]
+   58 |   if(sqlite3_finalize(statement)!=0)InfinityDatabaseBarrier::RecordFailure("fixture.sqlite.finalize");return value;}
+      |   ^~
+/tmp/kodi451-p0-watched-host/source/test_peers.h:58:103: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+   58 |   if(sqlite3_finalize(statement)!=0)InfinityDatabaseBarrier::RecordFailure("fixture.sqlite.finalize");return value;}
+      |                                                                                                       ^~~~~~
+cc1plus: all warnings being treated as errors

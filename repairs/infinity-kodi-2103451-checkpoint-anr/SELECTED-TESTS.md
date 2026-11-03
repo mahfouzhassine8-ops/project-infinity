@@ -81,3 +81,62 @@ Compare all existing messenger method bodies and all unrelated application
 methods against their input bytes; only the new helper and the two exact
 checkpoint branches may differ. No real EGL/native-window, database operation,
 Android execution or physical Fold acceptance is represented by this harness.
+
+## Bounded local watched receipt — selected before execution
+
+Stage and test commands:
+
+```
+PYTHONDONTWRITEBYTECODE=1 python3 repairs/infinity-kodi-2103451-checkpoint-anr/stage_watched_repair.py --source /tmp/kodi451-p0-inputs --out /tmp/kodi451-p0-watched-candidate
+PYTHONDONTWRITEBYTECODE=1 python3 repairs/infinity-kodi-2103451-checkpoint-anr/test_watched_repair.py --source /tmp/kodi451-p0-watched-candidate --inputs /tmp/kodi451-p0-inputs --out /tmp/kodi451-p0-watched-host
+```
+
+Compile the actual staged watched-job implementation and original library-job
+wrapper with actual JobCheckpoint/JobManager tracking and database-observation
+headers. FileItem/profile/queue peers and CVideoDatabase are controlled adapters;
+the database adapter must execute real temporary-file SQLite transactions,
+separate-connection readback and reopen verification. It is not the Kodi database
+engine or the final native-database checkpoint fence.
+
+Selected cases: mark watched; mark unwatched; verified unchanged/no-op; failed
+BEGIN; failed COMMIT; failed resume readback; failed count readback; failed close;
+unclassified UPnP work preserving its original call; recursive-folder refusal;
+unreviewed callback subclass; unreviewed job subclass; failed completion callback.
+
+Assert successful local outcomes produce the correct job receipt only after
+checked work/close; failures and unreviewed paths remain blocking. Verify file
+rows after the host process exits. Never mark a complete shutdown saved or waive
+the authoritative native database fence in this fixture. Android verification
+and the actual reported item's route remain outstanding.
+
+The first watched host compile stopped before any case ran: the new header
+needed an explicit JobCheckpoint include, and two adapter statements triggered
+the strict compiler's indentation check. Correct these specific defects and run
+the same selected cases on fresh `-v2` staged/output directories; preserve the
+first compile log. No lifecycle tests are repeated for these unrelated edits.
+
+The v2 run passed mark-watched, then exposed an inconsistent cached-tag input in
+mark-unwatched. Preserve the passed result in WATCHED-FIRST-CASE.json. Set the
+unwatched fixture's cached count to 2 to match its initial database row; the
+original job deliberately skips a cached status already matching the request.
+No candidate source changes are made for this fixture correction. Execute only
+the remaining 12 cases on fresh output `/tmp/kodi451-p0-watched-host-v3` using
+`--cases mark-unwatched unchanged begin-failure commit-failure resume-read-error
+count-read-error close-failure unknown-upnp unknown-folder unknown-callback
+unknown-job callback-failure`, with the same v2 candidate source.
+
+After those 12 remaining cases passed, add exactly one PVR negative control:
+`--cases unknown-pvr` with the same v2 candidate source and fresh output
+`/tmp/kodi451-p0-watched-host-pvr`. Verify its original remote call and local
+playcount update occur, its resume row remains as in the original PVR branch,
+and its unreviewed persistence obligation remains Unknown. Do not rerun the
+already-passing watched/lifecycle cases for this fixture addition.
+
+Before integration, tighten the new CheckpointSucceeded override to preserve the
+original operation result for unclassified remote/subclass work. Their Unknown
+ledger entry must still block retirement; successful remote work must not gain a
+new misleading generic job-failure label. This changes a tested production
+method, so select all 14 watched cases once against fresh candidate `-v3` and
+host output `-final`, adding an explicit unknown-operation-result assertion.
+Prior v2 results remain historical. The lifecycle source/tests are unchanged and
+are not repeated. No Android run is selected by this correction.

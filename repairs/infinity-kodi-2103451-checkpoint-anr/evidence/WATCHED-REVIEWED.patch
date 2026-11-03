@@ -1,0 +1,144 @@
+--- a/xbmc/video/jobs/VideoLibraryMarkWatchedJob.cpp
++++ b/xbmc/video/jobs/VideoLibraryMarkWatchedJob.cpp
+@@ -9,0 +10,7 @@
++#if defined(TARGET_ANDROID)
++#include "dbwrappers/InfinityDatabaseBarrier.h"
++#include "utils/JobManager.h"
++#include "video/VideoLibraryQueue.h"
++#include <cstring>
++#include <typeinfo>
++#endif
+@@ -45,0 +53,55 @@
++
++#if defined(TARGET_ANDROID)
++bool CVideoLibraryMarkWatchedJob::IsInfinityLocalWatchedJob() const
++{
++  // Directory/provider recursion and remote recording/server writes have their
++  // own contracts. Never classify them by this local SQLite receipt.
++  return typeid(*this) == typeid(CVideoLibraryMarkWatchedJob) && m_item &&
++      !m_item->m_bIsFolder && !m_item->HasPVRRecordingInfoTag() &&
++      !URIUtils::IsUPnP(m_item->GetPath());
++}
++
++CJob::CheckpointResponsibility CVideoLibraryMarkWatchedJob::GetCheckpointResponsibility(
++    const IJobCallback* callback) const
++{
++  return IsInfinityLocalWatchedJob() && callback &&
++         typeid(*callback) == typeid(CVideoLibraryQueue) ?
++      CheckpointResponsibility::Required : CheckpointResponsibility::Unknown;
++}
++
++const char* CVideoLibraryMarkWatchedJob::GetCheckpointPersistenceOwner() const
++{
++  return IsInfinityLocalWatchedJob() ? "native_databases" : "";
++}
++
++bool CVideoLibraryMarkWatchedJob::RequiresCheckpointCompletionReceipt() const
++{
++  return IsInfinityLocalWatchedJob();
++}
++
++bool CVideoLibraryMarkWatchedJob::CheckpointSucceeded(bool success) const
++{
++  if (!IsInfinityLocalWatchedJob())
++    return success; // Preserve its operation result; Unknown still blocks retirement.
++  return success && m_infinityCompletionVerified &&
++      m_infinityDatabaseFailures == InfinityDatabaseBarrier::ThreadFailureSerial();
++}
++
++bool CVideoLibraryMarkWatchedJob::DoWork()
++{
++  m_infinityCompletionVerified = false;
++  m_infinityOutcomeReviewed = false;
++  m_infinityDurability = CJobDurability::Pending;
++  m_infinityDatabaseFailures = InfinityDatabaseBarrier::ThreadFailureSerial();
++  InfinityDatabaseBarrier::WriteObservation writes;
++  // Includes open, the original Work implementation and database destruction.
++  const bool success = CVideoLibraryJob::DoWork();
++  m_infinityCompletionVerified = success && IsInfinityLocalWatchedJob() &&
++      m_infinityOutcomeReviewed && writes.Durable() &&
++      m_infinityDatabaseFailures == InfinityDatabaseBarrier::ThreadFailureSerial();
++  JobCheckpoint::WorkResult(CJobManager::CheckpointRecord(this),
++      m_infinityCompletionVerified ? m_infinityDurability : CJobDurability::Unresolved,
++      success, m_infinityCompletionVerified ? "" : "watched_job_persistence_unverified");
++  return success; // Preserve the actual operation result; no fabricated save.
++}
++#endif
+@@ -90,0 +153,8 @@
++  {
++#if defined(TARGET_ANDROID)
++    if (IsInfinityLocalWatchedJob())
++    {
++      m_infinityOutcomeReviewed = true;
++      m_infinityDurability = CJobDurability::VerifiedUnchanged;
++    }
++#endif
+@@ -91,0 +162 @@
++  }
+@@ -93,0 +165,5 @@
++#if defined(TARGET_ANDROID)
++  if (IsInfinityLocalWatchedJob() &&
++      m_infinityDatabaseFailures != InfinityDatabaseBarrier::ThreadFailureSerial())
++    return false; // Do not run writes outside a failed transaction.
++#endif
+@@ -116 +192 @@
+-  db.CommitTransaction();
++  const bool committed = db.CommitTransaction();
+@@ -118 +194,33 @@
+-
++  if (!committed)
++    return false;
++
++#if defined(TARGET_ANDROID)
++  if (IsInfinityLocalWatchedJob())
++  {
++    // Verify through a separate database object after the write connection has
++    // closed. The native_databases final fence still owns checkpoint durability.
++    CVideoDatabase persisted;
++    if (!persisted.Open())
++      return false;
++    bool verified = m_infinityDatabaseFailures == InfinityDatabaseBarrier::ThreadFailureSerial();
++    for (const auto& item : markItems)
++    {
++      const int count = persisted.GetPlayCount(*item);
++      if (m_mark ? count <= 0 : count != 0)
++        verified = false;
++      std::string path(item->GetPath());
++      if (item->HasVideoInfoTag() && !item->GetVideoInfoTag()->GetPath().empty())
++        path = item->GetVideoInfoTag()->GetPath();
++      CBookmark bookmark;
++      if (persisted.GetResumeBookMark(path, bookmark))
++        verified = false;
++    }
++    persisted.Close();
++    verified = verified &&
++        m_infinityDatabaseFailures == InfinityDatabaseBarrier::ThreadFailureSerial();
++    if (!verified)
++      return false;
++    m_infinityOutcomeReviewed = true;
++    m_infinityDurability = CJobDurability::VerifiedCommitted;
++  }
++#endif
+--- a/xbmc/video/jobs/VideoLibraryMarkWatchedJob.h
++++ b/xbmc/video/jobs/VideoLibraryMarkWatchedJob.h
+@@ -11,0 +12,3 @@
++#if defined(TARGET_ANDROID)
++#include "utils/JobCheckpoint.h"
++#endif
+@@ -33,0 +37,8 @@
++#if defined(TARGET_ANDROID)
++  bool DoWork() override;
++  CheckpointResponsibility GetCheckpointResponsibility(const IJobCallback*) const override;
++  const char* GetCheckpointPersistenceOwner() const override;
++  bool RequiresCheckpointCompletionReceipt() const override;
++  bool RequiresCheckpointCallback() const override { return true; }
++  bool CheckpointSucceeded(bool success) const override;
++#endif
+@@ -38,0 +50,7 @@
++#if defined(TARGET_ANDROID)
++  bool IsInfinityLocalWatchedJob() const;
++  bool m_infinityCompletionVerified{false};
++  bool m_infinityOutcomeReviewed{false};
++  uint64_t m_infinityDatabaseFailures{0};
++  CJobDurability m_infinityDurability{CJobDurability::Pending};
++#endif

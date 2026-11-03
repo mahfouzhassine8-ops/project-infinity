@@ -77,3 +77,26 @@ file with upstream originals.
 Production source, Preview, Cobra, the lock and signing identity are unchanged.
 Exact final source-map recovery, complete signed-451 APK access, safe operation
 contracts and Android runtime evidence remain release gates.
+
+## Staged corrections and current verification
+
+The lifecycle staging producer changes only two checkpoint branches in
+Application.cpp and adds one Android-only selective display-dispatch method in
+ApplicationMessenger.cpp/.h. Seven host cases pass; existing normal-dispatch,
+sender/cleanup and unrelated application methods compare unchanged.
+
+The watched staging producer changes only VideoLibraryMarkWatchedJob.cpp/.h. It
+accepts only the exact local nonrecursive/non-PVR/non-UPnP class and exact
+VideoLibraryQueue callback for a native_databases receipt. It checks BEGIN
+failure observations and COMMIT, reads watched/resume state through a separate
+database object, includes open/close failures in the existing write observation,
+and leaves final durability authorization to the existing native database fence.
+No-op work receives VerifiedUnchanged only for that bounded scope. Unknown
+paths and subclasses retain their obligations and original operation outcomes.
+
+Fourteen final host cases passed with actual job/receipt code and real SQLite
+3.46.1 files. These tests use controlled FileItem/profile/CVideoDatabase/queue
+peers and do not claim real Kodi database, callback, final-fence or Android
+execution. The original record's item route is still unknown, so coverage of
+that particular historical job is not asserted. Five native source files are
+staged in total; no APK, native engine build or lock has been produced.

@@ -1,0 +1,31 @@
+{
+  "case": "mark-watched",
+  "status": "HOST_PASS",
+  "provenance": "Previously captured v2 run printed HOST_PASS after executable success and parent-process reopen assertions; retained without rerunning.",
+  "command": "test_watched_repair.py --source /tmp/kodi451-p0-watched-candidate-v2 --inputs /tmp/kodi451-p0-inputs --out /tmp/kodi451-p0-watched-host-v2",
+  "actual_test_unit_sha256": "d72b6aaf5d23eb90b4df5948e306ad0d59043fe9104ae7b66e82fa373a8ff5d2",
+  "actual_test_binary_sha256": "a049d769c0b486ab857ee26dac9cb1d949bfc6c897b946e1ca47a0d3735359c4",
+  "candidate_source_delta": {
+    "kind": "bounded local watched-job persistence receipt, staged only",
+    "before": {
+      "xbmc/video/jobs/VideoLibraryMarkWatchedJob.cpp": "4acc7acb650dca3b5b99c5ff71ee9c76fc7ccadb162f9fc2f0485b32cd8e1e69",
+      "xbmc/video/jobs/VideoLibraryMarkWatchedJob.h": "be989bc5d0fca626c5c43d2e3ca9273fad6c0e25162ee2f49399bfbecf7d429d"
+    },
+    "after": {
+      "xbmc/video/jobs/VideoLibraryMarkWatchedJob.cpp": "21b02301a621d5ea3e58a98a91e36280194b5989cea3adffdca12f34ccc800f2",
+      "xbmc/video/jobs/VideoLibraryMarkWatchedJob.h": "b48e086c09c1c535ed139bc067dc16b86639b33d3e95f579dab1f2ff0bdf9a19"
+    },
+    "scope": "exact class, nonrecursive non-PVR/non-UPnP item, exact VideoLibraryQueue callback",
+    "unknown_recursive_and_remote_work_remains_blocking": true,
+    "checked_commit_and_separate_connection_readback": true,
+    "final_native_database_fence_preserved": true,
+    "host_verified": false,
+    "android_verified": false,
+    "full_native_source_map_verified": false,
+    "apk_built_or_signed": false
+  },
+  "reopened_playcount": 1,
+  "reopened_resume_rows": 0,
+  "android_execution": false,
+  "full_shutdown_saved_asserted": false
+}

@@ -155,7 +155,22 @@ cleanup and normal-dispatch methods plus seven unrelated Application methods
 were byte-compared unchanged. This is not full-engine integration or Android
 verification. See evidence/LIFECYCLE-HOST-VERIFICATION.json and the reviewed patch.
 
-**Release blocked:** reviewed watched-job persistence-contract correction,
-lifecycle repair integration, final native source-map provenance, full signed-451
-APK access and Android runtime verification remain outstanding. No successor
-build/signing or automatic lock is implied by the host results.
+The bounded local watched-job contract is also implemented as a guarded staging
+producer: checked commit, separate-connection readback, actual database write
+observation and reviewed callback identity. Fourteen selected host cases pass
+against the final source using real SQLite temporary files, with current source
+bindings in WATCHED-HOST-VERIFICATION.json. The first compile and fixture-input
+failures are retained separately; they were corrected before final cases passed.
+Unclassified recursive/UPnP/PVR jobs remain blocking and keep their original
+operation results. The original historical job item's route remains unknown.
+
+The exact five-file source union is saved in CONSOLIDATED-STAGING-PLAN.json.
+The existing original native producer/overlays, Preview/Cobra payloads and
+signature infrastructure remain unmodified. No full native engine was compiled.
+
+**Release blocked:** exact full native source/map and signed-451 artifact access,
+full-engine integration, real Kodi/Android verification and complete package
+preservation. This executor has no adb, emulator or exposed KVM; do not rerun the
+known translated-native constructor failure as if it could verify these changes.
+Original diagnostic bytes and historical item-route/producer attribution remain
+unavailable here. No successor build/signing or automatic lock is implied.
