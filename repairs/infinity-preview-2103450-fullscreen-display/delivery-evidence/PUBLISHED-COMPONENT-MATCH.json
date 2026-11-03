@@ -1,0 +1,36 @@
+{
+  "artifact_sha256": "e5f3017e5154625561103580c86020eab0176cc4d1f6ca033f0c1bb8726baedd",
+  "components": {
+    "CHOOSER_SHELL": {
+      "dex_members": [
+        "classes.dex"
+      ],
+      "payload_members": 1,
+      "zip_sha256": "70da3f8ff060c4709ef8c0a61821f001a24355d6f3c086ecaf9c6fc707d42360"
+    },
+    "COBRA": {
+      "dex_members": [
+        "classes4.dex",
+        "classes5.dex"
+      ],
+      "payload_members": 11,
+      "zip_sha256": "f63d4c1e491dc94591c5623bf02be90d4f9c187b91a0511b36398ee96745f8a8"
+    },
+    "INFINITY": {
+      "dex_members": [
+        "classes3.dex"
+      ],
+      "payload_members": 7516,
+      "zip_sha256": "7aea7edf649f5718bf858d97c61ec87e976ddd84cee320bed28b78721f449130"
+    },
+    "MINIMAL_ANDROID_CONTRACT": {
+      "dex_members": [
+        "classes2.dex"
+      ],
+      "payload_members": 81,
+      "zip_sha256": "1c4a2890ef5ca8665b86b148dd293c06a56d76ec846de1e0c9c037a3b0151a25"
+    }
+  },
+  "manifest_exception": "app versionCode only; normalized shared component is exact",
+  "status": "PASS_ALL_PUBLISHED_COMPONENT_PAYLOADS_MATCH_SIGNED_APK"
+}
