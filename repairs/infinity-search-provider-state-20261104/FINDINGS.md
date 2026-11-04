@@ -2,6 +2,10 @@
 
 Read-only production investigation. No Search implementation, add-on, settings, native, Preview, Cobra or APK changes. The separately authorized UI454/recovery455 work contains no Search correction.
 
+Continuation: [provider-specific source findings and seven additional diagnostic cases](PROVIDER-CONTINUATION.md) identify normal WatchNixtoons2 settings writes and distinguish Crew's conditional paths. The initial 15-case evidence below is retained; current device attribution remains pending.
+
+The [standalone read-only diagnostic script](infinity_search_state_probe.py) is delivered with [instructions and ten passing safety checks](STATE-PROBE-README.md). It has not been deployed; no connected authorized Kodi script-launch route is currently exposed. The initial source findings below remain the historical first-phase record; use the continuation for the newly verified provider-side writes.
+
 ## Confirmed source and executable evidence
 
 Examined the actual original-key signed 2103453 APK, SHA256 `08ca19e9ff01e3830253980028dbcdbfb36056fd71b06a18cbfb922158ceaac8`. Its `assets/addons/script.infinity.commandcenter/infinity_search.py` is SHA256 `cbbf36ee20974ada8be7a8630e0f0b621b0fb646004842508901b727ddad47b5`. The UI packaging allowlist freezes this member.

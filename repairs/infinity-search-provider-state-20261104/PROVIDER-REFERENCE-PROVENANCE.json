@@ -1,0 +1,58 @@
+{
+  "reference_only": true,
+  "phone_versions": "NOT_COLLECTED",
+  "archives": [
+    {
+      "id": "plugin.video.thecrew",
+      "version": "3.2.2",
+      "url": "https://raw.githubusercontent.com/thecrewwh/zips/master/matrix/_zip/plugin.video.thecrew/plugin.video.thecrew-3.2.2.zip",
+      "archive_sha256": "b60a2f93abf80fd528133c197bb5c7c56cf713eac4ffbf6df5d703d2a0a0f3b7",
+      "source_sha256": {
+        "plugin.video.thecrew/addon.xml": "17b833c8752fd7c2171939294c6a05f958e82b1e50537721189868e468ae1b91",
+        "plugin.video.thecrew/thecrew.py": "9ee54c130080be01f1fe209384e7cba04add0d09bb8edf72d02e5cbe4a94642d"
+      }
+    },
+    {
+      "id": "script.module.thecrew",
+      "version": "3.2.26",
+      "url": "https://raw.githubusercontent.com/thecrewwh/zips/ae33df23c3348c8c249514a3dc70c4cd7536df8c/matrix/_zip/script.module.thecrew/script.module.thecrew-3.2.26.zip",
+      "archive_sha256": "7cfbb1060f617e7b0165d0e3f4ae3c35330d094f64b79a76093664d110b463ce",
+      "source_sha256": {
+        "script.module.thecrew/addon.xml": "3f9cad7b0f1b22ee987b21d94f8002d30e466ada5bb0325ab8773a7d9332386a",
+        "script.module.thecrew/lib/resources/lib/indexers/tvshows.py": "0b41bb739b609ad068ea3b48f403ef422d40eb5fc61b66b0e30344f29892f00e",
+        "script.module.thecrew/lib/resources/lib/indexers/movies.py": "5f80392b631277b2a2c4dda5f736dd52a050bfd50d0aa528de5bcb4295bb9e3c",
+        "script.module.thecrew/lib/resources/lib/indexers/navigator.py": "5e489d7ea2df6936ac4b693aa1497f6f244f2b4d26a07c9f42a18ac479124be6",
+        "script.module.thecrew/lib/resources/lib/modules/utils.py": "b56f1f0b06f5fddc7f88080df6f8bef982ea911360b65261dfbfd78938ed27ea",
+        "script.module.thecrew/lib/resources/lib/modules/crew.py": "caafcf30c7c286345ff3eb98246e42198c1c4990a3f03d9242a3c73138eba7c8",
+        "script.module.thecrew/lib/resources/lib/modules/crewruntime.py": "e45ba1dd3ef55f4287915613031bc3ebeb56ccb39a4dd38991a3ca782c08aed9",
+        "script.module.thecrew/lib/resources/lib/modules/settings_repair.py": "b43ecd3cb8c53652cc4770a6873406f1f70ef9425ab0f8c124ce3a54fee41b61"
+      }
+    },
+    {
+      "id": "plugin.video.watchnixtoons2",
+      "version": "0.14.24",
+      "url": "https://raw.githubusercontent.com/OldManJax/repository.animaniac/ac317fdf6d001f6e252b41037fb1086817e8b00f/plugin.video.watchnixtoons2/plugin.video.watchnixtoons2-0.14.24.zip",
+      "archive_sha256": "76a0580d035b80634fc6775f46aacc780a9449a9ca46b446dde63c2360ce6540",
+      "source_sha256": {
+        "plugin.video.watchnixtoons2/default.py": "aa2ce18fcbdf1a4076419e3e5b23b65d1dcc6abe0bf9edc66c206b4bfe8c7d75",
+        "plugin.video.watchnixtoons2/lib/common.py": "826e411989c9d02b89ce6efe9715f3c74f7e241cbaca4bbac5c5f9999425c03e",
+        "plugin.video.watchnixtoons2/lib/constants.py": "81c63b78d46f8cd7c99318be2923d86e85b4ff6833b6047970c5bb9155a6ee23",
+        "plugin.video.watchnixtoons2/lib/network.py": "6cd59019db4fddeb86d83596cc163bd56176f181efcd3f21cf4313554b564d66",
+        "plugin.video.watchnixtoons2/lib/plugin.py": "d8d395634eff8ada8c9d09138744997573035b7819fcac91985ff870bbfc2283",
+        "plugin.video.watchnixtoons2/lib/sites/wcoflix.py": "171a090d4e26b0f94a39a9dd1e48301849561abbaa6aec2fd7c6534f42273395",
+        "plugin.video.watchnixtoons2/lib/sites/wcoforever.py": "5a8fe52886a516b146481bcbb41b11ea31f8bdbdf0f10a1664481d7a239dd213",
+        "plugin.video.watchnixtoons2/lib/sites/wcostream.py": "9c7b2e051cf61e147e860494f8eaebe597e0eddf3ef883ea35c0fb7fa226fa0d"
+      },
+      "all_eight_shipped_source_pins_match": true
+    }
+  ],
+  "read_only": true,
+  "production_changes": [],
+  "Android": "NOT_RUN",
+  "prior_host_cases_reused": 15,
+  "new_host_cases": 7,
+  "notes": [
+    "No live provider imports or network searches. Only selected function ASTs execute with synthetic platform boundaries.",
+    "Crew module moving-branch URL returned404; exact original archive recovered from historical GitHub commit and SHA verified."
+  ]
+}
