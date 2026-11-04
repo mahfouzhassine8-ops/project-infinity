@@ -1,0 +1,424 @@
+{
+  "native_before": "f89a40b5653c0091a06edd44f6ac5cdf056a649301b6751ee638c8ba88db9674",
+  "native_after": "d0b6f115e839fbe39e764e2fecad47418c501ab1ece853294578652cd0b80b98",
+  "selected_methods": 46,
+  "methods": [
+    {
+      "symbol": "_ZN12CApplication8OnActionERK7CAction",
+      "instruction_count": 1445,
+      "classification": {
+        "exact_instruction": 950,
+        "same_named_function_target": 231,
+        "same_intrafunction_target_offset": 244,
+        "same_allocated_section_page_offset": 20
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZN17CGUIWindowManager20OnApplicationMessageEPN4KODI9MESSAGING13ThreadMessageE",
+      "instruction_count": 244,
+      "classification": {
+        "exact_instruction": 177,
+        "same_intrafunction_target_offset": 39,
+        "same_allocated_section_page_offset": 3,
+        "same_named_function_target": 25
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZN25InfinityAndroidCheckpoint16AllowNativeWriteEPKc",
+      "instruction_count": 50,
+      "classification": {
+        "exact_instruction": 37,
+        "same_named_function_target": 3,
+        "same_intrafunction_target_offset": 7,
+        "same_allocated_section_page_offset": 3
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZN25InfinityAndroidCheckpoint20AuthorizeTerminationERKNSt6__ndk112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEES8_i",
+      "instruction_count": 185,
+      "classification": {
+        "exact_instruction": 124,
+        "same_named_function_target": 17,
+        "same_intrafunction_target_offset": 34,
+        "same_allocated_section_page_offset": 10
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZN25InfinityAndroidCheckpoint20CheckpointWriteGuardC1EPKc",
+      "instruction_count": 161,
+      "classification": {
+        "exact_instruction": 111,
+        "same_named_function_target": 7,
+        "same_allocated_section_page_offset": 15,
+        "same_intrafunction_target_offset": 28
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZN25InfinityAndroidCheckpoint20CheckpointWriteGuardC2EPKc",
+      "instruction_count": 161,
+      "classification": {
+        "exact_instruction": 111,
+        "same_named_function_target": 7,
+        "same_allocated_section_page_offset": 15,
+        "same_intrafunction_target_offset": 28
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZN25InfinityAndroidCheckpoint20CheckpointWriteGuardD1Ev",
+      "instruction_count": 30,
+      "classification": {
+        "exact_instruction": 27,
+        "same_intrafunction_target_offset": 2,
+        "same_named_function_target": 1
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZN25InfinityAndroidCheckpoint20CheckpointWriteGuardD2Ev",
+      "instruction_count": 30,
+      "classification": {
+        "exact_instruction": 27,
+        "same_intrafunction_target_offset": 2,
+        "same_named_function_target": 1
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZN25InfinityAndroidCheckpoint4PumpER12CApplication",
+      "instruction_count": 2164,
+      "classification": {
+        "exact_instruction": 1497,
+        "same_named_function_target": 159,
+        "same_intrafunction_target_offset": 327,
+        "same_allocated_section_page_offset": 181
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZN25InfinityAndroidCheckpoint8IsActiveEv",
+      "instruction_count": 7,
+      "classification": {
+        "exact_instruction": 6,
+        "same_named_function_target": 1
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZN4KODI9MESSAGING21CApplicationMessenger14ProcessMessageEPNS0_13ThreadMessageE",
+      "instruction_count": 83,
+      "classification": {
+        "exact_instruction": 76,
+        "same_named_function_target": 5,
+        "same_allocated_section_page_offset": 2
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZN4KODI9MESSAGING21CApplicationMessenger15ProcessMessagesEv",
+      "instruction_count": 65,
+      "classification": {
+        "exact_instruction": 49,
+        "same_named_function_target": 10,
+        "same_intrafunction_target_offset": 6
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZN4KODI9MESSAGING21CApplicationMessenger7CleanupEv",
+      "instruction_count": 75,
+      "classification": {
+        "exact_instruction": 62,
+        "same_named_function_target": 13
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZN4KODI9MESSAGING21CApplicationMessenger7SendMsgEONS0_13ThreadMessageEb",
+      "instruction_count": 174,
+      "classification": {
+        "exact_instruction": 145,
+        "same_named_function_target": 26,
+        "same_allocated_section_page_offset": 3
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZN4KODI9MESSAGING21CApplicationMessenger7SendMsgEj",
+      "instruction_count": 32,
+      "classification": {
+        "exact_instruction": 28,
+        "same_named_function_target": 4
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZN4KODI9MESSAGING21CApplicationMessenger7SendMsgEjiiPv",
+      "instruction_count": 33,
+      "classification": {
+        "exact_instruction": 29,
+        "same_named_function_target": 4
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZN4KODI9MESSAGING21CApplicationMessenger7SendMsgEjiiPvNSt6__ndk112basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEE",
+      "instruction_count": 61,
+      "classification": {
+        "exact_instruction": 57,
+        "same_named_function_target": 4
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZN4KODI9MESSAGING21CApplicationMessenger7SendMsgEjiiPvNSt6__ndk112basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEENS3_6vectorIS9_NS7_IS9_EEEE",
+      "instruction_count": 67,
+      "classification": {
+        "exact_instruction": 63,
+        "same_named_function_target": 4
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZN8CXBMCApp18onAudioFocusChangeEi",
+      "instruction_count": 115,
+      "classification": {
+        "exact_instruction": 106,
+        "same_allocated_section_page_offset": 4,
+        "same_named_function_target": 5
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZN8CXBMCApp6onStopEv",
+      "instruction_count": 113,
+      "classification": {
+        "exact_instruction": 104,
+        "same_allocated_section_page_offset": 4,
+        "same_named_function_target": 5
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZN8CXBMCApp7onPauseEv",
+      "instruction_count": 135,
+      "classification": {
+        "exact_instruction": 118,
+        "same_allocated_section_page_offset": 3,
+        "same_named_function_target": 14
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZN8CXBMCApp8onResumeEv",
+      "instruction_count": 198,
+      "classification": {
+        "exact_instruction": 178,
+        "same_allocated_section_page_offset": 4,
+        "same_named_function_target": 16
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZNK25InfinityAndroidCheckpoint20CheckpointWriteGuardcvbEv",
+      "instruction_count": 2,
+      "classification": {
+        "exact_instruction": 2
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZNKSt6__ndk110unique_ptrIN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEEdeEv",
+      "instruction_count": 6,
+      "classification": {
+        "exact_instruction": 6
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZNKSt6__ndk114default_deleteIN25InfinityAndroidCheckpoint20CheckpointWriteGuardEEclEPS2_",
+      "instruction_count": 12,
+      "classification": {
+        "exact_instruction": 11,
+        "same_named_function_target": 1
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZNKSt6__ndk117__compressed_pairIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEE5firstEv",
+      "instruction_count": 1,
+      "classification": {
+        "exact_instruction": 1
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZNKSt6__ndk122__compressed_pair_elemIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardELi0ELb0EE5__getEv",
+      "instruction_count": 1,
+      "classification": {
+        "exact_instruction": 1
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZNSt6__ndk110unique_ptrIN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEE11get_deleterEv",
+      "instruction_count": 1,
+      "classification": {
+        "exact_instruction": 1
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZNSt6__ndk110unique_ptrIN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEE5resetEPS2_",
+      "instruction_count": 23,
+      "classification": {
+        "exact_instruction": 23
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZNSt6__ndk110unique_ptrIN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEE7releaseEv",
+      "instruction_count": 13,
+      "classification": {
+        "exact_instruction": 13
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZNSt6__ndk110unique_ptrIN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEEC2ILb1EvEEPS2_",
+      "instruction_count": 20,
+      "classification": {
+        "exact_instruction": 20
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZNSt6__ndk110unique_ptrIN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEEC2ILb1EvEEv",
+      "instruction_count": 20,
+      "classification": {
+        "exact_instruction": 20
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZNSt6__ndk110unique_ptrIN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEED2Ev",
+      "instruction_count": 2,
+      "classification": {
+        "exact_instruction": 2
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZNSt6__ndk110unique_ptrIN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEEaSEOS5_",
+      "instruction_count": 19,
+      "classification": {
+        "exact_instruction": 19
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZNSt6__ndk111make_uniqueIN25InfinityAndroidCheckpoint20CheckpointWriteGuardEJRA5_KcEEENS_11__unique_ifIT_E15__unique_singleEDpOT0_",
+      "instruction_count": 25,
+      "classification": {
+        "exact_instruction": 23,
+        "same_named_function_target": 2
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZNSt6__ndk117__compressed_pairIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEE5firstEv",
+      "instruction_count": 1,
+      "classification": {
+        "exact_instruction": 1
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZNSt6__ndk117__compressed_pairIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEE6secondEv",
+      "instruction_count": 1,
+      "classification": {
+        "exact_instruction": 1
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZNSt6__ndk117__compressed_pairIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEEC2IRS3_Lb1EEEOT_",
+      "instruction_count": 11,
+      "classification": {
+        "exact_instruction": 11
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZNSt6__ndk117__compressed_pairIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEEC2IS3_Lb1EEEOT_",
+      "instruction_count": 11,
+      "classification": {
+        "exact_instruction": 11
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZNSt6__ndk122__compressed_pair_elemINS_14default_deleteIN25InfinityAndroidCheckpoint20CheckpointWriteGuardEEELi1ELb1EE5__getEv",
+      "instruction_count": 1,
+      "classification": {
+        "exact_instruction": 1
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZNSt6__ndk122__compressed_pair_elemIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardELi0ELb0EE5__getEv",
+      "instruction_count": 1,
+      "classification": {
+        "exact_instruction": 1
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZNSt6__ndk122__compressed_pair_elemIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardELi0ELb0EEC2IRS3_vEEOT_",
+      "instruction_count": 11,
+      "classification": {
+        "exact_instruction": 11
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZNSt6__ndk122__compressed_pair_elemIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardELi0ELb0EEC2IS3_vEEOT_",
+      "instruction_count": 11,
+      "classification": {
+        "exact_instruction": 11
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZNSt6__ndk17forwardINS_14default_deleteIN25InfinityAndroidCheckpoint20CheckpointWriteGuardEEEEEOT_RNS_16remove_referenceIS5_E4typeE",
+      "instruction_count": 1,
+      "classification": {
+        "exact_instruction": 1
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZNSt6__ndk17forwardIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardEEEOT_RNS_16remove_referenceIS4_E4typeE",
+      "instruction_count": 1,
+      "classification": {
+        "exact_instruction": 1
+      },
+      "unresolved": []
+    },
+    {
+      "symbol": "_ZNSt6__ndk17forwardIRPN25InfinityAndroidCheckpoint20CheckpointWriteGuardEEEOT_RNS_16remove_referenceIS5_E4typeE",
+      "instruction_count": 1,
+      "classification": {
+        "exact_instruction": 1
+      },
+      "unresolved": []
+    }
+  ],
+  "all_selected_changes_classified": true,
+  "limits": "Selected unchanged methods only. PC-relative operands must retain intra-method offsets, named targets, or allocated-section offsets. This does not compare every code/data relocation or establish Android execution."
+}

@@ -1,0 +1,1785 @@
+{
+  "before_sha256": "f89a40b5653c0091a06edd44f6ac5cdf056a649301b6751ee638c8ba88db9674",
+  "after_sha256": "d0b6f115e839fbe39e764e2fecad47418c501ab1ece853294578652cd0b80b98",
+  "before_bytes": 638038440,
+  "after_bytes": 637989448,
+  "dynamic_symbol_contract_equal": true,
+  "section_comparison": {
+    "": {
+      "before": {
+        "address": 0,
+        "alignment": 0,
+        "file_data_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "flags": 0,
+        "offset": 0,
+        "size": 0,
+        "type": "SHT_NULL"
+      },
+      "after": {
+        "type": "SHT_NULL",
+        "address": 0,
+        "offset": 0,
+        "size": 0,
+        "flags": 0,
+        "alignment": 0,
+        "file_data_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "metadata_equal": true,
+      "file_bytes_equal": true
+    },
+    ".PyRuntime": {
+      "before": {
+        "address": 99288712,
+        "alignment": 8,
+        "file_data_sha256": "cf135a1c9ded966efae5c8c81cae63ce5a41f003e518aa5245d591c81aa2da02",
+        "flags": 3,
+        "offset": 99284616,
+        "size": 166688,
+        "type": "SHT_PROGBITS"
+      },
+      "after": {
+        "type": "SHT_PROGBITS",
+        "address": 99239560,
+        "offset": 99235464,
+        "size": 166688,
+        "flags": 3,
+        "alignment": 8,
+        "file_data_sha256": "fc5f4b4611cc6d70f78a8d7574c2f796cd8a9d12ea74ba7a58841b3b0fb495b8"
+      },
+      "metadata_equal": false,
+      "file_bytes_equal": false
+    },
+    ".bss": {
+      "before": {
+        "address": 99455424,
+        "alignment": 64,
+        "file_data_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "flags": 3,
+        "offset": 99451304,
+        "size": 23412128,
+        "type": "SHT_NOBITS"
+      },
+      "after": {
+        "type": "SHT_NOBITS",
+        "address": 99406272,
+        "offset": 99402152,
+        "size": 23412128,
+        "flags": 3,
+        "alignment": 64,
+        "file_data_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "metadata_equal": false,
+      "file_bytes_equal": true
+    },
+    ".comment": {
+      "before": {
+        "address": 0,
+        "alignment": 1,
+        "file_data_sha256": "370d1c0e799288334f6fbdf083f277de843cb7cf5a01780a81c53e6f1e131506",
+        "flags": 48,
+        "offset": 99451304,
+        "size": 421,
+        "type": "SHT_PROGBITS"
+      },
+      "after": {
+        "type": "SHT_PROGBITS",
+        "address": 0,
+        "offset": 99402152,
+        "size": 421,
+        "flags": 48,
+        "alignment": 1,
+        "file_data_sha256": "370d1c0e799288334f6fbdf083f277de843cb7cf5a01780a81c53e6f1e131506"
+      },
+      "metadata_equal": false,
+      "file_bytes_equal": true
+    },
+    ".data": {
+      "before": {
+        "address": 97775616,
+        "alignment": 8,
+        "file_data_sha256": "c649d8bb2389c096c899ba2ff89f9a5c05e11b058d25d94f028710e3463389e6",
+        "flags": 3,
+        "offset": 97771520,
+        "size": 1513096,
+        "type": "SHT_PROGBITS"
+      },
+      "after": {
+        "type": "SHT_PROGBITS",
+        "address": 97726464,
+        "offset": 97722368,
+        "size": 1513096,
+        "flags": 3,
+        "alignment": 8,
+        "file_data_sha256": "bebdc86a8ce596271ca0088a9ff12a7e75ca54d4ce0753026c6d8b3a18b6f079"
+      },
+      "metadata_equal": false,
+      "file_bytes_equal": false
+    },
+    ".data.rel.ro": {
+      "before": {
+        "address": 94904824,
+        "alignment": 8,
+        "file_data_sha256": "7a7da09991584bc309c5da230fc204942bea02618bd93fa75d1245e098e37e42",
+        "flags": 3,
+        "offset": 94900728,
+        "size": 2784024,
+        "type": "SHT_PROGBITS"
+      },
+      "after": {
+        "type": "SHT_PROGBITS",
+        "address": 94855672,
+        "offset": 94851576,
+        "size": 2784024,
+        "flags": 3,
+        "alignment": 8,
+        "file_data_sha256": "0de135fa58244c9f1774a1393deb8665dfc6d4665437489100498c098fa6d928"
+      },
+      "metadata_equal": false,
+      "file_bytes_equal": false
+    },
+    ".debug_abbrev": {
+      "before": {
+        "address": 0,
+        "alignment": 1,
+        "file_data_sha256": "7c68b518ef19575674b7d9a60d276f2f0279c192e2e3dc852a16fc304d8b7b0b",
+        "flags": 0,
+        "offset": 328633325,
+        "size": 5662936,
+        "type": "SHT_PROGBITS"
+      },
+      "after": {
+        "type": "SHT_PROGBITS",
+        "address": 0,
+        "offset": 328585123,
+        "size": 5662984,
+        "flags": 0,
+        "alignment": 1,
+        "file_data_sha256": "85a290101af513e1ba3f21f9597302df92f4d4f76ef252fb11a0654914616462"
+      },
+      "metadata_equal": false,
+      "file_bytes_equal": false
+    },
+    ".debug_aranges": {
+      "before": {
+        "address": 0,
+        "alignment": 1,
+        "file_data_sha256": "e7151cd66342305062400cd1053c302289a1ab55c93df3f89e38bd19e01519d6",
+        "flags": 0,
+        "offset": 99451725,
+        "size": 31072,
+        "type": "SHT_PROGBITS"
+      },
+      "after": {
+        "type": "SHT_PROGBITS",
+        "address": 0,
+        "offset": 99402573,
+        "size": 31072,
+        "flags": 0,
+        "alignment": 1,
+        "file_data_sha256": "a5163474955aeaed59d5fcabc3cc33ef71bb571e08d43ed66e435105409ec6a2"
+      },
+      "metadata_equal": false,
+      "file_bytes_equal": false
+    },
+    ".debug_frame": {
+      "before": {
+        "address": 0,
+        "alignment": 8,
+        "file_data_sha256": "4c8ef8ecf2b42303f205cf387f6f66ae3964d3ca7a25c637d4489b7683655d34",
+        "flags": 0,
+        "offset": 385217704,
+        "size": 816,
+        "type": "SHT_PROGBITS"
+      },
+      "after": {
+        "type": "SHT_PROGBITS",
+        "address": 0,
+        "offset": 385169832,
+        "size": 816,
+        "flags": 0,
+        "alignment": 8,
+        "file_data_sha256": "46096bf9254c71e87e8fbfa4ce329ab902a25c6a532a297b5712355ed9b060fe"
+      },
+      "metadata_equal": false,
+      "file_bytes_equal": false
+    },
+    ".debug_info": {
+      "before": {
+        "address": 0,
+        "alignment": 1,
+        "file_data_sha256": "3587e0adcd0300a9d2f879e28e580e2b65ebece98bd370731e5fedc9e30c8647",
+        "flags": 0,
+        "offset": 99482797,
+        "size": 229150528,
+        "type": "SHT_PROGBITS"
+      },
+      "after": {
+        "type": "SHT_PROGBITS",
+        "address": 0,
+        "offset": 99433645,
+        "size": 229151478,
+        "flags": 0,
+        "alignment": 1,
+        "file_data_sha256": "d97f2e1005facce875164430f985ca0662866851fc5549906aa6c6c8abfe7513"
+      },
+      "metadata_equal": false,
+      "file_bytes_equal": false
+    },
+    ".debug_line": {
+      "before": {
+        "address": 0,
+        "alignment": 1,
+        "file_data_sha256": "3a2a2e8c115f0e319615333241bb9c6ff80f894e354030d7955a8eda708db5e0",
+        "flags": 0,
+        "offset": 334296261,
+        "size": 50921438,
+        "type": "SHT_PROGBITS"
+      },
+      "after": {
+        "type": "SHT_PROGBITS",
+        "address": 0,
+        "offset": 334248107,
+        "size": 50921718,
+        "flags": 0,
+        "alignment": 1,
+        "file_data_sha256": "38d86267ee635ae48149a7f3244b8983ed5cfb9b71cf30185a720f3e5320d3c8"
+      },
+      "metadata_equal": false,
+      "file_bytes_equal": false
+    },
+    ".debug_loc": {
+      "before": {
+        "address": 0,
+        "alignment": 1,
+        "file_data_sha256": "56dbb29ccc0175f3599fb5a59b10436a63bbe23131a16c98219eb018875956a4",
+        "flags": 0,
+        "offset": 461631026,
+        "size": 111035994,
+        "type": "SHT_PROGBITS"
+      },
+      "after": {
+        "type": "SHT_PROGBITS",
+        "address": 0,
+        "offset": 461583267,
+        "size": 111036169,
+        "flags": 0,
+        "alignment": 1,
+        "file_data_sha256": "ea685dc31b3e17d26d8447e894b16ad4d177f67fc5cd0003f50446a5d0ff7578"
+      },
+      "metadata_equal": false,
+      "file_bytes_equal": false
+    },
+    ".debug_macinfo": {
+      "before": {
+        "address": 0,
+        "alignment": 1,
+        "file_data_sha256": "00675b07fd0be8d5f135a91ff07683739a77c04f6ffc1da6fb3602ea741b7c21",
+        "flags": 0,
+        "offset": 572667020,
+        "size": 6707,
+        "type": "SHT_PROGBITS"
+      },
+      "after": {
+        "type": "SHT_PROGBITS",
+        "address": 0,
+        "offset": 572619436,
+        "size": 6707,
+        "flags": 0,
+        "alignment": 1,
+        "file_data_sha256": "00675b07fd0be8d5f135a91ff07683739a77c04f6ffc1da6fb3602ea741b7c21"
+      },
+      "metadata_equal": false,
+      "file_bytes_equal": true
+    },
+    ".debug_ranges": {
+      "before": {
+        "address": 0,
+        "alignment": 1,
+        "file_data_sha256": "c46b892bc3962c54a27c4497f5c53aaf824281e925557ef10996bfb1026120f4",
+        "flags": 0,
+        "offset": 572673727,
+        "size": 20032064,
+        "type": "SHT_PROGBITS"
+      },
+      "after": {
+        "type": "SHT_PROGBITS",
+        "address": 0,
+        "offset": 572626143,
+        "size": 20032128,
+        "flags": 0,
+        "alignment": 1,
+        "file_data_sha256": "6c135fadab1b3ee0eb93920615be9bf19573a46fe4fbef1fec91e4b3e0563aae"
+      },
+      "metadata_equal": false,
+      "file_bytes_equal": false
+    },
+    ".debug_str": {
+      "before": {
+        "address": 0,
+        "alignment": 1,
+        "file_data_sha256": "43eb45cb97630bef8d747880ea3fbcfd7f264eed360ef26a7fc2b6a155fc8614",
+        "flags": 48,
+        "offset": 385218520,
+        "size": 76412506,
+        "type": "SHT_PROGBITS"
+      },
+      "after": {
+        "type": "SHT_PROGBITS",
+        "address": 0,
+        "offset": 385170648,
+        "size": 76412619,
+        "flags": 48,
+        "alignment": 1,
+        "file_data_sha256": "4aab94ab0287d3a1ebe1953947831269d2efd7f1e214e55e750da06852540e94"
+      },
+      "metadata_equal": false,
+      "file_bytes_equal": false
+    },
+    ".dynamic": {
+      "before": {
+        "address": 97688848,
+        "alignment": 8,
+        "file_data_sha256": "3c572f0b61245fcaada1f4e62fd357fa0d6c593107e485bcea9bdfa8a490b73b",
+        "flags": 3,
+        "offset": 97684752,
+        "size": 656,
+        "type": "SHT_DYNAMIC"
+      },
+      "after": {
+        "type": "SHT_DYNAMIC",
+        "address": 97639696,
+        "offset": 97635600,
+        "size": 656,
+        "flags": 3,
+        "alignment": 8,
+        "file_data_sha256": "86123be393354e0b1889995e3ccf09ca1dcd9e7548ee857d6c62eb924465c24c"
+      },
+      "metadata_equal": false,
+      "file_bytes_equal": false
+    },
+    ".dynstr": {
+      "before": {
+        "address": 4770504,
+        "alignment": 1,
+        "file_data_sha256": "8522fb9b8d1bbc51c1a2dd6c7775655e3260e77f42363bd2726be93331dea095",
+        "flags": 2,
+        "offset": 4770504,
+        "size": 10730526,
+        "type": "SHT_STRTAB"
+      },
+      "after": {
+        "type": "SHT_STRTAB",
+        "address": 4770504,
+        "offset": 4770504,
+        "size": 10730526,
+        "flags": 2,
+        "alignment": 1,
+        "file_data_sha256": "8522fb9b8d1bbc51c1a2dd6c7775655e3260e77f42363bd2726be93331dea095"
+      },
+      "metadata_equal": true,
+      "file_bytes_equal": true
+    },
+    ".dynsym": {
+      "before": {
+        "address": 1485120,
+        "alignment": 8,
+        "file_data_sha256": "da139aa292ee8640d60e19c1f49da212f208a2a7226bfcd843362b874588dfad",
+        "flags": 2,
+        "offset": 1485120,
+        "size": 3285384,
+        "type": "SHT_DYNSYM"
+      },
+      "after": {
+        "type": "SHT_DYNSYM",
+        "address": 1485120,
+        "offset": 1485120,
+        "size": 3285384,
+        "flags": 2,
+        "alignment": 8,
+        "file_data_sha256": "3d72302607d87fd8dab777303ee9a6c665c91fb690ef83a6123130899db6535d"
+      },
+      "metadata_equal": false,
+      "file_bytes_equal": false
+    },
+    ".eh_frame": {
+      "before": {
+        "address": 83462664,
+        "alignment": 8,
+        "file_data_sha256": "37847189fe0dde8b3be62afb411200fea01995e3b30162510e637eb0d89c5f79",
+        "flags": 2,
+        "offset": 83462664,
+        "size": 9498584,
+        "type": "SHT_PROGBITS"
+      },
+      "after": {
+        "type": "SHT_PROGBITS",
+        "address": 83413520,
+        "offset": 83413520,
+        "size": 9498616,
+        "flags": 2,
+        "alignment": 8,
+        "file_data_sha256": "c0a955054c2edddd84819efad30d7bb9ccbd4b68cf9b04fb99a4c8707578128c"
+      },
+      "metadata_equal": false,
+      "file_bytes_equal": false
+    },
+    ".eh_frame_hdr": {
+      "before": {
+        "address": 81035172,
+        "alignment": 4,
+        "file_data_sha256": "3f13394d3e44fea27b060345c76c56e12c79a0625bb534e93b45448684bd658b",
+        "flags": 2,
+        "offset": 81035172,
+        "size": 2427492,
+        "type": "SHT_PROGBITS"
+      },
+      "after": {
+        "type": "SHT_PROGBITS",
+        "address": 80986020,
+        "offset": 80986020,
+        "size": 2427500,
+        "flags": 2,
+        "alignment": 4,
+        "file_data_sha256": "324b4be8c1871fe3ec803cd01e5d05ef256f4bf231b8f2af3f900a6ddb42c779"
+      },
+      "metadata_equal": false,
+      "file_bytes_equal": false
+    },
+    ".fini_array": {
+      "before": {
+        "address": 94904776,
+        "alignment": 8,
+        "file_data_sha256": "354fbe587988168fe973e67efc0f962a71fcfc43fd2a44ba1f71154dfbc63f88",
+        "flags": 3,
+        "offset": 94900680,
+        "size": 48,
+        "type": "SHT_FINI_ARRAY"
+      },
+      "after": {
+        "type": "SHT_FINI_ARRAY",
+        "address": 94855624,
+        "offset": 94851528,
+        "size": 48,
+        "flags": 3,
+        "alignment": 8,
+        "file_data_sha256": "53109c1159b282808eeec9cadb9984f7c660528878a98d3234e319d5b46a5321"
+      },
+      "metadata_equal": false,
+      "file_bytes_equal": false
+    },
+    ".gcc_except_table": {
+      "before": {
+        "address": 92961248,
+        "alignment": 4,
+        "file_data_sha256": "09462d50223435a6a18b722a77f1b12f1b217dbc2ac55fa6b3bde4444f06ad29",
+        "flags": 2,
+        "offset": 92961248,
+        "size": 1930248,
+        "type": "SHT_PROGBITS"
+      },
+      "after": {
+        "type": "SHT_PROGBITS",
+        "address": 92912136,
+        "offset": 92912136,
+        "size": 1930248,
+        "flags": 2,
+        "alignment": 4,
+        "file_data_sha256": "affca9794ac002f533cce0a96efa2a18e72d31f118a373a9c6cca99c43b9b747"
+      },
+      "metadata_equal": false,
+      "file_bytes_equal": false
+    },
+    ".gnu.hash": {
+      "before": {
+        "address": 679168,
+        "alignment": 8,
+        "file_data_sha256": "81cd2bc5cad14c1718393deef45043202c80e8950303d4a5de3ae509665df097",
+        "flags": 2,
+        "offset": 679168,
+        "size": 805948,
+        "type": "SHT_GNU_HASH"
+      },
+      "after": {
+        "type": "SHT_GNU_HASH",
+        "address": 679168,
+        "offset": 679168,
+        "size": 805948,
+        "flags": 2,
+        "alignment": 8,
+        "file_data_sha256": "81cd2bc5cad14c1718393deef45043202c80e8950303d4a5de3ae509665df097"
+      },
+      "metadata_equal": true,
+      "file_bytes_equal": true
+    },
+    ".gnu.version": {
+      "before": {
+        "address": 15501030,
+        "alignment": 2,
+        "file_data_sha256": "c663cbc2ef5257fdf6b53aaee2cf59efa6b1c02058c26c2217b04563aa70dcff",
+        "flags": 2,
+        "offset": 15501030,
+        "size": 273782,
+        "type": "SHT_GNU_versym"
+      },
+      "after": {
+        "type": "SHT_GNU_versym",
+        "address": 15501030,
+        "offset": 15501030,
+        "size": 273782,
+        "flags": 2,
+        "alignment": 2,
+        "file_data_sha256": "c663cbc2ef5257fdf6b53aaee2cf59efa6b1c02058c26c2217b04563aa70dcff"
+      },
+      "metadata_equal": true,
+      "file_bytes_equal": true
+    },
+    ".gnu.version_r": {
+      "before": {
+        "address": 15774816,
+        "alignment": 8,
+        "file_data_sha256": "b81e4debd84bcc83a04fa3b2c5841ac93c9523ee06b2ca4ad60ec4d568c10802",
+        "flags": 2,
+        "offset": 15774816,
+        "size": 96,
+        "type": "SHT_GNU_verneed"
+      },
+      "after": {
+        "type": "SHT_GNU_verneed",
+        "address": 15774816,
+        "offset": 15774816,
+        "size": 96,
+        "flags": 2,
+        "alignment": 8,
+        "file_data_sha256": "b81e4debd84bcc83a04fa3b2c5841ac93c9523ee06b2ca4ad60ec4d568c10802"
+      },
+      "metadata_equal": true,
+      "file_bytes_equal": true
+    },
+    ".got": {
+      "before": {
+        "address": 97689504,
+        "alignment": 8,
+        "file_data_sha256": "6b6e85629719fac2c99d4a741731d9d960db46caf89a08f39998e6b9ca69b2f0",
+        "flags": 3,
+        "offset": 97685408,
+        "size": 86112,
+        "type": "SHT_PROGBITS"
+      },
+      "after": {
+        "type": "SHT_PROGBITS",
+        "address": 97640352,
+        "offset": 97636256,
+        "size": 86112,
+        "flags": 3,
+        "alignment": 8,
+        "file_data_sha256": "4f0ea247a50fc16faefac0cb538084d6a8a1f747815709354fc7b0fccf6cafd2"
+      },
+      "metadata_equal": false,
+      "file_bytes_equal": false
+    },
+    ".hash": {
+      "before": {
+        "address": 512,
+        "alignment": 8,
+        "file_data_sha256": "110e4aa2154a8bbd1482841d927e5c12c89c2c780345b9ccb338ba8c966a938d",
+        "flags": 2,
+        "offset": 512,
+        "size": 678656,
+        "type": "SHT_HASH"
+      },
+      "after": {
+        "type": "SHT_HASH",
+        "address": 512,
+        "offset": 512,
+        "size": 678656,
+        "flags": 2,
+        "alignment": 8,
+        "file_data_sha256": "110e4aa2154a8bbd1482841d927e5c12c89c2c780345b9ccb338ba8c966a938d"
+      },
+      "metadata_equal": true,
+      "file_bytes_equal": true
+    },
+    ".init_array": {
+      "before": {
+        "address": 94896976,
+        "alignment": 8,
+        "file_data_sha256": "cbf2c5006529b843c5cc6e979a09f71ad5b561eb743eeeac9821fef4f5fb83c9",
+        "flags": 3,
+        "offset": 94892880,
+        "size": 7800,
+        "type": "SHT_INIT_ARRAY"
+      },
+      "after": {
+        "type": "SHT_INIT_ARRAY",
+        "address": 94847824,
+        "offset": 94843728,
+        "size": 7800,
+        "flags": 3,
+        "alignment": 8,
+        "file_data_sha256": "14b2d1539fd88ff787ef4e0094974e8d7159adf2be92dcf84bb7b4b9626ce22d"
+      },
+      "metadata_equal": false,
+      "file_bytes_equal": false
+    },
+    ".note.android.ident": {
+      "before": {
+        "address": 94891496,
+        "alignment": 4,
+        "file_data_sha256": "0f61c70f4be9fe39e18304caf933b220bef3d5016f50a40ff94667eafd8cfa0e",
+        "flags": 2,
+        "offset": 94891496,
+        "size": 152,
+        "type": "SHT_NOTE"
+      },
+      "after": {
+        "type": "SHT_NOTE",
+        "address": 94842384,
+        "offset": 94842384,
+        "size": 152,
+        "flags": 2,
+        "alignment": 4,
+        "file_data_sha256": "0f61c70f4be9fe39e18304caf933b220bef3d5016f50a40ff94667eafd8cfa0e"
+      },
+      "metadata_equal": false,
+      "file_bytes_equal": true
+    },
+    ".plt": {
+      "before": {
+        "address": 21254208,
+        "alignment": 16,
+        "file_data_sha256": "e141507f5b4a208c13e7cf5ea249d96ac792f17dab33f0ab5017ef31c92f68d4",
+        "flags": 6,
+        "offset": 21254208,
+        "size": 14032,
+        "type": "SHT_PROGBITS"
+      },
+      "after": {
+        "type": "SHT_PROGBITS",
+        "address": 21254208,
+        "offset": 21254208,
+        "size": 14032,
+        "flags": 6,
+        "alignment": 16,
+        "file_data_sha256": "a8756347b20538af2f727ffe4f243b1bdfe3053c227d93dc38a47931bf4363f0"
+      },
+      "metadata_equal": false,
+      "file_bytes_equal": false
+    },
+    ".rela.dyn": {
+      "before": {
+        "address": 15774912,
+        "alignment": 8,
+        "file_data_sha256": "5f6a60053ea50544fdf33ffa282ae3cd6ad4e763dfe138ce154e0b84bf9a627c",
+        "flags": 2,
+        "offset": 15774912,
+        "size": 5458296,
+        "type": "SHT_RELA"
+      },
+      "after": {
+        "type": "SHT_RELA",
+        "address": 15774912,
+        "offset": 15774912,
+        "size": 5458296,
+        "flags": 2,
+        "alignment": 8,
+        "file_data_sha256": "45d8ee46faa76b6cc77516f3e903099299bbf3e560f8dbcd7651f8bb7d99ae5c"
+      },
+      "metadata_equal": false,
+      "file_bytes_equal": false
+    },
+    ".rela.plt": {
+      "before": {
+        "address": 21233208,
+        "alignment": 8,
+        "file_data_sha256": "1a2b8f29ea8d08ef7669217baa33979acd9c6b898a3eef5b6b40d148a8b9f9dd",
+        "flags": 66,
+        "offset": 21233208,
+        "size": 21000,
+        "type": "SHT_RELA"
+      },
+      "after": {
+        "type": "SHT_RELA",
+        "address": 21233208,
+        "offset": 21233208,
+        "size": 21000,
+        "flags": 66,
+        "alignment": 8,
+        "file_data_sha256": "add4f79bbfe8df365e522cfb30b6a620f94b152b43d675670bdbf27cab6cf166"
+      },
+      "metadata_equal": false,
+      "file_bytes_equal": false
+    },
+    ".rodata": {
+      "before": {
+        "address": 68629376,
+        "alignment": 64,
+        "file_data_sha256": "121faef2b3c3ad1884ab3c91cda8408db659d2ab6799a81851dfdc6ad2a6b01f",
+        "flags": 2,
+        "offset": 68629376,
+        "size": 12405793,
+        "type": "SHT_PROGBITS"
+      },
+      "after": {
+        "type": "SHT_PROGBITS",
+        "address": 68580224,
+        "offset": 68580224,
+        "size": 12405793,
+        "flags": 2,
+        "alignment": 64,
+        "file_data_sha256": "01ed81e12ae1be2e8809e7455dd2d6c9e164b376130f7db4885353d1d72bcfc4"
+      },
+      "metadata_equal": false,
+      "file_bytes_equal": false
+    },
+    ".shstrtab": {
+      "before": {
+        "address": 0,
+        "alignment": 1,
+        "file_data_sha256": "977113f8e4dd919f7cec7ca6597b800e3e91f2b146a85ce8660286154f1a136b",
+        "flags": 0,
+        "offset": 638035691,
+        "size": 376,
+        "type": "SHT_STRTAB"
+      },
+      "after": {
+        "type": "SHT_STRTAB",
+        "address": 0,
+        "offset": 637986698,
+        "size": 376,
+        "flags": 0,
+        "alignment": 1,
+        "file_data_sha256": "977113f8e4dd919f7cec7ca6597b800e3e91f2b146a85ce8660286154f1a136b"
+      },
+      "metadata_equal": false,
+      "file_bytes_equal": true
+    },
+    ".strtab": {
+      "before": {
+        "address": 0,
+        "alignment": 1,
+        "file_data_sha256": "6432b1fe4fab3046b51f077e57274773d3219756045ecd8f96d615ac7c1dbaca",
+        "flags": 0,
+        "offset": 608968216,
+        "size": 29067475,
+        "type": "SHT_STRTAB"
+      },
+      "after": {
+        "type": "SHT_STRTAB",
+        "address": 0,
+        "offset": 608919592,
+        "size": 29067106,
+        "flags": 0,
+        "alignment": 1,
+        "file_data_sha256": "4cd48561f325219ebe98fdb0e5e0f05730f8ad5348ad8a0ef4470f3de6589715"
+      },
+      "metadata_equal": false,
+      "file_bytes_equal": false
+    },
+    ".symtab": {
+      "before": {
+        "address": 0,
+        "alignment": 8,
+        "file_data_sha256": "a473fed7b677a2ee0b94a124632448e2b21de1b1876341486b81a64f7527489a",
+        "flags": 0,
+        "offset": 592705792,
+        "size": 16262424,
+        "type": "SHT_SYMTAB"
+      },
+      "after": {
+        "type": "SHT_SYMTAB",
+        "address": 0,
+        "offset": 592658272,
+        "size": 16261320,
+        "flags": 0,
+        "alignment": 8,
+        "file_data_sha256": "b212cd5353cfe05380b69aff2de794a41fbdc2650b6e9b5a38781a1ce1c69e28"
+      },
+      "metadata_equal": false,
+      "file_bytes_equal": false
+    },
+    ".text": {
+      "before": {
+        "address": 21282816,
+        "alignment": 16384,
+        "file_data_sha256": "87209280d9d5d167fccb988654d262a4900c7da46075bfd17829b2803a594912",
+        "flags": 6,
+        "offset": 21282816,
+        "size": 47346516,
+        "type": "SHT_PROGBITS"
+      },
+      "after": {
+        "type": "SHT_PROGBITS",
+        "address": 21282816,
+        "offset": 21282816,
+        "size": 47297364,
+        "flags": 6,
+        "alignment": 16384,
+        "file_data_sha256": "d726b0220964f1632c4b677a8156e7dddb155a30be710135d94439e4a27af189"
+      },
+      "metadata_equal": false,
+      "file_bytes_equal": false
+    }
+  },
+  "function_raw_byte_counts": {
+    "equal": 203143,
+    "changed_or_added_removed": 104126,
+    "duplicate_symbol_names": 2587
+  },
+  "selected_function_comparison": [
+    {
+      "name": "_ZN12CApplication8OnActionERK7CAction",
+      "before": {
+        "address": 29192748,
+        "bind": "STB_GLOBAL",
+        "name": "_ZN12CApplication8OnActionERK7CAction",
+        "section": ".text",
+        "sha256": "c7b7573f975d26347a07838f5b7551a4c7d1211c3cec5885b04b0d3cab6ab006",
+        "size": 5780
+      },
+      "after": {
+        "name": "_ZN12CApplication8OnActionERK7CAction",
+        "address": 29188800,
+        "size": 5780,
+        "section": ".text",
+        "bind": "STB_GLOBAL",
+        "sha256": "503a311e45bac46b858c051d1a2c2e6d172598b09f7dc5969944d0b5c9a392c7"
+      },
+      "raw_equal": false
+    },
+    {
+      "name": "_ZN17CGUIWindowManager20OnApplicationMessageEPN4KODI9MESSAGING13ThreadMessageE",
+      "before": {
+        "address": 28602636,
+        "bind": "STB_GLOBAL",
+        "name": "_ZN17CGUIWindowManager20OnApplicationMessageEPN4KODI9MESSAGING13ThreadMessageE",
+        "section": ".text",
+        "sha256": "af9d94fa47111aa3a46ef27977df61bb6d330b82755a59a96991c6d9623916ce",
+        "size": 976
+      },
+      "after": {
+        "name": "_ZN17CGUIWindowManager20OnApplicationMessageEPN4KODI9MESSAGING13ThreadMessageE",
+        "address": 28602784,
+        "size": 976,
+        "section": ".text",
+        "bind": "STB_GLOBAL",
+        "sha256": "5564b2a8d073e978bc640f0129f5bda28482d9f4f1f3db260877d7fe29db6d76"
+      },
+      "raw_equal": false
+    },
+    {
+      "name": "_ZN25InfinityAndroidCheckpoint16AllowNativeWriteEPKc",
+      "before": {
+        "address": 37629520,
+        "bind": "STB_GLOBAL",
+        "name": "_ZN25InfinityAndroidCheckpoint16AllowNativeWriteEPKc",
+        "section": ".text",
+        "sha256": "1266889573cdd0d7fc47d015458d22afc007c2cb43c749a4c212f632157bb5d9",
+        "size": 200
+      },
+      "after": {
+        "name": "_ZN25InfinityAndroidCheckpoint16AllowNativeWriteEPKc",
+        "address": 37629668,
+        "size": 200,
+        "section": ".text",
+        "bind": "STB_GLOBAL",
+        "sha256": "82ff06bd17c55ae2be5ab3d84d1805d59ec0b8262cd00fcb6c70d2b4d1896d6b"
+      },
+      "raw_equal": false
+    },
+    {
+      "name": "_ZN25InfinityAndroidCheckpoint20AuthorizeTerminationERKNSt6__ndk112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEES8_i",
+      "before": {
+        "address": 37652964,
+        "bind": "STB_GLOBAL",
+        "name": "_ZN25InfinityAndroidCheckpoint20AuthorizeTerminationERKNSt6__ndk112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEES8_i",
+        "section": ".text",
+        "sha256": "017971859f7102abcb05d08d094e6af67ab4ffa8c1d9499ce6ba589edfd8d998",
+        "size": 740
+      },
+      "after": {
+        "name": "_ZN25InfinityAndroidCheckpoint20AuthorizeTerminationERKNSt6__ndk112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEES8_i",
+        "address": 37653112,
+        "size": 740,
+        "section": ".text",
+        "bind": "STB_GLOBAL",
+        "sha256": "e6b283cd57dae1f313c8173f5fcd9c27b18181c51c220fe4c7deb7fb02d6e102"
+      },
+      "raw_equal": false
+    },
+    {
+      "name": "_ZN25InfinityAndroidCheckpoint20CheckpointWriteGuardC1EPKc",
+      "before": {
+        "address": 37629720,
+        "bind": "STB_GLOBAL",
+        "name": "_ZN25InfinityAndroidCheckpoint20CheckpointWriteGuardC1EPKc",
+        "section": ".text",
+        "sha256": "c97f548904ca523df5407b3ebf067db2305d49e64ddcaa7a2d9d2e7a3b4aa4f2",
+        "size": 644
+      },
+      "after": {
+        "name": "_ZN25InfinityAndroidCheckpoint20CheckpointWriteGuardC1EPKc",
+        "address": 37629868,
+        "size": 644,
+        "section": ".text",
+        "bind": "STB_GLOBAL",
+        "sha256": "102c74c30035d497c4b0a48d8a3c36731e6ebb8032c54c94c738a2e8403b873f"
+      },
+      "raw_equal": false
+    },
+    {
+      "name": "_ZN25InfinityAndroidCheckpoint20CheckpointWriteGuardC2EPKc",
+      "before": {
+        "address": 37629720,
+        "bind": "STB_GLOBAL",
+        "name": "_ZN25InfinityAndroidCheckpoint20CheckpointWriteGuardC2EPKc",
+        "section": ".text",
+        "sha256": "c97f548904ca523df5407b3ebf067db2305d49e64ddcaa7a2d9d2e7a3b4aa4f2",
+        "size": 644
+      },
+      "after": {
+        "name": "_ZN25InfinityAndroidCheckpoint20CheckpointWriteGuardC2EPKc",
+        "address": 37629868,
+        "size": 644,
+        "section": ".text",
+        "bind": "STB_GLOBAL",
+        "sha256": "102c74c30035d497c4b0a48d8a3c36731e6ebb8032c54c94c738a2e8403b873f"
+      },
+      "raw_equal": false
+    },
+    {
+      "name": "_ZN25InfinityAndroidCheckpoint20CheckpointWriteGuardD1Ev",
+      "before": {
+        "address": 37630500,
+        "bind": "STB_GLOBAL",
+        "name": "_ZN25InfinityAndroidCheckpoint20CheckpointWriteGuardD1Ev",
+        "section": ".text",
+        "sha256": "e6c041f885d03df4fb84d271aeac1d3d7fb5bddd326dd079bfe03264d789495c",
+        "size": 120
+      },
+      "after": {
+        "name": "_ZN25InfinityAndroidCheckpoint20CheckpointWriteGuardD1Ev",
+        "address": 37630648,
+        "size": 120,
+        "section": ".text",
+        "bind": "STB_GLOBAL",
+        "sha256": "a68e558edebde94622c7a80219673e4af2a88107b695201bb38f82287eae2442"
+      },
+      "raw_equal": false
+    },
+    {
+      "name": "_ZN25InfinityAndroidCheckpoint20CheckpointWriteGuardD2Ev",
+      "before": {
+        "address": 37630500,
+        "bind": "STB_GLOBAL",
+        "name": "_ZN25InfinityAndroidCheckpoint20CheckpointWriteGuardD2Ev",
+        "section": ".text",
+        "sha256": "e6c041f885d03df4fb84d271aeac1d3d7fb5bddd326dd079bfe03264d789495c",
+        "size": 120
+      },
+      "after": {
+        "name": "_ZN25InfinityAndroidCheckpoint20CheckpointWriteGuardD2Ev",
+        "address": 37630648,
+        "size": 120,
+        "section": ".text",
+        "bind": "STB_GLOBAL",
+        "sha256": "a68e558edebde94622c7a80219673e4af2a88107b695201bb38f82287eae2442"
+      },
+      "raw_equal": false
+    },
+    {
+      "name": "_ZN25InfinityAndroidCheckpoint4PumpER12CApplication",
+      "before": {
+        "address": 37654008,
+        "bind": "STB_GLOBAL",
+        "name": "_ZN25InfinityAndroidCheckpoint4PumpER12CApplication",
+        "section": ".text",
+        "sha256": "84562aae9c7e08a0038ca268f58e34403f9610740b21469ab5831127b652b404",
+        "size": 8656
+      },
+      "after": {
+        "name": "_ZN25InfinityAndroidCheckpoint4PumpER12CApplication",
+        "address": 37654156,
+        "size": 8656,
+        "section": ".text",
+        "bind": "STB_GLOBAL",
+        "sha256": "e4088d9c56c0b77e6d7c0a37caf61400862a2f3b8fd5be557851f31cf7885c03"
+      },
+      "raw_equal": false
+    },
+    {
+      "name": "_ZN25InfinityAndroidCheckpoint8IsActiveEv",
+      "before": {
+        "address": 37627832,
+        "bind": "STB_GLOBAL",
+        "name": "_ZN25InfinityAndroidCheckpoint8IsActiveEv",
+        "section": ".text",
+        "sha256": "3422c6e368703f60240372eb65ab3b92644dee7e2b386b217aebbc0a25a2b2c7",
+        "size": 28
+      },
+      "after": {
+        "name": "_ZN25InfinityAndroidCheckpoint8IsActiveEv",
+        "address": 37627980,
+        "size": 28,
+        "section": ".text",
+        "bind": "STB_GLOBAL",
+        "sha256": "b61768f3c10a20f8275335333e87d45ce60634b3a8ce760b1c6efd15b388eae1"
+      },
+      "raw_equal": false
+    },
+    {
+      "name": "_ZN4KODI9MESSAGING12_GLOBAL__N_127IsCheckpointPlaybackControlERKNS0_13ThreadMessageE",
+      "before": null,
+      "after": {
+        "name": "_ZN4KODI9MESSAGING12_GLOBAL__N_127IsCheckpointPlaybackControlERKNS0_13ThreadMessageE",
+        "address": 27682136,
+        "size": 156,
+        "section": ".text",
+        "bind": "STB_LOCAL",
+        "sha256": "544caefef1e3f2fb0b307c7169d62050ebc83370ff2f37dec10bce1ff59c625d"
+      },
+      "raw_equal": false
+    },
+    {
+      "name": "_ZN4KODI9MESSAGING21CApplicationMessenger14ProcessMessageEPNS0_13ThreadMessageE",
+      "before": {
+        "address": 27679932,
+        "bind": "STB_GLOBAL",
+        "name": "_ZN4KODI9MESSAGING21CApplicationMessenger14ProcessMessageEPNS0_13ThreadMessageE",
+        "section": ".text",
+        "sha256": "84bf4001fe18911aa9a8c364d9847c7fe7cc1299d7099b1b1df7a64420c33707",
+        "size": 332
+      },
+      "after": {
+        "name": "_ZN4KODI9MESSAGING21CApplicationMessenger14ProcessMessageEPNS0_13ThreadMessageE",
+        "address": 27679932,
+        "size": 332,
+        "section": ".text",
+        "bind": "STB_GLOBAL",
+        "sha256": "2cb41792b9ff433a9463969a5fca7b363e49142421956903b3c2d6ec14aa5c8e"
+      },
+      "raw_equal": false
+    },
+    {
+      "name": "_ZN4KODI9MESSAGING21CApplicationMessenger15ProcessMessagesEv",
+      "before": {
+        "address": 27682144,
+        "bind": "STB_GLOBAL",
+        "name": "_ZN4KODI9MESSAGING21CApplicationMessenger15ProcessMessagesEv",
+        "section": ".text",
+        "sha256": "98f0d30fccc27b9c42140fb571b8674101680d1375e46a9aab0559ef2711e24e",
+        "size": 260
+      },
+      "after": {
+        "name": "_ZN4KODI9MESSAGING21CApplicationMessenger15ProcessMessagesEv",
+        "address": 27682292,
+        "size": 260,
+        "section": ".text",
+        "bind": "STB_GLOBAL",
+        "sha256": "56674d048d1755bd7b5a0f8c524522c90dc5d8b65fb5d63893182925c05e666f"
+      },
+      "raw_equal": false
+    },
+    {
+      "name": "_ZN4KODI9MESSAGING21CApplicationMessenger32ProcessCheckpointDisplayMessagesEv",
+      "before": {
+        "address": 27681636,
+        "bind": "STB_GLOBAL",
+        "name": "_ZN4KODI9MESSAGING21CApplicationMessenger32ProcessCheckpointDisplayMessagesEv",
+        "section": ".text",
+        "sha256": "874f5c507899e17cee21e0d137bb37cb222cb5ef0be23d1c08e6a627c4e01d28",
+        "size": 468
+      },
+      "after": {
+        "name": "_ZN4KODI9MESSAGING21CApplicationMessenger32ProcessCheckpointDisplayMessagesEv",
+        "address": 27681636,
+        "size": 460,
+        "section": ".text",
+        "bind": "STB_GLOBAL",
+        "sha256": "8dcd0958ae7c8ffbaaaf8446a63b3239d08cb9f12f191f19472cf9e26e4fd602"
+      },
+      "raw_equal": false
+    },
+    {
+      "name": "_ZN4KODI9MESSAGING21CApplicationMessenger7CleanupEv",
+      "before": {
+        "address": 27678936,
+        "bind": "STB_GLOBAL",
+        "name": "_ZN4KODI9MESSAGING21CApplicationMessenger7CleanupEv",
+        "section": ".text",
+        "sha256": "bc4ba69b57d575b52538212b8593e7c690db86c77478c4723330d73a611c66ec",
+        "size": 300
+      },
+      "after": {
+        "name": "_ZN4KODI9MESSAGING21CApplicationMessenger7CleanupEv",
+        "address": 27678936,
+        "size": 300,
+        "section": ".text",
+        "bind": "STB_GLOBAL",
+        "sha256": "602b4b8b7d3388c471bebff4dd96a1443dd75fc39a60a7e51e72fa974b3989ed"
+      },
+      "raw_equal": false
+    },
+    {
+      "name": "_ZN4KODI9MESSAGING21CApplicationMessenger7SendMsgEONS0_13ThreadMessageEb",
+      "before": {
+        "address": 27679236,
+        "bind": "STB_GLOBAL",
+        "name": "_ZN4KODI9MESSAGING21CApplicationMessenger7SendMsgEONS0_13ThreadMessageEb",
+        "section": ".text",
+        "sha256": "1d66b88c3109dc0bf7cd664d17e75d681d02cf5f026e3d70ae203671181bba2f",
+        "size": 696
+      },
+      "after": {
+        "name": "_ZN4KODI9MESSAGING21CApplicationMessenger7SendMsgEONS0_13ThreadMessageEb",
+        "address": 27679236,
+        "size": 696,
+        "section": ".text",
+        "bind": "STB_GLOBAL",
+        "sha256": "7db73c50708dabc434881125994cee69057485079e877cdc565c924fcc46e56e"
+      },
+      "raw_equal": false
+    },
+    {
+      "name": "_ZN4KODI9MESSAGING21CApplicationMessenger7SendMsgEj",
+      "before": {
+        "address": 27680264,
+        "bind": "STB_GLOBAL",
+        "name": "_ZN4KODI9MESSAGING21CApplicationMessenger7SendMsgEj",
+        "section": ".text",
+        "sha256": "9294dc8064194783fdedad67b5bb0c8185794cbc868d1a0f94389b516f756e8d",
+        "size": 128
+      },
+      "after": {
+        "name": "_ZN4KODI9MESSAGING21CApplicationMessenger7SendMsgEj",
+        "address": 27680264,
+        "size": 128,
+        "section": ".text",
+        "bind": "STB_GLOBAL",
+        "sha256": "e8709cb9054605dd25ce8c14e8103dc3810f5d3045e0653c1bb6495dbe348bee"
+      },
+      "raw_equal": false
+    },
+    {
+      "name": "_ZN4KODI9MESSAGING21CApplicationMessenger7SendMsgEjiiPv",
+      "before": {
+        "address": 27680392,
+        "bind": "STB_GLOBAL",
+        "name": "_ZN4KODI9MESSAGING21CApplicationMessenger7SendMsgEjiiPv",
+        "section": ".text",
+        "sha256": "9c3ff452a96464cce1742e759e08ed0862563d80c4d12fec64209e96b4f4c2ea",
+        "size": 132
+      },
+      "after": {
+        "name": "_ZN4KODI9MESSAGING21CApplicationMessenger7SendMsgEjiiPv",
+        "address": 27680392,
+        "size": 132,
+        "section": ".text",
+        "bind": "STB_GLOBAL",
+        "sha256": "06955b8396d5b253e5b6bb2eef3466aca76e40b3121fc0e05e981eecaa600df4"
+      },
+      "raw_equal": false
+    },
+    {
+      "name": "_ZN4KODI9MESSAGING21CApplicationMessenger7SendMsgEjiiPvNSt6__ndk112basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEE",
+      "before": {
+        "address": 27680524,
+        "bind": "STB_GLOBAL",
+        "name": "_ZN4KODI9MESSAGING21CApplicationMessenger7SendMsgEjiiPvNSt6__ndk112basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEE",
+        "section": ".text",
+        "sha256": "9aadd8dae60807fe89b9f13ea9b1a9b7e9994b2f3bc3ddf982c20ee850f7d3d1",
+        "size": 244
+      },
+      "after": {
+        "name": "_ZN4KODI9MESSAGING21CApplicationMessenger7SendMsgEjiiPvNSt6__ndk112basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEE",
+        "address": 27680524,
+        "size": 244,
+        "section": ".text",
+        "bind": "STB_GLOBAL",
+        "sha256": "4b633f41bcccedcd8d7cafd3d1d9c787c4136240f77b5e9c3ffbf9db4bf9d673"
+      },
+      "raw_equal": false
+    },
+    {
+      "name": "_ZN4KODI9MESSAGING21CApplicationMessenger7SendMsgEjiiPvNSt6__ndk112basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEENS3_6vectorIS9_NS7_IS9_EEEE",
+      "before": {
+        "address": 27680768,
+        "bind": "STB_GLOBAL",
+        "name": "_ZN4KODI9MESSAGING21CApplicationMessenger7SendMsgEjiiPvNSt6__ndk112basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEENS3_6vectorIS9_NS7_IS9_EEEE",
+        "section": ".text",
+        "sha256": "86d91824e610cca171e48eae8ae5bc07430f1ddacf9995032602190fe8438a4e",
+        "size": 268
+      },
+      "after": {
+        "name": "_ZN4KODI9MESSAGING21CApplicationMessenger7SendMsgEjiiPvNSt6__ndk112basic_stringIcNS3_11char_traitsIcEENS3_9allocatorIcEEEENS3_6vectorIS9_NS7_IS9_EEEE",
+        "address": 27680768,
+        "size": 268,
+        "section": ".text",
+        "bind": "STB_GLOBAL",
+        "sha256": "bbe75402ff21db4044485f917f59f8652e04bb394a3129fd4a585d1da3a8ba31"
+      },
+      "raw_equal": false
+    },
+    {
+      "name": "_ZN8CXBMCApp18onAudioFocusChangeEi",
+      "before": {
+        "address": 21695304,
+        "bind": "STB_GLOBAL",
+        "name": "_ZN8CXBMCApp18onAudioFocusChangeEi",
+        "section": ".text",
+        "sha256": "34ec28a7ea5ba7d6b404479e18a6049a096a6cce473def91800ca633bf53db3f",
+        "size": 460
+      },
+      "after": {
+        "name": "_ZN8CXBMCApp18onAudioFocusChangeEi",
+        "address": 21695304,
+        "size": 460,
+        "section": ".text",
+        "bind": "STB_GLOBAL",
+        "sha256": "c5c219319625a591c07fb02dc0af62f10fe85f5358a111e3ee0cc5d15237e952"
+      },
+      "raw_equal": false
+    },
+    {
+      "name": "_ZN8CXBMCApp6onStopEv",
+      "before": {
+        "address": 21677208,
+        "bind": "STB_GLOBAL",
+        "name": "_ZN8CXBMCApp6onStopEv",
+        "section": ".text",
+        "sha256": "a81ac05a5d187492fc783e5fc6ba724032d0786ed503ed945cd7ef3968bd906e",
+        "size": 452
+      },
+      "after": {
+        "name": "_ZN8CXBMCApp6onStopEv",
+        "address": 21677208,
+        "size": 452,
+        "section": ".text",
+        "bind": "STB_GLOBAL",
+        "sha256": "a28765bb4137943ca1b7114825514fd6293a58921e464a7c6009702d9337681c"
+      },
+      "raw_equal": false
+    },
+    {
+      "name": "_ZN8CXBMCApp7onPauseEv",
+      "before": {
+        "address": 21676668,
+        "bind": "STB_GLOBAL",
+        "name": "_ZN8CXBMCApp7onPauseEv",
+        "section": ".text",
+        "sha256": "fbacae48413d443d21cd1e3c2579824ee0524614748cbefc48dea985dda60c40",
+        "size": 540
+      },
+      "after": {
+        "name": "_ZN8CXBMCApp7onPauseEv",
+        "address": 21676668,
+        "size": 540,
+        "section": ".text",
+        "bind": "STB_GLOBAL",
+        "sha256": "e8a7839a752f89c193c3992b484ca09a0304e53f8c1d1d5fa8f879c63ee3a0b2"
+      },
+      "raw_equal": false
+    },
+    {
+      "name": "_ZN8CXBMCApp8onResumeEv",
+      "before": {
+        "address": 21675152,
+        "bind": "STB_GLOBAL",
+        "name": "_ZN8CXBMCApp8onResumeEv",
+        "section": ".text",
+        "sha256": "345aa994f086d44100d37288b715e0ddee47a05d63c7eb76c5fdb5b6b035cbbc",
+        "size": 792
+      },
+      "after": {
+        "name": "_ZN8CXBMCApp8onResumeEv",
+        "address": 21675152,
+        "size": 792,
+        "section": ".text",
+        "bind": "STB_GLOBAL",
+        "sha256": "3a9215140a2a9d8d70b52f56353f976683db9b3437cf221676cc2c8a36a31c81"
+      },
+      "raw_equal": false
+    },
+    {
+      "name": "_ZNK25InfinityAndroidCheckpoint20CheckpointWriteGuardcvbEv",
+      "before": {
+        "address": 25388380,
+        "bind": "STB_WEAK",
+        "name": "_ZNK25InfinityAndroidCheckpoint20CheckpointWriteGuardcvbEv",
+        "section": ".text",
+        "sha256": "cb54949d467f73d9dcbdbcb28d5a644a4eec1b14f07f76f0b273836bd51115b8",
+        "size": 8
+      },
+      "after": {
+        "name": "_ZNK25InfinityAndroidCheckpoint20CheckpointWriteGuardcvbEv",
+        "address": 25388380,
+        "size": 8,
+        "section": ".text",
+        "bind": "STB_WEAK",
+        "sha256": "cb54949d467f73d9dcbdbcb28d5a644a4eec1b14f07f76f0b273836bd51115b8"
+      },
+      "raw_equal": true
+    },
+    {
+      "name": "_ZNKSt6__ndk110unique_ptrIN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEEdeEv",
+      "before": {
+        "address": 26758848,
+        "bind": "STB_LOCAL",
+        "name": "_ZNKSt6__ndk110unique_ptrIN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEEdeEv",
+        "section": ".text",
+        "sha256": "09bfe0f2ed76e55ff3016b84de86e45e8908ef7e935c6bc2d66fc8542ea9234e",
+        "size": 24
+      },
+      "after": {
+        "name": "_ZNKSt6__ndk110unique_ptrIN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEEdeEv",
+        "address": 26758848,
+        "size": 24,
+        "section": ".text",
+        "bind": "STB_LOCAL",
+        "sha256": "09bfe0f2ed76e55ff3016b84de86e45e8908ef7e935c6bc2d66fc8542ea9234e"
+      },
+      "raw_equal": true
+    },
+    {
+      "name": "_ZNKSt6__ndk114default_deleteIN25InfinityAndroidCheckpoint20CheckpointWriteGuardEEclEPS2_",
+      "before": {
+        "address": 26812072,
+        "bind": "STB_LOCAL",
+        "name": "_ZNKSt6__ndk114default_deleteIN25InfinityAndroidCheckpoint20CheckpointWriteGuardEEclEPS2_",
+        "section": ".text",
+        "sha256": "97fe9bf3184e77ef8d7826fdf2cb330a32f22eba37891fa550171cd177d442ed",
+        "size": 48
+      },
+      "after": {
+        "name": "_ZNKSt6__ndk114default_deleteIN25InfinityAndroidCheckpoint20CheckpointWriteGuardEEclEPS2_",
+        "address": 26812072,
+        "size": 48,
+        "section": ".text",
+        "bind": "STB_LOCAL",
+        "sha256": "44354cb9dc77d21799090a8e5d4f4725bfd4d26fe0f762c9cff7f68d1785a6b3"
+      },
+      "raw_equal": false
+    },
+    {
+      "name": "_ZNKSt6__ndk117__compressed_pairIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEE5firstEv",
+      "before": {
+        "address": 26812360,
+        "bind": "STB_LOCAL",
+        "name": "_ZNKSt6__ndk117__compressed_pairIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEE5firstEv",
+        "section": ".text",
+        "sha256": "788f1512f26f87f558ccda89030f23036527961be061f31e047ad5b93b8aafe2",
+        "size": 4
+      },
+      "after": {
+        "name": "_ZNKSt6__ndk117__compressed_pairIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEE5firstEv",
+        "address": 26812360,
+        "size": 4,
+        "section": ".text",
+        "bind": "STB_LOCAL",
+        "sha256": "788f1512f26f87f558ccda89030f23036527961be061f31e047ad5b93b8aafe2"
+      },
+      "raw_equal": true
+    },
+    {
+      "name": "_ZNKSt6__ndk122__compressed_pair_elemIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardELi0ELb0EE5__getEv",
+      "before": {
+        "address": 26812364,
+        "bind": "STB_LOCAL",
+        "name": "_ZNKSt6__ndk122__compressed_pair_elemIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardELi0ELb0EE5__getEv",
+        "section": ".text",
+        "sha256": "110f46b5b35c069160560c6ad6786f647dd44e8760a52a46fc22dbbcd7630b91",
+        "size": 4
+      },
+      "after": {
+        "name": "_ZNKSt6__ndk122__compressed_pair_elemIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardELi0ELb0EE5__getEv",
+        "address": 26812364,
+        "size": 4,
+        "section": ".text",
+        "bind": "STB_LOCAL",
+        "sha256": "110f46b5b35c069160560c6ad6786f647dd44e8760a52a46fc22dbbcd7630b91"
+      },
+      "raw_equal": true
+    },
+    {
+      "name": "_ZNSt6__ndk110unique_ptrIN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEE11get_deleterEv",
+      "before": {
+        "address": 26812356,
+        "bind": "STB_LOCAL",
+        "name": "_ZNSt6__ndk110unique_ptrIN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEE11get_deleterEv",
+        "section": ".text",
+        "sha256": "a57c0370b4cc20921e000cac7bfa474365ed8947bbf6a4da1184a0de7628a93c",
+        "size": 4
+      },
+      "after": {
+        "name": "_ZNSt6__ndk110unique_ptrIN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEE11get_deleterEv",
+        "address": 26812356,
+        "size": 4,
+        "section": ".text",
+        "bind": "STB_LOCAL",
+        "sha256": "a57c0370b4cc20921e000cac7bfa474365ed8947bbf6a4da1184a0de7628a93c"
+      },
+      "raw_equal": true
+    },
+    {
+      "name": "_ZNSt6__ndk110unique_ptrIN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEE5resetEPS2_",
+      "before": {
+        "address": 26811972,
+        "bind": "STB_LOCAL",
+        "name": "_ZNSt6__ndk110unique_ptrIN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEE5resetEPS2_",
+        "section": ".text",
+        "sha256": "7e267d54204ea564ef8d71c48b367be3ffd6d74163e3748437f1d05c2fa3bd7e",
+        "size": 92
+      },
+      "after": {
+        "name": "_ZNSt6__ndk110unique_ptrIN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEE5resetEPS2_",
+        "address": 26811972,
+        "size": 92,
+        "section": ".text",
+        "bind": "STB_LOCAL",
+        "sha256": "7e267d54204ea564ef8d71c48b367be3ffd6d74163e3748437f1d05c2fa3bd7e"
+      },
+      "raw_equal": true
+    },
+    {
+      "name": "_ZNSt6__ndk110unique_ptrIN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEE7releaseEv",
+      "before": {
+        "address": 26812300,
+        "bind": "STB_LOCAL",
+        "name": "_ZNSt6__ndk110unique_ptrIN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEE7releaseEv",
+        "section": ".text",
+        "sha256": "0833f22899e7b1125eebe793184990527996940e1dea076065c0fa3daa6f88a6",
+        "size": 52
+      },
+      "after": {
+        "name": "_ZNSt6__ndk110unique_ptrIN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEE7releaseEv",
+        "address": 26812300,
+        "size": 52,
+        "section": ".text",
+        "bind": "STB_LOCAL",
+        "sha256": "0833f22899e7b1125eebe793184990527996940e1dea076065c0fa3daa6f88a6"
+      },
+      "raw_equal": true
+    },
+    {
+      "name": "_ZNSt6__ndk110unique_ptrIN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEEC2ILb1EvEEPS2_",
+      "before": {
+        "address": 26812128,
+        "bind": "STB_WEAK",
+        "name": "_ZNSt6__ndk110unique_ptrIN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEEC2ILb1EvEEPS2_",
+        "section": ".text",
+        "sha256": "ec8e46e5ac9d00fd1ba87021bf3dc5fe7614ad4f5cdc39b90193b06f3dee5133",
+        "size": 80
+      },
+      "after": {
+        "name": "_ZNSt6__ndk110unique_ptrIN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEEC2ILb1EvEEPS2_",
+        "address": 26812128,
+        "size": 80,
+        "section": ".text",
+        "bind": "STB_WEAK",
+        "sha256": "ec8e46e5ac9d00fd1ba87021bf3dc5fe7614ad4f5cdc39b90193b06f3dee5133"
+      },
+      "raw_equal": true
+    },
+    {
+      "name": "_ZNSt6__ndk110unique_ptrIN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEEC2ILb1EvEEv",
+      "before": {
+        "address": 26758584,
+        "bind": "STB_WEAK",
+        "name": "_ZNSt6__ndk110unique_ptrIN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEEC2ILb1EvEEv",
+        "section": ".text",
+        "sha256": "2d3ef2e07fa7492a2b98d12361b85c6d60b1fc9acf3509d1d1ff5d894fba201c",
+        "size": 80
+      },
+      "after": {
+        "name": "_ZNSt6__ndk110unique_ptrIN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEEC2ILb1EvEEv",
+        "address": 26758584,
+        "size": 80,
+        "section": ".text",
+        "bind": "STB_WEAK",
+        "sha256": "2d3ef2e07fa7492a2b98d12361b85c6d60b1fc9acf3509d1d1ff5d894fba201c"
+      },
+      "raw_equal": true
+    },
+    {
+      "name": "_ZNSt6__ndk110unique_ptrIN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEED2Ev",
+      "before": {
+        "address": 26758840,
+        "bind": "STB_LOCAL",
+        "name": "_ZNSt6__ndk110unique_ptrIN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEED2Ev",
+        "section": ".text",
+        "sha256": "b15f8c9d533ba1421867f6966d257a59ef977a06f994a2b61d0666e5facaa20c",
+        "size": 8
+      },
+      "after": {
+        "name": "_ZNSt6__ndk110unique_ptrIN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEED2Ev",
+        "address": 26758840,
+        "size": 8,
+        "section": ".text",
+        "bind": "STB_LOCAL",
+        "sha256": "b15f8c9d533ba1421867f6966d257a59ef977a06f994a2b61d0666e5facaa20c"
+      },
+      "raw_equal": true
+    },
+    {
+      "name": "_ZNSt6__ndk110unique_ptrIN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEEaSEOS5_",
+      "before": {
+        "address": 26758764,
+        "bind": "STB_LOCAL",
+        "name": "_ZNSt6__ndk110unique_ptrIN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEEaSEOS5_",
+        "section": ".text",
+        "sha256": "ccb80de6ffba446969024179078334c5ac8ef5cec56dc788621261d54348cffc",
+        "size": 76
+      },
+      "after": {
+        "name": "_ZNSt6__ndk110unique_ptrIN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEEaSEOS5_",
+        "address": 26758764,
+        "size": 76,
+        "section": ".text",
+        "bind": "STB_LOCAL",
+        "sha256": "ccb80de6ffba446969024179078334c5ac8ef5cec56dc788621261d54348cffc"
+      },
+      "raw_equal": true
+    },
+    {
+      "name": "_ZNSt6__ndk111make_uniqueIN25InfinityAndroidCheckpoint20CheckpointWriteGuardEJRA5_KcEEENS_11__unique_ifIT_E15__unique_singleEDpOT0_",
+      "before": {
+        "address": 26758664,
+        "bind": "STB_LOCAL",
+        "name": "_ZNSt6__ndk111make_uniqueIN25InfinityAndroidCheckpoint20CheckpointWriteGuardEJRA5_KcEEENS_11__unique_ifIT_E15__unique_singleEDpOT0_",
+        "section": ".text",
+        "sha256": "a147cc7a553d083cffbc4eb241e8cf8b6ecab303190bd1ad178b06a987f08090",
+        "size": 100
+      },
+      "after": {
+        "name": "_ZNSt6__ndk111make_uniqueIN25InfinityAndroidCheckpoint20CheckpointWriteGuardEJRA5_KcEEENS_11__unique_ifIT_E15__unique_singleEDpOT0_",
+        "address": 26758664,
+        "size": 100,
+        "section": ".text",
+        "bind": "STB_LOCAL",
+        "sha256": "685becbeb7ca6e8d75af2fefaf20196e2178017008dd2473033021ed53ce5de0"
+      },
+      "raw_equal": false
+    },
+    {
+      "name": "_ZNSt6__ndk117__compressed_pairIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEE5firstEv",
+      "before": {
+        "address": 26812064,
+        "bind": "STB_LOCAL",
+        "name": "_ZNSt6__ndk117__compressed_pairIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEE5firstEv",
+        "section": ".text",
+        "sha256": "b7817d9355c0a4a37f1af7c8519d90aabaaadfe2a55aec7a6fd26330bea2a546",
+        "size": 4
+      },
+      "after": {
+        "name": "_ZNSt6__ndk117__compressed_pairIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEE5firstEv",
+        "address": 26812064,
+        "size": 4,
+        "section": ".text",
+        "bind": "STB_LOCAL",
+        "sha256": "b7817d9355c0a4a37f1af7c8519d90aabaaadfe2a55aec7a6fd26330bea2a546"
+      },
+      "raw_equal": true
+    },
+    {
+      "name": "_ZNSt6__ndk117__compressed_pairIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEE6secondEv",
+      "before": {
+        "address": 26812068,
+        "bind": "STB_LOCAL",
+        "name": "_ZNSt6__ndk117__compressed_pairIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEE6secondEv",
+        "section": ".text",
+        "sha256": "b7817d9355c0a4a37f1af7c8519d90aabaaadfe2a55aec7a6fd26330bea2a546",
+        "size": 4
+      },
+      "after": {
+        "name": "_ZNSt6__ndk117__compressed_pairIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEE6secondEv",
+        "address": 26812068,
+        "size": 4,
+        "section": ".text",
+        "bind": "STB_LOCAL",
+        "sha256": "b7817d9355c0a4a37f1af7c8519d90aabaaadfe2a55aec7a6fd26330bea2a546"
+      },
+      "raw_equal": true
+    },
+    {
+      "name": "_ZNSt6__ndk117__compressed_pairIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEEC2IRS3_Lb1EEEOT_",
+      "before": {
+        "address": 26812208,
+        "bind": "STB_WEAK",
+        "name": "_ZNSt6__ndk117__compressed_pairIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEEC2IRS3_Lb1EEEOT_",
+        "section": ".text",
+        "sha256": "16e7f1bd33fade9d3c3677e7f16e1ad08bda58d20cf18168e437653e21e4d23b",
+        "size": 44
+      },
+      "after": {
+        "name": "_ZNSt6__ndk117__compressed_pairIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEEC2IRS3_Lb1EEEOT_",
+        "address": 26812208,
+        "size": 44,
+        "section": ".text",
+        "bind": "STB_WEAK",
+        "sha256": "16e7f1bd33fade9d3c3677e7f16e1ad08bda58d20cf18168e437653e21e4d23b"
+      },
+      "raw_equal": true
+    },
+    {
+      "name": "_ZNSt6__ndk117__compressed_pairIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEEC2IS3_Lb1EEEOT_",
+      "before": {
+        "address": 26774972,
+        "bind": "STB_WEAK",
+        "name": "_ZNSt6__ndk117__compressed_pairIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEEC2IS3_Lb1EEEOT_",
+        "section": ".text",
+        "sha256": "16e7f1bd33fade9d3c3677e7f16e1ad08bda58d20cf18168e437653e21e4d23b",
+        "size": 44
+      },
+      "after": {
+        "name": "_ZNSt6__ndk117__compressed_pairIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardENS_14default_deleteIS2_EEEC2IS3_Lb1EEEOT_",
+        "address": 26774972,
+        "size": 44,
+        "section": ".text",
+        "bind": "STB_WEAK",
+        "sha256": "16e7f1bd33fade9d3c3677e7f16e1ad08bda58d20cf18168e437653e21e4d23b"
+      },
+      "raw_equal": true
+    },
+    {
+      "name": "_ZNSt6__ndk122__compressed_pair_elemINS_14default_deleteIN25InfinityAndroidCheckpoint20CheckpointWriteGuardEEELi1ELb1EE5__getEv",
+      "before": {
+        "address": 26812124,
+        "bind": "STB_LOCAL",
+        "name": "_ZNSt6__ndk122__compressed_pair_elemINS_14default_deleteIN25InfinityAndroidCheckpoint20CheckpointWriteGuardEEELi1ELb1EE5__getEv",
+        "section": ".text",
+        "sha256": "110f46b5b35c069160560c6ad6786f647dd44e8760a52a46fc22dbbcd7630b91",
+        "size": 4
+      },
+      "after": {
+        "name": "_ZNSt6__ndk122__compressed_pair_elemINS_14default_deleteIN25InfinityAndroidCheckpoint20CheckpointWriteGuardEEELi1ELb1EE5__getEv",
+        "address": 26812124,
+        "size": 4,
+        "section": ".text",
+        "bind": "STB_LOCAL",
+        "sha256": "110f46b5b35c069160560c6ad6786f647dd44e8760a52a46fc22dbbcd7630b91"
+      },
+      "raw_equal": true
+    },
+    {
+      "name": "_ZNSt6__ndk122__compressed_pair_elemIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardELi0ELb0EE5__getEv",
+      "before": {
+        "address": 26812120,
+        "bind": "STB_LOCAL",
+        "name": "_ZNSt6__ndk122__compressed_pair_elemIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardELi0ELb0EE5__getEv",
+        "section": ".text",
+        "sha256": "110f46b5b35c069160560c6ad6786f647dd44e8760a52a46fc22dbbcd7630b91",
+        "size": 4
+      },
+      "after": {
+        "name": "_ZNSt6__ndk122__compressed_pair_elemIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardELi0ELb0EE5__getEv",
+        "address": 26812120,
+        "size": 4,
+        "section": ".text",
+        "bind": "STB_LOCAL",
+        "sha256": "110f46b5b35c069160560c6ad6786f647dd44e8760a52a46fc22dbbcd7630b91"
+      },
+      "raw_equal": true
+    },
+    {
+      "name": "_ZNSt6__ndk122__compressed_pair_elemIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardELi0ELb0EEC2IRS3_vEEOT_",
+      "before": {
+        "address": 26812256,
+        "bind": "STB_WEAK",
+        "name": "_ZNSt6__ndk122__compressed_pair_elemIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardELi0ELb0EEC2IRS3_vEEOT_",
+        "section": ".text",
+        "sha256": "34f6ec140177fea24655eb05b57fe4e754c9da7ae3ef77902da91abbbc87569a",
+        "size": 44
+      },
+      "after": {
+        "name": "_ZNSt6__ndk122__compressed_pair_elemIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardELi0ELb0EEC2IRS3_vEEOT_",
+        "address": 26812256,
+        "size": 44,
+        "section": ".text",
+        "bind": "STB_WEAK",
+        "sha256": "34f6ec140177fea24655eb05b57fe4e754c9da7ae3ef77902da91abbbc87569a"
+      },
+      "raw_equal": true
+    },
+    {
+      "name": "_ZNSt6__ndk122__compressed_pair_elemIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardELi0ELb0EEC2IS3_vEEOT_",
+      "before": {
+        "address": 26775020,
+        "bind": "STB_WEAK",
+        "name": "_ZNSt6__ndk122__compressed_pair_elemIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardELi0ELb0EEC2IS3_vEEOT_",
+        "section": ".text",
+        "sha256": "34f6ec140177fea24655eb05b57fe4e754c9da7ae3ef77902da91abbbc87569a",
+        "size": 44
+      },
+      "after": {
+        "name": "_ZNSt6__ndk122__compressed_pair_elemIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardELi0ELb0EEC2IS3_vEEOT_",
+        "address": 26775020,
+        "size": 44,
+        "section": ".text",
+        "bind": "STB_WEAK",
+        "sha256": "34f6ec140177fea24655eb05b57fe4e754c9da7ae3ef77902da91abbbc87569a"
+      },
+      "raw_equal": true
+    },
+    {
+      "name": "_ZNSt6__ndk17forwardINS_14default_deleteIN25InfinityAndroidCheckpoint20CheckpointWriteGuardEEEEEOT_RNS_16remove_referenceIS5_E4typeE",
+      "before": {
+        "address": 26812352,
+        "bind": "STB_LOCAL",
+        "name": "_ZNSt6__ndk17forwardINS_14default_deleteIN25InfinityAndroidCheckpoint20CheckpointWriteGuardEEEEEOT_RNS_16remove_referenceIS5_E4typeE",
+        "section": ".text",
+        "sha256": "110f46b5b35c069160560c6ad6786f647dd44e8760a52a46fc22dbbcd7630b91",
+        "size": 4
+      },
+      "after": {
+        "name": "_ZNSt6__ndk17forwardINS_14default_deleteIN25InfinityAndroidCheckpoint20CheckpointWriteGuardEEEEEOT_RNS_16remove_referenceIS5_E4typeE",
+        "address": 26812352,
+        "size": 4,
+        "section": ".text",
+        "bind": "STB_LOCAL",
+        "sha256": "110f46b5b35c069160560c6ad6786f647dd44e8760a52a46fc22dbbcd7630b91"
+      },
+      "raw_equal": true
+    },
+    {
+      "name": "_ZNSt6__ndk17forwardIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardEEEOT_RNS_16remove_referenceIS4_E4typeE",
+      "before": {
+        "address": 26775016,
+        "bind": "STB_LOCAL",
+        "name": "_ZNSt6__ndk17forwardIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardEEEOT_RNS_16remove_referenceIS4_E4typeE",
+        "section": ".text",
+        "sha256": "110f46b5b35c069160560c6ad6786f647dd44e8760a52a46fc22dbbcd7630b91",
+        "size": 4
+      },
+      "after": {
+        "name": "_ZNSt6__ndk17forwardIPN25InfinityAndroidCheckpoint20CheckpointWriteGuardEEEOT_RNS_16remove_referenceIS4_E4typeE",
+        "address": 26775016,
+        "size": 4,
+        "section": ".text",
+        "bind": "STB_LOCAL",
+        "sha256": "110f46b5b35c069160560c6ad6786f647dd44e8760a52a46fc22dbbcd7630b91"
+      },
+      "raw_equal": true
+    },
+    {
+      "name": "_ZNSt6__ndk17forwardIRPN25InfinityAndroidCheckpoint20CheckpointWriteGuardEEEOT_RNS_16remove_referenceIS5_E4typeE",
+      "before": {
+        "address": 26812252,
+        "bind": "STB_LOCAL",
+        "name": "_ZNSt6__ndk17forwardIRPN25InfinityAndroidCheckpoint20CheckpointWriteGuardEEEOT_RNS_16remove_referenceIS5_E4typeE",
+        "section": ".text",
+        "sha256": "110f46b5b35c069160560c6ad6786f647dd44e8760a52a46fc22dbbcd7630b91",
+        "size": 4
+      },
+      "after": {
+        "name": "_ZNSt6__ndk17forwardIRPN25InfinityAndroidCheckpoint20CheckpointWriteGuardEEEOT_RNS_16remove_referenceIS5_E4typeE",
+        "address": 26812252,
+        "size": 4,
+        "section": ".text",
+        "bind": "STB_LOCAL",
+        "sha256": "110f46b5b35c069160560c6ad6786f647dd44e8760a52a46fc22dbbcd7630b91"
+      },
+      "raw_equal": true
+    }
+  ],
+  "interpretation": "Raw equality is exact. Changed bytes include link-address relocations and debug/build metadata; this inventory alone does not prove semantic equivalence. Duplicate local names are paired by address order and explicitly counted.",
+  "android_executed": false
+}

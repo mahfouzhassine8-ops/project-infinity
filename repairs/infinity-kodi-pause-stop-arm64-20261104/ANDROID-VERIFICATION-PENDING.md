@@ -1,0 +1,14 @@
+**Required Android/Fold verification — NOT RUN**
+
+This stage authorizes native ARM64 integration and focused host/binary verification only. It creates no installable APK and grants no installation, signing, promotion or lock authority. The current environment has no connected authorized ARM64 Android/Fold device. Compilation and disassembly are not Android execution.
+
+After separately authorized packaging and connection of a test device, bind every result to the exact installed APK, native engine hash and Android build. Use a disposable controlled profile for injected persistence failures; preserve the user's databases and settings. Do not clear data, force-kill the application, invent a success receipt or disable a checkpoint gate.
+
+1. Establish ordinary playback without an active checkpoint. Verify Pause, Stop, resume, audio-focus interruption, screen-off/on and foreground return retain their normal effects. Confirm actual player events and state, not just that a button or JNI call returned.
+2. Reproduce the checkpoint/Pause/Stop queue condition in a controlled failed-checkpoint fixture. Trace the real Android callback, native enqueue, selective admission, `OnAction` refusal, payload disposal and wait-event completion. The failure remains latched and commands remain refused. No playback transition, save-success receipt or termination permission may be inferred from completion of that refusal.
+3. Exercise the cannot-pause Stop branch and ordinary Pause branch of actual audio-focus loss. Check the observed focus event; do not assume a particular assistant application always sends the same event. Repeat background/foreground and focus interruptions, including the existing resume-time Play request.
+4. Keep a real pending write, a failed durable write and an unknown persistence owner blocking independently. Verify the failure receipt and owner/revision state before and after interruptions. Separately verify successful shutdown/restart with checked watched/settings persistence. No unknown historical watched route may be reclassified by this test.
+5. Verify real surface destruction and creation with the checkpoint active and failed. Completion must occur after the real display operation. Check screen-off/on, supported rotation, cover-to-inner and inner-to-cover Fold transitions, playback surface continuity and Android main/event-loop responsiveness. Host display peers cannot verify EGL or codec teardown.
+6. Capture actual ANR/thread evidence if a receiver still blocks. A codec, player callback, worker or activity-destruction hang outside the selective queue must be reported separately rather than bypassed. There is no blanket no-ANR claim.
+
+Infinity Preview, Cobra, settings-owner retirement, Scudo analysis, Continue Playing and Home startup remain outside this correction. A native-integration pass may support requesting a controlled physical-testing APK; it is not production acceptance or authority to create that APK.

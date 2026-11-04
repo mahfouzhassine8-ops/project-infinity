@@ -1,0 +1,45 @@
+{
+  "verification_kind": "Direct manual ARM64 disassembly review plus byte-bound instruction classification, not execution",
+  "native_sha256": "d0b6f115e839fbe39e764e2fecad47418c501ab1ece853294578652cd0b80b98",
+  "selective_pump": {
+    "address": "0x1a66364",
+    "bytes": 460,
+    "thread_and_active_guards": true,
+    "helper_call": "0x1a66434",
+    "ProcessMessage_call": "0x1a66470",
+    "CEvent_Set_after_receiver": "0x1a66488",
+    "message_destructor_after_ack": "0x1a66490",
+    "relock_after_disposal": "0x1a664a0"
+  },
+  "helper": {
+    "address": "0x1a66558",
+    "bytes": 156,
+    "message": "0x08000005",
+    "target": 9999,
+    "param2": -1,
+    "param3": 0,
+    "payload_required": true,
+    "string_and_vector_empty": true,
+    "actions": [
+      12,
+      13,
+      79
+    ],
+    "id_comparison": "(id | 1) == 13 OR id == 79"
+  },
+  "receiver": {
+    "GUI_ACTION_to_OnAction_call": "0x1b47238",
+    "CAction_destructor": "0x1b474d8",
+    "GUI_ACTION_sets_success_result": false
+  },
+  "OnAction": {
+    "address": "0x1bd62c0",
+    "bytes": 5780,
+    "IsActive_call": "0x1bd62f4",
+    "active_branch": "0x1bd62f8",
+    "returns_before_action_dispatch": true
+  },
+  "SendMsg_default_result": -1,
+  "android_runtime_executed": false,
+  "whole_engine_semantic_equivalence_claimed": false
+}
