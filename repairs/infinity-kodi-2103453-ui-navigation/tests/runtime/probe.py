@@ -17,7 +17,7 @@ result = {'platform': 'upstream Linux Kodi 21.2; synthetic providers; actual sig
           'phase': config['phase'], 'checks': [], 'observations': []}
 controller = None
 last_tick = 0.0
-ids = (50, 51, 52, 53, 55, 56, 57, 58, 59, 500, 501, 502, 503, 504, 505, 506, 507, 509, 591, 592, 602, 609)
+ids = (50, 65050, 65051, 65052, 51, 52, 53, 55, 56, 57, 58, 59, 500, 501, 502, 503, 504, 505, 506, 507, 509, 591, 592, 602, 609)
 
 
 def tick():
@@ -25,7 +25,15 @@ def tick():
     now = time.monotonic()
     if controller and now - last_tick >= .5:
         last_tick = now
-        return controller.tick()
+        status = controller.tick()
+        if config['phase'].startswith('list-registration-'):
+            state = {'status':status, 'view':view(), 'pending':controller.pending,
+                'path':xbmc.getInfoLabel('Container.FolderPath'),
+                'updating':bool(xbmc.getCondVisibility('Container.IsUpdating'))}
+            history = result.setdefault('observer_transitions', [])
+            if len(history) < 256 and (not history or history[-1]['state'] != state):
+                history.append({'time':time.monotonic(), 'state':state})
+        return status
 
 
 def wait(predicate, seconds=12):
@@ -89,7 +97,8 @@ def open_page(provider='a', page=1, content='movies'):
     xbmc.sleep(250)
 
 
-def select(view_id):
+def select(view_id, expected=None):
+    if expected is None:expected = view_id
     dialog = 1130 if config['phase'] == 'baseline' else 1136
     label = xbmc.getLocalizedString({50:535, 56:31243, 55:31078, 51:31247}[view_id])
     xbmc.executebuiltin('ActivateWindow(%s)' % dialog)
@@ -102,7 +111,80 @@ def select(view_id):
     xbmc.executebuiltin('Action(Select)')
     if config['phase'] == 'baseline':
         xbmc.sleep(200);xbmc.executebuiltin('Dialog.Close(%s)' % dialog)
-    check('selected-view:%s' % view_id, wait(lambda: view() == view_id and xbmcgui.getCurrentWindowDialogId() == 9999))
+    check('selected-view:%s' % expected, wait(lambda: view() == expected and xbmcgui.getCurrentWindowDialogId() == 9999))
+
+
+def list_continuation():
+    """New List registration path only; no playback or shutdown calls."""
+    phase = config['phase']
+    mode = 'compact' if phase.endswith('compact') else 'cinema' if phase.endswith('cinema') else 'auto'
+    slim = phase.endswith('slim')
+    xbmc.executebuiltin('Skin.SetString(Infinity.HomeView,%s)' % mode)
+    xbmc.executebuiltin('Skin.SetBool(Enable.SlimList)' if slim else 'Skin.Reset(Enable.SlimList)')
+    xbmc.sleep(200)
+    core = 50 if mode == 'cinema' else 65050
+    folder = 50 if mode == 'cinema' else 65052 if mode == 'compact' else 65051
+    # First-ever Videos window entry in this process has no provider content.
+    xbmc.executebuiltin('ActivateWindow(Videos,files)')
+    check('cold-native-files-window', wait(lambda: xbmcgui.getCurrentWindowId() == 10025 and
+        not xbmc.getCondVisibility('Container.IsUpdating')))
+    xbmc.executebuiltin('Container.SetViewMode(%s)' % core)
+    check('core-list-visible-before-provider', wait(lambda: view() == core))
+    native_window = xbmcgui.Window(10025)
+    # Keep the Window reference alive during control inspection.
+    detailed = native_window.getControl(50)
+    result['registered_list'] = {'position':detailed.getPosition(), 'width':detailed.getWidth(),
+        'height':detailed.getHeight(), 'mode':mode, 'slim':slim}
+    check('media-list-already-registered-in-file-context', detailed.getWidth() > 0)
+    if mode != 'cinema':
+        check('separate-core-and-plugin-lists-registered',
+              native_window.getControl(core).getWidth() > 0 and native_window.getControl(folder).getWidth() > 0)
+    observation('first-entry-files')
+    open_page()
+    before = home.getProperty('Infinity.UIQA.ProviderInvocations')
+    select(50)
+    check('view-choice-does-not-rerun-provider', home.getProperty('Infinity.UIQA.ProviderInvocations') == before)
+    check('global-default-stays-canonical-list', xbmc.getInfoLabel('Skin.String(Infinity.MediaView.Default)') == '50')
+    xbmc.executebuiltin('SetFocus(50,1,absolute)')
+    check('detailed-movie-title-available', wait(lambda: xbmc.getInfoLabel('ListItem.Title').startswith('Fixture movies')))
+    check('detailed-movie-synopsis-available', 'Synthetic browsing metadata' in xbmc.getInfoLabel('ListItem.Plot'))
+    check('detailed-movie-poster-available', xbmc.getInfoLabel('ListItem.Art(poster)').endswith('/poster.png'))
+    check('detailed-movie-year-duration-available', xbmc.getInfoLabel('ListItem.Year') == '2026' and bool(xbmc.getInfoLabel('ListItem.Duration')))
+    check('movie-focus-on-canonical-list', native_window.getFocusId() == 50)
+    observation('first-entry-detailed-movies');shot('detailed-list')
+    if phase.startswith('list-registration-regular'):
+        xbmc.executebuiltin('SetFocus(50,9,absolute)');xbmc.sleep(200)
+        check('next-page-item', xbmc.getInfoLabel('ListItem.Label') == 'Next page')
+        xbmc.executebuiltin('Action(Select)')
+        check('native-next-page-retains-list', wait(lambda: view() == 50 and
+            'page=2' in xbmc.getInfoLabel('Container.FolderPath') and not xbmc.getCondVisibility('Container.IsUpdating')))
+        xbmc.executebuiltin('Action(Back)')
+        check('native-back-retains-list', wait(lambda: view() == 50 and 'page=1' in xbmc.getInfoLabel('Container.FolderPath')))
+        xbmc.executebuiltin('Container.Refresh');xbmc.sleep(300)
+        check('refresh-retains-detailed-list', wait(lambda: view() == 50 and not xbmc.getCondVisibility('Container.IsUpdating')))
+        xbmc.executebuiltin('SetFocus(50,1,absolute)')
+        check('refresh-retains-synopsis', wait(lambda: 'Synthetic browsing metadata' in xbmc.getInfoLabel('ListItem.Plot')))
+    open_page('b', 1, 'files')
+    before = home.getProperty('Infinity.UIQA.ProviderInvocations')
+    select(50, folder)
+    check('folder-choice-does-not-rerun-provider', home.getProperty('Infinity.UIQA.ProviderInvocations') == before)
+    check('folder-choice-keeps-global-list-id', xbmc.getInfoLabel('Skin.String(Infinity.MediaView.Default)') == '50')
+    check('folder-focus-redirects-to-internal-list', native_window.getFocusId() == folder)
+    observation('generic-files');shot('generic-files')
+    open_page('b', 2, 'tvshows')
+    check('tv-after-files-restores-detailed-list', wait(lambda: view() == 50))
+    xbmc.executebuiltin('SetFocus(50,1,absolute)')
+    check('tv-synopsis-and-artwork-preserved', wait(lambda:
+        'Synthetic browsing metadata' in xbmc.getInfoLabel('ListItem.Plot') and
+        xbmc.getInfoLabel('ListItem.Art(poster)').endswith('/poster.png')))
+    if phase.startswith('list-registration-regular'):
+        select(51);open_page('b', 1, 'episodes')
+        check('unsupported-tri-panel-falls-back-to-detailed-list', wait(lambda: view() == 50))
+        check('fallback-does-not-replace-saved-choice', xbmc.getInfoLabel('Skin.String(Infinity.MediaView.Default)') == '51')
+        open_page('a', 1)
+        check('supported-tri-panel-restored', wait(lambda: view() == 51))
+        select(50)
+    observation('list-continuation-final')
 
 
 try:
@@ -116,8 +198,12 @@ try:
         spec = importlib.util.spec_from_file_location('ui_media_view', p)
         mod = importlib.util.module_from_spec(spec);spec.loader.exec_module(mod)
         controller = mod.MediaViewPreference(xbmc, xbmcgui)
-    open_page()
-    if config['phase'] == 'baseline':
+    if config['phase'].startswith('list-registration-'):
+        list_continuation()
+    else:open_page()
+    if config['phase'].startswith('list-registration-'):
+        pass
+    elif config['phase'] == 'baseline':
         select(56);shot('posters');observation('explicit-posters')
         open_page('a', 2);observation('page-2-provider-default');shot('page-2')
         check('baseline-loses-requested-global-view', view() != 56)

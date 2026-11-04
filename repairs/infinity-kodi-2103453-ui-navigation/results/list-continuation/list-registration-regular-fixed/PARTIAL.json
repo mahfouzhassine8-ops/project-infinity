@@ -1,0 +1,438 @@
+{
+  "platform": "upstream Linux Kodi 21.2; synthetic providers; actual signed skin plus source overlay",
+  "phase": "list-registration-regular-fixed",
+  "checks": [
+    {
+      "name": "actual-infinity-skin",
+      "passed": true
+    },
+    {
+      "name": "cold-native-files-window",
+      "passed": true
+    },
+    {
+      "name": "core-list-visible-before-provider",
+      "passed": true
+    },
+    {
+      "name": "media-list-already-registered-in-file-context",
+      "passed": true
+    },
+    {
+      "name": "separate-core-and-plugin-lists-registered",
+      "passed": true
+    },
+    {
+      "name": "directory-ready:a:1:movies",
+      "passed": true
+    },
+    {
+      "name": "selector-open:50",
+      "passed": true
+    },
+    {
+      "name": "selector-row:50",
+      "passed": true
+    },
+    {
+      "name": "selected-view:50",
+      "passed": true
+    },
+    {
+      "name": "view-choice-does-not-rerun-provider",
+      "passed": true
+    },
+    {
+      "name": "global-default-stays-canonical-list",
+      "passed": true
+    },
+    {
+      "name": "detailed-movie-title-available",
+      "passed": true
+    },
+    {
+      "name": "detailed-movie-synopsis-available",
+      "passed": true
+    },
+    {
+      "name": "detailed-movie-poster-available",
+      "passed": true
+    },
+    {
+      "name": "detailed-movie-year-duration-available",
+      "passed": true
+    },
+    {
+      "name": "movie-focus-on-canonical-list",
+      "passed": true
+    },
+    {
+      "name": "next-page-item",
+      "passed": true
+    },
+    {
+      "name": "native-next-page-retains-list",
+      "passed": true
+    },
+    {
+      "name": "native-back-retains-list",
+      "passed": true
+    },
+    {
+      "name": "refresh-retains-detailed-list",
+      "passed": true
+    },
+    {
+      "name": "refresh-retains-synopsis",
+      "passed": true
+    },
+    {
+      "name": "directory-ready:b:1:files",
+      "passed": true
+    },
+    {
+      "name": "selector-open:50",
+      "passed": true
+    },
+    {
+      "name": "selector-row:50",
+      "passed": true
+    },
+    {
+      "name": "selected-view:65051",
+      "passed": true
+    },
+    {
+      "name": "folder-choice-does-not-rerun-provider",
+      "passed": true
+    },
+    {
+      "name": "folder-choice-keeps-global-list-id",
+      "passed": true
+    },
+    {
+      "name": "folder-focus-redirects-to-internal-list",
+      "passed": true
+    },
+    {
+      "name": "directory-ready:b:2:tvshows",
+      "passed": true
+    },
+    {
+      "name": "tv-after-files-restores-detailed-list",
+      "passed": true
+    },
+    {
+      "name": "tv-synopsis-and-artwork-preserved",
+      "passed": true
+    },
+    {
+      "name": "selector-open:51",
+      "passed": true
+    },
+    {
+      "name": "selector-row:51",
+      "passed": true
+    },
+    {
+      "name": "selected-view:51",
+      "passed": true
+    },
+    {
+      "name": "directory-ready:b:1:episodes",
+      "passed": true
+    },
+    {
+      "name": "unsupported-tri-panel-falls-back-to-detailed-list",
+      "passed": true
+    },
+    {
+      "name": "fallback-does-not-replace-saved-choice",
+      "passed": true
+    },
+    {
+      "name": "directory-ready:a:1:movies",
+      "passed": true
+    },
+    {
+      "name": "supported-tri-panel-restored",
+      "passed": true
+    },
+    {
+      "name": "selector-open:50",
+      "passed": true
+    },
+    {
+      "name": "selector-row:50",
+      "passed": true
+    },
+    {
+      "name": "selected-view:50",
+      "passed": true
+    }
+  ],
+  "observations": [
+    {
+      "label": "first-entry-files",
+      "window": 10025,
+      "dialog": 9999,
+      "view": 65050,
+      "default": "50",
+      "path": "",
+      "items": "3",
+      "title": ""
+    },
+    {
+      "label": "first-entry-detailed-movies",
+      "window": 10025,
+      "dialog": 9999,
+      "view": 50,
+      "default": "50",
+      "path": "plugin://plugin.video.infinityuiqa.a/?page=1&content=movies",
+      "items": "9",
+      "title": "Fixture movies 01"
+    },
+    {
+      "label": "generic-files",
+      "window": 10025,
+      "dialog": 9999,
+      "view": 65051,
+      "default": "50",
+      "path": "plugin://plugin.video.infinityuiqa.b/?page=1&content=files",
+      "items": "9",
+      "title": ""
+    }
+  ],
+  "observer_transitions": [
+    {
+      "time": 95820.540983813,
+      "state": {
+        "status": "inactive",
+        "view": 65050,
+        "pending": null,
+        "path": "",
+        "updating": false
+      }
+    },
+    {
+      "time": 95820.983189087,
+      "state": {
+        "status": "non-media",
+        "view": 65051,
+        "pending": null,
+        "path": "plugin://plugin.video.infinityuiqa.a/?page=1&content=movies",
+        "updating": false
+      }
+    },
+    {
+      "time": 95821.591242043,
+      "state": {
+        "status": "not-ready",
+        "view": null,
+        "pending": null,
+        "path": "plugin://plugin.video.infinityuiqa.a/?page=1&content=movies",
+        "updating": false
+      }
+    },
+    {
+      "time": 95822.308538062,
+      "state": {
+        "status": "matched",
+        "view": 50,
+        "pending": null,
+        "path": "plugin://plugin.video.infinityuiqa.a/?page=1&content=movies",
+        "updating": false
+      }
+    },
+    {
+      "time": 95823.618799241,
+      "state": {
+        "status": "requested",
+        "view": 500,
+        "pending": [
+          "plugin://plugin.video.infinityuiqa.a/?content=movies&page=2",
+          "movies",
+          50,
+          50,
+          500
+        ],
+        "path": "plugin://plugin.video.infinityuiqa.a/?content=movies&page=2",
+        "updating": false
+      }
+    },
+    {
+      "time": 95823.989766578,
+      "state": {
+        "status": "inactive",
+        "view": 500,
+        "pending": null,
+        "path": "plugin://plugin.video.infinityuiqa.a/?page=1&content=movies",
+        "updating": false
+      }
+    },
+    {
+      "time": 95824.602090434,
+      "state": {
+        "status": "requested",
+        "view": 500,
+        "pending": [
+          "plugin://plugin.video.infinityuiqa.a/?page=1&content=movies",
+          "movies",
+          50,
+          50,
+          500
+        ],
+        "path": "plugin://plugin.video.infinityuiqa.a/?page=1&content=movies",
+        "updating": false
+      }
+    },
+    {
+      "time": 95825.958565428,
+      "state": {
+        "status": "non-media",
+        "view": null,
+        "pending": null,
+        "path": "plugin://plugin.video.infinityuiqa.b/?page=1&content=files",
+        "updating": false
+      }
+    },
+    {
+      "time": 95826.228408218,
+      "state": {
+        "status": "non-media",
+        "view": 500,
+        "pending": null,
+        "path": "plugin://plugin.video.infinityuiqa.b/?page=1&content=files",
+        "updating": false
+      }
+    },
+    {
+      "time": 95826.869177557,
+      "state": {
+        "status": "inactive",
+        "view": null,
+        "pending": null,
+        "path": "plugin://plugin.video.infinityuiqa.b/?page=1&content=files",
+        "updating": false
+      }
+    },
+    {
+      "time": 95828.175876026,
+      "state": {
+        "status": "non-media",
+        "view": 65051,
+        "pending": null,
+        "path": "plugin://plugin.video.infinityuiqa.b/?page=2&content=tvshows",
+        "updating": false
+      }
+    },
+    {
+      "time": 95828.314264188,
+      "state": {
+        "status": "non-media",
+        "view": null,
+        "pending": null,
+        "path": "plugin://plugin.video.infinityuiqa.b/?page=2&content=tvshows",
+        "updating": false
+      }
+    },
+    {
+      "time": 95828.981295639,
+      "state": {
+        "status": "requested",
+        "view": 500,
+        "pending": [
+          "plugin://plugin.video.infinityuiqa.b/?page=2&content=tvshows",
+          "tvshows",
+          50,
+          50,
+          500
+        ],
+        "path": "plugin://plugin.video.infinityuiqa.b/?page=2&content=tvshows",
+        "updating": false
+      }
+    },
+    {
+      "time": 95830.526160187,
+      "state": {
+        "status": "inactive",
+        "view": null,
+        "pending": null,
+        "path": "plugin://plugin.video.infinityuiqa.b/?page=2&content=tvshows",
+        "updating": false
+      }
+    },
+    {
+      "time": 95831.296146549,
+      "state": {
+        "status": "non-media",
+        "view": null,
+        "pending": null,
+        "path": "plugin://plugin.video.infinityuiqa.b/?page=1&content=episodes",
+        "updating": false
+      }
+    },
+    {
+      "time": 95831.72684249,
+      "state": {
+        "status": "requested-fallback",
+        "view": 500,
+        "pending": [
+          "plugin://plugin.video.infinityuiqa.b/?page=1&content=episodes",
+          "episodes",
+          51,
+          50,
+          500
+        ],
+        "path": "plugin://plugin.video.infinityuiqa.b/?page=1&content=episodes",
+        "updating": false
+      }
+    },
+    {
+      "time": 95832.565132516,
+      "state": {
+        "status": "non-media",
+        "view": null,
+        "pending": null,
+        "path": "plugin://plugin.video.infinityuiqa.a/?page=1&content=movies",
+        "updating": false
+      }
+    },
+    {
+      "time": 95833.334897902,
+      "state": {
+        "status": "requested",
+        "view": 500,
+        "pending": [
+          "plugin://plugin.video.infinityuiqa.a/?page=1&content=movies",
+          "movies",
+          51,
+          51,
+          500
+        ],
+        "path": "plugin://plugin.video.infinityuiqa.a/?page=1&content=movies",
+        "updating": false
+      }
+    },
+    {
+      "time": 95834.136173938,
+      "state": {
+        "status": "inactive",
+        "view": null,
+        "pending": null,
+        "path": "plugin://plugin.video.infinityuiqa.a/?page=1&content=movies",
+        "updating": false
+      }
+    }
+  ],
+  "registered_list": {
+    "position": [
+      0,
+      390
+    ],
+    "width": 652,
+    "height": 1820,
+    "mode": "auto",
+    "slim": false
+  }
+}

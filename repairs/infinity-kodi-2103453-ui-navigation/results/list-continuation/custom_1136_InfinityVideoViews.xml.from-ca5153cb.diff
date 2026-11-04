@@ -1,0 +1,14 @@
+--- ca5153cb/assets/addons/skin.infinity.diggz/unified/custom_1136_InfinityVideoViews.xml
++++ candidate/assets/addons/skin.infinity.diggz/unified/custom_1136_InfinityVideoViews.xml
+@@ -97,7 +97,10 @@
+               <item>
+                 <label>$LOCALIZE[535]</label>
+                 <onclick condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Skin.SetString(Infinity.MediaView.Default,50)</onclick>
+-                <onclick>Container.SetViewMode(50)</onclick>
++                <onclick condition="String.IsEqual(Skin.String(Infinity.HomeView),cinema) | [[String.IsEmpty(Container.PluginName) + ![Container.Content() | Container.Content(files) | Container.Content(playlists) | Container.Content(addons)]] | [!String.IsEmpty(Container.PluginName) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]]]">Container.SetViewMode(50)</onclick>
++                <onclick condition="!String.IsEqual(Skin.String(Infinity.HomeView),cinema) + String.IsEmpty(Container.PluginName) + [Container.Content() | Container.Content(files) | Container.Content(playlists) | Container.Content(addons)]">Container.SetViewMode(65050)</onclick>
++                <onclick condition="!String.IsEqual(Skin.String(Infinity.HomeView),cinema) + !String.IsEqual(Skin.String(Infinity.HomeView),compact) + !String.IsEmpty(Container.PluginName) + ![Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Container.SetViewMode(65051)</onclick>
++                <onclick condition="!String.IsEqual(Skin.String(Infinity.HomeView),cinema) + String.IsEqual(Skin.String(Infinity.HomeView),compact) + !String.IsEmpty(Container.PluginName) + ![Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Container.SetViewMode(65052)</onclick>
+                 <onclick>ClearProperty(MediaMenu,Home)</onclick>
+                 <onclick>Dialog.Close(1136)</onclick>
+                 <onclick>SetFocus(50)</onclick>

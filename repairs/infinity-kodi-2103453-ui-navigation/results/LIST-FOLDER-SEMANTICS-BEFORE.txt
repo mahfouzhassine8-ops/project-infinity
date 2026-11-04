@@ -1,0 +1,14 @@
+test_video_list_predicates_preserve_folder_semantics (tests.test_list_registration.ListRegistration.test_video_list_predicates_preserve_folder_semantics) ... FAIL
+
+======================================================================
+FAIL: test_video_list_predicates_preserve_folder_semantics (tests.test_list_registration.ListRegistration.test_video_list_predicates_preserve_folder_semantics)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-kodi-ui-navigation/repairs/infinity-kodi-2103453-ui-navigation/tests/test_list_registration.py", line 148, in test_video_list_predicates_preserve_folder_semantics
+    self.assertIn(FAMILY,b)
+AssertionError: '[Control.IsVisible(50) | Control.IsVisible(65050) | Control.IsVisible(65051) | Control.IsVisible(65052)]' not found in '![String.IsEqual(Skin.String(Infinity.HomeView),cinema) + Control.IsVisible(50)]'
+
+----------------------------------------------------------------------
+Ran 1 test in 0.004s
+
+FAILED (failures=1)

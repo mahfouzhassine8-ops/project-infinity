@@ -1,0 +1,21 @@
+test_registered_media_list_exists_before_provider_content (tests.test_list_registration.ListRegistration.test_registered_media_list_exists_before_provider_content) ... FAIL
+
+======================================================================
+FAIL: test_registered_media_list_exists_before_provider_content (tests.test_list_registration.ListRegistration.test_registered_media_list_exists_before_provider_content)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-kodi-ui-navigation/repairs/infinity-kodi-2103453-ui-navigation/tests/test_list_registration.py", line 60, in test_registered_media_list_exists_before_provider_content
+    self.assertEqual(available('', 'movies', 'plugin.video.qa'), [('VideoList',50)])
+AssertionError: Lists differ: [('InfinityPluginDirectoryRegular', 50)] != [('VideoList', 50)]
+
+First differing element 0:
+('InfinityPluginDirectoryRegular', 50)
+('VideoList', 50)
+
+- [('InfinityPluginDirectoryRegular', 50)]
++ [('VideoList', 50)]
+
+----------------------------------------------------------------------
+Ran 1 test in 0.008s
+
+FAILED (failures=1)

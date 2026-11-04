@@ -4,8 +4,10 @@ No provider execution, file/database access, new thread, timer or setting writer
 The Videos selector owns the preference through native Skin.SetString. Native
 SetViewMode retains Kodi's existing item/focus transfer and directory history.
 """
+from uuid import uuid4
 
 PREFERENCE = 'Infinity.MediaView.Default'
+PROCESSED = 'Infinity.MediaView.Processed'
 MEDIA = ('movies', 'tvshows', 'seasons', 'episodes', 'sets', 'musicvideos')
 # Populated from the exact signed Videos registration and selector predicates.
 REGISTERED = (50, 51, 52, 53, 55, 56, 57, 58, 59, 500, 501, 502, 503, 504, 505, 506, 507, 509, 591, 592, 602, 609)
@@ -17,6 +19,9 @@ class MediaViewPreference:
         self.xbmc = xbmc
         self.gui = gui
         self.pending = None
+        self.nonce = uuid4().hex
+        self.sequence = 0
+        self.ticket = ''
 
     def _eligible(self):
         return (self.xbmc.getSkinDir() == 'skin.infinity.diggz'
@@ -76,7 +81,8 @@ class MediaViewPreference:
         # Keep only the current context in memory, never log/persist its path.
         context = (self.xbmc.getInfoLabel('Container.FolderPath'), media,
                    preferred, target, current)
-        if self.pending == context:
+        if (self.pending == context
+                and self.gui.Window(10000).getProperty(PROCESSED) != self.ticket):
             return 'pending'
         # Recheck immediately before asynchronous dispatch. Never wait on Kodi's
         # GUI from the resident or change focus, directory, playback or refresh.
@@ -84,6 +90,13 @@ class MediaViewPreference:
                 or self.xbmc.getInfoLabel('Skin.String(%s)' % PREFERENCE) != value
                 or self.xbmc.getInfoLabel('Container.FolderPath') != context[0]):
             return 'changed'
+        self.sequence += 1
+        self.ticket = '%s:%s' % (self.nonce, self.sequence)
         self.xbmc.executebuiltin('Container.SetViewMode(%s)' % target)
+        # Same FIFO GUI queue: acknowledges processing, not view success. A
+        # provider may override the view before the next resident observation.
+        # Never wait synchronously, or confuse an old acknowledgement with a
+        # new request. This property is transient and contains no media data.
+        self.xbmc.executebuiltin('SetProperty(%s,%s,Home)' % (PROCESSED, self.ticket))
         self.pending = context
         return 'requested' if target == preferred else 'requested-fallback'

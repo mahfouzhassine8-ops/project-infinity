@@ -16,6 +16,51 @@ HERE = Path(__file__).resolve().parent
 PREFIX = 'assets/addons/skin.infinity.diggz/'
 CC_PREFIX = 'assets/addons/script.infinity.commandcenter/'
 NEW_IDS = {1130: 1136, 1131: 1137, 1132: 1138}
+MEDIA_CONTENT = '[' + ' | '.join('Container.Content(%s)' % c for c in
+    ('movies', 'tvshows', 'seasons', 'episodes', 'sets', 'musicvideos')) + ']'
+FILE_CONTENT = '[Container.Content() | Container.Content(files) | Container.Content(playlists) | Container.Content(addons)]'
+NO_CINEMA = '!String.IsEqual(Skin.String(Infinity.HomeView),cinema)'
+DETAILED_LIST = '[[String.IsEmpty(Container.PluginName) + !%s] | [!String.IsEmpty(Container.PluginName) + %s]]' % (FILE_CONTENT, MEDIA_CONTENT)
+FOLDER_LISTS = (
+    ('InfinityCoreDirectory', 65050, 65150, NO_CINEMA,
+     'String.IsEmpty(Container.PluginName) + ' + FILE_CONTENT),
+    ('InfinityPluginDirectoryRegular', 65051, 65151,
+     NO_CINEMA + ' + !String.IsEqual(Skin.String(Infinity.HomeView),compact)',
+     '!String.IsEmpty(Container.PluginName) + !' + MEDIA_CONTENT),
+    ('InfinityPluginDirectoryCompact', 65052, 65152,
+     NO_CINEMA + ' + String.IsEqual(Skin.String(Infinity.HomeView),compact)',
+     '!String.IsEmpty(Container.PluginName) + !' + MEDIA_CONTENT),
+)
+LIST_FAMILY = '[Control.IsVisible(50) | Control.IsVisible(65050) | Control.IsVisible(65051) | Control.IsVisible(65052)]'
+
+
+def list_compat(node):
+    """Keep existing List settings/headers for Videos' internal folder IDs."""
+    for n in node.iter():
+        if n.text:n.text = n.text.replace('Control.IsVisible(50)', LIST_FAMILY)
+        for key, value in list(n.attrib.items()):
+            n.set(key, value.replace('Control.IsVisible(50)', LIST_FAMILY))
+
+
+def remap_controls(node, mapping):
+    """Change control references only; never rewrite dimensions such as 50%."""
+    def expression(value):
+        for old, new in mapping.items():
+            value = re.sub(r'((?:Container|Control\.(?:IsVisible|HasFocus|GetLabel))\()' + str(old) + r'\)',
+                           lambda m: m[1] + str(new) + ')', value)
+            value = re.sub(r'(SetFocus\()' + str(old) + r'(?=[,)])', lambda m: m[1] + str(new), value)
+        return value
+    for n in node.iter():
+        if n.text:
+            if n.tag in ('onup', 'ondown', 'onleft', 'onright', 'pagecontrol') and n.text.strip() in {str(i) for i in mapping}:
+                n.text = str(mapping[int(n.text.strip())])
+            else:n.text = expression(n.text)
+        for key, value in list(n.attrib.items()):
+            if n.tag == 'control' and key == 'id' and value in {str(i) for i in mapping}:
+                n.set(key, str(mapping[int(value)]))
+            elif n.tag == 'param' and n.get('name') == 'control' and key == 'value' and value in {str(i) for i in mapping}:
+                n.set(key, str(mapping[int(value)]))
+            else:n.set(key, expression(value))
 
 
 def put(node, tag, value, **attrs):
@@ -103,10 +148,45 @@ def main(apk, out):
                 root = E.fromstring(z.read(n))
                 if root.tag == 'window' and root.get('id') in {str(i) for i in NEW_IDS.values()}:
                     raise ValueError('Scoped dialog ID already used: ' + n)
+                for c in root.iter('control'):
+                    if c.get('id') in {'65050','65051','65052','65150','65151','65152'}:
+                        raise ValueError('Internal folder List ID collision: ' + n)
 
         includes_bytes = read('unified/Includes.xml')
         includes = E.fromstring(includes_bytes)
         scoped = E.Element('includes')
+        list_scoped = E.Element('includes')
+        list_source = E.fromstring(read('unified/View_50_List.xml'))
+        for old in ('VideoList', 'SlimVideoList'):
+            item = copy.deepcopy(list_source.find("include[@name='%s']" % old))
+            item.set('name', 'InfinityMedia_' + old)
+            container = item.find(".//control[@id='50']")
+            assert container.findtext('visible') == 'True'
+            put(container, 'visible', DETAILED_LIST)
+            list_scoped.append(item)
+        for old, cid, scrollbar, static, dynamic in FOLDER_LISTS:
+            item = copy.deepcopy(list_source.find("include[@name='%s']" % old))
+            item.set('name', 'InfinityMedia_' + old)
+            remap_controls(item, {50: cid, 95060: scrollbar})
+            put(item.find(".//control[@id='%s']" % cid), 'visible', dynamic)
+            list_scoped.append(item)
+
+        # Only Videos uses these compatibility copies; shared implementations
+        # and the canonical media List ID 50 remain unchanged everywhere else.
+        compatibility = {'Topbar': includes, 'DefaultLetterJump': includes,
+            'CommonBackground': E.fromstring(read('unified/Includes_Backgrounds.xml'))}
+        returns = E.fromstring(read('unified/Includes_InfinityRepairs.xml'))
+        for direction in ('Left','Right','Up','Down'):
+            compatibility['InfinityReturnToView' + direction] = returns
+        compat_names = {n: 'InfinityMedia_' + n for n in compatibility}
+        for old, source in compatibility.items():
+            item = copy.deepcopy(source.find("include[@name='%s']" % old))
+            assert item is not None, old
+            item.set('name', compat_names[old]);list_compat(item)
+            for n in item.iter('include'):
+                if n.text in compat_names:n.text = compat_names[n.text]
+                if n.get('content') in compat_names:n.set('content', compat_names[n.get('content')])
+            list_scoped.append(item)
         for old, new in [('MediaMenuTop', 'InfinityVideoMenuTop'),
                          ('SideBladeLeft', 'InfinityVideoSideBladeLeft')]:
             original = includes.find("include[@name='%s']" % old)
@@ -207,28 +287,41 @@ def main(apk, out):
                             ('movies', 'tvshows', 'seasons', 'episodes', 'sets', 'musicvideos')) + ']'})
                         save.text = 'Skin.SetString(Infinity.MediaView.Default,%s)' % view
                         item.insert(list(item).index(action), save)
+                        if view == '50':
+                            action.set('condition', 'String.IsEqual(Skin.String(Infinity.HomeView),cinema) | ' + DETAILED_LIST)
+                            for old, cid, scrollbar, static, dynamic in FOLDER_LISTS:
+                                E.SubElement(item, 'onclick', {'condition': static + ' + ' + dynamic}).text = 'Container.SetViewMode(%s)' % cid
                         for text in ['ClearProperty(MediaMenu,Home)', 'Dialog.Close(%s)' % new, 'SetFocus(%s)' % view]:E.SubElement(item, 'onclick').text = text
                 config = group.find(".//control[@id='9012']")
                 drop(config, 'top');put(config, 'left', '18');put(config, 'right', '18');drop(config, 'width');put(config, 'bottom', '18')
                 put(config, 'onup', '9000');put(config, 'ondown', '8999')
             write('unified/custom_%s_InfinityVideo%s.xml' % (new, suffix), xml(root))
 
+        for item in scoped:list_compat(item)
         write('unified/Includes_InfinityVideoOptions.xml', xml(scoped))
+        write('unified/Includes_InfinityMediaLists.xml', xml(list_scoped))
         anchor = b'</includes>'
         assert includes_bytes.count(anchor) == 1
         write('unified/Includes.xml', includes_bytes.replace(anchor,
-              b'  <include file="Includes_InfinityVideoOptions.xml" />\n</includes>'))
+              b'  <include file="Includes_InfinityVideoOptions.xml" />\n'
+              b'  <include file="Includes_InfinityMediaLists.xml" />\n</includes>'))
 
         video = read('unified/MyVideoNav.xml').decode()
-        for name in ['InfinityPluginDirectoryCompact', 'InfinityPluginDirectoryRegular']:
-            pattern = r'(<include condition=")([^"]+)(">' + name + r'</include>)'
-            video, count = re.subn(pattern, lambda m: m[1] + m[2] + ' + !Container.Content(movies)' + m[3], video)
-            assert count == 1
-        for name in ['VideoList', 'SlimVideoList']:
-            pattern = r'(<include condition=")([^"]+)(">' + name + r'</include>)'
-            video, count = re.subn(pattern, lambda m: m[1] + m[2].replace('String.IsEmpty(Container.PluginName)',
-                '[String.IsEmpty(Container.PluginName) | Container.Content(movies)]') + m[3], video)
-            assert count == 1
+        families = [(old, static) for old, cid, scrollbar, static, dynamic in FOLDER_LISTS]
+        families += [('VideoList', NO_CINEMA + ' + !Skin.HasSetting(Enable.SlimList)'),
+                     ('SlimVideoList', NO_CINEMA + ' + Skin.HasSetting(Enable.SlimList)')]
+        for name, static in families:
+            pattern = r'<include condition="[^"]+">' + name + r'</include>'
+            video, count = re.subn(pattern, '<include condition="' + static + '">InfinityMedia_' + name + '</include>', video)
+            assert count == 1, name
+        assert video.count('<views>50,') == 1
+        video = video.replace('<views>50,', '<views>50,65050,65051,65052,')
+        video = video.replace('FrameControls,|50|', 'FrameControls,|50|65050|65051|65052|')
+        video = video.replace('FrameControls.10025,|50|', 'FrameControls.10025,|50|65050|65051|65052|')
+        video = video.replace('Control.IsVisible(50)', LIST_FAMILY)
+        for old, new in compat_names.items():
+            video = video.replace('>' + old + '</include>', '>' + new + '</include>')
+            video = video.replace('content="' + old + '"', 'content="' + new + '"')
         assert video.count('<include>MediaMenuTop</include>') == 1
         video = video.replace('<include>MediaMenuTop</include>', '<include>InfinityVideoMenuTop</include>')
         assert video.count('<include>SideBladeLeft</include>') == 1

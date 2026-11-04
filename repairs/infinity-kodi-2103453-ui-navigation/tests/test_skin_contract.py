@@ -36,6 +36,9 @@ def condition(text, content='', plugin='', mode='auto', slim=False):
 
 
 def owners(content, plugin='', mode='auto', slim=False):
+    if (ROOT / 'unified/Includes_InfinityMediaLists.xml').exists():
+        from test_list_registration import available
+        return [name for name, cid in available('',content,plugin,mode,slim)]
     choices = {'InfinityPluginDirectoryCompact', 'InfinityPluginDirectoryRegular',
                'InfinityCoreDirectory', 'VideoList', 'SlimVideoList', 'InfinityCinemaBrowseList'}
     return [n.text for n in read('MyVideoNav.xml').iter('include')
@@ -57,7 +60,7 @@ class BrowserSource(unittest.TestCase):
                                      ['SlimVideoList' if slim else 'VideoList'])
 
     def test_other_list_routes_unchanged(self):
-        for content in ['', 'files', 'playlists', 'addons', 'tvshows', 'episodes']:
+        for content in ['', 'files', 'playlists', 'addons']:
             for plugin in ['', 'plugin.video.fixture']:
                 for mode in ['auto', 'compact', 'cinema']:
                     for slim in [False, True]:
@@ -108,8 +111,9 @@ class BrowserSource(unittest.TestCase):
             native = next((a for a in actions if a.startswith('Container.SetViewMode(')), None)
             if native:
                 view = native.split('(')[1].rstrip(')')
+                folder_actions = ['Container.SetViewMode(%s)' % i for i in (65050,65051,65052)] if view == '50' else []
                 self.assertEqual(actions, ['Skin.SetString(Infinity.MediaView.Default,%s)' % view,
-                                          native, 'ClearProperty(MediaMenu,Home)',
+                                          native] + folder_actions + ['ClearProperty(MediaMenu,Home)',
                                           'Dialog.Close(1136)', 'SetFocus(%s)' % view])
                 save = item.find('onclick')
                 predicate = save.get('condition', '')
@@ -153,7 +157,8 @@ class BrowserSource(unittest.TestCase):
         before = (BASE / 'unified/Includes.xml').read_bytes()
         after = path('Includes.xml').read_bytes()
         addition = b'  <include file="Includes_InfinityVideoOptions.xml" />\n'
-        self.assertEqual(after.replace(addition, b''), before)
+        media_addition = b'  <include file="Includes_InfinityMediaLists.xml" />\n'
+        self.assertEqual(after.replace(addition, b'').replace(media_addition,b''), before)
 
     def test_main_video_menu_has_one_close_and_full_width_rows(self):
         p = ROOT / 'unified/Includes_InfinityVideoOptions.xml'

@@ -9,6 +9,9 @@ p = parse_qs(sys.argv[2].lstrip('?'))
 page = int(p.get('page', ['1'])[0])
 content = p.get('content', ['movies'])[0]
 handle = int(sys.argv[1])
+home = xbmcgui.Window(10000)
+counter = 'Infinity.UIQA.ProviderInvocations'
+home.setProperty(counter, str(int(home.getProperty(counter) or '0') + 1))
 xbmcplugin.setContent(handle, content)
 for i in range(1, 9):
     item = xbmcgui.ListItem(label='Fixture %s %02d' % (content, i))

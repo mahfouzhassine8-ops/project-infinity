@@ -1,0 +1,287 @@
+{
+  "platform": "upstream Linux Kodi 21.2; synthetic providers; actual signed skin plus source overlay",
+  "phase": "list-registration-folder-semantics",
+  "checks": [
+    {
+      "name": "actual-infinity-skin",
+      "passed": true
+    },
+    {
+      "name": "cold-native-files-window",
+      "passed": true
+    },
+    {
+      "name": "core-list-visible-before-provider",
+      "passed": true
+    },
+    {
+      "name": "media-list-already-registered-in-file-context",
+      "passed": true
+    },
+    {
+      "name": "separate-core-and-plugin-lists-registered",
+      "passed": true
+    },
+    {
+      "name": "directory-ready:a:1:movies",
+      "passed": true
+    },
+    {
+      "name": "selector-open:50",
+      "passed": true
+    },
+    {
+      "name": "selector-row:50",
+      "passed": true
+    },
+    {
+      "name": "selected-view:50",
+      "passed": true
+    },
+    {
+      "name": "view-choice-does-not-rerun-provider",
+      "passed": true
+    },
+    {
+      "name": "global-default-stays-canonical-list",
+      "passed": true
+    },
+    {
+      "name": "detailed-movie-title-available",
+      "passed": true
+    },
+    {
+      "name": "detailed-movie-synopsis-available",
+      "passed": true
+    },
+    {
+      "name": "detailed-movie-poster-available",
+      "passed": true
+    },
+    {
+      "name": "detailed-movie-year-duration-available",
+      "passed": true
+    },
+    {
+      "name": "movie-focus-on-canonical-list",
+      "passed": true
+    },
+    {
+      "name": "directory-ready:b:1:files",
+      "passed": true
+    },
+    {
+      "name": "selector-open:50",
+      "passed": true
+    },
+    {
+      "name": "selector-row:50",
+      "passed": true
+    },
+    {
+      "name": "selected-view:65051",
+      "passed": true
+    },
+    {
+      "name": "folder-choice-does-not-rerun-provider",
+      "passed": true
+    },
+    {
+      "name": "folder-choice-keeps-global-list-id",
+      "passed": true
+    },
+    {
+      "name": "folder-focus-redirects-to-internal-list",
+      "passed": true
+    },
+    {
+      "name": "directory-ready:b:2:tvshows",
+      "passed": true
+    },
+    {
+      "name": "tv-after-files-restores-detailed-list",
+      "passed": true
+    },
+    {
+      "name": "tv-synopsis-and-artwork-preserved",
+      "passed": true
+    }
+  ],
+  "observations": [
+    {
+      "label": "first-entry-files",
+      "window": 10025,
+      "dialog": 9999,
+      "view": 65050,
+      "default": "50",
+      "path": "",
+      "items": "3",
+      "title": ""
+    },
+    {
+      "label": "first-entry-detailed-movies",
+      "window": 10025,
+      "dialog": 9999,
+      "view": 50,
+      "default": "50",
+      "path": "plugin://plugin.video.infinityuiqa.a/?page=1&content=movies",
+      "items": "9",
+      "title": "Fixture movies 01"
+    },
+    {
+      "label": "generic-files",
+      "window": 10025,
+      "dialog": 9999,
+      "view": 65051,
+      "default": "50",
+      "path": "plugin://plugin.video.infinityuiqa.b/?page=1&content=files",
+      "items": "9",
+      "title": ""
+    },
+    {
+      "label": "list-continuation-final",
+      "window": 10025,
+      "dialog": 9999,
+      "view": 50,
+      "default": "50",
+      "path": "plugin://plugin.video.infinityuiqa.b/?page=2&content=tvshows",
+      "items": "9",
+      "title": "Fixture tvshows 01"
+    },
+    {
+      "label": "final",
+      "window": 10025,
+      "dialog": 9999,
+      "view": 50,
+      "default": "50",
+      "path": "plugin://plugin.video.infinityuiqa.b/?page=2&content=tvshows",
+      "items": "9",
+      "title": "Fixture tvshows 01"
+    }
+  ],
+  "observer_transitions": [
+    {
+      "time": 96340.793439425,
+      "state": {
+        "status": "inactive",
+        "view": 65050,
+        "pending": null,
+        "path": "",
+        "updating": false
+      }
+    },
+    {
+      "time": 96341.471288954,
+      "state": {
+        "status": "requested",
+        "view": 500,
+        "pending": [
+          "plugin://plugin.video.infinityuiqa.a/?page=1&content=movies",
+          "movies",
+          50,
+          50,
+          500
+        ],
+        "path": "plugin://plugin.video.infinityuiqa.a/?page=1&content=movies",
+        "updating": false
+      }
+    },
+    {
+      "time": 96341.973802299,
+      "state": {
+        "status": "not-ready",
+        "view": null,
+        "pending": null,
+        "path": "plugin://plugin.video.infinityuiqa.a/?page=1&content=movies",
+        "updating": false
+      }
+    },
+    {
+      "time": 96342.267622872,
+      "state": {
+        "status": "inactive",
+        "view": null,
+        "pending": null,
+        "path": "plugin://plugin.video.infinityuiqa.a/?page=1&content=movies",
+        "updating": false
+      }
+    },
+    {
+      "time": 96343.772240112,
+      "state": {
+        "status": "non-media",
+        "view": null,
+        "pending": null,
+        "path": "plugin://plugin.video.infinityuiqa.b/?page=1&content=files",
+        "updating": false
+      }
+    },
+    {
+      "time": 96344.393516652,
+      "state": {
+        "status": "inactive",
+        "view": null,
+        "pending": null,
+        "path": "plugin://plugin.video.infinityuiqa.b/?page=1&content=files",
+        "updating": false
+      }
+    },
+    {
+      "time": 96345.171773368,
+      "state": {
+        "status": "non-media",
+        "view": 65051,
+        "pending": null,
+        "path": "plugin://plugin.video.infinityuiqa.b/?page=1&content=files",
+        "updating": false
+      }
+    },
+    {
+      "time": 96346.339810013,
+      "state": {
+        "status": "non-media",
+        "view": 65051,
+        "pending": null,
+        "path": "plugin://plugin.video.infinityuiqa.b/?page=2&content=tvshows",
+        "updating": false
+      }
+    },
+    {
+      "time": 96346.572398062,
+      "state": {
+        "status": "non-media",
+        "view": 500,
+        "pending": null,
+        "path": "plugin://plugin.video.infinityuiqa.b/?page=2&content=tvshows",
+        "updating": false
+      }
+    },
+    {
+      "time": 96346.956910567,
+      "state": {
+        "status": "requested",
+        "view": 500,
+        "pending": [
+          "plugin://plugin.video.infinityuiqa.b/?page=2&content=tvshows",
+          "tvshows",
+          50,
+          50,
+          500
+        ],
+        "path": "plugin://plugin.video.infinityuiqa.b/?page=2&content=tvshows",
+        "updating": false
+      }
+    }
+  ],
+  "registered_list": {
+    "position": [
+      0,
+      390
+    ],
+    "width": 652,
+    "height": 1820,
+    "mode": "auto",
+    "slim": false
+  },
+  "status": "PASS_LINUX_FIXTURE_ONLY"
+}

@@ -1,0 +1,11 @@
+--- ca5153cb/assets/addons/skin.infinity.diggz/unified/Includes_InfinityVideoOptions.xml
++++ candidate/assets/addons/skin.infinity.diggz/unified/Includes_InfinityVideoOptions.xml
+@@ -40,7 +40,7 @@
+       <textcolor>$VAR[InfinityPaletteTextPrimary]</textcolor>
+       <include>InfinityVideoMenuRow</include>
+       <label>$INFO[Container.Viewmode,,: $LOCALIZE[5]]</label>
+-      <onclick condition="Control.IsVisible(50)">SetProperty(actualViewtype,List,Home)</onclick>
++      <onclick condition="[Control.IsVisible(50) | Control.IsVisible(65050) | Control.IsVisible(65051) | Control.IsVisible(65052)]">SetProperty(actualViewtype,List,Home)</onclick>
+       <onclick condition="Control.IsVisible(51)">SetProperty(actualViewtype,InfoWall,Home)</onclick>
+       <onclick condition="Control.IsVisible(52)">SetProperty(actualViewtype,Landscape,Home)</onclick>
+       <onclick condition="Control.IsVisible(53)">SetProperty(actualViewtype,ShowCase,Home)</onclick>

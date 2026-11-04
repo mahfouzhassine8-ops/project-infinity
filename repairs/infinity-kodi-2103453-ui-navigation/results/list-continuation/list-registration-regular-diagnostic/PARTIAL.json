@@ -1,0 +1,208 @@
+{
+  "platform": "upstream Linux Kodi 21.2; synthetic providers; actual signed skin plus source overlay",
+  "phase": "list-registration-regular-diagnostic",
+  "checks": [
+    {
+      "name": "actual-infinity-skin",
+      "passed": true
+    },
+    {
+      "name": "cold-native-files-window",
+      "passed": true
+    },
+    {
+      "name": "core-list-visible-before-provider",
+      "passed": true
+    },
+    {
+      "name": "media-list-already-registered-in-file-context",
+      "passed": true
+    },
+    {
+      "name": "separate-core-and-plugin-lists-registered",
+      "passed": true
+    },
+    {
+      "name": "directory-ready:a:1:movies",
+      "passed": true
+    },
+    {
+      "name": "selector-open:50",
+      "passed": true
+    },
+    {
+      "name": "selector-row:50",
+      "passed": true
+    },
+    {
+      "name": "selected-view:50",
+      "passed": true
+    },
+    {
+      "name": "view-choice-does-not-rerun-provider",
+      "passed": true
+    },
+    {
+      "name": "global-default-stays-canonical-list",
+      "passed": true
+    },
+    {
+      "name": "detailed-movie-title-available",
+      "passed": true
+    },
+    {
+      "name": "detailed-movie-synopsis-available",
+      "passed": true
+    },
+    {
+      "name": "detailed-movie-poster-available",
+      "passed": true
+    },
+    {
+      "name": "detailed-movie-year-duration-available",
+      "passed": true
+    },
+    {
+      "name": "movie-focus-on-canonical-list",
+      "passed": true
+    },
+    {
+      "name": "next-page-item",
+      "passed": true
+    },
+    {
+      "name": "native-next-page-retains-list",
+      "passed": true
+    },
+    {
+      "name": "native-back-retains-list",
+      "passed": true
+    },
+    {
+      "name": "refresh-retains-detailed-list",
+      "passed": false
+    }
+  ],
+  "observations": [
+    {
+      "label": "first-entry-files",
+      "window": 10025,
+      "dialog": 9999,
+      "view": 65050,
+      "default": "50",
+      "path": "",
+      "items": "3",
+      "title": ""
+    },
+    {
+      "label": "first-entry-detailed-movies",
+      "window": 10025,
+      "dialog": 9999,
+      "view": 50,
+      "default": "50",
+      "path": "plugin://plugin.video.infinityuiqa.a/?page=1&content=movies",
+      "items": "9",
+      "title": "Fixture movies 01"
+    }
+  ],
+  "observer_transitions": [
+    {
+      "time": 95583.78245769,
+      "state": {
+        "status": "inactive",
+        "view": 65050,
+        "pending": null,
+        "path": "",
+        "updating": false
+      }
+    },
+    {
+      "time": 95584.47378236,
+      "state": {
+        "status": "requested",
+        "view": 500,
+        "pending": [
+          "plugin://plugin.video.infinityuiqa.a/?page=1&content=movies",
+          "movies",
+          50,
+          50,
+          500
+        ],
+        "path": "plugin://plugin.video.infinityuiqa.a/?page=1&content=movies",
+        "updating": false
+      }
+    },
+    {
+      "time": 95584.882198212,
+      "state": {
+        "status": "not-ready",
+        "view": null,
+        "pending": null,
+        "path": "plugin://plugin.video.infinityuiqa.a/?page=1&content=movies",
+        "updating": false
+      }
+    },
+    {
+      "time": 95585.292312327,
+      "state": {
+        "status": "inactive",
+        "view": null,
+        "pending": null,
+        "path": "plugin://plugin.video.infinityuiqa.a/?page=1&content=movies",
+        "updating": false
+      }
+    },
+    {
+      "time": 95586.354193501,
+      "state": {
+        "status": "matched",
+        "view": 50,
+        "pending": null,
+        "path": "plugin://plugin.video.infinityuiqa.a/?page=1&content=movies",
+        "updating": false
+      }
+    },
+    {
+      "time": 95587.119548361,
+      "state": {
+        "status": "requested",
+        "view": 500,
+        "pending": [
+          "plugin://plugin.video.infinityuiqa.a/?page=1&content=movies",
+          "movies",
+          50,
+          50,
+          500
+        ],
+        "path": "plugin://plugin.video.infinityuiqa.a/?page=1&content=movies",
+        "updating": false
+      }
+    },
+    {
+      "time": 95587.645844754,
+      "state": {
+        "status": "pending",
+        "view": 500,
+        "pending": [
+          "plugin://plugin.video.infinityuiqa.a/?page=1&content=movies",
+          "movies",
+          50,
+          50,
+          500
+        ],
+        "path": "plugin://plugin.video.infinityuiqa.a/?page=1&content=movies",
+        "updating": false
+      }
+    }
+  ],
+  "registered_list": {
+    "position": [
+      0,
+      390
+    ],
+    "width": 652,
+    "height": 1820,
+    "mode": "auto",
+    "slim": false
+  }
+}

@@ -1,0 +1,17 @@
+test_override_between_dispatch_and_observation_is_not_stuck_pending (tests.test_media_view.GlobalMediaPreference.test_override_between_dispatch_and_observation_is_not_stuck_pending) ... FAIL
+
+======================================================================
+FAIL: test_override_between_dispatch_and_observation_is_not_stuck_pending (tests.test_media_view.GlobalMediaPreference.test_override_between_dispatch_and_observation_is_not_stuck_pending)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-kodi-ui-navigation/repairs/infinity-kodi-2103453-ui-navigation/tests/test_media_view.py", line 146, in test_override_between_dispatch_and_observation_is_not_stuck_pending
+    self.assertEqual(self.c.tick(), 'requested')
+AssertionError: 'pending' != 'requested'
+- pending
++ requested
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (failures=1)

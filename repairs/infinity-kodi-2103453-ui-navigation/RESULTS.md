@@ -1,179 +1,186 @@
-# Global media view persistence — source-only candidate
+# Global media view and first-entry List correction — source only
 
-Continues `4e4b662b` on
+Continuation of `ca5153cbeac5a4a35f5c41a13c53ac0e83f0b3b2` on
 `work/infinity-kodi-2103453-ui-navigation-source-20261104`.
-The latest user instruction explicitly replaces the earlier per-provider policy
-with **one movie/TV media-view preference**. No APK or component ZIP was built,
-installed, signed, released, promoted or locked.
+The preceding report is retained verbatim in
+`results/list-continuation/CA5153CB-REPORT.md`; its failures and evidence remain
+available. No APK/component was built, signed, installed, released or locked.
 
-## Implemented global preference
+## Result and confirmed mechanisms
 
-- Explicit selection in Infinity Videos' View Options stores
-  `Infinity.MediaView.Default` through native `Skin.SetString`, before applying
-  the existing view action. A new explicit selection replaces it.
-- The existing Command Center foreground UI loop observes that preference in
-  Videos window 10025, with the Infinity skin and declared movie/TV content.
-  Its existing checkpoint and background gates remain before the observer.
-  No new service, worker, timer, database, provider execution or refresh loop.
-- Registered view IDs and availability predicates are generated directly from
-  the signed skin. Missing/disabled/incompatible layouts fall back to registered
-  List without writing the global setting. Returning to supported content restores
-  the saved choice. Direct provider view overrides do not become user preferences.
-- Unset preferences preserve legacy behavior. File folders, add-on roots, Music,
-  Settings, specialized windows and other skins do not acquire a media preference.
-  Selecting a local view in such a folder does not replace the movie/TV default.
-- Commands are asynchronous and coalesced while awaiting an observable result.
-  The helper does not change directory, selection, scrolling, playback or focus.
-  Native Kodi's existing view switch transfers the selected item.
+The source candidate retains one explicit movie/TV view preference across
+providers, categories, pages, Back, refresh and reopening. Unsupported views use
+a registered fallback without replacing the saved preference. Unclassified
+folders and unrelated windows retain native behavior.
 
-## Confirmed mechanisms and limits of attribution
+1. **Native preferences were directory-specific.** Kodi stores views by full
+   path/window/skin, so another page/provider can restore a different view.
+   Providers can also issue `Container.SetViewMode` after supplying results.
+   The earlier synthetic-provider test reproduced Posters changing to Icons.
+   The global policy is an explicit user-requested change; neither that fixture
+   nor the original recording establishes Red Light's exact historical URL or
+   override. No provider settings, source or native view database is changed.
+2. **First-entry List registered the wrong implementation.**
+   `CGUIMediaWindow::Load` expands includes and registers containers before the
+   new directory has supplied its content type. Changing a content-based include
+   condition alone could therefore leave generic folder rows registered as 50.
+   `CGUIViewControl::UpdateViewVisibility` reevaluates registered controls; it
+   does not instantiate an omitted include. This is reproduced by the retained
+   failing host case and the prior Linux first-entry capture.
+3. **Candidate refresh race, found and corrected here.** The global observer
+   previously treated an unchanged context as indefinitely pending. Kodi can
+   process its request and a provider can replace the view before the next
+   observation. The initial and diagnostic Linux runs fail after Refresh with
+   saved List 50 but visible Icons 500. The bounded trace remains `pending`;
+   a host counterexample proves the missed-observation ordering. This was a
+   candidate defect, not a claim about the signed baseline's implementation.
+4. **View Options geometry and close handling** remain as previously corrected:
+   narrow selector columns and the redundant, small off-panel close target are
+   replaced only in Videos by scoped wider panels and explicit close/Back
+   actions. The original shared selectors remain unchanged. View 54 was ruled
+   out: it is excluded from Videos; the existing movie ShowCase is 53.
 
-1. `GUIViewState.cpp`/`ViewDatabase.cpp` save and restore by full directory path,
-   window and skin. A provider's page/category URL can therefore have a different
-   stored view. There was no shared movie/TV default in the signed skin.
-   `Container.SetViewMode` can also replace the current native view after a
-   directory finishes. The Linux fixture reproduced this with a synthetic
-   provider: Posters 56 on page one became Icons 500 on page two.
-   This establishes the mechanism and missing global policy, **not the exact
-   installed Red Light override or its historical URL sequence**.
-2. View 54 is explicitly excluded from Videos by the original selector. Movie
-   ShowCase is 53. The initial registration lead was ruled out; no View 54
-   registration, native calculation or provider code was changed.
-3. The original nested selector used 20.833333% title/list widths and an off-panel
-   64x48 close target. Videos now has scoped, wider panel variants with 128x128
-   in-panel targets and explicit dismissal. Original shared Music/Pictures
-   variants remain untouched. Selecting a view dismisses the selector and main
-   options; pressing X in the nested selector preserves its legitimate parent.
-4. Non-Cinema plugin List routing unconditionally selected generic plugin rows,
-   even for movie content. The staged four-predicate correction permits the
-   existing detailed movie List/SlimList instead; it rewrites no view's metadata
-   or artwork implementation. **Its runtime sufficiency is not established.**
-   The Linux first-entry capture still showed generic plugin List rows: include
-   conditions are resolved during window loading, before the new directory's
-   content necessarily exists. The static predicate tests are not proof that
-   every first-entry/pagination layout is repaired. This remains an open rendering
-   requirement; no forced skin reload, new view tree or native change was added
-   to conceal it. Do not package this candidate as a completed layout repair.
+## Exact source correction
 
-## Other retained source corrections
+Detailed VideoList/SlimVideoList is registered as canonical **50** before any
+provider result arrives. Existing core/plugin/compact folder lists receive
+internal IDs **65050/65051/65052**, below Kodi's 16-bit view-ID limit, with
+separate scrollbars. Runtime content predicates expose exactly one List family.
+No user-facing view is added, removed or renumbered. Existing Cinema remains its
+original implementation. The original List artwork, text, dimensions, metadata,
+actions and saved settings are retained in Videos-scoped copies; the shared
+`View_50_List.xml` is untouched. Native fallback resolves legacy List choices in
+folders, and native focus redirection returns to the current internal container.
 
-The existing drawer retains its style and original actions. Navigation contains
-Home, Movies, TV Shows, Sports and Favorites. Sports uses only the existing
-configured playlist Sports route and reports unavailability rather than silently
-substituting another provider. Favorites uses the native existing destination.
+Videos-only header/background/letter-navigation compatibility copies preserve
+List semantics for those internal IDs. Existing loading-frame bindings include
+them. No skin reload, provider rerun, refresh action or native change is used.
 
-Library contains native Infinity Movies and TV collections, Browse Files,
-Downloads and Media Sources. The helper uses the original Kodi folder picker,
-video sources and JSON-RPC navigation. Downloads distinguishes accessible-empty
-from access failure and offers an existing authorized folder. It grants no new
-permissions, scans/imports/deletes nothing, and creates no playback engine or
-library database. Actual Android 17 storage/provider access remains unverified.
+The observer now posts a unique acknowledgement to a transient Home-window
+property after its `SetViewMode` command. Both use the existing FIFO GUI builtin
+queue; native SetViewMode completes message dispatch before SetProperty runs.
+The acknowledgement means **processed**, not successfully displayed. The next
+ordinary foreground tick still checks the visible view. An old acknowledgement
+cannot release a newer request. An unprocessed request remains coalesced; a
+processed request that lost to a provider override can be reapplied. There is no
+new timer, synchronous GUI wait, worker, persistent setting or diagnostic log.
+Existing checkpoint/background guards and all original service bytes are
+preserved after removing the three previously declared observer hook lines.
 
-## Focused evidence
+### Proposed members relative to exact signed 2103453
 
-| Evidence | Result | What it establishes |
-|---|---:|---|
-| Previously acknowledged navigation API fixtures | 11 passing, reused | Sports routing, local folder selection, safe parameters, empty/error/cancel handling; underlying helper unchanged |
-| Updated skin/source contracts | 13 passing | Selector actions/guards/geometry model, old actions and metadata sources, declared registration and drawer structure; not rendered Fold layout |
-| New global-view host tests | 15 passing | Multiple providers/pages/categories, TV, replacement, service recreation, fallback, late overrides, exclusions and untouched resident bytes |
-| Optional diagnostic probe tests | 5 passing | Redaction, per-session fingerprints, bounded observation and read-only/no-wait database access |
-| Native Linux baseline fixture | 7 assertions | Baseline provider override reproduces loss of the requested global view |
-| Native Linux candidate navigation fixture | 74 assertions | List/Posters/InfoWall/TriPanel, real Next-page item selection, Back, other provider, refresh, TV, episode fallback and restoration |
-| Linux process restart/focus fixture | 12 assertions | Native skin setting survives process restart; selected movie, title/plot and keyboard navigation remain available |
-| Linux pointer fixture | 9 assertions | Main menu opens scoped selector; actual X11 mouse click closes nested X; native action closes parent without leaving Videos |
-| Final native media-write guard | 13 assertions | Selecting List in Files leaves movie default intact; a different movie provider restores it |
+All paths below are under `assets/addons/`.
 
-The 44 distinct host cases include the 11 unchanged navigation cases reused from
-the acknowledged run. Repeated source checks are not counted as additional cases.
-The 108 candidate Linux assertions include setup/state assertions and two
-pointer diagnostic checkpoints; they are not 108 independent user workflows.
-
-The final selector change adds only the movie/TV condition to the preference
-write. Earlier candidate runtime evidence is retained for unchanged code and
-media actions; `media-write-guard` rechecks that exact final XML change. The
-restart and final guard use the resident's existing 0.5-second observation cadence.
-No performance improvement or physical Android acceptance is claimed.
-
-### Failed observations retained
-
-- The first candidate Back assertion failed because the harness used direct
-  `ActivateWindow` for page two. Native Back correctly returned to the provider
-  root. The corrected fixture selected the real Next-page item; the full flow
-  then passed. Original result remains `results/linux/candidate/RESULT.json`.
-- The first pointer run exited with SIGSEGV before it produced a result. Holding
-  the Python Window reference throughout control inspection, with bounded signal
-  diagnostics, allowed the selected mouse scenario to pass without production
-  changes. The original exit/log is retained; without its native stack, its exact
-  crash site is not claimed proven or attributed to the Android engine.
-- An initial probe assertion matched the word `token` in the intentional
-  `path_token` field name. It now checks actual private query material; no private
-  value was emitted. Original failed output is retained.
-- The source allowlist caught local host-test `__pycache__` output in the overlay.
-  Only that generated file was removed; the test disables bytecode output.
-  The allowlist was not widened. Final source preservation passes.
-
-## Exact proposed payload changes
-
-All paths below are under `assets/addons/` in the reviewable overlay.
-
-| File | Authorized change |
+| Member | Authorized change |
 |---|---|
-| `script.infinity.commandcenter/service.py` | Three additive lines: import, observer instance, foreground tick. Removing them restores every original byte. |
-| `script.infinity.commandcenter/media_view.py` | New narrow global media-view observer, signed-skin-derived registration predicates. |
-| `skin.infinity.diggz/unified/MyVideoNav.xml` | Scoped Videos menus and staged movie List include predicates; List first-entry limitation above. |
-| `skin.infinity.diggz/unified/Includes.xml` | One added include declaration; all original bytes retained. |
-| `skin.infinity.diggz/unified/Includes_InfinityVideoOptions.xml` | Videos-only clones of existing menu/row/settings definitions. |
-| `skin.infinity.diggz/unified/custom_1136_InfinityVideoViews.xml` | Scoped selector, persistent explicit media choice, close/Back behavior. |
-| `skin.infinity.diggz/unified/custom_1137_InfinityVideoViewSettings.xml` | Scoped existing view-settings panel. |
-| `skin.infinity.diggz/unified/custom_1138_InfinityVideoDisableViews.xml` | Scoped existing enabled-view panel; original settings actions retained. |
-| `skin.infinity.diggz/unified/Custom_1198_InfinityNav.xml` | Requested Navigation/Library destinations with retained existing row styling/actions. |
-| `skin.infinity.diggz/resources/lib/infinity_library_navigation.py` | On-demand, non-mutating native folder/Sports/Downloads routing. |
+| `script.infinity.commandcenter/service.py` | Existing three additive observer-hook lines; unchanged from ca5153cb |
+| `script.infinity.commandcenter/media_view.py` | Global media preference observer; transient GUI acknowledgement added in this continuation |
+| `skin.infinity.diggz/unified/MyVideoNav.xml` | Scoped menus, static List registration, internal folder IDs and compatibility/loading bindings |
+| `skin.infinity.diggz/unified/Includes.xml` | Two include declarations; all original bytes retained |
+| `skin.infinity.diggz/unified/Includes_InfinityMediaLists.xml` | New Videos-scoped existing List variants and compatibility includes |
+| `skin.infinity.diggz/unified/Includes_InfinityVideoOptions.xml` | Scoped menu/settings definitions; logical List conditions include folder IDs |
+| `skin.infinity.diggz/unified/custom_1136_InfinityVideoViews.xml` | Explicit global media choice, compatible folder List target, close/Back/focus behavior |
+| `skin.infinity.diggz/unified/custom_1137_InfinityVideoViewSettings.xml` | Prior scoped settings panel, unchanged from ca5153cb |
+| `skin.infinity.diggz/unified/custom_1138_InfinityVideoDisableViews.xml` | Prior enabled-view panel, unchanged from ca5153cb |
+| `skin.infinity.diggz/unified/Custom_1198_InfinityNav.xml` | Prior Navigation/Library destinations, unchanged from ca5153cb |
+| `skin.infinity.diggz/resources/lib/infinity_library_navigation.py` | Prior on-demand native routing helper, unchanged from ca5153cb |
 
-Four existing members and six new source members. Exact preimages, candidate
-hashes and diffs are in `SOURCE-PLAN.json`, `results/SOURCE-PRESERVATION.json`
-and `results/*.diff`. Test source/artifact hashes are in
-`results/EVIDENCE-BINDING.json`. The optional `view_probe.py` is **outside** the
-production overlay, is never started automatically and was not run on the Fold.
+Four existing members and seven new source members. Compared with ca5153cb,
+five proposed members are byte-identical and six are changed/new. Exact hashes
+are in `SOURCE-PLAN.json`, `results/LIST-SOURCE-PRESERVATION.json` and
+`results/list-continuation/EVIDENCE-BINDING.json`; continuation diffs are beside
+that binding. Original shared layouts and menu implementations are untouched.
 
-Signed 2103453 APK SHA-256 remains:
+Navigation retains Home/Movies/TV actions, adds the existing configured Sports
+route and native Favorites, and exposes Infinity Movies, Infinity TV Shows,
+Browse Files, Downloads and Media Sources. Missing Sports configuration and
+inaccessible Downloads produce recoverable messages, not invented destinations
+or permission bypasses. No scanning, importing, deletion, new player or new
+library database is introduced.
+
+## Focused verification
+
+Tests were selected before execution in `LIST-CONTINUATION.md` and
+`CONTINUATION-SCOPE.md`.
+
+| Current evidence | Result | Meaning |
+|---|---:|---|
+| First-entry host counterexample on previous source | Failed as expected | Generic folder List remained registered after movie content arrived |
+| List registration and preservation cases | 9 passed | Exactly one runtime family, static registration, original subtree semantics, IDs, folder actions and compatibility |
+| Affected skin contracts | 13 passed | Preserved view actions, menu/close contracts and drawer structure |
+| Refresh-race host counterexample on previous observer | Failed as expected | Processed request plus unobserved override stayed pending |
+| Updated global preference host cases | 17 passed | Provider/page/category policy, replacement, fallback, restart, stale acknowledgement, queue coalescing and exclusions |
+| Linux Regular continuation | 42 assertions passed | Cold Files entry registers detailed List; movie metadata; real Next/Back/Refresh; files-to-TV; episode fallback/restoration; focus; no provider rerun on view choice |
+| Linux Slim continuation | 26 assertions passed | Detailed Slim List and folder/TV transitions |
+| Linux Compact continuation | 26 assertions passed | Detailed media List plus existing compact folder variant |
+| Linux Cinema preservation control | 25 assertions passed | Existing Cinema List and folder/TV transitions retained |
+| Final folder-visibility compatibility check | 26 assertions passed | Raw Videos List conditions recognize internal folder IDs; source equivalence preserves media/Cinema conditions |
+| Exact signed-source preservation | Passed | 11-member source allowlist/preimages, protected APK and engine hashes |
+
+This continuation executes **39 distinct focused host cases and 145 Linux assertions**.
+Assertions include setup/state checks, not 145 independent workflows. The
+11 navigation and five privacy-probe cases are reused: navigation bytes and
+probe privacy/database functions are unchanged; the probe only adds the three
+internal IDs to its observed ID list. There are **55 distinct host cases** in
+the cumulative source evidence, not 55 newly executed cases.
+
+Earlier native Linux pagination/other-view, restart and mouse-close evidence is
+retained with its original source binding. The persistent Skin.SetString action,
+key, native storage implementation and pointer geometry are unchanged. Those
+results are not relabeled as new executions on every current byte. The updated
+observer is covered by the 17 host cases and new Linux List/fallback scenarios.
+The final folder-visibility delta has its own source equivalence check and
+26-assertion runtime run. Earlier media/Cinema runs retain their tested XML hashes.
+The real Command Center service/authentication lifecycle is not started in this
+fixture; the candidate helper runs through actual Kodi APIs at the existing
+0.5-second observation cadence, with other production services stubbed.
+
+The two initial refresh failures, bounded trace, first-entry/refresh host failures
+and the folder-visibility source counterexample are retained. The acknowledgement correction passes that same Linux
+scenario. No timeout was increased and no failed assertion was suppressed.
+
+## Preservation
+
+Signed 2103453 remains untouched:
 `08ca19e9ff01e3830253980028dbcdbfb36056fd71b06a18cbfb922158ceaac8`.
 Protected ARM64 engine remains:
 `d0b6f115e839fbe39e764e2fecad47418c501ab1ece853294578652cd0b80b98`.
-All 5 DEX members, all 47 native members and 7,613 other baseline payload members
-are excluded from the proposed changes. No Preview, Cobra, provider, native,
-manifest/permission, release-control, signing or shutdown edits were made.
-This is source-preservation evidence, not a comparison against a nonexistent
-candidate APK.
 
-## Remaining verification and completion requirements
+The source gate excludes all **7,613 other baseline members**, including all
+**5 DEX and 47 native members**, from modification. Preview, Cobra, providers,
+playback, native/shared components, manifest/permissions, databases, user files,
+shutdown protections, signing and recovery locks are unchanged. This compares
+a proposed source overlay with the actual signed APK; it is not a candidate-APK
+comparison, because building one is not authorized.
 
-- Original user screenshots/recording are still inaccessible to this executor.
-  No original visual inspection or recording playback is claimed.
-- Linux renders at 1080x2520 and 2160x2250 were inspected. They visibly mis-handle
-  percentage item layouts and aspect geometry. Signed Infinity's preserved
-  `GUIListItemLayout` has percentage/auto/aspect handling absent from upstream
-  Linux. These renders validate neither Fold sizing nor visual acceptance.
-  Native first-entry movie List ownership, poster proportions and details/spacing
-  across all existing layouts remain open. No speculative geometry rewrite was
-  made to compensate for the different Linux engine.
-- Real Red Light/other installed providers, rapid queued navigation, screen
-  transitions, rotation/folding, touch/remote accessibility and genuine Android
-  process restart must be checked on the preserved native engine. Provider routes
-  that omit usable movie/TV content retain native behavior rather than receiving
-  guessed classification. Direct provider `SetViewMode` is an override, not an
-  explicit Infinity View Options choice.
-- The optional 180-sample probe can capture provider ID, keyed route fingerprints,
-  numeric page/view IDs, content, busy state and matching native view preferences
-  during a later authorized real session. It records no raw URL, titles, media
-  identifiers, credentials or arbitrary settings values, and modifies no DB.
-- Android Downloads permissions, local movie playback/return and configured
-  Sports require real accessible sources/device evidence; only API fixtures ran.
-- The actual authenticated Command Center service was not started in Linux; its
-  checkpoint/background gates are byte-preserved and source-tested. Later
-  authorized packaging must regenerate the existing trusted source manifests
-  and prove full application integration. No authentication guard was bypassed.
+## Remaining evidence and device requirements
 
-Do not sign or describe the entire movie-layout repair as complete on this
-evidence. Global preference behavior is implemented and exercised as above;
-remaining layout/device gates stay explicit. Recovery baselines and locks remain
-untouched.
+- The original ZIP was independently inspected by another reader, not opened
+  on this executor. Its reported SHA-256 is
+  `eecf9f10f1c2a0c6356b9f28f6dffaa7df7d50d2133cf784ae19e1ffa08c7701`.
+  Attributed observations and their limits are recorded in LIST-CONTINUATION.
+  No direct video playback or visual acceptance is claimed here.
+- Current Linux screenshots were inspected. They visibly misrender percentage
+  row heights/aspect geometry, including overlapping List text and stretched
+  artwork. Upstream Linux lacks the protected Infinity Android percentage/auto/
+  aspect implementation. **These screenshots do not pass visual acceptance.**
+  No speculative geometry rewrite compensates for the different renderer.
+  First-entry container ownership is now verified; full movie-detail layout,
+  proportional art and spacing require the preserved Android engine on cover,
+  inner display and both orientations.
+- Actual Red Light and other installed providers, fast repeated navigation,
+  Android restart, fold/unfold, touch/remote use and display reflow remain
+  untested on the physical Fold. Directories that omit usable movie/TV content
+  retain native behavior; the candidate does not guess from private URLs.
+- Android Downloads authorization, real local playback/return, native library
+  collections and configured Sports require accessible device sources. API
+  fixture passes are not physical storage or playback evidence.
+- Optional bounded `view_probe.py` remains outside the production overlay and
+  has not been run on the Fold. It records no raw URL, private media title,
+  credentials or arbitrary setting value, and never changes a database.
+- A later separately authorized packaging step must regenerate existing trusted
+  source manifests and verify full service integration. No guard is bypassed.
+
+Source-level corrections and available focused checks are complete as described;
+Android visual/functionality acceptance remains pending. No APK build, signing,
+release or lock is authorized or performed by this continuation.

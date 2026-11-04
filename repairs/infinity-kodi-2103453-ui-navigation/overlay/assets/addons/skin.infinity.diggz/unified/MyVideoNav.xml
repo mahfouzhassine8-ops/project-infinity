@@ -1,13 +1,13 @@
 <?xml version='1.0' encoding='utf-8'?>
 <window>
 <!-- INFINITY_LOADING_V2 -->
-<onload>SetProperty(Infinity.Loading.FrameControls,|50|55|501|602|8000|98140|)</onload>
+<onload>SetProperty(Infinity.Loading.FrameControls,|50|65050|65051|65052|55|501|602|8000|98140|)</onload>
 
 <!-- INFINITY_ACTION_LOADING_V1 -->
-<onload>SetProperty(Infinity.Loading.FrameControls.10025,|50|55|501|508|602|603|8000|60350|98140|,Home)</onload>
+<onload>SetProperty(Infinity.Loading.FrameControls.10025,|50|65050|65051|65052|55|501|508|602|603|8000|60350|98140|,Home)</onload>
 
   <defaultcontrol always="true">50</defaultcontrol>
-  <views>50,51,52,53,55,56,57,58,59,500,501,502,503,504,505,506,507,509,591,592,602,609</views>
+  <views>50,65050,65051,65052,51,52,53,55,56,57,58,59,500,501,502,503,504,505,506,507,509,591,592,602,609</views>
   <menucontrol>9051</menucontrol>
   <onload condition="System.AddonIsEnabled(script.skin.info.service) + String.IsEmpty(Window(home).Property(skininfos_daemon_running))">RunScript(script.skin.info.service)</onload>
   <onload>SetProperty(Window.HasSettings,True,Home)</onload>
@@ -17,7 +17,7 @@
   <controls>
     <control type="group">
       <description>InfinityCinemaBrowse: legacy projection</description>
-      <visible>![String.IsEqual(Skin.String(Infinity.HomeView),cinema) + Control.IsVisible(50)]</visible>
+      <visible>![String.IsEqual(Skin.String(Infinity.HomeView),cinema) + [Control.IsVisible(50) | Control.IsVisible(65050) | Control.IsVisible(65051) | Control.IsVisible(65052)]]</visible>
       <include>InfinitySystemBackground</include>
     </control>
     <include>InfinityCinemaBrowseBackground</include>
@@ -191,8 +191,8 @@
     <include condition="System.AddonIsEnabled(plugin.video.themoviedb.helper)">TMDbHelperContentList</include>
     <control type="group">
       <description>InfinityCinemaBrowse: legacy projection</description>
-      <visible>![String.IsEqual(Skin.String(Infinity.HomeView),cinema) + Control.IsVisible(50)]</visible>
-      <include>CommonBackground</include>
+      <visible>![String.IsEqual(Skin.String(Infinity.HomeView),cinema) + [Control.IsVisible(50) | Control.IsVisible(65050) | Control.IsVisible(65051) | Control.IsVisible(65052)]]</visible>
+      <include>InfinityMedia_CommonBackground</include>
     </control>
     <control type="group">
       <visible>Control.IsVisible(52) | Control.IsVisible(53) | Control.IsVisible(57) | [Control.IsVisible(58) + Skin.HasSetting(BannerPlex) + Skin.HasSetting(Disable.BannerWallInfo)] | Control.IsVisible(59)</visible>
@@ -201,12 +201,12 @@
     </control>
     <control type="group">
       <include>WindowOpenCloseAnimation</include>
-      <include condition="!String.IsEqual(Skin.String(Infinity.HomeView),cinema) + !String.IsEmpty(Container.PluginName) + String.IsEqual(Skin.String(Infinity.HomeView),compact) + !Container.Content(movies)">InfinityPluginDirectoryCompact</include>
-      <include condition="!String.IsEqual(Skin.String(Infinity.HomeView),cinema) + !String.IsEmpty(Container.PluginName) + !String.IsEqual(Skin.String(Infinity.HomeView),compact) + !Container.Content(movies)">InfinityPluginDirectoryRegular</include>
-      <include condition="!String.IsEqual(Skin.String(Infinity.HomeView),cinema) + String.IsEmpty(Container.PluginName) + [Container.Content() | Container.Content(files) | Container.Content(playlists) | Container.Content(addons)]">InfinityCoreDirectory</include>
-      <include condition="!String.IsEqual(Skin.String(Infinity.HomeView),cinema) + [String.IsEmpty(Container.PluginName) | Container.Content(movies)] + ![Container.Content() | Container.Content(files) | Container.Content(playlists) | Container.Content(addons)] + !Skin.HasSetting(Enable.SlimList)">VideoList</include>
+      <include condition="!String.IsEqual(Skin.String(Infinity.HomeView),cinema) + String.IsEqual(Skin.String(Infinity.HomeView),compact)">InfinityMedia_InfinityPluginDirectoryCompact</include>
+      <include condition="!String.IsEqual(Skin.String(Infinity.HomeView),cinema) + !String.IsEqual(Skin.String(Infinity.HomeView),compact)">InfinityMedia_InfinityPluginDirectoryRegular</include>
+      <include condition="!String.IsEqual(Skin.String(Infinity.HomeView),cinema)">InfinityMedia_InfinityCoreDirectory</include>
+      <include condition="!String.IsEqual(Skin.String(Infinity.HomeView),cinema) + !Skin.HasSetting(Enable.SlimList)">InfinityMedia_VideoList</include>
       <include condition="String.IsEqual(Skin.String(Infinity.HomeView),cinema) + !Skin.HasSetting(Enable.SlimList)">InfinityCinemaBrowseList</include>
-      <include condition="!String.IsEqual(Skin.String(Infinity.HomeView),cinema) + [String.IsEmpty(Container.PluginName) | Container.Content(movies)] + ![Container.Content() | Container.Content(files) | Container.Content(playlists) | Container.Content(addons)] + Skin.HasSetting(Enable.SlimList)">SlimVideoList</include>
+      <include condition="!String.IsEqual(Skin.String(Infinity.HomeView),cinema) + Skin.HasSetting(Enable.SlimList)">InfinityMedia_SlimVideoList</include>
       <include condition="String.IsEqual(Skin.String(Infinity.HomeView),cinema) + Skin.HasSetting(Enable.SlimList)">InfinityCinemaBrowseList</include>
       <include condition="!Skin.HasSetting(Disable.InfoWallView)">VideoInfoWall</include>
       <include condition="!Skin.HasSetting(Disable.LandscapeView)">View_52_Landscape</include>
@@ -231,7 +231,7 @@
     </control>
     <control type="group">
       <description>InfinityCinemaBrowse: legacy projection</description>
-      <visible>![String.IsEqual(Skin.String(Infinity.HomeView),cinema) + Control.IsVisible(50)]</visible>
+      <visible>![String.IsEqual(Skin.String(Infinity.HomeView),cinema) + [Control.IsVisible(50) | Control.IsVisible(65050) | Control.IsVisible(65051) | Control.IsVisible(65052)]]</visible>
       <control type="group">
         <visible>!Window.IsActive(addoninformation)</visible>
         <include>WindowOpenCloseAnimation</include>
@@ -616,17 +616,17 @@
               </control>
             </control>
             <control type="group">
-              <visible>Control.IsVisible(50) | Control.IsVisible(55) | Control.IsVisible(56) | Control.IsVisible(57) | [Control.IsVisible(58)] | Control.IsVisible(500) | Control.IsVisible(506) | Control.IsVisible(509) | Control.IsVisible(591) | Control.IsVisible(602) | Control.IsVisible(507)</visible>
+              <visible>[Control.IsVisible(50) | Control.IsVisible(65050) | Control.IsVisible(65051) | Control.IsVisible(65052)] | Control.IsVisible(55) | Control.IsVisible(56) | Control.IsVisible(57) | [Control.IsVisible(58)] | Control.IsVisible(500) | Control.IsVisible(506) | Control.IsVisible(509) | Control.IsVisible(591) | Control.IsVisible(602) | Control.IsVisible(507)</visible>
               <include>ViewAnimation</include>
               <top>91.3514%</top>
               <height>90</height>
               <control type="group">
                 <visible>![Container.Content(addons) | Container.Content(tvshows) | Container.Content(seasons)]</visible>
                 <animation effect="slide" end="85" condition="String.IsEmpty(Skin.String(LanguageFlags)) + [System.AddonIsEnabled(script.embuary.helper) | System.AddonIsEnabled(plugin.video.themoviedb.helper)]">Conditional</animation>
-                <animation effect="slide" end="80" condition="Control.IsVisible(50) + Container.Content(movies)">Conditional</animation>
+                <animation effect="slide" end="80" condition="[Control.IsVisible(50) | Control.IsVisible(65050) | Control.IsVisible(65051) | Control.IsVisible(65052)] + Container.Content(movies)">Conditional</animation>
                 <control type="group">
                   <left>2.0833%</left>
-                  <visible>[Container.Content(movies) + Control.IsVisible(50) + !Skin.HasSetting(Disable.List.Mediaflags)] | [Container.Content(episodes) + Control.IsVisible(50)]  | [Container.Content(movies) + Control.IsVisible(506) + !Skin.HasSetting(Disable.RightList.Mediaflags)] | [Container.Content(episodes) + Control.IsVisible(506) + !Skin.HasSetting(Disable.RightList.EpisodeMediaflags)] | Control.IsVisible(591) + [Container.Content(movies) | Container.Content(episodes)] | Control.IsVisible(509) + !Skin.HasSetting(Disable.MyFlix.Mediaflags) + [Container.Content(movies) | Container.Content(episodes)] | Control.IsVisible(55) | Control.IsVisible(56) | Control.IsVisible(57) | Control.IsVisible(58) | Control.IsVisible(500) | Control.IsVisible(602) | Control.IsVisible(507)</visible>
+                  <visible>[Container.Content(movies) + [Control.IsVisible(50) | Control.IsVisible(65050) | Control.IsVisible(65051) | Control.IsVisible(65052)] + !Skin.HasSetting(Disable.List.Mediaflags)] | [Container.Content(episodes) + [Control.IsVisible(50) | Control.IsVisible(65050) | Control.IsVisible(65051) | Control.IsVisible(65052)]]  | [Container.Content(movies) + Control.IsVisible(506) + !Skin.HasSetting(Disable.RightList.Mediaflags)] | [Container.Content(episodes) + Control.IsVisible(506) + !Skin.HasSetting(Disable.RightList.EpisodeMediaflags)] | Control.IsVisible(591) + [Container.Content(movies) | Container.Content(episodes)] | Control.IsVisible(509) + !Skin.HasSetting(Disable.MyFlix.Mediaflags) + [Container.Content(movies) | Container.Content(episodes)] | Control.IsVisible(55) | Control.IsVisible(56) | Control.IsVisible(57) | Control.IsVisible(58) | Control.IsVisible(500) | Control.IsVisible(602) | Control.IsVisible(507)</visible>
                   <include>ViewAnimation</include>
                   <include condition="!System.AddonIsEnabled(script.embuary.helper) + !System.AddonIsEnabled(plugin.video.themoviedb.helper)">NoRatingsHelperFlagAnimations</include>
                   <control type="grouplist">
@@ -775,7 +775,7 @@
               <control type="group">
                 <left>39.0625%</left>
                 <control type="group">
-                  <visible>!Control.IsVisible(50) + !Control.IsVisible(506) + [Container.Content(tvshows) | Container.Content(seasons)] | Control.IsVisible(50) + !Skin.HasSetting(Disable.List.TVMediaflags) + [Container.Content(tvshows) | Container.Content(seasons)] | Control.IsVisible(506) + !Skin.HasSetting(Disable.RightList.TVMediaflags) + [Container.Content(tvshows) | Container.Content(seasons)]</visible>
+                  <visible>![Control.IsVisible(50) | Control.IsVisible(65050) | Control.IsVisible(65051) | Control.IsVisible(65052)] + !Control.IsVisible(506) + [Container.Content(tvshows) | Container.Content(seasons)] | [Control.IsVisible(50) | Control.IsVisible(65050) | Control.IsVisible(65051) | Control.IsVisible(65052)] + !Skin.HasSetting(Disable.List.TVMediaflags) + [Container.Content(tvshows) | Container.Content(seasons)] | Control.IsVisible(506) + !Skin.HasSetting(Disable.RightList.TVMediaflags) + [Container.Content(tvshows) | Container.Content(seasons)]</visible>
                   <control type="group">
                     <width>84.4017%</width>
                     <visible>Container.Content(tvshows)</visible>
@@ -1014,12 +1014,12 @@
           <control type="group">
             <visible>ListItem.IsCollection</visible>
             <animation effect="fade" time="140" delay="100" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">Visible</animation>
-            <animation effect="slide" end="1200" condition="Control.IsVisible(50) + Container.Content(sets)">Conditional</animation>
+            <animation effect="slide" end="1200" condition="[Control.IsVisible(50) | Control.IsVisible(65050) | Control.IsVisible(65051) | Control.IsVisible(65052)] + Container.Content(sets)">Conditional</animation>
             <animation effect="slide" end="1320" condition="Control.IsVisible(506)">Conditional</animation>
             <animation effect="slide" end="-70" condition="Control.IsVisible(509)">Conditional</animation>
             <animation effect="slide" end="-1152.5" condition="Control.IsVisible(591)">Conditional</animation>
             <control type="grouplist">
-              <visible>Control.IsVisible(50) | Control.IsVisible(55) | Control.IsVisible(56) | Control.IsVisible(57) | [Control.IsVisible(58) + Skin.HasSetting(Disable.BannerWallInfo)] | Control.IsVisible(500) | [Control.IsVisible(506) + Container.Content(movies) + !Skin.HasSetting(Disable.RightList.Mediaflags)] | [Control.IsVisible(506) + Container.Content(sets) + !Skin.HasSetting(Disable.RightList.SetMediaflags)] | Control.IsVisible(509) | Control.IsVisible(591) | Control.IsVisible(602)</visible>
+              <visible>[Control.IsVisible(50) | Control.IsVisible(65050) | Control.IsVisible(65051) | Control.IsVisible(65052)] | Control.IsVisible(55) | Control.IsVisible(56) | Control.IsVisible(57) | [Control.IsVisible(58) + Skin.HasSetting(Disable.BannerWallInfo)] | Control.IsVisible(500) | [Control.IsVisible(506) + Container.Content(movies) + !Skin.HasSetting(Disable.RightList.Mediaflags)] | [Control.IsVisible(506) + Container.Content(sets) + !Skin.HasSetting(Disable.RightList.SetMediaflags)] | Control.IsVisible(509) | Control.IsVisible(591) | Control.IsVisible(602)</visible>
               <left>3.125%</left>
               <top>91.3514%</top>
               <height>90</height>
@@ -1098,17 +1098,17 @@
     </control>
     <control type="group">
       <description>InfinityCinemaBrowse: legacy projection</description>
-      <visible>![String.IsEqual(Skin.String(Infinity.HomeView),cinema) + Control.IsVisible(50)]</visible>
+      <visible>![String.IsEqual(Skin.String(Infinity.HomeView),cinema) + [Control.IsVisible(50) | Control.IsVisible(65050) | Control.IsVisible(65051) | Control.IsVisible(65052)]]</visible>
       <include condition="!Skin.HasSetting(Disable.ScrollLabel) + String.IsEmpty(Container.PluginName)">ScrollOffsetLabel</include>
     </control>
     <control type="group">
       <description>InfinityCinemaBrowse: legacy projection</description>
-      <visible>![String.IsEqual(Skin.String(Infinity.HomeView),cinema) + Control.IsVisible(50)]</visible>
-      <include>Topbar</include>
+      <visible>![String.IsEqual(Skin.String(Infinity.HomeView),cinema) + [Control.IsVisible(50) | Control.IsVisible(65050) | Control.IsVisible(65051) | Control.IsVisible(65052)]]</visible>
+      <include>InfinityMedia_Topbar</include>
     </control>
     <control type="group">
       <description>InfinityCinemaBrowse: legacy projection</description>
-      <visible>![String.IsEqual(Skin.String(Infinity.HomeView),cinema) + Control.IsVisible(50)]</visible>
+      <visible>![String.IsEqual(Skin.String(Infinity.HomeView),cinema) + [Control.IsVisible(50) | Control.IsVisible(65050) | Control.IsVisible(65051) | Control.IsVisible(65052)]]</visible>
       <include content="InfinitySecondaryHeader">
         <param name="Title" value="VIDEOS"/>
         <param name="Subtitle" value="$VAR[InfinityResumeDirectoryTitle]"/>
@@ -1294,7 +1294,7 @@
       </control>
       <visible allowhiddenfocus="true">true</visible>
     </control>
-    <include condition="!System.AddonIsEnabled(script.embuary.helper)">DefaultLetterJump</include>
+    <include condition="!System.AddonIsEnabled(script.embuary.helper)">InfinityMedia_DefaultLetterJump</include>
     <include condition="System.AddonIsEnabled(script.embuary.helper)">ScriptLetterJump</include>
     <control type="group">
       <visible>!String.IsEmpty(Window(Home).Property(Enable.FullscreenFanart))</visible>

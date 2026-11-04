@@ -14,6 +14,7 @@ ALLOWED = {PREFIX + n for n in (
     'unified/Includes.xml', 'unified/MyVideoNav.xml', 'unified/Custom_1198_InfinityNav.xml',
     'unified/custom_1136_InfinityVideoViews.xml', 'unified/custom_1137_InfinityVideoViewSettings.xml',
     'unified/custom_1138_InfinityVideoDisableViews.xml', 'unified/Includes_InfinityVideoOptions.xml',
+    'unified/Includes_InfinityMediaLists.xml',
     'resources/lib/infinity_library_navigation.py')}
 ALLOWED |= {'assets/addons/script.infinity.commandcenter/' + n
             for n in ('service.py', 'media_view.py')}
@@ -61,7 +62,7 @@ def main(apk, out):
             'protected_dex_count': len(dex), 'protected_native_count': len(native),
             'new_apk_built': False, 'actual_candidate_apk_comparison': 'NOT APPLICABLE: source-only',
             'android_runtime': 'NOT RUN', 'physical_fold': 'PENDING',
-            'original_visual_evidence': 'INACCESSIBLE',
+            'original_visual_evidence': 'Original bytes unavailable on this executor; independent source-tagged inspection recorded in LIST-CONTINUATION.md',
         }
     out.write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps({k: v for k, v in result.items() if k != 'source_members'}, indent=2))

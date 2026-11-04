@@ -28,6 +28,7 @@ class Kodi:
         self.disabled = set()
         self.commands = []
         self.queue = []
+        self.properties = {}
         self.focus = 'channel-independent-item-7'
         self.scroll = 7
 
@@ -35,8 +36,9 @@ class Kodi:
     def getCurrentWindowId(self):return self.window
     def getCurrentWindowDialogId(self):return self.dialog
     def Window(self, number):
-        assert number == 10025
+        assert number in (10000, 10025)
         return self
+    def getProperty(self, name):return self.properties.get(name, '')
     def getControl(self, number):
         if number not in self.controls:raise RuntimeError('not included')
         return object()
@@ -57,12 +59,18 @@ class Kodi:
     def executebuiltin(self, command, *args):
         # Any synchronous call, file/setting/refresh/player action fails this seam.
         assert not args
-        match = re.fullmatch(r'Container.SetViewMode\((\d+)\)', command)
-        assert match, command
+        view = re.fullmatch(r'Container.SetViewMode\((\d+)\)', command)
+        ack = re.fullmatch(r'SetProperty\(Infinity.MediaView.Processed,([a-z0-9:]+),Home\)', command)
+        assert view or ack, command
         self.commands.append(command)
-        self.queue.append(int(match[1]))
+        self.queue.append(('view', int(view[1])) if view else ('ack', ack[1]))
     def acknowledge(self):
-        if self.queue:self.current = self.queue.pop(0)
+        if self.queue:
+            kind,value = self.queue.pop(0)
+            assert kind == 'view'
+            self.current = value
+        if self.queue and self.queue[0][0] == 'ack':
+            self.properties['Infinity.MediaView.Processed'] = self.queue.pop(0)[1]
     def select(self, view):
         # Native selector stores the skin setting then applies the local view.
         self.saved[module.PREFERENCE] = str(view)
@@ -130,14 +138,37 @@ class GlobalMediaPreference(unittest.TestCase):
         self.k.current = 500;self.settle(55)
         self.assertEqual(self.k.saved[module.PREFERENCE], '55')
 
+    def test_override_between_dispatch_and_observation_is_not_stuck_pending(self):
+        self.k.select(50);self.k.current = 500
+        self.assertEqual(self.c.tick(), 'requested')
+        self.k.acknowledge()  # GUI processed request; observer has not sampled it.
+        self.k.current = 500  # A refresh/provider override occurs in that gap.
+        self.assertEqual(self.c.tick(), 'requested')
+        self.k.acknowledge()
+        self.assertEqual(self.c.tick(), 'matched')
+        self.assertEqual(self.k.current, 50)
+
+    def test_stale_acknowledgement_does_not_release_a_newer_request(self):
+        self.k.select(50);self.k.current = 500
+        self.assertEqual(self.c.tick(), 'requested')
+        self.k.path = 'plugin://provider.b/movies?page=2'
+        self.assertEqual(self.c.tick(), 'requested')
+        self.k.acknowledge()  # Only the older request and its acknowledgement.
+        self.k.current = 500
+        before = list(self.k.commands)
+        self.assertEqual(self.c.tick(), 'pending')
+        self.assertEqual(self.k.commands, before)
+        self.k.acknowledge()
+        self.assertEqual(self.c.tick(), 'matched')
+
     def test_pending_command_is_not_repeated_and_matching_view_writes_nothing(self):
         self.k.select(51);self.k.current = 50
         self.assertEqual(self.c.tick(), 'requested')
         for _ in range(20):self.assertEqual(self.c.tick(), 'pending')
-        self.assertEqual(len(self.k.commands), 1)
+        self.assertEqual(len(self.k.commands), 2)  # One view command + its receipt.
         self.k.acknowledge()
         for _ in range(20):self.assertEqual(self.c.tick(), 'matched')
-        self.assertEqual(len(self.k.commands), 1)
+        self.assertEqual(len(self.k.commands), 2)
 
     def test_unset_and_invalid_preferences_preserve_legacy_state(self):
         for value in ('', 'not-an-id', '54', '50);Quit()', '-1'):
@@ -160,7 +191,9 @@ class GlobalMediaPreference(unittest.TestCase):
         original = (self.k.focus, self.k.scroll, self.k.path)
         self.settle(56)
         self.assertEqual((self.k.focus, self.k.scroll, self.k.path), original)
-        self.assertEqual(self.k.commands, ['Container.SetViewMode(56)'])
+        self.assertEqual(self.k.commands[0], 'Container.SetViewMode(56)')
+        self.assertEqual(len(self.k.commands), 2)
+        self.assertRegex(self.k.commands[1], r'^SetProperty\(Infinity.MediaView.Processed,[a-z0-9:]+,Home\)$')
 
     def test_no_command_when_registered_list_is_missing_or_view_not_ready(self):
         self.k.select(55);self.k.controls.clear()

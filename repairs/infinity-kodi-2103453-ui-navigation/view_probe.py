@@ -14,7 +14,7 @@ import sqlite3
 import time
 from urllib.parse import quote, urlsplit, urlunsplit, parse_qs
 
-VIEWS = (50, 51, 52, 53, 55, 56, 57, 58, 59, 500, 501, 502, 503, 504, 505, 506, 507, 509, 591, 592, 602, 609)
+VIEWS = (50, 65050, 65051, 65052, 51, 52, 53, 55, 56, 57, 58, 59, 500, 501, 502, 503, 504, 505, 506, 507, 509, 591, 592, 602, 609)
 CONTENTS = ('movies', 'tvshows', 'sets', 'seasons', 'episodes', 'musicvideos', 'videos', 'files', 'addons')
 
 
