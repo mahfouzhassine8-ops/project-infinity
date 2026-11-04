@@ -26,6 +26,13 @@ class Packaging(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'ONLY_AUTHORIZED_VERSIONS'):
             r.generate(Path('never-opened'),2103456,Path('never-created'))
 
+    def test_ref_version_parser_ignores_hash_digits_but_detects_newer_ref(self):
+        sha='a'*20+'2106853'+'b'*13
+        self.assertEqual(r.ref_versions(sha+'\trefs/heads/infinity-kodi-upstream-toolkit-v1\n'),[])
+        self.assertEqual(r.ref_versions(sha+'\trefs/heads/work/ui-2103454-2103455\n'),[2103454,2103455])
+        self.assertEqual(r.ref_versions(sha+'\trefs/tags/testing-2103456\n'),[2103456])
+        with self.assertRaisesRegex(ValueError,'VALID_REF_RECORD'):r.ref_versions('invalid refs/heads/version-2103454')
+
     def test_wrong_or_multiple_signer_rejected(self):
         with patch.object(r,'cmd',return_value='Signer #1 certificate SHA-256 digest: '+'0'*64):
             with self.assertRaisesRegex(ValueError,'ORIGINAL_CERTIFICATE'):r.certificate(Path('unused'),Path('unused'))

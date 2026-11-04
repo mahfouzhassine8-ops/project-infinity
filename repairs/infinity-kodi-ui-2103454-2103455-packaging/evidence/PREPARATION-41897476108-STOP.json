@@ -1,0 +1,11 @@
+{
+  "run": 41897476108,
+  "result": "STOPPED_BEFORE_KEY_ACCESS",
+  "gate": "NEWER_VERSION_REF_REVIEW_REQUIRED",
+  "cause": "Parser inspected full ls-remote line including object ID; toolkit SHA contained digits 2106853, ref did not.",
+  "actual_newer_versioned_ref": false,
+  "correction": "Parse validated ref-name column only; retain genuine newer-ref rejection.",
+  "regression_cases": "Hash digits ignored, authorized ref numbers detected, newer ref detected, malformed record rejected.",
+  "APK_built": false,
+  "APK_signed": false
+}

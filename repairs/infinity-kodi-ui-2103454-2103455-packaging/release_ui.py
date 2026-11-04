@@ -93,10 +93,20 @@ def certificate(apk,sdk):
         require(re.search('Verified using '+scheme+r' scheme[^\n]*: true',result) is not None,'SIGNATURE_'+scheme)
     return result
 
+def ref_versions(listing):
+    # Git object IDs may contain decimal-looking runs; only ref names identify
+    # versioned branches/tags. Never interpret a SHA as a release version.
+    values=[]
+    for line in listing.splitlines():
+        sha,name=line.split()
+        require(re.fullmatch('[0-9a-f]{40}',sha) is not None and name.startswith('refs/'),'VALID_REF_RECORD')
+        values.extend(int(v) for v in re.findall(r'(?<!\d)210\d{4}(?!\d)',name))
+    return values
+
 def version_check(version,out):
     require(version in VERSIONS,'ONLY_AUTHORIZED_VERSIONS')
     refs=cmd('git','ls-remote','--heads','--tags','origin')
-    require(not any(int(n)>2103455 for n in re.findall(r'210\d{4}',refs)),'NEWER_VERSION_REF_REVIEW_REQUIRED')
+    require(not any(n>2103455 for n in ref_versions(refs)),'NEWER_VERSION_REF_REVIEW_REQUIRED')
     rows=json.loads(cmd('gh','api','repos/mahfouzhassine8-ops/project-infinity/actions/runs?per_page=100'))['workflow_runs']
     current=int(os.environ.get('GITHUB_RUN_ID','0'));issued=[]
     for row in rows:
