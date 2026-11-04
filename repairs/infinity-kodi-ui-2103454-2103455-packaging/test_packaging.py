@@ -44,6 +44,20 @@ class Packaging(unittest.TestCase):
         for value in (b'no field',b'version="x" version="x"'):
             with self.assertRaisesRegex(ValueError,'EXACT_SINGLE_VERSION_FIELD'):r.xml_replace(value,b'version="x"',b'version="y"')
 
+    def test_native_manifest_verifier_path_contract_on_actual_signed_base(self):
+        baseline=Path(os.environ.get('INFINITY_UI_BASELINE','/tmp/kodi453-published-signed/Infinity-2103453-Combined-Original-Signer.apk'))
+        with tempfile.TemporaryDirectory(prefix='ui-original-module-check-') as tmp,ZipFile(baseline) as z:
+            folder=Path(tmp);root=folder/'addons';root.mkdir()
+            for n in z.namelist():
+                if n.startswith('assets/addons/') and n.split('/')[2] in r.module_bundle.IDS:
+                    p=root/n.removeprefix('assets/addons/');p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(z.read(n))
+            verifier=folder/'verifier'
+            r.cmd('g++','-std=c++17','-O2','-Wall','-Wextra','-Werror',r.FIRST/'verify_module_bundle.cpp',r.FIRST/'isolated-native/InfinityModuleManifest.cpp','-lcrypto','-o',verifier)
+            relative=Path(os.path.relpath(root))
+            bad=r.subprocess.run([str(verifier),str(relative),str(r.FIRST/'ORIGINAL-INFINITY-PUBLIC-KEY.pem')],capture_output=True,text=True)
+            self.assertNotEqual(bad.returncode,0);self.assertIn('unavailable',bad.stderr)
+            self.assertIn('NATIVE_VERIFIED package=0.3.5.54 protocol=1 files=76',r.verify_module(verifier,relative))
+
     def test_original_security_sources_frozen(self):
         for name in ('assemble.py','release_authority.py','component_bundles.py','signer_policy.py','signer-policy.json','accepted-combined-release.json'):
             p=r.ISO/name;self.assertEqual(p.read_bytes(),r.original(p))

@@ -1,0 +1,12 @@
+{
+  "run": 41897914746,
+  "result": "STOPPED_BEFORE_APK_ASSEMBLY",
+  "gate": "ORIGINAL_NATIVE_MODULE_VERIFIER",
+  "cause": "Packaging wrapper passed a relative addonsRoot; original verifier rejects addonsRoot.front() != slash with unavailable before signature inspection.",
+  "source_predicate": "InfinityModuleManifest.cpp:247",
+  "correction": "Canonicalize build paths; invoke unchanged verifier with absolute root.",
+  "regression": "Actual signed453 module rejects relative root and passes via canonical wrapper with original public key.",
+  "APK_built": false,
+  "APK_signed": false,
+  "original_module_signing_attempted": true
+}

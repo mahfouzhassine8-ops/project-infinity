@@ -124,6 +124,9 @@ def version_check(version,out):
 def xml_replace(raw,old,new):
     require(raw.count(old)==1,'EXACT_SINGLE_VERSION_FIELD');return raw.replace(old,new,1)
 
+def verify_module(verifier,root):
+    return cmd(verifier.resolve(),root.resolve(),FIRST/'ORIGINAL-INFINITY-PUBLIC-KEY.pem')
+
 def generate(baseline,version,root):
     require(version in VERSIONS,'ONLY_AUTHORIZED_VERSIONS')
     v=55 if version==2103454 else 56;skin=252 if version==2103454 else 253
@@ -212,6 +215,9 @@ def compare(baseline,candidate,version,expected,out,sdk=None):
     return proof
 
 def prepare(bundles,baseline,sdk,out):
+    # The unchanged native manifest verifier intentionally refuses relative
+    # roots. Canonicalize build inputs, never relax that security contract.
+    bundles,baseline,sdk,out=(p.resolve() for p in (bundles,baseline,sdk,out))
     source=head_check();prior=baseline_authority()
     require(file_sha(baseline)==APK_SHA,'EXACT_SIGNED453')
     require(load(bundles/'catalog.json')==prior['bundle_catalog'],'EXACT_BASE_CATALOG')
@@ -238,7 +244,7 @@ def prepare(bundles,baseline,sdk,out):
             work=out/str(version);root=work/'modules';marker=root/module_bundle.CC/module_bundle.MANIFEST
             require(module_bundle.build(root)[0]==marker.read_bytes(),'MANIFEST_SOURCE_RACE')
             text=cmd('java','-cp',classes,'SignInfinityModules',key,marker,env=env)
-            text+=cmd(verifier,root,FIRST/'ORIGINAL-INFINITY-PUBLIC-KEY.pem')
+            text+=verify_module(verifier,root)
             (work/'MODULE-AUTHENTICATION.txt').write_text(text)
             all_changes[version][CC+'INFINITY-MODULES.v1.sig']=Path(str(marker)+'.sig').read_bytes()
     head_check()
