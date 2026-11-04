@@ -1,0 +1,141 @@
+{
+  "android_fold_acceptance": "NOT RUN",
+  "apk_sha256": "08ca19e9ff01e3830253980028dbcdbfb36056fd71b06a18cbfb922158ceaac8",
+  "kind": "read-only signed-source observations, not application tests",
+  "media_inspection": "BLOCKED: original ZIP bytes unavailable",
+  "member_sha256": {
+    "assets/addons/skin.infinity.diggz/addon.xml": "ac5cd495e283101e0226672c58b624cdb0330f87712bde04a906377ee42b7438",
+    "assets/addons/skin.infinity.diggz/unified/Custom_1198_InfinityNav.xml": "5372022ded234687f7ecbb376bff6bca13a82aa88657a7ef1fa8b5411f63c214",
+    "assets/addons/skin.infinity.diggz/unified/MyVideoNav.xml": "f6a65dce19db29db6a7577cc92afb60140f9199e2b671bbaf92a129df3c97ad4",
+    "assets/addons/skin.infinity.diggz/unified/View_54_ShowCase.xml": "be209e97f1ba458247434fdda67bd69c7af5f432c2695fcef18be111d73b551c",
+    "assets/addons/skin.infinity.diggz/unified/custom_1130_Views.xml": "175eccb1c770ed3268dbfeba8b954a429c4aea66dc6d1fd3031b77d60cb5e380",
+    "assets/addons/skin.infinity.diggz/unified/custom_1131_ViewSettings.xml": "1f3ab55a3141ae5bba41c9010c409d9a6d166253bb0d0bd63fc64079d1dfc16a"
+  },
+  "nested_close_geometry": {
+    "1130": {
+      "height": "48",
+      "left": "19.0104%",
+      "onclick": "Dialog.Close(1130)",
+      "top": "-11",
+      "visible": "system.getbool(input.enablemouse)",
+      "width": "64"
+    },
+    "1131": {
+      "height": "48",
+      "left": "19.0104%",
+      "onclick": "Dialog.Close(1131)",
+      "top": "1%",
+      "visible": null,
+      "width": "64"
+    }
+  },
+  "original_drawer_routes": {
+    "1198101": {
+      "actions": [
+        "Dialog.Close(1198)",
+        "ActivateWindow(Home)"
+      ],
+      "label": "Home"
+    },
+    "1198102": {
+      "actions": [
+        "Dialog.Close(1198)",
+        "ActivateWindow(Videos,plugin://script.infinity.commandcenter/?action=movies,return)"
+      ],
+      "label": "Movies"
+    },
+    "1198103": {
+      "actions": [
+        "Dialog.Close(1198)",
+        "ActivateWindow(Videos,plugin://script.infinity.commandcenter/?action=tv,return)"
+      ],
+      "label": "TV Shows"
+    },
+    "1198104": {
+      "actions": [
+        "Dialog.Close(1198)",
+        "ActivateWindow(Videos)"
+      ],
+      "label": "Library"
+    },
+    "1198105": {
+      "actions": [
+        "Dialog.Close(1198)",
+        "ActivateWindow(AddonBrowser)"
+      ],
+      "label": "Add-ons"
+    },
+    "1198301": {
+      "actions": [
+        "Dialog.Close(1198)",
+        "ActivateWindow(favouritesbrowser)"
+      ],
+      "label": "Favourites"
+    }
+  },
+  "production_changes": 0,
+  "red_light_runtime_causality": "NOT ESTABLISHED",
+  "selector_offered_views": [
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    500,
+    501,
+    502,
+    503,
+    504,
+    505,
+    506,
+    507,
+    508,
+    509,
+    591,
+    602,
+    603,
+    609
+  ],
+  "skin_resolutions": [
+    {
+      "aspect": "9:20",
+      "default": "true",
+      "folder": "unified",
+      "height": "2400",
+      "width": "1080"
+    }
+  ],
+  "video_registered_views": [
+    50,
+    51,
+    52,
+    53,
+    55,
+    56,
+    57,
+    58,
+    59,
+    500,
+    501,
+    502,
+    503,
+    504,
+    505,
+    506,
+    507,
+    509,
+    591,
+    592,
+    602,
+    609
+  ],
+  "view54_defined": true,
+  "view54_offered": true,
+  "view54_registered_in_video_window": false,
+  "view_selector_list_width": "20.833333%"
+}
