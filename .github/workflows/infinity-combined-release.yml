@@ -7,7 +7,7 @@ on:
         type: choice
         required: true
         default: final-combined
-        options: [final-combined, prepare-preview451, prepare-kodi452]
+        options: [final-combined, prepare-preview451, prepare-kodi452, prepare-kodi453]
 permissions:
   contents: read
   actions: read
@@ -153,9 +153,81 @@ jobs:
             prepared452/preservation/
           if-no-files-found: warn
           retention-days: 90
+  prepare-kodi453:
+    name: Kodi 453 native-only owner preparation; exact452 frozen payload
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/infinity-kodi-2103453-controlled-test-20261104' && inputs.operation == 'prepare-kodi453'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '21'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with:
+          packages: 'build-tools;35.0.0'
+          log-accepted-android-sdk-licenses: false
+      - name: Selected Kodi release contracts and sole signer check before preparation
+        run: |
+          set -euo pipefail
+          python3 -m pip install PyYAML==6.0.3
+          python3 repairs/infinity-kodi-2103453-controlled-test/test_release453.py
+          python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out SIGNER-ROUTES.json
+          python3 repairs/infinity-kodi-2103453-controlled-test/release453.py metadata --out INPUT-METADATA.json
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          artifact-ids: '13282546349'
+          run-id: '41742368066'
+          merge-multiple: true
+          github-token: ${{ github.token }}
+          path: protected452
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          artifact-ids: '13282361545'
+          run-id: '41742368066'
+          merge-multiple: true
+          github-token: ${{ github.token }}
+          path: protected452-components
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          artifact-ids: '13298763260'
+          run-id: '41778685295'
+          merge-multiple: true
+          github-token: ${{ github.token }}
+          path: compiled-native
+      - name: Assemble only the existing compiled Kodi repair and truthful version metadata
+        run: |
+          python3 repairs/infinity-kodi-2103453-controlled-test/release453.py prepare \
+            --bundles protected452-components --baseline protected452/Infinity-2103452-Combined-Original-Signer.apk \
+            --native compiled-native --sdk "$ANDROID_HOME/build-tools/35.0.0" --out prepared453
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity453-Prepared-${{ github.run_id }}
+          path: prepared453/publish/
+          if-no-files-found: error
+          retention-days: 90
+          compression-level: 0
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Infinity453-Preparation-Evidence-${{ github.run_id }}
+          path: |
+            SIGNER-ROUTES.json
+            INPUT-METADATA.json
+            prepared453/BASELINE-SIGNATURE.txt
+            prepared453/PREPARATION.json
+            prepared453/preservation/
+            prepared453/recovery/
+          if-no-files-found: warn
+          retention-days: 90
   combined:
     name: Registered combined original-key testing APK; exact owner preservation
-    if: github.event_name == 'workflow_dispatch' && inputs.operation == 'final-combined' && (github.ref == 'refs/heads/work/infinity-preview-2103450-fullscreen-display-20261102' || github.ref == 'refs/heads/work/infinity-kodi-2103451-checkpoint-anr-20261103')
+    if: github.event_name == 'workflow_dispatch' && inputs.operation == 'final-combined' && (github.ref == 'refs/heads/work/infinity-preview-2103450-fullscreen-display-20261102' || github.ref == 'refs/heads/work/infinity-kodi-2103451-checkpoint-anr-20261103' || github.ref == 'refs/heads/work/infinity-kodi-2103453-controlled-test-20261104')
     runs-on: ubuntu-22.04
     timeout-minutes: 40
     env:
@@ -174,7 +246,9 @@ jobs:
         run: |
           set -euo pipefail
           python3 -m pip install PyYAML==6.0.3
-          if [ "$GITHUB_REF" = 'refs/heads/work/infinity-kodi-2103451-checkpoint-anr-20261103' ]; then
+          if [ "$GITHUB_REF" = 'refs/heads/work/infinity-kodi-2103453-controlled-test-20261104' ]; then
+            python3 repairs/infinity-kodi-2103453-controlled-test/test_release453.py
+          elif [ "$GITHUB_REF" = 'refs/heads/work/infinity-kodi-2103451-checkpoint-anr-20261103' ]; then
             python3 repairs/infinity-kodi-2103451-checkpoint-anr/test_release452.py
           else
             python3 repairs/infinity-preview-2103450-fullscreen-display/test_release451.py
@@ -184,19 +258,20 @@ jobs:
           from pathlib import Path
           from release_gate import remote_authority,require
           a=remote_authority(Path('.'),os.environ['GITHUB_SHA'])
+          p453=os.environ['GITHUB_REF']=='refs/heads/work/infinity-kodi-2103453-controlled-test-20261104'
           p0=os.environ['GITHUB_REF']=='refs/heads/work/infinity-kodi-2103451-checkpoint-anr-20261103'
-          version,generation,baseline,owner=(2103452,38,2103451,'INFINITY_KODI_P0_NATIVE') if p0 else (2103451,37,2103450,'INFINITY_PREVIEW_FULLSCREEN_DISPLAY')
+          version,generation,baseline,owner=(2103453,39,2103452,'INFINITY_KODI_PAUSE_STOP_PLAY') if p453 else ((2103452,38,2103451,'INFINITY_KODI_P0_NATIVE') if p0 else (2103451,37,2103450,'INFINITY_PREVIEW_FULLSCREEN_DISPLAY'))
           require(a['candidate_versionCode']==version and a['generation']==generation,'EXACT_SELECTED_AUTHORITY')
           require(a['target_owners']==['INFINITY','CHOOSER_SHELL'] and a['update_kind']=='owner_update','EXACT_OWNER_UPDATE')
           require(a['owner_update_evidence']['owner']==owner,'EXACT_APPROVED_SCOPE')
-          if p0:
+          if p0 or p453:
               require(a['owner_update_evidence']['Android']=='BLOCKED_NO_AUTHORIZED_COMPATIBLE_TARGET','TRUTHFUL_ANDROID_PENDING')
-              require(a['owner_update_evidence']['native_sha256']=='f89a40b5653c0091a06edd44f6ac5cdf056a649301b6751ee638c8ba88db9674','EXACT_COMPILED_NATIVE')
+              require(a['owner_update_evidence']['native_sha256']==('d0b6f115e839fbe39e764e2fecad47418c501ab1ece853294578652cd0b80b98' if p453 else 'f89a40b5653c0091a06edd44f6ac5cdf056a649301b6751ee638c8ba88db9674'),'EXACT_COMPILED_NATIVE')
           with open(os.environ['GITHUB_OUTPUT'],'a') as f:
               f.write('producer_run='+str(a['owner_update_evidence']['producer_run'])+'\n')
               f.write('version='+str(version)+'\ngeneration='+str(generation)+'\nbaseline='+str(baseline)+'\n')
-              f.write('baseline_run='+str(41568721264 if p0 else 41541654995)+'\n')
-              f.write('prepared_prefix='+('Infinity452' if p0 else 'Infinity451')+'\n')
+              f.write('baseline_run='+str(41742368066 if p453 else (41568721264 if p0 else 41541654995))+'\n')
+              f.write('prepared_prefix='+('Infinity453' if p453 else ('Infinity452' if p0 else 'Infinity451'))+'\n')
           PYCODE
           python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out SIGNER-ROUTES.json
       - uses: actions/download-artifact@v4
@@ -223,9 +298,11 @@ jobs:
           python3 - "${{ steps.selected.outputs.producer_run }}" <<'PYCODE'
           import os,sys
           from pathlib import Path
+          p453=os.environ['GITHUB_REF']=='refs/heads/work/infinity-kodi-2103453-controlled-test-20261104'
           p0=os.environ['GITHUB_REF']=='refs/heads/work/infinity-kodi-2103451-checkpoint-anr-20261103'
-          sys.path.insert(0,'repairs/infinity-kodi-2103451-checkpoint-anr' if p0 else 'repairs/infinity-preview-2103450-fullscreen-display')
-          if p0: import release452 as r
+          sys.path.insert(0,'repairs/infinity-kodi-2103453-controlled-test' if p453 else ('repairs/infinity-kodi-2103451-checkpoint-anr' if p0 else 'repairs/infinity-preview-2103450-fullscreen-display'))
+          if p453: import release453 as r
+          elif p0: import release452 as r
           else: import release451 as r
           r.check_registered(Path('prepared-owner'),int(sys.argv[1]),Path('REGISTERED-CANDIDATE-CHECK.json'))
           PYCODE
@@ -258,7 +335,13 @@ jobs:
       - name: Signed predecessor-to-candidate exact member and original certificate comparison
         run: |
           set -euo pipefail
-          if [ "$GITHUB_REF" = 'refs/heads/work/infinity-kodi-2103451-checkpoint-anr-20261103' ]; then
+          if [ "$GITHUB_REF" = 'refs/heads/work/infinity-kodi-2103453-controlled-test-20261104' ]; then
+            python3 repairs/infinity-kodi-2103453-controlled-test/release453.py compare \
+              --baseline protected-baseline/Infinity-2103452-Combined-Original-Signer.apk \
+              --candidate signed-combined/Infinity-2103453-Combined-Original-Signer.apk \
+              --out signed-combined/preservation --sdk "$ANDROID_HOME/build-tools/35.0.0"
+            cp -r prepared-owner/recovery signed-combined/
+          elif [ "$GITHUB_REF" = 'refs/heads/work/infinity-kodi-2103451-checkpoint-anr-20261103' ]; then
             python3 repairs/infinity-kodi-2103451-checkpoint-anr/release452.py compare \
               --baseline protected-baseline/Infinity-2103451-Combined-Original-Signer.apk \
               --candidate signed-combined/Infinity-2103452-Combined-Original-Signer.apk \

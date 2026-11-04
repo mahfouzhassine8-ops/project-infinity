@@ -37,9 +37,16 @@
       "path": ".github/workflows/infinity-kodi451-p0-native-build.yml",
       "source": "7bcc698d5b89f1cfe9d020bafc89b85a78f94c7c",
       "workflow_sha256": "20146190d32597abc4d17db2db6160e307e249834f487940bc1338dee4335f74"
+    },
+    {
+      "id": 406545245,
+      "path": ".github/workflows/infinity-kodi452-pause-stop-arm64.yml",
+      "source": "24c6eeb30a6fbc65546a9945a87ca19500694f31",
+      "workflow_sha256": "54c3bc268bfd1295973917da5a42e15931751c61e416aac7cad77da658c348ef",
+      "original_key_access": false
     }
   ],
-  "audit_workflows": 617,
+  "audit_workflows": 618,
   "retired_original_key_workflows": [
     {
       "id": 370925114,
@@ -2753,7 +2760,8 @@
     398401582,
     404063472,
     406247408,
-    406270295
+    406270295,
+    406545245
   ],
   "schema": 1,
   "scope": "Retire historical workflows with access to the original permanent signing secret; preserve their files, runs, artifacts and every locked ref",
