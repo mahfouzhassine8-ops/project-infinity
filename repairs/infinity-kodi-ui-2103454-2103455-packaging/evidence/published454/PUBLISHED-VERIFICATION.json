@@ -1,0 +1,107 @@
+{
+  "Android": "NOT_RUN",
+  "DEX_unchanged": 5,
+  "Scudo": "UNRESOLVED_NOT_CHANGED",
+  "accepted": false,
+  "apk_name": "Infinity-2103454-Combined-Original-Signer.apk",
+  "apk_sha256": "db8dd757343d2e321b4f0964e99dd479017d3f52428e85f982685acaf36945fa",
+  "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "changed_existing": [
+    "AndroidManifest.xml",
+    "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1",
+    "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1.sig",
+    "assets/addons/script.infinity.commandcenter/addon.xml",
+    "assets/addons/script.infinity.commandcenter/service.py",
+    "assets/addons/skin.infinity.diggz/Infinity-Protected-Manifest.json",
+    "assets/addons/skin.infinity.diggz/addon.xml",
+    "assets/addons/skin.infinity.diggz/infinity-skin.json",
+    "assets/addons/skin.infinity.diggz/unified/Custom_1198_InfinityNav.xml",
+    "assets/addons/skin.infinity.diggz/unified/Includes.xml",
+    "assets/addons/skin.infinity.diggz/unified/MyVideoNav.xml",
+    "assets/experience-component-updates.properties"
+  ],
+  "component_artifact": {
+    "digest": "sha256:c78433294133e47c040d17fa1f72550a975a9ebf982544f48a587ed9433703ce",
+    "expires_at": "2027-02-02T19:48:46Z",
+    "id": 13358915535,
+    "name": "Infinity-Combined-Owner-Components-41900547905"
+  },
+  "components": {
+    "CHOOSER_SHELL": {
+      "dex": {
+        "classes.dex": "8cbfe62eae167e4441462cf5be970dbfbb2cc96e068134a39e12b61c64223118"
+      },
+      "exceptions": [],
+      "payload_members": 1,
+      "sha256": "b2265bce05551ebee4db2c31678065d05864354d4cab4214bb1b4a16487c89ac",
+      "version": "2103454.chooser_shell.1"
+    },
+    "COBRA": {
+      "dex": {
+        "classes4.dex": "8286747329a4f1a572dc5e85c27239c3cfef24d8be81f1fbee770be4ba1e9584",
+        "classes5.dex": "70dc429bff4d2df7fe19907100d5df39d5ade973aa2679328b42d567b3d5aee1"
+      },
+      "exceptions": [],
+      "payload_members": 11,
+      "sha256": "f63d4c1e491dc94591c5623bf02be90d4f9c187b91a0511b36398ee96745f8a8",
+      "version": "2103445.cobra.1"
+    },
+    "INFINITY": {
+      "dex": {
+        "classes3.dex": "5634f2376e5d0bf6176ebef6fa1ac16bb22fdecc1d018ac078f266bb757fe9b8"
+      },
+      "exceptions": [],
+      "payload_members": 7523,
+      "sha256": "63f70204487d697cf42db349327499dab5b9a2b90add3593e208ab5803a883d8",
+      "version": "2103454.infinity.1"
+    },
+    "MINIMAL_ANDROID_CONTRACT": {
+      "dex": {
+        "classes2.dex": "2e8fa1ae27e670db0525d31a655e93d861893fa20316d5c54a4c6283a97ca304"
+      },
+      "exceptions": [
+        "AndroidManifest.xml: only typed assembly versionCode differs"
+      ],
+      "payload_members": 81,
+      "sha256": "1c4a2890ef5ca8665b86b148dd293c06a56d76ec846de1e0c9c037a3b0151a25",
+      "version": "2103447.minimal_android_contract.1"
+    }
+  },
+  "installed": false,
+  "locked": false,
+  "module_files": 77,
+  "native_unchanged": 47,
+  "new_members": [
+    "assets/addons/script.infinity.commandcenter/media_view.py",
+    "assets/addons/skin.infinity.diggz/resources/lib/infinity_library_navigation.py",
+    "assets/addons/skin.infinity.diggz/unified/Includes_InfinityMediaLists.xml",
+    "assets/addons/skin.infinity.diggz/unified/Includes_InfinityVideoOptions.xml",
+    "assets/addons/skin.infinity.diggz/unified/custom_1136_InfinityVideoViews.xml",
+    "assets/addons/skin.infinity.diggz/unified/custom_1137_InfinityVideoViewSettings.xml",
+    "assets/addons/skin.infinity.diggz/unified/custom_1138_InfinityVideoDisableViews.xml"
+  ],
+  "original_module_signature": "VERIFIED",
+  "original_native_sha256": "d0b6f115e839fbe39e764e2fecad47418c501ab1ece853294578652cd0b80b98",
+  "package": "com.projectinfinity.kodi",
+  "physical_Fold": "PENDING",
+  "physical_recovery": "PENDING",
+  "producer_source": "7057045f98a73bea010fe454667f7046caf9fdc6",
+  "protected_members": 7602,
+  "recovery_host_checks": 20,
+  "run_id": 41900547905,
+  "signature_schemes": [
+    "v1",
+    "v2",
+    "v3"
+  ],
+  "signed_artifact": {
+    "digest": "sha256:fec74c9131307e0943bc4176eb516d6d039ed09829f428033c0044ebcc04adbc",
+    "expires_at": "2027-02-02T19:48:46Z",
+    "id": 13359155363,
+    "name": "Infinity-Combined-Original-Signer-41900547905"
+  },
+  "skin_records": 948,
+  "source": "8986dfa23e387b4597f19feca54d9388f7512ba8",
+  "status": "PASS_PUBLISHED_ORIGINAL_SIGNED_UI_OR_RECOVERY",
+  "versionCode": 2103454
+}

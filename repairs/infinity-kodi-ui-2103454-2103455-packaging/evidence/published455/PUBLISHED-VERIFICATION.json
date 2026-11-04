@@ -1,0 +1,95 @@
+{
+  "Android": "NOT_RUN",
+  "DEX_unchanged": 5,
+  "Scudo": "UNRESOLVED_NOT_CHANGED",
+  "accepted": false,
+  "apk_name": "Infinity-2103455-Combined-Original-Signer.apk",
+  "apk_sha256": "1065bc5e26ed06f62cedd483597ba5cb41d4917222ffbc304d93be70e7648772",
+  "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "changed_existing": [
+    "AndroidManifest.xml",
+    "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1",
+    "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1.sig",
+    "assets/addons/script.infinity.commandcenter/addon.xml",
+    "assets/addons/skin.infinity.diggz/Infinity-Protected-Manifest.json",
+    "assets/addons/skin.infinity.diggz/addon.xml",
+    "assets/addons/skin.infinity.diggz/infinity-skin.json",
+    "assets/experience-component-updates.properties"
+  ],
+  "component_artifact": {
+    "digest": "sha256:c83d7cd9067e589a95603775297c5ed4001fc69443e0f8d19481bd0c072e2a36",
+    "expires_at": "2027-02-02T19:54:54Z",
+    "id": 13358161664,
+    "name": "Infinity-Combined-Owner-Components-41901526958"
+  },
+  "components": {
+    "CHOOSER_SHELL": {
+      "dex": {
+        "classes.dex": "8cbfe62eae167e4441462cf5be970dbfbb2cc96e068134a39e12b61c64223118"
+      },
+      "exceptions": [],
+      "payload_members": 1,
+      "sha256": "a335b2fa4f099213649bafac9a71a28ad64c879e8a4dcbd78bb41260903dd953",
+      "version": "2103455.chooser_shell.1"
+    },
+    "COBRA": {
+      "dex": {
+        "classes4.dex": "8286747329a4f1a572dc5e85c27239c3cfef24d8be81f1fbee770be4ba1e9584",
+        "classes5.dex": "70dc429bff4d2df7fe19907100d5df39d5ade973aa2679328b42d567b3d5aee1"
+      },
+      "exceptions": [],
+      "payload_members": 11,
+      "sha256": "f63d4c1e491dc94591c5623bf02be90d4f9c187b91a0511b36398ee96745f8a8",
+      "version": "2103445.cobra.1"
+    },
+    "INFINITY": {
+      "dex": {
+        "classes3.dex": "5634f2376e5d0bf6176ebef6fa1ac16bb22fdecc1d018ac078f266bb757fe9b8"
+      },
+      "exceptions": [],
+      "payload_members": 7516,
+      "sha256": "b82e0ecd65fcfb1d3db9adc79845ae1bfecc1e4216e0f286662a9722b8a0adf8",
+      "version": "2103455.infinity.1"
+    },
+    "MINIMAL_ANDROID_CONTRACT": {
+      "dex": {
+        "classes2.dex": "2e8fa1ae27e670db0525d31a655e93d861893fa20316d5c54a4c6283a97ca304"
+      },
+      "exceptions": [
+        "AndroidManifest.xml: only typed assembly versionCode differs"
+      ],
+      "payload_members": 81,
+      "sha256": "1c4a2890ef5ca8665b86b148dd293c06a56d76ec846de1e0c9c037a3b0151a25",
+      "version": "2103447.minimal_android_contract.1"
+    }
+  },
+  "installed": false,
+  "locked": false,
+  "module_files": 76,
+  "native_unchanged": 47,
+  "new_members": [],
+  "original_module_signature": "VERIFIED",
+  "original_native_sha256": "d0b6f115e839fbe39e764e2fecad47418c501ab1ece853294578652cd0b80b98",
+  "package": "com.projectinfinity.kodi",
+  "physical_Fold": "PENDING",
+  "physical_recovery": "PENDING",
+  "producer_source": "7057045f98a73bea010fe454667f7046caf9fdc6",
+  "protected_members": 7602,
+  "recovery_host_checks": 20,
+  "run_id": 41901526958,
+  "signature_schemes": [
+    "v1",
+    "v2",
+    "v3"
+  ],
+  "signed_artifact": {
+    "digest": "sha256:49379996ddff3d8efad1069d1f14cc44af137b234e8f0203a6975a8e61c57195",
+    "expires_at": "2027-02-02T19:54:54Z",
+    "id": 13358381510,
+    "name": "Infinity-Combined-Original-Signer-41901526958"
+  },
+  "skin_records": 942,
+  "source": "03d788a78481911a9648fa1c4a30e6e4424d022e",
+  "status": "PASS_PUBLISHED_ORIGINAL_SIGNED_UI_OR_RECOVERY",
+  "versionCode": 2103455
+}

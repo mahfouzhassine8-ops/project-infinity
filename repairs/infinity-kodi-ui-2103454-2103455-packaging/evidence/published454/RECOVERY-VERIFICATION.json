@@ -1,0 +1,100 @@
+{
+  "Android": "NOT_RUN_NO_CONNECTED_COMPATIBLE_TARGET",
+  "Scudo": "UNRESOLVED_NOT_CHANGED",
+  "accepted_pointer_updated": false,
+  "checks": [
+    {
+      "check": "actual_original_key_adapter_installs_candidate",
+      "result": "PASS"
+    },
+    {
+      "check": "native_module_verifier_accepts_installed_candidate",
+      "result": "PASS"
+    },
+    {
+      "check": "interrupted_recovery_is_reported_not_success",
+      "result": "PASS"
+    },
+    {
+      "check": "interruption_occurred_after_source_write_before_manifest_commit",
+      "result": "PASS"
+    },
+    {
+      "check": "same_recovery_resumes_interrupted_write",
+      "result": "PASS"
+    },
+    {
+      "check": "native_module_verifier_accepts_recovery",
+      "result": "PASS"
+    },
+    {
+      "check": "all_recovery_signed_files_installed_exactly",
+      "result": "PASS"
+    },
+    {
+      "check": "previous_authenticated_generation_backed_up",
+      "result": "PASS"
+    },
+    {
+      "check": "userdata_sentinel_preserved",
+      "result": "PASS"
+    },
+    {
+      "check": "older_module_does_not_replace_recovery",
+      "result": "PASS"
+    },
+    {
+      "check": "candidate_helper_retained_without_destructive_cleanup",
+      "result": "PASS"
+    },
+    {
+      "check": "leftover_helper_rejected_by_original_import_contract",
+      "result": "PASS"
+    },
+    {
+      "check": "unknown_source_refused_without_overwrite",
+      "result": "PASS"
+    },
+    {
+      "check": "invalid_original_signature_refused_without_writes",
+      "result": "PASS"
+    },
+    {
+      "check": "no_user_data_loss_after_all_negative_cases",
+      "result": "PASS"
+    },
+    {
+      "check": "restored_source_has_no_candidate_helper_or_window_routes",
+      "result": "PASS"
+    },
+    {
+      "check": "retained_dialog_1137_has_no_auto_visibility",
+      "result": "PASS"
+    },
+    {
+      "check": "retained_dialog_1138_has_no_auto_visibility",
+      "result": "PASS"
+    },
+    {
+      "check": "retained_dialog_1136_has_no_auto_visibility",
+      "result": "PASS"
+    },
+    {
+      "check": "exact_three_candidate_only_dialogs",
+      "result": "PASS"
+    }
+  ],
+  "installer_source_sha256": "3763a9dce6e9c0cafbefb4a967e76230e134ed2ecb67bdc4961676df061729bb",
+  "limits": [
+    "Host POSIX adapter execution validates original installer algorithm/JCA signatures, not Android ABI or actual Fold installation.",
+    "Retained first-party helper is denied by restored authenticated import contract; baseline routes do not reach candidate-only skin code and modal dialogs have no automatic visibility.",
+    "This is not a sandbox claim against deliberate manual RunScript/ActivateWindow calls or third-party scripts with arbitrary execution privileges.",
+    "Actual installed skin generation selection, window registration and install-over recovery require physical Android verification.",
+    "Cannot recover unsaved in-memory data; unresolved checkpoint obligations remain blocking."
+  ],
+  "original_key_replaced": false,
+  "physical_recovery": "PENDING",
+  "source_template_sha256": "ee66ede93c32e9282b042817f894ccef96f83a25b465234e1e70b48ea81eb0bf",
+  "status": "PASS_ORIGINAL_KEY_HOST_RECOVERY_AND_ENTRY_REACHABILITY",
+  "userdata_accessed": "Disposable sentinel only; no real profile or database opened"
+}
