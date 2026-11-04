@@ -16,7 +16,7 @@ The APK ZIP contains the actual `.apk`, signing receipt and complete preservatio
 | 2103454 | `db8dd757343d2e321b4f0964e99dd479017d3f52428e85f982685acaf36945fa` |
 | 2103455 | `1065bc5e26ed06f62cedd483597ba5cb41d4917222ffbc304d93be70e7648772` |
 
-Full APK/component hashes: [SHA256SUMS.txt](SHA256SUMS.txt).
+Full APK/component hashes: [SHA256SUMS.txt](SHA256SUMS.txt), with files grouped under `2103454/` and `2103455/`. Each artifact also includes its own checksum file.
 
 Original certificate SHA-256: `d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7`. One original 4096-bit RSA signer; v1/v2/v3 signatures verified on the actual published APKs. Package remains `com.projectinfinity.kodi`, ARM64. All manifest fields except versionCode are unchanged. The unchanged signing workflow checks 16 KiB native/4-byte ZIP alignment after signing. These establish package compatibility, not successful Android installation.
 
