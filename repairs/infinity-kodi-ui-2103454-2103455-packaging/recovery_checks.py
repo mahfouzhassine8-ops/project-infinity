@@ -46,8 +46,13 @@ def verify_recovery(baseline,out,verifier):
         check('actual_original_key_adapter_installs_candidate',first.returncode==0 and 'VERIFIED_VERSION=0.3.5.55' in first.stdout)
         check('native_module_verifier_accepts_installed_candidate',subprocess.run([str(verifier),str(addons),str(r.FIRST/'ORIGINAL-INFINITY-PUBLIC-KEY.pem')],capture_output=True).returncode==0)
         old_manifest=r.file_sha(addons/r.module_bundle.CC/r.module_bundle.MANIFEST)
-        fail=call(2103455,fail=3)
+        # Metadata backups (2), addon backup (1), addon replacement (1), then
+        # interrupt the next write: exercise a genuinely mixed code generation.
+        fail=call(2103455,fail=5)
         check('interrupted_recovery_is_reported_not_success',fail.returncode!=0 and 'Injected host atomic-write failure' in fail.stderr)
+        check('interruption_occurred_after_source_write_before_manifest_commit',
+              b'version="0.3.5.56"' in (addons/r.module_bundle.CC/'addon.xml').read_bytes()
+              and r.file_sha(addons/r.module_bundle.CC/r.module_bundle.MANIFEST)==old_manifest)
         recovered=call(2103455)
         check('same_recovery_resumes_interrupted_write',recovered.returncode==0 and 'VERIFIED_VERSION=0.3.5.56' in recovered.stdout)
         check('native_module_verifier_accepts_recovery',subprocess.run([str(verifier),str(addons),str(r.FIRST/'ORIGINAL-INFINITY-PUBLIC-KEY.pem')],capture_output=True).returncode==0)
