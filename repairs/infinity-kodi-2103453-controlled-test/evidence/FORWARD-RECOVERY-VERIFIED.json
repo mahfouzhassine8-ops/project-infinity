@@ -1,0 +1,24 @@
+{
+  "Android_tested": false,
+  "accepted_pointer_updated": false,
+  "actual_original_authority_transition_passed": true,
+  "baseline_apk_sha256": "efc24cc53e25675360bb70a2c8c0122cfc107f99035d04c957265d08206f6729",
+  "candidate_unsigned_sha256": "05a03793e9473870efe10554815638e4b863e9b0cdec23d7223e797daf40990e",
+  "changed_members_from452": [
+    "AndroidManifest.xml",
+    "assets/experience-component-updates.properties"
+  ],
+  "data_schema_unchanged": true,
+  "future_signing": "Separate explicit recovery authorization; recheck next unused higher version, official preparation, owner/source gates and original signer.",
+  "installed_candidate_version": 2103453,
+  "limits": "Unsigned package/authority rehearsal only. Cannot recover unsaved in-memory writes. Never install during unresolved persistence or force termination.",
+  "preserved_payload_members": 7612,
+  "recovery_unsigned_sha256": "403c6c891a2bad23605acf8fc78c848f551344faef32c18214a99ba1af006701",
+  "recovery_version_rehearsed": 2103454,
+  "restored_native_sha256": "f89a40b5653c0091a06edd44f6ac5cdf056a649301b6751ee638c8ba88db9674",
+  "signed_or_installed": false,
+  "signed_recovery_available": false,
+  "source": "d4a843853922ca9da338cfeaa77dfd7734c6dc87",
+  "status": "PASS_UNSIGNED_FORWARD_RECOVERY_REHEARSAL",
+  "user_data_accessed": false
+}
