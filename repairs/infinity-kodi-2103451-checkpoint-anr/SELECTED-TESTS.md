@@ -246,3 +246,23 @@ only after registration passes. Original pre-sign ownership, source/authority,
 sole-signer, certificate, alignment and post-sign payload checks remain mandatory.
 No Android/shutdown workflow is selected by packaging; physical testing follows
 the independently supplied procedure. No release lock/promotion is selected.
+
+## Published signed452 byte verification — selected after signing success
+
+Official original-key run41742368066 completed successfully at source
+f5b6dbb22bfa0f0ee3d540f7566baa06128e07ac. Select SHA256/CRC verification and safe
+extraction of actual signed artifact13282546349 (archive SHA47645c969808b2ea1cb1097e710802f63cd4b4709c26d965e5cb10b070058528)
+and component artifact13282361545 (archive SHAded88066027f024f3f71e254bc4efb9e35fdc74d7b28821b3c64cacf8968553c).
+
+Then select only:
+
+```
+PYTHONDONTWRITEBYTECODE=1 python3 repairs/infinity-kodi-2103451-checkpoint-anr/verify_published452.py --signed /tmp/kodi452-published-signed --components /tmp/kodi452-published-components --baseline /tmp/kodi451-signed-baseline/Infinity-2103451-Combined-Original-Signer.apk --out /tmp/kodi452-published-verification
+```
+
+Verify official run/source, actual APK hash and original SDK certificate/schemes
+bound to those bytes, strict three-member preservation, each published component
+payload/DEX against the actual signed APK, exact frozen ZIPs, truthful blocked
+Android/pending Fold status and no acceptance update. Save all five deliverable
+SHA256 values. This is post-publication artifact verification, not an Android or
+shutdown test; do not repeat the native/host behavior suites.

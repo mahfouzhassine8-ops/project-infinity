@@ -252,3 +252,29 @@ capability, VPN or TCP grants. See ANDROID-ACCESS-BLOCKER.md. Actual Android
 checkpoint/database/display/ANR scenarios are BLOCKED. Do not repeat the known
 translated-constructor failure or sign a successor based on compilation alone.
 Preserve the native build/tests, Unknown historical job973/token976 and all locks.
+
+
+## Signed physical-test candidate452 delivered — 2026-11-04 UTC
+
+The user's continuation explicitly authorizes a safe physical-testing candidate
+with Android pending. Existing policy separates packaging and behavioral tests.
+No mandatory integrity/signature/ownership/persistence safeguard was waived.
+The original combined signer completed run41742368066 at source
+f5b6dbb22bfa0f0ee3d540f7566baa06128e07ac after official owner preparation41741416133.
+The original signer implementation is unchanged. Candidate452 uses the already
+compiled native f89a40b...; no native rebuild or additional production repair.
+
+Both actual published artifacts were downloaded through the supported GitHub
+broker, archive SHA/CRC verified, and every component/DEX matched to the signed
+APK. Signed APK SHA is efc24cc53e25675360bb70a2c8c0122cfc107f99035d04c957265d08206f6729.
+Only libkodi plus typed manifest version and truthful owner-version property
+change. All5 DEX,46 other native libraries and7611 other payload members are exact.
+Cobra and minimal-contract ZIPs are exact baseline;119 protected contracts and
+accepted pointer remain unchanged. See DELIVERY452.md, checksums and published
+verification evidence. Physical Fold procedure is provided separately.
+
+Android/runtime/shutdown/ANR tests remain NOT RUN/PENDING physical Fold; native
+and host successes do not establish acceptance. The historical job973/token976
+route remains UNKNOWN; unreviewed obligations remain blocking. No process was
+force-stopped, no data reset/migration performed, no key replaced and no release
+lock/promote action taken. Preserve all prior evidence and451 recovery baseline.
