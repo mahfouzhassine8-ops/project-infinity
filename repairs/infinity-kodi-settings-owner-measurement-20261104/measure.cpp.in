@@ -1,0 +1,112 @@
+// All snapshots/output happen after measured functions release their settings/registry locks.
+struct Snapshot {
+ uint64_t operation,registry,liveRegistry,dirty,expired,pending,created,destroyed;
+ uint64_t baselineSize,baselineCapacity,pendingSize,pendingCapacity,fixtureValueCapacity;
+ uint64_t cppLive,cppPeak,allocations,glibcBytes,rssKiB,pssKiB,maxRssKiB;
+};
+uint64_t readMetric(const char* bytes,const char* key){
+ const char* p=std::strstr(bytes,key);unsigned long long value=0;
+ if(p)std::sscanf(p+std::strlen(key),"%llu",&value);return value;
+}
+Snapshot snapshot(size_t op){
+ Snapshot s{};s.operation=op;
+ {
+  std::lock_guard<std::mutex> lock(g_checkpointAddonMutex);
+  s.registry=g_checkpointAddonTrees.size();s.pending=g_checkpointAddonSaves.size();
+  for(const auto& row:g_checkpointAddonTrees){
+   s.baselineSize+=row.loadedBytes.size();s.baselineCapacity+=row.loadedBytes.capacity();
+   if(row.dirtyOwner)++s.dirty;
+   if(auto owner=row.settings.lock()){++s.liveRegistry;s.fixtureValueCapacity+=owner->valueCapacity();}
+   else ++s.expired;
+  }
+  for(const auto& row:g_checkpointAddonSaves){s.pendingSize+=row.second.bytes.size();s.pendingCapacity+=row.second.bytes.capacity();}
+ }
+ s.created=Observation::ownersCreated;s.destroyed=Observation::ownersDestroyed;
+ s.cppLive=Heap::live.load();s.cppPeak=Heap::peak.load();s.allocations=Heap::calls.load();
+ const auto heap=mallinfo2();s.glibcBytes=heap.uordblks+heap.hblkhd;
+ char buffer[8192]{};
+ int fd=::open("/proc/self/smaps_rollup",O_RDONLY|O_CLOEXEC);
+ if(fd>=0){const ssize_t n=::read(fd,buffer,sizeof(buffer)-1);::close(fd);if(n>0){s.rssKiB=readMetric(buffer,"\nRss:");s.pssKiB=readMetric(buffer,"\nPss:");}}
+ rusage usage{};getrusage(RUSAGE_SELF,&usage);s.maxRssKiB=usage.ru_maxrss;return s;
+}
+void print(const Snapshot& s){
+ std::cout<<"{\"operation\":"<<s.operation<<",\"registry\":"<<s.registry<<",\"live_registry\":"<<s.liveRegistry<<",\"dirty\":"<<s.dirty<<",\"expired\":"<<s.expired
+ <<",\"pending\":"<<s.pending<<",\"created\":"<<s.created<<",\"destroyed\":"<<s.destroyed
+ <<",\"baseline_size\":"<<s.baselineSize<<",\"baseline_capacity\":"<<s.baselineCapacity
+ <<",\"pending_size\":"<<s.pendingSize<<",\"pending_capacity\":"<<s.pendingCapacity
+ <<",\"fixture_value_capacity\":"<<s.fixtureValueCapacity
+ <<",\"cpp_live_requested_bytes\":"<<s.cppLive<<",\"cpp_peak_requested_bytes\":"<<s.cppPeak<<",\"cpp_allocations\":"<<s.allocations
+ <<",\"glibc_allocated_bytes\":"<<s.glibcBytes<<",\"rss_kib\":"<<s.rssKiB<<",\"pss_kib\":"<<s.pssKiB<<",\"max_rss_kib\":"<<s.maxRssKiB<<"}";
+}
+void loadOwner(const std::shared_ptr<ADDON::CAddonSettings>& owner,const std::string& path){
+ const auto start=Observation::Clock::now();
+ TrackCreatedAddonTree(owner,path);
+ TrackLoadedAddonTree(owner,path);
+ Observation::record(owner->ownerId,1,Observation::elapsed(start));
+}
+void ordinarySaveBoundary(const std::shared_ptr<ADDON::CAddonSettings>& owner,const std::string& path,size_t operation){
+ const auto start=Observation::Clock::now();
+ // Fixture supplies an actual changed, loaded setting at the native callback boundary.
+ owner->mutate(operation);
+ InfinityAndroidCheckpoint::MarkAddonSettingsManagerDirty(owner->GetSettingsManager());
+ CXBMCTinyXML doc;assert(owner->Save(doc));
+ TrackAddonSave(owner,path,doc);
+ // Normal file-save success is a supplied peer, NOT an asserted disk/checkpoint durability result.
+ assert(ConfirmAddonSave(owner,path,doc));
+ Observation::record(owner->ownerId,2,Observation::elapsed(start));
+}
+int main(int argc,char** argv){
+ assert(argc==3);
+ const std::string mode=argv[1];
+ Observation::enabled=std::string(argv[2])=="on";
+ assert(mode=="clean_fresh"||mode=="dirty_reused"||mode=="dirty_fresh"||mode=="transient_large");
+ const size_t iterations=mode=="transient_large"?4:128;
+ const size_t count=mode=="transient_large"?1:16;
+ const size_t bytes=mode=="transient_large"?4194304:4096;
+ const std::string path="/synthetic-settings-owner-only/settings.xml"; // never opened, never logged
+ Snapshot samples[8]{};size_t sampleCount=0;
+ samples[sampleCount++]=snapshot(0);
+ Heap::peak.store(Heap::live.load());
+ uint64_t loopNs=0;
+ std::shared_ptr<ADDON::CAddonSettings> reused;
+ if(mode=="dirty_reused"){
+  reused=std::make_shared<ADDON::CAddonSettings>(count,bytes);
+  loadOwner(reused,path);
+ }
+ for(size_t i=1;i<=iterations;++i){
+   const auto start=Observation::Clock::now();
+   {
+    auto owner=reused?reused:std::make_shared<ADDON::CAddonSettings>(count,bytes);
+    if(!reused)loadOwner(owner,path);
+    if(mode=="dirty_reused"||mode=="dirty_fresh")ordinarySaveBoundary(owner,path,i);
+   }
+   loopNs+=Observation::elapsed(start);
+   if(i==1||i==iterations||i==iterations/4||i==iterations/2)samples[sampleCount++]=snapshot(i);
+ }
+ reused.reset();
+ const Snapshot final=snapshot(iterations);
+ if(mode=="clean_fresh"||mode=="transient_large"){
+  assert(final.registry==1&&final.dirty==0&&final.liveRegistry==0&&final.expired==1&&final.destroyed==iterations);
+  assert(Observation::serializations==iterations);
+ }else if(mode=="dirty_fresh"){
+  assert(final.registry==iterations&&final.dirty==iterations&&final.liveRegistry==iterations&&final.pending==1&&final.destroyed==0);
+  assert(Observation::serializations==iterations*2);
+ }else{
+  assert(final.registry==1&&final.dirty==1&&final.liveRegistry==1&&final.pending==1&&final.destroyed==0);
+  assert(Observation::serializations==iterations+1);
+ }
+ assert(Observation::dropped==0);
+ std::cout<<"{\"scenario\":\""<<mode<<"\",\"observer\":\""<<(Observation::enabled?"on":"off")<<"\",\"addon\":\"diagnostic.synthetic.settings\",\"owners_are_synthetic\":true"
+ <<",\"iterations\":"<<iterations<<",\"settings_per_owner\":"<<count<<",\"value_bytes_each\":"<<bytes<<",\"loop_ns\":"<<loopNs
+ <<",\"serializations\":"<<Observation::serializations<<",\"serialized_bytes_total\":"<<Observation::serializedBytes<<",\"max_serialized_bytes\":"<<Observation::maxSerialized
+ <<",\"serialization_ns\":"<<Observation::serializationNs<<",\"observer_fixed_bytes\":"<<sizeof(Observation::rows)<<",\"observer_records\":"<<Observation::rowCount<<",\"observer_dropped\":"<<Observation::dropped
+ <<",\"snapshots\":[";
+ for(size_t i=0;i<sampleCount;++i){if(i)std::cout<<",";print(samples[i]);}
+ std::cout<<"],\"final\":";print(final);
+ std::cout<<",\"rows\":[";
+ for(size_t i=0;i<Observation::rowCount;++i){if(i)std::cout<<",";const auto& r=Observation::rows[i];
+   std::cout<<"{\"owner\":"<<r.owner<<",\"stage\":"<<r.stage<<",\"duration_ns\":"<<r.duration<<",\"cpp_live\":"<<r.cppLive<<",\"cpp_peak\":"<<r.cppPeak<<"}";}
+ std::cout<<"]}\n";
+ // Process/test object destruction only; never invoke a checkpoint, deletion or production teardown.
+ return 0;
+}

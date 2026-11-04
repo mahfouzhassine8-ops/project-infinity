@@ -1,0 +1,37 @@
+In file included from /tmp/infinity-settings-measurement-20261104/measurement.cpp:2:
+/tmp/infinity-settings-measurement-20261104/deps/tinyxml-2.6.2_2/include/tinyxml.h:1450:29: warning: ‘virtual const char* TiXmlDocument::Parse(const char*, TiXmlParsingData*, TiXmlEncoding)’ was hidden [-Woverloaded-virtual=]
+ 1450 |         virtual const char* Parse( const char* p, TiXmlParsingData* data = 0, TiXmlEncoding encoding = TIXML_DEFAULT_ENCODING );
+      |                             ^~~~~
+/tmp/infinity-settings-measurement-20261104/measurement.cpp:79:8: note:   by ‘bool CXBMCTinyXML::Parse(const std::string&)’
+   79 |   bool Parse(const std::string& text) { TiXmlDocument::Parse(text.c_str(),nullptr,TIXML_ENCODING_UTF8);return !Error(); }
+      |        ^~~~~
+/tmp/infinity-settings-measurement-20261104/measurement.cpp: In function ‘uint64_t readMetric(const char*, const char*)’:
+/tmp/infinity-settings-measurement-20261104/measurement.cpp:474:2: warning: this ‘if’ clause does not guard... [-Wmisleading-indentation]
+  474 |  if(p)std::sscanf(p+std::strlen(key),"%llu",&value);return value;
+      |  ^~
+/tmp/infinity-settings-measurement-20261104/measurement.cpp:474:53: note: ...this statement, but the latter is misleadingly indented as if it were guarded by the ‘if’
+  474 |  if(p)std::sscanf(p+std::strlen(key),"%llu",&value);return value;
+      |                                                     ^~~~~~
+/tmp/infinity-settings-measurement-20261104/measurement.cpp: At global scope:
+/tmp/infinity-settings-measurement-20261104/measurement.cpp:445:6: warning: ‘void {anonymous}::TrackAddonDeletion(const std::string&)’ defined but not used [-Wunused-function]
+  445 | void TrackAddonDeletion(const std::string& path)
+      |      ^~~~~~~~~~~~~~~~~~
+/tmp/infinity-settings-measurement-20261104/deps/tinyxml-2.6.2_2/src/tinyxmlparser.cpp: In static member function ‘static void TiXmlBase::ConvertUTF32ToUTF8(long unsigned int, char*, int*)’:
+/tmp/infinity-settings-measurement-20261104/deps/tinyxml-2.6.2_2/src/tinyxmlparser.cpp:113:31: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  113 |                         input >>= 6;
+      |                         ~~~~~~^~~~~
+/tmp/infinity-settings-measurement-20261104/deps/tinyxml-2.6.2_2/src/tinyxmlparser.cpp:114:17: note: here
+  114 |                 case 3:
+      |                 ^~~~
+/tmp/infinity-settings-measurement-20261104/deps/tinyxml-2.6.2_2/src/tinyxmlparser.cpp:117:31: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  117 |                         input >>= 6;
+      |                         ~~~~~~^~~~~
+/tmp/infinity-settings-measurement-20261104/deps/tinyxml-2.6.2_2/src/tinyxmlparser.cpp:118:17: note: here
+  118 |                 case 2:
+      |                 ^~~~
+/tmp/infinity-settings-measurement-20261104/deps/tinyxml-2.6.2_2/src/tinyxmlparser.cpp:121:31: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  121 |                         input >>= 6;
+      |                         ~~~~~~^~~~~
+/tmp/infinity-settings-measurement-20261104/deps/tinyxml-2.6.2_2/src/tinyxmlparser.cpp:122:17: note: here
+  122 |                 case 1:
+      |                 ^~~~

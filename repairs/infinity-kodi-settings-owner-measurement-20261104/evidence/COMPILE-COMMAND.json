@@ -1,0 +1,19 @@
+[
+  "g++",
+  "-std=c++17",
+  "-O2",
+  "-pthread",
+  "-DTIXML_USE_STL",
+  "-DTARGET_ANDROID",
+  "-Wall",
+  "-Wextra",
+  "-I",
+  "/tmp/infinity-settings-measurement-20261104/deps/tinyxml-2.6.2_2/include",
+  "/tmp/infinity-settings-measurement-20261104/measurement.cpp",
+  "/tmp/infinity-settings-measurement-20261104/deps/tinyxml-2.6.2_2/src/tinyxml.cpp",
+  "/tmp/infinity-settings-measurement-20261104/deps/tinyxml-2.6.2_2/src/tinyxmlparser.cpp",
+  "/tmp/infinity-settings-measurement-20261104/deps/tinyxml-2.6.2_2/src/tinyxmlerror.cpp",
+  "/tmp/infinity-settings-measurement-20261104/deps/tinyxml-2.6.2_2/src/tinystr.cpp",
+  "-o",
+  "/tmp/infinity-settings-measurement-20261104/measurement"
+]

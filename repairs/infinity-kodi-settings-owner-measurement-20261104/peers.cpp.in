@@ -1,0 +1,152 @@
+// Host-only measurement peers. No production file includes this unit.
+#include <tinyxml.h>
+#include <algorithm>
+#include <atomic>
+#include <cassert>
+#include <chrono>
+#include <cstddef>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <functional>
+#include <iostream>
+#include <map>
+#include <memory>
+#include <mutex>
+#include <new>
+#include <set>
+#include <shared_mutex>
+#include <sstream>
+#include <string>
+#include <vector>
+#include <fcntl.h>
+#include <unistd.h>
+#include <malloc.h>
+#include <sys/resource.h>
+
+namespace Heap {
+struct alignas(std::max_align_t) Header { size_t bytes; };
+std::atomic<size_t> live{0}, peak{0}, calls{0};
+void* allocate(size_t n) {
+  if(n>SIZE_MAX-sizeof(Header)) throw std::bad_alloc();
+  auto* p=static_cast<Header*>(std::malloc(sizeof(Header)+(n?n:1)));
+  if(!p) throw std::bad_alloc();
+  p->bytes=n;calls.fetch_add(1,std::memory_order_relaxed);
+  const size_t now=live.fetch_add(n,std::memory_order_relaxed)+n;
+  size_t was=peak.load(std::memory_order_relaxed);
+  while(now>was && !peak.compare_exchange_weak(was,now,std::memory_order_relaxed)){}
+  return p+1;
+}
+void release(void* value) noexcept {
+  if(!value)return;
+  auto* p=static_cast<Header*>(value)-1;
+  live.fetch_sub(p->bytes,std::memory_order_relaxed);std::free(p);
+}
+}
+void* operator new(size_t n){return Heap::allocate(n);}
+void* operator new[](size_t n){return Heap::allocate(n);}
+void operator delete(void* p) noexcept {Heap::release(p);}
+void operator delete[](void* p) noexcept {Heap::release(p);}
+void operator delete(void* p,size_t) noexcept {Heap::release(p);}
+void operator delete[](void* p,size_t) noexcept {Heap::release(p);}
+
+namespace Observation {
+using Clock=std::chrono::steady_clock;
+inline bool enabled=false;
+inline uint64_t serializations=0,serializedBytes=0,maxSerialized=0,serializationNs=0;
+inline uint64_t ownersCreated=0,ownersDestroyed=0;
+inline uint64_t elapsed(Clock::time_point start) {
+  return std::chrono::duration_cast<std::chrono::nanoseconds>(Clock::now()-start).count();
+}
+struct Row {uint64_t owner,stage,duration,cppLive,cppPeak;};
+inline Row rows[512]{};
+inline size_t rowCount=0,dropped=0;
+inline void record(uint64_t owner,uint64_t stage,uint64_t duration) {
+  if(!enabled)return;
+  if(rowCount<512) rows[rowCount++]={owner,stage,duration,Heap::live.load(),Heap::peak.load()};
+  else ++dropped;
+}
+}
+
+using CCriticalSection=std::recursive_mutex;
+using CSharedSection=std::shared_mutex;
+constexpr int LOGWARNING=1,LOGERROR=2;
+struct CLog {template<class... Args> static void Log(int,const char*,Args&&...){std::abort();}};
+struct Logger {template<class... Args> void error(const char*,Args&&...) const {std::abort();}};
+class CXBMCTinyXML: public TiXmlDocument {
+public:
+  // Synthetic ASCII fixture: real pinned TinyXML parser, without Kodi charset fallback peers.
+  bool Parse(const std::string& text) { TiXmlDocument::Parse(text.c_str(),nullptr,TIXML_ENCODING_UTF8);return !Error(); }
+};
+enum class SettingType{String,Action};
+class CSetting {
+public:
+ std::string key,value;
+ CSetting(size_t n,size_t bytes):key("synthetic_"+std::to_string(n)),value(bytes,'x'){}
+ bool IsReference()const{return false;}
+ SettingType GetType()const{return SettingType::String;}
+ const std::string& GetId()const{return key;}
+ bool IsDefault()const{return false;}
+ std::string ToString()const{return value;}
+};
+class CSettingGroup {
+public:std::vector<std::shared_ptr<CSetting>> values;
+ auto GetSettings()const{return values;}
+};
+class CSettingCategory {
+public:std::vector<std::shared_ptr<CSettingGroup>> values;
+ auto GetGroups()const{return values;}
+};
+class CSettingSection {
+public:std::vector<std::shared_ptr<CSettingCategory>> values;
+ auto GetCategories()const{return values;}
+};
+class CSettingsManager;
+class ISettingsValueSerializer {
+public:virtual ~ISettingsValueSerializer()=default;
+ virtual std::string SerializeValues(const CSettingsManager*)const=0;
+};
+class CSettingsManager {
+public:
+ mutable CSharedSection m_critical,m_settingsCritical;
+ bool m_initialized=true;
+ std::vector<std::shared_ptr<CSettingSection>> sections;
+ bool OnSettingsSaving()const{return true;}
+ void OnSettingsSaved()const{}
+ auto GetSections()const{return sections;}
+ int GetVersion()const{return 2;}
+ bool Save(const ISettingsValueSerializer*,std::string&)const;
+};
+class CSettingsBase {
+public:
+ mutable CCriticalSection m_critical;
+ bool m_initialized=true;
+ std::unique_ptr<CSettingsManager> storage=std::make_unique<CSettingsManager>();
+ CSettingsManager* m_settingsManager=storage.get();
+ bool SaveValuesToXml(CXBMCTinyXML&)const;
+};
+namespace ADDON {
+class CAddonSettings:public CSettingsBase {
+public:
+ uint64_t ownerId;
+ std::vector<std::shared_ptr<CSetting>> fixtureSettings;
+ CAddonSettings(size_t count,size_t bytes):ownerId(++Observation::ownersCreated) {
+   auto group=std::make_shared<CSettingGroup>();
+   for(size_t n=0;n<count;++n){auto s=std::make_shared<CSetting>(n,bytes);fixtureSettings.push_back(s);group->values.push_back(s);}
+   auto category=std::make_shared<CSettingCategory>();category->values.push_back(group);
+   auto section=std::make_shared<CSettingSection>();section->values.push_back(category);
+   m_settingsManager->sections.push_back(section);
+ }
+ ~CAddonSettings(){++Observation::ownersDestroyed;}
+ Logger logger;const Logger* m_logger=&logger;
+ bool IsLoaded()const{return true;}
+ const void* GetSettingsManager()const{return m_settingsManager;}
+ bool Save(CXBMCTinyXML&)const;
+ void mutate(size_t operation){fixtureSettings.front()->value[0]=(operation%2)?'y':'z';}
+ size_t valueCapacity()const{size_t bytes=0;for(const auto& s:fixtureSettings)bytes+=s->value.capacity();return bytes;}
+};
+}
+namespace InfinityAndroidCheckpoint {
+void MarkAddonSettingsManagerDirty(const void*);
+void RecordFailure(const char*,const char*){std::abort();}
+}

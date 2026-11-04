@@ -1,0 +1,58 @@
+{
+  "files": {
+    "xbmc/addons/Addon.cpp": {
+      "sha256": "1cba9747ee7c1638885df49d61c854b418a88572e4a3ea31d0bf5017d66c9de4",
+      "same_in451_and452": true
+    },
+    "xbmc/settings/SettingsValueXmlSerializer.h": {
+      "sha256": "803dc0de5c322378d7f1bdfa346a40d72f545e7ae8102dfc2ac26d298ec27f08",
+      "same_in451_and452": true
+    },
+    "xbmc/settings/SettingsValueXmlSerializer.cpp": {
+      "sha256": "5d46b89f89948b5e3af2a87dfc6a1a5ebf98135d4d05a81272458b2c6beefd6b",
+      "same_in451_and452": true
+    },
+    "xbmc/settings/lib/SettingDefinitions.h": {
+      "sha256": "b4292fe7ffba3d0fe61705aae677ba51e5eb2c64537241f00b48ca3dd2a2a0a7",
+      "same_in451_and452": true
+    },
+    "xbmc/settings/lib/SettingsManager.cpp": {
+      "sha256": "6f14955de92cb075418c3b361685083cc4ce675c82a782afebe07603e70ae750",
+      "same_in451_and452": true
+    },
+    "xbmc/settings/SettingsBase.cpp": {
+      "sha256": "e271c121b33ba901e74e75979e01e80dd9cccf9b70067ba7d028a8832a5bca14",
+      "same_in451_and452": true
+    },
+    "xbmc/addons/settings/AddonSettings.cpp": {
+      "sha256": "a11cfb9198a6914c869f2098db13dd156952f50f9ded24f344b2f38bceba78a5",
+      "same_in451_and452": true
+    }
+  },
+  "existing_test_extractor": {
+    "file": "/workspace/project-infinity/repairs/android-checkpoint-shutdown/native/test_runtime_file_saves.py",
+    "sha256": "ab2195232ca3ce160085be45bc8f04efd930e04d56fb0dd840df59406de5b4fb"
+  },
+  "generated_cpp_sha256": "caacc1398af83219184c400acab2ff6a464730cfe38a95734b85c6e9f621a333",
+  "unchanged_bodies": [
+    "owner registry helpers",
+    "CSettingsManager::Save",
+    "CSettingsBase::SaveValuesToXml",
+    "CAddonSettings::Save"
+  ],
+  "serializer_adaptor": "Only public entry renamed Original plus wrapper; original body unchanged; no extra serialization.",
+  "peers": [
+    "Synthetic CSettingsManager tree/locks/hooks and CAddonSettings owner construction",
+    "ASCII pinned TinyXML Parse, without Kodi charset detection",
+    "Normal file-save success supplied; no disk/durability claim"
+  ],
+  "excluded": [
+    "actual Kodi/Android",
+    "Scudo allocator",
+    "native settings load/deserialization",
+    "actual data/settings values",
+    "derived owner serialization overrides",
+    "shutdown coordinator",
+    "provider execution"
+  ]
+}

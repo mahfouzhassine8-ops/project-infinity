@@ -1,0 +1,54 @@
+{
+  "authorization": "One bounded diagnostic-only measurement pass; no APK rebuild/sign/release/lock or production repair.",
+  "recorded_utc": "2026-11-04T03:08:44.891628+00:00",
+  "source_checkpoint": "8b25b7d425e644d5af559580665d2499c61814b9",
+  "native_source": "authenticated 451/452 source; relevant registry and serializer files identical",
+  "method": "Reuse original extracted-function host infrastructure. Real owner-ledger bodies and pinned TinyXML/serializer; synthetic settings-manager peers. No application/shutdown run.",
+  "cases": [
+    {
+      "name": "clean_fresh",
+      "operations": 128,
+      "settings": 16,
+      "value_bytes_each": 4096
+    },
+    {
+      "name": "dirty_reused",
+      "operations": 128,
+      "settings": 16,
+      "value_bytes_each": 4096
+    },
+    {
+      "name": "dirty_fresh",
+      "operations": 128,
+      "settings": 16,
+      "value_bytes_each": 4096
+    },
+    {
+      "name": "transient_large",
+      "operations": 4,
+      "settings": 1,
+      "value_bytes_each": 4194304
+    }
+  ],
+  "overhead": "Three paired diagnostic-off/on executions per scenario, alternating order, one fixed run manifest. Measure numeric observer storage/clock overhead; heap accounting and final measurement snapshots common to both.",
+  "bounds": "24 isolated host processes, <=30 seconds each, <=120 seconds whole execution; fixed observation arrays; no allocator failure injection or application memory limits.",
+  "privacy": "Synthetic add-on/owner IDs only. No setting values, credentials, paths or media in results.",
+  "frozen": [
+    "native production tree",
+    "primary worktree/branch",
+    "all signed APKs",
+    "Cobra",
+    "Preview",
+    "persistence guards and checkpoint decisions"
+  ],
+  "not_selected": [
+    "Android/device tests",
+    "old21 host tests",
+    "shutdown/reopen tests",
+    "provider execution",
+    "APK/native-engine rebuild",
+    "Scudo crash recreation"
+  ],
+  "limits": "Host GNU allocator, not Android Scudo. No historical add-on attribution. Save success supplied at normal post-save boundary; no disk durability claim.",
+  "main_worktree_status": "?? repairs/cobra-2103442-end-to-end-quality-refresh/__pycache__/\n?? repairs/cobra-2103444-rotation-audio/__pycache__/\n?? repairs/infinity-2103445-external-video-lifecycle/\n?? repairs/infinity-preview-2103447-resume/__pycache__/\n?? repairs/infinity-preview-2103447-resume/android-qa/__pycache__/\n"
+}
