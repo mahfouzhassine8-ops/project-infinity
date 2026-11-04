@@ -1,0 +1,71 @@
+{
+  "Android": "BLOCKED_NO_AUTHORIZED_COMPATIBLE_TARGET",
+  "accepted_pointer_updated": false,
+  "apk_sha256": "08ca19e9ff01e3830253980028dbcdbfb36056fd71b06a18cbfb922158ceaac8",
+  "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "historical_watched_route": "UNKNOWN",
+  "member_preservation": {
+    "Android": "BLOCKED_NO_AUTHORIZED_COMPATIBLE_TARGET",
+    "accepted_pointer_updated": false,
+    "added": [],
+    "baseline_sha256": "efc24cc53e25675360bb70a2c8c0122cfc107f99035d04c957265d08206f6729",
+    "candidate_sha256": "08ca19e9ff01e3830253980028dbcdbfb36056fd71b06a18cbfb922158ceaac8",
+    "changed_members": {
+      "AndroidManifest.xml": {
+        "after": "915898af7788e13c7bd5c92b931db747da7840eebd425ede71be2601f1bce214",
+        "before": "b64f456c052bdca0f4452a47ac4978cf55d726f0ea1632ebbf7d2522b78a71e6"
+      },
+      "assets/experience-component-updates.properties": {
+        "after": "08f0f80f01b8f3f65a4e14d6be79c1a98f77a136a32fb2fc227c0fb0ebbad602",
+        "before": "0acd71eae9bf710407d7fc014e71c40204cd5e2b6ba6c879f319b0c7f7e476d2"
+      },
+      "lib/arm64-v8a/libkodi.so": {
+        "after": "d0b6f115e839fbe39e764e2fecad47418c501ab1ece853294578652cd0b80b98",
+        "before": "f89a40b5653c0091a06edd44f6ac5cdf056a649301b6751ee638c8ba88db9674"
+      }
+    },
+    "physical_Fold": "PENDING",
+    "removed": [],
+    "status": "PASS_EXACT_SIGNED452_PAUSE_STOP_PRESERVATION",
+    "unchanged_dex_members": 5,
+    "unchanged_members": 7611,
+    "unchanged_native_libraries": 46
+  },
+  "native_build_run": 41778685295,
+  "native_build_source": "24c6eeb30a6fbc65546a9945a87ca19500694f31",
+  "native_sha256": "d0b6f115e839fbe39e764e2fecad47418c501ab1ece853294578652cd0b80b98",
+  "original_SDK_signature_schemes": [
+    "v1",
+    "v2",
+    "v3"
+  ],
+  "package": "com.projectinfinity.kodi",
+  "physical_Fold": "PENDING",
+  "published_components": {
+    "CHOOSER_SHELL": {
+      "matched_dex_partitions": 1,
+      "matched_payload_members": 1,
+      "sha256": "3d1a0b4e4e0fa7eb56f32a7eb7573d30de618e19678f11cf19e9401bbb9f9776"
+    },
+    "COBRA": {
+      "matched_dex_partitions": 2,
+      "matched_payload_members": 11,
+      "sha256": "f63d4c1e491dc94591c5623bf02be90d4f9c187b91a0511b36398ee96745f8a8"
+    },
+    "INFINITY": {
+      "matched_dex_partitions": 1,
+      "matched_payload_members": 7516,
+      "sha256": "4a7747418633c66cc01bf0cd113ddabd1cdda178179d4c55d01597e883cb1632"
+    },
+    "MINIMAL_ANDROID_CONTRACT": {
+      "matched_dex_partitions": 1,
+      "matched_payload_members": 81,
+      "sha256": "1c4a2890ef5ca8665b86b148dd293c06a56d76ec846de1e0c9c037a3b0151a25"
+    }
+  },
+  "signing_run": 41783963413,
+  "source_commit": "cb7c6214807b79661e397cccb0740fc91fab3e24",
+  "status": "PASS_PUBLISHED_SIGNED_APK_AND_ALL_COMPONENT_BYTES",
+  "unknown_obligations": "REMAIN_BLOCKING",
+  "versionCode": 2103453
+}
