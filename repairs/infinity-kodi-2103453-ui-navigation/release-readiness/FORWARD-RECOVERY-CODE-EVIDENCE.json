@@ -1,0 +1,34 @@
+{
+  "status": "READ_ONLY_SIGNED_DEX_INSPECTION_NOT_ANDROID_EXECUTION",
+  "apk_sha256": "08ca19e9ff01e3830253980028dbcdbfb36056fd71b06a18cbfb922158ceaac8",
+  "dex_member": "classes3.dex",
+  "dex_sha256": "5634f2376e5d0bf6176ebef6fa1ac16bb22fdecc1d018ac078f266bb757fe9b8",
+  "class_name": "com.projectinfinity.kodi.InfinityInstalledCheckpointInstaller",
+  "method": "verify(Context, File)",
+  "disassembled_class_sha256": "5049ea56fabe600405c485ffb2effe9fbe8607152ec7e54a079a89ea58052e4c",
+  "method_body_sha256": "67053a9f7502a219e4a6b0bc3ab7957e20786521f51d9df10b3e25c78b4423e5",
+  "source_template": "repairs/infinity-final-closure-2103407/InfinityInstalledModules.java.in",
+  "decoded_character_array_messages": {
+    ":array_6cc": "script.infinity.commandcenter/INFINITY-MODULES.v1",
+    ":array_702": "script.infinity.commandcenter/INFINITY-MODULES.v1.sig",
+    ":array_73c": "addons/script.infinity.commandcenter/INFINITY-MODULES.v1",
+    ":array_778": "addons/script.infinity.commandcenter/INFINITY-MODULES.v1.sig",
+    ":array_7da": ".infinity-module-previous/",
+    ":array_7f8": "/INFINITY-MODULES.v1.sig",
+    ":array_820": ".infinity-module-previous/",
+    ":array_83e": "Installed signed generation must not be downgraded",
+    ":array_9f2": "Unrecognized installed source; preserved without modification",
+    ":array_a34": "Unrecognized baseline backup; preserved without modification",
+    ":array_a90": "INFINITY-MODULES.v1",
+    ":array_aa8": "INFINITY-MODULES.v1.sig",
+    ":array_b1a": "Baseline backup changed after preflight; preserved",
+    ":array_b50": "Installed source changed after preflight; preserved"
+  },
+  "findings": [
+    "Actual signed DEX compares numeric signed-module versions. Same/lower package retains verified installed generation; incomplete newer installed state is not downgraded.",
+    "A higher signed module generation is needed for forward recovery, not only a higher Android versionCode.",
+    "Source/DEX retain preflight of old/new known files, backups and signature/manifest publication last; unknown local source edits remain blocking.",
+    "Installer does not remove obsolete source files. Recovery must establish that retained candidate helper files are unreferenced and cannot pass the older functional module allowlist. No user-data cleanup is authorized.",
+    "Skin update/install-over selection still requires verification on actual Android; version metadata is proposed, not a claim of runtime success."
+  ]
+}

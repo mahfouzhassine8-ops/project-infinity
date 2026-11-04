@@ -1,0 +1,164 @@
+{
+  "actual_candidate_comparison": "PENDING_SEPARATE_AUTHORIZATION",
+  "apk_signing_block": "Existing original-key v2/v3 signatures must be regenerated; not a ZIP member.",
+  "baseline_apk_sha256": "08ca19e9ff01e3830253980028dbcdbfb36056fd71b06a18cbfb922158ceaac8",
+  "baseline_version": 2103453,
+  "candidate_built": false,
+  "deletions_allowed": [],
+  "existing_UI_modifications": 4,
+  "members": [
+    {
+      "baseline_sha256": null,
+      "kind": "authorized_UI_source",
+      "member": "assets/addons/script.infinity.commandcenter/media_view.py",
+      "proposed_sha256": "41f8d561fe6dca87c69d633672ecaec4689c3f1bd153388ef6c69766e70adfe6"
+    },
+    {
+      "baseline_sha256": "7c03a9d00e22da4950345f9151a8ce3bd4137809be0c013d67eaf5a9ec667a50",
+      "kind": "authorized_UI_source",
+      "member": "assets/addons/script.infinity.commandcenter/service.py",
+      "proposed_sha256": "1844b2b217ccc7f3adef4d82bc825588fb2d561a87d6447f32ebedf3295e927d"
+    },
+    {
+      "baseline_sha256": null,
+      "kind": "authorized_UI_source",
+      "member": "assets/addons/skin.infinity.diggz/resources/lib/infinity_library_navigation.py",
+      "proposed_sha256": "60d500f1afe2cf9ec576e7701deaa598b264b6892c115ca96064dbcd12144ed9"
+    },
+    {
+      "baseline_sha256": "5372022ded234687f7ecbb376bff6bca13a82aa88657a7ef1fa8b5411f63c214",
+      "kind": "authorized_UI_source",
+      "member": "assets/addons/skin.infinity.diggz/unified/Custom_1198_InfinityNav.xml",
+      "proposed_sha256": "566e695a1642141fdba83ccd79923721b669801c608a503f2f12175493fa0124"
+    },
+    {
+      "baseline_sha256": "86be565011a96a4dc91bee5a41cb5ee9e28b5867e9d7ca1d7855e5b017120757",
+      "kind": "authorized_UI_source",
+      "member": "assets/addons/skin.infinity.diggz/unified/Includes.xml",
+      "proposed_sha256": "bc9fda570aa829ae3fcd8fea5716338f4c9626937f058e1f20e336ecf1cf6836"
+    },
+    {
+      "baseline_sha256": null,
+      "kind": "authorized_UI_source",
+      "member": "assets/addons/skin.infinity.diggz/unified/Includes_InfinityMediaLists.xml",
+      "proposed_sha256": "16bf1170853841ef7e5319d91a4d7562eba46940e99a3d17497bc137fbb40686"
+    },
+    {
+      "baseline_sha256": null,
+      "kind": "authorized_UI_source",
+      "member": "assets/addons/skin.infinity.diggz/unified/Includes_InfinityVideoOptions.xml",
+      "proposed_sha256": "c2fcaba2e910fa657a4569644d8c218a739e753f141f3501ef668e36cbf30fd5"
+    },
+    {
+      "baseline_sha256": "f6a65dce19db29db6a7577cc92afb60140f9199e2b671bbaf92a129df3c97ad4",
+      "kind": "authorized_UI_source",
+      "member": "assets/addons/skin.infinity.diggz/unified/MyVideoNav.xml",
+      "proposed_sha256": "f94d0078834420c9580e1c4e6ed8ce1311550e38f32569da54a6ec16633b7f5f"
+    },
+    {
+      "baseline_sha256": null,
+      "kind": "authorized_UI_source",
+      "member": "assets/addons/skin.infinity.diggz/unified/custom_1136_InfinityVideoViews.xml",
+      "proposed_sha256": "dc95a4f91455573737b61368022cec2a189fe5167d4e3aa13ae03f66aa4d32d7"
+    },
+    {
+      "baseline_sha256": null,
+      "kind": "authorized_UI_source",
+      "member": "assets/addons/skin.infinity.diggz/unified/custom_1137_InfinityVideoViewSettings.xml",
+      "proposed_sha256": "ac5c229d3e78d99dbc26663431dc7b17fdacde2920be2e717c6a50b0c85c748e"
+    },
+    {
+      "baseline_sha256": null,
+      "kind": "authorized_UI_source",
+      "member": "assets/addons/skin.infinity.diggz/unified/custom_1138_InfinityVideoDisableViews.xml",
+      "proposed_sha256": "84b22b790dc64b4032ae05a229b117c9dbbfde8d23b7fbbdf921cb1aece8afba"
+    },
+    {
+      "baseline_sha256": "915898af7788e13c7bd5c92b931db747da7840eebd425ede71be2601f1bce214",
+      "constraint": "Only the typed versionCode: proposed 2103454. Every other byte, including permissions, activities and versionName, frozen.",
+      "kind": "proposed_packaging_metadata",
+      "member": "AndroidManifest.xml",
+      "proposed_sha256": null
+    },
+    {
+      "baseline_sha256": "2d4d794aa5e858791e119ecd09ac090cad48fb0ebc1653e42b7e16bb08e0d64b",
+      "constraint": "Package generation .55; only addon.xml/service.py hashes and new media_view.py entry. Original other file records, capabilities, entries, protocol and installation baseline unchanged.",
+      "kind": "proposed_packaging_metadata",
+      "member": "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1",
+      "proposed_sha256": null
+    },
+    {
+      "baseline_sha256": "c3c391c4cd472bfa100b6b90a47035450b233b82200ff547353db197a6b419d3",
+      "constraint": "Fresh signature of exact proposed manifest using original permanent key through trusted workflow. No verifier or key replacement.",
+      "kind": "proposed_packaging_metadata",
+      "member": "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1.sig",
+      "proposed_sha256": null
+    },
+    {
+      "baseline_sha256": "c7a41cda0cabc0bc818846ca4018b85093eeb5d4b4d3eb9878919ff5ecd939c1",
+      "constraint": "Only package version 0.3.5.54 to 0.3.5.55; entries, dependencies, invoker policy unchanged.",
+      "kind": "proposed_packaging_metadata",
+      "member": "assets/addons/script.infinity.commandcenter/addon.xml",
+      "proposed_sha256": null
+    },
+    {
+      "baseline_sha256": "3d80a411c654dc339eaaf0a03022a2b8e7082dcd1c559752b169bce0ab1abf95",
+      "constraint": "Only candidate/skin version; update hashes for three changed UI files, addon.xml and infinity-skin.json; add six new skin files (942 to 948 entries). Every other protected record and contract unchanged.",
+      "kind": "proposed_packaging_metadata",
+      "member": "assets/addons/skin.infinity.diggz/Infinity-Protected-Manifest.json",
+      "proposed_sha256": null
+    },
+    {
+      "baseline_sha256": "ac5cd495e283101e0226672c58b624cdb0330f87712bde04a906377ee42b7438",
+      "constraint": "Only skin 1.0.5.251 to 1.0.5.252 and existing Command Center minimum .54 to .55.",
+      "kind": "proposed_packaging_metadata",
+      "member": "assets/addons/skin.infinity.diggz/addon.xml",
+      "proposed_sha256": null
+    },
+    {
+      "baseline_sha256": "4773fa8a36dff24549db940aac9394c66e0eb6233129d0dcdf268182586f62c5",
+      "constraint": "Only candidate/version fields advance to 252 / 1.0.5.252. Existing design, contracts and historical annotations remain unchanged.",
+      "kind": "proposed_packaging_metadata",
+      "member": "assets/addons/skin.infinity.diggz/infinity-skin.json",
+      "proposed_sha256": null
+    },
+    {
+      "baseline_sha256": "08f0f80f01b8f3f65a4e14d6be79c1a98f77a136a32fb2fc227c0fb0ebbad602",
+      "constraint": "Only infinity.last_updated_in advances to 2103454; cobra.last_updated_in stays 2103445.",
+      "kind": "proposed_packaging_metadata",
+      "member": "assets/experience-component-updates.properties",
+      "proposed_sha256": null
+    },
+    {
+      "baseline_sha256": "5ae04ae0f19f230c6ef56b6ade750616a4a7f0b278f4afe5c539e033da4d5336",
+      "constraint": "Only original-signer APK v1 artifacts; all other META-INF members frozen.",
+      "kind": "APK_signature_entry",
+      "member": "META-INF/INFINITY.RSA",
+      "proposed_sha256": null
+    },
+    {
+      "baseline_sha256": "fac0509dff03d880cd42cff8d92548aae78e140c7136e2bc104ed0f1a99b9242",
+      "constraint": "Only original-signer APK v1 artifacts; all other META-INF members frozen.",
+      "kind": "APK_signature_entry",
+      "member": "META-INF/INFINITY.SF",
+      "proposed_sha256": null
+    },
+    {
+      "baseline_sha256": "eab0b18d889cdaa7b98a6faa7e0678c6c14d25b6112699af43957a0942a7248b",
+      "constraint": "Only original-signer APK v1 artifacts; all other META-INF members frozen.",
+      "kind": "APK_signature_entry",
+      "member": "META-INF/MANIFEST.MF",
+      "proposed_sha256": null
+    }
+  ],
+  "metadata_applied": false,
+  "new_UI_members": 7,
+  "proposed_metadata_members": 8,
+  "protected_inventory_sha256": "a14d379602b91917dd75ced593e00d49690d2370e57e6ac5647ef804a1e0f261",
+  "protected_member_count": 7602,
+  "signing_members": 3,
+  "source_checkpoint": "1cc7684bd05581c21f31682cdb0f2d4e156a585e",
+  "source_members": 11,
+  "status": "READ_ONLY_PROPOSAL_NOT_A_CANDIDATE_APK_COMPARISON",
+  "zip_container": "Central directory, offsets, compression and alignment may change only as packaging mechanics; compare each uncompressed member exactly. Reject unexplained members."
+}

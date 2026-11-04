@@ -1,0 +1,124 @@
+{
+  "checked_at_utc": "2026-11-04T18:47:11.579561+00:00",
+  "proposed_candidate": 2103454,
+  "proposed_forward_recovery": 2103455,
+  "reserved": false,
+  "source_checkpoint": "1cc7684bd05581c21f31682cdb0f2d4e156a585e",
+  "highest_observed_issued_version": 2103453,
+  "all_heads_tags_count": 584,
+  "highest_code_in_head_or_tag": 2103453,
+  "refs_454_or_higher": [],
+  "release_count": 12,
+  "release_tags": [
+    "infinity-ci-assets-20261017",
+    "infinity-2103401-binaries-39779917183",
+    "infinity-2103400-binaries-39720566646",
+    "infinity-2103399-binaries-39662645551",
+    "infinity-2103398-binaries-39662467387",
+    "infinity-2103397-binaries-39584431102",
+    "infinity-2103396-binaries-39579955813",
+    "infinity-2103395-binaries-39555495053",
+    "infinity-2103394-binaries-39539171911",
+    "infinity-2103393-binaries-39483588212",
+    "build-4",
+    "build-1"
+  ],
+  "latest_100_run_count": 100,
+  "latest_run": {
+    "id": 41783963413,
+    "name": "Infinity combined release | owner gate before original signing",
+    "head_branch": "work/infinity-kodi-2103453-controlled-test-20261104",
+    "head_sha": "cb7c6214807b79661e397cccb0740fc91fab3e24",
+    "status": "completed",
+    "conclusion": "success",
+    "created_at": "2026-11-04T06:12:10Z"
+  },
+  "active_runs_in_latest100": [],
+  "remote_authority_snapshots": [
+    {
+      "ref": "work/infinity-kodi-2103453-controlled-test-20261104",
+      "candidate": 2103453,
+      "last_issued": 2103452,
+      "generation": 39,
+      "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+      "registry_sha256": "d239d0875ae3fac836dbf8975e43aef873819c7926a149850a335bd0372220f0"
+    },
+    {
+      "ref": "work/infinity-kodi-2103453-ui-navigation-source-20261104",
+      "candidate": 2103453,
+      "last_issued": 2103452,
+      "generation": 39,
+      "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+      "registry_sha256": "d239d0875ae3fac836dbf8975e43aef873819c7926a149850a335bd0372220f0"
+    }
+  ],
+  "coverage": "All remote heads/tags, all published releases, two release-authority branches, latest 100 descending workflow runs, exact 453 artifacts. Older pagination was stopped after current records were captured; no exhaustive deleted/private external builds claim.",
+  "limits": [
+    "Version registry last_issued remains 2103452 although signed 2103453 exists: actual signed output takes precedence.",
+    "2103454 appears in an unsigned prior recovery rehearsal only; no issue or reservation.",
+    "Recheck codes and authority immediately before future authorization/packaging; no current APK or version reservation.",
+    "No user device queried; installed-version preflight still required."
+  ],
+  "protected_refs": [
+    {
+      "sha": "0b3450433adc3349056167a6697dae92dad63d86",
+      "ref": "refs/heads/lock/infinity-preview-2103451-user-frozen-20261103"
+    }
+  ],
+  "artifacts": {
+    "signed453": [
+      {
+        "id": 13301200085,
+        "name": "Infinity-Combined-Original-Signer-41783963413",
+        "digest": "sha256:3b336697af5a9ff309c2f32d94a2305688a540cdd05b5f03c8646f8ff2a74516",
+        "expired": false,
+        "expires_at": "2027-02-02T06:12:12Z",
+        "archive_download_url": "https://api.github.com/repos/mahfouzhassine8-ops/project-infinity/actions/artifacts/13301200085/zip"
+      },
+      {
+        "id": 13301010393,
+        "name": "Infinity-Combined-Owner-Components-41783963413",
+        "digest": "sha256:20c691a4a6837b53dc9288b2ad24f5c9b47bf7c6eaa6d72841e5ba95eeadfa4e",
+        "expired": false,
+        "expires_at": "2027-02-02T06:12:12Z",
+        "archive_download_url": "https://api.github.com/repos/mahfouzhassine8-ops/project-infinity/actions/artifacts/13301010393/zip"
+      },
+      {
+        "id": 13300785936,
+        "name": "Infinity-Combined-Signing-Evidence-41783963413",
+        "digest": "sha256:d6b33f4974ebfb6f41b0c2b28261cf4fe4ff353e0903092288120f629b230b2e",
+        "expired": false,
+        "expires_at": "2027-02-02T06:12:12Z",
+        "archive_download_url": "https://api.github.com/repos/mahfouzhassine8-ops/project-infinity/actions/artifacts/13300785936/zip"
+      }
+    ],
+    "prepared453": [
+      {
+        "id": 13300695240,
+        "name": "Infinity453-Prepared-41783441765",
+        "digest": "sha256:d98a3337b540e0a1308115a5d1fa3f20612b6501771c8f188141558c8fdf32d2",
+        "expired": false,
+        "expires_at": "2027-02-02T06:07:23Z",
+        "archive_download_url": "https://api.github.com/repos/mahfouzhassine8-ops/project-infinity/actions/artifacts/13300695240/zip"
+      },
+      {
+        "id": 13299334718,
+        "name": "Infinity453-Preparation-Evidence-41783441765",
+        "digest": "sha256:0a53c744d9430b90558f2f8dee7751f901b9ce467417413e974c62730f29b806",
+        "expired": false,
+        "expires_at": "2027-02-02T06:07:23Z",
+        "archive_download_url": "https://api.github.com/repos/mahfouzhassine8-ops/project-infinity/actions/artifacts/13299334718/zip"
+      }
+    ]
+  },
+  "signer": {
+    "workflow_id": 397702717,
+    "path": ".github/workflows/infinity-combined-release.yml",
+    "last_success": 41783963413,
+    "source_branch_currently_admitted": false,
+    "needed": "Narrow separately approved UI and forward-recovery producer/authority wiring; retain all original guards and secret ownership.",
+    "secrets_metadata_status": 403,
+    "secrets_metadata_message": "Resource not accessible by integration",
+    "replacement_key_allowed": false
+  }
+}
