@@ -1,0 +1,18 @@
+In file included from /tmp/kodi452-pause-stop-regressions/watched/source/video/jobs/VideoLibraryMarkWatchedJob.cpp:11:
+/tmp/kodi452-pause-stop-regressions/watched/source/dbwrappers/InfinityDatabaseBarrier.h:9:10: fatal error: platform/android/activity/InfinityProtectedWrites.h: No such file or directory
+    9 | #include "platform/android/activity/InfinityProtectedWrites.h"
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+In file included from /tmp/kodi452-pause-stop-regressions/watched/source/test_peers.h:4,
+                 from /tmp/kodi452-pause-stop-regressions/watched/source/video/VideoDatabase.h:2,
+                 from /tmp/kodi452-pause-stop-regressions/watched/source/video/jobs/VideoLibraryJob.cpp:11:
+/tmp/kodi452-pause-stop-regressions/watched/source/dbwrappers/InfinityDatabaseBarrier.h:9:10: fatal error: platform/android/activity/InfinityProtectedWrites.h: No such file or directory
+    9 | #include "platform/android/activity/InfinityProtectedWrites.h"
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+In file included from /tmp/kodi452-pause-stop-regressions/watched/source/test_peers.h:4,
+                 from /tmp/kodi452-pause-stop-regressions/watched/test.cpp:2:
+/tmp/kodi452-pause-stop-regressions/watched/source/dbwrappers/InfinityDatabaseBarrier.h:9:10: fatal error: platform/android/activity/InfinityProtectedWrites.h: No such file or directory
+    9 | #include "platform/android/activity/InfinityProtectedWrites.h"
+      |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.

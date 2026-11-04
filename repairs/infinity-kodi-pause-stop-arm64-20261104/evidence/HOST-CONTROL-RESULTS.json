@@ -1,0 +1,112 @@
+{
+  "integrated_source_bindings": {
+    "xbmc/messaging/ApplicationMessenger.cpp": "f53c09ca57fe3b4e8e575b4f51e2f3108dc77836b35c4498dbb859f61c866f8b",
+    "xbmc/messaging/ApplicationMessenger.h": "2326742d7bb60b46a8b3521542445c2d3109cefab15ff105423731b78b7367ec",
+    "xbmc/input/actions/ActionIDs.h": "3a0bf357d9741d3b3074f8d8261886f76353894f97334a9eecc4998f0dc4a2f4",
+    "xbmc/guilib/WindowIDs.h": "3f26ab2c746217f0e0f283c13a881a0bdc9ba6fb5dc0897106678509fef68c34",
+    "xbmc/platform/android/activity/XBMCApp.cpp": "126fee30678e70c0444b0bcb7c0d586b57c99e9ced723010e034f70148504a9d",
+    "xbmc/application/Application.cpp": "d266a16ef3f56ee91ce82c8e7e1da9a868d853b22b48e773cad3b1e24331f307",
+    "xbmc/guilib/GUIWindowManager.cpp": "f9aeddec883a4d1ac63303bfbb9b88cba2bcba5f01fcd799f68c444665d31c23",
+    "xbmc/platform/android/activity/InfinityAndroidCheckpoint.cpp": "e8f617ac615d657ec0b37d1bef39d277ceafa8e2ad20bb2b6118cebae7f0350f",
+    "xbmc/messaging/ThreadMessage.h": "a3dde8405f4b6a89cf616bebe6764785070e1ae09c8d7ba0b12be659b90d77ab",
+    "xbmc/messaging/IMessageTarget.h": "a15d4afb51a0c77987a129cf36a7962e86b90b2bd8b720ac0efa24021ee4ee6c",
+    "xbmc/input/actions/Action.h": "88dc7132b6bb99f03bdda9421e2215e23effa68edb260a29a9b4e8dd9e0b3b1f",
+    "xbmc/platform/android/activity/InfinityAndroidCheckpoint.h": "bb9501674ed8a0ea36894bfbe6d52b704a1244c8e5f727590493c11cc87c8d20"
+  },
+  "original_harness_sha256": "17bda16cc123dc6402b0458c38b8b35b58e35cf91ddec9e27fbefe2f54c682ae",
+  "source_map_sha256": "45e293edc1e05ebff6c1e930273691cdb01c1788df61a1c7061cba089fe42b75",
+  "host_only": true,
+  "android_verified": false,
+  "cases": [
+    {
+      "case": "pause-starvation",
+      "returncode": 0,
+      "stdout": "PASS pause-starvation checkpoint_receiver_calls=1 player_commands=0 (host peers; no Android acceptance)\n",
+      "stderr": ""
+    },
+    {
+      "case": "stop-starvation",
+      "returncode": 0,
+      "stdout": "PASS stop-starvation checkpoint_receiver_calls=1 player_commands=0 (host peers; no Android acceptance)\n",
+      "stderr": ""
+    },
+    {
+      "case": "resume-starvation",
+      "returncode": 0,
+      "stdout": "PASS resume-starvation checkpoint_receiver_calls=1 player_commands=0 (host peers; no Android acceptance)\n",
+      "stderr": ""
+    },
+    {
+      "case": "audio-focus-pause-and-stop",
+      "returncode": 0,
+      "stdout": "PASS audio-focus-pause-and-stop checkpoint_receiver_calls=2 player_commands=0 (host peers; no Android acceptance)\n",
+      "stderr": ""
+    },
+    {
+      "case": "android-pause-stop-resume",
+      "returncode": 0,
+      "stdout": "PASS android-pause-stop-resume checkpoint_receiver_calls=3 player_commands=0 (host peers; no Android acceptance)\n",
+      "stderr": ""
+    },
+    {
+      "case": "failed-checkpoint-repeated-interruptions",
+      "returncode": 0,
+      "stdout": "PASS failed-checkpoint-repeated-interruptions checkpoint_receiver_calls=48 player_commands=0 (host peers; no Android acceptance)\n",
+      "stderr": ""
+    },
+    {
+      "case": "ack-after-real-rejection-handler",
+      "returncode": 0,
+      "stdout": "PASS ack-after-real-rejection-handler checkpoint_receiver_calls=1 player_commands=0 (host peers; no Android acceptance)\n",
+      "stderr": ""
+    },
+    {
+      "case": "display-ack-and-order",
+      "returncode": 0,
+      "stdout": "PASS display-ack-and-order checkpoint_receiver_calls=1 player_commands=0 (host peers; no Android acceptance)\n",
+      "stderr": ""
+    },
+    {
+      "case": "unrelated-messages-and-FIFO",
+      "returncode": 0,
+      "stdout": "PASS unrelated-messages-and-FIFO checkpoint_receiver_calls=1 player_commands=0 (host peers; no Android acceptance)\n",
+      "stderr": ""
+    },
+    {
+      "case": "wrong-thread",
+      "returncode": 0,
+      "stdout": "PASS wrong-thread checkpoint_receiver_calls=1 player_commands=0 (host peers; no Android acceptance)\n",
+      "stderr": ""
+    },
+    {
+      "case": "noncheckpoint-normal",
+      "returncode": 0,
+      "stdout": "PASS noncheckpoint-normal checkpoint_receiver_calls=4 player_commands=4 (host peers; no Android acceptance)\n",
+      "stderr": ""
+    },
+    {
+      "case": "bounded-reentrant-display",
+      "returncode": 0,
+      "stdout": "PASS bounded-reentrant-display checkpoint_receiver_calls=0 player_commands=0 (host peers; no Android acceptance)\n",
+      "stderr": ""
+    },
+    {
+      "case": "checkpoint-transition-after-enqueue",
+      "returncode": 0,
+      "stdout": "PASS checkpoint-transition-after-enqueue checkpoint_receiver_calls=1 player_commands=0 (host peers; no Android acceptance)\n",
+      "stderr": ""
+    },
+    {
+      "case": "sealed-durability-and-shutdown-fences",
+      "returncode": 0,
+      "stdout": "PASS sealed-durability-and-shutdown-fences checkpoint_receiver_calls=24 player_commands=0 (host peers; no Android acceptance)\n",
+      "stderr": ""
+    },
+    {
+      "case": "stopped-queue-cleanup",
+      "returncode": 0,
+      "stdout": "PASS stopped-queue-cleanup checkpoint_receiver_calls=0 player_commands=0 (host peers; no Android acceptance)\n",
+      "stderr": ""
+    }
+  ]
+}

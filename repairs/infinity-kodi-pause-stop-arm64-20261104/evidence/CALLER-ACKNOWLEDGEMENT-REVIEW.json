@@ -1,0 +1,29 @@
+{
+  "source_sha256": "126fee30678e70c0444b0bcb7c0d586b57c99e9ced723010e034f70148504a9d",
+  "callbacks": {
+    "void CXBMCApp::onPause()": {
+      "sha256": "55e310be22178103ccf7d2d1ff83cf8df4d17357aa251c0019d3964dffa0db0c",
+      "synchronous_action_request": true,
+      "does_not_assign_SendMsg_to_success": true
+    },
+    "void CXBMCApp::onStop()": {
+      "sha256": "d98a51184acd2ba715aee49232a6b9c2fe81a9ce143f512acf658e8cfe41e139",
+      "synchronous_action_request": true,
+      "does_not_assign_SendMsg_to_success": true
+    },
+    "void CXBMCApp::onResume()": {
+      "sha256": "9f8908636af5c4910d493228db79af1deb956cbbd41bc3fb72057e567820b868",
+      "synchronous_action_request": true,
+      "does_not_assign_SendMsg_to_success": true
+    },
+    "void CXBMCApp::onAudioFocusChange(int focusChange)": {
+      "sha256": "b74a2a1c76f470f826ff4e4366014c81f0b686ecf7fb4da2e306cf7319e20ba3",
+      "synchronous_action_request": true,
+      "does_not_assign_SendMsg_to_success": true
+    }
+  },
+  "resume_flag": "onPause retains existing m_bResumePlayback=true intent after callback; not proof player paused. onResume separately checks IsPlaying/HasVideo/IsPaused, then action remains refused while checkpoint active.",
+  "result_contract": "GUI_ACTION receiver does not call SetResult; SendMsg default remains -1. OnAction true means handled/refused, not successful playback.",
+  "no_new_state_publication": "No native callback, playback state publication, guard, checkpoint receipt or termination method modified.",
+  "required_android_check": "Observe actual callbacks return without publishing a playback transition; host peer and source inspection are not JNI/device execution."
+}
