@@ -1,0 +1,16 @@
+{
+  "operation": "compile-only-checkpoint-playback-admission",
+  "branch": "work/infinity-kodi-452-pause-stop-arm64-20261104",
+  "candidate_commit": "7f2c93f94c7372679b756091d5b2666a7d909fd0",
+  "native_compilation_allowed": true,
+  "apk_build_allowed": false,
+  "signing_allowed": false,
+  "installation_allowed": false,
+  "android_execution_performed": false,
+  "automatic_lock_allowed": false,
+  "native_delta": [
+    "xbmc/messaging/ApplicationMessenger.cpp"
+  ],
+  "preserve": "452 native inputs and five earlier changes;451 recovery and Preview frozen; Cobra frozen; retirement BLOCKED; no memory/Continue/Home changes",
+  "recorded_utc": "2026-11-04T05:18:17.361406+00:00"
+}
