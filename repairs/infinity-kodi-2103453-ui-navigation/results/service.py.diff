@@ -1,0 +1,19 @@
+--- signed-2103453/assets/addons/script.infinity.commandcenter/service.py
++++ source-candidate/assets/addons/script.infinity.commandcenter/service.py
+@@ -1611,6 +1611,8 @@
+     loading = make_monitor(xbmc, xbmcgui)
+     normal_return = NormalReturnController()
+     display_reflow = DisplayReflowController()
++    from media_view import MediaViewPreference
++    media_views = MediaViewPreference(xbmc, xbmcgui)
+     checkpoint = ResidentCheckpoint(profile, player, experience, stability, {
+         'version': lambda: COMMAND_ADDON.getAddonInfo('version'),
+         'live': lambda: xbmc.getCondVisibility('Pvr.IsPlayingTV | Pvr.IsPlayingRadio'),
+@@ -1656,6 +1658,7 @@
+             stability.started += now - suspended_at
+             suspended_at = None
+         loading.tick()
++        media_views.tick()
+         _consume_home_observer_epoch()
+         _consume_home_runtime_sync(now)
+         hub.observe_visible_cards()

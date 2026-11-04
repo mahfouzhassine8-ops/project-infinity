@@ -1,0 +1,477 @@
+<?xml version='1.0' encoding='utf-8'?>
+<window id="1136" type="dialog">
+  <onback>Dialog.Close(1136)</onback>
+  <onload>SetProperty(Infinity.Loading.FrameControls,|9000|)</onload>
+  <defaultcontrol always="true">9000</defaultcontrol>
+  <controls>
+    <control type="group">
+      <control type="image">
+        <width>100%</width>
+        <height>100%</height>
+        <texture border="24" colordiffuse="$VAR[InfinityDrawerPanel]">infinity_polish/surface.png</texture>
+      </control>
+      <control type="image">
+        <width>100%</width>
+        <height>100%</height>
+        <texture border="24" colordiffuse="$VAR[InfinityGlassFocus]">infinity_polish/rim.png</texture>
+      </control>
+      <left>18</left>
+      <top>18</top>
+      <bottom>18</bottom>
+      <width max="840">92%</width>
+      <control type="group">
+        <animation effect="fade" start="100" end="0" time="200" condition="[Window.IsVisible(1138)] + !String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)" reversible="false">Conditional</animation>
+        <control type="group">
+          <include>InfinityLegacy_WindowSettingsFadeAnimation</include>
+          <control type="label">
+            <scroll>true</scroll>
+            <height>96</height>
+            <top>36</top>
+            <right>166</right>
+            <left>24</left>
+            <textoffsetx>15</textoffsetx>
+            <font>InfinityBodyBold</font>
+            <label>31101</label>
+            <textcolor>$VAR[InfinityLegacyAccent]</textcolor>
+          </control>
+          <control type="list" id="9000">
+            <onup>8999</onup>
+            <onback>Dialog.Close(1136)</onback>
+            <bottom>128</bottom>
+            <top>176</top>
+            <right>18</right>
+            <left>18</left>
+            <onleft>Dialog.Close(1136)</onleft>
+            <onright>Dialog.Close(1136)</onright>
+            <ondown>9012</ondown>
+            <itemlayout width="100%" height="108">
+              <control type="label">
+                <scroll>true</scroll>
+                <textoffsetx>24</textoffsetx>
+                <aligny>center</aligny>
+                <height>104</height>
+                <width>100%</width>
+                <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
+                <label>$INFO[ListItem.Label]</label>
+              </control>
+            </itemlayout>
+            <focusedlayout width="100%" height="108">
+              <control type="image">
+                <width>100%</width>
+                <height>100%</height>
+                <texture colordiffuse="$VAR[InfinityLegacyAccent]" border="16">infinity_glass/focus.png</texture>
+                <animation effect="fade" start="100" end="0" time="300" tween="sine" easing="inout" condition="[!Control.HasFocus(9000)] + !String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">Conditional</animation>
+              </control>
+              <control type="label">
+                <scroll>true</scroll>
+                <textoffsetx>24</textoffsetx>
+                <aligny>center</aligny>
+                <height>104</height>
+                <width>100%</width>
+                <label>$INFO[ListItem.Label]</label>
+							`<animation effect="fade" start="100" end="70" time="300" tween="sine" easing="inout" condition="[!Control.HasFocus(9000)] + !String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">Conditional</animation>
+                <textcolor>$VAR[InfinityLegacyText]</textcolor>
+              </control>
+              <include content="InfinityActionLoadingFrame">
+                <param name="width" value="100%" />
+                <param name="height" value="100%" />
+                <param name="left" value="0" />
+                <param name="top" value="0" />
+                <param name="control" value="9000" />
+                <param name="window" value="0" />
+                <param name="globalframe" value="false" />
+                <param name="inheritwindow" value="true" />
+              </include>
+            </focusedlayout>
+            <content>
+              <item>
+                <label>$LOCALIZE[31510]</label>
+                <onclick condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Skin.SetString(Infinity.MediaView.Default,603)</onclick>
+                <onclick>Container.SetViewMode(603)</onclick>
+                <visible>Window.IsActive(music)</visible>
+                <visible>[Container.Content(artists) | Container.Content(albums)] + !Skin.HasSetting(Disable.JukeBox)</visible>
+                <onclick>ClearProperty(MediaMenu,Home)</onclick>
+                <onclick>Dialog.Close(1136)</onclick>
+                <onclick>SetFocus(603)</onclick>
+              </item>
+              <item>
+                <label>$LOCALIZE[535]</label>
+                <onclick condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Skin.SetString(Infinity.MediaView.Default,50)</onclick>
+                <onclick>Container.SetViewMode(50)</onclick>
+                <onclick>ClearProperty(MediaMenu,Home)</onclick>
+                <onclick>Dialog.Close(1136)</onclick>
+                <onclick>SetFocus(50)</onclick>
+              </item>
+              <item>
+                <label>$LOCALIZE[31238]</label>
+                <onclick condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Skin.SetString(Infinity.MediaView.Default,508)</onclick>
+                <onclick>Container.SetViewMode(508)</onclick>
+                <visible>Window.IsActive(music)</visible>
+                <visible>Container.Content(songs) + !Skin.HasSetting(Disable.SongListView)</visible>
+                <onclick>ClearProperty(MediaMenu,Home)</onclick>
+                <onclick>Dialog.Close(1136)</onclick>
+                <onclick>SetFocus(508)</onclick>
+              </item>
+              <item>
+                <label>$LOCALIZE[31239]</label>
+                <onclick condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Skin.SetString(Infinity.MediaView.Default,506)</onclick>
+                <onclick>Container.SetViewMode(506)</onclick>
+                <visible>Window.IsActive(videos)</visible>
+                <visible>[Container.Content(movies) | Container.Content(sets) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(artists)] + !Skin.HasSetting(Disable.RightListView)</visible>
+                <onclick>ClearProperty(MediaMenu,Home)</onclick>
+                <onclick>Dialog.Close(1136)</onclick>
+                <onclick>SetFocus(506)</onclick>
+              </item>
+              <item>
+                <label>$LOCALIZE[31239]</label>
+                <onclick condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Skin.SetString(Infinity.MediaView.Default,506)</onclick>
+                <onclick>Container.SetViewMode(506)</onclick>
+                <visible>Window.IsActive(music)</visible>
+                <visible>!Skin.HasSetting(Disable.RightListView)</visible>
+                <onclick>ClearProperty(MediaMenu,Home)</onclick>
+                <onclick>Dialog.Close(1136)</onclick>
+                <onclick>SetFocus(506)</onclick>
+              </item>
+              <item>
+                <label>$LOCALIZE[31240]</label>
+                <onclick condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Skin.SetString(Infinity.MediaView.Default,602)</onclick>
+                <onclick>Container.SetViewMode(602)</onclick>
+                <visible>Window.IsActive(videos)</visible>
+                <visible>[Container.Content(movies) | Container.Content(sets) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes)] + !Skin.HasSetting(Disable.FanartListView)</visible>
+                <onclick>ClearProperty(MediaMenu,Home)</onclick>
+                <onclick>Dialog.Close(1136)</onclick>
+                <onclick>SetFocus(602)</onclick>
+              </item>
+              <item>
+                <label>$LOCALIZE[31241]</label>
+                <onclick condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Skin.SetString(Infinity.MediaView.Default,501)</onclick>
+                <onclick>Container.SetViewMode(501)</onclick>
+                <visible>Window.IsActive(videos)</visible>
+                <visible>[Container.Content(movies) | Container.Content(sets) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes)] + !Skin.HasSetting(Disable.LowListView)</visible>
+                <onclick>ClearProperty(MediaMenu,Home)</onclick>
+                <onclick>Dialog.Close(1136)</onclick>
+                <onclick>SetFocus(501)</onclick>
+              </item>
+              <item>
+                <label>$LOCALIZE[31241]</label>
+                <onclick condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Skin.SetString(Infinity.MediaView.Default,501)</onclick>
+                <onclick>Container.SetViewMode(501)</onclick>
+                <visible>Window.IsActive(music)</visible>
+                <visible>[Container.Content(albums) | Container.Content(artists) | Container.Content(songs) | Container.Content(files)] + !Skin.HasSetting(Disable.LowListView)</visible>
+                <onclick>ClearProperty(MediaMenu,Home)</onclick>
+                <onclick>Dialog.Close(1136)</onclick>
+                <onclick>SetFocus(501)</onclick>
+              </item>
+              <item>
+                <label>$LOCALIZE[31241]</label>
+                <onclick condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Skin.SetString(Infinity.MediaView.Default,501)</onclick>
+                <onclick>Container.SetViewMode(501)</onclick>
+                <visible>Window.IsActive(programs)</visible>
+                <visible>String.Contains(Container.FolderPath,plugin.program.advanced.launcher) + !Skin.HasSetting(Disable.LowListView)</visible>
+                <onclick>ClearProperty(MediaMenu,Home)</onclick>
+                <onclick>Dialog.Close(1136)</onclick>
+                <onclick>SetFocus(501)</onclick>
+              </item>
+              <item>
+                <label>$LOCALIZE[31242]</label>
+                <onclick condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Skin.SetString(Infinity.MediaView.Default,507)</onclick>
+                <onclick>Container.SetViewMode(507)</onclick>7
+							<visible>Window.IsActive(videos)</visible>
+                <visible>[Container.Content(movies) | Container.Content(tvshows) | Container.Content(episodes)] + !Skin.HasSetting(Disable.BigListView)</visible>
+                <onclick>ClearProperty(MediaMenu,Home)</onclick>
+                <onclick>Dialog.Close(1136)</onclick>
+                <onclick>SetFocus(507)</onclick>
+              </item>
+              <item>
+                <label>$LOCALIZE[31242]</label>
+                <onclick condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Skin.SetString(Infinity.MediaView.Default,507)</onclick>
+                <onclick>Container.SetViewMode(507)</onclick>
+                <visible>Window.IsActive(music)</visible>
+                <visible>[Container.Content(albums) | Container.Content(artists)] + !Skin.HasSetting(Disable.BigListView)</visible>
+                <onclick>ClearProperty(MediaMenu,Home)</onclick>
+                <onclick>Dialog.Close(1136)</onclick>
+                <onclick>SetFocus(507)</onclick>
+              </item>
+              <item>
+                <label>$LOCALIZE[31606]</label>
+                <onclick condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Skin.SetString(Infinity.MediaView.Default,59)</onclick>
+                <onclick>Container.SetViewMode(59)</onclick>
+                <visible>Window.IsActive(videos) | Window.IsActive(music)</visible>
+                <visible>!Skin.HasSetting(Disable.LogoView)</visible>
+                <visible>[Container.Content(movies) | Container.Content(sets) | Container.Content(tvshows) | Container.Content(artists)]</visible>
+                <onclick>ClearProperty(MediaMenu,Home)</onclick>
+                <onclick>Dialog.Close(1136)</onclick>
+                <onclick>SetFocus(59)</onclick>
+              </item>
+              <item>
+                <label>[CAPITALIZE]$LOCALIZE[36906][/CAPITALIZE]</label>
+                <onclick condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Skin.SetString(Infinity.MediaView.Default,502)</onclick>
+                <onclick>Container.SetViewMode(502)</onclick>
+                <visible>Window.IsActive(videos)</visible>
+                <visible>Container.Content(episodes) + !Skin.HasSetting(Disable.EpisodeView)</visible>
+                <onclick>ClearProperty(MediaMenu,Home)</onclick>
+                <onclick>Dialog.Close(1136)</onclick>
+                <onclick>SetFocus(502)</onclick>
+              </item>
+              <item>
+                <label>$LOCALIZE[31077]</label>
+                <onclick condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Skin.SetString(Infinity.MediaView.Default,53)</onclick>
+                <onclick>Container.SetViewMode(53)</onclick>
+                <visible>Window.IsActive(videos)</visible>
+                <visible>[Container.Content(movies) | Container.Content(tvshows) | Container.Content(musicvideos) | Container.Content(seasons) | Container.Content(genres) | Container.Content(sets)] + !Skin.HasSetting(Disable.ShowCaseView)</visible>
+                <onclick>ClearProperty(MediaMenu,Home)</onclick>
+                <onclick>Dialog.Close(1136)</onclick>
+                <onclick>SetFocus(53)</onclick>
+              </item>
+              <item>
+                <label>$LOCALIZE[31079]</label>
+                <onclick condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Skin.SetString(Infinity.MediaView.Default,57)</onclick>
+                <onclick>Container.SetViewMode(57)</onclick>
+                <visible>[Container.Content(movies) | Container.Content(tvshows) | Container.Content(musicvideos) | Container.Content(seasons) | Container.Content(genres) | Container.Content(sets) | Container.Content(addons) | Container.Content(songs) | Container.Content(artists) | Container.Content(albums) | Container.Content(genres)] + !Skin.HasSetting(Disable.ShiftView)</visible>
+                <onclick>ClearProperty(MediaMenu,Home)</onclick>
+                <onclick>Dialog.Close(1136)</onclick>
+                <onclick>SetFocus(57)</onclick>
+              </item>
+              <item>
+                <label>$LOCALIZE[31079]</label>
+                <onclick condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Skin.SetString(Infinity.MediaView.Default,57)</onclick>
+                <onclick>Container.SetViewMode(57)</onclick>
+                <visible>Window.IsActive(programs)</visible>
+                <visible>String.Contains(Container.FolderPath,plugin.program.advanced.launcher) + !Skin.HasSetting(Disable.LowListView)</visible>
+                <onclick>ClearProperty(MediaMenu,Home)</onclick>
+                <onclick>Dialog.Close(1136)</onclick>
+                <onclick>SetFocus(57)</onclick>
+              </item>
+              <item>
+                <label>$LOCALIZE[31243]</label>
+                <onclick condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Skin.SetString(Infinity.MediaView.Default,56)</onclick>
+                <onclick>Container.SetViewMode(56)</onclick>
+                <visible>Window.IsActive(videos)</visible>
+                <visible>[Container.Content(genres) | Container.Content(tvshows) | Container.Content(movies) | Container.Content(sets) | Container.Content(seasons) | Container.Content(musicvideos)] + !Skin.HasSetting(Disable.PostersView)</visible>
+                <onclick>ClearProperty(MediaMenu,Home)</onclick>
+                <onclick>Dialog.Close(1136)</onclick>
+                <onclick>SetFocus(56)</onclick>
+              </item>
+              <item>
+                <label>$LOCALIZE[31077]</label>
+                <onclick condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Skin.SetString(Infinity.MediaView.Default,54)</onclick>
+                <onclick>Container.SetViewMode(54)</onclick>
+                <visible>!Window.IsActive(videos) + !Window.IsActive(musicplaylist)</visible>
+                <visible>[Container.Content(addons) | Container.Content(albums) | Container.Content(songs) | Container.Content(artists) | Container.Content(genres) | Container.Content(years) | Window.IsActive(pictures) | Container.Content(files)] + !Skin.HasSetting(Disable.ShowCaseView)</visible>
+                <onclick>ClearProperty(MediaMenu,Home)</onclick>
+                <onclick>Dialog.Close(1136)</onclick>
+                <onclick>SetFocus(54)</onclick>
+              </item>
+              <item>
+                <label>$LOCALIZE[31244]</label>
+                <onclick condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Skin.SetString(Infinity.MediaView.Default,509)</onclick>
+                <onclick>Container.SetViewMode(509)</onclick>
+                <visible>Window.IsActive(videos)</visible>
+                <visible>[Container.Content(movies) | Container.Content(sets) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes)] + !Skin.HasSetting(Disable.MyFlixView)</visible>
+                <onclick>ClearProperty(MediaMenu,Home)</onclick>
+                <onclick>Dialog.Close(1136)</onclick>
+                <onclick>SetFocus(509)</onclick>
+              </item>
+              <item>
+                <label>$LOCALIZE[31078]</label>
+                <onclick condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Skin.SetString(Infinity.MediaView.Default,55)</onclick>
+                <onclick>Container.SetViewMode(55)</onclick>
+                <visible>Window.IsActive(videos)</visible>
+                <visible>[Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets)] + !Skin.HasSetting(Disable.TriPanelView)</visible>
+                <onclick>ClearProperty(MediaMenu,Home)</onclick>
+                <onclick>Dialog.Close(1136)</onclick>
+                <onclick>SetFocus(55)</onclick>
+              </item>
+              <item>
+                <label>$LOCALIZE[31078]</label>
+                <onclick condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Skin.SetString(Infinity.MediaView.Default,55)</onclick>
+                <onclick>Container.SetViewMode(55)</onclick>
+                <visible>[Window.IsActive(music) | Window.IsActive(addonbrowser)]</visible>
+                <visible>[Container.Content(albums) | Container.Content(artists) | Container.Content(songs) | Container.Content(addons) | Window.IsActive(music) + Container.Content(files)] + !Skin.HasSetting(Disable.TriPanelView)</visible>
+                <onclick>ClearProperty(MediaMenu,Home)</onclick>
+                <onclick>Dialog.Close(1136)</onclick>
+                <onclick>SetFocus(55)</onclick>
+              </item>
+              <item>
+                <label>$LOCALIZE[31078]</label>
+                <onclick condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Skin.SetString(Infinity.MediaView.Default,55)</onclick>
+                <onclick>Container.SetViewMode(55)</onclick>
+                <visible>Window.IsActive(programs)</visible>
+                <visible>String.Contains(Container.FolderPath,plugin.program.advanced.launcher) + !Skin.HasSetting(Disable.TriPanelView)</visible>
+                <onclick>ClearProperty(MediaMenu,Home)</onclick>
+                <onclick>Dialog.Close(1136)</onclick>
+                <onclick>SetFocus(55)</onclick>
+              </item>
+              <item>
+                <label>$LOCALIZE[536]</label>
+                <onclick condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Skin.SetString(Infinity.MediaView.Default,500)</onclick>
+                <onclick>Container.SetViewMode(500)</onclick>
+                <visible>!Skin.HasSetting(Disable.IconsView)</visible>
+                <visible>![Window.IsActive(FavouritesBrowser) | Window.IsActive(tvchannels) | Window.IsActive(tvrecordings) | Window.IsActive(tvguide) | Window.IsActive(tvtimers) | Window.IsActive(tvsearch) | Window.IsActive(musicplaylist) | Window.IsActive(radiochannels) | Window.IsActive(radiorecordings) | Window.IsActive(radioguide) | Window.IsActive(radiotimers) | Window.IsActive(radiosearch) | [Window.IsActive(pictures) + Container.Content(addons)]]</visible>
+                <onclick>ClearProperty(MediaMenu,Home)</onclick>
+                <onclick>Dialog.Close(1136)</onclick>
+                <onclick>SetFocus(500)</onclick>
+              </item>
+              <item>
+                <label>$LOCALIZE[31245]</label>
+                <onclick condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Skin.SetString(Infinity.MediaView.Default,503)</onclick>
+                <onclick>Container.SetViewMode(503)</onclick>
+                <visible>Window.IsActive(videos) | Window.IsActive(programs)</visible>
+                <visible>[Container.Content(movies) | Container.Content(sets) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(addons) | Container.Content(files)] + !Skin.HasSetting(Disable.WallView)</visible>
+                <onclick>ClearProperty(MediaMenu,Home)</onclick>
+                <onclick>Dialog.Close(1136)</onclick>
+                <onclick>SetFocus(503)</onclick>
+              </item>
+              <item>
+                <label>$LOCALIZE[31245]</label>
+                <onclick condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Skin.SetString(Infinity.MediaView.Default,503)</onclick>
+                <onclick>Container.SetViewMode(503)</onclick>
+                <visible>Window.IsActive(music)</visible>
+                <visible>[Container.Content(artists) | Container.Content(albums) | Container.Content(genres) | Container.Content(files) + !Skin.HasSetting(Disable.WallView)]</visible>
+                <onclick>ClearProperty(MediaMenu,Home)</onclick>
+                <onclick>Dialog.Close(1136)</onclick>
+                <onclick>SetFocus(503)</onclick>
+              </item>
+              <item>
+                <label>$LOCALIZE[31246]</label>
+                <onclick condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Skin.SetString(Infinity.MediaView.Default,609)</onclick>
+                <onclick>Container.SetViewMode(609)</onclick>
+                <visible>Window.IsActive(videos)</visible>
+                <visible>[Container.Content(movies) | Container.Content(tvshows) | Container.Content(sets)] + !Skin.HasSetting(Disable.FullscreenWallView)</visible>
+                <onclick>ClearProperty(MediaMenu,Home)</onclick>
+                <onclick>Dialog.Close(1136)</onclick>
+                <onclick>SetFocus(609)</onclick>
+              </item>
+              <item>
+                <label>$LOCALIZE[31246]</label>
+                <onclick condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Skin.SetString(Infinity.MediaView.Default,609)</onclick>
+                <onclick>Container.SetViewMode(609)</onclick>
+                <visible>Window.IsActive(music)</visible>
+                <visible>[Container.Content(artists) | Container.Content(albums)] | [Window.IsActive(music) + Container.Content(files)] + !Skin.HasSetting(Disable.FullscreenWallView)</visible>
+                <onclick>ClearProperty(MediaMenu,Home)</onclick>
+                <onclick>Dialog.Close(1136)</onclick>
+                <onclick>SetFocus(609)</onclick>
+              </item>
+              <item>
+                <label>$LOCALIZE[31247]</label>
+                <onclick condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Skin.SetString(Infinity.MediaView.Default,51)</onclick>
+                <onclick>Container.SetViewMode(51)</onclick>
+                <visible>Window.IsActive(videos)</visible>
+                <visible>[Container.Content(tvshows) | Container.Content(movies)] + !Skin.HasSetting(Disable.InfoWallView)</visible>
+                <onclick>ClearProperty(MediaMenu,Home)</onclick>
+                <onclick>Dialog.Close(1136)</onclick>
+                <onclick>SetFocus(51)</onclick>
+              </item>
+              <item>
+                <label>$LOCALIZE[31247]</label>
+                <onclick condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Skin.SetString(Infinity.MediaView.Default,51)</onclick>
+                <onclick>Container.SetViewMode(51)</onclick>
+                <visible>Window.IsActive(music) | Window.IsActive(addonbrowser) | Window.IsActive(programs)</visible>
+                <visible>[Container.Content(albums) | Container.Content(artists) | Container.Content(addons)]</visible>
+                <visible>!Skin.HasSetting(Disable.InfoWallView)</visible>
+                <onclick>ClearProperty(MediaMenu,Home)</onclick>
+                <onclick>Dialog.Close(1136)</onclick>
+                <onclick>SetFocus(51)</onclick>
+              </item>
+              <item>
+                <label>$LOCALIZE[31088]</label>
+                <onclick condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Skin.SetString(Infinity.MediaView.Default,58)</onclick>
+                <onclick>Container.SetViewMode(58)</onclick>
+                <visible>Window.IsActive(videos)</visible>
+                <visible>[Container.Content(movies) | Container.Content(tvshows)] + !Skin.HasSetting(Disable.BannerWallView)</visible>
+                <onclick>ClearProperty(MediaMenu,Home)</onclick>
+                <onclick>Dialog.Close(1136)</onclick>
+                <onclick>SetFocus(58)</onclick>
+              </item>
+              <item>
+                <label>$LOCALIZE[31076]</label>
+                <onclick condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Skin.SetString(Infinity.MediaView.Default,52)</onclick>
+                <onclick>Container.SetViewMode(52)</onclick>
+                <visible>[Container.Content(movies) | Container.Content(tvshows) | Container.Content(episodes) | Container.Content(artists) | Container.Content(sets)] + !Skin.HasSetting(Disable.LandscapeView)</visible>
+                <onclick>ClearProperty(MediaMenu,Home)</onclick>
+                <onclick>Dialog.Close(1136)</onclick>
+                <onclick>SetFocus(52)</onclick>
+              </item>
+              <item>
+                <label>$LOCALIZE[31249]</label>
+                <onclick condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Skin.SetString(Infinity.MediaView.Default,591)</onclick>
+                <onclick>Container.SetViewMode(591)</onclick>
+                <visible>[Container.Content(movies) | Container.Content(sets) | Container.Content(tvshows) | Container.Content(seasons)] + !Skin.HasSetting(Disable.BigFanView)</visible>
+                <onclick>ClearProperty(MediaMenu,Home)</onclick>
+                <onclick>Dialog.Close(1136)</onclick>
+                <onclick>SetFocus(591)</onclick>
+              </item>
+              <item>
+                <label>$LOCALIZE[31251]</label>
+                <onclick condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Skin.SetString(Infinity.MediaView.Default,504)</onclick>
+                <onclick>Container.SetViewMode(504)</onclick>
+                <visible>[Container.Content(movies) | Container.Content(tvshows) | Container.Content(sets) | Window.IsActive(pictures)] + !Skin.HasSetting(Disable.GalleryView)</visible>
+                <visible>![Window.IsActive(pictures) + Container.Content(addons)]</visible>
+                <onclick>ClearProperty(MediaMenu,Home)</onclick>
+                <onclick>Dialog.Close(1136)</onclick>
+                <onclick>SetFocus(504)</onclick>
+              </item>
+              <item>
+                <label>$LOCALIZE[31314]</label>
+                <onclick condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]">Skin.SetString(Infinity.MediaView.Default,505)</onclick>
+                <onclick>Container.SetViewMode(505)</onclick>
+                <visible>[Container.Content(movies) | Container.Content(tvshows) | Container.Content(episodes)] + !Skin.HasSetting(Disable.PanelView)</visible>
+                <onclick>ClearProperty(MediaMenu,Home)</onclick>
+                <onclick>Dialog.Close(1136)</onclick>
+                <onclick>SetFocus(505)</onclick>
+              </item>
+            </content>
+          </control>
+          <control type="button" id="9012">
+            <ondown>8999</ondown>
+            <onup>9000</onup>
+            <bottom>18</bottom>
+            <right>18</right>
+            <left>18</left>
+            <wrapmultiline>true</wrapmultiline>
+            <radioposx>0</radioposx>
+            <textwidth>0</textwidth>
+            <height>108</height>
+            <visible>!Skin.HasSetting(KioskMode.Enabled)</visible>
+            <align>center</align>
+            <textoffsetx>30</textoffsetx>
+            <font>IconMedium</font>
+            <label></label>
+            <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+            <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+            <onleft>9000</onleft>
+            <onright>9000</onright>
+            <onclick condition="System.AddonIsEnabled(script.infinity.commandcenter)">NotifyAll(script.infinity.commandcenter,seamless.loading,"{\"state\":\"action\",\"target\":\"76dcf92145370f6522d9f24911efb6f72881240682651781ae74836836e3cfe7\",\"owner\":{\"window\":\"$INFO[Window(Home).Property(Infinity.Loading.CurrentWindow)]\",\"control\":\"9012\",\"item\":\"$INFO[Container(9012).CurrentItem]\",\"epoch\":\"$INFO[Window(Home).Property(Infinity.Loading.Context)]\",\"section\":\"$INFO[Container(9012).ListItem.Property(section)]\",\"source\":\"$INFO[Container(9012).ListItem.Property(hubsource)]\",\"addon\":\"$INFO[Container(9012).ListItem.Property(Addon.ID)]\",\"dbid\":\"$INFO[Container(9012).ListItem.DBID]\",\"home_section\":\"$INFO[Container(9000).ListItem.Property(section)]\",\"home_source\":\"$INFO[Container(9000).ListItem.Property(hubsource)]\"}}")</onclick>
+            <onclick>ActivateWindow(1138)</onclick>
+            <onclick condition="System.AddonIsEnabled(script.infinity.commandcenter)">NotifyAll(script.infinity.commandcenter,seamless.loading,"{\"state\":\"dispatched\",\"target\":\"76dcf92145370f6522d9f24911efb6f72881240682651781ae74836836e3cfe7\",\"owner\":{\"window\":\"$INFO[Window(Home).Property(Infinity.Loading.CurrentWindow)]\",\"control\":\"9012\",\"item\":\"$INFO[Container(9012).CurrentItem]\",\"epoch\":\"$INFO[Window(Home).Property(Infinity.Loading.Context)]\",\"section\":\"$INFO[Container(9012).ListItem.Property(section)]\",\"source\":\"$INFO[Container(9012).ListItem.Property(hubsource)]\",\"addon\":\"$INFO[Container(9012).ListItem.Property(Addon.ID)]\",\"dbid\":\"$INFO[Container(9012).ListItem.DBID]\",\"home_section\":\"$INFO[Container(9000).ListItem.Property(section)]\",\"home_source\":\"$INFO[Container(9000).ListItem.Property(hubsource)]\"}}")</onclick>
+            <texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+            <textcolor>$VAR[InfinityLegacyText]</textcolor>
+            <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+          </control>
+        </control>
+      </control>
+      <control type="button" id="8999">
+        <right>18</right>
+        <top>18</top>
+        <width>128</width>
+        <height>128</height>
+        <label />
+        <ondown>9000</ondown>
+        <onleft>9000</onleft>
+        <onup>9000</onup>
+        <onclick>Dialog.Close(1136)</onclick>
+        <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+        <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+      </control>
+      <control type="image">
+        <right>58</right>
+        <top>58</top>
+        <width>48</width>
+        <height>48</height>
+        <texture colordiffuse="$VAR[InfinityGlassFocus]">infinity_polish/close.png</texture>
+      </control>
+    </control>
+  </controls>
+  <animation effect="fade" start="0" end="100" time="160" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowOpen</animation>
+  <animation effect="fade" start="100" end="0" time="110" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowClose</animation>
+</window>

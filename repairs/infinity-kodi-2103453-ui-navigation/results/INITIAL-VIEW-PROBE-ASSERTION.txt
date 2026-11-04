@@ -1,0 +1,18 @@
+test_database_contention_does_not_wait_or_change_data (test_view_probe.PrivateBoundedProbe.test_database_contention_does_not_wait_or_change_data) ... ok
+test_no_private_query_path_or_credentials_in_output (test_view_probe.PrivateBoundedProbe.test_no_private_query_path_or_credentials_in_output) ... FAIL
+test_non_video_sources_and_invalid_page_values_are_not_exported (test_view_probe.PrivateBoundedProbe.test_non_video_sources_and_invalid_page_values_are_not_exported) ... ok
+test_probe_is_bounded_and_excluded_from_production_overlay (test_view_probe.PrivateBoundedProbe.test_probe_is_bounded_and_excluded_from_production_overlay) ... ok
+test_readonly_exact_view_database_lookup_and_hash_preservation (test_view_probe.PrivateBoundedProbe.test_readonly_exact_view_database_lookup_and_hash_preservation) ... ok
+
+======================================================================
+FAIL: test_no_private_query_path_or_credentials_in_output (test_view_probe.PrivateBoundedProbe.test_no_private_query_path_or_credentials_in_output)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-kodi-ui-navigation/repairs/infinity-kodi-2103453-ui-navigation/tests/test_view_probe.py", line 22, in test_no_private_query_path_or_credentials_in_output
+    self.assertNotIn(value, json.dumps(row))
+AssertionError: 'token' unexpectedly found in '{"provider": "plugin.video.redlight", "path_token": "9fe562aabfc4199495492b78", "page": 2}'
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.003s
+
+FAILED (failures=1)

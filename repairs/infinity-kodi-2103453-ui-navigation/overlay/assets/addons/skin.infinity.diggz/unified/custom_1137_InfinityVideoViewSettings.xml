@@ -1,0 +1,209 @@
+<?xml version='1.0' encoding='utf-8'?>
+<window id="1137" type="dialog">
+  <onback>Dialog.Close(1137)</onback>
+  <onload>SetProperty(Infinity.Loading.FrameControls,|8999|)</onload>
+  <defaultcontrol always="true">9011</defaultcontrol>
+  <onunload>ClearProperty(actualViewtype,Home)</onunload>
+  <controls>
+    <control type="group">
+      <control type="image">
+        <width>100%</width>
+        <height>100%</height>
+        <texture border="24" colordiffuse="$VAR[InfinityDrawerPanel]">infinity_polish/surface.png</texture>
+      </control>
+      <control type="image">
+        <width>100%</width>
+        <height>100%</height>
+        <texture border="24" colordiffuse="$VAR[InfinityGlassFocus]">infinity_polish/rim.png</texture>
+      </control>
+      <left>18</left>
+      <top>18</top>
+      <bottom>18</bottom>
+      <width max="840">92%</width>
+      <control type="group">
+        <include>InfinityLegacy_WindowSettingsFadeAnimation</include>
+        <control type="label">
+          <scroll>true</scroll>
+          <height>96</height>
+          <top>36</top>
+          <right>166</right>
+          <left>24</left>
+          <textoffsetx>15</textoffsetx>
+          <font>InfinityBodyBold</font>
+          <label>$INFO[Container.Viewmode] $LOCALIZE[5]</label>
+          <textcolor>$VAR[InfinityLegacyAccent]</textcolor>
+        </control>
+        <control type="grouplist" id="9011">
+          <onup>8999</onup>
+          <onback>Dialog.Close(1137)</onback>
+          <bottom>18</bottom>
+          <top>176</top>
+          <right>18</right>
+          <left>18</left>
+          <onleft>Dialog.Close(1137)</onleft>
+          <onright>Dialog.Close(1137)</onright>
+          <ondown>9011</ondown>
+          <control type="button" id="1500">
+            <wrapmultiline>true</wrapmultiline>
+            <radioposx>0</radioposx>
+            <textwidth>0</textwidth>
+            <height>108</height>
+            <width>100%</width>
+            <texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+            <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+            <textoffsetx>18</textoffsetx>
+            <aligny>center</aligny>
+            <shadowcolor>00000000</shadowcolor>
+            <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+            <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+            <textcolor>$VAR[InfinityLegacyText]</textcolor>
+            <font>InfinitySettingsRow</font>
+            <include>InfinityVideoOptionRow</include>
+            <label>$LOCALIZE[31252]</label>
+            <label2>[COLOR $VAR[InfinityLegacyAccent]]$VAR[NoTopBarLabelVar][/COLOR]</label2>
+            <onclick>$VAR[NoTopBarOnClickVar]</onclick>
+            <visible>!Skin.HasSetting(Disable.TopBar)</visible>
+          </control>
+          <control type="button" id="1501">
+            <wrapmultiline>true</wrapmultiline>
+            <radioposx>0</radioposx>
+            <textwidth>0</textwidth>
+            <height>108</height>
+            <width>100%</width>
+            <texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+            <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+            <textoffsetx>18</textoffsetx>
+            <aligny>center</aligny>
+            <shadowcolor>00000000</shadowcolor>
+            <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+            <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+            <textcolor>$VAR[InfinityLegacyText]</textcolor>
+            <font>InfinitySettingsRow</font>
+            <include>InfinityVideoOptionRow</include>
+            <label>$LOCALIZE[31188]</label>
+            <label2>[COLOR $VAR[InfinityLegacyAccent]]$VAR[DisableOverlayLabelVar][/COLOR]</label2>
+            <onclick>$VAR[DisableOverlayOnclickVar]</onclick>
+            <visible>[!String.IsEmpty(Skin.String(Overlay.Toggle)) | !Skin.HasSetting(Disable.Resumable)] + !Window.IsActive(music) + !Window.IsActive(programs) + !Container.Content(genres)</visible>
+            <visible>[String.IsEqual(Window(Home).Property(actualViewtype),Landscape) | String.IsEqual(Window(Home).Property(actualViewtype),ShowCase) | String.IsEqual(Window(Home).Property(actualViewtype),MyFlix) | String.IsEqual(Window(Home).Property(actualViewtype),Icons) | String.IsEqual(Window(Home).Property(actualViewtype),Wall) | [String.IsEqual(Window(Home).Property(actualViewtype),FullscreenWall) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(sets)]] | String.IsEqual(Window(Home).Property(actualViewtype),InfoWall) | String.IsEqual(Window(Home).Property(actualViewtype),BannerWall) | String.IsEqual(Window(Home).Property(actualViewtype),BigList) | String.IsEqual(Window(Home).Property(actualViewtype),Shift) | String.IsEqual(Window(Home).Property(actualViewtype),Posters) | String.IsEqual(Window(Home).Property(actualViewtype),BigFan)]</visible>
+          </control>
+          <control type="button" id="1502">
+            <wrapmultiline>true</wrapmultiline>
+            <radioposx>0</radioposx>
+            <textwidth>0</textwidth>
+            <height>108</height>
+            <width>100%</width>
+            <texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+            <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+            <textoffsetx>18</textoffsetx>
+            <aligny>center</aligny>
+            <shadowcolor>00000000</shadowcolor>
+            <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+            <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+            <textcolor>$VAR[InfinityLegacyText]</textcolor>
+            <font>InfinitySettingsRow</font>
+            <include>InfinityVideoOptionRow</include>
+            <label>$LOCALIZE[31255]</label>
+            <label2>[COLOR $VAR[InfinityLegacyAccent]]$VAR[ViewFlagsLabelVar][/COLOR]</label2>
+            <onclick>$VAR[ViewFlagsOnclickVar]</onclick>
+            <visible>!Container.Content(genres) + !Container.Content(sets)</visible>
+            <visible>String.IsEqual(Window(Home).Property(actualViewtype),ShowCase) | [String.IsEqual(Window(Home).Property(actualViewtype),Landscape) + !Window.IsActive(music)] | [String.IsEqual(Window(Home).Property(actualViewtype),Wall) + ![Container.Content(programs) | Container.Content(addons) | Window.IsActive(music)]] | String.IsEqual(Window(Home).Property(actualViewtype),Logo)</visible>
+          </control>
+          <include condition="String.IsEqual(Window(Home).Property(actualViewtype),List)">InfinityLegacy_ListViewSettings</include>
+          <include condition="String.IsEqual(Window(Home).Property(actualViewtype),InfoWall)">InfinityLegacy_InfoWallViewSettings</include>
+          <include condition="String.IsEqual(Window(Home).Property(actualViewtype),Landscape)">InfinityLegacy_LandscapeViewSettings</include>
+          <include condition="String.IsEqual(Window(Home).Property(actualViewtype),ShowCase)">InfinityLegacy_ShowCaseViewSettings</include>
+          <include condition="String.IsEqual(Window(Home).Property(actualViewtype),ShowCaseSquare)">InfinityLegacy_ShowCaseSquareViewSettings</include>
+          <include condition="String.IsEqual(Window(Home).Property(actualViewtype),TriPanel)">InfinityLegacy_TriPanelViewSettings</include>
+          <include condition="String.IsEqual(Window(Home).Property(actualViewtype),Posters)">InfinityLegacy_PostersViewSettings</include>
+          <include condition="String.IsEqual(Window(Home).Property(actualViewtype),Shift)">InfinityLegacy_ShiftViewSettings</include>
+          <include condition="String.IsEqual(Window(Home).Property(actualViewtype),BannerWall)">InfinityLegacy_BannerWallViewSettings</include>
+          <include condition="String.IsEqual(Window(Home).Property(actualViewtype),Logo)">InfinityLegacy_LogoViewSettings</include>
+          <include condition="String.IsEqual(Window(Home).Property(actualViewtype),Icons)">InfinityLegacy_IconsViewSettings</include>
+          <include condition="String.IsEqual(Window(Home).Property(actualViewtype),LowList)">InfinityLegacy_LowListViewSettings</include>
+          <include condition="String.IsEqual(Window(Home).Property(actualViewtype),Episode)">InfinityLegacy_EpisodeViewSettings</include>
+          <include condition="String.IsEqual(Window(Home).Property(actualViewtype),Wall)">InfinityLegacy_WallViewSettings</include>
+          <include condition="String.IsEqual(Window(Home).Property(actualViewtype),Gallery)">InfinityLegacy_GalleryViewSettings</include>
+          <include condition="String.IsEqual(Window(Home).Property(actualViewtype),Panel)">InfinityLegacy_PanelViewSettings</include>
+          <include condition="String.IsEqual(Window(Home).Property(actualViewtype),RightList)">InfinityLegacy_RightListViewSettings</include>
+          <include condition="String.IsEqual(Window(Home).Property(actualViewtype),BigList)">InfinityLegacy_BigListViewSettings</include>
+          <include condition="String.IsEqual(Window(Home).Property(actualViewtype),SongList)">InfinityLegacy_SongListViewSettings</include>
+          <include condition="String.IsEqual(Window(Home).Property(actualViewtype),MyFlix)">InfinityLegacy_MyFlixViewSettings</include>
+          <include condition="String.IsEqual(Window(Home).Property(actualViewtype),BigFan)">InfinityLegacy_BigFanViewSettings</include>
+          <include condition="String.IsEqual(Window(Home).Property(actualViewtype),FanartList)">InfinityLegacy_FanartListViewSettings</include>
+          <include condition="String.IsEqual(Window(Home).Property(actualViewtype),MusicJukeBox)">InfinityLegacy_MusicJukeBoxViewSettings</include>
+          <include condition="String.IsEqual(Window(Home).Property(actualViewtype),FullscreenWall)">InfinityLegacy_FullscreenWallViewSettings</include>
+          <control type="button" id="1550">
+            <wrapmultiline>true</wrapmultiline>
+            <radioposx>0</radioposx>
+            <textwidth>0</textwidth>
+            <height>108</height>
+            <width>100%</width>
+            <texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+            <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+            <textoffsetx>18</textoffsetx>
+            <aligny>center</aligny>
+            <shadowcolor>00000000</shadowcolor>
+            <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+            <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+            <textcolor>$VAR[InfinityLegacyText]</textcolor>
+            <font>InfinitySettingsRow</font>
+            <include>InfinityVideoOptionRow</include>
+            <label>  - $LOCALIZE[303]</label>
+            <label2>[COLOR $VAR[InfinityLegacyAccent]]$INFO[Skin.String(InfoPopup.Delay),, $LOCALIZE[31090]][/COLOR]</label2>
+            <onclick>$VAR[InfoPopupDelayOnClickVar]</onclick>
+            <visible>[String.IsEqual(Window(Home).Property(actualViewtype),FullscreenWall) + Skin.HasSetting(Enable.FullscreenWallInfoPopup)] | [String.IsEqual(Window(Home).Property(actualViewtype),RightList) + Skin.HasSetting(Enable.RightlistInfoPopup) + Skin.HasSetting(inforightlist)] | [String.IsEqual(Window(Home).Property(actualViewtype),Icons) + Skin.HasSetting(Enable.IconsInfoPopup)] | [String.IsEqual(Window(Home).Property(actualViewtype),BannerWall) + Skin.HasSetting(Disable.BannerWallInfo) + Skin.HasSetting(Enable.BannerWallInfoPopup)] + !Window.IsActive(music)</visible>
+          </control>
+          <control type="button" id="1551">
+            <wrapmultiline>true</wrapmultiline>
+            <radioposx>0</radioposx>
+            <textwidth>0</textwidth>
+            <height>108</height>
+            <width>100%</width>
+            <texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus>
+            <texturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</texturefocus>
+            <textoffsetx>18</textoffsetx>
+            <aligny>center</aligny>
+            <shadowcolor>00000000</shadowcolor>
+            <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+            <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
+            <textcolor>$VAR[InfinityLegacyText]</textcolor>
+            <font>InfinitySettingsRow</font>
+            <include>InfinityVideoOptionRow</include>
+            <label>$LOCALIZE[31607]</label>
+            <label2>[COLOR $VAR[InfinityLegacyAccent]]$VAR[DisableHDIndicatorsLabelVar][/COLOR]</label2>
+            <onclick condition="String.IsEqual(Window(Home).Property(actualViewtype),List)">Skin.ToggleSetting(noindicatorlist)</onclick>
+            <onclick condition="String.IsEqual(Window(Home).Property(actualViewtype),FanartList)">Skin.ToggleSetting(noindicatorfanartlist)</onclick>
+            <onclick condition="String.IsEqual(Window(Home).Property(actualViewtype),Wall)">Skin.ToggleSetting(noindicatorwall)</onclick>
+            <onclick condition="String.IsEqual(Window(Home).Property(actualViewtype),Gallery)">Skin.ToggleSetting(noindicatorgallery)</onclick>
+            <onclick condition="String.IsEqual(Window(Home).Property(actualViewtype),BigList)">Skin.ToggleSetting(noindicatorbiglist)</onclick>
+            <visible>Window.IsMedia + !Window.IsVisible(addonbrowser) + !Window.IsVisible(favouritesbrowser)</visible>
+            <visible>[String.IsEqual(Window(Home).Property(actualViewtype),List)] | [String.IsEqual(Window(Home).Property(actualViewtype),FanartList)] | [String.IsEqual(Window(Home).Property(actualViewtype),BigList)] | [String.IsEqual(Window(Home).Property(actualViewtype),Gallery)]</visible>
+            <visible>!Window.IsActive(music) + !Container.Content(tvshows) + !Container.Content(seasons) + !Container.Content(genres) + !Container.Content(sets)</visible>
+          </control>
+        </control>
+      </control>
+      <control type="button" id="8999">
+        <right>18</right>
+        <top>18</top>
+        <width>128</width>
+        <height>128</height>
+        <label />
+        <ondown>9011</ondown>
+        <onleft>9011</onleft>
+        <onup>9011</onup>
+        <onclick>Dialog.Close(1137)</onclick>
+        <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+        <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+      </control>
+      <control type="image">
+        <right>58</right>
+        <top>58</top>
+        <width>48</width>
+        <height>48</height>
+        <texture colordiffuse="$VAR[InfinityGlassFocus]">infinity_polish/close.png</texture>
+      </control>
+    </control>
+  </controls>
+  <animation effect="fade" start="0" end="100" time="160" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowOpen</animation>
+  <animation effect="fade" start="100" end="0" time="110" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowClose</animation>
+</window>

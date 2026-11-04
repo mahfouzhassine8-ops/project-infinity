@@ -1,0 +1,61 @@
+{
+  "platform": "upstream Linux Kodi 21.2; synthetic providers; actual signed skin plus source overlay",
+  "phase": "pointer-diagnostic",
+  "checks": [
+    {
+      "name": "actual-infinity-skin",
+      "passed": true
+    },
+    {
+      "name": "directory-ready:a:1:movies",
+      "passed": true
+    },
+    {
+      "name": "main-view-options-focus",
+      "passed": true
+    },
+    {
+      "name": "main-opens-scoped-selector",
+      "passed": true
+    },
+    {
+      "name": "before-button-inspection",
+      "passed": true
+    },
+    {
+      "name": "button-inspection-returned",
+      "passed": true
+    },
+    {
+      "name": "mouse-x-closes-only-nested-selector",
+      "passed": true
+    },
+    {
+      "name": "legitimate-main-options-still-open",
+      "passed": true
+    },
+    {
+      "name": "main-x-closes-options-without-exiting-videos",
+      "passed": true
+    }
+  ],
+  "observations": [
+    {
+      "label": "final",
+      "window": 10025,
+      "dialog": 9999,
+      "view": 51,
+      "default": "51",
+      "path": "plugin://plugin.video.infinityuiqa.a/?page=1&content=movies",
+      "items": "9",
+      "title": ""
+    }
+  ],
+  "pointer": {
+    "x": 929.0,
+    "y": 105.0,
+    "width": 128,
+    "height": 128
+  },
+  "status": "PASS_LINUX_FIXTURE_ONLY"
+}

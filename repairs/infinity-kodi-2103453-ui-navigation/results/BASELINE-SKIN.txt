@@ -1,0 +1,235 @@
+test_all_original_view_actions_and_filters_retained (test_skin_contract.BrowserSource.test_all_original_view_actions_and_filters_retained) ... ok
+test_close_and_back_only_dismiss_intended_layer (test_skin_contract.BrowserSource.test_close_and_back_only_dismiss_intended_layer) ... FAIL
+test_main_video_menu_has_one_close_and_full_width_rows (test_skin_contract.BrowserSource.test_main_video_menu_has_one_close_and_full_width_rows) ... FAIL
+test_nested_panel_bounds_and_nonoverlapping_rows (test_skin_contract.BrowserSource.test_nested_panel_bounds_and_nonoverlapping_rows) ... FAIL
+test_original_movie_layout_and_metadata_not_rewritten (test_skin_contract.BrowserSource.test_original_movie_layout_and_metadata_not_rewritten) ... ok
+test_other_list_routes_unchanged (test_skin_contract.BrowserSource.test_other_list_routes_unchanged) ... ok
+test_plugin_movie_list_retains_existing_detail_layout (test_skin_contract.BrowserSource.test_plugin_movie_list_retains_existing_detail_layout) ... 
+  test_plugin_movie_list_retains_existing_detail_layout (test_skin_contract.BrowserSource.test_plugin_movie_list_retains_existing_detail_layout) (mode='auto', slim=False) ... FAIL
+  test_plugin_movie_list_retains_existing_detail_layout (test_skin_contract.BrowserSource.test_plugin_movie_list_retains_existing_detail_layout) (mode='auto', slim=True) ... FAIL
+  test_plugin_movie_list_retains_existing_detail_layout (test_skin_contract.BrowserSource.test_plugin_movie_list_retains_existing_detail_layout) (mode='normal', slim=False) ... FAIL
+  test_plugin_movie_list_retains_existing_detail_layout (test_skin_contract.BrowserSource.test_plugin_movie_list_retains_existing_detail_layout) (mode='normal', slim=True) ... FAIL
+  test_plugin_movie_list_retains_existing_detail_layout (test_skin_contract.BrowserSource.test_plugin_movie_list_retains_existing_detail_layout) (mode='compact', slim=False) ... FAIL
+  test_plugin_movie_list_retains_existing_detail_layout (test_skin_contract.BrowserSource.test_plugin_movie_list_retains_existing_detail_layout) (mode='compact', slim=True) ... FAIL
+  test_plugin_movie_list_retains_existing_detail_layout (test_skin_contract.BrowserSource.test_plugin_movie_list_retains_existing_detail_layout) (mode='twopane', slim=False) ... FAIL
+  test_plugin_movie_list_retains_existing_detail_layout (test_skin_contract.BrowserSource.test_plugin_movie_list_retains_existing_detail_layout) (mode='twopane', slim=True) ... FAIL
+test_selection_applies_then_returns_to_selected_view_once (test_skin_contract.BrowserSource.test_selection_applies_then_returns_to_selected_view_once) ... FAIL
+test_shared_dialogs_and_rows_unchanged (test_skin_contract.BrowserSource.test_shared_dialogs_and_rows_unchanged) ... ok
+test_view54_is_non_video_not_a_movie_registration_repair (test_skin_contract.BrowserSource.test_view54_is_non_video_not_a_movie_registration_repair) ... ok
+test_library_uses_native_collections_and_sources (test_skin_contract.DrawerSource.test_library_uses_native_collections_and_sources) ... FAIL
+test_navigation_order (test_skin_contract.DrawerSource.test_navigation_order) ... FAIL
+test_original_routes_system_actions_and_styling_preserved (test_skin_contract.DrawerSource.test_original_routes_system_actions_and_styling_preserved) ... ok
+
+======================================================================
+FAIL: test_close_and_back_only_dismiss_intended_layer (test_skin_contract.BrowserSource.test_close_and_back_only_dismiss_intended_layer)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-kodi-ui-navigation/repairs/infinity-kodi-2103453-ui-navigation/tests/test_skin_contract.py", line 118, in test_close_and_back_only_dismiss_intended_layer
+    self.assertEqual(close[0].findtext('onclick'), 'Dialog.Close(%s)' % (old + 6))
+AssertionError: 'Dialog.Close(1130)' != 'Dialog.Close(1136)'
+- Dialog.Close(1130)
+?                 ^
++ Dialog.Close(1136)
+?                 ^
+
+
+======================================================================
+FAIL: test_main_video_menu_has_one_close_and_full_width_rows (test_skin_contract.BrowserSource.test_main_video_menu_has_one_close_and_full_width_rows)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-kodi-ui-navigation/repairs/infinity-kodi-2103453-ui-navigation/tests/test_skin_contract.py", line 153, in test_main_video_menu_has_one_close_and_full_width_rows
+    self.assertTrue(p.exists(), 'Videos-specific menu missing')
+AssertionError: False is not true : Videos-specific menu missing
+
+======================================================================
+FAIL: test_nested_panel_bounds_and_nonoverlapping_rows (test_skin_contract.BrowserSource.test_nested_panel_bounds_and_nonoverlapping_rows)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-kodi-ui-navigation/repairs/infinity-kodi-2103453-ui-navigation/tests/test_skin_contract.py", line 129, in test_nested_panel_bounds_and_nonoverlapping_rows
+    self.assertEqual(panel.findtext('width'), '92%')
+AssertionError: None != '92%'
+
+======================================================================
+FAIL: test_plugin_movie_list_retains_existing_detail_layout (test_skin_contract.BrowserSource.test_plugin_movie_list_retains_existing_detail_layout) (mode='auto', slim=False)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-kodi-ui-navigation/repairs/infinity-kodi-2103453-ui-navigation/tests/test_skin_contract.py", line 56, in test_plugin_movie_list_retains_existing_detail_layout
+    self.assertEqual(owners('movies', 'plugin.video.fixture', mode, slim),
+AssertionError: Lists differ: ['InfinityPluginDirectoryRegular'] != ['VideoList']
+
+First differing element 0:
+'InfinityPluginDirectoryRegular'
+'VideoList'
+
+- ['InfinityPluginDirectoryRegular']
++ ['VideoList']
+
+======================================================================
+FAIL: test_plugin_movie_list_retains_existing_detail_layout (test_skin_contract.BrowserSource.test_plugin_movie_list_retains_existing_detail_layout) (mode='auto', slim=True)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-kodi-ui-navigation/repairs/infinity-kodi-2103453-ui-navigation/tests/test_skin_contract.py", line 56, in test_plugin_movie_list_retains_existing_detail_layout
+    self.assertEqual(owners('movies', 'plugin.video.fixture', mode, slim),
+AssertionError: Lists differ: ['InfinityPluginDirectoryRegular'] != ['SlimVideoList']
+
+First differing element 0:
+'InfinityPluginDirectoryRegular'
+'SlimVideoList'
+
+- ['InfinityPluginDirectoryRegular']
++ ['SlimVideoList']
+
+======================================================================
+FAIL: test_plugin_movie_list_retains_existing_detail_layout (test_skin_contract.BrowserSource.test_plugin_movie_list_retains_existing_detail_layout) (mode='normal', slim=False)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-kodi-ui-navigation/repairs/infinity-kodi-2103453-ui-navigation/tests/test_skin_contract.py", line 56, in test_plugin_movie_list_retains_existing_detail_layout
+    self.assertEqual(owners('movies', 'plugin.video.fixture', mode, slim),
+AssertionError: Lists differ: ['InfinityPluginDirectoryRegular'] != ['VideoList']
+
+First differing element 0:
+'InfinityPluginDirectoryRegular'
+'VideoList'
+
+- ['InfinityPluginDirectoryRegular']
++ ['VideoList']
+
+======================================================================
+FAIL: test_plugin_movie_list_retains_existing_detail_layout (test_skin_contract.BrowserSource.test_plugin_movie_list_retains_existing_detail_layout) (mode='normal', slim=True)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-kodi-ui-navigation/repairs/infinity-kodi-2103453-ui-navigation/tests/test_skin_contract.py", line 56, in test_plugin_movie_list_retains_existing_detail_layout
+    self.assertEqual(owners('movies', 'plugin.video.fixture', mode, slim),
+AssertionError: Lists differ: ['InfinityPluginDirectoryRegular'] != ['SlimVideoList']
+
+First differing element 0:
+'InfinityPluginDirectoryRegular'
+'SlimVideoList'
+
+- ['InfinityPluginDirectoryRegular']
++ ['SlimVideoList']
+
+======================================================================
+FAIL: test_plugin_movie_list_retains_existing_detail_layout (test_skin_contract.BrowserSource.test_plugin_movie_list_retains_existing_detail_layout) (mode='compact', slim=False)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-kodi-ui-navigation/repairs/infinity-kodi-2103453-ui-navigation/tests/test_skin_contract.py", line 56, in test_plugin_movie_list_retains_existing_detail_layout
+    self.assertEqual(owners('movies', 'plugin.video.fixture', mode, slim),
+AssertionError: Lists differ: ['InfinityPluginDirectoryCompact'] != ['VideoList']
+
+First differing element 0:
+'InfinityPluginDirectoryCompact'
+'VideoList'
+
+- ['InfinityPluginDirectoryCompact']
++ ['VideoList']
+
+======================================================================
+FAIL: test_plugin_movie_list_retains_existing_detail_layout (test_skin_contract.BrowserSource.test_plugin_movie_list_retains_existing_detail_layout) (mode='compact', slim=True)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-kodi-ui-navigation/repairs/infinity-kodi-2103453-ui-navigation/tests/test_skin_contract.py", line 56, in test_plugin_movie_list_retains_existing_detail_layout
+    self.assertEqual(owners('movies', 'plugin.video.fixture', mode, slim),
+AssertionError: Lists differ: ['InfinityPluginDirectoryCompact'] != ['SlimVideoList']
+
+First differing element 0:
+'InfinityPluginDirectoryCompact'
+'SlimVideoList'
+
+- ['InfinityPluginDirectoryCompact']
++ ['SlimVideoList']
+
+======================================================================
+FAIL: test_plugin_movie_list_retains_existing_detail_layout (test_skin_contract.BrowserSource.test_plugin_movie_list_retains_existing_detail_layout) (mode='twopane', slim=False)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-kodi-ui-navigation/repairs/infinity-kodi-2103453-ui-navigation/tests/test_skin_contract.py", line 56, in test_plugin_movie_list_retains_existing_detail_layout
+    self.assertEqual(owners('movies', 'plugin.video.fixture', mode, slim),
+AssertionError: Lists differ: ['InfinityPluginDirectoryRegular'] != ['VideoList']
+
+First differing element 0:
+'InfinityPluginDirectoryRegular'
+'VideoList'
+
+- ['InfinityPluginDirectoryRegular']
++ ['VideoList']
+
+======================================================================
+FAIL: test_plugin_movie_list_retains_existing_detail_layout (test_skin_contract.BrowserSource.test_plugin_movie_list_retains_existing_detail_layout) (mode='twopane', slim=True)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-kodi-ui-navigation/repairs/infinity-kodi-2103453-ui-navigation/tests/test_skin_contract.py", line 56, in test_plugin_movie_list_retains_existing_detail_layout
+    self.assertEqual(owners('movies', 'plugin.video.fixture', mode, slim),
+AssertionError: Lists differ: ['InfinityPluginDirectoryRegular'] != ['SlimVideoList']
+
+First differing element 0:
+'InfinityPluginDirectoryRegular'
+'SlimVideoList'
+
+- ['InfinityPluginDirectoryRegular']
++ ['SlimVideoList']
+
+======================================================================
+FAIL: test_selection_applies_then_returns_to_selected_view_once (test_skin_contract.BrowserSource.test_selection_applies_then_returns_to_selected_view_once)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-kodi-ui-navigation/repairs/infinity-kodi-2103453-ui-navigation/tests/test_skin_contract.py", line 110, in test_selection_applies_then_returns_to_selected_view_once
+    self.assertEqual(actions, [actions[0], 'ClearProperty(MediaMenu,Home)',
+AssertionError: Lists differ: ['Con[19 chars]603)'] != ['Con[19 chars]603)', 'ClearProperty(MediaMenu,Home)', 'Dialo[27 chars]03)']
+
+Second list contains 3 additional elements.
+First extra element 1:
+'ClearProperty(MediaMenu,Home)'
+
+- ['Container.SetViewMode(603)']
+?                              ^
+
++ ['Container.SetViewMode(603)',
+?                              ^
+
++  'ClearProperty(MediaMenu,Home)',
++  'Dialog.Close(1136)',
++  'SetFocus(603)']
+
+======================================================================
+FAIL: test_library_uses_native_collections_and_sources (test_skin_contract.DrawerSource.test_library_uses_native_collections_and_sources)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-kodi-ui-navigation/repairs/infinity-kodi-2103453-ui-navigation/tests/test_skin_contract.py", line 183, in test_library_uses_native_collections_and_sources
+    self.assertEqual(list(by_label)[:5], ['Infinity Movies', 'Infinity TV Shows', 'Browse Files', 'Downloads', 'Media Sources'])
+AssertionError: Lists differ: ['Library', 'Add-ons'] != ['Infinity Movies', 'Infinity TV Shows', 'B[38 chars]ces']
+
+First differing element 0:
+'Library'
+'Infinity Movies'
+
+Second list contains 3 additional elements.
+First extra element 2:
+'Browse Files'
+
+- ['Library', 'Add-ons']
++ ['Infinity Movies',
++  'Infinity TV Shows',
++  'Browse Files',
++  'Downloads',
++  'Media Sources']
+
+======================================================================
+FAIL: test_navigation_order (test_skin_contract.DrawerSource.test_navigation_order)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-kodi-ui-navigation/repairs/infinity-kodi-2103453-ui-navigation/tests/test_skin_contract.py", line 177, in test_navigation_order
+    self.assertEqual([b.findtext('label') for b in rows['NAVIGATION']],
+AssertionError: Lists differ: ['Home', 'Movies', 'TV Shows'] != ['Home', 'Movies', 'TV Shows', 'Sports', 'Favorites']
+
+Second list contains 2 additional elements.
+First extra element 3:
+'Sports'
+
+- ['Home', 'Movies', 'TV Shows']
++ ['Home', 'Movies', 'TV Shows', 'Sports', 'Favorites']
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.123s
+
+FAILED (failures=14)

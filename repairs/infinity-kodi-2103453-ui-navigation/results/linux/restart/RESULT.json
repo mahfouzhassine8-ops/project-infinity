@@ -1,0 +1,77 @@
+{
+  "platform": "upstream Linux Kodi 21.2; synthetic providers; actual signed skin plus source overlay",
+  "phase": "restart",
+  "checks": [
+    {
+      "name": "actual-infinity-skin",
+      "passed": true
+    },
+    {
+      "name": "directory-ready:a:1:movies",
+      "passed": true
+    },
+    {
+      "name": "native-skin-setting-survived-process-restart",
+      "passed": true
+    },
+    {
+      "name": "global-view-restored-after-process-restart",
+      "passed": true
+    },
+    {
+      "name": "native-movie-title-available",
+      "passed": true
+    },
+    {
+      "name": "native-synopsis-available",
+      "passed": true
+    },
+    {
+      "name": "selector-open:51",
+      "passed": true
+    },
+    {
+      "name": "selector-row:51",
+      "passed": true
+    },
+    {
+      "name": "selected-view:51",
+      "passed": true
+    },
+    {
+      "name": "selected-movie-retained-across-view-switch",
+      "passed": true
+    },
+    {
+      "name": "focus-returned-to-current-container",
+      "passed": true
+    },
+    {
+      "name": "native-arrow-navigation-after-selector-close",
+      "passed": true
+    }
+  ],
+  "observations": [
+    {
+      "label": "metadata-and-focus",
+      "window": 10025,
+      "dialog": 9999,
+      "view": 51,
+      "default": "51",
+      "path": "plugin://plugin.video.infinityuiqa.a/?page=1&content=movies",
+      "items": "9",
+      "title": "Fixture movies 02"
+    },
+    {
+      "label": "final",
+      "window": 10025,
+      "dialog": 9999,
+      "view": 51,
+      "default": "51",
+      "path": "plugin://plugin.video.infinityuiqa.a/?page=1&content=movies",
+      "items": "9",
+      "title": "Fixture movies 02"
+    }
+  ],
+  "status": "PASS_LINUX_FIXTURE_ONLY"
+}

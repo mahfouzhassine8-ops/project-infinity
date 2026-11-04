@@ -1,0 +1,56 @@
+{
+  "platform": "upstream Linux Kodi 21.2; synthetic providers; actual signed skin plus source overlay",
+  "phase": "candidate",
+  "checks": [
+    {
+      "name": "actual-infinity-skin",
+      "passed": true
+    },
+    {
+      "name": "directory-ready:a:1:movies",
+      "passed": true
+    },
+    {
+      "name": "selector-open:50",
+      "passed": true
+    },
+    {
+      "name": "selector-row:50",
+      "passed": true
+    },
+    {
+      "name": "selected-view:50",
+      "passed": true
+    },
+    {
+      "name": "explicit-global-setting:50",
+      "passed": true
+    },
+    {
+      "name": "directory-ready:a:2:movies",
+      "passed": true
+    },
+    {
+      "name": "next-page:50",
+      "passed": true
+    },
+    {
+      "name": "back:50",
+      "passed": false
+    }
+  ],
+  "observations": [
+    {
+      "label": "failure",
+      "window": 10025,
+      "dialog": 9999,
+      "view": 50,
+      "default": "50",
+      "path": "plugin://plugin.video.infinityuiqa.a/",
+      "items": "9",
+      "title": ""
+    }
+  ],
+  "status": "FAIL",
+  "error": "Traceback (most recent call last):\n  File \"/tmp/kodi-ui-runtime-qa/root/usr/share/kodi/addons/script.infinityuiqa/probe.py\", line 110, in <module>\n    check('back:%s' % desired, wait(lambda: view() == desired and 'page=1' in xbmc.getInfoLabel('Container.FolderPath')))\n    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/tmp/kodi-ui-runtime-qa/root/usr/share/kodi/addons/script.infinityuiqa/probe.py\", line 34, in check\n    if not ok:raise RuntimeError(name)\n              ^^^^^^^^^^^^^^^^^^^^^^^^\nRuntimeError: back:50\n"
+}

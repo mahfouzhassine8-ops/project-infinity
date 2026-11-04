@@ -1,0 +1,59 @@
+{
+  "platform": "upstream Linux Kodi 21.2; synthetic providers; actual signed skin plus source overlay",
+  "phase": "media-write-guard",
+  "checks": [
+    {
+      "name": "actual-infinity-skin",
+      "passed": true
+    },
+    {
+      "name": "directory-ready:a:1:movies",
+      "passed": true
+    },
+    {
+      "name": "selector-open:55",
+      "passed": true
+    },
+    {
+      "name": "selector-row:55",
+      "passed": true
+    },
+    {
+      "name": "selected-view:55",
+      "passed": true
+    },
+    {
+      "name": "movie-choice-saved",
+      "passed": true
+    },
+    {
+      "name": "directory-ready:b:1:files",
+      "passed": true
+    },
+    {
+      "name": "selector-open:50",
+      "passed": true
+    },
+    {
+      "name": "selector-row:50",
+      "passed": true
+    },
+    {
+      "name": "selected-view:50",
+      "passed": true
+    },
+    {
+      "name": "file-view-selection-preserves-media-default",
+      "passed": true
+    },
+    {
+      "name": "directory-ready:b:2:movies",
+      "passed": true
+    },
+    {
+      "name": "movie-default-restored-after-file-browser",
+      "passed": true
+    }
+  ],
+  "observations": []
+}

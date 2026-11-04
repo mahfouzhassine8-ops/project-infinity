@@ -1,5 +1,10 @@
 # Kodi UI/navigation source investigation — 2026-11-04
 
+Historical checkpoint note: the later user instruction explicitly authorizes one
+global movie/TV view preference. It supersedes this investigation's original
+per-directory policy. See `RESULTS.md` for the implementation, ruled-out View 54
+lead, actual runtime evidence and remaining List-rendering limitations.
+
 ## Authority and boundary
 
 User-authorized source-only investigation, targeted implementation and focused

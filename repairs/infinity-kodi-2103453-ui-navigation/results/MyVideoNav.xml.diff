@@ -1,0 +1,217 @@
+--- signed-2103453/assets/addons/skin.infinity.diggz/unified/MyVideoNav.xml
++++ source-candidate/assets/addons/skin.infinity.diggz/unified/MyVideoNav.xml
+@@ -201,12 +201,12 @@
+     </control>
+     <control type="group">
+       <include>WindowOpenCloseAnimation</include>
+-      <include condition="!String.IsEqual(Skin.String(Infinity.HomeView),cinema) + !String.IsEmpty(Container.PluginName) + String.IsEqual(Skin.String(Infinity.HomeView),compact)">InfinityPluginDirectoryCompact</include>
+-      <include condition="!String.IsEqual(Skin.String(Infinity.HomeView),cinema) + !String.IsEmpty(Container.PluginName) + !String.IsEqual(Skin.String(Infinity.HomeView),compact)">InfinityPluginDirectoryRegular</include>
++      <include condition="!String.IsEqual(Skin.String(Infinity.HomeView),cinema) + !String.IsEmpty(Container.PluginName) + String.IsEqual(Skin.String(Infinity.HomeView),compact) + !Container.Content(movies)">InfinityPluginDirectoryCompact</include>
++      <include condition="!String.IsEqual(Skin.String(Infinity.HomeView),cinema) + !String.IsEmpty(Container.PluginName) + !String.IsEqual(Skin.String(Infinity.HomeView),compact) + !Container.Content(movies)">InfinityPluginDirectoryRegular</include>
+       <include condition="!String.IsEqual(Skin.String(Infinity.HomeView),cinema) + String.IsEmpty(Container.PluginName) + [Container.Content() | Container.Content(files) | Container.Content(playlists) | Container.Content(addons)]">InfinityCoreDirectory</include>
+-      <include condition="!String.IsEqual(Skin.String(Infinity.HomeView),cinema) + String.IsEmpty(Container.PluginName) + ![Container.Content() | Container.Content(files) | Container.Content(playlists) | Container.Content(addons)] + !Skin.HasSetting(Enable.SlimList)">VideoList</include>
++      <include condition="!String.IsEqual(Skin.String(Infinity.HomeView),cinema) + [String.IsEmpty(Container.PluginName) | Container.Content(movies)] + ![Container.Content() | Container.Content(files) | Container.Content(playlists) | Container.Content(addons)] + !Skin.HasSetting(Enable.SlimList)">VideoList</include>
+       <include condition="String.IsEqual(Skin.String(Infinity.HomeView),cinema) + !Skin.HasSetting(Enable.SlimList)">InfinityCinemaBrowseList</include>
+-      <include condition="!String.IsEqual(Skin.String(Infinity.HomeView),cinema) + String.IsEmpty(Container.PluginName) + ![Container.Content() | Container.Content(files) | Container.Content(playlists) | Container.Content(addons)] + Skin.HasSetting(Enable.SlimList)">SlimVideoList</include>
++      <include condition="!String.IsEqual(Skin.String(Infinity.HomeView),cinema) + [String.IsEmpty(Container.PluginName) | Container.Content(movies)] + ![Container.Content() | Container.Content(files) | Container.Content(playlists) | Container.Content(addons)] + Skin.HasSetting(Enable.SlimList)">SlimVideoList</include>
+       <include condition="String.IsEqual(Skin.String(Infinity.HomeView),cinema) + Skin.HasSetting(Enable.SlimList)">InfinityCinemaBrowseList</include>
+       <include condition="!Skin.HasSetting(Disable.InfoWallView)">VideoInfoWall</include>
+       <include condition="!Skin.HasSetting(Disable.LandscapeView)">View_52_Landscape</include>
+@@ -1118,13 +1118,13 @@
+     <control type="group">
+       <description>InfinityCinemaBrowse: legacy projection</description>
+       <control type="group">
+-        <include>SideBladeLeft</include>
++        <include>InfinityVideoSideBladeLeft</include>
+         <control type="grouplist" id="9050">
+-          <include>MediaMenuTop</include>
++          <include>InfinityVideoMenuTop</include>
+           <control type="button" id="6051">
+             <description>Show Info Toggle</description>
+             <textcolor>$VAR[InfinityPaletteTextPrimary]</textcolor>
+-            <include>ButtonCommonValues_PolishMenu</include>
++            <include>InfinityVideoMenuRow</include>
+             <label>$LOCALIZE[31018]</label>
+             <label2>[COLOR $VAR[ThemeLabelColor]]$VAR[InfoPanelLabelVar][/COLOR]</label2>
+             <onclick condition="Control.IsVisible(52)">$VAR[52VideoInfoPanelVar]</onclick>
+@@ -1135,40 +1135,40 @@
+             <onclick condition="Control.IsVisible(503)">Skin.ToggleSetting(503.InfoPanel)</onclick>
+             <visible>![Container.Content(genres) | Container.Content(musicvideos)]</visible>
+             <visible>Control.IsVisible(52) | Control.IsVisible(53) | Control.IsVisible(57) | [Control.IsVisible(58) + Skin.HasSetting(BannerPlex) + Skin.HasSetting(Disable.BannerWallInfo)] | Control.IsVisible(59) | Control.IsVisible(503)</visible>
+-            <textwidth>300</textwidth>
++            <textwidth>0</textwidth>
+           </control>
+           <control type="radiobutton" id="6052">
+             <description>InfoPanel Settings button</description>
+             <textcolor>$VAR[InfinityPaletteTextPrimary]</textcolor>
+-            <include>ButtonCommonValues_PolishMenu</include>
++            <include>InfinityVideoMenuRow</include>
+             <label>   - $LOCALIZE[413]</label>
+             <onclick>Skin.ToggleSetting(Enable.ManualInfoPanel)</onclick>
+             <onclick condition="!Skin.HasSetting(Enable.ManualInfoPanel)">Skin.Reset(InfoPanel.Delay)</onclick>
+             <selected>Skin.HasSetting(Enable.ManualInfoPanel)</selected>
+             <visible>!Container.Content(genres) + Window.IsActive(videos) + Control.IsVisible(6051) + [!String.IsEmpty(Control.GetLabel(4420)) | !String.IsEmpty(Control.GetLabel(4421))]</visible>
+-            <textwidth>300</textwidth>
++            <textwidth>0</textwidth>
+           </control>
+           <control type="button" id="201">
+             <description>View options</description>
+             <font>font13_bold</font>
+             <textcolor>$VAR[InfinityPaletteTextPrimary]</textcolor>
+-            <include>ButtonCommonValues_PolishMenu</include>
++            <include>InfinityVideoMenuRow</include>
+             <label>31026</label>
+             <enable>no</enable>
+             <disabledcolor>$VAR[ThemeLabelColor]</disabledcolor>
+-            <textwidth>300</textwidth>
++            <textwidth>0</textwidth>
+           </control>
+           <control type="button" id="10">
+             <description>Watched Toggle</description>
+             <textcolor>$VAR[InfinityPaletteTextPrimary]</textcolor>
+-            <include>ButtonCommonValues_PolishMenu</include>
++            <include>InfinityVideoMenuRow</include>
+             <label2>[COLOR $VAR[ThemeLabelColor]]$INFO[Container.NumItems][/COLOR]</label2>
+-            <textwidth>300</textwidth>
++            <textwidth>0</textwidth>
+           </control>
+           <control type="button" id="11118">
+             <description>Search</description>
+             <textcolor>$VAR[InfinityPaletteTextPrimary]</textcolor>
+-            <include>ButtonCommonValues_PolishMenu</include>
++            <include>InfinityVideoMenuRow</include>
+             <label>137</label>
+             <onclick>ClearProperty(MediaMenu,Home)</onclick>
+             <onclick>SetFocus(50)</onclick>
+@@ -1180,68 +1180,68 @@
+ <onclick condition="[!Skin.HasSetting(Disable.MultiSearch)] + System.AddonIsEnabled(script.infinity.commandcenter)">NotifyAll(script.infinity.commandcenter,seamless.loading,&quot;{\&quot;state\&quot;:\&quot;dispatched\&quot;,\&quot;target\&quot;:\&quot;24a138726bee2b645c64f60b1921fb861a245697509fb6382805a5a02f78e9f5\&quot;,\&quot;owner\&quot;:{\&quot;window\&quot;:\&quot;$INFO[Window(Home).Property(Infinity.Loading.CurrentWindow)]\&quot;,\&quot;control\&quot;:\&quot;11118\&quot;,\&quot;item\&quot;:\&quot;$INFO[Container(11118).CurrentItem]\&quot;,\&quot;epoch\&quot;:\&quot;$INFO[Window(Home).Property(Infinity.Loading.Context)]\&quot;,\&quot;section\&quot;:\&quot;$INFO[Container(11118).ListItem.Property(section)]\&quot;,\&quot;source\&quot;:\&quot;$INFO[Container(11118).ListItem.Property(hubsource)]\&quot;,\&quot;addon\&quot;:\&quot;$INFO[Container(11118).ListItem.Property(Addon.ID)]\&quot;,\&quot;dbid\&quot;:\&quot;$INFO[Container(11118).ListItem.DBID]\&quot;,\&quot;home_section\&quot;:\&quot;$INFO[Container(9000).ListItem.Property(section)]\&quot;,\&quot;home_source\&quot;:\&quot;$INFO[Container(9000).ListItem.Property(hubsource)]\&quot;}}&quot;)</onclick>
+ 
+             <onclick condition="Skin.HasSetting(Disable.MultiSearch)">SendClick(videos,8)</onclick>
+-            <textwidth>300</textwidth>
++            <textwidth>0</textwidth>
+           </control>
+           <control type="edit" id="19">
+             <visible>Container.CanFilter + !Container.CanFilterAdvanced</visible>
+             <description>Filter</description>
+             <textwidth>345</textwidth>
+             <textcolor>$VAR[InfinityPaletteTextPrimary]</textcolor>
+-            <include>ButtonCommonValues_PolishMenu</include>
++            <include>InfinityVideoMenuRow</include>
+             <label>587</label>
+           </control>
+           <control type="button" id="98">
+             <visible>Container.CanFilterAdvanced</visible>
+             <description>Filter</description>
+             <textcolor>$VAR[InfinityPaletteTextPrimary]</textcolor>
+-            <include>ButtonCommonValues_PolishMenu</include>
++            <include>InfinityVideoMenuRow</include>
+             <label>587</label>
+             <onclick>ClearProperty(MediaMenu,Home)</onclick>
+             <onclick>SetFocus(50)</onclick>
+             <onclick>Filter</onclick>
+-            <textwidth>300</textwidth>
++            <textwidth>0</textwidth>
+           </control>
+           <control type="radiobutton" id="16">
+             <description>PartyMode</description>
+             <label>589</label>
+             <textcolor>$VAR[InfinityPaletteTextPrimary]</textcolor>
+-            <include>ButtonCommonValues_PolishMenu</include>
++            <include>InfinityVideoMenuRow</include>
+             <visible>Container.Content(MusicVideos)</visible>
+-            <textwidth>300</textwidth>
++            <textwidth>0</textwidth>
+           </control>
+           <control type="radiobutton" id="11">
+             <description>Unlock Shares</description>
+             <textcolor>$VAR[InfinityPaletteTextPrimary]</textcolor>
+-            <include>ButtonCommonValues_PolishMenu</include>
++            <include>InfinityVideoMenuRow</include>
+             <label>20336</label>
+             <onclick>Mastermode</onclick>
+             <selected>System.IsMaster</selected>
+             <visible>System.HasLocks</visible>
+-            <textwidth>300</textwidth>
++            <textwidth>0</textwidth>
+           </control>
+           <control type="button" id="203">
+             <description>View options</description>
+             <font>font13_bold</font>
+             <textcolor>$VAR[InfinityPaletteTextPrimary]</textcolor>
+-            <include>ButtonCommonValues_PolishMenu</include>
++            <include>InfinityVideoMenuRow</include>
+             <label>31039</label>
+             <enable>no</enable>
+             <disabledcolor>$VAR[ThemeLabelColor]</disabledcolor>
+-            <textwidth>300</textwidth>
++            <textwidth>0</textwidth>
+           </control>
+           <control type="togglebutton" id="20">
+             <description>Update library</description>
+             <textcolor>$VAR[InfinityPaletteTextPrimary]</textcolor>
+-            <include>ButtonCommonValues_PolishMenu</include>
++            <include>InfinityVideoMenuRow</include>
+             <label>653</label>
+             <altlabel>13353</altlabel>
+             <usealttexture>library.isscanningvideo</usealttexture>
+-            <textwidth>300</textwidth>
++            <textwidth>0</textwidth>
+           </control>
+           <control type="button" id="612">
+             <description>Go to playlist</description>
+             <textcolor>$VAR[InfinityPaletteTextPrimary]</textcolor>
+-            <include>ButtonCommonValues_PolishMenu</include>
++            <include>InfinityVideoMenuRow</include>
+             <label>13350</label>
+             <onclick>ClearProperty(MediaMenu,Home)</onclick>
+             <!-- INFINITY_ACTION_LOADING_V1 -->
+@@ -1251,12 +1251,12 @@
+ <onclick condition="System.AddonIsEnabled(script.infinity.commandcenter)">NotifyAll(script.infinity.commandcenter,seamless.loading,&quot;{\&quot;state\&quot;:\&quot;dispatched\&quot;,\&quot;target\&quot;:\&quot;84437a529c9b105bcd9caa5f8830631d962c5d1542afc4f1ffd07bb8b4be0efd\&quot;,\&quot;owner\&quot;:{\&quot;window\&quot;:\&quot;$INFO[Window(Home).Property(Infinity.Loading.CurrentWindow)]\&quot;,\&quot;control\&quot;:\&quot;612\&quot;,\&quot;item\&quot;:\&quot;$INFO[Container(612).CurrentItem]\&quot;,\&quot;epoch\&quot;:\&quot;$INFO[Window(Home).Property(Infinity.Loading.Context)]\&quot;,\&quot;section\&quot;:\&quot;$INFO[Container(612).ListItem.Property(section)]\&quot;,\&quot;source\&quot;:\&quot;$INFO[Container(612).ListItem.Property(hubsource)]\&quot;,\&quot;addon\&quot;:\&quot;$INFO[Container(612).ListItem.Property(Addon.ID)]\&quot;,\&quot;dbid\&quot;:\&quot;$INFO[Container(612).ListItem.DBID]\&quot;,\&quot;home_section\&quot;:\&quot;$INFO[Container(9000).ListItem.Property(section)]\&quot;,\&quot;home_source\&quot;:\&quot;$INFO[Container(9000).ListItem.Property(hubsource)]\&quot;}}&quot;)</onclick>
+ 
+             <visible>!String.IsEqual(Playlist.Length(video),0)</visible>
+-            <textwidth>300</textwidth>
++            <textwidth>0</textwidth>
+           </control>
+           <control type="button" id="613">
+             <description>Get more</description>
+             <textcolor>$VAR[InfinityPaletteTextPrimary]</textcolor>
+-            <include>ButtonCommonValues_PolishMenu</include>
++            <include>InfinityVideoMenuRow</include>
+             <label>$LOCALIZE[21452]</label>
+             <onclick>ClearProperty(MediaMenu,Home)</onclick>
+             <!-- INFINITY_ACTION_LOADING_V1 -->
+@@ -1266,20 +1266,20 @@
+ <onclick condition="System.AddonIsEnabled(script.infinity.commandcenter)">NotifyAll(script.infinity.commandcenter,seamless.loading,&quot;{\&quot;state\&quot;:\&quot;dispatched\&quot;,\&quot;target\&quot;:\&quot;d2ff60ceb64c7d90baed1dc607de8c1521c7fbba5fe3a5e0091e71d28f9191fd\&quot;,\&quot;owner\&quot;:{\&quot;window\&quot;:\&quot;$INFO[Window(Home).Property(Infinity.Loading.CurrentWindow)]\&quot;,\&quot;control\&quot;:\&quot;613\&quot;,\&quot;item\&quot;:\&quot;$INFO[Container(613).CurrentItem]\&quot;,\&quot;epoch\&quot;:\&quot;$INFO[Window(Home).Property(Infinity.Loading.Context)]\&quot;,\&quot;section\&quot;:\&quot;$INFO[Container(613).ListItem.Property(section)]\&quot;,\&quot;source\&quot;:\&quot;$INFO[Container(613).ListItem.Property(hubsource)]\&quot;,\&quot;addon\&quot;:\&quot;$INFO[Container(613).ListItem.Property(Addon.ID)]\&quot;,\&quot;dbid\&quot;:\&quot;$INFO[Container(613).ListItem.DBID]\&quot;,\&quot;home_section\&quot;:\&quot;$INFO[Container(9000).ListItem.Property(section)]\&quot;,\&quot;home_source\&quot;:\&quot;$INFO[Container(9000).ListItem.Property(hubsource)]\&quot;}}&quot;)</onclick>
+ 
+             <visible>Container.Content(addons)</visible>
+-            <textwidth>300</textwidth>
++            <textwidth>0</textwidth>
+           </control>
+           <control type="button" id="617">
+             <description>Add-on settings</description>
+             <textcolor>$VAR[InfinityPaletteTextPrimary]</textcolor>
+-            <include>ButtonCommonValues_PolishMenu</include>
++            <include>InfinityVideoMenuRow</include>
+             <label>$LOCALIZE[10140]</label>
+             <onclick>Addon.OpenSettings($INFO[Container.PluginName])</onclick>
+             <visible>!String.IsEmpty(Container.PluginName)</visible>
+-            <textwidth>300</textwidth>
++            <textwidth>0</textwidth>
+           </control>
+           <left>18</left>
+-          <right>112</right>
+-          <top>112</top>
++          <right>18</right>
++          <top>176</top>
+           <bottom>116</bottom>
+           <visible>!String.IsEmpty(Window(Home).Property(MediaMenu))</visible>
+           <orientation>vertical</orientation>
+@@ -1289,7 +1289,7 @@
+         <include>MediaMenuPlayerControls</include>
+         <left>18</left>
+         <top>18</top>
+-        <width>480</width>
++        <width max="840">92%</width>
+         <bottom>18</bottom>
+       </control>
+       <visible allowhiddenfocus="true">true</visible>

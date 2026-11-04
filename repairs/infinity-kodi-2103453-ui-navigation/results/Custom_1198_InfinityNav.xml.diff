@@ -1,0 +1,416 @@
+--- signed-2103453/assets/addons/skin.infinity.diggz/unified/Custom_1198_InfinityNav.xml
++++ source-candidate/assets/addons/skin.infinity.diggz/unified/Custom_1198_InfinityNav.xml
+@@ -271,6 +271,106 @@
+         </control>
+         <control type="group">
+           <width>100%</width>
++          <height>80</height>
++          <control type="button" id="1198110">
++            <align>left</align>
++            <onclick>Dialog.Close(1198)</onclick>
++            
++<!-- INFINITY_LOADING_V2 -->
++
++<onclick>RunScript(special://skin/resources/lib/infinity_library_navigation.py,sports)</onclick>
++<!-- INFINITY_LOADING_V2 -->
++
++
++            <left>0</left>
++            <top>0</top>
++            <width>100%</width>
++            <height>80</height>
++            <textoffsetx>74</textoffsetx>
++            <textwidth>308</textwidth>
++            <aligny>center</aligny>
++            <font>InfinitySmall</font>
++            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
++            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
++            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
++            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
++            <label>Sports</label>
++          </control>
++          <control type="image">
++            <left>0</left>
++            <top>0</top>
++            <width>100%</width>
++            <height>80</height>
++            <visible>Control.HasFocus(1198110)</visible>
++            <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
++          </control>
++          <control type="image">
++            <left>20</left>
++            <top>24</top>
++            <width>32</width>
++            <height>32</height>
++            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/tv.png</texture>
++          </control>
++          <control type="image">
++            <right>16</right>
++            <top>30</top>
++            <width>20</width>
++            <height>20</height>
++            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/chevron.png</texture>
++          </control>
++        </control>
++        <control type="group">
++          <width>100%</width>
++          <height>80</height>
++          <control type="button" id="1198301">
++            <align>left</align>
++            <onclick>Dialog.Close(1198)</onclick>
++            
++<!-- INFINITY_LOADING_V2 -->
++<onclick condition="System.AddonIsEnabled(script.infinity.commandcenter)">NotifyAll(script.infinity.commandcenter,seamless.loading,&quot;{\&quot;state\&quot;:\&quot;action\&quot;,\&quot;target\&quot;:\&quot;b663b24a58b37211bdad8e3db0eb87bf421f2c9f3cb8a675bcf6401016bda194\&quot;,\&quot;owner\&quot;:{\&quot;window\&quot;:\&quot;$INFO[Window(Home).Property(Infinity.Loading.CurrentWindow)]\&quot;,\&quot;control\&quot;:\&quot;1198301\&quot;,\&quot;item\&quot;:\&quot;$INFO[Container(1198301).CurrentItem]\&quot;,\&quot;epoch\&quot;:\&quot;$INFO[Window(Home).Property(Infinity.Loading.Context)]\&quot;,\&quot;section\&quot;:\&quot;$INFO[Container(1198301).ListItem.Property(section)]\&quot;,\&quot;source\&quot;:\&quot;$INFO[Container(1198301).ListItem.Property(hubsource)]\&quot;,\&quot;addon\&quot;:\&quot;$INFO[Container(1198301).ListItem.Property(Addon.ID)]\&quot;,\&quot;dbid\&quot;:\&quot;$INFO[Container(1198301).ListItem.DBID]\&quot;,\&quot;home_section\&quot;:\&quot;$INFO[Container(9000).ListItem.Property(section)]\&quot;,\&quot;home_source\&quot;:\&quot;$INFO[Container(9000).ListItem.Property(hubsource)]\&quot;}}&quot;)</onclick>
++<onclick>ActivateWindow(favouritesbrowser)</onclick>
++<!-- INFINITY_LOADING_V2 -->
++<onclick condition="System.AddonIsEnabled(script.infinity.commandcenter)">NotifyAll(script.infinity.commandcenter,seamless.loading,&quot;{\&quot;state\&quot;:\&quot;dispatched\&quot;,\&quot;target\&quot;:\&quot;b663b24a58b37211bdad8e3db0eb87bf421f2c9f3cb8a675bcf6401016bda194\&quot;,\&quot;owner\&quot;:{\&quot;window\&quot;:\&quot;$INFO[Window(Home).Property(Infinity.Loading.CurrentWindow)]\&quot;,\&quot;control\&quot;:\&quot;1198301\&quot;,\&quot;item\&quot;:\&quot;$INFO[Container(1198301).CurrentItem]\&quot;,\&quot;epoch\&quot;:\&quot;$INFO[Window(Home).Property(Infinity.Loading.Context)]\&quot;,\&quot;section\&quot;:\&quot;$INFO[Container(1198301).ListItem.Property(section)]\&quot;,\&quot;source\&quot;:\&quot;$INFO[Container(1198301).ListItem.Property(hubsource)]\&quot;,\&quot;addon\&quot;:\&quot;$INFO[Container(1198301).ListItem.Property(Addon.ID)]\&quot;,\&quot;dbid\&quot;:\&quot;$INFO[Container(1198301).ListItem.DBID]\&quot;,\&quot;home_section\&quot;:\&quot;$INFO[Container(9000).ListItem.Property(section)]\&quot;,\&quot;home_source\&quot;:\&quot;$INFO[Container(9000).ListItem.Property(hubsource)]\&quot;}}&quot;)</onclick>
++
++            <left>0</left>
++            <top>0</top>
++            <width>100%</width>
++            <height>80</height>
++            <textoffsetx>74</textoffsetx>
++            <textwidth>308</textwidth>
++            <aligny>center</aligny>
++            <font>InfinitySmall</font>
++            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
++            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
++            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
++            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
++            <label>Favorites</label>
++          </control>
++          <control type="image">
++            <left>0</left>
++            <top>0</top>
++            <width>100%</width>
++            <height>80</height>
++            <visible>Control.HasFocus(1198301)</visible>
++            <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
++          </control>
++          <control type="image">
++            <left>20</left>
++            <top>24</top>
++            <width>32</width>
++            <height>32</height>
++            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/favorite.png</texture>
++          </control>
++          <control type="image">
++            <right>16</right>
++            <top>30</top>
++            <width>20</width>
++            <height>20</height>
++            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/chevron.png</texture>
++          </control>
++        </control>
++        <control type="group">
++          <width>100%</width>
+           <height>38</height>
+           <control type="label">
+             <left>16</left>
+@@ -291,24 +391,24 @@
+             <onclick>Dialog.Close(1198)</onclick>
+             
+ <!-- INFINITY_LOADING_V2 -->
+-<onclick condition="System.AddonIsEnabled(script.infinity.commandcenter)">NotifyAll(script.infinity.commandcenter,seamless.loading,&quot;{\&quot;state\&quot;:\&quot;action\&quot;,\&quot;target\&quot;:\&quot;36cd559b877d5b35089cc4efed2f860e572014dd719d60a46bf50dd52fd362ac\&quot;,\&quot;owner\&quot;:{\&quot;window\&quot;:\&quot;$INFO[Window(Home).Property(Infinity.Loading.CurrentWindow)]\&quot;,\&quot;control\&quot;:\&quot;1198104\&quot;,\&quot;item\&quot;:\&quot;$INFO[Container(1198104).CurrentItem]\&quot;,\&quot;epoch\&quot;:\&quot;$INFO[Window(Home).Property(Infinity.Loading.Context)]\&quot;,\&quot;section\&quot;:\&quot;$INFO[Container(1198104).ListItem.Property(section)]\&quot;,\&quot;source\&quot;:\&quot;$INFO[Container(1198104).ListItem.Property(hubsource)]\&quot;,\&quot;addon\&quot;:\&quot;$INFO[Container(1198104).ListItem.Property(Addon.ID)]\&quot;,\&quot;dbid\&quot;:\&quot;$INFO[Container(1198104).ListItem.DBID]\&quot;,\&quot;home_section\&quot;:\&quot;$INFO[Container(9000).ListItem.Property(section)]\&quot;,\&quot;home_source\&quot;:\&quot;$INFO[Container(9000).ListItem.Property(hubsource)]\&quot;}}&quot;)</onclick>
+-<onclick>ActivateWindow(Videos)</onclick>
+-<!-- INFINITY_LOADING_V2 -->
+-<onclick condition="System.AddonIsEnabled(script.infinity.commandcenter)">NotifyAll(script.infinity.commandcenter,seamless.loading,&quot;{\&quot;state\&quot;:\&quot;dispatched\&quot;,\&quot;target\&quot;:\&quot;36cd559b877d5b35089cc4efed2f860e572014dd719d60a46bf50dd52fd362ac\&quot;,\&quot;owner\&quot;:{\&quot;window\&quot;:\&quot;$INFO[Window(Home).Property(Infinity.Loading.CurrentWindow)]\&quot;,\&quot;control\&quot;:\&quot;1198104\&quot;,\&quot;item\&quot;:\&quot;$INFO[Container(1198104).CurrentItem]\&quot;,\&quot;epoch\&quot;:\&quot;$INFO[Window(Home).Property(Infinity.Loading.Context)]\&quot;,\&quot;section\&quot;:\&quot;$INFO[Container(1198104).ListItem.Property(section)]\&quot;,\&quot;source\&quot;:\&quot;$INFO[Container(1198104).ListItem.Property(hubsource)]\&quot;,\&quot;addon\&quot;:\&quot;$INFO[Container(1198104).ListItem.Property(Addon.ID)]\&quot;,\&quot;dbid\&quot;:\&quot;$INFO[Container(1198104).ListItem.DBID]\&quot;,\&quot;home_section\&quot;:\&quot;$INFO[Container(9000).ListItem.Property(section)]\&quot;,\&quot;home_source\&quot;:\&quot;$INFO[Container(9000).ListItem.Property(hubsource)]\&quot;}}&quot;)</onclick>
+-
+-            <left>0</left>
+-            <top>0</top>
+-            <width>100%</width>
+-            <height>80</height>
+-            <textoffsetx>74</textoffsetx>
+-            <textwidth>308</textwidth>
+-            <aligny>center</aligny>
+-            <font>InfinitySmall</font>
+-            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+-            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+-            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+-            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+-            <label>Library</label>
++
++<onclick>ActivateWindow(Videos,videodb://movies/titles/,return)</onclick>
++<!-- INFINITY_LOADING_V2 -->
++
++
++            <left>0</left>
++            <top>0</top>
++            <width>100%</width>
++            <height>80</height>
++            <textoffsetx>74</textoffsetx>
++            <textwidth>308</textwidth>
++            <aligny>center</aligny>
++            <font>InfinitySmall</font>
++            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
++            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
++            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
++            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
++            <label>Infinity Movies</label>
+           </control>
+           <control type="image">
+             <left>0</left>
+@@ -316,6 +416,206 @@
+             <width>100%</width>
+             <height>80</height>
+             <visible>Control.HasFocus(1198104)</visible>
++            <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
++          </control>
++          <control type="image">
++            <left>20</left>
++            <top>24</top>
++            <width>32</width>
++            <height>32</height>
++            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/movies.png</texture>
++          </control>
++          <control type="image">
++            <right>16</right>
++            <top>30</top>
++            <width>20</width>
++            <height>20</height>
++            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/chevron.png</texture>
++          </control>
++        </control>
++        <control type="group">
++          <width>100%</width>
++          <height>80</height>
++          <control type="button" id="1198111">
++            <align>left</align>
++            <onclick>Dialog.Close(1198)</onclick>
++            
++<!-- INFINITY_LOADING_V2 -->
++
++<onclick>ActivateWindow(Videos,videodb://tvshows/titles/,return)</onclick>
++<!-- INFINITY_LOADING_V2 -->
++
++
++            <left>0</left>
++            <top>0</top>
++            <width>100%</width>
++            <height>80</height>
++            <textoffsetx>74</textoffsetx>
++            <textwidth>308</textwidth>
++            <aligny>center</aligny>
++            <font>InfinitySmall</font>
++            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
++            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
++            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
++            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
++            <label>Infinity TV Shows</label>
++          </control>
++          <control type="image">
++            <left>0</left>
++            <top>0</top>
++            <width>100%</width>
++            <height>80</height>
++            <visible>Control.HasFocus(1198111)</visible>
++            <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
++          </control>
++          <control type="image">
++            <left>20</left>
++            <top>24</top>
++            <width>32</width>
++            <height>32</height>
++            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/tv.png</texture>
++          </control>
++          <control type="image">
++            <right>16</right>
++            <top>30</top>
++            <width>20</width>
++            <height>20</height>
++            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/chevron.png</texture>
++          </control>
++        </control>
++        <control type="group">
++          <width>100%</width>
++          <height>80</height>
++          <control type="button" id="1198112">
++            <align>left</align>
++            <onclick>Dialog.Close(1198)</onclick>
++            
++<!-- INFINITY_LOADING_V2 -->
++
++<onclick>RunScript(special://skin/resources/lib/infinity_library_navigation.py,browse)</onclick>
++<!-- INFINITY_LOADING_V2 -->
++
++
++            <left>0</left>
++            <top>0</top>
++            <width>100%</width>
++            <height>80</height>
++            <textoffsetx>74</textoffsetx>
++            <textwidth>308</textwidth>
++            <aligny>center</aligny>
++            <font>InfinitySmall</font>
++            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
++            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
++            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
++            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
++            <label>Browse Files</label>
++          </control>
++          <control type="image">
++            <left>0</left>
++            <top>0</top>
++            <width>100%</width>
++            <height>80</height>
++            <visible>Control.HasFocus(1198112)</visible>
++            <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
++          </control>
++          <control type="image">
++            <left>20</left>
++            <top>24</top>
++            <width>32</width>
++            <height>32</height>
++            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/library.png</texture>
++          </control>
++          <control type="image">
++            <right>16</right>
++            <top>30</top>
++            <width>20</width>
++            <height>20</height>
++            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/chevron.png</texture>
++          </control>
++        </control>
++        <control type="group">
++          <width>100%</width>
++          <height>80</height>
++          <control type="button" id="1198113">
++            <align>left</align>
++            <onclick>Dialog.Close(1198)</onclick>
++            
++<!-- INFINITY_LOADING_V2 -->
++
++<onclick>RunScript(special://skin/resources/lib/infinity_library_navigation.py,downloads)</onclick>
++<!-- INFINITY_LOADING_V2 -->
++
++
++            <left>0</left>
++            <top>0</top>
++            <width>100%</width>
++            <height>80</height>
++            <textoffsetx>74</textoffsetx>
++            <textwidth>308</textwidth>
++            <aligny>center</aligny>
++            <font>InfinitySmall</font>
++            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
++            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
++            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
++            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
++            <label>Downloads</label>
++          </control>
++          <control type="image">
++            <left>0</left>
++            <top>0</top>
++            <width>100%</width>
++            <height>80</height>
++            <visible>Control.HasFocus(1198113)</visible>
++            <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
++          </control>
++          <control type="image">
++            <left>20</left>
++            <top>24</top>
++            <width>32</width>
++            <height>32</height>
++            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/library.png</texture>
++          </control>
++          <control type="image">
++            <right>16</right>
++            <top>30</top>
++            <width>20</width>
++            <height>20</height>
++            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/chevron.png</texture>
++          </control>
++        </control>
++        <control type="group">
++          <width>100%</width>
++          <height>80</height>
++          <control type="button" id="1198114">
++            <align>left</align>
++            <onclick>Dialog.Close(1198)</onclick>
++            
++<!-- INFINITY_LOADING_V2 -->
++
++<onclick>ActivateWindow(Videos,files,return)</onclick>
++<!-- INFINITY_LOADING_V2 -->
++
++
++            <left>0</left>
++            <top>0</top>
++            <width>100%</width>
++            <height>80</height>
++            <textoffsetx>74</textoffsetx>
++            <textwidth>308</textwidth>
++            <aligny>center</aligny>
++            <font>InfinitySmall</font>
++            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
++            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
++            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
++            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
++            <label>Media Sources</label>
++          </control>
++          <control type="image">
++            <left>0</left>
++            <top>0</top>
++            <width>100%</width>
++            <height>80</height>
++            <visible>Control.HasFocus(1198114)</visible>
+             <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
+           </control>
+           <control type="image">
+@@ -696,56 +996,6 @@
+             <width>32</width>
+             <height>32</height>
+             <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/search.png</texture>
+-          </control>
+-          <control type="image">
+-            <right>16</right>
+-            <top>30</top>
+-            <width>20</width>
+-            <height>20</height>
+-            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/chevron.png</texture>
+-          </control>
+-        </control>
+-        <control type="group">
+-          <width>100%</width>
+-          <height>80</height>
+-          <control type="button" id="1198301">
+-            <align>left</align>
+-            <onclick>Dialog.Close(1198)</onclick>
+-            
+-<!-- INFINITY_LOADING_V2 -->
+-<onclick condition="System.AddonIsEnabled(script.infinity.commandcenter)">NotifyAll(script.infinity.commandcenter,seamless.loading,&quot;{\&quot;state\&quot;:\&quot;action\&quot;,\&quot;target\&quot;:\&quot;b663b24a58b37211bdad8e3db0eb87bf421f2c9f3cb8a675bcf6401016bda194\&quot;,\&quot;owner\&quot;:{\&quot;window\&quot;:\&quot;$INFO[Window(Home).Property(Infinity.Loading.CurrentWindow)]\&quot;,\&quot;control\&quot;:\&quot;1198301\&quot;,\&quot;item\&quot;:\&quot;$INFO[Container(1198301).CurrentItem]\&quot;,\&quot;epoch\&quot;:\&quot;$INFO[Window(Home).Property(Infinity.Loading.Context)]\&quot;,\&quot;section\&quot;:\&quot;$INFO[Container(1198301).ListItem.Property(section)]\&quot;,\&quot;source\&quot;:\&quot;$INFO[Container(1198301).ListItem.Property(hubsource)]\&quot;,\&quot;addon\&quot;:\&quot;$INFO[Container(1198301).ListItem.Property(Addon.ID)]\&quot;,\&quot;dbid\&quot;:\&quot;$INFO[Container(1198301).ListItem.DBID]\&quot;,\&quot;home_section\&quot;:\&quot;$INFO[Container(9000).ListItem.Property(section)]\&quot;,\&quot;home_source\&quot;:\&quot;$INFO[Container(9000).ListItem.Property(hubsource)]\&quot;}}&quot;)</onclick>
+-<onclick>ActivateWindow(favouritesbrowser)</onclick>
+-<!-- INFINITY_LOADING_V2 -->
+-<onclick condition="System.AddonIsEnabled(script.infinity.commandcenter)">NotifyAll(script.infinity.commandcenter,seamless.loading,&quot;{\&quot;state\&quot;:\&quot;dispatched\&quot;,\&quot;target\&quot;:\&quot;b663b24a58b37211bdad8e3db0eb87bf421f2c9f3cb8a675bcf6401016bda194\&quot;,\&quot;owner\&quot;:{\&quot;window\&quot;:\&quot;$INFO[Window(Home).Property(Infinity.Loading.CurrentWindow)]\&quot;,\&quot;control\&quot;:\&quot;1198301\&quot;,\&quot;item\&quot;:\&quot;$INFO[Container(1198301).CurrentItem]\&quot;,\&quot;epoch\&quot;:\&quot;$INFO[Window(Home).Property(Infinity.Loading.Context)]\&quot;,\&quot;section\&quot;:\&quot;$INFO[Container(1198301).ListItem.Property(section)]\&quot;,\&quot;source\&quot;:\&quot;$INFO[Container(1198301).ListItem.Property(hubsource)]\&quot;,\&quot;addon\&quot;:\&quot;$INFO[Container(1198301).ListItem.Property(Addon.ID)]\&quot;,\&quot;dbid\&quot;:\&quot;$INFO[Container(1198301).ListItem.DBID]\&quot;,\&quot;home_section\&quot;:\&quot;$INFO[Container(9000).ListItem.Property(section)]\&quot;,\&quot;home_source\&quot;:\&quot;$INFO[Container(9000).ListItem.Property(hubsource)]\&quot;}}&quot;)</onclick>
+-
+-            <left>0</left>
+-            <top>0</top>
+-            <width>100%</width>
+-            <height>80</height>
+-            <textoffsetx>74</textoffsetx>
+-            <textwidth>308</textwidth>
+-            <aligny>center</aligny>
+-            <font>InfinitySmall</font>
+-            <textcolor>$VAR[InfinityGlassTextPrimary]</textcolor>
+-            <focusedcolor>$VAR[InfinityGlassTextPrimary]</focusedcolor>
+-            <texturefocus border="20" colordiffuse="$VAR[InfinityDrawerFocusWash]">infinity_polish/field.png</texturefocus>
+-            <texturenofocus border="20" colordiffuse="$VAR[InfinityDrawerQuietRow]">infinity_polish/field.png</texturenofocus>
+-            <label>Favourites</label>
+-          </control>
+-          <control type="image">
+-            <left>0</left>
+-            <top>0</top>
+-            <width>100%</width>
+-            <height>80</height>
+-            <visible>Control.HasFocus(1198301)</visible>
+-            <texture colordiffuse="$VAR[InfinityGlassFocus]" border="20">infinity_polish/focus_rim.png</texture>
+-          </control>
+-          <control type="image">
+-            <left>20</left>
+-            <top>24</top>
+-            <width>32</width>
+-            <height>32</height>
+-            <texture colordiffuse="$VAR[InfinityGlassTextSecondary]">infinity_polish/favorite.png</texture>
+           </control>
+           <control type="image">
+             <right>16</right>
