@@ -1,0 +1,136 @@
+// Host-only Android/window/player peers; production sender/queue/guards are appended unchanged.
+#include <atomic>
+#include <cassert>
+#include <chrono>
+#include <condition_variable>
+#include <future>
+#include <iostream>
+#include <map>
+#include <memory>
+#include <mutex>
+#include <queue>
+#include <string>
+#include <thread>
+#include <type_traits>
+#include <vector>
+using namespace std::chrono_literals;
+using CCriticalSection=std::recursive_mutex;
+struct Barrier {
+ std::mutex mutex;std::condition_variable cv;bool enabled=false,arrived=false,released=false;
+ void pause(){std::unique_lock<std::mutex> l(mutex);if(!enabled)return;arrived=true;cv.notify_all();cv.wait(l,[&]{return released;});}
+ void reached(){std::unique_lock<std::mutex> l(mutex);assert(cv.wait_for(l,3s,[&]{return arrived;}));}
+ void release(){std::lock_guard<std::mutex> l(mutex);released=true;cv.notify_all();}
+} payloadBarrier,displayBarrier;
+std::atomic<int> waiting{0},liveMessages{0},liveActions{0};
+std::mutex waitingMutex;std::condition_variable waitingCv;
+struct CEvent {
+ std::mutex mutex;std::condition_variable cv;bool signalled=false;
+ explicit CEvent(bool){}
+ void Wait(){std::unique_lock<std::mutex> lock(mutex);{std::lock_guard<std::mutex> q(waitingMutex);++waiting;}waitingCv.notify_all();cv.wait(lock,[&]{return signalled;});--waiting;}
+ void Set(){std::lock_guard<std::mutex> lock(mutex);signalled=true;cv.notify_all();}
+};
+struct CThread {static std::thread::id GetCurrentThreadId(){return std::this_thread::get_id();}};
+struct CSingleExit {
+ CCriticalSection* mutex=nullptr;
+ explicit CSingleExit(int){}
+ explicit CSingleExit(CCriticalSection& m):mutex(&m){mutex->unlock();}
+ ~CSingleExit(){if(mutex)mutex->lock();}
+};
+struct CAction {
+ int m_id;
+ explicit CAction(int id):m_id(id){++liveActions;}
+ ~CAction(){payloadBarrier.pause();--liveActions;}
+ int GetID()const{return m_id;}
+};
+namespace InfinityShutdownTrace {template<class...T>void Event(T&&...) {}}
+constexpr int LOGERROR=1,LOGWARNING=2,LOGDEBUG=3;
+struct CLog {template<class...T>static void LogF(int,const char*,T&&...){} template<class...T>static void Log(int,const char*,T&&...) {}};
+struct ThreadMessage {
+ uint32_t dwMessage;int param1=-1,param2=-1;int64_t param3=0;void* lpVoid=nullptr;
+ std::string strParam;std::vector<std::string> params;
+ std::shared_ptr<CEvent> waitEvent;std::shared_ptr<int> result;
+ explicit ThreadMessage(uint32_t id,int p1=-1,int p2=-1,void* p=nullptr):dwMessage(id),param1(p1),param2(p2),lpVoid(p){++liveMessages;}
+ ThreadMessage(ThreadMessage&& o):dwMessage(o.dwMessage),param1(o.param1),param2(o.param2),param3(o.param3),lpVoid(o.lpVoid),strParam(std::move(o.strParam)),params(std::move(o.params)),waitEvent(std::move(o.waitEvent)),result(std::move(o.result)){++liveMessages;}
+ ~ThreadMessage(){--liveMessages;}
+ void SetResult(int value){if(result)*result=value;}
+};
+struct ThreadMessageCallback {void (*callback)(void*);void* userptr;};
+struct IMessageTarget {virtual void OnApplicationMessage(ThreadMessage*)=0;virtual ~IMessageTarget()=default;};
+class CApplicationMessenger {
+public:
+ std::queue<ThreadMessage*> m_vecMessages,m_vecWindowMessages;
+ std::map<int,IMessageTarget*> m_mapTargets;
+ CCriticalSection m_critSection;
+ std::thread::id m_guiThreadId=std::this_thread::get_id(),m_processThreadId=m_guiThreadId;
+ std::atomic<bool> m_bStop{false};
+ int SendMsg(ThreadMessage&&,bool);
+ int SendMsg(uint32_t id,int p1,int p2,void* p){return SendMsg(ThreadMessage(id,p1,p2,p),true);}
+ void PostMsg(uint32_t id){SendMsg(ThreadMessage(id),false);}
+ void Cleanup();void ProcessMessages();void ProcessWindowMessages();void ProcessMessage(ThreadMessage*);
+ void ProcessCheckpointDisplayMessages();bool IsProcessThread()const;
+ void Stop(){m_bStop=true;}
+};
+namespace InfinityAndroidCheckpoint {
+struct Owner {uint64_t generation=7;bool dirty=true,complete=false;};
+struct State {
+ std::mutex mutex;std::atomic<bool> active{true};bool sealed=true,startupInProgress=false,writeAdmissionStarted=true;
+ std::string phase="CHECKPOINT_FAILED";int activeWrites=0;
+ std::map<std::string,Owner> owners{{"pending-settings",{}},{"unknown-watched-owner",{}}};
+ bool checkpointSaved=false,terminationAuthorized=false;int failures=1;
+};
+inline State state;inline State& Get(){return state;}
+inline thread_local unsigned permissionDepth=0,acceptedPlaybackDepth=0,startupWriteDepth=0;
+bool IsActive(){return Get().active.load();}
+bool AllowNativeWrite(const char*);
+class CheckpointWriteGuard {bool m_admitted=false;public:explicit CheckpointWriteGuard(const char*);~CheckpointWriteGuard();explicit operator bool()const{return m_admitted;}};
+}
+int checkpointPumps=0,normalFrames=0,playerCommands=0,windowActions=0,otherCallbacks=0,guardReceivers=0;
+bool enqueueDisplayDuringHandler=false;
+std::vector<uint32_t> displayObserved,otherObserved;
+std::vector<int> controlObserved;
+class CApplication:public IMessageTarget {
+public:bool IsInitialized()const{return false;}void Process();bool OnAction(const CAction&);void OnApplicationMessage(ThreadMessage*)override;
+};
+inline CApplication g_application;
+struct CGUIWindow {void OnAction(const CAction&){++windowActions;}};
+class CGUIWindowManager:public IMessageTarget {
+public:
+ CGUIWindow fakeWindow;
+ CGUIWindow* GetWindow(int){return &fakeWindow;}
+ void OnApplicationMessage(ThreadMessage*)override;
+ void SwitchToFullScreen(bool){}
+};
+struct CGUIComponent {CGUIWindowManager windows;CGUIWindowManager& GetWindowManager(){return windows;}};
+struct CApplicationPlayer {bool playing=true,video=true,paused=false;bool IsPlaying()const{return playing;}bool HasVideo()const{return video;}bool IsPaused()const{return paused;}};
+struct CApplicationPowerHandling {void ResetShutdownTimers(){}};
+struct Components {
+ std::shared_ptr<CApplicationPlayer> player=std::make_shared<CApplicationPlayer>();
+ std::shared_ptr<CApplicationPowerHandling> power=std::make_shared<CApplicationPowerHandling>();
+ template<class T>std::shared_ptr<T> GetComponent()const{if constexpr(std::is_same_v<T,CApplicationPlayer>)return player;else return power;}
+};
+struct CSettings {static constexpr int SETTING_POWERMANAGEMENT_SHUTDOWNTIME=1;int GetInt(int)const{return 0;}};
+struct SettingsComponent {CSettings settings;CSettings* GetSettings(){return &settings;}};
+struct ScreenSaver {bool IsInhibited()const{return false;}};
+struct CWinSystemBase {ScreenSaver saver;int GetGfxContext(){return 0;}ScreenSaver* GetOSScreenSaver(){return &saver;}};
+struct CServiceBroker {
+ static CApplicationMessenger* messenger;
+ static CApplicationMessenger* GetAppMessenger(){return messenger;}
+ static CWinSystemBase* GetWinSystem(){static CWinSystemBase w;return &w;}
+ static CGUIComponent* GetGUI(){static CGUIComponent gui;return &gui;}
+ static Components& GetAppComponents(){static Components c;return c;}
+ static SettingsComponent* GetSettingsComponent(){static SettingsComponent c;return &c;}
+};
+CApplicationMessenger* CServiceBroker::messenger=nullptr;
+template<class...T>void android_printf(const char*,T&&...){}
+bool infinityIsPictureInPicture(){return false;}
+bool isHeadsetPlugged(){return false;}
+struct CJNIAudioManager {static constexpr int AUDIOFOCUS_LOSS=-1;};
+class CXBMCApp {
+public:
+ bool m_bResumePlayback=false,m_hasReqVisible=false,m_headsetPlugged=false;
+ int m_playback_state=PLAYBACK_STATE_PLAYING|PLAYBACK_STATE_VIDEO;
+ CCriticalSection m_applicationsMutex;std::map<int,int> m_applications;
+ void KeepScreenOn(bool){}void RequestVisibleBehind(bool){}
+ void onResume();void onPause();void onStop();void onAudioFocusChange(int);
+};
+namespace InfinityAndroidCheckpoint {void Pump(CApplication&){++checkpointPumps;} } // Coordinator body remains a peer; native write guards are exact.

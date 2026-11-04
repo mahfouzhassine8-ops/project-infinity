@@ -1,0 +1,30 @@
+/tmp/infinity-kodi-pause-stop-host-20261104/before.cpp: In member function ‘bool CApplication::OnAction(const CAction&)’:
+/tmp/infinity-kodi-pause-stop-host-20261104/before.cpp:606:44: error: unused parameter ‘action’ [-Werror=unused-parameter]
+  606 | bool CApplication::OnAction(const CAction &action)
+      |                             ~~~~~~~~~~~~~~~^~~~~~
+/tmp/infinity-kodi-pause-stop-host-20261104/before.cpp: In function ‘std::future<int> control(CApplicationMessenger&, int)’:
+/tmp/infinity-kodi-pause-stop-host-20261104/before.cpp:688:63: error: a function-definition is not allowed here before ‘{’ token
+  688 | std::future<int> display(CApplicationMessenger& m,uint32_t id){
+      |                                                               ^
+/tmp/infinity-kodi-pause-stop-host-20261104/before.cpp:691:1: error: a template declaration cannot appear at block scope
+  691 | template<class F>void callback(CApplicationMessenger&,F fn){
+      | ^~~~~~~~
+/tmp/infinity-kodi-pause-stop-host-20261104/before.cpp:704:65: error: a function-definition is not allowed here before ‘{’ token
+  704 | std::vector<ThreadMessage*> queued(std::queue<ThreadMessage*> q){
+      |                                                                 ^
+/tmp/infinity-kodi-pause-stop-host-20261104/before.cpp:710:38: error: a function-definition is not allowed here before ‘{’ token
+  710 | void rescue(CApplicationMessenger& m){
+      |                                      ^
+/tmp/infinity-kodi-pause-stop-host-20261104/before.cpp:717:22: error: a function-definition is not allowed here before ‘{’ token
+  717 | void unrelated(void*){++otherCallbacks;}
+      |                      ^
+/tmp/infinity-kodi-pause-stop-host-20261104/before.cpp:718:30: error: a function-definition is not allowed here before ‘{’ token
+  718 | int main(int argc,char**argv){
+      |                              ^
+/tmp/infinity-kodi-pause-stop-host-20261104/before.cpp:870:2: error: expected ‘}’ at end of input
+  870 | }
+      |  ^
+/tmp/infinity-kodi-pause-stop-host-20261104/before.cpp:684:58: note: to match this ‘{’
+  684 | std::future<int> control(CApplicationMessenger& m,int id){
+      |                                                          ^
+cc1plus: all warnings being treated as errors

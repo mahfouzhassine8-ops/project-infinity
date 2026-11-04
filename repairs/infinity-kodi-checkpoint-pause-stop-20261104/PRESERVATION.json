@@ -1,0 +1,53 @@
+{
+  "checked_utc": "2026-11-04T05:01:05.618914+00:00",
+  "native_mapped_files": 9411,
+  "native_tree_mismatches": [],
+  "native_parent_map_sha256": "7ecb7a8ec00215a96919f55c490b5d70e55f7aa119f62cea00d4077d9b3ecbea",
+  "new_source_overlay": {
+    "xbmc/messaging/ApplicationMessenger.cpp": "f53c09ca57fe3b4e8e575b4f51e2f3108dc77836b35c4498dbb859f61c866f8b"
+  },
+  "previous_452_vs_451_changes_retained_not_reapproved": {
+    "xbmc/application/Application.cpp": {
+      "signed451_source": "fb5167b4fd7cb7fa16357fe367c9d212ae9440b4821870e4fd2d90018d9b4356",
+      "retained452_source": "d266a16ef3f56ee91ce82c8e7e1da9a868d853b22b48e773cad3b1e24331f307"
+    },
+    "xbmc/messaging/ApplicationMessenger.cpp": {
+      "signed451_source": "e998192278d6f5d99783647a1f16a4fdb71be791a826cbe4b5db31b67b2e50a5",
+      "retained452_source": "c565bf9dad1f5dcbdca3d81a6d3dc5a42c4d8fd8151dac2f20766caaeb4ef0c8"
+    },
+    "xbmc/messaging/ApplicationMessenger.h": {
+      "signed451_source": "c89c0b7c5cf53349ac6c739b9d6f3365a40ddcf4fdbf8c4cc438b52c561fa251",
+      "retained452_source": "2326742d7bb60b46a8b3521542445c2d3109cefab15ff105423731b78b7367ec"
+    },
+    "xbmc/video/jobs/VideoLibraryMarkWatchedJob.cpp": {
+      "signed451_source": "4acc7acb650dca3b5b99c5ff71ee9c76fc7ccadb162f9fc2f0485b32cd8e1e69",
+      "retained452_source": "6be1cd18d715bfda133d98643fff623f9d3c5f0066b54ba2c3ea2da753bb0510"
+    },
+    "xbmc/video/jobs/VideoLibraryMarkWatchedJob.h": {
+      "signed451_source": "be989bc5d0fca626c5c43d2e3ca9273fad6c0e25162ee2f49399bfbecf7d429d",
+      "retained452_source": "b48e086c09c1c535ed139bc067dc16b86639b33d3e95f579dab1f2ff0bdf9a19"
+    }
+  },
+  "main_worktree_status_unchanged": true,
+  "prior_checkpoints": {
+    "/tmp/infinity-settings-diagnostic-20261104": {
+      "head": "7ea3f0b99f553e2a788ed520a9f0628783f23b6a",
+      "clean": true
+    },
+    "/tmp/infinity-settings-retirement-proof-20261104": {
+      "head": "8c54e2cf3bbe98ec4512721802d1011a73c82eb2",
+      "clean": true
+    },
+    "/tmp/infinity-settings-retirement-final-proof-20261104": {
+      "head": "cdbaa5abc86675094229171746a8c627a7f367e8",
+      "clean": true
+    }
+  },
+  "signed_apks_unchanged": {
+    "/tmp/kodi451-signed-baseline/Infinity-2103451-Combined-Original-Signer.apk": "d77c31c458c4571212022bea7cea1e76c1d415cd5792b780b3c655fba97c6399",
+    "/tmp/kodi452-published-signed/Infinity-2103452-Combined-Original-Signer.apk": "efc24cc53e25675360bb70a2c8c0122cfc107f99035d04c957265d08206f6729"
+  },
+  "new_engine_or_apk": null,
+  "new_apk_member_comparison": "NOT APPLICABLE: source-only; no candidate APK created",
+  "retirement": "BLOCKED decision at cdbaa5ab preserved; no retirement source/test changes"
+}

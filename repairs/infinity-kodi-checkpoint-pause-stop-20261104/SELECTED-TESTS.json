@@ -1,0 +1,39 @@
+{
+  "authorization": "Isolated source-only checkpoint/Pause/Stop ANR candidate and focused safety tests. No settings-retirement changes, APK/engine build, signing, release or lock.",
+  "parent": "cdbaa5abc86675094229171746a8c627a7f367e8",
+  "native_preimage": "Preserved 452 native source with approved recovery451 retained; existing watched/display repairs not removed.",
+  "recorded_utc": "2026-11-04T04:49:28.724804+00:00",
+  "cases_before": [
+    "pause-starvation",
+    "stop-starvation",
+    "resume-starvation"
+  ],
+  "cases_after": [
+    "pause-starvation",
+    "stop-starvation",
+    "resume-starvation",
+    "audio-focus-pause-and-stop",
+    "android-pause-stop-resume",
+    "failed-checkpoint-repeated-interruptions",
+    "ack-after-real-rejection-handler",
+    "display-ack-and-order",
+    "unrelated-messages-and-FIFO",
+    "wrong-thread",
+    "noncheckpoint-normal",
+    "bounded-reentrant-display",
+    "checkpoint-transition-after-enqueue",
+    "sealed-durability-and-shutdown-fences",
+    "stopped-queue-cleanup"
+  ],
+  "selected_scope": "Actual SendMsg/queue/dispatcher bodies, actual GUI-action case and OnAction checkpoint guard, selected actual Android callback bodies; native window/player/Android and checkpoint coordinator pumping remain peers. Actual write-admission guard bodies inspected/executed separately.",
+  "bounds": "One before/after harness compile each; fixed18 subprocess cases <=15 seconds each; no automatic retries. Finite48-control interruption burst. Host deadline observations are never production timeouts or success substitutes.",
+  "preserved": [
+    "retirement BLOCKED at cdbaa5ab",
+    "settings registry/serializer",
+    "watched/Resume/Home code",
+    "full native tree/APKs/recovery locks",
+    "existing21/24/16/20 evidence"
+  ],
+  "main_status": "?? repairs/cobra-2103442-end-to-end-quality-refresh/__pycache__/\n?? repairs/cobra-2103444-rotation-audio/__pycache__/\n?? repairs/infinity-2103445-external-video-lifecycle/\n?? repairs/infinity-preview-2103447-resume/__pycache__/\n?? repairs/infinity-preview-2103447-resume/android-qa/__pycache__/\n",
+  "harness_correction": "Initial host compile failed before any case ran: missing host-helper closing brace and unused peer parameter under -Werror. Correct only those harness issues; retain initial compile output; rerun same selected cases once. Candidate source unchanged."
+}

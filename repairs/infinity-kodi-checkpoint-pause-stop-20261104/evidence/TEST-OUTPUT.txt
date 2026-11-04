@@ -1,0 +1,18 @@
+FAIL_BEFORE_WITNESS pause-starvation still_waiting=1 checkpoint_frames=4 receiver_calls=0
+FAIL_BEFORE_WITNESS stop-starvation still_waiting=1 checkpoint_frames=4 receiver_calls=0
+FAIL_BEFORE_WITNESS resume-starvation still_waiting=1 checkpoint_frames=4 receiver_calls=0
+PASS pause-starvation checkpoint_receiver_calls=1 player_commands=0 (host peers; no Android acceptance)
+PASS stop-starvation checkpoint_receiver_calls=1 player_commands=0 (host peers; no Android acceptance)
+PASS resume-starvation checkpoint_receiver_calls=1 player_commands=0 (host peers; no Android acceptance)
+PASS audio-focus-pause-and-stop checkpoint_receiver_calls=2 player_commands=0 (host peers; no Android acceptance)
+PASS android-pause-stop-resume checkpoint_receiver_calls=3 player_commands=0 (host peers; no Android acceptance)
+PASS failed-checkpoint-repeated-interruptions checkpoint_receiver_calls=48 player_commands=0 (host peers; no Android acceptance)
+PASS ack-after-real-rejection-handler checkpoint_receiver_calls=1 player_commands=0 (host peers; no Android acceptance)
+PASS display-ack-and-order checkpoint_receiver_calls=1 player_commands=0 (host peers; no Android acceptance)
+PASS unrelated-messages-and-FIFO checkpoint_receiver_calls=1 player_commands=0 (host peers; no Android acceptance)
+PASS wrong-thread checkpoint_receiver_calls=1 player_commands=0 (host peers; no Android acceptance)
+PASS noncheckpoint-normal checkpoint_receiver_calls=4 player_commands=4 (host peers; no Android acceptance)
+PASS bounded-reentrant-display checkpoint_receiver_calls=0 player_commands=0 (host peers; no Android acceptance)
+PASS checkpoint-transition-after-enqueue checkpoint_receiver_calls=1 player_commands=0 (host peers; no Android acceptance)
+PASS sealed-durability-and-shutdown-fences checkpoint_receiver_calls=24 player_commands=0 (host peers; no Android acceptance)
+PASS stopped-queue-cleanup checkpoint_receiver_calls=0 player_commands=0 (host peers; no Android acceptance)

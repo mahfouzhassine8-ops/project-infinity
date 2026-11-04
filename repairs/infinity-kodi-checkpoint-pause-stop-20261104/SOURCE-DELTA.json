@@ -1,0 +1,34 @@
+{
+  "native_preimage": "preserved452; baseline451 retained; no release promotion",
+  "changed_paths": [
+    "xbmc/messaging/ApplicationMessenger.cpp"
+  ],
+  "before": {
+    "xbmc/messaging/ApplicationMessenger.cpp": "c565bf9dad1f5dcbdca3d81a6d3dc5a42c4d8fd8151dac2f20766caaeb4ef0c8"
+  },
+  "after": {
+    "xbmc/messaging/ApplicationMessenger.cpp": "f53c09ca57fe3b4e8e575b4f51e2f3108dc77836b35c4498dbb859f61c866f8b"
+  },
+  "changed_methods": [
+    "new Android-only IsCheckpointPlaybackControl predicate",
+    "ProcessCheckpointDisplayMessages selective admission only"
+  ],
+  "allowed_actions": [
+    "ACTION_PAUSE",
+    "ACTION_STOP",
+    "ACTION_PLAYER_PLAY (existing onResume request)"
+  ],
+  "unchanged": [
+    "SendMsg synchronization",
+    "ProcessMessage routing",
+    "Cleanup/Stop",
+    "native Android callbacks",
+    "OnAction checkpoint guard",
+    "display handlers",
+    "checkpoint coordinator/write/durability gates",
+    "all settings-retirement code"
+  ],
+  "behavior_during_checkpoint": "Existing OnAction refusal completes; player Pause/Stop/Play does not execute. Sender completion is not save completion.",
+  "production_tree_edited": false,
+  "engine_or_APK_built": false
+}

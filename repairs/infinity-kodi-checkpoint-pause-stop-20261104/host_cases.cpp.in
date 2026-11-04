@@ -1,0 +1,196 @@
+// Harness-only assertions. Deadlines bound failed tests; no timeout enters the candidate.
+void awaitWaiting(int n=1){
+ std::unique_lock<std::mutex> l(waitingMutex);
+ assert(waitingCv.wait_for(l,3s,[&]{return waiting.load()==n;}));
+}
+template<class T>T completed(std::future<T>& f){
+ assert(f.wait_for(3s)==std::future_status::ready);return f.get();
+}
+std::future<int> control(CApplicationMessenger& m,int id){
+ return std::async(std::launch::async,[&m,id]{
+  return m.SendMsg(TMSG_GUI_ACTION,WINDOW_INVALID,-1,new CAction(id));
+ });
+}
+std::future<int> display(CApplicationMessenger& m,uint32_t id){
+ return std::async(std::launch::async,[&m,id]{return m.SendMsg(ThreadMessage(id),true);});
+}
+template<class F>void callback(CApplicationMessenger&,F fn){
+ auto f=std::async(std::launch::async,[fn]{fn();return 0;});
+ awaitWaiting();g_application.Process();assert(completed(f)==0);
+}
+std::string persistenceState(){
+ auto& s=InfinityAndroidCheckpoint::Get();std::lock_guard<std::mutex> l(s.mutex);
+ std::string result=s.phase+":"+std::to_string(s.active.load())+":"+std::to_string(s.sealed)+":"+
+  std::to_string(s.activeWrites)+":"+std::to_string(s.failures)+":"+
+  std::to_string(s.checkpointSaved)+":"+std::to_string(s.terminationAuthorized);
+ for(const auto& entry:s.owners)result+="|"+entry.first+":"+std::to_string(entry.second.generation)+":"+
+  std::to_string(entry.second.dirty)+":"+std::to_string(entry.second.complete);
+ return result;
+}
+std::vector<ThreadMessage*> queued(std::queue<ThreadMessage*> q){
+ std::vector<ThreadMessage*> result;while(!q.empty()){result.push_back(q.front());q.pop();}return result;
+}
+// Baseline/negative-case rescue only: native Cleanup signals waiters but does not own
+// CAction payload disposal. Free these synthetic actions before Cleanup and disclose it.
+// This rescue is never an after-candidate completion assertion.
+void rescue(CApplicationMessenger& m){
+ {std::lock_guard<CCriticalSection> l(m.m_critSection);
+  for(auto* message:queued(m.m_vecMessages))
+   if(message->dwMessage==TMSG_GUI_ACTION&&message->lpVoid){delete static_cast<CAction*>(message->lpVoid);message->lpVoid=nullptr;}
+ }
+ m.Cleanup();
+}
+void unrelated(void*){++otherCallbacks;}
+int main(int argc,char**argv){
+ assert(argc==3);const bool before=std::string(argv[1])=="before";const std::string test=argv[2];
+ CApplicationMessenger m;CServiceBroker::messenger=&m;
+ m.m_mapTargets[TMSG_MASK_APPLICATION]=&g_application;
+ m.m_mapTargets[TMSG_MASK_WINDOWMANAGER]=&CServiceBroker::GetGUI()->GetWindowManager();
+ auto& s=InfinityAndroidCheckpoint::Get();
+ const auto originalState=persistenceState();
+ bool compareOriginal=true;
+ if(test=="pause-starvation"||test=="stop-starvation"||test=="resume-starvation"){
+  const int id=test=="pause-starvation"?ACTION_PAUSE:(test=="stop-starvation"?ACTION_STOP:ACTION_PLAYER_PLAY);
+  auto f=control(m,id);awaitWaiting();
+  for(int i=0;i<4;++i)g_application.Process();
+  if(before){
+   assert(f.wait_for(0ms)==std::future_status::timeout);
+   assert(waiting==1&&m.m_vecMessages.size()==1&&guardReceivers==0);
+   assert(playerCommands==0&&checkpointPumps==4&&persistenceState()==originalState);
+   std::cout<<"FAIL_BEFORE_WITNESS "<<test<<" still_waiting=1 checkpoint_frames=4 receiver_calls=0\n";
+   rescue(m);assert(completed(f)==-1);
+  }else{
+   assert(completed(f)==-1&&guardReceivers==1&&playerCommands==0);
+   assert(m.m_vecMessages.empty()&&liveActions==0&&checkpointPumps==4);
+  }
+ }else if(test=="audio-focus-pause-and-stop"){
+  CXBMCApp app;
+  callback(m,[&]{app.onAudioFocusChange(CJNIAudioManager::AUDIOFOCUS_LOSS);});
+  app.m_playback_state|=PLAYBACK_STATE_CANNOT_PAUSE;
+  callback(m,[&]{app.onAudioFocusChange(CJNIAudioManager::AUDIOFOCUS_LOSS);});
+  app.onAudioFocusChange(1); // Native no-op for this unrelated focus value.
+  assert((controlObserved==std::vector<int>{ACTION_PAUSE,ACTION_STOP}));
+  assert(playerCommands==0&&liveActions==0);
+ }else if(test=="android-pause-stop-resume"){
+  CXBMCApp app;
+  callback(m,[&]{app.onPause();});assert(app.m_bResumePlayback);
+  app.m_playback_state|=PLAYBACK_STATE_CANNOT_PAUSE;
+  callback(m,[&]{app.onStop();});
+  CServiceBroker::GetAppComponents().player->paused=true;
+  callback(m,[&]{app.onResume();});
+  assert((controlObserved==std::vector<int>{ACTION_PAUSE,ACTION_STOP,ACTION_PLAYER_PLAY}));
+  // onResume's ordinary async message remains closed, without blocking Android.
+  assert(m.m_vecMessages.size()==1&&m.m_vecMessages.front()->dwMessage==TMSG_RESUMEAPP);
+  assert(playerCommands==0&&otherObserved.empty());m.Cleanup();
+ }else if(test=="failed-checkpoint-repeated-interruptions"){
+  std::vector<std::future<int>> futures;
+  for(int i=0;i<48;++i)futures.push_back(std::async(std::launch::async,[i]{
+   CXBMCApp app;
+   if(i%3==0)app.onPause();
+   else if(i%3==1){app.m_playback_state|=PLAYBACK_STATE_CANNOT_PAUSE;app.onStop();}
+   else app.onAudioFocusChange(CJNIAudioManager::AUDIOFOCUS_LOSS);
+   return 0;
+  }));
+  awaitWaiting(48);g_application.Process();
+  for(auto& f:futures)assert(completed(f)==0);
+  assert(guardReceivers==48&&playerCommands==0&&liveActions==0&&m.m_vecMessages.empty());
+ }else if(test=="ack-after-real-rejection-handler"){
+  payloadBarrier.enabled=true;
+  auto f=control(m,ACTION_STOP);awaitWaiting();
+  std::thread observer([&]{
+   payloadBarrier.reached();
+   assert(f.wait_for(0ms)==std::future_status::timeout&&waiting==1);
+   assert(guardReceivers==1&&playerCommands==0);
+   payloadBarrier.release();
+  });
+  g_application.Process();observer.join();assert(completed(f)==-1&&liveActions==0);
+ }else if(test=="display-ack-and-order"){
+  displayBarrier.enabled=true;
+  auto d=display(m,TMSG_DISPLAY_DESTROY);awaitWaiting();
+  std::thread observer([&]{displayBarrier.reached();assert(d.wait_for(0ms)==std::future_status::timeout);displayBarrier.release();});
+  g_application.Process();observer.join();assert(completed(d)==42);
+  displayBarrier.enabled=false;
+  m.PostMsg(TMSG_DISPLAY_SETUP);
+  auto p=control(m,ACTION_PAUSE);awaitWaiting();
+  m.PostMsg(TMSG_DISPLAY_DESTROY);m.PostMsg(TMSG_DISPLAY_SETUP);
+  g_application.Process();assert(completed(p)==-1);
+  assert((displayObserved==std::vector<uint32_t>{TMSG_DISPLAY_DESTROY,TMSG_DISPLAY_SETUP,TMSG_DISPLAY_DESTROY,TMSG_DISPLAY_SETUP}));
+  assert(playerCommands==0);
+ }else if(test=="unrelated-messages-and-FIFO"){
+  std::vector<ThreadMessage*> retained;
+  auto post=[&](ThreadMessage&& message){m.SendMsg(std::move(message),false);retained.push_back(m.m_vecMessages.back());};
+  ThreadMessageCallback cb{unrelated,nullptr};
+  post(ThreadMessage(TMSG_CALLBACK,-1,-1,&cb));
+  post(ThreadMessage(TMSG_GUI_ACTION,WINDOW_INVALID-1,-1,new CAction(ACTION_PAUSE)));
+  post(ThreadMessage(TMSG_GUI_ACTION,WINDOW_INVALID,0,new CAction(ACTION_STOP)));
+  ThreadMessage extra(TMSG_GUI_ACTION,WINDOW_INVALID,-1,new CAction(ACTION_STOP));extra.param3=1;post(std::move(extra));
+  post(ThreadMessage(TMSG_GUI_ACTION,WINDOW_INVALID,-1,nullptr));
+  post(ThreadMessage(TMSG_GUI_ACTION,WINDOW_INVALID,-1,new CAction(ACTION_MOVE_LEFT)));
+  auto safe=control(m,ACTION_STOP);awaitWaiting();m.PostMsg(TMSG_DISPLAY_DESTROY);
+  ThreadMessage text(TMSG_GUI_ACTION,WINDOW_INVALID,-1,new CAction(ACTION_PAUSE));text.strParam="synthetic";post(std::move(text));
+  ThreadMessage params(TMSG_GUI_ACTION,WINDOW_INVALID,-1,new CAction(ACTION_PLAYER_PLAY));params.params={"synthetic"};post(std::move(params));
+  post(ThreadMessage(TMSG_SHUTDOWN));post(ThreadMessage(TMSG_QUIT));
+  m.SendMsg(ThreadMessage(TMSG_GUI_MESSAGE),false);auto windows=queued(m.m_vecWindowMessages);
+  g_application.Process();assert(completed(safe)==-1);
+  assert(queued(m.m_vecMessages)==retained&&queued(m.m_vecWindowMessages)==windows);
+  assert(guardReceivers==1&&windowActions==0&&playerCommands==0&&otherCallbacks==0&&otherObserved.empty());
+  rescue(m);
+ }else if(test=="wrong-thread"){
+  auto f=control(m,ACTION_PAUSE);awaitWaiting();
+  auto wrong=std::async(std::launch::async,[&]{m.ProcessCheckpointDisplayMessages();});wrong.get();
+  assert(guardReceivers==0&&f.wait_for(0ms)==std::future_status::timeout);
+  g_application.Process();assert(completed(f)==-1&&guardReceivers==1&&playerCommands==0);
+ }else if(test=="noncheckpoint-normal"){
+  compareOriginal=false;s.active=false;
+  for(int id:{ACTION_PAUSE,ACTION_STOP,ACTION_PLAYER_PLAY}){
+   auto f=control(m,id);awaitWaiting();m.ProcessCheckpointDisplayMessages();
+   assert(f.wait_for(0ms)==std::future_status::timeout);
+   g_application.Process();assert(completed(f)==-1);
+  }
+  // Same-thread native direct-dispatch path remains intact too.
+  assert(m.SendMsg(TMSG_GUI_ACTION,WINDOW_INVALID,-1,new CAction(ACTION_PAUSE))==-1);
+  assert(playerCommands==4&&guardReceivers==4&&normalFrames==3&&checkpointPumps==0);
+ }else if(test=="bounded-reentrant-display"){
+  enqueueDisplayDuringHandler=true;m.PostMsg(TMSG_DISPLAY_SETUP);g_application.Process();
+  assert(displayObserved.size()==1&&m.m_vecMessages.size()==1&&checkpointPumps==1);
+  g_application.Process();assert(displayObserved.size()==2&&m.m_vecMessages.empty()&&checkpointPumps==2);
+ }else if(test=="checkpoint-transition-after-enqueue"){
+  s.active=false;auto f=control(m,ACTION_STOP);awaitWaiting();s.active=true;
+  g_application.Process();assert(completed(f)==-1&&guardReceivers==1&&playerCommands==0);
+ }else if(test=="sealed-durability-and-shutdown-fences"){
+  compareOriginal=false;
+  for(const auto& phase:{"QUIESCE","PERSISTING","CHECKPOINT_FAILED","SAFE_TO_TERMINATE"}){
+   for(bool sealed:{false,true}){
+    s.phase=phase;s.sealed=sealed;const auto snapshot=persistenceState();
+    for(int id:{ACTION_PAUSE,ACTION_STOP,ACTION_PLAYER_PLAY}){
+     auto f=control(m,id);awaitWaiting();g_application.Process();assert(completed(f)==-1);
+    }
+    {InfinityAndroidCheckpoint::CheckpointWriteGuard blocked("playback-command");assert(!blocked);}
+    assert(persistenceState()==snapshot&&playerCommands==0);
+    if(s.phase=="CHECKPOINT_FAILED"){
+     InfinityAndroidCheckpoint::permissionDepth=1; // Even a stale coordinator scope must not admit failed writes.
+     {InfinityAndroidCheckpoint::CheckpointWriteGuard failed("pending-settings");assert(!failed);}
+     assert(!InfinityAndroidCheckpoint::AllowNativeWrite("pending-settings"));
+     InfinityAndroidCheckpoint::permissionDepth=0;assert(persistenceState()==snapshot);
+    }
+   }
+  }
+  s.phase="PERSISTING";s.sealed=true;InfinityAndroidCheckpoint::permissionDepth=1;
+  {InfinityAndroidCheckpoint::CheckpointWriteGuard writer("pending-settings");assert(writer&&s.activeWrites==1);}
+  assert(s.activeWrites==0&&s.owners.at("pending-settings").generation==8);
+  assert(s.owners.at("pending-settings").dirty&&!s.owners.at("pending-settings").complete);
+  assert(s.owners.at("unknown-watched-owner").generation==7&&s.owners.at("unknown-watched-owner").dirty);
+  assert(!s.checkpointSaved&&!s.terminationAuthorized&&s.failures==1);
+  {InfinityAndroidCheckpoint::CheckpointWriteGuard command("playback-command");assert(!command);}
+  InfinityAndroidCheckpoint::permissionDepth=0;
+ }else if(test=="stopped-queue-cleanup"){
+  auto f=control(m,ACTION_STOP);awaitWaiting();m.Stop();g_application.Process();
+  assert(f.wait_for(0ms)==std::future_status::timeout&&guardReceivers==0&&playerCommands==0);
+  rescue(m);assert(completed(f)==-1);
+  assert(m.SendMsg(ThreadMessage(TMSG_DISPLAY_SETUP),false)==-1&&m.m_vecMessages.empty());
+ }else assert(false);
+ if(compareOriginal)assert(persistenceState()==originalState);
+ assert(m.m_vecMessages.empty()&&m.m_vecWindowMessages.empty());
+ assert(liveMessages==0&&liveActions==0&&waiting==0);
+ if(!before)std::cout<<"PASS "<<test<<" checkpoint_receiver_calls="<<guardReceivers<<" player_commands="<<playerCommands<<" (host peers; no Android acceptance)\n";
+}

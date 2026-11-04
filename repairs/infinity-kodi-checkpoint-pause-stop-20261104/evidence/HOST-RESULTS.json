@@ -1,0 +1,330 @@
+{
+  "scope": "source-extracted host checks only; no Android/native-engine build or acceptance",
+  "source_bindings": {
+    "xbmc/messaging/ApplicationMessenger.cpp": "c565bf9dad1f5dcbdca3d81a6d3dc5a42c4d8fd8151dac2f20766caaeb4ef0c8",
+    "xbmc/messaging/ApplicationMessenger.h": "2326742d7bb60b46a8b3521542445c2d3109cefab15ff105423731b78b7367ec",
+    "xbmc/input/actions/ActionIDs.h": "3a0bf357d9741d3b3074f8d8261886f76353894f97334a9eecc4998f0dc4a2f4",
+    "xbmc/guilib/WindowIDs.h": "3f26ab2c746217f0e0f283c13a881a0bdc9ba6fb5dc0897106678509fef68c34",
+    "xbmc/platform/android/activity/XBMCApp.cpp": "126fee30678e70c0444b0bcb7c0d586b57c99e9ced723010e034f70148504a9d",
+    "xbmc/application/Application.cpp": "d266a16ef3f56ee91ce82c8e7e1da9a868d853b22b48e773cad3b1e24331f307",
+    "xbmc/guilib/GUIWindowManager.cpp": "f9aeddec883a4d1ac63303bfbb9b88cba2bcba5f01fcd799f68c444665d31c23",
+    "xbmc/platform/android/activity/InfinityAndroidCheckpoint.cpp": "e8f617ac615d657ec0b37d1bef39d277ceafa8e2ad20bb2b6118cebae7f0350f",
+    "xbmc/messaging/ThreadMessage.h": "a3dde8405f4b6a89cf616bebe6764785070e1ae09c8d7ba0b12be659b90d77ab",
+    "xbmc/messaging/IMessageTarget.h": "a15d4afb51a0c77987a129cf36a7962e86b90b2bd8b720ac0efa24021ee4ee6c",
+    "xbmc/input/actions/Action.h": "88dc7132b6bb99f03bdda9421e2215e23effa68edb260a29a9b4e8dd9e0b3b1f",
+    "xbmc/platform/android/activity/InfinityAndroidCheckpoint.h": "bb9501674ed8a0ea36894bfbe6d52b704a1244c8e5f727590493c11cc87c8d20"
+  },
+  "candidate_sha256": "f53c09ca57fe3b4e8e575b4f51e2f3108dc77836b35c4498dbb859f61c866f8b",
+  "selected_bodies": {
+    "void CXBMCApp::onResume()": {
+      "sha256": "9f8908636af5c4910d493228db79af1deb956cbbd41bc3fb72057e567820b868",
+      "bytes": 1540
+    },
+    "void CXBMCApp::onPause()": {
+      "sha256": "55e310be22178103ccf7d2d1ff83cf8df4d17357aa251c0019d3964dffa0db0c",
+      "bytes": 1036
+    },
+    "void CXBMCApp::onStop()": {
+      "sha256": "d98a51184acd2ba715aee49232a6b9c2fe81a9ce143f512acf658e8cfe41e139",
+      "bytes": 629
+    },
+    "void CXBMCApp::onAudioFocusChange(int focusChange)": {
+      "sha256": "b74a2a1c76f470f826ff4e4366014c81f0b686ecf7fb4da2e306cf7319e20ba3",
+      "bytes": 683
+    },
+    "bool AllowNativeWrite(const char*)": {
+      "sha256": "353e31e219cadc98c5c82ca9cbd156a0a35dbcc232ec1d15d62977c5b64458fd",
+      "bytes": 235
+    },
+    "CheckpointWriteGuard::CheckpointWriteGuard(const char* name)": {
+      "sha256": "aa1b8fc93c38702a2660ef57a7c46550e078070fc19a1868f606141c8f738bcb",
+      "bytes": 1015
+    },
+    "CheckpointWriteGuard::~CheckpointWriteGuard()": {
+      "sha256": "b54e504e9f2ef3bc0fa751172909de8eb2151ed0d7cde77cc7475fcaa228cfb1",
+      "bytes": 165
+    },
+    "OnAction exact checkpoint prefix": {
+      "sha256": "c23a97b0230af493e38708c9f1158f6fb4a64d283db2ec897d2c0b93d05c7e75",
+      "bytes": 149
+    },
+    "Process exact checkpoint prefix": {
+      "sha256": "fcb40e94c9a4f6d1d47c7a863421861319450c5fc54bcd4f8eda127a5b4b69df",
+      "bytes": 457
+    },
+    "OnApplicationMessage exact checkpoint prefix": {
+      "sha256": "1c8dbaa9695d5fa76c37eb7d5d415d4bade2aeb46f29616d5ff0e152c969c74d",
+      "bytes": 317
+    },
+    "GUIWindowManager exact GUI_ACTION case": {
+      "sha256": "ec97d21e76ad57727a3d6733b44ebc920a4b995eb2ffd4951d4c07ffeea8c4ad",
+      "bytes": 519
+    },
+    "before: void CApplicationMessenger::Cleanup()": {
+      "sha256": "560720dc5fc9fced42cb977ccf9fca5b0f658109fbd14ae82d0ecffc26650345",
+      "bytes": 497
+    },
+    "before: int CApplicationMessenger::SendMsg(ThreadMessage&& message, bool wait)": {
+      "sha256": "24a8ef4d706a98b5a2087cb762412111471299282b9f5dbd9daf3d4c7db1fbf9",
+      "bytes": 2577
+    },
+    "before: void CApplicationMessenger::ProcessMessages()": {
+      "sha256": "8a7319b53f3e2b19ea210a23ccce81b58b810a083819097c428fbba6828fd951",
+      "bytes": 677
+    },
+    "before: void CApplicationMessenger::ProcessWindowMessages()": {
+      "sha256": "16bf87ed90eea37adf1be1e052e65e7a2aa54302b54851a6f4e12a88c885690f",
+      "bytes": 693
+    },
+    "before: void CApplicationMessenger::ProcessMessage(ThreadMessage *pMsg)": {
+      "sha256": "11aacfa6324c3f91c744acf9de602a2bb7b06e24781485bb85372d610a49b5ac",
+      "bytes": 653
+    },
+    "before: bool CApplicationMessenger::IsProcessThread() const": {
+      "sha256": "3ea167d711cf3a5d35b840aa1098a2668ae17bb2e437257002bd02f8ade40eae",
+      "bytes": 116
+    },
+    "before: void CApplicationMessenger::ProcessCheckpointDisplayMessages()": {
+      "sha256": "e0818f4bc91e1851f1086788f1e47cfdba34f21b1f4a7565e9b4a9ee076e544d",
+      "bytes": 1462
+    },
+    "IsCheckpointPlaybackControl candidate": {
+      "sha256": "b1c7c032bdd399dd3d87b6d2bfee0cfd1b75f59e5a7d90259d1fd8ed065590ac",
+      "bytes": 693
+    },
+    "after: void CApplicationMessenger::Cleanup()": {
+      "sha256": "560720dc5fc9fced42cb977ccf9fca5b0f658109fbd14ae82d0ecffc26650345",
+      "bytes": 497
+    },
+    "after: int CApplicationMessenger::SendMsg(ThreadMessage&& message, bool wait)": {
+      "sha256": "24a8ef4d706a98b5a2087cb762412111471299282b9f5dbd9daf3d4c7db1fbf9",
+      "bytes": 2577
+    },
+    "after: void CApplicationMessenger::ProcessMessages()": {
+      "sha256": "8a7319b53f3e2b19ea210a23ccce81b58b810a083819097c428fbba6828fd951",
+      "bytes": 677
+    },
+    "after: void CApplicationMessenger::ProcessWindowMessages()": {
+      "sha256": "16bf87ed90eea37adf1be1e052e65e7a2aa54302b54851a6f4e12a88c885690f",
+      "bytes": 693
+    },
+    "after: void CApplicationMessenger::ProcessMessage(ThreadMessage *pMsg)": {
+      "sha256": "11aacfa6324c3f91c744acf9de602a2bb7b06e24781485bb85372d610a49b5ac",
+      "bytes": 653
+    },
+    "after: bool CApplicationMessenger::IsProcessThread() const": {
+      "sha256": "3ea167d711cf3a5d35b840aa1098a2668ae17bb2e437257002bd02f8ade40eae",
+      "bytes": 116
+    },
+    "after: void CApplicationMessenger::ProcessCheckpointDisplayMessages()": {
+      "sha256": "36955b0759e5ad3510fd952950cef688232a6a85f630e78ca60326e3db389ed3",
+      "bytes": 1647
+    }
+  },
+  "boundaries": [
+    "CEvent/critical-section/ThreadMessage storage are host peers",
+    "real native Android callback bodies execute with Android service peers",
+    "real GUI_ACTION receiver branch and application checkpoint prefixes",
+    "real native write-guard bodies, reduced coordinator state",
+    "checkpoint Pump, native EGL, codecs, graphics lock and player work are peers",
+    "baseline and negative-case synthetic payload cleanup is test-only rescue"
+  ],
+  "tests": [
+    {
+      "mode": "before",
+      "case": "pause-starvation",
+      "passed": true,
+      "elapsed_seconds": 0.002333,
+      "returncode": 0,
+      "stdout": "FAIL_BEFORE_WITNESS pause-starvation still_waiting=1 checkpoint_frames=4 receiver_calls=0\n",
+      "stderr": ""
+    },
+    {
+      "mode": "before",
+      "case": "stop-starvation",
+      "passed": true,
+      "elapsed_seconds": 0.001959,
+      "returncode": 0,
+      "stdout": "FAIL_BEFORE_WITNESS stop-starvation still_waiting=1 checkpoint_frames=4 receiver_calls=0\n",
+      "stderr": ""
+    },
+    {
+      "mode": "before",
+      "case": "resume-starvation",
+      "passed": true,
+      "elapsed_seconds": 0.002051,
+      "returncode": 0,
+      "stdout": "FAIL_BEFORE_WITNESS resume-starvation still_waiting=1 checkpoint_frames=4 receiver_calls=0\n",
+      "stderr": ""
+    },
+    {
+      "mode": "after",
+      "case": "pause-starvation",
+      "passed": true,
+      "elapsed_seconds": 0.002318,
+      "returncode": 0,
+      "stdout": "PASS pause-starvation checkpoint_receiver_calls=1 player_commands=0 (host peers; no Android acceptance)\n",
+      "stderr": ""
+    },
+    {
+      "mode": "after",
+      "case": "stop-starvation",
+      "passed": true,
+      "elapsed_seconds": 0.00181,
+      "returncode": 0,
+      "stdout": "PASS stop-starvation checkpoint_receiver_calls=1 player_commands=0 (host peers; no Android acceptance)\n",
+      "stderr": ""
+    },
+    {
+      "mode": "after",
+      "case": "resume-starvation",
+      "passed": true,
+      "elapsed_seconds": 0.001846,
+      "returncode": 0,
+      "stdout": "PASS resume-starvation checkpoint_receiver_calls=1 player_commands=0 (host peers; no Android acceptance)\n",
+      "stderr": ""
+    },
+    {
+      "mode": "after",
+      "case": "audio-focus-pause-and-stop",
+      "passed": true,
+      "elapsed_seconds": 0.001777,
+      "returncode": 0,
+      "stdout": "PASS audio-focus-pause-and-stop checkpoint_receiver_calls=2 player_commands=0 (host peers; no Android acceptance)\n",
+      "stderr": ""
+    },
+    {
+      "mode": "after",
+      "case": "android-pause-stop-resume",
+      "passed": true,
+      "elapsed_seconds": 0.002258,
+      "returncode": 0,
+      "stdout": "PASS android-pause-stop-resume checkpoint_receiver_calls=3 player_commands=0 (host peers; no Android acceptance)\n",
+      "stderr": ""
+    },
+    {
+      "mode": "after",
+      "case": "failed-checkpoint-repeated-interruptions",
+      "passed": true,
+      "elapsed_seconds": 0.005813,
+      "returncode": 0,
+      "stdout": "PASS failed-checkpoint-repeated-interruptions checkpoint_receiver_calls=48 player_commands=0 (host peers; no Android acceptance)\n",
+      "stderr": ""
+    },
+    {
+      "mode": "after",
+      "case": "ack-after-real-rejection-handler",
+      "passed": true,
+      "elapsed_seconds": 0.002233,
+      "returncode": 0,
+      "stdout": "PASS ack-after-real-rejection-handler checkpoint_receiver_calls=1 player_commands=0 (host peers; no Android acceptance)\n",
+      "stderr": ""
+    },
+    {
+      "mode": "after",
+      "case": "display-ack-and-order",
+      "passed": true,
+      "elapsed_seconds": 0.002017,
+      "returncode": 0,
+      "stdout": "PASS display-ack-and-order checkpoint_receiver_calls=1 player_commands=0 (host peers; no Android acceptance)\n",
+      "stderr": ""
+    },
+    {
+      "mode": "after",
+      "case": "unrelated-messages-and-FIFO",
+      "passed": true,
+      "elapsed_seconds": 0.001589,
+      "returncode": 0,
+      "stdout": "PASS unrelated-messages-and-FIFO checkpoint_receiver_calls=1 player_commands=0 (host peers; no Android acceptance)\n",
+      "stderr": ""
+    },
+    {
+      "mode": "after",
+      "case": "wrong-thread",
+      "passed": true,
+      "elapsed_seconds": 0.001777,
+      "returncode": 0,
+      "stdout": "PASS wrong-thread checkpoint_receiver_calls=1 player_commands=0 (host peers; no Android acceptance)\n",
+      "stderr": ""
+    },
+    {
+      "mode": "after",
+      "case": "noncheckpoint-normal",
+      "passed": true,
+      "elapsed_seconds": 0.002091,
+      "returncode": 0,
+      "stdout": "PASS noncheckpoint-normal checkpoint_receiver_calls=4 player_commands=4 (host peers; no Android acceptance)\n",
+      "stderr": ""
+    },
+    {
+      "mode": "after",
+      "case": "bounded-reentrant-display",
+      "passed": true,
+      "elapsed_seconds": 0.001268,
+      "returncode": 0,
+      "stdout": "PASS bounded-reentrant-display checkpoint_receiver_calls=0 player_commands=0 (host peers; no Android acceptance)\n",
+      "stderr": ""
+    },
+    {
+      "mode": "after",
+      "case": "checkpoint-transition-after-enqueue",
+      "passed": true,
+      "elapsed_seconds": 0.001742,
+      "returncode": 0,
+      "stdout": "PASS checkpoint-transition-after-enqueue checkpoint_receiver_calls=1 player_commands=0 (host peers; no Android acceptance)\n",
+      "stderr": ""
+    },
+    {
+      "mode": "after",
+      "case": "sealed-durability-and-shutdown-fences",
+      "passed": true,
+      "elapsed_seconds": 0.00535,
+      "returncode": 0,
+      "stdout": "PASS sealed-durability-and-shutdown-fences checkpoint_receiver_calls=24 player_commands=0 (host peers; no Android acceptance)\n",
+      "stderr": ""
+    },
+    {
+      "mode": "after",
+      "case": "stopped-queue-cleanup",
+      "passed": true,
+      "elapsed_seconds": 0.002087,
+      "returncode": 0,
+      "stdout": "PASS stopped-queue-cleanup checkpoint_receiver_calls=0 player_commands=0 (host peers; no Android acceptance)\n",
+      "stderr": ""
+    }
+  ],
+  "complete": true,
+  "android_verified": false,
+  "before_compile": {
+    "returncode": 0,
+    "command": [
+      "g++",
+      "-std=c++17",
+      "-pthread",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-DTARGET_ANDROID",
+      "/tmp/infinity-kodi-pause-stop-host-corrected-20261104/before.cpp",
+      "-o",
+      "/tmp/infinity-kodi-pause-stop-host-corrected-20261104/before"
+    ],
+    "harness_cpp_sha256": "603947b1c6923e7eb945827a4cb35bc23d6c5f9e61d21e79490b649813ba241c"
+  },
+  "after_compile": {
+    "returncode": 0,
+    "command": [
+      "g++",
+      "-std=c++17",
+      "-pthread",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-DTARGET_ANDROID",
+      "/tmp/infinity-kodi-pause-stop-host-corrected-20261104/after.cpp",
+      "-o",
+      "/tmp/infinity-kodi-pause-stop-host-corrected-20261104/after"
+    ],
+    "harness_cpp_sha256": "17bda16cc123dc6402b0458c38b8b35b58e35cf91ddec9e27fbefe2f54c682ae"
+  }
+}
