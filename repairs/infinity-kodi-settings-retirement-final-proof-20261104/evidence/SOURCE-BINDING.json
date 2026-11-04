@@ -1,0 +1,52 @@
+{
+  "files": {
+    "xbmc/settings/lib/Setting.cpp": {
+      "sha256": "9c1255df25c158223a5c2c27d0fd0f88f82aa0a6ca54030a3bad66cd18814d04",
+      "identical_in451_and452": true
+    },
+    "xbmc/settings/lib/Setting.h": {
+      "sha256": "cdb9660f2f98f0871eb568f24febb1acb204ce0adfad6e305bfd20b5c1bbba22",
+      "identical_in451_and452": true
+    },
+    "xbmc/settings/lib/SettingsManager.cpp": {
+      "sha256": "6f14955de92cb075418c3b361685083cc4ce675c82a782afebe07603e70ae750",
+      "identical_in451_and452": true
+    },
+    "xbmc/addons/settings/AddonSettings.cpp": {
+      "sha256": "a11cfb9198a6914c869f2098db13dd156952f50f9ded24f344b2f38bceba78a5",
+      "identical_in451_and452": true
+    },
+    "xbmc/addons/Addon.cpp": {
+      "sha256": "1cba9747ee7c1638885df49d61c854b418a88572e4a3ea31d0bf5017d66c9de4",
+      "identical_in451_and452": true
+    },
+    "xbmc/settings/SettingsValueXmlSerializer.cpp": {
+      "sha256": "5d46b89f89948b5e3af2a87dfc6a1a5ebf98135d4d05a81272458b2c6beefd6b",
+      "identical_in451_and452": true
+    }
+  },
+  "extractor_sha256": "ab2195232ca3ce160085be45bc8f04efd930e04d56fb0dd840df59406de5b4fb",
+  "coverage_cpp_sha256": "894827a8c92e37ca5531e8a4c2ada26e7ae943bdb6710cbd30ed610c0c99e09f",
+  "native_unchanged_bodies": [
+    "CAddon::UpdateSetting",
+    "CAddonSettings::AddSetting(string)",
+    "AddSettingWithoutDefinition",
+    "InitializeFromOldSettingWithoutDefinition generic/string",
+    "CSettingsManager::AddSetting(group)",
+    "CSettingString::SetDefault",
+    "CSettingString::SetValue",
+    "CSettingString::FromString"
+  ],
+  "coverage_peers": [
+    "Already initialized/loaded synthetic owner",
+    "Containers and section registration",
+    "Accepted simple-value validation",
+    "Value-change notification counter; no real providers or profiles"
+  ],
+  "prototype": "Independent C++ protocol implementation; no native integration claim",
+  "prototype_sha256": {
+    "contract.hpp": "81598db1262757cc92ea7edca099380a142eb1e8f207efce5fa9f476ef639545",
+    "contract_tests.cpp": "9c5632ad7e22ea0b1b6e668e62896fc8b21541643a04636b7f2d4b87047f7e77"
+  },
+  "production_changes": 0
+}

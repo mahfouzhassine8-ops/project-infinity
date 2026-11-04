@@ -1,0 +1,19 @@
+#define CHECK(x) do{if(!(x))throw std::runtime_error("assertion at line "+std::to_string(__LINE__)+": " #x);}while(false)
+int main(){try{
+  ADDON::CAddon addon;
+  auto owner=addon.m_settings.at(0).m_addonSettings;
+  auto& manager=owner->manager;
+  CHECK(manager.m_initialized&&manager.m_loaded);
+  addon.UpdateSetting("synthetic-first","synthetic-value-one");
+  CHECK(manager.m_settings.size()==1&&manager.changeNotifications==0);
+  addon.UpdateSetting("synthetic-first","synthetic-value-two");
+  CHECK(manager.changeNotifications==1); // Existing-value callback path is observable.
+  const auto before=manager.changeNotifications;
+  addon.UpdateSetting("synthetic-new-key","synthetic-new-value");
+  CHECK(manager.m_settings.size()==2&&manager.changeNotifications==before);
+  auto added=std::dynamic_pointer_cast<CSettingString>(owner->GetSetting("synthetic-new-key"));
+  CHECK(added&&added->m_value=="synthetic-new-value");
+  CHECK(manager.sections.at(0)->GetCategories().at(0)->GetGroups().at(0)->GetSettings().size()==2);
+  std::cout<<"{\"case\":\"loaded_undefined_setting_insertion_misses_value_callback\",\"expected_result_observed\":true,\"classification\":\"NATIVE_COVERAGE_GAP\",\"loaded_owner\":true,\"new_settings_inserted\":2,\"existing_value_change_notifications\":1,\"new_key_notification_delta\":0,\"production_coverage_certificate\":false}\n";
+  return 0;
+}catch(const std::exception& e){std::cerr<<e.what()<<"\n";return 1;}}

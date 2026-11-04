@@ -1,0 +1,27 @@
+{
+  "contract": [
+    "g++",
+    "-std=c++17",
+    "-O2",
+    "-pthread",
+    "-Wall",
+    "-Wextra",
+    "-I",
+    "/tmp/infinity-settings-retirement-final-proof-20261104/repairs/infinity-kodi-settings-retirement-final-proof-20261104",
+    "/tmp/infinity-settings-retirement-final-proof-20261104/repairs/infinity-kodi-settings-retirement-final-proof-20261104/contract_tests.cpp",
+    "-o",
+    "/tmp/infinity-settings-retirement-final-results-20261104/contract"
+  ],
+  "native_coverage": [
+    "g++",
+    "-std=c++17",
+    "-O2",
+    "-pthread",
+    "-DTARGET_ANDROID",
+    "-Wall",
+    "-Wextra",
+    "/tmp/infinity-settings-retirement-final-results-20261104/native_coverage.cpp",
+    "-o",
+    "/tmp/infinity-settings-retirement-final-results-20261104/native_coverage"
+  ]
+}

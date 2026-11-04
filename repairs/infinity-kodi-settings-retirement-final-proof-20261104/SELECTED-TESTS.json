@@ -1,0 +1,41 @@
+{
+  "authorization": "Final isolated implementation and safety testing only; no production changes or APK/sign/lock",
+  "parent_checkpoint": "8c54e2cf3bbe98ec4512721802d1011a73c82eb2",
+  "recorded_utc": "2026-11-04T04:25:58.557674+00:00",
+  "prototype_cases": [
+    "snapshot_bound_confirmation",
+    "stale_confirmation_rejected",
+    "mutation_before_capture",
+    "duplicate_confirmation_rejected",
+    "foreign_snapshot_rejected",
+    "same_path_ordering",
+    "different_paths_independent",
+    "failed_save_blocks_retirement",
+    "pending_token_blocks_retirement",
+    "conflicting_revision_blocks_retirement",
+    "durability_failure_blocks_retirement",
+    "missing_replacement_blocks_retirement",
+    "unknown_coverage_blocks_retirement",
+    "mutation_guard_categories",
+    "retirement_destruction_outside_lock",
+    "external_lease_preserved",
+    "weak_reacquisition_repins",
+    "abandoned_token_retains_obligation",
+    "revision_overflow_fails_closed"
+  ],
+  "source_bound_cases": [
+    "loaded_undefined_setting_insertion_misses_value_callback"
+  ],
+  "bounds": "One isolated contract prototype; these 20 cases only; 60 seconds per host compile, 20 seconds per case; no automatic repeats or broad suites",
+  "decision_gate": "A reachable source-bound mutation not certified by the proposed revision contract blocks a production patch, even if synthetic contract cases pass. Stop at the gate; do not expand the shared settings engine to force a PASS.",
+  "scope": "Revision/save-token rules, same-path exclusion, guarded reference retirement, native mutation-coverage boundary",
+  "not_selected": [
+    "old24 measurement",
+    "old16 safety cases",
+    "old21 native repair cases",
+    "Android/app/shutdown execution",
+    "APK/native-engine build"
+  ],
+  "source_peers": "Prototype has encapsulated synthetic mutation APIs and simulated write/receipt outcomes. Separate source-bound witness compiles unchanged actual settings update/insertion/value setter bodies. Native integration is not simulated acceptance.",
+  "main_status": "?? repairs/cobra-2103442-end-to-end-quality-refresh/__pycache__/\n?? repairs/cobra-2103444-rotation-audio/__pycache__/\n?? repairs/infinity-2103445-external-video-lifecycle/\n?? repairs/infinity-preview-2103447-resume/__pycache__/\n?? repairs/infinity-preview-2103447-resume/android-qa/__pycache__/\n"
+}

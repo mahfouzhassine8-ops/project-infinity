@@ -1,0 +1,119 @@
+{
+  "decision": "EARLY_RETIREMENT_BLOCKED",
+  "cases": 20,
+  "prototype_cases": 19,
+  "source_bound_coverage_witnesses": 1,
+  "results": [
+    {
+      "case": "snapshot_bound_confirmation",
+      "expected_result_observed": true,
+      "scope": "synthetic_contract_only"
+    },
+    {
+      "case": "stale_confirmation_rejected",
+      "expected_result_observed": true,
+      "scope": "synthetic_contract_only"
+    },
+    {
+      "case": "mutation_before_capture",
+      "expected_result_observed": true,
+      "scope": "synthetic_contract_only"
+    },
+    {
+      "case": "duplicate_confirmation_rejected",
+      "expected_result_observed": true,
+      "scope": "synthetic_contract_only"
+    },
+    {
+      "case": "foreign_snapshot_rejected",
+      "expected_result_observed": true,
+      "scope": "synthetic_contract_only"
+    },
+    {
+      "case": "same_path_ordering",
+      "expected_result_observed": true,
+      "scope": "synthetic_contract_only"
+    },
+    {
+      "case": "different_paths_independent",
+      "expected_result_observed": true,
+      "scope": "synthetic_contract_only"
+    },
+    {
+      "case": "failed_save_blocks_retirement",
+      "expected_result_observed": true,
+      "scope": "synthetic_contract_only"
+    },
+    {
+      "case": "pending_token_blocks_retirement",
+      "expected_result_observed": true,
+      "scope": "synthetic_contract_only"
+    },
+    {
+      "case": "conflicting_revision_blocks_retirement",
+      "expected_result_observed": true,
+      "scope": "synthetic_contract_only"
+    },
+    {
+      "case": "durability_failure_blocks_retirement",
+      "expected_result_observed": true,
+      "scope": "synthetic_contract_only"
+    },
+    {
+      "case": "missing_replacement_blocks_retirement",
+      "expected_result_observed": true,
+      "scope": "synthetic_contract_only"
+    },
+    {
+      "case": "unknown_coverage_blocks_retirement",
+      "expected_result_observed": true,
+      "scope": "synthetic_contract_only"
+    },
+    {
+      "case": "mutation_guard_categories",
+      "expected_result_observed": true,
+      "scope": "synthetic_contract_only"
+    },
+    {
+      "case": "retirement_destruction_outside_lock",
+      "expected_result_observed": true,
+      "scope": "synthetic_contract_only"
+    },
+    {
+      "case": "external_lease_preserved",
+      "expected_result_observed": true,
+      "scope": "synthetic_contract_only"
+    },
+    {
+      "case": "weak_reacquisition_repins",
+      "expected_result_observed": true,
+      "scope": "synthetic_contract_only"
+    },
+    {
+      "case": "abandoned_token_retains_obligation",
+      "expected_result_observed": true,
+      "scope": "synthetic_contract_only"
+    },
+    {
+      "case": "revision_overflow_fails_closed",
+      "expected_result_observed": true,
+      "scope": "synthetic_contract_only"
+    },
+    {
+      "case": "loaded_undefined_setting_insertion_misses_value_callback",
+      "expected_result_observed": true,
+      "classification": "NATIVE_COVERAGE_GAP",
+      "loaded_owner": true,
+      "new_settings_inserted": 2,
+      "existing_value_change_notifications": 1,
+      "new_key_notification_delta": 0,
+      "production_coverage_certificate": false
+    }
+  ],
+  "contract_limits": "Only the encapsulated synthetic API has complete mutation coverage. Native integration, ownership callbacks and write-lease placement remain unproven.",
+  "concrete_blocker": "Actual loaded-owner UpdateSetting(undefined key) changes registered serialized settings without the ordinary OnSettingChanged notification; callback-only revision tracking misses it.",
+  "production_patch_delivered": false,
+  "native_sources_changed": 0,
+  "APKs_built_signed_locked": 0,
+  "stop_rule": "Gate reached; retain existing safe checkpoint behavior. No expansion into shared-settings rewrite or unrelated systems."
+}

@@ -1,0 +1,120 @@
+// Host peers for a source-bound native mutation-coverage witness. No real settings.
+#include <algorithm>
+#include <iostream>
+#include <map>
+#include <memory>
+#include <mutex>
+#include <shared_mutex>
+#include <stdexcept>
+#include <string>
+#include <vector>
+using CSharedSection=std::shared_mutex;
+using CCriticalSection=std::recursive_mutex;
+namespace InfinityAndroidCheckpoint {
+struct CheckpointWriteGuard {explicit CheckpointWriteGuard(const char*){} explicit operator bool()const{return true;}};
+}
+constexpr int LOGERROR=1;
+struct CLog {template<class... T>static void Log(int,const char*,T&&...){throw std::runtime_error("unexpected source error path");}};
+struct Log {template<class... T>void warn(const char*,T&&...)const{throw std::runtime_error("unexpected source warning path");}};
+using Logger=std::shared_ptr<Log>;
+enum class SettingLevel {Internal};
+class CSettingsManager;
+class CSetting:public std::enable_shared_from_this<CSetting> {
+  std::string id;
+public:
+  CSettingsManager* callback;
+  CSetting(std::string n,CSettingsManager* p):id(std::move(n)),callback(p){}
+  virtual ~CSetting()=default;
+  virtual bool FromString(const std::string&)=0;
+  const std::string& GetId()const{return id;}
+  void SetLevel(SettingLevel){}
+  void SetVisible(bool){}
+  void SetCallback(CSettingsManager* p){callback=p;}
+  template<class T>std::shared_ptr<T> shared_from_base(){return std::static_pointer_cast<T>(shared_from_this());}
+};
+using SettingPtr=std::shared_ptr<CSetting>;
+class CSettingString:public CSetting {
+public:
+  using Value=std::string;
+  mutable CSharedSection m_critical;
+  std::string m_value,m_default;
+  bool m_changed=false;
+  CSettingString(const std::string& id,CSettingsManager* p):CSetting(id,p){}
+  void SetAllowEmpty(bool){}
+  bool CheckValidity(const std::string&)const{return true;}
+  bool OnSettingChanging(const std::shared_ptr<CSettingString>&){return true;}
+  void OnSettingChanged(const std::shared_ptr<CSettingString>&);
+  bool FromString(const std::string&)override;
+  bool SetValue(const std::string&);
+  void SetDefault(const std::string&);
+};
+class CSettingGroup {
+public:
+  std::vector<SettingPtr> values;
+  CSettingGroup(const std::string&,CSettingsManager*){}
+  auto GetSettings()const{return values;}
+  void AddSetting(const SettingPtr& s){values.push_back(s);}
+};
+class CSettingCategory {
+public:
+  std::vector<std::shared_ptr<CSettingGroup>> values;
+  CSettingCategory(const std::string&,CSettingsManager*){}
+  auto GetGroups()const{return values;}
+  void AddGroup(const std::shared_ptr<CSettingGroup>& p){values.push_back(p);}
+};
+class CSettingSection {
+  std::string id;
+public:
+  std::vector<std::shared_ptr<CSettingCategory>> values;
+  CSettingSection(const std::string& s,CSettingsManager*):id(s){}
+  const std::string& GetId()const{return id;}
+  auto GetCategories()const{return values;}
+  void AddCategory(const std::shared_ptr<CSettingCategory>& p){values.push_back(p);}
+};
+using SettingSectionPtr=std::shared_ptr<CSettingSection>;
+using SettingCategoryPtr=std::shared_ptr<CSettingCategory>;
+using SettingGroupPtr=std::shared_ptr<CSettingGroup>;
+class CSettingsManager {
+public:
+  struct Entry {SettingPtr setting;};
+  CSharedSection m_critical,m_settingsCritical;
+  bool m_initialized=true,m_loaded=true;
+  unsigned changeNotifications=0;
+  std::map<std::string,Entry> m_settings;
+  std::vector<SettingSectionPtr> sections;
+  auto FindSetting(const std::string& key){return m_settings.find(key);}
+  auto GetSections()const{return sections;}
+  SettingSectionPtr GetSection(const std::string& key){for(const auto& s:sections)if(s->GetId()==key)return s;return {};}
+  SettingPtr GetSetting(const std::string& key){auto i=m_settings.find(key);return i==m_settings.end()?nullptr:i->second.setting;}
+  void AddSetting(const SettingPtr& p){m_settings[p->GetId()]={p};p->SetCallback(this);}
+  void AddSection(const SettingSectionPtr& p){sections.push_back(p);for(const auto& c:p->values)for(const auto& g:c->values)for(const auto& s:g->values)AddSetting(s);}
+  void CleanupIncompleteSettings(){}
+  void ResolveSettingDependencies(const SettingPtr&){}
+  bool AddSetting(const SettingPtr&,const SettingSectionPtr&,const SettingCategoryPtr&,const SettingGroupPtr&);
+};
+void CSettingString::OnSettingChanged(const std::shared_ptr<CSettingString>&){if(callback&&callback->m_loaded)++callback->changeNotifications;}
+struct CXBMCTinyXML {};
+using AddonInstanceId=int;
+constexpr AddonInstanceId ADDON_SETTINGS_ID=0;
+namespace ADDON {
+class CAddonSettings {
+public:
+  CSettingsManager manager;
+  Logger m_logger=std::make_shared<Log>();
+  CSettingsManager* GetSettingsManager(){return &manager;}
+  std::string GetAddonId()const{return "synthetic.settings.coverage";}
+  bool IsInitialized()const{return true;}
+  bool Initialize(const CXBMCTinyXML&,bool){return true;}
+  SettingPtr GetSetting(const std::string& key){return manager.GetSetting(key);}
+  SettingPtr AddSetting(const std::string& key,const std::string& value);
+};
+class CAddon {
+public:
+  struct Data {std::shared_ptr<CAddonSettings> m_addonSettings=std::make_shared<CAddonSettings>();};
+  std::map<int,Data> m_settings{{0,{}}};
+  CCriticalSection m_checkpointSettingsMutex;
+  bool LoadSettings(bool,bool,AddonInstanceId){return true;} // Already initialized and loaded fixture.
+  std::string ID()const{return "synthetic.settings.coverage";}
+  void UpdateSetting(const std::string&,const std::string&,AddonInstanceId id=0);
+};
+}
