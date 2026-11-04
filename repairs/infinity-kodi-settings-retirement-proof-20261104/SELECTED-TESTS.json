@@ -1,0 +1,36 @@
+{
+  "authorization": "Targeted safety proof and repair preparation only. No production implementation or APK build/sign/lock. Settings-checkpoint host scenarios explicitly selected; no broader shutdown suite.",
+  "recorded_utc": "2026-11-04T04:08:08.678303+00:00",
+  "parent_checkpoint": "7ea3f0b99f553e2a788ed520a9f0628783f23b6a",
+  "cases": [
+    "saved_success_retained_until_checkpoint",
+    "superseded_success_same_path",
+    "failed_save_unconfirmed_recovery",
+    "pending_save_kept",
+    "conflict_unsaved_after_commit",
+    "stale_snapshot_confirm",
+    "repeated_mutations_two_checkpoints",
+    "unknown_baseline",
+    "serializer_failure",
+    "derived_serializer_changes",
+    "checkpoint_file_sync_failure_retry",
+    "checkpoint_directory_sync_failure_retry",
+    "checkpoint_admission_and_phase",
+    "confirmed_order_not_file_order",
+    "unsafe_generation_count_retirement_counterexample",
+    "revision_invalidation_only_counterexample"
+  ],
+  "method": "Exact extracted Addon.cpp registry/checkpoint and CXBMCTinyXML::SaveFile; protected POSIX checkpoint implementation; synthetic setting/manager and phase/admission peers. Deterministic operation interleavings, no real Kodi process.",
+  "negative_controls": "Two intentionally unsafe retirement predicates exist only in the host fixture to demonstrate data-loss counterexamples. No production source patch is applied.",
+  "io": "Ephemeral synthetic files under the proof output directory, real POSIX writes/fsync/rename/read-back. Link-time fsync fault injection only in this host binary. No user files or cache deletion.",
+  "timeouts": "60 seconds compile; 30 seconds per selected case; no automatic retry of cases. Explicit checkpoint retry within fault scenario is selected.",
+  "preserved": [
+    "previous 24-run measurement",
+    "old21 repair tests",
+    "9411 native source files",
+    "primary branch and untracked work",
+    "all APKs/signers/locks",
+    "Preview/Cobra/user data"
+  ],
+  "main_status": "?? repairs/cobra-2103442-end-to-end-quality-refresh/__pycache__/\n?? repairs/cobra-2103444-rotation-audio/__pycache__/\n?? repairs/infinity-2103445-external-video-lifecycle/\n?? repairs/infinity-preview-2103447-resume/__pycache__/\n?? repairs/infinity-preview-2103447-resume/android-qa/__pycache__/\n"
+}

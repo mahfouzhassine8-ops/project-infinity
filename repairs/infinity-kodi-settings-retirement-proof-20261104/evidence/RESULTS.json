@@ -1,0 +1,126 @@
+{
+  "status": "COMPLETED_SELECTED_HOST_SAFETY_PROOF",
+  "cases": 16,
+  "preserved_obligation_cases": 13,
+  "counterexamples": 3,
+  "results": [
+    {
+      "case": "saved_success_retained_until_checkpoint",
+      "expected_result_observed": true,
+      "android": false,
+      "production_changes": 0,
+      "classification": "PRESERVED_OBLIGATION_OBSERVED"
+    },
+    {
+      "case": "superseded_success_same_path",
+      "expected_result_observed": true,
+      "android": false,
+      "production_changes": 0,
+      "classification": "PRESERVED_OBLIGATION_OBSERVED"
+    },
+    {
+      "case": "failed_save_unconfirmed_recovery",
+      "expected_result_observed": true,
+      "android": false,
+      "production_changes": 0,
+      "classification": "PRESERVED_OBLIGATION_OBSERVED"
+    },
+    {
+      "case": "pending_save_kept",
+      "expected_result_observed": true,
+      "android": false,
+      "production_changes": 0,
+      "classification": "PRESERVED_OBLIGATION_OBSERVED"
+    },
+    {
+      "case": "conflict_unsaved_after_commit",
+      "expected_result_observed": true,
+      "android": false,
+      "production_changes": 0,
+      "classification": "PRESERVED_OBLIGATION_OBSERVED"
+    },
+    {
+      "case": "stale_snapshot_confirm",
+      "expected_result_observed": true,
+      "android": false,
+      "production_changes": 0,
+      "classification": "PRESERVED_OBLIGATION_OBSERVED"
+    },
+    {
+      "case": "repeated_mutations_two_checkpoints",
+      "expected_result_observed": true,
+      "android": false,
+      "production_changes": 0,
+      "classification": "PRESERVED_OBLIGATION_OBSERVED"
+    },
+    {
+      "case": "unknown_baseline",
+      "expected_result_observed": true,
+      "android": false,
+      "production_changes": 0,
+      "classification": "PRESERVED_OBLIGATION_OBSERVED"
+    },
+    {
+      "case": "serializer_failure",
+      "expected_result_observed": true,
+      "android": false,
+      "production_changes": 0,
+      "classification": "PRESERVED_OBLIGATION_OBSERVED"
+    },
+    {
+      "case": "derived_serializer_changes",
+      "expected_result_observed": true,
+      "android": false,
+      "production_changes": 0,
+      "classification": "PRESERVED_OBLIGATION_OBSERVED"
+    },
+    {
+      "case": "checkpoint_file_sync_failure_retry",
+      "expected_result_observed": true,
+      "android": false,
+      "production_changes": 0,
+      "classification": "PRESERVED_OBLIGATION_OBSERVED"
+    },
+    {
+      "case": "checkpoint_directory_sync_failure_retry",
+      "expected_result_observed": true,
+      "android": false,
+      "production_changes": 0,
+      "classification": "PRESERVED_OBLIGATION_OBSERVED"
+    },
+    {
+      "case": "checkpoint_admission_and_phase",
+      "expected_result_observed": true,
+      "android": false,
+      "production_changes": 0,
+      "classification": "PRESERVED_OBLIGATION_OBSERVED"
+    },
+    {
+      "case": "confirmed_order_not_file_order",
+      "expected_result_observed": true,
+      "android": false,
+      "production_changes": 0,
+      "classification": "UNSAFE_RULE_OR_ORDERING_COUNTEREXAMPLE"
+    },
+    {
+      "case": "unsafe_generation_count_retirement_counterexample",
+      "expected_result_observed": true,
+      "android": false,
+      "production_changes": 0,
+      "classification": "UNSAFE_RULE_OR_ORDERING_COUNTEREXAMPLE"
+    },
+    {
+      "case": "revision_invalidation_only_counterexample",
+      "expected_result_observed": true,
+      "android": false,
+      "production_changes": 0,
+      "classification": "UNSAFE_RULE_OR_ORDERING_COUNTEREXAMPLE"
+    }
+  ],
+  "production_ready_retirement_patch": false,
+  "why_not_ready": "Existing generation/reference metadata does not establish snapshot revision, mutation coverage or actual same-path write ordering.",
+  "android_tested": false,
+  "full_shutdown_tested": false,
+  "checkpoint_component_tested": true,
+  "signed_or_built_apk": false
+}

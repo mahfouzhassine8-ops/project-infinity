@@ -1,0 +1,54 @@
+{
+  "xbmc/addons/Addon.cpp": {
+    "sha256": "1cba9747ee7c1638885df49d61c854b418a88572e4a3ea31d0bf5017d66c9de4",
+    "symbols": {
+      "struct CheckpointAddonTree": 56,
+      "void TrackCreatedAddonTree(": 78,
+      "void TrackLoadedAddonTree(": 99,
+      "void TrackAddonSave(": 133,
+      "bool ConfirmAddonSave(": 148,
+      "void InfinityAndroidCheckpoint::MarkAddonSettingsManagerDirty(": 188,
+      "bool InfinityAndroidCheckpoint::CheckpointLoadedAddonSettings()": 210,
+      "bool CAddon::SaveSettings(": 699,
+      "bool CAddon::InitSettings(": 971
+    }
+  },
+  "xbmc/settings/lib/SettingsManager.cpp": {
+    "sha256": "6f14955de92cb075418c3b361685083cc4ce675c82a782afebe07603e70ae750",
+    "symbols": {
+      "bool CSettingsManager::AddSetting(const std::shared_ptr<CSetting>& setting,": 338,
+      "void CSettingsManager::OnSettingChanged(": 899
+    }
+  },
+  "xbmc/settings/lib/Setting.cpp": {
+    "sha256": "9c1255df25c158223a5c2c27d0fd0f88f82aa0a6ca54030a3bad66cd18814d04",
+    "symbols": {
+      "bool CSettingString::SetValue(": 1559
+    }
+  },
+  "xbmc/addons/settings/AddonSettings.cpp": {
+    "sha256": "a11cfb9198a6914c869f2098db13dd156952f50f9ded24f344b2f38bceba78a5",
+    "symbols": {
+      "SettingPtr AddSettingWithoutDefinition(": 92
+    }
+  },
+  "xbmc/addons/Skin.cpp": {
+    "sha256": "3fc803173532d910db81986e37d2f5d2d30139e3e879b9c71cd8a8dc4b2e498e",
+    "symbols": {
+      "bool CSkinInfo::SettingsToXML(": 1190
+    }
+  },
+  "xbmc/utils/XBMCTinyXML.cpp": {
+    "sha256": "e2a25f2f5c8e73bafe083f5f6edb5447706f1b9b906fe8f80a154d61b904adc1",
+    "symbols": {
+      "bool CXBMCTinyXML::SaveFile(const std::string& filename) const": 110
+    }
+  },
+  "xbmc/platform/android/activity/InfinityAndroidCheckpoint.cpp": {
+    "sha256": "e8f617ac615d657ec0b37d1bef39d277ceafa8e2ad20bb2b6118cebae7f0350f",
+    "symbols": {
+      "s.sealed = true; // No ordinary mutation can enter between drain and save.": 1306,
+      "const bool ok=CheckpointLoadedAddonSettings();": 1346
+    }
+  }
+}

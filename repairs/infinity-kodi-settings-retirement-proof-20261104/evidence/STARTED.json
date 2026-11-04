@@ -1,0 +1,22 @@
+{
+  "cases": [
+    "saved_success_retained_until_checkpoint",
+    "superseded_success_same_path",
+    "failed_save_unconfirmed_recovery",
+    "pending_save_kept",
+    "conflict_unsaved_after_commit",
+    "stale_snapshot_confirm",
+    "repeated_mutations_two_checkpoints",
+    "unknown_baseline",
+    "serializer_failure",
+    "derived_serializer_changes",
+    "checkpoint_file_sync_failure_retry",
+    "checkpoint_directory_sync_failure_retry",
+    "checkpoint_admission_and_phase",
+    "confirmed_order_not_file_order",
+    "unsafe_generation_count_retirement_counterexample",
+    "revision_invalidation_only_counterexample"
+  ],
+  "binary_sha256": "d01eaca8a9f3376f71619d91f20ac809e5d4eea5438415c8fa77eb0f75f1562d",
+  "pid": 10111
+}

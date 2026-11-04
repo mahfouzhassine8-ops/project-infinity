@@ -1,0 +1,165 @@
+// Every data value/path below is synthetic. Only case labels and boolean results are emitted.
+using Owner=std::shared_ptr<ADDON::CAddonSettings>;
+std::string path;
+void Seed(const std::string& value){std::ofstream f(path,std::ios::binary);f<<value;CHECK(f.good());}
+std::string Read(){std::ifstream f(path,std::ios::binary);return {std::istreambuf_iterator<char>(f),{}};}
+Owner Create(const std::string& value,bool baseline=true,CheckpointAddonSerializer serializer={}) {
+  auto owner=std::make_shared<ADDON::CAddonSettings>();owner->bytes=value;
+  TrackCreatedAddonTree(owner,path,std::move(serializer));
+  if(baseline)TrackLoadedAddonTree(owner,path);
+  return owner;
+}
+void Mutate(const Owner& owner,const std::string& value){owner->bytes=value;InfinityAndroidCheckpoint::MarkAddonSettingsManagerDirty(owner.get());}
+CXBMCTinyXML Capture(const Owner& owner){CXBMCTinyXML doc;CHECK(owner->Save(doc));return doc;}
+bool Save(const Owner& owner) {
+  CHECK(!InfinityAndroidCheckpoint::persist);
+  auto doc=Capture(owner);TrackAddonSave(owner,path,doc);
+  if(!doc.SaveFile(path))return false;
+  return ConfirmAddonSave(owner,path,doc);
+}
+bool Checkpoint(){InfinityAndroidCheckpoint::persist=true;const bool ok=InfinityAndroidCheckpoint::CheckpointLoadedAddonSettings();InfinityAndroidCheckpoint::persist=false;return ok;}
+bool Failure(const std::string& fragment){for(const auto& s:InfinityAndroidCheckpoint::failures)if(s.find(fragment)!=std::string::npos)return true;return false;}
+CheckpointAddonTree& Entry(const Owner& o){for(auto& e:g_checkpointAddonTrees)if(e.settings.lock()==o)return e;throw std::runtime_error("synthetic owner missing");}
+size_t Dirty(){size_t n=0;for(const auto& e:g_checkpointAddonTrees)n+=bool(e.dirtyOwner);return n;}
+
+// DELIBERATELY UNSAFE negative control, never proposed or applied to production.
+// Tests demonstrate why generation + apparent sole ownership is insufficient.
+size_t UnsafeRetireUsingExistingMetadata() {
+  std::lock_guard<std::mutex> lock(g_checkpointAddonMutex);size_t retired=0;
+  for(auto& e:g_checkpointAddonTrees) {
+    if(e.dirtyOwner && e.dirtyOwner.use_count()==1 && e.loadedBaselineKnown &&
+       e.committedGeneration>0 && e.committedGeneration<g_checkpointAddonSaveGenerations[e.path]) {
+      e.dirtyOwner.reset();++retired;
+    }
+  }
+  return retired;
+}
+
+void Run(const std::string& name) {
+  Seed("initial");
+  if(name=="saved_success_retained_until_checkpoint") {
+    auto a=Create("initial");Mutate(a,"saved-a");CHECK(Save(a));
+    std::weak_ptr<ADDON::CAddonSettings> weak=a;a.reset();
+    CHECK(!weak.expired()&&Dirty()==1&&g_checkpointAddonSaves.size()==1);
+    Fault::reset();CHECK(Checkpoint());CHECK(Read()=="saved-a");
+    CHECK(weak.expired()&&Dirty()==0&&g_checkpointAddonSaves.empty());
+    CHECK(Fault::fileSyncs>0&&Fault::directorySyncs>0);
+  } else if(name=="superseded_success_same_path") {
+    auto a=Create("initial");Mutate(a,"a");CHECK(Save(a));
+    std::weak_ptr<ADDON::CAddonSettings> wa=a;a.reset();
+    auto b=Create("a");Mutate(b,"b");CHECK(Save(b));
+    std::weak_ptr<ADDON::CAddonSettings> wb=b;b.reset();
+    CHECK(!wa.expired()&&!wb.expired()&&Dirty()==2&&g_checkpointAddonSaves.size()==1);
+    CHECK(Checkpoint());CHECK(Read()=="b");CHECK(wa.expired()&&wb.expired());
+  } else if(name=="failed_save_unconfirmed_recovery") {
+    auto a=Create("initial");Mutate(a,"unsaved");Fault::failOrdinaryOpen=true;
+    CHECK(!Save(a));CHECK(Entry(a).committedGeneration==0&&Read()=="initial");
+    std::weak_ptr<ADDON::CAddonSettings> wa=a;a.reset();CHECK(!wa.expired());
+    Fault::reset();CHECK(Checkpoint());CHECK(Read()=="unsaved"&&wa.expired());
+  } else if(name=="pending_save_kept") {
+    auto a=Create("initial");Mutate(a,"pending");auto doc=Capture(a);TrackAddonSave(a,path,doc);
+    std::weak_ptr<ADDON::CAddonSettings> wa=a;a.reset();
+    InfinityAndroidCheckpoint::admit=false;
+    CHECK(!Checkpoint());CHECK(!wa.expired()&&g_checkpointAddonSaves.size()==1&&Read()=="initial");
+    InfinityAndroidCheckpoint::admit=true;
+    CHECK(Checkpoint());CHECK(Read()=="pending"&&wa.expired());
+  } else if(name=="conflict_unsaved_after_commit") {
+    auto a=Create("initial");Mutate(a,"a");CHECK(Save(a));
+    const auto generation=Entry(a).committedGeneration;Mutate(a,"a-unsaved");
+    CHECK(Entry(a).committedGeneration==generation); // no revision invalidation in existing source
+    std::weak_ptr<ADDON::CAddonSettings> wa=a;a.reset();
+    auto b=Create("a");Mutate(b,"b");CHECK(Save(b));b.reset();
+    CHECK(!Checkpoint());CHECK(Failure("conflicting_loaded_owners"));
+    CHECK(Read()=="b"&&!wa.expired()&&Dirty()==2&&g_checkpointAddonSaves.size()==1);
+  } else if(name=="stale_snapshot_confirm") {
+    auto a=Create("initial");Mutate(a,"captured");auto doc=Capture(a);TrackAddonSave(a,path,doc);
+    CHECK(doc.SaveFile(path));Mutate(a,"after-snapshot");CHECK(ConfirmAddonSave(a,path,doc));
+    CHECK(Entry(a).committedGeneration==1&&Entry(a).loadedBytes=="captured");
+    std::weak_ptr<ADDON::CAddonSettings> wa=a;a.reset();
+    auto b=Create("captured");Mutate(b,"new-owner");CHECK(Save(b));b.reset();
+    CHECK(!Checkpoint());CHECK(Failure("conflicting_loaded_owners")&&!wa.expired());
+    CHECK(Read()=="new-owner");
+  } else if(name=="repeated_mutations_two_checkpoints") {
+    auto a=Create("initial");Mutate(a,"one");CHECK(Save(a));
+    Mutate(a,"two");Mutate(a,"three");
+    CHECK(Checkpoint());CHECK(Read()=="three"&&Dirty()==0);
+    Mutate(a,"four");CHECK(Dirty()==1);
+    std::weak_ptr<ADDON::CAddonSettings> wa=a;a.reset();
+    CHECK(Checkpoint());CHECK(Read()=="four"&&wa.expired());
+  } else if(name=="unknown_baseline") {
+    auto a=Create("unknown",false);Mutate(a,"unknown-changed");
+    std::weak_ptr<ADDON::CAddonSettings> wa=a;a.reset();
+    CHECK(!Checkpoint());CHECK(Failure("loaded_owner_baseline_unknown"));
+    CHECK(!wa.expired()&&Read()=="initial");
+  } else if(name=="serializer_failure") {
+    auto a=Create("initial");Mutate(a,"a");CHECK(Save(a));a->serializable=false;
+    std::weak_ptr<ADDON::CAddonSettings> wa=a;a.reset();
+    CHECK(!Checkpoint());CHECK(Failure("loaded_owner_not_serializable"));
+    CHECK(!wa.expired()&&g_checkpointAddonSaves.size()==1&&Read()=="a");
+  } else if(name=="derived_serializer_changes") {
+    // A derived serialization source can change without a base-setting dirty callback.
+    auto derived=std::make_shared<std::string>("initial");
+    auto a=Create("base-only",true,[derived](const Owner&,CXBMCTinyXML& doc){doc.bytes=*derived;return true;});
+    CXBMCTinyXML committed;committed.bytes="derived-committed";*derived=committed.bytes;
+    InfinityAndroidCheckpoint::MarkAddonSettingsManagerDirty(a.get());
+    TrackAddonSave(a,path,committed);CHECK(committed.SaveFile(path));CHECK(ConfirmAddonSave(a,path,committed));
+    *derived="derived-newer";const auto generation=Entry(a).committedGeneration;
+    CHECK(generation==1); // base generation cannot identify derived state mutation
+    std::weak_ptr<ADDON::CAddonSettings> wa=a;a.reset();
+    CHECK(Checkpoint());CHECK(Read()=="derived-newer"&&wa.expired());
+  } else if(name=="checkpoint_file_sync_failure_retry") {
+    auto a=Create("initial");Mutate(a,"pending");auto doc=Capture(a);TrackAddonSave(a,path,doc);
+    std::weak_ptr<ADDON::CAddonSettings> wa=a;a.reset();Fault::failFileSync=1;
+    CHECK(!Checkpoint());CHECK(Failure("sync_temporary"));
+    CHECK(!wa.expired()&&g_checkpointAddonSaves.size()==1&&Read()=="initial");
+    Fault::reset();CHECK(Checkpoint());CHECK(Read()=="pending"&&wa.expired());
+    // Helper retry only. No coordinator failure latch is cleared or termination receipt claimed.
+  } else if(name=="checkpoint_directory_sync_failure_retry") {
+    auto a=Create("initial");Mutate(a,"pending");auto doc=Capture(a);TrackAddonSave(a,path,doc);
+    std::weak_ptr<ADDON::CAddonSettings> wa=a;a.reset();Fault::failDirectorySyncAt=3;
+    CHECK(!Checkpoint());CHECK(Failure("sync_directory"));
+    CHECK(Read()=="pending"); // rename visible does NOT mean its namespace is durably acknowledged
+    CHECK(!wa.expired()&&g_checkpointAddonSaves.size()==1);
+    Fault::reset();CHECK(Checkpoint());CHECK(Read()=="pending"&&wa.expired());
+  } else if(name=="checkpoint_admission_and_phase") {
+    auto a=Create("initial");Mutate(a,"pending");auto doc=Capture(a);TrackAddonSave(a,path,doc);
+    CHECK(!InfinityAndroidCheckpoint::CheckpointLoadedAddonSettings());
+    CHECK(Failure("unauthorized_loaded_owner_checkpoint")&&Read()=="initial"&&Dirty()==1);
+    InfinityAndroidCheckpoint::admit=false;CHECK(!Checkpoint());CHECK(Dirty()==1&&Read()=="initial");
+  } else if(name=="confirmed_order_not_file_order") {
+    // Deterministic two-owner interleaving. The source holds per-addon locks, not a per-path save lock.
+    auto a=Create("initial"),b=Create("initial");
+    Mutate(a,"written-first");auto da=Capture(a);TrackAddonSave(a,path,da);CHECK(da.SaveFile(path));
+    Mutate(b,"written-second");auto db=Capture(b);TrackAddonSave(b,path,db);CHECK(db.SaveFile(path));
+    CHECK(ConfirmAddonSave(b,path,db));CHECK(ConfirmAddonSave(a,path,da));
+    CHECK(Read()=="written-second"&&Entry(a).committedGeneration>Entry(b).committedGeneration);
+    CHECK(g_checkpointAddonSaves.at(path).bytes=="written-first");
+    CHECK(Checkpoint());CHECK(Read()=="written-first"); // witness: completion order is not actual file-write order
+  } else if(name=="unsafe_generation_count_retirement_counterexample") {
+    auto a=Create("initial");Mutate(a,"a");CHECK(Save(a));Mutate(a,"unresolved-a");
+    std::weak_ptr<ADDON::CAddonSettings> wa=a;a.reset();
+    auto b=Create("a");Mutate(b,"b");CHECK(Save(b));b.reset();
+    CHECK(UnsafeRetireUsingExistingMetadata()==1&&wa.expired());
+    CHECK(Checkpoint());CHECK(Read()=="b"); // false success compared with retained conflict control
+  } else if(name=="revision_invalidation_only_counterexample") {
+    auto a=Create("initial");Mutate(a,"snapshot");auto da=Capture(a);TrackAddonSave(a,path,da);CHECK(da.SaveFile(path));
+    Mutate(a,"after-snapshot");
+    Entry(a).committedGeneration=0; // simulate the insufficient proposal: invalidate only on mutation
+    CHECK(ConfirmAddonSave(a,path,da));CHECK(Entry(a).committedGeneration==1);
+    std::weak_ptr<ADDON::CAddonSettings> wa=a;a.reset();
+    auto b=Create("snapshot");Mutate(b,"b");CHECK(Save(b));b.reset();
+    CHECK(UnsafeRetireUsingExistingMetadata()==1&&wa.expired());
+    CHECK(Checkpoint());CHECK(Read()=="b"); // stale confirmation erased the invalidation proof
+  } else throw std::runtime_error("unselected case");
+}
+
+int main(int argc,char** argv){
+  try {
+    CHECK(argc==3);const std::string name=argv[1];
+    fs::create_directories(fs::path(argv[2])/"profile"/"synthetic-addon");
+    path=(fs::path(argv[2])/"profile"/"synthetic-addon"/"settings.xml").string();
+    Run(name);
+    std::cout<<"{\"case\":\""<<name<<"\",\"expected_result_observed\":true,\"android\":false,\"production_changes\":0}\n";
+    return 0;
+  }catch(const std::exception& e){std::cerr<<e.what()<<"\n";return 1;}
+}

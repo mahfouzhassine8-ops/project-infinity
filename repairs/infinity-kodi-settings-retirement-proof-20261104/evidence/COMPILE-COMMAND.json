@@ -1,0 +1,17 @@
+[
+  "g++",
+  "-std=c++17",
+  "-O2",
+  "-pthread",
+  "-DTARGET_ANDROID",
+  "-Wall",
+  "-Wextra",
+  "-I",
+  "/tmp/infinity-settings-retirement-proof-results-20261104/include",
+  "-I",
+  "/tmp/kodi451-restored-native/xbmc/platform/android/activity",
+  "/tmp/infinity-settings-retirement-proof-results-20261104/proof.cpp",
+  "-Wl,--wrap=fsync",
+  "-o",
+  "/tmp/infinity-settings-retirement-proof-results-20261104/proof"
+]
