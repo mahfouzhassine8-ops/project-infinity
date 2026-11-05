@@ -1,0 +1,53 @@
+{
+  "platform": "upstream Linux Kodi 21.2 + explicit responsive fixture projection",
+  "Android": "NOT_RUN",
+  "physical_Fold": "NOT_RUN",
+  "viewport": [
+    1080,
+    2520
+  ],
+  "source_sha256": "d176ac2a66daa1b08016996ab6991644abcff6ad13369492497049c5fb02917d",
+  "checks": [
+    {
+      "name": "skin-running",
+      "passed": true
+    },
+    {
+      "name": "synthetic-movies-ready",
+      "passed": true
+    },
+    {
+      "name": "original-view50",
+      "passed": true
+    },
+    {
+      "name": "selected-item:1",
+      "passed": true
+    },
+    {
+      "name": "selected-metadata",
+      "passed": true
+    },
+    {
+      "name": "play-affordance-valid",
+      "passed": false
+    },
+    {
+      "name": "screenshot:failure",
+      "passed": true
+    }
+  ],
+  "observations": [
+    {
+      "container_width": 548,
+      "container_height": 2132,
+      "position": [
+        0,
+        0
+      ],
+      "title": "Media 01 \u2014 A longer title with readable words"
+    }
+  ],
+  "status": "FAIL",
+  "error": "Traceback (most recent call last):\n  File \"/tmp/infinity-browser-render-20261105/share/addons/script.infinitybrowserqa/entry.py\", line 61, in <module>\n    check('play-affordance-valid',xbmc.getCondVisibility('Control.IsVisible(98070)'))\n    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/tmp/infinity-browser-render-20261105/share/addons/script.infinitybrowserqa/entry.py\", line 21, in check\n    raise RuntimeError(name)\nRuntimeError: play-affordance-valid\n"
+}

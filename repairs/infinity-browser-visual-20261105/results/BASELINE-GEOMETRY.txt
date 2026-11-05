@@ -1,0 +1,39 @@
+test_columns_have_explicit_bounded_nonoverlapping_coordinate_spaces (__main__.Browser.test_columns_have_explicit_bounded_nonoverlapping_coordinate_spaces) ... FAIL
+test_selected_art_is_real_media_only_and_never_stretched (__main__.Browser.test_selected_art_is_real_media_only_and_never_stretched) ... FAIL
+test_normal_focused_rows_keep_same_geometry_and_wrap_titles (__main__.Browser.test_normal_focused_rows_keep_same_geometry_and_wrap_titles) ... FAIL
+
+======================================================================
+FAIL: test_columns_have_explicit_bounded_nonoverlapping_coordinate_spaces (__main__.Browser.test_columns_have_explicit_bounded_nonoverlapping_coordinate_spaces)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-browser-visual-20261105/test_browser.py", line 83, in test_columns_have_explicit_bounded_nonoverlapping_coordinate_spaces
+    self.assertLess(lx + lw, rx);self.assertLessEqual(rx + rw, bw + .01)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1080.0 not less than 742.5
+
+======================================================================
+FAIL: test_selected_art_is_real_media_only_and_never_stretched (__main__.Browser.test_selected_art_is_real_media_only_and_never_stretched)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-browser-visual-20261105/test_browser.py", line 123, in test_selected_art_is_real_media_only_and_never_stretched
+    self.assertEqual(image.findtext('aspectratio'), 'keep', 'Selected media is stretched by the existing multiimage')
+AssertionError: 'stretch' != 'keep'
+- stretch
++ keep
+ : Selected media is stretched by the existing multiimage
+
+======================================================================
+FAIL: test_normal_focused_rows_keep_same_geometry_and_wrap_titles (__main__.Browser.test_normal_focused_rows_keep_same_geometry_and_wrap_titles)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-browser-visual-20261105/test_browser.py", line 109, in test_normal_focused_rows_keep_same_geometry_and_wrap_titles
+    self.assertEqual(title.get('type'), 'textbox')
+AssertionError: 'label' != 'textbox'
+- label
++ textbox
+
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.017s
+
+FAILED (failures=3)

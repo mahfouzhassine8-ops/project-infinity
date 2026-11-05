@@ -1,29 +1,512 @@
 <?xml version='1.0' encoding='utf-8'?>
 <includes>
+  <variable name="InfinityMedia_RowArtwork">
+    <value condition="!String.IsEmpty(ListItem.Art(poster))">$INFO[ListItem.Art(poster)]</value>
+    <value condition="!String.IsEmpty(ListItem.Art(season.poster))">$INFO[ListItem.Art(season.poster)]</value>
+    <value condition="!String.IsEmpty(ListItem.Art(tvshow.poster))">$INFO[ListItem.Art(tvshow.poster)]</value>
+    <value condition="!String.IsEmpty(ListItem.Art(thumb))">$INFO[ListItem.Art(thumb)]</value>
+    <value />
+  </variable>
+  <variable name="InfinityMedia_SelectedPoster">
+    <value condition="!String.IsEmpty(Container(50).ListItem.Art(poster))">$INFO[Container(50).ListItem.Art(poster)]</value>
+    <value condition="!String.IsEmpty(Container(50).ListItem.Art(season.poster))">$INFO[Container(50).ListItem.Art(season.poster)]</value>
+    <value condition="!String.IsEmpty(Container(50).ListItem.Art(tvshow.poster))">$INFO[Container(50).ListItem.Art(tvshow.poster)]</value>
+    <value />
+  </variable>
+  <include name="InfinityMedia_BrowserRow">
+    <param name="Focused" default="false" />
+    <param name="ArtHeight" default="108" />
+    <param name="TitleHeight" default="72" />
+    <param name="MetaTop" default="88" />
+    <definition>
+      <control type="image">
+        <left>0</left>
+        <top>3</top>
+        <width>100%</width>
+        <bottom>3</bottom>
+        <texture border="14">infinity_ui/contract_white.png</texture>
+        <colordiffuse>$VAR[InfinityPaletteBackground]</colordiffuse>
+      </control>
+      <control type="image">
+        <left>0</left>
+        <top>3</top>
+        <width>100%</width>
+        <bottom>3</bottom>
+        <texture border="14">infinity_ui/contract_white.png</texture>
+        <visible>$PARAM[Focused] + Control.HasFocus(50)</visible>
+        <colordiffuse>$VAR[InfinityDirectoryFocusWash]</colordiffuse>
+      </control>
+      <control type="image">
+        <left>0</left>
+        <top>3</top>
+        <width>100%</width>
+        <bottom>3</bottom>
+        <visible>$PARAM[Focused] + Control.HasFocus(50)</visible>
+        <colordiffuse>$VAR[InfinityPaletteAccent]</colordiffuse>
+        <texture border="14">infinity_ui/frame_soft.png</texture>
+      </control>
+      <control type="image">
+        <left>12</left>
+        <top>8</top>
+        <width>72</width>
+        <height>$PARAM[ArtHeight]</height>
+        <aspectratio>keep</aspectratio>
+        <texture background="true">$VAR[InfinityMedia_RowArtwork]</texture>
+      </control>
+      <control type="label">
+        <left>128</left>
+        <top>12</top>
+        <right>12</right>
+        <height>$PARAM[TitleHeight]</height>
+        <font>InfinityBodyBold</font>
+        <textcolor>$VAR[InfinityPaletteTextPrimary]</textcolor>
+        <label>$INFO[ListItem.Label]</label>
+        <scroll>true</scroll>
+        <visible>$PARAM[Focused] + !String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)</visible>
+      </control>
+      <control type="label">
+        <left>128</left>
+        <top>12</top>
+        <right>12</right>
+        <height>$PARAM[TitleHeight]</height>
+        <font>InfinityBodyBold</font>
+        <textcolor>$VAR[InfinityPaletteTextPrimary]</textcolor>
+        <label>$INFO[ListItem.Label]</label>
+        <scroll>false</scroll>
+        <visible>!$PARAM[Focused] | String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)</visible>
+      </control>
+      <control type="label">
+        <left>128</left>
+        <top>$PARAM[MetaTop]</top>
+        <right>12</right>
+        <height>32</height>
+        <font>InfinitySmall</font>
+        <textcolor>$VAR[InfinityPaletteTextSecondary]</textcolor>
+        <label>$VAR[InfinityMedia_RowMetadata]</label>
+        <scroll>true</scroll>
+        <visible>$PARAM[Focused] + !String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)</visible>
+      </control>
+      <control type="label">
+        <left>128</left>
+        <top>$PARAM[MetaTop]</top>
+        <right>12</right>
+        <height>32</height>
+        <font>InfinitySmall</font>
+        <textcolor>$VAR[InfinityPaletteTextSecondary]</textcolor>
+        <label>$VAR[InfinityMedia_RowMetadata]</label>
+        <scroll>false</scroll>
+        <visible>!$PARAM[Focused] | String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)</visible>
+      </control>
+      <control type="image">
+        <top>84</top>
+        <width>24</width>
+        <height>24</height>
+        <aspectratio>keep</aspectratio>
+        <texture>$VAR[ListItemOverlay]</texture>
+        <colordiffuse>$VAR[InfinityPaletteAccent]</colordiffuse>
+        <left>60</left>
+        <visible>ListItem.IsResumable | Integer.IsGreater(ListItem.PlayCount,0) | ListItem.IsPlaying</visible>
+      </control>
+      <include content="InfinityActionLoadingFrame" condition="$PARAM[Focused]">
+        <param name="width" value="100%" />
+        <param name="height" value="100%" />
+        <param name="left" value="0" />
+        <param name="top" value="0" />
+        <param name="control" value="50" />
+        <param name="window" value="0" />
+        <param name="globalframe" value="false" />
+        <param name="inheritwindow" value="true" />
+      </include>
+    </definition>
+  </include>
+  <variable name="InfinityMedia_RowMetadata">
+    <value>$INFO[ListItem.Duration(mins),, $LOCALIZE[12391]]$INFO[ListItem.Year, • ]$INFO[ListItem.Genre, • ]</value>
+  </variable>
+  <include name="InfinityMedia_SelectedMediaText">
+    <definition>
+      <control type="textbox">
+        <width>100%</width>
+        <height min="40" max="4000">auto</height>
+        <font>InfinityBodyBold</font>
+        <textcolor>$VAR[InfinityPaletteTextPrimary]</textcolor>
+        <label>$INFO[Container(50).ListItem.Label]</label>
+      </control>
+      <control type="grouplist">
+        <width>100%</width>
+        <height>50</height>
+        <orientation>horizontal</orientation>
+        <itemgap>8</itemgap>
+        <usecontrolcoords>false</usecontrolcoords>
+        <control type="group">
+          <width>84</width>
+          <height>46</height>
+          <visible>!String.IsEmpty(Container(50).ListItem.Year)</visible>
+          <control type="image">
+            <width>100%</width>
+            <height>100%</height>
+            <texture border="10">infinity_ui/frame_soft.png</texture>
+            <colordiffuse>$VAR[InfinityPaletteBorder]</colordiffuse>
+          </control>
+          <control type="label">
+            <width>100%</width>
+            <height>100%</height>
+            <font>InfinityTiny</font>
+            <textcolor>$VAR[InfinityPaletteTextSecondary]</textcolor>
+            <align>center</align>
+            <aligny>center</aligny>
+            <label>$INFO[Container(50).ListItem.Year]</label>
+          </control>
+        </control>
+        <control type="group">
+          <width>126</width>
+          <height>46</height>
+          <visible>!String.IsEmpty(Container(50).ListItem.Duration)</visible>
+          <control type="image">
+            <width>100%</width>
+            <height>100%</height>
+            <texture border="10">infinity_ui/frame_soft.png</texture>
+            <colordiffuse>$VAR[InfinityPaletteBorder]</colordiffuse>
+          </control>
+          <control type="label">
+            <width>100%</width>
+            <height>100%</height>
+            <font>InfinityTiny</font>
+            <textcolor>$VAR[InfinityPaletteTextSecondary]</textcolor>
+            <align>center</align>
+            <aligny>center</aligny>
+            <label>$INFO[Container(50).ListItem.Duration(mins),, min]</label>
+          </control>
+        </control>
+        <control type="group">
+          <width>126</width>
+          <height>46</height>
+          <visible>!String.IsEmpty(Container(50).ListItem.MPAA)</visible>
+          <control type="image">
+            <width>100%</width>
+            <height>100%</height>
+            <texture border="10">infinity_ui/frame_soft.png</texture>
+            <colordiffuse>$VAR[InfinityPaletteBorder]</colordiffuse>
+          </control>
+          <control type="label">
+            <left>6</left>
+            <right>6</right>
+            <height>100%</height>
+            <font>InfinityTiny</font>
+            <textcolor>$VAR[InfinityPaletteTextSecondary]</textcolor>
+            <align>center</align>
+            <aligny>center</aligny>
+            <scroll>true</scroll>
+            <label>$INFO[Container(50).ListItem.MPAA]</label>
+          </control>
+        </control>
+      </control>
+      <control type="textbox">
+        <width>100%</width>
+        <height min="32" max="100">auto</height>
+        <font>InfinitySmall</font>
+        <textcolor>$VAR[InfinityPaletteAccent]</textcolor>
+        <label>$INFO[Container(50).ListItem.Genre]</label>
+        <visible>!String.IsEmpty(Container(50).ListItem.Genre)</visible>
+      </control>
+      <control type="label">
+        <width>100%</width>
+        <height>34</height>
+        <font>InfinityTiny</font>
+        <textcolor>$VAR[InfinityPaletteTextSecondary]</textcolor>
+        <label>$INFO[Container(50).ListItem.Rating,$LOCALIZE[563]: ]</label>
+        <visible>!Skin.HasSetting(Enable.HideRatings) + !String.IsEmpty(Container(50).ListItem.Rating)</visible>
+      </control>
+      <control type="textbox" id="98064">
+        <width>100%</width>
+        <height min="40" max="30%">auto</height>
+        <font>InfinitySmall</font>
+        <textcolor>$VAR[InfinityPaletteTextPrimary]</textcolor>
+        <label>$VAR[VideoPlotVar]</label>
+        <onleft>50</onleft>
+        <onup>50</onup>
+        <ondown>98070</ondown>
+      </control>
+    </definition>
+  </include>
+  <include name="InfinityMedia_SelectedMedia">
+    <definition>
+      <control type="group">
+        <left>64.5%</left>
+        <top>0</top>
+        <width>35.5%</width>
+        <height>100%</height>
+        <control type="grouplist" id="98059">
+          <left>0</left>
+          <top>0</top>
+          <right>16</right>
+          <height min="100%" max="100%">auto</height>
+          <orientation>vertical</orientation>
+          <itemgap>12</itemgap>
+          <usecontrolcoords>false</usecontrolcoords>
+          <control type="grouplist" id="98060">
+            <description>Selected media: native stacking and text auto-height</description>
+            <orientation>vertical</orientation>
+            <itemgap>12</itemgap>
+            <usecontrolcoords>false</usecontrolcoords>
+            <scrolltime>0</scrolltime>
+            <visible>!Container(50).ListItem.IsParentFolder</visible>
+            <control type="image">
+              <width>100%</width>
+              <height max="540">55%</height>
+              <aspectratio align="left" aligny="top">keep</aspectratio>
+              <texture background="true">$VAR[InfinityMedia_SelectedPoster]</texture>
+              <visible>!String.IsEmpty(Container(50).ListItem.Art(poster)) | !String.IsEmpty(Container(50).ListItem.Art(season.poster)) | !String.IsEmpty(Container(50).ListItem.Art(tvshow.poster))</visible>
+            </control>
+            <include content="InfinityMedia_SelectedMediaText" />
+            <control type="image">
+              <width>100%</width>
+              <height>1</height>
+              <texture>infinity_ui/contract_white.png</texture>
+              <colordiffuse>$VAR[InfinityPaletteBorder]</colordiffuse>
+            </control>
+            <pagecontrol>98066</pagecontrol>
+            <width>100%</width>
+            <bottom>128</bottom>
+          </control>
+          <control type="grouplist" id="98068">
+            <height>108</height>
+            <orientation>horizontal</orientation>
+            <itemgap>10</itemgap>
+            <usecontrolcoords>false</usecontrolcoords>
+            <control type="group" id="98080">
+              <control type="image">
+                <left>0</left>
+                <top>0</top>
+                <width>100%</width>
+                <height>100%</height>
+                <colordiffuse>$VAR[InfinityPaletteAccent]</colordiffuse>
+                <visible>Control.HasFocus(98070)</visible>
+                <texture border="12">infinity_ui/frame_soft.png</texture>
+              </control>
+              <control type="image">
+                <left>0</left>
+                <top>0</top>
+                <width>100%</width>
+                <height>100%</height>
+                <colordiffuse>$VAR[InfinityPaletteBorder]</colordiffuse>
+                <visible>!Control.HasFocus(98070)</visible>
+                <texture border="12">infinity_ui/frame_soft.png</texture>
+              </control>
+              <width>30%</width>
+              <height>104</height>
+              <visible>!Container(50).ListItem.IsFolder + [String.IsEqual(Container(50).ListItem.Property(IsPlayable),true) | String.IsEqual(Container(50).ListItem.DBType,movie) | String.IsEqual(Container(50).ListItem.DBType,episode) | String.IsEqual(Container(50).ListItem.DBType,musicvideo)]</visible>
+              <control type="button" id="98070">
+                <width>100%</width>
+                <height>100%</height>
+                <label>$LOCALIZE[208]</label>
+                <font>InfinityTiny</font>
+                <textcolor>$VAR[InfinityPaletteAccent]</textcolor>
+                <aligny>bottom</aligny>
+                <textoffsety>64</textoffsety>
+                <texturefocus />
+                <texturenofocus />
+                <enable>!Container.IsUpdating</enable>
+                <onleft>50</onleft>
+                <onup>98064</onup>
+                <onclick condition="!Container.IsUpdating + [!Container(50).ListItem.IsFolder + [String.IsEqual(Container(50).ListItem.Property(IsPlayable),true) | String.IsEqual(Container(50).ListItem.DBType,movie) | String.IsEqual(Container(50).ListItem.DBType,episode) | String.IsEqual(Container(50).ListItem.DBType,musicvideo)]]">SetFocus(50)</onclick>
+                <onclick condition="!Container.IsUpdating + [!Container(50).ListItem.IsFolder + [String.IsEqual(Container(50).ListItem.Property(IsPlayable),true) | String.IsEqual(Container(50).ListItem.DBType,movie) | String.IsEqual(Container(50).ListItem.DBType,episode) | String.IsEqual(Container(50).ListItem.DBType,musicvideo)]]">Action(Select)</onclick>
+                <visible>!Container(50).ListItem.IsFolder + [String.IsEqual(Container(50).ListItem.Property(IsPlayable),true) | String.IsEqual(Container(50).ListItem.DBType,movie) | String.IsEqual(Container(50).ListItem.DBType,episode) | String.IsEqual(Container(50).ListItem.DBType,musicvideo)]</visible>
+              </control>
+              <control type="image">
+                <centerleft>50%</centerleft>
+                <top>12</top>
+                <width>40</width>
+                <height>40</height>
+                <aspectratio>keep</aspectratio>
+                <texture>infinity_ui/icons/play.png</texture>
+                <colordiffuse>$VAR[InfinityPaletteAccent]</colordiffuse>
+              </control>
+            </control>
+            <control type="group" id="98081">
+              <control type="image">
+                <left>0</left>
+                <top>0</top>
+                <width>100%</width>
+                <height>100%</height>
+                <colordiffuse>$VAR[InfinityPaletteAccent]</colordiffuse>
+                <visible>Control.HasFocus(98071)</visible>
+                <texture border="12">infinity_ui/frame_soft.png</texture>
+              </control>
+              <control type="image">
+                <left>0</left>
+                <top>0</top>
+                <width>100%</width>
+                <height>100%</height>
+                <colordiffuse>$VAR[InfinityPaletteBorder]</colordiffuse>
+                <visible>!Control.HasFocus(98071)</visible>
+                <texture border="12">infinity_ui/frame_soft.png</texture>
+              </control>
+              <width>30%</width>
+              <height>104</height>
+              <visible>!String.IsEmpty(Container(50).ListItem.Trailer)</visible>
+              <control type="button" id="98071">
+                <width>100%</width>
+                <height>100%</height>
+                <label>$LOCALIZE[20410]</label>
+                <font>InfinityTiny</font>
+                <textcolor>$VAR[InfinityPaletteTextPrimary]</textcolor>
+                <aligny>bottom</aligny>
+                <textoffsety>64</textoffsety>
+                <texturefocus />
+                <texturenofocus />
+                <enable>!Container.IsUpdating</enable>
+                <onleft>50</onleft>
+                <onup>98064</onup>
+                <onclick condition="!Container.IsUpdating + [!String.IsEmpty(Container(50).ListItem.Trailer)]">PlayMedia($ESCINFO[Container(50).ListItem.Trailer])</onclick>
+                <visible>!String.IsEmpty(Container(50).ListItem.Trailer)</visible>
+              </control>
+              <control type="image">
+                <centerleft>50%</centerleft>
+                <top>12</top>
+                <width>40</width>
+                <height>40</height>
+                <aspectratio>keep</aspectratio>
+                <texture>infinity_legacy/trailer.png</texture>
+                <colordiffuse>$VAR[InfinityPaletteTextSecondary]</colordiffuse>
+              </control>
+            </control>
+            <control type="group" id="98082">
+              <control type="image">
+                <left>0</left>
+                <top>0</top>
+                <width>100%</width>
+                <height>100%</height>
+                <colordiffuse>$VAR[InfinityPaletteAccent]</colordiffuse>
+                <visible>Control.HasFocus(98072)</visible>
+                <texture border="12">infinity_ui/frame_soft.png</texture>
+              </control>
+              <control type="image">
+                <left>0</left>
+                <top>0</top>
+                <width>100%</width>
+                <height>100%</height>
+                <colordiffuse>$VAR[InfinityPaletteBorder]</colordiffuse>
+                <visible>!Control.HasFocus(98072)</visible>
+                <texture border="12">infinity_ui/frame_soft.png</texture>
+              </control>
+              <width>30%</width>
+              <height>104</height>
+              <visible>String.IsEqual(Container(50).ListItem.DBType,movie) | String.IsEqual(Container(50).ListItem.DBType,tvshow) | String.IsEqual(Container(50).ListItem.DBType,episode) | String.IsEqual(Container(50).ListItem.DBType,season) | String.IsEqual(Container(50).ListItem.DBType,musicvideo)</visible>
+              <control type="button" id="98072">
+                <width>100%</width>
+                <height>100%</height>
+                <label>Info</label>
+                <font>InfinityTiny</font>
+                <textcolor>$VAR[InfinityPaletteTextPrimary]</textcolor>
+                <aligny>bottom</aligny>
+                <textoffsety>64</textoffsety>
+                <texturefocus />
+                <texturenofocus />
+                <enable>!Container.IsUpdating</enable>
+                <onleft>50</onleft>
+                <onup>98064</onup>
+                <onclick condition="!Container.IsUpdating + [String.IsEqual(Container(50).ListItem.DBType,movie) | String.IsEqual(Container(50).ListItem.DBType,tvshow) | String.IsEqual(Container(50).ListItem.DBType,episode) | String.IsEqual(Container(50).ListItem.DBType,season) | String.IsEqual(Container(50).ListItem.DBType,musicvideo)]">SetFocus(50)</onclick>
+                <onclick condition="!Container.IsUpdating + [String.IsEqual(Container(50).ListItem.DBType,movie) | String.IsEqual(Container(50).ListItem.DBType,tvshow) | String.IsEqual(Container(50).ListItem.DBType,episode) | String.IsEqual(Container(50).ListItem.DBType,season) | String.IsEqual(Container(50).ListItem.DBType,musicvideo)]">Action(Info)</onclick>
+                <visible>String.IsEqual(Container(50).ListItem.DBType,movie) | String.IsEqual(Container(50).ListItem.DBType,tvshow) | String.IsEqual(Container(50).ListItem.DBType,episode) | String.IsEqual(Container(50).ListItem.DBType,season) | String.IsEqual(Container(50).ListItem.DBType,musicvideo)</visible>
+              </control>
+              <control type="image">
+                <centerleft>50%</centerleft>
+                <top>12</top>
+                <width>40</width>
+                <height>40</height>
+                <aspectratio>keep</aspectratio>
+                <texture>infinity_ui/icons/info.png</texture>
+                <colordiffuse>$VAR[InfinityPaletteTextSecondary]</colordiffuse>
+              </control>
+            </control>
+            <width min="100%" max="100%">auto</width>
+          </control>
+        </control>
+        <control type="scrollbar" id="98066">
+          <right>0</right>
+          <top>0</top>
+          <width>10</width>
+          <height>100%</height>
+          <showonepage>false</showonepage>
+          <onleft>50</onleft>
+          <onup>50</onup>
+          <ondown>50</ondown>
+        </control>
+      </control>
+    </definition>
+  </include>
+  <include name="InfinityMedia_TouchGuide">
+    <definition>
+      <control type="group">
+        <left>1.5%</left>
+        <bottom>24</bottom>
+        <width>97%</width>
+        <height>88</height>
+        <visible>Control.IsVisible(50) + !String.IsEqual(Skin.String(Infinity.HomeView),cinema) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos) | Container.Content(videos)]</visible>
+        <control type="image">
+          <width>100%</width>
+          <height>100%</height>
+          <texture border="14">infinity_ui/frame_soft.png</texture>
+          <colordiffuse>$VAR[InfinityPaletteBorder]</colordiffuse>
+        </control>
+        <control type="label">
+          <left>0</left>
+          <top>0</top>
+          <width>32%</width>
+          <height>100%</height>
+          <font>InfinityTiny</font>
+          <textcolor>$VAR[InfinityPaletteTextPrimary]</textcolor>
+          <align>center</align>
+          <aligny>center</aligny>
+          <label>Tap = Select</label>
+        </control>
+        <control type="label">
+          <left>32%</left>
+          <top>0</top>
+          <width>33%</width>
+          <height>100%</height>
+          <font>InfinityTiny</font>
+          <textcolor>$VAR[InfinityPaletteTextPrimary]</textcolor>
+          <align>center</align>
+          <aligny>center</aligny>
+          <label>Tap Again = Open</label>
+        </control>
+        <control type="label">
+          <left>65%</left>
+          <top>0</top>
+          <width>35%</width>
+          <height>100%</height>
+          <font>InfinityTiny</font>
+          <textcolor>$VAR[InfinityPaletteTextPrimary]</textcolor>
+          <align>center</align>
+          <aligny>center</aligny>
+          <label>Press &amp; Hold = Menu</label>
+        </control>
+      </control>
+    </definition>
+  </include>
   <include name="InfinityMedia_VideoList">
     <control type="group">
       <visible>Control.IsVisible(50) + !Window.IsActive(addoninformation)</visible>
       <include>ViewAnimation</include>
-      <centerleft>50%</centerleft>
-      <width>100%</width>
-      <top>0.9259%</top>
       <control type="group">
-        <left>4.1667%</left>
-        <top>-50</top>
+        <left>0</left>
+        <top>0</top>
         <control type="image">
-          <left>-1</left>
-          <top>15.9821%</top>
-          <width>63.1522%</width>
-          <height>75.1786%</height>
+          <left>0</left>
+          <top>0</top>
+          <width>100%</width>
+          <height>100%</height>
           <texture>$VAR[InfinityPanelTexture]</texture>
           <bordersize>1</bordersize>
           <bordertexture border="18" infill="false" colordiffuse="$VAR[InfinityCollectiveFrameSoft]">infinity_ui/frame_soft.png</bordertexture>
+          <visible>![Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos) | Container.Content(videos)]</visible>
         </control>
         <control type="panel" id="50">
           <visible>[[String.IsEmpty(Container.PluginName) + ![Container.Content() | Container.Content(files) | Container.Content(playlists) | Container.Content(addons)]] | [!String.IsEmpty(Container.PluginName) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]]]</visible>
-          <top>16.0714%</top>
-          <width>63.0435%</width>
-          <height>75%</height>
+          <top>0</top>
+          <width>100%</width>
+          <height>100%</height>
           <onleft>SetProperty(MediaMenu,True,Home)</onleft>
           <onleft>SetFocus(9050)</onleft>
           <onright condition="String.IsEqual(ListItem.DBType,movie)">RunScript(script.trailer.bridge,?imdb=$INFO[ListItem.IMDBNumber]&amp;tmdb=$INFO[ListItem.Property(tmdb_id)]&amp;tmdbshow=$INFO[ListItem.Property(tmdbshow_id)]&amp;dbtype=$INFO[ListItem.DBType]&amp;mediatype=$INFO[ListItem.MediaType]&amp;title=$INFO[ListItem.Title]&amp;tvshowtitle=$INFO[ListItem.TVShowTitle]&amp;year=$INFO[ListItem.Year])</onright>
@@ -44,190 +527,20 @@
           <viewtype label="535">list</viewtype>
           <pagecontrol>95060</pagecontrol>
           <scrolltime tween="quadratic" easing="out">200</scrolltime>
-          <itemlayout height="14.285689%" width="auto" condition="Container.Content(movies)" aspectratio="9.500000000">
-            <control type="image">
-              <left>0%</left>
-              <top>0%</top>
-              <width>100%</width>
-              <height>100%</height>
-              <texture border="14" colordiffuse="$VAR[InfinityPaletteSurfaceElevated]">infinity_ui/contract_white.png</texture>
-            </control>
-            <control type="image">
-              <left>0.8772%</left>
-              <top>4.1667%</top>
-              <width>9.649123%</width>
-              <height>91.6667%</height>
-              <aspectratio>keep</aspectratio>
-              <texture>$INFO[ListItem.Art(poster)]</texture>
-              <colordiffuse>grey2</colordiffuse>
-            </control>
-            <control type="group">
-              <visible>!ListItem.IsCollection</visible>
-              <control type="label">
-                <left>11.8421%</left>
-                <width>69.2982%</width>
-                <height>44</height>
-                <font>InfinityBodyBold</font>
-                <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
-                <label>$INFO[ListItem.Label]</label>
-              </control>
-              <control type="group">
-                <visible>Skin.HasSetting(noindicatorlist)</visible>
-                <control type="image">
-                  <left>0.4386%</left>
-                  <top>16.6667%</top>
-                  <width>95.614%</width>
-                  <height>33.333333%</height>
-                  <aspectratio align="right">keep</aspectratio>
-                  <colordiffuse>grey2</colordiffuse>
-                  <texture>$VAR[UnFocusHDIndicator]</texture>
-                </control>
-                <control type="label">
-                  <left>0.4386%</left>
-                  <top>50%</top>
-                  <width>95.614%</width>
-                  <height>40.0</height>
-                  <font>InfinitySmall</font>
-                  <align>right</align>
-                  <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
-                  <label>$VAR[VideoListLabelVar]</label>
-                </control>
-              </control>
-              <control type="label">
-                <left>0.4386%</left>
-                <width>95.614%</width>
-                <height>96.6667%</height>
-                <font>InfinitySmall</font>
-                <align>right</align>
-                <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
-                <label>$VAR[VideoListLabelVar]</label>
-                <visible>!Skin.HasSetting(noindicatorlist)</visible>
-              </control>
-            </control>
-            <control type="label">
-              <left>11.8421%</left>
-              <width>69.2982%</width>
-              <height>100%</height>
-              <font>InfinityBodyBold</font>
-              <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
-              <label>$INFO[ListItem.Label]</label>
-              <visible>ListItem.IsCollection</visible>
-            </control>
-            <control type="label">
-              <left>11.8421%</left>
-              <width>69.2982%</width>
-              <height>100%</height>
-              <font>InfinityBodyBold</font>
-              <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
-              <label>$INFO[ListItem.Label]</label>
-              <visible>ListItem.IsCollection</visible>
-            </control>
-            <control type="label">
-              <left>11.8421%</left>
-              <top>45.8333%</top>
-              <width>69.2982%</width>
-              <height>44</height>
-              <font>InfinitySmall</font>
-              <textcolor>$VAR[InfinityDiggzSecondaryText]</textcolor>
-              <label>$VAR[VideoListLabel2Var]</label>
-            </control>
-            <control type="image">
-              <left>95.614%</left>
-              <top>23.3333%</top>
-              <width>5.614035%</width>
-              <height>53.3333%</height>
-              <aspectratio>keep</aspectratio>
-              <texture colordiffuse="$VAR[InfinityWatched224Tint8fc4d23453f3]">$VAR[ListItemOverlay]</texture>
-            </control>
+          <itemlayout condition="Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos) | Container.Content(videos)" width="100%" height="124">
+            <include content="InfinityMedia_BrowserRow">
+              <param name="Focused" value="false" />
+              <param name="ArtHeight" value="108" />
+              <param name="TitleHeight" value="48" />
+              <param name="MetaTop" value="68" />
+            </include>
           </itemlayout>
-          <focusedlayout height="14.285689%" width="auto" condition="Container.Content(movies)" aspectratio="9.500000000">
-            <control type="image">
-              <width>101.7544%</width>
-              <height>100%</height>
-              <texture border="14">infinity_ui/focus.png</texture>
-              <visible>Control.HasFocus(50)</visible>
-              <include>VisibleFadeAnimation</include>
-            </control>
-            <control type="image">
-              <left>0.8772%</left>
-              <top>4.1667%</top>
-              <width>9.649123%</width>
-              <height>91.6667%</height>
-              <aspectratio>keep</aspectratio>
-              <texture>$INFO[ListItem.Art(poster)]</texture>
-            </control>
-            <control type="group">
-              <visible>!ListItem.IsCollection</visible>
-              <control type="label">
-                <left>11.8421%</left>
-                <width>69.2982%</width>
-                <height>44</height>
-                <font>InfinityBodyBold</font>
-                <label>$INFO[ListItem.Label]</label>
-              </control>
-              <control type="group">
-                <visible>Skin.HasSetting(noindicatorlist)</visible>
-                <control type="image">
-                  <left>0.4386%</left>
-                  <top>16.6667%</top>
-                  <width>95.614%</width>
-                  <height>33.333333%</height>
-                  <aspectratio align="right">keep</aspectratio>
-                  <texture>$VAR[UnFocusHDIndicator]</texture>
-                </control>
-                <control type="label">
-                  <left>0.4386%</left>
-                  <top>50%</top>
-                  <width>95.614%</width>
-                  <height>40.0</height>
-                  <font>InfinitySmall</font>
-                  <align>right</align>
-                  <label>$VAR[VideoListLabelVar]</label>
-                </control>
-              </control>
-              <control type="label">
-                <left>0.4386%</left>
-                <width>95.614%</width>
-                <height>96.6667%</height>
-                <font>InfinitySmall</font>
-                <align>right</align>
-                <label>$VAR[VideoListLabelVar]</label>
-                <visible>!Skin.HasSetting(noindicatorlist)</visible>
-              </control>
-            </control>
-            <control type="label">
-              <left>11.8421%</left>
-              <width>69.2982%</width>
-              <height>100%</height>
-              <font>InfinityBodyBold</font>
-              <label>$INFO[ListItem.Label]</label>
-              <visible>ListItem.IsCollection</visible>
-            </control>
-            <control type="label">
-              <left>11.8421%</left>
-              <top>45.8333%</top>
-              <width>69.2982%</width>
-              <height>44</height>
-              <font>InfinitySmall</font>
-              <label>$VAR[VideoListLabel2Var]</label>
-            </control>
-            <control type="image">
-              <left>95.614%</left>
-              <top>23.3333%</top>
-              <width>5.614035%</width>
-              <height>53.3333%</height>
-              <aspectratio>keep</aspectratio>
-              <texture colordiffuse="$VAR[InfinityWatched224Tint8fc4d23453f3]">$VAR[ListItemOverlay]</texture>
-            </control>
-            <include content="InfinityActionLoadingFrame">
-              <param name="width" value="101.7544%" />
-              <param name="height" value="100%" />
-              <param name="left" value="0" />
-              <param name="top" value="0" />
-              <param name="control" value="50" />
-              <param name="window" value="0" />
-              <param name="globalframe" value="false" />
-              <param name="inheritwindow" value="true" />
+          <focusedlayout condition="Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos) | Container.Content(videos)" width="100%" height="124">
+            <include content="InfinityMedia_BrowserRow">
+              <param name="Focused" value="true" />
+              <param name="ArtHeight" value="108" />
+              <param name="TitleHeight" value="48" />
+              <param name="MetaTop" value="68" />
             </include>
           </focusedlayout>
           <itemlayout height="14.285689%" width="auto" condition="Container.Content(studios)" aspectratio="9.500000000">
@@ -278,516 +591,6 @@
               <height>96.6667%</height>
               <font>InfinityBodyBold</font>
               <label>$INFO[ListItem.Label]</label>
-            </control>
-            <include content="InfinityActionLoadingFrame">
-              <param name="width" value="101.7544%" />
-              <param name="height" value="100%" />
-              <param name="left" value="0" />
-              <param name="top" value="0" />
-              <param name="control" value="50" />
-              <param name="window" value="0" />
-              <param name="globalframe" value="false" />
-              <param name="inheritwindow" value="true" />
-            </include>
-          </focusedlayout>
-          <itemlayout height="14.285689%" width="auto" condition="Container.Content(sets)" aspectratio="9.500000000">
-            <control type="image">
-              <left>0%</left>
-              <top>0%</top>
-              <width>100%</width>
-              <height>100%</height>
-              <texture border="14" colordiffuse="$VAR[InfinityPaletteSurfaceElevated]">infinity_ui/contract_white.png</texture>
-            </control>
-            <control type="image">
-              <left>1.3158%</left>
-              <top>6.6667%</top>
-              <width>9.210526%</width>
-              <height>87.5%</height>
-              <aspectratio>keep</aspectratio>
-              <texture background="true">$VAR[PosterVar]</texture>
-            </control>
-            <control type="label">
-              <left>11.8421%</left>
-              <top>20.8333%</top>
-              <width>69.2982%</width>
-              <height>44</height>
-              <font>InfinityBodyBold</font>
-              <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
-              <label>$INFO[ListItem.Label]</label>
-            </control>
-            <control type="image">
-              <left>95.614%</left>
-              <top>23.3333%</top>
-              <width>5.614035%</width>
-              <height>53.3333%</height>
-              <aspectratio>keep</aspectratio>
-              <texture colordiffuse="$VAR[InfinityWatched224Tint8fc4d23453f3]">$VAR[ListItemOverlay]</texture>
-            </control>
-          </itemlayout>
-          <focusedlayout height="14.285689%" width="auto" condition="Container.Content(sets)" aspectratio="9.500000000">
-            <control type="image">
-              <width>101.7544%</width>
-              <height>100%</height>
-              <texture border="14">infinity_ui/focus.png</texture>
-              <visible>Control.HasFocus(50)</visible>
-              <include>VisibleFadeAnimation</include>
-            </control>
-            <control type="image">
-              <left>1.3158%</left>
-              <top>6.6667%</top>
-              <width>9.210526%</width>
-              <height>87.5%</height>
-              <aspectratio>keep</aspectratio>
-              <texture background="true">$VAR[PosterVar]</texture>
-            </control>
-            <control type="label">
-              <left>11.8421%</left>
-              <top>20.8333%</top>
-              <width>69.2982%</width>
-              <height>44</height>
-              <font>InfinityBodyBold</font>
-              <label>$INFO[ListItem.Label]</label>
-            </control>
-            <control type="image">
-              <left>95.614%</left>
-              <top>23.3333%</top>
-              <width>5.614035%</width>
-              <height>53.3333%</height>
-              <aspectratio>keep</aspectratio>
-              <texture colordiffuse="$VAR[InfinityWatched224Tint8fc4d23453f3]">$VAR[ListItemOverlay]</texture>
-            </control>
-            <include content="InfinityActionLoadingFrame">
-              <param name="width" value="101.7544%" />
-              <param name="height" value="100%" />
-              <param name="left" value="0" />
-              <param name="top" value="0" />
-              <param name="control" value="50" />
-              <param name="window" value="0" />
-              <param name="globalframe" value="false" />
-              <param name="inheritwindow" value="true" />
-            </include>
-          </focusedlayout>
-          <itemlayout height="14.285689%" width="auto" condition="Container.Content(episodes)" aspectratio="9.500000000">
-            <control type="image">
-              <left>0%</left>
-              <top>0%</top>
-              <width>100%</width>
-              <height>100%</height>
-              <texture border="14" colordiffuse="$VAR[InfinityPaletteSurfaceElevated]">infinity_ui/contract_white.png</texture>
-            </control>
-            <control type="image">
-              <left>1.3158%</left>
-              <top>6.6667%</top>
-              <width>9.210526%</width>
-              <height>87.5%</height>
-              <aspectratio>keep</aspectratio>
-              <texture background="true">$INFO[ListItem.Icon,views/list/]</texture>
-              <colordiffuse>grey2</colordiffuse>
-              <visible>String.StartsWith(ListItem.Icon,Default)</visible>
-            </control>
-            <control type="image">
-              <left>1.3158%</left>
-              <top>6.6667%</top>
-              <width>9.210526%</width>
-              <height>87.5%</height>
-              <aspectratio>keep</aspectratio>
-              <texture background="true" colordiffuse="$VAR[InfinityPolishIcon0Tint]">$VAR[InfinityPolishIcon0]</texture>
-              <visible>!String.StartsWith(ListItem.Icon,Default)</visible>
-            </control>
-            <control type="label">
-              <left>11.8421%</left>
-              <width>69.2982%</width>
-              <height>44</height>
-              <font>InfinityBodyBold</font>
-              <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
-              <label>$INFO[ListItem.Label]</label>
-            </control>
-            <control type="label">
-              <left>11.8421%</left>
-              <top>45.8333%</top>
-              <width>69.2982%</width>
-              <height>44</height>
-              <font>InfinitySmall</font>
-              <textcolor>$VAR[InfinityDiggzSecondaryText]</textcolor>
-              <label>$VAR[VideoListLabel2Var]</label>
-            </control>
-            <control type="group">
-              <visible>Skin.HasSetting(noindicatorlist)</visible>
-              <control type="image">
-                <left>0.4386%</left>
-                <top>16.6667%</top>
-                <width>95.614%</width>
-                <height>33.333333%</height>
-                <aspectratio align="right">keep</aspectratio>
-                <colordiffuse>grey2</colordiffuse>
-                <texture>$VAR[UnFocusHDIndicator]</texture>
-              </control>
-              <control type="label">
-                <left>0.4386%</left>
-                <top>50%</top>
-                <width>95.614%</width>
-                <height>40.0</height>
-                <font>InfinitySmall</font>
-                <align>right</align>
-                <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
-                <label>$VAR[VideoListLabelVar]</label>
-              </control>
-            </control>
-            <control type="label">
-              <left>0.4386%</left>
-              <width>95.614%</width>
-              <height>96.6667%</height>
-              <font>InfinitySmall</font>
-              <align>right</align>
-              <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
-              <label>$VAR[VideoListLabelVar]</label>
-              <visible>!Skin.HasSetting(noindicatorlist)</visible>
-            </control>
-            <control type="image">
-              <left>95.614%</left>
-              <top>23.3333%</top>
-              <width>5.614035%</width>
-              <height>53.3333%</height>
-              <aspectratio>keep</aspectratio>
-              <texture colordiffuse="$VAR[InfinityWatched224Tint8fc4d23453f3]">$VAR[ListItemOverlay]</texture>
-            </control>
-          </itemlayout>
-          <focusedlayout height="14.285689%" width="auto" condition="Container.Content(episodes)" aspectratio="9.500000000">
-            <control type="image">
-              <width>101.7544%</width>
-              <height>100%</height>
-              <texture border="14">infinity_ui/focus.png</texture>
-              <visible>Control.HasFocus(50)</visible>
-              <include>VisibleFadeAnimation</include>
-            </control>
-            <control type="image">
-              <left>1.3158%</left>
-              <top>6.6667%</top>
-              <width>9.210526%</width>
-              <height>87.5%</height>
-              <aspectratio>keep</aspectratio>
-              <texture background="true">$INFO[ListItem.Icon,views/list/]</texture>
-              <visible>String.StartsWith(ListItem.Icon,Default)</visible>
-            </control>
-            <control type="image">
-              <left>1.3158%</left>
-              <top>6.6667%</top>
-              <width>9.210526%</width>
-              <height>87.5%</height>
-              <aspectratio>keep</aspectratio>
-              <texture background="true" colordiffuse="$VAR[InfinityPolishIcon0Tint]">$VAR[InfinityPolishIcon0]</texture>
-              <visible>!String.StartsWith(ListItem.Icon,Default)</visible>
-            </control>
-            <control type="label">
-              <left>11.8421%</left>
-              <width>69.2982%</width>
-              <height>44</height>
-              <font>InfinityBodyBold</font>
-              <label>$INFO[ListItem.Label]</label>
-            </control>
-            <control type="label">
-              <left>11.8421%</left>
-              <top>45.8333%</top>
-              <width>69.2982%</width>
-              <height>44</height>
-              <font>InfinitySmall</font>
-              <label>$VAR[VideoListLabel2Var]</label>
-            </control>
-            <control type="group">
-              <visible>Skin.HasSetting(noindicatorlist)</visible>
-              <control type="image">
-                <left>0.4386%</left>
-                <top>16.6667%</top>
-                <width>95.614%</width>
-                <height>33.333333%</height>
-                <aspectratio align="right">keep</aspectratio>
-                <texture>$VAR[UnFocusHDIndicator]</texture>
-              </control>
-              <control type="label">
-                <left>0.4386%</left>
-                <top>50%</top>
-                <width>95.614%</width>
-                <height>40.0</height>
-                <font>InfinitySmall</font>
-                <align>right</align>
-                <label>$VAR[VideoListLabelVar]</label>
-              </control>
-            </control>
-            <control type="label">
-              <left>0.4386%</left>
-              <width>95.614%</width>
-              <height>96.6667%</height>
-              <font>InfinitySmall</font>
-              <align>right</align>
-              <label>$VAR[VideoListLabelVar]</label>
-              <visible>!Skin.HasSetting(noindicatorlist)</visible>
-            </control>
-            <control type="image">
-              <left>95.614%</left>
-              <top>23.3333%</top>
-              <width>5.614035%</width>
-              <height>53.3333%</height>
-              <aspectratio>keep</aspectratio>
-              <texture colordiffuse="$VAR[InfinityWatched224Tint8fc4d23453f3]">$VAR[ListItemOverlay]</texture>
-            </control>
-            <include content="InfinityActionLoadingFrame">
-              <param name="width" value="101.7544%" />
-              <param name="height" value="100%" />
-              <param name="left" value="0" />
-              <param name="top" value="0" />
-              <param name="control" value="50" />
-              <param name="window" value="0" />
-              <param name="globalframe" value="false" />
-              <param name="inheritwindow" value="true" />
-            </include>
-          </focusedlayout>
-          <itemlayout height="14.285689%" width="auto" condition="Container.Content(tvshows)" aspectratio="9.500000000">
-            <control type="image">
-              <left>0%</left>
-              <top>0%</top>
-              <width>100%</width>
-              <height>100%</height>
-              <texture border="14" colordiffuse="$VAR[InfinityPaletteSurfaceElevated]">infinity_ui/contract_white.png</texture>
-            </control>
-            <control type="image">
-              <left>1.3158%</left>
-              <top>6.6667%</top>
-              <width>9.210526%</width>
-              <height>87.5%</height>
-              <aspectratio>keep</aspectratio>
-              <texture>$VAR[StudioIconVar]</texture>
-              <colordiffuse>grey2</colordiffuse>
-            </control>
-            <control type="label">
-              <left>11.8421%</left>
-              <width>69.2982%</width>
-              <height>44</height>
-              <font>InfinityBodyBold</font>
-              <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
-              <label>$INFO[ListItem.Label]</label>
-            </control>
-            <control type="label">
-              <left>11.8421%</left>
-              <top>45.8333%</top>
-              <width>69.2982%</width>
-              <height>44</height>
-              <font>InfinitySmall</font>
-              <textcolor>$VAR[InfinityDiggzSecondaryText]</textcolor>
-              <label>$VAR[VideoListLabel2Var]</label>
-            </control>
-            <control type="label">
-              <width>95.614%</width>
-              <height>96.6667%</height>
-              <font>InfinitySmall</font>
-              <align>right</align>
-              <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
-              <label>$INFO[ListItem.Property(TotalEpisodes),, $LOCALIZE[20453]]</label>
-            </control>
-            <control type="group">
-              <left>95.1754%</left>
-              <top>23.3333%</top>
-              <control type="image">
-                <width>116.3636%</width>
-                <height>69.5652%</height>
-                <aspectratio>keep</aspectratio>
-                <texture colordiffuse="$VAR[InfinityWatched224Tint8fc4d23453f3]">$VAR[ListItemOverlay]</texture>
-              </control>
-              <control type="label">
-                <width>116.3636%</width>
-                <height>69.5652%</height>
-                <font>font12_title</font>
-                <align>center</align>
-                <label>$VAR[ListItemOverlayShowsVar]</label>
-                <textcolor>$VAR[InfinityDiggzSecondaryText]</textcolor>
-              </control>
-            </control>
-          </itemlayout>
-          <focusedlayout height="14.285689%" width="auto" condition="Container.Content(tvshows)" aspectratio="9.500000000">
-            <control type="image">
-              <width>101.7544%</width>
-              <height>100%</height>
-              <texture border="14">infinity_ui/focus.png</texture>
-              <visible>Control.HasFocus(50)</visible>
-              <include>VisibleFadeAnimation</include>
-            </control>
-            <control type="image">
-              <left>1.3158%</left>
-              <top>6.6667%</top>
-              <width>9.210526%</width>
-              <height>87.5%</height>
-              <aspectratio>keep</aspectratio>
-              <texture>$VAR[StudioIconVar]</texture>
-            </control>
-            <control type="label">
-              <left>11.8421%</left>
-              <width>69.2982%</width>
-              <height>44</height>
-              <font>InfinityBodyBold</font>
-              <label>$INFO[ListItem.Label]</label>
-            </control>
-            <control type="label">
-              <left>11.8421%</left>
-              <top>45.8333%</top>
-              <width>69.2982%</width>
-              <height>44</height>
-              <font>InfinitySmall</font>
-              <label>$VAR[VideoListLabel2Var]</label>
-            </control>
-            <control type="label">
-              <width>95.614%</width>
-              <height>96.6667%</height>
-              <font>InfinitySmall</font>
-              <align>right</align>
-              <label>$INFO[ListItem.Property(TotalEpisodes),, $LOCALIZE[20453]]</label>
-            </control>
-            <control type="group">
-              <left>95.1754%</left>
-              <top>23.3333%</top>
-              <control type="image">
-                <width>116.3636%</width>
-                <height>69.5652%</height>
-                <aspectratio>keep</aspectratio>
-                <texture colordiffuse="$VAR[InfinityWatched224Tint8fc4d23453f3]">$VAR[ListItemOverlay]</texture>
-              </control>
-              <control type="label">
-                <width>116.3636%</width>
-                <height>69.5652%</height>
-                <font>font12_title</font>
-                <align>center</align>
-                <label>$VAR[ListItemOverlayShowsVar]</label>
-                <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
-              </control>
-            </control>
-            <include content="InfinityActionLoadingFrame">
-              <param name="width" value="101.7544%" />
-              <param name="height" value="100%" />
-              <param name="left" value="0" />
-              <param name="top" value="0" />
-              <param name="control" value="50" />
-              <param name="window" value="0" />
-              <param name="globalframe" value="false" />
-              <param name="inheritwindow" value="true" />
-            </include>
-          </focusedlayout>
-          <itemlayout height="14.285689%" width="auto" condition="Container.Content(seasons)" aspectratio="9.500000000">
-            <control type="image">
-              <left>0%</left>
-              <top>0%</top>
-              <width>100%</width>
-              <height>100%</height>
-              <texture border="14" colordiffuse="$VAR[InfinityPaletteSurfaceElevated]">infinity_ui/contract_white.png</texture>
-            </control>
-            <control type="image">
-              <left>1.3158%</left>
-              <top>6.6667%</top>
-              <width>9.210526%</width>
-              <height>87.5%</height>
-              <aspectratio>keep</aspectratio>
-              <texture background="true" colordiffuse="$VAR[InfinityPolishIcon0Tint]">$VAR[InfinityPolishIcon0]</texture>
-              <visible>!String.StartsWith(ListItem.Icon,Default)</visible>
-            </control>
-            <control type="image">
-              <left>1.3158%</left>
-              <top>6.6667%</top>
-              <width>9.210526%</width>
-              <height>87.5%</height>
-              <aspectratio>keep</aspectratio>
-              <texture background="true">$INFO[ListItem.Icon,views/list/]</texture>
-              <colordiffuse>grey2</colordiffuse>
-              <visible>String.StartsWith(ListItem.Icon,Default)</visible>
-            </control>
-            <control type="label">
-              <left>11.8421%</left>
-              <width>84.2105%</width>
-              <height>100%</height>
-              <font>InfinityBodyBold</font>
-              <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
-              <label>$INFO[ListItem.Label]</label>
-            </control>
-            <control type="label">
-              <width>95.614%</width>
-              <height>96.6667%</height>
-              <font>InfinitySmall</font>
-              <align>right</align>
-              <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
-              <label>$INFO[ListItem.Property(TotalEpisodes),, $LOCALIZE[20453]]</label>
-            </control>
-            <control type="group">
-              <left>95.1754%</left>
-              <top>23.3333%</top>
-              <control type="image">
-                <width>116.3636%</width>
-                <height>69.5652%</height>
-                <aspectratio>keep</aspectratio>
-                <texture colordiffuse="$VAR[InfinityWatched224Tint8fc4d23453f3]">$VAR[ListItemOverlay]</texture>
-              </control>
-              <control type="label">
-                <width>116.3636%</width>
-                <height>69.5652%</height>
-                <font>font12_title</font>
-                <align>center</align>
-                <label>$VAR[ListItemOverlayShowsVar]</label>
-                <textcolor>$VAR[InfinityDiggzSecondaryText]</textcolor>
-              </control>
-            </control>
-          </itemlayout>
-          <focusedlayout height="14.285689%" width="auto" condition="Container.Content(seasons)" aspectratio="9.500000000">
-            <control type="image">
-              <width>101.7544%</width>
-              <height>100%</height>
-              <texture border="14">infinity_ui/focus.png</texture>
-              <visible>Control.HasFocus(50)</visible>
-              <include>VisibleFadeAnimation</include>
-            </control>
-            <control type="image">
-              <left>1.3158%</left>
-              <top>6.6667%</top>
-              <width>9.210526%</width>
-              <height>87.5%</height>
-              <aspectratio>keep</aspectratio>
-              <texture background="true" colordiffuse="$VAR[InfinityPolishIcon0Tint]">$VAR[InfinityPolishIcon0]</texture>
-              <visible>!String.StartsWith(ListItem.Icon,Default)</visible>
-            </control>
-            <control type="image">
-              <left>1.3158%</left>
-              <top>6.6667%</top>
-              <width>9.210526%</width>
-              <height>87.5%</height>
-              <aspectratio>keep</aspectratio>
-              <texture background="true">$INFO[ListItem.Icon,views/list/]</texture>
-              <visible>String.StartsWith(ListItem.Icon,Default)</visible>
-            </control>
-            <control type="label">
-              <left>11.8421%</left>
-              <width>84.2105%</width>
-              <height>100%</height>
-              <font>InfinityBodyBold</font>
-              <label>$INFO[ListItem.Label]</label>
-            </control>
-            <control type="label">
-              <width>95.614%</width>
-              <height>96.6667%</height>
-              <font>InfinitySmall</font>
-              <align>right</align>
-              <label>$INFO[ListItem.Property(TotalEpisodes),, $LOCALIZE[20453]]</label>
-            </control>
-            <control type="group">
-              <left>95.1754%</left>
-              <top>23.3333%</top>
-              <control type="image">
-                <width>116.3636%</width>
-                <height>69.5652%</height>
-                <aspectratio>keep</aspectratio>
-                <texture colordiffuse="$VAR[InfinityWatched224Tint8fc4d23453f3]">$VAR[ListItemOverlay]</texture>
-              </control>
-              <control type="label">
-                <width>116.3636%</width>
-                <height>69.5652%</height>
-                <font>font12_title</font>
-                <align>center</align>
-                <label>$VAR[ListItemOverlayShowsVar]</label>
-                <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
-              </control>
             </control>
             <include content="InfinityActionLoadingFrame">
               <param name="width" value="101.7544%" />
@@ -904,99 +707,6 @@
               <font>InfinitySmall</font>
               <align>right</align>
               <label>$INFO[ListItem.Label2]</label>
-            </control>
-            <include content="InfinityActionLoadingFrame">
-              <param name="width" value="101.7544%" />
-              <param name="height" value="100%" />
-              <param name="left" value="0" />
-              <param name="top" value="0" />
-              <param name="control" value="50" />
-              <param name="window" value="0" />
-              <param name="globalframe" value="false" />
-              <param name="inheritwindow" value="true" />
-            </include>
-          </focusedlayout>
-          <itemlayout height="14.285689%" width="auto" condition="Container.Content(videos)" aspectratio="9.500000000">
-            <control type="image">
-              <left>0%</left>
-              <top>0%</top>
-              <width>100%</width>
-              <height>100%</height>
-              <texture border="14" colordiffuse="$VAR[InfinityPaletteSurfaceElevated]">infinity_ui/contract_white.png</texture>
-            </control>
-            <control type="label">
-              <left>2.6316%</left>
-              <width>91.2281%</width>
-              <height>44</height>
-              <font>InfinityBodyBold</font>
-              <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
-              <label>$INFO[ListItem.Label]</label>
-            </control>
-            <control type="label">
-              <left>2.6316%</left>
-              <top>45.8333%</top>
-              <width>91.2281%</width>
-              <height>44</height>
-              <font>InfinitySmall</font>
-              <textcolor>$VAR[InfinityDiggzSecondaryText]</textcolor>
-              <label>$INFO[ListItem.Studio]$INFO[ListItem.Premiered, • ]</label>
-            </control>
-            <control type="label">
-              <left>2.6316%</left>
-              <width>91.2281%</width>
-              <height>100%</height>
-              <font>InfinitySmall</font>
-              <align>right</align>
-              <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
-              <label>$VAR[VideoListLabelVar]</label>
-            </control>
-            <control type="image">
-              <left>94.386%</left>
-              <top>23.3333%</top>
-              <width>5.614035%</width>
-              <height>53.3333%</height>
-              <aspectratio>keep</aspectratio>
-              <texture colordiffuse="$VAR[InfinityWatched224Tint8fc4d23453f3]">$VAR[ListItemOverlay]</texture>
-            </control>
-          </itemlayout>
-          <focusedlayout height="14.285689%" width="auto" condition="Container.Content(videos)" aspectratio="9.500000000">
-            <control type="image">
-              <width>101.7544%</width>
-              <height>100%</height>
-              <texture border="14">infinity_ui/focus.png</texture>
-              <visible>Control.HasFocus(50)</visible>
-              <include>VisibleFadeAnimation</include>
-            </control>
-            <control type="label">
-              <left>2.6316%</left>
-              <width>91.2281%</width>
-              <height>44</height>
-              <font>InfinityBodyBold</font>
-              <label>$INFO[ListItem.Label]</label>
-            </control>
-            <control type="label">
-              <left>2.6316%</left>
-              <top>45.8333%</top>
-              <width>91.2281%</width>
-              <height>44</height>
-              <font>InfinitySmall</font>
-              <label>$INFO[ListItem.Studio]$INFO[ListItem.Premiered, • ]</label>
-            </control>
-            <control type="label">
-              <left>2.6316%</left>
-              <width>91.2281%</width>
-              <height>100%</height>
-              <font>InfinitySmall</font>
-              <align>right</align>
-              <label>$VAR[VideoListLabelVar]</label>
-            </control>
-            <control type="image">
-              <left>94.386%</left>
-              <top>23.3333%</top>
-              <width>5.614035%</width>
-              <height>53.3333%</height>
-              <aspectratio>keep</aspectratio>
-              <texture colordiffuse="$VAR[InfinityWatched224Tint8fc4d23453f3]">$VAR[ListItemOverlay]</texture>
             </control>
             <include content="InfinityActionLoadingFrame">
               <param name="width" value="101.7544%" />
@@ -1203,12 +913,13 @@
               <param name="inheritwindow" value="true" />
             </include>
           </focusedlayout>
+          <left>0</left>
         </control>
         <control type="scrollbar" id="95060">
-          <left>62.3913%</left>
-          <top>16.0714%</top>
-          <width>12</width>
-          <height>75%</height>
+          <left>99%</left>
+          <top>0</top>
+          <width>10</width>
+          <height>100%</height>
           <onup>95060</onup>
           <ondown>95060</ondown>
           <onleft>50</onleft>
@@ -1224,11 +935,13 @@
           <texturesliderbarfocus colordiffuse="$VAR[ThemeLabelColor]">colors/white.png</texturesliderbarfocus>
           <showonepage>false</showonepage>
         </control>
+        <width>61%</width>
+        <height>100%</height>
       </control>
       <control type="group">
         <left>68.75%</left>
         <top>18.6916%</top>
-        <visible>Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(musicvideos) | Container.Content(files) | Container.Content(addons) | Container.Content()</visible>
+        <visible>[Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(musicvideos) | Container.Content(files) | Container.Content(addons) | Container.Content()] + ![Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos) | Container.Content(videos)]</visible>
         <include>VisibleFadeAnimation</include>
         <control type="image">
           <width>95%</width>
@@ -1275,7 +988,7 @@
       <control type="group">
         <left>67.5%</left>
         <top>14.486%</top>
-        <visible>Container.Content(genres)</visible>
+        <visible>[Container.Content(genres)] + ![Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos) | Container.Content(videos)]</visible>
         <include>VisibleFadeAnimation</include>
         <control type="image">
           <width>91.3462%</width>
@@ -1299,7 +1012,7 @@
       <control type="group" id="8001">
         <left>66.6667%</left>
         <top>12.1495%</top>
-        <visible>![Container.Content(movies) | Container.Content(genres) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(musicvideos) | Container.Content() | Container.Content(files) | Container.Content(addons)]</visible>
+        <visible>[![Container.Content(movies) | Container.Content(genres) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(musicvideos) | Container.Content() | Container.Content(files) | Container.Content(addons)]] + ![Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos) | Container.Content(videos)]</visible>
         <animation effect="fade" time="250" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">Visible</animation>
         <control type="image">
           <left>-1</left>
@@ -1536,6 +1249,25 @@
           </control>
         </control>
       </control>
+      <left>1.5%</left>
+      <top>300</top>
+      <width>97%</width>
+      <bottom>144</bottom>
+      <control type="group">
+        <left>0</left>
+        <top>0</top>
+        <width>100%</width>
+        <height>100%</height>
+        <visible>Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos) | Container.Content(videos)</visible>
+        <include content="InfinityMedia_SelectedMedia" />
+      </control>
+      <control type="image">
+        <left>62.5%</left>
+        <top>0</top>
+        <width>1</width>
+        <height>100%</height>
+        <texture colordiffuse="$VAR[InfinityPaletteBorder]">infinity_ui/contract_white.png</texture>
+      </control>
     </control>
   </include>
   <include name="InfinityMedia_SlimVideoList">
@@ -1543,20 +1275,21 @@
       <visible>Control.IsVisible(50) + !Window.IsActive(addoninformation)</visible>
       <include>ViewAnimation</include>
       <control type="group">
-        <left>5.2083%</left>
-        <top>-68</top>
+        <left>0</left>
+        <top>0</top>
         <control type="image">
-          <left>-1</left>
-          <top>15.5052%</top>
-          <width>63.8462%</width>
-          <height>78.6585%</height>
+          <left>0</left>
+          <top>0</top>
+          <width>100%</width>
+          <height>100%</height>
           <texture>contentpanel.png</texture>
+          <visible>![Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos) | Container.Content(videos)]</visible>
         </control>
         <control type="panel" id="50">
           <visible>[[String.IsEmpty(Container.PluginName) + ![Container.Content() | Container.Content(files) | Container.Content(playlists) | Container.Content(addons)]] | [!String.IsEmpty(Container.PluginName) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos)]]]</visible>
-          <top>16.5505%</top>
-          <width>63.1868%</width>
-          <height>76.6551%</height>
+          <top>0</top>
+          <width>100%</width>
+          <height>100%</height>
           <onleft>SetProperty(MediaMenu,True,Home)</onleft>
           <onleft>SetFocus(9050)</onleft>
           <onright condition="String.IsEqual(ListItem.DBType,movie)">RunScript(script.trailer.bridge,?imdb=$INFO[ListItem.IMDBNumber]&amp;tmdb=$INFO[ListItem.Property(tmdb_id)]&amp;tmdbshow=$INFO[ListItem.Property(tmdbshow_id)]&amp;dbtype=$INFO[ListItem.DBType]&amp;mediatype=$INFO[ListItem.MediaType]&amp;title=$INFO[ListItem.Title]&amp;tvshowtitle=$INFO[ListItem.TVShowTitle]&amp;year=$INFO[ListItem.Year])</onright>
@@ -1577,6 +1310,22 @@
           <viewtype label="535">list</viewtype>
           <pagecontrol>95060</pagecontrol>
           <scrolltime tween="quadratic" easing="out">200</scrolltime>
+          <itemlayout condition="Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos) | Container.Content(videos)" width="100%" height="108">
+            <include content="InfinityMedia_BrowserRow">
+              <param name="Focused" value="false" />
+              <param name="ArtHeight" value="78" />
+              <param name="TitleHeight" value="44" />
+              <param name="MetaTop" value="62" />
+            </include>
+          </itemlayout>
+          <focusedlayout condition="Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos) | Container.Content(videos)" width="100%" height="108">
+            <include content="InfinityMedia_BrowserRow">
+              <param name="Focused" value="true" />
+              <param name="ArtHeight" value="78" />
+              <param name="TitleHeight" value="44" />
+              <param name="MetaTop" value="62" />
+            </include>
+          </focusedlayout>
           <itemlayout height="9.090891%" width="auto" condition="!Container.Content(addons)" aspectratio="14.250000000">
             <control type="image">
               <left>0%</left>
@@ -1773,12 +1522,13 @@
               <param name="inheritwindow" value="true" />
             </include>
           </focusedlayout>
+          <left>0</left>
         </control>
         <control type="scrollbar" id="95060">
-          <left>62.5275%</left>
-          <top>16.5505%</top>
-          <width>12</width>
-          <height>76.3937%</height>
+          <left>99%</left>
+          <top>0</top>
+          <width>10</width>
+          <height>100%</height>
           <onup>95060</onup>
           <ondown>95060</ondown>
           <onleft>50</onleft>
@@ -1797,11 +1547,13 @@
           <texturesliderbarfocus colordiffuse="$VAR[ThemeLabelColor]">colors/white.png</texturesliderbarfocus>
           <showonepage>false</showonepage>
         </control>
+        <width>61%</width>
+        <height>100%</height>
       </control>
       <control type="group">
         <left>67.5%</left>
         <top>16.2037%</top>
-        <visible>!Control.IsVisible(8001)</visible>
+        <visible>[!Control.IsVisible(8001)] + ![Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos) | Container.Content(videos)]</visible>
         <include>VisibleFadeAnimation</include>
         <control type="image">
           <width>91.3462%</width>
@@ -1848,7 +1600,7 @@
       <control type="group" id="8001">
         <left>66.6667%</left>
         <top>-40</top>
-        <visible>Skin.HasSetting(SlimList.Info) + ![Container.Content(movies) | Container.Content(genres) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(musicvideos) | Container.Content() | Container.Content(files) | Container.Content(addons)]</visible>
+        <visible>[Skin.HasSetting(SlimList.Info) + ![Container.Content(movies) | Container.Content(genres) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(musicvideos) | Container.Content() | Container.Content(files) | Container.Content(addons)]] + ![Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos) | Container.Content(videos)]</visible>
         <include>VisibleFadeAnimation</include>
         <control type="image">
           <top>13.2143%</top>
@@ -2104,6 +1856,25 @@
             <animation effect="rotate" start="360" end="0" center="auto" time="2000" loop="true" condition="[true] + !String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">Conditional</animation>
           </control>
         </control>
+      </control>
+      <left>1.5%</left>
+      <top>300</top>
+      <width>97%</width>
+      <bottom>144</bottom>
+      <control type="group">
+        <left>0</left>
+        <top>0</top>
+        <width>100%</width>
+        <height>100%</height>
+        <visible>Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos) | Container.Content(videos)</visible>
+        <include content="InfinityMedia_SelectedMedia" />
+      </control>
+      <control type="image">
+        <left>62.5%</left>
+        <top>0</top>
+        <width>1</width>
+        <height>100%</height>
+        <texture colordiffuse="$VAR[InfinityPaletteBorder]">infinity_ui/contract_white.png</texture>
       </control>
     </control>
   </include>
@@ -3195,6 +2966,7 @@
           <label>$VAR[TopBarRightLabelVar]</label>
         </control>
       </control>
+      <visible>![Control.IsVisible(50) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos) | Container.Content(videos)]]</visible>
     </control>
   </include>
   <include name="InfinityMedia_DefaultLetterJump">

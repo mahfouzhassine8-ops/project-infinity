@@ -1,0 +1,48 @@
+{
+  "source_sha256": "d176ac2a66daa1b08016996ab6991644abcff6ad13369492497049c5fb02917d",
+  "fixture_only": [
+    "skin addon.xml resolution",
+    "media itemlayout width attributes",
+    "synthetic QA add-on identities in copied Linux manifest"
+  ],
+  "logical": [
+    1080,
+    2520
+  ],
+  "viewport": [
+    1080,
+    2520
+  ],
+  "layouts": [
+    {
+      "include": "InfinityMedia_VideoList",
+      "tag": "itemlayout",
+      "source_width": "100%",
+      "projected_width": 548.208,
+      "height": "140"
+    },
+    {
+      "include": "InfinityMedia_VideoList",
+      "tag": "focusedlayout",
+      "source_width": "100%",
+      "projected_width": 548.208,
+      "height": "140"
+    },
+    {
+      "include": "InfinityMedia_SlimVideoList",
+      "tag": "itemlayout",
+      "source_width": "100%",
+      "projected_width": 548.208,
+      "height": "108"
+    },
+    {
+      "include": "InfinityMedia_SlimVideoList",
+      "tag": "focusedlayout",
+      "source_width": "100%",
+      "projected_width": 548.208,
+      "height": "108"
+    }
+  ],
+  "Android": "NOT_RUN",
+  "native_engine_executed": false
+}

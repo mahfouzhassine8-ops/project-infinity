@@ -178,7 +178,7 @@
             
 <!-- INFINITY_LOADING_V2 -->
 <onclick condition="System.AddonIsEnabled(script.infinity.commandcenter)">NotifyAll(script.infinity.commandcenter,seamless.loading,&quot;{\&quot;state\&quot;:\&quot;action\&quot;,\&quot;target\&quot;:\&quot;d6dd57476222a811180600d61971a78fd7b187b24d9fd7a735880d16e4424fa0\&quot;,\&quot;owner\&quot;:{\&quot;window\&quot;:\&quot;$INFO[Window(Home).Property(Infinity.Loading.CurrentWindow)]\&quot;,\&quot;control\&quot;:\&quot;1198102\&quot;,\&quot;item\&quot;:\&quot;$INFO[Container(1198102).CurrentItem]\&quot;,\&quot;epoch\&quot;:\&quot;$INFO[Window(Home).Property(Infinity.Loading.Context)]\&quot;,\&quot;section\&quot;:\&quot;$INFO[Container(1198102).ListItem.Property(section)]\&quot;,\&quot;source\&quot;:\&quot;$INFO[Container(1198102).ListItem.Property(hubsource)]\&quot;,\&quot;addon\&quot;:\&quot;$INFO[Container(1198102).ListItem.Property(Addon.ID)]\&quot;,\&quot;dbid\&quot;:\&quot;$INFO[Container(1198102).ListItem.DBID]\&quot;,\&quot;home_section\&quot;:\&quot;$INFO[Container(9000).ListItem.Property(section)]\&quot;,\&quot;home_source\&quot;:\&quot;$INFO[Container(9000).ListItem.Property(hubsource)]\&quot;}}&quot;)</onclick>
-<onclick>RunScript(special://skin/resources/lib/infinity_library_navigation.py,movies)</onclick>
+<onclick>RunScript(script.infinity.commandcenter,library-navigation,movies)</onclick>
 <!-- INFINITY_LOADING_V2 -->
 <onclick condition="System.AddonIsEnabled(script.infinity.commandcenter)">NotifyAll(script.infinity.commandcenter,seamless.loading,&quot;{\&quot;state\&quot;:\&quot;dispatched\&quot;,\&quot;target\&quot;:\&quot;d6dd57476222a811180600d61971a78fd7b187b24d9fd7a735880d16e4424fa0\&quot;,\&quot;owner\&quot;:{\&quot;window\&quot;:\&quot;$INFO[Window(Home).Property(Infinity.Loading.CurrentWindow)]\&quot;,\&quot;control\&quot;:\&quot;1198102\&quot;,\&quot;item\&quot;:\&quot;$INFO[Container(1198102).CurrentItem]\&quot;,\&quot;epoch\&quot;:\&quot;$INFO[Window(Home).Property(Infinity.Loading.Context)]\&quot;,\&quot;section\&quot;:\&quot;$INFO[Container(1198102).ListItem.Property(section)]\&quot;,\&quot;source\&quot;:\&quot;$INFO[Container(1198102).ListItem.Property(hubsource)]\&quot;,\&quot;addon\&quot;:\&quot;$INFO[Container(1198102).ListItem.Property(Addon.ID)]\&quot;,\&quot;dbid\&quot;:\&quot;$INFO[Container(1198102).ListItem.DBID]\&quot;,\&quot;home_section\&quot;:\&quot;$INFO[Container(9000).ListItem.Property(section)]\&quot;,\&quot;home_source\&quot;:\&quot;$INFO[Container(9000).ListItem.Property(hubsource)]\&quot;}}&quot;)</onclick>
 
@@ -228,7 +228,7 @@
             
 <!-- INFINITY_LOADING_V2 -->
 <onclick condition="System.AddonIsEnabled(script.infinity.commandcenter)">NotifyAll(script.infinity.commandcenter,seamless.loading,&quot;{\&quot;state\&quot;:\&quot;action\&quot;,\&quot;target\&quot;:\&quot;cbd4b37105e4e7617d78aef47ab6bbd40c61996568596d11870129e60a722b07\&quot;,\&quot;owner\&quot;:{\&quot;window\&quot;:\&quot;$INFO[Window(Home).Property(Infinity.Loading.CurrentWindow)]\&quot;,\&quot;control\&quot;:\&quot;1198103\&quot;,\&quot;item\&quot;:\&quot;$INFO[Container(1198103).CurrentItem]\&quot;,\&quot;epoch\&quot;:\&quot;$INFO[Window(Home).Property(Infinity.Loading.Context)]\&quot;,\&quot;section\&quot;:\&quot;$INFO[Container(1198103).ListItem.Property(section)]\&quot;,\&quot;source\&quot;:\&quot;$INFO[Container(1198103).ListItem.Property(hubsource)]\&quot;,\&quot;addon\&quot;:\&quot;$INFO[Container(1198103).ListItem.Property(Addon.ID)]\&quot;,\&quot;dbid\&quot;:\&quot;$INFO[Container(1198103).ListItem.DBID]\&quot;,\&quot;home_section\&quot;:\&quot;$INFO[Container(9000).ListItem.Property(section)]\&quot;,\&quot;home_source\&quot;:\&quot;$INFO[Container(9000).ListItem.Property(hubsource)]\&quot;}}&quot;)</onclick>
-<onclick>RunScript(special://skin/resources/lib/infinity_library_navigation.py,tv)</onclick>
+<onclick>RunScript(script.infinity.commandcenter,library-navigation,tv)</onclick>
 <!-- INFINITY_LOADING_V2 -->
 <onclick condition="System.AddonIsEnabled(script.infinity.commandcenter)">NotifyAll(script.infinity.commandcenter,seamless.loading,&quot;{\&quot;state\&quot;:\&quot;dispatched\&quot;,\&quot;target\&quot;:\&quot;cbd4b37105e4e7617d78aef47ab6bbd40c61996568596d11870129e60a722b07\&quot;,\&quot;owner\&quot;:{\&quot;window\&quot;:\&quot;$INFO[Window(Home).Property(Infinity.Loading.CurrentWindow)]\&quot;,\&quot;control\&quot;:\&quot;1198103\&quot;,\&quot;item\&quot;:\&quot;$INFO[Container(1198103).CurrentItem]\&quot;,\&quot;epoch\&quot;:\&quot;$INFO[Window(Home).Property(Infinity.Loading.Context)]\&quot;,\&quot;section\&quot;:\&quot;$INFO[Container(1198103).ListItem.Property(section)]\&quot;,\&quot;source\&quot;:\&quot;$INFO[Container(1198103).ListItem.Property(hubsource)]\&quot;,\&quot;addon\&quot;:\&quot;$INFO[Container(1198103).ListItem.Property(Addon.ID)]\&quot;,\&quot;dbid\&quot;:\&quot;$INFO[Container(1198103).ListItem.DBID]\&quot;,\&quot;home_section\&quot;:\&quot;$INFO[Container(9000).ListItem.Property(section)]\&quot;,\&quot;home_source\&quot;:\&quot;$INFO[Container(9000).ListItem.Property(hubsource)]\&quot;}}&quot;)</onclick>
 
@@ -278,7 +278,7 @@
             
 <!-- INFINITY_LOADING_V2 -->
 
-<onclick>RunScript(special://skin/resources/lib/infinity_library_navigation.py,sports)</onclick>
+<onclick>RunScript(script.infinity.commandcenter,library-navigation,sports)</onclick>
 <!-- INFINITY_LOADING_V2 -->
 
 
@@ -492,7 +492,7 @@
             
 <!-- INFINITY_LOADING_V2 -->
 
-<onclick>RunScript(special://skin/resources/lib/infinity_library_navigation.py,browse)</onclick>
+<onclick>RunScript(script.infinity.commandcenter,library-navigation,browse)</onclick>
 <!-- INFINITY_LOADING_V2 -->
 
 
@@ -542,7 +542,7 @@
             
 <!-- INFINITY_LOADING_V2 -->
 
-<onclick>RunScript(special://skin/resources/lib/infinity_library_navigation.py,downloads)</onclick>
+<onclick>RunScript(script.infinity.commandcenter,library-navigation,downloads)</onclick>
 <!-- INFINITY_LOADING_V2 -->
 
 

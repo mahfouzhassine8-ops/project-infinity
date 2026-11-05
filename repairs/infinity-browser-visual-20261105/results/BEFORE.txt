@@ -1,0 +1,108 @@
+test_columns_have_explicit_bounded_nonoverlapping_coordinate_spaces (__main__.Browser.test_columns_have_explicit_bounded_nonoverlapping_coordinate_spaces) ... FAIL
+test_existing_palette_and_fonts_own_new_surfaces (__main__.Browser.test_existing_palette_and_fonts_own_new_surfaces) ... FAIL
+test_media_rows_take_full_column_with_fixed_readable_height (__main__.Browser.test_media_rows_take_full_column_with_fixed_readable_height) ... FAIL
+test_metadata_and_plot_remain_selected_item_data (__main__.Browser.test_metadata_and_plot_remain_selected_item_data) ... FAIL
+test_missing_poster_collapses_reserved_artwork_space (__main__.Browser.test_missing_poster_collapses_reserved_artwork_space) ... FAIL
+test_normal_focused_rows_keep_same_geometry_and_wrap_titles (__main__.Browser.test_normal_focused_rows_keep_same_geometry_and_wrap_titles) ... FAIL
+test_original_container_input_and_context_ownership_are_preserved (__main__.Browser.test_original_container_input_and_context_ownership_are_preserved) ... FAIL
+test_other_existing_include_families_remain_unchanged (__main__.Browser.test_other_existing_include_families_remain_unchanged) ... ok
+test_real_actions_are_conditional_and_use_original_native_dispatch (__main__.Browser.test_real_actions_are_conditional_and_use_original_native_dispatch) ... FAIL
+test_selected_art_is_real_media_only_and_never_stretched (__main__.Browser.test_selected_art_is_real_media_only_and_never_stretched) ... FAIL
+
+======================================================================
+FAIL: test_columns_have_explicit_bounded_nonoverlapping_coordinate_spaces (__main__.Browser.test_columns_have_explicit_bounded_nonoverlapping_coordinate_spaces)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-browser-visual-20261105/test_browser.py", line 72, in test_columns_have_explicit_bounded_nonoverlapping_coordinate_spaces
+    selected = include(root, 'InfinityMedia_SelectedMedia').find('definition/control')
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-browser-visual-20261105/test_browser.py", line 25, in include
+    raise AssertionError('Missing existing-system browser include: ' + name)
+AssertionError: Missing existing-system browser include: InfinityMedia_SelectedMedia
+
+======================================================================
+FAIL: test_existing_palette_and_fonts_own_new_surfaces (__main__.Browser.test_existing_palette_and_fonts_own_new_surfaces)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-browser-visual-20261105/test_browser.py", line 149, in test_existing_palette_and_fonts_own_new_surfaces
+    for c in include(root, name).findall('.//control'):
+             ^^^^^^^^^^^^^^^^^^^
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-browser-visual-20261105/test_browser.py", line 25, in include
+    raise AssertionError('Missing existing-system browser include: ' + name)
+AssertionError: Missing existing-system browser include: InfinityMedia_BrowserRow
+
+======================================================================
+FAIL: test_media_rows_take_full_column_with_fixed_readable_height (__main__.Browser.test_media_rows_take_full_column_with_fixed_readable_height)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-browser-visual-20261105/test_browser.py", line 91, in test_media_rows_take_full_column_with_fixed_readable_height
+    self.assertIn('Container.Content(tvshows)', layout.get('condition', ''))
+AssertionError: 'Container.Content(tvshows)' not found in 'Container.Content(movies)'
+
+======================================================================
+FAIL: test_metadata_and_plot_remain_selected_item_data (__main__.Browser.test_metadata_and_plot_remain_selected_item_data)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-browser-visual-20261105/test_browser.py", line 131, in test_metadata_and_plot_remain_selected_item_data
+    text = E.tostring(include(root, 'InfinityMedia_SelectedMediaText'), encoding='unicode')
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-browser-visual-20261105/test_browser.py", line 25, in include
+    raise AssertionError('Missing existing-system browser include: ' + name)
+AssertionError: Missing existing-system browser include: InfinityMedia_SelectedMediaText
+
+======================================================================
+FAIL: test_missing_poster_collapses_reserved_artwork_space (__main__.Browser.test_missing_poster_collapses_reserved_artwork_space)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-browser-visual-20261105/test_browser.py", line 140, in test_missing_poster_collapses_reserved_artwork_space
+    root = read();selected = include(root, 'InfinityMedia_SelectedMedia')
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-browser-visual-20261105/test_browser.py", line 25, in include
+    raise AssertionError('Missing existing-system browser include: ' + name)
+AssertionError: Missing existing-system browser include: InfinityMedia_SelectedMedia
+
+======================================================================
+FAIL: test_normal_focused_rows_keep_same_geometry_and_wrap_titles (__main__.Browser.test_normal_focused_rows_keep_same_geometry_and_wrap_titles)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-browser-visual-20261105/test_browser.py", line 107, in test_normal_focused_rows_keep_same_geometry_and_wrap_titles
+    self.assertEqual(title.get('type'), 'textbox')
+AssertionError: 'label' != 'textbox'
+- label
++ textbox
+
+
+======================================================================
+FAIL: test_original_container_input_and_context_ownership_are_preserved (__main__.Browser.test_original_container_input_and_context_ownership_are_preserved)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-browser-visual-20261105/test_browser.py", line 180, in test_original_container_input_and_context_ownership_are_preserved
+    frame = include(root, 'InfinityMedia_BrowserRow').find(".//include[@content='InfinityActionLoadingFrame']")
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-browser-visual-20261105/test_browser.py", line 25, in include
+    raise AssertionError('Missing existing-system browser include: ' + name)
+AssertionError: Missing existing-system browser include: InfinityMedia_BrowserRow
+
+======================================================================
+FAIL: test_real_actions_are_conditional_and_use_original_native_dispatch (__main__.Browser.test_real_actions_are_conditional_and_use_original_native_dispatch)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-browser-visual-20261105/test_browser.py", line 158, in test_real_actions_are_conditional_and_use_original_native_dispatch
+    source = include(read(), 'InfinityMedia_SelectedMedia')
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-browser-visual-20261105/test_browser.py", line 25, in include
+    raise AssertionError('Missing existing-system browser include: ' + name)
+AssertionError: Missing existing-system browser include: InfinityMedia_SelectedMedia
+
+======================================================================
+FAIL: test_selected_art_is_real_media_only_and_never_stretched (__main__.Browser.test_selected_art_is_real_media_only_and_never_stretched)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-browser-visual-20261105/test_browser.py", line 117, in test_selected_art_is_real_media_only_and_never_stretched
+    self.assertIsNotNone(poster)
+AssertionError: unexpectedly None
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.034s
+
+FAILED (failures=9)

@@ -1,0 +1,36 @@
+{
+  "status": "BLOCKED_EXISTING_EXACT_RELEASE_AUTHORITY",
+  "APK_built": false,
+  "keys_used": false,
+  "phone_installed_version": "UNVERIFIED",
+  "Android": "NOT_RUN",
+  "physical_Fold": "NOT_RUN",
+  "registered_candidate_versionCode": 2103457,
+  "registered_owner": "INFINITY_MASTER_FORWARD_RECOVERY",
+  "authorized_versions": [
+    2103456,
+    2103457
+  ],
+  "authority_branch": "work/infinity-master-testing-from-2103451-20261105",
+  "working_branch": "work/infinity-browser-visual-correction-from-2103456-20261105",
+  "next_version_rejection": "ONLY_CONTROLLED_AND_RECOVERY_VERSIONS",
+  "source_guard": {
+    "required_checkpoint": "4c4094918845bd42649f50bcb094d2ba334a51bc",
+    "required_completed_members": 12,
+    "actual_candidate_changed_members": [
+      "assets/addons/script.infinity.commandcenter/default.py",
+      "assets/addons/script.infinity.commandcenter/library_navigation.py",
+      "assets/addons/skin.infinity.diggz/unified/Custom_1198_InfinityNav.xml",
+      "assets/addons/skin.infinity.diggz/unified/Includes_InfinityMediaLists.xml",
+      "assets/addons/skin.infinity.diggz/unified/MyVideoNav.xml",
+      "assets/addons/skin.infinity.diggz/unified/Variables.xml"
+    ]
+  },
+  "required_next_release_action": "Review/register a distinct exact successor source/member/version authority and higher-version recovery through the sole original-key workflow. The existing 456/457 authority must not be reused or weakened.",
+  "security_sources_unchanged": {
+    "repairs/dual-experience-isolation-2103420/release_gate.py": true,
+    "repairs/dual-experience-isolation-2103420/release-authority.json": true,
+    "repairs/dual-experience-isolation-2103420/signer-policy.json": true,
+    ".github/workflows/infinity-combined-release.yml": true
+  }
+}

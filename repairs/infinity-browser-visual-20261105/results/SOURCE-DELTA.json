@@ -1,0 +1,87 @@
+{
+  "status": "EXACT_SOURCE_CANDIDATE_DELTA_NOT_APK_COMPARISON",
+  "base_source": "2b5fcc73a12adcf223858b429d1daa23ed4420ea",
+  "base_signed_APK": 2103456,
+  "base_APK_SHA256": "81aed468bcdf4031f3186fa7c5aa73e396a38f27837581fbcc54f56cbbc94696",
+  "runtime_changes": {
+    "assets/addons/script.infinity.commandcenter/default.py": {
+      "source": "repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/default.py",
+      "signed456_sha256": "7996a2e78053359f4f8a61d29b4e277c072c0fde1990e72ef2317da048916393",
+      "candidate_sha256": "e1d98b1df8579b2dd71c59f3dbcc8cfb85c71638f195bc628833188501f8644c",
+      "bytes": 28133
+    },
+    "assets/addons/script.infinity.commandcenter/library_navigation.py": {
+      "source": "repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/library_navigation.py",
+      "signed456_sha256": null,
+      "candidate_sha256": "c6689df59f2b077e9250e584d69c28ef83928d2139894c8b335837df5b2fe163",
+      "bytes": 8209
+    },
+    "assets/addons/skin.infinity.diggz/unified/Custom_1198_InfinityNav.xml": {
+      "source": "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Custom_1198_InfinityNav.xml",
+      "signed456_sha256": "07806a3d489a7d95d953058f1da65e06f7425f25c011e14d6383806840d624aa",
+      "candidate_sha256": "0f1827f4f37aab009f8ff75fcc8267c184128b5ef35ff7847bca9dbb9efc295e",
+      "bytes": 145357
+    },
+    "assets/addons/skin.infinity.diggz/unified/Includes_InfinityMediaLists.xml": {
+      "source": "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Includes_InfinityMediaLists.xml",
+      "signed456_sha256": "860bee806464e4a4f5c4baa0ec2fdad250a40281efa257a97ddfe919e451c31f",
+      "candidate_sha256": "4bd1fc90636bc420ddc31f7160b47c4a12b0f675aef619ad047103c835e665b1",
+      "bytes": 171289
+    },
+    "assets/addons/skin.infinity.diggz/unified/MyVideoNav.xml": {
+      "source": "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/MyVideoNav.xml",
+      "signed456_sha256": "f94d0078834420c9580e1c4e6ed8ce1311550e38f32569da54a6ec16633b7f5f",
+      "candidate_sha256": "7df68af11f2484e9e8187aa0b689305cb2b305b6001b57ca9ca5704050dca4de",
+      "bytes": 99957
+    },
+    "assets/addons/skin.infinity.diggz/unified/Variables.xml": {
+      "source": "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Variables.xml",
+      "signed456_sha256": "b131f1b87517ec7260bb13b20857b0c72533e0186248df6122d4c94330ef858e",
+      "candidate_sha256": "9efb6dac17abb69eb1ef8cf1cebb4e1419952b459ac49df1b23751c0383519cd",
+      "bytes": 285041
+    }
+  },
+  "existing_changed": 5,
+  "new_files": 1,
+  "protected_sources": {
+    "repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/infinity_search.py": true,
+    "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/script.infinity.commandcenter/media_view.py": true,
+    "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/script.infinity.commandcenter/service.py": true,
+    "repairs/dual-experience-isolation-2103420/release-authority.json": true,
+    "repairs/dual-experience-isolation-2103420/accepted-combined-release.json": true,
+    "repairs/dual-experience-isolation-2103420/release_gate.py": true,
+    "repairs/dual-experience-isolation-2103420/assemble.py": true,
+    "repairs/dual-experience-isolation-2103420/signer-policy.json": true,
+    ".github/workflows/infinity-combined-release.yml": true,
+    "repairs/infinity-native-touch-2103451-20261105/native/xbmc/input/InputManager.cpp": true,
+    "repairs/infinity-native-touch-2103451-20261105/native/xbmc/guilib/GUIBaseContainer.cpp": true,
+    "repairs/infinity-native-touch-2103451-20261105/APPLIED-SOURCE-DELTA.json": true
+  },
+  "protected_recovery_locks": {
+    "refs/heads/lock/infinity-2103399-user-approved-baseline-20261021": "e4bb09dbb951173bf99d868b2391aeafac89c03f",
+    "refs/heads/lock/infinity-2103401-signed-qa-20261024": "1738478709cd8881f7ad4a524e7abbbc82b5d79c",
+    "refs/heads/lock/infinity-2103402-five-fold-passes-20261024": "98ac3730a6e64f95f788c4b2f5e41c4f718a8e7d",
+    "refs/heads/lock/infinity-2103407-proven-passing-only-20261025": "0e8739d2d0e1be0ab8f127519b526556426fb160",
+    "refs/heads/lock/infinity-2103420-user-approved-baseline-20261026": "883c64a4de6f87077893921454de71bba850235b",
+    "refs/heads/lock/infinity-cobra-2103425-fold-approved-chooser-20261028": "db730100a3bfea7e06d2e6c3434e89aeb6fa8a15",
+    "refs/heads/lock/infinity-cobra-2103427-user-approved-20261028": "782242090483982c39a78f9c4da932a4751bdafc",
+    "refs/heads/lock/infinity-cobra-2103435-user-approved-20261031": "e0c6153588992001d84076d33fdf8f0d676c0d00",
+    "refs/heads/lock/infinity-cobra-2103436-user-approved-20261031": "7bbe08363b493146ca7ed67cb872e9a98b1d888b",
+    "refs/heads/lock/infinity-cobra-2103437-user-approved-20261031": "31d55543e3a01a37975c396c0291ff26d98cc4b8",
+    "refs/heads/lock/infinity-cobra-2103438-user-approved-pending-one-fix-20261031": "a5f721578c53e026a26cf21d929fbdad530f6d17",
+    "refs/heads/lock/infinity-cobra-2103442-user-approved-20261101": "2e88f85250ef2e46952192cf0fdb42ac5af7c9c8",
+    "refs/heads/lock/infinity-cobra-2103444-user-approved-20261101": "1b7a4ef16524854fab77a1c974538aee8a1132bb",
+    "refs/heads/lock/infinity-cobra-2103445-user-approved-20261101": "6cf75639a46ec6b0c858ae32abc102450fdc0974",
+    "refs/heads/lock/infinity-cobra-2103447-user-locked-20261102": "1fe75deaebdbf71d5873dc69ba3e21c0526954f0",
+    "refs/heads/lock/infinity-cobra-2103450-user-approved-20261102": "e0ba877193ce55e041dad63d873a95a6504a38ff",
+    "refs/heads/lock/infinity-preview-2103447-cinematic-ui-design-20261102": "25b051fc9c8614d980af92aa749b73ebd4785d12",
+    "refs/heads/lock/infinity-preview-2103450-fullscreen-display-design-20261102": "b3106c875ac5287cff5adf9e4ad924b62d8c81c8",
+    "refs/heads/lock/infinity-preview-2103451-user-frozen-20261103": "0b3450433adc3349056167a6697dae92dad63d86"
+  },
+  "no_binary_changes": true,
+  "protected_native_sha256": "9f77b092899b51850928007578e0fbf91bad38c05f147a308f3ac0cf5c036638",
+  "APK_built": false,
+  "APK_member_comparison": "NOT_RUN_FOR_NEW_CANDIDATE",
+  "installed_version": "UNVERIFIED",
+  "physical_acceptance": "NOT_ACCEPTED"
+}

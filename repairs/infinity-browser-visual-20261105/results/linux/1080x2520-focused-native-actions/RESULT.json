@@ -1,0 +1,81 @@
+{
+  "platform": "upstream Linux Kodi 21.2 + explicit responsive fixture projection",
+  "Android": "NOT_RUN",
+  "physical_Fold": "NOT_RUN",
+  "viewport": [
+    1080,
+    2520
+  ],
+  "source_sha256": "0c362f586ae34e5ebef2e35033008e47b3065a7b95bd9923ee30e1e4bd5cce9b",
+  "checks": [
+    {
+      "name": "skin-running",
+      "passed": true
+    },
+    {
+      "name": "synthetic-movies-ready",
+      "passed": true
+    },
+    {
+      "name": "original-view50",
+      "passed": true
+    },
+    {
+      "name": "selected-item:1",
+      "passed": true
+    },
+    {
+      "name": "selected-metadata",
+      "passed": true
+    },
+    {
+      "name": "play-affordance-valid",
+      "passed": true
+    },
+    {
+      "name": "trailer-affordance-valid",
+      "passed": true
+    },
+    {
+      "name": "info-affordance-valid",
+      "passed": true
+    },
+    {
+      "name": "screenshot:movies-dark",
+      "passed": true
+    },
+    {
+      "name": "screenshot:movies-light-live-switch",
+      "passed": true
+    },
+    {
+      "name": "selected-item:2",
+      "passed": true
+    },
+    {
+      "name": "missing-poster-not-directory-icon",
+      "passed": true
+    },
+    {
+      "name": "missing-trailer-action-hidden",
+      "passed": false
+    },
+    {
+      "name": "screenshot:failure",
+      "passed": true
+    }
+  ],
+  "observations": [
+    {
+      "container_width": 639,
+      "container_height": 2076,
+      "position": [
+        0,
+        0
+      ],
+      "title": "Media 01 \u2014 A longer title with readable words"
+    }
+  ],
+  "status": "FAIL",
+  "error": "Traceback (most recent call last):\n  File \"/tmp/infinity-browser-render-20261105/share/addons/script.infinitybrowserqa/entry.py\", line 70, in <module>\n    check('missing-trailer-action-hidden',wait(lambda:not xbmc.getCondVisibility('Control.IsVisible(98071)')))\n    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/tmp/infinity-browser-render-20261105/share/addons/script.infinitybrowserqa/entry.py\", line 21, in check\n    raise RuntimeError(name)\nRuntimeError: missing-trailer-action-hidden\n"
+}

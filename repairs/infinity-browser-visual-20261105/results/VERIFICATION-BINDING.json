@@ -1,0 +1,39 @@
+{
+  "status": "PASS_BOUND_CURRENT_SOURCE_AND_SELECTED_CHECK_LOGS",
+  "test_logs_sha256": {
+    "CURRENT-SOURCE-CHECKS.txt": "535a00fc7a392010cbe1cf925ea774bf30bf152a8b4e8d2f536589a40ea928fb",
+    "NAVIGATION-ENTRY-CHECKS.txt": "eaf41dbd0cf64dbba70772eb1008b108cdf6691b3409dc8ca129076cb28d3193",
+    "MYVIDEONAV-PRESERVATION-CHECK.txt": "a43dd818a5decb9707ee698a03a3fc64ca9719bed9a7588ea4fca338e6b4bd99"
+  },
+  "source_sha256": {
+    "repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/infinity_search.py": "61501614f0b49b407dea024a27d7cc6698979a8fc56aa00ec786c368b4e63a78",
+    "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/script.infinity.commandcenter/media_view.py": "41f8d561fe6dca87c69d633672ecaec4689c3f1bd153388ef6c69766e70adfe6",
+    "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/script.infinity.commandcenter/service.py": "1844b2b217ccc7f3adef4d82bc825588fb2d561a87d6447f32ebedf3295e927d",
+    "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/resources/lib/infinity_library_navigation.py": "c6689df59f2b077e9250e584d69c28ef83928d2139894c8b335837df5b2fe163",
+    "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Custom_1198_InfinityNav.xml": "0f1827f4f37aab009f8ff75fcc8267c184128b5ef35ff7847bca9dbb9efc295e",
+    "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Includes.xml": "bc9fda570aa829ae3fcd8fea5716338f4c9626937f058e1f20e336ecf1cf6836",
+    "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Includes_InfinityMediaLists.xml": "4bd1fc90636bc420ddc31f7160b47c4a12b0f675aef619ad047103c835e665b1",
+    "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Includes_InfinityVideoOptions.xml": "c2fcaba2e910fa657a4569644d8c218a739e753f141f3501ef668e36cbf30fd5",
+    "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/MyVideoNav.xml": "7df68af11f2484e9e8187aa0b689305cb2b305b6001b57ca9ca5704050dca4de",
+    "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/custom_1136_InfinityVideoViews.xml": "dc95a4f91455573737b61368022cec2a189fe5167d4e3aa13ae03f66aa4d32d7",
+    "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/custom_1137_InfinityVideoViewSettings.xml": "ac5c229d3e78d99dbc26663431dc7b17fdacde2920be2e717c6a50b0c85c748e",
+    "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/custom_1138_InfinityVideoDisableViews.xml": "84b22b790dc64b4032ae05a229b117c9dbbfde8d23b7fbbdf921cb1aece8afba",
+    "repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/default.py": "e1d98b1df8579b2dd71c59f3dbcc8cfb85c71638f195bc628833188501f8644c",
+    "repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/library_navigation.py": "c6689df59f2b077e9250e584d69c28ef83928d2139894c8b335837df5b2fe163",
+    "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Variables.xml": "9efb6dac17abb69eb1ef8cf1cebb4e1419952b459ac49df1b23751c0383519cd"
+  },
+  "source_cases": {
+    "browser": 15,
+    "navigation_entry": 15
+  },
+  "Android": "NOT_RUN",
+  "physical_Fold": "NOT_RUN",
+  "Search_required": "2 FAIL retained, not rerun or waived",
+  "signed_successor": "BLOCKED_AUTHORITY_REGISTRATION",
+  "test_source_sha256": {
+    "repairs/infinity-browser-visual-20261105/test_browser.py": "4dbcb2e2700c084a3359b052dc2b8382553e94e42eea00dc8e4a18e27836f825",
+    "repairs/infinity-browser-visual-20261105/test_navigation_entry.py": "f3c532c24939ed2110d28a9d61d89b155cd482e0d5866a6d85db9a207b840fce"
+  },
+  "reused_fixture_source_commit": "99bd0cdc1cdd4116ecc7c7445892b564144dd364",
+  "public_router_fixture_sha256": "75663777383139f32304229944595cfccd156e8b14ebd0289f2d585e6dbcadef"
+}

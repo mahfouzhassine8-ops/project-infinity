@@ -1,0 +1,121 @@
+{
+  "status": "REVIEW_PLAN_ONLY_NOT_AUTHORITY_NOT_BUILD",
+  "created_UTC": "2026-11-05T17:23:38.610085+00:00",
+  "branch": "work/infinity-browser-visual-correction-from-2103456-20261105",
+  "source_checkpoint": "Bind the exact next source commit; hashes below are current bytes.",
+  "testing_version_proposed_not_reserved": 2103458,
+  "recovery_version_proposed_not_reserved": 2103459,
+  "authority_generation_proposed": [
+    44,
+    45
+  ],
+  "permanent_original_signer_workflow_id": 397702717,
+  "original_certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "package": "com.projectinfinity.kodi",
+  "source_changes": {
+    "assets/addons/script.infinity.commandcenter/default.py": {
+      "source": "repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/default.py",
+      "signed456_sha256": "7996a2e78053359f4f8a61d29b4e277c072c0fde1990e72ef2317da048916393",
+      "candidate_sha256": "e1d98b1df8579b2dd71c59f3dbcc8cfb85c71638f195bc628833188501f8644c",
+      "bytes": 28133
+    },
+    "assets/addons/script.infinity.commandcenter/library_navigation.py": {
+      "source": "repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/library_navigation.py",
+      "signed456_sha256": null,
+      "candidate_sha256": "c6689df59f2b077e9250e584d69c28ef83928d2139894c8b335837df5b2fe163",
+      "bytes": 8209
+    },
+    "assets/addons/skin.infinity.diggz/unified/Custom_1198_InfinityNav.xml": {
+      "source": "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Custom_1198_InfinityNav.xml",
+      "signed456_sha256": "07806a3d489a7d95d953058f1da65e06f7425f25c011e14d6383806840d624aa",
+      "candidate_sha256": "0f1827f4f37aab009f8ff75fcc8267c184128b5ef35ff7847bca9dbb9efc295e",
+      "bytes": 145357
+    },
+    "assets/addons/skin.infinity.diggz/unified/Includes_InfinityMediaLists.xml": {
+      "source": "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Includes_InfinityMediaLists.xml",
+      "signed456_sha256": "860bee806464e4a4f5c4baa0ec2fdad250a40281efa257a97ddfe919e451c31f",
+      "candidate_sha256": "4bd1fc90636bc420ddc31f7160b47c4a12b0f675aef619ad047103c835e665b1",
+      "bytes": 171289
+    },
+    "assets/addons/skin.infinity.diggz/unified/MyVideoNav.xml": {
+      "source": "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/MyVideoNav.xml",
+      "signed456_sha256": "f94d0078834420c9580e1c4e6ed8ce1311550e38f32569da54a6ec16633b7f5f",
+      "candidate_sha256": "7df68af11f2484e9e8187aa0b689305cb2b305b6001b57ca9ca5704050dca4de",
+      "bytes": 99957
+    },
+    "assets/addons/skin.infinity.diggz/unified/Variables.xml": {
+      "source": "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Variables.xml",
+      "signed456_sha256": "b131f1b87517ec7260bb13b20857b0c72533e0186248df6122d4c94330ef858e",
+      "candidate_sha256": "9efb6dac17abb69eb1ef8cf1cebb4e1419952b459ac49df1b23751c0383519cd",
+      "bytes": 285041
+    }
+  },
+  "controlled_metadata_only": [
+    "AndroidManifest.xml",
+    "assets/addons/script.infinity.commandcenter/addon.xml",
+    "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1",
+    "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1.sig",
+    "assets/addons/skin.infinity.diggz/addon.xml",
+    "assets/addons/skin.infinity.diggz/infinity-skin.json",
+    "assets/addons/skin.infinity.diggz/Infinity-Protected-Manifest.json",
+    "assets/experience-component-updates.properties"
+  ],
+  "candidate_vs_signed456": {
+    "existing_payload_members_changed": 13,
+    "new_payload_members": 1,
+    "expected_protected_existing": 7608,
+    "DEX_unchanged": 5,
+    "native_libraries_unchanged": 47,
+    "native_sha256": "9f77b092899b51850928007578e0fbf91bad38c05f147a308f3ac0cf5c036638",
+    "actual_APK_comparison": "NOT_RUN_NO_SUCCESSOR"
+  },
+  "module_generations_proposed": {
+    "testing": {
+      "CC": "0.3.5.59",
+      "skin": "1.0.5.256",
+      "CC_signed_source_count_expected": 78,
+      "skin_protected_count_expected": 948
+    },
+    "recovery": {
+      "CC": "0.3.5.60",
+      "skin": "1.0.5.257",
+      "CC_signed_source_count_expected": 76,
+      "skin_protected_count_expected": 942
+    }
+  },
+  "forward_recovery": {
+    "restore_functional_source": "0b3450433adc3349056167a6697dae92dad63d86",
+    "restore_signed_APK_SHA256": "d77c31c458c4571212022bea7cea1e76c1d415cd5792b780b3c655fba97c6399",
+    "native_sha256": "151128c176b6094f28bb3fc716cc07c3985a9aa38f1fe41e1bb1424f0285a47e",
+    "version": "2103459 > proposed testing2103458; existing457 cannot serve as install-over recovery",
+    "requirements": [
+      "Advance authenticated module/skin generations using original key and original installer.",
+      "Prove retained media_view.py and library_navigation.py are denied by restored manifest; old skin routes cannot automatically enter retained candidate files/dialogs.",
+      "Run original-signature and exact-source/member gates; verify installer interruption/retry/downgrade refusal on disposable host adapters.",
+      "No user-data deletion, downgrade installation, forced shutdown or automatic installation. Actual Android/Fold recovery stays NOT RUN until executed."
+    ],
+    "signed_recovery_exists": false
+  },
+  "mandatory_before_keys": [
+    "Review exact branch/version/source/member successor registration through the existing sole signer.",
+    "Recheck availability against current official issuer history and refs.",
+    "Verify original bootstrap, installer, native module authentication and owner-specific security gates unchanged.",
+    "Compare candidate against actual signed456 and frozen451; reject every other byte/member difference.",
+    "Original-key authenticate all new module/skin source metadata and verify full original-certificate install-over compatibility.",
+    "Produce and verify signed higher-version recovery before recommending installation."
+  ],
+  "not_authorized_by_this_plan": [
+    "No change to signer identity, protected behavior, user data or accepted/recovery lock pointers.",
+    "No automatic install, acceptance, promotion or lock."
+  ],
+  "known_unresolved": [
+    "Search required2FAIL",
+    "Crew device rejection un-attributed",
+    "canonicalPNG and brokenLightJPEG unavailable",
+    "universal multi-view visual/physical acceptance incomplete",
+    "phone Favorites data unavailable",
+    "Android/Fold NOT_RUN",
+    "device-installed version UNVERIFIED",
+    "Scudo not addressed"
+  ]
+}

@@ -617,6 +617,7 @@
             </control>
             <control type="group">
               <visible>[Control.IsVisible(50) | Control.IsVisible(65050) | Control.IsVisible(65051) | Control.IsVisible(65052)] | Control.IsVisible(55) | Control.IsVisible(56) | Control.IsVisible(57) | [Control.IsVisible(58)] | Control.IsVisible(500) | Control.IsVisible(506) | Control.IsVisible(509) | Control.IsVisible(591) | Control.IsVisible(602) | Control.IsVisible(507)</visible>
+              <visible>![Control.IsVisible(50) + !String.IsEqual(Skin.String(Infinity.HomeView),cinema) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos) | Container.Content(videos)]]</visible>
               <include>ViewAnimation</include>
               <top>91.3514%</top>
               <height>90</height>
@@ -1020,6 +1021,7 @@
             <animation effect="slide" end="-1152.5" condition="Control.IsVisible(591)">Conditional</animation>
             <control type="grouplist">
               <visible>[Control.IsVisible(50) | Control.IsVisible(65050) | Control.IsVisible(65051) | Control.IsVisible(65052)] | Control.IsVisible(55) | Control.IsVisible(56) | Control.IsVisible(57) | [Control.IsVisible(58) + Skin.HasSetting(Disable.BannerWallInfo)] | Control.IsVisible(500) | [Control.IsVisible(506) + Container.Content(movies) + !Skin.HasSetting(Disable.RightList.Mediaflags)] | [Control.IsVisible(506) + Container.Content(sets) + !Skin.HasSetting(Disable.RightList.SetMediaflags)] | Control.IsVisible(509) | Control.IsVisible(591) | Control.IsVisible(602)</visible>
+              <visible>![Control.IsVisible(50) + !String.IsEqual(Skin.String(Infinity.HomeView),cinema) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos) | Container.Content(videos)]]</visible>
               <left>3.125%</left>
               <top>91.3514%</top>
               <height>90</height>
@@ -1309,10 +1311,11 @@
         <imagepath background="true">$VAR[GlobalBackgroundVar]</imagepath>
       </control>
     </control>
+    <include content="InfinityMedia_TouchGuide" />
     <control type="button" id="8">
       <include>HiddenObject</include>
     </control>
-    <include condition="!String.IsEqual(Skin.String(Infinity.HomeView),cinema) + String.IsEmpty(Container.PluginName)">FloorReturnButtons</include>
+    <control type="group"><visible>![Control.IsVisible(50) + !String.IsEqual(Skin.String(Infinity.HomeView),cinema) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos) | Container.Content(videos)]]</visible><include condition="!String.IsEqual(Skin.String(Infinity.HomeView),cinema) + String.IsEmpty(Container.PluginName)">FloorReturnButtons</include></control>
     <include condition="String.IsEqual(Skin.String(Infinity.HomeView),cinema) + [true]">InfinityCinemaBrowseFooter</include>
   </controls>
 </window>
