@@ -1,0 +1,35 @@
+{
+  "artifact_id": 13393888704,
+  "run": 41981486304,
+  "source_commit": "6c0453ce2f87bacefc08712db927c859c88b9ede",
+  "archive_bytes": 423100,
+  "archive_sha256": "b471d1648129f20f0e961bb2fd0e91cf24a29e8e1271e5fab1aa1ee130f31b37",
+  "CRC_verified": true,
+  "full_native9411_map_verified": true,
+  "changed_native_files": [
+    "xbmc/guilib/GUIBaseContainer.cpp",
+    "xbmc/input/InputManager.cpp"
+  ],
+  "protected_native_source_count": 9409,
+  "selected_actual_sources_match_reviewed_hashes": true,
+  "native_engine_linked": false,
+  "APK_built": false,
+  "signing": false,
+  "Android_runtime": "NOT_RUN",
+  "artifact_members": [
+    "AUTHENTICATED-INPUTS.json",
+    "COMPILE-RESULT.json",
+    "NATIVE-SOURCE-MAP.json",
+    "PREREQUISITE-TARGETS.json",
+    "SELECTED-COMPILE-COMMANDS.json",
+    "SOURCE-BINDING.json",
+    "configure-only.sh"
+  ],
+  "current_configure_recipe_matches_compiled_run": true,
+  "original_CMake_prerequisites": [
+    "crossguid",
+    "libandroidjni",
+    "spdlog"
+  ],
+  "current_native_source_bytes_match_compile_run": true
+}
