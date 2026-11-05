@@ -1,0 +1,17 @@
+test_before_reports_original_touch_gaps (test_gesture_integration.GestureIntegration.test_before_reports_original_touch_gaps) ... FAIL
+test_exact_candidate_method_dispatcher_and_negative_cases (test_gesture_integration.GestureIntegration.test_exact_candidate_method_dispatcher_and_negative_cases) ... ok
+
+======================================================================
+FAIL: test_before_reports_original_touch_gaps (test_gesture_integration.GestureIntegration.test_before_reports_original_touch_gaps)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-native-touch-candidate/repairs/infinity-native-touch-2103451-20261105/test_gesture_integration.py", line 44, in test_before_reports_original_touch_gaps
+    self.assertIn('FAIL untyped provider first tap selects only',result.stdout)
+AssertionError: 'FAIL untyped provider first tap selects only' not found in ''
+
+----------------------------------------------------------------------
+Ran 2 tests in 2.180s
+
+FAILED (failures=1)
+BEFORE: 
+AFTER: 59 host assertions, 0 failing; mocked UI boundaries, Android NOT RUN.

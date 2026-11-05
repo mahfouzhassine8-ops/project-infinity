@@ -81,24 +81,61 @@ def restore():
     save('NATIVE-SOURCE-MAP.json',actual)
     save('SOURCE-BINDING.json',dict(reference=2103451,full_baseline_match_before_patch=True,reviewed_source_count=len(actual),changed_files=sorted(delta),protected_native_source_count=len(actual)-len(delta),patch_sha256=PATCH_SHA,baseline_source_map_sha256=MAP_SHA,source_commit=os.environ.get('GITHUB_SHA'),APK_built=False,signing=False))
 
-def compile_objects():
-    expected=json.loads((OUT/'NATIVE-SOURCE-MAP.json').read_text());native=ROOT/'kodi'
-    assert hashes(native)==expected
-    subprocess.run(['python3','repairs/android-checkpoint-shutdown/native_ci.py','verify-dependencies'],cwd=ROOT,check=True)
-    original=(ROOT/'scripts/infinity_live_app_ci_2.sh').read_text()
+def configure_script(original):
     old='python3 scripts/infinity_gui_render_hardening_v3.py apply --source kodi --receipt engine/gui-render-hardening-source.json'
     assert original.count(old)==1
     stage=original.replace(old,'python3 scripts/infinity_gui_render_hardening_v3.py verify --source kodi')
     start=stage.index('rm -f "$TARBALLS/fontconfig-2.14.0.tar.xz"')
     end=stage.index('make -C target/cmakebuildsys BUILD_DIR="$BUILD_DIR"',start)
     stage=stage[:start]+stage[end:]
-    stop='make -C "$BUILD_DIR" -j"$(nproc)"'
+    # This inherited precheck builds platform targets and finally all of kodi.
+    # Stop BEFORE it, not merely before the later explicit full-build command.
+    stop='python3 scripts/infinity71.py native-check --build-dir "$BUILD_DIR"'
     assert stage.count(stop)==1
     stage=stage[:stage.index(stop)]
-    assert ' apk ' not in stage and 'apksigner' not in stage
+    assert ' apk ' not in stage and 'apksigner' not in stage and 'native-check' not in stage
+    assert 'make -C "$BUILD_DIR"' not in stage
+    return stage
+
+def prerequisite_plan(targets,native):
+    # These are existing original CMake-owned header/library prerequisites, not
+    # application targets. Never use kodi/platform/guilib as a shortcut.
+    wanted={'fmt','crossguid','libandroidjni','spdlog'}
+    by_id={t['id']:t for t in targets}
+    selected=[t for t in targets if t['name'] in wanted]
+    visited=set()
+    def check(t):
+        if t['id'] in visited:return
+        visited.add(t['id'])
+        assert t['name'] not in {'kodi','libkodi','generate-packaging','export-files','gen_skin_pack','gen_system_addons'}
+        assert t['type'] in {'UTILITY','STATIC_LIBRARY','INTERFACE_LIBRARY','OBJECT_LIBRARY'}
+        for source in t.get('sources',[]):
+            path=Path(source['path']);path=path if path.is_absolute() else native/path
+            assert not path.resolve().is_relative_to((native/'xbmc').resolve()),'Unselected Kodi source prerequisite: '+str(path)
+        for row in t.get('dependencies',[]):check(by_id[row['id']])
+    for t in selected:check(t)
+    return sorted(t['name'] for t in selected)
+
+def compile_objects():
+    expected=json.loads((OUT/'NATIVE-SOURCE-MAP.json').read_text());native=ROOT/'kodi'
+    assert hashes(native)==expected
+    subprocess.run(['python3','repairs/android-checkpoint-shutdown/native_ci.py','verify-dependencies'],cwd=ROOT,check=True)
+    original=(ROOT/'scripts/infinity_live_app_ci_2.sh').read_text()
+    stage=configure_script(original)
+    build=Path(os.environ['BUILD_DIR'])
+    query=build/'.cmake/api/v1/query';query.mkdir(parents=True)
+    (query/'codemodel-v2').touch()
     script=OUT/'configure-only.sh';script.write_text(stage)
     subprocess.run(['bash',str(script)],cwd=ROOT,check=True)
-    build=Path(os.environ['BUILD_DIR'])
+    reply=build/'.cmake/api/v1/reply'
+    models=list(reply.glob('codemodel-v2-*.json'));assert len(models)==1
+    model=json.loads(models[0].read_text());assert len(model['configurations'])==1
+    targets=[json.loads((reply/row['jsonFile']).read_text()) for row in model['configurations'][0]['targets']]
+    plan=prerequisite_plan(targets,native)
+    save('PREREQUISITE-TARGETS.json',dict(original_CMake_targets=plan,application_targets_allowed=False))
+    cache={line.split('=',1)[0]:line.split('=',1)[1] for line in (build/'CMakeCache.txt').read_text().splitlines() if '=' in line}
+    cmake=cache['CMAKE_COMMAND:INTERNAL']
+    if plan:subprocess.run([cmake,'--build',str(build),'--target',*plan,'--parallel','2'],check=True)
     commands=json.loads((build/'compile_commands.json').read_text())
     wanted={'xbmc/guilib/GUIBaseContainer.cpp','xbmc/input/InputManager.cpp'}
     selected=[]
@@ -110,7 +147,7 @@ def compile_objects():
     objects={}
     for row in selected:
         args=row.get('arguments') or shlex.split(row['command'])
-        assert '-c' in args and '-o' in args and '-DTARGET_ANDROID' in args
+        assert '-c' in args and '-o' in args and any(a=='-DTARGET_ANDROID' or a.startswith('-DTARGET_ANDROID=') for a in args)
         subprocess.run(args,cwd=row['directory'],check=True)
         output=Path(args[args.index('-o')+1]);output=output if output.is_absolute() else Path(row['directory'])/output
         header=subprocess.check_output([str(readelf),'-h',str(output)],text=True)

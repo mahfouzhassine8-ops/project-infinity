@@ -1,0 +1,10 @@
+First run 41979324652: CANCELLED, not a compile-only PASS.
+Source commit 3db89891753ab018d66c1a423f05e2ca48946fe0.
+The inherited native-check invoked broad targets. Cancelled upon source review.
+No APK/signing/application step was present. No final engine/object preservation conclusion is inferred from the cancelled run.
+2026-11-05T06:19:11.6391193Z Native compiler gate with dependencies: platform_android_activity
+2026-11-05T06:20:20.1606344Z Native compiler gate with dependencies: windowing_android
+2026-11-05T06:20:24.8131539Z Native compiler gate with dependencies: kodi
+2026-11-05T06:22:55.0162899Z [ 28%] Building CXX object build/input/CMakeFiles/input.dir/InputManager.cpp.o
+2026-11-05T06:28:54.4035839Z [ 67%] Building CXX object build/guilib/CMakeFiles/guilib.dir/GUIBaseContainer.cpp.o
+2026-11-05T06:31:50.9753618Z ##[error]The operation was canceled.

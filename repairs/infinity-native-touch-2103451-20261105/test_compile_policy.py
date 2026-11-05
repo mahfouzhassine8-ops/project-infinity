@@ -11,6 +11,23 @@ import compile_only as candidate
 
 
 class CompilePolicy(unittest.TestCase):
+    def test_configuration_recipe_has_no_broad_native_precheck_or_build(self):
+        original=candidate.subprocess.check_output(['git','show','HEAD:scripts/infinity_live_app_ci_2.sh'],cwd=candidate.ROOT,text=True)
+        if hasattr(candidate,'configure_script'):
+            stage=candidate.configure_script(original)
+        else:
+            # The first job used this exact inherited slicing sequence.
+            old='python3 scripts/infinity_gui_render_hardening_v3.py apply --source kodi --receipt engine/gui-render-hardening-source.json'
+            stage=original.replace(old,'python3 scripts/infinity_gui_render_hardening_v3.py verify --source kodi')
+            start=stage.index('rm -f "$TARBALLS/fontconfig-2.14.0.tar.xz"')
+            end=stage.index('make -C target/cmakebuildsys BUILD_DIR="$BUILD_DIR"',start)
+            stage=stage[:start]+stage[end:]
+            stage=stage[:stage.index('make -C "$BUILD_DIR" -j"$(nproc)"')]
+        self.assertNotIn('native-check',stage)
+        self.assertNotIn('make -C "$BUILD_DIR"',stage)
+        self.assertNotIn(' apk ',stage)
+        self.assertIn('-DCMAKE_EXPORT_COMPILE_COMMANDS=ON',stage)
+
     def test_wrong_repository_or_branch_stops_before_network_and_restore(self):
         for repo,branch in [('other/repo','refs/heads/'+candidate.BRANCH),
                             ('mahfouzhassine8-ops/project-infinity','refs/heads/main')]:
@@ -29,11 +46,23 @@ class CompilePolicy(unittest.TestCase):
         module=ast.parse(raw)
         function=next(n for n in module.body if isinstance(n,ast.FunctionDef) and n.name=='compile_objects')
         body=ast.get_source_segment(raw,function)
-        self.assertIn("stage=stage[:stage.index(stop)]",body)
+        self.assertIn("stage=configure_script(original)",body)
         self.assertIn("assert len(selected)==2",body)
         self.assertIn("'AArch64' in header",body)
         self.assertIn("assert all(actual.get(n)==h for n,h in expected.items())",body)
         self.assertNotIn('compile_engine(',body)
+
+    def test_prerequisites_are_original_external_targets_without_Kodi_source(self):
+        native=Path('/isolated/kodi')
+        targets=[dict(id='fmt',name='fmt',type='UTILITY'),
+                 dict(id='jni',name='libandroidjni',type='UTILITY',dependencies=[{'id':'fmt'}]),
+                 dict(id='kodi',name='kodi',type='SHARED_LIBRARY',sources=[{'path':'xbmc/Application.cpp'}])]
+        self.assertEqual(candidate.prerequisite_plan(targets,native),['fmt','libandroidjni'])
+        targets[1]['dependencies'].append({'id':'kodi'})
+        with self.assertRaises(AssertionError):candidate.prerequisite_plan(targets,native)
+        targets[1]['dependencies']=[{'id':'fmt'}]
+        targets[0]['sources']=[{'path':'xbmc/guilib/Unselected.cpp'}]
+        with self.assertRaises(AssertionError):candidate.prerequisite_plan(targets,native)
 
     def test_exact_reviewed_patch_and_after_bytes_are_fixed(self):
         receipt=json.loads((candidate.HERE/'APPLIED-SOURCE-DELTA.json').read_text())

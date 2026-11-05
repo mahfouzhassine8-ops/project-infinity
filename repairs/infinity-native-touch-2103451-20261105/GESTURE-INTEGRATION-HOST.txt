@@ -1,0 +1,39 @@
+test_before_reports_original_touch_gaps (test_gesture_integration.GestureIntegration.test_before_reports_original_touch_gaps) ... ok
+test_exact_candidate_method_dispatcher_and_negative_cases (test_gesture_integration.GestureIntegration.test_exact_candidate_method_dispatcher_and_negative_cases) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 2.182s
+
+OK
+BEFORE: FAIL untyped provider first tap selects only
+FAIL untyped provider second tap activates once
+FAIL original selected provider route retained
+FAIL typed immediate second tap activates without arbitrary lower time bound
+FAIL typed immediate second tap activates without arbitrary lower time bound
+FAIL typed immediate second tap activates without arbitrary lower time bound
+FAIL typed immediate second tap activates without arbitrary lower time bound
+FAIL arm row0
+FAIL different row needs fresh first tap
+FAIL second tap activates actual new row
+FAIL native Favorites first tap
+FAIL native Favorites second tap
+FAIL Home Favorite first tap
+FAIL Home Favorite second tap
+FAIL Home Favorite first tap
+FAIL Home Favorite second tap
+FAIL Home Favorite first tap
+FAIL Home Favorite second tap
+FAIL Home Favorite first tap
+FAIL Home Favorite second tap
+FAIL local folder first tap
+FAIL local folder second tap
+FAIL untyped hold opens native context once
+FAIL hold release never activates
+FAIL transformed coordinates select actual hit row
+FAIL transformed second tap activates same hit row
+FAIL actual pre-hover dispatcher first tap consumes
+FAIL actual dispatcher second tap activates once
+FAIL actual dispatcher admits active native Favorites view
+FAIL actual dispatcher admits Home Favorites
+59 host assertions, 30 failing; mocked UI boundaries, Android NOT RUN.
+AFTER: 59 host assertions, 0 failing; mocked UI boundaries, Android NOT RUN.
