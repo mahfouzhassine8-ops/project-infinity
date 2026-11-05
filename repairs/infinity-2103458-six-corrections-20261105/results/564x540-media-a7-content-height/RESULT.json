@@ -1,0 +1,226 @@
+{
+  "platform": "upstream Linux Kodi; explicit responsive projection",
+  "Android": "NOT_RUN",
+  "physical_Fold": "NOT_RUN",
+  "source_hashes": {
+    "Info": "dfcf1942c87745a9bca6eacd7194c22ccde78176a901c524cae876d82f3ef8c1",
+    "List": "3cb1a97ad96ce558e361b6ea5c8c05256cf84b439023d98834031a1c2f33024c",
+    "genre_presentation": "0110de2cdc4c8295fdb314df221385f356e0ed0247547cf49c16a4dff2a6b54c",
+    "Variables": "764c81548d1213b18487a65613d5fa8a427d39781cff626c0e0512b4011078b8",
+    "media_probe.py": "1e3211668351eb8c8179af0f78742ce857a7939b350497f209bbbc73c803bbe1",
+    "media_fixture.py": "62ae3421abb9f80ada6ca0af76feffa8a9a9f307be730b92d8169b10d50ac36f",
+    "probe.py": "24307d237eeabb92bc5ebd1f22a5aedd326526741da90ef1f3520ab5f4cc48a0"
+  },
+  "checks": [
+    {
+      "name": "skin-ready",
+      "passed": true
+    },
+    {
+      "name": "movies-directory",
+      "passed": true
+    },
+    {
+      "name": "movies-selection",
+      "passed": true
+    },
+    {
+      "name": "movies-list-dark-capture",
+      "passed": true
+    },
+    {
+      "name": "movies-list-light-capture",
+      "passed": true
+    },
+    {
+      "name": "movies-existing-scrollbar-focus",
+      "passed": true
+    },
+    {
+      "name": "movies-existing-scrollbar-moves",
+      "passed": true
+    },
+    {
+      "name": "movies-scroll-preserves-item",
+      "passed": true
+    },
+    {
+      "name": "movies-details-scrollbar-light-capture",
+      "passed": true
+    },
+    {
+      "name": "movies-native-info",
+      "passed": true
+    },
+    {
+      "name": "movies-info-dark-capture",
+      "passed": true
+    },
+    {
+      "name": "movies-info-light-capture",
+      "passed": true
+    },
+    {
+      "name": "movies-cast-visible",
+      "passed": true
+    },
+    {
+      "name": "movies-cast-light-capture",
+      "passed": true
+    },
+    {
+      "name": "movies-native-back",
+      "passed": true
+    },
+    {
+      "name": "movies-selection-restored",
+      "passed": true
+    },
+    {
+      "name": "tvshows-directory",
+      "passed": true
+    },
+    {
+      "name": "tvshows-selection",
+      "passed": true
+    },
+    {
+      "name": "tvshows-list-dark-capture",
+      "passed": true
+    },
+    {
+      "name": "tvshows-list-light-capture",
+      "passed": true
+    },
+    {
+      "name": "tvshows-existing-scrollbar-focus",
+      "passed": true
+    },
+    {
+      "name": "tvshows-existing-scrollbar-moves",
+      "passed": true
+    },
+    {
+      "name": "tvshows-scroll-preserves-item",
+      "passed": true
+    },
+    {
+      "name": "tvshows-details-scrollbar-light-capture",
+      "passed": true
+    },
+    {
+      "name": "tvshows-native-info",
+      "passed": true
+    },
+    {
+      "name": "tvshows-info-dark-capture",
+      "passed": true
+    },
+    {
+      "name": "tvshows-info-light-capture",
+      "passed": true
+    },
+    {
+      "name": "tvshows-cast-visible",
+      "passed": true
+    },
+    {
+      "name": "tvshows-cast-light-capture",
+      "passed": true
+    },
+    {
+      "name": "tvshows-native-back",
+      "passed": true
+    },
+    {
+      "name": "tvshows-selection-restored",
+      "passed": true
+    },
+    {
+      "name": "seasons-directory",
+      "passed": true
+    },
+    {
+      "name": "seasons-selection",
+      "passed": true
+    },
+    {
+      "name": "seasons-list-dark-capture",
+      "passed": true
+    },
+    {
+      "name": "seasons-list-light-capture",
+      "passed": true
+    },
+    {
+      "name": "seasons-existing-scrollbar-focus",
+      "passed": true
+    },
+    {
+      "name": "seasons-existing-scrollbar-moves",
+      "passed": true
+    },
+    {
+      "name": "seasons-scroll-preserves-item",
+      "passed": false
+    }
+  ],
+  "observations": [
+    {
+      "kind": "movies",
+      "DBType": "movie",
+      "plot_present": true,
+      "thumb_present": false,
+      "poster_present": true,
+      "season_poster_present": false
+    },
+    {
+      "kind": "movies",
+      "endpoint_HasNext": true,
+      "endpoint_focus": 50,
+      "endpoint_visual_check": "PENDING_SCREENSHOT_REVIEW"
+    },
+    {
+      "kind": "movies",
+      "cast_count": "3"
+    },
+    {
+      "kind": "tvshows",
+      "DBType": "tvshow",
+      "plot_present": true,
+      "thumb_present": false,
+      "poster_present": true,
+      "season_poster_present": false
+    },
+    {
+      "kind": "tvshows",
+      "endpoint_HasNext": true,
+      "endpoint_focus": 50,
+      "endpoint_visual_check": "PENDING_SCREENSHOT_REVIEW"
+    },
+    {
+      "kind": "tvshows",
+      "cast_count": "3"
+    },
+    {
+      "kind": "seasons",
+      "DBType": "season",
+      "plot_present": true,
+      "thumb_present": false,
+      "poster_present": false,
+      "season_poster_present": true
+    },
+    {
+      "kind": "seasons",
+      "endpoint_HasNext": true,
+      "endpoint_focus": 50,
+      "endpoint_visual_check": "PENDING_SCREENSHOT_REVIEW"
+    }
+  ],
+  "known_behavior_failures": [
+    "action-Up points to nonfocusable textbox98064",
+    "Info Back10/native GetThumb conflict; proposal not applied"
+  ],
+  "status": "FAIL",
+  "error": "Traceback (most recent call last):\n  File \"/tmp/infinity-browser-render-20261105/share/addons/script.infinitybrowserqa/entry.py\", line 48, in <module>\n    check(kind+'-scroll-preserves-item',xbmc.getInfoLabel('Container(50).ListItem.Label').startswith('Media 01'))\n    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/tmp/infinity-browser-render-20261105/share/addons/script.infinitybrowserqa/entry.py\", line 16, in check\n    if not ok:raise RuntimeError(name)\n              ^^^^^^^^^^^^^^^^^^^^^^^^\nRuntimeError: seasons-scroll-preserves-item\n"
+}

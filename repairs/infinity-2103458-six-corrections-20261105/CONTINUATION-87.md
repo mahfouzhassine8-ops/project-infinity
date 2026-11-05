@@ -43,3 +43,7 @@ Source guard passes: only the three listed runtime files plus scoped review/test
 Before packaging: complete or explicitly disposition the open functional/visual requirements, obtain current runtime identity and real Search evidence, separately approve any Back/Trailer or Downloads behavioral change, then perform full signed-payload preservation, version, signer and forward-recovery gates. Nothing in this report authorizes packaging or marks the six-group correction complete.
 
 The exact successful47-check probe is retained as media_probe.scrollbar-verified.py (SHA8c8140675e0e69aad0ae98df6a555e71012fd79bb348a3136e46c1071975949e). The current media_probe.py retains the additional failing endpoint assertion for investigation; it must not be mistaken for the earlier passing probe. No failed assertion was removed from its evidence.
+
+## Next source continuation
+
+See [continuation-a7/REPORT.md](continuation-a7/REPORT.md) for the current candidate, source-bound visuals, failed evidence, two unapplied behavior proposals and remaining Android gates. This report above remains historical.

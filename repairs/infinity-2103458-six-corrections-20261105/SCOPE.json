@@ -8,11 +8,11 @@
     },
     "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/DialogVideoInfo.xml": {
       "before_sha256": "39bb6ad5c0b7c5a75da697e139b5c8b20622d94a63de17f041150d207d2650fb",
-      "allowed_behavior": "Info-only Back/header width and position, matching existing loading frame geometry, keep-scaled poster/cast artwork; preserve every action, visibility, enablement, labels, metadata, theme bindings and IDs. Existing action group/button geometry only to prevent narrow-window label clipping; preserve IDs/native mappings including reported unresolved ID10 collision. Info artwork binds to existing-system variable with episode thumbnail fallback; use existing rim as native image border, aligned top, instead of independent tall rim; no action/ID/metadata changes."
+      "allowed_behavior": "Info-only Back/header width and position, matching existing loading frame geometry, keep-scaled poster/cast artwork; preserve every action, visibility, enablement, labels, metadata, theme bindings and IDs. Existing action group/button geometry only to prevent narrow-window label clipping; preserve IDs/native mappings including reported unresolved ID10 collision. Info artwork binds to existing-system variable with episode thumbnail fallback; use existing rim as native image border, aligned top, instead of independent tall rim; no action/ID/metadata changes. a7 continuation: native label scrolling for existing metadata/cast labels, wider existing cast cards, synopsis height within existing unused vertical space; no action or control-type changes."
     },
     "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Includes_InfinityMediaLists.xml": {
       "before_sha256": "4a41c95b6c08d2f08b9d459263f5aea949a406131c2f6fbfbc6f5f4faed1fccc",
-      "allowed_behavior": "Existing selected media artwork: permit real episode thumbnail only after existing poster priority; corresponding image visibility. Add Info-only artwork variable with same episode fallback and existing PosterThumb otherwise. No actions/control IDs/layout/provider/touch changes. Thumbnail-only episode image uses mutually exclusive216-logical-pixel frame; original poster frame unchanged."
+      "allowed_behavior": "Existing selected media artwork: permit real episode thumbnail only after existing poster priority; corresponding image visibility. Add Info-only artwork variable with same episode fallback and existing PosterThumb otherwise. No actions/control IDs/layout/provider/touch changes. Thumbnail-only episode image uses mutually exclusive216-logical-pixel frame; original poster frame unchanged. a7 continuation: synopsis top0/max0 auto-height uses native content extent within existing scroll group; preserves every input route and metadata value."
     },
     "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Variables.xml": {
       "before_sha256": "9efb6dac17abb69eb1ef8cf1cebb4e1419952b459ac49df1b23751c0383519cd",
@@ -44,7 +44,12 @@
     "Season synopsis fallback: signed458 byte binding, exact one-value addition, Videos/seasons-only and existing collection/show-plot precedence; actual season Light/Dark rendering with supplied item plot",
     "Short-window selected-details reachability via existing focus target98064; capture scrolled synopsis without altering layout/actions or invoking playback",
     "Retain failed textbox focus cases; independently test existing scrollbar98066 and group98060 HasNext/HasPrevious native scroll with synthetic metadata",
-    "Selected synopsis extent: before/after retained text/IDs/actions and existing auto-height bound; short-window existing scrollbar exposes full synthetic synopsis endpoint"
+    "Selected synopsis extent: before/after retained text/IDs/actions and existing auto-height bound; short-window existing scrollbar exposes full synthetic synopsis endpoint",
+    "a7 continuation: existing synopsis native auto-height0 and integer scrollbar endpoint source proof; before/after XML-only bound and metadata/actions/IDs invariant tests; short-window final synopsis screenshot using bounded existing Down input and retained old HasNext assertion as observation, not PASS",
+    "a7 continuation: Info label overflow using existing native label scrolling, cast card width and available synopsis height; focused source geometry checks and Light/Dark native Info/Cast screenshot inspection at cover/inner portrait/landscape; no playback",
+    "a7 continuation: inert Details Up target proposal replacing only three onup98064 references with existing scrollbar98066; reverse-byte and focusability checks, no application",
+    "a7 continuation: read-only view-registration inventory and Search worker/cancellation lifetimes against unchanged signed source; no simulated stress rerun",
+    "a7 synopsis negative cases: select existing synthetic short and empty plot rows through native SetFocus; inspect Light/Dark and preserve labels/actions with no playback/provider call"
   ],
   "release_blocked_until": [
     "Six-group correctness and precise full payload allowlist verified",

@@ -1,0 +1,144 @@
+{
+  "platform": "upstream Linux Kodi; explicit responsive projection",
+  "Android": "NOT_RUN",
+  "physical_Fold": "NOT_RUN",
+  "source_hashes": {
+    "Info": "dfcf1942c87745a9bca6eacd7194c22ccde78176a901c524cae876d82f3ef8c1",
+    "List": "3cb1a97ad96ce558e361b6ea5c8c05256cf84b439023d98834031a1c2f33024c",
+    "genre_presentation": "0110de2cdc4c8295fdb314df221385f356e0ed0247547cf49c16a4dff2a6b54c",
+    "Variables": "764c81548d1213b18487a65613d5fa8a427d39781cff626c0e0512b4011078b8",
+    "media_probe.py": "1e3211668351eb8c8179af0f78742ce857a7939b350497f209bbbc73c803bbe1",
+    "media_fixture.py": "62ae3421abb9f80ada6ca0af76feffa8a9a9f307be730b92d8169b10d50ac36f",
+    "probe.py": "730738b5099d8c878d1c0b5594937f3b2910a1063970fd200a0d1d70965605d7",
+    "fixture_negative.py": "ea3b29368ae17a6c28b31398703cb184198834493b0c08e681b7aaeca5280bbc"
+  },
+  "checks": [
+    {
+      "name": "skin-ready",
+      "passed": true
+    },
+    {
+      "name": "movies-directory",
+      "passed": true
+    },
+    {
+      "name": "movies-selection",
+      "passed": true
+    },
+    {
+      "name": "movies-list-dark-capture",
+      "passed": true
+    },
+    {
+      "name": "movies-list-light-capture",
+      "passed": true
+    },
+    {
+      "name": "movies-existing-scrollbar-focus",
+      "passed": true
+    },
+    {
+      "name": "movies-existing-scrollbar-moves",
+      "passed": true
+    },
+    {
+      "name": "movies-endpoint-before-selection-check-capture",
+      "passed": true
+    },
+    {
+      "name": "movies-scroll-preserves-item",
+      "passed": true
+    },
+    {
+      "name": "movies-details-scrollbar-light-capture",
+      "passed": true
+    },
+    {
+      "name": "movies-native-info",
+      "passed": true
+    },
+    {
+      "name": "movies-info-dark-capture",
+      "passed": true
+    },
+    {
+      "name": "movies-info-light-capture",
+      "passed": true
+    },
+    {
+      "name": "movies-cast-visible",
+      "passed": true
+    },
+    {
+      "name": "movies-cast-light-capture",
+      "passed": true
+    },
+    {
+      "name": "movies-native-back",
+      "passed": true
+    },
+    {
+      "name": "movies-selection-restored",
+      "passed": true
+    },
+    {
+      "name": "negative-2-selection",
+      "passed": true
+    },
+    {
+      "name": "negative-2-plot",
+      "passed": true
+    },
+    {
+      "name": "negative-2-dark-capture",
+      "passed": true
+    },
+    {
+      "name": "negative-2-light-capture",
+      "passed": true
+    },
+    {
+      "name": "negative-3-selection",
+      "passed": true
+    },
+    {
+      "name": "negative-3-plot",
+      "passed": true
+    },
+    {
+      "name": "negative-3-dark-capture",
+      "passed": true
+    },
+    {
+      "name": "negative-3-light-capture",
+      "passed": true
+    }
+  ],
+  "observations": [
+    {
+      "kind": "movies",
+      "DBType": "movie",
+      "plot_present": true,
+      "thumb_present": false,
+      "poster_present": true,
+      "season_poster_present": false
+    },
+    {
+      "kind": "movies",
+      "endpoint_HasNext": true,
+      "endpoint_focus": 50,
+      "endpoint_selected": "Media 01 \u2014 movies fixture with a readable long title",
+      "endpoint_visual_check": "PENDING_SCREENSHOT_REVIEW"
+    },
+    {
+      "kind": "movies",
+      "cast_count": "3"
+    }
+  ],
+  "known_behavior_failures": [
+    "action-Up points to nonfocusable textbox98064",
+    "Info Back10/native GetThumb conflict; proposal not applied"
+  ],
+  "status": "PASS_SELECTED_SYNTHETIC_CONTENT_RENDER_AND_NATIVE_BACK",
+  "visual_acceptance": "PENDING_IMAGE_REVIEW_NOT_PHYSICAL_ACCEPTANCE"
+}

@@ -1,0 +1,53 @@
+{
+  "review": "Actual Linux screenshot visual inspection; not Android/Fold or pixel-equivalence acceptance",
+  "images": [
+    {
+      "path": "results/564x540-media-a7-content-height/movies-details-scrollbar-light.png",
+      "sha256": "3ee90789ae962d1110492e61377e859d7a9760b1cf7e83b111bb502daac7cf0b"
+    },
+    {
+      "path": "results/564x540-media-a7-content-height/movies-cast-light.png",
+      "sha256": "fda1673ad64bf741aa6bdfd9ce421544abdd3f531e2cff64fa4a62c161889d3b"
+    },
+    {
+      "path": "results/564x540-media-a7-sequence-after/episodes-list-light.png",
+      "sha256": "c0e59589a857057d217cd4b1386793a776e52e5885a537c8868d6503855f732e"
+    },
+    {
+      "path": "results/564x540-media-a7-sequence-after/seasons-details-scrollbar-light.png",
+      "sha256": "dcfffca5727a1af047aa82dcaa5ef5d58e47c9dbb28019dc4a503f389cbbdacc"
+    },
+    {
+      "path": "results/564x540-media-a7-sequence-after/movies-info-light.png",
+      "sha256": "711c19af20d7c681d8efad39bf6844222a8767a213b8e1fdd911d5587856fe67"
+    },
+    {
+      "path": "results/540x1260-media-a7-cover-final/movies-info-light.png",
+      "sha256": "238e5b4fab53a3f74255c3c3e1492626b7cc1480fdf8b5e5d7046cc4027b248c"
+    },
+    {
+      "path": "results/1260x540-media-a7-cover-landscape/episodes-list-dark.png",
+      "sha256": "2583b211399fee462de792712aa9590e700ca90d3336b8370b8716f4faa6a5fe"
+    },
+    {
+      "path": "results/1260x540-media-a7-cover-landscape/movies-cast-light.png",
+      "sha256": "8c40743df9e63451b8b06dbdd33981aee2722514f2415ba8bd1e35ba938d0fb4"
+    },
+    {
+      "path": "results/540x564-media-a7-inner-negative/negative-2-light.png",
+      "sha256": "eda0c83462b9a18a2602ddc2764b4987dfc38ae005c1a7ef73dc932a39c0aae5"
+    },
+    {
+      "path": "results/540x564-media-a7-inner-negative/negative-3-dark.png",
+      "sha256": "3524b34e8bd34d2bab32b285d609b9dc88769f2990b6a17203f1bf5688654161"
+    }
+  ],
+  "observations": [
+    "Movie/season/episode synopsis endpoint visible in short viewport after native scrolling",
+    "Wider Cast cards show fixture actor names; long Info label uses existing marquee",
+    "Cover Info synopsis occupies more available height without buttons overlapping",
+    "Short/empty synopsis cases retain title, metadata and actions",
+    "Details scroll is retained across item/directory changes; not silently reset in production",
+    "Existing fixed Info slots and all-mode/physical rendering remain incomplete"
+  ]
+}

@@ -1,0 +1,434 @@
+{
+  "registered_video_ids": [
+    "50",
+    "65050",
+    "65051",
+    "65052",
+    "51",
+    "52",
+    "53",
+    "55",
+    "56",
+    "57",
+    "58",
+    "59",
+    "500",
+    "501",
+    "502",
+    "503",
+    "504",
+    "505",
+    "506",
+    "507",
+    "509",
+    "591",
+    "592",
+    "602",
+    "609"
+  ],
+  "baseline_bound_definitions": [
+    {
+      "file": "View_500_Icons.xml",
+      "signed458_sha256": "6104dc82013c94cccc8c39479fe2283e9cd4ae593deaad5271d3cb6b1d64cded",
+      "containers": [
+        {
+          "id": "500",
+          "type": "panel",
+          "visible": "True"
+        },
+        {
+          "id": "500",
+          "type": "panel",
+          "visible": null
+        },
+        {
+          "id": "500",
+          "type": "panel",
+          "visible": null
+        },
+        {
+          "id": "500",
+          "type": "panel",
+          "visible": "!Container.Content(addons)"
+        }
+      ],
+      "Android_visual": "NOT_RUN",
+      "production_edit": false
+    },
+    {
+      "file": "View_501_LowList.xml",
+      "signed458_sha256": "3c8ef880efc9a1cbd34ca9908615a825b65e9685e993082e7c4cfead7a7e547c",
+      "containers": [
+        {
+          "id": "501",
+          "type": "list",
+          "visible": "[Container.Content(movies) | Container.Content(sets) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | String.Contains(Container.FolderPath,plugin.program.advanced.launcher)]"
+        },
+        {
+          "id": "501",
+          "type": "list",
+          "visible": "Container.Content(albums) | Container.Content(artists) | Container.Content(songs) | [Window.IsActive(music) + Container.Content(files)]"
+        },
+        {
+          "id": "501",
+          "type": "list",
+          "visible": "String.Contains(Container.FolderPath,plugin.program.advanced.launcher)"
+        }
+      ],
+      "Android_visual": "NOT_RUN",
+      "production_edit": false
+    },
+    {
+      "file": "View_502_Episode.xml",
+      "signed458_sha256": "1ef0163ddff115bebaacc48edf835b434d5d66b5e5454c21f296b461af831fef",
+      "containers": [
+        {
+          "id": "502",
+          "type": "fixedlist",
+          "visible": "Container.Content(episodes)"
+        }
+      ],
+      "Android_visual": "NOT_RUN",
+      "production_edit": false
+    },
+    {
+      "file": "View_503_Wall.xml",
+      "signed458_sha256": "9377a0dac67187005c7f7a1bcb113ba7caee225561a10ecb5705138c5ce3126e",
+      "containers": [
+        {
+          "id": "503",
+          "type": "panel",
+          "visible": "[Container.Content(movies) | Container.Content(sets) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(addons) | Container.Content(files)] | Window.IsActive(music) + [Container.Content(artists) | Container.Content(albums) | Container.Content(genres)]"
+        }
+      ],
+      "Android_visual": "NOT_RUN",
+      "production_edit": false
+    },
+    {
+      "file": "View_504_Gallery.xml",
+      "signed458_sha256": "4796f39ff9c673f06a837543d2358840d7effd11fe6c893c3c8a6fc20d408a95",
+      "containers": [
+        {
+          "id": "504",
+          "type": "fixedlist",
+          "visible": "[Container.Content(movies) | Container.Content(tvshows) | Window.IsActive(pictures) | Container.Content(artists) | Container.Content(sets)]"
+        }
+      ],
+      "Android_visual": "NOT_RUN",
+      "production_edit": false
+    },
+    {
+      "file": "View_505_Panel.xml",
+      "signed458_sha256": "29eac228718f5825a011b2d0f88224aaaf261c756aca753ba3a89b57a50fed1e",
+      "containers": [
+        {
+          "id": "505",
+          "type": "list",
+          "visible": "[Container.Content(movies) | Container.Content(tvshows) | Container.Content(episodes)]"
+        }
+      ],
+      "Android_visual": "NOT_RUN",
+      "production_edit": false
+    },
+    {
+      "file": "View_506_RightList.xml",
+      "signed458_sha256": "ca2cc9879b63031d7c4b4e0cb9037443db6e5d469fbaf3fc51500c6af51776ab",
+      "containers": [
+        {
+          "id": "506",
+          "type": "list",
+          "visible": null
+        },
+        {
+          "id": "506",
+          "type": "fixedlist",
+          "visible": null
+        },
+        {
+          "id": "506",
+          "type": "list",
+          "visible": null
+        }
+      ],
+      "Android_visual": "NOT_RUN",
+      "production_edit": false
+    },
+    {
+      "file": "View_507_BigList.xml",
+      "signed458_sha256": "2e59b8518f15bf15cca19bf8c1433254f6ca25771dac65530f3e7b94569d3e76",
+      "containers": [
+        {
+          "id": "507",
+          "type": "list",
+          "visible": "[Container.Content(movies) | Container.Content(tvshows) | Container.Content(episodes)] | Window.IsActive(music) + [Container.Content(artists) | Container.Content(albums)]"
+        }
+      ],
+      "Android_visual": "NOT_RUN",
+      "production_edit": false
+    },
+    {
+      "file": "View_509_MyFlix.xml",
+      "signed458_sha256": "c050917194ebf1f7dd439fb9645b3874f78f8e345995b6c76e92294545a444e7",
+      "containers": [
+        {
+          "id": "509",
+          "type": "fixedlist",
+          "visible": "[Container.Content(movies) | Container.Content(sets) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes)]"
+        }
+      ],
+      "Android_visual": "NOT_RUN",
+      "production_edit": false
+    },
+    {
+      "file": "View_50_List.xml",
+      "signed458_sha256": "a66fcbfd27bd01371196d7800202d7a8aa0f084bcd56efb41d5753be4010d0a9",
+      "containers": [
+        {
+          "id": "50",
+          "type": "panel",
+          "visible": "True"
+        },
+        {
+          "id": "50",
+          "type": "panel",
+          "visible": null
+        },
+        {
+          "id": "50",
+          "type": "panel",
+          "visible": null
+        },
+        {
+          "id": "50",
+          "type": "panel",
+          "visible": null
+        },
+        {
+          "id": "50",
+          "type": "panel",
+          "visible": "True"
+        },
+        {
+          "id": "50",
+          "type": "panel",
+          "visible": null
+        },
+        {
+          "id": "50",
+          "type": "panel",
+          "visible": null
+        },
+        {
+          "id": "50",
+          "type": "list",
+          "visible": "True"
+        },
+        {
+          "id": "50",
+          "type": "list",
+          "visible": "True"
+        },
+        {
+          "id": "50",
+          "type": "list",
+          "visible": null
+        }
+      ],
+      "Android_visual": "NOT_RUN",
+      "production_edit": false
+    },
+    {
+      "file": "View_51_InfoWall.xml",
+      "signed458_sha256": "495bb6c70af3cec7506bff6dea8f0dc02eb79b8b7b4fe9da63365c9c271766ee",
+      "containers": [
+        {
+          "id": "51",
+          "type": "panel",
+          "visible": "[Container.Content(tvshows) | Container.Content(movies)]"
+        },
+        {
+          "id": "51",
+          "type": "panel",
+          "visible": "Container.Content(albums) | Container.Content(artists) | Container.Content(addons)"
+        },
+        {
+          "id": "51",
+          "type": "panel",
+          "visible": "Container.Content(addons)"
+        }
+      ],
+      "Android_visual": "NOT_RUN",
+      "production_edit": false
+    },
+    {
+      "file": "View_52_Landscape.xml",
+      "signed458_sha256": "90fd92e081b333cc13538d9c20d2a191045f5050ef66fd2d41a6a882b158b592",
+      "containers": [
+        {
+          "id": "52",
+          "type": "fixedlist",
+          "visible": null
+        },
+        {
+          "id": "52",
+          "type": "wraplist",
+          "visible": null
+        }
+      ],
+      "Android_visual": "NOT_RUN",
+      "production_edit": false
+    },
+    {
+      "file": "View_53_ShowCase.xml",
+      "signed458_sha256": "1498881c2629c6c8b292696a9b54760207b6f7b972ae5108b5d41a838570197f",
+      "containers": [
+        {
+          "id": "53",
+          "type": "fixedlist",
+          "visible": null
+        },
+        {
+          "id": "53",
+          "type": "wraplist",
+          "visible": null
+        }
+      ],
+      "Android_visual": "NOT_RUN",
+      "production_edit": false
+    },
+    {
+      "file": "View_55_TriPanel.xml",
+      "signed458_sha256": "740fa9f158bc183f021c0007c8412d14dc7982c68084cdafae109272c9e8d95b",
+      "containers": [
+        {
+          "id": "55",
+          "type": "list",
+          "visible": "[Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets)]"
+        },
+        {
+          "id": "55",
+          "type": "list",
+          "visible": "Container.Content(albums) | Container.Content(artists) | Container.Content(songs) | Container.Content(addons) | [Window.IsActive(music) + Container.Content(files)]"
+        },
+        {
+          "id": "55",
+          "type": "list",
+          "visible": "String.Contains(Container.FolderPath,plugin.program.advanced.launcher)"
+        }
+      ],
+      "Android_visual": "NOT_RUN",
+      "production_edit": false
+    },
+    {
+      "file": "View_56_Posters.xml",
+      "signed458_sha256": "04a661c108a2b88736aefdaa3b70277bd7cca60faa63d3b577bc642d59e9e7d3",
+      "containers": [
+        {
+          "id": "56",
+          "type": "fixedlist",
+          "visible": "[Container.Content(genres) | Container.Content(tvshows) | Container.Content(movies) | Container.Content(sets) | Container.Content(seasons) | Container.Content(musicvideos)]"
+        }
+      ],
+      "Android_visual": "NOT_RUN",
+      "production_edit": false
+    },
+    {
+      "file": "View_57_Shift.xml",
+      "signed458_sha256": "e42f3ade76b8d37f882598ee75887b6bedb5d6721bce62087471e9ca0bb7f213",
+      "containers": [
+        {
+          "id": "57",
+          "type": "fixedlist",
+          "visible": "[Container.Content(movies) | Container.Content(tvshows) | Container.Content(musicvideos) | Container.Content(seasons) | Container.Content(genres) | Container.Content(sets) | Container.Content(addons)]"
+        },
+        {
+          "id": "57",
+          "type": "fixedlist",
+          "visible": "Container.Content(addons) | Container.Content(songs) | Container.Content(artists) | Container.Content(albums) | Container.Content(genres) | [Window.IsActive(music) + Container.Content(files)]"
+        },
+        {
+          "id": "57",
+          "type": "fixedlist",
+          "visible": "String.Contains(Container.FolderPath,plugin.program.advanced.launcher)"
+        }
+      ],
+      "Android_visual": "NOT_RUN",
+      "production_edit": false
+    },
+    {
+      "file": "View_58_BannerWall.xml",
+      "signed458_sha256": "c94fe8d0ac31e2e3ff09fb78f40800e7013eb646235771e0e258365a46e4980e",
+      "containers": [
+        {
+          "id": "58",
+          "type": "panel",
+          "visible": "[Container.Content(tvshows) | Container.Content(movies)]"
+        }
+      ],
+      "Android_visual": "NOT_RUN",
+      "production_edit": false
+    },
+    {
+      "file": "View_591_BigFan.xml",
+      "signed458_sha256": "5d5469b24b7712107a874387804fb8ac746ac24a29566980fe076ba818341a4f",
+      "containers": [
+        {
+          "id": "591",
+          "type": "fixedlist",
+          "visible": null
+        }
+      ],
+      "Android_visual": "NOT_RUN",
+      "production_edit": false
+    },
+    {
+      "file": "View_59_Logo.xml",
+      "signed458_sha256": "2366810565c304ae6e3d11ef73e076ec7f9321a49c184e3ec735c28eaf2d8c9d",
+      "containers": [
+        {
+          "id": "59",
+          "type": "fixedlist",
+          "visible": null
+        },
+        {
+          "id": "59",
+          "type": "wraplist",
+          "visible": null
+        }
+      ],
+      "Android_visual": "NOT_RUN",
+      "production_edit": false
+    },
+    {
+      "file": "View_602_FanartList.xml",
+      "signed458_sha256": "65e385409485e2196ede3bf0a21c37879e020efcb04ade25d4b88754a95afcf1",
+      "containers": [
+        {
+          "id": "602",
+          "type": "list",
+          "visible": "[Container.Content(movies) | Container.Content(sets) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes)]"
+        }
+      ],
+      "Android_visual": "NOT_RUN",
+      "production_edit": false
+    },
+    {
+      "file": "View_609_Fullscreen_Wall.xml",
+      "signed458_sha256": "30c96e3fb4812a03bdead762c62d9dbd2c14016339da6cb27cd5cb37cc321ffc",
+      "containers": [
+        {
+          "id": "609",
+          "type": "panel",
+          "visible": "[Container.Content(movies) | Container.Content(tvshows) | Container.Content(sets)] | Window.IsActive(music) + [Container.Content(artists) | Container.Content(albums) | Container.Content(files)]"
+        }
+      ],
+      "Android_visual": "NOT_RUN",
+      "production_edit": false
+    }
+  ],
+  "changed_shared_presentation": [
+    "DialogVideoInfo.xml: existing common Info dialog",
+    "Includes_InfinityMediaLists.xml: existing shared media List selected-details include"
+  ],
+  "limits": "Source coverage only. Common Info improvements apply when that native dialog is used; providers using custom dialogs are not replaced. No claim that every registered view was visually verified. No view modes removed."
+}

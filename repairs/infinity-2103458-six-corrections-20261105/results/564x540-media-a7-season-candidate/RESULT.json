@@ -1,0 +1,93 @@
+{
+  "platform": "upstream Linux Kodi; explicit responsive projection",
+  "Android": "NOT_RUN",
+  "physical_Fold": "NOT_RUN",
+  "source_hashes": {
+    "Info": "dfcf1942c87745a9bca6eacd7194c22ccde78176a901c524cae876d82f3ef8c1",
+    "List": "3cb1a97ad96ce558e361b6ea5c8c05256cf84b439023d98834031a1c2f33024c",
+    "genre_presentation": "0110de2cdc4c8295fdb314df221385f356e0ed0247547cf49c16a4dff2a6b54c",
+    "Variables": "764c81548d1213b18487a65613d5fa8a427d39781cff626c0e0512b4011078b8",
+    "media_probe.py": "1e3211668351eb8c8179af0f78742ce857a7939b350497f209bbbc73c803bbe1",
+    "media_fixture.py": "62ae3421abb9f80ada6ca0af76feffa8a9a9f307be730b92d8169b10d50ac36f",
+    "probe.py": "bfe9d13d8f6653a66c4175a3c678cfb7ae38d0e0d1c7127a57fdf33807202de4"
+  },
+  "checks": [
+    {
+      "name": "skin-ready",
+      "passed": true
+    },
+    {
+      "name": "seasons-directory",
+      "passed": true
+    },
+    {
+      "name": "seasons-selection",
+      "passed": true
+    },
+    {
+      "name": "seasons-list-dark-capture",
+      "passed": true
+    },
+    {
+      "name": "seasons-list-light-capture",
+      "passed": true
+    },
+    {
+      "name": "seasons-existing-scrollbar-focus",
+      "passed": true
+    },
+    {
+      "name": "seasons-existing-scrollbar-moves",
+      "passed": true
+    },
+    {
+      "name": "seasons-endpoint-before-selection-check-capture",
+      "passed": true
+    },
+    {
+      "name": "seasons-scroll-preserves-item",
+      "passed": true
+    },
+    {
+      "name": "seasons-details-scrollbar-light-capture",
+      "passed": true
+    }
+  ],
+  "observations": [
+    {
+      "kind": "seasons",
+      "DBType": "season",
+      "plot_present": true,
+      "thumb_present": false,
+      "poster_present": false,
+      "season_poster_present": true
+    },
+    {
+      "step": 0,
+      "focus": 98066,
+      "selected": "Media 01 \u2014 seasons fixture with a readable long title"
+    },
+    {
+      "step": 1,
+      "focus": 98066,
+      "selected": "Media 01 \u2014 seasons fixture with a readable long title"
+    },
+    {
+      "step": 2,
+      "focus": 50,
+      "selected": "Media 01 \u2014 seasons fixture with a readable long title"
+    },
+    {
+      "kind": "seasons",
+      "endpoint_HasNext": true,
+      "endpoint_focus": 50,
+      "endpoint_visual_check": "PENDING_SCREENSHOT_REVIEW"
+    }
+  ],
+  "known_behavior_failures": [
+    "action-Up points to nonfocusable textbox98064",
+    "Info Back10/native GetThumb conflict; proposal not applied"
+  ],
+  "status": "PASS_SELECTED_SYNTHETIC_CONTENT_RENDER_AND_NATIVE_BACK",
+  "visual_acceptance": "PENDING_IMAGE_REVIEW_NOT_PHYSICAL_ACCEPTANCE"
+}

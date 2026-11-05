@@ -96,6 +96,7 @@
       <font>InfinityTitle</font>
       <textcolor>$VAR[InfinityLegacyText]</textcolor>
       <label>$INFO[ListItem.Title]</label>
+      <scroll>true</scroll>
       <align>left</align>
       <aligny>center</aligny>
     </control>
@@ -107,6 +108,7 @@
       <font>InfinityTiny</font>
       <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
       <label>$INFO[ListItem.Year]  •  $INFO[ListItem.Duration]  •  $INFO[ListItem.MPAA]</label>
+      <scroll>true</scroll>
       <align>left</align>
       <aligny>center</aligny>
     </control>
@@ -118,6 +120,7 @@
       <font>InfinityTiny</font>
       <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
       <label>$INFO[ListItem.Genre]</label>
+      <scroll>true</scroll>
       <align>left</align>
       <aligny>center</aligny>
     </control>
@@ -125,7 +128,7 @@
       <left>23.6458%</left>
       <top>27.037%</top>
       <width>67.7083%</width>
-      <height>150</height>
+      <height>14%</height>
       <font>InfinityTiny</font>
       <textcolor>$VAR[InfinityLegacySecondary]</textcolor>
       <label>$INFO[ListItem.Plot]</label>
@@ -244,7 +247,7 @@
       <scrolltime>120</scrolltime>
       <onup>9000</onup>
       <ondown>9000</ondown>
-      <itemlayout width="auto" height="96.666667%" aspectratio="1.034482759">
+      <itemlayout width="auto" height="96.666667%" aspectratio="1.6">
         <control type="image">
           <left>3.3333%</left>
           <top>3.4483%</top>
@@ -267,12 +270,13 @@
           <font>InfinityTiny</font>
           <textcolor>$VAR[InfinityLegacyText]</textcolor>
           <label>$INFO[ListItem.Label]</label>
+      <scroll>true</scroll>
           <align>center</align>
           <aligny>center</aligny>
           <bottom>3.448314%</bottom>
         </control>
       </itemlayout>
-      <focusedlayout width="auto" height="96.666667%" aspectratio="1.034482759">
+      <focusedlayout width="auto" height="96.666667%" aspectratio="1.6">
         <control type="image">
           <left>3.3333%</left>
           <top>3.4483%</top>
@@ -302,6 +306,7 @@
           <font>InfinityTiny</font>
           <textcolor>$VAR[InfinityLegacyText]</textcolor>
           <label>$INFO[ListItem.Label]</label>
+      <scroll>true</scroll>
           <align>center</align>
           <aligny>center</aligny>
           <bottom>3.448314%</bottom>
@@ -348,6 +353,7 @@
       <font>InfinityTiny</font>
       <textcolor>$VAR[InfinityLegacyText]</textcolor>
       <label>$INFO[ListItem.Director]</label>
+      <scroll>true</scroll>
       <align>left</align>
       <aligny>center</aligny>
     </control>
@@ -370,6 +376,7 @@
       <font>InfinityTiny</font>
       <textcolor>$VAR[InfinityLegacyText]</textcolor>
       <label>$INFO[ListItem.Writer]</label>
+      <scroll>true</scroll>
       <align>left</align>
       <aligny>center</aligny>
     </control>
@@ -392,6 +399,7 @@
       <font>InfinityTiny</font>
       <textcolor>$VAR[InfinityLegacyText]</textcolor>
       <label>$INFO[ListItem.Studio]</label>
+      <scroll>true</scroll>
       <align>left</align>
       <aligny>center</aligny>
     </control>

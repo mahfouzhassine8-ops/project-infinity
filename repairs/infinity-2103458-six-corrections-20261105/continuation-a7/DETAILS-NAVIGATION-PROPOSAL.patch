@@ -1,0 +1,32 @@
+--- a/repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Includes_InfinityMediaLists.xml
++++ b/repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Includes_InfinityMediaLists.xml
+@@ -428,7 +428,8 @@
+                 <texturenofocus />
+                 <enable>!Container.IsUpdating</enable>
+                 <onleft>50</onleft>
+-                <onup>98064</onup>
++                <onup condition="Control.IsVisible(98066)">98066</onup>
++                <onup>50</onup>
+                 <onclick condition="!Container.IsUpdating + [!Container(50).ListItem.IsFolder + [String.IsEqual(Container(50).ListItem.Property(IsPlayable),true) | String.IsEqual(Container(50).ListItem.DBType,movie) | String.IsEqual(Container(50).ListItem.DBType,episode) | String.IsEqual(Container(50).ListItem.DBType,musicvideo)]]">SetFocus(50)</onclick>
+                 <onclick condition="!Container.IsUpdating + [!Container(50).ListItem.IsFolder + [String.IsEqual(Container(50).ListItem.Property(IsPlayable),true) | String.IsEqual(Container(50).ListItem.DBType,movie) | String.IsEqual(Container(50).ListItem.DBType,episode) | String.IsEqual(Container(50).ListItem.DBType,musicvideo)]]">Action(Select)</onclick>
+                 <visible>!Container(50).ListItem.IsFolder + [String.IsEqual(Container(50).ListItem.Property(IsPlayable),true) | String.IsEqual(Container(50).ListItem.DBType,movie) | String.IsEqual(Container(50).ListItem.DBType,episode) | String.IsEqual(Container(50).ListItem.DBType,musicvideo)]</visible>
+@@ -478,7 +479,8 @@
+                 <texturenofocus />
+                 <enable>!Container.IsUpdating</enable>
+                 <onleft>50</onleft>
+-                <onup>98064</onup>
++                <onup condition="Control.IsVisible(98066)">98066</onup>
++                <onup>50</onup>
+                 <onclick condition="!Container.IsUpdating + [!String.IsEmpty(Container(50).ListItem.Trailer)]">PlayMedia($ESCINFO[Container(50).ListItem.Trailer])</onclick>
+                 <visible>!String.IsEmpty(Container(50).ListItem.Trailer)</visible>
+                 <align>center</align>
+@@ -527,7 +529,8 @@
+                 <texturenofocus />
+                 <enable>!Container.IsUpdating</enable>
+                 <onleft>50</onleft>
+-                <onup>98064</onup>
++                <onup condition="Control.IsVisible(98066)">98066</onup>
++                <onup>50</onup>
+                 <onclick condition="!Container.IsUpdating + [String.IsEqual(Container(50).ListItem.DBType,movie) | String.IsEqual(Container(50).ListItem.DBType,tvshow) | String.IsEqual(Container(50).ListItem.DBType,episode) | String.IsEqual(Container(50).ListItem.DBType,season) | String.IsEqual(Container(50).ListItem.DBType,musicvideo)]">SetFocus(50)</onclick>
+                 <onclick condition="!Container.IsUpdating + [String.IsEqual(Container(50).ListItem.DBType,movie) | String.IsEqual(Container(50).ListItem.DBType,tvshow) | String.IsEqual(Container(50).ListItem.DBType,episode) | String.IsEqual(Container(50).ListItem.DBType,season) | String.IsEqual(Container(50).ListItem.DBType,musicvideo)]">Action(Info)</onclick>
+                 <visible>String.IsEqual(Container(50).ListItem.DBType,movie) | String.IsEqual(Container(50).ListItem.DBType,tvshow) | String.IsEqual(Container(50).ListItem.DBType,episode) | String.IsEqual(Container(50).ListItem.DBType,season) | String.IsEqual(Container(50).ListItem.DBType,musicvideo)</visible>

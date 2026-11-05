@@ -1,0 +1,14 @@
+diff --git a/repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Includes_InfinityMediaLists.xml b/repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Includes_InfinityMediaLists.xml
+index 2e593308..d2e461d7 100644
+--- a/repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Includes_InfinityMediaLists.xml
++++ b/repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Includes_InfinityMediaLists.xml
+@@ -327,7 +327,8 @@
+       </control>
+       <control type="textbox" id="98064">
+         <width>100%</width>
+-        <height min="40" max="30%">auto</height>
++        <top>0</top>
++        <height min="40" max="0">auto</height>
+         <font>InfinitySmall</font>
+         <textcolor>$VAR[InfinityPaletteTextPrimary]</textcolor>
+         <label>$VAR[VideoPlotVar]</label>

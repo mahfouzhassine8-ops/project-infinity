@@ -1,0 +1,143 @@
+{
+  "start": "a7f65029",
+  "source_checks": "5 PASS",
+  "runtime": [
+    {
+      "fixture": "564x540-media-a7-content-height",
+      "status": "FAIL",
+      "passed_checks": 37,
+      "failed_checks": [
+        "seasons-scroll-preserves-item"
+      ],
+      "source_hashes": {
+        "Info": "dfcf1942c87745a9bca6eacd7194c22ccde78176a901c524cae876d82f3ef8c1",
+        "List": "3cb1a97ad96ce558e361b6ea5c8c05256cf84b439023d98834031a1c2f33024c",
+        "genre_presentation": "0110de2cdc4c8295fdb314df221385f356e0ed0247547cf49c16a4dff2a6b54c",
+        "Variables": "764c81548d1213b18487a65613d5fa8a427d39781cff626c0e0512b4011078b8",
+        "media_probe.py": "1e3211668351eb8c8179af0f78742ce857a7939b350497f209bbbc73c803bbe1",
+        "media_fixture.py": "62ae3421abb9f80ada6ca0af76feffa8a9a9f307be730b92d8169b10d50ac36f",
+        "probe.py": "24307d237eeabb92bc5ebd1f22a5aedd326526741da90ef1f3520ab5f4cc48a0"
+      },
+      "Android": "NOT_RUN"
+    },
+    {
+      "fixture": "564x540-media-a7-season-baseline",
+      "status": "PASS_SELECTED_SYNTHETIC_CONTENT_RENDER_AND_NATIVE_BACK",
+      "passed_checks": 10,
+      "failed_checks": [],
+      "source_hashes": {
+        "Info": "dfcf1942c87745a9bca6eacd7194c22ccde78176a901c524cae876d82f3ef8c1",
+        "List": "e2c7be2ccbf7d4b493bff260863d96c6dffc8daf3fe5ef99bf4271462c7cc449",
+        "genre_presentation": "0110de2cdc4c8295fdb314df221385f356e0ed0247547cf49c16a4dff2a6b54c",
+        "Variables": "764c81548d1213b18487a65613d5fa8a427d39781cff626c0e0512b4011078b8",
+        "media_probe.py": "1e3211668351eb8c8179af0f78742ce857a7939b350497f209bbbc73c803bbe1",
+        "media_fixture.py": "62ae3421abb9f80ada6ca0af76feffa8a9a9f307be730b92d8169b10d50ac36f",
+        "probe.py": "bfe9d13d8f6653a66c4175a3c678cfb7ae38d0e0d1c7127a57fdf33807202de4"
+      },
+      "Android": "NOT_RUN"
+    },
+    {
+      "fixture": "564x540-media-a7-season-candidate",
+      "status": "PASS_SELECTED_SYNTHETIC_CONTENT_RENDER_AND_NATIVE_BACK",
+      "passed_checks": 10,
+      "failed_checks": [],
+      "source_hashes": {
+        "Info": "dfcf1942c87745a9bca6eacd7194c22ccde78176a901c524cae876d82f3ef8c1",
+        "List": "3cb1a97ad96ce558e361b6ea5c8c05256cf84b439023d98834031a1c2f33024c",
+        "genre_presentation": "0110de2cdc4c8295fdb314df221385f356e0ed0247547cf49c16a4dff2a6b54c",
+        "Variables": "764c81548d1213b18487a65613d5fa8a427d39781cff626c0e0512b4011078b8",
+        "media_probe.py": "1e3211668351eb8c8179af0f78742ce857a7939b350497f209bbbc73c803bbe1",
+        "media_fixture.py": "62ae3421abb9f80ada6ca0af76feffa8a9a9f307be730b92d8169b10d50ac36f",
+        "probe.py": "bfe9d13d8f6653a66c4175a3c678cfb7ae38d0e0d1c7127a57fdf33807202de4"
+      },
+      "Android": "NOT_RUN"
+    },
+    {
+      "fixture": "564x540-media-a7-sequence-before",
+      "status": "PASS_SELECTED_SYNTHETIC_CONTENT_RENDER_AND_NATIVE_BACK",
+      "passed_checks": 53,
+      "failed_checks": [],
+      "source_hashes": {
+        "Info": "dfcf1942c87745a9bca6eacd7194c22ccde78176a901c524cae876d82f3ef8c1",
+        "List": "e2c7be2ccbf7d4b493bff260863d96c6dffc8daf3fe5ef99bf4271462c7cc449",
+        "genre_presentation": "0110de2cdc4c8295fdb314df221385f356e0ed0247547cf49c16a4dff2a6b54c",
+        "Variables": "764c81548d1213b18487a65613d5fa8a427d39781cff626c0e0512b4011078b8",
+        "media_probe.py": "1e3211668351eb8c8179af0f78742ce857a7939b350497f209bbbc73c803bbe1",
+        "media_fixture.py": "62ae3421abb9f80ada6ca0af76feffa8a9a9f307be730b92d8169b10d50ac36f",
+        "probe.py": "5362e0dbb547614127b9552c499cce52e7a6bbb9b99baa8e682285c1f892cd17"
+      },
+      "Android": "NOT_RUN"
+    },
+    {
+      "fixture": "564x540-media-a7-sequence-after",
+      "status": "PASS_SELECTED_SYNTHETIC_CONTENT_RENDER_AND_NATIVE_BACK",
+      "passed_checks": 53,
+      "failed_checks": [],
+      "source_hashes": {
+        "Info": "dfcf1942c87745a9bca6eacd7194c22ccde78176a901c524cae876d82f3ef8c1",
+        "List": "3cb1a97ad96ce558e361b6ea5c8c05256cf84b439023d98834031a1c2f33024c",
+        "genre_presentation": "0110de2cdc4c8295fdb314df221385f356e0ed0247547cf49c16a4dff2a6b54c",
+        "Variables": "764c81548d1213b18487a65613d5fa8a427d39781cff626c0e0512b4011078b8",
+        "media_probe.py": "1e3211668351eb8c8179af0f78742ce857a7939b350497f209bbbc73c803bbe1",
+        "media_fixture.py": "62ae3421abb9f80ada6ca0af76feffa8a9a9f307be730b92d8169b10d50ac36f",
+        "probe.py": "5362e0dbb547614127b9552c499cce52e7a6bbb9b99baa8e682285c1f892cd17"
+      },
+      "Android": "NOT_RUN"
+    },
+    {
+      "fixture": "540x1260-media-a7-cover-final",
+      "status": "PASS_SELECTED_SYNTHETIC_CONTENT_RENDER_AND_NATIVE_BACK",
+      "passed_checks": 43,
+      "failed_checks": [],
+      "source_hashes": {
+        "Info": "dfcf1942c87745a9bca6eacd7194c22ccde78176a901c524cae876d82f3ef8c1",
+        "List": "3cb1a97ad96ce558e361b6ea5c8c05256cf84b439023d98834031a1c2f33024c",
+        "genre_presentation": "0110de2cdc4c8295fdb314df221385f356e0ed0247547cf49c16a4dff2a6b54c",
+        "Variables": "764c81548d1213b18487a65613d5fa8a427d39781cff626c0e0512b4011078b8",
+        "media_probe.py": "1e3211668351eb8c8179af0f78742ce857a7939b350497f209bbbc73c803bbe1",
+        "media_fixture.py": "62ae3421abb9f80ada6ca0af76feffa8a9a9f307be730b92d8169b10d50ac36f",
+        "probe.py": "5362e0dbb547614127b9552c499cce52e7a6bbb9b99baa8e682285c1f892cd17"
+      },
+      "Android": "NOT_RUN"
+    },
+    {
+      "fixture": "1260x540-media-a7-cover-landscape",
+      "status": "PASS_SELECTED_SYNTHETIC_CONTENT_RENDER_AND_NATIVE_BACK",
+      "passed_checks": 61,
+      "failed_checks": [],
+      "source_hashes": {
+        "Info": "dfcf1942c87745a9bca6eacd7194c22ccde78176a901c524cae876d82f3ef8c1",
+        "List": "3cb1a97ad96ce558e361b6ea5c8c05256cf84b439023d98834031a1c2f33024c",
+        "genre_presentation": "0110de2cdc4c8295fdb314df221385f356e0ed0247547cf49c16a4dff2a6b54c",
+        "Variables": "764c81548d1213b18487a65613d5fa8a427d39781cff626c0e0512b4011078b8",
+        "media_probe.py": "1e3211668351eb8c8179af0f78742ce857a7939b350497f209bbbc73c803bbe1",
+        "media_fixture.py": "62ae3421abb9f80ada6ca0af76feffa8a9a9f307be730b92d8169b10d50ac36f",
+        "probe.py": "633d3e232566a5fdab9254a1ebe975d9575363ec08a2680c05a66eb8a835a653"
+      },
+      "Android": "NOT_RUN"
+    },
+    {
+      "fixture": "540x564-media-a7-inner-negative",
+      "status": "PASS_SELECTED_SYNTHETIC_CONTENT_RENDER_AND_NATIVE_BACK",
+      "passed_checks": 25,
+      "failed_checks": [],
+      "source_hashes": {
+        "Info": "dfcf1942c87745a9bca6eacd7194c22ccde78176a901c524cae876d82f3ef8c1",
+        "List": "3cb1a97ad96ce558e361b6ea5c8c05256cf84b439023d98834031a1c2f33024c",
+        "genre_presentation": "0110de2cdc4c8295fdb314df221385f356e0ed0247547cf49c16a4dff2a6b54c",
+        "Variables": "764c81548d1213b18487a65613d5fa8a427d39781cff626c0e0512b4011078b8",
+        "media_probe.py": "1e3211668351eb8c8179af0f78742ce857a7939b350497f209bbbc73c803bbe1",
+        "media_fixture.py": "62ae3421abb9f80ada6ca0af76feffa8a9a9f307be730b92d8169b10d50ac36f",
+        "probe.py": "730738b5099d8c878d1c0b5594937f3b2910a1063970fd200a0d1d70965605d7",
+        "fixture_negative.py": "ea3b29368ae17a6c28b31398703cb184198834493b0c08e681b7aaeca5280bbc"
+      },
+      "Android": "NOT_RUN"
+    }
+  ],
+  "source_only_guard": "PASS_TWO_XML_FILES_PLUS_SCOPED_EVIDENCE",
+  "protected_source_edits": false,
+  "APK_comparison": "NOT_RUN_NO_NEW_APK",
+  "physical_Fold": "NOT_RUN",
+  "original_signed_artifact_sha256_rechecked": "ea4b8c99eb89e7e3610ed8e51833240b20748def6979b358e9d85a30fd1b4f82",
+  "original_signed_artifact_unchanged": true
+}

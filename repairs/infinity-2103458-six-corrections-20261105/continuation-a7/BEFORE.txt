@@ -1,0 +1,41 @@
+test_actions_ids_conditions_data_and_themes_unchanged (__main__.Visual.test_actions_ids_conditions_data_and_themes_unchanged) ... ok
+test_cast_width_and_native_overflow_labels (__main__.Visual.test_cast_width_and_native_overflow_labels) ... FAIL
+test_exact_visual_only_substitutions (__main__.Visual.test_exact_visual_only_substitutions) ... FAIL
+test_info_plot_does_not_overlap_action_row (__main__.Visual.test_info_plot_does_not_overlap_action_row) ... ok
+test_synopsis_uses_native_content_extent (__main__.Visual.test_synopsis_uses_native_content_extent) ... FAIL
+
+======================================================================
+FAIL: test_cast_width_and_native_overflow_labels (__main__.Visual.test_cast_width_and_native_overflow_labels)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-2103458-six-corrections-20261105/continuation-a7/test_polish.py", line 23, in test_cast_width_and_native_overflow_labels
+    self.assertEqual(layout.get('aspectratio'),'1.6');self.assertGreater(1080*.13888888*.96666667*1.6*.893333,200)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '1.034482759' != '1.6'
+- 1.034482759
++ 1.6
+
+
+======================================================================
+FAIL: test_exact_visual_only_substitutions (__main__.Visual.test_exact_visual_only_substitutions)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-2103458-six-corrections-20261105/continuation-a7/test_polish.py", line 6, in test_exact_visual_only_substitutions
+    for n,f in [('DialogVideoInfo.xml',P.info),('Includes_InfinityMediaLists.xml',P.listing)]:self.assertEqual((P.BASE/n).read_text(),f(self.before(n)))
+                                                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '<?xm[5457 chars]    <align>left</align>\n      <aligny>center<[24456 chars]w>\n' != '<?xm[5457 chars]    <scroll>true</scroll>\n      <align>left</[24672 chars]w>\n'
+Diff is 30788 characters long. Set self.maxDiff to None to see it.
+
+======================================================================
+FAIL: test_synopsis_uses_native_content_extent (__main__.Visual.test_synopsis_uses_native_content_extent)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-2103458-six-corrections-20261105/continuation-a7/test_polish.py", line 15, in test_synopsis_uses_native_content_extent
+    self.assertEqual(x.findtext('top'),'0');self.assertEqual(x.find('height').attrib,{'min':'40','max':'0'});self.assertEqual(x.findtext('height'),'auto')
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: None != '0'
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.050s
+
+FAILED (failures=3)
