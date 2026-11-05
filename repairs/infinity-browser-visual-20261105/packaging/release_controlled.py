@@ -59,6 +59,7 @@ def plan():return {row['member']:row for row in load(HERE.parent/'CONSOLIDATED-S
 def source_bindings():
     paths=[HERE/n for n in ('release_controlled.py','recovery_checks.py','test_release.py','AUTHORIZATION.md','ENGINE-INPUT.json')]
     paths += [HERE.parent/'CONSOLIDATED-SOURCE-PLAN.json']
+    paths += [HERE.parent/'results/SOURCE-DELTA.json', ROOT/'design-locks/infinity-media-browser-20261104/IMAGE-SHA-MANIFEST.json']
     paths += [ROOT/row['source'] for row in plan().values()]
     paths += [ROOT/'repairs/infinity-native-touch-2103451-20261105'/n for n in ('APPLIED-SOURCE-DELTA.json','native/xbmc/input/InputManager.cpp','native/xbmc/guilib/GUIBaseContainer.cpp')]
     return {str(p.relative_to(ROOT)):file_sha(p) for p in sorted(paths)}
