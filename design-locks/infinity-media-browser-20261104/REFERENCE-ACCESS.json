@@ -1,5 +1,5 @@
 {
-  "status": "PARTIAL_REFERENCE_ACCESS",
+  "status": "ORIGINAL_PAIR_SHA_VERIFIED_AND_DIRECTLY_INSPECTED",
   "accessible_original_file": "reference/21581-user-supplied-layout.jpg",
   "format": "JPEG",
   "size": [
@@ -11,9 +11,29 @@
   "direct_visual_inspection": true,
   "role": "User-supplied layout image; not asserted to be the current-device broken screenshot",
   "canonical_PNG_expected_sha256": "6786b5cadb7153bb0036a651dcfba889a58f2a5acd79a759a798302e2d70c0ad",
-  "canonical_PNG_bytes_accessible": false,
+  "canonical_PNG_bytes_accessible": true,
   "original_ZIP_bytes_accessible": false,
-  "broken_Light_original_JPEG_bytes_accessible": false,
+  "broken_Light_original_JPEG_bytes_accessible": true,
   "reencoded": false,
-  "physical_visual_acceptance": "NOT_ACCEPTED"
+  "physical_visual_acceptance": "NOT_ACCEPTED",
+  "reference_source_commit": "7eace7c938d02f1369c5a0f19b41c8fbe37f3dee",
+  "canonical_PNG": {
+    "path": "a_polished_ui_mockup_of_the_same_screen_redesigne.png",
+    "sha256": "6786b5cadb7153bb0036a651dcfba889a58f2a5acd79a759a798302e2d70c0ad",
+    "bytes": 1547339,
+    "size": [
+      820,
+      1918
+    ]
+  },
+  "actual_broken_Light_JPEG": {
+    "path": "ACTUAL-BROKEN-LIGHT-MODE.jpg",
+    "sha256": "682ec40a4b18c82499532d91db62519b09938aeee43d0f07b52e279d96b7cedc",
+    "bytes": 140980,
+    "size": [
+      658,
+      1536
+    ]
+  },
+  "transfer": "Exact Git blobs / strict base64 reconstruction; no re-encoding"
 }
