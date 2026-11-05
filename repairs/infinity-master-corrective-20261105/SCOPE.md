@@ -1,0 +1,29 @@
+# Master corrective implementation — 2026-11-05
+
+User authorization: shared Search validation, verified direct drawer routes, original scrollable drawer height, locked shared media-browser design, native touch-contract integration, Browse Files and native Favorites. Source corrections and focused verification are authorized. Final packaging depends on confirmed installed version, baseline selection, exact preservation, original signing compatibility and safe forward recovery. No installation, promotion or lock.
+
+User clarification: last *reported* installed build is 2103451, but actual installed version and last physical acceptance remain UNVERIFIED. Signed 2103451 is the frozen preservation reference. 453 native and 454/455 UI/recovery are unaccepted test artifacts, not automatic merge instructions. Reference-source overlays must be reviewed individually. No native engine replacement is inferred.
+
+Preserve Cobra, Preview, chooser/Splash, playback, shared libraries, settings/data, providers, shutdown/checkpoint, blocked settings-retirement and all recovery locks. Changes outside authorized paths block release. No user profile is available or accessed.
+
+References reviewed: Search 99bd0cdc; UI source 1cc7684b / packaging evidence 1b655a9e; drawer ce2c3faf (only panel height 1050/88% to1572/96%); design lock745b542a. None is merged automatically. Canonical PNG hash6786b5cadb7153bb0036a651dcfba889a58f2a5acd79a759a798302e2d70c0ad is not yet accessible; visual fidelity is pending.
+
+## Selected verification, recorded before execution
+
+- Compare signed451 with signed453 source/member identities and the individually reviewed UI overlay; no APK construction. Record exact source/payload inventory.
+- Shared Search: execute unchanged baseline and corrected source functions with synthetic provider/native boundaries. Cover unrelated revisions, byte-identical settings rewrites, Nixtoons history/timing under exact source pins, meaningful/unknown settings, malformed/oversized/raced settings, source/profile/dependency changes, noncompleted native outcomes, cancel/overlap/cache/empty results. No real network provider invocation; no raw queries/credentials in evidence. Retain prior 15+7 diagnostic checks without unnecessary reruns.
+- Navigation/Library: exact verified route contracts, disabled/changed provider refusal with no substitute, native Favorites route/data binding, native video sources browser, Downloads permission/error behavior and preserved indexed-library targets. Synthetic host API calls only unless an authorized target becomes available.
+- Drawer: unchanged menu actions/order and original scroll ownership; measured layout bounds for cover/inner portrait/landscape. Static geometry is not physical acceptance.
+- Browser/theme: registered IDs, existing global preference, selected-item art and metadata, no directory/default art enlargement, proportional imagery, existing theme/font ownership, no dead contextual actions, readable bounds. Actual canonical-image comparison and device rendering are separate pending gates.
+- Touch: trace existing Android dispatch before synthetic hover, all media/folder/Favorites eligibility, press/hold/Back/focus and direct-button exemptions. No duplicate gesture service. Preserve the native engine; report any required native input change as a protected-component dependency before implementing it.
+- Run only newly relevant fixture/host tests for changed paths. No unrelated shutdown, playback, provider or regression sweep. Android/Fold tests are NOT RUN without an available supported target.
+
+Initial source allowlist: this repair directory and reviewed source overlay assets for Command Center Search, Videos list/art/layout includes, native Favorites skin binding, original drawer and existing on-demand Library/navigation helper. The allowlist must be finalized before packaging. No workflow, signing authority or release metadata change is currently staged.
+
+Exact first selected commands: `python test_search_correction.py` with baseline and candidate source selections, and `python test_navigation_drawer.py`. Baseline assertion failures are retained as before evidence. These are synthetic host checks only. The settings-content/timestamp ambiguity is deliberately retained as a blocking counterexample; no unsafe field exemption is implemented.
+
+Additional independently confirmed browser correction: the detailed movie List row binds its small art slot to a studio icon instead of the movie poster. Correct only its normal/focused texture binding, keeping geometry, existing themes, metadata, callbacks and other layouts unchanged. Select `python test_media_art.py` before execution. This does not constitute full locked-design implementation or image verification.
+
+Release-readiness assertions selected before execution: `python test_required_behavior.py`. These explicitly require the remaining user-visible Nixtoons/timestamp behavior, direct navigation and landscape Power fit. Known failures must stay FAIL; diagnostic tests that assert the preserved rejection are not substitutes for these requirements. Synthetic geometry is labelled separately from physical measurements. No APK is built if these requirements fail.
+
+Direct-route source continuation: prepare runtime verification before dispatch, using existing Command Center `eligible`/`route`/`_source` infrastructure, read-only installed SportHD manifest/entrypoint lookup and the existing navigation helper. Main Movies/TV buttons invoke that helper directly; indexed Library and Favorites remain unchanged. Current phone compatibility remains unverified until the guarded paths actually run there. Select `python test_direct_navigation.py` and rerun only the affected navigation/readiness assertions after this correction. No provider execution, account/settings access or substituted Sports path is allowed.

@@ -1,0 +1,78 @@
+test_identical_settings_rewrite_must_not_discard_completed_result (__main__.RequiredBehavior.test_identical_settings_rewrite_must_not_discard_completed_result) ... FAIL
+test_movies_and_tv_must_not_open_intermediate_cc_menu (__main__.RequiredBehavior.test_movies_and_tv_must_not_open_intermediate_cc_menu) ...
+  test_movies_and_tv_must_not_open_intermediate_cc_menu (__main__.RequiredBehavior.test_movies_and_tv_must_not_open_intermediate_cc_menu) (control='1198102') ... FAIL
+  test_movies_and_tv_must_not_open_intermediate_cc_menu (__main__.RequiredBehavior.test_movies_and_tv_must_not_open_intermediate_cc_menu) (control='1198103') ... FAIL
+test_nixtoons_history_must_not_discard_completed_result (__main__.RequiredBehavior.test_nixtoons_history_must_not_discard_completed_result) ... FAIL
+test_power_initial_fit_in_synthetic_cover_inner_orientations (__main__.RequiredBehavior.test_power_initial_fit_in_synthetic_cover_inner_orientations) ...
+  test_power_initial_fit_in_synthetic_cover_inner_orientations (__main__.RequiredBehavior.test_power_initial_fit_in_synthetic_cover_inner_orientations) (case='SYNTHETIC_cover_landscape') ... FAIL
+  test_power_initial_fit_in_synthetic_cover_inner_orientations (__main__.RequiredBehavior.test_power_initial_fit_in_synthetic_cover_inner_orientations) (case='SYNTHETIC_inner_landscape') ... FAIL
+test_sports_must_not_substitute_playlistbrowser (__main__.RequiredBehavior.test_sports_must_not_substitute_playlistbrowser) ... FAIL
+
+======================================================================
+FAIL: test_identical_settings_rewrite_must_not_discard_completed_result (__main__.RequiredBehavior.test_identical_settings_rewrite_must_not_discard_completed_result)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-corrective/repairs/infinity-master-corrective-20261105/test_required_behavior.py", line 31, in test_identical_settings_rewrite_must_not_discard_completed_result
+    self.assertEqual(fixture.b.query()[1],'completed')
+AssertionError: 'state_changed' != 'completed'
+- state_changed
++ completed
+
+
+======================================================================
+FAIL: test_movies_and_tv_must_not_open_intermediate_cc_menu (__main__.RequiredBehavior.test_movies_and_tv_must_not_open_intermediate_cc_menu) (control='1198102')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-corrective/repairs/infinity-master-corrective-20261105/test_required_behavior.py", line 38, in test_movies_and_tv_must_not_open_intermediate_cc_menu
+    self.assertFalse(any('plugin://script.infinity.commandcenter/?action=' in (e.text or '') for e in button.findall('onclick')))
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_movies_and_tv_must_not_open_intermediate_cc_menu (__main__.RequiredBehavior.test_movies_and_tv_must_not_open_intermediate_cc_menu) (control='1198103')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-corrective/repairs/infinity-master-corrective-20261105/test_required_behavior.py", line 38, in test_movies_and_tv_must_not_open_intermediate_cc_menu
+    self.assertFalse(any('plugin://script.infinity.commandcenter/?action=' in (e.text or '') for e in button.findall('onclick')))
+AssertionError: True is not false
+
+======================================================================
+FAIL: test_nixtoons_history_must_not_discard_completed_result (__main__.RequiredBehavior.test_nixtoons_history_must_not_discard_completed_result)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-corrective/repairs/infinity-master-corrective-20261105/test_required_behavior.py", line 26, in test_nixtoons_history_must_not_discard_completed_result
+    self.assertEqual(fixture.b.query()[1],'completed')
+AssertionError: 'state_changed' != 'completed'
+- state_changed
++ completed
+
+
+======================================================================
+FAIL: test_power_initial_fit_in_synthetic_cover_inner_orientations (__main__.RequiredBehavior.test_power_initial_fit_in_synthetic_cover_inner_orientations) (case='SYNTHETIC_cover_landscape')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-corrective/repairs/infinity-master-corrective-20261105/test_required_behavior.py", line 65, in test_power_initial_fit_in_synthetic_cover_inner_orientations
+    with self.subTest(case=r['case']):self.assertTrue(r['power_fits'],r)
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : {'case': 'SYNTHETIC_cover_landscape', 'viewport': [2520, 1080], 'logical_height': 1056, 'panel_height': 1013.76, 'usable_list_height': 863.76, 'power_end': 1416.0, 'power_fits': False}
+
+======================================================================
+FAIL: test_power_initial_fit_in_synthetic_cover_inner_orientations (__main__.RequiredBehavior.test_power_initial_fit_in_synthetic_cover_inner_orientations) (case='SYNTHETIC_inner_landscape')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-corrective/repairs/infinity-master-corrective-20261105/test_required_behavior.py", line 65, in test_power_initial_fit_in_synthetic_cover_inner_orientations
+    with self.subTest(case=r['case']):self.assertTrue(r['power_fits'],r)
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true : {'case': 'SYNTHETIC_inner_landscape', 'viewport': [2160, 1800], 'logical_height': 1472, 'panel_height': 1413.12, 'usable_list_height': 1263.12, 'power_end': 1416.0, 'power_fits': False}
+
+======================================================================
+FAIL: test_sports_must_not_substitute_playlistbrowser (__main__.RequiredBehavior.test_sports_must_not_substitute_playlistbrowser)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-corrective/repairs/infinity-master-corrective-20261105/test_required_behavior.py", line 43, in test_sports_must_not_substitute_playlistbrowser
+    self.assertFalse(any('plugin.video.playlistbrowser' in json.dumps(c) for c in a.requests))
+AssertionError: True is not false
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.029s
+
+FAILED (failures=7)

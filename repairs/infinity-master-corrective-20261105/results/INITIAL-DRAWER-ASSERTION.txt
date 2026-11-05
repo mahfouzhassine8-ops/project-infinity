@@ -1,0 +1,20 @@
+test_browse_uses_native_video_files_once (__main__.NavigationAndDrawer.test_browse_uses_native_video_files_once) ... ok
+test_drawer_is_exact_reviewed_one_line_height_change (__main__.NavigationAndDrawer.test_drawer_is_exact_reviewed_one_line_height_change) ... ok
+test_failed_navigation_reports_failure_without_retry (__main__.NavigationAndDrawer.test_failed_navigation_reports_failure_without_retry) ... ok
+test_helper_matches_staged_source (__main__.NavigationAndDrawer.test_helper_matches_staged_source) ... ok
+test_native_favourites_route_and_library_targets_remain (__main__.NavigationAndDrawer.test_native_favourites_route_and_library_targets_remain) ... ok
+test_native_files_mapping_and_zip_label_are_confirmed_source_evidence (__main__.NavigationAndDrawer.test_native_files_mapping_and_zip_label_are_confirmed_source_evidence) ... ok
+test_power_is_single_original_scroll_child_and_action (__main__.NavigationAndDrawer.test_power_is_single_original_scroll_child_and_action) ... FAIL
+
+======================================================================
+FAIL: test_power_is_single_original_scroll_child_and_action (__main__.NavigationAndDrawer.test_power_is_single_original_scroll_child_and_action)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-corrective/repairs/infinity-master-corrective-20261105/test_navigation_drawer.py", line 53, in test_power_is_single_original_scroll_child_and_action
+    self.assertIn(matches[0],list(group))
+AssertionError: <Element 'control' at 0x7fbccdca4bd0> not found in [<Element 'left' at 0x7fbccdc60c70>, <Element 'right' at 0x7fbccdc60cc0>, <Element 'top' at 0x7fbccdc60d10>, <Element 'bottom' at 0x7fbccdc60d60>, <Element 'orientation' at 0x7fbccdc60db0>, <Element 'itemgap' at 0x7fbccdc60e00>, <Element 'usecontrolcoords' at 0x7fbccdc60e50>, <Element 'scrolltime' at 0x7fbccdc60ea0>, <Element 'onback' at 0x7fbccdc60ef0>, <Element 'onleft' at 0x7fbccdc60f40>, <Element 'control' at 0x7fbccdc60f90>, <Element 'control' at 0x7fbccdc613a0>, <Element 'control' at 0x7fbccdc62520>, <Element 'control' at 0x7fbccdc636a0>, <Element 'control' at 0x7fbccdc54810>, <Element 'control' at 0x7fbccdc55800>, <Element 'control' at 0x7fbccdc569d0>, <Element 'control' at 0x7fbccdc56de0>, <Element 'control' at 0x7fbccdc57e20>, <Element 'control' at 0x7fbccdc6ce50>, <Element 'control' at 0x7fbccdc6de90>, <Element 'control' at 0x7fbccdc6eed0>, <Element 'control' at 0x7fbccdc6ff60>, <Element 'control' at 0x7fbccdc79170>, <Element 'control' at 0x7fbccdc79580>, <Element 'control' at 0x7fbccdc7a750>, <Element 'control' at 0x7fbccdc7b920>, <Element 'control' at 0x7fbccdca4ae0>, <Element 'control' at 0x7fbccdca5b70>, <Element 'control' at 0x7fbccdca5f80>, <Element 'control' at 0x7fbccdca7100>, <Element 'control' at 0x7fbccdcc82c0>, <Element 'control' at 0x7fbccdcc86d0>, <Element 'control' at 0x7fbccdcc9b20>, <Element 'control' at 0x7fbccdccb290>, <Element 'control' at 0x7fbccdcf4630>, <Element 'control' at 0x7fbccdcf5990>, <Element 'control' at 0x7fbccdcf5da0>, <Element 'control' at 0x7fbccdcf7060>, <Element 'control' at 0x7fbccdcec220>, <Element 'control' at 0x7fbccdced3a0>, <Element 'control' at 0x7fbccdced7b0>, <Element 'control' at 0x7fbccdceeac0>, <Element 'control' at 0x7fbccdcefdd0>, <Element 'control' at 0x7fbccdce1120>, <Element 'control' at 0x7fbccdce2430>, <Element 'control' at 0x7fbccdce3740>, <Element 'control' at 0x7fbccdcb5120>]
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.053s
+
+FAILED (failures=1)

@@ -1,0 +1,22 @@
+test_baseline_binds_movie_rows_to_studio_art (__main__.MediaArt.test_baseline_binds_movie_rows_to_studio_art) ... ok
+test_normal_and_focused_movie_rows_use_item_poster (__main__.MediaArt.test_normal_and_focused_movie_rows_use_item_poster) ... ok
+test_only_two_bindings_change_no_metadata_actions_or_theme_rewrite (__main__.MediaArt.test_only_two_bindings_change_no_metadata_actions_or_theme_rewrite) ... FAIL
+
+======================================================================
+FAIL: test_only_two_bindings_change_no_metadata_actions_or_theme_rewrite (__main__.MediaArt.test_only_two_bindings_change_no_metadata_actions_or_theme_rewrite)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-corrective/repairs/infinity-master-corrective-20261105/test_media_art.py", line 37, in test_only_two_bindings_change_no_metadata_actions_or_theme_rewrite
+    self.assertEqual([E.tostring(e) for e in old.iter(tag)],[E.tostring(e) for e in new.iter(tag)])
+AssertionError: Lists differ: [b'<i[4181 chars]ure>$VAR[StudioIconVar]</texture>\n           [191807 chars]>\n'] != [b'<i[4181 chars]ure>$INFO[ListItem.Art(poster)]</texture>\n   [191823 chars]>\n']
+
+First differing element 0:
+b'<in[4180 chars]ure>$VAR[StudioIconVar]</texture>\n           [70196 chars]\n  '
+b'<in[4180 chars]ure>$INFO[ListItem.Art(poster)]</texture>\n   [70212 chars]\n  '
+
+Diff is 229975 characters long. Set self.maxDiff to None to see it.
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.271s
+
+FAILED (failures=1)

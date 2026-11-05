@@ -1,0 +1,42 @@
+{
+  "installed_version": "UNVERIFIED",
+  "physical_acceptance": "UNVERIFIED",
+  "frozen_reference": 2103451,
+  "apk_sha256": {
+    "451": "d77c31c458c4571212022bea7cea1e76c1d415cd5792b780b3c655fba97c6399",
+    "453": "08ca19e9ff01e3830253980028dbcdbfb36056fd71b06a18cbfb922158ceaac8"
+  },
+  "signed451_to_test453_differences": [
+    {
+      "member": "AndroidManifest.xml",
+      "451": "447aed22ee1b42aef44a2f56a44e77ea8bb679ad2113050d97d7fa295b5bfaaf",
+      "453": "915898af7788e13c7bd5c92b931db747da7840eebd425ede71be2601f1bce214"
+    },
+    {
+      "member": "META-INF/INFINITY.RSA",
+      "451": "5dc7f974a1b32600bbb2830933efd25311b563ca0a64135b9c786808d6311759",
+      "453": "5ae04ae0f19f230c6ef56b6ade750616a4a7f0b278f4afe5c539e033da4d5336"
+    },
+    {
+      "member": "META-INF/INFINITY.SF",
+      "451": "44cdf8407e8e749ce7647b419924cb141b64bb3b003a7080411c105a05569343",
+      "453": "fac0509dff03d880cd42cff8d92548aae78e140c7136e2bc104ed0f1a99b9242"
+    },
+    {
+      "member": "META-INF/MANIFEST.MF",
+      "451": "7ebc6bdecaca51dfeecc7d076de585c7fdbc6eb2d4fd31ffa8c5cea66e638bf6",
+      "453": "eab0b18d889cdaa7b98a6faa7e0678c6c14d25b6112699af43957a0942a7248b"
+    },
+    {
+      "member": "assets/experience-component-updates.properties",
+      "451": "de10eb0e9fa3a3d8d1cf72ab8616e0b5ad17468adbff2df6921a051b0bea0534",
+      "453": "08f0f80f01b8f3f65a4e14d6be79c1a98f77a136a32fb2fc227c0fb0ebbad602"
+    },
+    {
+      "member": "lib/arm64-v8a/libkodi.so",
+      "451": "151128c176b6094f28bb3fc716cc07c3985a9aa38f1fe41e1bb1424f0285a47e",
+      "453": "d0b6f115e839fbe39e764e2fecad47418c501ab1ece853294578652cd0b80b98"
+    }
+  ],
+  "automatic_engine_integration": false
+}
