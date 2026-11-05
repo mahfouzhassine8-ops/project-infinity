@@ -1,0 +1,100 @@
+--- signed2103458/assets/addons/skin.infinity.diggz/unified/DialogVideoInfo.xml
++++ source-candidate/assets/addons/skin.infinity.diggz/unified/DialogVideoInfo.xml
+@@ -35,7 +35,7 @@
+     <control type="button" id="10">
+       <left>3.0208%</left>
+       <top>4.4444%</top>
+-      <width>4.791614%</width>
++      <width>17.5%</width>
+       <height>48</height>
+       <label>‹  MOVIES</label>
+       <onclick>PreviousMenu</onclick>
+@@ -51,7 +51,7 @@
+       <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+     </control>
+ <!-- INFINITY_LOADING_V2 -->
+-<include content="InfinityActionLoadingFrame"><param name="left" value="3.0208%" /><param name="top" value="4.4444%" /><param name="width" value="4.791614%" /><param name="height" value="48" /><param name="control" value="10" /><param name="window" value="0" /><param name="globalframe" value="false" /><param name="inheritwindow" value="true" /></include>
++<include content="InfinityActionLoadingFrame"><param name="left" value="3.0208%" /><param name="top" value="4.4444%" /><param name="width" value="17.5%" /><param name="height" value="48" /><param name="control" value="10" /><param name="window" value="0" /><param name="globalframe" value="false" /><param name="inheritwindow" value="true" /></include>
+ 
+     <control type="image">
+       <left>3.6458%</left>
+@@ -61,7 +61,7 @@
+       <texture colordiffuse="$VAR[InfinityBoardText]">infinity_ui/icons/back.png</texture>
+     </control>
+     <control type="label">
+-      <left>8.2292%</left>
++      <left>22%</left>
+       <top>4.6296%</top>
+       <width>48.9583%</width>
+       <height>42</height>
+@@ -83,7 +83,7 @@
+       <top>13.7037%</top>
+       <width>17.1875%</width>
+       <height>43.055544%</height>
+-      <aspectratio>scale</aspectratio>
++      <aspectratio>keep</aspectratio>
+       <texture background="true">$VAR[PosterThumb]</texture>
+     </control>
+     <control type="image">
+@@ -139,13 +139,13 @@
+     <control type="grouplist" id="9000">
+       <left>23.6458%</left>
+       <top>42.4074%</top>
+-      <width>54.6875%</width>
+-      <height>58</height>
++      <width>72%</width>
++      <height>72</height>
+       <orientation>horizontal</orientation>
+       <itemgap>12</itemgap>
+       <align>left</align>
+       <control type="togglebutton" id="8">
+-        <width>14.285694%</width>
++        <width>22.8%</width>
+         <height>93.1034%</height>
+         <label>PLAY</label>
+         <altlabel>OPEN</altlabel>
+@@ -159,7 +159,7 @@
+         <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+       </control>
+       <control type="togglebutton" id="15">
+-        <width>16.190453%</width>
++        <width>22.8%</width>
+         <height>93.1034%</height>
+         <label>TRAILER</label>
+         <altlabel>STOP TRAILER</altlabel>
+@@ -183,7 +183,7 @@
+         <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+       </control>
+       <control type="button" id="5">
+-        <width>14.285694%</width>
++        <width>22.8%</width>
+         <height>93.1034%</height>
+         <label>CAST</label>
+         <onclick>SetFocus(50)</onclick>
+@@ -195,7 +195,7 @@
+         <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
+       </control>
+       <control type="button" id="106">
+-        <width>18.095213%</width>
++        <width>22.8%</width>
+         <height>93.1034%</height>
+         <label>MORE INFO</label>
+         <font>InfinityTiny</font>
+@@ -262,7 +262,7 @@
+           <top>6.2069%</top>
+           <width>61.3333%</width>
+           <height>63.4483%</height>
+-          <aspectratio>scale</aspectratio>
++          <aspectratio>keep</aspectratio>
+           <texture colordiffuse="$VAR[InfinityPolishIcon0Tint]">$VAR[InfinityPolishIcon0]</texture>
+         </control>
+         <control type="label">
+@@ -297,7 +297,7 @@
+           <top>6.2069%</top>
+           <width>61.3333%</width>
+           <height>63.4483%</height>
+-          <aspectratio>scale</aspectratio>
++          <aspectratio>keep</aspectratio>
+           <texture colordiffuse="$VAR[InfinityPolishIcon0Tint]">$VAR[InfinityPolishIcon0]</texture>
+         </control>
+         <control type="label">

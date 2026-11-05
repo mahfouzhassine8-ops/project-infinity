@@ -5,6 +5,10 @@
     "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Custom_1198_InfinityNav.xml": {
       "allowed_behavior": "Remove only complete Browse Files and Media Sources drawer row groups; preserve all other XML bytes, drawer height, Power list position and actions.",
       "before_sha256": "0f1827f4f37aab009f8ff75fcc8267c184128b5ef35ff7847bca9dbb9efc295e"
+    },
+    "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/DialogVideoInfo.xml": {
+      "before_sha256": "39bb6ad5c0b7c5a75da697e139b5c8b20622d94a63de17f041150d207d2650fb",
+      "allowed_behavior": "Info-only Back/header width and position, matching existing loading frame geometry, keep-scaled poster/cast artwork; preserve every action, visibility, enablement, labels, metadata, theme bindings and IDs. Existing action group/button geometry only to prevent narrow-window label clipping; preserve IDs/native mappings including reported unresolved ID10 collision."
     }
   },
   "groups": {
@@ -20,7 +24,10 @@
     "Read-only signed458 original archive CRC/SHA/source binding",
     "30 consecutive synthetic provider-result publication operations with real existing validation code; explicitly not native/Android searches",
     "Retain two existing state_changed FAILs and validate actual rejection boundary without bypass",
-    "30 real Python Search worker/admission calls against synthetic RPC, including4 RPC errors; record residual tokens, thread and FD counts; not native/provider/Android stress"
+    "30 real Python Search worker/admission calls against synthetic RPC, including4 RPC errors; record residual tokens, thread and FD counts; not native/provider/Android stress",
+    "Info before/after logical Back label-space and header separation across cover/inner portrait/landscape; XML action/metadata/theme/control-ID exact preservation",
+    "Finite upstream full-skin native Info invocation, Light/Dark screenshots and Back restoration with explicit source-bound responsive projection; no playback or shutdown tests",
+    "Info action row minimum label width and total fit at cover/inner dimensions; rerender only changed Info geometry in Light/Dark with native Back"
   ],
   "release_blocked_until": [
     "Six-group correctness and precise full payload allowlist verified",

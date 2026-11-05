@@ -1,0 +1,35 @@
+test_artwork_proportional_without_metadata_substitution (__main__.Info.test_artwork_proportional_without_metadata_substitution) ... FAIL
+test_baseline_bound_to_signed458 (__main__.Info.test_baseline_bound_to_signed458) ... ok
+test_every_action_binding_and_control_preserved (__main__.Info.test_every_action_binding_and_control_preserved) ... FAIL
+test_header_label_space_and_no_overlap (__main__.Info.test_header_label_space_and_no_overlap) ... FAIL
+
+======================================================================
+FAIL: test_artwork_proportional_without_metadata_substitution (__main__.Info.test_artwork_proportional_without_metadata_substitution)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-2103458-six-corrections-20261105/test_info_visual.py", line 23, in test_artwork_proportional_without_metadata_substitution
+    self.assertEqual(len(images),3);self.assertTrue(all(n.findtext('aspectratio')=='keep' for n in images))
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_every_action_binding_and_control_preserved (__main__.Info.test_every_action_binding_and_control_preserved)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-2103458-six-corrections-20261105/test_info_visual.py", line 20, in test_every_action_binding_and_control_preserved
+    self.assertEqual(A,expected)
+AssertionError: '<?xm[2492 chars]idth>4.791614%</width>\n      <height>48</heig[27542 chars]w>\n' != '<?xm[2492 chars]idth>17.5%</width>\n      <height>48</height>\[27527 chars]w>\n'
+Diff is 31239 characters long. Set self.maxDiff to None to see it.
+
+======================================================================
+FAIL: test_header_label_space_and_no_overlap (__main__.Info.test_header_label_space_and_no_overlap)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-2103458-six-corrections-20261105/test_info_visual.py", line 15, in test_header_label_space_and_no_overlap
+    self.assertGreaterEqual(v(back.findtext('width'),w)-float(back.findtext('textoffsetx')),140)
+AssertionError: 7.7494311999999965 not greater than or equal to 140
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.013s
+
+FAILED (failures=3)

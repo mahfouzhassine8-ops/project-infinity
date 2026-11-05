@@ -1,0 +1,286 @@
+{
+  "runs": [
+    {
+      "result": "results/1260x540-action-width/RESULT.json",
+      "status": "PASS_INFO_OPEN_THEME_AND_NATIVE_BACK_ONLY",
+      "info_source_sha256": "79f7b1786e237eac35bf6bb4b3b0f2aaeb0bbc251ed83a08588a8221b78a210c",
+      "checks": [
+        {
+          "name": "skin-ready",
+          "passed": true
+        },
+        {
+          "name": "fixture-modal-dismissed",
+          "passed": true
+        },
+        {
+          "name": "synthetic-directory",
+          "passed": true
+        },
+        {
+          "name": "selected-movie",
+          "passed": true
+        },
+        {
+          "name": "native-info-open",
+          "passed": true
+        },
+        {
+          "name": "info-dark-capture",
+          "passed": true
+        },
+        {
+          "name": "info-light-capture",
+          "passed": true
+        },
+        {
+          "name": "back-restores-browser",
+          "passed": true
+        },
+        {
+          "name": "same-selected-movie",
+          "passed": true
+        }
+      ],
+      "Android": "NOT_RUN",
+      "Fold": "NOT_RUN"
+    },
+    {
+      "result": "results/1260x540-native-back/RESULT.json",
+      "status": "PASS_INFO_OPEN_THEME_AND_NATIVE_BACK_ONLY",
+      "info_source_sha256": "986da3df8968928621075b178666ad54a417eea9bdb5dba7218627b0db116ac3",
+      "checks": [
+        {
+          "name": "skin-ready",
+          "passed": true
+        },
+        {
+          "name": "fixture-modal-dismissed",
+          "passed": true
+        },
+        {
+          "name": "synthetic-directory",
+          "passed": true
+        },
+        {
+          "name": "selected-movie",
+          "passed": true
+        },
+        {
+          "name": "native-info-open",
+          "passed": true
+        },
+        {
+          "name": "info-dark-capture",
+          "passed": true
+        },
+        {
+          "name": "info-light-capture",
+          "passed": true
+        },
+        {
+          "name": "back-restores-browser",
+          "passed": true
+        },
+        {
+          "name": "same-selected-movie",
+          "passed": true
+        }
+      ],
+      "Android": "NOT_RUN",
+      "Fold": "NOT_RUN"
+    },
+    {
+      "result": "results/540x1260-action-width/RESULT.json",
+      "status": "PASS_INFO_OPEN_THEME_AND_NATIVE_BACK_ONLY",
+      "info_source_sha256": "79f7b1786e237eac35bf6bb4b3b0f2aaeb0bbc251ed83a08588a8221b78a210c",
+      "checks": [
+        {
+          "name": "skin-ready",
+          "passed": true
+        },
+        {
+          "name": "fixture-modal-dismissed",
+          "passed": true
+        },
+        {
+          "name": "synthetic-directory",
+          "passed": true
+        },
+        {
+          "name": "selected-movie",
+          "passed": true
+        },
+        {
+          "name": "native-info-open",
+          "passed": true
+        },
+        {
+          "name": "info-dark-capture",
+          "passed": true
+        },
+        {
+          "name": "info-light-capture",
+          "passed": true
+        },
+        {
+          "name": "back-restores-browser",
+          "passed": true
+        },
+        {
+          "name": "same-selected-movie",
+          "passed": true
+        }
+      ],
+      "Android": "NOT_RUN",
+      "Fold": "NOT_RUN"
+    },
+    {
+      "result": "results/540x1260-after/RESULT.json",
+      "status": "FAIL",
+      "info_source_sha256": "986da3df8968928621075b178666ad54a417eea9bdb5dba7218627b0db116ac3",
+      "checks": [
+        {
+          "name": "skin-ready",
+          "passed": true
+        },
+        {
+          "name": "synthetic-directory",
+          "passed": false
+        }
+      ],
+      "Android": "NOT_RUN",
+      "Fold": "NOT_RUN"
+    },
+    {
+      "result": "results/540x1260-after-modal/RESULT.json",
+      "status": "FAIL",
+      "info_source_sha256": "986da3df8968928621075b178666ad54a417eea9bdb5dba7218627b0db116ac3",
+      "checks": [
+        {
+          "name": "skin-ready",
+          "passed": true
+        },
+        {
+          "name": "fixture-modal-dismissed",
+          "passed": false
+        }
+      ],
+      "Android": "NOT_RUN",
+      "Fold": "NOT_RUN"
+    },
+    {
+      "result": "results/540x1260-after-notice/RESULT.json",
+      "status": "FAIL",
+      "info_source_sha256": "986da3df8968928621075b178666ad54a417eea9bdb5dba7218627b0db116ac3",
+      "checks": [
+        {
+          "name": "skin-ready",
+          "passed": true
+        },
+        {
+          "name": "known-fixture-disabled-addons-notice",
+          "passed": true
+        },
+        {
+          "name": "fixture-modal-dismissed",
+          "passed": false
+        }
+      ],
+      "Android": "NOT_RUN",
+      "Fold": "NOT_RUN"
+    },
+    {
+      "result": "results/540x1260-bounded-notices/RESULT.json",
+      "status": "FAIL",
+      "info_source_sha256": "986da3df8968928621075b178666ad54a417eea9bdb5dba7218627b0db116ac3",
+      "checks": [
+        {
+          "name": "skin-ready",
+          "passed": true
+        },
+        {
+          "name": "fixture-modal-dismissed",
+          "passed": true
+        },
+        {
+          "name": "synthetic-directory",
+          "passed": true
+        },
+        {
+          "name": "selected-movie",
+          "passed": true
+        },
+        {
+          "name": "native-info-open",
+          "passed": true
+        },
+        {
+          "name": "info-dark-capture",
+          "passed": true
+        },
+        {
+          "name": "info-light-capture",
+          "passed": true
+        },
+        {
+          "name": "original-back-control-focused",
+          "passed": true
+        },
+        {
+          "name": "back-restores-browser",
+          "passed": false
+        }
+      ],
+      "Android": "NOT_RUN",
+      "Fold": "NOT_RUN"
+    },
+    {
+      "result": "results/540x1260-native-back/RESULT.json",
+      "status": "PASS_INFO_OPEN_THEME_AND_NATIVE_BACK_ONLY",
+      "info_source_sha256": "986da3df8968928621075b178666ad54a417eea9bdb5dba7218627b0db116ac3",
+      "checks": [
+        {
+          "name": "skin-ready",
+          "passed": true
+        },
+        {
+          "name": "fixture-modal-dismissed",
+          "passed": true
+        },
+        {
+          "name": "synthetic-directory",
+          "passed": true
+        },
+        {
+          "name": "selected-movie",
+          "passed": true
+        },
+        {
+          "name": "native-info-open",
+          "passed": true
+        },
+        {
+          "name": "info-dark-capture",
+          "passed": true
+        },
+        {
+          "name": "info-light-capture",
+          "passed": true
+        },
+        {
+          "name": "back-restores-browser",
+          "passed": true
+        },
+        {
+          "name": "same-selected-movie",
+          "passed": true
+        }
+      ],
+      "Android": "NOT_RUN",
+      "Fold": "NOT_RUN"
+    }
+  ],
+  "failure_records_preserved": true,
+  "physical_acceptance": false
+}

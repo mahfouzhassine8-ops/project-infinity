@@ -1,0 +1,27 @@
+test_action_labels_fit_narrow_window (__main__.Info.test_action_labels_fit_narrow_window) ... FAIL
+test_artwork_proportional_without_metadata_substitution (__main__.Info.test_artwork_proportional_without_metadata_substitution) ... ok
+test_baseline_bound_to_signed458 (__main__.Info.test_baseline_bound_to_signed458) ... ok
+test_every_action_binding_and_control_preserved (__main__.Info.test_every_action_binding_and_control_preserved) ... FAIL
+test_header_label_space_and_no_overlap (__main__.Info.test_header_label_space_and_no_overlap) ... ok
+
+======================================================================
+FAIL: test_action_labels_fit_narrow_window (__main__.Info.test_action_labels_fit_narrow_window)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-2103458-six-corrections-20261105/test_info_visual.py", line 26, in test_action_labels_fit_narrow_window
+    self.assertTrue(all(w>=175 for w in widths))
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_every_action_binding_and_control_preserved (__main__.Info.test_every_action_binding_and_control_preserved)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-2103458-six-corrections-20261105/test_info_visual.py", line 20, in test_every_action_binding_and_control_preserved
+    self.assertEqual(A,expected)
+AssertionError: '<?xm[6817 chars]idth>54.6875%</width>\n      <height>58</heigh[23202 chars]w>\n' != '<?xm[6817 chars]idth>72%</width>\n      <height>72</height>\n [23177 chars]w>\n'
+Diff is 30590 characters long. Set self.maxDiff to None to see it.
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.013s
+
+FAILED (failures=2)

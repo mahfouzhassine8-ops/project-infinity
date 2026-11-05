@@ -1,0 +1,26 @@
+{
+  "platform": "upstream Linux Kodi with explicit responsive projection",
+  "Android": "NOT_RUN",
+  "Fold": "NOT_RUN",
+  "info_sha256": "986da3df8968928621075b178666ad54a417eea9bdb5dba7218627b0db116ac3",
+  "checks": [
+    {
+      "name": "skin-ready",
+      "passed": true
+    },
+    {
+      "name": "known-fixture-disabled-addons-notice",
+      "passed": true
+    },
+    {
+      "name": "fixture-modal-dismissed",
+      "passed": false
+    }
+  ],
+  "fixture_startup_dialog": {
+    "id": 10100,
+    "heading": "Disabled add-ons"
+  },
+  "status": "FAIL",
+  "error": "Traceback (most recent call last):\n  File \"/tmp/infinity-browser-render-20261105/share/addons/script.infinitybrowserqa/entry.py\", line 26, in <module>\n    check('fixture-modal-dismissed',wait(lambda:xbmcgui.getCurrentWindowDialogId()==9999,5))\n    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/tmp/infinity-browser-render-20261105/share/addons/script.infinitybrowserqa/entry.py\", line 16, in check\n    if not value:raise RuntimeError(name)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^\nRuntimeError: fixture-modal-dismissed\n"
+}

@@ -1,4 +1,6 @@
-# Six-group controlled correction — source checkpoint, no successor APK
+# Six-group controlled correction — checkpoint 598b89b9 findings
+
+**Continuation:** See CONTINUATION.md and CONTINUATION-PRESERVATION.json for the subsequent Info-only correction and new runtime observations. The one-file statement below describes checkpoint598b89b9, not the later continuation.
 
 **Immutable correction base: signed 2103458**, source b740fc6f2f987c83b9a67617bfae82a34bd307d2, signing run42108276626. The retained original artifact ZIP is read-only; its CRC and contained APK SHA were reverified. APK SHA: eb2c5121b6a0173dc3848eda93ea0d640d1db9245de5b5985933312d56e951fd. Matching component/source references remain preserved in BASELINE.json. 2103458 is a working reference, not physically accepted. Earlier signing/host results do not establish correct device behavior.
 

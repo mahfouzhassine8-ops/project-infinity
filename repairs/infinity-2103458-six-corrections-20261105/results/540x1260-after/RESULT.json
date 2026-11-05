@@ -1,0 +1,18 @@
+{
+  "platform": "upstream Linux Kodi with explicit responsive projection",
+  "Android": "NOT_RUN",
+  "Fold": "NOT_RUN",
+  "info_sha256": "986da3df8968928621075b178666ad54a417eea9bdb5dba7218627b0db116ac3",
+  "checks": [
+    {
+      "name": "skin-ready",
+      "passed": true
+    },
+    {
+      "name": "synthetic-directory",
+      "passed": false
+    }
+  ],
+  "status": "FAIL",
+  "error": "Traceback (most recent call last):\n  File \"/tmp/infinity-browser-render-20261105/share/addons/script.infinitybrowserqa/entry.py\", line 25, in <module>\n    check('synthetic-directory',wait(lambda:xbmc.getInfoLabel('Container.Content')=='movies' and not xbmc.getCondVisibility('Container.IsUpdating')))\n    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/tmp/infinity-browser-render-20261105/share/addons/script.infinitybrowserqa/entry.py\", line 16, in check\n    if not value:raise RuntimeError(name)\n                 ^^^^^^^^^^^^^^^^^^^^^^^^\nRuntimeError: synthetic-directory\n"
+}

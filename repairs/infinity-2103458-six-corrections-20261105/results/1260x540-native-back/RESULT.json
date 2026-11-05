@@ -1,0 +1,47 @@
+{
+  "platform": "upstream Linux Kodi with explicit responsive projection",
+  "Android": "NOT_RUN",
+  "Fold": "NOT_RUN",
+  "info_sha256": "986da3df8968928621075b178666ad54a417eea9bdb5dba7218627b0db116ac3",
+  "checks": [
+    {
+      "name": "skin-ready",
+      "passed": true
+    },
+    {
+      "name": "fixture-modal-dismissed",
+      "passed": true
+    },
+    {
+      "name": "synthetic-directory",
+      "passed": true
+    },
+    {
+      "name": "selected-movie",
+      "passed": true
+    },
+    {
+      "name": "native-info-open",
+      "passed": true
+    },
+    {
+      "name": "info-dark-capture",
+      "passed": true
+    },
+    {
+      "name": "info-light-capture",
+      "passed": true
+    },
+    {
+      "name": "back-restores-browser",
+      "passed": true
+    },
+    {
+      "name": "same-selected-movie",
+      "passed": true
+    }
+  ],
+  "skin_back_button": "FAIL_PREEXISTING_ID10_GET_THUMB_COLLISION_NOT_REPAIRED",
+  "status": "PASS_INFO_OPEN_THEME_AND_NATIVE_BACK_ONLY",
+  "overall_Info_acceptance": "NOT_ACCEPTED_BACK_BUTTON_FAILURE_AND_REMAINING_VISUAL_POLISH"
+}
