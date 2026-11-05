@@ -1,0 +1,108 @@
+--- a/xbmc/input/InputManager.cpp
++++ b/xbmc/input/InputManager.cpp
+@@ -587 +587,2 @@
+-          if (wm.GetActiveWindow() == WINDOW_VIDEO_NAV) ids.push_back(owner->GetViewContainerID());
++          if (wm.GetActiveWindow() == WINDOW_VIDEO_NAV || wm.GetActiveWindow() == WINDOW_FAVOURITES)
++            ids.push_back(owner->GetViewContainerID());
+@@ -589 +590 @@
+-            ids = {8101,8102,8601,8602,8701,8702,8801,8802,8830,8831,8103,8104,8603,8604,8703,8704,8803,8804,8721,8722,8821,8822,9201,9202};
++            ids = {8101,8102,8601,8602,8701,8702,8801,8802,8830,8831,8103,8104,8603,8604,8703,8704,8803,8804,8721,8722,8821,8822,9201,9202,8109,8609,8709,8809};
+--- a/xbmc/guilib/GUIBaseContainer.cpp
++++ b/xbmc/guilib/GUIBaseContainer.cpp
+@@ -619,0 +620,3 @@
++  if (message.GetControlId() == GetID() && message.GetMessage() == GUI_MSG_LOSTFOCUS &&
++      message.GetParam1() != GetID())
++    InfinityTouchClearForAction(this); // preserve same-control refocus; clear real transfers
+@@ -1035,0 +1039 @@
++  InfinityTouchPress(this, "", false, true, std::chrono::steady_clock::now());
+@@ -1084,0 +1089 @@
++  InfinityTouchPress(this, "", false, true, std::chrono::steady_clock::now());
+@@ -1180 +1185 @@
+-  const bool video = GetParentID() == WINDOW_VIDEO_NAV && window &&
++  const bool video = (GetParentID() == WINDOW_VIDEO_NAV || GetParentID() == WINDOW_FAVOURITES) && window &&
+@@ -1181,0 +1187,2 @@
++  const bool homeFavourites = GetParentID() == WINDOW_HOME &&
++      (GetID() == 8109 || GetID() == 8609 || GetID() == 8709 || GetID() == 8809);
+@@ -1188 +1195 @@
+-  if ((!video && !featured && !resume && !sharedHome && !sharedBrowse) || !window || !HasProcessed() || m_gestureActive ||
++  if ((!video && !featured && !resume && !sharedHome && !sharedBrowse && !homeFavourites) || !window || !HasProcessed() || m_gestureActive ||
+@@ -1204,4 +1211,7 @@
+-  if (!item->HasVideoInfoTag()) return reject();
+-  const std::string type = item->GetVideoInfoTag()->m_type;
+-  if (type != "movie" && type != "tvshow" && type != "season" && type != "episode")
+-    return reject(); // search/history/command entries are not media records
++  if (item->IsParentFolder()) return reject(); // retain original one-tap Back navigation
++  if (!HasFocus() || window->GetFocusedControlID() != GetID())
++    InfinityTouchClearForAction(this); // a newly focused view starts unarmed
++  const std::string type = item->HasVideoInfoTag() ? item->GetVideoInfoTag()->m_type : "";
++  const bool media = type == "movie" || type == "tvshow" || type == "season" || type == "episode";
++  if (!media && !video && !homeFavourites) return reject();
++  if (homeFavourites && !item->IsFavourite()) return reject();
+@@ -1227 +1237 @@
+-  const bool owned = (controllerDirectory || latest ||
++  const bool owned = media && (controllerDirectory || latest ||
+@@ -1247,16 +1257,4 @@
+-    if (hold)
+-    {
+-      m_infinityMediaTapKey.clear();
+-      m_infinityMediaSuppressUntil = now + std::chrono::milliseconds(600);
+-      InfinityOpenTitlePopup(item);
+-      return true;
+-    }
+-    if (now < m_infinityMediaSuppressUntil) return true;
+-    const auto elapsed = now - m_infinityMediaTappedAt;
+-    const bool open = previous == selected && m_infinityMediaTapKey == key &&
+-        elapsed >= std::chrono::milliseconds(120) && elapsed <= std::chrono::seconds(5);
+-    m_infinityMediaTapKey = key;
+-    m_infinityMediaTappedAt = now;
+-    if (open)
+-    {
+-      m_infinityMediaTapKey.clear();
++    const auto decision = InfinityTouchPress(this, key, previous == selected, hold, now);
++    if (decision == InfinityTouchDecision::Context)
++      InfinityOpenTitlePopup(item); // retain the authenticated title context owner
++    else if (decision == InfinityTouchDecision::Activate)
+@@ -1264 +1261,0 @@
+-    }
+@@ -1268 +1265,4 @@
+-  if ((!provider && !library && !local) || path.size() > 8192 || item->IsParentFolder()) return reject();
++  const bool nativeDirectory = video || homeFavourites;
++  if ((!nativeDirectory && !provider && !library && !local) || path.empty() ||
++      path.size() > (nativeDirectory ? 32768U : 8192U) ||
++      (item->IsParentFolder() && !nativeDirectory)) return reject();
+@@ -1275,18 +1275,10 @@
+-  const std::string key = type + "\n" + path + "\n" + std::to_string(selected) + "\n" +
+-      std::to_string(reinterpret_cast<std::uintptr_t>(item.get()));
+-  if (hold)
+-  {
+-    m_infinityMediaTapKey.clear();
+-    m_infinityMediaSuppressUntil = now + std::chrono::milliseconds(600);
+-    OnClick(ACTION_CONTEXT_MENU); // original exact-item provider/native context, no Select
+-    return true;
+-  }
+-  if (now < m_infinityMediaSuppressUntil) return true;
+-  const auto elapsed = now-m_infinityMediaTappedAt;
+-  const bool open = previous == selected && m_infinityMediaTapKey == key &&
+-      elapsed >= std::chrono::milliseconds(120) && elapsed <= std::chrono::seconds(5);
+-  m_infinityMediaTapKey = key;
+-  m_infinityMediaTappedAt = now;
+-  if (open)
+-  {
+-    m_infinityMediaTapKey.clear();
++  std::string key = "infinity-native-media-touch-v1";
++  for (const auto& field : {type, path, directory, std::to_string(GetParentID()),
++       std::to_string(GetID()), std::to_string(selected),
++       std::to_string(reinterpret_cast<std::uintptr_t>(item.get())),
++       item->m_bIsFolder ? std::string("folder") : std::string("item")})
++    InfinitySelectionField(key, field);
++  const auto decision = InfinityTouchPress(this, key, previous == selected, hold, now);
++  if (decision == InfinityTouchDecision::Context)
++    OnClick(ACTION_CONTEXT_MENU); // preserve exact native/provider context ownership
++  else if (decision == InfinityTouchDecision::Activate)
+@@ -1294 +1285,0 @@
+-  }
+@@ -1394,0 +1386,2 @@
++    if (resume)
++      InfinityTouchPress(this, "", false, true, std::chrono::steady_clock::now());
+@@ -1946,0 +1940 @@
++  InfinityTouchClearForAction(this); // rebind/reset must not arm a replacement row

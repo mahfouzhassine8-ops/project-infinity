@@ -13,7 +13,7 @@ import test_provider_side_effects as effects
 HERE = Path(__file__).resolve().parent
 SOURCE = Path(os.environ.get('SEARCH_SOURCE', str(HERE/'overlay/assets/addons/script.infinity.commandcenter/infinity_search.py')))
 TREE = ast.parse(SOURCE.read_bytes())
-CODE = compile(ast.Module(body=[n for n in TREE.body if isinstance(n, (ast.FunctionDef, ast.ClassDef)) and n.name in shipped.SELECT], type_ignores=[]), str(SOURCE), 'exec')
+CODE = compile(ast.Module(body=[n for n in TREE.body if isinstance(n, (ast.FunctionDef, ast.ClassDef)) and n.name in shipped.SELECT|{'_state_rejection_trace'}], type_ignores=[]), str(SOURCE), 'exec')
 
 
 class SearchCorrection(unittest.TestCase):
@@ -113,11 +113,11 @@ class SearchCorrection(unittest.TestCase):
         self.assertEqual(fixture.writes, ['searchHistory'])
         self.assertEqual(len(calls), 1)
 
-    def test_only_two_search_functions_changed(self):
+    def test_only_two_search_functions_and_rejection_diagnostic_changed(self):
         before = {n.name:ast.dump(n) for n in ast.parse(shipped.RAW).body if isinstance(n,(ast.FunctionDef,ast.ClassDef))}
         after = {n.name:ast.dump(n) for n in TREE.body if isinstance(n,(ast.FunctionDef,ast.ClassDef))}
         if SOURCE.name == 'infinity_search.py' and 'overlay' in SOURCE.parts:
-            self.assertEqual({n for n in before.keys()|after.keys() if before.get(n)!=after.get(n)}, {'_query_signature','_provider_result'})
+            self.assertEqual({n for n in before.keys()|after.keys() if before.get(n)!=after.get(n)}, {'_query_signature','_provider_result','_state_rejection_trace'})
         else: self.assertEqual(before, after)
 
 

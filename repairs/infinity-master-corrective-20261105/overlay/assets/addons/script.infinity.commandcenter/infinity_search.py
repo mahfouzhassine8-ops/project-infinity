@@ -246,7 +246,7 @@ def _query_file_stamp(path):
     return (value.st_dev, value.st_ino, value.st_size, value.st_mtime_ns, value.st_ctime_ns)
 
 
-def _query_signature(provider, path, home, response=False):
+def _query_signature(provider, path, home, response=False, components=None):
     """Bind answers to their actual route, dependencies and current UI state.
 
     These stamps never grant a capability. route() must still verify enabled
@@ -268,6 +268,8 @@ def _query_signature(provider, path, home, response=False):
         paths = paths[1:]
     stamps = [_query_file_stamp(file) for file in paths]
     if any(stamp is None for stamp in stamps):
+        if components is not None:
+            components['unverifiable_state'] = 'unverifiable'
         return None
     revisions = [home.getProperty(name) for name in (
         'Infinity.ContinueWatchingRevision', 'Infinity.ProviderInventory.Revision',
@@ -275,17 +277,61 @@ def _query_signature(provider, path, home, response=False):
         'widgetreload-movies', 'widgetreload-tvshows')]
     if response:
         revisions = []
-    identity = [str(profile), str(progress), addon.getAddonInfo('version'), path,
+    version = addon.getAddonInfo('version')
+    if components is not None:
+        # Diagnostic comparisons reuse this exact snapshot. Retain only hashes
+        # in RAM; log reason names, never these hashes or their source values.
+        fields = dict(profile=str(profile), commandcenter_profile=str(progress),
+                      commandcenter_version=version, route=path,
+                      provider_root=provider['root'], contract=provider['contract'])
+        source_stamps = stamps if response else stamps[1:]
+        fields.update(provider_manifest_metadata=source_stamps[0], provider_settings_metadata=source_stamps[1],
+                      dependency_manifest_metadata=source_stamps[2::2], dependency_settings_metadata=source_stamps[3::2])
+        if not response:
+            fields['continue_watching_metadata'] = stamps[0]
+            for name, value in zip(('Infinity.ContinueWatchingRevision', 'Infinity.ProviderInventory.Revision',
+                    'Infinity.ResumeHub.PresentationSnapshot', 'widgetreload', 'widgetreload2',
+                    'widgetreload-movies', 'widgetreload-tvshows'), revisions):
+                fields['home.' + name] = value
+        components.update({name:hashlib.sha256(json.dumps(value, sort_keys=True,
+                            separators=(',', ':')).encode('utf-8')).hexdigest() for name,value in fields.items()})
+    identity = [str(profile), str(progress), version, path,
                 provider['root'], provider['contract'], stamps, revisions]
     return hashlib.sha256(json.dumps(identity, sort_keys=True, separators=(',', ':')).encode('utf-8')).hexdigest()
+
+
+def _state_rejection_trace(provider, status, answer, hit, before, after, cache_before, cache_after):
+    """One small existing-log record per rejection; never a readiness decision."""
+    try:
+        import re
+        aid = provider.get('id', '')
+        if not isinstance(aid, str) or not re.fullmatch(r'plugin\.video\.[A-Za-z0-9._-]{1,100}', aid):
+            aid = 'unreported'
+        changed = ({'unverifiable_state'} if 'unverifiable_state' in before or 'unverifiable_state' in after
+                   else {name for name in before.keys() | after.keys() if before.get(name) != after.get(name)})
+        if hit:
+            changed.update(name for name in cache_before.keys() | cache_after.keys()
+                           if cache_before.get(name) != cache_after.get(name))
+        if not changed:
+            changed.add('unverifiable_or_unclassified_state')
+        result = answer.get('result') if isinstance(answer, dict) else None
+        rows = result.get('files') if isinstance(result, dict) else None
+        record = dict(schema=1, event='aggregate_result_rejected', provider=aid,
+                      original_status=status if status in ('completed','busy','timeout','cancelled','unavailable') else 'unreported',
+                      original_result_count=len(rows) if isinstance(rows, list) else None,
+                      cache_hit=bool(hit), changed=sorted(changed), original_provider_route_retained=True)
+        xbmc.log('INFINITY_SEARCH_STATE ' + json.dumps(record, sort_keys=True, separators=(',', ':')), xbmc.LOGINFO)
+    except Exception:
+        pass  # Diagnostic failure never changes source, cancellation or publication.
 
 
 def _provider_result(provider,query,home,cancel,progress=None):
     try:
         if cancel.iscanceled():return provider,'cancelled',{},''
         path=route(provider,query)
-        response_signature=_query_signature(provider,path,home,response=True)
-        signature=_query_signature(provider,path,home)
+        before_response={};before_cache={}
+        response_signature=_query_signature(provider,path,home,response=True,components=before_response)
+        signature=_query_signature(provider,path,home,components=before_cache)
         cache_key='Infinity.Search.Cache.'+provider['id']
         cache=_query_cache_entries(home.getProperty(cache_key),time.monotonic())
         hit=next((row for row in cache if signature is not None and row['signature']==signature),None)
@@ -299,10 +345,13 @@ def _provider_result(provider,query,home,cancel,progress=None):
         # Preserve the original native refusal/error; freshness is not its cause.
         if status != 'completed' or 'error' in answer:
             return provider,status,answer,path
-        current_signature=_query_signature(provider,path,home)
+        after_response={};after_cache={}
+        current_signature=_query_signature(provider,path,home,components=after_cache)
+        current_response_signature=_query_signature(provider,path,home,response=True,components=after_response)
         if (response_signature is None or
-                _query_signature(provider,path,home,response=True) != response_signature or
+                current_response_signature != response_signature or
                 (hit is not None and current_signature != signature)):
+            _state_rejection_trace(provider,status,answer,hit is not None,before_response,after_response,before_cache,after_cache)
             return provider,'state_changed',{},path
         # Never transplant a response into a different cache generation.
         if hit is None and signature is not None and current_signature == signature:

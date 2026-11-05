@@ -8,6 +8,8 @@ The timestamp and Nixtoons requirements are **not fixed**. An endpoint-content-o
 
 Next smallest action: capture the actual failing request's installed provider identity, original native outcome, cache/fresh status and changed-component/field category, then prove a request-local configuration-mutation contract before exempting bookkeeping. The supplied standalone probe can collect sampled identity/deltas but cannot prove writer ownership or complete mutation history. No connected authorized launch route is exposed. Native settings mutation/ownership modifications would cross the preserved engine boundary and require a separately reviewed exception; do not reopen blocked settings-retirement work. Crew's specific device failure remains unverified and is not assumed to be Nixtoons' history path.
 
+Continuation prepares a bounded existing-log rejection record using already-read components, retaining the original status/count without private values. [Search All/direct-provider comparison](SEARCH-ALL-COMPARISON.md) confirms the rejected provider heading retains the original query URI. The new physical report is accepted as provider-capability evidence, not proof of the original aggregate outcome or inspected video. Source callbacks were checked: Command Center cannot subscribe to all provider settings writes with the existing Monitor API; direct-file Crew repairs also bypass that notification. The two required acceptance failures remain visible.
+
 ## Direct destinations
 
 Reference publisher source confirms Umbrella's `movieNavigator → Navigator.movies` and `tvNavigator → Navigator.tvshows` routes. It also identifies the current public SportHD reference as `plugin.video.sporthdme`, version0.1.92, `default.py`. These are **public reference inputs, not the phone's installed IDs/versions/source hashes**.
@@ -22,6 +24,8 @@ The actual native route is `WINDOW_FAVOURITES → MyFavourites.xml`; its Update 
 
 No existing user Favorites collection, active profile, load result, lock state or returned native count is available here. Do not infer data loss, rebuild the collection, disable locks or migrate it. Next observation is the current profile identity (private), native count/load status and actual selected window; retain all data unchanged. No Favorites data repair is claimed.
 
+[The existing standalone probe now has a read-only Favorites mode](diagnostics/README.md), with11 passing host safety cases and no device deployment. First-party Add to Favorites already uses the same native API/backend. Actual attribution still needs read-only device evidence.
+
 ## Locked media-browser image
 
 The user confirms reattachment of the exact locked PNG. This executor still exposes no attachment bytes or file ID; the workspace/repository and accessible Pages do not contain that image. The design branch contains the SHA/specification only. Therefore SHA verification, direct visual inspection and exact locked-design implementation remain blocked. No substitute image was generated or treated as the approved reference.
@@ -33,6 +37,8 @@ The independent movie List thumbnail-binding defect has been corrected without c
 Existing Android `CInputManager::OnEvent` dispatches media touch before synthetic hover. `CGUIBaseContainer::OnInfinityMediaTouch` handles the active Videos container and designated Home surfaces, but requires a video tag with movie/tvshow/season/episode type and an eligible provider/library/controller path. It excludes ordinary untyped provider rows, many file/folder entries and the native Favorites window. The native Favorites path has a hold handler but is not admitted to the generic first/second-tap media path. Existing typed-media paths also retain a 120ms–5s tap pairing interval. This does not establish the requested universal contract.
 
 Skin XML alone cannot extend the native dispatcher eligibility or replace that pairing rule. Smallest proposed native exception: the Infinity-only Android branches of `xbmc/input/InputManager.cpp::OnEvent` and `xbmc/guilib/GUIBaseContainer.cpp::OnInfinityMediaTouch`, reusing the existing `InfinityTouchPress`, transformed hit testing, native item action/context dispatch and row identity. Include the native Favorites active view and applicable real folder/media rows; retain one-tap modal/direct buttons, Back, original context owners and all Kodi playback/shutdown code. No new tracker, worker or parallel gesture engine. Those production native files are unchanged; no native repair, compilation or Android touch PASS is claimed. A separate explicit protected-engine/source allowlist is needed before this exception is integrated.
+
+The [exact two-file proposal and narrow authorization request](TOUCH-AUTHORIZATION-REQUEST.md) are now reviewable. It clears existing pairs on genuine lost-focus messages, item reset and the original Home Favorites/Option B/Resume hold handlers, preserving one-tap parent/Back navigation and the existing validated context actions. Same-control refocus is explicitly preserved; SetFocus is unchanged. The native input byte hashes remain unchanged. Host helper/scope checks do not stand in for compilation of the full proposed GUI methods or Android input acceptance.
 
 ## Drawer geometry
 

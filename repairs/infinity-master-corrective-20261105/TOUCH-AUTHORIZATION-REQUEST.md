@@ -1,0 +1,30 @@
+# Narrow protected-native touch authorization request
+
+**Status: review proposal only. NOT APPLIED.** No native/build input, APK, library, header/class layout or recovery lock changed. [Exact two-file patch](TOUCH-NATIVE-PROPOSAL.patch), SHA256 `d6b61065f4158520e045985f6834327e80c163fed805cebd0c5b27c3179c1563`; [input/proposal hashes](TOUCH-PROPOSAL-INPUTS.json).
+
+The user's continuation explicitly requires a request before changing protected native files. Skin XML cannot fix the current fallback: rejected touch eligibility falls through to synthesized hover/ordinary click, after the pre-tap selection has been lost. The existing native controller already supports two-state selection and native context ownership.
+
+## Exact requested exception
+
+1. `xbmc/input/InputManager.cpp`, only the existing Infinity Android media-touch block of `CInputManager::OnEvent`: admit the active native Favorites view and the four existing Home Favorites containers, before synthetic hover. Preserve one-pointer/skin/modal/screensaver guards and every button/other input path.
+2. `xbmc/guilib/GUIBaseContainer.cpp`:
+   - `OnInfinityMediaTouch`: include eligible untyped provider/file/folder rows and native/Home Favorites; retain transformed hit testing, active-view ownership, source/title-owner proof and original item dispatch/context actions. Reuse `InfinityTouchPress` for existing media paths as well, removing the arbitrary five-second pairing expiry.
+   - `OnInfinityFavouritesLongPress`: disarm/suppress the same existing controller pair while preserving the original Favorites context handler.
+   - `OnInfinityOptionBLongPress` and the Resume-only hold branch of `OnInfinityUiTouch`: disarm/suppress the same pair after existing identity/focus validation. These legacy context handlers run first when the title owner is unavailable; retain every original context command/proof and non-Resume UI action unchanged.
+   - `OnMessage(GUI_MSG_LOSTFOCUS)` and `Reset`: clear an existing pair for a real focus transfer or item rebind. The lost-focus target ID must differ from the current control; Kodi's same-control refocus must retain the pair. `OnInfinityMediaTouch` also disarms a newly focused view before requesting focus. `SetFocus` remains byte-identical. The existing clear function neither allocates a store nor acts on controls without an Infinity pair.
+
+No new tracker, timer, worker, keymap, event service, native API, settings owner, class data member or virtual slot. The existing600ms hold-release suppression is reused. Normal mouse/remote/keyboard paths, the parent-directory Back row and direct Close/Back/Power/modal buttons are unchanged. Existing authenticated title popups remain their context owner; generic folders/Favorites use native context actions. No Kodi playback, codecs, audio, Preview, Cobra, chooser, add-on/provider, settings, database, checkpoint or shutdown code is included.
+
+The review artifact is a zero-context unified patch; apply only after exact input-hash verification, using the checked generator or explicit `--unidiff-zero` handling. This is not authorization to apply it. Both input files are now verified against the restored signed451 source map, SHA25620f901cf5780aebff6eff45e4f21248904f8a8ff72d4acdcd5ea72e783c829c3. The existing trusted restoration receipt binds source producer89300fa6690015f17378657f96230040bb4766ea to native451 SHA151128c176b6094f28bb3fc716cc07c3985a9aa38f1fe41e1bb1424f0285a47e. The generator rejects a map/file mismatch. Do not silently integrate the unaccepted453 engine or other native repairs. Any additional required file stops the sub-change for review. Keep original restored inputs untouched; apply only to an isolated approved candidate after authorization.
+
+## Evidence and next stage
+
+Six focused host checks pass against the final proposal: two-file/input immutability, exact dispatcher delta, exactly six container methods changed, preserved ownership/context guards, exact original legacy context methods after subtracting the suppression hooks, and the controller/focus/hold harness. Sixteen host cases compile/run the **unchanged existing** controller/framing helper plus the actual added focus/hold snippets against mocked callers: default focus, second tap after10s, changed/recycled selection, hold/ghost suppression, isolated owners, reset/focus/remote clearing, reused owner, empty identity, field framing, same-control versus real focus transfer and legacy Option B/Resume holds. [Final output](results/TOUCH-LEGACY-HOLD-REGRESSION.txt). The first harness extraction erroneously retained an enclosing native `#endif`; its failure is retained, and the extraction-only correction passes.
+
+Source review also rejected the initial proposal's unconditional `SetFocus(false)` clearing: native `GUI_MSG_SETFOCUS` deliberately sends lost-focus even when refocusing the same control. That would erase a valid second-tap pair. The final patch leaves `SetFocus` unchanged, clears actual transfers in `OnMessage`, and includes a regression for the native refocus sequence. No rejected proposal was applied.
+
+Final review found two earlier-dispatched legacy hold handlers that share the eligible Home containers. Their original context actions remain unchanged; the proposal adds only pair suppression there, so a prior media tap cannot survive a valid hold when the title owner is unavailable. Other rail handlers use different containers and remain byte-identical.
+
+This is **not** compilation of the proposed GUI method/body or ARM64 engine, and is not Android/Fold input evidence. After narrow authorization: apply only this patch to verified inputs, compile/check the actual methods and run the selected touch integration/negative controls. Android physical touch, modal behavior, Back/focus, context action identity, view changes, fold/rotation and foreground return remain NOT RUN. No APK packaging/signing is authorized by accepting this source exception.
+
+Requested decision: authorize this exact touch-only two-file source correction and focused verification, with the exclusions above. Search settings-observer changes are **not** included in this request.
