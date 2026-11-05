@@ -1,0 +1,88 @@
+{
+  "Android": "NOT_RUN",
+  "accepted_pointer_updated": false,
+  "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "current_installed_version": "UNVERIFIED",
+  "focused_packaging_CI": {
+    "cases_PASS": 11,
+    "evidence": "CI-PACKAGING-CHECKS.txt",
+    "job": 127108716836,
+    "run": 41986609531
+  },
+  "host_recovery_checks_PASS": 20,
+  "installed": false,
+  "known_defects": {
+    "Favorites_attribution": "UNCONFIRMED",
+    "Scudo_memory": "UNRESOLVED",
+    "Search_required_acceptance": "2 FAIL",
+    "full_locked_browser": "INCOMPLETE"
+  },
+  "locked": false,
+  "locks_preserved": 19,
+  "native": {
+    "modified_source_files": [
+      "xbmc/guilib/GUIBaseContainer.cpp",
+      "xbmc/input/InputManager.cpp"
+    ],
+    "protected_source_files": 9409,
+    "run": 41983648377,
+    "sha256": "9f77b092899b51850928007578e0fbf91bad38c05f147a308f3ac0cf5c036638",
+    "source_map_files": 9411,
+    "strong_exports_unchanged": 71211
+  },
+  "package": "com.projectinfinity.kodi",
+  "physical_Fold": "NOT_RUN",
+  "physical_install_over_and_recovery": "NOT_RUN",
+  "preservation_baseline": 2103451,
+  "promoted": false,
+  "source_checkpoint": "4c4094918845bd42649f50bcb094d2ba334a51bc",
+  "status": "PASS_CONTROLLED_TESTING_SAFETY_GATES_NOT_FEATURE_ACCEPTANCE",
+  "versions": {
+    "2103456": {
+      "APK_artifact": 13397163155,
+      "APK_bytes": 778576464,
+      "APK_file": "Infinity-2103456-Combined-Original-Signer.apk",
+      "APK_sha256": "81aed468bcdf4031f3186fa7c5aa73e396a38f27837581fbcc54f56cbbc94696",
+      "DEX_files_unchanged": 5,
+      "changed_existing": 14,
+      "component_payloads": "PASS_ALL_MEMBERS_AND_5_DEX_MATCH_SIGNED_APK",
+      "component_sha256": {
+        "CHOOSER_SHELL": "c16633a76ff8086888ccf5b33aaa340def8b4a5b4c7948505919a54ee6820c83",
+        "COBRA": "f63d4c1e491dc94591c5623bf02be90d4f9c187b91a0511b36398ee96745f8a8",
+        "INFINITY": "610db92ab778acaee5fc35c71d7eea58fb612296b0a6d06f91101f9d677b598c",
+        "MINIMAL_ANDROID_CONTRACT": "1c4a2890ef5ca8665b86b148dd293c06a56d76ec846de1e0c9c037a3b0151a25"
+      },
+      "components_artifact": 13397307616,
+      "native_libraries_unchanged": 46,
+      "new_members": 7,
+      "protected_existing_members": 7600,
+      "run": 41988386798,
+      "signature": "PASS_ORIGINAL_SOLE_SIGNER_v1_v2_v3_AND_ACTUAL_DOWNLOAD_HASH",
+      "source_commit": "9c77703eb847d3482441091da94bdbee272a2ee3",
+      "version_availability": "PASS_BEFORE_ISSUANCE"
+    },
+    "2103457": {
+      "APK_artifact": 13397403046,
+      "APK_bytes": 778596097,
+      "APK_file": "Infinity-2103457-Combined-Original-Signer.apk",
+      "APK_sha256": "cbba67441055492e2bd83558e7e65ad95396aefc1381d2e9e7809e180e8eb212",
+      "DEX_files_unchanged": 5,
+      "changed_existing": 8,
+      "component_payloads": "PASS_ALL_MEMBERS_AND_5_DEX_MATCH_SIGNED_APK",
+      "component_sha256": {
+        "CHOOSER_SHELL": "eb9b42da1d937d263882ea238e67e64925869a4c33caefb7adf959cc4ecbc43f",
+        "COBRA": "f63d4c1e491dc94591c5623bf02be90d4f9c187b91a0511b36398ee96745f8a8",
+        "INFINITY": "e7be5ad3113ce5d0b56874c6b46853338df00134867dcf13b3eb36107a85e505",
+        "MINIMAL_ANDROID_CONTRACT": "1c4a2890ef5ca8665b86b148dd293c06a56d76ec846de1e0c9c037a3b0151a25"
+      },
+      "components_artifact": 13397408243,
+      "native_libraries_unchanged": 47,
+      "new_members": 0,
+      "protected_existing_members": 7606,
+      "run": 41989110830,
+      "signature": "PASS_ORIGINAL_SOLE_SIGNER_v1_v2_v3_AND_ACTUAL_DOWNLOAD_HASH",
+      "source_commit": "feec0ee1c8c450c52a21b3d93877e97502cc2652",
+      "version_availability": "PASS_BEFORE_ISSUANCE"
+    }
+  }
+}

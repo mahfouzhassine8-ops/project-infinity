@@ -1,0 +1,55 @@
+{
+  "status": "PASS_ACTUAL_COMPONENT_ZIPS_MATCH_SIGNED456_PAYLOAD",
+  "run": 41988386798,
+  "artifact": 13397307616,
+  "archive_sha256": "5146c21886cacaa2db00462c47840b6da424ac06975bc4e60f3a1919e2ebd788",
+  "archive_bytes": 319105840,
+  "CRC_all_component_members_verified": true,
+  "package": "com.projectinfinity.kodi",
+  "versionCode": 2103456,
+  "APK_sha256": "81aed468bcdf4031f3186fa7c5aa73e396a38f27837581fbcc54f56cbbc94696",
+  "components": {
+    "CHOOSER_SHELL": {
+      "file": "CHOOSER_SHELL.zip",
+      "sha256": "c16633a76ff8086888ccf5b33aaa340def8b4a5b4c7948505919a54ee6820c83",
+      "version": "2103456.chooser_shell.1",
+      "digest": "0640d9d36dd157f9492cbc995eea409466426f864e6df8d47e1d87a89d70697d",
+      "payload_members": 1,
+      "DEX_members": 1,
+      "all_payload_members_match_signed_APK": true
+    },
+    "COBRA": {
+      "file": "COBRA.zip",
+      "sha256": "f63d4c1e491dc94591c5623bf02be90d4f9c187b91a0511b36398ee96745f8a8",
+      "version": "2103445.cobra.1",
+      "digest": "3bffd5a40fff3cb105d1db022d95dd69192edf02f2a81f40049a2b02c41d29cc",
+      "payload_members": 11,
+      "DEX_members": 2,
+      "all_payload_members_match_signed_APK": true
+    },
+    "INFINITY": {
+      "file": "INFINITY.zip",
+      "sha256": "610db92ab778acaee5fc35c71d7eea58fb612296b0a6d06f91101f9d677b598c",
+      "version": "2103456.infinity.1",
+      "digest": "18fd4fac0e447fae49b2a0214823667b85e40caebafeddd7ccd7f239f47a5d31",
+      "payload_members": 7523,
+      "DEX_members": 1,
+      "all_payload_members_match_signed_APK": true
+    },
+    "MINIMAL_ANDROID_CONTRACT": {
+      "file": "MINIMAL_ANDROID_CONTRACT.zip",
+      "sha256": "1c4a2890ef5ca8665b86b148dd293c06a56d76ec846de1e0c9c037a3b0151a25",
+      "version": "2103447.minimal_android_contract.1",
+      "digest": "df260c3ba97b4130a63ceee18bc89a69c0d59438ee04fcbbb0acc8319b672d11",
+      "payload_members": 81,
+      "DEX_members": 1,
+      "all_payload_members_match_signed_APK": true
+    }
+  },
+  "DEX_files_matched": 5,
+  "manifest_exception": "Only the original typed versionCode is assembled; no other manifest byte may change",
+  "Android": "NOT_RUN",
+  "installed": false,
+  "accepted": false,
+  "locked": false
+}

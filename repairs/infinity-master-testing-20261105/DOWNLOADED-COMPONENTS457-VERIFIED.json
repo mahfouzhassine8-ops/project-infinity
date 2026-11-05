@@ -1,0 +1,52 @@
+{
+  "status": "PASS_ACTUAL_COMPONENT_ZIPS_MATCH_SIGNED457_PAYLOAD",
+  "run": 41989110830,
+  "artifact": 13397408243,
+  "archive_sha256": "8fb3ac966c730125bf66e9145ac1ab93d23c3a77007997a49268cc66f2f1d06e",
+  "archive_bytes": 319074390,
+  "CRC_all_component_members_verified": true,
+  "package": "com.projectinfinity.kodi",
+  "versionCode": 2103457,
+  "APK_sha256": "cbba67441055492e2bd83558e7e65ad95396aefc1381d2e9e7809e180e8eb212",
+  "components": {
+    "CHOOSER_SHELL": {
+      "file": "CHOOSER_SHELL.zip",
+      "sha256": "eb9b42da1d937d263882ea238e67e64925869a4c33caefb7adf959cc4ecbc43f",
+      "version": "2103457.chooser_shell.1",
+      "payload_members": 1,
+      "DEX_members": 1,
+      "all_payload_members_match_signed_APK": true
+    },
+    "COBRA": {
+      "file": "COBRA.zip",
+      "sha256": "f63d4c1e491dc94591c5623bf02be90d4f9c187b91a0511b36398ee96745f8a8",
+      "version": "2103445.cobra.1",
+      "payload_members": 11,
+      "DEX_members": 2,
+      "all_payload_members_match_signed_APK": true
+    },
+    "INFINITY": {
+      "file": "INFINITY.zip",
+      "sha256": "e7be5ad3113ce5d0b56874c6b46853338df00134867dcf13b3eb36107a85e505",
+      "version": "2103457.infinity.1",
+      "payload_members": 7516,
+      "DEX_members": 1,
+      "all_payload_members_match_signed_APK": true
+    },
+    "MINIMAL_ANDROID_CONTRACT": {
+      "file": "MINIMAL_ANDROID_CONTRACT.zip",
+      "sha256": "1c4a2890ef5ca8665b86b148dd293c06a56d76ec846de1e0c9c037a3b0151a25",
+      "version": "2103447.minimal_android_contract.1",
+      "payload_members": 81,
+      "DEX_members": 1,
+      "all_payload_members_match_signed_APK": true
+    }
+  },
+  "DEX_files_matched": 5,
+  "manifest_exception": "Only the original typed versionCode is assembled",
+  "Android": "NOT_RUN",
+  "physical_recovery": "NOT_RUN",
+  "installed": false,
+  "accepted": false,
+  "locked": false
+}
