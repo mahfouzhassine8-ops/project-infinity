@@ -1,0 +1,141 @@
+{
+  "platform": "upstream Linux Kodi 21.2 + explicit responsive fixture projection",
+  "Android": "NOT_RUN",
+  "physical_Fold": "NOT_RUN",
+  "viewport": [
+    1080,
+    2520
+  ],
+  "source_sha256": "4a41c95b6c08d2f08b9d459263f5aea949a406131c2f6fbfbc6f5f4faed1fccc",
+  "presentation_sha256": "0110de2cdc4c8295fdb314df221385f356e0ed0247547cf49c16a4dff2a6b54c",
+  "checks": [
+    {
+      "name": "skin-running",
+      "passed": true
+    },
+    {
+      "name": "synthetic-movies-ready",
+      "passed": true
+    },
+    {
+      "name": "original-view50",
+      "passed": true
+    },
+    {
+      "name": "selected-item:1",
+      "passed": true
+    },
+    {
+      "name": "selected-genre-presentation:1",
+      "passed": true
+    },
+    {
+      "name": "selected-metadata",
+      "passed": true
+    },
+    {
+      "name": "case-regression-flag-enabled",
+      "passed": true
+    },
+    {
+      "name": "case-regression-resolution-absent",
+      "passed": true
+    },
+    {
+      "name": "play-affordance-valid",
+      "passed": true
+    },
+    {
+      "name": "trailer-affordance-valid",
+      "passed": true
+    },
+    {
+      "name": "info-affordance-valid",
+      "passed": true
+    },
+    {
+      "name": "real-genre-chip-1",
+      "passed": true
+    },
+    {
+      "name": "real-genre-chip-2",
+      "passed": true
+    },
+    {
+      "name": "screenshot:movies-dark",
+      "passed": true
+    },
+    {
+      "name": "screenshot:movies-light-live-switch",
+      "passed": true
+    },
+    {
+      "name": "selected-item:2",
+      "passed": true
+    },
+    {
+      "name": "selected-genre-presentation:2",
+      "passed": true
+    },
+    {
+      "name": "missing-poster-not-directory-icon",
+      "passed": true
+    },
+    {
+      "name": "missing-trailer-action-hidden",
+      "passed": true
+    },
+    {
+      "name": "screenshot:missing-art-light",
+      "passed": true
+    },
+    {
+      "name": "selected-item:1",
+      "passed": true
+    },
+    {
+      "name": "selected-genre-presentation:1",
+      "passed": true
+    },
+    {
+      "name": "screenshot:movies-dark-return",
+      "passed": true
+    },
+    {
+      "name": "synthetic-shows-ready",
+      "passed": true
+    },
+    {
+      "name": "selected-item:1",
+      "passed": true
+    },
+    {
+      "name": "selected-genre-presentation:1",
+      "passed": true
+    },
+    {
+      "name": "folder-has-no-play-button",
+      "passed": true
+    },
+    {
+      "name": "show-info-available",
+      "passed": true
+    },
+    {
+      "name": "screenshot:shows-dark",
+      "passed": true
+    }
+  ],
+  "observations": [
+    {
+      "container_width": 639,
+      "container_height": 2076,
+      "position": [
+        0,
+        0
+      ],
+      "title": "Media 01 \u2014 A longer title with readable words"
+    }
+  ],
+  "status": "PASS_SELECTED_HOST_RENDERER_ACTION_CHECKS"
+}

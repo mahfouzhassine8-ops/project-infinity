@@ -12,7 +12,8 @@ C = json.loads((BASE / 'config.json').read_text())
 OUT = Path(C['output'])
 result = {'platform':'upstream Linux Kodi 21.2 + explicit responsive fixture projection',
           'Android':'NOT_RUN', 'physical_Fold':'NOT_RUN', 'viewport':C['viewport'],
-          'source_sha256':C['source_sha256'], 'checks':[], 'observations':[]}
+          'source_sha256':C['source_sha256'], 'presentation_sha256':C.get('presentation_sha256'),
+          'checks':[], 'observations':[]}
 
 
 def check(name, ok):

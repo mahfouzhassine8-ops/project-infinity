@@ -1,9 +1,30 @@
-# Successor packaging stopped at the existing authority gate
+# Original-key signing gates passed; physical acceptance pending
 
-The read-only preflight refused a new version with `ONLY_CONTROLLED_AND_RECOVERY_VERSIONS`. The sole signer workflow397702717 currently admits only456/457 on the previous branch, pinned12-source checkpoint and registered43rd authority generation. Those identities cannot legitimately sign changed source on this branch. This is a real local authority preflight rejection, **not an automatic approval-review rejection**, certificate mismatch or account-authentication failure.
+The original sole-signer workflow issued testing APK **2103458** in run
+[42108276626](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/42108276626)
+and higher-version forward recovery **2103459** in run
+[42112995114](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/42112995114).
+Both runs passed the original pre-key authority, source, payload ownership,
+original-certificate and exact-member gates. Both actual signed APK archives and
+both matching component archives were subsequently downloaded, CRC/hash checked,
+and compared with the official signed authorities. See [delivery evidence](DELIVERY.md).
 
-The current master brief protects signing infrastructure; the controlled-testing instruction says to stop on failed signing/compatibility/integrity/recovery gates. Nothing was weakened, bypassed or signed with a replacement key. The original56/57 authorities and signed recovery remain unchanged. A safe continuation requires separately reviewing and registering the exact successor source/version/member authority through the existing sole signer, while retaining all owner, source, original-certificate and preservation gates. Do not reuse the old allowlist or claim a successful new signing run.
+The initial 456/457 preflight correctly refused the new source. That historical
+rejection was resolved by a distinct, exact 458/459 registration under the user's
+controlled-testing authorization, through the same original signing workflow.
+Preparation 42106024906 and official artifact review 42107607016 passed before
+registration. No old authority was reused for changed bytes. The signing key,
+security-policy algorithm, module/installer verifier, durability safeguards and
+accepted pointer remain unchanged. The configuration/routing changes are recorded
+in the source history and the 11 focused packaging contracts.
 
-Concrete proposal: [SUCCESSOR-REGISTRATION-PLAN.json](SUCCESSOR-REGISTRATION-PLAN.json) binds the six runtime changes, controlled metadata allowlist, proposed458/459 versions, unchanged native/DEX/Cobra/Preview payload, authenticated generation requirements and higher-version recovery obligations. [CONSOLIDATED-SOURCE-PLAN.json](CONSOLIDATED-SOURCE-PLAN.json) binds all15 source overlay members, preserving the previous completed work. These are review records, **not newly granted release authority or APK verification results**.
+2103458 preserves the exact delivered 2103456 native engine and all five DEX
+files. Recovery 2103459 restores frozen 2103451 functional code with higher
+authenticated module/skin generations. The original-key host recovery checks
+passed; actual Android installation and recovery are **NOT RUN**. Existing 2103457
+cannot be used to recover a higher 2103458 installation.
 
-Version survey: all82 current official workflow runs were listed, successful-source authorities were readable, highest recorded version457. Proposed458/459 remain unreserved and must be checked again immediately before issuance. A signed459 recovery restoring frozen451 functional code, with higher module/skin versions and proof that retained candidate helpers cannot enter restored routes, must pass before recommending installation. No original key material is requested or exposed.
+The two required Search failures remain FAIL. Favorites attribution and universal
+browser/Fold acceptance remain unresolved. No signing success changes those
+results. The installed Fold version is UNVERIFIED. Neither build was installed,
+accepted, promoted or locked.

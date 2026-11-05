@@ -1,0 +1,54 @@
+{
+  "status": "DIRECT_CANONICAL_AND_ACTUAL_IMAGE_REVIEW_NOT_DEVICE_ACCEPTANCE",
+  "canonical_sha256": "6786b5cadb7153bb0036a651dcfba889a58f2a5acd79a759a798302e2d70c0ad",
+  "actual_failed_JPEG_sha256": "682ec40a4b18c82499532d91db62519b09938aeee43d0f07b52e279d96b7cedc",
+  "canonical_bytes_verified": true,
+  "both_images_directly_inspected": true,
+  "transport_source": "7eace7c938d02f1369c5a0f19b41c8fbe37f3dee",
+  "source_root_causes": [
+    "GlobalCaseVar fallback selects trailers.png without resolution/case metadata; List.MovieCases projects the oversized case.",
+    "Legacy selected poster uses stretch in unbounded nested groups.",
+    "Untinted normal-list panel uses the white-pixel texture.",
+    "Native left row geometry and selected metadata need independent bounded coordinate spaces."
+  ],
+  "current_render_review": "Normal/Slim List shows real metadata, passive genre chips, proportional art and live Light/Dark colors; no old case even when its setting is enabled. Conditional Play/Trailer/Info still call native handlers.",
+  "remaining_limits": [
+    "No signed Android/Fold render or actual provider route execution.",
+    "Gesture guide uses text and dividers rather than the reference finger illustrations.",
+    "Natural artwork aspect and metadata affect stacking; no pixel-equivalence claim.",
+    "Parent-directory row and all view modes remain; universal multi-view acceptance is pending.",
+    "Two Search acceptance cases still fail; Favorites data/installed version remain unverified."
+  ],
+  "earlier_manual_review": {
+    "status": "MANUAL_RENDER_REVIEW_NOT_PHYSICAL_ACCEPTANCE",
+    "earlier_short_window_cases": {
+      "1128x1080-final-control-access": "FAIL_VISUAL_ACTION_REACHABILITY: controls clipped even though focus and activation checks passed.",
+      "1128x1080-visible-short-toolbar": "Visible Play/Trailer/Info after reserving their space; manual screenshot inspection completed. This version precedes the direct-palette cleanup.",
+      "1128x1080-palette-return": "Reviewed dark return screenshot: list text readable, proportional art, real action row visible. Keyboard/native action/decode checks passed."
+    },
+    "canonical_reference": "NOT_AVAILABLE_FOR_SHA_VERIFICATION",
+    "supporting_JPEG_sha256": "13fbcfe29a21b6f9f73788da13d5921ed4f58741056b9a46a0996c03cea08f82",
+    "reference_differences": [
+      "Genre remains the actual provider genre text, not split into individual pill controls.",
+      "Short windows reserve visible actions while details scroll; canonical exact visual equivalence has not been verified.",
+      "Existing native parent-directory row remains visible.",
+      "Upstream fixture uses explicit responsive projection and synthetic content, not the signed ARM64 engine or real providers."
+    ],
+    "overall_design_acceptance": "PENDING_CANONICAL_AND_PHYSICAL_FOLD",
+    "current_source_sha256": "4bd1fc90636bc420ddc31f7160b47c4a12b0f675aef619ad047103c835e665b1",
+    "latest_direct_inspection": [
+      "1128x1080-palette-return/movies-dark-return.png",
+      "1080x2520-palette-cover-slim/movies-light-live-switch.png",
+      "2520x1080-palette-cover-landscape/movies-dark.png",
+      "1080x1128-palette-inner-portrait/movies-light-live-switch.png"
+    ],
+    "observations": [
+      "Original dark/light palette is readable in reviewed current screenshots, including dark return.",
+      "Real controls are visible outside scrolling details in short-window renders.",
+      "Short windows still require details scrolling; exact touch scrolling and physical sizing are NOT RUN.",
+      "Native parent row, long synthetic titles and plots are retained; source has no example movie hardcoding."
+    ]
+  },
+  "physical_acceptance": "PENDING",
+  "Android": "NOT_RUN"
+}

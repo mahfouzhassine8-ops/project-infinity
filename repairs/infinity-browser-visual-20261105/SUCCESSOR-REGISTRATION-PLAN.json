@@ -1,8 +1,8 @@
 {
-  "status": "REVIEW_PLAN_ONLY_NOT_AUTHORITY_NOT_BUILD",
+  "status": "PASS_SIGNED458_AND459_ORIGINAL_KEY_VERIFIED_DOWNLOADS",
   "created_UTC": "2026-11-05T17:23:38.610085+00:00",
   "branch": "work/infinity-browser-visual-correction-from-2103456-20261105",
-  "source_checkpoint": "1d962167affb24cdf645330cec75316287f4c931",
+  "source_checkpoint": "924fd6e593c4f0fcc7cf96bcd5f9b3347b3a295d",
   "testing_version_proposed_not_reserved": 2103458,
   "recovery_version_proposed_not_reserved": 2103459,
   "authority_generation_proposed": [
@@ -25,6 +25,12 @@
       "candidate_sha256": "c6689df59f2b077e9250e584d69c28ef83928d2139894c8b335837df5b2fe163",
       "bytes": 8209
     },
+    "assets/addons/script.infinity.commandcenter/media_view.py": {
+      "source": "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/script.infinity.commandcenter/media_view.py",
+      "signed456_sha256": "41f8d561fe6dca87c69d633672ecaec4689c3f1bd153388ef6c69766e70adfe6",
+      "candidate_sha256": "0110de2cdc4c8295fdb314df221385f356e0ed0247547cf49c16a4dff2a6b54c",
+      "bytes": 12687
+    },
     "assets/addons/skin.infinity.diggz/unified/Custom_1198_InfinityNav.xml": {
       "source": "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Custom_1198_InfinityNav.xml",
       "signed456_sha256": "07806a3d489a7d95d953058f1da65e06f7425f25c011e14d6383806840d624aa",
@@ -34,8 +40,8 @@
     "assets/addons/skin.infinity.diggz/unified/Includes_InfinityMediaLists.xml": {
       "source": "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Includes_InfinityMediaLists.xml",
       "signed456_sha256": "860bee806464e4a4f5c4baa0ec2fdad250a40281efa257a97ddfe919e451c31f",
-      "candidate_sha256": "4bd1fc90636bc420ddc31f7160b47c4a12b0f675aef619ad047103c835e665b1",
-      "bytes": 171289
+      "candidate_sha256": "4a41c95b6c08d2f08b9d459263f5aea949a406131c2f6fbfbc6f5f4faed1fccc",
+      "bytes": 176848
     },
     "assets/addons/skin.infinity.diggz/unified/MyVideoNav.xml": {
       "source": "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/MyVideoNav.xml",
@@ -61,9 +67,9 @@
     "assets/experience-component-updates.properties"
   ],
   "candidate_vs_signed456": {
-    "existing_payload_members_changed": 13,
+    "existing_payload_members_changed": 14,
     "new_payload_members": 1,
-    "expected_protected_existing": 7608,
+    "expected_protected_existing": 7607,
     "DEX_unchanged": 5,
     "native_libraries_unchanged": 47,
     "native_sha256": "9f77b092899b51850928007578e0fbf91bad38c05f147a308f3ac0cf5c036638",
@@ -111,11 +117,22 @@
   "known_unresolved": [
     "Search required2FAIL",
     "Crew device rejection un-attributed",
-    "canonicalPNG and brokenLightJPEG unavailable",
     "universal multi-view visual/physical acceptance incomplete",
     "phone Favorites data unavailable",
     "Android/Fold NOT_RUN",
     "device-installed version UNVERIFIED",
     "Scudo not addressed"
-  ]
+  ],
+  "producer_source": "735f269f6c2f0fc223b4fd98648f666d41a2496e",
+  "preparation_run": 42106024906,
+  "review_run": 42107607016,
+  "canonical_PNG_verified": true,
+  "issued_testing_versionCode": 2103458,
+  "issued_recovery_versionCode": 2103459,
+  "signing_runs": {
+    "testing": 42108276626,
+    "recovery": 42112995114
+  },
+  "final_delivery_record": "DELIVERY.md",
+  "proposal_fields_are_historical": true
 }
