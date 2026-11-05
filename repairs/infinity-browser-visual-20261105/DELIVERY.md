@@ -79,6 +79,12 @@ addon/manifest/signature, skin addon/protected manifest/identity, and component
 update properties. [Full member list and counts](packaging/signed458-evidence/INDEPENDENT-SIGNED456-COMPARISON.json).
 [Every member's before/after hash](packaging/signed458-evidence/preservation/ALL-APK-MEMBER-HASHES.json).
 
+These counts and member maps cover APK payloads. Original-key signing separately
+regenerates `META-INF/MANIFEST.MF`, `META-INF/INFINITY.SF` and
+`META-INF/INFINITY.RSA`; the v2/v3 APK Signing Block is outside the ZIP member list.
+Those signing artifacts are excluded from payload-equality counts, not from the
+full downloaded APK SHA-256 or original-certificate/signature verification.
+
 Against frozen signed 2103451, the complete previously authorized master/touch
 overlay is 16 changed existing members plus eight new members; 7,598 existing
 members are unchanged. The sole native difference from 451 is the previously built
