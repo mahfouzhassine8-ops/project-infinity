@@ -5,6 +5,7 @@ import time
 import traceback
 import xbmc
 import xbmcgui
+from candidate_media_view import publish_browser_genres
 
 BASE = Path(__file__).resolve().parents[1]
 C = json.loads((BASE / 'config.json').read_text())
@@ -39,6 +40,7 @@ def shot(name):
 def selected(index):
     xbmc.executebuiltin('SetFocus(50,%d,absolute)' % index)
     check('selected-item:%s'%index, wait(lambda:xbmc.getInfoLabel('Container(50).ListItem.Label').startswith('Media %02d'%index)))
+    check('selected-genre-presentation:%s'%index,publish_browser_genres(xbmc,xbmcgui) in ('published','unchanged'))
 
 
 try:
@@ -47,6 +49,7 @@ try:
     home.setProperty('Infinity.SystemTheme','dark')
     home.setProperty('Infinity.OptionalMotionAllowed','false')
     xbmc.executebuiltin('Skin.SetString(Infinity.HomeView,auto)')
+    xbmc.executebuiltin('Skin.SetBool(List.MovieCases)')
     xbmc.executebuiltin('Skin.SetBool(Enable.SlimList)' if C.get('slim') else 'Skin.Reset(Enable.SlimList)')
     xbmc.executebuiltin('ActivateWindow(Videos,plugin://plugin.video.infinitybrowserqa/?kind=movies)')
     check('synthetic-movies-ready',wait(lambda:xbmcgui.getCurrentWindowId()==10025 and
@@ -59,9 +62,13 @@ try:
     result['observations'].append({'container_width':panel.getWidth(),'container_height':panel.getHeight(),
                                   'position':panel.getPosition(),'title':xbmc.getInfoLabel('Container(50).ListItem.Label')})
     check('selected-metadata', 'Synthetic metadata for selected item 01' in xbmc.getInfoLabel('Container(50).ListItem.Plot'))
+    check('case-regression-flag-enabled',xbmc.getCondVisibility('Skin.HasSetting(List.MovieCases)'))
+    check('case-regression-resolution-absent',xbmc.getInfoLabel('Container(50).ListItem.VideoResolution')=='')
     check('play-affordance-valid',xbmc.getCondVisibility('Control.IsVisible(98070)'))
     check('trailer-affordance-valid',xbmc.getCondVisibility('Control.IsVisible(98071)'))
     check('info-affordance-valid',xbmc.getCondVisibility('Control.IsVisible(98072)'))
+    check('real-genre-chip-1',wait(lambda:xbmc.getCondVisibility('Control.IsVisible(98090)')))
+    check('real-genre-chip-2',xbmc.getCondVisibility('Control.IsVisible(98091)'))
     shot('movies-dark')
     home.setProperty('Infinity.SystemTheme','light')
     shot('movies-light-live-switch')

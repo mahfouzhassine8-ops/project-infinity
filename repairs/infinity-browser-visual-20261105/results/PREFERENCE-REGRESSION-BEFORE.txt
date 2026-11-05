@@ -1,0 +1,17 @@
+..............F..
+======================================================================
+FAIL: test_state_changed_before_dispatch_is_deferred (__main__.GlobalMediaPreference.test_state_changed_before_dispatch_is_deferred)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-kodi-2103453-ui-navigation/tests/test_media_view.py", line 212, in test_state_changed_before_dispatch_is_deferred
+    self.assertEqual(self.c.tick(), 'changed');self.assertFalse(self.k.commands)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'inactive' != 'changed'
+- inactive
++ changed
+
+
+----------------------------------------------------------------------
+Ran 17 tests in 0.023s
+
+FAILED (failures=1)

@@ -39,11 +39,9 @@ Short-window screenshot review caught clipped actions even though focus/activati
 
 Linux Kodi21.2 rendered the full skin and original signed assets with synthetic local media at cover/inner portrait/landscape representative sizes. **Upstream lacks Infinity's responsive native extensions.** Fixture coordinate projection is explicitly documented/source-bound in each PROJECTION.json. These are not Android engine, real-provider, native-touch or physical Fold tests. Native Info, Play and Trailer were activated through real focus/Action Select; the generated silent clip actually decoded/advanced, Stop returned to the same browser. Missing-art/trailer and nonplayable TV-folder cases were checked. Screenshot existence/boolean checks alone are not visual acceptance; [manual review](results/VISUAL-REVIEW.json) records the clipped-controls failure and remaining reference differences.
 
-## Exact reference access
+## Exact reference access — resolved
 
-The materialized21581 JPEG was opened directly and retained unchanged with SHA256 `13fbcfe29a21b6f9f73788da13d5921ed4f58741056b9a46a0996c03cea08f82` in the existing design-lock folder. The lock document is copied unchanged from745b542a. The original canonical PNG (`6786b5cadb7153bb0036a651dcfba889a58f2a5acd79a759a798302e2d70c0ad`) and the named broken-Light JPEG/ZIP are **not exposed to this executor**. Their inspection, exact checksum comparison and original-pair commit remain blocked. No replacement image was generated or mislabeled. `import_references.py` is ready to verify/import the original bytes when a supported reference becomes accessible; it has not run.
-
-The supporting JPEG guides the two-column corrections; it is not a substitute for canonical exact-match verification. Individual genre pills, the native parent row and responsive short-window action placement remain disclosed differences/verification limits. The universal multi-view design and physical acceptance are **not complete**.
+The canonical PNG and actual failing Light JPEG are now SHA-verified and directly inspected. Originals and transport are preserved in evidence-only commit630e4009. See [verified continuation and precise Apple-case cause](VERIFIED-REFERENCE-CONTINUATION.md). Earlier access-failure records remain historical evidence, not a current blocker. Physical visual acceptance is still pending.
 
 ## Search and Favorites stay unresolved where evidence is missing
 
@@ -53,7 +51,7 @@ Favorites already uses the native registered route and service. Source review co
 
 ## Preservation and release boundary
 
-[Source delta](results/SOURCE-DELTA.json): **five existing source members + one new helper** versus actual signed456. Protected native/touch sources, Search/global-view service, original signer/workflow/authority/accepted pointer and19 lock refs compare unchanged. Cobra, Preview, DEX, libraries, providers, databases and user files have no new edits. No successor APK exists, so **no new APK-member/certificate/install-over PASS is claimed**.
+[Source delta](results/SOURCE-DELTA.json): **six existing source members + one new helper** versus actual signed456. Protected native/touch sources, Search, global-view preference methods, original signer/workflow/authority/accepted pointer and19 lock refs compare unchanged. Cobra, Preview, DEX, libraries, providers, databases and user files have no new edits. No successor APK exists, so **no new APK-member/certificate/install-over PASS is claimed**.
 
 [Release preflight](results/RELEASE-PREFLIGHT.json) is BLOCKED: existing trusted preparation/authority admits only the old456/457 branch/source/version pair. Calling its generator with458 refuses `ONLY_CONTROLLED_AND_RECOVERY_VERSIONS`; the fixed12-source checkpoint guard also cannot authenticate this six-member correction. User instructions freeze signing infrastructure and require stopping a failed authority/recovery gate. No guard, key, accepted pointer or old issued artifact was altered.
 

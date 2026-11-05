@@ -279,6 +279,33 @@ class Browser(unittest.TestCase):
             self.assertIn('![Container.Content(movies)', new.findtext('visible'))
             self.assertEqual(old.findtext('texture'), new.findtext('texture'))
 
+    def test_case_fallback_cannot_cover_the_new_media_details(self):
+        original=E.parse('/tmp/infinity-signed456-payload-audit/assets/addons/skin.infinity.diggz/unified/Variables.xml').getroot()
+        case=original.find('variable[@name="GlobalCaseVar"]')
+        self.assertEqual(case.findall('value')[-1].text,'trailers.png')
+        self.assertIn('ListItem.VideoResolution',case.findall('value')[-2].get('condition'))
+        selected=E.tostring(include(read(),'InfinityMedia_SelectedMedia'),encoding='unicode')
+        self.assertNotIn('GlobalCaseVar',selected);self.assertNotIn('CaseTypePathVar',selected)
+        for name in NAMES:
+            body=include(read(),name).find('control')
+            legacy=body.findall('control[@type="group"]')[1]
+            self.assertIn('![Container.Content(movies)',legacy.findtext('visible'))
+
+    def test_reference_frame_and_passive_genres_preserve_native_actions(self):
+        root=read();selected=include(root,'InfinityMedia_SelectedMedia')
+        poster=next(c for c in selected.findall('.//control') if c.findtext('texture')=='$VAR[InfinityMedia_SelectedPoster]')
+        self.assertEqual(poster.findtext('aspectratio'),'keep')
+        self.assertEqual(poster.find('bordertexture').get('colordiffuse'),'$VAR[InfinityPaletteAccent]')
+        for c in selected.findall('.//control[@type="button"]'):
+            self.assertEqual(c.findtext('align'),'center')
+        text=include(root,'InfinityMedia_SelectedMediaText')
+        chips=[c for c in text.findall('.//control') if c.get('id') in ('98090','98091','98092','98093')]
+        self.assertEqual(len(chips),4)
+        for c in chips:
+            self.assertEqual(c.get('type'),'group');self.assertFalse(c.findall('.//onclick'))
+        fallback=next(c for c in text.findall('.//control') if c.findtext('label')=='$INFO[Container(50).ListItem.Genre]')
+        self.assertIn('GenreSource',fallback.findtext('visible'));self.assertIn('GenreCount',fallback.findtext('visible'))
+
     def test_other_include_families_unchanged_except_duplicate_media_topbar(self):
         root = read()
         for old in OLD:

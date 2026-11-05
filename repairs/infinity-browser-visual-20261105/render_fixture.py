@@ -118,6 +118,8 @@ def setup(width,height,actions,attempt,slim=False):
         content=content.replace('base = '+repr(str(QA)), 'base = Path('+repr(str(QA))+')')
         content=content.replace('BASE = '+repr(str(QA)), 'BASE = Path('+repr(str(QA))+')')
         replace(dest/'entry.py',content.encode())
+    presentation=prepare.ROOT/'repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/script.infinity.commandcenter/media_view.py'
+    replace(share/'addons/script.infinitybrowserqa/candidate_media_view.py',presentation.read_bytes())
     # The earlier QA root lists its synthetic add-ons as mandatory built-ins.
     # Replace those fixture identities, not any production manifest or guard.
     manifest=E.parse(share/'system/addon-manifest.xml').getroot()
@@ -133,7 +135,8 @@ def setup(width,height,actions,attempt,slim=False):
     out.mkdir(parents=True,exist_ok=True)
     assert not (out/'RESULT.json').exists(),'Preserve previous run evidence'
     config={'viewport':[width,height],'logical':[logical_w,logical_h],'output':str(out),
-            'actions':actions,'slim':slim,'source_sha256':hashlib.sha256(SOURCE.read_bytes()).hexdigest()}
+            'actions':actions,'slim':slim,'source_sha256':hashlib.sha256(SOURCE.read_bytes()).hexdigest(),
+            'presentation_sha256':hashlib.sha256(presentation.read_bytes()).hexdigest()}
     (QA/'config.json').write_text(json.dumps(config))
     (out/'PROJECTION.json').write_text(json.dumps({'source_sha256':config['source_sha256'],
         'fixture_only':['skin addon.xml resolution','native recursive coordinates/itemlayout sizes projected in existing two List includes and touch guide','synthetic QA add-on identities in copied Linux manifest'],

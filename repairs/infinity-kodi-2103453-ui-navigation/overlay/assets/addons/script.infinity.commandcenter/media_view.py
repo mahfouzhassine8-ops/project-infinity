@@ -14,6 +14,42 @@ REGISTERED = (50, 51, 52, 53, 55, 56, 57, 58, 59, 500, 501, 502, 503, 504, 505, 
 RULES = {50: [()], 506: [('Window.IsActive(videos)', '[Container.Content(movies) | Container.Content(sets) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(artists)] + !Skin.HasSetting(Disable.RightListView)'), ('Window.IsActive(music)', '!Skin.HasSetting(Disable.RightListView)')], 602: [('Window.IsActive(videos)', '[Container.Content(movies) | Container.Content(sets) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes)] + !Skin.HasSetting(Disable.FanartListView)')], 501: [('Window.IsActive(videos)', '[Container.Content(movies) | Container.Content(sets) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes)] + !Skin.HasSetting(Disable.LowListView)'), ('Window.IsActive(music)', '[Container.Content(albums) | Container.Content(artists) | Container.Content(songs) | Container.Content(files)] + !Skin.HasSetting(Disable.LowListView)'), ('Window.IsActive(programs)', 'String.Contains(Container.FolderPath,plugin.program.advanced.launcher) + !Skin.HasSetting(Disable.LowListView)')], 507: [('Window.IsActive(videos)', '[Container.Content(movies) | Container.Content(tvshows) | Container.Content(episodes)] + !Skin.HasSetting(Disable.BigListView)'), ('Window.IsActive(music)', '[Container.Content(albums) | Container.Content(artists)] + !Skin.HasSetting(Disable.BigListView)')], 59: [('Window.IsActive(videos) | Window.IsActive(music)', '!Skin.HasSetting(Disable.LogoView)', '[Container.Content(movies) | Container.Content(sets) | Container.Content(tvshows) | Container.Content(artists)]')], 502: [('Window.IsActive(videos)', 'Container.Content(episodes) + !Skin.HasSetting(Disable.EpisodeView)')], 53: [('Window.IsActive(videos)', '[Container.Content(movies) | Container.Content(tvshows) | Container.Content(musicvideos) | Container.Content(seasons) | Container.Content(genres) | Container.Content(sets)] + !Skin.HasSetting(Disable.ShowCaseView)')], 57: [('[Container.Content(movies) | Container.Content(tvshows) | Container.Content(musicvideos) | Container.Content(seasons) | Container.Content(genres) | Container.Content(sets) | Container.Content(addons) | Container.Content(songs) | Container.Content(artists) | Container.Content(albums) | Container.Content(genres)] + !Skin.HasSetting(Disable.ShiftView)',), ('Window.IsActive(programs)', 'String.Contains(Container.FolderPath,plugin.program.advanced.launcher) + !Skin.HasSetting(Disable.LowListView)')], 56: [('Window.IsActive(videos)', '[Container.Content(genres) | Container.Content(tvshows) | Container.Content(movies) | Container.Content(sets) | Container.Content(seasons) | Container.Content(musicvideos)] + !Skin.HasSetting(Disable.PostersView)')], 509: [('Window.IsActive(videos)', '[Container.Content(movies) | Container.Content(sets) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes)] + !Skin.HasSetting(Disable.MyFlixView)')], 55: [('Window.IsActive(videos)', '[Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets)] + !Skin.HasSetting(Disable.TriPanelView)'), ('[Window.IsActive(music) | Window.IsActive(addonbrowser)]', '[Container.Content(albums) | Container.Content(artists) | Container.Content(songs) | Container.Content(addons) | Window.IsActive(music) + Container.Content(files)] + !Skin.HasSetting(Disable.TriPanelView)'), ('Window.IsActive(programs)', 'String.Contains(Container.FolderPath,plugin.program.advanced.launcher) + !Skin.HasSetting(Disable.TriPanelView)')], 500: [('!Skin.HasSetting(Disable.IconsView)', '![Window.IsActive(FavouritesBrowser) | Window.IsActive(tvchannels) | Window.IsActive(tvrecordings) | Window.IsActive(tvguide) | Window.IsActive(tvtimers) | Window.IsActive(tvsearch) | Window.IsActive(musicplaylist) | Window.IsActive(radiochannels) | Window.IsActive(radiorecordings) | Window.IsActive(radioguide) | Window.IsActive(radiotimers) | Window.IsActive(radiosearch) | [Window.IsActive(pictures) + Container.Content(addons)]]')], 503: [('Window.IsActive(videos) | Window.IsActive(programs)', '[Container.Content(movies) | Container.Content(sets) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(addons) | Container.Content(files)] + !Skin.HasSetting(Disable.WallView)'), ('Window.IsActive(music)', '[Container.Content(artists) | Container.Content(albums) | Container.Content(genres) | Container.Content(files) + !Skin.HasSetting(Disable.WallView)]')], 609: [('Window.IsActive(videos)', '[Container.Content(movies) | Container.Content(tvshows) | Container.Content(sets)] + !Skin.HasSetting(Disable.FullscreenWallView)'), ('Window.IsActive(music)', '[Container.Content(artists) | Container.Content(albums)] | [Window.IsActive(music) + Container.Content(files)] + !Skin.HasSetting(Disable.FullscreenWallView)')], 51: [('Window.IsActive(videos)', '[Container.Content(tvshows) | Container.Content(movies)] + !Skin.HasSetting(Disable.InfoWallView)'), ('Window.IsActive(music) | Window.IsActive(addonbrowser) | Window.IsActive(programs)', '[Container.Content(albums) | Container.Content(artists) | Container.Content(addons)]', '!Skin.HasSetting(Disable.InfoWallView)')], 58: [('Window.IsActive(videos)', '[Container.Content(movies) | Container.Content(tvshows)] + !Skin.HasSetting(Disable.BannerWallView)')], 52: [('[Container.Content(movies) | Container.Content(tvshows) | Container.Content(episodes) | Container.Content(artists) | Container.Content(sets)] + !Skin.HasSetting(Disable.LandscapeView)',)], 591: [('[Container.Content(movies) | Container.Content(sets) | Container.Content(tvshows) | Container.Content(seasons)] + !Skin.HasSetting(Disable.BigFanView)',)], 504: [('[Container.Content(movies) | Container.Content(tvshows) | Container.Content(sets) | Window.IsActive(pictures)] + !Skin.HasSetting(Disable.GalleryView)', '![Window.IsActive(pictures) + Container.Content(addons)]')], 505: [('[Container.Content(movies) | Container.Content(tvshows) | Container.Content(episodes)] + !Skin.HasSetting(Disable.PanelView)',)]}
 
 
+def publish_browser_genres(xbmc, gui):
+    """Transient selected-item styling only, on the existing resident tick.
+
+    Kodi's genre label uses its existing human-readable separator. If a source
+    supplies another separator or more than four tags, the skin keeps its full
+    native genre text. No provider/settings/file access or action dispatch.
+    """
+    if (xbmc.getSkinDir() != 'skin.infinity.diggz'
+            or gui.getCurrentWindowId() != 10025
+            or gui.getCurrentWindowDialogId() not in (0, 9999)
+            or not xbmc.getCondVisibility('Control.IsVisible(50)')
+            or xbmc.getCondVisibility('Container.IsUpdating')):
+        return 'inactive'
+    source = xbmc.getInfoLabel('Container(50).ListItem.Genre')
+    window = gui.Window(10025)
+    key = 'Infinity.MediaBrowser.GenreSource'
+    if window.getProperty(key) == source:
+        return 'unchanged'
+    tags = [s.strip() for s in source.split(' / ') if s.strip()]
+    # The complete native label remains visible as fallback, never silently cut.
+    usable = bool(tags) and len(tags) <= 4
+    window.setProperty('Infinity.MediaBrowser.GenreCount', '0')
+    window.clearProperty(key)
+    for i in range(4):
+        window.setProperty('Infinity.MediaBrowser.Genre%s' % (i + 1),
+                           tags[i] if usable and i < len(tags) else '')
+    if (gui.getCurrentWindowId() != 10025
+            or xbmc.getCondVisibility('Container.IsUpdating')
+            or xbmc.getInfoLabel('Container(50).ListItem.Genre') != source):
+        return 'changed'
+    # Publish last: the skin compares this exact native label before using tags.
+    window.setProperty(key, source)
+    window.setProperty('Infinity.MediaBrowser.GenreCount', str(len(tags) if usable else 0))
+    return 'published'
+
+
 class MediaViewPreference:
     def __init__(self, xbmc, gui):
         self.xbmc = xbmc
@@ -44,12 +80,18 @@ class MediaViewPreference:
 
     def tick(self):
         try:
-            return self._observe()
+            result = self._observe()
         except Exception:
             # A changing window/control is not a reason to interrupt the resident
             # or expose provider paths. Retry only at its next ordinary UI tick.
             self.pending = None
-            return 'unavailable'
+            result = 'unavailable'
+        try:
+            publish_browser_genres(self.xbmc, self.gui)
+        except Exception:
+            # Presentation cannot change preference ordering/result or pending work.
+            pass
+        return result
 
     def _observe(self):
         if not self._eligible():

@@ -127,7 +127,7 @@
       <control type="textbox">
         <width>100%</width>
         <height min="40" max="4000">auto</height>
-        <font>InfinityBodyBold</font>
+        <font>InfinityTitle</font>
         <textcolor>$VAR[InfinityPaletteTextPrimary]</textcolor>
         <label>$INFO[Container(50).ListItem.Label]</label>
       </control>
@@ -200,13 +200,113 @@
           </control>
         </control>
       </control>
+      <control type="grouplist">
+        <width>100%</width>
+        <height>54</height>
+        <orientation>horizontal</orientation>
+        <itemgap>10</itemgap>
+        <usecontrolcoords>false</usecontrolcoords>
+        <visible>String.IsEqual(Container(50).ListItem.Genre,Window(Videos).Property(Infinity.MediaBrowser.GenreSource)) + Integer.IsGreater(Window(Videos).Property(Infinity.MediaBrowser.GenreCount),0) + !String.IsEmpty(Window(Videos).Property(Infinity.MediaBrowser.Genre1))</visible>
+        <control type="group" id="98090">
+          <width>47%</width>
+          <height>54</height>
+          <visible>!String.IsEmpty(Window(Videos).Property(Infinity.MediaBrowser.Genre1))</visible>
+          <control type="image">
+            <width>100%</width>
+            <height>100%</height>
+            <colordiffuse>$VAR[InfinityPaletteAccent]</colordiffuse>
+            <texture border="14">infinity_ui/frame_soft.png</texture>
+          </control>
+          <control type="textbox">
+            <left>6</left>
+            <right>6</right>
+            <top>4</top>
+            <height>46</height>
+            <font>InfinityTiny</font>
+            <textcolor>$VAR[InfinityPaletteAccent]</textcolor>
+            <align>center</align>
+            <label>$INFO[Window(Videos).Property(Infinity.MediaBrowser.Genre1)]</label>
+          </control>
+        </control>
+        <control type="group" id="98091">
+          <width>47%</width>
+          <height>54</height>
+          <visible>!String.IsEmpty(Window(Videos).Property(Infinity.MediaBrowser.Genre2))</visible>
+          <control type="image">
+            <width>100%</width>
+            <height>100%</height>
+            <colordiffuse>$VAR[InfinityPaletteAccent]</colordiffuse>
+            <texture border="14">infinity_ui/frame_soft.png</texture>
+          </control>
+          <control type="textbox">
+            <left>6</left>
+            <right>6</right>
+            <top>4</top>
+            <height>46</height>
+            <font>InfinityTiny</font>
+            <textcolor>$VAR[InfinityPaletteAccent]</textcolor>
+            <align>center</align>
+            <label>$INFO[Window(Videos).Property(Infinity.MediaBrowser.Genre2)]</label>
+          </control>
+        </control>
+      </control>
+      <control type="grouplist">
+        <width>100%</width>
+        <height>54</height>
+        <orientation>horizontal</orientation>
+        <itemgap>10</itemgap>
+        <usecontrolcoords>false</usecontrolcoords>
+        <visible>String.IsEqual(Container(50).ListItem.Genre,Window(Videos).Property(Infinity.MediaBrowser.GenreSource)) + Integer.IsGreater(Window(Videos).Property(Infinity.MediaBrowser.GenreCount),0) + !String.IsEmpty(Window(Videos).Property(Infinity.MediaBrowser.Genre3))</visible>
+        <control type="group" id="98092">
+          <width>47%</width>
+          <height>54</height>
+          <visible>!String.IsEmpty(Window(Videos).Property(Infinity.MediaBrowser.Genre3))</visible>
+          <control type="image">
+            <width>100%</width>
+            <height>100%</height>
+            <colordiffuse>$VAR[InfinityPaletteAccent]</colordiffuse>
+            <texture border="14">infinity_ui/frame_soft.png</texture>
+          </control>
+          <control type="textbox">
+            <left>6</left>
+            <right>6</right>
+            <top>4</top>
+            <height>46</height>
+            <font>InfinityTiny</font>
+            <textcolor>$VAR[InfinityPaletteAccent]</textcolor>
+            <align>center</align>
+            <label>$INFO[Window(Videos).Property(Infinity.MediaBrowser.Genre3)]</label>
+          </control>
+        </control>
+        <control type="group" id="98093">
+          <width>47%</width>
+          <height>54</height>
+          <visible>!String.IsEmpty(Window(Videos).Property(Infinity.MediaBrowser.Genre4))</visible>
+          <control type="image">
+            <width>100%</width>
+            <height>100%</height>
+            <colordiffuse>$VAR[InfinityPaletteAccent]</colordiffuse>
+            <texture border="14">infinity_ui/frame_soft.png</texture>
+          </control>
+          <control type="textbox">
+            <left>6</left>
+            <right>6</right>
+            <top>4</top>
+            <height>46</height>
+            <font>InfinityTiny</font>
+            <textcolor>$VAR[InfinityPaletteAccent]</textcolor>
+            <align>center</align>
+            <label>$INFO[Window(Videos).Property(Infinity.MediaBrowser.Genre4)]</label>
+          </control>
+        </control>
+      </control>
       <control type="textbox">
         <width>100%</width>
         <height min="32" max="100">auto</height>
         <font>InfinitySmall</font>
         <textcolor>$VAR[InfinityPaletteAccent]</textcolor>
         <label>$INFO[Container(50).ListItem.Genre]</label>
-        <visible>!String.IsEmpty(Container(50).ListItem.Genre)</visible>
+        <visible>!String.IsEmpty(Container(50).ListItem.Genre) + ![String.IsEqual(Container(50).ListItem.Genre,Window(Videos).Property(Infinity.MediaBrowser.GenreSource)) + Integer.IsGreater(Window(Videos).Property(Infinity.MediaBrowser.GenreCount),0)]</visible>
       </control>
       <control type="label">
         <width>100%</width>
@@ -256,6 +356,8 @@
               <aspectratio align="left" aligny="top">keep</aspectratio>
               <texture background="true">$VAR[InfinityMedia_SelectedPoster]</texture>
               <visible>!String.IsEmpty(Container(50).ListItem.Art(poster)) | !String.IsEmpty(Container(50).ListItem.Art(season.poster)) | !String.IsEmpty(Container(50).ListItem.Art(tvshow.poster))</visible>
+              <bordertexture border="14" colordiffuse="$VAR[InfinityPaletteAccent]">infinity_ui/frame_soft.png</bordertexture>
+              <bordersize>2</bordersize>
             </control>
             <include content="InfinityMedia_SelectedMediaText" />
             <control type="image">
@@ -311,6 +413,7 @@
                 <onclick condition="!Container.IsUpdating + [!Container(50).ListItem.IsFolder + [String.IsEqual(Container(50).ListItem.Property(IsPlayable),true) | String.IsEqual(Container(50).ListItem.DBType,movie) | String.IsEqual(Container(50).ListItem.DBType,episode) | String.IsEqual(Container(50).ListItem.DBType,musicvideo)]]">SetFocus(50)</onclick>
                 <onclick condition="!Container.IsUpdating + [!Container(50).ListItem.IsFolder + [String.IsEqual(Container(50).ListItem.Property(IsPlayable),true) | String.IsEqual(Container(50).ListItem.DBType,movie) | String.IsEqual(Container(50).ListItem.DBType,episode) | String.IsEqual(Container(50).ListItem.DBType,musicvideo)]]">Action(Select)</onclick>
                 <visible>!Container(50).ListItem.IsFolder + [String.IsEqual(Container(50).ListItem.Property(IsPlayable),true) | String.IsEqual(Container(50).ListItem.DBType,movie) | String.IsEqual(Container(50).ListItem.DBType,episode) | String.IsEqual(Container(50).ListItem.DBType,musicvideo)]</visible>
+                <align>center</align>
               </control>
               <control type="image">
                 <centerleft>50%</centerleft>
@@ -359,6 +462,7 @@
                 <onup>98064</onup>
                 <onclick condition="!Container.IsUpdating + [!String.IsEmpty(Container(50).ListItem.Trailer)]">PlayMedia($ESCINFO[Container(50).ListItem.Trailer])</onclick>
                 <visible>!String.IsEmpty(Container(50).ListItem.Trailer)</visible>
+                <align>center</align>
               </control>
               <control type="image">
                 <centerleft>50%</centerleft>
@@ -408,6 +512,7 @@
                 <onclick condition="!Container.IsUpdating + [String.IsEqual(Container(50).ListItem.DBType,movie) | String.IsEqual(Container(50).ListItem.DBType,tvshow) | String.IsEqual(Container(50).ListItem.DBType,episode) | String.IsEqual(Container(50).ListItem.DBType,season) | String.IsEqual(Container(50).ListItem.DBType,musicvideo)]">SetFocus(50)</onclick>
                 <onclick condition="!Container.IsUpdating + [String.IsEqual(Container(50).ListItem.DBType,movie) | String.IsEqual(Container(50).ListItem.DBType,tvshow) | String.IsEqual(Container(50).ListItem.DBType,episode) | String.IsEqual(Container(50).ListItem.DBType,season) | String.IsEqual(Container(50).ListItem.DBType,musicvideo)]">Action(Info)</onclick>
                 <visible>String.IsEqual(Container(50).ListItem.DBType,movie) | String.IsEqual(Container(50).ListItem.DBType,tvshow) | String.IsEqual(Container(50).ListItem.DBType,episode) | String.IsEqual(Container(50).ListItem.DBType,season) | String.IsEqual(Container(50).ListItem.DBType,musicvideo)</visible>
+                <align>center</align>
               </control>
               <control type="image">
                 <centerleft>50%</centerleft>
@@ -481,6 +586,22 @@
           <align>center</align>
           <aligny>center</aligny>
           <label>Press &amp; Hold = Menu</label>
+        </control>
+        <control type="image">
+          <left>32%</left>
+          <top>14</top>
+          <width>1</width>
+          <bottom>14</bottom>
+          <colordiffuse>$VAR[InfinityPaletteBorder]</colordiffuse>
+          <texture>infinity_ui/contract_white.png</texture>
+        </control>
+        <control type="image">
+          <left>65%</left>
+          <top>14</top>
+          <width>1</width>
+          <bottom>14</bottom>
+          <colordiffuse>$VAR[InfinityPaletteBorder]</colordiffuse>
+          <texture>infinity_ui/contract_white.png</texture>
         </control>
       </control>
     </definition>

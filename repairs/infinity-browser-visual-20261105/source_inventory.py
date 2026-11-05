@@ -7,6 +7,7 @@ ROOT=HERE.parents[1]
 BASE='2b5fcc73a12adcf223858b429d1daa23ed4420ea'
 SIGNED=Path('/tmp/infinity-signed456-payload-audit/assets/addons')
 NAMES=['script.infinity.commandcenter/default.py','script.infinity.commandcenter/library_navigation.py',
+ 'script.infinity.commandcenter/media_view.py',
  'skin.infinity.diggz/unified/Custom_1198_InfinityNav.xml','skin.infinity.diggz/unified/Includes_InfinityMediaLists.xml',
  'skin.infinity.diggz/unified/MyVideoNav.xml','skin.infinity.diggz/unified/Variables.xml']
 def sha(raw):return hashlib.sha256(raw).hexdigest()
@@ -15,13 +16,13 @@ def git(*args):return subprocess.check_output(['git',*args],cwd=ROOT)
 def main():
  rows={}
  for member in NAMES:
-  folder='infinity-master-corrective-20261105' if member.startswith('script.') else 'infinity-kodi-2103453-ui-navigation'
+  folder='infinity-master-corrective-20261105' if member.startswith('script.') and not member.endswith('/media_view.py') else 'infinity-kodi-2103453-ui-navigation'
   p=ROOT/'repairs'/folder/'overlay/assets/addons'/member;old=SIGNED/member
   rows['assets/addons/'+member]=dict(source=str(p.relative_to(ROOT)),signed456_sha256=sha(old.read_bytes()) if old.exists() else None,
                                     candidate_sha256=sha(p.read_bytes()),bytes=p.stat().st_size)
  protected={}
  prior_plan=json.loads((ROOT/'repairs/infinity-master-corrective-20261105/PLANNED-MEMBERS.json').read_text())['overlay_members']
- for n in [row['source'] for row in prior_plan if row['member'] in {'assets/addons/script.infinity.commandcenter/'+leaf for leaf in ('infinity_search.py','service.py','media_view.py')}]:
+ for n in [row['source'] for row in prior_plan if row['member'] in {'assets/addons/script.infinity.commandcenter/'+leaf for leaf in ('infinity_search.py','service.py')}]:
   p=ROOT/n;protected[n]=p.read_bytes()==git('show',BASE+':'+n)
  for n in ['repairs/dual-experience-isolation-2103420/'+leaf for leaf in ('release-authority.json','accepted-combined-release.json','release_gate.py','assemble.py','signer-policy.json')]+['.github/workflows/infinity-combined-release.yml']:
   protected[n]=(ROOT/n).read_bytes()==git('show',BASE+':'+n)
@@ -43,5 +44,5 @@ def main():
   protected_native_sha256='9f77b092899b51850928007578e0fbf91bad38c05f147a308f3ac0cf5c036638',
   APK_built=False,APK_member_comparison='NOT_RUN_FOR_NEW_CANDIDATE',installed_version='UNVERIFIED',physical_acceptance='NOT_ACCEPTED')
  (HERE/'results/SOURCE-DELTA.json').write_text(json.dumps(report,indent=2)+'\n')
- print('Five changed existing source members, one new helper; protected-source checks and 19 lock refs unchanged. No new APK comparison claimed.')
+ print('Six changed existing source members, one new helper; protected-source checks and 19 lock refs unchanged. No new APK comparison claimed.')
 if __name__=='__main__':main()
