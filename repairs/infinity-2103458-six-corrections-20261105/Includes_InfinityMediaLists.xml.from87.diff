@@ -1,0 +1,40 @@
+--- 87efb5ec/repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Includes_InfinityMediaLists.xml
++++ source-candidate/repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Includes_InfinityMediaLists.xml
+@@ -1,5 +1,13 @@
+ <?xml version='1.0' encoding='utf-8'?>
+ <includes>
++  <variable name="InfinityMedia_InfoArtwork">
++    <value condition="String.IsEqual(ListItem.DBType,episode) + !String.IsEmpty(ListItem.Art(poster))">$INFO[ListItem.Art(poster)]</value>
++    <value condition="String.IsEqual(ListItem.DBType,episode) + !String.IsEmpty(ListItem.Art(season.poster))">$INFO[ListItem.Art(season.poster)]</value>
++    <value condition="String.IsEqual(ListItem.DBType,episode) + !String.IsEmpty(ListItem.Art(tvshow.poster))">$INFO[ListItem.Art(tvshow.poster)]</value>
++    <value condition="String.IsEqual(ListItem.DBType,episode) + !String.IsEmpty(ListItem.Art(thumb))">$INFO[ListItem.Art(thumb)]</value>
++    <value>$VAR[PosterThumb]</value>
++  </variable>
++
+   <variable name="InfinityMedia_RowArtwork">
+     <value condition="!String.IsEmpty(ListItem.Art(poster))">$INFO[ListItem.Art(poster)]</value>
+     <value condition="!String.IsEmpty(ListItem.Art(season.poster))">$INFO[ListItem.Art(season.poster)]</value>
+@@ -11,6 +19,7 @@
+     <value condition="!String.IsEmpty(Container(50).ListItem.Art(poster))">$INFO[Container(50).ListItem.Art(poster)]</value>
+     <value condition="!String.IsEmpty(Container(50).ListItem.Art(season.poster))">$INFO[Container(50).ListItem.Art(season.poster)]</value>
+     <value condition="!String.IsEmpty(Container(50).ListItem.Art(tvshow.poster))">$INFO[Container(50).ListItem.Art(tvshow.poster)]</value>
++    <value condition="String.IsEqual(Container(50).ListItem.DBType,episode) + !String.IsEmpty(Container(50).ListItem.Art(thumb))">$INFO[Container(50).ListItem.Art(thumb)]</value>
+     <value />
+   </variable>
+   <include name="InfinityMedia_BrowserRow">
+@@ -356,6 +365,15 @@
+               <aspectratio align="left" aligny="top">keep</aspectratio>
+               <texture background="true">$VAR[InfinityMedia_SelectedPoster]</texture>
+               <visible>!String.IsEmpty(Container(50).ListItem.Art(poster)) | !String.IsEmpty(Container(50).ListItem.Art(season.poster)) | !String.IsEmpty(Container(50).ListItem.Art(tvshow.poster))</visible>
++              <bordertexture border="14" colordiffuse="$VAR[InfinityPaletteAccent]">infinity_ui/frame_soft.png</bordertexture>
++              <bordersize>2</bordersize>
++            </control>
++            <control type="image">
++              <width>100%</width>
++              <height>216</height>
++              <aspectratio align="left" aligny="top">keep</aspectratio>
++              <texture background="true">$VAR[InfinityMedia_SelectedPoster]</texture>
++              <visible>String.IsEqual(Container(50).ListItem.DBType,episode) + !String.IsEmpty(Container(50).ListItem.Art(thumb)) + String.IsEmpty(Container(50).ListItem.Art(poster)) + String.IsEmpty(Container(50).ListItem.Art(season.poster)) + String.IsEmpty(Container(50).ListItem.Art(tvshow.poster))</visible>
+               <bordertexture border="14" colordiffuse="$VAR[InfinityPaletteAccent]">infinity_ui/frame_soft.png</bordertexture>
+               <bordersize>2</bordersize>
+             </control>

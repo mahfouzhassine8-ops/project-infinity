@@ -1,0 +1,46 @@
+{
+  "status": "INERT_PROPOSAL_NOT_APPLIED",
+  "source_file": "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/DialogVideoInfo.xml",
+  "before_sha256": "87ae9a5d751d42150d56eb2a8a56e5d8fcfd1ed04b137248f3999997943ff0e5",
+  "proposed_sha256": "2bde89d6f62e5684aaf4498e34d3b8d69d057e3db808ff41329d3f28f4a638c9",
+  "replacements": [
+    {
+      "from": "|10|50|",
+      "to": "|9011|50|",
+      "occurrences": 1
+    },
+    {
+      "from": "type=\"button\" id=\"10\"",
+      "to": "type=\"button\" id=\"9011\"",
+      "occurrences": 1
+    },
+    {
+      "from": "Control.HasFocus(10)",
+      "to": "Control.HasFocus(9011)",
+      "occurrences": 1
+    },
+    {
+      "from": "name=\"control\" value=\"10\"",
+      "to": "name=\"control\" value=\"9011\"",
+      "occurrences": 1
+    },
+    {
+      "from": "type=\"togglebutton\" id=\"15\"",
+      "to": "type=\"togglebutton\" id=\"9012\"",
+      "occurrences": 1
+    },
+    {
+      "from": "Container(15)",
+      "to": "Container(9012)",
+      "occurrences": 10
+    },
+    {
+      "from": "\\&quot;15\\&quot;",
+      "to": "\\&quot;9012\\&quot;",
+      "occurrences": 2
+    }
+  ],
+  "static_checks": "PASS_REFERENCE_IDS_ACTIONS_UNIQUE_IDS",
+  "behavior_tests": "NOT_RUN_NOT_AUTHORIZED",
+  "native_changes": false
+}

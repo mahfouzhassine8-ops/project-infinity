@@ -33,3 +33,7 @@ Universal all-view, seasons/episodes, cast and physical responsive polish is sti
 CONTINUATION-PRESERVATION.json binds the two total runtime source differences (drawer + Info) to the immutable signed member hashes. Inherited post-sign documentation/release-authority records predate this continuation and were checked unchanged from598b89b9; they are not misrepresented as identical to the earlier signed-source Git tree. Original APK/component evidence remains intact. No new APK exists, so candidate APK-member verification is NOT RUN, not PASS. No user data, settings, profile, recovery lock, installation or release pointer was changed.
 
 Git whitespace check reports inherited whitespace on five unchanged lines in the newly introduced full-file Info overlay (and one context line in its exact diff). Those bytes match the signed baseline and were deliberately preserved. This is not reported as a clean whitespace-check PASS.
+
+## Subsequent continuation
+
+See [CONTINUATION-87.md](CONTINUATION-87.md) for the next source-only changes, Back/Trailer proposal, source-bound Linux fixtures, retained failures and current blockers. Earlier findings/evidence above remain historical, not new device acceptance.

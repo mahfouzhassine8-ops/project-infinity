@@ -1,0 +1,63 @@
+{
+  "platform": "upstream Linux Kodi; explicit responsive projection",
+  "Android": "NOT_RUN",
+  "physical_Fold": "NOT_RUN",
+  "source_hashes": {
+    "Info": "87ae9a5d751d42150d56eb2a8a56e5d8fcfd1ed04b137248f3999997943ff0e5",
+    "List": "f5047753760ac3ce2cdd1dad5e27a6b0c7d45634209130018b6eb80c41e9949e",
+    "genre_presentation": "0110de2cdc4c8295fdb314df221385f356e0ed0247547cf49c16a4dff2a6b54c",
+    "Variables": "764c81548d1213b18487a65613d5fa8a427d39781cff626c0e0512b4011078b8",
+    "media_probe.py": "1e3211668351eb8c8179af0f78742ce857a7939b350497f209bbbc73c803bbe1",
+    "media_fixture.py": "62ae3421abb9f80ada6ca0af76feffa8a9a9f307be730b92d8169b10d50ac36f"
+  },
+  "checks": [
+    {
+      "name": "skin-ready",
+      "passed": true
+    },
+    {
+      "name": "movies-directory",
+      "passed": true
+    },
+    {
+      "name": "movies-selection",
+      "passed": true
+    },
+    {
+      "name": "movies-list-dark-capture",
+      "passed": true
+    },
+    {
+      "name": "movies-list-light-capture",
+      "passed": true
+    },
+    {
+      "name": "movies-existing-scrollbar-focus",
+      "passed": true
+    },
+    {
+      "name": "movies-existing-scrollbar-moves",
+      "passed": true
+    },
+    {
+      "name": "movies-detail-scroll-end",
+      "passed": false
+    }
+  ],
+  "observations": [
+    {
+      "kind": "movies",
+      "DBType": "movie",
+      "plot_present": true,
+      "thumb_present": false,
+      "poster_present": true,
+      "season_poster_present": false
+    }
+  ],
+  "known_behavior_failures": [
+    "action-Up points to nonfocusable textbox98064",
+    "Info Back10/native GetThumb conflict; proposal not applied"
+  ],
+  "status": "FAIL",
+  "error": "Traceback (most recent call last):\n  File \"/tmp/infinity-browser-render-20261105/share/addons/script.infinitybrowserqa/entry.py\", line 47, in <module>\n    check(kind+'-detail-scroll-end',not xbmc.getCondVisibility('Container(98060).HasNext'))\n    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/tmp/infinity-browser-render-20261105/share/addons/script.infinitybrowserqa/entry.py\", line 16, in check\n    if not ok:raise RuntimeError(name)\n              ^^^^^^^^^^^^^^^^^^^^^^^^\nRuntimeError: movies-detail-scroll-end\n"
+}

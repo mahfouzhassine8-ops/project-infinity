@@ -1,0 +1,10 @@
+--- 87efb5ec/repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Variables.xml
++++ source-candidate/repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Variables.xml
+@@ -452,6 +452,7 @@
+   </variable>
+   <variable name="VideoPlotVar">
+     <value condition="ListItem.IsCollection + System.AddonIsEnabled(script.skin.info.service) + System.AddonIsEnabled(script.skin.info.service) + !Skin.HasSetting(ViewSetPlotToggle) + !String.IsEmpty(Window(Home).Property(SkinInfo.Set.Movies.Plot))">$INFO[Window(Home).Property(SkinInfo.Set.Movies.Plot)]</value>
++    <value condition="Window.IsActive(videos) + Container.Content(seasons) + String.IsEmpty(Container.ShowPlot) + !String.IsEmpty(ListItem.Plot)">$INFO[ListItem.Plot]</value>
+     <value condition="Container.Content(seasons)">$INFO[Container.ShowPlot]</value>
+     <value condition="!String.IsEmpty(ListItem.PlotOutline) + Skin.HasSetting(ViewInfoPlotToggle)">$INFO[ListItem.PlotOutline]</value>
+     <value condition="System.GetBool(videolibrary.showunwatchedplots)">$INFO[ListItem.Plot]</value>

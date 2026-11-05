@@ -1,0 +1,29 @@
+test_collection_and_existing_show_plot_priority (__main__.Season.test_collection_and_existing_show_plot_priority) ... FAIL
+test_one_scoped_value_only (__main__.Season.test_one_scoped_value_only) ... FAIL
+test_signed_baseline (__main__.Season.test_signed_baseline) ... ok
+
+======================================================================
+FAIL: test_collection_and_existing_show_plot_priority (__main__.Season.test_collection_and_existing_show_plot_priority)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-2103458-six-corrections-20261105/test_season_plot.py", line 15, in test_collection_and_existing_show_plot_priority
+    self.assertEqual(vs[1].text,'$INFO[ListItem.Plot]');self.assertEqual(vs[1].get('condition'),E.fromstring(NEW).get('condition'))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '$INFO[Container.ShowPlot]' != '$INFO[ListItem.Plot]'
+- $INFO[Container.ShowPlot]
++ $INFO[ListItem.Plot]
+
+
+======================================================================
+FAIL: test_one_scoped_value_only (__main__.Season.test_one_scoped_value_only)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-2103458-six-corrections-20261105/test_season_plot.py", line 11, in test_one_scoped_value_only
+    def test_one_scoped_value_only(self):self.assertEqual((R/REL).read_text(),BEFORE.replace(OLD,NEW+OLD))
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: '<?xm[53540 chars]ion="Container.Content(seasons)">$INFO[Contain[233643 chars]des>' != '<?xm[53540 chars]ion="Window.IsActive(videos) + Container.Conte[233819 chars]des>'
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.020s
+
+FAILED (failures=2)

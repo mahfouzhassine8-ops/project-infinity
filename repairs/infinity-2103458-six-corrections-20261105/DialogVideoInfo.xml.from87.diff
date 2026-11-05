@@ -1,0 +1,22 @@
+--- 87efb5ec/repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/DialogVideoInfo.xml
++++ source-candidate/repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/DialogVideoInfo.xml
+@@ -83,15 +83,10 @@
+       <top>13.7037%</top>
+       <width>17.1875%</width>
+       <height>43.055544%</height>
+-      <aspectratio>keep</aspectratio>
+-      <texture background="true">$VAR[PosterThumb]</texture>
+-    </control>
+-    <control type="image">
+-      <left>3.9583%</left>
+-      <top>13.5185%</top>
+-      <width>17.395687%</width>
+-      <height>43.425866%</height>
+-      <texture border="24" colordiffuse="$VAR[InfinityLegacyBorder]">infinity_glass/rim.png</texture>
++      <aspectratio align="left" aligny="top">keep</aspectratio>
++      <texture background="true">$VAR[InfinityMedia_InfoArtwork]</texture>
++      <bordertexture border="24" colordiffuse="$VAR[InfinityLegacyBorder]">infinity_glass/rim.png</bordertexture>
++      <bordersize>2</bordersize>
+     </control>
+     <control type="label" id="1">
+       <left>23.6458%</left>

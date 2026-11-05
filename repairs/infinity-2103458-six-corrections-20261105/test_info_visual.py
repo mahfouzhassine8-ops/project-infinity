@@ -17,7 +17,8 @@ class Info(unittest.TestCase):
  def test_every_action_binding_and_control_preserved(self):
   # Byte reconstruction constrains changes to the exact reviewed visual fields.
   expected=B.replace('4.791614%','17.5%').replace('<left>8.2292%</left>','<left>22%</left>').replace('<aspectratio>scale</aspectratio>','<aspectratio>keep</aspectratio>').replace('<width>54.6875%</width>','<width>72%</width>').replace('<height>58</height>\n      <orientation>horizontal</orientation>','<height>72</height>\n      <orientation>horizontal</orientation>').replace('<width>14.285694%</width>','<width>22.8%</width>').replace('<width>16.190453%</width>','<width>22.8%</width>').replace('<width>18.095213%</width>','<width>22.8%</width>')
-  self.assertEqual(A,expected)
+  from art_polish import info_polish
+  self.assertEqual(A,info_polish(expected))
  def test_action_labels_fit_narrow_window(self):
   x=E.fromstring(A);g=x.find('.//control[@id="9000"]')
   for width in (1080,1128,2520):

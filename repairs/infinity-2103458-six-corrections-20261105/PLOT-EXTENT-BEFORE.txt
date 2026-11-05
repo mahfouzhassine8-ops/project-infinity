@@ -1,0 +1,35 @@
+test_all_nonvisual_fields_exact_and_ids_unmodified (__main__.Art.test_all_nonvisual_fields_exact_and_ids_unmodified) ... FAIL
+test_episode_fallback_and_poster_order (__main__.Art.test_episode_fallback_and_poster_order) ... ok
+test_episode_frame_compact_and_mutually_exclusive (__main__.Art.test_episode_frame_compact_and_mutually_exclusive) ... ok
+test_existing_info_fallback_retained (__main__.Art.test_existing_info_fallback_retained) ... ok
+test_frame_tracks_rendered_image_not_viewport (__main__.Art.test_frame_tracks_rendered_image_not_viewport) ... ok
+test_list_baseline_matches_signed458 (__main__.Art.test_list_baseline_matches_signed458) ... ok
+test_no_icon_or_generic_thumbnail_selected (__main__.Art.test_no_icon_or_generic_thumbnail_selected) ... ok
+test_synopsis_exposed_by_existing_outer_scrollbar (__main__.Art.test_synopsis_exposed_by_existing_outer_scrollbar) ... FAIL
+
+======================================================================
+FAIL: test_all_nonvisual_fields_exact_and_ids_unmodified (__main__.Art.test_all_nonvisual_fields_exact_and_ids_unmodified)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-2103458-six-corrections-20261105/test_art_polish.py", line 45, in test_all_nonvisual_fields_exact_and_ids_unmodified
+    self.assertEqual(p.read_text(),fn(before))
+AssertionError: '<?xm[15251 chars]max="30%">auto</height>\n        <font>Infinit[166624 chars]s>\n' != '<?xm[15251 chars]max="4000">auto</height>\n        <font>Infini[166625 chars]s>\n'
+
+======================================================================
+FAIL: test_synopsis_exposed_by_existing_outer_scrollbar (__main__.Art.test_synopsis_exposed_by_existing_outer_scrollbar)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-2103458-six-corrections-20261105/test_art_polish.py", line 29, in test_synopsis_exposed_by_existing_outer_scrollbar
+    self.assertEqual(n.find('height').attrib,{'min':'40','max':'4000'})
+AssertionError: {'min': '40', 'max': '30%'} != {'min': '40', 'max': '4000'}
+- {'max': '30%', 'min': '40'}
+?          ^ ^
+
++ {'max': '4000', 'min': '40'}
+?          ^ ^^
+
+
+----------------------------------------------------------------------
+Ran 8 tests in 0.034s
+
+FAILED (failures=2)

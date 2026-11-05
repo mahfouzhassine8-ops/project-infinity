@@ -8,7 +8,15 @@
     },
     "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/DialogVideoInfo.xml": {
       "before_sha256": "39bb6ad5c0b7c5a75da697e139b5c8b20622d94a63de17f041150d207d2650fb",
-      "allowed_behavior": "Info-only Back/header width and position, matching existing loading frame geometry, keep-scaled poster/cast artwork; preserve every action, visibility, enablement, labels, metadata, theme bindings and IDs. Existing action group/button geometry only to prevent narrow-window label clipping; preserve IDs/native mappings including reported unresolved ID10 collision."
+      "allowed_behavior": "Info-only Back/header width and position, matching existing loading frame geometry, keep-scaled poster/cast artwork; preserve every action, visibility, enablement, labels, metadata, theme bindings and IDs. Existing action group/button geometry only to prevent narrow-window label clipping; preserve IDs/native mappings including reported unresolved ID10 collision. Info artwork binds to existing-system variable with episode thumbnail fallback; use existing rim as native image border, aligned top, instead of independent tall rim; no action/ID/metadata changes."
+    },
+    "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Includes_InfinityMediaLists.xml": {
+      "before_sha256": "4a41c95b6c08d2f08b9d459263f5aea949a406131c2f6fbfbc6f5f4faed1fccc",
+      "allowed_behavior": "Existing selected media artwork: permit real episode thumbnail only after existing poster priority; corresponding image visibility. Add Info-only artwork variable with same episode fallback and existing PosterThumb otherwise. No actions/control IDs/layout/provider/touch changes. Thumbnail-only episode image uses mutually exclusive216-logical-pixel frame; original poster frame unchanged."
+    },
+    "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Variables.xml": {
+      "before_sha256": "9efb6dac17abb69eb1ef8cf1cebb4e1419952b459ac49df1b23751c0383519cd",
+      "allowed_behavior": "One VideoPlotVar value: active Videos + seasons + empty ShowPlot + nonempty item Plot uses existing ListItem.Plot. Preserve collection precedence, existing ShowPlot, all other windows/content and all other variable bytes."
     }
   },
   "groups": {
@@ -27,7 +35,16 @@
     "30 real Python Search worker/admission calls against synthetic RPC, including4 RPC errors; record residual tokens, thread and FD counts; not native/provider/Android stress",
     "Info before/after logical Back label-space and header separation across cover/inner portrait/landscape; XML action/metadata/theme/control-ID exact preservation",
     "Finite upstream full-skin native Info invocation, Light/Dark screenshots and Back restoration with explicit source-bound responsive projection; no playback or shutdown tests",
-    "Info action row minimum label width and total fit at cover/inner dimensions; rerender only changed Info geometry in Light/Dark with native Back"
+    "Info action row minimum label width and total fit at cover/inner dimensions; rerender only changed Info geometry in Light/Dark with native Back",
+    "Prepare inert skin-only Back10\u21929011 and Trailer15\u21929012 proposal; parse/XML reference and native reserved-ID inspection only; do not apply or execute proposed behavior",
+    "Finite existing-browser/Info Linux rendering for movies, TV shows, seasons and episodes using synthetic metadata/cast/art, Light/Dark and representative cover/inner viewports; explicit projection; no playback/provider/shutdown execution",
+    "Read-only Search rejection trace extraction from existing November5 diagnostics; counts/classified reason names only; no raw private log publication",
+    "Before/after source-bound episode-art fallback, no directory icon fallback, poster precedence and native image-frame geometry; exact nonvisual ID/action/condition preservation",
+    "Rerender only changed shared List/Info artwork for movie/show/season/episode with existing Light/Dark themes and native Back; bounded Cast reveal uses existing control5, no actor selection/playback/shutdown",
+    "Season synopsis fallback: signed458 byte binding, exact one-value addition, Videos/seasons-only and existing collection/show-plot precedence; actual season Light/Dark rendering with supplied item plot",
+    "Short-window selected-details reachability via existing focus target98064; capture scrolled synopsis without altering layout/actions or invoking playback",
+    "Retain failed textbox focus cases; independently test existing scrollbar98066 and group98060 HasNext/HasPrevious native scroll with synthetic metadata",
+    "Selected synopsis extent: before/after retained text/IDs/actions and existing auto-height bound; short-window existing scrollbar exposes full synthetic synopsis endpoint"
   ],
   "release_blocked_until": [
     "Six-group correctness and precise full payload allowlist verified",
@@ -44,5 +61,8 @@
     "provider source",
     "accepted pointers and recovery locks"
   ],
-  "no_native_edits_authorized_by_this_document": true
+  "no_native_edits_authorized_by_this_document": true,
+  "withdrawn_experiments": [
+    "Synopsis max4000 height experiment: host assertions passed but end-scroll runtime check failed with both PageDown and Down inputs; max30% restored byte-exactly. Failure evidence preserved; no completion claim."
+  ]
 }

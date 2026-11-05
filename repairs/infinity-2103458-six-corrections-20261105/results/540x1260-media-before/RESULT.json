@@ -1,0 +1,174 @@
+{
+  "platform": "upstream Linux Kodi; explicit responsive projection",
+  "Android": "NOT_RUN",
+  "physical_Fold": "NOT_RUN",
+  "source_hashes": {
+    "Info": "79f7b1786e237eac35bf6bb4b3b0f2aaeb0bbc251ed83a08588a8221b78a210c",
+    "List": "4a41c95b6c08d2f08b9d459263f5aea949a406131c2f6fbfbc6f5f4faed1fccc",
+    "genre_presentation": "0110de2cdc4c8295fdb314df221385f356e0ed0247547cf49c16a4dff2a6b54c",
+    "media_probe.py": "f3c70bed924aa7bc8358bb0c5431a90f1117de61b4519d0874beb9374e870500",
+    "media_fixture.py": "f9ba15d12fb731f518c2228e144e0d5066dd25cd50ecf35e80083d20ff470eec"
+  },
+  "checks": [
+    {
+      "name": "skin-ready",
+      "passed": true
+    },
+    {
+      "name": "movies-directory",
+      "passed": true
+    },
+    {
+      "name": "movies-selection",
+      "passed": true
+    },
+    {
+      "name": "movies-list-dark-capture",
+      "passed": true
+    },
+    {
+      "name": "movies-list-light-capture",
+      "passed": true
+    },
+    {
+      "name": "movies-native-info",
+      "passed": true
+    },
+    {
+      "name": "movies-info-dark-capture",
+      "passed": true
+    },
+    {
+      "name": "movies-info-light-capture",
+      "passed": true
+    },
+    {
+      "name": "movies-native-back",
+      "passed": true
+    },
+    {
+      "name": "movies-selection-restored",
+      "passed": true
+    },
+    {
+      "name": "tvshows-directory",
+      "passed": true
+    },
+    {
+      "name": "tvshows-selection",
+      "passed": true
+    },
+    {
+      "name": "tvshows-list-dark-capture",
+      "passed": true
+    },
+    {
+      "name": "tvshows-list-light-capture",
+      "passed": true
+    },
+    {
+      "name": "tvshows-native-info",
+      "passed": true
+    },
+    {
+      "name": "tvshows-info-dark-capture",
+      "passed": true
+    },
+    {
+      "name": "tvshows-info-light-capture",
+      "passed": true
+    },
+    {
+      "name": "tvshows-native-back",
+      "passed": true
+    },
+    {
+      "name": "tvshows-selection-restored",
+      "passed": true
+    },
+    {
+      "name": "seasons-directory",
+      "passed": true
+    },
+    {
+      "name": "seasons-selection",
+      "passed": true
+    },
+    {
+      "name": "seasons-list-dark-capture",
+      "passed": true
+    },
+    {
+      "name": "seasons-list-light-capture",
+      "passed": true
+    },
+    {
+      "name": "episodes-directory",
+      "passed": true
+    },
+    {
+      "name": "episodes-selection",
+      "passed": true
+    },
+    {
+      "name": "episodes-list-dark-capture",
+      "passed": true
+    },
+    {
+      "name": "episodes-list-light-capture",
+      "passed": true
+    },
+    {
+      "name": "episodes-native-info",
+      "passed": true
+    },
+    {
+      "name": "episodes-info-dark-capture",
+      "passed": true
+    },
+    {
+      "name": "episodes-info-light-capture",
+      "passed": true
+    },
+    {
+      "name": "episodes-native-back",
+      "passed": true
+    },
+    {
+      "name": "episodes-selection-restored",
+      "passed": true
+    }
+  ],
+  "observations": [
+    {
+      "kind": "movies",
+      "DBType": "movie",
+      "plot_present": true,
+      "thumb_present": false,
+      "selected_art_present": true
+    },
+    {
+      "kind": "tvshows",
+      "DBType": "tvshow",
+      "plot_present": true,
+      "thumb_present": false,
+      "selected_art_present": true
+    },
+    {
+      "kind": "seasons",
+      "DBType": "season",
+      "plot_present": true,
+      "thumb_present": false,
+      "selected_art_present": true
+    },
+    {
+      "kind": "episodes",
+      "DBType": "episode",
+      "plot_present": true,
+      "thumb_present": true,
+      "selected_art_present": true
+    }
+  ],
+  "status": "PASS_SELECTED_SYNTHETIC_CONTENT_RENDER_AND_NATIVE_BACK",
+  "visual_acceptance": "PENDING_IMAGE_REVIEW_NOT_PHYSICAL_ACCEPTANCE"
+}

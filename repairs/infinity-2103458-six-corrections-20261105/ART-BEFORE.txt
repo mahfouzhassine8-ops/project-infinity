@@ -1,0 +1,55 @@
+test_all_nonvisual_fields_exact_and_ids_unmodified (__main__.Art.test_all_nonvisual_fields_exact_and_ids_unmodified) ... FAIL
+test_episode_fallback_and_poster_order (__main__.Art.test_episode_fallback_and_poster_order) ... FAIL
+test_existing_info_fallback_retained (__main__.Art.test_existing_info_fallback_retained) ... FAIL
+test_frame_tracks_rendered_image_not_viewport (__main__.Art.test_frame_tracks_rendered_image_not_viewport) ... ERROR
+test_list_baseline_matches_signed458 (__main__.Art.test_list_baseline_matches_signed458) ... ok
+test_no_icon_or_generic_thumbnail_selected (__main__.Art.test_no_icon_or_generic_thumbnail_selected) ... FAIL
+
+======================================================================
+ERROR: test_frame_tracks_rendered_image_not_viewport (__main__.Art.test_frame_tracks_rendered_image_not_viewport)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-2103458-six-corrections-20261105/test_art_polish.py", line 24, in test_frame_tracks_rendered_image_not_viewport
+    n=next(c for c in x.findall('.//control') if c.findtext('texture')=='$VAR[InfinityMedia_InfoArtwork]')
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+StopIteration
+
+======================================================================
+FAIL: test_all_nonvisual_fields_exact_and_ids_unmodified (__main__.Art.test_all_nonvisual_fields_exact_and_ids_unmodified)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-2103458-six-corrections-20261105/test_art_polish.py", line 32, in test_all_nonvisual_fields_exact_and_ids_unmodified
+    self.assertEqual(p.read_text(),fn(before))
+AssertionError: '<?xm[79 chars]edia_RowArtwork">\n    <value condition="!Stri[180153 chars]s>\n' != '<?xm[79 chars]edia_InfoArtwork">\n    <value condition="Stri[181132 chars]s>\n'
+
+======================================================================
+FAIL: test_episode_fallback_and_poster_order (__main__.Art.test_episode_fallback_and_poster_order)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-2103458-six-corrections-20261105/test_art_polish.py", line 10, in test_episode_fallback_and_poster_order
+    self.assertEqual(vals[3].get('condition'),A.EP);self.assertEqual(vals[3].text,'$INFO[Container(50).ListItem.Art(thumb)]')
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: None != 'String.IsEqual(Container(50).ListItem.DB[62 chars]mb))'
+
+======================================================================
+FAIL: test_existing_info_fallback_retained (__main__.Art.test_existing_info_fallback_retained)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-2103458-six-corrections-20261105/test_art_polish.py", line 21, in test_existing_info_fallback_retained
+    self.assertIsNotNone(v);self.assertEqual(v.findall('value')[-1].text,'$VAR[PosterThumb]')
+    ^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: unexpectedly None
+
+======================================================================
+FAIL: test_no_icon_or_generic_thumbnail_selected (__main__.Art.test_no_icon_or_generic_thumbnail_selected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-2103458-six-corrections-20261105/test_art_polish.py", line 15, in test_no_icon_or_generic_thumbnail_selected
+    n=x.find('variable[@name="'+name+'"]');self.assertIsNotNone(n)
+                                           ^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: unexpectedly None
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.030s
+
+FAILED (failures=4, errors=1)

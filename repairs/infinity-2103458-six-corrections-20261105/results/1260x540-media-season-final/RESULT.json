@@ -1,0 +1,51 @@
+{
+  "platform": "upstream Linux Kodi; explicit responsive projection",
+  "Android": "NOT_RUN",
+  "physical_Fold": "NOT_RUN",
+  "source_hashes": {
+    "Info": "87ae9a5d751d42150d56eb2a8a56e5d8fcfd1ed04b137248f3999997943ff0e5",
+    "List": "e2c7be2ccbf7d4b493bff260863d96c6dffc8daf3fe5ef99bf4271462c7cc449",
+    "genre_presentation": "0110de2cdc4c8295fdb314df221385f356e0ed0247547cf49c16a4dff2a6b54c",
+    "Variables": "764c81548d1213b18487a65613d5fa8a427d39781cff626c0e0512b4011078b8",
+    "media_probe.py": "47eda92bb6c4a17dcf64cc60e7d205f2420a9ed010fb75bc629629de6b0bcf2f",
+    "media_fixture.py": "f9ba15d12fb731f518c2228e144e0d5066dd25cd50ecf35e80083d20ff470eec"
+  },
+  "checks": [
+    {
+      "name": "skin-ready",
+      "passed": true
+    },
+    {
+      "name": "movies-directory",
+      "passed": true
+    },
+    {
+      "name": "movies-selection",
+      "passed": true
+    },
+    {
+      "name": "movies-list-dark-capture",
+      "passed": true
+    },
+    {
+      "name": "movies-list-light-capture",
+      "passed": true
+    },
+    {
+      "name": "movies-detail-focus",
+      "passed": false
+    }
+  ],
+  "observations": [
+    {
+      "kind": "movies",
+      "DBType": "movie",
+      "plot_present": true,
+      "thumb_present": false,
+      "poster_present": true,
+      "season_poster_present": false
+    }
+  ],
+  "status": "FAIL",
+  "error": "Traceback (most recent call last):\n  File \"/tmp/infinity-browser-render-20261105/share/addons/script.infinitybrowserqa/entry.py\", line 39, in <module>\n    check(kind+'-detail-focus',wait(lambda:xbmcgui.Window(10025).getFocusId()==98064))\n    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/tmp/infinity-browser-render-20261105/share/addons/script.infinitybrowserqa/entry.py\", line 16, in check\n    if not ok:raise RuntimeError(name)\n              ^^^^^^^^^^^^^^^^^^^^^^^^\nRuntimeError: movies-detail-focus\n"
+}
