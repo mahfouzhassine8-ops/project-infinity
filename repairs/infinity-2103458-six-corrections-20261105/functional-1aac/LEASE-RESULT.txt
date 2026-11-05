@@ -1,0 +1,6 @@
+PASS duplicate token refused
+PASS failed start retires reservation
+PASS three live distinct invokers block fourth lease
+PASS conditional same-live-invoker accounting counts three tokens
+PASS no liveness retirement inferred from subsequent admission
+PASS observed invoker completion retires old leases

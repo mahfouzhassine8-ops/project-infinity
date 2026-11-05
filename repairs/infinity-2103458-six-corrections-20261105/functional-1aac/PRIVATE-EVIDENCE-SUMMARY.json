@@ -1,0 +1,67 @@
+{
+  "archive_sha256": "b48d8c632c01b098a12d48670b8527c949c4691d0f2b525ec9f2d429a8d5586d",
+  "capture_version": 2103456,
+  "correction_base": 2103458,
+  "raw_logs_published": false,
+  "historical_critical_records": [
+    {
+      "member": "shutdown/critical.jsonl",
+      "pid_values": [
+        19492
+      ],
+      "first_epoch_utc": "2026-11-05T21:08:45.385408+00:00",
+      "last_epoch_utc": "2026-11-05T21:08:48.638678+00:00",
+      "Crew_selected_observations": [
+        {
+          "pid": 19492,
+          "invoker_id": 9,
+          "phase": "vfs.python.active_invoker",
+          "epoch_ns": 1793912925385665759
+        },
+        {
+          "pid": 19492,
+          "invoker_id": 9,
+          "phase": "vfs.python.children_wait",
+          "epoch_ns": 1793912927048844769
+        },
+        {
+          "pid": 19492,
+          "invoker_id": 9,
+          "phase": "python.child_thread_wait",
+          "epoch_ns": 1793912927048870081
+        }
+      ],
+      "limits": "Checkpoint history, not a Search request trace; absence of a later callback in this bounded capture is not proof of permanent hang."
+    },
+    {
+      "member": "shutdown/critical.previous.jsonl",
+      "pid_values": [
+        13439
+      ],
+      "first_epoch_utc": "2026-11-05T15:55:57.376491+00:00",
+      "last_epoch_utc": "2026-11-05T15:55:59.516321+00:00",
+      "Crew_selected_observations": [
+        {
+          "pid": 13439,
+          "invoker_id": 9,
+          "phase": "vfs.python.active_invoker",
+          "epoch_ns": 1793894157377846096
+        },
+        {
+          "pid": 13439,
+          "invoker_id": 9,
+          "phase": "vfs.python.children_wait",
+          "epoch_ns": 1793894158375609220
+        },
+        {
+          "pid": 13439,
+          "invoker_id": 9,
+          "phase": "python.child_thread_wait",
+          "epoch_ns": 1793894158375623283
+        }
+      ],
+      "limits": "Checkpoint history, not a Search request trace; absence of a later callback in this bounded capture is not proof of permanent hang."
+    }
+  ],
+  "SIG11_stack_or_request_binding": "ABSENT"
+}

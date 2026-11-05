@@ -1,0 +1,48 @@
+#include <map>
+#include <string>
+#include <mutex>
+#include <cassert>
+#include <iostream>
+struct CScriptInvocationManager {
+ std::map<int,bool> live;
+ static CScriptInvocationManager& GetInstance(){static CScriptInvocationManager v;return v;}
+ bool IsRunning(int id){return live[id];}
+};
+struct InfinitySearchLeases
+{
+  std::mutex mutex;
+  std::map<std::string, int> scripts;
+  bool Reserve(const std::string& token)
+  {
+    std::map<std::string, int> previous;
+    { std::lock_guard<std::mutex> lock(mutex); previous = scripts; }
+    for (const auto& entry : previous)
+      if (entry.second >= 0 && !CScriptInvocationManager::GetInstance().IsRunning(entry.second))
+      {
+        std::lock_guard<std::mutex> lock(mutex);
+        const auto current = scripts.find(entry.first);
+        if (current != scripts.end() && current->second == entry.second)
+          scripts.erase(current);
+      }
+    std::lock_guard<std::mutex> lock(mutex);
+    if (scripts.size() >= 3 || scripts.count(token))
+      return false;
+    scripts.emplace(token, -1);
+    return true;
+  }
+  void Started(const std::string& token, int id)
+  {
+    std::lock_guard<std::mutex> lock(mutex);
+    if (id < 0) scripts.erase(token);
+    else scripts[token] = id;
+  }
+};
+int main(){
+ auto& manager=CScriptInvocationManager::GetInstance();
+ {InfinitySearchLeases x;assert(x.Reserve("one"));assert(!x.Reserve("one"));std::cout<<"PASS duplicate token refused\n";}
+ {InfinitySearchLeases x;assert(x.Reserve("one"));x.Started("one",-1);assert(x.scripts.empty());std::cout<<"PASS failed start retires reservation\n";}
+ {InfinitySearchLeases x;for(int id=1;id<=3;++id){manager.live[id]=true;assert(x.Reserve(std::to_string(id)));x.Started(std::to_string(id),id);}assert(!x.Reserve("four"));std::cout<<"PASS three live distinct invokers block fourth lease\n";}
+ {InfinitySearchLeases x;manager.live[7]=true;for(int n=1;n<=3;++n){assert(x.Reserve(std::to_string(n)));x.Started(std::to_string(n),7);}assert(x.scripts.size()==3);assert(!x.Reserve("four"));std::cout<<"PASS conditional same-live-invoker accounting counts three tokens\n";}
+ {InfinitySearchLeases x;manager.live[8]=true;assert(x.Reserve("done-result"));x.Started("done-result",8);assert(x.Reserve("next"));assert(x.scripts.count("done-result")==1);std::cout<<"PASS no liveness retirement inferred from subsequent admission\n";}
+ {InfinitySearchLeases x;manager.live[9]=true;for(int n=1;n<=3;++n){assert(x.Reserve(std::to_string(n)));x.Started(std::to_string(n),9);}manager.live[9]=false;assert(x.Reserve("fresh"));assert(x.scripts.size()==1);std::cout<<"PASS observed invoker completion retires old leases\n";}
+}
