@@ -1,0 +1,49 @@
+{
+  "archive_sha256": "b48d8c632c01b098a12d48670b8527c949c4691d0f2b525ec9f2d429a8d5586d",
+  "bytes": 929608,
+  "CRC": "PASS",
+  "raw_archive_committed": false,
+  "capture_version": 2103456,
+  "correction_base": 2103458,
+  "historical_signal11_exits": [
+    {
+      "reported_time": "2026-11-05 10:43:02",
+      "RSS_KB": 1840608
+    },
+    {
+      "reported_time": "2026-11-05 10:46:58",
+      "RSS_KB": 1234492
+    }
+  ],
+  "crash_stack_available": false,
+  "exit_manifest_trace_records": 0,
+  "native_crash_last_bytes": 0,
+  "native_histories_truncated": true,
+  "native_binary_same_in_capture_APK_and458": true,
+  "Search_source_same_on_captured_disk_and458": true,
+  "historical_captured_skin_version": "1.0.5.243",
+  "historical_disk_skin": {
+    "addon.xml": {
+      "sha256": "573523c4cd8e757ef93778b23c4ce899e43b244cbc367ba5ee05b3096261b4a9",
+      "state": "DIFFERENT"
+    },
+    "unified/Custom_1198_InfinityNav.xml": {
+      "sha256": "f4919fbea5385de30b1532aac16afd44c6ad991deeaaf74cc7d741d18cb49fc9",
+      "state": "MATCH"
+    },
+    "unified/MyVideoNav.xml": {
+      "sha256": "fd13bd1161723cf527fea6ee0a9646439ab5cb4ff88c8d3c9b0471f43414358b",
+      "state": "MATCH"
+    }
+  },
+  "historical_runtime_selection": "UNKNOWN",
+  "current458_runtime_selection": "NOT_RUN",
+  "reported_crash_reproduced_on458": false,
+  "historical_final_close": {
+    "pid": 19492,
+    "phase": "COMPLETE",
+    "checkpoint_saved": true,
+    "process_death_confirmed": true
+  },
+  "attribution": "Historical signal11 summaries establish crashes, not Search causality, allocation owner, or failing native function."
+}
