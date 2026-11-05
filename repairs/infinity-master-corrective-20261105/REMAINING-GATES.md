@@ -36,9 +36,11 @@ Skin XML alone cannot extend the native dispatcher eligibility or replace that p
 
 ## Drawer geometry
 
+The user explicitly resolved the short-window requirement: **preserve rows; scroll in landscape**. Initial Power visibility is a portrait requirement; landscape uses original scrolling. No row-density change, pinning, reordering or automatic scroll is introduced.
+
 The original scrolling grouplist has top132, bottom18 and gap6. Power's original row spans1336–1416 relative to that list; Explore follows at1422. At panel height1572, the usable list is1422 and the agreed placement fits exactly. At smaller percent-constrained heights it does not.
 
-The signed451 skin declares1080×2400 and has **no** native-responsive marker. Its preserved Android `CSkinInfo::GetNativeWindowResolution` adapts the original logical area to the usable window's aspect, quantizing both axes to8. A landscape example can therefore have a logical height near1056; its96%-height drawer exposes only about864 list units. This is a measured source constraint using synthetic window dimensions, not a physical Fold measurement. The height-only correction cannot satisfy initial Power visibility in all required orientations while retaining every row size and order. Do not extend beyond the viewport, auto-scroll past Home, pin/duplicate Power or secretly shrink touch targets. A reviewed responsive row/spacing treatment or an explicit narrower placement requirement is needed.
+The signed451 skin declares1080×2400 and has **no** native-responsive marker. Its preserved Android `CSkinInfo::GetNativeWindowResolution` adapts the original logical area to the usable window's aspect, quantizing both axes to8. A landscape example can therefore have a logical height near1056; its96%-height drawer exposes only about864 list units. This is a measured source constraint using synthetic window dimensions, not a physical Fold measurement. The revised focused acceptance assertion passes for portrait fit and original landscape scroll ownership. Actual viewport/insets and touch/scroll measurements on the Fold remain NOT RUN. The earlier all-orientation initial-fit failure is retained and superseded by the user's clarification, not reclassified as a previous PASS.
 
 ## Release boundary
 

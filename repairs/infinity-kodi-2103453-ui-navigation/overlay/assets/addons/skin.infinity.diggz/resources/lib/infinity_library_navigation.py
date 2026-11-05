@@ -102,7 +102,7 @@ def direct(action, xbmc, gui):
                     and addon.get('name') == 'SportHD' and xbmc.getCondVisibility('System.AddonIsEnabled(' + identity + ')')):
                 raise ValueError('unverified provider')
             import xbmcvfs
-            root = Path(xbmcvfs.translatePath(addon['path']))
+            root = Path(xbmcvfs.translatePath(addon['path'])).resolve()
             raw = source(root, 'addon.xml')
             text = raw.decode('utf-8-sig')
             if '\x00' in text or '<!DOCTYPE' in text.upper() or '<!ENTITY' in text.upper():

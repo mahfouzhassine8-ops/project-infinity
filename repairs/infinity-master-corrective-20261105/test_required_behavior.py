@@ -42,7 +42,7 @@ class RequiredBehavior(unittest.TestCase):
         navigation.nav.run('sports',a,a)
         self.assertFalse(any('plugin.video.playlistbrowser' in json.dumps(c) for c in a.requests))
 
-    def test_power_initial_fit_in_synthetic_cover_inner_orientations(self):
+    def test_power_initial_portrait_fit_and_original_landscape_scrolling(self):
         root=E.parse(SKIN/'unified/Custom_1198_InfinityNav.xml').getroot()
         group=root.find(".//control[@id='1198899']")
         offset=0;power_end=None
@@ -61,8 +61,15 @@ class RequiredBehavior(unittest.TestCase):
             results.append(dict(case='SYNTHETIC_'+label,viewport=[w,h],logical_height=logical_height,panel_height=panel,usable_list_height=usable,power_end=power_end,power_fits=power_end<=usable))
         target=Path(__file__).parent/'results/DRAWER-SYNTHETIC-GEOMETRY.json'
         target.write_text(json.dumps({'physical_measurements':False,'cases':results},indent=2)+'\n')
+        # User clarified: preserve row sizes; normal scrolling in landscape.
         for r in results:
-            with self.subTest(case=r['case']):self.assertTrue(r['power_fits'],r)
+            with self.subTest(case=r['case']):
+                if 'portrait' in r['case']:self.assertTrue(r['power_fits'],r)
+                else:
+                    self.assertFalse(r['power_fits'],r)
+                    self.assertEqual(group.get('type'),'grouplist')
+                    self.assertEqual(group.findtext('orientation'),'vertical')
+                    self.assertIsNotNone(group.find(".//control[@id='1198304']"))
 
 
 if __name__=='__main__':unittest.main(verbosity=2)

@@ -37,7 +37,8 @@ class DirectNavigation(unittest.TestCase):
         self.manifest='<addon id="plugin.video.sporthdme" name="SportHD" version="0.1.92" provider-name="Bugatsinho"><extension point="xbmc.python.pluginsource" library="default.py"/></addon>'
         (self.sport/'addon.xml').write_text(self.manifest);(self.sport/'default.py').write_text('# fixture entrypoint, never executed')
         def eligible(media,**kwargs):self.eligibility.append((media,kwargs));return [self.provider],[]
-        def source(root,name):return (root/name).read_bytes()
+        self.source_reads=[]
+        def source(root,name):self.source_reads.append((root,name));return (root/name).read_bytes()
         mock=patch.object(nav,'_provider_tools',return_value=(eligible,self.b.env['route'],source));mock.start();self.addCleanup(mock.stop)
         mock=patch.dict(sys.modules,xbmcvfs=SimpleNamespace(translatePath=lambda p:str(self.sport) if p=='special://fixture/sport' else p));mock.start();self.addCleanup(mock.stop)
     def executeJSONRPC(self,raw):
@@ -86,6 +87,13 @@ class DirectNavigation(unittest.TestCase):
         self.assertTrue(nav.run('sports',self,self))
         self.assertEqual(self.activated(),[['plugin://plugin.video.sporthdme/','return']])
         self.assertEqual([r['method'] for r in self.calls],['Addons.GetAddonDetails','GUI.ActivateWindow'])
+
+    def test_sporthd_translated_root_uses_existing_source_readers_canonical_path(self):
+        actual=self.sport
+        alias=self.b.root/'android-path-alias';alias.symlink_to(actual,target_is_directory=True)
+        self.sport=alias
+        self.assertTrue(nav.run('sports',self,self))
+        self.assertEqual([root for root,_ in self.source_reads],[actual.resolve(),actual.resolve()])
 
     def test_missing_disabled_wrong_identity_or_unverified_entrypoint_do_not_navigate(self):
         for key,value in [('enabled',False),('addonid','plugin.video.other'),('name','Different')]:
