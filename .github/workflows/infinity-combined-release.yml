@@ -7,7 +7,7 @@ on:
         type: choice
         required: true
         default: final-combined
-        options: [final-combined, prepare-preview451, prepare-kodi452, prepare-kodi453, prepare-ui454-455, prepare-controlled456-457, review-controlled456-457]
+        options: [final-combined, prepare-preview451, prepare-kodi452, prepare-kodi453, prepare-ui454-455, prepare-controlled456-457, review-controlled456-457, prepare-browser458-459, review-browser458-459]
       prepared_run:
         description: Completed official controlled preparation run for read-only authority review
         type: string
@@ -428,9 +428,123 @@ jobs:
           PYCODE
       - uses: actions/upload-artifact@v4
         with: {name: 'Infinity456457-Authority-Proposals-${{ github.run_id }}', path: authority-proposals/, if-no-files-found: error, retention-days: 90}
+  prepare-browser458-459:
+    name: Frozen451 browser458 and higher459 recovery preparation
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/infinity-browser-visual-correction-from-2103456-20261105' && inputs.operation == 'prepare-browser458-459'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '21'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with: {packages: 'build-tools;35.0.0', log-accepted-android-sdk-licenses: false}
+      - name: Verify exact source versions sole signer and authenticated artifact pins
+        id: pins
+        run: |
+          set -euo pipefail
+          python3 -m pip install PyYAML==6.0.3
+          python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out SIGNER-ROUTES.json
+          python3 repairs/infinity-browser-visual-20261105/packaging/release_controlled.py versions --version 2103458 --out VERSION458.json
+          python3 repairs/infinity-browser-visual-20261105/packaging/release_controlled.py versions --version 2103459 --out VERSION459.json
+          python3 repairs/infinity-browser-visual-20261105/packaging/release_controlled.py metadata --out INPUT-METADATA.json
+          python3 - <<'PYCODE'
+          import json,os
+          from pathlib import Path
+          p=json.loads(Path('repairs/infinity-browser-visual-20261105/packaging/ENGINE-INPUT.json').read_text())['artifact_identity']
+          with open(os.environ['GITHUB_OUTPUT'],'a') as f:f.write('native_id='+str(p[0])+'\nnative_run='+str(p[1])+'\n')
+          PYCODE
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13200361701', run-id: '41568721264', merge-multiple: true, github-token: '${{ github.token }}', path: protected451}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13200925524', run-id: '41568721264', merge-multiple: true, github-token: '${{ github.token }}', path: protected451-components}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          artifact-ids: ${{ steps.pins.outputs.native_id }}
+          run-id: ${{ steps.pins.outputs.native_run }}
+          merge-multiple: true
+          github-token: ${{ github.token }}
+          path: controlled-engine
+      - uses: actions/download-artifact@v4
+        with: {artifact-ids: '13397163155', run-id: '41988386798', merge-multiple: true, github-token: '${{ github.token }}', path: protected456}
+      - name: Focused package metadata and source tests before key access
+        env:
+          INFINITY_CONTROLLED_BASELINE: protected451/Infinity-2103451-Combined-Original-Signer.apk
+        run: python3 repairs/infinity-browser-visual-20261105/packaging/test_release.py
+      - name: Original-key modules exact preservation and verified forward-recovery preparation
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          python3 repairs/infinity-browser-visual-20261105/packaging/release_controlled.py prepare             --bundles protected451-components --baseline protected451/Infinity-2103451-Combined-Original-Signer.apk             --previous456 protected456/Infinity-2103456-Combined-Original-Signer.apk --native controlled-engine --sdk "$ANDROID_HOME/build-tools/35.0.0" --out prepared-controlled
+      - uses: actions/upload-artifact@v4
+        with: {name: 'Infinity2103458-Prepared-${{ github.run_id }}', path: prepared-controlled/2103458/publish/, if-no-files-found: error, retention-days: 90, compression-level: 0}
+      - uses: actions/upload-artifact@v4
+        with: {name: 'Infinity2103459-Prepared-${{ github.run_id }}', path: prepared-controlled/2103459/publish/, if-no-files-found: error, retention-days: 90, compression-level: 0}
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Infinity458459-Preparation-Evidence-${{ github.run_id }}
+          path: |
+            SIGNER-ROUTES.json
+            VERSION458.json
+            VERSION459.json
+            INPUT-METADATA.json
+            prepared-controlled/BASELINE-SIGNATURE.txt
+            prepared-controlled/RECOVERY-VERIFICATION.json
+            prepared-controlled/NATIVE-COMPATIBILITY.json
+            prepared-controlled/*/UNSIGNED-SOURCE-GATE.json
+            prepared-controlled/*/MODULE-AUTHENTICATION.txt
+            prepared-controlled/*/PREPARATION.json
+            prepared-controlled/*/preservation/
+          if-no-files-found: warn
+          retention-days: 90
+  review-browser458-459:
+    name: Read-only official controlled artifacts and authority proposals - no keys
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/infinity-browser-visual-correction-from-2103456-20261105' && inputs.operation == 'review-browser458-459'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      GH_TOKEN: ${{ github.token }}
+      PREPARED_RUN: ${{ inputs.prepared_run }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - uses: actions/download-artifact@v4
+        with: {run-id: '${{ inputs.prepared_run }}', name: 'Infinity2103458-Prepared-${{ inputs.prepared_run }}', github-token: '${{ github.token }}', path: reviewed/2103458}
+      - uses: actions/download-artifact@v4
+        with: {run-id: '${{ inputs.prepared_run }}', name: 'Infinity2103459-Prepared-${{ inputs.prepared_run }}', github-token: '${{ github.token }}', path: reviewed/2103459}
+      - name: Verify full official archives and prepare exact authority data without repository writes
+        run: |
+          python3 - <<'PYCODE'
+          import os,sys
+          from pathlib import Path
+          sys.path.insert(0,'repairs/infinity-browser-visual-20261105/packaging')
+          import release_controlled as r
+          run=int(os.environ['PREPARED_RUN']);out=Path('authority-proposals');out.mkdir()
+          a=r.proposed(Path('reviewed/2103458'),run)
+          r.save(out/'AUTHORITY458.json',a)
+          r.save(r.HERE/'ISSUED458-AUTHORITY.json',a)
+          b=r.proposed(Path('reviewed/2103459'),run)
+          r.save(out/'AUTHORITY459.json',b)
+          r.save(out/'REVIEW.json',dict(status='PASS_FULL_OFFICIAL_PREPARED_ARCHIVES_AND_EXACT_AUTHORITIES',prepared_run=run,source=os.environ['GITHUB_SHA'],APK_signed=False,keys_used=False,accepted_pointer_updated=False))
+          PYCODE
+      - uses: actions/upload-artifact@v4
+        with: {name: 'Infinity458459-Authority-Proposals-${{ github.run_id }}', path: authority-proposals/, if-no-files-found: error, retention-days: 90}
   combined:
     name: Registered combined original-key testing APK; exact owner preservation
-    if: github.event_name == 'workflow_dispatch' && inputs.operation == 'final-combined' && (github.ref == 'refs/heads/work/infinity-preview-2103450-fullscreen-display-20261102' || github.ref == 'refs/heads/work/infinity-kodi-2103451-checkpoint-anr-20261103' || github.ref == 'refs/heads/work/infinity-kodi-2103453-controlled-test-20261104' || github.ref == 'refs/heads/work/infinity-kodi-ui-2103454-2103455-packaging-20261104' || github.ref == 'refs/heads/work/infinity-master-testing-from-2103451-20261105')
+    if: github.event_name == 'workflow_dispatch' && inputs.operation == 'final-combined' && (github.ref == 'refs/heads/work/infinity-preview-2103450-fullscreen-display-20261102' || github.ref == 'refs/heads/work/infinity-kodi-2103451-checkpoint-anr-20261103' || github.ref == 'refs/heads/work/infinity-kodi-2103453-controlled-test-20261104' || github.ref == 'refs/heads/work/infinity-kodi-ui-2103454-2103455-packaging-20261104' || github.ref == 'refs/heads/work/infinity-master-testing-from-2103451-20261105' || github.ref == 'refs/heads/work/infinity-browser-visual-correction-from-2103456-20261105')
     runs-on: ubuntu-22.04
     timeout-minutes: 40
     env:
@@ -449,7 +563,9 @@ jobs:
         run: |
           set -euo pipefail
           python3 -m pip install PyYAML==6.0.3
-          if [ "$GITHUB_REF" = 'refs/heads/work/infinity-master-testing-from-2103451-20261105' ]; then
+          if [ "$GITHUB_REF" = 'refs/heads/work/infinity-browser-visual-correction-from-2103456-20261105' ]; then
+            python3 -m py_compile repairs/infinity-browser-visual-20261105/packaging/release_controlled.py
+          elif [ "$GITHUB_REF" = 'refs/heads/work/infinity-master-testing-from-2103451-20261105' ]; then
             python3 -m py_compile repairs/infinity-master-testing-20261105/release_controlled.py
           elif [ "$GITHUB_REF" = 'refs/heads/work/infinity-kodi-ui-2103454-2103455-packaging-20261104' ]; then
             python3 -m py_compile repairs/infinity-kodi-ui-2103454-2103455-packaging/release_ui.py
@@ -465,7 +581,8 @@ jobs:
           from pathlib import Path
           from release_gate import remote_authority,require
           a=remote_authority(Path('.'),os.environ['GITHUB_SHA'])
-          pctrl=os.environ['GITHUB_REF']=='refs/heads/work/infinity-master-testing-from-2103451-20261105'
+          pvisual=os.environ['GITHUB_REF']=='refs/heads/work/infinity-browser-visual-correction-from-2103456-20261105'
+          pctrl=pvisual or os.environ['GITHUB_REF']=='refs/heads/work/infinity-master-testing-from-2103451-20261105'
           p453=os.environ['GITHUB_REF']=='refs/heads/work/infinity-kodi-2103453-controlled-test-20261104'
           pui=os.environ['GITHUB_REF']=='refs/heads/work/infinity-kodi-ui-2103454-2103455-packaging-20261104'
           p0=os.environ['GITHUB_REF']=='refs/heads/work/infinity-kodi-2103451-checkpoint-anr-20261103'
@@ -477,14 +594,14 @@ jobs:
               require(a['owner_update_evidence']['native_sha256']=='d0b6f115e839fbe39e764e2fecad47418c501ab1ece853294578652cd0b80b98','EXACT453_ENGINE')
               require(a['owner_update_evidence']['Android']=='PENDING_NO_CONNECTED_COMPATIBLE_ANDROID_TARGET','TRUTHFUL_UI_ANDROID_PENDING')
           if pctrl:
-              require(a['candidate_versionCode'] in (2103456,2103457),'EXACT_CONTROLLED_RECOVERY_VERSIONS')
-              version=a['candidate_versionCode'];generation=42 if version==2103456 else 43;baseline=2103451
-              owner='INFINITY_MASTER_CONTROLLED_TEST' if version==2103456 else 'INFINITY_MASTER_FORWARD_RECOVERY'
-              sys_path='repairs/infinity-master-testing-20261105'
+              require(a['candidate_versionCode'] in ((2103458,2103459) if pvisual else (2103456,2103457)),'EXACT_CONTROLLED_RECOVERY_VERSIONS')
+              version=a['candidate_versionCode'];generation=(44 if version==2103458 else 45) if pvisual else (42 if version==2103456 else 43);baseline=2103451
+              owner=('INFINITY_BROWSER_CONTROLLED_TEST' if version==2103458 else 'INFINITY_BROWSER_FORWARD_RECOVERY') if pvisual else ('INFINITY_MASTER_CONTROLLED_TEST' if version==2103456 else 'INFINITY_MASTER_FORWARD_RECOVERY')
+              sys_path='repairs/infinity-browser-visual-20261105/packaging' if pvisual else 'repairs/infinity-master-testing-20261105'
               import sys
               sys.path.insert(0,sys_path)
               import release_controlled as controlled
-              require(a['owner_update_evidence']['native_sha256']==(controlled.engine_record()['native_sha256'] if version==2103456 else controlled.FROZEN_NATIVE),'EXACT_CONTROLLED_NATIVE')
+              require(a['owner_update_evidence']['native_sha256']==(controlled.engine_record()['native_sha256'] if version in (2103456,2103458) else controlled.FROZEN_NATIVE),'EXACT_CONTROLLED_NATIVE')
               require(a['owner_update_evidence']['Android']==controlled.RUNTIME,'TRUTHFUL_ANDROID_NOT_RUN')
           require(a['candidate_versionCode']==version and a['generation']==generation,'EXACT_SELECTED_AUTHORITY')
           require(a['target_owners']==['INFINITY','CHOOSER_SHELL'] and a['update_kind']=='owner_update','EXACT_OWNER_UPDATE')
@@ -505,6 +622,12 @@ jobs:
       - name: Recheck exact controlled or recovery version before issuance
         if: github.ref == 'refs/heads/work/infinity-master-testing-from-2103451-20261105'
         run: python3 repairs/infinity-master-testing-20261105/release_controlled.py versions --version "${{ steps.selected.outputs.version }}" --out VERSION-AVAILABILITY.json
+      - name: Recheck exact browser or recovery version before issuance
+        if: github.ref == 'refs/heads/work/infinity-browser-visual-correction-from-2103456-20261105'
+        run: python3 repairs/infinity-browser-visual-20261105/packaging/release_controlled.py versions --version "${{ steps.selected.outputs.version }}" --out VERSION-AVAILABILITY.json
+      - uses: actions/download-artifact@v4
+        if: github.ref == 'refs/heads/work/infinity-browser-visual-correction-from-2103456-20261105'
+        with: {artifact-ids: '13397163155', run-id: '41988386798', merge-multiple: true, github-token: '${{ github.token }}', path: protected456}
       - uses: actions/download-artifact@v4
         with:
           run-id: ${{ steps.selected.outputs.baseline_run }}
@@ -529,11 +652,12 @@ jobs:
           python3 - "${{ steps.selected.outputs.producer_run }}" <<'PYCODE'
           import os,sys
           from pathlib import Path
-          pctrl=os.environ['GITHUB_REF']=='refs/heads/work/infinity-master-testing-from-2103451-20261105'
+          pvisual=os.environ['GITHUB_REF']=='refs/heads/work/infinity-browser-visual-correction-from-2103456-20261105'
+          pctrl=pvisual or os.environ['GITHUB_REF']=='refs/heads/work/infinity-master-testing-from-2103451-20261105'
           p453=os.environ['GITHUB_REF']=='refs/heads/work/infinity-kodi-2103453-controlled-test-20261104'
           pui=os.environ['GITHUB_REF']=='refs/heads/work/infinity-kodi-ui-2103454-2103455-packaging-20261104'
           p0=os.environ['GITHUB_REF']=='refs/heads/work/infinity-kodi-2103451-checkpoint-anr-20261103'
-          sys.path.insert(0,'repairs/infinity-master-testing-20261105' if pctrl else ('repairs/infinity-kodi-ui-2103454-2103455-packaging' if pui else ('repairs/infinity-kodi-2103453-controlled-test' if p453 else ('repairs/infinity-kodi-2103451-checkpoint-anr' if p0 else 'repairs/infinity-preview-2103450-fullscreen-display'))))
+          sys.path.insert(0,'repairs/infinity-browser-visual-20261105/packaging' if pvisual else ('repairs/infinity-master-testing-20261105' if pctrl else ('repairs/infinity-kodi-ui-2103454-2103455-packaging' if pui else ('repairs/infinity-kodi-2103453-controlled-test' if p453 else ('repairs/infinity-kodi-2103451-checkpoint-anr' if p0 else 'repairs/infinity-preview-2103450-fullscreen-display')))))
           if pctrl: import release_controlled as r
           elif pui: import release_ui as r
           elif p453: import release453 as r
@@ -570,7 +694,15 @@ jobs:
       - name: Signed predecessor-to-candidate exact member and original certificate comparison
         run: |
           set -euo pipefail
-          if [ "$GITHUB_REF" = 'refs/heads/work/infinity-master-testing-from-2103451-20261105' ]; then
+          if [ "$GITHUB_REF" = 'refs/heads/work/infinity-browser-visual-correction-from-2103456-20261105' ]; then
+            python3 repairs/infinity-browser-visual-20261105/packaging/release_controlled.py compare \
+              --baseline protected-baseline/Infinity-2103451-Combined-Original-Signer.apk \
+              --previous456 protected456/Infinity-2103456-Combined-Original-Signer.apk \
+              --candidate signed-combined/Infinity-${{ steps.selected.outputs.version }}-Combined-Original-Signer.apk \
+              --plan prepared-owner/PREPARATION.json --out signed-combined/preservation --sdk "$ANDROID_HOME/build-tools/35.0.0"
+            cp prepared-owner/RECOVERY-VERIFICATION.json prepared-owner/MODULE-AUTHENTICATION.txt prepared-owner/NATIVE-COMPATIBILITY.json signed-combined/
+            cp VERSION-AVAILABILITY.json signed-combined/
+          elif [ "$GITHUB_REF" = 'refs/heads/work/infinity-master-testing-from-2103451-20261105' ]; then
             python3 repairs/infinity-master-testing-20261105/release_controlled.py compare               --baseline protected-baseline/Infinity-2103451-Combined-Original-Signer.apk               --candidate signed-combined/Infinity-${{ steps.selected.outputs.version }}-Combined-Original-Signer.apk               --plan prepared-owner/PREPARATION.json --out signed-combined/preservation --sdk "$ANDROID_HOME/build-tools/35.0.0"
             cp prepared-owner/RECOVERY-VERIFICATION.json prepared-owner/MODULE-AUTHENTICATION.txt prepared-owner/NATIVE-COMPATIBILITY.json signed-combined/
             cp VERSION-AVAILABILITY.json signed-combined/

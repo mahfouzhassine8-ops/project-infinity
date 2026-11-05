@@ -24,8 +24,12 @@ def main():
  prior_plan=json.loads((ROOT/'repairs/infinity-master-corrective-20261105/PLANNED-MEMBERS.json').read_text())['overlay_members']
  for n in [row['source'] for row in prior_plan if row['member'] in {'assets/addons/script.infinity.commandcenter/'+leaf for leaf in ('infinity_search.py','service.py')}]:
   p=ROOT/n;protected[n]=p.read_bytes()==git('show',BASE+':'+n)
- for n in ['repairs/dual-experience-isolation-2103420/'+leaf for leaf in ('release-authority.json','accepted-combined-release.json','release_gate.py','assemble.py','signer-policy.json')]+['.github/workflows/infinity-combined-release.yml']:
+ for n in ['repairs/dual-experience-isolation-2103420/'+leaf for leaf in ('accepted-combined-release.json','assemble.py','signer-policy.json')]:
   protected[n]=(ROOT/n).read_bytes()==git('show',BASE+':'+n)
+ gate='repairs/dual-experience-isolation-2103420/release_gate.py'
+ old=git('show',BASE+':'+gate)
+ expected=old.replace(b"AUTHORITY_BRANCH = 'work/infinity-master-testing-from-2103451-20261105'",b"AUTHORITY_BRANCH = 'work/infinity-browser-visual-correction-from-2103456-20261105'")
+ protected['original_release_gate_algorithm_except_exact_authority_branch']=(ROOT/gate).read_bytes() in (old,expected)
  native='repairs/infinity-native-touch-2103451-20261105/'
  for leaf in ['native/xbmc/input/InputManager.cpp','native/xbmc/guilib/GUIBaseContainer.cpp','APPLIED-SOURCE-DELTA.json']:
   n=native+leaf;protected[n]=(ROOT/n).read_bytes()==git('show',BASE+':'+n)
@@ -35,7 +39,8 @@ def main():
  assert locks==previous['locks']
  tracked=git('diff','--name-only',BASE,'--').decode().splitlines()
  allowed=set(r['source'] for r in rows.values())
- assert all(n in allowed or n.startswith(('repairs/infinity-browser-visual-20261105/',
+ configuration={'.github/workflows/infinity-combined-release.yml',gate,'repairs/dual-experience-isolation-2103420/release-authority.json'}
+ assert all(n in allowed or n in configuration or n.startswith(('repairs/infinity-browser-visual-20261105/',
      'design-locks/infinity-media-browser-20261104/')) for n in tracked),tracked
  report=dict(status='EXACT_SOURCE_CANDIDATE_DELTA_NOT_APK_COMPARISON',base_source=BASE,base_signed_APK=2103456,
   base_APK_SHA256='81aed468bcdf4031f3186fa7c5aa73e396a38f27837581fbcc54f56cbbc94696',runtime_changes=rows,
