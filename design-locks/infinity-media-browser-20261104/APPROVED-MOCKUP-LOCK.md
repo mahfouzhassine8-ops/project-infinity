@@ -32,6 +32,20 @@ Across Infinity's selectable movie/TV/provider/list/card/poster/favorites/add-on
 
 The user explicitly clarified the screenshots were **examples**, not provider-limited scope: consistency is required throughout applicable **Infinity** experiences, not merely Umbrella or this one view. Implement shared UI/gesture ownership, *not* separate provider-specific hacks.
 
+## Mandatory existing-system integration — explicitly reaffirmed by user
+
+**Nothing in this design is a standalone or parallel implementation. Every new or changed capability must be connected to the existing Infinity ecosystem and behave as a native extension of what is already approved.** The theme is one example, not the only integration obligation. This is a release-blocking acceptance contract, not an optional styling preference.
+
+- **Existing theme ownership:** Resolve colors, backgrounds, panel surfaces, focus treatments, typography, spacing, and imagery through Infinity's established theme/skin variables and resources. Honor the already-implemented light/dark choice immediately, including on every provider page, dialog, poster and details surface. Do not hardcode a new black/cyan palette because the design mockup is dark, or ship a separate theme toggle.
+- **Existing view/mode ownership:** Retain and integrate the approved global media-view preference, List/Posters/InfoWall/TriPanel and other supported modes, the front/inner Fold reflow, landscape/portrait rules, window/view IDs and focus state. Apply the approved visual language through their existing entry points; do not create a competing browse engine or silently force a different saved view.
+- **Existing touch and controls:** Use the existing native Kodi/Infinity touch dispatch and contextual-action paths to implement first-tap select, second-tap activate, and hold-for-context across applicable surfaces. Reuse existing real actions, including playback, info, long-press, Back, selection restoration and modal dismissal; do not add decorative controls or another gesture tracker that conflicts with earlier work.
+- **Existing media/provider ownership:** Display the selected item via Kodi's existing provider list item, art and metadata fields. Reuse the verified provider routes and installed source adapters. Missing posters/metadata should degrade gracefully, never substitute a huge unrelated directory icon, forge results or change provider behavior.
+- **Existing loading, lifecycle and persistence:** Respect the existing loading-indicator ownership, cancellation, native admission/worker lifetime, app foreground/background behavior, health diagnostics, data durability, settings, Favorites and Continue Playing. No duplicated timers, workers, network requests, storage models, or new persistence owners.
+- **Existing cross-experience isolation and packaging:** Cobra, chooser, protected shared/native runtime and shutdown remain unchanged without separate authorization. Any implementation must pass the current module-authentication, original-signer, install-over version, exact-member preservation and forward-recovery gates. Do not treat a source-only test or visual mock as signed/device-accepted.
+- **Integration verification:** Before claiming PASS, test that changing the existing Light/Dark setting updates the actual new surfaces; the chosen global view persists through page/provider changes; front/inner reflow, orientation, touch, focus, selected-item art, scroll, long-press, Back/return, loading and playback handoff all use the existing system. Report any integration blocker instead of introducing a second implementation.
+
+**In short: connect to what we already built; preserve it; improve it in place.** The mockup defines the approved look and interaction target, not permission to replace existing architecture.
+
 ## Preservation and safety
 
 - Do **not** change Cobra, original approved chooser, native playback/codec behavior, provider search routes/logic, Source/Library destinations, saved media or Favorites data, view-preference persistence, provider settings, security, checkpoint/shutdown admission, app identity, original signer or locks.
