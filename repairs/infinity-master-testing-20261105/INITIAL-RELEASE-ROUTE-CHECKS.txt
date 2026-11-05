@@ -1,0 +1,25 @@
+test_native_ABI_and_dependency_mismatches_refuse_before_signing (test_release.ControlledRelease.test_native_ABI_and_dependency_mismatches_refuse_before_signing) ... ERROR
+test_original_signer_gate_steps_and_historical_jobs_remain (test_release.ControlledRelease.test_original_signer_gate_steps_and_historical_jobs_remain) ... ok
+test_workflow_embedded_code_parses_without_execution (test_release.ControlledRelease.test_workflow_embedded_code_parses_without_execution) ... ok
+test_only_exact_authority_route_and_unsigned_workflow_records_change (test_release.ControlledRelease.test_only_exact_authority_route_and_unsigned_workflow_records_change) ... ok
+test_no_application_or_shutdown_execution_in_release_preparer (test_release.ControlledRelease.test_no_application_or_shutdown_execution_in_release_preparer) ... ok
+
+======================================================================
+ERROR: test_native_ABI_and_dependency_mismatches_refuse_before_signing (test_release.ControlledRelease.test_native_ABI_and_dependency_mismatches_refuse_before_signing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-master-testing-20261105/test_release.py", line 88, in test_native_ABI_and_dependency_mismatches_refuse_before_signing
+    with self.assertRaisesRegex(ValueError,reason):r.native_compatibility(baseline,lib,p/'proof.json')
+                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/infinity-master-testing-20261105/repairs/infinity-master-testing-20261105/release_controlled.py", line 124, in native_compatibility
+    with ZipFile(baseline) as z:old.write_bytes(z.read(NATIVE))
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/pathlib.py", line 1037, in write_bytes
+    return f.write(view)
+           ^^^^^^^^^^^^^
+OSError: [Errno 28] No space left on device
+
+----------------------------------------------------------------------
+Ran 5 tests in 1.729s
+
+FAILED (errors=1)

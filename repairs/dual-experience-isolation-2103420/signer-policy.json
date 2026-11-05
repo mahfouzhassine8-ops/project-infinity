@@ -40,10 +40,24 @@
     },
     {
       "id": 406545245,
+      "original_key_access": false,
       "path": ".github/workflows/infinity-kodi452-pause-stop-arm64.yml",
       "source": "24c6eeb30a6fbc65546a9945a87ca19500694f31",
-      "workflow_sha256": "54c3bc268bfd1295973917da5a42e15931751c61e416aac7cad77da658c348ef",
-      "original_key_access": false
+      "workflow_sha256": "54c3bc268bfd1295973917da5a42e15931751c61e416aac7cad77da658c348ef"
+    },
+    {
+      "id": 407785045,
+      "original_key_access": false,
+      "path": ".github/workflows/infinity-native-touch-451-objects.yml",
+      "source": "4c4094918845bd42649f50bcb094d2ba334a51bc",
+      "workflow_sha256": "b7ead681dffcbb792e609327885d105ce27ec3c00f23d5f874c83085358fbae5"
+    },
+    {
+      "id": 407812103,
+      "original_key_access": false,
+      "path": ".github/workflows/infinity-master-controlled-native.yml",
+      "source": "a6722c3848e12e58c4c0fbef360629e922c4ece6",
+      "workflow_sha256": "894418d39e98e505d9c002c9e71560f9e1a6e25a362bf3570a5e7387b4dc6247"
     }
   ],
   "audit_workflows": 618,
@@ -2761,7 +2775,9 @@
     404063472,
     406247408,
     406270295,
-    406545245
+    406545245,
+    407785045,
+    407812103
   ],
   "schema": 1,
   "scope": "Retire historical workflows with access to the original permanent signing secret; preserve their files, runs, artifacts and every locked ref",
