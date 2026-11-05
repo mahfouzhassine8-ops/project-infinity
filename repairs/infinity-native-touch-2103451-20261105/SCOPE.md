@@ -1,0 +1,18 @@
+# Authorized native touch integration — source only
+
+Continue from55c993e3 on isolated branch `work/infinity-native-touch-from-2103451-20261105`. The user explicitly authorized the exact reviewed two-file patch. Patch SHA256 d6b61065f4158520e045985f6834327e80c163fed805cebd0c5b27c3179c1563. No APK, signing, install, release, acceptance or lock.
+
+Only functional native differences from frozen451 may be `xbmc/input/InputManager.cpp` and `xbmc/guilib/GUIBaseContainer.cpp`, with exactly the reviewed after-hashes. No other native dependency may be edited. Preserve existing controller, context owners, focus, one-tap parent/Back/direct buttons and all non-Infinity/Android input paths.
+
+Before applying, the full inventory gate detected five earlier staged P0 files in `/tmp/kodi451-restored-native`. The two touch files were correct, but the whole workspace was not frozen451. No touch patch was applied to that workspace. The isolated copy restores those five files to their independently hash-verified original451 bytes from `/tmp/kodi451-p0-inputs`; all9411 paths/hashes must match the original source map before applying the exact touch patch. The existing P0 workspace and all earlier evidence stay unchanged. `BASELINE451-RESTORATION.patch` is input restoration, not a new P0 correction or reversal in an accepted application.
+
+Selected checks, recorded before execution:
+
+1. Full9411-file frozen input and isolated postpatch inventory: exactly2 changed,9409 unchanged. Compare proposed/actual file hashes, scope outside the allowed methods and unchanged Search/UI sources from55c993e3.
+2. Compile the actual changed media-touch method and pre-hover admission block with the unchanged controller in a disposable C++ host fixture. Test typed/untyped provider rows, native/Home Favorites, files/folders, first/second tap, existing context ownership, held-release suppression, transformed coordinates, selection changes, focus, parent navigation, modal/skin/screensaver/pointer/disabled/hidden/other-window guards and direct buttons. Mocked Kodi boundaries are not a real Android gesture result. Reuse the byte-identical prior controller/focus/legacy-hold evidence; run new integration checks only.
+3. Use a separate compile-only Actions job with the existing authenticated source/dependency artifacts and original pinned NDK/recipe. Restore exact451 first, apply the2-file patch, configure the original ARM64 target and compile **only the two real translation units**. Do not link a native engine or package an APK. Check real object architecture, source bindings and untouched protected inputs afterward. No signing keys or signing-infrastructure edits, application launch or shutdown suites.
+4. Retain the two failing mandatory Search acceptance cases and prior passing evidence without an unrelated rerun. Favorites source probe is unchanged and not deployed. Exact locked browser PNG and device connection remain pending; no substitute design or physical PASS.
+
+Any additional source/API dependency or failed gate is reported before editing another native file. Real Android/Fold touch, transformed rendering, Back/context interaction and runtime integration are NOT RUN without a supported connected target.
+
+Exact new infrastructure selection: `test_compile_policy.CompilePolicy` (four tests) before triggering the compile-only workflow: reject wrong authority before network work; no package/key/application steps; fixed patch/after hashes; actual authenticated source archive restored to all9411 frozen entries, then exact2-file patch. The temporary restoration fixture is removed after its source-map evidence is asserted; no existing source/evidence is deleted.

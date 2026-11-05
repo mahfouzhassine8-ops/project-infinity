@@ -1,0 +1,36 @@
+{
+  "authorization": "User: exact reviewed55c993e3 two-file source-only native touch correction",
+  "branch": "work/infinity-native-touch-from-2103451-20261105",
+  "parent_checkpoint": "55c993e31709f317bf1f31acf460f5641bc31420",
+  "reference": 2103451,
+  "source_map_sha256": "20f901cf5780aebff6eff45e4f21248904f8a8ff72d4acdcd5ea72e783c829c3",
+  "reviewed_patch_sha256": "d6b61065f4158520e045985f6834327e80c163fed805cebd0c5b27c3179c1563",
+  "existing_P0_workspace_unchanged": true,
+  "existing_P0_workspace_excluded_files": [
+    "xbmc/application/Application.cpp",
+    "xbmc/messaging/ApplicationMessenger.cpp",
+    "xbmc/messaging/ApplicationMessenger.h",
+    "xbmc/video/jobs/VideoLibraryMarkWatchedJob.cpp",
+    "xbmc/video/jobs/VideoLibraryMarkWatchedJob.h"
+  ],
+  "isolated_baseline_full9411_match_before_touch": true,
+  "baseline_restoration_patch_sha256": "51d0d9d22b12b843b13550ec8723492b9bc81e9c09201320fbe7e82f31a7fe8e",
+  "native_source_count": 9411,
+  "protected_native_sources_byte_identical": 9409,
+  "changed_files": {
+    "xbmc/guilib/GUIBaseContainer.cpp": {
+      "before_sha256": "85f2b8bffdaa71f1ffd93a345ee2b7863ccef6c826ece68ef1cf9fd537fd317b",
+      "after_sha256": "cb0e262c9cb58c56f6655955b6dc2999a2608523be9de582dabd82d3a0dfe0ae"
+    },
+    "xbmc/input/InputManager.cpp": {
+      "before_sha256": "8887b9f9110d5534667a9b9cf3e28bce0f5cadee737492196a3379fd203c7172",
+      "after_sha256": "23a07619efc01a728e572689e93c5010dd6f6e7354c229617b1b076ad62cbb25"
+    }
+  },
+  "apk_packaging_allowed": false,
+  "signing_allowed": false,
+  "installation_allowed": false,
+  "full_engine_linked": false,
+  "Android_runtime": "NOT_RUN",
+  "Search_required_tests": "2 FAIL, unchanged and not waived"
+}
