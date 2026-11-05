@@ -1,0 +1,23 @@
+{
+  "scope": "One changed-control campaign; fixture failures retained, no broad suite",
+  "attempts": [
+    {
+      "name": "564x540-media-integration-controls-44da",
+      "result": "FAIL_FIXTURE_EXPECTATION",
+      "observed": "Three dark overflow Up routes and selection preservation passed. Short synopsis still overflows because total details include poster/metadata. No production edit."
+    },
+    {
+      "name": "540x1260-media-integration-controls-44da-portrait",
+      "result": "NO_RESULT_MODAL_TEST_CALL",
+      "cause": "Probe invoked Action(Info) with wait=True; existing working fixture uses asynchronous Info open. Runner bound retained. No production edit."
+    },
+    {
+      "name": "540x1260-media-integration-controls-44da-modal-corrected",
+      "result": "PASS_CHANGED_CONTROL_DISPATCH_ONLY",
+      "checks": 58,
+      "limits": "Upstream Linux with explicit responsive projection; synthetic trailer receiver; no actual provider/bridge playback or Android/Fold acceptance"
+    }
+  ],
+  "Android": "NOT_RUN",
+  "campaign_complete": true
+}

@@ -8,11 +8,11 @@
     },
     "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/DialogVideoInfo.xml": {
       "before_sha256": "39bb6ad5c0b7c5a75da697e139b5c8b20622d94a63de17f041150d207d2650fb",
-      "allowed_behavior": "Info-only Back/header width and position, matching existing loading frame geometry, keep-scaled poster/cast artwork; preserve every action, visibility, enablement, labels, metadata, theme bindings and IDs. Existing action group/button geometry only to prevent narrow-window label clipping; preserve IDs/native mappings including reported unresolved ID10 collision. Info artwork binds to existing-system variable with episode thumbnail fallback; use existing rim as native image border, aligned top, instead of independent tall rim; no action/ID/metadata changes. a7 continuation: native label scrolling for existing metadata/cast labels, wider existing cast cards, synopsis height within existing unused vertical space; no action or control-type changes."
+      "allowed_behavior": "Info-only Back/header width and position, matching existing loading frame geometry, keep-scaled poster/cast artwork; preserve every action, visibility, enablement, labels, metadata, theme bindings and IDs. Existing action group/button geometry only to prevent narrow-window label clipping; preserve IDs/native mappings including reported unresolved ID10 collision. Info artwork binds to existing-system variable with episode thumbnail fallback; use existing rim as native image border, aligned top, instead of independent tall rim; no action/ID/metadata changes. a7 continuation: native label scrolling for existing metadata/cast labels, wider existing cast cards, synopsis height within existing unused vertical space; no action or control-type changes. User final integration authorization after44da: apply exact reviewed Back10->9011 and Trailer15->9012 IDs and related loading/focus references, preserving all action bytes otherwise."
     },
     "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Includes_InfinityMediaLists.xml": {
       "before_sha256": "4a41c95b6c08d2f08b9d459263f5aea949a406131c2f6fbfbc6f5f4faed1fccc",
-      "allowed_behavior": "Existing selected media artwork: permit real episode thumbnail only after existing poster priority; corresponding image visibility. Add Info-only artwork variable with same episode fallback and existing PosterThumb otherwise. No actions/control IDs/layout/provider/touch changes. Thumbnail-only episode image uses mutually exclusive216-logical-pixel frame; original poster frame unchanged. a7 continuation: synopsis top0/max0 auto-height uses native content extent within existing scroll group; preserves every input route and metadata value."
+      "allowed_behavior": "Existing selected media artwork: permit real episode thumbnail only after existing poster priority; corresponding image visibility. Add Info-only artwork variable with same episode fallback and existing PosterThumb otherwise. No actions/control IDs/layout/provider/touch changes. Thumbnail-only episode image uses mutually exclusive216-logical-pixel frame; original poster frame unchanged. a7 continuation: synopsis top0/max0 auto-height uses native content extent within existing scroll group; preserves every input route and metadata value. User final integration authorization after44da: only three reviewed Up routes use visible scrollbar98066, otherwise list50; all other input/action bytes preserved."
     },
     "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Variables.xml": {
       "before_sha256": "9efb6dac17abb69eb1ef8cf1cebb4e1419952b459ac49df1b23751c0383519cd",
@@ -51,7 +51,9 @@
     "a7 continuation: read-only view-registration inventory and Search worker/cancellation lifetimes against unchanged signed source; no simulated stress rerun",
     "a7 synopsis negative cases: select existing synthetic short and empty plot rows through native SetFocus; inspect Light/Dark and preserve labels/actions with no playback/provider call",
     "1aac functional continuation: read-only consumer/lease/invoker lifetime trace; compile exact existing InfinitySearchLeases struct in isolated host harness with explicitly synthetic liveness, six admission/accounting cases only; no Android, crash reproduction, engine build, provider, playback or shutdown execution",
-    "1aac functional continuation: static verification of both unapplied skin proposals and final Downloads proposal boundaries; exact preserved runtime hashes and immutable signed archive; no repeated visual suite"
+    "1aac functional continuation: static verification of both unapplied skin proposals and final Downloads proposal boundaries; exact preserved runtime hashes and immutable signed archive; no repeated visual suite",
+    "44da integration: execute changed Info Back9011/Trailer9012 dispatch and all three Details Up routes in one finite upstream Linux fixture, synthetic long/short metadata, Light/Dark, test-only trailer receiver; no provider playback or shutdown; source hashes recorded.",
+    "44da campaign continuation after preserved short-viewport fixture failure: total detail extent includes poster/metadata; run portrait changed-control fixture, record actual visible scrollbar branches and any unexecuted fallback instead of assuming short plot is one page. No production adjustment."
   ],
   "release_blocked_until": [
     "Six-group correctness and precise full payload allowlist verified",
@@ -71,5 +73,15 @@
   "no_native_edits_authorized_by_this_document": true,
   "withdrawn_experiments": [
     "Synopsis max4000 height experiment: host assertions passed but end-scroll runtime check failed with both PageDown and Down inputs; max30% restored byte-exactly. Failure evidence preserved; no completion claim."
-  ]
+  ],
+  "conditional_native_authorization": {
+    "files": [
+      "xbmc/video/windows/GUIWindowVideoNav.cpp",
+      "xbmc/video/windows/GUIWindowVideoNav.h"
+    ],
+    "helper_scope": "library_navigation.py Downloads action only",
+    "gate": "Only positively identified unwanted provider roots; stop on uncertain source classification or preservation",
+    "implemented": false
+  },
+  "native_authority_note": "Only user final-integration instruction grants conditional three-file Downloads scope; this document does not extend it. No other native changes authorized."
 }

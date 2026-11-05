@@ -1,0 +1,24 @@
+{
+  "checkpoint": "44da6e19",
+  "immutable_base": 2103458,
+  "authorization": "User final integration: reviewed skin controls and conditional three-file Downloads native scope; safe Search corrections only; no other native changes. Successor only if integrity, compatibility and recovery gates pass.",
+  "planned_runtime_changes": [
+    "Apply exact INFO-CONTROL-PROPOSAL.json transformations",
+    "Apply exact continuation-a7/DETAILS-NAVIGATION-PROPOSAL.patch"
+  ],
+  "conditional_scope": {
+    "Downloads": [
+      "xbmc/video/windows/GUIWindowVideoNav.cpp",
+      "xbmc/video/windows/GUIWindowVideoNav.h",
+      "library_navigation.py:Downloads only"
+    ],
+    "Downloads_gate": "Stop if positive source classification or preservation cannot be established",
+    "Search_gate": "No early interpreter retirement or meaningful configuration/security exemption; causal native evidence required for additional native approval"
+  },
+  "selected_checks_before_execution": [
+    "One consolidated host campaign: exact proposal hashes, XML input/focus/loading/trailer action invariants, native dispatch source binding, protected runtime hashes and drawer/library route preservation",
+    "Source-bound native/Linux execution of changed controls if existing supported fixture can run safely within resource limits; report unsupported cases NOT RUN",
+    "Retain unchanged Search acceptance FAILs and native/Android stress NOT RUN; do not rerun unchanged synthetic tests",
+    "No unrelated playback/shutdown tests, no provider or user-data changes"
+  ]
+}

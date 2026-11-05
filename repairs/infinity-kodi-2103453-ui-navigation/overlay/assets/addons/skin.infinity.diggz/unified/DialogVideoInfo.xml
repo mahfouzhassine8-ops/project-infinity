@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <window>
 <!-- INFINITY_LOADING_V2 -->
-<onload>SetProperty(Infinity.Loading.FrameControls,|10|50|)</onload>
+<onload>SetProperty(Infinity.Loading.FrameControls,|9011|50|)</onload>
 
   <defaultcontrol>8</defaultcontrol>
   <onload condition="System.AddonIsEnabled(script.extendedinfo) + Skin.HasSetting(AutoExtendedInfo)">Dialog.Close(all)</onload>
@@ -32,7 +32,7 @@
       <height>95.1852%</height>
       <texture border="24" colordiffuse="$VAR[InfinityGlassSpecular]">infinity_glass/rim.png</texture>
     </control>
-    <control type="button" id="10">
+    <control type="button" id="9011">
       <left>3.0208%</left>
       <top>4.4444%</top>
       <width>17.5%</width>
@@ -47,11 +47,11 @@
       <align>left</align>
       <aligny>center</aligny>
       <textoffsetx>44</textoffsetx>
-      <animation effect="zoom" start="100" end="102" time="85" tween="quadratic" easing="out" reversible="true" condition="[Control.HasFocus(10)] + [String.IsEmpty(Window(Home).Property(Infinity.RuntimeCapabilitiesReady)) | String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),true)]">Conditional</animation>
+      <animation effect="zoom" start="100" end="102" time="85" tween="quadratic" easing="out" reversible="true" condition="[Control.HasFocus(9011)] + [String.IsEmpty(Window(Home).Property(Infinity.RuntimeCapabilitiesReady)) | String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),true)]">Conditional</animation>
       <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
     </control>
 <!-- INFINITY_LOADING_V2 -->
-<include content="InfinityActionLoadingFrame"><param name="left" value="3.0208%" /><param name="top" value="4.4444%" /><param name="width" value="17.5%" /><param name="height" value="48" /><param name="control" value="10" /><param name="window" value="0" /><param name="globalframe" value="false" /><param name="inheritwindow" value="true" /></include>
+<include content="InfinityActionLoadingFrame"><param name="left" value="3.0208%" /><param name="top" value="4.4444%" /><param name="width" value="17.5%" /><param name="height" value="48" /><param name="control" value="9011" /><param name="window" value="0" /><param name="globalframe" value="false" /><param name="inheritwindow" value="true" /></include>
 
     <control type="image">
       <left>3.6458%</left>
@@ -156,7 +156,7 @@
         <focusedcolor>$VAR[InfinityLegacyText]</focusedcolor>
         <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
       </control>
-      <control type="togglebutton" id="15">
+      <control type="togglebutton" id="9012">
         <width>22.8%</width>
         <height>93.1034%</height>
         <label>TRAILER</label>
@@ -169,10 +169,10 @@
         <onclick condition="Player.HasVideo">PlayerControl(Stop)</onclick>
         
 <!-- INFINITY_LOADING_V2 -->
-<onclick condition="[!Player.HasVideo] + System.AddonIsEnabled(script.infinity.commandcenter)">NotifyAll(script.infinity.commandcenter,seamless.loading,&quot;{\&quot;state\&quot;:\&quot;action\&quot;,\&quot;target\&quot;:\&quot;4787d0bffc8bbf1b04aad553e05c3eba53ac59c8dc8c323d536a2cce2c9a26f6\&quot;,\&quot;owner\&quot;:{\&quot;window\&quot;:\&quot;$INFO[Window(Home).Property(Infinity.Loading.CurrentWindow)]\&quot;,\&quot;control\&quot;:\&quot;15\&quot;,\&quot;item\&quot;:\&quot;$INFO[Container(15).CurrentItem]\&quot;,\&quot;epoch\&quot;:\&quot;$INFO[Window(Home).Property(Infinity.Loading.Context)]\&quot;,\&quot;section\&quot;:\&quot;$INFO[Container(15).ListItem.Property(section)]\&quot;,\&quot;source\&quot;:\&quot;$INFO[Container(15).ListItem.Property(hubsource)]\&quot;,\&quot;addon\&quot;:\&quot;$INFO[Container(15).ListItem.Property(Addon.ID)]\&quot;,\&quot;dbid\&quot;:\&quot;$INFO[Container(15).ListItem.DBID]\&quot;,\&quot;home_section\&quot;:\&quot;$INFO[Container(9000).ListItem.Property(section)]\&quot;,\&quot;home_source\&quot;:\&quot;$INFO[Container(9000).ListItem.Property(hubsource)]\&quot;}}&quot;)</onclick>
+<onclick condition="[!Player.HasVideo] + System.AddonIsEnabled(script.infinity.commandcenter)">NotifyAll(script.infinity.commandcenter,seamless.loading,&quot;{\&quot;state\&quot;:\&quot;action\&quot;,\&quot;target\&quot;:\&quot;4787d0bffc8bbf1b04aad553e05c3eba53ac59c8dc8c323d536a2cce2c9a26f6\&quot;,\&quot;owner\&quot;:{\&quot;window\&quot;:\&quot;$INFO[Window(Home).Property(Infinity.Loading.CurrentWindow)]\&quot;,\&quot;control\&quot;:\&quot;9012\&quot;,\&quot;item\&quot;:\&quot;$INFO[Container(9012).CurrentItem]\&quot;,\&quot;epoch\&quot;:\&quot;$INFO[Window(Home).Property(Infinity.Loading.Context)]\&quot;,\&quot;section\&quot;:\&quot;$INFO[Container(9012).ListItem.Property(section)]\&quot;,\&quot;source\&quot;:\&quot;$INFO[Container(9012).ListItem.Property(hubsource)]\&quot;,\&quot;addon\&quot;:\&quot;$INFO[Container(9012).ListItem.Property(Addon.ID)]\&quot;,\&quot;dbid\&quot;:\&quot;$INFO[Container(9012).ListItem.DBID]\&quot;,\&quot;home_section\&quot;:\&quot;$INFO[Container(9000).ListItem.Property(section)]\&quot;,\&quot;home_source\&quot;:\&quot;$INFO[Container(9000).ListItem.Property(hubsource)]\&quot;}}&quot;)</onclick>
 <onclick condition="!Player.HasVideo">RunScript(script.trailer.bridge,?imdb=$INFO[ListItem.IMDBNumber]&amp;tmdb=$INFO[ListItem.Property(tmdb_id)]&amp;tmdbshow=$INFO[ListItem.Property(tmdbshow_id)]&amp;dbtype=$INFO[ListItem.DBType]&amp;mediatype=$INFO[ListItem.MediaType]&amp;title=$INFO[ListItem.Title]&amp;tvshowtitle=$INFO[ListItem.TVShowTitle]&amp;year=$INFO[ListItem.Year]&amp;windowed=1)</onclick>
 <!-- INFINITY_LOADING_V2 -->
-<onclick condition="[!Player.HasVideo] + System.AddonIsEnabled(script.infinity.commandcenter)">NotifyAll(script.infinity.commandcenter,seamless.loading,&quot;{\&quot;state\&quot;:\&quot;dispatched\&quot;,\&quot;target\&quot;:\&quot;4787d0bffc8bbf1b04aad553e05c3eba53ac59c8dc8c323d536a2cce2c9a26f6\&quot;,\&quot;owner\&quot;:{\&quot;window\&quot;:\&quot;$INFO[Window(Home).Property(Infinity.Loading.CurrentWindow)]\&quot;,\&quot;control\&quot;:\&quot;15\&quot;,\&quot;item\&quot;:\&quot;$INFO[Container(15).CurrentItem]\&quot;,\&quot;epoch\&quot;:\&quot;$INFO[Window(Home).Property(Infinity.Loading.Context)]\&quot;,\&quot;section\&quot;:\&quot;$INFO[Container(15).ListItem.Property(section)]\&quot;,\&quot;source\&quot;:\&quot;$INFO[Container(15).ListItem.Property(hubsource)]\&quot;,\&quot;addon\&quot;:\&quot;$INFO[Container(15).ListItem.Property(Addon.ID)]\&quot;,\&quot;dbid\&quot;:\&quot;$INFO[Container(15).ListItem.DBID]\&quot;,\&quot;home_section\&quot;:\&quot;$INFO[Container(9000).ListItem.Property(section)]\&quot;,\&quot;home_source\&quot;:\&quot;$INFO[Container(9000).ListItem.Property(hubsource)]\&quot;}}&quot;)</onclick>
+<onclick condition="[!Player.HasVideo] + System.AddonIsEnabled(script.infinity.commandcenter)">NotifyAll(script.infinity.commandcenter,seamless.loading,&quot;{\&quot;state\&quot;:\&quot;dispatched\&quot;,\&quot;target\&quot;:\&quot;4787d0bffc8bbf1b04aad553e05c3eba53ac59c8dc8c323d536a2cce2c9a26f6\&quot;,\&quot;owner\&quot;:{\&quot;window\&quot;:\&quot;$INFO[Window(Home).Property(Infinity.Loading.CurrentWindow)]\&quot;,\&quot;control\&quot;:\&quot;9012\&quot;,\&quot;item\&quot;:\&quot;$INFO[Container(9012).CurrentItem]\&quot;,\&quot;epoch\&quot;:\&quot;$INFO[Window(Home).Property(Infinity.Loading.Context)]\&quot;,\&quot;section\&quot;:\&quot;$INFO[Container(9012).ListItem.Property(section)]\&quot;,\&quot;source\&quot;:\&quot;$INFO[Container(9012).ListItem.Property(hubsource)]\&quot;,\&quot;addon\&quot;:\&quot;$INFO[Container(9012).ListItem.Property(Addon.ID)]\&quot;,\&quot;dbid\&quot;:\&quot;$INFO[Container(9012).ListItem.DBID]\&quot;,\&quot;home_section\&quot;:\&quot;$INFO[Container(9000).ListItem.Property(section)]\&quot;,\&quot;home_source\&quot;:\&quot;$INFO[Container(9000).ListItem.Property(hubsource)]\&quot;}}&quot;)</onclick>
 
         <visible>!String.IsEqual(ListItem.DBTYPE,episode)</visible>
         <alttexturefocus border="16" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/focus.png</alttexturefocus>
