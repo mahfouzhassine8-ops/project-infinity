@@ -1,39 +1,41 @@
-# Genuine Kodi ZIP installers — controlled testing, no acceptance/lock
+# Infinity controlled testing updates — not an all-nine completion or acceptance
 
-Protected APK2103460 is not modified by the published ZIP bundle. Source and signatures are bound to bbe5197616ecbe1736ed706564a6d22a5f103be2, not later unbuilt Downloads code.
+Signed2103460 remains immutable and recoverable. No application installation, uninstall, data clearing, provider change, baseline promotion or lock was performed. Current installed Fold version remains the user's confirmed2103460; delivery does not imply installation.
 
-Download: https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/42183471037/artifacts/13485763569
+## Correct installation set
 
-Outer archive SHA256: dd04ad49d08006433e5c3d4c4b1b57dda2e0454cee25270f56fb6dcb35061ff1
+Use the exact original-key signed2103462 testing APK, Command Center corrective0.3.5.61 ZIP and skin corrective1.0.5.262 ZIP listed below. Keep the higher-version2103463 recovery APK and both recovery ZIPs accessible before beginning. The native changes are required for reliable library-menu root initialization and positive Downloads-folder membership. The APK is deliberately native-only; matching UI/script changes are delivered through the existing addon update path rather than silently overwriting a same-version installed module.
 
-Extract the outer GitHub artifact. It contains four complete Kodi addon installers, SHA256SUMS, the original public key, the original-key-signed ZIP envelope and build evidence. Do not install the outer artifact or a repository source overlay.
+1. Manually update the existing app in place with2103462. Same package and permanent certificate; no uninstall/reset/downgrade.
+2. Extract the outer authenticated quick-update artifact. Through existing native Add-ons -> Install from zip file, install the inner Command Center corrective ZIP, then skin1.0.5.262 corrective ZIP. The outer artifact is not a Kodi installer. Follow existing permission/trust prompts and normal addon/skin reload behavior; do not bypass a refusal. The original-key envelope and payload hashes were verified for delivery; the normal Kodi ZIP installer does not itself validate the detached outer envelope. Use the exact matching files and checksums.
+3. Check existing module authentication, active Infinity skin and normal navigation. This is physical verification, not assumed from source. If a guard fails, stop and retain the first diagnostic; use the native addon interface for the original-signed recovery ZIPs where reachable.
 
-Before any testing, ensure the existing native Add-ons -> Install from zip file interface is reachable and retain both recovery ZIPs in an accessible location. Keep existing authentication and permission prompts. Do not clear data or bypass a failed check.
+For recovery, use the higher-version2103463 APK restoring exact functional2103460 and the Command Center recovery ZIP + skin1.0.5.263 recovery ZIP through native Add-ons. Recovery CC contents exactly match2103460; recovery skin differs only in3 authenticated integrity/version files. Do not reinstall a lower APK code, uninstall, clear data or bypass an unresolved save/checkpoint. Physical install-over, service restart and recovery remain NOT RUN here. If native UI is unavailable, stop and obtain supported device evidence; no unsafe forced-exit remedy is claimed. After463 recovery, any later APK retest needs a higher original-signed version.
 
-Install through that native interface:
+## Nine requirements
 
-1. script.infinity.commandcenter-0.3.5.61-2103460-corrective.zip
-2. skin.infinity.diggz-1.0.5.260-2103460-corrective.zip
+1. Power is the drawer's absolute final action. Existing dimensions, entries and Power action are retained.
+2. Infinity Movies uses the existing Home Movies menu, including its original collections. Actual XML -> Python dispatcher -> helper -> native parameters checked. Existing direct-entry guard now includes only the exact CC Home menu URL, avoiding retention of a child via return. No global history reset.
+3. Infinity TV uses the existing Home TV menu through the same scoped native handling. Other Movies/TV routes are preserved.
+4. White LIVE graphic suppressed at its exact existing resource reference in shared skin selectors and21 Home/widget textures; touch guide and its unused120px space removed. Actual native gestures are unchanged.
+5. Downloads uses Kodi's real Files window. Initially only genuine Add videos; no Android Download-path probe. Folders explicitly added there persist by canonical native location, including ordinary source renames. Edits use exact selected source matching. All source definitions and ordinary Files are preserved; failed preference/source saves remain failures. Membership reuses existing per-profile skin settings, no parallel source DB or worker.
+6. Native repeated-Search crash remains UNRESOLVED. Historical456 summaries contain no faulting stack establishing its cause in460 or the testing candidate. No native Search/player/checkpoint/settings-retirement change was made.
+7. Search cache/UI invalidation corrected using at most one original owned request after discarding stale cache. Meaningful configuration/source/profile/cancel/ownership safeguards remain. Two required settings/history false-positive tests still FAIL. Crew's actual writer remains unconfirmed; no provider is classed as unable to search and no working results are intentionally suppressed or replaced.
+8. Shared browser/Info presentation refinements, real artwork, released guide space and Cast proportions are included, using existing theme/view/layout resources. Complete Light/Dark/all-view/Fold rendered acceptance remains NOT RUN, not a pixel-match claim.
+9. Info Cast control moved away from native control5 to9013; native list50 retained. Play/Back actions preserved; original Trailer/ExtendedInfo routes retained with actual available-trailer/native-metadata fallback where optional helpers are absent. Actual Android control interaction remains pending.
 
-Command Center remains0.3.5.61. There is no new app, APK, launcher or player. The actual native module verifier accepts the original-key manifest for78 files/11 entries, and all948 skin protected-file hashes were checked. Kodi ZIP installation itself is not claimed to verify the detached outer envelope; that envelope is independently checked against the established original public key. The existing runtime module authentication is unchanged.
+## Verification boundaries
 
-Recovery uses native Add-ons, not a Command Center script:
+PASS: actual final full ARM64 build;9411 mapped native inputs with9407 unchanged and exactly4 scoped files; all71211 original strong exports/dependencies/SONAME retained plus exactly2 reviewed source-dialog APIs. Actual C++ host boundaries44 checks; native direct-entry conditional8 cases; Python helper8 checks; actual drawer dispatch2 cases; unchanged UI-health functions accept prepared skin. Before-failure cases and superseded preparation evidence are retained.
 
-1. script.infinity.commandcenter-0.3.5.61-2103460-recovery.zip
-2. skin.infinity.diggz-1.0.5.261-2103460-recovery.zip
+PASS: Search6 focused cache cases and8 retained security/config/cancel/profile guards. FAIL:2 mandatory settings/history acceptance cases. NOT RUN: real Android30-search stress, actual decoding/control interactions, Fold/orientation/theme rendering, native ZIP installation/service restart and physical recovery. No unrelated shutdown suite ran.
 
-Recovery Command Center content is exactly original2103460. Recovery skin functional contents are exactly original2103460; only3 necessary higher-generation integrity/version files differ. Actual original-Java verification passes after both simulated partial-update restorations, with userdata sentinel intact. The native GUI route is traced against exact460 DEX/native source. Android GUI copying, installation/recovery, permissions and service restart remain NOT RUN. If the native interface cannot be reached, stop and report rather than forcing installation or editing protected files.
+PASS: original signed module verification78 files/11 entries, signed ZIP envelope and948 skin integrity hashes; full downloaded artifact sizes/SHA/CRC; exact APK-member and original-certificate verification. Existing original Java installer recovery audit uses final real signed ZIPs and disposable filesystem transports:6 cases pass or correctly refuse incomplete generations. It does not execute Android GUI copying.
 
-## One coordinated physical check — record outcomes, not assumed passes
+## One coordinated Fold session
 
-- Open the drawer: Power is last, all intended entries remain accessible and dimensions/scroll behavior match460.
-- Infinity Movies opens the same existing Home movie menu including Continue Playing/Watchlist/Save For Later/Collection; Infinity TV opens the existing Next Episodes/Progress Shows/Continue Playing menu. Check Back/focus.
-- Check no white curved LIVE artwork or touch-instruction bar in the previously affected browser/Home/widget contexts. Real art remains present; actual first/second tap and hold behavior remain unchanged.
-- Inspect representative provider movie/show/season/episode directories and native lists in Light/Dark, cover/inner, portrait/landscape. Check poster proportions, synopsis, metadata, Cast rows, focus and long-press. This is physical visual acceptance, not established by XML tests.
-- Info: Play existing movie; Back returns; Trailer uses existing bridge or actual available trailer; More uses installed ExtendedInfo or available native metadata; Cast displays supplied actors and native list actions. Record unavailable metadata truthfully.
-- Search: use the currently working providers, preserve results and legitimate cancellation/configuration refusals. Record the exact existing INFINITY_SEARCH_STATE category/status/count records for Crew and Nixtoons when falsely rejected. Two settings/history acceptance cases remain known FAIL; this bundle does not promise their correction.
-- Downloads in this published bundle removes the automatic Android Download-path probe but does not yet provide native folder isolation. Do not mark that requirement passed. Later scoped native integration must separately check genuine Add videos, manual folder creation/edit, retained folders across reopening/profile, ordinary Files preservation, permissions, playback and folder return.
-- Repeated real Search stress target is30 completed requests, but stop at a crash and preserve its first failure evidence; no repeated forced crashes. Current native crash remains unresolved. One current460 crash requires faulting native thread stack/offsets, PID/time and loaded libkodi identity/mapping; historical456 summaries lack those. No credentials, settings values, query/media names or private raw logs should be published.
-- Do not test unrelated shutdown behavior. No reset, uninstall, data clearing, provider modification, automatic install or release lock.
+Check Power order; both library menus on initial and repeat entry after navigating into a child, Back and focus; two Downloads entry points, Add videos, manual folder selection, reopen/rename/edit, ordinary Files and playback return; no white graphic/guide; movie/show/season/episode metadata and artwork in relevant views; Info Play/Trailer/Cast/More/Back; existing first/second tap and hold; Light/Dark and cover/inner portrait/landscape. Follow the existing data-saving protections throughout.
 
-All physical results are NOT RUN here. Nine-correction completion is not claimed; Search and native Downloads remain explicitly open.
+Search stress target30 actual consecutive requests; stop at the first failure. Preserve the existing INFINITY_SEARCH_STATE category/status/count/timestamp records for Crew/Nixtoons, without settings values, credentials, query/media paths. A crash additionally needs the faulting native thread backtrace/offsets, PID/time and loaded libkodi identity/mapping bound to the tested package/engine. Health Center first; if it lacks that trace, a same-event Android bug report via legitimate authorized USB/Wireless debugging is required. No repeated upload of the historical archive or device-version confirmation is requested. Raw diagnostics remain private.
+
+Search is the precise remaining blocker to all-nine completion. Device-only acceptance remains the user's. Nothing is automatically installed, accepted, promoted or locked.
