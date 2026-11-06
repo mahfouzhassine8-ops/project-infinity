@@ -16,11 +16,16 @@ def rpc(xbmc, method, params):
         return None
 
 
-def activate(xbmc, gui, path):
+def activate(xbmc, gui, path, direct_library=False):
     # JSON-RPC passes a vector of window parameters; folder names never become
     # executable builtin text. Kodi retains its own directory/player history.
+    parameters = [path, 'return']
+    if direct_library:
+        if path not in ('videodb://movies/titles/', 'videodb://tvshows/titles/'):
+            return False
+        parameters.append('infinity-library-direct')
     result = rpc(xbmc, 'GUI.ActivateWindow',
-                 {'window': 'videos', 'parameters': [path, 'return']})
+                 {'window': 'videos', 'parameters': parameters})
     if result != 'OK':
         gui.Dialog().ok('Infinity', 'Kodi could not open this location. '
                         'Your files and media sources have not been changed.')
@@ -127,6 +132,10 @@ def direct(action, xbmc, gui):
 
 
 def run(action, xbmc, gui, environ=None):
+    if action in ('library-movies', 'library-tv'):
+        path = ('videodb://movies/titles/' if action == 'library-movies'
+                else 'videodb://tvshows/titles/')
+        return activate(xbmc, gui, path, direct_library=True)
     if action in ('movies', 'tv', 'sports'):
         return direct(action, xbmc, gui)
     if action == 'browse':

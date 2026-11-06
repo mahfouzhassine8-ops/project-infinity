@@ -1,0 +1,114 @@
+{
+  "status": "PASS_EXACT_APPROVED_SOURCE_INTEGRATION",
+  "approval": "04806da44330e5db4a795bf291625e72abded128",
+  "immutable_base": 2103458,
+  "checks": [
+    {
+      "name": "exact approval checkpoint",
+      "pass": true
+    },
+    {
+      "name": "reviewed patch unchanged",
+      "pass": true
+    },
+    {
+      "name": "exact applied candidate: xbmc/video/windows/GUIWindowVideoNav.cpp",
+      "pass": true
+    },
+    {
+      "name": "exact applied candidate: repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/library_navigation.py",
+      "pass": true
+    },
+    {
+      "name": "exact applied candidate: repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Custom_1198_InfinityNav.xml",
+      "pass": true
+    },
+    {
+      "name": "reverse-byte source preservation: xbmc/video/windows/GUIWindowVideoNav.cpp",
+      "pass": true
+    },
+    {
+      "name": "reverse-byte source preservation: repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/library_navigation.py",
+      "pass": true
+    },
+    {
+      "name": "reverse-byte source preservation: repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Custom_1198_InfinityNav.xml",
+      "pass": true
+    },
+    {
+      "name": "completed skin correction preserved: repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Custom_1198_InfinityNav.xml",
+      "pass": true
+    },
+    {
+      "name": "completed skin correction preserved: repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/DialogVideoInfo.xml",
+      "pass": true
+    },
+    {
+      "name": "completed skin correction preserved: repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Includes_InfinityMediaLists.xml",
+      "pass": true
+    },
+    {
+      "name": "completed skin correction preserved: repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Variables.xml",
+      "pass": true
+    },
+    {
+      "name": "native base file immutable",
+      "pass": true
+    },
+    {
+      "name": "Search safety implementation unchanged",
+      "pass": true
+    },
+    {
+      "name": "reuse exact reviewed fragment evidence",
+      "pass": true
+    },
+    {
+      "name": "no unrelated tracked source changes",
+      "pass": true
+    }
+  ],
+  "pass_count": 16,
+  "retained_not_rerun": {
+    "navigation_fragment_checks": 53,
+    "prior_static_checks": 23,
+    "prior_Linux_changed_control_checks": 58
+  },
+  "candidate_source_members": {
+    "assets/addons/skin.infinity.diggz/unified/Custom_1198_InfinityNav.xml": {
+      "signed458_sha256": "0f1827f4f37aab009f8ff75fcc8267c184128b5ef35ff7847bca9dbb9efc295e",
+      "candidate_sha256": "0997d1b1cde571a25474ffcf9997131428363290e3401d1558f41e84d50d1d13",
+      "source": "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Custom_1198_InfinityNav.xml"
+    },
+    "assets/addons/skin.infinity.diggz/unified/DialogVideoInfo.xml": {
+      "signed458_sha256": "39bb6ad5c0b7c5a75da697e139b5c8b20622d94a63de17f041150d207d2650fb",
+      "candidate_sha256": "aaba427766b1bff0e4fe5d97641c58b541128bca909c33a5ddef10e9e06fdde9",
+      "source": "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/DialogVideoInfo.xml"
+    },
+    "assets/addons/skin.infinity.diggz/unified/Includes_InfinityMediaLists.xml": {
+      "signed458_sha256": "4a41c95b6c08d2f08b9d459263f5aea949a406131c2f6fbfbc6f5f4faed1fccc",
+      "candidate_sha256": "73d33c8dfcb94d6483fc3b2b4356ec64eaede7c7a8cf107134aa2fb49dcedf7c",
+      "source": "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Includes_InfinityMediaLists.xml"
+    },
+    "assets/addons/skin.infinity.diggz/unified/Variables.xml": {
+      "signed458_sha256": "9efb6dac17abb69eb1ef8cf1cebb4e1419952b459ac49df1b23751c0383519cd",
+      "candidate_sha256": "764c81548d1213b18487a65613d5fa8a427d39781cff626c0e0512b4011078b8",
+      "source": "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Variables.xml"
+    },
+    "assets/addons/script.infinity.commandcenter/library_navigation.py": {
+      "signed458_sha256": "c6689df59f2b077e9250e584d69c28ef83928d2139894c8b335837df5b2fe163",
+      "candidate_sha256": "47bddff3fe88948eab422506b5d4dce6712ecedee00208d3aa182fd45d2a4fe2",
+      "source": "repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/library_navigation.py"
+    }
+  },
+  "native_source_delta": [
+    "xbmc/video/windows/GUIWindowVideoNav.cpp"
+  ],
+  "complete_ARM64_compile": "PENDING_REMOTE_NATIVE_STAGE",
+  "Android": "NOT RUN",
+  "Fold": "NOT RUN",
+  "Search_acceptance": "TWO_FAILS_RETAINED",
+  "Downloads": "BLOCKED_POSITIVE_CLASSIFICATION",
+  "APK": "NOT_BUILT",
+  "no_runtime_changes_outside_six_groups": true
+}

@@ -1,0 +1,27 @@
+{
+  "approval_checkpoint": "04806da44330e5db4a795bf291625e72abded128",
+  "immutable_signed_base": 2103458,
+  "authorized": "Exact approved three-file direct-library patch; full ARM64 integration, consolidated verification, controlled original-signed testing APK subject to integrity and recovery gates. No acceptance or installation.",
+  "native_delta": [
+    "xbmc/video/windows/GUIWindowVideoNav.cpp"
+  ],
+  "preserved_native_inputs": "Exact 2103458 engine source map; previous two touch modifications retained",
+  "selected_checks": [
+    "Exact approved three-file output hashes and reverse-source preservation",
+    "Full ARM64 compile and link with complete native source-map comparison",
+    "Consolidated source integration and allowlist checks, retaining unchanged existing test evidence",
+    "Original signer/package/architecture/component authentication and member preservation gates before any signed APK",
+    "Forward-recovery higher-version and authenticated generation verification"
+  ],
+  "unresolved": [
+    "Downloads provider-root classification unavailable; no guessed filter",
+    "Two Search acceptance failures retained; configuration and lifetime safety checks unchanged",
+    "Native Search crash remains unproven; Android stress NOT RUN"
+  ],
+  "prohibited": [
+    "Unrelated native changes",
+    "Shutdown suites",
+    "Provider or user-data modifications",
+    "Automatic installation, promotion or lock"
+  ]
+}
