@@ -53,3 +53,14 @@ User-provided screenshot shows the real **VIDEOS → Files** native-root screen 
 This screenshot is of **Downloads / Files**, **not** Search. Localize the outstanding white graphic under visual item **#4**, and **retain #5 Downloads as PASS** (native `Add videos...` visible with no old provider rows). Trace whether the bottom-left element is an active Kodi busy/spinner image/animation, skin overlay, or provider/icon texture before changing anything. Remove the spurious graphic only in this context; do not disable real progress indicators, interactive controls, file-source registration or the working panel/layout. #7 Crew/Nixtoons results regression remains independent and is not cleared by this screenshot.
 
 No additional user-reported fail in the other visual screens; this narrows #4 rather than classifying every screen as defective. Actual pixel screenshot is present in the user conversation, not uploaded into this repository. No source changes made by this note.
+
+## New visual cross-reference — Infinity skin Add-on Information screenshot
+
+The user supplied a separate Android/Kodi **Add-on Browser → Add-on information → Infinity** screenshot. It visibly reports:
+- Name: **Infinity**, Type: **Skin**, Version: **1.0.5.262**.
+- Enabled blue toggle; the **Use** action is grayed out, consistent with an already-selected skin (not a runtime-path/hash attestation).
+- The skin's displayed add-on thumbnail is visually **the same distinctive white curled/open-loop symbol** that still appears at the lower-left of **Drawer Downloads → Videos → Files**. This is much more specific visual evidence than an unidentified generic loading spinner.
+
+**Engineering direction:** Trace the skin/add-on icon resource and its incidental rendering path as artwork/thumbnail in the Files root, including any shared ListItem.Icon/selected-item artwork widgets and bottom-left controls. Inspect the actual installed .262 asset references before editing. Preserve the thumbnail within the proper Add-on Information UI; suppress only the inappropriate Files-screen instance. DO NOT disable true busy/progress feedback or delete the skin, Live add-on, global icon fallback, native Add videos, file-source ownership, or the user's passing visuals. Visual similarity alone does not identify the exact texture file or active renderer; verify control/resource ownership before patch.
+
+**Identity clarification:** This screenshot itself is direct Kodi UI evidence of installed/enabled skin **1.0.5.262**, consistent with the Health Center export, but does not by itself contain the exact active XML source path, authenticated manifest digest, or Search failure trace. Don't ask the user again for skin version. The P0 Crew/Nixtoons regression remains separate.
