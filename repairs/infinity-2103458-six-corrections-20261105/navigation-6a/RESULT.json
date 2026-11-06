@@ -1,0 +1,236 @@
+{
+  "kind": "UNAPPLIED proposal / compiled native fragments and Python mocks",
+  "checks": [
+    {
+      "name": "source map: xbmc/windows/GUIMediaWindow.cpp",
+      "pass": true
+    },
+    {
+      "name": "source map: xbmc/interfaces/builtins/GUIBuiltins.cpp",
+      "pass": true
+    },
+    {
+      "name": "source map: xbmc/interfaces/json-rpc/GUIOperations.cpp",
+      "pass": true
+    },
+    {
+      "name": "source map: xbmc/guilib/GUIWindowManager.cpp",
+      "pass": true
+    },
+    {
+      "name": "source map: xbmc/addons/Skin.h",
+      "pass": true
+    },
+    {
+      "name": "source map: xbmc/video/windows/GUIWindowVideoNav.cpp",
+      "pass": true
+    },
+    {
+      "name": "native proposal removes cleanly",
+      "pass": true
+    },
+    {
+      "name": "original builtin descendant guard remains",
+      "pass": true
+    },
+    {
+      "name": "RPC posts parameters without builtin folder suppression",
+      "pass": true
+    },
+    {
+      "name": "native activation restrictions retained",
+      "pass": true
+    },
+    {
+      "name": "native fragments compile with warnings as errors",
+      "pass": true
+    },
+    {
+      "name": "before retained-child reproduction: videodb://movies/titles/",
+      "pass": true
+    },
+    {
+      "name": "proposed explicit root from Home: videodb://movies/titles/",
+      "pass": true
+    },
+    {
+      "name": "before builtin suppression: videodb://movies/titles/",
+      "pass": true
+    },
+    {
+      "name": "proposed RPC entry from child: videodb://movies/titles/",
+      "pass": true
+    },
+    {
+      "name": "first/cross-directory entry: videodb://movies/titles/",
+      "pass": true
+    },
+    {
+      "name": "first/cross-directory entry: videodb://movies/titles/?",
+      "pass": true
+    },
+    {
+      "name": "first/cross-directory entry: videodb://movies/titles/videodb://movies/titles/",
+      "pass": true
+    },
+    {
+      "name": "first/cross-directory entry: videodb://movies/titles/plugin://fixture-provider/category/",
+      "pass": true
+    },
+    {
+      "name": "failed target attempted once; no forced success: videodb://movies/titles/",
+      "pass": true
+    },
+    {
+      "name": "before retained-child reproduction: videodb://tvshows/titles/",
+      "pass": true
+    },
+    {
+      "name": "proposed explicit root from Home: videodb://tvshows/titles/",
+      "pass": true
+    },
+    {
+      "name": "before builtin suppression: videodb://tvshows/titles/",
+      "pass": true
+    },
+    {
+      "name": "proposed RPC entry from child: videodb://tvshows/titles/",
+      "pass": true
+    },
+    {
+      "name": "first/cross-directory entry: videodb://tvshows/titles/",
+      "pass": true
+    },
+    {
+      "name": "first/cross-directory entry: videodb://tvshows/titles/?",
+      "pass": true
+    },
+    {
+      "name": "first/cross-directory entry: videodb://tvshows/titles/videodb://tvshows/titles/",
+      "pass": true
+    },
+    {
+      "name": "first/cross-directory entry: videodb://tvshows/titles/plugin://fixture-provider/category/",
+      "pass": true
+    },
+    {
+      "name": "failed target attempted once; no forced success: videodb://tvshows/titles/",
+      "pass": true
+    },
+    {
+      "name": "unchanged negative: ordinary return",
+      "pass": true
+    },
+    {
+      "name": "unchanged negative: wrong flag",
+      "pass": true
+    },
+    {
+      "name": "unchanged negative: additional parameter",
+      "pass": true
+    },
+    {
+      "name": "unchanged negative: no loaded skin",
+      "pass": true
+    },
+    {
+      "name": "unchanged negative: other skin",
+      "pass": true
+    },
+    {
+      "name": "unchanged negative: non-return mode",
+      "pass": true
+    },
+    {
+      "name": "unchanged negative: unsupported path",
+      "pass": true
+    },
+    {
+      "name": "non-Android unaffected",
+      "pass": true
+    },
+    {
+      "name": "helper dispatch: library-movies",
+      "pass": true
+    },
+    {
+      "name": "RPC rejection remains visible: library-movies",
+      "pass": true
+    },
+    {
+      "name": "helper dispatch: library-tv",
+      "pass": true
+    },
+    {
+      "name": "RPC rejection remains visible: library-tv",
+      "pass": true
+    },
+    {
+      "name": "ordinary helper activation unchanged: files",
+      "pass": true
+    },
+    {
+      "name": "ordinary helper activation unchanged: /storage/self/primary/Download/",
+      "pass": true
+    },
+    {
+      "name": "ordinary helper activation unchanged: plugin://fixture-provider/",
+      "pass": true
+    },
+    {
+      "name": "flag unavailable to arbitrary paths",
+      "pass": true
+    },
+    {
+      "name": "all unrelated helper functions unchanged",
+      "pass": true
+    },
+    {
+      "name": "run old actions unchanged",
+      "pass": true
+    },
+    {
+      "name": "drawer reverse-byte preservation",
+      "pass": true
+    },
+    {
+      "name": "intended visible control only: 1198104",
+      "pass": true
+    },
+    {
+      "name": "intended visible control only: 1198111",
+      "pass": true
+    },
+    {
+      "name": "production source unchanged: xbmc/video/windows/GUIWindowVideoNav.cpp",
+      "pass": true
+    },
+    {
+      "name": "production source unchanged: repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/library_navigation.py",
+      "pass": true
+    },
+    {
+      "name": "production source unchanged: repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Custom_1198_InfinityNav.xml",
+      "pass": true
+    }
+  ],
+  "Android": "NOT RUN",
+  "Fold": "NOT RUN",
+  "ARM64_engine": "NOT RUN",
+  "source_bindings": {
+    "xbmc/windows/GUIMediaWindow.cpp": "b28f806814203f047f03557df2f439b20086cc9a08c9f419faf64a17a651dc4d",
+    "xbmc/interfaces/builtins/GUIBuiltins.cpp": "99f30b0035d7124890893d45883d3475eb262b213ec3459fd742a46a6a571814",
+    "xbmc/interfaces/json-rpc/GUIOperations.cpp": "8ad1a9f65d4c06fe78ccd040aba084be4268b23342dced0dfa3f0297dbaff274",
+    "xbmc/guilib/GUIWindowManager.cpp": "f9aeddec883a4d1ac63303bfbb9b88cba2bcba5f01fcd799f68c444665d31c23",
+    "xbmc/addons/Skin.h": "c2e55793be6d32b6ce66874496b632ea90cb6afbcc570ae4c9f79a47d2b92409",
+    "xbmc/video/windows/GUIWindowVideoNav.cpp": "57818436a65fe03333835d27e6ba98a82fbf00b961290997767f2103bc125eb3"
+  },
+  "compiled_fragment_sha256": "2e3b1d8cfd7ce6c68acff0c114d268a145a6cc8f1600e006bb2fb9b3fcf3906b",
+  "pass_count": 53,
+  "limitations": [
+    "Native directory loading, locks, permissions, window manager and Back input were not executed; their original source is preserved.",
+    "Harness reproduces the source conditions, not the user device incident.",
+    "RPC OK means admitted request, not completed navigation.",
+    "No full ARM64 compile, engine link, APK, Android or physical acceptance result."
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "base": "signed 2103458",
+  "continuation": "6a26f34d",
+  "status": "UNAPPLIED REVIEW CANDIDATE; not production implementation",
+  "reason": "Native authorization currently covers Downloads only. Direct-library initialization needs a separately approved use of GUIWindowVideoNav.cpp; adding a builtin flag alone cannot reach it from an already active library child.",
+  "proposed_files": [
+    "xbmc/video/windows/GUIWindowVideoNav.cpp",
+    "script.infinity.commandcenter/library_navigation.py",
+    "skin.infinity.diggz/unified/Custom_1198_InfinityNav.xml"
+  ],
+  "selected_checks_before_execution": [
+    "Bind inspected native routing sources to the retained source map",
+    "Compile exact original media-window initialization fragment plus proposed VideoNav precondition in a disposable host harness; exercise retained-path, Back-start, malformed request, wrong skin and failed-load cases",
+    "Execute proposed existing Python navigation helper with captured JSON-RPC responses and verify exact two library paths and original existing action preservation",
+    "Reverse the proposed delta to recover original native/helper/drawer bytes",
+    "Confirm production runtime overlay, protected source inputs and original signed artifact remain unchanged"
+  ],
+  "not_selected": ["APK build", "ARM64 integration without native scope approval", "signing", "installation", "shutdown suites", "unchanged Search tests", "unchanged visual rerenders"],
+  "limitations": "Compiled source-fragment tests are not full-engine, Android, or Fold verification. Conditional source defects do not establish which path produced the user's original screen."
+}

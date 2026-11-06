@@ -1,0 +1,84 @@
+--- a/xbmc/video/windows/GUIWindowVideoNav.cpp
++++ b/xbmc/video/windows/GUIWindowVideoNav.cpp
+@@ -12,6 +12,7 @@
+ #include "GUIPassword.h"
+ #include "PartyModeManager.h"
+ #include "ServiceBroker.h"
++#include "addons/Skin.h"
+ #include "Util.h"
+ #include "dialogs/GUIDialogMediaSource.h"
+ #include "dialogs/GUIDialogYesNo.h"
+@@ -114,6 +115,21 @@
+       {
+         message.SetStringParam("");
+       }
++
++#if defined(TARGET_ANDROID)
++      // An explicit Infinity drawer entry opens its title root, even when
++      // "return" would otherwise restore a previously retained child.
++      // Other callers keep Kodi's existing return/history semantics.
++      if (g_SkinInfo && g_SkinInfo->ID() == "skin.infinity.diggz" &&
++          message.GetNumStringParams() == 3 &&
++          message.GetStringParam(1) == "return" &&
++          message.GetStringParam(2) == "infinity-library-direct" &&
++          (message.GetStringParam(0) == "videodb://movies/titles/" ||
++           message.GetStringParam(0) == "videodb://tvshows/titles/"))
++      {
++        m_vecItems->SetPath(message.GetStringParam(0));
++      }
++#endif
+ 
+       if (!CGUIWindowVideoBase::OnMessage(message))
+         return false;
+--- a/repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/library_navigation.py
++++ b/repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/library_navigation.py
+@@ -16,11 +16,16 @@
+         return None
+ 
+ 
+-def activate(xbmc, gui, path):
++def activate(xbmc, gui, path, direct_library=False):
+     # JSON-RPC passes a vector of window parameters; folder names never become
+     # executable builtin text. Kodi retains its own directory/player history.
++    parameters = [path, 'return']
++    if direct_library:
++        if path not in ('videodb://movies/titles/', 'videodb://tvshows/titles/'):
++            return False
++        parameters.append('infinity-library-direct')
+     result = rpc(xbmc, 'GUI.ActivateWindow',
+-                 {'window': 'videos', 'parameters': [path, 'return']})
++                 {'window': 'videos', 'parameters': parameters})
+     if result != 'OK':
+         gui.Dialog().ok('Infinity', 'Kodi could not open this location. '
+                         'Your files and media sources have not been changed.')
+@@ -127,6 +132,10 @@
+ 
+ 
+ def run(action, xbmc, gui, environ=None):
++    if action in ('library-movies', 'library-tv'):
++        path = ('videodb://movies/titles/' if action == 'library-movies'
++                else 'videodb://tvshows/titles/')
++        return activate(xbmc, gui, path, direct_library=True)
+     if action in ('movies', 'tv', 'sports'):
+         return direct(action, xbmc, gui)
+     if action == 'browse':
+--- a/repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Custom_1198_InfinityNav.xml
++++ b/repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Custom_1198_InfinityNav.xml
+@@ -392,7 +392,7 @@
+             
+ <!-- INFINITY_LOADING_V2 -->
+ 
+-<onclick>ActivateWindow(Videos,videodb://movies/titles/,return)</onclick>
++<onclick>RunScript(script.infinity.commandcenter,library-navigation,library-movies)</onclick>
+ <!-- INFINITY_LOADING_V2 -->
+ 
+ 
+@@ -442,7 +442,7 @@
+             
+ <!-- INFINITY_LOADING_V2 -->
+ 
+-<onclick>ActivateWindow(Videos,videodb://tvshows/titles/,return)</onclick>
++<onclick>RunScript(script.infinity.commandcenter,library-navigation,library-tv)</onclick>
+ <!-- INFINITY_LOADING_V2 -->
+ 
+ 
