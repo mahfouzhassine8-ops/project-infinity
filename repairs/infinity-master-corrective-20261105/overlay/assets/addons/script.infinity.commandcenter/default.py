@@ -233,7 +233,7 @@ def _media_details_fallback():
         if value:
             lines.append(label + ': ' + value)
     xbmcgui.Dialog().textviewer(
-        'Media Details', '\\n\\n'.join(lines) if lines else
+        'Media Details', '\n\n'.join(lines) if lines else
         'No additional metadata is available for this item.')
     return True
 
