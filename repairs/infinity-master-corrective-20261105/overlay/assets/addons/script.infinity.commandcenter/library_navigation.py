@@ -133,9 +133,12 @@ def direct(action, xbmc, gui):
 
 def run(action, xbmc, gui, environ=None):
     if action in ('library-movies', 'library-tv'):
-        path = ('videodb://movies/titles/' if action == 'library-movies'
-                else 'videodb://tvshows/titles/')
-        return activate(xbmc, gui, path, direct_library=True)
+        # Match the exact existing Infinity Home menu destination, not Kodi's
+        # separate videodb title library (which can legitimately be empty).
+        path = ('plugin://script.infinity.commandcenter/?action=movies'
+                if action == 'library-movies'
+                else 'plugin://script.infinity.commandcenter/?action=tv')
+        return activate(xbmc, gui, path)
     if action in ('movies', 'tv', 'sports'):
         return direct(action, xbmc, gui)
     if action == 'browse':
