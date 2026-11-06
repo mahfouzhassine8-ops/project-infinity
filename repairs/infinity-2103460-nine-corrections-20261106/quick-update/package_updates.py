@@ -58,8 +58,14 @@ def preflight(apk,out):
   for k in ('version','candidate_version','skin_version'):
    if k in d:d[k]='1.0.5.261'
   if 'physical_device_verified' in d:d['physical_device_verified']=False
-  if 'protected_files' in d:d['protected_files']['addon.xml']=sha(recovery_xml)
+  if 'protected_files' in d:
+   d['protected_files']['addon.xml']=sha(recovery_xml)
+   d['protected_files']['infinity-skin.json']=sha(recovery/SKIN/'infinity-skin.json')
   save(f,d)
+ for skin_root in (addons/SKIN,recovery/SKIN):
+  protected_skin=json.loads((skin_root/'Infinity-Protected-Manifest.json').read_text())['protected_files']
+  assert len(protected_skin)==948
+  for rel,want in protected_skin.items():assert sha(skin_root/rel)==want,'SKIN_INTEGRITY_BEFORE_KEYS:'+rel
  old_marker=(addons/CC/module_bundle.MANIFEST).read_bytes();payload,files=module_bundle.build(addons_for_build(addons,out))
  assert len(files)==78 and payload.startswith(('INFINITY-MODULES/1\npackage\t'+VERSION+'\n').encode())
  marker=addons/CC/module_bundle.MANIFEST;marker.write_bytes(payload);Path(str(marker)+'.sig').unlink();changes[CC+'/'+module_bundle.MANIFEST]=sha(marker)

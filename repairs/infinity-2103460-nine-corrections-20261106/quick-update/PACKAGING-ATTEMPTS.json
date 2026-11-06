@@ -17,6 +17,13 @@
       "run": 42179987000,
       "status": "CANCEL_REQUESTED_OLD_SOURCE_DISPATCH",
       "reason": "Shell continued after missing repository overlay source; old packaging source detected and cancellation requested; actual signed APK provides the authoritative XML preimage."
+    },
+    {
+      "run": 42180054708,
+      "artifact": 13485290665,
+      "status": "QUARANTINED_DO_NOT_INSTALL",
+      "cause": "Independent downloaded recovery check found stale infinity-skin.json protected hash; correctives passed their checks but pair withheld",
+      "correction": "Update recovery skin metadata hash and verify all948 hashes for both skins before key access"
     }
   ]
 }
