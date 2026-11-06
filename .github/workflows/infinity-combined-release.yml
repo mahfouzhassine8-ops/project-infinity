@@ -7,7 +7,7 @@ on:
         type: choice
         required: true
         default: final-combined
-        options: [final-combined, prepare-preview451, prepare-kodi452, prepare-kodi453, prepare-ui454-455, prepare-controlled456-457, review-controlled456-457, prepare-browser458-459, review-browser458-459, prepare-six460-461, review-six460-461]
+        options: [final-combined, prepare-preview451, prepare-kodi452, prepare-kodi453, prepare-ui454-455, prepare-controlled456-457, review-controlled456-457, prepare-browser458-459, review-browser458-459, prepare-six460-461, review-six460-461, package-nine-quick-updates]
       prepared_run:
         description: Completed official controlled preparation run for read-only authority review
         type: string
@@ -900,4 +900,43 @@ jobs:
             SIGNER-ROUTES.json
             signed-combined/preservation/
           if-no-files-found: warn
+          retention-days: 90
+
+  package-nine-quick-updates:
+    name: Exact2103460 original-key add-on installers; no APK
+    if: github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/work/infinity-2103460-nine-corrections-20261106' && inputs.operation == 'package-nine-quick-updates'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '21'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: 42146650003
+          name: Infinity-Combined-Original-Signer-42146650003
+          github-token: ${{ github.token }}
+          path: signed2103460
+      - name: Original signer policy and exact source/addon gates before keys
+        run: |
+          python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out SIGNER-ROUTES.json
+          python3 repairs/infinity-2103460-nine-corrections-20261106/quick-update/package_updates.py preflight --baseline signed2103460/Infinity-2103460-Combined-Original-Signer.apk --out quick-updates
+      - name: Original-key authenticate complete addon ZIPs only
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: python3 repairs/infinity-2103460-nine-corrections-20261106/quick-update/package_updates.py sign --out quick-updates
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity2103460-Authenticated-Quick-Updates-${{ github.run_id }}
+          path: quick-updates/publish/
+          if-no-files-found: error
           retention-days: 90
