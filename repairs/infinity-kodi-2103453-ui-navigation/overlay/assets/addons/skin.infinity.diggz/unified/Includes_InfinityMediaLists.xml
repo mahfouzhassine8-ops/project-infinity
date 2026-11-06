@@ -565,6 +565,8 @@
   <include name="InfinityMedia_TouchGuide">
     <definition>
       <control type="group">
+        <!-- Globally hide the outdated visual touch guide; native gestures remain intact. -->
+        <visible>false</visible>
         <left>1.5%</left>
         <bottom>24</bottom>
         <width>97%</width>
