@@ -8,7 +8,7 @@
     "xbmc/dialogs/GUIDialogMediaSource.cpp",
     "xbmc/dialogs/GUIDialogMediaSource.h"
   ],
-  "native_status": "FINAL_LIBRARY_ROOT_AND_FOLDER_RENAME_CANDIDATE_REQUIRES_FULL_ARM64_BUILD",
+  "native_status": "PASS_FINAL_FULL_ARM64_AND_SOURCE_ABI_VERIFICATION",
   "helper_source_hashes": {
     "repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/library_navigation.py": "55ec20e34341b6d16d8911a20231901f04f8f95fc66231a5dbba359a6d7ff40d",
     "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/resources/lib/infinity_library_navigation.py": "6cb5abe0d93544572135f2d7b3b3405ddee70d9e954a211292bfe0d08b4d03c9"
@@ -19,12 +19,16 @@
   "signed_zip_bundle_has_native_isolation": false,
   "Android": "NOT_RUN",
   "source_preservation": "No old source-dialog body changed; native map gate9411 files /4 intended differences; normal Files dormant scope preserved.",
-  "latest_build_run": 42197947372,
-  "latest_build_source": "dd1443fa5df97976c266ecc2d65d0acb4bb1e8b0",
+  "latest_build_run": 42199527560,
+  "latest_build_source": "b511c75ff608305a1e1a3e0392434706411f8282",
   "prior_native_build": 42193766744,
   "prior_preparation": 42196679754,
   "prior_preparation_status": "Superseded before signing by confirmed folder-rename regression",
   "prior_native_sha256": "4b433e343008d3176ddf53ed42d6cf3ea2a1b398629f6f846dc34663b009357a",
   "superseded_build": 42197947372,
-  "reason": "Return/history source dependency requires the existing scoped direct-entry guard for the two exact Home menu URLs; no other native file or history function changed."
+  "reason": "Return/history source dependency requires the existing scoped direct-entry guard for the two exact Home menu URLs; no other native file or history function changed.",
+  "native_sha256": "fadfb1a08e3d125958a77d393c1d66453ec3e9c91aac3349ec5806c67c17694d",
+  "native_direct_entry_checks": 8,
+  "actual_drawer_dispatch_cases": 2,
+  "APK_signing": "PENDING_ORIGINAL_GATES"
 }

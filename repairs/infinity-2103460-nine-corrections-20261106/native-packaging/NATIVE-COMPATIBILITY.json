@@ -1,13 +1,6 @@
 {
-  "permitted_additions": [
-    "_ZN21CGUIDialogMediaSource31ShowAndAddMediaSourceWithResultERKNSt6__ndk112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEER12CMediaSourceRbRKNS0_8functionIFbRKS9_EEE",
-    "_ZN21CGUIDialogMediaSource32ShowAndEditMediaSourceWithResultERKNSt6__ndk112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEERK12CMediaSourceRS9_RbRKNS0_8functionIFbSB_EEE"
-  ],
-  "status": "PASS_ALL_ORIGINAL_ABI_PLUS_EXACT_TWO_SCOPED_SOURCE_DIALOG_APIS",
-  "original_export_count": 71211,
   "candidate_export_count": 71213,
-  "original_exports_sha256": "79e928c0653df233ab0a98521afc5294835d0ac784eab28e2ad1272ccf545d64",
-  "candidate_exports_sha256": "01409859277cdb903dcc9290a61ec9040b9cc36c83e90049d37a1493bfce2c38",
+  "candidate_exports_sha256": "36e5f0975f0101cfbd5211d3586e81fa545647735de42382ed7c48fc343f1e1d",
   "needed": [
     "libEGL.so",
     "libGLESv2.so",
@@ -21,7 +14,14 @@
     "libmediandk.so",
     "libshairplay.so"
   ],
+  "original_export_count": 71211,
+  "original_exports_sha256": "d59c954f0a6e1dbf47c02880aa6c8a7b332c55427799a074e1e67f5d33a03b7d",
+  "permitted_additions": [
+    "_ZN21CGUIDialogMediaSource31ShowAndAddMediaSourceWithResultERKNSt6__ndk112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEER12CMediaSourceRbRKNS0_8functionIFbRKS9_EEE",
+    "_ZN21CGUIDialogMediaSource32ShowAndEditMediaSourceWithResultERKNSt6__ndk112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEERK12CMediaSourceRS9_RbRKNS0_8functionIFbSB_EEE"
+  ],
   "soname": [
     "libkodi.so"
-  ]
+  ],
+  "status": "PASS_ALL_ORIGINAL_ABI_PLUS_EXACT_TWO_SCOPED_SOURCE_DIALOG_APIS"
 }
