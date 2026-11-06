@@ -5,7 +5,11 @@
     <value condition="String.IsEqual(ListItem.DBType,episode) + !String.IsEmpty(ListItem.Art(season.poster))">$INFO[ListItem.Art(season.poster)]</value>
     <value condition="String.IsEqual(ListItem.DBType,episode) + !String.IsEmpty(ListItem.Art(tvshow.poster))">$INFO[ListItem.Art(tvshow.poster)]</value>
     <value condition="String.IsEqual(ListItem.DBType,episode) + !String.IsEmpty(ListItem.Art(thumb))">$INFO[ListItem.Art(thumb)]</value>
-    <value>$VAR[PosterThumb]</value>
+    <value condition="!String.IsEmpty(ListItem.Art(poster))">$INFO[ListItem.Art(poster)]</value>
+    <value condition="!String.IsEmpty(ListItem.Art(season.poster))">$INFO[ListItem.Art(season.poster)]</value>
+    <value condition="!String.IsEmpty(ListItem.Art(tvshow.poster))">$INFO[ListItem.Art(tvshow.poster)]</value>
+    <value condition="!String.IsEmpty(ListItem.Art(thumb))">$INFO[ListItem.Art(thumb)]</value>
+    <value />
   </variable>
 
   <variable name="InfinityMedia_RowArtwork">
@@ -562,72 +566,7 @@
       </control>
     </definition>
   </include>
-  <include name="InfinityMedia_TouchGuide">
-    <definition>
-      <control type="group">
-        <left>1.5%</left>
-        <bottom>24</bottom>
-        <width>97%</width>
-        <height>88</height>
-        <visible>Control.IsVisible(50) + !String.IsEqual(Skin.String(Infinity.HomeView),cinema) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos) | Container.Content(videos)]</visible>
-        <control type="image">
-          <width>100%</width>
-          <height>100%</height>
-          <texture border="14">infinity_ui/frame_soft.png</texture>
-          <colordiffuse>$VAR[InfinityPaletteBorder]</colordiffuse>
-        </control>
-        <control type="label">
-          <left>0</left>
-          <top>0</top>
-          <width>32%</width>
-          <height>100%</height>
-          <font>InfinityTiny</font>
-          <textcolor>$VAR[InfinityPaletteTextPrimary]</textcolor>
-          <align>center</align>
-          <aligny>center</aligny>
-          <label>Tap = Select</label>
-        </control>
-        <control type="label">
-          <left>32%</left>
-          <top>0</top>
-          <width>33%</width>
-          <height>100%</height>
-          <font>InfinityTiny</font>
-          <textcolor>$VAR[InfinityPaletteTextPrimary]</textcolor>
-          <align>center</align>
-          <aligny>center</aligny>
-          <label>Tap Again = Open</label>
-        </control>
-        <control type="label">
-          <left>65%</left>
-          <top>0</top>
-          <width>35%</width>
-          <height>100%</height>
-          <font>InfinityTiny</font>
-          <textcolor>$VAR[InfinityPaletteTextPrimary]</textcolor>
-          <align>center</align>
-          <aligny>center</aligny>
-          <label>Press &amp; Hold = Menu</label>
-        </control>
-        <control type="image">
-          <left>32%</left>
-          <top>14</top>
-          <width>1</width>
-          <bottom>14</bottom>
-          <colordiffuse>$VAR[InfinityPaletteBorder]</colordiffuse>
-          <texture>infinity_ui/contract_white.png</texture>
-        </control>
-        <control type="image">
-          <left>65%</left>
-          <top>14</top>
-          <width>1</width>
-          <bottom>14</bottom>
-          <colordiffuse>$VAR[InfinityPaletteBorder]</colordiffuse>
-          <texture>infinity_ui/contract_white.png</texture>
-        </control>
-      </control>
-    </definition>
-  </include>
+  <include name="InfinityMedia_TouchGuide"><definition /></include>
   <include name="InfinityMedia_VideoList">
     <control type="group">
       <visible>Control.IsVisible(50) + !Window.IsActive(addoninformation)</visible>

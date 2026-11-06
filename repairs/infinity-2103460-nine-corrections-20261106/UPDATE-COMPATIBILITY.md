@@ -1,0 +1,11 @@
+# Signed 2103460 quick-update investigation
+
+Read from the actual extracted APK, not the experimental branch. Command Center is `script.infinity.commandcenter` 0.3.5.61. `addon.xml` and `module_contract.py` are unchanged in this candidate.
+
+The native `InfinityInstalledModules` verifier authenticates the original-RSA-signed `INFINITY-MODULES.v1` manifest, exact source hashes, supported entry ownership and protocol. `module_contract.installed_identity` compares the native-verified package version to installed addon.xml and receives the actual signed manifest digest. The native verifier has no discovered requirement that an updated manifest must retain the APK's original digest. Therefore an independently signed module update is a plausible existing route; the experimental branch's blanket claim that every script update requires an APK is NOT adopted.
+
+Compatibility is not yet proven end-to-end. A corrected Command Center ZIP must keep version 0.3.5.61 as requested, include the original-key signature and all authenticated sibling source obligations, and preserve the bootstrap digest. Kodi's actual InstallFromZip path requires one addon root and invokes DoInstall; it is not a repository source overlay. Its service stop/start and old/new participant ownership must be observed with the exact signed package before this is called safe. Java's existing installer verifies the installed signed generation, rejects unknown partial code, and on a differing same/older version retains only a fully verified installed generation. Do not weaken or bypass those checks to make a ZIP install.
+
+A skin ZIP must preserve the real addon structure, dependencies, health/control-ID and protected-file manifests. Matching helper routes must not diverge between Command Center and the skin. Signature/authentication, native entry ownership, restart behavior and forward recovery remain required. A detached checksum alone is not an authenticated installer.
+
+No source-only ZIP was produced or represented as installable. No new signing route, signer credential, original-key replacement, APK rebuild, userdata access or release lock was attempted. The nine-correction set is incomplete; no finished installer is claimed.

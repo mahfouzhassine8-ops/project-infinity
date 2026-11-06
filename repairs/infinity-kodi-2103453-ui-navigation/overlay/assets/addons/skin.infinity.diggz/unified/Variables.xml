@@ -32,6 +32,7 @@
     <!-- Videos: only actual media artwork; never enlarge a provider/directory icon. -->
     <value condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos) | Container.Content(videos)] + !String.IsEmpty(ListItem.Art(poster))">$INFO[ListItem.Art(poster)]</value>
     <value condition="Window.IsActive(videos) + [Container.Content(movies) | Container.Content(tvshows) | Container.Content(seasons) | Container.Content(episodes) | Container.Content(sets) | Container.Content(musicvideos) | Container.Content(videos)]" />
+    <value condition="Window.IsActive(videos)" />
     <value condition="!String.IsEmpty(ListItem.Art(poster))">$INFO[ListItem.Art(poster)]</value>
     <value>$INFO[ListItem.Icon]</value>
   </variable>
