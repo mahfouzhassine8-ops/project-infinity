@@ -391,7 +391,7 @@ def _publish_result(handle,provider,status,answer,path):
     rows=answer.get('result',{}).get('files') or []
     if not isinstance(rows,list):rows=[];status='invalid_result'
     heading=xbmcgui.ListItem(provider['name']+' — '+(str(len(rows))+' results' if status=='completed' else
-        'State changed; search again' if status=='state_changed' else status or 'unavailable'))
+        'Open provider search' if status=='state_changed' else status or 'unavailable'))
     heading.setProperty('IsPlayable','false')
     heading.setProperty('Infinity.Search.Provider',provider['id'])
     xbmcplugin.addDirectoryItem(handle,path,heading,isFolder=bool(path))
