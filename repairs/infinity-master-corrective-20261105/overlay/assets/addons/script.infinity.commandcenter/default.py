@@ -209,10 +209,41 @@ def open_support_exporter():
     except Exception:
         xbmcgui.Dialog().ok(TITLE, 'Infinity Support Exporter is not installed.')
 
+def _media_details_fallback():
+    """Show the selected Kodi item details if the extended-info add-on is absent.
+
+    Read-only: no provider calls, playback or settings writes.
+    """
+    fields = (
+        ('Title', 'ListItem.Title'),
+        ('Original title', 'ListItem.OriginalTitle'),
+        ('Year', 'ListItem.Year'),
+        ('Genre', 'ListItem.Genre'),
+        ('Runtime', 'ListItem.Duration'),
+        ('Rating', 'ListItem.Rating'),
+        ('Director', 'ListItem.Director'),
+        ('Writer', 'ListItem.Writer'),
+        ('Studio', 'ListItem.Studio'),
+        ('Release', 'ListItem.Premiered'),
+        ('Plot', 'ListItem.Plot'),
+    )
+    lines = []
+    for label, infolabel in fields:
+        value = (xbmc.getInfoLabel(infolabel) or '').strip()
+        if value:
+            lines.append(label + ': ' + value)
+    xbmcgui.Dialog().textviewer(
+        'Media Details', '\\n\\n'.join(lines) if lines else
+        'No additional metadata is available for this item.')
+    return True
+
+
 def direct_command(argv) -> bool:
     if len(argv) < 2:
         return False
     action = argv[1].strip().lower()
+    if action == 'media-details':
+        return _media_details_fallback()
     if action == 'library-navigation':
         from library_navigation import run
         run(argv[2].strip().lower() if len(argv) > 2 else '', xbmc, xbmcgui)
