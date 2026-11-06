@@ -1,0 +1,10 @@
+{
+  "status": "PASS_SOURCE_TRACED_EXISTING_AUTHENTICATED_UPDATE_CONTRACT",
+  "native_source_sha256": "0ecc31e2f3608683712aac71656c75c0bcbcc8c9ba9aa4a753a506fcdddf6bda",
+  "same_version_update": "IdentityV1 and Classify call VerifyRoot against current original-key signed manifest/source; no compiled-in old manifest digest exemption added",
+  "cache": "Only two original module roots; changed manifest/signature stamps invalidate cached capability; original source verification reruns before script admission",
+  "skin_ui_health": "Original signed460 common.py UI-health functions pass against complete prepared262 skin, no self-heal/service code changed",
+  "native_installer": "Exact460 InstallFromZip -> DoInstall -> DoWork checks dependencies/admission, unloads addon, installs local ZIP, loads exact addon version; manual path has no same-version refusal. Android execution not claimed.",
+  "runtime_and_service_restart": "NOT_RUN",
+  "guards_changed": false
+}

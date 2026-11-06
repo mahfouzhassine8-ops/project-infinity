@@ -19,7 +19,7 @@ def head_check():
  return os.environ['GITHUB_SHA']
 def bindings():
  files=[HERE/n for n in ('release_native.py','AUTHORIZATION.md','ENGINE-INPUT.json','SCOPED-EXPORT-ALLOWLIST.json')]
- files += [HERE.parent/'downloads-native'/n for n in ('CANDIDATE.json','HOST-CONTRACT-RESULT.json','HELPER-INTEGRATION-RESULT.json','SIGNED460-NATIVE-SOURCE-MAP.json','build_native.py')]
+ files += [HERE.parent/'downloads-native'/n for n in ('CANDIDATE.json','HOST-CONTRACT-RESULT.json','HELPER-INTEGRATION-RESULT.json','DIRECT-ENTRY-RESULT.json','DRAWER-DISPATCH-RESULT.json','SIGNED460-NATIVE-SOURCE-MAP.json','build_native.py')]
  rows=load(HERE.parent/'downloads-native/CANDIDATE.json')['files'];files += [ROOT/r['source'] for r in rows.values()]
  return {str(p.relative_to(ROOT)):file_sha(p) for p in files}
 def versions(version,out):
@@ -44,6 +44,7 @@ def verify_native(folder):
  pins=engine_record();paths=list(folder.rglob('libkodi.so'));require(len(paths)==1,'ONE_AUTHENTICATED_ENGINE');library=paths[0];where=library.parent
  for n,h in pins['artifact_member_hashes'].items():require(file_sha(where/n)==h,'NATIVE_ARTIFACT_MEMBER:'+n)
  proof=load(where/'CONTROLLED-ENGINE-VERIFIED.json');mapping=load(where/'NATIVE-SOURCE-MAP.json');before=load(where/'SIGNED460-NATIVE-SOURCE-MAP.json');rows=load(HERE.parent/'downloads-native/CANDIDATE.json')['files']
+ require(set(rows)=={'xbmc/video/windows/GUIWindowVideoNav.cpp','xbmc/video/windows/GUIWindowVideoNav.h','xbmc/dialogs/GUIDialogMediaSource.cpp','xbmc/dialogs/GUIDialogMediaSource.h'},'EXACT_AUTHORIZED_NATIVE_FILE_ALLOWLIST')
  require(proof['status']=='PASS_FULL_ARM64_SIGNED460_PLUS_SCOPED_LIBRARY_DOWNLOADS' and proof['source_commit']==pins['source_commit'] and proof['native_sha256']==pins['native_sha256']==file_sha(library),'VERIFIED_ARM64_ENGINE')
  require(len(mapping)==9411 and set(mapping)==set(before) and {n for n in mapping if mapping[n]!=before[n]}==set(rows),'FOUR_EXACT_NATIVE_SOURCES')
  for n,r in rows.items():require(before[n]==r['before_sha256'] and mapping[n]==r['candidate_sha256']==file_sha(ROOT/r['source']),'EXACT_NATIVE_SOURCE:'+n)
