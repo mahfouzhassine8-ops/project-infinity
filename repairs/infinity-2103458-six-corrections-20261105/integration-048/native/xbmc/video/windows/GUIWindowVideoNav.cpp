@@ -110,8 +110,24 @@ bool CGUIWindowVideoNav::OnMessage(CGUIMessage& message)
       m_rootDir.AllowNonLocalSources(false);
 
       SetProperty("flattened", CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_MYVIDEOS_FLATTEN));
-      if (message.GetNumStringParams() && StringUtils::EqualsNoCase(message.GetStringParam(0), "Files") &&
-          CMediaSourceSettings::GetInstance().GetSources("video")->empty())
+#if defined(TARGET_ANDROID)
+      // The existing Infinity Downloads drawer requests this distinct Files
+      // presentation. It is NOT the generic Kodi sources window; the same
+      // source registry, Add videos editor and folder navigation remain native.
+      const bool infinityDownloadsOnly =
+          g_SkinInfo && g_SkinInfo->ID() == "skin.infinity.diggz" &&
+          message.GetNumStringParams() == 3 &&
+          StringUtils::EqualsNoCase(message.GetStringParam(0), "files") &&
+          message.GetStringParam(1) == "return" &&
+          message.GetStringParam(2) == "infinity-downloads-only";
+      SetProperty("Infinity.DownloadsOnly", infinityDownloadsOnly);
+#else
+      const bool infinityDownloadsOnly = false;
+#endif
+      if (message.GetNumStringParams() &&
+          StringUtils::EqualsNoCase(message.GetStringParam(0), "Files") &&
+          CMediaSourceSettings::GetInstance().GetSources("video")->empty() &&
+          !infinityDownloadsOnly)
       {
         message.SetStringParam("");
       }
@@ -374,6 +390,40 @@ bool CGUIWindowVideoNav::GetDirectory(const std::string &strDirectory, CFileItem
   bool bResult = CGUIWindowVideoBase::GetDirectory(strDirectory, items);
   if (bResult)
   {
+#if defined(TARGET_ANDROID)
+    // Hide ONLY the exact legacy sources identified in the user's original
+    // 2103460 Downloads root. Do not edit the source registry or hide a newly
+    // added folder with a different name. All ordinary Files entry points
+    // continue to show their full original source list.
+    if (g_SkinInfo && g_SkinInfo->ID() == "skin.infinity.diggz" &&
+        GetProperty("Infinity.DownloadsOnly").asBoolean() &&
+        URIUtils::PathEquals(items.GetPath(), "sources://video/"))
+    {
+      for (int i = items.Size() - 1; i >= 0; --i)
+      {
+        const CFileItemPtr item = items.Get(i);
+        if (!item || item->IsParentFolder())
+          continue;
+        const std::string& label = item->GetLabel();
+        if (StringUtils::EqualsNoCase(label, "The Crew Movies") ||
+            StringUtils::EqualsNoCase(label, "The Crew TVShows") ||
+            StringUtils::EqualsNoCase(label, "Download") ||
+            StringUtils::EqualsNoCase(label, "FREE99 Movies") ||
+            StringUtils::EqualsNoCase(label, "FREE99 TVShows") ||
+            StringUtils::EqualsNoCase(label, "Homelander Movies") ||
+            StringUtils::EqualsNoCase(label, "Homelander TV Shows") ||
+            StringUtils::EqualsNoCase(label, "Netflix Movies") ||
+            StringUtils::EqualsNoCase(label, "Netflix shows") ||
+            StringUtils::EqualsNoCase(label, "Scrubs Movies") ||
+            StringUtils::EqualsNoCase(label, "Scrubs TV Shows") ||
+            StringUtils::EqualsNoCase(label, "TMDBH Movies") ||
+            StringUtils::EqualsNoCase(label, "TMDBH TV Shows"))
+        {
+          items.Remove(i);
+        }
+      }
+    }
+#endif
     if (items.IsVideoDb())
     {
       XFILE::CVideoDatabaseDirectory dir;
