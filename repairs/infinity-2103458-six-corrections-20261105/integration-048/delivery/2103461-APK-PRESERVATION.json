@@ -1,0 +1,36 @@
+{
+  "Android": "NOT_RUN_NO_CONNECTED_COMPATIBLE_ANDROID_TARGET",
+  "Downloads": "BLOCKED_CLASSIFICATION",
+  "Scudo": "UNRESOLVED_NOT_CHANGED",
+  "Search_required_tests": "2 FAIL, not waived",
+  "accepted_pointer_updated": false,
+  "all_DEX_unchanged": 5,
+  "baseline_sha256": "eb2c5121b6a0173dc3848eda93ea0d640d1db9245de5b5985933312d56e951fd",
+  "browser_design": "ANDROID_UNACCEPTED",
+  "candidate_sha256": "ffd95188504357a093070aa7d064aa2c3fafec6b6eed176b3db0685857ff1a16",
+  "changed_existing": [
+    "AndroidManifest.xml",
+    "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1",
+    "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1.sig",
+    "assets/addons/script.infinity.commandcenter/addon.xml",
+    "assets/addons/skin.infinity.diggz/Infinity-Protected-Manifest.json",
+    "assets/addons/skin.infinity.diggz/addon.xml",
+    "assets/addons/skin.infinity.diggz/infinity-skin.json",
+    "assets/experience-component-updates.properties"
+  ],
+  "expected_member_hashes": {
+    "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1": "efad9c78285a325fc00488cebf78af9cf13ae1e22bc90dfbf81d74d14c1f4174",
+    "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1.sig": "36a036a634e04e82202904827a032b288c6292b1a51a008efbb47ebb0e3828df",
+    "assets/addons/script.infinity.commandcenter/addon.xml": "a98672f89b10fe9dc908d411cf80f098a2107892881c7e878a7754cc46751c32",
+    "assets/addons/skin.infinity.diggz/Infinity-Protected-Manifest.json": "01f0826389be9960d820f1109f3f5fd1e1538828bfb4900a5a1c70ad5f71063c",
+    "assets/addons/skin.infinity.diggz/addon.xml": "5f4dfc357b2b05849a9e2f4c27aa866ab822f63965cd15915c6bda27d3408f48",
+    "assets/addons/skin.infinity.diggz/infinity-skin.json": "8122148020fe24d36813f85a983e46ab11e381a7c50d9cf0ff0cc5807dc60da7",
+    "assets/experience-component-updates.properties": "53b074cda3f7e392e26fe7784f6a078b30d7751f08b900bb390fe1e85104ff47"
+  },
+  "native_libraries_unchanged": 47,
+  "new_members": [],
+  "physical_Fold": "PENDING",
+  "protected_existing_members": 7614,
+  "status": "PASS_EXACT_SIGNED458_CONTROLLED_MEMBER_PRESERVATION",
+  "versionCode": 2103461
+}

@@ -1,0 +1,96 @@
+{
+  "Android": "NOT_RUN_NO_CONNECTED_COMPATIBLE_TARGET",
+  "Scudo": "UNRESOLVED_NOT_CHANGED",
+  "accepted_pointer_updated": false,
+  "checks": [
+    {
+      "check": "actual_original_key_adapter_installs_candidate",
+      "result": "PASS"
+    },
+    {
+      "check": "native_module_verifier_accepts_installed_candidate",
+      "result": "PASS"
+    },
+    {
+      "check": "interrupted_recovery_is_reported_not_success",
+      "result": "PASS"
+    },
+    {
+      "check": "interruption_occurred_after_source_write_before_manifest_commit",
+      "result": "PASS"
+    },
+    {
+      "check": "same_recovery_resumes_interrupted_write",
+      "result": "PASS"
+    },
+    {
+      "check": "native_module_verifier_accepts_recovery",
+      "result": "PASS"
+    },
+    {
+      "check": "all_recovery_signed_files_installed_exactly",
+      "result": "PASS"
+    },
+    {
+      "check": "previous_authenticated_generation_backed_up",
+      "result": "PASS"
+    },
+    {
+      "check": "userdata_sentinel_preserved",
+      "result": "PASS"
+    },
+    {
+      "check": "older_module_does_not_replace_recovery",
+      "result": "PASS"
+    },
+    {
+      "check": "library_helper_restores_exact_signed458_code",
+      "result": "PASS"
+    },
+    {
+      "check": "candidate_only_entry_flag_not_in_recovery_helper",
+      "result": "PASS"
+    },
+    {
+      "check": "restored_helper_is_authenticated_original_code",
+      "result": "PASS"
+    },
+    {
+      "check": "unknown_source_refused_without_overwrite",
+      "result": "PASS"
+    },
+    {
+      "check": "invalid_original_signature_refused_without_writes",
+      "result": "PASS"
+    },
+    {
+      "check": "no_user_data_loss_after_all_negative_cases",
+      "result": "PASS"
+    },
+    {
+      "check": "recovery_original_drawer_1198104",
+      "result": "PASS"
+    },
+    {
+      "check": "recovery_original_drawer_1198111",
+      "result": "PASS"
+    },
+    {
+      "check": "no_new_native_entry_flag_in_recovery_drawer",
+      "result": "PASS"
+    }
+  ],
+  "installer_source_sha256": "3763a9dce6e9c0cafbefb4a967e76230e134ed2ecb67bdc4961676df061729bb",
+  "limits": [
+    "Host POSIX adapter execution validates original installer algorithm/JCA signatures, not Android ABI or actual Fold installation.",
+    "No candidate-only source files are added; original458 helper bytes and original library routes are restored. Higher authenticated module/skin metadata is required.",
+    "This is not a sandbox claim against deliberate manual RunScript/ActivateWindow calls or third-party scripts with arbitrary execution privileges.",
+    "Actual installed skin generation selection, window registration and install-over recovery require physical Android verification.",
+    "Cannot recover unsaved in-memory data; unresolved checkpoint obligations remain blocking."
+  ],
+  "original_key_replaced": false,
+  "physical_recovery": "PENDING",
+  "source_template_sha256": "ee66ede93c32e9282b042817f894ccef96f83a25b465234e1e70b48ea81eb0bf",
+  "status": "PASS_ORIGINAL_KEY_HOST_RECOVERY_AND_ENTRY_REACHABILITY",
+  "userdata_accessed": "Disposable sentinel only; no real profile or database opened"
+}

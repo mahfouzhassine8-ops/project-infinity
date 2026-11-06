@@ -1,0 +1,43 @@
+{
+  "artifact": {
+    "id": 13471120224,
+    "name": "Infinity-Combined-Signing-Evidence-42146650003",
+    "digest": "sha256:80c007456027a389b9e0bd0da83198a22eb92ce32c1b5f966162181bbb4cfd67",
+    "size_in_bytes": 378750,
+    "workflow_run": {
+      "id": 42146650003,
+      "repository_id": 1357922020,
+      "head_repository_id": 1357922020,
+      "head_branch": "work/infinity-2103458-six-corrections-20261105",
+      "head_sha": "a4c1d751c32b3a978ee86ab4ed9a7b38783956dc"
+    }
+  },
+  "archive_sha256_verified": true,
+  "all_members_read_with_libarchive_CRC_checks": true,
+  "members": {
+    "SIGNING-DECISION.json": {
+      "sha256": "565b866ed46765b5e14195e965dd456f07c4212c76d40bcda0b5dc65efca825e",
+      "size": 2960
+    },
+    "REGISTERED-CANDIDATE-CHECK.json": {
+      "sha256": "de1da78581bb0267aa762c3b3ae772160db7fcae5de53c9406c6340c1cdfba67",
+      "size": 156
+    },
+    "SIGNER-ROUTES.json": {
+      "sha256": "cc5bfd565713c7274453aaeaf35b952b14f938f4f304a8c54b3fe6baf713a27c",
+      "size": 141
+    },
+    "signed-combined/preservation/ALL-APK-MEMBER-HASHES.json": {
+      "sha256": "df230c566ee03997d314b955c11285f3eb3c545e0ff0662e2b900ae2389a522a",
+      "size": 1905323
+    },
+    "signed-combined/preservation/APK-PRESERVATION.json": {
+      "sha256": "57a0e4035aa935b2035d187963d295bc330c751747261be74fe4162191f81f87",
+      "size": 3350
+    },
+    "signed-combined/preservation/SIGNATURE.txt": {
+      "sha256": "daf0259134728e4bc6a7f29d66e669f8312ef87c0ed4627c2d95adebc21421b2",
+      "size": 2607
+    }
+  }
+}

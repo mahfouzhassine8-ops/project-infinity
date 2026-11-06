@@ -1,0 +1,48 @@
+{
+  "status": "PASS_DOWNLOADED_APK_AND_COMPONENT_IDENTITY",
+  "versionCode": 2103460,
+  "apk": "Infinity-2103460-Combined-Original-Signer.apk",
+  "apk_sha256": "226911966c1d27d1246cd0ecfcd864c722df48f9be07167bd4b15ad1e73560af",
+  "apk_size": 778580671,
+  "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "signature_cryptographic_verification": "Original GitHub signer apksigner v1/v2/v3 PASS; local certificate identity matched",
+  "member_hashes_checked": 7622,
+  "changed_existing": [
+    "AndroidManifest.xml",
+    "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1",
+    "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1.sig",
+    "assets/addons/script.infinity.commandcenter/addon.xml",
+    "assets/addons/script.infinity.commandcenter/library_navigation.py",
+    "assets/addons/skin.infinity.diggz/Infinity-Protected-Manifest.json",
+    "assets/addons/skin.infinity.diggz/addon.xml",
+    "assets/addons/skin.infinity.diggz/infinity-skin.json",
+    "assets/addons/skin.infinity.diggz/unified/Custom_1198_InfinityNav.xml",
+    "assets/addons/skin.infinity.diggz/unified/DialogVideoInfo.xml",
+    "assets/addons/skin.infinity.diggz/unified/Includes_InfinityMediaLists.xml",
+    "assets/addons/skin.infinity.diggz/unified/Variables.xml",
+    "assets/experience-component-updates.properties",
+    "lib/arm64-v8a/libkodi.so"
+  ],
+  "protected_existing_members": 7608,
+  "components": {
+    "CHOOSER_SHELL": {
+      "sha256": "a3c767dbfa742b75c5e9a72fd76660c0ad71dc5bcba542f1928c66a1f365d78f",
+      "matching_apk_payload_members": 1
+    },
+    "COBRA": {
+      "sha256": "f63d4c1e491dc94591c5623bf02be90d4f9c187b91a0511b36398ee96745f8a8",
+      "matching_apk_payload_members": 11
+    },
+    "INFINITY": {
+      "sha256": "f6f64bcdfc540d94227f88777ca463fb93925e02db6a1504171393f3fded9a89",
+      "matching_apk_payload_members": 7524
+    },
+    "MINIMAL_ANDROID_CONTRACT": {
+      "sha256": "1c4a2890ef5ca8665b86b148dd293c06a56d76ec846de1e0c9c037a3b0151a25",
+      "matching_apk_payload_members": 81
+    }
+  },
+  "Android": "NOT_RUN",
+  "physical_Fold": "PENDING",
+  "verifier_development_note": "The initial local 2103460 raw bundle-manifest check stopped; reproducing the unchanged assembler versionCode stamping and DEX ordering corrected the checker. No application payload changed. 2103461 used that corrected checker on its first verification."
+}

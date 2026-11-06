@@ -1,0 +1,42 @@
+{
+  "status": "PASS_DOWNLOADED_APK_AND_COMPONENT_IDENTITY",
+  "versionCode": 2103461,
+  "apk": "Infinity-2103461-Combined-Original-Signer.apk",
+  "apk_sha256": "ffd95188504357a093070aa7d064aa2c3fafec6b6eed176b3db0685857ff1a16",
+  "apk_size": 778576575,
+  "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "signature_cryptographic_verification": "Original GitHub signer apksigner v1/v2/v3 PASS; local certificate identity matched",
+  "member_hashes_checked": 7622,
+  "changed_existing": [
+    "AndroidManifest.xml",
+    "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1",
+    "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1.sig",
+    "assets/addons/script.infinity.commandcenter/addon.xml",
+    "assets/addons/skin.infinity.diggz/Infinity-Protected-Manifest.json",
+    "assets/addons/skin.infinity.diggz/addon.xml",
+    "assets/addons/skin.infinity.diggz/infinity-skin.json",
+    "assets/experience-component-updates.properties"
+  ],
+  "protected_existing_members": 7614,
+  "components": {
+    "CHOOSER_SHELL": {
+      "sha256": "9a87b83e3b6e09a0ccb1e9916a7223a1b1c7b876f53e563e235a4a570101eaa9",
+      "matching_apk_payload_members": 1
+    },
+    "COBRA": {
+      "sha256": "f63d4c1e491dc94591c5623bf02be90d4f9c187b91a0511b36398ee96745f8a8",
+      "matching_apk_payload_members": 11
+    },
+    "INFINITY": {
+      "sha256": "3959b5170ac63d7e738b2928610d13c7f0b7e699dceca8a5a72dd686d908dc61",
+      "matching_apk_payload_members": 7524
+    },
+    "MINIMAL_ANDROID_CONTRACT": {
+      "sha256": "1c4a2890ef5ca8665b86b148dd293c06a56d76ec846de1e0c9c037a3b0151a25",
+      "matching_apk_payload_members": 81
+    }
+  },
+  "Android": "NOT_RUN",
+  "physical_Fold": "PENDING",
+  "verifier_development_note": "The initial local 2103460 raw bundle-manifest check stopped; reproducing the unchanged assembler versionCode stamping and DEX ordering corrected the checker. No application payload changed. 2103461 used that corrected checker on its first verification."
+}
