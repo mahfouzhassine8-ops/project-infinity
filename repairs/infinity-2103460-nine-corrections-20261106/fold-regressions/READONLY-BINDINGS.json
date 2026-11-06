@@ -1,0 +1,63 @@
+{
+  "active_phone_apk_and_components": "UNVERIFIED",
+  "device_QA": "user PASS 1/2/3/5; FAIL 4/7/8/9; repeated Search UNTESTED",
+  "native_sources": {
+    "xbmc/guilib/GUIControlGroupList.cpp": {
+      "sha256": "b1115abec2823f31d5ef0e6cdd21133a9441e1bafd02c1405fb8461ab5ed1117",
+      "signed460_source_map_match": true,
+      "signed462_source_map_match": true
+    },
+    "xbmc/guilib/GUIControlGroup.cpp": {
+      "sha256": "57f9a837b027ad2f517c164278300d629d756aa944a183124ae63e800ddf545f",
+      "signed460_source_map_match": true,
+      "signed462_source_map_match": true
+    },
+    "xbmc/guilib/GUIControlFactory.cpp": {
+      "sha256": "ce432bb0fdc3f8d8e6b98f167f8f1348b1efcc093346d5738b79f63e7323f362",
+      "signed460_source_map_match": true,
+      "signed462_source_map_match": true
+    },
+    "xbmc/guilib/GUIWindow.cpp": {
+      "sha256": "e1c423646c1b2fc4c9f8c7ec8eb5928b40d345d5313a327997af36360469fb7d",
+      "signed460_source_map_match": true,
+      "signed462_source_map_match": true
+    },
+    "xbmc/guilib/GUIVideoControl.cpp": {
+      "sha256": "d8b5f1705a27a6e85bba6416a935ac330250c4d780128a3cec23ae2a6980bc0f",
+      "signed460_source_map_match": true,
+      "signed462_source_map_match": true
+    },
+    "xbmc/video/dialogs/GUIDialogVideoInfo.cpp": {
+      "sha256": "ae02f1537fc46af9072d240bbecde21ea69e1f5fc411fc4823220a9f3bdab00b",
+      "signed460_source_map_match": true,
+      "signed462_source_map_match": true
+    },
+    "xbmc/guilib/GUIBaseContainer.cpp": {
+      "sha256": "cb0e262c9cb58c56f6655955b6dc2999a2608523be9de582dabd82d3a0dfe0ae",
+      "signed460_source_map_match": true,
+      "signed462_source_map_match": true
+    },
+    "xbmc/interfaces/generic/ScriptRunner.cpp": {
+      "sha256": "450a7fb07e4ecdf2dcc933f6e8ebcbcc06ddc36b7f52cbeacc9d31130ce6ff83",
+      "signed460_source_map_match": true,
+      "signed462_source_map_match": true
+    }
+  },
+  "delivered_addon_bindings": {
+    "script.infinity.commandcenter": {
+      "infinity_search.py": "245e599843b817bfa7f06b1db212502790a2dca13d229e21367060beb1fa9b6c",
+      "context.py": "c688c9f192512a7bb7628c545e9743eead901be532add06baf50a2cce112aedd",
+      "plugin.py": "87dcfdceedffc9829fd3310a5de3244b3379adfe24d1210cb750d4e06005a57e",
+      "module_contract.py": "759e60439fae0b1bf0f8a2ff6895209ac848101b9544ac6c0e297b9c73df1267",
+      "addon.xml": "922ac8d332bbef8ccd70a194f664536f0b789ffbe451ff402736f9fa696090a2",
+      "INFINITY-MODULES.v1": "7f90cb34e4035b36b670289bbcafa18e596c211527e41adf5ac7820288e8396b",
+      "INFINITY-MODULES.v1.sig": "540ca08b74ff1212e2a27702065f11afb7bda2ad758e1faa4c5f4476b8a3a4c7"
+    },
+    "skin.infinity.diggz": {
+      "unified/DialogVideoInfo.xml": "3e1323aec4af3121d4283d55bcb77f5b1d05dd892593854835e36e7b64b51460",
+      "unified/Includes_InfinityMediaLists.xml": "a9e6ea83bb6aad8b598e6d559963097e47404dec98f7a0399b872e82e0f32896",
+      "unified/Custom_1198_InfinityNav.xml": "15da2e0b3e3779f08018a624d20d72f8aef4a0d412a559fb679c64fd1858dfde",
+      "addon.xml": "f72125c39115f2d108e25cdf2b12ebd35220a6f726c55bffa56be8c1c6054e7e"
+    }
+  }
+}

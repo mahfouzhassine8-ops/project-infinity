@@ -1,0 +1,46 @@
+--- a/repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/DialogVideoInfo.xml
++++ b/repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/DialogVideoInfo.xml
+@@ -134,10 +134,17 @@
+       <label>$INFO[ListItem.Plot]</label>
+       <autoscroll>false</autoscroll>
+     </control>
++    <control type="videowindow">
++      <left>4.0625%</left>
++      <top>13.5185%</top>
++      <width>91.6667%</width>
++      <height>64.0741%</height>
++      <visible>Player.HasVideo</visible>
++    </control>
+     <control type="grouplist" id="9000">
+       <left>7%</left>
+       <top>42.4074%</top>
+-      <width>86%</width>
++      <width min="86%" max="86%">auto</width>
+       <height>72</height>
+       <orientation>horizontal</orientation>
+       <itemgap>8</itemgap>
+@@ -466,13 +473,6 @@
+       <height>1</height>
+       <visible>false</visible>
+     </control>
+-    <control type="videowindow">
+-      <left>4.0625%</left>
+-      <top>13.5185%</top>
+-      <width>91.6667%</width>
+-      <height>64.0741%</height>
+-      <visible>Player.HasVideo</visible>
+-    </control>
+   </controls>
+   <animation effect="fade" start="0" end="100" time="160" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowOpen</animation>
+   <animation effect="fade" start="100" end="0" time="110" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowClose</animation>
+--- a/repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Includes_InfinityMediaLists.xml
++++ b/repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Includes_InfinityMediaLists.xml
+@@ -118,7 +118,7 @@
+         <texture>$VAR[ListItemOverlay]</texture>
+         <colordiffuse>$VAR[InfinityPaletteAccent]</colordiffuse>
+         <left>60</left>
+-        <visible>ListItem.IsResumable | Integer.IsGreater(ListItem.PlayCount,0) | ListItem.IsPlaying</visible>
++        <visible>ListItem.IsResumable | Integer.IsGreater(ListItem.PlayCount,0) | ListItem.IsPlaying | String.IsEqual(ListItem.Overlay,OverlayWatched.png) | String.IsEqual(ListItem.Property(Infinity.ResumeHub.Watched),true)</visible>
+       </control>
+       <include content="InfinityActionLoadingFrame" condition="$PARAM[Focused]">
+         <param name="width" value="100%" />

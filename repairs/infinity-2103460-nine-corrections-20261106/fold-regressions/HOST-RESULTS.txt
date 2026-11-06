@@ -1,0 +1,27 @@
+test_actual_native_initial_width_fails_before_and_passes_after (__main__.InfoAndPreservation.test_actual_native_initial_width_fails_before_and_passes_after) ... ok
+test_all_four_physically_passed_features_and_runtime_sources_untouched (__main__.InfoAndPreservation.test_all_four_physically_passed_features_and_runtime_sources_untouched) ... ok
+test_existing_menu_retains_both_watched_actions_without_writer_changes (__main__.InfoAndPreservation.test_existing_menu_retains_both_watched_actions_without_writer_changes) ... ok
+test_existing_watched_states_are_not_hidden (__main__.InfoAndPreservation.test_existing_watched_states_are_not_hidden) ... ok
+test_native_play_once_and_all_existing_actions_and_ids_preserved (__main__.InfoAndPreservation.test_native_play_once_and_all_existing_actions_and_ids_preserved) ... FAIL
+test_video_cannot_preempt_buttons_or_cast_after_candidate (__main__.InfoAndPreservation.test_video_cannot_preempt_buttons_or_cast_after_candidate) ... FAIL
+
+======================================================================
+FAIL: test_native_play_once_and_all_existing_actions_and_ids_preserved (__main__.InfoAndPreservation.test_native_play_once_and_all_existing_actions_and_ids_preserved)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/dev/shm/infinity-nine-corrections/repairs/infinity-fold-regressions-20261106/test_info_and_preservation.py", line 112, in test_native_play_once_and_all_existing_actions_and_ids_preserved
+    self.assertIsNotNone(old,cid)
+AssertionError: unexpectedly None : 60
+
+======================================================================
+FAIL: test_video_cannot_preempt_buttons_or_cast_after_candidate (__main__.InfoAndPreservation.test_video_cannot_preempt_buttons_or_cast_after_candidate)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/dev/shm/infinity-nine-corrections/repairs/infinity-fold-regressions-20261106/test_info_and_preservation.py", line 101, in test_video_cannot_preempt_buttons_or_cast_after_candidate
+    self.assertEqual(ET.tostring(video),ET.tostring(self.before.find('.//control[@type="videowindow"]')))
+AssertionError: b'<co[146 chars]      <visible>Player.HasVideo</visible>\n    </control>\n    ' != b'<co[146 chars]      <visible>Player.HasVideo</visible>\n    </control>\n  '
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.113s
+
+FAILED (failures=2)
