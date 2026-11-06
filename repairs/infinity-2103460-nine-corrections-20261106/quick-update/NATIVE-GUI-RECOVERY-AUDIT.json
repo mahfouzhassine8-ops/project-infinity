@@ -1,0 +1,49 @@
+{
+  "status": "PASS_HOST_RECOVERY_WITH_SOURCE_TRACED_NATIVE_GUI_ANDROID_PENDING",
+  "audit_completed": true,
+  "tests": [
+    {
+      "case": "original_complete_generation",
+      "result": "PASS",
+      "version": "VERIFIED_VERSION=0.3.5.61"
+    },
+    {
+      "case": "complete_same_version_original_key_quick_update_cold_start",
+      "result": "PASS",
+      "version": "VERIFIED_VERSION=0.3.5.61"
+    },
+    {
+      "case": "interrupted_zip_new_manifest_old_signature_cold_start",
+      "result": "BLOCKED_AS_DESIGNED",
+      "error": "ErrnoException: open: missing module file",
+      "source_and_userdata_unchanged": true
+    },
+    {
+      "case": "native_GUI_transport_fixture_recovers_manifest_pair_interruption",
+      "result": "PASS_HOST_ZIP_RESTORE_AND_REAL_JAVA_VERIFICATION",
+      "native_GUI_executed": false,
+      "userdata_sentinel_preserved": true,
+      "version": "VERIFIED_VERSION=0.3.5.61"
+    },
+    {
+      "case": "interrupted_zip_new_code_old_manifest_cold_start",
+      "result": "BLOCKED_AS_DESIGNED",
+      "error": "IOException: Unrecognized installed source; preserved without modification",
+      "source_and_userdata_unchanged": true
+    },
+    {
+      "case": "native_GUI_transport_fixture_recovers_code_only_interruption",
+      "result": "PASS_HOST_ZIP_RESTORE_AND_REAL_JAVA_VERIFICATION",
+      "native_GUI_executed": false,
+      "userdata_sentinel_preserved": true,
+      "version": "VERIFIED_VERSION=0.3.5.61"
+    }
+  ],
+  "keys_accessed": false,
+  "baseline_version": 2103460,
+  "commandcenter_version": "0.3.5.61",
+  "physical_Android": "NOT_RUN",
+  "user_data_accessed": false,
+  "production_installer_changed": false,
+  "interpretation": "APK auto-repair correctly rejects partial standalone generations. Main caller records this refusal and continues native entry; native AddonBrowser recovery route is independent of Command Center. After recovery ZIP filesystem transport, the real unchanged Java installer accepts the restored original-signed generation and preserves the user-data sentinel. Android GUI/file-copy/service execution remain pending."
+}

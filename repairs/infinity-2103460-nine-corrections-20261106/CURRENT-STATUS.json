@@ -1,17 +1,17 @@
 {
   "all_nine_complete": false,
-  "installation_recommendation": "HOLD_DO_NOT_INSTALL_STANDALONE_CC_ZIPS",
+  "installation_recommendation": "CONTROLLED_NATIVE_ADDON_GUI_TESTING_ONLY_ANDROID_PENDING",
   "signed_preparation_artifact": {
     "id": 13485763569,
     "run": 42183471037,
     "source": "bbe5197616ecbe1736ed706564a6d22a5f103be2"
   },
   "payload_and_original_signature_verification": "PASS",
-  "interrupted_standalone_update_recovery": "BLOCKED_CONFIRMED_ORIGINAL_JAVA_INSTALLER",
+  "interrupted_standalone_update_recovery": "HOST_PASS_WITH_SOURCE_TRACED_NATIVE_ADDON_GUI_ANDROID_PENDING",
   "protected_base": 2103460,
   "Cobra_changed": false,
   "Preview_changed": false,
-  "native_changed": false,
+  "native_changed": "four-file isolated source candidate only; signed APK/native runtime unchanged",
   "user_data_accessed": false,
   "Android_runtime": "NOT_RUN",
   "groups": {
@@ -19,11 +19,11 @@
     "2_Infinity_Movies": "existing Home menu route implemented; host dispatch checked",
     "3_Infinity_TV": "existing Home menu route implemented; host dispatch checked",
     "4_white_graphic_and_guide": "identified exact curved-icon selector integrated across shared icon variable and21 direct Home/widget textures; guide removed; display pending",
-    "5_Downloads": "native Files route/no automatic probe implemented; user-added folder isolation UNSOLVED",
+    "5_Downloads": "native candidate prepared:43 actual-C++ host-boundary checks PASS; four-file full ARM64 compile pending; no Android isolation claim",
     "6_Search_crash": "unresolved; historical exit summaries have no faulting stack",
     "7_state_changed": "cache-only UI/progress race fixed with one owned request;6 selected+8 guard cases PASS; required settings/history acceptance2 FAIL",
     "8_universal_presentation": "shared artwork, spacing, cast proportions and removed-guide space integrated; all-view/Fold acceptance pending",
     "9_Info_controls": "skin Cast-ID conflict, Play/Back preservation, Trailer/More fallbacks implemented; actual playback/metadata runtime pending"
   },
-  "safe_packaging_dependency": "Original same-version standalone update accepts full payload but refuses interrupted source/signature generations at cold start; do not bypass protection. A supported newer signed module generation/atomic APK update route needs to be permitted or equivalently proven before installation."
+  "safe_packaging_dependency": "Original APK self-repair refuses incomplete standalone generations as designed. Actual Main caller continues native entry; direct Add-ons -> native Install from zip is independent of Command Center. Actual Java verification passes after recovery ZIP filesystem transport in host fixtures. Physical GUI/recovery remains NOT RUN."
 }
