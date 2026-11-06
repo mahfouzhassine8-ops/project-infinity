@@ -20,7 +20,7 @@ def preflight(apk,out):
  assert sha(apk)==BASE,'EXACT_SIGNED2103460_REQUIRED'
  branch=run('git','branch','--show-current').strip();assert branch=='work/infinity-2103460-nine-corrections-20261106'
  changed=run('git','diff','--name-only','ed5f797618b570e837d83668ba355a4396a8d4a8','HEAD').splitlines()
- assert all(n.startswith('repairs/infinity-2103460-nine-corrections-20261106/') or n=='.github/workflows/infinity-combined-release.yml' for n in changed),'UNRELATED_SOURCE_CHANGE'
+ assert all(n.startswith('repairs/infinity-2103460-nine-corrections-20261106/') or n in ('.github/workflows/infinity-combined-release.yml','repairs/dual-experience-isolation-2103420/signer-policy.json') for n in changed),'UNRELATED_SOURCE_CHANGE'
  assert run('git','status','--porcelain','--untracked-files=no').strip()=='','COMMITTED_REVIEWED_SOURCE_REQUIRED'
  assert not out.exists(),'fresh output required'
  out.mkdir(parents=True);addons=out/'addons';addons.mkdir();inventory=json.loads((HERE.parent/'SOURCE-INVENTORY.json').read_text());changes={};protected={}

@@ -65,6 +65,13 @@
       "path": ".github/workflows/infinity-six-navigation-arm64.yml",
       "source": "3f3f47bdf9b0f14f9ac3b42fcff6f8710ceeda05",
       "workflow_sha256": "e6d35df1ceb2ed5dc3facfd1543a39b51f0dc8f94e2b679b38bd91a9d2e56f91"
+    },
+    {
+      "id": 409014924,
+      "path": ".github/workflows/infinity-2103460-scoped-arm64.yml",
+      "source": "9765fd0706dac90eadee785293ca927ebc3ed8d2",
+      "workflow_sha256": "aae334b97c90d152f9fda6ceccceff4da2d7f3a86ea44878c2e47c78ce4948ff",
+      "original_key_access": false
     }
   ],
   "audit_workflows": 619,
@@ -2785,7 +2792,8 @@
     406545245,
     407785045,
     407812103,
-    408828503
+    408828503,
+    409014924
   ],
   "schema": 1,
   "scope": "Retire historical workflows with access to the original permanent signing secret; preserve their files, runs, artifacts and every locked ref",
