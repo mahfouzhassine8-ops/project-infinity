@@ -13,7 +13,7 @@ assert sha(base)=='226911966c1d27d1246cd0ecfcd864c722df48f9be07167bd4b15ad1e7356
 assert (delivery/'ORIGINAL-INFINITY-PUBLIC-KEY.pem').read_bytes()==(FIRST/'ORIGINAL-INFINITY-PUBLIC-KEY.pem').read_bytes()
 key=serialization.load_pem_public_key((delivery/'ORIGINAL-INFINITY-PUBLIC-KEY.pem').read_bytes());key.verify((delivery/'INFINITY-QUICK-UPDATE.v1.sig').read_bytes(),(delivery/'INFINITY-QUICK-UPDATE.v1').read_bytes(),padding.PKCS1v15(),hashes.SHA256())
 proof=json.loads((delivery/'BUILD-RECEIPT.json').read_text());assert proof['commandcenter_version']=='0.3.5.61';assert not proof['native_changed']
-lines=(delivery/'INFINITY-QUICK-UPDATE.v1').read_text().splitlines();assert lines[:4]==['INFINITY-QUICK-UPDATE/1','base\t2103460','commandcenter\t0.3.5.61','skin\t1.0.5.260']
+lines=(delivery/'INFINITY-QUICK-UPDATE.v1').read_text().splitlines();assert lines[:4]==['INFINITY-QUICK-UPDATE/1','base\t2103460','commandcenter\t0.3.5.61','skin\t1.0.5.262']
 bound={x.split('\t')[2]:x.split('\t')[1] for x in lines[4:]};assert bound==proof['artifacts']
 CC='script.infinity.commandcenter';SKIN='skin.infinity.diggz';ids=(CC,'script.infinity.rails','script.infinity.uirepair','script.infinity.watchedbridge')
 with ZipFile(base) as z:

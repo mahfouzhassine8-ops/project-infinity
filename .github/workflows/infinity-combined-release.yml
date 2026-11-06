@@ -7,7 +7,7 @@ on:
         type: choice
         required: true
         default: final-combined
-        options: [final-combined, prepare-preview451, prepare-kodi452, prepare-kodi453, prepare-ui454-455, prepare-controlled456-457, review-controlled456-457, prepare-browser458-459, review-browser458-459, prepare-six460-461, review-six460-461, package-nine-quick-updates, verify-nine-update-recovery]
+        options: [final-combined, prepare-preview451, prepare-kodi452, prepare-kodi453, prepare-ui454-455, prepare-controlled456-457, review-controlled456-457, prepare-browser458-459, review-browser458-459, prepare-six460-461, review-six460-461, package-nine-quick-updates, verify-nine-update-recovery, prepare-nine-native462-463]
       prepared_run:
         description: Completed official controlled preparation run for read-only authority review
         type: string
@@ -656,7 +656,7 @@ jobs:
         with: {name: 'Infinity460461-Authority-Proposals-${{ github.run_id }}', path: authority-proposals/, if-no-files-found: error, retention-days: 90}
   combined:
     name: Registered combined original-key testing APK; exact owner preservation
-    if: github.event_name == 'workflow_dispatch' && inputs.operation == 'final-combined' && (github.ref == 'refs/heads/work/infinity-preview-2103450-fullscreen-display-20261102' || github.ref == 'refs/heads/work/infinity-kodi-2103451-checkpoint-anr-20261103' || github.ref == 'refs/heads/work/infinity-kodi-2103453-controlled-test-20261104' || github.ref == 'refs/heads/work/infinity-kodi-ui-2103454-2103455-packaging-20261104' || github.ref == 'refs/heads/work/infinity-master-testing-from-2103451-20261105' || github.ref == 'refs/heads/work/infinity-browser-visual-correction-from-2103456-20261105' || github.ref == 'refs/heads/work/infinity-2103458-six-corrections-20261105')
+    if: github.event_name == 'workflow_dispatch' && inputs.operation == 'final-combined' && (github.ref == 'refs/heads/work/infinity-preview-2103450-fullscreen-display-20261102' || github.ref == 'refs/heads/work/infinity-kodi-2103451-checkpoint-anr-20261103' || github.ref == 'refs/heads/work/infinity-kodi-2103453-controlled-test-20261104' || github.ref == 'refs/heads/work/infinity-kodi-ui-2103454-2103455-packaging-20261104' || github.ref == 'refs/heads/work/infinity-master-testing-from-2103451-20261105' || github.ref == 'refs/heads/work/infinity-browser-visual-correction-from-2103456-20261105' || github.ref == 'refs/heads/work/infinity-2103458-six-corrections-20261105' || github.ref == 'refs/heads/work/infinity-2103460-nine-corrections-20261106')
     runs-on: ubuntu-22.04
     timeout-minutes: 40
     env:
@@ -675,7 +675,9 @@ jobs:
         run: |
           set -euo pipefail
           python3 -m pip install PyYAML==6.0.3
-          if [ "$GITHUB_REF" = 'refs/heads/work/infinity-2103458-six-corrections-20261105' ]; then
+          if [ "$GITHUB_REF" = 'refs/heads/work/infinity-2103460-nine-corrections-20261106' ]; then
+            python3 -m py_compile repairs/infinity-2103460-nine-corrections-20261106/native-packaging/release_native.py
+          elif [ "$GITHUB_REF" = 'refs/heads/work/infinity-2103458-six-corrections-20261105' ]; then
             python3 -m py_compile repairs/infinity-2103458-six-corrections-20261105/integration-048/packaging/release_controlled.py
           elif [ "$GITHUB_REF" = 'refs/heads/work/infinity-browser-visual-correction-from-2103456-20261105' ]; then
             python3 -m py_compile repairs/infinity-browser-visual-20261105/packaging/release_controlled.py
@@ -695,6 +697,7 @@ jobs:
           from pathlib import Path
           from release_gate import remote_authority,require
           a=remote_authority(Path('.'),os.environ['GITHUB_SHA'])
+          pnative=os.environ['GITHUB_REF']=='refs/heads/work/infinity-2103460-nine-corrections-20261106'
           psix=os.environ['GITHUB_REF']=='refs/heads/work/infinity-2103458-six-corrections-20261105'
           pvisual=os.environ['GITHUB_REF']=='refs/heads/work/infinity-browser-visual-correction-from-2103456-20261105'
           pctrl=psix or pvisual or os.environ['GITHUB_REF']=='refs/heads/work/infinity-master-testing-from-2103451-20261105'
@@ -727,6 +730,15 @@ jobs:
               import release_controlled as controlled
               require(a['owner_update_evidence']['native_sha256']==(controlled.engine_record()['native_sha256'] if version in (2103456,2103458) else controlled.FROZEN_NATIVE),'EXACT_CONTROLLED_NATIVE')
               require(a['owner_update_evidence']['Android']==controlled.RUNTIME,'TRUTHFUL_ANDROID_NOT_RUN')
+          if pnative:
+              require(a['candidate_versionCode'] in (2103462,2103463),'EXACT_DOWNLOADS_NATIVE_RECOVERY_VERSIONS')
+              version=a['candidate_versionCode'];generation=48 if version==2103462 else 49;baseline=2103460
+              owner='INFINITY_DOWNLOADS_NATIVE_TEST' if version==2103462 else 'INFINITY_SIGNED460_FORWARD_RECOVERY'
+              import sys
+              sys.path.insert(0,'repairs/infinity-2103460-nine-corrections-20261106/native-packaging')
+              import release_native as controlled
+              require(a['owner_update_evidence']['native_sha256']==(controlled.engine_record()['native_sha256'] if version==2103462 else controlled.BASE_NATIVE),'EXACT_SCOPED_DOWNLOADS_ENGINE')
+              require(a['owner_update_evidence']['Android']==controlled.RUNTIME,'TRUTHFUL_NATIVE_ANDROID_PENDING')
           require(a['candidate_versionCode']==version and a['generation']==generation,'EXACT_SELECTED_AUTHORITY')
           require(a['target_owners']==['INFINITY','CHOOSER_SHELL'] and a['update_kind']=='owner_update','EXACT_OWNER_UPDATE')
           require(a['owner_update_evidence']['owner']==owner,'EXACT_APPROVED_SCOPE')
@@ -736,10 +748,13 @@ jobs:
           with open(os.environ['GITHUB_OUTPUT'],'a') as f:
               f.write('producer_run='+str(a['owner_update_evidence']['producer_run'])+'\n')
               f.write('version='+str(version)+'\ngeneration='+str(generation)+'\nbaseline='+str(baseline)+'\n')
-              f.write('baseline_run='+str(42108276626 if psix else 41568721264 if pctrl else (41783963413 if pui else (41742368066 if p453 else (41568721264 if p0 else 41541654995))))+'\n')
-              f.write('prepared_prefix='+('Infinity'+str(version) if pui or pctrl else ('Infinity453' if p453 else ('Infinity452' if p0 else 'Infinity451')))+'\n')
+              f.write('baseline_run='+str(42146650003 if pnative else 42108276626 if psix else 41568721264 if pctrl else (41783963413 if pui else (41742368066 if p453 else (41568721264 if p0 else 41541654995))))+'\n')
+              f.write('prepared_prefix='+('Infinity'+str(version) if pnative or pui or pctrl else ('Infinity453' if p453 else ('Infinity452' if p0 else 'Infinity451')))+'\n')
           PYCODE
           python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out SIGNER-ROUTES.json
+      - name: Recheck exact native Downloads or recovery version before issuance
+        if: github.ref == 'refs/heads/work/infinity-2103460-nine-corrections-20261106'
+        run: python3 repairs/infinity-2103460-nine-corrections-20261106/native-packaging/release_native.py versions --version "${{ steps.selected.outputs.version }}" --out VERSION-AVAILABILITY.json
       - name: Recheck exact integrated or recovery version before issuance
         if: github.ref == 'refs/heads/work/infinity-2103458-six-corrections-20261105'
         run: python3 repairs/infinity-2103458-six-corrections-20261105/integration-048/packaging/release_controlled.py versions --version "${{ steps.selected.outputs.version }}" --out VERSION-AVAILABILITY.json
@@ -779,6 +794,7 @@ jobs:
           python3 - "${{ steps.selected.outputs.producer_run }}" <<'PYCODE'
           import os,sys
           from pathlib import Path
+          pnative=os.environ['GITHUB_REF']=='refs/heads/work/infinity-2103460-nine-corrections-20261106'
           psix=os.environ['GITHUB_REF']=='refs/heads/work/infinity-2103458-six-corrections-20261105'
           pvisual=os.environ['GITHUB_REF']=='refs/heads/work/infinity-browser-visual-correction-from-2103456-20261105'
           pctrl=psix or pvisual or os.environ['GITHUB_REF']=='refs/heads/work/infinity-master-testing-from-2103451-20261105'
@@ -786,7 +802,10 @@ jobs:
           pui=os.environ['GITHUB_REF']=='refs/heads/work/infinity-kodi-ui-2103454-2103455-packaging-20261104'
           p0=os.environ['GITHUB_REF']=='refs/heads/work/infinity-kodi-2103451-checkpoint-anr-20261103'
           sys.path.insert(0,'repairs/infinity-2103458-six-corrections-20261105/integration-048/packaging' if psix else 'repairs/infinity-browser-visual-20261105/packaging' if pvisual else ('repairs/infinity-master-testing-20261105' if pctrl else ('repairs/infinity-kodi-ui-2103454-2103455-packaging' if pui else ('repairs/infinity-kodi-2103453-controlled-test' if p453 else ('repairs/infinity-kodi-2103451-checkpoint-anr' if p0 else 'repairs/infinity-preview-2103450-fullscreen-display')))))
-          if pctrl: import release_controlled as r
+          if pnative:
+              sys.path.insert(0,'repairs/infinity-2103460-nine-corrections-20261106/native-packaging')
+              import release_native as r
+          elif pctrl: import release_controlled as r
           elif pui: import release_ui as r
           elif p453: import release453 as r
           elif p0: import release452 as r
@@ -822,7 +841,10 @@ jobs:
       - name: Signed predecessor-to-candidate exact member and original certificate comparison
         run: |
           set -euo pipefail
-          if [ "$GITHUB_REF" = 'refs/heads/work/infinity-2103458-six-corrections-20261105' ]; then
+          if [ "$GITHUB_REF" = 'refs/heads/work/infinity-2103460-nine-corrections-20261106' ]; then
+            python3 repairs/infinity-2103460-nine-corrections-20261106/native-packaging/release_native.py compare --baseline protected-baseline/Infinity-2103460-Combined-Original-Signer.apk --candidate signed-combined/Infinity-${{ steps.selected.outputs.version }}-Combined-Original-Signer.apk --plan prepared-owner/PREPARATION.json --out signed-combined/preservation --sdk "$ANDROID_HOME/build-tools/35.0.0"
+            cp prepared-owner/RECOVERY-VERIFICATION.json prepared-owner/NATIVE-COMPATIBILITY.json VERSION-AVAILABILITY.json signed-combined/
+          elif [ "$GITHUB_REF" = 'refs/heads/work/infinity-2103458-six-corrections-20261105' ]; then
             python3 repairs/infinity-2103458-six-corrections-20261105/integration-048/packaging/release_controlled.py compare \
               --baseline protected-baseline/Infinity-2103458-Combined-Original-Signer.apk \
               --candidate signed-combined/Infinity-${{ steps.selected.outputs.version }}-Combined-Original-Signer.apk \
@@ -968,3 +990,51 @@ jobs:
           name: Infinity2103460-Quick-Update-Recovery-Audit-${{ github.run_id }}
           path: recovery-audit/
           if-no-files-found: error
+
+  prepare-nine-native462-463:
+    name: Exact2103460 Downloads native testing and forward recovery - keyless preparation
+    if: github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/work/infinity-2103460-nine-corrections-20261106' && inputs.operation == 'prepare-nine-native462-463'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '21'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with: {packages: 'build-tools;35.0.0', log-accepted-android-sdk-licenses: false}
+      - name: Verify sole signer and unused testing/recovery versions - no key
+        run: |
+          python3 -m pip install PyYAML==6.0.3
+          python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out SIGNER-ROUTES.json
+          python3 repairs/infinity-2103460-nine-corrections-20261106/native-packaging/release_native.py versions --version 2103462 --out VERSION462.json
+          python3 repairs/infinity-2103460-nine-corrections-20261106/native-packaging/release_native.py versions --version 2103463 --out VERSION463.json
+      - uses: actions/download-artifact@v4
+        with: {run-id: 42146650003, name: Infinity-Combined-Original-Signer-42146650003, github-token: '${{ github.token }}', path: signed2103460}
+      - uses: actions/download-artifact@v4
+        with: {run-id: 42146650003, name: Infinity-Combined-Owner-Components-42146650003, github-token: '${{ github.token }}', path: signed2103460-components}
+      - name: Read verified scoped engine input identity
+        id: engine
+        run: |
+          python3 - <<'PYCODE'
+          import json,os
+          from pathlib import Path
+          row=json.loads(Path('repairs/infinity-2103460-nine-corrections-20261106/native-packaging/ENGINE-INPUT.json').read_text())
+          with open(os.environ['GITHUB_OUTPUT'],'a') as f:f.write('id='+str(row['artifact_identity'][0])+'\nrun='+str(row['artifact_identity'][1])+'\n')
+          PYCODE
+      - uses: actions/download-artifact@v4
+        with: {artifact-ids: '${{ steps.engine.outputs.id }}', run-id: '${{ steps.engine.outputs.run }}', merge-multiple: true, github-token: '${{ github.token }}', path: native-downloads}
+      - name: Exact460 source/ABI/component/member comparison and forward recovery proof
+        run: python3 repairs/infinity-2103460-nine-corrections-20261106/native-packaging/release_native.py prepare --bundles signed2103460-components --baseline signed2103460/Infinity-2103460-Combined-Original-Signer.apk --native native-downloads --sdk "$ANDROID_HOME/build-tools/35.0.0" --out prepared-downloads
+      - uses: actions/upload-artifact@v4
+        with: {name: 'Infinity2103462-Prepared-${{ github.run_id }}', path: prepared-downloads/2103462/publish/, if-no-files-found: error, retention-days: 90, compression-level: 0}
+      - uses: actions/upload-artifact@v4
+        with: {name: 'Infinity2103463-Prepared-${{ github.run_id }}', path: prepared-downloads/2103463/publish/, if-no-files-found: error, retention-days: 90, compression-level: 0}
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with: {name: 'Infinity462463-Preparation-Evidence-${{ github.run_id }}', path: 'prepared-downloads/*.json', if-no-files-found: warn, retention-days: 90}

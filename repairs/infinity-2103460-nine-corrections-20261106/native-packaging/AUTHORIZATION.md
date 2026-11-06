@@ -1,0 +1,7 @@
+# Native-only Downloads testing APK and higher-version recovery
+
+User nine-correction authorization: signed APK only when native is genuinely necessary; original-key identity, exact2103460 foundation and all unrelated code frozen. Both source-dialog APIs and scoped source filtering are needed for positive user-added-folder provenance; no provider/source deletion or blacklist is permitted.
+
+Selected packaging checks: exact signed460 and owner bundles; exact4 native-source delta, full ARM64 link; old exports/dependencies retained;3 changed candidate APK members (libkodi, version-only manifest, authenticated experience-update metadata),2 recovery members; all DEX/addons/Cobra/Preview/other native payloads byte-identical; original certificate/package, higher unused codes462/463, actual existing owner-authority lineage and sole signer policy. No application execution/shutdown test/install/acceptance. Search defects remain disclosed; candidate is not an all-nine completion claim.
+
+Only necessary release routing additions are permitted: exact isolated branch in existing sole workflow and authority-branch binding, retaining every original gate, owner vector, immutable lock, key and verification implementation. No alternate signer. Matching authenticated addon ZIPs provide script/skin changes; native-only APK does not silently replace same-version installed Command Center. Preserve CC0.3.5.61 and existing module signature protocol.

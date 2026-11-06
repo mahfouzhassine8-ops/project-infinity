@@ -8,7 +8,7 @@ FIRST=ROOT/'repairs/infinity-final-closure-2103407';sys.path.insert(0,str(FIRST)
 import module_bundle
 BASE='226911966c1d27d1246cd0ecfcd864c722df48f9be07167bd4b15ad1e73560af'
 CERT='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
-CC='script.infinity.commandcenter';SKIN='skin.infinity.diggz';VERSION='0.3.5.61';SKIN_VERSION='1.0.5.260'
+CC='script.infinity.commandcenter';SKIN='skin.infinity.diggz';VERSION='0.3.5.61';SKIN_VERSION='1.0.5.262'
 def sha(p):
  with Path(p).open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
 def run(*args,env=None):
@@ -20,7 +20,7 @@ def preflight(apk,out):
  assert sha(apk)==BASE,'EXACT_SIGNED2103460_REQUIRED'
  branch=run('git','branch','--show-current').strip();assert branch=='work/infinity-2103460-nine-corrections-20261106'
  changed=run('git','diff','--name-only','ed5f797618b570e837d83668ba355a4396a8d4a8','HEAD').splitlines()
- assert all(n.startswith('repairs/infinity-2103460-nine-corrections-20261106/') or n in ('.github/workflows/infinity-combined-release.yml','repairs/dual-experience-isolation-2103420/signer-policy.json') or n in json.loads((HERE.parent/'SOURCE-INVENTORY.json').read_text())['changed_source_files'] for n in changed),'UNRELATED_SOURCE_CHANGE'
+ assert all(n.startswith('repairs/infinity-2103460-nine-corrections-20261106/') or n in ('.github/workflows/infinity-combined-release.yml','.github/workflows/infinity-six-navigation-arm64.yml','repairs/dual-experience-isolation-2103420/signer-policy.json','repairs/dual-experience-isolation-2103420/release_gate.py') or n in json.loads((HERE.parent/'SOURCE-INVENTORY.json').read_text())['changed_source_files'] for n in changed),'UNRELATED_SOURCE_CHANGE'
  assert run('git','status','--porcelain','--untracked-files=no').strip()=='','COMMITTED_REVIEWED_SOURCE_REQUIRED'
  assert not out.exists(),'fresh output required'
  out.mkdir(parents=True);addons=out/'addons';addons.mkdir();inventory=json.loads((HERE.parent/'SOURCE-INVENTORY.json').read_text());changes={};protected={}
@@ -40,9 +40,9 @@ def preflight(apk,out):
  assert ET.parse(addons/CC/'addon.xml').getroot().get('version')==VERSION
  # Only skin release/integrity metadata changes; Command Center identity remains exact.
  xml=addons/SKIN/'addon.xml';raw=xml.read_bytes();assert b'version="1.0.5.258"' in raw
- xml.write_bytes(raw.replace(b'version="1.0.5.258"',b'version="1.0.5.260"',1));changes[SKIN+'/addon.xml']=sha(xml)
+ xml.write_bytes(raw.replace(b'version="1.0.5.258"',b'version="1.0.5.262"',1));changes[SKIN+'/addon.xml']=sha(xml)
  for leaf in ('infinity-skin.json','Infinity-Protected-Manifest.json'):
-  f=addons/SKIN/leaf;d=json.loads(f.read_text());d['candidate']=260;d['candidate_locked']=False
+  f=addons/SKIN/leaf;d=json.loads(f.read_text());d['candidate']=262;d['candidate_locked']=False
   if 'physical_device_verified' in d:d['physical_device_verified']=False
   for k in ('version','candidate_version','skin_version'):
    if k in d:d[k]=SKIN_VERSION
@@ -52,11 +52,11 @@ def preflight(apk,out):
    assert len(d['protected_files'])==948
   save(f,d);changes[SKIN+'/'+leaf]=sha(f)
  # Forward skin recovery: original functional payload, higher skin version.
- recovery_xml=recovery/SKIN/'addon.xml';recovery_xml.write_bytes(recovery_xml.read_bytes().replace(b'version="1.0.5.258"',b'version="1.0.5.261"',1))
+ recovery_xml=recovery/SKIN/'addon.xml';recovery_xml.write_bytes(recovery_xml.read_bytes().replace(b'version="1.0.5.258"',b'version="1.0.5.263"',1))
  for leaf in ('infinity-skin.json','Infinity-Protected-Manifest.json'):
-  f=recovery/SKIN/leaf;d=json.loads(f.read_text());d['candidate']=261;d['candidate_locked']=False
+  f=recovery/SKIN/leaf;d=json.loads(f.read_text());d['candidate']=263;d['candidate_locked']=False
   for k in ('version','candidate_version','skin_version'):
-   if k in d:d[k]='1.0.5.261'
+   if k in d:d[k]='1.0.5.263'
   if 'physical_device_verified' in d:d['physical_device_verified']=False
   if 'protected_files' in d:
    d['protected_files']['addon.xml']=sha(recovery_xml)
@@ -77,7 +77,7 @@ def preflight(apk,out):
   if rel not in changes and rel!=CC+'/'+module_bundle.MANIFEST+'.sig':assert sha(addons/rel)==want,rel
  for path in (addons/SKIN).rglob('*.xml'):ET.parse(path)
  for leaf in ('default.py','library_navigation.py'):compile((addons/CC/leaf).read_bytes(),leaf,'exec')
- save(out/'PREFLIGHT.json',dict(status='PASS_EXACT2103460_ADDON_SOURCE_AND_METADATA',baseline_sha256=BASE,commandcenter_version=VERSION,skin_version=SKIN_VERSION,source=run('git','rev-parse','HEAD').strip(),changes=changes,protected=protected,module_file_count=78,old_module_manifest_sha256=hashlib.sha256(old_marker).hexdigest(),Android='NOT_RUN',all_nine_complete=False))
+ save(out/'PREFLIGHT.json',dict(status='PASS_EXACT2103460_ADDON_SOURCE_AND_METADATA',baseline_sha256=BASE,commandcenter_version=VERSION,skin_version=SKIN_VERSION,source=run('git','rev-parse','HEAD').strip(),changes=changes,protected=protected,module_file_count=78,old_module_manifest_sha256=hashlib.sha256(old_marker).hexdigest(),Android='NOT_RUN',all_nine_complete=False,Downloads_native_required_sha256=json.loads((HERE.parent/'native-packaging/ENGINE-INPUT.json').read_text())['native_sha256']))
  print('PASS exact signed2103460, 14 authorized source changes, original CC identity and complete module source set')
 def addons_for_build(addons,out):
  root=out/'module-root'
@@ -111,7 +111,7 @@ def sign(out):
   text+=run(verifier,module_root,FIRST/'ORIGINAL-INFINITY-PUBLIC-KEY.pem');(publish/'MODULE-AUTHENTICATION.txt').write_text(text)
   # Normal Kodi add-on ZIP shape: exactly one addon root, complete existing resources.
   ziprows=[]
-  for aid,version,source_root,suffix in ((CC,VERSION,addons,'corrective'),(SKIN,SKIN_VERSION,addons,'corrective'),(CC,VERSION,out/'recovery-addons','recovery'),(SKIN,'1.0.5.261',out/'recovery-addons','recovery')):
+  for aid,version,source_root,suffix in ((CC,VERSION,addons,'corrective'),(SKIN,SKIN_VERSION,addons,'corrective'),(CC,VERSION,out/'recovery-addons','recovery'),(SKIN,'1.0.5.263',out/'recovery-addons','recovery')):
    name=aid+'-'+version+'-2103460-'+suffix+'.zip';dest=publish/name
    with ZipFile(dest,'w',compression=ZIP_DEFLATED,compresslevel=9) as z:
     for f in sorted((source_root/aid).rglob('*')):
