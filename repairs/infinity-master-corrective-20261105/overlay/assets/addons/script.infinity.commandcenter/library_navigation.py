@@ -141,28 +141,9 @@ def run(action, xbmc, gui, environ=None):
     if action == 'browse':
         return browse(xbmc, gui)
     if action == 'downloads':
-        if not xbmc.getCondVisibility('System.Platform.Android'):
-            gui.Dialog().ok('Downloads', 'Choose the Downloads folder accessible to Kodi.')
-            return browse(xbmc, gui)
-        env = os.environ if environ is None else environ
-        # /storage/self/primary follows the current Android user. Neither path
-        # grants access or bypasses Android's storage permissions.
-        storage = env.get('EXTERNAL_STORAGE') or '/storage/self/primary'
-        if not storage.startswith('/') or '\x00' in storage:
-            storage = '/storage/self/primary'
-        path = storage.rstrip('/') + '/Download/'
-        result = rpc(xbmc, 'Files.GetDirectory', {
-            'directory': path, 'media': 'video', 'limits': {'start': 0, 'end': 1}})
-        # Empty is a completed, accessible directory. Errors are not empty lists.
-        if isinstance(result, dict) and ('files' in result or 'limits' in result):
-            return activate(xbmc, gui, path)
-        if gui.Dialog().yesno('Downloads access',
-                'Kodi cannot read this Downloads folder. Check Infinity’s existing '
-                'video/file permission in Android App settings, or choose an already '
-                'accessible folder. No additional storage permission is requested.',
-                nolabel='Cancel', yeslabel='Browse Files'):
-            return browse(xbmc, gui)
-        return False
+        # User selects sources through Kodi's existing Add videos workflow.
+        # The entry-specific source-root presentation is a separate native boundary.
+        return browse(xbmc, gui)
     return False
 
 
