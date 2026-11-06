@@ -16,10 +16,14 @@ def rpc(xbmc, method, params):
         return None
 
 
-def activate(xbmc, gui, path, direct_library=False):
+def activate(xbmc, gui, path, direct_library=False, downloads_only=False):
     # JSON-RPC passes a vector of window parameters; folder names never become
     # executable builtin text. Kodi retains its own directory/player history.
     parameters = [path, 'return']
+    if downloads_only:
+        if path != 'files' or direct_library:
+            return False
+        parameters.append('infinity-downloads-only')
     if direct_library:
         if path not in ('videodb://movies/titles/', 'videodb://tvshows/titles/'):
             return False
@@ -142,8 +146,8 @@ def run(action, xbmc, gui, environ=None):
     if action == 'browse':
         return browse(xbmc, gui)
     if action == 'downloads':
-        # User opens/adds a video folder through Kodi; do not probe Android storage.
-        return browse(xbmc, gui)
+        # Native scoped source view; no Android storage probe or source deletion.
+        return activate(xbmc, gui, 'files', downloads_only=True)
 
     return False
 

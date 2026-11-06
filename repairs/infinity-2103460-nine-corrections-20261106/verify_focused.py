@@ -33,7 +33,7 @@ class Selected(unittest.TestCase):
  def test_downloads_both_helpers_never_probe_storage(self):
   for path in (CC/'library_navigation.py',SKIN/'resources/lib/infinity_library_navigation.py'):
    spec=importlib.util.spec_from_file_location('download_helper',path);m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m);calls=[];xb=types.SimpleNamespace(executeJSONRPC=lambda raw:(calls.append(json.loads(raw)) or '{"result":"OK"}'));gui=types.SimpleNamespace(Dialog=lambda:None)
-   self.assertTrue(m.run('downloads',xb,gui));self.assertEqual(len(calls),1);self.assertEqual(calls[0]['method'],'GUI.ActivateWindow');self.assertEqual(calls[0]['params'],{'window':'videos','parameters':['files','return']})
+   self.assertTrue(m.run('downloads',xb,gui));self.assertEqual(len(calls),1);self.assertEqual(calls[0]['method'],'GUI.ActivateWindow');self.assertEqual(calls[0]['params'],{'window':'videos','parameters':['files','return','infinity-downloads-only']})
  def test_native_touch_unchanged(self):
   changed=subprocess.check_output(['git','diff','--name-only'],cwd=ROOT,text=True);self.assertNotIn('InputManager.cpp',changed);self.assertNotIn('GUIBaseContainer.cpp',changed)
  def test_guide_has_no_controls_or_decorations(self):
