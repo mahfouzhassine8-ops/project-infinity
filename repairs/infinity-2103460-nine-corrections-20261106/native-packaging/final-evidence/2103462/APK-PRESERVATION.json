@@ -1,0 +1,23 @@
+{
+  "Android": "NOT_RUN_NO_CONNECTED_COMPATIBLE_ANDROID_TARGET",
+  "Cobra_unchanged": true,
+  "Preview_unchanged": true,
+  "all_DEX_unchanged": true,
+  "all_addons_and_skin_unchanged": true,
+  "all_nine_complete": false,
+  "baseline_sha256": "226911966c1d27d1246cd0ecfcd864c722df48f9be07167bd4b15ad1e73560af",
+  "candidate_sha256": "503a70e51e6c6f40a058e438092282fdc61bcce99e802b2f177e3353d30284c1",
+  "changed_existing": [
+    "AndroidManifest.xml",
+    "assets/experience-component-updates.properties",
+    "lib/arm64-v8a/libkodi.so"
+  ],
+  "expected_member_hashes": {
+    "assets/experience-component-updates.properties": "d8fb4ffddf76e27fe9b83f0626a4df01f299e8b79c29459bfbec07ae34366472",
+    "lib/arm64-v8a/libkodi.so": "fadfb1a08e3d125958a77d393c1d66453ec3e9c91aac3349ec5806c67c17694d"
+  },
+  "new_members": [],
+  "protected_existing_members": 7619,
+  "status": "PASS_EXACT_SIGNED460_NATIVE_ONLY_MEMBER_PRESERVATION",
+  "versionCode": 2103462
+}
