@@ -1,5 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
 <includes>
+  <variable name="InfinityContentItemIcon">
+    <!-- Only the identified white curved Live decoration is suppressed. -->
+    <value condition="String.Contains(ListItem.Icon,script.infinity.live/resources/icon.png) | String.Contains(ListItem.Icon,script.infinity.live%2fresources%2ficon.png)" />
+    <value>$INFO[ListItem.Icon]</value>
+  </variable>
+
   <variable name="InfinityPolishWarning">
     <value condition="String.IsEqual(Skin.String(Infinity.HomeView),cinema)">FFD8BA88</value>
     <value condition="String.IsEqual(Window(Home).Property(Infinity.SystemTheme),OLED)">FFF7C66F</value>
@@ -7,8 +13,6 @@
     <value>FFF2BC68</value>
   </variable>
   <variable name="InfinityPolishIcon0">
-    <!-- Suppress only the identified Live curved decoration; keep all other icons. -->
-    <value condition="String.Contains(ListItem.Icon,script.infinity.live/) + String.EndsWith(ListItem.Icon,resources/icon.png)" />
     <value condition="String.IsEqual(ListItem.Icon,DefaultFolder.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultFolder.png)">infinity_system/folder.png</value>
     <value condition="String.IsEqual(ListItem.Icon,DefaultFile.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultFile.png) | String.IsEqual(ListItem.Icon,DefaultAddonsZip.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonsZip.png) | String.IsEqual(ListItem.Icon,DefaultAddonNone.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonNone.png)">infinity_system/file.png</value>
     <value condition="String.IsEqual(ListItem.Icon,DefaultHardDisk.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultHardDisk.png) | String.IsEqual(ListItem.Icon,DefaultRemovableDisk.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultRemovableDisk.png)">infinity_system/drive.png</value>
@@ -32,7 +36,7 @@
     <value condition="String.IsEqual(ListItem.Icon,DefaultAddonsSearch.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonsSearch.png)">infinity_ui/icons/search.png</value>
     <value condition="String.IsEqual(ListItem.Icon,DefaultAddonsRecentlyUpdated.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonsRecentlyUpdated.png) | String.IsEqual(ListItem.Icon,DefaultAddonsUpdates.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonsUpdates.png)">infinity_polish/refresh.png</value>
     <value condition="String.IsEqual(ListItem.Icon,DefaultAddonSkin.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonSkin.png) | String.IsEqual(ListItem.Icon,DefaultAddonLookAndFeel.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonLookAndFeel.png) | String.IsEqual(ListItem.Icon,DefaultAddonScreensaver.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonScreensaver.png) | String.IsEqual(ListItem.Icon,DefaultAddonVisualization.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonVisualization.png) | String.IsEqual(ListItem.Icon,DefaultAddonWebSkin.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultAddonWebSkin.png)">infinity_ui/icons/settings.png</value>
-    <value>$INFO[ListItem.Icon]</value>
+    <value>$VAR[InfinityContentItemIcon]</value>
   </variable>
   <variable name="InfinityPolishIcon0Tint">
     <value condition="String.IsEqual(ListItem.Icon,DefaultFolder.png) | String.IsEqual(ListItem.Icon,special://skin/media/DefaultFolder.png)">$VAR[InfinityLegacyAccent]</value>

@@ -1,0 +1,400 @@
+<?xml version='1.0' encoding='utf-8'?>
+<includes>
+  <include name="InfinityAdditionalFonts">
+    <font>
+      <name>InfinityHeader</name>
+      <filename>Roboto-Bold.ttf</filename>
+      <size>30</size>
+    </font>
+    <font>
+      <name>InfinityHero</name>
+      <filename>Roboto-Bold.ttf</filename>
+      <size>42</size>
+    </font>
+    <font>
+      <name>font10_title</name>
+      <filename>Roboto-Regular.ttf</filename>
+      <size>21</size>
+    </font>
+    <font>
+      <name>fontContextMenu</name>
+      <filename>Roboto-Regular.ttf</filename>
+      <size>26</size>
+    </font>
+  </include>
+  <include name="BackgroundDimensions">
+    <include>Dimensions_Fullscreen</include>
+  </include>
+  <include name="StandardAutoScroll">
+    <autoscroll time="3000" delay="6000" repeat="9000">!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)</autoscroll>
+  </include>
+  <include name="BackgroundFade">
+    <animation effect="fade" start="0" end="100" time="180" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">Visible</animation>
+    <animation effect="fade" start="100" end="0" time="140" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">Hidden</animation>
+  </include>
+  <include name="DimBackground">
+    <control type="image">
+      <left>0%</left>
+      <top>0%</top>
+      <width>100%</width>
+      <height>100%</height>
+      <texture colordiffuse="$VAR[InfinityPaletteScrim]">infinity_ui/contract_white.png</texture>
+    </control>
+  </include>
+  <include name="SetPresetBlueTheme">
+    <include>SetPresetSiLVOTheme</include>
+  </include>
+  <include name="InfoTMDbPersonAge">
+    <control type="label">
+      <left>0%</left>
+      <top>10.1852%</top>
+      <width>62.5%</width>
+      <height>70</height>
+      <font>font16_title_bold</font>
+      <aligny>center</aligny>
+      <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
+      <label>$INFO[ListItem.Property(Age),$LOCALIZE[31599]: , $LOCALIZE[31544]]</label>
+      <visible>!String.IsEmpty(ListItem.Property(Age))</visible>
+    </control>
+  </include>
+  <include name="FavListDialog">
+    <include content="InfinityFavouritesList">
+      <param name="left" value="60" />
+      <param name="top" value="98" />
+      <param name="width" value="780" />
+      <param name="height" value="660" />
+      <param name="row" value="132" />
+      <param name="labelwidth" value="648" />
+      <param name="right" value="61" />
+      <param name="icontop" value="36" />
+    </include>
+  </include>
+  <include name="FavListOrig">
+    <include content="InfinityFavouritesList">
+      <param name="left" value="1365" />
+      <param name="top" value="375" />
+      <param name="width" value="510" />
+      <param name="height" value="592" />
+      <param name="row" value="74" />
+      <param name="labelwidth" value="378" />
+      <param name="right" value="450" />
+      <param name="icontop" value="7" />
+    </include>
+  </include>
+  <include name="InfinityFavouritesList">
+    <param name="left" />
+    <param name="top" />
+    <param name="width" />
+    <param name="height" />
+    <param name="row" />
+    <param name="labelwidth" />
+    <param name="right" />
+    <param name="icontop" default="7" />
+    <definition>
+      <control type="list" id="450">
+        <left>$PARAM[left]</left>
+        <top>$PARAM[top]</top>
+        <width>$PARAM[width]</width>
+        <height>$PARAM[height]</height>
+        <onup>450</onup>
+        <ondown>450</ondown>
+        <onleft>450</onleft>
+        <onright>$PARAM[right]</onright>
+        <pagecontrol>61</pagecontrol>
+        <scrolltime>180</scrolltime>
+        <itemlayout width="$PARAM[width]" height="$PARAM[row]">
+          <control type="image">
+            <left>12</left>
+            <top>$PARAM[icontop]</top>
+            <width>60</width>
+            <height>60</height>
+            <aspectratio>keep</aspectratio>
+            <texture fallback="DefaultFolder.png">$VAR[InfinityContentItemIcon]</texture>
+          </control>
+          <control type="label">
+            <left>92</left>
+            <width>$PARAM[labelwidth]</width>
+            <height>$PARAM[row]</height>
+            <font>font13</font>
+            <aligny>center</aligny>
+            <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
+            <label>$INFO[ListItem.Label]</label>
+          </control>
+        </itemlayout>
+        <focusedlayout width="$PARAM[width]" height="$PARAM[row]">
+          <control type="image">
+            <width>$PARAM[width]</width>
+            <height>$PARAM[row]</height>
+            <texture colordiffuse="$VAR[InfinityPaletteSurfaceElevated]">infinity_ui/contract_white.png</texture>
+            <visible>Control.HasFocus(450)</visible>
+          </control>
+          <control type="image">
+            <width>4</width>
+            <height>$PARAM[row]</height>
+            <texture colordiffuse="$VAR[InfinityPaletteFocus]">infinity_ui/contract_white.png</texture>
+            <visible>Control.HasFocus(450)</visible>
+          </control>
+          <control type="image">
+            <left>12</left>
+            <top>$PARAM[icontop]</top>
+            <width>60</width>
+            <height>60</height>
+            <aspectratio>keep</aspectratio>
+            <texture fallback="DefaultFolder.png">$VAR[InfinityContentItemIcon]</texture>
+          </control>
+          <control type="label">
+            <left>92</left>
+            <width>$PARAM[labelwidth]</width>
+            <height>$PARAM[row]</height>
+            <font>font13</font>
+            <aligny>center</aligny>
+            <textcolor>$VAR[InfinityDiggzPrimaryText]</textcolor>
+            <scroll>true</scroll>
+            <label>$INFO[ListItem.Label]</label>
+          </control>
+        </focusedlayout>
+      </control>
+    </definition>
+  </include>
+  <include name="KBurnsAnimateFanart">
+    <animation effect="zoom" start="100" end="104" center="auto" time="18000" tween="sine" easing="inout" reversible="true" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">Conditional</animation>
+  </include>
+  <include name="OSDButtonModernNoAlt">
+    <param name="Size" default="82" />
+    <param name="Texture" default="" />
+    <param name="flipx" default="false" />
+    <definition>
+      <include content="OSDButtonClassicNoAlt">
+        <param name="Size" value="$PARAM[Size]" />
+        <param name="Texture" value="$PARAM[Texture]" />
+        <param name="flipx" value="$PARAM[flipx]" />
+      </include>
+    </definition>
+  </include>
+  <include name="OSDButtonMaxNoAlt">
+    <param name="Size" default="82" />
+    <param name="Texture" default="" />
+    <param name="flipx" default="false" />
+    <definition>
+      <include content="OSDButtonClassicNoAlt">
+        <param name="Size" value="$PARAM[Size]" />
+        <param name="Texture" value="$PARAM[Texture]" />
+        <param name="flipx" value="$PARAM[flipx]" />
+      </include>
+    </definition>
+  </include>
+  <include name="OSDButtonModern">
+    <param name="Size" default="82" />
+    <param name="Texture" default="" />
+    <param name="AltTexture" default="" />
+    <definition>
+      <include content="OSDButtonClassic">
+        <param name="Size" value="$PARAM[Size]" />
+        <param name="Texture" value="$PARAM[Texture]" />
+        <param name="AltTexture" value="$PARAM[AltTexture]" />
+      </include>
+    </definition>
+  </include>
+  <include name="OSDButtonMax">
+    <param name="Size" default="82" />
+    <param name="Texture" default="" />
+    <param name="AltTexture" default="" />
+    <definition>
+      <include content="OSDButtonClassic">
+        <param name="Size" value="$PARAM[Size]" />
+        <param name="Texture" value="$PARAM[Texture]" />
+        <param name="AltTexture" value="$PARAM[AltTexture]" />
+      </include>
+    </definition>
+  </include>
+  <variable name="AddonLabel2">
+    <value>$INFO[ListItem.Label2]</value>
+  </variable>
+  <variable name="DurationInMinutes">
+    <value>$INFO[ListItem.Duration,, $LOCALIZE[12391]]</value>
+  </variable>
+  <variable name="GameSelectHeader">
+    <value>$LOCALIZE[35200]</value>
+  </variable>
+  <variable name="MainColorOne">
+    <value>$VAR[InfinityPaletteAccent]</value>
+  </variable>
+  <variable name="MediaInfoOverlayVar">
+    <value>$INFO[ListItem.Overlay]</value>
+  </variable>
+  <variable name="MusicInfoListViewLabel">
+    <value>$INFO[ListItem.Label]</value>
+  </variable>
+  <variable name="MusicInfoListViewPanel">
+    <value condition="!String.IsEmpty(ListItem.Plot)">$INFO[ListItem.Plot]</value>
+    <value>$INFO[ListItem.Artist]$INFO[ListItem.Album, • ]</value>
+  </variable>
+  <variable name="MusicInfoListViewRating">
+    <value>$INFO[ListItem.UserRating,flags/rating/,.png]</value>
+  </variable>
+  <variable name="MusicInfoListViewThumb">
+    <value condition="!String.IsEmpty(ListItem.Art(thumb))">$INFO[ListItem.Art(thumb)]</value>
+    <value>$INFO[ListItem.Icon]</value>
+  </variable>
+  <variable name="PVRTimerLabel">
+    <value>$INFO[ListItem.Label2]</value>
+  </variable>
+  <variable name="PVRGuideControlsHelpTextVar">
+    <value condition="Control.HasFocus(600)">$LOCALIZE[31628]</value>
+    <value condition="Control.HasFocus(601)">$LOCALIZE[31629]</value>
+    <value condition="Control.HasFocus(602)">$LOCALIZE[31630]</value>
+    <value condition="Control.HasFocus(603)">$LOCALIZE[31631]</value>
+    <value condition="Control.HasFocus(604)">$LOCALIZE[31632]</value>
+    <value condition="Control.HasFocus(605)">$LOCALIZE[31633]</value>
+    <value condition="Control.HasFocus(606)">$LOCALIZE[31634]</value>
+    <value condition="Control.HasFocus(607)">$LOCALIZE[31635]</value>
+    <value condition="Control.HasFocus(608)">$LOCALIZE[31636]</value>
+    <value condition="Control.HasFocus(609)">$LOCALIZE[31637]</value>
+    <value condition="Control.HasFocus(610)">$LOCALIZE[31638]</value>
+    <value condition="Control.HasFocus(611)">$LOCALIZE[31639]</value>
+    <value />
+  </variable>
+  <variable name="PlayList">
+    <value condition="Window.IsActive(Music)">ActivateWindow(MusicPlaylist)</value>
+    <value>ActivateWindow(VideoPlaylist)</value>
+  </variable>
+  <variable name="StarRatingDiffuseVar">
+    <value>$VAR[InfinityPaletteAccent]</value>
+  </variable>
+  <variable name="videocodec">
+    <value>$INFO[ListItem.VideoCodec]</value>
+  </variable>
+  <variable name="audiocodec">
+    <value>$INFO[ListItem.AudioCodec]</value>
+  </variable>
+  <variable name="typehackflagging">
+    <value condition="String.Contains(ListItem.FileNameAndPath,bluray)">bluray</value>
+    <value condition="String.Contains(ListItem.FileNameAndPath,bdrip)">bluray</value>
+    <value condition="String.Contains(ListItem.FileNameAndPath,hdtv)">hdtv</value>
+    <value>$INFO[ListItem.VideoCodec]</value>
+  </variable>
+  <include name="InfinityReturnToViewLeft">
+    <param name="when" default="true" />
+    <definition>
+      <onleft condition="[$PARAM[when]] + Control.IsVisible(4400)">4400</onleft>
+      <onleft condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(50)">50</onleft>
+      <onleft condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(51)">51</onleft>
+      <onleft condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(52)">52</onleft>
+      <onleft condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(53)">53</onleft>
+      <onleft condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(54)">54</onleft>
+      <onleft condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(55)">55</onleft>
+      <onleft condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(56)">56</onleft>
+      <onleft condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(57)">57</onleft>
+      <onleft condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(58)">58</onleft>
+      <onleft condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(59)">59</onleft>
+      <onleft condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(500)">500</onleft>
+      <onleft condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(501)">501</onleft>
+      <onleft condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(502)">502</onleft>
+      <onleft condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(503)">503</onleft>
+      <onleft condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(504)">504</onleft>
+      <onleft condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(505)">505</onleft>
+      <onleft condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(506)">506</onleft>
+      <onleft condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(507)">507</onleft>
+      <onleft condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(508)">508</onleft>
+      <onleft condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(509)">509</onleft>
+      <onleft condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(591)">591</onleft>
+      <onleft condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(592)">592</onleft>
+      <onleft condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(602)">602</onleft>
+      <onleft condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(603)">603</onleft>
+      <onleft condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(609)">609</onleft>
+    </definition>
+  </include>
+  <include name="InfinityReturnToViewRight">
+    <param name="when" default="true" />
+    <definition>
+      <onright condition="[$PARAM[when]] + Control.IsVisible(4400)">4400</onright>
+      <onright condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(50)">50</onright>
+      <onright condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(51)">51</onright>
+      <onright condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(52)">52</onright>
+      <onright condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(53)">53</onright>
+      <onright condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(54)">54</onright>
+      <onright condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(55)">55</onright>
+      <onright condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(56)">56</onright>
+      <onright condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(57)">57</onright>
+      <onright condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(58)">58</onright>
+      <onright condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(59)">59</onright>
+      <onright condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(500)">500</onright>
+      <onright condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(501)">501</onright>
+      <onright condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(502)">502</onright>
+      <onright condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(503)">503</onright>
+      <onright condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(504)">504</onright>
+      <onright condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(505)">505</onright>
+      <onright condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(506)">506</onright>
+      <onright condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(507)">507</onright>
+      <onright condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(508)">508</onright>
+      <onright condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(509)">509</onright>
+      <onright condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(591)">591</onright>
+      <onright condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(592)">592</onright>
+      <onright condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(602)">602</onright>
+      <onright condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(603)">603</onright>
+      <onright condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(609)">609</onright>
+    </definition>
+  </include>
+  <include name="InfinityReturnToViewUp">
+    <param name="when" default="true" />
+    <definition>
+      <onup condition="[$PARAM[when]] + Control.IsVisible(4400)">4400</onup>
+      <onup condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(50)">50</onup>
+      <onup condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(51)">51</onup>
+      <onup condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(52)">52</onup>
+      <onup condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(53)">53</onup>
+      <onup condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(54)">54</onup>
+      <onup condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(55)">55</onup>
+      <onup condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(56)">56</onup>
+      <onup condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(57)">57</onup>
+      <onup condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(58)">58</onup>
+      <onup condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(59)">59</onup>
+      <onup condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(500)">500</onup>
+      <onup condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(501)">501</onup>
+      <onup condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(502)">502</onup>
+      <onup condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(503)">503</onup>
+      <onup condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(504)">504</onup>
+      <onup condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(505)">505</onup>
+      <onup condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(506)">506</onup>
+      <onup condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(507)">507</onup>
+      <onup condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(508)">508</onup>
+      <onup condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(509)">509</onup>
+      <onup condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(591)">591</onup>
+      <onup condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(592)">592</onup>
+      <onup condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(602)">602</onup>
+      <onup condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(603)">603</onup>
+      <onup condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(609)">609</onup>
+    </definition>
+  </include>
+  <include name="InfinityReturnToViewDown">
+    <param name="when" default="true" />
+    <definition>
+      <ondown condition="[$PARAM[when]] + Control.IsVisible(4400)">4400</ondown>
+      <ondown condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(50)">50</ondown>
+      <ondown condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(51)">51</ondown>
+      <ondown condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(52)">52</ondown>
+      <ondown condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(53)">53</ondown>
+      <ondown condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(54)">54</ondown>
+      <ondown condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(55)">55</ondown>
+      <ondown condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(56)">56</ondown>
+      <ondown condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(57)">57</ondown>
+      <ondown condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(58)">58</ondown>
+      <ondown condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(59)">59</ondown>
+      <ondown condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(500)">500</ondown>
+      <ondown condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(501)">501</ondown>
+      <ondown condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(502)">502</ondown>
+      <ondown condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(503)">503</ondown>
+      <ondown condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(504)">504</ondown>
+      <ondown condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(505)">505</ondown>
+      <ondown condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(506)">506</ondown>
+      <ondown condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(507)">507</ondown>
+      <ondown condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(508)">508</ondown>
+      <ondown condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(509)">509</ondown>
+      <ondown condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(591)">591</ondown>
+      <ondown condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(592)">592</ondown>
+      <ondown condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(602)">602</ondown>
+      <ondown condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(603)">603</ondown>
+      <ondown condition="[$PARAM[when]] + !Control.IsVisible(4400) + Control.IsVisible(609)">609</ondown>
+    </definition>
+  </include>
+</includes>
