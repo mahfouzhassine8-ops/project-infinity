@@ -1,0 +1,13 @@
+{
+  "status": "PASS_SOURCE_REACHABILITY_NOT_ANDROID_EXECUTION",
+  "classes_dex_sha256_matches_actual_signed2103460": "8cbfe62eae167e4441462cf5be970dbfbb2cc96e068134a39e12b61c64223118",
+  "method": "Main.infinityPrepareNativeTask",
+  "installer_refusal_effect": "breadcrumb only; joins same path and native entry remains admitted",
+  "recovery_entry": "Infinity drawer1198105 -> ActivateWindow(AddonBrowser) -> native InstallFromZip -> CAddonInstaller; no Command Center script required",
+  "native_source_sha256_matches_exact_compiled460_map": {
+    "xbmc/addons/AddonInstaller.cpp": "509010d32d6ee1c3c3a5ca0c1fb1ed4536743210256f74287e819fa825a4931a",
+    "xbmc/addons/gui/GUIWindowAddonBrowser.cpp": "cf965e53aa11dc850af461abe0942aeb358acd61629c5f8cb38fad6ae07f9c59"
+  },
+  "source_checks": "Native pre/post install and unload/reload functions retained; standard AddonBrowser file picker and security prompts remain in force",
+  "limits": "This proves source reachability, not physical GUI/Android operation after an interruption. Other independent startup/permission failures must not be bypassed."
+}
