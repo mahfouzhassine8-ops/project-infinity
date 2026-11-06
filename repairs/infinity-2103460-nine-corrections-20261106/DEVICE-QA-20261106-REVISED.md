@@ -45,3 +45,11 @@ Protect #1, #2, #3, #5 in their **physically accepted installed behavior**. Pres
 5. Explicitly report per-item PASS/FAIL/UNTESTED after user validation; **do not promote/lock** before the user's acceptance.
 
 Current test: **PASS 1,2,3,5; FAIL 4,7,8,9; UNTESTED 6**. Source-only assumptions do not override this outcome.
+
+## Later device screenshot — visual issue #4 localized
+
+User-provided screenshot shows the real **VIDEOS → Files** native-root screen containing only `Add videos...`. The **unwanted large white curved graphic** remains at the **bottom-left** of that screen, separated from the top-left blue Infinity logo and lower-right navigation icons. User reports that **elsewhere the visual cleanup looks good**; do not rework those passing views.
+
+This screenshot is of **Downloads / Files**, **not** Search. Localize the outstanding white graphic under visual item **#4**, and **retain #5 Downloads as PASS** (native `Add videos...` visible with no old provider rows). Trace whether the bottom-left element is an active Kodi busy/spinner image/animation, skin overlay, or provider/icon texture before changing anything. Remove the spurious graphic only in this context; do not disable real progress indicators, interactive controls, file-source registration or the working panel/layout. #7 Crew/Nixtoons results regression remains independent and is not cleared by this screenshot.
+
+No additional user-reported fail in the other visual screens; this narrows #4 rather than classifying every screen as defective. Actual pixel screenshot is present in the user conversation, not uploaded into this repository. No source changes made by this note.
