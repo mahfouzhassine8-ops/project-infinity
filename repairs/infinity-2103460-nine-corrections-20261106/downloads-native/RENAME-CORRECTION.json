@@ -1,0 +1,9 @@
+{
+  "case": "ordinary Files source rename retains explicitly chosen Downloads folder",
+  "before": "FAIL_ACTUAL_CPP_FILTER",
+  "after": "PASS_ACTUAL_CPP_CONTRACT_44_CHECKS",
+  "membership": "canonical native CFileItem location; no presentation label",
+  "context_edit": "location AND exact currently selected native source label; prevents choosing another same-location source",
+  "new_native_files": [],
+  "Android": "NOT_RUN"
+}

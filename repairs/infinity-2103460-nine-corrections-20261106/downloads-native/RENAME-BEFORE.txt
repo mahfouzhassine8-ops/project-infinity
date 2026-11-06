@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/dev/shm/infinity-nine-corrections/repairs/infinity-2103460-nine-corrections-20261106/downloads-native/test_contract.py", line 86, in <module>
+    p=subprocess.run([str(OUT/'contract')],text=True,capture_output=True);(OUT/'result.txt').write_text(p.stdout+p.stderr);assert p.returncode==0,p.stdout+p.stderr
+                                                                                                                                  ^^^^^^^^^^^^^^^
+AssertionError: CHECK ordinary_source_rename_keeps_added_folder
+contract: /dev/shm/infinity-downloads-native-host/contract.cpp:210: void check(bool): Assertion `v' failed.
+

@@ -4,5 +4,11 @@
     "result": "FAIL_CLOSED_BEFORE_KEYS",
     "cause": "Original export-set-equality check sees exactly two necessary new result-returning dialog APIs; no original export or dependency lost",
     "resolution": "Precisely review and allow these two source-scoped APIs, retaining all original exports and all other ABI gates; no native source rebuild/change."
+  },
+  {
+    "run": 42196679754,
+    "result": "PASS_KEYLESS_3_MEMBER_CANDIDATE_2_MEMBER_RECOVERY_PREPARATION_SUPERSEDED_BEFORE_SIGNING",
+    "source": "7b47c1c835bc0abdef9f5552ed110c99bb57552b",
+    "reason": "Subsequent actual-C++ rename regression proved old location+label membership unsafe under a normal Files source rename; source identity corrected to location without changing original Files implementation. New native build required. No APK signed from this preparer."
   }
 ]

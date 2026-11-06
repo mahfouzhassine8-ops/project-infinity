@@ -1,0 +1,22 @@
+{
+  "status": "PASS_EXACT_COMPILED460_UNCHANGED_CALLER_AND_PERSISTENCE_SOURCE_BINDING",
+  "files": {
+    "xbmc/FileItem.cpp": "6677feb9c017af6f106db1918c53d4bc2933a8ae7796a490013fb5a77fa6b412",
+    "xbmc/filesystem/SourcesDirectory.cpp": "3eb0eb39c4dd92077fb19bdbbc5829e82f4795ec627c88a00504965f2589c02f",
+    "xbmc/windows/GUIMediaWindow.cpp": "b28f806814203f047f03557df2f439b20086cc9a08c9f419faf64a17a651dc4d",
+    "xbmc/settings/MediaSourceSettings.cpp": "abbbb29b65ba1368e5715d5f09d3ee36cb4a8d5172a183894204ac3c5a739db9",
+    "xbmc/addons/Skin.cpp": "3fc803173532d910db81986e37d2f5d2d30139e3e879b9c71cd8a8dc4b2e498e",
+    "xbmc/addons/Addon.cpp": "1cba9747ee7c1638885df49d61c854b418a88572e4a3ea31d0bf5017d66c9de4",
+    "xbmc/addons/Addon.h": "9cd83b30bfaf97ac48a3fa78e9c5b9fdcf989af508ca7ef0ed6520243dcc052a",
+    "xbmc/settings/SkinSettings.cpp": "ae5a24d6a19554201cfc878cb5d0ee9915fec2093adec02025b251dd645f85f1",
+    "xbmc/addons/AddonInstaller.cpp": "509010d32d6ee1c3c3a5ca0c1fb1ed4536743210256f74287e819fa825a4931a",
+    "xbmc/addons/gui/GUIWindowAddonBrowser.cpp": "cf965e53aa11dc850af461abe0942aeb358acd61629c5f8cb38fad6ae07f9c59"
+  },
+  "contracts": [
+    "SourcesDirectory constructs CFileItem(source), matching preference and filter representation; preserves ordinary directory implementation",
+    "GUIMediaWindow appends real Add videos after derived GetDirectory; original add-source permission checks and refresh retained",
+    "Existing skin settings dirty/admission/save ownership reused; no settings-owner retirement",
+    "Native AddonBrowser/AddonInstaller recovery unchanged"
+  ],
+  "Android": "NOT_RUN"
+}

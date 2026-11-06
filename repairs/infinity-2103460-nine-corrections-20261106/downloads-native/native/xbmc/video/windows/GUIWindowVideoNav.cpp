@@ -61,7 +61,7 @@ constexpr const char* DOWNLOADS_SETTING = "Infinity.DownloadsSources.v1";
 std::string DownloadsSourceKey(const CFileItem& item)
 {
   CVariant identity(CVariant::VariantTypeObject);
-  identity["name"] = item.GetLabel();
+  // A folder remains the same when its display/source label changes.
   identity["path"] = item.GetPath();
   std::string serialized;
   if (!CJSONVariantWriter::Write(identity, serialized, true)) return {};
@@ -1001,7 +1001,8 @@ bool CGUIWindowVideoNav::OnContextButton(int itemNumber, CONTEXT_BUTTON button)
     if (!sources) return false;
     for (const auto& source : *sources)
     {
-      if (DownloadsSourceKey(CFileItem(source)) != DownloadsSourceKey(*item)) continue;
+      if (DownloadsSourceKey(CFileItem(source)) != DownloadsSourceKey(*item) ||
+          CFileItem(source).GetLabel() != item->GetLabel()) continue;
       const CMediaSource original = source;
       CMediaSource edited;
       bool saveFailed = false;
