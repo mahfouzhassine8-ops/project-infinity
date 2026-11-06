@@ -29,6 +29,8 @@ def preflight(apk,out):
   for n in z.namelist():
    if n.startswith(tuple('assets/addons/'+a+'/' for a in (*module_bundle.IDS,SKIN))) and not n.endswith('/'):
     raw=z.read(n);p=addons/n.removeprefix('assets/addons/');assert '..' not in p.parts;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(raw);protected[n.removeprefix('assets/addons/')]=hashlib.sha256(raw).hexdigest()
+  recovery=out/'recovery-addons';recovery.mkdir()
+  for aid in (CC,SKIN):shutil.copytree(addons/aid,recovery/aid)
   for source,row in inventory['changed_source_files'].items():
    rel=source.split('/overlay/assets/addons/',1)[1];assert rel.startswith((CC+'/',SKIN+'/'))
    assert protected[rel]==row['before_sha256'],rel
@@ -40,7 +42,8 @@ def preflight(apk,out):
  xml=addons/SKIN/'addon.xml';raw=xml.read_bytes();assert b'version="1.0.5.258"' in raw
  xml.write_bytes(raw.replace(b'version="1.0.5.258"',b'version="1.0.5.260"',1));changes[SKIN+'/addon.xml']=sha(xml)
  for leaf in ('infinity-skin.json','Infinity-Protected-Manifest.json'):
-  f=addons/SKIN/leaf;d=json.loads(f.read_text());d['candidate']=260
+  f=addons/SKIN/leaf;d=json.loads(f.read_text());d['candidate']=260;d['candidate_locked']=False
+  if 'physical_device_verified' in d:d['physical_device_verified']=False
   for k in ('version','candidate_version','skin_version'):
    if k in d:d[k]=SKIN_VERSION
   if 'protected_files' in d:
@@ -48,9 +51,21 @@ def preflight(apk,out):
     if name.startswith(SKIN+'/'):d['protected_files'][name[len(SKIN)+1:]]=value
    assert len(d['protected_files'])==948
   save(f,d);changes[SKIN+'/'+leaf]=sha(f)
+ # Forward skin recovery: original functional payload, higher skin version.
+ recovery_xml=recovery/SKIN/'addon.xml';recovery_xml.write_bytes(recovery_xml.read_bytes().replace(b'version="1.0.5.258"',b'version="1.0.5.261"',1))
+ for leaf in ('infinity-skin.json','Infinity-Protected-Manifest.json'):
+  f=recovery/SKIN/leaf;d=json.loads(f.read_text());d['candidate']=261;d['candidate_locked']=False
+  for k in ('version','candidate_version','skin_version'):
+   if k in d:d[k]='1.0.5.261'
+  if 'physical_device_verified' in d:d['physical_device_verified']=False
+  if 'protected_files' in d:d['protected_files']['addon.xml']=sha(recovery_xml)
+  save(f,d)
  old_marker=(addons/CC/module_bundle.MANIFEST).read_bytes();payload,files=module_bundle.build(addons_for_build(addons,out))
  assert len(files)==78 and payload.startswith(('INFINITY-MODULES/1\npackage\t'+VERSION+'\n').encode())
  marker=addons/CC/module_bundle.MANIFEST;marker.write_bytes(payload);Path(str(marker)+'.sig').unlink();changes[CC+'/'+module_bundle.MANIFEST]=sha(marker)
+ for rel,want in protected.items():
+  if rel.startswith((CC+'/',SKIN+'/')) and rel not in {SKIN+'/addon.xml',SKIN+'/infinity-skin.json',SKIN+'/Infinity-Protected-Manifest.json'}:
+   assert sha(recovery/rel)==want,'RECOVERY_FUNCTIONAL_DIFFERENCE:'+rel
  # Full reference inventory; every unrelated existing add-on byte must match.
  for rel,want in protected.items():
   if rel not in changes and rel!=CC+'/'+module_bundle.MANIFEST+'.sig':assert sha(addons/rel)==want,rel
@@ -90,11 +105,11 @@ def sign(out):
   text+=run(verifier,module_root,FIRST/'ORIGINAL-INFINITY-PUBLIC-KEY.pem');(publish/'MODULE-AUTHENTICATION.txt').write_text(text)
   # Normal Kodi add-on ZIP shape: exactly one addon root, complete existing resources.
   ziprows=[]
-  for aid,version in ((CC,VERSION),(SKIN,SKIN_VERSION)):
-   name=aid+'-'+version+'-2103460-corrective.zip';dest=publish/name
+  for aid,version,source_root,suffix in ((CC,VERSION,addons,'corrective'),(SKIN,SKIN_VERSION,addons,'corrective'),(CC,VERSION,out/'recovery-addons','recovery'),(SKIN,'1.0.5.261',out/'recovery-addons','recovery')):
+   name=aid+'-'+version+'-2103460-'+suffix+'.zip';dest=publish/name
    with ZipFile(dest,'w',compression=ZIP_DEFLATED,compresslevel=9) as z:
-    for f in sorted((addons/aid).rglob('*')):
-     if f.is_file():z.write(f,str(f.relative_to(addons)))
+    for f in sorted((source_root/aid).rglob('*')):
+     if f.is_file():z.write(f,str(f.relative_to(source_root)))
    with ZipFile(dest) as z:
     assert z.testzip() is None
     assert {n.split('/')[0] for n in z.namelist()}=={aid}
