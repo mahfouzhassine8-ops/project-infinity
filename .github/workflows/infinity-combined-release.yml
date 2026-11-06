@@ -7,7 +7,7 @@ on:
         type: choice
         required: true
         default: final-combined
-        options: [final-combined, prepare-preview451, prepare-kodi452, prepare-kodi453, prepare-ui454-455, prepare-controlled456-457, review-controlled456-457, prepare-browser458-459, review-browser458-459, prepare-six460-461, review-six460-461, package-nine-quick-updates]
+        options: [final-combined, prepare-preview451, prepare-kodi452, prepare-kodi453, prepare-ui454-455, prepare-controlled456-457, review-controlled456-457, prepare-browser458-459, review-browser458-459, prepare-six460-461, review-six460-461, package-nine-quick-updates, verify-nine-update-recovery]
       prepared_run:
         description: Completed official controlled preparation run for read-only authority review
         type: string
@@ -940,3 +940,31 @@ jobs:
           path: quick-updates/publish/
           if-no-files-found: error
           retention-days: 90
+
+  verify-nine-update-recovery:
+    name: Read-only exact2103460 ZIP recovery audit; no keys or APK
+    if: github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/work/infinity-2103460-nine-corrections-20261106' && inputs.operation == 'verify-nine-update-recovery'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '21'}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - uses: actions/download-artifact@v4
+        with: {run-id: 42146650003, name: Infinity-Combined-Original-Signer-42146650003, github-token: '${{ github.token }}', path: signed2103460}
+      - uses: actions/download-artifact@v4
+        with: {run-id: 42183471037, name: Infinity2103460-Authenticated-Quick-Updates-42183471037, github-token: '${{ github.token }}', path: signed-updates}
+      - name: Original Java installer and real signatures on disposable profiles only
+        run: python3 repairs/infinity-2103460-nine-corrections-20261106/quick-update/verify_installer_recovery.py --baseline signed2103460/Infinity-2103460-Combined-Original-Signer.apk --updates signed-updates --out recovery-audit
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity2103460-Quick-Update-Recovery-Audit-${{ github.run_id }}
+          path: recovery-audit/
+          if-no-files-found: error
