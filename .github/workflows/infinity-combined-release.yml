@@ -544,7 +544,7 @@ jobs:
         with: {name: 'Infinity458459-Authority-Proposals-${{ github.run_id }}', path: authority-proposals/, if-no-files-found: error, retention-days: 90}
   prepare-six460-461:
     name: Signed458 integration460 and higher461 recovery preparation
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/infinity-2103460-six-corrections-20261105' && inputs.operation == 'prepare-six460-461'
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/infinity-2103458-six-corrections-20261105' && inputs.operation == 'prepare-six460-461'
     runs-on: ubuntu-22.04
     timeout-minutes: 60
     env:
@@ -565,13 +565,13 @@ jobs:
           set -euo pipefail
           python3 -m pip install PyYAML==6.0.3
           python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out SIGNER-ROUTES.json
-          python3 repairs/infinity-2103460-six-corrections-20261105/integration-048/packaging/release_controlled.py versions --version 2103460 --out VERSION460.json
-          python3 repairs/infinity-2103460-six-corrections-20261105/integration-048/packaging/release_controlled.py versions --version 2103461 --out VERSION461.json
-          python3 repairs/infinity-2103460-six-corrections-20261105/integration-048/packaging/release_controlled.py metadata --out INPUT-METADATA.json
+          python3 repairs/infinity-2103458-six-corrections-20261105/integration-048/packaging/release_controlled.py versions --version 2103460 --out VERSION460.json
+          python3 repairs/infinity-2103458-six-corrections-20261105/integration-048/packaging/release_controlled.py versions --version 2103461 --out VERSION461.json
+          python3 repairs/infinity-2103458-six-corrections-20261105/integration-048/packaging/release_controlled.py metadata --out INPUT-METADATA.json
           python3 - <<'PYCODE'
           import json,os
           from pathlib import Path
-          p=json.loads(Path('repairs/infinity-2103460-six-corrections-20261105/integration-048/packaging/ENGINE-INPUT.json').read_text())['artifact_identity']
+          p=json.loads(Path('repairs/infinity-2103458-six-corrections-20261105/integration-048/packaging/ENGINE-INPUT.json').read_text())['artifact_identity']
           with open(os.environ['GITHUB_OUTPUT'],'a') as f:f.write('native_id='+str(p[0])+'\nnative_run='+str(p[1])+'\n')
           PYCODE
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
@@ -588,7 +588,7 @@ jobs:
       - name: Focused package metadata and source tests before key access
         env:
           INFINITY_CONTROLLED_BASELINE: protected458/Infinity-2103458-Combined-Original-Signer.apk
-        run: python3 repairs/infinity-2103460-six-corrections-20261105/integration-048/packaging/test_release.py
+        run: python3 repairs/infinity-2103458-six-corrections-20261105/integration-048/packaging/test_release.py
       - name: Original-key modules exact preservation and verified forward-recovery preparation
         env:
           INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
@@ -596,7 +596,7 @@ jobs:
           INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
           INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
         run: |
-          python3 repairs/infinity-2103460-six-corrections-20261105/integration-048/packaging/release_controlled.py prepare             --bundles protected458-components --baseline protected458/Infinity-2103458-Combined-Original-Signer.apk             --native controlled-engine --sdk "$ANDROID_HOME/build-tools/35.0.0" --out prepared-controlled
+          python3 repairs/infinity-2103458-six-corrections-20261105/integration-048/packaging/release_controlled.py prepare             --bundles protected458-components --baseline protected458/Infinity-2103458-Combined-Original-Signer.apk             --native controlled-engine --sdk "$ANDROID_HOME/build-tools/35.0.0" --out prepared-controlled
       - uses: actions/upload-artifact@v4
         with: {name: 'Infinity2103460-Prepared-${{ github.run_id }}', path: prepared-controlled/2103460/publish/, if-no-files-found: error, retention-days: 90, compression-level: 0}
       - uses: actions/upload-artifact@v4
@@ -621,7 +621,7 @@ jobs:
           retention-days: 90
   review-six460-461:
     name: Read-only official controlled artifacts and authority proposals - no keys
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/infinity-2103460-six-corrections-20261105' && inputs.operation == 'review-six460-461'
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/infinity-2103458-six-corrections-20261105' && inputs.operation == 'review-six460-461'
     runs-on: ubuntu-22.04
     timeout-minutes: 40
     env:
@@ -642,7 +642,7 @@ jobs:
           python3 - <<'PYCODE'
           import os,sys
           from pathlib import Path
-          sys.path.insert(0,'repairs/infinity-2103460-six-corrections-20261105/integration-048/packaging')
+          sys.path.insert(0,'repairs/infinity-2103458-six-corrections-20261105/integration-048/packaging')
           import release_controlled as r
           run=int(os.environ['PREPARED_RUN']);out=Path('authority-proposals');out.mkdir()
           a=r.proposed(Path('reviewed/2103460'),run)
