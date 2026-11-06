@@ -1,0 +1,20 @@
+{
+  "actual_shipped_source": "signed2103460 infinity_search.py",
+  "correction": "A cache-only UI/progress invalidation discards the cache and invokes original owned native request at most once; no response/source/configuration checks are relaxed",
+  "before": {
+    "cases": 6,
+    "failures": 3
+  },
+  "after": {
+    "cases": 6,
+    "failures": 0
+  },
+  "focused_guard_regressions": {
+    "cases": 8,
+    "failures": 0
+  },
+  "remaining_required_settings_acceptance": "2 FAIL unchanged; not waived",
+  "superseded_test": "Old cache-hit UI-race test expected state_changed and zero current request; replacement requires one original native request only after discarding cache. Meaningful config/profile/cancellation keep original refusals.",
+  "native_crash_fixed": false,
+  "Android": "NOT_RUN"
+}

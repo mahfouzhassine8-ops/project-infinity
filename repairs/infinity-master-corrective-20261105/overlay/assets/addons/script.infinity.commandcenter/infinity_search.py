@@ -348,6 +348,35 @@ def _provider_result(provider,query,home,cancel,progress=None):
         after_response={};after_cache={}
         current_signature=_query_signature(provider,path,home,components=after_cache)
         current_response_signature=_query_signature(provider,path,home,response=True,components=after_response)
+        # A cache-only presentation race is a miss, not a provider state change.
+        # No RPC has been issued by this invocation on this branch. Discard the
+        # old answer and use the original single owned native request path.
+        ui_fields = {'continue_watching_metadata',
+                     'home.Infinity.ContinueWatchingRevision',
+                     'home.Infinity.ProviderInventory.Revision',
+                     'home.Infinity.ResumeHub.PresentationSnapshot',
+                     'home.widgetreload', 'home.widgetreload2',
+                     'home.widgetreload-movies', 'home.widgetreload-tvshows'}
+        changed_cache = {name for name in before_cache.keys() | after_cache.keys()
+                         if before_cache.get(name) != after_cache.get(name)}
+        if (hit is not None and signature is not None and current_signature is not None
+                and current_signature != signature and changed_cache
+                and changed_cache <= ui_fields and response_signature is not None
+                and current_response_signature == response_signature):
+            if cancel.iscanceled():
+                return provider,'cancelled',{},path
+            signature = current_signature
+            before_cache = after_cache
+            hit = None  # Never publish the discarded cache generation.
+            status,answer = _leased_directory(path,home,_VisibleCancellation(cancel,progress))
+            route(provider,query)  # Original source/enable/dependency verification.
+            if cancel.iscanceled():
+                return provider,'cancelled',{},path
+            if status != 'completed' or 'error' in answer:
+                return provider,status,answer,path
+            after_response={};after_cache={}
+            current_signature=_query_signature(provider,path,home,components=after_cache)
+            current_response_signature=_query_signature(provider,path,home,response=True,components=after_response)
         if (response_signature is None or
                 current_response_signature != response_signature or
                 (hit is not None and current_signature != signature)):

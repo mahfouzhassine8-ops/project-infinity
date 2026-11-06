@@ -1,0 +1,47 @@
+test_cancellation_does_not_start_fresh_request (__main__.CacheRace.test_cancellation_does_not_start_fresh_request) ... ok
+test_fresh_native_refusal_is_preserved (__main__.CacheRace.test_fresh_native_refusal_is_preserved) ... FAIL
+test_profile_switch_does_not_start_request_in_new_profile (__main__.CacheRace.test_profile_switch_does_not_start_request_in_new_profile) ... ok
+test_progress_race_uses_one_fresh_request (__main__.CacheRace.test_progress_race_uses_one_fresh_request) ... FAIL
+test_ui_plus_meaningful_config_change_is_still_rejected (__main__.CacheRace.test_ui_plus_meaningful_config_change_is_still_rejected) ... ok
+test_widget_race_uses_one_fresh_request_not_stale_rows (__main__.CacheRace.test_widget_race_uses_one_fresh_request_not_stale_rows) ... FAIL
+
+======================================================================
+FAIL: test_fresh_native_refusal_is_preserved (__main__.CacheRace.test_fresh_native_refusal_is_preserved)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/dev/shm/infinity-nine-corrections/repairs/infinity-2103460-nine-corrections-20261106/test_search_cache_race.py", line 35, in test_fresh_native_refusal_is_preserved
+    self.assertEqual(self.b.query()[1],'timeout');self.assertEqual(self.b.calls,2)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'state_changed' != 'timeout'
+- state_changed
++ timeout
+
+
+======================================================================
+FAIL: test_progress_race_uses_one_fresh_request (__main__.CacheRace.test_progress_race_uses_one_fresh_request)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/dev/shm/infinity-nine-corrections/repairs/infinity-2103460-nine-corrections-20261106/test_search_cache_race.py", line 23, in test_progress_race_uses_one_fresh_request
+    self.assertEqual(self.b.query()[1],'completed');self.assertEqual(self.b.calls,2)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'state_changed' != 'completed'
+- state_changed
++ completed
+
+
+======================================================================
+FAIL: test_widget_race_uses_one_fresh_request_not_stale_rows (__main__.CacheRace.test_widget_race_uses_one_fresh_request_not_stale_rows)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/dev/shm/infinity-nine-corrections/repairs/infinity-2103460-nine-corrections-20261106/test_search_cache_race.py", line 20, in test_widget_race_uses_one_fresh_request_not_stale_rows
+    self.assertEqual(self.b.query()[1],'completed');self.assertEqual(self.b.calls,2)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'state_changed' != 'completed'
+- state_changed
++ completed
+
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.032s
+
+FAILED (failures=3)

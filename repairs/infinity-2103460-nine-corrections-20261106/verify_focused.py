@@ -59,7 +59,10 @@ class Selected(unittest.TestCase):
   for p in (CC/'default.py',CC/'library_navigation.py'):ast.parse(p.read_text())
   for p in ('DialogVideoInfo.xml','Custom_1198_InfinityNav.xml','Includes_InfinityMediaLists.xml','Variables.xml'):xml(p)
   ids=[c.get('id') for c in xml('DialogVideoInfo.xml').findall('.//control[@id]')];self.assertEqual(len(ids),len(set(ids)))
- def test_no_search_or_native_guess(self):
-  changed=subprocess.check_output(['git','diff','--name-only'],cwd=ROOT,text=True);self.assertNotIn('infinity_search.py',changed);self.assertNotIn('GUIWindowVideoNav.cpp',changed)
+ def test_search_patch_changes_only_reviewed_cache_function(self):
+  before=ast.parse((BASE/'script.infinity.commandcenter/infinity_search.py').read_text());after=ast.parse((CC/'infinity_search.py').read_text())
+  functions=lambda tree:{n.name:ast.dump(n,include_attributes=False) for n in tree.body if isinstance(n,(ast.FunctionDef,ast.ClassDef))}
+  a=functions(before);b=functions(after);self.assertEqual(a.keys(),b.keys());self.assertEqual({k for k in a if a[k]!=b[k]},{'_provider_result'})
+  changed=subprocess.check_output(['git','diff','ed5f7976','--name-only'],cwd=ROOT,text=True);self.assertNotIn('GUIWindowVideoNav.cpp',changed)
 if __name__=='__main__':
  suite=unittest.defaultTestLoader.loadTestsFromTestCase(Selected);r=unittest.TextTestRunner(verbosity=2).run(suite);Path(__file__).with_name('FOCUSED-RESULT.json').write_text(json.dumps({'tests':r.testsRun,'failures':len(r.failures),'errors':len(r.errors),'Android':'NOT_RUN','physical_Fold':'PENDING','scope':'selected host navigation/XML/control/source cases only'},indent=2)+'\n');sys.exit(not r.wasSuccessful())

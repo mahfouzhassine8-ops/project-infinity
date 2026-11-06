@@ -53,10 +53,14 @@
     "repairs/infinity-2103460-nine-corrections-20261106/overlay/assets/addons/skin.infinity.diggz/unified/Home.xml": {
       "before_sha256": "2e0300daff6d5e2d70055f705abb634de70f4df30d577457484cd559958619d1",
       "candidate_sha256": "3f92581a3a6e0e379336fdea9dbe25543f599333e70ab075007f14bac033720f"
+    },
+    "repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/infinity_search.py": {
+      "before_sha256": "61501614f0b49b407dea024a27d7cc6698979a8fc56aa00ec786c368b4e63a78",
+      "candidate_sha256": "245e599843b817bfa7f06b1db212502790a2dca13d229e21367060beb1fa9b6c"
     }
   },
   "native_modified": false,
-  "Search_modified": false,
+  "Search_modified": "Cache-only UI/progress invalidation becomes one fresh owned request; settings stamps and native crash unchanged",
   "Cobra_modified": false,
   "Preview_modified": false,
   "Command_Center_version": "0.3.5.61 unchanged",

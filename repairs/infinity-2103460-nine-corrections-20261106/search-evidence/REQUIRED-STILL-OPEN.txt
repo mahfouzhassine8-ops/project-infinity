@@ -1,0 +1,29 @@
+test_nixtoons_history_must_not_discard_completed_result (test_required_behavior.RequiredBehavior.test_nixtoons_history_must_not_discard_completed_result) ... FAIL
+test_identical_settings_rewrite_must_not_discard_completed_result (test_required_behavior.RequiredBehavior.test_identical_settings_rewrite_must_not_discard_completed_result) ... FAIL
+
+======================================================================
+FAIL: test_nixtoons_history_must_not_discard_completed_result (test_required_behavior.RequiredBehavior.test_nixtoons_history_must_not_discard_completed_result)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/dev/shm/infinity-nine-corrections/repairs/infinity-master-corrective-20261105/test_required_behavior.py", line 26, in test_nixtoons_history_must_not_discard_completed_result
+    self.assertEqual(fixture.b.query()[1],'completed')
+AssertionError: 'state_changed' != 'completed'
+- state_changed
++ completed
+
+
+======================================================================
+FAIL: test_identical_settings_rewrite_must_not_discard_completed_result (test_required_behavior.RequiredBehavior.test_identical_settings_rewrite_must_not_discard_completed_result)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/dev/shm/infinity-nine-corrections/repairs/infinity-master-corrective-20261105/test_required_behavior.py", line 31, in test_identical_settings_rewrite_must_not_discard_completed_result
+    self.assertEqual(fixture.b.query()[1],'completed')
+AssertionError: 'state_changed' != 'completed'
+- state_changed
++ completed
+
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.020s
+
+FAILED (failures=2)

@@ -36,7 +36,7 @@ def preflight(apk,out):
    assert protected[rel]==row['before_sha256'],rel
    assert sha(ROOT/source)==row['candidate_sha256'],source
    (addons/rel).write_bytes((ROOT/source).read_bytes());changes[rel]=row['candidate_sha256']
- assert len(changes)==13 and inventory['Command_Center_version']=='0.3.5.61 unchanged'
+ assert len(changes)==14 and inventory['Command_Center_version']=='0.3.5.61 unchanged'
  assert ET.parse(addons/CC/'addon.xml').getroot().get('version')==VERSION
  # Only skin release/integrity metadata changes; Command Center identity remains exact.
  xml=addons/SKIN/'addon.xml';raw=xml.read_bytes();assert b'version="1.0.5.258"' in raw
@@ -78,7 +78,7 @@ def preflight(apk,out):
  for path in (addons/SKIN).rglob('*.xml'):ET.parse(path)
  for leaf in ('default.py','library_navigation.py'):compile((addons/CC/leaf).read_bytes(),leaf,'exec')
  save(out/'PREFLIGHT.json',dict(status='PASS_EXACT2103460_ADDON_SOURCE_AND_METADATA',baseline_sha256=BASE,commandcenter_version=VERSION,skin_version=SKIN_VERSION,source=run('git','rev-parse','HEAD').strip(),changes=changes,protected=protected,module_file_count=78,old_module_manifest_sha256=hashlib.sha256(old_marker).hexdigest(),Android='NOT_RUN',all_nine_complete=False))
- print('PASS exact signed2103460, 13 authorized source changes, original CC identity and complete module source set')
+ print('PASS exact signed2103460, 14 authorized source changes, original CC identity and complete module source set')
 def addons_for_build(addons,out):
  root=out/'module-root'
  if root.exists():shutil.rmtree(root)
