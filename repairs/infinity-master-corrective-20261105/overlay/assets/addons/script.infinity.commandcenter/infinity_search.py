@@ -561,16 +561,25 @@ def _open_search(media='movie'):
         else:
             provider=next((p for p in ready if p['id']==aid),None)
             if provider is None:return
-            # This dispatch reaches only our first-party results handler. It
-            # force-discovers and validates the selected provider immediately
-            # before execution; avoid a redundant full source read here.
-            target=('plugin://'+CC+'/?'+urlencode(dict(action='search-provider',media=media,query=query,provider=aid))
-                    if not legacy_history else route(provider,query,history=True))
+            # Explicit provider selection opens that provider's original GUI
+            # search, just like a provider heading. It is not a request to
+            # collect/re-publish an aggregate snapshot. In particular, a
+            # provider's own search-history writes must not erase this page.
+            # The shared route verifier still checks enabled state, source
+            # pins, dependencies and query encoding for every provider.
+            target=route(provider,query,history=legacy_history)
             provider_name=provider['name']
         # Commit the existing history writer before posting asynchronous GUI
         # activation. An admission/write failure cannot leave a dispatched page
         # waiting on the submitting invoker's persistence transaction.
         if not legacy_history:shared_history(query=query,media=media,provider=aid,name=provider_name)
+        if aid != 'all' or legacy_history:
+            # History persistence can wait on another writer. Revalidate the
+            # exact original destination afterwards; never activate a changed
+            # source or a cancelled application request after that wait.
+            if xbmc.Monitor().abortRequested():return
+            if route(provider,query,history=legacy_history) != target:
+                raise RuntimeError('Provider changed before opening Search.')
         xbmc.executebuiltin('ActivateWindow(Videos,"'+target+'",return)')
         return
 

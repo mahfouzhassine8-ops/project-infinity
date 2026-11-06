@@ -12,11 +12,11 @@
     },
     "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/DialogVideoInfo.xml": {
       "before_sha256": "aaba427766b1bff0e4fe5d97641c58b541128bca909c33a5ddef10e9e06fdde9",
-      "candidate_sha256": "3e1323aec4af3121d4283d55bcb77f5b1d05dd892593854835e36e7b64b51460"
+      "candidate_sha256": "9f4d961937ee088b7650ed13cf71c46c257a62d90f0d4818b265bb25da354a19"
     },
     "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Includes_InfinityMediaLists.xml": {
       "before_sha256": "73d33c8dfcb94d6483fc3b2b4356ec64eaede7c7a8cf107134aa2fb49dcedf7c",
-      "candidate_sha256": "a9e6ea83bb6aad8b598e6d559963097e47404dec98f7a0399b872e82e0f32896"
+      "candidate_sha256": "20b44d5beefd2d6143e511add0c92fb7b68e2e4967c253e5e45d97eb4f62297c"
     },
     "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/skin.infinity.diggz/unified/Variables.xml": {
       "before_sha256": "764c81548d1213b18487a65613d5fa8a427d39781cff626c0e0512b4011078b8",
@@ -56,14 +56,28 @@
     },
     "repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/infinity_search.py": {
       "before_sha256": "61501614f0b49b407dea024a27d7cc6698979a8fc56aa00ec786c368b4e63a78",
-      "candidate_sha256": "245e599843b817bfa7f06b1db212502790a2dca13d229e21367060beb1fa9b6c"
+      "candidate_sha256": "5c1ccee971e8a306ba4df732f7043718308b3e91f8fec1c0f47abecabb71831a"
+    },
+    "repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/addon.xml": {
+      "before_sha256": "922ac8d332bbef8ccd70a194f664536f0b789ffbe451ff402736f9fa696090a2",
+      "candidate_sha256": "af7477ee9208c78eaf5ae34b6103e0571d2defeb4f8d876e1b0abafbc4913ead"
+    },
+    "repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/context.py": {
+      "before_sha256": "c688c9f192512a7bb7628c545e9743eead901be532add06baf50a2cce112aedd",
+      "candidate_sha256": "bd874b64942262853f424b3a3258a72ce67d905f07784f55b81fbb0af4cef050"
+    },
+    "repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/plugin.py": {
+      "before_sha256": "87dcfdceedffc9829fd3310a5de3244b3379adfe24d1210cb750d4e06005a57e",
+      "candidate_sha256": "396d66bea518fe0fffa28fdc5452a5e14235cdcfc32de640ae27b5bd557e65c7"
     }
   },
   "native_modified": false,
-  "Search_modified": "Cache-only UI/progress invalidation becomes one fresh owned request; settings stamps and native crash unchanged",
+  "Search_modified": "Explicit provider selection opens the existing source-verified native provider route. Aggregate guards unchanged; Search All settings false positives unresolved.",
   "Cobra_modified": false,
   "Preview_modified": false,
   "Command_Center_version": "0.3.5.61 unchanged",
   "installable_updates_produced": false,
-  "Android": "NOT_RUN"
+  "Android": "NOT_RUN",
+  "functional_device_reference": "user confirmed APK2103462, authenticated skin262 and CC61 payload",
+  "all_nine_complete": false
 }

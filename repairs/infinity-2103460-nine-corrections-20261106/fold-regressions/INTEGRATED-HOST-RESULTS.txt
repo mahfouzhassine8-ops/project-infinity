@@ -1,0 +1,135 @@
+test_abort_during_history_save_does_not_activate_window (__main__.ProviderDispatch.test_abort_during_history_save_does_not_activate_window) ... ERROR
+test_aggregate_security_ownership_and_cancellation_functions_unchanged (__main__.ProviderDispatch.test_aggregate_security_ownership_and_cancellation_functions_unchanged) ... ok
+test_all_still_uses_original_owned_aggregate (__main__.ProviderDispatch.test_all_still_uses_original_owned_aggregate) ... ERROR
+test_explicit_selection_opens_original_provider_not_empty_aggregate_wrapper (__main__.ProviderDispatch.test_explicit_selection_opens_original_provider_not_empty_aggregate_wrapper) ... 
+  test_explicit_selection_opens_original_provider_not_empty_aggregate_wrapper (__main__.ProviderDispatch.test_explicit_selection_opens_original_provider_not_empty_aggregate_wrapper) (provider='plugin.video.thecrew') ... ERROR
+  test_explicit_selection_opens_original_provider_not_empty_aggregate_wrapper (__main__.ProviderDispatch.test_explicit_selection_opens_original_provider_not_empty_aggregate_wrapper) (provider='plugin.video.watchnixtoons2') ... ERROR
+  test_explicit_selection_opens_original_provider_not_empty_aggregate_wrapper (__main__.ProviderDispatch.test_explicit_selection_opens_original_provider_not_empty_aggregate_wrapper) (provider='plugin.video.umbrella') ... ERROR
+  test_explicit_selection_opens_original_provider_not_empty_aggregate_wrapper (__main__.ProviderDispatch.test_explicit_selection_opens_original_provider_not_empty_aggregate_wrapper) (provider='plugin.video.seren') ... ERROR
+test_legacy_provider_history_still_uses_verified_history_route (__main__.ProviderDispatch.test_legacy_provider_history_still_uses_verified_history_route) ... ERROR
+test_source_change_during_history_save_refuses_activation (__main__.ProviderDispatch.test_source_change_during_history_save_refuses_activation) ... ERROR
+test_applied_info_matches_previously_verified_candidate (__main__.SkinAndProtectedPasses.test_applied_info_matches_previously_verified_candidate) ... ok
+test_four_physical_passes_native_and_other_overlay_files_are_identical (__main__.SkinAndProtectedPasses.test_four_physical_passes_native_and_other_overlay_files_are_identical) ... ok
+test_white_texture_is_static_files_decoration_not_busy_or_item_art (__main__.SkinAndProtectedPasses.test_white_texture_is_static_files_decoration_not_busy_or_item_art) ... ok
+test_both_direct_actions_call_original_writer_and_flush (__main__.WatchedActions.test_both_direct_actions_call_original_writer_and_flush) ... ok
+test_direct_entries_do_not_duplicate_native_file_actions (__main__.WatchedActions.test_direct_entries_do_not_duplicate_native_file_actions) ... ok
+test_invalid_or_unowned_direct_action_cannot_mutate (__main__.WatchedActions.test_invalid_or_unowned_direct_action_cannot_mutate) ... ok
+test_original_watched_store_survives_reload_preserving_other_lists (__main__.WatchedActions.test_original_watched_store_survives_reload_preserving_other_lists) ... ok
+test_stale_watched_action_cannot_reverse_newer_state (__main__.WatchedActions.test_stale_watched_action_cannot_reverse_newer_state) ... ok
+test_writer_and_identity_helpers_are_unchanged (__main__.WatchedActions.test_writer_and_identity_helpers_are_unchanged) ... ok
+
+======================================================================
+ERROR: test_abort_during_history_save_does_not_activate_window (__main__.ProviderDispatch.test_abort_during_history_save_does_not_activate_window)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/dev/shm/infinity-nine-corrections/repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/test_integrated_corrections.py", line 72, in test_abort_during_history_save_does_not_activate_window
+    commands,calls=self.run_form(during=lambda p,s:s.__setitem__(0,True))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/dev/shm/infinity-nine-corrections/repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/test_integrated_corrections.py", line 55, in run_form
+    function(CC/'infinity_search.py','_open_search',env)('tv')
+  File "/dev/shm/infinity-nine-corrections/repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/infinity_search.py", line 510, in _open_search
+    icon=xbmcvfs.translatePath(icon)))
+         ^^^^^^^
+NameError: name 'xbmcvfs' is not defined
+
+======================================================================
+ERROR: test_all_still_uses_original_owned_aggregate (__main__.ProviderDispatch.test_all_still_uses_original_owned_aggregate)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/dev/shm/infinity-nine-corrections/repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/test_integrated_corrections.py", line 76, in test_all_still_uses_original_owned_aggregate
+    commands,calls=self.run_form('all')
+                   ^^^^^^^^^^^^^^^^^^^^
+  File "/dev/shm/infinity-nine-corrections/repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/test_integrated_corrections.py", line 55, in run_form
+    function(CC/'infinity_search.py','_open_search',env)('tv')
+  File "/dev/shm/infinity-nine-corrections/repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/infinity_search.py", line 510, in _open_search
+    icon=xbmcvfs.translatePath(icon)))
+         ^^^^^^^
+NameError: name 'xbmcvfs' is not defined
+
+======================================================================
+ERROR: test_explicit_selection_opens_original_provider_not_empty_aggregate_wrapper (__main__.ProviderDispatch.test_explicit_selection_opens_original_provider_not_empty_aggregate_wrapper) (provider='plugin.video.thecrew')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/dev/shm/infinity-nine-corrections/repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/test_integrated_corrections.py", line 61, in test_explicit_selection_opens_original_provider_not_empty_aggregate_wrapper
+    commands,calls=self.run_form(aid)
+                   ^^^^^^^^^^^^^^^^^^
+  File "/dev/shm/infinity-nine-corrections/repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/test_integrated_corrections.py", line 55, in run_form
+    function(CC/'infinity_search.py','_open_search',env)('tv')
+  File "/dev/shm/infinity-nine-corrections/repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/infinity_search.py", line 510, in _open_search
+    icon=xbmcvfs.translatePath(icon)))
+         ^^^^^^^
+NameError: name 'xbmcvfs' is not defined
+
+======================================================================
+ERROR: test_explicit_selection_opens_original_provider_not_empty_aggregate_wrapper (__main__.ProviderDispatch.test_explicit_selection_opens_original_provider_not_empty_aggregate_wrapper) (provider='plugin.video.watchnixtoons2')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/dev/shm/infinity-nine-corrections/repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/test_integrated_corrections.py", line 61, in test_explicit_selection_opens_original_provider_not_empty_aggregate_wrapper
+    commands,calls=self.run_form(aid)
+                   ^^^^^^^^^^^^^^^^^^
+  File "/dev/shm/infinity-nine-corrections/repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/test_integrated_corrections.py", line 55, in run_form
+    function(CC/'infinity_search.py','_open_search',env)('tv')
+  File "/dev/shm/infinity-nine-corrections/repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/infinity_search.py", line 510, in _open_search
+    icon=xbmcvfs.translatePath(icon)))
+         ^^^^^^^
+NameError: name 'xbmcvfs' is not defined
+
+======================================================================
+ERROR: test_explicit_selection_opens_original_provider_not_empty_aggregate_wrapper (__main__.ProviderDispatch.test_explicit_selection_opens_original_provider_not_empty_aggregate_wrapper) (provider='plugin.video.umbrella')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/dev/shm/infinity-nine-corrections/repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/test_integrated_corrections.py", line 61, in test_explicit_selection_opens_original_provider_not_empty_aggregate_wrapper
+    commands,calls=self.run_form(aid)
+                   ^^^^^^^^^^^^^^^^^^
+  File "/dev/shm/infinity-nine-corrections/repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/test_integrated_corrections.py", line 55, in run_form
+    function(CC/'infinity_search.py','_open_search',env)('tv')
+  File "/dev/shm/infinity-nine-corrections/repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/infinity_search.py", line 510, in _open_search
+    icon=xbmcvfs.translatePath(icon)))
+         ^^^^^^^
+NameError: name 'xbmcvfs' is not defined
+
+======================================================================
+ERROR: test_explicit_selection_opens_original_provider_not_empty_aggregate_wrapper (__main__.ProviderDispatch.test_explicit_selection_opens_original_provider_not_empty_aggregate_wrapper) (provider='plugin.video.seren')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/dev/shm/infinity-nine-corrections/repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/test_integrated_corrections.py", line 61, in test_explicit_selection_opens_original_provider_not_empty_aggregate_wrapper
+    commands,calls=self.run_form(aid)
+                   ^^^^^^^^^^^^^^^^^^
+  File "/dev/shm/infinity-nine-corrections/repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/test_integrated_corrections.py", line 55, in run_form
+    function(CC/'infinity_search.py','_open_search',env)('tv')
+  File "/dev/shm/infinity-nine-corrections/repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/infinity_search.py", line 510, in _open_search
+    icon=xbmcvfs.translatePath(icon)))
+         ^^^^^^^
+NameError: name 'xbmcvfs' is not defined
+
+======================================================================
+ERROR: test_legacy_provider_history_still_uses_verified_history_route (__main__.ProviderDispatch.test_legacy_provider_history_still_uses_verified_history_route)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/dev/shm/infinity-nine-corrections/repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/test_integrated_corrections.py", line 80, in test_legacy_provider_history_still_uses_verified_history_route
+    commands,calls=self.run_form(history=True)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/dev/shm/infinity-nine-corrections/repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/test_integrated_corrections.py", line 55, in run_form
+    function(CC/'infinity_search.py','_open_search',env)('tv')
+  File "/dev/shm/infinity-nine-corrections/repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/infinity_search.py", line 510, in _open_search
+    icon=xbmcvfs.translatePath(icon)))
+         ^^^^^^^
+NameError: name 'xbmcvfs' is not defined
+
+======================================================================
+ERROR: test_source_change_during_history_save_refuses_activation (__main__.ProviderDispatch.test_source_change_during_history_save_refuses_activation)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/dev/shm/infinity-nine-corrections/repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/test_integrated_corrections.py", line 69, in test_source_change_during_history_save_refuses_activation
+    self.run_form(during=lambda p,s:p.update(source_changed=True))
+  File "/dev/shm/infinity-nine-corrections/repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/test_integrated_corrections.py", line 55, in run_form
+    function(CC/'infinity_search.py','_open_search',env)('tv')
+  File "/dev/shm/infinity-nine-corrections/repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/infinity_search.py", line 510, in _open_search
+    icon=xbmcvfs.translatePath(icon)))
+         ^^^^^^^
+NameError: name 'xbmcvfs' is not defined
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.266s
+
+FAILED (errors=8)

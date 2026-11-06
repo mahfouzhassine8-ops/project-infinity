@@ -134,10 +134,17 @@
       <label>$INFO[ListItem.Plot]</label>
       <autoscroll>false</autoscroll>
     </control>
+    <control type="videowindow">
+      <left>4.0625%</left>
+      <top>13.5185%</top>
+      <width>91.6667%</width>
+      <height>64.0741%</height>
+      <visible>Player.HasVideo</visible>
+    </control>
     <control type="grouplist" id="9000">
       <left>7%</left>
       <top>42.4074%</top>
-      <width>86%</width>
+      <width min="86%" max="86%">auto</width>
       <height>72</height>
       <orientation>horizontal</orientation>
       <itemgap>8</itemgap>
@@ -465,13 +472,6 @@
       <width>1</width>
       <height>1</height>
       <visible>false</visible>
-    </control>
-    <control type="videowindow">
-      <left>4.0625%</left>
-      <top>13.5185%</top>
-      <width>91.6667%</width>
-      <height>64.0741%</height>
-      <visible>Player.HasVideo</visible>
     </control>
   </controls>
   <animation effect="fade" start="0" end="100" time="160" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowOpen</animation>

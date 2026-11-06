@@ -8,7 +8,7 @@ FIRST=ROOT/'repairs/infinity-final-closure-2103407';sys.path.insert(0,str(FIRST)
 import module_bundle
 BASE='226911966c1d27d1246cd0ecfcd864c722df48f9be07167bd4b15ad1e73560af'
 CERT='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
-CC='script.infinity.commandcenter';SKIN='skin.infinity.diggz';VERSION='0.3.5.61';SKIN_VERSION='1.0.5.262'
+CC='script.infinity.commandcenter';SKIN='skin.infinity.diggz';VERSION='0.3.5.61';SKIN_VERSION='1.0.5.264'
 def sha(p):
  with Path(p).open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
 def run(*args,env=None):
@@ -17,68 +17,11 @@ def run(*args,env=None):
  return p.stdout
 def save(p,d):p.write_text(json.dumps(d,indent=2,sort_keys=True)+'\n')
 def preflight(apk,out):
- assert sha(apk)==BASE,'EXACT_SIGNED2103460_REQUIRED'
- branch=run('git','branch','--show-current').strip();assert branch=='work/infinity-2103460-nine-corrections-20261106'
- changed=run('git','diff','--name-only','ed5f797618b570e837d83668ba355a4396a8d4a8','HEAD').splitlines()
- assert all(n.startswith('repairs/infinity-2103460-nine-corrections-20261106/') or n in ('.github/workflows/infinity-combined-release.yml','.github/workflows/infinity-six-navigation-arm64.yml','repairs/dual-experience-isolation-2103420/signer-policy.json','repairs/dual-experience-isolation-2103420/release_gate.py') or n in json.loads((HERE.parent/'SOURCE-INVENTORY.json').read_text())['changed_source_files'] for n in changed),'UNRELATED_SOURCE_CHANGE'
- assert run('git','status','--porcelain','--untracked-files=no').strip()=='','COMMITTED_REVIEWED_SOURCE_REQUIRED'
- assert not out.exists(),'fresh output required'
- out.mkdir(parents=True);addons=out/'addons';addons.mkdir();inventory=json.loads((HERE.parent/'SOURCE-INVENTORY.json').read_text());changes={};protected={}
- with ZipFile(apk) as z:
-  assert len(z.namelist())==len(set(z.namelist()))
-  for n in z.namelist():
-   if n.startswith(tuple('assets/addons/'+a+'/' for a in (*module_bundle.IDS,SKIN))) and not n.endswith('/'):
-    raw=z.read(n);p=addons/n.removeprefix('assets/addons/');assert '..' not in p.parts;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(raw);protected[n.removeprefix('assets/addons/')]=hashlib.sha256(raw).hexdigest()
-  recovery=out/'recovery-addons';recovery.mkdir()
-  for aid in (CC,SKIN):shutil.copytree(addons/aid,recovery/aid)
-  for source,row in inventory['changed_source_files'].items():
-   rel=source.split('/overlay/assets/addons/',1)[1];assert rel.startswith((CC+'/',SKIN+'/'))
-   assert protected[rel]==row['before_sha256'],rel
-   assert sha(ROOT/source)==row['candidate_sha256'],source
-   (addons/rel).write_bytes((ROOT/source).read_bytes());changes[rel]=row['candidate_sha256']
- assert len(changes)==14 and inventory['Command_Center_version']=='0.3.5.61 unchanged'
- assert ET.parse(addons/CC/'addon.xml').getroot().get('version')==VERSION
- # Only skin release/integrity metadata changes; Command Center identity remains exact.
- xml=addons/SKIN/'addon.xml';raw=xml.read_bytes();assert b'version="1.0.5.258"' in raw
- xml.write_bytes(raw.replace(b'version="1.0.5.258"',b'version="1.0.5.262"',1));changes[SKIN+'/addon.xml']=sha(xml)
- for leaf in ('infinity-skin.json','Infinity-Protected-Manifest.json'):
-  f=addons/SKIN/leaf;d=json.loads(f.read_text());d['candidate']=262;d['candidate_locked']=False
-  if 'physical_device_verified' in d:d['physical_device_verified']=False
-  for k in ('version','candidate_version','skin_version'):
-   if k in d:d[k]=SKIN_VERSION
-  if 'protected_files' in d:
-   for name,value in changes.items():
-    if name.startswith(SKIN+'/'):d['protected_files'][name[len(SKIN)+1:]]=value
-   assert len(d['protected_files'])==948
-  save(f,d);changes[SKIN+'/'+leaf]=sha(f)
- # Forward skin recovery: original functional payload, higher skin version.
- recovery_xml=recovery/SKIN/'addon.xml';recovery_xml.write_bytes(recovery_xml.read_bytes().replace(b'version="1.0.5.258"',b'version="1.0.5.263"',1))
- for leaf in ('infinity-skin.json','Infinity-Protected-Manifest.json'):
-  f=recovery/SKIN/leaf;d=json.loads(f.read_text());d['candidate']=263;d['candidate_locked']=False
-  for k in ('version','candidate_version','skin_version'):
-   if k in d:d[k]='1.0.5.263'
-  if 'physical_device_verified' in d:d['physical_device_verified']=False
-  if 'protected_files' in d:
-   d['protected_files']['addon.xml']=sha(recovery_xml)
-   d['protected_files']['infinity-skin.json']=sha(recovery/SKIN/'infinity-skin.json')
-  save(f,d)
- for skin_root in (addons/SKIN,recovery/SKIN):
-  protected_skin=json.loads((skin_root/'Infinity-Protected-Manifest.json').read_text())['protected_files']
-  assert len(protected_skin)==948
-  for rel,want in protected_skin.items():assert sha(skin_root/rel)==want,'SKIN_INTEGRITY_BEFORE_KEYS:'+rel
- old_marker=(addons/CC/module_bundle.MANIFEST).read_bytes();payload,files=module_bundle.build(addons_for_build(addons,out))
- assert len(files)==78 and payload.startswith(('INFINITY-MODULES/1\npackage\t'+VERSION+'\n').encode())
- marker=addons/CC/module_bundle.MANIFEST;marker.write_bytes(payload);Path(str(marker)+'.sig').unlink();changes[CC+'/'+module_bundle.MANIFEST]=sha(marker)
- for rel,want in protected.items():
-  if rel.startswith((CC+'/',SKIN+'/')) and rel not in {SKIN+'/addon.xml',SKIN+'/infinity-skin.json',SKIN+'/Infinity-Protected-Manifest.json'}:
-   assert sha(recovery/rel)==want,'RECOVERY_FUNCTIONAL_DIFFERENCE:'+rel
- # Full reference inventory; every unrelated existing add-on byte must match.
- for rel,want in protected.items():
-  if rel not in changes and rel!=CC+'/'+module_bundle.MANIFEST+'.sig':assert sha(addons/rel)==want,rel
- for path in (addons/SKIN).rglob('*.xml'):ET.parse(path)
- for leaf in ('default.py','library_navigation.py'):compile((addons/CC/leaf).read_bytes(),leaf,'exec')
- save(out/'PREFLIGHT.json',dict(status='PASS_EXACT2103460_ADDON_SOURCE_AND_METADATA',baseline_sha256=BASE,commandcenter_version=VERSION,skin_version=SKIN_VERSION,source=run('git','rev-parse','HEAD').strip(),changes=changes,protected=protected,module_file_count=78,old_module_manifest_sha256=hashlib.sha256(old_marker).hexdigest(),Android='NOT_RUN',all_nine_complete=False,Downloads_native_required_sha256=json.loads((HERE.parent/'native-packaging/ENGINE-INPUT.json').read_text())['native_sha256']))
- print('PASS exact signed2103460, 14 authorized source changes, original CC identity and complete module source set')
+ # Same owner-gated workflow and signing implementation; forward from the
+ # authenticated physical-pass262 addon payload without repackaging APK462.
+ from importlib.machinery import SourceFileLoader
+ helper=SourceFileLoader('infinity_fold_preflight',str(HERE.parent/'fold-regressions/package_preflight.py')).load_module()
+ return helper.prepare(sys.modules[__name__],apk,out)
 def addons_for_build(addons,out):
  root=out/'module-root'
  if root.exists():shutil.rmtree(root)
@@ -111,7 +54,7 @@ def sign(out):
   text+=run(verifier,module_root,FIRST/'ORIGINAL-INFINITY-PUBLIC-KEY.pem');(publish/'MODULE-AUTHENTICATION.txt').write_text(text)
   # Normal Kodi add-on ZIP shape: exactly one addon root, complete existing resources.
   ziprows=[]
-  for aid,version,source_root,suffix in ((CC,VERSION,addons,'corrective'),(SKIN,SKIN_VERSION,addons,'corrective'),(CC,VERSION,out/'recovery-addons','recovery'),(SKIN,'1.0.5.263',out/'recovery-addons','recovery')):
+  for aid,version,source_root,suffix in ((CC,VERSION,addons,'corrective'),(SKIN,SKIN_VERSION,addons,'corrective'),(CC,VERSION,out/'recovery-addons','recovery'),(SKIN,'1.0.5.265',out/'recovery-addons','recovery')):
    name=aid+'-'+version+'-2103460-'+suffix+'.zip';dest=publish/name
    with ZipFile(dest,'w',compression=ZIP_DEFLATED,compresslevel=9) as z:
     for f in sorted((source_root/aid).rglob('*')):
@@ -129,6 +72,11 @@ def sign(out):
  (publish/'SHA256SUMS').write_text(''.join(h+'  '+n+'\n' for n,h in ziprows))
  proof['status']='PASS_ORIGINAL_KEY_COMPLETE_ADDON_INSTALLER_ZIPS';proof['artifacts']={n:h for n,h in ziprows};proof['certificate_sha256']=CERT;proof['native_changed']=False;proof['all_nine_complete']=False;proof['Android_install_and_service_restart']='NOT_RUN'
  save(publish/'BUILD-RECEIPT.json',proof)
+ # Exercise the unchanged actual Java installer on disposable host profiles,
+ # including partial-pair refusal and exact current-generation recovery.
+ from importlib.machinery import SourceFileLoader
+ recovery_audit=SourceFileLoader('infinity_fold_recovery_audit',str(HERE.parent/'fold-regressions/verify_recovery.py')).load_module()
+ recovery_audit.audit(ROOT,Path(proof['seed_apk_path']),publish,out,out/'recovery-audit')
  # No key, temporary classes, extracted user data, or raw native engine enters artifacts.
  print('PASS original signatures and complete installable add-on ZIP structures; Android acceptance NOT RUN')
 if __name__=='__main__':

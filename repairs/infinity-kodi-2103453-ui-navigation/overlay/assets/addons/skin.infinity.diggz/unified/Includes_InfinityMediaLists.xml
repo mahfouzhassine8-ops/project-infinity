@@ -118,7 +118,7 @@
         <texture>$VAR[ListItemOverlay]</texture>
         <colordiffuse>$VAR[InfinityPaletteAccent]</colordiffuse>
         <left>60</left>
-        <visible>ListItem.IsResumable | Integer.IsGreater(ListItem.PlayCount,0) | ListItem.IsPlaying</visible>
+        <visible>ListItem.IsResumable | Integer.IsGreater(ListItem.PlayCount,0) | ListItem.IsPlaying | String.IsEqual(ListItem.Overlay,OverlayWatched.png) | String.IsEqual(ListItem.Property(Infinity.ResumeHub.Watched),true)</visible>
       </control>
       <include content="InfinityActionLoadingFrame" condition="$PARAM[Focused]">
         <param name="width" value="100%" />
@@ -3186,7 +3186,7 @@
           <top>86.6142%</top>
           <width>20.833455%</width>
           <height>12.79528%</height>
-          <visible>!Window.IsActive(home) | !Window.IsActive(DialogAddonInfo)</visible>
+          <visible>[!Window.IsActive(home) | !Window.IsActive(DialogAddonInfo)] + ![Window.IsActive(videos) + String.IsEmpty(Container.PluginName) + [Container.Content(files) | Container.Content()]]</visible>
           <texture>special://skin/resources/icon.png</texture>
         </control>
       </control>
