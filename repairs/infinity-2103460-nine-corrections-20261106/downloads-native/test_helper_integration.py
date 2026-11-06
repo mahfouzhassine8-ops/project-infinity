@@ -11,6 +11,6 @@ for name in paths:
  count=len(calls);assert m.activate(xb,gui,'plugin://anything/',downloads_only=True) is False;assert len(calls)==count;cases.append('reject_other_paths:'+name)
  if 'commandcenter' in name:
   for a,route in [('library-movies','movies'),('library-tv','tv')]:
-   assert m.run(a,xb,gui);assert calls[-1]['params']=={'window':'videos','parameters':['plugin://script.infinity.commandcenter/?action='+route,'return']};cases.append('existing_home:'+a)
+   assert m.run(a,xb,gui);assert calls[-1]['params']=={'window':'videos','parameters':['plugin://script.infinity.commandcenter/?action='+route,'return','infinity-library-direct']};cases.append('existing_home:'+a)
 report={'status':'PASS_ACTUAL_HELPER_IMPORTS','checks':len(cases),'cases':cases,'native_or_provider_execution':False,'Android':'NOT_RUN','shutdown_suite':False}
 Path(__file__).with_name('HELPER-INTEGRATION-RESULT.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report))

@@ -25,7 +25,9 @@ def activate(xbmc, gui, path, direct_library=False, downloads_only=False):
             return False
         parameters.append('infinity-downloads-only')
     if direct_library:
-        if path not in ('videodb://movies/titles/', 'videodb://tvshows/titles/'):
+        if path not in ('videodb://movies/titles/', 'videodb://tvshows/titles/',
+                        'plugin://script.infinity.commandcenter/?action=movies',
+                        'plugin://script.infinity.commandcenter/?action=tv'):
             return False
         parameters.append('infinity-library-direct')
     result = rpc(xbmc, 'GUI.ActivateWindow',
@@ -140,7 +142,7 @@ def run(action, xbmc, gui, environ=None):
         path = ('plugin://script.infinity.commandcenter/?action=movies'
                 if action == 'library-movies'
                 else 'plugin://script.infinity.commandcenter/?action=tv')
-        return activate(xbmc, gui, path)
+        return activate(xbmc, gui, path, direct_library=True)
     if action in ('movies', 'tv', 'sports'):
         return direct(action, xbmc, gui)
     if action == 'browse':

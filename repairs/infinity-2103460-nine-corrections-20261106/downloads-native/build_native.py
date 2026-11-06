@@ -56,6 +56,6 @@ def compile_engine():
  (OUT/'ELF-ABI.txt').write_text(header);(OUT/'DYNAMIC-SYMBOLS.txt').write_text(symbols)
  before=json.loads((OUT/'SIGNED460-NATIVE-SOURCE-MAP.json').read_text());after=json.loads((OUT/'NATIVE-SOURCE-MAP.json').read_text());rows=json.loads((HERE/'CANDIDATE.json').read_text())['files']
  assert set(before)==set(after) and {n for n in after if before[n]!=after[n]}==set(rows)
- save('CONTROLLED-ENGINE-VERIFIED.json',dict(status='PASS_FULL_ARM64_SIGNED460_PLUS_SCOPED_DOWNLOADS',source_commit=os.environ['GITHUB_SHA'],native_sha256=sha(lib),native_bytes=lib.stat().st_size,source_reference=2103460,changed_native_sources={n:after[n] for n in rows},protected_native_source_count=9407,APK=False,signing=False,Android='NOT_RUN',Fold='NOT_RUN',Search_crash='UNRESOLVED_SEPARATE'))
+ save('CONTROLLED-ENGINE-VERIFIED.json',dict(status='PASS_FULL_ARM64_SIGNED460_PLUS_SCOPED_LIBRARY_DOWNLOADS',source_commit=os.environ['GITHUB_SHA'],native_sha256=sha(lib),native_bytes=lib.stat().st_size,source_reference=2103460,changed_native_sources={n:after[n] for n in rows},protected_native_source_count=9407,APK=False,signing=False,Android='NOT_RUN',Fold='NOT_RUN',Search_crash='UNRESOLVED_SEPARATE'))
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('mode',choices=['preflight','restore','compile']);a=p.parse_args();OUT.mkdir(exist_ok=True);{'preflight':preflight,'restore':restore_sources,'compile':compile_engine}[a.mode]()

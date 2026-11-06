@@ -200,7 +200,7 @@ bool CGUIWindowVideoNav::OnMessage(CGUIMessage& message)
       }
 
 #if defined(TARGET_ANDROID)
-      // An explicit Infinity drawer entry opens its title root, even when
+      // An explicit Infinity drawer entry opens its exact library menu/root, even when
       // "return" would otherwise restore a previously retained child.
       // Other callers keep Kodi's existing return/history semantics.
       if (g_SkinInfo && g_SkinInfo->ID() == "skin.infinity.diggz" &&
@@ -208,7 +208,9 @@ bool CGUIWindowVideoNav::OnMessage(CGUIMessage& message)
           message.GetStringParam(1) == "return" &&
           message.GetStringParam(2) == "infinity-library-direct" &&
           (message.GetStringParam(0) == "videodb://movies/titles/" ||
-           message.GetStringParam(0) == "videodb://tvshows/titles/"))
+           message.GetStringParam(0) == "videodb://tvshows/titles/" ||
+           message.GetStringParam(0) == "plugin://script.infinity.commandcenter/?action=movies" ||
+           message.GetStringParam(0) == "plugin://script.infinity.commandcenter/?action=tv"))
       {
         m_vecItems->SetPath(message.GetStringParam(0));
       }

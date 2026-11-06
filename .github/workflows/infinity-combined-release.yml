@@ -733,7 +733,7 @@ jobs:
           if pnative:
               require(a['candidate_versionCode'] in (2103462,2103463),'EXACT_DOWNLOADS_NATIVE_RECOVERY_VERSIONS')
               version=a['candidate_versionCode'];generation=48 if version==2103462 else 49;baseline=2103460
-              owner='INFINITY_DOWNLOADS_NATIVE_TEST' if version==2103462 else 'INFINITY_SIGNED460_FORWARD_RECOVERY'
+              owner='INFINITY_LIBRARY_DOWNLOADS_NATIVE_TEST' if version==2103462 else 'INFINITY_SIGNED460_FORWARD_RECOVERY'
               import sys
               sys.path.insert(0,'repairs/infinity-2103460-nine-corrections-20261106/native-packaging')
               import release_native as controlled

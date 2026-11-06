@@ -29,7 +29,7 @@ class Selected(unittest.TestCase):
   m=loadhelper();calls=[];xb=types.SimpleNamespace(executeJSONRPC=lambda raw:(calls.append(json.loads(raw)) or '{"result":"OK"}'));gui=types.SimpleNamespace(Dialog=lambda:None)
   home=(BASE/'skin.infinity.diggz/unified/Home.xml').read_text()
   for action,route in [('library-movies','movies'),('library-tv','tv')]:
-   self.assertTrue(m.run(action,xb,gui));path='plugin://script.infinity.commandcenter/?action='+route;self.assertIn(path,home);self.assertEqual(calls[-1]['params'],{'window':'videos','parameters':[path,'return']})
+   self.assertTrue(m.run(action,xb,gui));path='plugin://script.infinity.commandcenter/?action='+route;self.assertIn(path,home);self.assertEqual(calls[-1]['params'],{'window':'videos','parameters':[path,'return','infinity-library-direct']})
  def test_downloads_both_helpers_never_probe_storage(self):
   for path in (CC/'library_navigation.py',SKIN/'resources/lib/infinity_library_navigation.py'):
    spec=importlib.util.spec_from_file_location('download_helper',path);m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m);calls=[];xb=types.SimpleNamespace(executeJSONRPC=lambda raw:(calls.append(json.loads(raw)) or '{"result":"OK"}'));gui=types.SimpleNamespace(Dialog=lambda:None)

@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "/dev/shm/infinity-nine-corrections/repairs/infinity-2103460-nine-corrections-20261106/downloads-native/test_direct_entry.py", line 28, in <module>
+    r=subprocess.run([str(out/'conditional')],capture_output=True,text=True);(out/'result.txt').write_text(r.stdout+r.stderr);assert r.returncode==0,r.stdout+r.stderr
+                                                                                                                                     ^^^^^^^^^^^^^^^
+AssertionError: conditional: /dev/shm/infinity-native-direct-entry/conditional.cpp:22: int main(): Assertion `apply({{path,"return","infinity-library-direct"}})==path' failed.
+
