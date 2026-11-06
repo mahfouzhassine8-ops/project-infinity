@@ -16,7 +16,7 @@ def rpc(xbmc, method, params):
         return None
 
 
-def activate(xbmc, gui, path, direct_library=False):
+def activate(xbmc, gui, path, direct_library=False, downloads_only=False):
     # JSON-RPC passes a vector of window parameters; folder names never become
     # executable builtin text. Kodi retains its own directory/player history.
     parameters = [path, 'return']
@@ -24,6 +24,10 @@ def activate(xbmc, gui, path, direct_library=False):
         if path not in ('videodb://movies/titles/', 'videodb://tvshows/titles/'):
             return False
         parameters.append('infinity-library-direct')
+    if downloads_only:
+        if path != 'files' or direct_library:
+            return False
+        parameters.append('infinity-downloads-only')
     result = rpc(xbmc, 'GUI.ActivateWindow',
                  {'window': 'videos', 'parameters': parameters})
     if result != 'OK':
@@ -144,9 +148,9 @@ def run(action, xbmc, gui, environ=None):
     if action == 'browse':
         return browse(xbmc, gui)
     if action == 'downloads':
-        # User selects sources through Kodi's existing Add videos workflow.
-        # The entry-specific source-root presentation is a separate native boundary.
-        return browse(xbmc, gui)
+        # Open Kodi's genuine video-sources root with an explicit, Infinity-only
+        # presentation marker. Kodi's native Add videos/source editing stays owner.
+        return activate(xbmc, gui, 'files', downloads_only=True)
     return False
 
 
