@@ -4,6 +4,7 @@ from contextlib import nullcontext
 from copy import deepcopy
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import subprocess
@@ -183,9 +184,64 @@ class WatchedActions(unittest.TestCase):
 
 class SkinAndProtectedPasses(unittest.TestCase):
     def test_applied_info_matches_previously_verified_candidate(self):
-        d=json.loads((HERE/'SKIN-CANDIDATE.json').read_text())
-        self.assertEqual(hashlib.sha256((SKIN/'DialogVideoInfo.xml').read_bytes()).hexdigest(),
-                         d['files']['DialogVideoInfo.xml']['candidate_sha256'])
+        # Revised after the exact original GroupList methods exposed stale
+        # min-width on a second in-place resize. No whole campaign is rerun.
+        from zipfile import ZipFile
+        with ZipFile('/dev/shm/infinity-fold264-signed/skin.infinity.diggz-1.0.5.264-2103460-corrective.zip') as z:
+            old=ET.fromstring(z.read('skin.infinity.diggz/unified/DialogVideoInfo.xml'))
+        new=ET.parse(SKIN/'DialogVideoInfo.xml').getroot()
+        group=new.find('.//control[@id="9000"]')
+        self.assertEqual(group.get('type'),'group');self.assertEqual(group.findtext('width'),'86%')
+        self.assertEqual(group.findtext('defaultcontrol'),'8')
+        self.assertEqual(group.find('width').attrib,{})
+        for ident,left in [('8','0%'),('9012','25%'),('9013','50%'),('106','75%')]:
+            a,b=old.find('.//control[@id="'+ident+'"]'),new.find('.//control[@id="'+ident+'"]')
+            self.assertEqual(b.findtext('left'),left)
+            for tag in ('onclick','visible','enable','label','texturefocus','texturenofocus'):
+                self.assertEqual([(e.attrib,e.text) for e in a.findall(tag)],[(e.attrib,e.text) for e in b.findall(tag)],(ident,tag))
+        for ident in ('50','400'):
+            self.assertEqual(ET.tostring(old.find('.//control[@id="'+ident+'"]')),
+                             ET.tostring(new.find('.//control[@id="'+ident+'"]')))
+        for viewport in (2400,2000,1900,1080,1440):
+            width=.86*viewport
+            end=0
+            for ident in ('8','9012','9013','106'):
+                node=group.find('control[@id="'+ident+'"]')
+                start=float(node.findtext('left').rstrip('%'))/100*width
+                size=float(node.findtext('width').rstrip('%'))/100*width
+                self.assertGreaterEqual(start,end);end=start+size
+            self.assertLessEqual(end,width)
+        play=group.find('control[@id="8"]');cast=group.find('control[@id="9013"]')
+        self.assertEqual(play.findtext('onright[@condition="Control.IsVisible(9012)"]'),'9012')
+        self.assertEqual(play.findtext('onright[@condition="!Control.IsVisible(9012)"]'),'9013')
+        self.assertEqual(cast.findtext('onleft[@condition="!Control.IsVisible(9012)"]'),'8')
+        self.assertEqual(new.findtext('.//control[@id="9011"]/ondown'),'8')
+        from test_info_and_preservation import method
+        native=Path('/tmp/kodi451-restored-native/xbmc/guilib/GUIControlGroupList.cpp').read_text()
+        actual='\n'.join(method(native,s) for s in ('float CGUIControlGroupList::GetWidth() const','void CGUIControlGroupList::SetMinSize(float minWidth, float minHeight)'))
+        source='''#include <cassert>
+        enum {VERTICAL,HORIZONTAL};
+        #define CLAMP(x,l,h) (((x)>(h))?(h):(((x)<(l))?(l):(x)))
+        struct CGUIControlGroup {float m_width=0;float GetWidth()const{return m_width;}};
+        struct CGUIControlGroupList:CGUIControlGroup{int m_orientation=HORIZONTAL;float m_minSize=0,m_totalSize=0;
+          float GetWidth()const;void SetMinSize(float,float);};
+        '''+actual+'''\nint main(){CGUIControlGroupList old;
+        old.m_width=2064;old.SetMinSize(2064,0);old.m_totalSize=4*.23f*2064+24;
+        old.m_width=1720;old.m_totalSize=4*.23f*old.GetWidth()+24;
+        old.m_width=1634;old.m_totalSize=4*.23f*old.GetWidth()+24;
+        assert(old.m_totalSize>old.m_width); // original auto/min candidate clips
+        CGUIControlGroup corrected;
+        for(float w:{2400.f,2000.f,1900.f,1080.f,1440.f}) {corrected.m_width=.86f*w;
+          assert(.75f*corrected.GetWidth()+.23f*corrected.GetWidth()<=corrected.m_width);}}
+        '''
+        source=source.replace('#include <cassert>','#include <cassert>\n#include <initializer_list>')
+        with tempfile.TemporaryDirectory(dir='/dev/shm') as t:
+            cpp=Path(t)/'actual-resize.cpp';cpp.write_text(source)
+            fd,binary=tempfile.mkstemp(prefix='infinity-info-resize-',dir='/tmp');os.close(fd)
+            try:
+                subprocess.run(['g++','-std=c++17','-Wall','-Wextra','-Werror',str(cpp),'-o',binary],check=True,capture_output=True)
+                subprocess.run([binary],check=True,capture_output=True)
+            finally:Path(binary).unlink(missing_ok=True)
 
     def test_white_texture_is_static_files_decoration_not_busy_or_item_art(self):
         r=ET.parse(SKIN/'Includes_InfinityMediaLists.xml').getroot()

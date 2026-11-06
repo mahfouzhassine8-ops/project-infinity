@@ -17,6 +17,28 @@ def audit(root,seed,publish,previous,out):
     import module_dex
     ids=('script.infinity.commandcenter','script.infinity.rails','script.infinity.uirepair','script.infinity.watchedbridge')
     cc=ids[0];out.mkdir(exist_ok=False)
+    # Only the Info skin changed after run42281237899. Reuse its real Java
+    # cases only when BOTH complete module payloads and every Java source are
+    # identical. Skin hashes/forward version and RSA are checked afresh elsewhere.
+    reference_path=Path(__file__).with_name('CC-AUDIT-REFERENCE.json')
+    if reference_path.is_file():
+        reference=json.loads(reference_path.read_text())
+        assert reference['run_id']==42281237899 and reference['artifact_id']==13535786340
+        with Path(seed).open('rb') as stream:
+            assert hashlib.file_digest(stream,'sha256').hexdigest()==reference['seed_apk_sha256']
+        assert hashlib.sha256(module_dex.source().encode()).hexdigest()==reference['java_source_sha256']
+        assert {str(f.relative_to(first)):hashlib.sha256(f.read_bytes()).hexdigest() for f in (first/'host-java').rglob('*.java')}==reference['host_java_sha256']
+        def payload_hashes(path):
+            with ZipFile(path) as z:return {n:hashlib.sha256(z.read(n)).hexdigest() for n in z.namelist() if not n.endswith('/')}
+        assert payload_hashes(next(publish.glob(cc+'-*-corrective.zip')))==reference['candidate']
+        assert payload_hashes(next(publish.glob(cc+'-*-recovery.zip')))==reference['recovery']
+        report=reference['report']
+        report['evidence_reused']=dict(run_id=reference['run_id'],artifact_id=reference['artifact_id'],
+            artifact_sha256=reference['artifact_sha256'],CC_payloads_and_Java_sources='EXACTLY_IDENTICAL',tests_rerun=False)
+        (out/'RECOVERY-VERIFIED.json').write_text(json.dumps(report,indent=2)+'\n')
+        shutil.copyfile(out/'RECOVERY-VERIFIED.json',publish/'RECOVERY-VERIFIED.json')
+        print('REUSE six real-Java recovery cases: both CC payloads and all Java sources exactly identical; no unchanged tests rerun')
+        return
     rows=[]
     with tempfile.TemporaryDirectory(dir=out) as temp:
         temp=Path(temp);assets=temp/'assets';addons=assets/'addons';addons.mkdir(parents=True)

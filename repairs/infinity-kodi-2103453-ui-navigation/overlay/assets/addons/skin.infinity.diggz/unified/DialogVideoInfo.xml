@@ -33,6 +33,7 @@
       <texture border="24" colordiffuse="$VAR[InfinityGlassSpecular]">infinity_glass/rim.png</texture>
     </control>
     <control type="button" id="9011">
+      <ondown>8</ondown>
       <left>3.0208%</left>
       <top>4.4444%</top>
       <width>17.5%</width>
@@ -141,15 +142,20 @@
       <height>64.0741%</height>
       <visible>Player.HasVideo</visible>
     </control>
-    <control type="grouplist" id="9000">
+    <control type="group" id="9000">
       <left>7%</left>
       <top>42.4074%</top>
-      <width min="86%" max="86%">auto</width>
+      <width>86%</width>
       <height>72</height>
-      <orientation>horizontal</orientation>
-      <itemgap>8</itemgap>
-      <align>left</align>
+      <defaultcontrol>8</defaultcontrol>
       <control type="togglebutton" id="8">
+        <left>0%</left>
+        <onleft>106</onleft>
+        <onright condition="Control.IsVisible(9012)">9012</onright>
+        <onright condition="!Control.IsVisible(9012)">9013</onright>
+        <onup>9011</onup>
+        <ondown condition="Integer.IsGreater(Container(50).NumItems,0)">50</ondown>
+        <ondown condition="!Integer.IsGreater(Container(50).NumItems,0)">9011</ondown>
         <width>23%</width>
         <height>93.1034%</height>
         <label>PLAY</label>
@@ -164,6 +170,12 @@
         <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
       </control>
       <control type="togglebutton" id="9012">
+        <left>25%</left>
+        <onleft>8</onleft>
+        <onright>9013</onright>
+        <onup>9011</onup>
+        <ondown condition="Integer.IsGreater(Container(50).NumItems,0)">50</ondown>
+        <ondown condition="!Integer.IsGreater(Container(50).NumItems,0)">9011</ondown>
         <width>23%</width>
         <height>93.1034%</height>
         <label>TRAILER</label>
@@ -191,6 +203,13 @@
         <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
       </control>
       <control type="button" id="9013">
+        <left>50%</left>
+        <onleft condition="Control.IsVisible(9012)">9012</onleft>
+        <onleft condition="!Control.IsVisible(9012)">8</onleft>
+        <onright>106</onright>
+        <onup>9011</onup>
+        <ondown condition="Integer.IsGreater(Container(50).NumItems,0)">50</ondown>
+        <ondown condition="!Integer.IsGreater(Container(50).NumItems,0)">9011</ondown>
         <width>23%</width>
         <height>93.1034%</height>
         <label>CAST</label>
@@ -204,6 +223,12 @@
         <disabledcolor>$VAR[InfinityLegacyDisabled]</disabledcolor>
       </control>
       <control type="button" id="106">
+        <left>75%</left>
+        <onleft>9013</onleft>
+        <onright>8</onright>
+        <onup>9011</onup>
+        <ondown condition="Integer.IsGreater(Container(50).NumItems,0)">50</ondown>
+        <ondown condition="!Integer.IsGreater(Container(50).NumItems,0)">9011</ondown>
         <width>23%</width>
         <height>93.1034%</height>
         <label>MORE INFO</label>

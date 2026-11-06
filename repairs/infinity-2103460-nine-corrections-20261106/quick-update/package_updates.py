@@ -8,7 +8,7 @@ FIRST=ROOT/'repairs/infinity-final-closure-2103407';sys.path.insert(0,str(FIRST)
 import module_bundle
 BASE='226911966c1d27d1246cd0ecfcd864c722df48f9be07167bd4b15ad1e73560af'
 CERT='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
-CC='script.infinity.commandcenter';SKIN='skin.infinity.diggz';VERSION='0.3.5.61';SKIN_VERSION='1.0.5.264'
+CC='script.infinity.commandcenter';SKIN='skin.infinity.diggz';VERSION='0.3.5.61';SKIN_VERSION='1.0.5.266'
 def sha(p):
  with Path(p).open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
 def run(*args,env=None):
@@ -54,7 +54,7 @@ def sign(out):
   text+=run(verifier,module_root,FIRST/'ORIGINAL-INFINITY-PUBLIC-KEY.pem');(publish/'MODULE-AUTHENTICATION.txt').write_text(text)
   # Normal Kodi add-on ZIP shape: exactly one addon root, complete existing resources.
   ziprows=[]
-  for aid,version,source_root,suffix in ((CC,VERSION,addons,'corrective'),(SKIN,SKIN_VERSION,addons,'corrective'),(CC,VERSION,out/'recovery-addons','recovery'),(SKIN,'1.0.5.265',out/'recovery-addons','recovery')):
+  for aid,version,source_root,suffix in ((CC,VERSION,addons,'corrective'),(SKIN,SKIN_VERSION,addons,'corrective'),(CC,VERSION,out/'recovery-addons','recovery'),(SKIN,'1.0.5.267',out/'recovery-addons','recovery')):
    name=aid+'-'+version+'-2103460-'+suffix+'.zip';dest=publish/name
    with ZipFile(dest,'w',compression=ZIP_DEFLATED,compresslevel=9) as z:
     for f in sorted((source_root/aid).rglob('*')):

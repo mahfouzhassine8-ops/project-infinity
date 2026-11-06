@@ -1,4 +1,4 @@
-"""Assemble forward skin264 / recovery265 through the existing original signer.
+"""Assemble forward skin266 / recovery267 through the existing original signer.
 
 No keys or signing implementation here. The exact signed262 quick-update
 artifact is the functional/recovery reference; signed460 seeds unchanged shims.
@@ -35,7 +35,8 @@ def prepare(p,apk,out):
     changed=p.run('git','diff','--name-only',REFERENCE,'HEAD').splitlines()
     assert all(n in runtime or n==PREFIX+'SOURCE-INVENTORY.json' or n==PREFIX+'quick-update/package_updates.py' or n.startswith(PREFIX+'fold-regressions/') for n in changed),'UNAUTHORIZED_SOURCE_DIFFERENCE'
     for source in (*inventory['changed_source_files'],PREFIX+'quick-update/package_updates.py',
-                   PREFIX+'fold-regressions/package_preflight.py',PREFIX+'SOURCE-INVENTORY.json'):
+                   PREFIX+'fold-regressions/package_preflight.py',PREFIX+'fold-regressions/verify_recovery.py',
+                   PREFIX+'fold-regressions/CC-AUDIT-REFERENCE.json',PREFIX+'SOURCE-INVENTORY.json'):
         assert (p.ROOT/source).read_bytes()==subprocess.check_output(['git','show','HEAD:'+source],cwd=p.ROOT),'SOURCE_NOT_BOUND_TO_HEAD:'+source
     # Signer, authority, native sources and all protected runtime ownership stay frozen.
     for n in ('repairs/dual-experience-isolation-2103420/release-authority.json',
@@ -96,7 +97,9 @@ def prepare(p,apk,out):
             assert source in runtime,'UNREVIEWED_RUNTIME_DELTA:'+source
             (addons/rel).write_bytes((p.ROOT/source).read_bytes());changes[rel]=p.sha(addons/rel)
     assert len(changes)==6,'EXACT_SIX_REMAINING_RUNTIME_FILES'
-    for base,number in ((addons,264),(recovery,265)):
+    candidate_number=int(p.SKIN_VERSION.rsplit('.',1)[1])
+    assert candidate_number==266,'EXACT_REVIEWED_FORWARD_GENERATION'
+    for base,number in ((addons,candidate_number),(recovery,candidate_number+1)):
         skin=base/p.SKIN;xml=skin/'addon.xml';raw=xml.read_bytes()
         assert b'version="1.0.5.262"' in raw
         xml.write_bytes(raw.replace(b'version="1.0.5.262"',f'version="1.0.5.{number}"'.encode(),1))
@@ -125,11 +128,11 @@ def prepare(p,apk,out):
         seed_apk_path=str(Path(apk).resolve()),
         device_APK=2103462,device_identity='USER_CONFIRMED',functional_reference='authenticated skin262 and CC61 artifact13495017909',
         predecessor_artifact_sha256=PREVIOUS_SHA,commandcenter_version=p.VERSION,skin_version=p.SKIN_VERSION,
-        recovery_skin_version='1.0.5.265',changes=changes,protected=protected,module_file_count=78,
+        recovery_skin_version='1.0.5.267',changes=changes,protected=protected,module_file_count=78,
         old_module_manifest_sha256=protected[p.CC+'/'+p.module_bundle.MANIFEST],
         Downloads_native_required_sha256='fadfb1a08e3d125958a77d393c1d66453ec3e9c91aac3349ec5806c67c17694d',
         native_changed=False,APK_produced=False,Android='NOT_RUN',all_nine_complete=False,
         known_limitations=['Search All settings-history/ABA validation remains strict and unresolved',
                            'Actual provider-heading regression not reproduced on Android',
                            'Repeated native Search crash stability NOT RUN; no speculative engine fix']))
-    print('PASS authenticated262 reference, six runtime file deltas, exact protected sources and forward265 recovery; Android NOT RUN')
+    print('PASS authenticated262 reference, six runtime file deltas, exact protected sources and forward267 recovery; Android NOT RUN')
