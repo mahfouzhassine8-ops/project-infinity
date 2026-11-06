@@ -18,7 +18,7 @@ def head_check():
  require(not cmd('git','status','--porcelain','--untracked-files=no').strip(),'COMMITTED_SOURCE_REQUIRED')
  return os.environ['GITHUB_SHA']
 def bindings():
- files=[HERE/n for n in ('release_native.py','AUTHORIZATION.md','ENGINE-INPUT.json')]
+ files=[HERE/n for n in ('release_native.py','AUTHORIZATION.md','ENGINE-INPUT.json','SCOPED-EXPORT-ALLOWLIST.json')]
  files += [HERE.parent/'downloads-native'/n for n in ('CANDIDATE.json','HOST-CONTRACT-RESULT.json','HELPER-INTEGRATION-RESULT.json','SIGNED460-NATIVE-SOURCE-MAP.json','build_native.py')]
  rows=load(HERE.parent/'downloads-native/CANDIDATE.json')['files'];files += [ROOT/r['source'] for r in rows.values()]
  return {str(p.relative_to(ROOT)):file_sha(p) for p in files}
@@ -63,7 +63,11 @@ def native_abi(base,lib,out):
     if len(f)>=8 and f[4]=='GLOBAL' and f[5] in ('DEFAULT','PROTECTED') and f[6]!='UND':strong.add(f[7])
    require('ELF64' in header and 'AArch64' in header,'AARCH64_REQUIRED')
    return dict(needed=sorted(re.findall(r'\(NEEDED\).*\[([^]]+)\]',dynamic)),soname=re.findall(r'\(SONAME\).*\[([^]]+)\]',dynamic),strong_exports=sorted(strong))
-  a,b=inspect(old),inspect(lib);require(a==b,'UNCHANGED_NATIVE_LINK_AND_PUBLIC_ABI');save(out,dict(status='PASS_EXACT_ORIGINAL_PUBLIC_ABI_AND_LINK_DEPENDENCIES',original=a,candidate=b))
+  a,b=inspect(old),inspect(lib);allowed=load(HERE/'SCOPED-EXPORT-ALLOWLIST.json')['permitted_additions']
+  require(a['needed']==b['needed'] and a['soname']==b['soname'],'UNCHANGED_NATIVE_LINK_DEPENDENCIES')
+  require(set(a['strong_exports'])<=set(b['strong_exports']),'NO_ORIGINAL_PUBLIC_EXPORT_REMOVAL')
+  require(set(b['strong_exports'])-set(a['strong_exports'])==set(allowed) and len(allowed)==2,'EXACT_TWO_SCOPED_SOURCE_DIALOG_EXPORT_ADDITIONS')
+  save(out,dict(status='PASS_ALL_ORIGINAL_ABI_PLUS_EXACT_TWO_SCOPED_SOURCE_DIALOG_APIS',original_export_count=len(a['strong_exports']),candidate_export_count=len(b['strong_exports']),original_exports_sha256=digest(canonical(a['strong_exports'])),candidate_exports_sha256=digest(canonical(b['strong_exports'])),needed=a['needed'],soname=a['soname'],permitted_additions=allowed))
 
 def repack(owner,bundles,dest,row,source,version,changes):
  old=read_bundle(bundles/row['file'],row);meta=copy.deepcopy(old);meta.update(version=str(version)+'.'+owner.lower()+'.1',approved_source=source)

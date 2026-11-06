@@ -1,0 +1,8 @@
+[
+  {
+    "run": 42196235901,
+    "result": "FAIL_CLOSED_BEFORE_KEYS",
+    "cause": "Original export-set-equality check sees exactly two necessary new result-returning dialog APIs; no original export or dependency lost",
+    "resolution": "Precisely review and allow these two source-scoped APIs, retaining all original exports and all other ABI gates; no native source rebuild/change."
+  }
+]

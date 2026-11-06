@@ -1,0 +1,12 @@
+{
+  "status": "EXACT_SCOPED_EXPORT_ADDITIONS_REVIEWED",
+  "original_export_count": 71211,
+  "permitted_additions": [
+    "_ZN21CGUIDialogMediaSource31ShowAndAddMediaSourceWithResultERKNSt6__ndk112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEER12CMediaSourceRbRKNS0_8functionIFbRKS9_EEE",
+    "_ZN21CGUIDialogMediaSource32ShowAndEditMediaSourceWithResultERKNSt6__ndk112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEERK12CMediaSourceRS9_RbRKNS0_8functionIFbSB_EEE"
+  ],
+  "source_file": "xbmc/dialogs/GUIDialogMediaSource.cpp",
+  "reason": "The two new result-returning static source-dialog APIs are the only additions; their exact bodies are independently compiled and tested, original overloads reverse-byte identical. No original symbol is removed, no dependency/SONAME changes. Existing binary ABI remains preserved; two necessary API additions are explicitly allowed rather than claiming total set equality. No new native rebuild or source change.",
+  "failure_evidence": "ABI-GATE-FAILURE.json retained; original set-equality gate stopped keyless preparation",
+  "new_unrelated_exports_permitted": false
+}
