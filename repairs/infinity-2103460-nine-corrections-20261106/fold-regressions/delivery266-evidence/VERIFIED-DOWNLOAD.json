@@ -1,0 +1,79 @@
+{
+  "status": "PASS_ACTUAL_DOWNLOADED_ORIGINAL_KEY_QUICK_INSTALLERS",
+  "artifacts": [
+    {
+      "file": "script.infinity.commandcenter-0.3.5.61-2103460-corrective.zip",
+      "sha256": "cdd139dd3fb3442ea7d5425cbc6314c4d42649988b52a4e202a3c75571dc7b34",
+      "addon": "script.infinity.commandcenter",
+      "version": "0.3.5.61",
+      "member_count": 64,
+      "protected_unchanged": 58,
+      "changed": [
+        "script.infinity.commandcenter/INFINITY-MODULES.v1",
+        "script.infinity.commandcenter/INFINITY-MODULES.v1.sig",
+        "script.infinity.commandcenter/addon.xml",
+        "script.infinity.commandcenter/context.py",
+        "script.infinity.commandcenter/infinity_search.py",
+        "script.infinity.commandcenter/plugin.py"
+      ],
+      "original_key_module_signature": "PASS",
+      "exact262_functional_recovery": false
+    },
+    {
+      "file": "skin.infinity.diggz-1.0.5.266-2103460-corrective.zip",
+      "sha256": "2e45705f423492971306769ed0ef26d43ff138965c102af6dad0ea9c4f2248b1",
+      "addon": "skin.infinity.diggz",
+      "version": "1.0.5.266",
+      "member_count": 3141,
+      "protected_unchanged": 3136,
+      "changed": [
+        "skin.infinity.diggz/Infinity-Protected-Manifest.json",
+        "skin.infinity.diggz/addon.xml",
+        "skin.infinity.diggz/infinity-skin.json",
+        "skin.infinity.diggz/unified/DialogVideoInfo.xml",
+        "skin.infinity.diggz/unified/Includes_InfinityMediaLists.xml"
+      ],
+      "original_key_module_signature": "covered by original-key outer envelope",
+      "exact262_functional_recovery": false
+    },
+    {
+      "file": "script.infinity.commandcenter-0.3.5.61-2103460-recovery.zip",
+      "sha256": "569277c1ed25ced16ac03b7231f2fa4e06d8f244baa07ea21123bf4b97506559",
+      "addon": "script.infinity.commandcenter",
+      "version": "0.3.5.61",
+      "member_count": 64,
+      "protected_unchanged": 64,
+      "changed": [],
+      "original_key_module_signature": "PASS",
+      "exact262_functional_recovery": true
+    },
+    {
+      "file": "skin.infinity.diggz-1.0.5.267-2103460-recovery.zip",
+      "sha256": "ce2ca0774b8faae7e629482a36ab7b831423625aa83ae806fe65d5f76ce942e0",
+      "addon": "skin.infinity.diggz",
+      "version": "1.0.5.267",
+      "member_count": 3141,
+      "protected_unchanged": 3138,
+      "changed": [
+        "skin.infinity.diggz/Infinity-Protected-Manifest.json",
+        "skin.infinity.diggz/addon.xml",
+        "skin.infinity.diggz/infinity-skin.json"
+      ],
+      "original_key_module_signature": "covered by original-key outer envelope",
+      "exact262_functional_recovery": true
+    }
+  ],
+  "module_RSA_and_native_verifier": "PASS",
+  "outer_RSA": "PASS",
+  "skin_948_hashes": "PASS",
+  "physical_Android": "NOT_RUN",
+  "APK2103462_unchanged": true,
+  "Cobra_changed": false,
+  "Preview_changed": false,
+  "all_requested_repairs_complete": false,
+  "known_open": [
+    "Search All settings-write rejection",
+    "reported heading regression Android attribution",
+    "native repeated-search stability"
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "actual_Android_GUI": "NOT_RUN",
+  "keys_accessed": false,
+  "original_production_installer_changed": false,
+  "physical_Fold": "NOT_RUN",
+  "recovery_reference": "authenticated currently installed CC61/skin262, not original460 functionality",
+  "shutdown_tests": "NOT_RUN",
+  "status": "PASS_SIX_HOST_INSTALLER_AND_RECOVERY_CASES",
+  "tests": [
+    {
+      "case": "authenticated_current262_generation",
+      "status": "PASS_HOST_REAL_JAVA_INSTALLER",
+      "user_data_sentinel_unchanged": true
+    },
+    {
+      "case": "complete_fold_corrective_generation",
+      "status": "PASS_HOST_REAL_JAVA_INSTALLER",
+      "user_data_sentinel_unchanged": true
+    },
+    {
+      "case": "manifest_pair_interruption",
+      "files_and_data_unchanged": true,
+      "status": "REFUSED_AS_REQUIRED"
+    },
+    {
+      "case": "manifest_pair_interruption_forward_recovery",
+      "exact_CC262_function_restored": true,
+      "status": "PASS_HOST_ZIP_TRANSPORT_AND_REAL_JAVA",
+      "user_data_sentinel_unchanged": true
+    },
+    {
+      "case": "source_pair_interruption",
+      "files_and_data_unchanged": true,
+      "status": "REFUSED_AS_REQUIRED"
+    },
+    {
+      "case": "source_pair_interruption_forward_recovery",
+      "exact_CC262_function_restored": true,
+      "status": "PASS_HOST_ZIP_TRANSPORT_AND_REAL_JAVA",
+      "user_data_sentinel_unchanged": true
+    }
+  ],
+  "evidence_reused": {
+    "run_id": 42281237899,
+    "artifact_id": 13535786340,
+    "artifact_sha256": "925610c70178dc9fb12defe51d98b453dc16097b57a61cffd4aa4363261b11e2",
+    "CC_payloads_and_Java_sources": "EXACTLY_IDENTICAL",
+    "tests_rerun": false
+  }
+}
