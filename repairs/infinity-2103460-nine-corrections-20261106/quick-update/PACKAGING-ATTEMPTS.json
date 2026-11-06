@@ -1,0 +1,22 @@
+{
+  "attempts": [
+    {
+      "run": 42179383190,
+      "status": "FAIL_CLOSED_BEFORE_KEY_ACCESS",
+      "reason": "UNREVIEWED_NEW_WORKFLOW",
+      "correction": "Source-reviewed keyless workflow registered; sole signer retained"
+    },
+    {
+      "run": 42179611548,
+      "status": "FAIL_QUARANTINED_NO_ARTIFACT",
+      "reason": "Native verifier requires absolute module root; producer passed relative output path",
+      "key_used_for_module_signature": true,
+      "correction": "Resolve output to canonical absolute path before invoking original unchanged verifier"
+    },
+    {
+      "run": 42179987000,
+      "status": "CANCEL_REQUESTED_OLD_SOURCE_DISPATCH",
+      "reason": "Shell continued after missing repository overlay source; old packaging source detected and cancellation requested; actual signed APK provides the authoritative XML preimage."
+    }
+  ]
+}

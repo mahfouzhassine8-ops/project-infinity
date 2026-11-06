@@ -20,7 +20,7 @@ def preflight(apk,out):
  assert sha(apk)==BASE,'EXACT_SIGNED2103460_REQUIRED'
  branch=run('git','branch','--show-current').strip();assert branch=='work/infinity-2103460-nine-corrections-20261106'
  changed=run('git','diff','--name-only','ed5f797618b570e837d83668ba355a4396a8d4a8','HEAD').splitlines()
- assert all(n.startswith('repairs/infinity-2103460-nine-corrections-20261106/') or n in ('.github/workflows/infinity-combined-release.yml','repairs/dual-experience-isolation-2103420/signer-policy.json') for n in changed),'UNRELATED_SOURCE_CHANGE'
+ assert all(n.startswith('repairs/infinity-2103460-nine-corrections-20261106/') or n in ('.github/workflows/infinity-combined-release.yml','repairs/dual-experience-isolation-2103420/signer-policy.json') or n in json.loads((HERE.parent/'SOURCE-INVENTORY.json').read_text())['changed_source_files'] for n in changed),'UNRELATED_SOURCE_CHANGE'
  assert run('git','status','--porcelain','--untracked-files=no').strip()=='','COMMITTED_REVIEWED_SOURCE_REQUIRED'
  assert not out.exists(),'fresh output required'
  out.mkdir(parents=True);addons=out/'addons';addons.mkdir();inventory=json.loads((HERE.parent/'SOURCE-INVENTORY.json').read_text());changes={};protected={}
@@ -36,7 +36,7 @@ def preflight(apk,out):
    assert protected[rel]==row['before_sha256'],rel
    assert sha(ROOT/source)==row['candidate_sha256'],source
    (addons/rel).write_bytes((ROOT/source).read_bytes());changes[rel]=row['candidate_sha256']
- assert len(changes)==7 and inventory['Command_Center_version']=='0.3.5.61 unchanged'
+ assert len(changes)==8 and inventory['Command_Center_version']=='0.3.5.61 unchanged'
  assert ET.parse(addons/CC/'addon.xml').getroot().get('version')==VERSION
  # Only skin release/integrity metadata changes; Command Center identity remains exact.
  xml=addons/SKIN/'addon.xml';raw=xml.read_bytes();assert b'version="1.0.5.258"' in raw
@@ -72,7 +72,7 @@ def preflight(apk,out):
  for path in (addons/SKIN).rglob('*.xml'):ET.parse(path)
  for leaf in ('default.py','library_navigation.py'):compile((addons/CC/leaf).read_bytes(),leaf,'exec')
  save(out/'PREFLIGHT.json',dict(status='PASS_EXACT2103460_ADDON_SOURCE_AND_METADATA',baseline_sha256=BASE,commandcenter_version=VERSION,skin_version=SKIN_VERSION,source=run('git','rev-parse','HEAD').strip(),changes=changes,protected=protected,module_file_count=78,old_module_manifest_sha256=hashlib.sha256(old_marker).hexdigest(),Android='NOT_RUN',all_nine_complete=False))
- print('PASS exact signed2103460, 7 authorized source changes, original CC identity and complete module source set')
+ print('PASS exact signed2103460, 8 authorized source changes, original CC identity and complete module source set')
 def addons_for_build(addons,out):
  root=out/'module-root'
  if root.exists():shutil.rmtree(root)
@@ -127,5 +127,6 @@ def sign(out):
  print('PASS original signatures and complete installable add-on ZIP structures; Android acceptance NOT RUN')
 if __name__=='__main__':
  p=argparse.ArgumentParser();p.add_argument('operation',choices=('preflight','sign'));p.add_argument('--baseline',type=Path);p.add_argument('--out',type=Path,required=True);a=p.parse_args()
+ a.out=a.out.resolve()
  if a.operation=='preflight':preflight(a.baseline,a.out)
  else:sign(a.out)
