@@ -246,7 +246,7 @@ def _query_file_stamp(path):
     return (value.st_dev, value.st_ino, value.st_size, value.st_mtime_ns, value.st_ctime_ns)
 
 
-def _query_signature(provider, path, home, response=False, components=None):
+def _query_signature(provider, path, home, response=False, components=None, native_only=False):
     """Bind answers to their actual route, dependencies and current UI state.
 
     These stamps never grant a capability. route() must still verify enabled
@@ -263,8 +263,15 @@ def _query_signature(provider, path, home, response=False, components=None):
         paths.extend((Path(dependency['root']) / 'addon.xml',
                       profile / 'addon_data' / dependency['id'] / 'settings.xml'))
     # A fresh owned response does not depend on unrelated Home/progress work.
-    # Settings/source stamps remain strict, including intervening rewrites.
-    if response:
+    # Cache identity retains the complete original settings/source revision
+    # binding. A separate source-only identity can be used for an AUTHENTIC
+    # fresh provider-owned response; it is never sufficient for cached rows.
+    if native_only and not response:
+        raise ValueError('A source-only identity cannot authorize cached Search rows')
+    if native_only:
+        paths = [Path(provider['root']) / 'addon.xml']
+        paths.extend(Path(dep['root']) / 'addon.xml' for dep in dependencies)
+    elif response:
         paths = paths[1:]
     stamps = [_query_file_stamp(file) for file in paths]
     if any(stamp is None for stamp in stamps):
@@ -285,8 +292,12 @@ def _query_signature(provider, path, home, response=False, components=None):
                       commandcenter_version=version, route=path,
                       provider_root=provider['root'], contract=provider['contract'])
         source_stamps = stamps if response else stamps[1:]
-        fields.update(provider_manifest_metadata=source_stamps[0], provider_settings_metadata=source_stamps[1],
-                      dependency_manifest_metadata=source_stamps[2::2], dependency_settings_metadata=source_stamps[3::2])
+        if native_only:
+            fields.update(provider_manifest_metadata=source_stamps[0],
+                          dependency_manifest_metadata=source_stamps[1:])
+        else:
+            fields.update(provider_manifest_metadata=source_stamps[0], provider_settings_metadata=source_stamps[1],
+                          dependency_manifest_metadata=source_stamps[2::2], dependency_settings_metadata=source_stamps[3::2])
         if not response:
             fields['continue_watching_metadata'] = stamps[0]
             for name, value in zip(('Infinity.ContinueWatchingRevision', 'Infinity.ProviderInventory.Revision',
@@ -331,6 +342,7 @@ def _provider_result(provider,query,home,cancel,progress=None):
         path=route(provider,query)
         before_response={};before_cache={}
         response_signature=_query_signature(provider,path,home,response=True,components=before_response)
+        native_source_signature=_query_signature(provider,path,home,response=True,native_only=True)
         signature=_query_signature(provider,path,home,components=before_cache)
         cache_key='Infinity.Search.Cache.'+provider['id']
         cache=_query_cache_entries(home.getProperty(cache_key),time.monotonic())
@@ -348,6 +360,7 @@ def _provider_result(provider,query,home,cancel,progress=None):
         after_response={};after_cache={}
         current_signature=_query_signature(provider,path,home,components=after_cache)
         current_response_signature=_query_signature(provider,path,home,response=True,components=after_response)
+        current_native_source_signature=_query_signature(provider,path,home,response=True,native_only=True)
         # A cache-only presentation race is a miss, not a provider state change.
         # No RPC has been issued by this invocation on this branch. Discard the
         # old answer and use the original single owned native request path.
@@ -377,13 +390,34 @@ def _provider_result(provider,query,home,cancel,progress=None):
             after_response={};after_cache={}
             current_signature=_query_signature(provider,path,home,components=after_cache)
             current_response_signature=_query_signature(provider,path,home,response=True,components=after_response)
-        if (response_signature is None or
-                current_response_signature != response_signature or
-                (hit is not None and current_signature != signature)):
+            current_native_source_signature=_query_signature(provider,path,home,response=True,native_only=True)
+        # CANDIDATE ONLY: a fresh COMPLETED native-provider result is authoritative
+        # for the request that generated it, even if the provider wrote its own
+        # settings while searching. A cache HIT is never allowed this treatment.
+        # Source, profile, route, manifest and dependency changes still reject.
+        # A meaningfully changed setting inside the provider and ABA cannot be
+        # distinguished using only before/after filesystem stamps. This policy
+        # is NOT release-authorized until that trade-off is explicitly reviewed.
+        changed_response = {name for name in before_response.keys() | after_response.keys()
+                            if before_response.get(name) != after_response.get(name)}
+        provider_owned_drift = (
+            hit is None and
+            response_signature is not None and
+            current_response_signature != response_signature and
+            changed_response == {'provider_settings_metadata'} and
+            native_source_signature is not None and
+            native_source_signature == current_native_source_signature)
+        invalid_result = (
+            response_signature is None or
+            (current_response_signature != response_signature and not provider_owned_drift) or
+            (hit is not None and current_signature != signature))
+        if invalid_result:
             _state_rejection_trace(provider,status,answer,hit is not None,before_response,after_response,before_cache,after_cache)
             return provider,'state_changed',{},path
-        # Never transplant a response into a different cache generation.
-        if hit is None and signature is not None and current_signature == signature:
+        # Preserve strict exact revision cache generation: never cache a
+        # provider-owned response across any unobserved settings-file write.
+        if (hit is None and not provider_owned_drift and
+                signature is not None and current_signature == signature):
             _remember_query_answer(home,cache_key,cache,signature,answer,time.monotonic())
         return provider,status,answer,path
     except (OSError,ValueError,RuntimeError,KeyError,TypeError):
