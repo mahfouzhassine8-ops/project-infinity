@@ -1,0 +1,38 @@
+{
+  "authorization": "Final APK release brief authorizes scoped integration, original signing, install-over compatibility, forward recovery and publication after mandatory gates",
+  "candidate_versionCode": 2103464,
+  "recovery_versionCode": 2103465,
+  "candidate_Command_Center": "0.3.5.62",
+  "recovery_Command_Center": "0.3.5.63",
+  "candidate_skin": "1.0.5.270",
+  "recovery_skin": "1.0.5.271",
+  "functional_parent_APK": 2103462,
+  "functional_component_reference": "Original-key authenticated CC61/skin268 from run42351486944",
+  "runtime_changes_relative_to_current_components": [
+    "Only reviewed Search source and retirement of rejected search-open-verified handoff",
+    "Only four previously compiled keyboard/graphics native sources"
+  ],
+  "metadata_changes": [
+    "Monotonic APK, Command Center and skin versions",
+    "Matching signed module/protected skin manifests",
+    "Existing experience last-updated metadata"
+  ],
+  "protected": [
+    "All DEX",
+    "Cobra owner bundle",
+    "Minimal Android contract owner bundle",
+    "All unrelated native sources/libraries",
+    "All other CC/skin source files",
+    "Original signer implementation and certificate",
+    "Production installer and data/settings logic"
+  ],
+  "selected_packaging_checks": [
+    "Exact original signed462 seed authentication",
+    "Current268 signed envelope and all component hashes",
+    "Full native map and ABI reuse",
+    "Original Java module installer valid61 -> 62 upgrade and62 ->63 recovery, with sentinel preservation and unknown-source refusal",
+    "Owner bundle/source/member comparison before original APK signing"
+  ],
+  "runtime_acceptance": "Separate selected Android execution after signed complete candidate exists; no release publication until required results pass",
+  "shutdown": "NOT_SELECTED"
+}
