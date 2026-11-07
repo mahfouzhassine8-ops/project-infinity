@@ -144,7 +144,7 @@ def review_graphics():
  'xbmc/guilib/GUIWindowManager.cpp','xbmc/windowing/GraphicContext.cpp','xbmc/windowing/GraphicContext.h',
  'xbmc/platform/android/activity/XBMCApp.cpp','xbmc/platform/android/activity/android_main.cpp',
  'xbmc/platform/android/activity/android_native_app_glue.c','xbmc/windowing/android/WinEventsAndroid.cpp',
- 'xbmc/application/AppInboundProtocol.cpp','xbmc/application/Application.cpp','xbmc/input/InputManager.cpp']
+ 'xbmc/application/AppInboundProtocol.cpp']
  names=[n for n in names if n in expected];raws={}
  with tarfile.open(ROOT/'verified-inputs/verified-p0-native-source.tar.gz','r:gz')as archive:
   for member in archive:
