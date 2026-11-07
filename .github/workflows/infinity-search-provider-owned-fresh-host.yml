@@ -1,0 +1,59 @@
+name: Infinity provider-native fresh response acceptance EXPERIMENT - NOT RELEASABLE
+on:
+  push:
+    branches: [work/infinity-search-provider-owned-fresh-results-20261107]
+    paths:
+      - .github/workflows/infinity-search-provider-owned-fresh-host.yml
+      - repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/infinity_search.py
+      - repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/test_provider_owned_fresh_policy.py
+      - repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/PROVIDER-OWNED-FRESH-RESULTS-EXPERIMENT.md
+permissions: {contents: read}
+concurrency:
+  group: infinity-search-provider-owned-fresh-host-20261107
+  cancel-in-progress: true
+jobs:
+  explicit-policy-experiment:
+    name: Native source vs settings metadata acceptance matrix - NOT A PRODUCT FIX
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    env: {PYTHONDONTWRITEBYTECODE: '1'}
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Enforce search-only changes; preserve native, Cobra, Preview, and signer
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          python3 - <<'PY'
+          import subprocess
+          base='c75e6de691cc6263236d778cd16b50573e7eb348'
+          changed=set(subprocess.check_output(['git','diff','--name-only',base,'HEAD'],text=True).splitlines())
+          allowed={
+            '.github/workflows/infinity-search-provider-owned-fresh-host.yml',
+            'repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/infinity_search.py',
+            'repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/test_provider_owned_fresh_policy.py',
+            'repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/PROVIDER-OWNED-FRESH-RESULTS-EXPERIMENT.md'
+          }
+          assert changed==allowed, ('unexpected change',sorted(changed^allowed))
+          print('PASS no changes outside scoped Search policy experiment')
+          PY
+          git diff --name-only c75e6de691cc6263236d778cd16b50573e7eb348 HEAD | tee evidence/CHANGED-SCOPE.txt
+          python3 -m py_compile repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/infinity_search.py
+      - name: Execute native-owned fresh-result decision matrix, including explicit ABA unsafe case
+        run: |
+          set -euo pipefail
+          cd repairs/infinity-2103460-nine-corrections-20261106/fold-regressions
+          python3 -m unittest test_provider_owned_fresh_policy -v 2>&1 | tee "$GITHUB_WORKSPACE/evidence/POLICY-PROBE.txt"
+      - name: Forbid release claims and publish explicit safety gaps
+        if: always()
+        run: |
+          printf '%s\n' 'EXPERIMENTAL ONLY. Known meaningful settings change and A-B-A are accepted: this violates the earlier locked acceptance contract.' 'The provider-specific file metadata exemption cannot be released without an owner-approved consistency-policy change or complete native provenance proof.' 'No APK, signing, install, protected branch promotion, Android/Fold PASS or finished Search repair.' > evidence/NO-RELEASE.txt
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-Search-Fresh-Native-Policy-EXPERIMENT-${{ github.run_id }}-NO-APK
+          path: evidence/
+          retention-days: 14
+          if-no-files-found: warn
