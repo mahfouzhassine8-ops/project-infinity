@@ -56,7 +56,7 @@
     },
     "repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/infinity_search.py": {
       "before_sha256": "61501614f0b49b407dea024a27d7cc6698979a8fc56aa00ec786c368b4e63a78",
-      "candidate_sha256": "5c1ccee971e8a306ba4df732f7043718308b3e91f8fec1c0f47abecabb71831a"
+      "candidate_sha256": "ae7c456c5a3ba5c66080df9fd619bce722bf0cdb9736d22e9127923410cc7c06"
     },
     "repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/addon.xml": {
       "before_sha256": "922ac8d332bbef8ccd70a194f664536f0b789ffbe451ff402736f9fa696090a2",
@@ -68,11 +68,11 @@
     },
     "repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/plugin.py": {
       "before_sha256": "87dcfdceedffc9829fd3310a5de3244b3379adfe24d1210cb750d4e06005a57e",
-      "candidate_sha256": "396d66bea518fe0fffa28fdc5452a5e14235cdcfc32de640ae27b5bd557e65c7"
+      "candidate_sha256": "65960f264c6564749c8f1c88da93cd3e39cda922a2a073ee1469030d7db1bf35"
     }
   },
   "native_modified": false,
-  "Search_modified": "Explicit provider selection opens the existing source-verified native provider route. Aggregate guards unchanged; Search All settings false positives unresolved.",
+  "Search_modified": "On state_changed, keep strict rejection of stale rows; present one fresh, source-verified direct-provider handoff through existing Kodi native Videos. No ABA/settings exemption. Tested host-only.",
   "Cobra_modified": false,
   "Preview_modified": false,
   "Command_Center_version": "0.3.5.61 unchanged",
