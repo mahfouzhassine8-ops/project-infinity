@@ -1,0 +1,37 @@
+# Physical Fold diagnosis — 2026-11-07 03:12 America/Detroit
+Read-only evidence from user-provided Health Center `Infinity-Diagnostics-20261107-031217.zip`. The complete ZIP is **private, not committed**; this note has only sanitized event times, native offsets, code digests and reason codes. Do not assume any unobserved Search or touch outcome.
+
+## Installed generation — confirmed on disk
+- APK versionCode **2103462**, Android 17, Fold device.
+- Installed Infinity skin **1.0.5.268**. `skin.infinity.diggz/addon.xml` SHA256 **656b9f80882a40bd7e5ce8e1c9d7db1f6679a519d4067219d01fd05321043cb1**, matches signed268. `unified/DialogVideoInfo.xml` SHA256 **5e79e8db6356…** and protected skin manifest **41892be08afb…** match signed268 package.
+- Installed Command Center **0.3.5.61**, and its recorded `infinity_search.py` SHA256 **7505f01f7f8042dd61bb30d6d75707eca054183184c200efadc27eaa1b43d32d**, `plugin.py` SHA256 **e5d9329541a2788eb042c923fa7f23b5894692a8db0a8a86e377fdecda8bbcf1**, `context.py`, `default.py`, `service.py`, `resume_hub.py` **all match signed268**.
+- `checkpoint/installed-participants.json` has `command_center_applied=true` from the current process. Code hashes are disk identity, not guarantee that every live Python invoker reused new code. **268 installation is recorded, but functional acceptance is NOT established.**
+- Health export ZIP passes CRC for all 22 members and contains three Android native tombstone protobuf records.
+
+## Three actual native-crash tombstones (same calendar day, local America/Detroit)
+| Local crash | Native PID/TID | Signal | Known fault evidence |
+|---|---|---|---|
+| 00:47:26 | 16179/16235 | **SIGABRT** | Fatal stack `libc.free → std::deque<CPointGen<float>>::__maybe_remove_back_spare → CGraphicContext::SetScalingResolution → CGUIWindow::OnMouseAction → CGenericTouchActionHandler::QuerySupportedGestures → CAndroidTouch::onTouchEvent`. Abort text: *Pointer tag ... was truncated*. This is a **real native touch/layout/scaling crash**. Exact memory corruption cause is not proven. Key rel_pc: `libkodi.so +0x1914fec` allocator deallocate, `+0x1912b3c` `SetScalingResolution`, `+0x1b3fb00` `OnMouseAction`, `+0x241274c` AndroidTouch.
+| 00:51:48 | 7200/8427 | **SIGSEGV** | Tombstone faulting thread records `libinfinitycrash.so:restore_and_reraise +0x211c`. The reporter re-raised the original signal; original PC for this specific crash is not preserved in this archive. Two separate Python-driven `CGUIKeyboardFactory::ShowAndGetInput → xbmc.Keyboard.doModal` threads are present in its all-thread snapshot; **no causal attribution to Search**.
+| 03:12:09 | 1585/3676 | **SIGSEGV** | Tombstone faulting thread likewise shows crash reporter `restore_and_reraise`, but **same-incident** `crash/native-crash-last.txt` (03:12:09.318) preserves original `SIGSEGV` fault: `si_code=1`, original PC `0x70a0586aec`, fault address redacted here, engine hash **704834f42e49a2eea0a36ad41b5f79345f5e4108dcd339213899ea3c6ff045a0**. Mapped against that tombstone's executable `libkodi.so` mapping, original PC is **libkodi.so +0x1b0daec**. It is near the `CGUIKeyboardFactory` code region; **exact function and fault cause require source-matched symbols/instructions**. Two different Python-invoker threads were simultaneously in Kodi keyboard modality, one in `CGUIDialog::Open/CApplicationMessenger::SendMsg` wait, another in `CGUIDialogKeyboardTouch::ShowAndGetInput/CThread::StopThread` join. This suggests checking **concurrent keyboard-dialog / lifecycle ownership**, but does NOT prove the overlap triggered the SIGSEGV or that the failing invokers were Infinity Search.
+
+Caution: both SIGSEGV *final* tombstones show `SI_TKILL` because the crash-reporter re-raised them; use the same-event original `native-crash-last.txt` for the last SIGSEGV. Do NOT mistake the reporter's top frame for the original faulting code. The original captured native engine SHA is distinct from the APK-member digest because these are different byte representations/sources; verify build identity before symbolizing.
+
+## Independent shutdown persistence problem — previous engine, NOT same crash
+- Last checkpoint receipt PID **796** failed at local **03:10:29** as `CHECKPOINT_FAILED`: `background_jobs: completed_write_failed:addon_uninstall`.
+- `checkpoint_saved=false`, `process_death_confirmed=false`, no safe-to-terminate authorization. Some owners committed; `background_jobs`, deferred dialog state and native DBs were not all confirmed durable. **Do not claim user data was lost; do not treat shutdown as safe.**
+- Prior checkpoint PID **1691**, around local 00:50, separately failed with `native_admission: python_persistence_observer_initialization_failed`. Do not collapse these different producer PIDs/events.
+- The health report also shows provider add-on persistence failures and quarantine notices; these are historic/advisory unless correlated to the same failure.
+
+## What this export DOES NOT show
+- There are **zero** `INFINITY_SEARCH_NAV`, `INFINITY_SEARCH_STATE`, `search-open-verified` records in this Health Center export. It is not a matched post268 Search trace and cannot prove Crew/Nixtoons result display, Search All heading tap, Info buttons, watched persistence or exact Search→crash causality.
+- Active runtime XML rendering and exact Python invoker generation are not established merely by matching on-disk hashes. User physical acceptance is not claimed.
+- Two SIGSEGVs' original full faulting-thread frames are **not** in the reporter re-raise tombstones; for the latest one an original PC is available. The 00:47 SIGABRT has a full native faulting stack.
+
+## Priority engineering response (read-only first; preserve accepted features)
+1. Preserve raw protobufs privately. On the existing **exact APK2103462 native engine / SHA-matched symbols**, locate instructions/functions at `libkodi.so+0x1b0daec`; inspect `CGUIKeyboardFactory::ShowAndGetInput`, overlapping Python invokers, native dialog lifecycle and cancellation, and the `00:47:26` `CGraphicContext::SetScalingResolution` / touch handling allocator abort. Determine whether two independent native defects exist. No speculative memory/reentrancy hacks; a native repair may require an APK, unlike the Python-only Search handoff.
+2. Separately diagnose checkpoint PID796 `addon_uninstall` durable write failure without force-exit or suppressing failure. Preserve checkpoints and installed add-on data.
+3. Continue the prior 268 on-disk script/skin corrections and **strict** `state_changed` integrity checks. DO NOT represent the install as post268 behavioral PASS, do not change the original key/signer or the four physical PASS items.
+4. Do not ask the user for existing APK identity, screenshots or this same export again. The remaining missing evidence is a **matched Search navigation event**, *only if* needed to attribute Search specifically; native crash evidence itself now exists. Limit next Fold testing to one coordinated owner session following causal repair.
+
+**Status:** 268 code installed and matches signed ZIP; one native touch/scaling SIGABRT with clear faulting stack; two SIGSEGV reporter-reraise events, newest with actual original native PC; one independent prior checkpoint failure. Search functionality/crash causal link and repair acceptance **NOT PROVEN**.
