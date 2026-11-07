@@ -227,8 +227,8 @@ class Candidate(unittest.TestCase):
         bs=functions(before);ns=functions(now)
         self.assertEqual(set(ns)-set(bs),{'_search_modal_admission'})
         self.assertEqual({name for name in bs if bs[name]!=ns[name]},
-                         {'open_search','_open_search'})
-        for guard in ('route','_query_file_stamp','_query_signature','_provider_result',
+                         {'open_search','_open_search','_provider_result'})
+        for guard in ('route','_query_file_stamp','_query_signature',
                       '_leased_directory','_native_search_admission','_bounded_results',
                       '_search_results','_publish_result','search_provider','search_all'):
             self.assertEqual(bs[guard],ns[guard],guard)
@@ -240,7 +240,10 @@ class Candidate(unittest.TestCase):
         allowed={str(SEARCH.relative_to(ROOT)),
                  str(Path(__file__).relative_to(ROOT)),
                  '.github/workflows/infinity-unified-native-search-candidate.yml',
-                 'repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/UNIFIED-NATIVE-SEARCH-CANDIDATE.md'}
+                 'repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/UNIFIED-NATIVE-SEARCH-CANDIDATE.md',
+                 'repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/test_native_owned_response_policy.py',
+                 'repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/NATIVE-OWNED-RESPONSE-POLICY.md',
+                 '.github/workflows/infinity-native-owned-response-candidate-20261107.yml'}
         self.assertTrue(names <= allowed, names-allowed)
 
 if __name__=='__main__':
