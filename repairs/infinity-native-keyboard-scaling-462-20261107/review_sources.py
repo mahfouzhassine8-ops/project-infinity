@@ -24,7 +24,7 @@ def metadata():
  request=json.loads((HERE/'REVIEW-REQUEST.json').read_text())
  assert request['source_base']==BASE and request['native_changes'] is False
  stage=request.get('stage','restore-review')
- assert stage in ('restore-review','review-callbacks')
+ assert stage in ('restore-review','review-callbacks','probe-keyboard')
  if os.environ.get('GITHUB_OUTPUT'):
   with open(os.environ['GITHUB_OUTPUT'],'a') as f:f.write('stage='+stage+'\n')
  assets=ASSETS if stage=='restore-review' else [ASSETS[0],(13571276665,42364232328,886694,'9cd229acfcf0c8bd30b52ed083fa77ab640888fc04950a1e85f11465c79999c7')]
@@ -63,16 +63,16 @@ def restore_review():
  # Print source, not private runtime data. Do not repeat ELF symbolication.
  for name in sorted(selected):
   if name.endswith(('GUIKeyboardFactory.cpp','GUIDialogKeyboardTouch.cpp','GUIKeyboardTouch.cpp','GenericTouchActionHandler.cpp','AndroidTouch.cpp')):
-   print('SOURCE_BEGIN '+name+' sha256='+expected[name])
+   if emit:print('SOURCE_BEGIN '+name+' sha256='+expected[name])
    for i,line in enumerate((ROOT/'kodi'/name).read_text().splitlines(),1):print(f'{i:04d}: {line}')
-   print('SOURCE_END '+name)
+   if emit:print('SOURCE_END '+name)
  save('EXACT462-SOURCE-REVIEW.json',dict(status='PASS_EXACT_9411_FILE_MAP',source=os.environ['GITHUB_SHA'],native_map_sha256=MAP_SHA,
       selected_sources={n:expected[n] for n in sorted(selected)},original_engine_sha256='fadfb1a08e3d125958a77d393c1d66453ec3e9c91aac3349ec5806c67c17694d',
       native_patch=False,compilation='NOT_RUN',Android='NOT_RUN',shutdown='NOT_RUN',signing=False,APK=False,
       causal_keyboard_fix='NOT_PROVEN',causal_scaling_fix='NOT_PROVEN'))
  print('PASS exact9411-file APK462 source binding; selected native ownership source exposed; no fix or runtime acceptance claimed')
 
-def review_callbacks():
+def review_callbacks(emit=True):
  prior=ROOT/'previous-review'
  proof=json.loads((prior/'EXACT462-SOURCE-REVIEW.json').read_text())
  assert proof['source']=='a6902706d6db77335516990956791c128acb07fc'
@@ -117,7 +117,8 @@ def review_callbacks():
     if any(m in line for m in markers[Path(name).name]):
      for j in range(max(0,i-2),min(len(lines),i+75)):selected.add(j)
   else:selected=range(len(lines))
-  for i in sorted(selected):print(f'{i+1:04d}: {lines[i]}')
+  if emit:
+   for i in sorted(selected):print(f'{i+1:04d}: {lines[i]}')
   print('SOURCE_END '+name)
  save('CALLBACK-SOURCE-BINDING.json',dict(status='PASS_SELECTED_SOURCES_MATCH_REUSED_EXACT462_MAP',
       reused_full_map_run=42364232328,reused_full_map_artifact=13571276665,absent_optional_sources=absent_optional,
@@ -125,6 +126,12 @@ def review_callbacks():
       native_patch=False,compilation='NOT_RUN',Android='NOT_RUN',signing=False,APK=False))
  print('PASS callback/locking source binding; reused9411-file proof; no unchanged tests or symbolication repeated')
 
+
+def probe_keyboard():
+ review_callbacks(emit=False)
+ spec=importlib.util.spec_from_file_location('selected_keyboard_probe',HERE/'probe_keyboard.py')
+ probe=importlib.util.module_from_spec(spec);spec.loader.exec_module(probe);probe.run(ROOT,OUT)
+
 if __name__=='__main__':
  mode=sys.argv[1]
- {'metadata':metadata,'restore-review':restore_review,'review-callbacks':review_callbacks}[mode]()
+ {'metadata':metadata,'restore-review':restore_review,'review-callbacks':review_callbacks,'probe-keyboard':probe_keyboard}[mode]()

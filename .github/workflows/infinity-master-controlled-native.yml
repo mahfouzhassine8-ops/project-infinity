@@ -64,7 +64,7 @@ jobs:
           retention-days: 90
 
   native-462-source-review:
-    name: Exact APK462 native source ownership review; no patch, compilation, APK or signing
+    name: Exact APK462 selected native ownership proof; no production patch, APK or signing
     if: github.ref == 'refs/heads/work/infinity-native-keyboard-scaling-462-20261107'
     runs-on: ubuntu-22.04
     timeout-minutes: 20
@@ -85,7 +85,7 @@ jobs:
         if: steps.scope.outputs.stage == 'restore-review'
         with: {artifact-ids: '13493978721', run-id: '42199527560', merge-multiple: true, github-token: '${{ github.token }}', path: compiled462}
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
-        if: steps.scope.outputs.stage == 'review-callbacks'
+        if: steps.scope.outputs.stage != 'restore-review'
         with: {artifact-ids: '13571276665', run-id: '42364232328', merge-multiple: true, github-token: '${{ github.token }}', path: previous-review}
       - name: Read exact selected native ownership source; reuse completed full map proof
         run: python3 repairs/infinity-native-keyboard-scaling-462-20261107/review_sources.py ${{ steps.scope.outputs.stage }}
