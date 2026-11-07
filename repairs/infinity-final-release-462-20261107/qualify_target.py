@@ -11,6 +11,7 @@ from pathlib import Path
 import re
 import subprocess
 import time
+import xml.etree.ElementTree as ET
 from zipfile import ZipFile
 
 HERE = Path(__file__).resolve().parent
@@ -101,20 +102,64 @@ def android(apk, sdk, out):
         if installed.returncode != 0 or 'Success' not in installed.stdout:
             report['blocker'] = (installed.stdout + installed.stderr).strip()[-3000:]
             raise RuntimeError('EXACT_ARM64_PARENT_INSTALL_FAILED')
-        # One original native entry, no replacement or test DEX/native library.
-        launched = shell('am', 'start', '-W', '-n', PACKAGE + '/.Main', timeout=90)
+        # Prepare only permissions on this disposable fresh installation.
+        # Use the real chooser; Main deliberately refuses unowned direct entry.
+        grants=[]
+        for args in [('appops','set',PACKAGE,'MANAGE_EXTERNAL_STORAGE','allow'),
+                     ('pm','grant',PACKAGE,'android.permission.RECORD_AUDIO'),
+                     ('pm','grant',PACKAGE,'android.permission.POST_NOTIFICATIONS')]:
+            grant=shell(*args)
+            grants.append(dict(command=list(args),exit=grant.returncode,
+                               output=grant.stdout+grant.stderr))
+            assert grant.returncode==0, 'FRESH_INSTALL_PERMISSION_SETUP_FAILED'
+        save(out,'FRESH-PERMISSIONS.json',grants)
+        launched = shell('am', 'start', '-W', '-n', PACKAGE + '/.Splash', timeout=90)
         (out / 'LAUNCH.txt').write_text(launched.stdout + launched.stderr)
         report['launch_exit'] = launched.returncode
         if launched.returncode or 'Error:' in launched.stdout + launched.stderr or 'Exception' in launched.stdout + launched.stderr:
             report['blocker'] = (launched.stdout + launched.stderr).strip()[-3000:]
             raise RuntimeError('ORIGINAL_NATIVE_ENTRY_LAUNCH_FAILED')
+        chooser_deadline=time.monotonic()+120
+        card=None
+        while time.monotonic()<chooser_deadline:
+            dumped=shell('uiautomator','dump','/sdcard/Download/infinity-qualification-ui.xml',timeout=40)
+            if dumped.returncode==0:
+                raw=shell('cat','/sdcard/Download/infinity-qualification-ui.xml').stdout
+                (out/'CHOOSER.xml').write_text(raw)
+                try:
+                    tree=ET.fromstring(raw)
+                    parents={child:parent for parent in tree.iter() for child in parent}
+                    matches=set()
+                    for node in tree.iter():
+                        if node.get('text','').strip().lower()!='infinity':
+                            continue
+                        owner=node
+                        while owner is not None and owner.get('clickable')!='true':
+                            owner=parents.get(owner)
+                        if owner is not None:
+                            bounds=re.fullmatch(r'\[(\d+),(\d+)\]\[(\d+),(\d+)\]',owner.get('bounds',''))
+                            if bounds:
+                                x1,y1,x2,y2=map(int,bounds.groups())
+                                if x2>x1 and y2>y1:matches.add(((x1+x2)//2,(y1+y2)//2))
+                    if len(matches)==1:
+                        card=next(iter(matches));break
+                except ET.ParseError:
+                    pass
+            time.sleep(2)
+        if card is None:
+            report['blocker']='Real Infinity chooser card was not available; see CHOOSER.xml.'
+            raise RuntimeError('CHOOSER_ENTRY_NOT_ESTABLISHED')
+        tapped=shell('input','tap',str(card[0]),str(card[1]))
+        assert tapped.returncode==0
+        report['entry']='Single tap on original Infinity chooser card'
+        report['chooser_tap']=list(card)
         # Read-only observation. This is neither a Close nor a reopen cycle.
-        deadline = time.monotonic() + 60
+        deadline = time.monotonic() + 90
         live = []
         while time.monotonic() < deadline:
-            pid = shell('pidof', PACKAGE).stdout.strip()
+            pid = shell('pidof', PACKAGE+':kodi').stdout.strip()
             live.append(pid)
-            if not pid:
+            if not pid and any(live[:-1]):
                 break
             time.sleep(2)
         logs = run([adb, '-s', serial, 'logcat', '-d', '-v', 'threadtime'], timeout=60)
@@ -123,8 +168,13 @@ def android(apk, sdk, out):
         report['native_startup_markers'] = {s: s in logs.stdout for s in (
             'Starting Kodi', 'Running on', 'CApplication::Create',
             'Fatal signal', 'dlopen failed', 'talloc', 'AT_RANDOM')}
+        native_log=shell('cat','/sdcard/Android/data/'+PACKAGE+'/files/.kodi/temp/kodi.log',timeout=40)
+        (out/'KODI-LOG.txt').write_text(native_log.stdout+native_log.stderr)
+        report['native_log_read_exit']=native_log.returncode
+        native_started='Starting Kodi' in native_log.stdout or 'Starting Kodi' in logs.stdout
         # Do not treat Java launch or PID presence alone as native qualification.
-        if not live or not all(live) or not report['native_startup_markers']['Starting Kodi']:
+        running=[pid for pid in live if pid]
+        if not running or not live[-1] or not native_started:
             report['blocker'] = 'Original native engine did not establish a live Kodi runtime on the selected target; see source-bound LOGCAT.txt.'
             raise RuntimeError('ORIGINAL_NATIVE_RUNTIME_NOT_ESTABLISHED')
         report['status'] = 'PASS_PARENT_TARGET_STARTUP_QUALIFICATION_ONLY'

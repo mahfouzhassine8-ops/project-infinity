@@ -5,7 +5,7 @@
   "selected_feature": "final462-target-qualification",
   "selected_tests": [
     "Authenticate exact archived signed 2103462 parent using official SDK35 verifier and package identity",
-    "Qualify one disposable stock Android17/API37.1 Google APIs ps16k target by installing and launching that exact ARM64 parent once"
+    "Qualify one fresh stock Android17/API37.0 4KiB emulator through normal Splash, existing Infinity chooser card, and the separate :kodi process/native log; no direct Main entry"
   ],
   "excluded": [
     "shutdown",
@@ -22,7 +22,7 @@
   "release_requested_in_this_probe": false,
   "existing_engine_and_24_search_tests": "Reuse existing source-bound passing runs; do not rerun unchanged tests",
   "target_limits": "This stock 4KiB Google API37.0 target is a distinct disposable infrastructure check, retaining the previous stock16KiB refusal. No Samsung/Fold equivalence, immutable settings consistency, candidate runtime PASS or release follows from it.",
-  "qualification_infrastructure_attempt": 3,
+  "qualification_infrastructure_attempt": 4,
   "retained_failed_attempt": {
     "run": 42422231072,
     "application_execution": "NOT_RUN",
@@ -44,5 +44,12 @@
     "result": "Exact original APK installed; libkodi.so load failed because 4096 alignment is smaller than 16384 system page size",
     "application_native_tests": "NOT_RUN",
     "next_selected_test": "One fresh stock Google APIs Android17/API37.0 4KiB target; no OS overrides, no lower major API, same exact original APK"
+  },
+  "retained_invalid_4k_probe": {
+    "run": 42422940642,
+    "artifact": 13594138180,
+    "sha256": "72526c0fd4a809bd4a04d76d096dad2b5ad1e7c163cec02de0bc48c03169f745",
+    "finding": "Library loaded successfully, then direct Main was correctly returned to chooser by original admission protection. Probe monitored the shell process instead of :kodi. This is a harness failure and NOT proof the 4KiB target cannot run Kodi.",
+    "correction": "Use original Splash and one actual Infinity card tap; record fresh-install permissions; observe :kodi and its native log."
   }
 }
