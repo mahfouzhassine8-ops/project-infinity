@@ -1,0 +1,99 @@
+name: Infinity original signing identity vs exact previously signed APK | read-only
+on:
+  push:
+    branches: [ci/infinity-original-signer-reference-20261107]
+    paths: [.github/workflows/infinity-original-signer-reference-20261107.yml]
+permissions: {contents: read, actions: read}
+jobs:
+  verify-existing-signer:
+    name: Exact original signed APK certificate equals configured retained keystore - NO APK
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with: {packages: 'platform-tools build-tools;35.0.0', log-accepted-android-sdk-licenses: false}
+      - name: Strict CI-only scope against current fully integrated Search+native candidate
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import subprocess
+          base='776e2e46006129b603275119bc3643021790456f'
+          names=subprocess.check_output(['git','diff','--name-only',base,'HEAD'],text=True).splitlines()
+          assert names==['.github/workflows/infinity-original-signer-reference-20261107.yml'],names
+          print('PASS no approved app source, signing store, native build, or Search results modified')
+          PY
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          artifact-ids: '12598182156'
+          run-id: '40191243446'
+          github-token: ${{ github.token }}
+          path: signed-reference
+          merge-multiple: true
+      - name: Match configured original keystore cert against exact trusted signed Infinity APK
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          umask 077
+          mkdir -p original-signer-proof
+          python3 - <<'PY'
+          import base64,hashlib,json,os,re,subprocess,tempfile
+          from pathlib import Path
+          REQUIRED=('INFINITY_KEYSTORE_B64','INFINITY_STORE_PASSWORD','INFINITY_KEY_PASSWORD','INFINITY_KEY_ALIAS')
+          assert all(os.environ.get(n) for n in REQUIRED),'permanent signer config missing'
+          expected_apk_hash='a388be6cbcda5a2fb9b740300fde09e247519d9a23552ead30e84080fd9852cf'
+          candidates=[]
+          for path in Path('signed-reference').rglob('*.apk'):
+            with path.open('rb') as stream: digest=hashlib.file_digest(stream,'sha256').hexdigest()
+            if digest==expected_apk_hash:candidates.append(path)
+          assert len(candidates)==1,'trusted previously signed APK not present exactly once'
+          apk=candidates[0]
+          apksigner=Path(os.environ['ANDROID_HOME'])/'build-tools/35.0.0/apksigner'
+          info=subprocess.check_output([str(apksigner),'verify','--verbose','--print-certs',str(apk)],text=True)
+          found=re.findall(r'Signer #1 certificate SHA-256 digest:\s*([0-9a-fA-F]{64})',info)
+          assert len(found)==1,'original APK signer certificate not identifiable'
+          original=found[0].lower()
+          with tempfile.TemporaryDirectory(prefix='private-signing-match-') as folder:
+            key=Path(folder)/'original-keystore.jks'
+            cert=Path(folder)/'original-cert.der'
+            key.write_bytes(base64.b64decode(os.environ['INFINITY_KEYSTORE_B64'],validate=True))
+            process=subprocess.run(['keytool','-exportcert','-keystore',str(key),
+                                    '-storepass:env','INFINITY_STORE_PASSWORD',
+                                    '-alias',os.environ['INFINITY_KEY_ALIAS'],
+                                    '-file',str(cert)],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
+            assert process.returncode==0,'original signer certificate could not be exported'
+            current=hashlib.sha256(cert.read_bytes()).hexdigest()
+            assert current==original,'configured signing identity does NOT match original signed APK'
+          report=dict(status='READY_ORIGINAL_SIGNER_MATCHES_VERIFIED_PAST_APK',
+              trusted_original_apk_sha256=expected_apk_hash,
+              identical_original_signing_certificate=True,
+              signing_private_fields_present=4,
+              missing_optional_stored_cert_digest_no_longer_blocks_match=True,
+              original_signer_preserved=True,
+              new_key_created=False,private_key_uploaded=False,
+              APK_created=False,APK_signed=False,
+              installed_462_signer_not_directly_checked=True)
+          Path('original-signer-proof/STATUS.json').write_text(json.dumps(report,indent=2,sort_keys=True)+'\n')
+          print('PASS retained keystore public certificate matches exact prior original-signer signed APK; no key generated, no APK signed')
+          PY
+      - name: Explicit limits
+        if: always()
+        run: |
+          mkdir -p original-signer-proof
+          printf '%s\n' 'No private signing material retained or published. Reference is exact pinned 2103406 signed APK; current installed 2103462 public certificate still needs comparison during final packaging.' 'No new APK built, signed, installed or accepted on device.' > original-signer-proof/LIMITS.txt
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-Original-Signer-Reference-Verified-${{ github.run_id }}-NO-KEY-NO-APK
+          path: original-signer-proof/
+          retention-days: 14
+          if-no-files-found: warn
