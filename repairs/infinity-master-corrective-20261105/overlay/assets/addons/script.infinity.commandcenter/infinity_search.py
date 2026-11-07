@@ -416,14 +416,85 @@ def _bounded_results(ready,query,home,cancel,progress):
     finally:
         cancel.cancel()
 
-def _publish_result(handle,provider,status,answer,path):
+
+def _search_nav_trace(event, provider_id, outcome):
+    """Privacy-safe first-party navigation evidence; never log query or path."""
+    try:
+        if not isinstance(provider_id, str) or not provider_id.startswith('plugin.video.'):
+            return
+        xbmc.log('INFINITY_SEARCH_NAV ' + json.dumps(dict(
+            schema=1, event=event, provider=provider_id, outcome=outcome
+        ), sort_keys=True, separators=(',', ':')), xbmc.LOGINFO)
+    except Exception:
+        pass
+
+
+def verified_provider_target(media, provider_id, query):
+    """Resolve a CURRENT trusted provider URI on click, never reuse rejected rows.
+
+    This is a handoff, not aggregate acceptance. Meaningful settings / ABA
+    rejection logic in _provider_result stays fully enforced.
+    """
+    if (media not in ('movie', 'tv', 'anime', 'cartoon') or
+            not isinstance(query, str) or not query.strip() or len(query) > 160 or
+            not isinstance(provider_id, str) or not provider_id.startswith('plugin.video.') or
+            len(provider_id) > 120 or any(c not in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789._-' for c in provider_id)):
+        return ''
+    try:
+        active_profile = Path(xbmcvfs.translatePath('special://profile')).resolve()
+        ready, _ = providers(media, force=True, provider_id=provider_id)
+        selected = [p for p in ready if p['id'] == provider_id]
+        if len(selected) != 1:
+            _search_nav_trace('verified_handoff', provider_id, 'provider_unavailable')
+            return ''
+        provider = selected[0]
+        target = route(provider, query)
+        if (not target.startswith('plugin://' + provider_id + '/') or
+                any(c in target for c in ('"', '\\', '\r', '\n'))):
+            _search_nav_trace('verified_handoff', provider_id, 'invalid_route')
+            return ''
+        # Revalidate source/dependencies immediately before the native builtin.
+        if (xbmc.Monitor().abortRequested() or
+                Path(xbmcvfs.translatePath('special://profile')).resolve() != active_profile or
+                route(provider, query) != target):
+            _search_nav_trace('verified_handoff', provider_id, 'source_profile_or_abort_changed')
+            return ''
+        _search_nav_trace('verified_handoff', provider_id, 'verified_fresh_route')
+        return target
+    except (OSError, ValueError, RuntimeError, TypeError, KeyError):
+        _search_nav_trace('verified_handoff', provider_id, 'verification_refused')
+        return ''
+
+
+def _verified_heading_target(provider_id, media, query):
+    """Fresh first-party entry. No stale aggregate rows travel across it."""
+    if media not in ('movie', 'tv', 'anime', 'cartoon') or not isinstance(query, str) or not query.strip() or len(query) > 160:
+        return ''
+    if not isinstance(provider_id, str) or not provider_id.startswith('plugin.video.'):
+        return ''
+    return 'plugin://' + CC + '/?' + urlencode(dict(
+        action='search-open-verified', media=media, provider=provider_id, query=query))
+
+
+def _publish_result(handle,provider,status,answer,path,media=None,query=None):
     rows=answer.get('result',{}).get('files') or []
     if not isinstance(rows,list):rows=[];status='invalid_result'
+    invalidated = status == 'state_changed'
+    # Invalidated results must NOT be published as fresh. Only offer a new,
+    # source-verified provider search on a separate user activation.
+    fresh = _verified_heading_target(provider['id'], media, query) if invalidated else ''
     heading=xbmcgui.ListItem(provider['name']+' — '+(str(len(rows))+' results' if status=='completed' else
-        'State changed; search again' if status=='state_changed' else status or 'unavailable'))
+        'Open fresh provider search' if fresh else
+        'State changed; search again' if invalidated else status or 'unavailable'))
     heading.setProperty('IsPlayable','false')
     heading.setProperty('Infinity.Search.Provider',provider['id'])
-    xbmcplugin.addDirectoryItem(handle,path,heading,isFolder=bool(path))
+    destination = fresh or path
+    if fresh:
+        heading.setProperty('Infinity.Search.Handoff', 'fresh-source-verification')
+        heading.addContextMenuItems([('Open verified provider search',
+            'ActivateWindow(Videos,"'+fresh+'",return)')])
+        _search_nav_trace('verified_handoff', provider['id'], 'heading_published')
+    xbmcplugin.addDirectoryItem(handle,destination,heading,isFolder=bool(destination))
     if status!='completed':return
     for row in rows[:MAX_RESULTS]:
         if not isinstance(row,dict):continue
@@ -472,7 +543,7 @@ def _search_results(handle,media,query,provider_id=None):
     try:
         for provider,status,answer,path in results:
             if cancel.iscanceled():break
-            _publish_result(handle,provider,status,answer,path)
+            _publish_result(handle,provider,status,answer,path,media,query)
     finally:
         cancel.cancel();results.close();progress.close()
 
