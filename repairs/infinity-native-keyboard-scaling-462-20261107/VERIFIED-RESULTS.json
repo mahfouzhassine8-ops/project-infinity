@@ -1,0 +1,39 @@
+{
+  "protected_correction": "86d5b5e2b65acb878632d407c3a3a07dd1af3b6d",
+  "search_candidate": "72fefa8fe2554eb3fa7181027d6b9b2f05d7dd75",
+  "native_branch": "work/infinity-native-keyboard-scaling-462-20261107",
+  "native_sources_changed": {
+    "xbmc/guilib/GUIKeyboardFactory.cpp": {
+      "before_sha256": "964e3c943a11f1bbed87c4529bedcd08c0111152954ff5b7140fb96c87ef3fb2",
+      "after_sha256": "fdef3763a10d981649d4312d5f1646514b1e621829153ab9a0fa3900b8418df5"
+    }
+  },
+  "native_source_count": 9411,
+  "protected_native_source_count": 9410,
+  "keyboard": {
+    "host_before_run": 42365055708,
+    "host_after_run": 42365578534,
+    "actual_arm64_compile_run": 42365858072,
+    "compile_workflow_conclusion": "failure_post_compile_assertion",
+    "verified_actual_abi_run": 42366436089,
+    "object_sha256": "f13f4aa269e77790f554616b63e80af3391895d352b26a546c1a7909e76fc6eb",
+    "complete_engine_link": false,
+    "Android": "NOT_RUN",
+    "Fold": "NOT_RUN"
+  },
+  "graphics": {
+    "actual_host_race_run": 42366031630,
+    "source_lifetime_run": 42366550095,
+    "exact_checkpoint_binding_run": 42366938495,
+    "cause": "SOURCE_LEVEL_RACE_DEMONSTRATED_NOT_EXCLUSIVE_HISTORICAL_ATTRIBUTION",
+    "repair": "BLOCKED_SAFE_QUERY_OWNERSHIP_AND_CHECKPOINT_CANCELLATION_NOT_PROVEN"
+  },
+  "search_settings": "UNRESOLVED_SEPARATE_OWNER",
+  "APK": false,
+  "signing": false,
+  "installation": false,
+  "promotion": false,
+  "lock": false,
+  "existing_native_job_body_unchanged": true,
+  "existing_native_job_body_sha256": "76889a08643b62699b46904dcc651dd93dd3426b8b6cfb63755cc93b8796f2c2"
+}
