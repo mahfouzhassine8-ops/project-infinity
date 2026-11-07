@@ -1,12 +1,10 @@
 {
-  "schema": 1,
   "source_base": "86d5b5e2b65acb878632d407c3a3a07dd1af3b6d",
-  "operation": "exact462-source-ownership-review",
-  "stage": "probe-keyboard",
   "native_changes": false,
-  "compile": "host-asan-counterexample-only",
-  "APK": false,
+  "stage": "verify-keyboard",
+  "candidate": "isolated-one-file-android-modal-ownership",
+  "original_factory_sha256": "964e3c943a11f1bbed87c4529bedcd08c0111152954ff5b7140fb96c87ef3fb2",
+  "candidate_factory_sha256": "fdef3763a10d981649d4312d5f1646514b1e621829153ab9a0fa3900b8418df5",
   "signing": false,
-  "shutdown": false,
-  "execution_attempt": 3
+  "APK": false
 }
