@@ -44,6 +44,7 @@ jobs:
         run: |
           set -euo pipefail
           python3 -m unittest discover             -s repairs/infinity-2103460-nine-corrections-20261106/fold-regressions             -p test_unified_coordinator_removal.py -v             2>&1 | tee host-proof/FOCUSED-HOST-TESTS.log
+          python3 -m unittest discover -s repairs/infinity-2103460-nine-corrections-20261106/fold-regressions -p test_settings_invalidation_matrix.py -v 2>&1 | tee host-proof/SETTINGS-INVALIDATION-MATRIX.log
       - name: Preserve host-only limits and evidence
         if: always()
         run: |
