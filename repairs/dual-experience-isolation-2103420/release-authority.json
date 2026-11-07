@@ -120,7 +120,7 @@
       "repairs/infinity-2103445-standalone-external-player/release_guard.py": "3c80c746931c9723d5a858e83779d369694cdc4e08ec7d688837761c368078b0"
     }
   },
-  "generation": 50,
+  "generation": 51,
   "guard_schema": 2,
   "last_issued_versionCode": 2103463,
   "launcher_icon_exception": {
@@ -194,12 +194,20 @@
       "repairs/infinity-final-release-462-20261107/PACKAGING-SCOPE.json": "83695d4e9485c52404b8b4634e9e1d76bbe3124e3f359080d39b091eb3cfdaa7",
       "repairs/infinity-final-release-462-20261107/SEARCH-REVIEW-SELECTION.json": "f7bd8fdb13885541130f4678ab1066223855fc8a983e2fca22e24d856041e27b",
       "repairs/infinity-final-release-462-20261107/WORKFLOW-REVIEW.json": "151183dbf1091bc395cc83bf1bded6c30439c18d81eceec6fa1c70f909cf8778",
-      "repairs/infinity-final-release-462-20261107/final_release.py": "44f79903af78143ac2407179011e875588e8ed10bad6741211baa3d8e5872b3f",
+      "repairs/infinity-final-release-462-20261107/final_release.py": "e2d1093a3e4cbc1522b9799898fe32fa6a2aafdec4e83752fa6d0411e289ec30",
       "repairs/infinity-final-release-462-20261107/prepare_release.py": "81980ce4177612332313ea116248be498ed953e3909a60b88b90c5224b0366c6",
-      "repairs/infinity-final-release-462-20261107/register_engineering.py": "5b9df3184f1623e4c4dfd33479c787fd925ea91c4792a4def5c53e3866b5dc8c",
+      "repairs/infinity-final-release-462-20261107/register_engineering.py": "014f8cd3851de50b3a443286a35e699a6cac6a3dbc219a67a01a1335937a93cb",
+      "repairs/infinity-final-release-462-20261107/verify_dex_toolchain.py": "0696b2f97873b8b2a0a394201949c891672833b6dbaf5fcbf3ca96aebd44e43e",
       "repairs/infinity-final-release-462-20261107/verify_module_upgrade.py": "dc14d19c60dc4093d16849943f450dbafd25a16a2e7fe7aecd0c49fbe7368cce",
       "repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/infinity_search.py": "a5949485c723cd56f727feec40f3be66eb60976af255ede431040511c145dc44",
       "repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/plugin.py": "a61290fe791e264e82f00aebb7c5b6173226639edca3bee15d17dccdda82fc8e"
+    },
+    "verification_toolchain": {
+      "APK_or_DEX_changed": false,
+      "guard_changed": false,
+      "java_major": 21,
+      "original_failure_run": 42426683249,
+      "report_sha256": "201278aa8566f4dbcd16bcc2e59c2e5075d2b485f457591da57cc10709c069ca"
     }
   },
   "package": "com.projectinfinity.kodi",
@@ -66994,7 +67002,7 @@
     "root": "CobraCardsTheme",
     "source_sha256": "58bd661ed94a2a949b459bab470c095bfb48d6d84d1e3fddc178f8ea21851864"
   },
-  "previous_authority_sha256": "cf16c0d1596e683467b80a70ed87c51a4eb7ce6cf9c190cfb45438c979ce35b8",
+  "previous_authority_sha256": "9b6511df370859af47b4e6611e8006f67aad1e53a4738d805b7c06cdb125b567",
   "proofs": {
     "COMBINATION-CONTROLS.json": "bcb21adb63fefb898a8e8799d9892f76e382315518d8e94b51c42060cc5ece83",
     "OWNER-CONTRACT.json": "dd0fdfdcb7715777007984969bfac45b36f3e4ef04023b5ba1884c67904d0846",
@@ -67189,10 +67197,7 @@
     "repairs/dual-experience-isolation-2103420/verify_runtime.py": "b903edd3d6c3402d46613841c9ac44f0103420a64da5dff2897d14c9952e7460"
   },
   "status": "ENGINEERING_REVIEWED_FOLD_PENDING",
-  "target_owners": [
-    "INFINITY",
-    "CHOOSER_SHELL"
-  ],
-  "update_kind": "owner_update",
-  "workflow_sha256": "3b92116383826ac41403af43258eb4be9b1ef7dd0d6d315d713eb074fbe24004"
+  "target_owners": [],
+  "update_kind": "evidence_refresh",
+  "workflow_sha256": "84e84d7ef292d3a648337088f718e241b71472524420affcfef2cc27e628c0d2"
 }

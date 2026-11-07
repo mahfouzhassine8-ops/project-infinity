@@ -1,0 +1,37 @@
+{
+  "APK_or_DEX_modified": false,
+  "Android": "NOT_RUN",
+  "Cobra_classes_changed": [],
+  "DEX": {
+    "classes.dex": "8cbfe62eae167e4441462cf5be970dbfbb2cc96e068134a39e12b61c64223118",
+    "classes2.dex": "2e8fa1ae27e670db0525d31a655e93d861893fa20316d5c54a4c6283a97ca304",
+    "classes3.dex": "5634f2376e5d0bf6176ebef6fa1ac16bb22fdecc1d018ac078f266bb757fe9b8",
+    "classes4.dex": "8286747329a4f1a572dc5e85c27239c3cfef24d8be81f1fbee770be4ba1e9584",
+    "classes5.dex": "70dc429bff4d2df7fe19907100d5df39d5ade973aa2679328b42d567b3d5aee1"
+  },
+  "Fold": "NOT_RUN",
+  "application_tests": "NOT_RUN_SOURCE_AUDIT_ONLY",
+  "class_differences": [],
+  "class_hashes_sha256": "26fda8c5ba2d17fbbcd1d126b46ae2aab20baf65da1fdaf12fb37025dd47ba33",
+  "classes_checked": 9077,
+  "example": {
+    "class_name": "Landroidx/media3/common/util/Util;",
+    "java17_comment": "3.25454944E8f",
+    "java17_sha256": "b64920f363e7ed8f65a084ddfc81b456ced2e59ce07b922687859fdedf5f0e79",
+    "java21_comment": "3.2545494E8f",
+    "java21_sha256": "e6838a660dc0f2ba70cb8656eabef8538ef9ae16d75bdf74b1bbeb44059723d1",
+    "unchanged_instruction": "0x4d9b3063"
+  },
+  "guard_modified": false,
+  "hash_normalization": false,
+  "java": "openjdk version \"21.0.13\" 2026-10-20 LTS\nOpenJDK Runtime Environment Temurin-21.0.13+9 (build 21.0.13+9-LTS)\nOpenJDK 64-Bit Server VM Temurin-21.0.13+9 (build 21.0.13+9-LTS, mixed mode, sharing)\n",
+  "java_major": 21,
+  "parent_apk_sha256": "a24ffafd056db23aa9d433552e17d4362cc9dbc9dd568b086d84cabadae8c619",
+  "retained_refusal": {
+    "artifact": 13595313349,
+    "artifact_sha256": "6d6e67abf0ca12aed1f598ca30976631aebad3c75637bf44ae54cd38824970c6",
+    "reason": "Java17 baksmali float annotation differs from original Java21",
+    "run": 42426683249
+  },
+  "status": "PASS_ALL_ORIGINAL_CLASS_HASHES_WITH_ORIGINAL_JAVA21"
+}
