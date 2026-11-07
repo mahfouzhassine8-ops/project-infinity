@@ -1,0 +1,52 @@
+name: Infinity unified native-provider Search candidate | HOST ONLY
+on:
+  push:
+    branches: [work/infinity-search-unified-native-candidate-20261107]
+    paths:
+      - .github/workflows/infinity-unified-native-search-candidate.yml
+      - repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/infinity_search.py
+      - repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/test_unified_native_provider_selection.py
+      - repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/UNIFIED-NATIVE-SEARCH-CANDIDATE.md
+permissions: {contents: read}
+concurrency:
+  group: infinity-unified-search-candidate-host
+  cancel-in-progress: false
+jobs:
+  unified-provider-source:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Verify candidate-only source scope, module syntax and original plugin preservation
+        run: |
+          set -euo pipefail
+          mkdir -p unified-native-evidence
+          python3 -m py_compile repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/infinity_search.py
+          python3 -m py_compile repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/test_unified_native_provider_selection.py
+          git diff --name-only 86d5b5e2 HEAD | tee unified-native-evidence/CHANGED-PATHS.txt
+          git rev-parse HEAD | tee unified-native-evidence/SOURCE-COMMIT.txt
+      - name: Execute isolated unified native-provider form and modal-owner host regression
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s repairs/infinity-2103460-nine-corrections-20261106/fold-regressions -p test_unified_native_provider_selection.py -v 2>&1 | tee unified-native-evidence/UNIFIED-PROVIDER-HOST-RESULTS.txt
+      - name: Preserve accurate limits
+        if: always()
+        run: |
+          cat > unified-native-evidence/LIMITS.txt <<'EOF'
+          HOST MOCKS/SOURCE ONLY. No Android navigation, native C++, OTA compatibility,
+          benign provider-settings acceptance, unobserved ABA coverage, crash fix,
+          signed ZIP/APK, or Fold runtime acceptance. The protected parent 86d5b5e2
+          and installed application remain unchanged. This is NOT a complete release.
+          EOF
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-Unified-Native-Search-Candidate-HOST-ONLY
+          path: unified-native-evidence/
+          retention-days: 30
+          if-no-files-found: warn
