@@ -257,32 +257,38 @@ def review_graphics_lifetime():
  print('UNREGISTER_WINSYSTEM_CALLS '+json.dumps(sites))
 
 
+
 def closeout_native():
  prior=ROOT/'previous-review';expected=json.loads((prior/'NATIVE-SOURCE-MAP.json').read_text())
  assert sha(prior/'NATIVE-SOURCE-MAP.json')==MAP_SHA
  name='xbmc/platform/android/activity/InfinityAndroidCheckpoint.cpp'
- source=ROOT/'repairs/android-checkpoint-shutdown/runtime/native/overlay'/name
- assert sha(source)==expected[name],('CHECKPOINT_SOURCE_NOT_EXACT462',sha(source),expected[name])
- text=source.read_text();start=text.index('void Pump(CApplication& application)')
- pump=text[start:text.index('\nvoid ',start+1)] if '\nvoid ' in text[start+1:] else text[start:]
- assert 's.phase == "CHECKPOINT_FAILED"' in pump
- assert 'ProcessWindowMessages(' not in pump
- save('GRAPHICS-CHECKPOINT-BOUNDARY.json',dict(status='EXACT462_PROTECTED_PUMP_HAS_NO_WINDOW_QUERY_DRAIN',source=os.environ['GITHUB_SHA'],
-  native_source=name,source_sha256=expected[name],failed_checkpoint_returns_before_work=True,
-  application_source_sha256=expected['xbmc/application/Application.cpp'],
-  application_binding_run=42366550095,
-  dependency='Application::Process returns after protected Pump when checkpoint active; direct synchronous GUI query marshalling would have no guaranteed failure acknowledgement',
-  production_graphics_patch=False,checkpoint_source_modified=False,Android='NOT_RUN',Fold='NOT_RUN'))
- print('PASS exact462 checkpoint-source binding; protected failed Pump returns without ProcessWindowMessages')
- for i,line in enumerate(text.splitlines(),1):
-  if start<=len('\n'.join(text.splitlines()[:i])) and i<text[:start].count('\n')+23:print(f'{i:04d}: {line}')
+ overlay=ROOT/'repairs/android-checkpoint-shutdown/runtime/native/overlay'/name
+ spec=importlib.util.spec_from_file_location('exact462_checkpoint_dependency',ROOT/'repairs/infinity-2103460-nine-corrections-20261106/downloads-native/build_native.py')
+ r=importlib.util.module_from_spec(spec);spec.loader.exec_module(r);r.OUT=OUT;r.restore.OUT=OUT;r.restore_sources()
+ assert r.restore.hashes(ROOT/'kodi')==expected
+ source=ROOT/'kodi'/name;assert sha(source)==expected[name]
+ text=source.read_text();start=text.index('void Pump(CApplication& application)');end=text.index('\n}\n',start)+3;pump=text[start:end]
+ target=OUT/'sources'/name;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(source.read_bytes())
+ lines=text.splitlines();selected=set();first=text[:start].count('\n')
+ for i in range(first,text[:end].count('\n')+1):selected.add(i)
+ for i,line in enumerate(lines):
+  if any(m in line for m in ('ProcessWindowMessages(', 'ProcessMessages(', 'PumpRuntime', 'PumpLifecycle', 'ServiceRuntime', 'ServiceLifecycle')):
+   for j in range(max(0,i-14),min(len(lines),i+100)):selected.add(j)
+ save('GRAPHICS-CHECKPOINT-BOUNDARY.json',dict(status='EXACT462_CHECKPOINT_SOURCE_EXPOSED_NO_PREMATURE_BLOCKER_ATTRIBUTION',source=os.environ['GITHUB_SHA'],
+  native_source=name,source_sha256=expected[name],stale_overlay_sha256=sha(overlay),
+  application_source_sha256=expected['xbmc/application/Application.cpp'],application_binding_run=42366550095,
+  previous_overlay_attribution='RETRACTED_AFTER_EXACT_HASH_MISMATCH',production_graphics_patch=False,checkpoint_source_modified=False,Android='NOT_RUN',Fold='NOT_RUN'))
+ print('EXACT_CHECKPOINT_SOURCE_BEGIN '+name+' sha256='+expected[name])
+ for i in sorted(selected):
+  if i<len(lines):print(f'{i+1:04d}: {lines[i]}')
+ print('EXACT_CHECKPOINT_SOURCE_END '+name)
  for branch,head in [('work/infinity-2103460-nine-corrections-20261106','86d5b5e2b65acb878632d407c3a3a07dd1af3b6d'),
  ('work/infinity-search-unified-native-candidate-20261107','72fefa8fe2554eb3fa7181027d6b9b2f05d7dd75')]:
   current=json.loads(subprocess.check_output(['gh','api','repos/mahfouzhassine8-ops/project-infinity/git/ref/heads/'+branch],text=True))['object']['sha']
   assert current==head,('PRESERVED_REFERENCE_MOVED_EXTERNALLY',branch,current)
  save('PRESERVED-CHECKPOINTS.json',dict(protected='86d5b5e2b65acb878632d407c3a3a07dd1af3b6d',search_candidate='72fefa8fe2554eb3fa7181027d6b9b2f05d7dd75',source=os.environ['GITHUB_SHA'],unchanged=True,
  native_candidate={'xbmc/guilib/GUIKeyboardFactory.cpp':sha(HERE/'native/xbmc/guilib/GUIKeyboardFactory.cpp')},APK=False,signing=False))
- print('PASS protected correction/Search branches unchanged; no Cobra/Preview/signing/runtime changes')
+ print('PASS exact462 native checkpoint binding; protected correction/Search branches unchanged; no source or runtime protection changed')
 
 if __name__=='__main__':
  mode=sys.argv[1]
