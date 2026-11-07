@@ -8,7 +8,7 @@ on:
 permissions: {contents: read, actions: read}
 concurrency:
   group: infinity462-graphics-gesture-render-prototype
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   scoped-graphics-host:
     name: Exact462 graphics gate source + TSAN host check - NO APK
