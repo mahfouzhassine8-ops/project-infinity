@@ -87,6 +87,9 @@ def android(apk, sdk, out):
     props['emulator_serial'] = serial
     save(out, 'ANDROID-TARGET.json', props)
     assert props['ro.build.version.sdk'] == '37', 'ANDROID17_REQUIRED'
+    expected = json.loads((HERE / 'SCOPE.json').read_text()).get('expected_target')
+    if expected:
+        assert props['page_size'] == expected['page_size'], 'EXACT_SELECTED_STOCK_PAGE_SIZE_REQUIRED'
     report = dict(status='BLOCKED_TARGET_NOT_QUALIFIED', parent_apk_sha256=APK_SHA,
                   candidate_runtime='NOT_RUN', Fold='NOT_RUN', shutdown='NOT_RUN',
                   settings_reset=False, OS_compatibility_overrides=False,

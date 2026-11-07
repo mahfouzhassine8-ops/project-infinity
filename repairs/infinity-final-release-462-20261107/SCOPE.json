@@ -21,12 +21,28 @@
   "signing_requested_in_this_probe": false,
   "release_requested_in_this_probe": false,
   "existing_engine_and_24_search_tests": "Reuse existing source-bound passing runs; do not rerun unchanged tests",
-  "target_limits": "An emulator qualification is not Samsung Fold acceptance or a repaired candidate runtime PASS. Stock OS page and native bridge properties are recorded; no compatibility override.",
-  "qualification_infrastructure_attempt": 2,
+  "target_limits": "This stock 4KiB Google API37.0 target is a distinct disposable infrastructure check, retaining the previous stock16KiB refusal. No Samsung/Fold equivalence, immutable settings consistency, candidate runtime PASS or release follows from it.",
+  "qualification_infrastructure_attempt": 3,
   "retained_failed_attempt": {
     "run": 42422231072,
     "application_execution": "NOT_RUN",
     "failure": "Existing SDK pin helper requires cmdline-tools/22.0; setup did not install that exact package",
     "correction": "Install cmdline-tools;22.0 explicitly on disposable runner. No app, OS or source change."
+  },
+  "qualification_source_base": "8f51c0415c8a96ffc1ae3d8c3c9e1d7ac92a9a75",
+  "expected_target": {
+    "api": "37.0",
+    "android": "17",
+    "image": "google_apis",
+    "ABI": "x86_64 with advertised arm64-v8a translation",
+    "page_size": "4096"
+  },
+  "retained_stock16k_failure": {
+    "run": 42422427458,
+    "artifact": 13593289692,
+    "sha256": "722ab424a9cd84e5f6227d560c4cf7c2fc74e375b7f68cdd5d4c6b71be5e39e9",
+    "result": "Exact original APK installed; libkodi.so load failed because 4096 alignment is smaller than 16384 system page size",
+    "application_native_tests": "NOT_RUN",
+    "next_selected_test": "One fresh stock Google APIs Android17/API37.0 4KiB target; no OS overrides, no lower major API, same exact original APK"
   }
 }

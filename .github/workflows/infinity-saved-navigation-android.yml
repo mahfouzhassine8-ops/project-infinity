@@ -39,8 +39,8 @@ jobs:
     timeout-minutes: 25
     env:
       PYTHONDONTWRITEBYTECODE: '1'
-      INFINITY_EMULATOR_API: '37.1'
-      INFINITY_EMULATOR_TARGET: google_apis_ps16k
+      INFINITY_EMULATOR_API: '37.0'
+      INFINITY_EMULATOR_TARGET: google_apis
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
@@ -55,7 +55,7 @@ jobs:
           from pathlib import Path
           scope=json.loads(Path('repairs/infinity-final-release-462-20261107/SCOPE.json').read_text())
           assert scope['selected_feature']=='final462-target-qualification'
-          changed=subprocess.check_output(['git','diff','--name-only',scope['parent'],'HEAD'],text=True).splitlines()
+          changed=subprocess.check_output(['git','diff','--name-only',scope.get('qualification_source_base',scope['parent']),'HEAD'],text=True).splitlines()
           assert changed and all(n.startswith('repairs/infinity-final-release-462-20261107/') or n=='.github/workflows/infinity-saved-navigation-android.yml' for n in changed),changed
           assert scope['app_source_changes'] is False
           Path('target-platform').mkdir(exist_ok=True)
@@ -66,23 +66,23 @@ jobs:
         with: {artifact-ids: '13495518701', run-id: '42204671979', github-token: '${{ github.token }}', path: exact-signed-parent, merge-multiple: true}
       - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
         with: {cmdline-tools-version: '15859902', packages: 'platform-tools build-tools;35.0.0 cmdline-tools;22.0', log-accepted-android-sdk-licenses: false}
-      - name: Prepare exact existing API37.1 infrastructure; no app or OS compatibility changes
+      - name: Prepare stock API37.0 4KiB infrastructure; no app or OS compatibility changes
         run: |
           set -euo pipefail
           sudo apt-get -o Acquire::Retries=3 update -qq
           sudo apt-get install -y libpulse0
-          python3 repairs/infinity-final-closure-2103407/api37_environment_gate.py --sdk-root "$ANDROID_HOME" --out target-platform --pin-tools
+          python3 repairs/four-repair-20261018/android37_gate.py --sdk-root "$ANDROID_HOME" --out target-platform --pin-tools
           python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out target-emulator-setup
           sudo chmod 666 /dev/kvm
       - uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
         with:
-          api-level: '37.1'
+          api-level: '37.0'
           arch: x86_64
-          target: google_apis_ps16k
+          target: google_apis
           profile: pixel_2
           disk-size: 8G
           avd-name: infinity-four-repair-api37
-          pre-emulator-launch-script: python3 repairs/infinity-final-closure-2103407/api37_environment_gate.py --sdk-root "$ANDROID_HOME" --out target-platform --check-avd
+          pre-emulator-launch-script: python3 repairs/four-repair-20261018/android37_gate.py --sdk-root "$ANDROID_HOME" --out target-platform --check-avd
           disable-animations: false
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
           script: python3 repairs/infinity-final-release-462-20261107/qualify_target.py android --apk exact-signed-parent/Infinity-2103462-Combined-Original-Signer.apk --sdk "$ANDROID_HOME/build-tools/35.0.0" --out target-qualification
