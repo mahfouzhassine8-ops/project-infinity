@@ -37,6 +37,21 @@ The owner has now **explicitly confirmed** that **ALL THREE native tombstones fo
 - Active runtime XML rendering and exact Python invoker generation are not established merely by matching on-disk hashes. User physical acceptance is not claimed.
 - Two SIGSEGVs' original full faulting-thread frames are **not** in the reporter re-raise tombstones; for the latest one an original PC is available. The 00:47 SIGABRT has a full native faulting stack.
 
+## Owner-provided new activation detail — delayed Search may receive multiple taps
+The owner reports **Infinity Search takes a long time to open**, and may have **tapped Search twice or more** while waiting because no prompt appeared. This is an owner-supplied *possible interaction pattern*, **not a confirmed timestamped tap count**. All three crash events remain owner-attributed to Search activation.
+
+**Specific hypothesis to test:** a repeated tap, duplicated touch event or second navigation callback while the first Search is preparing can start two concurrent `_open_search` invokers. Both can eventually reach `xbmc.Keyboard(...).doModal()`. This fits (but does not conclusively explain) the simultaneous Python keyboard threads and the invalid keyboard callback pointer at `CGUIKeyboardFactory::keyTypedCB`. It would not automatically explain the separate `SetScalingResolution` allocator abort.
+
+**Required minimal correction criteria (do NOT implement blindly):**
+- Trace where the Search tap is dispatched and where `_open_search` starts, specifically **before slow provider discovery, history load and keyboard construction**. Record event count/elapsed timings without search text or credentials.
+- Test both a genuine rapid double tap and duplicated activation from a *single* touch; determine whether multiple Python invokers can enter the Search preparation path concurrently. Reproduce the overlap in controlled host/native fixtures, not by forcing the user to crash.
+- If confirmed, use **atomic cross-invoker single-flight admission** with a unique Search-modal owner. Acquiring the guard only inside `_leased_directory` is too late: that guard protects provider result RPCs, **not keyboard creation**. A read-then-set GUI window property without atomicity is insufficient. A second tap must not create another Search modal or start another provider inventory operation.
+- Provide **immediate truthful visual acknowledgement** of the first activation (existing loading owner) without a second overlay or spin that adds delay. Account for cover/inner displays and screen readers as appropriate. Leave keyboard construction on its supported Kodi GUI/dialog thread.
+- Hold modal ownership through actual keyboard teardown, cancellation/Back, history handling and navigation handoff. Release via `finally` on all failures, app-abort or normal close. No indefinite stale lock and no aggressive interpreter/thread destruction.
+- Test rapid taps, cancel/reopen, slow inventory, back-to-back Search requests, successful first Search, aborted owner, and no second keyboard; verify no regressions to existing Search All validation, four accepted features, Cobra, Preview or data. A Python entry guard is **not proof** the native invalid pointer/scaling bugs are fully repaired; still inspect source-matched native ownership and scaling path.
+
+**Priority:** This gives 6.1 a narrowly testable shared Search activation scenario to investigate first, reducing needless provider/GUI speculation. The evidence does not justify declaring root cause fixed.
+
 ## Priority engineering response (read-only first; preserve accepted features)
 1. Preserve raw protobufs privately. On the existing **exact APK2103462 native engine / SHA-matched symbols**, locate instructions/functions at `libkodi.so+0x1b0daec`; inspect `CGUIKeyboardFactory::ShowAndGetInput`, overlapping Python invokers, native dialog lifecycle and cancellation, and the `00:47:26` `CGraphicContext::SetScalingResolution` / touch handling allocator abort. Determine whether two independent native defects exist. No speculative memory/reentrancy hacks; a native repair may require an APK, unlike the Python-only Search handoff.
 2. Separately diagnose checkpoint PID796 `addon_uninstall` durable write failure without force-exit or suppressing failure. Preserve checkpoints and installed add-on data.
