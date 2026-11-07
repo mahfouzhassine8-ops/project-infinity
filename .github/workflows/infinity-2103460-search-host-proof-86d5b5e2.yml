@@ -1,0 +1,51 @@
+name: Infinity 268 Search native-provider publication host proof - no APK
+on:
+  push:
+    branches:
+      - ci/infinity-search-86d5b5e2-host-20261107
+    paths:
+      - .github/workflows/infinity-2103460-search-host-proof-86d5b5e2.yml
+permissions:
+  contents: read
+concurrency:
+  group: infinity-search-86d5b5e2-host-proof
+  cancel-in-progress: false
+jobs:
+  focused-host-regressions:
+    name: Exact 86d5b5e2 source-only host tests; no signing, APK or modification
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 86d5b5e2b65acb878632d407c3a3a07dd1af3b6d
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify exact frozen candidate source and local syntax only
+        run: |
+          set -euo pipefail
+          mkdir -p host-proof
+          test "$(git rev-parse HEAD)" = '86d5b5e2b65acb878632d407c3a3a07dd1af3b6d'
+          git rev-parse HEAD | tee host-proof/SOURCE-COMMIT.txt
+          python3 -m py_compile             repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/infinity_search.py             repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/plugin.py
+      - name: Run only prepared source-level regression tests
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover             -s repairs/infinity-2103460-nine-corrections-20261106/fold-regressions             -p test_unified_coordinator_removal.py -v             2>&1 | tee host-proof/FOCUSED-HOST-TESTS.log
+      - name: Preserve host-only limits and evidence
+        if: always()
+        run: |
+          mkdir -p host-proof
+          printf '%s\n'             'SOURCE-ONLY HOST CHECKS. No Android, JNI, native C++ compile, settings-write acceptance, APK signing, release, or Fold verification.'             'A pass only supports source restoration and the included mocked publisher contracts; it does not resolve the open false rejection or crashes.'             > host-proof/LIMITS.txt
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-86d5b5e2-Focused-Host-Source-Evidence-UNSIGNED
+          path: host-proof/
+          if-no-files-found: warn
+          retention-days: 14
