@@ -21,7 +21,7 @@ KEYBOARD='xbmc/guilib/GUIKeyboardFactory.cpp'
 GRAPHICS={
   'xbmc/windowing/GraphicContext.h':('c18eb52470514ebb8da9c59330005f80b5815120b006ff8d76861f170b082bea','24f27b66184979b05246cce7052ce0b013aad548b2a171d429b199820bf376c2'),
   'xbmc/guilib/GUIWindowManager.cpp':('f9aeddec883a4d1ac63303bfbb9b88cba2bcba5f01fcd799f68c444665d31c23','c36cf699f799f89b2ffde8900763837b1fb3436f74b05cca84226380cb9f4bde'),
-  'xbmc/input/touch/generic/GenericTouchActionHandler.cpp':('43bb691c2fa01355125b54de845761aa35f3553902c9b593acc4bfde292fc509','82c1a61c21c79c9abdbf341959a0cdc689b114d1985371f6153cfab06a9f188a'),
+  'xbmc/input/touch/generic/GenericTouchActionHandler.cpp':('43bb691c2fa01355125b54de845761aa35f3553902c9b593acc4bfde292fc509','7fdd605c3136b361408d4a24d0765c2c8769c717a9df748a7c23b8fb4b5d20a1'),
 }
 PATCH=HERE/'GRAPHICS-GESTURE-RENDER.patch'
 
