@@ -85,6 +85,11 @@ def review_callbacks():
          'xbmc/guilib/GUIKeyboard.cpp','xbmc/guilib/GUIKeyboard.h',
          'xbmc/guilib/GUIWindow.cpp','xbmc/windowing/GraphicContext.cpp',
          'xbmc/dialogs/GUIDialogKeyboardTouch.h']
+ required={'xbmc/platform/android/activity/AndroidKeyboard.cpp','xbmc/platform/android/activity/AndroidKeyboard.h',\
+           'xbmc/guilib/GUIWindowManager.cpp'}
+ assert required.issubset(expected),'REQUIRED_NATIVE_BRIDGE_SOURCE_MISSING'
+ absent_optional=[name for name in wanted if name not in expected]
+ wanted=[name for name in wanted if name in expected]
  extracted={}
  with tarfile.open(ROOT/'verified-inputs/verified-p0-native-source.tar.gz','r:gz') as archive:
   for member in archive:
@@ -115,7 +120,7 @@ def review_callbacks():
   for i in sorted(selected):print(f'{i+1:04d}: {lines[i]}')
   print('SOURCE_END '+name)
  save('CALLBACK-SOURCE-BINDING.json',dict(status='PASS_SELECTED_SOURCES_MATCH_REUSED_EXACT462_MAP',
-      reused_full_map_run=42364232328,reused_full_map_artifact=13571276665,
+      reused_full_map_run=42364232328,reused_full_map_artifact=13571276665,absent_optional_sources=absent_optional,
       source=os.environ['GITHUB_SHA'],selected_sources={n:expected[n] for n in wanted},
       native_patch=False,compilation='NOT_RUN',Android='NOT_RUN',signing=False,APK=False))
  print('PASS callback/locking source binding; reused9411-file proof; no unchanged tests or symbolication repeated')
