@@ -150,6 +150,76 @@ class Candidate(unittest.TestCase):
         self.assertEqual(env['open_search']('anime'),'first')
         self.assertEqual(calls,['movie','anime'])
 
+    def test_single_provider_collects_and_publishes_native_rows_in_existing_infinity_screen(self):
+        """Host-level integration of existing search-provider -> shared publisher."""
+        provider=dict(id=PID,name='WatchNixtoons2',root='fixture',contract={})
+        native_calls=[]
+        published=[]
+        chosen=[]
+        class Item:
+            def __init__(self,label='',path='',offscreen=False):
+                self.label,self.path=label,path
+                self.props={}
+            def setProperty(self,k,v):self.props[k]=v
+            def setInfo(self,*a):pass
+            def setUniqueIDs(self,*a):pass
+            def setArt(self,*a):pass
+            def addContextMenuItems(self,*a):pass
+        class Home:
+            def getProperty(self,name):return '1' if name=='Infinity.Search.Protocol' else ''
+            def setProperty(self,*a):pass
+        class Progress:
+            def create(self,*a):pass
+            def iscanceled(self):return False
+            def update(self,*a):pass
+            def close(self):pass
+        def eligible(media,force=False,provider_id=None):
+            chosen.append((media,force,provider_id))
+            return ([provider],[])
+        def native(path,home,progress):
+            native_calls.append(path)
+            return ('completed',{'result':{'files':[
+                dict(file='plugin://'+PID+'/?action=title&id='+str(i),
+                     label='Synthetic series '+str(i),type='tvshow',filetype='directory')
+                for i in range(31)]}})
+        class Cancel:
+            def iscanceled(self):return False
+            def cancel(self):pass
+        env=dict(
+            xbmc=types.SimpleNamespace(Monitor=lambda:types.SimpleNamespace(abortRequested=lambda:False)),
+            xbmcgui=types.SimpleNamespace(ListItem=Item,Window=lambda _:Home(),DialogProgress=Progress),
+            xbmcplugin=types.SimpleNamespace(setPluginCategory=lambda *a:None,
+                setContent=lambda *a:None,
+                addDirectoryItem=lambda *args,**kw:published.append((args,kw))),
+            providers=eligible,
+            _Cancellation=Cancel,
+            _leased_directory=native,
+            _query_signature=lambda *args,**kw:'0'*64,
+            _query_cache_entries=lambda *args:[],
+            _remember_query_answer=lambda *args:None,
+            _VisibleCancellation=lambda *args:None,
+            route=lambda p,q:'plugin://'+PID+'/?action=actionSearchMenu&searchType=series&query=Re%3Azero',
+            time=types.SimpleNamespace(monotonic=lambda:1.0),
+            MAX_RESULTS=40,CC='script.infinity.commandcenter'
+        )
+        load(('_publish_result','_provider_result','_bounded_results','_search_results',
+              'search_provider'),env)
+        metadata=types.ModuleType('title_metadata')
+        metadata.trailer_route=lambda *args:None
+        with patch.dict(sys.modules,title_metadata=metadata):
+            env['search_provider'](1,'anime','Re:zero',PID)
+        self.assertEqual(chosen,[('anime',True,PID)])
+        self.assertEqual(len(native_calls),1)
+        self.assertTrue(native_calls[0].startswith('plugin://'+PID+'/'))
+        self.assertEqual(len(published),32)
+        heading_path=published[0][0][1]
+        self.assertEqual(heading_path,native_calls[0])
+        self.assertIn('31 results',published[0][0][2].label)
+        self.assertEqual([args[1] for args,kw in published[1:]],
+            ['plugin://'+PID+'/?action=title&id='+str(i) for i in range(31)])
+        self.assertFalse(any('script.infinity.commandcenter' in args[1]
+                             for args,kw in published[1:]))
+
     def test_protected_validator_native_lease_and_external_components_unchanged(self):
         before=subprocess.check_output(['git','show',FROZEN+':'+str(SEARCH.relative_to(ROOT))],
                                         cwd=ROOT,text=True)
