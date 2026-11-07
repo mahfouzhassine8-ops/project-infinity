@@ -1,0 +1,53 @@
+name: Infinity Search settings consistency evidence contract | HOST MODEL ONLY
+on:
+  push:
+    branches: [work/infinity-search-settings-proof-candidate-20261107]
+    paths:
+      - .github/workflows/infinity-search-settings-proof-model-20261107.yml
+      - repairs/infinity-search-settings-proof-20261107/**
+permissions: {contents: read}
+concurrency:
+  group: infinity-search-settings-proof-model-20261107
+  cancel-in-progress: true
+jobs:
+  proof-model:
+    name: Settings benign / meaningful / ABA / external writer contract - NO APK
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Refuse all source modifications outside isolated research
+        run: |
+          set -euo pipefail
+          mkdir -p search-settings-evidence
+          python3 - <<'PY'
+          import subprocess
+          base="c75e6de691cc6263236d778cd16b50573e7eb348"
+          allowed=".github/workflows/infinity-search-settings-proof-model-20261107.yml"
+          names=subprocess.check_output(["git","diff","--name-only",base,"HEAD"],text=True).splitlines()
+          assert names and all(n==allowed or n.startswith("repairs/infinity-search-settings-proof-20261107/") for n in names),names
+          print("PASS: production Search publisher, native routes, Cobra, Preview and protected baseline unchanged")
+          PY
+          git diff --name-only c75e6de691cc6263236d778cd16b50573e7eb348 HEAD | tee search-settings-evidence/SCOPE.txt
+          python3 -m py_compile repairs/infinity-search-settings-proof-20261107/settings_proof_contract.py
+      - name: Run bounded decision matrix (not a real Kodi-native journal)
+        run: |
+          set -euo pipefail
+          cd repairs/infinity-search-settings-proof-20261107
+          python3 -m unittest test_settings_proof_contract -v 2>&1 | tee "$GITHUB_WORKSPACE/search-settings-evidence/RESULTS.txt"
+      - name: Evidence clearly states no production provider fix
+        if: always()
+        run: |
+          printf '%s\n' 'MODEL ONLY; a Python-controlled/JSON witness is NOT trusted native evidence.' 'Neither Kodi global mutation-order journal nor comprehensive direct file writer instrumentation exists yet.' 'NO Infinity Search runtime modification, NO settings acceptance fix, NO APK, signing, Android/Fold tests or release.' > search-settings-evidence/LIMITS.txt
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-Search-Settings-Proof-Model-${{ github.run_id }}-NO-APK
+          path: search-settings-evidence/
+          retention-days: 30
+          if-no-files-found: warn
