@@ -30,15 +30,19 @@ def audit(root,seed,publish,previous,out):
         assert {str(f.relative_to(first)):hashlib.sha256(f.read_bytes()).hexdigest() for f in (first/'host-java').rglob('*.java')}==reference['host_java_sha256']
         def payload_hashes(path):
             with ZipFile(path) as z:return {n:hashlib.sha256(z.read(n)).hexdigest() for n in z.namelist() if not n.endswith('/')}
-        assert payload_hashes(next(publish.glob(cc+'-*-corrective.zip')))==reference['candidate']
-        assert payload_hashes(next(publish.glob(cc+'-*-recovery.zip')))==reference['recovery']
-        report=reference['report']
-        report['evidence_reused']=dict(run_id=reference['run_id'],artifact_id=reference['artifact_id'],
-            artifact_sha256=reference['artifact_sha256'],CC_payloads_and_Java_sources='EXACTLY_IDENTICAL',tests_rerun=False)
-        (out/'RECOVERY-VERIFIED.json').write_text(json.dumps(report,indent=2)+'\n')
-        shutil.copyfile(out/'RECOVERY-VERIFIED.json',publish/'RECOVERY-VERIFIED.json')
-        print('REUSE six real-Java recovery cases: both CC payloads and all Java sources exactly identical; no unchanged tests rerun')
-        return
+        # The 268 Search repair changes authenticated CC code. Its 266 Java
+        # host evidence MUST NOT be reused; rerun the six actual Java checks.
+        unchanged_candidate = payload_hashes(next(publish.glob(cc+'-*-corrective.zip')))==reference['candidate']
+        unchanged_recovery = payload_hashes(next(publish.glob(cc+'-*-recovery.zip')))==reference['recovery']
+        if unchanged_candidate and unchanged_recovery:
+            report=reference['report']
+            report['evidence_reused']=dict(run_id=reference['run_id'],artifact_id=reference['artifact_id'],
+                artifact_sha256=reference['artifact_sha256'],CC_payloads_and_Java_sources='EXACTLY_IDENTICAL',tests_rerun=False)
+            (out/'RECOVERY-VERIFIED.json').write_text(json.dumps(report,indent=2)+'\n')
+            shutil.copyfile(out/'RECOVERY-VERIFIED.json',publish/'RECOVERY-VERIFIED.json')
+            print('REUSE six real-Java recovery cases: both CC payloads and all Java sources exactly identical')
+            return
+        print('CHANGED authenticated Command Center payload: six real-Java installer/recovery checks required')
     rows=[]
     with tempfile.TemporaryDirectory(dir=out) as temp:
         temp=Path(temp);assets=temp/'assets';addons=assets/'addons';addons.mkdir(parents=True)
