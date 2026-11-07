@@ -1,6 +1,15 @@
 # 268 coordinated installers / 269 forward recovery — delivery status
 Date: 2026-11-07 UTC.
 
+## Superseding physical result — 268 installed, Search correction FAILED
+The owner now confirms APK2103462 / skin1.0.5.268 installed. The recorded Fold video proves the fresh-provider heading opens empty Command Center/provider directories rather than the required mixed Search All results. The 268 fallback is rejected. Its cryptographic/artifact verification remains valid, but it must not be presented as a completed or accepted repair, recommended for another test installation, promoted or locked. No automatic269 recovery is authorized by this status correction.
+
+The latest owner requirement is one Search All list with actual Crew/Nixtoons results alongside every other supported provider, using common validation/navigation without special exceptions or another fallback. Remove the failed handoff as part of a verified coordinated correction. Preserve current Power, Movies, TV and Downloads physical passes, Cast, approved layouts, Cobra, Preview and user data.
+
+Read 268-PHYSICAL-SEARCH-HEADING-REGRESSION-20261107.md and 268-FOLD-DIAGNOSTIC-20261107-SANITIZED.md. All three tombstones are owner-associated with Search activation; the actual recorded native fault evidence must be analyzed against verified engine/source identity. The touch/scaling allocator abort and keyboard-region SIGSEGV are not automatically the same cause. No repeat diagnostics/version request is needed.
+
+Execution status for this continuation: GitHub read/write remains available; the managed executor is unavailable. exec_command returns “No usable execution environment is available”; wait_for_environment rejects the selected ID as neither ready nor starting even while provider status says starting/offline. Therefore new compilation, focused application tests and source-matched native symbol analysis are BLOCKED. No replacement runtime fix, new test PASS or successor installer is claimed. Existing source, signatures and artifacts are preserved.
+
 ## Actual signed artifact
 [Download the coordinated installer and recovery bundle](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/42351486944/artifacts/13565947121)
 
@@ -68,11 +77,11 @@ The user reports all three tombstones followed clicking Search, whose opening ha
 
 The user also reports worsening results and requires Crew/Nixtoons results alongside other Search All providers, without special treatment. The268 fresh heading handoff is a safety-preserving fallback and does not meet that complete aggregate acceptance requirement. No claim of a fixed validator, successful native heading dispatch or current268 installation follows from the signed artifact.
 
-## Installation/recovery route — controlled testing only
+## Historical 268 installation/recovery route — superseded by physical FAIL above
 Extract the outer artifact; keep both matching recovery installers available first. Through the existing Kodi Add-ons -> Install from ZIP interface, install the corrective CC ZIP and then corrective skin268 ZIP as one coordinated update. Do not install the outer artifact itself.
 
 If needed, install recovery CC and recovery skin269 through the same interface. Recovery restores authenticated262/CC61 functional files while retaining native462 and all existing folders/data. It advances the skin version; it is not an APK downgrade. Once269 is used, future corrected skin must advance beyond269. No uninstall, data clear, profile reset or automatic installation/lock.
 
 The generic Kodi ZIP chooser does not independently enforce the outer RSA envelope. CI performed original-key authentication and existing native CC module authentication remains unchanged; do not claim a new native skin-signature gate.
 
-With the independent artifact audit reconciled, use ONE coordinated Fold session for explicit Crew/Nixtoons provider selection and fresh Search All heading; supported Watched/Unwatched and visible badge; Info Play/Trailer/Cast/More/Back on affected cover/inner/light/dark layouts; last Files curve removal with accepted folders unchanged. Then perform repeated real searches, stopping at first fault. Collect a same-event native stack only if a crash occurs. No baseline promotion or acceptance without the owner.
+Historical test checklist, not a recommendation to reinstall failed268: use ONE coordinated Fold session only after the replacement correction is verified for explicit Crew/Nixtoons provider selection and fresh Search All heading; supported Watched/Unwatched and visible badge; Info Play/Trailer/Cast/More/Back on affected cover/inner/light/dark layouts; last Files curve removal with accepted folders unchanged. Then perform repeated real searches, stopping at first fault. Collect a same-event native stack only if a crash occurs. No baseline promotion or acceptance without the owner.
