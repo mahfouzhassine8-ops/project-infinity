@@ -36,7 +36,7 @@ def main(delivery,previous,out):
     envelope=(delivery/'INFINITY-QUICK-UPDATE.v1').read_bytes()
     key.verify((delivery/'INFINITY-QUICK-UPDATE.v1.sig').read_bytes(),envelope,padding.PKCS1v15(),hashes.SHA256())
     lines=envelope.decode('ascii').splitlines()
-    assert lines[:4]==['INFINITY-QUICK-UPDATE/1','base\t2103460','commandcenter\t0.3.5.61','skin\t1.0.5.266']
+    assert lines[:4]==['INFINITY-QUICK-UPDATE/1','base\t2103460','commandcenter\t0.3.5.61','skin\t1.0.5.268']
     bound={row.split('\t')[2]:row.split('\t')[1] for row in lines[4:]}
     assert len(bound)==4
     proof=json.loads((delivery/'BUILD-RECEIPT.json').read_text())
@@ -44,6 +44,7 @@ def main(delivery,previous,out):
     assert proof['device_APK']==2103462 and proof['native_changed'] is False
     recovery=json.loads((delivery/'RECOVERY-VERIFIED.json').read_text())
     assert recovery['status']=='PASS_SIX_HOST_INSTALLER_AND_RECOVERY_CASES' and len(recovery['tests'])==6
+    assert 'evidence_reused' not in recovery,'CHANGED_CC_REQUIRES_FRESH_REAL_JAVA_AUDIT'
     baseline={}
     for aid,version in ((CC,'0.3.5.61'),(SKIN,'1.0.5.262')):
         p=previous/(aid+'-'+version+'-2103460-corrective.zip')
@@ -62,7 +63,7 @@ def main(delivery,previous,out):
         assert changed==expected,(filename,changed^expected)
         with ZipFile(path) as z:
             version=ET.fromstring(z.read(aid+'/addon.xml')).get('version')
-            expected_version=('1.0.5.267' if recover else '1.0.5.266') if aid==SKIN else '0.3.5.61'
+            expected_version=('1.0.5.269' if recover else '1.0.5.268') if aid==SKIN else '0.3.5.61'
             assert version==expected_version
             if aid==SKIN:
                 protected=json.loads(z.read(aid+'/Infinity-Protected-Manifest.json'))['protected_files']

@@ -420,7 +420,15 @@ def _bounded_results(ready,query,home,cancel,progress):
 def _search_nav_trace(event, provider_id, outcome):
     """Privacy-safe first-party navigation evidence; never log query or path."""
     try:
-        if not isinstance(provider_id, str) or not provider_id.startswith('plugin.video.'):
+        import re
+        if (not isinstance(provider_id, str) or
+                not re.fullmatch(r'plugin\.video\.[A-Za-z0-9._-]{1,100}', provider_id) or
+                event not in ('verified_handoff', 'provider_form') or
+                outcome not in ('provider_unavailable', 'invalid_route',
+                    'source_profile_or_abort_changed', 'verified_fresh_route',
+                    'verification_refused', 'heading_published', 'action_invoked',
+                    'directory_end_returned', 'native_navigation_requested',
+                    'builtin_returned', 'abort_before_dispatch')):
             return
         xbmc.log('INFINITY_SEARCH_NAV ' + json.dumps(dict(
             schema=1, event=event, provider=provider_id, outcome=outcome
@@ -454,9 +462,9 @@ def verified_provider_target(media, provider_id, query):
             _search_nav_trace('verified_handoff', provider_id, 'invalid_route')
             return ''
         # Revalidate source/dependencies immediately before the native builtin.
-        if (xbmc.Monitor().abortRequested() or
-                Path(xbmcvfs.translatePath('special://profile')).resolve() != active_profile or
-                route(provider, query) != target):
+        if (route(provider, query) != target or
+                xbmc.Monitor().abortRequested() or
+                Path(xbmcvfs.translatePath('special://profile')).resolve() != active_profile):
             _search_nav_trace('verified_handoff', provider_id, 'source_profile_or_abort_changed')
             return ''
         _search_nav_trace('verified_handoff', provider_id, 'verified_fresh_route')
@@ -651,7 +659,11 @@ def _open_search(media='movie'):
             if xbmc.Monitor().abortRequested():return
             if route(provider,query,history=legacy_history) != target:
                 raise RuntimeError('Provider changed before opening Search.')
+        if aid != 'all' or legacy_history:
+            _search_nav_trace('provider_form', aid, 'native_navigation_requested')
         xbmc.executebuiltin('ActivateWindow(Videos,"'+target+'",return)')
+        if aid != 'all' or legacy_history:
+            _search_nav_trace('provider_form', aid, 'builtin_returned')
         return
 
 

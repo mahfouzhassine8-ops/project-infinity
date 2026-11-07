@@ -1,4 +1,4 @@
-"""Assemble forward skin266 / recovery267 through the existing original signer.
+"""Assemble forward skin268 / recovery269 through the existing original signer.
 
 No keys or signing implementation here. The exact signed262 quick-update
 artifact is the functional/recovery reference; signed460 seeds unchanged shims.
@@ -140,4 +140,4 @@ def prepare(p,apk,out):
         known_limitations=['Search All settings-history/ABA validation remains strict and unresolved',
                            'Actual provider-heading regression not reproduced on Android',
                            'Repeated native Search crash stability NOT RUN; no speculative engine fix']))
-    print('PASS authenticated262 reference, six runtime file deltas, exact protected sources and forward267 recovery; Android NOT RUN')
+    print('PASS authenticated262 reference, six runtime file deltas, exact protected sources and forward269 recovery; Android NOT RUN')

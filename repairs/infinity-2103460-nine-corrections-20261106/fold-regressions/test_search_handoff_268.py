@@ -125,6 +125,62 @@ class Host(unittest.TestCase):
         self.vfs.switch=True
         self.assertEqual(self.env['verified_provider_target']('anime',PROVIDER['id'],'test'),'')
 
+    def test_profile_or_abort_changed_during_final_route_refuses(self):
+        original=self.env['route']
+        def route(provider,query):
+            result=original(provider,query)
+            if len(self.routes)==2:self.vfs.switch=True
+            return result
+        self.env['route']=route
+        self.assertEqual(self.env['verified_provider_target']('anime',PROVIDER['id'],'test'),'')
+        self.vfs.switch=False;self.routes.clear()
+        def aborting(provider,query):
+            result=original(provider,query)
+            if len(self.routes)==2:self.xbmc.aborted=True
+            return result
+        self.env['route']=aborting
+        self.assertEqual(self.env['verified_provider_target']('anime',PROVIDER['id'],'test'),'')
+
+    def test_completed_counts_and_zero_preserve_real_rows_and_routes(self):
+        meta=types.ModuleType('title_metadata');meta.trailer_route=lambda value:None
+        original=sys.modules.get('title_metadata');sys.modules['title_metadata']=meta
+        try:
+            for identity,count in [('plugin.video.watchnixtoons2',31),('plugin.video.thecrew',2),
+                                   ('plugin.video.watchnixtoons2',0)]:
+                with self.subTest(provider=identity,count=count):
+                    self.plugin.items.clear()
+                    provider=dict(PROVIDER,id=identity)
+                    raw='plugin://'+identity+'/?action=search&query=fixture'
+                    rows=[dict(file='plugin://'+identity+'/?title='+str(i),
+                               label='Fixture',filetype='directory',type='tvshow') for i in range(count)]
+                    self.env['_publish_result'](1,provider,'completed',{'result':{'files':rows}},raw,'tv','fixture')
+                    self.assertEqual(len(self.plugin.items),count+1)
+                    self.assertEqual(self.plugin.items[0][0],raw)
+                    self.assertIn(str(count)+' results',self.plugin.items[0][1].label)
+                    self.assertEqual([p for p,_,_ in self.plugin.items[1:]],[r['file'] for r in rows])
+        finally:
+            if original is None:sys.modules.pop('title_metadata',None)
+            else:sys.modules['title_metadata']=original
+
+    def test_native_error_statuses_do_not_start_fresh_handoff(self):
+        for status in ('cancelled','timeout','busy','unavailable'):
+            with self.subTest(status=status):
+                self.plugin.items.clear()
+                self.env['_publish_result'](1,PROVIDER,status,{},'plugin://'+PROVIDER['id']+'/','tv','fixture')
+                self.assertEqual(len(self.plugin.items),1)
+                self.assertNotIn('search-open-verified',self.plugin.items[0][0])
+                self.assertEqual(self.plugin.items[0][1].context,[])
+                self.assertEqual(self.routes,[])
+
+    def test_trace_rejects_private_or_unbounded_fields(self):
+        trace=self.env['_search_nav_trace']
+        for event,identity,outcome in [('private query',PROVIDER['id'],'builtin_returned'),
+                ('provider_form','plugin.video.bad\nprivate query','builtin_returned'),
+                ('provider_form',PROVIDER['id'],'https://private.invalid/token'),
+                ('provider_form','plugin.video.'+'x'*101,'builtin_returned')]:
+            trace(event,identity,outcome)
+        self.assertEqual(self.events,[])
+
     def test_malformed_input_refuses_without_provider_call(self):
         f=self.env['verified_provider_target']
         for media,identity,query in [('bad',PROVIDER['id'],'q'),('anime','script.infinity.commandcenter','q'),
@@ -145,9 +201,42 @@ class Host(unittest.TestCase):
             exec(selected(PLUGIN,('main',)),self.env)
             self.env['main']()
             self.assertEqual([e[0] for e in self.events if e[0] in ('end','execute')],['end','execute'])
+            phases=[json.loads(e[1].split(' ',1)[1])['outcome'] for e in self.events if e[0]=='log']
+            self.assertEqual(phases,['action_invoked','verified_fresh_route','directory_end_returned',
+                                     'native_navigation_requested','builtin_returned'])
             self.events.clear();self.providers=[]
             self.env['main']()
             self.assertEqual([e[0] for e in self.events if e[0] in ('end','execute','notice')],['end','notice'])
+        finally:
+            if original is None:sys.modules.pop('infinity_search',None)
+            else:sys.modules['infinity_search']=original
+
+    def test_directory_end_failure_never_posts_navigation(self):
+        self.env.update(PARAMS=dict(action='search-open-verified',provider=PROVIDER['id'],media='tv',query='fixture'),HANDLE=1)
+        mock=types.ModuleType('infinity_search')
+        mock.verified_provider_target=self.env['verified_provider_target'];mock._search_nav_trace=self.env['_search_nav_trace']
+        original=sys.modules.get('infinity_search');sys.modules['infinity_search']=mock
+        def fail(*a,**k):raise RuntimeError('fixture directory failed')
+        self.plugin.endOfDirectory=fail
+        try:
+            exec(selected(PLUGIN,('main',)),self.env)
+            with self.assertRaisesRegex(RuntimeError,'directory failed'):self.env['main']()
+            self.assertFalse(any(e[0]=='execute' for e in self.events))
+        finally:
+            if original is None:sys.modules.pop('infinity_search',None)
+            else:sys.modules['infinity_search']=original
+
+    def test_abort_after_directory_end_never_posts_navigation(self):
+        self.env.update(PARAMS=dict(action='search-open-verified',provider=PROVIDER['id'],media='tv',query='fixture'),HANDLE=1)
+        mock=types.ModuleType('infinity_search')
+        mock.verified_provider_target=self.env['verified_provider_target'];mock._search_nav_trace=self.env['_search_nav_trace']
+        original=sys.modules.get('infinity_search');sys.modules['infinity_search']=mock
+        def abort(*a,**k):self.xbmc.aborted=True
+        self.plugin.endOfDirectory=abort
+        try:
+            exec(selected(PLUGIN,('main',)),self.env);self.env['main']()
+            self.assertFalse(any(e[0]=='execute' for e in self.events))
+            self.assertTrue(any('abort_before_dispatch' in str(e) for e in self.events))
         finally:
             if original is None:sys.modules.pop('infinity_search',None)
             else:sys.modules['infinity_search']=original

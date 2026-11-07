@@ -30,7 +30,7 @@ def function(path,name,env):
 
 class ProviderDispatch(unittest.TestCase):
     def run_form(self,aid='plugin.video.thecrew',history=False,during=None):
-        props={}; commands=[]; calls=[]; stopped=[False]
+        props={}; commands=[]; calls=[]; stopped=[False];self.trace_events=[]
         provider=dict(id=aid,name='Fixture provider',root='fixture',contract={})
         class Keyboard:
             def __init__(self,text,heading,hidden): self.token=json.loads(heading.split(':',1)[1])['token']
@@ -39,7 +39,8 @@ class ProviderDispatch(unittest.TestCase):
             def getText(self): return json.dumps(dict(token=self.token,query='fixture query',provider=aid,history=history))
         xbmc=types.SimpleNamespace(getSkinDir=lambda:'skin.infinity.diggz',
             Monitor=lambda:types.SimpleNamespace(abortRequested=lambda:stopped[0]),
-            Keyboard=Keyboard,executebuiltin=commands.append,getInfoLabel=lambda _: '')
+            Keyboard=Keyboard,executebuiltin=commands.append,getInfoLabel=lambda _: '',
+            LOGINFO=1,log=lambda line,level:self.trace_events.append(line))
         gui=types.SimpleNamespace(Window=lambda _:types.SimpleNamespace(getProperty=lambda k:props.get(k,'')))
         def route(p,q,history=False):
             calls.append((p['id'],q,history))
@@ -54,6 +55,7 @@ class ProviderDispatch(unittest.TestCase):
                  providers=lambda *a,**k:([provider],[]),shared_history=save_history,route=route,
                  uuid=uuid,json=json,urlencode=urlencode,CC='script.infinity.commandcenter')
         with patch.dict(sys.modules,action_loading=loading):
+            function(CC/'infinity_search.py','_search_nav_trace',env)
             function(CC/'infinity_search.py','_open_search',env)('tv')
         return commands,calls
 
@@ -82,13 +84,22 @@ class ProviderDispatch(unittest.TestCase):
         commands,calls=self.run_form(history=True)
         self.assertIn('action=history',commands[0]);self.assertTrue(all(c[2] for c in calls))
 
+    def test_form_trace_reports_builtin_request_return_without_query_or_success_claim(self):
+        self.run_form()
+        rows=[json.loads(line.split(' ',1)[1]) for line in self.trace_events]
+        self.assertEqual([r['outcome'] for r in rows],['native_navigation_requested','builtin_returned'])
+        self.assertTrue(all(r['event']=='provider_form' for r in rows))
+        self.assertNotIn('fixture query',str(rows));self.assertNotIn('plugin://',str(rows))
+
     def test_aggregate_security_ownership_and_cancellation_functions_unchanged(self):
         before=subprocess.check_output(['git','show','9ab8ec01:'+str((CC/'infinity_search.py').relative_to(ROOT))],cwd=ROOT)
         a={n.name:ast.dump(n) for n in ast.parse(before).body if isinstance(n,(ast.FunctionDef,ast.ClassDef))}
         b={n.name:ast.dump(n) for n in ast.parse((CC/'infinity_search.py').read_bytes()).body if isinstance(n,(ast.FunctionDef,ast.ClassDef))}
-        self.assertEqual({n for n in a.keys()|b.keys() if a.get(n)!=b.get(n)},{'_open_search'})
+        self.assertEqual({n for n in a.keys()|b.keys() if a.get(n)!=b.get(n)},
+                         {'_open_search','_publish_result','_search_results',
+                          '_search_nav_trace','verified_provider_target','_verified_heading_target'})
         # Reuse the prior guard evidence; these functions are byte/AST bound.
-        for name in ('route','_provider_result','_query_signature','_leased_directory','_publish_result'):
+        for name in ('route','_provider_result','_query_signature','_leased_directory'):
             self.assertEqual(a[name],b[name])
 
 class WatchedActions(unittest.TestCase):

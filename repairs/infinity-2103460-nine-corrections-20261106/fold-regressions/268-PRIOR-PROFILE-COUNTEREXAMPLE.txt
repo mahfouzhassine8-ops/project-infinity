@@ -1,0 +1,17 @@
+test_profile_or_abort_changed_during_final_route_refuses (test_search_handoff_268.Host.test_profile_or_abort_changed_during_final_route_refuses) ... FAIL
+
+======================================================================
+FAIL: test_profile_or_abort_changed_during_final_route_refuses (test_search_handoff_268.Host.test_profile_or_abort_changed_during_final_route_refuses)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/dev/shm/infinity-nine-corrections/repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/test_search_handoff_268.py", line 135, in test_profile_or_abort_changed_during_final_route_refuses
+    self.assertEqual(self.env['verified_provider_target']('anime',PROVIDER['id'],'test'),'')
+AssertionError: 'plugin://plugin.video.watchnixtoons2/?action=search&query=test' != ''
+- plugin://plugin.video.watchnixtoons2/?action=search&query=test
+
+
+----------------------------------------------------------------------
+Ran 1 test in 0.007s
+
+FAILED (failures=1)
+EXPECTED_FAIL_PRIOR_SOURCE: profile switches during final route verification; previous guard returns a route. Final current-source case passed in 268-HOST-RESULTS.txt. Host only.
