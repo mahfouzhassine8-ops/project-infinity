@@ -578,13 +578,15 @@ def _open_search(media='movie'):
         else:
             provider=next((p for p in ready if p['id']==aid),None)
             if provider is None:return
-            # Explicit provider selection opens that provider's original GUI
-            # search, just like a provider heading. It is not a request to
-            # collect/re-publish an aggregate snapshot. In particular, a
-            # provider's own search-history writes must not erase this page.
-            # The shared route verifier still checks enabled state, source
-            # pins, dependencies and query encoding for every provider.
-            target=route(provider,query,history=legacy_history)
+            # Verify the provider's own native search route before dispatch.
+            # Explicit Search now uses the SAME Infinity result collector as
+            # Search All, filtered to this one provider. No second search
+            # engine, replacement scraper, or provider source modifications.
+            # Legacy provider history still opens its original native route.
+            verified_native=route(provider,query,history=legacy_history)
+            target=(verified_native if legacy_history else
+                'plugin://'+CC+'/?'+urlencode(dict(action='search-provider',
+                    media=media,query=query,provider=aid)))
             provider_name=provider['name']
         # Commit the existing history writer before posting asynchronous GUI
         # activation. An admission/write failure cannot leave a dispatched page
@@ -595,7 +597,7 @@ def _open_search(media='movie'):
             # exact original destination afterwards; never activate a changed
             # source or a cancelled application request after that wait.
             if xbmc.Monitor().abortRequested():return
-            if route(provider,query,history=legacy_history) != target:
+            if route(provider,query,history=legacy_history) != verified_native:
                 raise RuntimeError('Provider changed before opening Search.')
         if aid != 'all' or legacy_history:
             _search_nav_trace('provider_form', aid, 'native_navigation_requested')
