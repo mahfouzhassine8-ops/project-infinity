@@ -20,7 +20,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: 86d5b5e2b65acb878632d407c3a3a07dd1af3b6d
           fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-python@v5
@@ -30,7 +29,15 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p host-proof
-          test "$(git rev-parse HEAD)" = '86d5b5e2b65acb878632d407c3a3a07dd1af3b6d'
+          python3 - <<'PY'
+          import subprocess
+          names = set(subprocess.check_output(['git','diff','--name-only','86d5b5e2b65acb878632d407c3a3a07dd1af3b6d','HEAD'],text=True).splitlines())
+          allowed = {'.github/workflows/infinity-2103460-search-host-proof-86d5b5e2.yml','repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/test_settings_invalidation_matrix.py'}
+          assert names <= allowed, ('unexpected source modifications',sorted(names-allowed))
+          PY
+          git diff --exit-code 86d5b5e2b65acb878632d407c3a3a07dd1af3b6d -- \
+            repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/infinity_search.py \
+            repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/plugin.py
           git rev-parse HEAD | tee host-proof/SOURCE-COMMIT.txt
           python3 -m py_compile             repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/infinity_search.py             repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/plugin.py
       - name: Run only prepared source-level regression tests
@@ -41,7 +48,7 @@ jobs:
         if: always()
         run: |
           mkdir -p host-proof
-          printf '%s\n'             'SOURCE-ONLY HOST CHECKS. No Android, JNI, native C++ compile, settings-write acceptance, APK signing, release, or Fold verification.'             'A pass only supports source restoration and the included mocked publisher contracts; it does not resolve the open false rejection or crashes.'             > host-proof/LIMITS.txt
+          printf '%s\n'             'SOURCE-ONLY HOST CHECKS. No Android, JNI, native C++ compile, settings-write acceptance, APK signing, release, or Fold verification.'             'A pass confirms current source behavior, including deliberate demonstration of the benign-settings false rejection; it does NOT fix it.'             > host-proof/LIMITS.txt
       - if: always()
         uses: actions/upload-artifact@v4
         with:
