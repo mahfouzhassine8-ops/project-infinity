@@ -377,13 +377,31 @@ def _provider_result(provider,query,home,cancel,progress=None):
             after_response={};after_cache={}
             current_signature=_query_signature(provider,path,home,components=after_cache)
             current_response_signature=_query_signature(provider,path,home,response=True,components=after_response)
-        if (response_signature is None or
-                current_response_signature != response_signature or
+        # A completed, fresh Files.GetDirectory reply belongs to the verified
+        # native provider that just executed the request. Its settings file may
+        # have been saved by that provider while searching (history, timing,
+        # metadata, or even its own configuration decisions). Those mutations
+        # are NOT proof that the native reply is invalid. Keep source, enabled,
+        # dependency, manifest, profile, route and all native lease checks.
+        #
+        # Different rule for a cache HIT: the cached reply is not provider-owned
+        # by this invocation and must still match the whole settings generation.
+        changed_response = {name for name in before_response.keys() | after_response.keys()
+                            if before_response.get(name) != after_response.get(name)}
+        settings_only_drift = (
+            hit is None and response_signature is not None and
+            current_response_signature is not None and bool(changed_response) and
+            changed_response <= {'provider_settings_metadata',
+                                 'dependency_settings_metadata'})
+        if (response_signature is None or current_response_signature is None or
+                (current_response_signature != response_signature and not settings_only_drift) or
                 (hit is not None and current_signature != signature)):
             _state_rejection_trace(provider,status,answer,hit is not None,before_response,after_response,before_cache,after_cache)
             return provider,'state_changed',{},path
-        # Never transplant a response into a different cache generation.
-        if hit is None and signature is not None and current_signature == signature:
+        # Never transplant a native answer into a different cache generation;
+        # a settings-mutating request may DISPLAY fresh rows, not cache them.
+        if (hit is None and not settings_only_drift and
+                signature is not None and current_signature == signature):
             _remember_query_answer(home,cache_key,cache,signature,answer,time.monotonic())
         return provider,status,answer,path
     except (OSError,ValueError,RuntimeError,KeyError,TypeError):
@@ -502,10 +520,41 @@ def search_provider(handle,media,query,provider_id):
     return _search_results(handle,media,query,provider_id=provider_id)
 
 
+def _search_modal_admission():
+    """Atomic Search-window ownership before inventory, history or keyboard.
+
+    Native result RPC admission happens later, after the keyboard closes;
+    it cannot prevent two overlapping modal Search entries. This separate
+    process-local socket guard spans the whole original Search GUI action.
+    """
+    import errno
+    import os
+    import socket
+    owner=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
+    try:
+        owner.bind('\0infinity-search-modal-v1-'+str(os.getpid()))
+    except OSError as failure:
+        owner.close()
+        if failure.errno==errno.EADDRINUSE:
+            return None  # Duplicate activation; leave the original modal owner.
+        raise RuntimeError('Infinity Search could not acquire its modal owner.') from failure
+    return owner
+
+
 def open_search(media='movie'):
-    try:return _open_search(media)
+    if xbmc.getSkinDir()!='skin.infinity.diggz' or media not in ('movie','tv','anime','cartoon'):
+        return
+    owner=None
+    try:
+        owner=_search_modal_admission()
+        if owner is None:
+            return  # Never create a second keyboard or repeat slow discovery.
+        return _open_search(media)
     except (OSError,ValueError,RuntimeError) as error:
         xbmcgui.Dialog().ok('Infinity Search',str(error))
+    finally:
+        if owner is not None:
+            owner.close()
 
 
 def _open_search(media='movie'):
@@ -578,13 +627,15 @@ def _open_search(media='movie'):
         else:
             provider=next((p for p in ready if p['id']==aid),None)
             if provider is None:return
-            # Explicit provider selection opens that provider's original GUI
-            # search, just like a provider heading. It is not a request to
-            # collect/re-publish an aggregate snapshot. In particular, a
-            # provider's own search-history writes must not erase this page.
-            # The shared route verifier still checks enabled state, source
-            # pins, dependencies and query encoding for every provider.
-            target=route(provider,query,history=legacy_history)
+            # Verify the provider's own native search route before dispatch.
+            # Explicit Search now uses the SAME Infinity result collector as
+            # Search All, filtered to this one provider. No second search
+            # engine, replacement scraper, or provider source modifications.
+            # Legacy provider history still opens its original native route.
+            verified_native=route(provider,query,history=legacy_history)
+            target=(verified_native if legacy_history else
+                'plugin://'+CC+'/?'+urlencode(dict(action='search-provider',
+                    media=media,query=query,provider=aid)))
             provider_name=provider['name']
         # Commit the existing history writer before posting asynchronous GUI
         # activation. An admission/write failure cannot leave a dispatched page
@@ -595,7 +646,7 @@ def _open_search(media='movie'):
             # exact original destination afterwards; never activate a changed
             # source or a cancelled application request after that wait.
             if xbmc.Monitor().abortRequested():return
-            if route(provider,query,history=legacy_history) != target:
+            if route(provider,query,history=legacy_history) != verified_native:
                 raise RuntimeError('Provider changed before opening Search.')
         if aid != 'all' or legacy_history:
             _search_nav_trace('provider_form', aid, 'native_navigation_requested')
