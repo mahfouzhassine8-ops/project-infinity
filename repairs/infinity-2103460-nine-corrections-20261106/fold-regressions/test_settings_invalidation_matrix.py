@@ -50,7 +50,7 @@ class Matrix(unittest.TestCase):
             original = '<settings><setting id="searchHistory">none</setting><setting id="provider_mode">enabled</setting></settings>'
             settings.write_text(original)
             addon = types.SimpleNamespace(getAddonInfo=lambda field: {'profile':str(cc_profile),'version':'0.3.5.61'}[field])
-            env = dict(Path=Path, hashlib=hashlib, json=json, time=time,
+            env = dict(Path=Path, hashlib=hashlib, json=json, time=time, CC='script.infinity.commandcenter',
                 xbmcvfs=types.SimpleNamespace(translatePath=lambda key: str(profile) if key=='special://profile' else key),
                 xbmcaddon=types.SimpleNamespace(Addon=lambda _:addon),
                 _query_cache_entries=lambda raw,now:[],
