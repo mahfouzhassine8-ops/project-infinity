@@ -20,6 +20,8 @@
 
 **November 7 physical correction to earlier status:** Owner video now proves 268's *Open fresh provider search* headings fail to display provider results, twice for Crew and once for Nixtoons. See `268-PHYSICAL-SEARCH-HEADING-REGRESSION-20261107.md`. The user also confirmed all three native crash tombstones followed tapping Infinity Search, which opens the keyboard and crosses native touch/window code. Search's on-disk 268 code was confirmed installed. This overrides any earlier language treating 268 physical heading behavior as untested or the candidate uninstalled; root-cause/settings and repeated-crash repair remain open.
 
+**New usable native analysis despite 6.1 executor outage:** See `268-EXACT-APK462-NATIVE-SYMBOLICATION-20261107.md` in this folder. Separate executor extracted the EXACT original-signed APK2103462 **unstripped** `libkodi.so` (SHA256 `fadfb1a08e3d125958a77d393c1d66453ec3e9c91aac3349ec5806c67c17694d`) and successfully symbolicated the original 03:12 SIGSEGV as `CGUIKeyboardFactory::keyTypedCB` line 49 at `libkodi.so+0x1b0daec` (`ldr x8,[x0]` dereference of non-null invalid keyboard pointer); 00:47 touch SIGABRT maps to `CGraphicContext::SetScalingResolution` line 721 (`m_origins.pop()`); 00:51 original PC remains unknown. These are confirmed fault sites, NOT demonstrated causation or fixes. **Do not repeat native symbolication or request the uploaded tombstones again.**
+
 ## Authoritative engineering starting point
 - Branch `work/infinity-2103460-nine-corrections-20261106`, HEAD at handoff `28529256554518274357a1d3e6ba356e46709e48` plus this brief.
 - Current source-level **268/269** preparation: `repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/SEARCH-HANDOFF-268-STATUS.md`.
