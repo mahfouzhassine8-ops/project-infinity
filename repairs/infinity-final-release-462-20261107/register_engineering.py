@@ -56,8 +56,43 @@ def register(prepared,version,audit,out):
     save(out/'ENGINEERING-AUTHORITY-RECEIPT.json',dict(status='PASS_CHECKED_ENGINEERING_PAYLOAD_STAGED_WITH_LEASE',versionCode=version,generation=proposal['generation'],source_reviewed=source,registered_commit=commit,previous_authority_sha256=digest(canonical(previous)),authority_sha256=digest(canonical(proposal)),module_audit_sha256=file_sha(audit),canonical_authority_advance='PENDING_SEPARATE_REVIEWED_LEASE_BEFORE_SIGNING',locked_references_updated=False,accepted_pointer_updated=False,APK_signed=False,public_release=False,Android='PENDING_SUCCESSOR',Fold='PENDING_ONE_FINAL_TEST'))
     print('PASS registered engineering-only payload:',commit)
 
+def refresh(toolchain,out):
+    out.mkdir(parents=True,exist_ok=False)
+    source=os.environ['GITHUB_SHA']
+    require(os.environ['GITHUB_REF']=='refs/heads/'+r.BRANCH and r.cmd('git','rev-parse','HEAD')==source,'EXACT_CORRECTIVE_SOURCE')
+    require(not r.cmd('git','status','--porcelain','--untracked-files=no'),'COMMITTED_SOURCE_REQUIRED')
+    request=load(r.HERE/'REQUEST.json')
+    require(request['operation']=='refresh-original-java21' and request['version']==2103464 and request['publication'] is False,'EXACT_TOOLCHAIN_ONLY_REQUEST')
+    previous=load(r.ROOT/r.AUTHORITY_PATH)
+    for name,want in previous['source_files'].items():require(file_sha(r.ROOT/name)==want,'UNCHANGED_RELEASE_GUARD_SOURCE:'+name)
+    proposal=r.toolchain_refresh(previous,toolchain)
+    save(out/'PROPOSED-AUTHORITY.json',proposal)
+    remote=r.cmd('git','ls-remote','origin','refs/heads/'+r.BRANCH).split()[0]
+    require(remote==source,'CORRECTIVE_HEAD_RACE')
+    dest=r.HERE/'DEX-TOOLCHAIN-VERIFICATION.json'
+    shutil.copyfile(toolchain,dest);save(r.ROOT/r.AUTHORITY_PATH,proposal)
+    paths=[r.AUTHORITY_PATH,str(dest.relative_to(r.ROOT))]
+    subprocess.run(['git','add','--',*paths],check=True)
+    require(set(r.cmd('git','diff','--cached','--name-only').splitlines())==set(paths),'EXACT_TOOLCHAIN_EVIDENCE_METADATA_ONLY')
+    subprocess.run(['git','-c','user.name=Infinity scoped engineering','-c','user.email=infinity-engineering@users.noreply.github.com','commit','-m','Restore original Java21 verification evidence; identical payload and unmodified owner guard'],check=True)
+    commit=r.cmd('git','rev-parse','HEAD')
+    with tempfile.TemporaryDirectory(prefix='infinity-scoped-git-auth-') as temporary:
+        askpass=Path(temporary)/'askpass.py'
+        askpass.write_text('#!/usr/bin/env python3\nimport os,sys\nprint("x-access-token" if "Username" in sys.argv[1] else os.environ["GH_TOKEN"])\n')
+        askpass.chmod(0o700)
+        subprocess.run(['git','push','--force-with-lease=refs/heads/'+r.BRANCH+':'+source,'origin',commit+':refs/heads/'+r.BRANCH],check=True,env=dict(os.environ,GIT_ASKPASS=str(askpass),GIT_TERMINAL_PROMPT='0'))
+    save(out/'ENGINEERING-AUTHORITY-RECEIPT.json',dict(status='PASS_ORIGINAL_JAVA21_EVIDENCE_REFRESH_ONLY',generation=51,versionCode=2103464,registered_commit=commit,authority_sha256=digest(canonical(proposal)),payload_identical=True,components_identical=True,original_guard_unchanged=True,locked_references_updated=False,accepted_pointer_updated=False,APK_signed=False,public_release=False))
+    print('PASS original Java21 evidence-only authority:',commit)
+
 if __name__=='__main__':
     p=argparse.ArgumentParser()
-    for name in ('prepared','audit','out'):p.add_argument('--'+name,type=Path,required=True)
-    p.add_argument('--version',type=int,required=True)
-    register(**vars(p.parse_args()))
+    for name in ('prepared','audit','toolchain'):p.add_argument('--'+name,type=Path)
+    p.add_argument('--out',type=Path,required=True)
+    p.add_argument('--version',type=int)
+    p.add_argument('--refresh-toolchain',action='store_true')
+    args=vars(p.parse_args())
+    if args.pop('refresh_toolchain'):
+        refresh(args['toolchain'],args['out'])
+    else:
+        assert all(args[n] is not None for n in ('prepared','audit','version'))
+        args.pop('toolchain');register(**args)

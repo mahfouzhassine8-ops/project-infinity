@@ -238,7 +238,7 @@ jobs:
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with: {python-version: '3.11.7'}
       - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
-        with: {distribution: temurin, java-version: '17'}
+        with: {distribution: temurin, java-version: '21'}
       - name: Exact registered engineering-only sign request and sole signer check
         run: |
           python3 - <<'PYCHECK'
@@ -248,7 +248,7 @@ jobs:
           a=json.loads(Path('repairs/dual-experience-isolation-2103420/release-authority.json').read_text())
           assert r['operation']=='sign-final464465' and r['publication'] is False
           assert r['version'] in (2103464,2103465) and r['version']==a['candidate_versionCode']
-          assert a['generation']==(50 if r['version']==2103464 else 51)
+          assert a['generation']==(51 if r['version']==2103464 else 52)
           with Path(os.environ['GITHUB_ENV']).open('a') as f:f.write('SIGN_VERSION='+str(r['version'])+'\nSIGN_GENERATION='+str(a['generation'])+'\n')
           PYCHECK
           python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out SIGNER-ROUTES.json
@@ -298,6 +298,37 @@ jobs:
             SIGNER-ROUTES.json
             unsigned-preservation/
           if-no-files-found: warn
+          retention-days: 90
+  final464-original-toolchain-review:
+    name: Original Java21 exact full DEX fingerprint audit and evidence-only authority refresh
+    if: github.event_name == 'push' && github.ref == 'refs/heads/work/infinity-final-release-462-20261107' && startsWith(github.event.head_commit.message, 'Refresh final464:')
+    runs-on: ubuntu-22.04
+    permissions: {contents: write, actions: read}
+    timeout-minutes: 20
+    env: {GH_TOKEN: '${{ github.token }}', PYTHONDONTWRITEBYTECODE: '1'}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '21'}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13495518701', run-id: '42204671979', github-token: '${{ github.token }}', path: final-parent, merge-multiple: true}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {run-id: '39867073954', name: Infinity-Receipt-Race-Android17-Investigation, github-token: '${{ github.token }}', path: tools}
+      - name: Compare every original class against unchanged owner fingerprints with original Java21
+        run: python3 repairs/infinity-final-release-462-20261107/verify_dex_toolchain.py --parent final-parent/Infinity-2103462-Combined-Original-Signer.apk --jars tools/receipt-evidence/tool-jars --out original-dex-toolchain
+      - name: Preserve complete payload, every component and all original guards in evidence refresh
+        run: python3 repairs/infinity-final-release-462-20261107/register_engineering.py --refresh-toolchain --toolchain original-dex-toolchain/DEX-TOOLCHAIN-VERIFICATION.json --out original-toolchain-authority
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity464-Original-Java21-Evidence-Refresh-${{ github.run_id }}-NO-APK
+          path: |
+            original-dex-toolchain/DEX-TOOLCHAIN-VERIFICATION.json
+            original-toolchain-authority/
+          if-no-files-found: error
           retention-days: 90
   prepare-preview451:
     name: Preview 451 owner preparation; exact450 frozen payload

@@ -42,7 +42,7 @@ def cmd(*args):
 def gh(path):return json.loads(cmd('gh','api','repos/mahfouzhassine8-ops/project-infinity/'+path))
 
 def bindings():
-    paths=[HERE/n for n in ('prepare_release.py','final_release.py','register_engineering.py','verify_module_upgrade.py','PACKAGING-SCOPE.json','SEARCH-REVIEW-SELECTION.json','WORKFLOW-REVIEW.json')]
+    paths=[HERE/n for n in ('prepare_release.py','final_release.py','register_engineering.py','verify_module_upgrade.py','verify_dex_toolchain.py','PACKAGING-SCOPE.json','SEARCH-REVIEW-SELECTION.json','WORKFLOW-REVIEW.json')]
     paths += [SEARCH/n for n in SOURCE_PINS]
     paths += [ROOT/'repairs/infinity-final-closure-2103407'/n for n in ('SignInfinityModules.java','ORIGINAL-INFINITY-PUBLIC-KEY.pem','InfinityInstalledModules.java.in','module_dex.py','module_bundle.py')]
     return {str(p.relative_to(ROOT)):file_sha(p) for p in paths}
@@ -81,7 +81,7 @@ def official(prepared,version):
 def proposed(prepared,version,audit,previous=None):
     artifact=official(prepared,version);proof=load(prepared/'PREPARATION.json')
     previous=previous or load(ROOT/AUTHORITY_PATH)
-    require(previous['generation']==(49 if version==2103464 else 50) and previous['candidate_versionCode']==version-1,'EXACT_AUTHORITY_PREDECESSOR')
+    require(previous['generation']==(49 if version==2103464 else 51) and previous['candidate_versionCode']==version-1,'EXACT_AUTHORITY_PREDECESSOR')
     report=load(audit)
     require(report['status']=='PASS_NINE_FOCUSED_REAL_JAVA_UPGRADE_AND_RECOVERY_CASES' and len(report['cases'])==9 and report['original_installer_changed'] is False,'ACTUAL_JAVA_INSTALL_OVER_AND_RECOVERY_REQUIRED')
     catalog=load(prepared/'components/catalog.json')
@@ -104,8 +104,27 @@ def check_registered(prepared,version,audit,out):
     current=load(ROOT/AUTHORITY_PATH)
     path=cmd('git','log','-1','--format=%H','--',AUTHORITY_PATH)
     previous=json.loads(cmd('git','show',path+'^:'+AUTHORITY_PATH))
-    require(proposed(prepared,version,audit,previous)==current,'EXACT_OFFICIAL_REGISTERED_CONSOLIDATION')
+    if version==2103464 and current['update_kind']=='evidence_refresh':
+        official(prepared,version)
+        toolchain=HERE/'DEX-TOOLCHAIN-VERIFICATION.json'
+        require(current==toolchain_refresh(previous,toolchain),'EXACT_ORIGINAL_TOOLCHAIN_ONLY_AUTHORITY_REFRESH')
+        require(file_sha(audit)==current['owner_update_evidence']['module_upgrade_recovery_sha256'],'UNCHANGED_NINE_REAL_JAVA_CHECKS')
+    else:
+        require(proposed(prepared,version,audit,previous)==current,'EXACT_OFFICIAL_REGISTERED_CONSOLIDATION')
     save(out,dict(status='PASS_EXACT_OFFICIAL_REGISTERED_ENGINEERING_PAYLOAD',versionCode=version,source=cmd('git','rev-parse','HEAD'),accepted_pointer_updated=False,public_release=False))
+
+def toolchain_refresh(previous,report):
+    require(previous['generation']==50 and previous['candidate_versionCode']==2103464 and previous['update_kind']=='owner_update','EXACT_UNISSUED_GEN50')
+    proof=load(report)
+    require(proof['status']=='PASS_ALL_ORIGINAL_CLASS_HASHES_WITH_ORIGINAL_JAVA21' and proof['java_major']==21 and proof['parent_apk_sha256']==PARENT,'ORIGINAL_TOOLCHAIN_ALL_CLASS_AUDIT_REQUIRED')
+    require(proof['class_differences']==[] and proof['Cobra_classes_changed']==[] and proof['guard_modified'] is False and proof['hash_normalization'] is False and proof['APK_or_DEX_modified'] is False,'NO_CLASS_OR_VERIFIER_MUTATION')
+    require(proof['classes_checked']==sum(n.startswith('class:') for n in previous['payload']),'ALL_ORIGINAL_CLASSES_REQUIRED')
+    a=copy.deepcopy(previous)
+    a.update(generation=51,previous_authority_sha256=digest(canonical(previous)),update_kind='evidence_refresh',target_owners=[],workflow_sha256=file_sha(ROOT/'.github/workflows/infinity-combined-release.yml'))
+    a['owner_update_evidence']['source_files']=bindings()
+    a['owner_update_evidence']['verification_toolchain']=dict(java_major=21,report_sha256=file_sha(report),original_failure_run=42426683249,APK_or_DEX_changed=False,guard_changed=False)
+    transition(previous,a,[]);verify_evidence(a,lambda n:(ROOT/n).read_bytes())
+    return a
 
 def compare(parent,candidate,prepared,out,sdk=None):
     proof=load(prepared/'PREPARATION.json');version=proof['versionCode']
