@@ -192,7 +192,7 @@ def verify_existing_compile():
  assert (obj['ELF_class'],obj['machine'],obj['type'])==('ELF64','AArch64','REL')
  scope=json.loads((prior/'KEYBOARD-SOURCE-PRESERVATION.json').read_text())
  assert scope['protected_native_source_files_unchanged']==9410 and len(scope['changed'])==1
- logs=subprocess.check_output(['gh','api','repos/mahfouzhassine8-ops/project-infinity/actions/jobs/128383699532/logs'],text=True)
+ logs=subprocess.check_output(['gh','api','--allow-escape-sequences','repos/mahfouzhassine8-ops/project-infinity/actions/jobs/128383699532/logs'],text=True)
  assert 'One real ARM64 Android keyboard translation unit compiled' in logs
  assert 'AssertionError:' in logs and 'pthread_mutex_trylock' in logs
  required=[' b (anonymous namespace)::keyboardModalMutex',
