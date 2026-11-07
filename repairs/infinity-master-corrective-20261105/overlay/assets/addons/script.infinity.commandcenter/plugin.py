@@ -933,6 +933,22 @@ def main():
         finally:
             xbmcplugin.endOfDirectory(HANDLE, cacheToDisc=False)
         return
+    if action == 'search-open-verified':
+        from infinity_search import verified_provider_target, _search_nav_trace
+        provider_id = PARAMS.get('provider', '')
+        target = verified_provider_target(PARAMS.get('media', ''), provider_id,
+                                          PARAMS.get('query', ''))
+        # Resolve the temporary first-party directory before posting the
+        # existing Kodi native Videos handoff; no nested provider RPC here.
+        xbmcplugin.endOfDirectory(HANDLE, succeeded=bool(target), cacheToDisc=False)
+        if target:
+            _search_nav_trace('verified_handoff', provider_id, 'native_navigation_requested')
+            xbmc.executebuiltin('ActivateWindow(Videos,"'+target+'",return)')
+        else:
+            xbmcgui.Dialog().notification('Infinity Search',
+                'Provider verification failed. Reopen Search.',
+                xbmcgui.NOTIFICATION_WARNING, 3000)
+        return
     if action == 'search-all':
         from infinity_search import search_all
         try:
