@@ -36,8 +36,13 @@ def prepare(p,apk,out):
     assert all(n in runtime or n==PREFIX+'SOURCE-INVENTORY.json' or n==PREFIX+'quick-update/package_updates.py' or n.startswith(PREFIX+'fold-regressions/') for n in changed),'UNAUTHORIZED_SOURCE_DIFFERENCE'
     for source in (*inventory['changed_source_files'],PREFIX+'quick-update/package_updates.py',
                    PREFIX+'fold-regressions/package_preflight.py',PREFIX+'fold-regressions/verify_recovery.py',
+                   PREFIX+'fold-regressions/test_search_handoff_268.py',
                    PREFIX+'fold-regressions/CC-AUDIT-REFERENCE.json',PREFIX+'SOURCE-INVENTORY.json'):
         assert (p.ROOT/source).read_bytes()==subprocess.check_output(['git','show','HEAD:'+source],cwd=p.ROOT),'SOURCE_NOT_BOUND_TO_HEAD:'+source
+    # Focused source-bound Search handoff and security/ABA negative tests must
+    # PASS before any private signer is accessed. No Android acceptance claim.
+    subprocess.run(['python3',str(p.ROOT/(PREFIX+'fold-regressions/test_search_handoff_268.py'))],
+                   cwd=p.ROOT,check=True)
     # Signer, authority, native sources and all protected runtime ownership stay frozen.
     for n in ('repairs/dual-experience-isolation-2103420/release-authority.json',
               'repairs/dual-experience-isolation-2103420/signer-policy.json',
