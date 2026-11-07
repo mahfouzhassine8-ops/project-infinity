@@ -60,7 +60,7 @@ jobs:
           cd repairs/infinity-2103460-nine-corrections-20261106/fold-regressions
           python3 -m unittest test_native_owned_response_policy -v 2>&1 | tee "$GITHUB_WORKSPACE/integration-evidence/NATIVE-SEARCH-RESULTS.txt"
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
-        with: {artifact-ids: '13586082418', run-id: '42401805296', github-token: '${{ github.token }}', path: pinned-native}
+        with: {artifact-ids: '13586082418', run-id: '42401805296', github-token: '${{ github.token }}', path: pinned-native, merge-multiple: true}
       - name: Verify full ARM64 native link artifact from EXACT graphics/keyboard parent
         run: |
           set -euo pipefail
@@ -120,7 +120,8 @@ jobs:
           import base64,hashlib,json,os,re,subprocess,tempfile
           from pathlib import Path
           fields=('INFINITY_KEYSTORE_B64','INFINITY_STORE_PASSWORD','INFINITY_KEY_PASSWORD','INFINITY_KEY_ALIAS','INFINITY_SIGNER_SHA256')
-          if not all(os.environ.get(key) for key in fields):
+          configured=sum(bool(os.environ.get(key)) for key in fields)
+          if configured!=len(fields):
             status='BLOCKED_MISSING_SIGNING_FIELDS'
           else:
             expected=os.environ['INFINITY_SIGNER_SHA256'].strip().lower()
@@ -133,7 +134,7 @@ jobs:
               assert completed.returncode==0,'failed retained certificate export'
               assert hashlib.sha256(pub.read_bytes()).hexdigest()==expected,'original signer cert mismatch'
             status='READY_ORIGINAL_CERT_PIN_MATCH'
-          Path('signing-readiness/STATUS.json').write_text(json.dumps({'status':status,'new_key_created':False,'APK_signed':False,'private_material_retained':False},indent=2)+'\n')
+          Path('signing-readiness/STATUS.json').write_text(json.dumps({'status':status,'configured_field_count':configured,'required_field_count':len(fields),'new_key_created':False,'APK_signed':False,'private_material_retained':False},indent=2)+'\n')
           print(status)
           PY
       - if: always()
