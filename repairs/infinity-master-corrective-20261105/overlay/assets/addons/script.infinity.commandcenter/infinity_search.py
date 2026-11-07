@@ -263,7 +263,8 @@ def _query_signature(provider, path, home, response=False, components=None):
         paths.extend((Path(dependency['root']) / 'addon.xml',
                       profile / 'addon_data' / dependency['id'] / 'settings.xml'))
     # A fresh owned response does not depend on unrelated Home/progress work.
-    # Settings/source stamps remain strict, including intervening rewrites.
+    # Source stamps remain strict. Fresh native replies use the explicit
+    # settings-drift policy below; cached replies retain the whole generation.
     if response:
         paths = paths[1:]
     stamps = [_query_file_stamp(file) for file in paths]
@@ -279,8 +280,8 @@ def _query_signature(provider, path, home, response=False, components=None):
         revisions = []
     version = addon.getAddonInfo('version')
     if components is not None:
-        # Diagnostic comparisons reuse this exact snapshot. Retain only hashes
-        # in RAM; log reason names, never these hashes or their source values.
+        # Diagnostic comparisons reuse this exact snapshot. Retain hashes and
+        # existence bits only in RAM; log reason names, never source values.
         fields = dict(profile=str(profile), commandcenter_profile=str(progress),
                       commandcenter_version=version, route=path,
                       provider_root=provider['root'], contract=provider['contract'])
@@ -295,6 +296,11 @@ def _query_signature(provider, path, home, response=False, components=None):
                 fields['home.' + name] = value
         components.update({name:hashlib.sha256(json.dumps(value, sort_keys=True,
                             separators=(',', ':')).encode('utf-8')).hexdigest() for name,value in fields.items()})
+        # Preserve per-file existence from these same stamps, without another
+        # filesystem read. A newly created settings file is ordinary provider
+        # initialization; losing an existing file must not gain the exemption.
+        components['settings_present'] = tuple(
+            stamp != ('absent',) for stamp in (source_stamps[1], *source_stamps[3::2]))
     identity = [str(profile), str(progress), version, path,
                 provider['root'], provider['contract'], stamps, revisions]
     return hashlib.sha256(json.dumps(identity, sort_keys=True, separators=(',', ':')).encode('utf-8')).hexdigest()
@@ -388,11 +394,17 @@ def _provider_result(provider,query,home,cancel,progress=None):
         # by this invocation and must still match the whole settings generation.
         changed_response = {name for name in before_response.keys() | after_response.keys()
                             if before_response.get(name) != after_response.get(name)}
+        before_present = before_response.get('settings_present', ())
+        after_present = after_response.get('settings_present', ())
+        settings_disappeared = (len(before_present) != len(after_present) or
+                                any(was_present and not is_present
+                                    for was_present, is_present in zip(before_present, after_present)))
         settings_only_drift = (
             hit is None and response_signature is not None and
             current_response_signature is not None and bool(changed_response) and
+            not settings_disappeared and
             changed_response <= {'provider_settings_metadata',
-                                 'dependency_settings_metadata'})
+                                 'dependency_settings_metadata', 'settings_present'})
         if (response_signature is None or current_response_signature is None or
                 (current_response_signature != response_signature and not settings_only_drift) or
                 (hit is not None and current_signature != signature)):

@@ -227,8 +227,13 @@ class Candidate(unittest.TestCase):
         bs=functions(before);ns=functions(now)
         self.assertEqual(set(ns)-set(bs),{'_search_modal_admission'})
         self.assertEqual({name for name in bs if bs[name]!=ns[name]},
-                         {'open_search','_open_search','_provider_result'})
-        for guard in ('route','_query_file_stamp','_query_signature',
+                         {'open_search','_open_search','_provider_result','_query_signature'})
+        # The reviewed signature change retains the same returned identity hash
+        # and adds only same-snapshot settings existence bits to comparisons.
+        old_signature=ast.parse(bs['_query_signature']).body[0]
+        new_signature=ast.parse(ns['_query_signature']).body[0]
+        self.assertEqual(ast.dump(old_signature.body[-1]),ast.dump(new_signature.body[-1]))
+        for guard in ('route','_query_file_stamp',
                       '_leased_directory','_native_search_admission','_bounded_results',
                       '_search_results','_publish_result','search_provider','search_all'):
             self.assertEqual(bs[guard],ns[guard],guard)
@@ -244,7 +249,9 @@ class Candidate(unittest.TestCase):
                  str(Path(__file__).relative_to(ROOT)),
                  'repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/test_native_owned_response_policy.py',
                  'repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/NATIVE-OWNED-RESPONSE-POLICY.md',
-                 '.github/workflows/infinity-462-search-graphics-integration-20261107.yml'}
+                 '.github/workflows/infinity-462-search-graphics-integration-20261107.yml',
+                 '.github/workflows/infinity-saved-navigation-android.yml'}
+        allowed|={n for n in names if n.startswith('repairs/infinity-final-release-462-20261107/')}
         self.assertTrue(names <= allowed, names-allowed)
 
 if __name__=='__main__':

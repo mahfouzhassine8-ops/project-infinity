@@ -1,0 +1,19 @@
+{
+  "authorization": "Final APK brief requires explicit production review of fresh-result policy and preservation of safeguards",
+  "selected_tests": [
+    "test_unified_native_provider_selection: 9 focused UI/source preservation cases",
+    "test_native_owned_response_policy: 15 existing policy cases plus 4 new same-snapshot settings-existence cases"
+  ],
+  "reason_for_recheck": "New common settings-existence guard; prior 24 passing tests describe the earlier candidate and are retained separately",
+  "local_attempt": {
+    "total": 28,
+    "passed": 26,
+    "failures": 1,
+    "errors": 1,
+    "cause": "Local execution sandbox denies creation of AF_UNIX sockets: PermissionError errno 1 in two unchanged modal admission cases",
+    "application_defect_claimed": false,
+    "rerun_reason": "Run the complete corrected-source selection on the existing GitHub host, which supports the original socket primitive"
+  },
+  "Android": "Separate target qualification only",
+  "shutdown": "NOT_SELECTED"
+}

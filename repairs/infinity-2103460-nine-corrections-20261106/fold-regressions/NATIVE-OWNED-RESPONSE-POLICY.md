@@ -36,6 +36,13 @@ source/dependency pins and manifest metadata, current app/skin/profile
 identity, native worker and cancellation ownership, status/error handling,
 response size/time limits, cross-provider failure isolation, and publication.
 
+Release review correction: disappearance of a previously existing provider or
+dependency settings file refuses the response. Per-file existence bits come
+from the same signature stamps; creation of previously absent settings remains
+valid provider initialization. An initially absent file that remains absent
+continues to permit the provider's defaults. No extra filesystem read, settings
+parser, provider exception, native RPC, or cache exemption is introduced.
+
 ## Honest consistency boundary
 This design intentionally delegates meaning of the provider's own settings
 writes to that provider. A meaningful setting flip or A→B→A inside the native
@@ -59,7 +66,7 @@ this candidate is approved for production.
   publish original 31/2 synthetic rows without a duplicate RPC.
 - Fresh response with both provider and dependency settings updates: accept
   only when other source/profile/route checks hold.
-- Native source/manifest/dependency file change, missing or linked settings
+- Native source/manifest/dependency file change, disappearance of existing or linked settings
   state, profile change, disabled provider, changed route, cancellation,
   native errors and lease conflict: original refusal behavior.
 - Cache hit with changed settings: reject; do not blindly reuse.

@@ -1,18 +1,58 @@
 name: Infinity462 integrated Search + native graphics + keyboard evidence, original signer readiness - NO APK
 on:
   push:
-    branches: [work/infinity-462-search-graphics-integration-20261107]
+    branches: [work/infinity-462-search-graphics-integration-20261107, work/infinity-final-release-462-20261107]
     paths:
       - .github/workflows/infinity-462-search-graphics-integration-20261107.yml
       - repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/infinity_search.py
       - repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/**
 permissions: {contents: read, actions: read}
 concurrency:
-  group: infinity462-scoped-native-search-integration
+  group: infinity462-scoped-native-search-integration-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  final462-search-settings-existence:
+    name: Corrected common Search guard - 28 selected host checks only
+    if: github.ref == 'refs/heads/work/infinity-final-release-462-20261107'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    env: {PYTHONDONTWRITEBYTECODE: '1'}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - name: Bind exact selected guard correction; reject unrelated runtime edits
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,subprocess
+          from pathlib import Path
+          folder=Path('repairs/infinity-final-release-462-20261107')
+          scope=json.loads((folder/'SEARCH-REVIEW-SELECTION.json').read_text())
+          assert len(scope['selected_tests'])==2 and scope['shutdown']=='NOT_SELECTED'
+          search='repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/infinity_search.py'
+          prefix='repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/'
+          allowed={search,prefix+'test_native_owned_response_policy.py',prefix+'test_unified_native_provider_selection.py',prefix+'NATIVE-OWNED-RESPONSE-POLICY.md','.github/workflows/infinity-saved-navigation-android.yml','.github/workflows/infinity-462-search-graphics-integration-20261107.yml'}
+          changed=subprocess.check_output(['git','diff','--name-only','776e2e46006129b603275119bc3643021790456f','HEAD'],text=True).splitlines()
+          assert all(n in allowed or n.startswith(str(folder)+'/') for n in changed),changed
+          Path('search-existence-evidence').mkdir()
+          Path('search-existence-evidence/SOURCE.json').write_text(json.dumps({'source_commit':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'search_sha256':hashlib.sha256(Path(search).read_bytes()).hexdigest(),'only_runtime_file_changed':search,'Android':'NOT_RUN','Fold':'NOT_RUN'},indent=2)+'\n')
+          PY
+      - name: Run actual common guard and existing native Search UI contracts
+        run: |
+          set -euo pipefail
+          cd repairs/infinity-2103460-nine-corrections-20261106/fold-regressions
+          python3 -m unittest test_unified_native_provider_selection test_native_owned_response_policy -v 2>&1 | tee "$GITHUB_WORKSPACE/search-existence-evidence/RESULTS.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity462-Search-Settings-Existence-Host-${{ github.run_id }}-NO-APK
+          path: search-existence-evidence/
+          if-no-files-found: error
+          retention-days: 30
   source-and-verified-native:
     name: Search native UI 24 regressions + pinned compiled ARM64 keyboard/graphics input - NO APK
+    if: github.ref == 'refs/heads/work/infinity-462-search-graphics-integration-20261107'
     runs-on: ubuntu-22.04
     timeout-minutes: 25
     env: {PYTHONDONTWRITEBYTECODE: '1'}
@@ -98,6 +138,7 @@ jobs:
 
   original-signer-readiness:
     name: Verify configured original APK signer certificate only - NEVER sign or upload key
+    if: github.ref == 'refs/heads/work/infinity-462-search-graphics-integration-20261107'
     runs-on: ubuntu-22.04
     timeout-minutes: 8
     steps:

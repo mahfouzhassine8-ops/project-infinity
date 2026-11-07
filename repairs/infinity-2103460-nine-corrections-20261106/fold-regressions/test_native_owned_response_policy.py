@@ -167,6 +167,38 @@ class Policy(unittest.TestCase):
                               self.f.settings.symlink_to(self.f.root/'addon.xml'))
         self.assertEqual(self.f.query()[1],'state_changed')
 
+    def test_existing_provider_settings_disappearance_refuses_fresh_rows(self):
+        self.f.change=self.f.settings.unlink
+        self.assertEqual(self.f.query()[1],'state_changed')
+        self.assertEqual(self.f.calls,1)
+
+    def test_first_native_search_may_create_previously_absent_settings(self):
+        self.f.settings.unlink()
+        self.f.change=lambda:self.f.write(self.f.initial)
+        self.assertEqual(self.f.query()[1],'completed')
+        self.assertEqual(self.f.calls,1)
+
+    def test_unchanged_absent_settings_remain_valid_for_native_defaults(self):
+        self.f.settings.unlink()
+        self.assertEqual(self.f.query()[1],'completed')
+
+    def test_one_dependency_disappearing_is_not_hidden_by_another_created(self):
+        deps=[]
+        for index in range(2):
+            aid='script.module.fixture'+str(index)
+            setting=self.f.profile/'addon_data'/aid/'settings.xml'
+            setting.parent.mkdir(parents=True)
+            root=Path(self.f.tmp.name)/('dependency'+str(index));root.mkdir()
+            (root/'addon.xml').write_text('<addon/>')
+            deps.append((dict(id=aid,root=str(root)),setting))
+        deps[0][1].write_bytes(b'<settings/>')
+        self.f.provider['contract']['dependencies']=[dep for dep,path in deps]
+        def exchange():
+            deps[0][1].unlink()
+            deps[1][1].write_bytes(b'<settings/>')
+        self.f.change=exchange
+        self.assertEqual(self.f.query()[1],'state_changed')
+
     def test_native_failure_is_not_reinterpreted_as_state_change(self):
         self.f.env['_leased_directory']=lambda *args:('timeout',{'error':{'message':'provider_timeout'}})
         self.assertEqual(self.f.query()[1],'timeout')
