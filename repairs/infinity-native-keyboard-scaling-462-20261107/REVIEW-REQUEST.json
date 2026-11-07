@@ -1,10 +1,11 @@
 {
   "source_base": "86d5b5e2b65acb878632d407c3a3a07dd1af3b6d",
   "native_changes": false,
-  "stage": "probe-graphics",
-  "purpose": "exact-dispatch-and-origin-ownership-source-and-host-only-race-proof",
-  "production_graphics_patch": false,
-  "keyboard_compile_reused_run": 42365858072,
-  "signing": false,
-  "APK": false
+  "stage": "verify-compiled-keyboard",
+  "purpose": "verify-existing-actual-arm64-object-using-real-ndk-libcxx-abi-symbols",
+  "prior_compile": 42365858072,
+  "no_recompile": true,
+  "no_runtime": true,
+  "no_APK": true,
+  "no_signing": true
 }

@@ -24,7 +24,7 @@ def metadata():
  request=json.loads((HERE/'REVIEW-REQUEST.json').read_text())
  assert request['source_base']==BASE and request['native_changes'] is False
  stage=request.get('stage','restore-review')
- assert stage in ('restore-review','review-callbacks','probe-keyboard','verify-keyboard','compile-keyboard','probe-graphics')
+ assert stage in ('restore-review','review-callbacks','probe-keyboard','verify-keyboard','compile-keyboard','probe-graphics','verify-compiled-keyboard')
  if os.environ.get('GITHUB_OUTPUT'):
   with open(os.environ['GITHUB_OUTPUT'],'a') as f:f.write('stage='+stage+'\n')
  assets=ASSETS if stage=='restore-review' else [ASSETS[0],(13571276665,42364232328,886694,'9cd229acfcf0c8bd30b52ed083fa77ab640888fc04950a1e85f11465c79999c7')]
@@ -176,7 +176,49 @@ def probe_graphics():
  import graphics_research
  graphics_research.run(ROOT,OUT)
 
+
+def verify_existing_compile():
+ prior=ROOT/'compiled-keyboard'
+ artifact=json.loads(subprocess.check_output(['gh','api','repos/mahfouzhassine8-ops/project-infinity/actions/artifacts/13571623548'],text=True))
+ assert (artifact['workflow_run']['id'],artifact['size_in_bytes'],artifact['digest'],artifact['expired'])==(42365858072,841723,'sha256:42d598f8e203b6529328e9d15fbb068e85bb1108be9b4ef7cf0b3e94a4218213',False)
+ run=json.loads(subprocess.check_output(['gh','api','repos/mahfouzhassine8-ops/project-infinity/actions/runs/42365858072'],text=True))
+ assert run['head_sha']=='bcb0c4d598b31fd74489eaa50bc2666388501b3c' and run['conclusion']=='failure'
+ proof=json.loads((prior/'COMPILE-RESULT.json').read_text())
+ assert proof['source_commit']==run['head_sha'] and proof['reviewed_native_inputs_unchanged'] is True
+ objects=proof['actual_ARM64_translation_units_compiled']
+ assert set(objects)=={'xbmc/guilib/GUIKeyboardFactory.cpp'}
+ obj=objects['xbmc/guilib/GUIKeyboardFactory.cpp']
+ assert obj['source_sha256']=='fdef3763a10d981649d4312d5f1646514b1e621829153ab9a0fa3900b8418df5'
+ assert (obj['ELF_class'],obj['machine'],obj['type'])==('ELF64','AArch64','REL')
+ scope=json.loads((prior/'KEYBOARD-SOURCE-PRESERVATION.json').read_text())
+ assert scope['protected_native_source_files_unchanged']==9410 and len(scope['changed'])==1
+ logs=subprocess.check_output(['gh','api','repos/mahfouzhassine8-ops/project-infinity/actions/jobs/128383699532/logs'],text=True)
+ assert 'One real ARM64 Android keyboard translation unit compiled' in logs
+ assert 'AssertionError:' in logs and 'pthread_mutex_trylock' in logs
+ required=[' b (anonymous namespace)::keyboardModalMutex',
+           ' U std::__ndk1::recursive_mutex::try_lock()',' U std::__ndk1::recursive_mutex::unlock()',
+           'std::__ndk1::unique_lock<std::__ndk1::recursive_mutex>::owns_lock() const']
+ for marker in required:assert marker in logs,marker
+ selected=[line for line in logs.splitlines() if any(m in line for m in (' b (anonymous namespace)::keyboardModalMutex',' U std::__ndk1::recursive_mutex::',' W std::__ndk1::unique_lock<std::__ndk1::recursive_mutex>::'))]
+ (OUT/'ACTUAL-ARM64-LIBCXX-SYMBOLS.txt').write_text('\n'.join(selected)+'\n')
+ import difflib
+ name='xbmc/guilib/GUIKeyboardFactory.cpp'
+ before=ROOT/'previous-review/sources'/name
+ after=HERE/'native'/name
+ assert sha(before)=='964e3c943a11f1bbed87c4529bedcd08c0111152954ff5b7140fb96c87ef3fb2'
+ assert sha(after)==obj['source_sha256']
+ delta=''.join(difflib.unified_diff(before.read_text().splitlines(keepends=True),after.read_text().splitlines(keepends=True),fromfile='a/'+name,tofile='b/'+name))
+ (OUT/'KEYBOARD-NATIVE-CHANGE.patch').write_text(delta)
+ save('KEYBOARD-ARM64-VERIFIED.json',dict(status='PASS_EXISTING_REAL_ARM64_COMPILATION_RECONCILED_WITH_CORRECT_NDK_LIBCXX_ABI',
+   source=os.environ['GITHUB_SHA'],compile_source=run['head_sha'],compile_run=42365858072,compile_job=128383699532,
+   original_run_result='FAIL_POST_COMPILE_SYMBOL_ASSERTION_NOT_COMPILE_FAILURE',compiled_object=obj,
+   protected_native_sources_unchanged=9410,corrected_expectation='NDK_LIBCXX_RECURSIVE_MUTEX_TRY_LOCK_UNLOCK_NOT_DIRECT_PTHREAD',
+   code_recompiled=False,original_failure_preserved=True,object_retained_in_artifact=False,
+   native_engine_linked=False,Android='NOT_RUN',Fold='NOT_RUN',APK=False,signing=False))
+ print('PASS original actual ARM64 object evidence and correct NDK libc++ ownership symbols verified; no recompilation; original post-compile assertion failure retained')
+ print(json.dumps(obj,sort_keys=True))
+
 if __name__=='__main__':
  mode=sys.argv[1]
  {'metadata':metadata,'restore-review':restore_review,'review-callbacks':review_callbacks,
-  'probe-keyboard':probe_keyboard,'verify-keyboard':verify_keyboard,'compile-keyboard':review_graphics,'probe-graphics':probe_graphics}[mode]()
+  'probe-keyboard':probe_keyboard,'verify-keyboard':verify_keyboard,'compile-keyboard':review_graphics,'probe-graphics':probe_graphics,'verify-compiled-keyboard':verify_existing_compile}[mode]()

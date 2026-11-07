@@ -45,7 +45,7 @@ def compile():
  obj=Path(args[args.index('-o')+1]);obj=obj if obj.is_absolute() else Path(row['directory'])/obj
  tool=Path(os.environ['ANDROID_HOME'])/'ndk/21.4.7075529/toolchains/llvm/prebuilt/linux-x86_64/bin'
  symbols=subprocess.check_output([str(tool/'llvm-nm'),'-C',str(obj)],text=True)
- assert 'keyboardModalMutex' in symbols and 'pthread_mutex_trylock' in symbols and 'pthread_mutex_unlock' in symbols,symbols
+ assert 'keyboardModalMutex' in symbols and 'std::__ndk1::recursive_mutex::try_lock()' in symbols and 'std::__ndk1::recursive_mutex::unlock()' in symbols,symbols
  (OUT/'KEYBOARD-OBJECT-SYMBOLS.txt').write_text(symbols)
  shutil.copyfile(obj,OUT/'GUIKeyboardFactory.cpp.o')
  result=json.loads((OUT/'COMPILE-RESULT.json').read_text())

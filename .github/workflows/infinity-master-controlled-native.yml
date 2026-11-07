@@ -82,6 +82,7 @@ jobs:
         id: scope
         run: python3 repairs/infinity-native-keyboard-scaling-462-20261107/review_sources.py metadata
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        if: steps.scope.outputs.stage != 'verify-compiled-keyboard'
         with: {artifact-ids: '13274901825', run-id: '41726452356', merge-multiple: true, github-token: '${{ github.token }}', path: verified-inputs}
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         if: steps.scope.outputs.stage == 'restore-review'
@@ -89,6 +90,9 @@ jobs:
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         if: steps.scope.outputs.stage != 'restore-review'
         with: {artifact-ids: '13571276665', run-id: '42364232328', merge-multiple: true, github-token: '${{ github.token }}', path: previous-review}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        if: steps.scope.outputs.stage == 'verify-compiled-keyboard'
+        with: {artifact-ids: '13571623548', run-id: '42365858072', merge-multiple: true, github-token: '${{ github.token }}', path: compiled-keyboard}
       - name: Read exact selected native ownership source; reuse completed full map proof
         run: python3 repairs/infinity-native-keyboard-scaling-462-20261107/review_sources.py ${{ steps.scope.outputs.stage }}
       - if: always()
