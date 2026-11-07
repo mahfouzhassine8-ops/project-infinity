@@ -514,7 +514,7 @@ def _search_modal_admission():
     import socket
     owner=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
     try:
-        owner.bind('\\0infinity-search-modal-v1-'+str(os.getpid()))
+        owner.bind('\0infinity-search-modal-v1-'+str(os.getpid()))
     except OSError as failure:
         owner.close()
         if failure.errno==errno.EADDRINUSE:
