@@ -24,7 +24,7 @@ def metadata():
  request=json.loads((HERE/'REVIEW-REQUEST.json').read_text())
  assert request['source_base']==BASE and request['native_changes'] is False
  stage=request.get('stage','restore-review')
- assert stage in ('restore-review','review-callbacks','probe-keyboard','verify-keyboard','compile-keyboard','probe-graphics','verify-compiled-keyboard')
+ assert stage in ('restore-review','review-callbacks','probe-keyboard','verify-keyboard','compile-keyboard','probe-graphics','verify-compiled-keyboard','review-graphics-lifetime')
  if os.environ.get('GITHUB_OUTPUT'):
   with open(os.environ['GITHUB_OUTPUT'],'a') as f:f.write('stage='+stage+'\n')
  assets=ASSETS if stage=='restore-review' else [ASSETS[0],(13571276665,42364232328,886694,'9cd229acfcf0c8bd30b52ed083fa77ab640888fc04950a1e85f11465c79999c7')]
@@ -218,7 +218,45 @@ def verify_existing_compile():
  print('PASS original actual ARM64 object evidence and correct NDK libc++ ownership symbols verified; no recompilation; original post-compile assertion failure retained')
  print(json.dumps(obj,sort_keys=True))
 
+
+def review_graphics_lifetime():
+ expected=json.loads((ROOT/'previous-review/NATIVE-SOURCE-MAP.json').read_text())
+ assert sha(ROOT/'previous-review/NATIVE-SOURCE-MAP.json')==MAP_SHA
+ spec=importlib.util.spec_from_file_location('exact462_lifetime',ROOT/'repairs/infinity-2103460-nine-corrections-20261106/downloads-native/build_native.py')
+ r=importlib.util.module_from_spec(spec);spec.loader.exec_module(r);r.OUT=OUT;r.restore.OUT=OUT;r.restore_sources()
+ assert r.restore.hashes(ROOT/'kodi')==expected
+ names=['xbmc/ServiceBroker.cpp','xbmc/ServiceBroker.h','xbmc/application/Application.cpp',
+ 'xbmc/messaging/ApplicationMessenger.cpp','xbmc/messaging/ApplicationMessenger.h',
+ 'xbmc/platform/android/activity/android_main.cpp','xbmc/platform/android/activity/XBMCApp.cpp',
+ 'xbmc/guilib/GUIWindowManager.cpp']
+ names.extend(n for n in expected if n.endswith('/ThreadMessage.h'))
+ for n in names:
+  p=ROOT/'kodi'/n;assert sha(p)==expected[n]
+  raw=p.read_text();target=OUT/'sources'/n;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(p.read_bytes())
+  lines=raw.splitlines();selected=set()
+  markers={'ServiceBroker.cpp':('GetWinSystem(', 'RegisterWinSystem(', 'UnregisterWinSystem('),
+   'ServiceBroker.h':('GetWinSystem(', 'RegisterWinSystem(', 'UnregisterWinSystem('),
+   'Application.cpp':('::Cleanup(', '::Destroy(', 'UnregisterWinSystem(', '->Cleanup(', '::Run(', 'ProcessWindowMessages(', 'checkpoint_poll', 'Checkpoint', 'IsExit'),
+   'ApplicationMessenger.cpp':('::Cleanup(', 'CApplicationMessenger::CApplicationMessenger(', '::~CApplicationMessenger('),
+   'ApplicationMessenger.h':('struct ThreadMessage','~ThreadMessage'),
+   'XBMCApp.cpp':('GetWinSystem(', 'UnregisterWinSystem(', '::~CXBMCApp(', '::run('),
+   'GUIWindowManager.cpp':('case TMSG_GUI_MESSAGE:',)}
+  if Path(n).name not in markers: selected=set(range(len(lines)))
+  else:
+   for i,line in enumerate(lines):
+    if any(m in line for m in markers[Path(n).name]):
+     for j in range(max(0,i-5),min(len(lines),i+130)):selected.add(j)
+  print('LIFETIME_SOURCE_BEGIN '+n+' sha256='+expected[n])
+  for i in sorted(selected):print(f'{i+1:04d}: {lines[i]}')
+  print('LIFETIME_SOURCE_END '+n)
+ sites=[]
+ for p in (ROOT/'kodi/xbmc').rglob('*.cpp'):
+  for i,line in enumerate(p.read_text(errors='replace').splitlines()):
+   if 'UnregisterWinSystem(' in line:sites.append((p.relative_to(ROOT/'kodi').as_posix(),i+1,line.strip()))
+ save('GRAPHICS-LIFETIME-SOURCES.json',dict(status='PASS_EXACT_SOURCE_BINDING_ONLY',sources={n:expected[n]for n in names},unregister_call_sites=sites,native_patch=False,Android='NOT_RUN'))
+ print('UNREGISTER_WINSYSTEM_CALLS '+json.dumps(sites))
+
 if __name__=='__main__':
  mode=sys.argv[1]
  {'metadata':metadata,'restore-review':restore_review,'review-callbacks':review_callbacks,
-  'probe-keyboard':probe_keyboard,'verify-keyboard':verify_keyboard,'compile-keyboard':review_graphics,'probe-graphics':probe_graphics,'verify-compiled-keyboard':verify_existing_compile}[mode]()
+  'probe-keyboard':probe_keyboard,'verify-keyboard':verify_keyboard,'compile-keyboard':review_graphics,'probe-graphics':probe_graphics,'verify-compiled-keyboard':verify_existing_compile,'review-graphics-lifetime':review_graphics_lifetime}[mode]()
