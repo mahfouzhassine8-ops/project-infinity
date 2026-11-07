@@ -55,7 +55,7 @@
  #include "guilib/GUIWindowManager.h"
  #include "input/actions/ActionIDs.h"
 +#if defined(TARGET_ANDROID)
-+#include "WinSystem.h"
++#include "windowing/WinSystem.h"
 +#include "windowing/GraphicContext.h"
 +#include <mutex>
 +#endif
