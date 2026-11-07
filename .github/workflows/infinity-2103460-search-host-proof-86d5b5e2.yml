@@ -5,6 +5,7 @@ on:
       - ci/infinity-search-86d5b5e2-host-20261107
     paths:
       - .github/workflows/infinity-2103460-search-host-proof-86d5b5e2.yml
+      - repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/test_settings_invalidation_matrix.py
 permissions:
   contents: read
 concurrency:
