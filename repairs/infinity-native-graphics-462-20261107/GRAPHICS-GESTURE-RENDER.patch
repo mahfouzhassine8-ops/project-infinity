@@ -1,0 +1,82 @@
+--- a/xbmc/windowing/GraphicContext.h
++++ b/xbmc/windowing/GraphicContext.h
+@@ -14,6 +14,10 @@
+ #include "utils/ColorUtils.h"
+ #include "utils/Geometry.h" // for CRect/CPoint
+ #include "utils/TransformMatrix.h" // for the members m_guiTransform etc.
++
++#if defined(TARGET_ANDROID)
++#include <mutex>
++#endif
+ 
+ #include <map>
+ #include <stack>
+@@ -126,6 +130,10 @@
+   UTILS::COLOR::Color MergeColor(UTILS::COLOR::Color color) const;
+   void SetOrigin(float x, float y);
+   void RestoreOrigin();
++#if defined(TARGET_ANDROID)
++  // One frame-wide ownership gate for direct Android gesture queries.
++  std::recursive_mutex& GestureRenderMutex() { return m_gestureRenderMutex; }
++#endif
+   void SetCameraPosition(const CPoint &camera);
+   void SetStereoView(RENDER_STEREO_VIEW view);
+   RENDER_STEREO_VIEW GetStereoView()  { return m_stereoView; }
+@@ -202,6 +210,9 @@
+   RESOLUTION_INFO m_windowResolution;
+   std::stack<CPoint> m_cameras;
+   std::stack<CPoint> m_origins;
++#if defined(TARGET_ANDROID)
++  std::recursive_mutex m_gestureRenderMutex;
++#endif
+   std::stack<CRect> m_clipRegions;
+   std::stack<float> m_stereoFactors;
+   std::stack<CRect> m_viewStack;
+--- a/xbmc/guilib/GUIWindowManager.cpp
++++ b/xbmc/guilib/GUIWindowManager.cpp
+@@ -1340,6 +1340,13 @@
+ {
+   assert(CServiceBroker::GetAppMessenger()->IsProcessThread());
+   CSingleExit lock(CServiceBroker::GetWinSystem()->GetGfxContext());
++#if defined(TARGET_ANDROID)
++  auto& graphics = CServiceBroker::GetWinSystem()->GetGfxContext();
++  // CSingleExit releases the graphics section before this gate is acquired.
++  // Direct Android gesture queries acquire the gate before entering SendMessage,
++  // so the two paths use the same gate -> graphics-section lock ordering.
++  std::unique_lock<std::recursive_mutex> gestureRenderOwner(graphics.GestureRenderMutex());
++#endif
+ 
+   CDirtyRegionList dirtyRegions = m_tracker.GetDirtyRegions();
+ 
+--- a/xbmc/input/touch/generic/GenericTouchActionHandler.cpp
++++ b/xbmc/input/touch/generic/GenericTouchActionHandler.cpp
+@@ -13,6 +13,11 @@
+ #include "guilib/GUIComponent.h"
+ #include "guilib/GUIWindowManager.h"
+ #include "input/actions/ActionIDs.h"
++#if defined(TARGET_ANDROID)
++#include "WinSystem.h"
++#include "windowing/GraphicContext.h"
++#include <mutex>
++#endif
+ 
+ #include <cmath>
+ 
+@@ -160,6 +165,17 @@
+   if (gui == nullptr)
+     return 0;
+ 
++#if defined(TARGET_ANDROID)
++  // Preserve the existing synchronous gesture-mask response and ownership.
++  // Wait for a complete GUI render pass before calling the native window
++  // handler: SetScalingResolution must not reset an actively rendered origin.
++  // This gate is acquired BEFORE SendMessage takes the graphics section.
++  auto* winSystem = CServiceBroker::GetWinSystem();
++  if (winSystem == nullptr)
++    return 0;
++  std::unique_lock<std::recursive_mutex> gestureRenderOwner(
++      winSystem->GetGfxContext().GestureRenderMutex());
++#endif
+   CGUIMessage msg(GUI_MSG_GESTURE_NOTIFY, 0, 0, static_cast<int>(std::round(x)),
+                   static_cast<int>(std::round(y)));
+   if (!gui->GetWindowManager().SendMessage(msg))
