@@ -1,0 +1,122 @@
+name: Infinity462 graphics gesture-render ownership candidate | NO APK
+on:
+  push:
+    branches: [work/infinity-graphics-gesture-render-462-candidate-20261107]
+    paths:
+      - .github/workflows/infinity-graphics-gesture-render-462-host.yml
+      - repairs/infinity-native-graphics-462-20261107/**
+permissions: {contents: read, actions: read}
+concurrency:
+  group: infinity462-graphics-gesture-render-prototype
+  cancel-in-progress: false
+jobs:
+  scoped-graphics-host:
+    name: Exact462 graphics gate source + TSAN host check - NO APK
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - name: Strict source-only workflow boundary
+        run: |
+          set -euo pipefail
+          python3 -m py_compile repairs/infinity-native-graphics-462-20261107/verify_gesture_render.py
+          python3 - <<'PY'
+          import subprocess
+          base='92bb6ecbb21c14f62f40555ba2aaef198e3847e2'
+          changed=subprocess.check_output(['git','diff','--name-only',base,'HEAD'],text=True).splitlines()
+          assert changed and all(x.startswith('repairs/infinity-native-graphics-462-20261107/') or
+             x=='.github/workflows/infinity-graphics-gesture-render-462-host.yml' for x in changed),changed
+          print('PASS only isolated graphics experiment, no original runtime source or signer changes')
+          PY
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13274901825', run-id: '41726452356', merge-multiple: true, github-token: '${{ github.token }}', path: verified-inputs}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13571276665', run-id: '42364232328', merge-multiple: true, github-token: '${{ github.token }}', path: previous-review}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13571601535', run-id: '42365578534', merge-multiple: true, github-token: '${{ github.token }}', path: keyboard-after}
+      - name: Restore 9411 exact APK462 source files and preserved keyboard candidate
+        run: python3 repairs/infinity-native-keyboard-scaling-462-20261107/compile_keyboard.py restore
+      - name: Apply only 3-source Android gesture/render prototype; preserve original pointer mask
+        run: python3 repairs/infinity-native-graphics-462-20261107/verify_gesture_render.py prepare
+      - name: Verify exact graphics origin methods under bounded host ThreadSanitizer
+        run: python3 repairs/infinity-native-graphics-462-20261107/verify_gesture_render.py host
+      - name: Explicit device and security limits
+        if: always()
+        run: |
+          mkdir -p native-ownership-review
+          printf '%s\n' 'SOURCE/TSAN HOST ONLY. Actual Android, complete native link, deadlock/lifetime and checkpoint behavior, Search settings/ABA, signed APK and Fold verification are NOT passed by this job.' > native-ownership-review/GRAPHICS-HOST-LIMITS.txt
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Infinity462-Graphics-GestureRender-HOST-${{ github.run_id }}-NO-APK
+          path: native-ownership-review/
+          if-no-files-found: warn
+          retention-days: 30
+
+  candidate-arm64-engine:
+    name: Complete source-matched ARM64 engine candidate - NO APK/signing
+    needs: scoped-graphics-host
+    if: needs.scoped-graphics-host.result == 'success'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 420
+    env:
+      GH_TOKEN: ${{ github.token }}
+      NDK_VER: '21.4.7075529'
+      DEPENDS: ${{ github.workspace }}/android-tools/xbmc-depends
+      TARBALLS: ${{ github.workspace }}/android-tools/xbmc-tarballs
+      BUILD_DIR: ${{ github.workspace }}/kodi-build
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with: {packages: 'platform-tools build-tools;35.0.0 platforms;android-34', log-accepted-android-sdk-licenses: false}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13274901825', run-id: '41726452356', merge-multiple: true, github-token: '${{ github.token }}', path: verified-inputs}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13571276665', run-id: '42364232328', merge-multiple: true, github-token: '${{ github.token }}', path: previous-review}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13571601535', run-id: '42365578534', merge-multiple: true, github-token: '${{ github.token }}', path: keyboard-after}
+      - name: Restore source-bound APK462 and apply only 3 reviewed graphics files
+        run: |
+          set -euo pipefail
+          python3 repairs/infinity-native-keyboard-scaling-462-20261107/compile_keyboard.py restore
+          python3 repairs/infinity-native-graphics-462-20261107/verify_gesture_render.py prepare
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '11698374892', run-id: '38132105717', merge-multiple: true, github-token: '${{ github.token }}', path: dependency-transfer}
+      - name: Restore pinned original native dependencies
+        run: |
+          set -euo pipefail
+          sudo apt-get -o Acquire::Retries=3 update -qq
+          sudo apt-get install -y python3-yaml python3-dev libsqlite3-dev libssl-dev libffi-dev
+          (cd dependency-transfer && sha256sum -c SHA256SUMS)
+          tar --no-same-owner -xf dependency-transfer/verified-android-dependencies.tar
+          tar --no-same-owner -xf dependency-transfer/verified-compiler-cache.tar -C "$HOME"
+      - uses: actions/cache@v4
+        with: {path: /usr/local/lib/android/sdk/ndk/21.4.7075529, key: infinity-pinned-ndk-linux-21.4.7075529-v1}
+      - name: Restore unchanged NDK
+        run: bash repairs/android-checkpoint-shutdown/install_ndk.sh
+      - name: Build and link complete source-matched Android ARM64 native engine
+        run: python3 repairs/infinity-native-graphics-462-20261107/verify_gesture_render.py link
+      - name: Preserve honest release limitations
+        if: always()
+        run: |
+          mkdir -p native-ownership-review
+          printf '%s\n' 'FULL ARM64 NATIVE LINK ONLY; no signed APK or Fold acceptance. Checkpoint/lifetime behavior and Search settings/ABA still require correction/verification.' > native-ownership-review/GRAPHICS-RELEASE-LIMITS.txt
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: Infinity462-Graphics-GestureRender-FullNative-${{ github.run_id }}-UNRELEASED
+          path: native-ownership-review/
+          if-no-files-found: warn
+          retention-days: 30
