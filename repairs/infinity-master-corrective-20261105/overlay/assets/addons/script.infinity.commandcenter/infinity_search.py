@@ -502,10 +502,41 @@ def search_provider(handle,media,query,provider_id):
     return _search_results(handle,media,query,provider_id=provider_id)
 
 
+def _search_modal_admission():
+    """Atomic Search-window ownership before inventory, history or keyboard.
+
+    Native result RPC admission happens later, after the keyboard closes;
+    it cannot prevent two overlapping modal Search entries. This separate
+    process-local socket guard spans the whole original Search GUI action.
+    """
+    import errno
+    import os
+    import socket
+    owner=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
+    try:
+        owner.bind('\\0infinity-search-modal-v1-'+str(os.getpid()))
+    except OSError as failure:
+        owner.close()
+        if failure.errno==errno.EADDRINUSE:
+            return None  # Duplicate activation; leave the original modal owner.
+        raise RuntimeError('Infinity Search could not acquire its modal owner.') from failure
+    return owner
+
+
 def open_search(media='movie'):
-    try:return _open_search(media)
+    if xbmc.getSkinDir()!='skin.infinity.diggz' or media not in ('movie','tv','anime','cartoon'):
+        return
+    owner=None
+    try:
+        owner=_search_modal_admission()
+        if owner is None:
+            return  # Never create a second keyboard or repeat slow discovery.
+        return _open_search(media)
     except (OSError,ValueError,RuntimeError) as error:
         xbmcgui.Dialog().ok('Infinity Search',str(error))
+    finally:
+        if owner is not None:
+            owner.close()
 
 
 def _open_search(media='movie'):
