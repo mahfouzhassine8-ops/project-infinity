@@ -1,10 +1,13 @@
-# Native keyboard/scaling source review — owner-authorized 2026-11-07
+# Native keyboard/scaling engineering scope — 2026-11-07
 
-Isolated branch from protected86d5b5e2. Search candidate72fefa8f and both existing branches remain untouched.
-Reuse existing native input restoration and existing native workflow; add only a branch-specific source-review job.
-Scope: restore signed451 inputs + existing touch/navigation/Downloads to the exact compiled APK4629411-file source map. Inspect selected keyboard callback/dialog, graphics origin-stack and Android touch ownership.
-Selected verification: input metadata/digests, exact full source map, original source helper reuse and unchanged protected runtime sources. No repeated Search tests, symbolication or physical reproduction.
-No native patch, compile, APK, original signer access, shutdown suite or application execution in this first job.
-Choose a native correction only after the matching source establishes its cause. User scope permits subsequent focused proof and real ARM64 compilation; this stage is read-only preparation.
+Protected correction checkpoint: 86d5b5e2b65acb878632d407c3a3a07dd1af3b6d. Separate Search candidate 72fefa8fe2554eb3fa7181027d6b9b2f05d7dd75 is not merged or modified. Installed reference is APK2103462 / skin268 / Command Center0.3.5.61.
 
-Selected next proof: compile actual pinned CAndroidKeyboard/CGUIDialogKeyboardTouch/CGUIKeyboardFactory method bodies under host AddressSanitizer with explicit JNI/window/timer scheduling boundaries. Exercise two original native factory callers; pause second after its editor replacement, wake first state callback and require actual heap-use-after-free evidence. This is a source-level counterexample, not physical root-cause exclusivity or ARM64 acceptance. Preserve failed collector run42364469826 (nonexistent optional GUIKeyboard.cpp); corrected source read succeeded42364577300. No native production patch in this stage.
+Allowed native runtime candidate: Android-only keyboard-modal ownership in xbmc/guilib/GUIKeyboardFactory.cpp, prepared under this folder's native/ tree. Restore exact compiled APK462 sources before applying; exactly one native file may differ. Reentrant input/filter requests return false before replacing editor/filter state; normal cancellation and worker drain remain unchanged.
+
+Selected checks: source-map binding against all9411 APK462 native inputs; before/after host ASan using the actual pinned keyboard method bodies; selected real Android ARM64 keyboard translation-unit compilation with the original toolchain; NDK libc++ symbol reconciliation; bounded host ThreadSanitizer probe of pinned graphics origin/scaling methods; read-only graphics dispatch/payload/checkpoint dependency tracing. Host platform boundaries and unavailable Android/Fold results must be stated.
+
+Read-only graphics work must not be represented as a repaired device crash. No speculative locks, origin-stack resets, or gesture-mask substitutions. No checkpoint/durability or settings-retirement changes.
+
+Execution infrastructure changes are confined to this folder and branch-specific read-only/compile jobs in the existing controlled-native workflow. Its original native build job remains unchanged; permissions are contents:read/actions:read. No signing keys, release authorities, APKs, installations, shutdown suites, user data, Cobra, Preview or provider modifications.
+
+No complete engine link, APK packaging, signing, installation, promotion or lock has been performed. Release remains held for graphics safety, shared Search consistency, combined integration and Android verification.

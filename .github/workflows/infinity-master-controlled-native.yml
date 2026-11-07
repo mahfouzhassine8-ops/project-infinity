@@ -82,7 +82,7 @@ jobs:
         id: scope
         run: python3 repairs/infinity-native-keyboard-scaling-462-20261107/review_sources.py metadata
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
-        if: steps.scope.outputs.stage != 'verify-compiled-keyboard'
+        if: steps.scope.outputs.stage != 'verify-compiled-keyboard' && steps.scope.outputs.stage != 'closeout-native'
         with: {artifact-ids: '13274901825', run-id: '41726452356', merge-multiple: true, github-token: '${{ github.token }}', path: verified-inputs}
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         if: steps.scope.outputs.stage == 'restore-review'

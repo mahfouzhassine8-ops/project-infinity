@@ -24,7 +24,7 @@ def metadata():
  request=json.loads((HERE/'REVIEW-REQUEST.json').read_text())
  assert request['source_base']==BASE and request['native_changes'] is False
  stage=request.get('stage','restore-review')
- assert stage in ('restore-review','review-callbacks','probe-keyboard','verify-keyboard','compile-keyboard','probe-graphics','verify-compiled-keyboard','review-graphics-lifetime')
+ assert stage in ('restore-review','review-callbacks','probe-keyboard','verify-keyboard','compile-keyboard','probe-graphics','verify-compiled-keyboard','review-graphics-lifetime','closeout-native')
  if os.environ.get('GITHUB_OUTPUT'):
   with open(os.environ['GITHUB_OUTPUT'],'a') as f:f.write('stage='+stage+'\n')
  assets=ASSETS if stage=='restore-review' else [ASSETS[0],(13571276665,42364232328,886694,'9cd229acfcf0c8bd30b52ed083fa77ab640888fc04950a1e85f11465c79999c7')]
@@ -256,7 +256,35 @@ def review_graphics_lifetime():
  save('GRAPHICS-LIFETIME-SOURCES.json',dict(status='PASS_EXACT_SOURCE_BINDING_ONLY',sources={n:expected[n]for n in names},unregister_call_sites=sites,native_patch=False,Android='NOT_RUN'))
  print('UNREGISTER_WINSYSTEM_CALLS '+json.dumps(sites))
 
+
+def closeout_native():
+ prior=ROOT/'previous-review';expected=json.loads((prior/'NATIVE-SOURCE-MAP.json').read_text())
+ assert sha(prior/'NATIVE-SOURCE-MAP.json')==MAP_SHA
+ name='xbmc/platform/android/activity/InfinityAndroidCheckpoint.cpp'
+ source=ROOT/'repairs/android-checkpoint-shutdown/runtime/native/overlay'/name
+ assert sha(source)==expected[name],('CHECKPOINT_SOURCE_NOT_EXACT462',sha(source),expected[name])
+ text=source.read_text();start=text.index('void Pump(CApplication& application)')
+ pump=text[start:text.index('\nvoid ',start+1)] if '\nvoid ' in text[start+1:] else text[start:]
+ assert 's.phase == "CHECKPOINT_FAILED"' in pump
+ assert 'ProcessWindowMessages(' not in pump
+ save('GRAPHICS-CHECKPOINT-BOUNDARY.json',dict(status='EXACT462_PROTECTED_PUMP_HAS_NO_WINDOW_QUERY_DRAIN',source=os.environ['GITHUB_SHA'],
+  native_source=name,source_sha256=expected[name],failed_checkpoint_returns_before_work=True,
+  application_source_sha256=expected['xbmc/application/Application.cpp'],
+  application_binding_run=42366550095,
+  dependency='Application::Process returns after protected Pump when checkpoint active; direct synchronous GUI query marshalling would have no guaranteed failure acknowledgement',
+  production_graphics_patch=False,checkpoint_source_modified=False,Android='NOT_RUN',Fold='NOT_RUN'))
+ print('PASS exact462 checkpoint-source binding; protected failed Pump returns without ProcessWindowMessages')
+ for i,line in enumerate(text.splitlines(),1):
+  if start<=len('\n'.join(text.splitlines()[:i])) and i<text[:start].count('\n')+23:print(f'{i:04d}: {line}')
+ for branch,head in [('work/infinity-2103460-nine-corrections-20261106','86d5b5e2b65acb878632d407c3a3a07dd1af3b6d'),
+ ('work/infinity-search-unified-native-candidate-20261107','72fefa8fe2554eb3fa7181027d6b9b2f05d7dd75')]:
+  current=json.loads(subprocess.check_output(['gh','api','repos/mahfouzhassine8-ops/project-infinity/git/ref/heads/'+branch],text=True))['object']['sha']
+  assert current==head,('PRESERVED_REFERENCE_MOVED_EXTERNALLY',branch,current)
+ save('PRESERVED-CHECKPOINTS.json',dict(protected='86d5b5e2b65acb878632d407c3a3a07dd1af3b6d',search_candidate='72fefa8fe2554eb3fa7181027d6b9b2f05d7dd75',source=os.environ['GITHUB_SHA'],unchanged=True,
+ native_candidate={'xbmc/guilib/GUIKeyboardFactory.cpp':sha(HERE/'native/xbmc/guilib/GUIKeyboardFactory.cpp')},APK=False,signing=False))
+ print('PASS protected correction/Search branches unchanged; no Cobra/Preview/signing/runtime changes')
+
 if __name__=='__main__':
  mode=sys.argv[1]
  {'metadata':metadata,'restore-review':restore_review,'review-callbacks':review_callbacks,
-  'probe-keyboard':probe_keyboard,'verify-keyboard':verify_keyboard,'compile-keyboard':review_graphics,'probe-graphics':probe_graphics,'verify-compiled-keyboard':verify_existing_compile,'review-graphics-lifetime':review_graphics_lifetime}[mode]()
+  'probe-keyboard':probe_keyboard,'verify-keyboard':verify_keyboard,'compile-keyboard':review_graphics,'probe-graphics':probe_graphics,'verify-compiled-keyboard':verify_existing_compile,'review-graphics-lifetime':review_graphics_lifetime,'closeout-native':closeout_native}[mode]()
