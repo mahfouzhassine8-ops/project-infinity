@@ -25,7 +25,7 @@ concurrency:
 jobs:
   final464465-preflight:
     name: Exact462 final consolidation scope and existing signer policy before keys
-    if: github.event_name == 'push' && github.ref == 'refs/heads/work/infinity-final-release-462-20261107'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/work/infinity-final-release-462-20261107' && startsWith(github.event.head_commit.message, 'Prepare final464465:')
     runs-on: ubuntu-22.04
     permissions: {contents: read, actions: write}
     timeout-minutes: 20
@@ -161,6 +161,144 @@ jobs:
             final-prepared/2103465/INPUTS.json
           if-no-files-found: warn
           retention-days: 30
+  final464465-review-register:
+    name: Exact official component review, real installer checks and engineering authority only
+    if: github.event_name == 'push' && github.ref == 'refs/heads/work/infinity-final-release-462-20261107' && startsWith(github.event.head_commit.message, 'Register final464465:')
+    runs-on: ubuntu-22.04
+    permissions: {contents: write, actions: read}
+    timeout-minutes: 30
+    env: {GH_TOKEN: '${{ github.token }}', PYTHONDONTWRITEBYTECODE: '1'}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '17'}
+      - name: Verify exact engineering-only request and existing sole signer
+        run: |
+          python3 - <<'PYCHECK'
+          import json
+          from pathlib import Path
+          request=json.loads(Path('repairs/infinity-final-release-462-20261107/REQUEST.json').read_text())
+          assert request['operation']=='register-final464465' and request['publication'] is False
+          assert request['version'] in (2103464,2103465)
+          with Path(__import__('os').environ['GITHUB_ENV']).open('a') as output:output.write('REVIEW_VERSION='+str(request['version'])+'\n')
+          PYCHECK
+          python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out SIGNER-ROUTES.json
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13495518701', run-id: '42204671979', github-token: '${{ github.token }}', path: final-parent, merge-multiple: true}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13565947121', run-id: '42351486944', github-token: '${{ github.token }}', path: final-current-components, merge-multiple: true}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13595626273', run-id: '42425522122', github-token: '${{ github.token }}', path: reviewed/2103464, merge-multiple: true}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13594949809', run-id: '42425522122', github-token: '${{ github.token }}', path: reviewed/2103465, merge-multiple: true}
+      - name: Authenticate official prepared archives before actual Java host execution
+        run: |
+          python3 - <<'PYVERIFY'
+          import sys
+          from pathlib import Path
+          sys.path.insert(0,'repairs/infinity-final-release-462-20261107')
+          import final_release as r
+          from inventory import file_sha
+          assert file_sha('final-parent/Infinity-2103462-Combined-Original-Signer.apk')==r.PARENT
+          r.official(Path('reviewed/2103464'),2103464)
+          r.official(Path('reviewed/2103465'),2103465)
+          PYVERIFY
+      - name: Selected real production Java installer upgrade and forward recovery
+        run: |
+          if [ "$REVIEW_VERSION" = 2103464 ]; then
+            python3 repairs/infinity-final-release-462-20261107/verify_module_upgrade.py --parent final-parent/Infinity-2103462-Combined-Original-Signer.apk --candidate reviewed/2103464 --recovery reviewed/2103465 --current final-current-components --out final-module-audit
+          else
+            mkdir final-module-audit
+            cp repairs/infinity-final-release-462-20261107/MODULE-UPGRADE-RECOVERY.json final-module-audit/
+          fi
+      - name: Admit exact payload to engineering authority, preserve every locked reference
+        run: python3 repairs/infinity-final-release-462-20261107/register_engineering.py --prepared "reviewed/$REVIEW_VERSION" --version "$REVIEW_VERSION" --audit final-module-audit/MODULE-UPGRADE-RECOVERY.json --out final-authority-review
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity464465-Exact-Authority-Review-${{ github.run_id }}-NO-APK-NO-ACCEPTANCE
+          path: |
+            final-module-audit/
+            final-authority-review/
+            SIGNER-ROUTES.json
+          if-no-files-found: error
+          retention-days: 90
+  final464465-sign:
+    name: Exact registered consolidation through unchanged original APK signer, internal verification only
+    if: github.event_name == 'push' && github.ref == 'refs/heads/work/infinity-final-release-462-20261107' && startsWith(github.event.head_commit.message, 'Sign final464465:')
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    env: {GH_TOKEN: '${{ github.token }}', PYTHONDONTWRITEBYTECODE: '1'}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '17'}
+      - name: Exact registered engineering-only sign request and sole signer check
+        run: |
+          python3 - <<'PYCHECK'
+          import json,os
+          from pathlib import Path
+          r=json.loads(Path('repairs/infinity-final-release-462-20261107/REQUEST.json').read_text())
+          a=json.loads(Path('repairs/dual-experience-isolation-2103420/release-authority.json').read_text())
+          assert r['operation']=='sign-final464465' and r['publication'] is False
+          assert r['version'] in (2103464,2103465) and r['version']==a['candidate_versionCode']
+          assert a['generation']==(50 if r['version']==2103464 else 51)
+          with Path(os.environ['GITHUB_ENV']).open('a') as f:f.write('SIGN_VERSION='+str(r['version'])+'\nSIGN_GENERATION='+str(a['generation'])+'\n')
+          PYCHECK
+          python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out SIGNER-ROUTES.json
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13495518701', run-id: '42204671979', github-token: '${{ github.token }}', path: final-parent, merge-multiple: true}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13595626273', run-id: '42425522122', github-token: '${{ github.token }}', path: reviewed/2103464, merge-multiple: true}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13594949809', run-id: '42425522122', github-token: '${{ github.token }}', path: reviewed/2103465, merge-multiple: true}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {run-id: '39867073954', name: Infinity-Receipt-Race-Android17-Investigation, github-token: '${{ github.token }}', path: tools}
+      - name: Exact official artifact, registered authority and every unsigned APK member before keys
+        run: |
+          python3 repairs/infinity-final-release-462-20261107/final_release.py check_registered --prepared "reviewed/$SIGN_VERSION" --version "$SIGN_VERSION" --audit repairs/infinity-final-release-462-20261107/MODULE-UPGRADE-RECOVERY.json --out REGISTERED-CANDIDATE-CHECK.json
+          python3 repairs/dual-experience-isolation-2103420/component_bundles.py combine --bundles "reviewed/$SIGN_VERSION/components" --catalog "reviewed/$SIGN_VERSION/components/catalog.json" --out combined-unsigned.apk --version "$SIGN_VERSION"
+          python3 - <<'PYHASH'
+          import os,sys
+          from pathlib import Path
+          sys.path.insert(0,'repairs/dual-experience-isolation-2103420')
+          from inventory import file_sha,load
+          assert file_sha('combined-unsigned.apk')==load(Path('reviewed')/os.environ['SIGN_VERSION']/'PREPARATION.json')['unsigned_sha256']
+          PYHASH
+          python3 repairs/infinity-final-release-462-20261107/final_release.py compare --parent final-parent/Infinity-2103462-Combined-Original-Signer.apk --candidate combined-unsigned.apk --prepared "reviewed/$SIGN_VERSION" --out unsigned-preservation
+          python3 repairs/dual-experience-isolation-2103420/release_gate.py --apk combined-unsigned.apk --jars tools/receipt-evidence/tool-jars --work gate-dex --repository . --expected-head "$GITHUB_SHA" --expected-generation "$SIGN_GENERATION" --out SIGNING-DECISION.json
+      - name: Unchanged original signer after exact owner and source checks
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: python3 repairs/dual-experience-isolation-2103420/assemble.py sign --apk combined-unsigned.apk --jars tools/receipt-evidence/tool-jars --work signer-dex --repository . --expected-head "$GITHUB_SHA" --expected-generation "$SIGN_GENERATION" --sdk "$ANDROID_HOME/build-tools/35.0.0" --out signed-combined
+      - name: Every signed member, permanent certificate and source-bound engineering receipt
+        run: |
+          python3 repairs/infinity-final-release-462-20261107/final_release.py compare --parent final-parent/Infinity-2103462-Combined-Original-Signer.apk --candidate "signed-combined/Infinity-$SIGN_VERSION-Combined-Original-Signer.apk" --prepared "reviewed/$SIGN_VERSION" --out signed-combined/preservation --sdk "$ANDROID_HOME/build-tools/35.0.0"
+          cp SIGNING-DECISION.json REGISTERED-CANDIDATE-CHECK.json SIGNER-ROUTES.json signed-combined/
+          cp repairs/dual-experience-isolation-2103420/release-authority.json signed-combined/
+          cp "reviewed/$SIGN_VERSION/PREPARATION.json" signed-combined/
+      - uses: actions/upload-artifact@v4
+        with: {name: 'Infinity-Combined-Original-Signer-${{ github.run_id }}', path: signed-combined/, if-no-files-found: error, retention-days: 90, compression-level: 0}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity464465-Signing-Evidence-${{ github.run_id }}-PUBLIC-RELEASE-PENDING
+          path: |
+            SIGNING-DECISION.json
+            REGISTERED-CANDIDATE-CHECK.json
+            SIGNER-ROUTES.json
+            unsigned-preservation/
+          if-no-files-found: warn
+          retention-days: 90
   prepare-preview451:
     name: Preview 451 owner preparation; exact450 frozen payload
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/infinity-preview-2103450-fullscreen-display-20261102' && inputs.operation == 'prepare-preview451'
