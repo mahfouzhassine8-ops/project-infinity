@@ -1,0 +1,75 @@
+{
+  "status": "PASS_NINE_FOCUSED_REAL_JAVA_UPGRADE_AND_RECOVERY_CASES",
+  "cases": [
+    {
+      "case": "authenticated61_to62_upgrade",
+      "status": "PASS_REAL_JAVA_HOST",
+      "version": 62,
+      "user_data_and_unlisted_source_preserved": true
+    },
+    {
+      "case": "same62_noop",
+      "status": "PASS_REAL_JAVA_HOST",
+      "version": 62,
+      "user_data_and_unlisted_source_preserved": true
+    },
+    {
+      "case": "authenticated62_to63_forward_recovery",
+      "status": "PASS_REAL_JAVA_HOST",
+      "version": 63,
+      "user_data_and_unlisted_source_preserved": true,
+      "all_functional61_source_restored": true
+    },
+    {
+      "case": "older62_APK_retains_valid63",
+      "status": "PASS_NO_DOWNGRADE",
+      "all_files_preserved": true
+    },
+    {
+      "case": "signed61_pair_and_known62_partial_source_resume",
+      "status": "PASS_REAL_JAVA_HOST",
+      "version": 62,
+      "user_data_and_unlisted_source_preserved": true
+    },
+    {
+      "case": "unknown_known_source",
+      "status": "REFUSED_AS_REQUIRED",
+      "all_files_preserved": true,
+      "reason": "IOException: Unrecognized installed source; preserved without modification"
+    },
+    {
+      "case": "unmatched_partial_signature",
+      "status": "REFUSED_AS_REQUIRED",
+      "all_files_preserved": true,
+      "reason": "ErrnoException: open: missing module file"
+    },
+    {
+      "case": "missing_installed_signature",
+      "status": "REFUSED_AS_REQUIRED",
+      "all_files_preserved": true,
+      "reason": "IOException: Installed signed generation has no signature"
+    },
+    {
+      "case": "signed_manifest_but_tampered_APK_source",
+      "status": "REFUSED_AS_REQUIRED",
+      "all_files_preserved": true,
+      "reason": "IOException: APK module source mismatch"
+    }
+  ],
+  "java_source_sha256": "3763a9dce6e9c0cafbefb4a967e76230e134ed2ecb67bdc4961676df061729bb",
+  "host_transport_sha256": {
+    "host-java/com/projectinfinity/kodi/Main.java": "b4bd71980c8ef1417c87e9e6eb7cd1d7a92fdcf6c30d3ccf96b16d0b79f4fc70",
+    "host-java/android/system/ErrnoException.java": "2f0dd1387c247ebb60914df4185af1f3000136a7d2f1fb9d6edf48112443987e",
+    "host-java/android/system/StructStat.java": "7a280d7328a729c87673bcd5611b127f7e2956851208abcc15337221a9a3a098",
+    "host-java/android/system/Os.java": "e09d0d6bc7a7ad98f3c4e9a1bcff3e9b68d89f347f27820ce02a1e7e3cc862e0",
+    "host-java/android/system/OsConstants.java": "65af8537683f4c0f9d0e5f91bcf371e062e148d9d6a95d66579c53011b4dd551",
+    "host-java/android/content/Context.java": "ad334790db64faf4e7eb39dfe98cfce66dcce232e8b765cf5773532bc0b45e39",
+    "host-java/android/content/res/AssetManager.java": "e48e78fe9a6212bdcf59bd3a1a3be1163cb4c7479b17ec55c8b9084b79203e1a"
+  },
+  "original_installer_changed": false,
+  "APK_or_DEX_changed_by_test": false,
+  "signing_keys_accessed": false,
+  "Android": "NOT_RUN_BY_HOST_TEST",
+  "Fold": "NOT_RUN",
+  "shutdown": "NOT_SELECTED"
+}
