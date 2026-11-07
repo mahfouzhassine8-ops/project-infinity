@@ -24,7 +24,7 @@ def metadata():
  request=json.loads((HERE/'REVIEW-REQUEST.json').read_text())
  assert request['source_base']==BASE and request['native_changes'] is False
  stage=request.get('stage','restore-review')
- assert stage in ('restore-review','review-callbacks','probe-keyboard','verify-keyboard','compile-keyboard')
+ assert stage in ('restore-review','review-callbacks','probe-keyboard','verify-keyboard','compile-keyboard','probe-graphics')
  if os.environ.get('GITHUB_OUTPUT'):
   with open(os.environ['GITHUB_OUTPUT'],'a') as f:f.write('stage='+stage+'\n')
  assets=ASSETS if stage=='restore-review' else [ASSETS[0],(13571276665,42364232328,886694,'9cd229acfcf0c8bd30b52ed083fa77ab640888fc04950a1e85f11465c79999c7')]
@@ -172,7 +172,11 @@ def review_graphics():
  save('GRAPHICS-SOURCE-BINDING.json',dict(status='PASS_BOUND_EXACT462_READ_ONLY_GRAPHICS_DEPENDENCIES',source=os.environ['GITHUB_SHA'],sources={n:expected[n]for n in names},native_patch=False,graphics_cause='NOT_PROVEN'))
  print('PASS exact462 graphics dependency source exposed; no speculative scaling patch')
 
+def probe_graphics():
+ import graphics_research
+ graphics_research.run(ROOT,OUT)
+
 if __name__=='__main__':
  mode=sys.argv[1]
  {'metadata':metadata,'restore-review':restore_review,'review-callbacks':review_callbacks,
-  'probe-keyboard':probe_keyboard,'verify-keyboard':verify_keyboard,'compile-keyboard':review_graphics}[mode]()
+  'probe-keyboard':probe_keyboard,'verify-keyboard':verify_keyboard,'compile-keyboard':review_graphics,'probe-graphics':probe_graphics}[mode]()
