@@ -1,10 +1,13 @@
 {
   "source_base": "86d5b5e2b65acb878632d407c3a3a07dd1af3b6d",
   "native_changes": false,
-  "stage": "verify-keyboard",
-  "candidate": "isolated-one-file-android-modal-ownership",
-  "original_factory_sha256": "964e3c943a11f1bbed87c4529bedcd08c0111152954ff5b7140fb96c87ef3fb2",
-  "candidate_factory_sha256": "fdef3763a10d981649d4312d5f1646514b1e621829153ab9a0fa3900b8418df5",
+  "stage": "compile-keyboard",
+  "runtime_candidate": "one-file-android-keyboard-modal-ownership",
+  "real_ARM64_object_compile": true,
+  "native_engine_link": false,
+  "APK": false,
   "signing": false,
-  "APK": false
+  "graphics_patch": false,
+  "host_before_reused": 42365055708,
+  "host_after_reused": 42365578534
 }

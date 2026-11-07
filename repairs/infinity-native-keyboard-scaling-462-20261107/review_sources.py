@@ -24,7 +24,7 @@ def metadata():
  request=json.loads((HERE/'REVIEW-REQUEST.json').read_text())
  assert request['source_base']==BASE and request['native_changes'] is False
  stage=request.get('stage','restore-review')
- assert stage in ('restore-review','review-callbacks','probe-keyboard','verify-keyboard')
+ assert stage in ('restore-review','review-callbacks','probe-keyboard','verify-keyboard','compile-keyboard')
  if os.environ.get('GITHUB_OUTPUT'):
   with open(os.environ['GITHUB_OUTPUT'],'a') as f:f.write('stage='+stage+'\n')
  assets=ASSETS if stage=='restore-review' else [ASSETS[0],(13571276665,42364232328,886694,'9cd229acfcf0c8bd30b52ed083fa77ab640888fc04950a1e85f11465c79999c7')]
@@ -136,7 +136,43 @@ def verify_keyboard():
  import verify_keyboard as probe
  probe.run(ROOT,OUT)
 
+
+def review_graphics():
+ review_callbacks(emit=False)
+ expected=json.loads((ROOT/'previous-review/NATIVE-SOURCE-MAP.json').read_text())
+ names=['xbmc/guilib/GUIWindow.cpp','xbmc/guilib/GUIControl.cpp','xbmc/guilib/GUIControlGroup.cpp',
+ 'xbmc/guilib/GUIWindowManager.cpp','xbmc/windowing/GraphicContext.cpp','xbmc/windowing/GraphicContext.h',
+ 'xbmc/platform/android/activity/XBMCApp.cpp','xbmc/platform/android/activity/android_main.cpp',
+ 'xbmc/platform/android/activity/android_native_app_glue.c','xbmc/windowing/android/WinEventsAndroid.cpp',
+ 'xbmc/application/AppInboundProtocol.cpp','xbmc/application/Application.cpp','xbmc/input/InputManager.cpp']
+ names=[n for n in names if n in expected];raws={}
+ with tarfile.open(ROOT/'verified-inputs/verified-p0-native-source.tar.gz','r:gz')as archive:
+  for member in archive:
+   n=member.name.removeprefix('./')
+   if n in names:
+    assert member.isfile() and member.size<2*1024*1024
+    raw=archive.extractfile(member).read()
+    if hashlib.sha256(raw).hexdigest()==expected[n]:raws[n]=raw
+ for n in names:
+  if n not in raws:
+   p=ROOT/'previous-review/sources'/n
+   assert p.is_file() and sha(p)==expected[n],'UNBOUND_GRAPHICS_SOURCE:'+n
+   raws[n]=p.read_bytes()
+  p=OUT/'sources'/n;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(raws[n])
+  lines=raws[n].decode().splitlines();selected=set()
+  markers=('::DoRender(', '::RenderPass(', '::Render(', '::OnInputEvent(', '::onInputEvent(', '::OnEvent(',
+    '::MessagePump(', '::ProcessQueue(', 'AInputQueue_getEvent(', 'AInputQueue_attachLooper(', 'onInputEvent(',
+    'm_origins','CSingleExit')
+  for i,line in enumerate(lines):
+   if any(m in line for m in markers):
+    for j in range(max(0,i-4),min(len(lines),i+100)):selected.add(j)
+  print('GRAPHICS_SOURCE_BEGIN '+n+' sha256='+expected[n])
+  for i in sorted(selected):print(f'{i+1:04d}: {lines[i]}')
+  print('GRAPHICS_SOURCE_END '+n)
+ save('GRAPHICS-SOURCE-BINDING.json',dict(status='PASS_BOUND_EXACT462_READ_ONLY_GRAPHICS_DEPENDENCIES',source=os.environ['GITHUB_SHA'],sources={n:expected[n]for n in names},native_patch=False,graphics_cause='NOT_PROVEN'))
+ print('PASS exact462 graphics dependency source exposed; no speculative scaling patch')
+
 if __name__=='__main__':
  mode=sys.argv[1]
  {'metadata':metadata,'restore-review':restore_review,'review-callbacks':review_callbacks,
-  'probe-keyboard':probe_keyboard,'verify-keyboard':verify_keyboard}[mode]()
+  'probe-keyboard':probe_keyboard,'verify-keyboard':verify_keyboard,'compile-keyboard':review_graphics}[mode]()
