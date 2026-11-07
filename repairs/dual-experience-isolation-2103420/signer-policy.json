@@ -68,10 +68,74 @@
     },
     {
       "id": 409014924,
+      "original_key_access": false,
       "path": ".github/workflows/infinity-2103460-scoped-arm64.yml",
       "source": "9765fd0706dac90eadee785293ca927ebc3ed8d2",
-      "workflow_sha256": "aae334b97c90d152f9fda6ceccceff4da2d7f3a86ea44878c2e47c78ce4948ff",
-      "original_key_access": false
+      "workflow_sha256": "aae334b97c90d152f9fda6ceccceff4da2d7f3a86ea44878c2e47c78ce4948ff"
+    },
+    {
+      "id": 410227798,
+      "original_key_access": false,
+      "path": ".github/workflows/infinity-2103460-search-host-proof-86d5b5e2.yml",
+      "review_role": "Host/source/native-build verification only; no original signing credentials",
+      "source": "85bc5110bc0ffb1031160d3c2e13d2c5fb392308",
+      "workflow_sha256": "ace4f9229b1ede709bdea1a311265c09fa9bdd60137025294327a6365081f3e2"
+    },
+    {
+      "id": 410317730,
+      "original_key_access": false,
+      "path": ".github/workflows/infinity-462-keyboard-verified-arm64-evidence.yml",
+      "review_role": "Host/source/native-build verification only; no original signing credentials",
+      "source": "64ac884225fc33e3c27bd33cfeedcebd4243981d",
+      "workflow_sha256": "206a6d55f9d73f140238ea0819d38104d43ce747081d0bcf2859e47912cd176f"
+    },
+    {
+      "id": 410565232,
+      "original_key_access": false,
+      "path": ".github/workflows/infinity-graphics-gesture-render-462-host.yml",
+      "review_role": "Host/source/native-build verification only; no original signing credentials",
+      "source": "4ee6a5f7346077900f09114439db947a02fa2737",
+      "workflow_sha256": "6af1c48fa54449002c40eb1356fd5f6e582796575d99ea9bd511ef6370d590a4"
+    },
+    {
+      "id": 410705046,
+      "original_key_access": false,
+      "path": ".github/workflows/infinity-native-owned-response-candidate-20261107.yml",
+      "review_role": "Host/source/native-build verification only; no original signing credentials",
+      "source": "b654fb0b0afb616c0749568bc06bf2b499928eb6",
+      "workflow_sha256": "163288d35eaf54d46da597fe2ccc07d8b51e4055d72fc9559250b7b315bba54a"
+    },
+    {
+      "id": 410690287,
+      "original_key_access": false,
+      "path": ".github/workflows/infinity-search-provider-owned-fresh-host.yml",
+      "review_role": "Host/source/native-build verification only; no original signing credentials",
+      "source": "e9cf059f86807df7d64b086819ff1d5d52670815",
+      "workflow_sha256": "3d5bbee66ef021378430fa0eb54649ed615630affe21526d7a6440161436575b"
+    },
+    {
+      "id": 410686341,
+      "original_key_access": false,
+      "path": ".github/workflows/infinity-search-settings-proof-model-20261107.yml",
+      "review_role": "Host/source/native-build verification only; no original signing credentials",
+      "source": "5af6f442e54a4f84958e7ce4ccab5a36bf663d67",
+      "workflow_sha256": "34baabe25ab1d8ac8e532403bb5a5683ffff4737416805ca768f005ad8752d03"
+    },
+    {
+      "id": 410239306,
+      "original_key_access": false,
+      "path": ".github/workflows/infinity-unified-native-search-candidate.yml",
+      "review_role": "Host/source/native-build verification only; no original signing credentials",
+      "source": "72fefa8fe2554eb3fa7181027d6b9b2f05d7dd75",
+      "workflow_sha256": "e0e8ff096b5e674b325d2c7ad0763c5c0737a55a4512a2c3f7b2cf6e67e25e43"
+    },
+    {
+      "id": 410333805,
+      "original_key_access": false,
+      "path": ".github/workflows/infinity462-keyboard-full-engine-unreleased.yml",
+      "review_role": "Host/source/native-build verification only; no original signing credentials",
+      "source": "1f5e900226772cbbc9b0282b3838f675711994aa",
+      "workflow_sha256": "990d07c4515173075d0bf3c48f4788eb9d83aa293ebdce848fbc9491d2ac2178"
     }
   ],
   "audit_workflows": 619,
@@ -2169,6 +2233,22 @@
       "path": ".github/workflows/sign-rc3-candidate.yml",
       "reviewed_source": "current-authorized-branch",
       "workflow_sha256": "6ad07776ee29e7d5e625311af8e94d47076ada3ed54751b5c4e8c88d88b5ab61"
+    },
+    {
+      "id": 410707721,
+      "original_key_access": true,
+      "path": ".github/workflows/infinity-462-search-graphics-integration-20261107.yml",
+      "review_role": "Certificate export/readiness only; retire key-access workflow preserving evidence",
+      "source": "8f51c0415c8a96ffc1ae3d8c3c9e1d7ac92a9a75",
+      "workflow_sha256": "3f76d6273438788804db2c0533b291941ade98ac7f61c8b3329bdcd95b7a556c"
+    },
+    {
+      "id": 410710260,
+      "original_key_access": true,
+      "path": ".github/workflows/infinity-original-signer-reference-20261107.yml",
+      "review_role": "Certificate export/readiness only; retire key-access workflow preserving evidence",
+      "source": "d578ea5a864799753b76157714371c1c3c0495c2",
+      "workflow_sha256": "b5cf86e79d8f997691abc9faf5728d5a05a514cd993a2ba7cda2d97e314fb88f"
     }
   ],
   "reviewed_workflow_ids": [
@@ -2793,7 +2873,17 @@
     407785045,
     407812103,
     408828503,
-    409014924
+    409014924,
+    410227798,
+    410239306,
+    410317730,
+    410333805,
+    410565232,
+    410686341,
+    410690287,
+    410705046,
+    410707721,
+    410710260
   ],
   "schema": 1,
   "scope": "Retire historical workflows with access to the original permanent signing secret; preserve their files, runs, artifacts and every locked ref",

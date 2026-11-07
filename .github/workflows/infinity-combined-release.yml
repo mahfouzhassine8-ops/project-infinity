@@ -27,6 +27,7 @@ jobs:
     name: Exact462 final consolidation scope and existing signer policy before keys
     if: github.event_name == 'push' && github.ref == 'refs/heads/work/infinity-final-release-462-20261107'
     runs-on: ubuntu-22.04
+    permissions: {contents: read, actions: write}
     timeout-minutes: 20
     env: {GH_TOKEN: '${{ github.token }}', PYTHONDONTWRITEBYTECODE: '1'}
     steps:
@@ -46,6 +47,20 @@ jobs:
           import hashlib
           authority=json.loads(Path('repairs/dual-experience-isolation-2103420/release-authority.json').read_text())
           for path,want in authority['source_files'].items():
+            if path=='repairs/dual-experience-isolation-2103420/signer-policy.json':
+              old=json.loads(subprocess.check_output(['git','show','776e2e4:'+path],text=True))
+              actual=json.loads(Path(path).read_text())
+              review=json.loads(Path('repairs/infinity-final-release-462-20261107/WORKFLOW-REVIEW.json').read_text())
+              assert {r['id'] for r in review['reviewed']}=={410227798,410317730,410707721,410565232,410705046,410710260,410690287,410686341,410239306,410333805}
+              expected=json.loads(json.dumps(old))
+              expected['reviewed_workflow_ids']=sorted(set(old['reviewed_workflow_ids'])|{r['id'] for r in review['reviewed']})
+              for r in review['reviewed']:
+                assert r['APK_signing'] is False
+                assert r['original_key_access']==(r['id'] in (410707721,410710260))
+                item={k:r[k] for k in ['id','path','source','workflow_sha256','original_key_access']};item['review_role']=r['role']
+                expected['retired_original_key_workflows' if r['original_key_access'] else 'additional_unsigned_owner_workflows'].append(item)
+              assert actual==expected and actual['sole_original_key_workflow_id']==397702717,'ONLY_REVIEWED_AUDIT_CATALOG_UPDATE_ALLOWED'
+              continue
             assert hashlib.sha256(Path(path).read_bytes()).hexdigest()==want,'PROTECTED_RELEASE_SOURCE_CHANGED:'+path
           for path in ['repairs/infinity-final-closure-2103407/SignInfinityModules.java','repairs/infinity-final-closure-2103407/ORIGINAL-INFINITY-PUBLIC-KEY.pem']:
             original=subprocess.check_output(['git','show','776e2e4:'+path])
@@ -65,7 +80,7 @@ jobs:
           (out/'WORKFLOW-POLICY-INVENTORY.json').write_text(json.dumps({'unknown_active_workflows':unknown,'sole_original_signer':policy['sole_original_key_workflow_id']},indent=2)+'\n')
           print(json.dumps({'unreviewed_active_workflows':unknown}))
           PY
-          python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out final-preflight/SIGNER-ROUTES.json
+          python3 repairs/dual-experience-isolation-2103420/signer_policy.py retire --out final-preflight/SIGNER-ROUTES.json
       - name: Audit unused exact candidate and forward-recovery version codes
         run: python3 repairs/infinity-final-release-462-20261107/prepare_release.py versions final-preflight/VERSION-AVAILABILITY.json
       - uses: actions/upload-artifact@v4

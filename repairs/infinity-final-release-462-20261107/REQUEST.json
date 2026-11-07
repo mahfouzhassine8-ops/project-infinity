@@ -7,11 +7,18 @@
   "parent_Android_qualification_run": 42423578286,
   "corrected_Search_host_run": 42422768029,
   "publication": false,
-  "preparation_request_revision": 2,
+  "preparation_request_revision": 3,
   "retained_failure": {
     "run": 42425056628,
     "reason": "Text-preservation guard matched its own quoted marker before the actual unchanged job header",
     "correction": "Compare the suffix from an exact YAML job-header line; original signer job definitions remain byte-identical",
+    "keys_accessed": false
+  },
+  "signer_policy_review": "Ten exact new audit/build workflows reviewed; eight have no original-key access, two completed public-certificate-only audits are retired through unchanged existing policy helper. Original sole signing workflow and implementations preserved.",
+  "retained_policy_refusal": {
+    "run": 42425156018,
+    "artifact": 13595033374,
+    "reason": "UNREVIEWED_NEW_WORKFLOW",
     "keys_accessed": false
   }
 }
