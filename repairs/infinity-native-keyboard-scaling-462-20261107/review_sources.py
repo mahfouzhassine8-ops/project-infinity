@@ -1,6 +1,6 @@
 """Source-matched native ownership review only. No original diagnostics or app execution."""
 from pathlib import Path
-import hashlib,importlib.util,json,os,shutil,subprocess,sys
+import hashlib,importlib.util,json,os,shutil,subprocess,sys,tarfile
 ROOT=Path(__file__).resolve().parents[2]
 HERE=Path(__file__).resolve().parent
 OUT=ROOT/'native-ownership-review'
@@ -23,8 +23,13 @@ def metadata():
  assert names and all(n==WORKFLOW or n.startswith(PREFIX) for n in names),names
  request=json.loads((HERE/'REVIEW-REQUEST.json').read_text())
  assert request['source_base']==BASE and request['native_changes'] is False
+ stage=request.get('stage','restore-review')
+ assert stage in ('restore-review','review-callbacks')
+ if os.environ.get('GITHUB_OUTPUT'):
+  with open(os.environ['GITHUB_OUTPUT'],'a') as f:f.write('stage='+stage+'\n')
+ assets=ASSETS if stage=='restore-review' else [ASSETS[0],(13571276665,42364232328,886694,'9cd229acfcf0c8bd30b52ed083fa77ab640888fc04950a1e85f11465c79999c7')]
  evidence=[]
- for aid,run,size,digest in ASSETS:
+ for aid,run,size,digest in assets:
   row=json.loads(subprocess.check_output(['gh','api',f'repos/mahfouzhassine8-ops/project-infinity/actions/artifacts/{aid}'],text=True))
   assert row['id']==aid and row['workflow_run']['id']==run and row['size_in_bytes']==size
   assert row['digest']=='sha256:'+digest and row['expired'] is False
@@ -66,6 +71,55 @@ def restore_review():
       native_patch=False,compilation='NOT_RUN',Android='NOT_RUN',shutdown='NOT_RUN',signing=False,APK=False,
       causal_keyboard_fix='NOT_PROVEN',causal_scaling_fix='NOT_PROVEN'))
  print('PASS exact9411-file APK462 source binding; selected native ownership source exposed; no fix or runtime acceptance claimed')
+
+def review_callbacks():
+ prior=ROOT/'previous-review'
+ proof=json.loads((prior/'EXACT462-SOURCE-REVIEW.json').read_text())
+ assert proof['source']=='a6902706d6db77335516990956791c128acb07fc'
+ assert proof['status']=='PASS_EXACT_9411_FILE_MAP' and proof['native_map_sha256']==MAP_SHA
+ assert sha(prior/'NATIVE-SOURCE-MAP.json')==MAP_SHA
+ expected=json.loads((prior/'NATIVE-SOURCE-MAP.json').read_text())
+ assert sha(ROOT/'verified-inputs/verified-p0-native-source.tar.gz')=='b147411ef39a5a76250bc17ca41907866f5df684faa9397c84a3ce99c50ac213'
+ wanted=['xbmc/platform/android/activity/AndroidKeyboard.cpp','xbmc/platform/android/activity/AndroidKeyboard.h',
+         'xbmc/guilib/GUIWindowManager.cpp','xbmc/guilib/GUIWindowManager.h',
+         'xbmc/guilib/GUIKeyboard.cpp','xbmc/guilib/GUIKeyboard.h',
+         'xbmc/guilib/GUIWindow.cpp','xbmc/windowing/GraphicContext.cpp',
+         'xbmc/dialogs/GUIDialogKeyboardTouch.h']
+ extracted={}
+ with tarfile.open(ROOT/'verified-inputs/verified-p0-native-source.tar.gz','r:gz') as archive:
+  for member in archive:
+   name=member.name.removeprefix('./')
+   if name in wanted:
+    assert member.isfile() and member.size<512*1024
+    raw=archive.extractfile(member).read()
+    if hashlib.sha256(raw).hexdigest()==expected[name]:extracted[name]=raw
+ for name in wanted:
+  if name not in extracted:
+   p=prior/'sources'/name
+   assert p.is_file() and sha(p)==expected[name], 'MISSING_OR_DIFFERENT_SOURCE:'+name
+   extracted[name]=p.read_bytes()
+ for name,raw in extracted.items():
+  target=OUT/'sources'/name;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(raw)
+  assert sha(target)==expected[name]
+  print('SOURCE_BEGIN '+name+' sha256='+expected[name])
+  lines=raw.decode().splitlines()
+  if name.endswith(('GUIWindowManager.cpp','GUIWindow.cpp','GraphicContext.cpp')):
+   selected=set()
+   markers={'GUIWindowManager.cpp':('::SendMessage(', '::ProcessRenderLoop(', '::Render('),
+            'GUIWindow.cpp':('::OnMouseAction(', 'case GUI_MSG_GESTURE_NOTIFY'),
+            'GraphicContext.cpp':('::SetOrigin(', '::RestoreOrigin(', '::SetScalingResolution(', '::SetRenderingResolution(')}
+   for i,line in enumerate(lines):
+    if any(m in line for m in markers[Path(name).name]):
+     for j in range(max(0,i-2),min(len(lines),i+75)):selected.add(j)
+  else:selected=range(len(lines))
+  for i in sorted(selected):print(f'{i+1:04d}: {lines[i]}')
+  print('SOURCE_END '+name)
+ save('CALLBACK-SOURCE-BINDING.json',dict(status='PASS_SELECTED_SOURCES_MATCH_REUSED_EXACT462_MAP',
+      reused_full_map_run=42364232328,reused_full_map_artifact=13571276665,
+      source=os.environ['GITHUB_SHA'],selected_sources={n:expected[n] for n in wanted},
+      native_patch=False,compilation='NOT_RUN',Android='NOT_RUN',signing=False,APK=False))
+ print('PASS callback/locking source binding; reused9411-file proof; no unchanged tests or symbolication repeated')
+
 if __name__=='__main__':
  mode=sys.argv[1]
- {'metadata':metadata,'restore-review':restore_review}[mode]()
+ {'metadata':metadata,'restore-review':restore_review,'review-callbacks':review_callbacks}[mode]()
