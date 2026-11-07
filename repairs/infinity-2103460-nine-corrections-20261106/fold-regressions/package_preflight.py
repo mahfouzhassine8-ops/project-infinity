@@ -98,7 +98,7 @@ def prepare(p,apk,out):
             (addons/rel).write_bytes((p.ROOT/source).read_bytes());changes[rel]=p.sha(addons/rel)
     assert len(changes)==6,'EXACT_SIX_REMAINING_RUNTIME_FILES'
     candidate_number=int(p.SKIN_VERSION.rsplit('.',1)[1])
-    assert candidate_number==266,'EXACT_REVIEWED_FORWARD_GENERATION'
+    assert candidate_number==268,'EXACT_REVIEWED_FORWARD_GENERATION'
     for base,number in ((addons,candidate_number),(recovery,candidate_number+1)):
         skin=base/p.SKIN;xml=skin/'addon.xml';raw=xml.read_bytes()
         assert b'version="1.0.5.262"' in raw
@@ -128,7 +128,7 @@ def prepare(p,apk,out):
         seed_apk_path=str(Path(apk).resolve()),
         device_APK=2103462,device_identity='USER_CONFIRMED',functional_reference='authenticated skin262 and CC61 artifact13495017909',
         predecessor_artifact_sha256=PREVIOUS_SHA,commandcenter_version=p.VERSION,skin_version=p.SKIN_VERSION,
-        recovery_skin_version='1.0.5.267',changes=changes,protected=protected,module_file_count=78,
+        recovery_skin_version='1.0.5.269',changes=changes,protected=protected,module_file_count=78,
         old_module_manifest_sha256=protected[p.CC+'/'+p.module_bundle.MANIFEST],
         Downloads_native_required_sha256='fadfb1a08e3d125958a77d393c1d66453ec3e9c91aac3349ec5806c67c17694d',
         native_changed=False,APK_produced=False,Android='NOT_RUN',all_nine_complete=False,
