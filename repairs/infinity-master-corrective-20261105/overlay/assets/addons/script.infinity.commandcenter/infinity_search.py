@@ -377,13 +377,31 @@ def _provider_result(provider,query,home,cancel,progress=None):
             after_response={};after_cache={}
             current_signature=_query_signature(provider,path,home,components=after_cache)
             current_response_signature=_query_signature(provider,path,home,response=True,components=after_response)
-        if (response_signature is None or
-                current_response_signature != response_signature or
+        # A completed, fresh Files.GetDirectory reply belongs to the verified
+        # native provider that just executed the request. Its settings file may
+        # have been saved by that provider while searching (history, timing,
+        # metadata, or even its own configuration decisions). Those mutations
+        # are NOT proof that the native reply is invalid. Keep source, enabled,
+        # dependency, manifest, profile, route and all native lease checks.
+        #
+        # Different rule for a cache HIT: the cached reply is not provider-owned
+        # by this invocation and must still match the whole settings generation.
+        changed_response = {name for name in before_response.keys() | after_response.keys()
+                            if before_response.get(name) != after_response.get(name)}
+        settings_only_drift = (
+            hit is None and response_signature is not None and
+            current_response_signature is not None and bool(changed_response) and
+            changed_response <= {'provider_settings_metadata',
+                                 'dependency_settings_metadata'})
+        if (response_signature is None or current_response_signature is None or
+                (current_response_signature != response_signature and not settings_only_drift) or
                 (hit is not None and current_signature != signature)):
             _state_rejection_trace(provider,status,answer,hit is not None,before_response,after_response,before_cache,after_cache)
             return provider,'state_changed',{},path
-        # Never transplant a response into a different cache generation.
-        if hit is None and signature is not None and current_signature == signature:
+        # Never transplant a native answer into a different cache generation;
+        # a settings-mutating request may DISPLAY fresh rows, not cache them.
+        if (hit is None and not settings_only_drift and
+                signature is not None and current_signature == signature):
             _remember_query_answer(home,cache_key,cache,signature,answer,time.monotonic())
         return provider,status,answer,path
     except (OSError,ValueError,RuntimeError,KeyError,TypeError):
