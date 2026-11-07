@@ -243,6 +243,7 @@ class Candidate(unittest.TestCase):
                  'repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/UNIFIED-NATIVE-SEARCH-CANDIDATE.md',
                  'repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/test_native_owned_response_policy.py',
                  'repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/NATIVE-OWNED-RESPONSE-POLICY.md',
+                 'repairs/infinity-2103460-nine-corrections-20261106/fold-regressions/SEARCH-CONSISTENCY-NATIVE-CONTRACT-20261107.md',
                  '.github/workflows/infinity-native-owned-response-candidate-20261107.yml'}
         self.assertTrue(names <= allowed, names-allowed)
 
