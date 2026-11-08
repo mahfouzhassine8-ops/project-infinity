@@ -75,9 +75,14 @@ def stage(parent,candidate,recovery,current,sdk,out,identity_only=False):
             if dep.get('optional')=='true' or name in seen:continue
             require(name in known,'SEPARATELY_PINNED_DEPENDENCY_REQUIRED:'+name);pending.append(known[name])
     qa=addons/'script.infinity.finalreleaseqa';qa.mkdir()
-    (qa/'addon.xml').write_text('<addon id="script.infinity.finalreleaseqa" name="Disposable final release QA" version="1.0.0" provider-name="Infinity engineering"><requires><import addon="xbmc.python" version="3.0.0"/></requires><extension point="xbmc.python.script" library="qa.py"/><extension point="xbmc.python.pluginsource" library="qa.py"><provides>video</provides></extension><extension point="xbmc.addon.metadata"><summary lang="en">Disposable fixed test actions and generated clip only</summary><platform>all</platform></extension></addon>')
+    (qa/'addon.xml').write_text('<addon id="script.infinity.finalreleaseqa" name="Disposable final release QA" version="1.0.0" provider-name="Infinity engineering"><requires><import addon="xbmc.python" version="3.0.0"/></requires><extension point="xbmc.python.script" library="qa.py"/><extension point="xbmc.addon.metadata"><summary lang="en">Disposable fixed test observer only</summary><platform>all</platform></extension></addon>')
     shutil.copyfile(HERE/'android_qa.py',qa/'qa.py')
     shutil.copyfile(ROOT/'repairs/save-later-multiimage-20261023/android_runtime_checks.py',qa/'android_runtime_checks.py')
+    # RunAddon prioritizes pluginsource over script. Keep the observer script
+    # separate so ExecuteAddon starts it even while first-use notices exist.
+    clip=addons/'plugin.video.infinity.finalreleaseqaclip';clip.mkdir()
+    (clip/'addon.xml').write_text('<addon id="plugin.video.infinity.finalreleaseqaclip" name="Disposable generated clip" version="1.0.0" provider-name="Infinity engineering"><requires><import addon="xbmc.python" version="3.0.0"/></requires><extension point="xbmc.python.pluginsource" library="qa.py"><provides>video</provides></extension><extension point="xbmc.addon.metadata"><summary lang="en">Generated gray clip for selected controls only</summary><platform>all</platform></extension></addon>')
+    shutil.copyfile(HERE/'android_qa.py',clip/'qa.py')
     profile=home/'userdata';profile.mkdir()
     (profile/'guisettings.xml').write_text('<settings version="2"><setting id="lookandfeel.skin">skin.infinity.diggz</setting><setting id="general.addonupdates">2</setting></settings>')
     (profile/'release-data-sentinel.txt').write_bytes(b'preserve-disposable-preupdate-data-464465-v1')

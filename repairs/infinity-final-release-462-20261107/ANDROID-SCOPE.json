@@ -100,7 +100,7 @@
   },
   "native_search_query_cache": "Eight distinct queries on a fresh fixture avoid reusing a previous query result; no cache purge or provider modifications",
   "original_dependencies": "ANDROID-EXTRA-INPUT-PINS.json records unchanged official archives and exact seven packaged binary API matches; no provider/addon.xml edit",
-  "fixture_setup_revision": 5,
+  "fixture_setup_revision": 6,
   "retained_fixture_ownership_failure": {
     "run": 42430438984,
     "source": "96d74a0cb5d888cb421a23c18714e43420f9769c",
@@ -126,5 +126,16 @@
     "recovery_execution": "NOT_RUN",
     "Search_or_UI_cases_passed": 0
   },
-  "OS_first_use": "Reuse existing pure immersive_prompt.locate helper only; no Preview/Cobra application tests, no OS compatibility override, no unknown-dialog dismissal"
+  "OS_first_use": "Reuse existing pure immersive_prompt.locate helper only; no Preview/Cobra application tests, no OS compatibility override, no unknown-dialog dismissal",
+  "retained_observer_dispatch_failure": {
+    "run": 42432919100,
+    "source": "4dddd3d73ff764231e61fc425cdcddc052fb1e0d",
+    "artifact": 13598746224,
+    "artifact_sha256": "37ad7a572cf0b249a2d2998c5ef82d69032f6c4182675a50e51ffe2f0e9dd57d",
+    "failure": "Normal parent launch/native RPC and file observation work. Combined script/pluginsource QA addon is dispatched by RunAddon as a video directory; the visible provider modal prevents directory activation. No observer invocation or ready file; candidate not executed.",
+    "correction": "Separate script-only observer and clip-only plugin IDs in disposable fixture; signed APKs and provider archives unchanged. Require reported script type before observer execution.",
+    "candidate_execution": "NOT_RUN",
+    "recovery_execution": "NOT_RUN",
+    "Search_or_UI_cases_passed": 0
+  }
 }

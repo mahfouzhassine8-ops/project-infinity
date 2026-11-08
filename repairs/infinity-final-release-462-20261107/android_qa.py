@@ -87,7 +87,7 @@ def action(request,root):
         until(lambda:xbmcgui.getCurrentWindowId()==10025,'native Videos Files')
         xbmc.sleep(1000);return snapshot()
     if kind=='info':
-        target='plugin://'+QA+'/?action=clip-list'
+        target='plugin://plugin.video.infinity.finalreleaseqaclip/?action=clip-list'
         xbmc.executebuiltin('ActivateWindow(Videos,"'+target+'",return)')
         until(lambda:xbmc.getInfoLabel('Container.FolderPath')==target and int(xbmc.getInfoLabel('Container.NumItems') or 0)>0,'generated local-clip list')
         xbmc.executebuiltin('Container.SetViewMode(50)',True)

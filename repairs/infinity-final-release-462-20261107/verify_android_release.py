@@ -103,8 +103,10 @@ class Device:
         self.alive();self.sequence=0
         return dict(pid=self.pid,entry='Original Splash and original Infinity card/default admission',chooser_tap=tapped)
     def start_qa(self):
-        addon=self.rpc('Addons.GetAddonDetails',dict(addonid=QA,properties=['enabled']))['addon']
-        if not addon['enabled']:assert self.rpc('Addons.SetAddonEnabled',dict(addonid=QA,enabled=True))=='OK'
+        for aid in (QA,'plugin.video.infinity.finalreleaseqaclip'):
+            addon=self.rpc('Addons.GetAddonDetails',dict(addonid=aid,properties=['enabled']))['addon']
+            if not addon['enabled']:assert self.rpc('Addons.SetAddonEnabled',dict(addonid=aid,enabled=True))=='OK'
+        assert self.rpc('Addons.GetAddonDetails',dict(addonid=QA))['addon']['type']=='xbmc.python.script','OBSERVER_MUST_BE_SCRIPT_ONLY'
         assert self.rpc('Addons.ExecuteAddon',dict(addonid=QA))=='OK'
         self.until(lambda:self.read_json(QAROOT+'/ready.json').get('pid')==self.pid,'fresh QA observer',90)
         self.dismiss_immersive_education()
