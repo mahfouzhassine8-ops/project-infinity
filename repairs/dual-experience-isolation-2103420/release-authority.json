@@ -7,11 +7,11 @@
     "bundles": {
       "CHOOSER_SHELL": {
         "approved_source": "ec4d011e1dfd0bec7949e8b442dbde5ee42deabf",
-        "digest": "3dc26c7b91b9c075412ed74bb0ebad3da2479ff7a92d56d7246498c56b8e99a5",
+        "digest": "8cf33d9d31b525c59b884a32298a0c165e581e26f12096e4840fdf643c42248e",
         "file": "CHOOSER_SHELL.zip",
         "settings_schema": "original-launch-preference",
-        "sha256": "dc233114a979510cca87cc241054a23bfcb4df617de8685422445f30ad7ba986",
-        "version": "2103466.chooser_shell.1"
+        "sha256": "f05ce7bff5bc6c83bd056ceb2ccb6307985e41ae202961531566d46fef75ad05",
+        "version": "2103467.chooser_shell.1"
       },
       "COBRA": {
         "approved_source": "73edb4f25b9e25d67cd8e0c41d44e74931f2b8ef",
@@ -23,11 +23,11 @@
       },
       "INFINITY": {
         "approved_source": "ec4d011e1dfd0bec7949e8b442dbde5ee42deabf",
-        "digest": "12c15d7482ca5c1d50db21974352eb8d47156627f77432af439a2c6a3103a10a",
+        "digest": "b0a1bcb00d39b7482d27de367bdb4d416ec20e598782dd038f984342c29210d4",
         "file": "INFINITY.zip",
         "settings_schema": "original-2103420",
-        "sha256": "82e008d6ab995f6f1d0cb569a0ac38107a68272c50ccd07d65380fbd5b12eb28",
-        "version": "2103466.infinity.1"
+        "sha256": "d95ca5221040e92bf977fddc652965530eb906668f23b5cd2d96cf3786ed9bd3",
+        "version": "2103467.infinity.1"
       },
       "MINIMAL_ANDROID_CONTRACT": {
         "approved_source": "a5dcae39a49cf44a341f659969bfbee78ba93986",
@@ -46,7 +46,7 @@
   },
   "bundle_sources": {
     "CHOOSER_SHELL": {
-      "artifact": "Infinity2103466-ThreeCorrections-Prepared-42460784588-INTERNAL",
+      "artifact": "Infinity2103467-ThreeCorrections-Recovery-Prepared-42460784588-INTERNAL",
       "build_source": "ec4d011e1dfd0bec7949e8b442dbde5ee42deabf",
       "path": "components/CHOOSER_SHELL.zip",
       "run_id": 42460784588
@@ -58,7 +58,7 @@
       "run_id": 41349307267
     },
     "INFINITY": {
-      "artifact": "Infinity2103466-ThreeCorrections-Prepared-42460784588-INTERNAL",
+      "artifact": "Infinity2103467-ThreeCorrections-Recovery-Prepared-42460784588-INTERNAL",
       "build_source": "ec4d011e1dfd0bec7949e8b442dbde5ee42deabf",
       "path": "components/INFINITY.zip",
       "run_id": 42460784588
@@ -70,15 +70,15 @@
       "run_id": 41412966100
     }
   },
-  "candidate_versionCode": 2103466,
+  "candidate_versionCode": 2103467,
   "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
   "components": {
     "CHOOSER_SHELL": {
       "approved_source": "ec4d011e1dfd0bec7949e8b442dbde5ee42deabf",
-      "digest": "3dc26c7b91b9c075412ed74bb0ebad3da2479ff7a92d56d7246498c56b8e99a5",
-      "revision": 43,
+      "digest": "8cf33d9d31b525c59b884a32298a0c165e581e26f12096e4840fdf643c42248e",
+      "revision": 44,
       "settings_schema": "original-launch-preference",
-      "version": "2103466.chooser_shell.1"
+      "version": "2103467.chooser_shell.1"
     },
     "COBRA": {
       "approved_source": "73edb4f25b9e25d67cd8e0c41d44e74931f2b8ef",
@@ -89,10 +89,10 @@
     },
     "INFINITY": {
       "approved_source": "ec4d011e1dfd0bec7949e8b442dbde5ee42deabf",
-      "digest": "12c15d7482ca5c1d50db21974352eb8d47156627f77432af439a2c6a3103a10a",
-      "revision": 26,
+      "digest": "b0a1bcb00d39b7482d27de367bdb4d416ec20e598782dd038f984342c29210d4",
+      "revision": 27,
       "settings_schema": "original-2103420",
-      "version": "2103466.infinity.1"
+      "version": "2103467.infinity.1"
     },
     "MINIMAL_ANDROID_CONTRACT": {
       "approved_source": "a5dcae39a49cf44a341f659969bfbee78ba93986",
@@ -104,7 +104,7 @@
   },
   "experience_version_labels": {
     "COBRA": 2103445,
-    "INFINITY": 2103466
+    "INFINITY": 2103467
   },
   "external_player_manifest_exception": {
     "authorization": "repairs/infinity-2103445-standalone-external-player/ASTRA-MASTER-IMPLEMENTATION-BRIEF.md",
@@ -120,9 +120,9 @@
       "repairs/infinity-2103445-standalone-external-player/release_guard.py": "3c80c746931c9723d5a858e83779d369694cdc4e08ec7d688837761c368078b0"
     }
   },
-  "generation": 53,
+  "generation": 54,
   "guard_schema": 2,
-  "last_issued_versionCode": 2103465,
+  "last_issued_versionCode": 2103466,
   "launcher_icon_exception": {
     "added_members": {
       "res/infinity_launcher_light_hdpi.png": "e059b58ec3af72994725510e2e4e518879ed36eb654b050463b3e98d94685f3c",
@@ -171,17 +171,17 @@
     "Android": "PENDING_SELECTED_SEARCH_TRAKT_INSTALL_OVER_AND_RECOVERY",
     "accepted_pointer_updated": false,
     "artifact": {
-      "digest": "sha256:9c27d2cf7a7a9e75f047a2d3204b327b7e024fa7df4f4d2523ee81d1f63d908f",
-      "id": 13609546660,
-      "name": "Infinity2103466-ThreeCorrections-Prepared-42460784588-INTERNAL",
-      "size_in_bytes": 320620369
+      "digest": "sha256:62e6344da6e3903d36ee665b7ec841aad66b4721dd101cbc279381b577749b9b",
+      "id": 13608819053,
+      "name": "Infinity2103467-ThreeCorrections-Recovery-Prepared-42460784588-INTERNAL",
+      "size_in_bytes": 320613005
     },
     "installed_source_evidence_sha256": "e14b1e9c8441e78ce5c930dea8c7a5885053011d531df9ec51377fcb18298b65",
     "module_upgrade_recovery_sha256": "8525416b4336c11e21eb0c547079f44ffcd7faa19adcda99595ecfe91351b253",
-    "native_sha256": "ee3be7c7a95b86f8357539001fcd50bedbd80217b02f130d649f7f57e6075794",
-    "owner": "INFINITY_THREE_SCOPED_CORRECTIONS",
+    "native_sha256": "6fc35b8718621ef2e941540b8c858d7d7cd7f408c810ed2fd0d14f7031e8fbb7",
+    "owner": "INFINITY_THREE_CORRECTIONS_FORWARD_RECOVERY",
     "physical_Fold": "PENDING_ONE_FINAL_OWNER_ACCEPTANCE",
-    "preparation_sha256": "cd05455131913ab3137fae5999d073b8f349fa15fffbd355d157a69c3f598cb7",
+    "preparation_sha256": "b242ff392ceb1e8df7039e53ed12a554d11db7cb96eaab62f6b7f5a212edb216",
     "producer_run": 42460784588,
     "producer_source": "ec4d011e1dfd0bec7949e8b442dbde5ee42deabf",
     "public_release": "BLOCKED_UNTIL_SELECTED_ANDROID_GATES_PASS",
@@ -193,7 +193,7 @@
       "repairs/infinity-final-closure-2103407/module_dex.py": "949a8d50160f901da7477d4f2273f51ec9254b8537ed3b64b461bb021c8fdf70",
       "repairs/infinity-three-corrections-20261108/INSTALLED-SOURCE-CHECKS.json": "a947abfbd51b5b12c1a3df95676c9f42d62e72be93bff2b89c6de1560e4bb94d",
       "repairs/infinity-three-corrections-20261108/PACKAGING-SCOPE.json": "c474d35de7183544e5cbe3597176ebf51da85b5c2cc917aa374deced90a21e1e",
-      "repairs/infinity-three-corrections-20261108/RELEASE-REQUEST.json": "f6a6fb22576b6f8245f76512ef2dd1eb20fe4825667a744dc65fed43421a603d",
+      "repairs/infinity-three-corrections-20261108/RELEASE-REQUEST.json": "723f7c2a565e1ddb05d74ddeda1593ce9a2291d825dc886e72ed5f1a1440198f",
       "repairs/infinity-three-corrections-20261108/admit_preparation.py": "bc4fdb7c95b4c5901063ffe2f08075b18704e5a4459d0bfaf9474f878c977a74",
       "repairs/infinity-three-corrections-20261108/compile_native.py": "d44ea88912edba3ff46e312a6ef44d79f8b77e5a74efda5c9e0c76c321a722d4",
       "repairs/infinity-three-corrections-20261108/evidence/ARM64-LINK-VERIFIED.json": "0b657cb13be1e0a8fbc4343855a68d3d251286f469ed260c2a94fa952e3d98bd",
@@ -41120,11 +41120,11 @@
     },
     "member:assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1": {
       "owner": "INFINITY",
-      "sha256": "91a4154b44d537afd840cd7a8f4c6703e1f8f894aa61d5373daf652e8db60db0"
+      "sha256": "2decb54167db6d01e3070a6b93322480b4f46cd2621f61a28169052eff2fcbb0"
     },
     "member:assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1.sig": {
       "owner": "INFINITY",
-      "sha256": "c744be73619557ae1261a72851d01c4bb2022e6d774a52ebec484e84d8d75b75"
+      "sha256": "b77a8fc4cc14921109a364885a9928332654cdb185df81d83805eaa8938b9e7f"
     },
     "member:assets/addons/script.infinity.commandcenter/INSTALL-BASELINE.v1": {
       "owner": "INFINITY",
@@ -41148,7 +41148,7 @@
     },
     "member:assets/addons/script.infinity.commandcenter/addon.xml": {
       "owner": "INFINITY",
-      "sha256": "e92ce412dbf7e5fd8cddefbafac1dbe2272360f089657674ce4903aeec0ed262"
+      "sha256": "cad7b6059fe800183070113f23fa611fde05b485f5e4ca1456a85da745473646"
     },
     "member:assets/addons/script.infinity.commandcenter/checkpoint_runtime.py": {
       "owner": "INFINITY",
@@ -41320,7 +41320,7 @@
     },
     "member:assets/addons/script.infinity.commandcenter/provider_inventory.py": {
       "owner": "INFINITY",
-      "sha256": "fc0e9aa3d1592c720a2fcd1ce9fdc3fe1b2ec8619c5a117cf92df273f5a262d0"
+      "sha256": "d9b51790c737f9cfa013806c6bf287ab37bd17cb798644ab0aaaf31ea37ae3e2"
     },
     "member:assets/addons/script.infinity.commandcenter/resources/settings.xml": {
       "owner": "INFINITY",
@@ -42660,7 +42660,7 @@
     },
     "member:assets/addons/script.module.tmdbhelper.sync.trakt/addon.xml": {
       "owner": "INFINITY",
-      "sha256": "0a90665833805e06a3b72ed799f30bfae7e650dcfc2c83c34687f89632a5957e"
+      "sha256": "aaf6617b3a68f5f2735a42bbe877e8fb2717cdeec6be062a73d0206a88b1f1ce"
     },
     "member:assets/addons/script.module.tmdbhelper.sync.trakt/resources/fanart.jpg": {
       "owner": "INFINITY",
@@ -42972,7 +42972,7 @@
     },
     "member:assets/addons/script.module.tmdbhelper.sync.trakt/resources/lib/tmdbhelper_sync_trakt/api/authenticator.py": {
       "owner": "INFINITY",
-      "sha256": "b3b36007a3d05252ddd99d95ff63b8734f6b3d27349382d394c4ac38d4931adb"
+      "sha256": "0f65df4f727927d34daa820a983b5dfb9838c1fbb1fe13d4deedf172ef5afcab"
     },
     "member:assets/addons/script.module.tmdbhelper.sync.trakt/resources/lib/tmdbhelper_sync_trakt/api/consts.py": {
       "owner": "INFINITY",
@@ -43000,7 +43000,7 @@
     },
     "member:assets/addons/script.module.tmdbhelper.sync.trakt/resources/lib/tmdbhelper_sync_trakt/api/token.py": {
       "owner": "INFINITY",
-      "sha256": "7fe82522b4faf2365f438f4f8a68eda07489d1887ae25bcbca3304e1bcb874ff"
+      "sha256": "08e98239ef6f3ed78e174c23503d0187f9ff73fd80295ace0017e683c86bd1e1"
     },
     "member:assets/addons/script.module.tmdbhelper.sync.trakt/resources/lib/tmdbhelper_sync_trakt/calendar.py": {
       "owner": "INFINITY",
@@ -58688,7 +58688,7 @@
     },
     "member:assets/experience-component-updates.properties": {
       "owner": "CHOOSER_SHELL",
-      "sha256": "b9629401a580276396e99c475908aff843cc8b14774dc57dc27f2d41649f5253"
+      "sha256": "73e73749626ad2c5ce7e29ea0b2eced4e7226472b7cdcc2c8be26d3bb3e393da"
     },
     "member:assets/infinity-2103395-components.json": {
       "owner": "INFINITY",
@@ -67280,7 +67280,7 @@
     },
     "member:lib/arm64-v8a/libkodi.so": {
       "owner": "INFINITY",
-      "sha256": "ee3be7c7a95b86f8357539001fcd50bedbd80217b02f130d649f7f57e6075794"
+      "sha256": "6fc35b8718621ef2e941540b8c858d7d7cd7f408c810ed2fd0d14f7031e8fbb7"
     },
     "member:lib/arm64-v8a/libshairplay.so": {
       "owner": "INFINITY",
@@ -67592,7 +67592,7 @@
     "root": "CobraCardsTheme",
     "source_sha256": "58bd661ed94a2a949b459bab470c095bfb48d6d84d1e3fddc178f8ea21851864"
   },
-  "previous_authority_sha256": "6b1916377ffd46293c803e7562b33e5a18be49e69ff04b647565ccbc3f4459ef",
+  "previous_authority_sha256": "fc15f7ce66335b35f2f6fe6be915203849471bec7776eec55f44019e90102677",
   "proofs": {
     "COMBINATION-CONTROLS.json": "bcb21adb63fefb898a8e8799d9892f76e382315518d8e94b51c42060cc5ece83",
     "OWNER-CONTRACT.json": "dd0fdfdcb7715777007984969bfac45b36f3e4ef04023b5ba1884c67904d0846",
