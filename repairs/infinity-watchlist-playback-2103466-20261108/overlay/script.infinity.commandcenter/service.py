@@ -827,6 +827,10 @@ class InfinityPlayer(xbmc.Player):
             return
         actual_item = _continue_player_item(player_id)
         item = _continue_identity(actual_item)
+        if item and actual_item.get('infinity_watchlist_origin'):
+            from saved_playback import admit
+            item = admit(self.profile, actual_item, item)
+        watchlist_origin = item.pop('_watchlist_origin', None) if item else None
         # This is the existing playback-start path, not another poll/worker.
         # A pending recovery may be saved only when its resolved item really starts.
         if _prop('Infinity.SavedNavigation.Pending', ''):
@@ -844,7 +848,39 @@ class InfinityPlayer(xbmc.Player):
         self.cw_last_save = 0.0
         if self.experience:
             self.experience.on_started()
+        if watchlist_origin:
+            self._resume_watchlist(player_id, actual_item, watchlist_origin)
         log('Continue Watching armed for ' + item.get('label', 'video'))
+
+    def _resume_watchlist(self, player_id, actual, origin):
+        """Reuse the player SDK only after a proven Watchlist item actually starts."""
+        try:
+            import math
+            from saved_playback import profile_root
+            if not setting_bool('continue_watching_enabled', True) or not self.isPlayingVideo():
+                return
+            if origin.get('profile') != profile_root():
+                return
+            # Refresh exact progress after resolver completion, never another
+            # episode's series-card offset or the render-time ListItem snapshot.
+            progress = hub.watchlist_progress(hub.load_view(self.profile), self.cw_item)
+            position = float(progress.get('position')) if progress else 0.0
+            total = float(self.getTotalTime())
+            if not (math.isfinite(position) and position >= 0 and math.isfinite(total) and total > 0 and position < total * .95):
+                return
+            current = _continue_player_item(player_id)
+            receipt = current.get('infinity_watchlist_origin') or {}
+            if (receipt.get('token') != origin.get('token') or receipt.get('key') != origin.get('key') or
+                    receipt.get('destination') != origin.get('destination') or receipt.get('profile') != origin.get('profile') or
+                    current.get('type') != actual.get('type') or current.get('uniqueid') != actual.get('uniqueid') or
+                    (current.get('season'), current.get('episode')) != (actual.get('season'), actual.get('episode')) or
+                    not actual.get('file') or current.get('file') != actual.get('file') or
+                    self.getPlayingFile() != actual.get('file') or not self.isPlayingVideo() or
+                    xbmc.getSkinDir() != 'skin.infinity.diggz'):
+                return
+            self.seekTime(position)
+        except (AttributeError, TypeError, ValueError, RuntimeError, OverflowError):
+            return  # An unavailable seek preserves baseline playback.
 
     @_serialized_progress
     def persist_continue(self, completed=False, force=False, immediate=False):

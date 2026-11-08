@@ -13,6 +13,7 @@ import tempfile
 import types
 import unittest
 from contextlib import nullcontext
+from urllib.parse import urlencode
 
 HERE = Path(__file__).resolve().parent
 BASE = Path('/workspace/scratch/infinity-watchlist-2103466/assets/addons/script.infinity.commandcenter')
@@ -22,14 +23,21 @@ OVERLAY = HERE / 'overlay/script.infinity.commandcenter'
 def load_hub():
     common = types.ModuleType('common')
     common.persistence_scope = nullcontext
+    common.setting_bool = lambda *args: True
     common.read_json = lambda path, default: json.loads(path.read_text()) if path.exists() else default
     common.atomic_json = lambda path, data: path.write_text(json.dumps(data))
     sys.modules['common'] = common
-    sys.modules['xbmc'] = types.SimpleNamespace(log=lambda *args: None)
+    sys.modules['xbmc'] = types.SimpleNamespace(log=lambda *args: None, getSkinDir=lambda: 'skin.infinity.diggz')
+    sys.modules['xbmcaddon'] = types.SimpleNamespace(Addon=lambda provider: (_ for _ in ()).throw(RuntimeError('Not installed')))
+    sys.modules['xbmcgui'] = types.SimpleNamespace()
+    sys.modules['xbmcvfs'] = types.SimpleNamespace(translatePath=lambda path: '/testprofile' if path == 'special://profile' else path)
     sys.path.insert(0, str(BASE))
+    sys.path.insert(0, str(OVERLAY))
     spec = importlib.util.spec_from_file_location('watchlist_test_hub', OVERLAY / 'resume_hub.py')
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
+    sys.modules['resume_hub'] = module
+    sys.modules.pop('saved_playback', None)
     return module
 
 
@@ -188,6 +196,7 @@ class WatchlistProgress(unittest.TestCase):
                 self.properties = {}
                 self.kwargs = kwargs
             def setProperty(self, name, value): self.properties[name] = value
+            def setPath(self, value): self.kwargs['path'] = value
             def setInfo(self, *args): pass
             def setUniqueIDs(self, *args): pass
             def setArt(self, *args): pass
@@ -196,10 +205,10 @@ class WatchlistProgress(unittest.TestCase):
         sys.modules['selection_contract'] = types.SimpleNamespace(publish=lambda *args: None)
         tree = ast.parse((OVERLAY / 'plugin.py').read_text())
         methods = [node for node in tree.body if isinstance(node, ast.FunctionDef) and
-                   node.name in ('_apply_identity', '_list_item')]
+                   node.name in ('_apply_identity', '_list_item', '_watchlist_target')]
         env = {'hub': self.hub, 'number': lambda value: float(value or 0),
                'navigation_target': lambda entry, *args: entry['source'],
-               '_url': lambda **kwargs: 'unavailable', '_context': lambda *args: [],
+               '_url': lambda **kwargs: 'plugin://script.infinity.commandcenter/?' + urlencode(kwargs), '_context': lambda *args: [],
                'artwork': lambda value, *args: value,
                'xbmcgui': types.SimpleNamespace(ListItem=ListItem)}
         exec(compile(ast.Module(body=methods, type_ignores=[]), 'actual-watchlist-list-item', 'exec'), env)
@@ -207,7 +216,8 @@ class WatchlistProgress(unittest.TestCase):
         actual = self.item(self.row('actual', {'tmdb': '603'}, position=456))
         render = {'tier': 'standard', 'watched_data': self.data, 'watched_flags': {saved['key']: False}}
         target, item = env['_list_item'](saved, self.data, 'watchlist', render=render)
-        self.assertEqual(target, saved['source'])
+        self.assertIn('action=watchlist-play', target)
+        self.assertEqual(item.properties['Infinity.Watchlist.Destination'], saved['source'])
         self.assertEqual(item.properties['StartOffset'], '456.0')
         self.assertEqual(item.properties['Infinity.ResumeHub.Key'], saved['key'])
         self.assertEqual(saved['position'], 0)

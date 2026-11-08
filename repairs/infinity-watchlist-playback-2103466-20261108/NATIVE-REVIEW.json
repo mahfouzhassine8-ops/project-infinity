@@ -6,6 +6,17 @@
     "One-use TLS directory permit is armed only by actual selected folder and consumed by PrepareNext; cached and fresh Update share generation checks",
     "No new state-mutex call-outs or lock inversion found in targeted correction"
   ],
+  "final_header_delta_review": {
+    "changes_reviewed": [
+      "WatchResultScope constructor is noexcept; masks previous TLS before path assignment, catches allocation failure, restores previous pointer in destructor",
+      "MovieAttempt newly added previous Watchlist TLS optional is transferred and restored by move rather than copy"
+    ],
+    "previous_sha256": "e88142a6f1448a7f052e7fdd8f26d5c63c07c395d36f4c9e9f659c7a90f21008",
+    "scope": "Only final constructor/destructor exception-containment delta reread; no protocol or broader architecture review repeated",
+    "sha256": "0f574675c1339eca52b372b91e18ce2b255283ee020a39e44c83295d7b156092",
+    "status": "ACCEPTABLE_SOURCE_ONLY_DELTA",
+    "tests_executed_by_reviewer": false
+  },
   "findings": [],
   "initial_findings": [
     {
@@ -54,7 +65,7 @@
   "scope": "Targeted read-only review of six native overlays; no tests/build/runtime executed",
   "source_sha256": {
     "xbmc/filesystem/PluginDirectory.cpp": "d36a14db6752babcc1f72b86e9537faeb4d6f14b990c56f81a7952cb71655c4a",
-    "xbmc/guilib/InfinitySavedNavigation.h": "e88142a6f1448a7f052e7fdd8f26d5c63c07c395d36f4c9e9f659c7a90f21008",
+    "xbmc/guilib/InfinitySavedNavigation.h": "0f574675c1339eca52b372b91e18ce2b255283ee020a39e44c83295d7b156092",
     "xbmc/guilib/InfinitySavedNavigationState.h": "7885116d5c9b869cea813f0ad34dc240efecd1cf1e05913c916d7a9e0a4aebbe",
     "xbmc/interfaces/generic/ScriptInvocationManager.cpp": "eb46c1df3a4e8a249e7b00cbcbf50c91b16a822e6b323e523f19098e388ffd20",
     "xbmc/interfaces/json-rpc/PlayerOperations.cpp": "adc78b8aba4f81393f56e8d83459ddf4ad14d1f662d12c246853ee21b2068824",

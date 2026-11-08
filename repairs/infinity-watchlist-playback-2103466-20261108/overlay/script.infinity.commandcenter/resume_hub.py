@@ -720,7 +720,9 @@ def _watchlist_progress_identity(data, entry, key):
     canonical = presentation(entry, raw_identity(entry), _dict(data.get(PROOFS)).get(key))
     if canonical and canonical.get('scope') == 'show_episode':
         return media_identity('tv', {}, entry.get('season'), entry.get('episode'), canonical['ids'])
-    return identity
+    from saved_playback import saved_identity
+    current = saved_identity(entry)
+    return current if current and current.get('scope') != identity.get('scope') else identity
 
 
 def watchlist_progress(data, saved):

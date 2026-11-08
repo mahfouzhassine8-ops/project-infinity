@@ -22,6 +22,11 @@ destination. It reselects current exact progress at dispatch and forwards the
 original provider target. A fresh compact ASCII JSON descriptor is stored both
 on Home and that exact playback item as `Infinity.Watchlist.Launch`: schema 1,
 fresh UUID-hex `token`, `profile`, `key`, `selection`, `destination`, `epoch_ms`.
+It also carries fresh finite nonnegative `resume` and integer `resume_revision`.
+Native transfers these as evidence only and does not override provider offsets.
+Existing InfinityPlayer rechecks current exact progress and actual item after AV
+start before its scoped seek. Pending/active native receipts have a five-minute
+bound; Python consumes them only at arming and immediate seek revalidation.
 Direct wrapper dispatch additionally includes the consumed native
 `selected_token`. Explicit popup/Information Play mints this descriptor only
 after confirmed first-party Play and the existing fresh selected-row check.

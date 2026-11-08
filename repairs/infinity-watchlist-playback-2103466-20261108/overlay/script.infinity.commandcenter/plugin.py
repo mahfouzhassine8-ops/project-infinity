@@ -252,6 +252,57 @@ def recover_entry(key, bucket='later', token='', resume_offset=0):
                          item_builder=_list_item, resume_offset=resume_offset)
 
 
+def _watchlist_target(entry, data, render=None):
+    target = navigation_target(entry, data, 'watchlist', render)
+    if not target.startswith('plugin://script.infinity.commandcenter/?action=saved-recovery&'):
+        return target
+    from saved_playback import supported_target
+    candidate = supported_target(entry)
+    if not candidate:
+        return target
+    # A newly reviewed current emitter does not override recorded user recovery
+    # choices or retry a route already known to have failed.
+    from saved_navigation import remembered
+    record = remembered(data, hub.entry_identity(entry))
+    if record and (record.get('route') or record.get('failed_routes')):
+        return target
+    return candidate
+
+
+def play_watchlist(key, selected_token='', expected_selection=''):
+    """Fresh explicit first-party dispatch; rendering never mints launch intent."""
+    if xbmc.getSkinDir() != 'skin.infinity.diggz' or not hub.KEY_RE.fullmatch(str(key)):
+        return False
+    data = hub.load_view(PROFILE)
+    entry = data.get('watchlist', {}).get(key)
+    if not isinstance(entry, dict):
+        return False
+    entry = dict(entry, key=key)
+    if (hub.entry_identity(entry) or {}).get('kind') not in ('movie', 'episode'):
+        return False
+    from selection_contract import matches
+    if expected_selection and not matches(expected_selection, entry, 'watchlist'):
+        return False
+    destination = _watchlist_target(entry, data)
+    if not destination:
+        return False
+    home = xbmcgui.Window(10000)
+    from saved_playback import launch, selected_matches
+    # A URL invoked without actual native selection is never first-party intent.
+    if not expected_selection and not selected_matches(home, selected_token, entry, destination):
+        return False
+    progress = hub.watchlist_progress(data, entry)
+    if destination.startswith('plugin://script.infinity.commandcenter/?action=saved-recovery&'):
+        recover_entry(key, 'watchlist', resume_offset=number(progress.get('position')) if progress else 0)
+        return True
+    _, item = _list_item(entry, data, 'watchlist')
+    item.setPath(destination)
+    if not launch(home, item, entry, destination, selected_token, progress):
+        return False
+    xbmc.Player().play(destination, item)
+    return True
+
+
 def _mutate_url(op, key, list_name=''):
     params = {'action': 'mutate', 'op': op, 'key': key}
     if list_name:
@@ -538,6 +589,9 @@ def show_item_menu(key, bucket='continue', list_name='', incoming=None, expected
         current = refreshed
         if not _menu_play_available(current, current_data, bucket):
             return False
+        if bucket == 'watchlist' and (hub.entry_identity(current) or {}).get('kind') in ('movie', 'episode'):
+            from selection_contract import token
+            return play_watchlist(key, expected_selection=token(current, 'watchlist'))
         watchlist_playable = bucket == 'watchlist' and (
             hub.entry_identity(current) or {}).get('kind') in ('movie', 'episode')
         if incoming is not None and not watchlist_playable:
@@ -595,7 +649,8 @@ def prepare_render(data, values, render=None):
 
 def _list_item(entry, data, bucket='', list_name='', render=None):
     key = str(entry.get('key') or '')
-    target = navigation_target(entry, data, bucket, render)
+    target = (_watchlist_target(entry, data, render) if bucket == 'watchlist' else
+              navigation_target(entry, data, bucket, render))
     if not target:
         target = _url(action='unavailable')
     kind = entry.get('media')
@@ -676,6 +731,10 @@ def _list_item(entry, data, bucket='', list_name='', render=None):
     context = _context(entry, data, bucket, list_name)
     if context:
         li.addContextMenuItems(context)
+    if watchlist_playable and target.startswith('plugin://') and not target.startswith('plugin://script.infinity.commandcenter/'):
+        li.setProperty('Infinity.Watchlist.Destination', target)
+        target = _url(action='watchlist-play', key=key)
+        li.setPath(target)
     return target, li
 
 
@@ -928,6 +987,9 @@ def play_saved(key):
 
 def main():
     action = PARAMS.get('action', 'continue')
+    if action == 'watchlist-play':
+        play_watchlist(PARAMS.get('key', ''), PARAMS.get('token', ''))
+        return
     if action == 'play-local-next':
         if not play_local_next(PARAMS.get('key', '')):
             xbmcplugin.setResolvedUrl(HANDLE, False, xbmcgui.ListItem())

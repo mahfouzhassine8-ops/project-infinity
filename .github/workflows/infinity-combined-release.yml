@@ -10,7 +10,7 @@ on:
         type: choice
         required: true
         default: final-combined
-        options: [final-combined, prepare-preview451, prepare-kodi452, prepare-kodi453, prepare-ui454-455, prepare-controlled456-457, review-controlled456-457, prepare-browser458-459, review-browser458-459, prepare-six460-461, review-six460-461, package-nine-quick-updates, verify-nine-update-recovery, prepare-nine-native462-463, package-umbrella-pov-462, verify-three-native, prepare-three, sign-three, watchlist-verify-native]
+        options: [final-combined, prepare-preview451, prepare-kodi452, prepare-kodi453, prepare-ui454-455, prepare-controlled456-457, review-controlled456-457, prepare-browser458-459, review-browser458-459, prepare-six460-461, review-six460-461, package-nine-quick-updates, verify-nine-update-recovery, prepare-nine-native462-463, package-umbrella-pov-462, verify-three-native, prepare-three, sign-three, watchlist-verify-native, prepare-watchlist]
       prepared_run:
         description: Completed official controlled preparation run for read-only authority review
         type: string
@@ -1667,5 +1667,119 @@ jobs:
             watchlist-native-evidence/*.sh
             watchlist-native-evidence/*.cpp.o
             watchlist-native-evidence/libkodi.so
+          if-no-files-found: warn
+          retention-days: 90
+  prepare-watchlist:
+    name: Watchlist signed modules and unsigned 68/69 preparation; Android acceptance pending
+    if: github.event_name == 'workflow_dispatch' && github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/work/infinity-watchlist-phase-b-20261108' && inputs.operation == 'prepare-watchlist'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    env: {GH_TOKEN: '${{ github.token }}', PYTHONDONTWRITEBYTECODE: '1'}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11', check-latest: false}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '21'}
+      - name: Read the committed exact native artifact request without credentials
+        id: native-input
+        run: |
+          python3 - <<'PY'
+          import json,os
+          from pathlib import Path
+          request=json.loads(Path('repairs/infinity-watchlist-playback-2103466-20261108/NATIVE-INPUT-REQUEST.json').read_text())
+          artifact_id=request['artifact']['id']
+          run=request['run_id'];source=request['source_commit']
+          assert type(artifact_id) is int and artifact_id>0,'EXACT_FROZEN_NATIVE_ARTIFACT_ID_REQUIRED'
+          assert run==42509875214 and source=='392ac55acf32402a60e7e903dcc1261b3bf35617','EXACT_NATIVE_PRODUCER_REQUIRED'
+          with Path(os.environ['GITHUB_OUTPUT']).open('a') as output:
+            output.write('artifact_id='+str(artifact_id)+'\n')
+          PY
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13609794621', run-id: '42462319257', github-token: '${{ github.token }}', path: watchlist-baseline, merge-multiple: true}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13609546660', run-id: '42460784588', github-token: '${{ github.token }}', path: watchlist-components, merge-multiple: true}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '${{ steps.native-input.outputs.artifact_id }}', run-id: '42509875214', github-token: '${{ github.token }}', path: watchlist-native, merge-multiple: true}
+      - name: Exact committed scope, native and 28 Python host evidence, original tools and current unused versions before keys
+        run: |
+          python3 repairs/infinity-watchlist-playback-2103466-20261108/admit_release.py --native-artifact watchlist-native --out watchlist-preflight
+          python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out watchlist-preflight/SIGNER-ROUTES.json
+      - name: Original66 and real linked native admission; stage both complete 80 unsigned manifests
+        run: |
+          python3 repairs/infinity-watchlist-playback-2103466-20261108/prepare_release.py inputs --apk watchlist-baseline/Infinity-2103466-Combined-Original-Signer.apk --prepared watchlist-components --native-artifact watchlist-native --admission-file watchlist-preflight/VERSION-ADMISSION.json --out watchlist-prepared
+      - name: Existing original-key SignInfinityModules after complete frozen 80-source equality
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          python3 - <<'PY'
+          import base64,hashlib,json,os,subprocess,sys,tempfile
+          from pathlib import Path
+          task=Path('repairs/infinity-watchlist-playback-2103466-20261108')
+          sys.path.insert(0,str(task))
+          import prepare_release as prep
+          first=Path('repairs/infinity-final-closure-2103407')
+          staged=Path('watchlist-prepared')
+          source_pins=json.loads((staged/'SOURCE-PINS.json').read_text())
+          assert source_pins['source']==os.environ['GITHUB_SHA'],'EXACT_COMMITTED_PREPARATION_SOURCE'
+          assert prep.tool_pins()==source_pins['original_tools'],'PINNED_ORIGINAL_JAVA_AND_ASSEMBLERS'
+          assert prep.file_sha(task/'RUNTIME-SOURCE-PINS.json')==source_pins['runtime_source_pins_sha256'],'FROZEN_RUNTIME_PINS'
+          assert prep.hashes(task/'overlay'/prep.CC)==source_pins['overlay_sha256'],'FROZEN_PYTHON_OVERLAY'
+          native,compiled=prep.native_admission(Path('watchlist-native'))
+          assert compiled==source_pins['native_source_sha256'] and native['native_sha256']==source_pins['native_artifact_sha256'],'MATCHED_PASSING_REAL_ARM64'
+          assert prep.file_sha(Path('watchlist-native/ARM64-LINK-VERIFIED.json'))==source_pins['native_proof_sha256'],'FROZEN_NATIVE_LINK_PROOF'
+          pairs=prep.admission(Path('watchlist-preflight/VERSION-ADMISSION.json'))
+          roots=[]
+          for version,cc_version in pairs:
+            root=staged/str(version)/'modules'
+            metadata=root.parent/'INPUTS.json'
+            assert prep.file_sha(metadata)==source_pins['input_metadata_sha256'][str(version)],'FROZEN_INPUTS_METADATA'
+            pins=json.loads(metadata.read_text())
+            actual=prep.hashes(root)
+            assert actual==pins['modules'],'STAGED_SOURCE_CHANGED_BEFORE_ORIGINAL_KEY_ACCESS'
+            payload,files=prep.module_bundle.build(root)
+            manifest=root/prep.CC/prep.module_bundle.MANIFEST
+            assert len(files)==80 and pins['authenticated_source_count']==80,'COMPLETE80_MANIFEST_ONLY'
+            assert payload==manifest.read_bytes() and hashlib.sha256(payload).hexdigest()==pins['module_manifest_sha256'],'FROZEN_FULL_MANIFEST'
+            assert not Path(str(manifest)+'.sig').exists(),'NO_SIGNATURE_OVERWRITE'
+            roots.append(root)
+          # All source, module, native, tool and pair checks above precede
+          # decoding or opening the existing original signing credential.
+          with tempfile.TemporaryDirectory(prefix='infinity-original-module-sign-') as temporary:
+            temp=Path(temporary);classes=temp/'classes';classes.mkdir()
+            subprocess.run(['javac','--release','8','-g:none','-d',str(classes),str(first/'SignInfinityModules.java')],check=True)
+            key=temp/'original.jks'
+            key.write_bytes(base64.b64decode(os.environ['INFINITY_KEYSTORE_B64'],validate=True));key.chmod(0o600)
+            env={n:os.environ[n] for n in ('PATH','JAVA_HOME','INFINITY_STORE_PASSWORD','INFINITY_KEY_PASSWORD','INFINITY_KEY_ALIAS')}
+            for root in roots:
+              pins=json.loads((root.parent/'INPUTS.json').read_text())['modules']
+              assert prep.hashes(root)==pins,'STAGED_SOURCE_CHANGED_BEFORE_MODULE_SIGN_CALL'
+              subprocess.run(['java','-cp',str(classes),'SignInfinityModules',str(key),str(root/prep.CC/prep.module_bundle.MANIFEST)],env=env,check=True)
+          PY
+      - name: Thirteen selected actual unchanged Java installer new80-input upgrade and recovery cases
+        run: python3 repairs/infinity-watchlist-playback-2103466-20261108/verify_modules.py --prepared watchlist-prepared --out watchlist-module-audit
+      - name: Original owner-bundle combine and exact original66 APK member comparison; unsigned only
+        run: |
+          python3 repairs/infinity-watchlist-playback-2103466-20261108/prepare_release.py finish --apk watchlist-baseline/Infinity-2103466-Combined-Original-Signer.apk --prepared watchlist-components --native-artifact watchlist-native --admission-file watchlist-preflight/VERSION-ADMISSION.json --out watchlist-prepared
+      - uses: actions/upload-artifact@v4
+        with: {name: 'Infinity2103468-Watchlist-Prepared-${{ github.run_id }}-INTERNAL', path: watchlist-prepared/2103468/publish/, if-no-files-found: error, retention-days: 90, compression-level: 0}
+      - uses: actions/upload-artifact@v4
+        with: {name: 'Infinity2103469-Watchlist-Recovery-Prepared-${{ github.run_id }}-INTERNAL', path: watchlist-prepared/2103469/publish/, if-no-files-found: error, retention-days: 90, compression-level: 0}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-Watchlist-Preparation-Evidence-${{ github.run_id }}-NOT-INSTALLER
+          path: |
+            watchlist-preflight/
+            watchlist-module-audit/
+            watchlist-prepared/*.json
+            watchlist-prepared/2103468/INPUTS.json
+            watchlist-prepared/2103469/INPUTS.json
+            watchlist-prepared/2103468/modules/script.infinity.commandcenter/INFINITY-MODULES.v1*
+            watchlist-prepared/2103469/modules/script.infinity.commandcenter/INFINITY-MODULES.v1*
           if-no-files-found: warn
           retention-days: 90

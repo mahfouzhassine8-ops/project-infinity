@@ -1,92 +1,84 @@
-# Phase B bounded Python implementation — feature incomplete
+# Python integration implemented — native/Android acceptance remains separate
 
-The accepted independent Watchlist resume projection is implemented in the task
-overlay. The full playback-continuity feature is **not complete or install-ready**.
-No application, Android, native integration, build, signing or installation ran.
+Latest owner authorization permits the two additional native invocation/player
+observation files and accepts conservative provider-only Next Episodes when no
+existing local catalogue proves a successor. The earlier seven-file blocker is
+historical and superseded by the authorized integration.
 
-## Implemented exact source scope
+## Frozen production source
 
-`overlay/script.infinity.commandcenter/` starts from the exact retained signed
-APK 2103466 extraction. `PYTHON-PRESERVATION.json` binds baseline and overlay
-hashes and function-level AST differences; `PYTHON-PROJECTION.diff` is the full
-reviewable production diff.
+Three authorized Python files plus the sole optional saved_playback.py helper
+are in overlay/script.infinity.commandcenter/, copied from actual signed APK
+2103466 where applicable. PYTHON-INTEGRATION.diff is the complete current diff;
+PYTHON-PRESERVATION.json records source hashes and exact function changes.
 
-- `resume_hub.py`: adds `_watchlist_progress_identity` and `watchlist_progress`.
-  Existing functions are unchanged. The opt-in selector inspects raw items,
-  matches exact playable movie/episode identities, quarantines conflicting alias
-  components and uses current revision/time ordering. Existing exact producer
-  proof or verified parent fields can supply a temporary comparison view; raw
-  keys/identities/routes are preserved. Hidden/latest completed state suppresses
-  old aliases; genuine newer replay may resume. Invalid/nonfinite/end offsets
-  are rejected. Selection returns a private copy and performs no write.
-- `plugin.py`: changes only `_menu_rows`, `show_item_menu`, and `_list_item`.
-  Playable Watchlist movie/episode rows read effective progress for presentation,
-  popup/Information resume indication and existing recovery offset dispatch.
-  They retain the selected saved key, original route, identity and membership.
-  Show/season rows and other list buckets keep their existing path. No new
-  wrapper/nonce/receipt dispatch is bound.
-- `service.py`: copied as a baseline reference and **byte-identical**. No player,
-  provenance, threshold, identity, occurrence or persistence logic changed.
+- resume_hub.py adds only opt-in exact Watchlist progress/comparison helpers.
+  Raw episodes match individually, conflicting alias components fail closed,
+  hidden/manual/completed state wins, and persisted revision orders updates.
+  Existing identity equality, progress_key, record_progress and writer remain.
+- plugin.py uses a native-observed playable Watchlist wrapper. Actual selection
+  posts a fresh native nonce; dispatch re-reads the exact selected snapshot,
+  destination and offset before forwarding the original provider route.
+  Confirmed popup/Information Play uses the same fresh dispatch and one-use
+  Home/item descriptor. Rendering never mints a nonce. Folder rows retain
+  baseline navigation; direct folder lineage is native-owned.
+- service.py optionally admits native actual-item evidence/current emitter proof
+  at existing _arm_continue. Only admitted playback gets verified parent fields
+  and its exact stable provider route. Raw progress identity/key semantics stay.
+  New _resume_watchlist refreshes exact progress after real AV start and checks
+  current receipt, profile/skin, type, IDs, S/E, file and player before existing
+  seekTime. Missing proof or failed seek preserves baseline playback. Ordinary
+  same-title playback without receipt takes the baseline branch. Ephemeral
+  receipt data is removed before the existing writer receives the entry.
+- saved_playback.py owns bounded JSON handoff, current saved-row checks, reviewed
+  route interpretation and exact code/version pins (13 Umbrella, 14 POV files).
+  It imports no provider code, inspects no credentials/account data and starts no
+  worker, metadata client or writer. Changed cache stamps force source hashing.
 
-There is no optional helper module, new database, schema migration, global
-identity relaxation, provider proof expansion or native modification by this
-implementation. Existing Watchlist saved data remains immutable during resume
-projection. Ordinary Movies/TV recording and all existing service functions are
-unchanged.
+RUNTIME-CONTRACT.md records the agreed native/Python schema before binding.
+Native source/host evidence, ARM64 compilation and Android verification are
+owned by Codex/native agent and are not certified by this Python report.
 
-## Focused host evidence
+## Preserved state and successor behavior
 
-`HOST-TEST-SELECTION.md` records selected cases before execution.
-`HOST-PROJECTION-RESULT.json` records all runs and current source hashes. The
-final selected run passed **17 cases**, using actual overlay hub/list-item/menu
-and existing service-writer functions with controlled Kodi boundaries.
+The existing continue-watching.json schema 2, admitted writer, sampling,
+thresholds, occurrences, hidden markers, manual watched and pending sync remain.
+Saving/rendering/selection/dispatch/resolution create no progress. Actual
+playback must qualify through the existing writer.
 
-Evidence covers exact movie/current offset; exact episode vs newer other episode
-and season; duplicate agreeing IDs; transitive secondary-ID conflict quarantine;
-similar titles and namespace separation; hidden aliases; manual watched and
-completed occurrence vs replay; nonfinite/invalid/end offsets; disposable store
-save/reload and unknown fields; proof mismatch; original saved route/key;
-non-Watchlist rendering; exact baseline folder popup comparison; natural-ended
-completion with zero/short duration; 95% completion below partial-duration gate;
-duplicate completion; partial minima and released-clock preservation.
+Progress Shows and unfinished Next Episodes consume proven parent IDs. Only
+existing _continue_show_identity local Kodi catalogue evidence supplies
+verified_next. Provider-only completion safely withholds an unproved successor.
+No E+1, new catalogue adapter, metadata client, worker or tracking database.
+Existing generic Progress/Continue resolver/recovery behavior remains unchanged;
+there is no global provider playback-contract expansion.
 
-One intermediate 16-case run had a fixture key expectation error: the test used
-an arbitrary row key where the actual writer derives its identity key. The
-fixture alone was corrected, and that failed run is retained in the receipt.
-The final 17-case run followed a narrow preservation correction restricting the
-new projection to playable rows. No passed case was rerun without a recorded
-new case, fixture correction or source correction.
+Folder popup route-only navigation retains baseline behavior and does not claim
+new item-bound origin. Direct actual Watchlist folder selection uses the native
+lineage contract. The owner journey uses that direct selection.
 
-These are host checks, not evidence of actual Android item lineage, playback,
-fresh click dispatch, installed-provider admission or complete Next Episodes.
+## Focused host evidence and limits
 
-## Unimplemented contracts and precise blocker
+HOST-INTEGRATION-RESULT.json binds frozen current source and records 28 unique
+passing host cases: the 27-case affected-source suite plus the new chained actual
+AV-arm/writer/completion/replay case. Actual overlay functions run with controlled
+Kodi/native-receipt boundaries. Exact test selection preceded execution.
 
-The reviewed POV 6.11.02 player creates a fresh ListItem and calls native Python
-`Player.play` directly. That path can bypass `PluginDirectory`'s final resolver
-item and discard a saved-origin observation carried on the original item.
-Umbrella also contains exceptional direct-play/playlist paths. Neither a pending
-global receipt nor matching title/IDs/stream URL proves causality for the fresh
-active item. Ordinary playback of the same saved title must remain unchanged.
+Cases cover exact resume/season exclusion, ID conflict quarantine, hidden/manual/
+completion/replay, disposable store reload, original route/key, folders/other
+lists, unchanged completion/partial rules, native-selected fresh offsets, explicit
+popup handoff, ordinary no-receipt negative control, invalid/stale receipt, exact
+producer pins and disposable source tampering, current-item revalidation and
+safe seek failure. The chain confirms arming creates no history, the existing
+writer populates Progress Shows/unfinished Next, completion counts once, no next
+is invented, and real replay can progress.
 
-Closing that handoff requires the actual native Python Player caller boundary
-(the additional `xbmc/interfaces/legacy/Player.cpp` source scope identified by
-Codex/Astra), unless a source-proven equivalent is found. It is outside the
-seven authorized production files. Owner authorization explicitly requires new
-scope approval before such expansion. No provenance guessing or unused handoff
-code was added.
+Historical fixture errors are retained. The new chained fixture initially had
+misplaced test lines (NameError), corrected without production edits; only its
+two affected cases were rerun. Earlier 17-case evidence retains its original
+source binding as historical evidence.
 
-Consequently these remain NOT IMPLEMENTED / NOT VERIFIED:
-
-- Native selected-row/descendant/actual-item origin receipt.
-- Fresh direct-click offset recheck after rendering. The current patch refreshes
-  Watchlist row rendering and existing explicit Python dispatch only; direct
-  provider URL activation can still carry its render-time offset.
-- Current Umbrella/POV scoped runtime emitter admission and parent enrichment.
-- Complete supported catalogue acquisition and completed-to-next advancement.
-- Real AV-start/order, Android persistence/restart and ordinary same-title
-  negative-control acceptance; native ARM64 compile/link; candidate packaging,
-  permanent signing, install-over and forward recovery.
-
-The safe bounded patch is retained for review. It must not be labeled completion
-of the requested feature, a release candidate, or a passed owner Fold journey.
+Actual installed Umbrella unexported files must match runtime pins; reviewed
+public code is not a fresh Fold hash claim. Real native lineage, Android AV
+ordering/restart/install-over, build, signing and owner Fold acceptance remain
+root delivery gates. This report makes no install-ready/final acceptance claim.

@@ -1,0 +1,43 @@
+{
+  "result": "PASS",
+  "unique_focused_host_cases": 28,
+  "selected_cases_receipt": "HOST-TEST-SELECTION.md",
+  "runs": [
+    {
+      "tests": 25,
+      "result": "PASS",
+      "reason": "authorized handoff integration changed affected source; seventeen existing plus eight new cases"
+    },
+    {
+      "tests": 27,
+      "result": "PASS",
+      "reason": "source-pin/typed-entry guard cases added and alias-scope fallback preserved"
+    },
+    {
+      "tests": 1,
+      "result": "ERROR",
+      "reason": "new chained fixture included misplaced prior test lines; NameError entry; no production failure"
+    },
+    {
+      "tests": 2,
+      "result": "PASS",
+      "reason": "moved fixture lines to original negative case, reran only affected negative plus new chained case"
+    }
+  ],
+  "functions": "actual overlay helper/hub/plugin/service arming/writer/seek with controlled Kodi/native receipt boundaries",
+  "native_actual_item_integration": "NOT RUN by Python agent; native host evidence separately owned",
+  "Android_actual_AV_restart": "NOT RUN by Python agent",
+  "build_sign_install": "NOT RUN by Python agent",
+  "shutdown": "NOT RUN",
+  "source_binding": {
+    "overlay/script.infinity.commandcenter/resume_hub.py": "38f8e3cedbb8d1b21902c08d3cd4558c424317a6910be520b328fae749cc9420",
+    "overlay/script.infinity.commandcenter/plugin.py": "be2f3764c6ca52e169168a2ada3f5586e20f4f9775d3e258b18fc93be3ba5135",
+    "overlay/script.infinity.commandcenter/service.py": "b65b9937ec1a1c02595c0b1e3c3c2041cad97bce5cfa565d89f652cff396b88f",
+    "overlay/script.infinity.commandcenter/saved_playback.py": "ba80dd13b100fbe45ce80af23b7edd8e66abdb748d15a4fa6006d02f68fea209",
+    "test_watchlist_progress.py": "bfe0e0d13c28c61cd2e14ebb6b4a1272b5e189eba701e7ac58c70c6d5a76f659",
+    "test_watchlist_handoff.py": "36bcc173cc05b9fe37b52580b5277dd9424f258ea9341c4d5ad3789703f665a6",
+    "RUNTIME-CONTRACT.md": "661b691b025189f05540a5344eeff7160c19822fc2698a203737aacbd22f13db",
+    "CURRENT-EMITTER-PINS.json": "aa41d6d478271f712da64ca61a004a19e5a714a9618dc06bb4dff42503f97c84"
+  },
+  "historical_projection_evidence": "HOST-PROJECTION-RESULT.json retains original seventeen-case source binding and earlier fixture error; current binding is this receipt"
+}

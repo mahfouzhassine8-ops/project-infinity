@@ -6,12 +6,13 @@ restriction. Native field names and handoff are pending agreement with Codex;
 producer/catalogue evidence is being closed independently by Astra. This file
 does not claim those gates have passed.
 
-Implementation outcome: only the independent exact-progress/projection portion
-below is implemented and host-tested. Native origin, fresh direct-click dispatch,
-current-emitter enrichment and catalogue integration remain UNIMPLEMENTED after
-the source-proven fresh-`Player.play` item bypass exposed a required source seam
-outside the seven authorized files. `IMPLEMENTATION-STATUS.md` is authoritative
-for completion; the remaining protocol sections below are proposals, not code.
+Latest outcome: the owner subsequently authorized the two native invocation
+observation boundaries and accepted existing-local-catalogue-only successors.
+The Python handoff, exact current emitter admission and scoped AV-start resume
+are now implemented against the agreed `RUNTIME-CONTRACT.md`. No new catalogue
+client/worker is implemented. `IMPLEMENTATION-STATUS.md` and
+`HOST-INTEGRATION-RESULT.json` are authoritative for current evidence; earlier
+pending-gate prose below records the design before those agreements.
 
 ## Exact resume projection
 
