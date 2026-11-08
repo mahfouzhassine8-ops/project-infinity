@@ -148,6 +148,11 @@ class Device:
         local=self.out/'request.json';local.write_text(json.dumps(req))
         self.adb('push',local,QAROOT+'/request.json')
         def answer():
+            # The QA responder runs inside the Kodi process. A process death
+            # cannot produce a new reply: detect it on every poll instead of
+            # silently waiting the full selected-action deadline. This is a
+            # host-only verification guard; it never changes the signed APK.
+            self.alive()
             reply=self.read_json(QAROOT+'/reply.json')
             return reply if reply.get('pid')==self.pid and reply.get('sequence')==self.sequence else None
         reply=self.until(answer,'selected '+action,seconds)
