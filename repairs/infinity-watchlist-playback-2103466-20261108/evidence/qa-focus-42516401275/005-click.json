@@ -1,0 +1,7 @@
+{
+  "pid": 6172,
+  "sequence": 5,
+  "passed": false,
+  "error": "AssertionError('LIVE_NATIVE_LISTITEM_PATH_REQUIRED')",
+  "traceback": "Traceback (most recent call last):\n  File \"/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/addons/script.infinity.finalreleaseqa/qa.py\", line 250, in serve\n    reply.update(passed=True, result=action(request))\n                                     ^^^^^^^^^^^^^^^\n  File \"/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/addons/script.infinity.finalreleaseqa/qa.py\", line 205, in action\n    expected = focus(request)\n               ^^^^^^^^^^^^^^\n  File \"/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/addons/script.infinity.finalreleaseqa/qa.py\", line 155, in focus\n    raise AssertionError('LIVE_NATIVE_LISTITEM_PATH_REQUIRED')\nAssertionError: LIVE_NATIVE_LISTITEM_PATH_REQUIRED\n"
+}

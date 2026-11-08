@@ -41,7 +41,7 @@
     "artifact_id": 13631340281,
     "APK_SHA256": "804eebc57af2e4ef4e5418b56994bda64eb7fd7e7f2c0653b5c6e2a9f7833058"
   },
-  "Android": "RETRY_SELECTED_AFTER_PINNED_AUTHENTICATED_OBSERVER_BOOTSTRAP_FIX; same APK pair",
+  "Android": "RETRY_SAME_SIGNED_PAIR_WITH_CONFIRMED_ACTUAL_NATIVE_VIEW_TARGETING; first two PASS retained",
   "Fold": "NOT_RUN_PENDING_ONE_OWNER_ACCEPTANCE",
   "shutdown": "NOT_SELECTED",
   "accepted_pointer_updated": false,
@@ -71,6 +71,19 @@
       "candidate_installed": false,
       "completed_app_cases": 0,
       "reason": "Observer imported owned controller_access before active_contract established verified loader ownership; original production guard correctly refused.",
+      "APK_rebuild": false
+    },
+    {
+      "run_id": 42516401275,
+      "source_commit": "de3bb977f06485ab777b340ee7adb2ce801f8546",
+      "result": "FAIL_DIAGNOSTIC_LIVE_VIEW_FOCUS_BEFORE_FIRST_PLAYBACK",
+      "artifact_id": 13631059724,
+      "artifact_SHA256": "776c8220aab637ca86a1887c801de9e4d699e00921f1f9afe2b678a3a1f39c96",
+      "completed_app_cases": 2,
+      "candidate_installed": true,
+      "baseline_authentication": "PASS79",
+      "candidate_install_over_and_authentication": "PASS80",
+      "reason": "Observer forced hidden control50; actual mixed Watchlist native view65051 remained on parent row. Exact live path check correctly refused wrong click.",
       "APK_rebuild": false
     }
   ]

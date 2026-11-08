@@ -1,0 +1,33 @@
+{
+  "status": "PASS_SELECTED_QA_FOCUS_SOURCE_AND_OPTIMIZE1_CHECK",
+  "actual_run": 42516401275,
+  "actual_phase": "original66 authenticated79 and signed68 install-over authenticated80 PASS; observer failed before first movie click",
+  "failure_classification": "FAIL_OBSERVER_NATIVE_CONTROL_SELECTION",
+  "checks": [
+    "captured exact wrapper/index and actual mixed Watchlist view",
+    "signed skin50visibility excludes mixed plugin directory;65051/65052 declared native directory views",
+    "new focus resolves unique visible native view with bounded count",
+    "absolute row, selected-container and focused-ListItem exact paths all required",
+    "bounded real Control.HasFocus wait before unchanged actual Input.Select",
+    "full changed observer explicit checks compile optimize1",
+    "all prior authentication/event/journey function ASTs unchanged"
+  ],
+  "skin_source_sha256": {
+    "MyVideoNav.xml": "7df68af11f2484e9e8187aa0b689305cb2b305b6001b57ca9ca5704050dca4de",
+    "Includes_InfinityMediaLists.xml": "20b44d5beefd2d6143e511add0c92fb7b68e2e4967c253e5e45d97eb4f62297c"
+  },
+  "observer_sha256": "23c48bb7a1ee9661a3af2ec7c9337615e98202ef689e4240e2b367a0808570a4",
+  "evidence_sha256": {
+    "failure-snapshot.json": "a9d465684fb22043a265cb772af0492143ca0653d107413922f0459ef0c0bc64",
+    "failure.png": "f5a75ab94ef8adbed5d9a0c6f9737b60914e4a9d69f5e120c974cd96ccbf9cf8",
+    "005-click.json": "e472b946b656546d35d20cc9edc5d772cccea065c8b6bbfeec6a0a3dbcc9e9e1",
+    "ANDROID-VERIFICATION.json": "cb2805de9ab20ca732afff44afd92b2280a34f603f87c99b9cf20b3594042226",
+    "004-watchlist.json": "bb34b99b0e3f3cbe0442c6456de10e85e4350abf633c3fe72bb2b7aaa30ca575",
+    "ANDROID-HARNESS-HOST-RESULT-before-focus-fix.json": "1d38840013c9c55b47ee0a037576f7b1a27e36b7bfcb0c8cfc6dab2a770ffbbc"
+  },
+  "production_changes": false,
+  "APK_changes": false,
+  "native_build": "NOT_RUN",
+  "Android_retry": "NOT_RUN",
+  "shutdown": "NOT_SELECTED"
+}

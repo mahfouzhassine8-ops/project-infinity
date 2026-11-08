@@ -6,6 +6,7 @@ from pathlib import Path
 import sys
 import time
 import traceback
+import xml.etree.ElementTree as ET
 import xbmc
 import xbmcaddon
 import xbmcgui
@@ -129,17 +130,46 @@ def snapshot():
     return dict(pid=os.getpid(),window=xbmcgui.getCurrentWindowId(),dialog=xbmcgui.getCurrentWindowDialogId(),
                 folder=xbmc.getInfoLabel('Container.FolderPath'),rows=rows,menus=menus,
                 dialog_xml=(xbmcgui.Window(xbmcgui.getCurrentWindowDialogId()).getProperty('xmlfile') if xbmcgui.getCurrentWindowDialogId() not in (0,-1,9999) else ''),
+                current_control=xbmc.getInfoLabel('System.CurrentControlID'),focused_path=xbmc.getInfoLabel('ListItem.FileNameAndPath'),
                 heading=xbmc.getInfoLabel('Control.GetLabel(1)'),
                 body=xbmc.getInfoLabel('Control.GetLabel(9)'),skin=xbmc.getSkinDir())
+
+
+def native_directory_container():
+    assert xbmcgui.getCurrentWindowId()==10025,'ACTUAL_NATIVE_VIDEOS_DIRECTORY_REQUIRED'
+    skin=Path(xbmcvfs.translatePath(xbmcaddon.Addon(xbmc.getSkinDir()).getAddonInfo('path')))
+    with (skin/'unified/MyVideoNav.xml').open('rb') as stream:raw=stream.read(1024*1024+1)
+    assert len(raw)<=1024*1024,'BOUNDED_INSTALLED_NATIVE_VIEW_DECLARATION_REQUIRED'
+    declared=(ET.fromstring(raw).findtext('views') or '').split(',')
+    assert 0<len(declared)<=64 and all(value.strip().isdigit() for value in declared)
+    views=[int(value.strip()) for value in declared]
+    assert len(set(views))==len(views),'UNIQUE_NATIVE_VIEW_IDS_REQUIRED'
+    def visible():
+        current=[]
+        for control in views:
+            if not xbmc.getCondVisibility('Control.IsVisible(%d)'%control):continue
+            count=int(xbmc.getInfoLabel('Container(%d).NumItems'%control) or 0)
+            if 0<count<=1000:current.append((control,count))
+        assert len(current)<=1,'ONE_VISIBLE_NATIVE_DIRECTORY_CONTAINER_REQUIRED'
+        return current[0] if current else None
+    return until(visible,'actual visible native directory view',10)
 
 
 def focus(request):
     expected=request['file'];index=request['index']
     assert expected.startswith(('plugin://script.infinity.commandcenter/','plugin://plugin.video.pov/'))
     assert type(index) is int and 0<=index<=1000
-    xbmc.executebuiltin('Container.SetViewMode(50)',True)
-    xbmc.executebuiltin('SetFocus(50,%d,absolute)'%index,True)
-    assert xbmc.getInfoLabel('Container(50).ListItem.FileNameAndPath')==expected,'LIVE_NATIVE_LISTITEM_PATH_REQUIRED'
+    control,count=native_directory_container()
+    assert index<=count,'BOUNDED_ACTUAL_NATIVE_DIRECTORY_INDEX_REQUIRED'
+    assert xbmc.getInfoLabel('Container(%d).ListItemAbsolute(%d).FileNameAndPath'%(control,index))==expected,'EXACT_ACTUAL_NATIVE_DIRECTORY_ROW_REQUIRED'
+    xbmc.executebuiltin('SetFocus(%d,%d,absolute)'%(control,index),True)
+    until(lambda:xbmc.getCondVisibility('Control.HasFocus(%d)'%control) and
+          xbmc.getInfoLabel('Container(%d).ListItem.FileNameAndPath'%control)==expected and
+          xbmc.getInfoLabel('ListItem.FileNameAndPath')==expected,
+          'LIVE_NATIVE_LISTITEM_PATH_REQUIRED',10)
+    assert xbmc.getInfoLabel('Container(%d).ListItem.FileNameAndPath'%control)==expected,'LIVE_NATIVE_LISTITEM_PATH_REQUIRED'
+    assert xbmc.getInfoLabel('ListItem.FileNameAndPath')==expected,'LIVE_FOCUSED_LISTITEM_PATH_REQUIRED'
+    xbmc.log('INFINITY_QA_NATIVE_FOCUS '+json.dumps(dict(control=control,index=index,file=expected)),xbmc.LOGINFO)
     return expected
 
 
