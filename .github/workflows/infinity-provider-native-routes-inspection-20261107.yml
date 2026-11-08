@@ -1,0 +1,48 @@
+name: Infinity Native Search compatibility read-only publisher source check | NO APK
+on:
+  push:
+    branches: [work/infinity-native-search-compatibility-scope-20261107]
+    paths: [.github/workflows/infinity-provider-native-routes-inspection-20261107.yml]
+permissions: {contents: read}
+jobs:
+  source-readonly:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - name: Read published zip for route inspection only, no imports, no execution, no APK
+        run: |
+          set -euo pipefail
+          mkdir -p audit
+          curl -fL --retry 2 --max-time 45 'https://raw.githubusercontent.com/kodifitzwell/repo/master/plugin.video.pov/plugin.video.pov-6.11.02.zip' -o audit/pov-latest.zip
+          curl -fL --retry 2 --max-time 45 'https://raw.githubusercontent.com/umbrellaplug/umbrellaplug.github.io/master/omega/plugin.video.umbrella/resources/lib/modules/router.py' -o audit/umbrella-router.py
+          python3 - <<'PY'
+          from zipfile import ZipFile
+          import ast,hashlib,io,re
+          from pathlib import Path
+          with ZipFile('audit/pov-latest.zip') as z:
+            members=[n for n in z.namelist() if n.endswith(('addon.xml','router.py','pov.py','movies.py','tvshows.py','tmdb_api.py'))]
+            print('POV_ROUTING_SOURCE_NAMES',members[:80])
+            for n in members:
+              if n.endswith(('addon.xml','router.py','pov.py')) and len(z.read(n))<=512*1024:
+                src=z.read(n).decode('utf8','replace')
+                if n.endswith('addon.xml'):
+                  print('POV_MANIFEST_BEGIN',src[:950],'POV_MANIFEST_END')
+                else:
+                  print('POV_ROUTE_FILE',n,'sha256',hashlib.sha256(z.read(n)).hexdigest())
+                  for line in src.splitlines():
+                    if any(term in line for term in ('def router','def routing','build_movie_list','build_tvshow_list','tmdb_movies_search','tmdb_tv_search','parse_qsl','params.get','params[','search_term(')):
+                      print('   ',line[:250])
+          s=Path('audit/umbrella-router.py').read_text()
+          print('UMBRELLA_ROUTER_SHA256',hashlib.sha256(s.encode()).hexdigest())
+          for line in s.splitlines():
+            if any(term in line for term in ("action = params.get('action')","name = params.get('name')","elif action == 'movieSearchterm'","elif action == 'tvSearchterm'","search_term(name)")):
+              print('   ',line[:250])
+          print('PASS_READONLY_PUBLIC_SOURCE_INSPECTION_NO_PROVIDER_EXECUTION')
+          PY
+      - name: Do not publish downloaded third-party source
+        if: always()
+        run: rm -rf audit
