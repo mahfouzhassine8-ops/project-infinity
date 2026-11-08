@@ -1,0 +1,47 @@
+{
+  "baseline": "actual retained APK2103466 extracted source; immutable",
+  "scope": "bounded Watchlist exact resume projection only",
+  "files": {
+    "resume_hub.py": {
+      "baseline_sha256": "1c38df4f68201dc209d309f31bebf051e24baf0e45f4cb7318828af2212780d5",
+      "overlay_sha256": "956c5d62d0d93bc98171fd3c576e726d7bee25ebbe03dec5297200cf9bc175ab",
+      "byte_identical": false,
+      "new": [
+        "_watchlist_progress_identity",
+        "watchlist_progress"
+      ],
+      "changed": [],
+      "removed": []
+    },
+    "plugin.py": {
+      "baseline_sha256": "a61290fe791e264e82f00aebb7c5b6173226639edca3bee15d17dccdda82fc8e",
+      "overlay_sha256": "7bb81d997756d58c285a0535392b95240f5f91260b3603fddc60fffc0823188b",
+      "byte_identical": false,
+      "new": [],
+      "changed": [
+        "_list_item",
+        "_menu_rows",
+        "show_item_menu"
+      ],
+      "removed": []
+    },
+    "service.py": {
+      "baseline_sha256": "1844b2b217ccc7f3adef4d82bc825588fb2d561a87d6447f32ebedf3295e927d",
+      "overlay_sha256": "1844b2b217ccc7f3adef4d82bc825588fb2d561a87d6447f32ebedf3295e927d",
+      "byte_identical": true,
+      "new": [],
+      "changed": [],
+      "removed": []
+    }
+  },
+  "existing_global_identity_helpers": "UNCHANGED",
+  "optional_helper_added": false,
+  "native_edits_by_this_agent": false,
+  "baseline_extraction_modified": false,
+  "native_origin": "NOT IMPLEMENTED",
+  "fresh_direct_click_dispatch": "NOT IMPLEMENTED",
+  "current_provider_emitter_admission": "NOT IMPLEMENTED",
+  "successor_catalogue": "NOT IMPLEMENTED",
+  "Android_AV_start_build_sign_install": "NOT RUN",
+  "full_feature": "INCOMPLETE"
+}

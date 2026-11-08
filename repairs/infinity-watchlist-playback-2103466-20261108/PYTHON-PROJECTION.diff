@@ -1,0 +1,166 @@
+--- a/assets/addons/script.infinity.commandcenter/resume_hub.py
++++ b/assets/addons/script.infinity.commandcenter/resume_hub.py
+@@ -702,6 +702,87 @@
+         return min(matches, key=lambda pair: (int(pair[1].get('resume_first_seen') or pair[1].get('added_at') or
+                                                   pair[1].get('updated') or 0), pair[0]))[0]
+     return compatible_key(data, entry)
++
++
++def _watchlist_progress_identity(data, entry, key):
++    """Read-only comparison view; saved identities and ordinary keys stay intact."""
++    identity = _resume_identity(entry)
++    if not identity or identity.get('kind') not in ('movie', 'episode'):
++        return None
++    if identity['kind'] != 'episode' or identity.get('scope') != 'episode':
++        return identity
++    # These are existing parent proofs, never a promotion of an episode ID.
++    series = continue_series_ids(entry)
++    if series:
++        return media_identity('tv', {}, entry.get('season'), entry.get('episode'), series)
++    from infinity_modules.watchedbridge.bridge_state import identity as raw_identity
++    from infinity_modules.watchedbridge.provider_contracts import PROOFS, presentation
++    canonical = presentation(entry, raw_identity(entry), _dict(data.get(PROOFS)).get(key))
++    if canonical and canonical.get('scope') == 'show_episode':
++        return media_identity('tv', {}, entry.get('season'), entry.get('episode'), canonical['ids'])
++    return identity
++
++
++def watchlist_progress(data, saved):
++    """Select exact current playable progress without changing a saved action.
++
++    This is opt-in for Watchlist rendering/dispatch only. Inspect raw episodes,
++    because the ordinary Continue projection deliberately collapses TV series.
++    Conflicting alias components and newer hidden/completed state fail closed.
++    """
++    import math
++    if not isinstance(data, dict) or not isinstance(saved, dict):
++        return None
++    selected = _watchlist_progress_identity(data, saved, saved.get('key'))
++    if not selected:
++        return None
++    values, locations = [], []
++    for bucket in ('items', 'watched'):
++        for key, entry in _dict(data.get(bucket)).items():
++            if not KEY_RE.fullmatch(str(key)) or not isinstance(entry, dict):
++                continue
++            identity = _watchlist_progress_identity(data, entry, key)
++            if identity:
++                # Only comparison copies carry canonical scope; never persist it.
++                value = dict(entry, identity=identity)
++                value.pop('resume_verified_ids', None)
++                values.append(value)
++                locations.append((bucket, key, entry))
++    query = dict(saved, identity=selected)
++    query.pop('resume_verified_ids', None)
++    groups = _resume_groups(values + [query], series=False)
++    matches = [location for location, group in zip(locations, groups) if group == groups[-1]]
++    items = [(key, entry) for bucket, key, entry in matches if bucket == 'items']
++    if not items:
++        return None
++
++    def marker(entry):
++        try:
++            return (int(entry.get('updated') or entry.get('watched_at') or 0),
++                    int(entry.get('resume_revision') or 0))
++        except (TypeError, ValueError, OverflowError):
++            return (0, 0)
++
++    key, newest = max(items, key=lambda pair: (marker(pair[1]), pair[0]))
++    if not resume_visible(data, key):
++        return None  # Never fall back to an older visible alias.
++    for bucket, _, watched in matches:
++        if bucket != 'watched':
++            continue
++        occurrence = str(newest.get('playback_occurrence') or '')
++        if ((occurrence and watched.get('completed_occurrence') == occurrence) or
++                marker(watched) >= marker(newest)):
++            return None
++    try:
++        if type(newest.get('position')) is bool or type(newest.get('duration')) is bool:
++            return None
++        position, duration = float(newest.get('position')), float(newest.get('duration'))
++        if not (math.isfinite(position) and math.isfinite(duration) and
++                0 < position < duration and position / duration < 0.95):
++            return None
++    except (TypeError, ValueError, OverflowError):
++        return None
++    return _entry_copy(newest, key)
+ 
+ 
+ def record_progress(data, entry):
+--- a/assets/addons/script.infinity.commandcenter/plugin.py
++++ b/assets/addons/script.infinity.commandcenter/plugin.py
+@@ -380,7 +380,9 @@
+     identity = hub.entry_identity(entry)
+     rows = []
+     if play_available is not False and (entry.get('source') or entry.get('stable_source') or identity):
+-        progress = _menu_resume(entry, data)
++        progress = (hub.watchlist_progress(data, entry) if bucket == 'watchlist' and
++                    (identity or {}).get('kind') in ('movie', 'episode')
++                    else _menu_resume(entry, data))
+         resume = progress is not None and number(progress.get('position')) > 0
+         rows.append(('Resume' if resume else 'Play', 'play', ''))
+     if identity:
+@@ -507,7 +509,9 @@
+         from information import show_information
+         from title_metadata import from_entry, trailer_route
+         _, item = _list_item(current, current_data, bucket, list_name)
+-        progress = _menu_resume(current, current_data)
++        progress = (hub.watchlist_progress(current_data, current) if bucket == 'watchlist' and
++                    (hub.entry_identity(current) or {}).get('kind') in ('movie', 'episode')
++                    else _menu_resume(current, current_data))
+         action = show_information(item, current, play_available=play_available,
+                                   resume=progress is not None and number(progress.get('position')) > 0)
+         if action == 'play':
+@@ -534,14 +538,18 @@
+         current = refreshed
+         if not _menu_play_available(current, current_data, bucket):
+             return False
+-        if incoming is not None:
++        watchlist_playable = bucket == 'watchlist' and (
++            hub.entry_identity(current) or {}).get('kind') in ('movie', 'episode')
++        if incoming is not None and not watchlist_playable:
+             progress = _menu_resume(current, current_data)
+             if progress is not None:
+                 current, key, bucket = progress, progress['key'], 'continue'
+         target, item = _list_item(current, current_data, bucket, list_name)
+         if target.startswith('plugin://script.infinity.commandcenter/?action=saved-recovery&'):
+-            recover_entry(key, bucket, resume_offset=max(0.0, number(current.get('position')))
+-                          if hub.resume_visible(current_data, key) else 0)
++            progress = hub.watchlist_progress(current_data, current) if watchlist_playable else None
++            offset = (number(progress.get('position')) if progress else 0) if watchlist_playable else (
++                max(0.0, number(current.get('position'))) if hub.resume_visible(current_data, key) else 0)
++            recover_entry(key, bucket, resume_offset=offset)
+         elif (hub.entry_identity(current) or {}).get('kind') in ('tvshow', 'season'):
+             _rpc('GUI.ActivateWindow', {'window': 'videos', 'parameters': [target, 'return']})
+         elif target:
+@@ -597,7 +605,11 @@
+     li = xbmcgui.ListItem(label=label, label2=label2, path=target, offscreen=True)
+     flags = render.get('watched_flags', {}) if render is not None and render.get('watched_data') is data else {}
+     watched = flags[key] if key in flags else hub.is_watched(data, key)
+-    in_progress = hub.resume_visible(data, key) and number(entry.get('position')) > 0
++    watchlist_playable = bucket == 'watchlist' and (
++        hub.entry_identity(entry) or {}).get('kind') in ('movie', 'episode')
++    watchlist_progress = hub.watchlist_progress(data, entry) if watchlist_playable else None
++    in_progress = (watchlist_progress is not None if watchlist_playable else
++                   hub.resume_visible(data, key) and number(entry.get('position')) > 0)
+     info = {
+         'title': str(entry.get('title') or label),
+         'mediatype': (hub.entry_identity(entry) or {}).get('kind') or ('episode' if kind == 'tv' else 'movie'),
+@@ -650,12 +662,13 @@
+     if rating:
+         li.setProperty('Rating', str(rating))
+     if in_progress:
+-        position = number(entry.get('position'))
+-        duration = number(entry.get('duration'))
++        effective = watchlist_progress if watchlist_playable else entry
++        position = number(effective.get('position'))
++        duration = number(effective.get('duration'))
+         li.setProperty('ResumeTime', str(position))
+         li.setProperty('TotalTime', str(duration))
+         li.setProperty('StartOffset', str(position))
+-        li.setProperty('PercentPlayed', str(entry.get('percentage', 0) or 0))
++        li.setProperty('PercentPlayed', str(effective.get('percentage', 0) or 0))
+     else:
+         # A watched title started again must begin from zero, not its prior completion point.
+         li.setProperty('ResumeTime', '0')

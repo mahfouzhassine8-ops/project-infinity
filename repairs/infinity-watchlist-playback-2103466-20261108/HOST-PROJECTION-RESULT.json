@@ -1,0 +1,40 @@
+{
+  "selected": "HOST-TEST-SELECTION.md",
+  "command": "python test_watchlist_progress.py",
+  "tests": 17,
+  "result": "PASS",
+  "scope": "exact Watchlist progress and actual list-item projection; mocked Kodi; temporary disposable persistence",
+  "native_origin": "NOT RUN / integration pending",
+  "actual_AV_start": "NOT RUN",
+  "catalogue": "NOT RUN / contract pending",
+  "android": "NOT RUN",
+  "build_sign_install": "NOT RUN",
+  "shutdown": "NOT RUN",
+  "sha256": {
+    "test_watchlist_progress.py": "07ee028f9097353dbf9f6c803fb77fa1ca8ebd941c04bf15db5726026bc3555e",
+    "overlay/script.infinity.commandcenter/resume_hub.py": "956c5d62d0d93bc98171fd3c576e726d7bee25ebbe03dec5297200cf9bc175ab",
+    "overlay/script.infinity.commandcenter/plugin.py": "7bb81d997756d58c285a0535392b95240f5f91260b3603fddc60fffc0823188b",
+    "overlay/script.infinity.commandcenter/service.py": "1844b2b217ccc7f3adef4d82bc825588fb2d561a87d6447f32ebedf3295e927d"
+  },
+  "runs": [
+    {
+      "tests": 13,
+      "result": "PASS"
+    },
+    {
+      "tests": 16,
+      "result": "ERROR",
+      "error": "new partial writer test fixture expected arbitrary row key instead of identity-derived production progress key; production source unchanged by correction"
+    },
+    {
+      "tests": 16,
+      "result": "PASS",
+      "correction": "fixture uses hub.identity_key(entry.identity)"
+    },
+    {
+      "tests": 17,
+      "result": "PASS",
+      "correction": "new selector limited to playable Watchlist rows; actual baseline folder popup comparison added"
+    }
+  ]
+}

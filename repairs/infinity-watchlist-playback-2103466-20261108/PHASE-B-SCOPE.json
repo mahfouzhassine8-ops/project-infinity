@@ -1,0 +1,41 @@
+{
+  "phase": "B_AUTHORIZED_IMPLEMENTATION",
+  "authorization": "8e83bcb8374dec0ccc646cbe02c3c4249395ba8c",
+  "baseline": "5ee1c7ae0bbe295c311aa34c02f6b62688ccb5a7",
+  "branch": "work/infinity-watchlist-phase-b-20261108",
+  "status": "PARTIAL_REVIEWED_PROJECTION_PASS_FULL_FEATURE_BLOCKED",
+  "scope": "Only candidate Watchlist projection overlay and task evidence; not integrated installer",
+  "candidate_changed_components": [
+    "script.infinity.commandcenter/resume_hub.py",
+    "script.infinity.commandcenter/plugin.py"
+  ],
+  "candidate_unchanged_reference": [
+    "script.infinity.commandcenter/service.py"
+  ],
+  "native_source_edits": [],
+  "provider_source_edits": [],
+  "installed_device_mutations": [],
+  "host_tests": "17_PASS_CONTROLLED_BOUNDARIES_NOT_ANDROID",
+  "native_ARM64": "NOT_RUN_INCOMPLETE_NATIVE_SOURCE",
+  "Android_AV_restart": "NOT_RUN",
+  "signed_successor": "NOT_PREPARED",
+  "forward_recovery": "NOT_PREPARED",
+  "release_registry": "UNCHANGED_NO_VERSION_RESERVED",
+  "original_signer": "UNCHANGED_NOT_INVOKED",
+  "baseline_ref": "UNCHANGED",
+  "Search_work": "SEPARATE_UNCHANGED",
+  "full_feature_acceptance": "NOT_CLAIMED",
+  "blocker": {
+    "kind": "AUTHORIZED_SOURCE_SCOPE_INSUFFICIENT_FOR_POV_FRESH_PLAYER_ITEM",
+    "required_additional_boundary": "xbmc/interfaces/legacy/Player.cpp::Player::playStream",
+    "expected_invocation_binding": "UNRESOLVED_NO_PROMISE_ONE_EXTRA_HOOK_SUFFICES",
+    "details": "CONTRACTS.md"
+  },
+  "remaining_contracts": [
+    "Native exact provider invocation to fresh playing item",
+    "Fresh direct-click dispatch",
+    "Current installed emitter byte admission",
+    "Complete source-bound metadata snapshot scheduling and late consumption"
+  ],
+  "next_permission": "Required only for demonstrated production files outside explicit owner allowlist; no routine questions"
+}
