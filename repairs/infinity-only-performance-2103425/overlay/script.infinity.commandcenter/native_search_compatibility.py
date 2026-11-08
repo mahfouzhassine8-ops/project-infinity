@@ -38,7 +38,7 @@ def _contains(node, text):
 def _method(nodes, name):
     hits = [n for n in nodes if isinstance(n, ast.FunctionDef) and n.name == name]
     if len(hits) != 1:
-        raise Unverified("Missing or ambiguous native search method")
+        raise Unverified("Missing or ambiguous native search method: "+name)
     return hits[0]
 
 
