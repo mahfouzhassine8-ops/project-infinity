@@ -188,3 +188,9 @@ Nine local checks PASS. It uses explicit checks compatible with Kodi optimizatio
 reads the real APK path and active source files, and writes only a new JSON report.
 No ADB/root/permissions/account-settings/database operation. Fold report pending;
 Health Center integration remains deferred. See ../infinity-readonly-inventory-20261108/README.md.
+
+Run42469886546 attempts1/2 did not reach application tests: repeated HTTP504
+on the uncached host Python3.11.7 archive. The selected QA job now uses the
+runner’s cached3.11 patch, records the exact version and requires host assertions
+enabled. Actual Android/Kodi Python, sources and signed APKs remain unchanged.
+This is a demonstrated test-infrastructure correction, not another APK build.

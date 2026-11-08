@@ -1961,13 +1961,16 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
-        with: {python-version: '3.11.7'}
+        with: {python-version: '3.11'}
       - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
         with: {distribution: temurin, java-version: '21'}
       - name: Exact selected three-scope request, finite actions and original live-item observer
         run: |
           python3 - <<'PY'
-          import ast,json
+          import ast,json,sys
+          if not __debug__ or sys.version_info[:2] != (3,11):
+            raise RuntimeError('Host verification needs non-optimized Python3.11')
+          print('HOST_PYTHON_EXACT=' + sys.version)
           from pathlib import Path
           root=Path('repairs/infinity-three-corrections-20261108')
           for name in ('stage_three_android.py','verify_three_android.py','android_qa_extension.py.txt'):
@@ -1994,6 +1997,7 @@ jobs:
           python3 -m pip install Pillow==11.3.0
           python3 repairs/infinity-three-corrections-20261108/stage_three_android.py --baseline three-qa-baseline/Infinity-2103464-Combined-Original-Signer.apk --candidate three-qa-candidate/Infinity-2103466-Combined-Original-Signer.apk --recovery three-qa-recovery/Infinity-2103467-Combined-Original-Signer.apk --sdk "$ANDROID_HOME/build-tools/35.0.0" --out three-qa-fixture
           python3 repairs/four-repair-20261018/android37_gate.py --sdk-root "$ANDROID_HOME" --out three-qa-platform --pin-tools
+          python3 -c "import json,sys,pathlib; pathlib.Path('three-qa-platform/HOST-PYTHON.json').write_text(json.dumps(dict(version=sys.version,optimization=sys.flags.optimize,Android_interpreter_changed=False)))"
           python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out three-qa-emulator-setup
           sudo chmod 666 /dev/kvm
       - uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d

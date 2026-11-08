@@ -1,0 +1,12 @@
+{
+  "run": 42469886546,
+  "attempts": [
+    1,
+    2
+  ],
+  "source": "2f18336ec766cf6e0234ecf7e9727ab4993247ff",
+  "status": "BLOCKED_BEFORE_APPLICATION_TESTS",
+  "failure": "Repeated GitHub HTTP504 downloading uncached Python3.11.7; no corrected observer execution",
+  "necessary_QA_only_environment_change": "setup-python uses cached3.11 patch version and records full version/optimization; host major/minor and assertions checked, real Android interpreter/APKs unchanged",
+  "APK_rebuild": false
+}
