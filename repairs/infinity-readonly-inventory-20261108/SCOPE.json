@@ -1,0 +1,19 @@
+{
+  "authorization": "Owner requested a standalone installable Kodi read-only diagnostic ZIP, using existing Kodi access only, while the three-correction investigation remains active.",
+  "operation": "collect-installed-APK-and-active-module-identities",
+  "existing_component_changes": false,
+  "Health_Center_integration": "DEFERRED_SEPARATE_REVIEW",
+  "APK_build_or_signing": false,
+  "phone_writes": "One new JSON report in Downloads or an already accessible user-selected folder; normal installation of this separate diagnostic add-on only.",
+  "forbidden": ["ADB", "root", "wireless debugging", "permission changes or bypass", "database access", "account settings or token access", "existing add-on writes", "services or automatic execution"],
+  "selected_checks_before_delivery": [
+    "Real pinned APK binary-manifest parsing and streaming SHA256; no assumed version/hash",
+    "Exact active module manifest/signature and declared-source hash fixtures, including mismatch and unknown-path refusal",
+    "Trakt known installed-source145-file coverage with unrelated/database files unread",
+    "Permission-denied APK result contains an explicit limitation and no hash",
+    "Traversal and symlink rejection; protected source fixture bytes unchanged",
+    "Deterministic standard Kodi ZIP structure, script-only metadata and no release-repair payload"
+  ],
+  "Android_execution": "Separate existing three-correction workflow remains active; this collector is not yet executed on the Fold.",
+  "release_clearance": false
+}

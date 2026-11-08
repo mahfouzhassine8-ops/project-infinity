@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="script.infinity.readonlyinventory" name="Infinity Read-only Identity Report" version="1.0.0" provider-name="Infinity diagnostics">
+  <requires><import addon="xbmc.python" version="3.0.1"/></requires>
+  <extension point="xbmc.python.script" library="default.py"/>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">Collect installed APK and active module identities into a new JSON report.</summary>
+    <description lang="en_GB">Manually launched, read-only source diagnostic. Uses existing Kodi access. Reads no account settings or databases and changes no existing add-on.</description>
+    <platform>all</platform>
+    <license>GPL-3.0-or-later</license>
+  </extension>
+</addon>
