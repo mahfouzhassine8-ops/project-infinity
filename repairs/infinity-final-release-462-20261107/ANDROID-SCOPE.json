@@ -12,5 +12,12 @@
   "APK_changes": false,
   "public_release": false,
   "Fold": "NOT_RUN",
-  "shutdown": "NOT_SELECTED"
+  "shutdown": "NOT_SELECTED",
+  "transport_attempt": 2,
+  "retained_harness_failure": {
+    "run": 42428112464,
+    "reason": "Disposable runner default Python3.10 lacks hashlib.file_digest; use the same pinnedPython3.11.7 as the existing release tooling",
+    "application_tests": "NOT_RUN",
+    "APK_changed": false
+  }
 }
