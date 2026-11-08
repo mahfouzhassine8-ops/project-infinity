@@ -1,0 +1,17 @@
+{
+  "operation": "verify-owner-supplied-installed-source-before-integration",
+  "archive": "Infinity_Source_Exports_For_Work.zip",
+  "archive_sha256": "e14b1e9c8441e78ce5c930dea8c7a5885053011d531df9ec51377fcb18298b65",
+  "selected_checks": [
+    "Verify all7 outer manifest records, all nested export receipts, CRCs, safe names and source-only scope",
+    "Original-key RSA authentication of installed CC62 metadata and all62 exported declared CC files; recognize the one approved unlisted helper",
+    "Compare all145 installed Trakt files; preserve the installed CLIENT_ID source and AM Lite recovery sentinel guard",
+    "Actual installed CC62 inventory versus unchanged approved two-file correction against actual Umbrella/POV route files; no provider imports or execution",
+    "Reuse the existing13 host cases against the actual installed Trakt recovery dependency because its source differs from the original public fixture",
+    "One additional host check that sentinel refresh token1 is not submitted and still preserves cooldown/account state before/after the two-file notification change"
+  ],
+  "prior_provider_matrix_and_native_compile": "REUSE_WITHOUT_RERUN",
+  "production_source_correction": "NO_NEW_CORRECTION; reuse16af10e4 and514a82e5",
+  "Android_or_Fold": "NOT_RUN_BY_SOURCE_CHECKS",
+  "Health_Center_feature": "EXCLUDED_FROM_RELEASE"
+}

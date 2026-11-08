@@ -25,7 +25,7 @@
     "Silent Mode automatic auth failure ON/OFF, record/cooldown/manual preservation after actual producer identified",
     "Exact shipped CC62 inventory rejection versus approved two-file overlay for two pinned public providers; no provider execution"
   ],
-  "APK_build": "NOT_INITIATED",
+  "APK_build": "PREPARATION_INPUTS_SELECTED; NOT_SIGNED",
   "Trakt_producer": "script.module.tmdbhelper.sync.trakt: TraktAuthenticator.notify_failure, localized32103/32111",
   "physical_Fold_acceptance": "REQUIRED_NOT_RUN",
   "shutdown": "NOT_SELECTED",
@@ -50,7 +50,7 @@
   "installed_Trakt": {
     "version": "1.2.8",
     "owner_direct_verification": true,
-    "source_hashes": "NOT_COLLECTED",
+    "source_hashes": "ALL145_FILES_VERIFIED; installed CLIENT_ID and recovery guard preserved",
     "auto_update": true,
     "setting_changes": false
   },
@@ -71,5 +71,15 @@
     "device_database_access": false,
     "selected_checks": "HEALTH-EXPORT-INVESTIGATION.md",
     "result": "5_LOCAL_CHECKS_PASS_NOT_DEVICE_VERIFICATION"
+  },
+  "installed_source_evidence": {
+    "archive_sha256": "e14b1e9c8441e78ce5c930dea8c7a5885053011d531df9ec51377fcb18298b65",
+    "CC_signature": "ORIGINAL_RSA_VERIFIED",
+    "CC_exported_declared_sources_verified": 62,
+    "other_shims_source_bytes": "NOT_EXPORTED; existing installer must verify all16 before any source write",
+    "provider_actual_inventory": "MOVIE_TV_SEARCH_ONLY_PASS",
+    "Trakt_actual_source": "145_FILES_AUDITED; 2_NOTIFICATION_CHANGES_ONLY; installed CLIENT_ID and AM Lite recovery guard preserved",
+    "Trakt_actual_host_cases": 14,
+    "APK_identity": "DISPLAY2103464; SOURCE_HASH_NOT_IN_ARCHIVE"
   }
 }

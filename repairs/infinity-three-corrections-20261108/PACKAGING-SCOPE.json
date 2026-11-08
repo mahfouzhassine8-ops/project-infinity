@@ -1,0 +1,35 @@
+{
+  "operation": "prepare-three-corrections-internal-QA-pair",
+  "branch": "work/infinity-three-corrections-20261108",
+  "candidate_versionCode": 2103466,
+  "recovery_versionCode": 2103467,
+  "CC": ["0.3.5.64", "0.3.5.65"],
+  "Trakt": ["1.2.8.1", "1.2.8.2"],
+  "version_reservation": "Requires current sole-signer history check before preparation/signing; no reuse of issued465",
+  "baseline_signed_APK_sha256": "eb4ea5594d18d83c5638d10c0c1b22b2124e6c61c303d41908108dcd02b6ae54",
+  "owner_source_evidence_sha256": "e14b1e9c8441e78ce5c930dea8c7a5885053011d531df9ec51377fcb18298b65",
+  "native_compile_reused": {"run":42453405536,"artifact":13606537849,"sha256":"ee3be7c7a95b86f8357539001fcd50bedbd80217b02f130d649f7f57e6075794"},
+  "permitted_payload_changes": [
+    "Existing APK version and Infinity component last-updated metadata only",
+    "CC candidate: approved provider_inventory.py and helper; complete79-file manifest, original signature, forward addon.xml version",
+    "CC recovery: original installed inventory with the same already-present inactive approved helper covered by complete79-file manifest; forward version/signature",
+    "One candidate native library; recovery restores exact existing464 native library",
+    "Complete installed145-file Trakt source carried through standard bundled add-on selection: only the two approved notification edits and necessary forward addon.xml version differ; preserve installed CLIENT_ID and AM Lite recovery guard",
+    "Trakt recovery restores installed functional sources with higher version metadata; account/profile data is never packaged or migrated"
+  ],
+  "selected_checks_before_key_access": [
+    "Current sole-signer APK history and immutable original key/signer/source guards",
+    "Exact authenticated464 baseline APK/components and passing reused native artifact",
+    "Actual installed four-source evidence authentication; reuse14 actual-source host cases without rerun",
+    "Complete79-file module generation and all unrelated module/Trakt bytes preserved",
+    "Unmodified real Java installer preflight upgrade with loose helper, unknown-generation refusal, idempotency, and forward recovery after original module signatures exist",
+    "Every unsigned APK member, owner bundle, DEX and skin comparison before APK signing"
+  ],
+  "application_tests": false,
+  "shutdown_tests": false,
+  "Android_verification": "Separate selected run against the resulting original-key QA APK pair; required before delivery",
+  "Fold_acceptance": "One final owner test; never inferred from CI",
+  "publication": false,
+  "optional_Health_Center_feature": false,
+  "original465_recovery": "Preserved unchanged"
+}

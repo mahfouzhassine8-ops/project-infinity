@@ -5,7 +5,11 @@ Cobra2103445 and Command Center0.3.5.62. These values supersede the earlier
 462/CC61 report. No device was connected or changed during this investigation.
 The owner directly confirmed these versions and Trakt sync1.2.8 on the Fold.
 Trakt auto-update is ON and remains unchanged. Version labels are confirmed;
-installed APK/module/provider source hashes have not been supplied.
+The four installed-source exports are now supplied in
+Infinity_Source_Exports_For_Work.zip (SHA256
+e14b1e9c8441e78ce5c930dea8c7a5885053011d531df9ec51377fcb18298b65).
+The remaining device identity gap is the installed APK hash and the16 source
+records belonging to the other three signed first-party module roots.
 
 ## Umbrella/POV
 
@@ -13,8 +17,12 @@ The reported Movies message, â€œSearch interface not verified for this categoryâ
 maps to an installed provider with no admitted operation. It is distinct from
 the Kodi disabled-add-on state.
 
-The authenticated original CC62 package contains the old provider inventory and
-does not contain native_search_compatibility.py. A new focused integration test
+The authenticated original APK CC62 package contains the old provider inventory
+and does not contain native_search_compatibility.py. The actual installed CC62
+export additionally contains the exact approved helper as an unlisted loose
+file, while its inventory and78-file signed manifest are still original.
+The original RSA signature and all62 exported declared CC source hashes PASS.
+This directly establishes an inactive partial compatibility update. A focused integration test
 ran the actual shipped CC62 inventory against the exact public provider sources
 used by the existing compatibility work. Both were unsupported. Repeating only
 that inventory integration with the two unchanged approved source files admitted
@@ -23,9 +31,11 @@ executed or modified. No navigation or identity operation was granted.
 
 The passing provider matrix42435806833 is reused. CC62-SOURCE-REUSE.json pins the
 existing approved source files; no additional compatibility development was
-needed for these fixture versions. The observed Fold rejection is consistent
-with this shipped package, but installed source identities are still needed to
-confirm the exact Fold cause and current provider versions.
+needed. The same actual inventory scan now also passes against the supplied
+Umbrella6.8.00 and POV6.11.02 installed sources: old CC62 rejects both, and the
+approved two-file overlay admits only native Movie/TV Search. This is source
+integration evidence, not actual Android result/heading execution.
+See evidence/DEVICE-SOURCE-VERIFICATION.json. No provider code was executed.
 
 The CC61 ZIP from42448904041 is excluded from this device's update path.
 Do not downgrade CC62, overwrite an unknown same-version generation, or assume
@@ -109,17 +119,25 @@ successful refresh preservation. A complete pinned upstream tree audit PASS
 confirms exactly2 modified files and144 unchanged files. These are local host
 results with synthetic SDK/HTTP/clock boundaries, not Android/Fold acceptance.
 
-The owner directly verified installed version1.2.8; source hashes remain
-unverified. Auto-update is enabled. Do not upgrade, downgrade or replace an
-installed version with this public reference blindly.
+The complete installed145-file source export is now verified. Its two patch
+preimages exactly match514a82e5. Two other installed files differ from the public
+reference: keys.py contains an installed CLIENT_ID application identifier and
+recovery.py contains the Account Manager Lite sentinel-refresh-token guard.
+Both are preserved byte-for-byte. The actual-source candidate changes only the
+two approved notification files, preserving143 others. The original13 host
+cases were run once against this changed installed recovery dependency, plus
+one sentinel-preservation case:14 PASS. The old reference evidence remains
+unchanged. Auto-update is enabled and remains unchanged.
 See trakt/REPAIR-NOTE.md for exact call paths, source pins and remaining gates.
 
 An equal-version APK copy alone cannot establish deployment: the unchanged
 Kodi AddonManager::FindAddons scans the external add-on directory after bundled
 directories and selects the external copy when versions are equal. Packaging
 must prove the selected Trakt path/version/hash on Android with an existing
-external1.2.8 installation. No generic updater, source overwrite, version
-reservation or settings change was implemented to bypass this gate.
+external1.2.8 installation. The staged standard bundled-source route uses
+forward1.2.8.1 metadata and1.2.8.2 recovery, retaining the complete installed
+functional source except the two approved notification edits. There is no
+generic updater, forced external source overwrite or settings change.
 
 ## Device verification
 
@@ -165,23 +183,32 @@ blocker; no root or permission bypass is authorized.
 
 ## Release gate
 
-No APK build, signing, installation or recovery change was initiated for these
-three scopes. The one necessary native compile/link is complete; do not repeat
-it for reporting or metadata changes. A combined release cannot be prepared
-safely while installed source identities are unknown. If the native correction
+The one necessary native compile/link is complete; do not repeat it for
+reporting or metadata changes. Actual installed-source authentication and
+scoped source integration now PASS. Preparation is selected in
+PACKAGING-SCOPE.json and reuses the existing original module signer and owner
+bundle assembler. New APK signing and Android/Fold verification have not run.
+If the native correction
 is confirmed and adopted, it requires a source-matched combined APK rather than
 an add-on-only ZIP; reusing the old engine would not carry the C++ correction.
 Do not assign or reuse release/recovery versions before checking the existing
 owner registry and monotonic component requirements.
 
-The immediate blocker is the missing installed source inventory/exports, not a
-missing original-key signer. After that gate: prepare one source-matched
-candidate and forward recovery through the existing owner-gated original-key
-workflow; execute only the selected Android Search/Trakt/install-over/recovery
-checks in ANDROID-REQUEST.json; then provide the verified installer for one
-Galaxy Fold end-to-end acceptance. Runtime verification needs that signed QA
-installer; object/link success cannot substitute for it. No final installer,
-completed production repair, or Fold acceptance is claimed by this handoff.
+The sole-signer history audit checked47 signed APK releases and confirms465 is
+latest issued. The selected unused pair is466/467, CC64/65; skin270 is byte
+identical. The separately signed465/CC63 recovery is preserved unchanged.
+The new recovery restores the exact464 engine and pre-correction functional
+sources with higher version metadata. Both CC packages authenticate79 files,
+including the already-present helper (inactive with the old inventory in
+recovery), so no stale-source deletion is required.
+
+The next gates are original module signatures, selected real-Java installer
+upgrade/refusal/recovery cases, exact APK/component preservation, original-key
+QA APK signing, then the selected Android Search/Trakt/install-over/recovery
+checks in ANDROID-REQUEST.json. Runtime verification needs that signed QA
+installer; object/link success cannot substitute for it. Verify the remaining
+Fold identities before installation and perform one final owner acceptance.
+No final installer, completed production repair, or Fold acceptance is claimed.
 
 Cobra, layouts/themes, native provider search implementations, unrelated
 providers, Continue Playing, Resume Hub, playback, user settings/databases,
