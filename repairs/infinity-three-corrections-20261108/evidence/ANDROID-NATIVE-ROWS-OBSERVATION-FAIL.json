@@ -1,0 +1,17 @@
+{
+  "run": 42472683863,
+  "source": "2223baf47bd89a94fbcf1200a9108422357ddad5",
+  "artifact": 13614477724,
+  "artifact_sha256": "ba77ae2111ed275d53065c27dc26badb33422f519ca176278ce9635f505f90f7",
+  "status": "FAIL_DISPOSABLE_OBSERVER_INSPECTED_NATIVE_DIRECTORY_BEFORE_ROWS_POPULATED",
+  "observed": {
+    "POV_native_TV_heading_activated": true,
+    "folder": "plugin://plugin.video.pov/?action=tmdb_tv_search&mode=build_tvshow_list&query=Stranger%20Things",
+    "Container_NumItems": 0,
+    "observed_PID": 5919,
+    "live_item_check_executed": true
+  },
+  "missing": "Wait for real rows and select native result folder; Trakt cases were not reached",
+  "production_changes": false,
+  "correction": "Await actual provider-native rows under bounded original GUI observation; independent Trakt cases run first. Reuse seven prior real cycles and fresh Fold signature/source verification. Same APKs and native20-second limit."
+}

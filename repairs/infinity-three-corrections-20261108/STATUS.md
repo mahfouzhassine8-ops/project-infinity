@@ -211,3 +211,11 @@ the ordinary native Umbrella same-query zero control, one additional common-TV
 Search/POV heading, actual SDK Trakt and recovery. Native zero must match before
 the original eighth completion can be accepted as normal provider behavior.
 No production/provider/settings/native-deadline/signing/build change.
+
+Run42472683863 reached the real POVTV native heading with live-item checks,
+then the observer inspected Container.NumItems0 immediately and failed its
+folder assertion. The native route was correct. The incomplete navigation case
+now awaits actual native rows with a finite120-second deadline. Independent
+Trakt SDK cases run first so this incomplete navigation cannot block them again.
+All failures remain visible; same signed APKs, provider source/preferences and
+20-second consumer lease. Prior seven cycles and Fold source checks are reused.

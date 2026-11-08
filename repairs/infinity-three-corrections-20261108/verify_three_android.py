@@ -169,7 +169,7 @@ def run(baseline, candidate, recovery, fixture, out):
         passed('signed464_to466_complete79_authentication_and_Trakt_source_selection', identity=value)
         init = device.command('first-use', seconds=420)
         assert init['status'] == 'PASS_UNMODIFIED_TWO_PROVIDER_INITIALIZATION'
-        if phase in ('complete', 'finish-native-heading-and-Trakt'):
+        def selected_searches():
             queries = [('movie', 'The Matrix'), ('movie', 'Inception'), ('movie', 'Toy Story'), ('movie', 'Finding Nemo'),
                        ('tv', 'Breaking Bad'), ('tv', 'The Office'), ('tv', 'SpongeBob'), ('tv', 'Re:zero')]
             headings_open = {0: 'plugin.video.umbrella', 1: 'plugin.video.pov', 6: 'plugin.video.umbrella', 7: 'plugin.video.pov'}
@@ -205,11 +205,18 @@ def run(baseline, candidate, recovery, fixture, out):
                     native = device.command('select-row', index=heading['index'], file=heading['file'], seconds=160)
                     opened = provider
                     if media == 'tv':
-                        folders = [r for r in native.get('rows', []) if r.get('file', '').startswith('plugin://' + provider + '/') and 'season' in r['file'].lower()]
-                        assert folders, 'ACTUAL_TV_RESULT_FOLDER_REQUIRED'
+                        def loaded_native_results():
+                            state = device.command('snapshot', seconds=55)
+                            if state['window'] != 10025 or state['labels']['Container.FolderPath'].rstrip('/') != heading['file'].rstrip('/'):
+                                return None
+                            folders = [r for r in state.get('rows', []) if r.get('file', '').startswith('plugin://' + provider + '/') and 'season' in r['file'].lower()]
+                            return (state, folders) if folders else None
+                        native, folders = device.until(loaded_native_results, 'actual native TV directory rows after heading', 120)
                         device.command('select-row', index=folders[0]['index'], file=folders[0]['file'], seconds=160)
                 device.alive()
                 passed('real_Search_All_cycle_' + str(cycle + 1), media=media, query=query, providers=sorted(PROVIDERS), results=len(good), heading_opened=opened, PID=device.pid, live_ListItem_read=True)
+        if phase == 'complete':
+            selected_searches()
         device.command('home')
         try:
             for case in ('silent-on', 'silent-off', 'manual', 'success', 'other-skin'):
@@ -243,6 +250,13 @@ def run(baseline, candidate, recovery, fixture, out):
             time.sleep(3)
             device.alive()
             device.command('home')
+            if phase == 'finish-native-heading-and-Trakt':
+                try:
+                    selected_searches()
+                except Exception as error:
+                    report.setdefault('feature_failures', []).append(dict(feature='Search-navigation', error=repr(error), traceback=traceback.format_exc()))
+                    save()
+                device.command('home')
             if phase == 'Trakt-recovery-and-provider-timing':
                 for media, query in (('movie', 'The Matrix'), ('tv', 'Breaking Bad')):
                     timing = device.command('provider-timing', provider='plugin.video.umbrella', media=media, query=query, seconds=180)
