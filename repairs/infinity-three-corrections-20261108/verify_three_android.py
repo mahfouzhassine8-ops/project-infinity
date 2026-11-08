@@ -62,13 +62,18 @@ def run(baseline, candidate, recovery, fixture, out):
     scope = json.loads((HERE / 'ANDROID-REQUEST.json').read_text())
     assert scope['application_tests'] is True and scope['shutdown_tests'] is False
     phase = scope.get('execution_phase', 'complete')
-    assert phase in ('complete', 'Trakt-recovery-and-provider-timing')
+    assert phase in ('complete', 'Trakt-recovery-and-provider-timing', 'finish-native-heading-and-Trakt')
     report = dict(status='RUNNING_SELECTED_THREE_CORRECTION_ANDROID_GATES', cases=[], Fold='NOT_RUN',
                   shutdown='NOT_SELECTED', playback='NOT_SELECTED', observer_workaround=False, accepted_pointer_updated=False)
     device = None
     report['selected_phase'] = phase
-    if phase != 'complete':
+    if phase == 'Trakt-recovery-and-provider-timing':
         report['Search_acceptance'] = 'FAIL_COLD_UMBRELLA_TIMEOUT_RUN42465125757_ATTEMPT2_RETAINED'
+    if phase == 'finish-native-heading-and-Trakt':
+        prior = json.loads((HERE / 'evidence/ANDROID-SEVEN-PASS-EIGHTH-ZERO-PENDING.json').read_text())
+        assert prior['run'] == 42470383172 and prior['candidate_sha256'] == hashlib.file_digest(candidate.open('rb'), 'sha256').hexdigest()
+        assert len(prior['accepted_cycles']) == 7 and prior['observed_same_PID_completed_requests'] == 8
+        report['source_bound_reused_Search'] = prior
 
     def save():
         (out / 'ANDROID-VERIFICATION.json').write_text(json.dumps(report, indent=2) + '\n')
@@ -164,11 +169,15 @@ def run(baseline, candidate, recovery, fixture, out):
         passed('signed464_to466_complete79_authentication_and_Trakt_source_selection', identity=value)
         init = device.command('first-use', seconds=420)
         assert init['status'] == 'PASS_UNMODIFIED_TWO_PROVIDER_INITIALIZATION'
-        if phase == 'complete':
+        if phase in ('complete', 'finish-native-heading-and-Trakt'):
             queries = [('movie', 'The Matrix'), ('movie', 'Inception'), ('movie', 'Toy Story'), ('movie', 'Finding Nemo'),
                        ('tv', 'Breaking Bad'), ('tv', 'The Office'), ('tv', 'SpongeBob'), ('tv', 'Re:zero')]
             headings_open = {0: 'plugin.video.umbrella', 1: 'plugin.video.pov', 6: 'plugin.video.umbrella', 7: 'plugin.video.pov'}
-            for cycle, (media, query) in enumerate(queries):
+            start = 0
+            if phase == 'finish-native-heading-and-Trakt':
+                queries, start = [('tv', 'Stranger Things')], 8
+                headings_open[8] = 'plugin.video.pov'
+            for cycle, (media, query) in enumerate(queries, start=start):
                 device.command('home')
                 device.command('search', media=media)
                 device.submit_search_all(query, cycle)
@@ -234,10 +243,14 @@ def run(baseline, candidate, recovery, fixture, out):
             time.sleep(3)
             device.alive()
             device.command('home')
-            if phase != 'complete':
+            if phase == 'Trakt-recovery-and-provider-timing':
                 for media, query in (('movie', 'The Matrix'), ('tv', 'Breaking Bad')):
                     timing = device.command('provider-timing', provider='plugin.video.umbrella', media=media, query=query, seconds=180)
                     passed('diagnostic_normal_Umbrella_' + media + '_route_timing', details=timing, production_Search_acceptance=False)
+            if phase == 'finish-native-heading-and-Trakt':
+                control = device.command('provider-timing', provider='plugin.video.umbrella', media='tv', query='Re:zero', allow_empty=True, seconds=180)
+                assert control['results'] == 0, 'RETAINED_INFINITY_ZERO_MUST_MATCH_ORDINARY_NATIVE_PROVIDER'
+                passed('retained_eighth_zero_matches_ordinary_native_Umbrella', details=control, original_run=42470383172, original_PID=5361)
         except Exception as error:
             # Retain a failed feature and still exercise the selected forward
             # recovery. Never convert a failed SDK/diagnostic case into PASS.
@@ -254,7 +267,10 @@ def run(baseline, candidate, recovery, fixture, out):
         passed('signed466_to467_forward_recovery79_files_and_data', identity=restored, previous_functional_sources_restored=True)
         if report.get('feature_failures'):
             raise RuntimeError('Selected Trakt/provider diagnostic failed; forward recovery results retained')
-        report.update(status=('PASS_SELECTED_ANDROID_THREE_CORRECTION_GATES' if phase == 'complete' else 'PASS_ONLY_SELECTED_TRAKT_RECOVERY_AND_NATIVE_ROUTE_DIAGNOSTICS_SEARCH_REMAINS_BLOCKED'), physical_Fold='PENDING_ONE_OWNER_TEST', public_release='ENGINEERING_CANDIDATE_ONLY')
+        status = ('PASS_SELECTED_ANDROID_THREE_CORRECTION_GATES' if phase == 'complete' else
+                  'PASS_REMAINING_ANDROID_GATES_WITH_SOURCE_BOUND_REUSED_SEARCH' if phase == 'finish-native-heading-and-Trakt' else
+                  'PASS_ONLY_SELECTED_TRAKT_RECOVERY_AND_NATIVE_ROUTE_DIAGNOSTICS_SEARCH_REMAINS_BLOCKED')
+        report.update(status=status, physical_Fold='PENDING_ONE_OWNER_TEST', public_release='ENGINEERING_CANDIDATE_ONLY')
     except BaseException as error:
         report.update(status='FAIL_SELECTED_ANDROID_THREE_CORRECTION_GATE', error=type(error).__name__ + ': ' + str(error), traceback=traceback.format_exc())
         raise

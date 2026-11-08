@@ -1,0 +1,134 @@
+{
+  "status": "SEVEN_REAL_CYCLES_PASS_EIGHTH_COMPLETED_ZERO_REQUIRES_NATIVE_CONTROL",
+  "run": 42470383172,
+  "source": "9402f95a71b4e740fbdedea9e17cf4de6e334d93",
+  "artifact": 13613758738,
+  "artifact_sha256": "20e01bc1f11d20d1a05118e3da5ab3a30ad5984c4fe51f02df317c0a174e7fd2",
+  "report_sha256": "597a9eb403b85e9915f1b0b3c935620e84b026ee6373c6b33f614c0846ff1c8b",
+  "candidate_sha256": "d366e4b8aadba8484768cfcc0d362c2fc8e0181d78123ea77e04af4f028a3135",
+  "accepted_cycles": [
+    {
+      "case": "real_Search_All_cycle_1",
+      "status": "PASS",
+      "media": "movie",
+      "query": "The Matrix",
+      "providers": [
+        "plugin.video.pov",
+        "plugin.video.umbrella"
+      ],
+      "results": 42,
+      "heading_opened": "plugin.video.umbrella",
+      "PID": 5361,
+      "live_ListItem_read": true
+    },
+    {
+      "case": "real_Search_All_cycle_2",
+      "status": "PASS",
+      "media": "movie",
+      "query": "Inception",
+      "providers": [
+        "plugin.video.pov",
+        "plugin.video.umbrella"
+      ],
+      "results": 24,
+      "heading_opened": "plugin.video.pov",
+      "PID": 5361,
+      "live_ListItem_read": true
+    },
+    {
+      "case": "real_Search_All_cycle_3",
+      "status": "PASS",
+      "media": "movie",
+      "query": "Toy Story",
+      "providers": [
+        "plugin.video.pov",
+        "plugin.video.umbrella"
+      ],
+      "results": 42,
+      "heading_opened": null,
+      "PID": 5361,
+      "live_ListItem_read": true
+    },
+    {
+      "case": "real_Search_All_cycle_4",
+      "status": "PASS",
+      "media": "movie",
+      "query": "Finding Nemo",
+      "providers": [
+        "plugin.video.pov",
+        "plugin.video.umbrella"
+      ],
+      "results": 6,
+      "heading_opened": null,
+      "PID": 5361,
+      "live_ListItem_read": true
+    },
+    {
+      "case": "real_Search_All_cycle_5",
+      "status": "PASS",
+      "media": "tv",
+      "query": "Breaking Bad",
+      "providers": [
+        "plugin.video.pov",
+        "plugin.video.umbrella"
+      ],
+      "results": 10,
+      "heading_opened": null,
+      "PID": 5361,
+      "live_ListItem_read": true
+    },
+    {
+      "case": "real_Search_All_cycle_6",
+      "status": "PASS",
+      "media": "tv",
+      "query": "The Office",
+      "providers": [
+        "plugin.video.pov",
+        "plugin.video.umbrella"
+      ],
+      "results": 42,
+      "heading_opened": null,
+      "PID": 5361,
+      "live_ListItem_read": true
+    },
+    {
+      "case": "real_Search_All_cycle_7",
+      "status": "PASS",
+      "media": "tv",
+      "query": "SpongeBob",
+      "providers": [
+        "plugin.video.pov",
+        "plugin.video.umbrella"
+      ],
+      "results": 14,
+      "heading_opened": "plugin.video.umbrella",
+      "PID": 5361,
+      "live_ListItem_read": true
+    }
+  ],
+  "observed_same_PID_completed_requests": 8,
+  "PID": 5361,
+  "observer_Python_optimization": 1,
+  "observer_checks": "EXPLICIT_IF_RAISE",
+  "three_native_heading_activations": [
+    "Umbrella movie",
+    "POV movie",
+    "Umbrella TV with native result-folder selection"
+  ],
+  "eighth": {
+    "media": "tv",
+    "query": "Re:zero",
+    "Umbrella_completed_results": 0,
+    "POV_completed_results": 2,
+    "snapshot_sha256": "c5611d885b42329816182322a3e951e6f6581fb2a7254a1d0b1ba34cc7cadfbb",
+    "production_failure_not_established": true,
+    "native_zero_control_required": true
+  },
+  "remaining": [
+    "Ordinary native Umbrella same-query zero control",
+    "POV TV heading and native result folder on common TV query",
+    "Actual SDK Trakt ON/OFF/manual/success/other-skin with nonzero calls/timestamp",
+    "Final integrated recovery; prior real signed recovery already passes"
+  ],
+  "overall_release_clearance": false
+}

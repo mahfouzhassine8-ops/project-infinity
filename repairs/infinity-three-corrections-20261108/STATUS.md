@@ -200,3 +200,14 @@ This is a demonstrated test-infrastructure correction, not another APK build.
 Current corrected-observer run42470383172, source9402f95a, has advanced beyond
 the host download blocker into real Android execution. Source identity and
 original-key checks are now closed; selected behavior gates remain pending.
+
+Run42470383172 genuinely executed the optimized-safe observer (Python flag1).
+Seven distinct real both-provider Movie/TV Search cycles, three native headings
+and native TV-result navigation PASS with onePID5361. The eighth request also
+completed, with Umbrella0 andPOV2 results for Re:zero; the tester demanded both
+nonempty and timed out. This does not establish a provider/native-engine failure.
+The original FAIL is preserved. Reuse all seven valid passes; next execute only
+the ordinary native Umbrella same-query zero control, one additional common-TV
+Search/POV heading, actual SDK Trakt and recovery. Native zero must match before
+the original eighth completion can be accepted as normal provider behavior.
+No production/provider/settings/native-deadline/signing/build change.

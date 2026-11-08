@@ -123,7 +123,10 @@ def action(request, root):
         started = time.monotonic()
         answer = rpc('Files.GetDirectory', dict(directory=target, media='video', properties=infinity_search.PROPERTIES, limits=dict(start=0, end=40)))
         files = answer['files']
-        assert files, 'REAL_NATIVE_PROVIDER_RESULTS_REQUIRED'
+        allow_empty = request.get('allow_empty') is True
+        if allow_empty:
+            assert request['media'] == 'tv' and request['query'] == 'Re:zero', 'ONLY_RETAINED_ZERO_RESULT_CONTROL'
+        assert files or allow_empty, 'REAL_NATIVE_PROVIDER_RESULTS_REQUIRED'
         return dict(status='DIAGNOSTIC_NORMAL_PROVIDER_ROUTE_COMPLETED', seconds=time.monotonic()-started,
                     route=target, results=len(files), labels=[r.get('label') for r in files[:5]],
                     Infinity_Search_lease=False, production_Search_acceptance=False)
