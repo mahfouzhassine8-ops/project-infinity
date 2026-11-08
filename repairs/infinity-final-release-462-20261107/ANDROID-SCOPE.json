@@ -1,23 +1,56 @@
 {
-  "authorization": "User final release brief: original certificate, package integrity, exact source preservation and independent engineering verification before publication",
-  "operation": "transport-candidate464",
-  "signed_run": 42427388825,
-  "signed_source": "33c800fe656eca117a5bfbdc1d4ac46269f3d7ed",
-  "versionCode": 2103464,
-  "selected_checks": [
-    "Exact unchanged signed APK SHA256/source receipt and SDK35 original certificate",
-    "Unchanged byte transport with ZIP compression only"
-  ],
-  "application_tests": false,
-  "APK_changes": false,
+  "authorization": "User final APK release brief: independently verify exact signed install-over, Search, keyboard/graphics, navigation/watched/Info and forward recovery before public delivery; one final Fold test afterward",
+  "operation": "verify-signed464465",
+  "application_tests": true,
   "public_release": false,
-  "Fold": "NOT_RUN",
-  "shutdown": "NOT_SELECTED",
-  "transport_attempt": 2,
-  "retained_harness_failure": {
-    "run": 42428112464,
-    "reason": "Disposable runner default Python3.10 lacks hashlib.file_digest; use the same pinnedPython3.11.7 as the existing release tooling",
-    "application_tests": "NOT_RUN",
-    "APK_changed": false
+  "APK_changes": false,
+  "selected_tests": [
+    "Exact462 with authenticated externalCC61/skin268 through normal Splash/chooser",
+    "462 to464 Android install-over; all78 signed module files and selected protected skin source; data sentinel retained",
+    "Eight real Android Search/IME submissions using unmodified pinnedPOV and Umbrella native search; provider attribution; two actual heading activations; result swipes and constant nativePID",
+    "Front1080x2520 and inner1600x1800 UI observations in system light/dark; manual screenshot/white-line review remains required",
+    "Actual native watched/unwatched popup callbacks against isolated synthetic tracking row",
+    "Actual native Info Play and Trailer buttons with generated local clip; no authenticated-provider playback claim",
+    "Native Downloads Files route observation for independent row/screenshot review",
+    "464 to465 Android forward recovery; exact signed78-file recovery generation and data sentinel retained"
+  ],
+  "excluded": [
+    "Cobra/Preview execution",
+    "Normal Close",
+    "Essential-First",
+    "shutdown scenarios",
+    "unselected reopen scenarios",
+    "uninstall",
+    "data clear",
+    "provider reset",
+    "physical user device",
+    "private provider accounts"
+  ],
+  "target": {
+    "android": 17,
+    "api": "37.0",
+    "image": "google_apis;x86_64",
+    "page_size": 4096,
+    "advertised_arm64_translation": true,
+    "RAM_MiB": 4096
+  },
+  "limits": "Stock emulator and pinned public provider versions are not Samsung/Fold or installed-user-provider acceptance. UI screenshots and white-line/Files observations require manual review. One final Fold test remains.",
+  "signed_APKs": {
+    "2103464": {
+      "run": 42427388825,
+      "source": "33c800fe656eca117a5bfbdc1d4ac46269f3d7ed",
+      "sha256": "eb4ea5594d18d83c5638d10c0c1b22b2124e6c61c303d41908108dcd02b6ae54",
+      "artifact": 13596730735,
+      "artifact_run": 42428328498,
+      "artifact_sha256": "7c2a24f178ab0359d240480faeb8d9571910df3d583f836c59f882de313c28f4"
+    },
+    "2103465": {
+      "run": 42428335227,
+      "source": "69a81674e5244ee2644e0bd4fecd1daf738cf737",
+      "sha256": "bec094103bca08abce081038669428ce9babf0aab1d99ca4cb0ec09ca1a729e9",
+      "artifact": 13596606000,
+      "artifact_run": 42428335227,
+      "artifact_sha256": "827b6655051dbd3f54f43d160c7cac67f2c2d68d71e13ed17574b6e509e947bf"
+    }
   }
 }

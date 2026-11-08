@@ -1,7 +1,7 @@
 """Fresh disposable fixture, exact signed artifacts and unmodified providers."""
 from pathlib import Path
 from zipfile import ZipFile
-import argparse,hashlib,io,json,shutil,subprocess,sys
+import argparse,hashlib,io,json,re,shutil,subprocess,sys
 import xml.etree.ElementTree as ET
 HERE=Path(__file__).resolve().parent
 ROOT=HERE.parents[1]
@@ -11,21 +11,26 @@ from prepare_release import PARENT,CERT,ENGINE,OLD_ENGINE,CC,SKIN
 from inventory import file_sha,load,save,validate_names
 from release_gate import require
 
-def stage(parent,candidate,recovery,current,sdk,out):
+def stage(parent,candidate,recovery,current,sdk,out,identity_only=False):
     require(not out.exists(),'FRESH_DISPOSABLE_FIXTURE');out.mkdir(parents=True)
     require(file_sha(parent)==PARENT,'EXACT_PARENT')
+    scope=load(HERE/'ANDROID-SCOPE.json')
+    require(scope['operation']=='verify-signed464465' and scope['application_tests'] is True,'EXACT_SELECTED_ANDROID_SCOPE')
     inputs=[]
     for version,path,native in [(2103464,candidate,ENGINE),(2103465,recovery,OLD_ENGINE)]:
         receipt=load(path.parent/'BUILD-RECEIPT.json')
-        require(receipt['versionCode']==version and receipt['signed_apk_sha256']==file_sha(path),'EXACT_SOURCE_BOUND_SIGNED_APK')
+        wanted=scope['signed_APKs'][str(version)]
+        require(receipt['versionCode']==version and receipt['signed_apk_sha256']==file_sha(path)==wanted['sha256'] and receipt['source']==wanted['source'],'EXACT_SOURCE_BOUND_SIGNED_APK')
         sig=subprocess.check_output([str(sdk/'apksigner'),'verify','--verbose','--print-certs',str(path)],text=True)
-        require('certificate SHA-256 digest: '+CERT in sig,'ORIGINAL_CERTIFICATE')
+        require(re.findall(r'certificate SHA-256 digest: ([0-9a-f]+)',sig)==[CERT],'EXACT_ONE_ORIGINAL_CERTIFICATE')
         (out/(str(version)+'-SIGNATURE.txt')).write_text(sig)
         with ZipFile(parent) as a,ZipFile(path) as b:
             for n in a.namelist():
                 if n.startswith('classes') and n.endswith('.dex'):require(a.read(n)==b.read(n),'DEX_PRESERVATION:'+n)
             require(hashlib.sha256(b.read('lib/arm64-v8a/libkodi.so')).hexdigest()==native,'EXPECTED_NATIVE_ENGINE')
         inputs.append(dict(versionCode=version,sha256=file_sha(path),source=receipt['source'],certificate_sha256=CERT))
+    save(out/'SIGNED-INPUT-IDENTITY.json',dict(status='PASS_EXACT_SIGNED464_AND465_INPUTS',APKs=inputs,parent_sha256=PARENT,APK_modified=False,Android='NOT_RUN'))
+    if identity_only:return
     home=out/'home';addons=home/'addons';addons.mkdir(parents=True)
     ids=(CC,'script.infinity.rails','script.infinity.uirepair','script.infinity.watchedbridge')
     with ZipFile(parent) as z:
@@ -77,4 +82,5 @@ def stage(parent,candidate,recovery,current,sdk,out):
 if __name__=='__main__':
     p=argparse.ArgumentParser()
     for n in ('parent','candidate','recovery','current','sdk','out'):p.add_argument('--'+n,type=Path,required=True)
+    p.add_argument('--identity-only',action='store_true')
     stage(**vars(p.parse_args()))

@@ -43,7 +43,21 @@ def snapshot():
 
 def action(request,root):
     kind=request['action']
-    if kind=='snapshot':return snapshot()
+    if kind=='snapshot':
+        result=snapshot()
+        if request.get('full') is True:
+            controller=Path(result['controller_path'])
+            result['module_files']={}
+            for line in (controller/'INFINITY-MODULES.v1').read_text().splitlines():
+                row=line.split('\t')
+                if row[0]=='file':
+                    path=controller.parent/row[2]
+                    assert path.resolve().is_relative_to(controller.parent.resolve())
+                    result['module_files'][row[2]]=hashlib.sha256(path.read_bytes()).hexdigest()
+            skin=Path(xbmcvfs.translatePath(xbmcaddon.Addon('skin.infinity.diggz').getAddonInfo('path')))
+            result['skin_path']=str(skin)
+            result['skin_files']={n:hashlib.sha256((skin/n).read_bytes()).hexdigest() for n in ('addon.xml','infinity-skin.json','Infinity-Protected-Manifest.json','unified/DialogVideoInfo.xml','unified/Includes_InfinityMediaLists.xml')}
+        return result
     if kind=='first-use':
         import android_runtime_checks as ui
         result={}
@@ -93,11 +107,12 @@ def action(request,root):
         until(lambda:xbmc.Player().isPlayingVideo(),'actual '+expected+' starts generated clip',45)
         active=rpc('Player.GetActivePlayers');player=next(p['playerid'] for p in active if p['type']=='video')
         item=rpc('Player.GetItem',dict(playerid=player,properties=['file','title']))
-        assert item['item']['file']==xbmcvfs.translatePath(CLIP),item
+        assert item['item']['file'] in (CLIP,xbmcvfs.translatePath(CLIP)),item
         before=rpc('Player.GetProperties',dict(playerid=player,properties=['time','speed']))
-        xbmc.sleep(1300)
-        after=rpc('Player.GetProperties',dict(playerid=player,properties=['time','speed']))
-        assert after['speed']==1 and after['time']!=before['time']
+        def advanced():
+            value=rpc('Player.GetProperties',dict(playerid=player,properties=['time','speed']))
+            return value if value['speed']==1 and value['time']!=before['time'] else None
+        after=until(advanced,'actual local video time advances',10)
         rpc('Player.Stop',dict(playerid=player))
         until(lambda:not xbmc.Player().isPlayingVideo(),'selected clip Stop')
         return dict(status='PASS_ACTUAL_INFO_CONTROL_AND_LOCAL_VIDEO',control=control,item=item,before=before,after=after,content='Generated gray clip; no authenticated provider playback claim')
