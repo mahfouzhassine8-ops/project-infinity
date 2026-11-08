@@ -1,0 +1,74 @@
+{
+  "schema": 1,
+  "status": "PINNED_UNSIGNED_SOURCE_CANDIDATE_NOT_INSTALLABLE",
+  "authority": "Exact prepared original-signed Infinity2103464 and original-key CC61 authenticated current268 reference",
+  "baseline": {
+    "apk_versionCode": 2103464,
+    "command_center_version": "0.3.5.62",
+    "skin_version": "1.0.5.270",
+    "signed_apk_run": 42427388825,
+    "prepared_run": 42425522122,
+    "prepared_artifact_id": 13595626273,
+    "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "command_center_baseline_files": {
+      "addon.xml": "1fe2eaf9012b5e38dfae03c7f7656eacef5f12a70a34ae5222dcad52437dd217",
+      "INFINITY-MODULES.v1": "166c994d66503cfe3b3c70b7c4d4a10ce9778cea5e01a9838c9ce83a1a4b34bc",
+      "provider_inventory.py": "d9b51790c737f9cfa013806c6bf287ab37bd17cb798644ab0aaaf31ea37ae3e2",
+      "infinity_search.py": "a5949485c723cd56f727feec40f3be66eb60976af255ede431040511c145dc44",
+      "plugin.py": "a61290fe791e264e82f00aebb7c5b6173226639edca3bee15d17dccdda82fc8e",
+      "NAVIGATION-CONTRACTS.json": "fd5b58e3a8a5671ded84c0a91ba57d1bbd03a51c5d08869805d33269d275d76d"
+    },
+    "original_manifest_package": "0.3.5.62",
+    "original_manifest_source_file_count": 78
+  },
+  "target": {
+    "apk_versionCode": 2103464,
+    "command_center_version": "0.3.5.62",
+    "skin_version": "1.0.5.270",
+    "same_version_signed_addon_zip": true,
+    "allowed_changed_first_party_source": [
+      "script.infinity.commandcenter/provider_inventory.py"
+    ],
+    "allowed_added_first_party_source": [
+      "script.infinity.commandcenter/native_search_compatibility.py"
+    ],
+    "required_regenerated_authenticated_members": [
+      "script.infinity.commandcenter/INFINITY-MODULES.v1",
+      "script.infinity.commandcenter/INFINITY-MODULES.v1.sig"
+    ],
+    "expected_manifest_package": "0.3.5.62",
+    "unchanged": [
+      "all other Command Center Python and resources",
+      "all sibling first-party modules",
+      "all skin including version and protected manifests",
+      "all original native libraries",
+      "all Android DEX",
+      "all Cobra and Preview",
+      "all third-party providers",
+      "all user data"
+    ]
+  },
+  "recovery": {
+    "apk_versionCode": 2103465,
+    "command_center_version": "0.3.5.63",
+    "skin_version": "1.0.5.271",
+    "remains_original_key_signed_and_unmodified": true,
+    "source": "repairs/infinity-final-release-462-20261107/RECOVERY-README.md",
+    "notes": "Recovery CC63 must remain strictly higher than corrected CC62; do not reuse CC63 for patch"
+  },
+  "releases": {
+    "original_key_signing_required": true,
+    "standalone_zip_GUI_recovery_verified_on_android": false,
+    "physical_Fold_verified": false,
+    "public_installable_package_created": false,
+    "signing_workflow_and_keys_changed": false,
+    "installed_device_version_unknown": true,
+    "blockers": [
+      "Review source-derived signed input identity and all modified files",
+      "Use existing original-key module signer to regenerate complete manifest/signature",
+      "Verify exact ZIP complete-root install-over and partial-update recovery on Android17",
+      "Refuse installation if device is already at recovery465/CC63; never downgrade",
+      "Do not promote an unsigned loose source ZIP as installable"
+    ]
+  }
+}
