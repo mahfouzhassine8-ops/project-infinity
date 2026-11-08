@@ -7,7 +7,7 @@
   "selected_tests": [
     "Exact462 with authenticated externalCC61/skin268 through normal Splash/chooser",
     "462 to464 Android install-over; all78 signed module files and selected protected skin source; data sentinel retained",
-    "Eight real Android Search/IME submissions using unmodified pinnedPOV and Umbrella native search; provider attribution; two actual heading activations; result swipes and constant nativePID",
+    "Eight distinct real Android Search/IME movie/TV submissions using unchanged pinnedNixtoons and Umbrella native search; source attribution, two heading activations, native swipes, constantPID; Re:zero must include actualNixtoons results",
     "Front1080x2520 and inner1600x1800 UI observations in system light/dark; manual screenshot/white-line review remains required",
     "Actual native watched/unwatched popup callbacks against isolated synthetic tracking row",
     "Actual native Info Play and Trailer buttons with generated local clip; no authenticated-provider playback claim",
@@ -52,5 +52,52 @@
       "artifact_run": 42428335227,
       "artifact_sha256": "827b6655051dbd3f54f43d160c7cac67f2c2d68d71e13ed17574b6e509e947bf"
     }
-  }
+  },
+  "fixture_input_revision": 3,
+  "query_selection": [
+    {
+      "media": "movie",
+      "query": "The Matrix"
+    },
+    {
+      "media": "movie",
+      "query": "Just Friends"
+    },
+    {
+      "media": "movie",
+      "query": "Inception"
+    },
+    {
+      "media": "movie",
+      "query": "Toy Story"
+    },
+    {
+      "media": "movie",
+      "query": "Spirited Away"
+    },
+    {
+      "media": "movie",
+      "query": "Finding Nemo"
+    },
+    {
+      "media": "tv",
+      "query": "Re:zero"
+    },
+    {
+      "media": "tv",
+      "query": "SpongeBob"
+    }
+  ],
+  "retained_preexecution_failure": {
+    "run": 42429020127,
+    "artifact": 13596414321,
+    "artifact_sha256": "866358d5ad9fd5f631f08e9d8a383b28003cf39de0ee30a2ed1100d30d7e34c5",
+    "failure": "Mutable upstreamPOV6.10.22 fixture URL returns404; publisher history exposes no retained archive at that path",
+    "Android_application_execution": "NOT_RUN",
+    "both_signed_APK_identities": "PASS",
+    "correction": "Both historicalPOV fixture URLs unavailable; use exact already-reviewed publisherWatchNixtoons2 0.14.24 archiveSHA76a0580d035b80634fc6775f46aacc780a9449a9ca46b446dde63c2360ce6540 plus unchanged officialKodi six/InputStream dependencies. All seven binaryAPI versions match exact462. Umbrella and both signed APKs unchanged. No user provider or APK baseline substitution.",
+    "alternate_POV_6_10_21": "Immutable old publisher commit also returns404; never executed or claimed passing"
+  },
+  "native_search_query_cache": "Eight distinct queries on a fresh fixture avoid reusing a previous query result; no cache purge or provider modifications",
+  "original_dependencies": "ANDROID-EXTRA-INPUT-PINS.json records unchanged official archives and exact seven packaged binary API matches; no provider/addon.xml edit"
 }

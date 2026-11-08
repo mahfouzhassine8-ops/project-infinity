@@ -15,7 +15,7 @@ QA='script.infinity.finalreleaseqa'
 HOME='/sdcard/Android/data/'+PACKAGE+'/files/.kodi'
 PROFILE=HOME+'/userdata'
 QAROOT=PROFILE+'/addon_data/'+QA
-PROVIDERS={'plugin.video.pov','plugin.video.umbrella'}
+PROVIDERS={'plugin.video.watchnixtoons2','plugin.video.umbrella'}
 
 class Device:
     def __init__(self,out):
@@ -146,7 +146,7 @@ def verify_successor(device,apk,version):
 
 def verify(parent,candidate,recovery,fixture,out):
     assert not out.exists();out.mkdir(parents=True)
-    report=dict(status='RUNNING_SELECTED_ANDROID_GATES',parent=2103462,candidate=2103464,recovery=2103465,cases=[],actual_provider_versions='PinnedPOV6.10.22 and Umbrella6.7.729; not claimed as installed Fold versions',physical_Fold='NOT_RUN',shutdown='NOT_SELECTED',accepted_pointer_updated=False,public_release=False)
+    report=dict(status='RUNNING_SELECTED_ANDROID_GATES',parent=2103462,candidate=2103464,recovery=2103465,cases=[],actual_provider_versions='PinnedWatchNixtoons2 0.14.24 and Umbrella6.7.729; not claimed as installed Fold versions',physical_Fold='NOT_RUN',shutdown='NOT_SELECTED',accepted_pointer_updated=False,public_release=False)
     def save(): (out/'ANDROID-VERIFICATION.json').write_text(json.dumps(report,indent=2)+'\n')
     def passed(case,**detail):report['cases'].append(dict(case=case,status='PASS',**detail));save()
     device=None
@@ -186,8 +186,9 @@ def verify(parent,candidate,recovery,fixture,out):
                 device.shell('cmd','uimode','night',theme);time.sleep(3);device.alive()
                 passed('layout_snapshot_'+mode+'_'+theme,screenshot=device.screenshot(mode+'-'+theme+'-home'),interpretation='Actual emulator surface for visual inspection; no automatic Fold or white-line PASS')
         device.shell('wm','size','1080x2520');device.shell('wm','density','420');device.shell('cmd','uimode','night','yes')
-        for cycle in range(8):
-            device.command('home');device.command('search')
+        queries=[('movie','The Matrix'),('movie','Just Friends'),('movie','Inception'),('movie','Toy Story'),('movie','Spirited Away'),('movie','Finding Nemo'),('tv','Re:zero'),('tv','SpongeBob')]
+        for cycle,(media,query) in enumerate(queries):
+            device.command('home');device.command('search',media=media)
             def keyboard():
                 tree=device.nodes('search-'+str(cycle))
                 edits=[n for n in tree.iter('node') if n.get('class')=='android.widget.EditText' and n.get('enabled')=='true']
@@ -195,7 +196,6 @@ def verify(parent,candidate,recovery,fixture,out):
             tree,edit=device.until(keyboard,'actual original Infinity Search EditText',60)
             device.tap(edit)
             device.until(lambda:'mInputShown=true' in device.shell('dumpsys','input_method'),'actual shown IME',30)
-            query='The Matrix' if cycle%2==0 else 'Just Friends'
             device.shell('input','text',query.replace(' ','%s'))
             # Submit through real Android IME; no synthetic keyboard callback.
             device.shell('input','keyevent','66')
@@ -209,6 +209,7 @@ def verify(parent,candidate,recovery,fixture,out):
                 return None
             value,headings,good=device.until(results,'actual two-provider grouped native results',160)
             assert not any('state changed' in r['label'].lower() for r in value['rows'])
+            if query=='Re:zero':assert any(r['provider']=='plugin.video.watchnixtoons2' for r in good),'ACTUAL_NIXTOONS_POSITIVE_RESULT_REQUIRED'
             device.alive()
             device.shell('input','swipe','820','1650','820','750','500');device.shell('input','swipe','820','750','820','1650','500')
             if cycle in (0,7):device.command('select-row',index=headings[0]['index'],file=headings[0]['file'],seconds=160)

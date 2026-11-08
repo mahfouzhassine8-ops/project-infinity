@@ -1,0 +1,76 @@
+{
+  "authority": "Unmodified Kodi official Omega index and original publisher-pinned WatchNixtoons2; disposable Android dependencies only",
+  "index_url": "https://mirrors.kodi.tv/addons/omega/addons.xml.gz",
+  "index_sha256": "0bc2a2fbcce89440d1ad435ee9b0fff60b36727598a029b006aa91b23dd1cee4",
+  "archives": [
+    {
+      "addon": "plugin.video.watchnixtoons2",
+      "version": "0.14.24",
+      "url": "https://raw.githubusercontent.com/OldManJax/repository.animaniac/ac317fdf6d001f6e252b41037fb1086817e8b00f/plugin.video.watchnixtoons2/plugin.video.watchnixtoons2-0.14.24.zip",
+      "sha256": "76a0580d035b80634fc6775f46aacc780a9449a9ca46b446dde63c2360ce6540"
+    },
+    {
+      "addon": "script.module.six",
+      "version": "1.16.0+matrix.1",
+      "url": "https://mirrors.kodi.tv/addons/omega/script.module.six/script.module.six-1.16.0+matrix.1.zip",
+      "sha256": "4197f7773f75ab9f16b3c920195acbb8b8b151b4b3c8c3e14fc4876e764e3860",
+      "dependencies": [
+        {
+          "addon": "xbmc.python",
+          "version": "3.0.0",
+          "packaged": "3.0.1"
+        }
+      ]
+    },
+    {
+      "addon": "inputstream.adaptive",
+      "version": "21.5.25",
+      "url": "https://mirrors.kodi.tv/addons/omega/inputstream.adaptive+android-aarch64/inputstream.adaptive-21.5.25.zip",
+      "sha256": "5bec8b8ca1f1ca8264e32455cb34b2939e523f9bdb18cd65d7383d18afdf04cb",
+      "dependencies": [
+        {
+          "addon": "kodi.binary.global.main",
+          "minversion": "2.0.0",
+          "version": "2.0.2",
+          "packaged": "2.0.2"
+        },
+        {
+          "addon": "kodi.binary.global.general",
+          "minversion": "1.0.4",
+          "version": "1.0.5",
+          "packaged": "1.0.5"
+        },
+        {
+          "addon": "kodi.binary.global.gui",
+          "minversion": "5.15.0",
+          "version": "5.15.0",
+          "packaged": "5.15.0"
+        },
+        {
+          "addon": "kodi.binary.global.filesystem",
+          "minversion": "1.1.7",
+          "version": "1.1.9",
+          "packaged": "1.1.9"
+        },
+        {
+          "addon": "kodi.binary.global.tools",
+          "minversion": "1.0.0",
+          "version": "1.0.4",
+          "packaged": "1.0.4"
+        },
+        {
+          "addon": "kodi.binary.instance.inputstream",
+          "minversion": "3.3.0",
+          "version": "3.3.0",
+          "packaged": "3.3.0"
+        },
+        {
+          "addon": "kodi.binary.instance.videocodec",
+          "minversion": "2.1.0",
+          "version": "2.1.0",
+          "packaged": "2.1.0"
+        }
+      ]
+    }
+  ]
+}

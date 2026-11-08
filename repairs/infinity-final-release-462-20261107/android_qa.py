@@ -10,7 +10,7 @@ import xbmc,xbmcaddon,xbmcgui,xbmcplugin,xbmcvfs
 
 CC='script.infinity.commandcenter'
 QA='script.infinity.finalreleaseqa'
-PROVIDERS=['plugin.video.pov','plugin.video.umbrella']
+PROVIDERS=['plugin.video.watchnixtoons2','plugin.video.umbrella']
 CLIP='special://profile/infinity-final-qa.mp4'
 
 def rpc(method,params=None):
@@ -69,7 +69,8 @@ def action(request,root):
         return snapshot()
     if kind=='search':
         assert xbmc.getSkinDir()=='skin.infinity.diggz'
-        xbmc.executebuiltin('RunScript(script.infinity.commandcenter,universal-search,movie)')
+        media=request.get('media','movie');assert media in ('movie','tv')
+        xbmc.executebuiltin('RunScript(script.infinity.commandcenter,universal-search,'+media+')')
         return dict(status='ORIGINAL_HOME_SEARCH_DISPATCHED',pid=os.getpid())
     if kind=='select-row':
         index=request['index'];count=int(xbmc.getInfoLabel('Container.NumItems') or 0)

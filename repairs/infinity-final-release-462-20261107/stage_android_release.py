@@ -48,11 +48,18 @@ def stage(parent,candidate,recovery,current,sdk,out,identity_only=False):
     # settings, response substitution, provider patch or source shim.
     pins=load(ROOT/'repairs/save-later-multiimage-20261023/ANDROID-INPUT-PINS.json')
     known={r['addon']:r for r in pins['archives']}
-    pending=[dict(addon='plugin.video.pov',version='6.10.22',url='https://raw.githubusercontent.com/kodifitzwell/repo/master/plugin.video.pov/plugin.video.pov-6.10.22.zip',sha256='126b9fbe690dded613d0c2bab177babd6ce2235bc9d67fb25e1c79aefc9dc0d3'),known['plugin.video.umbrella']]
+    for row in load(HERE/'ANDROID-EXTRA-INPUT-PINS.json')['archives']:known[row['addon']]=row
+    with ZipFile(parent) as z:
+        builtins={}
+        for n in z.namelist():
+            if n.startswith('assets/addons/') and n.endswith('/addon.xml'):
+                a=ET.fromstring(z.read(n));builtins[a.get('id')]=a.get('version')
+    pending=[known['plugin.video.watchnixtoons2'],known['plugin.video.umbrella']]
     rows=[];seen=set()
     while pending:
         row=pending.pop(0);aid=row['addon']
         if aid in seen:continue
+        print('Fetch exact unmodified fixture:',aid,row['version'],row['url'],flush=True)
         raw=android_inputs.fetch(row['url']);require(hashlib.sha256(raw).hexdigest()==row['sha256'],'EXACT_ORIGINAL_PROVIDER_DISTRIBUTION:'+aid)
         manifest=android_inputs.manifest(raw,aid);require(manifest.get('version')==row['version'],'PROVIDER_VERSION')
         with ZipFile(io.BytesIO(raw)) as z:
@@ -62,7 +69,10 @@ def stage(parent,candidate,recovery,current,sdk,out,identity_only=False):
         rows.append(row);seen.add(aid)
         for dep in manifest.findall('requires/import'):
             name=dep.get('addon')
-            if name.startswith('xbmc.') or dep.get('optional')=='true' or name in seen:continue
+            if name in builtins:
+                if name.startswith('kodi.binary.'):require(builtins[name]==dep.get('version'),'EXACT_PACKAGED_NATIVE_DEPENDENCY_API:'+name)
+                continue
+            if dep.get('optional')=='true' or name in seen:continue
             require(name in known,'SEPARATELY_PINNED_DEPENDENCY_REQUIRED:'+name);pending.append(known[name])
     qa=addons/'script.infinity.finalreleaseqa';qa.mkdir()
     (qa/'addon.xml').write_text('<addon id="script.infinity.finalreleaseqa" name="Disposable final release QA" version="1.0.0" provider-name="Infinity engineering"><requires><import addon="xbmc.python" version="3.0.0"/></requires><extension point="xbmc.python.script" library="qa.py"/><extension point="xbmc.python.pluginsource" library="qa.py"><provides>video</provides></extension><extension point="xbmc.addon.metadata"><summary lang="en">Disposable fixed test actions and generated clip only</summary><platform>all</platform></extension></addon>')
