@@ -10,7 +10,7 @@ on:
         type: choice
         required: true
         default: final-combined
-        options: [final-combined, prepare-preview451, prepare-kodi452, prepare-kodi453, prepare-ui454-455, prepare-controlled456-457, review-controlled456-457, prepare-browser458-459, review-browser458-459, prepare-six460-461, review-six460-461, package-nine-quick-updates, verify-nine-update-recovery, prepare-nine-native462-463, package-umbrella-pov-462, verify-three-native, prepare-three, sign-three, watchlist-verify-native, prepare-watchlist, sign-watchlist]
+        options: [final-combined, prepare-preview451, prepare-kodi452, prepare-kodi453, prepare-ui454-455, prepare-controlled456-457, review-controlled456-457, prepare-browser458-459, review-browser458-459, prepare-six460-461, review-six460-461, package-nine-quick-updates, verify-nine-update-recovery, prepare-nine-native462-463, package-umbrella-pov-462, verify-three-native, prepare-three, sign-three, watchlist-verify-native, prepare-watchlist, sign-watchlist, publish-watchlist]
       prepared_run:
         description: Completed official controlled preparation run for read-only authority review
         type: string
@@ -1909,5 +1909,214 @@ jobs:
             REGISTERED-CANDIDATE-CHECK.json
             SIGNER-ROUTES.json
             unsigned-preservation/
+          if-no-files-found: warn
+          retention-days: 90
+  publish-watchlist:
+    name: Exact signed468 and forward469 engineering prerelease; Fold acceptance pending
+    if: github.event_name == 'workflow_dispatch' && github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/work/infinity-watchlist-phase-b-20261108' && inputs.operation == 'publish-watchlist'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    permissions: {contents: write, actions: read}
+    env: {GH_TOKEN: '${{ github.token }}', PYTHONDONTWRITEBYTECODE: '1'}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '21'}
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with: {packages: 'build-tools;35.0.0', log-accepted-android-sdk-licenses: false}
+      - name: Authenticate exact signed producers and completed selected Android evidence; package unchanged bytes
+        run: |
+          python3 - <<'PYGATE'
+          import ast,hashlib,json,os,re,shutil,stat,subprocess,zipfile
+          from pathlib import Path,PurePosixPath
+          task=Path('repairs/infinity-watchlist-playback-2103466-20261108')
+          repo='mahfouzhassine8-ops/project-infinity';base='repos/'+repo+'/'
+          def load(path):return json.loads(Path(path).read_text())
+          def sha(path):
+            with Path(path).open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
+          def api(path):return json.loads(subprocess.check_output(['gh','api',base+path],text=True))
+          def ancestor(source,target):subprocess.run(['git','merge-base','--is-ancestor',source,target],check=True)
+          def source_bytes(source,path):return subprocess.check_output(['git','show',source+':'+str(path)])
+          request=load(task/'PUBLICATION-REQUEST.json');pair=load(task/'SIGNED-PAIR-REQUEST.json')
+          assert request['schema']==1 and request['operation']=='publish-watchlist-engineering-prerelease'
+          assert request['repository']==repo and request['publication'] is True and request['prerelease'] is True and request['accepted_pointer_updated'] is False
+          assert request['release_tag']=='infinity-2103468-watchlist-fold-pending'
+          assert 1<=len(request['release_title'])<=160 and all(word in request['release_title'].lower() for word in ('fold','pending'))
+          assert sha(task/'SIGNED-PAIR-REQUEST.json')==request['signed_pair_request_sha256']
+          assert pair['schema']==1 and pair['operation']=='verify-watchlist-signed468-forward469' and pair['repository']==repo
+          certificate='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
+          assert pair['certificate_sha256']==certificate and set(pair['inputs'])=={'baseline','candidate','recovery'}
+          for key,name in [('runtime_source_pins_sha256','RUNTIME-SOURCE-PINS.json'),('android_request_sha256','ANDROID-REQUEST.json'),('harness_host_result_sha256','ANDROID-HARNESS-HOST-RESULT.json')]:assert sha(task/name)==pair[key]
+          scope=load(task/'ANDROID-REQUEST.json')
+          assert scope['operation']==pair['operation'] and scope['application_tests'] is True and scope['shutdown_tests'] is False
+          android=request['android'];source=android['source_commit']
+          assert re.fullmatch('[0-9a-f]{40}',source) and type(android['run_id']) is int and android['run_id']>0
+          ancestor(source,os.environ['GITHUB_SHA'])
+          workflow=api('actions/workflows/infinity-saved-navigation-android.yml')
+          run=api('actions/runs/'+str(android['run_id']))
+          assert android['workflow_id']==workflow['id']==run['workflow_id']
+          assert workflow['path']==run['path']=='.github/workflows/infinity-saved-navigation-android.yml'
+          assert run['status']=='completed' and run['conclusion']=='success' and run['head_sha']==source and run['head_branch']=='work/infinity-watchlist-phase-b-20261108'
+          jobs=api('actions/runs/'+str(android['run_id'])+'/jobs?per_page=100')['jobs']
+          selected=[job for job in jobs if job['name']=='Exact signed468 Watchlist playback and forward469 recovery; selected feature only']
+          assert len(selected)==1 and selected[0]['status']=='completed' and selected[0]['conclusion']=='success'
+          assert (task/'SIGNED-PAIR-REQUEST.json').read_bytes()==source_bytes(source,task/'SIGNED-PAIR-REQUEST.json')
+          workflow_path=Path('.github/workflows/infinity-saved-navigation-android.yml')
+          assert workflow_path.read_bytes()==source_bytes(source,workflow_path)
+          assert "inputs.feature == 'watchlist-playback-android'" in workflow_path.read_text()
+          host=load(task/'ANDROID-HARNESS-HOST-RESULT.json');assert host['status']=='PASS_HOST_STAGING_ONLY'
+          for name,wanted in host['source_sha256'].items():
+            path=task/name;assert sha(path)==wanted and path.read_bytes()==source_bytes(source,path)
+          for name in ('ANDROID-REQUEST.json','RUNTIME-SOURCE-PINS.json','ANDROID-HARNESS-HOST-RESULT.json'):
+            path=task/name;assert path.read_bytes()==source_bytes(source,path)
+          pins=load(task/'RUNTIME-SOURCE-PINS.json')
+          for group,folder in [('native',task/'native'),('python',task/'overlay/script.infinity.commandcenter')]:
+            for name,wanted in pins[group].items():
+              path=folder/name;assert sha(path)==wanted and path.read_bytes()==source_bytes(source,path)
+          work=Path('watchlist-publication-inputs');work.mkdir()
+          provenance={'android_run':run,'signed_runs':{},'artifacts':{}}
+          def download(row,label):
+            expected=row['artifact'];assert set(expected)=={'id','name','digest','size_in_bytes'}
+            assert type(expected['id']) is int and expected['id']>0 and re.fullmatch('sha256:[0-9a-f]{64}',expected['digest'])
+            assert type(expected['size_in_bytes']) is int and 0<expected['size_in_bytes']<=2*1024**3
+            actual=api('actions/artifacts/'+str(expected['id']))
+            assert not actual['expired'] and actual['workflow_run']['id']==row['run_id'] and all(actual[k]==v for k,v in expected.items())
+            archive=work/(label+'.zip')
+            with archive.open('xb') as stream:subprocess.run(['gh','api',base+'actions/artifacts/'+str(expected['id'])+'/zip'],stdout=stream,check=True,timeout=600)
+            assert archive.stat().st_size==expected['size_in_bytes'] and 'sha256:'+sha(archive)==expected['digest']
+            destination=work/label;destination.mkdir()
+            with zipfile.ZipFile(archive) as z:
+              names=z.namelist();assert len(names)==len(set(names)) and len(names)<=10000 and sum(i.file_size for i in z.infolist())<=4*1024**3
+              for item in z.infolist():
+                path=PurePosixPath(item.filename)
+                assert not path.is_absolute() and '..' not in path.parts and '\\' not in item.filename and '\x00' not in item.filename
+                assert not stat.S_ISLNK(item.external_attr>>16) and not (item.flag_bits&1)
+              z.extractall(destination)
+            provenance['artifacts'][label]=actual
+            return destination
+          android_dir=download(android,'android')
+          def unique(root,name):
+            found=list(root.rglob(name));assert len(found)==1 and found[0].is_file();return found[0]
+          report_path=unique(android_dir,'ANDROID-VERIFICATION.json');report=load(report_path)
+          assert report['status']=='PASS_SELECTED_ANDROID_WATCHLIST_SYNTHETIC_MEDIA_GATES'
+          assert report['Fold']=='NOT_RUN' and report['shutdown']=='NOT_SELECTED' and report['release_acceptance'] is False
+          assert report['synthetic_fixture_media'] is True and report['real_provider_source_unmodified'] is True and report['provider_accounts'] is False
+          harness=ast.parse((task/'verify_watchlist_android.py').read_text())
+          expected={node.args[0].value for node in ast.walk(harness) if isinstance(node,ast.Call) and isinstance(node.func,ast.Name) and node.func.id=='passed' and node.args and isinstance(node.args[0],ast.Constant)}
+          assert len(expected)==10
+          cases=report['cases'];assert len(cases)==len(expected) and {case['case'] for case in cases}==expected and all(case['status']=='PASS' for case in cases)
+          inputs_path=unique(android_dir,'ANDROID-INPUTS.json');tested=load(inputs_path)['signed_pair']
+          assert tested['certificate_sha256']==certificate
+          baseline=pair['inputs']['baseline']
+          assert baseline['version_code']==2103466 and baseline['run_id']==42462319257 and baseline['artifact']['id']==13609794621 and baseline['apk_sha256']=='d366e4b8aadba8484768cfcc0d362c2fc8e0181d78123ea77e04af4f028a3135'
+          for kind,version in [('baseline',2103466),('candidate',2103468),('recovery',2103469)]:
+            assert pair['inputs'][kind]['version_code']==version and tested[str(version)]['sha256']==pair['inputs'][kind]['apk_sha256']
+          copied_request=unique(android_dir,'ANDROID-REQUEST.json');assert load(copied_request)==scope
+          payload=Path('watchlist-publication-ready');payload.mkdir()
+          evidence=work/'engineering';evidence.mkdir()
+          shutil.copyfile(report_path,evidence/'ANDROID-VERIFICATION.json');shutil.copyfile(inputs_path,evidence/'ANDROID-INPUTS.json')
+          for name in ('PUBLICATION-REQUEST.json','SIGNED-PAIR-REQUEST.json','ANDROID-REQUEST.json','RUNTIME-SOURCE-PINS.json','HOST-INTEGRATION-RESULT.json','NATIVE-HOST-RESULT.json','NATIVE-REVIEW.json','PYTHON-TARGETED-REVIEW.json','CURRENT-EMITTER-PINS.json'):
+            shutil.copyfile(task/name,evidence/name)
+          shutil.copyfile(task/'evidence/MODULE-UPGRADE-RECOVERY.json',evidence/'MODULE-UPGRADE-RECOVERY.json')
+          for name in ('ARM64-LINK-VERIFIED.json','ARM64-SOURCE-PRESERVATION.json'):
+            shutil.copyfile(task/'contract-evidence'/name,evidence/name)
+          sdk=Path(os.environ['ANDROID_HOME'])/'build-tools/35.0.0'
+          for kind,version in [('candidate',2103468),('recovery',2103469)]:
+            row=pair['inputs'][kind];assert row['workflow_id']==397702717 and re.fullmatch('[0-9a-f]{40}',row['source_commit'])
+            producer=api('actions/runs/'+str(row['run_id']))
+            assert producer['status']=='completed' and producer['conclusion']=='success' and producer['workflow_id']==397702717
+            assert producer['path']=='.github/workflows/infinity-combined-release.yml' and producer['head_sha']==row['source_commit'] and producer['head_branch']=='work/infinity-watchlist-phase-b-20261108'
+            ancestor(row['source_commit'],source);provenance['signed_runs'][kind]=producer
+            directory=download(row,kind)
+            def member(name):
+              relative=PurePosixPath(name);assert not relative.is_absolute() and '..' not in relative.parts and '\\' not in name
+              path=directory/str(relative);assert path.is_file() and path.resolve().is_relative_to(directory.resolve());return path
+            apk=member(row['apk_path']);receipt_path=member(row['receipt_path']);receipt=load(receipt_path)
+            assert sha(apk)==row['apk_sha256']==receipt['signed_apk_sha256']==tested[str(version)]['sha256']
+            assert receipt['versionCode']==version and receipt['source']==row['source_commit'] and receipt['certificate_sha256']==certificate
+            signature=subprocess.check_output([str(sdk/'apksigner'),'verify','--verbose','--print-certs',str(apk)],text=True)
+            assert re.findall(r'certificate SHA-256 digest: ([0-9a-f]+)',signature)==[certificate]
+            name='Infinity-'+str(version)+'-Combined-Original-Signer.apk'
+            shutil.copyfile(apk,payload/name);assert sha(payload/name)==row['apk_sha256']
+            shutil.copyfile(receipt_path,evidence/('BUILD-RECEIPT-'+str(version)+'.json'))
+            shutil.copyfile(directory/'PREPARATION.json',evidence/('PREPARATION-'+str(version)+'.json'))
+            shutil.copyfile(directory/'preservation/APK-PRESERVATION.json',evidence/('APK-PRESERVATION-'+str(version)+'.json'))
+            (evidence/('SIGNATURE-'+str(version)+'.txt')).write_text(signature)
+          (evidence/'GITHUB-PROVENANCE.json').write_text(json.dumps(provenance,indent=2)+'\n')
+          with zipfile.ZipFile(payload/'ENGINEERING-EVIDENCE.zip','w',compression=zipfile.ZIP_DEFLATED) as z:
+            for path in sorted(evidence.iterdir()):z.write(path,path.name)
+          instructions='''# Infinity 2103468 Watchlist — Fold acceptance pending
+
+          This prerelease contains the exact original-signed APKs exercised by the selected Android engineering journey. Engineering used synthetic AIO/MP4 media with unmodified real provider code. Physical Fold acceptance is pending; shutdown was not selected. No accepted pointer is changed.
+
+          Install Infinity-2103468-Combined-Original-Signer.apk over your existing Infinity app. Keep app data/settings; do not uninstall or clear data. Verify SHA256SUMS before installing.
+
+          Forward recovery is Infinity-2103469-Combined-Original-Signer.apk. Use it only when recovery is needed: it restores approved 2103466 functional modules/native with a higher Android version and preserves saved user data. It uses the same permanent original signer. Do not attempt a version downgrade.
+
+          One owner journey: save a never-played title without creating progress; play/partially stop/resume the exact saved TV episode; verify Progress Shows and unfinished Next Episodes; complete it; play/resume a saved movie; confirm normal Movies/TV and existing Search. A successor is shown only when the existing local catalogue proves it; provider-only completion withholds an unproved next episode.
+
+          ENGINEERING-EVIDENCE.zip contains exact signed receipts, hashes, source pins and selected Android results. These are engineering evidence, not a Fold acceptance claim.
+          '''
+          (payload/'INSTALL-AND-RECOVERY.md').write_text(instructions)
+          gate=dict(status='PASS_EXACT_SIGNED_PAIR_AND_SELECTED_ANDROID_PUBLICATION_GATE',request_sha256=sha(task/'PUBLICATION-REQUEST.json'),signed_pair_request_sha256=sha(task/'SIGNED-PAIR-REQUEST.json'),Android_run=android['run_id'],Android_source=source,Android_artifact=android['artifact'],selected_cases=sorted(expected),Fold='PENDING_OWNER_ACCEPTANCE',shutdown='NOT_SELECTED',accepted_pointer_updated=False,APK_modified=False)
+          Path('WATCHLIST-PUBLICATION-GATE.json').write_text(json.dumps(gate,indent=2)+'\n')
+          print('PASS exact unchanged signed468/469 and all ten selected Android cases; Fold pending')
+          PYGATE
+      - name: Upload private draft, verify every asset hash and size, then publish engineering prerelease
+        run: |
+          python3 - <<'PYPUBLISH'
+          import hashlib,json,os,subprocess
+          from pathlib import Path
+          task=Path('repairs/infinity-watchlist-playback-2103466-20261108');request=json.loads((task/'PUBLICATION-REQUEST.json').read_text())
+          repo='mahfouzhassine8-ops/project-infinity';base='repos/'+repo+'/';payload=Path('watchlist-publication-ready')
+          def sha(path):
+            with Path(path).open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
+          def api(path,method='GET',body=None):
+            args=['gh','api','--method',method,base+path]
+            if body is not None:args+=['--input','-']
+            return json.loads(subprocess.check_output(args,input=json.dumps(body) if body is not None else None,text=True))
+          tag=request['release_tag']
+          existing=subprocess.run(['gh','api',base+'releases/tags/'+tag],text=True,capture_output=True)
+          assert existing.returncode!=0 and '404' in existing.stderr,'Existing tag/release is never replaced'
+          notes='Engineering-verified Watchlist prerelease. Exact original-signed 2103468 candidate and 2103469 forward recovery; selected synthetic-media Android cases passed. Physical Fold acceptance remains pending. No shutdown acceptance, real-account/debrid claim, or accepted-pointer update. See INSTALL-AND-RECOVERY.md and ENGINEERING-EVIDENCE.zip.'
+          release=api('releases','POST',dict(tag_name=tag,target_commitish=os.environ['GITHUB_SHA'],name=request['release_title'],body=notes,draft=True,prerelease=True,make_latest='false'))
+          release_id=release['id'];assert release['draft'] is True and release['prerelease'] is True
+          def upload(paths):subprocess.run(['gh','release','upload',tag,'--repo',repo]+[str(path) for path in paths],check=True)
+          def verified():
+            assets=api('releases/'+str(release_id)+'/assets?per_page=100')
+            wanted={path.name:path for path in payload.iterdir() if path.is_file()}
+            assert len(assets)==len(wanted) and {a['name'] for a in assets}==set(wanted)
+            for asset in assets:
+              path=wanted[asset['name']]
+              assert asset['state']=='uploaded' and asset['size']==path.stat().st_size and asset['digest']=='sha256:'+sha(path)
+            return assets
+          upload(sorted(payload.iterdir()));assets=verified()
+          downloads=dict(status='ENGINEERING_PRERELEASE_FOLD_ACCEPTANCE_PENDING',tag=tag,Fold='PENDING_OWNER_ACCEPTANCE',accepted_pointer_updated=False,release_url=release['html_url'],assets=[dict(name=a['name'],size_in_bytes=a['size'],sha256=a['digest'].removeprefix('sha256:'),url=a['browser_download_url']) for a in sorted(assets,key=lambda a:a['name'])])
+          downloads['checksums_url']='https://github.com/'+repo+'/releases/download/'+tag+'/SHA256SUMS'
+          (payload/'DOWNLOADS.json').write_text(json.dumps(downloads,indent=2)+'\n')
+          (payload/'SHA256SUMS').write_text(''.join(sha(path)+'  '+path.name+'\n' for path in sorted(payload.iterdir()) if path.is_file()))
+          upload([payload/'DOWNLOADS.json',payload/'SHA256SUMS']);assets=verified()
+          published=api('releases/'+str(release_id),'PATCH',dict(draft=False,prerelease=True,make_latest='false'))
+          assert published['draft'] is False and published['prerelease'] is True and published['tag_name']==tag
+          final=verified()
+          assert next(a['browser_download_url'] for a in final if a['name']=='SHA256SUMS')==downloads['checksums_url']
+          receipt=dict(status='PUBLISHED_EXACT_ORIGINAL_SIGNED_PAIR_ENGINEERING_PRERELEASE',release_id=release_id,release_url=published['html_url'],tag=tag,prerelease=True,Fold='PENDING_OWNER_ACCEPTANCE',accepted_pointer_updated=False,signer_keys_accessed=False,APK_modified=False,assets=[dict(name=a['name'],size_in_bytes=a['size'],digest=a['digest'],url=a['browser_download_url']) for a in sorted(final,key=lambda a:a['name'])])
+          Path('WATCHLIST-PUBLICATION-RECEIPT.json').write_text(json.dumps(receipt,indent=2)+'\n')
+          Path('DOWNLOADS.json').write_bytes((payload/'DOWNLOADS.json').read_bytes())
+          print(published['html_url'])
+          PYPUBLISH
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-Watchlist-Publication-Receipt-${{ github.run_id }}-FOLD-PENDING
+          path: |
+            WATCHLIST-PUBLICATION-GATE.json
+            WATCHLIST-PUBLICATION-RECEIPT.json
+            DOWNLOADS.json
+            watchlist-publication-ready/SHA256SUMS
+            watchlist-publication-ready/INSTALL-AND-RECOVERY.md
           if-no-files-found: warn
           retention-days: 90
