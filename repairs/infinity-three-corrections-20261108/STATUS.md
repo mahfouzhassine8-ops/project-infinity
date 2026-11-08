@@ -2,9 +2,12 @@
 
 The supplied installed-source evidence is verified. Original-key candidate
 2103466 and matching forward recovery2103467 are built and authenticated.
-Neither is cleared as a completed combined repair: the first cold Umbrella
-Search timed out on the selected Android emulator. No Fold installation or
-acceptance has occurred. The accepted release pointer is unchanged.
+Neither is cleared as a completed combined repair. Run42470383172 completed all
+eight real searches; its eighth Umbrella0/POV2 response is valid. Separately,
+run42473993024 reports a genuine Umbrella timeout for Stranger Things and leaves
+POV TV result-folder navigation incomplete. All five real SDK Trakt cases and
+signed forward recovery PASS in that run. No Fold installation or acceptance
+has occurred. The accepted release pointer is unchanged.
 
 ## Actual baseline and source evidence
 
@@ -60,7 +63,9 @@ No native recompile is selected.
 Diagnostic heading42441430136 and eight-cycle42443988873 attempt2 are retained
 as diagnostic evidence. Their disposable observer workaround is excluded from
 this production candidate and current observer. Eight-search and heading
-acceptance for the compiled candidate remain incomplete.
+responses for the compiled candidate now PASS in42470383172 under the correct
+provider-response contract. Four-heading/populated TV navigation coverage remains
+incomplete; a separate real provider timeout is unresolved.
 
 ## Silent Mode / Trakt
 
@@ -188,8 +193,8 @@ The owner requested and received a separate read-only Kodi identity diagnostic
 ed9456568f4d4ce5d5ad331d988d7e3fffb3d5fbbf01873ba95384985ac8f6c1.
 Nine local checks PASS. It uses explicit checks compatible with Kodi optimization,
 reads the real APK path and active source files, and writes only a new JSON report.
-No ADB/root/permissions/account-settings/database operation. Fold report pending;
-Health Center integration remains deferred. See ../infinity-readonly-inventory-20261108/README.md.
+No ADB/root/permissions/account-settings/database operation. The actual Fold
+report is now independently verified; Health Center integration remains deferred. See ../infinity-readonly-inventory-20261108/README.md.
 
 Run42469886546 attempts1/2 did not reach application tests: repeated HTTP504
 on the uncached host Python3.11.7 archive. The selected QA job now uses the
@@ -206,10 +211,9 @@ Seven distinct real both-provider Movie/TV Search cycles, three native headings
 and native TV-result navigation PASS with onePID5361. The eighth request also
 completed, with Umbrella0 andPOV2 results for Re:zero; the tester demanded both
 nonempty and timed out. This does not establish a provider/native-engine failure.
-The original FAIL is preserved. Reuse all seven valid passes; next execute only
-the ordinary native Umbrella same-query zero control, one additional common-TV
-Search/POV heading, actual SDK Trakt and recovery. Native zero must match before
-the original eighth completion can be accepted as normal provider behavior.
+The original workflow FAIL is preserved with an explicit corrected review. All
+eight responses are accepted. Cross-call catalog equality is not required;
+the independent native zero control is optional diagnostic evidence.
 No production/provider/settings/native-deadline/signing/build change.
 
 Run42472683863 reached the real POVTV native heading with live-item checks,
@@ -237,6 +241,39 @@ The Office21/21, SpongeBob7/7, Re:zero0/2. The eighth operation was responsive:
 84 completed-result snapshots, window10025, no modal dialog and samePID.
 Its workflow FAIL was a tester waiting for catalog hits, not a provider timeout
 or unresponsive Search. See evidence/ANDROID-EIGHT-SEARCH-ACCEPTANCE-REVIEW.json.
-Eight-operation/no-observed-crash gate PASS; remaining native TV row selection,
-actual SDK Trakt and integrated recovery are running in42473993024. Physical
-Fold acceptance and overall release clearance remain pending.
+Eight-operation/no-observed-crash gate PASS. Run42473993024 has now completed:
+all five actual SDK Trakt cases and integrated signed recovery PASS. Native TV
+row selection remains incomplete because a separate genuine Umbrella timeout
+blocked that Search journey. Physical Fold acceptance and overall release
+clearance remain pending.
+
+
+## Latest Android outcome — run42473993024
+
+The actual Kodi SDK executed all five Trakt cases. Silent ON suppressed the
+unsolicited automatic failure dialog; Silent OFF and another skin retained it.
+Manual sign-in displayed device-code and failure dialogs during cooldown, with
+three actual device-code polls. Failure cases recorded real positive retry
+deadlines (300.02–303.81 seconds) and refused automatic retries. Successful
+synthetic refresh rotated the token with no failure cooldown. These tests use
+synthetic HTTP/account boundaries and real Kodi dialogs, not the owner's account.
+
+Signed464→466 installation and signed466→467 recovery authenticated all79 module
+records and145 active Trakt files and preserved the profile sentinel. The source
+and signatures are unchanged from the existing original-key signed pair.
+
+A separate real TV Search for Stranger Things published “Umbrella — timeout”
+and “POV — 4 results”. Sixty-one completed GUI snapshots remained responsive at
+PID5969, window10025, no modal dialog. The corrected acceptance function rejects
+that actual timeout, rather than treating it as a successful empty response.
+This was not a whole-process freeze. Its cause is unresolved: existing logs do
+not isolate provider/network execution from scheduling delay. Unmodified
+Umbrella tvSearchterm still calls its own TVshows.search_term(name)/get(url).
+No provider logic, native deadline or APK source was changed to satisfy the test.
+
+POV TV heading/populated result-folder navigation remains incomplete. The
+workflow's FAIL is retained, and the combined release stays blocked. Reuse the
+eight accepted requests, actual SDK cases, source/signing and recovery evidence;
+do not repeat them merely to replace a workflow conclusion. No new application
+run, APK rebuild or signing operation was initiated by this review.
+See evidence/ANDROID-TRAKT-PASS-SEARCH-TIMEOUT.json for exact artifact and hashes.

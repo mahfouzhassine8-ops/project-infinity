@@ -1,0 +1,400 @@
+{
+  "status": "PARTIAL_ANDROID_PASS_WITH_REAL_PROVIDER_TIMEOUT_RELEASE_BLOCKED",
+  "run": 42473993024,
+  "source": "4cc47b51bd0e3e5e302156f2e30b6a5987fcb767",
+  "artifact": 13615510184,
+  "artifact_sha256": "58c39d2d61fe66ce37730e9cdf39efbda58bef2b86f1ad7389015974dd467125",
+  "raw_report_sha256": "dc2e03ec53e65c2a06ed535d4343fbdb955e54b439fc3635cb2feed230317c5b",
+  "original_workflow_conclusion": "FAIL_RETAINED",
+  "candidate_APK_sha256": "d366e4b8aadba8484768cfcc0d362c2fc8e0181d78123ea77e04af4f028a3135",
+  "recovery_APK_sha256": "03e43b2b6fb91627722559aeb835c498203e6217efe2f54f85083beb5ca58958",
+  "platform": {
+    "ro.build.fingerprint": "google/sdk_gphone64_x86_64/emu64xa:17/CE2A.260420.051.A3/16571990:userdebug/dev-keys",
+    "ro.build.version.sdk": "37",
+    "ro.product.cpu.abilist": "x86_64,arm64-v8a",
+    "ro.dalvik.vm.native.bridge": "libndk_translation.so"
+  },
+  "Trakt_cases": [
+    {
+      "case": "real_SDK_Trakt_silent-on",
+      "status": "PASS",
+      "details": {
+        "case": "silent-on",
+        "pid": 5969,
+        "module_source": "/data/user/0/com.projectinfinity.kodi/cache/apk/assets/addons/script.module.tmdbhelper.sync.trakt/",
+        "real_Kodi_SDK": true,
+        "real_account_or_HTTP": false,
+        "HTTP_boundary_calls": 1,
+        "device_code_polls": 0,
+        "status": "PASS_REAL_SDK_SCOPED_TRAKT_CASE",
+        "cooldown_seconds": 300,
+        "deadline": 1794136752.114429,
+        "timestamp_delta": 300.03376817703247,
+        "account_bytes_unchanged": true,
+        "automatic_retry_refused": true,
+        "skin": "skin.infinity.diggz",
+        "silent": true
+      }
+    },
+    {
+      "case": "real_SDK_Trakt_silent-off",
+      "status": "PASS",
+      "details": {
+        "case": "silent-off",
+        "pid": 5969,
+        "module_source": "/data/user/0/com.projectinfinity.kodi/cache/apk/assets/addons/script.module.tmdbhelper.sync.trakt/",
+        "real_Kodi_SDK": true,
+        "real_account_or_HTTP": false,
+        "HTTP_boundary_calls": 1,
+        "device_code_polls": 0,
+        "status": "PASS_REAL_SDK_SCOPED_TRAKT_CASE",
+        "cooldown_seconds": 300,
+        "deadline": 1794136753.039294,
+        "timestamp_delta": 300.0367217063904,
+        "account_bytes_unchanged": true,
+        "automatic_retry_refused": true,
+        "skin": "skin.infinity.diggz",
+        "silent": false
+      }
+    },
+    {
+      "case": "real_SDK_Trakt_manual",
+      "status": "PASS",
+      "details": {
+        "case": "manual",
+        "pid": 5969,
+        "module_source": "/data/user/0/com.projectinfinity.kodi/cache/apk/assets/addons/script.module.tmdbhelper.sync.trakt/",
+        "real_Kodi_SDK": true,
+        "real_account_or_HTTP": false,
+        "HTTP_boundary_calls": 0,
+        "device_code_polls": 3,
+        "status": "PASS_REAL_SDK_SCOPED_TRAKT_CASE",
+        "cooldown_seconds": 300,
+        "deadline": 1794136760.1530223,
+        "timestamp_delta": 303.8064959049225,
+        "account_bytes_unchanged": true,
+        "automatic_retry_refused": true,
+        "skin": "skin.infinity.diggz",
+        "silent": true
+      }
+    },
+    {
+      "case": "real_SDK_Trakt_success",
+      "status": "PASS",
+      "details": {
+        "case": "success",
+        "pid": 5969,
+        "module_source": "/data/user/0/com.projectinfinity.kodi/cache/apk/assets/addons/script.module.tmdbhelper.sync.trakt/",
+        "real_Kodi_SDK": true,
+        "real_account_or_HTTP": false,
+        "HTTP_boundary_calls": 1,
+        "device_code_polls": 0,
+        "status": "PASS_REAL_SDK_SUCCESSFUL_REFRESH",
+        "synthetic_token_rotation": true,
+        "no_failure_cooldown": true
+      }
+    },
+    {
+      "case": "real_SDK_Trakt_other-skin",
+      "status": "PASS",
+      "details": {
+        "case": "other-skin",
+        "pid": 5969,
+        "module_source": "/data/user/0/com.projectinfinity.kodi/cache/apk/assets/addons/script.module.tmdbhelper.sync.trakt/",
+        "real_Kodi_SDK": true,
+        "real_account_or_HTTP": false,
+        "HTTP_boundary_calls": 1,
+        "device_code_polls": 0,
+        "status": "PASS_REAL_SDK_SCOPED_TRAKT_CASE",
+        "cooldown_seconds": 300,
+        "deadline": 1794136767.8402684,
+        "timestamp_delta": 300.0182855129242,
+        "account_bytes_unchanged": true,
+        "automatic_retry_refused": true,
+        "skin": "skin.estuary",
+        "silent": true
+      }
+    }
+  ],
+  "authenticated_installation_and_forward_recovery": "PASS_ALL79_MODULE_FILES_ALL145_TRAKT_SOURCES_PROFILE_SENTINEL",
+  "Search": {
+    "status": "FAIL_PROVIDER_TIMEOUT_REQUIRES_INVESTIGATION",
+    "media": "tv",
+    "query": "Stranger Things",
+    "provider_responses": {
+      "plugin.video.umbrella": "timeout",
+      "plugin.video.pov": "4 results"
+    },
+    "PID": 5969,
+    "responsive_timeout_snapshots": 61,
+    "snapshot_evidence": [
+      {
+        "file": "048-snapshot.json",
+        "sha256": "418138a7e32f62a30c3df865ce72b81024ae38488e68be38b276a9bb54b51c45"
+      },
+      {
+        "file": "049-snapshot.json",
+        "sha256": "1174f433d94388038353931c79d1c8ac112a51694a21cdf94d454f1d76a7e6cb"
+      },
+      {
+        "file": "050-snapshot.json",
+        "sha256": "7e1b2de9325ce98879ca24547206bf1cdb188df8807c5c2d194a77a9ec83be57"
+      },
+      {
+        "file": "051-snapshot.json",
+        "sha256": "fe1d2af9d56e95fe963eaf6451772a686b9d717392f3b0229d8d27dca233f709"
+      },
+      {
+        "file": "052-snapshot.json",
+        "sha256": "72b2e7a1b9f06fb4cfd77dacb952bcdc23a42c72d41cf170a8720be3212cd4c8"
+      },
+      {
+        "file": "053-snapshot.json",
+        "sha256": "a36d6958ec73b4ef7b0c5f06b561c563e433615b5da78b0222b2938d3abb91de"
+      },
+      {
+        "file": "054-snapshot.json",
+        "sha256": "414571288a47129dbc385c7f06f2a652f59438f7f1f36cd767932135fb9f0b0d"
+      },
+      {
+        "file": "055-snapshot.json",
+        "sha256": "371e4bed563cb4181481081dccd8569855bcf22f26b48a9f9db4efb7e2ec6fee"
+      },
+      {
+        "file": "056-snapshot.json",
+        "sha256": "5ae2e0c8f840b7a5b9449300650d1e3ed2080496c3cbac81cc60d2f392ff6056"
+      },
+      {
+        "file": "057-snapshot.json",
+        "sha256": "120eaa8469fff973acedb498b730efd4a78cbf0a2362c79a56b2559a346fa8f2"
+      },
+      {
+        "file": "058-snapshot.json",
+        "sha256": "f3b140a00ed0ff646159e788bf174fabe088bfdc98fb0a31fb3c79487a1909dc"
+      },
+      {
+        "file": "059-snapshot.json",
+        "sha256": "b2beab85998ebef432f4aee59bed166425753c228d8b0162192bb7a8a5cd904f"
+      },
+      {
+        "file": "060-snapshot.json",
+        "sha256": "54fbfce29e2c35277fde0ed3e25e1ed89f32b2999581a619f30925fd0bf4e353"
+      },
+      {
+        "file": "061-snapshot.json",
+        "sha256": "30a414e2d251950a170cf9fafff92ee6eb8984dbd95fcfeb62eadad86e7ad9ce"
+      },
+      {
+        "file": "062-snapshot.json",
+        "sha256": "5bfb07a455575fc5fc6cff405c62e3c544b51d73221dd21b8fe0b5bacc16e61a"
+      },
+      {
+        "file": "063-snapshot.json",
+        "sha256": "25560d8813199e53eb4c1fb7b67eca114db5baf0ab22631afbd2295e9464903b"
+      },
+      {
+        "file": "064-snapshot.json",
+        "sha256": "646f561bbf69a11ffe63381059904dd740917bc547ed3b66d2a671e09d310669"
+      },
+      {
+        "file": "065-snapshot.json",
+        "sha256": "be8387bc1105388d3b5044d705aa175c1c7ac958f921382e6dde91d9339a1a5f"
+      },
+      {
+        "file": "066-snapshot.json",
+        "sha256": "ee4ad08f163ff9e58da514d8de73d4081a15ca0bdfe7e8f82883b777cc5833ca"
+      },
+      {
+        "file": "067-snapshot.json",
+        "sha256": "6674bb3a95a8346838f5c331e18148e3bb2cae3b60c0e23d099e22ccb6f9fd2c"
+      },
+      {
+        "file": "068-snapshot.json",
+        "sha256": "14f97bb0655a70ab029af06bc4246b11a8ad6fa23a0db960567c35eebc18087c"
+      },
+      {
+        "file": "069-snapshot.json",
+        "sha256": "fe3950b7f5d90c77bbe9a6bcde793c559b9550d586dc672923d72c39c60fca63"
+      },
+      {
+        "file": "070-snapshot.json",
+        "sha256": "0a6e57d7fee23b4e9d3742eb6f5fa3c798ed3d9a359ad2176a9ac1cf210f8f1d"
+      },
+      {
+        "file": "071-snapshot.json",
+        "sha256": "c9a5a7f7cd4723f1312785648ae8b07af48d58269bba094aad2d3ba008d84185"
+      },
+      {
+        "file": "072-snapshot.json",
+        "sha256": "c6ff4712a0f938c1ed48cc972e0965102474f47a82a6d21f43e4b9eae8fbdc9c"
+      },
+      {
+        "file": "073-snapshot.json",
+        "sha256": "8dd3a2b5f3dd76284749c1300e1973a95331c90873d7363e7ee4fcdb18a3c705"
+      },
+      {
+        "file": "074-snapshot.json",
+        "sha256": "e33a69fe531050cd53469ca54f5ef417e03492b23420bc441769e9cdc2ba3ded"
+      },
+      {
+        "file": "075-snapshot.json",
+        "sha256": "02d0895e2d6723ef15e27b215da3f3dcc48f97cffe96db33eef3ad02a35f399b"
+      },
+      {
+        "file": "076-snapshot.json",
+        "sha256": "72f1912f9d6e2226a008f65774fac270d2464753a30ce9f6fa6849df61ae22f6"
+      },
+      {
+        "file": "077-snapshot.json",
+        "sha256": "1731b1421f27539918c66c35c26a4e5c76269083c8838592bf2ae54e9e9f9ccb"
+      },
+      {
+        "file": "078-snapshot.json",
+        "sha256": "5e2b3bd7aa860477a98e5281faaa893497ec6091e8899d5e9a32fe8279f0a3f3"
+      },
+      {
+        "file": "079-snapshot.json",
+        "sha256": "78ecde173c4665b2a99c89e3f95b74ab9b1d122727eace01cd1b6e6a9c71c5e5"
+      },
+      {
+        "file": "080-snapshot.json",
+        "sha256": "70bf5065de7ee15ed9eec74b9b5feeb33b33adedc35940d05a2a9559ccbf1f79"
+      },
+      {
+        "file": "081-snapshot.json",
+        "sha256": "8d64505177d20c76c2981d6318b9368785e2f5194042e1ae44108038f10eebd0"
+      },
+      {
+        "file": "082-snapshot.json",
+        "sha256": "a2a72209278bfe171f6868cac9fdcd968fe5233f2558b267eaff460975a90dc9"
+      },
+      {
+        "file": "083-snapshot.json",
+        "sha256": "257267aa057a6f78fb06edc1454c1e85bc8a2e89c6dee15b54174f2542f29684"
+      },
+      {
+        "file": "084-snapshot.json",
+        "sha256": "3192c8b28423b63debe7b9e20d92da5c6c20352bfe6fe70c6b429fe8e80e1ece"
+      },
+      {
+        "file": "085-snapshot.json",
+        "sha256": "b66358bbb0b7b4fdcc6048e788b5771935b635d8fe74e4b36c75c5abe0ee3f42"
+      },
+      {
+        "file": "086-snapshot.json",
+        "sha256": "63907ef5225ea80826606d3f6f77c146122c7a6ad1ffac83ef544953e4779af8"
+      },
+      {
+        "file": "087-snapshot.json",
+        "sha256": "10760223cb206580b431d6875d9a41ef892a4a2b4dfaf20668d6c2d917a0616b"
+      },
+      {
+        "file": "088-snapshot.json",
+        "sha256": "3f4dc377b11365140002ab344318c372bbbb9905648242b3194001d3b56dec37"
+      },
+      {
+        "file": "089-snapshot.json",
+        "sha256": "2b4e427762b7bd51a5c01394502ce1f5c44a5b34f339a17f44776279cea8c347"
+      },
+      {
+        "file": "090-snapshot.json",
+        "sha256": "89c2f24706fcc09e8efb1dc6bc1597cc32c543be8cafef13627c8d5b085210ed"
+      },
+      {
+        "file": "091-snapshot.json",
+        "sha256": "1cad66618b51c877a9e71083adb2ef8efaa18c0065cbe8bfef2849b72e9fe5dd"
+      },
+      {
+        "file": "092-snapshot.json",
+        "sha256": "d8a5ff6a45b6cdfd4969cdbc830cb89d7df796a756752138ff99e7d5c4670192"
+      },
+      {
+        "file": "093-snapshot.json",
+        "sha256": "200328cda8eec66c46623ba63d13059228f39d818fcf5ce8234089ac020cf591"
+      },
+      {
+        "file": "094-snapshot.json",
+        "sha256": "3108b1a772c59f64907e391b72472e7b4abb9340bf287f5d23609827eb9838b5"
+      },
+      {
+        "file": "095-snapshot.json",
+        "sha256": "4eea98da4b64911f81c1d5cec9c3edd9eb4ec98d65665d3dfe038ddf3fa7ac05"
+      },
+      {
+        "file": "096-snapshot.json",
+        "sha256": "d96328830d39bd01bafde04f99ba423dd989719f5a36667e49d79ba036493d85"
+      },
+      {
+        "file": "097-snapshot.json",
+        "sha256": "2f675faf1062a5f86f13755cbfb4236a9b900c3365a48954bcaed66fe8c8ca8c"
+      },
+      {
+        "file": "098-snapshot.json",
+        "sha256": "3a7ce077b8a48dc7f0b0ed97e5f95f6039ca73b519d520672898fba185857673"
+      },
+      {
+        "file": "099-snapshot.json",
+        "sha256": "1221a9c326f46e2ad79f26ec85399f70de40d1a428624939008e6c3500a7c147"
+      },
+      {
+        "file": "100-snapshot.json",
+        "sha256": "d905bd8af893c4a59bfc79f3a47802948c4c1f701281e653dca136e5e97b564c"
+      },
+      {
+        "file": "101-snapshot.json",
+        "sha256": "8bdb24d67afc3498c77fc222f87e6d4fb2c16142538eb34fd4205cc2161daaf9"
+      },
+      {
+        "file": "102-snapshot.json",
+        "sha256": "a1617becc24539f82469ad8e696678c767360bd24dae02c6aa4b68047ee142d0"
+      },
+      {
+        "file": "103-snapshot.json",
+        "sha256": "f13aa834c2304e5b37c4b52c224941d27330f73a74f8c1a6872e2c3c8b50d646"
+      },
+      {
+        "file": "104-snapshot.json",
+        "sha256": "59be715a912bba7f7bdf7af1b2c213c14a70a437602028c4ad6d72f95c18fdba"
+      },
+      {
+        "file": "105-snapshot.json",
+        "sha256": "96c12e319c0722e7ce83ea4911fefda1803b92881452c9c58efec5a6180b5bb8"
+      },
+      {
+        "file": "106-snapshot.json",
+        "sha256": "816652634853be01616056037e7c5828bd3fea975b91f04b63453cd03b4f9784"
+      },
+      {
+        "file": "107-snapshot.json",
+        "sha256": "e2576eb1484cb0b0521e87e34354774ae7af09d7e26249bd0e2d0510ae24f3ee"
+      },
+      {
+        "file": "108-snapshot.json",
+        "sha256": "260f843cd766e6e4de60ad49c8054dee05b7a8fd00da267dda92b8af1b16ff17"
+      }
+    ],
+    "whole_process_freeze_observed": false,
+    "corrected_acceptance_rejects_actual_timeout": true,
+    "heading_and_native_TV_folder_selection": "NOT_REACHED_IN_THIS_RUN",
+    "cause": "UNRESOLVED: native consumer reports provider timeout; existing logs do not isolate network, provider execution or scheduling delay",
+    "code_inspection": "Unmodified Umbrella router tvSearchterm calls TVshows.search_term(name), then its own get(url). No provider code changed.",
+    "original_eighth_request": "SEPARATE_VALID_EMPTY_RESPONSE_42470383172_UNCHANGED"
+  },
+  "ordinary_zero_control": {
+    "status": "DIAGNOSTIC_NORMAL_PROVIDER_ROUTE_COMPLETED",
+    "seconds": 6.897745056999952,
+    "route": "plugin://plugin.video.umbrella/?action=tvSearchterm&name=Re%3Azero",
+    "results": 0,
+    "labels": [],
+    "Infinity_Search_lease": false,
+    "production_Search_acceptance": false
+  },
+  "no_new_APK_build_or_signing": true,
+  "provider_changes": false,
+  "physical_Fold_acceptance": "NOT_RUN",
+  "remaining_gates": [
+    "Investigate genuine Umbrella timeout without changing catalogs or bypassing deadlines",
+    "Complete POV TV native populated result-folder navigation with live reads",
+    "One final owner Galaxy Fold acceptance after engineering clearance"
+  ]
+}
