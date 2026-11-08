@@ -44,13 +44,13 @@ jobs:
           print('PASS scoped diagnostic scripts parsed; no signed APK modifications')
           PY
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
-        with: {artifact-ids: '13495518701', run-id: '42204671979', github-token: ${{ github.token }}, path: parent462, merge-multiple: true}
+        with: {artifact-ids: '13495518701', run-id: '42204671979', github-token: '${{ github.token }}', path: parent462, merge-multiple: true}
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
-        with: {artifact-ids: '13596730735', run-id: '42428328498', github-token: ${{ github.token }}, path: signed464, merge-multiple: true}
+        with: {artifact-ids: '13596730735', run-id: '42428328498', github-token: '${{ github.token }}', path: signed464, merge-multiple: true}
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
-        with: {artifact-ids: '13596606000', run-id: '42428335227', github-token: ${{ github.token }}, path: signed465, merge-multiple: true}
+        with: {artifact-ids: '13596606000', run-id: '42428335227', github-token: '${{ github.token }}', path: signed465, merge-multiple: true}
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
-        with: {artifact-ids: '13565947121', run-id: '42351486944', github-token: ${{ github.token }}, path: current268, merge-multiple: true}
+        with: {artifact-ids: '13565947121', run-id: '42351486944', github-token: '${{ github.token }}', path: current268, merge-multiple: true}
       - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
         with: {cmdline-tools-version: '15859902', packages: 'platform-tools build-tools;35.0.0 cmdline-tools;22.0', log-accepted-android-sdk-licenses: false}
       - name: Prepare exact unmodified signed inputs and one disposable QA fixture
