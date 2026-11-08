@@ -1,0 +1,7 @@
+# Original-key Umbrella/POV ZIP packaging, 2026-11-08
+
+The owner explicitly requests the smallest signed ZIP for last-reported APK2103462/CC0.3.5.61, using the existing owner-gated workflow and SignInfinityModules.java. Rebind the exact passing two-file correction to authenticated original signed462, preserve addon.xml and every other source byte, sign the complete79-record manifest, and retain original signed61 recovery. Do not build an APK or change the separately signed465 recovery, runtime engine, DEX, skin, providers, settings or data. Never publish an unsigned installer.
+
+Selected new checks: exact462 source and manifest rebind; original-key native authentication; complete ZIP membership; unchanged real Java installer under complete same-version install, partial signature/manifest/source interruptions, recovery from original signed61 ZIP, unknown-source refusal. Reuse existing provider route host PASS42435806833. Android standalone ZIP installation/recovery remains a separate mandatory delivery gate. No shutdown, unrelated feature suite, accepted-pointer update or automatic publication.
+
+Reviewed workflow catalog additions contain only the four pinned unsigned host/diagnostic workflows in WORKFLOW-REVIEW.json. Preserve all previous routes, the sole signer397702717, retired workflow list, guards and key handling. Existing signer jobs are unchanged. Candidate source is pinned to16af10e42265f9f5155efd54849b25871c50aa0f. No diagnostic observer or native change is packaged.
