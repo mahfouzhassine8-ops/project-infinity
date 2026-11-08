@@ -1,0 +1,22 @@
+{
+  "operation": "exact464-single-native-source-object-and-link",
+  "base": "514a82e513ed2ac00ba096d87011b3d3789cfb32",
+  "branch": "work/infinity-three-corrections-20261108",
+  "native_reference": 2103464,
+  "changed_native_source": "xbmc/interfaces/legacy/ModuleXbmc.cpp",
+  "candidate_sha256": "a2e9b1ef442c46d39275b45454cbf17dad8f7c2e533e3736904462001d82442d",
+  "unchanged_native_sources": 9410,
+  "selected_checks": [
+    "exact9411-source preservation and unchanged build recipes",
+    "one real Android ARM64 translation unit",
+    "one native CMake owning-target link",
+    "unchanged strong native exports and runtime dependencies",
+    "source-matched label function linked"
+  ],
+  "reused_host_and_Trakt_results": true,
+  "APK": false,
+  "signing": false,
+  "application_tests": false,
+  "shutdown_tests": false,
+  "acceptance": "Android Search/deadlock and physical Fold verification remain separate mandatory gates"
+}
