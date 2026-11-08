@@ -226,9 +226,11 @@ def _verify(addon_id, root, specs, manifest_raw=None):
                 operations[(media, 'title_navigation')] = deepcopy(search)
                 operations[(media, 'identity_lookup')] = deepcopy(search)
         break
-    if not operations:
-        # Search-only fallback for an updated provider whose original native
-        # search action is still provably connected, even though unrelated
+    if not operations and addon_id in ('plugin.video.umbrella', 'plugin.video.pov'):
+        # Search-only fallback for an updated Umbrella or POV whose original
+        # native search action is still provably connected. Every other
+        # provider keeps exactly the pre-existing recognition and fallback.
+        # Unrelated
         # menu/skin/helpers no longer match a whole-module reviewed fingerprint.
         # This grants no title-navigation/identity, no provider-code execution
         # and no source-pin bypass. Verified current source bytes are rechecked
