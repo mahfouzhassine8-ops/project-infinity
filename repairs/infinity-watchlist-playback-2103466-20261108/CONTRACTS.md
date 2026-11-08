@@ -83,8 +83,9 @@ fresh-item clone/message. A narrowly scoped observer could carry an existing
 Watchlist provider-invocation nonce only when the active Python invoker, provider
 identity, exact media identity and current generation all agree. Existing
 `PythonLanguageHook::GetAddonId` and `GetInvokerId` are available, but provider ID
-alone is insufficient. The expected resolver script ID currently remains private
-to `CScriptRunner::ExecuteAsync`; it is not exposed to PluginDirectory. Binding
+alone is insufficient. The current `CScriptRunner::RunScriptInternal` retains the ID returned by
+`ExecuteScript`/`CScriptInvocationManager::ExecuteAsync` internally; that ID is not
+exposed to PluginDirectory. Binding
 the expected invocation to the new player item therefore remains a design gate.
 Thread/new-invoker propagation, concurrent same-provider invocations, one-use
 consumption, cancellation and playlist behavior require source review and tests.
@@ -235,3 +236,8 @@ stated host projection scope: it does not prove fresh direct-click dispatch,
 native lineage, provider AV-start, catalogue acquisition, Android, signing or
 delivery. The additional POV seam and metadata timing remain blockers to a
 complete feature claim.
+
+The later source-only `INVOCATION-SCOPE-ADDENDUM.md` identifies a concrete
+two-file observation proposal to bind that ID before dispatch and transfer it to
+the fresh player item. Both additional files require scope authorization; the
+proposal has not been implemented or runtime verified.

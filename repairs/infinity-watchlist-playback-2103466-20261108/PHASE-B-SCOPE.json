@@ -28,8 +28,13 @@
   "blocker": {
     "kind": "AUTHORIZED_SOURCE_SCOPE_INSUFFICIENT_FOR_POV_FRESH_PLAYER_ITEM",
     "required_additional_boundary": "xbmc/interfaces/legacy/Player.cpp::Player::playStream",
-    "expected_invocation_binding": "UNRESOLVED_NO_PROMISE_ONE_EXTRA_HOOK_SUFFICES",
-    "details": "CONTRACTS.md"
+    "expected_invocation_binding": "SOURCE_BOUND_TWO_FILE_PROPOSAL_IDENTIFIED_NOT_IMPLEMENTED_OR_RUNTIME_VERIFIED",
+    "details": "CONTRACTS.md",
+    "required_additional_boundaries": [
+      "xbmc/interfaces/generic/ScriptInvocationManager.cpp::ExecuteAsync",
+      "xbmc/interfaces/legacy/Player.cpp::Player::playStream"
+    ],
+    "scope_addendum": "INVOCATION-SCOPE-ADDENDUM.md"
   },
   "remaining_contracts": [
     "Native exact provider invocation to fresh playing item",

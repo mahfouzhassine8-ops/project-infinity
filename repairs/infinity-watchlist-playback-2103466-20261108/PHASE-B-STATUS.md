@@ -71,10 +71,26 @@ ScriptRunner dispatch. That invocation-binding contract still needs review;
 one additional hook is not promised sufficient. Umbrella's exceptional direct-
 play/playlist branches require the same truthful coverage assessment.
 
-**This file is outside the owner's seven-file allowlist.** The committed
+A further read-only source review identifies two concrete observation points for
+an expanded-scope implementation, documented in `INVOCATION-SCOPE-ADDENDUM.md`:
+
+- `xbmc/interfaces/generic/ScriptInvocationManager.cpp::ExecuteAsync`: register
+  the current saved-resolver scope against the actual invoker ID before either
+  new or reused invocation executes; clear stale associations on unrelated reuse.
+- `xbmc/interfaces/legacy/Player.cpp::Player::playStream`: snapshot caller identity
+  before the existing GIL-release guard, then bind the matching registered origin
+  to the fresh playing item before its message copy.
+
+Both files are outside the allowlist. This is a source-supported conditional
+proposal, not implemented or tested. Preserve existing admission, return values,
+thread startup, locking and shutdown behavior; the observer must perform bounded
+bookkeeping only, with strictly one-way lock ordering. No demonstrated need for
+ScriptRunner, LanguageHook, GUI or player callback edits was found.
+
+**These two files are outside the owner's seven-file allowlist.** The committed
 `OWNER-PHASE-B-AUTHORIZATION.md` explicitly says: “If technically necessary scope
 exceeds these files, record the precise dependency and seek new owner scope
-approval rather than silently expanding.” No edit to that file or another
+approval rather than silently expanding.” No edit to either file or another
 unapproved native boundary was made. This is a source-scope blocker, not a missing
 signing key, a demand for repeated owner diagnosis, or an excuse to rebuild.
 
@@ -103,6 +119,6 @@ successful next-up transition is claimed from source feasibility alone.
 Retain the bounded patch and its passing evidence. Do not apply it to the owner,
 ship a partial feature, replace the original signer, reuse2103466, move the locked
 baseline, or merge unfinished Search work. The next required scope review is the
-native Python Player item-origin boundary and exact invoker handoff. Continue
+two-file native invocation registration and Python Player item-origin handoff. Continue
 full implementation only once any additional production files are explicitly
 authorized and the remaining corresponding contracts are proven.
