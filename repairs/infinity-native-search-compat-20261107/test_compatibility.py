@@ -71,8 +71,16 @@ class NativeRouteCompatibility(unittest.TestCase):
         def reader(path):
             consulted.append(path)
             return files[path]
+        active_spec=specs or contract(kind)
         result=compat.recognize('plugin.video.'+kind,Path("/read-only/"+kind),
-                                [specs or contract(kind)],reader)
+                                [active_spec],reader)
+        if kind == "pov" and not result and not modifications:
+            for media in ("movie","tv"):
+                get,pins=compat._reading(reader)
+                try:
+                    compat._pov(get,active_spec["search"][media],media)
+                except Exception as error:
+                    print("POV_HOST_DIAGNOSTIC",media,type(error).__name__,str(error))
         return result,files,consulted
 
     def test_umbrella_current_natural_movie_and_tv_routes_both_recognized(self):
@@ -172,7 +180,7 @@ class NativeRouteCompatibility(unittest.TestCase):
         for kind in ("umbrella","pov"):
             with self.subTest(kind=kind):
                 a,_,_=self.invoke(kind)
-                self.assertEqual({op for m,op in a},"search")
+                self.assertEqual({op for m,op in a},{"search"})
 
 if __name__=="__main__":
     unittest.main(verbosity=2)
