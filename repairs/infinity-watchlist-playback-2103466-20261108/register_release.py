@@ -68,8 +68,16 @@ def bindings(producer, request):
     result = {}
     for p in paths:
         name = p.relative_to(ROOT).as_posix()
-        require(p.read_bytes() == prep.git('show', producer + ':' + name), 'UNCHANGED_OFFICIAL_PREPARATION_SOURCE:' + name)
+        if p == Path(__file__).resolve():
+            review = load(HERE / 'REGISTER-TOOL-REVIEW.json')
+            require(producer == review['producer_source'] == 'a56ef7d9e96146a167afe84e5a8a6fcf904f40cb' and
+                    review['producer_tool_sha256'] == digest(prep.git('show', producer + ':' + name)) ==
+                    '904286f2ff03ba1b322c45c9a16d514aab547a18c6d4ac35d1de7e58030affc9' and
+                    review['reviewed_tool_sha256'] == file_sha(p), 'EXACT_REGISTRATION_ONLY_TOOL_CORRECTION')
+        else:
+            require(p.read_bytes() == prep.git('show', producer + ':' + name), 'UNCHANGED_OFFICIAL_PREPARATION_SOURCE:' + name)
         result[name] = file_sha(p)
+    result[(HERE / 'REGISTER-TOOL-REVIEW.json').relative_to(ROOT).as_posix()] = file_sha(HERE / 'REGISTER-TOOL-REVIEW.json')
     result[request.relative_to(ROOT).as_posix()] = file_sha(request)
     return result
 
@@ -144,7 +152,7 @@ def official(prepared, version, audit, request):
     require(set(proof['changed_members']) == changed | {'AndroidManifest.xml'}, 'EXACT_DECLARED_FULL_MEMBER_CHANGES')
     for owner, meta in metas.items():
         with ZipFile(prepared / 'components' / catalog['bundles'][owner]['file']) as z:
-            for name, row in meta['members'].items():
+            for name, member_row in meta['members'].items():
                 raw = z.read('payload/' + name)
                 normalized = prep.normalize_manifest(raw)[0] if name == 'AndroidManifest.xml' else raw
                 require(meta['payload']['member:' + name]['sha256'] == digest(normalized), 'COMPLETE_COMPONENT_RAW_PAYLOAD_BINDING:' + name)

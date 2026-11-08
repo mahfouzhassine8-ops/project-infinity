@@ -26,6 +26,13 @@
           version=request['version'];assert type(version) is int and version in (2103468,2103469)
           generation={2103468:55,2103469:56}[version]
           assert authority['candidate_versionCode']==version and authority['generation']==generation
+          reviewed=authority['owner_update_evidence']['source_files']
+          assert 'repairs/infinity-watchlist-playback-2103466-20261108/register_release.py' in reviewed
+          assert 'repairs/infinity-watchlist-playback-2103466-20261108/REGISTER-TOOL-REVIEW.json' in reviewed
+          for relative,wanted in reviewed.items():
+            path=Path(relative)
+            assert not path.is_absolute() and '..' not in path.parts and path.is_file(),'EXACT_REVIEWED_SOURCE_PATH:'+relative
+            assert hashlib.file_digest(path.open('rb'),'sha256').hexdigest()==wanted,'REGISTERED_SOURCE_CHANGED:'+relative
           assert type(pair['run_id']) is int and pair['run_id']>0 and re.fullmatch('[0-9a-f]{40}',pair['source_commit'])
           assert set(pair['artifacts'])=={'2103468','2103469'}
           row=pair['artifacts'][str(version)]

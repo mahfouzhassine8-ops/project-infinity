@@ -1,0 +1,18 @@
+{
+  "status": "PASS_ROOT_AND_ASTRA_TARGETED_REGISTRATION_TOOL_REVIEW",
+  "scope": "register_release.py only; registration review after successful official preparation",
+  "producer_source": "a56ef7d9e96146a167afe84e5a8a6fcf904f40cb",
+  "official_preparation_run": 42512905724,
+  "producer_tool_sha256": "904286f2ff03ba1b322c45c9a16d514aab547a18c6d4ac35d1de7e58030affc9",
+  "reviewed_tool_sha256": "92bb8c1417a2db8f4cc5840963268989bd77f6a87b1d326f5e09b8b18f211cc9",
+  "runtime_or_preparation_code_changed": false,
+  "correction": "Rename the unused inner component-member loop target row to member_row so official() returns the API artifact row rather than member metadata.",
+  "binding_policy": "Only register_release.py may differ from producer. Bind its current exact SHA and this receipt SHA into authority.owner_update_evidence.source_files; every other producer source equality remains. The existing verify_evidence checks the original protected source_files and workflow, not owner_update_evidence.source_files. check_registered recomputes the corrected-helper/receipt binding against the registered authority. Root also adds a signing-job preflight that hashes every owner_update_evidence.source_files entry before importing the helper or accessing credentials, protected by the existing workflow hash gate.",
+  "reason": "The registration helper was not executed during preparation. Successful original-signer preparation, signed80 manifests, thirteen actual-installer cases and native artifacts remain unchanged; no rerun is necessary for a subsequent review-tool variable bug.",
+  "validation": "Root and Astra reviewed final exact diff and receipt before registration. Current helper SHA remains92bb8c1417a2db8f4cc5840963268989bd77f6a87b1d326f5e09b8b18f211cc9.",
+  "application_tests": false,
+  "native_or_APK_build": false,
+  "signing": false,
+  "authority_mutation": false,
+  "independent_review": "Astra reviewed exact helper and pre-import/pre-key source-hash workflow delta; no material gate weakening or bug; no production edits/builds/tests rerun."
+}
