@@ -1,0 +1,44 @@
+{
+  "status": "PASS_ACTUAL_AFFECTED_STAGING_GUARD_HOST_PATH",
+  "failure_run": 42518029152,
+  "failure_classification": "FAIL_STAGING_SETUP_BEFORE_EMULATOR",
+  "application_cases": 0,
+  "actual_stage_statement_range": [
+    108,
+    118
+  ],
+  "actual_transformed_observer_accepted": true,
+  "negative_source_variants": [
+    {
+      "case": "dynamic_path",
+      "status": "PASS_REJECTED",
+      "error": "Exact live native ListItem path checks missing"
+    },
+    {
+      "case": "focused_path",
+      "status": "PASS_REJECTED",
+      "error": "Exact live native ListItem path checks missing"
+    },
+    {
+      "case": "UI_click",
+      "status": "PASS_REJECTED",
+      "error": "Actual verified native UI click missing"
+    }
+  ],
+  "stage_sha256": "ca75732a9aefd963d18a45e2eb196d21e9cc44de75d62e52c09040511ae0daa7",
+  "observer_sha256": "99b9527872ca42e87301746ef38b3ca988678fbeaa9ed98963c2ea9c726b0b75",
+  "full_staging": "NOT_RUN",
+  "certificate_checks": "NOT_RUN_NOT_MOCKED",
+  "Android_retry": "NOT_RUN",
+  "production_changes": false,
+  "APK_changes": false,
+  "shutdown": "NOT_SELECTED",
+  "driver_sha256": "7d097c185f885861f2caccaa7724f409f63dd61cca4b7c4a250ab67cf0d46c20",
+  "confirmed_additional_GUI_contracts": [
+    "native context button template1000 -> actual1001+i with exact public label/focus/Input.Select",
+    "actual InfinityItemOptions list50 preserved",
+    "actual POV button11 exact resolved bold localized Start label",
+    "same progress_media.xml loading vs real enabled bookmark prompt distinguished"
+  ],
+  "additional_source_checks": "PASS_SOURCE_BINDINGS_AND_CHANGED_SCRIPT_SYNTAX_ONLY"
+}

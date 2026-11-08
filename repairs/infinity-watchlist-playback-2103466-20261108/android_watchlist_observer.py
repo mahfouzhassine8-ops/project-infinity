@@ -122,14 +122,33 @@ def snapshot():
         for key in ('Infinity.ResumeHub.Key','Infinity.Selection.Snapshot','Infinity.Watchlist.Child'):
             row[key]=xbmc.getInfoLabel(prefix+'Property('+key+')')
         rows.append(row)
+    dialog=xbmcgui.getCurrentWindowDialogId()
+    dialog_xml=xbmcgui.Window(dialog).getProperty('xmlfile') if dialog not in (0,-1,9999) else ''
+    provider_bookmark_prompt=False
+    provider_progress={}
+    if Path(dialog_xml).name=='progress_media.xml':
+        window=xbmcgui.Window(dialog)
+        start_label=xbmcaddon.Addon('plugin.video.pov').getLocalizedString(32833)
+        provider_progress=dict(buttons=window.getProperty('tikiskins.source_progress.buttons'),
+                               false_button=window.getProperty('tikiskins.source_progress.false_button'),
+                               button11_label=xbmc.getInfoLabel('Control.GetLabel(11)'))
+        provider_bookmark_prompt=(provider_progress['buttons']=='true' and
+                                  provider_progress['false_button']==start_label and
+                                  provider_progress['button11_label']=='[B]'+start_label+'[/B]')
+    context_buttons=[]
+    if Path(dialog_xml).name=='DialogContextMenu.xml':
+        for control in range(1001,1101):
+            if xbmc.getCondVisibility('Control.IsVisible(%d)'%control):
+                label=xbmc.getInfoLabel('Control.GetLabel(%d)'%control)
+                if label:context_buttons.append(dict(control=control,label=label))
     menus={}
-    for control in (50,450,1000):
+    for control in (50,450):
         n=int(xbmc.getInfoLabel('Container(%d).NumItems'%control) or 0)
         if 0<n<=100:
             menus[str(control)]=[xbmc.getInfoLabel('Container(%d).ListItemAbsolute(%d).Label'%(control,i)) for i in range(n+1)]
     return dict(pid=os.getpid(),window=xbmcgui.getCurrentWindowId(),dialog=xbmcgui.getCurrentWindowDialogId(),
-                folder=xbmc.getInfoLabel('Container.FolderPath'),rows=rows,menus=menus,
-                dialog_xml=(xbmcgui.Window(xbmcgui.getCurrentWindowDialogId()).getProperty('xmlfile') if xbmcgui.getCurrentWindowDialogId() not in (0,-1,9999) else ''),
+                folder=xbmc.getInfoLabel('Container.FolderPath'),rows=rows,menus=menus,context_buttons=context_buttons,
+                dialog_xml=dialog_xml,provider_bookmark_prompt=provider_bookmark_prompt,provider_progress=provider_progress,
                 current_control=xbmc.getInfoLabel('System.CurrentControlID'),focused_path=xbmc.getInfoLabel('ListItem.FileNameAndPath'),
                 heading=xbmc.getInfoLabel('Control.GetLabel(1)'),
                 body=xbmc.getInfoLabel('Control.GetLabel(9)'),skin=xbmc.getSkinDir())
@@ -196,7 +215,7 @@ def action(request):
         assert Path(window.getProperty('xmlfile')).name=='progress_media.xml'
         assert window.getProperty('tikiskins.source_progress.buttons')=='true'
         assert window.getProperty('tikiskins.source_progress.false_button')==addon.getLocalizedString(32833)
-        assert xbmc.getInfoLabel('Control.GetLabel(11)')==addon.getLocalizedString(32833)
+        assert xbmc.getInfoLabel('Control.GetLabel(11)')=='[B]'+addon.getLocalizedString(32833)+'[/B]'
         xbmc.executebuiltin('SendClick(%d,11)'%dialog)
         return dict(actual_provider_start_from_beginning=True,provider_bookmark_edited_by_harness=False)
     if kind=='initialize':
@@ -218,11 +237,26 @@ def action(request):
         return snapshot()
     if kind=='menu-select':
         control=request['control'];index=request['index'];label=request['label']
-        assert control in (50,450,1000) and type(index) is int and 0<=index<=100
-        assert xbmcgui.getCurrentWindowDialogId() not in (0,-1,9999)
-        xbmc.executebuiltin('SetFocus(%d,%d,absolute)'%(control,index),True)
-        assert xbmc.getInfoLabel('Container(%d).ListItem.Label'%control)==label,'LIVE_NATIVE_MENU_LABEL_REQUIRED'
-        rpc('Input.Select');return dict(selected_actual_label=label)
+        dialog=xbmcgui.getCurrentWindowDialogId()
+        assert dialog not in (0,-1,9999)
+        window=xbmcgui.Window(dialog)
+        if request.get('button') is True:
+            assert type(control) is int and 1001<=control<=1100
+            assert Path(window.getProperty('xmlfile')).name=='DialogContextMenu.xml'
+            assert xbmc.getCondVisibility('Control.IsVisible(%d)'%control)
+            assert xbmc.getInfoLabel('Control.GetLabel(%d)'%control)==label,'LIVE_NATIVE_CONTEXT_BUTTON_LABEL_REQUIRED'
+            xbmc.executebuiltin('SetFocus(%d)'%control,True)
+            until(lambda:xbmc.getCondVisibility('Control.HasFocus(%d)'%control) and
+                  xbmc.getInfoLabel('Control.GetLabel(%d)'%control)==label,'actual native context button focus',10)
+            assert xbmc.getInfoLabel('Control.GetLabel(%d)'%control)==label,'LIVE_NATIVE_CONTEXT_BUTTON_LABEL_REQUIRED'
+        else:
+            assert control in (50,450) and type(index) is int and 0<=index<=100
+            assert window.getProperty('Infinity.UI.Popup')=='1' and Path(window.getProperty('xmlfile')).name=='InfinityItemOptions.xml'
+            xbmc.executebuiltin('SetFocus(%d,%d,absolute)'%(control,index),True)
+            until(lambda:xbmc.getCondVisibility('Control.HasFocus(%d)'%control) and
+                  xbmc.getInfoLabel('Container(%d).ListItem.Label'%control)==label,'actual saved title menu focus',10)
+            assert xbmc.getInfoLabel('Container(%d).ListItem.Label'%control)==label,'LIVE_NATIVE_MENU_LABEL_REQUIRED'
+        rpc('Input.Select');return dict(selected_actual_label=label,control=control,actual_context_button=request.get('button') is True)
     raise ValueError('UNSELECTED_QA_ACTION: '+str(kind))
 
 

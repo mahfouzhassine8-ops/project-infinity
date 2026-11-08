@@ -106,7 +106,15 @@ def stage(baseline, candidate, recovery, signed_pair, owner_export, sdk, out, po
     qa = addons / QA; qa.mkdir()
     (qa / 'addon.xml').write_text('<addon id="'+QA+'" name="Disposable Watchlist QA" version="1.0.0" provider-name="Infinity engineering"><requires><import addon="xbmc.python" version="3.0.1"/></requires><extension point="xbmc.python.script" library="qa.py"/><extension point="xbmc.addon.metadata"><summary lang="en">Selected Watchlist playback verification only</summary><platform>all</platform></extension></addon>')
     observer = checked_observer((HERE / 'android_watchlist_observer.py').read_text())
-    if 'Container(50).ListItem.FileNameAndPath' not in observer: raise ValueError('Live native ListItem observer missing')
+    observer_functions = {node.name: node for node in ast.parse(observer).body if isinstance(node, ast.FunctionDef)}
+    required_functions = ('native_directory_container', 'focus', 'action')
+    if not all(name in observer_functions for name in required_functions): raise ValueError('Live native ListItem observer missing')
+    native_literals = {node.value for node in ast.walk(observer_functions['native_directory_container']) if isinstance(node, ast.Constant) and isinstance(node.value, str)}
+    focus_literals = {node.value for node in ast.walk(observer_functions['focus']) if isinstance(node, ast.Constant) and isinstance(node.value, str)}
+    if not {'Control.IsVisible(%d)', 'Container(%d).NumItems', 'ONE_VISIBLE_NATIVE_DIRECTORY_CONTAINER_REQUIRED'}.issubset(native_literals): raise ValueError('Actual visible native container observer missing')
+    if not {'Container(%d).ListItemAbsolute(%d).FileNameAndPath', 'Control.HasFocus(%d)', 'Container(%d).ListItem.FileNameAndPath', 'ListItem.FileNameAndPath', 'SetFocus(%d,%d,absolute)', 'LIVE_NATIVE_LISTITEM_PATH_REQUIRED', 'LIVE_FOCUSED_LISTITEM_PATH_REQUIRED'}.issubset(focus_literals): raise ValueError('Exact live native ListItem path checks missing')
+    click = next((node for node in observer_functions['action'].body if isinstance(node, ast.If) and ast.unparse(node.test) == "kind == 'click'"), None)
+    if click is None or len(click.body) < 2 or ast.unparse(click.body[0]) != 'expected = focus(request)' or ast.unparse(click.body[1]) != "rpc('Input.Select')": raise ValueError('Actual verified native UI click missing')
     compile(observer, 'qa.py', 'exec', optimize=1)
     (qa / 'qa.py').write_text(observer)
     (qa / 'android_runtime_checks.py').write_bytes(retained('repairs/save-later-multiimage-20261023/android_runtime_checks.py'))

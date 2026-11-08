@@ -41,7 +41,7 @@
     "artifact_id": 13631340281,
     "APK_SHA256": "804eebc57af2e4ef4e5418b56994bda64eb7fd7e7f2c0653b5c6e2a9f7833058"
   },
-  "Android": "RETRY_SAME_SIGNED_PAIR_WITH_CONFIRMED_ACTUAL_NATIVE_VIEW_TARGETING; first two PASS retained",
+  "Android": "RETRY_SAME_SIGNED_PAIR_AFTER_EXECUTED_STAGING_GUARD_AND_SOURCE_CONFIRMED_POPUP_BINDINGS",
   "Fold": "NOT_RUN_PENDING_ONE_OWNER_ACCEPTANCE",
   "shutdown": "NOT_SELECTED",
   "accepted_pointer_updated": false,
@@ -84,6 +84,16 @@
       "baseline_authentication": "PASS79",
       "candidate_install_over_and_authentication": "PASS80",
       "reason": "Observer forced hidden control50; actual mixed Watchlist native view65051 remained on parent row. Exact live path check correctly refused wrong click.",
+      "APK_rebuild": false
+    },
+    {
+      "run_id": 42518029152,
+      "source_commit": "b3facb23bf7d1cc6cc08171adb91c0b17f71dcad",
+      "result": "FAIL_STAGING_OBSERVER_SOURCE_ASSERTION_BEFORE_EMULATOR",
+      "artifact_id": 13631799681,
+      "artifact_SHA256": "602744f13ac55eaf9732e946ad25154d573311c1c4a2483e808d4b460e74fba5",
+      "application_tests_run": 0,
+      "reason": "stage_watchlist_android.py still required literal hidden Container(50) path read instead of new actual-view native live reads; no APK/runtime change.",
       "APK_rebuild": false
     }
   ]

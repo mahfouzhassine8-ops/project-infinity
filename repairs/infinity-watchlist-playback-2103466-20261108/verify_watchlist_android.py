@@ -67,7 +67,7 @@ def run(baseline,candidate,recovery,fixture,out,port):
             device.alive();pid=active()
             if pid is None:
                 current=device.command('snapshot',seconds=15)
-                if Path(current.get('dialog_xml','')).name=='progress_media.xml' and not prompt_handled:
+                if current.get('provider_bookmark_prompt') is True and not prompt_handled:
                     device.command('provider-start-new',seconds=15);prompt_handled=True
                 return None
             item=device.rpc('Player.GetItem',dict(playerid=pid,properties=['title','file','uniqueid','season','episode','showtitle']))['item']
@@ -106,12 +106,14 @@ def run(baseline,candidate,recovery,fixture,out,port):
     def menu_pick(choices):
         def find():
             view=device.command('snapshot',seconds=15)
+            for button in view.get('context_buttons',[]):
+                if button['label'] in choices:return dict(control=button['control'],index=0,label=button['label'],button=True)
             for control,labels in view.get('menus',{}).items():
                 for index,label in enumerate(labels):
-                    if label in choices:return int(control),index,label
+                    if label in choices:return dict(control=int(control),index=index,label=label,button=False)
             return None
-        control,index,label=device.until(find,'actual native menu '+str(choices),15)
-        return device.command('menu-select',control=control,index=index,label=label,seconds=20)
+        selected=device.until(find,'actual native menu '+str(choices),15)
+        return device.command('menu-select',seconds=20,**selected)
     save()
     try:
         clip=out/'fixture.mp4';generate_clip(clip);server=start(clip,port,out/'AIO-HTTP.jsonl')
