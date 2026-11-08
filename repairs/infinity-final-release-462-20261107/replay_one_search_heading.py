@@ -79,7 +79,7 @@ def run(parent, candidate, fixture, out):
             if snapshot["window"] != 10025 or "action=search-all" not in snapshot["labels"]["Container.FolderPath"]:
                 return None
             headings = [x for x in snapshot.get("rows", []) if x.get("provider") == "plugin.video.umbrella"
-                        and re.search(r" — \\d+ results$", x.get("label", ""))]
+                        and re.search(r" — \d+ results$", x.get("label", ""))]
             if len(headings) != 1:
                 return None
             return snapshot, headings[0]
