@@ -14,7 +14,7 @@ from release_gate import require
 CERT='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
 PINS={2103464:'eb4ea5594d18d83c5638d10c0c1b22b2124e6c61c303d41908108dcd02b6ae54',2103465:'bec094103bca08abce081038669428ce9babf0aab1d99ca4cb0ec09ca1a729e9'}
 SCREENS=['front-yes-home.png','front-no-home.png','inner-yes-home.png','inner-no-home.png','Info-Play.png','Info-Trailer.png','Downloads-Files.png']
-CASES=['authenticated_current_external61_268_on_exact462','actual_462_to464_install_over_and78_signed_module_files',*['real_native_Search_cycle_'+str(i) for i in range(1,9)],'actual_watched_and_unwatched_popup_callbacks','actual_Info_Play_control','actual_Info_Trailer_control','native_Downloads_Files_observation','actual_464_to465_forward_recovery78_files_and_data_preservation']
+CASES=['authenticated_current_external61_268_before_exact462_update','actual_462_to464_install_over_and78_signed_module_files',*['real_native_Search_cycle_'+str(i) for i in range(1,9)],'actual_watched_and_unwatched_popup_callbacks','actual_Info_Play_control','actual_Info_Trailer_control','native_Downloads_Files_observation','actual_464_to465_forward_recovery78_files_and_data_preservation']
 
 def copy_verified(source,target,expected):
     require(file_sha(source)==expected,'EXACT_SIGNED_SOURCE')

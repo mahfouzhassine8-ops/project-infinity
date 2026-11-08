@@ -218,24 +218,36 @@ def verify(parent,candidate,recovery,fixture,out):
         # so it can read the app-owned observer/profile files. The application
         # itself keeps the ordinary UID above; SELinux and app guards stay on.
         report['fresh_fixture_ownership']['ADB_transport']='Debug-emulator root retained only for test-file observation; application UID unchanged'
-        report['parent_entry']=device.enter('parent462')
+        # The exact parent's normal entry is already qualified in42423578286.
+        # Do not repeat buggy old-engine execution before testing its successor.
+        # Actual install-over remains mandatory: exact parent package, same UID,
+        # authenticated61/268 files and existing-data sentinel, then normal464.
+        parent_package=device.shell('dumpsys','package',PACKAGE)
+        assert re.search(r'\bversionCode=2103462\b',parent_package)
+        fixture_addons=fixture/'home/addons'
+        manifest=(fixture_addons/CC/'INFINITY-MODULES.v1').read_text()
+        names=[row[2] for line in manifest.splitlines() if (row:=line.split('\t'))[0]=='file']
+        names += [CC+'/'+n for n in ('addon.xml','INFINITY-MODULES.v1','INFINITY-MODULES.v1.sig')]
+        names += ['skin.infinity.diggz/'+n for n in ('addon.xml','infinity-skin.json','Infinity-Protected-Manifest.json','unified/DialogVideoInfo.xml','unified/Includes_InfinityMediaLists.xml')]
+        assert all(not n.startswith('/') and '..' not in Path(n).parts for n in names)
+        expected={HOME+'/addons/'+n:hashlib.sha256((fixture_addons/n).read_bytes()).hexdigest() for n in names}
+        actual={line.split(None,1)[1].lstrip('*'):line.split(None,1)[0] for line in device.shell('sha256sum',*expected).splitlines()}
+        assert actual==expected,'EXACT_PREUPDATE_EXTERNAL61_268_ON_ANDROID'
+        sentinel=device.shell('cat',PROFILE+'/release-data-sentinel.txt')
+        assert sentinel=='preserve-disposable-preupdate-data-464465-v1'
+        report['parent_entry']=dict(status='REUSED_EXISTING_PARENT_QUALIFICATION',run=42423578286,execution_in_this_run='NOT_REPEATED',reason='Selected successor correction does not require repeating original native-engine startup')
+        passed('authenticated_current_external61_268_before_exact462_update',app_uid=int(uid),package_version=2103462,authenticated_existing_files=actual,user_data_sentinel_present=True,parent_runtime_evidence_reused=42423578286)
+        device.install(candidate,'candidate464');report['candidate_entry']=device.enter('candidate464')
+        assert device.shell('stat','-c','%u','/data/user/0/'+PACKAGE).strip()==uid,'INSTALL_OVER_UID_PRESERVED'
         inputs=json.loads((fixture/'ANDROID-INPUTS.json').read_text())
         for row in inputs['original_provider_archives']:
             aid=row['addon'];details=device.rpc('Addons.GetAddonDetails',dict(addonid=aid,properties=['enabled','version']))['addon']
             assert details['version']==row['version']
             if not details['enabled']:assert device.rpc('Addons.SetAddonEnabled',dict(addonid=aid,enabled=True))=='OK'
         device.start_qa();init=device.command('first-use',seconds=1150)
-        parent_snapshot=device.command('snapshot',full=True)
-        assert parent_snapshot['components']=={CC:'0.3.5.61','skin.infinity.diggz':'1.0.5.268'}
-        assert parent_snapshot['skin']=='skin.infinity.diggz'
-        sentinel=device.shell('cat',PROFILE+'/release-data-sentinel.txt')
-        assert sentinel=='preserve-disposable-preupdate-data-464465-v1'
-        passed('authenticated_current_external61_268_on_exact462',snapshot=parent_snapshot,first_use=init)
-        oldpid=device.pid;device.install(candidate,'candidate464');report['candidate_entry']=device.enter('candidate464')
-        assert oldpid!=device.pid
-        device.start_qa();actual=verify_successor(device,candidate,2103464)
+        actual=verify_successor(device,candidate,2103464)
         assert device.shell('cat',PROFILE+'/release-data-sentinel.txt')==sentinel
-        passed('actual_462_to464_install_over_and78_signed_module_files',snapshot=actual,user_data_sentinel_preserved=True)
+        passed('actual_462_to464_install_over_and78_signed_module_files',snapshot=actual,user_data_sentinel_preserved=True,app_uid_preserved=True,first_use=init)
         for mode,width,height,density in [('front',1080,2520,420),('inner',1600,1800,320)]:
             device.shell('wm','size',str(width)+'x'+str(height));device.shell('wm','density',str(density));time.sleep(2)
             device.command('home')

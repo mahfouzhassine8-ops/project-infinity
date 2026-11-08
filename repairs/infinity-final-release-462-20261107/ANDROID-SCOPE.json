@@ -5,7 +5,7 @@
   "public_release": false,
   "APK_changes": false,
   "selected_tests": [
-    "Exact462 with authenticated externalCC61/skin268 through normal Splash/chooser",
+    "Exact462 package and authenticated externalCC61/skin268 files on Android before update; reuse prior normal parent-entry qualification42423578286 instead of rerunning old native engine",
     "462 to464 Android install-over; all78 signed module files and selected protected skin source; data sentinel retained",
     "Eight distinct real Android Search/IME movie/TV submissions using unchanged pinnedNixtoons and Umbrella native search; source attribution, two heading activations, native swipes, constantPID; Re:zero must include actualNixtoons results",
     "Front1080x2520 and inner1600x1800 UI observations in system light/dark; manual screenshot/white-line review remains required",
@@ -100,7 +100,7 @@
   },
   "native_search_query_cache": "Eight distinct queries on a fresh fixture avoid reusing a previous query result; no cache purge or provider modifications",
   "original_dependencies": "ANDROID-EXTRA-INPUT-PINS.json records unchanged official archives and exact seven packaged binary API matches; no provider/addon.xml edit",
-  "fixture_setup_revision": 6,
+  "fixture_setup_revision": 7,
   "retained_fixture_ownership_failure": {
     "run": 42430438984,
     "source": "96d74a0cb5d888cb421a23c18714e43420f9769c",
@@ -137,5 +137,15 @@
     "candidate_execution": "NOT_RUN",
     "recovery_execution": "NOT_RUN",
     "Search_or_UI_cases_passed": 0
+  },
+  "retained_original_parent_loader_failure": {
+    "run": 42433728866,
+    "source": "c847eae219ede9ab3cad9941096617c85a8af547",
+    "artifact": 13598569474,
+    "artifact_sha256": "04498e011fbe2fc4f7b413da0e25747c69c0aa2c25818462bd09be9079957f5e",
+    "failure": "Unchanged exact462 native loading crashed under libndk_translation: host /memfd:exec with ARM backtrace talloc_lib_init+60 in originallibkodi then dynamic linker constructors; before Kodi/RPC and before candidate installation. Not evidence of successor behavior or a physical Fold crash.",
+    "candidate_execution": "NOT_RUN",
+    "recovery_execution": "NOT_RUN",
+    "correction": "Reuse already-passed original parent entry42423578286. Keep exact parent PM installation, same UID, authenticated live61/268 file digests and data sentinel before normal464 install-over. All successor execution, first use, live78 module hashes, Search/UI and forward recovery gates remain mandatory. No retry/override of an actual successor crash."
   }
 }
