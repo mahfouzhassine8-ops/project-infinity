@@ -1,0 +1,41 @@
+{
+  "APK": false,
+  "Android_Search": "NOT_RUN",
+  "deadlock_safety": "NOT_PROVEN_BY_COMPILE_OR_LINK",
+  "label_function": {
+    "baseline": {
+      "address": "0000000001695f24",
+      "name": "_ZN9XBMCAddon4xbmc12getInfoLabelEPKc",
+      "size": 248
+    },
+    "candidate": {
+      "address": "0000000001695f24",
+      "name": "_ZN9XBMCAddon4xbmc12getInfoLabelEPKc",
+      "size": 608
+    }
+  },
+  "native_bytes": 637997168,
+  "native_sha256": "ee3be7c7a95b86f8357539001fcd50bedbd80217b02f130d649f7f57e6075794",
+  "object_sha256": "7e01580ecd6035d7add9f7a9776891d201ff399f481af20aabbb1f930d72cf9b",
+  "physical_Fold": "NOT_RUN",
+  "preserved_strong_exports": 71213,
+  "production_repair": false,
+  "signing": false,
+  "source_commit": "a2e803e7927c06ed4b7a8e526b688a730a1f31da",
+  "source_sha256": "a2e9b1ef442c46d39275b45454cbf17dad8f7c2e533e3736904462001d82442d",
+  "status": "PASS_REAL_ARM64_OBJECT_AND_FULL_NATIVE_LINK",
+  "unchanged_dynamic_dependencies": [
+    "libEGL.so",
+    "libGLESv2.so",
+    "libandroid.so",
+    "libc++_shared.so",
+    "libc.so",
+    "libdl.so",
+    "libjnigraphics.so",
+    "liblog.so",
+    "libm.so",
+    "libmediandk.so",
+    "libshairplay.so"
+  ],
+  "unchanged_native_source_count": 9410
+}

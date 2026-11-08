@@ -12,9 +12,11 @@ The owner's exact title and message match the following pinned upstream source:
 [Pinned dialog call](https://github.com/jurialmunkey/script.module.tmdbhelper.sync.trakt/blob/fff6d9b38820d2e64e0b00cb2b469c72ff3fbe2b/resources/lib/tmdbhelper_sync_trakt/api/authenticator.py#L141)
 and [exact text](https://github.com/jurialmunkey/script.module.tmdbhelper.sync.trakt/blob/fff6d9b38820d2e64e0b00cb2b469c72ff3fbe2b/resources/language/resource.language.en_gb/strings.po#L122).
 
-This identifies the matching producer implementation. The installed Fold's copy,
-version and source hashes have not yet been captured. Do not replace or upgrade
-the installed module blindly with this public reference version.
+This identifies the matching producer implementation. The owner has directly
+confirmed installed version1.2.8 on the Fold and that auto-update is enabled.
+The installed source hashes have not been captured. Do not replace or upgrade
+the installed module blindly with this public reference version or change the
+owner's auto-update setting.
 
 ## Automatic failure path
 
@@ -93,8 +95,19 @@ report with the pinned baseline before deciding whether this patch applies; a
 different version/source requires a review against that actual input, not a
 forced overwrite.
 
+The existing Kodi Health Center Add-on Exporter also provides a source-only ZIP
+without ADB. Choose add-on files only, excluding saved settings/data. Check its
+per-file export inventory and then compare the actual code with SOURCE-PINS.json.
+
+Deployment must verify the active source path: unmodified Kodi gives an
+external add-on precedence over an equal-version bundled copy. Merely adding
+another1.2.8 copy inside an APK does not prove the correction will run. No live
+source updater or deployment workaround has been introduced.
+
 After installed-source identity is established, actual Android/Fold verification
 must check automatic failure with Silent Mode ON/OFF, retained cooldown/error
 recording, and manual sign-in. The existing provider compatibility and native
-Search gates remain separate. No build or signing is authorized by this note;
-the user's explicit hold remains in force.
+Search gates remain separate. The user's later consolidated-release directive
+authorizes the existing owner-gated signing route after applicable input gates;
+this note itself grants no signing or installation clearance. Source integrity
+and actual Android/Fold behavior remain outstanding.

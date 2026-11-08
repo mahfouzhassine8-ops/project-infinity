@@ -28,6 +28,20 @@ def main():
     versions = sorted(set(re.findall(r'\bversionCode=(\d+)\b', package)))
     if len(versions) != 1:
         raise RuntimeError('Could not identify one installed Infinity APK version code')
+    apk_identity = {}
+    try:
+        installed = call('shell', 'pm', 'path', 'com.projectinfinity.kodi').decode().splitlines()
+        if len(installed) != 1 or not installed[0].startswith('package:'):
+            raise RuntimeError('Expected one installed combined APK')
+        apk_path = installed[0][len('package:'):]
+        if not re.fullmatch(r'/data/app/[A-Za-z0-9/._~+=-]+\.apk', apk_path):
+            raise RuntimeError('Unrecognized installed APK path')
+        apk_hash = call('exec-out', 'sha256sum', apk_path).decode().split()[0]
+        if not re.fullmatch('[0-9a-f]{64}', apk_hash):
+            raise RuntimeError('Invalid APK hash response')
+        apk_identity = dict(sha256=apk_hash)
+    except RuntimeError:
+        apk_identity = dict(status='APK_HASH_UNREADABLE_NO_BYPASS_ATTEMPTED')
     root = '/sdcard/Android/data/com.projectinfinity.kodi/files/.kodi/addons/'
     cc = 'script.infinity.commandcenter/'
     def read(relative, limit):
@@ -65,6 +79,19 @@ def main():
                                   manifest_sha256=hashlib.sha256(raw).hexdigest())
         except RuntimeError:
             providers[aid] = dict(status='UNREADABLE_AT_STANDARD_EXTERNAL_ADDON_PATH')
+    provider_sources = {}
+    for aid, names in (
+            ('plugin.video.umbrella', ('umbrella.py', 'resources/lib/modules/router.py',
+                                      'resources/lib/menus/movies.py', 'resources/lib/menus/tvshows.py')),
+            ('plugin.video.pov', ('resources/lib/router.py', 'resources/lib/modules/entry.py',
+                                 'resources/lib/menus/movies.py', 'resources/lib/menus/tvshows.py'))):
+        provider_sources[aid] = {}
+        for relative in names:
+            try:
+                raw = read(aid + '/' + relative, 512 * 1024)
+                provider_sources[aid][relative] = hashlib.sha256(raw).hexdigest()
+            except RuntimeError:
+                provider_sources[aid][relative] = 'UNREADABLE'
     trakt_sources = {}
     for relative in (
             'resources/script.py', 'resources/settings.xml',
@@ -81,11 +108,13 @@ def main():
             trakt_sources[relative] = 'UNREADABLE'
     report = dict(status='READ_ONLY_COLLECTION_NOT_INSTALLATION_CLEARANCE',
                   apk_version_code=int(versions[0]),
+                  installed_apk_identity=apk_identity,
                   module_manifest_base64=base64.b64encode(manifest).decode(),
                   module_signature_base64=base64.b64encode(signature).decode(),
                   module_manifest_sha256=hashlib.sha256(manifest).hexdigest(),
                   installed_source_hash_output=hashes, providers=providers,
                   trakt_source_hashes=trakt_sources,
+                  provider_source_hashes=provider_sources,
                   phone_writes=False, settings_or_database_reads=False,
                   Android_functionality_verified=False)
     args.out.write_text(json.dumps(report, indent=2) + '\n')

@@ -1,0 +1,44 @@
+{
+  "status": "PASS_REAL_ARM64_COMPILE_LINK_AND_DOWNLOADED_ARTIFACT_IDENTITY",
+  "run": 42453405536,
+  "job": 128647215087,
+  "artifact": 13606537849,
+  "url": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/42453405536",
+  "source_commit": "a2e803e7927c06ed4b7a8e526b688a730a1f31da",
+  "archive_sha256": "b0e83cfd666848f34f7698d3bf08e6cab5fcf8cb29262456bcc69fc7530a7cd8",
+  "artifact_files": {
+    "ARM64-LINK-VERIFIED.json": "0b657cb13be1e0a8fbc4343855a68d3d251286f469ed260c2a94fa952e3d98bd",
+    "COMPILE-RESULT.json": "1c10194a9cc0c5799560efff9960b6ad951370b65133d81dcc9bd67a2c60e346",
+    "SOURCE-PRESERVATION.json": "e13f6fda771f14ecceff84a0dc08efc0b06c5a87dce91e25a53e887ef7d0864d",
+    "ENGINE-PROOF.json": "599b943f7bdf6bf1fb01dc1aa34a41ec8b8dbb8f081c3f1d4f585520b1933c93",
+    "EXACT464-SOURCE-MAP.json": "a9bfebd4fa5bbc6a0c68f3326e683460626bafcc13b8b2be49fe6db5e7828481",
+    "NATIVE-SOURCE-MAP.json": "f48df24caabdf36fee25d69d47b0a2ad3c98df3936949c8dcd6d07a92e2f0412",
+    "libkodi.so": "ee3be7c7a95b86f8357539001fcd50bedbd80217b02f130d649f7f57e6075794",
+    "ModuleXbmc.cpp.o": "7e01580ecd6035d7add9f7a9776891d201ff399f481af20aabbb1f930d72cf9b"
+  },
+  "downloaded_native_bytes": 637997168,
+  "downloaded_source_map_comparison": {
+    "total": 9411,
+    "unchanged": 9410,
+    "changed": [
+      "xbmc/interfaces/legacy/ModuleXbmc.cpp"
+    ]
+  },
+  "APK": false,
+  "installable": false,
+  "signing": false,
+  "Android_Search": "NOT_RUN",
+  "deadlock_safety": "NOT_PROVEN",
+  "Fold_acceptance": "NOT_RUN",
+  "evidence_reused_without_repeating": {
+    "provider_host": 42435806833,
+    "native_heading_diagnostic": 42441430136,
+    "native_eight_cycles": {
+      "run": 42443988873,
+      "attempt": 2,
+      "production_repair": false
+    },
+    "Trakt_host_tests": 13
+  },
+  "preservation": "Build at source checkpoint only; no new production correction or APK/module/signing/recovery change."
+}

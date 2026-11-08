@@ -1,0 +1,64 @@
+{
+  "status": "PASS_LINKED_AARCH64_DIRECT_BRANCH_PATHS_TO_EXISTING_GUI_LOCK",
+  "library_sha256": "ee3be7c7a95b86f8357539001fcd50bedbd80217b02f130d649f7f57e6075794",
+  "method": "Read-only ELF64 symbol table and AArch64 BL/B immediate decode; no execution or source changes",
+  "source_run": 42453405536,
+  "root": "_ZN9XBMCAddon4xbmc12getInfoLabelEPKc",
+  "paths": [
+    [
+      {
+        "from_function": "_ZN9XBMCAddon4xbmc12getInfoLabelEPKc",
+        "call_pc": "0x1696040",
+        "target_function": "_ZNSt6__ndk18optionalIN14XBMCAddonUtils7GuiLockEE7emplaceIJDnbEvEERS2_DpOT_",
+        "target": "0x1697488"
+      },
+      {
+        "from_function": "_ZNSt6__ndk18optionalIN14XBMCAddonUtils7GuiLockEE7emplaceIJDnbEvEERS2_DpOT_",
+        "call_pc": "0x16974a4",
+        "target_function": "_ZNSt6__ndk124__optional_destruct_baseIN14XBMCAddonUtils7GuiLockELb0EE5resetEv",
+        "target": "0x1697d1c"
+      },
+      {
+        "from_function": "_ZNSt6__ndk124__optional_destruct_baseIN14XBMCAddonUtils7GuiLockELb0EE5resetEv",
+        "call_pc": "0x1697d34",
+        "target_function": "_ZN14XBMCAddonUtils7GuiLockD1Ev",
+        "target": "0x1672458"
+      }
+    ],
+    [
+      {
+        "from_function": "_ZN9XBMCAddon4xbmc12getInfoLabelEPKc",
+        "call_pc": "0x1696040",
+        "target_function": "_ZNSt6__ndk18optionalIN14XBMCAddonUtils7GuiLockEE7emplaceIJDnbEvEERS2_DpOT_",
+        "target": "0x1697488"
+      },
+      {
+        "from_function": "_ZNSt6__ndk18optionalIN14XBMCAddonUtils7GuiLockEE7emplaceIJDnbEvEERS2_DpOT_",
+        "call_pc": "0x16974c8",
+        "target_function": "_ZNSt6__ndk123__optional_storage_baseIN14XBMCAddonUtils7GuiLockELb0EE11__constructIJDnbEEEvDpOT_",
+        "target": "0x1697d48"
+      },
+      {
+        "from_function": "_ZNSt6__ndk123__optional_storage_baseIN14XBMCAddonUtils7GuiLockELb0EE11__constructIJDnbEEEvDpOT_",
+        "call_pc": "0x1697d88",
+        "target_function": "_ZN14XBMCAddonUtils7GuiLockC2EPN9XBMCAddon12LanguageHookEb",
+        "target": "0x16723f4"
+      }
+    ],
+    [
+      {
+        "from_function": "_ZN9XBMCAddon4xbmc12getInfoLabelEPKc",
+        "call_pc": "0x16960d0",
+        "target_function": "_ZNSt6__ndk124__optional_destruct_baseIN14XBMCAddonUtils7GuiLockELb0EED2Ev",
+        "target": "0x16974e0"
+      },
+      {
+        "from_function": "_ZNSt6__ndk124__optional_destruct_baseIN14XBMCAddonUtils7GuiLockELb0EED2Ev",
+        "call_pc": "0x16974e8",
+        "target_function": "_ZN14XBMCAddonUtils7GuiLockD1Ev",
+        "target": "0x1672458"
+      }
+    ]
+  ],
+  "deadlock_or_crash_prevention": "NOT_PROVEN_BY_STATIC_LINKAGE"
+}

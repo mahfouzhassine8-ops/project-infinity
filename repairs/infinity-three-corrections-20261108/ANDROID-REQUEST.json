@@ -1,0 +1,63 @@
+{
+  "operation": "three-corrections-selected-Android-and-installation-gates",
+  "status": "SELECTED_NOT_EXECUTED_BLOCKED_ON_INSTALLED_SOURCE_IDENTITY_AND_SOURCE_MATCHED_SIGNED_APKS",
+  "existing_host_results": "REUSE_NO_REPEATED_HOST_SUITE",
+  "source_prerequisites": [
+    "Authenticate actual installed CC62 manifest with original public key and compare its source bytes; collect other signed module roots via read-only inventory if needed.",
+    "Read actual installed Umbrella/POV addon.xml and native route sources; admit movie/tv search only using unchanged approved compatibility checker, no provider execution/modification.",
+    "Compare installed Trakt1.2.8 runtime tree including auth/token/recovery/account/api/localization against pinned baseline before applying two-file patch.",
+    "Recheck active module paths/version/hash immediately before owner installation because Trakt auto-update is enabled; never overwrite a newer/unknown authenticated generation."
+  ],
+  "Android_prerequisites": [
+    "Use one source-matched original-key QA installer plus forward recovery from the existing owner-gated workflow; no root native-library swap or alternate signing identity.",
+    "Bind both APKs, complete module manifests/signatures, native source/library and original provider distributions by SHA256.",
+    "Verify Kodi selects the intended patched Trakt source path despite a pre-existing external1.2.8 module; preserve auto-update and settings.",
+    "Use disposable Android profile only, preserving prior diagnostic/crash evidence."
+  ],
+  "selected_tests": [
+    {
+      "case": "native-Search-eight-cycles",
+      "checks": [
+        "Search All for movie and tv categories",
+        "at least two Umbrella and two POV native heading activations across movie/tv",
+        "normal navigation between results/home",
+        "unchanged native PID throughout each candidate journey",
+        "original live Container(50).ListItem observer path retained",
+        "finite GUI/RPC deadlines; timeout, stalled frame heartbeat, native crash or process restart FAIL"
+      ],
+      "observer_workaround_allowed": false
+    },
+    {
+      "case": "Silent-Mode-Trakt",
+      "checks": [
+        "actual Kodi SDK automatic failure with Silent Mode ON has no failure dialog",
+        "Silent Mode OFF retains exact failure dialog",
+        "manual sign-in retains device-code and failure dialogs during cooldown",
+        "on_failure log and300-second timestamp retained, automatic retry refused before expiry",
+        "same API call with successful refresh unchanged",
+        "non-Infinity-skin presentation retained"
+      ],
+      "accounts": "Synthetic failure boundaries in disposable QA profile; never owner account/token data"
+    },
+    {
+      "case": "install-over-and-forward-recovery",
+      "checks": [
+        "all79 candidate module records authenticate and match selected source",
+        "no79-to78 stale-file confusion in recovery",
+        "exact Cobra/DEX/skin/unrelated file preservation against authenticated464",
+        "old465/CC63 recovery artifact remains unchanged",
+        "new recovery has a greater APK/module generation than candidate and restores pinned pre-correction functional sources",
+        "profile sentinel, selected settings and saved content survive update/recovery"
+      ],
+      "owner_device": "Only one candidate install and final end-to-end acceptance after CI gates; no blind reinstall or downgrade"
+    }
+  ],
+  "unselected": [
+    "shutdown",
+    "unrelated playback/Watchlist additions",
+    "full Android regression matrix"
+  ],
+  "physical_Fold_acceptance": "MANDATORY_NOT_RUN",
+  "release_versions": "UNASSIGNED; original465/CC63 recovery already issued; registry and monotonic component checks required before reservation",
+  "signing": "Existing original-key owner gate only; no signer or key-policy changes."
+}
