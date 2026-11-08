@@ -1,0 +1,13 @@
+{
+  "status": "FAIL_SELECTED_ANDROID_WATCHLIST_GATES",
+  "cases": [],
+  "synthetic_fixture_media": true,
+  "real_provider_source_unmodified": true,
+  "provider_accounts": false,
+  "Fold": "NOT_RUN",
+  "shutdown": "NOT_SELECTED",
+  "release_acceptance": false,
+  "fixture_clip_sha256": "f9a56845b231db7392668791c1928cc2a0abc4e373111e4f0955a833ace84e5b",
+  "error": "AssertionError('NATIVE_ENGINE_DIED_OR_RESTARTED')",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/project-infinity/project-infinity/repairs/infinity-watchlist-playback-2103466-20261108/verify_watchlist_android.py\", line 186, in run\n    device.enter('baseline466')\n  File \"/home/runner/work/project-infinity/project-infinity/repairs/infinity-final-release-462-20261107/verify_android_release.py\", line 103, in enter\n    self.alive();self.sequence=0\n  File \"/home/runner/work/project-infinity/project-infinity/repairs/infinity-final-release-462-20261107/verify_android_release.py\", line 42, in until\n    if value:return value\n          ^^^^\n  File \"/home/runner/work/project-infinity/project-infinity/repairs/infinity-final-release-462-20261107/verify_android_release.py\", line 101, in native_ready\n    return self.rpc('JSONRPC.Ping')=='pong'\n    ^^^^^^^^^^^^\n  File \"/home/runner/work/project-infinity/project-infinity/repairs/infinity-final-release-462-20261107/verify_android_release.py\", line 49, in alive\n    def rpc(self,method,params=None,timeout=25):\n               ^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: NATIVE_ENGINE_DIED_OR_RESTARTED\n"
+}

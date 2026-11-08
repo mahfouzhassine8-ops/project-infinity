@@ -1,0 +1,47 @@
+*** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+Build fingerprint: 'google/sdk_gphone64_x86_64/emu64xa:17/CE2A.260420.051.A3/16571990:userdebug/dev-keys'
+Kernel Release: '6.12.81-android16-6-g4f69fc7b210c-ab16167562'
+Revision: '0'
+ABI: 'x86_64'
+Guest architecture: 'arm64'
+Timestamp: 2026-11-08 22:14:26.490284086+0000
+Process uptime: 6s
+Executable: /system/bin/app_process64
+Cmdline: com.projectinfinity.kodi:kodi
+pid: 4777, ppid: 430, tid: 4777, name: inity.kodi:kodi  >>> com.projectinfinity.kodi:kodi <<<
+uid: 10234
+signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr 0x00007ec164cb7fa7 (read)
+    rax 000000006b8b4560  rbx 00007ec471c4b020  rcx 00007ec45baf4b5c  rdx 0000000000000001
+    r8  0000000052005101  r9  0000000000000001  r10 000000000034d03d  r11 00007ec1761352c0
+    r12 0000000000000007  r13 00007ec164cb7fa0  r14 0000000000000007  r15 0000000000000007
+    rdi 00007ec471c4b020  rsi 0000000040705fc0
+    rbp 00007ec471c4b020  rsp 00007ffd094538f0  rip 000000004070621a  err 0000000000000004
+
+1 total frames
+backtrace:
+      #00 pc 000000000019d21a  /memfd:exec (deleted)
+
+Note: To display stack pointer information, use the pbtombstone tool:
+[memory maps omitted; complete original retained in authenticated Actions artifact]
+--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
+Guest thread information for tid: 4777
+    x0  000000006b8b4567  x1  00007ec1179dd5d0  x2  00007ec1179dd5d0  x3  0000000000000047
+    x4  0000000000000041  x5  0000000000000000  x6  1b1a030611000600  x7  0006001106031a1b
+    x8  0000000000000007  x9  0000000008f645c8  x10 000000000000000c  x11 00007ec1179cc4b0
+    x12 00000000d7168acf  x13 00007ec1179cc4bc  x14 00007ec1179cc4ac  x15 00007ec1179cc4b0
+    x16 0000000000000001  x17 00007ec117952568  x18 00007ec111a00000  x19 00007ec164cb7fa0
+    x20 00007ec164d4a46d  x21 00007ec1064a4238  x22 00000000000003ae  x23 00007ec164d42d5d
+    x24 00000000000003cf  x25 00007ec164d445a3  x26 00007ec164df5000  x27 00007ec1036169c0
+    x28 00007ec164df5000  x29 00007ec1131fecf0  lr  00007ec1036169e0  sp  00007ec1131fece0
+    pc  00007ec1036169fc  pst 0000000000000000  esr 0000000000000000  vg  0000000000000000
+  
+
+6 total frames
+backtrace:
+      #00 pc 0000000002be89fc  /data/app/~~XKDJ6y2FczLyBKfdfjbgrg==/com.projectinfinity.kodi-vTKBM8ACjxnuLKujxFfYiQ==/lib/arm64/libkodi.so (talloc_lib_init+60)
+      #01 pc 00000000000970cc  /system/bin/arm64/linker64 (__dl_void call_array<void (*)(int, char**, char**)>(char const*, void (**)(int, char**, char**), unsigned long, bool, char const*)+260) (BuildId: a8223eb066f58fc574a79f10b3d8b4e1)
+      #02 pc 0000000000097300  /system/bin/arm64/linker64 (__dl_soinfo::call_constructors()+432) (BuildId: a8223eb066f58fc574a79f10b3d8b4e1)
+      #03 pc 000000000007b36c  /system/bin/arm64/linker64 (__dl_do_dlopen(char const*, int, android_dlextinfo const*, void const*)+3272) (BuildId: a8223eb066f58fc574a79f10b3d8b4e1)
+      #04 pc 0000000000075100  /system/bin/arm64/linker64 (__dl_dlopen_ext(char const*, int, android_dlextinfo const*, void const*)+72) (BuildId: a8223eb066f58fc574a79f10b3d8b4e1)
+      #05 pc 0000000000008018  /system/lib64/arm64/libnative_bridge_vdso.so (BuildId: 669de18a1b49081cead6374c9d053f94)
+--->Fault address falls at 00007ec1'64cb7fa7 between mapped regions

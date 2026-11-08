@@ -1,9 +1,17 @@
-# Engineering installer instructions — release gates pending
+# Engineering installer instructions — Android release gate blocked
 
 Do not install or distribute unfinished preparation inputs. The final signed
 APK pair and SHA-256 values must be filled from the verified signing artifacts
 only after focused Android installation, actual playback and recovery pass.
 Galaxy Fold acceptance remains separate from those engineering results.
+
+The same signed pair is preserved. Android runs42527381943 and42528730683
+failed while starting the unchanged2103466 baseline before candidate installation.
+The latter captured `libkodi.so:talloc_lib_init+60` during library constructors.
+The cause remains undetermined; no baseline repair or additional rebuild is
+justified. See CURRENT-RELEASE-STATUS.json and its retained evidence references.
+Seven playback/resume/TV/persistence/forward-recovery cases still lack a PASS.
+These APKs remain internal engineering inputs and are not cleared for Fold installation.
 
 The planned installer is combined Infinity2103468 / Cobra2103445 with Command
 Center0.3.5.66. Its matching **forward** recovery is combined Infinity2103469 /

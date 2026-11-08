@@ -1,0 +1,28 @@
+{
+  "run_id": 42528730683,
+  "source_commit": "a4a89977f085480c720a7b6e73489374d01395dc",
+  "artifact_id": 13636716810,
+  "artifact_sha256": "cfdff856c2f8cb212f18f92df050c68d2fbd4834d8ca8c309f83cf9647728320",
+  "artifact_size": 4546550,
+  "status": "FAIL_ORIGINAL_BASELINE_STARTUP_SIGSEGV_BEFORE_CANDIDATE",
+  "candidate_installed": false,
+  "completed_app_cases": 0,
+  "APK_rebuild": false,
+  "APK_sha256": "d366e4b8aadba8484768cfcc0d362c2fc8e0181d78123ea77e04af4f028a3135",
+  "actual_crash": "2103466 :kodi main process pid4777 SIGSEGV during native library constructors",
+  "guest_frame": "libkodi.so talloc_lib_init+60 (pc offset 0x2be89fc)",
+  "guest_callers": [
+    "arm64/linker64 call_array",
+    "arm64/linker64 soinfo::call_constructors",
+    "arm64/linker64 do_dlopen",
+    "arm64/linker64 dlopen_ext",
+    "arm64/libnative_bridge_vdso.so"
+  ],
+  "host_frame": "/memfd:exec +0x19d21a",
+  "fault_address": "0x7ec164cb7fa7 read; unmapped between regions",
+  "cause": "UNDETERMINED: exact original-library initialization crash captured; translation versus baseline library cause not established. Watchlist candidate was not installed.",
+  "full_tombstone_sha256": "7025a8d968300b4b25d1616e10509864140547b5218e969465dcec96923e6f8e",
+  "full_log_sha256": "15d64d530d2b22e55ec62146ebd64fbba8760a3be91c6d537d210e3c3b2e732d",
+  "host_cleanup": "PASS finite failed action plus complete artifact upload; no previous cleanup timeout",
+  "additional_execution": "STOPPED: no third retry, source modification or rebuild justified"
+}
