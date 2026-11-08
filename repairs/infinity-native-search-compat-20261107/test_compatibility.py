@@ -186,6 +186,22 @@ class NativeRouteCompatibility(unittest.TestCase):
         files[path]+=b"\n# modified after verification"
         self.assertNotEqual(pins[path],hashlib.sha256(files[path]).hexdigest())
 
+    def test_crew_seren_otaku_nixtoons_and_other_providers_out_of_scope(self):
+        for aid in ("plugin.video.thecrew","plugin.video.seren",
+                    "plugin.video.otaku","plugin.video.watchnixtoons2",
+                    "plugin.video.unknown"):
+            with self.subTest(addon=aid):
+                # Even a structurally similar search family cannot grant
+                # anything through the new Umbrella/POV-only fallback.
+                reads=[]
+                def reader(name):
+                    reads.append(name)
+                    raise AssertionError("Out-of-scope provider source was inspected")
+                for family in (contract("umbrella"),contract("pov")):
+                    result=compat.recognize(aid,Path("/read-only/"+aid),[family],reader)
+                    self.assertEqual(result,{})
+                self.assertEqual(reads,[])
+
     def test_no_navigation_or_identity_granted_to_search_only_fallback(self):
         for kind in ("umbrella","pov"):
             with self.subTest(kind=kind):
