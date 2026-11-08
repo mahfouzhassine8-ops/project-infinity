@@ -10,6 +10,7 @@ import xbmc,xbmcaddon,xbmcgui,xbmcplugin,xbmcvfs
 
 CC='script.infinity.commandcenter'
 QA='script.infinity.finalreleaseqa'
+COMPAT='service.infinity.compat'
 PROVIDERS=['plugin.video.watchnixtoons2','plugin.video.umbrella']
 CLIP='special://profile/infinity-final-qa.mp4'
 
@@ -40,7 +41,7 @@ def snapshot():
     result['controller_files']={n:hashlib.sha256((controller/n).read_bytes()).hexdigest() for n in ('infinity_search.py','plugin.py','addon.xml','INFINITY-MODULES.v1','INFINITY-MODULES.v1.sig')}
     result['controller_path']=str(controller)
     home=xbmcgui.Window(10000)
-    result['appearance_observation']=dict(home_properties={n:home.getProperty(n) for n in ('Infinity.SystemTheme','Infinity.NativeSystemTheme')},labels={n:xbmc.getInfoLabel(n) for n in ('Skin.String(Infinity.DarkAppearance)','Skin.CurrentColourTheme','Skin.CurrentTheme','$VAR[InfinityPaletteCardSurface]','$VAR[InfinityBoardBackground]','$VAR[InfinityCollectiveTextPrimary]')})
+    result['appearance_observation']=dict(home_properties={n:home.getProperty(n) for n in ('Infinity.SystemTheme','Infinity.NativeSystemTheme','Infinity.ThemeReady','Infinity.ThemeServiceReady','Infinity.ThemeContract','Infinity.ThemeRevision')},labels={n:xbmc.getInfoLabel(n) for n in ('Skin.String(Infinity.DarkAppearance)','Skin.CurrentColourTheme','Skin.CurrentTheme','$VAR[InfinityPaletteCardSurface]','$VAR[InfinityBoardBackground]','$VAR[InfinityCollectiveTextPrimary]')})
     return result
 
 def action(request,root):
@@ -59,6 +60,8 @@ def action(request,root):
             skin=Path(xbmcvfs.translatePath(xbmcaddon.Addon('skin.infinity.diggz').getAddonInfo('path')))
             result['skin_path']=str(skin)
             result['skin_files']={n:hashlib.sha256((skin/n).read_bytes()).hexdigest() for n in ('addon.xml','infinity-skin.json','Infinity-Protected-Manifest.json','unified/DialogVideoInfo.xml','unified/Includes_InfinityMediaLists.xml')}
+            compat=xbmcaddon.Addon(COMPAT);path=Path(xbmcvfs.translatePath(compat.getAddonInfo('path')))
+            result['compat82']=dict(version=compat.getAddonInfo('version'),path=str(path),files={n:hashlib.sha256((path/n).read_bytes()).hexdigest() for n in ('addon.xml','runtime_service.py','checkpoint_runtime.py','compat_runtime.py','layout_service.py','theme_contract.py')})
         return result
     if kind=='first-use':
         import android_runtime_checks as ui
@@ -121,7 +124,9 @@ def action(request,root):
         return dict(status='PASS_ACTUAL_INFO_CONTROL_AND_LOCAL_VIDEO',control=control,item=item,before=before,after=after,content='Generated gray clip; no authenticated provider playback claim')
     if kind=='watched':
         import android_runtime_checks as ui
-        helper=Path(xbmcvfs.translatePath(xbmcaddon.Addon('script.infinity.uirepair').getAddonInfo('path')))
+        # Current signed owner generation consolidates the helper behind its
+        # unchanged UIRepair shim. Import the actual authenticated module path.
+        helper=Path(xbmcvfs.translatePath(xbmcaddon.Addon(CC).getAddonInfo('path')))/'infinity_modules/uirepair'
         sys.path.insert(0,str(helper));from controller_access import load
         plugin=load();hub=plugin.hub;profile=plugin.PROFILE
         before=hub.load_view(profile);key='a'*64

@@ -12,6 +12,7 @@ import xml.etree.ElementTree as ET
 PACKAGE='com.projectinfinity.kodi'
 CC='script.infinity.commandcenter'
 QA='script.infinity.finalreleaseqa'
+COMPAT='service.infinity.compat'
 HOME='/sdcard/Android/data/'+PACKAGE+'/files/.kodi'
 PROFILE=HOME+'/userdata'
 QAROOT=PROFILE+'/addon_data/'+QA
@@ -186,6 +187,12 @@ class Device:
         result=self.adb('install','--no-streaming','-r',path,timeout=300)
         (self.out/(label+'-INSTALL.txt')).write_text(result)
         assert 'Success' in result
+    def appearance_ready(self,expected=None):
+        def published():
+            values=self.command('snapshot')['appearance_observation']
+            props=values['home_properties']
+            return values if props['Infinity.ThemeReady']=='true' and props['Infinity.ThemeServiceReady']=='true' and (expected is None or props['Infinity.SystemTheme']==expected) else None
+        return self.until(published,'unchanged external Compat82 publishes actual effective theme',60)
 
 def expected_modules(apk):
     with ZipFile(apk) as z:
@@ -208,6 +215,9 @@ def verify_successor(device,apk,version):
     assert actual['controller_files']==controller,'ACTUAL_INSTALLED_CONTROLLER_IDENTITY'
     assert actual['skin_files']==skin,'ACTUAL_INSTALLED_SKIN_SOURCE_AND_METADATA'
     assert actual['controller_path'].endswith('/.kodi/addons/'+CC),'EXTERNAL_INSTALL_OVER_WAS_NOT_VERIFIED'
+    compat=json.loads((Path(__file__).parent/'COMPAT82-INPUT.json').read_text())
+    assert actual['compat82']['version']=='0.8.2' and actual['compat82']['path'].endswith('/.kodi/addons/'+COMPAT)
+    assert actual['compat82']['files']==compat['after'],'UNCHANGED_EXISTING_COMPAT82_SIX_FILE_IDENTITY'
     return actual
 
 def verify(parent,candidate,recovery,fixture,out):
@@ -254,6 +264,7 @@ def verify(parent,candidate,recovery,fixture,out):
         names=[row[2] for line in manifest.splitlines() if (row:=line.split('\t'))[0]=='file']
         names += [CC+'/'+n for n in ('addon.xml','INFINITY-MODULES.v1','INFINITY-MODULES.v1.sig')]
         names += ['skin.infinity.diggz/'+n for n in ('addon.xml','infinity-skin.json','Infinity-Protected-Manifest.json','unified/DialogVideoInfo.xml','unified/Includes_InfinityMediaLists.xml')]
+        names += [COMPAT+'/'+n for n in json.loads((Path(__file__).parent/'COMPAT82-INPUT.json').read_text())['after']]
         assert all(not n.startswith('/') and '..' not in Path(n).parts for n in names)
         expected={HOME+'/addons/'+n:hashlib.sha256((fixture_addons/n).read_bytes()).hexdigest() for n in names}
         actual={line.split(None,1)[1].lstrip('*'):line.split(None,1)[0] for line in device.shell('sha256sum',*expected).splitlines()}
@@ -269,7 +280,11 @@ def verify(parent,candidate,recovery,fixture,out):
             aid=row['addon'];details=device.rpc('Addons.GetAddonDetails',dict(addonid=aid,properties=['enabled','version']))['addon']
             assert details['version']==row['version']
             if not details['enabled']:assert device.rpc('Addons.SetAddonEnabled',dict(addonid=aid,enabled=True))=='OK'
+        details=device.rpc('Addons.GetAddonDetails',dict(addonid=COMPAT,properties=['enabled','version']))['addon']
+        assert details['version']=='0.8.2','EXISTING_EXTERNAL_COMPAT82_REQUIRED'
+        if not details['enabled']:assert device.rpc('Addons.SetAddonEnabled',dict(addonid=COMPAT,enabled=True))=='OK'
         device.start_qa();init=device.command('first-use',seconds=1150)
+        report['actual_existing_theme_service']=device.appearance_ready()
         actual=verify_successor(device,candidate,2103464)
         assert device.shell('cat',PROFILE+'/release-data-sentinel.txt')==sentinel
         passed('actual_462_to464_install_over_and78_signed_module_files',snapshot=actual,user_data_sentinel_preserved=True,app_uid_preserved=True,first_use=init)
@@ -278,7 +293,7 @@ def verify(parent,candidate,recovery,fixture,out):
             device.command('home')
             for theme in ('yes','no'):
                 device.shell('cmd','uimode','night',theme);time.sleep(3);device.alive()
-                appearance=device.command('snapshot')['appearance_observation']
+                appearance=device.appearance_ready('dark' if theme=='yes' else 'light')
                 passed('layout_snapshot_'+mode+'_'+theme,screenshot=device.screenshot(mode+'-'+theme+'-home'),appearance_observation=appearance,interpretation='Actual emulator surface for visual inspection; no automatic Fold or white-line PASS')
         device.shell('wm','size','1080x2520');device.shell('wm','density','420');device.shell('cmd','uimode','night','yes')
         queries=[('movie','The Matrix'),('movie','Just Friends'),('movie','Inception'),('movie','Toy Story'),('movie','Spirited Away'),('movie','Finding Nemo'),('tv','Re:zero'),('tv','SpongeBob')]

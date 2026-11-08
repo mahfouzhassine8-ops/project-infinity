@@ -1,0 +1,33 @@
+{
+  "addon": "service.infinity.compat",
+  "version": "0.8.2",
+  "before": {
+    "addon.xml": "6105af7bbb1d179f32326c82c323c9b2a6d2f7935b4f82f91f06614041bb3720",
+    "compat_runtime.py": "f70cc391f88a4ccad1327c7bea36378e5a615549da0ca31fc077347decff4878",
+    "layout_service.py": "227cf88d71febf61fe46b5dce5d8c131a31f0bfa11bc66d1bd4b02176582abdf",
+    "runtime_service.py": "0e4c348bbd1bdc60d158d224e1287927a779c90956c32b813bba1eecba9b72ec",
+    "theme_contract.py": "93320b9c0bfdb3ea87b1d76d2aae1a39bef715015977326a74740f3490410735"
+  },
+  "after": {
+    "addon.xml": "6105af7bbb1d179f32326c82c323c9b2a6d2f7935b4f82f91f06614041bb3720",
+    "checkpoint_runtime.py": "eb07f7cac8e773b5edc770d853618ca12a21c6279224fcfb04e23801c90077be",
+    "compat_runtime.py": "f70cc391f88a4ccad1327c7bea36378e5a615549da0ca31fc077347decff4878",
+    "layout_service.py": "227cf88d71febf61fe46b5dce5d8c131a31f0bfa11bc66d1bd4b02176582abdf",
+    "runtime_service.py": "657d75dee8f04d5cbdb1307893eed55efe05f32a1cefc0fa11c5213395080dca",
+    "theme_contract.py": "93320b9c0bfdb3ea87b1d76d2aae1a39bef715015977326a74740f3490410735"
+  },
+  "original_source_directory": "repairs/android-checkpoint-shutdown/installed/parent/service.infinity.compat",
+  "original_source_manifest": "repairs/android-checkpoint-shutdown/installed/manifest.json",
+  "original_signed462_embedded_patch": "assets/infinity/checkpoint-compat-82.zip",
+  "original_signed_patch_sha256": "15b95f6db13ba7e83ec9a689bc55676a905bd511dfba7f7098f31d032aa1e926",
+  "observed_installed_code": {
+    "captured_epoch_ms": 1794039139465,
+    "version": "0.8.2",
+    "entry_point_hashes": {
+      "addon.xml": "6105af7bbb1d179f32326c82c323c9b2a6d2f7935b4f82f91f06614041bb3720",
+      "runtime_service.py": "657d75dee8f04d5cbdb1307893eed55efe05f32a1cefc0fa11c5213395080dca"
+    }
+  },
+  "operation": "Reproduce existing external component in disposable profile only; no APK/component source or real user data changes",
+  "limits": "Saved observed entry points identify0.8.2; all six reconstructed files match the original reviewed source/patch manifest. This does not infer later private user modifications."
+}

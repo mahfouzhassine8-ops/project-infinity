@@ -5,10 +5,10 @@
   "public_release": false,
   "APK_changes": false,
   "selected_tests": [
-    "Exact462 package and authenticated externalCC61/skin268 files on Android before update; reuse prior normal parent-entry qualification42423578286 instead of rerunning old native engine",
+    "Exact462 PM package and authenticated externalCC61/skin268 plus original existingCompat0.8.2 files on Android before update; reuse prior parent-entry qualification42423578286",
     "462 to464 Android install-over; all78 signed module files and selected protected skin source; data sentinel retained",
     "Eight distinct real Android Search/IME movie/TV submissions using unchanged pinnedNixtoons and Umbrella native search; source attribution, two heading activations, native swipes, constantPID; Re:zero must include actualNixtoons results",
-    "Front1080x2520 and inner1600x1800 UI observations in system light/dark; manual screenshot/white-line review remains required",
+    "Front1080x2520 and inner1600x1800 actual UI observations in light/dark after unchanged existingCompat82 publishes matching theme; all6 externalCompat files preserved; manual screenshot/white-line review required",
     "Actual native watched/unwatched popup callbacks against isolated synthetic tracking row",
     "Actual native Info Play and Trailer buttons with generated local clip; no authenticated-provider playback claim",
     "Native Downloads Files route observation for independent row/screenshot review",
@@ -53,7 +53,7 @@
       "artifact_sha256": "827b6655051dbd3f54f43d160c7cac67f2c2d68d71e13ed17574b6e509e947bf"
     }
   },
-  "fixture_input_revision": 3,
+  "fixture_input_revision": 4,
   "query_selection": [
     {
       "media": "movie",
@@ -100,7 +100,7 @@
   },
   "native_search_query_cache": "Eight distinct queries on a fresh fixture avoid reusing a previous query result; no cache purge or provider modifications",
   "original_dependencies": "ANDROID-EXTRA-INPUT-PINS.json records unchanged official archives and exact seven packaged binary API matches; no provider/addon.xml edit",
-  "fixture_setup_revision": 8,
+  "fixture_setup_revision": 9,
   "retained_fixture_ownership_failure": {
     "run": 42430438984,
     "source": "96d74a0cb5d888cb421a23c18714e43420f9769c",
@@ -162,5 +162,43 @@
     "Search_observation": "The first native IME query opened search-provider=Umbrella and returned21 original rows, not SearchAll. The test had tapped EditText bounds captured before asynchronous IME resize; no post-resize selected-provider proof was retained. This is not a passing grouped Search test. No state_changed or native crash observed in that first provider-specific reply.",
     "correction": "Remove pre-IME stale-coordinate editor tap. Require actual shown IME and already-focused native editor, exact typed query, two fresh identical All-row bounds, actual All-row tap and explicit selected accessibility state plus SearchAll submit label before native Enter. Original APK/UI and providers unchanged.",
     "remaining": "Eight grouped Search cycles, heading/touch navigation, watched/Info/Downloads and actual465 recovery still mandatory. Investigate actual Home contrast observations independently; no visual PASS claimed."
+  },
+  "external_compat82_fixture_correction": {
+    "reason": "Saved installed-code inventory identifies externalCompat0.8.2 by addon.xml and runtime_service.py hashes. Earlier fresh fixtures incorrectly used older bundled0.7.2, so effective theme service/state was not representative. Home contrast evidence remains unpassed until corrected fixture is observed.",
+    "proof": "COMPAT82-INPUT.json",
+    "original_signed462_patch_sha256": "15b95f6db13ba7e83ec9a689bc55676a905bd511dfba7f7098f31d032aa1e926",
+    "method": "Reconstruct unchanged original0.8.2 parent sources plus exact signed462 code-only patch; all6 match existing manifest and observed entrypoints; stage only in disposable profile. Verify all6 runtime files before/after install-over and recovery; enable via ordinary Addons.SetAddonEnabled only if disabled; require actual theme publication.",
+    "APK_changes": false,
+    "production_source_changes": false,
+    "user_data_changes": false,
+    "shutdown_execution": "NOT_SELECTED"
+  },
+  "retained_eight_native_search_passes_and_watched_helper_path_failure": {
+    "run": 42435881141,
+    "source": "f8ad4c00fe3466032eb6049c3db957015f646d0e",
+    "artifact": 13600615107,
+    "artifact_sha256": "fa4f4afa561468bae23a7737ca3360a288eaa3a1c3ac1fdec2d0f4cb5744d33f",
+    "APK_sha256": "eb4ea5594d18d83c5638d10c0c1b22b2124e6c61c303d41908108dcd02b6ae54",
+    "actual_passes": "All8 distinct native-provider grouped searches, two actual original heading activations, native touch swipes and constantPID5043; positiveNixtoonsRe:zero required and observed. Both headings completed each cycle without state_changed. Actual install-over/78file/data checks remain PASS.",
+    "query_row_counts": {
+      "The Matrix": 21,
+      "Just Friends": 21,
+      "Inception": 12,
+      "Toy Story": 31,
+      "Spirited Away": 8,
+      "Finding Nemo": 4,
+      "Re:zero": 4,
+      "SpongeBob": 8
+    },
+    "failure": "Disposable watched observer imported controller_access from the old legacy addon-root layout; actual current signed owner consolidates it underCC/infinity_modules/uirepair. No watched action was attempted.",
+    "correction": "Point observer to actual authenticated consolidated helper directory; no production helper, callback or source change.",
+    "Home_observation": "SystemTheme empty while rawNativeSystemTheme changes; CardSurface and Text colors resolve but BoardBackground staysblack inLight. Proper known externalCompat82 was missing from fixture. Manual visualPASS remains withheld.",
+    "remaining_not_run": [
+      "watched actions",
+      "Info Play/Trailer",
+      "Downloads",
+      "actual forward465 recovery"
+    ],
+    "reason_for_revised_selected_runtime": "Corrected known existing participant changes actual theme/layout publication and runtime state; verify selected journeys on representative baseline, retaining allprevious actual PASS evidence; no host/build/sign tests rerun."
   }
 }

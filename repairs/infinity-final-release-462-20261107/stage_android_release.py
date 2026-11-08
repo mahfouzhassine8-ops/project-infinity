@@ -44,6 +44,27 @@ def stage(parent,candidate,recovery,current,sdk,out,identity_only=False):
         require(file_sha(current/leaf)==want,'AUTHENTICATED_CURRENT_EXTERNAL_COMPONENT')
         if (addons/aid).exists():shutil.rmtree(addons/aid)
         with ZipFile(current/leaf) as z:validate_names(z);z.extractall(addons)
+    # The user's saved code inventory identifies external Compat0.8.2. The
+    # APK deliberately retains the old0.7.2 base plus an exact code-only patch.
+    # Reproduce the existing external component; never change APK assets or
+    # remove its original checkpoint/writer admission guards.
+    compat=load(HERE/'COMPAT82-INPUT.json')
+    original=ROOT/compat['original_source_directory']
+    content={p.name:p.read_bytes() for p in original.iterdir() if p.is_file()}
+    require({n:hashlib.sha256(b).hexdigest() for n,b in content.items()}==compat['before'],'EXACT_ORIGINAL_EXTERNAL_COMPAT82_SOURCE')
+    with ZipFile(parent) as apk:patch_bytes=apk.read(compat['original_signed462_embedded_patch'])
+    require(hashlib.sha256(patch_bytes).hexdigest()==compat['original_signed_patch_sha256'],'EXACT_ORIGINAL_SIGNED_COMPAT82_PATCH')
+    with ZipFile(io.BytesIO(patch_bytes)) as patch:
+        manifest=json.loads(patch.read('manifest.json'))
+        require(manifest['addon_id']==compat['addon'] and manifest['addon_version']==compat['version'] and manifest['addon_xml_sha256']==hashlib.sha256(content['addon.xml']).hexdigest(),'AUTHENTICATED_EXISTING_COMPAT82_PATCH_TARGET')
+        for row in manifest['files']:
+            name=row['path'];require(Path(name).name==name,'FIXED_COMPAT_SOURCE_LEAF')
+            if row['before'] is not None:require(hashlib.sha256(content[name]).hexdigest()==row['before'],'ORIGINAL_COMPAT_PATCH_PRECONDITION')
+            raw=patch.read('payload/'+name);require(hashlib.sha256(raw).hexdigest()==row['after'],'ORIGINAL_COMPAT_PATCH_PAYLOAD');content[name]=raw
+    require({n:hashlib.sha256(b).hexdigest() for n,b in content.items()}==compat['after'],'ALL_SIX_EXACT_EXISTING_COMPAT82_FILES')
+    for name,want in compat['observed_installed_code']['entry_point_hashes'].items():require(hashlib.sha256(content[name]).hexdigest()==want,'OBSERVED_PHONE_COMPAT82_ENTRY_POINT')
+    destination=addons/compat['addon'];destination.mkdir()
+    for name,raw in content.items():(destination/name).write_bytes(raw)
     # Exact retained native-provider distributions; no account, private
     # settings, response substitution, provider patch or source shim.
     pins=load(ROOT/'repairs/save-later-multiimage-20261023/ANDROID-INPUT-PINS.json')
@@ -91,7 +112,7 @@ def stage(parent,candidate,recovery,current,sdk,out,identity_only=False):
     state=dict(schema=2,items={entry['key']:entry},watched={},watchlist={},collection={},lists={},sources={},later={},navigation_recovery={'unrelated':{'retained_sentinel':True}})
     save(profile/'addon_data'/CC/'continue-watching.json',state)
     subprocess.run(['ffmpeg','-v','error','-f','lavfi','-i','color=c=gray:s=320x180:r=10','-t','180','-an','-c:v','libx264','-pix_fmt','yuv420p',str(profile/'infinity-final-qa.mp4')],check=True)
-    report=dict(status='PASS_EXACT_INPUTS_AND_DISPOSABLE_FIXTURE_PREPARATION',parent_sha256=PARENT,APKs=inputs,original_provider_archives=rows,provider_sources_modified=False,test_QA_addon_packaged_in_APK=False,generated_content='Gray180second clip; synthetic tracking metadata references TMDb603 only for alias/watched validation; no actual movie playback claim',actual_installed_Fold_provider_versions='NOT_CLAIMED',physical_Fold='NOT_RUN',shutdown='NOT_SELECTED')
+    report=dict(status='PASS_EXACT_INPUTS_AND_DISPOSABLE_FIXTURE_PREPARATION',parent_sha256=PARENT,APKs=inputs,original_provider_archives=rows,external_compat82=compat,provider_sources_modified=False,test_QA_addon_packaged_in_APK=False,generated_content='Gray180second clip; synthetic tracking metadata references TMDb603 only for alias/watched validation; no actual movie playback claim',actual_installed_Fold_provider_versions='NOT_CLAIMED',physical_Fold='NOT_RUN',shutdown='NOT_SELECTED')
     save(out/'ANDROID-INPUTS.json',report);print(report['status'])
 
 if __name__=='__main__':
