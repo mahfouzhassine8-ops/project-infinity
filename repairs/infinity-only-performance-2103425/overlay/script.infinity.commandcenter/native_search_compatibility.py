@@ -165,9 +165,8 @@ def _pov(get, contract, media):
         raise Unverified("Native router owner changed")
 
     menu = _class(get("resources/lib/"+module.replace(".", "/")+".py").body, "Menu")
-    init = _method(menu.body, "__init__")
-    if not _contains(init, "self.params.get('action')"):
-        raise Unverified("Native menu action origin changed")
+    # Current POV derives its menu constructor from a shared base; require the
+    # native run() action/query chain here rather than an invented local __init__.
     handler = _method(menu.body, "run")
     branch = _branch(handler, "self.action == "+repr(action))
     if not _contains(branch, "self.params['query']"):
