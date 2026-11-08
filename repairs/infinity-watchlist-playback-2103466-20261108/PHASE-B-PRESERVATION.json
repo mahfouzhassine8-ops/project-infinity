@@ -1,18 +1,35 @@
 {
-  "status": "PASS_BOUNDED_CANDIDATE_DIFF_ONLY_FULL_FEATURE_BLOCKED",
-  "owner_authorization": "8e83bcb8374dec0ccc646cbe02c3c4249395ba8c",
+  "status": "PASS_SOURCE_BOUND_SCOPED_INTEGRATION_AND_REAL_ARM64_LINK_RUNTIME_PENDING",
   "baseline": "5ee1c7ae0bbe295c311aa34c02f6b62688ccb5a7",
+  "owner_authorization": "8e83bcb8374dec0ccc646cbe02c3c4249395ba8c",
+  "extended_authorization": "OWNER-SCOPE-EXTENSION.md",
   "candidate_source_hashes": {
-    "resume_hub.py": "956c5d62d0d93bc98171fd3c576e726d7bee25ebbe03dec5297200cf9bc175ab",
-    "plugin.py": "7bb81d997756d58c285a0535392b95240f5f91260b3603fddc60fffc0823188b",
-    "service.py": "1844b2b217ccc7f3adef4d82bc825588fb2d561a87d6447f32ebedf3295e927d"
+    "resume_hub.py": "38f8e3cedbb8d1b21902c08d3cd4558c424317a6910be520b328fae749cc9420",
+    "plugin.py": "be2f3764c6ca52e169168a2ada3f5586e20f4f9775d3e258b18fc93be3ba5135",
+    "service.py": "b65b9937ec1a1c02595c0b1e3c3c2041cad97bce5cfa565d89f652cff396b88f",
+    "saved_playback.py": "ba80dd13b100fbe45ce80af23b7edd8e66abdb748d15a4fa6006d02f68fea209"
   },
-  "independent_root_review": "Actual diff, immutable source hashes and existing-function AST comparison verified; no repeated valid host suite",
-  "Astra_review": "Actual final projection diff reviewed; host receipt hashes matched; no material regression within limited scope",
-  "global_identity_writer_callback_functions": "UNCHANGED",
-  "native_files": "UNCHANGED",
-  "providers_Search_Cobra_skin_DEX": "NO_EDITS",
-  "user_data": "NO_ACCESS_OR_MUTATION",
-  "runtime_or_APK_preservation_acceptance": "NOT_RUN",
-  "test_receipt_sha256": "665b9ecb020783b042814d9d09a211bbac06b4501367ece804af15e863406069"
+  "native_source_hashes": {
+    "xbmc/filesystem/PluginDirectory.cpp": "d36a14db6752babcc1f72b86e9537faeb4d6f14b990c56f81a7952cb71655c4a",
+    "xbmc/guilib/InfinitySavedNavigation.h": "0f574675c1339eca52b372b91e18ce2b255283ee020a39e44c83295d7b156092",
+    "xbmc/guilib/InfinitySavedNavigationState.h": "7885116d5c9b869cea813f0ad34dc240efecd1cf1e05913c916d7a9e0a4aebbe",
+    "xbmc/interfaces/generic/ScriptInvocationManager.cpp": "eb46c1df3a4e8a249e7b00cbcbf50c91b16a822e6b323e523f19098e388ffd20",
+    "xbmc/interfaces/json-rpc/PlayerOperations.cpp": "adc78b8aba4f81393f56e8d83459ddf4ad14d1f662d12c246853ee21b2068824",
+    "xbmc/interfaces/legacy/Player.cpp": "70dfdc45ea6f8d890b9c11982ddf6c884c5c4223edde2cbc6290af0b16e63e45"
+  },
+  "host_unique_cases": 28,
+  "native_workflow_run": 42509875214,
+  "native_sha256": "d27779dd8d36d573e0dc75eb3309b38ac89d7ce158ebf632257fc23a17c0af99",
+  "native_unchanged_source_files": 9405,
+  "native_total_source_files": 9411,
+  "strong_exports_unchanged": 71213,
+  "runtime_dependencies_unchanged": 11,
+  "providers_Search_Cobra_skin_DEX": "NO_SOURCE_EDITS; full APK member comparison required before signing",
+  "user_data": "NO_OWNER_DEVICE_ACCESS_OR_MUTATION",
+  "writer_thresholds_callbacks": "EXISTING_WRITER_AND_SEMANTICS_PRESERVED; only opt-in actual-AV origin enrichment",
+  "episode_ordering": "Existing verified_next evidence only; unproved successor withheld",
+  "Android_AV_install_recovery": "PENDING",
+  "Galaxy_Fold": "PENDING_ONE_FINAL_OWNER_ACCEPTANCE",
+  "signed_installer": "NOT_YET_PREPARED",
+  "previous_bounded_receipt": "PHASE-B-PRESERVATION-INITIAL.json"
 }

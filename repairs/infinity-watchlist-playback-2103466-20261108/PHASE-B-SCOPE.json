@@ -7,19 +7,26 @@
   "scope": "Nine runtime files plus at most one authenticated helper; source-bound origin only",
   "candidate_changed_components": [
     "script.infinity.commandcenter/resume_hub.py",
-    "script.infinity.commandcenter/plugin.py"
+    "script.infinity.commandcenter/plugin.py",
+    "script.infinity.commandcenter/service.py",
+    "script.infinity.commandcenter/saved_playback.py"
   ],
-  "candidate_unchanged_reference": [
-    "script.infinity.commandcenter/service.py"
+  "candidate_unchanged_reference": [],
+  "native_source_edits": [
+    "xbmc/filesystem/PluginDirectory.cpp",
+    "xbmc/guilib/InfinitySavedNavigation.h",
+    "xbmc/guilib/InfinitySavedNavigationState.h",
+    "xbmc/interfaces/generic/ScriptInvocationManager.cpp",
+    "xbmc/interfaces/json-rpc/PlayerOperations.cpp",
+    "xbmc/interfaces/legacy/Player.cpp"
   ],
-  "native_source_edits": [],
   "provider_source_edits": [],
   "installed_device_mutations": [],
-  "host_tests": "17_PASS_CONTROLLED_BOUNDARIES_NOT_ANDROID",
-  "native_ARM64": "NOT_RUN_INCOMPLETE_NATIVE_SOURCE",
+  "host_tests": "28_PASS_SOURCE_BOUND_FOCUSED_INTEGRATION; original17 preserved",
+  "native_ARM64": "PASS_REAL_FOUR_OBJECTS_FULL_LINK_42509875214",
   "Android_AV_restart": "NOT_RUN",
-  "signed_successor": "NOT_PREPARED",
-  "forward_recovery": "NOT_PREPARED",
+  "signed_successor": "PENDING_ORIGINAL_SIGNING",
+  "forward_recovery": "PENDING_ORIGINAL_SIGNING",
   "release_registry": "UNCHANGED_NO_VERSION_RESERVED",
   "original_signer": "UNCHANGED_NOT_INVOKED",
   "baseline_ref": "UNCHANGED",
@@ -28,16 +35,12 @@
   "blocker": {
     "previous_scope_blocker": "RESOLVED_BY_LATEST_OWNER_AUTHORIZATION",
     "remaining_engineering_gates": [
-      "Source-bound native/Python origin contract implementation",
-      "Focused host/ARM64/Android and preservation",
-      "Original signing/current registry/recovery"
+      "Complete original-key module and APK signing",
+      "Focused Android actual AV/install-over/restart/recovery"
     ]
   },
   "remaining_contracts": [
-    "Native exact provider invocation to fresh playing item",
-    "Fresh direct-click dispatch",
-    "Current installed emitter byte admission",
-    "Complete source-bound metadata snapshot scheduling and late consumption"
+    "Focused Android actual playback and signed installation/recovery verification"
   ],
   "next_permission": "No routine approvals within authorized scope",
   "additional_authorization": "OWNER-SCOPE-EXTENSION.md",

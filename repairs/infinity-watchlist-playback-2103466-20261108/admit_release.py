@@ -8,6 +8,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 
 HERE=Path(__file__).resolve().parent
@@ -15,6 +16,7 @@ ROOT=HERE.parents[1]
 BASE='5ee1c7ae0bbe295c311aa34c02f6b62688ccb5a7'
 AUTHORITY='2aa41804821264581fe69e0fb1d10703e6583baf'
 WORKFLOW='.github/workflows/infinity-combined-release.yml'
+FEATURE_WORKFLOW='.github/workflows/infinity-saved-navigation-android.yml'
 REPO='repos/mahfouzhassine8-ops/project-infinity/'
 
 
@@ -37,9 +39,20 @@ def admit(native_artifact,out):
     expected=previous.replace('prepare-three, sign-three]', 'prepare-three, sign-three, '+', '.join(additions)+']')
     assert additions[:2]==['watchlist-verify-native','prepare-watchlist']
     assert actual.startswith(expected.rstrip()+'\n'),'EXISTING_ORIGINAL_WORKFLOW_JOBS_CHANGED'
+    feature_before=command('git','show',BASE+':'+FEATURE_WORKFLOW).decode()
+    feature_actual=(ROOT/FEATURE_WORKFLOW).read_text()
+    if feature_actual!=feature_before:
+        selector='preview-fullscreen451-android]'
+        exclusion="&& inputs.feature != 'cobra-quality444-final'"
+        assert feature_before.count(selector)==1 and feature_before.count(exclusion)==1,'EXACT_FEATURE_WORKFLOW_ANCHORS'
+        feature_expected=feature_before.replace(selector,'preview-fullscreen451-android, watchlist-playback-android]',1)
+        feature_expected=feature_expected.replace(exclusion,exclusion+" && inputs.feature != 'watchlist-playback-android'",1)
+        assert feature_actual.startswith(feature_expected),'EXISTING_FEATURE_WORKFLOW_JOBS_CHANGED'
+        appended=feature_actual[len(feature_expected):]
+        assert appended.lstrip('\n').startswith('  selected_watchlist:\n') and re.findall(r'^  ([A-Za-z0-9_-]+):',appended,re.M)==['selected_watchlist'],'ONLY_SELECTED_WATCHLIST_FEATURE_JOB_MAY_BE_APPENDED'
     changed=command('git','diff','--name-only',BASE,'HEAD').decode().splitlines()
     prefix=HERE.relative_to(ROOT).as_posix()+'/'
-    assert all(n.startswith(prefix) or n==WORKFLOW for n in changed),'PREPARATION_HAS_UNRELATED_SOURCE_CHANGES'
+    assert all(n.startswith(prefix) or n in (WORKFLOW,FEATURE_WORKFLOW) for n in changed),'PREPARATION_HAS_UNRELATED_SOURCE_CHANGES'
     for n in ('SignInfinityModules.java','ORIGINAL-INFINITY-PUBLIC-KEY.pem','module_bundle.py','module_dex.py','InfinityInstalledModules.java.in'):
         path='repairs/infinity-final-closure-2103407/'+n
         assert (ROOT/path).read_bytes()==command('git','show',BASE+':'+path),'ORIGINAL_MODULE_TOOLS_CHANGED:'+n
@@ -65,7 +78,8 @@ def admit(native_artifact,out):
     # The helper's reviewed producer closure is data, not an imported provider.
     tree=ast.parse((HERE/'overlay/script.infinity.commandcenter/saved_playback.py').read_text())
     producer=next(ast.literal_eval(n.value) for n in tree.body if isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and t.id=='PRODUCERS' for t in n.targets))
-    assert producer==load(HERE/'CURRENT-EMITTER-PINS.json')['providers']
+    provider_pins=load(HERE/'CURRENT-EMITTER-PINS.json')['providers']
+    assert producer=={aid:{'version':item['version'],'files':item['files']} for aid,item in provider_pins.items()},'EXACT_PRODUCER_VERSION_AND_FILES_PINS'
     request=load(HERE/'NATIVE-INPUT-REQUEST.json')
     run=gh('actions/runs/'+str(request['run_id']))
     assert run['status']=='completed' and run['conclusion']=='success' and run['workflow_id']==397702717
