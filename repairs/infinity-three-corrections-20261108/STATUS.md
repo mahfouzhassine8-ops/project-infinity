@@ -219,3 +219,24 @@ now awaits actual native rows with a finite120-second deadline. Independent
 Trakt SDK cases run first so this incomplete navigation cannot block them again.
 All failures remain visible; same signed APKs, provider source/preferences and
 20-second consumer lease. Prior seven cycles and Fold source checks are reused.
+
+
+Owner clarified the actual Search acceptance contract: successful zero results
+are valid; provider errors/timeouts remain distinct, and crashes/deadlocks or
+unresponsive navigation FAIL. The test now follows that contract, binding each
+snapshot to the exact requested media/query and excluding pending modal/loading
+states. Six focused contract checks PASS, including zero/positive combinations,
+provider errors/timeout refusal and pending/stale-query refusal. Live item reads,
+heading selection, native20-second lease, PID checks and finite GUI deadlines
+are unchanged. No provider or APK change.
+
+Reevaluation of original artifact13613758738 under the corrected contract finds
+all eight requested searches completed in order with PID5361. Results U/POV:
+Matrix21/21, Inception12/12, Toy Story21/21, Finding Nemo3/3, Breaking Bad5/5,
+The Office21/21, SpongeBob7/7, Re:zero0/2. The eighth operation was responsive:
+84 completed-result snapshots, window10025, no modal dialog and samePID.
+Its workflow FAIL was a tester waiting for catalog hits, not a provider timeout
+or unresponsive Search. See evidence/ANDROID-EIGHT-SEARCH-ACCEPTANCE-REVIEW.json.
+Eight-operation/no-observed-crash gate PASS; remaining native TV row selection,
+actual SDK Trakt and integrated recovery are running in42473993024. Physical
+Fold acceptance and overall release clearance remain pending.

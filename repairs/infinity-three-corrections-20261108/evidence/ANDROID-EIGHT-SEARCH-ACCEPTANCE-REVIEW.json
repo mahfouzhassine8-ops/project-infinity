@@ -1,0 +1,202 @@
+{
+  "status": "PASS_EIGHT_CONSECUTIVE_REAL_SEARCH_COMPLETIONS_CORRECTED_CONTRACT",
+  "original_run": 42470383172,
+  "original_source": "9402f95a71b4e740fbdedea9e17cf4de6e334d93",
+  "artifact": 13613758738,
+  "artifact_sha256": "20e01bc1f11d20d1a05118e3da5ab3a30ad5984c4fe51f02df317c0a174e7fd2",
+  "candidate_APK_sha256": "d366e4b8aadba8484768cfcc0d362c2fc8e0181d78123ea77e04af4f028a3135",
+  "native_source_changed": false,
+  "original_workflow_conclusion": "FAIL_INVALID_NONEMPTY_PREDICATE_ON_EIGHTH_QUERY",
+  "operation_was_unresponsive": false,
+  "original_problem": "Test demanded nonempty results from both independent catalogs. Eighth request had already completed with Umbrella0/POV2 and84responsive snapshots; no provider timeout/error was published.",
+  "PID": 5361,
+  "cycles": [
+    {
+      "cycle": 1,
+      "media": "movie",
+      "query": "The Matrix",
+      "status": "PASS_COMPLETED_PROVIDER_RESPONSES",
+      "provider_outcomes": {
+        "plugin.video.umbrella": {
+          "status": "PASS_WITH_RESULTS",
+          "results": 21
+        },
+        "plugin.video.pov": {
+          "status": "PASS_WITH_RESULTS",
+          "results": 21
+        }
+      },
+      "PID": 5361,
+      "source_snapshot": "026-snapshot.json",
+      "source_snapshot_sha256": "6e040af81370011764dcded86cf3d4c08f3d8a8840ffc66815a197189b6ebdd0",
+      "responsive_completed_snapshots": 1,
+      "real_live_ListItem_reads": true
+    },
+    {
+      "cycle": 2,
+      "media": "movie",
+      "query": "Inception",
+      "status": "PASS_COMPLETED_PROVIDER_RESPONSES",
+      "provider_outcomes": {
+        "plugin.video.umbrella": {
+          "status": "PASS_WITH_RESULTS",
+          "results": 12
+        },
+        "plugin.video.pov": {
+          "status": "PASS_WITH_RESULTS",
+          "results": 12
+        }
+      },
+      "PID": 5361,
+      "source_snapshot": "047-snapshot.json",
+      "source_snapshot_sha256": "0550fe41d27216f0fcc8feb954c4131d1e9205ac08c91284e62a1a1ff059de46",
+      "responsive_completed_snapshots": 1,
+      "real_live_ListItem_reads": true
+    },
+    {
+      "cycle": 3,
+      "media": "movie",
+      "query": "Toy Story",
+      "status": "PASS_COMPLETED_PROVIDER_RESPONSES",
+      "provider_outcomes": {
+        "plugin.video.umbrella": {
+          "status": "PASS_WITH_RESULTS",
+          "results": 21
+        },
+        "plugin.video.pov": {
+          "status": "PASS_WITH_RESULTS",
+          "results": 21
+        }
+      },
+      "PID": 5361,
+      "source_snapshot": "070-snapshot.json",
+      "source_snapshot_sha256": "062a45501914cb9cb301556c24d45348b028bd4e13e68e7d3431f088630577f1",
+      "responsive_completed_snapshots": 1,
+      "real_live_ListItem_reads": true
+    },
+    {
+      "cycle": 4,
+      "media": "movie",
+      "query": "Finding Nemo",
+      "status": "PASS_COMPLETED_PROVIDER_RESPONSES",
+      "provider_outcomes": {
+        "plugin.video.umbrella": {
+          "status": "PASS_WITH_RESULTS",
+          "results": 3
+        },
+        "plugin.video.pov": {
+          "status": "PASS_WITH_RESULTS",
+          "results": 3
+        }
+      },
+      "PID": 5361,
+      "source_snapshot": "088-snapshot.json",
+      "source_snapshot_sha256": "8c36a515c6934edfacb0b6f876351337d3130695f55a476fdce6e8ad6c753fdc",
+      "responsive_completed_snapshots": 1,
+      "real_live_ListItem_reads": true
+    },
+    {
+      "cycle": 5,
+      "media": "tv",
+      "query": "Breaking Bad",
+      "status": "PASS_COMPLETED_PROVIDER_RESPONSES",
+      "provider_outcomes": {
+        "plugin.video.umbrella": {
+          "status": "PASS_WITH_RESULTS",
+          "results": 5
+        },
+        "plugin.video.pov": {
+          "status": "PASS_WITH_RESULTS",
+          "results": 5
+        }
+      },
+      "PID": 5361,
+      "source_snapshot": "108-snapshot.json",
+      "source_snapshot_sha256": "6db2b574741c030f2c9f246841f09f647dc3321652c722d48d28eb40fe5e82ca",
+      "responsive_completed_snapshots": 1,
+      "real_live_ListItem_reads": true
+    },
+    {
+      "cycle": 6,
+      "media": "tv",
+      "query": "The Office",
+      "status": "PASS_COMPLETED_PROVIDER_RESPONSES",
+      "provider_outcomes": {
+        "plugin.video.umbrella": {
+          "status": "PASS_WITH_RESULTS",
+          "results": 21
+        },
+        "plugin.video.pov": {
+          "status": "PASS_WITH_RESULTS",
+          "results": 21
+        }
+      },
+      "PID": 5361,
+      "source_snapshot": "130-snapshot.json",
+      "source_snapshot_sha256": "b8da539cfa796283344ade6659d6922ece45630c97a533f79baa8cfd22c2fdc3",
+      "responsive_completed_snapshots": 1,
+      "real_live_ListItem_reads": true
+    },
+    {
+      "cycle": 7,
+      "media": "tv",
+      "query": "SpongeBob",
+      "status": "PASS_COMPLETED_PROVIDER_RESPONSES",
+      "provider_outcomes": {
+        "plugin.video.umbrella": {
+          "status": "PASS_WITH_RESULTS",
+          "results": 7
+        },
+        "plugin.video.pov": {
+          "status": "PASS_WITH_RESULTS",
+          "results": 7
+        }
+      },
+      "PID": 5361,
+      "source_snapshot": "150-snapshot.json",
+      "source_snapshot_sha256": "6bd61760e03c8bc3bc8254301fce32593ec34e62b157b1c2876d154987204a71",
+      "responsive_completed_snapshots": 1,
+      "real_live_ListItem_reads": true
+    },
+    {
+      "cycle": 8,
+      "media": "tv",
+      "query": "Re:zero",
+      "status": "PASS_COMPLETED_PROVIDER_RESPONSES",
+      "provider_outcomes": {
+        "plugin.video.umbrella": {
+          "status": "PASS_SUCCESSFUL_EMPTY",
+          "results": 0
+        },
+        "plugin.video.pov": {
+          "status": "PASS_WITH_RESULTS",
+          "results": 2
+        }
+      },
+      "PID": 5361,
+      "source_snapshot": "169-snapshot.json",
+      "source_snapshot_sha256": "a656266e4c6396fc68f50898521015887076f9e4323856a1c3e3359d31de33d2",
+      "responsive_completed_snapshots": 84,
+      "real_live_ListItem_reads": true
+    }
+  ],
+  "positive_result_coverage": {
+    "movie": [
+      "plugin.video.umbrella",
+      "plugin.video.pov"
+    ],
+    "tv": [
+      "plugin.video.umbrella",
+      "plugin.video.pov"
+    ]
+  },
+  "three_native_heading_activations_verified": true,
+  "fourth_heading_opened_in_run42472683863": true,
+  "remaining": [
+    "Complete native POVTV result-row navigation once directory is populated",
+    "Actual Trakt SDK behavior and integrated recovery"
+  ],
+  "Fold_acceptance": "NOT_RUN",
+  "overall_release_clearance": false,
+  "contract_tests_passed": 6
+}

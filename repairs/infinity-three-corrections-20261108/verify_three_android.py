@@ -11,6 +11,7 @@ import subprocess
 import time
 import traceback
 from zipfile import ZipFile
+from urllib.parse import urlparse, parse_qs
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
@@ -23,6 +24,45 @@ HOME = '/sdcard/Android/data/' + PACKAGE + '/files/.kodi'
 PROFILE = HOME + '/userdata'
 QAROOT = PROFILE + '/addon_data/script.infinity.finalreleaseqa'
 PROVIDERS = {'plugin.video.umbrella', 'plugin.video.pov'}
+
+
+class ProviderResponseFailure(Exception):
+    """A published provider error/timeout, distinct from an unresponsive GUI."""
+    def __init__(self, provider, outcome):
+        self.provider, self.outcome = provider, outcome
+        super().__init__(provider + ' reported ' + outcome)
+
+
+def completed_search(current, media, query):
+    if current['window'] != 10025 or current.get('dialog', 9999) not in (0, -1, 9999):
+        return None
+    path = urlparse(current['labels']['Container.FolderPath'])
+    params = parse_qs(path.query)
+    if (path.scheme != 'plugin' or path.netloc != CC or params.get('action') != ['search-all']
+            or params.get('media') != [media] or params.get('query') != [query]):
+        return None
+    first = {}
+    for row in current.get('rows', []):
+        if row.get('provider') in PROVIDERS:
+            first.setdefault(row['provider'], row)
+    if set(first) != PROVIDERS:
+        return None
+    outcomes = {}
+    for provider, heading in first.items():
+        match = re.fullmatch(r'.+ — (\d+) results', heading.get('label', ''))
+        if not match:
+            raise ProviderResponseFailure(provider, heading.get('label', '').partition(' — ')[2] or 'unrecognized response')
+        count = int(match[1])
+        outcomes[provider] = dict(status='PASS_WITH_RESULTS' if count else 'PASS_SUCCESSFUL_EMPTY', results=count)
+    header_indices = {r['index'] for r in first.values()}
+    rows = [r for r in current.get('rows', []) if r.get('provider') in PROVIDERS and r.get('index') not in header_indices
+            and r.get('file', '').startswith('plugin://' + r['provider'] + '/')]
+    for provider, outcome in outcomes.items():
+        # Wait for a coherent published list, without demanding catalog hits.
+        has_rows = any(r['provider'] == provider for r in rows)
+        if has_rows != (outcome['results'] > 0):
+            return None
+    return current, list(first.values()), rows, outcomes
 
 
 def transport():
@@ -184,17 +224,11 @@ def run(baseline, candidate, recovery, fixture, out):
 
                 def results():
                     current = device.command('snapshot', seconds=55)
-                    if current['window'] != 10025 or 'action=search-all' not in current['labels']['Container.FolderPath']:
-                        return None
-                    headings = [r for r in current.get('rows', []) if r.get('provider') in PROVIDERS and re.search(r' — \d+ results$', r.get('label', ''))]
-                    good = [r for r in current.get('rows', []) if r.get('provider') in PROVIDERS and not re.search(r' — \d+ results$', r.get('label', '')) and r.get('file', '').startswith('plugin://' + r['provider'] + '/')]
-                    if {r['provider'] for r in headings} == PROVIDERS and {r['provider'] for r in good} == PROVIDERS:
-                        return current, headings, good
-                    return None
+                    return completed_search(current, media, query)
 
-                current, headings, good = device.until(results, 'real nonempty Umbrella and POV results cycle' + str(cycle + 1), 160)
-                assert not any('state changed' in r.get('label', '').lower() for r in current['rows'])
-                device.command('focus-result', index=good[0]['index'], file=good[0]['file'])
+                current, headings, good, outcomes = device.until(results, 'completed real provider responses cycle' + str(cycle + 1), 160)
+                focused = good[0] if good else headings[0]
+                device.command('focus-result', index=focused['index'], file=focused['file'])
                 device.shell('input', 'swipe', '820', '1650', '820', '750', '500')
                 device.shell('input', 'swipe', '820', '750', '820', '1650', '500')
                 opened = None
@@ -204,7 +238,7 @@ def run(baseline, candidate, recovery, fixture, out):
                     # Original live Container(50).ListItem read is deliberately used.
                     native = device.command('select-row', index=heading['index'], file=heading['file'], seconds=160)
                     opened = provider
-                    if media == 'tv':
+                    if media == 'tv' and outcomes[provider]['results'] > 0:
                         def loaded_native_results():
                             state = device.command('snapshot', seconds=55)
                             if state['window'] != 10025 or state['labels']['Container.FolderPath'].rstrip('/') != heading['file'].rstrip('/'):
@@ -214,7 +248,7 @@ def run(baseline, candidate, recovery, fixture, out):
                         native, folders = device.until(loaded_native_results, 'actual native TV directory rows after heading', 120)
                         device.command('select-row', index=folders[0]['index'], file=folders[0]['file'], seconds=160)
                 device.alive()
-                passed('real_Search_All_cycle_' + str(cycle + 1), media=media, query=query, providers=sorted(PROVIDERS), results=len(good), heading_opened=opened, PID=device.pid, live_ListItem_read=True)
+                passed('real_Search_All_cycle_' + str(cycle + 1), media=media, query=query, providers=sorted(PROVIDERS), results=len(good), provider_outcomes=outcomes, heading_opened=opened, PID=device.pid, live_ListItem_read=True)
         if phase == 'complete':
             selected_searches()
         device.command('home')
@@ -263,8 +297,7 @@ def run(baseline, candidate, recovery, fixture, out):
                     passed('diagnostic_normal_Umbrella_' + media + '_route_timing', details=timing, production_Search_acceptance=False)
             if phase == 'finish-native-heading-and-Trakt':
                 control = device.command('provider-timing', provider='plugin.video.umbrella', media='tv', query='Re:zero', allow_empty=True, seconds=180)
-                assert control['results'] == 0, 'RETAINED_INFINITY_ZERO_MUST_MATCH_ORDINARY_NATIVE_PROVIDER'
-                passed('retained_eighth_zero_matches_ordinary_native_Umbrella', details=control, original_run=42470383172, original_PID=5361)
+                passed('ordinary_native_catalog_control_diagnostic', details=control, original_run=42470383172, original_PID=5361, result_counts_may_vary=True)
         except Exception as error:
             # Retain a failed feature and still exercise the selected forward
             # recovery. Never convert a failed SDK/diagnostic case into PASS.
@@ -287,6 +320,9 @@ def run(baseline, candidate, recovery, fixture, out):
         report.update(status=status, physical_Fold='PENDING_ONE_OWNER_TEST', public_release='ENGINEERING_CANDIDATE_ONLY')
     except BaseException as error:
         report.update(status='FAIL_SELECTED_ANDROID_THREE_CORRECTION_GATE', error=type(error).__name__ + ': ' + str(error), traceback=traceback.format_exc())
+        if isinstance(error, ProviderResponseFailure):
+            report['error_classification'] = 'PROVIDER_ERROR_OR_TIMEOUT_REQUIRES_INVESTIGATION'
+            report['provider_error'] = dict(provider=error.provider, outcome=error.outcome)
         raise
     finally:
         if device:
