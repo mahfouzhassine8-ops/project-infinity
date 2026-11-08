@@ -1,0 +1,38 @@
+{
+  "status": "PASS_SHIPPED_CC62_REJECTION_AND_APPROVED_SEARCH_ONLY_ADMISSION",
+  "results": {
+    "shipped_CC62": {
+      "plugin.video.umbrella": {
+        "status": "unsupported",
+        "operations": []
+      },
+      "plugin.video.pov": {
+        "status": "unsupported",
+        "operations": []
+      }
+    },
+    "approved_overlay_CC62": {
+      "plugin.video.umbrella": {
+        "status": "verified",
+        "operations": [
+          "movie/search",
+          "tv/search"
+        ]
+      },
+      "plugin.video.pov": {
+        "status": "verified",
+        "operations": [
+          "movie/search",
+          "tv/search"
+        ]
+      }
+    }
+  },
+  "provider_code_executed": false,
+  "provider_code_modified": false,
+  "APK_built": false,
+  "existing_host_matrix_reused": 42435806833,
+  "installed_Fold_hashes": "NOT_COLLECTED",
+  "interpretation": "Explains the message for the shipped CC62 plus these pinned providers; actual Fold cause requires installed source identities",
+  "Android_native_Search_execution": false
+}

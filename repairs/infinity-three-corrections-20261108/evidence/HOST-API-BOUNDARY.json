@@ -1,0 +1,17 @@
+{
+  "status": "PASS_EXTRACTED_PRODUCTION_API_ACCESS_BOUNDARY_CONTRACT_ONLY",
+  "results": {
+    "before": "guarded_item_cases=0\nread_completed_while_GUI_mutation_guard_held=1\ncontrols_unchanged=1\n",
+    "after": "guarded_item_cases=4\nread_completed_while_GUI_mutation_guard_held=0\ncontrols_unchanged=1\n"
+  },
+  "native_candidate_sha256": "a2e9b1ef442c46d39275b45454cbf17dad8f7c2e533e3736904462001d82442d",
+  "original_api_source_sha256": "215726b011de58f5cfb7cc1c33c42adfeb29f5f4c85a98864ab36a1819b8d888",
+  "exact_original_GuiLock_source": true,
+  "original_GuiLock_implementation_changed": false,
+  "all_other_ModuleXbmc_functions_byte_identical": true,
+  "full_CGUIContainer_or_Android_execution": false,
+  "original_Scudo_crash_reproduced_by_this_test": false,
+  "ARM64_compile": "NOT_RUN",
+  "Android_Search_replay": "NOT_RUN",
+  "production_repair_proven": false
+}
