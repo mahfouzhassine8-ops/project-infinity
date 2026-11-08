@@ -174,9 +174,13 @@ def _pov(get, contract, media):
                n.targets[0].id == "params_get" and _same(n.value, "self.params.get")
                for n in ast.walk(handler)):
         raise Unverified("Original POV query reader changed")
+    # POV movie search uses the local params_get alias; its TV search
+    # directly reads self.params. Both are literal, reviewed native forwarding.
+    query_reader = ("params_get('query')" if media == "movie"
+                    else "self.params['query']")
     if not (any(isinstance(n, ast.Assign) and
                 len(n.targets) == 1 and isinstance(n.targets[0], ast.Name) and
-                n.targets[0].id == "query" and _same(n.value, "params_get('query')")
+                n.targets[0].id == "query" and _same(n.value, query_reader)
                 for n in branch.body) and
             _contains(branch, "function(query, page_no)")):
         raise Unverified("Original query not passed to native menu")
