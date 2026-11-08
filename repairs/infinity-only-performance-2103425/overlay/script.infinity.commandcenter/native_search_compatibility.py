@@ -199,7 +199,7 @@ def recognize(addon_id, root, specs, reader):
                     _umbrella(get, contract, media)
                 else:
                     _pov(get, contract, media)
-            except (Unverified, OSError, ValueError, UnicodeError, RecursionError):
+            except (Unverified, OSError, KeyError, ValueError, UnicodeError, RecursionError):
                 continue
             # An actual reviewed route, with only the source files needed to
             # prove it. The installed exact bytes are pinned until dispatch.
