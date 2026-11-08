@@ -64,7 +64,8 @@ def package(candidate,recovery,android,review,sdk,out):
             info=ZipInfo(name,(1980,1,1,0,0,0));info.compress_type=ZIP_DEFLATED;info.external_attr=0o100644<<16;info.file_size=path.stat().st_size
             with path.open('rb') as src,z.open(info,'w') as dst:
                 while block:=src.read(1024*1024):dst.write(block)
-        z.writestr('SHA256SUMS',PINS[2103465]+'  Infinity-2103465-Combined-Original-Signer.apk\n')
+        info=ZipInfo('SHA256SUMS',(1980,1,1,0,0,0));info.compress_type=ZIP_DEFLATED;info.external_attr=0o100644<<16
+        z.writestr(info,PINS[2103465]+'  Infinity-2103465-Combined-Original-Signer.apk\n')
     with recovery_zip.open('rb') as stream:os.fsync(stream.fileno())
     with ZipFile(recovery_zip) as z:
         with z.open('Infinity-2103465-Combined-Original-Signer.apk') as stream:
