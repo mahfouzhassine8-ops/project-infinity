@@ -27,7 +27,7 @@ jobs:
             members=[n for n in z.namelist() if n.endswith(('addon.xml','router.py','pov.py','movies.py','tvshows.py','tmdb_api.py','entry.py'))]
             print('POV_ROUTING_SOURCE_NAMES',members[:80])
             for n in members:
-              if n.endswith(('addon.xml','router.py','pov.py','entry.py')) and len(z.read(n))<=512*1024:
+              if n.endswith(('addon.xml','router.py','pov.py','entry.py','movies.py','tvshows.py')) and len(z.read(n))<=512*1024:
                 src=z.read(n).decode('utf8','replace')
                 if n.endswith('addon.xml'):
                   print('POV_MANIFEST_BEGIN',src[:950],'POV_MANIFEST_END')
@@ -35,6 +35,10 @@ jobs:
                   print('POV_ROUTE_FILE',n,'sha256',hashlib.sha256(z.read(n)).hexdigest())
                   if n.endswith('resources/lib/router.py'):
                     print('POV_ENTRYPOINT_HEAD',repr(src[:9500]))
+                  if n.endswith('resources/lib/modules/entry.py'):
+                    print('POV_ROUTER_ENTRY',repr(src[:16500]))
+                  if n.endswith(('resources/lib/menus/movies.py','resources/lib/menus/tvshows.py')):
+                    print('POV_MENU_SEARCH_LINES',n,[(i+1,x.strip()[:200]) for i,x in enumerate(src.splitlines()) if any(term in x for term in ('tmdb_movie','tmdb_tv','search','def run','params.get','params['))][:80])
                   for line in src.splitlines():
                     if any(term in line for term in ('def router','def routing','build_movie_list','build_tvshow_list','tmdb_movies_search','tmdb_tv_search','parse_qsl','params.get','params[','search_term(','def search(')):
                       print('   ',line[:250])
