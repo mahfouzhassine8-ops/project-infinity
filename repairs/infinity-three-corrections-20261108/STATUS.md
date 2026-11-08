@@ -71,26 +71,30 @@ eight-cycle observer modification is not incorporated into production.
 
 The existing Silent Mode implementation explicitly gates passive KaiToast
 presentation and leaves interactive dialogs intact. The bundled Infinity Trakt
-module manages local lists and has no OAuth authentication retry loop. Therefore
-altering it would not address an unidentified external authentication dialog.
+module manages local lists and has no OAuth authentication retry loop. It is
+therefore not the notification owner for the located sync-module dialog.
 
-The actual failure producer and its automatic/manual distinction have not been
-identified. The five-minute retry loop and exact dialog call site have not been
-located in the authenticated bundled component source. A read-only comparison
-with the pinned public Umbrella/POV auth sources did not establish that they own
-the reported dialog. No third-party or authentication code was changed.
+The exact screenshot wording has now been located in the pinned upstream
+script.module.tmdbhelper.sync.trakt1.2.8 source, commit
+fff6d9b38820d2e64e0b00cb2b469c72ff3fbe2b. TraktAuthenticator.notify_failure()
+uses title32103 and message32111. TraktStoredAccessToken.on_failure() logs the
+error and sets the300-second TraktRefreshTimeStamp before notification.
 
-The text reports of the screenshots are available, but the image files themselves
-were not attached to this execution context. The exact title/message, caller
-add-on/version, and corresponding failure-handler source are still required.
-No title-wide dialog filter or blanket interactive-dialog suppression is safe:
-that could hide manual authentication or other required prompts.
+A presentation-only two-file correction is staged under trakt/candidate.
+notify_failure checks Infinity Silent Mode for automatic failures only; recover
+forwards its existing force_login flag so manual sign-in keeps the original
+failure dialog and cooldown bypass. The second401 failure uses the automatic
+path. No global dialog suppression or credential/Watchlist/tracking change was made.
 
-The eventual correction must gate only automatic Trakt failure presentation
-when Infinity Silent Mode is ON. Error recording and the five-minute cooldown
-must execute exactly as before; manual sign-in, other authentication operations,
-non-Infinity behavior, account data and tracking remain unchanged. No speculative
-patch was made without identifying that boundary.
+Thirteen focused host checks PASS, including original failure reproduction,
+automatic ON/OFF, other skins, cooldown expiry, manual sign-in, second401 and
+successful refresh preservation. A complete pinned upstream tree audit PASS
+confirms exactly2 modified files and144 unchanged files. These are local host
+results with synthetic SDK/HTTP/clock boundaries, not Android/Fold acceptance.
+
+The installed module version/source hashes remain unverified. Do not upgrade,
+downgrade or replace an installed version with this public reference blindly.
+See trakt/REPAIR-NOTE.md for exact call paths, source pins and remaining gates.
 
 ## Device verification
 
@@ -103,7 +107,7 @@ The versionCode field is the APK code. For installed module identity, run:
     python3 read_device_inventory.py --out INFINITY-INSTALLED-INVENTORY.json
 
 The collector reads the bounded signed module metadata, hashes of the named
-owned module source files, and the two public provider addon.xml files at their
+owned module source files, and public provider/Trakt-module metadata and relevant Trakt source hashes at their
 standard installed locations. It does not access user settings/databases, launch
 or stop apps, install anything, change permissions, or write to the phone. It
 does not clear installation or authenticate an unknown generation by itself.
@@ -113,15 +117,15 @@ The collector was syntax/CLI checked, not executed against the Fold.
 ## Release gate
 
 No APK build, signing, installation or recovery change was initiated for these
-three scopes. A combined release cannot be signed safely while the Trakt repair
-is undefined and the native candidate is unverified. If the native correction
+three scopes. A combined release cannot be signed safely while installed source
+identities and the native candidate remain unverified. If the native correction
 is confirmed and adopted, it requires a source-matched combined APK rather than
 an add-on-only ZIP; reusing the old engine would not carry the C++ correction.
 Do not assign or reuse release/recovery versions before checking the existing
 owner registry and monotonic component requirements.
 
-The next gates are: identify the actual Trakt producer; confirm the installed
-module/provider identities; complete only the selected native/Trakt checks;
+The next gates are: confirm the installed Trakt/module/provider identities;
+complete only the selected native/Trakt checks;
 then perform one consolidated build/signing through the existing owner gate,
 complete integrity/install-over/recovery checks, and one Galaxy Fold end-to-end
 acceptance. No final installer, completed production repair, or Fold acceptance

@@ -1,0 +1,33 @@
+--- a/resources/lib/tmdbhelper_sync_trakt/api/authenticator.py
++++ b/resources/lib/tmdbhelper_sync_trakt/api/authenticator.py
+@@ -138,7 +138,18 @@
+         from tmdbhelper.lib.script.sync.provider_setup import SyncProviderOnboarding
+         SyncProviderOnboarding('script.module.tmdbhelper.sync.trakt').configure()
+
+-    def notify_failure(self):
++    def notify_failure(self, manual=False):
++        if not manual:
++            # Only automatic failure presentation follows Infinity Silent Mode.
++            # Manual sign-in and every other skin retain the existing dialog.
++            try:
++                from xbmc import getSkinDir, getCondVisibility
++                silent = (getSkinDir() == 'skin.infinity.diggz'
++                          and getCondVisibility('Skin.HasSetting(Infinity.SilentMode)'))
++            except Exception:
++                silent = False  # A presentation-query error must not hide the failure.
++            if silent:
++                return
+         Dialog().ok(get_localized(32103), get_localized(32111))
+
+     def poller(self):
+--- a/resources/lib/tmdbhelper_sync_trakt/api/token.py
++++ b/resources/lib/tmdbhelper_sync_trakt/api/token.py
+@@ -94,7 +94,7 @@
+         if result.logged_in:
+             self.trakt_api.authenticator.configure_provider()
+         if result.failed:
+-            self.trakt_api.authenticator.notify_failure()
++            self.trakt_api.authenticator.notify_failure(manual=force_login)
+         return result.authorization
+
+     def on_failure(self, reason):

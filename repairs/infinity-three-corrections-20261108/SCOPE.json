@@ -26,7 +26,7 @@
     "Exact shipped CC62 inventory rejection versus approved two-file overlay for two pinned public providers; no provider execution"
   ],
   "APK_build": "NOT_INITIATED",
-  "Trakt_producer": "UNIDENTIFIED_NO_PATCH",
+  "Trakt_producer": "script.module.tmdbhelper.sync.trakt: TraktAuthenticator.notify_failure, localized32103/32111",
   "physical_Fold_acceptance": "REQUIRED_NOT_RUN",
   "shutdown": "NOT_SELECTED",
   "preserved": [
@@ -38,5 +38,13 @@
   ],
   "installed_Infinity": "2103464_OWNER_SCREENSHOT_REPORT",
   "installed_Cobra": "2103445_OWNER_SCREENSHOT_REPORT",
-  "host_access_boundary_test": "PASS_NOT_ANDROID_CRASH_REPAIR"
+  "host_access_boundary_test": "PASS_NOT_ANDROID_CRASH_REPAIR",
+  "Trakt_selected_checks": [
+    "exact screenshot wording and title match pinned upstream source",
+    "automatic Silent ON/OFF and other skin presentation",
+    "automatic get_authorization/recover/reject paths keep logs and 300-second cooldown",
+    "manual authenticator.login bypasses automatic cooldown and keeps failure dialog",
+    "successful recovery, no-result, credential/settings preservation",
+    "only notify_failure and one recover notification call change; all other methods byte-identical"
+  ]
 }

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings version="1">
+    <section id="script.module.tmdbhelper.sync.trakt">
+        <category id="account" label="32009">
+            <group id="1">
+                <setting id="token" type="string" label="32101" help="32010">
+                    <level>0</level>
+                    <default/>
+                    <visible>false</visible>
+                    <constraints><allowempty>true</allowempty></constraints>
+                    <control type="edit" format="string"/>
+                </setting>
+                <setting id="authenticate" type="action" label="32011" help="32012">
+                    <level>0</level>
+                    <data>RunScript(script.module.tmdbhelper.sync.trakt,action=authenticate)</data>
+                    <control type="button" format="action"><close>true</close></control>
+                </setting>
+                <setting id="revoke" type="action" label="32013" help="32014">
+                    <level>0</level>
+                    <data>RunScript(script.module.tmdbhelper.sync.trakt,action=revoke)</data>
+                    <dependencies>
+                        <dependency type="visible">
+                            <condition operator="!is" setting="token"/>
+                        </dependency>
+                    </dependencies>
+                    <control type="button" format="action"><close>true</close></control>
+                </setting>
+                <setting id="credentials_migrated" type="boolean" label="32015">
+                    <level>0</level>
+                    <default>false</default>
+                    <visible>false</visible>
+                    <control type="toggle"/>
+                </setting>
+            </group>
+        </category>
+        <category id="lists" label="32000">
+            <group id="1">
+                <setting id="cache_own_lists" type="boolean" label="32001" help="32002">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="genre_icon_location" type="path" label="32003" help="32004">
+                    <level>0</level>
+                    <default/>
+                    <constraints>
+                        <sources><source>files</source></sources>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="button" format="path">
+                        <heading>32003</heading>
+                    </control>
+                </setting>
+            </group>
+        </category>
+        <category id="progress" label="32005">
+            <group id="1">
+                <setting id="use_calendar" type="boolean" label="32006" help="32007">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="preferences_migrated" type="boolean" label="32008">
+                    <level>0</level>
+                    <default>false</default>
+                    <visible>false</visible>
+                    <control type="toggle"/>
+                </setting>
+            </group>
+        </category>
+        <category id="diagnostics" label="32200">
+            <group id="1">
+                <setting id="log_request" type="action" label="32201" help="32202">
+                    <level>0</level>
+                    <data>RunScript(script.module.tmdbhelper.sync.trakt,action=log_request)</data>
+                    <control type="button" format="action"/>
+                </setting>
+                <setting id="auth_status" type="action" label="32203" help="32204">
+                    <level>0</level>
+                    <data>RunScript(script.module.tmdbhelper.sync.trakt,action=auth_status)</data>
+                    <control type="button" format="action"/>
+                </setting>
+            </group>
+        </category>
+    </section>
+</settings>

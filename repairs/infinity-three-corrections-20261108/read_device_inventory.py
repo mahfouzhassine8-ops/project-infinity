@@ -58,19 +58,34 @@ def main():
             signature != read(cc + 'INFINITY-MODULES.v1.sig', 512)):
         raise RuntimeError('Installed generation changed during read; no report issued')
     providers = {}
-    for aid in ('plugin.video.umbrella', 'plugin.video.pov'):
+    for aid in ('plugin.video.umbrella', 'plugin.video.pov', 'script.module.tmdbhelper.sync.trakt'):
         try:
             raw = read(aid + '/addon.xml', 131072)
             providers[aid] = dict(manifest_base64=base64.b64encode(raw).decode(),
                                   manifest_sha256=hashlib.sha256(raw).hexdigest())
         except RuntimeError:
             providers[aid] = dict(status='UNREADABLE_AT_STANDARD_EXTERNAL_ADDON_PATH')
+    trakt_sources = {}
+    for relative in (
+            'resources/script.py', 'resources/settings.xml',
+            'resources/language/resource.language.en_gb/strings.po',
+            'resources/lib/tmdbhelper_sync_trakt/account.py',
+            'resources/lib/tmdbhelper_sync_trakt/api/api.py',
+            'resources/lib/tmdbhelper_sync_trakt/api/authenticator.py',
+            'resources/lib/tmdbhelper_sync_trakt/api/token.py',
+            'resources/lib/tmdbhelper_sync_trakt/api/recovery.py'):
+        try:
+            raw = read('script.module.tmdbhelper.sync.trakt/' + relative, 512 * 1024)
+            trakt_sources[relative] = hashlib.sha256(raw).hexdigest()
+        except RuntimeError:
+            trakt_sources[relative] = 'UNREADABLE'
     report = dict(status='READ_ONLY_COLLECTION_NOT_INSTALLATION_CLEARANCE',
                   apk_version_code=int(versions[0]),
                   module_manifest_base64=base64.b64encode(manifest).decode(),
                   module_signature_base64=base64.b64encode(signature).decode(),
                   module_manifest_sha256=hashlib.sha256(manifest).hexdigest(),
                   installed_source_hash_output=hashes, providers=providers,
+                  trakt_source_hashes=trakt_sources,
                   phone_writes=False, settings_or_database_reads=False,
                   Android_functionality_verified=False)
     args.out.write_text(json.dumps(report, indent=2) + '\n')
