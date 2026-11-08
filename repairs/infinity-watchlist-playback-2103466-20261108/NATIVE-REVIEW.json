@@ -1,0 +1,64 @@
+{
+  "correction_review": [
+    "Exact Launch result or original selected Child seal supplies MovieAttempt TLS item permit; ordinary nested launch masks outer permit",
+    "Single resolver nonce claim prevents another same-route resolver obtaining selected origin",
+    "Exact GetPluginResult resultScope captures registered invoker and resolver nonce; no route-only consumption remains",
+    "One-use TLS directory permit is armed only by actual selected folder and consumed by PrepareNext; cached and fresh Update share generation checks",
+    "No new state-mutex call-outs or lock inversion found in targeted correction"
+  ],
+  "findings": [],
+  "initial_findings": [
+    {
+      "function": "InfinitySavedNavigation::WatchResolver",
+      "issue": "Resolver authorization reconstructed solely from global current route/profile; an ordinary concurrent same-route resolver can inherit selected invocation origin before consumption.",
+      "required": "One-use resolver-instance admission from exact selected launch/item, no path-only rediscovery.",
+      "severity": "high"
+    },
+    {
+      "function": "InfinitySavedNavigation::WatchResolved / Correlation::WatchConsume",
+      "issue": "Resolved-result consumption passes id=-1 and selects an invocation by route. An unobserved concurrent same-route result can consume the selected invocation receipt.",
+      "required": "Bind fresh result to the same CPluginDirectory resolver instance and exact registered invoker, never route alone.",
+      "severity": "high"
+    }
+  ],
+  "initial_source_sha256": {
+    "xbmc/filesystem/PluginDirectory.cpp": "be7c9bcf5bf157bedbbb998083989d60b9511c9abfc0b9074e77218908680fac",
+    "xbmc/guilib/InfinitySavedNavigation.h": "b44ebfeb75c196e8615241de86d00664af93ebbde86f3fbf33206fbec52c187e",
+    "xbmc/guilib/InfinitySavedNavigationState.h": "a247f80a127c267e05d0887cac47529c044e063da60fc007f5e30d048254d53d",
+    "xbmc/interfaces/generic/ScriptInvocationManager.cpp": "eb46c1df3a4e8a249e7b00cbcbf50c91b16a822e6b323e523f19098e388ffd20",
+    "xbmc/interfaces/json-rpc/PlayerOperations.cpp": "adc78b8aba4f81393f56e8d83459ddf4ad14d1f662d12c246853ee21b2068824",
+    "xbmc/interfaces/legacy/Player.cpp": "b24c8654d75f3247cdc21150f2d76752f25970183643a085038fee3b3421c85c"
+  },
+  "not_claimed": [
+    "Native compilation",
+    "End-to-end provider runtime",
+    "Full freshness/cancellation acceptance",
+    "Full GUI cache-thread runtime acceptance"
+  ],
+  "receipt_matches": {
+    "xbmc/filesystem/PluginDirectory.cpp": true,
+    "xbmc/guilib/InfinitySavedNavigation.h": true,
+    "xbmc/guilib/InfinitySavedNavigationState.h": true,
+    "xbmc/interfaces/generic/ScriptInvocationManager.cpp": true,
+    "xbmc/interfaces/json-rpc/PlayerOperations.cpp": true,
+    "xbmc/interfaces/legacy/Player.cpp": true
+  },
+  "reviewed_constraints": [
+    "Python getters precede DelayedCallGuard; state access follows GIL release",
+    "Manager observation uses pure correlation state and releases its mutex before Execute; no reverse call observed",
+    "Active-item export occurs before GUI/database metadata fallback",
+    "Recovery Ticket state remains distinct",
+    "Folder seals bind generation/path/profile with bounded state"
+  ],
+  "schema": 1,
+  "scope": "Targeted read-only review of six native overlays; no tests/build/runtime executed",
+  "source_sha256": {
+    "xbmc/filesystem/PluginDirectory.cpp": "d36a14db6752babcc1f72b86e9537faeb4d6f14b990c56f81a7952cb71655c4a",
+    "xbmc/guilib/InfinitySavedNavigation.h": "e88142a6f1448a7f052e7fdd8f26d5c63c07c395d36f4c9e9f659c7a90f21008",
+    "xbmc/guilib/InfinitySavedNavigationState.h": "7885116d5c9b869cea813f0ad34dc240efecd1cf1e05913c916d7a9e0a4aebbe",
+    "xbmc/interfaces/generic/ScriptInvocationManager.cpp": "eb46c1df3a4e8a249e7b00cbcbf50c91b16a822e6b323e523f19098e388ffd20",
+    "xbmc/interfaces/json-rpc/PlayerOperations.cpp": "adc78b8aba4f81393f56e8d83459ddf4ad14d1f662d12c246853ee21b2068824",
+    "xbmc/interfaces/legacy/Player.cpp": "70dfdc45ea6f8d890b9c11982ddf6c884c5c4223edde2cbc6290af0b16e63e45"
+  },
+  "status": "IDENTIFIED_BINDING_FINDINGS_SOURCE_CORRECTED"
+}

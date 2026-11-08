@@ -1,0 +1,23 @@
+{
+  "operation": "signed466-plus-six-Watchlist-observation-sources-real-ARM64",
+  "base_APK": 2103466,
+  "native_sources": [
+    "xbmc/filesystem/PluginDirectory.cpp",
+    "xbmc/guilib/InfinitySavedNavigation.h",
+    "xbmc/guilib/InfinitySavedNavigationState.h",
+    "xbmc/interfaces/generic/ScriptInvocationManager.cpp",
+    "xbmc/interfaces/json-rpc/PlayerOperations.cpp",
+    "xbmc/interfaces/legacy/Player.cpp"
+  ],
+  "selected_checks": [
+    "9411-source preservation against signed466 map",
+    "Four actual ARM64 translation units including changed headers",
+    "Full native owning-target linkage",
+    "Unchanged strong ABI and runtime dependencies"
+  ],
+  "APK": false,
+  "signing": false,
+  "application_tests": false,
+  "shutdown_tests": false,
+  "physical_Fold": "NOT_RUN_BY_COMPILATION"
+}

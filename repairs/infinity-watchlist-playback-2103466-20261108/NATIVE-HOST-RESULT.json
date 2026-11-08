@@ -1,0 +1,58 @@
+{
+  "schema": 1,
+  "scope": "native Watchlist transient origin state only",
+  "status": "PASS",
+  "test_count": 1,
+  "assertion_scope": [
+    "exact invoker registration",
+    "one-use actual-item handoff",
+    "same-title ordinary invoker reuse rejection",
+    "typed coordinates mismatch",
+    "profile mismatch",
+    "cache descendant exact seal selection",
+    "stale generation rejection",
+    "concurrent invoker isolation",
+    "supersession/cancellation invalidation",
+    "direct nonce one-use",
+    "recovery correlation independence",
+    "failed resolver invalidates pending only",
+    "POV resolver failure preserves already-proven self.play receipt",
+    "cross-provider caller rejection consumes invocation",
+    "bounded256descendant exhaustion",
+    "Launch replay cannot bypass selected token by omitting it",
+    "same-route ordinary caller without original item seal cannot mint permit",
+    "oneuse exact resolver claim",
+    "wrong-instance/stale result cannot consume exact selected invocation",
+    "exact selected resolver result receipt"
+  ],
+  "command": "c++ -std=c++17 -Wall -Wextra -Werror -pthread repairs/infinity-watchlist-playback-2103466-20261108/test_native_watchlist_state.cpp -o /tmp/infinity-watchlist-native-state && /tmp/infinity-watchlist-native-state",
+  "output": "PASS native Watchlist focused state contract",
+  "test_sha256": "1ffd6882317693d1a95e9918e2959de9d21872a6199b26da328302900f1dad40",
+  "source_sha256": {
+    "xbmc/filesystem/PluginDirectory.cpp": "d36a14db6752babcc1f72b86e9537faeb4d6f14b990c56f81a7952cb71655c4a",
+    "xbmc/guilib/InfinitySavedNavigation.h": "0f574675c1339eca52b372b91e18ce2b255283ee020a39e44c83295d7b156092",
+    "xbmc/guilib/InfinitySavedNavigationState.h": "7885116d5c9b869cea813f0ad34dc240efecd1cf1e05913c916d7a9e0a4aebbe",
+    "xbmc/interfaces/generic/ScriptInvocationManager.cpp": "eb46c1df3a4e8a249e7b00cbcbf50c91b16a822e6b323e523f19098e388ffd20",
+    "xbmc/interfaces/json-rpc/PlayerOperations.cpp": "adc78b8aba4f81393f56e8d83459ddf4ad14d1f662d12c246853ee21b2068824",
+    "xbmc/interfaces/legacy/Player.cpp": "70dfdc45ea6f8d890b9c11982ddf6c884c5c4223edde2cbc6290af0b16e63e45"
+  },
+  "unchanged_base_sha256": {
+    "xbmc/filesystem/PluginDirectory.cpp": "c6b2a76ce81a44a42abc3cf42a19bd6ab6b96edf7c078f7e9b4debcf70b9d4fc",
+    "xbmc/guilib/InfinitySavedNavigation.h": "dd584b26513f549fdf1eeb3ab1b9d5dc7190f16486fc926eb78bd2ab9e27e9ce",
+    "xbmc/guilib/InfinitySavedNavigationState.h": "ca39154769bdcde1c0dc2c5874c441c6f19dae49e9878f0a8b7adeffa5555173",
+    "xbmc/interfaces/generic/ScriptInvocationManager.cpp": "a9eb9a48269adf3ed838c18a3247e469056d9784bfeca85833957cebb45c8661",
+    "xbmc/interfaces/json-rpc/PlayerOperations.cpp": "5b17c13e4405c20f21bc2f066cd780ecd304f656102bd49fec267b716005289d",
+    "xbmc/interfaces/legacy/Player.cpp": "94c5a9a3422fa4d004bc552d02fde8a88de6e00ccc4bf03b84e5ee773a5981f2"
+  },
+  "not_run": [
+    "Android compilation/link",
+    "application execution",
+    "shutdown",
+    "provider runtime",
+    "APK signing/install"
+  ],
+  "timestamp_utc": "2026-11-08T18:24:31.589628+00:00",
+  "base_six_match_retained_native_source_map": true,
+  "retained_native_source_map_sha256": "f48df24caabdf36fee25d69d47b0a2ad3c98df3936949c8dcd6d07a92e2f0412",
+  "supersedes": "NATIVE-HOST-RESULT-INITIAL.json (passed narrower state test but omitted same-route resolver inference)"
+}

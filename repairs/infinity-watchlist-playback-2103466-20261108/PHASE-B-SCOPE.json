@@ -3,8 +3,8 @@
   "authorization": "8e83bcb8374dec0ccc646cbe02c3c4249395ba8c",
   "baseline": "5ee1c7ae0bbe295c311aa34c02f6b62688ccb5a7",
   "branch": "work/infinity-watchlist-phase-b-20261108",
-  "status": "PARTIAL_REVIEWED_PROJECTION_PASS_FULL_FEATURE_BLOCKED",
-  "scope": "Only candidate Watchlist projection overlay and task evidence; not integrated installer",
+  "status": "AUTHORIZED_FULL_INTEGRATION_IN_PROGRESS",
+  "scope": "Nine runtime files plus at most one authenticated helper; source-bound origin only",
   "candidate_changed_components": [
     "script.infinity.commandcenter/resume_hub.py",
     "script.infinity.commandcenter/plugin.py"
@@ -26,15 +26,12 @@
   "Search_work": "SEPARATE_UNCHANGED",
   "full_feature_acceptance": "NOT_CLAIMED",
   "blocker": {
-    "kind": "AUTHORIZED_SOURCE_SCOPE_INSUFFICIENT_FOR_POV_FRESH_PLAYER_ITEM",
-    "required_additional_boundary": "xbmc/interfaces/legacy/Player.cpp::Player::playStream",
-    "expected_invocation_binding": "SOURCE_BOUND_TWO_FILE_PROPOSAL_IDENTIFIED_NOT_IMPLEMENTED_OR_RUNTIME_VERIFIED",
-    "details": "CONTRACTS.md",
-    "required_additional_boundaries": [
-      "xbmc/interfaces/generic/ScriptInvocationManager.cpp::ExecuteAsync",
-      "xbmc/interfaces/legacy/Player.cpp::Player::playStream"
-    ],
-    "scope_addendum": "INVOCATION-SCOPE-ADDENDUM.md"
+    "previous_scope_blocker": "RESOLVED_BY_LATEST_OWNER_AUTHORIZATION",
+    "remaining_engineering_gates": [
+      "Source-bound native/Python origin contract implementation",
+      "Focused host/ARM64/Android and preservation",
+      "Original signing/current registry/recovery"
+    ]
   },
   "remaining_contracts": [
     "Native exact provider invocation to fresh playing item",
@@ -42,5 +39,7 @@
     "Current installed emitter byte admission",
     "Complete source-bound metadata snapshot scheduling and late consumption"
   ],
-  "next_permission": "Required only for demonstrated production files outside explicit owner allowlist; no routine questions"
+  "next_permission": "No routine approvals within authorized scope",
+  "additional_authorization": "OWNER-SCOPE-EXTENSION.md",
+  "episode_ordering": "Reuse existing verified_next only; unavailable complete catalogue safely withholds successor under latest owner instruction"
 }
