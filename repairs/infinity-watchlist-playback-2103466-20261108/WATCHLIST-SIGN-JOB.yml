@@ -1,0 +1,121 @@
+  sign-watchlist:
+    name: Exact registered Watchlist QA pair through unchanged original owner gate and signer
+    if: github.event_name == 'workflow_dispatch' && github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/work/infinity-watchlist-phase-b-20261108' && inputs.operation == 'sign-watchlist'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    env: {GH_TOKEN: '${{ github.token }}', PYTHONDONTWRITEBYTECODE: '1'}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '21'}
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with: {packages: 'build-tools;35.0.0', log-accepted-android-sdk-licenses: false}
+      - name: Exact internal-QA request, registered generation and unchanged sole signer policy before keys
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,os,re
+          from pathlib import Path
+          task=Path('repairs/infinity-watchlist-playback-2103466-20261108')
+          request=json.loads((task/'RELEASE-REQUEST.json').read_text())
+          pair=json.loads((task/'PREPARED-PAIR-REQUEST.json').read_text())
+          authority=json.loads(Path('repairs/dual-experience-isolation-2103420/release-authority.json').read_text())
+          assert request['operation']=='sign-watchlist-internal-QA' and request['publication'] is False
+          version=request['version'];assert type(version) is int and version in (2103468,2103469)
+          generation={2103468:55,2103469:56}[version]
+          assert authority['candidate_versionCode']==version and authority['generation']==generation
+          assert type(pair['run_id']) is int and pair['run_id']>0 and re.fullmatch('[0-9a-f]{40}',pair['source_commit'])
+          assert set(pair['artifacts'])=={'2103468','2103469'}
+          row=pair['artifacts'][str(version)]
+          assert set(row)=={'id','name','digest','size_in_bytes'} and type(row['id']) is int and row['id']>0
+          assert re.fullmatch('sha256:[0-9a-f]{64}',row['digest']) and type(row['size_in_bytes']) is int and 0<row['size_in_bytes']<=2*1024**3
+          audit=task/'evidence/MODULE-UPGRADE-RECOVERY.json'
+          assert audit.is_file() and hashlib.file_digest(audit.open('rb'),'sha256').hexdigest()==pair['module_audit_sha256']
+          with Path(os.environ['GITHUB_ENV']).open('a') as output:
+            output.write('WATCHLIST_VERSION='+str(version)+'\nWATCHLIST_GENERATION='+str(generation)+'\n')
+          PY
+          python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out SIGNER-ROUTES.json
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13609794621', run-id: '42462319257', github-token: '${{ github.token }}', path: watchlist-baseline, merge-multiple: true}
+      - name: Download exact official prepared archive and verify whole digest, size and safe members
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,os,stat,subprocess,sys,zipfile
+          from pathlib import Path,PurePosixPath
+          task=Path('repairs/infinity-watchlist-playback-2103466-20261108')
+          sys.path.insert(0,'repairs/dual-experience-isolation-2103420')
+          from inventory import validate_names
+          request=json.loads((task/'PREPARED-PAIR-REQUEST.json').read_text())
+          version=int(os.environ['WATCHLIST_VERSION']);expected=request['artifacts'][str(version)]
+          def api(path):
+            return json.loads(subprocess.check_output(['gh','api','repos/mahfouzhassine8-ops/project-infinity/'+path],text=True))
+          run=api('actions/runs/'+str(request['run_id']))
+          assert run['status']=='completed' and run['conclusion']=='success' and run['head_sha']==request['source_commit']
+          assert run['head_branch']=='work/infinity-watchlist-phase-b-20261108' and run['workflow_id']==397702717 and run['path']=='.github/workflows/infinity-combined-release.yml'
+          actual=api('actions/artifacts/'+str(expected['id']))
+          assert not actual['expired'] and actual['workflow_run']['id']==request['run_id']
+          assert all(actual[key]==value for key,value in expected.items())
+          root=Path('watchlist-reviewed');root.mkdir(exist_ok=False)
+          archive=root/(str(expected['id'])+'.zip')
+          with archive.open('xb') as output:
+            subprocess.run(['gh','api','repos/mahfouzhassine8-ops/project-infinity/actions/artifacts/'+str(expected['id'])+'/zip'],stdout=output,check=True)
+          assert archive.stat().st_size==expected['size_in_bytes']
+          assert hashlib.file_digest(archive.open('rb'),'sha256').hexdigest()==expected['digest'].removeprefix('sha256:')
+          destination=root/str(version)
+          with zipfile.ZipFile(archive) as source:
+            names=validate_names(source)
+            assert names and len(names)<=100000
+            assert sum(info.file_size for info in source.infolist())<=8*1024**3
+            for info in source.infolist():
+              path=PurePosixPath(info.filename)
+              assert path.parts and all(part not in ('','.') for part in path.parts)
+              assert not stat.S_ISLNK(info.external_attr>>16) and not (info.flag_bits&1)
+            destination.mkdir()
+            source.extractall(destination)
+          print('Exact official prepared archive verified:',expected['id'],'version',version)
+          PY
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {run-id: '39867073954', name: Infinity-Receipt-Race-Android17-Investigation, github-token: '${{ github.token }}', path: tools}
+      - name: Exact official registration, unsigned combine and all APK members before APK key access
+        run: |
+          python3 repairs/infinity-watchlist-playback-2103466-20261108/register_release.py check_registered --prepared "watchlist-reviewed/$WATCHLIST_VERSION" --version "$WATCHLIST_VERSION" --audit repairs/infinity-watchlist-playback-2103466-20261108/evidence/MODULE-UPGRADE-RECOVERY.json --request repairs/infinity-watchlist-playback-2103466-20261108/PREPARED-PAIR-REQUEST.json --out REGISTERED-CANDIDATE-CHECK.json
+          python3 repairs/dual-experience-isolation-2103420/component_bundles.py combine --bundles "watchlist-reviewed/$WATCHLIST_VERSION/components" --catalog "watchlist-reviewed/$WATCHLIST_VERSION/components/catalog.json" --out combined-unsigned.apk --version "$WATCHLIST_VERSION"
+          python3 - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          proof=json.loads((Path('watchlist-reviewed')/os.environ['WATCHLIST_VERSION']/'PREPARATION.json').read_text())
+          assert hashlib.file_digest(Path('combined-unsigned.apk').open('rb'),'sha256').hexdigest()==proof['unsigned_sha256']
+          assert proof['versionCode']==int(os.environ['WATCHLIST_VERSION']) and proof['public_release'] is False
+          PY
+          python3 repairs/infinity-watchlist-playback-2103466-20261108/register_release.py compare --parent watchlist-baseline/Infinity-2103466-Combined-Original-Signer.apk --candidate combined-unsigned.apk --prepared "watchlist-reviewed/$WATCHLIST_VERSION" --out unsigned-preservation
+          python3 repairs/dual-experience-isolation-2103420/release_gate.py --apk combined-unsigned.apk --jars tools/receipt-evidence/tool-jars --work gate-dex --repository . --expected-head "$GITHUB_SHA" --expected-generation "$WATCHLIST_GENERATION" --out SIGNING-DECISION.json
+      - name: Existing permanent original APK signer after unchanged owner and source guard
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: python3 repairs/dual-experience-isolation-2103420/assemble.py sign --apk combined-unsigned.apk --jars tools/receipt-evidence/tool-jars --work signer-dex --repository . --expected-head "$GITHUB_SHA" --expected-generation "$WATCHLIST_GENERATION" --sdk "$ANDROID_HOME/build-tools/35.0.0" --out signed-combined
+      - name: Original certificate, exact signed payload and immutable engineering receipts
+        run: |
+          python3 repairs/infinity-watchlist-playback-2103466-20261108/register_release.py compare --parent watchlist-baseline/Infinity-2103466-Combined-Original-Signer.apk --candidate "signed-combined/Infinity-$WATCHLIST_VERSION-Combined-Original-Signer.apk" --prepared "watchlist-reviewed/$WATCHLIST_VERSION" --out signed-combined/preservation --sdk "$ANDROID_HOME/build-tools/35.0.0"
+          cp SIGNING-DECISION.json REGISTERED-CANDIDATE-CHECK.json SIGNER-ROUTES.json signed-combined/
+          cp repairs/dual-experience-isolation-2103420/release-authority.json signed-combined/
+          cp repairs/infinity-watchlist-playback-2103466-20261108/RELEASE-REQUEST.json repairs/infinity-watchlist-playback-2103466-20261108/PREPARED-PAIR-REQUEST.json signed-combined/
+          cp repairs/infinity-watchlist-playback-2103466-20261108/evidence/MODULE-UPGRADE-RECOVERY.json signed-combined/
+          cp "watchlist-reviewed/$WATCHLIST_VERSION/PREPARATION.json" signed-combined/
+      - uses: actions/upload-artifact@v4
+        with: {name: 'Infinity-Watchlist-Original-Signed-${{ env.WATCHLIST_VERSION }}-${{ github.run_id }}-INTERNAL-QA', path: signed-combined/, if-no-files-found: error, retention-days: 90, compression-level: 6}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-Watchlist-Signing-Evidence-${{ github.run_id }}-NOT-ACCEPTANCE
+          path: |
+            SIGNING-DECISION.json
+            REGISTERED-CANDIDATE-CHECK.json
+            SIGNER-ROUTES.json
+            unsigned-preservation/
+          if-no-files-found: warn
+          retention-days: 90

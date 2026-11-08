@@ -1,0 +1,163 @@
+  selected_watchlist:
+    name: Exact signed468 Watchlist playback and forward469 recovery; selected feature only
+    if: github.event_name == 'workflow_dispatch' && inputs.feature == 'watchlist-playback-android'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 75
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PYTHONDONTWRITEBYTECODE: '1'
+      SELECTED_SOURCE: ${{ inputs.source_ref }}
+      AUTHORIZED_SCOPE: ${{ inputs.authorization }}
+      INFINITY_EMULATOR_API: '37.0'
+      INFINITY_EMULATOR_TARGET: google_apis
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {ref: '${{ inputs.source_ref }}', fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '21'}
+      - name: Require committed signed pair; authenticate exact GitHub producers, archive digests, APK sources and selected scope
+        run: |
+          python3 - <<'PYADMIT'
+          import ast,hashlib,json,os,re,stat,subprocess
+          from pathlib import Path
+          from zipfile import ZipFile
+          task=Path('repairs/infinity-watchlist-playback-2103466-20261108')
+          out=Path('watchlist-qa-admission');out.mkdir()
+          repository='mahfouzhassine8-ops/project-infinity'
+          base='repos/'+repository+'/'
+          def require(value,label):
+              if not value:raise RuntimeError(label)
+          def gh(path):return json.loads(subprocess.check_output(['gh','api',base+path],text=True))
+          def digest(path):
+              with Path(path).open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
+          def load(path):return json.loads(Path(path).read_text())
+          require(os.environ['GITHUB_REPOSITORY']==repository,'EXACT_REPOSITORY')
+          require(os.environ['GITHUB_REF']=='refs/heads/work/infinity-watchlist-phase-b-20261108','AUTHORIZED_CORRECTIVE_BRANCH_ONLY')
+          head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+          require(re.fullmatch('[0-9a-f]{40}',os.environ['SELECTED_SOURCE']) is not None and head==os.environ['SELECTED_SOURCE'],'EXACT40HEX_TEST_SOURCE_REQUIRED')
+          require(len(os.environ['AUTHORIZED_SCOPE'].strip())>=8,'EXPLICIT_SELECTED_FEATURE_AUTHORIZATION_REQUIRED')
+          workflow=gh('actions/workflows/infinity-saved-navigation-android.yml')
+          this=gh('actions/runs/'+os.environ['GITHUB_RUN_ID'])
+          require(this['workflow_id']==workflow['id'] and this['path']=='.github/workflows/infinity-saved-navigation-android.yml' and this['head_sha']==head,'EXISTING_FEATURE_WORKFLOW_AND_EXACT_SOURCE_ONLY')
+          request=load(task/'SIGNED-PAIR-REQUEST.json')
+          require(request['schema']==1 and request['operation']=='verify-watchlist-signed468-forward469' and request['repository']==repository,'COMMITTED_SIGNED_PAIR_REQUIRED')
+          selected=load(task/'ANDROID-REQUEST.json')
+          require(selected['operation']==request['operation'] and selected['application_tests'] is True and selected['shutdown_tests'] is False,'SELECTED_FEATURE_ONLY_NO_SHUTDOWN')
+          for key,name in [('runtime_source_pins_sha256','RUNTIME-SOURCE-PINS.json'),('android_request_sha256','ANDROID-REQUEST.json'),('harness_host_result_sha256','ANDROID-HARNESS-HOST-RESULT.json')]:
+              require(digest(task/name)==request[key],'EXACT_COMMITTED_REQUEST_SOURCE:'+name)
+          host=load(task/'ANDROID-HARNESS-HOST-RESULT.json')
+          require(host['status']=='PASS_HOST_STAGING_ONLY','STAGING_STATIC_CHECK_RECEIPT_REQUIRED')
+          for name,wanted in host['source_sha256'].items():require(digest(task/name)==wanted,'UNCHANGED_HARNESS_SOURCE:'+name)
+          for name in ['android_watchlist_common.py','stage_watchlist_android.py','watchlist_fixture_server.py','android_watchlist_observer.py','verify_watchlist_android.py']:ast.parse((task/name).read_text())
+          pins=load(task/'RUNTIME-SOURCE-PINS.json')
+          for name,wanted in pins['native'].items():require(digest(task/'native'/name)==wanted,'FROZEN_NATIVE_SOURCE:'+name)
+          for name,wanted in pins['python'].items():require(digest(task/'overlay/script.infinity.commandcenter'/name)==wanted,'FROZEN_PYTHON_SOURCE:'+name)
+          certificate='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
+          require(request['certificate_sha256']==certificate,'PERMANENT_ORIGINAL_CERTIFICATE_ONLY')
+          versions={'baseline':2103466,'candidate':2103468,'recovery':2103469}
+          require(set(request['inputs'])==set(versions),'EXACT_THREE_SIGNED_INPUTS')
+          baseline=request['inputs']['baseline']
+          require(baseline['run_id']==42462319257 and baseline['artifact']['id']==13609794621 and baseline['apk_sha256']=='d366e4b8aadba8484768cfcc0d362c2fc8e0181d78123ea77e04af4f028a3135','IMMUTABLE_ORIGINAL66_INPUT')
+          require(len({row['artifact']['id'] for row in request['inputs'].values()})==3,'THREE_DISTINCT_ARTIFACTS')
+          metadata={}
+          for kind,version in versions.items():
+              row=request['inputs'][kind]
+              require(row['version_code']==version and row['workflow_id']==397702717,'EXISTING_ORIGINAL_SIGNING_WORKFLOW_ONLY')
+              require(re.fullmatch('[0-9a-f]{40}',row['source_commit']) is not None,'EXACT_SIGNED_SOURCE_COMMIT')
+              run=gh('actions/runs/'+str(int(row['run_id'])))
+              require(run['status']=='completed' and run['conclusion']=='success','SIGNING_PRODUCER_MUST_SUCCEED:'+kind)
+              require(run['workflow_id']==row['workflow_id'] and run['path']=='.github/workflows/infinity-combined-release.yml' and run['head_sha']==row['source_commit'],'SIGNING_PRODUCER_SOURCE_AND_ID:'+kind)
+              if kind!='baseline':
+                  require(run['head_branch']=='work/infinity-watchlist-phase-b-20261108','CORRECTIVE_SIGNED_PRODUCER_BRANCH')
+                  subprocess.run(['git','merge-base','--is-ancestor',row['source_commit'],head],check=True)
+              artifact=gh('actions/artifacts/'+str(int(row['artifact']['id'])))
+              require(not artifact['expired'] and artifact['workflow_run']['id']==row['run_id'],'LIVE_EXACT_ARTIFACT_PRODUCER:'+kind)
+              require(all(artifact[key]==row['artifact'][key] for key in ('id','name','digest','size_in_bytes')),'EXACT_COMMITTED_ARTIFACT_METADATA:'+kind)
+              require(re.fullmatch('sha256:[0-9a-f]{64}',artifact['digest']) is not None and 0<artifact['size_in_bytes']<2*1024**3,'BOUNDED_SHA256_ARTIFACT_REQUIRED')
+              metadata[kind]=dict(run=run,artifact=artifact)
+          (out/'GITHUB-PROVENANCE.json').write_text(json.dumps(metadata,indent=2)+'\n')
+          # Three authenticated downloads; compare the actual ZIP bytes to the committed GitHub digest.
+          pair={'certificate_sha256':certificate}
+          env=[]
+          for kind,version in versions.items():
+              row=request['inputs'][kind];directory=Path('watchlist-qa-'+kind);directory.mkdir()
+              archive=out/(kind+'.zip')
+              with archive.open('wb') as stream:
+                  subprocess.run(['gh','api',base+'actions/artifacts/'+str(row['artifact']['id'])+'/zip'],stdout=stream,check=True,timeout=600)
+              require('sha256:'+digest(archive)==row['artifact']['digest'],'DOWNLOADED_ARCHIVE_DIGEST:'+kind)
+              with ZipFile(archive) as z:
+                  require(len(z.infolist())<=4000 and sum(i.file_size for i in z.infolist())<=2*1024**3,'BOUNDED_ARTIFACT_CONTENTS')
+                  for item in z.infolist():
+                      path=Path(item.filename)
+                      require(not path.is_absolute() and '..' not in path.parts and '\\' not in item.filename and not stat.S_ISLNK(item.external_attr>>16),'SAFE_ARTIFACT_MEMBER')
+                  z.extractall(directory)
+              def member(name):
+                  relative=Path(name)
+                  require(not relative.is_absolute() and '..' not in relative.parts,'EXACT_RELATIVE_ARTIFACT_MEMBER')
+                  value=directory/relative
+                  require(value.is_file() and value.resolve().is_relative_to(directory.resolve()),'EXACT_ARTIFACT_FILE:'+name)
+                  return value
+              apk=member(row['apk_path']);receipt=load(member(row['receipt_path']))
+              require(digest(apk)==row['apk_sha256'] and receipt['signed_apk_sha256']==row['apk_sha256'],'DOWNLOADED_SIGNED_APK_BYTES:'+kind)
+              require(receipt['versionCode']==version and receipt['source']==row['source_commit'] and receipt['certificate_sha256']==certificate,'SIGNED_BUILD_RECEIPT_SOURCE_VERSION_CERT:'+kind)
+              with ZipFile(apk) as z:
+                  native=hashlib.sha256(z.read('lib/arm64-v8a/libkodi.so')).hexdigest()
+                  expected=load(task/('NATIVE-INPUT-REQUEST.json' if kind=='candidate' else 'contract-evidence/RELEASE-BASELINE-INVENTORY.json'))
+                  require(native==expected['native_sha256' if kind=='candidate' else 'baseline_native_sha256'],'EXACT_COMPILED_OR_RECOVERY_NATIVE:'+kind)
+                  if kind=='candidate':
+                      for name,wanted in pins['python'].items():require(hashlib.sha256(z.read('assets/addons/script.infinity.commandcenter/'+name)).hexdigest()==wanted,'ACTUAL_CANDIDATE_PYTHON_SOURCE:'+name)
+              pair[str(version)]={'sha256':row['apk_sha256']}
+              env.append('WATCHLIST_'+kind.upper()+'_APK='+str(apk))
+              archive.unlink()
+          (out/'SIGNED-PAIR.json').write_text(json.dumps(pair,indent=2)+'\n')
+          with Path(os.environ['GITHUB_ENV']).open('a') as stream:stream.write('\n'.join(env)+'\n')
+          tools=Path('watchlist-qa-tools');tools.mkdir()
+          retained='2f18336ec766cf6e0234ecf7e9727ab4993247ff'
+          (tools/'android37_gate.py').write_bytes(subprocess.check_output(['git','show',retained+':repairs/four-repair-20261018/android37_gate.py']))
+          require(digest(task/'inputs/Infinity_Source_Exports_For_Work.zip')=='e14b1e9c8441e78ce5c930dea8c7a5885053011d531df9ec51377fcb18298b65','EXACT_SOURCE_ONLY_OWNER_EXPORT')
+          print('PASS authenticated three signed artifacts and exact frozen source; no application has executed')
+          PYADMIT
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with: {cmdline-tools-version: '15859902', packages: 'platform-tools build-tools;35.0.0 cmdline-tools;22.0', log-accepted-android-sdk-licenses: false}
+      - name: Verify actual original SDK signatures and stage only selected real-provider playback fixtures
+        run: |
+          set -euo pipefail
+          sudo apt-get -o Acquire::Retries=3 update -qq
+          sudo apt-get install -y libpulse0 ffmpeg tesseract-ocr
+          python3 -m pip install Pillow==11.3.0
+          python3 repairs/infinity-watchlist-playback-2103466-20261108/stage_watchlist_android.py --baseline "$WATCHLIST_BASELINE_APK" --candidate "$WATCHLIST_CANDIDATE_APK" --recovery "$WATCHLIST_RECOVERY_APK" --signed-pair watchlist-qa-admission/SIGNED-PAIR.json --owner-export repairs/infinity-watchlist-playback-2103466-20261108/inputs/Infinity_Source_Exports_For_Work.zip --sdk "$ANDROID_HOME/build-tools/35.0.0" --out watchlist-qa-fixture
+          python3 watchlist-qa-tools/android37_gate.py --sdk-root "$ANDROID_HOME" --out watchlist-qa-platform --pin-tools
+          python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out watchlist-qa-emulator-setup
+          sudo chmod 666 /dev/kvm
+      - uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: '37.0'
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disk-size: 10G
+          avd-name: infinity-four-repair-api37
+          pre-emulator-launch-script: python3 watchlist-qa-tools/android37_gate.py --sdk-root "$ANDROID_HOME" --out watchlist-qa-platform --check-avd
+          disable-animations: false
+          emulator-options: -no-window -memory 4096 -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: |
+            set -euo pipefail
+            adb shell getprop > watchlist-qa-platform/runtime-properties.txt
+            adb shell getconf PAGESIZE > watchlist-qa-platform/runtime-pagesize.txt
+            adb shell sha256sum /system/lib64/libndk_translation.so > watchlist-qa-platform/runtime-native-bridge-sha256.txt
+            python3 repairs/infinity-watchlist-playback-2103466-20261108/verify_watchlist_android.py --baseline "$WATCHLIST_BASELINE_APK" --candidate "$WATCHLIST_CANDIDATE_APK" --recovery "$WATCHLIST_RECOVERY_APK" --fixture watchlist-qa-fixture --out watchlist-qa-results --port 18766
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-Watchlist-Selected-Android-${{ github.run_id }}-NOT-FOLD-ACCEPTANCE
+          path: |
+            watchlist-qa-results/
+            watchlist-qa-admission/*.json
+            watchlist-qa-fixture/ANDROID-INPUTS.json
+            watchlist-qa-fixture/*-SIGNATURE.txt
+            watchlist-qa-platform/
+            watchlist-qa-emulator-setup/
+          retention-days: 90
+          if-no-files-found: warn
