@@ -1,6 +1,6 @@
 {
   "operation": "three-corrections-selected-Android-and-installation-gates",
-  "status": "SELECTED_SOURCE_MATCHED_SIGNED_PAIR_READY_FOR_ANDROID_EXECUTION",
+  "status": "SELECTED_RETRY_AFTER_OBSERVER_FIXTURE_DEPENDENCY_CORRECTION",
   "existing_host_results": "REUSE_NO_REPEATED_HOST_SUITE",
   "source_prerequisites": [
     "Authenticate actual installed CC62 manifest with original public key and compare its source bytes; collect other signed module roots via read-only inventory if needed.",
@@ -64,5 +64,6 @@
   "shutdown_tests": false,
   "observer_workaround_allowed": false,
   "signed_pair": "SIGNED-PAIR.json",
-  "source_gate": "PASS actual four exports,14 actual Trakt host cases,10 real Java cases, native ARM64 link and original-key pair signatures"
+  "source_gate": "PASS actual four exports,14 actual Trakt host cases,10 real Java cases, native ARM64 link and original-key pair signatures",
+  "retry_reason": "Run42464385488 failed before cases because retained start_qa requested excluded playback add-on. Only override observer admission to require its existing script; no production or live-item observation change."
 }

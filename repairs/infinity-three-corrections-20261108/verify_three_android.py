@@ -17,6 +17,7 @@ ROOT = HERE.parents[1]
 OLD = ROOT / 'repairs/infinity-final-release-462-20261107'
 PACKAGE = 'com.projectinfinity.kodi'
 CC = 'script.infinity.commandcenter'
+QA = 'script.infinity.finalreleaseqa'
 TRAKT = 'script.module.tmdbhelper.sync.trakt'
 HOME = '/sdcard/Android/data/' + PACKAGE + '/files/.kodi'
 PROFILE = HOME + '/userdata'
@@ -30,7 +31,19 @@ def transport():
     namespace = {'__name__': 'retained_feature_only_transport', '__file__': str(OLD / 'verify_android_release.py')}
     exec(compile(source, str(OLD / 'verify_android_release.py'), 'exec'), namespace)
     namespace['PROVIDERS'] = PROVIDERS
-    return namespace['Device']
+    class SelectedDevice(namespace['Device']):
+        def start_qa(self):
+            # The retained transport also enables an unrelated playback clip.
+            # This selected fixture contains only the script observer.
+            addon = self.rpc('Addons.GetAddonDetails', dict(addonid=QA, properties=['enabled']))['addon']
+            if not addon['enabled']:
+                assert self.rpc('Addons.SetAddonEnabled', dict(addonid=QA, enabled=True)) == 'OK'
+            assert self.rpc('Addons.GetAddonDetails', dict(addonid=QA))['addon']['type'] == 'xbmc.python.script'
+            assert self.rpc('Addons.ExecuteAddon', dict(addonid=QA)) == 'OK'
+            self.until(lambda: self.read_json(QAROOT + '/ready.json').get('pid') == self.pid, 'fresh QA observer', 90)
+            self.dismiss_immersive_education()
+
+    return SelectedDevice
 
 
 def expected(apk):

@@ -1,0 +1,28 @@
+{
+  "status": "FAIL_SELECTED_ANDROID_THREE_CORRECTION_GATE",
+  "cases": [],
+  "Fold": "NOT_RUN",
+  "shutdown": "NOT_SELECTED",
+  "playback": "NOT_SELECTED",
+  "observer_workaround": false,
+  "accepted_pointer_updated": false,
+  "platform": {
+    "ro.build.fingerprint": "google/sdk_gphone64_x86_64/emu64xa:17/CE2A.260420.051.A3/16571990:userdebug/dev-keys",
+    "ro.build.version.sdk": "37",
+    "ro.product.cpu.abilist": "x86_64,arm64-v8a",
+    "ro.dalvik.vm.native.bridge": "libndk_translation.so"
+  },
+  "fixture_ownership": {
+    "disposable_qemu_only": true,
+    "application_UID": 10234,
+    "app_protections_unchanged": true
+  },
+  "error": "RuntimeError: Addons.GetAddonDetails: {\"code\": -32602, \"message\": \"Invalid params.\"}",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/project-infinity/project-infinity/repairs/infinity-three-corrections-20261108/verify_three_android.py\", line 132, in run\n    device.start_qa()\n  File \"/home/runner/work/project-infinity/project-infinity/repairs/infinity-final-release-462-20261107/verify_android_release.py\", line 108, in start_qa\n    assert self.rpc('Addons.ExecuteAddon',dict(addonid=QA))=='OK'\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/project-infinity/project-infinity/repairs/infinity-final-release-462-20261107/verify_android_release.py\", line 66, in rpc\n    return reply.get('result')\n                        ^^^^^^^\nRuntimeError: Addons.GetAddonDetails: {\"code\": -32602, \"message\": \"Invalid params.\"}\n",
+  "run": 42464385488,
+  "artifact": 13611017598,
+  "source_commit": "44a8acd9738f31abc55a936d431ce111a2cba670",
+  "classification": "Disposable observer setup requested missing unrelated playback fixture; zero correction cases reached",
+  "production_changes_required": false,
+  "exact_signed_pair_reused": true
+}

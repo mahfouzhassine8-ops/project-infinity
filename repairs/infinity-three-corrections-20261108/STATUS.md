@@ -187,7 +187,7 @@ The one necessary native compile/link is complete; do not repeat it for
 reporting or metadata changes. Actual installed-source authentication and
 scoped source integration now PASS. Preparation is selected in
 PACKAGING-SCOPE.json and reuses the existing original module signer and owner
-bundle assembler. New APK signing and Android/Fold verification have not run.
+bundle assembler. Original-key APK signing PASS for466 and matching forward recovery467. Android/Fold acceptance remains pending.
 If the native correction
 is confirmed and adopted, it requires a source-matched combined APK rather than
 an add-on-only ZIP; reusing the old engine would not carry the C++ correction.
@@ -214,3 +214,20 @@ Cobra, layouts/themes, native provider search implementations, unrelated
 providers, Continue Playing, Resume Hub, playback, user settings/databases,
 account data, signing implementation and existing recovery are unchanged.
 Watchlist-to-Progress tracking remains deferred. No shutdown test was selected.
+
+## Signed pair and selected Android gate
+
+Original-key signatures and full source/component preservation PASS for candidate466
+(run42462319257) and forward recovery467 (run42463180613). SIGNED-PAIR.json
+pins their exact APK hashes. The unchanged original module signer produced both
+complete79-file manifests;10 unchanged Java installer transition/refusal/recovery
+cases PASS in preparation run42460784588. No native rebuild is required.
+
+First selected Android run42464385488 FAIL before any correction cases: the
+retained start_qa transport requested a playback fixture absent from the selected
+Search/Trakt-only profile. The observer is registered in Kodi; its missing clip
+is unrelated. The narrowly scoped transport override admits only the existing
+script observer, preserving original live GUI-list reads, APKs and every assertion.
+The failed report is retained in evidence/ANDROID-FIRST-ATTEMPT-FAIL.json.
+Retry only the still-missing selected Android journey with the exact signed pair.
+No Android functionality PASS or Fold acceptance is claimed.
