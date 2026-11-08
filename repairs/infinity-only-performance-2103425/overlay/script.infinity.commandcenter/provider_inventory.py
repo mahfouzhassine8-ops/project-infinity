@@ -227,6 +227,15 @@ def _verify(addon_id, root, specs, manifest_raw=None):
                 operations[(media, 'identity_lookup')] = deepcopy(search)
         break
     if not operations:
+        # Search-only fallback for an updated provider whose original native
+        # search action is still provably connected, even though unrelated
+        # menu/skin/helpers no longer match a whole-module reviewed fingerprint.
+        # This grants no title-navigation/identity, no provider-code execution
+        # and no source-pin bypass. Verified current source bytes are rechecked
+        # again by infinity_search.route at native dispatch.
+        from native_search_compatibility import recognize
+        operations = recognize(addon_id, root, specs, lambda name: _source(root, name))
+    if not operations:
         operations = _automatic_search(addon_id, root, manifest_raw)
     return operations
 
