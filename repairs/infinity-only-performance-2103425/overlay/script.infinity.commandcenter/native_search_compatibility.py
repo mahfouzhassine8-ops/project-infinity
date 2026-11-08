@@ -169,7 +169,16 @@ def _pov(get, contract, media):
     # native run() action/query chain here rather than an invented local __init__.
     handler = _method(menu.body, "run")
     branch = _branch(handler, "self.action == "+repr(action))
-    if not _contains(branch, "self.params['query']"):
+    if not any(isinstance(n, ast.Assign) and
+               len(n.targets) == 1 and isinstance(n.targets[0], ast.Name) and
+               n.targets[0].id == "params_get" and _same(n.value, "self.params.get")
+               for n in ast.walk(handler)):
+        raise Unverified("Original POV query reader changed")
+    if not (any(isinstance(n, ast.Assign) and
+                len(n.targets) == 1 and isinstance(n.targets[0], ast.Name) and
+                n.targets[0].id == "query" and _same(n.value, "params_get('query')")
+                for n in branch.body) and
+            _contains(branch, "function(query, page_no)")):
         raise Unverified("Original query not passed to native menu")
 
 
@@ -181,12 +190,20 @@ def recognize(addon_id, root, specs, reader):
     Unsupported sources simply remain unavailable. Other capabilities never
     inherit Search-only acceptance.
     """
+    # This release scope adds compatibility only for these two installed
+    # providers. Never reinterpret another provider's Search/navigation policy.
+    reviewed = {
+        "plugin.video.umbrella": ("action-list-v1", "umbrella.py"),
+        "plugin.video.pov": ("mode-list-v1", "resources/lib/router.py"),
+    }
+    expected = reviewed.get(addon_id)
+    if expected is None:
+        return {}
     results = {}
     for spec in specs:
         family = spec.get("family")
         entry = spec.get("entrypoint")
-        if (family, entry) not in (("action-list-v1", "umbrella.py"),
-                                   ("mode-list-v1", "resources/lib/router.py")):
+        if (family, entry) != expected:
             continue
         for media in ("movie", "tv"):
             contract = spec.get("search", {}).get(media)
