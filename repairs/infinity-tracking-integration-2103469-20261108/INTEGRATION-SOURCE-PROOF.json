@@ -1,0 +1,83 @@
+{
+  "status": "PASS_SCOPED_SOURCE_PRESERVATION_NOT_ANDROID",
+  "files": {
+    "plugin.py": {
+      "baseline_sha256": "a61290fe791e264e82f00aebb7c5b6173226639edca3bee15d17dccdda82fc8e",
+      "overlay_sha256": "580a2d7b25bc7a415c2db059fe1fa696808107a4f997a32d544baf2468a2877a",
+      "changed_functions": [
+        "_menu_resume",
+        "show_item_menu",
+        "_list_item"
+      ],
+      "added_functions": [],
+      "removed_functions": []
+    },
+    "resume_hub.py": {
+      "baseline_sha256": "1c38df4f68201dc209d309f31bebf051e24baf0e45f4cb7318828af2212780d5",
+      "overlay_sha256": "c5069a231b72cbca2281b4cb09c9df3f74673c28a264cf1cfbc919770f88b645",
+      "changed_functions": [
+        "_resume_groups",
+        "_resume_aliases",
+        "record_progress",
+        "_entries_projection",
+        "continue_series_ids",
+        "progress_shows",
+        "next_episodes"
+      ],
+      "added_functions": [
+        "_progress_rows",
+        "_series_rows",
+        "exact_progress"
+      ],
+      "removed_functions": []
+    },
+    "service.py": {
+      "baseline_sha256": "1844b2b217ccc7f3adef4d82bc825588fb2d561a87d6447f32ebedf3295e927d",
+      "overlay_sha256": "ee50426e4c5b804041eda279dcd2d6f83b335c59c40f685849c47f002dd358c8",
+      "changed_functions": [
+        "InfinityPlayer.__init__",
+        "InfinityPlayer.onAVStarted",
+        "InfinityPlayer._arm_continue"
+      ],
+      "added_functions": [
+        "_continue_source_item"
+      ],
+      "removed_functions": []
+    }
+  },
+  "baseline_reference_files": "All66exacthashesstillmatch signed69 extraction",
+  "protected_APK_SHA256": "804eebc57af2e4ef4e5418b56994bda64eb7fd7e7f2c0653b5c6e2a9f7833058",
+  "protected_ref": "locks/infinity-2103469-protected-recovery-20261108",
+  "protected_ref_source": "a76e29b84996304241e6b309d56a31e6659ad190",
+  "native": "UNCHANGED original66/69 ARM64 bytes; no native source overlay or compilation",
+  "generic_tracking_and_threshold_methods": "UNCHANGED AST",
+  "new_tracking_database": false,
+  "new_service": false,
+  "automatic_AV_seek_added": false,
+  "rejected68_helper_activation": false,
+  "provider_source_edits": false,
+  "UI_resource_edits": false,
+  "existing_owner_registry_and_signers": "UNCHANGED",
+  "retained_actual_source_host": {
+    "cases": 13,
+    "receipt_sha256": "f5b458be19d432f72ca0eb436959dc5c58a72f7936882cc4c3da2e782e64b0ad",
+    "service_sha256": "ee50426e4c5b804041eda279dcd2d6f83b335c59c40f685849c47f002dd358c8",
+    "unchanged_helper_dependency_AST": [
+      "entry_identity",
+      "same_identity",
+      "episode_number",
+      "watchnixtoons_source_identity",
+      "verified_ids",
+      "identity_key",
+      "show_identity",
+      "load_view"
+    ],
+    "note": "Receipt retains both actual source snapshots and selected reruns. Final hub change adds series-only removal proof; helper and all its unchanged identity dependency functions remain source-bound. Final27 projection cases cover shared grouping/removal/source_parent."
+  },
+  "projection_cases": 27,
+  "projection_receipt_sha256": "739712d256192f7860c254c766ba13eb65eeca3053582a4565ac00ab260e52f2",
+  "independent_review": "Astra accepted final hub c5069a23 and service ee50426e, including source-parent inheritance and series removal; no material source issue. Android/provider execution unverified.",
+  "Android": "NOT_RUN_NEW_INTEGRATION",
+  "Fold": "NOT_RUN",
+  "release": "BLOCKED_REQUIRED_ANDROID_CHECKS"
+}

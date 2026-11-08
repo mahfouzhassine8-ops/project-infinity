@@ -1,0 +1,30 @@
+{
+  "status": "BLOCKED_NO_VERIFIED_ANDROID_EXECUTION_ROUTE",
+  "local_host_arch": "x86_64",
+  "adb_on_PATH": null,
+  "emulator_on_PATH": null,
+  "KVM_available": false,
+  "USB_device_directory": false,
+  "managed_capabilities": "Desktop available; no attached Android device or Android runtime capability observed",
+  "alternative_runner": "UNCONFIRMED: GitHub self-hosted runner enumeration403; no usable alternative discovered",
+  "prior_failure": {
+    "run_id": 42528730683,
+    "source_commit": "a4a89977f085480c720a7b6e73489374d01395dc",
+    "artifact_id": 13636716810,
+    "artifact_sha256": "cfdff856c2f8cb212f18f92df050c68d2fbd4834d8ca8c309f83cf9647728320",
+    "protected_baseline_APK": 2103466,
+    "completed_cases": 0,
+    "guest_stack": "libkodi.so:talloc_lib_init+60 -> arm64/linker constructors/dlopen",
+    "environment": "API37 x86_64 with translated ARM64",
+    "cause": "UNDETERMINED; baseline versus translator not established",
+    "new_candidate_loaded": false
+  },
+  "repeat_failure_run": 42527381943,
+  "protected69_native": "Exact same original66 ARM64 native SHA256 ee3be7c7a95b86f8357539001fcd50bedbd80217b02f130d649f7f57e6075794",
+  "new_application_tests": "NOT_RUN",
+  "minimum_requirement": "First demonstrate stable unchanged signed2103469 startup in a qualified disposable Android execution environment, then run exact twelve selected checks on originally signed internal QA candidate/recovery",
+  "new_workflow_dispatches": 0,
+  "new_builds": 0,
+  "new_signatures": 0,
+  "sourcecode_fixes_for_startup": "NONE: outside tracking scope and cause unproved"
+}

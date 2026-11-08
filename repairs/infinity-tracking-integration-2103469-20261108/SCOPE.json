@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "operation": "integrate-existing-infinity-movies-tv-tracking",
+  "owner_authorization": "User final tracking integration brief in this conversation",
+  "protected_recovery": 2103469,
+  "functional_foundation": 2103466,
+  "rejected_watchlist_implementation": 2103468,
+  "source_branch": "work/infinity-tracking-integration-20261108",
+  "no_new_database": true,
+  "no_replacement_tracker": true,
+  "no_new_service": true,
+  "no_arbitrary_provider_allowlist": true,
+  "provider_source_edits_authorized": false,
+  "UI_resource_edits_authorized": false,
+  "shutdown_tests_selected": false,
+  "publication_allowed_only_after_all_mandatory_engineering_checks": true,
+  "Fold_acceptance": "ONE_FINAL_OWNER_TEST_AFTER_ENGINEERING; NOT_RUN",
+  "selected_checks": [
+    {
+      "id": "queens_blade_wnt2",
+      "requirement": "Actual WatchNixtoons2 Queen's Blade Episode4 via Infinity TV: five minutes, stop, correct existing progress/Continue/Next/resume",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "cross_entry_rezero_dedup",
+      "requirement": "Existing regular TV Re:Zero E3 then Infinity TV E4: one canonical show card, accurate episode-level rows, regular rows untouched",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "all_supported_families",
+      "requirement": "Representative actual playback for WatchNixtoons2, Otaku, The Crew, Umbrella, POV, Seren and other supported compatible families; no arbitrary provider admission restriction",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "exact_movie_episode_identity",
+      "requirement": "Actual typed movie and exact show/season/episode identity; uncertain identity playback preserved with reported tracking limitation",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "player_events",
+      "requirement": "Partial, resume, stop, seek, completion and replay through original thresholds/events",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "next_episodes",
+      "requirement": "Existing unfinished continuation and evidenced successor behavior; no inferred E+1",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "no_false_history",
+      "requirement": "Saving, browsing, failed launch or selection alone produce no playback progress/history",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "restart_persistence",
+      "requirement": "Existing tracking store survives explicit application restart after saved playback",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "one_way_isolation",
+      "requirement": "Regular supported playback continues feeding Infinity; Infinity-only playback does not create regular Movies/TV playback entries or alter their history",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "view_display_theme",
+      "requirement": "Shared records consistent in every existing applicable view, front/unfolded display dimensions, portrait/landscape and light/dark; layouts/resources unchanged",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "protected_features",
+      "requirement": "Existing Search, Cobra, navigation, Continue From/resume and unrelated components preserved",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "install_forward_recovery",
+      "requirement": "Originally signed in-place install plus matching forward recovery with existing data retained",
+      "status": "NOT_RUN"
+    }
+  ],
+  "source_modification_authorized": "Only confirmed necessary integration changes after tracing protected69/66 and rejecting unnecessary68 code",
+  "version_reservation": "NOT_REQUESTED; use actual registry at release time"
+}

@@ -1,0 +1,100 @@
+{
+  "status": "PASS_FOCUSED_COMMON_PROJECTION_CONTRACT",
+  "unique_cases_passed": 27,
+  "selection": "PROJECTION-TEST-SELECTION.md",
+  "runs": [
+    {
+      "command": "python test_common_projection.py",
+      "tests": 14,
+      "passed": 13,
+      "errors": 1,
+      "error": "Fixture unpack expected2 rather than unchanged toggle_watchlist_data3 return values; no production failure"
+    },
+    {
+      "command": "python -m unittest -v [three selected affected/new cases]",
+      "tests": 3,
+      "result": "PASS",
+      "reason": "correct saving fixture, add exact movie conflict, execute actual Home Continue begin caller"
+    },
+    {
+      "command": "python -m unittest -v [four selected canonical cases]",
+      "tests": 4,
+      "result": "PASS",
+      "reason": "new same-key unproven-parent replay fallback; affected ReZero/conflict/verified-next cases rerun"
+    },
+    {
+      "command": "python test_common_projection.py",
+      "tests": 23,
+      "result": "PASS",
+      "reason": "owner-approved WNT local-parent extension and common watched/items group input changed affected shared projections"
+    },
+    {
+      "command": "python -m unittest -v [seven selected canonical edge cases]",
+      "tests": 7,
+      "result": "PASS",
+      "reason": "review corrections for multiple local parent locators and contradictory parent quarantine; new two plus five affected existing cases"
+    },
+    {
+      "command": "python -m unittest -v [one actual watched-bridge removal repro]",
+      "tests": 1,
+      "result": "FAIL_CONFIRMED_PRODUCTION_EDGE",
+      "source_sha256": "ffecec5cd4e646579c2c1ebac9162952c218a45765c9b3d045c380d749e73c3c",
+      "failure": "Continue one-card canonical group reappeared through remaining alias after removal because series alias lookup ignored watched proof"
+    },
+    {
+      "command": "python -m unittest -v [three selected removal/preservation cases]",
+      "tests": 3,
+      "result": "PASS",
+      "reason": "series alias removal uses shared watched/items proof; ordinary exact writer preserved"
+    },
+    {
+      "command": "python -m unittest -v [two selected removal cases]",
+      "tests": 2,
+      "result": "PASS",
+      "reason": "retain original canonical-key filter in new series-only branch"
+    }
+  ],
+  "final_source_coverage": "Final removal correction reran two affected cases; ordinary writer preservation passed after introducing the series branch. Prior 25 cases retained against unchanged default grouping/exact paths; no broad repeat.",
+  "files": {
+    "resume_hub.py": {
+      "baseline_sha256": "1c38df4f68201dc209d309f31bebf051e24baf0e45f4cb7318828af2212780d5",
+      "overlay_sha256": "c5069a231b72cbca2281b4cb09c9df3f74673c28a264cf1cfbc919770f88b645",
+      "added_functions": [
+        "_progress_rows",
+        "_series_rows",
+        "exact_progress"
+      ],
+      "changed_functions": [
+        "_entries_projection",
+        "_resume_aliases",
+        "_resume_groups",
+        "continue_series_ids",
+        "next_episodes",
+        "progress_shows",
+        "record_progress"
+      ],
+      "removed_functions": []
+    },
+    "plugin.py": {
+      "baseline_sha256": "a61290fe791e264e82f00aebb7c5b6173226639edca3bee15d17dccdda82fc8e",
+      "overlay_sha256": "580a2d7b25bc7a415c2db059fe1fa696808107a4f997a32d544baf2468a2877a",
+      "added_functions": [],
+      "changed_functions": [
+        "_list_item",
+        "_menu_resume",
+        "show_item_menu"
+      ],
+      "removed_functions": []
+    }
+  },
+  "test_source_sha256": "0f0056a3bf9712c11d1a17b4483fad27d1f5548528aec16a476498d9093cb125",
+  "baseline": "protected actual signed2103469/functional66 extraction",
+  "writer_identity_key_thresholds_store": "Original identity/key/threshold/store semantics unchanged; record_progress adds only validated source_parent retention, with ordinary movie/TV output compared against original69.",
+  "membership_sources_unknown_fields": "PRESERVED; controlled host assertions",
+  "service_native_inactive68helper": "NO CHANGES OR ACTIVATION",
+  "application_provider_Android": "NOT RUN / NOT CLAIMED",
+  "build_sign_install_shutdown": "NOT RUN",
+  "all_twelve_owner_release_gates": "NOT CLAIMED; this receipt is common projection contract only",
+  "WNT_scope": "Existing exact local episode/parent page identity only; unknown season retained; canonical link requires explicit verified parent fields; no provider runtime claim.",
+  "exact_episode_alias_writer_path": "AST-identical original _resume_aliases body after excluding new series=True branch; progress_key AST-identical; series=False default unchanged."
+}
