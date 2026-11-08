@@ -41,7 +41,7 @@
     "artifact_id": 13631340281,
     "APK_SHA256": "804eebc57af2e4ef4e5418b56994bda64eb7fd7e7f2c0653b5c6e2a9f7833058"
   },
-  "Android": "INFRASTRUCTURE_FAIL_BEFORE_APP_EXECUTION; same signed pair selected for corrected launch",
+  "Android": "RETRY_SELECTED_AFTER_PINNED_AUTHENTICATED_OBSERVER_BOOTSTRAP_FIX; same APK pair",
   "Fold": "NOT_RUN_PENDING_ONE_OWNER_ACCEPTANCE",
   "shutdown": "NOT_SELECTED",
   "accepted_pointer_updated": false,
@@ -60,6 +60,18 @@
       "reason": "/usr/bin/sh rejects Bash-only set -o pipefail; emulator runner already propagates every individual command failure",
       "APK_rebuild": false,
       "application_tests_run": 0
+    },
+    {
+      "run_id": 42515457202,
+      "source_commit": "c01fd72494fa604a07cf85124f7ae123d38a746a",
+      "result": "FAIL_BASELINE_DIAGNOSTIC_BOOTSTRAP_GUARD",
+      "artifact_id": 13631551281,
+      "artifact_SHA256": "a79819b16b6a1df5fb8b5e179d113c697cd3177d5c6253fdb68c8e2408b67725",
+      "baseline_started": true,
+      "candidate_installed": false,
+      "completed_app_cases": 0,
+      "reason": "Observer imported owned controller_access before active_contract established verified loader ownership; original production guard correctly refused.",
+      "APK_rebuild": false
     }
   ]
 }

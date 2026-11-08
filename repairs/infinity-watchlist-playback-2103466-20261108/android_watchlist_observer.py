@@ -15,6 +15,8 @@ CC='script.infinity.commandcenter'
 QA='script.infinity.finalreleaseqa'
 PROVIDERS=('plugin.video.pov','plugin.video.umbrella')
 EVENTS=None
+BOOTSTRAP_SHA256='75821ef1dc3a42d1b5029f7d296f628fc19c3fea54c619b7a93acd1fb395576f'
+BOOTSTRAP_MANIFEST=None
 
 
 class ActualPlayerEvents(xbmc.Player):
@@ -50,8 +52,28 @@ def until(fn,label,seconds=90):
     raise RuntimeError('Timed out: '+label)
 
 
+def authenticated_bootstrap(root):
+    """Run the exact existing entry bootstrap before importing any owned helper."""
+    global BOOTSTRAP_MANIFEST
+    entry=root/'default.py'
+    with entry.open('rb') as stream:source=stream.read(4*1024*1024+1)
+    begin=b'# INFINITY_AUTHENTICATED_MODULE_BOOTSTRAP_V1\n'
+    end=b'# END_INFINITY_AUTHENTICATED_MODULE_BOOTSTRAP_V1\n'
+    assert len(source)<=4*1024*1024 and source.count(begin)==1 and source.count(end)==1
+    block=begin+source.split(begin,1)[1].split(end,1)[0]+end
+    assert hashlib.sha256(block).hexdigest()==BOOTSTRAP_SHA256,'EXACT_EXISTING_AUTHENTICATED_ENTRY_BOOTSTRAP_REQUIRED'
+    # The unmodified entry bootstrap pins module_contract.py, filters owned import
+    # paths, and performs the existing real native signature/source handshake.
+    namespace={'__name__':'infinity_disposable_qa_bootstrap','__file__':__file__}
+    exec(compile(block,str(entry),'exec',dont_inherit=True),namespace)
+    contract=namespace['_infinity_contract']
+    assert contract.source(CC+'/default.py')==source,'ACTUAL_INSTALLED_ENTRY_SOURCE_MUST_MATCH_NATIVE_AUTHENTICATED_MANIFEST'
+    BOOTSTRAP_MANIFEST=contract.identity.manifest_sha256
+
+
 def controller():
     root=Path(xbmcvfs.translatePath(xbmcaddon.Addon(CC).getAddonInfo('path')))
+    authenticated_bootstrap(root)
     if str(root) not in sys.path:sys.path.insert(0,str(root))
     helper=root/'infinity_modules/uirepair'
     assert (helper/'controller_access.py').is_file(),'AUTHENTICATED_CONTROLLER_ACCESS_REQUIRED'
@@ -79,6 +101,7 @@ def identity():
         actual[aid]=dict(version=addon.getAddonInfo('version'),files=observed,path=str(source))
     return dict(pid=os.getpid(),module_files=files,module_count=len(files),producer_sources=actual,
                 controller_path=str(root),loaded_controller=str(plugin.__file__),Python_optimization=sys.flags.optimize,
+                observer_bootstrap=dict(entry='default.py',bootstrap_sha256=BOOTSTRAP_SHA256,native_manifest_sha256=BOOTSTRAP_MANIFEST,helper_loader=type(sys.modules['controller_access'].__loader__).__name__),
                 cc_version=xbmcaddon.Addon(CC).getAddonInfo('version'),skin=xbmc.getSkinDir())
 
 

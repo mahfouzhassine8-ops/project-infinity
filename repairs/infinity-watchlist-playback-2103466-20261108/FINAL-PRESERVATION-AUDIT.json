@@ -1,0 +1,93 @@
+{
+  "status": "PASS_REUSED_SOURCE_BOUND_COMPILATION_MODULE_AND_SIGNED_PAYLOAD_PRESERVATION; ANDROID_PENDING",
+  "protected_baseline_ref": "5ee1c7ae0bbe295c311aa34c02f6b62688ccb5a7",
+  "original_signing_identity": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "runtime_source_pins": {
+    "native": {
+      "xbmc/filesystem/PluginDirectory.cpp": "d36a14db6752babcc1f72b86e9537faeb4d6f14b990c56f81a7952cb71655c4a",
+      "xbmc/guilib/InfinitySavedNavigation.h": "0f574675c1339eca52b372b91e18ce2b255283ee020a39e44c83295d7b156092",
+      "xbmc/guilib/InfinitySavedNavigationState.h": "7885116d5c9b869cea813f0ad34dc240efecd1cf1e05913c916d7a9e0a4aebbe",
+      "xbmc/interfaces/generic/ScriptInvocationManager.cpp": "eb46c1df3a4e8a249e7b00cbcbf50c91b16a822e6b323e523f19098e388ffd20",
+      "xbmc/interfaces/json-rpc/PlayerOperations.cpp": "adc78b8aba4f81393f56e8d83459ddf4ad14d1f662d12c246853ee21b2068824",
+      "xbmc/interfaces/legacy/Player.cpp": "70dfdc45ea6f8d890b9c11982ddf6c884c5c4223edde2cbc6290af0b16e63e45"
+    },
+    "python": {
+      "resume_hub.py": "38f8e3cedbb8d1b21902c08d3cd4558c424317a6910be520b328fae749cc9420",
+      "plugin.py": "be2f3764c6ca52e169168a2ada3f5586e20f4f9775d3e258b18fc93be3ba5135",
+      "service.py": "b65b9937ec1a1c02595c0b1e3c3c2041cad97bce5cfa565d89f652cff396b88f",
+      "saved_playback.py": "ba80dd13b100fbe45ce80af23b7edd8e66abdb748d15a4fa6006d02f68fea209"
+    },
+    "baseline_source_map_sha256": "f48df24caabdf36fee25d69d47b0a2ad3c98df3936949c8dcd6d07a92e2f0412",
+    "phase": "NATIVE_AND_PYTHON_SOURCE_FROZEN_HOST_ACCEPTED_ANDROID_PENDING"
+  },
+  "signed_receipts": {
+    "2103468": {
+      "versionCode": 2103468,
+      "generation": 55,
+      "source": "2354f0afb8bbc7114fa82f7843973a231de99d2a",
+      "signed_apk_sha256": "ad153c06899b4ee7c0f2618ecba25b382c94f7b7af20178fb76010567134ab32",
+      "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7"
+    },
+    "2103469": {
+      "versionCode": 2103469,
+      "generation": 56,
+      "source": "a76e29b84996304241e6b309d56a31e6659ad190",
+      "signed_apk_sha256": "804eebc57af2e4ef4e5418b56994bda64eb7fd7e7f2c0653b5c6e2a9f7833058",
+      "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7"
+    }
+  },
+  "complete_APK_member_proofs": {
+    "2103468": {
+      "APK_sha256": "ad153c06899b4ee7c0f2618ecba25b382c94f7b7af20178fb76010567134ab32",
+      "Android": "NOT_RUN",
+      "Fold": "NOT_RUN",
+      "accepted_pointer_updated": false,
+      "baseline_sha256": "d366e4b8aadba8484768cfcc0d362c2fc8e0181d78123ea77e04af4f028a3135",
+      "changed_members": {
+        "AndroidManifest.xml": "daf640c42db01694fbbf3ed027b1c505972a50e7dff9c0987296514793c5dead",
+        "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1": "066a8c5e6c1514a3e007b1c34c60305b9a872a156cb182e1d887f32d968f9379",
+        "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1.sig": "5f577a2c7e63491b63eae2ce67f2bce0a95f0c95ca6a66154edad4fd69e29076",
+        "assets/addons/script.infinity.commandcenter/addon.xml": "086f5b185728807ef411503e4068556a788f162a29594e5ea0831806132f5a1c",
+        "assets/addons/script.infinity.commandcenter/plugin.py": "be2f3764c6ca52e169168a2ada3f5586e20f4f9775d3e258b18fc93be3ba5135",
+        "assets/addons/script.infinity.commandcenter/resume_hub.py": "38f8e3cedbb8d1b21902c08d3cd4558c424317a6910be520b328fae749cc9420",
+        "assets/addons/script.infinity.commandcenter/saved_playback.py": "ba80dd13b100fbe45ce80af23b7edd8e66abdb748d15a4fa6006d02f68fea209",
+        "assets/addons/script.infinity.commandcenter/service.py": "b65b9937ec1a1c02595c0b1e3c3c2041cad97bce5cfa565d89f652cff396b88f",
+        "assets/experience-component-updates.properties": "dec8ea2f62337ce6e3bba977e75df376f321c8172d11f358bfed83dc19562ca2",
+        "lib/arm64-v8a/libkodi.so": "d27779dd8d36d573e0dc75eb3309b38ac89d7ce158ebf632257fc23a17c0af99"
+      },
+      "engineering_QA_only": true,
+      "public_release": false,
+      "publication": false,
+      "signing": "VERIFIED_ONE_ORIGINAL_PERMANENT_CERTIFICATE",
+      "status": "PASS_EXACT466_DECLARED_NATIVE_CC_METADATA_MEMBERS"
+    },
+    "2103469": {
+      "APK_sha256": "804eebc57af2e4ef4e5418b56994bda64eb7fd7e7f2c0653b5c6e2a9f7833058",
+      "Android": "NOT_RUN",
+      "Fold": "NOT_RUN",
+      "accepted_pointer_updated": false,
+      "baseline_sha256": "d366e4b8aadba8484768cfcc0d362c2fc8e0181d78123ea77e04af4f028a3135",
+      "changed_members": {
+        "AndroidManifest.xml": "4d9f0f3f92d43992d9f7b7adcc182991e73804f8ab785e4df022a63fb4ccd543",
+        "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1": "6fb82d58f2488a2eac23d2f0aa0e8a4eaa600f5fcf35901a24445b32beb852d2",
+        "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1.sig": "23ef4063500edbaf7352f295a87f93d8cf6f9858ec82678abffd52e2c83bf6d8",
+        "assets/addons/script.infinity.commandcenter/addon.xml": "7b522aabc3cb04a6bd1bd6a3dbef2aab335b72a71853f0ce4b1a6ecade62ba8b",
+        "assets/addons/script.infinity.commandcenter/saved_playback.py": "ba80dd13b100fbe45ce80af23b7edd8e66abdb748d15a4fa6006d02f68fea209",
+        "assets/experience-component-updates.properties": "52510dab3a317aee4636d728ca61043ceafa851443b313f9cb437df379c32c3f"
+      },
+      "engineering_QA_only": true,
+      "public_release": false,
+      "publication": false,
+      "signing": "VERIFIED_ONE_ORIGINAL_PERMANENT_CERTIFICATE",
+      "status": "PASS_EXACT466_DECLARED_NATIVE_CC_METADATA_MEMBERS"
+    }
+  },
+  "unrelated_APK_members": "BYTE_IDENTICAL_PROTECTED2103466",
+  "source_scope": "Six authorized native files + three CC Python files + sole signed helper",
+  "provider_Search_Trakt_Cobra_UI_DEX_changes": false,
+  "owner_device_access": false,
+  "accepted_pointer_updated": false,
+  "Android": "PENDING_ACTUAL_SELECTED_RUN",
+  "Fold": "NOT_RUN",
+  "shutdown": "NOT_SELECTED"
+}

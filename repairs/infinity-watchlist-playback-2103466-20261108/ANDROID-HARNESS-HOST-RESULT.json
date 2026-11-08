@@ -1,19 +1,20 @@
 {
   "status": "PASS_HOST_STAGING_ONLY",
-  "timestamp_utc": "2026-11-08T18:39:42.887326+00:00",
+  "timestamp_utc": "2026-11-08T19:40:28.268911+00:00",
   "checks": [
     "five Python scripts syntax compile",
     "real pure hub identity seed two saved rows only",
     "reviewed14/13 producer pin shape",
     "retained12 dependency archive list",
     "Kodi optimize1 explicit if/raise observer compilation with live ListItem read",
-    "necessary real-event observer staging: optimize1 explicit checks; bound64KiB request/2MiB reply/64 genuine events; PID/sequence remain required"
+    "necessary real-event observer staging: optimize1 explicit checks; bound64KiB request/2MiB reply/64 genuine events; PID/sequence remain required",
+    "selected QA bootstrap correction: existing pinned entry/native handshake before guarded owned helper import; optimize1 changed-byte rejection"
   ],
   "source_sha256": {
     "android_watchlist_common.py": "1fd1f0a5a663c784df49c4b21440b4f753193bfe1c0020d01d355581722923c7",
     "stage_watchlist_android.py": "1b463bbdb9a0750cf5b82e9d0065a39f983e1988902e2813a5b13256cd9f1fe4",
     "watchlist_fixture_server.py": "19dc7f4b123134e3dbd990f1d5d142f4134c061f42e580312e151f999895d797",
-    "android_watchlist_observer.py": "d353e2eff760307c7e2c71fb23aae959abd56e174436bfd9b7310c3c12e4ec93",
+    "android_watchlist_observer.py": "431cbfd3c0d63458e5da04d0c2c4a8f2de61176e7dab765c5e07a2e4252e0891",
     "verify_watchlist_android.py": "df730e67184e09232f3f99d2912f680b338bcc9e918fcb36f43c98250a67f959",
     "ANDROID-REQUEST.json": "bf4e461c140d152167b2a8395cd3538c062825615ea1383a8a3d749777e9dd61",
     "ANDROID-HARNESS.md": "f89d4701347b8acb742cb886506ae6b3dfc3dc248b0ccdb718380ba96bc8fbf4"
@@ -22,5 +23,10 @@
   "application": "NOT_RUN",
   "HTTP_server": "NOT_RUN",
   "media_generation": "NOT_RUN",
-  "shutdown": "NOT_SELECTED"
+  "shutdown": "NOT_SELECTED",
+  "qa_bootstrap_fix": {
+    "host_result": "ANDROID-QA-BOOTSTRAP-HOST-RESULT.json",
+    "original_failure_retained": "evidence/qa-bootstrap-42515457202",
+    "Android_retry": "NOT_RUN"
+  }
 }

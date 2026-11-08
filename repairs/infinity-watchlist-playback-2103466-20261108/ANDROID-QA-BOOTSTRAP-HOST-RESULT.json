@@ -1,0 +1,32 @@
+{
+  "status": "PASS_SELECTED_QA_BOOTSTRAP_HOST_CHECK",
+  "scope": "disposable observer bootstrap order and unchanged authenticated entry bytes only",
+  "actual_failure": {
+    "run": 42515457202,
+    "phase": "baseline66 observer identity before candidate install",
+    "classification": "FAIL_OBSERVER_BOOTSTRAP_SETUP",
+    "cases_completed": 0,
+    "native_runtime_verdict": "NOT_TESTED_BY_THIS_FAILURE"
+  },
+  "checks": [
+    "exact identical default/plugin/service entry bootstrap SHA256",
+    "unchanged module_contract.py SHA256",
+    "bootstrap call precedes any owned helper import",
+    "no early top-level owned helper imports",
+    "actual changed bootstrap rejected by transformed observer under optimize1 before native execution",
+    "full changed observer compiles optimize1 with zero stripped assertions"
+  ],
+  "bootstrap_sha256": "75821ef1dc3a42d1b5029f7d296f628fc19c3fea54c619b7a93acd1fb395576f",
+  "module_contract_sha256": "759e60439fae0b1bf0f8a2ff6895209ac848101b9544ac6c0e297b9c73df1267",
+  "observer_sha256": "431cbfd3c0d63458e5da04d0c2c4a8f2de61176e7dab765c5e07a2e4252e0891",
+  "evidence_sha256": {
+    "001-identity.json": "07de3b78ebba298f6145a4ad214a021d2633b557bc061bfbf2b573d9815dd607",
+    "ANDROID-VERIFICATION.json": "656050237a1f5b3c4b42b5530ad6ad6089fe3c4b2a0ae1d25a3bb34618b30d73",
+    "ANDROID-HARNESS-HOST-RESULT-before-fix.json": "b394d2d7d30228b1ea793092749bfac04be3f25ec044885eb001b60555cdc8b6"
+  },
+  "Android_retry": "NOT_RUN",
+  "production_changes": false,
+  "APK_changes": false,
+  "shutdown": "NOT_SELECTED",
+  "existing_SDK_event_ListItem_and_journey_function_AST_unchanged": true
+}
