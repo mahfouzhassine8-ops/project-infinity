@@ -26,6 +26,41 @@ def manifest(apk):
         return {f[2]:f[1] for line in source.splitlines() if (f:=line.split('\t'))[0]=='file'}
 
 
+def capture_native_crash(device,out,budget=20):
+    """Read-only, finite debuggerd evidence on the already-rooted disposable VM."""
+    started=time.monotonic();deadline=started+budget
+    detail=dict(target_pid=device.pid,application_restarted=False,budget_seconds=budget)
+    def shell(*args):
+        remaining=deadline-time.monotonic()
+        if remaining<=0:raise TimeoutError('Native crash evidence capture deadline')
+        return device.shell(*args,timeout=min(3,remaining),check=False)
+    try:
+        require(device.serial.startswith('emulator-'),'Disposable emulator required for crash evidence')
+        require(shell('getprop','ro.kernel.qemu').strip()=='1' and shell('id','-u').strip()=='0','Existing rooted qemu required for crash evidence')
+        dumpers=shell('pidof','crash_dump64').strip()
+        while dumpers and time.monotonic()<deadline-5:
+            time.sleep(.25)
+            dumpers=shell('pidof','crash_dump64').strip()
+        detail['debuggerd_still_running']=bool(dumpers)
+        crash=shell('logcat','-b','crash','-d','-t','2000')
+        (out/'failure-crash-buffer.txt').write_text(crash[-2*1024*1024:])
+        detail['crash_buffer_captured']=True
+        names=shell('ls','-t','/data/tombstones').splitlines()[:4]
+        for name in names:
+            if not re.fullmatch(r'tombstone_[0-9]+',name):continue
+            text=shell('head','-c','2097152','/data/tombstones/'+name)
+            if PACKAGE in text and re.search(r'\bpid:\s*'+str(int(device.pid))+r'\b',text):
+                (out/'failure-tombstone.txt').write_text(text)
+                detail['matching_tombstone']='/data/tombstones/'+name
+                break
+        detail['status']='READ_ONLY_CAPTURE_FINISHED'
+    except Exception as error:
+        detail.update(status='READ_ONLY_CAPTURE_BOUNDED_OR_UNAVAILABLE',error=repr(error)[:1000])
+    finally:
+        detail['elapsed_seconds']=time.monotonic()-started
+        (out/'failure-native-capture.json').write_text(json.dumps(detail,indent=2)+'\n')
+
+
 def run(baseline,candidate,recovery,fixture,out,port):
     require(not out.exists(),'Fresh evidence directory required');out.mkdir(parents=True)
     selected=json.loads((HERE/'ANDROID-REQUEST.json').read_text())
@@ -53,6 +88,10 @@ def run(baseline,candidate,recovery,fixture,out,port):
             except BaseException as error:(out/(name+'.error')).write_text(repr(error))
         try:device.screenshot('failure')
         except BaseException:pass
+        try:capture_native_crash(device,out)
+        except BaseException as error:
+            try:(out/'failure-native-capture.error').write_text(repr(error))
+            except OSError:pass
     def check_identity(apk,count):
         actual=device.command('identity')
         require(actual['module_files']==manifest(apk) and actual['module_count']==count,'Complete actual authenticated module inventory mismatch')

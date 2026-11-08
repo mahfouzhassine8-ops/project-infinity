@@ -5,9 +5,9 @@
   "owner_authorization_commit": "8e83bcb8374dec0ccc646cbe02c3c4249395ba8c",
   "application_tests": true,
   "shutdown_tests": false,
-  "signed_pair_request_sha256": "1d83f78f34105b15dbee4185db04182bd8b66e32419772bf47709ffd46de7693",
+  "signed_pair_request_sha256": "9880d10a58a9d1db25836872e8fecc4be2d20364662adc4d797dcd420abaeb69",
   "android_request_sha256": "bf4e461c140d152167b2a8395cd3538c062825615ea1383a8a3d749777e9dd61",
   "runtime_source_pins_sha256": "494ff2d34a49ecd79d3c662dad1eb860f399eb39f06f71c4834a1ef5493e1056",
-  "harness_host_result_sha256": "74477f750253f603029cf63458c5164ab95b3264c3789a46568e6977531bf958",
-  "reason": "Same original signed pair; three actual passes preserved; wait for exact nonbusy Watchlist row, bound RPC and host emulator/action disposal after observed diagnostic/infrastructure failures. No APK or runtime source changes."
+  "harness_host_result_sha256": "af9cceae72d9857f4e2ec6e00553a46908a837c0d8690e8abf9ba38c84705f1b",
+  "reason": "One unchanged-signed-pair execution after actual original2103466 startupSIGSEGV before candidate installation; preserve prior real three passes and original crash FAIL, capture completed debuggerd evidence if recurring. No restart/retry inside test, no APK/runtime changes."
 }

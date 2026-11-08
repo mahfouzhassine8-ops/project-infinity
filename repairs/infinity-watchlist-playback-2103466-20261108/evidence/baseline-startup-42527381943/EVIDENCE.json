@@ -1,0 +1,14 @@
+{
+  "run_id": 42527381943,
+  "source_commit": "1f8257ec7dfb3563c14928f8987ff5598c6ee782",
+  "artifact_id": 13636460983,
+  "artifact_sha256": "e86100f5d0014ea700ec183cfd15d9797c301355fc2afea570ace02697c858c2",
+  "status": "FAIL_ORIGINAL_BASELINE_STARTUP_SIGSEGV_BEFORE_CANDIDATE",
+  "candidate_installed": false,
+  "completed_app_cases": 0,
+  "APK_rebuild": false,
+  "actual_crash": "2103466 :kodi main process pid4732 SIGSEGV at 2026-11-08T21:59:35.147Z",
+  "cause": "UNDETERMINED: capture ends before completed tombstone/backtrace; same berberis undefined-instruction messages occur in prior passing starts and do not prove crash cause",
+  "host_cleanup": "PASS: failed verifier returned, emulator action terminated, evidence uploaded without previous job timeout",
+  "full_log_sha256": "6528b3cc9a4d8ec93c56528cd621883a0a7e5d01b37e326e81fff15a4ad2f922"
+}

@@ -1,0 +1,26 @@
+{
+  "status": "PASS_SELECTED_FAILURE_CAPTURE_HOST_CHECK",
+  "scope": "actual capture helper executed with host-only read-only command fixtures; not Android evidence",
+  "cases": [
+    {
+      "case": "wait_for_dump_completion_then_capture_matching_pid",
+      "status": "PASS",
+      "calls": 7
+    },
+    {
+      "case": "nonroot_disposable_capture_refused",
+      "status": "PASS"
+    },
+    {
+      "case": "wrong_pid_tombstone_not_attached",
+      "status": "PASS"
+    }
+  ],
+  "total_budget_seconds": 20,
+  "per_command_max_seconds": 3,
+  "verify_sha256": "7ea1f479f6b38fcf7a76278b6811d22fc09d668770e06ce55022fc0886c2bb8d",
+  "original_failure_preserved": true,
+  "APK_changes": false,
+  "production_changes": false,
+  "Android_retry": "NOT_RUN"
+}
