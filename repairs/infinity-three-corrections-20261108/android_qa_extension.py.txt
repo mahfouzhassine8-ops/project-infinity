@@ -4,7 +4,7 @@ _original_selected_action = action
 
 
 def _three_identity():
-    result = dict(pid=os.getpid(), skin=xbmc.getSkinDir(), components={}, module_files={}, trakt_files={})
+    result = dict(pid=os.getpid(), skin=xbmc.getSkinDir(), components={}, module_files={}, trakt_files={}, Python_optimization=sys.flags.optimize)
     for aid in (CC, 'skin.infinity.diggz', 'script.module.tmdbhelper.sync.trakt', *PROVIDERS):
         addon = xbmcaddon.Addon(aid)
         result['components'][aid] = dict(version=addon.getAddonInfo('version'), path=xbmcvfs.translatePath(addon.getAddonInfo('path')))

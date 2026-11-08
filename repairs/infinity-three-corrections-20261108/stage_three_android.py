@@ -1,5 +1,6 @@
 """Source-pinned disposable Android fixture only; no production modifications."""
 import argparse
+import ast
 import hashlib
 import io
 import json
@@ -21,6 +22,20 @@ from verify_device_sources import audit
 
 def sha(raw):
     return hashlib.sha256(raw).hexdigest()
+
+
+def checked_observer(source):
+    # Kodi XBPython.cpp sets Py_OptimizeFlag=1. Preserve every selected check
+    # and its evaluated SDK call using explicit runtime if/raise statements.
+    class RuntimeChecks(ast.NodeTransformer):
+        def visit_Assert(self, node):
+            return ast.copy_location(ast.If(test=ast.UnaryOp(op=ast.Not(), operand=node.test),
+                body=[ast.Raise(exc=ast.Call(func=ast.Name(id='AssertionError', ctx=ast.Load()),
+                    args=[node.msg] if node.msg else [], keywords=[]), cause=None)], orelse=[]), node)
+
+    tree = ast.fix_missing_locations(RuntimeChecks().visit(ast.parse(source)))
+    assert not any(isinstance(n, ast.Assert) for n in ast.walk(tree))
+    return ast.unparse(tree) + '\n'
 
 
 def stage(baseline, candidate, recovery, sdk, out):
@@ -93,7 +108,8 @@ def stage(baseline, candidate, recovery, sdk, out):
     anchor = "if len(sys.argv)>1 and sys.argv[1].lstrip('-').isdigit():plugin_directory()"
     assert base.count(anchor) == 1
     observer = base.replace(anchor, (HERE / 'android_qa_extension.py.txt').read_text() + '\n' + anchor)
-    compile(observer, 'qa.py', 'exec')
+    observer = checked_observer(observer)
+    compile(observer, 'qa.py', 'exec', optimize=1)
     (qa / 'qa.py').write_text(observer)
     shutil.copyfile(ROOT / 'repairs/save-later-multiimage-20261023/android_runtime_checks.py', qa / 'android_runtime_checks.py')
     profile = out / 'home/userdata'
@@ -104,6 +120,7 @@ def stage(baseline, candidate, recovery, sdk, out):
                   owner_POV_files=210, owner_Trakt_files=145, Umbrella_source='Unmodified publisher6.8.00; all5 captured Fold files text-identical after newline normalization',
                   existing_compat82='Exact six files reused from passing diagnosis; original guards unchanged',
                   live_ListItem_observer_retained=True, diagnostic_workaround_applied=False, APK_modified=False,
+                  observer_assertions='EXPLICIT_IF_RAISE_VALID_UNDER_KODI_OPTIMIZATION1', observer_sha256=sha(observer.encode()),
                   owner_data_or_settings_accessed=False, physical_Fold='NOT_RUN', shutdown='NOT_SELECTED')
     (out / 'ANDROID-INPUTS.json').write_text(json.dumps(report, indent=2) + '\n')
     print(report['status'])

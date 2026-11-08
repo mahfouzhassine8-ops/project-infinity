@@ -218,6 +218,11 @@ def run(baseline, candidate, recovery, fixture, out):
                     labels = confirm_failure('Trakt-' + case)
                 outcome = device.until(lambda: reply(seq), 'selected actual SDK Trakt case ' + case, 40)
                 assert outcome['status'] == ('PASS_REAL_SDK_SUCCESSFUL_REFRESH' if case == 'success' else 'PASS_REAL_SDK_SCOPED_TRAKT_CASE')
+                assert outcome['HTTP_boundary_calls'] == (0 if case == 'manual' else 1), 'ACTUAL_SDK_CALL_MUST_BE_OBSERVED'
+                if case != 'success':
+                    assert 299 <= outcome['timestamp_delta'] <= 335 and outcome['deadline'] > 0, 'ACTUAL_300_SECOND_COOLDOWN_REQUIRED'
+                if case == 'manual':
+                    assert outcome['device_code_polls'] > 0, 'ACTUAL_MANUAL_DEVICE_CODE_POLL_REQUIRED'
                 if case in ('silent-on', 'success'):
                     assert not visible(12002)
                 passed('real_SDK_Trakt_' + case, details=outcome)

@@ -159,3 +159,32 @@ did not mirror the installed module’s own helper/resources import setup. The
 QA-only import now follows that exact existing consumer path. The next selected
 retry retains this failure and exercises independent forward recovery even if
 another SDK/diagnostic case fails; its overall result remains FAIL in that case.
+
+
+Run42467845009 attempt1 failed before cases on a stock Android System UI ANR;
+no Infinity/native repair behavior ran. Attempt2 PASS: real signed466→467 forward
+recovery, all79 module/145 active Trakt files and profile sentinel. Ordinary
+Umbrella movie route returned21 results in12.02054s;TV returned5 in6.34976s.
+These ordinary provider timings do not pass Infinity Search or explain every
+previous timeout.
+
+Audit found the reported Silent-ON SDK PASS invalid: HTTP calls0 and cooldown
+deadline0. Kodi XBPython.cpp explicitly sets Py_OptimizeFlag=1. SDK calls written
+inside assert were omitted, including the retained first-provider-home calls.
+All Trakt behavior claims from that attempt are rejected. The raw report and
+explicit invalidation remain in evidence/ANDROID-PARTIAL-RECOVERY-AND-INVALID-SDK.json.
+Only the disposable observer now converts assertions to equivalent if/raise
+checks. Host optimize1 checks confirm the SDK call executes and a failed check
+raises; every original live GUI-item read is preserved and now actually runs.
+Host acceptance additionally requires HTTP-call/cooldown/device-code evidence.
+No production source, APK, provider or native lease changed. The full selected
+missing Search/Trakt journey is retried after actual provider-home initialization;
+all earlier source/signing/link/recovery evidence is retained. No broad suite.
+
+The owner requested and received a separate read-only Kodi identity diagnostic
+1.0.0, source7fb1769f. Its immutable ZIP download is byte-verified, SHA256
+ed9456568f4d4ce5d5ad331d988d7e3fffb3d5fbbf01873ba95384985ac8f6c1.
+Nine local checks PASS. It uses explicit checks compatible with Kodi optimization,
+reads the real APK path and active source files, and writes only a new JSON report.
+No ADB/root/permissions/account-settings/database operation. Fold report pending;
+Health Center integration remains deferred. See ../infinity-readonly-inventory-20261108/README.md.

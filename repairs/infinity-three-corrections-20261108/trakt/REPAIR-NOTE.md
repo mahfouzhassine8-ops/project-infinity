@@ -112,3 +112,9 @@ timeout independently blocks combined release; a Trakt subset PASS cannot clear
 that failure or claim an eight-search/native-crash repair. Fold acceptance and
 installation clearance remain outstanding. Original signing is complete, with
 unchanged owner-gated infrastructure and no additional build selected.
+
+Run42467845009 attempt2’s claimed Silent-ON PASS is explicitly invalidated: Kodi
+optimization omitted SDK calls inside assertions. No Trakt behavior PASS is
+accepted from it. The observer now uses equivalent explicit runtime checks and
+host-side call/timestamp evidence. Real signed forward recovery79/145 hashes and
+data sentinel did PASS independently. No Trakt production source change.
