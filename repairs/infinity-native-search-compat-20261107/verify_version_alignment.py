@@ -36,13 +36,17 @@ def verify(prepared_zip,out):
     with tempfile.TemporaryDirectory(prefix="infinity-cc62-source-only-") as t:
         t=Path(t)
         inner_file=t/"exact464-infinity-owner.zip"
-        with ZipFile(prepared_zip) as outer:
-            metadata=json.loads(outer.read("PREPARATION.json"))
-            check(metadata["status"]=="PASS_EXACT462_AND_AUTHENTICATED_CURRENT_COMPONENT_CONSOLIDATION","Invalid prepared source")
-            for field,expected in [("versionCode",2103464),("CC","0.3.5.62"),("skin","1.0.5.270"),("run_id",SIGNED["prepared_run"])]:
-                check(metadata[field]==expected,"Prepared "+field+" mismatch")
-            with outer.open("components/INFINITY.zip") as stream,inner_file.open("wb") as dst:
-                shutil.copyfileobj(stream,dst)
+        if Path(prepared_zip).is_dir():
+            metadata=json.loads((prepared_zip/"PREPARATION.json").read_text())
+            shutil.copyfile(prepared_zip/"components/INFINITY.zip",inner_file)
+        else:
+            with ZipFile(prepared_zip) as outer:
+                metadata=json.loads(outer.read("PREPARATION.json"))
+                with outer.open("components/INFINITY.zip") as stream,inner_file.open("wb") as dst:
+                    shutil.copyfileobj(stream,dst)
+        check(metadata["status"]=="PASS_EXACT462_AND_AUTHENTICATED_CURRENT_COMPONENT_CONSOLIDATION","Invalid prepared source")
+        for field,expected in [("versionCode",2103464),("CC","0.3.5.62"),("skin","1.0.5.270"),("run_id",SIGNED["prepared_run"])]:
+            check(metadata[field]==expected,"Prepared "+field+" mismatch")
         roots=t/"source"
         roots.mkdir()
         prefix="payload/assets/addons/"
