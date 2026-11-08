@@ -1,0 +1,83 @@
+name: Infinity native-provider search compatibility | SOURCE+HOST ONLY
+on:
+  push:
+    branches: [work/infinity-native-search-compatibility-scope-20261107]
+    paths:
+      - .github/workflows/infinity-native-search-compatibility-host-20261107.yml
+      - repairs/infinity-native-search-compat-20261107/**
+      - repairs/infinity-only-performance-2103425/overlay/script.infinity.commandcenter/native_search_compatibility.py
+      - repairs/infinity-only-performance-2103425/overlay/script.infinity.commandcenter/provider_inventory.py
+permissions: {contents: read}
+concurrency:
+  group: infinity-native-search-compatibility-20261107
+  cancel-in-progress: true
+jobs:
+  native_search:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 12
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - name: Require exact isolated scope and preserve Work signing branch
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import subprocess
+          base='562a0d4578340e1a763ef403eaecc62082c5adf5'
+          changed=set(subprocess.check_output(['git','diff','--name-only',base,'HEAD'],text=True).splitlines())
+          allowed={
+            '.github/workflows/infinity-provider-native-routes-inspection-20261107.yml',
+            '.github/workflows/infinity-native-search-compatibility-host-20261107.yml',
+            'repairs/infinity-native-search-compat-20261107/test_compatibility.py',
+            'repairs/infinity-only-performance-2103425/overlay/script.infinity.commandcenter/native_search_compatibility.py',
+            'repairs/infinity-only-performance-2103425/overlay/script.infinity.commandcenter/provider_inventory.py',
+          }
+          assert changed==allowed,('Unreviewed paths',sorted(changed ^ allowed))
+          print('PASS strict scope; original Work final release, native engine, Cobra, Preview, Crew and signing untouched')
+          PY
+          python3 -m py_compile repairs/infinity-only-performance-2103425/overlay/script.infinity.commandcenter/native_search_compatibility.py repairs/infinity-only-performance-2103425/overlay/script.infinity.commandcenter/provider_inventory.py
+      - name: Retrieve exact public provider versions into disposable inputs only
+        run: |
+          set -euo pipefail
+          mkdir -p provider-fixtures/umbrella/resources/lib/modules provider-fixtures/umbrella/resources/lib/menus provider-fixtures/pov
+          base=https://raw.githubusercontent.com/umbrellaplug/umbrellaplug.github.io/e4f24004462d22757d375ebbea0bad26e9d983cc/omega/plugin.video.umbrella
+          for file in umbrella.py resources/lib/modules/router.py resources/lib/menus/movies.py resources/lib/menus/tvshows.py; do
+            curl -fsSL --retry 3 --max-time 50 "$base/$file" -o "provider-fixtures/umbrella/$file"
+          done
+          curl -fsSL --retry 3 --max-time 50 'https://raw.githubusercontent.com/kodifitzwell/repo/bc4753c49f409cae09c2a4243d5af4ae4e9cdca2/plugin.video.pov/plugin.video.pov-6.11.02.zip' -o provider-fixtures/pov/pov-6.11.02.zip
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib,json
+          rows={}
+          for p in Path('provider-fixtures').rglob('*'):
+            if p.is_file():
+              with p.open('rb') as fd:rows[str(p.relative_to('provider-fixtures'))]=hashlib.file_digest(fd,'sha256').hexdigest()
+          Path('provider-input-hashes.json').write_text(json.dumps(rows,sort_keys=True,indent=2)+'\n')
+          print('PASS source-pinned public fixture inputs loaded; no addon installed, imported or executed')
+          PY
+      - name: Run safe native route positive and negative acceptance matrix
+        env:
+          POV_ARCHIVE: ${{ github.workspace }}/provider-fixtures/pov/pov-6.11.02.zip
+          UMBRELLA_ROOT: ${{ github.workspace }}/provider-fixtures/umbrella
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s repairs/infinity-native-search-compat-20261107 -p 'test_compatibility.py' -v
+      - name: Do not export third-party source or private user data
+        if: always()
+        run: |
+          rm -rf provider-fixtures
+          printf '%s\n' 'SOURCE/HOST ONLY. No user's installed provider versions inspected, no APK produced, no Work release/preservation or Fold behavior modified. Only native Search fallback is proposed and owner approval is required before packing.' > NATIVE-COMPATIBILITY-LIMITS.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-Native-Compatibility-Host-${{ github.run_id }}-NOT-APK
+          path: |
+            NATIVE-COMPATIBILITY-LIMITS.txt
+            provider-input-hashes.json
+          retention-days: 30
+          if-no-files-found: warn
