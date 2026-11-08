@@ -1,6 +1,6 @@
 {
   "operation": "three-corrections-selected-Android-and-installation-gates",
-  "status": "SELECTED_NOT_EXECUTED_BLOCKED_ON_INSTALLED_SOURCE_IDENTITY_AND_SOURCE_MATCHED_SIGNED_APKS",
+  "status": "SELECTED_SOURCE_MATCHED_SIGNED_PAIR_READY_FOR_ANDROID_EXECUTION",
   "existing_host_results": "REUSE_NO_REPEATED_HOST_SUITE",
   "source_prerequisites": [
     "Authenticate actual installed CC62 manifest with original public key and compare its source bytes; collect other signed module roots via read-only inventory if needed.",
@@ -43,7 +43,7 @@
       "case": "install-over-and-forward-recovery",
       "checks": [
         "all79 candidate module records authenticate and match selected source",
-        "no79-to78 stale-file confusion in recovery",
+        "both79-file generations authenticate the already-present helper; recovery uses original inventory without deleting code",
         "exact Cobra/DEX/skin/unrelated file preservation against authenticated464",
         "old465/CC63 recovery artifact remains unchanged",
         "new recovery has a greater APK/module generation than candidate and restores pinned pre-correction functional sources",
@@ -58,6 +58,11 @@
     "full Android regression matrix"
   ],
   "physical_Fold_acceptance": "MANDATORY_NOT_RUN",
-  "release_versions": "UNASSIGNED; original465/CC63 recovery already issued; registry and monotonic component checks required before reservation",
-  "signing": "Existing original-key owner gate only; no signer or key-policy changes."
+  "release_versions": "466/467 reserved and original-signed through authority generations53/54; old465 unchanged",
+  "signing": "Existing original-key owner gate only; no signer or key-policy changes.",
+  "application_tests": true,
+  "shutdown_tests": false,
+  "observer_workaround_allowed": false,
+  "signed_pair": "SIGNED-PAIR.json",
+  "source_gate": "PASS actual four exports,14 actual Trakt host cases,10 real Java cases, native ARM64 link and original-key pair signatures"
 }

@@ -1,0 +1,102 @@
+# Appended to the unchanged original selected Search observer before serve().
+# Disposable emulator fixture only; never included in the release APK.
+_original_selected_action = action
+
+
+def _three_identity():
+    result = dict(pid=os.getpid(), skin=xbmc.getSkinDir(), components={}, module_files={}, trakt_files={})
+    for aid in (CC, 'skin.infinity.diggz', 'script.module.tmdbhelper.sync.trakt', *PROVIDERS):
+        addon = xbmcaddon.Addon(aid)
+        result['components'][aid] = dict(version=addon.getAddonInfo('version'), path=xbmcvfs.translatePath(addon.getAddonInfo('path')))
+    controller = Path(result['components'][CC]['path'])
+    for line in (controller/'INFINITY-MODULES.v1').read_text().splitlines():
+        fields = line.split('\t')
+        if fields[0] == 'file':
+            source = controller.parent/fields[2]
+            assert source.resolve().is_relative_to(controller.parent.resolve())
+            result['module_files'][fields[2]] = hashlib.sha256(source.read_bytes()).hexdigest()
+    trakt = Path(result['components']['script.module.tmdbhelper.sync.trakt']['path'])
+    for source in trakt.rglob('*'):
+        if source.is_file() and '__pycache__' not in source.parts and source.suffix not in ('.pyc', '.pyo'):
+            result['trakt_files'][source.relative_to(trakt).as_posix()] = hashlib.sha256(source.read_bytes()).hexdigest()
+    return result
+
+
+def _three_trakt_case(case):
+    from types import SimpleNamespace
+    from jurialmunkey.window import get_property
+    from tmdbhelper_sync_trakt.api.authenticator import TraktAuthenticator
+    from tmdbhelper_sync_trakt.api.token import TraktStoredAccessToken
+    assert case in ('silent-on', 'silent-off', 'manual', 'other-skin')
+    assert xbmc.getSkinDir() == ('skin.estuary' if case == 'other-skin' else 'skin.infinity.diggz')
+    names = ('TraktUserToken', 'TraktIsAuth', 'TraktRefreshTimeStamp', 'TraktRefreshAttempts', 'TraktAttemptedLogin')
+    previous = {n: get_property(n) for n in names}
+    silent_before = xbmc.getCondVisibility('Skin.HasSetting(Infinity.SilentMode)')
+    source = xbmcaddon.Addon('script.module.tmdbhelper.sync.trakt').getAddonInfo('path')
+    report = dict(case=case, pid=os.getpid(), module_source=source, real_Kodi_SDK=True,
+                  real_account_or_HTTP=False, HTTP_boundary_calls=0, device_code_polls=0)
+    try:
+        for name in names:
+            get_property(name, clear_property=True)
+        silent = case != 'silent-off'
+        xbmc.executebuiltin('Skin.SetBool(Infinity.SilentMode)' if silent else 'Skin.Reset(Infinity.SilentMode)', True)
+        until(lambda: xbmc.getCondVisibility('Skin.HasSetting(Infinity.SilentMode)') == silent, 'selected Silent Mode setting', 10)
+        original = json.dumps(dict(access_token='synthetic-qa-access', refresh_token='synthetic-qa-refresh', created_at=0, expires_in=1))
+        api = SimpleNamespace(user_token=SimpleNamespace(value=original), login_if_required=False, req_api_name='Trakt')
+        api.authenticator = TraktAuthenticator(api)
+
+        def no_response(token):
+            assert token == 'synthetic-qa-refresh'
+            report['HTTP_boundary_calls'] += 1
+            return None
+
+        api.set_authorisation_token = no_response
+        api.get_device_code = lambda: dict(user_code='QA-CODE', device_code='synthetic-device-code', verification_url='https://trakt.tv/activate', expires_in=30, interval=1)
+
+        def no_authorization(token):
+            assert token == 'synthetic-device-code'
+            report['device_code_polls'] += 1
+            return None
+
+        api.get_authorisation_token = no_authorization
+        started = time.time()
+        stored = TraktStoredAccessToken(api)
+        if case == 'manual':
+            get_property('TraktRefreshTimeStamp', time.time()+299)
+            assert api.authenticator.login() is None
+            assert report['HTTP_boundary_calls'] == 0
+        else:
+            assert stored.get_authorization() is None
+            assert report['HTTP_boundary_calls'] == 1
+        deadline = get_property('TraktRefreshTimeStamp', is_type=float)
+        assert 299 <= deadline-started <= 335, ('300-second actual SDK timestamp', deadline-started)
+        assert stored.get_authorization() is None
+        assert report['HTTP_boundary_calls'] == (0 if case == 'manual' else 1), 'AUTOMATIC_RETRY_DURING_COOLDOWN'
+        assert api.user_token.value == original, 'SYNTHETIC_ACCOUNT_DATA_MUST_REMAIN_UNCHANGED'
+        report.update(status='PASS_REAL_SDK_SCOPED_TRAKT_CASE', cooldown_seconds=300,
+                      deadline=deadline, timestamp_delta=deadline-started, account_bytes_unchanged=True,
+                      automatic_retry_refused=True, skin=xbmc.getSkinDir(), silent=silent)
+        return report
+    finally:
+        for name, value in previous.items():
+            get_property(name, clear_property=True)
+            if value:
+                get_property(name, value)
+        xbmc.executebuiltin('Skin.SetBool(Infinity.SilentMode)' if silent_before else 'Skin.Reset(Infinity.SilentMode)', True)
+
+
+def action(request, root):
+    kind = request['action']
+    if kind == 'identity':
+        return _three_identity()
+    if kind == 'trakt-case':
+        return _three_trakt_case(request['case'])
+    if kind == 'focus-result':
+        expected = request['file']
+        assert expected.startswith(tuple('plugin://'+p+'/' for p in PROVIDERS))
+        xbmc.executebuiltin('Container.SetViewMode(50)', True)
+        xbmc.executebuiltin('SetFocus(50,%d,absolute)' % request['index'], True)
+        assert xbmc.getInfoLabel('Container(50).ListItem.FileNameAndPath') == expected
+        return dict(status='ACTUAL_NATIVE_RESULT_ROW_FOCUSED_WITH_LIVE_ITEM_READ', file=expected, pid=os.getpid())
+    assert kind in ('snapshot', 'first-use', 'home', 'search', 'select-row'), 'UNSELECTED_QA_ACTION'
+    return _original_selected_action(request, root)

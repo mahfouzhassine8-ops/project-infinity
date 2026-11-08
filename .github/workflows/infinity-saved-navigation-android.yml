@@ -19,7 +19,7 @@ on:
         required: true
         type: choice
         default: select-a-feature
-        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host, infinity-performance-android, cobra-owner-host, cobra-android-launch, cobra-cards-baseline, cobra-cards-host, cobra-fold-more433, cobra-rejected434-controls, infinity-seamless-loading434, cobra-drawer436-prepare, cobra-drawer436-android, cobra-quality444-final, external-player447-android, preview-resume448-android, preview-chrome449-android, preview-layout450-android, preview-fullscreen451-android]
+        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host, infinity-performance-android, cobra-owner-host, cobra-android-launch, cobra-cards-baseline, cobra-cards-host, cobra-fold-more433, cobra-rejected434-controls, infinity-seamless-loading434, cobra-drawer436-prepare, cobra-drawer436-android, cobra-quality444-final, external-player447-android, preview-resume448-android, preview-chrome449-android, preview-layout450-android, preview-fullscreen451-android, three-corrections-android]
       candidate_build:
         description: Existing signed build run (no rebuild)
         required: true
@@ -1812,7 +1812,7 @@ jobs:
           retention-days: 90
           if-no-files-found: error
   android17:
-    if: github.ref != 'refs/heads/work/infinity-final-release-462-20261107' && inputs.feature != 'preview-fullscreen451-android' && inputs.feature != 'preview-layout450-android' && inputs.feature != 'preview-chrome449-android' && inputs.feature != 'preview-resume448-android' && inputs.feature != 'external-player447-android' && inputs.feature != 'infinity-performance-host' && inputs.feature != 'infinity-performance-android' && inputs.feature != 'cobra-owner-host' && inputs.feature != 'cobra-android-launch' && inputs.feature != 'cobra-cards-baseline' && inputs.feature != 'cobra-cards-host' && inputs.feature != 'cobra-fold-more433' && inputs.feature != 'cobra-rejected434-controls' && inputs.feature != 'infinity-seamless-loading434' && inputs.feature != 'cobra-drawer436-prepare' && inputs.feature != 'cobra-drawer436-android' && inputs.feature != 'cobra-quality444-final'
+    if: inputs.feature != 'three-corrections-android' && github.ref != 'refs/heads/work/infinity-final-release-462-20261107' && inputs.feature != 'preview-fullscreen451-android' && inputs.feature != 'preview-layout450-android' && inputs.feature != 'preview-chrome449-android' && inputs.feature != 'preview-resume448-android' && inputs.feature != 'external-player447-android' && inputs.feature != 'infinity-performance-host' && inputs.feature != 'infinity-performance-android' && inputs.feature != 'cobra-owner-host' && inputs.feature != 'cobra-android-launch' && inputs.feature != 'cobra-cards-baseline' && inputs.feature != 'cobra-cards-host' && inputs.feature != 'cobra-fold-more433' && inputs.feature != 'cobra-rejected434-controls' && inputs.feature != 'infinity-seamless-loading434' && inputs.feature != 'cobra-drawer436-prepare' && inputs.feature != 'cobra-drawer436-android' && inputs.feature != 'cobra-quality444-final'
     name: Selected feature ${{ inputs.feature || 'explicit baseline Search request' }}
     runs-on: ubuntu-22.04
     timeout-minutes: 150
@@ -1946,5 +1946,76 @@ jobs:
             api37-support/
             emulator-setup/
             android-provider-inputs/INPUTS.json
+          retention-days: 90
+          if-no-files-found: warn
+  three-corrections-android:
+    name: Signed466467 selected native Search, Silent Trakt, install-over and recovery only
+    if: github.event_name == 'workflow_dispatch' && inputs.feature == 'three-corrections-android' && github.ref == 'refs/heads/work/infinity-three-corrections-20261108'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 55
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      INFINITY_EMULATOR_API: '37.0'
+      INFINITY_EMULATOR_TARGET: google_apis
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '21'}
+      - name: Exact selected three-scope request, finite actions and original live-item observer
+        run: |
+          python3 - <<'PY'
+          import ast,json
+          from pathlib import Path
+          root=Path('repairs/infinity-three-corrections-20261108')
+          for name in ('stage_three_android.py','verify_three_android.py','android_qa_extension.py.txt'):
+            ast.parse((root/name).read_text(),filename=name)
+          request=json.loads((root/'ANDROID-REQUEST.json').read_text())
+          assert request['application_tests'] is True and request['shutdown_tests'] is False
+          assert request['observer_workaround_allowed'] is False
+          assert 'prepare_eight_observer' not in (root/'stage_three_android.py').read_text()
+          assert 'select-row-no-list-read' not in (root/'android_qa_extension.py.txt').read_text()
+          print('PASS exact selected Search/Trakt/install-over/recovery scope; no other feature or shutdown runner')
+          PY
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13596730735', run-id: '42428328498', github-token: '${{ github.token }}', path: three-qa-baseline, merge-multiple: true}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13609794621', run-id: '42462319257', github-token: '${{ github.token }}', path: three-qa-candidate, merge-multiple: true}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13610482359', run-id: '42463180613', github-token: '${{ github.token }}', path: three-qa-recovery, merge-multiple: true}
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with: {cmdline-tools-version: '15859902', packages: 'platform-tools build-tools;35.0.0 cmdline-tools;22.0', log-accepted-android-sdk-licenses: false}
+      - name: Original signatures, real provider sources and reused stock API37 environment
+        run: |
+          sudo apt-get -o Acquire::Retries=3 update -qq
+          sudo apt-get install -y libpulse0 tesseract-ocr
+          python3 -m pip install Pillow==11.3.0
+          python3 repairs/infinity-three-corrections-20261108/stage_three_android.py --baseline three-qa-baseline/Infinity-2103464-Combined-Original-Signer.apk --candidate three-qa-candidate/Infinity-2103466-Combined-Original-Signer.apk --recovery three-qa-recovery/Infinity-2103467-Combined-Original-Signer.apk --sdk "$ANDROID_HOME/build-tools/35.0.0" --out three-qa-fixture
+          python3 repairs/four-repair-20261018/android37_gate.py --sdk-root "$ANDROID_HOME" --out three-qa-platform --pin-tools
+          python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out three-qa-emulator-setup
+          sudo chmod 666 /dev/kvm
+      - uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: '37.0'
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disk-size: 10G
+          avd-name: infinity-four-repair-api37
+          pre-emulator-launch-script: python3 repairs/four-repair-20261018/android37_gate.py --sdk-root "$ANDROID_HOME" --out three-qa-platform --check-avd
+          disable-animations: false
+          emulator-options: -no-window -memory 4096 -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: python3 repairs/infinity-three-corrections-20261108/verify_three_android.py --baseline three-qa-baseline/Infinity-2103464-Combined-Original-Signer.apk --candidate three-qa-candidate/Infinity-2103466-Combined-Original-Signer.apk --recovery three-qa-recovery/Infinity-2103467-Combined-Original-Signer.apk --fixture three-qa-fixture --out three-qa-results
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-ThreeCorrections-Selected-Android-${{ github.run_id }}-NOT-FOLD-ACCEPTANCE
+          path: |
+            three-qa-results/
+            three-qa-fixture/ANDROID-INPUTS.json
+            three-qa-platform/
+            three-qa-emulator-setup/
           retention-days: 90
           if-no-files-found: warn
