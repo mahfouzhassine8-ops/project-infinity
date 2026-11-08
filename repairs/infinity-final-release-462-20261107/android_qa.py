@@ -39,6 +39,8 @@ def snapshot():
     controller=Path(xbmcvfs.translatePath(xbmcaddon.Addon(CC).getAddonInfo('path')))
     result['controller_files']={n:hashlib.sha256((controller/n).read_bytes()).hexdigest() for n in ('infinity_search.py','plugin.py','addon.xml','INFINITY-MODULES.v1','INFINITY-MODULES.v1.sig')}
     result['controller_path']=str(controller)
+    home=xbmcgui.Window(10000)
+    result['appearance_observation']=dict(home_properties={n:home.getProperty(n) for n in ('Infinity.SystemTheme','Infinity.NativeSystemTheme')},labels={n:xbmc.getInfoLabel(n) for n in ('Skin.String(Infinity.DarkAppearance)','Skin.CurrentColourTheme','Skin.CurrentTheme','$VAR[InfinityPaletteCardSurface]','$VAR[InfinityBoardBackground]','$VAR[InfinityCollectiveTextPrimary]')})
     return result
 
 def action(request,root):

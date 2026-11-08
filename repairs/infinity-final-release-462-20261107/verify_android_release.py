@@ -157,6 +157,31 @@ class Device:
         result=self.run([self.adb_bin,'-s',self.serial,'exec-out','screencap','-p'],binary=True)
         assert result.returncode==0 and result.stdout.startswith(b'\x89PNG\r\n\x1a\n')
         path=self.out/(label+'.png');path.write_bytes(result.stdout);return path.name
+    def submit_search_all(self,query,cycle):
+        # Native Search focuses its EditText and asynchronously shows the IME.
+        # Never tap bounds captured before that resize: they may now hit a
+        # provider row. Require the actual focused editor and selected All row.
+        self.until(lambda:'mInputShown=true' in self.shell('dumpsys','input_method'),'actual shown Search IME',45)
+        def form(label):
+            tree=self.nodes(label)
+            edits=[n for n in tree.iter('node') if n.get('class')=='android.widget.EditText' and n.get('enabled')=='true' and n.get('package')==PACKAGE]
+            alls=[n for n in tree.iter('node') if n.get('content-desc') in ('Search All, selected','Search All, select provider') and n.get('clickable')=='true']
+            submits=[n for n in tree.iter('node') if n.get('content-desc')=='Submit Infinity Search']
+            assert len(edits)==len(alls)==len(submits)==1,'ONE_REAL_SEARCH_FORM_REQUIRED'
+            return edits[0],alls[0],submits[0]
+        prefix='search-'+str(cycle)
+        edit,allrow,submit=form(prefix+'-IME-ready')
+        assert edit.get('focused')=='true','NATIVE_SEARCH_EDITOR_MUST_ALREADY_HAVE_FOCUS'
+        self.shell('input','text',query.replace(' ','%s'))
+        # Two consecutive fresh layouts must agree before touching the All row.
+        first=form(prefix+'-typed-1');second=form(prefix+'-typed-2')
+        assert first[1].get('bounds')==second[1].get('bounds'),'SEARCH_LAYOUT_MUST_BE_STABLE_AFTER_IME'
+        assert second[0].get('text')==query,'EXACT_QUERY_MUST_BE_VISIBLE_IN_REAL_EDITOR'
+        self.tap(second[1])
+        edit,allrow,submit=form(prefix+'-All-selected')
+        assert allrow.get('content-desc')=='Search All, selected' and submit.get('text')=='Search All','ACTUAL_SEARCH_ALL_SELECTION_REQUIRED'
+        assert edit.get('focused')=='true' and edit.get('text')==query,'EXACT_FOCUSED_QUERY_BEFORE_REAL_IME_SUBMISSION'
+        self.shell('input','keyevent','66')
     def install(self,path,label):
         result=self.adb('install','--no-streaming','-r',path,timeout=300)
         (self.out/(label+'-INSTALL.txt')).write_text(result)
@@ -253,21 +278,13 @@ def verify(parent,candidate,recovery,fixture,out):
             device.command('home')
             for theme in ('yes','no'):
                 device.shell('cmd','uimode','night',theme);time.sleep(3);device.alive()
-                passed('layout_snapshot_'+mode+'_'+theme,screenshot=device.screenshot(mode+'-'+theme+'-home'),interpretation='Actual emulator surface for visual inspection; no automatic Fold or white-line PASS')
+                appearance=device.command('snapshot')['appearance_observation']
+                passed('layout_snapshot_'+mode+'_'+theme,screenshot=device.screenshot(mode+'-'+theme+'-home'),appearance_observation=appearance,interpretation='Actual emulator surface for visual inspection; no automatic Fold or white-line PASS')
         device.shell('wm','size','1080x2520');device.shell('wm','density','420');device.shell('cmd','uimode','night','yes')
         queries=[('movie','The Matrix'),('movie','Just Friends'),('movie','Inception'),('movie','Toy Story'),('movie','Spirited Away'),('movie','Finding Nemo'),('tv','Re:zero'),('tv','SpongeBob')]
         for cycle,(media,query) in enumerate(queries):
             device.command('home');device.command('search',media=media)
-            def keyboard():
-                tree=device.nodes('search-'+str(cycle))
-                edits=[n for n in tree.iter('node') if n.get('class')=='android.widget.EditText' and n.get('enabled')=='true']
-                return (tree,edits[0]) if len(edits)==1 else None
-            tree,edit=device.until(keyboard,'actual original Infinity Search EditText',60)
-            device.tap(edit)
-            device.until(lambda:'mInputShown=true' in device.shell('dumpsys','input_method'),'actual shown IME',30)
-            device.shell('input','text',query.replace(' ','%s'))
-            # Submit through real Android IME; no synthetic keyboard callback.
-            device.shell('input','keyevent','66')
+            device.submit_search_all(query,cycle)
             def results():
                 value=device.command('snapshot')
                 if value['window']!=10025 or 'action=search-all' not in value['labels']['Container.FolderPath']:return None

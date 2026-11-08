@@ -100,7 +100,7 @@
   },
   "native_search_query_cache": "Eight distinct queries on a fresh fixture avoid reusing a previous query result; no cache purge or provider modifications",
   "original_dependencies": "ANDROID-EXTRA-INPUT-PINS.json records unchanged official archives and exact seven packaged binary API matches; no provider/addon.xml edit",
-  "fixture_setup_revision": 7,
+  "fixture_setup_revision": 8,
   "retained_fixture_ownership_failure": {
     "run": 42430438984,
     "source": "96d74a0cb5d888cb421a23c18714e43420f9769c",
@@ -147,5 +147,20 @@
     "candidate_execution": "NOT_RUN",
     "recovery_execution": "NOT_RUN",
     "correction": "Reuse already-passed original parent entry42423578286. Keep exact parent PM installation, same UID, authenticated live61/268 file digests and data sentinel before normal464 install-over. All successor execution, first use, live78 module hashes, Search/UI and forward recovery gates remain mandatory. No retry/override of an actual successor crash."
+  },
+  "retained_actual_candidate_and_wrong_selection": {
+    "run": 42434395721,
+    "source": "c9ea868321b194325013e2dee048b014e0bb4e48",
+    "artifact": 13599631111,
+    "artifact_sha256": "a6532f81d20d248caa9d921e66a3ebb146e0ee5c4fe42d48cce5f3ab58424f20",
+    "actual_passes": [
+      "Exact462 PM install and authenticated current61/268 file hashes on Android",
+      "Actual signed464 normal chooser launch; original Android install-over UID and data sentinel; all78 installed module files and selected skin files match signedAPK",
+      "Unmodified native provider first use",
+      "Four actual layout captures (manual quality review NOT PASSED)"
+    ],
+    "Search_observation": "The first native IME query opened search-provider=Umbrella and returned21 original rows, not SearchAll. The test had tapped EditText bounds captured before asynchronous IME resize; no post-resize selected-provider proof was retained. This is not a passing grouped Search test. No state_changed or native crash observed in that first provider-specific reply.",
+    "correction": "Remove pre-IME stale-coordinate editor tap. Require actual shown IME and already-focused native editor, exact typed query, two fresh identical All-row bounds, actual All-row tap and explicit selected accessibility state plus SearchAll submit label before native Enter. Original APK/UI and providers unchanged.",
+    "remaining": "Eight grouped Search cycles, heading/touch navigation, watched/Info/Downloads and actual465 recovery still mandatory. Investigate actual Home contrast observations independently; no visual PASS claimed."
   }
 }
