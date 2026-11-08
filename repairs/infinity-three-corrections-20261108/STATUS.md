@@ -22,9 +22,10 @@ whose five captured files match the Fold texts after newline normalization.
 
 CC's original RSA signature verifies. All62 exported signed CC records match
 its78-file manifest. The other16 records belong to three first-party shim roots
-and were not exported. Fresh installed APK hash and those16 source hashes are
-still required before owner installation; displayed versions alone are not
-installation clearance. See evidence/DEVICE-SOURCE-VERIFICATION.json.
+and were not exported. Fresh Fold report collected10:09:49UTC now verifies the installed APK hash
+and all16 remaining sources. Original-public-key verification of its current
+manifest/signature PASS; all78 declared records and the loose helper match.
+Source identity is satisfied; behavior gates still control installation clearance. See evidence/DEVICE-SOURCE-VERIFICATION.json.
 
 ## Umbrella and POV
 
@@ -139,14 +140,15 @@ TV result navigation, Trakt SDK behavior and signed Android recovery. Failed
 mandatory gates remain visible. Do not lengthen the native lease, weaken source
 validation, pre-seed fabricated results or modify third-party providers.
 
-Before Fold installation, use an already authorized ADB host:
-
-    python3 repairs/infinity-three-corrections-20261108/read_device_inventory.py --out INFINITY-INSTALLED-INVENTORY.json
-
-This hashes the APK, declared first-party files and selected provider/Trakt code;
-it reads no user settings/databases and writes only the JSON on the computer.
-No phone writes, app launch/stop, installation, root or permission bypass. Access
-denial remains a blocker. No re-export of the four supplied packages is needed.
+Fresh Fold identity collection is COMPLETE. The owner used the standalone Kodi
+diagnostic with existing access, without ADB/root/permission changes. Actual JSON
+SHA2566812f5e1cfa7a0ddcbb786c7ee7123faaaff8c1c80a222ce696d6ca91cc17fd1:
+APK464 exacteb4ea559… byte identity, original-key manifest signature Verified OK,
+all78 declared records (including the missing16), loose helper1281c379… and all145
+Trakt1.2.8 files match. No unknown Trakt files. Source identity gate PASS.
+See evidence/FOLD-INSTALLED-IDENTITY-VERIFIED.json. The raw report remains private
+in the workspace; only this derived verification is committed. No repeated
+collection or source export is needed. This is not behavior/installation clearance.
 One final owner Fold acceptance is still mandatory after engineering clearance.
 
 Cobra, locked interfaces/themes/navigation, other providers, playback, Continue
@@ -194,3 +196,7 @@ on the uncached host Python3.11.7 archive. The selected QA job now uses the
 runner’s cached3.11 patch, records the exact version and requires host assertions
 enabled. Actual Android/Kodi Python, sources and signed APKs remain unchanged.
 This is a demonstrated test-infrastructure correction, not another APK build.
+
+Current corrected-observer run42470383172, source9402f95a, has advanced beyond
+the host download blocker into real Android execution. Source identity and
+original-key checks are now closed; selected behavior gates remain pending.

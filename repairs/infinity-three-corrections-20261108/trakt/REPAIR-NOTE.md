@@ -118,3 +118,8 @@ optimization omitted SDK calls inside assertions. No Trakt behavior PASS is
 accepted from it. The observer now uses equivalent explicit runtime checks and
 host-side call/timestamp evidence. Real signed forward recovery79/145 hashes and
 data sentinel did PASS independently. No Trakt production source change.
+
+Fresh actual Fold JSON6812f5e1… independently closes the current Trakt145-file
+and APK/CC/module identity gate; original-public-key verification PASS. No further
+source export or identity collection is needed. Actual SDK behavior remains gated
+on corrected-observer run42470383172; no production completion is claimed.

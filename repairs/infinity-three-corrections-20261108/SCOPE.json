@@ -10,7 +10,7 @@
     "production_repair": false
   },
   "installed_CC_report": "0.3.5.62",
-  "installed_APK": "2103464_OWNER_SCREENSHOT_REPORT_NOT_DEVICE_HASH_VERIFIED",
+  "installed_APK": "2103464_FRESH_WHOLE_APK_SHA_MATCH_ORIGINAL_SIGNED_REFERENCE",
   "native_candidate": {
     "path": "repairs/infinity-three-corrections-20261108/native/xbmc/interfaces/legacy/ModuleXbmc.cpp",
     "before_sha256": "215726b011de58f5cfb7cc1c33c42adfeb29f5f4c85a98864ab36a1819b8d888",
@@ -76,10 +76,11 @@
     "archive_sha256": "e14b1e9c8441e78ce5c930dea8c7a5885053011d531df9ec51377fcb18298b65",
     "CC_signature": "ORIGINAL_RSA_VERIFIED",
     "CC_exported_declared_sources_verified": 62,
-    "other_shims_source_bytes": "NOT_EXPORTED; existing installer must verify all16 before any source write",
+    "other_shims_source_bytes": "ALL16_FRESH_HASHES_VERIFIED_IN_FOLD_REPORT",
     "provider_actual_inventory": "MOVIE_TV_SEARCH_ONLY_PASS",
     "Trakt_actual_source": "145_FILES_AUDITED; 2_NOTIFICATION_CHANGES_ONLY; installed CLIENT_ID and AM Lite recovery guard preserved",
     "Trakt_actual_host_cases": 14,
-    "APK_identity": "DISPLAY2103464; SOURCE_HASH_NOT_IN_ARCHIVE"
-  }
+    "APK_identity": "PASS_FRESH_SHA256_eb4ea5594d18d83c5638d10c0c1b22b2124e6c61c303d41908108dcd02b6ae54"
+  },
+  "fresh_Fold_identity": "evidence/FOLD-INSTALLED-IDENTITY-VERIFIED.json"
 }
