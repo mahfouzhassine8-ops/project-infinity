@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "operation": "verify-watchlist-signed468-forward469",
+  "repository": "mahfouzhassine8-ops/project-infinity",
+  "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "inputs": {
+    "baseline": {
+      "version_code": 2103466,
+      "run_id": 42462319257,
+      "source_commit": "5ee1c7ae0bbe295c311aa34c02f6b62688ccb5a7",
+      "workflow_id": 397702717,
+      "artifact": {
+        "id": 13609794621,
+        "name": "Infinity-ThreeCorrections-Original-Signed-2103466-42462319257-INTERNAL-QA",
+        "digest": "sha256:43be57c10a435b255d09bf884915bea590e314f8839bf1f140d94c35b7348f64",
+        "size_in_bytes": 329126268
+      },
+      "apk_sha256": "d366e4b8aadba8484768cfcc0d362c2fc8e0181d78123ea77e04af4f028a3135",
+      "apk_path": "Infinity-2103466-Combined-Original-Signer.apk",
+      "receipt_path": "BUILD-RECEIPT.json"
+    },
+    "candidate": {
+      "version_code": 2103468,
+      "run_id": 42513795660,
+      "source_commit": "2354f0afb8bbc7114fa82f7843973a231de99d2a",
+      "workflow_id": 397702717,
+      "artifact": {
+        "id": 13630921370,
+        "name": "Infinity-Watchlist-Original-Signed-2103468-42513795660-INTERNAL-QA",
+        "digest": "sha256:f5f84a12f92333261dd8765dbaf3ac0e5daa527f9fe7b9e99a7c2f88bdb6de98",
+        "size_in_bytes": 329376269
+      },
+      "apk_sha256": "ad153c06899b4ee7c0f2618ecba25b382c94f7b7af20178fb76010567134ab32",
+      "apk_path": "Infinity-2103468-Combined-Original-Signer.apk",
+      "receipt_path": "BUILD-RECEIPT.json"
+    },
+    "recovery": {
+      "version_code": 2103469,
+      "run_id": 42514440156,
+      "source_commit": "a76e29b84996304241e6b309d56a31e6659ad190",
+      "workflow_id": 397702717,
+      "artifact": {
+        "id": 13631340281,
+        "name": "Infinity-Watchlist-Original-Signed-2103469-42514440156-INTERNAL-QA",
+        "digest": "sha256:f9d054ee500326b77ee2bf4ce8673af2bd54c54115831899d374d931a98dff43",
+        "size_in_bytes": 329126132
+      },
+      "apk_sha256": "804eebc57af2e4ef4e5418b56994bda64eb7fd7e7f2c0653b5c6e2a9f7833058",
+      "apk_path": "Infinity-2103469-Combined-Original-Signer.apk",
+      "receipt_path": "BUILD-RECEIPT.json"
+    }
+  },
+  "runtime_source_pins_sha256": "494ff2d34a49ecd79d3c662dad1eb860f399eb39f06f71c4834a1ef5493e1056",
+  "android_request_sha256": "bf4e461c140d152167b2a8395cd3538c062825615ea1383a8a3d749777e9dd61",
+  "harness_host_result_sha256": "b394d2d7d30228b1ea793092749bfac04be3f25ec044885eb001b60555cdc8b6"
+}

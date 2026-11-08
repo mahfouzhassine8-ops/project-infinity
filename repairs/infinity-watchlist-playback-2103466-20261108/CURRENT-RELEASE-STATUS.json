@@ -1,0 +1,55 @@
+{
+  "status": "PASS_ORIGINAL_SIGNED_PAIR_PENDING_SELECTED_ANDROID_AND_FOLD",
+  "protected_baseline": {
+    "versionCode": 2103466,
+    "commit": "5ee1c7ae0bbe295c311aa34c02f6b62688ccb5a7",
+    "APK_SHA256": "d366e4b8aadba8484768cfcc0d362c2fc8e0181d78123ea77e04af4f028a3135"
+  },
+  "runtime_source_pins_sha256": "494ff2d34a49ecd79d3c662dad1eb860f399eb39f06f71c4834a1ef5493e1056",
+  "host": {
+    "status": "PASS",
+    "unique_cases": 28,
+    "original17": "Retained with original source binding",
+    "receipt_sha256": "749498af5aef0fa8caa6f8d5f9a26d223106917ef808811cbfeadf3fdc180d5c"
+  },
+  "ARM64": {
+    "status": "PASS_REAL_FOUR_OBJECTS_FULL_NATIVE_LINK_UNCHANGED_ABI",
+    "run_id": 42509875214,
+    "native_sha256": "d27779dd8d36d573e0dc75eb3309b38ac89d7ce158ebf632257fc23a17c0af99"
+  },
+  "module_preparation": {
+    "status": "PASS_ORIGINAL_SIGNED_COMPLETE80_AND_THIRTEEN_ACTUAL_INSTALLER_CASES",
+    "run_id": 42512905724,
+    "module_audit_sha256": "d5dde95eaa3e73e6947ff23e00a786fe68b6440ce70bb2f4985bc45bcf4e87e9"
+  },
+  "candidate": {
+    "versionCode": 2103468,
+    "CC": "0.3.5.66",
+    "Cobra": 2103445,
+    "signing_run": 42513795660,
+    "artifact_id": 13630921370,
+    "APK_SHA256": "ad153c06899b4ee7c0f2618ecba25b382c94f7b7af20178fb76010567134ab32",
+    "status": "PASS_ORIGINAL_CERTIFICATE_AND_COMPLETE_PAYLOAD_PRESERVATION"
+  },
+  "recovery": {
+    "versionCode": 2103469,
+    "CC": "0.3.5.67",
+    "Cobra": 2103445,
+    "signing_run": 42514440156,
+    "status": "PASS_ORIGINAL_CERTIFICATE_AND_COMPLETE_BASE466_PAYLOAD_PRESERVATION",
+    "functional_source": "EXACT_PROTECTED2103466; inactive same authenticated helper retained",
+    "artifact_id": 13631340281,
+    "APK_SHA256": "804eebc57af2e4ef4e5418b56994bda64eb7fd7e7f2c0653b5c6e2a9f7833058"
+  },
+  "Android": "SELECTED_TEN_CASES_TO_RUN_ON_EXACT_SIGNED_PAIR",
+  "Fold": "NOT_RUN_PENDING_ONE_OWNER_ACCEPTANCE",
+  "shutdown": "NOT_SELECTED",
+  "accepted_pointer_updated": false,
+  "owner_device_access": false,
+  "limitations": [
+    "Successor supplied only by existing verified_next local catalogue evidence; unavailable successor withheld.",
+    "Exact current Umbrella/POV source pins required for scoped enrichment; changed sources retain ordinary playback.",
+    "Folder popup navigation retains baseline behavior; new origin is verified for direct Watchlist selection and playable-title Play."
+  ],
+  "preservation": "Only six authorized native source files, three Command Center Python files and sole saved_playback.py helper, plus necessary release metadata; other runtime sources unchanged."
+}
