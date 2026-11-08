@@ -1,0 +1,38 @@
+{
+  "APK": false,
+  "Search_getInfoLabel_source_unchanged": true,
+  "application_tests": false,
+  "baseline_native_sha256": "ee3be7c7a95b86f8357539001fcd50bedbd80217b02f130d649f7f57e6075794",
+  "changed": {
+    "xbmc/filesystem/PluginDirectory.cpp": {
+      "after": "d36a14db6752babcc1f72b86e9537faeb4d6f14b990c56f81a7952cb71655c4a",
+      "before": "c6b2a76ce81a44a42abc3cf42a19bd6ab6b96edf7c078f7e9b4debcf70b9d4fc"
+    },
+    "xbmc/guilib/InfinitySavedNavigation.h": {
+      "after": "0f574675c1339eca52b372b91e18ce2b255283ee020a39e44c83295d7b156092",
+      "before": "dd584b26513f549fdf1eeb3ab1b9d5dc7190f16486fc926eb78bd2ab9e27e9ce"
+    },
+    "xbmc/guilib/InfinitySavedNavigationState.h": {
+      "after": "7885116d5c9b869cea813f0ad34dc240efecd1cf1e05913c916d7a9e0a4aebbe",
+      "before": "ca39154769bdcde1c0dc2c5874c441c6f19dae49e9878f0a8b7adeffa5555173"
+    },
+    "xbmc/interfaces/generic/ScriptInvocationManager.cpp": {
+      "after": "eb46c1df3a4e8a249e7b00cbcbf50c91b16a822e6b323e523f19098e388ffd20",
+      "before": "a9eb9a48269adf3ed838c18a3247e469056d9784bfeca85833957cebb45c8661"
+    },
+    "xbmc/interfaces/json-rpc/PlayerOperations.cpp": {
+      "after": "adc78b8aba4f81393f56e8d83459ddf4ad14d1f662d12c246853ee21b2068824",
+      "before": "5b17c13e4405c20f21bc2f066cd780ecd304f656102bd49fec267b716005289d"
+    },
+    "xbmc/interfaces/legacy/Player.cpp": {
+      "after": "70dfdc45ea6f8d890b9c11982ddf6c884c5c4223edde2cbc6290af0b16e63e45",
+      "before": "94c5a9a3422fa4d004bc552d02fde8a88de6e00ccc4bf03b84e5ee773a5981f2"
+    }
+  },
+  "protected_baseline": 2103466,
+  "shutdown_tests": false,
+  "signing": false,
+  "source_commit": "392ac55acf32402a60e7e903dcc1261b3bf35617",
+  "status": "PASS_EXACT466_PLUS_SIX_SCOPED_OBSERVATION_SOURCES",
+  "unchanged_native_sources": 9405
+}

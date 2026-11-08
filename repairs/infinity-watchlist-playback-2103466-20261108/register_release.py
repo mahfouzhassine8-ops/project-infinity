@@ -20,7 +20,7 @@ ISO = ROOT / 'repairs/dual-experience-isolation-2103420'
 sys.path[:0] = [str(HERE), str(ISO)]
 import prepare_release as prep
 from inventory import canonical, digest, file_sha, load, save, validate_names
-from component_bundles import read_bundle
+from component_bundles import read_bundle, set_version
 from release_gate import require
 from release_authority import AUTHORITY_PATH, transition, verify_evidence
 
@@ -45,6 +45,7 @@ def gh(path):
 
 
 def request_data(path):
+    require(path.is_relative_to(ROOT), 'COMMITTED_TASK_REQUEST_PATH_REQUIRED')
     request = load(path)
     require(type(request['run_id']) is int and request['run_id'] > 0 and
             re.fullmatch('[0-9a-f]{40}', request['source_commit']) is not None, 'FROZEN_PREPARATION_PRODUCER')
@@ -69,11 +70,12 @@ def bindings(producer, request):
         name = p.relative_to(ROOT).as_posix()
         require(p.read_bytes() == prep.git('show', producer + ':' + name), 'UNCHANGED_OFFICIAL_PREPARATION_SOURCE:' + name)
         result[name] = file_sha(p)
-    result[request.relative_to(ROOT).as_posix()] = file_sha(request) if request.is_relative_to(ROOT) else None
+    result[request.relative_to(ROOT).as_posix()] = file_sha(request)
     return result
 
 
 def official(prepared, version, audit, request):
+    request = request.resolve()
     frozen = request_data(request)
     require(version in (2103468, 2103469), 'EXACT_SELECTED_WATCHLIST_PAIR')
     producer, run_id = frozen['source_commit'], frozen['run_id']
@@ -138,6 +140,17 @@ def official(prepared, version, audit, request):
     require(set(full) - set(baseline['payload']) == {cc_prefix + prep.HELPER} and not set(baseline['payload']) - set(full), 'ONE_ADDED_HELPER_FULL_PAYLOAD_MAP')
     require(all(full[key] == value for key, value in baseline['payload'].items() if key not in allowed), 'ALL_UNDECLARED_NATIVE_CC_SEARCH_TRAKT_SKIN_DEX_PAYLOAD_IDENTICAL466')
     require(full['member:' + prep.NATIVE]['sha256'] == wanted_native, 'EXACT_MATCHED_CANDIDATE_OR_NATIVE466_RECOVERY')
+    changed = {key.removeprefix('member:') for key in full if key.startswith('member:') and full[key] != baseline['payload'].get(key)}
+    require(set(proof['changed_members']) == changed | {'AndroidManifest.xml'}, 'EXACT_DECLARED_FULL_MEMBER_CHANGES')
+    for owner, meta in metas.items():
+        with ZipFile(prepared / 'components' / catalog['bundles'][owner]['file']) as z:
+            for name, row in meta['members'].items():
+                raw = z.read('payload/' + name)
+                normalized = prep.normalize_manifest(raw)[0] if name == 'AndroidManifest.xml' else raw
+                require(meta['payload']['member:' + name]['sha256'] == digest(normalized), 'COMPLETE_COMPONENT_RAW_PAYLOAD_BINDING:' + name)
+                if name in proof['changed_members']:
+                    actual = set_version(raw, version) if name == 'AndroidManifest.xml' else raw
+                    require(digest(actual) == proof['changed_members'][name], 'FROZEN_PREPARATION_MEMBER_HASH:' + name)
     with tempfile.TemporaryDirectory() as temp:
         modules = Path(temp) / 'modules'
         modules.mkdir()

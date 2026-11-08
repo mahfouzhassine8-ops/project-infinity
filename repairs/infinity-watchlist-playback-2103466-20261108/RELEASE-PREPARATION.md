@@ -67,3 +67,30 @@ also checks a later APK against those frozen member hashes, ignoring only APK
 signature members. It does not verify the APK signing certificate; the existing
 original signer/release gate remains responsible for signature and release
 admission. Neither successful preparation nor comparison is install acceptance.
+
+## Read-only registration proposals
+
+`register_release.py` adapts the unchanged `release_three.py` review pattern.
+It runs only after the official preparation completes and root freezes
+`PREPARED-PAIR-REQUEST.json`: `run_id`, full `source_commit`, `artifacts` keyed
+by `2103468` and `2103469` (each has `id`, `name`, `digest`, `size_in_bytes`),
+and the exact `module_audit_sha256`. Retain each downloaded artifact archive
+as `PREPARED_DIRECTORY/../ARTIFACT_ID.zip` beside its extracted directory.
+
+`propose --prepared DIR --version 2103468 --audit MODULE_AUDIT --out PROPOSAL`
+produces generation55 from exact canonical67 authority. Optional `--previous`
+selects a reviewed predecessor JSON; version69 requires the same-pair68
+predecessor and produces generation56, restoring baseline66 functionality.
+No authority or ref is changed. `check_registered` recomputes the exact proposal
+from the previous authority commit and compares it to the actual authority;
+it also requires `RELEASE-REQUEST.json` with matching `version` and
+`publication: false`. The original transition/evidence gates still run.
+
+Review validates original-workflow API provenance, whole artifact digest and
+members, every owner bundle/raw-payload binding, baseline66 full payload map,
+unchanged preparation tools and source-bound host/review receipts, complete80
+original-key module signatures and exact actual-Java-tested source hashes.
+`compare --parent BASE66 --candidate APK --prepared DIR --out AUDIT --sdk SDK`
+adds the existing apksigner original-certificate check to exact APK-member
+comparison. All proposal/report metadata remains engineering QA only, with
+publication and accepted-pointer updates false and Android/Fold pending.
