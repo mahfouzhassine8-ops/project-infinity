@@ -107,6 +107,38 @@ class Device:
         if not addon['enabled']:assert self.rpc('Addons.SetAddonEnabled',dict(addonid=QA,enabled=True))=='OK'
         assert self.rpc('Addons.ExecuteAddon',dict(addonid=QA))=='OK'
         self.until(lambda:self.read_json(QAROOT+'/ready.json').get('pid')==self.pid,'fresh QA observer',90)
+        self.dismiss_immersive_education()
+    def dismiss_immersive_education(self):
+        # Original stock OS tutorial only, acknowledged with measured input.
+        # Never disable an OS/app guard or click an unknown provider prompt.
+        def visible():
+            dump=self.shell('dumpsys','window','windows')
+            rows=[r for r in re.split(r'(?m)^  Window #\d+ ',dump) if 'ImmersiveModeConfirmation}' in r.split('\n')[0] and 'isVisible=true' in r]
+            return dump,rows
+        dump,rows=visible()
+        if not rows:return False
+        import sys
+        sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'infinity-preview-2103450-fullscreen-display/android-qa'))
+        from immersive_prompt import locate
+        from PIL import Image
+        (self.out/'OS-immersive-window.txt').write_text(dump)
+        deadline=time.monotonic()+8;previous=None;number=0
+        while time.monotonic()<deadline:
+            dump,rows=visible();assert len(rows)==1,'ONE_ACTUAL_OS_TUTORIAL_WINDOW_REQUIRED'
+            row=rows[0]
+            assert 'mOwnerUid=1000' in row or re.search(r'package(?:Name)?=com\.android\.systemui\b',row),'TRUSTED_SYSTEM_UI_OWNER_REQUIRED'
+            region=re.search(r'touchable region=SkRegion\(\((-?\d+),(-?\d+),(-?\d+),(-?\d+)\)\)',row)
+            assert region,'OS_TUTORIAL_TOUCHABLE_REGION_REQUIRED'
+            region=list(map(int,region.groups()));name=self.screenshot('OS-immersive-'+str(number));number+=1
+            try:bounds=locate(Image.open(self.out/name).convert('RGB'),region,self.out/('OS-immersive-OCR-'+str(number)))
+            except AssertionError:previous=None;time.sleep(.1);continue
+            target=(bounds,region)
+            if target==previous:
+                a,b,c,d=bounds;self.shell('input','tap',str((a+c)//2),str((b+d)//2));break
+            previous=target;time.sleep(.1)
+        else:raise RuntimeError('OS_TUTORIAL_HAS_NO_STABLE_VERIFIED_GOT_IT_TARGET')
+        self.until(lambda:not visible()[1],'actual OS fullscreen tutorial closes',3.5)
+        return True
     def command(self,action,seconds=90,**params):
         self.alive();self.sequence+=1
         req=dict(pid=self.pid,sequence=self.sequence,action=action,**params)
@@ -180,7 +212,10 @@ def verify(parent,candidate,recovery,fixture,out):
         device.shell('restorecon','-RF',backing)
         ownership_after=device.shell('ls','-ldn',backing,backing+'/files',backing+'/files/.kodi')
         report['fresh_fixture_ownership']=dict(app_uid=int(uid),before=ownership_before,after=ownership_after,only_disposable_package_tree=True,APK_modified=False,app_security_changed=False)
-        device.adb('unroot');device.adb('wait-for-device')
+        # Keep this disposable debuggable emulator's ADB transport privileged
+        # so it can read the app-owned observer/profile files. The application
+        # itself keeps the ordinary UID above; SELinux and app guards stay on.
+        report['fresh_fixture_ownership']['ADB_transport']='Debug-emulator root retained only for test-file observation; application UID unchanged'
         report['parent_entry']=device.enter('parent462')
         inputs=json.loads((fixture/'ANDROID-INPUTS.json').read_text())
         for row in inputs['original_provider_archives']:

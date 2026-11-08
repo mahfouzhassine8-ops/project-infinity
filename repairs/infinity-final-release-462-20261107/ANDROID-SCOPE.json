@@ -100,7 +100,7 @@
   },
   "native_search_query_cache": "Eight distinct queries on a fresh fixture avoid reusing a previous query result; no cache purge or provider modifications",
   "original_dependencies": "ANDROID-EXTRA-INPUT-PINS.json records unchanged official archives and exact seven packaged binary API matches; no provider/addon.xml edit",
-  "fixture_setup_revision": 4,
+  "fixture_setup_revision": 5,
   "retained_fixture_ownership_failure": {
     "run": 42430438984,
     "source": "96d74a0cb5d888cb421a23c18714e43420f9769c",
@@ -110,8 +110,21 @@
     "candidate_execution": "NOT_RUN",
     "recovery_execution": "NOT_RUN",
     "Search_or_UI_cases_passed": 0,
-    "correction": "Restore real fresh app UID and stock SELinux labels only on disposable /data/media/0/Android/data/com.projectinfinity.kodi, using existing proven feature fixture technique; return adbd to unprivileged before normal Splash/chooser; no APK/data reset/guard changes"
+    "correction": "Restore fresh app UID and stock labels on disposable package tree; retain ADB debug root for test-file observation as in original feature transport. App sandbox, APK, user device and production guards unchanged."
   },
   "transport_correction": "Decode the normal Kodi TCP JSON stream and ignore unrelated notifications while requiring the exact response ID; unchanged size/deadline bounds and error refusal",
-  "Downloads_dispatch": "Use actual RunScript(script.infinity.commandcenter,downloads), which calls existing library_navigation.activate(files,downloads_only=True) and preserves infinity-downloads-only native route tag"
+  "Downloads_dispatch": "Use actual RunScript(script.infinity.commandcenter,downloads), which calls existing library_navigation.activate(files,downloads_only=True) and preserves infinity-downloads-only native route tag",
+  "retained_test_transport_failure": {
+    "run": 42431776673,
+    "source": "890e0ed7f54fb0864288ae2bc70e2c5d51ed4f96",
+    "artifact": 13597603138,
+    "artifact_sha256": "1e219f0bbf014613ed248246f3d242aac53a1e46434ad67cf89a0f60653e7542",
+    "confirmed": "Original462 starts through normal chooser asPID4684 and native JSONRPC responds; all selected immutable provider versions are discovered. File ownership correction is successful.",
+    "failure": "After explicitly unrooting the test ADB daemon, shell cannot read app-owned QA/profile/kodi.log files; observer readiness times out. Actual stock OS fullscreen tutorial also remains visible.",
+    "correction": "Retain debuggable qemu-only ADB root for file observation, keep actual app UID10234 and SELinux/app guards unchanged; acknowledge only the actually visible SystemUI fullscreen tutorial with two fresh identical OCR targets measured within trusted OS touchable region.",
+    "candidate_execution": "NOT_RUN",
+    "recovery_execution": "NOT_RUN",
+    "Search_or_UI_cases_passed": 0
+  },
+  "OS_first_use": "Reuse existing pure immersive_prompt.locate helper only; no Preview/Cobra application tests, no OS compatibility override, no unknown-dialog dismissal"
 }

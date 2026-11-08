@@ -88,7 +88,8 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get -o Acquire::Retries=3 update -qq
-          sudo apt-get install -y libpulse0 ffmpeg
+          sudo apt-get install -y libpulse0 ffmpeg tesseract-ocr
+          python3 -m pip install Pillow==11.3.0
           python3 repairs/infinity-final-release-462-20261107/stage_android_release.py --parent parent462/Infinity-2103462-Combined-Original-Signer.apk --candidate signed464/Infinity-2103464-Combined-Original-Signer.apk --recovery signed465/Infinity-2103465-Combined-Original-Signer.apk --current current268 --sdk "$ANDROID_HOME/build-tools/35.0.0" --out release-android-fixture
           python3 repairs/four-repair-20261018/android37_gate.py --sdk-root "$ANDROID_HOME" --out release-platform --pin-tools
           python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out release-emulator-setup
