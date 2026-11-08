@@ -1,249 +1,161 @@
-# Infinity three-correction handoff — not releasable
+# Infinity three corrections — release blocked by Android Search gate
 
-Target reported by the owner: combined APK2103464, Infinity2103464,
-Cobra2103445 and Command Center0.3.5.62. These values supersede the earlier
-462/CC61 report. No device was connected or changed during this investigation.
-The owner directly confirmed these versions and Trakt sync1.2.8 on the Fold.
-Trakt auto-update is ON and remains unchanged. Version labels are confirmed;
-The four installed-source exports are now supplied in
-Infinity_Source_Exports_For_Work.zip (SHA256
-e14b1e9c8441e78ce5c930dea8c7a5885053011d531df9ec51377fcb18298b65).
-The remaining device identity gap is the installed APK hash and the16 source
-records belonging to the other three signed first-party module roots.
+The supplied installed-source evidence is verified. Original-key candidate
+2103466 and matching forward recovery2103467 are built and authenticated.
+Neither is cleared as a completed combined repair: the first cold Umbrella
+Search timed out on the selected Android emulator. No Fold installation or
+acceptance has occurred. The accepted release pointer is unchanged.
 
-## Umbrella/POV
+## Actual baseline and source evidence
 
-The reported Movies message, “Search interface not verified for this category”,
-maps to an installed provider with no admitted operation. It is distinct from
-the Kodi disabled-add-on state.
+Owner-confirmed displayed baseline: combined APK2103464, Infinity2103464,
+Cobra2103445, CC0.3.5.62, Umbrella6.8.00, POV6.11.02 and Trakt sync1.2.8.
+Trakt auto-update remains enabled.
 
-The authenticated original APK CC62 package contains the old provider inventory
-and does not contain native_search_compatibility.py. The actual installed CC62
-export additionally contains the exact approved helper as an unlisted loose
-file, while its inventory and78-file signed manifest are still original.
-The original RSA signature and all62 exported declared CC source hashes PASS.
-This directly establishes an inactive partial compatibility update. A focused integration test
-ran the actual shipped CC62 inventory against the exact public provider sources
-used by the existing compatibility work. Both were unsupported. Repeating only
-that inventory integration with the two unchanged approved source files admitted
-Movie Search and TV Search for both providers. No provider code was imported,
-executed or modified. No navigation or identity operation was granted.
+Infinity_Source_Exports_For_Work.zip SHA256:
+`e14b1e9c8441e78ce5c930dea8c7a5885053011d531df9ec51377fcb18298b65`.
+All seven outer manifest entries, four nested export receipts, supplied file
+checksums, ZIP CRCs and source-only/path constraints PASS. Supplied file counts:
+CC65, POV210, Trakt145 and five targeted Umbrella files. This does not claim a
+complete Umbrella tree was exported. Runtime QA uses unmodified publisher6.8.00
+whose five captured files match the Fold texts after newline normalization.
 
-The passing provider matrix42435806833 is reused. CC62-SOURCE-REUSE.json pins the
-existing approved source files; no additional compatibility development was
-needed. The same actual inventory scan now also passes against the supplied
-Umbrella6.8.00 and POV6.11.02 installed sources: old CC62 rejects both, and the
-approved two-file overlay admits only native Movie/TV Search. This is source
-integration evidence, not actual Android result/heading execution.
-See evidence/DEVICE-SOURCE-VERIFICATION.json. No provider code was executed.
+CC's original RSA signature verifies. All62 exported signed CC records match
+its78-file manifest. The other16 records belong to three first-party shim roots
+and were not exported. Fresh installed APK hash and those16 source hashes are
+still required before owner installation; displayed versions alone are not
+installation clearance. See evidence/DEVICE-SOURCE-VERIFICATION.json.
 
-The CC61 ZIP from42448904041 is excluded from this device's update path.
-Do not downgrade CC62, overwrite an unknown same-version generation, or assume
-the host fixture versions are the owner's installed provider versions.
+## Umbrella and POV
 
-## Native Search crash
+Actual CC62 contains its old inventory plus the exact approved helper as an
+unlisted, inactive file. This explains “Search interface not verified for this
+category”. The two approved files from16af10e4 are reused unchanged:
+provider_inventory.py and native_search_compatibility.py. Actual-source scans
+admit only native movie/search and tv/search for both installed providers.
+Host run42435806833 is reused. No provider code or other provider logic changed.
+The obsolete CC61 ZIP is excluded.
 
-The retained failing run42437719318 records Scudo invalid-chunk-state during
-deallocation. The guest ARM64 stack includes destruction of a CGUIListItem
-property map, release of a shared CFileItem, CGUIInfoManager::GetMultiInfoLabel,
-and XBMCAddon::xbmc::getInfoLabel. The corresponding original source functions
-were recovered from authenticated source artifact13274901825 and checked against
-the signed native source map. GUIInfoManager.cpp, GUIInfoHelper.cpp,
-ModuleXbmc.cpp and AddonUtils.cpp match the preserved native source identities;
-the four existing464 keyboard/graphics differences do not change these files.
+Both new CC generations authenticate79 records with the original module signer.
+CC64 activates the approved inventory/helper. CC65 recovery authenticates the
+same helper but restores the old inventory; no source deletion is required.
 
-The live-container helper copies a shared pointer out of the container. The
-Python getInfoLabel API reaches that helper without the GUI guard already used
-by getCondVisibility. Container reset can clear the item vector during navigation.
-This is an evidence-supported unsafe access path consistent with the retained
-stack, not proof that it is the only cause of every Search crash on the Fold.
+## Native candidate
 
-An isolated native candidate changes only getInfoLabel and adds one standard
-header in ModuleXbmc.cpp. For Infinity's skin and labels containing ListItem,
-it uses the existing XBMCAddonUtils::GuiLock for the full label evaluation and
-item-reference release. That guard already manages the Python call boundary
-and the original frame/graphics lock order. There is no new mutex, altered
-container ownership, observer workaround, or modification to GuiLock itself.
-Other skins, non-item labels and every other function retain their original
-implementation. The source is a candidate, not a released native correction.
+Retained SIGABRT42437719318 shows CGUIListItem property-map destruction through
+GetMultiInfoLabel and Python getInfoLabel. The inspected production path copies
+a live container item without the GUI guard already used by related APIs.
+The candidate changes only ModuleXbmc.cpp: Infinity ListItem labels use existing
+XBMCAddonUtils::GuiLock for evaluation and item release, with its existing
+Python/GIL and GUI lock ordering. No global mutex, provider or observer repair.
+This is an evidence-supported unsafe access path, not proof of every crash cause.
 
-The focused host test extracts the real original/candidate getInfoLabel bodies
-and the real unchanged GuiLock constructor/destructor. It checks access during
-a simulated GUI mutation, four item-label forms, existing lock order, and the
-unrelated-skin/non-item/null controls. The original read completes while the
-mutation guard is held; the candidate waits and performs guarded reads. PASS.
-These are host adapters, not the complete Kodi container or Android process.
+Real ARM64 compile/full native link PASS42453405536. Only one of9411 native
+sources changed; all71213 strong exports and11 dependencies remain. Linked
+native SHA256: ee3be7c7a95b86f8357539001fcd50bedbd80217b02f130d649f7f57e6075794.
+The candidate's actual AArch64 branch paths reach the unchanged GuiLock.
+No native recompile is selected.
 
-Real Android ARM64 compilation and the full native engine link PASS in
-[run42453405536](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/42453405536),
-sourcea2e803e7927c06ed4b7a8e526b688a730a1f31da, artifact13606537849.
-The downloaded artifact's source maps confirm9,410 unchanged native files and
-only the reviewed ModuleXbmc.cpp change. All71,213 strong native exports and all
-11 runtime dependencies match the authenticated464 engine. The changed
-getInfoLabel implementation is present in the linked ARM64 library. See
-evidence/ARM64-ARTIFACT-IDENTITY.json and evidence/ARM64-LINK-VERIFIED.json.
-Read-only ELF inspection also resolves actual AArch64 direct branch paths from
-getInfoLabel through optional construction/destruction to the unchanged GuiLock
-constructor/destructor (evidence/ARM64-GUARD-LINKAGE.json). The reproducible
-inspector accepts only this exact linked-library hash.
-The internal library is not an APK or installable update.
-
-Android repeated Search/provider-selection/navigation and deadlock checks have
-NOT RUN. No production crash repair is claimed. Existing isolated-heading
-PASS42441430136 and eight-cycle
-diagnostic PASS42443988873 attempt2 remain valid diagnostic evidence only. The
-eight-cycle observer modification is not incorporated into production.
+Diagnostic heading42441430136 and eight-cycle42443988873 attempt2 are retained
+as diagnostic evidence. Their disposable observer workaround is excluded from
+this production candidate and current observer. Eight-search and heading
+acceptance for the compiled candidate remain incomplete.
 
 ## Silent Mode / Trakt
 
-The existing Silent Mode implementation explicitly gates passive KaiToast
-presentation and leaves interactive dialogs intact. The bundled Infinity Trakt
-module manages local lists and has no OAuth authentication retry loop. It is
-therefore not the notification owner for the located sync-module dialog.
+The exact dialog producer is script.module.tmdbhelper.sync.trakt1.2.8:
+TraktAuthenticator.notify_failure(), called after
+TraktStoredAccessToken.on_failure() records the failure and300-second cooldown.
+The two-file correction from514a82e5 gates only automatic failure presentation
+on Infinity Silent Mode and forwards existing force_login for manual sign-in.
+Logging, cooldown, token operations, lists/tracking and other skins are retained.
 
-The exact screenshot wording has now been located in the pinned upstream
-script.module.tmdbhelper.sync.trakt1.2.8 source, commit
-fff6d9b38820d2e64e0b00cb2b469c72ff3fbe2b. TraktAuthenticator.notify_failure()
-uses title32103 and message32111. TraktStoredAccessToken.on_failure() logs the
-error and sets the300-second TraktRefreshTimeStamp before notification.
+All145 installed source files were audited. The two patch preimages exactly
+match the reference. The installed public application identifier and Account
+Manager Lite sentinel guard are preserved byte-for-byte. The original13 tests
+plus the actual sentinel case PASS against the installed recovery dependency.
+Before forward-version metadata,143 files remain identical. The packaged tree
+changes those two notification files and addon.xml version metadata only.
+No user settings, account/token data or databases were supplied or read.
 
-A presentation-only two-file correction is staged under trakt/candidate.
-notify_failure checks Infinity Silent Mode for automatic failures only; recover
-forwards its existing force_login flag so manual sign-in keeps the original
-failure dialog and cooldown bypass. The second401 failure uses the automatic
-path. No global dialog suppression or credential/Watchlist/tracking change was made.
+Android run42465125757 attempt2 confirms Kodi selects all145 exact candidate
+Trakt files from bundled1.2.8.1 over pre-existing external1.2.8. External source
+and profile are not overwritten. Auto-update is unchanged; a future upstream
+update can supersede this patch and needs its own source verification.
 
-Thirteen focused host checks PASS, including original failure reproduction,
-automatic ON/OFF, other skins, cooldown expiry, manual sign-in, second401 and
-successful refresh preservation. A complete pinned upstream tree audit PASS
-confirms exactly2 modified files and144 unchanged files. These are local host
-results with synthetic SDK/HTTP/clock boundaries, not Android/Fold acceptance.
+## Signed pair and preservation
 
-The complete installed145-file source export is now verified. Its two patch
-preimages exactly match514a82e5. Two other installed files differ from the public
-reference: keys.py contains an installed CLIENT_ID application identifier and
-recovery.py contains the Account Manager Lite sentinel-refresh-token guard.
-Both are preserved byte-for-byte. The actual-source candidate changes only the
-two approved notification files, preserving143 others. The original13 host
-cases were run once against this changed installed recovery dependency, plus
-one sentinel-preservation case:14 PASS. The old reference evidence remains
-unchanged. Auto-update is enabled and remains unchanged.
-See trakt/REPAIR-NOTE.md for exact call paths, source pins and remaining gates.
+| Purpose | APK / Infinity | Cobra | CC | Trakt | SHA256 |
+| --- | --- | --- | --- | --- | --- |
+| Internal candidate | 2103466 | 2103445 | 0.3.5.64 | 1.2.8.1 | d366e4b8aadba8484768cfcc0d362c2fc8e0181d78123ea77e04af4f028a3135 |
+| Forward recovery | 2103467 | 2103445 | 0.3.5.65 | 1.2.8.2 | 03e43b2b6fb91627722559aeb835c498203e6217efe2f54f85083beb5ca58958 |
 
-An equal-version APK copy alone cannot establish deployment: the unchanged
-Kodi AddonManager::FindAddons scans the external add-on directory after bundled
-directories and selects the external copy when versions are equal. Packaging
-must prove the selected Trakt path/version/hash on Android with an existing
-external1.2.8 installation. The staged standard bundled-source route uses
-forward1.2.8.1 metadata and1.2.8.2 recovery, retaining the complete installed
-functional source except the two approved notification edits. There is no
-generic updater, forced external source overwrite or settings change.
+Original certificate:
+`d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7`.
+Sole original owner-gated signing workflow397702717 PASS:
+42462319257 (candidate) and42463180613 (recovery). Original signer, gate,
+assembler and key protections are unchanged. SIGNED-PAIR.json binds sources,
+artifacts and APK hashes. No additional build/signing is selected.
 
-## Device verification
+Preparation42460784588: ten real unchanged-Java installer cases PASS, including
+62→64, same-generation no-op,64→65 recovery, retaining a newer generation,
+unknown/tampered/interrupted signature refusal and known partial resume.
+Signed candidate has7615 unchanged existing APK members, seven necessary
+existing changes and146 additions (CC helper plus145 installed Trakt files).
+Recovery has7617 unchanged existing members and five metadata changes.
+All DEX, Cobra, skin270, minimal Android contract and every unrelated member
+remain byte-identical to authenticated464. No profile migration/updater added.
 
-From an already authorized ADB host, this reads the APK metadata only:
+New recovery restores exact464 native engine and original inventory/Trakt
+functional code with forward metadata. It restores pre-correction limitations;
+it does not retain these repairs. Existing separately signed465/CC63 recovery
+is untouched (SHA256 bec094103bca08abce081038669428ce9babf0aab1d99ca4cb0ec09ca1a729e9).
 
-    adb shell dumpsys package com.projectinfinity.kodi
+## Actual Android results and remaining gates
 
-The versionCode field is the APK code. For installed module identity, run:
+API37/4KiB x86_64 emulator runs the real ARM64 APK through Android's native
+bridge. It is not a Galaxy Fold test or native ARM hardware performance proof.
 
-    python3 read_device_inventory.py --out INFINITY-INSTALLED-INVENTORY.json
+- 42464385488 FAIL before cases: retained observer requested excluded playback
+fixture. Only observer admission was narrowed; real live ListItem reads remain.
+- 42465125757 attempt1 failed Python download HTTP504 before execution;
+attempt2 reused the exact source after the transient download succeeded.
+- 42465125757 attempt2 PASS: original464/CC62/external Trakt1.2.8 registered;
+signed install-over to466; complete79 authenticated module files and all145
+active Trakt files match the APK; profile sentinel preserved.
+-First real cold Movie Search All FAIL: The Matrix returned POV21 results and
+Umbrella timeout under the unchanged20-second native consumer deadline.
+The same KodiPID returned110 snapshots, covering5988 live list-item label reads.
+This is not an eight-cycle, heading, deadlock-safety or production crash PASS.
+Retained evidence: evidence/ANDROID-COLD-SEARCH-FAIL.json and artifact13611653347.
+- The remaining independent actual SDK Trakt ON/OFF/manual/success/other-skin,
+forward recovery and ordinary Umbrella Movie/TV route timing diagnostics are
+selected in run42467007998. Results pending. An ordinary provider-route timing
+or subset PASS cannot clear the retained Infinity Search failure.
 
-The collector reads the bounded signed module metadata, hashes of the named
-owned module source files, public provider/Trakt-module metadata, eight native
-provider-route source hashes, eight relevant Trakt source hashes, and the
-installed base APK hash when readable. It does not access user settings/databases, launch
-or stop apps, install anything, change permissions, or write to the phone. It
-does not clear installation or authenticate an unknown generation by itself.
-If Android denies access, stop; do not root or bypass access controls.
-The collector was syntax/CLI checked, not executed against the Fold.
+Before release, resolve/qualify the real Umbrella timeout and complete the
+selected eight distinct Movie/TV Search cycles, four native heading activations,
+TV result navigation, Trakt SDK behavior and signed Android recovery. Failed
+mandatory gates remain visible. Do not lengthen the native lease, weaken source
+validation, pre-seed fabricated results or modify third-party providers.
 
-The owner subsequently reports Health Center2.5.26 Add-on Exporter fails for
-Umbrella6.8.00 with “Database has no readable SQLite header; raw fallback
-refused”. The matching preserved helper receives every file in the add-on
-folder, including database-extension files even in source-only mode. The exact
-refusal was reproduced locally without a SQLite connection. The installed
-failing filename and Health Center source hashes are unknown. Do not retry a
-full-folder export, change the snapshot helper, or alter any database to obtain
-Search source. See HEALTH-EXPORT-INVESTIGATION.md for the reference-version
-distinction and five passing local checks.
+Before Fold installation, use an already authorized ADB host:
 
-Prefer the existing read-only collector with optional computer-only source
-copies:
+    python3 repairs/infinity-three-corrections-20261108/read_device_inventory.py --out INFINITY-INSTALLED-INVENTORY.json
 
-    python3 read_device_inventory.py --out INFINITY-INSTALLED-INVENTORY.json --sources-out INFINITY-SOURCE-INSPECTION
+This hashes the APK, declared first-party files and selected provider/Trakt code;
+it reads no user settings/databases and writes only the JSON on the computer.
+No phone writes, app launch/stop, installation, root or permission bypass. Access
+denial remains a blocker. No re-export of the four supplied packages is needed.
+One final owner Fold acceptance is still mandatory after engineering clearance.
 
-Use an already authorized ADB host. This writes a new local folder containing
-only specifically named code/manifests, not a recursive add-on copy or database
-backup. It includes the provider routes, Trakt failure-path sources, CC metadata
-and inventory, and the three Health Center implementation files needed to
-identify the installed exporter. Attach the JSON and a ZIP of this local folder.
-The ZIP is diagnostic source, not an installable fix. Access denial remains a
-blocker; no root or permission bypass is authorized.
+Cobra, locked interfaces/themes/navigation, other providers, playback, Continue
+Playing, Resume Hub, Watchlists and all user/account data remain protected.
+Watchlist-to-Progress tracking and the optional Health Center exporter feature
+remain deferred. No Health Center/database change or shutdown test is selected.
 
-## Release gate
-
-The one necessary native compile/link is complete; do not repeat it for
-reporting or metadata changes. Actual installed-source authentication and
-scoped source integration now PASS. Preparation is selected in
-PACKAGING-SCOPE.json and reuses the existing original module signer and owner
-bundle assembler. Original-key APK signing PASS for466 and matching forward recovery467. Android/Fold acceptance remains pending.
-If the native correction
-is confirmed and adopted, it requires a source-matched combined APK rather than
-an add-on-only ZIP; reusing the old engine would not carry the C++ correction.
-Do not assign or reuse release/recovery versions before checking the existing
-owner registry and monotonic component requirements.
-
-The sole-signer history audit checked47 signed APK releases and confirms465 is
-latest issued. The selected unused pair is466/467, CC64/65; skin270 is byte
-identical. The separately signed465/CC63 recovery is preserved unchanged.
-The new recovery restores the exact464 engine and pre-correction functional
-sources with higher version metadata. Both CC packages authenticate79 files,
-including the already-present helper (inactive with the old inventory in
-recovery), so no stale-source deletion is required.
-
-The next gates are original module signatures, selected real-Java installer
-upgrade/refusal/recovery cases, exact APK/component preservation, original-key
-QA APK signing, then the selected Android Search/Trakt/install-over/recovery
-checks in ANDROID-REQUEST.json. Runtime verification needs that signed QA
-installer; object/link success cannot substitute for it. Verify the remaining
-Fold identities before installation and perform one final owner acceptance.
-No final installer, completed production repair, or Fold acceptance is claimed.
-
-Cobra, layouts/themes, native provider search implementations, unrelated
-providers, Continue Playing, Resume Hub, playback, user settings/databases,
-account data, signing implementation and existing recovery are unchanged.
-Watchlist-to-Progress tracking remains deferred. No shutdown test was selected.
-
-## Signed pair and selected Android gate
-
-Original-key signatures and full source/component preservation PASS for candidate466
-(run42462319257) and forward recovery467 (run42463180613). SIGNED-PAIR.json
-pins their exact APK hashes. The unchanged original module signer produced both
-complete79-file manifests;10 unchanged Java installer transition/refusal/recovery
-cases PASS in preparation run42460784588. No native rebuild is required.
-
-First selected Android run42464385488 FAIL before any correction cases: the
-retained start_qa transport requested a playback fixture absent from the selected
-Search/Trakt-only profile. The observer is registered in Kodi; its missing clip
-is unrelated. The narrowly scoped transport override admits only the existing
-script observer, preserving original live GUI-list reads, APKs and every assertion.
-The failed report is retained in evidence/ANDROID-FIRST-ATTEMPT-FAIL.json.
-Retry only the still-missing selected Android journey with the exact signed pair.
-No Android functionality PASS or Fold acceptance is claimed.
-
-
-Run42465125757 attempt1 stopped before execution on a GitHub Python-download
-HTTP504; retry attempt2 reached real Android execution. Its signed464→466
-install-over, complete79-module identity and exact active145-file Trakt source
-selection PASS. First real Movie Search All (The Matrix) FAIL: POV returned21
-results while Umbrella returned timeout under the original20-second native lease.
-Kodi kept responding with the samePID through114 observer replies. This is not
-an eight-cycle stability pass, heading pass, or completed crash repair. The fail
-report is retained in evidence/ANDROID-COLD-SEARCH-FAIL.json. No provider, native
-lease, cancellation/admission protection, engine or APK bytes are changed.
-
-Only the missing Trakt/recovery gates and ordinary native Umbrella movie/TV
-route timing diagnostics are selected next. A PASS of that subset cannot clear
-the retained Search failure or release the combined package. Physical Fold
-identity and final acceptance remain pending. No additional signing or build.
+Run42467007998 failed before Trakt behavior because the disposable observer
+did not mirror the installed module’s own helper/resources import setup. The
+QA-only import now follows that exact existing consumer path. The next selected
+retry retains this failure and exercises independent forward recovery even if
+another SDK/diagnostic case fails; its overall result remains FAIL in that case.

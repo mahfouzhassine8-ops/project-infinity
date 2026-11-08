@@ -202,32 +202,42 @@ def run(baseline, candidate, recovery, fixture, out):
                 device.alive()
                 passed('real_Search_All_cycle_' + str(cycle + 1), media=media, query=query, providers=sorted(PROVIDERS), results=len(good), heading_opened=opened, PID=device.pid, live_ListItem_read=True)
         device.command('home')
-        for case in ('silent-on', 'silent-off', 'manual', 'success', 'other-skin'):
-            if case == 'other-skin':
-                assert device.rpc('Settings.SetSettingValue', dict(setting='lookandfeel.skin', value='skin.estuary')) is True
-                device.until(lambda: device.rpc('XBMC.GetInfoLabels', dict(labels=['System.CurrentWindow'])), 'Estuary loaded', 20)
-                time.sleep(3)
-            seq = begin(dict(action='trakt-case', case=case))
-            if case == 'manual':
-                device.until(lambda: visible(10101), 'actual manual device-code progress dialog', 25)
-                device.screenshot('manual-Trakt-device-code')
-                time.sleep(2)
-                device.rpc('Input.Back')
-            if case not in ('silent-on', 'success'):
-                labels = confirm_failure('Trakt-' + case)
-            outcome = device.until(lambda: reply(seq), 'selected actual SDK Trakt case ' + case, 40)
-            assert outcome['status'] == ('PASS_REAL_SDK_SUCCESSFUL_REFRESH' if case == 'success' else 'PASS_REAL_SDK_SCOPED_TRAKT_CASE')
-            if case in ('silent-on', 'success'):
-                assert not visible(12002)
-            passed('real_SDK_Trakt_' + case, details=outcome)
-        assert device.rpc('Settings.SetSettingValue', dict(setting='lookandfeel.skin', value='skin.infinity.diggz')) is True
-        time.sleep(3)
-        device.alive()
-        device.command('home')
-        if phase != 'complete':
-            for media, query in (('movie', 'The Matrix'), ('tv', 'Breaking Bad')):
-                timing = device.command('provider-timing', provider='plugin.video.umbrella', media=media, query=query, seconds=180)
-                passed('diagnostic_normal_Umbrella_' + media + '_route_timing', details=timing, production_Search_acceptance=False)
+        try:
+            for case in ('silent-on', 'silent-off', 'manual', 'success', 'other-skin'):
+                if case == 'other-skin':
+                    assert device.rpc('Settings.SetSettingValue', dict(setting='lookandfeel.skin', value='skin.estuary')) is True
+                    device.until(lambda: device.rpc('XBMC.GetInfoLabels', dict(labels=['System.CurrentWindow'])), 'Estuary loaded', 20)
+                    time.sleep(3)
+                seq = begin(dict(action='trakt-case', case=case))
+                if case == 'manual':
+                    device.until(lambda: visible(10101), 'actual manual device-code progress dialog', 25)
+                    device.screenshot('manual-Trakt-device-code')
+                    time.sleep(2)
+                    device.rpc('Input.Back')
+                if case not in ('silent-on', 'success'):
+                    labels = confirm_failure('Trakt-' + case)
+                outcome = device.until(lambda: reply(seq), 'selected actual SDK Trakt case ' + case, 40)
+                assert outcome['status'] == ('PASS_REAL_SDK_SUCCESSFUL_REFRESH' if case == 'success' else 'PASS_REAL_SDK_SCOPED_TRAKT_CASE')
+                if case in ('silent-on', 'success'):
+                    assert not visible(12002)
+                passed('real_SDK_Trakt_' + case, details=outcome)
+        except Exception as error:
+            report.setdefault('feature_failures', []).append(dict(feature='Trakt', error=repr(error), traceback=traceback.format_exc()))
+            save()
+        try:
+            assert device.rpc('Settings.SetSettingValue', dict(setting='lookandfeel.skin', value='skin.infinity.diggz')) is True
+            time.sleep(3)
+            device.alive()
+            device.command('home')
+            if phase != 'complete':
+                for media, query in (('movie', 'The Matrix'), ('tv', 'Breaking Bad')):
+                    timing = device.command('provider-timing', provider='plugin.video.umbrella', media=media, query=query, seconds=180)
+                    passed('diagnostic_normal_Umbrella_' + media + '_route_timing', details=timing, production_Search_acceptance=False)
+        except Exception as error:
+            # Retain a failed feature and still exercise the selected forward
+            # recovery. Never convert a failed SDK/diagnostic case into PASS.
+            report.setdefault('feature_failures', []).append(dict(feature='native-route-diagnostic', error=repr(error), traceback=traceback.format_exc()))
+            save()
         (out / 'CANDIDATE-LOGCAT.txt').write_text(device.adb('logcat', '-d', '-v', 'threadtime', timeout=60))
         oldpid = device.pid
         device.install(recovery, 'recovery467')
@@ -237,6 +247,8 @@ def run(baseline, candidate, recovery, fixture, out):
         restored = identity(recovery, '0.3.5.65', '1.2.8.2')
         assert device.shell('cat', PROFILE + '/release-data-sentinel.txt') == sentinel
         passed('signed466_to467_forward_recovery79_files_and_data', identity=restored, previous_functional_sources_restored=True)
+        if report.get('feature_failures'):
+            raise RuntimeError('Selected Trakt/provider diagnostic failed; forward recovery results retained')
         report.update(status=('PASS_SELECTED_ANDROID_THREE_CORRECTION_GATES' if phase == 'complete' else 'PASS_ONLY_SELECTED_TRAKT_RECOVERY_AND_NATIVE_ROUTE_DIAGNOSTICS_SEARCH_REMAINS_BLOCKED'), physical_Fold='PENDING_ONE_OWNER_TEST', public_release='ENGINEERING_CANDIDATE_ONLY')
     except BaseException as error:
         report.update(status='FAIL_SELECTED_ANDROID_THREE_CORRECTION_GATE', error=type(error).__name__ + ': ' + str(error), traceback=traceback.format_exc())

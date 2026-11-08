@@ -88,26 +88,27 @@ results do not claim an installed Fold repair or production release acceptance.
 
 ## Outstanding gates
 
-The read-only `read_device_inventory.py` now collects this module's addon.xml
-and hashes of the relevant source, settings-definition and localization files.
-It never reads the user's authentication settings or databases. Compare that
-report with the pinned baseline before deciding whether this patch applies; a
-different version/source requires a review against that actual input, not a
-forced overwrite.
+The supplied installed145-file export is now verified. The two patch preimages
+match the reference exactly. The installed application identifier and Account
+Manager Lite recovery guard differ from the public reference and are preserved.
+The14 actual-source host cases pass; see ../evidence/DEVICE-SOURCE-VERIFICATION.json.
+No re-export or Health Center retry is needed. Its reported database-header
+refusal remains protected and is outside this release.
 
-The existing Kodi Health Center Add-on Exporter also provides a source-only ZIP
-without ADB. Choose add-on files only, excluding saved settings/data. Check its
-per-file export inventory and then compare the actual code with SOURCE-PINS.json.
+The read-only `read_device_inventory.py` collects addon.xml and the relevant
+source hashes without authentication settings or databases. Fresh APK identity,
+the other16 signed first-party records, and module versions/hashes still need
+verification before Fold installation because auto-update remains enabled.
 
-Deployment must verify the active source path: unmodified Kodi gives an
-external add-on precedence over an equal-version bundled copy. Merely adding
-another1.2.8 copy inside an APK does not prove the correction will run. No live
-source updater or deployment workaround has been introduced.
+Deployment selection PASS on actual Android in run42465125757 attempt2:
+the standard higher-version bundled1.2.8.1 tree is selected over existing
+external1.2.8, and all145 active files match signed466 exactly. The external
+source and user profile are not overwritten. No generic live updater was added.
 
-After installed-source identity is established, actual Android/Fold verification
-must check automatic failure with Silent Mode ON/OFF, retained cooldown/error
-recording, and manual sign-in. The existing provider compatibility and native
-Search gates remain separate. The user's later consolidated-release directive
-authorizes the existing owner-gated signing route after applicable input gates;
-this note itself grants no signing or installation clearance. Source integrity
-and actual Android/Fold behavior remain outstanding.
+Actual SDK automatic ON/OFF, manual device-code/failure, successful synthetic
+refresh, other-skin presentation and forward recovery are selected in follow-up
+run42467007998. Results remain pending. The retained first cold Umbrella Search
+timeout independently blocks combined release; a Trakt subset PASS cannot clear
+that failure or claim an eight-search/native-crash repair. Fold acceptance and
+installation clearance remain outstanding. Original signing is complete, with
+unchanged owner-gated infrastructure and no additional build selected.

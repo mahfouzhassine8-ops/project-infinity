@@ -24,6 +24,12 @@ def _three_identity():
 
 def _three_trakt_case(case):
     from types import SimpleNamespace
+    # Mirror the installed module's own resources/script.py consumer setup.
+    # TMDbHelper exports resources/modules; its internal tmdbhelper package
+    # lives in resources and is intentionally added by the real consumer.
+    helper = Path(xbmcvfs.translatePath(xbmcaddon.Addon('plugin.video.themoviedb.helper').getAddonInfo('path'))) / 'resources'
+    assert (helper / 'tmdbhelper/lib/sync/providers/registry.py').is_file()
+    sys.path.insert(0, str(helper))
     from jurialmunkey.window import get_property
     from tmdbhelper_sync_trakt.api.authenticator import TraktAuthenticator
     from tmdbhelper_sync_trakt.api.token import TraktStoredAccessToken
