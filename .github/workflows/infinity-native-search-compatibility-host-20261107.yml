@@ -71,7 +71,7 @@ jobs:
         if: always()
         run: |
           rm -rf provider-fixtures
-          printf '%s\n' 'SOURCE/HOST ONLY. No user's installed provider versions inspected, no APK produced, no Work release/preservation or Fold behavior modified. Only native Search fallback is proposed and owner approval is required before packing.' > NATIVE-COMPATIBILITY-LIMITS.txt
+          printf '%s\n' 'SOURCE/HOST ONLY. No installed user-provider versions inspected, no APK produced, no Work release/preservation or Fold behavior modified. Only native Search fallback is proposed and owner approval is required before packing.' > NATIVE-COMPATIBILITY-LIMITS.txt
       - uses: actions/upload-artifact@v4
         if: always()
         with:
