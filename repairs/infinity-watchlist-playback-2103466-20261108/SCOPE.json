@@ -1,0 +1,47 @@
+{
+  "phase": "A_READ_ONLY_ARCHITECTURE_AND_IMPLEMENTATION_DESIGN",
+  "status": "AWAITING_OWNER_REVIEW_NO_IMPLEMENTATION",
+  "baseline": "5ee1c7ae0bbe295c311aa34c02f6b62688ccb5a7",
+  "branch": "work/infinity-watchlist-phase-a-20261108",
+  "lead": "Codex",
+  "supporting_agents": [
+    {
+      "role": "architecture and independent audit",
+      "model": "gpt-6-astra"
+    },
+    {
+      "role": "implementation design",
+      "model": "gpt-6.1-sol"
+    }
+  ],
+  "authorized_now": [
+    "Read-only source tracing",
+    "Implementation design",
+    "Focused test planning",
+    "Source and preservation verification",
+    "Task documentation"
+  ],
+  "not_authorized_now": [
+    "Production source changes",
+    "Implementation or feature tests",
+    "APK rebuild",
+    "Signing",
+    "Installation",
+    "Device tests"
+  ],
+  "Phase_B": "Requires explicit owner authorization after review; native observation and successor catalogue design must first be source-bound",
+  "source_changes_allowed_in_this_phase": [],
+  "runtime_tests_selected": [],
+  "new_tracking_database": false,
+  "existing_store": "continue-watching.json schema2",
+  "preserved": [
+    "Original saved workflow and list membership",
+    "Regular Movies and TV behavior including same saved title launched outside saved list",
+    "Cobra",
+    "Providers and Search",
+    "Trakt authentication and account data",
+    "Playback engine and lifecycle",
+    "Existing thresholds, persistence admission, recovery and original signer"
+  ],
+  "separate_work": "Search/Silent Mode repairs on work/infinity-three-corrections-20261108; no changes imported or gates relabeled"
+}
