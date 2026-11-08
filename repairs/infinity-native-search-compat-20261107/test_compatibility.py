@@ -74,13 +74,23 @@ class NativeRouteCompatibility(unittest.TestCase):
         active_spec=specs or contract(kind)
         result=compat.recognize('plugin.video.'+kind,Path("/read-only/"+kind),
                                 [active_spec],reader)
-        if kind == "pov" and not result and not modifications:
+        if kind == "pov" and len(result) < 2 and not modifications:
             for media in ("movie","tv"):
                 get,pins=compat._reading(reader)
                 try:
                     compat._pov(get,active_spec["search"][media],media)
                 except Exception as error:
                     print("POV_HOST_DIAGNOSTIC",media,type(error).__name__,str(error))
+                    import ast
+                    src=ast.parse(files["resources/lib/menus/"+("movies" if media=="movie" else "tvshows")+".py"])
+                    for item in src.body:
+                        if isinstance(item,ast.ClassDef) and item.name=="Menu":
+                            for node in item.body:
+                                if isinstance(node,ast.FunctionDef) and node.name=="run":
+                                    for branch in ast.walk(node):
+                                        if isinstance(branch,ast.If) and isinstance(branch.test,ast.Compare):
+                                            if ("tmdb_movies_search" if media=="movie" else "tmdb_tv_search") in ast.unparse(branch.test):
+                                                print("POV_SEARCH_BRANCH_SOURCE",media,ast.unparse(branch)[:1200])
         return result,files,consulted
 
     def test_umbrella_current_natural_movie_and_tv_routes_both_recognized(self):
