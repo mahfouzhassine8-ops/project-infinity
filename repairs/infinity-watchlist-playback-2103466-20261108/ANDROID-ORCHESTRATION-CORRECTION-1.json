@@ -1,0 +1,9 @@
+{
+  "status": "EXACT_TEST_LAUNCH_FIX_SAME_SIGNED_APKS_RETRY_REQUIRED",
+  "failed_run": 42514966691,
+  "workflow_before_sha256": "0d346d6fb0702a6cae00f6fcf018661c68c906ffc4bca2b6b6c718b2d6240a52",
+  "workflow_after_sha256": "fb3b7a4d6772e70cd8c1628a0c8331c6cd93aa11662da079eef999c11e2d5579",
+  "change": "Remove only unsupported standalone set -euo pipefail from per-command sh emulator runner. All four substantive commands and immediate nonzero failure handling remain.",
+  "native_or_APK_or_harness_source_changed": false,
+  "application_tests_run": 0
+}

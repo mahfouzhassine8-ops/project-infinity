@@ -143,7 +143,6 @@
           disable-animations: false
           emulator-options: -no-window -memory 4096 -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
           script: |
-            set -euo pipefail
             adb shell getprop > watchlist-qa-platform/runtime-properties.txt
             adb shell getconf PAGESIZE > watchlist-qa-platform/runtime-pagesize.txt
             adb shell sha256sum /system/lib64/libndk_translation.so > watchlist-qa-platform/runtime-native-bridge-sha256.txt

@@ -41,7 +41,7 @@
     "artifact_id": 13631340281,
     "APK_SHA256": "804eebc57af2e4ef4e5418b56994bda64eb7fd7e7f2c0653b5c6e2a9f7833058"
   },
-  "Android": "SELECTED_TEN_CASES_TO_RUN_ON_EXACT_SIGNED_PAIR",
+  "Android": "INFRASTRUCTURE_FAIL_BEFORE_APP_EXECUTION; same signed pair selected for corrected launch",
   "Fold": "NOT_RUN_PENDING_ONE_OWNER_ACCEPTANCE",
   "shutdown": "NOT_SELECTED",
   "accepted_pointer_updated": false,
@@ -51,5 +51,15 @@
     "Exact current Umbrella/POV source pins required for scoped enrichment; changed sources retain ordinary playback.",
     "Folder popup navigation retains baseline behavior; new origin is verified for direct Watchlist selection and playable-title Play."
   ],
-  "preservation": "Only six authorized native source files, three Command Center Python files and sole saved_playback.py helper, plus necessary release metadata; other runtime sources unchanged."
+  "preservation": "Only six authorized native source files, three Command Center Python files and sole saved_playback.py helper, plus necessary release metadata; other runtime sources unchanged.",
+  "Android_attempts": [
+    {
+      "run_id": 42514966691,
+      "source_commit": "3091ea8049eea4817690bee6def1f425a62568ce",
+      "result": "FAIL_INFRASTRUCTURE_BEFORE_ANY_APPLICATION_EXECUTION",
+      "reason": "/usr/bin/sh rejects Bash-only set -o pipefail; emulator runner already propagates every individual command failure",
+      "APK_rebuild": false,
+      "application_tests_run": 0
+    }
+  ]
 }
