@@ -200,5 +200,20 @@
       "actual forward465 recovery"
     ],
     "reason_for_revised_selected_runtime": "Corrected known existing participant changes actual theme/layout publication and runtime state; verify selected journeys on representative baseline, retaining allprevious actual PASS evidence; no host/build/sign tests rerun."
-  }
+  },
+  "latest_selected_execution": {
+    "run": 42437719318,
+    "source": "152ae1bed123894af9669640edd2f6508cd80996",
+    "artifact": 13601500225,
+    "artifact_sha256": "026afc06cb8c306dbd4c7c6fb1d82d6b73b0866b0b4883df0c96484c56d12726",
+    "status": "FAIL_NATIVE_ABORT_AND_MANUAL_DARK_CONTRAST",
+    "full_Search_cycles_recorded_passed": 7,
+    "eighth_results_present": true,
+    "heading_activation_not_proved": true,
+    "details": "BLOCKED-RELEASE-FINDINGS.json",
+    "remaining_cases": "NOT_RUN_AFTER_ABORT",
+    "production_changes_in_this_checkpoint": false,
+    "new_Android_run_selected_or_started": false
+  },
+  "release_disposition": "BLOCKED; retain all failures and earlier partial evidence. No public APK/recovery release or accepted-baseline promotion."
 }

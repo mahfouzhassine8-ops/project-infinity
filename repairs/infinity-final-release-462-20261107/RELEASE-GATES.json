@@ -1,16 +1,19 @@
 {
-  "status": "PUBLIC_RELEASE_BLOCKED_REMAINING_RUNTIME_AND_VISUAL_GATES",
+  "status": "PUBLIC_RELEASE_BLOCKED_NATIVE_HEAP_ABORT_AND_DARK_VISUAL_FAILURE",
   "candidate": {
     "versionCode": 2103464,
     "sha256": "eb4ea5594d18d83c5638d10c0c1b22b2124e6c61c303d41908108dcd02b6ae54",
     "signing_run": 42427388825,
-    "certificate": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7"
+    "certificate": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "publication": "HELD_NOT_A_FINISHED_RELEASE"
   },
   "recovery": {
     "versionCode": 2103465,
     "sha256": "bec094103bca08abce081038669428ce9babf0aab1d99ca4cb0ec09ca1a729e9",
     "signing_run": 42428335227,
-    "restores": "Exact462 engine plus authenticated268 functionality, monotonic63/271 metadata"
+    "restores": "Exact462 engine plus authenticated268 functionality, monotonic63/271 metadata",
+    "Android_forward_recovery_execution": "NOT_RUN_AFTER_CANDIDATE_ABORT",
+    "publication": "HELD_NOT_A_FINISHED_RECOVERY_DELIVERY"
   },
   "passed": [
     "Exact signed462 parent authentication",
@@ -21,15 +24,14 @@
     "Both original-key signed APKs and independent complete payload/member comparison",
     "Exact unchanged Nixtoons/Umbrella and official dependency fixture authentication",
     "Actual Android37.0 install-over462 to464 preserves UID and data sentinel and matches all78 live module files plus selected skin hashes:42434395721",
-    "UnmodifiedNixtoons/Umbrella native first-use initialization:42434395721",
-    "All8 actual grouped native Nixtoons/Umbrella queries, positiveNixtoonsRe:zero, two original provider-heading activations, native swipes and one constantPID5043:42435881141; runfailedlater only inwatched observerimport beforeanywatched action"
+    "UnmodifiedNixtoons/Umbrella native first-use initialization:42434395721"
   ],
   "pending": [
-    "Selected full representative externalCompat82 baseline run42437719318, source152ae1bed123894af9669640edd2f6508cd80996; watched/Info/Downloads/recovery/visual gates still unpassed",
-    "Manual UI/Downloads/white-line screenshot and state review",
-    "Matching recovery ZIP/checksums/final concise report",
-    "GitHub publication after preceding gates",
-    "One final user Fold acceptance afterward"
+    "Root-cause native abort and verify a narrowly scoped repair before a new release candidate",
+    "Resolve dark card rendering causally while preserving approved UI; no visual or white-line PASS",
+    "Watched/unwatched, native InfoPlay/Trailer, Downloads and actual465 forward recovery NOT RUN after abort",
+    "Matching recovery ZIP/checksums/final publication only after all runtime/visual gates pass",
+    "One final physicalFold acceptance after engineering gates pass"
   ],
   "never_claimed": [
     "Immutable provider settings consistency",
@@ -78,12 +80,31 @@
     "PID": 5043,
     "cycles_passed": 8,
     "later_failure": "Disposable observer used legacy helperroot; production helper nowconsolidated underCC/infinity_modules/uirepair. Noactualwatched action wasattempted.",
-    "overall_run": "FAIL_LATER_SELECTED_CASE_NOT_RELABELLED"
+    "overall_run": "FAIL_LATER_SELECTED_CASE_NOT_RELABELLED",
+    "qualification": "Earlier incompleteCompat72 fixture; retains its eight recorded cycles and overall failure. Does not supersede correctedCompat82 run42437719318 native abort."
   },
   "representative_UI_fixture": {
     "prior_mismatch": "Fresh fixture lacked existing externalCompat82 identified by saved observed code inventory; older bundledCompat72 didnotpublish effectiveSystemTheme (confirmedempty atbothnativeThemes).",
     "proof": "COMPAT82-INPUT.json",
     "restoration": "OriginalreviewedCompat82 sources plus originalsigned462 code-onlypatch, all6sourcefiles andsavedentryhashesexact. NoAPK/UIcode/sourcepalette change. Newselectedrunrequiresall6actualsourcesbefore/afterupgradesandmatchingeffectiveThemepublicationbeforecaptures.",
-    "visual_status": "PENDING_ACTUAL_CORRECTED_FIXTURE"
-  }
+    "visual_status": "FAIL_DARK_HOME_CONTRAST_AFTER_EXACT_COMPAT82_RESTORATION",
+    "latest_run": 42437719318
+  },
+  "failed": [
+    "Actual signed464 native heap abort during eighth Search heading check:42437719318; minimal cause/fix unproven",
+    "Manual dark Home contrast review FAIL on front and inner with correct existingCompat82 and published dark theme"
+  ],
+  "latest_selected_Android_evidence": {
+    "run": 42437719318,
+    "job": 128600072991,
+    "source": "152ae1bed123894af9669640edd2f6508cd80996",
+    "artifact": 13601500225,
+    "artifact_sha256": "026afc06cb8c306dbd4c7c6fb1d82d6b73b0866b0b4883df0c96484c56d12726",
+    "status": "FAIL_SELECTED_ANDROID_GATE",
+    "app_pid": 4925,
+    "full_Search_cycles_recorded_passed": 7,
+    "eighth_heading_check": "FAIL_NATIVE_ABORT; no matching QA reply and no full-cycle PASS",
+    "details": "BLOCKED-RELEASE-FINDINGS.json"
+  },
+  "release_request_created": false
 }
