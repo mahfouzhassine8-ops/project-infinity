@@ -7,7 +7,7 @@ on:
       - repairs/infinity-native-search-compat-20261107/**
       - repairs/infinity-only-performance-2103425/overlay/script.infinity.commandcenter/native_search_compatibility.py
       - repairs/infinity-only-performance-2103425/overlay/script.infinity.commandcenter/provider_inventory.py
-permissions: {contents: read}
+permissions: {contents: read, actions: read}
 concurrency:
   group: infinity-native-search-compatibility-20261107
   cancel-in-progress: true
@@ -34,6 +34,8 @@ jobs:
             '.github/workflows/infinity-provider-native-routes-inspection-20261107.yml',
             '.github/workflows/infinity-native-search-compatibility-host-20261107.yml',
             'repairs/infinity-native-search-compat-20261107/test_compatibility.py',
+            'repairs/infinity-native-search-compat-20261107/VERSION-ALIGNMENT.json',
+            'repairs/infinity-native-search-compat-20261107/verify_version_alignment.py',
             'repairs/infinity-only-performance-2103425/overlay/script.infinity.commandcenter/native_search_compatibility.py',
             'repairs/infinity-only-performance-2103425/overlay/script.infinity.commandcenter/provider_inventory.py',
           }
@@ -67,6 +69,27 @@ jobs:
         run: |
           set -euo pipefail
           python3 -m unittest discover -s repairs/infinity-native-search-compat-20261107 -p 'test_compatibility.py' -v
+      - name: Download exact official prepared 2103464 source only (no signing material)
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          artifact-ids: '13595626273'
+          run-id: '42425522122'
+          github-token: ${{ github.token }}
+          path: exact464-prepared
+          merge-multiple: true
+      - name: Verify real signed 464 / CC 62 / skin 270 input and proposed same-version Search-only source
+        run: |
+          set -euo pipefail
+          python3 repairs/infinity-native-search-compat-20261107/verify_version_alignment.py --prepared exact464-prepared --out version-alignment-evidence
+          python3 - <<'PY'
+          import json
+          r=json.load(open('version-alignment-evidence/EXACT-VERSION-ALIGNMENT.json'))
+          assert r['status']=='PASS_EXACT_464_CC62_SAME_VERSION_SOURCE_SIGNABILITY_ONLY'
+          assert r['baseline_cc']=='0.3.5.62' and r['forward_recovery_cc']=='0.3.5.63'
+          assert r['installable_zip'] is False and r['original_key_new_signature']=='REQUIRED_NOT_PRODUCED'
+          assert r['unchanged_skin'] if 'unchanged_skin' in r else r['skin_unchanged']=='1.0.5.270'
+          print('PASS scoped version alignment against exact reviewed APK source. No installer produced.')
+          PY
       - name: Do not export third-party source or private user data
         if: always()
         run: |
@@ -79,5 +102,6 @@ jobs:
           path: |
             NATIVE-COMPATIBILITY-LIMITS.txt
             provider-input-hashes.json
+            version-alignment-evidence/EXACT-VERSION-ALIGNMENT.json
           retention-days: 30
           if-no-files-found: warn
