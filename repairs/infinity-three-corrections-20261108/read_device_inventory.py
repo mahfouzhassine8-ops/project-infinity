@@ -17,7 +17,12 @@ def main():
     parser.add_argument('--adb', default='adb')
     parser.add_argument('--serial')
     parser.add_argument('--out', type=Path, default=Path('INFINITY-INSTALLED-INVENTORY.json'))
+    parser.add_argument('--sources-out', type=Path,
+                        help='New folder on this computer for selected code/manifests only; no full add-on/profile export')
     args = parser.parse_args()
+    if args.sources_out and args.sources_out.exists():
+        parser.error('--sources-out must name a new folder on this computer')
+    source_copies = {}
     command = [args.adb] + (['-s', args.serial] if args.serial else [])
     def call(*arguments):
         result = subprocess.run(command + list(arguments), capture_output=True, timeout=60)
@@ -48,6 +53,8 @@ def main():
         raw = call('exec-out', 'head', '-c', str(limit + 1), root + relative)
         if len(raw) > limit:
             raise RuntimeError('Owned metadata exceeds its size bound')
+        if args.sources_out:
+            source_copies[relative] = raw
         return raw
     manifest = read(cc + 'INFINITY-MODULES.v1', 131072)
     signature = read(cc + 'INFINITY-MODULES.v1.sig', 512)
@@ -61,6 +68,9 @@ def main():
         if (len(fields) != 3 or not re.fullmatch('[0-9a-f]{64}', fields[1]) or
                 not re.fullmatch(r'[A-Za-z0-9/._-]+', fields[2]) or
                 fields[2].split('/')[0] not in owned or
+                Path(fields[2]).suffix not in ('.py', '.xml', '.json', '.v1', '.po') or
+                any(p.casefold() in ('addon_data', 'userdata', 'database', 'profile')
+                    for p in fields[2].split('/')) or
                 any(p in ('', '.', '..') for p in fields[2].split('/'))):
             raise RuntimeError('Invalid module record; report collection stopped')
         names.append(fields[2])
@@ -106,6 +116,17 @@ def main():
             trakt_sources[relative] = hashlib.sha256(raw).hexdigest()
         except RuntimeError:
             trakt_sources[relative] = 'UNREADABLE'
+    inspection_sources = {}
+    for aid, names in (
+            ('script.infinity.commandcenter', ('addon.xml', 'provider_inventory.py', 'native_search_compatibility.py')),
+            ('script.kodihealthcenter', ('addon.xml', 'default.py', 'khc_exports.py', 'khc_safety.py'))):
+        inspection_sources[aid] = {}
+        for relative in names:
+            try:
+                raw = read(aid + '/' + relative, 512 * 1024)
+                inspection_sources[aid][relative] = hashlib.sha256(raw).hexdigest()
+            except RuntimeError:
+                inspection_sources[aid][relative] = 'UNREADABLE'
     report = dict(status='READ_ONLY_COLLECTION_NOT_INSTALLATION_CLEARANCE',
                   apk_version_code=int(versions[0]),
                   installed_apk_identity=apk_identity,
@@ -115,8 +136,18 @@ def main():
                   installed_source_hash_output=hashes, providers=providers,
                   trakt_source_hashes=trakt_sources,
                   provider_source_hashes=provider_sources,
+                  inspection_source_hashes=inspection_sources,
                   phone_writes=False, settings_or_database_reads=False,
                   Android_functionality_verified=False)
+    if args.sources_out:
+        args.sources_out.mkdir(parents=True, exist_ok=False)
+        for relative, raw in source_copies.items():
+            destination = args.sources_out / relative
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            destination.write_bytes(raw)
+        report['source_copies_on_computer'] = {
+            relative: hashlib.sha256(raw).hexdigest()
+            for relative, raw in sorted(source_copies.items())}
     args.out.write_text(json.dumps(report, indent=2) + '\n')
     print('Read-only inventory written to ' + str(args.out))
 

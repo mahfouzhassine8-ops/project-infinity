@@ -140,15 +140,28 @@ does not clear installation or authenticate an unknown generation by itself.
 If Android denies access, stop; do not root or bypass access controls.
 The collector was syntax/CLI checked, not executed against the Fold.
 
-An alternative already present on the Fold is Kodi Health Center's **Add-on
-Exporter**. Export these four add-ons separately: Infinity Command Center,
-Umbrella, POV, and TMDbHelper Sync - Trakt. Select **Add-on files only
-(recommended for sharing/inspection)** and **Copy to a folder I choose**.
-Attach the four ZIPs for local source inspection. Do not include saved
-settings/data. This creates source export copies; it does not install a repair.
-Its KHC_ADDON_EXPORT_MANIFEST.json supplies per-file size/SHA256 records, which
-must be checked against the actual ZIP contents and then the trusted source
-pins; the exporter manifest is not an Infinity module signature.
+The owner subsequently reports Health Center2.5.26 Add-on Exporter fails for
+Umbrella6.8.00 with “Database has no readable SQLite header; raw fallback
+refused”. The matching preserved helper receives every file in the add-on
+folder, including database-extension files even in source-only mode. The exact
+refusal was reproduced locally without a SQLite connection. The installed
+failing filename and Health Center source hashes are unknown. Do not retry a
+full-folder export, change the snapshot helper, or alter any database to obtain
+Search source. See HEALTH-EXPORT-INVESTIGATION.md for the reference-version
+distinction and five passing local checks.
+
+Prefer the existing read-only collector with optional computer-only source
+copies:
+
+    python3 read_device_inventory.py --out INFINITY-INSTALLED-INVENTORY.json --sources-out INFINITY-SOURCE-INSPECTION
+
+Use an already authorized ADB host. This writes a new local folder containing
+only specifically named code/manifests, not a recursive add-on copy or database
+backup. It includes the provider routes, Trakt failure-path sources, CC metadata
+and inventory, and the three Health Center implementation files needed to
+identify the installed exporter. Attach the JSON and a ZIP of this local folder.
+The ZIP is diagnostic source, not an installable fix. Access denial remains a
+blocker; no root or permission bypass is authorized.
 
 ## Release gate
 

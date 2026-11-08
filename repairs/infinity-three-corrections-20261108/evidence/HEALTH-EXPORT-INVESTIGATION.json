@@ -1,0 +1,48 @@
+{
+  "status": "PASS_FOCUSED_LOCAL_SOURCE_EXPORT_INVESTIGATION",
+  "owner_report": {
+    "Health_Center": "2.5.26",
+    "Umbrella": "6.8.00",
+    "error": "RuntimeError: Database has no readable SQLite header; raw fallback refused"
+  },
+  "reference": {
+    "APK": "Infinity-2103462-Combined-Original-Signer.apk",
+    "APK_sha256": "a24ffafd056db23aa9d433552e17d4362cc9dbc9dd568b086d84cabadae8c619",
+    "Health_Center": "2.5.27",
+    "installed_2_5_26_source_authenticated": false,
+    "exporter_sha256": "392c4a41a40f4cc8c7885ec1b399ef4698a36a3691474ee921b257b862cc8dfa",
+    "snapshot_helper_sha256": "cf0f63eb529700393798fd45258a8d45f2bf6a54f2b12405445cac72d408aefc"
+  },
+  "cause_in_reference": "Source-only mode excludes profile/addon_data but recursively includes every file in the add-on folder; generic exporter invokes snapshot_file on every file; database extension without SQLite header raises the exact exception before SQLite connection.",
+  "installed_failing_filename": "UNKNOWN_NO_DATABASE_ACCESSED",
+  "public_Umbrella_6_8_00": {
+    "commit": "e4f24004462d22757d375ebbea0bad26e9d983cc",
+    "resources_tree": "82375e40bdb61b51ec46286fc7f8d6bc45cf2eb0",
+    "truncated": false,
+    "database_extension_files": 0,
+    "installed_source_hashes_verified": false
+  },
+  "tests": {
+    "total": 5,
+    "passed": 5,
+    "failed": 0,
+    "cases": [
+      "Exact reference exporter source-only failure; no SQLite connection and source fixtures unchanged",
+      "Collector copies fixed sources/manifests and checksums using fake ADB; no database/profile reads or phone writes",
+      "Database record in module metadata rejected before reading",
+      "Oversized source not copied",
+      "Existing computer output directory preserved"
+    ]
+  },
+  "source_inspection_output": "Optional --sources-out in existing read_device_inventory.py; local computer folder, not an installable ZIP",
+  "production_source_changes": false,
+  "Health_Center_changes": false,
+  "database_changes": false,
+  "Android_device_execution": false,
+  "APK_build": false,
+  "signing": false,
+  "remaining": [
+    "Run collector on owner-authorized ADB host; device-source hashes and actual Health Center implementation remain unverified",
+    "All existing three-correction Android/Fold gates remain outstanding"
+  ]
+}
