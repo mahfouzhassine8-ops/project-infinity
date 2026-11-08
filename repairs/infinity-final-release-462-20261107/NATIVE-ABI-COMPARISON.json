@@ -1,0 +1,48 @@
+{
+  "parent": {
+    "ELF64": true,
+    "AArch64": true,
+    "needed": [
+      "libEGL.so",
+      "libGLESv2.so",
+      "libandroid.so",
+      "libc++_shared.so",
+      "libc.so",
+      "libdl.so",
+      "libjnigraphics.so",
+      "liblog.so",
+      "libm.so",
+      "libmediandk.so",
+      "libshairplay.so"
+    ],
+    "soname": [
+      "libkodi.so"
+    ]
+  },
+  "candidate": {
+    "ELF64": true,
+    "AArch64": true,
+    "needed": [
+      "libEGL.so",
+      "libGLESv2.so",
+      "libandroid.so",
+      "libc++_shared.so",
+      "libc.so",
+      "libdl.so",
+      "libjnigraphics.so",
+      "liblog.so",
+      "libm.so",
+      "libmediandk.so",
+      "libshairplay.so"
+    ],
+    "soname": [
+      "libkodi.so"
+    ]
+  },
+  "removed_strong_exports": [],
+  "added_strong_exports": [],
+  "parent_export_count": 71213,
+  "candidate_export_count": 71213,
+  "Android": "NOT_RUN",
+  "ABI_runtime": "NOT_RUN"
+}

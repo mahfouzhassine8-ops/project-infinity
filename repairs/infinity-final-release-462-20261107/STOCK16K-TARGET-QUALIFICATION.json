@@ -1,0 +1,27 @@
+{
+  "Fold": "NOT_RUN",
+  "OS_compatibility_overrides": false,
+  "PID_observations": [
+    ""
+  ],
+  "attempts": 1,
+  "blocker": "Original native engine did not establish a live Kodi runtime on the selected target; see source-bound LOGCAT.txt.",
+  "candidate_runtime": "NOT_RUN",
+  "failure": "ORIGINAL_NATIVE_RUNTIME_NOT_ESTABLISHED",
+  "install_exit": 0,
+  "installed_user_device": false,
+  "launch_exit": 0,
+  "native_startup_markers": {
+    "AT_RANDOM": false,
+    "CApplication::Create": false,
+    "Fatal signal": false,
+    "Running on": true,
+    "Starting Kodi": false,
+    "dlopen failed": true,
+    "talloc": false
+  },
+  "parent_apk_sha256": "a24ffafd056db23aa9d433552e17d4362cc9dbc9dd568b086d84cabadae8c619",
+  "settings_reset": false,
+  "shutdown": "NOT_RUN",
+  "status": "BLOCKED_TARGET_NOT_QUALIFIED"
+}

@@ -1,0 +1,9 @@
+{
+  "case": "Existing settings.xml removed while native request completes",
+  "observed_status": "completed",
+  "observed_rows": 31,
+  "native_requests": 1,
+  "settings_exists_after": false,
+  "Android": "NOT_RUN",
+  "interpretation": "Current fresh-result policy also accepts disappearance of readable regular settings state. This is not proof of benign writes or immutable settings consistency; existing documentation saying missing state always refuses is too broad."
+}

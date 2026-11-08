@@ -2,7 +2,7 @@ name: Infinity feature-only verification
 on:
   push:
     branches: [work/infinity-2103402-final-stabilization-20261024, work/infinity-final-corrective-from-2103407-20261025, work/infinity-final-release-462-20261107]
-    paths: ['repairs/infinity-2103402-final/android17/REQUEST.json', 'repairs/infinity-final-closure-2103407/ANDROID17-REQUEST.json', 'repairs/infinity-final-release-462-20261107/SCOPE.json']
+    paths: ['repairs/infinity-2103402-final/android17/REQUEST.json', 'repairs/infinity-final-closure-2103407/ANDROID17-REQUEST.json', 'repairs/infinity-final-release-462-20261107/SCOPE.json', 'repairs/infinity-final-release-462-20261107/ANDROID-SCOPE.json']
   workflow_dispatch:
     inputs:
       source_ref:
@@ -32,9 +32,53 @@ concurrency:
   group: infinity-feature-${{ inputs.source_ref || github.ref }}-${{ inputs.feature || 'explicit-request' }}-${{ github.ref == 'refs/heads/work/infinity-final-corrective-from-2103407-20261025' && github.sha || 'serial' }}
   cancel-in-progress: false
 jobs:
+  final464-input-transport:
+    name: Read-only signed464 input verification and unchanged compressed transport; no application tests
+    if: github.event_name == 'push' && github.ref == 'refs/heads/work/infinity-final-release-462-20261107' && startsWith(github.event.head_commit.message, 'Transport final464:')
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    env: {PYTHONDONTWRITEBYTECODE: '1'}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '21'}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13595614797', run-id: '42427388825', github-token: '${{ github.token }}', path: signed-input, merge-multiple: true}
+      - name: Exact signed receipt and SDK signature before transport; no APK changes
+        run: |
+          python3 - <<'PYVERIFY'
+          import hashlib,json,os,re,subprocess
+          from pathlib import Path
+          scope=json.loads(Path('repairs/infinity-final-release-462-20261107/ANDROID-SCOPE.json').read_text())
+          assert scope['operation']=='transport-candidate464' and scope['application_tests'] is False
+          apk=Path('signed-input/Infinity-2103464-Combined-Original-Signer.apk')
+          with apk.open('rb') as stream:sha=hashlib.file_digest(stream,'sha256').hexdigest()
+          receipt=json.loads(Path('signed-input/BUILD-RECEIPT.json').read_text())
+          assert sha==receipt['signed_apk_sha256'] and receipt['versionCode']==2103464 and receipt['source']=='33c800fe656eca117a5bfbdc1d4ac46269f3d7ed'
+          sdk=Path(os.environ['ANDROID_HOME'])/'build-tools/35.0.0'
+          signature=subprocess.check_output([str(sdk/'apksigner'),'verify','--verbose','--print-certs',str(apk)],text=True)
+          assert re.findall(r'certificate SHA-256 digest: ([0-9a-f]+)',signature)==['d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7']
+          Path('signed-input/TRANSPORT-SIGNATURE.txt').write_text(signature)
+          Path('signed-input/TRANSPORT.json').write_text(json.dumps(dict(status='PASS_EXACT_SIGNED_INPUT_BYTE_IDENTITY',APK_sha256=sha,APK_modified=False,source=receipt['source'],Android='NOT_RUN',Fold='NOT_RUN',public_release=False),indent=2)+'\n')
+          print('PASS unchanged signed464 bytes and original certificate')
+          PYVERIFY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity464-Verified-Compressed-Input-${{ github.run_id }}-INTERNAL
+          path: |
+            signed-input/Infinity-2103464-Combined-Original-Signer.apk
+            signed-input/BUILD-RECEIPT.json
+            signed-input/SIGNATURE.txt
+            signed-input/TRANSPORT.json
+            signed-input/TRANSPORT-SIGNATURE.txt
+            signed-input/preservation/
+          if-no-files-found: error
+          compression-level: 6
+          retention-days: 90
   final462-target-qualification:
     name: Exact signed462 stock Android17 target qualification only
-    if: github.event_name == 'push' && github.ref == 'refs/heads/work/infinity-final-release-462-20261107'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/work/infinity-final-release-462-20261107' && startsWith(github.event.head_commit.message, 'Qualify final462:')
     runs-on: ubuntu-22.04
     timeout-minutes: 25
     env:

@@ -1,0 +1,25 @@
+{
+  "native_sha256": "6fc35b8718621ef2e941540b8c858d7d7cd7f408c810ed2fd0d14f7031e8fbb7",
+  "archive_sha256": "828baf82d6060348bb50bcae22eb775e354e6f7c260ca2836ee922ea25de253f",
+  "changed_native_sources": {
+    "xbmc/guilib/GUIKeyboardFactory.cpp": {
+      "before": "964e3c943a11f1bbed87c4529bedcd08c0111152954ff5b7140fb96c87ef3fb2",
+      "after": "fdef3763a10d981649d4312d5f1646514b1e621829153ab9a0fa3900b8418df5"
+    },
+    "xbmc/guilib/GUIWindowManager.cpp": {
+      "before": "f9aeddec883a4d1ac63303bfbb9b88cba2bcba5f01fcd799f68c444665d31c23",
+      "after": "c36cf699f799f89b2ffde8900763837b1fb3436f74b05cca84226380cb9f4bde"
+    },
+    "xbmc/input/touch/generic/GenericTouchActionHandler.cpp": {
+      "before": "43bb691c2fa01355125b54de845761aa35f3553902c9b593acc4bfde292fc509",
+      "after": "7fdd605c3136b361408d4a24d0765c2c8769c717a9df748a7c23b8fb4b5d20a1"
+    },
+    "xbmc/windowing/GraphicContext.h": {
+      "before": "c18eb52470514ebb8da9c59330005f80b5815120b006ff8d76861f170b082bea",
+      "after": "24f27b66184979b05246cce7052ce0b013aad548b2a171d429b199820bf376c2"
+    }
+  },
+  "preserved_native_source_count": 9407,
+  "Android": "NOT_RUN",
+  "APK": false
+}
