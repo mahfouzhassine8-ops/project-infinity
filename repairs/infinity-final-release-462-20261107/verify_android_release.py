@@ -6,7 +6,7 @@ Installation replaces the package normally; user data is never cleared.
 """
 from pathlib import Path
 from zipfile import ZipFile
-import argparse,hashlib,json,os,re,socket,subprocess,time
+import argparse,codecs,hashlib,json,os,re,socket,subprocess,time
 import xml.etree.ElementTree as ET
 
 PACKAGE='com.projectinfinity.kodi'
@@ -50,16 +50,20 @@ class Device:
         request=dict(jsonrpc='2.0',id=464,method=method)
         if params is not None:request['params']=params
         with socket.create_connection(('127.0.0.1',19090),timeout=timeout) as conn:
-            conn.settimeout(timeout);conn.sendall(json.dumps(request).encode()+b'\n');data=b''
-            while len(data)<8*1024*1024:
+            conn.settimeout(timeout);conn.sendall(json.dumps(request).encode())
+            decoder=json.JSONDecoder();utf8=codecs.getincrementaldecoder('utf-8')();pending='';received=0
+            while received<8*1024*1024:
                 chunk=conn.recv(65536)
                 if not chunk:break
-                data+=chunk
-                try:reply=json.loads(data)
-                except (ValueError,UnicodeDecodeError):continue
-                if 'error' in reply:raise RuntimeError(method+': '+json.dumps(reply['error']))
-                assert reply.get('id')==464
-                return reply.get('result')
+                received+=len(chunk);pending+=utf8.decode(chunk)
+                while pending.strip():
+                    pending=pending.lstrip()
+                    try:reply,end=decoder.raw_decode(pending)
+                    except ValueError:break
+                    pending=pending[end:]
+                    if reply.get('id')!=464:continue
+                    if 'error' in reply:raise RuntimeError(method+': '+json.dumps(reply['error']))
+                    return reply.get('result')
         raise RuntimeError('Incomplete bounded JSONRPC reply: '+method)
     def read_json(self,path):return json.loads(self.shell('cat',path,check=False))
     def nodes(self,label):
@@ -92,7 +96,10 @@ class Device:
             time.sleep(1)
         else:raise RuntimeError('NORMAL_CHOOSER_DID_NOT_START_KODI')
         self.adb('forward','tcp:19090','tcp:9090')
-        self.until(lambda:self.rpc('JSONRPC.Ping')=='pong','native RPC readiness',240)
+        def native_ready():
+            self.alive()
+            return self.rpc('JSONRPC.Ping')=='pong'
+        self.until(native_ready,'native RPC readiness',240)
         self.alive();self.sequence=0
         return dict(pid=self.pid,entry='Original Splash and original Infinity card/default admission',chooser_tap=tapped)
     def start_qa(self):
@@ -161,6 +168,19 @@ def verify(parent,candidate,recovery,fixture,out):
         for args in [('appops','set',PACKAGE,'MANAGE_EXTERNAL_STORAGE','allow'),('pm','grant',PACKAGE,'android.permission.RECORD_AUDIO'),('pm','grant',PACKAGE,'android.permission.POST_NOTIFICATIONS')]:device.shell(*args)
         device.shell('mkdir','-p',HOME)
         device.adb('push',str(fixture/'home')+'/.',HOME)
+        # ADB-created backing directories initially belong to shell/root.
+        # Restore the normal app UID/SELinux labels on this fresh qemu fixture;
+        # never change an APK, Android protection or a real-device directory.
+        device.adb('root');device.adb('wait-for-device')
+        uid=device.shell('stat','-c','%u','/data/user/0/'+PACKAGE).strip()
+        assert uid.isdigit() and int(uid)>=10000,'EXACT_FRESH_APP_UID_REQUIRED'
+        backing='/data/media/0/Android/data/'+PACKAGE
+        ownership_before=device.shell('ls','-ldn',backing,backing+'/files',backing+'/files/.kodi')
+        device.shell('chown','-R',uid+':'+uid,backing)
+        device.shell('restorecon','-RF',backing)
+        ownership_after=device.shell('ls','-ldn',backing,backing+'/files',backing+'/files/.kodi')
+        report['fresh_fixture_ownership']=dict(app_uid=int(uid),before=ownership_before,after=ownership_after,only_disposable_package_tree=True,APK_modified=False,app_security_changed=False)
+        device.adb('unroot');device.adb('wait-for-device')
         report['parent_entry']=device.enter('parent462')
         inputs=json.loads((fixture/'ANDROID-INPUTS.json').read_text())
         for row in inputs['original_provider_archives']:

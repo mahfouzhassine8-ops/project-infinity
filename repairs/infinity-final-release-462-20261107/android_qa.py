@@ -83,7 +83,7 @@ def action(request,root):
         until(lambda:xbmc.getInfoLabel('Container.FolderPath').rstrip('/')==expected.rstrip('/'),'original provider heading route',120)
         return snapshot()
     if kind=='downloads':
-        xbmc.executebuiltin('ActivateWindow(Videos,files,return)')
+        xbmc.executebuiltin('RunScript(script.infinity.commandcenter,downloads)')
         until(lambda:xbmcgui.getCurrentWindowId()==10025,'native Videos Files')
         xbmc.sleep(1000);return snapshot()
     if kind=='info':
