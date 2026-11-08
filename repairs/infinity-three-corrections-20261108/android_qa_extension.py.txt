@@ -27,7 +27,7 @@ def _three_trakt_case(case):
     from jurialmunkey.window import get_property
     from tmdbhelper_sync_trakt.api.authenticator import TraktAuthenticator
     from tmdbhelper_sync_trakt.api.token import TraktStoredAccessToken
-    assert case in ('silent-on', 'silent-off', 'manual', 'other-skin')
+    assert case in ('silent-on', 'silent-off', 'manual', 'other-skin', 'success')
     assert xbmc.getSkinDir() == ('skin.estuary' if case == 'other-skin' else 'skin.infinity.diggz')
     names = ('TraktUserToken', 'TraktIsAuth', 'TraktRefreshTimeStamp', 'TraktRefreshAttempts', 'TraktAttemptedLogin')
     previous = {n: get_property(n) for n in names}
@@ -61,6 +61,21 @@ def _three_trakt_case(case):
         api.get_authorisation_token = no_authorization
         started = time.time()
         stored = TraktStoredAccessToken(api)
+        if case == 'success':
+            refreshed = dict(access_token='synthetic-new-access', refresh_token='synthetic-new-refresh', created_at=int(time.time()), expires_in=3600)
+
+            def success_response(token):
+                assert token == 'synthetic-qa-refresh'
+                report['HTTP_boundary_calls'] += 1
+                return SimpleNamespace(status_code=200, json=lambda: refreshed, close=lambda: None)
+
+            api.set_authorisation_token = success_response
+            assert stored.get_authorization() == refreshed
+            assert json.loads(api.user_token.value) == refreshed
+            assert report['HTTP_boundary_calls'] == 1
+            assert not get_property('TraktRefreshTimeStamp')
+            report.update(status='PASS_REAL_SDK_SUCCESSFUL_REFRESH', synthetic_token_rotation=True, no_failure_cooldown=True)
+            return report
         if case == 'manual':
             get_property('TraktRefreshTimeStamp', time.time()+299)
             assert api.authenticator.login() is None
@@ -91,6 +106,21 @@ def action(request, root):
         return _three_identity()
     if kind == 'trakt-case':
         return _three_trakt_case(request['case'])
+    if kind == 'provider-timing':
+        assert request['provider'] == 'plugin.video.umbrella'
+        controller = xbmcvfs.translatePath(xbmcaddon.Addon(CC).getAddonInfo('path'))
+        sys.path.insert(0, controller)
+        import infinity_search
+        ready, _ = infinity_search.providers(request['media'], force=True, provider_id=request['provider'])
+        assert len(ready) == 1 and ready[0]['id'] == request['provider']
+        target = infinity_search.route(ready[0], request['query'])
+        started = time.monotonic()
+        answer = rpc('Files.GetDirectory', dict(directory=target, media='video', properties=infinity_search.PROPERTIES, limits=dict(start=0, end=40)))
+        files = answer['files']
+        assert files, 'REAL_NATIVE_PROVIDER_RESULTS_REQUIRED'
+        return dict(status='DIAGNOSTIC_NORMAL_PROVIDER_ROUTE_COMPLETED', seconds=time.monotonic()-started,
+                    route=target, results=len(files), labels=[r.get('label') for r in files[:5]],
+                    Infinity_Search_lease=False, production_Search_acceptance=False)
     if kind == 'focus-result':
         expected = request['file']
         assert expected.startswith(tuple('plugin://'+p+'/' for p in PROVIDERS))

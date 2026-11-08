@@ -231,3 +231,19 @@ script observer, preserving original live GUI-list reads, APKs and every asserti
 The failed report is retained in evidence/ANDROID-FIRST-ATTEMPT-FAIL.json.
 Retry only the still-missing selected Android journey with the exact signed pair.
 No Android functionality PASS or Fold acceptance is claimed.
+
+
+Run42465125757 attempt1 stopped before execution on a GitHub Python-download
+HTTP504; retry attempt2 reached real Android execution. Its signed464→466
+install-over, complete79-module identity and exact active145-file Trakt source
+selection PASS. First real Movie Search All (The Matrix) FAIL: POV returned21
+results while Umbrella returned timeout under the original20-second native lease.
+Kodi kept responding with the samePID through114 observer replies. This is not
+an eight-cycle stability pass, heading pass, or completed crash repair. The fail
+report is retained in evidence/ANDROID-COLD-SEARCH-FAIL.json. No provider, native
+lease, cancellation/admission protection, engine or APK bytes are changed.
+
+Only the missing Trakt/recovery gates and ordinary native Umbrella movie/TV
+route timing diagnostics are selected next. A PASS of that subset cannot clear
+the retained Search failure or release the combined package. Physical Fold
+identity and final acceptance remain pending. No additional signing or build.

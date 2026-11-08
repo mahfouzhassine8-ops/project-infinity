@@ -61,9 +61,14 @@ def run(baseline, candidate, recovery, fixture, out):
     out.mkdir(parents=True)
     scope = json.loads((HERE / 'ANDROID-REQUEST.json').read_text())
     assert scope['application_tests'] is True and scope['shutdown_tests'] is False
+    phase = scope.get('execution_phase', 'complete')
+    assert phase in ('complete', 'Trakt-recovery-and-provider-timing')
     report = dict(status='RUNNING_SELECTED_THREE_CORRECTION_ANDROID_GATES', cases=[], Fold='NOT_RUN',
                   shutdown='NOT_SELECTED', playback='NOT_SELECTED', observer_workaround=False, accepted_pointer_updated=False)
     device = None
+    report['selected_phase'] = phase
+    if phase != 'complete':
+        report['Search_acceptance'] = 'FAIL_COLD_UMBRELLA_TIMEOUT_RUN42465125757_ATTEMPT2_RETAINED'
 
     def save():
         (out / 'ANDROID-VERIFICATION.json').write_text(json.dumps(report, indent=2) + '\n')
@@ -159,44 +164,45 @@ def run(baseline, candidate, recovery, fixture, out):
         passed('signed464_to466_complete79_authentication_and_Trakt_source_selection', identity=value)
         init = device.command('first-use', seconds=420)
         assert init['status'] == 'PASS_UNMODIFIED_TWO_PROVIDER_INITIALIZATION'
-        queries = [('movie', 'The Matrix'), ('movie', 'Inception'), ('movie', 'Toy Story'), ('movie', 'Finding Nemo'),
-                   ('tv', 'Breaking Bad'), ('tv', 'The Office'), ('tv', 'SpongeBob'), ('tv', 'Re:zero')]
-        headings_open = {0: 'plugin.video.umbrella', 1: 'plugin.video.pov', 6: 'plugin.video.umbrella', 7: 'plugin.video.pov'}
-        for cycle, (media, query) in enumerate(queries):
-            device.command('home')
-            device.command('search', media=media)
-            device.submit_search_all(query, cycle)
+        if phase == 'complete':
+            queries = [('movie', 'The Matrix'), ('movie', 'Inception'), ('movie', 'Toy Story'), ('movie', 'Finding Nemo'),
+                       ('tv', 'Breaking Bad'), ('tv', 'The Office'), ('tv', 'SpongeBob'), ('tv', 'Re:zero')]
+            headings_open = {0: 'plugin.video.umbrella', 1: 'plugin.video.pov', 6: 'plugin.video.umbrella', 7: 'plugin.video.pov'}
+            for cycle, (media, query) in enumerate(queries):
+                device.command('home')
+                device.command('search', media=media)
+                device.submit_search_all(query, cycle)
 
-            def results():
-                current = device.command('snapshot', seconds=55)
-                if current['window'] != 10025 or 'action=search-all' not in current['labels']['Container.FolderPath']:
+                def results():
+                    current = device.command('snapshot', seconds=55)
+                    if current['window'] != 10025 or 'action=search-all' not in current['labels']['Container.FolderPath']:
+                        return None
+                    headings = [r for r in current.get('rows', []) if r.get('provider') in PROVIDERS and re.search(r' — \d+ results$', r.get('label', ''))]
+                    good = [r for r in current.get('rows', []) if r.get('provider') in PROVIDERS and not re.search(r' — \d+ results$', r.get('label', '')) and r.get('file', '').startswith('plugin://' + r['provider'] + '/')]
+                    if {r['provider'] for r in headings} == PROVIDERS and {r['provider'] for r in good} == PROVIDERS:
+                        return current, headings, good
                     return None
-                headings = [r for r in current.get('rows', []) if r.get('provider') in PROVIDERS and re.search(r' — \d+ results$', r.get('label', ''))]
-                good = [r for r in current.get('rows', []) if r.get('provider') in PROVIDERS and not re.search(r' — \d+ results$', r.get('label', '')) and r.get('file', '').startswith('plugin://' + r['provider'] + '/')]
-                if {r['provider'] for r in headings} == PROVIDERS and {r['provider'] for r in good} == PROVIDERS:
-                    return current, headings, good
-                return None
 
-            current, headings, good = device.until(results, 'real nonempty Umbrella and POV results cycle' + str(cycle + 1), 160)
-            assert not any('state changed' in r.get('label', '').lower() for r in current['rows'])
-            device.command('focus-result', index=good[0]['index'], file=good[0]['file'])
-            device.shell('input', 'swipe', '820', '1650', '820', '750', '500')
-            device.shell('input', 'swipe', '820', '750', '820', '1650', '500')
-            opened = None
-            if cycle in headings_open:
-                provider = headings_open[cycle]
-                heading = next(r for r in headings if r['provider'] == provider)
-                # Original live Container(50).ListItem read is deliberately used.
-                native = device.command('select-row', index=heading['index'], file=heading['file'], seconds=160)
-                opened = provider
-                if media == 'tv':
-                    folders = [r for r in native.get('rows', []) if r.get('file', '').startswith('plugin://' + provider + '/') and 'season' in r['file'].lower()]
-                    assert folders, 'ACTUAL_TV_RESULT_FOLDER_REQUIRED'
-                    device.command('select-row', index=folders[0]['index'], file=folders[0]['file'], seconds=160)
-            device.alive()
-            passed('real_Search_All_cycle_' + str(cycle + 1), media=media, query=query, providers=sorted(PROVIDERS), results=len(good), heading_opened=opened, PID=device.pid, live_ListItem_read=True)
+                current, headings, good = device.until(results, 'real nonempty Umbrella and POV results cycle' + str(cycle + 1), 160)
+                assert not any('state changed' in r.get('label', '').lower() for r in current['rows'])
+                device.command('focus-result', index=good[0]['index'], file=good[0]['file'])
+                device.shell('input', 'swipe', '820', '1650', '820', '750', '500')
+                device.shell('input', 'swipe', '820', '750', '820', '1650', '500')
+                opened = None
+                if cycle in headings_open:
+                    provider = headings_open[cycle]
+                    heading = next(r for r in headings if r['provider'] == provider)
+                    # Original live Container(50).ListItem read is deliberately used.
+                    native = device.command('select-row', index=heading['index'], file=heading['file'], seconds=160)
+                    opened = provider
+                    if media == 'tv':
+                        folders = [r for r in native.get('rows', []) if r.get('file', '').startswith('plugin://' + provider + '/') and 'season' in r['file'].lower()]
+                        assert folders, 'ACTUAL_TV_RESULT_FOLDER_REQUIRED'
+                        device.command('select-row', index=folders[0]['index'], file=folders[0]['file'], seconds=160)
+                device.alive()
+                passed('real_Search_All_cycle_' + str(cycle + 1), media=media, query=query, providers=sorted(PROVIDERS), results=len(good), heading_opened=opened, PID=device.pid, live_ListItem_read=True)
         device.command('home')
-        for case in ('silent-on', 'silent-off', 'manual', 'other-skin'):
+        for case in ('silent-on', 'silent-off', 'manual', 'success', 'other-skin'):
             if case == 'other-skin':
                 assert device.rpc('Settings.SetSettingValue', dict(setting='lookandfeel.skin', value='skin.estuary')) is True
                 device.until(lambda: device.rpc('XBMC.GetInfoLabels', dict(labels=['System.CurrentWindow'])), 'Estuary loaded', 20)
@@ -207,17 +213,21 @@ def run(baseline, candidate, recovery, fixture, out):
                 device.screenshot('manual-Trakt-device-code')
                 time.sleep(2)
                 device.rpc('Input.Back')
-            if case != 'silent-on':
+            if case not in ('silent-on', 'success'):
                 labels = confirm_failure('Trakt-' + case)
             outcome = device.until(lambda: reply(seq), 'selected actual SDK Trakt case ' + case, 40)
-            assert outcome['status'] == 'PASS_REAL_SDK_SCOPED_TRAKT_CASE'
-            if case == 'silent-on':
+            assert outcome['status'] == ('PASS_REAL_SDK_SUCCESSFUL_REFRESH' if case == 'success' else 'PASS_REAL_SDK_SCOPED_TRAKT_CASE')
+            if case in ('silent-on', 'success'):
                 assert not visible(12002)
             passed('real_SDK_Trakt_' + case, details=outcome)
         assert device.rpc('Settings.SetSettingValue', dict(setting='lookandfeel.skin', value='skin.infinity.diggz')) is True
         time.sleep(3)
         device.alive()
         device.command('home')
+        if phase != 'complete':
+            for media, query in (('movie', 'The Matrix'), ('tv', 'Breaking Bad')):
+                timing = device.command('provider-timing', provider='plugin.video.umbrella', media=media, query=query, seconds=180)
+                passed('diagnostic_normal_Umbrella_' + media + '_route_timing', details=timing, production_Search_acceptance=False)
         (out / 'CANDIDATE-LOGCAT.txt').write_text(device.adb('logcat', '-d', '-v', 'threadtime', timeout=60))
         oldpid = device.pid
         device.install(recovery, 'recovery467')
@@ -227,7 +237,7 @@ def run(baseline, candidate, recovery, fixture, out):
         restored = identity(recovery, '0.3.5.65', '1.2.8.2')
         assert device.shell('cat', PROFILE + '/release-data-sentinel.txt') == sentinel
         passed('signed466_to467_forward_recovery79_files_and_data', identity=restored, previous_functional_sources_restored=True)
-        report.update(status='PASS_SELECTED_ANDROID_THREE_CORRECTION_GATES', physical_Fold='PENDING_ONE_OWNER_TEST', public_release='ENGINEERING_CANDIDATE_ONLY')
+        report.update(status=('PASS_SELECTED_ANDROID_THREE_CORRECTION_GATES' if phase == 'complete' else 'PASS_ONLY_SELECTED_TRAKT_RECOVERY_AND_NATIVE_ROUTE_DIAGNOSTICS_SEARCH_REMAINS_BLOCKED'), physical_Fold='PENDING_ONE_OWNER_TEST', public_release='ENGINEERING_CANDIDATE_ONLY')
     except BaseException as error:
         report.update(status='FAIL_SELECTED_ANDROID_THREE_CORRECTION_GATE', error=type(error).__name__ + ': ' + str(error), traceback=traceback.format_exc())
         raise
