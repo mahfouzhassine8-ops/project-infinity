@@ -1,18 +1,18 @@
   selected_watchlist:
     name: Exact signed468 Watchlist playback and forward469 recovery; selected feature only
-    if: github.event_name == 'workflow_dispatch' && inputs.feature == 'watchlist-playback-android'
+    if: (github.event_name == 'workflow_dispatch' && inputs.feature == 'watchlist-playback-android') || (github.event_name == 'push' && github.ref == 'refs/heads/work/infinity-watchlist-phase-b-20261108' && startsWith(github.event.head_commit.message, 'Verify Watchlist468:'))
     runs-on: ubuntu-22.04
     timeout-minutes: 75
     env:
       GH_TOKEN: ${{ github.token }}
       PYTHONDONTWRITEBYTECODE: '1'
-      SELECTED_SOURCE: ${{ inputs.source_ref }}
-      AUTHORIZED_SCOPE: ${{ inputs.authorization }}
+      SELECTED_SOURCE: ${{ inputs.source_ref || github.sha }}
+      AUTHORIZED_SCOPE: ${{ github.event_name == 'push' && 'Owner authorization 8e83bcb8374dec0ccc646cbe02c3c4249395ba8c; exact selected Watchlist468/forward469 feature cases; no shutdown acceptance' || inputs.authorization }}
       INFINITY_EMULATOR_API: '37.0'
       INFINITY_EMULATOR_TARGET: google_apis
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-        with: {ref: '${{ inputs.source_ref }}', fetch-depth: 0, persist-credentials: false, show-progress: false}
+        with: {ref: '${{ inputs.source_ref || github.sha }}', fetch-depth: 0, persist-credentials: false, show-progress: false}
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with: {python-version: '3.11.7'}
       - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
@@ -43,6 +43,17 @@
           require(this['workflow_id']==workflow['id'] and this['path']=='.github/workflows/infinity-saved-navigation-android.yml' and this['head_sha']==head,'EXISTING_FEATURE_WORKFLOW_AND_EXACT_SOURCE_ONLY')
           request=load(task/'SIGNED-PAIR-REQUEST.json')
           require(request['schema']==1 and request['operation']=='verify-watchlist-signed468-forward469' and request['repository']==repository,'COMMITTED_SIGNED_PAIR_REQUIRED')
+          if os.environ['GITHUB_EVENT_NAME']=='push':
+              event=load(os.environ['GITHUB_EVENT_PATH'])
+              require(event['head_commit']['message'].startswith('Verify Watchlist468:'),'EXACT_SELECTED_PUSH_PREFIX')
+              execution=load(task/'ANDROID-EXECUTION-REQUEST.json')
+              owner='8e83bcb8374dec0ccc646cbe02c3c4249395ba8c'
+              require(execution['schema']==1 and execution['operation']==request['operation'] and execution['feature']=='watchlist-playback-android','EXACT_SELECTED_PUSH_OPERATION')
+              require(execution['owner_authorization_commit']==owner and execution['application_tests'] is True and execution['shutdown_tests'] is False,'EXISTING_OWNER_FEATURE_AUTHORIZATION_ONLY')
+              authority_path=task/'OWNER-PHASE-B-AUTHORIZATION.md'
+              require(authority_path.read_bytes()==subprocess.check_output(['git','show',owner+':'+authority_path.as_posix()]),'UNCHANGED_OWNER_AUTHORIZATION_BINDING')
+              for key,name in [('signed_pair_request_sha256','SIGNED-PAIR-REQUEST.json'),('android_request_sha256','ANDROID-REQUEST.json'),('runtime_source_pins_sha256','RUNTIME-SOURCE-PINS.json'),('harness_host_result_sha256','ANDROID-HARNESS-HOST-RESULT.json')]:
+                  require(digest(task/name)==execution[key],'EXACT_COMMITTED_EXECUTION_BINDING:'+name)
           selected=load(task/'ANDROID-REQUEST.json')
           require(selected['operation']==request['operation'] and selected['application_tests'] is True and selected['shutdown_tests'] is False,'SELECTED_FEATURE_ONLY_NO_SHUTDOWN')
           for key,name in [('runtime_source_pins_sha256','RUNTIME-SOURCE-PINS.json'),('android_request_sha256','ANDROID-REQUEST.json'),('harness_host_result_sha256','ANDROID-HARNESS-HOST-RESULT.json')]:
@@ -132,6 +143,7 @@
           python3 repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py --out watchlist-qa-emulator-setup
           sudo chmod 666 /dev/kvm
       - uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        timeout-minutes: 45
         with:
           api-level: '37.0'
           arch: x86_64

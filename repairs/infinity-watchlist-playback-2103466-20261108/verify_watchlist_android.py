@@ -8,7 +8,7 @@ import time
 import traceback
 from urllib.parse import urlsplit, parse_qs
 from zipfile import ZipFile
-from android_watchlist_common import HERE, CC, PACKAGE, HOME, PROFILE, device_class, sha
+from android_watchlist_common import HERE, CC, PACKAGE, HOME, PROFILE, device_class, sha, arm_host_disposal
 from watchlist_fixture_server import generate_clip, start
 
 
@@ -40,6 +40,11 @@ def run(baseline,candidate,recovery,fixture,out,port):
     def save(): (out/'ANDROID-VERIFICATION.json').write_text(json.dumps(report,indent=2)+'\n')
     def passed(name,**detail): report['cases'].append(dict(case=name,status='PASS',**detail));save()
     def fail_capture():
+        # Preserve the actual in-flight QA request before diagnostic snapshot replaces it.
+        pending=out/'request.json'
+        try:
+            if pending.is_file():(out/'failure-original-request.json').write_bytes(pending.read_bytes())
+        except OSError as error:report['original_request_capture_error']=repr(error)
         if device is None:return
         for name,fn in (('failure-logcat.txt',lambda:device.adb('logcat','-d',timeout=45)),
                         ('failure-pids.txt',lambda:device.shell('pidof',PACKAGE+':kodi',check=False)),
@@ -99,9 +104,22 @@ def run(baseline,candidate,recovery,fixture,out,port):
             events=device.command('events')
             return events if any(e['event']=='Stopped' and e['monotonic']>marker for e in events) else None
         device.until(actual_stop,'genuine actual Stopped callback',10);wait_alive(2)
+    native_watchlist_paths={}
     def row_for(key):
-        view=device.command('watchlist',seconds=120)
-        return next(r for r in view['rows'] if r.get('Infinity.ResumeHub.Key')==key)
+        route='plugin://script.infinity.commandcenter/?action=library&bucket=watchlist'
+        view=device.command('watchlist',key=key,seconds=90)
+        require(view['window']==10025 and view['folder']==route and view['dialog'] in (0,-1,9999),'Actual ready native Watchlist directory required')
+        rows=[row for row in view['rows'] if row.get('Infinity.ResumeHub.Key')==key]
+        require(len(rows)==1 and rows[0].get('file'),'Unique exact Watchlist key and nonempty native path required')
+        row=rows[0]
+        for current in view['rows']:
+            saved_key=current.get('Infinity.ResumeHub.Key')
+            if saved_key not in inputs['seed']['watchlist'] or not current.get('file'):continue
+            if saved_key in native_watchlist_paths:
+                require(current['file']==native_watchlist_paths[saved_key],'Exact previously observed native Watchlist path changed')
+            else:native_watchlist_paths[saved_key]=current['file']
+        require(row['file']==native_watchlist_paths[key],'Exact native Watchlist selected path required')
+        return row
     def click(row):device.command('click',index=row['index'],file=row['file'],seconds=20)
     def menu_pick(choices):
         def find():
@@ -194,6 +212,7 @@ def run(baseline,candidate,recovery,fixture,out,port):
     finally:
         save()
         if server:server.shutdown();server.server_close()
+        if device is not None:arm_host_disposal(device,out)
 
 
 if __name__=='__main__':

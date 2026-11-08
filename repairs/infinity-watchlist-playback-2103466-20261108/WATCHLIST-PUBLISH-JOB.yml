@@ -1,6 +1,6 @@
   publish-watchlist:
     name: Exact signed468 and forward469 engineering prerelease; Fold acceptance pending
-    if: github.event_name == 'workflow_dispatch' && github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/work/infinity-watchlist-phase-b-20261108' && inputs.operation == 'publish-watchlist'
+    if: github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/work/infinity-watchlist-phase-b-20261108' && ((github.event_name == 'workflow_dispatch' && inputs.operation == 'publish-watchlist') || (github.event_name == 'push' && startsWith(github.event.head_commit.message, 'Publish Watchlist468:')))
     runs-on: ubuntu-22.04
     timeout-minutes: 40
     permissions: {contents: write, actions: read}

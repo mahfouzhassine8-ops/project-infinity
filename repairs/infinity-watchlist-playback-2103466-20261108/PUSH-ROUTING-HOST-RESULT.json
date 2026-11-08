@@ -1,0 +1,93 @@
+{
+  "status": "PASS_SELECTED_PUSH_ROUTING_CONTRACT_ONLY",
+  "prior_head": "33240c9a7d388c36ae6a29d17cf15c4919785b85",
+  "checks": [
+    {
+      "case": "all_old_jobs_inputs_and_publisher_gates_preserved",
+      "status": "PASS"
+    },
+    {
+      "case": "feature_verify_push",
+      "status": "PASS"
+    },
+    {
+      "case": "feature_unrelated_push",
+      "status": "PASS"
+    },
+    {
+      "case": "feature_publication_prefix",
+      "status": "PASS"
+    },
+    {
+      "case": "combined_publish_push",
+      "status": "PASS"
+    },
+    {
+      "case": "combined_verify_prefix",
+      "status": "PASS"
+    },
+    {
+      "case": "combined_sign_prefix_no_keys",
+      "status": "PASS"
+    },
+    {
+      "case": "all_selected_manual_feature_routes_unchanged_including_generic_phaseB_manual",
+      "status": "PASS"
+    },
+    {
+      "case": "manual_combined_routes_unchanged",
+      "status": "PASS"
+    },
+    {
+      "case": "old_branch_push_routes_unchanged",
+      "status": "PASS"
+    },
+    {
+      "case": "fresh_push_source_and45minute_emulator_with75minute_always_artifacts",
+      "status": "PASS"
+    },
+    {
+      "case": "actual_push_guard_accepts_exact_committed_hashes_and_owner",
+      "status": "PASS"
+    },
+    {
+      "case": "push_guard_rejects_wrong_prefix",
+      "status": "PASS"
+    },
+    {
+      "case": "push_guard_rejects_owner_authorization_commit",
+      "status": "PASS"
+    },
+    {
+      "case": "push_guard_rejects_shutdown_tests",
+      "status": "PASS"
+    },
+    {
+      "case": "push_guard_rejects_signed_pair_request_sha256",
+      "status": "PASS"
+    },
+    {
+      "case": "push_guard_rejects_android_request_sha256",
+      "status": "PASS"
+    },
+    {
+      "case": "push_guard_rejects_runtime_source_pins_sha256",
+      "status": "PASS"
+    },
+    {
+      "case": "push_guard_rejects_harness_host_result_sha256",
+      "status": "PASS"
+    },
+    {
+      "case": "both_workflow_embedded_python_blocks_parse_without_execution",
+      "status": "PASS"
+    }
+  ],
+  "workflow_sha256": {
+    ".github/workflows/infinity-saved-navigation-android.yml": "89d5021bda0b59053aa9c4070b9850c2a1a66292616ed0257155ac55c53a9762",
+    ".github/workflows/infinity-combined-release.yml": "1495c3f14d338c3134f023b2c3f0c23973dc02502ae09061592bceb6b698539c"
+  },
+  "application_tests": "NOT RUN",
+  "workflow_dispatch_or_push": "NOT EXECUTED",
+  "APK_runtime_signer_authority": "UNCHANGED_BY_THIS_ROUTING_TASK"
+}

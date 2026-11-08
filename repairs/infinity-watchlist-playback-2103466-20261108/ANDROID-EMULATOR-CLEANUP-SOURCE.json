@@ -1,0 +1,16 @@
+{
+  "url": "https://github.com/ReactiveCircus/android-emulator-runner/blob/a421e43855164a8197daf9d8d40fe71c6996bb0d/src/emulator-manager.ts",
+  "sha256": "1e9ca00c20d35d925440afc1ce82303c42cddc4c1ac196da65e39209ef87696f",
+  "observed_source_facts": [
+    "launchEmulator backgrounds emulator through sh -c with &",
+    "killEmulator awaits adb emu kill without timeout/process-exit verification",
+    "killEmulator finally prints endgroup regardless catch outcome"
+  ],
+  "current_actual_failure": "run42519069995 StopIteration at row_for; three preceding actual cases PASS; post-emulator-kill Node action hang is separate host cleanup",
+  "root_reviewed_actual_teardown_process": {
+    "run": 42519069995,
+    "pid": 4479,
+    "basename": "qemu-system-x86_64-headless",
+    "source": "actual cleanup log reviewed by root"
+  }
+}

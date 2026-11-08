@@ -225,9 +225,17 @@ def action(request):
         return dict(status='ACTUAL_SELECTED_PROVIDER_FIRST_USE',details=result)
     if kind=='watchlist':
         route='plugin://script.infinity.commandcenter/?action=library&bucket=watchlist'
+        key=request['key']
+        assert isinstance(key,str) and len(key)==64 and all(char in '0123456789abcdef' for char in key)
         rpc('GUI.ActivateWindow',dict(window='videos',parameters=[route,'return']))
-        until(lambda:xbmc.getInfoLabel('Container.FolderPath')==route and int(xbmc.getInfoLabel('Container.NumItems') or 0)>=2,'actual Watchlist directory',90)
-        return snapshot()
+        def ready():
+            view=snapshot()
+            if (view['window']!=10025 or view['folder']!=route or view['dialog'] not in (0,-1,9999) or
+                    xbmc.getCondVisibility('System.HasActiveModalDialog')):return None
+            rows=[row for row in view['rows'] if row.get('Infinity.ResumeHub.Key')==key]
+            assert len(rows)<=1,'UNIQUE_EXACT_WATCHLIST_KEY_REQUIRED'
+            return view if rows and rows[0].get('file') else None
+        return until(ready,'actual ready Watchlist row for exact key '+key,60)
     if kind=='click':
         expected=focus(request);rpc('Input.Select')
         return dict(status='ACTUAL_NATIVE_SELECTED_ITEM_CLICK',file=expected,live_ListItem_read=True)

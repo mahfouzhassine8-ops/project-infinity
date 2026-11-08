@@ -41,7 +41,7 @@
     "artifact_id": 13631340281,
     "APK_SHA256": "804eebc57af2e4ef4e5418b56994bda64eb7fd7e7f2c0653b5c6e2a9f7833058"
   },
-  "Android": "RETRY_SAME_SIGNED_PAIR_AFTER_EXECUTED_STAGING_GUARD_AND_SOURCE_CONFIRMED_POPUP_BINDINGS",
+  "Android": "PUSH_SELECTED_SAME_SIGNED_PAIR_AFTER_EXECUTED_ROW_READY_RPC_AND_HOST_DISPOSAL_GUARDS; three real passes retained",
   "Fold": "NOT_RUN_PENDING_ONE_OWNER_ACCEPTANCE",
   "shutdown": "NOT_SELECTED",
   "accepted_pointer_updated": false,
@@ -95,6 +95,20 @@
       "application_tests_run": 0,
       "reason": "stage_watchlist_android.py still required literal hidden Container(50) path read instead of new actual-view native live reads; no APK/runtime change.",
       "APK_rebuild": false
+    },
+    {
+      "run_id": 42519069995,
+      "source_commit": "33240c9a7d388c36ae6a29d17cf15c4919785b85",
+      "result": "FAIL_ROW_LOOKUP_ASYNC_DIRECTORY_THEN_HOST_ACTION_CLEANUP_TIMEOUT",
+      "artifact_id": 13634299398,
+      "artifact_SHA256": "5a9e6065c3f2e5006bea04ecb0155ca58606224113c0ab079c056cecb50068fc",
+      "completed_app_cases": 3,
+      "movie_native_handoff_and_partial_progress": "PASS_REAL_POV_AND_AV_EVENTS",
+      "verifier_failure_at": "2026-11-08T20:23:15Z",
+      "job_timeout_at": "2026-11-08T21:29:05Z",
+      "reason": "Immediate fresh-resume row lookup encountered blank rows/Busy directory; emulator action lingered after emu kill. No production source defect established by this failure.",
+      "APK_rebuild": false
     }
-  ]
+  ],
+  "native_Watchlist_movie": "PASS_ACTUAL_POV_FRESH_PLAYING_ITEM_ORIGIN_AND_PARTIAL_PROGRESS"
 }
