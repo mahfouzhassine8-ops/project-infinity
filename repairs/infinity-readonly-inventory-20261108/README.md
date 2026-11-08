@@ -40,3 +40,9 @@ Search timeout investigation and final Galaxy Fold acceptance remain separate.
 
 The complete installable diagnostic ZIP and its checksum are in dist/. The
 ZIP contains only this separate diagnostic script and identity-reference data.
+
+Owner execution on the Galaxy Fold is confirmed: report collected2026-11-08
+10:09:49UTC, SHA2566812f5e1cfa7a0ddcbb786c7ee7123faaaff8c1c80a222ce696d6ca91cc17fd1.
+Host verification confirms the real APK hash, original-key CC signature, all78
+module records plus the loose helper, and145 Trakt files. This validates this
+diagnostic only; the three repairs’ Android/Fold acceptance remains separate.
