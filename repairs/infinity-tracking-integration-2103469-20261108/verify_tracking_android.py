@@ -669,18 +669,8 @@ def run(staged_path, sdk, out):
         report['cases'].append(dict(case='queens_blade_actual_tv_identity', status='FAIL',
             retained=True, executed_this_run=False, run=42567028842,
             error='Retained genuine AV SDK movie/S=-1/E=-1; no TV replay or inferred identity.'))
-        if selection['execution_focus'] == 'independent-movie':
-            try:
-                before = observer.call('state')
-                enter_saved_queen_parent(device, observer, before, passed)
-            except Exception as parent_error:
-                report['queens_blade_saved_parent_limitation'] = repr(parent_error)
-                record_case_failure(device, observer, out, report, 'actual_infinity_parent_save_navigation', parent_error)
-                parent_snapshot = observer.call('snapshot')
-                base.save(out / 'queens-blade-parent-navigation-limitation.json',
-                          dict(error=repr(parent_error), actual=parent_snapshot))
-                if parent_snapshot['dialog'] == 12002 and parent_snapshot['heading'] == 'Infinity Tracked':
-                    observer.call('ack-parent-identity-refusal')
+        report['retained_parent_query_save_failure'] = dict(run=42569526805, status='FAIL',
+            executed_this_run=False, reason='Actual owned identity refusal confirmed; not replayed before independent movie.')
         base.crash_free_alive(device)
         try:
             run_public_movie(device, observer, out, passed)
@@ -705,10 +695,8 @@ def run(staged_path, sdk, out):
         except Exception as error:
             record_case_failure(device, observer, out, report, 'independent_recorded_state_persistence', error)
         base.crash_free_alive(device)
-        try:
-            report['view_theme_matrix'] = capture_ui(device, observer, out)
-        except Exception as error:
-            record_case_failure(device, observer, out, report, 'independent_ui_capture', error)
+        report['view_theme_matrix'] = dict(status='NOT_RUN_BLOCKED_ELIGIBLE_TV_RECORD_AND_THEME_PREREQUISITE',
+            repeated=False, prior_capture_run=42564230119)
         base.crash_free_alive(device)
         failed = any(case['status'] == 'FAIL' for case in report['cases'])
         report['focused_execution_status'] = ('FAIL' if any(case['status'] == 'FAIL' and not case.get('retained')

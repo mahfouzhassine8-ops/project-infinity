@@ -117,3 +117,7 @@ Before running, select only new `test_tracking_content_stop_focus.py` optimized 
 ```sh
 python repairs/infinity-tracking-integration-2103469-20261108/test_tracking_content_stop_focus.py
 ```
+
+## Movie-only continuation after42569526805
+
+The actual native65051 list/context path now reached the source-proven query-bearing parent refusal. The observer then failed while trying to focus an invisible standard affirmative11; the protected dialog displayed its9010 close control. Movie execution remained NOT_RUN. Retain the raw failure and run the still-missing movie checks directly; do not repeat TV playback, parent saving, or known incomplete viewport/theme captures. No lower-level dialog/Stop/content helper is changed by this routing reduction. Original source/key fixture and all retained mandatory FAIL states remain unchanged.
