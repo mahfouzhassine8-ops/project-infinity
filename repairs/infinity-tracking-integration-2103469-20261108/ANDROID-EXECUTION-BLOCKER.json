@@ -1,5 +1,5 @@
 {
-  "status": "BASELINE_EXECUTION_ROUTE_QUALIFIED; INTEGRATED_FEATURE_GATES_PENDING",
+  "status": "BASELINE_RUNTIME_AND_NATIVE80_AUTH_QUALIFIED; REAL_PLAYBACK_AND_RELEASE_GATES_PENDING",
   "local_host_arch": "x86_64",
   "adb_on_PATH": null,
   "emulator_on_PATH": null,
@@ -21,8 +21,8 @@
   },
   "repeat_failure_run": 42527381943,
   "protected69_native": "Exact same original66 ARM64 native SHA256 ee3be7c7a95b86f8357539001fcd50bedbd80217b02f130d649f7f57e6075794",
-  "new_application_tests": "PASS_UNCHANGED69_STOCK_API36_THREE_STARTS_ONLY; NEW_SOURCE_NOT_RUN",
-  "minimum_requirement": "Use qualified unchanged stockAPI36r7 environment for originally signed internalQA candidate/recovery and twelve selected integrated tracking checks; no new native compilation needed for three Python-only changes.",
+  "new_application_tests": "PASS unchanged69 stock API36 startup reused; PASS candidate CC68 native RSA/full80 authentication; actual AV not yet observed",
+  "minimum_requirement": "Correct source-bound native dialog selection, execute real provider playback via genuine Infinity entrypoint, inspect final SDK identity, and retain all unresolved twelve engineering gates. No startup rebuild or qualification repeat.",
   "new_workflow_dispatches": 0,
   "new_builds": 0,
   "new_signatures": 0,
@@ -41,5 +41,13 @@
     "run_id": 42542862696,
     "artifact_id": 13642681405
   },
-  "new_selected_push_runs": 5
+  "latest_feature_run": 42564230119,
+  "latest_feature_scope": "Test reached real native Select Quality dialog; observer omitted standard list3/6. Correct test-only selection before provider failure classification.",
+  "internal_original_key_module_signatures": "Two full80 internal module fixtures signed once in42555855742; no APK signing or publication.",
+  "selected_feature_runs_retained": [
+    42559424109,
+    42560198172,
+    42562370691,
+    42564230119
+  ]
 }

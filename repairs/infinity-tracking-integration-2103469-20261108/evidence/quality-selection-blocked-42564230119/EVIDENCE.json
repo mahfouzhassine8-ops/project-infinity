@@ -1,0 +1,35 @@
+{
+  "status": "FAIL_SELECTED_ANDROID_TEST; AUTHENTICATION_AND_BROWSE_NO_HISTORY_PASS",
+  "run_id": 42564230119,
+  "source_commit": "65d13114db55a808131828c33c7e6c5f3528e39c",
+  "artifact_id": 13650818879,
+  "artifact_sha256": "2d97c2353ebbc109a5ab5c4d26ac5c169d7af7b80e3fa3d77b6b7a63158aa074",
+  "artifact_size": 2958802,
+  "auth": "PASS original native RSA/full80, CC0.3.5.68 on unchanged2103469 APK",
+  "APK_unchanged": true,
+  "actual_AV_started": false,
+  "observed_E4_dialog": {
+    "id": 12000,
+    "heading": "Select Quality",
+    "captured_controls": {}
+  },
+  "test_limitation": "Observer did not capture selection controls of this native dialog; driver did not select a quality option. AV wait expired before playback. This is not evidence of an unresponsive provider search, production crash, or native deadlock.",
+  "movie_limitation": "Subsequent Playback failed modal after cancelling pending resolver prevented independent movie navigation; no movie producer failure conclusion.",
+  "actual_directory_identity": {
+    "queens_blade_e4": "tvshow; season=-1; episode=-1; no external IDs",
+    "rezero_e3_e4": "tvshow; season=-1; episode=-1; no external IDs"
+  },
+  "Infinity_entrypoint": "Episode save branch was not entered because actual directory SDK identity was unproved. Native WNT launch cannot clear Infinity saved-list launch gate.",
+  "remaining": "Real final AV metadata, typed TV/movie progress, Infinity origin, persistence, cross-entry dedup, provider coverage, populated view matrix and APK/recovery verification remain unresolved.",
+  "retained_files": {
+    "ANDROID-VERIFICATION.json": "9e38f9c52e9aef4bec34bdd35525f253035d0e05d990b5cbfcf3cfd38d1c518b",
+    "queens-blade-e4-actual-gui-sdk.json": "670ee152a533bc47edaf50697d9cdd8bc29622fd59ac6cbecdede919f52321b9",
+    "rezero-actual-native-e3-e4-sdk.json": "a4052d0a1ba309241791b26963412f3d4cf508ef8573fc0f38113242e1dc7f45",
+    "queens_blade_e4-failure-snapshot.json": "d3533f56e0b5cf97dcc2fc43e7675ce9e6590555e441062329db3f5c6bcb7625",
+    "queens_blade_e4-failure-playing.json": "c91f066d54a6f8221dc61865bead774ac1da71d32ed814e481d0e9ed5752eb23",
+    "queens_blade_e4-failure-events.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "public_movie-failure-snapshot.json": "3ad743bb02c1f0b1a232686d01135092d4ef7f3fe6f339521b2c1dd381ad3ef8",
+    "LIFECYCLE-CAPTURE.json": "7f43a6d5acbdb891900d0a35b272e10c432e708011438dad62f6d9aaa8a850fb"
+  },
+  "release_acceptance": false
+}

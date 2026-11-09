@@ -71,3 +71,33 @@ The final success string is **PASS_SELECTED_REAL_WNT_TRACKING_CASES_OTHER_REQUIR
 Public catalogue evidence in `/workspace/scratch/tracking69-public-provider-inputs` establishes exact source pages/parent links and availability only. The WNT `wcostream.py` parser uses `name="pid"` through `<!--CAT PAGE`; modern page markup is not replaced with a mock catalogue. The original default `cleanupEpisodes=false` has a Python filter/string path that may omit real episode metadata, and the resolver may then classify playback as movie. The first actual SDK/AV gate must settle that fact before proposing any production/provider correction.
 
 No source fix is authorized by a harness failure. Root reviews actual evidence and decides the narrow next action. The frozen3 production files, APK/native/source signer, authority registry, Search, Cobra, provider code/account state and original release acceptance pointer remain untouched by this test work.
+
+## Selected correction after actual run42564230119
+
+The run passed original full80 native/importer authentication under Python optimization1, but reached native dialog12000 **Select Quality** with no inspected list options and no AV callbacks. Earlier snapshots omitted its real controls. Read-only verification of the exact original69 APK found `16x9/DialogSelect.xml` SHA256 `c6959b3bb39dc56b3dddcabb74c58cc0a381da72fb7222a62d06dc400968dbdc`, defaultcontrol3, and `IncludesDialogSelect.xml` SHA256 `149684c6699d9b56cb695055b05a1619647787b8e0c008f7bd7aeba8ee6425e3`, containing simple list3 and detailed list6. Original `GUIDialogSelect.cpp:21–22,338–358` selects those same controls.
+
+The observer now records actual option labels for3/6, their actual visibility and focused control. Quality/chapter selection requires dialog12000, the exact recognized heading, one visible populated native list, in-range index, actual focus and unchanged selected label before native Input.Select. Empty/invisible options are captured and never guessed. This does not select an authentication or account dialog.
+
+Failure cleanup no longer sends blanket Back commands. Only an observed Select Quality/Select Chapter may be deliberately canceled. A recent cancellation, no later AV and the exact resulting12002 Playback failed text authorize one OK acknowledgement. Other modals stay visible. A separately recognized original Infinity Tracked refusal may be acknowledged only with the exact source-defined text: “This item has no verifiable WatchNixtoons2 source location. Nothing was changed.” Its identity failure remains FAIL.
+
+For genuine Infinity entrypoint evidence, first try the actual parent show in WNT's original dubbed catalogue sectionQ, using `/dubbed-anime-list`. A read-only HTTP200 response from `https://www.wcostream.tv/dubbed-anime-list` (370148bytes, SHA256 `3cb803dd4c3f257716eb53bed0be1fc80211d2284f8ddb097d2e96e59f942e50`) yields exactly one original-parser row `/anime/queen-s-blade?season=all&lang=dub`, “Queen's Blade”. Actual GUI tvshow type is still required. Use its original Add to Watchlist, then the actual Infinity saved parent card and actual provider child E4. The original identity parser may reject the query-bearing parent URI; do not normalize, rewrite or bypass it. Preserve that genuine case as FAIL with the actual refusal and continue only a separately labelled native provider identity probe after narrowly acknowledging the known refusal.
+
+Every E4 launch records `launch_origin=existing_infinity_saved_entry` or `native_provider_identity_probe`. A fallback's real progress uses the **native_provider** case label; it never clears Infinity saved-origin coverage. Actual final playing SDK episode metadata remains authoritative; the observed malformed GUI E4/ReZero tvshow/-1/-1 is never relabelled or used to invent coordinates. Parent-show resume uses the existing exact progressed episode's Continue card, because a parent folder is not the episode resume row.
+
+Before execution, select only the new optimized host controls in `test_tracking_dialog_select_optimized.py`: real-source snapshot controls3/6, visible simple/detailed selection, stale-label rejection, hidden/empty/auth/wrong-dialog refusal, driver visible-list routing, empty-choice nonselection, one-use canceled Playback failed acknowledgement, unknown-modal nondismissal, and exact parent-identity-refusal acknowledgement. They compile the selected actual observer/driver functions with `optimize=1` against explicit SDK doubles. These host controls are not Android/provider/playback evidence. No retained host40/installer13/baseline startup cases are rerun.
+
+```sh
+python repairs/infinity-tracking-integration-2103469-20261108/test_tracking_dialog_select_optimized.py
+```
+
+The first nine optimized dialog controls passed against observer8358c3cb/drivercef2ce82. The subsequent source-supported native context correction observes actual dialog10106 dynamic buttons1001–1100 (`GUIDialogContextMenu.cpp:44–45,137–138`;1000 is the template,996 is a grouplist, neither is an option container). Select only a visible exact label at a bounded button ID with live dialog/focus guards. Existing provider rows enter their real **Infinity Tracked** button before the owned menu; saved rows may use their real **Title options** command before Resume/Play. Direct matching native Resume/Play buttons remain real selections. No synthetic menu or direct call to a private mutation function is used.
+
+Before executing the correction, select only the affected driver quality routing control plus two new optimized native-context controls: observed button→owned-menu handoff and stale/hidden/template/wrong-dialog refusal. Retain the other eight passing dialog controls; no application test or previous matrix is rerun by this host command.
+
+```sh
+cd repairs/infinity-tracking-integration-2103469-20261108
+python -m unittest -v \
+  test_tracking_dialog_select_optimized.DialogControls.test_driver_selects_only_visible_original_quality_list \
+  test_tracking_dialog_select_optimized.DialogControls.test_actual_context_buttons_handoff_to_owned_menu \
+  test_tracking_dialog_select_optimized.DialogControls.test_context_button_stale_hidden_template_or_wrong_dialog_refuses
+```

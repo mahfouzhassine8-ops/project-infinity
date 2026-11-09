@@ -21,6 +21,7 @@ QA = 'script.infinity.trackingqa'
 CC = 'script.infinity.commandcenter'
 EVENTS = None
 BOOTSTRAP_PHASES = []
+CANCELLED_CHOICE = None
 
 
 def require(value, label):
@@ -183,7 +184,7 @@ def tag(item):
 
 def snapshot():
     controls = {}
-    for control in (50, 450, 451, 1000):
+    for control in (3, 6, 50, 450, 451, 1000):
         count = int(xbmc.getInfoLabel('Container(%d).NumItems' % control) or 0)
         require(0 <= count <= 1500, 'BOUNDED_ACTUAL_DIRECTORY_REQUIRED')
         if count:
@@ -205,13 +206,23 @@ def snapshot():
         require(theme in ('system', 'light', 'dark'), 'THEME_OWNER_POLICY_UNAVAILABLE')
     except Exception as error:
         theme, theme_error = None, repr(error)
+    buttons = []
+    if xbmcgui.getCurrentWindowDialogId() == 10106:
+        for control in range(1001, 1101):
+            label = xbmc.getInfoLabel('Control.GetLabel(%d)' % control)
+            if label and xbmc.getCondVisibility('Control.IsVisible(%d)' % control):
+                buttons.append(dict(control=control, label=label))
     return dict(pid=os.getpid(), window=xbmcgui.getCurrentWindowId(),
                 dialog=xbmcgui.getCurrentWindowDialogId(), controls=controls,
+                context_buttons=buttons,
                 folder=xbmc.getInfoLabel('Container.FolderPath'), skin=xbmc.getSkinDir(),
                 heading=xbmc.getInfoLabel('Control.GetLabel(1)'), body=xbmc.getInfoLabel('Control.GetLabel(9)'),
                 screen_width=xbmc.getInfoLabel('System.ScreenWidth'), screen_height=xbmc.getInfoLabel('System.ScreenHeight'),
                 theme=theme, theme_available=theme is not None, theme_error=theme_error,
                 published_theme=xbmc.getInfoLabel('Window(Home).Property(Infinity.Theme)'),
+                visible_controls={str(control): xbmc.getCondVisibility('Control.IsVisible(%d)' % control)
+                                  for control in (3, 6, 50, 450, 451, 1000)},
+                focused_control=xbmc.getInfoLabel('System.CurrentControlId'),
                 visual_mode=xbmc.getInfoLabel('Skin.String(Infinity.VisualMode)'),
                 home_view=xbmc.getInfoLabel('Skin.String(Infinity.HomeView)'))
 
@@ -238,6 +249,7 @@ def selected(request):
 
 
 def action(request):
+    global CANCELLED_CHOICE
     kind = request['action']
     if kind == 'identity': return identity()
     if kind == 'snapshot': return snapshot()
@@ -266,14 +278,72 @@ def action(request):
         return result
     if kind == 'menu-select':
         control, index = request['control'], request['index']
-        require(control in (50, 450, 1000) and type(index) is int and 0 <= index <= 100,
+        require(control in (3, 6, 50, 450, 1000) and type(index) is int and 0 <= index <= 100,
                 'EXACT_NATIVE_MENU_CONTROL_AND_INDEX_REQUIRED')
         require(xbmcgui.getCurrentWindowDialogId() not in (0, -1, 9999), 'ACTUAL_NATIVE_MENU_DIALOG_REQUIRED')
+        if control in (3, 6):
+            require(xbmcgui.getCurrentWindowDialogId() == request.get('dialog') == 12000 and
+                    xbmc.getInfoLabel('Control.GetLabel(1)') == request.get('heading') and
+                    request.get('heading') in ('Select Quality', 'Select Chapter'), 'RECOGNIZED_ACTUAL_PROVIDER_CHOICE_REQUIRED')
+            require(xbmc.getCondVisibility('Control.IsVisible(%d)' % control), 'VISIBLE_NATIVE_CHOICE_LIST_REQUIRED')
+            count = int(xbmc.getInfoLabel('Container(%d).NumItems' % control) or 0)
+            require(index < count <= 100, 'ACTUAL_NATIVE_CHOICE_INDEX_REQUIRED')
         xbmc.executebuiltin('SetFocus(%d,%d,absolute)' % (control, index), True)
+        require(xbmc.getInfoLabel('System.CurrentControlId') == str(control), 'ACTUAL_NATIVE_MENU_FOCUS_REQUIRED')
         require(xbmc.getInfoLabel('Container(%d).ListItem.Label' % control) == request['label'],
                 'LIVE_NATIVE_MENU_LABEL_REQUIRED')
-        xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"Input.Select"}')
+        reply = json.loads(xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"Input.Select"}'))
+        require('error' not in reply, 'ACTUAL_NATIVE_MENU_SELECT_RPC_REQUIRED')
         return dict(actual_selected_label=request['label'])
+    if kind == 'context-button':
+        control = request['control']
+        require(type(control) is int and 1001 <= control <= 1100 and
+                xbmcgui.getCurrentWindowDialogId() == 10106, 'ACTUAL_BOUNDED_NATIVE_CONTEXT_BUTTON_REQUIRED')
+        require(xbmc.getCondVisibility('Control.IsVisible(%d)' % control) and
+                xbmc.getInfoLabel('Control.GetLabel(%d)' % control) == request['label'], 'LIVE_VISIBLE_NATIVE_CONTEXT_LABEL_REQUIRED')
+        xbmc.executebuiltin('SetFocus(%d)' % control, True)
+        require(xbmc.getInfoLabel('System.CurrentControlId') == str(control) and
+                xbmc.getInfoLabel('Control.GetLabel(%d)' % control) == request['label'], 'LIVE_NATIVE_CONTEXT_FOCUS_AND_LABEL_REQUIRED')
+        reply = json.loads(xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"Input.Select"}'))
+        require('error' not in reply, 'ACTUAL_NATIVE_CONTEXT_SELECT_RPC_REQUIRED')
+        return dict(actual_context_button=control, actual_selected_label=request['label'])
+    if kind == 'cancel-provider-choice':
+        heading = xbmc.getInfoLabel('Control.GetLabel(1)')
+        require(xbmcgui.getCurrentWindowDialogId() == 12000 and heading in ('Select Quality', 'Select Chapter') and
+                heading == request.get('heading'), 'ONLY_RECOGNIZED_PROVIDER_CHOICE_CANCEL_ALLOWED')
+        reply = json.loads(xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"Input.Back"}'))
+        require('error' not in reply, 'ACTUAL_NATIVE_CHOICE_CANCEL_RPC_REQUIRED')
+        CANCELLED_CHOICE = dict(heading=heading, monotonic=time.monotonic(), event_sequence=EVENTS.sequence)
+        return dict(deliberate_cancel=dict(CANCELLED_CHOICE))
+    if kind == 'ack-cancelled-playback-failure':
+        require(CANCELLED_CHOICE is not None and time.monotonic() - CANCELLED_CHOICE['monotonic'] <= 15,
+                'RECENT_OBSERVED_DELIBERATE_CHOICE_CANCEL_REQUIRED')
+        require(not xbmc.Player().isPlayingVideo() and not any(event['event'] == 'AVStarted' and
+                event['sequence'] > CANCELLED_CHOICE['event_sequence'] for event in EVENTS.events),
+                'NO_NEW_AV_AFTER_CANCEL_REQUIRED')
+        if xbmcgui.getCurrentWindowDialogId() != 12002:
+            return dict(acknowledged=False, dialog=xbmcgui.getCurrentWindowDialogId())
+        require(xbmc.getInfoLabel('Control.GetLabel(1)') == 'Playback failed' and
+                xbmc.getInfoLabel('Control.GetLabel(9)') ==
+                'One or more items failed to play. Check the log for more information about this message.',
+                'ONLY_EXACT_STALE_CANCELLED_PLAYBACK_FAILURE_ALLOWED')
+        xbmc.executebuiltin('SetFocus(11)', True)
+        require(xbmc.getInfoLabel('System.CurrentControlId') == '11', 'ACTUAL_PLAYBACK_FAILURE_OK_FOCUS_REQUIRED')
+        reply = json.loads(xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"Input.Select"}'))
+        require('error' not in reply, 'ACTUAL_CANCELLED_FAILURE_ACK_RPC_REQUIRED')
+        CANCELLED_CHOICE = None
+        return dict(acknowledged=True, exact_cancelled_playback_failure=True)
+    if kind == 'ack-parent-identity-refusal':
+        require(xbmcgui.getCurrentWindowDialogId() == 12002 and
+                xbmc.getInfoLabel('Control.GetLabel(1)') == 'Infinity Tracked' and
+                xbmc.getInfoLabel('Control.GetLabel(9)') ==
+                'This item has no verifiable WatchNixtoons2 source location. Nothing was changed.',
+                'ONLY_EXACT_EXISTING_INFINITY_PARENT_IDENTITY_REFUSAL_ALLOWED')
+        xbmc.executebuiltin('SetFocus(11)', True)
+        require(xbmc.getInfoLabel('System.CurrentControlId') == '11', 'ACTUAL_IDENTITY_REFUSAL_OK_FOCUS_REQUIRED')
+        reply = json.loads(xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"Input.Select"}'))
+        require('error' not in reply, 'ACTUAL_EXISTING_IDENTITY_REFUSAL_ACK_RPC_REQUIRED')
+        return dict(acknowledged=True, exact_existing_identity_refusal=True)
     raise ValueError('UNSELECTED_OBSERVER_ACTION:' + str(kind))
 
 

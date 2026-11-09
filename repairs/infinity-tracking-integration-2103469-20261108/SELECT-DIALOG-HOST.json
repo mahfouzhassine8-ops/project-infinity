@@ -1,0 +1,16 @@
+{
+  "status": "PASS_ELEVEN_FINAL_FROZEN_OPTIMIZE1_HARNESS_INTERACTION_CONTROLS_ONLY",
+  "test_command": "python test_tracking_dialog_select_optimized.py",
+  "cases": 11,
+  "compiled_target_optimization": 1,
+  "reason": "New context delta changes source snapshot/action/menu functions covered by initial nine. Final eleven controls run once on same frozen source; original40/13/baseline startup not repeated.",
+  "selection_sha256": "ab517fbe928b515b4d63ef3ef2248651bcea29d18b84f92d043b81234b31a363",
+  "source_sha256": {
+    "tracking_android_observer.py": "44d35533c84ef2955d79f9c3f0f7aeeb576d97114e7d5c795548582750b560a6",
+    "verify_tracking_android.py": "b593332c6b39dbb691a9a4f5202c1c6c7c3f5074fb8d6120607316faa168d7e0",
+    "test_tracking_dialog_select_optimized.py": "c5bbfe84a329b47d242c150a9c95044f54cb077f89bd8dcb429cb6bc575dad74"
+  },
+  "log_sha256": "54d6b59fcbf3e5ecb68b349fc3d097516708633d62eb6eddd61465c9d501625f",
+  "actual_Kodi_SDK_or_GUI": false,
+  "Android_playback_acceptance": false
+}

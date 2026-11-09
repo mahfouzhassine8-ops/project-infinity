@@ -219,13 +219,66 @@ def exact_episode_row(snapshot, page):
 
 
 def menu_choose(device, observer, expected):
+    opened_owned_menu = False
     def find():
+        nonlocal opened_owned_menu
         snap = observer.call('snapshot')
-        matches = [dict(control=int(control), index=row['index'], label=row['label'])
-            for control, rows in snap['controls'].items() for row in rows if row['label'] == expected]
-        return matches[0] if len(matches) == 1 else None
+        matches = [dict(control=int(control), index=row['index'], label=row['label'],
+                        dialog=snap['dialog'], heading=snap['heading'])
+            for control, rows in snap['controls'].items() if snap['visible_controls'].get(control)
+            for row in rows if row['label'] == expected]
+        buttons = [dict(kind='context-button', **button) for button in snap.get('context_buttons', []) if button['label'] == expected]
+        if buttons:
+            base.require(len(buttons) == 1 and not matches, 'UNIQUE_ACTUAL_NATIVE_CONTEXT_ACTION_REQUIRED')
+            return buttons[0]
+        if len(matches) == 1:
+            return dict(kind='menu-select', **matches[0])
+        if snap['dialog'] == 10106 and not opened_owned_menu and expected in ('Add to Watchlist', 'Resume', 'Play'):
+            # Original addon.xml Infinity Tracked or the saved row's original
+            # Title options command, never an external/provider auth action.
+            bridges = [button for button in snap.get('context_buttons', []) if button['label'] in ('Infinity Tracked', 'Title options')]
+            base.require(len(bridges) <= 1, 'UNIQUE_EXISTING_FIRSTPARTY_CONTEXT_HANDOFF_REQUIRED')
+            if bridges:
+                observer.call('context-button', **bridges[0])
+                opened_owned_menu = True
+        return None
     selection = until(device, find, 'Actual existing title menu label: ' + expected, 20)
-    observer.call('menu-select', **selection)
+    kind = selection.pop('kind')
+    observer.call(kind, **selection)
+
+
+def enter_saved_queen_parent(device, observer, before, passed):
+    destination = 'plugin://' + WNT + '/?' + urlencode(dict(action='actionCatalogSection', path='/dubbed-anime-list', section='Q'))
+    catalog = open_directory(device, observer, destination)
+    matches = []
+    for row in catalog['controls'].get('50', []):
+        parsed = urlsplit(row['file'])
+        query = parse_qs(parsed.query)
+        if parsed.netloc == WNT and query.get('action') == ['actionEpisodesMenu'] and query.get('url') in (
+                [QUEEN_PARENT], ['https://www.wcostream.tv' + QUEEN_PARENT]):
+            matches.append(row)
+    base.require(len(matches) == 1, 'EXACT_ACTUAL_QUEEN_PARENT_CATALOG_ROW_REQUIRED')
+    row = dict(control=50, **{key: matches[0][key] for key in ('index', 'file', 'label')})
+    inspected = observer.call('inspect', **row)
+    base.require(inspected['actual_gui_item']['media_type'] == 'tvshow', 'ACTUAL_TYPED_PARENT_SHOW_REQUIRED_NO_EPISODE_RELABEL')
+    observer.call('context', **row)
+    menu_choose(device, observer, 'Add to Watchlist')
+    saved_state = until(device, lambda: (s if (s := observer.call('state')) and
+        len(saved_source(s, row['file'])) == 1 else None), 'Existing typed parent show saved by actual menu', 25)
+    base.require(progress_rows(before) == progress_rows(saved_state), 'SAVING_ACTUAL_PARENT_ALONE_CREATES_NO_HISTORY')
+    saved = saved_source(saved_state, row['file'])[0]
+    watchlist = open_directory(device, observer, 'plugin://script.infinity.commandcenter/?action=library&media=tv&bucket=watchlist')
+    cards = [card for card in watchlist['controls'].get('50', []) if card['key'] == saved['key']]
+    base.require(len(cards) == 1, 'UNIQUE_ACTUAL_INFINITY_SAVED_PARENT_CARD_REQUIRED')
+    selected = dict(control=50, **{key: cards[0][key] for key in ('index', 'file', 'label')})
+    observer.call('click', **selected)
+    def children():
+        snapshot = observer.call('snapshot')
+        return snapshot if snapshot['folder'] == row['file'] and snapshot['dialog'] in (0, -1, 9999) and snapshot['controls'].get('50') else None
+    snapshot = until(device, children, 'Actual Infinity saved parent opens original provider children', 90)
+    passed('actual_typed_parent_save_no_history_and_infinity_child_navigation', saved_key=saved['key'],
+           selected_parent=inspected, native_saved_card=selected, provider_folder=row['file'])
+    return snapshot, saved['key']
 
 
 def sections(device, observer, out, label):
@@ -305,12 +358,18 @@ def record_case_failure(device, observer, out, report, name, error):
     # Preserve the real failure before ending only its actual video; no restart/retry.
     stop_video(device, observer)
     base.crash_free_alive(device)
-    for _ in range(3):
-        current = gui(device)['currentwindow']['id']
-        if current in (10000, 10025, 10040):
-            break
-        device.rpc('Input.Back')
-        time.sleep(.25)
+    snap = observer.call('snapshot')
+    if snap['dialog'] == 12000 and snap['heading'] in ('Select Quality', 'Select Chapter'):
+        record['choice_cancel'] = observer.call('cancel-provider-choice', heading=snap['heading'])
+        deadline = time.monotonic() + 8
+        while time.monotonic() < deadline:
+            acknowledged = observer.call('ack-cancelled-playback-failure')
+            if acknowledged['acknowledged']:
+                record['cancelled_failure_ack'] = acknowledged
+                break
+            time.sleep(.25)
+        base.save(out / (name + '-recognized-cancel-cleanup.json'), record)
+    # Other modals, including authentication/account dialogs, are retained.
     device.screenshot(name + '-failure')
 
 
@@ -327,13 +386,17 @@ def actual_av(device, observer, event_floor, seconds=120):
         # Source-backed original WNT dialogs, using only actual visible options.
         snap = observer.call('snapshot')
         heading = snap['heading']
-        if heading in ('Select Quality', 'Select Chapter'):
-            rows = snap['controls'].get('450', [])
-            candidates = [row for row in rows if row['label'] and row['label'] != '..']
-            if candidates and (heading, snap['dialog']) not in choices:
-                selected = candidates[0]
-                observer.call('menu-select', control=450, index=selected['index'], label=selected['label'])
-                choices.add((heading, snap['dialog']))
+        if snap['dialog'] == 12000 and heading in ('Select Quality', 'Select Chapter'):
+            controls = [control for control in ('3', '6') if snap['visible_controls'].get(control) and snap['controls'].get(control)]
+            base.require(len(controls) <= 1, 'UNAMBIGUOUS_VISIBLE_ORIGINAL_SELECT_DIALOG_LIST_REQUIRED')
+            if controls:
+                control = controls[0]
+                candidates = [row for row in snap['controls'][control] if row['label'] and row['label'] != '..']
+                if candidates and (heading, snap['dialog'], control) not in choices:
+                    selected = candidates[0]
+                    observer.call('menu-select', control=int(control), index=selected['index'], label=selected['label'],
+                                  dialog=snap['dialog'], heading=heading)
+                    choices.add((heading, snap['dialog'], control))
         return None
     return until(device, playing, 'New genuine provider AVStarted/current player', seconds)
 
@@ -588,8 +651,20 @@ def run(staged_path, sdk, out):
         base.crash_free_alive(device)
         try:
             saved_key = None
+            saved_kind = None
             before = observer.call('state')
-            snap = open_directory(device, observer, route(QUEEN_PARENT))
+            try:
+                snap, saved_key = enter_saved_queen_parent(device, observer, before, passed)
+                saved_kind = 'tvshow'
+            except Exception as parent_error:
+                report['queens_blade_saved_parent_limitation'] = repr(parent_error)
+                record_case_failure(device, observer, out, report, 'actual_infinity_parent_save_navigation', parent_error)
+                parent_snapshot = observer.call('snapshot')
+                base.save(out / 'queens-blade-parent-navigation-limitation.json',
+                          dict(error=repr(parent_error), actual=parent_snapshot))
+                if parent_snapshot['dialog'] == 12002 and parent_snapshot['heading'] == 'Infinity Tracked':
+                    observer.call('ack-parent-identity-refusal')
+                snap = open_directory(device, observer, route(QUEEN_PARENT))
             row = exact_episode_row(snap, QUEEN_E4)
             inspected = observer.call('inspect', **row)
             base.save(out / 'queens-blade-e4-actual-gui-sdk.json', inspected)
@@ -598,7 +673,7 @@ def run(staged_path, sdk, out):
             passed('real_wnt_catalog_browse_no_history', exact_page=QUEEN_E4, actual_gui_item=inspected['actual_gui_item'])
             gui_item = inspected['actual_gui_item']
             valid_episode = gui_item.get('media_type') == 'episode' and gui_item.get('episode') == 4
-            if valid_episode:
+            if saved_key is None and valid_episode:
                 observer.call('context', **row)
                 menu_choose(device, observer, 'Add to Watchlist')
                 after_save = until(device, lambda: (s if (s := observer.call('state')) and
@@ -607,12 +682,16 @@ def run(staged_path, sdk, out):
                 saved = saved_source(after_save, row['file'])
                 base.require(len(saved) == 1, 'EXACT_ACTUAL_ROW_SAVED_BY_EXISTING_MENU')
                 saved_key = saved[0]['key']
+                saved_kind = 'episode'
                 passed('existing_actual_title_save_no_history', key=saved_key)
                 watchlist = open_directory(device, observer, 'plugin://script.infinity.commandcenter/?action=library&media=tv&bucket=watchlist')
                 selected = [r for r in watchlist['controls'].get('50', []) if r['key'] == saved_key]
                 base.require(len(selected) == 1, 'ACTUAL_SAVED_ROW_KEY_UNIQUE')
                 row = dict(control=50, **{k: selected[0][k] for k in ('index', 'file', 'label')})
             floor = event_sequence(observer)
+            launch_origin = 'existing_infinity_saved_entry' if saved_key is not None else 'native_provider_identity_probe'
+            report['queens_blade_launch'] = dict(launch_origin=launch_origin, saved_key=saved_key, saved_kind=saved_kind,
+                                                actual_selected_file=row['file'])
             observer.call('click', **row)
             # Real source chooser, DRM/site errors or missing playable media remain failures;
             # no fake account/server or substituted clip is supplied.
@@ -643,7 +722,9 @@ def run(staged_path, sdk, out):
             base.require(stored.get('episode') == 4 and stored.get('season') == sdk_item['season'] and
                          290 <= float(stored.get('position') or 0) <= samples[-1]['time'] + 15,
                          'EXACT_ACTUAL_EPISODE_POSITION_NO_METADATA_GUESS')
-            passed('real_wnt_infinity_e4_300_second_clock_stop_progress', stored=stored, callbacks=observer.call('events'))
+            passed('real_wnt_infinity_e4_300_second_clock_stop_progress' if saved_key is not None else
+                   'real_wnt_native_provider_e4_300_second_clock_stop_progress', stored=stored,
+                   launch_origin=launch_origin, callbacks=observer.call('events'))
             cards = sections(device, observer, out, 'after-wnt-stop')
             current_state = observer.call('state')
             for section, field in (('continue', 'continue_entries'), ('progress', 'progress_shows'), ('next', 'next_episodes')):
@@ -669,8 +750,10 @@ def run(staged_path, sdk, out):
             passed('explicit_restart_exact_progress_and_membership_persistence')
             # Resume is an independent actual existing menu path; never seek or add AV restore.
             base.require(saved_key is not None, 'ACTUAL_GUI_SAVE_METADATA_UNAVAILABLE_NO_INVENTED_SAVED_IDENTITY')
-            watchlist = open_directory(device, observer, 'plugin://script.infinity.commandcenter/?action=library&media=tv&bucket=watchlist')
-            selected = [r for r in watchlist['controls'].get('50', []) if r['key'] == saved_key]
+            resume_route = ('plugin://script.infinity.commandcenter/?action=resume' if saved_kind == 'tvshow' else
+                            'plugin://script.infinity.commandcenter/?action=library&media=tv&bucket=watchlist')
+            watchlist = open_directory(device, observer, resume_route)
+            selected = [r for r in watchlist['controls'].get('50', []) if r['key'] == (stored['key'] if saved_kind == 'tvshow' else saved_key)]
             base.require(len(selected) == 1, 'EXACT_SAVED_RESUME_ROW')
             row = dict(control=50, **{k: selected[0][k] for k in ('index', 'file', 'label')})
             observer.call('context', **row)
