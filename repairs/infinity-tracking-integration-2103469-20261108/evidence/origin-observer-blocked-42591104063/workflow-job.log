@@ -1,0 +1,1560 @@
+﻿2026-11-09T09:08:39.4826898Z Current runner version: '2.338.2'
+2026-11-09T09:08:39.4845640Z ##[group]Runner Image Provisioner
+2026-11-09T09:08:39.4846261Z Hosted Compute Agent
+2026-11-09T09:08:39.4846590Z Version: 20261028.624
+2026-11-09T09:08:39.4846964Z Commit: 54898b74c23fde5556c9b3c3a2290865feef0dfe
+2026-11-09T09:08:39.4847591Z Build Date: 2026-10-28T21:51:42Z
+2026-11-09T09:08:39.4847966Z Worker ID: {25dfd408-0a76-48c7-a23f-30bdbb5d60c2}
+2026-11-09T09:08:39.4848397Z Region: centralus
+2026-11-09T09:08:39.4848707Z Cloud: Azure
+2026-11-09T09:08:39.4849022Z ##[endgroup]
+2026-11-09T09:08:39.4849835Z ##[group]Operating System
+2026-11-09T09:08:39.4850188Z Ubuntu
+2026-11-09T09:08:39.4850506Z 22.04.5
+2026-11-09T09:08:39.4850792Z LTS
+2026-11-09T09:08:39.4851090Z ##[endgroup]
+2026-11-09T09:08:39.4851402Z ##[group]Runner Image
+2026-11-09T09:08:39.4851746Z Image: ubuntu-22.04
+2026-11-09T09:08:39.4852085Z Version: 20261101.347.1
+2026-11-09T09:08:39.4852818Z Included Software: https://github.com/actions/runner-images/blob/ubuntu22/20261101.347/images/ubuntu/Ubuntu2204-Readme.md
+2026-11-09T09:08:39.4853666Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu22%2F20261101.347
+2026-11-09T09:08:39.4854207Z ##[endgroup]
+2026-11-09T09:08:39.4854890Z ##[group]GITHUB_TOKEN Permissions
+2026-11-09T09:08:39.4856080Z Actions: read
+2026-11-09T09:08:39.4856433Z Contents: read
+2026-11-09T09:08:39.4856750Z Metadata: read
+2026-11-09T09:08:39.4857093Z ##[endgroup]
+2026-11-09T09:08:39.4858905Z Secret source: Actions
+2026-11-09T09:08:39.4859398Z Cache mode: write
+2026-11-09T09:08:39.4859853Z Prepare workflow directory
+2026-11-09T09:08:39.5182300Z Prepare all required actions
+2026-11-09T09:08:39.5218309Z Getting action download info
+2026-11-09T09:08:39.8115169Z Download action repository 'actions/checkout@11d5960a326750d5838078e36cf38b85af677262' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-11-09T09:08:39.9168563Z Download action repository 'actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+2026-11-09T09:08:39.9940114Z Download action repository 'actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3' (SHA:cf277c60eb25467037889841efdb72551f06f6c3)
+2026-11-09T09:08:40.4624732Z Download action repository 'android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407' (SHA:9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407)
+2026-11-09T09:08:40.7728245Z Download action repository 'reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d' (SHA:a421e43855164a8197daf9d8d40fe71c6996bb0d)
+2026-11-09T09:08:41.0806014Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-11-09T09:08:41.2805848Z Complete job name: Existing Infinity tracking with authenticated module fixture; actual selected Android tests only
+2026-11-09T09:08:41.3379950Z ##[group]Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+2026-11-09T09:08:41.3380936Z with:
+2026-11-09T09:08:41.3381446Z   ref: 28f1853495f570ce75282ce4603765258223378e
+2026-11-09T09:08:41.3382139Z   fetch-depth: 0
+2026-11-09T09:08:41.3382642Z   persist-credentials: false
+2026-11-09T09:08:41.3383225Z   show-progress: false
+2026-11-09T09:08:41.3383812Z   repository: mahfouzhassine8-ops/project-infinity
+2026-11-09T09:08:41.3388498Z   token: ***
+2026-11-09T09:08:41.3388979Z   ssh-strict: true
+2026-11-09T09:08:41.3389458Z   ssh-user: git
+2026-11-09T09:08:41.3389922Z   clean: true
+2026-11-09T09:08:41.3390449Z   sparse-checkout-cone-mode: true
+2026-11-09T09:08:41.3391012Z   fetch-tags: false
+2026-11-09T09:08:41.3391508Z   lfs: false
+2026-11-09T09:08:41.3391962Z   submodules: false
+2026-11-09T09:08:41.3392456Z   set-safe-directory: true
+2026-11-09T09:08:41.3393015Z   allow-unsafe-pr-checkout: false
+2026-11-09T09:08:41.3393679Z env:
+2026-11-09T09:08:41.3397953Z   GH_TOKEN: ***
+2026-11-09T09:08:41.3398444Z   PYTHONDONTWRITEBYTECODE: 1
+2026-11-09T09:08:41.3428101Z ##[endgroup]
+2026-11-09T09:08:41.4723150Z Syncing repository: mahfouzhassine8-ops/project-infinity
+2026-11-09T09:08:41.4725610Z ##[group]Getting Git version info
+2026-11-09T09:08:41.4726464Z Working directory is '/home/runner/work/project-infinity/project-infinity'
+2026-11-09T09:08:41.4727895Z [command]/usr/bin/git version
+2026-11-09T09:08:41.4763793Z git version 2.56.0
+2026-11-09T09:08:41.4778866Z ##[endgroup]
+2026-11-09T09:08:41.4801812Z Temporarily overriding HOME='/home/runner/work/_temp/28944226-293a-406c-b57f-e8daa326994d' before making global git config changes
+2026-11-09T09:08:41.4804889Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-09T09:08:41.4807681Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/project-infinity/project-infinity
+2026-11-09T09:08:41.4839996Z Deleting the contents of '/home/runner/work/project-infinity/project-infinity'
+2026-11-09T09:08:41.4847097Z ##[group]Initializing the repository
+2026-11-09T09:08:41.4848995Z [command]/usr/bin/git init /home/runner/work/project-infinity/project-infinity
+2026-11-09T09:08:41.4936603Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-11-09T09:08:41.4938749Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-11-09T09:08:41.4940255Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-11-09T09:08:41.4941408Z hint: call:
+2026-11-09T09:08:41.4942004Z hint:
+2026-11-09T09:08:41.4942800Z hint: 	git config --global init.defaultBranch <name>
+2026-11-09T09:08:41.4943725Z hint:
+2026-11-09T09:08:41.4944601Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-11-09T09:08:41.4946119Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-11-09T09:08:41.4947489Z hint:
+2026-11-09T09:08:41.4948112Z hint: 	git branch -m <name>
+2026-11-09T09:08:41.4948859Z hint:
+2026-11-09T09:08:41.4949824Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-11-09T09:08:41.4951647Z Initialized empty Git repository in /home/runner/work/project-infinity/project-infinity/.git/
+2026-11-09T09:08:41.4954526Z [command]/usr/bin/git remote add origin https://github.com/mahfouzhassine8-ops/project-infinity
+2026-11-09T09:08:41.4978082Z ##[endgroup]
+2026-11-09T09:08:41.4979226Z ##[group]Disabling automatic garbage collection
+2026-11-09T09:08:41.4981043Z [command]/usr/bin/git config --local gc.auto 0
+2026-11-09T09:08:41.5011315Z ##[endgroup]
+2026-11-09T09:08:41.5012575Z ##[group]Setting up auth
+2026-11-09T09:08:41.5013896Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-09T09:08:41.5034996Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-09T09:08:41.5262737Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-09T09:08:41.5289850Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-09T09:08:41.5415559Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-09T09:08:41.5439255Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-09T09:08:41.5571549Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-11-09T09:08:41.5597687Z ##[endgroup]
+2026-11-09T09:08:41.5598705Z ##[group]Fetching the repository
+2026-11-09T09:08:41.5604069Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+2026-11-09T09:08:44.8155841Z From https://github.com/mahfouzhassine8-ops/project-infinity
+2026-11-09T09:08:44.8157832Z  * [new branch]        audit-cobra-2103267-display-all-modes-20260930 -> origin/audit-cobra-2103267-display-all-modes-20260930
+2026-11-09T09:08:44.8158977Z  * [new branch]        audit-cobra-2103278-watch-ambient-lock-20260930 -> origin/audit-cobra-2103278-watch-ambient-lock-20260930
+2026-11-09T09:08:44.8159757Z  * [new branch]        audit-infinity-mobile-whole-system-20261001 -> origin/audit-infinity-mobile-whole-system-20261001
+2026-11-09T09:08:44.8160495Z  * [new branch]        audit/infinity-2103377-addon-grid-20261014 -> origin/audit/infinity-2103377-addon-grid-20261014
+2026-11-09T09:08:44.8161134Z  * [new branch]        baseline/infinity-2103377-rc5 -> origin/baseline/infinity-2103377-rc5
+2026-11-09T09:08:44.8161846Z  * [new branch]        candidate-cobra-2103276-whole-ui-ambient -> origin/candidate-cobra-2103276-whole-ui-ambient
+2026-11-09T09:08:44.8162654Z  * [new branch]        candidate-cobra-2103277-mini-player-fill -> origin/candidate-cobra-2103277-mini-player-fill
+2026-11-09T09:08:44.8163138Z  * [new branch]        candidate-cobra-2103278-watch-ambient -> origin/candidate-cobra-2103278-watch-ambient
+2026-11-09T09:08:44.8163596Z  * [new branch]        candidate-cobra-2103279-end-to-end -> origin/candidate-cobra-2103279-end-to-end
+2026-11-09T09:08:44.8164054Z  * [new branch]        candidate-cobra-2103280-audit-followup -> origin/candidate-cobra-2103280-audit-followup
+2026-11-09T09:08:44.8166691Z  * [new branch]        candidate-cobra-2103281-remaining-audit -> origin/candidate-cobra-2103281-remaining-audit
+2026-11-09T09:08:44.8167552Z  * [new branch]        candidate-cobra-pro-sports-2103307 -> origin/candidate-cobra-pro-sports-2103307
+2026-11-09T09:08:44.8168411Z  * [new branch]        candidate-infinity-1.0.5.177-native-ambient-warmup-repair -> origin/candidate-infinity-1.0.5.177-native-ambient-warmup-repair
+2026-11-09T09:08:44.8169516Z  * [new branch]        candidate-infinity-2103283-mediacodec-surface-ambient -> origin/candidate-infinity-2103283-mediacodec-surface-ambient
+2026-11-09T09:08:44.8170558Z  * [new branch]        candidate-infinity-2103284-ambient-surface-repair -> origin/candidate-infinity-2103284-ambient-surface-repair
+2026-11-09T09:08:44.8171414Z  * [new branch]        candidate-infinity-2103285-native-fd-recovery -> origin/candidate-infinity-2103285-native-fd-recovery
+2026-11-09T09:08:44.8172167Z  * [new branch]        candidate-infinity-2103286-chooser-responsive-longpress-repair -> origin/candidate-infinity-2103286-chooser-responsive-longpress-repair
+2026-11-09T09:08:44.8172781Z  * [new branch]        candidate-infinity-2103287-natural-window-resize -> origin/candidate-infinity-2103287-natural-window-resize
+2026-11-09T09:08:44.8173320Z  * [new branch]        candidate-infinity-2103288-evidence-first-health -> origin/candidate-infinity-2103288-evidence-first-health
+2026-11-09T09:08:44.8174078Z  * [new branch]        candidate-infinity-2103289-trace-hardening -> origin/candidate-infinity-2103289-trace-hardening
+2026-11-09T09:08:44.8174609Z  * [new branch]        candidate-infinity-2103290-native-responsive-layout -> origin/candidate-infinity-2103290-native-responsive-layout
+2026-11-09T09:08:44.8175183Z  * [new branch]        candidate-infinity-2103291-inplace-responsive-reflow -> origin/candidate-infinity-2103291-inplace-responsive-reflow
+2026-11-09T09:08:44.8175694Z  * [new branch]        candidate-infinity-2103291-native-fast -> origin/candidate-infinity-2103291-native-fast
+2026-11-09T09:08:44.8176139Z  * [new branch]        candidate-infinity-2103292-resume-hub -> origin/candidate-infinity-2103292-resume-hub
+2026-11-09T09:08:44.8176607Z  * [new branch]        candidate-infinity-2103293-fold-unification -> origin/candidate-infinity-2103293-fold-unification
+2026-11-09T09:08:44.8177068Z  * [new branch]        candidate-infinity-2103294-text-reflow -> origin/candidate-infinity-2103294-text-reflow
+2026-11-09T09:08:44.8177781Z  * [new branch]        candidate-infinity-2103295-window-input -> origin/candidate-infinity-2103295-window-input
+2026-11-09T09:08:44.8178255Z  * [new branch]        candidate-infinity-2103296-cosmic-chooser -> origin/candidate-infinity-2103296-cosmic-chooser
+2026-11-09T09:08:44.8179075Z  * [new branch]        candidate-infinity-2103297-cosmic-motion-lifecycle -> origin/candidate-infinity-2103297-cosmic-motion-lifecycle
+2026-11-09T09:08:44.8180266Z  * [new branch]        candidate-infinity-2103298-startup-reliability -> origin/candidate-infinity-2103298-startup-reliability
+2026-11-09T09:08:44.8180796Z  * [new branch]        candidate-infinity-2103299-graceful-exit-handoff -> origin/candidate-infinity-2103299-graceful-exit-handoff
+2026-11-09T09:08:44.8181344Z  * [new branch]        candidate-infinity-2103300-stale-main-task-relaunch -> origin/candidate-infinity-2103300-stale-main-task-relaunch
+2026-11-09T09:08:44.8181906Z  * [new branch]        candidate-infinity-2103301-weather-native-isolation -> origin/candidate-infinity-2103301-weather-native-isolation
+2026-11-09T09:08:44.8182476Z  * [new branch]        candidate-infinity-2103302-chooser-weather-snapshot -> origin/candidate-infinity-2103302-chooser-weather-snapshot
+2026-11-09T09:08:44.8182984Z  * [new branch]        candidate-infinity-2103303-e2e-repair -> origin/candidate-infinity-2103303-e2e-repair
+2026-11-09T09:08:44.8183521Z  * [new branch]        candidate-infinity-native-video-ambient-from-2103281 -> origin/candidate-infinity-native-video-ambient-from-2103281
+2026-11-09T09:08:44.8184188Z  * [new branch]        candidate-infinity-native-video-ambient-settings-drawer-20261001 -> origin/candidate-infinity-native-video-ambient-settings-drawer-20261001
+2026-11-09T09:08:44.8184826Z  * [new branch]        checkpoint/infinity-preview-2103451-freeze-20261103 -> origin/checkpoint/infinity-preview-2103451-freeze-20261103
+2026-11-09T09:08:44.8185372Z  * [new branch]        ci/infinity-462-keyboard-build-verified-20261107 -> origin/ci/infinity-462-keyboard-build-verified-20261107
+2026-11-09T09:08:44.8185909Z  * [new branch]        ci/infinity-original-signer-reference-20261107 -> origin/ci/infinity-original-signer-reference-20261107
+2026-11-09T09:08:44.8186408Z  * [new branch]        ci/infinity-search-86d5b5e2-host-20261107 -> origin/ci/infinity-search-86d5b5e2-host-20261107
+2026-11-09T09:08:44.8186991Z  * [new branch]        ci/infinity462-keyboard-full-engine-unreleased-20261107 -> origin/ci/infinity462-keyboard-full-engine-unreleased-20261107
+2026-11-09T09:08:44.8187915Z  * [new branch]        cobra-2103180-theme-recovery -> origin/cobra-2103180-theme-recovery
+2026-11-09T09:08:44.8188364Z  * [new branch]        cobra-approved-mockups-reference-20261031 -> origin/cobra-approved-mockups-reference-20261031
+2026-11-09T09:08:44.8188804Z  * [new branch]        cobra-liquid-glass-theme-v1 -> origin/cobra-liquid-glass-theme-v1
+2026-11-09T09:08:44.8189384Z  * [new branch]        design/infinity-preview-2103447-cinematic-controls-approved-20261102 -> origin/design/infinity-preview-2103447-cinematic-controls-approved-20261102
+2026-11-09T09:08:44.8190292Z  * [new branch]        design/infinity-preview-2103450-fullscreen-display-approved-20261102 -> origin/design/infinity-preview-2103450-fullscreen-display-approved-20261102
+2026-11-09T09:08:44.8191006Z  * [new branch]        design/infinity-shared-media-browser-visual-lock-20261104 -> origin/design/infinity-shared-media-browser-visual-lock-20261104
+2026-11-09T09:08:44.8191568Z  * [new branch]        diagnostic/infinity-join-target-2103338 -> origin/diagnostic/infinity-join-target-2103338
+2026-11-09T09:08:44.8192328Z  * [new branch]        diagnostics/provider-inspector-download-20261104 -> origin/diagnostics/provider-inspector-download-20261104
+2026-11-09T09:08:44.8193130Z  * [new branch]        experiment/dual-infinity-2103368-g0 -> origin/experiment/dual-infinity-2103368-g0
+2026-11-09T09:08:44.8193908Z  * [new branch]        experiment/infinity-2103377-hardstop-feasibility -> origin/experiment/infinity-2103377-hardstop-feasibility
+2026-11-09T09:08:44.8194981Z  * [new branch]        experiment/infinity-2103377-python311-shutdown-ordering-test-20261015 -> origin/experiment/infinity-2103377-python311-shutdown-ordering-test-20261015
+2026-11-09T09:08:44.8195869Z  * [new branch]        fix-workflow-restore    -> origin/fix-workflow-restore
+2026-11-09T09:08:44.8196499Z  * [new branch]        g2-candidate-6-fresh-sign -> origin/g2-candidate-6-fresh-sign
+2026-11-09T09:08:44.8197045Z  * [new branch]        g2-candidate-6-mapping  -> origin/g2-candidate-6-mapping
+2026-11-09T09:08:44.8197686Z  * [new branch]        g2-candidate6-on-working5 -> origin/g2-candidate6-on-working5
+2026-11-09T09:08:44.8198234Z  * [new branch]        handoff/infinity-final-closure-scope-freeze-20261025 -> origin/handoff/infinity-final-closure-scope-freeze-20261025
+2026-11-09T09:08:44.8198837Z  * [new branch]        infinity-1.0.10-final-polish -> origin/infinity-1.0.10-final-polish
+2026-11-09T09:08:44.8199268Z  * [new branch]        infinity-1.0.5-candidate-1-diggz-test -> origin/infinity-1.0.5-candidate-1-diggz-test
+2026-11-09T09:08:44.8199971Z  * [new branch]        infinity-1.0.8-audio-policy-integration -> origin/infinity-1.0.8-audio-policy-integration
+2026-11-09T09:08:44.8200449Z  * [new branch]        infinity-1.0.8-deep-rebrand -> origin/infinity-1.0.8-deep-rebrand
+2026-11-09T09:08:44.8200910Z  * [new branch]        infinity-1.0.8-deep-rebrand-audio-cumulative -> origin/infinity-1.0.8-deep-rebrand-audio-cumulative
+2026-11-09T09:08:44.8201541Z  * [new branch]        infinity-1.0.8-high-refresh -> origin/infinity-1.0.8-high-refresh
+2026-11-09T09:08:44.8202013Z  * [new branch]        infinity-1.0.8-native-media -> origin/infinity-1.0.8-native-media
+2026-11-09T09:08:44.8202459Z  * [new branch]        infinity-1.0.8-responsive-bridge-v5 -> origin/infinity-1.0.8-responsive-bridge-v5
+2026-11-09T09:08:44.8202917Z  * [new branch]        infinity-1.0.9-cobra-rotation-handoff-c2 -> origin/infinity-1.0.9-cobra-rotation-handoff-c2
+2026-11-09T09:08:44.8203339Z  * [new branch]        infinity-1.0.9-deep-cleanup -> origin/infinity-1.0.9-deep-cleanup
+2026-11-09T09:08:44.8203693Z  * [new branch]        infinity-1.0.9-experience -> origin/infinity-1.0.9-experience
+2026-11-09T09:08:44.8204025Z  * [new branch]        infinity-1.0.9-live     -> origin/infinity-1.0.9-live
+2026-11-09T09:08:44.8204425Z  * [new branch]        infinity-1.0.9-native-responsive-reflow -> origin/infinity-1.0.9-native-responsive-reflow
+2026-11-09T09:08:44.8204950Z  * [new branch]        infinity-1.0.9-native-responsive-reflow-cumulative -> origin/infinity-1.0.9-native-responsive-reflow-cumulative
+2026-11-09T09:08:44.8205574Z  * [new branch]        infinity-1.0.9-player-rotation -> origin/infinity-1.0.9-player-rotation
+2026-11-09T09:08:44.8206284Z  * [new branch]        infinity-2103159-experience-zip-bridge-rc1 -> origin/infinity-2103159-experience-zip-bridge-rc1
+2026-11-09T09:08:44.8207028Z  * [new branch]        infinity-2103254-shipping-audit-rc1 -> origin/infinity-2103254-shipping-audit-rc1
+2026-11-09T09:08:44.8208415Z  * [new branch]        infinity-2103255-shipping-lifecycle-rc2 -> origin/infinity-2103255-shipping-lifecycle-rc2
+2026-11-09T09:08:44.8209207Z  * [new branch]        infinity-2103256-experience-features-1-9-rc1 -> origin/infinity-2103256-experience-features-1-9-rc1
+2026-11-09T09:08:44.8210069Z  * [new branch]        infinity-2103257-glass-chooser-light-dark-rc1 -> origin/infinity-2103257-glass-chooser-light-dark-rc1
+2026-11-09T09:08:44.8210946Z  * [new branch]        infinity-2103258-glass-settings-light-dark-rc1 -> origin/infinity-2103258-glass-settings-light-dark-rc1
+2026-11-09T09:08:44.8211766Z  * [new branch]        infinity-2103259-options-health-glass-finish-rc1 -> origin/infinity-2103259-options-health-glass-finish-rc1
+2026-11-09T09:08:44.8212292Z  * [new branch]        infinity-2103260-recovery-fixed-chooser-rc1 -> origin/infinity-2103260-recovery-fixed-chooser-rc1
+2026-11-09T09:08:44.8212772Z  * [new branch]        infinity-2103261-pro-mode-focus-only-rc1 -> origin/infinity-2103261-pro-mode-focus-only-rc1
+2026-11-09T09:08:44.8213265Z  * [new branch]        infinity-2103262-pro-visual-correction-rc1 -> origin/infinity-2103262-pro-visual-correction-rc1
+2026-11-09T09:08:44.8213755Z  * [new branch]        infinity-2103263-pro-oled-light-polish-rc1 -> origin/infinity-2103263-pro-oled-light-polish-rc1
+2026-11-09T09:08:44.8214414Z  * [new branch]        infinity-2103264-pro-live-glass-rc1 -> origin/infinity-2103264-pro-live-glass-rc1
+2026-11-09T09:08:44.8215105Z  * [new branch]        infinity-2103265-phone-glass-polish-rc1 -> origin/infinity-2103265-phone-glass-polish-rc1
+2026-11-09T09:08:44.8215777Z  * [new branch]        infinity-2103266-ambient-glass-cinema-rc1 -> origin/infinity-2103266-ambient-glass-cinema-rc1
+2026-11-09T09:08:44.8216183Z  * [new branch]        infinity-6.4-appearance -> origin/infinity-6.4-appearance
+2026-11-09T09:08:44.8216523Z  * [new branch]        infinity-7.1-core-unified -> origin/infinity-7.1-core-unified
+2026-11-09T09:08:44.8216856Z  * [new branch]        infinity-android-first  -> origin/infinity-android-first
+2026-11-09T09:08:44.8217366Z  * [new branch]        infinity-auth-manager-010-rc1 -> origin/infinity-auth-manager-010-rc1
+2026-11-09T09:08:44.8217770Z  * [new branch]        infinity-background-controls-rc2 -> origin/infinity-background-controls-rc2
+2026-11-09T09:08:44.8218186Z  * [new branch]        infinity-cobra-2103150-iron-polish -> origin/infinity-cobra-2103150-iron-polish
+2026-11-09T09:08:44.8218664Z  * [new branch]        infinity-cobra-2103151-player-multiview-polish -> origin/infinity-cobra-2103151-player-multiview-polish
+2026-11-09T09:08:44.8219170Z  * [new branch]        infinity-cobra-2103152-player-reboot-lock -> origin/infinity-cobra-2103152-player-reboot-lock
+2026-11-09T09:08:44.8219672Z  * [new branch]        infinity-cobra-2103153-guide-player-refinement -> origin/infinity-cobra-2103153-guide-player-refinement
+2026-11-09T09:08:44.8220202Z  * [new branch]        infinity-cobra-2103153-guide-session-refinement -> origin/infinity-cobra-2103153-guide-session-refinement
+2026-11-09T09:08:44.8220716Z  * [new branch]        infinity-cobra-2103154-adaptive-five-modes -> origin/infinity-cobra-2103154-adaptive-five-modes
+2026-11-09T09:08:44.8221223Z  * [new branch]        infinity-cobra-2103154-adaptive-view-identities -> origin/infinity-cobra-2103154-adaptive-view-identities
+2026-11-09T09:08:44.8221746Z  * [new branch]        infinity-cobra-2103156-diagnostics-audit-rc1 -> origin/infinity-cobra-2103156-diagnostics-audit-rc1
+2026-11-09T09:08:44.8222400Z  * [new branch]        infinity-cobra-2103157-tv-navigation-appearance-rc1 -> origin/infinity-cobra-2103157-tv-navigation-appearance-rc1
+2026-11-09T09:08:44.8222966Z  * [new branch]        infinity-cobra-2103158-health-playback-polish-rc1 -> origin/infinity-cobra-2103158-health-playback-polish-rc1
+2026-11-09T09:08:44.8223547Z  * [new branch]        infinity-cobra-2103158-health-preferences-recovery-rc1 -> origin/infinity-cobra-2103158-health-preferences-recovery-rc1
+2026-11-09T09:08:44.8224243Z  * [new branch]        infinity-cobra-2103160-visual-theme-runtime-v2-rc1 -> origin/infinity-cobra-2103160-visual-theme-runtime-v2-rc1
+2026-11-09T09:08:44.8224960Z  * [new branch]        infinity-cobra-2103161-theme-management-background-mode-safe-area-rc1 -> origin/infinity-cobra-2103161-theme-management-background-mode-safe-area-rc1
+2026-11-09T09:08:44.8225725Z  * [new branch]        infinity-cobra-2103162-theme-switch-player-rotation-rc1 -> origin/infinity-cobra-2103162-theme-switch-player-rotation-rc1
+2026-11-09T09:08:44.8226302Z  * [new branch]        infinity-cobra-2103163-candidate14-five-fixes-rc1 -> origin/infinity-cobra-2103163-candidate14-five-fixes-rc1
+2026-11-09T09:08:44.8226833Z  * [new branch]        infinity-cobra-2103164-playback-stability-rc1 -> origin/infinity-cobra-2103164-playback-stability-rc1
+2026-11-09T09:08:44.8227810Z  * [new branch]        infinity-cobra-2103164-player-settings-pip-reentry-rc1 -> origin/infinity-cobra-2103164-player-settings-pip-reentry-rc1
+2026-11-09T09:08:44.8228877Z  * [new branch]        infinity-cobra-2103164-pythoninvoker-threadstate-repair-rc1 -> origin/infinity-cobra-2103164-pythoninvoker-threadstate-repair-rc1
+2026-11-09T09:08:44.8230022Z  * [new branch]        infinity-cobra-2103165-inner-insets-pip-return-player-consistency-rc1 -> origin/infinity-cobra-2103165-inner-insets-pip-return-player-consistency-rc1
+2026-11-09T09:08:44.8231323Z  * [new branch]        infinity-cobra-2103166-end-to-end-ui-lifecycle-audit-rc1 -> origin/infinity-cobra-2103166-end-to-end-ui-lifecycle-audit-rc1
+2026-11-09T09:08:44.8232258Z  * [new branch]        infinity-cobra-2103167-status-bar-restore-rc1 -> origin/infinity-cobra-2103167-status-bar-restore-rc1
+2026-11-09T09:08:44.8233138Z  * [new branch]        infinity-cobra-2103168-status-bar-surface-match-rc1 -> origin/infinity-cobra-2103168-status-bar-surface-match-rc1
+2026-11-09T09:08:44.8233837Z  * [new branch]        infinity-cobra-2103168-statusbar-pythoninvoker-stability-rc1 -> origin/infinity-cobra-2103168-statusbar-pythoninvoker-stability-rc1
+2026-11-09T09:08:44.8234454Z  * [new branch]        infinity-cobra-2103169-status-bar-edge-to-edge-rc1 -> origin/infinity-cobra-2103169-status-bar-edge-to-edge-rc1
+2026-11-09T09:08:44.8235032Z  * [new branch]        infinity-cobra-2103169-statusbar-native-stability-rc1 -> origin/infinity-cobra-2103169-statusbar-native-stability-rc1
+2026-11-09T09:08:44.8235603Z  * [new branch]        infinity-cobra-2103170-statusbar-edge-to-edge-rc1 -> origin/infinity-cobra-2103170-statusbar-edge-to-edge-rc1
+2026-11-09T09:08:44.8236168Z  * [new branch]        infinity-cobra-2103171-chooser-statusbar-surface-rc1 -> origin/infinity-cobra-2103171-chooser-statusbar-surface-rc1
+2026-11-09T09:08:44.8236723Z  * [new branch]        infinity-cobra-2103173-buffering-stability-rc1 -> origin/infinity-cobra-2103173-buffering-stability-rc1
+2026-11-09T09:08:44.8237459Z  * [new branch]        infinity-cobra-2103174-playback-buffer-regression-rc1 -> origin/infinity-cobra-2103174-playback-buffer-regression-rc1
+2026-11-09T09:08:44.8238155Z  * [new branch]        infinity-cobra-2103175-fullscreen-background-safe-content-rc1 -> origin/infinity-cobra-2103175-fullscreen-background-safe-content-rc1
+2026-11-09T09:08:44.8238747Z  * [new branch]        infinity-cobra-2103176-live-rewind-catchup-rc1 -> origin/infinity-cobra-2103176-live-rewind-catchup-rc1
+2026-11-09T09:08:44.8239369Z  * [new branch]        infinity-cobra-2103177-feature-freeze-performance-timeshift-rc1 -> origin/infinity-cobra-2103177-feature-freeze-performance-timeshift-rc1
+2026-11-09T09:08:44.8239971Z  * [new branch]        infinity-cobra-2103177-final-feature-freeze-rc1 -> origin/infinity-cobra-2103177-final-feature-freeze-rc1
+2026-11-09T09:08:44.8240566Z  * [new branch]        infinity-cobra-2103178-timeshift-miniplayer-audit-repair-rc1 -> origin/infinity-cobra-2103178-timeshift-miniplayer-audit-repair-rc1
+2026-11-09T09:08:44.8241146Z  * [new branch]        infinity-cobra-2103179-buffer-resilience-rc1 -> origin/infinity-cobra-2103179-buffer-resilience-rc1
+2026-11-09T09:08:44.8241750Z  * [new branch]        infinity-cobra-2103180-playback-finalization-rc1 -> origin/infinity-cobra-2103180-playback-finalization-rc1
+2026-11-09T09:08:44.8242329Z  * [new branch]        infinity-cobra-2103181-timeshift-transport-integrity-rc1 -> origin/infinity-cobra-2103181-timeshift-transport-integrity-rc1
+2026-11-09T09:08:44.8242930Z  * [new branch]        infinity-cobra-2103182-timeshift-startup-reserve-rc1 -> origin/infinity-cobra-2103182-timeshift-startup-reserve-rc1
+2026-11-09T09:08:44.8243485Z  * [new branch]        infinity-cobra-2103183-network-family-control-rc1 -> origin/infinity-cobra-2103183-network-family-control-rc1
+2026-11-09T09:08:44.8244052Z  * [new branch]        infinity-cobra-2103184-stream-network-optimization-rc1 -> origin/infinity-cobra-2103184-stream-network-optimization-rc1
+2026-11-09T09:08:44.8244627Z  * [new branch]        infinity-cobra-2103185-live-diagnostics-freeze-rc1 -> origin/infinity-cobra-2103185-live-diagnostics-freeze-rc1
+2026-11-09T09:08:44.8245202Z  * [new branch]        infinity-cobra-2103186-stream-cadence-fingerprint-rc1 -> origin/infinity-cobra-2103186-stream-cadence-fingerprint-rc1
+2026-11-09T09:08:44.8245794Z  * [new branch]        infinity-cobra-2103187-ts-access-unit-compatibility-rc1 -> origin/infinity-cobra-2103187-ts-access-unit-compatibility-rc1
+2026-11-09T09:08:44.8246425Z  * [new branch]        infinity-cobra-2103188-ts-keyframe-compatibility-rc1 -> origin/infinity-cobra-2103188-ts-keyframe-compatibility-rc1
+2026-11-09T09:08:44.8246980Z  * [new branch]        infinity-cobra-2103189-ts-timeline-fingerprint-rc1 -> origin/infinity-cobra-2103189-ts-timeline-fingerprint-rc1
+2026-11-09T09:08:44.8247716Z  * [new branch]        infinity-cobra-2103190-ts-clock-normalization-rc1 -> origin/infinity-cobra-2103190-ts-clock-normalization-rc1
+2026-11-09T09:08:44.8248268Z  * [new branch]        infinity-cobra-2103191-provider-route-fingerprint-rc1 -> origin/infinity-cobra-2103191-provider-route-fingerprint-rc1
+2026-11-09T09:08:44.8248831Z  * [new branch]        infinity-cobra-2103192-provider-pace-reserve-rc1 -> origin/infinity-cobra-2103192-provider-pace-reserve-rc1
+2026-11-09T09:08:44.8249367Z  * [new branch]        infinity-cobra-2103193-source-manager-restore-rc1 -> origin/infinity-cobra-2103193-source-manager-restore-rc1
+2026-11-09T09:08:44.8249897Z  * [new branch]        infinity-cobra-2103194-fold-adaptive-aspect-rc1 -> origin/infinity-cobra-2103194-fold-adaptive-aspect-rc1
+2026-11-09T09:08:44.8250588Z  * [new branch]        infinity-cobra-2103195-presentation-polish-motion-audit-rc1 -> origin/infinity-cobra-2103195-presentation-polish-motion-audit-rc1
+2026-11-09T09:08:44.8251355Z  * [new branch]        infinity-cobra-2103195-tivimate-player-polish-audit-rc1 -> origin/infinity-cobra-2103195-tivimate-player-polish-audit-rc1
+2026-11-09T09:08:44.8251933Z  * [new branch]        infinity-cobra-2103196-original-player-settings-rc1 -> origin/infinity-cobra-2103196-original-player-settings-rc1
+2026-11-09T09:08:44.8252504Z  * [new branch]        infinity-cobra-2103197-original-player-menu-only-rc1 -> origin/infinity-cobra-2103197-original-player-menu-only-rc1
+2026-11-09T09:08:44.8253146Z  * [new branch]        infinity-cobra-2103198-complete-product-audit-polish-stability-rc1 -> origin/infinity-cobra-2103198-complete-product-audit-polish-stability-rc1
+2026-11-09T09:08:44.8253903Z  * [new branch]        infinity-cobra-2103198-normal-rollback-rc1 -> origin/infinity-cobra-2103198-normal-rollback-rc1
+2026-11-09T09:08:44.8254437Z  * [new branch]        infinity-cobra-2103199-power-audit-repairs-rc1 -> origin/infinity-cobra-2103199-power-audit-repairs-rc1
+2026-11-09T09:08:44.8254951Z  * [new branch]        infinity-cobra-2103200-provider-boundary-rc1 -> origin/infinity-cobra-2103200-provider-boundary-rc1
+2026-11-09T09:08:44.8255430Z  * [new branch]        infinity-cobra-2103201-player-polish-rc1 -> origin/infinity-cobra-2103201-player-polish-rc1
+2026-11-09T09:08:44.8255915Z  * [new branch]        infinity-cobra-2103202-player-refinement-rc1 -> origin/infinity-cobra-2103202-player-refinement-rc1
+2026-11-09T09:08:44.8256424Z  * [new branch]        infinity-cobra-2103203-pip-call-rc1 -> origin/infinity-cobra-2103203-pip-call-rc1
+2026-11-09T09:08:44.8256850Z  * [new branch]        infinity-cobra-2103204-oled-blue-rc1 -> origin/infinity-cobra-2103204-oled-blue-rc1
+2026-11-09T09:08:44.8257408Z  * [new branch]        infinity-cobra-2103205-final-features-rc1 -> origin/infinity-cobra-2103205-final-features-rc1
+2026-11-09T09:08:44.8257869Z  * [new branch]        infinity-cobra-2103206-media-calls-rc1 -> origin/infinity-cobra-2103206-media-calls-rc1
+2026-11-09T09:08:44.8258345Z  * [new branch]        infinity-cobra-2103207-feature-refinement-rc1 -> origin/infinity-cobra-2103207-feature-refinement-rc1
+2026-11-09T09:08:44.8258853Z  * [new branch]        infinity-cobra-2103208-integration-polish-rc1 -> origin/infinity-cobra-2103208-integration-polish-rc1
+2026-11-09T09:08:44.8259351Z  * [new branch]        infinity-cobra-2103209-package-recovery-rc1 -> origin/infinity-cobra-2103209-package-recovery-rc1
+2026-11-09T09:08:44.8259883Z  * [new branch]        infinity-cobra-2103209-python311-gil-stability-rc1 -> origin/infinity-cobra-2103209-python311-gil-stability-rc1
+2026-11-09T09:08:44.8260420Z  * [new branch]        infinity-cobra-2103210-media-library-health-rc1 -> origin/infinity-cobra-2103210-media-library-health-rc1
+2026-11-09T09:08:44.8261311Z  * [new branch]        infinity-cobra-2103211-library-health-refinement-rc1 -> origin/infinity-cobra-2103211-library-health-refinement-rc1
+2026-11-09T09:08:44.8262127Z  * [new branch]        infinity-cobra-2103212-health-media-trim-rc1 -> origin/infinity-cobra-2103212-health-media-trim-rc1
+2026-11-09T09:08:44.8262883Z  * [new branch]        infinity-cobra-2103213-live-blue-ambient-settings-return-rc1 -> origin/infinity-cobra-2103213-live-blue-ambient-settings-return-rc1
+2026-11-09T09:08:44.8263472Z  * [new branch]        infinity-cobra-2103214-media-details-final-rc1 -> origin/infinity-cobra-2103214-media-details-final-rc1
+2026-11-09T09:08:44.8264049Z  * [new branch]        infinity-cobra-2103215-smart-return-experience-drawer-rc1 -> origin/infinity-cobra-2103215-smart-return-experience-drawer-rc1
+2026-11-09T09:08:44.8264676Z  * [new branch]        infinity-cobra-2103216-smart-return-experience-display-rc1 -> origin/infinity-cobra-2103216-smart-return-experience-display-rc1
+2026-11-09T09:08:44.8265254Z  * [new branch]        infinity-cobra-2103217-media-return-context-rc1 -> origin/infinity-cobra-2103217-media-return-context-rc1
+2026-11-09T09:08:44.8265760Z  * [new branch]        infinity-cobra-2103218-onn4kpro-tv-armv7-rc1 -> origin/infinity-cobra-2103218-onn4kpro-tv-armv7-rc1
+2026-11-09T09:08:44.8266264Z  * [new branch]        infinity-cobra-2103219-active-section-owner-rc1 -> origin/infinity-cobra-2103219-active-section-owner-rc1
+2026-11-09T09:08:44.8266770Z  * [new branch]        infinity-cobra-2103219-onn4kpro-tv-remote-rc2 -> origin/infinity-cobra-2103219-onn4kpro-tv-remote-rc2
+2026-11-09T09:08:44.8267528Z  * [new branch]        infinity-cobra-2103220-active-section-lifecycle-rc1 -> origin/infinity-cobra-2103220-active-section-lifecycle-rc1
+2026-11-09T09:08:44.8268071Z  * [new branch]        infinity-cobra-2103220-onn4kpro-tv-grid-only-rc3 -> origin/infinity-cobra-2103220-onn4kpro-tv-grid-only-rc3
+2026-11-09T09:08:44.8268590Z  * [new branch]        infinity-cobra-2103221-chooser-options-ui-rc1 -> origin/infinity-cobra-2103221-chooser-options-ui-rc1
+2026-11-09T09:08:44.8269105Z  * [new branch]        infinity-cobra-2103221-drawer-owner-surgical-rc1 -> origin/infinity-cobra-2103221-drawer-owner-surgical-rc1
+2026-11-09T09:08:44.8269638Z  * [new branch]        infinity-cobra-2103221-drawer-owner-ui-restore-rc1 -> origin/infinity-cobra-2103221-drawer-owner-ui-restore-rc1
+2026-11-09T09:08:44.8270171Z  * [new branch]        infinity-cobra-2103221-onn4kpro-tv-remote-ui-rc4 -> origin/infinity-cobra-2103221-onn4kpro-tv-remote-ui-rc4
+2026-11-09T09:08:44.8270704Z  * [new branch]        infinity-cobra-2103221-options-ui-owner-guard-rc1 -> origin/infinity-cobra-2103221-options-ui-owner-guard-rc1
+2026-11-09T09:08:44.8271291Z  * [new branch]        infinity-cobra-2103221-owner-chooser-ui-rc1 -> origin/infinity-cobra-2103221-owner-chooser-ui-rc1
+2026-11-09T09:08:44.8271801Z  * [new branch]        infinity-cobra-2103222-experience-options-ui-rc1 -> origin/infinity-cobra-2103222-experience-options-ui-rc1
+2026-11-09T09:08:44.8272394Z  * [new branch]        infinity-cobra-2103222-onn4kpro-tv-player-multiview-fit-rc5 -> origin/infinity-cobra-2103222-onn4kpro-tv-player-multiview-fit-rc5
+2026-11-09T09:08:44.8272989Z  * [new branch]        infinity-cobra-2103223-movie-details-trailers-rc1 -> origin/infinity-cobra-2103223-movie-details-trailers-rc1
+2026-11-09T09:08:44.8273517Z  * [new branch]        infinity-cobra-2103223-onn4kpro-tv-hardening-rc6 -> origin/infinity-cobra-2103223-onn4kpro-tv-hardening-rc6
+2026-11-09T09:08:44.8274130Z  * [new branch]        infinity-cobra-2103224-onn4kpro-tv-native-remote-architecture-rc7 -> origin/infinity-cobra-2103224-onn4kpro-tv-native-remote-architecture-rc7
+2026-11-09T09:08:44.8274762Z  * [new branch]        infinity-cobra-2103224-tv-show-details-trailers-rc1 -> origin/infinity-cobra-2103224-tv-show-details-trailers-rc1
+2026-11-09T09:08:44.8275321Z  * [new branch]        infinity-cobra-2103225-onn4kpro-tv-handoff-focus-rc8 -> origin/infinity-cobra-2103225-onn4kpro-tv-handoff-focus-rc8
+2026-11-09T09:08:44.8275923Z  * [new branch]        infinity-cobra-2103225-tv-show-typography-rc1 -> origin/infinity-cobra-2103225-tv-show-typography-rc1
+2026-11-09T09:08:44.8276437Z  * [new branch]        infinity-cobra-2103226-fold-fit-fill-audited-rc1 -> origin/infinity-cobra-2103226-fold-fit-fill-audited-rc1
+2026-11-09T09:08:44.8277005Z  * [new branch]        infinity-cobra-2103226-onn4kpro-tv-lightweight-live-rc9 -> origin/infinity-cobra-2103226-onn4kpro-tv-lightweight-live-rc9
+2026-11-09T09:08:44.8277755Z  * [new branch]        infinity-cobra-2103227-device-live-fold-multiview-audit-rc1 -> origin/infinity-cobra-2103227-device-live-fold-multiview-audit-rc1
+2026-11-09T09:08:44.8278332Z  * [new branch]        infinity-cobra-2103228-preservation-audit-rc1 -> origin/infinity-cobra-2103228-preservation-audit-rc1
+2026-11-09T09:08:44.8278865Z  * [new branch]        infinity-cobra-2103229-multiview-stability-fill-rc1 -> origin/infinity-cobra-2103229-multiview-stability-fill-rc1
+2026-11-09T09:08:44.8279447Z  * [new branch]        infinity-cobra-2103230-final-preservation-audit-rc1 -> origin/infinity-cobra-2103230-final-preservation-audit-rc1
+2026-11-09T09:08:44.8280042Z  * [new branch]        infinity-cobra-2103230-onn4kpro-tv-navigation-motion-rc10 -> origin/infinity-cobra-2103230-onn4kpro-tv-navigation-motion-rc10
+2026-11-09T09:08:44.8280671Z  * [new branch]        infinity-cobra-2103231-onn4kpro-tv-adaptive-ui-polish-rc11 -> origin/infinity-cobra-2103231-onn4kpro-tv-adaptive-ui-polish-rc11
+2026-11-09T09:08:44.8281294Z  * [new branch]        infinity-cobra-2103232-onn4kpro-tv-integrated-drawer-rc12 -> origin/infinity-cobra-2103232-onn4kpro-tv-integrated-drawer-rc12
+2026-11-09T09:08:44.8281886Z  * [new branch]        infinity-cobra-2103233-onn4kpro-tv-glass-system-rc13 -> origin/infinity-cobra-2103233-onn4kpro-tv-glass-system-rc13
+2026-11-09T09:08:44.8282513Z  * [new branch]        infinity-cobra-2103234-onn4kpro-tv-integrated-shell-playing-rc14 -> origin/infinity-cobra-2103234-onn4kpro-tv-integrated-shell-playing-rc14
+2026-11-09T09:08:44.8283129Z  * [new branch]        infinity-cobra-2103235-live-playing-indicator-rc1 -> origin/infinity-cobra-2103235-live-playing-indicator-rc1
+2026-11-09T09:08:44.8283687Z  * [new branch]        infinity-cobra-2103235-onn4kpro-tv-final-polish-rc15 -> origin/infinity-cobra-2103235-onn4kpro-tv-final-polish-rc15
+2026-11-09T09:08:44.8284244Z  * [new branch]        infinity-cobra-2103236-onn4kpro-tv-pulsing-dot-rc16 -> origin/infinity-cobra-2103236-onn4kpro-tv-pulsing-dot-rc16
+2026-11-09T09:08:44.8284822Z  * [new branch]        infinity-cobra-2103236-playing-indicator-all-views-rc1 -> origin/infinity-cobra-2103236-playing-indicator-all-views-rc1
+2026-11-09T09:08:44.8285537Z  * [new branch]        infinity-cobra-2103237-onn4kpro-tv-section-owner-player-cleanup-rc17 -> origin/infinity-cobra-2103237-onn4kpro-tv-section-owner-player-cleanup-rc17
+2026-11-09T09:08:44.8286210Z  * [new branch]        infinity-cobra-2103237-playing-dot-oled-micro-polish-rc1 -> origin/infinity-cobra-2103237-playing-dot-oled-micro-polish-rc1
+2026-11-09T09:08:44.8286861Z  * [new branch]        infinity-cobra-2103238-onn4kpro-tv-movies-shows-refinement-rc18 -> origin/infinity-cobra-2103238-onn4kpro-tv-movies-shows-refinement-rc18
+2026-11-09T09:08:44.8287660Z  * [new branch]        infinity-cobra-2103239-onn4kpro-tv-native-search-ui-polish-rc19 -> origin/infinity-cobra-2103239-onn4kpro-tv-native-search-ui-polish-rc19
+2026-11-09T09:08:44.8288340Z  * [new branch]        infinity-cobra-2103240-onn4kpro-tv-search-remote-hardening-rc20 -> origin/infinity-cobra-2103240-onn4kpro-tv-search-remote-hardening-rc20
+2026-11-09T09:08:44.8289053Z  * [new branch]        infinity-cobra-2103241-onn4kpro-tv-player-chrome-focus-stability-rc21 -> origin/infinity-cobra-2103241-onn4kpro-tv-player-chrome-focus-stability-rc21
+2026-11-09T09:08:44.8289747Z  * [new branch]        infinity-cobra-2103242-onn4kpro-tv-final-product-audit-rc22 -> origin/infinity-cobra-2103242-onn4kpro-tv-final-product-audit-rc22
+2026-11-09T09:08:44.8290414Z  * [new branch]        infinity-cobra-2103242-onn4kpro-tv-preservation-audit-rc22 -> origin/infinity-cobra-2103242-onn4kpro-tv-preservation-audit-rc22
+2026-11-09T09:08:44.8291027Z  * [new branch]        infinity-cobra-2103243-onn4kpro-tv-end-to-end-audit-rc23 -> origin/infinity-cobra-2103243-onn4kpro-tv-end-to-end-audit-rc23
+2026-11-09T09:08:44.8291594Z  * [new branch]        infinity-cobra-2103250-native-crash-forensics-rc1 -> origin/infinity-cobra-2103250-native-crash-forensics-rc1
+2026-11-09T09:08:44.8292127Z  * [new branch]        infinity-cobra-2103251-native-crash-forensics-rc2 -> origin/infinity-cobra-2103251-native-crash-forensics-rc2
+2026-11-09T09:08:44.8292666Z  * [new branch]        infinity-cobra-2103252-native-crash-forensics-rc3 -> origin/infinity-cobra-2103252-native-crash-forensics-rc3
+2026-11-09T09:08:44.8293196Z  * [new branch]        infinity-cobra-2103253-native-crash-forensics-rc4 -> origin/infinity-cobra-2103253-native-crash-forensics-rc4
+2026-11-09T09:08:44.8293767Z  * [new branch]        infinity-cobra-2103254-python-runtime-native-repair-rc1 -> origin/infinity-cobra-2103254-python-runtime-native-repair-rc1
+2026-11-09T09:08:44.8294318Z  * [new branch]        infinity-cobra-2103256-no-video-hold-menu-rc1 -> origin/infinity-cobra-2103256-no-video-hold-menu-rc1
+2026-11-09T09:08:44.8294825Z  * [new branch]        infinity-cobra-2103267-restore-playing-dot-rc1 -> origin/infinity-cobra-2103267-restore-playing-dot-rc1
+2026-11-09T09:08:44.8295341Z  * [new branch]        infinity-cobra-2103268-display-player-audit-rc1 -> origin/infinity-cobra-2103268-display-player-audit-rc1
+2026-11-09T09:08:44.8295817Z  * [new branch]        infinity-cobra-2103270-sports-hub-rc1 -> origin/infinity-cobra-2103270-sports-hub-rc1
+2026-11-09T09:08:44.8296258Z  * [new branch]        infinity-cobra-2103271-sports-data-rc1 -> origin/infinity-cobra-2103271-sports-data-rc1
+2026-11-09T09:08:44.8296709Z  * [new branch]        infinity-cobra-2103272-sports-polish-rc1 -> origin/infinity-cobra-2103272-sports-polish-rc1
+2026-11-09T09:08:44.8297326Z  * [new branch]        infinity-cobra-2103273-pro-sports-soccer-rc1 -> origin/infinity-cobra-2103273-pro-sports-soccer-rc1
+2026-11-09T09:08:44.8297828Z  * [new branch]        infinity-cobra-2103274-sports-hub-soccer-rc1 -> origin/infinity-cobra-2103274-sports-hub-soccer-rc1
+2026-11-09T09:08:44.8298344Z  * [new branch]        infinity-cobra-2103275-immersive-edge-ambient-rc1 -> origin/infinity-cobra-2103275-immersive-edge-ambient-rc1
+2026-11-09T09:08:44.8298838Z  * [new branch]        infinity-cobra-background-resume-rc1 -> origin/infinity-cobra-background-resume-rc1
+2026-11-09T09:08:44.8299311Z  * [new branch]        infinity-cobra-drawer-view-selector-20260917 -> origin/infinity-cobra-drawer-view-selector-20260917
+2026-11-09T09:08:44.8299795Z  * [new branch]        infinity-cobra-epg-repair-rc1 -> origin/infinity-cobra-epg-repair-rc1
+2026-11-09T09:08:44.8300225Z  * [new branch]        infinity-cobra-full-feature-candidate-2 -> origin/infinity-cobra-full-feature-candidate-2
+2026-11-09T09:08:44.8300791Z  * [new branch]        infinity-cobra-full-feature-candidate-2-extended-background -> origin/infinity-cobra-full-feature-candidate-2-extended-background
+2026-11-09T09:08:44.8301319Z  * [new branch]        infinity-cobra-legitimate-live -> origin/infinity-cobra-legitimate-live
+2026-11-09T09:08:44.8301734Z  * [new branch]        infinity-cobra-mobile-tv-guide-views -> origin/infinity-cobra-mobile-tv-guide-views
+2026-11-09T09:08:44.8302160Z  * [new branch]        infinity-cobra-post-2103148-polish -> origin/infinity-cobra-post-2103148-polish
+2026-11-09T09:08:44.8302550Z  * [new branch]        infinity-cobra-ui-runtime-rc1 -> origin/infinity-cobra-ui-runtime-rc1
+2026-11-09T09:08:44.8302893Z  * [new branch]        infinity-engine-1.0     -> origin/infinity-engine-1.0
+2026-11-09T09:08:44.8303214Z  * [new branch]        infinity-engine-1.0-build -> origin/infinity-engine-1.0-build
+2026-11-09T09:08:44.8303548Z  * [new branch]        infinity-engine-donor-v1 -> origin/infinity-engine-donor-v1
+2026-11-09T09:08:44.8303966Z  * [new branch]        infinity-hm-theme-203-audit-harness -> origin/infinity-hm-theme-203-audit-harness
+2026-11-09T09:08:44.8304356Z  * [new branch]        infinity-kodi-analysis-smoke -> origin/infinity-kodi-analysis-smoke
+2026-11-09T09:08:44.8304743Z  * [new branch]        infinity-kodi-candidate-stage-v1 -> origin/infinity-kodi-candidate-stage-v1
+2026-11-09T09:08:44.8305151Z  * [new branch]        infinity-kodi-upstream-toolkit-v1 -> origin/infinity-kodi-upstream-toolkit-v1
+2026-11-09T09:08:44.8305539Z  * [new branch]        infinity-lifecycle-repair-rc3 -> origin/infinity-lifecycle-repair-rc3
+2026-11-09T09:08:44.8305913Z  * [new branch]        infinity-live-app-within-app -> origin/infinity-live-app-within-app
+2026-11-09T09:08:44.8306307Z  * [new branch]        infinity-live-exoplayer-multiview -> origin/infinity-live-exoplayer-multiview
+2026-11-09T09:08:44.8306671Z  * [new branch]        infinity-live-multiview -> origin/infinity-live-multiview
+2026-11-09T09:08:44.8307038Z  * [new branch]        infinity-player-protection -> origin/infinity-player-protection
+2026-11-09T09:08:44.8307555Z  * [new branch]        infinity-rc3-cobra-async-lifecycle-fix -> origin/infinity-rc3-cobra-async-lifecycle-fix
+2026-11-09T09:08:44.8308032Z  * [new branch]        infinity-rc3-cobra-runtime-v3-install-fix -> origin/infinity-rc3-cobra-runtime-v3-install-fix
+2026-11-09T09:08:44.8308495Z  * [new branch]        infinity-responsive-window-2103269-rc1 -> origin/infinity-responsive-window-2103269-rc1
+2026-11-09T09:08:44.8308874Z  * [new branch]        infinity-stability-rc   -> origin/infinity-stability-rc
+2026-11-09T09:08:44.8309196Z  * [new branch]        infinity-theme-hook-audit -> origin/infinity-theme-hook-audit
+2026-11-09T09:08:44.8309573Z  * [new branch]        infinity-two-experience-live-shell -> origin/infinity-two-experience-live-shell
+2026-11-09T09:08:44.8309953Z  * [new branch]        infinity-ui-control-center -> origin/infinity-ui-control-center
+2026-11-09T09:08:44.8310331Z  * [new branch]        infinity-upstream-infrastructure -> origin/infinity-upstream-infrastructure
+2026-11-09T09:08:44.8310773Z  * [new branch]        lock-infinity-2103295-window-input-20261003 -> origin/lock-infinity-2103295-window-input-20261003
+2026-11-09T09:08:44.8311304Z  * [new branch]        lock/infinity-2103399-user-approved-baseline-20261021 -> origin/lock/infinity-2103399-user-approved-baseline-20261021
+2026-11-09T09:08:44.8311808Z  * [new branch]        lock/infinity-2103401-signed-qa-20261024 -> origin/lock/infinity-2103401-signed-qa-20261024
+2026-11-09T09:08:44.8312279Z  * [new branch]        lock/infinity-2103402-five-fold-passes-20261024 -> origin/lock/infinity-2103402-five-fold-passes-20261024
+2026-11-09T09:08:44.8312836Z  * [new branch]        lock/infinity-2103407-proven-passing-only-20261025 -> origin/lock/infinity-2103407-proven-passing-only-20261025
+2026-11-09T09:08:44.8313382Z  * [new branch]        lock/infinity-2103420-user-approved-baseline-20261026 -> origin/lock/infinity-2103420-user-approved-baseline-20261026
+2026-11-09T09:08:44.8313972Z  * [new branch]        lock/infinity-cobra-2103425-fold-approved-chooser-20261028 -> origin/lock/infinity-cobra-2103425-fold-approved-chooser-20261028
+2026-11-09T09:08:44.8314544Z  * [new branch]        lock/infinity-cobra-2103427-user-approved-20261028 -> origin/lock/infinity-cobra-2103427-user-approved-20261028
+2026-11-09T09:08:44.8315071Z  * [new branch]        lock/infinity-cobra-2103435-user-approved-20261031 -> origin/lock/infinity-cobra-2103435-user-approved-20261031
+2026-11-09T09:08:44.8315597Z  * [new branch]        lock/infinity-cobra-2103436-user-approved-20261031 -> origin/lock/infinity-cobra-2103436-user-approved-20261031
+2026-11-09T09:08:44.8316125Z  * [new branch]        lock/infinity-cobra-2103437-user-approved-20261031 -> origin/lock/infinity-cobra-2103437-user-approved-20261031
+2026-11-09T09:08:44.8316725Z  * [new branch]        lock/infinity-cobra-2103438-user-approved-pending-one-fix-20261031 -> origin/lock/infinity-cobra-2103438-user-approved-pending-one-fix-20261031
+2026-11-09T09:08:44.8317480Z  * [new branch]        lock/infinity-cobra-2103442-user-approved-20261101 -> origin/lock/infinity-cobra-2103442-user-approved-20261101
+2026-11-09T09:08:44.8318002Z  * [new branch]        lock/infinity-cobra-2103444-user-approved-20261101 -> origin/lock/infinity-cobra-2103444-user-approved-20261101
+2026-11-09T09:08:44.8318519Z  * [new branch]        lock/infinity-cobra-2103445-user-approved-20261101 -> origin/lock/infinity-cobra-2103445-user-approved-20261101
+2026-11-09T09:08:44.8319026Z  * [new branch]        lock/infinity-cobra-2103447-user-locked-20261102 -> origin/lock/infinity-cobra-2103447-user-locked-20261102
+2026-11-09T09:08:44.8319546Z  * [new branch]        lock/infinity-cobra-2103450-user-approved-20261102 -> origin/lock/infinity-cobra-2103450-user-approved-20261102
+2026-11-09T09:08:44.8320109Z  * [new branch]        lock/infinity-preview-2103447-cinematic-ui-design-20261102 -> origin/lock/infinity-preview-2103447-cinematic-ui-design-20261102
+2026-11-09T09:08:44.8320760Z  * [new branch]        lock/infinity-preview-2103450-fullscreen-display-design-20261102 -> origin/lock/infinity-preview-2103450-fullscreen-display-design-20261102
+2026-11-09T09:08:44.8321360Z  * [new branch]        lock/infinity-preview-2103451-user-frozen-20261103 -> origin/lock/infinity-preview-2103451-user-frozen-20261103
+2026-11-09T09:08:44.8321864Z  * [new branch]        locked-2103262-pro-visual-correction-passed -> origin/locked-2103262-pro-visual-correction-passed
+2026-11-09T09:08:44.8322365Z  * [new branch]        locked-2103263-pro-oled-light-polish-approved -> origin/locked-2103263-pro-oled-light-polish-approved
+2026-11-09T09:08:44.8322896Z  * [new branch]        locked-cobra-2103155-adaptive-views-epg-repair-rc1 -> origin/locked-cobra-2103155-adaptive-views-epg-repair-rc1
+2026-11-09T09:08:44.8323521Z  * [new branch]        locked-cobra-2103157-tv-navigation-appearance-diagnostics-epg-rc1 -> origin/locked-cobra-2103157-tv-navigation-appearance-diagnostics-epg-rc1
+2026-11-09T09:08:44.8324131Z  * [new branch]        locked-cobra-2103158-health-playback-polish-rc1 -> origin/locked-cobra-2103158-health-playback-polish-rc1
+2026-11-09T09:08:44.8324676Z  * [new branch]        locked-cobra-2103160-hm-theme-2.0.3-audited-refinement -> origin/locked-cobra-2103160-hm-theme-2.0.3-audited-refinement
+2026-11-09T09:08:44.8325250Z  * [new branch]        locked-cobra-2103161-theme-background-safe-area-passed -> origin/locked-cobra-2103161-theme-background-safe-area-passed
+2026-11-09T09:08:44.8325851Z  * [new branch]        locked-cobra-2103162-theme-switch-player-rotation-audited -> origin/locked-cobra-2103162-theme-switch-player-rotation-audited
+2026-11-09T09:08:44.8326461Z  * [new branch]        locked-cobra-2103164-playback-stability-passed -> origin/locked-cobra-2103164-playback-stability-passed
+2026-11-09T09:08:44.8327101Z  * [new branch]        locked-cobra-2103165-inner-insets-pip-return-player-consistency-passed -> origin/locked-cobra-2103165-inner-insets-pip-return-player-consistency-passed
+2026-11-09T09:08:44.8327952Z  * [new branch]        locked-cobra-2103166-end-to-end-ui-lifecycle-audit-passed -> origin/locked-cobra-2103166-end-to-end-ui-lifecycle-audit-passed
+2026-11-09T09:08:44.8328516Z  * [new branch]        locked-cobra-2103167-status-bar-restore-passed -> origin/locked-cobra-2103167-status-bar-restore-passed
+2026-11-09T09:08:44.8329047Z  * [new branch]        locked-cobra-2103168-pythoninvoker-native-crash-fix -> origin/locked-cobra-2103168-pythoninvoker-native-crash-fix
+2026-11-09T09:08:44.8329568Z  * [new branch]        locked-cobra-2103201-player-polish-20260921 -> origin/locked-cobra-2103201-player-polish-20260921
+2026-11-09T09:08:44.8330071Z  * [new branch]        locked-cobra-2103202-player-refinement-20260921 -> origin/locked-cobra-2103202-player-refinement-20260921
+2026-11-09T09:08:44.8330540Z  * [new branch]        locked-cobra-2103203-pip-call-20260921 -> origin/locked-cobra-2103203-pip-call-20260921
+2026-11-09T09:08:44.8330979Z  * [new branch]        locked-cobra-2103204-oled-blue-20260921 -> origin/locked-cobra-2103204-oled-blue-20260921
+2026-11-09T09:08:44.8331491Z  * [new branch]        locked-cobra-2103205-final-features-20260921 -> origin/locked-cobra-2103205-final-features-20260921
+2026-11-09T09:08:44.8332025Z  * [new branch]        locked-cobra-2103323-sports-live-user-approved-20261007 -> origin/locked-cobra-2103323-sports-live-user-approved-20261007
+2026-11-09T09:08:44.8332651Z  * [new branch]        locked-cobra-2103324-chooser-close-owner-user-approved-20261007 -> origin/locked-cobra-2103324-chooser-close-owner-user-approved-20261007
+2026-11-09T09:08:44.8333317Z  * [new branch]        locked-cobra-2103373-targeted-isolation-user-approved-20261012 -> origin/locked-cobra-2103373-targeted-isolation-user-approved-20261012
+2026-11-09T09:08:44.8333982Z  * [new branch]        locked-cobra-2103374-verified-deadweight-user-approved-20261012 -> origin/locked-cobra-2103374-verified-deadweight-user-approved-20261012
+2026-11-09T09:08:44.8334584Z  * [new branch]        locked-infinity-2103159-experience-zip-bridge-rc1 -> origin/locked-infinity-2103159-experience-zip-bridge-rc1
+2026-11-09T09:08:44.8335145Z  * [new branch]        locked-infinity-2103170-statusbar-edge-to-edge-run10 -> origin/locked-infinity-2103170-statusbar-edge-to-edge-run10
+2026-11-09T09:08:44.8335735Z  * [new branch]        locked-infinity-2103171-chooser-statusbar-surface-passed -> origin/locked-infinity-2103171-chooser-statusbar-surface-passed
+2026-11-09T09:08:44.8336317Z  * [new branch]        locked-infinity-2103255-shipping-audit-rc2-20260926 -> origin/locked-infinity-2103255-shipping-audit-rc2-20260926
+2026-11-09T09:08:44.8336800Z  * [new branch]        locked-infinity-2103265-phone-glass -> origin/locked-infinity-2103265-phone-glass
+2026-11-09T09:08:44.8337393Z  * [new branch]        locked-infinity-2103266-ambient-glass-cinema -> origin/locked-infinity-2103266-ambient-glass-cinema
+2026-11-09T09:08:44.8338065Z  * [new branch]        locked-infinity-2103282-native-ambient-settings-drawer-user-approved-20261001 -> origin/locked-infinity-2103282-native-ambient-settings-drawer-user-approved-20261001
+2026-11-09T09:08:44.8338807Z  * [new branch]        locked-infinity-2103282-native-ambient-user-approved-20261001 -> origin/locked-infinity-2103282-native-ambient-user-approved-20261001
+2026-11-09T09:08:44.8339400Z  * [new branch]        locked-infinity-2103291-inplace-responsive-reflow -> origin/locked-infinity-2103291-inplace-responsive-reflow
+2026-11-09T09:08:44.8339931Z  * [new branch]        locked-infinity-apk-2103376-user-passed-20261012 -> origin/locked-infinity-apk-2103376-user-passed-20261012
+2026-11-09T09:08:44.8340498Z  * [new branch]        locked-infinity-apk-2103377-test4-user-fold-base-20261016 -> origin/locked-infinity-apk-2103377-test4-user-fold-base-20261016
+2026-11-09T09:08:44.8341103Z  * [new branch]        locked-infinity-apk-2103384-user-passed-20261017 -> origin/locked-infinity-apk-2103384-user-passed-20261017
+2026-11-09T09:08:44.8341667Z  * [new branch]        locked-infinity-cobra-2103177-final-feature-freeze-passed -> origin/locked-infinity-cobra-2103177-final-feature-freeze-passed
+2026-11-09T09:08:44.8342292Z  * [new branch]        locked-infinity-cobra-2103211-library-native-health-passed -> origin/locked-infinity-cobra-2103211-library-native-health-passed
+2026-11-09T09:08:44.8342938Z  * [new branch]        locked-infinity-cobra-2103212-health-ambient-media-trim-passed -> origin/locked-infinity-cobra-2103212-health-ambient-media-trim-passed
+2026-11-09T09:08:44.8343644Z  * [new branch]        locked-infinity-cobra-2103213-live-blue-ambient-settings-return-passed -> origin/locked-infinity-cobra-2103213-live-blue-ambient-settings-return-passed
+2026-11-09T09:08:44.8344403Z  * [new branch]        locked-infinity-cobra-2103213-live-blue-ambient-settings-return-working -> origin/locked-infinity-cobra-2103213-live-blue-ambient-settings-return-working
+2026-11-09T09:08:44.8345096Z  * [new branch]        locked-infinity-cobra-2103214-media-details-final-passed -> origin/locked-infinity-cobra-2103214-media-details-final-passed
+2026-11-09T09:08:44.8345804Z  * [new branch]        locked-infinity-cobra-2103216-smart-return-experience-display-passed -> origin/locked-infinity-cobra-2103216-smart-return-experience-display-passed
+2026-11-09T09:08:44.8346483Z  * [new branch]        locked-infinity-cobra-2103217-media-return-context-current -> origin/locked-infinity-cobra-2103217-media-return-context-current
+2026-11-09T09:08:44.8347092Z  * [new branch]        locked-infinity-cobra-2103221-chooser-options-ui-passed -> origin/locked-infinity-cobra-2103221-chooser-options-ui-passed
+2026-11-09T09:08:44.8347888Z  * [new branch]        locked-infinity-cobra-2103221-drawer-owner-ui-restore-passed -> origin/locked-infinity-cobra-2103221-drawer-owner-ui-restore-passed
+2026-11-09T09:08:44.8348526Z  * [new branch]        locked-infinity-cobra-2103222-experience-options-ui-passed -> origin/locked-infinity-cobra-2103222-experience-options-ui-passed
+2026-11-09T09:08:44.8349157Z  * [new branch]        locked-infinity-cobra-2103223-movie-details-trailers-passed -> origin/locked-infinity-cobra-2103223-movie-details-trailers-passed
+2026-11-09T09:08:44.8349784Z  * [new branch]        locked-infinity-cobra-2103223-onn4kpro-tv-hardening-passed -> origin/locked-infinity-cobra-2103223-onn4kpro-tv-hardening-passed
+2026-11-09T09:08:44.8350420Z  * [new branch]        locked-infinity-cobra-2103224-movie-tv-details-trailers-passed -> origin/locked-infinity-cobra-2103224-movie-tv-details-trailers-passed
+2026-11-09T09:08:44.8351080Z  * [new branch]        locked-infinity-cobra-2103224-onn4kpro-tv-native-remote-passed -> origin/locked-infinity-cobra-2103224-onn4kpro-tv-native-remote-passed
+2026-11-09T09:08:44.8351743Z  * [new branch]        locked-infinity-cobra-2103225-onn4kpro-tv-handoff-focus-passed -> origin/locked-infinity-cobra-2103225-onn4kpro-tv-handoff-focus-passed
+2026-11-09T09:08:44.8352376Z  * [new branch]        locked-infinity-cobra-2103225-tv-show-typography-passed -> origin/locked-infinity-cobra-2103225-tv-show-typography-passed
+2026-11-09T09:08:44.8353017Z  * [new branch]        locked-infinity-cobra-2103227-device-live-fold-multiview-passed -> origin/locked-infinity-cobra-2103227-device-live-fold-multiview-passed
+2026-11-09T09:08:44.8353678Z  * [new branch]        locked-infinity-cobra-2103229-multiview-stability-fill-passed -> origin/locked-infinity-cobra-2103229-multiview-stability-fill-passed
+2026-11-09T09:08:44.8354357Z  * [new branch]        locked-infinity-cobra-2103230-onn4kpro-tv-navigation-motion-passed -> origin/locked-infinity-cobra-2103230-onn4kpro-tv-navigation-motion-passed
+2026-11-09T09:08:44.8355072Z  * [new branch]        locked-infinity-cobra-2103231-onn4kpro-tv-adaptive-ui-polish-passed -> origin/locked-infinity-cobra-2103231-onn4kpro-tv-adaptive-ui-polish-passed
+2026-11-09T09:08:44.8355821Z  * [new branch]        locked-infinity-cobra-2103232-onn4kpro-tv-integrated-drawer-passed -> origin/locked-infinity-cobra-2103232-onn4kpro-tv-integrated-drawer-passed
+2026-11-09T09:08:44.8356496Z  * [new branch]        locked-infinity-cobra-2103233-onn4kpro-tv-glass-system-passed -> origin/locked-infinity-cobra-2103233-onn4kpro-tv-glass-system-passed
+2026-11-09T09:08:44.8357366Z  * [new branch]        locked-infinity-cobra-2103234-onn4kpro-tv-integrated-shell-playing-passed -> origin/locked-infinity-cobra-2103234-onn4kpro-tv-integrated-shell-playing-passed
+2026-11-09T09:08:44.8358080Z  * [new branch]        locked-infinity-cobra-2103235-onn4kpro-tv-final-polish-passed -> origin/locked-infinity-cobra-2103235-onn4kpro-tv-final-polish-passed
+2026-11-09T09:08:44.8358735Z  * [new branch]        locked-infinity-cobra-2103236-onn4kpro-tv-pulsing-dot-passed -> origin/locked-infinity-cobra-2103236-onn4kpro-tv-pulsing-dot-passed
+2026-11-09T09:08:44.8359413Z  * [new branch]        locked-infinity-cobra-2103236-playing-indicator-all-views-passed -> origin/locked-infinity-cobra-2103236-playing-indicator-all-views-passed
+2026-11-09T09:08:44.8360153Z  * [new branch]        locked-infinity-cobra-2103237-onn4kpro-tv-section-owner-source-checkpoint -> origin/locked-infinity-cobra-2103237-onn4kpro-tv-section-owner-source-checkpoint
+2026-11-09T09:08:44.8360947Z  * [new branch]        locked-infinity-cobra-2103237-playing-dot-oled-micro-polish-passed -> origin/locked-infinity-cobra-2103237-playing-dot-oled-micro-polish-passed
+2026-11-09T09:08:44.8361684Z  * [new branch]        locked-infinity-cobra-2103240-onn4kpro-tv-search-remote-hardening-passed -> origin/locked-infinity-cobra-2103240-onn4kpro-tv-search-remote-hardening-passed
+2026-11-09T09:08:44.8362516Z  * [new branch]        locked-infinity-cobra-2103241-onn4kpro-tv-player-chrome-focus-stability-passed -> origin/locked-infinity-cobra-2103241-onn4kpro-tv-player-chrome-focus-stability-passed
+2026-11-09T09:08:44.8363308Z  * [new branch]        locked-infinity-cobra-2103242-onn4kpro-tv-final-product-audit-passed -> origin/locked-infinity-cobra-2103242-onn4kpro-tv-final-product-audit-passed
+2026-11-09T09:08:44.8364054Z  * [new branch]        locked-infinity-cobra-2103256-no-video-hold-menu-device-passed-20260926 -> origin/locked-infinity-cobra-2103256-no-video-hold-menu-device-passed-20260926
+2026-11-09T09:08:44.8364820Z  * [new branch]        locked-infinity-cobra-2103267-playing-dot-restore-device-passed-20260930 -> origin/locked-infinity-cobra-2103267-playing-dot-restore-device-passed-20260930
+2026-11-09T09:08:44.8365569Z  * [new branch]        locked-infinity-cobra-2103269-responsive-window-device-passed-20260930 -> origin/locked-infinity-cobra-2103269-responsive-window-device-passed-20260930
+2026-11-09T09:08:44.8366287Z  * [new branch]        locked-infinity-cobra-2103271-sports-data-device-passed-20260930 -> origin/locked-infinity-cobra-2103271-sports-data-device-passed-20260930
+2026-11-09T09:08:44.8367009Z  * [new branch]        locked-infinity-cobra-2103273-pro-sports-soccer-device-passed-20260930 -> origin/locked-infinity-cobra-2103273-pro-sports-soccer-device-passed-20260930
+2026-11-09T09:08:44.8367853Z  * [new branch]        locked-infinity-cobra-2103274-sports-hub-soccer-device-passed-20260930 -> origin/locked-infinity-cobra-2103274-sports-hub-soccer-device-passed-20260930
+2026-11-09T09:08:44.8368636Z  * [new branch]        locked-infinity-cobra-2103275-immersive-edge-ambient-device-passed-20260930 -> origin/locked-infinity-cobra-2103275-immersive-edge-ambient-device-passed-20260930
+2026-11-09T09:08:44.8369394Z  * [new branch]        locked-infinity-cobra-2103276-whole-ui-ambient-device-passed-20260930 -> origin/locked-infinity-cobra-2103276-whole-ui-ambient-device-passed-20260930
+2026-11-09T09:08:44.8370122Z  * [new branch]        locked-infinity-cobra-2103277-mini-player-fill-device-passed-20260930 -> origin/locked-infinity-cobra-2103277-mini-player-fill-device-passed-20260930
+2026-11-09T09:08:44.8370880Z  * [new branch]        locked-infinity-cobra-2103278-watch-ambient-user-approved-20260930 -> origin/locked-infinity-cobra-2103278-watch-ambient-user-approved-20260930
+2026-11-09T09:08:44.8371559Z  * [new branch]        locked-infinity-cobra-2103279-end-to-end-user-approved-20261001 -> origin/locked-infinity-cobra-2103279-end-to-end-user-approved-20261001
+2026-11-09T09:08:44.8372245Z  * [new branch]        locked-infinity-cobra-2103280-audit-followup-user-approved-20261001 -> origin/locked-infinity-cobra-2103280-audit-followup-user-approved-20261001
+2026-11-09T09:08:44.8372957Z  * [new branch]        locked-infinity-cobra-2103281-remaining-audit-user-approved-20261001 -> origin/locked-infinity-cobra-2103281-remaining-audit-user-approved-20261001
+2026-11-09T09:08:44.8373665Z  * [new branch]        locked-infinity-health-2.5.20-packaging-rc1-user-approved-20261012 -> origin/locked-infinity-health-2.5.20-packaging-rc1-user-approved-20261012
+2026-11-09T09:08:44.8374363Z  * [new branch]        locked-infinity-rc3-cleanup-health-2518-skin-updater-101-20260926 -> origin/locked-infinity-rc3-cleanup-health-2518-skin-updater-101-20260926
+2026-11-09T09:08:44.8375070Z  * [new branch]        locked-infinity-skin-1.0.5.208-verified-cleanup-user-approved-20261012 -> origin/locked-infinity-skin-1.0.5.208-verified-cleanup-user-approved-20261012
+2026-11-09T09:08:44.8375729Z  * [new branch]        locked-infinity-skin-1.0.5.211-user-passed-20261012 -> origin/locked-infinity-skin-1.0.5.211-user-passed-20261012
+2026-11-09T09:08:44.8376213Z  * [new branch]        locked/2103316-close-progress-isolation -> origin/locked/2103316-close-progress-isolation
+2026-11-09T09:08:44.8376642Z  * [new branch]        locked/2103317-cobra-pro-season-oled -> origin/locked/2103317-cobra-pro-season-oled
+2026-11-09T09:08:44.8377110Z  * [new branch]        locked/infinity-2103377-rails-handoff-rc1-20261015 -> origin/locked/infinity-2103377-rails-handoff-rc1-20261015
+2026-11-09T09:08:44.8377647Z  * [new branch]        locked/infinity-2103377-rc5 -> origin/locked/infinity-2103377-rc5
+2026-11-09T09:08:44.8378031Z  * [new branch]        locked/infinity-rails-mocha-20261014 -> origin/locked/infinity-rails-mocha-20261014
+2026-11-09T09:08:44.8378530Z  * [new branch]        locked/infinity-skin223-addon-browser-polish-20261014 -> origin/locked/infinity-skin223-addon-browser-polish-20261014
+2026-11-09T09:08:44.8379085Z  * [new branch]        locks/infinity-2103466-owner-approved-base-20261108 -> origin/locks/infinity-2103466-owner-approved-base-20261108
+2026-11-09T09:08:44.8379616Z  * [new branch]        locks/infinity-2103469-protected-recovery-20261108 -> origin/locks/infinity-2103469-protected-recovery-20261108
+2026-11-09T09:08:44.8380099Z  * [new branch]        locks/infinity-tracking-e410f30b-20261109 -> origin/locks/infinity-tracking-e410f30b-20261109
+2026-11-09T09:08:44.8380586Z  * [new branch]        locks/infinity464-eight-search-qa-pass-20261107 -> origin/locks/infinity464-eight-search-qa-pass-20261107
+2026-11-09T09:08:44.8381090Z  * [new branch]        locks/infinity464-reuse-passed-gates-20261107 -> origin/locks/infinity464-reuse-passed-gates-20261107
+2026-11-09T09:08:44.8381607Z  * [new branch]        locks/umbrella-pov-native-search-host-pass-20261107 -> origin/locks/umbrella-pov-native-search-host-pass-20261107
+2026-11-09T09:08:44.8382007Z  * [new branch]        main                    -> origin/main
+2026-11-09T09:08:44.8382376Z  * [new branch]        records-2103263-pro-oled-light-polish-lock -> origin/records-2103263-pro-oled-light-polish-lock
+2026-11-09T09:08:44.8382811Z  * [new branch]        records-cobra-2103276-lock-20260930 -> origin/records-cobra-2103276-lock-20260930
+2026-11-09T09:08:44.8383215Z  * [new branch]        records-cobra-2103277-lock-20260930 -> origin/records-cobra-2103277-lock-20260930
+2026-11-09T09:08:44.8383787Z  * [new branch]        recovery/infinity-2103445-payload-after-2103446-playback-failure-20261101 -> origin/recovery/infinity-2103445-payload-after-2103446-playback-failure-20261101
+2026-11-09T09:08:44.8384512Z  * [new branch]        recovery/restore-exact-2103433-after-rejected-2103434-20261030 -> origin/recovery/restore-exact-2103433-after-rejected-2103434-20261030
+2026-11-09T09:08:44.8385047Z  * [new branch]        repair/2103303-194-responsive-regressions -> origin/repair/2103303-194-responsive-regressions
+2026-11-09T09:08:44.8385435Z  * [new branch]        repair/2103308-close-reopen -> origin/repair/2103308-close-reopen
+2026-11-09T09:08:44.8385757Z  * [new branch]        repair/2103309-close-ring -> origin/repair/2103309-close-ring
+2026-11-09T09:08:44.8386090Z  * [new branch]        repair/2103310-close-progress -> origin/repair/2103310-close-progress
+2026-11-09T09:08:44.8386454Z  * [new branch]        repair/2103311-chooser-isolation -> origin/repair/2103311-chooser-isolation
+2026-11-09T09:08:44.8386797Z  * [new branch]        repair/2103312-pro-teams -> origin/repair/2103312-pro-teams
+2026-11-09T09:08:44.8387098Z  * [new branch]        repair/2103313-shutdown -> origin/repair/2103313-shutdown
+2026-11-09T09:08:44.8387567Z  * [new branch]        repair/2103314-shutdown-evidence -> origin/repair/2103314-shutdown-evidence
+2026-11-09T09:08:44.8387942Z  * [new branch]        repair/2103315-android-task-close -> origin/repair/2103315-android-task-close
+2026-11-09T09:08:44.8388349Z  * [new branch]        repair/2103316-close-progress-isolation -> origin/repair/2103316-close-progress-isolation
+2026-11-09T09:08:44.8388823Z  * [new branch]        repair/2103317-cobra-pro-season-oled -> origin/repair/2103317-cobra-pro-season-oled
+2026-11-09T09:08:44.8389225Z  * [new branch]        repair/chooser-close-owner-2103324 -> origin/repair/chooser-close-owner-2103324
+2026-11-09T09:08:44.8389613Z  * [new branch]        repair/cobra-pro-carousel-2103320 -> origin/repair/cobra-pro-carousel-2103320
+2026-11-09T09:08:44.8390018Z  * [new branch]        repair/cobra-pro-corrections-2103319 -> origin/repair/cobra-pro-corrections-2103319
+2026-11-09T09:08:44.8390405Z  * [new branch]        repair/cobra-pro-handoff-317 -> origin/repair/cobra-pro-handoff-317
+2026-11-09T09:08:44.8390777Z  * [new branch]        repair/cobra-pro-preview-2103321 -> origin/repair/cobra-pro-preview-2103321
+2026-11-09T09:08:44.8391169Z  * [new branch]        repair/cobra-pro-refinement-2103322 -> origin/repair/cobra-pro-refinement-2103322
+2026-11-09T09:08:44.8391566Z  * [new branch]        repair/cobra-sports-live-2103323 -> origin/repair/cobra-sports-live-2103323
+2026-11-09T09:08:44.8391972Z  * [new branch]        repair/infinity-2103331-stable-restamp -> origin/repair/infinity-2103331-stable-restamp
+2026-11-09T09:08:44.8392382Z  * [new branch]        repair/infinity-closing-ui-2103328 -> origin/repair/infinity-closing-ui-2103328
+2026-11-09T09:08:44.8392810Z  * [new branch]        repair/infinity-cooperative-close-2103326 -> origin/repair/infinity-cooperative-close-2103326
+2026-11-09T09:08:44.8393262Z  * [new branch]        repair/infinity-directory-close-2103330 -> origin/repair/infinity-directory-close-2103330
+2026-11-09T09:08:44.8393709Z  * [new branch]        repair/infinity-directory-verify-2103333 -> origin/repair/infinity-directory-verify-2103333
+2026-11-09T09:08:44.8394185Z  * [new branch]        repair/infinity-health-native-bridge-2103335 -> origin/repair/infinity-health-native-bridge-2103335
+2026-11-09T09:08:44.8394656Z  * [new branch]        repair/infinity-jobmanager-close-2103327 -> origin/repair/infinity-jobmanager-close-2103327
+2026-11-09T09:08:44.8395093Z  * [new branch]        repair/infinity-live-closing-2103329 -> origin/repair/infinity-live-closing-2103329
+2026-11-09T09:08:44.8395500Z  * [new branch]        repair/infinity-python-exit-2103334 -> origin/repair/infinity-python-exit-2103334
+2026-11-09T09:08:44.8395947Z  * [new branch]        repair/infinity-shutdown-diagnostics-2103325 -> origin/repair/infinity-shutdown-diagnostics-2103325
+2026-11-09T09:08:44.8396386Z  * [new branch]        repair/screensaver-421-skin-198-rc1 -> origin/repair/screensaver-421-skin-198-rc1
+2026-11-09T09:08:44.8396783Z  * [new branch]        restore/infinity-2103332-exact-3327 -> origin/restore/infinity-2103332-exact-3327
+2026-11-09T09:08:44.8397454Z  * [new branch]        review/infinity-fold-qa-reported-regressions-20261106 -> origin/review/infinity-fold-qa-reported-regressions-20261106
+2026-11-09T09:08:44.8397994Z  * [new branch]        review/kodi22-piers-selective-shutdown-20261008 -> origin/review/kodi22-piers-selective-shutdown-20261008
+2026-11-09T09:08:44.8398547Z  * [new branch]        rollback-2103159-before-render-contract-repair-20260917 -> origin/rollback-2103159-before-render-contract-repair-20260917
+2026-11-09T09:08:44.8399094Z  * [new branch]        rollback-2103159-run10-before-text-fit-20260917 -> origin/rollback-2103159-run10-before-text-fit-20260917
+2026-11-09T09:08:44.8399629Z  * [new branch]        rollback-2103258-before-options-health-finish-20260927 -> origin/rollback-2103258-before-options-health-finish-20260927
+2026-11-09T09:08:44.8400204Z  * [new branch]        rollback-2103259-before-recovery-fixed-chooser-20260927 -> origin/rollback-2103259-before-recovery-fixed-chooser-20260927
+2026-11-09T09:08:44.8400729Z  * [new branch]        rollback-2103260-before-pro-mode-20260927 -> origin/rollback-2103260-before-pro-mode-20260927
+2026-11-09T09:08:44.8401218Z  * [new branch]        rollback-before-kodi-watcher-first-run-20260916 -> origin/rollback-before-kodi-watcher-first-run-20260916
+2026-11-09T09:08:44.8401817Z  * [new branch]        rollback-cobra-2103157-before-android-layout-fix-20260917 -> origin/rollback-cobra-2103157-before-android-layout-fix-20260917
+2026-11-09T09:08:44.8402432Z  * [new branch]        rollback-cobra-2103157-before-first-layout-arm-fix-20260917 -> origin/rollback-cobra-2103157-before-first-layout-arm-fix-20260917
+2026-11-09T09:08:44.8403038Z  * [new branch]        rollback-cobra-2103157-before-measurement-audit-d04fff1 -> origin/rollback-cobra-2103157-before-measurement-audit-d04fff1
+2026-11-09T09:08:44.8403617Z  * [new branch]        rollback-cobra-2103163-before-stability-audit-20260918 -> origin/rollback-cobra-2103163-before-stability-audit-20260918
+2026-11-09T09:08:44.8404228Z  * [new branch]        rollback-cobra-2103197-before-complete-product-audit-20260920 -> origin/rollback-cobra-2103197-before-complete-product-audit-20260920
+2026-11-09T09:08:44.8404845Z  * [new branch]        rollback-cobra-2103199-before-provider-boundary-20260920 -> origin/rollback-cobra-2103199-before-provider-boundary-20260920
+2026-11-09T09:08:44.8405423Z  * [new branch]        rollback-cobra-2103200-before-player-polish-20260921 -> origin/rollback-cobra-2103200-before-player-polish-20260921
+2026-11-09T09:08:44.8406020Z  * [new branch]        rollback-cobra-2103278-before-end-to-end-2103279-20261001 -> origin/rollback-cobra-2103278-before-end-to-end-2103279-20261001
+2026-11-09T09:08:44.8406601Z  * [new branch]        rollback-cobra-2103279-before-followup-2103280-20261001 -> origin/rollback-cobra-2103279-before-followup-2103280-20261001
+2026-11-09T09:08:44.8407269Z  * [new branch]        rollback-cobra-2103280-before-remaining-audit-20261001 -> origin/rollback-cobra-2103280-before-remaining-audit-20261001
+2026-11-09T09:08:44.8407890Z  * [new branch]        rollback-cobra-epg-packaging-before-runtime-pin-fix-20260917 -> origin/rollback-cobra-epg-packaging-before-runtime-pin-fix-20260917
+2026-11-09T09:08:44.8408520Z  * [new branch]        rollback-infinity-2103254-before-shipping-audit-20260926 -> origin/rollback-infinity-2103254-before-shipping-audit-20260926
+2026-11-09T09:08:44.8409123Z  * [new branch]        rollback-infinity-2103282-before-surface-repair-20261001 -> origin/rollback-infinity-2103282-before-surface-repair-20261001
+2026-11-09T09:08:44.8409735Z  * [new branch]        rollback-infinity-2103284-before-native-fd-repair-20261001 -> origin/rollback-infinity-2103284-before-native-fd-repair-20261001
+2026-11-09T09:08:44.8410436Z  * [new branch]        rollback-infinity-2103285-before-chooser-responsive-20261001 -> origin/rollback-infinity-2103285-before-chooser-responsive-20261001
+2026-11-09T09:08:44.8411133Z  * [new branch]        rollback-infinity-2103285-before-evidence-health-20261001 -> origin/rollback-infinity-2103285-before-evidence-health-20261001
+2026-11-09T09:08:44.8411730Z  * [new branch]        rollback-infinity-2103285-before-natural-resize-20261001 -> origin/rollback-infinity-2103285-before-natural-resize-20261001
+2026-11-09T09:08:44.8412383Z  * [new branch]        rollback-infinity-2103288-before-native-responsive-layout-20261001 -> origin/rollback-infinity-2103288-before-native-responsive-layout-20261001
+2026-11-09T09:08:44.8413034Z  * [new branch]        rollback-infinity-2103288-before-trace-hardening-20261001 -> origin/rollback-infinity-2103288-before-trace-hardening-20261001
+2026-11-09T09:08:44.8413636Z  * [new branch]        rollback-infinity-2103290-before-inplace-reflow-20261002 -> origin/rollback-infinity-2103290-before-inplace-reflow-20261002
+2026-11-09T09:08:44.8414215Z  * [new branch]        rollback-infinity-2103302-before-e2e-repair-20261003 -> origin/rollback-infinity-2103302-before-e2e-repair-20261003
+2026-11-09T09:08:44.8414780Z  * [new branch]        rollback-phone-2103256-before-glass-chooser-20260927 -> origin/rollback-phone-2103256-before-glass-chooser-20260927
+2026-11-09T09:08:44.8415341Z  * [new branch]        rollback-phone-2103257-before-glass-settings-20260927 -> origin/rollback-phone-2103257-before-glass-settings-20260927
+2026-11-09T09:08:44.8415880Z  * [new branch]        rollback/2103304-195-before-2103305-20261004 -> origin/rollback/2103304-195-before-2103305-20261004
+2026-11-09T09:08:44.8416364Z  * [new branch]        rollback/2103306-before-png-preservation-20261004 -> origin/rollback/2103306-before-png-preservation-20261004
+2026-11-09T09:08:44.8416779Z  * [new branch]        utility-map-point-apk   -> origin/utility-map-point-apk
+2026-11-09T09:08:44.8417266Z  * [new branch]        work/android-checkpoint-shutdown-2103335 -> origin/work/android-checkpoint-shutdown-2103335
+2026-11-09T09:08:44.8417757Z  * [new branch]        work/chooser-release-authority-2103424-20261027 -> origin/work/chooser-release-authority-2103424-20261027
+2026-11-09T09:08:44.8418262Z  * [new branch]        work/chooser-release-authority-2103425-20261027 -> origin/work/chooser-release-authority-2103425-20261027
+2026-11-09T09:08:44.8418773Z  * [new branch]        work/chooser-version-labels-from-2103423-20261027 -> origin/work/chooser-version-labels-from-2103423-20261027
+2026-11-09T09:08:44.8419314Z  * [new branch]        work/cobra-2103442-end-to-end-quality-refresh-20261101 -> origin/work/cobra-2103442-end-to-end-quality-refresh-20261101
+2026-11-09T09:08:44.8419867Z  * [new branch]        work/cobra-2103444-rotation-audio-preserved-20261101 -> origin/work/cobra-2103444-rotation-audio-preserved-20261101
+2026-11-09T09:08:44.8420431Z  * [new branch]        work/cobra-all-layout-fold-reflow-from-2103421-20261027 -> origin/work/cobra-all-layout-fold-reflow-from-2103421-20261027
+2026-11-09T09:08:44.8420926Z  * [new branch]        work/cobra-astra-corrective-20261012 -> origin/work/cobra-astra-corrective-20261012
+2026-11-09T09:08:44.8421326Z  * [new branch]        work/cobra-clean-restart-20261012 -> origin/work/cobra-clean-restart-20261012
+2026-11-09T09:08:44.8421810Z  * [new branch]        work/cobra-fullscreen-display-from-2103438-20261031 -> origin/work/cobra-fullscreen-display-from-2103438-20261031
+2026-11-09T09:08:44.8422282Z  * [new branch]        work/cobra-only-from-2103427-20261028 -> origin/work/cobra-only-from-2103427-20261028
+2026-11-09T09:08:44.8422695Z  * [new branch]        work/cobra-only-from-2103435-20261031 -> origin/work/cobra-only-from-2103435-20261031
+2026-11-09T09:08:44.8423103Z  * [new branch]        work/cobra-only-from-2103437-20261031 -> origin/work/cobra-only-from-2103437-20261031
+2026-11-09T09:08:44.8423461Z  * [new branch]        work/cobra-six-2103370  -> origin/work/cobra-six-2103370
+2026-11-09T09:08:44.8423824Z  * [new branch]        work/cobra-targeted-isolation-2103373 -> origin/work/cobra-targeted-isolation-2103373
+2026-11-09T09:08:44.8424293Z  * [new branch]        work/infinity-2103377-close-recents-preservation -> origin/work/infinity-2103377-close-recents-preservation
+2026-11-09T09:08:44.8424864Z  * [new branch]        work/infinity-2103377-essential-first-shutdown-only -> origin/work/infinity-2103377-essential-first-shutdown-only
+2026-11-09T09:08:44.8425337Z  * [new branch]        work/infinity-2103377-final-shutdown -> origin/work/infinity-2103377-final-shutdown
+2026-11-09T09:08:44.8425786Z  * [new branch]        work/infinity-2103377-final-shutdown-package -> origin/work/infinity-2103377-final-shutdown-package
+2026-11-09T09:08:44.8426275Z  * [new branch]        work/infinity-2103377-overflow-diagnostic-apk -> origin/work/infinity-2103377-overflow-diagnostic-apk
+2026-11-09T09:08:44.8426797Z  * [new branch]        work/infinity-2103377-python-shutdown-retirement-rc1 -> origin/work/infinity-2103377-python-shutdown-retirement-rc1
+2026-11-09T09:08:44.8427457Z  * [new branch]        work/infinity-2103377-rails-handoff-rc1 -> origin/work/infinity-2103377-rails-handoff-rc1
+2026-11-09T09:08:44.8428068Z  * [new branch]        work/infinity-2103377-rc3-curl-early-save -> origin/work/infinity-2103377-rc3-curl-early-save
+2026-11-09T09:08:44.8428566Z  * [new branch]        work/infinity-2103377-rc3-early-python-retirement -> origin/work/infinity-2103377-rc3-early-python-retirement
+2026-11-09T09:08:44.8429066Z  * [new branch]        work/infinity-2103377-rc4-targeted-retirement -> origin/work/infinity-2103377-rc4-targeted-retirement
+2026-11-09T09:08:44.8429570Z  * [new branch]        work/infinity-2103377-rc5-green-package -> origin/work/infinity-2103377-rc5-green-package
+2026-11-09T09:08:44.8429991Z  * [new branch]        work/infinity-2103377-rc5-host-debug -> origin/work/infinity-2103377-rc5-host-debug
+2026-11-09T09:08:44.8430468Z  * [new branch]        work/infinity-2103377-rc5-optional-python-retirement -> origin/work/infinity-2103377-rc5-optional-python-retirement
+2026-11-09T09:08:44.8430961Z  * [new branch]        work/infinity-2103377-rc5-signed-package -> origin/work/infinity-2103377-rc5-signed-package
+2026-11-09T09:08:44.8431401Z  * [new branch]        work/infinity-2103377-shutdown-drain-rc2 -> origin/work/infinity-2103377-shutdown-drain-rc2
+2026-11-09T09:08:44.8431869Z  * [new branch]        work/infinity-2103377-shutdown-wide-diagnostics -> origin/work/infinity-2103377-shutdown-wide-diagnostics
+2026-11-09T09:08:44.8432334Z  * [new branch]        work/infinity-2103390-targeted-bugfixes -> origin/work/infinity-2103390-targeted-bugfixes
+2026-11-09T09:08:44.8432832Z  * [new branch]        work/infinity-2103391-pro-seven-group-audit-20261019 -> origin/work/infinity-2103391-pro-seven-group-audit-20261019
+2026-11-09T09:08:44.8433327Z  * [new branch]        work/infinity-2103392-apk-download-chunks -> origin/work/infinity-2103392-apk-download-chunks
+2026-11-09T09:08:44.8433772Z  * [new branch]        work/infinity-2103392-delivery-artifacts -> origin/work/infinity-2103392-delivery-artifacts
+2026-11-09T09:08:44.8434175Z  * [new branch]        work/infinity-2103392-final-apk -> origin/work/infinity-2103392-final-apk
+2026-11-09T09:08:44.8434572Z  * [new branch]        work/infinity-2103392-individual-zips -> origin/work/infinity-2103392-individual-zips
+2026-11-09T09:08:44.8435021Z  * [new branch]        work/infinity-2103392-standalone-apk-delivery -> origin/work/infinity-2103392-standalone-apk-delivery
+2026-11-09T09:08:44.8435463Z  * [new branch]        work/infinity-2103393-build-control -> origin/work/infinity-2103393-build-control
+2026-11-09T09:08:44.8435912Z  * [new branch]        work/infinity-2103393-fold-corrective-20261020 -> origin/work/infinity-2103393-fold-corrective-20261020
+2026-11-09T09:08:44.8436390Z  * [new branch]        work/infinity-2103394-fold-complete-20261021 -> origin/work/infinity-2103394-fold-complete-20261021
+2026-11-09T09:08:44.8436927Z  * [new branch]        work/infinity-2103394-optionb-zip-runtime-evidence-20261021 -> origin/work/infinity-2103394-optionb-zip-runtime-evidence-20261021
+2026-11-09T09:08:44.8437613Z  * [new branch]        work/infinity-2103395-fold-critical-20261021 -> origin/work/infinity-2103395-fold-critical-20261021
+2026-11-09T09:08:44.8438180Z  * [new branch]        work/infinity-2103395-optionb-shutdown-evidence-20261021 -> origin/work/infinity-2103395-optionb-shutdown-evidence-20261021
+2026-11-09T09:08:44.8453927Z  * [new branch]        work/infinity-2103395-search-android17-execution-20261021 -> origin/work/infinity-2103395-search-android17-execution-20261021
+2026-11-09T09:08:44.8454792Z  * [new branch]        work/infinity-2103396-targeted-corrective -> origin/work/infinity-2103396-targeted-corrective
+2026-11-09T09:08:44.8455417Z  * [new branch]        work/infinity-2103397-final-oled -> origin/work/infinity-2103397-final-oled
+2026-11-09T09:08:44.8456013Z  * [new branch]        work/infinity-2103398-consolidated -> origin/work/infinity-2103398-consolidated
+2026-11-09T09:08:44.8456569Z  * [new branch]        work/infinity-2103399-final-ui -> origin/work/infinity-2103399-final-ui
+2026-11-09T09:08:44.8457288Z  * [new branch]        work/infinity-2103400-three-corrections -> origin/work/infinity-2103400-three-corrections
+2026-11-09T09:08:44.8457948Z  * [new branch]        work/infinity-2103401-corrective-polish -> origin/work/infinity-2103401-corrective-polish
+2026-11-09T09:08:44.8458659Z  * [new branch]        work/infinity-2103402-cc03535-compat-20261024 -> origin/work/infinity-2103402-cc03535-compat-20261024
+2026-11-09T09:08:44.8459625Z  * [new branch]        work/infinity-2103402-e2e-continue-hold-findings-20261024 -> origin/work/infinity-2103402-e2e-continue-hold-findings-20261024
+2026-11-09T09:08:44.8460549Z  * [new branch]        work/infinity-2103402-final-stabilization-20261024 -> origin/work/infinity-2103402-final-stabilization-20261024
+2026-11-09T09:08:44.8461394Z  * [new branch]        work/infinity-2103402-functional-qa-20261024 -> origin/work/infinity-2103402-functional-qa-20261024
+2026-11-09T09:08:44.8462258Z  * [new branch]        work/infinity-2103402-native-owner-corrective-20261024 -> origin/work/infinity-2103402-native-owner-corrective-20261024
+2026-11-09T09:08:44.8463245Z  * [new branch]        work/infinity-2103402-nixtoons-only-identity-menu-20261025 -> origin/work/infinity-2103402-nixtoons-only-identity-menu-20261025
+2026-11-09T09:08:44.8464299Z  * [new branch]        work/infinity-2103402-resume-otaku-nixtoons-favorites-20261024 -> origin/work/infinity-2103402-resume-otaku-nixtoons-favorites-20261024
+2026-11-09T09:08:44.8465372Z  * [new branch]        work/infinity-2103403-nixtoons-route-link-search-crash-20261025 -> origin/work/infinity-2103403-nixtoons-route-link-search-crash-20261025
+2026-11-09T09:08:44.8466467Z  * [new branch]        work/infinity-2103404-watchnixtoons-source-location-only-20261025 -> origin/work/infinity-2103404-watchnixtoons-source-location-only-20261025
+2026-11-09T09:08:44.8467531Z  * [new branch]        work/infinity-2103405-watchnixtoons-infinity-tracked-context-20261025 -> origin/work/infinity-2103405-watchnixtoons-infinity-tracked-context-20261025
+2026-11-09T09:08:44.8468211Z  * [new branch]        work/infinity-2103406-native-search-crash-correction-20261025 -> origin/work/infinity-2103406-native-search-crash-correction-20261025
+2026-11-09T09:08:44.8468849Z  * [new branch]        work/infinity-2103407-search-overload-single-flight-20261025 -> origin/work/infinity-2103407-search-overload-single-flight-20261025
+2026-11-09T09:08:44.8469445Z  * [new branch]        work/infinity-2103445-external-video-lifecycle-20261101 -> origin/work/infinity-2103445-external-video-lifecycle-20261101
+2026-11-09T09:08:44.8470034Z  * [new branch]        work/infinity-2103445-standalone-external-player-20261101 -> origin/work/infinity-2103445-standalone-external-player-20261101
+2026-11-09T09:08:44.8470582Z  * [new branch]        work/infinity-2103458-six-corrections-20261105 -> origin/work/infinity-2103458-six-corrections-20261105
+2026-11-09T09:08:44.8471080Z  * [new branch]        work/infinity-2103460-nine-corrections-20261106 -> origin/work/infinity-2103460-nine-corrections-20261106
+2026-11-09T09:08:44.8471622Z  * [new branch]        work/infinity-2103460-skin-script-scoped-fixes-20261106 -> origin/work/infinity-2103460-skin-script-scoped-fixes-20261106
+2026-11-09T09:08:44.8472298Z  * [new branch]        work/infinity-462-search-graphics-integration-20261107 -> origin/work/infinity-462-search-graphics-integration-20261107
+2026-11-09T09:08:44.8472829Z  * [new branch]        work/infinity-addon-error-quarantine-2103355 -> origin/work/infinity-addon-error-quarantine-2103355
+2026-11-09T09:08:44.8473289Z  * [new branch]        work/infinity-android-close-2103365 -> origin/work/infinity-android-close-2103365
+2026-11-09T09:08:44.8473819Z  * [new branch]        work/infinity-browser-visual-correction-from-2103456-20261105 -> origin/work/infinity-browser-visual-correction-from-2103456-20261105
+2026-11-09T09:08:44.8474347Z  * [new branch]        work/infinity-bytecode-cache-2103349 -> origin/work/infinity-bytecode-cache-2103349
+2026-11-09T09:08:44.8474815Z  * [new branch]        work/infinity-cancelled-script-receipt-2103369 -> origin/work/infinity-cancelled-script-receipt-2103369
+2026-11-09T09:08:44.8475371Z  * [new branch]        work/infinity-checkpoint-retirement-escalation-2103357 -> origin/work/infinity-checkpoint-retirement-escalation-2103357
+2026-11-09T09:08:44.8475931Z  * [new branch]        work/infinity-cobra-isolation-from-2103420-20261026 -> origin/work/infinity-cobra-isolation-from-2103420-20261026
+2026-11-09T09:08:44.8476521Z  * [new branch]        work/infinity-commandcenter-03520-labels-verified-v2 -> origin/work/infinity-commandcenter-03520-labels-verified-v2
+2026-11-09T09:08:44.8477018Z  * [new branch]        work/infinity-compact-preview-skin-211 -> origin/work/infinity-compact-preview-skin-211
+2026-11-09T09:08:44.8477632Z  * [new branch]        work/infinity-consolidated-anr-first-20261017 -> origin/work/infinity-consolidated-anr-first-20261017
+2026-11-09T09:08:44.8478100Z  * [new branch]        work/infinity-critical-preview-2103376 -> origin/work/infinity-critical-preview-2103376
+2026-11-09T09:08:44.8478514Z  * [new branch]        work/infinity-critical-skin-210 -> origin/work/infinity-critical-skin-210
+2026-11-09T09:08:44.8478959Z  * [new branch]        work/infinity-drawer-extended-scroll-20261104 -> origin/work/infinity-drawer-extended-scroll-20261104
+2026-11-09T09:08:44.8479466Z  * [new branch]        work/infinity-drawer-power-fixed-source-20261104 -> origin/work/infinity-drawer-power-fixed-source-20261104
+2026-11-09T09:08:44.8479979Z  * [new branch]        work/infinity-drawer-shortcuts-scope-20261104 -> origin/work/infinity-drawer-shortcuts-scope-20261104
+2026-11-09T09:08:44.8480506Z  * [new branch]        work/infinity-final-blocker-detail-inventory-2103359 -> origin/work/infinity-final-blocker-detail-inventory-2103359
+2026-11-09T09:08:44.8481061Z  * [new branch]        work/infinity-final-corrective-from-2103407-20261025 -> origin/work/infinity-final-corrective-from-2103407-20261025
+2026-11-09T09:08:44.8481549Z  * [new branch]        work/infinity-final-release-462-20261107 -> origin/work/infinity-final-release-462-20261107
+2026-11-09T09:08:44.8482016Z  * [new branch]        work/infinity-full-blocker-inventory-2103351 -> origin/work/infinity-full-blocker-inventory-2103351
+2026-11-09T09:08:44.8482476Z  * [new branch]        work/infinity-full-repair-20261017-gpt6 -> origin/work/infinity-full-repair-20261017-gpt6
+2026-11-09T09:08:44.8483011Z  * [new branch]        work/infinity-graphics-gesture-render-462-candidate-20261107 -> origin/work/infinity-graphics-gesture-render-462-candidate-20261107
+2026-11-09T09:08:44.8483574Z  * [new branch]        work/infinity-health-2520-packaging-cleanup -> origin/work/infinity-health-2520-packaging-cleanup
+2026-11-09T09:08:44.8484024Z  * [new branch]        work/infinity-installer-close-2103368 -> origin/work/infinity-installer-close-2103368
+2026-11-09T09:08:44.8484499Z  * [new branch]        work/infinity-kodi-2103451-checkpoint-anr-20261103 -> origin/work/infinity-kodi-2103451-checkpoint-anr-20261103
+2026-11-09T09:08:44.8485020Z  * [new branch]        work/infinity-kodi-2103453-controlled-test-20261104 -> origin/work/infinity-kodi-2103453-controlled-test-20261104
+2026-11-09T09:08:44.8485616Z  * [new branch]        work/infinity-kodi-2103453-ui-navigation-source-20261104 -> origin/work/infinity-kodi-2103453-ui-navigation-source-20261104
+2026-11-09T09:08:44.8486171Z  * [new branch]        work/infinity-kodi-452-pause-stop-arm64-20261104 -> origin/work/infinity-kodi-452-pause-stop-arm64-20261104
+2026-11-09T09:08:44.8486728Z  * [new branch]        work/infinity-kodi-checkpoint-pause-stop-source-20261104 -> origin/work/infinity-kodi-checkpoint-pause-stop-source-20261104
+2026-11-09T09:08:44.8487463Z  * [new branch]        work/infinity-kodi-ui-2103454-2103455-packaging-20261104 -> origin/work/infinity-kodi-ui-2103454-2103455-packaging-20261104
+2026-11-09T09:08:44.8487933Z  * [new branch]        work/infinity-lifecycle-2103364 -> origin/work/infinity-lifecycle-2103364
+2026-11-09T09:08:44.8488346Z  * [new branch]        work/infinity-lifecycle-recovery-2103346 -> origin/work/infinity-lifecycle-recovery-2103346
+2026-11-09T09:08:44.8488797Z  * [new branch]        work/infinity-master-corrective-20261105 -> origin/work/infinity-master-corrective-20261105
+2026-11-09T09:08:44.8489282Z  * [new branch]        work/infinity-master-testing-from-2103451-20261105 -> origin/work/infinity-master-testing-from-2103451-20261105
+2026-11-09T09:08:44.8489815Z  * [new branch]        work/infinity-native-keyboard-scaling-462-20261107 -> origin/work/infinity-native-keyboard-scaling-462-20261107
+2026-11-09T09:08:44.8490423Z  * [new branch]        work/infinity-native-search-compatibility-scope-20261107 -> origin/work/infinity-native-search-compatibility-scope-20261107
+2026-11-09T09:08:44.8490973Z  * [new branch]        work/infinity-native-touch-from-2103451-20261105 -> origin/work/infinity-native-touch-from-2103451-20261105
+2026-11-09T09:08:44.8491429Z  * [new branch]        work/infinity-native-writer-2103348 -> origin/work/infinity-native-writer-2103348
+2026-11-09T09:08:44.8491845Z  * [new branch]        work/infinity-only-from-2103436-20261031 -> origin/work/infinity-only-from-2103436-20261031
+2026-11-09T09:08:44.8492362Z  * [new branch]        work/infinity-only-seamless-loading-from-2103433-20261030 -> origin/work/infinity-only-seamless-loading-from-2103433-20261030
+2026-11-09T09:08:44.8492949Z  * [new branch]        work/infinity-only-stability-speed-from-2103425-20261028 -> origin/work/infinity-only-stability-speed-from-2103425-20261028
+2026-11-09T09:08:44.8493541Z  * [new branch]        work/infinity-phase-d-225-renderer-diagnostics-20261017 -> origin/work/infinity-phase-d-225-renderer-diagnostics-20261017
+2026-11-09T09:08:44.8494022Z  * [new branch]        work/infinity-phase-d-skin-225 -> origin/work/infinity-phase-d-skin-225
+2026-11-09T09:08:44.8494434Z  * [new branch]        work/infinity-phase-d-skin-225-complete -> origin/work/infinity-phase-d-skin-225-complete
+2026-11-09T09:08:44.8494912Z  * [new branch]        work/infinity-post-2103384-feature-restoration -> origin/work/infinity-post-2103384-feature-restoration
+2026-11-09T09:08:44.8495450Z  * [new branch]        work/infinity-preview-2103447-per-video-resume-20261102 -> origin/work/infinity-preview-2103447-per-video-resume-20261102
+2026-11-09T09:08:44.8496012Z  * [new branch]        work/infinity-preview-2103448-cinematic-call-20261102 -> origin/work/infinity-preview-2103448-cinematic-call-20261102
+2026-11-09T09:08:44.8496651Z  * [new branch]        work/infinity-preview-2103450-acceptance-and-display-design-20261102 -> origin/work/infinity-preview-2103450-acceptance-and-display-design-20261102
+2026-11-09T09:08:44.8497400Z  * [new branch]        work/infinity-preview-2103450-fullscreen-display-20261102 -> origin/work/infinity-preview-2103450-fullscreen-display-20261102
+2026-11-09T09:08:44.8497946Z  * [new branch]        work/infinity-python-retirement-batch-2103352 -> origin/work/infinity-python-retirement-batch-2103352
+2026-11-09T09:08:44.8498432Z  * [new branch]        work/infinity-quarantine-probation-2103356 -> origin/work/infinity-quarantine-probation-2103356
+2026-11-09T09:08:44.8498855Z  * [new branch]        work/infinity-rails-hold-2103378 -> origin/work/infinity-rails-hold-2103378
+2026-11-09T09:08:44.8499332Z  * [new branch]        work/infinity-rails-hold-2103379-hit-test-rc2 -> origin/work/infinity-rails-hold-2103379-hit-test-rc2
+2026-11-09T09:08:44.8499836Z  * [new branch]        work/infinity-rails-input-investigation-20261014 -> origin/work/infinity-rails-input-investigation-20261014
+2026-11-09T09:08:44.8500331Z  * [new branch]        work/infinity-recovery-integration-2103367 -> origin/work/infinity-recovery-integration-2103367
+2026-11-09T09:08:44.8500848Z  * [new branch]        work/infinity-redlight-observer-finalization-2103358 -> origin/work/infinity-redlight-observer-finalization-2103358
+2026-11-09T09:08:44.8501324Z  * [new branch]        work/infinity-resume-speed-2103363 -> origin/work/infinity-resume-speed-2103363
+2026-11-09T09:08:44.8501777Z  * [new branch]        work/infinity-runtime-probe-and-recents-2103361 -> origin/work/infinity-runtime-probe-and-recents-2103361
+2026-11-09T09:08:44.8502289Z  * [new branch]        work/infinity-runtime-probe-retirement-2103361 -> origin/work/infinity-runtime-probe-retirement-2103361
+2026-11-09T09:08:44.8502773Z  * [new branch]        work/infinity-save-blocker-repair-2103353 -> origin/work/infinity-save-blocker-repair-2103353
+2026-11-09T09:08:44.8503244Z  * [new branch]        work/infinity-save-later-multiimage-20261023 -> origin/work/infinity-save-later-multiimage-20261023
+2026-11-09T09:08:44.8503791Z  * [new branch]        work/infinity-save-retirement-job-contracts-2103354 -> origin/work/infinity-save-retirement-job-contracts-2103354
+2026-11-09T09:08:44.8504296Z  * [new branch]        work/infinity-saved-route-android-20261023 -> origin/work/infinity-saved-route-android-20261023
+2026-11-09T09:08:44.8504774Z  * [new branch]        work/infinity-saved-route-correction-20261023 -> origin/work/infinity-saved-route-correction-20261023
+2026-11-09T09:08:44.8505263Z  * [new branch]        work/infinity-script-retirement-2103347 -> origin/work/infinity-script-retirement-2103347
+2026-11-09T09:08:44.8505766Z  * [new branch]        work/infinity-search-native-owned-response-20261107 -> origin/work/infinity-search-native-owned-response-20261107
+2026-11-09T09:08:44.8506349Z  * [new branch]        work/infinity-search-provider-owned-fresh-results-20261107 -> origin/work/infinity-search-provider-owned-fresh-results-20261107
+2026-11-09T09:08:44.8506944Z  * [new branch]        work/infinity-search-provider-state-readonly-20261104 -> origin/work/infinity-search-provider-state-readonly-20261104
+2026-11-09T09:08:44.8507656Z  * [new branch]        work/infinity-search-settings-proof-candidate-20261107 -> origin/work/infinity-search-settings-proof-candidate-20261107
+2026-11-09T09:08:44.8508232Z  * [new branch]        work/infinity-search-unified-native-candidate-20261107 -> origin/work/infinity-search-unified-native-candidate-20261107
+2026-11-09T09:08:44.8508743Z  * [new branch]        work/infinity-shutdown-contracts-2103362 -> origin/work/infinity-shutdown-contracts-2103362
+2026-11-09T09:08:44.8509231Z  * [new branch]        work/infinity-skin-1.0.5.213-addon-tile-selection -> origin/work/infinity-skin-1.0.5.213-addon-tile-selection
+2026-11-09T09:08:44.8509720Z  * [new branch]        work/infinity-skin-1.0.5.214-normal-window-rc2 -> origin/work/infinity-skin-1.0.5.214-normal-window-rc2
+2026-11-09T09:08:44.8510181Z  * [new branch]        work/infinity-skin-207-verified-cleanup -> origin/work/infinity-skin-207-verified-cleanup
+2026-11-09T09:08:44.8510614Z  * [new branch]        work/infinity-skin-209-preview-polish -> origin/work/infinity-skin-209-preview-polish
+2026-11-09T09:08:44.8511101Z  * [new branch]        work/infinity-skin215-commandcenter-settings-labels -> origin/work/infinity-skin215-commandcenter-settings-labels
+2026-11-09T09:08:44.8511599Z  * [new branch]        work/infinity-skin216-custom-addon-rails -> origin/work/infinity-skin216-custom-addon-rails
+2026-11-09T09:08:44.8512061Z  * [new branch]        work/infinity-skin217-custom-addon-rails-rc3 -> origin/work/infinity-skin217-custom-addon-rails-rc3
+2026-11-09T09:08:44.8512568Z  * [new branch]        work/infinity-skin217-custom-rails-rc3 -> origin/work/infinity-skin217-custom-rails-rc3
+2026-11-09T09:08:44.8512995Z  * [new branch]        work/infinity-skin218-custom-rails-rc3 -> origin/work/infinity-skin218-custom-rails-rc3
+2026-11-09T09:08:44.8513463Z  * [new branch]        work/infinity-skin219-custom-rails-rc3-geometry -> origin/work/infinity-skin219-custom-rails-rc3-geometry
+2026-11-09T09:08:44.8513982Z  * [new branch]        work/infinity-skin220-rail-context-restoration-rc4 -> origin/work/infinity-skin220-rail-context-restoration-rc4
+2026-11-09T09:08:44.8514455Z  * [new branch]        work/infinity-skin221-rails-input-rc5 -> origin/work/infinity-skin221-rails-input-rc5
+2026-11-09T09:08:44.8514898Z  * [new branch]        work/infinity-skin223-addon-browser-polish -> origin/work/infinity-skin223-addon-browser-polish
+2026-11-09T09:08:44.8515336Z  * [new branch]        work/infinity-sqlite-bridge-2103350 -> origin/work/infinity-sqlite-bridge-2103350
+2026-11-09T09:08:44.8515756Z  * [new branch]        work/infinity-stability-probe-20261014 -> origin/work/infinity-stability-probe-20261014
+2026-11-09T09:08:44.8516193Z  * [new branch]        work/infinity-stability-rollback-2103366 -> origin/work/infinity-stability-rollback-2103366
+2026-11-09T09:08:44.8516719Z  * [new branch]        work/infinity-stability-rollback-scope-2103366 -> origin/work/infinity-stability-rollback-scope-2103366
+2026-11-09T09:08:44.8517290Z  * [new branch]        work/infinity-system-stability-2103366 -> origin/work/infinity-system-stability-2103366
+2026-11-09T09:08:44.8517748Z  * [new branch]        work/infinity-system-stability-scope-2103366 -> origin/work/infinity-system-stability-scope-2103366
+2026-11-09T09:08:44.8518231Z  * [new branch]        work/infinity-system-stability-shell-2103366 -> origin/work/infinity-system-stability-shell-2103366
+2026-11-09T09:08:44.8518690Z  * [new branch]        work/infinity-three-corrections-20261108 -> origin/work/infinity-three-corrections-20261108
+2026-11-09T09:08:44.8519152Z  * [new branch]        work/infinity-tracking-integration-20261108 -> origin/work/infinity-tracking-integration-20261108
+2026-11-09T09:08:44.8519603Z  * [new branch]        work/infinity-ui-stabilization-2103365 -> origin/work/infinity-ui-stabilization-2103365
+2026-11-09T09:08:44.8520046Z  * [new branch]        work/infinity-umbrella-pov-zip-20261108 -> origin/work/infinity-umbrella-pov-zip-20261108
+2026-11-09T09:08:44.8520505Z  * [new branch]        work/infinity-universal-persistence-20261022 -> origin/work/infinity-universal-persistence-20261022
+2026-11-09T09:08:44.8521024Z  * [new branch]        work/infinity-universal-persistence-android-20261022 -> origin/work/infinity-universal-persistence-android-20261022
+2026-11-09T09:08:44.8521521Z  * [new branch]        work/infinity-universal-receipt-20261022 -> origin/work/infinity-universal-receipt-20261022
+2026-11-09T09:08:44.8521959Z  * [new branch]        work/infinity-universal-review-20261022 -> origin/work/infinity-universal-review-20261022
+2026-11-09T09:08:44.8522408Z  * [new branch]        work/infinity-verified-deadweight-2103374 -> origin/work/infinity-verified-deadweight-2103374
+2026-11-09T09:08:44.8522860Z  * [new branch]        work/infinity-watchlist-phase-a-20261108 -> origin/work/infinity-watchlist-phase-a-20261108
+2026-11-09T09:08:44.8523309Z  * [new branch]        work/infinity-watchlist-phase-b-20261108 -> origin/work/infinity-watchlist-phase-b-20261108
+2026-11-09T09:08:44.8523777Z  * [new branch]        work/infinity-weather-temp-retirement-2103360 -> origin/work/infinity-weather-temp-retirement-2103360
+2026-11-09T09:08:44.8524245Z  * [new branch]        work/infinity-zip-preview-native-2103375 -> origin/work/infinity-zip-preview-native-2103375
+2026-11-09T09:08:44.8524732Z  * [new branch]        work/infinity464-targeted-crash-diagnosis-20261107 -> origin/work/infinity464-targeted-crash-diagnosis-20261107
+2026-11-09T09:08:44.8525207Z  * [new branch]        work/kodi22-selective-shutdown-2103339 -> origin/work/kodi22-selective-shutdown-2103339
+2026-11-09T09:08:44.8525586Z  * [new tag]           build-1                 -> build-1
+2026-11-09T09:08:44.8525817Z  * [new tag]           build-4                 -> build-4
+2026-11-09T09:08:44.8526126Z  * [new tag]           infinity-2103393-binaries-39483588212 -> infinity-2103393-binaries-39483588212
+2026-11-09T09:08:44.8526513Z  * [new tag]           infinity-2103394-binaries-39539171911 -> infinity-2103394-binaries-39539171911
+2026-11-09T09:08:44.8526895Z  * [new tag]           infinity-2103395-binaries-39555495053 -> infinity-2103395-binaries-39555495053
+2026-11-09T09:08:44.8527396Z  * [new tag]           infinity-2103396-binaries-39579955813 -> infinity-2103396-binaries-39579955813
+2026-11-09T09:08:44.8527766Z  * [new tag]           infinity-2103397-binaries-39584431102 -> infinity-2103397-binaries-39584431102
+2026-11-09T09:08:44.8528139Z  * [new tag]           infinity-2103398-binaries-39662467387 -> infinity-2103398-binaries-39662467387
+2026-11-09T09:08:44.8528514Z  * [new tag]           infinity-2103399-binaries-39662645551 -> infinity-2103399-binaries-39662645551
+2026-11-09T09:08:44.8528883Z  * [new tag]           infinity-2103400-binaries-39720566646 -> infinity-2103400-binaries-39720566646
+2026-11-09T09:08:44.8529255Z  * [new tag]           infinity-2103401-binaries-39779917183 -> infinity-2103401-binaries-39779917183
+2026-11-09T09:08:44.8530389Z [command]/usr/bin/git rev-parse --verify --quiet 28f1853495f570ce75282ce4603765258223378e^{object}
+2026-11-09T09:08:44.8530788Z 28f1853495f570ce75282ce4603765258223378e
+2026-11-09T09:08:44.8531311Z ##[endgroup]
+2026-11-09T09:08:44.8531569Z ##[group]Determining the checkout info
+2026-11-09T09:08:44.8531840Z ##[endgroup]
+2026-11-09T09:08:44.8532008Z [command]/usr/bin/git sparse-checkout disable
+2026-11-09T09:08:44.8532463Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-11-09T09:08:44.8533047Z ##[group]Checking out the ref
+2026-11-09T09:08:44.8533311Z [command]/usr/bin/git checkout --progress --force 28f1853495f570ce75282ce4603765258223378e
+2026-11-09T09:08:45.5465389Z Note: switching to '28f1853495f570ce75282ce4603765258223378e'.
+2026-11-09T09:08:45.5465666Z 
+2026-11-09T09:08:45.5465843Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-11-09T09:08:45.5466225Z changes and commit them, and you can discard any commits you make in this
+2026-11-09T09:08:45.5466599Z state without impacting any branches by switching back to a branch.
+2026-11-09T09:08:45.5466815Z 
+2026-11-09T09:08:45.5466965Z If you want to create a new branch to retain commits you create, you may
+2026-11-09T09:08:45.5467502Z do so (now or later) by using -c with the switch command. Example:
+2026-11-09T09:08:45.5467707Z 
+2026-11-09T09:08:45.5467797Z   git switch -c <new-branch-name>
+2026-11-09T09:08:45.5467941Z 
+2026-11-09T09:08:45.5468025Z Or undo this operation with:
+2026-11-09T09:08:45.5468155Z 
+2026-11-09T09:08:45.5468241Z   git switch -
+2026-11-09T09:08:45.5468344Z 
+2026-11-09T09:08:45.5468512Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-11-09T09:08:45.5468775Z 
+2026-11-09T09:08:45.5469032Z HEAD is now at 28f18534 Verify tracking integration: genuine Infinity TV and Movies Watchlist origin only
+2026-11-09T09:08:45.5501657Z ##[endgroup]
+2026-11-09T09:08:45.5528470Z [command]/usr/bin/git log -1 --format=%H
+2026-11-09T09:08:45.5541952Z 28f1853495f570ce75282ce4603765258223378e
+2026-11-09T09:08:45.5549721Z ##[group]Removing auth
+2026-11-09T09:08:45.5552646Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-09T09:08:45.5570013Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-09T09:08:45.5687622Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-09T09:08:45.5700364Z http.https://github.com/.extraheader
+2026-11-09T09:08:45.5704995Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-11-09T09:08:45.5758161Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-09T09:08:45.5919616Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-09T09:08:45.5927938Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-09T09:08:45.6070006Z ##[endgroup]
+2026-11-09T09:08:45.6321940Z ##[group]Run actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+2026-11-09T09:08:45.6322160Z with:
+2026-11-09T09:08:45.6322279Z   python-version: 3.11.7
+2026-11-09T09:08:45.6322408Z   check-latest: false
+2026-11-09T09:08:45.6323626Z   token: ***
+2026-11-09T09:08:45.6323743Z   update-environment: true
+2026-11-09T09:08:45.6323879Z   allow-prereleases: false
+2026-11-09T09:08:45.6324012Z   freethreaded: false
+2026-11-09T09:08:45.6324128Z env:
+2026-11-09T09:08:45.6325316Z   GH_TOKEN: ***
+2026-11-09T09:08:45.6325436Z   PYTHONDONTWRITEBYTECODE: 1
+2026-11-09T09:08:45.6325569Z ##[endgroup]
+2026-11-09T09:08:45.7342057Z ##[group]Installed versions
+2026-11-09T09:08:45.7353183Z Version 3.11.7 was not found in the local cache
+2026-11-09T09:08:45.7441485Z (node:1953) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-09T09:08:45.7441900Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-09T09:08:46.6020963Z Version 3.11.7 is available for downloading
+2026-11-09T09:08:46.6022310Z Download from "https://github.com/actions/python-versions/releases/download/3.11.7-11113197120/python-3.11.7-linux-22.04-x64.tar.gz"
+2026-11-09T09:08:47.2390065Z Extract downloaded archive
+2026-11-09T09:08:47.2462591Z [command]/usr/bin/tar xz --warning=no-unknown-keyword --overwrite -C /home/runner/work/_temp/ef38d1b2-987e-4841-96e9-e27435394a65 -f /home/runner/work/_temp/8c0e0ad5-4bbf-48dd-af5a-07e430170d73
+2026-11-09T09:08:48.6937343Z Execute installation script
+2026-11-09T09:08:48.6991286Z Check if Python hostedtoolcache folder exist...
+2026-11-09T09:08:48.6991667Z Create Python 3.11.7 folder
+2026-11-09T09:08:48.6999567Z Copy Python binaries to hostedtoolcache folder
+2026-11-09T09:08:48.9478516Z Create additional symlinks (Required for the UsePythonVersion Azure Pipelines task and the setup-python GitHub Action)
+2026-11-09T09:08:48.9496506Z Upgrading pip...
+2026-11-09T09:08:50.9587595Z Looking in links: /tmp/tmp_rz25_me
+2026-11-09T09:08:50.9592110Z Requirement already satisfied: setuptools in /opt/hostedtoolcache/Python/3.11.7/x64/lib/python3.11/site-packages (65.5.0)
+2026-11-09T09:08:50.9596727Z Requirement already satisfied: pip in /opt/hostedtoolcache/Python/3.11.7/x64/lib/python3.11/site-packages (23.2.1)
+2026-11-09T09:08:52.1807477Z Collecting pip
+2026-11-09T09:08:52.1808394Z Obtaining dependency information for pip from https://files.pythonhosted.org/packages/07/25/ee8c38ae72d66b844ce8eb9711ba905dba21ca1a8a0c960057c41cd23337/pip-26.3-py3-none-any.whl.metadata
+2026-11-09T09:08:52.2388357Z Downloading pip-26.3-py3-none-any.whl.metadata (4.6 kB)
+2026-11-09T09:08:52.2519033Z Downloading pip-26.3-py3-none-any.whl (2.0 MB)
+2026-11-09T09:08:52.4106272Z ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.0/2.0 MB 12.5 MB/s eta 0:00:00
+2026-11-09T09:08:52.4106566Z 
+2026-11-09T09:08:52.4372511Z Installing collected packages: pip
+2026-11-09T09:08:52.4373014Z Attempting uninstall: pip
+2026-11-09T09:08:52.4383759Z Found existing installation: pip 23.2.1
+2026-11-09T09:08:52.4549398Z Uninstalling pip-23.2.1:
+2026-11-09T09:08:52.4581171Z Successfully uninstalled pip-23.2.1
+2026-11-09T09:08:52.9823224Z Successfully installed pip-26.3
+2026-11-09T09:08:53.0548709Z Create complete file
+2026-11-09T09:08:53.0574761Z Successfully set up CPython (3.11.7)
+2026-11-09T09:08:53.0575693Z ##[endgroup]
+2026-11-09T09:08:53.0701695Z ##[group]Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+2026-11-09T09:08:53.0701912Z with:
+2026-11-09T09:08:53.0702026Z   distribution: temurin
+2026-11-09T09:08:53.0702151Z   java-version: 21
+2026-11-09T09:08:53.0702265Z   java-package: jdk
+2026-11-09T09:08:53.0702404Z   check-latest: false
+2026-11-09T09:08:53.0702521Z   server-id: github
+2026-11-09T09:08:53.0702642Z   server-username: GITHUB_ACTOR
+2026-11-09T09:08:53.0702783Z   server-password: GITHUB_TOKEN
+2026-11-09T09:08:53.0702920Z   overwrite-settings: true
+2026-11-09T09:08:53.0703051Z   job-status: success
+2026-11-09T09:08:53.0704256Z   token: ***
+2026-11-09T09:08:53.0704366Z env:
+2026-11-09T09:08:53.0705520Z   GH_TOKEN: ***
+2026-11-09T09:08:53.0705641Z   PYTHONDONTWRITEBYTECODE: 1
+2026-11-09T09:08:53.0705815Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.7/x64
+2026-11-09T09:08:53.0706062Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.7/x64/lib/pkgconfig
+2026-11-09T09:08:53.0706314Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.7/x64
+2026-11-09T09:08:53.0706521Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.7/x64
+2026-11-09T09:08:53.0706723Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.7/x64
+2026-11-09T09:08:53.0706928Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.7/x64/lib
+2026-11-09T09:08:53.0707337Z ##[endgroup]
+2026-11-09T09:08:53.1809650Z ##[warning]setup-java v4 is deprecated and will no longer receive updates. Please migrate to actions/setup-java@v5.
+2026-11-09T09:08:53.1814915Z ##[group]Installed distributions
+2026-11-09T09:08:53.1838519Z Resolved Java 21.0.13+9 from tool-cache
+2026-11-09T09:08:53.1838803Z Setting Java 21.0.13+9 as the default
+2026-11-09T09:08:53.1845352Z (node:2006) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-09T09:08:53.1845857Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-09T09:08:53.1848242Z Creating toolchains.xml for JDK version 21 from temurin
+2026-11-09T09:08:53.1895663Z Writing to /home/runner/.m2/toolchains.xml
+2026-11-09T09:08:53.1896301Z 
+2026-11-09T09:08:53.1908783Z Java configuration:
+2026-11-09T09:08:53.1909076Z   Distribution: temurin
+2026-11-09T09:08:53.1909291Z   Version: 21.0.13+9
+2026-11-09T09:08:53.1909582Z   Path: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.13-9/x64
+2026-11-09T09:08:53.1909872Z 
+2026-11-09T09:08:53.1914601Z ##[endgroup]
+2026-11-09T09:08:53.1928955Z Creating settings.xml with server-id: github
+2026-11-09T09:08:53.1930736Z Writing to /home/runner/.m2/settings.xml
+2026-11-09T09:08:53.2030627Z ##[group]Run android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+2026-11-09T09:08:53.2030885Z with:
+2026-11-09T09:08:53.2031010Z   cmdline-tools-version: 15859902
+2026-11-09T09:08:53.2031212Z   packages: platform-tools build-tools;35.0.0 cmdline-tools;22.0
+2026-11-09T09:08:53.2031436Z   log-accepted-android-sdk-licenses: false
+2026-11-09T09:08:53.2031612Z   accept-android-sdk-licenses: true
+2026-11-09T09:08:53.2031761Z env:
+2026-11-09T09:08:53.2033113Z   GH_TOKEN: ***
+2026-11-09T09:08:53.2033247Z   PYTHONDONTWRITEBYTECODE: 1
+2026-11-09T09:08:53.2033432Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.7/x64
+2026-11-09T09:08:53.2033675Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.7/x64/lib/pkgconfig
+2026-11-09T09:08:53.2033926Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.7/x64
+2026-11-09T09:08:53.2034139Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.7/x64
+2026-11-09T09:08:53.2034376Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.7/x64
+2026-11-09T09:08:53.2034592Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.7/x64/lib
+2026-11-09T09:08:53.2034837Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.13-9/x64
+2026-11-09T09:08:53.2035111Z   JAVA_HOME_21_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.13-9/x64
+2026-11-09T09:08:53.2035326Z ##[endgroup]
+2026-11-09T09:08:53.2642460Z Found preinstalled sdkmanager in /usr/local/lib/android/sdk/cmdline-tools/latest with following source.properties:
+2026-11-09T09:08:53.2643011Z Pkg.Revision=9.0
+2026-11-09T09:08:53.2643239Z Pkg.Path=cmdline-tools;9.0
+2026-11-09T09:08:53.2643484Z Pkg.Desc=Android SDK Command-line Tools
+2026-11-09T09:08:53.2643675Z 
+2026-11-09T09:08:53.2643783Z Wrong version in preinstalled sdkmanager
+2026-11-09T09:08:53.2644338Z Downloading commandline tools from https://dl.google.com/android/repository/commandlinetools-linux-15859902_latest.zip
+2026-11-09T09:08:54.7442940Z [command]/usr/bin/unzip -o -q /home/runner/work/_temp/851619b3-40cd-486a-880a-4e1ea58c6b39
+2026-11-09T09:08:55.2592705Z Accepting Android SDK licenses
+2026-11-09T09:08:57.3779771Z [command]/usr/local/lib/android/sdk/cmdline-tools/15859902/bin/sdkmanager platform-tools
+2026-11-09T09:08:57.4430168Z WARNING: The SDK Manager CLI tool (sdkmanager) is deprecated. Use Android CLI instead.
+2026-11-09T09:08:57.4458009Z The 'android' binary can also be found in the cmdline-tools directory, and 'android sdk' is the replacement for 'sdkmanager'.
+2026-11-09T09:08:57.4459032Z To learn more about the Android CLI and how to use it, see the documentation (https://d.android.com/tools/agents/android-cli)
+2026-11-09T09:08:57.4459645Z 
+2026-11-09T09:08:57.9511174Z Loading package information...                                                  
+2026-11-09T09:08:58.0138738Z Loading local repository...                                                     
+2026-11-09T09:08:58.0139565Z [                                       ] 3% Loading local repository...        
+2026-11-09T09:08:58.0149316Z [                                       ] 3% Fetch remote repository...         
+2026-11-09T09:08:58.2416914Z [=                                      ] 3% Fetch remote repository...         
+2026-11-09T09:08:58.2889806Z [=                                      ] 4% Fetch remote repository...         
+2026-11-09T09:08:58.3151001Z [=                                      ] 5% Fetch remote repository...         
+2026-11-09T09:08:58.3518326Z [==                                     ] 5% Fetch remote repository...         
+2026-11-09T09:08:58.4055819Z [==                                     ] 6% Fetch remote repository...         
+2026-11-09T09:08:58.4719627Z [==                                     ] 7% Fetch remote repository...         
+2026-11-09T09:08:58.4748583Z [==                                     ] 7% Computing updates...               
+2026-11-09T09:08:58.4805305Z [===                                    ] 8% Computing updates...               
+2026-11-09T09:08:58.4873050Z [===                                    ] 10% Computing updates...              
+2026-11-09T09:08:58.4873664Z [=======================================] 100% Computing updates...             
+2026-11-09T09:08:58.4877844Z 
+2026-11-09T09:08:58.5036667Z [command]/usr/local/lib/android/sdk/cmdline-tools/15859902/bin/sdkmanager build-tools;35.0.0
+2026-11-09T09:08:58.5730525Z WARNING: The SDK Manager CLI tool (sdkmanager) is deprecated. Use Android CLI instead.
+2026-11-09T09:08:58.5730994Z The 'android' binary can also be found in the cmdline-tools directory, and 'android sdk' is the replacement for 'sdkmanager'.
+2026-11-09T09:08:58.5731470Z To learn more about the Android CLI and how to use it, see the documentation (https://d.android.com/tools/agents/android-cli)
+2026-11-09T09:08:58.5731732Z 
+2026-11-09T09:08:59.0581621Z Loading package information...                                                  
+2026-11-09T09:08:59.1195482Z Loading local repository...                                                     
+2026-11-09T09:08:59.1195847Z [                                       ] 3% Loading local repository...        
+2026-11-09T09:08:59.1220221Z [                                       ] 3% Fetch remote repository...         
+2026-11-09T09:08:59.3239781Z [=                                      ] 3% Fetch remote repository...         
+2026-11-09T09:08:59.4438715Z [=                                      ] 4% Fetch remote repository...         
+2026-11-09T09:08:59.4688663Z [=                                      ] 5% Fetch remote repository...         
+2026-11-09T09:08:59.5087538Z [==                                     ] 5% Fetch remote repository...         
+2026-11-09T09:08:59.5603033Z [==                                     ] 6% Fetch remote repository...         
+2026-11-09T09:08:59.6188957Z [==                                     ] 7% Fetch remote repository...         
+2026-11-09T09:08:59.6216684Z [==                                     ] 7% Computing updates...               
+2026-11-09T09:08:59.6286389Z [===                                    ] 8% Computing updates...               
+2026-11-09T09:08:59.6360183Z [===                                    ] 10% Computing updates...              
+2026-11-09T09:08:59.6362805Z [=======================================] 100% Computing updates...             
+2026-11-09T09:08:59.6363380Z 
+2026-11-09T09:08:59.6555078Z [command]/usr/local/lib/android/sdk/cmdline-tools/15859902/bin/sdkmanager cmdline-tools;22.0
+2026-11-09T09:08:59.7219516Z WARNING: The SDK Manager CLI tool (sdkmanager) is deprecated. Use Android CLI instead.
+2026-11-09T09:08:59.7220211Z The 'android' binary can also be found in the cmdline-tools directory, and 'android sdk' is the replacement for 'sdkmanager'.
+2026-11-09T09:08:59.7220937Z To learn more about the Android CLI and how to use it, see the documentation (https://d.android.com/tools/agents/android-cli)
+2026-11-09T09:08:59.7221986Z 
+2026-11-09T09:09:00.2550801Z Loading package information...                                                  
+2026-11-09T09:09:00.3150871Z Loading local repository...                                                     
+2026-11-09T09:09:00.3151599Z [                                       ] 3% Loading local repository...        
+2026-11-09T09:09:00.3179290Z [                                       ] 3% Fetch remote repository...         
+2026-11-09T09:09:00.5571819Z [=                                      ] 3% Fetch remote repository...         
+2026-11-09T09:09:00.6222457Z [=                                      ] 4% Fetch remote repository...         
+2026-11-09T09:09:00.6504545Z [=                                      ] 5% Fetch remote repository...         
+2026-11-09T09:09:00.6991340Z [==                                     ] 5% Fetch remote repository...         
+2026-11-09T09:09:00.7629115Z [==                                     ] 6% Fetch remote repository...         
+2026-11-09T09:09:00.8186534Z [==                                     ] 7% Fetch remote repository...         
+2026-11-09T09:09:00.8229431Z [==                                     ] 7% Computing updates...               
+2026-11-09T09:09:00.8272844Z [===                                    ] 8% Computing updates...               
+2026-11-09T09:09:00.8385359Z [===                                    ] 10% Computing updates...              
+2026-11-09T09:09:01.1886263Z [===                                    ] 10% Installing Android SDK Command-lin
+2026-11-09T09:09:01.3402047Z [===                                    ] 10% Downloading commandlinetools-linux
+2026-11-09T09:09:01.3776386Z [====                                   ] 10% Downloading commandlinetools-linux
+2026-11-09T09:09:01.4184769Z [====                                   ] 11% Downloading commandlinetools-linux
+2026-11-09T09:09:01.4718885Z [====                                   ] 12% Downloading commandlinetools-linux
+2026-11-09T09:09:01.5127112Z [=====                                  ] 13% Downloading commandlinetools-linux
+2026-11-09T09:09:01.5579366Z [=====                                  ] 14% Downloading commandlinetools-linux
+2026-11-09T09:09:01.5888935Z [=====                                  ] 15% Downloading commandlinetools-linux
+2026-11-09T09:09:01.6086902Z [======                                 ] 15% Downloading commandlinetools-linux
+2026-11-09T09:09:01.6523704Z [======                                 ] 16% Downloading commandlinetools-linux
+2026-11-09T09:09:01.7061044Z [======                                 ] 17% Downloading commandlinetools-linux
+2026-11-09T09:09:01.7468824Z [=======                                ] 18% Downloading commandlinetools-linux
+2026-11-09T09:09:01.7987743Z [=======                                ] 19% Downloading commandlinetools-linux
+2026-11-09T09:09:01.8193815Z [=======                                ] 20% Downloading commandlinetools-linux
+2026-11-09T09:09:01.8398876Z [========                               ] 20% Downloading commandlinetools-linux
+2026-11-09T09:09:01.8914549Z [========                               ] 21% Downloading commandlinetools-linux
+2026-11-09T09:09:01.9552490Z [========                               ] 22% Downloading commandlinetools-linux
+2026-11-09T09:09:01.9969952Z [=========                              ] 23% Downloading commandlinetools-linux
+2026-11-09T09:09:02.0722578Z [=========                              ] 24% Downloading commandlinetools-linux
+2026-11-09T09:09:02.1033814Z [=========                              ] 25% Downloading commandlinetools-linux
+2026-11-09T09:09:02.1364433Z [==========                             ] 25% Downloading commandlinetools-linux
+2026-11-09T09:09:02.2015042Z [==========                             ] 26% Downloading commandlinetools-linux
+2026-11-09T09:09:02.2557384Z [==========                             ] 27% Downloading commandlinetools-linux
+2026-11-09T09:09:02.3218307Z [===========                            ] 28% Downloading commandlinetools-linux
+2026-11-09T09:09:02.3633399Z [===========                            ] 29% Downloading commandlinetools-linux
+2026-11-09T09:09:02.3850909Z [===========                            ] 30% Downloading commandlinetools-linux
+2026-11-09T09:09:02.4174040Z [============                           ] 30% Downloading commandlinetools-linux
+2026-11-09T09:09:02.4591480Z [============                           ] 31% Downloading commandlinetools-linux
+2026-11-09T09:09:02.5025516Z [============                           ] 32% Downloading commandlinetools-linux
+2026-11-09T09:09:02.5033910Z [============                           ] 33% Downloading commandlinetools-linux
+2026-11-09T09:09:02.5389337Z [============                           ] 33% Unzipping...                      
+2026-11-09T09:09:02.5401627Z [============                           ] 33% Unzipping... cmdline-tools/bin/avd
+2026-11-09T09:09:02.5685613Z [=============                          ] 33% Unzipping... cmdline-tools/bin/avd
+2026-11-09T09:09:02.5760800Z [=============                          ] 33% Unzipping... cmdline-tools/bin/sdk
+2026-11-09T09:09:02.5763679Z [=============                          ] 33% Unzipping... cmdline-tools/bin/d8 
+2026-11-09T09:09:02.5855819Z [=============                          ] 33% Unzipping... cmdline-tools/bin/r8 
+2026-11-09T09:09:02.5857711Z [=============                          ] 33% Unzipping... cmdline-tools/bin/ret
+2026-11-09T09:09:02.5860248Z [=============                          ] 33% Unzipping... cmdline-tools/bin/res
+2026-11-09T09:09:02.5862343Z [=============                          ] 33% Unzipping... cmdline-tools/bin/apk
+2026-11-09T09:09:02.5961508Z [=============                          ] 33% Unzipping... cmdline-tools/bin/lin
+2026-11-09T09:09:02.6159337Z [=============                          ] 33% Unzipping... cmdline-tools/bin/scr
+2026-11-09T09:09:02.6160981Z [=============                          ] 33% Unzipping... cmdline-tools/bin/pro
+2026-11-09T09:09:02.6362363Z [=============                          ] 33% Unzipping... cmdline-tools/lib/sdk
+2026-11-09T09:09:02.6559628Z [=============                          ] 33% Unzipping... cmdline-tools/lib/com
+2026-11-09T09:09:02.6655219Z [=============                          ] 33% Unzipping... cmdline-tools/lib/ann
+2026-11-09T09:09:02.7489985Z [=============                          ] 33% Unzipping... cmdline-tools/lib/ext
+2026-11-09T09:09:02.8052639Z [=============                          ] 34% Unzipping... cmdline-tools/lib/ext
+2026-11-09T09:09:02.8147783Z [=============                          ] 34% Unzipping... cmdline-tools/lib/dev
+2026-11-09T09:09:02.8151136Z [=============                          ] 34% Unzipping... cmdline-tools/lib/lay
+2026-11-09T09:09:02.8153945Z [=============                          ] 34% Unzipping... cmdline-tools/lib/ext
+2026-11-09T09:09:02.8249882Z [=============                          ] 34% Unzipping... cmdline-tools/lib/rep
+2026-11-09T09:09:02.8374894Z [=============                          ] 34% Unzipping... cmdline-tools/lib/ana
+2026-11-09T09:09:02.8393294Z [=============                          ] 35% Unzipping... cmdline-tools/lib/ana
+2026-11-09T09:09:02.8657289Z [==============                         ] 35% Unzipping... cmdline-tools/lib/ana
+2026-11-09T09:09:02.8657927Z [==============                         ] 35% Unzipping... cmdline-tools/lib/ext
+2026-11-09T09:09:03.0369174Z [==============                         ] 36% Unzipping... cmdline-tools/lib/ext
+2026-11-09T09:09:03.2435676Z [==============                         ] 37% Unzipping... cmdline-tools/lib/ext
+2026-11-09T09:09:03.2736626Z [==============                         ] 37% Unzipping... cmdline-tools/lib/sdk
+2026-11-09T09:09:03.2833117Z [==============                         ] 37% Unzipping... cmdline-tools/lib/rep
+2026-11-09T09:09:03.2837936Z [==============                         ] 37% Unzipping... cmdline-tools/lib/sdk
+2026-11-09T09:09:03.2840337Z [==============                         ] 37% Unzipping... cmdline-tools/lib/rep
+2026-11-09T09:09:03.2938269Z [==============                         ] 37% Unzipping... cmdline-tools/lib/sdk
+2026-11-09T09:09:03.2938818Z [==============                         ] 37% Unzipping... cmdline-tools/lib/rep
+2026-11-09T09:09:03.2940409Z [==============                         ] 37% Unzipping... cmdline-tools/lib/sdk
+2026-11-09T09:09:03.2941944Z [==============                         ] 37% Unzipping... cmdline-tools/lib/rep
+2026-11-09T09:09:03.2946366Z [==============                         ] 37% Unzipping... cmdline-tools/lib/sdk
+2026-11-09T09:09:03.3033830Z [==============                         ] 37% Unzipping... cmdline-tools/lib/rep
+2026-11-09T09:09:03.3238635Z [==============                         ] 37% Unzipping... cmdline-tools/lib/sdk
+2026-11-09T09:09:03.3257087Z [==============                         ] 37% Unzipping... cmdline-tools/lib/r8.
+2026-11-09T09:09:03.3370836Z [===============                        ] 38% Unzipping... cmdline-tools/lib/r8.
+2026-11-09T09:09:03.3415591Z [===============                        ] 39% Unzipping... cmdline-tools/lib/r8.
+2026-11-09T09:09:03.5533462Z [===============                        ] 40% Unzipping... cmdline-tools/lib/r8.
+2026-11-09T09:09:03.5825302Z [===============                        ] 40% Unzipping... cmdline-tools/lib/bui
+2026-11-09T09:09:03.5832955Z [===============                        ] 40% Unzipping... cmdline-tools/lib/sdk
+2026-11-09T09:09:03.5925464Z [================                       ] 40% Unzipping... cmdline-tools/lib/sdk
+2026-11-09T09:09:03.6128515Z [================                       ] 40% Unzipping... cmdline-tools/lib/ddm
+2026-11-09T09:09:03.6225692Z [================                       ] 40% Unzipping... cmdline-tools/lib/sdk
+2026-11-09T09:09:03.6337116Z [================                       ] 40% Unzipping... cmdline-tools/lib/ext
+2026-11-09T09:09:03.6458100Z [================                       ] 41% Unzipping... cmdline-tools/lib/ext
+2026-11-09T09:09:03.7032815Z [================                       ] 42% Unzipping... cmdline-tools/lib/ext
+2026-11-09T09:09:03.7228268Z [================                       ] 42% Unzipping... cmdline-tools/lib/apk
+2026-11-09T09:09:03.7420334Z [================                       ] 42% Unzipping... cmdline-tools/lib/ext
+2026-11-09T09:09:03.7422907Z [================                       ] 42% Unzipping... cmdline-tools/lib/zip
+2026-11-09T09:09:03.7623979Z [================                       ] 42% Unzipping... cmdline-tools/lib/ext
+2026-11-09T09:09:03.7719485Z [================                       ] 42% Unzipping... cmdline-tools/lib/pro
+2026-11-09T09:09:03.7725893Z [================                       ] 42% Unzipping... cmdline-tools/lib/ext
+2026-11-09T09:09:03.8019509Z [================                       ] 42% Unzipping... cmdline-tools/lib/lin
+2026-11-09T09:09:03.8115611Z [================                       ] 42% Unzipping... cmdline-tools/lib/bui
+2026-11-09T09:09:03.8123289Z [================                       ] 42% Unzipping... cmdline-tools/lib/ext
+2026-11-09T09:09:03.8154326Z [=================                      ] 43% Unzipping... cmdline-tools/lib/ext
+2026-11-09T09:09:03.8184934Z [=================                      ] 44% Unzipping... cmdline-tools/lib/ext
+2026-11-09T09:09:03.8200031Z [=================                      ] 45% Unzipping... cmdline-tools/lib/ext
+2026-11-09T09:09:03.8216729Z [==================                     ] 45% Unzipping... cmdline-tools/lib/ext
+2026-11-09T09:09:03.8246833Z [==================                     ] 46% Unzipping... cmdline-tools/lib/ext
+2026-11-09T09:09:03.9449651Z [==================                     ] 47% Unzipping... cmdline-tools/lib/ext
+2026-11-09T09:09:03.9478213Z [===================                    ] 48% Unzipping... cmdline-tools/lib/ext
+2026-11-09T09:09:03.9507837Z [===================                    ] 49% Unzipping... cmdline-tools/lib/ext
+2026-11-09T09:09:03.9524261Z [===================                    ] 50% Unzipping... cmdline-tools/lib/ext
+2026-11-09T09:09:03.9540171Z [====================                   ] 50% Unzipping... cmdline-tools/lib/ext
+2026-11-09T09:09:03.9569286Z [====================                   ] 51% Unzipping... cmdline-tools/lib/ext
+2026-11-09T09:09:03.9601578Z [====================                   ] 52% Unzipping... cmdline-tools/lib/ext
+2026-11-09T09:09:04.2900591Z [=====================                  ] 53% Unzipping... cmdline-tools/lib/ext
+2026-11-09T09:09:04.2999663Z [=====================                  ] 53% Unzipping... cmdline-tools/lib/bui
+2026-11-09T09:09:04.3008470Z [=====================                  ] 53% Unzipping... cmdline-tools/lib/ext
+2026-11-09T09:09:04.3012785Z [=====================                  ] 53% Unzipping... cmdline-tools/lib/lin
+2026-11-09T09:09:04.3600537Z [=====================                  ] 54% Unzipping... cmdline-tools/lib/lin
+2026-11-09T09:09:04.3799022Z [=====================                  ] 54% Unzipping... cmdline-tools/lib/ext
+2026-11-09T09:09:04.3804094Z [=====================                  ] 54% Unzipping... cmdline-tools/lib/ana
+2026-11-09T09:09:04.3903513Z [=====================                  ] 54% Unzipping... cmdline-tools/lib/mis
+2026-11-09T09:09:04.4099336Z [=====================                  ] 54% Unzipping... cmdline-tools/lib/pro
+2026-11-09T09:09:04.4200790Z [=====================                  ] 54% Unzipping... cmdline-tools/lib/ext
+2026-11-09T09:09:04.4307570Z [=====================                  ] 54% Unzipping... cmdline-tools/lib/avd
+2026-11-09T09:09:04.4308818Z [=====================                  ] 54% Unzipping... cmdline-tools/lib/sdk
+2026-11-09T09:09:04.4309434Z [=====================                  ] 54% Unzipping... cmdline-tools/lib/d8-
+2026-11-09T09:09:04.4309930Z [=====================                  ] 54% Unzipping... cmdline-tools/lib/r8-
+2026-11-09T09:09:04.4310394Z [=====================                  ] 54% Unzipping... cmdline-tools/lib/ret
+2026-11-09T09:09:04.4310894Z [=====================                  ] 54% Unzipping... cmdline-tools/lib/res
+2026-11-09T09:09:04.4311388Z [=====================                  ] 54% Unzipping... cmdline-tools/lib/apk
+2026-11-09T09:09:04.4311852Z [=====================                  ] 54% Unzipping... cmdline-tools/lib/lin
+2026-11-09T09:09:04.4312307Z [=====================                  ] 54% Unzipping... cmdline-tools/lib/scr
+2026-11-09T09:09:04.4312761Z [=====================                  ] 54% Unzipping... cmdline-tools/lib/pro
+2026-11-09T09:09:04.4313422Z [=====================                  ] 54% Unzipping... cmdline-tools/source.
+2026-11-09T09:09:04.4313882Z [=====================                  ] 54% Unzipping... cmdline-tools/NOTICE.
+2026-11-09T09:09:04.4314331Z [=====================                  ] 54% Unzipping... cmdline-tools/lib/REA
+2026-11-09T09:09:04.4314797Z [=====================                  ] 54% Unzipping... cmdline-tools/bin/and
+2026-11-09T09:09:04.4570475Z [=====================                  ] 55% Unzipping... cmdline-tools/bin/and
+2026-11-09T09:09:04.4572072Z [=======================================] 100% Unzipping... cmdline-tools/bin/an
+2026-11-09T09:09:04.5769321Z 
+2026-11-09T09:09:04.6404165Z ##[group]Run python3 repairs/infinity-tracking-integration-2103469-20261108/admit_tracking_android.py --out tracking-android-admission
+2026-11-09T09:09:04.6404788Z [36;1mpython3 repairs/infinity-tracking-integration-2103469-20261108/admit_tracking_android.py --out tracking-android-admission[0m
+2026-11-09T09:09:04.6497932Z shell: /usr/bin/bash -e {0}
+2026-11-09T09:09:04.6498140Z env:
+2026-11-09T09:09:04.6499989Z   GH_TOKEN: ***
+2026-11-09T09:09:04.6500126Z   PYTHONDONTWRITEBYTECODE: 1
+2026-11-09T09:09:04.6500307Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.7/x64
+2026-11-09T09:09:04.6500546Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.7/x64/lib/pkgconfig
+2026-11-09T09:09:04.6500779Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.7/x64
+2026-11-09T09:09:04.6500987Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.7/x64
+2026-11-09T09:09:04.6501329Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.7/x64
+2026-11-09T09:09:04.6501583Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.7/x64/lib
+2026-11-09T09:09:04.6501818Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.13-9/x64
+2026-11-09T09:09:04.6502078Z   JAVA_HOME_21_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.13-9/x64
+2026-11-09T09:09:04.6502296Z   ANDROID_HOME: /usr/local/lib/android/sdk
+2026-11-09T09:09:04.6502465Z   ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+2026-11-09T09:09:04.6502623Z ##[endgroup]
+2026-11-09T09:09:22.5624345Z PASS_SELECTED_TRACKING_ANDROID_INPUT_ADMISSION_ONLY
+2026-11-09T09:09:22.5728303Z ##[group]Run python3 repairs/infinity-tracking-integration-2103469-20261108/stage_tracking_android.py --apk tracking-android-admission/original69/files/Infinity-2103469-Combined-Original-Signer.apk --fixture-dir tracking-android-admission/signed-modules/files --dependency-pins repairs/infinity-tracking-integration-2103469-20261108/TRACKING-DEPENDENCY-PINS.json --sdk "$ANDROID_HOME/build-tools/35.0.0" --out tracking-android-staged
+2026-11-09T09:09:22.5730019Z [36;1mpython3 repairs/infinity-tracking-integration-2103469-20261108/stage_tracking_android.py --apk tracking-android-admission/original69/files/Infinity-2103469-Combined-Original-Signer.apk --fixture-dir tracking-android-admission/signed-modules/files --dependency-pins repairs/infinity-tracking-integration-2103469-20261108/TRACKING-DEPENDENCY-PINS.json --sdk "$ANDROID_HOME/build-tools/35.0.0" --out tracking-android-staged[0m
+2026-11-09T09:09:22.5757481Z shell: /usr/bin/bash -e {0}
+2026-11-09T09:09:22.5757619Z env:
+2026-11-09T09:09:22.5759093Z   GH_TOKEN: ***
+2026-11-09T09:09:22.5759221Z   PYTHONDONTWRITEBYTECODE: 1
+2026-11-09T09:09:22.5759396Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.7/x64
+2026-11-09T09:09:22.5759631Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.7/x64/lib/pkgconfig
+2026-11-09T09:09:22.5759862Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.7/x64
+2026-11-09T09:09:22.5760079Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.7/x64
+2026-11-09T09:09:22.5760280Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.7/x64
+2026-11-09T09:09:22.5760488Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.7/x64/lib
+2026-11-09T09:09:22.5760723Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.13-9/x64
+2026-11-09T09:09:22.5760983Z   JAVA_HOME_21_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.13-9/x64
+2026-11-09T09:09:22.5761198Z   ANDROID_HOME: /usr/local/lib/android/sdk
+2026-11-09T09:09:22.5761362Z   ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+2026-11-09T09:09:22.5761518Z ##[endgroup]
+2026-11-09T09:09:40.3794223Z ##[group]Run set -euo pipefail
+2026-11-09T09:09:40.3794429Z [36;1mset -euo pipefail[0m
+2026-11-09T09:09:40.3794594Z [36;1msudo apt-get -o Acquire::Retries=3 update -qq[0m
+2026-11-09T09:09:40.3794786Z [36;1msudo apt-get install -y libpulse0[0m
+2026-11-09T09:09:40.3794944Z [36;1mpython3 - <<'PYSDK'[0m
+2026-11-09T09:09:40.3795097Z [36;1mimport ast,os,subprocess[0m
+2026-11-09T09:09:40.3795245Z [36;1mfrom pathlib import Path[0m
+2026-11-09T09:09:40.3795416Z [36;1msource='a4a89977f085480c720a7b6e73489374d01395dc'[0m
+2026-11-09T09:09:40.3795634Z [36;1mpath='repairs/four-repair-20261018/android37_gate.py'[0m
+2026-11-09T09:09:40.3795866Z [36;1mraw=subprocess.check_output(['git','show',source+':'+path])[0m
+2026-11-09T09:09:40.3796063Z [36;1mtree=ast.parse(raw)[0m
+2026-11-09T09:09:40.3796289Z [36;1mfn=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='pin_tools')[0m
+2026-11-09T09:09:40.3796615Z [36;1mnamespace={'os':os,'Path':Path,'json':__import__('json')}[0m
+2026-11-09T09:09:40.3796874Z [36;1mexec(compile(ast.Module(body=[fn],type_ignores=[]),path,'exec'),namespace)[0m
+2026-11-09T09:09:40.3797326Z [36;1mnamespace['pin_tools'](os.environ['ANDROID_HOME'],'tracking-feature-platform')[0m
+2026-11-09T09:09:40.3797719Z [36;1mpath='repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py'[0m
+2026-11-09T09:09:40.3798140Z [36;1mtemporary=Path('/tmp/infinity-tracking-feature-emulator-prepare.py')[0m
+2026-11-09T09:09:40.3798440Z [36;1mtemporary.write_bytes(subprocess.check_output(['git','show',source+':'+path]))[0m
+2026-11-09T09:09:40.3798785Z [36;1msubprocess.run(['python3',str(temporary),'--out','tracking-feature-emulator-setup'],check=True)[0m
+2026-11-09T09:09:40.3799039Z [36;1mPYSDK[0m
+2026-11-09T09:09:40.3799157Z [36;1msudo chmod 666 /dev/kvm[0m
+2026-11-09T09:09:40.3825707Z shell: /usr/bin/bash -e {0}
+2026-11-09T09:09:40.3825842Z env:
+2026-11-09T09:09:40.3827376Z   GH_TOKEN: ***
+2026-11-09T09:09:40.3827513Z   PYTHONDONTWRITEBYTECODE: 1
+2026-11-09T09:09:40.3827688Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.7/x64
+2026-11-09T09:09:40.3827924Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.7/x64/lib/pkgconfig
+2026-11-09T09:09:40.3828154Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.7/x64
+2026-11-09T09:09:40.3828360Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.7/x64
+2026-11-09T09:09:40.3828624Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.7/x64
+2026-11-09T09:09:40.3828883Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.7/x64/lib
+2026-11-09T09:09:40.3829178Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.13-9/x64
+2026-11-09T09:09:40.3829581Z   JAVA_HOME_21_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.13-9/x64
+2026-11-09T09:09:40.3829851Z   ANDROID_HOME: /usr/local/lib/android/sdk
+2026-11-09T09:09:40.3830084Z   ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+2026-11-09T09:09:40.3830318Z ##[endgroup]
+2026-11-09T09:09:48.6150013Z Reading package lists...
+2026-11-09T09:09:48.8955722Z Building dependency tree...
+2026-11-09T09:09:48.8964057Z Reading state information...
+2026-11-09T09:09:49.0385309Z The following additional packages will be installed:
+2026-11-09T09:09:49.0391049Z   libasyncns0 libflac8 libopus0 libsndfile1 libvorbisenc2
+2026-11-09T09:09:49.0395345Z Suggested packages:
+2026-11-09T09:09:49.0395603Z   opus-tools pulseaudio
+2026-11-09T09:09:49.0520666Z The following NEW packages will be installed:
+2026-11-09T09:09:49.0523516Z   libasyncns0 libflac8 libopus0 libpulse0 libsndfile1 libvorbisenc2
+2026-11-09T09:09:49.0625073Z 0 upgraded, 6 newly installed, 0 to remove and 34 not upgraded.
+2026-11-09T09:09:49.0625434Z Need to get 903 kB of archives.
+2026-11-09T09:09:49.0625793Z After this operation, 3049 kB of additional disk space will be used.
+2026-11-09T09:09:49.0626198Z Get:1 file:/etc/apt/apt-mirrors.txt Mirrorlist [144 B]
+2026-11-09T09:09:49.1231780Z Get:2 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libasyncns0 amd64 0.8-6build2 [12.8 kB]
+2026-11-09T09:09:49.1586424Z Get:3 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 libflac8 amd64 1.3.3-2ubuntu0.2 [111 kB]
+2026-11-09T09:09:49.1911606Z Get:4 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libopus0 amd64 1.3.1-0.1build2 [203 kB]
+2026-11-09T09:09:49.2238090Z Get:5 http://azure.archive.ubuntu.com/ubuntu jammy/main amd64 libvorbisenc2 amd64 1.3.7-1build2 [82.6 kB]
+2026-11-09T09:09:49.2603432Z Get:6 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 libsndfile1 amd64 1.0.31-2ubuntu0.2 [196 kB]
+2026-11-09T09:09:49.3043238Z Get:7 http://azure.archive.ubuntu.com/ubuntu jammy-updates/main amd64 libpulse0 amd64 1:15.99.1+dfsg1-1ubuntu2.2 [298 kB]
+2026-11-09T09:09:49.5409917Z Fetched 903 kB in 0s (3620 kB/s)
+2026-11-09T09:09:49.5560822Z Selecting previously unselected package libasyncns0:amd64.
+2026-11-09T09:09:49.5788593Z (Reading database ... 
+2026-11-09T09:09:49.5789058Z (Reading database ... 5%
+2026-11-09T09:09:49.5789388Z (Reading database ... 10%
+2026-11-09T09:09:49.5789672Z (Reading database ... 15%
+2026-11-09T09:09:49.5789925Z (Reading database ... 20%
+2026-11-09T09:09:49.5790082Z (Reading database ... 25%
+2026-11-09T09:09:49.5790234Z (Reading database ... 30%
+2026-11-09T09:09:49.5790384Z (Reading database ... 35%
+2026-11-09T09:09:49.5790607Z (Reading database ... 40%
+2026-11-09T09:09:49.5791095Z (Reading database ... 45%
+2026-11-09T09:09:49.5791308Z (Reading database ... 50%
+2026-11-09T09:09:49.6423971Z (Reading database ... 55%
+2026-11-09T09:09:49.8878738Z (Reading database ... 60%
+2026-11-09T09:09:50.0764768Z (Reading database ... 65%
+2026-11-09T09:09:50.2365063Z (Reading database ... 70%
+2026-11-09T09:09:50.3347485Z (Reading database ... 75%
+2026-11-09T09:09:50.5342085Z (Reading database ... 80%
+2026-11-09T09:09:50.6918147Z (Reading database ... 85%
+2026-11-09T09:09:50.8385372Z (Reading database ... 90%
+2026-11-09T09:09:50.9896256Z (Reading database ... 95%
+2026-11-09T09:09:50.9896594Z (Reading database ... 100%
+2026-11-09T09:09:50.9896993Z (Reading database ... 263778 files and directories currently installed.)
+2026-11-09T09:09:50.9946577Z Preparing to unpack .../0-libasyncns0_0.8-6build2_amd64.deb ...
+2026-11-09T09:09:51.0069245Z Unpacking libasyncns0:amd64 (0.8-6build2) ...
+2026-11-09T09:09:51.0202225Z Selecting previously unselected package libflac8:amd64.
+2026-11-09T09:09:51.0305024Z Preparing to unpack .../1-libflac8_1.3.3-2ubuntu0.2_amd64.deb ...
+2026-11-09T09:09:51.0314835Z Unpacking libflac8:amd64 (1.3.3-2ubuntu0.2) ...
+2026-11-09T09:09:51.0464254Z Selecting previously unselected package libopus0:amd64.
+2026-11-09T09:09:51.0566348Z Preparing to unpack .../2-libopus0_1.3.1-0.1build2_amd64.deb ...
+2026-11-09T09:09:51.0573638Z Unpacking libopus0:amd64 (1.3.1-0.1build2) ...
+2026-11-09T09:09:51.0718683Z Selecting previously unselected package libvorbisenc2:amd64.
+2026-11-09T09:09:51.0824310Z Preparing to unpack .../3-libvorbisenc2_1.3.7-1build2_amd64.deb ...
+2026-11-09T09:09:51.0831548Z Unpacking libvorbisenc2:amd64 (1.3.7-1build2) ...
+2026-11-09T09:09:51.0980093Z Selecting previously unselected package libsndfile1:amd64.
+2026-11-09T09:09:51.1081813Z Preparing to unpack .../4-libsndfile1_1.0.31-2ubuntu0.2_amd64.deb ...
+2026-11-09T09:09:51.1090340Z Unpacking libsndfile1:amd64 (1.0.31-2ubuntu0.2) ...
+2026-11-09T09:09:51.1255789Z Selecting previously unselected package libpulse0:amd64.
+2026-11-09T09:09:51.1356098Z Preparing to unpack .../5-libpulse0_1%3a15.99.1+dfsg1-1ubuntu2.2_amd64.deb ...
+2026-11-09T09:09:51.1404873Z Unpacking libpulse0:amd64 (1:15.99.1+dfsg1-1ubuntu2.2) ...
+2026-11-09T09:09:51.1703744Z Setting up libflac8:amd64 (1.3.3-2ubuntu0.2) ...
+2026-11-09T09:09:51.1721267Z Setting up libopus0:amd64 (1.3.1-0.1build2) ...
+2026-11-09T09:09:51.1737683Z Setting up libasyncns0:amd64 (0.8-6build2) ...
+2026-11-09T09:09:51.1754930Z Setting up libvorbisenc2:amd64 (1.3.7-1build2) ...
+2026-11-09T09:09:51.1773466Z Setting up libsndfile1:amd64 (1.0.31-2ubuntu0.2) ...
+2026-11-09T09:09:51.1790646Z Setting up libpulse0:amd64 (1:15.99.1+dfsg1-1ubuntu2.2) ...
+2026-11-09T09:09:51.1841280Z Processing triggers for libc-bin (2.35-0ubuntu3.15) ...
+2026-11-09T09:09:54.8725579Z 
+2026-11-09T09:09:54.8726272Z Running kernel seems to be up-to-date.
+2026-11-09T09:09:54.8726516Z 
+2026-11-09T09:09:54.8726655Z No services need to be restarted.
+2026-11-09T09:09:54.8726811Z 
+2026-11-09T09:09:54.8726953Z No containers need to be restarted.
+2026-11-09T09:09:54.8727246Z 
+2026-11-09T09:09:54.8727406Z No user sessions are running outdated binaries.
+2026-11-09T09:09:54.8727598Z 
+2026-11-09T09:09:54.8727802Z No VM guests are running outdated hypervisor (qemu) binaries on this host.
+2026-11-09T09:10:06.5259236Z {"application_test_retried": false, "attempts": [{"attempt": 1, "exit_code": 0, "log": "sdkmanager-attempt-1.log", "observed_invalid_emulator_zip": false}], "emulator_revision": "37.2.13", "executable_revision": "37.2.13.0", "loader_dependencies": {"exit_code": 1, "log": "emulator-loader-dependencies.log", "missing": []}, "passed": true, "scope": "disposable emulator setup only", "version_command": {"exit_code": 0, "log": "emulator-version.log", "output": "Android emulator version 37.2.13.0 (build_id 16740729) (CL:N/A)\nCopyright (C) 2006-2024 The Android Open Source Project and many others.\nThis program is a derivative of the QEMU CPU emulator (www.qemu.org).\n\n  This software is licensed under the terms of the GNU General Public\n  License version 2, as published by the Free Software Foundation, and\n  may be copied, distributed, and modified under those terms.\n\n  This program is distributed in the hope that it will be useful,\n  but WITHOUT ANY WARRANTY; without even the implied warranty of\n  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n  GNU General Public License for more details.\n\n"}}
+2026-11-09T09:10:06.5468933Z ##[group]Run reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+2026-11-09T09:10:06.5469201Z with:
+2026-11-09T09:10:06.5469313Z   api-level: 36
+2026-11-09T09:10:06.5469430Z   arch: x86_64
+2026-11-09T09:10:06.5469547Z   target: google_apis
+2026-11-09T09:10:06.5469671Z   profile: pixel_2
+2026-11-09T09:10:06.5469788Z   disk-size: 10G
+2026-11-09T09:10:06.5469926Z   avd-name: infinity-tracking-baseline-api36
+2026-11-09T09:10:06.5470096Z   disable-animations: false
+2026-11-09T09:10:06.5470411Z   emulator-options: -no-window -memory 4096 -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+2026-11-09T09:10:06.5471015Z   script: python3 repairs/infinity-tracking-integration-2103469-20261108/verify_tracking_android.py --staged tracking-android-staged --sdk "$ANDROID_HOME" --out tracking-android-results
+2026-11-09T09:10:06.5471442Z   cores: 2
+2026-11-09T09:10:06.5471557Z   force-avd-creation: true
+2026-11-09T09:10:06.5471718Z   emulator-boot-timeout: 600
+2026-11-09T09:10:06.5471858Z   emulator-port: 5554
+2026-11-09T09:10:06.5471990Z   disable-spellchecker: false
+2026-11-09T09:10:06.5472135Z   disable-linux-hw-accel: auto
+2026-11-09T09:10:06.5472277Z   enable-hw-keyboard: false
+2026-11-09T09:10:06.5472411Z   channel: stable
+2026-11-09T09:10:06.5472521Z env:
+2026-11-09T09:10:06.5473931Z   GH_TOKEN: ***
+2026-11-09T09:10:06.5474060Z   PYTHONDONTWRITEBYTECODE: 1
+2026-11-09T09:10:06.5474237Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.7/x64
+2026-11-09T09:10:06.5474478Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.7/x64/lib/pkgconfig
+2026-11-09T09:10:06.5474720Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.7/x64
+2026-11-09T09:10:06.5474931Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.7/x64
+2026-11-09T09:10:06.5475141Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.7/x64
+2026-11-09T09:10:06.5475350Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.7/x64/lib
+2026-11-09T09:10:06.5475591Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.13-9/x64
+2026-11-09T09:10:06.5475859Z   JAVA_HOME_21_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.13-9/x64
+2026-11-09T09:10:06.5476080Z   ANDROID_HOME: /usr/local/lib/android/sdk
+2026-11-09T09:10:06.5476246Z   ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+2026-11-09T09:10:06.5476404Z ##[endgroup]
+2026-11-09T09:10:06.5858012Z ##[group]Configure emulator
+2026-11-09T09:10:06.5859199Z API level: 36
+2026-11-09T09:10:06.5859468Z System image API level: 36
+2026-11-09T09:10:06.5859668Z target: google_apis
+2026-11-09T09:10:06.5859936Z CPU architecture: x86_64
+2026-11-09T09:10:06.5860235Z Hardware profile: pixel_2
+2026-11-09T09:10:06.5869683Z Cores: 2
+2026-11-09T09:10:06.5869852Z RAM size: 
+2026-11-09T09:10:06.5870030Z Heap size: 
+2026-11-09T09:10:06.5870238Z SD card path or size: 
+2026-11-09T09:10:06.5870434Z Disk size: 10G
+2026-11-09T09:10:06.5870703Z AVD name: infinity-tracking-baseline-api36
+2026-11-09T09:10:06.5871010Z force avd creation: true
+2026-11-09T09:10:06.5871270Z Emulator boot timeout: 600
+2026-11-09T09:10:06.5871490Z emulator port: 5554
+2026-11-09T09:10:06.5872062Z emulator options: -no-window -memory 4096 -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+2026-11-09T09:10:06.5872599Z disable animations: false
+2026-11-09T09:10:06.5872854Z disable spellchecker: false
+2026-11-09T09:10:06.5873140Z disable Linux hardware acceleration: false
+2026-11-09T09:10:06.5873456Z enable hardware keyboard: false
+2026-11-09T09:10:06.5873705Z Channel: 0 (stable)
+2026-11-09T09:10:06.5873876Z Script:
+2026-11-09T09:10:06.5874658Z python3 repairs/infinity-tracking-integration-2103469-20261108/verify_tracking_android.py --staged tracking-android-staged --sdk "$ANDROID_HOME" --out tracking-android-results
+2026-11-09T09:10:06.5875583Z Pre emulator launch script:
+2026-11-09T09:10:06.5875982Z ##[endgroup]
+2026-11-09T09:10:06.5876304Z ##[group]Install Android SDK
+2026-11-09T09:10:06.5900232Z [command]/usr/bin/sh -c \yes | sdkmanager --licenses > /dev/null
+2026-11-09T09:10:06.6660798Z WARNING: The SDK Manager CLI tool (sdkmanager) is deprecated. Use Android CLI instead.
+2026-11-09T09:10:06.6661808Z The 'android' binary can also be found in the cmdline-tools directory, and 'android sdk' is the replacement for 'sdkmanager'.
+2026-11-09T09:10:06.6668177Z To learn more about the Android CLI and how to use it, see the documentation (https://d.android.com/tools/agents/android-cli)
+2026-11-09T09:10:06.6668692Z 
+2026-11-09T09:10:07.1136672Z Warning: Observed package id 'cmdline-tools;22.0' in inconsistent location '/usr/local/lib/android/sdk/cmdline-tools/latest' (Expected '/usr/local/lib/android/sdk/cmdline-tools/22.0')
+2026-11-09T09:10:07.1138259Z Warning: Already observed package id 'cmdline-tools;22.0' in '/usr/local/lib/android/sdk/cmdline-tools/22.0'. Skipping duplicate at '/usr/local/lib/android/sdk/cmdline-tools/latest'
+2026-11-09T09:10:07.2347682Z Warning: Observed package id 'cmdline-tools;22.0' in inconsistent location '/usr/local/lib/android/sdk/cmdline-tools/latest' (Expected '/usr/local/lib/android/sdk/cmdline-tools/22.0')
+2026-11-09T09:10:07.2349452Z Warning: Already observed package id 'cmdline-tools;22.0' in '/usr/local/lib/android/sdk/cmdline-tools/22.0'. Skipping duplicate at '/usr/local/lib/android/sdk/cmdline-tools/latest'
+2026-11-09T09:10:07.7394248Z Installing latest build tools, platform tools, and platform.
+2026-11-09T09:10:07.7402339Z [command]/usr/bin/sh -c \sdkmanager --install 'build-tools;37.0.0' platform-tools 'platforms;android-36'> /dev/null
+2026-11-09T09:10:07.8147103Z WARNING: The SDK Manager CLI tool (sdkmanager) is deprecated. Use Android CLI instead.
+2026-11-09T09:10:07.8148444Z The 'android' binary can also be found in the cmdline-tools directory, and 'android sdk' is the replacement for 'sdkmanager'.
+2026-11-09T09:10:07.8149439Z To learn more about the Android CLI and how to use it, see the documentation (https://d.android.com/tools/agents/android-cli)
+2026-11-09T09:10:07.8149923Z 
+2026-11-09T09:10:08.2466348Z Warning: Observed package id 'cmdline-tools;22.0' in inconsistent location '/usr/local/lib/android/sdk/cmdline-tools/latest' (Expected '/usr/local/lib/android/sdk/cmdline-tools/22.0')
+2026-11-09T09:10:08.2468475Z Warning: Already observed package id 'cmdline-tools;22.0' in '/usr/local/lib/android/sdk/cmdline-tools/22.0'. Skipping duplicate at '/usr/local/lib/android/sdk/cmdline-tools/latest'
+2026-11-09T09:10:08.3717662Z Warning: Observed package id 'cmdline-tools;22.0' in inconsistent location '/usr/local/lib/android/sdk/cmdline-tools/latest' (Expected '/usr/local/lib/android/sdk/cmdline-tools/22.0')
+2026-11-09T09:10:08.3719092Z Warning: Already observed package id 'cmdline-tools;22.0' in '/usr/local/lib/android/sdk/cmdline-tools/22.0'. Skipping duplicate at '/usr/local/lib/android/sdk/cmdline-tools/latest'
+2026-11-09T09:10:08.8154782Z Installing latest emulator.
+2026-11-09T09:10:08.8162407Z [command]/usr/bin/sh -c \sdkmanager --install emulator --channel=0 > /dev/null
+2026-11-09T09:10:08.8852784Z WARNING: The SDK Manager CLI tool (sdkmanager) is deprecated. Use Android CLI instead.
+2026-11-09T09:10:08.8854621Z The 'android' binary can also be found in the cmdline-tools directory, and 'android sdk' is the replacement for 'sdkmanager'.
+2026-11-09T09:10:08.8858621Z To learn more about the Android CLI and how to use it, see the documentation (https://d.android.com/tools/agents/android-cli)
+2026-11-09T09:10:08.8859286Z 
+2026-11-09T09:10:09.3722316Z Warning: Observed package id 'cmdline-tools;22.0' in inconsistent location '/usr/local/lib/android/sdk/cmdline-tools/latest' (Expected '/usr/local/lib/android/sdk/cmdline-tools/22.0')
+2026-11-09T09:10:09.3724144Z Warning: Already observed package id 'cmdline-tools;22.0' in '/usr/local/lib/android/sdk/cmdline-tools/22.0'. Skipping duplicate at '/usr/local/lib/android/sdk/cmdline-tools/latest'
+2026-11-09T09:10:09.4893633Z Warning: Observed package id 'cmdline-tools;22.0' in inconsistent location '/usr/local/lib/android/sdk/cmdline-tools/latest' (Expected '/usr/local/lib/android/sdk/cmdline-tools/22.0')
+2026-11-09T09:10:09.4895168Z Warning: Already observed package id 'cmdline-tools;22.0' in '/usr/local/lib/android/sdk/cmdline-tools/22.0'. Skipping duplicate at '/usr/local/lib/android/sdk/cmdline-tools/latest'
+2026-11-09T09:10:10.0501194Z Installing system images.
+2026-11-09T09:10:10.0511042Z [command]/usr/bin/sh -c \sdkmanager --install 'system-images;android-36;google_apis;x86_64' --channel=0 > /dev/null
+2026-11-09T09:10:10.1232639Z WARNING: The SDK Manager CLI tool (sdkmanager) is deprecated. Use Android CLI instead.
+2026-11-09T09:10:10.1233480Z The 'android' binary can also be found in the cmdline-tools directory, and 'android sdk' is the replacement for 'sdkmanager'.
+2026-11-09T09:10:10.1234375Z To learn more about the Android CLI and how to use it, see the documentation (https://d.android.com/tools/agents/android-cli)
+2026-11-09T09:10:10.1234799Z 
+2026-11-09T09:10:10.5691593Z Warning: Observed package id 'cmdline-tools;22.0' in inconsistent location '/usr/local/lib/android/sdk/cmdline-tools/latest' (Expected '/usr/local/lib/android/sdk/cmdline-tools/22.0')
+2026-11-09T09:10:10.5692943Z Warning: Already observed package id 'cmdline-tools;22.0' in '/usr/local/lib/android/sdk/cmdline-tools/22.0'. Skipping duplicate at '/usr/local/lib/android/sdk/cmdline-tools/latest'
+2026-11-09T09:10:10.6792114Z Warning: Observed package id 'cmdline-tools;22.0' in inconsistent location '/usr/local/lib/android/sdk/cmdline-tools/latest' (Expected '/usr/local/lib/android/sdk/cmdline-tools/22.0')
+2026-11-09T09:10:10.6793267Z Warning: Already observed package id 'cmdline-tools;22.0' in '/usr/local/lib/android/sdk/cmdline-tools/22.0'. Skipping duplicate at '/usr/local/lib/android/sdk/cmdline-tools/latest'
+2026-11-09T09:10:51.5762168Z ##[endgroup]
+2026-11-09T09:10:51.5763440Z ##[group]Create AVD
+2026-11-09T09:10:51.5763954Z Creating AVD.
+2026-11-09T09:10:51.5774066Z [command]/usr/bin/sh -c \echo no | avdmanager create avd --force -n infinity-tracking-baseline-api36 --package 'system-images;android-36;google_apis;x86_64' --device 'pixel_2'
+2026-11-09T09:10:52.1152305Z Loading local repository...                                                     
+2026-11-09T09:10:52.1155484Z Warning: Observed package id 'cmdline-tools;22.0' in inconsistent location '/usr/local/lib/android/sdk/cmdline-tools/latest' (Expected '/usr/local/lib/android/sdk/cmdline-tools/22.0')
+2026-11-09T09:10:52.1156807Z Warning: Already observed package id 'cmdline-tools;22.0' in '/usr/local/lib/android/sdk/cmdline-tools/22.0'. Skipping duplicate at '/usr/local/lib/android/sdk/cmdline-tools/latest'
+2026-11-09T09:10:52.2540121Z [=========                              ] 25% Loading local repository...       
+2026-11-09T09:10:52.2540764Z Auto-selecting single ABI x86_64
+2026-11-09T09:10:52.2605964Z Error: Could not load devices from /usr/local/lib/android/sdk/system-images/android-36/google_apis/x86_64/devices.xml
+2026-11-09T09:10:52.2606679Z Error: /usr/local/lib/android/sdk/system-images/android-36/google_apis/x86_64/devices.xml
+2026-11-09T09:10:52.5645246Z [command]/usr/bin/sh -c \printf 'hw.cpu.ncore=2\ndisk.dataPartition.size=10G\n' >> /home/runner/.android/avd/infinity-tracking-baseline-api36.avd/config.ini
+2026-11-09T09:10:52.5660816Z ##[endgroup]
+2026-11-09T09:10:52.5662506Z ##[group]Launch Emulator
+2026-11-09T09:10:52.5662759Z Starting emulator.
+2026-11-09T09:10:52.5673534Z [command]/usr/bin/sh -c \/usr/local/lib/android/sdk/emulator/emulator -port 5554 -avd infinity-tracking-baseline-api36 -no-window -memory 4096 -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none &
+2026-11-09T09:10:52.5766960Z INFO         | Android emulator version 37.2.13.0 (build_id 16740729) (CL:N/A)
+2026-11-09T09:10:52.5767703Z INFO         | Graphics backend: gfxstream
+2026-11-09T09:10:52.5768047Z INFO         | Found systemPath /usr/local/lib/android/sdk/system-images/android-36/google_apis/x86_64/
+2026-11-09T09:10:52.6159763Z INFO         | Saving last run QEMU version for the AVD to 2
+2026-11-09T09:10:52.6160508Z INFO         | Guest usage of host flag 'VulkanVirtualQueue' will be ignored.
+2026-11-09T09:10:52.6160983Z ##############################################################################
+2026-11-09T09:10:52.6161414Z ##                        WARNING - ACTION REQUIRED                         ##
+2026-11-09T09:10:52.6161897Z ##  Consider using the '-metrics-collection' flag to help improve the       ##
+2026-11-09T09:10:52.6162423Z ##  emulator by sending anonymized usage data. Or use the '-no-metrics'     ##
+2026-11-09T09:10:52.6162942Z ##  flag to bypass this warning and turn off the metrics collection.        ##
+2026-11-09T09:10:52.6163446Z ##  In a future release this warning will turn into a one-time blocking     ##
+2026-11-09T09:10:52.6164100Z ##  prompt to ask for explicit user input regarding metrics collection.     ##
+2026-11-09T09:10:52.6164586Z ##                                                                          ##
+2026-11-09T09:10:52.6165059Z ##  Please see '-help-metrics-collection' for more details. You can use     ##
+2026-11-09T09:10:52.6165603Z ##  '-metrics-to-file' or '-metrics-to-console' flags to see what type of   ##
+2026-11-09T09:10:52.6166175Z ##  data is being collected by emulator as part of usage statistics.        ##
+2026-11-09T09:10:52.6166667Z ##############################################################################
+2026-11-09T09:10:52.6167102Z INFO         | Guest GLES Driver: Auto (ext controls)
+2026-11-09T09:10:52.6167856Z INFO         | emuglConfig_init: vulkan_mode_selected:swiftshader gles_mode_selected:swiftshader
+2026-11-09T09:10:52.6168406Z INFO         | Checking system compatibility:
+2026-11-09T09:10:52.6168813Z INFO         |   Checking: hasSufficientDiskSpace
+2026-11-09T09:10:52.6169420Z INFO         |      Ok: Disk space requirements to run avd: `infinity-tracking-baseline-api36` are met
+2026-11-09T09:10:52.6169908Z INFO         |   Checking: hasSufficientHwGpu
+2026-11-09T09:10:52.6170324Z INFO         |      Ok: Hardware GPU compatibility checks are not required
+2026-11-09T09:10:52.6170747Z INFO         |   Checking: hasSufficientSystem
+2026-11-09T09:10:52.6171308Z INFO         |      Ok: System requirements to run avd: `infinity-tracking-baseline-api36` are met
+2026-11-09T09:10:52.6172442Z WARNING      | Feature QuickbootFileBacked is disabled due to stability issues, if you really want that, the environment variable ANDROID_EMU_FORCE_QUICKBOOT_FILE_BACKED need to set to 1
+2026-11-09T09:10:52.9057841Z ERROR        | Unable to connect to adb daemon on port: 5037
+2026-11-09T09:10:52.9073851Z INFO         | Storing crashdata in: /tmp/android-runner/emu-crash-37.2.13.db, detection is enabled for process: 3728
+2026-11-09T09:10:52.9074557Z INFO         | Initializing gfxstream backend
+2026-11-09T09:10:52.9083044Z INFO         | startOpenglesRendererImpl: gpu info
+2026-11-09T09:10:52.9083416Z INFO         | 
+2026-11-09T09:10:52.9084794Z INFO         | initIcdPaths: ICD set to 'swiftshader', using Swiftshader ICD
+2026-11-09T09:10:52.9085608Z INFO         | Setting ICD filenames for the loader = /usr/local/lib/android/sdk/emulator/lib64/vulkan/vk_swiftshader_icd.json
+2026-11-09T09:10:52.9086528Z INFO         | SharedLibrary::open for [/usr/local/lib/android/sdk/emulator/qemu/linux-x86_64/lib64/vulkan/libvulkan.so]
+2026-11-09T09:10:52.9087621Z INFO         | SharedLibrary::open for [/usr/local/lib/android/sdk/emulator/qemu/linux-x86_64/lib64/vulkan/libvulkan.so.1]
+2026-11-09T09:10:52.9088482Z INFO         | SharedLibrary::open for [/usr/local/lib/android/sdk/emulator/lib64/vulkan/libvulkan.so]
+2026-11-09T09:10:52.9089605Z INFO         | Added library: /usr/local/lib/android/sdk/emulator/lib64/vulkan/libvulkan.so
+2026-11-09T09:10:52.9122634Z INFO         | Selecting Vulkan device: SwiftShader Device (Subzero), Version: 1.3.0
+2026-11-09T09:10:52.9123776Z INFO         | Using Vulkan externalMemoryMode: OpaqueFd for VkEmulation
+2026-11-09T09:10:52.9412691Z INFO         | Format VK_FORMAT_G10X6_B10X6R10X6_2PLANE_422_UNORM_3PACK16 does not support YCbCr sampler conversion
+2026-11-09T09:10:52.9429114Z INFO         | SharedLibrary::open for [libX11]
+2026-11-09T09:10:52.9429468Z INFO         | SharedLibrary::open for [libX11-xcb]
+2026-11-09T09:10:52.9429729Z WARNING      | Could not open libX11-xcb.so, try libX11-xcb.so.1
+2026-11-09T09:10:52.9429987Z INFO         | SharedLibrary::open for [libX11-xcb.so.1]
+2026-11-09T09:10:52.9482820Z INFO         | Initializing VkEmulation features:
+2026-11-09T09:10:52.9483093Z INFO         |     glInteropSupported: false
+2026-11-09T09:10:52.9483305Z INFO         |     useDeferredCommands: true
+2026-11-09T09:10:52.9483544Z INFO         |     createResourceWithRequirements: true
+2026-11-09T09:10:52.9483786Z INFO         |     useVulkanComposition: false
+2026-11-09T09:10:52.9484034Z INFO         |     useVulkanNativeSwapchain: false
+2026-11-09T09:10:52.9484268Z INFO         |     enable guestRenderDoc: false
+2026-11-09T09:10:52.9484496Z INFO         |     ASTC LDR emulation mode: Gpu
+2026-11-09T09:10:52.9484707Z INFO         |     enable ETC2 emulation: true
+2026-11-09T09:10:52.9484947Z INFO         |     enable Ycbcr emulation: false
+2026-11-09T09:10:52.9485166Z INFO         |     guestVulkanOnly: false
+2026-11-09T09:10:52.9485386Z INFO         |     useDedicatedAllocations: false
+2026-11-09T09:10:52.9485611Z INFO         |     guestVulkanMaxApiVersion: 1.3.0
+2026-11-09T09:10:52.9485874Z INFO         |     enableProtectedMemoryEmulation: false
+2026-11-09T09:10:52.9487465Z INFO         | Graphics Adapter Vendor Google (Google Inc.)
+2026-11-09T09:10:52.9487811Z INFO         | Graphics Adapter Android Emulator OpenGL ES Translator (Google SwiftShader)
+2026-11-09T09:10:52.9488201Z INFO         | Graphics API Version OpenGL ES 3.0 (OpenGL ES 3.0 SwiftShader 4.0.0.1)
+2026-11-09T09:10:52.9490500Z INFO         | Graphics API Extensions GL_OES_EGL_sync GL_OES_EGL_image GL_OES_EGL_image_external GL_OES_depth24 GL_OES_depth32 GL_OES_element_index_uint GL_OES_texture_float GL_OES_texture_float_linear GL_OES_compressed_paletted_texture GL_OES_compressed_ETC1_RGB8_texture GL_OES_depth_texture GL_OES_texture_half_float GL_OES_texture_half_float_linear GL_OES_packed_depth_stencil GL_OES_vertex_half_float GL_OES_standard_derivatives GL_OES_texture_npot GL_OES_rgb8_rgba8 GL_EXT_color_buffer_float GL_EXT_color_buffer_half_float GL_EXT_texture_format_BGRA8888 GL_APPLE_texture_format_BGRA8888 
+2026-11-09T09:10:52.9492369Z INFO         | Graphics Device Extensions N/A
+2026-11-09T09:10:52.9492708Z INFO         | Disabling sparse binding feature support
+2026-11-09T09:10:52.9538540Z INFO         | Sending adb public key [QAAAAAlyWbDHQ6BcDP5vGN0WDHiOT7exTPCl5LP709JQSAKCZoycTvlVSWFl1zjHT6wyQgx+9X6DDBvyZIHU6n3dGkpRxgfdS0W7dn46Cj2mz0Bg/zBIXfg5EveFO6VFBoSfzN41Ytjb5X+rUxNNpW5Fp4A0d+zeg87k2QZDSSNDXbDwjrHYOpmWdNZF8Re2SyCXOfOa/wvsHPEyzTPJjn2/SwOzvyFMpdlPcSYYIluVZvg/KMotXfDfbMdxTsLj4t2EZXPxndUHj/dNO/0UDhzU0AH6+apfgoyOUQABvfEQX1LSuk3y46mFitgajOdNcQggebxodPhTwwLwQCyxD/TFCgABVOW+KzyzNIpOZI//1SCRIN0N6IjrRnea84FtfvrtqcPWcR/6tSR7pZyVRo3URzUb1JB9ka0e+XktPH0PLlIa1bY+H71+2OeSb4Enbq5H0WLLFU9HO0xpIyoSiNUH/lO64CCI9AXOXrTX0GHaNB/lTTzp+saTO+Dka+J1ySS2+lUN+h/PyY2sPGx1P3gUmjQu5GyTWD6gg/OlsUgoq/Xw+rWm240deC4ISANjaEeLIC4wLsUng2p7lki2QQnWjrCW0jGrNgtqNXhk0zUIW1/RyawseMuYtFl4tB/K0+zCD9Ml1v4WfQa99tMDKMe/jFzQm3MJp1nhgNJgsXooOPoaJfNsBAEAAQA= runner@unknown]
+2026-11-09T09:10:52.9540540Z INFO         | Userspace boot properties:
+2026-11-09T09:10:52.9541239Z INFO         |   androidboot.boot_devices=pci0000:00/0000:00:03.0 pci0000:00/0000:00:06.0
+2026-11-09T09:10:52.9541552Z INFO         |   androidboot.dalvik.vm.heapsize=576m
+2026-11-09T09:10:52.9541872Z INFO         |   androidboot.debug.hwui.renderer=skiagl
+2026-11-09T09:10:52.9542214Z INFO         |   androidboot.debug.sf.nobootanimation=1
+2026-11-09T09:10:52.9542707Z INFO         |   androidboot.hardware=ranchu
+2026-11-09T09:10:52.9543038Z INFO         |   androidboot.hardware.gltransport=pipe
+2026-11-09T09:10:52.9543293Z INFO         |   androidboot.hardware.vulkan=ranchu
+2026-11-09T09:10:52.9543524Z INFO         |   androidboot.logcat=*:V
+2026-11-09T09:10:52.9543736Z INFO         |   androidboot.opengles.version=196608
+2026-11-09T09:10:52.9544024Z INFO         |   androidboot.qemu=1
+2026-11-09T09:10:52.9546091Z INFO         |   androidboot.qemu.adb.pubkey=QAAAAAlyWbDHQ6BcDP5vGN0WDHiOT7exTPCl5LP709JQSAKCZoycTvlVSWFl1zjHT6wyQgx+9X6DDBvyZIHU6n3dGkpRxgfdS0W7dn46Cj2mz0Bg/zBIXfg5EveFO6VFBoSfzN41Ytjb5X+rUxNNpW5Fp4A0d+zeg87k2QZDSSNDXbDwjrHYOpmWdNZF8Re2SyCXOfOa/wvsHPEyzTPJjn2/SwOzvyFMpdlPcSYYIluVZvg/KMotXfDfbMdxTsLj4t2EZXPxndUHj/dNO/0UDhzU0AH6+apfgoyOUQABvfEQX1LSuk3y46mFitgajOdNcQggebxodPhTwwLwQCyxD/TFCgABVOW+KzyzNIpOZI//1SCRIN0N6IjrRnea84FtfvrtqcPWcR/6tSR7pZyVRo3URzUb1JB9ka0e+XktPH0PLlIa1bY+H71+2OeSb4Enbq5H0WLLFU9HO0xpIyoSiNUH/lO64CCI9AXOXrTX0GHaNB/lTTzp+saTO+Dka+J1ySS2+lUN+h/PyY2sPGx1P3gUmjQu5GyTWD6gg/OlsUgoq/Xw+rWm240deC4ISANjaEeLIC4wLsUng2p7lki2QQnWjrCW0jGrNgtqNXhk0zUIW1/RyawseMuYtFl4tB/K0+zCD9Ml1v4WfQa99tMDKMe/jFzQm3MJp1nhgNJgsXooOPoaJfNsBAEAAQA= runner@unknown
+2026-11-09T09:10:52.9548075Z INFO         |   androidboot.qemu.avd_name=infinity-tracking-baseline-api36
+2026-11-09T09:10:52.9548363Z INFO         |   androidboot.qemu.camera_hq_edge_processing=0
+2026-11-09T09:10:52.9548611Z INFO         |   androidboot.qemu.camera_protocol_ver=1
+2026-11-09T09:10:52.9548855Z INFO         |   androidboot.qemu.cpuvulkan.version=4206592
+2026-11-09T09:10:52.9549118Z INFO         |   androidboot.qemu.gltransport.drawFlushInterval=800
+2026-11-09T09:10:52.9549375Z INFO         |   androidboot.qemu.gltransport.name=pipe
+2026-11-09T09:10:52.9549599Z INFO         |   androidboot.qemu.hwcodec.avcdec=2
+2026-11-09T09:10:52.9549817Z INFO         |   androidboot.qemu.hwcodec.hevcdec=2
+2026-11-09T09:10:52.9550047Z INFO         |   androidboot.qemu.hwcodec.vpxdec=2
+2026-11-09T09:10:52.9550334Z INFO         |   androidboot.qemu.settings.system.screen_off_timeout=2147483647
+2026-11-09T09:10:52.9550592Z INFO         |   androidboot.qemu.skin=1080x1920
+2026-11-09T09:10:52.9550795Z INFO         |   androidboot.qemu.virtiowifi=1
+2026-11-09T09:10:52.9550992Z INFO         |   androidboot.qemu.vsync=60
+2026-11-09T09:10:52.9551223Z INFO         |   androidboot.serialno=EMULATOR37X2X13X0
+2026-11-09T09:10:52.9551582Z INFO         |   androidboot.vbmeta.digest=7466b5c28e6a3e1427b22ed2c317c6c7066294bde838d4d5243cce5d37992bd5
+2026-11-09T09:10:52.9551899Z INFO         |   androidboot.vbmeta.hash_alg=sha256
+2026-11-09T09:10:52.9552107Z INFO         |   androidboot.vbmeta.size=6848
+2026-11-09T09:10:52.9552314Z INFO         |   androidboot.veritymode=enforcing
+2026-11-09T09:10:52.9673463Z WARNING: cannnot unmap ptr 0x7fa7a7e01000 as it is in the protected range from 0x7fa6a7e00000 to 0x7fa7a8000000
+2026-11-09T09:10:52.9674427Z pc_memory_init: above 4g size: 40000000
+2026-11-09T09:10:52.9831866Z INFO         | Monitoring duration of emulator setup.
+2026-11-09T09:10:53.9743764Z INFO         | Activated packet streamer for bluetooth emulation
+2026-11-09T09:10:53.9744171Z INFO         | Successfully initialized netsim WiFi
+2026-11-09T09:10:53.9744450Z INFO         | Activated packet streamer for uwb emulation
+2026-11-09T09:10:53.9786458Z INFO         | Setting display: 0 configuration to: 1080x1920, dpi: 420x420 
+2026-11-09T09:10:53.9786851Z INFO         | setDisplayActiveConfig: id:0, 1080x1920
+2026-11-09T09:10:53.9787301Z INFO         | emulatorSetupEnvironment: Environment scene is not required
+2026-11-09T09:10:53.9839438Z USER_INFO    | Emulator is performing a full startup. This may take upto two minutes, or more.
+2026-11-09T09:10:53.9840441Z WARNING      | Failed to process .ini file /home/runner/.android/emu-update-last-check.ini for reading.
+2026-11-09T09:10:54.1863054Z WARNING      | Failed to process .ini file /home/runner/.android/emu-update-last-check.ini for reading.
+2026-11-09T09:11:02.5711069Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+2026-11-09T09:11:02.5734882Z * daemon not running; starting now at tcp:5037
+2026-11-09T09:11:02.5755368Z * daemon started successfully
+2026-11-09T09:11:02.5756084Z adb: device offline
+2026-11-09T09:11:02.5761402Z The process '/usr/local/lib/android/sdk/platform-tools/adb' failed with exit code 1
+2026-11-09T09:11:04.5783140Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+2026-11-09T09:11:04.5813267Z adb: device offline
+2026-11-09T09:11:04.5817815Z The process '/usr/local/lib/android/sdk/platform-tools/adb' failed with exit code 1
+2026-11-09T09:11:06.5888619Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+2026-11-09T09:11:06.5898105Z adb: device offline
+2026-11-09T09:11:06.5902353Z The process '/usr/local/lib/android/sdk/platform-tools/adb' failed with exit code 1
+2026-11-09T09:11:08.5966496Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+2026-11-09T09:11:08.5998591Z adb: device offline
+2026-11-09T09:11:08.6004674Z The process '/usr/local/lib/android/sdk/platform-tools/adb' failed with exit code 1
+2026-11-09T09:11:10.6083064Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+2026-11-09T09:11:10.6426168Z 
+2026-11-09T09:11:12.6499321Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+2026-11-09T09:11:12.6751957Z 
+2026-11-09T09:11:14.6794395Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+2026-11-09T09:11:14.7040208Z 
+2026-11-09T09:11:16.7097114Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+2026-11-09T09:11:16.7340402Z 
+2026-11-09T09:11:18.7372752Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+2026-11-09T09:11:18.7663169Z 
+2026-11-09T09:11:20.7739329Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+2026-11-09T09:11:20.8373923Z 
+2026-11-09T09:11:22.8450853Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+2026-11-09T09:11:22.8712953Z 
+2026-11-09T09:11:24.8784388Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+2026-11-09T09:11:24.8936163Z 
+2026-11-09T09:11:26.8991114Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+2026-11-09T09:11:26.9256882Z 
+2026-11-09T09:11:28.9290920Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+2026-11-09T09:11:29.1080516Z 
+2026-11-09T09:11:31.1149064Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+2026-11-09T09:11:31.2732446Z 
+2026-11-09T09:11:33.2919395Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+2026-11-09T09:11:33.5190245Z 
+2026-11-09T09:11:35.5289099Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell getprop sys.boot_completed
+2026-11-09T09:11:35.6045187Z 1
+2026-11-09T09:11:35.6338093Z INFO         | Boot completed in 43031 ms
+2026-11-09T09:11:35.6367716Z INFO         | Increasing screen off timeout, logcat buffer size to 2M.
+2026-11-09T09:11:35.6648549Z Emulator booted.
+2026-11-09T09:11:35.6677513Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell input keyevent 82
+2026-11-09T09:11:36.1787912Z ##[endgroup]
+2026-11-09T09:11:36.1849475Z [command]/usr/bin/sh -c python3 repairs/infinity-tracking-integration-2103469-20261108/verify_tracking_android.py --staged tracking-android-staged --sdk "$ANDROID_HOME" --out tracking-android-results
+2026-11-09T09:11:38.9504358Z WARNING      | adb command '/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 shell am broadcast -a com.android.emulator.multidisplay.START -n com.android.emulator.multidisplay/.MultiDisplayServiceReceiver --user 0 ' failed: 'adb: device 'emulator-5554' not found'
+2026-11-09T09:12:47.8158674Z ERROR        | bad color buffer handle 455
+2026-11-09T09:13:12.2518838Z INFO         | Created VkInstance:0x557acfbb6000 for application:'' engine:''.
+2026-11-09T09:13:12.6142075Z INFO         | Destroyed VkInstance:0x557acfbb6000 for application:'' engine:''.
+2026-11-09T09:16:35.8474984Z ##[error]The process '/usr/bin/sh' failed with exit code 1
+2026-11-09T09:16:35.8476847Z ##[group]Terminate Emulator
+2026-11-09T09:16:35.8483491Z [command]/usr/local/lib/android/sdk/platform-tools/adb -s emulator-5554 emu kill
+2026-11-09T09:16:35.8514463Z OK: killing emulator, bye bye
+2026-11-09T09:16:35.8514719Z OK
+2026-11-09T09:16:35.8516683Z INFO         | Wait for emulator (pid 3728) 20 seconds to shutdown gracefully before kill;you can set environment variable ANDROID_EMULATOR_WAIT_TIME_BEFORE_KILL(in seconds) to change the default value (20 seconds)
+2026-11-09T09:16:35.8517854Z 
+2026-11-09T09:16:35.8518496Z ##[endgroup]
+2026-11-09T09:16:35.8650852Z USER_INFO    | Snapshots have been disabled by the user, save request is ignored.
+2026-11-09T09:16:35.8655195Z INFO         | Saving snapshot 'default_boot' took 0 ms
+2026-11-09T09:16:36.1387804Z ERROR        | stop: Not implemented
+2026-11-09T09:16:36.1394957Z WARNING      | Emulator client has not yet been configured.. Call configure me first!
+2026-11-09T09:16:36.2004005Z INFO         | removeAll
+2026-11-09T09:16:36.2498859Z WARNING      | Netsim Wifi dns:///localhost:43271 is gone due to Stream removed (CANCELLED)
+2026-11-09T09:16:36.9385365Z ##[group]Run actions/upload-artifact@v4
+2026-11-09T09:16:36.9385578Z with:
+2026-11-09T09:16:36.9385847Z   name: Infinity69-Tracking-Selected-Android-42591104063-NOT-FOLD-OR-RELEASE-ACCEPTANCE
+2026-11-09T09:16:36.9386470Z   path: tracking-android-results/
+tracking-android-admission/ADMISSION.json
+tracking-android-staged/*.json
+tracking-feature-platform/
+tracking-feature-emulator-setup/
+
+2026-11-09T09:16:36.9386948Z   if-no-files-found: warn
+2026-11-09T09:16:36.9387100Z   retention-days: 90
+2026-11-09T09:16:36.9387461Z   compression-level: 6
+2026-11-09T09:16:36.9387633Z   overwrite: false
+2026-11-09T09:16:36.9387782Z   include-hidden-files: false
+2026-11-09T09:16:36.9387936Z env:
+2026-11-09T09:16:36.9389400Z   GH_TOKEN: ***
+2026-11-09T09:16:36.9389556Z   PYTHONDONTWRITEBYTECODE: 1
+2026-11-09T09:16:36.9389767Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.7/x64
+2026-11-09T09:16:36.9390045Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.7/x64/lib/pkgconfig
+2026-11-09T09:16:36.9390348Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.7/x64
+2026-11-09T09:16:36.9390673Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.7/x64
+2026-11-09T09:16:36.9390922Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.7/x64
+2026-11-09T09:16:36.9391172Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.7/x64/lib
+2026-11-09T09:16:36.9391452Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.13-9/x64
+2026-11-09T09:16:36.9391760Z   JAVA_HOME_21_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.13-9/x64
+2026-11-09T09:16:36.9392021Z   ANDROID_HOME: /usr/local/lib/android/sdk
+2026-11-09T09:16:36.9392215Z   ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+2026-11-09T09:16:36.9392421Z   ANDROID_AVD_HOME: /home/runner/.android/avd
+2026-11-09T09:16:36.9392596Z ##[endgroup]
+2026-11-09T09:16:37.0532650Z (node:7002) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-09T09:16:37.0533198Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-09T09:16:37.0767645Z Multiple search paths detected. Calculating the least common ancestor of all paths
+2026-11-09T09:16:37.0799734Z The least common ancestor is /home/runner/work/project-infinity/project-infinity. This will be the root directory of the artifact
+2026-11-09T09:16:37.0800878Z With the provided path, there will be 230 files uploaded
+2026-11-09T09:16:37.0801579Z Artifact name is valid!
+2026-11-09T09:16:37.0801841Z Root directory input is valid!
+2026-11-09T09:16:37.3715011Z Beginning upload of artifact content to blob storage
+2026-11-09T09:16:37.5738386Z (node:7002) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-11-09T09:16:38.0334150Z Uploaded bytes 1767177
+2026-11-09T09:16:38.0823659Z Finished uploading artifact content to blob storage!
+2026-11-09T09:16:38.0824219Z SHA256 digest of uploaded artifact zip is 337c51263a7be671ec8568f917a8232e9594535cc337c6e111d47f0181ec30d1
+2026-11-09T09:16:38.0825388Z Finalizing artifact upload
+2026-11-09T09:16:38.5243558Z Artifact Infinity69-Tracking-Selected-Android-42591104063-NOT-FOLD-OR-RELEASE-ACCEPTANCE.zip successfully finalized. Artifact ID 13662595963
+2026-11-09T09:16:38.5244417Z Artifact Infinity69-Tracking-Selected-Android-42591104063-NOT-FOLD-OR-RELEASE-ACCEPTANCE has been successfully uploaded! Final size is 1767177 bytes. Artifact ID is 13662595963
+2026-11-09T09:16:38.5248715Z Artifact download URL: https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/42591104063/artifacts/13662595963
+2026-11-09T09:16:38.5382260Z Post job cleanup.
+2026-11-09T09:16:38.6304807Z (node:7014) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-09T09:16:38.6305297Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-09T09:16:38.6464176Z Post job cleanup.
+2026-11-09T09:16:38.7089365Z [command]/usr/bin/git version
+2026-11-09T09:16:38.7120355Z git version 2.56.0
+2026-11-09T09:16:38.7149166Z Temporarily overriding HOME='/home/runner/work/_temp/682c702a-7e20-4359-939d-4a3ec4d855cd' before making global git config changes
+2026-11-09T09:16:38.7149984Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-09T09:16:38.7153600Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/project-infinity/project-infinity
+2026-11-09T09:16:38.7182956Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-09T09:16:38.7208027Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-09T09:16:38.7376988Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-09T09:16:38.7408639Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-09T09:16:38.7564207Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-09T09:16:38.7596460Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-09T09:16:38.7847330Z Cleaning up orphan processes
+2026-11-09T09:16:38.8090863Z Terminate orphan process: pid (3834) (adb)
+2026-11-09T09:16:38.8161163Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262, actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3, actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065, actions/upload-artifact@v4, android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

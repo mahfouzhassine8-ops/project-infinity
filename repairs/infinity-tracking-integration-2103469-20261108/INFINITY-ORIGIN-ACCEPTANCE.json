@@ -21,7 +21,7 @@
     "retest_or_repair_on_owner_device_required": false
   },
   "fixture_preparation": {
-    "status": "READY_ORIGINAL_KEY_SIGNED_E410_FIXTURE",
+    "status": "MATCHING_FIXTURE_AUTHENTICATED_ON_ANDROID; LEGITIMATE_SAVE_NOT_RUN_AFTER_EMPTY_LOADING_FRAME_OBSERVER_BLOCKER",
     "existing_signed_fixture_run": 42555855742,
     "rule": "Find an existing valid saved title, or create it using only the existing supported save/context-menu flow in the isolated QA profile.",
     "saving_alone": "Must leave playback progress/watched history unchanged.",
@@ -115,11 +115,11 @@
     "raw_history": "Retain original workflow failures/logs unchanged; current interpretation must not promote them to unexecuted functional failures or successes."
   },
   "execution": {
-    "status": "SOURCE_REVIEWED_SELECTED_PENDING_ONE_ANDROID_ATTEMPT",
-    "application_tests_executed_this_change": 0,
+    "status": "SOURCE_REVIEWED_READINESS_CORRECTION_SELECTED_PENDING_ANDROID",
+    "application_tests_executed_this_change": 1,
     "repeat_completed_tests": false,
     "old_independent_movie_selection_retired_for_acceptance": true,
-    "new_origin_runner_activation": "Origin-only source and classification review complete; one new source-bound attempt selected, zero automatic retries. No application result yet.",
+    "new_origin_runner_activation": "One new attempt selected after source-reviewed test-only empty-directory readiness correction; prior failed run and snapshots retained. No automatic retries.",
     "APK_build": false,
     "publication": false,
     "release_acceptance": false,
@@ -127,7 +127,10 @@
     "module_fixture_signing": "Completed via existing original-key signer run42588102830; no APK created",
     "maximum_new_attempts": 1,
     "automatic_retries": 0,
-    "retained_environment_failure_run": 42570831467
+    "retained_environment_failure_run": 42570831467,
+    "last_attempt": 42591104063,
+    "last_attempt_result": "BLOCKED_OBSERVER_BEFORE_INFINITY_ORIGIN; Movie activation refused by prior busy modal",
+    "owner_origin_attempt_number": 2
   },
   "shared_record_view_coverage": {
     "status": "NOT_RUN",

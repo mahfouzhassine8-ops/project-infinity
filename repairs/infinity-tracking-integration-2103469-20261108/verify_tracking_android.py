@@ -216,6 +216,8 @@ def route(parent):
 def content_rows(snapshot, optional=False):
     """One actual visible source-declared Videos content view, never a title match."""
     base.require(snapshot['window'] == 10025 and snapshot['dialog'] in (0, -1, 9999), 'ACTUAL_UNOBSCURED_VIDEOS_CONTENT_REQUIRED')
+    if optional and not any(snapshot['controls'].get(str(control)) for control in snapshot['primary_controls']):
+        return []  # Observed empty initialization state: wait without selecting a view.
     controls = [control for control in snapshot['primary_controls'] if snapshot['visible_controls'].get(str(control))]
     base.require(len(controls) <= 1, 'AMBIGUOUS_VISIBLE_PRIMARY_CONTENT_CONTROLS_REJECTED')
     if not controls and optional:

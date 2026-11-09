@@ -76,3 +76,13 @@ Selected review correction, before execution: run only `AcceptanceGuards.test_ob
 ```sh
 python -m unittest -v test_infinity_origin_acceptance_guards.AcceptanceGuards.test_observed_save_and_resume_assertions_fail_without_hiding_blockers
 ```
+
+Selected readiness correction after actual42591104063, recorded before execution: observer003 is an empty initialization snapshot with visible content views500+65051, no rows and no focus. The optional directory wait must return pending/[] for that entirely empty observed primary-control state before its unique-visible check. Mandatory selection and any populated ambiguous state keep the original refusal. Observer014 then contains the sole focused65051 and the actual Queen parent row. Control500 is a legitimate original content view; control50 was not visible in this ambiguity and is also a legitimate media panel in the signed skin. No popup-ID exclusion, view picking, metadata relaxation or saving/navigation change is warranted.
+
+Run only `test_origin_recorded_content_readiness.ActualReadiness.test_actual_empty_transient_waits_settled_reads_and_populated_ambiguity_refuses`. It hash-binds the actual003/014 snapshot bytes from the retained run, compiles only the pure content_rows guard with optimize=1, confirms empty optional pending, settled actual rows, mandatory empty ambiguity refusal and a counterfactual populated-ambiguity refusal. It creates no installed records/SDK/app and reruns none of the prior eight guards or other suites.
+
+Movie catalogue F was not independently tested: the retained lifecycle log line2570 explicitly reports its Videos activation refused while the earlier modal was active, and later snapshots remain Q. This is a preparation blocker, not evidence of broken movie source/navigation. Root archives raw evidence unchanged and separately selects any next correction-specific actual attempt; this host control authorizes no dispatch.
+
+```sh
+python repairs/infinity-tracking-integration-2103469-20261108/test_origin_recorded_content_readiness.py
+```

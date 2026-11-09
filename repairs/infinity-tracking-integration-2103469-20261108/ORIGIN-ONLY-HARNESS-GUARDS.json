@@ -34,6 +34,16 @@
       "passed": 1,
       "reason": "Narrow review correction: observed save/resume mismatches FAIL; currently valid same-source lower deadline FAIL; observer/stopped/no-AV/transport remain BLOCKED.",
       "tests": 1
+    },
+    {
+      "command": "python repairs/infinity-tracking-integration-2103469-20261108/test_origin_recorded_content_readiness.py",
+      "passed": 1,
+      "reason": "Actual42591104063 snapshot003 empty primary-state waits; snapshot014 settled rows read; mandatory/populated ambiguity still refuse. Only pure content_rows optimize1, no app/SDK/installed records.",
+      "recorded_inputs": {
+        "observer-003-snapshot.json": "1cba1d0b9691072a54316857793480abe7862a67df5d13e6b1b8a033fe5846ae",
+        "observer-014-snapshot.json": "7e3648e844f6c5fe2c50ae3c53aa954cc55cf0bc6cf1ebbad8e94116c4c8433e"
+      },
+      "tests": 1
     }
   ],
   "runtime_acceptance": "NOT_RUN",
@@ -45,15 +55,23 @@
       "test_infinity_origin_acceptance_guards.py": "f536088f949a3f626f6c3aa7ed03662186294ce7dcbc82a71292c30f95c9bab8",
       "tracking_android_observer.py": "48c8477b8c474a049d6b9f635ffc84977042ca1a7f9ae9935f0b07689b732468",
       "verify_tracking_android.py": "cdf267598b6a0029b61ad33fea1785ff32481fc43c89d56039a50eac16020a9f"
+    },
+    {
+      "TRACKING-ANDROID-PLAN.md": "209479ffb781a904f55543057c22328fad7d35d75fb1482d7bca236a7e1621a4",
+      "stage_tracking_android.py": "a5bf5f1f82a7e17a69deb3a1d28d0ba354222b14c46400b2df0f0fb503df84bf",
+      "test_infinity_origin_acceptance_guards.py": "27731b44050f9245b717223595cf71af38d541b8980daf89d1a54fe69c870a47",
+      "tracking_android_observer.py": "48c8477b8c474a049d6b9f635ffc84977042ca1a7f9ae9935f0b07689b732468",
+      "verify_tracking_android.py": "56f60f06e8a89f1b38668fcc381371ca56450db2d79eccd5bbdeddc8ca8b9fd6"
     }
   ],
   "sources": {
-    "TRACKING-ANDROID-PLAN.md": "209479ffb781a904f55543057c22328fad7d35d75fb1482d7bca236a7e1621a4",
+    "TRACKING-ANDROID-PLAN.md": "200654a90716bc276fd2d733df299efa0bae4c1dfbee4d9eb0623661336f700f",
     "stage_tracking_android.py": "a5bf5f1f82a7e17a69deb3a1d28d0ba354222b14c46400b2df0f0fb503df84bf",
     "test_infinity_origin_acceptance_guards.py": "27731b44050f9245b717223595cf71af38d541b8980daf89d1a54fe69c870a47",
+    "test_origin_recorded_content_readiness.py": "96ca3a3332d16287b5bcec346cca707e2a745be306ac1150bbbfa5e191a885b5",
     "tracking_android_observer.py": "48c8477b8c474a049d6b9f635ffc84977042ca1a7f9ae9935f0b07689b732468",
-    "verify_tracking_android.py": "56f60f06e8a89f1b38668fcc381371ca56450db2d79eccd5bbdeddc8ca8b9fd6"
+    "verify_tracking_android.py": "15a0a81431b441f615c029058aea1509669cec210b0f6ea9c3dae2767fff7685"
   },
   "status": "PASS_SELECTED_INFINITY_ORIGIN_ACCEPTANCE_HOST_GUARDS",
-  "unique_cases_passed": 8
+  "unique_cases_passed": 9
 }

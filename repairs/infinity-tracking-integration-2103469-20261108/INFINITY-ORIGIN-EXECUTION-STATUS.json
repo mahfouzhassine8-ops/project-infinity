@@ -1,5 +1,5 @@
 {
-  "status": "SIGNED_MATCHING_FIXTURE_AND_REVIEWED_ORIGIN_ONLY_SELECTION_READY; ANDROID_NOT_RUN",
+  "status": "PRIOR_ANDROID_BLOCKED_OBSERVER_BEFORE_ORIGIN; SOURCE_REVIEWED_READINESS_CORRECTION_SELECTED",
   "protected_checkpoint": "e410f30ba9e38182e4e77810e5237e5442cbd31a",
   "production_source_sha256": {
     "plugin.py": "580a2d7b25bc7a415c2db059fe1fa696808107a4f997a32d544baf2468a2877a",
@@ -8,9 +8,9 @@
   },
   "production_source_changes": false,
   "Watchlist_or_navigation_changes": false,
-  "new_APK_or_signed_fixture": "Matching internal module fixture signed42588102830; no new APK",
-  "application_tests": 0,
-  "host_behavior_tests": "7 new intake guards and8 new selected harness controls only; original40/14/13 not repeated",
+  "new_APK_or_signed_fixture": "Existing same authenticated CC70/71 fixture reused; no new signing or APK",
+  "application_tests": 1,
+  "host_behavior_tests": "7 intake guards +9 unique new harness guards; only1 affected new recorded-snapshot guard after observed readiness defect. Original40/14/13 not repeated",
   "completed_tests_repeated": false,
   "runtime_capabilities_observed": [
     "remote_desktop"
@@ -18,14 +18,11 @@
   "dedicated_Android_connector_tools_exposed": 0,
   "current_limitations": [
     {
-      "type": "RUNTIME_PRECONDITION",
-      "evidence": "evidence/baseline-constructor-fail-42570831467/EVIDENCE.json",
-      "observed": "Unchanged69 firststartup SIGSEGVtalloc_lib_init+32, API36r7 x86_64 translating ARM64, before featureexecution.",
-      "cause": "Unresolved; not proof of a Fold failure or tracking defect. Earlier startupPASS retained."
-    },
-    {
-      "type": "ANDROID_ACCEPTANCE_NOT_EXECUTED",
-      "observed": "Matching fixture authenticated and origin-only tooling ready; actual workflow pending final source review and one selected attempt. Prior emulator constructor failure retained; no automatic retries."
+      "type": "OBSERVED_TEST_OBSERVER_READINESS",
+      "run": 42591104063,
+      "observed": "Empty transient showed two visible controls with no rows; observer stopped prematurely before native Save. Later actual Queen catalogue populated. Movie activation was refused because prior busy modal remained.",
+      "source_review": "ORIGIN-READINESS-DELTA-REVIEW.json",
+      "resolution_selected": "Optional entirely-empty directory read waits; mandatory/populated ambiguity guards unchanged. New actual origin/playback verification pending."
     }
   ],
   "classification": "Prerequisite failure => BLOCKED; unreached functional steps => NOT_RUN. Original raw failed runs unchanged.",
@@ -34,5 +31,10 @@
   "candidate_CC": "0.3.5.70",
   "recovery_CC": "0.3.5.71",
   "APK_build": false,
-  "publication": false
+  "publication": false,
+  "last_run": 42591104063,
+  "last_run_evidence": "evidence/origin-observer-blocked-42591104063/EVIDENCE.json",
+  "last_observed_native_authentication": "PASS_EXACT_E410_FULL80_CC70",
+  "last_observed_final_APK": "PASS_EXACT_ORIGINAL69",
+  "functional_acceptance": "NOT_RUN"
 }
