@@ -1,0 +1,36 @@
+{
+  "APK_module_or_app_execution": false,
+  "count": 10,
+  "initial_fixture_harness_error": "Corrected fixture catch to original release_gate.Rejected exception type; production code and policy untouched",
+  "not_selected": [
+    "APKor modulespreparation/signing",
+    "Java4/13",
+    "Old17/40/14/9",
+    "App/native/emulator",
+    "Authoritymutation"
+  ],
+  "original39_and_signers_unchanged": true,
+  "registry_mutation": false,
+  "results": [
+    "PASS_VALIDATED_RELATIVE_ABSOLUTE_REQUEST_BINDINGS_IDENTICAL",
+    "PASS_ORIGINAL_TRANSITION_AND_EVIDENCE_REFRESH_SAME_PAYLOAD74_LAST69",
+    "REFUSED_REFRESH_CHANGE:candidate_versionCode",
+    "REFUSED_REFRESH_CHANGE:last_issued_versionCode",
+    "REFUSED_REFRESH_CHANGE:payload",
+    "REFUSED_REFRESH_FEATURE_TARGET",
+    "PASS_REGISTERED_REFRESH_USES_ACTUAL_GIT_PREDECESSOR_FIXTURE",
+    "REFUSED_ANY_OTHER_PRODUCER_INPUT_DRIFT",
+    "REFUSED_PENDING_REVIEW_OUTSIDE_FIXTURE",
+    "PASS_EXACT_SINGLE_GENERATION_LITERAL_WORKFLOW_DELTA"
+  ],
+  "review_status_mocked_only_in_metadata_fixtures": true,
+  "selected": [
+    "Relative/absolute validatedrequest paths giveidentical sourcebindings",
+    "Exactreviewedhelper/workflow allowlist refuses anyotherproducerinput drift orunreviewedreceipt",
+    "Original transition/evidence admitsgen57->58 same74/last69 payload/components/contracts targets[]",
+    "Changedrefreshpayload/version/issuedstate/targets refuse; check_registered uses actualGitparent",
+    "Workflowdiff exactlyone generationliteral; originalsignerand39 unchanged"
+  ],
+  "selected_before_execution": true,
+  "status": "PASS_FOCUSED_REQUEST_PATH_AND_EVIDENCE_REFRESH_METADATA_GUARDS"
+}

@@ -1,0 +1,47 @@
+{
+  "SDK_emulator_application": false,
+  "build_sign_dispatch_push": false,
+  "command": "python repairs/infinity-tracking-integration-2103469-20261108/test_tracking_install_route_shape.py",
+  "compile_optimization": 1,
+  "created_utc": "2026-11-09T11:54:45.149920+00:00",
+  "exact_appended_job_sha256": "97228f5c6dd5d8148d4cfb2e1ce9ab75ace386663bcfb33537ab9f1cf1649ad1",
+  "exit_code": 0,
+  "feature_workflow_sha256": "8c1cdaa665a7b12188e63a16cda24339896a5da3d7b76be65efe6919c8a6a31e",
+  "final_exact_appended_job_sha256": "a9468cd44f94b31ef432ab465b31a7c67b841b9c7179eb52483adb01bdf4e91f",
+  "final_feature_workflow_sha256": "01ec86c3818d89fdb48156f4abda113eedb61b7e2271892e594c7851bc94c82a",
+  "final_source_sha256": {
+    "POST-SIGN-WORKFLOW-CONTRACT.md": "412fc9160bf42b8b1de015046093c0fcb50bbaf16696721f8cbbc6764893d23f",
+    "POST-SIGN-WORKFLOW-SELECTION.json": "47c168e2fda22a24276f5e4b04ec094aea04ab6775769dd5b21fd7a5f4cc400c",
+    "admit_tracking_android.py": "55fc1ae419f2f6f81a3efe52ec3a4b06f0ee0e7348236e97bb640eb7e217c470",
+    "test_tracking_install_route_shape.py": "3e9228a1eec8cc54ec1be57e78cedd20c287a8aca541af6ffe824849d5c4ce09",
+    "verify_tracking_install_inputs.py": "d61edad84805d972a765fcd682b3145289d00cf03365ccd4a6097edce34c6948"
+  },
+  "followup_selected_control": {
+    "case": "RouteShape.test_only_exact_reviewed_manual_addition_normalizes",
+    "command": "python repairs/infinity-tracking-integration-2103469-20261108/test_tracking_install_route_shape.py",
+    "exit_code": 0,
+    "reason": "Pre-SDK Python3.10 digest compatibility source correction changes pinned intake/job hashes; same affected route guard reselected before execution.",
+    "reported_elapsed_seconds": 0.03,
+    "status": "PASS",
+    "unrelated_suites_rerun": false
+  },
+  "frozen_install_helper_sha256": "ed500734e7c851e4ac157d33b56c3cf1c1cd1ba72117fc470a800f96181265c1",
+  "historical_workflow_source": "0245abf5e4a10d490bd38677b118e873c01e5504",
+  "network_API_downloads": false,
+  "pre_setup_syntax": "PASS_PYTHON310_GRAMMAR_AND_COMPATIBLE_STREAMING_SHA_SOURCE_REVIEW",
+  "prior_suites_rerun": false,
+  "reported_elapsed_seconds": 0.042,
+  "request_present": false,
+  "schema": 1,
+  "selected_case": "RouteShape.test_only_exact_reviewed_manual_addition_normalizes",
+  "selected_count": 1,
+  "source_sha256": {
+    "POST-SIGN-WORKFLOW-CONTRACT.md": "d2a9be2be50e8d695edea5ff719f9c688e0b11beca7eafe8e946c0b1acde3083",
+    "POST-SIGN-WORKFLOW-SELECTION.json": "cf189375dcdf5814c3b636910e9d3ab5b5c86d8f04313216dc29678dcc4f3593",
+    "admit_tracking_android.py": "314b01c3893e516ad9c8b84e0f02e0f41039ca0371a0b2188140bed756094b19",
+    "test_tracking_install_route_shape.py": "3e9228a1eec8cc54ec1be57e78cedd20c287a8aca541af6ffe824849d5c4ce09",
+    "verify_tracking_install_inputs.py": "09dc3a17362ed95ab89c5c5830ff873506b3287f8ac80b70e23905e7441f8fe8"
+  },
+  "status": "PASS_ONE_SELECTED_ROUTE_SOURCE_GUARD_ONLY_NOT_WORKFLOW_EXECUTION",
+  "syntax": "PASS_YAML_PARSE"
+}

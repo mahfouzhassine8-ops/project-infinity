@@ -1,0 +1,1129 @@
+﻿2026-11-09T11:59:11.1451087Z Current runner version: '2.338.2'
+2026-11-09T11:59:11.1480256Z ##[group]Runner Image Provisioner
+2026-11-09T11:59:11.1481501Z Hosted Compute Agent
+2026-11-09T11:59:11.1482334Z Version: 20261028.624
+2026-11-09T11:59:11.1483279Z Commit: 54898b74c23fde5556c9b3c3a2290865feef0dfe
+2026-11-09T11:59:11.1484237Z Build Date: 2026-10-28T21:51:42Z
+2026-11-09T11:59:11.1485265Z Worker ID: {e32c2ffb-13d0-44c5-8fb5-4da6a5455aa2}
+2026-11-09T11:59:11.1486237Z Region: westus3
+2026-11-09T11:59:11.1487045Z Cloud: Azure
+2026-11-09T11:59:11.1487875Z ##[endgroup]
+2026-11-09T11:59:11.1489886Z ##[group]Operating System
+2026-11-09T11:59:11.1490879Z Ubuntu
+2026-11-09T11:59:11.1491581Z 22.04.5
+2026-11-09T11:59:11.1492259Z LTS
+2026-11-09T11:59:11.1493108Z ##[endgroup]
+2026-11-09T11:59:11.1493854Z ##[group]Runner Image
+2026-11-09T11:59:11.1494725Z Image: ubuntu-22.04
+2026-11-09T11:59:11.1495544Z Version: 20261101.347.1
+2026-11-09T11:59:11.1497286Z Included Software: https://github.com/actions/runner-images/blob/ubuntu22/20261101.347/images/ubuntu/Ubuntu2204-Readme.md
+2026-11-09T11:59:11.1499512Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu22%2F20261101.347
+2026-11-09T11:59:11.1501036Z ##[endgroup]
+2026-11-09T11:59:11.1502621Z ##[group]GITHUB_TOKEN Permissions
+2026-11-09T11:59:11.1504801Z Actions: read
+2026-11-09T11:59:11.1505610Z Contents: read
+2026-11-09T11:59:11.1506484Z Metadata: read
+2026-11-09T11:59:11.1507204Z ##[endgroup]
+2026-11-09T11:59:11.1510406Z Secret source: Actions
+2026-11-09T11:59:11.1511676Z Cache mode: write
+2026-11-09T11:59:11.1512661Z Prepare workflow directory
+2026-11-09T11:59:11.1983060Z Prepare all required actions
+2026-11-09T11:59:11.2022032Z Getting action download info
+2026-11-09T11:59:11.5257034Z Download action repository 'actions/checkout@11d5960a326750d5838078e36cf38b85af677262' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+2026-11-09T11:59:11.6375256Z Download action repository 'actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065' (SHA:a26af69be951a213d495a4c3e4e4022e16d87065)
+2026-11-09T11:59:11.7952950Z Download action repository 'actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3' (SHA:cf277c60eb25467037889841efdb72551f06f6c3)
+2026-11-09T11:59:12.5712277Z Download action repository 'android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407' (SHA:9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407)
+2026-11-09T11:59:13.0764921Z Download action repository 'actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093' (SHA:d3f86a106a0bac45b974a628896c90dbdf5c8093)
+2026-11-09T11:59:13.6937092Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+2026-11-09T11:59:13.9104906Z Complete job name: Registered experimental74/forward75 through unchanged original owner gate and signer
+2026-11-09T11:59:13.9744347Z ##[group]Run actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+2026-11-09T11:59:13.9744905Z with:
+2026-11-09T11:59:13.9745097Z   fetch-depth: 0
+2026-11-09T11:59:13.9745302Z   persist-credentials: false
+2026-11-09T11:59:13.9745539Z   show-progress: false
+2026-11-09T11:59:13.9745775Z   repository: mahfouzhassine8-ops/project-infinity
+2026-11-09T11:59:13.9747950Z   token: ***
+2026-11-09T11:59:13.9748143Z   ssh-strict: true
+2026-11-09T11:59:13.9748342Z   ssh-user: git
+2026-11-09T11:59:13.9748528Z   clean: true
+2026-11-09T11:59:13.9748731Z   sparse-checkout-cone-mode: true
+2026-11-09T11:59:13.9748968Z   fetch-tags: false
+2026-11-09T11:59:13.9749369Z   lfs: false
+2026-11-09T11:59:13.9749543Z   submodules: false
+2026-11-09T11:59:13.9749728Z   set-safe-directory: true
+2026-11-09T11:59:13.9749953Z   allow-unsafe-pr-checkout: false
+2026-11-09T11:59:13.9750345Z env:
+2026-11-09T11:59:13.9752380Z   GH_TOKEN: ***
+2026-11-09T11:59:13.9752575Z   PYTHONDONTWRITEBYTECODE: 1
+2026-11-09T11:59:13.9752826Z ##[endgroup]
+2026-11-09T11:59:14.1327299Z Syncing repository: mahfouzhassine8-ops/project-infinity
+2026-11-09T11:59:14.1328479Z ##[group]Getting Git version info
+2026-11-09T11:59:14.1328873Z Working directory is '/home/runner/work/project-infinity/project-infinity'
+2026-11-09T11:59:14.1330192Z [command]/usr/bin/git version
+2026-11-09T11:59:14.1407122Z git version 2.56.0
+2026-11-09T11:59:14.1444813Z ##[endgroup]
+2026-11-09T11:59:14.1450370Z Temporarily overriding HOME='/home/runner/work/_temp/c2d5b0f5-8a4c-4dac-b93e-599113575f63' before making global git config changes
+2026-11-09T11:59:14.1451798Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-09T11:59:14.1452956Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/project-infinity/project-infinity
+2026-11-09T11:59:14.1488434Z Deleting the contents of '/home/runner/work/project-infinity/project-infinity'
+2026-11-09T11:59:14.1493334Z ##[group]Initializing the repository
+2026-11-09T11:59:14.1497281Z [command]/usr/bin/git init /home/runner/work/project-infinity/project-infinity
+2026-11-09T11:59:14.1587229Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-11-09T11:59:14.1588453Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-11-09T11:59:14.1589511Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-11-09T11:59:14.1590392Z hint: call:
+2026-11-09T11:59:14.1590763Z hint:
+2026-11-09T11:59:14.1591208Z hint: 	git config --global init.defaultBranch <name>
+2026-11-09T11:59:14.1591682Z hint:
+2026-11-09T11:59:14.1592134Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-11-09T11:59:14.1592857Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-11-09T11:59:14.1593437Z hint:
+2026-11-09T11:59:14.1593759Z hint: 	git branch -m <name>
+2026-11-09T11:59:14.1594112Z hint:
+2026-11-09T11:59:14.1594614Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-11-09T11:59:14.1595436Z Initialized empty Git repository in /home/runner/work/project-infinity/project-infinity/.git/
+2026-11-09T11:59:14.1607035Z [command]/usr/bin/git remote add origin https://github.com/mahfouzhassine8-ops/project-infinity
+2026-11-09T11:59:14.1632591Z ##[endgroup]
+2026-11-09T11:59:14.1633152Z ##[group]Disabling automatic garbage collection
+2026-11-09T11:59:14.1636640Z [command]/usr/bin/git config --local gc.auto 0
+2026-11-09T11:59:14.1666322Z ##[endgroup]
+2026-11-09T11:59:14.1672091Z ##[group]Setting up auth
+2026-11-09T11:59:14.1672671Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-09T11:59:14.1703496Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-09T11:59:14.2053382Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-09T11:59:14.2106857Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-09T11:59:14.2352295Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-09T11:59:14.2385950Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-09T11:59:14.2605646Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-11-09T11:59:14.2645564Z ##[endgroup]
+2026-11-09T11:59:14.2645957Z ##[group]Fetching the repository
+2026-11-09T11:59:14.2654166Z [command]/usr/bin/git -c protocol.version=2 fetch --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/*
+2026-11-09T11:59:19.1400531Z From https://github.com/mahfouzhassine8-ops/project-infinity
+2026-11-09T11:59:19.1401544Z  * [new branch]        audit-cobra-2103267-display-all-modes-20260930 -> origin/audit-cobra-2103267-display-all-modes-20260930
+2026-11-09T11:59:19.1402727Z  * [new branch]        audit-cobra-2103278-watch-ambient-lock-20260930 -> origin/audit-cobra-2103278-watch-ambient-lock-20260930
+2026-11-09T11:59:19.1404168Z  * [new branch]        audit-infinity-mobile-whole-system-20261001 -> origin/audit-infinity-mobile-whole-system-20261001
+2026-11-09T11:59:19.1405205Z  * [new branch]        audit/infinity-2103377-addon-grid-20261014 -> origin/audit/infinity-2103377-addon-grid-20261014
+2026-11-09T11:59:19.1406062Z  * [new branch]        baseline/infinity-2103377-rc5 -> origin/baseline/infinity-2103377-rc5
+2026-11-09T11:59:19.1406946Z  * [new branch]        candidate-cobra-2103276-whole-ui-ambient -> origin/candidate-cobra-2103276-whole-ui-ambient
+2026-11-09T11:59:19.1407934Z  * [new branch]        candidate-cobra-2103277-mini-player-fill -> origin/candidate-cobra-2103277-mini-player-fill
+2026-11-09T11:59:19.1408906Z  * [new branch]        candidate-cobra-2103278-watch-ambient -> origin/candidate-cobra-2103278-watch-ambient
+2026-11-09T11:59:19.1409979Z  * [new branch]        candidate-cobra-2103279-end-to-end -> origin/candidate-cobra-2103279-end-to-end
+2026-11-09T11:59:19.1410870Z  * [new branch]        candidate-cobra-2103280-audit-followup -> origin/candidate-cobra-2103280-audit-followup
+2026-11-09T11:59:19.1411900Z  * [new branch]        candidate-cobra-2103281-remaining-audit -> origin/candidate-cobra-2103281-remaining-audit
+2026-11-09T11:59:19.1412760Z  * [new branch]        candidate-cobra-pro-sports-2103307 -> origin/candidate-cobra-pro-sports-2103307
+2026-11-09T11:59:19.1413489Z  * [new branch]        candidate-infinity-1.0.5.177-native-ambient-warmup-repair -> origin/candidate-infinity-1.0.5.177-native-ambient-warmup-repair
+2026-11-09T11:59:19.1414411Z  * [new branch]        candidate-infinity-2103283-mediacodec-surface-ambient -> origin/candidate-infinity-2103283-mediacodec-surface-ambient
+2026-11-09T11:59:19.1415203Z  * [new branch]        candidate-infinity-2103284-ambient-surface-repair -> origin/candidate-infinity-2103284-ambient-surface-repair
+2026-11-09T11:59:19.1415897Z  * [new branch]        candidate-infinity-2103285-native-fd-recovery -> origin/candidate-infinity-2103285-native-fd-recovery
+2026-11-09T11:59:19.1416727Z  * [new branch]        candidate-infinity-2103286-chooser-responsive-longpress-repair -> origin/candidate-infinity-2103286-chooser-responsive-longpress-repair
+2026-11-09T11:59:19.1417546Z  * [new branch]        candidate-infinity-2103287-natural-window-resize -> origin/candidate-infinity-2103287-natural-window-resize
+2026-11-09T11:59:19.1418236Z  * [new branch]        candidate-infinity-2103288-evidence-first-health -> origin/candidate-infinity-2103288-evidence-first-health
+2026-11-09T11:59:19.1418892Z  * [new branch]        candidate-infinity-2103289-trace-hardening -> origin/candidate-infinity-2103289-trace-hardening
+2026-11-09T11:59:19.1420696Z  * [new branch]        candidate-infinity-2103290-native-responsive-layout -> origin/candidate-infinity-2103290-native-responsive-layout
+2026-11-09T11:59:19.1421998Z  * [new branch]        candidate-infinity-2103291-inplace-responsive-reflow -> origin/candidate-infinity-2103291-inplace-responsive-reflow
+2026-11-09T11:59:19.1423058Z  * [new branch]        candidate-infinity-2103291-native-fast -> origin/candidate-infinity-2103291-native-fast
+2026-11-09T11:59:19.1423985Z  * [new branch]        candidate-infinity-2103292-resume-hub -> origin/candidate-infinity-2103292-resume-hub
+2026-11-09T11:59:19.1424961Z  * [new branch]        candidate-infinity-2103293-fold-unification -> origin/candidate-infinity-2103293-fold-unification
+2026-11-09T11:59:19.1425921Z  * [new branch]        candidate-infinity-2103294-text-reflow -> origin/candidate-infinity-2103294-text-reflow
+2026-11-09T11:59:19.1426874Z  * [new branch]        candidate-infinity-2103295-window-input -> origin/candidate-infinity-2103295-window-input
+2026-11-09T11:59:19.1428235Z  * [new branch]        candidate-infinity-2103296-cosmic-chooser -> origin/candidate-infinity-2103296-cosmic-chooser
+2026-11-09T11:59:19.1429733Z  * [new branch]        candidate-infinity-2103297-cosmic-motion-lifecycle -> origin/candidate-infinity-2103297-cosmic-motion-lifecycle
+2026-11-09T11:59:19.1431204Z  * [new branch]        candidate-infinity-2103298-startup-reliability -> origin/candidate-infinity-2103298-startup-reliability
+2026-11-09T11:59:19.1432324Z  * [new branch]        candidate-infinity-2103299-graceful-exit-handoff -> origin/candidate-infinity-2103299-graceful-exit-handoff
+2026-11-09T11:59:19.1433583Z  * [new branch]        candidate-infinity-2103300-stale-main-task-relaunch -> origin/candidate-infinity-2103300-stale-main-task-relaunch
+2026-11-09T11:59:19.1434553Z  * [new branch]        candidate-infinity-2103301-weather-native-isolation -> origin/candidate-infinity-2103301-weather-native-isolation
+2026-11-09T11:59:19.1435330Z  * [new branch]        candidate-infinity-2103302-chooser-weather-snapshot -> origin/candidate-infinity-2103302-chooser-weather-snapshot
+2026-11-09T11:59:19.1436011Z  * [new branch]        candidate-infinity-2103303-e2e-repair -> origin/candidate-infinity-2103303-e2e-repair
+2026-11-09T11:59:19.1436740Z  * [new branch]        candidate-infinity-native-video-ambient-from-2103281 -> origin/candidate-infinity-native-video-ambient-from-2103281
+2026-11-09T11:59:19.1437672Z  * [new branch]        candidate-infinity-native-video-ambient-settings-drawer-20261001 -> origin/candidate-infinity-native-video-ambient-settings-drawer-20261001
+2026-11-09T11:59:19.1438579Z  * [new branch]        checkpoint/infinity-preview-2103451-freeze-20261103 -> origin/checkpoint/infinity-preview-2103451-freeze-20261103
+2026-11-09T11:59:19.1439604Z  * [new branch]        ci/infinity-462-keyboard-build-verified-20261107 -> origin/ci/infinity-462-keyboard-build-verified-20261107
+2026-11-09T11:59:19.1440722Z  * [new branch]        ci/infinity-original-signer-reference-20261107 -> origin/ci/infinity-original-signer-reference-20261107
+2026-11-09T11:59:19.1441732Z  * [new branch]        ci/infinity-search-86d5b5e2-host-20261107 -> origin/ci/infinity-search-86d5b5e2-host-20261107
+2026-11-09T11:59:19.1442813Z  * [new branch]        ci/infinity462-keyboard-full-engine-unreleased-20261107 -> origin/ci/infinity462-keyboard-full-engine-unreleased-20261107
+2026-11-09T11:59:19.1443777Z  * [new branch]        cobra-2103180-theme-recovery -> origin/cobra-2103180-theme-recovery
+2026-11-09T11:59:19.1444670Z  * [new branch]        cobra-approved-mockups-reference-20261031 -> origin/cobra-approved-mockups-reference-20261031
+2026-11-09T11:59:19.1445517Z  * [new branch]        cobra-liquid-glass-theme-v1 -> origin/cobra-liquid-glass-theme-v1
+2026-11-09T11:59:19.1446657Z  * [new branch]        design/infinity-preview-2103447-cinematic-controls-approved-20261102 -> origin/design/infinity-preview-2103447-cinematic-controls-approved-20261102
+2026-11-09T11:59:19.1448573Z  * [new branch]        design/infinity-preview-2103450-fullscreen-display-approved-20261102 -> origin/design/infinity-preview-2103450-fullscreen-display-approved-20261102
+2026-11-09T11:59:19.1450714Z  * [new branch]        design/infinity-shared-media-browser-visual-lock-20261104 -> origin/design/infinity-shared-media-browser-visual-lock-20261104
+2026-11-09T11:59:19.1451976Z  * [new branch]        diagnostic/infinity-join-target-2103338 -> origin/diagnostic/infinity-join-target-2103338
+2026-11-09T11:59:19.1453135Z  * [new branch]        diagnostics/provider-inspector-download-20261104 -> origin/diagnostics/provider-inspector-download-20261104
+2026-11-09T11:59:19.1454213Z  * [new branch]        experiment/dual-infinity-2103368-g0 -> origin/experiment/dual-infinity-2103368-g0
+2026-11-09T11:59:19.1455300Z  * [new branch]        experiment/infinity-2103377-hardstop-feasibility -> origin/experiment/infinity-2103377-hardstop-feasibility
+2026-11-09T11:59:19.1456830Z  * [new branch]        experiment/infinity-2103377-python311-shutdown-ordering-test-20261015 -> origin/experiment/infinity-2103377-python311-shutdown-ordering-test-20261015
+2026-11-09T11:59:19.1458013Z  * [new branch]        fix-workflow-restore    -> origin/fix-workflow-restore
+2026-11-09T11:59:19.1458745Z  * [new branch]        g2-candidate-6-fresh-sign -> origin/g2-candidate-6-fresh-sign
+2026-11-09T11:59:19.1459880Z  * [new branch]        g2-candidate-6-mapping  -> origin/g2-candidate-6-mapping
+2026-11-09T11:59:19.1460586Z  * [new branch]        g2-candidate6-on-working5 -> origin/g2-candidate6-on-working5
+2026-11-09T11:59:19.1461615Z  * [new branch]        handoff/infinity-final-closure-scope-freeze-20261025 -> origin/handoff/infinity-final-closure-scope-freeze-20261025
+2026-11-09T11:59:19.1462676Z  * [new branch]        infinity-1.0.10-final-polish -> origin/infinity-1.0.10-final-polish
+2026-11-09T11:59:19.1463567Z  * [new branch]        infinity-1.0.5-candidate-1-diggz-test -> origin/infinity-1.0.5-candidate-1-diggz-test
+2026-11-09T11:59:19.1464597Z  * [new branch]        infinity-1.0.8-audio-policy-integration -> origin/infinity-1.0.8-audio-policy-integration
+2026-11-09T11:59:19.1465492Z  * [new branch]        infinity-1.0.8-deep-rebrand -> origin/infinity-1.0.8-deep-rebrand
+2026-11-09T11:59:19.1466449Z  * [new branch]        infinity-1.0.8-deep-rebrand-audio-cumulative -> origin/infinity-1.0.8-deep-rebrand-audio-cumulative
+2026-11-09T11:59:19.1467417Z  * [new branch]        infinity-1.0.8-high-refresh -> origin/infinity-1.0.8-high-refresh
+2026-11-09T11:59:19.1468195Z  * [new branch]        infinity-1.0.8-native-media -> origin/infinity-1.0.8-native-media
+2026-11-09T11:59:19.1469097Z  * [new branch]        infinity-1.0.8-responsive-bridge-v5 -> origin/infinity-1.0.8-responsive-bridge-v5
+2026-11-09T11:59:19.1470295Z  * [new branch]        infinity-1.0.9-cobra-rotation-handoff-c2 -> origin/infinity-1.0.9-cobra-rotation-handoff-c2
+2026-11-09T11:59:19.1471174Z  * [new branch]        infinity-1.0.9-deep-cleanup -> origin/infinity-1.0.9-deep-cleanup
+2026-11-09T11:59:19.1471911Z  * [new branch]        infinity-1.0.9-experience -> origin/infinity-1.0.9-experience
+2026-11-09T11:59:19.1472595Z  * [new branch]        infinity-1.0.9-live     -> origin/infinity-1.0.9-live
+2026-11-09T11:59:19.1473451Z  * [new branch]        infinity-1.0.9-native-responsive-reflow -> origin/infinity-1.0.9-native-responsive-reflow
+2026-11-09T11:59:19.1474644Z  * [new branch]        infinity-1.0.9-native-responsive-reflow-cumulative -> origin/infinity-1.0.9-native-responsive-reflow-cumulative
+2026-11-09T11:59:19.1475711Z  * [new branch]        infinity-1.0.9-player-rotation -> origin/infinity-1.0.9-player-rotation
+2026-11-09T11:59:19.1476684Z  * [new branch]        infinity-2103159-experience-zip-bridge-rc1 -> origin/infinity-2103159-experience-zip-bridge-rc1
+2026-11-09T11:59:19.1477702Z  * [new branch]        infinity-2103254-shipping-audit-rc1 -> origin/infinity-2103254-shipping-audit-rc1
+2026-11-09T11:59:19.1478643Z  * [new branch]        infinity-2103255-shipping-lifecycle-rc2 -> origin/infinity-2103255-shipping-lifecycle-rc2
+2026-11-09T11:59:19.1480092Z  * [new branch]        infinity-2103256-experience-features-1-9-rc1 -> origin/infinity-2103256-experience-features-1-9-rc1
+2026-11-09T11:59:19.1481160Z  * [new branch]        infinity-2103257-glass-chooser-light-dark-rc1 -> origin/infinity-2103257-glass-chooser-light-dark-rc1
+2026-11-09T11:59:19.1482244Z  * [new branch]        infinity-2103258-glass-settings-light-dark-rc1 -> origin/infinity-2103258-glass-settings-light-dark-rc1
+2026-11-09T11:59:19.1483394Z  * [new branch]        infinity-2103259-options-health-glass-finish-rc1 -> origin/infinity-2103259-options-health-glass-finish-rc1
+2026-11-09T11:59:19.1484536Z  * [new branch]        infinity-2103260-recovery-fixed-chooser-rc1 -> origin/infinity-2103260-recovery-fixed-chooser-rc1
+2026-11-09T11:59:19.1485571Z  * [new branch]        infinity-2103261-pro-mode-focus-only-rc1 -> origin/infinity-2103261-pro-mode-focus-only-rc1
+2026-11-09T11:59:19.1486598Z  * [new branch]        infinity-2103262-pro-visual-correction-rc1 -> origin/infinity-2103262-pro-visual-correction-rc1
+2026-11-09T11:59:19.1487639Z  * [new branch]        infinity-2103263-pro-oled-light-polish-rc1 -> origin/infinity-2103263-pro-oled-light-polish-rc1
+2026-11-09T11:59:19.1488596Z  * [new branch]        infinity-2103264-pro-live-glass-rc1 -> origin/infinity-2103264-pro-live-glass-rc1
+2026-11-09T11:59:19.1489929Z  * [new branch]        infinity-2103265-phone-glass-polish-rc1 -> origin/infinity-2103265-phone-glass-polish-rc1
+2026-11-09T11:59:19.1490912Z  * [new branch]        infinity-2103266-ambient-glass-cinema-rc1 -> origin/infinity-2103266-ambient-glass-cinema-rc1
+2026-11-09T11:59:19.1491751Z  * [new branch]        infinity-6.4-appearance -> origin/infinity-6.4-appearance
+2026-11-09T11:59:19.1492415Z  * [new branch]        infinity-7.1-core-unified -> origin/infinity-7.1-core-unified
+2026-11-09T11:59:19.1493089Z  * [new branch]        infinity-android-first  -> origin/infinity-android-first
+2026-11-09T11:59:19.1493816Z  * [new branch]        infinity-auth-manager-010-rc1 -> origin/infinity-auth-manager-010-rc1
+2026-11-09T11:59:19.1494648Z  * [new branch]        infinity-background-controls-rc2 -> origin/infinity-background-controls-rc2
+2026-11-09T11:59:19.1495545Z  * [new branch]        infinity-cobra-2103150-iron-polish -> origin/infinity-cobra-2103150-iron-polish
+2026-11-09T11:59:19.1496587Z  * [new branch]        infinity-cobra-2103151-player-multiview-polish -> origin/infinity-cobra-2103151-player-multiview-polish
+2026-11-09T11:59:19.1497705Z  * [new branch]        infinity-cobra-2103152-player-reboot-lock -> origin/infinity-cobra-2103152-player-reboot-lock
+2026-11-09T11:59:19.1498819Z  * [new branch]        infinity-cobra-2103153-guide-player-refinement -> origin/infinity-cobra-2103153-guide-player-refinement
+2026-11-09T11:59:19.1500144Z  * [new branch]        infinity-cobra-2103153-guide-session-refinement -> origin/infinity-cobra-2103153-guide-session-refinement
+2026-11-09T11:59:19.1501245Z  * [new branch]        infinity-cobra-2103154-adaptive-five-modes -> origin/infinity-cobra-2103154-adaptive-five-modes
+2026-11-09T11:59:19.1502386Z  * [new branch]        infinity-cobra-2103154-adaptive-view-identities -> origin/infinity-cobra-2103154-adaptive-view-identities
+2026-11-09T11:59:19.1503514Z  * [new branch]        infinity-cobra-2103156-diagnostics-audit-rc1 -> origin/infinity-cobra-2103156-diagnostics-audit-rc1
+2026-11-09T11:59:19.1504759Z  * [new branch]        infinity-cobra-2103157-tv-navigation-appearance-rc1 -> origin/infinity-cobra-2103157-tv-navigation-appearance-rc1
+2026-11-09T11:59:19.1506028Z  * [new branch]        infinity-cobra-2103158-health-playback-polish-rc1 -> origin/infinity-cobra-2103158-health-playback-polish-rc1
+2026-11-09T11:59:19.1507324Z  * [new branch]        infinity-cobra-2103158-health-preferences-recovery-rc1 -> origin/infinity-cobra-2103158-health-preferences-recovery-rc1
+2026-11-09T11:59:19.1508623Z  * [new branch]        infinity-cobra-2103160-visual-theme-runtime-v2-rc1 -> origin/infinity-cobra-2103160-visual-theme-runtime-v2-rc1
+2026-11-09T11:59:19.1510533Z  * [new branch]        infinity-cobra-2103161-theme-management-background-mode-safe-area-rc1 -> origin/infinity-cobra-2103161-theme-management-background-mode-safe-area-rc1
+2026-11-09T11:59:19.1512164Z  * [new branch]        infinity-cobra-2103162-theme-switch-player-rotation-rc1 -> origin/infinity-cobra-2103162-theme-switch-player-rotation-rc1
+2026-11-09T11:59:19.1513530Z  * [new branch]        infinity-cobra-2103163-candidate14-five-fixes-rc1 -> origin/infinity-cobra-2103163-candidate14-five-fixes-rc1
+2026-11-09T11:59:19.1514685Z  * [new branch]        infinity-cobra-2103164-playback-stability-rc1 -> origin/infinity-cobra-2103164-playback-stability-rc1
+2026-11-09T11:59:19.1515885Z  * [new branch]        infinity-cobra-2103164-player-settings-pip-reentry-rc1 -> origin/infinity-cobra-2103164-player-settings-pip-reentry-rc1
+2026-11-09T11:59:19.1517344Z  * [new branch]        infinity-cobra-2103164-pythoninvoker-threadstate-repair-rc1 -> origin/infinity-cobra-2103164-pythoninvoker-threadstate-repair-rc1
+2026-11-09T11:59:19.1518996Z  * [new branch]        infinity-cobra-2103165-inner-insets-pip-return-player-consistency-rc1 -> origin/infinity-cobra-2103165-inner-insets-pip-return-player-consistency-rc1
+2026-11-09T11:59:19.1520703Z  * [new branch]        infinity-cobra-2103166-end-to-end-ui-lifecycle-audit-rc1 -> origin/infinity-cobra-2103166-end-to-end-ui-lifecycle-audit-rc1
+2026-11-09T11:59:19.1522187Z  * [new branch]        infinity-cobra-2103167-status-bar-restore-rc1 -> origin/infinity-cobra-2103167-status-bar-restore-rc1
+2026-11-09T11:59:19.1523358Z  * [new branch]        infinity-cobra-2103168-status-bar-surface-match-rc1 -> origin/infinity-cobra-2103168-status-bar-surface-match-rc1
+2026-11-09T11:59:19.1524709Z  * [new branch]        infinity-cobra-2103168-statusbar-pythoninvoker-stability-rc1 -> origin/infinity-cobra-2103168-statusbar-pythoninvoker-stability-rc1
+2026-11-09T11:59:19.1526078Z  * [new branch]        infinity-cobra-2103169-status-bar-edge-to-edge-rc1 -> origin/infinity-cobra-2103169-status-bar-edge-to-edge-rc1
+2026-11-09T11:59:19.1527352Z  * [new branch]        infinity-cobra-2103169-statusbar-native-stability-rc1 -> origin/infinity-cobra-2103169-statusbar-native-stability-rc1
+2026-11-09T11:59:19.1528625Z  * [new branch]        infinity-cobra-2103170-statusbar-edge-to-edge-rc1 -> origin/infinity-cobra-2103170-statusbar-edge-to-edge-rc1
+2026-11-09T11:59:19.1530060Z  * [new branch]        infinity-cobra-2103171-chooser-statusbar-surface-rc1 -> origin/infinity-cobra-2103171-chooser-statusbar-surface-rc1
+2026-11-09T11:59:19.1531292Z  * [new branch]        infinity-cobra-2103173-buffering-stability-rc1 -> origin/infinity-cobra-2103173-buffering-stability-rc1
+2026-11-09T11:59:19.1532529Z  * [new branch]        infinity-cobra-2103174-playback-buffer-regression-rc1 -> origin/infinity-cobra-2103174-playback-buffer-regression-rc1
+2026-11-09T11:59:19.1533881Z  * [new branch]        infinity-cobra-2103175-fullscreen-background-safe-content-rc1 -> origin/infinity-cobra-2103175-fullscreen-background-safe-content-rc1
+2026-11-09T11:59:19.1535205Z  * [new branch]        infinity-cobra-2103176-live-rewind-catchup-rc1 -> origin/infinity-cobra-2103176-live-rewind-catchup-rc1
+2026-11-09T11:59:19.1536560Z  * [new branch]        infinity-cobra-2103177-feature-freeze-performance-timeshift-rc1 -> origin/infinity-cobra-2103177-feature-freeze-performance-timeshift-rc1
+2026-11-09T11:59:19.1537973Z  * [new branch]        infinity-cobra-2103177-final-feature-freeze-rc1 -> origin/infinity-cobra-2103177-final-feature-freeze-rc1
+2026-11-09T11:59:19.1539484Z  * [new branch]        infinity-cobra-2103178-timeshift-miniplayer-audit-repair-rc1 -> origin/infinity-cobra-2103178-timeshift-miniplayer-audit-repair-rc1
+2026-11-09T11:59:19.1540834Z  * [new branch]        infinity-cobra-2103179-buffer-resilience-rc1 -> origin/infinity-cobra-2103179-buffer-resilience-rc1
+2026-11-09T11:59:19.1541995Z  * [new branch]        infinity-cobra-2103180-playback-finalization-rc1 -> origin/infinity-cobra-2103180-playback-finalization-rc1
+2026-11-09T11:59:19.1543528Z  * [new branch]        infinity-cobra-2103181-timeshift-transport-integrity-rc1 -> origin/infinity-cobra-2103181-timeshift-transport-integrity-rc1
+2026-11-09T11:59:19.1544913Z  * [new branch]        infinity-cobra-2103182-timeshift-startup-reserve-rc1 -> origin/infinity-cobra-2103182-timeshift-startup-reserve-rc1
+2026-11-09T11:59:19.1546127Z  * [new branch]        infinity-cobra-2103183-network-family-control-rc1 -> origin/infinity-cobra-2103183-network-family-control-rc1
+2026-11-09T11:59:19.1547360Z  * [new branch]        infinity-cobra-2103184-stream-network-optimization-rc1 -> origin/infinity-cobra-2103184-stream-network-optimization-rc1
+2026-11-09T11:59:19.1548629Z  * [new branch]        infinity-cobra-2103185-live-diagnostics-freeze-rc1 -> origin/infinity-cobra-2103185-live-diagnostics-freeze-rc1
+2026-11-09T11:59:19.1550092Z  * [new branch]        infinity-cobra-2103186-stream-cadence-fingerprint-rc1 -> origin/infinity-cobra-2103186-stream-cadence-fingerprint-rc1
+2026-11-09T11:59:19.1551461Z  * [new branch]        infinity-cobra-2103187-ts-access-unit-compatibility-rc1 -> origin/infinity-cobra-2103187-ts-access-unit-compatibility-rc1
+2026-11-09T11:59:19.1552801Z  * [new branch]        infinity-cobra-2103188-ts-keyframe-compatibility-rc1 -> origin/infinity-cobra-2103188-ts-keyframe-compatibility-rc1
+2026-11-09T11:59:19.1554280Z  * [new branch]        infinity-cobra-2103189-ts-timeline-fingerprint-rc1 -> origin/infinity-cobra-2103189-ts-timeline-fingerprint-rc1
+2026-11-09T11:59:19.1555464Z  * [new branch]        infinity-cobra-2103190-ts-clock-normalization-rc1 -> origin/infinity-cobra-2103190-ts-clock-normalization-rc1
+2026-11-09T11:59:19.1556211Z  * [new branch]        infinity-cobra-2103191-provider-route-fingerprint-rc1 -> origin/infinity-cobra-2103191-provider-route-fingerprint-rc1
+2026-11-09T11:59:19.1556930Z  * [new branch]        infinity-cobra-2103192-provider-pace-reserve-rc1 -> origin/infinity-cobra-2103192-provider-pace-reserve-rc1
+2026-11-09T11:59:19.1557631Z  * [new branch]        infinity-cobra-2103193-source-manager-restore-rc1 -> origin/infinity-cobra-2103193-source-manager-restore-rc1
+2026-11-09T11:59:19.1558302Z  * [new branch]        infinity-cobra-2103194-fold-adaptive-aspect-rc1 -> origin/infinity-cobra-2103194-fold-adaptive-aspect-rc1
+2026-11-09T11:59:19.1559075Z  * [new branch]        infinity-cobra-2103195-presentation-polish-motion-audit-rc1 -> origin/infinity-cobra-2103195-presentation-polish-motion-audit-rc1
+2026-11-09T11:59:19.1560267Z  * [new branch]        infinity-cobra-2103195-tivimate-player-polish-audit-rc1 -> origin/infinity-cobra-2103195-tivimate-player-polish-audit-rc1
+2026-11-09T11:59:19.1561042Z  * [new branch]        infinity-cobra-2103196-original-player-settings-rc1 -> origin/infinity-cobra-2103196-original-player-settings-rc1
+2026-11-09T11:59:19.1562048Z  * [new branch]        infinity-cobra-2103197-original-player-menu-only-rc1 -> origin/infinity-cobra-2103197-original-player-menu-only-rc1
+2026-11-09T11:59:19.1563482Z  * [new branch]        infinity-cobra-2103198-complete-product-audit-polish-stability-rc1 -> origin/infinity-cobra-2103198-complete-product-audit-polish-stability-rc1
+2026-11-09T11:59:19.1564758Z  * [new branch]        infinity-cobra-2103198-normal-rollback-rc1 -> origin/infinity-cobra-2103198-normal-rollback-rc1
+2026-11-09T11:59:19.1565823Z  * [new branch]        infinity-cobra-2103199-power-audit-repairs-rc1 -> origin/infinity-cobra-2103199-power-audit-repairs-rc1
+2026-11-09T11:59:19.1566922Z  * [new branch]        infinity-cobra-2103200-provider-boundary-rc1 -> origin/infinity-cobra-2103200-provider-boundary-rc1
+2026-11-09T11:59:19.1567954Z  * [new branch]        infinity-cobra-2103201-player-polish-rc1 -> origin/infinity-cobra-2103201-player-polish-rc1
+2026-11-09T11:59:19.1568983Z  * [new branch]        infinity-cobra-2103202-player-refinement-rc1 -> origin/infinity-cobra-2103202-player-refinement-rc1
+2026-11-09T11:59:19.1570085Z  * [new branch]        infinity-cobra-2103203-pip-call-rc1 -> origin/infinity-cobra-2103203-pip-call-rc1
+2026-11-09T11:59:19.1571126Z  * [new branch]        infinity-cobra-2103204-oled-blue-rc1 -> origin/infinity-cobra-2103204-oled-blue-rc1
+2026-11-09T11:59:19.1572060Z  * [new branch]        infinity-cobra-2103205-final-features-rc1 -> origin/infinity-cobra-2103205-final-features-rc1
+2026-11-09T11:59:19.1572651Z  * [new branch]        infinity-cobra-2103206-media-calls-rc1 -> origin/infinity-cobra-2103206-media-calls-rc1
+2026-11-09T11:59:19.1573261Z  * [new branch]        infinity-cobra-2103207-feature-refinement-rc1 -> origin/infinity-cobra-2103207-feature-refinement-rc1
+2026-11-09T11:59:19.1573899Z  * [new branch]        infinity-cobra-2103208-integration-polish-rc1 -> origin/infinity-cobra-2103208-integration-polish-rc1
+2026-11-09T11:59:19.1574527Z  * [new branch]        infinity-cobra-2103209-package-recovery-rc1 -> origin/infinity-cobra-2103209-package-recovery-rc1
+2026-11-09T11:59:19.1575188Z  * [new branch]        infinity-cobra-2103209-python311-gil-stability-rc1 -> origin/infinity-cobra-2103209-python311-gil-stability-rc1
+2026-11-09T11:59:19.1575861Z  * [new branch]        infinity-cobra-2103210-media-library-health-rc1 -> origin/infinity-cobra-2103210-media-library-health-rc1
+2026-11-09T11:59:19.1576565Z  * [new branch]        infinity-cobra-2103211-library-health-refinement-rc1 -> origin/infinity-cobra-2103211-library-health-refinement-rc1
+2026-11-09T11:59:19.1577371Z  * [new branch]        infinity-cobra-2103212-health-media-trim-rc1 -> origin/infinity-cobra-2103212-health-media-trim-rc1
+2026-11-09T11:59:19.1578109Z  * [new branch]        infinity-cobra-2103213-live-blue-ambient-settings-return-rc1 -> origin/infinity-cobra-2103213-live-blue-ambient-settings-return-rc1
+2026-11-09T11:59:19.1579379Z  * [new branch]        infinity-cobra-2103214-media-details-final-rc1 -> origin/infinity-cobra-2103214-media-details-final-rc1
+2026-11-09T11:59:19.1580598Z  * [new branch]        infinity-cobra-2103215-smart-return-experience-drawer-rc1 -> origin/infinity-cobra-2103215-smart-return-experience-drawer-rc1
+2026-11-09T11:59:19.1581602Z  * [new branch]        infinity-cobra-2103216-smart-return-experience-display-rc1 -> origin/infinity-cobra-2103216-smart-return-experience-display-rc1
+2026-11-09T11:59:19.1582346Z  * [new branch]        infinity-cobra-2103217-media-return-context-rc1 -> origin/infinity-cobra-2103217-media-return-context-rc1
+2026-11-09T11:59:19.1583004Z  * [new branch]        infinity-cobra-2103218-onn4kpro-tv-armv7-rc1 -> origin/infinity-cobra-2103218-onn4kpro-tv-armv7-rc1
+2026-11-09T11:59:19.1583643Z  * [new branch]        infinity-cobra-2103219-active-section-owner-rc1 -> origin/infinity-cobra-2103219-active-section-owner-rc1
+2026-11-09T11:59:19.1584298Z  * [new branch]        infinity-cobra-2103219-onn4kpro-tv-remote-rc2 -> origin/infinity-cobra-2103219-onn4kpro-tv-remote-rc2
+2026-11-09T11:59:19.1584968Z  * [new branch]        infinity-cobra-2103220-active-section-lifecycle-rc1 -> origin/infinity-cobra-2103220-active-section-lifecycle-rc1
+2026-11-09T11:59:19.1585668Z  * [new branch]        infinity-cobra-2103220-onn4kpro-tv-grid-only-rc3 -> origin/infinity-cobra-2103220-onn4kpro-tv-grid-only-rc3
+2026-11-09T11:59:19.1586310Z  * [new branch]        infinity-cobra-2103221-chooser-options-ui-rc1 -> origin/infinity-cobra-2103221-chooser-options-ui-rc1
+2026-11-09T11:59:19.1586970Z  * [new branch]        infinity-cobra-2103221-drawer-owner-surgical-rc1 -> origin/infinity-cobra-2103221-drawer-owner-surgical-rc1
+2026-11-09T11:59:19.1587646Z  * [new branch]        infinity-cobra-2103221-drawer-owner-ui-restore-rc1 -> origin/infinity-cobra-2103221-drawer-owner-ui-restore-rc1
+2026-11-09T11:59:19.1588323Z  * [new branch]        infinity-cobra-2103221-onn4kpro-tv-remote-ui-rc4 -> origin/infinity-cobra-2103221-onn4kpro-tv-remote-ui-rc4
+2026-11-09T11:59:19.1589500Z  * [new branch]        infinity-cobra-2103221-options-ui-owner-guard-rc1 -> origin/infinity-cobra-2103221-options-ui-owner-guard-rc1
+2026-11-09T11:59:19.1590752Z  * [new branch]        infinity-cobra-2103221-owner-chooser-ui-rc1 -> origin/infinity-cobra-2103221-owner-chooser-ui-rc1
+2026-11-09T11:59:19.1591861Z  * [new branch]        infinity-cobra-2103222-experience-options-ui-rc1 -> origin/infinity-cobra-2103222-experience-options-ui-rc1
+2026-11-09T11:59:19.1593130Z  * [new branch]        infinity-cobra-2103222-onn4kpro-tv-player-multiview-fit-rc5 -> origin/infinity-cobra-2103222-onn4kpro-tv-player-multiview-fit-rc5
+2026-11-09T11:59:19.1594442Z  * [new branch]        infinity-cobra-2103223-movie-details-trailers-rc1 -> origin/infinity-cobra-2103223-movie-details-trailers-rc1
+2026-11-09T11:59:19.1595590Z  * [new branch]        infinity-cobra-2103223-onn4kpro-tv-hardening-rc6 -> origin/infinity-cobra-2103223-onn4kpro-tv-hardening-rc6
+2026-11-09T11:59:19.1596986Z  * [new branch]        infinity-cobra-2103224-onn4kpro-tv-native-remote-architecture-rc7 -> origin/infinity-cobra-2103224-onn4kpro-tv-native-remote-architecture-rc7
+2026-11-09T11:59:19.1598437Z  * [new branch]        infinity-cobra-2103224-tv-show-details-trailers-rc1 -> origin/infinity-cobra-2103224-tv-show-details-trailers-rc1
+2026-11-09T11:59:19.1599840Z  * [new branch]        infinity-cobra-2103225-onn4kpro-tv-handoff-focus-rc8 -> origin/infinity-cobra-2103225-onn4kpro-tv-handoff-focus-rc8
+2026-11-09T11:59:19.1601121Z  * [new branch]        infinity-cobra-2103225-tv-show-typography-rc1 -> origin/infinity-cobra-2103225-tv-show-typography-rc1
+2026-11-09T11:59:19.1602512Z  * [new branch]        infinity-cobra-2103226-fold-fit-fill-audited-rc1 -> origin/infinity-cobra-2103226-fold-fit-fill-audited-rc1
+2026-11-09T11:59:19.1603765Z  * [new branch]        infinity-cobra-2103226-onn4kpro-tv-lightweight-live-rc9 -> origin/infinity-cobra-2103226-onn4kpro-tv-lightweight-live-rc9
+2026-11-09T11:59:19.1605153Z  * [new branch]        infinity-cobra-2103227-device-live-fold-multiview-audit-rc1 -> origin/infinity-cobra-2103227-device-live-fold-multiview-audit-rc1
+2026-11-09T11:59:19.1606436Z  * [new branch]        infinity-cobra-2103228-preservation-audit-rc1 -> origin/infinity-cobra-2103228-preservation-audit-rc1
+2026-11-09T11:59:19.1607604Z  * [new branch]        infinity-cobra-2103229-multiview-stability-fill-rc1 -> origin/infinity-cobra-2103229-multiview-stability-fill-rc1
+2026-11-09T11:59:19.1608859Z  * [new branch]        infinity-cobra-2103230-final-preservation-audit-rc1 -> origin/infinity-cobra-2103230-final-preservation-audit-rc1
+2026-11-09T11:59:19.1610176Z  * [new branch]        infinity-cobra-2103230-onn4kpro-tv-navigation-motion-rc10 -> origin/infinity-cobra-2103230-onn4kpro-tv-navigation-motion-rc10
+2026-11-09T11:59:19.1611016Z  * [new branch]        infinity-cobra-2103231-onn4kpro-tv-adaptive-ui-polish-rc11 -> origin/infinity-cobra-2103231-onn4kpro-tv-adaptive-ui-polish-rc11
+2026-11-09T11:59:19.1611822Z  * [new branch]        infinity-cobra-2103232-onn4kpro-tv-integrated-drawer-rc12 -> origin/infinity-cobra-2103232-onn4kpro-tv-integrated-drawer-rc12
+2026-11-09T11:59:19.1612585Z  * [new branch]        infinity-cobra-2103233-onn4kpro-tv-glass-system-rc13 -> origin/infinity-cobra-2103233-onn4kpro-tv-glass-system-rc13
+2026-11-09T11:59:19.1613412Z  * [new branch]        infinity-cobra-2103234-onn4kpro-tv-integrated-shell-playing-rc14 -> origin/infinity-cobra-2103234-onn4kpro-tv-integrated-shell-playing-rc14
+2026-11-09T11:59:19.1614219Z  * [new branch]        infinity-cobra-2103235-live-playing-indicator-rc1 -> origin/infinity-cobra-2103235-live-playing-indicator-rc1
+2026-11-09T11:59:19.1614929Z  * [new branch]        infinity-cobra-2103235-onn4kpro-tv-final-polish-rc15 -> origin/infinity-cobra-2103235-onn4kpro-tv-final-polish-rc15
+2026-11-09T11:59:19.1615654Z  * [new branch]        infinity-cobra-2103236-onn4kpro-tv-pulsing-dot-rc16 -> origin/infinity-cobra-2103236-onn4kpro-tv-pulsing-dot-rc16
+2026-11-09T11:59:19.1616692Z  * [new branch]        infinity-cobra-2103236-playing-indicator-all-views-rc1 -> origin/infinity-cobra-2103236-playing-indicator-all-views-rc1
+2026-11-09T11:59:19.1618375Z  * [new branch]        infinity-cobra-2103237-onn4kpro-tv-section-owner-player-cleanup-rc17 -> origin/infinity-cobra-2103237-onn4kpro-tv-section-owner-player-cleanup-rc17
+2026-11-09T11:59:19.1619499Z  * [new branch]        infinity-cobra-2103237-playing-dot-oled-micro-polish-rc1 -> origin/infinity-cobra-2103237-playing-dot-oled-micro-polish-rc1
+2026-11-09T11:59:19.1620347Z  * [new branch]        infinity-cobra-2103238-onn4kpro-tv-movies-shows-refinement-rc18 -> origin/infinity-cobra-2103238-onn4kpro-tv-movies-shows-refinement-rc18
+2026-11-09T11:59:19.1621232Z  * [new branch]        infinity-cobra-2103239-onn4kpro-tv-native-search-ui-polish-rc19 -> origin/infinity-cobra-2103239-onn4kpro-tv-native-search-ui-polish-rc19
+2026-11-09T11:59:19.1622089Z  * [new branch]        infinity-cobra-2103240-onn4kpro-tv-search-remote-hardening-rc20 -> origin/infinity-cobra-2103240-onn4kpro-tv-search-remote-hardening-rc20
+2026-11-09T11:59:19.1623007Z  * [new branch]        infinity-cobra-2103241-onn4kpro-tv-player-chrome-focus-stability-rc21 -> origin/infinity-cobra-2103241-onn4kpro-tv-player-chrome-focus-stability-rc21
+2026-11-09T11:59:19.1623905Z  * [new branch]        infinity-cobra-2103242-onn4kpro-tv-final-product-audit-rc22 -> origin/infinity-cobra-2103242-onn4kpro-tv-final-product-audit-rc22
+2026-11-09T11:59:19.1624726Z  * [new branch]        infinity-cobra-2103242-onn4kpro-tv-preservation-audit-rc22 -> origin/infinity-cobra-2103242-onn4kpro-tv-preservation-audit-rc22
+2026-11-09T11:59:19.1625654Z  * [new branch]        infinity-cobra-2103243-onn4kpro-tv-end-to-end-audit-rc23 -> origin/infinity-cobra-2103243-onn4kpro-tv-end-to-end-audit-rc23
+2026-11-09T11:59:19.1626380Z  * [new branch]        infinity-cobra-2103250-native-crash-forensics-rc1 -> origin/infinity-cobra-2103250-native-crash-forensics-rc1
+2026-11-09T11:59:19.1627064Z  * [new branch]        infinity-cobra-2103251-native-crash-forensics-rc2 -> origin/infinity-cobra-2103251-native-crash-forensics-rc2
+2026-11-09T11:59:19.1627722Z  * [new branch]        infinity-cobra-2103252-native-crash-forensics-rc3 -> origin/infinity-cobra-2103252-native-crash-forensics-rc3
+2026-11-09T11:59:19.1628394Z  * [new branch]        infinity-cobra-2103253-native-crash-forensics-rc4 -> origin/infinity-cobra-2103253-native-crash-forensics-rc4
+2026-11-09T11:59:19.1629462Z  * [new branch]        infinity-cobra-2103254-python-runtime-native-repair-rc1 -> origin/infinity-cobra-2103254-python-runtime-native-repair-rc1
+2026-11-09T11:59:19.1630678Z  * [new branch]        infinity-cobra-2103256-no-video-hold-menu-rc1 -> origin/infinity-cobra-2103256-no-video-hold-menu-rc1
+2026-11-09T11:59:19.1631780Z  * [new branch]        infinity-cobra-2103267-restore-playing-dot-rc1 -> origin/infinity-cobra-2103267-restore-playing-dot-rc1
+2026-11-09T11:59:19.1632889Z  * [new branch]        infinity-cobra-2103268-display-player-audit-rc1 -> origin/infinity-cobra-2103268-display-player-audit-rc1
+2026-11-09T11:59:19.1633940Z  * [new branch]        infinity-cobra-2103270-sports-hub-rc1 -> origin/infinity-cobra-2103270-sports-hub-rc1
+2026-11-09T11:59:19.1634887Z  * [new branch]        infinity-cobra-2103271-sports-data-rc1 -> origin/infinity-cobra-2103271-sports-data-rc1
+2026-11-09T11:59:19.1635626Z  * [new branch]        infinity-cobra-2103272-sports-polish-rc1 -> origin/infinity-cobra-2103272-sports-polish-rc1
+2026-11-09T11:59:19.1636390Z  * [new branch]        infinity-cobra-2103273-pro-sports-soccer-rc1 -> origin/infinity-cobra-2103273-pro-sports-soccer-rc1
+2026-11-09T11:59:19.1637480Z  * [new branch]        infinity-cobra-2103274-sports-hub-soccer-rc1 -> origin/infinity-cobra-2103274-sports-hub-soccer-rc1
+2026-11-09T11:59:19.1638622Z  * [new branch]        infinity-cobra-2103275-immersive-edge-ambient-rc1 -> origin/infinity-cobra-2103275-immersive-edge-ambient-rc1
+2026-11-09T11:59:19.1639587Z  * [new branch]        infinity-cobra-background-resume-rc1 -> origin/infinity-cobra-background-resume-rc1
+2026-11-09T11:59:19.1640201Z  * [new branch]        infinity-cobra-drawer-view-selector-20260917 -> origin/infinity-cobra-drawer-view-selector-20260917
+2026-11-09T11:59:19.1640913Z  * [new branch]        infinity-cobra-epg-repair-rc1 -> origin/infinity-cobra-epg-repair-rc1
+2026-11-09T11:59:19.1641689Z  * [new branch]        infinity-cobra-full-feature-candidate-2 -> origin/infinity-cobra-full-feature-candidate-2
+2026-11-09T11:59:19.1642809Z  * [new branch]        infinity-cobra-full-feature-candidate-2-extended-background -> origin/infinity-cobra-full-feature-candidate-2-extended-background
+2026-11-09T11:59:19.1643512Z  * [new branch]        infinity-cobra-legitimate-live -> origin/infinity-cobra-legitimate-live
+2026-11-09T11:59:19.1644033Z  * [new branch]        infinity-cobra-mobile-tv-guide-views -> origin/infinity-cobra-mobile-tv-guide-views
+2026-11-09T11:59:19.1644563Z  * [new branch]        infinity-cobra-post-2103148-polish -> origin/infinity-cobra-post-2103148-polish
+2026-11-09T11:59:19.1645129Z  * [new branch]        infinity-cobra-ui-runtime-rc1 -> origin/infinity-cobra-ui-runtime-rc1
+2026-11-09T11:59:19.1645711Z  * [new branch]        infinity-engine-1.0     -> origin/infinity-engine-1.0
+2026-11-09T11:59:19.1646391Z  * [new branch]        infinity-engine-1.0-build -> origin/infinity-engine-1.0-build
+2026-11-09T11:59:19.1647074Z  * [new branch]        infinity-engine-donor-v1 -> origin/infinity-engine-donor-v1
+2026-11-09T11:59:19.1647841Z  * [new branch]        infinity-hm-theme-203-audit-harness -> origin/infinity-hm-theme-203-audit-harness
+2026-11-09T11:59:19.1648850Z  * [new branch]        infinity-kodi-analysis-smoke -> origin/infinity-kodi-analysis-smoke
+2026-11-09T11:59:19.1649802Z  * [new branch]        infinity-kodi-candidate-stage-v1 -> origin/infinity-kodi-candidate-stage-v1
+2026-11-09T11:59:19.1650671Z  * [new branch]        infinity-kodi-upstream-toolkit-v1 -> origin/infinity-kodi-upstream-toolkit-v1
+2026-11-09T11:59:19.1651495Z  * [new branch]        infinity-lifecycle-repair-rc3 -> origin/infinity-lifecycle-repair-rc3
+2026-11-09T11:59:19.1652265Z  * [new branch]        infinity-live-app-within-app -> origin/infinity-live-app-within-app
+2026-11-09T11:59:19.1653092Z  * [new branch]        infinity-live-exoplayer-multiview -> origin/infinity-live-exoplayer-multiview
+2026-11-09T11:59:19.1653839Z  * [new branch]        infinity-live-multiview -> origin/infinity-live-multiview
+2026-11-09T11:59:19.1654531Z  * [new branch]        infinity-player-protection -> origin/infinity-player-protection
+2026-11-09T11:59:19.1655213Z  * [new branch]        infinity-rc3-cobra-async-lifecycle-fix -> origin/infinity-rc3-cobra-async-lifecycle-fix
+2026-11-09T11:59:19.1655812Z  * [new branch]        infinity-rc3-cobra-runtime-v3-install-fix -> origin/infinity-rc3-cobra-runtime-v3-install-fix
+2026-11-09T11:59:19.1656399Z  * [new branch]        infinity-responsive-window-2103269-rc1 -> origin/infinity-responsive-window-2103269-rc1
+2026-11-09T11:59:19.1656869Z  * [new branch]        infinity-stability-rc   -> origin/infinity-stability-rc
+2026-11-09T11:59:19.1657270Z  * [new branch]        infinity-theme-hook-audit -> origin/infinity-theme-hook-audit
+2026-11-09T11:59:19.1657736Z  * [new branch]        infinity-two-experience-live-shell -> origin/infinity-two-experience-live-shell
+2026-11-09T11:59:19.1658222Z  * [new branch]        infinity-ui-control-center -> origin/infinity-ui-control-center
+2026-11-09T11:59:19.1658687Z  * [new branch]        infinity-upstream-infrastructure -> origin/infinity-upstream-infrastructure
+2026-11-09T11:59:19.1659427Z  * [new branch]        lock-infinity-2103295-window-input-20261003 -> origin/lock-infinity-2103295-window-input-20261003
+2026-11-09T11:59:19.1660105Z  * [new branch]        lock/infinity-2103399-user-approved-baseline-20261021 -> origin/lock/infinity-2103399-user-approved-baseline-20261021
+2026-11-09T11:59:19.1660749Z  * [new branch]        lock/infinity-2103401-signed-qa-20261024 -> origin/lock/infinity-2103401-signed-qa-20261024
+2026-11-09T11:59:19.1661471Z  * [new branch]        lock/infinity-2103402-five-fold-passes-20261024 -> origin/lock/infinity-2103402-five-fold-passes-20261024
+2026-11-09T11:59:19.1662581Z  * [new branch]        lock/infinity-2103407-proven-passing-only-20261025 -> origin/lock/infinity-2103407-proven-passing-only-20261025
+2026-11-09T11:59:19.1663962Z  * [new branch]        lock/infinity-2103420-user-approved-baseline-20261026 -> origin/lock/infinity-2103420-user-approved-baseline-20261026
+2026-11-09T11:59:19.1664789Z  * [new branch]        lock/infinity-cobra-2103425-fold-approved-chooser-20261028 -> origin/lock/infinity-cobra-2103425-fold-approved-chooser-20261028
+2026-11-09T11:59:19.1665529Z  * [new branch]        lock/infinity-cobra-2103427-user-approved-20261028 -> origin/lock/infinity-cobra-2103427-user-approved-20261028
+2026-11-09T11:59:19.1666211Z  * [new branch]        lock/infinity-cobra-2103435-user-approved-20261031 -> origin/lock/infinity-cobra-2103435-user-approved-20261031
+2026-11-09T11:59:19.1666870Z  * [new branch]        lock/infinity-cobra-2103436-user-approved-20261031 -> origin/lock/infinity-cobra-2103436-user-approved-20261031
+2026-11-09T11:59:19.1667533Z  * [new branch]        lock/infinity-cobra-2103437-user-approved-20261031 -> origin/lock/infinity-cobra-2103437-user-approved-20261031
+2026-11-09T11:59:19.1668315Z  * [new branch]        lock/infinity-cobra-2103438-user-approved-pending-one-fix-20261031 -> origin/lock/infinity-cobra-2103438-user-approved-pending-one-fix-20261031
+2026-11-09T11:59:19.1669095Z  * [new branch]        lock/infinity-cobra-2103442-user-approved-20261101 -> origin/lock/infinity-cobra-2103442-user-approved-20261101
+2026-11-09T11:59:19.1670045Z  * [new branch]        lock/infinity-cobra-2103444-user-approved-20261101 -> origin/lock/infinity-cobra-2103444-user-approved-20261101
+2026-11-09T11:59:19.1670702Z  * [new branch]        lock/infinity-cobra-2103445-user-approved-20261101 -> origin/lock/infinity-cobra-2103445-user-approved-20261101
+2026-11-09T11:59:19.1671366Z  * [new branch]        lock/infinity-cobra-2103447-user-locked-20261102 -> origin/lock/infinity-cobra-2103447-user-locked-20261102
+2026-11-09T11:59:19.1672015Z  * [new branch]        lock/infinity-cobra-2103450-user-approved-20261102 -> origin/lock/infinity-cobra-2103450-user-approved-20261102
+2026-11-09T11:59:19.1672748Z  * [new branch]        lock/infinity-preview-2103447-cinematic-ui-design-20261102 -> origin/lock/infinity-preview-2103447-cinematic-ui-design-20261102
+2026-11-09T11:59:19.1673578Z  * [new branch]        lock/infinity-preview-2103450-fullscreen-display-design-20261102 -> origin/lock/infinity-preview-2103450-fullscreen-display-design-20261102
+2026-11-09T11:59:19.1674354Z  * [new branch]        lock/infinity-preview-2103451-user-frozen-20261103 -> origin/lock/infinity-preview-2103451-user-frozen-20261103
+2026-11-09T11:59:19.1675086Z  * [new branch]        locked-2103262-pro-visual-correction-passed -> origin/locked-2103262-pro-visual-correction-passed
+2026-11-09T11:59:19.1676148Z  * [new branch]        locked-2103263-pro-oled-light-polish-approved -> origin/locked-2103263-pro-oled-light-polish-approved
+2026-11-09T11:59:19.1677351Z  * [new branch]        locked-cobra-2103155-adaptive-views-epg-repair-rc1 -> origin/locked-cobra-2103155-adaptive-views-epg-repair-rc1
+2026-11-09T11:59:19.1678772Z  * [new branch]        locked-cobra-2103157-tv-navigation-appearance-diagnostics-epg-rc1 -> origin/locked-cobra-2103157-tv-navigation-appearance-diagnostics-epg-rc1
+2026-11-09T11:59:19.1680444Z  * [new branch]        locked-cobra-2103158-health-playback-polish-rc1 -> origin/locked-cobra-2103158-health-playback-polish-rc1
+2026-11-09T11:59:19.1681649Z  * [new branch]        locked-cobra-2103160-hm-theme-2.0.3-audited-refinement -> origin/locked-cobra-2103160-hm-theme-2.0.3-audited-refinement
+2026-11-09T11:59:19.1682900Z  * [new branch]        locked-cobra-2103161-theme-background-safe-area-passed -> origin/locked-cobra-2103161-theme-background-safe-area-passed
+2026-11-09T11:59:19.1684268Z  * [new branch]        locked-cobra-2103162-theme-switch-player-rotation-audited -> origin/locked-cobra-2103162-theme-switch-player-rotation-audited
+2026-11-09T11:59:19.1685554Z  * [new branch]        locked-cobra-2103164-playback-stability-passed -> origin/locked-cobra-2103164-playback-stability-passed
+2026-11-09T11:59:19.1687216Z  * [new branch]        locked-cobra-2103165-inner-insets-pip-return-player-consistency-passed -> origin/locked-cobra-2103165-inner-insets-pip-return-player-consistency-passed
+2026-11-09T11:59:19.1688597Z  * [new branch]        locked-cobra-2103166-end-to-end-ui-lifecycle-audit-passed -> origin/locked-cobra-2103166-end-to-end-ui-lifecycle-audit-passed
+2026-11-09T11:59:19.1689572Z  * [new branch]        locked-cobra-2103167-status-bar-restore-passed -> origin/locked-cobra-2103167-status-bar-restore-passed
+2026-11-09T11:59:19.1690271Z  * [new branch]        locked-cobra-2103168-pythoninvoker-native-crash-fix -> origin/locked-cobra-2103168-pythoninvoker-native-crash-fix
+2026-11-09T11:59:19.1690953Z  * [new branch]        locked-cobra-2103201-player-polish-20260921 -> origin/locked-cobra-2103201-player-polish-20260921
+2026-11-09T11:59:19.1691591Z  * [new branch]        locked-cobra-2103202-player-refinement-20260921 -> origin/locked-cobra-2103202-player-refinement-20260921
+2026-11-09T11:59:19.1692211Z  * [new branch]        locked-cobra-2103203-pip-call-20260921 -> origin/locked-cobra-2103203-pip-call-20260921
+2026-11-09T11:59:19.1692763Z  * [new branch]        locked-cobra-2103204-oled-blue-20260921 -> origin/locked-cobra-2103204-oled-blue-20260921
+2026-11-09T11:59:19.1693524Z  * [new branch]        locked-cobra-2103205-final-features-20260921 -> origin/locked-cobra-2103205-final-features-20260921
+2026-11-09T11:59:19.1694210Z  * [new branch]        locked-cobra-2103323-sports-live-user-approved-20261007 -> origin/locked-cobra-2103323-sports-live-user-approved-20261007
+2026-11-09T11:59:19.1695032Z  * [new branch]        locked-cobra-2103324-chooser-close-owner-user-approved-20261007 -> origin/locked-cobra-2103324-chooser-close-owner-user-approved-20261007
+2026-11-09T11:59:19.1695906Z  * [new branch]        locked-cobra-2103373-targeted-isolation-user-approved-20261012 -> origin/locked-cobra-2103373-targeted-isolation-user-approved-20261012
+2026-11-09T11:59:19.1696772Z  * [new branch]        locked-cobra-2103374-verified-deadweight-user-approved-20261012 -> origin/locked-cobra-2103374-verified-deadweight-user-approved-20261012
+2026-11-09T11:59:19.1697565Z  * [new branch]        locked-infinity-2103159-experience-zip-bridge-rc1 -> origin/locked-infinity-2103159-experience-zip-bridge-rc1
+2026-11-09T11:59:19.1698278Z  * [new branch]        locked-infinity-2103170-statusbar-edge-to-edge-run10 -> origin/locked-infinity-2103170-statusbar-edge-to-edge-run10
+2026-11-09T11:59:19.1699047Z  * [new branch]        locked-infinity-2103171-chooser-statusbar-surface-passed -> origin/locked-infinity-2103171-chooser-statusbar-surface-passed
+2026-11-09T11:59:19.1699993Z  * [new branch]        locked-infinity-2103255-shipping-audit-rc2-20260926 -> origin/locked-infinity-2103255-shipping-audit-rc2-20260926
+2026-11-09T11:59:19.1700627Z  * [new branch]        locked-infinity-2103265-phone-glass -> origin/locked-infinity-2103265-phone-glass
+2026-11-09T11:59:19.1701215Z  * [new branch]        locked-infinity-2103266-ambient-glass-cinema -> origin/locked-infinity-2103266-ambient-glass-cinema
+2026-11-09T11:59:19.1702089Z  * [new branch]        locked-infinity-2103282-native-ambient-settings-drawer-user-approved-20261001 -> origin/locked-infinity-2103282-native-ambient-settings-drawer-user-approved-20261001
+2026-11-09T11:59:19.1703065Z  * [new branch]        locked-infinity-2103282-native-ambient-user-approved-20261001 -> origin/locked-infinity-2103282-native-ambient-user-approved-20261001
+2026-11-09T11:59:19.1703834Z  * [new branch]        locked-infinity-2103291-inplace-responsive-reflow -> origin/locked-infinity-2103291-inplace-responsive-reflow
+2026-11-09T11:59:19.1704526Z  * [new branch]        locked-infinity-apk-2103376-user-passed-20261012 -> origin/locked-infinity-apk-2103376-user-passed-20261012
+2026-11-09T11:59:19.1705261Z  * [new branch]        locked-infinity-apk-2103377-test4-user-fold-base-20261016 -> origin/locked-infinity-apk-2103377-test4-user-fold-base-20261016
+2026-11-09T11:59:19.1706115Z  * [new branch]        locked-infinity-apk-2103384-user-passed-20261017 -> origin/locked-infinity-apk-2103384-user-passed-20261017
+2026-11-09T11:59:19.1706850Z  * [new branch]        locked-infinity-cobra-2103177-final-feature-freeze-passed -> origin/locked-infinity-cobra-2103177-final-feature-freeze-passed
+2026-11-09T11:59:19.1707658Z  * [new branch]        locked-infinity-cobra-2103211-library-native-health-passed -> origin/locked-infinity-cobra-2103211-library-native-health-passed
+2026-11-09T11:59:19.1708502Z  * [new branch]        locked-infinity-cobra-2103212-health-ambient-media-trim-passed -> origin/locked-infinity-cobra-2103212-health-ambient-media-trim-passed
+2026-11-09T11:59:19.1709581Z  * [new branch]        locked-infinity-cobra-2103213-live-blue-ambient-settings-return-passed -> origin/locked-infinity-cobra-2103213-live-blue-ambient-settings-return-passed
+2026-11-09T11:59:19.1710594Z  * [new branch]        locked-infinity-cobra-2103213-live-blue-ambient-settings-return-working -> origin/locked-infinity-cobra-2103213-live-blue-ambient-settings-return-working
+2026-11-09T11:59:19.1711482Z  * [new branch]        locked-infinity-cobra-2103214-media-details-final-passed -> origin/locked-infinity-cobra-2103214-media-details-final-passed
+2026-11-09T11:59:19.1712368Z  * [new branch]        locked-infinity-cobra-2103216-smart-return-experience-display-passed -> origin/locked-infinity-cobra-2103216-smart-return-experience-display-passed
+2026-11-09T11:59:19.1713388Z  * [new branch]        locked-infinity-cobra-2103217-media-return-context-current -> origin/locked-infinity-cobra-2103217-media-return-context-current
+2026-11-09T11:59:19.1714194Z  * [new branch]        locked-infinity-cobra-2103221-chooser-options-ui-passed -> origin/locked-infinity-cobra-2103221-chooser-options-ui-passed
+2026-11-09T11:59:19.1715007Z  * [new branch]        locked-infinity-cobra-2103221-drawer-owner-ui-restore-passed -> origin/locked-infinity-cobra-2103221-drawer-owner-ui-restore-passed
+2026-11-09T11:59:19.1715837Z  * [new branch]        locked-infinity-cobra-2103222-experience-options-ui-passed -> origin/locked-infinity-cobra-2103222-experience-options-ui-passed
+2026-11-09T11:59:19.1716685Z  * [new branch]        locked-infinity-cobra-2103223-movie-details-trailers-passed -> origin/locked-infinity-cobra-2103223-movie-details-trailers-passed
+2026-11-09T11:59:19.1717501Z  * [new branch]        locked-infinity-cobra-2103223-onn4kpro-tv-hardening-passed -> origin/locked-infinity-cobra-2103223-onn4kpro-tv-hardening-passed
+2026-11-09T11:59:19.1718338Z  * [new branch]        locked-infinity-cobra-2103224-movie-tv-details-trailers-passed -> origin/locked-infinity-cobra-2103224-movie-tv-details-trailers-passed
+2026-11-09T11:59:19.1719338Z  * [new branch]        locked-infinity-cobra-2103224-onn4kpro-tv-native-remote-passed -> origin/locked-infinity-cobra-2103224-onn4kpro-tv-native-remote-passed
+2026-11-09T11:59:19.1720205Z  * [new branch]        locked-infinity-cobra-2103225-onn4kpro-tv-handoff-focus-passed -> origin/locked-infinity-cobra-2103225-onn4kpro-tv-handoff-focus-passed
+2026-11-09T11:59:19.1721023Z  * [new branch]        locked-infinity-cobra-2103225-tv-show-typography-passed -> origin/locked-infinity-cobra-2103225-tv-show-typography-passed
+2026-11-09T11:59:19.1721860Z  * [new branch]        locked-infinity-cobra-2103227-device-live-fold-multiview-passed -> origin/locked-infinity-cobra-2103227-device-live-fold-multiview-passed
+2026-11-09T11:59:19.1722733Z  * [new branch]        locked-infinity-cobra-2103229-multiview-stability-fill-passed -> origin/locked-infinity-cobra-2103229-multiview-stability-fill-passed
+2026-11-09T11:59:19.1723641Z  * [new branch]        locked-infinity-cobra-2103230-onn4kpro-tv-navigation-motion-passed -> origin/locked-infinity-cobra-2103230-onn4kpro-tv-navigation-motion-passed
+2026-11-09T11:59:19.1724576Z  * [new branch]        locked-infinity-cobra-2103231-onn4kpro-tv-adaptive-ui-polish-passed -> origin/locked-infinity-cobra-2103231-onn4kpro-tv-adaptive-ui-polish-passed
+2026-11-09T11:59:19.1725620Z  * [new branch]        locked-infinity-cobra-2103232-onn4kpro-tv-integrated-drawer-passed -> origin/locked-infinity-cobra-2103232-onn4kpro-tv-integrated-drawer-passed
+2026-11-09T11:59:19.1726515Z  * [new branch]        locked-infinity-cobra-2103233-onn4kpro-tv-glass-system-passed -> origin/locked-infinity-cobra-2103233-onn4kpro-tv-glass-system-passed
+2026-11-09T11:59:19.1727461Z  * [new branch]        locked-infinity-cobra-2103234-onn4kpro-tv-integrated-shell-playing-passed -> origin/locked-infinity-cobra-2103234-onn4kpro-tv-integrated-shell-playing-passed
+2026-11-09T11:59:19.1728400Z  * [new branch]        locked-infinity-cobra-2103235-onn4kpro-tv-final-polish-passed -> origin/locked-infinity-cobra-2103235-onn4kpro-tv-final-polish-passed
+2026-11-09T11:59:19.1729372Z  * [new branch]        locked-infinity-cobra-2103236-onn4kpro-tv-pulsing-dot-passed -> origin/locked-infinity-cobra-2103236-onn4kpro-tv-pulsing-dot-passed
+2026-11-09T11:59:19.1730278Z  * [new branch]        locked-infinity-cobra-2103236-playing-indicator-all-views-passed -> origin/locked-infinity-cobra-2103236-playing-indicator-all-views-passed
+2026-11-09T11:59:19.1731252Z  * [new branch]        locked-infinity-cobra-2103237-onn4kpro-tv-section-owner-source-checkpoint -> origin/locked-infinity-cobra-2103237-onn4kpro-tv-section-owner-source-checkpoint
+2026-11-09T11:59:19.1732351Z  * [new branch]        locked-infinity-cobra-2103237-playing-dot-oled-micro-polish-passed -> origin/locked-infinity-cobra-2103237-playing-dot-oled-micro-polish-passed
+2026-11-09T11:59:19.1733326Z  * [new branch]        locked-infinity-cobra-2103240-onn4kpro-tv-search-remote-hardening-passed -> origin/locked-infinity-cobra-2103240-onn4kpro-tv-search-remote-hardening-passed
+2026-11-09T11:59:19.1734388Z  * [new branch]        locked-infinity-cobra-2103241-onn4kpro-tv-player-chrome-focus-stability-passed -> origin/locked-infinity-cobra-2103241-onn4kpro-tv-player-chrome-focus-stability-passed
+2026-11-09T11:59:19.1735436Z  * [new branch]        locked-infinity-cobra-2103242-onn4kpro-tv-final-product-audit-passed -> origin/locked-infinity-cobra-2103242-onn4kpro-tv-final-product-audit-passed
+2026-11-09T11:59:19.1736420Z  * [new branch]        locked-infinity-cobra-2103256-no-video-hold-menu-device-passed-20260926 -> origin/locked-infinity-cobra-2103256-no-video-hold-menu-device-passed-20260926
+2026-11-09T11:59:19.1737419Z  * [new branch]        locked-infinity-cobra-2103267-playing-dot-restore-device-passed-20260930 -> origin/locked-infinity-cobra-2103267-playing-dot-restore-device-passed-20260930
+2026-11-09T11:59:19.1738407Z  * [new branch]        locked-infinity-cobra-2103269-responsive-window-device-passed-20260930 -> origin/locked-infinity-cobra-2103269-responsive-window-device-passed-20260930
+2026-11-09T11:59:19.1739501Z  * [new branch]        locked-infinity-cobra-2103271-sports-data-device-passed-20260930 -> origin/locked-infinity-cobra-2103271-sports-data-device-passed-20260930
+2026-11-09T11:59:19.1740444Z  * [new branch]        locked-infinity-cobra-2103273-pro-sports-soccer-device-passed-20260930 -> origin/locked-infinity-cobra-2103273-pro-sports-soccer-device-passed-20260930
+2026-11-09T11:59:19.1741415Z  * [new branch]        locked-infinity-cobra-2103274-sports-hub-soccer-device-passed-20260930 -> origin/locked-infinity-cobra-2103274-sports-hub-soccer-device-passed-20260930
+2026-11-09T11:59:19.1742430Z  * [new branch]        locked-infinity-cobra-2103275-immersive-edge-ambient-device-passed-20260930 -> origin/locked-infinity-cobra-2103275-immersive-edge-ambient-device-passed-20260930
+2026-11-09T11:59:19.1743436Z  * [new branch]        locked-infinity-cobra-2103276-whole-ui-ambient-device-passed-20260930 -> origin/locked-infinity-cobra-2103276-whole-ui-ambient-device-passed-20260930
+2026-11-09T11:59:19.1744380Z  * [new branch]        locked-infinity-cobra-2103277-mini-player-fill-device-passed-20260930 -> origin/locked-infinity-cobra-2103277-mini-player-fill-device-passed-20260930
+2026-11-09T11:59:19.1762865Z  * [new branch]        locked-infinity-cobra-2103278-watch-ambient-user-approved-20260930 -> origin/locked-infinity-cobra-2103278-watch-ambient-user-approved-20260930
+2026-11-09T11:59:19.1764360Z  * [new branch]        locked-infinity-cobra-2103279-end-to-end-user-approved-20261001 -> origin/locked-infinity-cobra-2103279-end-to-end-user-approved-20261001
+2026-11-09T11:59:19.1765736Z  * [new branch]        locked-infinity-cobra-2103280-audit-followup-user-approved-20261001 -> origin/locked-infinity-cobra-2103280-audit-followup-user-approved-20261001
+2026-11-09T11:59:19.1767270Z  * [new branch]        locked-infinity-cobra-2103281-remaining-audit-user-approved-20261001 -> origin/locked-infinity-cobra-2103281-remaining-audit-user-approved-20261001
+2026-11-09T11:59:19.1768865Z  * [new branch]        locked-infinity-health-2.5.20-packaging-rc1-user-approved-20261012 -> origin/locked-infinity-health-2.5.20-packaging-rc1-user-approved-20261012
+2026-11-09T11:59:19.1770701Z  * [new branch]        locked-infinity-rc3-cleanup-health-2518-skin-updater-101-20260926 -> origin/locked-infinity-rc3-cleanup-health-2518-skin-updater-101-20260926
+2026-11-09T11:59:19.1772369Z  * [new branch]        locked-infinity-skin-1.0.5.208-verified-cleanup-user-approved-20261012 -> origin/locked-infinity-skin-1.0.5.208-verified-cleanup-user-approved-20261012
+2026-11-09T11:59:19.1773817Z  * [new branch]        locked-infinity-skin-1.0.5.211-user-passed-20261012 -> origin/locked-infinity-skin-1.0.5.211-user-passed-20261012
+2026-11-09T11:59:19.1775098Z  * [new branch]        locked/2103316-close-progress-isolation -> origin/locked/2103316-close-progress-isolation
+2026-11-09T11:59:19.1775934Z  * [new branch]        locked/2103317-cobra-pro-season-oled -> origin/locked/2103317-cobra-pro-season-oled
+2026-11-09T11:59:19.1776562Z  * [new branch]        locked/infinity-2103377-rails-handoff-rc1-20261015 -> origin/locked/infinity-2103377-rails-handoff-rc1-20261015
+2026-11-09T11:59:19.1777121Z  * [new branch]        locked/infinity-2103377-rc5 -> origin/locked/infinity-2103377-rc5
+2026-11-09T11:59:19.1777607Z  * [new branch]        locked/infinity-rails-mocha-20261014 -> origin/locked/infinity-rails-mocha-20261014
+2026-11-09T11:59:19.1778247Z  * [new branch]        locked/infinity-skin223-addon-browser-polish-20261014 -> origin/locked/infinity-skin223-addon-browser-polish-20261014
+2026-11-09T11:59:19.1778988Z  * [new branch]        locks/infinity-2103466-owner-approved-base-20261108 -> origin/locks/infinity-2103466-owner-approved-base-20261108
+2026-11-09T11:59:19.1779916Z  * [new branch]        locks/infinity-2103469-protected-recovery-20261108 -> origin/locks/infinity-2103469-protected-recovery-20261108
+2026-11-09T11:59:19.1780561Z  * [new branch]        locks/infinity-tracking-e410f30b-20261109 -> origin/locks/infinity-tracking-e410f30b-20261109
+2026-11-09T11:59:19.1781215Z  * [new branch]        locks/infinity464-eight-search-qa-pass-20261107 -> origin/locks/infinity464-eight-search-qa-pass-20261107
+2026-11-09T11:59:19.1781880Z  * [new branch]        locks/infinity464-reuse-passed-gates-20261107 -> origin/locks/infinity464-reuse-passed-gates-20261107
+2026-11-09T11:59:19.1782573Z  * [new branch]        locks/umbrella-pov-native-search-host-pass-20261107 -> origin/locks/umbrella-pov-native-search-host-pass-20261107
+2026-11-09T11:59:19.1783091Z  * [new branch]        main                    -> origin/main
+2026-11-09T11:59:19.1783561Z  * [new branch]        records-2103263-pro-oled-light-polish-lock -> origin/records-2103263-pro-oled-light-polish-lock
+2026-11-09T11:59:19.1784125Z  * [new branch]        records-cobra-2103276-lock-20260930 -> origin/records-cobra-2103276-lock-20260930
+2026-11-09T11:59:19.1784625Z  * [new branch]        records-cobra-2103277-lock-20260930 -> origin/records-cobra-2103277-lock-20260930
+2026-11-09T11:59:19.1785368Z  * [new branch]        recovery/infinity-2103445-payload-after-2103446-playback-failure-20261101 -> origin/recovery/infinity-2103445-payload-after-2103446-playback-failure-20261101
+2026-11-09T11:59:19.1786272Z  * [new branch]        recovery/restore-exact-2103433-after-rejected-2103434-20261030 -> origin/recovery/restore-exact-2103433-after-rejected-2103434-20261030
+2026-11-09T11:59:19.1787170Z  * [new branch]        repair/2103303-194-responsive-regressions -> origin/repair/2103303-194-responsive-regressions
+2026-11-09T11:59:19.1787683Z  * [new branch]        repair/2103308-close-reopen -> origin/repair/2103308-close-reopen
+2026-11-09T11:59:19.1788104Z  * [new branch]        repair/2103309-close-ring -> origin/repair/2103309-close-ring
+2026-11-09T11:59:19.1788519Z  * [new branch]        repair/2103310-close-progress -> origin/repair/2103310-close-progress
+2026-11-09T11:59:19.1788983Z  * [new branch]        repair/2103311-chooser-isolation -> origin/repair/2103311-chooser-isolation
+2026-11-09T11:59:19.1789607Z  * [new branch]        repair/2103312-pro-teams -> origin/repair/2103312-pro-teams
+2026-11-09T11:59:19.1789993Z  * [new branch]        repair/2103313-shutdown -> origin/repair/2103313-shutdown
+2026-11-09T11:59:19.1790418Z  * [new branch]        repair/2103314-shutdown-evidence -> origin/repair/2103314-shutdown-evidence
+2026-11-09T11:59:19.1790894Z  * [new branch]        repair/2103315-android-task-close -> origin/repair/2103315-android-task-close
+2026-11-09T11:59:19.1791428Z  * [new branch]        repair/2103316-close-progress-isolation -> origin/repair/2103316-close-progress-isolation
+2026-11-09T11:59:19.1792103Z  * [new branch]        repair/2103317-cobra-pro-season-oled -> origin/repair/2103317-cobra-pro-season-oled
+2026-11-09T11:59:19.1792614Z  * [new branch]        repair/chooser-close-owner-2103324 -> origin/repair/chooser-close-owner-2103324
+2026-11-09T11:59:19.1793113Z  * [new branch]        repair/cobra-pro-carousel-2103320 -> origin/repair/cobra-pro-carousel-2103320
+2026-11-09T11:59:19.1793617Z  * [new branch]        repair/cobra-pro-corrections-2103319 -> origin/repair/cobra-pro-corrections-2103319
+2026-11-09T11:59:19.1794108Z  * [new branch]        repair/cobra-pro-handoff-317 -> origin/repair/cobra-pro-handoff-317
+2026-11-09T11:59:19.1794563Z  * [new branch]        repair/cobra-pro-preview-2103321 -> origin/repair/cobra-pro-preview-2103321
+2026-11-09T11:59:19.1795068Z  * [new branch]        repair/cobra-pro-refinement-2103322 -> origin/repair/cobra-pro-refinement-2103322
+2026-11-09T11:59:19.1795557Z  * [new branch]        repair/cobra-sports-live-2103323 -> origin/repair/cobra-sports-live-2103323
+2026-11-09T11:59:19.1796071Z  * [new branch]        repair/infinity-2103331-stable-restamp -> origin/repair/infinity-2103331-stable-restamp
+2026-11-09T11:59:19.1796595Z  * [new branch]        repair/infinity-closing-ui-2103328 -> origin/repair/infinity-closing-ui-2103328
+2026-11-09T11:59:19.1797143Z  * [new branch]        repair/infinity-cooperative-close-2103326 -> origin/repair/infinity-cooperative-close-2103326
+2026-11-09T11:59:19.1797724Z  * [new branch]        repair/infinity-directory-close-2103330 -> origin/repair/infinity-directory-close-2103330
+2026-11-09T11:59:19.1798289Z  * [new branch]        repair/infinity-directory-verify-2103333 -> origin/repair/infinity-directory-verify-2103333
+2026-11-09T11:59:19.1798894Z  * [new branch]        repair/infinity-health-native-bridge-2103335 -> origin/repair/infinity-health-native-bridge-2103335
+2026-11-09T11:59:19.1799649Z  * [new branch]        repair/infinity-jobmanager-close-2103327 -> origin/repair/infinity-jobmanager-close-2103327
+2026-11-09T11:59:19.1800206Z  * [new branch]        repair/infinity-live-closing-2103329 -> origin/repair/infinity-live-closing-2103329
+2026-11-09T11:59:19.1800740Z  * [new branch]        repair/infinity-python-exit-2103334 -> origin/repair/infinity-python-exit-2103334
+2026-11-09T11:59:19.1801311Z  * [new branch]        repair/infinity-shutdown-diagnostics-2103325 -> origin/repair/infinity-shutdown-diagnostics-2103325
+2026-11-09T11:59:19.1801882Z  * [new branch]        repair/screensaver-421-skin-198-rc1 -> origin/repair/screensaver-421-skin-198-rc1
+2026-11-09T11:59:19.1802386Z  * [new branch]        restore/infinity-2103332-exact-3327 -> origin/restore/infinity-2103332-exact-3327
+2026-11-09T11:59:19.1803126Z  * [new branch]        review/infinity-fold-qa-reported-regressions-20261106 -> origin/review/infinity-fold-qa-reported-regressions-20261106
+2026-11-09T11:59:19.1803860Z  * [new branch]        review/kodi22-piers-selective-shutdown-20261008 -> origin/review/kodi22-piers-selective-shutdown-20261008
+2026-11-09T11:59:19.1804583Z  * [new branch]        rollback-2103159-before-render-contract-repair-20260917 -> origin/rollback-2103159-before-render-contract-repair-20260917
+2026-11-09T11:59:19.1805299Z  * [new branch]        rollback-2103159-run10-before-text-fit-20260917 -> origin/rollback-2103159-run10-before-text-fit-20260917
+2026-11-09T11:59:19.1805994Z  * [new branch]        rollback-2103258-before-options-health-finish-20260927 -> origin/rollback-2103258-before-options-health-finish-20260927
+2026-11-09T11:59:19.1806740Z  * [new branch]        rollback-2103259-before-recovery-fixed-chooser-20260927 -> origin/rollback-2103259-before-recovery-fixed-chooser-20260927
+2026-11-09T11:59:19.1807405Z  * [new branch]        rollback-2103260-before-pro-mode-20260927 -> origin/rollback-2103260-before-pro-mode-20260927
+2026-11-09T11:59:19.1808026Z  * [new branch]        rollback-before-kodi-watcher-first-run-20260916 -> origin/rollback-before-kodi-watcher-first-run-20260916
+2026-11-09T11:59:19.1808756Z  * [new branch]        rollback-cobra-2103157-before-android-layout-fix-20260917 -> origin/rollback-cobra-2103157-before-android-layout-fix-20260917
+2026-11-09T11:59:19.1809837Z  * [new branch]        rollback-cobra-2103157-before-first-layout-arm-fix-20260917 -> origin/rollback-cobra-2103157-before-first-layout-arm-fix-20260917
+2026-11-09T11:59:19.1810634Z  * [new branch]        rollback-cobra-2103157-before-measurement-audit-d04fff1 -> origin/rollback-cobra-2103157-before-measurement-audit-d04fff1
+2026-11-09T11:59:19.1811383Z  * [new branch]        rollback-cobra-2103163-before-stability-audit-20260918 -> origin/rollback-cobra-2103163-before-stability-audit-20260918
+2026-11-09T11:59:19.1812186Z  * [new branch]        rollback-cobra-2103197-before-complete-product-audit-20260920 -> origin/rollback-cobra-2103197-before-complete-product-audit-20260920
+2026-11-09T11:59:19.1812997Z  * [new branch]        rollback-cobra-2103199-before-provider-boundary-20260920 -> origin/rollback-cobra-2103199-before-provider-boundary-20260920
+2026-11-09T11:59:19.1813763Z  * [new branch]        rollback-cobra-2103200-before-player-polish-20260921 -> origin/rollback-cobra-2103200-before-player-polish-20260921
+2026-11-09T11:59:19.1814511Z  * [new branch]        rollback-cobra-2103278-before-end-to-end-2103279-20261001 -> origin/rollback-cobra-2103278-before-end-to-end-2103279-20261001
+2026-11-09T11:59:19.1815260Z  * [new branch]        rollback-cobra-2103279-before-followup-2103280-20261001 -> origin/rollback-cobra-2103279-before-followup-2103280-20261001
+2026-11-09T11:59:19.1816002Z  * [new branch]        rollback-cobra-2103280-before-remaining-audit-20261001 -> origin/rollback-cobra-2103280-before-remaining-audit-20261001
+2026-11-09T11:59:19.1816847Z  * [new branch]        rollback-cobra-epg-packaging-before-runtime-pin-fix-20260917 -> origin/rollback-cobra-epg-packaging-before-runtime-pin-fix-20260917
+2026-11-09T11:59:19.1817697Z  * [new branch]        rollback-infinity-2103254-before-shipping-audit-20260926 -> origin/rollback-infinity-2103254-before-shipping-audit-20260926
+2026-11-09T11:59:19.1818471Z  * [new branch]        rollback-infinity-2103282-before-surface-repair-20261001 -> origin/rollback-infinity-2103282-before-surface-repair-20261001
+2026-11-09T11:59:19.1819449Z  * [new branch]        rollback-infinity-2103284-before-native-fd-repair-20261001 -> origin/rollback-infinity-2103284-before-native-fd-repair-20261001
+2026-11-09T11:59:19.1820268Z  * [new branch]        rollback-infinity-2103285-before-chooser-responsive-20261001 -> origin/rollback-infinity-2103285-before-chooser-responsive-20261001
+2026-11-09T11:59:19.1821081Z  * [new branch]        rollback-infinity-2103285-before-evidence-health-20261001 -> origin/rollback-infinity-2103285-before-evidence-health-20261001
+2026-11-09T11:59:19.1821976Z  * [new branch]        rollback-infinity-2103285-before-natural-resize-20261001 -> origin/rollback-infinity-2103285-before-natural-resize-20261001
+2026-11-09T11:59:19.1822843Z  * [new branch]        rollback-infinity-2103288-before-native-responsive-layout-20261001 -> origin/rollback-infinity-2103288-before-native-responsive-layout-20261001
+2026-11-09T11:59:19.1823730Z  * [new branch]        rollback-infinity-2103288-before-trace-hardening-20261001 -> origin/rollback-infinity-2103288-before-trace-hardening-20261001
+2026-11-09T11:59:19.1824511Z  * [new branch]        rollback-infinity-2103290-before-inplace-reflow-20261002 -> origin/rollback-infinity-2103290-before-inplace-reflow-20261002
+2026-11-09T11:59:19.1825269Z  * [new branch]        rollback-infinity-2103302-before-e2e-repair-20261003 -> origin/rollback-infinity-2103302-before-e2e-repair-20261003
+2026-11-09T11:59:19.1825988Z  * [new branch]        rollback-phone-2103256-before-glass-chooser-20260927 -> origin/rollback-phone-2103256-before-glass-chooser-20260927
+2026-11-09T11:59:19.1826717Z  * [new branch]        rollback-phone-2103257-before-glass-settings-20260927 -> origin/rollback-phone-2103257-before-glass-settings-20260927
+2026-11-09T11:59:19.1827370Z  * [new branch]        rollback/2103304-195-before-2103305-20261004 -> origin/rollback/2103304-195-before-2103305-20261004
+2026-11-09T11:59:19.1828105Z  * [new branch]        rollback/2103306-before-png-preservation-20261004 -> origin/rollback/2103306-before-png-preservation-20261004
+2026-11-09T11:59:19.1828637Z  * [new branch]        utility-map-point-apk   -> origin/utility-map-point-apk
+2026-11-09T11:59:19.1829131Z  * [new branch]        work/android-checkpoint-shutdown-2103335 -> origin/work/android-checkpoint-shutdown-2103335
+2026-11-09T11:59:19.1829878Z  * [new branch]        work/chooser-release-authority-2103424-20261027 -> origin/work/chooser-release-authority-2103424-20261027
+2026-11-09T11:59:19.1830524Z  * [new branch]        work/chooser-release-authority-2103425-20261027 -> origin/work/chooser-release-authority-2103425-20261027
+2026-11-09T11:59:19.1831186Z  * [new branch]        work/chooser-version-labels-from-2103423-20261027 -> origin/work/chooser-version-labels-from-2103423-20261027
+2026-11-09T11:59:19.1831887Z  * [new branch]        work/cobra-2103442-end-to-end-quality-refresh-20261101 -> origin/work/cobra-2103442-end-to-end-quality-refresh-20261101
+2026-11-09T11:59:19.1832612Z  * [new branch]        work/cobra-2103444-rotation-audio-preserved-20261101 -> origin/work/cobra-2103444-rotation-audio-preserved-20261101
+2026-11-09T11:59:19.1833338Z  * [new branch]        work/cobra-all-layout-fold-reflow-from-2103421-20261027 -> origin/work/cobra-all-layout-fold-reflow-from-2103421-20261027
+2026-11-09T11:59:19.1833975Z  * [new branch]        work/cobra-astra-corrective-20261012 -> origin/work/cobra-astra-corrective-20261012
+2026-11-09T11:59:19.1834496Z  * [new branch]        work/cobra-clean-restart-20261012 -> origin/work/cobra-clean-restart-20261012
+2026-11-09T11:59:19.1835143Z  * [new branch]        work/cobra-fullscreen-display-from-2103438-20261031 -> origin/work/cobra-fullscreen-display-from-2103438-20261031
+2026-11-09T11:59:19.1835760Z  * [new branch]        work/cobra-only-from-2103427-20261028 -> origin/work/cobra-only-from-2103427-20261028
+2026-11-09T11:59:19.1836275Z  * [new branch]        work/cobra-only-from-2103435-20261031 -> origin/work/cobra-only-from-2103435-20261031
+2026-11-09T11:59:19.1836780Z  * [new branch]        work/cobra-only-from-2103437-20261031 -> origin/work/cobra-only-from-2103437-20261031
+2026-11-09T11:59:19.1837220Z  * [new branch]        work/cobra-six-2103370  -> origin/work/cobra-six-2103370
+2026-11-09T11:59:19.1837670Z  * [new branch]        work/cobra-targeted-isolation-2103373 -> origin/work/cobra-targeted-isolation-2103373
+2026-11-09T11:59:19.1838275Z  * [new branch]        work/infinity-2103377-close-recents-preservation -> origin/work/infinity-2103377-close-recents-preservation
+2026-11-09T11:59:19.1839077Z  * [new branch]        work/infinity-2103377-essential-first-shutdown-only -> origin/work/infinity-2103377-essential-first-shutdown-only
+2026-11-09T11:59:19.1839787Z  * [new branch]        work/infinity-2103377-final-shutdown -> origin/work/infinity-2103377-final-shutdown
+2026-11-09T11:59:19.1840363Z  * [new branch]        work/infinity-2103377-final-shutdown-package -> origin/work/infinity-2103377-final-shutdown-package
+2026-11-09T11:59:19.1840999Z  * [new branch]        work/infinity-2103377-overflow-diagnostic-apk -> origin/work/infinity-2103377-overflow-diagnostic-apk
+2026-11-09T11:59:19.1841672Z  * [new branch]        work/infinity-2103377-python-shutdown-retirement-rc1 -> origin/work/infinity-2103377-python-shutdown-retirement-rc1
+2026-11-09T11:59:19.1842301Z  * [new branch]        work/infinity-2103377-rails-handoff-rc1 -> origin/work/infinity-2103377-rails-handoff-rc1
+2026-11-09T11:59:19.1842871Z  * [new branch]        work/infinity-2103377-rc3-curl-early-save -> origin/work/infinity-2103377-rc3-curl-early-save
+2026-11-09T11:59:19.1843508Z  * [new branch]        work/infinity-2103377-rc3-early-python-retirement -> origin/work/infinity-2103377-rc3-early-python-retirement
+2026-11-09T11:59:19.1844153Z  * [new branch]        work/infinity-2103377-rc4-targeted-retirement -> origin/work/infinity-2103377-rc4-targeted-retirement
+2026-11-09T11:59:19.1844865Z  * [new branch]        work/infinity-2103377-rc5-green-package -> origin/work/infinity-2103377-rc5-green-package
+2026-11-09T11:59:19.1845390Z  * [new branch]        work/infinity-2103377-rc5-host-debug -> origin/work/infinity-2103377-rc5-host-debug
+2026-11-09T11:59:19.1845991Z  * [new branch]        work/infinity-2103377-rc5-optional-python-retirement -> origin/work/infinity-2103377-rc5-optional-python-retirement
+2026-11-09T11:59:19.1846630Z  * [new branch]        work/infinity-2103377-rc5-signed-package -> origin/work/infinity-2103377-rc5-signed-package
+2026-11-09T11:59:19.1847178Z  * [new branch]        work/infinity-2103377-shutdown-drain-rc2 -> origin/work/infinity-2103377-shutdown-drain-rc2
+2026-11-09T11:59:19.1847785Z  * [new branch]        work/infinity-2103377-shutdown-wide-diagnostics -> origin/work/infinity-2103377-shutdown-wide-diagnostics
+2026-11-09T11:59:19.1848383Z  * [new branch]        work/infinity-2103390-targeted-bugfixes -> origin/work/infinity-2103390-targeted-bugfixes
+2026-11-09T11:59:19.1849012Z  * [new branch]        work/infinity-2103391-pro-seven-group-audit-20261019 -> origin/work/infinity-2103391-pro-seven-group-audit-20261019
+2026-11-09T11:59:19.1849752Z  * [new branch]        work/infinity-2103392-apk-download-chunks -> origin/work/infinity-2103392-apk-download-chunks
+2026-11-09T11:59:19.1850332Z  * [new branch]        work/infinity-2103392-delivery-artifacts -> origin/work/infinity-2103392-delivery-artifacts
+2026-11-09T11:59:19.1850855Z  * [new branch]        work/infinity-2103392-final-apk -> origin/work/infinity-2103392-final-apk
+2026-11-09T11:59:19.1851348Z  * [new branch]        work/infinity-2103392-individual-zips -> origin/work/infinity-2103392-individual-zips
+2026-11-09T11:59:19.1851940Z  * [new branch]        work/infinity-2103392-standalone-apk-delivery -> origin/work/infinity-2103392-standalone-apk-delivery
+2026-11-09T11:59:19.1852504Z  * [new branch]        work/infinity-2103393-build-control -> origin/work/infinity-2103393-build-control
+2026-11-09T11:59:19.1853082Z  * [new branch]        work/infinity-2103393-fold-corrective-20261020 -> origin/work/infinity-2103393-fold-corrective-20261020
+2026-11-09T11:59:19.1853689Z  * [new branch]        work/infinity-2103394-fold-complete-20261021 -> origin/work/infinity-2103394-fold-complete-20261021
+2026-11-09T11:59:19.1854377Z  * [new branch]        work/infinity-2103394-optionb-zip-runtime-evidence-20261021 -> origin/work/infinity-2103394-optionb-zip-runtime-evidence-20261021
+2026-11-09T11:59:19.1855075Z  * [new branch]        work/infinity-2103395-fold-critical-20261021 -> origin/work/infinity-2103395-fold-critical-20261021
+2026-11-09T11:59:19.1855856Z  * [new branch]        work/infinity-2103395-optionb-shutdown-evidence-20261021 -> origin/work/infinity-2103395-optionb-shutdown-evidence-20261021
+2026-11-09T11:59:19.1856634Z  * [new branch]        work/infinity-2103395-search-android17-execution-20261021 -> origin/work/infinity-2103395-search-android17-execution-20261021
+2026-11-09T11:59:19.1857298Z  * [new branch]        work/infinity-2103396-targeted-corrective -> origin/work/infinity-2103396-targeted-corrective
+2026-11-09T11:59:19.1857826Z  * [new branch]        work/infinity-2103397-final-oled -> origin/work/infinity-2103397-final-oled
+2026-11-09T11:59:19.1858311Z  * [new branch]        work/infinity-2103398-consolidated -> origin/work/infinity-2103398-consolidated
+2026-11-09T11:59:19.1858779Z  * [new branch]        work/infinity-2103399-final-ui -> origin/work/infinity-2103399-final-ui
+2026-11-09T11:59:19.1859530Z  * [new branch]        work/infinity-2103400-three-corrections -> origin/work/infinity-2103400-three-corrections
+2026-11-09T11:59:19.1860090Z  * [new branch]        work/infinity-2103401-corrective-polish -> origin/work/infinity-2103401-corrective-polish
+2026-11-09T11:59:19.1860680Z  * [new branch]        work/infinity-2103402-cc03535-compat-20261024 -> origin/work/infinity-2103402-cc03535-compat-20261024
+2026-11-09T11:59:19.1861361Z  * [new branch]        work/infinity-2103402-e2e-continue-hold-findings-20261024 -> origin/work/infinity-2103402-e2e-continue-hold-findings-20261024
+2026-11-09T11:59:19.1862210Z  * [new branch]        work/infinity-2103402-final-stabilization-20261024 -> origin/work/infinity-2103402-final-stabilization-20261024
+2026-11-09T11:59:19.1862854Z  * [new branch]        work/infinity-2103402-functional-qa-20261024 -> origin/work/infinity-2103402-functional-qa-20261024
+2026-11-09T11:59:19.1863510Z  * [new branch]        work/infinity-2103402-native-owner-corrective-20261024 -> origin/work/infinity-2103402-native-owner-corrective-20261024
+2026-11-09T11:59:19.1864264Z  * [new branch]        work/infinity-2103402-nixtoons-only-identity-menu-20261025 -> origin/work/infinity-2103402-nixtoons-only-identity-menu-20261025
+2026-11-09T11:59:19.1865070Z  * [new branch]        work/infinity-2103402-resume-otaku-nixtoons-favorites-20261024 -> origin/work/infinity-2103402-resume-otaku-nixtoons-favorites-20261024
+2026-11-09T11:59:19.1865919Z  * [new branch]        work/infinity-2103403-nixtoons-route-link-search-crash-20261025 -> origin/work/infinity-2103403-nixtoons-route-link-search-crash-20261025
+2026-11-09T11:59:19.1866779Z  * [new branch]        work/infinity-2103404-watchnixtoons-source-location-only-20261025 -> origin/work/infinity-2103404-watchnixtoons-source-location-only-20261025
+2026-11-09T11:59:19.1867679Z  * [new branch]        work/infinity-2103405-watchnixtoons-infinity-tracked-context-20261025 -> origin/work/infinity-2103405-watchnixtoons-infinity-tracked-context-20261025
+2026-11-09T11:59:19.1868582Z  * [new branch]        work/infinity-2103406-native-search-crash-correction-20261025 -> origin/work/infinity-2103406-native-search-crash-correction-20261025
+2026-11-09T11:59:19.1869573Z  * [new branch]        work/infinity-2103407-search-overload-single-flight-20261025 -> origin/work/infinity-2103407-search-overload-single-flight-20261025
+2026-11-09T11:59:19.1870360Z  * [new branch]        work/infinity-2103445-external-video-lifecycle-20261101 -> origin/work/infinity-2103445-external-video-lifecycle-20261101
+2026-11-09T11:59:19.1871115Z  * [new branch]        work/infinity-2103445-standalone-external-player-20261101 -> origin/work/infinity-2103445-standalone-external-player-20261101
+2026-11-09T11:59:19.1871817Z  * [new branch]        work/infinity-2103458-six-corrections-20261105 -> origin/work/infinity-2103458-six-corrections-20261105
+2026-11-09T11:59:19.1872455Z  * [new branch]        work/infinity-2103460-nine-corrections-20261106 -> origin/work/infinity-2103460-nine-corrections-20261106
+2026-11-09T11:59:19.1873138Z  * [new branch]        work/infinity-2103460-skin-script-scoped-fixes-20261106 -> origin/work/infinity-2103460-skin-script-scoped-fixes-20261106
+2026-11-09T11:59:19.1873997Z  * [new branch]        work/infinity-462-search-graphics-integration-20261107 -> origin/work/infinity-462-search-graphics-integration-20261107
+2026-11-09T11:59:19.1874694Z  * [new branch]        work/infinity-addon-error-quarantine-2103355 -> origin/work/infinity-addon-error-quarantine-2103355
+2026-11-09T11:59:19.1875271Z  * [new branch]        work/infinity-android-close-2103365 -> origin/work/infinity-android-close-2103365
+2026-11-09T11:59:19.1875949Z  * [new branch]        work/infinity-browser-visual-correction-from-2103456-20261105 -> origin/work/infinity-browser-visual-correction-from-2103456-20261105
+2026-11-09T11:59:19.1876636Z  * [new branch]        work/infinity-bytecode-cache-2103349 -> origin/work/infinity-bytecode-cache-2103349
+2026-11-09T11:59:19.1877224Z  * [new branch]        work/infinity-cancelled-script-receipt-2103369 -> origin/work/infinity-cancelled-script-receipt-2103369
+2026-11-09T11:59:19.1877917Z  * [new branch]        work/infinity-checkpoint-retirement-escalation-2103357 -> origin/work/infinity-checkpoint-retirement-escalation-2103357
+2026-11-09T11:59:19.1878642Z  * [new branch]        work/infinity-cobra-isolation-from-2103420-20261026 -> origin/work/infinity-cobra-isolation-from-2103420-20261026
+2026-11-09T11:59:19.1879442Z  * [new branch]        work/infinity-commandcenter-03520-labels-verified-v2 -> origin/work/infinity-commandcenter-03520-labels-verified-v2
+2026-11-09T11:59:19.1880209Z  * [new branch]        work/infinity-compact-preview-skin-211 -> origin/work/infinity-compact-preview-skin-211
+2026-11-09T11:59:19.1880809Z  * [new branch]        work/infinity-consolidated-anr-first-20261017 -> origin/work/infinity-consolidated-anr-first-20261017
+2026-11-09T11:59:19.1881410Z  * [new branch]        work/infinity-critical-preview-2103376 -> origin/work/infinity-critical-preview-2103376
+2026-11-09T11:59:19.1881926Z  * [new branch]        work/infinity-critical-skin-210 -> origin/work/infinity-critical-skin-210
+2026-11-09T11:59:19.1882472Z  * [new branch]        work/infinity-drawer-extended-scroll-20261104 -> origin/work/infinity-drawer-extended-scroll-20261104
+2026-11-09T11:59:19.1883497Z  * [new branch]        work/infinity-drawer-power-fixed-source-20261104 -> origin/work/infinity-drawer-power-fixed-source-20261104
+2026-11-09T11:59:19.1884158Z  * [new branch]        work/infinity-drawer-shortcuts-scope-20261104 -> origin/work/infinity-drawer-shortcuts-scope-20261104
+2026-11-09T11:59:19.1884847Z  * [new branch]        work/infinity-final-blocker-detail-inventory-2103359 -> origin/work/infinity-final-blocker-detail-inventory-2103359
+2026-11-09T11:59:19.1885575Z  * [new branch]        work/infinity-final-corrective-from-2103407-20261025 -> origin/work/infinity-final-corrective-from-2103407-20261025
+2026-11-09T11:59:19.1886213Z  * [new branch]        work/infinity-final-release-462-20261107 -> origin/work/infinity-final-release-462-20261107
+2026-11-09T11:59:19.1886805Z  * [new branch]        work/infinity-full-blocker-inventory-2103351 -> origin/work/infinity-full-blocker-inventory-2103351
+2026-11-09T11:59:19.1887388Z  * [new branch]        work/infinity-full-repair-20261017-gpt6 -> origin/work/infinity-full-repair-20261017-gpt6
+2026-11-09T11:59:19.1888087Z  * [new branch]        work/infinity-graphics-gesture-render-462-candidate-20261107 -> origin/work/infinity-graphics-gesture-render-462-candidate-20261107
+2026-11-09T11:59:19.1888815Z  * [new branch]        work/infinity-health-2520-packaging-cleanup -> origin/work/infinity-health-2520-packaging-cleanup
+2026-11-09T11:59:19.1889536Z  * [new branch]        work/infinity-installer-close-2103368 -> origin/work/infinity-installer-close-2103368
+2026-11-09T11:59:19.1890149Z  * [new branch]        work/infinity-kodi-2103451-checkpoint-anr-20261103 -> origin/work/infinity-kodi-2103451-checkpoint-anr-20261103
+2026-11-09T11:59:19.1890842Z  * [new branch]        work/infinity-kodi-2103453-controlled-test-20261104 -> origin/work/infinity-kodi-2103453-controlled-test-20261104
+2026-11-09T11:59:19.1891685Z  * [new branch]        work/infinity-kodi-2103453-ui-navigation-source-20261104 -> origin/work/infinity-kodi-2103453-ui-navigation-source-20261104
+2026-11-09T11:59:19.1892425Z  * [new branch]        work/infinity-kodi-452-pause-stop-arm64-20261104 -> origin/work/infinity-kodi-452-pause-stop-arm64-20261104
+2026-11-09T11:59:19.1893167Z  * [new branch]        work/infinity-kodi-checkpoint-pause-stop-source-20261104 -> origin/work/infinity-kodi-checkpoint-pause-stop-source-20261104
+2026-11-09T11:59:19.1893939Z  * [new branch]        work/infinity-kodi-ui-2103454-2103455-packaging-20261104 -> origin/work/infinity-kodi-ui-2103454-2103455-packaging-20261104
+2026-11-09T11:59:19.1894542Z  * [new branch]        work/infinity-lifecycle-2103364 -> origin/work/infinity-lifecycle-2103364
+2026-11-09T11:59:19.1895070Z  * [new branch]        work/infinity-lifecycle-recovery-2103346 -> origin/work/infinity-lifecycle-recovery-2103346
+2026-11-09T11:59:19.1895647Z  * [new branch]        work/infinity-master-corrective-20261105 -> origin/work/infinity-master-corrective-20261105
+2026-11-09T11:59:19.1896274Z  * [new branch]        work/infinity-master-testing-from-2103451-20261105 -> origin/work/infinity-master-testing-from-2103451-20261105
+2026-11-09T11:59:19.1896958Z  * [new branch]        work/infinity-native-keyboard-scaling-462-20261107 -> origin/work/infinity-native-keyboard-scaling-462-20261107
+2026-11-09T11:59:19.1897823Z  * [new branch]        work/infinity-native-search-compatibility-scope-20261107 -> origin/work/infinity-native-search-compatibility-scope-20261107
+2026-11-09T11:59:19.1898543Z  * [new branch]        work/infinity-native-touch-from-2103451-20261105 -> origin/work/infinity-native-touch-from-2103451-20261105
+2026-11-09T11:59:19.1899268Z  * [new branch]        work/infinity-native-writer-2103348 -> origin/work/infinity-native-writer-2103348
+2026-11-09T11:59:19.1899863Z  * [new branch]        work/infinity-only-from-2103436-20261031 -> origin/work/infinity-only-from-2103436-20261031
+2026-11-09T11:59:19.1900550Z  * [new branch]        work/infinity-only-seamless-loading-from-2103433-20261030 -> origin/work/infinity-only-seamless-loading-from-2103433-20261030
+2026-11-09T11:59:19.1901321Z  * [new branch]        work/infinity-only-stability-speed-from-2103425-20261028 -> origin/work/infinity-only-stability-speed-from-2103425-20261028
+2026-11-09T11:59:19.1902089Z  * [new branch]        work/infinity-phase-d-225-renderer-diagnostics-20261017 -> origin/work/infinity-phase-d-225-renderer-diagnostics-20261017
+2026-11-09T11:59:19.1902704Z  * [new branch]        work/infinity-phase-d-skin-225 -> origin/work/infinity-phase-d-skin-225
+2026-11-09T11:59:19.1903222Z  * [new branch]        work/infinity-phase-d-skin-225-complete -> origin/work/infinity-phase-d-skin-225-complete
+2026-11-09T11:59:19.1903834Z  * [new branch]        work/infinity-post-2103384-feature-restoration -> origin/work/infinity-post-2103384-feature-restoration
+2026-11-09T11:59:19.1904525Z  * [new branch]        work/infinity-preview-2103447-per-video-resume-20261102 -> origin/work/infinity-preview-2103447-per-video-resume-20261102
+2026-11-09T11:59:19.1905263Z  * [new branch]        work/infinity-preview-2103448-cinematic-call-20261102 -> origin/work/infinity-preview-2103448-cinematic-call-20261102
+2026-11-09T11:59:19.1906101Z  * [new branch]        work/infinity-preview-2103450-acceptance-and-display-design-20261102 -> origin/work/infinity-preview-2103450-acceptance-and-display-design-20261102
+2026-11-09T11:59:19.1906962Z  * [new branch]        work/infinity-preview-2103450-fullscreen-display-20261102 -> origin/work/infinity-preview-2103450-fullscreen-display-20261102
+2026-11-09T11:59:19.1907676Z  * [new branch]        work/infinity-python-retirement-batch-2103352 -> origin/work/infinity-python-retirement-batch-2103352
+2026-11-09T11:59:19.1908304Z  * [new branch]        work/infinity-quarantine-probation-2103356 -> origin/work/infinity-quarantine-probation-2103356
+2026-11-09T11:59:19.1908854Z  * [new branch]        work/infinity-rails-hold-2103378 -> origin/work/infinity-rails-hold-2103378
+2026-11-09T11:59:19.1909597Z  * [new branch]        work/infinity-rails-hold-2103379-hit-test-rc2 -> origin/work/infinity-rails-hold-2103379-hit-test-rc2
+2026-11-09T11:59:19.1910269Z  * [new branch]        work/infinity-rails-input-investigation-20261014 -> origin/work/infinity-rails-input-investigation-20261014
+2026-11-09T11:59:19.1910916Z  * [new branch]        work/infinity-recovery-integration-2103367 -> origin/work/infinity-recovery-integration-2103367
+2026-11-09T11:59:19.1911596Z  * [new branch]        work/infinity-redlight-observer-finalization-2103358 -> origin/work/infinity-redlight-observer-finalization-2103358
+2026-11-09T11:59:19.1912342Z  * [new branch]        work/infinity-resume-speed-2103363 -> origin/work/infinity-resume-speed-2103363
+2026-11-09T11:59:19.1912926Z  * [new branch]        work/infinity-runtime-probe-and-recents-2103361 -> origin/work/infinity-runtime-probe-and-recents-2103361
+2026-11-09T11:59:19.1913588Z  * [new branch]        work/infinity-runtime-probe-retirement-2103361 -> origin/work/infinity-runtime-probe-retirement-2103361
+2026-11-09T11:59:19.1914212Z  * [new branch]        work/infinity-save-blocker-repair-2103353 -> origin/work/infinity-save-blocker-repair-2103353
+2026-11-09T11:59:19.1914820Z  * [new branch]        work/infinity-save-later-multiimage-20261023 -> origin/work/infinity-save-later-multiimage-20261023
+2026-11-09T11:59:19.1915625Z  * [new branch]        work/infinity-save-retirement-job-contracts-2103354 -> origin/work/infinity-save-retirement-job-contracts-2103354
+2026-11-09T11:59:19.1916314Z  * [new branch]        work/infinity-saved-route-android-20261023 -> origin/work/infinity-saved-route-android-20261023
+2026-11-09T11:59:19.1916931Z  * [new branch]        work/infinity-saved-route-correction-20261023 -> origin/work/infinity-saved-route-correction-20261023
+2026-11-09T11:59:19.1917527Z  * [new branch]        work/infinity-script-retirement-2103347 -> origin/work/infinity-script-retirement-2103347
+2026-11-09T11:59:19.1918176Z  * [new branch]        work/infinity-search-native-owned-response-20261107 -> origin/work/infinity-search-native-owned-response-20261107
+2026-11-09T11:59:19.1918932Z  * [new branch]        work/infinity-search-provider-owned-fresh-results-20261107 -> origin/work/infinity-search-provider-owned-fresh-results-20261107
+2026-11-09T11:59:19.1919892Z  * [new branch]        work/infinity-search-provider-state-readonly-20261104 -> origin/work/infinity-search-provider-state-readonly-20261104
+2026-11-09T11:59:19.1920651Z  * [new branch]        work/infinity-search-settings-proof-candidate-20261107 -> origin/work/infinity-search-settings-proof-candidate-20261107
+2026-11-09T11:59:19.1921404Z  * [new branch]        work/infinity-search-unified-native-candidate-20261107 -> origin/work/infinity-search-unified-native-candidate-20261107
+2026-11-09T11:59:19.1922066Z  * [new branch]        work/infinity-shutdown-contracts-2103362 -> origin/work/infinity-shutdown-contracts-2103362
+2026-11-09T11:59:19.1922698Z  * [new branch]        work/infinity-skin-1.0.5.213-addon-tile-selection -> origin/work/infinity-skin-1.0.5.213-addon-tile-selection
+2026-11-09T11:59:19.1923342Z  * [new branch]        work/infinity-skin-1.0.5.214-normal-window-rc2 -> origin/work/infinity-skin-1.0.5.214-normal-window-rc2
+2026-11-09T11:59:19.1923929Z  * [new branch]        work/infinity-skin-207-verified-cleanup -> origin/work/infinity-skin-207-verified-cleanup
+2026-11-09T11:59:19.1924495Z  * [new branch]        work/infinity-skin-209-preview-polish -> origin/work/infinity-skin-209-preview-polish
+2026-11-09T11:59:19.1925122Z  * [new branch]        work/infinity-skin215-commandcenter-settings-labels -> origin/work/infinity-skin215-commandcenter-settings-labels
+2026-11-09T11:59:19.1925772Z  * [new branch]        work/infinity-skin216-custom-addon-rails -> origin/work/infinity-skin216-custom-addon-rails
+2026-11-09T11:59:19.1926361Z  * [new branch]        work/infinity-skin217-custom-addon-rails-rc3 -> origin/work/infinity-skin217-custom-addon-rails-rc3
+2026-11-09T11:59:19.1926943Z  * [new branch]        work/infinity-skin217-custom-rails-rc3 -> origin/work/infinity-skin217-custom-rails-rc3
+2026-11-09T11:59:19.1927595Z  * [new branch]        work/infinity-skin218-custom-rails-rc3 -> origin/work/infinity-skin218-custom-rails-rc3
+2026-11-09T11:59:19.1928200Z  * [new branch]        work/infinity-skin219-custom-rails-rc3-geometry -> origin/work/infinity-skin219-custom-rails-rc3-geometry
+2026-11-09T11:59:19.1928888Z  * [new branch]        work/infinity-skin220-rail-context-restoration-rc4 -> origin/work/infinity-skin220-rail-context-restoration-rc4
+2026-11-09T11:59:19.1929588Z  * [new branch]        work/infinity-skin221-rails-input-rc5 -> origin/work/infinity-skin221-rails-input-rc5
+2026-11-09T11:59:19.1930162Z  * [new branch]        work/infinity-skin223-addon-browser-polish -> origin/work/infinity-skin223-addon-browser-polish
+2026-11-09T11:59:19.1930724Z  * [new branch]        work/infinity-sqlite-bridge-2103350 -> origin/work/infinity-sqlite-bridge-2103350
+2026-11-09T11:59:19.1931257Z  * [new branch]        work/infinity-stability-probe-20261014 -> origin/work/infinity-stability-probe-20261014
+2026-11-09T11:59:19.1931828Z  * [new branch]        work/infinity-stability-rollback-2103366 -> origin/work/infinity-stability-rollback-2103366
+2026-11-09T11:59:19.1932446Z  * [new branch]        work/infinity-stability-rollback-scope-2103366 -> origin/work/infinity-stability-rollback-scope-2103366
+2026-11-09T11:59:19.1933161Z  * [new branch]        work/infinity-system-stability-2103366 -> origin/work/infinity-system-stability-2103366
+2026-11-09T11:59:19.1933741Z  * [new branch]        work/infinity-system-stability-scope-2103366 -> origin/work/infinity-system-stability-scope-2103366
+2026-11-09T11:59:19.1934350Z  * [new branch]        work/infinity-system-stability-shell-2103366 -> origin/work/infinity-system-stability-shell-2103366
+2026-11-09T11:59:19.1934935Z  * [new branch]        work/infinity-three-corrections-20261108 -> origin/work/infinity-three-corrections-20261108
+2026-11-09T11:59:19.1935647Z  * [new branch]        work/infinity-tracking-integration-20261108 -> origin/work/infinity-tracking-integration-20261108
+2026-11-09T11:59:19.1936328Z  * [new branch]        work/infinity-ui-stabilization-2103365 -> origin/work/infinity-ui-stabilization-2103365
+2026-11-09T11:59:19.1936884Z  * [new branch]        work/infinity-umbrella-pov-zip-20261108 -> origin/work/infinity-umbrella-pov-zip-20261108
+2026-11-09T11:59:19.1937486Z  * [new branch]        work/infinity-universal-persistence-20261022 -> origin/work/infinity-universal-persistence-20261022
+2026-11-09T11:59:19.1938161Z  * [new branch]        work/infinity-universal-persistence-android-20261022 -> origin/work/infinity-universal-persistence-android-20261022
+2026-11-09T11:59:19.1938813Z  * [new branch]        work/infinity-universal-receipt-20261022 -> origin/work/infinity-universal-receipt-20261022
+2026-11-09T11:59:19.1939573Z  * [new branch]        work/infinity-universal-review-20261022 -> origin/work/infinity-universal-review-20261022
+2026-11-09T11:59:19.1940187Z  * [new branch]        work/infinity-verified-deadweight-2103374 -> origin/work/infinity-verified-deadweight-2103374
+2026-11-09T11:59:19.1940784Z  * [new branch]        work/infinity-watchlist-phase-a-20261108 -> origin/work/infinity-watchlist-phase-a-20261108
+2026-11-09T11:59:19.1941347Z  * [new branch]        work/infinity-watchlist-phase-b-20261108 -> origin/work/infinity-watchlist-phase-b-20261108
+2026-11-09T11:59:19.1941962Z  * [new branch]        work/infinity-weather-temp-retirement-2103360 -> origin/work/infinity-weather-temp-retirement-2103360
+2026-11-09T11:59:19.1942566Z  * [new branch]        work/infinity-zip-preview-native-2103375 -> origin/work/infinity-zip-preview-native-2103375
+2026-11-09T11:59:19.1943207Z  * [new branch]        work/infinity464-targeted-crash-diagnosis-20261107 -> origin/work/infinity464-targeted-crash-diagnosis-20261107
+2026-11-09T11:59:19.1943822Z  * [new branch]        work/kodi22-selective-shutdown-2103339 -> origin/work/kodi22-selective-shutdown-2103339
+2026-11-09T11:59:19.1944241Z  * [new tag]           build-1                 -> build-1
+2026-11-09T11:59:19.1944650Z  * [new tag]           build-4                 -> build-4
+2026-11-09T11:59:19.1945036Z  * [new tag]           infinity-2103393-binaries-39483588212 -> infinity-2103393-binaries-39483588212
+2026-11-09T11:59:19.1945530Z  * [new tag]           infinity-2103394-binaries-39539171911 -> infinity-2103394-binaries-39539171911
+2026-11-09T11:59:19.1946003Z  * [new tag]           infinity-2103395-binaries-39555495053 -> infinity-2103395-binaries-39555495053
+2026-11-09T11:59:19.1946457Z  * [new tag]           infinity-2103396-binaries-39579955813 -> infinity-2103396-binaries-39579955813
+2026-11-09T11:59:19.1946922Z  * [new tag]           infinity-2103397-binaries-39584431102 -> infinity-2103397-binaries-39584431102
+2026-11-09T11:59:19.1947382Z  * [new tag]           infinity-2103398-binaries-39662467387 -> infinity-2103398-binaries-39662467387
+2026-11-09T11:59:19.1947841Z  * [new tag]           infinity-2103399-binaries-39662645551 -> infinity-2103399-binaries-39662645551
+2026-11-09T11:59:19.1948300Z  * [new tag]           infinity-2103400-binaries-39720566646 -> infinity-2103400-binaries-39720566646
+2026-11-09T11:59:19.1948756Z  * [new tag]           infinity-2103401-binaries-39779917183 -> infinity-2103401-binaries-39779917183
+2026-11-09T11:59:19.1950215Z [command]/usr/bin/git branch --list --remote origin/work/infinity-2103460-nine-corrections-20261106
+2026-11-09T11:59:19.1950639Z   origin/work/infinity-2103460-nine-corrections-20261106
+2026-11-09T11:59:19.1951312Z [command]/usr/bin/git rev-parse refs/remotes/origin/work/infinity-2103460-nine-corrections-20261106
+2026-11-09T11:59:19.1951695Z ae0a6c205eb948b240872613220f38309165e7da
+2026-11-09T11:59:19.1952313Z ##[endgroup]
+2026-11-09T11:59:19.1952627Z ##[group]Determining the checkout info
+2026-11-09T11:59:19.1952958Z ##[endgroup]
+2026-11-09T11:59:19.1953159Z [command]/usr/bin/git sparse-checkout disable
+2026-11-09T11:59:19.1953747Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-11-09T11:59:19.1954403Z ##[group]Checking out the ref
+2026-11-09T11:59:19.1954978Z [command]/usr/bin/git checkout --progress --force -B work/infinity-2103460-nine-corrections-20261106 refs/remotes/origin/work/infinity-2103460-nine-corrections-20261106
+2026-11-09T11:59:20.1951204Z Updating files:  78% (7785/9942)
+2026-11-09T11:59:20.1990768Z Updating files:  79% (7855/9942)
+2026-11-09T11:59:20.2034281Z Updating files:  80% (7954/9942)
+2026-11-09T11:59:20.2071482Z Updating files:  81% (8054/9942)
+2026-11-09T11:59:20.2266515Z Updating files:  82% (8153/9942)
+2026-11-09T11:59:20.2303224Z Updating files:  83% (8252/9942)
+2026-11-09T11:59:20.2488327Z Updating files:  84% (8352/9942)
+2026-11-09T11:59:20.2556722Z Updating files:  85% (8451/9942)
+2026-11-09T11:59:20.2621376Z Updating files:  86% (8551/9942)
+2026-11-09T11:59:20.2816311Z Updating files:  87% (8650/9942)
+2026-11-09T11:59:20.2879287Z Updating files:  88% (8749/9942)
+2026-11-09T11:59:20.2945081Z Updating files:  89% (8849/9942)
+2026-11-09T11:59:20.3016454Z Updating files:  90% (8948/9942)
+2026-11-09T11:59:20.3073620Z Updating files:  91% (9048/9942)
+2026-11-09T11:59:20.3130179Z Updating files:  92% (9147/9942)
+2026-11-09T11:59:20.3390995Z Updating files:  93% (9247/9942)
+2026-11-09T11:59:20.3759617Z Updating files:  94% (9346/9942)
+2026-11-09T11:59:20.3820143Z Updating files:  95% (9445/9942)
+2026-11-09T11:59:20.3875456Z Updating files:  96% (9545/9942)
+2026-11-09T11:59:20.3934316Z Updating files:  97% (9644/9942)
+2026-11-09T11:59:20.4003388Z Updating files:  98% (9744/9942)
+2026-11-09T11:59:20.4052532Z Updating files:  99% (9843/9942)
+2026-11-09T11:59:20.4052802Z Updating files: 100% (9942/9942)
+2026-11-09T11:59:20.4053040Z Updating files: 100% (9942/9942), done.
+2026-11-09T11:59:20.4162577Z Switched to a new branch 'work/infinity-2103460-nine-corrections-20261106'
+2026-11-09T11:59:20.4165710Z branch 'work/infinity-2103460-nine-corrections-20261106' set up to track 'origin/work/infinity-2103460-nine-corrections-20261106'.
+2026-11-09T11:59:20.4257558Z ##[endgroup]
+2026-11-09T11:59:20.4301427Z [command]/usr/bin/git log -1 --format=%H
+2026-11-09T11:59:20.4327445Z ae0a6c205eb948b240872613220f38309165e7da
+2026-11-09T11:59:20.4335540Z ##[group]Removing auth
+2026-11-09T11:59:20.4338594Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-09T11:59:20.4369946Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-09T11:59:20.4602263Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-09T11:59:20.4626905Z http.https://github.com/.extraheader
+2026-11-09T11:59:20.4633068Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+2026-11-09T11:59:20.4666019Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-09T11:59:20.4897821Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-09T11:59:20.4938602Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-09T11:59:20.5166029Z ##[endgroup]
+2026-11-09T11:59:20.5379500Z ##[group]Run actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+2026-11-09T11:59:20.5379862Z with:
+2026-11-09T11:59:20.5380045Z   python-version: 3.11
+2026-11-09T11:59:20.5380251Z   check-latest: false
+2026-11-09T11:59:20.5382298Z   token: ***
+2026-11-09T11:59:20.5382497Z   update-environment: true
+2026-11-09T11:59:20.5382712Z   allow-prereleases: false
+2026-11-09T11:59:20.5382914Z   freethreaded: false
+2026-11-09T11:59:20.5383096Z env:
+2026-11-09T11:59:20.5385081Z   GH_TOKEN: ***
+2026-11-09T11:59:20.5385278Z   PYTHONDONTWRITEBYTECODE: 1
+2026-11-09T11:59:20.5385486Z ##[endgroup]
+2026-11-09T11:59:20.6485929Z ##[group]Installed versions
+2026-11-09T11:59:20.6596950Z (node:2004) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-09T11:59:20.6597857Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-09T11:59:20.6598441Z Successfully set up CPython (3.11.18)
+2026-11-09T11:59:20.6598955Z ##[endgroup]
+2026-11-09T11:59:20.6794887Z ##[group]Run actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+2026-11-09T11:59:20.6795414Z with:
+2026-11-09T11:59:20.6795703Z   distribution: temurin
+2026-11-09T11:59:20.6796021Z   java-version: 21
+2026-11-09T11:59:20.6796323Z   java-package: jdk
+2026-11-09T11:59:20.6796629Z   check-latest: false
+2026-11-09T11:59:20.6796918Z   server-id: github
+2026-11-09T11:59:20.6797205Z   server-username: GITHUB_ACTOR
+2026-11-09T11:59:20.6797535Z   server-password: GITHUB_TOKEN
+2026-11-09T11:59:20.6797887Z   overwrite-settings: true
+2026-11-09T11:59:20.6798220Z   job-status: success
+2026-11-09T11:59:20.6802077Z   token: ***
+2026-11-09T11:59:20.6802369Z env:
+2026-11-09T11:59:20.6805607Z   GH_TOKEN: ***
+2026-11-09T11:59:20.6805970Z   PYTHONDONTWRITEBYTECODE: 1
+2026-11-09T11:59:20.6806436Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-09T11:59:20.6807065Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.18/x64/lib/pkgconfig
+2026-11-09T11:59:20.6807734Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-09T11:59:20.6808262Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-09T11:59:20.6808778Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-09T11:59:20.6809460Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.18/x64/lib
+2026-11-09T11:59:20.6809909Z ##[endgroup]
+2026-11-09T11:59:20.8218153Z ##[warning]setup-java v4 is deprecated and will no longer receive updates. Please migrate to actions/setup-java@v5.
+2026-11-09T11:59:20.8225174Z ##[group]Installed distributions
+2026-11-09T11:59:20.8299097Z Resolved Java 21.0.13+9 from tool-cache
+2026-11-09T11:59:20.8299568Z Setting Java 21.0.13+9 as the default
+2026-11-09T11:59:20.8308012Z (node:2012) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-09T11:59:20.8308946Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-09T11:59:20.8311692Z Creating toolchains.xml for JDK version 21 from temurin
+2026-11-09T11:59:20.8366614Z Writing to /home/runner/.m2/toolchains.xml
+2026-11-09T11:59:20.8366923Z 
+2026-11-09T11:59:20.8367060Z Java configuration:
+2026-11-09T11:59:20.8367378Z   Distribution: temurin
+2026-11-09T11:59:20.8367705Z   Version: 21.0.13+9
+2026-11-09T11:59:20.8368148Z   Path: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.13-9/x64
+2026-11-09T11:59:20.8368531Z 
+2026-11-09T11:59:20.8368928Z ##[endgroup]
+2026-11-09T11:59:20.8379937Z Creating settings.xml with server-id: github
+2026-11-09T11:59:20.8406808Z Writing to /home/runner/.m2/settings.xml
+2026-11-09T11:59:20.8542701Z ##[group]Run android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+2026-11-09T11:59:20.8543055Z with:
+2026-11-09T11:59:20.8543240Z   packages: build-tools;35.0.0
+2026-11-09T11:59:20.8543486Z   log-accepted-android-sdk-licenses: false
+2026-11-09T11:59:20.8543739Z   cmdline-tools-version: 12266719
+2026-11-09T11:59:20.8544153Z   accept-android-sdk-licenses: true
+2026-11-09T11:59:20.8544368Z env:
+2026-11-09T11:59:20.8546679Z   GH_TOKEN: ***
+2026-11-09T11:59:20.8546888Z   PYTHONDONTWRITEBYTECODE: 1
+2026-11-09T11:59:20.8547265Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-09T11:59:20.8547833Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.18/x64/lib/pkgconfig
+2026-11-09T11:59:20.8548331Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-09T11:59:20.8548818Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-09T11:59:20.8549498Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-09T11:59:20.8550051Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.18/x64/lib
+2026-11-09T11:59:20.8550602Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.13-9/x64
+2026-11-09T11:59:20.8551207Z   JAVA_HOME_21_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.13-9/x64
+2026-11-09T11:59:20.8551646Z ##[endgroup]
+2026-11-09T11:59:20.9429604Z Found preinstalled sdkmanager in /usr/local/lib/android/sdk/cmdline-tools/latest with following source.properties:
+2026-11-09T11:59:20.9430738Z Pkg.Revision=9.0
+2026-11-09T11:59:20.9431059Z Pkg.Path=cmdline-tools;9.0
+2026-11-09T11:59:20.9431297Z Pkg.Desc=Android SDK Command-line Tools
+2026-11-09T11:59:20.9431474Z 
+2026-11-09T11:59:20.9431589Z Wrong version in preinstalled sdkmanager
+2026-11-09T11:59:20.9432074Z Downloading commandline tools from https://dl.google.com/android/repository/commandlinetools-linux-12266719_latest.zip
+2026-11-09T11:59:21.6773070Z [command]/usr/bin/unzip -o -q /home/runner/work/_temp/880b3079-9870-4fee-aa04-4721a0bfef49
+2026-11-09T11:59:22.4082359Z Accepting Android SDK licenses
+2026-11-09T11:59:26.7439812Z [command]/usr/local/lib/android/sdk/cmdline-tools/16.0/bin/sdkmanager build-tools;35.0.0
+2026-11-09T11:59:27.3672653Z Loading package information...                                                  
+2026-11-09T11:59:27.4412957Z Loading local repository...                                                     
+2026-11-09T11:59:27.4414229Z [                                       ] 3% Loading local repository...        
+2026-11-09T11:59:27.4446568Z [                                       ] 3% Fetch remote repository...         
+2026-11-09T11:59:27.7342308Z [=                                      ] 3% Fetch remote repository...         
+2026-11-09T11:59:27.7977759Z [=                                      ] 4% Fetch remote repository...         
+2026-11-09T11:59:27.8290707Z [=                                      ] 5% Fetch remote repository...         
+2026-11-09T11:59:27.8751918Z [==                                     ] 5% Fetch remote repository...         
+2026-11-09T11:59:27.9592183Z [==                                     ] 6% Fetch remote repository...         
+2026-11-09T11:59:28.0336046Z [==                                     ] 7% Fetch remote repository...         
+2026-11-09T11:59:28.0359998Z [==                                     ] 7% Computing updates...               
+2026-11-09T11:59:28.0471188Z [===                                    ] 8% Computing updates...               
+2026-11-09T11:59:28.0507829Z [===                                    ] 10% Computing updates...              
+2026-11-09T11:59:28.0508533Z [=======================================] 100% Computing updates...             
+2026-11-09T11:59:28.0509284Z 
+2026-11-09T11:59:28.0913370Z ##[group]Run python3 - <<'PY'
+2026-11-09T11:59:28.0913741Z [36;1mpython3 - <<'PY'[0m
+2026-11-09T11:59:28.0914000Z [36;1mimport hashlib,json,os,re[0m
+2026-11-09T11:59:28.0914252Z [36;1mfrom pathlib import Path[0m
+2026-11-09T11:59:28.0914596Z [36;1mtask=Path('repairs/infinity-tracking-integration-2103469-20261108')[0m
+2026-11-09T11:59:28.0915021Z [36;1mrequest=json.loads((task/'RELEASE-REQUEST.json').read_text())[0m
+2026-11-09T11:59:28.0915413Z [36;1mpair=json.loads((task/'PREPARED-PAIR-REQUEST.json').read_text())[0m
+2026-11-09T11:59:28.0915960Z [36;1mauthority=json.loads(Path('repairs/dual-experience-isolation-2103420/release-authority.json').read_text())[0m
+2026-11-09T11:59:28.0916963Z [36;1massert request['operation']=='sign-tracking-experimental-internal' and request['enabled'] is True and request['publication'] is False and request['owner_delivery_cleared'] is False[0m
+2026-11-09T11:59:28.0917723Z [36;1mversion=request['version'];assert type(version) is int and version in (2103474,2103475)[0m
+2026-11-09T11:59:28.0918107Z [36;1mgeneration={2103474:57,2103475:58}[version][0m
+2026-11-09T11:59:28.0918501Z [36;1massert authority['candidate_versionCode']==version and authority['generation']==generation[0m
+2026-11-09T11:59:28.0918948Z [36;1mreviewed=authority['owner_update_evidence']['source_files'][0m
+2026-11-09T11:59:28.0919825Z [36;1massert 'repairs/infinity-tracking-integration-2103469-20261108/register_tracking_release.py' in reviewed[0m
+2026-11-09T11:59:28.0920451Z [36;1massert 'repairs/infinity-tracking-integration-2103469-20261108/APK-PREPARE-REQUEST.json' in reviewed[0m
+2026-11-09T11:59:28.0920936Z [36;1mfor relative,wanted in authority['source_files'].items():[0m
+2026-11-09T11:59:28.0921379Z [36;1m  path=Path(relative);assert not path.is_absolute() and '..' not in path.parts and path.is_file()[0m
+2026-11-09T11:59:28.0921962Z [36;1m  assert hashlib.file_digest(path.open('rb'),'sha256').hexdigest()==wanted,'UNCHANGED_ORIGINAL_RELEASE_TOOL:'+relative[0m
+2026-11-09T11:59:28.0922401Z [36;1mfor relative,wanted in reviewed.items():[0m
+2026-11-09T11:59:28.0922663Z [36;1m  path=Path(relative)[0m
+2026-11-09T11:59:28.0923056Z [36;1m  assert not path.is_absolute() and '..' not in path.parts and path.is_file(),'EXACT_REVIEWED_SOURCE_PATH:'+relative[0m
+2026-11-09T11:59:28.0923628Z [36;1m  assert hashlib.file_digest(path.open('rb'),'sha256').hexdigest()==wanted,'REGISTERED_SOURCE_CHANGED:'+relative[0m
+2026-11-09T11:59:28.0924182Z [36;1massert type(pair['run_id']) is int and pair['run_id']>0 and re.fullmatch('[0-9a-f]{40}',pair['source_commit'])[0m
+2026-11-09T11:59:28.0924602Z [36;1massert set(pair['artifacts'])=={'2103474','2103475'}[0m
+2026-11-09T11:59:28.0924899Z [36;1mrow=pair['artifacts'][str(version)][0m
+2026-11-09T11:59:28.0925276Z [36;1massert set(row)=={'id','name','digest','size_in_bytes'} and type(row['id']) is int and row['id']>0[0m
+2026-11-09T11:59:28.0925849Z [36;1massert re.fullmatch('sha256:[0-9a-f]{64}',row['digest']) and type(row['size_in_bytes']) is int and 0<row['size_in_bytes']<=2*1024**3[0m
+2026-11-09T11:59:28.0926427Z [36;1maudit=task/'evidence/signed-c1-fixture-42602243785/MODULE-UPGRADE-RECOVERY.json'[0m
+2026-11-09T11:59:28.0926983Z [36;1massert audit.is_file() and hashlib.file_digest(audit.open('rb'),'sha256').hexdigest()==pair['module_audit_sha256'][0m
+2026-11-09T11:59:28.0927465Z [36;1mwith Path(os.environ['GITHUB_ENV']).open('a') as output:[0m
+2026-11-09T11:59:28.0927890Z [36;1m  output.write('TRACKING_VERSION='+str(version)+'\nTRACKING_GENERATION='+str(generation)+'\n')[0m
+2026-11-09T11:59:28.0928257Z [36;1mPY[0m
+2026-11-09T11:59:28.0928621Z [36;1mpython3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out SIGNER-ROUTES.json[0m
+2026-11-09T11:59:28.1005454Z shell: /usr/bin/bash -e {0}
+2026-11-09T11:59:28.1005694Z env:
+2026-11-09T11:59:28.1008004Z   GH_TOKEN: ***
+2026-11-09T11:59:28.1008213Z   PYTHONDONTWRITEBYTECODE: 1
+2026-11-09T11:59:28.1008737Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-09T11:59:28.1009101Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.18/x64/lib/pkgconfig
+2026-11-09T11:59:28.1009599Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-09T11:59:28.1009915Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-09T11:59:28.1010228Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-09T11:59:28.1010532Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.18/x64/lib
+2026-11-09T11:59:28.1010888Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.13-9/x64
+2026-11-09T11:59:28.1011271Z   JAVA_HOME_21_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.13-9/x64
+2026-11-09T11:59:28.1011739Z   ANDROID_HOME: /usr/local/lib/android/sdk
+2026-11-09T11:59:28.1011993Z   ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+2026-11-09T11:59:28.1012228Z ##[endgroup]
+2026-11-09T11:59:32.4376279Z ##[group]Run actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+2026-11-09T11:59:32.4376619Z with:
+2026-11-09T11:59:32.4376805Z   artifact-ids: 13631340281
+2026-11-09T11:59:32.4377007Z   run-id: 42514440156
+2026-11-09T11:59:32.4379375Z   github-token: ***
+2026-11-09T11:59:32.4379585Z   path: tracking-baseline
+2026-11-09T11:59:32.4379796Z   merge-multiple: true
+2026-11-09T11:59:32.4380029Z   repository: mahfouzhassine8-ops/project-infinity
+2026-11-09T11:59:32.4380296Z env:
+2026-11-09T11:59:32.4382316Z   GH_TOKEN: ***
+2026-11-09T11:59:32.4382515Z   PYTHONDONTWRITEBYTECODE: 1
+2026-11-09T11:59:32.4382789Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-09T11:59:32.4383135Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.18/x64/lib/pkgconfig
+2026-11-09T11:59:32.4383504Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-09T11:59:32.4383808Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-09T11:59:32.4384140Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-09T11:59:32.4384446Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.18/x64/lib
+2026-11-09T11:59:32.4384794Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.13-9/x64
+2026-11-09T11:59:32.4385175Z   JAVA_HOME_21_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.13-9/x64
+2026-11-09T11:59:32.4385497Z   ANDROID_HOME: /usr/local/lib/android/sdk
+2026-11-09T11:59:32.4385752Z   ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+2026-11-09T11:59:32.4385993Z   TRACKING_VERSION: 2103474
+2026-11-09T11:59:32.4386198Z   TRACKING_GENERATION: 57
+2026-11-09T11:59:32.4386393Z ##[endgroup]
+2026-11-09T11:59:32.5648690Z Downloading artifacts by ID
+2026-11-09T11:59:32.5652252Z Fetching artifact list for workflow run 42514440156 in repository mahfouzhassine8-ops/project-infinity
+2026-11-09T11:59:32.5714100Z (node:2261) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-09T11:59:32.5714855Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-09T11:59:32.5900422Z (node:2261) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-11-09T11:59:32.8711691Z Found 2 artifact(s)
+2026-11-09T11:59:32.8712543Z Preparing to download the following artifacts:
+2026-11-09T11:59:32.8713987Z - Infinity-Watchlist-Original-Signed-2103469-42514440156-INTERNAL-QA (ID: 13631340281, Size: 329126132, Expected Digest: sha256:f9d054ee500326b77ee2bf4ce8673af2bd54c54115831899d374d931a98dff43)
+2026-11-09T11:59:32.8744245Z Downloading artifact '13631340281' from 'mahfouzhassine8-ops/project-infinity'
+2026-11-09T11:59:33.0654740Z Redirecting to blob download url: https://productionresultssa7.blob.core.windows.net/actions-results/ff1e76a0-1ba3-4b4c-9c08-cb78820fac7a/workflow-job-run-6f0963c2-a407-5d4e-a5c1-aaabbf448e05/artifacts/e0bd09564e566f2e3aab4874bc99f2974379b91557f86a4488d9aaa607bc4758.zip
+2026-11-09T11:59:33.0656150Z Starting download of artifact to: /home/runner/work/project-infinity/project-infinity/tracking-baseline
+2026-11-09T11:59:33.2830402Z (node:2261) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+2026-11-09T11:59:42.1199678Z SHA256 digest of downloaded artifact is f9d054ee500326b77ee2bf4ce8673af2bd54c54115831899d374d931a98dff43
+2026-11-09T11:59:42.1200530Z Artifact download completed successfully.
+2026-11-09T11:59:42.1200971Z Total of 1 artifact(s) downloaded
+2026-11-09T11:59:42.1205927Z Download artifact has finished successfully
+2026-11-09T11:59:42.1337404Z ##[group]Run python3 repairs/infinity-tracking-integration-2103469-20261108/register_tracking_release.py download_prepared --out tracking-reviewed --version "$TRACKING_VERSION"
+2026-11-09T11:59:42.1338547Z [36;1mpython3 repairs/infinity-tracking-integration-2103469-20261108/register_tracking_release.py download_prepared --out tracking-reviewed --version "$TRACKING_VERSION"[0m
+2026-11-09T11:59:42.1394806Z shell: /usr/bin/bash -e {0}
+2026-11-09T11:59:42.1395162Z env:
+2026-11-09T11:59:42.1397577Z   GH_TOKEN: ***
+2026-11-09T11:59:42.1397918Z   PYTHONDONTWRITEBYTECODE: 1
+2026-11-09T11:59:42.1398422Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-09T11:59:42.1398900Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.18/x64/lib/pkgconfig
+2026-11-09T11:59:42.1399649Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-09T11:59:42.1400082Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-09T11:59:42.1416508Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-09T11:59:42.1417200Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.18/x64/lib
+2026-11-09T11:59:42.1417762Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.13-9/x64
+2026-11-09T11:59:42.1418378Z   JAVA_HOME_21_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.13-9/x64
+2026-11-09T11:59:42.1418886Z   ANDROID_HOME: /usr/local/lib/android/sdk
+2026-11-09T11:59:42.1419420Z   ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+2026-11-09T11:59:42.1419790Z   TRACKING_VERSION: 2103474
+2026-11-09T11:59:42.1420113Z   TRACKING_GENERATION: 57
+2026-11-09T11:59:42.1420419Z ##[endgroup]
+2026-11-09T12:00:01.7837672Z ##[group]Run actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+2026-11-09T12:00:01.7838010Z with:
+2026-11-09T12:00:01.7838180Z   run-id: 39867073954
+2026-11-09T12:00:01.7838419Z   name: Infinity-Receipt-Race-Android17-Investigation
+2026-11-09T12:00:01.7840867Z   github-token: ***
+2026-11-09T12:00:01.7841075Z   path: tools
+2026-11-09T12:00:01.7841260Z   merge-multiple: false
+2026-11-09T12:00:01.7841521Z   repository: mahfouzhassine8-ops/project-infinity
+2026-11-09T12:00:01.7841772Z env:
+2026-11-09T12:00:01.7843740Z   GH_TOKEN: ***
+2026-11-09T12:00:01.7843935Z   PYTHONDONTWRITEBYTECODE: 1
+2026-11-09T12:00:01.7844199Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-09T12:00:01.7844548Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.18/x64/lib/pkgconfig
+2026-11-09T12:00:01.7844889Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-09T12:00:01.7845209Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-09T12:00:01.7845547Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-09T12:00:01.7845850Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.18/x64/lib
+2026-11-09T12:00:01.7846204Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.13-9/x64
+2026-11-09T12:00:01.7846583Z   JAVA_HOME_21_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.13-9/x64
+2026-11-09T12:00:01.7846904Z   ANDROID_HOME: /usr/local/lib/android/sdk
+2026-11-09T12:00:01.7847162Z   ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+2026-11-09T12:00:01.7847403Z   TRACKING_VERSION: 2103474
+2026-11-09T12:00:01.7847604Z   TRACKING_GENERATION: 57
+2026-11-09T12:00:01.7847804Z ##[endgroup]
+2026-11-09T12:00:01.9117420Z Downloading single artifact
+2026-11-09T12:00:01.9201142Z (node:2309) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-09T12:00:01.9201792Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-09T12:00:01.9343914Z (node:2309) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-11-09T12:00:02.3190838Z Preparing to download the following artifacts:
+2026-11-09T12:00:02.3191821Z - Infinity-Receipt-Race-Android17-Investigation (ID: 12464327386, Size: 48663433, Expected Digest: sha256:30c38f5fc41c1e546f8eeea9f2a0271c64b74ae0aa3a08b24ec30606de59a4c3)
+2026-11-09T12:00:02.3216689Z Downloading artifact '12464327386' from 'mahfouzhassine8-ops/project-infinity'
+2026-11-09T12:00:02.7043893Z Redirecting to blob download url: https://productionresultssa17.blob.core.windows.net/actions-results/f6b87fcf-971a-8825-add1-2409a10bae58/workflow-job-run-332a0e19-4c1b-5ac5-8690-847720d5f34c/artifacts/3f5402e136ba69d7809d5dbbf9f2d44dc8b75670192a582f4f4aaa75787d68de.zip
+2026-11-09T12:00:02.7045600Z Starting download of artifact to: /home/runner/work/project-infinity/project-infinity/tools
+2026-11-09T12:00:02.9381796Z (node:2309) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+2026-11-09T12:00:05.9053758Z SHA256 digest of downloaded artifact is 30c38f5fc41c1e546f8eeea9f2a0271c64b74ae0aa3a08b24ec30606de59a4c3
+2026-11-09T12:00:05.9054624Z Artifact download completed successfully.
+2026-11-09T12:00:05.9055108Z Total of 1 artifact(s) downloaded
+2026-11-09T12:00:05.9061402Z Download artifact has finished successfully
+2026-11-09T12:00:05.9430485Z ##[group]Run python3 repairs/infinity-tracking-integration-2103469-20261108/register_tracking_release.py check_registered --prepared "tracking-reviewed/$TRACKING_VERSION" --version "$TRACKING_VERSION" --audit repairs/infinity-tracking-integration-2103469-20261108/evidence/signed-c1-fixture-42602243785/MODULE-UPGRADE-RECOVERY.json --request repairs/infinity-tracking-integration-2103469-20261108/PREPARED-PAIR-REQUEST.json --out REGISTERED-CANDIDATE-CHECK.json
+2026-11-09T12:00:05.9433282Z [36;1mpython3 repairs/infinity-tracking-integration-2103469-20261108/register_tracking_release.py check_registered --prepared "tracking-reviewed/$TRACKING_VERSION" --version "$TRACKING_VERSION" --audit repairs/infinity-tracking-integration-2103469-20261108/evidence/signed-c1-fixture-42602243785/MODULE-UPGRADE-RECOVERY.json --request repairs/infinity-tracking-integration-2103469-20261108/PREPARED-PAIR-REQUEST.json --out REGISTERED-CANDIDATE-CHECK.json[0m
+2026-11-09T12:00:05.9435363Z [36;1mpython3 repairs/dual-experience-isolation-2103420/component_bundles.py combine --bundles "tracking-reviewed/$TRACKING_VERSION/components" --catalog "tracking-reviewed/$TRACKING_VERSION/components/catalog.json" --out combined-unsigned.apk --version "$TRACKING_VERSION"[0m
+2026-11-09T12:00:05.9436197Z [36;1mpython3 - <<'PY'[0m
+2026-11-09T12:00:05.9436413Z [36;1mimport hashlib,json,os[0m
+2026-11-09T12:00:05.9436648Z [36;1mfrom pathlib import Path[0m
+2026-11-09T12:00:05.9437055Z [36;1mproof=json.loads((Path('tracking-reviewed')/os.environ['TRACKING_VERSION']/'PREPARATION.json').read_text())[0m
+2026-11-09T12:00:05.9437673Z [36;1massert hashlib.file_digest(Path('combined-unsigned.apk').open('rb'),'sha256').hexdigest()==proof['unsigned_sha256'][0m
+2026-11-09T12:00:05.9438269Z [36;1massert proof['versionCode']==int(os.environ['TRACKING_VERSION']) and proof['public_release'] is False[0m
+2026-11-09T12:00:05.9438653Z [36;1mPY[0m
+2026-11-09T12:00:05.9440425Z [36;1mpython3 repairs/infinity-tracking-integration-2103469-20261108/register_tracking_release.py compare --parent tracking-baseline/Infinity-2103469-Combined-Original-Signer.apk --candidate combined-unsigned.apk --prepared "tracking-reviewed/$TRACKING_VERSION" --out unsigned-preservation[0m
+2026-11-09T12:00:05.9441941Z [36;1mpython3 repairs/dual-experience-isolation-2103420/release_gate.py --apk combined-unsigned.apk --jars tools/receipt-evidence/tool-jars --work gate-dex --repository . --expected-head "$GITHUB_SHA" --expected-generation "$TRACKING_GENERATION" --out SIGNING-DECISION.json[0m
+2026-11-09T12:00:05.9500307Z shell: /usr/bin/bash -e {0}
+2026-11-09T12:00:05.9500533Z env:
+2026-11-09T12:00:05.9502838Z   GH_TOKEN: ***
+2026-11-09T12:00:05.9503048Z   PYTHONDONTWRITEBYTECODE: 1
+2026-11-09T12:00:05.9503325Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-09T12:00:05.9503688Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.18/x64/lib/pkgconfig
+2026-11-09T12:00:05.9504274Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-09T12:00:05.9504601Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-09T12:00:05.9504902Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-09T12:00:05.9505212Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.18/x64/lib
+2026-11-09T12:00:05.9505554Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.13-9/x64
+2026-11-09T12:00:05.9505931Z   JAVA_HOME_21_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.13-9/x64
+2026-11-09T12:00:05.9506259Z   ANDROID_HOME: /usr/local/lib/android/sdk
+2026-11-09T12:00:05.9506504Z   ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+2026-11-09T12:00:05.9506739Z   TRACKING_VERSION: 2103474
+2026-11-09T12:00:05.9506941Z   TRACKING_GENERATION: 57
+2026-11-09T12:00:05.9507131Z ##[endgroup]
+2026-11-09T12:00:17.9758115Z Traceback (most recent call last):
+2026-11-09T12:00:17.9765606Z   File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-tracking-integration-2103469-20261108/register_tracking_release.py", line 483, in <module>
+2026-11-09T12:00:17.9766351Z     globals()[operation](**args)
+2026-11-09T12:00:17.9767154Z   File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-tracking-integration-2103469-20261108/register_tracking_release.py", line 435, in check_registered
+2026-11-09T12:00:17.9768102Z     require(proposed(prepared, version, audit, request, previous) == current, 'EXACT_REGISTERED_OFFICIAL_EXPERIMENTAL_PAIR')
+2026-11-09T12:00:17.9768613Z             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-09T12:00:17.9769679Z   File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-tracking-integration-2103469-20261108/register_tracking_release.py", line 387, in proposed
+2026-11-09T12:00:17.9770603Z     prep, tools, authority, frozen, artifact, proof, catalog, components, sources, clear = official(prepared, version, audit, request)
+2026-11-09T12:00:17.9771248Z                                                                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-09T12:00:17.9772049Z   File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-tracking-integration-2103469-20261108/register_tracking_release.py", line 379, in official
+2026-11-09T12:00:17.9772743Z     sources = bindings(prep, producer, module_pin['source'], request)
+2026-11-09T12:00:17.9773109Z               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-09T12:00:17.9773859Z   File "/home/runner/work/project-infinity/project-infinity/repairs/infinity-tracking-integration-2103469-20261108/register_tracking_release.py", line 146, in bindings
+2026-11-09T12:00:17.9774549Z     result[request.relative_to(ROOT).as_posix()] = sha(request)
+2026-11-09T12:00:17.9774860Z            ^^^^^^^^^^^^^^^^^^^^^^^^^
+2026-11-09T12:00:17.9775322Z   File "/opt/hostedtoolcache/Python/3.11.18/x64/lib/python3.11/pathlib.py", line 730, in relative_to
+2026-11-09T12:00:17.9852805Z     raise ValueError("{!r} is not in the subpath of {!r}"
+2026-11-09T12:00:17.9853798Z ValueError: 'repairs/infinity-tracking-integration-2103469-20261108/PREPARED-PAIR-REQUEST.json' is not in the subpath of '/home/runner/work/project-infinity/project-infinity' OR one path is relative and the other is absolute.
+2026-11-09T12:00:18.0073136Z ##[error]Process completed with exit code 1.
+2026-11-09T12:00:18.0141395Z ##[group]Run actions/upload-artifact@v4
+2026-11-09T12:00:18.0141636Z with:
+2026-11-09T12:00:18.0141901Z   name: Infinity-Tracking-Signing-Evidence-42613267416-NOT-ACCEPTANCE
+2026-11-09T12:00:18.0142411Z   path: SIGNING-DECISION.json
+REGISTERED-CANDIDATE-CHECK.json
+SIGNER-ROUTES.json
+unsigned-preservation/
+
+2026-11-09T12:00:18.0142995Z   if-no-files-found: warn
+2026-11-09T12:00:18.0143308Z   retention-days: 90
+2026-11-09T12:00:18.0143603Z   compression-level: 6
+2026-11-09T12:00:18.0143887Z   overwrite: false
+2026-11-09T12:00:18.0144122Z   include-hidden-files: false
+2026-11-09T12:00:18.0144552Z env:
+2026-11-09T12:00:18.0146608Z   GH_TOKEN: ***
+2026-11-09T12:00:18.0146821Z   PYTHONDONTWRITEBYTECODE: 1
+2026-11-09T12:00:18.0147095Z   pythonLocation: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-09T12:00:18.0147444Z   PKG_CONFIG_PATH: /opt/hostedtoolcache/Python/3.11.18/x64/lib/pkgconfig
+2026-11-09T12:00:18.0147785Z   Python_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-09T12:00:18.0148129Z   Python2_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-09T12:00:18.0148433Z   Python3_ROOT_DIR: /opt/hostedtoolcache/Python/3.11.18/x64
+2026-11-09T12:00:18.0148740Z   LD_LIBRARY_PATH: /opt/hostedtoolcache/Python/3.11.18/x64/lib
+2026-11-09T12:00:18.0149080Z   JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.13-9/x64
+2026-11-09T12:00:18.0149650Z   JAVA_HOME_21_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/21.0.13-9/x64
+2026-11-09T12:00:18.0149979Z   ANDROID_HOME: /usr/local/lib/android/sdk
+2026-11-09T12:00:18.0150230Z   ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+2026-11-09T12:00:18.0150490Z   TRACKING_VERSION: 2103474
+2026-11-09T12:00:18.0150703Z   TRACKING_GENERATION: 57
+2026-11-09T12:00:18.0150895Z ##[endgroup]
+2026-11-09T12:00:18.1555955Z (node:2467) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-09T12:00:18.1557031Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-09T12:00:18.1616343Z Multiple search paths detected. Calculating the least common ancestor of all paths
+2026-11-09T12:00:18.1618388Z The least common ancestor is /home/runner/work/project-infinity/project-infinity. This will be the root directory of the artifact
+2026-11-09T12:00:18.1619351Z With the provided path, there will be 1 file uploaded
+2026-11-09T12:00:18.1635956Z Artifact name is valid!
+2026-11-09T12:00:18.1636383Z Root directory input is valid!
+2026-11-09T12:00:18.5057139Z Beginning upload of artifact content to blob storage
+2026-11-09T12:00:18.5194696Z (node:2467) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-11-09T12:00:18.7244329Z Uploaded bytes 281
+2026-11-09T12:00:18.7812175Z Finished uploading artifact content to blob storage!
+2026-11-09T12:00:18.7813126Z SHA256 digest of uploaded artifact zip is e4972dcbbd88f48a591ee700870d77726e6243e18e46439949310b41f7569624
+2026-11-09T12:00:18.7814161Z Finalizing artifact upload
+2026-11-09T12:00:19.2239389Z Artifact Infinity-Tracking-Signing-Evidence-42613267416-NOT-ACCEPTANCE.zip successfully finalized. Artifact ID 13671432029
+2026-11-09T12:00:19.2240962Z Artifact Infinity-Tracking-Signing-Evidence-42613267416-NOT-ACCEPTANCE has been successfully uploaded! Final size is 281 bytes. Artifact ID is 13671432029
+2026-11-09T12:00:19.2245599Z Artifact download URL: https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/42613267416/artifacts/13671432029
+2026-11-09T12:00:19.2431337Z Post job cleanup.
+2026-11-09T12:00:19.3580882Z (node:2480) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-09T12:00:19.3581553Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-09T12:00:19.3786043Z Post job cleanup.
+2026-11-09T12:00:19.4534956Z [command]/usr/bin/git version
+2026-11-09T12:00:19.4571418Z git version 2.56.0
+2026-11-09T12:00:19.4600359Z Temporarily overriding HOME='/home/runner/work/_temp/7bd789e1-36aa-496a-b13d-b441f642d42d' before making global git config changes
+2026-11-09T12:00:19.4601514Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-09T12:00:19.4604524Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/project-infinity/project-infinity
+2026-11-09T12:00:19.4638909Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-09T12:00:19.4671403Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-09T12:00:19.4940412Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-09T12:00:19.4973974Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-09T12:00:19.5256725Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-09T12:00:19.5291990Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-09T12:00:19.5712530Z Cleaning up orphan processes
+2026-11-09T12:00:19.6033399Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/checkout@11d5960a326750d5838078e36cf38b85af677262, actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093, actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3, actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065, actions/upload-artifact@v4, android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

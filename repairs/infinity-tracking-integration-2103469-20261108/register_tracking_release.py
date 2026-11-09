@@ -31,6 +31,10 @@ WORKFLOW = '.github/workflows/infinity-combined-release.yml'
 TARGETS = ['INFINITY', 'CHOOSER_SHELL']
 CERT = 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
 BASE_APK = '804eebc57af2e4ef4e5418b56994bda64eb7fd7e7f2c0653b5c6e2a9f7833058'
+PREPARED_PRODUCER = '0245abf5e4a10d490bd38677b118e873c01e5504'
+REGISTERED74 = 'ae0a6c205eb948b240872613220f38309165e7da'
+REGISTERED74_SHA256 = '86dafbd9923adcc82b3c66075d3236a9f65b436dd15e8edbca5a7ea7a42fb670'
+CORRECTION = HERE / 'PACKAGING-PATH-CORRECTION-REVIEW.json'
 
 
 def require(value, message):
@@ -89,6 +93,33 @@ def request_data(path):
     return data
 
 
+def packaging_correction(prep):
+    """Two reviewed packaging-only exceptions; frozen payload inputs stay exact."""
+    require(CORRECTION.is_file(), 'REVIEWED_POSTPRODUCER_PACKAGING_CORRECTION_REQUIRED')
+    review = load(CORRECTION)
+    require(review['status'] == 'ROOT_ASTRA_REVIEWED_PACKAGING_PATH_CORRECTION_ONLY' and
+            review['producer_source'] == PREPARED_PRODUCER and review['registration74_commit'] == REGISTERED74 and
+            review['registration74_sha256'] == REGISTERED74_SHA256, 'EXACT_PACKAGING_CORRECTION_SCOPE')
+    own = Path(__file__).resolve().relative_to(ROOT).as_posix()
+    request = (HERE / 'APK-PREPARE-REQUEST.json').relative_to(ROOT).as_posix()
+    expected_old = {own: 'c321719d20dd7984f4f3d5ceabc984a9087a29d5da71c1fc6b8cb57d852092c8',
+                    WORKFLOW: '5a95562b576315c43585b43af76d4c4afe227c8920b0f7de46c42b902f6bd159'}
+    require(review['historical_sha256'] == expected_old and set(review['reviewed_sha256']) == set(expected_old) and
+            review['producer_request_sha256'] == '4b46e83b9163d709fa8c3d073949b47c64ea3f78e612db2a40533dae8d391d7b',
+            'ONLY_EXACT_HELPER_AND_WORKFLOW_CORRECTION')
+    for name, wanted in expected_old.items():
+        require(prep.digest(prep.git('show', PREPARED_PRODUCER + ':' + name)) == wanted and
+                sha(ROOT / name) == review['reviewed_sha256'][name], 'EXACT_REVIEWED_PACKAGING_BYTES:' + name)
+    require(sha(ROOT / request) == review['producer_request_sha256'] ==
+            prep.digest(prep.git('show', PREPARED_PRODUCER + ':' + request)), 'IMMUTABLE_PRODUCER_REQUEST')
+    old = prep.git('show', PREPARED_PRODUCER + ':' + WORKFLOW)
+    before = b'generation={2103474:57,2103475:58}[version]'
+    after = b'generation={2103474:58,2103475:59}[version]'
+    require(old.count(before) == 1 and (ROOT / WORKFLOW).read_bytes() == old.replace(before, after, 1),
+            'ONLY_REVIEWED_GENERATION_LITERAL_WORKFLOW_CHANGE')
+    return review
+
+
 def preserved_module_generator(prep, module_producer):
     path = HERE / 'prepare_tracking_release.py'
     old = prep.git('show', module_producer + ':' + path.relative_to(ROOT).as_posix())
@@ -126,21 +157,37 @@ def apk_request(prep):
     require(set(request['source_bindings']) == expected, 'EXACT_APK_PREPARATION_INPUT_BINDINGS')
     for name, wanted in request['source_bindings'].items():
         relative = Path(name)
-        require(not relative.is_absolute() and '..' not in relative.parts and sha(ROOT / relative) == wanted,
-                'REVIEWED_APK_PREPARATION_INPUT:' + name)
-    require(sha(ROOT / WORKFLOW) == request['workflow_sha256'], 'REVIEWED_APK_PREPARATION_WORKFLOW')
+        require(not relative.is_absolute() and '..' not in relative.parts, 'REVIEWED_APK_PREPARATION_PATH')
+        if name == Path(__file__).resolve().relative_to(ROOT).as_posix() and sha(ROOT / relative) != wanted:
+            require(packaging_correction(prep)['historical_sha256'][name] == wanted, 'EXACT_REGISTRATION_ONLY_CORRECTION')
+        else:
+            require(sha(ROOT / relative) == wanted, 'REVIEWED_APK_PREPARATION_INPUT:' + name)
+    if sha(ROOT / WORKFLOW) != request['workflow_sha256']:
+        require(packaging_correction(prep)['historical_sha256'][WORKFLOW] == request['workflow_sha256'],
+                'EXACT_POSTPRODUCER_WORKFLOW_CORRECTION')
     return request
 
 
 def bindings(prep, producer, module_producer, request):
+    request = request.resolve()
     selected = apk_request(prep)
     result = dict(selected['source_bindings'])
     for name, wanted in result.items():
-        require((ROOT / name).read_bytes() == prep.git('show', producer + ':' + name), 'OFFICIAL_APK_PRODUCER_SOURCE:' + name)
+        original = prep.git('show', producer + ':' + name)
+        if name == Path(__file__).resolve().relative_to(ROOT).as_posix() and (ROOT / name).read_bytes() != original:
+            review = packaging_correction(prep)
+            require(producer == PREPARED_PRODUCER and prep.digest(original) == review['historical_sha256'][name],
+                    'EXACT_POSTPRODUCER_REGISTRATION_HELPER')
+            result[name] = sha(ROOT / name)
+        else:
+            require((ROOT / name).read_bytes() == original, 'OFFICIAL_APK_PRODUCER_SOURCE:' + name)
     prepare_request = HERE / 'APK-PREPARE-REQUEST.json'
     require(prepare_request.read_bytes() == prep.git('show', producer + ':' + prepare_request.relative_to(ROOT).as_posix()),
             'OFFICIAL_APK_PREPARATION_REQUEST')
-    require((ROOT / WORKFLOW).read_bytes() == prep.git('show', producer + ':' + WORKFLOW), 'OFFICIAL_APK_PREPARATION_WORKFLOW')
+    if (ROOT / WORKFLOW).read_bytes() != prep.git('show', producer + ':' + WORKFLOW):
+        require(producer == PREPARED_PRODUCER, 'EXACT_CORRECTED_PRODUCER')
+        packaging_correction(prep)
+        result[CORRECTION.relative_to(ROOT).as_posix()] = sha(CORRECTION)
     result[prepare_request.relative_to(ROOT).as_posix()] = sha(prepare_request)
     result[WORKFLOW] = sha(ROOT / WORKFLOW)
     result[request.relative_to(ROOT).as_posix()] = sha(request)
@@ -383,6 +430,38 @@ def official(prepared, version, audit, request):
     return prep, tools, authority, frozen, artifact, proof, catalog, components, sources, clear
 
 
+def original_registration74(prep):
+    raw = prep.git('show', REGISTERED74 + ':' + prep.AUTHORITY)
+    require(prep.digest(raw) == REGISTERED74_SHA256, 'EXACT_ACTUAL_REGISTERED74_AUTHORITY')
+    value = json.loads(raw)
+    require(value['generation'] == 57 and value['candidate_versionCode'] == 2103474 and
+            value['last_issued_versionCode'] == 2103469 and value['update_kind'] == 'owner_update',
+            'REGISTERED74_UNISSUED_VERSION_STATE')
+    return value
+
+
+def refreshed_authority(prep, tools, authority, previous, sources):
+    packaging_correction(prep)
+    require(previous == original_registration74(prep), 'EXACT_GEN57_REFRESH_PREDECESSOR')
+    result = copy.deepcopy(previous)
+    result.update(generation=58, update_kind='evidence_refresh', target_owners=[],
+                  previous_authority_sha256=prep.digest(tools.canonical(previous)), workflow_sha256=sha(ROOT / WORKFLOW))
+    result['owner_update_evidence']['source_files'] = sources
+    result['owner_update_evidence']['packaging_correction_review_sha256'] = sha(CORRECTION)
+    # No payload/component/version/reservation/contract field is reconstructed
+    # or advanced. The unchanged original transition admits evidence only.
+    authority.transition(previous, result, [])
+    authority.verify_evidence(result, lambda name: (ROOT / name).read_bytes())
+    return result
+
+
+def refresh_proposal(prepared, version, audit, request=REQUEST, previous=None):
+    require(version == 2103474, 'EVIDENCE_REFRESH_ONLY_REGISTERED74')
+    prep, tools, authority, _, _, _, _, _, sources, _ = official(prepared, version, audit, request)
+    previous = previous if previous is not None else load(ROOT / prep.AUTHORITY)
+    return refreshed_authority(prep, tools, authority, previous, sources)
+
+
 def proposed(prepared, version, audit, request=REQUEST, previous=None):
     prep, tools, authority, frozen, artifact, proof, catalog, components, sources, clear = official(prepared, version, audit, request)
     previous = previous if previous is not None else load(ROOT / prep.AUTHORITY)
@@ -390,8 +469,8 @@ def proposed(prepared, version, audit, request=REQUEST, previous=None):
     if version == 2103474:
         require(previous == canonical, 'EXACT_CANONICAL69_AUTHORITY_PREDECESSOR')
     else:
-        require(previous['candidate_versionCode'] == 2103474 and previous['generation'] == 57 and
-                previous['previous_authority_sha256'] == prep.digest(tools.canonical(canonical)) and
+        require(previous == refreshed_authority(prep, tools, authority, original_registration74(prep), sources) and
+                previous['candidate_versionCode'] == 2103474 and previous['generation'] == 58 and
                 previous['owner_update_evidence']['producer_source'] == frozen['source_commit'] and
                 previous['owner_update_evidence']['artifact'] == frozen['artifacts']['2103474'], 'EXACT_SAME_PAIR74_AUTHORITY_PREDECESSOR')
     for name, wanted in previous['source_files'].items():
@@ -432,7 +511,9 @@ def check_registered(prepared, version, audit, out, request=REQUEST):
     current = load(ROOT / prep.AUTHORITY)
     changed = command('git', '-C', ROOT, 'log', '-1', '--format=%H', '--', prep.AUTHORITY)
     previous = json.loads(prep.git('show', changed + '^:' + prep.AUTHORITY))
-    require(proposed(prepared, version, audit, request, previous) == current, 'EXACT_REGISTERED_OFFICIAL_EXPERIMENTAL_PAIR')
+    expected = (refresh_proposal(prepared, version, audit, request, previous)
+                if current.get('update_kind') == 'evidence_refresh' else proposed(prepared, version, audit, request, previous))
+    require(expected == current, 'EXACT_REGISTERED_OFFICIAL_EXPERIMENTAL_PAIR')
     save(out, dict(status='EXACT_REGISTERED_OFFICIAL_EXPERIMENTAL_PAYLOAD', versionCode=version,
         publication=False, accepted_pointer_updated=False))
 
@@ -462,13 +543,13 @@ if __name__ == '__main__':
     mode.add_argument('--out', type=Path, required=True)
     mode.add_argument('--version', type=int, required=True)
     mode.add_argument('--request', type=Path, default=REQUEST)
-    for name in ('propose', 'check_registered'):
+    for name in ('propose', 'refresh', 'check_registered'):
         mode = modes.add_parser(name)
         for field in ('prepared', 'audit', 'out'):
             mode.add_argument('--' + field, type=Path, required=True)
         mode.add_argument('--version', type=int, required=True)
         mode.add_argument('--request', type=Path, default=REQUEST)
-        if name == 'propose':
+        if name in ('propose', 'refresh'):
             mode.add_argument('--previous', type=Path)
     mode = modes.add_parser('compare')
     for field in ('parent', 'candidate', 'prepared', 'out'):
@@ -476,8 +557,9 @@ if __name__ == '__main__':
     mode.add_argument('--sdk', type=Path)
     args = vars(parser.parse_args())
     operation = args.pop('operation')
-    if operation == 'propose':
+    if operation in ('propose', 'refresh'):
         output, previous = args.pop('out'), args.pop('previous')
-        save(output, proposed(previous=load(previous) if previous else None, **args))
+        proposal = refresh_proposal if operation == 'refresh' else proposed
+        save(output, proposal(previous=load(previous) if previous else None, **args))
     else:
         globals()[operation](**args)

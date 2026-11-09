@@ -1,0 +1,91 @@
+{
+  "authority74": {
+    "COBRA_MINIMAL_COMPONENT_RECORDS_UNCHANGED": true,
+    "candidate_versionCode": 2103474,
+    "generation": 57,
+    "last_issued_versionCode": 2103469,
+    "original39_source_bindings_all_match": true,
+    "owner_delivery_cleared": false,
+    "payload_key_set_and_all_undeclared_records_equal_original69": true,
+    "predecessor_matches_canonical69": true,
+    "previous_authority_sha256": "dc06fef6103d286fa09cd1fa30b12dd4f6bc8bc57eb7eaf23e1f4ece0ecb4a4f",
+    "release_blockers_unchanged_from_original": true,
+    "runtime_disposition": "ROOT_REVIEWED_EXPERIMENTAL_RUNTIME_BLOCKED",
+    "source_bindings_all_match_canonical_worktree": true,
+    "target_owners": [
+      "INFINITY",
+      "CHOOSER_SHELL"
+    ]
+  },
+  "concrete_blockers": [],
+  "pair": {
+    "2103474": {
+      "CC": "0.3.5.72",
+      "all_extracted_files_match_official_archive": true,
+      "all_nondeclared_payload_bytes_equal_signed69": true,
+      "archive_digest_verified": true,
+      "artifact": {
+        "digest": "sha256:5e5f6c82d0ace0f2edc6d054083fabeaed469eca9d2a065991188790a165ef44",
+        "id": 13671365931,
+        "name": "Infinity2103474-Tracking-Experimental-Prepared-42611979269-INTERNAL",
+        "size_in_bytes": 316194776
+      },
+      "component_manifest_version": 2103421,
+      "component_member_vector": 7764,
+      "declared_changed_members": {
+        "AndroidManifest.xml": "a47b7cf99e1e32516cde8112e07f695b60ab20b5de451a99fdc04ca872dbfbe6",
+        "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1": "d920522dabaf2a5202d2db5d9300eab57ce20d8a53b7dfbe7ce8fdabc366188c",
+        "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1.sig": "2342d107c00b30f80ce14c2ae7320fa2b6727f9f5a7badaf74f2edc37b537980",
+        "assets/addons/script.infinity.commandcenter/addon.xml": "1d8b5738a447f0bbbad5d5f8a36794de42b3e5d6f5a4e268c892747f486123a6",
+        "assets/addons/script.infinity.commandcenter/plugin.py": "580a2d7b25bc7a415c2db059fe1fa696808107a4f997a32d544baf2468a2877a",
+        "assets/addons/script.infinity.commandcenter/resume_hub.py": "807157626f817dd5375e0e60872b6cd351d33135a23c5a225f26c86a196e7ed5",
+        "assets/addons/script.infinity.commandcenter/service.py": "c0f45709166d9b7018eac0cee4834aaa617e8a684d6d199568e4e65a4645d6bd",
+        "assets/experience-component-updates.properties": "daef408bdb3721938cb75ed1d09bc4182955beaf3bd2fa4c794be534a78419ab"
+      },
+      "final_APK_version_bound_by_original_assembler_and_preparation": 2103474,
+      "module_manifest_sha256": "d920522dabaf2a5202d2db5d9300eab57ce20d8a53b7dfbe7ce8fdabc366188c",
+      "normalized_AndroidManifest_equal_signed69": true,
+      "preparation_sha256": "3f09c0d64261982077b3642d09afa52d9157ef1d2fd440e99310b453c99d935d"
+    },
+    "2103475": {
+      "CC": "0.3.5.73",
+      "all_extracted_files_match_official_archive": true,
+      "all_nondeclared_payload_bytes_equal_signed69": true,
+      "archive_digest_verified": true,
+      "artifact": {
+        "digest": "sha256:fe0d67545aa1ca84df79730c88a14c387af978903a27446d872cea144e7e0bde",
+        "id": 13671675224,
+        "name": "Infinity2103475-Tracking-Forward-Recovery-Prepared-42611979269-INTERNAL",
+        "size_in_bytes": 316188966
+      },
+      "component_manifest_version": 2103421,
+      "component_member_vector": 7764,
+      "declared_changed_members": {
+        "AndroidManifest.xml": "4ee946eae885314d79fb91f030ac557f2b8d4f6af815e7cea9acb7e1576f9674",
+        "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1": "bc5f896b5a1690cdc8b570f2b09e303fab23f290460fa386ba230b2961628752",
+        "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1.sig": "e019e401d7b2490944044e988b45c917762527c5c9355916c1e6ab0c9cbd0fc1",
+        "assets/addons/script.infinity.commandcenter/addon.xml": "c3f0a00f8119a8f9ccd6e16825f51265c6d630a5c3fce63fcb3a9433972d2052",
+        "assets/addons/script.infinity.commandcenter/service.py": "887fcbc6e90a1c33ac465147ac52d75c89cc43072665bbc8c94636d2b68722ba",
+        "assets/experience-component-updates.properties": "ce65fc969920400377ed469f82b85d6a96aaca9e9922bef87444dd968abb0f73"
+      },
+      "final_APK_version_bound_by_original_assembler_and_preparation": 2103475,
+      "module_manifest_sha256": "bc5f896b5a1690cdc8b570f2b09e303fab23f290460fa386ba230b2961628752",
+      "normalized_AndroidManifest_equal_signed69": true,
+      "preparation_sha256": "f5628f3d18777f48bf646bd751329f2c34d7ccbe6a38ed394ddacd8fe1bd9ebf"
+    }
+  },
+  "prepared_pair_request_sha256": "5cc7477501120cdec0c66f43a7196a86c631013aa3baa52f139c91be0b72c5d5",
+  "producer_run": 42611979269,
+  "producer_source": "0245abf5e4a10d490bd38677b118e873c01e5504",
+  "proposal_sha256": "86dafbd9923adcc82b3c66075d3236a9f65b436dd15e8edbca5a7ea7a42fb670",
+  "public_module_review_reused_sha256": "25d39f9964ecbeee941873efa7af26013391ed38bd054611eed48b19f86e7a4d",
+  "release_acceptance": false,
+  "reviewed_at_utc": "2026-11-09T11:57:56.854279+00:00",
+  "scope_limits": [
+    "Actual prepared components and unsigned proposal only. No private key/signing/registration/app or host behavioral tests executed by reviewer.",
+    "Candidate source3 exact C1; recovery actual service887f is original69 plus reviewed loading guard, not e410 tracking. Native/DEX/providers/skin/Trakt/inactivehelper preserved.",
+    "Original authority transition/evidence PASS reported by root, not rerun here. Actual signing job must independently enforce original gates and remote authority against registered commit.",
+    "C1 Android runtime remains blocked/unverified, prior failures retained; signed in-place/recovery/data and owner Fold acceptance remain separate gates."
+  ],
+  "status": "ACCEPTED_ACTUAL_PREPARED_PAIR_AND_74_AUTHORITY_PROPOSAL_NOT_SIGNED_OR_DELIVERY_CLEARED"
+}

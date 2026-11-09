@@ -1,0 +1,43 @@
+{
+  "Fold": "NOT_RUN",
+  "apks": [],
+  "application_tests": false,
+  "authorized_branch": "work/infinity-tracking-integration-20261108",
+  "automatic_retries": 0,
+  "build_sign": false,
+  "enabled": false,
+  "maximum_intentional_starts_per_version": 1,
+  "official_signed_pair": {},
+  "official_signing": {},
+  "operation": "verify-experimental-tracking-signed-pair-install",
+  "publication": false,
+  "release_acceptance": false,
+  "retained_failure": {
+    "native_constructor": 42604600259,
+    "pre_key_request_path": 42613267416
+  },
+  "schema": 1,
+  "shutdown_tests": false,
+  "source_bindings": {
+    "POST-SIGN-INSTALL-HOST.json": "cb2afa98e57234946c4d344027722190d1ce89052b23256068bd2b2d995d4aef",
+    "POST-SIGN-INSTALL-PLAN.md": "80a42f35b0e3d08dcac8eeb2fce570ed19c134021757fc60805ff38e96ffd623",
+    "POST-SIGN-INSTALL-SELECTION.json": "3969527263a4823db75502040c7e79aa5935de71dcfad5e29d8d07d5da754de1",
+    "POST-SIGN-INSTALL-SOURCE-REVIEW.json": "1a83d13db4451defd08bf703a4662fbcfeb52138f9530ee88d3a30bbfed30855",
+    "POST-SIGN-INSTALL-WORKFLOW-REVIEW.json": "e64910a14ff87604a0c3067c92030eb55cd793263950f1543af1cb7d8b39ce0c",
+    "POST-SIGN-WORKFLOW-CONTRACT.md": "412fc9160bf42b8b1de015046093c0fcb50bbaf16696721f8cbbc6764893d23f",
+    "POST-SIGN-WORKFLOW-HOST.json": "b2816292a25506f33aec1ff5502eccd8bd1ba884b9b56bb3c53cd65e1ab2ffee",
+    "POST-SIGN-WORKFLOW-SELECTION.json": "47c168e2fda22a24276f5e4b04ec094aea04ab6775769dd5b21fd7a5f4cc400c",
+    "TRACKING-DEPENDENCY-PINS.json": "750d95f74969f01cf1c147a991852794a6bf5e72def1f1b7d9497113bdfa9350",
+    "admit_tracking_android.py": "55fc1ae419f2f6f81a3efe52ec3a4b06f0ee0e7348236e97bb640eb7e217c470",
+    "qualify_android_baseline.py": "9b4cf409c35688a77e94849361aff510b6b896871314b32b15cc5844b4e23734",
+    "stage_tracking_android.py": "d5d2e8e99721a576e6e52611fa9f0ca8a02a9c89f639f6fe99ba90db020323b8",
+    "tracking_android_observer.py": "517e9edf111b129d0907190cf2783d427c4775f78a5f0188416bd4245dcf9b50",
+    "verify_tracking_android.py": "04e736720a44f6a56d99132cce24498c32311ab8df728d8305284a28d4e10315",
+    "verify_tracking_install.py": "ed500734e7c851e4ac157d33b56c3cf1c1cd1ba72117fc470a800f96181265c1",
+    "verify_tracking_install_inputs.py": "d61edad84805d972a765fcd682b3145289d00cf03365ccd4a6097edce34c6948"
+  },
+  "source_core": "5787ca4569faa70dec4f10493b08bd8015d542ea",
+  "status": "DISABLED_PENDING_ACTUAL_ORIGINAL_SIGNED_74_AND75_NO_INVENTED_APK_HASHES",
+  "transport_scaffold": "HARNESS_BOOTSTRAP",
+  "workflow_sha256": "01ec86c3818d89fdb48156f4abda113eedb61b7e2271892e594c7851bc94c82a"
+}

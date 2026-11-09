@@ -1,7 +1,7 @@
 {
   "schema": 2,
   "operation": "verify-infinity-movies-tv-existing-tracking",
-  "application_tests": true,
+  "application_tests": false,
   "shutdown_tests": false,
   "APK_build": false,
   "publication": false,
@@ -99,7 +99,7 @@
     "replay_known_wrong_typed_tv": false
   },
   "retained_parent_save_failure_run": 42569526805,
-  "execution_status": "REVIEWED_C1_SELECTED_NOT_EXECUTED",
+  "execution_status": "CONSUMED_RUN_42604600259_NATIVE_CONSTRUCTOR_BLOCK; INACTIVE_NO_RERUN",
   "direct_provider_acceptance": false,
   "direct_provider_fallback": false,
   "maximum_new_attempts": 1,
@@ -121,5 +121,6 @@
   "retained_five_minute_evidence_repeated": false,
   "new_TV_minimum_seconds": 45,
   "optional_budget_seconds": 720,
-  "streaming_lifecycle_capture_limit_seconds": 900
+  "streaming_lifecycle_capture_limit_seconds": 900,
+  "inactive_request_reason": "Original C1 attempt preserved at exact3b68308d/sourcearchive; new signed-install selection requires separate actual official APK pins. Changed manual route does not reauthorize C3."
 }

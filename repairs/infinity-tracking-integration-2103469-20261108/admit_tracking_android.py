@@ -151,6 +151,19 @@ def workflow_shape():
     exclude = "&& inputs.feature != 'tracking-baseline-android'"
     expected = expected.replace(exclude, exclude + " && inputs.feature != 'tracking-integration-android'", 1)
     actual = (ROOT / WORKFLOW).read_text()
+    # The prior integration route remains historical/inactive. Remove only the
+    # independently reviewed exact new manual route before the original guard.
+    marker = '  tracking_signed_install_android:\n'
+    if marker in actual:
+        require(actual.count(marker) == 1, 'ONE_EXACT_MANUAL_INSTALL_ROUTE')
+        start = actual.index(marker)
+        require(hashlib.sha256(actual[start:].encode()).hexdigest() == 'a9468cd44f94b31ef432ab465b31a7c67b841b9c7179eb52483adb01bdf4e91f',
+                'UNCHANGED_REVIEWED_MANUAL_INSTALL_JOB')
+        actual = actual[:start]
+        choice = ', tracking-signed-install-android]'
+        exclusion = " && inputs.feature != 'tracking-signed-install-android'"
+        require(actual.count(choice) == actual.count(exclusion) == 1, 'EXACT_MANUAL_CHOICE_AND_GENERIC_EXCLUSION')
+        actual = actual.replace(choice, ']', 1).replace(exclusion, '', 1)
     require(actual.startswith(expected.rstrip() + '\n') and
             re.findall(r'^  ([A-Za-z0-9_-]+):', actual[len(expected.rstrip()):], re.M) == ['tracking_integration_android'],
             'ALL_EXISTING_FEATURE_JOBS_UNCHANGED')

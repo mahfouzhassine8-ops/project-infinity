@@ -2280,7 +2280,7 @@ jobs:
           authority=json.loads(Path('repairs/dual-experience-isolation-2103420/release-authority.json').read_text())
           assert request['operation']=='sign-tracking-experimental-internal' and request['enabled'] is True and request['publication'] is False and request['owner_delivery_cleared'] is False
           version=request['version'];assert type(version) is int and version in (2103474,2103475)
-          generation={2103474:57,2103475:58}[version]
+          generation={2103474:58,2103475:59}[version]
           assert authority['candidate_versionCode']==version and authority['generation']==generation
           reviewed=authority['owner_update_evidence']['source_files']
           assert 'repairs/infinity-tracking-integration-2103469-20261108/register_tracking_release.py' in reviewed

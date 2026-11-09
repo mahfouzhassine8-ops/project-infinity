@@ -1,0 +1,22 @@
+{
+  "command": "python repairs/infinity-tracking-integration-2103469-20261108/test_tracking_install_route_shape.py",
+  "correction": "Manual-only tracking-signed-install-android route in existing393886994; preserve previous jobs by exact reviewed route normalization in old admission shape guard only.",
+  "historical_workflow_source": "0245abf5e4a10d490bd38677b118e873c01e5504",
+  "not_selected": [
+    "old9/40/14/13 or other host suites",
+    "APK verification/downloads",
+    "SDK/emulator/app execution",
+    "build/sign/dispatch/push",
+    "production/helper/preparer/combinedworkflow changes"
+  ],
+  "old_tracking_request_and_pins": "Historical/inactive; root archives/disables separately. No C3 rerun is selected.",
+  "schema": 1,
+  "scope": "Compile only original require/workflow_shape functions at optimize=1. Accept unchanged historical/current-normalized source, reject changed new job predicate, removed exclusion/choice and modified preexisting protected job. No workflow or application is executed.",
+  "selected_before_execution": true,
+  "selected_followup_before_execution": {
+    "case": "RouteShape.test_only_exact_reviewed_manual_addition_normalizes",
+    "command": "python repairs/infinity-tracking-integration-2103469-20261108/test_tracking_install_route_shape.py",
+    "reason": "Independent source review: pre-setup runner isPython3.10, so replace intake file_digest with compatible streamingSHA; exact intake/job pins and route-normalization jobSHA change. Rerun only the same affected source guard, no old suites."
+  },
+  "selected_host_case": "RouteShape.test_only_exact_reviewed_manual_addition_normalizes"
+}
