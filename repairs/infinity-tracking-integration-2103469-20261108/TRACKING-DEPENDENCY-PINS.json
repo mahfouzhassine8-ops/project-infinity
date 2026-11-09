@@ -1,0 +1,260 @@
+{
+  "schema": 1,
+  "scope": "Unmodified publisher packages for the selected disposable Android WNT tracking fixture only; no production/provider changes",
+  "provider": "plugin.video.watchnixtoons2",
+  "archives": [
+    {
+      "addon": "script.module.certifi",
+      "version": "2023.5.7",
+      "url": "https://mirrors.kodi.tv/addons/omega/script.module.certifi/script.module.certifi-2023.5.7.zip",
+      "sha256": "c16d4cd2efe6e57dbb5e8d71a9beb3af213b1e3d717e8b0b24f0cbdc4c645070",
+      "dependencies": [
+        {
+          "addon": "xbmc.python",
+          "version": "3.0.0"
+        }
+      ],
+      "manifest_sha256": "186548abb00ea69b67b43bd23f988b1f68150332d9ca5698c9b48c4beffe0732",
+      "source_pin_file": "repairs/save-later-multiimage-20261023/ANDROID-INPUT-PINS.json"
+    },
+    {
+      "addon": "script.module.chardet",
+      "version": "5.1.0",
+      "url": "https://mirrors.kodi.tv/addons/omega/script.module.chardet/script.module.chardet-5.1.0.zip",
+      "sha256": "d5010fc55a9523d86a306ae9e6a8dea0e3248fe079b9ed37280fe86110cd766a",
+      "dependencies": [
+        {
+          "addon": "xbmc.python",
+          "version": "3.0.0"
+        }
+      ],
+      "manifest_sha256": "73aa4e0b9f9ad26896a6d63df4321bb4dbb2eac5ebdc463c1c997902b6a3078b",
+      "source_pin_file": "repairs/save-later-multiimage-20261023/ANDROID-INPUT-PINS.json"
+    },
+    {
+      "addon": "script.module.idna",
+      "version": "3.10.0",
+      "url": "https://mirrors.kodi.tv/addons/omega/script.module.idna/script.module.idna-3.10.0.zip",
+      "sha256": "c4ff34dbfab2736e9214a374d331bd6f558d8b3fea8eb7902e210749509242b3",
+      "dependencies": [
+        {
+          "addon": "xbmc.python",
+          "version": "3.0.0"
+        }
+      ],
+      "manifest_sha256": "c250f4a73ac9f6e75d7539879fd59a864ea93e7f9d35bb586953abe6ab4376bd",
+      "source_pin_file": "repairs/save-later-multiimage-20261023/ANDROID-INPUT-PINS.json"
+    },
+    {
+      "addon": "script.module.urllib3",
+      "version": "2.2.3",
+      "url": "https://mirrors.kodi.tv/addons/omega/script.module.urllib3/script.module.urllib3-2.2.3.zip",
+      "sha256": "740b2d63bb50eee9fb35f01c567ec8d3588c5bbd548e2b8d280932be30d82f53",
+      "dependencies": [
+        {
+          "addon": "xbmc.python",
+          "version": "3.0.0"
+        }
+      ],
+      "manifest_sha256": "9ee4d9805a67de90965bb7c69c0363983c9961ea6cce8545df5181b50ebc7426",
+      "source_pin_file": "repairs/save-later-multiimage-20261023/ANDROID-INPUT-PINS.json"
+    },
+    {
+      "addon": "script.module.requests",
+      "version": "2.31.0",
+      "url": "https://mirrors.kodi.tv/addons/omega/script.module.requests/script.module.requests-2.31.0.zip",
+      "sha256": "a5704f0fd7afb4154e1beea9b5f05a002bcd75fa581a1e5fd15ece39bf2bd38a",
+      "dependencies": [
+        {
+          "addon": "xbmc.python",
+          "version": "3.0.0"
+        },
+        {
+          "addon": "script.module.certifi",
+          "version": "2023.5.7"
+        },
+        {
+          "addon": "script.module.chardet",
+          "version": "5.1.0"
+        },
+        {
+          "addon": "script.module.idna",
+          "version": "3.4.0"
+        },
+        {
+          "addon": "script.module.urllib3",
+          "version": "1.26.16+matrix.1"
+        }
+      ],
+      "manifest_sha256": "7921891c05b4fbb1ddbc8fc9d78ecab2ce083b3a83015cd670427ea0ff4e950d",
+      "source_pin_file": "repairs/save-later-multiimage-20261023/ANDROID-INPUT-PINS.json"
+    },
+    {
+      "addon": "script.module.six",
+      "version": "1.16.0+matrix.1",
+      "url": "https://mirrors.kodi.tv/addons/omega/script.module.six/script.module.six-1.16.0+matrix.1.zip",
+      "sha256": "4197f7773f75ab9f16b3c920195acbb8b8b151b4b3c8c3e14fc4876e764e3860",
+      "dependencies": [
+        {
+          "addon": "xbmc.python",
+          "version": "3.0.0"
+        }
+      ],
+      "manifest_sha256": "ce96b1ab08b36219bc0b7cc99f728d5ad64db4f5e274cb5802fe3abe095684ad",
+      "source_pin_file": "repairs/infinity-final-release-462-20261107/ANDROID-EXTRA-INPUT-PINS.json"
+    },
+    {
+      "addon": "inputstream.adaptive",
+      "version": "21.5.25",
+      "url": "https://mirrors.kodi.tv/addons/omega/inputstream.adaptive+android-aarch64/inputstream.adaptive-21.5.25.zip",
+      "sha256": "5bec8b8ca1f1ca8264e32455cb34b2939e523f9bdb18cd65d7383d18afdf04cb",
+      "dependencies": [
+        {
+          "addon": "kodi.binary.global.main",
+          "minversion": "2.0.0",
+          "version": "2.0.2"
+        },
+        {
+          "addon": "kodi.binary.global.general",
+          "minversion": "1.0.4",
+          "version": "1.0.5"
+        },
+        {
+          "addon": "kodi.binary.global.gui",
+          "minversion": "5.15.0",
+          "version": "5.15.0"
+        },
+        {
+          "addon": "kodi.binary.global.filesystem",
+          "minversion": "1.1.7",
+          "version": "1.1.9"
+        },
+        {
+          "addon": "kodi.binary.global.tools",
+          "minversion": "1.0.0",
+          "version": "1.0.4"
+        },
+        {
+          "addon": "kodi.binary.instance.inputstream",
+          "minversion": "3.3.0",
+          "version": "3.3.0"
+        },
+        {
+          "addon": "kodi.binary.instance.videocodec",
+          "minversion": "2.1.0",
+          "version": "2.1.0"
+        }
+      ],
+      "manifest_sha256": "60c0ee38bf04f65834d619fb2950d2d8bc44dc960e25339e838921d608b32713",
+      "source_pin_file": "repairs/infinity-final-release-462-20261107/ANDROID-EXTRA-INPUT-PINS.json",
+      "platform": "android-aarch64",
+      "binary": {
+        "archive_member": "inputstream.adaptive/libinputstream.adaptive.so",
+        "sha256": "9911be6cf3101a1c3866fe89f65a7168d91d3892465778bc0338eef43e269c58",
+        "elf_class": 64,
+        "elf_machine": 183,
+        "dt_needed": [
+          "libc++_shared.so",
+          "libm.so",
+          "libdl.so",
+          "libc.so"
+        ]
+      }
+    },
+    {
+      "addon": "plugin.video.watchnixtoons2",
+      "version": "0.14.24",
+      "url": "https://raw.githubusercontent.com/OldManJax/repository.animaniac/ac317fdf6d001f6e252b41037fb1086817e8b00f/plugin.video.watchnixtoons2/plugin.video.watchnixtoons2-0.14.24.zip",
+      "sha256": "76a0580d035b80634fc6775f46aacc780a9449a9ca46b446dde63c2360ce6540",
+      "dependencies": [
+        {
+          "addon": "script.module.requests"
+        },
+        {
+          "addon": "script.module.six"
+        },
+        {
+          "addon": "inputstream.adaptive"
+        }
+      ],
+      "manifest_sha256": "9dc68f15ce6d7e80ff31443eff8fcf43afe80d8fcdd88a5e8fc592f9fa31318c",
+      "source_pin_file": "repairs/infinity-final-release-462-20261107/ANDROID-EXTRA-INPUT-PINS.json"
+    }
+  ],
+  "builtin_dependencies": [
+    {
+      "addon": "kodi.binary.global.filesystem",
+      "version": "1.1.9",
+      "apk_member": "assets/addons/kodi.binary.global.filesystem/addon.xml",
+      "manifest_sha256": "0fb6d7a3a0918b0323c3c3da8b4ab04be2518eaff150858b15a648150c5b4ded"
+    },
+    {
+      "addon": "kodi.binary.global.general",
+      "version": "1.0.5",
+      "apk_member": "assets/addons/kodi.binary.global.general/addon.xml",
+      "manifest_sha256": "8455bb4d770a689bf807eb2361221cb4594fce5d9b14fb16c2b861b950d43e8f"
+    },
+    {
+      "addon": "kodi.binary.global.gui",
+      "version": "5.15.0",
+      "apk_member": "assets/addons/kodi.binary.global.gui/addon.xml",
+      "manifest_sha256": "fdaabd8db2742e2fb8c70366f7fc13ce7299ac51b1b3a17059943f6386cda3f7"
+    },
+    {
+      "addon": "kodi.binary.global.main",
+      "version": "2.0.2",
+      "apk_member": "assets/addons/kodi.binary.global.main/addon.xml",
+      "manifest_sha256": "294a55b1568509695c9cb62b71a0f9b8c2f1f88a014d3a0a229f0ceec9dd9617"
+    },
+    {
+      "addon": "kodi.binary.global.tools",
+      "version": "1.0.4",
+      "apk_member": "assets/addons/kodi.binary.global.tools/addon.xml",
+      "manifest_sha256": "c6c06b9b026e79dae5695137d846e763523d9b968020503d9f7fbee42afcf331"
+    },
+    {
+      "addon": "kodi.binary.instance.inputstream",
+      "version": "3.3.0",
+      "apk_member": "assets/addons/kodi.binary.instance.inputstream/addon.xml",
+      "manifest_sha256": "6b19568b9b7761ebea99e4673c7140399c86076b35cc290efe76a6075ea15b2f"
+    },
+    {
+      "addon": "kodi.binary.instance.videocodec",
+      "version": "2.1.0",
+      "apk_member": "assets/addons/kodi.binary.instance.videocodec/addon.xml",
+      "manifest_sha256": "8744b52e8c0a18a2c5af4cf8ea5267e5c02d92f0075c2e2469e79580926bb9f5"
+    },
+    {
+      "addon": "xbmc.python",
+      "version": "3.0.1",
+      "apk_member": "assets/addons/xbmc.python/addon.xml",
+      "manifest_sha256": "8f461fbda037a4c50ed0688249e4835f69c45fd74bb5f768f854c365ed933fea"
+    }
+  ],
+  "baseline_apk_sha256": "804eebc57af2e4ef4e5418b56994bda64eb7fd7e7f2c0653b5c6e2a9f7833058",
+  "inputstream_bundled_in_baseline": false,
+  "native_runtime_dependency": {
+    "apk_member": "lib/arm64-v8a/libc++_shared.so",
+    "sha256": "f1ce8bc0759504421da60393b8654cce473973615416254e68255306ec913222",
+    "elf_machine": 183
+  },
+  "status": "PINNED_ARCHIVES_AND_STATIC_DEPENDENCY_CLOSURE_VERIFIED_RUNTIME_NOT_RUN",
+  "not_selected": [
+    "all twelve unrelated dependencies",
+    "provider settings mutation",
+    "app execution",
+    "native build",
+    "signing",
+    "dispatch"
+  ],
+  "installation_order": [
+    "script.module.certifi",
+    "script.module.chardet",
+    "script.module.idna",
+    "script.module.urllib3",
+    "script.module.requests",
+    "script.module.six",
+    "inputstream.adaptive",
+    "plugin.video.watchnixtoons2"
+  ]
+}

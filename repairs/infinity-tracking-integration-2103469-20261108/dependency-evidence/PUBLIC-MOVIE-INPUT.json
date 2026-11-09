@@ -1,0 +1,64 @@
+{
+  "schema": 1,
+  "status": "PUBLIC_MOVIE_CATALOG_AND_PAGE_EVIDENCE_ONLY",
+  "captured_utc": "2026-11-09T03:34:00.910480+00:00",
+  "provider": {
+    "addon": "plugin.video.watchnixtoons2",
+    "version": "0.14.24",
+    "publisher_archive_sha256": "76a0580d035b80634fc6775f46aacc780a9449a9ca46b446dde63c2360ce6540"
+  },
+  "source_category": {
+    "kind": "movie",
+    "root_menu_source": "lib/plugin.py:49-50 actionMenu Movies -> URL_PATHS[movies]",
+    "path_source": "lib/constants.py:77 URL_PATHS[movies] = /movie-list",
+    "catalog_url": "https://www.wcostream.tv/movie-list",
+    "http_status": 200,
+    "final_url": "https://www.wcostream.tv/movie-list",
+    "body_sha256": "54f894ad389058dca86fd1aff1879b1c2658dda55bda3c3732829b6a30c3ae98",
+    "body_bytes": 905480,
+    "saved_body": "/workspace/scratch/tracking69-public-provider-inputs/movie-list.html",
+    "parser_source_sha256": "9c7b2e051cf61e147e860494f8eaebe597e0eddf3ef883ea35c0fb7fa226fa0d",
+    "catalog_start_index": 19132,
+    "catalog_end_index": 836796,
+    "catalog_rows": 5997,
+    "exact_matching_rows": 1,
+    "catalog_row": {
+      "url": "/fantastic-mr-fox",
+      "label": "Fantastic Mr. Fox"
+    },
+    "root_route": "plugin://plugin.video.watchnixtoons2/?action=actionCatalogMenu&path=%2Fmovie-list",
+    "category_route": "plugin://plugin.video.watchnixtoons2/?action=actionCatalogSection&path=%2Fmovie-list&section=F"
+  },
+  "selected": {
+    "label": "Fantastic Mr. Fox",
+    "provider_page_uri": "/fantastic-mr-fox",
+    "public_page_url": "https://www.wcostream.tv/fantastic-mr-fox",
+    "expected_provider_route": "plugin://plugin.video.watchnixtoons2/?action=actionResolve&url=%2Ffantastic-mr-fox",
+    "expected_media": "movie",
+    "expected_episode_coordinates": {
+      "season": -1,
+      "episode": -1
+    },
+    "canonical_ids": {},
+    "identity_basis": "Exact source page in provider Movies catalog; no title-to-external-ID inference.",
+    "public_http": {
+      "status": 200,
+      "final_url": "https://www.wcostream.tv/fantastic-mr-fox",
+      "body_sha256": "c687bcef5473536db937fa1d6f5538428023bb9c32896b3460c8b46b6bea44a5",
+      "body_bytes": 1964022,
+      "saved_body": "/workspace/scratch/tracking69-public-provider-inputs/fantastic-mr-fox.html",
+      "html_title": "Fantastic Mr. Fox | Watch cartoons online, Watch anime online, English dub anime"
+    }
+  },
+  "source_proof": {
+    "catalog_dispatch": "lib/plugin.py:137-150 /movie-list is_special=True -> actionResolve,is_folder=False",
+    "row_metadata": "lib/plugin.py:166-169 chooses normal/clean row builder. makeListItem(is_special=True) supplies movie; makeListItemClean(is_special=True) supplies video. Both are playable category movie routes. actionResolve1656-1679 supplies movie when actual focused ListItem has no episode; actual Android final kind remains a required assertion.",
+    "plugin_py_sha256": "d8d395634eff8ada8c9d09138744997573035b7819fcac91985ff870bbfc2283",
+    "constants_py_sha256": "81c63b78d46f8cd7c99318be2923d86e85b4ff6833b6047970c5bb9155a6ee23"
+  },
+  "limitations": [
+    "Public HTTP catalog/page availability only; no Kodi navigation or playback has run.",
+    "Movie media type, native provenance, duration, stream availability and actual tracker writes must be verified in selected Android execution.",
+    "No stream extraction, iframe request, account, synthetic identity, provider settings change or app dispatch was performed."
+  ]
+}
