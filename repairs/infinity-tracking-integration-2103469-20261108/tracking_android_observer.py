@@ -20,11 +20,97 @@ import xbmcvfs
 QA = 'script.infinity.trackingqa'
 CC = 'script.infinity.commandcenter'
 EVENTS = None
+BOOTSTRAP_PHASES = []
 
 
 def require(value, label):
     if not value:
         raise RuntimeError(label)
+
+
+def phase(name):
+    BOOTSTRAP_PHASES.append(dict(phase=name, monotonic=time.monotonic()))
+    BOOTSTRAP_PHASES[:] = BOOTSTRAP_PHASES[-64:]
+
+
+def authenticated_bootstrap(root, version):
+    """Consume the original loaded-engine ABI before executing owned Python.
+
+    The sole Python bootstrap is the installed, hash-verified module_contract
+    source, loaded exactly as the original default.py bootstrap does. Its own
+    ImportGuard remains responsible for every subsequent owned import.
+    """
+    expected = json.loads((Path(__file__).parent / 'expected.json').read_text())
+    owned = ('script.infinity.commandcenter', 'script.infinity.uirepair',
+             'script.infinity.watchedbridge', 'script.infinity.rails')
+    prefixes = tuple(str(root.parent / name) for name in owned)
+    previous = sys.path[:]
+    phase('NATIVE_IDENTITY_BEGIN')
+    try:
+        sys.path[:] = [p for p in previous if p.startswith('/') and not any(
+            p == prefix or p.startswith(prefix + '/') for prefix in prefixes)]
+        import ctypes
+        import types
+        library_root = os.environ.get('KODI_ANDROID_LIBS', '')
+        require(library_root.startswith('/') and '\0' not in library_root, 'RUNNING_ENGINE_LIBRARY_ROOT_REQUIRED')
+        library = ctypes.CDLL(os.path.realpath(os.path.join(library_root, 'libkodi.so')),
+                              mode=os.RTLD_NOLOAD | os.RTLD_NOW)
+        native = library.InfinityCommandCenterIdentityV1
+        native.argtypes = (ctypes.c_char_p, ctypes.POINTER(ctypes.c_char), ctypes.c_size_t,
+                           ctypes.POINTER(ctypes.c_char), ctypes.c_size_t, ctypes.POINTER(ctypes.c_uint))
+        native.restype = ctypes.c_int
+        encoded = str(root).encode('utf-8')
+        require(len(encoded) <= 4096 and b'\0' not in encoded, 'BOUNDED_INSTALLED_CC_ROOT_REQUIRED')
+        actual_version, digest, protocol = ctypes.create_string_buffer(49), ctypes.create_string_buffer(65), ctypes.c_uint()
+        require(native(encoded, actual_version, len(actual_version), digest, len(digest), ctypes.byref(protocol)) == 1,
+                'NATIVE_ORIGINAL_RSA_FULL80_IDENTITY_REQUIRED')
+        require(actual_version.value.decode('ascii') == version == expected['cc_version'] and protocol.value == 1 and
+                digest.value.decode('ascii') == expected['manifest_sha256'], 'EXPECTED_NATIVE_VERSION_PROTOCOL_MANIFEST_REQUIRED')
+        phase('NATIVE_FULL80_IDENTITY_ACCEPTED')
+        with (root / 'INFINITY-MODULES.v1').open('rb') as stream:
+            manifest = stream.read(128 * 1024 + 1)
+        require(len(manifest) <= 128 * 1024 and hashlib.sha256(manifest).hexdigest() == expected['manifest_sha256'],
+                'NATIVE_AUTHENTICATED_MANIFEST_BYTES_REQUIRED')
+        rows = [line.split('\t') for line in manifest.decode('ascii').splitlines() if line.startswith('file\t')]
+        require(len(rows) == 80 and all(len(row) == 3 for row in rows), 'EXACT80_MANIFEST_RECORDS_REQUIRED')
+        files = {row[2]: row[1] for row in rows}
+        require(len(files) == 80 and files == expected['module_sources'], 'EXACT_EXPECTED_AUTHENTICATED80_MAP_REQUIRED')
+        for relative, wanted in files.items():
+            path = root.parent / relative
+            require(path.resolve().is_relative_to(root.parent.resolve()), 'OWNED_BOOTSTRAP_SOURCE_PATH_REQUIRED')
+            require(hashlib.sha256(path.read_bytes()).hexdigest() == wanted, 'EXACT_BOOTSTRAP_FULL80_SOURCE_REQUIRED:' + relative)
+        phase('EXPECTED_FULL80_SOURCE_MAP_ACCEPTED')
+        bootstrap = root / 'module_contract.py'
+        require(files[CC + '/module_contract.py'] == '759e60439fae0b1bf0f8a2ff6895209ac848101b9544ac6c0e297b9c73df1267',
+                'ORIGINAL_IMMUTABLE_BOOTSTRAP_SOURCE_PIN_REQUIRED')
+        with bootstrap.open('rb') as stream:
+            raw = stream.read(4 * 1024 * 1024 + 1)
+        require(len(raw) <= 4 * 1024 * 1024 and hashlib.sha256(raw).hexdigest() == files[CC + '/module_contract.py'],
+                'AUTHENTICATED_INSTALLED_BOOTSTRAP_BYTES_REQUIRED')
+        module = sys.modules.get('module_contract')
+        if module is None:
+            module = types.ModuleType('module_contract')
+            module.__file__ = str(bootstrap)
+            sys.modules['module_contract'] = module
+            exec(compile(raw, str(bootstrap), 'exec', dont_inherit=True), module.__dict__)
+            phase('INSTALLED_VERIFIED_BOOTSTRAP_SOURCE_EXECUTED')
+        else:
+            require(getattr(module, '__file__', None) == str(bootstrap), 'CONFLICTING_BOOTSTRAP_CACHE_PATH_REJECTED')
+            guard_type = getattr(module, 'ImportGuard', None)
+            require(isinstance(guard_type, type), 'CONFLICTING_BOOTSTRAP_CACHE_TYPE_REJECTED')
+            guards = [guard for guard in sys.meta_path if isinstance(guard, guard_type)]
+            require(len(guards) == 1 and guards[0].contract.root == root.parent and
+                    guards[0].contract.identity.package_version == version and
+                    guards[0].contract.identity.manifest_sha256 == expected['manifest_sha256'],
+                    'UNOWNED_OR_CONFLICTING_BOOTSTRAP_CACHE_REJECTED')
+            phase('EXISTING_AUTHENTICATED_BOOTSTRAP_GUARD_ACCEPTED')
+        contract = module.active_contract(root, version)
+        require(contract.identity.manifest_sha256 == expected['manifest_sha256'] and
+                dict(contract.files) == files, 'ORIGINAL_ACTIVE_CONTRACT_REQUIRED')
+        phase('ORIGINAL_IMPORT_GUARD_ACTIVE_BEFORE_CONTROLLER_IMPORT')
+        return contract
+    finally:
+        sys.path[:] = previous
 
 
 class ActualEvents(xbmc.Player):
@@ -46,11 +132,14 @@ class ActualEvents(xbmc.Player):
 
 
 def controller():
-    root = Path(xbmcvfs.translatePath(xbmcaddon.Addon(CC).getAddonInfo('path')))
+    addon = xbmcaddon.Addon(CC)
+    root = Path(xbmcvfs.translatePath(addon.getAddonInfo('path'))).absolute()
+    authenticated_bootstrap(root, addon.getAddonInfo('version'))
     for path in (root, root / 'infinity_modules/uirepair'):
         if str(path) not in sys.path:
             sys.path.insert(0, str(path))
     from controller_access import load
+    phase('CONTROLLER_ACCESS_IMPORTED_THROUGH_ORIGINAL_GUARD')
     return load()
 
 
@@ -79,7 +168,8 @@ def identity():
     return dict(pid=os.getpid(), cc_version=native.package_version,
                 manifest_sha256=native.manifest_sha256, module_files=actual,
                 module_count=len(actual), controller_path=str(root), loaded_plugin=str(plugin.__file__),
-                provider_sources=providers, skin=xbmc.getSkinDir(), Python_optimization=sys.flags.optimize)
+                provider_sources=providers, skin=xbmc.getSkinDir(), Python_optimization=sys.flags.optimize,
+                bootstrap_phases=list(BOOTSTRAP_PHASES))
 
 
 def tag(item):
@@ -200,6 +290,7 @@ def serve():
             reply.update(passed=True, result=action(request))
         except Exception as error:
             reply.update(error=repr(error), traceback=traceback.format_exc())
+        reply['bootstrap_phases'] = list(BOOTSTRAP_PHASES)
         payload = json.dumps(reply)
         if len(payload.encode()) > 4 * 1024 * 1024:
             payload = json.dumps(dict(pid=pid, sequence=last, passed=False, error='BOUNDED_REPLY_EXCEEDED'))

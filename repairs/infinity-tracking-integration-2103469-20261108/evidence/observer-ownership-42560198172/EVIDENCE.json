@@ -1,0 +1,18 @@
+{
+  "status": "FAIL_OBSERVER_BOOTSTRAP_ORDER_BEFORE_ANY_PROVIDER_PLAYBACK",
+  "run_id": 42560198172,
+  "source_commit": "05c0080ce4e9afff81a96e2d2ee34dfe51229189",
+  "artifact_id": 13649092447,
+  "artifact_sha256": "dfce2b9b2b8164f67bdeb46c036742ab4c7644ff5e925778b20ee84d0053e856",
+  "artifact_size": 1828031,
+  "completed_feature_cases": 0,
+  "original_APK_unchanged": true,
+  "observed_error": "ContractRejected: First-party code was loaded before verified source ownership was established",
+  "boundary": "Diagnostic imported controller_access before activating the original import guard; native load_contract verification reached the ownership check. This is not a provider/native tracking result or separate Android authentication PASS.",
+  "native_crash_observed": false,
+  "fix_scope": "Observer bootstrap only: existing native ABI and original source-byte bootstrap before guarded helper import; no module validation relaxation",
+  "production_sources_modified": false,
+  "original_signed_module_fixture_reused": 42555855742,
+  "original40_or13_rerun": false,
+  "release_acceptance": false
+}

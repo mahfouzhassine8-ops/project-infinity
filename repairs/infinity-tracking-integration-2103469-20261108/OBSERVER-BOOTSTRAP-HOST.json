@@ -1,0 +1,53 @@
+{
+  "status": "PASS_SIX_OPTIMIZED_BOOTSTRAP_ORDER_REFUSAL_CONTROLS_ONLY",
+  "cases": [
+    {
+      "case": "valid",
+      "status": "PASS_HOST_BOOTSTRAP_CONTROL_ONLY",
+      "compile_optimization": 1,
+      "native_ABI_double": true,
+      "real_original_source_loader_used": true
+    },
+    {
+      "case": "native_reject",
+      "status": "PASS_HOST_BOOTSTRAP_CONTROL_ONLY",
+      "compile_optimization": 1,
+      "native_ABI_double": true,
+      "real_original_source_loader_used": false
+    },
+    {
+      "case": "wrong_protocol",
+      "status": "PASS_HOST_BOOTSTRAP_CONTROL_ONLY",
+      "compile_optimization": 1,
+      "native_ABI_double": true,
+      "real_original_source_loader_used": false
+    },
+    {
+      "case": "wrong_manifest",
+      "status": "PASS_HOST_BOOTSTRAP_CONTROL_ONLY",
+      "compile_optimization": 1,
+      "native_ABI_double": true,
+      "real_original_source_loader_used": false
+    },
+    {
+      "case": "wrong_map",
+      "status": "PASS_HOST_BOOTSTRAP_CONTROL_ONLY",
+      "compile_optimization": 1,
+      "native_ABI_double": true,
+      "real_original_source_loader_used": false
+    },
+    {
+      "case": "foreign_cache",
+      "status": "PASS_HOST_BOOTSTRAP_CONTROL_ONLY",
+      "compile_optimization": 1,
+      "native_ABI_double": true,
+      "real_original_source_loader_used": false
+    }
+  ],
+  "observer_sha256": "690f5bf9e3207f1ef3178a1dfb860aec35414db10fe981afede936f4005448d0",
+  "test_sha256": "6bb65a8c73d55252f5a47f3c697ef1fcaf4fc107e49ac1d66757b2f2953ca52f",
+  "selection_sha256": "111de99ff28adb169c237c3306e419321a2fb4002b0407ef2c21b25d33225d22",
+  "actual_Android_native_authentication": false,
+  "actual_Kodi_or_provider_execution": false,
+  "previous40_13_17_5_6_rerun": false
+}
