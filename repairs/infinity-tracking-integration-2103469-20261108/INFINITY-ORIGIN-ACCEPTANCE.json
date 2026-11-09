@@ -1,0 +1,142 @@
+{
+  "schema": 1,
+  "operation": "accept-existing-infinity-origin-playback-tracking",
+  "protected_source_checkpoint": "e410f30ba9e38182e4e77810e5237e5442cbd31a",
+  "protected_recovery": 2103469,
+  "production_source_sha256": {
+    "plugin.py": "580a2d7b25bc7a415c2db059fe1fa696808107a4f997a32d544baf2468a2877a",
+    "resume_hub.py": "807157626f817dd5375e0e60872b6cd351d33135a23c5a225f26c86a196e7ed5",
+    "service.py": "569fea31b465674b5e9fc357a895b0a00706df999c201246a33e8fcd00c9b669"
+  },
+  "authorization": "Owner directive: genuine Infinity-origin TV/movie workflow only; no direct-provider substitute; preserve e410f30b and existing saving/navigation/tracker.",
+  "owner_confirmed_navigation": {
+    "path": [
+      "Infinity TV",
+      "Watchlist",
+      "Queen's Blade",
+      "Episode List"
+    ],
+    "status": "PASS_OWNER_REPORTED_GALAXY_FOLD_NAVIGATION_ONLY",
+    "tracking_acceptance": false,
+    "retest_or_repair_on_owner_device_required": false
+  },
+  "fixture_preparation": {
+    "status": "BLOCKED_CURRENT_AUTHENTICATED_FIXTURE_IS_OLDER_THAN_E410",
+    "existing_signed_fixture_run": 42555855742,
+    "rule": "Find an existing valid saved title, or create it using only the existing supported save/context-menu flow in the isolated QA profile.",
+    "saving_alone": "Must leave playback progress/watched history unchanged.",
+    "prohibited": [
+      "Database or progress-file seeding",
+      "Invented title IDs or episode numbers",
+      "Replacing Watchlist navigation",
+      "Changing providers or owner settings",
+      "Using a raw provider launch after preparation fails"
+    ],
+    "failure_classification": "BLOCKED_FIXTURE_PREPARATION; all unreached integration steps NOT_RUN",
+    "signing_route": "Existing original-key complete80 module signer; no signature bypass or APK rebuild required for fixture preparation."
+  },
+  "mandatory_origin_evidence": [
+    "Capture actual Infinity Movies/TV selection and first-party Infinity hub identity; active Infinity skin alone is insufficient.",
+    "Select the real Watchlist or applicable Infinity section row; record its actual route, window and source item.",
+    "Select the existing saved title by its verified stored key/source, retaining native labels and metadata.",
+    "For TV, open the provider episode list by clicking that saved show, then select the actual Episode 4 row.",
+    "Retain an ordered test-only GUI/action trace linking Infinity hub -> saved entry -> native child -> real AVStarted.",
+    "After Stop, return through existing Infinity UI to tracking sections and compare actual displayed cards with the existing record/projection."
+  ],
+  "TV_scenario": {
+    "id": "infinity_tv_watchlist_queens_blade_real_playback",
+    "status": "NOT_RUN",
+    "sequence": [
+      "Infinity TV",
+      "Watchlist",
+      "Queen's Blade",
+      "Episode List",
+      "Episode 4",
+      "Play",
+      "At least 300 seconds of advancing actual playback clock while meeting existing tracker eligibility",
+      "Stop",
+      "Infinity TV Progress Shows",
+      "Next Episodes",
+      "Continue Playing",
+      "Existing Resume / Continue From"
+    ],
+    "assertions": [
+      "Actual playback begins before a progress record is permitted; browsing/saving/failed launch alone create none.",
+      "Persisted record identifies the exact played source or verified canonical identity and correct proved show parent; never merge by name.",
+      "One applicable show card per section, with actual eligible progress and no duplicate episode records.",
+      "Unfinished playback remains unfinished; Next Episodes uses the existing continuation rules.",
+      "Assert a completed successor only when existing trusted ordering proves it; otherwise record successor unavailable, never infer E+1.",
+      "Resume the same exact content through existing Infinity UI and verify the observed position against stored progress without a test seek.",
+      "Do not require a native numeric episode tag as a pre-play gate when the reviewed source-bound local identity path is applicable; keep unknown coordinates unknown and report that limitation."
+    ]
+  },
+  "movie_scenario": {
+    "id": "infinity_movies_watchlist_real_playback",
+    "status": "NOT_RUN",
+    "sequence": [
+      "Infinity Movies",
+      "Watchlist",
+      "Existing verified saved movie",
+      "Play",
+      "Actual playback meeting existing eligibility",
+      "Stop",
+      "Existing Infinity movie progress / Continue Playing",
+      "Existing Resume / Continue From"
+    ],
+    "assertions": [
+      "Exact movie/source identity and observed position",
+      "No progress from saving alone",
+      "No duplicate movie cards",
+      "Existing completion/history rules only; no TV successor requirement"
+    ]
+  },
+  "other_applicable_entry_points": {
+    "status": "NOT_RUN",
+    "sections": [
+      "Collection",
+      "Save For Later",
+      "Custom Lists",
+      "Other existing playable Infinity sections",
+      "Existing tracking-section continuation"
+    ],
+    "rule": "Use each real Infinity entry point and the same existing tracker; no Watchlist-only boundary or provider bypass."
+  },
+  "reporting": {
+    "PASS": "Only a completed observed assertion for the actual Infinity-origin scenario.",
+    "FAIL": "An observed integration assertion failure after its prerequisites and relevant steps actually executed.",
+    "BLOCKED": "Fixture, source authentication, observer, account access or runtime prerequisite prevents execution; name the exact blocker/last verified step.",
+    "NOT_RUN": "Every unreached scenario/step, regardless of the workflow job exit status.",
+    "diagnostics": "Direct-provider metadata/AV evidence stays separate and cannot satisfy Infinity-origin acceptance.",
+    "raw_history": "Retain original workflow failures/logs unchanged; current interpretation must not promote them to unexecuted functional failures or successes."
+  },
+  "execution": {
+    "status": "BLOCKED_RUNTIME_AND_MATCHING_AUTHENTICATED_FIXTURE",
+    "application_tests_executed_this_change": 0,
+    "repeat_completed_tests": false,
+    "old_independent_movie_selection_retired_for_acceptance": true,
+    "new_origin_runner_activation": "NOT_READY; requires matching signed e410 fixture and reviewed origin-only runner admission before dispatch.",
+    "APK_build": false,
+    "signing": false,
+    "publication": false,
+    "release_acceptance": false
+  },
+  "shared_record_view_coverage": {
+    "status": "NOT_RUN",
+    "prerequisite": "Genuine eligible progress recorded through the selected Infinity-origin workflow.",
+    "existing_contract": "VIEW-MODE-TEST-CONTRACT.json",
+    "modes": [
+      "Normal",
+      "Auto",
+      "Cinema",
+      "Compact",
+      "Two-Pane",
+      "All other applicable existing modes"
+    ],
+    "displays": [
+      "Fold front and inner display geometries",
+      "Applicable portrait/landscape",
+      "Light and dark themes"
+    ],
+    "rule": "Same existing records and approved layouts; empty viewport captures do not establish tracking acceptance."
+  }
+}

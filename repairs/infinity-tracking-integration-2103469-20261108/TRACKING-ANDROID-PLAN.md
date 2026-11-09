@@ -121,3 +121,7 @@ python repairs/infinity-tracking-integration-2103469-20261108/test_tracking_cont
 ## Movie-only continuation after42569526805
 
 The actual native65051 list/context path now reached the source-proven query-bearing parent refusal. The observer then failed while trying to focus an invisible standard affirmative11; the protected dialog displayed its9010 close control. Movie execution remained NOT_RUN. Retain the raw failure and run the still-missing movie checks directly; do not repeat TV playback, parent saving, or known incomplete viewport/theme captures. No lower-level dialog/Stop/content helper is changed by this routing reduction. Original source/key fixture and all retained mandatory FAIL states remain unchanged.
+
+## Superseded diagnostic selection — Infinity-origin acceptance required
+
+The owner has selected `INFINITY-ORIGIN-ACCEPTANCE.json` as the acceptance contract. Earlier direct-provider and independent-movie plans remain historical diagnostic evidence. The old request is preserved in `DIAGNOSTIC-REQUEST-6657b1a8.json`; the current request disables application dispatch. No raw provider fallback, raw database seeding, or Watchlist/navigation repair may substitute for the actual Infinity hub -> saved entry -> playback -> existing tracking workflow. A blocked preparation/runtime step leaves unreached integration steps NOT RUN. This change runs no application tests and changes no production sources.

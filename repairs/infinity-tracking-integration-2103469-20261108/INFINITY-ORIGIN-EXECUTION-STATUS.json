@@ -1,0 +1,40 @@
+{
+  "status": "TEST_SELECTION_AND_REPORTING_UPDATED_ONLY; NO_APPLICATION_EXECUTION",
+  "protected_checkpoint": "e410f30ba9e38182e4e77810e5237e5442cbd31a",
+  "production_source_sha256": {
+    "plugin.py": "580a2d7b25bc7a415c2db059fe1fa696808107a4f997a32d544baf2468a2877a",
+    "resume_hub.py": "807157626f817dd5375e0e60872b6cd351d33135a23c5a225f26c86a196e7ed5",
+    "service.py": "569fea31b465674b5e9fc357a895b0a00706df999c201246a33e8fcd00c9b669"
+  },
+  "production_source_changes": false,
+  "Watchlist_or_navigation_changes": false,
+  "new_APK_or_signed_fixture": false,
+  "application_tests": 0,
+  "host_behavior_tests": 0,
+  "completed_tests_repeated": false,
+  "runtime_capabilities_observed": [
+    "remote_desktop"
+  ],
+  "dedicated_Android_connector_tools_exposed": 0,
+  "current_limitations": [
+    {
+      "type": "RUNTIME_PRECONDITION",
+      "evidence": "evidence/baseline-constructor-fail-42570831467/EVIDENCE.json",
+      "observed": "Unchanged69 firststartup SIGSEGVtalloc_lib_init+32, API36r7 x86_64 translating ARM64, before featureexecution.",
+      "cause": "Unresolved; not proof of a Fold failure or tracking defect. Earlier startupPASS retained."
+    },
+    {
+      "type": "FIXTURE_AUTHENTICATION",
+      "evidence": "NEW-SOURCE-DEPLOYMENT-HOLD.json",
+      "observed": "Existing internal signed fixture predates e410; it cannot authenticate the current source.",
+      "resolution": "Complete original-key signed fixture matching frozen sources, using existing signer; no modification of owner Watchlist functionality."
+    },
+    {
+      "type": "RUNNER_SELECTION",
+      "observed": "Old independent-movie/direct-provider diagnostic selection is disabled for acceptance.",
+      "resolution": "Only the owner-specified actual Infinity-origin sequence may be activated after prerequisites."
+    }
+  ],
+  "classification": "Prerequisite failure => BLOCKED; unreached functional steps => NOT_RUN. Original raw failed runs unchanged.",
+  "owner_navigation": "Existing Fold Watchlist -> Queens Blade -> Episode List accepted as owner-reported; not a repair target."
+}

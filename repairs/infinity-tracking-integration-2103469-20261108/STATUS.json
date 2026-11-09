@@ -1,5 +1,5 @@
 {
-  "status": "SOURCE_INTEGRATION_REVIEWED_HOST_ONLY; RELEASE_BLOCKED_ANDROID_BASELINE_CONSTRUCTOR_FAILURE",
+  "status": "INFINITY_ORIGIN_ACCEPTANCE_NOT_RUN; BLOCKED_RUNTIME_AND_MATCHING_AUTHENTICATED_FIXTURE",
   "mission_complete": false,
   "protected_recovery": {
     "version": 2103469,
@@ -38,68 +38,80 @@
     }
   },
   "source_review": "Astra accepted source-bound local unnumbered episode-list bridge;2existingfunctions+one producer helper, allotherproductioncodeunchanged.",
-  "Android": "Historical startup42542862696 and oldfixture full80 authentication retained. Actual WNT AV observed42567028842 with wrong numeric metadata. Latest42570831467 original69 firststartup SIGSEGVtalloc_lib_init+32 beforefeaturecases; newbridge neverinstalled. Actual movie/resume/persistence NOT_RUN.",
-  "Fold": "NOT_RUN; no owner series requested",
+  "Android": "No complete Infinity-origin tracking scenario has executed. Direct WNT AV/metadata observations retained separately. Last original69 startup failed before feature execution; all unreached integration steps NOT_RUN.",
+  "Fold": "Owner confirmed existing Watchlist -> Queens Blade -> episodes navigation; full tracking acceptance NOT_RUN.",
   "mandatory_checks": [
     {
       "id": "queens_blade_wnt2",
       "requirement": "Actual WatchNixtoons2 Queen's Blade Episode4 via Infinity TV: five minutes, stop, correct existing progress/Continue/Next/resume",
-      "status": "NOT_VERIFIED_NEW_BRIDGE_ANDROID_BLOCKED; PRIOR_NUMERIC_METADATA_FAIL_RETAINED"
+      "status": "NOT_RUN_INFINITY_ORIGIN_ACCEPTANCE",
+      "prior_evidence_summary": "NOT_VERIFIED_NEW_BRIDGE_ANDROID_BLOCKED; PRIOR_NUMERIC_METADATA_FAIL_RETAINED"
     },
     {
       "id": "cross_entry_rezero_dedup",
       "requirement": "Existing regular TV Re:Zero E3 then Infinity TV E4: one canonical show card, accurate episode-level rows, regular rows untouched",
-      "status": "NOT_RUN; EXACT_CANONICAL_PARENT_PROOF_AND_REAL_PROVIDER_INPUT_REQUIRED"
+      "status": "NOT_RUN_INFINITY_ORIGIN_ACCEPTANCE",
+      "prior_evidence_summary": "NOT_RUN; EXACT_CANONICAL_PARENT_PROOF_AND_REAL_PROVIDER_INPUT_REQUIRED"
     },
     {
       "id": "all_supported_families",
       "requirement": "Representative actual playback for WatchNixtoons2, Otaku, The Crew, Umbrella, POV, Seren and other supported compatible families; no arbitrary provider admission restriction",
-      "status": "NOT_RUN; NORMAL_CREDENTIAL_GATED_PROVIDER_ACCESS_UNAVAILABLE_IN_QA"
+      "status": "NOT_RUN_INFINITY_ORIGIN_ACCEPTANCE",
+      "prior_evidence_summary": "NOT_RUN; NORMAL_CREDENTIAL_GATED_PROVIDER_ACCESS_UNAVAILABLE_IN_QA"
     },
     {
       "id": "exact_movie_episode_identity",
       "requirement": "Actual typed movie and exact show/season/episode identity; uncertain identity playback preserved with reported tracking limitation",
-      "status": "LOCAL_UNKNOWN_COORDINATE_BRIDGE_HOST_ONLY; NUMERIC_E4_AND_ACTUAL_MOVIE_PENDING"
+      "status": "NOT_RUN_INFINITY_ORIGIN_ACCEPTANCE",
+      "prior_evidence_summary": "LOCAL_UNKNOWN_COORDINATE_BRIDGE_HOST_ONLY; NUMERIC_E4_AND_ACTUAL_MOVIE_PENDING"
     },
     {
       "id": "player_events",
       "requirement": "Partial, resume, stop, seek, completion and replay through original thresholds/events",
-      "status": "ACTUAL_STARTED_AVSTARTED_STOPPED_OLD_FIXTURE_OBSERVED; NEW_PROGRESS_RESUME_COMPLETION_NOT_RUN"
+      "status": "NOT_RUN_INFINITY_ORIGIN_ACCEPTANCE",
+      "prior_evidence_summary": "ACTUAL_STARTED_AVSTARTED_STOPPED_OLD_FIXTURE_OBSERVED; NEW_PROGRESS_RESUME_COMPLETION_NOT_RUN"
     },
     {
       "id": "next_episodes",
       "requirement": "Existing unfinished continuation and evidenced successor behavior; no inferred E+1",
-      "status": "HOST_POLICY_REUSED; REAL_CONTINUATION_AND_VERIFIED_SUCCESSOR_NOT_RUN"
+      "status": "NOT_RUN_INFINITY_ORIGIN_ACCEPTANCE",
+      "prior_evidence_summary": "HOST_POLICY_REUSED; REAL_CONTINUATION_AND_VERIFIED_SUCCESSOR_NOT_RUN"
     },
     {
       "id": "no_false_history",
       "requirement": "Saving, browsing, failed launch or selection alone produce no playback progress/history",
-      "status": "BROWSE_NO_HISTORY_AND_REJECTED_SAVE_OLD_FIXTURE_ONLY; NEW_ACCEPTED_SAVE_AND_PLAYBACK_PENDING"
+      "status": "NOT_RUN_INFINITY_ORIGIN_ACCEPTANCE",
+      "prior_evidence_summary": "BROWSE_NO_HISTORY_AND_REJECTED_SAVE_OLD_FIXTURE_ONLY; NEW_ACCEPTED_SAVE_AND_PLAYBACK_PENDING"
     },
     {
       "id": "restart_persistence",
       "requirement": "Existing tracking store survives explicit application restart after saved playback",
-      "status": "NOT_RUN_WITH_GENUINE_PROGRESS; LATEST_BASELINE_BOOT_FAILED"
+      "status": "NOT_RUN_INFINITY_ORIGIN_ACCEPTANCE",
+      "prior_evidence_summary": "NOT_RUN_WITH_GENUINE_PROGRESS; LATEST_BASELINE_BOOT_FAILED"
     },
     {
       "id": "one_way_isolation",
       "requirement": "Regular supported playback continues feeding Infinity; Infinity-only playback does not create regular Movies/TV playback entries or alter their history",
-      "status": "SOURCE_PRESERVED; ACTUAL_CROSS_ENTRY_AND_PROVIDER_SIDE_EFFECTS_NOT_RUN"
+      "status": "NOT_RUN_INFINITY_ORIGIN_ACCEPTANCE",
+      "prior_evidence_summary": "SOURCE_PRESERVED; ACTUAL_CROSS_ENTRY_AND_PROVIDER_SIDE_EFFECTS_NOT_RUN"
     },
     {
       "id": "view_display_theme",
       "requirement": "Shared records consistent in every existing applicable view, front/unfolded display dimensions, portrait/landscape and light/dark; layouts/resources unchanged",
-      "status": "NOT_RUN_ELIGIBLE_NEW_RECORDS; FRESH_THEME_REGISTRY_UNRESOLVED; PHYSICAL_FOLD_NOT_RUN"
+      "status": "NOT_RUN_INFINITY_ORIGIN_ACCEPTANCE",
+      "prior_evidence_summary": "NOT_RUN_ELIGIBLE_NEW_RECORDS; FRESH_THEME_REGISTRY_UNRESOLVED; PHYSICAL_FOLD_NOT_RUN"
     },
     {
       "id": "protected_features",
       "requirement": "Existing Search, Cobra, navigation, Continue From/resume and unrelated components preserved",
-      "status": "PASS_SOURCE_BYTE_PRESERVATION; NEW_GENERATION_RUNTIME_NOT_RUN"
+      "status": "NOT_RUN_INFINITY_ORIGIN_ACCEPTANCE",
+      "prior_evidence_summary": "PASS_SOURCE_BYTE_PRESERVATION; NEW_GENERATION_RUNTIME_NOT_RUN"
     },
     {
       "id": "install_forward_recovery",
       "requirement": "Originally signed in-place install plus matching forward recovery with existing data retained",
-      "status": "ORIGINAL13_JAVA_CASES_RETAINED; NEW_FULL80_SIGNATURE_ANDROID_INSTALL_AND_APK_FORWARD_RECOVERY_NOT_RUN"
+      "status": "NOT_RUN_INFINITY_ORIGIN_ACCEPTANCE",
+      "prior_evidence_summary": "ORIGINAL13_JAVA_CASES_RETAINED; NEW_FULL80_SIGNATURE_ANDROID_INSTALL_AND_APK_FORWARD_RECOVERY_NOT_RUN"
     }
   ],
   "coverage_limits": [
@@ -123,13 +135,13 @@
     "signing_infrastructure": "Existing owner-gated original signer unchanged; future version must be re-audited/reserved, not assumed"
   },
   "blocker_report": "evidence/baseline-constructor-fail-42570831467/EVIDENCE.json",
-  "minimum_next_requirement": "A reliable compatible Android execution target for original69, preferably actualARM64; then refresh original-key full80 authentication for frozen reviewed sources and run missing actuallocalTV/movie/resume/persistence/views/provider/installation/recovery checks. No native workaround or APK rebuild justified by constructor failure.",
+  "minimum_next_requirement": "Reliable Android execution target plus original-key authenticated fixture matching frozen e410, followed by reviewed origin-only runner admission and genuine Infinity UI clicks. Existing owner Watchlist/navigation code must remain unchanged.",
   "accepted_pointer_updated": false,
   "source_preservation_receipt_sha256": "12503af6ce8700a8785299fa518bdc4110de08e85785541966636d7a1b17e1d2",
   "internal_module_fixture": "PASS original-key full80 CC68 + forward module recoveryCC69 and13 actual Java cases; CC68 actual Android native authentication PASS. Full APK recovery not yet tested.",
   "Android_selected_run": 42570831467,
   "observed_identity_boundary": "Runtime-pinned WNT0.14.24 declared episode-list context may establish exact local unnumberedpageidentity while keeping native movie tag/label and S/E=-1 asobserved. NumericE4/S1/canonicalequivalence/successor neverinvented. Bridge sourcehostvalidated only.",
-  "remaining_test_correction": "No new Android attempt planned while unchanged baseline can fail in native constructor; prior focused test failures retained in evidence.",
+  "remaining_test_correction": "Retire direct-provider/movie-only acceptance selection. Require real Infinity hub, saved-entry, episode/movie and Stop-to-tracking breadcrumbs; preparation failures block the scenario instead of triggering direct fallback.",
   "safety_source_receipt_sha256": "5f7ee550b4ea03d4502e8a437d5fb6c6814c9edecd78901bd0551de522dea140",
   "new_source_not_in_signed_fixture": true,
   "latest_independent_movie_probe": {
@@ -141,5 +153,34 @@
     "final_APK_hash_check": "UNVERIFIED_ADB_TIMEOUT_NOT_MISMATCH"
   },
   "current_source_proof_sha256": "ab9e89a84fa441ed7e2c75d5c0d715bc799a10adbec403b977db84f9f72e4c7b",
-  "new_full80_signing": "NOT_RUN_PENDING_RELIABLE_ANDROID_EXECUTION; EXISTING_ORIGINAL_SIGNER_ROUTE_VERIFIED_AVAILABLE"
+  "new_full80_signing": "NOT_RUN_PENDING_RELIABLE_ANDROID_EXECUTION; EXISTING_ORIGINAL_SIGNER_ROUTE_VERIFIED_AVAILABLE",
+  "acceptance_contract": "INFINITY-ORIGIN-ACCEPTANCE.json",
+  "owner_confirmed_navigation": {
+    "path": [
+      "Infinity TV",
+      "Watchlist",
+      "Queen's Blade",
+      "Episode List"
+    ],
+    "status": "PASS_OWNER_REPORTED_GALAXY_FOLD_NAVIGATION_ONLY",
+    "tracking_acceptance": false,
+    "retest_or_repair_on_owner_device_required": false
+  },
+  "diagnostic_findings_are_not_integration_acceptance": true,
+  "fixture_preparation": {
+    "status": "BLOCKED_CURRENT_AUTHENTICATED_FIXTURE_IS_OLDER_THAN_E410",
+    "existing_signed_fixture_run": 42555855742,
+    "rule": "Find an existing valid saved title, or create it using only the existing supported save/context-menu flow in the isolated QA profile.",
+    "saving_alone": "Must leave playback progress/watched history unchanged.",
+    "prohibited": [
+      "Database or progress-file seeding",
+      "Invented title IDs or episode numbers",
+      "Replacing Watchlist navigation",
+      "Changing providers or owner settings",
+      "Using a raw provider launch after preparation fails"
+    ],
+    "failure_classification": "BLOCKED_FIXTURE_PREPARATION; all unreached integration steps NOT_RUN",
+    "signing_route": "Existing original-key complete80 module signer; no signature bypass or APK rebuild required for fixture preparation."
+  },
+  "application_tests_this_update": 0
 }
