@@ -685,6 +685,53 @@ def _continue_identity(item):
     }
 
 
+def _watchnixtoons_episode_producer():
+    """Read-only proof for the reviewed unnumbered wcostream episode emitter."""
+    import hashlib
+    try:
+        addon = xbmcaddon.Addon('plugin.video.watchnixtoons2')
+        if (addon.getAddonInfo('id') != 'plugin.video.watchnixtoons2' or
+                addon.getAddonInfo('version') != '0.14.24' or addon.getSetting('baseURL') != '0'):
+            return False
+        root = Path(xbmcvfs.translatePath(addon.getAddonInfo('path'))).absolute()
+        if root.is_symlink() or root.resolve() != root or not root.is_dir():
+            return False
+        expected = {
+            "addon.xml": "9dc68f15ce6d7e80ff31443eff8fcf43afe80d8fcdd88a5e8fc592f9fa31318c",
+            "default.py": "aa2ce18fcbdf1a4076419e3e5b23b65d1dcc6abe0bf9edc66c206b4bfe8c7d75",
+            "lib/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "lib/common.py": "826e411989c9d02b89ce6efe9715f3c74f7e241cbaca4bbac5c5f9999425c03e",
+            "lib/constants.py": "81c63b78d46f8cd7c99318be2923d86e85b4ff6833b6047970c5bb9155a6ee23",
+            "lib/integration/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "lib/integration/trakt.py": "72df5eef646b8401cae21b13ee84dc3d23a31fb0441ca35eb15b0aa65cc321b2",
+            "lib/integration/trakt_actions.py": "4a043b7e460edd487bded85df8187382c6c63e8b7911b2fd20c3385c4854518e",
+            "lib/network.py": "6cd59019db4fddeb86d83596cc163bd56176f181efcd3f21cf4313554b564d66",
+            "lib/plugin.py": "d8d395634eff8ada8c9d09138744997573035b7819fcac91985ff870bbfc2283",
+            "lib/recently_watched.py": "c251a4adca347111281f257d0d81df3b89481ee11642d14ddb795831351ea096",
+            "lib/sites/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "lib/sites/wcoflix.py": "171a090d4e26b0f94a39a9dd1e48301849561abbaa6aec2fd7c6534f42273395",
+            "lib/sites/wcoforever.py": "5a8fe52886a516b146481bcbb41b11ea31f8bdbdf0f10a1664481d7a239dd213",
+            "lib/sites/wcostream.py": "9c7b2e051cf61e147e860494f8eaebe597e0eddf3ef883ea35c0fb7fa226fa0d"
+        }
+        paths = {}
+        for count, path in enumerate(root.rglob('*'), 1):
+            if count > 256 or path.is_symlink():
+                return False
+            if path.is_file() and (path.suffix == '.py' or path == root / 'addon.xml'):
+                paths[path.relative_to(root).as_posix()] = path
+        if set(paths) != set(expected) or sum(path.stat().st_size for path in paths.values()) != 108603:
+            return False
+        for name, path in paths.items():
+            with path.open('rb') as stream:
+                raw = stream.read(108604)
+            if hashlib.sha256(raw).hexdigest() != expected[name]:
+                return False
+        return (addon.getAddonInfo('version') == '0.14.24' and
+                addon.getSetting('baseURL') == '0')
+    except (AttributeError, OSError, RuntimeError, TypeError, ValueError):
+        return False
+
+
 def _continue_source_item(item):
     """Reuse exact Nixtoons page identities when its actual tag has no IDs.
 
@@ -733,6 +780,37 @@ def _continue_source_item(item):
         linked = links.get(_watchnixtoons_identity_slot(route)) if isinstance(links, dict) else None
         if isinstance(linked, dict):
             associations.append(linked)
+        bridge, bridge_parent = False, ''
+        if kind == 'movie':
+            parent_identity = hub.watchnixtoons_source_identity(actual['parent'], 'tvshow')
+            if parent_identity:
+                bridge_parent = actual['parent']
+            elif (actual['season'], actual['episode']) == (-1, -1):
+                # CC membership is not lineage. Reuse only an existing exact
+                # unnumbered local episode and its already retained parent.
+                prior_episode = _watchnixtoons_exact_previous(playing, route, 'episode')
+                prior_identity = hub.entry_identity(prior_episode) if prior_episode else None
+                if (prior_identity and prior_identity.get('scope') == 'watchnixtoons_local' and
+                        (prior_identity.get('season'), prior_identity.get('episode')) == (-1, -1) and
+                        hub.watchnixtoons_source_identity(prior_episode.get('source_parent', ''), 'tvshow')):
+                    bridge_parent = prior_episode['source_parent']
+            if bridge_parent:
+                if (actual['original'] != actual['path'] or not actual['original'] or
+                        (actual['season'], actual['episode']) != (-1, -1) or
+                        any(field in item and hub.episode_number(item[field]) != -1
+                            for field in ('season', 'episode')) or
+                        not _watchnixtoons_episode_producer()):
+                    return None
+                kind = 'episode'
+                identity = hub.watchnixtoons_source_identity(route, kind, -1, -1)
+                if not identity:
+                    return None
+                bridge = True
+                if any(hub.entry_identity(row) != identity or row.get('media') != 'tv' or
+                       row.get('source') != route or row.get('stable_source') != route or
+                       (hub.episode_number(row.get('season')), hub.episode_number(row.get('episode'))) != (-1, -1)
+                       for row in associations):
+                    return None
         previous = _watchnixtoons_exact_previous(playing, route, kind)
         if associations and (not previous or any(
                 hub.entry_identity(row) and not hub.same_identity(hub.entry_identity(previous), hub.entry_identity(row))
@@ -753,7 +831,7 @@ def _continue_source_item(item):
             fanart=playing.getArt('fanart'))
         if identity.get('scope') != 'watchnixtoons_local':
             entry.update(hub.verified_ids(identity.get('ids')))
-        parent_route = actual['parent']
+        parent_route = bridge_parent if bridge else actual['parent']
         if not hub.watchnixtoons_source_identity(parent_route, 'tvshow') and previous:
             parent_route = previous.get('source_parent', '')
         if kind == 'episode' and hub.watchnixtoons_source_identity(parent_route, 'tvshow'):
@@ -772,11 +850,23 @@ def _continue_source_item(item):
                 parent_ids = hub.verified_ids(parent_identity['ids'])
                 if parent_ids:
                     entry.update(show_ids_verified=True, **{'show_' + name: value for name, value in parent_ids.items()})
+        if bridge:
+            local_parent = hub.watchnixtoons_source_identity(parent_route, 'tvshow')
+            names = {str(row.get('title') or row.get('showtitle') or '').strip()
+                     for row in _watchnixtoons_owned_records(data, parent_route)
+                     if row.get('stable_source') == parent_route and hub.entry_identity(row) == local_parent}
+            if parent and parent_identity and parent_identity.get('scope') == 'show':
+                names.add(str(parent.get('title') or parent.get('showtitle') or '').strip())
+            names.discard('')
+            if len(names) == 1:
+                entry['showtitle'] = names.pop()
         if actual != snapshot()[1] or not player.isPlayingVideo():
             return None
         if identity.get('scope') == 'watchnixtoons_local':
             entry['_tracking_limitation'] = ('Exact source-page identity is available; canonical episode identity and successor are unverified.'
                 if kind == 'episode' else 'Exact source-page movie identity is available; cross-provider equivalence is unverified.')
+        if bridge:
+            entry['_tracking_limitation'] = 'Exact local episode-list child; season and episode numbers, canonical identity and successor are unverified.'
         return entry if hub.entry_identity(entry) else None
     except Exception:
         return None

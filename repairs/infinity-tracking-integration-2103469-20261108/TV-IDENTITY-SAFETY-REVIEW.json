@@ -1,0 +1,33 @@
+{
+  "status": "ACCEPTED_INDEPENDENT_TWO_FUNCTION_PRODUCTION_SAFETY_REVIEW_ONLY",
+  "reviewer": "Astra",
+  "source_sha256": {
+    "resume_hub.py": "807157626f817dd5375e0e60872b6cd351d33135a23c5a225f26c86a196e7ed5",
+    "service.py": "134d3c32a50caa855bdff1c3cabe4ac4ef07232d8b64389b49376b12fe779366",
+    "plugin.py": "580a2d7b25bc7a415c2db059fe1fa696808107a4f997a32d544baf2468a2877a"
+  },
+  "changed_functions": [
+    "resume_hub.watchnixtoons_source_identity",
+    "service._continue_source_item"
+  ],
+  "source_review_findings": [
+    "New relative TV-parent query exception limited to exact source-supported action/kind/outer fields/lexical path/query grammar",
+    "Raw URI/hash inputs and every previously accepted queryless/absolute identity branch preserved",
+    "Contradictory movie plus valid same-copied-item TV parent refused before association reads/entry construction",
+    "No relabelled episode, guessed coordinates, data writes/migrations, provider mutations or canonical-path changes",
+    "All other production functions/classes/imports/module statements unchanged"
+  ],
+  "new_host_case_count": 10,
+  "host_receipt_sha256": "a4f1195d71fd402778d1471b73b12a227badd87b433bba9eb7778000e02bdb49",
+  "limits": [
+    "Does not supply episode/canonical/successor identity",
+    "Unknown/unrecognized parent cannot prove contradiction",
+    "Existing stored rows not repaired or erased",
+    "Android42569526805 uses frozen83d1bc15 and earlier signed80 fixture, excluding these changes",
+    "New source requires regenerated original-key full80 authentication and Android checks before any installable release"
+  ],
+  "Android_acceptance": false,
+  "new_signing": false,
+  "APK_build": false,
+  "publication": false
+}

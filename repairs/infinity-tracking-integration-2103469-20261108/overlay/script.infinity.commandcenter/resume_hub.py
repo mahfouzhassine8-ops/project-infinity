@@ -113,8 +113,16 @@ def watchnixtoons_source_identity(route, kind, season=-1, episode=-1):
             return None
         # Keep host and page location exact; never follow a link or merge domains.
     elif (not source_url.startswith('/') or source_url.startswith('//') or
-          '?' in source_url or '#' in source_url):
+          '#' in source_url):
         return None
+    elif '?' in source_url:
+        # The publisher emits this exact TV catalogue selector. Keep its raw
+        # bytes in the existing identity; it proves no numbered season.
+        if (action != 'actionEpisodesMenu' or kind != 'tvshow' or
+                set(parts) != {'action', 'url'} or not re.fullmatch(
+                    r'/anime/[A-Za-z0-9][A-Za-z0-9._~-]*\?season=all(?:&lang=(?:dub|sub|cartoon))?',
+                    source_url)):
+            return None
     sn=episode_number(season) if kind in ('season','episode') else -1
     en=episode_number(episode) if kind=='episode' else -1
     if kind=='season' and sn<0:

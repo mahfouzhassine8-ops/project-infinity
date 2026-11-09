@@ -1,0 +1,43 @@
+{
+  "status": "READ_ONLY_RELEASE_PREP_OBSERVATIONS; NOT_RESERVED_OR_CLEARED",
+  "observed_utc": "2026-11-09T06:22Z",
+  "authority_and_protected69": "a76e29b84996304241e6b309d56a31e6659ad190",
+  "authority_blob": "4905f8d31c9996bd1f8a93a4bf8a4347da71bd8d",
+  "registry_generation": 56,
+  "last_issued_APK_registry": 2103468,
+  "current_candidate_protected_APK": 2103469,
+  "latest_actual_APK_signing_run": 42514440156,
+  "latest_original_workflow397_run": 42555855742,
+  "existing_internal_fixture": {
+    "source": "9d64ffb84404036ce6e02d6cb160fb004a029b33",
+    "CC_versions": [
+      "0.3.5.68",
+      "0.3.5.69"
+    ],
+    "metadata_labels": [
+      2103470,
+      2103471
+    ],
+    "APK_built": false
+  },
+  "new_CC_pair_observed_unused": [
+    "0.3.5.70",
+    "0.3.5.71"
+  ],
+  "suggested_distinct_internal_metadata_labels": [
+    2103472,
+    2103473
+  ],
+  "actual_APK70_to81_refs_or_release_assets_observed": false,
+  "actual_APK70_71_built_or_issued": false,
+  "reserved": false,
+  "next_APK_requirement": "Fresh actual registry reservation only after mandatory engineering gates. Internal metadata labels do not themselves issue APK codes or establish APK72 as minimum.",
+  "minimum_tool_updates": [
+    "Freeze new source+14host+Astra proof, retaining original40 receipts; refresh complete80 source map",
+    "Use existing prepare-tracking-modules owner-gated job and unchanged SignInfinityModules original key; no APK build/finish",
+    "Bind new actual signed artifact metadata only after source gates; keep original Android workflow shape base9d64 separate from new producer/tool source",
+    "Select only necessary new-generation installer cases explicitly; current archive requires13receipt and cannot silently accept historical pair as new proof"
+  ],
+  "current_blocker": "Unchanged69 startup SIGSEGV in42570831467 before featureactivation; defer new signing, APK preparation and retries until execution route is reliable.",
+  "new_signing_or_mutation": false
+}

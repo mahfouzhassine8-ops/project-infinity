@@ -1,0 +1,42 @@
+{
+  "status": "READ_ONLY_ACTUAL_PRODUCER_METADATA_BOUNDARY_CONFIRMED",
+  "provider": "plugin.video.watchnixtoons2",
+  "reference_version": "0.14.24",
+  "owner_current_WNT_source_identity": "NOT_FRESHLY_ESTABLISHED; this is the exact publisher tree authenticated in the selected Android run, not an owner-device version claim.",
+  "source_sha256": "d8d395634eff8ada8c9d09138744997573035b7819fcac91985ff870bbfc2283",
+  "actual_run": 42567028842,
+  "actual_GUI_label": "Episode 4 English Dubbed",
+  "source_chain": [
+    {
+      "function": "get_title_info",
+      "lines": "913-978",
+      "predicate": "unescaped_title.find(' Episode ')",
+      "actual_label_starts_with": "Episode 4",
+      "effect": "Actual caption lacks the leading show-name/space before Episode; this parser branch supplies no episode number."
+    },
+    {
+      "function": "makeListItem",
+      "lines": "995-1017",
+      "effect": "Unknown parsed episode produces GUI tvshow tag without S/E; matches actual captured GUI values."
+    },
+    {
+      "function": "actionResolve",
+      "lines": "1656-1678",
+      "predicate": "episode_string = xbmc.getInfoLabel('ListItem.Episode'); if missing, mediatype='movie'",
+      "effect": "Produces observed final movie tag with S/E=-1 despite the actual copied TV parent."
+    }
+  ],
+  "cleanup_setting": "No setting was changed. makeListItemClean calls the same get_title_info parser; enabling cleanup alone is not source-proven to repair this starting-Episode caption.",
+  "prohibited_shortcuts": [
+    "Infer episode or season numbers from URI/title",
+    "Globally reinterpret native movie tags without exact producer+lineage proof",
+    "Modify provider source or owner settings",
+    "Claim playback availability proves numeric/canonical TV identity"
+  ],
+  "minimum_missing_evidence": "Actual revised authenticated Android execution for localpage tracking; numeric E4/S1, canonicalcrossprovider equivalence and successor remain unproved and may neverbe fabricated.",
+  "safe_scope": "Runtime-pinned producer-declared unnumbered child may use existing exact localepisode identity with S/E=-1 and observednativeMovie provenance. Conflicts/mismatches failclosed; original playback/resume/data unchanged.",
+  "APK_rebuild_requirement": "None demonstrated; this boundary cannot be solved by rebuilding the unchanged native engine.",
+  "provider_modified": false,
+  "release_acceptance": false,
+  "later_source_supported_contract": "Pinned actionEpisodesMenu explicitly declares episodes and emits non-special child actionResolve entries. This permits only exact local unnumbered series-child progress from validated current/prior native lineage, not numeric episode or canonical identity. Bounded runtime15file-gated bridge now implemented; notAndroidvalidated."
+}
