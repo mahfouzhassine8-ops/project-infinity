@@ -17,8 +17,8 @@
   "version_code": 2103469,
   "min_sdk": 21,
   "target_sdk": 35,
-  "harness_sha256": "9108c34952046829ac64d460321518795a44b1bce9102d5b1d2153602dd3ce29",
-  "host_guard_receipt_sha256": "2c303ac4eb1e19f56a8653633d1afc0eb989a49ad9ac779dddf5d8524a766ed0",
+  "harness_sha256": "9b4cf409c35688a77e94849361aff510b6b896871314b32b15cc5844b4e23734",
+  "host_guard_receipt_sha256": "72a44d694b5abba5d9ac8be9f07fb777883e107bd481d49f847c38ce461e9f3e",
   "reviewed_tracking_commit": "2e52b7befd0228a09449f79eaf9774a3946dfa1c",
   "authorization": "Owner continuation: qualify unchanged2103469 in compatible Android environment before any new APK; no production changes",
   "result_scope": "API36 x86_64 stock ARM64 translation startup only; no tracking/provider/API37/Fold/release acceptance",
@@ -26,5 +26,5 @@
   "no_APK_build": true,
   "no_signing": true,
   "no_production_changes": true,
-  "setup_correction": "Exact observed stock Settings Compose permission row; confirm checked=true on fresh capture before normal Back, no appops/production changes."
+  "setup_correction": "Unique fresh UI XML and exact successful dump required before actions; retain bounded permission/lifecycle chronology, require exact current foreground before startup readiness. No relaunch, production edit or permission bypass."
 }

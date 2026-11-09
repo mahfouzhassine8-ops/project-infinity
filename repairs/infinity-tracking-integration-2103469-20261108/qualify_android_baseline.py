@@ -12,9 +12,11 @@ import json
 import os
 from pathlib import Path
 import re
+import resource
 import runpy
 import shutil
 import socket
+import signal
 import stat
 import struct
 import subprocess
@@ -248,6 +250,7 @@ class Device:
         require(any(line.split() == [connected[0], 'device'] for line in devices), 'EMULATOR_ADB_READY')
         self.serial, self.pid, self.start_time = connected[0], 0, None
         self.actions = []
+        self.ui_sequence, self.last_ui_capture = 0, None
 
     def adb(self, *args, timeout=20, check=True, binary=False):
         return command([self.adb_bin, '-s', self.serial, *args], timeout=timeout, check=check, binary=binary)
@@ -256,10 +259,54 @@ class Device:
         return self.adb('shell', *args, timeout=timeout, check=check)
 
     def nodes(self, label):
-        self.shell('uiautomator', 'dump', '/sdcard/Download/infinity-baseline-ui.xml', timeout=15)
-        raw = self.shell('cat', '/sdcard/Download/infinity-baseline-ui.xml')
-        (self.out / (label + '.xml')).write_text(raw)
-        return ET.fromstring(raw)
+        self.ui_sequence += 1
+        sequence = self.ui_sequence
+        remote = '/sdcard/Download/infinity-baseline-ui-' + str(os.getpid()) + '-' + str(sequence) + '.xml'
+        detail = dict(sequence=sequence, started_epoch=time.time(), remote_file=remote, label=label, accepted=False,
+                      returncode=None, stdout='', stderr='')
+        self.last_ui_capture = None
+        try:
+            result = subprocess.run([str(self.adb_bin), '-s', self.serial, 'shell', 'uiautomator', 'dump', remote],
+                                    check=False, capture_output=True, text=True, timeout=15)
+            detail.update(returncode=result.returncode, stdout=result.stdout, stderr=result.stderr)
+            marker = 'UI hierchary dumped to: ' + remote
+            require(result.returncode == 0 and result.stdout.strip() == marker and 'ERROR:' not in result.stderr, 'FRESH_UI_DUMP_SUCCESS_MARKER_REQUIRED')
+            raw = self.shell('cat', remote)
+            require(0 < len(raw.encode()) <= 4 * 1024 * 1024, 'BOUNDED_FRESH_UI_XML')
+            tree = ET.fromstring(raw)
+            require(tree.tag == 'hierarchy', 'FRESH_UI_HIERARCHY_REQUIRED')
+            versioned = label + '-dump-' + str(sequence).zfill(5) + '.xml'
+            (self.out / versioned).write_text(raw)
+            (self.out / (label + '.xml')).write_text(raw)
+            detail.update(accepted=True, XML_file=versioned, XML_sha256=hashlib.sha256(raw.encode()).hexdigest(),
+                          packages=sorted({n.get('package', '') for n in tree.iter('node')}))
+            self.last_ui_capture = dict(sequence=sequence, captured_epoch=time.time(), XML_file=versioned)
+            return tree
+        except (RuntimeError, OSError, ET.ParseError, subprocess.SubprocessError) as error:
+            detail['error'] = repr(error)
+            if isinstance(error, subprocess.TimeoutExpired):
+                detail['stdout'] = (error.stdout or b'').decode(errors='replace') if isinstance(error.stdout, bytes) else (error.stdout or '')
+                detail['stderr'] = (error.stderr or b'').decode(errors='replace') if isinstance(error.stderr, bytes) else (error.stderr or '')
+            return None  # No fresh tree means no action; the existing startup deadline still applies.
+        finally:
+            detail['finished_epoch'] = time.time()
+            save(self.out / ('ui-dump-' + str(sequence).zfill(5) + '.json'), detail)
+
+    def permission_snapshot(self, label):
+        detail = dict(captured_epoch=time.time(), UI_capture=self.last_ui_capture, read_only=True)
+        commands = dict(package_permissions=['dumpsys', 'package', PACKAGE],
+                        all_files_appop=['cmd', 'appops', 'get', PACKAGE, 'MANAGE_EXTERNAL_STORAGE'],
+                        foreground_tasks=['dumpsys', 'activity', 'activities'],
+                        Java_pids=['pidof', PACKAGE], native_pids=['pidof', PACKAGE + ':kodi'])
+        for name, args in commands.items():
+            try:
+                result = subprocess.run([str(self.adb_bin), '-s', self.serial, 'shell', *args],
+                                        check=False, capture_output=True, text=True, timeout=3)
+                detail[name] = dict(returncode=result.returncode, stdout=result.stdout[:2 * 1024 * 1024],
+                                    stderr=result.stderr[:4096], stdout_truncated=len(result.stdout) > 2 * 1024 * 1024)
+            except (OSError, subprocess.SubprocessError) as error:
+                detail[name] = dict(error=repr(error))
+        save(self.out / (label + '.json'), detail)
 
     def screenshot(self, label):
         data = self.adb('exec-out', 'screencap', '-p', timeout=15, binary=True)
@@ -276,10 +323,12 @@ class Device:
         require(started == self.start_time, 'NATIVE_PID_REUSED')
 
     def tap(self, node, purpose):
+        require(self.last_ui_capture is not None, 'FRESH_CAPTURE_REQUIRED_BEFORE_MEASURED_TAP')
         center = measured_center(node)
         self.shell('input', 'tap', *center)
         self.actions.append(dict(purpose=purpose, package=node.get('package'), resource_id=node.get('resource-id'),
-                                 description=node.get('content-desc'), text=node.get('text'), bounds=node.get('bounds'), center=center))
+                                 description=node.get('content-desc'), text=node.get('text'), bounds=node.get('bounds'), center=center,
+                                 UI_capture=self.last_ui_capture, action_epoch=time.time()))
 
     def handle_ui(self, tree):
         nodes = list(tree.iter('node'))
@@ -311,6 +360,8 @@ class Device:
                 self.tap(compose[0], 'Measured exact stock Settings Compose all-files row for Infinity')
                 return True
             self.shell('input', 'keyevent', 'KEYCODE_BACK')
+            self.actions.append(dict(purpose='Back after fresh checked=true stock all-files permission', keycode='KEYCODE_BACK', UI_capture=self.last_ui_capture, action_epoch=time.time()))
+            self.permission_snapshot('all-files-after-back-ui-' + str(self.ui_sequence))
             return True
         texts = ' '.join(n.get('text', '') for n in settings)
         if 'Infinity' in texts and ('Allow access to manage all files' in texts or 'Allow access to all files' in texts):
@@ -320,6 +371,8 @@ class Device:
                 self.tap(switches[0], 'Measured stock Settings all-files permission for Infinity')
                 return True
             self.shell('input', 'keyevent', 'KEYCODE_BACK')
+            self.actions.append(dict(purpose='Back after fresh checked=true stock all-files permission', keycode='KEYCODE_BACK', UI_capture=self.last_ui_capture, action_epoch=time.time()))
+            self.permission_snapshot('all-files-after-back-ui-' + str(self.ui_sequence))
             return True
         tutorials = [n for n in nodes if n.get('package') == 'com.android.systemui' and n.get('text') in ('Got it', 'GOT IT') and n.get('clickable') == 'true']
         if tutorials:
@@ -454,6 +507,49 @@ def crash_free_alive(device):
     device.alive()
 
 
+def _lifecycle_file_limit():
+    resource.setrlimit(resource.RLIMIT_FSIZE, (8 * 1024 * 1024, 8 * 1024 * 1024))
+
+
+def start_lifecycle_log(device, out):
+    timeout = shutil.which('timeout')
+    require(timeout is not None, 'BOUNDED_LIFECYCLE_READER_REQUIRES_HOST_TIMEOUT')
+    tags = ['ActivityTaskManager:I', 'ActivityManager:I', 'WindowManager:I', 'PermissionController:I', 'PermissionManager:I',
+            'AndroidRuntime:E', 'libc:F', 'DEBUG:F', 'linker:W', 'Kodi:V', 'kodi:V', 'XBMC:V', 'Infinity:V', 'Splash:V',
+            'am_proc_start:I', 'am_proc_died:I', 'am_crash:I', 'am_kill:I', 'am_finish_activity:I', 'am_create_activity:I',
+            'am_resume_activity:I', 'am_pause_activity:I', 'am_destroy_activity:I', 'am_force_stop:I', '*:S']
+    args = [timeout, '--signal=TERM', '--kill-after=2', '900', str(device.adb_bin), '-s', device.serial, 'logcat',
+            '-v', 'threadtime', '-b', 'main', '-b', 'system', '-b', 'crash', '-b', 'events', *tags]
+    with (out / 'lifecycle-filtered.log').open('wb') as stdout, (out / 'lifecycle-filtered.stderr').open('wb') as stderr:
+        process = subprocess.Popen(args, stdin=subprocess.DEVNULL, stdout=stdout, stderr=stderr,
+                                   close_fds=True, start_new_session=True, preexec_fn=_lifecycle_file_limit)
+    save(out / 'LIFECYCLE-CAPTURE.json', dict(status='STARTED_BEFORE_FIRST_SPLASH', host_pid=process.pid, command=args,
+                                           started_epoch=time.time(), duration_limit_seconds=900, per_file_limit_bytes=8 * 1024 * 1024,
+                                           logcat_cleared=False, application_state_changed=False))
+    return process
+
+
+def stop_lifecycle_log(process, out):
+    detail = load(out / 'LIFECYCLE-CAPTURE.json')
+    try:
+        if process.poll() is None:
+            os.killpg(process.pid, signal.SIGTERM)  # Only the session created for this reader and its adb child.
+            try:
+                process.wait(timeout=3)
+            except subprocess.TimeoutExpired:
+                os.killpg(process.pid, signal.SIGKILL)
+                process.wait(timeout=2)
+        detail.update(status='OWN_READER_STOP_REQUESTED_LEADER_EXITED', returncode=process.poll(),
+                      observation_scope='Owned reader leader exit only; adb descendant retirement not independently audited')
+    except (OSError, subprocess.SubprocessError) as error:
+        detail.update(status='OWN_READER_STOP_BOUNDED_OR_UNAVAILABLE', error=repr(error))
+    detail.update(finished_epoch=time.time(), stdout_bytes=(out / 'lifecycle-filtered.log').stat().st_size,
+                  stderr_bytes=(out / 'lifecycle-filtered.stderr').stat().st_size)
+    detail['size_cap_reached'] = max(detail['stdout_bytes'], detail['stderr_bytes']) >= detail['per_file_limit_bytes']
+    save(out / 'LIFECYCLE-CAPTURE.json', detail)
+    return detail
+
+
 def capture_failure(device, out):
     detail = dict(status='READ_ONLY_BOUNDED_CAPTURE', application_restarted=False, target_pid=device.pid)
     deadline = time.monotonic() + 25
@@ -484,6 +580,7 @@ def capture_failure(device, out):
         detail['capture_error'] = repr(error)
     finally:
         save(out / 'failure-native-capture.json', detail)
+    device.permission_snapshot('failure-permission-state')
     for name, args in (('failure-logcat.txt', ('logcat', '-d', '-t', '2000')),
                        ('failure-pids.txt', ('shell', 'ps', '-A'))):
         try:
@@ -496,11 +593,27 @@ def capture_failure(device, out):
         (out / 'failure-screenshot.error').write_text(repr(error))
 
 
+def resumed_component(raw):
+    markers = [line for line in raw.splitlines() if re.match(r'^\s*(?:topResumedActivity|mResumedActivity)\s*[=:]', line)]
+    components = set()
+    for line in markers:
+        match = re.match(r'^\s*(?:topResumedActivity|mResumedActivity)\s*[=:]\s*ActivityRecord\{[^}\n]*?\s([A-Za-z0-9_.]+/[A-Za-z0-9_.$]+)(?:\s|\})', line)
+        if match is None:
+            return None
+        components.add(match[1])
+    return next(iter(components)) if len(components) == 1 else None
+
+
 def start_once(device, cycle, out):
     device.pid, device.start_time = 0, None
-    device.shell('am', 'start', '-W', '-n', PACKAGE + '/.Splash', timeout=30)
+    started = subprocess.run([str(device.adb_bin), '-s', device.serial, 'shell', 'am', 'start', '-W', '-n', PACKAGE + '/.Splash'],
+                             check=False, capture_output=True, text=True, timeout=30)
+    save(out / ('start-' + str(cycle) + '-am-start.json'), dict(returncode=started.returncode, stdout=started.stdout,
+                                                            stderr=started.stderr, captured_epoch=time.time()))
+    require(started.returncode == 0, 'ORIGINAL_SPLASH_START_COMMAND_FAILED')
     deadline = time.monotonic() + 180
-    ping, home = None, None
+    ping, home, foreground = None, None, None
+    app_ui_seen, launcher_captures = False, 0
     while time.monotonic() < deadline:
         pids = device.pids()
         if device.pid:
@@ -512,7 +625,13 @@ def start_once(device, cycle, out):
         crash = device.shell('logcat', '-b', 'crash', '-d', '-t', '80', timeout=5)
         require(PACKAGE not in crash, 'BASELINE_NATIVE_OR_JAVA_CRASH_NO_RETRY')
         tree = device.nodes('start-' + str(cycle) + '-latest-ui')
-        device.handle_ui(tree)
+        if tree is not None:
+            packages = {n.get('package', '') for n in tree.iter('node')}
+            app_ui_seen = app_ui_seen or PACKAGE in packages
+            launcher = bool(packages & {'com.google.android.apps.nexuslauncher', 'com.android.launcher3'})
+            launcher_captures = launcher_captures + 1 if app_ui_seen and launcher and PACKAGE not in packages else 0
+            require(launcher_captures < 3, 'APP_EXITED_TO_LAUNCHER_AFTER_APP_UI_NO_RELAUNCH')
+            device.handle_ui(tree)
         if device.pid:
             try:
                 ping = device.rpc('JSONRPC.Ping', timeout=3)
@@ -521,13 +640,23 @@ def start_once(device, cycle, out):
                 time.sleep(.5)
                 continue
             if ping == 'pong' and home.get('currentwindow', {}).get('id') == 10000 and home.get('skin', {}).get('id') == 'skin.infinity.diggz':
-                break
+                raw, error = '', None
+                try:
+                    raw = device.shell('dumpsys', 'activity', 'activities', timeout=3)
+                except (RuntimeError, OSError, subprocess.SubprocessError) as caught:
+                    error = repr(caught)
+                component = resumed_component(raw) if len(raw.encode()) <= 2 * 1024 * 1024 else None
+                foreground = dict(component=component, captured_epoch=time.time(), raw_query=raw[:2 * 1024 * 1024],
+                                  query_truncated=len(raw.encode()) > 2 * 1024 * 1024, error=error)
+                save(out / ('start-' + str(cycle) + '-foreground.json'), foreground)
+                if component and component.startswith(PACKAGE + '/'):
+                    break
         time.sleep(.5)
     else:
         raise TimeoutError('NORMAL_SPLASH_INFINITY_HOME_STARTUP_DEADLINE')
     device.alive()
     return dict(cycle=cycle, pid=device.pid, process_start=device.start_time, entry='Original Splash and measured original Infinity card or retained original admission',
-                ping=ping, home=home)
+                ping=ping, home=home, foreground=foreground)
 
 
 def run(request, admission, out, avd):
@@ -545,7 +674,7 @@ def run(request, admission, out, avd):
     report = dict(status='RUNNING_BASELINE_ONLY_API36_STARTUP_QUALIFICATION', starts=[], APK_sha256=APK_SHA,
                   feature_checks='NOT_RUN', full_twelve_checks='NOT_RUN', shutdown='NOT_SELECTED', Fold='NOT_RUN', release_acceptance=False,
                   force_stop_scope='Only the two explicitly selected startup-reliability resets; no data clear or Close/shutdown coverage')
-    device, disposer = None, None
+    device, disposer, reader = None, None, None
     code = 1
     try:
         device = Device(out, Path(os.environ['ANDROID_HOME']))
@@ -572,6 +701,7 @@ def run(request, admission, out, avd):
         device.shell('chown', '-R', uid + ':' + uid, '/data/media/0/Android/data/' + PACKAGE)
         device.shell('restorecon', '-RF', '/data/media/0/Android/data/' + PACKAGE)
         device.adb('forward', 'tcp:19090', 'tcp:9090')
+        reader = start_lifecycle_log(device, out)
         seen = set()
         whole_deadline = time.monotonic() + 850
         for cycle in (1, 2, 3):
@@ -617,6 +747,8 @@ def run(request, admission, out, avd):
         if device:
             capture_failure(device, out)
     finally:
+        if reader:
+            report['lifecycle_capture'] = stop_lifecycle_log(reader, out)
         if device:
             report['measured_UI_actions'] = device.actions
         save(out / 'ANDROID-VERIFICATION.json', report)

@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "status": "PASS_SELECTED_BASELINE_HOST_GUARDS_ONLY",
-  "harness_sha256": "9108c34952046829ac64d460321518795a44b1bce9102d5b1d2153602dd3ce29",
+  "harness_sha256": "9b4cf409c35688a77e94849361aff510b6b896871314b32b15cc5844b4e23734",
   "selection": "New baseline-only API36 intake and artifact/UI/teardown guards; no forty-case suite repeated",
   "checks_selected": [
     "Syntax parses",
@@ -165,9 +165,31 @@
       "case": "wrong_Compose_label_app_owner_or_noncheckable_refuses",
       "status": "PASS_HOST_UI_GUARD_ONLY",
       "negative_variants": 4
+    },
+    {
+      "case": "fresh_unique_XML_and_action_sequence_timestamp_binding",
+      "status": "PASS_HOST_DIAGNOSTIC_GUARD_ONLY"
+    },
+    {
+      "case": "exit0_failed_dump_and_timeout_never_read_or_tap_previous_XML",
+      "status": "PASS_HOST_DIAGNOSTIC_GUARD_ONLY"
+    },
+    {
+      "case": "fresh_launcher_exit_refuses_without_relaunch_native_RPC_independent_of_UI_capture",
+      "status": "PASS_HOST_DIAGNOSTIC_GUARD_ONLY"
+    },
+    {
+      "case": "bounded_filtered_own_reader_cleanup_and_readonly_permission_snapshot_binding",
+      "status": "PASS_HOST_DIAGNOSTIC_GUARD_ONLY"
+    },
+    {
+      "case": "exact_current_foreground_withholds_background_RPC_Home_and_preserves_none_UI_polling",
+      "status": "PASS_HOST_DIAGNOSTIC_GUARD_ONLY",
+      "parser_variants": 6,
+      "negative_control": "Launcher remains foreground despite live native Ping/Home; no second Splash; startup not accepted"
     }
   ],
-  "check_count": 34,
+  "check_count": 39,
   "SDK_APK_signature_check": "NOT_RUN_LOCALLY_NO_SDK; required in admit before application execution",
   "module_RSA_signature_check": "PASS_ORIGINAL_PUBLIC_KEY_ONLY",
   "host_disposal_worker_executed": false,
@@ -297,5 +319,46 @@
     }
   ],
   "legacy_settings_selector": "Unchanged; after a legacy tap also waits for later checked=true capture before Back",
-  "failed42539616751_native_startup": "NOT_STARTED; stock Settings Compose permission row not handled; not a native API36 constructor failure"
+  "failed42539616751_native_startup": "NOT_STARTED; stock Settings Compose permission row not handled; not a native API36 constructor failure",
+  "freshness_diagnostic_selection_before_execution": [
+    "Successful unique dump binds versioned XML and action sequence/time",
+    "Exit0 idle/null-root and timeout cannot reuse previous XML or tap stale nodes",
+    "Multiple fresh launcher captures after app UI fail with one Splash only; native RPC remains outside successful-XML branch",
+    "Filtered capped lifecycle reader cleanup is own-session only; permission queries are read-only"
+  ],
+  "prior34_checks_preserved_not_rerun": true,
+  "freshness_diagnostic_checks": [
+    {
+      "case": "fresh_unique_XML_and_action_sequence_timestamp_binding",
+      "status": "PASS_HOST_DIAGNOSTIC_GUARD_ONLY"
+    },
+    {
+      "case": "exit0_failed_dump_and_timeout_never_read_or_tap_previous_XML",
+      "status": "PASS_HOST_DIAGNOSTIC_GUARD_ONLY"
+    },
+    {
+      "case": "fresh_launcher_exit_refuses_without_relaunch_native_RPC_independent_of_UI_capture",
+      "status": "PASS_HOST_DIAGNOSTIC_GUARD_ONLY"
+    },
+    {
+      "case": "bounded_filtered_own_reader_cleanup_and_readonly_permission_snapshot_binding",
+      "status": "PASS_HOST_DIAGNOSTIC_GUARD_ONLY"
+    }
+  ],
+  "failed42540374766_classification": "Freshness risk confirmed in prior harness; occurrence not proven; native PID never observed; no automatic relaunch added",
+  "post_Back_diagnostic_placement_selected_before_check": "Both stock checked-state paths send immediate capture-bound Back and record action before any read-only permission snapshot.",
+  "post_Back_diagnostic_placement": "PASS_HOST_ORDERING_GUARD_ONLY; no Android execution; same four focused groups, previous34/40 not rerun",
+  "foreground_readiness_selection_before_execution": [
+    "Only exact unambiguous current resumed component satisfies foreground policy; duplicate identical component lines deduplicate",
+    "Background Kodi Home/Ping cannot pass with launcher foreground, including failed subsequent UI capture; no extra Splash",
+    "Reader diagnostic reports leader exit only, not descendant retirement"
+  ],
+  "foreground_readiness_check": {
+    "case": "exact_current_foreground_withholds_background_RPC_Home_and_preserves_none_UI_polling",
+    "status": "PASS_HOST_DIAGNOSTIC_GUARD_ONLY",
+    "parser_variants": 6,
+    "negative_control": "Launcher remains foreground despite live native Ping/Home; no second Splash; startup not accepted"
+  },
+  "reader_report_wording_check": "PASS_HOST_FACTUAL_LEADER_ONLY_LABEL; no reader/adb descendant retirement audit",
+  "prior34_and_four_diagnostic_groups_preserved_not_rerun": true
 }
