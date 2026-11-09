@@ -120,7 +120,7 @@
       "repairs/infinity-2103445-standalone-external-player/release_guard.py": "3c80c746931c9723d5a858e83779d369694cdc4e08ec7d688837761c368078b0"
     }
   },
-  "generation": 57,
+  "generation": 58,
   "guard_schema": 2,
   "last_issued_versionCode": 2103469,
   "launcher_icon_exception": {
@@ -199,6 +199,7 @@
     "native_sha256": "ee3be7c7a95b86f8357539001fcd50bedbd80217b02f130d649f7f57e6075794",
     "owner": "INFINITY_TRACKING_EXPERIMENTAL",
     "owner_delivery_cleared": false,
+    "packaging_correction_review_sha256": "ea84b1041a48379e3a0e15f4174ddc8e153f0cdc49f885f4ed2ae3d39fd53f5f",
     "physical_Fold": "PENDING_ONE_FINAL_OWNER_ACCEPTANCE",
     "preparation_sha256": "3f09c0d64261982077b3642d09afa52d9157ef1d2fd440e99310b453c99d935d",
     "producer_run": 42611979269,
@@ -221,7 +222,7 @@
     "schema2_compatibility_disposition": "NOT_RUN_PENDING_ACTUAL_MOVIE_PROGRESS",
     "signed_APK_install_forward_recovery": "PENDING_POST_SIGN_OWNER_DELIVERY",
     "source_files": {
-      ".github/workflows/infinity-combined-release.yml": "5a95562b576315c43585b43af76d4c4afe227c8920b0f7de46c42b902f6bd159",
+      ".github/workflows/infinity-combined-release.yml": "51b4c99fa12bd522559d6da7d5f7c0c7ececde817771cc0843e420e15431778b",
       "repairs/infinity-tracking-integration-2103469-20261108/ACTUAL-SOURCE-HOST-RESULT.json": "f5b458be19d432f72ca0eb436959dc5c58a72f7936882cc4c3da2e782e64b0ad",
       "repairs/infinity-tracking-integration-2103469-20261108/APK-PREPARE-REQUEST.json": "4b46e83b9163d709fa8c3d073949b47c64ea3f78e612db2a40533dae8d391d7b",
       "repairs/infinity-tracking-integration-2103469-20261108/C1-42604600259-OUTCOME-REVIEW.json": "5bbcf280ce444903354958f0765aacb392f887aa890910bf686beefa280eba6f",
@@ -237,6 +238,7 @@
       "repairs/infinity-tracking-integration-2103469-20261108/MODULE-TEST-SELECTION.md": "b067fc9fb962aeefad0f08ddb5210962179cc46c98a066148b155c4af783e55b",
       "repairs/infinity-tracking-integration-2103469-20261108/OBSERVED-SCHEMA2-COMPATIBILITY-SELECTION.json": "61a3ab0c1d90266da4140fe59e3bcfa549ec2264fa3aca2d1b7bf53613380b50",
       "repairs/infinity-tracking-integration-2103469-20261108/OBSERVED-SCHEMA2-COMPATIBILITY.json": "4f91e4e08bb89e80192e35efc5452a2b280805d3219595a9268a222239aca7aa",
+      "repairs/infinity-tracking-integration-2103469-20261108/PACKAGING-PATH-CORRECTION-REVIEW.json": "ea84b1041a48379e3a0e15f4174ddc8e153f0cdc49f885f4ed2ae3d39fd53f5f",
       "repairs/infinity-tracking-integration-2103469-20261108/PREPARED-PAIR-REQUEST.json": "5cc7477501120cdec0c66f43a7196a86c631013aa3baa52f139c91be0b72c5d5",
       "repairs/infinity-tracking-integration-2103469-20261108/PROJECTION-HOST-RESULT.json": "739712d256192f7860c254c766ba13eb65eeca3053582a4565ac00ab260e52f2",
       "repairs/infinity-tracking-integration-2103469-20261108/RECOVERY-SERVICE-PRESERVATION.json": "a458f0b248eaea73f1aadd0f2b9354c2c9fd783cee560ed51189e0360f46f240",
@@ -265,7 +267,7 @@
       "repairs/infinity-tracking-integration-2103469-20261108/overlay/script.infinity.commandcenter/resume_hub.py": "807157626f817dd5375e0e60872b6cd351d33135a23c5a225f26c86a196e7ed5",
       "repairs/infinity-tracking-integration-2103469-20261108/overlay/script.infinity.commandcenter/service.py": "c0f45709166d9b7018eac0cee4834aaa617e8a684d6d199568e4e65a4645d6bd",
       "repairs/infinity-tracking-integration-2103469-20261108/prepare_tracking_release.py": "49c4d49bd679b2dd2ae2819ab45b8a673d4b362f80fc30090223553d3abc9e0b",
-      "repairs/infinity-tracking-integration-2103469-20261108/register_tracking_release.py": "c321719d20dd7984f4f3d5ceabc984a9087a29d5da71c1fc6b8cb57d852092c8",
+      "repairs/infinity-tracking-integration-2103469-20261108/register_tracking_release.py": "f1378d5a2bb6a45c200e724567c2f3e0267151b0eea1d41727297c0ba55eb30f",
       "repairs/infinity-tracking-integration-2103469-20261108/tracking_module_fixture.py": "af14da368c555a5d9d0862aa1c1f490bfcf64d389026cb82092261d39ce3ecdb",
       "repairs/infinity-tracking-integration-2103469-20261108/verify_tracking_modules.py": "761eeb4520a32a9d4ef73ed7f96ed0d10160933e1de6a16aa8e6222f991abdf9"
     },
@@ -67655,7 +67657,7 @@
     "root": "CobraCardsTheme",
     "source_sha256": "58bd661ed94a2a949b459bab470c095bfb48d6d84d1e3fddc178f8ea21851864"
   },
-  "previous_authority_sha256": "dc06fef6103d286fa09cd1fa30b12dd4f6bc8bc57eb7eaf23e1f4ece0ecb4a4f",
+  "previous_authority_sha256": "172c403a252ac3887fd8650c9edfbc8804c96f29b822fa974f7fb7797fd84eae",
   "proofs": {
     "COMBINATION-CONTROLS.json": "bcb21adb63fefb898a8e8799d9892f76e382315518d8e94b51c42060cc5ece83",
     "OWNER-CONTRACT.json": "dd0fdfdcb7715777007984969bfac45b36f3e4ef04023b5ba1884c67904d0846",
@@ -67850,10 +67852,7 @@
     "repairs/dual-experience-isolation-2103420/verify_runtime.py": "b903edd3d6c3402d46613841c9ac44f0103420a64da5dff2897d14c9952e7460"
   },
   "status": "ENGINEERING_REVIEWED_FOLD_PENDING",
-  "target_owners": [
-    "INFINITY",
-    "CHOOSER_SHELL"
-  ],
-  "update_kind": "owner_update",
-  "workflow_sha256": "5a95562b576315c43585b43af76d4c4afe227c8920b0f7de46c42b902f6bd159"
+  "target_owners": [],
+  "update_kind": "evidence_refresh",
+  "workflow_sha256": "51b4c99fa12bd522559d6da7d5f7c0c7ececde817771cc0843e420e15431778b"
 }
