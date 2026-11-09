@@ -1,0 +1,14 @@
+{
+  "operation": "focused-origin-intake-guard-checks-only",
+  "selected_checks": [
+    "Exact Infinity-origin acceptance focus with frozen e410 production source",
+    "Refuse old independent-movie focus and direct-provider acceptance/fallback",
+    "Refuse retries and missing retained runtime failure",
+    "Refuse a stale signed fixture that does not identify frozen e410",
+    "Owner-reported navigation must not be promoted to tracking acceptance"
+  ],
+  "reason": "Owner changed acceptance to the real Infinity-origin workflow; intake must refuse the old diagnostic route before app dispatch.",
+  "application_execution": false,
+  "original_tests_repeated": false,
+  "production_source_changed": false
+}

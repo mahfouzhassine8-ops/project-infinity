@@ -1,0 +1,31 @@
+{
+  "status": "PASS_INTERNAL_FIXTURE_AUTHENTICATION_AND_SOURCE_PRESERVATION_ONLY",
+  "reviewer": "Astra independent public verification",
+  "run": 42588102830,
+  "source": "ce88dc9dd16aad4d0bdd2e4f9ce1bcbb9f203cd4",
+  "artifact_id": 13659704122,
+  "archive_sha256": "22913a51131eb30509f2bf58b679232c4b1195a52750e89f865f06266f51e37a",
+  "archive_size": 1304003,
+  "source_pins_sha256": "5686b7687185b717be2c68815ec2ea5894219a0746e46c3d8fe0df18625da8f5",
+  "manifest_sha256": {
+    "0.3.5.70": "7566c19813de8dc01df5837bad12ad641046786fecfee0fbd4ddea497999b910",
+    "0.3.5.71": "9c219e7b35d8f5989fe7f68a30c095e880efbee49dc8ecf8af7a129af48f1f13"
+  },
+  "original_RSA_signatures": "PASS both",
+  "full_source_count": 80,
+  "CC_ZIP_member_count_each": 66,
+  "candidate": "Only exact e4103 source files plus CCversion differ from original69",
+  "recovery": "Exact original69 functional source bytes plus forward CCversion only",
+  "other_sources_and_inactive_helper": "UNCHANGED",
+  "new_installer_cases_passed": 4,
+  "prior13_cases_repeated": false,
+  "Android_acceptance": false,
+  "APK_build_or_signing": false,
+  "public_release": false,
+  "copied_evidence_sha256": {
+    "MODULE-FIXTURE.json": "54e91ea4fd59bcdfe1e967193abc4b6a4ec79cd3d1841b0510585155c60925d1",
+    "SOURCE-PINS.json": "5686b7687185b717be2c68815ec2ea5894219a0746e46c3d8fe0df18625da8f5",
+    "VERSION-ADMISSION.json": "641ed2c46162477f34e47d1c0fa5f6e0587a7cbc4dc7cdd61db9c228cff9224d",
+    "MODULE-UPGRADE-RECOVERY.json": "be44bb5e8157732bf79cd0fde4cbe761959fb8f8a642c380638610cfde94562a"
+  }
+}

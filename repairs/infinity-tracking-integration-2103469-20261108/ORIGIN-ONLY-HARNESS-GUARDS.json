@@ -1,0 +1,59 @@
+{
+  "application_tests_executed": 0,
+  "limits": "Source-extracted optimize=1 guard controls only; no full workflow simulation, SDK callbacks, fake installed records, APK/app/sign/dispatch. Final aggregate integrity-status preservation syntax reviewed; no claim of Android execution.",
+  "prior40_14_13_baseline_repeated": false,
+  "production_changes": false,
+  "runs": [
+    {
+      "command": "python repairs/infinity-tracking-integration-2103469-20261108/test_infinity_origin_acceptance_guards.py",
+      "failed": 1,
+      "failure": "Host fixture omitted base.PACKAGE in final APK-query test; production helper correctly returned UNVERIFIED_READ_ERROR for that fixture error.",
+      "passed": 5,
+      "tests": 6
+    },
+    {
+      "command": "python -m unittest -v test_infinity_origin_acceptance_guards.AcceptanceGuards.test_final_hash_timeout_is_unverified_but_actual_different_digest_fails",
+      "passed": 1,
+      "reason": "Correct missing fixture PACKAGE only; rerun affected case.",
+      "tests": 1
+    },
+    {
+      "command": "python -m unittest -v test_infinity_origin_acceptance_guards.AcceptanceGuards.test_live_home_regular_owner_cannot_be_declared_infinity",
+      "passed": 1,
+      "reason": "New live native Home-owner refusal control.",
+      "tests": 1
+    },
+    {
+      "command": "python -m unittest -v test_infinity_origin_acceptance_guards.AcceptanceGuards.test_fixture_blocked_and_observer_blocked_leave_steps_not_run",
+      "passed": 1,
+      "reason": "Affected observer/control blocked classification, preserve unreached NOT_RUN.",
+      "tests": 1
+    },
+    {
+      "command": "python -m unittest -v test_infinity_origin_acceptance_guards.AcceptanceGuards.test_observed_save_and_resume_assertions_fail_without_hiding_blockers",
+      "passed": 1,
+      "reason": "Narrow review correction: observed save/resume mismatches FAIL; currently valid same-source lower deadline FAIL; observer/stopped/no-AV/transport remain BLOCKED.",
+      "tests": 1
+    }
+  ],
+  "runtime_acceptance": "NOT_RUN",
+  "selection": "TRACKING-ANDROID-PLAN.md",
+  "source_history": [
+    {
+      "TRACKING-ANDROID-PLAN.md": "aab5433b474634b15d572c5b80b7bc454a4da7f997c1b37623c07d516de19c96",
+      "stage_tracking_android.py": "a5bf5f1f82a7e17a69deb3a1d28d0ba354222b14c46400b2df0f0fb503df84bf",
+      "test_infinity_origin_acceptance_guards.py": "f536088f949a3f626f6c3aa7ed03662186294ce7dcbc82a71292c30f95c9bab8",
+      "tracking_android_observer.py": "48c8477b8c474a049d6b9f635ffc84977042ca1a7f9ae9935f0b07689b732468",
+      "verify_tracking_android.py": "cdf267598b6a0029b61ad33fea1785ff32481fc43c89d56039a50eac16020a9f"
+    }
+  ],
+  "sources": {
+    "TRACKING-ANDROID-PLAN.md": "209479ffb781a904f55543057c22328fad7d35d75fb1482d7bca236a7e1621a4",
+    "stage_tracking_android.py": "a5bf5f1f82a7e17a69deb3a1d28d0ba354222b14c46400b2df0f0fb503df84bf",
+    "test_infinity_origin_acceptance_guards.py": "27731b44050f9245b717223595cf71af38d541b8980daf89d1a54fe69c870a47",
+    "tracking_android_observer.py": "48c8477b8c474a049d6b9f635ffc84977042ca1a7f9ae9935f0b07689b732468",
+    "verify_tracking_android.py": "56f60f06e8a89f1b38668fcc381371ca56450db2d79eccd5bbdeddc8ca8b9fd6"
+  },
+  "status": "PASS_SELECTED_INFINITY_ORIGIN_ACCEPTANCE_HOST_GUARDS",
+  "unique_cases_passed": 8
+}

@@ -186,7 +186,7 @@ def snapshot():
     # Exact original69 unified/MyVideoNav.xml <views>; owned popup50 is kept.
     primary_controls = (50, 65050, 65051, 65052, 51, 52, 53, 55, 56, 57, 58, 59,
                         500, 501, 502, 503, 504, 505, 506, 507, 509, 591, 592, 602, 609)
-    observed_controls = tuple(dict.fromkeys((3, 6, 50, 450, 451, 1000) + primary_controls))
+    observed_controls = tuple(dict.fromkeys((3, 6, 50, 450, 451, 1000, 9000) + primary_controls))
     visible = {str(control): xbmc.getCondVisibility('Control.IsVisible(%d)' % control) for control in observed_controls}
     controls = {}
     for control in observed_controls:
@@ -196,13 +196,17 @@ def snapshot():
         require(0 <= count <= 1500, 'BOUNDED_ACTUAL_DIRECTORY_REQUIRED')
         if count:
             rows = []
-            for i in range(count + 1):
+            # Home9000 is a wraplist: index==count wraps to the first item.
+            # Media directories may include a parent row excluded by NumItems.
+            for i in range(count if control == 9000 else count + 1):
                 p = 'Container(%d).ListItemAbsolute(%d).' % (control, i)
                 rows.append(dict(index=i, label=xbmc.getInfoLabel(p + 'Label'),
                     file=xbmc.getInfoLabel(p + 'FileNameAndPath'),
                     media_type=xbmc.getInfoLabel(p + 'DBTYPE'),
                     season=xbmc.getInfoLabel(p + 'Season'), episode=xbmc.getInfoLabel(p + 'Episode'),
                     key=xbmc.getInfoLabel(p + 'Property(Infinity.ResumeHub.Key)'),
+                    section=xbmc.getInfoLabel(p + 'Property(section)'),
+                    hubsource=xbmc.getInfoLabel(p + 'Property(hubsource)'),
                     selection=xbmc.getInfoLabel(p + 'Property(Infinity.Selection.Snapshot)')))
             controls[str(control)] = rows
     # Theme telemetry is independent of native directory/player observation.
@@ -270,11 +274,30 @@ def action(request):
     if kind == 'identity': return identity()
     if kind == 'snapshot': return snapshot()
     if kind == 'events': return EVENTS.events
+    if kind == 'home-select':
+        index = request['index']
+        require(xbmcgui.getCurrentWindowId() == 10000 and xbmcgui.getCurrentWindowDialogId() in (0, -1, 9999) and
+                xbmc.getSkinDir() == 'skin.infinity.diggz' and xbmc.getCondVisibility('Control.IsVisible(9000)') and
+                type(index) is int and 0 <= index < 100 and request.get('hubsource') == 'infinity' and
+                request.get('section') in ('trakttv', 'traktmovies'), 'ACTUAL_INFINITY_HOME_HUB_REQUIRED')
+        xbmc.executebuiltin('SetFocus(9000,%d,absolute)' % index, True)
+        p = 'Container(9000).ListItem.'
+        require(xbmc.getInfoLabel('System.CurrentControlId') == '9000' and
+                xbmc.getInfoLabel(p + 'Label') == request['label'] and
+                xbmc.getInfoLabel(p + 'Property(section)') == request['section'] and
+                xbmc.getInfoLabel(p + 'Property(hubsource)') == 'infinity', 'LIVE_FIRSTPARTY_HOME_SELECTION_REQUIRED')
+        observed = dict(label=request['label'], section=request['section'], hubsource='infinity', index=index,
+                        file=xbmc.getInfoLabel(p + 'FileNameAndPath'), pid=os.getpid(), monotonic=time.monotonic())
+        reply = json.loads(xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"Input.Select"}'))
+        require('error' not in reply, 'ACTUAL_INFINITY_HOME_INPUT_REQUIRED')
+        return observed
     if kind == 'state':
         plugin = controller()
         data = plugin.hub.load_view(plugin.PROFILE)
         return dict(data=data, continue_entries=plugin.hub.entries(data),
                     progress_shows=plugin.hub.progress_shows(data), next_episodes=plugin.hub.next_episodes(data),
+                    valid_identities={bucket: {key: plugin.hub.entry_identity(entry) for key, entry in data.get(bucket, {}).items()}
+                                      for bucket in ('items', 'watched', 'watchlist')},
                     series_proof={key: plugin.hub.continue_series_ids(entry)
                                   for key, entry in data.get('items', {}).items() if entry.get('media') == 'tv'})
     if kind == 'playing':

@@ -21,7 +21,7 @@
     "retest_or_repair_on_owner_device_required": false
   },
   "fixture_preparation": {
-    "status": "BLOCKED_CURRENT_AUTHENTICATED_FIXTURE_IS_OLDER_THAN_E410",
+    "status": "READY_ORIGINAL_KEY_SIGNED_E410_FIXTURE",
     "existing_signed_fixture_run": 42555855742,
     "rule": "Find an existing valid saved title, or create it using only the existing supported save/context-menu flow in the isolated QA profile.",
     "saving_alone": "Must leave playback progress/watched history unchanged.",
@@ -33,7 +33,12 @@
       "Using a raw provider launch after preparation fails"
     ],
     "failure_classification": "BLOCKED_FIXTURE_PREPARATION; all unreached integration steps NOT_RUN",
-    "signing_route": "Existing original-key complete80 module signer; no signature bypass or APK rebuild required for fixture preparation."
+    "signing_route": "Existing original-key complete80 module signer; no signature bypass or APK rebuild required for fixture preparation.",
+    "matching_signed_fixture_run": 42588102830,
+    "candidate_CC": "0.3.5.70",
+    "recovery_CC": "0.3.5.71",
+    "fixture_pin": "TRACKING-MODULE-FIXTURE-PIN.json",
+    "public_signature_review": "evidence/signed-e410-origin-fixture-42588102830/REVIEW.json"
   },
   "mandatory_origin_evidence": [
     "Capture actual Infinity Movies/TV selection and first-party Infinity hub identity; active Infinity skin alone is insufficient.",
@@ -110,15 +115,19 @@
     "raw_history": "Retain original workflow failures/logs unchanged; current interpretation must not promote them to unexecuted functional failures or successes."
   },
   "execution": {
-    "status": "BLOCKED_RUNTIME_AND_MATCHING_AUTHENTICATED_FIXTURE",
+    "status": "SOURCE_REVIEWED_SELECTED_PENDING_ONE_ANDROID_ATTEMPT",
     "application_tests_executed_this_change": 0,
     "repeat_completed_tests": false,
     "old_independent_movie_selection_retired_for_acceptance": true,
-    "new_origin_runner_activation": "NOT_READY; requires matching signed e410 fixture and reviewed origin-only runner admission before dispatch.",
+    "new_origin_runner_activation": "Origin-only source and classification review complete; one new source-bound attempt selected, zero automatic retries. No application result yet.",
     "APK_build": false,
-    "signing": false,
     "publication": false,
-    "release_acceptance": false
+    "release_acceptance": false,
+    "APK_signing": false,
+    "module_fixture_signing": "Completed via existing original-key signer run42588102830; no APK created",
+    "maximum_new_attempts": 1,
+    "automatic_retries": 0,
+    "retained_environment_failure_run": 42570831467
   },
   "shared_record_view_coverage": {
     "status": "NOT_RUN",

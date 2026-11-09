@@ -1,0 +1,60 @@
+{
+  "concrete_blockers": [],
+  "host_evidence": {
+    "executed_by_reviewer": false,
+    "receipt_hashes_match": true,
+    "reported_unique_focused_cases": 8
+  },
+  "limits": [
+    "Source acceptance only; no Android playback/origin/Fold/release acceptance.",
+    "Unknown local episode coordinates remain unknown; no numeric Episode4 or canonical cross-provider identity claim.",
+    "Other entrypoints/families, successor/completion, restart persistence and display/theme coverage remain unexecuted.",
+    "No app/tests/build/sign/dispatch or production edits performed by reviewer."
+  ],
+  "production_changes_by_reviewer": false,
+  "production_checkpoint": "e410f30ba9e38182e4e77810e5237e5442cbd31a",
+  "production_source_sha256": {
+    "plugin.py": "580a2d7b25bc7a415c2db059fe1fa696808107a4f997a32d544baf2468a2877a",
+    "resume_hub.py": "807157626f817dd5375e0e60872b6cd351d33135a23c5a225f26c86a196e7ed5",
+    "service.py": "569fea31b465674b5e9fc357a895b0a00706df999c201246a33e8fcd00c9b669"
+  },
+  "request_binding_count": 29,
+  "request_bindings": "ALL_MATCH_CURRENT_REVIEWED_FILES",
+  "resolved_findings": [
+    "Observed save-alone history mutation is classified FAIL, including during fixture preparation.",
+    "Observed post-AV resume source/type/known-ID/upper-offset assertion failures are classified FAIL; lower-offset timeout requires latest still-playing exact validated sample. Observer/no-AV/stopped/ambiguous/transport prerequisites remain BLOCKED."
+  ],
+  "reviewed_at_utc": "2026-11-09T09:07:45.371449+00:00",
+  "reviewed_boundaries": [
+    "Actual visible focused Infinity Home9000 owner/section selection, first-party TV/Movies root, real Watchlist row and saved key/source; TV child follows clicked saved parent; genuine new AVStarted and actual source must match native selected launch.",
+    "Catalogue/context Save is fixture preparation only; selected origin scenario has no direct-provider playback fallback.",
+    "TV300 advancing native playback seconds; eligible movie playback; real Stop callback; exact existing hub identity/parent/label/progress and native section projections; original Resume with no harness seek.",
+    "Original69 APK and native full80 authentication, original guarded module bootstrap, exact e410 candidate, separate ce88 signed producer and original-key public fixture pin.",
+    "Prerequisites BLOCKED and unreached steps NOT_RUN; observed functional failures FAIL; final unverified APK query blocks success, valid mismatch fails.",
+    "One selected attempt, no retry loop or repeated startup qualification; historical constructor failure retained; module activation restart is explicit."
+  ],
+  "signed_fixture_public_review": {
+    "Java_cases_rerun_by_reviewer": false,
+    "actual_CI_Java_cases": 4,
+    "candidate_CC": "0.3.5.70",
+    "producer": "ce88dc9dd16aad4d0bdd2e4f9ce1bcbb9f203cd4",
+    "public_RSA_complete80": "PASS_PREVIOUS_INDEPENDENT_REVIEW_REUSED",
+    "recovery_CC": "0.3.5.71",
+    "run": 42588102830,
+    "source_pins_sha256": "5686b7687185b717be2c68815ec2ea5894219a0746e46c3d8fe0df18625da8f5"
+  },
+  "source_sha256": {
+    "INFINITY-ORIGIN-ACCEPTANCE.json": "d58e0a0c5e1d19c164ed6a371a535553c77e467ea020ed33fece86522be82a8c",
+    "ORIGIN-ONLY-HARNESS-GUARDS.json": "f492575b2296176b1d66ddb70ca0d7bae6b893209bd3d90107d9f1b5b5d2b4e8",
+    "TRACKING-ANDROID-PLAN.md": "209479ffb781a904f55543057c22328fad7d35d75fb1482d7bca236a7e1621a4",
+    "TRACKING-ANDROID-REQUEST.json": "8da5cfd8bab84ef6d639b13eefa15eee22d063897a008859920fc12f7666e4dd",
+    "TRACKING-MODULE-FIXTURE-PIN.json": "2044138052c0be417da0562e953db8bf2b12e03f2c17fdffa06b9953da32a66b",
+    "admit_tracking_android.py": "242b7a9fe7bf4abe8a3a4fb479630ea1298b5e74e5451136f79bc9d8ae8a92c4",
+    "stage_tracking_android.py": "a5bf5f1f82a7e17a69deb3a1d28d0ba354222b14c46400b2df0f0fb503df84bf",
+    "test_infinity_origin_acceptance_guards.py": "27731b44050f9245b717223595cf71af38d541b8980daf89d1a54fe69c870a47",
+    "tracking_android_observer.py": "48c8477b8c474a049d6b9f635ffc84977042ca1a7f9ae9935f0b07689b732468",
+    "verify_tracking_android.py": "56f60f06e8a89f1b38668fcc381371ca56450db2d79eccd5bbdeddc8ca8b9fd6"
+  },
+  "status": "ACCEPTED_TARGETED_ORIGIN_ONLY_EXECUTION_SOURCE_REVIEW_NOT_RUNTIME_ACCEPTANCE",
+  "workflow_sha256": "51532274f846a9f3af3b3ed65772caf52741b416213aef2c89c7c42e898a0f72"
+}

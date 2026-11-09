@@ -18,21 +18,23 @@ import qualify_android_baseline as base
 HERE = Path(__file__).resolve().parent
 QA = 'script.infinity.trackingqa'
 CC = base.CC
-FIXTURE_SOURCE = '9d64ffb84404036ce6e02d6cb160fb004a029b33'
-FIXTURE_RUN = 42555855742
+CONTRACT = HERE / 'INFINITY-ORIGIN-ACCEPTANCE.json'
+FIXTURE_PIN = HERE / 'TRACKING-MODULE-FIXTURE-PIN.json'
 
 
 def selected_focus():
     request_path = HERE / 'TRACKING-ANDROID-REQUEST.json'
-    request = base.load(request_path)
-    retained = request['retained_actual_evidence']
-    base.require(request['execution_focus'] == 'independent-movie' and
-        retained['run'] == 42567028842 and retained['source'] == '9b05d1b4bf2283b7adc92f7ef6db0aff3b9fede3' and
-        retained['queens_blade_status'] == 'FAIL_ACTUAL_SDK_MOVIE_UNKNOWN_EPISODE' and
-        retained['cross_entry_rezero_status'] == 'BLOCKED_UNVERIFIED_METADATA' and
-        retained['replay_known_wrong_typed_tv'] is False, 'EXACT_COMMITTED_INDEPENDENT_MOVIE_FOCUS_REQUIRED')
+    request, contract = base.load(request_path), base.load(CONTRACT)
+    relative = CONTRACT.relative_to(base.ROOT).as_posix()
+    base.require(request['application_tests'] is True and request['shutdown_tests'] is False and
+        request['execution_focus'] == 'infinity-origin-acceptance' and
+        request['source_bindings'][relative] == base.sha(CONTRACT) and
+        contract['operation'] == 'accept-existing-infinity-origin-playback-tracking' and
+        contract['protected_source_checkpoint'] == 'e410f30ba9e38182e4e77810e5237e5442cbd31a' and
+        contract['protected_recovery'] == 2103469, 'EXACT_ENABLED_COMMITTED_INFINITY_ORIGIN_ACCEPTANCE_REQUIRED')
     return dict(request_sha256=base.sha(request_path), execution_focus=request['execution_focus'],
-                retained_actual_evidence=retained)
+        acceptance_contract_sha256=base.sha(CONTRACT), fixture_pin_sha256=base.sha(FIXTURE_PIN),
+        protected_source_checkpoint=contract['protected_source_checkpoint'])
 
 
 def stage(apk, sdk, fixture, pins_path, out):
@@ -41,8 +43,12 @@ def stage(apk, sdk, fixture, pins_path, out):
     out.mkdir(parents=True)
     proof = base.verify_apk(apk.resolve(), sdk.resolve(), out)
     bundle, _ = base.original_module_tools()
-    metadata = base.load(fixture / 'MODULE-FIXTURE.json')
-    base.require(metadata['run_id'] == FIXTURE_RUN and metadata['source'] == FIXTURE_SOURCE and
+    metadata, approved = base.load(fixture / 'MODULE-FIXTURE.json'), base.load(FIXTURE_PIN)
+    admission = base.load(fixture / 'pair/VERSION-ADMISSION.json')
+    contract = base.load(CONTRACT)
+    base.require(metadata['run_id'] == approved['run'] and metadata['source'] == approved['source'] and
+        metadata['production_source'] == contract['protected_source_checkpoint'] and
+        metadata['source_pins_sha256'] == approved['source_pins_sha256'] and
         metadata['status'] == 'ORIGINAL_KEY_SIGNED_INTERNAL_MODULE_FIXTURE_NOT_RELEASE_ACCEPTANCE' and
         metadata['original80_source_signatures'] is True and metadata['APK_build'] is False and
         metadata['APK_signing'] is False and metadata['release_acceptance'] is False,
@@ -53,11 +59,14 @@ def stage(apk, sdk, fixture, pins_path, out):
     fixtures, candidate = [], None
     for package in metadata['fixture_packages']:
         version = package['CC']
-        base.require(version in ('0.3.5.68', '0.3.5.69') and package['recovery'] is (version == '0.3.5.69'), 'EXACT_MODULE_PAIR')
+        role = 'recovery' if package['recovery'] is True else 'candidate'
+        base.require(type(package['recovery']) is bool and version == admission[role + '_CC'] and
+                     package['versionCode'] == admission[role + '_versionCode'], 'EXACT_APPROVED_DYNAMIC_MODULE_PAIR')
         archive = fixture / package['archive']
         base.require(archive.name == package['archive'] and base.sha(archive) == package['sha256'], 'FIXTURE_ZIP_HASH')
-        number = '2103470' if version == '0.3.5.68' else '2103471'
-        root = fixture / 'pair' / number / 'modules'
+        number = str(admission[role + '_versionCode'])
+        base.require(package['modules_path'] == 'pair/' + number + '/modules', 'EXACT_APPROVED_MODULE_DIRECTORY')
+        root = fixture / package['modules_path']
         payload, files = bundle.build(root)
         manifest = root / CC / bundle.MANIFEST
         base.require(len(files) == 80 and payload == manifest.read_bytes(), 'COMPLETE80_CANONICAL_MANIFEST')
@@ -65,8 +74,11 @@ def stage(apk, sdk, fixture, pins_path, out):
                       '-signature', str(manifest) + '.sig', manifest])
         base.require(ET.fromstring(files[CC + '/addon.xml']).get('version') == version, 'EXACT_FIXTURE_VERSION')
         for name in ('plugin.py', 'resume_hub.py', 'service.py'):
-            expected = (HERE / ('overlay' if version == '0.3.5.68' else 'reference') / CC / name).read_bytes()
+            expected = (HERE / ('reference' if package['recovery'] else 'overlay') / CC / name).read_bytes()
             base.require(files[CC + '/' + name] == expected, 'EXACT_FROZEN_THREE_SOURCES:' + name)
+            if not package['recovery']:
+                base.require(hashlib.sha256(expected).hexdigest() == contract['production_source_sha256'][name],
+                             'EXACT_E410_ACCEPTANCE_SOURCE:' + name)
         with ZipFile(archive) as z:
             names = [name for name in base.safe_zip(z) if not name.endswith('/')]
             expected = {name: raw for name, raw in files.items() if name.startswith(CC + '/')}
@@ -130,10 +142,9 @@ def stage(apk, sdk, fixture, pins_path, out):
         dependency_pins_sha256=base.sha(pins_path), dependencies=dependencies, expected=candidate,
         qa=dict(addon=QA, version='1.0.0', archive=qa_zip.name, sha256=base.sha(qa_zip)),
         observer_sha256=base.sha(observer), stage_source_sha256=base.sha(__file__), remote_zip_directory=remote,
-        selected_tests=['normal_zip_module_install_full80_auth', 'actual_typed_parent_save_menu_probe_no_tv_playback',
-            'save_browse_only_no_history', 'explicit_restart_persistence',
-            'independent_actual_public_wnt_movie_partial_resume_95_percent_completion_replay',
-            'independent_existing_theme_viewport_capture'],
+        selected_tests=['normal_zip_install_dynamic_e410_full80_auth', 'actual_infinity_tv_watchlist_origin',
+            'genuine_saved_parent_child_300_second_actual_clock_stop_progress_next_continue_resume',
+            'actual_infinity_movies_watchlist_origin_partial_stop_continue_resume', 'save_alone_no_history'],
         runtime_pending_availability=['actual_public_wnt_movie_source'],
         unselected_or_blocked=['premium_provider_credentials', 'Fold_acceptance', 'shutdown'],
         release_acceptance=False))

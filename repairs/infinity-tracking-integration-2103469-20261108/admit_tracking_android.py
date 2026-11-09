@@ -13,8 +13,8 @@ ROOT = HERE.parents[1]
 REQUEST = HERE / 'TRACKING-ANDROID-REQUEST.json'
 WORKFLOW = '.github/workflows/infinity-saved-navigation-android.yml'
 BRANCH = 'work/infinity-tracking-integration-20261108'
-REVIEWED = '2e52b7befd0228a09449f79eaf9774a3946dfa1c'
-MODULE_SOURCE = '9d64ffb84404036ce6e02d6cb160fb004a029b33'
+REVIEWED = 'e410f30ba9e38182e4e77810e5237e5442cbd31a'
+WORKFLOW_SHAPE_BASE = '9d64ffb84404036ce6e02d6cb160fb004a029b33'
 RETAINED_RUN = 42567028842
 RETAINED_SOURCE = '9b05d1b4bf2283b7adc92f7ef6db0aff3b9fede3'
 RETAINED_ARTIFACT = 13652516052
@@ -42,18 +42,40 @@ def git(*args):
 
 
 def checked_focus(selected):
-    require(selected.get('execution_focus') == 'independent-movie', 'EXACT_MISSING_MOVIE_FOCUS_ONLY')
-    require(selected.get('retained_actual_evidence') == dict(run=RETAINED_RUN, source=RETAINED_SOURCE,
-        artifact=RETAINED_ARTIFACT, artifact_sha256=RETAINED_DIGEST, artifact_size=RETAINED_SIZE,
-        queens_blade_status='FAIL_ACTUAL_SDK_MOVIE_UNKNOWN_EPISODE',
-        cross_entry_rezero_status='BLOCKED_UNVERIFIED_METADATA', replay_known_wrong_typed_tv=False),
-        'RETAIN_ACTUAL_EPISODE_FAILURE_WITHOUT_REPLAY_OR_PASS')
-    actual = load(HERE / RETAINED_DIR / 'queens-blade-e4-actual-av.json')
-    item = actual['item']
-    require(actual['playing'] is True and item['media_type'] == 'movie' and
-            item['season'] == item['episode'] == -1 and not any(item['ids'].values()) and
-            any(event['event'] == 'AVStarted' for event in actual['events']),
-            'ACTUAL_RETAINED_AV_IS_PLAYABLE_BUT_NOT_VERIFIED_EPISODE')
+    require(selected.get('execution_focus') == 'infinity-origin-acceptance', 'EXACT_INFINITY_ORIGIN_FOCUS_ONLY')
+    require(selected.get('direct_provider_acceptance') is False and
+            selected.get('direct_provider_fallback') is False, 'NO_PROVIDER_BYPASS_AS_INFINITY_ACCEPTANCE')
+    require(selected.get('maximum_new_attempts') == 1 and selected.get('automatic_retries') == 0,
+            'ONE_NEW_ORIGIN_ATTEMPT_NO_RETRIES')
+    require(selected.get('protected_source_checkpoint') == REVIEWED and
+            selected.get('retained_environment_failure_run') == 42570831467,
+            'FROZEN_E410_AND_RETAINED_STARTUP_FAILURE_REQUIRED')
+    contract = load(HERE / 'INFINITY-ORIGIN-ACCEPTANCE.json')
+    require(contract['operation'] == 'accept-existing-infinity-origin-playback-tracking' and
+            contract['protected_source_checkpoint'] == REVIEWED and contract['protected_recovery'] == 2103469,
+            'EXACT_OWNER_ORIGIN_ACCEPTANCE_CONTRACT')
+    require(contract['owner_confirmed_navigation']['status'] == 'PASS_OWNER_REPORTED_GALAXY_FOLD_NAVIGATION_ONLY' and
+            contract['owner_confirmed_navigation']['tracking_acceptance'] is False,
+            'PRESERVE_OWNER_NAVIGATION_CONFIRMATION_WITHOUT_TRACKING_PASS')
+    for name, wanted in contract['production_source_sha256'].items():
+        require(name in ('plugin.py', 'resume_hub.py', 'service.py') and
+                sha(HERE / 'overlay/script.infinity.commandcenter' / name) == wanted,
+                'UNCHANGED_E410_SOURCE_FROM_OWNER_CONTRACT:' + name)
+    require(set(contract['production_source_sha256']) == {'plugin.py', 'resume_hub.py', 'service.py'},
+            'EXACT_THREE_FROZEN_PRODUCTION_SOURCES')
+
+
+def checked_module_pin():
+    module = load(HERE / 'TRACKING-MODULE-FIXTURE-PIN.json')
+    require(module.get('production_source_checkpoint') == REVIEWED and
+            module.get('workflow_id') == 397702717 and
+            module.get('workflow_path') == '.github/workflows/infinity-combined-release.yml' and
+            module.get('APK_build') is False and module.get('publication') is False,
+            'MATCHING_ORIGINAL_KEY_E410_MODULE_FIXTURE_REQUIRED')
+    require(re.fullmatch(r'[0-9a-f]{40}', module.get('source', '')) and
+            type(module.get('run')) is int and type(module.get('id')) is int,
+            'EXACT_SIGNED_FIXTURE_PRODUCER_REFERENCE')
+    return module
 
 
 def checked_request():
@@ -72,6 +94,11 @@ def checked_request():
         'TRACKING-MODULE-FIXTURE-PIN.json', 'qualify_android_baseline.py', 'ANDROID-BASELINE-HOST-GUARDS.json',
         'dependency-evidence/PUBLIC-MOVIE-INPUT.json',
         'SCOPE.json', 'INTEGRATION-SOURCE-PROOF.json', 'PROJECTION-HOST-RESULT.json', 'ACTUAL-SOURCE-HOST-RESULT.json',
+        'CURRENT-SOURCE-PROOF.json', 'TV-IDENTITY-SAFETY-BRIDGE-HOST-RESULT.json',
+        'TV-IDENTITY-SAFETY-BRIDGE-REVIEW.json', 'INFINITY-ORIGIN-ACCEPTANCE.json',
+        'CURRENT-INPUT-FIXTURE.json', 'evidence/baseline-constructor-fail-42570831467/EVIDENCE.json',
+        'evidence/signed-e410-origin-fixture-42588102830/REVIEW.json',
+        'evidence/signed-e410-origin-fixture-42588102830/MODULE-UPGRADE-RECOVERY.json',
         'evidence/api36-startup-pass-42542862696/EVIDENCE.json',
         RETAINED_DIR + 'EVIDENCE.json', RETAINED_DIR + 'queens-blade-e4-actual-av.json',
         'evidence/signed-tracking80-42555855742/MODULE-UPGRADE-RECOVERY.json'}
@@ -83,19 +110,22 @@ def checked_request():
     require(sha(ROOT / WORKFLOW) == selected['workflow_sha256'], 'EXACT_ANDROID_WORKFLOW_SOURCE')
     checked_focus(selected)
     for name in ['overlay/script.infinity.commandcenter/' + n for n in ('plugin.py', 'resume_hub.py', 'service.py')] + [
-            'SCOPE.json', 'INTEGRATION-SOURCE-PROOF.json', 'PROJECTION-HOST-RESULT.json', 'ACTUAL-SOURCE-HOST-RESULT.json']:
+            'SCOPE.json', 'INTEGRATION-SOURCE-PROOF.json', 'PROJECTION-HOST-RESULT.json', 'ACTUAL-SOURCE-HOST-RESULT.json',
+            'CURRENT-SOURCE-PROOF.json', 'TV-IDENTITY-SAFETY-BRIDGE-HOST-RESULT.json',
+            'TV-IDENTITY-SAFETY-BRIDGE-REVIEW.json']:
         path = HERE / name
         require(path.read_bytes() == git('show', REVIEWED + ':' + path.relative_to(ROOT).as_posix()),
                 'UNCHANGED_REVIEWED_PRODUCTION_OR40_CASE_EVIDENCE:' + name)
+    module = checked_module_pin()
     for name in ('tracking_module_fixture.py', 'prepare_tracking_release.py', 'verify_tracking_modules.py'):
         path = HERE / name
-        require(path.read_bytes() == git('show', MODULE_SOURCE + ':' + path.relative_to(ROOT).as_posix()),
+        require(path.read_bytes() == git('show', module['source'] + ':' + path.relative_to(ROOT).as_posix()),
                 'UNCHANGED_ORIGINAL_MODULE_FIXTURE_TOOL:' + name)
     return selected
 
 
 def workflow_shape():
-    prior = git('show', MODULE_SOURCE + ':' + WORKFLOW).decode()
+    prior = git('show', WORKFLOW_SHAPE_BASE + ':' + WORKFLOW).decode()
     expected = prior.replace('tracking-baseline-android]', 'tracking-baseline-android, tracking-integration-android]', 1)
     anchor = "'repairs/infinity-tracking-integration-2103469-20261108/ANDROID-BASELINE-REQUEST.json']"
     expected = expected.replace(anchor, anchor[:-1] + ", 'repairs/infinity-tracking-integration-2103469-20261108/TRACKING-ANDROID-REQUEST.json']", 1)
@@ -132,9 +162,13 @@ def admit(out):
             baseline['head_sha'] == '3d32dfa90510011701c11c49a763774ce3428200', 'QUALIFIED_BASELINE_PASS_NOT_CHANGED')
     lock = original.api('git/ref/heads/locks/infinity-2103469-protected-recovery-20261108')
     require(lock['object']['sha'] == original.AUTHORITY, 'PROTECTED_RECOVERY69_UNCHANGED')
-    module = load(HERE / 'TRACKING-MODULE-FIXTURE-PIN.json')
-    require(module['run'] == 42555855742 and module['source'] == MODULE_SOURCE and module['workflow_id'] == 397702717 and
-            module['APK_build'] is False and module['publication'] is False, 'EXACT_INTERNAL_SIGNED_MODULE_PRODUCER')
+    module = checked_module_pin()
+    module_run = original.api('actions/runs/' + str(module['run']))
+    require(module_run['status'] == 'completed' and module_run['conclusion'] == 'success' and
+            module_run['workflow_id'] == module['workflow_id'] and module_run['path'] == module['workflow_path'] and
+            module_run['head_sha'] == module['source'], 'EXACT_ORIGINAL_SIGNED_E410_MODULE_PRODUCER')
+    e410 = original.api('git/ref/heads/locks/infinity-tracking-e410f30b-20261109')
+    require(e410['object']['sha'] == REVIEWED, 'PROTECTED_E410_CHECKPOINT_UNCHANGED')
     retained = original.api('actions/runs/' + str(RETAINED_RUN))
     require(retained['status'] == 'completed' and retained['conclusion'] == 'failure' and
             retained['head_sha'] == RETAINED_SOURCE and retained['workflow_id'] == 393886994 and
@@ -147,11 +181,18 @@ def admit(out):
     signed = original.download(original.SIGNED, out / 'original69')
     fixtures = original.download(module, out / 'signed-modules')
     require(sha(fixtures / 'pair/SOURCE-PINS.json') == module['source_pins_sha256'], 'FROZEN_MODULE_SOURCE_PINS')
+    metadata = load(fixtures / 'MODULE-FIXTURE.json')
+    require(metadata['production_source'] == module['production_source_checkpoint'] == REVIEWED and
+            metadata['source'] == module['source'] and metadata['run_id'] == module['run'] and
+            metadata['APK_build'] is False and metadata['APK_present'] is False and
+            metadata['fixture_packages'] == module['fixture_packages'],
+            'SIGNED_ARTIFACT_METADATA_MATCHES_APPROVED_E410_PIN')
     proof = dict(status='PASS_SELECTED_TRACKING_ANDROID_INPUT_ADMISSION_ONLY', source=source,
         APK=str((signed / 'Infinity-2103469-Combined-Original-Signer.apk').resolve()),
         module_fixture=str(fixtures.resolve()), selected_request_sha256=sha(REQUEST),
         qualified_startup_run_reused=42542862696, startup_qualification_repeated=False,
-        execution_focus=selected['execution_focus'], retained_actual_evidence=selected['retained_actual_evidence'],
+        execution_focus=selected['execution_focus'], direct_provider_acceptance=False,
+        maximum_new_attempts=1, automatic_retries=0, retained_environment_failure_run=42570831467,
         application_execution=False, module_producer=module, APK_build=False, publication=False)
     (out / 'ADMISSION.json').write_text(json.dumps(proof, indent=2, sort_keys=True) + '\n')
     print(proof['status'])

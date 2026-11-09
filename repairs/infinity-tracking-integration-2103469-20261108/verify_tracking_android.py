@@ -1,8 +1,8 @@
 """Selected real API36 tracking probe on unchanged69 + normally installed ZIP.
 
-No app/build/sign dispatch at import. Run only in the selected feature workflow
-after root reviews this harness. Missing actual metadata/playable media is FAIL,
-and credential-dependent/unexecuted families remain NOT_RUN_BLOCKED.
+No app/build/sign dispatch at import. Prerequisite or observer failures are
+BLOCKED and unreached steps remain NOT_RUN. Only observed functional assertions
+after the relevant genuine Infinity workflow report FAIL.
 """
 import argparse
 import codecs
@@ -10,6 +10,7 @@ import json
 import os
 from pathlib import Path
 import socket
+import re
 import time
 import traceback
 from urllib.parse import parse_qs, urlencode, urlsplit
@@ -24,6 +25,19 @@ WNT = 'plugin.video.watchnixtoons2'
 QUEEN_PARENT = '/anime/queen-s-blade?season=all&lang=dub'
 QUEEN_E4 = '/queens-blade-episode-4-english-dubbed'
 REZERO_PARENT = '/anime/re-zero-starting-life-in-another-world?season=all&lang=dub'
+
+
+class ObserverBlocked(RuntimeError):
+    pass
+
+
+class FunctionalFailure(RuntimeError):
+    pass
+
+
+def functional(value, label):
+    if not value:
+        raise FunctionalFailure(label)
 
 
 class FeatureDevice(base.Device):
@@ -190,7 +204,8 @@ class Observer:
             return result if result.get('pid') == self.device.pid and result.get('sequence') == self.sequence else None
         result = until(self.device, reply, 'Actual SDK observer ' + action, 45)
         base.save(self.out / ('observer-%03d-%s.json' % (self.sequence, action)), result)
-        base.require(result.get('passed') is True, 'OBSERVER_FAILED:' + repr(result))
+        if result.get('passed') is not True:
+            raise ObserverBlocked('OBSERVER_FAILED:' + repr(result))
         return result['result']
 
 
@@ -439,6 +454,12 @@ def exact_resume_observation(current, original, stored, event_floor):
     return current if current['time'] >= position - 20 else None
 
 
+def observed_resume_lower_deadline(error, valid_current=False):
+    # This is the outer position-wait deadline after actual same-source AV.
+    # Observer/RPC/no-AV timeouts have other labels and remain prerequisites.
+    return valid_current is True and isinstance(error, TimeoutError) and str(error).startswith('Existing same-source Infinity resume offset; last=')
+
+
 def run_public_movie(device, observer, out, passed):
     page = '/fantastic-mr-fox'
     destination = 'plugin://' + WNT + '/?' + urlencode(dict(action='actionCatalogSection', path='/movie-list', section='F'))
@@ -595,43 +616,294 @@ def capture_ui(device, observer, out):
     return result
 
 
+def row_request(row):
+    return {key: row[key] for key in ('control', 'index', 'file', 'label')}
+
+
+def route_matches(route_value, **wanted):
+    parsed = urlsplit(route_value)
+    query = parse_qs(parsed.query)
+    return parsed.scheme == 'plugin' and parsed.netloc == base.CC and all(query.get(key) == [value] for key, value in wanted.items())
+
+
+def breadcrumb(trace, name, **observed):
+    trace.append(dict(step=name, observed_epoch=time.time(), **observed))
+
+
+def infinity_section(device, observer, media, bucket, trace):
+    """Native Home9000 -> existing first-party root -> real section row."""
+    device.rpc('Input.Home')
+    section = 'trakttv' if media == 'tv' else 'traktmovies'
+    def home():
+        snap = observer.call('snapshot')
+        if snap['window'] != 10000 or snap['dialog'] not in (0, -1, 9999): return None
+        rows = [row for row in snap['controls'].get('9000', []) if row['section'] == section and row['hubsource'] == 'infinity']
+        base.require(len(rows) <= 1, 'UNIQUE_ACTUAL_INFINITY_HOME_OWNER_REQUIRED')
+        return (snap, rows[0]) if rows else None
+    snap, row = until(device, home, 'Actual visible first-party Infinity Home selection', 45)
+    observed = observer.call('home-select', index=row['index'], label=row['label'], section=section, hubsource='infinity')
+    breadcrumb(trace, 'home', native=observed, window=snap['window'])
+    action = 'tv' if media == 'tv' else 'movies'
+    def root():
+        current = observer.call('snapshot')
+        return current if current['window'] == 10025 and current['dialog'] in (0, -1, 9999) and route_matches(current['folder'], action=action) and content_rows(current, optional=True) else None
+    root_snapshot = until(device, root, 'Actual first-party Infinity root', 60)
+    breadcrumb(trace, 'root', folder=root_snapshot['folder'], window=root_snapshot['window'])
+    matches = [row for row in content_rows(root_snapshot) if route_matches(row['file'], action='library', media=media, bucket=bucket)]
+    base.require(len(matches) == 1, 'UNIQUE_ACTUAL_INFINITY_SECTION_ROW_REQUIRED:' + bucket)
+    selected = matches[0]
+    observed = observer.call('click', **row_request(selected))
+    def directory():
+        current = observer.call('snapshot')
+        return current if current['window'] == 10025 and current['dialog'] in (0, -1, 9999) and route_matches(current['folder'], action='library', media=media, bucket=bucket) and content_rows(current, optional=True) else None
+    current = until(device, directory, 'Actual Infinity section directory ' + bucket, 60)
+    breadcrumb(trace, 'section', bucket=bucket, media=media, folder=current['folder'], selected=row_request(selected), native=observed)
+    return current
+
+
+def prepare_saved_title(device, observer, media):
+    """Find a real saved entry, or use its existing native context Save action."""
+    page = QUEEN_PARENT if media == 'tv' else '/fantastic-mr-fox'
+    expected_action = 'actionEpisodesMenu' if media == 'tv' else 'actionResolve'
+    def matches(state):
+        found = []
+        for key, entry in state['data'].get('watchlist', {}).items():
+            parsed = urlsplit(entry.get('source', ''))
+            query = parse_qs(parsed.query)
+            if parsed.scheme == 'plugin' and parsed.netloc == WNT and query.get('action') == [expected_action] and query.get('url') in ([page], ['https://www.wcostream.tv' + page]):
+                found.append(dict(entry, key=key))
+        base.require(len(found) <= 1, 'UNIQUE_EXISTING_SAVED_SOURCE_REQUIRED')
+        return found
+    before = observer.call('state')
+    existing = matches(before)
+    if not existing:
+        # Provider directory access is preparation only, never play-origin proof.
+        path, letter = ('/dubbed-anime-list', 'Q') if media == 'tv' else ('/movie-list', 'F')
+        directory = open_directory(device, observer, 'plugin://' + WNT + '/?' + urlencode(dict(action='actionCatalogSection', path=path, section=letter)))
+        rows = []
+        for row in content_rows(directory):
+            parsed = urlsplit(row['file']); query = parse_qs(parsed.query)
+            if parsed.scheme == 'plugin' and parsed.netloc == WNT and query.get('action') == [expected_action] and query.get('url') in ([page], ['https://www.wcostream.tv' + page]): rows.append(row)
+        base.require(len(rows) == 1, 'ACTUAL_CATALOG_TITLE_REQUIRED_FOR_LEGITIMATE_SAVE')
+        selected = observer.call('inspect', **row_request(rows[0]))
+        base.require(selected['actual_gui_item']['media_type'] == ('tvshow' if media == 'tv' else 'movie'), 'ACTUAL_SAVE_METADATA_PREREQUISITE')
+        observer.call('context', **row_request(rows[0]))
+        menu_choose(device, observer, 'Add to Watchlist')
+        after = until(device, lambda: (state if matches(state := observer.call('state')) else None), 'Existing supported save completed', 25)
+        functional(progress_rows(before) == progress_rows(after), 'SAVING_ALONE_CHANGED_PLAYBACK_HISTORY')
+        existing = matches(after)
+    else:
+        after = before
+    entry = existing[0]
+    identity = after['valid_identities']['watchlist'].get(entry['key'])
+    base.require(identity and identity['kind'] == ('tvshow' if media == 'tv' else 'movie'), 'VALID_EXISTING_SAVED_IDENTITY_REQUIRED')
+    return entry
+
+
+def verify_origin(trace, media, require_av=False):
+    names = [event['step'] for event in trace]
+    required = ['home', 'root', 'section', 'saved'] + (['child'] if media == 'tv' else []) + ['launch'] + (['AVStarted'] if require_av else [])
+    functional(names == required, 'COMPLETE_ORDERED_INFINITY_ORIGIN_REQUIRED_NO_PROVIDER_FALLBACK')
+    expected_section = 'trakttv' if media == 'tv' else 'traktmovies'
+    functional(trace[0]['window'] == 10000 and trace[0]['native']['hubsource'] == 'infinity' and
+               trace[0]['native']['section'] == expected_section, 'ACTUAL_FIRSTPARTY_HOME_OWNER_REQUIRED')
+    functional(route_matches(trace[1]['folder'], action='tv' if media == 'tv' else 'movies') and
+               route_matches(trace[2]['folder'], action='library', media=media, bucket='watchlist'), 'ACTUAL_INFINITY_ROOT_WATCHLIST_CHAIN_REQUIRED')
+    functional(bool(trace[3]['key']) and bool(trace[3]['source']), 'ACTUAL_SAVED_KEY_SOURCE_REQUIRED')
+    if media == 'tv':
+        functional(trace[4]['folder'] == trace[3]['source'], 'CHILD_MUST_COME_FROM_CLICKED_SAVED_PARENT')
+    launch = trace[-2] if require_av else trace[-1]
+    functional(launch['native_click'] is True, 'ACTUAL_SELECTED_NATIVE_LAUNCH_REQUIRED')
+    if require_av:
+        functional(any(event['event'] == 'AVStarted' for event in trace[-1]['events']), 'GENUINE_AV_CALLBACK_REQUIRED_AFTER_ORIGIN')
+
+
+def validate_progress(state, stored, media, selected, parent_source=None):
+    """Trust the existing hub's validated identity; raw SDK tags stay diagnostic."""
+    identity = state['valid_identities']['items'].get(stored['key'])
+    functional(stored['media'] == media and identity and identity['kind'] == ('episode' if media == 'tv' else 'movie'), 'EXISTING_HUB_EXACT_VALID_MEDIA_IDENTITY_REQUIRED')
+    functional(stored.get('source') == selected['file'] or stored.get('stable_source') == selected['file'], 'EXACT_PLAYED_SOURCE_RECORD_REQUIRED')
+    if media == 'tv':
+        functional(stored.get('source_parent') == parent_source and state['series_proof'].get(stored['key']), 'EXACT_PROVED_PARENT_REQUIRED')
+        functional(identity.get('season') == stored.get('season') and identity.get('episode') == stored.get('episode'), 'STORED_COORDINATES_MUST_REMAIN_VALID_AND_UNKNOWN_WHEN_UNKNOWN')
+    functional(bool(stored.get('label')), 'RETAINED_NATIVE_LABEL_REQUIRED')
+    return identity
+
+
+def run_origin_scenario(device, observer, out, media, scenario, persist):
+    trace = scenario['origin_trace']
+    scenario['last_step'] = 'fixture_preparation'; persist()
+    saved = prepare_saved_title(device, observer, media)
+    before_launch_history = progress_rows(observer.call('state'))
+    scenario['steps']['fixture_preparation'] = dict(status='PASS', key=saved['key'], source=saved['source'])
+    scenario['last_step'] = 'infinity_origin'; persist()
+    watchlist = infinity_section(device, observer, media, 'watchlist', trace)
+    cards = [row for row in content_rows(watchlist) if row['key'] == saved['key']]
+    base.require(len(cards) == 1, 'ACTUAL_SAVED_WATCHLIST_CARD_REQUIRED')
+    selected = cards[0]
+    observer.call('inspect', **row_request(selected))
+    breadcrumb(trace, 'saved', key=saved['key'], source=saved['source'], row=row_request(selected), folder=watchlist['folder'])
+    if media == 'tv':
+        observer.call('click', **row_request(selected))
+        def children():
+            snap = observer.call('snapshot')
+            return snap if snap['window'] == 10025 and snap['dialog'] in (0, -1, 9999) and snap['folder'] == saved['source'] and content_rows(snap, optional=True) else None
+        child_snapshot = until(device, children, 'Actual saved Queen parent episode list', 90)
+        selected = exact_episode_row(child_snapshot, QUEEN_E4)
+        breadcrumb(trace, 'child', folder=child_snapshot['folder'], selected=selected)
+    floor = event_sequence(observer)
+    scenario['last_step'] = 'saving_browsing_no_history'
+    functional(progress_rows(observer.call('state')) == before_launch_history, 'INFINITY_BROWSING_BEFORE_AV_CREATED_HISTORY')
+    scenario['steps']['saving_browsing_no_history'] = dict(status='PASS')
+    scenario['last_step'] = 'infinity_origin'
+    observer.call('click', **row_request(selected))
+    breadcrumb(trace, 'launch', selected=row_request(selected), native_click=True)
+    verify_origin(trace, media)
+    scenario['steps']['infinity_origin'] = dict(status='PASS', trace=trace)
+    scenario['last_step'] = 'actual_av'; persist()
+    actual = actual_av(device, observer, floor)
+    breadcrumb(trace, 'AVStarted', events=actual['events'], native_item=actual['item'])
+    verify_origin(trace, media, require_av=True)
+    scenario['raw_sdk_diagnostic'] = actual
+    scenario['steps']['actual_av'] = dict(status='PASS', events=actual['events'])
+    scenario['integration_started'] = True
+    scenario['last_step'] = 'eligible_playback'; persist()
+    functional(actual['total'] >= 120 and 0 <= actual['time'] < 30, 'ACTUAL_DURATION_AND_INITIAL_CLOCK_REQUIRED')
+    expected_source = selected['file'] if media == 'tv' else saved['source']
+    functional(expected_source in (actual['item']['path'], actual['item']['original_listitem_url']), 'ACTUAL_PLAYING_NATIVE_SOURCE_MUST_MATCH_INFINITY_SELECTED_CONTENT')
+    target = 300 if media == 'tv' else max(90, actual['total'] * .01 + 5)
+    began, samples = time.monotonic(), [actual]
+    while samples[-1]['time'] - actual['time'] < target:
+        base.require(time.monotonic() - began < target + 120, 'BLOCKED_ACTUAL_MEDIA_BUFFERING_DEADLINE')
+        time.sleep(10)
+        current = observer.call('playing')
+        functional(current.get('playing') and current['file'] == actual['file'] and current['time'] >= samples[-1]['time'], 'SAME_ACTUAL_PLAYBACK_CLOCK_REQUIRED')
+        samples.append(current)
+        base.save(out / (media + '-actual-clock.json'), samples)
+    stop_video(device, observer)
+    scenario['steps']['eligible_playback'] = dict(status='PASS', actual_clock_delta=samples[-1]['time'] - actual['time'])
+    scenario['steps']['stop'] = dict(status='PASS', callbacks=observer.call('events'))
+    scenario['last_step'] = 'record'; persist()
+    source_page = QUEEN_E4 if media == 'tv' else '/fantastic-mr-fox'
+    try:
+        state = until(device, lambda: (state if len(matching_source_rows(state := observer.call('state'), source_page)) == 1 else None), 'One actual eligible progress record', 35)
+    except TimeoutError as error:
+        raise FunctionalFailure('NO_EXACT_ELIGIBLE_PROGRESS_AFTER_GENUINE_INFINITY_PLAYBACK') from error
+    stored = matching_source_rows(state, source_page)[0]
+    identity = validate_progress(state, stored, media, selected, saved['source'] if media == 'tv' else None)
+    functional(samples[-1]['time'] - 20 <= float(stored.get('position') or 0) <= samples[-1]['time'] + 15, 'PERSISTED_POSITION_MATCHES_ACTUAL_CLOCK')
+    functional(stored['label'] == actual['item']['label'], 'NATIVE_LABEL_PRESERVED_WITHOUT_INVENTED_EPISODE_NUMBER')
+    scenario['steps']['record'] = dict(status='PASS', stored=stored, validated_identity=identity)
+    scenario['last_step'] = 'tracking_sections'; persist()
+    for bucket, field in ([('progress', 'progress_shows'), ('next', 'next_episodes'), ('continue', 'continue_entries')] if media == 'tv' else [('continue', 'continue_entries')]):
+        section_trace = []
+        cards = infinity_section(device, observer, media, bucket, section_trace)
+        current_state = observer.call('state')
+        projection = [entry for entry in current_state[field] if entry.get('media') == media]
+        try:
+            assert_native_projection(cards, projection, stored['key'])
+        except RuntimeError as error:
+            if str(error) in ('AMBIGUOUS_VISIBLE_PRIMARY_CONTENT_CONTROLS_REJECTED',
+                              'ONE_VISIBLE_ORIGINAL_VIDEOS_CONTENT_CONTROL_REQUIRED', 'ACTUAL_UNOBSCURED_VIDEOS_CONTENT_REQUIRED'):
+                raise ObserverBlocked(str(error)) from error
+            raise FunctionalFailure('ACTUAL_TRACKING_CARD_PROJECTION_ASSERTION:' + str(error)) from error
+        scenario['steps'][bucket] = dict(status='PASS', trace=section_trace, key=stored['key'])
+        base.save(out / (media + '-' + bucket + '-actual-gui.json'), cards)
+        device.screenshot(media + '-' + bucket)
+    scenario['successor'] = 'NOT_ASSERTED_WITHOUT_EXISTING_VERIFIED_ORDERING; unfinished current source required'
+    scenario['last_step'] = 'resume'; persist()
+    cards = infinity_section(device, observer, media, 'continue', [])
+    matches = [row for row in content_rows(cards) if row['key'] == stored['key']]
+    functional(len(matches) == 1, 'ONE_EXACT_REAL_INFINITY_CONTINUE_CARD_REQUIRED')
+    observer.call('context', **row_request(matches[0]))
+    floor = event_sequence(observer)
+    menu_choose(device, observer, 'Resume')
+    resumed = actual_av(device, observer, floor)
+    exact_resume_observation(resumed, actual, stored, floor)
+    resume_sample = dict(valid_current=False)
+    def observed_offset():
+        current = observer.call('playing')
+        result = exact_resume_observation(current, actual, stored, floor)
+        resume_sample['valid_current'] = current.get('playing') is True
+        return result
+    try:
+        resumed = until(device, observed_offset, 'Existing same-source Infinity resume offset', 20)
+    except TimeoutError as error:
+        if observed_resume_lower_deadline(error, resume_sample['valid_current']):
+            raise FunctionalFailure('EXACT_RESUME_LOWER_OFFSET_DEADLINE') from error
+        raise
+    stop_video(device, observer)
+    scenario['steps']['resume'] = dict(status='PASS', observed=resumed, harness_seek=False)
+    scenario['status'] = 'PASS'; persist()
+
+
+def initial_report():
+    names = ('fixture_preparation', 'infinity_origin', 'saving_browsing_no_history', 'actual_av', 'eligible_playback', 'stop',
+             'record', 'progress', 'next', 'continue', 'resume')
+    return dict(status='NOT_RUN', APK_sha256=base.APK_SHA, release_acceptance=False, Fold='NOT_RUN',
+        shutdown='NOT_SELECTED', source=os.environ.get('GITHUB_SHA'),
+        scenarios={media: dict(status='NOT_RUN', steps={name: dict(status='NOT_RUN') for name in names},
+                               origin_trace=[], integration_started=False) for media in ('tv', 'movie')},
+        other_entry_points={name: 'NOT_RUN' for name in ('Collection', 'Save For Later', 'Custom Lists', 'Other playable sections')},
+        shared_record_view_coverage='NOT_RUN', completion96='NOT_RUN', direct_provider_diagnostics='NOT_ACCEPTANCE')
+
+
+def classify_scenario(error, scenario):
+    if isinstance(error, ObserverBlocked) or str(error) in ('AMBIGUOUS_VISIBLE_PRIMARY_CONTENT_CONTROLS_REJECTED',
+            'ONE_VISIBLE_ORIGINAL_VIDEOS_CONTENT_CONTROL_REQUIRED', 'ACTUAL_UNOBSCURED_VIDEOS_CONTENT_REQUIRED'):
+        return 'BLOCKED_OBSERVER'
+    if isinstance(error, FunctionalFailure) and str(error) == 'SAVING_ALONE_CHANGED_PLAYBACK_HISTORY':
+        return 'FAIL'
+    if scenario.get('integration_started') and scenario.get('last_step') == 'resume' and (
+            str(error).startswith(('RESUMED_ACTUAL_TYPED_ITEM_CONTINUITY:', 'RESUMED_ACTUAL_TYPED_ID_CONTINUITY:')) or
+            str(error) in ('RESUMED_ACTUAL_SOURCE_URI_CONTINUITY', 'EXACT_RESUME_UPPER_OFFSET_BOUND_NO_LATE_OVERSHOOT')):
+        return 'FAIL'
+    if isinstance(error, FunctionalFailure) and (scenario.get('integration_started') or scenario.get('last_step') == 'saving_browsing_no_history'): return 'FAIL'
+    if scenario.get('last_step') == 'fixture_preparation': return 'BLOCKED_FIXTURE_PREPARATION'
+    if scenario.get('last_step') == 'infinity_origin': return 'BLOCKED_ORIGIN_PREREQUISITE'
+    return 'BLOCKED_RUNTIME_PREREQUISITE'
+
+
+def final_apk_observation(device):
+    try:
+        paths = device.shell('pm', 'path', base.PACKAGE).splitlines()
+        if len(paths) != 1 or not paths[0].startswith('package:/data/app/') or not paths[0].endswith('/base.apk'):
+            return dict(status='UNVERIFIED_PACKAGE_QUERY')
+        path = paths[0].removeprefix('package:')
+        parts = device.shell('sha256sum', path).strip().split()
+        if len(parts) != 2 or not re.fullmatch('[0-9a-f]{64}', parts[0]) or parts[1] != path:
+            return dict(status='UNVERIFIED_DIGEST_QUERY')
+        return dict(status='PASS_EXACT_ORIGINAL69' if parts[0] == base.APK_SHA else 'FAIL_MISMATCH', observed_sha256=parts[0])
+    except Exception as error:
+        return dict(status='UNVERIFIED_READ_ERROR', error=repr(error))
+
+
 def run(staged_path, sdk, out):
     base.require(not out.exists(), 'FRESH_SELECTED_ANDROID_EVIDENCE')
     out.mkdir(parents=True)
-    staged = base.load(staged_path / 'STAGED.json')
-    selection = selected_focus()
-    base.require(staged.get('selection') == selection, 'CURRENT_COMMITTED_REQUEST_FOCUS_AND_RETAINED_EVIDENCE_REQUIRED')
-    base.require(staged['status'] == 'ADMITTED_INPUTS_ONLY_NOT_ANDROID_PASS' and
-                 staged['baseline']['apk_sha256'] == base.APK_SHA and
-                 staged['observer_sha256'] == base.sha(HERE / 'tracking_android_observer.py') and
-                 staged['stage_source_sha256'] == base.sha(HERE / 'stage_tracking_android.py'), 'EXACT_SOURCE_BOUND_STAGING')
-    base.require(os.environ.get('GITHUB_ACTIONS') == 'true' and
-                 os.environ.get('GITHUB_REPOSITORY') == 'mahfouzhassine8-ops/project-infinity' and
-                 os.environ.get('GITHUB_REF') == 'refs/heads/work/infinity-tracking-integration-20261108', 'SELECTED_DISPOSABLE_FEATURE_WORKFLOW_ONLY')
-    for row in [staged['qa'], *staged['dependencies'], *staged['fixture_packages']]:
-        base.require(base.sha(staged_path / 'zips' / row['archive']) == row['sha256'], 'STAGED_ZIP_REVALIDATED')
-    base.require(base.sha(Path(staged['APK_path'])) == base.APK_SHA, 'UNCHANGED69_APK_REVALIDATED')
-    report = dict(status='RUNNING_SELECTED_TRACKING_ANDROID', cases=[], APK_sha256=base.APK_SHA,
-        fixture=staged['fixture'], source=os.environ['GITHUB_SHA'],
-        harness_sha256=base.sha(__file__), stage_sha256=staged['stage_source_sha256'], observer_sha256=staged['observer_sha256'],
-        execution_focus=selection['execution_focus'], retained_actual_evidence=selection['retained_actual_evidence'],
-        retained_mandatory_queens_blade='FAIL_ACTUAL_SDK_MOVIE_UNKNOWN_EPISODE',
-        premium_families={name: 'NOT_RUN_BLOCKED_REAL_TEST_CREDENTIALS_OR_PLAYABLE_SOURCE_REQUIRED'
-                          for name in ('Umbrella', 'POV', 'Seren', 'Otaku', 'The Crew')},
-        movie='NOT_RUN', cross_entry_rezero='BLOCKED_RETAINED_UNVERIFIED_METADATA_NOT_REEXECUTED',
-        view_theme_matrix='NOT_RUN', module_recovery='NOT_RUN', full_twelve_checks='NOT_RUN',
-        shutdown='NOT_SELECTED', Fold='NOT_RUN', release_acceptance=False,
-        mandatory_owner_gates=dict(all_supported_families='NOT_RUN_BLOCKED_REAL_AUTH_AND_SOURCES',
-            cross_provider_rezero='NOT_RUN_BLOCKED_REAL_REGULAR_SOURCE_AND_EXPLICIT_PARENT_LINK',
-            natural_Ended='NOT_RUN', verified_completed_episode_successor='NOT_RUN_NO_CATALOGUE_PROOF',
-            all_view_modes='NOT_RUN', physical_Fold='NOT_RUN', forward_APK_install_recovery='NOT_RUN_MODULE_FIXTURE_ONLY'))
-    device, reader, disposer, observer, code = None, None, None, None, 1
-    def passed(name, **evidence):
-        report['cases'].append(dict(case=name, status='PASS', **evidence))
-        base.save(out / 'ANDROID-VERIFICATION.json', report)
+    report = initial_report()
+    device, reader, disposer, observer, phase = None, None, None, None, 'fixture_authentication'
+    def persist(): base.save(out / 'ANDROID-VERIFICATION.json', report)
+    persist()
     try:
+        staged = base.load(staged_path / 'STAGED.json')
+        selection = selected_focus()
+        base.require(staged.get('selection') == selection and selection['execution_focus'] == 'infinity-origin-acceptance', 'COMMITTED_ORIGIN_ONLY_SELECTION_REQUIRED')
+        base.require(staged['status'] == 'ADMITTED_INPUTS_ONLY_NOT_ANDROID_PASS' and staged['baseline']['apk_sha256'] == base.APK_SHA and
+            staged['observer_sha256'] == base.sha(HERE / 'tracking_android_observer.py') and
+            staged['stage_source_sha256'] == base.sha(HERE / 'stage_tracking_android.py'), 'EXACT_SOURCE_BOUND_STAGING')
+        base.require(os.environ.get('GITHUB_ACTIONS') == 'true' and
+            os.environ.get('GITHUB_REPOSITORY') == 'mahfouzhassine8-ops/project-infinity' and
+            os.environ.get('GITHUB_REF') == 'refs/heads/work/infinity-tracking-integration-20261108', 'SELECTED_DISPOSABLE_FEATURE_WORKFLOW_ONLY')
+        for row in [staged['qa'], *staged['dependencies'], *staged['fixture_packages']]:
+            base.require(base.sha(staged_path / 'zips' / row['archive']) == row['sha256'], 'STAGED_ZIP_REVALIDATED')
+        base.require(base.sha(Path(staged['APK_path'])) == base.APK_SHA, 'UNCHANGED69_APK_REVALIDATED')
+        report.update(status='RUNNING_ORIGIN_ACCEPTANCE', selection=selection, fixture=staged['fixture'],
+            candidate_version=staged['expected']['cc_version'], harness_sha256=base.sha(__file__),
+            observer_sha256=staged['observer_sha256'], stage_sha256=staged['stage_source_sha256'])
+        phase = 'environment'
         device = FeatureDevice(out, sdk)
-        disposer, report['retained_host_disposal'] = base.retained_disposal(out)
+        disposer, report['host_disposal'] = base.retained_disposal(out)
         report['environment'] = base.environment(device, out)
         base.require(not device.shell('pm', 'list', 'packages', base.PACKAGE).strip(), 'FRESH_VM_NO_DATA_RESET')
         report['root_handshake'] = base.root_reconnect(device, out)
@@ -647,92 +919,75 @@ def run(staged_path, sdk, out):
         device.shell('restorecon', '-RF', '/data/media/0/Android/data/' + base.PACKAGE)
         device.adb('forward', 'tcp:19090', 'tcp:9090')
         reader = base.start_lifecycle_log(device, out)
-        report['initial_start'] = base.start_once(device, 'feature-initial', out)
+        report['initial_start'] = base.start_once(device, 'origin-initial', out)
         base.crash_free_alive(device)
-        base.save(out / 'original69-installed80.json', base.installed_hashes(device, staged['baseline']))
+        phase = 'fixture_installation'
         install_zip(device, staged['qa'], staged, out, 'install-observer')
-        for i, row in enumerate(staged['dependencies']):
-            install_zip(device, row, staged, out, 'install-dependency-%02d' % i)
+        for i, row in enumerate(staged['dependencies']): install_zip(device, row, staged, out, 'install-dependency-%02d' % i)
         candidate = next(row for row in staged['fixture_packages'] if not row['recovery'])
-        install_zip(device, candidate, staged, out, 'install-authenticated-cc68')
-        # Explicit selected restart loads updated service/source; no Close journey.
-        previous = dict(pid=device.pid, process_start=device.start_time)
+        install_zip(device, candidate, staged, out, 'install-approved-candidate')
         device.shell('am', 'force-stop', base.PACKAGE)
         base.require(not device.pids(), 'SELECTED_MODULE_ACTIVATION_PROCESS_STOPPED')
-        report['module_activation_restart'] = dict(previous=previous, start=base.start_once(device, 'module-activation', out), data_cleared=False)
+        report['module_activation_restart'] = base.start_once(device, 'origin-module-activation', out)
+        phase = 'observer_authentication'
         observer = Observer(device, out)
         auth = observer.call('identity')
         base.require(auth['module_files'] == staged['expected']['module_sources'] and auth['module_count'] == 80 and
-                     auth['manifest_sha256'] == staged['expected']['manifest_sha256'] and auth['cc_version'] == '0.3.5.68', 'DYNAMIC_ORIGINAL_NATIVE_FULL80_CONTROLLER_AUTH')
-        passed('normal_zip_install_and_dynamic_original_full80_auth', identity=auth)
-        base.crash_free_alive(device)
-        report['cases'].append(dict(case='queens_blade_actual_tv_identity', status='FAIL',
-            retained=True, executed_this_run=False, run=42567028842,
-            error='Retained genuine AV SDK movie/S=-1/E=-1; no TV replay or inferred identity.'))
-        report['retained_parent_query_save_failure'] = dict(run=42569526805, status='FAIL',
-            executed_this_run=False, reason='Actual owned identity refusal confirmed; not replayed before independent movie.')
-        base.crash_free_alive(device)
-        try:
-            run_public_movie(device, observer, out, passed)
-            report['movie'] = 'PASS_SELECTED_REAL_PUBLIC_WNT_MOVIE_CASES'
-        except Exception as error:
-            report['movie'] = 'FAIL_ACTUAL_PUBLIC_WNT_MOVIE'
-            record_case_failure(device, observer, out, report, 'public_movie', error)
-        base.crash_free_alive(device)
-        try:
-            persisted = observer.call('state')
-            base.require(any(progress_rows(persisted).values()), 'ACTUAL_RECORDED_PROGRESS_REQUIRED_FOR_PERSISTENCE_CASE')
-            stop_video(device, observer)
-            device.shell('am', 'force-stop', base.PACKAGE)
-            base.require(not device.pids(), 'SELECTED_RECORDED_STATE_RESTART_STOPPED')
-            report['independent_progress_restart'] = base.start_once(device, 'recorded-state-persistence', out)
-            observer = Observer(device, out)
-            observer.call('identity')
-            reloaded = observer.call('state')
-            base.require(progress_rows(persisted) == progress_rows(reloaded) and
-                         persisted['data'].get('watchlist') == reloaded['data'].get('watchlist'), 'ACTUAL_RECORDED_STATE_RELOAD_NO_LOSS')
-            passed('independent_actual_recorded_state_restart_persistence')
-        except Exception as error:
-            record_case_failure(device, observer, out, report, 'independent_recorded_state_persistence', error)
-        base.crash_free_alive(device)
-        report['view_theme_matrix'] = dict(status='NOT_RUN_BLOCKED_ELIGIBLE_TV_RECORD_AND_THEME_PREREQUISITE',
-            repeated=False, prior_capture_run=42564230119)
-        base.crash_free_alive(device)
-        failed = any(case['status'] == 'FAIL' for case in report['cases'])
-        report['focused_execution_status'] = ('FAIL' if any(case['status'] == 'FAIL' and not case.get('retained')
-            for case in report['cases']) else 'PASS_SELECTED_INDEPENDENT_MOVIE_CASES_ONLY')
-        report['status'] = ('FAIL_SELECTED_REAL_TRACKING_ANDROID' if failed else
-                            'PASS_SELECTED_REAL_WNT_TRACKING_CASES_OTHER_REQUIREMENTS_NOT_RUN')
-        # This is deliberately not an all-family/release PASS.
-        code = 1 if failed else 0
+            auth['manifest_sha256'] == staged['expected']['manifest_sha256'] and auth['cc_version'] == candidate['version'], 'DYNAMIC_E410_NATIVE_FULL80_AUTH_REQUIRED')
+        report['authentication'] = dict(status='PASS', identity=auth)
+        phase = 'scenarios'
+        for media in ('tv', 'movie'):
+            scenario = report['scenarios'][media]
+            try:
+                scenario['status'] = 'RUNNING'; persist()
+                run_origin_scenario(device, observer, out, media, scenario, persist)
+            except Exception as error:
+                scenario.update(status=classify_scenario(error, scenario), blocker_or_failure=repr(error), traceback=traceback.format_exc())
+                for action in ('snapshot', 'playing', 'events', 'state'):
+                    try: base.save(out / (media + '-outcome-' + action + '.json'), observer.call(action))
+                    except Exception as capture_error: scenario['capture_' + action + '_error'] = repr(capture_error)
+                persist()
+                # Stop only an actual selected video; preserve unknown modals.
+                stop_video(device, observer)
+                snap = observer.call('snapshot')
+                if snap['dialog'] == 12002 and snap['heading'] == 'Infinity Tracked':
+                    observer.call('ack-parent-identity-refusal')
+                elif snap['dialog'] == 12000 and snap['heading'] in ('Select Quality', 'Select Chapter'):
+                    observer.call('cancel-provider-choice', heading=snap['heading'])
+                    deadline = time.monotonic() + 8
+                    while time.monotonic() < deadline:
+                        if observer.call('ack-cancelled-playback-failure')['acknowledged']: break
+                        time.sleep(.25)
+            base.crash_free_alive(device)
+            persist()
+        statuses = [case['status'] for case in report['scenarios'].values()]
+        report['status'] = ('PASS_SELECTED_INFINITY_ORIGIN_TV_MOVIE' if statuses == ['PASS', 'PASS'] else
+                            'FAIL_INFINITY_ORIGIN_ASSERTION' if 'FAIL' in statuses else 'BLOCKED_INFINITY_ORIGIN_ACCEPTANCE')
     except Exception as error:
-        report.update(status='FAIL_SELECTED_REAL_TRACKING_ANDROID', error=repr(error), traceback=traceback.format_exc())
-        if observer:
-            for name in ('snapshot', 'playing', 'events', 'state'):
-                try:
-                    base.save(out / ('failure-actual-' + name + '.json'), observer.call(name))
-                except Exception as capture_error:
-                    report['capture_' + name + '_error'] = repr(capture_error)
+        report.update(status=('BLOCKED_ENVIRONMENT' if phase == 'environment' else
+            'BLOCKED_OBSERVER' if phase == 'observer_authentication' or isinstance(error, ObserverBlocked) else
+            'BLOCKED_FIXTURE_PREPARATION' if phase.startswith('fixture') else 'BLOCKED_RUNTIME_PREREQUISITE'),
+            setup_phase=phase, blocker=repr(error), traceback=traceback.format_exc())
+        if phase == 'scenarios' and str(error) in ('NATIVE_ENGINE_DIED_OR_RESTARTED', 'NATIVE_PID_REUSED', 'BASELINE_PACKAGE_OR_CHILD_CRASH_NO_RETRY'):
+            report['status'] = 'FAIL_NATIVE_RUNTIME_DURING_SELECTED_SCENARIO'
         if device:
-            base.capture_failure(device, out)
+            try: base.capture_failure(device, out)
+            except Exception as capture_error: report['failure_capture_error'] = repr(capture_error)
     finally:
         if device:
             report['measured_UI_actions'] = device.actions
-            try:
-                base.installed_apk(device)
-                report['installed_APK_still_original69'] = True
-            except Exception as error:
-                report['installed_APK_check_error'] = repr(error)
-                report['installed_APK_still_original69'] = False
-                report['status_before_final_integrity_check'] = report['status']
-                report['status'] = 'FAIL_SELECTED_REAL_TRACKING_ANDROID_INSTALLED_APK_INTEGRITY'
-                code = 1
+            integrity = final_apk_observation(device)
+            report['final_APK_integrity'] = integrity
+            if integrity['status'] != 'PASS_EXACT_ORIGINAL69':
+                report['status_before_final_integrity'] = report['status']
+                if integrity['status'] == 'FAIL_MISMATCH': report['status'] = 'FAIL_INSTALLED_APK_INTEGRITY'
+                elif report['status'].startswith('PASS'): report['status'] = 'BLOCKED_FINAL_APK_INTEGRITY_UNVERIFIED'
         if reader:
-            report['lifecycle_capture'] = base.stop_lifecycle_log(reader, out)
-        base.save(out / 'ANDROID-VERIFICATION.json', report)
-        if device and disposer:
-            disposer['arm_host_disposal'](device, out)
-    return code
+            try: report['lifecycle_capture'] = base.stop_lifecycle_log(reader, out)
+            except Exception as error: report['lifecycle_capture_error'] = repr(error)
+        persist()
+        if device and disposer: disposer['arm_host_disposal'](device, out)
+    return 0 if report['status'] == 'PASS_SELECTED_INFINITY_ORIGIN_TV_MOVIE' else 1
 
 
 if __name__ == '__main__':

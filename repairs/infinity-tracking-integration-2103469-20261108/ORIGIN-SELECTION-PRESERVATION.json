@@ -1,0 +1,29 @@
+{
+  "status": "PASS_SOURCE_PRESERVATION_AND_TEST_SELECTION_ONLY",
+  "protected_source": "e410f30ba9e38182e4e77810e5237e5442cbd31a",
+  "production_source_changes": false,
+  "source_sha256": {
+    "plugin.py": "580a2d7b25bc7a415c2db059fe1fa696808107a4f997a32d544baf2468a2877a",
+    "resume_hub.py": "807157626f817dd5375e0e60872b6cd351d33135a23c5a225f26c86a196e7ed5",
+    "service.py": "569fea31b465674b5e9fc357a895b0a00706df999c201246a33e8fcd00c9b669"
+  },
+  "protected_remote_refs": {
+    "refs/heads/locks/infinity-tracking-e410f30b-20261109": "e410f30ba9e38182e4e77810e5237e5442cbd31a",
+    "refs/heads/locks/infinity-2103469-protected-recovery-20261108": "a76e29b84996304241e6b309d56a31e6659ad190"
+  },
+  "retained_original69_APK_sha256": "804eebc57af2e4ef4e5418b56994bda64eb7fd7e7f2c0653b5c6e2a9f7833058",
+  "scope_since_e410": "Only task test tooling/selection/evidence and previously reviewed module-only preparation job label/paths; no native, DEX, skin, provider, Cobra or production integration changes",
+  "actual_origin_android_tests": "NOT_RUN_PENDING_ONE_SELECTED_ATTEMPT",
+  "signed_input_fixture_run": 42588102830,
+  "signed_input_fixture_is_owner_release_or_acceptance": false,
+  "APK_build": false,
+  "APK_signing": false,
+  "publication": false,
+  "final_acceptance": false,
+  "reused_host_cases": [
+    40,
+    14
+  ],
+  "reused_startup_run": 42542862696,
+  "new_automatic_retries": 0
+}
