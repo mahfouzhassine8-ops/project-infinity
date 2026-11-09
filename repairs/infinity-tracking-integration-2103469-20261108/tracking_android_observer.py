@@ -234,6 +234,7 @@ def snapshot():
                 published_theme=xbmc.getInfoLabel('Window(Home).Property(Infinity.Theme)'),
                 visible_controls=visible,
                 focused_control=xbmc.getInfoLabel('System.CurrentControlId'),
+                keyboard_heading=xbmc.getInfoLabel('Control.GetLabel(311)') if xbmcgui.getCurrentWindowDialogId() == 10103 else '',
                 visual_mode=xbmc.getInfoLabel('Skin.String(Infinity.VisualMode)'),
                 home_view=xbmc.getInfoLabel('Skin.String(Infinity.HomeView)'))
 
@@ -274,7 +275,7 @@ def action(request):
     if kind == 'identity': return identity()
     if kind == 'snapshot': return snapshot()
     if kind == 'events': return EVENTS.events
-    if kind == 'home-select':
+    if kind in ('home-select', 'home-focus'):
         index = request['index']
         require(xbmcgui.getCurrentWindowId() == 10000 and xbmcgui.getCurrentWindowDialogId() in (0, -1, 9999) and
                 xbmc.getSkinDir() == 'skin.infinity.diggz' and xbmc.getCondVisibility('Control.IsVisible(9000)') and
@@ -288,9 +289,46 @@ def action(request):
                 xbmc.getInfoLabel(p + 'Property(hubsource)') == 'infinity', 'LIVE_FIRSTPARTY_HOME_SELECTION_REQUIRED')
         observed = dict(label=request['label'], section=request['section'], hubsource='infinity', index=index,
                         file=xbmc.getInfoLabel(p + 'FileNameAndPath'), pid=os.getpid(), monotonic=time.monotonic())
-        reply = json.loads(xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"Input.Select"}'))
-        require('error' not in reply, 'ACTUAL_INFINITY_HOME_INPUT_REQUIRED')
+        if kind == 'home-select':
+            reply = json.loads(xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"Input.Select"}'))
+            require('error' not in reply, 'ACTUAL_INFINITY_HOME_INPUT_REQUIRED')
         return observed
+    if kind == 'fill-custom-list-name':
+        require(xbmcgui.getCurrentWindowDialogId() == 10103 and
+                xbmc.getInfoLabel('Control.GetLabel(311)') == 'Add to custom list', 'EXACT_EXISTING_CUSTOM_LIST_KEYBOARD_REQUIRED')
+        reply = json.loads(xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"Input.SendText","params":{"text":"Tracking QA","done":true}}'))
+        require('error' not in reply, 'NORMAL_CUSTOM_LIST_KEYBOARD_INPUT_REQUIRED')
+        return dict(existing_keyboard_input=True, name='Tracking QA')
+    if kind in ('public-view-mode', 'public-theme'):
+        controller()
+        require(xbmcgui.getCurrentWindowId() == 10000 and xbmcgui.getCurrentWindowDialogId() in (0, -1, 9999), 'UNOBSCURED_HOME_REQUIRED_FOR_PUBLIC_VIEW_UI')
+        if kind == 'public-view-mode':
+            mode = request.get('mode')
+            require(mode in ('normal', 'auto', 'cinema', 'compact', 'twopane'), 'EXISTING_PUBLIC_MODE_REQUIRED')
+            xbmc.executebuiltin('RunScript(script.infinity.commandcenter,view-mode,' + mode + ')')
+        else:
+            xbmc.executebuiltin('RunScript(script.infinity.commandcenter,theme)')
+        return dict(public_command_queued=True, selection_verified=False)
+    if kind == 'view-snapshot':
+        require(xbmcgui.getCurrentWindowId() == 10000 and xbmcgui.getCurrentWindowDialogId() in (0, -1, 9999), 'UNOBSCURED_HOME_VIEW_OBSERVATION_REQUIRED')
+        allowed = (28103, 28104, 28603, 28604, 28703, 28704, 28721, 28722, 28803, 28804, 28821, 28822, 29201, 29202, 8830, 8831)
+        rows = {}
+        for control in allowed:
+            if not xbmc.getCondVisibility('Control.IsVisible(%d)' % control): continue
+            count = int(xbmc.getInfoLabel('Container(%d).NumItems' % control) or 0)
+            require(0 <= count <= 100, 'BOUNDED_EXISTING_HOME_DATA_ROWS_REQUIRED')
+            values = []
+            for index in range(count):
+                prefix = 'Container(%d).ListItemAbsolute(%d).' % (control, index)
+                values.append(dict(index=index, label=xbmc.getInfoLabel(prefix + 'Label'),
+                    file=xbmc.getInfoLabel(prefix + 'FileNameAndPath'), key=xbmc.getInfoLabel(prefix + 'Property(Infinity.ResumeHub.Key)')))
+            rows[str(control)] = values
+        home = xbmcgui.Window(10000)
+        keys = ('Infinity.ViewMode.Requested', 'Infinity.ViewMode.Effective', 'Infinity.EffectiveViewMode',
+                'Infinity.EffectivePaneMode', 'Infinity.ViewMode.PolicyReason', 'Infinity.NativeDeviceMode',
+                'Infinity.NativeLayout', 'Infinity.NativeOrientation', 'Infinity.NativeWidthDp', 'Infinity.NativeHeightDp',
+                'Infinity.ThemeReady', 'Infinity.Theme', 'Infinity.ThemeRevision', 'Infinity.NativeSystemTheme')
+        return dict(snapshot=snapshot(), rows=rows, properties={key: home.getProperty(key) for key in keys})
     if kind == 'state':
         plugin = controller()
         data = plugin.hub.load_view(plugin.PROFILE)

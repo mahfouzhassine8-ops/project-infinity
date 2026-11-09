@@ -1,0 +1,114 @@
+{
+  "application_executed": false,
+  "build_sign_dispatch": false,
+  "command": "python repairs/infinity-tracking-integration-2103469-20261108/test_tracking_c1_selection_guards.py",
+  "compile_optimization": 1,
+  "created_utc": "2026-11-09T10:40:52.113377+00:00",
+  "elapsed_reported_seconds": 0.074,
+  "exit_code": 0,
+  "final_tooling_source_sha256": {
+    "TRACKING-ANDROID-PLAN.md": "b37f7efae523c4fbb8e259ed0dad489b58ed2359495a550526076496c43801a8",
+    "test_tracking_c1_selection_guards.py": "f1678ad2ddb7690a5cd44603d12ea4cb1052866adbc7b75cc0fe57f77cc7fda0",
+    "tracking_android_observer.py": "517e9edf111b129d0907190cf2783d427c4775f78a5f0188416bd4245dcf9b50",
+    "verify_tracking_android.py": "04e736720a44f6a56d99132cce24498c32311ab8df728d8305284a28d4e10315"
+  },
+  "followup_selected_controls": [
+    {
+      "command": "python -m unittest -v test_tracking_c1_selection_guards.Selection.test_other_saved_origin_clock_does_not_assume_resume",
+      "count": 1,
+      "elapsed_reported_seconds": 0.04,
+      "exit_code": 0,
+      "selection_recorded_before_execution": true,
+      "status": "PASS"
+    },
+    {
+      "command": "python -m unittest -v test_tracking_c1_selection_guards.Selection.test_view_data_readiness_waits_empty_without_excusing_populated_wrong_rows",
+      "count": 1,
+      "elapsed_reported_seconds": 0.036,
+      "exit_code": 0,
+      "selection_recorded_before_execution": true,
+      "status": "PASS"
+    },
+    {
+      "command": "python -m unittest -v test_tracking_c1_selection_guards.Selection.test_empty_projection_cannot_hide_unexpected_or_duplicate_cards",
+      "count": 1,
+      "elapsed_reported_seconds": 0.046,
+      "exit_code": 0,
+      "selection_recorded_before_execution": true,
+      "status": "PASS"
+    }
+  ],
+  "host_command_setup_error": {
+    "detail": "First followup edit command used task-directory cwd with repository-relative edit paths and failed FileNotFoundError before writing or adding the case. An unintentionally chained unittest then reported AttributeError for the nonexistent method. Corrected cwd, recorded selection/added case, then executed only the new case. No Android/app/production action occurred.",
+    "status": "NOT_A_CONTROL_RESULT"
+  },
+  "limits": [
+    "Host doubles prove test-tool boundaries only, not Android/native/provider acceptance.",
+    "Source-bound test functions compiled optimize=1; no production module or full app workflow loaded.",
+    "Root owns request/admission/module fixture and any actual selected attempt.",
+    "Physical Fold/provider accounts/theme owner/successor catalogue unexecuted or unavailable remain explicitly NOT_RUN/BLOCKED."
+  ],
+  "old9_40_14_rerun": false,
+  "post_control_source_history": {
+    "verify_tracking_android.py": {
+      "change": "Optional source flow assertions/UI callsites only: explicit Title options, new occurrence/clock, replay typed continuity, completed-card failure classification, visual data-unobserved label. The four selected pure guard functions are unchanged. Independent-review refinements: eligible actual position plus12sec for other saved origins; empty Home asynchronous readiness wait; screenshots without per-media actual nonempty keys remain BLOCKED_DATA_NOT_OBSERVABLE. Final root review: visible mapped actual/expected key equality is unconditional, including expected-empty stale-card refusal; one new optimized pure-predicate control PASS.",
+      "current_full_file_sha256": "04e736720a44f6a56d99132cce24498c32311ab8df728d8305284a28d4e10315",
+      "executed_full_file_sha256": "b7d9dbc8dc4f289cfc15dc685b05cadbf7609502c98a69a9d2162ad5606c1d81"
+    }
+  },
+  "production_checkpoint": "5787ca4569faa70dec4f10493b08bd8015d542ea",
+  "production_files_changed_by_this_selection": false,
+  "production_source_sha256": {
+    "plugin.py": "580a2d7b25bc7a415c2db059fe1fa696808107a4f997a32d544baf2468a2877a",
+    "resume_hub.py": "807157626f817dd5375e0e60872b6cd351d33135a23c5a225f26c86a196e7ed5",
+    "service.py": "c0f45709166d9b7018eac0cee4834aaa617e8a684d6d199568e4e65a4645d6bd"
+  },
+  "retained_actual_tv": {
+    "clock_seconds": 304.257,
+    "repeated": false,
+    "run": 42593220047,
+    "stored_position_seconds": 307.902
+  },
+  "schema": 1,
+  "selected_cases": [
+    {
+      "case": "PublicUI.test_exact_original_custom_list_keyboard_fixed_name_only",
+      "status": "PASS"
+    },
+    {
+      "case": "PublicUI.test_public_mode_only_unobscured_home_and_known_mode",
+      "status": "PASS"
+    },
+    {
+      "case": "Selection.test_domain_ignores_bookkeeping_but_detects_playback_mutation",
+      "status": "PASS"
+    },
+    {
+      "case": "Selection.test_existing_eligibility_target_without_repeating_five_minutes",
+      "status": "PASS"
+    },
+    {
+      "case": "Selection.test_mode_needs_actual_publication_and_correct_pane",
+      "status": "PASS"
+    },
+    {
+      "case": "Selection.test_unexecuted_or_visual_pending_is_not_aggregate_pass",
+      "status": "PASS"
+    }
+  ],
+  "selected_count": 6,
+  "selected_driver_function_ast_sha256": {
+    "mode_ready": "d54c80882902bf53904a7ca1b791d87b6714f6bbfb6804dff1e24a73f1bb4ece",
+    "playback_domain": "d131525263a97faca67b95b9b2e892c665ee204004e074119e9d330f7787e439",
+    "selected_overall_status": "9fe8befe079ac457259daede57494c4c611471c92b4009e8dcb870a81493bbe9",
+    "selected_playback_seconds": "74fde67197ee342457a85be3e53d7d70a9c450a174d0c708c2de2256465f7544"
+  },
+  "source_sha256": {
+    "TRACKING-ANDROID-PLAN.md": "beb80ed0bf7e6f349c70dcfec122f476f459213eeda58aad47117cf1def2822f",
+    "test_tracking_c1_selection_guards.py": "b39f17810b85c1c56743d73a4e0b476b5792cc066752bb2a872b74dc006adfee",
+    "tracking_android_observer.py": "517e9edf111b129d0907190cf2783d427c4775f78a5f0188416bd4245dcf9b50",
+    "verify_tracking_android.py": "b7d9dbc8dc4f289cfc15dc685b05cadbf7609502c98a69a9d2162ad5606c1d81"
+  },
+  "status": "PASS_SELECTED_HOST_CONTROLS_ONLY_NOT_ANDROID",
+  "total_distinct_selected_controls_passed": 9
+}

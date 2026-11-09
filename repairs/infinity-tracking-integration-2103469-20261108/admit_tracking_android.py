@@ -115,6 +115,9 @@ def checked_request():
         'SERVICE-LOADING-SURVIVAL-REVIEW.json', 'ORIGIN-42593220047-OUTCOME-REVIEW.json',
         'EXPERIMENTAL-RELEASE-AUTHORIZATION.json',
         'evidence/genuine-origin-record-and-service-fail-42593220047/EVIDENCE.json',
+        'C1-SIGNED-MODULE-REVIEW.json', 'C1-FOCUSED-ANDROID-REVIEW.json',
+        'C1-ANDROID-SELECTION-HOST.json', 'VIEW-MODE-TEST-CONTRACT.json',
+        'evidence/signed-c1-fixture-42602243785/MODULE-UPGRADE-RECOVERY.json',
         'evidence/api36-startup-pass-42542862696/EVIDENCE.json',
         RETAINED_DIR + 'EVIDENCE.json', RETAINED_DIR + 'queens-blade-e4-actual-av.json',
         'evidence/signed-tracking80-42555855742/MODULE-UPGRADE-RECOVERY.json'}

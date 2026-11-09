@@ -632,7 +632,7 @@ def breadcrumb(trace, name, **observed):
     trace.append(dict(step=name, observed_epoch=time.time(), **observed))
 
 
-def infinity_section(device, observer, media, bucket, trace, known_history=()):
+def infinity_section(device, observer, media, bucket, trace, known_history=(), list_name='', allow_empty=False):
     """Native Home9000 -> existing first-party root -> real section row."""
     device.rpc('Input.Home')
     section = 'trakttv' if media == 'tv' else 'traktmovies'
@@ -667,13 +667,31 @@ def infinity_section(device, observer, media, bucket, trace, known_history=()):
         return None
     root_snapshot = until(device, root, 'Actual first-party Infinity root', 60)
     breadcrumb(trace, 'root', folder=root_snapshot['folder'], window=root_snapshot['window'])
-    matches = [row for row in content_rows(root_snapshot) if route_matches(row['file'], action='library', media=media, bucket=bucket)]
+    matches = [row for row in content_rows(root_snapshot) if
+               (route_matches(row['file'], action='custom-lists', media=media) if bucket == 'list' else
+                route_matches(row['file'], action='library', media=media, bucket=bucket))]
     base.require(len(matches) == 1, 'UNIQUE_ACTUAL_INFINITY_SECTION_ROW_REQUIRED:' + bucket)
     selected = matches[0]
     observed = observer.call('click', **row_request(selected))
+    if bucket == 'list':
+        base.require(list_name == 'Tracking QA', 'EXACT_LEGITIMATELY_CREATED_QA_CUSTOM_LIST_REQUIRED')
+        def lists():
+            current = observer.call('snapshot')
+            return current if current['window'] == 10025 and current['dialog'] in (0, -1, 9999) and route_matches(current['folder'], action='custom-lists', media=media) and content_rows(current, optional=True) else None
+        list_directory = until(device, lists, 'Actual existing Custom Lists directory', 45)
+        if isinstance(known_history, list): known_history.append(list_directory['folder'])
+        named = [row for row in content_rows(list_directory) if route_matches(row['file'], action='library', media=media, bucket='list', list=list_name)]
+        base.require(len(named) == 1, 'ACTUAL_NAMED_CUSTOM_LIST_ROW_REQUIRED')
+        observer.call('click', **row_request(named[0]))
+        breadcrumb(trace, 'custom_list', folder=list_directory['folder'], selected=row_request(named[0]))
     def directory():
         current = observer.call('snapshot')
-        return current if current['window'] == 10025 and current['dialog'] in (0, -1, 9999) and route_matches(current['folder'], action='library', media=media, bucket=bucket) and content_rows(current, optional=True) else None
+        wanted = dict(action='library', media=media, bucket=bucket)
+        if bucket == 'list': wanted['list'] = list_name
+        if current['window'] != 10025 or current['dialog'] not in (0, -1, 9999) or not route_matches(current['folder'], **wanted): return None
+        if content_rows(current, optional=True): return current
+        visible = [control for control in current['primary_controls'] if current['visible_controls'].get(str(control))]
+        return current if allow_empty and len(visible) == 1 and current['focused_control'] == str(visible[0]) else None
     current = until(device, directory, 'Actual Infinity section directory ' + bucket, 60)
     breadcrumb(trace, 'section', bucket=bucket, media=media, folder=current['folder'], selected=row_request(selected), native=observed)
     return current
@@ -748,6 +766,18 @@ def validate_progress(state, stored, media, selected, parent_source=None):
     return identity
 
 
+def selected_playback_seconds(media, duration):
+    # Existing >=30 seconds and >=1% eligibility; no tracker rule is changed.
+    return max(45 if media == 'tv' else 90, duration * .01 + 5)
+
+
+def playback_domain(state):
+    fields = ('key', 'identity', 'media', 'source', 'stable_source', 'source_parent', 'season', 'episode',
+              'position', 'duration', 'percentage', 'watched', 'playback_occurrence', 'completed_occurrence')
+    return {bucket: {key: {field: entry.get(field) for field in fields} for key, entry in state['data'].get(bucket, {}).items()}
+            for bucket in ('items', 'watched')}
+
+
 def run_origin_scenario(device, observer, out, media, scenario, persist):
     trace = scenario['origin_trace']
     scenario['last_step'] = 'fixture_preparation'; persist()
@@ -791,7 +821,7 @@ def run_origin_scenario(device, observer, out, media, scenario, persist):
     functional(actual['total'] >= 120 and 0 <= actual['time'] < 30, 'ACTUAL_DURATION_AND_INITIAL_CLOCK_REQUIRED')
     expected_source = selected['file'] if media == 'tv' else saved['source']
     functional(expected_source in (actual['item']['path'], actual['item']['original_listitem_url']), 'ACTUAL_PLAYING_NATIVE_SOURCE_MUST_MATCH_INFINITY_SELECTED_CONTENT')
-    target = 300 if media == 'tv' else max(90, actual['total'] * .01 + 5)
+    target = selected_playback_seconds(media, actual['total'])
     began, samples = time.monotonic(), [actual]
     while samples[-1]['time'] - actual['time'] < target:
         base.require(time.monotonic() - began < target + 120, 'BLOCKED_ACTUAL_MEDIA_BUFFERING_DEADLINE')
@@ -801,7 +831,8 @@ def run_origin_scenario(device, observer, out, media, scenario, persist):
         samples.append(current)
         base.save(out / (media + '-actual-clock.json'), samples)
     stop_video(device, observer)
-    scenario['steps']['eligible_playback'] = dict(status='PASS', actual_clock_delta=samples[-1]['time'] - actual['time'])
+    scenario['steps']['eligible_playback'] = dict(status='PASS', actual_clock_delta=samples[-1]['time'] - actual['time'],
+        target_seconds=target, retained_five_minute_proof_run=42593220047 if media == 'tv' else None)
     scenario['steps']['stop'] = dict(status='PASS', callbacks=observer.call('events'))
     scenario['last_step'] = 'record'; persist()
     source_page = QUEEN_E4 if media == 'tv' else '/fantastic-mr-fox'
@@ -859,6 +890,7 @@ def run_origin_scenario(device, observer, out, media, scenario, persist):
     stop_video(device, observer)
     scenario['steps']['resume'] = dict(status='PASS', observed=resumed, harness_seek=False)
     scenario['status'] = 'PASS'; persist()
+    return dict(media=media, saved=saved, stored=stored, actual=actual, known_history=known_history)
 
 
 def initial_report():
@@ -868,8 +900,305 @@ def initial_report():
         shutdown='NOT_SELECTED', source=os.environ.get('GITHUB_SHA'),
         scenarios={media: dict(status='NOT_RUN', steps={name: dict(status='NOT_RUN') for name in names},
                                origin_trace=[], integration_started=False) for media in ('tv', 'movie')},
-        other_entry_points={name: 'NOT_RUN' for name in ('Collection', 'Save For Later', 'Custom Lists', 'Other playable sections')},
-        shared_record_view_coverage='NOT_RUN', completion96='NOT_RUN', direct_provider_diagnostics='NOT_ACCEPTANCE')
+        other_entry_points={name: {media: dict(status='NOT_RUN') for media in ('tv', 'movie')}
+                            for name in ('Collection', 'Save For Later', 'Custom Lists')},
+        other_provider_families={name: dict(status='NOT_RUN', reason='No selected real installed source/account fixture; no fake catalogue or credentials')
+                                 for name in ('Umbrella', 'POV', 'Seren', 'Otaku', 'The Crew')},
+        retained_five_minute_tv_proof=dict(run=42593220047, actual_clock_seconds=304.257, stored_position_seconds=307.902,
+             repeated=False, current_tv_purpose='Eligible isolated-profile record for new service-lifetime/cards/resume checks; unchanged writer AST'),
+        shared_record_view_coverage=dict(status='NOT_RUN'), completion96=dict(status='NOT_RUN'), restart_persistence=dict(status='NOT_RUN'),
+        direct_provider_diagnostics='NOT_ACCEPTANCE')
+
+
+def current_record(observer, context):
+    state = observer.call('state')
+    key = context['stored']['key']
+    row = state['data'].get('items', {}).get(key)
+    base.require(row is not None, 'EXISTING_ACTUAL_PROGRESS_RECORD_REQUIRED')
+    return state, dict(row, key=key)
+
+
+def resume_context(device, observer, context, trace):
+    state, stored = current_record(observer, context)
+    cards = infinity_section(device, observer, context['media'], 'continue', trace, context['known_history'])
+    context['known_history'].append(cards['folder'])
+    rows = [row for row in content_rows(cards) if row['key'] == stored['key']]
+    functional(len(rows) == 1, 'ONE_ACTUAL_EXISTING_CONTINUE_ROW_REQUIRED')
+    observer.call('context', **row_request(rows[0]))
+    floor = event_sequence(observer)
+    menu_choose(device, observer, 'Resume')
+    actual = actual_av(device, observer, floor)
+    exact_resume_observation(actual, context['actual'], stored, floor)
+    valid = dict(current=False)
+    def offset():
+        current = observer.call('playing')
+        result = exact_resume_observation(current, context['actual'], stored, floor)
+        valid['current'] = current.get('playing') is True
+        return result
+    try:
+        actual = until(device, offset, 'Existing same-source Infinity resume offset', 20)
+    except TimeoutError as error:
+        if observed_resume_lower_deadline(error, valid['current']):
+            raise FunctionalFailure('EXACT_RESUME_LOWER_OFFSET_DEADLINE') from error
+        raise
+    return actual, stored
+
+
+def verify_completion_replay(device, observer, context, result, persist):
+    result.update(status='RUNNING', integration_started=True, last_step='resume', navigation=[]); persist()
+    actual, stored = resume_context(device, observer, context, result['navigation'])
+    result['last_step'] = 'actual_95_percent_clock'
+    active = device.rpc('Player.GetActivePlayers')
+    base.require(len(active) == 1 and active[0]['type'] == 'video', 'ONE_ACTUAL_MOVIE_PLAYER_REQUIRED')
+    result['seek'] = device.rpc('Player.Seek', dict(playerid=active[0]['playerid'], value=dict(percentage=96)))
+    clock = until(device, lambda: (item if (item := observer.call('playing')).get('playing') and
+        item['file'] == actual['file'] and item['total'] > 0 and item['time'] / item['total'] >= .95 else None),
+        'Actual native movie clock reached existing completion threshold', 25)
+    result['last_step'] = 'watched_after_actual_threshold'
+    try:
+        completed_state = until(device, lambda: (state if stored['key'] in (state := observer.call('state'))['data'].get('watched', {}) else None),
+            'Existing watched record after actual95percent clock', 25)
+    except TimeoutError as error:
+        if str(error).startswith('Existing watched record after actual95percent clock;'):
+            raise FunctionalFailure('NO_WATCHED_RECORD_AFTER_OBSERVED_95_PERCENT_CLOCK') from error
+        raise
+    completed = completed_state['data']['watched'][stored['key']]
+    functional(completed.get('identity') == stored.get('identity') and completed.get('source') == stored.get('source'), 'COMPLETED_EXACT_MOVIE_IDENTITY_REQUIRED')
+    stop_video(device, observer)
+    result['completed'] = dict(actual_clock=clock, stored=completed, natural_Ended_claimed=False)
+    cards = infinity_section(device, observer, 'movie', 'continue', [], context['known_history'], allow_empty=True)
+    state = observer.call('state')
+    projection = [row for row in state['continue_entries'] if row.get('media') == 'movie']
+    try:
+        assert_native_projection(cards, projection)
+    except RuntimeError as error:
+        if str(error) in ('AMBIGUOUS_VISIBLE_PRIMARY_CONTENT_CONTROLS_REJECTED', 'ONE_VISIBLE_ORIGINAL_VIDEOS_CONTENT_CONTROL_REQUIRED', 'ACTUAL_UNOBSCURED_VIDEOS_CONTENT_REQUIRED'):
+            raise ObserverBlocked(str(error)) from error
+        raise FunctionalFailure('ACTUAL_COMPLETED_CARD_PROJECTION_ASSERTION:' + str(error)) from error
+    functional(stored['key'] not in {row['key'] for row in projection}, 'COMPLETED_MOVIE_ABSENT_FROM_ACTUAL_UNFINISHED_CONTINUE')
+    result['last_step'] = 'actual_replay'
+    cards = infinity_section(device, observer, 'movie', 'watchlist', [], context['known_history'])
+    rows = [row for row in content_rows(cards) if row['key'] == context['saved']['key']]
+    base.require(len(rows) == 1, 'EXACT_REAL_SAVED_MOVIE_REPLAY_ROW_REQUIRED')
+    observer.call('context', **row_request(rows[0]))
+    floor = event_sequence(observer)
+    menu_choose(device, observer, 'Play')
+    replay = actual_av(device, observer, floor)
+    for field in ('media_type', 'season', 'episode', 'ids'):
+        functional(replay['item'][field] == actual['item'][field], 'REPLAY_ACTUAL_TYPED_ITEM_CONTINUITY:' + field)
+    functional(replay['item']['original_listitem_url'] == actual['item']['original_listitem_url'] and replay['time'] < 30,
+               'EXACT_NATIVE_MOVIE_REPLAY_FROM_BEGINNING_REQUIRED_NO_QA_SEEK')
+    until(device, lambda: (item if (item := observer.call('playing')).get('playing') and item['file'] == replay['file'] and
+        item['time'] - replay['time'] >= selected_playback_seconds('movie', replay['total']) else None),
+        'Actual replay qualifying advancing clock', selected_playback_seconds('movie', replay['total']) + 90)
+    stop_video(device, observer)
+    replay_state, replay_row = current_record(observer, context)
+    functional(len(matching_source_rows(replay_state, '/fantastic-mr-fox')) == 1 and replay_row['identity'] == stored['identity'] and
+               30 <= float(replay_row.get('position') or 0) <= selected_playback_seconds('movie', replay['total']) + 35 and replay_row.get('playback_occurrence') != completed.get('completed_occurrence'),
+               'ACTUAL_REPLAY_UPDATES_ONE_EXISTING_KEY_NEW_OCCURRENCE')
+    context['stored'] = replay_row
+    result.update(status='PASS', replay=dict(actual=replay, stored=replay_row), completion_mode='Actual96percent seek→unchanged95percent rule; no seek to resume/beginning')
+    persist()
+
+
+def saved_entry_clock_ready(current, initial):
+    # Native launches may legitimately begin at zero. An existing record alone
+    # does not make a twelve-second replay eligible for a new occurrence.
+    return (current.get('playing') and current['file'] == initial['file'] and
+            current['time'] - initial['time'] >= 12 and
+            current['time'] >= max(35, initial['total'] * .01 + 5))
+
+
+def verify_saved_entry(device, observer, context, bucket, result, persist):
+    media = context['media']
+    result.update(status='RUNNING', last_step='fixture_preparation', integration_started=False, navigation=[]); persist()
+    cards = infinity_section(device, observer, media, 'watchlist', result['navigation'], context['known_history'])
+    rows = [row for row in content_rows(cards) if row['key'] == context['saved']['key']]
+    base.require(len(rows) == 1, 'ACTUAL_SAVED_TITLE_FOR_EXISTING_CONTEXT_SAVE_REQUIRED')
+    before = observer.call('state')
+    key = context['saved']['key']
+    membership = before['data'].get('lists', {}).get('Tracking QA', {}) if bucket == 'list' else before['data'].get(bucket, {})
+    if key not in membership:
+        observer.call('context', **row_request(rows[0]))
+        menu_choose(device, observer, 'Title options')
+        menu_choose(device, observer, {'collection': 'Add to Collection', 'later': 'Save for Later', 'list': 'Add to Custom List'}[bucket])
+        if bucket == 'list':
+            until(device, lambda: (snap if (snap := observer.call('snapshot'))['dialog'] == 10103 and snap['keyboard_heading'] == 'Add to custom list' else None),
+                  'Existing custom-list keyboard', 20)
+            observer.call('fill-custom-list-name')
+        def saved():
+            state = observer.call('state')
+            entries = state['data'].get('lists', {}).get('Tracking QA', {}) if bucket == 'list' else state['data'].get(bucket, {})
+            return state if key in entries else None
+        after = until(device, saved, 'Existing supported membership saved', 25)
+        functional(playback_domain(before) == playback_domain(after), 'SAVING_ALONE_CHANGED_PLAYBACK_HISTORY')
+    result['last_step'] = 'infinity_origin'
+    cards = infinity_section(device, observer, media, bucket, result['navigation'], context['known_history'], list_name='Tracking QA' if bucket == 'list' else '')
+    context['known_history'].append(cards['folder'])
+    rows = [row for row in content_rows(cards) if row['key'] == key]
+    base.require(len(rows) == 1, 'ONE_REAL_OTHER_INFINITY_SAVED_ENTRY_REQUIRED')
+    row = rows[0]
+    result['actual_saved_selection'] = dict(key=key, source=context['saved']['source'], native_row=row_request(row))
+    if media == 'tv':
+        observer.call('click', **row_request(row))
+        def children():
+            snap = observer.call('snapshot')
+            return snap if snap['window'] == 10025 and snap['dialog'] in (0, -1, 9999) and snap['folder'] == context['saved']['source'] and content_rows(snap, optional=True) else None
+        child = until(device, children, 'Other Infinity saved parent native child list', 60)
+        context['known_history'].append(child['folder'])
+        row = exact_episode_row(child, QUEEN_E4)
+        result['actual_parent_child'] = dict(folder=child['folder'], native_row=row_request(row))
+    _, previous = current_record(observer, context)
+    floor = event_sequence(observer)
+    observer.call('click', **row_request(row))
+    actual = actual_av(device, observer, floor)
+    result['integration_started'] = True
+    result['last_step'] = 'same_existing_record'
+    functional(context['stored']['source'] in (actual['item']['path'], actual['item']['original_listitem_url']), 'OTHER_ENTRYPOINT_EXACT_NATIVE_SOURCE_REQUIRED')
+    last_clock = until(device, lambda: (item if saved_entry_clock_ready(item := observer.call('playing'), actual) else None),
+        'Actual other-entrypoint eligible advancing clock', max(35, actual['total'] * .01 + 5) + 90)
+    stop_video(device, observer)
+    state, stored = current_record(observer, context)
+    validate_progress(state, stored, media, dict(file=context['stored']['source']), context['saved']['source'] if media == 'tv' else None)
+    functional(len(matching_source_rows(state, QUEEN_E4 if media == 'tv' else '/fantastic-mr-fox')) == 1, 'OTHER_ENTRYPOINT_NO_DUPLICATE_RECORD')
+    functional(stored.get('playback_occurrence') and stored.get('playback_occurrence') != previous.get('playback_occurrence') and
+        last_clock['time'] - 20 <= float(stored.get('position') or 0) <= last_clock['time'] + 15, 'OTHER_ENTRYPOINT_ACTUAL_NEW_OCCURRENCE_AND_CLOCK_PERSISTED')
+    context['stored'] = stored
+    result.update(status='PASS', actual_source=stored['source'], saved_key=key, progress_key=stored['key'], actual_av=actual, source_coordinates_unchanged=True)
+    persist()
+
+
+def mode_ready(observed, requested):
+    props = observed['properties']
+    effective = props.get('Infinity.EffectiveViewMode')
+    return (props.get('Infinity.ViewMode.Requested') == requested and
+        props.get('Infinity.ViewMode.Effective') == effective and
+        effective in ('normal', 'auto', 'cinema', 'compact', 'twopane') and
+        (requested == 'auto' or effective == requested) and
+        props.get('Infinity.EffectivePaneMode') == ('two-pane' if effective == 'twopane' else 'single-pane'))
+
+
+def assert_view_keys(actual, expected):
+    functional(set(actual) == set(expected) and len(actual) == len(set(actual)), 'VISIBLE_MODE_DATA_KEYS_MUST_MATCH_SAME_EXISTING_RECORDS')
+
+
+def view_data_ready(observed, media, state, mappings):
+    for mapping in mappings:
+        control = str(mapping['container_id'])
+        params = parse_qs(urlsplit(mapping['route']).query)
+        if control not in observed['rows'] or params['media'][0] != media: continue
+        bucket = params['bucket'][0]
+        entries = (state['next_episodes'] if bucket == 'next' else state['progress_shows'] if bucket == 'progress' else
+                   [dict(value, key=key) for key, value in state['data'].get(bucket, {}).items()])
+        if any(entry.get('media') == media for entry in entries) and not any(row.get('key') or row.get('file') for row in observed['rows'][control]):
+            return False  # Native Home data is still asynchronously empty.
+    return True  # Populated wrong/duplicate keys remain subject to assertions.
+
+
+def verify_view_captures(device, observer, contexts, result, deadline, persist):
+    contract = base.load(HERE / 'VIEW-MODE-TEST-CONTRACT.json')
+    baseline = observer.call('state')
+    base.require(any(playback_domain(baseline).values()), 'GENUINE_EXISTING_RECORDS_REQUIRED_BEFORE_VIEW_CAPTURE')
+    device.rpc('Input.Home')
+    original = until(device, lambda: (snap if (snap := observer.call('snapshot'))['window'] == 10000 and snap['dialog'] in (0, -1, 9999) else None), 'Original Home for view capture', 30)
+    result.update(status='RUNNING', captures=[], theme_status='BLOCKED_THEME_OWNER_UNAVAILABLE' if not original['theme_available'] else 'AVAILABLE',
+        geometry_scope='Representative emulator dimensions/native facts, not physical Fold acceptance', all_40_combinations='NOT_RUN')
+    choices = [('current-unverified', None)] if not original['theme_available'] else [('Light Pearl', 'light'), ('Dark', 'dark')]
+    requested_original = observer.call('view-snapshot')['properties'].get('Infinity.ViewMode.Requested')
+    try:
+        for geometry in contract['future_40_combo_capture_plan']['geometry_presets']:
+            if time.monotonic() >= deadline: break
+            width, height = geometry['pixels']
+            device.shell('wm', 'size', str(width) + 'x' + str(height))
+            device.shell('wm', 'density', str(geometry['density_dpi']))
+            time.sleep(2)
+            for theme_label, theme in choices:
+                if time.monotonic() >= deadline: break
+                if theme is not None:
+                    observer.call('public-theme')
+                    menu_choose(device, observer, theme_label)
+                    until(device, lambda: (view if (view := observer.call('view-snapshot'))['snapshot']['theme'] == theme and
+                        view['properties'].get('Infinity.ThemeReady') == 'true' else None), 'Existing theme publication', 25)
+                for requested in contract['future_40_combo_capture_plan']['modes']:
+                    if time.monotonic() >= deadline: break
+                    capture = dict(status='NOT_RUN', geometry=geometry['name'], theme=theme_label, requested_mode=requested)
+                    result['captures'].append(capture)
+                    try:
+                        observer.call('public-view-mode', mode=requested)
+                        view = until(device, lambda: (view if mode_ready(view := observer.call('view-snapshot'), requested) else None), 'Existing requested/effective mode publication', 25)
+                        samples = []
+                        for media in contexts:
+                            section = 'trakttv' if media == 'tv' else 'traktmovies'
+                            snap = observer.call('snapshot')
+                            rows = [row for row in snap['controls'].get('9000', []) if row['section'] == section and row['hubsource'] == 'infinity']
+                            base.require(len(rows) == 1, 'ACTUAL_INFINITY_HOME_OWNER_REQUIRED_FOR_DATA_CAPTURE')
+                            observer.call('home-focus', index=rows[0]['index'], label=rows[0]['label'], section=section, hubsource='infinity')
+                            state = observer.call('state')
+                            observed = until(device, lambda: (view if view_data_ready(view := observer.call('view-snapshot'), media, state,
+                                contract['existing_data_container_contract']['Infinity_owned_library_rows']) else None),
+                                'Existing populated applicable Home data after focus', 20)
+                            functional(playback_domain(state) == playback_domain(baseline), 'VIEW_CHANGE_MUTATED_EXISTING_PLAYBACK_DOMAIN')
+                            checked = []
+                            for mapping in contract['existing_data_container_contract']['Infinity_owned_library_rows']:
+                                control = str(mapping['container_id'])
+                                if control not in observed['rows']: continue
+                                params = parse_qs(urlsplit(mapping['route']).query)
+                                kind, bucket = params['media'][0], params['bucket'][0]
+                                if kind != media: continue
+                                entries = (state['next_episodes'] if bucket == 'next' else state['progress_shows'] if bucket == 'progress' else
+                                           [dict(value, key=key) for key, value in state['data'].get(bucket, {}).items()])
+                                expected = {entry['key'] for entry in entries if entry.get('media') == media}
+                                actual = [row['key'] for row in observed['rows'][control] if row['key']]
+                                assert_view_keys(actual, expected)
+                                checked.append(dict(control=control, status='PASS_SAME_RECORD_KEYS' if expected else 'NOT_APPLICABLE_EMPTY_SECTION', expected_keys=sorted(expected), actual_keys=actual))
+                            samples.append(dict(media=media, actual=observed, data_checks=checked))
+                            device.screenshot('view-' + geometry['name'] + '-' + requested + '-' + theme_label.replace(' ', '-') + '-' + media)
+                        observed_records = bool(samples) and all(any(check['status'] == 'PASS_SAME_RECORD_KEYS' for check in sample['data_checks']) for sample in samples)
+                        capture.update(status='CAPTURED_VISUAL_ACCEPTANCE_PENDING' if observed_records else 'BLOCKED_DATA_NOT_OBSERVABLE', samples=samples,
+                            data_status='PASS_VISIBLE_SAME_RECORD_KEYS_EACH_APPLICABLE_MEDIA' if observed_records else 'NOT_OBSERVABLE_NO_APPLICABLE_NONEMPTY_VISIBLE_CONTAINER')
+                    except Exception as error:
+                        if str(error) in ('NATIVE_ENGINE_DIED_OR_RESTARTED', 'NATIVE_PID_REUSED', 'BASELINE_PACKAGE_OR_CHILD_CRASH_NO_RETRY'): raise
+                        capture.update(status='FAIL' if isinstance(error, FunctionalFailure) else 'BLOCKED_VIEW_PREREQUISITE', error=repr(error))
+                    base.save(device.out / 'same-record-view-captures.json', result)
+                    base.crash_free_alive(device); persist()
+        result['status'] = 'PARTIAL_CAPTURE_THEMES_BLOCKED' if not original['theme_available'] else 'CAPTURED_SELECTED_COMBINATIONS_VISUAL_ACCEPTANCE_PENDING'
+        if any(capture['status'] == 'FAIL' for capture in result['captures']): result['status'] = 'FAIL'
+        if not result['captures']: result['status'] = 'NOT_RUN_BUDGET'
+        elif not any(capture['status'].startswith('CAPTURED_') for capture in result['captures']) and result['status'] != 'FAIL':
+            result['status'] = 'BLOCKED_VIEW_PREREQUISITE'
+        result['budget_exhausted'] = time.monotonic() >= deadline
+        result['selected_geometry_count'] = len(contract['future_40_combo_capture_plan']['geometry_presets'])
+        result['unexecuted_combinations'] = 'NOT_RUN_BUDGET_OR_THEME_PREREQUISITE; only listed captures executed'
+        result['physical_Fold'] = 'NOT_RUN'
+    finally:
+        device.shell('wm', 'size', 'reset')
+        device.shell('wm', 'density', 'reset')
+        device.rpc('Input.Home')
+        if requested_original in ('normal', 'auto', 'cinema', 'compact', 'twopane'):
+            observer.call('public-view-mode', mode=requested_original)
+        if original['theme_available']:
+            observer.call('public-theme')
+            menu_choose(device, observer, {'system': 'Follow System', 'light': 'Light Pearl', 'dark': 'Dark'}[original['theme']])
+    persist()
+
+
+def verify_restart(device, observer, out, result):
+    stop_video(device, observer)
+    before = observer.call('state')
+    device.shell('am', 'force-stop', base.PACKAGE)
+    base.require(not device.pids(), 'EXPLICIT_PERSISTENCE_RESTART_STOPPED')
+    result['start'] = base.start_once(device, 'selected-same-record-persistence', out)
+    restart_out = out / 'after-persistence-restart'
+    restart_out.mkdir()
+    observer = Observer(device, restart_out)
+    result['authentication'] = observer.call('identity')
+    result['integration_started'] = True
+    after = observer.call('state')
+    functional(playback_domain(before) == playback_domain(after), 'REAL_RECORDED_PLAYBACK_DOMAIN_LOST_AFTER_RESTART')
+    for bucket in ('watchlist', 'collection', 'later', 'lists'):
+        functional(before['data'].get(bucket) == after['data'].get(bucket), 'LEGITIMATE_SAVED_MEMBERSHIP_LOST_AFTER_RESTART:' + bucket)
+    result.update(status='PASS', raw_record_keys={bucket: sorted(value) for bucket, value in playback_domain(after).items()}, data_cleared=False)
+    return observer
 
 
 def classify_scenario(error, scenario):
@@ -886,6 +1215,16 @@ def classify_scenario(error, scenario):
     if scenario.get('last_step') == 'fixture_preparation': return 'BLOCKED_FIXTURE_PREPARATION'
     if scenario.get('last_step') == 'infinity_origin': return 'BLOCKED_ORIGIN_PREREQUISITE'
     return 'BLOCKED_RUNTIME_PREREQUISITE'
+
+
+def selected_overall_status(core, optional):
+    if any(value == 'FAIL' for value in core + optional):
+        return 'FAIL_SELECTED_INFINITY_TRACKING_ASSERTION'
+    if core != ['PASS', 'PASS']:
+        return 'BLOCKED_INFINITY_ORIGIN_ACCEPTANCE'
+    if any(value != 'PASS' for value in optional):
+        return 'PARTIAL_SELECTED_INFINITY_TRACKING_CORE_PASS'
+    return 'PASS_SELECTED_INFINITY_ORIGIN_TV_MOVIE'
 
 
 def final_apk_observation(device):
@@ -960,11 +1299,12 @@ def run(staged_path, sdk, out):
             auth['manifest_sha256'] == staged['expected']['manifest_sha256'] and auth['cc_version'] == candidate['version'], 'DYNAMIC_E410_NATIVE_FULL80_AUTH_REQUIRED')
         report['authentication'] = dict(status='PASS', identity=auth)
         phase = 'scenarios'
+        contexts = {}
         for media in ('tv', 'movie'):
             scenario = report['scenarios'][media]
             try:
                 scenario['status'] = 'RUNNING'; persist()
-                run_origin_scenario(device, observer, out, media, scenario, persist)
+                contexts[media] = run_origin_scenario(device, observer, out, media, scenario, persist)
             except Exception as error:
                 scenario.update(status=classify_scenario(error, scenario), blocker_or_failure=repr(error), traceback=traceback.format_exc())
                 for action in ('snapshot', 'playing', 'events', 'state'):
@@ -984,9 +1324,46 @@ def run(staged_path, sdk, out):
                         time.sleep(.25)
             base.crash_free_alive(device)
             persist()
+        # Optional checks consume these same genuine records. No new provider
+        # fixtures, account guesses, or hidden retries are introduced here.
+        optional_deadline = time.monotonic() + 12 * 60
+        def selected_check(result, callback, prerequisite=True):
+            if not prerequisite:
+                result.update(status='BLOCKED_CORE_RECORD_PREREQUISITE'); persist(); return None
+            if time.monotonic() >= optional_deadline:
+                result.update(status='NOT_RUN_BUDGET'); persist(); return None
+            try:
+                result.update(status='RUNNING'); persist()
+                value = callback()
+                base.crash_free_alive(device)
+                persist()
+                return value
+            except Exception as error:
+                if str(error) in ('NATIVE_ENGINE_DIED_OR_RESTARTED', 'NATIVE_PID_REUSED', 'BASELINE_PACKAGE_OR_CHILD_CRASH_NO_RETRY'): raise
+                result.update(status=classify_scenario(error, result), blocker_or_failure=repr(error), traceback=traceback.format_exc())
+                try: result['actual_failure_snapshot'] = observer.call('snapshot')
+                except Exception as capture_error: result['capture_error'] = repr(capture_error)
+                stop_video(device, observer)  # Only actual video; unknown dialogs remain.
+                base.crash_free_alive(device)
+                persist()
+                return None
+        selected_check(report['completion96'], lambda: verify_completion_replay(device, observer, contexts['movie'], report['completion96'], persist), 'movie' in contexts)
+        if contexts:
+            replacement = selected_check(report['restart_persistence'], lambda: verify_restart(device, observer, out, report['restart_persistence']))
+            if replacement is not None: observer = replacement
+        else:
+            report['restart_persistence']['status'] = 'BLOCKED_CORE_RECORD_PREREQUISITE'
+        for label, bucket in (('Collection', 'collection'), ('Save For Later', 'later'), ('Custom Lists', 'list')):
+            for media in ('tv', 'movie'):
+                result = report['other_entry_points'][label][media]
+                selected_check(result, lambda media=media, bucket=bucket, result=result:
+                    verify_saved_entry(device, observer, contexts[media], bucket, result, persist), media in contexts)
+        selected_check(report['shared_record_view_coverage'], lambda:
+            verify_view_captures(device, observer, contexts, report['shared_record_view_coverage'], optional_deadline, persist), bool(contexts))
         statuses = [case['status'] for case in report['scenarios'].values()]
-        report['status'] = ('PASS_SELECTED_INFINITY_ORIGIN_TV_MOVIE' if statuses == ['PASS', 'PASS'] else
-                            'FAIL_INFINITY_ORIGIN_ASSERTION' if 'FAIL' in statuses else 'BLOCKED_INFINITY_ORIGIN_ACCEPTANCE')
+        extras = [report['completion96']['status'], report['restart_persistence']['status'],
+                  report['shared_record_view_coverage']['status']] + [value['status'] for entry in report['other_entry_points'].values() for value in entry.values()]
+        report['status'] = selected_overall_status(statuses, extras)
     except Exception as error:
         report.update(status=('BLOCKED_ENVIRONMENT' if phase == 'environment' else
             'BLOCKED_OBSERVER' if phase == 'observer_authentication' or isinstance(error, ObserverBlocked) else

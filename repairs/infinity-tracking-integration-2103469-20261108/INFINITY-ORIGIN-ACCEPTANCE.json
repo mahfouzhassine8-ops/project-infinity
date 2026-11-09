@@ -21,7 +21,7 @@
     "retest_or_repair_on_owner_device_required": false
   },
   "fixture_preparation": {
-    "status": "MATCHING_FIXTURE_AUTHENTICATED_ON_ANDROID; LEGITIMATE_SAVE_NOT_RUN_AFTER_EMPTY_LOADING_FRAME_OBSERVER_BLOCKER",
+    "status": "PASS_PUBLIC_ORIGINAL_KEY_FULL80_C1_MODULE_FIXTURE_READY",
     "existing_signed_fixture_run": 42555855742,
     "rule": "Find an existing valid saved title, or create it using only the existing supported save/context-menu flow in the isolated QA profile.",
     "saving_alone": "Must leave playback progress/watched history unchanged.",
@@ -34,11 +34,11 @@
     ],
     "failure_classification": "BLOCKED_FIXTURE_PREPARATION; all unreached integration steps NOT_RUN",
     "signing_route": "Existing original-key complete80 module signer; no signature bypass or APK rebuild required for fixture preparation.",
-    "matching_signed_fixture_run": 42588102830,
-    "candidate_CC": "0.3.5.70",
-    "recovery_CC": "0.3.5.71",
+    "matching_signed_fixture_run": 42602243785,
+    "candidate_CC": "0.3.5.72",
+    "recovery_CC": "0.3.5.73",
     "fixture_pin": "TRACKING-MODULE-FIXTURE-PIN.json",
-    "public_signature_review": "evidence/signed-e410-origin-fixture-42588102830/REVIEW.json"
+    "public_signature_review": "C1-SIGNED-MODULE-REVIEW.json"
   },
   "mandatory_origin_evidence": [
     "Capture actual Infinity Movies/TV selection and first-party Infinity hub identity; active Infinity skin alone is insufficient.",
@@ -122,11 +122,11 @@
     "raw_history": "Retain original workflow failures/logs unchanged; current interpretation must not promote them to unexecuted functional failures or successes."
   },
   "execution": {
-    "status": "BLOCKED_PENDING_MATCHING_C1_AUTHENTICATED_FIXTURE_AND_REVIEWED_NEW_SELECTION",
-    "application_tests_executed_this_change": 1,
+    "status": "SELECTED_REVIEWED_C1_CORE_AND_BOUNDED_OPTIONAL_ANDROID_NOT_RUN",
+    "application_tests_executed_this_change": 2,
     "repeat_completed_tests": false,
     "old_independent_movie_selection_retired_for_acceptance": true,
-    "new_origin_runner_activation": "Disabled until original-key signedC1 fixture and reviewed focused runtime selection are bound.",
+    "new_origin_runner_activation": "One source-bound attempt selected after confirmed production service-survival and test-only native history correction. Existing5-minute evidence retained; fresh eligibleTV record for displayedcards/resume only. No automatic retries.",
     "APK_build": false,
     "publication": false,
     "release_acceptance": false,
@@ -137,7 +137,10 @@
     "retained_environment_failure_run": 42570831467,
     "last_attempt": 42593220047,
     "last_attempt_result": "TVrealrecordPASS/nativeUIblocked; movierecordFAILafterresidentserviceexit; bothretainedunchanged",
-    "owner_origin_attempt_number": 3
+    "owner_origin_attempt_number": 3,
+    "streaming_lifecycle_capture_limit_seconds": 900,
+    "optional_coverage_budget_seconds": 720,
+    "workflow_emulator_bound_minutes": 45
   },
   "shared_record_view_coverage": {
     "status": "NOT_RUN",
@@ -163,5 +166,24 @@
     "resume_hub.py": "807157626f817dd5375e0e60872b6cd351d33135a23c5a225f26c86a196e7ed5",
     "service.py": "569fea31b465674b5e9fc357a895b0a00706df999c201246a33e8fcd00c9b669"
   },
-  "production_source_checkpoint": "5787ca4569faa70dec4f10493b08bd8015d542ea"
+  "production_source_checkpoint": "5787ca4569faa70dec4f10493b08bd8015d542ea",
+  "selected_runtime_coverage": {
+    "core": [
+      "Actual InfinityTVWatchlist nativeparent/child eligibleclock Stop existing nativeProgress/Next/Continue/resume",
+      "Actual InfinityMoviesWatchlist eligibleclock Stop record nativeContinue/resume"
+    ],
+    "optional_bounded": [
+      "Existing95percent completion/actualseek/replay",
+      "Sameprofile restart persistence/full80 reauthentication",
+      "Collection/SaveForLater/CustomList actualsaved entry origins usingnormalUI",
+      "Sameactualrecords acrossapplicablepublicviewmodes/nativegeometry/themecaptures"
+    ],
+    "unavailable_not_passed": [
+      "Uninstalledproviderfamilies or absentcredentials",
+      "Themeowner unavailable in freshQA",
+      "Unverifiedcanonicalcrossprovider/successor",
+      "PhysicalGalaxyFoldacceptance"
+    ],
+    "known_executed_functional_failure_policy": "Any observed functionalFAIL remains a releaseblocker; onlyBLOCKED/NOTRUN may be experimentaldisclosures."
+  }
 }
