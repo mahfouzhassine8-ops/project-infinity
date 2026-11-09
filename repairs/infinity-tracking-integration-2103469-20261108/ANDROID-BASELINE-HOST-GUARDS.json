@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "status": "PASS_SELECTED_BASELINE_HOST_GUARDS_ONLY",
-  "harness_sha256": "5272ececcde49a2ab31b505309d2773afdd67ffdc00cbf412707b7b548f36c38",
+  "harness_sha256": "6d8670051215ddb1c68d14a155c8b865791b0f7733c302f6653f41b99d0b250f",
   "selection": "New baseline-only API36 intake and artifact/UI/teardown guards; no forty-case suite repeated",
   "checks_selected": [
     "Syntax parses",
@@ -129,9 +129,27 @@
     {
       "case": "reconnect_timeout",
       "status": "PASS_HOST_INFRASTRUCTURE_GUARD_ONLY"
+    },
+    {
+      "case": "real42538614119_exact_rationale_XML_measured_Continue",
+      "status": "PASS_HOST_UI_GUARD_ONLY",
+      "fixture_sha256": "8dcaccde9157f4983c314de086aa52e3d857a591daec2331aace6038fe2cc796",
+      "center": [
+        542,
+        1177
+      ]
+    },
+    {
+      "case": "wrong_rationale_message_or_any_required_owner_refuses",
+      "status": "PASS_HOST_UI_GUARD_ONLY",
+      "negative_variants": 4
+    },
+    {
+      "case": "unknown_modal_no_generic_dismissal",
+      "status": "PASS_HOST_UI_GUARD_ONLY"
     }
   ],
-  "check_count": 28,
+  "check_count": 31,
   "SDK_APK_signature_check": "NOT_RUN_LOCALLY_NO_SDK; required in admit before application execution",
   "module_RSA_signature_check": "PASS_ORIGINAL_PUBLIC_KEY_ONLY",
   "host_disposal_worker_executed": false,
@@ -205,5 +223,33 @@
       "case": "reconnect_timeout",
       "status": "PASS_HOST_INFRASTRUCTURE_GUARD_ONLY"
     }
-  ]
+  ],
+  "permission_rationale_selection_before_execution": [
+    "Captured real app-owned exact rationale selects sole measured Continue button",
+    "Wrong exact rationale message or any required owner refuses without tap",
+    "Unknown modal refuses without generic dismissal"
+  ],
+  "prior28_checks_preserved_not_rerun": true,
+  "permission_rationale_checks": [
+    {
+      "case": "real42538614119_exact_rationale_XML_measured_Continue",
+      "status": "PASS_HOST_UI_GUARD_ONLY",
+      "fixture_sha256": "8dcaccde9157f4983c314de086aa52e3d857a591daec2331aace6038fe2cc796",
+      "center": [
+        542,
+        1177
+      ]
+    },
+    {
+      "case": "wrong_rationale_message_or_any_required_owner_refuses",
+      "status": "PASS_HOST_UI_GUARD_ONLY",
+      "negative_variants": 4
+    },
+    {
+      "case": "unknown_modal_no_generic_dismissal",
+      "status": "PASS_HOST_UI_GUARD_ONLY"
+    }
+  ],
+  "failed42538614119_native_startup": "NOT_STARTED; app-owned initial rationale not handled; not a native API36 failure",
+  "report_only_delta": "After successful adb install and installed-APK SHA verification, persist application_installed=true and installed_APK_sha256 before any start attempt; no extra tests selected."
 }

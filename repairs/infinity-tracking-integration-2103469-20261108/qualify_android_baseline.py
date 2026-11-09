@@ -283,6 +283,13 @@ class Device:
 
     def handle_ui(self, tree):
         nodes = list(tree.iter('node'))
+        rationale = 'Infinity requires access to your device media and files to function. Please allow this via the following dialogue box or Infinity will exit.'
+        titles = [n for n in nodes if n.get('package') == PACKAGE and n.get('resource-id') == 'android:id/alertTitle' and n.get('text') == 'Infinity']
+        messages = [n for n in nodes if n.get('package') == PACKAGE and n.get('resource-id') == 'android:id/message' and n.get('text') == rationale]
+        buttons = [n for n in nodes if n.get('class') == 'android.widget.Button' and n.get('clickable') == 'true' and n.get('enabled') == 'true']
+        if len(titles) == len(messages) == len(buttons) == 1 and buttons[0].get('package') == PACKAGE and buttons[0].get('resource-id') == 'android:id/button3' and buttons[0].get('text') == 'Continue':
+            self.tap(buttons[0], 'Measured exact Infinity initial media/files permission rationale Continue')
+            return True
         card = [n for n in nodes if n.get('package') == PACKAGE and n.get('content-desc') == 'Infinity. Open Infinity.' and n.get('clickable') == 'true']
         require(len(card) <= 1, 'UNAMBIGUOUS_ORIGINAL_INFINITY_CARD')
         if card:
@@ -542,6 +549,8 @@ def run(request, admission, out, avd):
         report['adb_root_handshake'] = root_reconnect(device, out)
         device.adb('install', '--no-streaming', apk, timeout=300)
         installed_apk(device)
+        report.update(application_installed=True, installed_APK_sha256=APK_SHA)
+        save(out / 'ANDROID-VERIFICATION.json', report)
         # Minimal disposable settings only. No addon, provider, observer or tracking seed.
         settings = '<settings version="2"><setting id="lookandfeel.skin">skin.infinity.diggz</setting><setting id="general.addonupdates">2</setting><setting id="services.esenabled">true</setting><setting id="services.esallinterfaces">true</setting></settings>'
         local = out / 'disposable-guisettings.xml'

@@ -18,6 +18,24 @@
       "production_source_changes": false,
       "build": false,
       "signing": false
+    },
+    {
+      "run_id": 42538614119,
+      "source_commit": "220c5f994b37787ddff104266a8f01da0b2eee48",
+      "artifact_id": 13640707545,
+      "artifact_sha256": "aa73c44d5e52eb86cf0ae72554de1100307637f442b2a3855a8d8015c982b453",
+      "artifact_size": 1592693,
+      "status": "FAIL_UNHANDLED_EXACT_FIRST_LAUNCH_PERMISSION_RATIONALE; NATIVE_NOT_STARTED",
+      "APK_installed": true,
+      "installed_APK_identity": "Exact original69 SHA verified by installed_apk before control reached start_once",
+      "native_process_started": false,
+      "completed_starts": 0,
+      "root_handshake": "PASS_UID0",
+      "normal_permission_flow": "App-owned permission rationale waiting for Continue; no appops/permission bypass",
+      "correction": "Exact captured owner/title/fullmessage/button3/Continue measured UI handler only; stock permission handling preserved",
+      "production_changes": false,
+      "APK_build": false,
+      "signing": false
     }
   ],
   "new_tracking_source_app_checks": "NOT_RUN",
