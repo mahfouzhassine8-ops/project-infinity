@@ -1,0 +1,21 @@
+{
+  "commands": [
+    "python repairs/infinity-tracking-integration-2103469-20261108/test_tracking_install_transport_name.py",
+    "python repairs/infinity-tracking-integration-2103469-20261108/test_tracking_install_route_shape.py"
+  ],
+  "not_selected": [
+    "APK host/certificate/full80 reruns",
+    "older host suites",
+    "downloads/API",
+    "SDK/emulator/application",
+    "production/frozen helper/core/APK changes",
+    "build/sign/dispatch"
+  ],
+  "reason": "Host-only42618175578 passed actual3APK originalcert/full80 then refused six localarchive filename containing+; zero Android attempts. Correct only transportbasename plus cascade sourcepins.",
+  "schema": 1,
+  "selected": [
+    "TransportName.test_existing_publisher_versions_and_hashes_survive_safe_local_names",
+    "RouteShape.test_only_exact_reviewed_manual_addition_normalizes"
+  ],
+  "selected_before_execution": true
+}

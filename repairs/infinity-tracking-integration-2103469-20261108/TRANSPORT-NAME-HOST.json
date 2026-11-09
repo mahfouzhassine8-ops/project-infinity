@@ -1,0 +1,43 @@
+{
+  "API_downloads_or_app": false,
+  "APK_changes": false,
+  "APK_host_checks_rerun": false,
+  "build_sign_dispatch": false,
+  "cases": [
+    {
+      "case": "TransportName.test_existing_publisher_versions_and_hashes_survive_safe_local_names",
+      "command": "python repairs/infinity-tracking-integration-2103469-20261108/test_tracking_install_transport_name.py",
+      "exit_code": 0,
+      "reported_elapsed_seconds": 0.005,
+      "status": "PASS"
+    },
+    {
+      "case": "RouteShape.test_only_exact_reviewed_manual_addition_normalizes",
+      "command": "python repairs/infinity-tracking-integration-2103469-20261108/test_tracking_install_route_shape.py",
+      "exit_code": 0,
+      "reported_elapsed_seconds": 0.037,
+      "status": "PASS"
+    }
+  ],
+  "compile_optimization": 1,
+  "created_utc": "2026-11-09T12:39:19.389128+00:00",
+  "exact_appended_job_sha256": "2e6560350c56653cfc1f080b68beea912f7b879b7f7615672f956c644e93a64e",
+  "feature_workflow_sha256": "899933b5ee95fd3212ceea6cf756271ed8a7fcb8126a7233039bc047e146ed5d",
+  "frozen_install_helper_sha256": "ed500734e7c851e4ac157d33b56c3cf1c1cd1ba72117fc470a800f96181265c1",
+  "old_suites_rerun": false,
+  "old_workflow_host_preserved_sha256": "b2816292a25506f33aec1ff5502eccd8bd1ba884b9b56bb3c53cd65e1ab2ffee",
+  "old_workflow_review_preserved_sha256": "e64910a14ff87604a0c3067c92030eb55cd793263950f1543af1cb7d8b39ce0c",
+  "schema": 1,
+  "selected_before_execution": "TRANSPORT-NAME-SELECTION.json",
+  "source_change": "Only local publisher ZIP transportbasename version.replace(+,-); actual publisher version/ZIP bytes/SHA unchanged. Cascade only fixed intake literalSHA in393 and exact appendedjobSHA inoldroute normalizer.",
+  "source_sha256": {
+    "TRANSPORT-NAME-SELECTION.json": "0346be5a86ed8cde259452f5ee8cfe225d23ffaa7f3f21a572ed26598bf7a1df",
+    "admit_tracking_android.py": "7d71b4797c09412cff88826143ccc995b7f18f6e1940e0d12027d1916b223678",
+    "test_tracking_install_transport_name.py": "d76fd78276dffb617cf95f921e8032c4a19d70e575391b5d2fc60d5657896be1",
+    "verify_tracking_install_inputs.py": "5dd3b900b1f23d79db5b12217fcfe6a6954890f93648967016e1a7c5ad2983de"
+  },
+  "status": "PASS_TWO_SELECTED_TRANSPORT_ROUTE_HOST_CONTROLS_ONLY",
+  "trigger_job": 129163212647,
+  "trigger_limit": "Host-only filename refusal after actual original certificate/full80 admission of all3APKs; no emulator or functional case started. Root retains the actual APK receipts unchanged.",
+  "trigger_run": 42618175578
+}

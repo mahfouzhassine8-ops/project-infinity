@@ -149,7 +149,7 @@ def prepare(sdk, out):
     pins = load(HERE / 'TRACKING-DEPENDENCY-PINS.json')
     by_id = {row['addon']: row for row in pins['archives']}
     for index, aid in enumerate(pins['installation_order']):
-        row = by_id[aid]; name = '%02d-' % index + aid + '-' + row['version'] + '.zip'
+        row = by_id[aid]; name = '%02d-' % index + aid + '-' + row['version'].replace('+', '-') + '.zip'
         require(row['url'].startswith('https://'), 'PINNED_HTTPS_PUBLISHER_ONLY')
         target = zips / name
         with urllib.request.urlopen(row['url'], timeout=45) as response, target.open('xb') as stream:

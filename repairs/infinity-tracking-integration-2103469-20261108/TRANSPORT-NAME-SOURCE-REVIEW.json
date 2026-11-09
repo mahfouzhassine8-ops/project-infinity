@@ -1,0 +1,34 @@
+{
+  "exact_appended_job_sha256": "2e6560350c56653cfc1f080b68beea912f7b879b7f7615672f956c644e93a64e",
+  "findings": [],
+  "limits": [
+    "Actual prior host-failure classification and retained APK admission are supplied by root; this review covers source delta only.",
+    "Root must bind corrected intake/workflow/admit hashes and this receipt in new selected request before the controlled attempt.",
+    "No Android startup, PackageManager update, data retention or functional behavior acceptance implied."
+  ],
+  "original_guard_preservation": [
+    "Downloaded archive still checked against exact original publisher hash.",
+    "Dependency metadata continues to emit original row version and hash; installer compares actual addon version to original publisher version.",
+    "Input signature/full80/source admission remains unchanged; no filename character whitelist or integrity guard weakened.",
+    "Prior source/host receipts preserved; old actual APK host admission is not relabelled as application execution."
+  ],
+  "owner_delivery_cleared": false,
+  "reason": "Frozen helper permits safe basename characters only; a publisher version containing plus previously produced a refused local transport filename. Replacement does not modify actual addon.xml/version metadata or downloaded archive bytes, and independent indexed addon names preserve distinct transport files.",
+  "reported_controls": 2,
+  "reviewed_at_utc": "2026-11-09T12:39:58.802742+00:00",
+  "reviewer_tests_API_apps_build_sign_dispatch": false,
+  "runtime_acceptance": false,
+  "scope": "Only local ZIP basename replaces plus with hyphen; bootstrap intake hash and exact job hash follow. Publisher versions/URLs/archive bytes/hashes and frozen installer/production/APKs unchanged.",
+  "source_sha256": {
+    "POST-SIGN-INSTALL-WORKFLOW-REVIEW.json": "e64910a14ff87604a0c3067c92030eb55cd793263950f1543af1cb7d8b39ce0c",
+    "POST-SIGN-WORKFLOW-HOST.json": "b2816292a25506f33aec1ff5502eccd8bd1ba884b9b56bb3c53cd65e1ab2ffee",
+    "TRACKING-DEPENDENCY-PINS.json": "750d95f74969f01cf1c147a991852794a6bf5e72def1f1b7d9497113bdfa9350",
+    "TRANSPORT-NAME-HOST.json": "c01d99ee6210d5313944f0306817627741300fa9ec3ce1aa48c494cbef98b26d",
+    "TRANSPORT-NAME-SELECTION.json": "0346be5a86ed8cde259452f5ee8cfe225d23ffaa7f3f21a572ed26598bf7a1df",
+    "admit_tracking_android.py": "7d71b4797c09412cff88826143ccc995b7f18f6e1940e0d12027d1916b223678",
+    "verify_tracking_install.py": "ed500734e7c851e4ac157d33b56c3cf1c1cd1ba72117fc470a800f96181265c1",
+    "verify_tracking_install_inputs.py": "5dd3b900b1f23d79db5b12217fcfe6a6954890f93648967016e1a7c5ad2983de"
+  },
+  "status": "ACCEPTED_LOCAL_TRANSPORT_FILENAME_DELTA_PENDING_ROOT_REQUEST_REBIND",
+  "workflow_sha256": "899933b5ee95fd3212ceea6cf756271ed8a7fcb8126a7233039bc047e146ed5d"
+}

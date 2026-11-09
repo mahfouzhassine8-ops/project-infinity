@@ -1,0 +1,42 @@
+{
+  "actual_Android_attempts": 0,
+  "artifact": {
+    "id": 13672589786,
+    "sha256": "4fc04a612887fb8f872f27a166448acc6e6392f82fa93ecac5b8add4f8f94425",
+    "size": 34269
+  },
+  "cause": "script.module.six originalversion1.16.0+matrix.1 copied into test-local ZIPbasename containing +, refusedby frozen strictregex. Publisher dependencyhash succeeded beforehostadmission.",
+  "host_APKs": {
+    "2103469": {
+      "CC": "0.3.5.67",
+      "authenticated_module_sources": 80,
+      "native_sha256": "ee3be7c7a95b86f8357539001fcd50bedbd80217b02f130d649f7f57e6075794",
+      "receipt_sha256": "093de7a395385950ced3598abe1605efcb7a921f3d27f62e71832d2666bb5f9a",
+      "sha256": "804eebc57af2e4ef4e5418b56994bda64eb7fd7e7f2c0653b5c6e2a9f7833058",
+      "status": "PASS_HOST_APK_ORIGINAL_CERT_FULL80_ONLY"
+    },
+    "2103474": {
+      "CC": "0.3.5.72",
+      "authenticated_module_sources": 80,
+      "native_sha256": "ee3be7c7a95b86f8357539001fcd50bedbd80217b02f130d649f7f57e6075794",
+      "receipt_sha256": "d715d97f922958dc85f5d156f948cbf150423713ebb54f2f8ddf4922f710bb86",
+      "sha256": "c4e8ec4dae7e296578bfbfe2f705cf8fc51bbb96f7884e103717c444ffc75894",
+      "status": "PASS_HOST_APK_ORIGINAL_CERT_FULL80_ONLY"
+    },
+    "2103475": {
+      "CC": "0.3.5.73",
+      "authenticated_module_sources": 80,
+      "native_sha256": "ee3be7c7a95b86f8357539001fcd50bedbd80217b02f130d649f7f57e6075794",
+      "receipt_sha256": "5da36e124815628118f4acf5b7de2fb1e706917b27d8b2c5c770421d98a589bf",
+      "sha256": "f11c9373f253f1c9b2059a0d8e49e50ff961879fd26ed2e1d0c82c04a448207e",
+      "status": "PASS_HOST_APK_ORIGINAL_CERT_FULL80_ONLY"
+    }
+  },
+  "job": 129163212647,
+  "native_or_APK_rebuild": false,
+  "owner_data_accessed": false,
+  "raw_decoded_job_log_sha256": "dcaf07dba7efb90b4a08cbef363073599ee0984e2d6c7750a5775602c2f64c6c",
+  "run": 42618175578,
+  "source": "2fc9c413946630172ff936e692f889c111f50dca",
+  "status": "FAIL_HOST_TRANSPORT_FILENAME; ANDROID_NOT_RUN"
+}

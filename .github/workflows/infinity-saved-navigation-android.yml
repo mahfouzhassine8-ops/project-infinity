@@ -2292,7 +2292,7 @@ jobs:
           require(path.is_file(),'POST_SIGN_REQUEST_ABSENT_NO_DOWNLOADS_OR_DEVICE')
           request=json.loads(path.read_bytes())
           require(request.get('enabled') is True and request.get('application_tests') is True and request.get('operation')=='verify-experimental-tracking-signed-pair-install','POST_SIGN_REQUEST_DISABLED_NO_DOWNLOADS_OR_DEVICE')
-          require(hashlib.sha256((task/'verify_tracking_install_inputs.py').read_bytes()).hexdigest()=='d61edad84805d972a765fcd682b3145289d00cf03365ccd4a6097edce34c6948','REVIEWED_INTAKE_BEFORE_EXECUTION')
+          require(hashlib.sha256((task/'verify_tracking_install_inputs.py').read_bytes()).hexdigest()=='5dd3b900b1f23d79db5b12217fcfe6a6954890f93648967016e1a7c5ad2983de','REVIEWED_INTAKE_BEFORE_EXECUTION')
           PYREQUEST
           python3 repairs/infinity-tracking-integration-2103469-20261108/verify_tracking_install_inputs.py gate
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065

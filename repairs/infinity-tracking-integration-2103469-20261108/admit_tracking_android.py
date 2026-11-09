@@ -157,7 +157,7 @@ def workflow_shape():
     if marker in actual:
         require(actual.count(marker) == 1, 'ONE_EXACT_MANUAL_INSTALL_ROUTE')
         start = actual.index(marker)
-        require(hashlib.sha256(actual[start:].encode()).hexdigest() == 'a9468cd44f94b31ef432ab465b31a7c67b841b9c7179eb52483adb01bdf4e91f',
+        require(hashlib.sha256(actual[start:].encode()).hexdigest() == '2e6560350c56653cfc1f080b68beea912f7b879b7f7615672f956c644e93a64e',
                 'UNCHANGED_REVIEWED_MANUAL_INSTALL_JOB')
         actual = actual[:start]
         choice = ', tracking-signed-install-android]'
