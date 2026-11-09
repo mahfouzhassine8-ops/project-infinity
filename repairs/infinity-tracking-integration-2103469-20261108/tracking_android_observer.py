@@ -183,8 +183,15 @@ def tag(item):
 
 
 def snapshot():
+    # Exact original69 unified/MyVideoNav.xml <views>; owned popup50 is kept.
+    primary_controls = (50, 65050, 65051, 65052, 51, 52, 53, 55, 56, 57, 58, 59,
+                        500, 501, 502, 503, 504, 505, 506, 507, 509, 591, 592, 602, 609)
+    observed_controls = tuple(dict.fromkeys((3, 6, 50, 450, 451, 1000) + primary_controls))
+    visible = {str(control): xbmc.getCondVisibility('Control.IsVisible(%d)' % control) for control in observed_controls}
     controls = {}
-    for control in (3, 6, 50, 450, 451, 1000):
+    for control in observed_controls:
+        if control in primary_controls and control != 50 and not visible[str(control)]:
+            continue
         count = int(xbmc.getInfoLabel('Container(%d).NumItems' % control) or 0)
         require(0 <= count <= 1500, 'BOUNDED_ACTUAL_DIRECTORY_REQUIRED')
         if count:
@@ -215,13 +222,13 @@ def snapshot():
     return dict(pid=os.getpid(), window=xbmcgui.getCurrentWindowId(),
                 dialog=xbmcgui.getCurrentWindowDialogId(), controls=controls,
                 context_buttons=buttons,
+                primary_controls=list(primary_controls),
                 folder=xbmc.getInfoLabel('Container.FolderPath'), skin=xbmc.getSkinDir(),
                 heading=xbmc.getInfoLabel('Control.GetLabel(1)'), body=xbmc.getInfoLabel('Control.GetLabel(9)'),
                 screen_width=xbmc.getInfoLabel('System.ScreenWidth'), screen_height=xbmc.getInfoLabel('System.ScreenHeight'),
                 theme=theme, theme_available=theme is not None, theme_error=theme_error,
                 published_theme=xbmc.getInfoLabel('Window(Home).Property(Infinity.Theme)'),
-                visible_controls={str(control): xbmc.getCondVisibility('Control.IsVisible(%d)' % control)
-                                  for control in (3, 6, 50, 450, 451, 1000)},
+                visible_controls=visible,
                 focused_control=xbmc.getInfoLabel('System.CurrentControlId'),
                 visual_mode=xbmc.getInfoLabel('Skin.String(Infinity.VisualMode)'),
                 home_view=xbmc.getInfoLabel('Skin.String(Infinity.HomeView)'))
@@ -229,12 +236,21 @@ def snapshot():
 
 def selected(request):
     control, index = request['control'], request['index']
-    require(control in (50, 450, 451, 1000) and type(index) is int and 0 <= index <= 1500,
+    primary = (50, 65050, 65051, 65052, 51, 52, 53, 55, 56, 57, 58, 59,
+               500, 501, 502, 503, 504, 505, 506, 507, 509, 591, 592, 602, 609)
+    require(control in primary + (450, 451, 1000)
+            and type(index) is int and 0 <= index <= 1500,
             'EXACT_SELECTED_NATIVE_CONTROL_AND_INDEX_REQUIRED')
+    require(xbmc.getCondVisibility('Control.IsVisible(%d)' % control), 'VISIBLE_ACTUAL_SELECTED_CONTAINER_REQUIRED')
+    if control in primary:
+        require(xbmcgui.getCurrentWindowId() == 10025 and xbmcgui.getCurrentWindowDialogId() in (0, -1, 9999) and
+                [candidate for candidate in primary if xbmc.getCondVisibility('Control.IsVisible(%d)' % candidate)] == [control],
+                'ONE_UNOBSCURED_ACTUAL_PRIMARY_DIRECTORY_VIEW_REQUIRED')
     xbmc.executebuiltin('SetFocus(%d,%d,absolute)' % (control, index), True)
     p = 'Container(%d).ListItem.' % control
     require(xbmc.getInfoLabel(p + 'FileNameAndPath') == request['file'], 'LIVE_NATIVE_SELECTED_PATH_REQUIRED')
     require(xbmc.getInfoLabel(p + 'Label') == request['label'], 'LIVE_NATIVE_SELECTED_LABEL_REQUIRED')
+    require(xbmc.getInfoLabel('System.CurrentControlId') == str(control), 'ACTUAL_SELECTED_DIRECTORY_FOCUS_REQUIRED')
     # A native ControlList Python wrapper has no Python-owned vecItems; its
     # getSelectedItem() would return None. Read the actual native GUI labels.
     # Only playing() below supplies an authoritative SDK CFileItem copy.
@@ -263,10 +279,21 @@ def action(request):
                                   for key, entry in data.get('items', {}).items() if entry.get('media') == 'tv'})
     if kind == 'playing':
         player = xbmc.Player()
-        value = dict(playing=player.isPlayingVideo(), events=EVENTS.events)
+        value = dict(playing=player.isPlayingVideo(), events=list(EVENTS.events))
         if value['playing']:
-            value.update(item=tag(player.getPlayingItem()), file=player.getPlayingFile(),
-                         time=player.getTime(), total=player.getTotalTime(), clock_monotonic=time.monotonic())
+            try:
+                observed = dict(item=tag(player.getPlayingItem()), file=player.getPlayingFile(),
+                                time=player.getTime(), total=player.getTotalTime(), clock_monotonic=time.monotonic())
+            except RuntimeError as error:
+                if str(error) not in ('Kodi is not playing any item', 'Kodi is not playing any file',
+                                      'Kodi is not playing any media file') or player.isPlayingVideo():
+                    raise
+                return dict(playing=False, observation='stopped_during_sdk_snapshot', sdk_transition_error=str(error),
+                            events=list(EVENTS.events), observed_monotonic=time.monotonic())
+            if not player.isPlayingVideo():
+                return dict(playing=False, observation='stopped_after_sdk_snapshot', events=list(EVENTS.events),
+                            observed_monotonic=time.monotonic())
+            value.update(observed)
         return value
     if kind in ('inspect', 'click', 'context'):
         result = selected(request)

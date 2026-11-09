@@ -22,7 +22,21 @@ FIXTURE_SOURCE = '9d64ffb84404036ce6e02d6cb160fb004a029b33'
 FIXTURE_RUN = 42555855742
 
 
+def selected_focus():
+    request_path = HERE / 'TRACKING-ANDROID-REQUEST.json'
+    request = base.load(request_path)
+    retained = request['retained_actual_evidence']
+    base.require(request['execution_focus'] == 'independent-movie' and
+        retained['run'] == 42567028842 and retained['source'] == '9b05d1b4bf2283b7adc92f7ef6db0aff3b9fede3' and
+        retained['queens_blade_status'] == 'FAIL_ACTUAL_SDK_MOVIE_UNKNOWN_EPISODE' and
+        retained['cross_entry_rezero_status'] == 'BLOCKED_UNVERIFIED_METADATA' and
+        retained['replay_known_wrong_typed_tv'] is False, 'EXACT_COMMITTED_INDEPENDENT_MOVIE_FOCUS_REQUIRED')
+    return dict(request_sha256=base.sha(request_path), execution_focus=request['execution_focus'],
+                retained_actual_evidence=retained)
+
+
 def stage(apk, sdk, fixture, pins_path, out):
+    selection = selected_focus()
     base.require(not out.exists(), 'FRESH_STAGING_DIRECTORY')
     out.mkdir(parents=True)
     proof = base.verify_apk(apk.resolve(), sdk.resolve(), out)
@@ -111,16 +125,16 @@ def stage(apk, sdk, fixture, pins_path, out):
     (out / 'sources.xml').write_text('<sources><files><source><name>Tracking engineering ZIPs</name>'
         '<path pathversion="1">' + remote + '</path><allowsharing>false</allowsharing></source></files></sources>')
     base.save(out / 'STAGED.json', dict(schema=1, status='ADMITTED_INPUTS_ONLY_NOT_ANDROID_PASS',
+        selection=selection,
         APK_path=str(apk.resolve()), baseline=proof, fixture=metadata, fixture_packages=fixtures,
         dependency_pins_sha256=base.sha(pins_path), dependencies=dependencies, expected=candidate,
         qa=dict(addon=QA, version='1.0.0', archive=qa_zip.name, sha256=base.sha(qa_zip)),
         observer_sha256=base.sha(observer), stage_source_sha256=base.sha(__file__), remote_zip_directory=remote,
-        selected_tests=['normal_zip_module_install_full80_auth', 'actual_wnt_queens_blade_e4_metadata',
-            'actual_wnt_queens_blade_e4_partial_300_seconds_stop', 'save_browse_only_no_history',
-            'existing_infinity_sections_exact_episode_resume', 'explicit_restart_persistence',
+        selected_tests=['normal_zip_module_install_full80_auth', 'actual_typed_parent_save_menu_probe_no_tv_playback',
+            'save_browse_only_no_history', 'explicit_restart_persistence',
             'independent_actual_public_wnt_movie_partial_resume_95_percent_completion_replay',
-            'actual_rezero_e3_e4_native_metadata', 'independent_existing_theme_viewport_capture'],
-        runtime_pending_availability=['actual_public_wnt_movie_source', 'actual_public_wnt_episode_source'],
+            'independent_existing_theme_viewport_capture'],
+        runtime_pending_availability=['actual_public_wnt_movie_source'],
         unselected_or_blocked=['premium_provider_credentials', 'Fold_acceptance', 'shutdown'],
         release_acceptance=False))
 

@@ -30,13 +30,13 @@
     "Android_acceptance": false
   },
   "source_review": "PASS targeted independent Astra preservation review; no actual playback claim",
-  "Android": "PASS original native80 authentication and browse-no-history in42564230119; FAIL test quality-option selection before real AV. No production playback acceptance.",
+  "Android": "PASS normal ZIP/native RSA/full80 and actual WNT AV; FAIL actual E4 identity (provider SDKmovie,-1,-1). Independent cases stopped by observer Stop race; original APK unchanged.",
   "Fold": "NOT_RUN",
   "mandatory_checks": [
     {
       "id": "queens_blade_wnt2",
       "requirement": "Actual WatchNixtoons2 Queen's Blade Episode4 via Infinity TV: five minutes, stop, correct existing progress/Continue/Next/resume",
-      "status": "NOT_RUN_ANDROID"
+      "status": "FAIL_ACTUAL_PROVIDER_TYPED_EPISODE_IDENTITY"
     },
     {
       "id": "cross_entry_rezero_dedup",
@@ -51,12 +51,12 @@
     {
       "id": "exact_movie_episode_identity",
       "requirement": "Actual typed movie and exact show/season/episode identity; uncertain identity playback preserved with reported tracking limitation",
-      "status": "NOT_RUN_ANDROID"
+      "status": "FAIL_E4_PROVIDER_SDK_MOVIE_WITH_UNKNOWN_COORDINATES"
     },
     {
       "id": "player_events",
       "requirement": "Partial, resume, stop, seek, completion and replay through original thresholds/events",
-      "status": "NOT_RUN_ANDROID"
+      "status": "ACTUAL_STARTED_AVSTARTED_STOPPED_OBSERVED; PROGRESS_RESUME_COMPLETION_PENDING"
     },
     {
       "id": "next_episodes",
@@ -115,11 +115,11 @@
     "signing_infrastructure": "Existing owner-gated original signer unchanged; future version must be re-audited/reserved, not assumed"
   },
   "blocker_report": "ANDROID-EXECUTION-BLOCKER.json",
-  "minimum_next_requirement": "Execute corrected real provider AV/identity and genuine Infinity entrypoint checks on qualified stockAPI36r7 using already signed internal CC68 fixture. No new APK/native build or startup qualification repeat. All twelve integrated engineering gates remain required.",
+  "minimum_next_requirement": "Run only missing actual movie/resume/persistence and typed parent menu probe with exact existing signedCC68 on unchanged69; retain wrongtypedE4FAIL42567028842 without replay. Then address confirmed producer identity contradiction safely before any final artifact.",
   "accepted_pointer_updated": false,
   "source_preservation_receipt_sha256": "12503af6ce8700a8785299fa518bdc4110de08e85785541966636d7a1b17e1d2",
   "internal_module_fixture": "PASS original-key full80 CC68 + forward module recoveryCC69 and13 actual Java cases; CC68 actual Android native authentication PASS. Full APK recovery not yet tested.",
-  "Android_selected_run": "42564230119 retained. Correct only source-supported native Select dialog interaction; do not label native launch as Infinity entrypoint.",
-  "observed_identity_boundary": "Current WNT reference emits query-bearing relative show URI; existing local identity helper refuses it. Query grammar proposed only, no production changes or normalized identities. Final actual AV still required before correction choice.",
-  "remaining_test_correction": "CORRECTED_SOURCE_AND11_FOCUSED_HOST_CONTROLS_PASS; actual native dialog/provider execution pending"
+  "Android_selected_run": 42567028842,
+  "observed_identity_boundary": "Actual playing SDK reports movie for TV episode with exact TV ParentPath; local fallback arms movie candidate. Source-supported fail-closed correction proposed, no persisted wrong history observed. Query-bearing parent currently rejected by existing local validator.",
+  "remaining_test_correction": "CORRECTED_SOURCE_REVIEW_AND9_CONTENT_STOP_PLUS6_ADMISSION_CONTROLS_PASS; independent movie Android execution pending"
 }

@@ -15,6 +15,7 @@ import traceback
 from urllib.parse import parse_qs, urlencode, urlsplit
 
 import qualify_android_baseline as base
+from stage_tracking_android import selected_focus
 
 HERE = Path(__file__).resolve().parent
 QA = 'script.infinity.trackingqa'
@@ -197,23 +198,35 @@ def route(parent):
     return 'plugin://' + WNT + '/?' + urlencode(dict(action='actionEpisodesMenu', url=parent))
 
 
+def content_rows(snapshot, optional=False):
+    """One actual visible source-declared Videos content view, never a title match."""
+    base.require(snapshot['window'] == 10025 and snapshot['dialog'] in (0, -1, 9999), 'ACTUAL_UNOBSCURED_VIDEOS_CONTENT_REQUIRED')
+    controls = [control for control in snapshot['primary_controls'] if snapshot['visible_controls'].get(str(control))]
+    base.require(len(controls) <= 1, 'AMBIGUOUS_VISIBLE_PRIMARY_CONTENT_CONTROLS_REJECTED')
+    if not controls and optional:
+        return []
+    base.require(len(controls) == 1, 'ONE_VISIBLE_ORIGINAL_VIDEOS_CONTENT_CONTROL_REQUIRED')
+    control = controls[0]
+    return [dict(row, control=control) for row in snapshot['controls'].get(str(control), [])]
+
+
 def open_directory(device, observer, destination):
     device.rpc('GUI.ActivateWindow', dict(window='videos', parameters=[destination, 'return']))
     def current():
         value = observer.call('snapshot')
-        return value if value['window'] == 10025 and value['dialog'] in (0, -1, 9999) and value['folder'] == destination and value['controls'].get('50') else None
+        return value if value['window'] == 10025 and value['dialog'] in (0, -1, 9999) and value['folder'] == destination and content_rows(value, optional=True) else None
     return until(device, current, 'Actual populated original directory: ' + destination, 90)
 
 
 def exact_episode_row(snapshot, page):
     matches = []
-    for row in snapshot['controls'].get('50', []):
+    for row in content_rows(snapshot):
         parsed = urlsplit(row['file'])
         query = parse_qs(parsed.query)
         if parsed.scheme == 'plugin' and parsed.netloc == WNT and query.get('action') == ['actionResolve']:
             raw = query.get('url', [''])[0]
             if raw == page or raw == 'https://www.wcostream.tv' + page:
-                matches.append(dict(control=50, **{k: row[k] for k in ('index', 'file', 'label')}))
+                matches.append(dict(**{k: row[k] for k in ('control', 'index', 'file', 'label')}))
     base.require(len(matches) == 1, 'EXACT_PUBLISHER_EPISODE_PAGE_NATIVE_ROW_REQUIRED:' + page)
     return matches[0]
 
@@ -251,14 +264,14 @@ def enter_saved_queen_parent(device, observer, before, passed):
     destination = 'plugin://' + WNT + '/?' + urlencode(dict(action='actionCatalogSection', path='/dubbed-anime-list', section='Q'))
     catalog = open_directory(device, observer, destination)
     matches = []
-    for row in catalog['controls'].get('50', []):
+    for row in content_rows(catalog):
         parsed = urlsplit(row['file'])
         query = parse_qs(parsed.query)
         if parsed.netloc == WNT and query.get('action') == ['actionEpisodesMenu'] and query.get('url') in (
                 [QUEEN_PARENT], ['https://www.wcostream.tv' + QUEEN_PARENT]):
             matches.append(row)
     base.require(len(matches) == 1, 'EXACT_ACTUAL_QUEEN_PARENT_CATALOG_ROW_REQUIRED')
-    row = dict(control=50, **{key: matches[0][key] for key in ('index', 'file', 'label')})
+    row = dict(**{key: matches[0][key] for key in ('control', 'index', 'file', 'label')})
     inspected = observer.call('inspect', **row)
     base.require(inspected['actual_gui_item']['media_type'] == 'tvshow', 'ACTUAL_TYPED_PARENT_SHOW_REQUIRED_NO_EPISODE_RELABEL')
     observer.call('context', **row)
@@ -268,13 +281,13 @@ def enter_saved_queen_parent(device, observer, before, passed):
     base.require(progress_rows(before) == progress_rows(saved_state), 'SAVING_ACTUAL_PARENT_ALONE_CREATES_NO_HISTORY')
     saved = saved_source(saved_state, row['file'])[0]
     watchlist = open_directory(device, observer, 'plugin://script.infinity.commandcenter/?action=library&media=tv&bucket=watchlist')
-    cards = [card for card in watchlist['controls'].get('50', []) if card['key'] == saved['key']]
+    cards = [card for card in content_rows(watchlist) if card['key'] == saved['key']]
     base.require(len(cards) == 1, 'UNIQUE_ACTUAL_INFINITY_SAVED_PARENT_CARD_REQUIRED')
-    selected = dict(control=50, **{key: cards[0][key] for key in ('index', 'file', 'label')})
+    selected = dict(**{key: cards[0][key] for key in ('control', 'index', 'file', 'label')})
     observer.call('click', **selected)
     def children():
         snapshot = observer.call('snapshot')
-        return snapshot if snapshot['folder'] == row['file'] and snapshot['dialog'] in (0, -1, 9999) and snapshot['controls'].get('50') else None
+        return snapshot if snapshot['folder'] == row['file'] and snapshot['dialog'] in (0, -1, 9999) and content_rows(snapshot, optional=True) else None
     snapshot = until(device, children, 'Actual Infinity saved parent opens original provider children', 90)
     passed('actual_typed_parent_save_no_history_and_infinity_child_navigation', saved_key=saved['key'],
            selected_parent=inspected, native_saved_card=selected, provider_folder=row['file'])
@@ -297,7 +310,7 @@ def sections(device, observer, out, label):
 def assert_native_projection(snapshot, projection, required_key=None):
     """Compare real existing-hub projection keys with real native GUI card keys."""
     expected = [entry['key'] for entry in projection]
-    actual = [row['key'] for row in snapshot['controls'].get('50', []) if row['key']]
+    actual = [row['key'] for row in content_rows(snapshot) if row['key']]
     base.require(len(expected) == len(set(expected)) and len(actual) == len(set(actual)), 'ONE_NATIVE_CARD_PER_PROJECTED_KEY')
     base.require(set(actual) == set(expected), 'ACTUAL_NATIVE_CARDS_EQUAL_EXISTING_HUB_PROJECTION_KEYS')
     if required_key is not None:
@@ -445,9 +458,9 @@ def run_public_movie(device, observer, out, passed):
         base.require(len(saved) == 1, 'ACTUAL_MOVIE_SAVED_KEY')
         saved_key = saved[0]['key']
         snap = open_directory(device, observer, 'plugin://script.infinity.commandcenter/?action=library&media=movie&bucket=watchlist')
-        matches = [r for r in snap['controls'].get('50', []) if r['key'] == saved_key]
+        matches = [r for r in content_rows(snap) if r['key'] == saved_key]
         base.require(len(matches) == 1, 'ONE_EXACT_MOVIE_SAVED_ROW')
-        row = dict(control=50, **{k: matches[0][k] for k in ('index', 'file', 'label')})
+        row = dict(**{k: matches[0][k] for k in ('control', 'index', 'file', 'label')})
         passed('actual_public_movie_save_only_no_history', key=saved_key)
     else:
         saved_key = None  # Capture final actual classification; never assign it.
@@ -478,9 +491,9 @@ def run_public_movie(device, observer, out, passed):
     passed('actual_public_movie_partial_native_clock_and_stop', stored=stored)
     base.require(saved_key is not None, 'ACTUAL_MOVIE_SAVE_MENU_AVAILABLE_NO_SYNTHETIC_METADATA')
     snap = open_directory(device, observer, 'plugin://script.infinity.commandcenter/?action=library&media=movie&bucket=watchlist')
-    matches = [r for r in snap['controls'].get('50', []) if r['key'] == saved_key]
+    matches = [r for r in content_rows(snap) if r['key'] == saved_key]
     base.require(len(matches) == 1, 'ONE_ACTUAL_MOVIE_RESUME_ROW')
-    row = dict(control=50, **{k: matches[0][k] for k in ('index', 'file', 'label')})
+    row = dict(**{k: matches[0][k] for k in ('control', 'index', 'file', 'label')})
     observer.call('context', **row)
     floor = event_sequence(observer)
     menu_choose(device, observer, 'Resume')
@@ -515,9 +528,9 @@ def run_public_movie(device, observer, out, passed):
     base.require(stored['key'] not in {entry['key'] for entry in completed_view['continue_entries']},
                  'COMPLETED_MOVIE_ABSENT_FROM_ACTUAL_NATIVE_AND_PROJECTED_CONTINUE_AFTER_STOP')
     snap = open_directory(device, observer, 'plugin://script.infinity.commandcenter/?action=library&media=movie&bucket=watchlist')
-    matches = [r for r in snap['controls'].get('50', []) if r['key'] == saved_key]
+    matches = [r for r in content_rows(snap) if r['key'] == saved_key]
     base.require(len(matches) == 1, 'EXACT_COMPLETED_SAVED_MOVIE_REPLAY_ROW')
-    row = dict(control=50, **{k: matches[0][k] for k in ('index', 'file', 'label')})
+    row = dict(**{k: matches[0][k] for k in ('control', 'index', 'file', 'label')})
     observer.call('context', **row)
     floor = event_sequence(observer)
     menu_choose(device, observer, 'Play')
@@ -586,6 +599,8 @@ def run(staged_path, sdk, out):
     base.require(not out.exists(), 'FRESH_SELECTED_ANDROID_EVIDENCE')
     out.mkdir(parents=True)
     staged = base.load(staged_path / 'STAGED.json')
+    selection = selected_focus()
+    base.require(staged.get('selection') == selection, 'CURRENT_COMMITTED_REQUEST_FOCUS_AND_RETAINED_EVIDENCE_REQUIRED')
     base.require(staged['status'] == 'ADMITTED_INPUTS_ONLY_NOT_ANDROID_PASS' and
                  staged['baseline']['apk_sha256'] == base.APK_SHA and
                  staged['observer_sha256'] == base.sha(HERE / 'tracking_android_observer.py') and
@@ -599,9 +614,11 @@ def run(staged_path, sdk, out):
     report = dict(status='RUNNING_SELECTED_TRACKING_ANDROID', cases=[], APK_sha256=base.APK_SHA,
         fixture=staged['fixture'], source=os.environ['GITHUB_SHA'],
         harness_sha256=base.sha(__file__), stage_sha256=staged['stage_source_sha256'], observer_sha256=staged['observer_sha256'],
+        execution_focus=selection['execution_focus'], retained_actual_evidence=selection['retained_actual_evidence'],
+        retained_mandatory_queens_blade='FAIL_ACTUAL_SDK_MOVIE_UNKNOWN_EPISODE',
         premium_families={name: 'NOT_RUN_BLOCKED_REAL_TEST_CREDENTIALS_OR_PLAYABLE_SOURCE_REQUIRED'
                           for name in ('Umbrella', 'POV', 'Seren', 'Otaku', 'The Crew')},
-        movie='NOT_RUN_BLOCKED_REAL_MOVIE_SOURCE_NOT_SELECTED', cross_entry_rezero='NOT_RUN',
+        movie='NOT_RUN', cross_entry_rezero='BLOCKED_RETAINED_UNVERIFIED_METADATA_NOT_REEXECUTED',
         view_theme_matrix='NOT_RUN', module_recovery='NOT_RUN', full_twelve_checks='NOT_RUN',
         shutdown='NOT_SELECTED', Fold='NOT_RUN', release_acceptance=False,
         mandatory_owner_gates=dict(all_supported_families='NOT_RUN_BLOCKED_REAL_AUTH_AND_SOURCES',
@@ -649,13 +666,13 @@ def run(staged_path, sdk, out):
                      auth['manifest_sha256'] == staged['expected']['manifest_sha256'] and auth['cc_version'] == '0.3.5.68', 'DYNAMIC_ORIGINAL_NATIVE_FULL80_CONTROLLER_AUTH')
         passed('normal_zip_install_and_dynamic_original_full80_auth', identity=auth)
         base.crash_free_alive(device)
-        try:
-            saved_key = None
-            saved_kind = None
-            before = observer.call('state')
+        report['cases'].append(dict(case='queens_blade_actual_tv_identity', status='FAIL',
+            retained=True, executed_this_run=False, run=42567028842,
+            error='Retained genuine AV SDK movie/S=-1/E=-1; no TV replay or inferred identity.'))
+        if selection['execution_focus'] == 'independent-movie':
             try:
-                snap, saved_key = enter_saved_queen_parent(device, observer, before, passed)
-                saved_kind = 'tvshow'
+                before = observer.call('state')
+                enter_saved_queen_parent(device, observer, before, passed)
             except Exception as parent_error:
                 report['queens_blade_saved_parent_limitation'] = repr(parent_error)
                 record_case_failure(device, observer, out, report, 'actual_infinity_parent_save_navigation', parent_error)
@@ -664,116 +681,6 @@ def run(staged_path, sdk, out):
                           dict(error=repr(parent_error), actual=parent_snapshot))
                 if parent_snapshot['dialog'] == 12002 and parent_snapshot['heading'] == 'Infinity Tracked':
                     observer.call('ack-parent-identity-refusal')
-                snap = open_directory(device, observer, route(QUEEN_PARENT))
-            row = exact_episode_row(snap, QUEEN_E4)
-            inspected = observer.call('inspect', **row)
-            base.save(out / 'queens-blade-e4-actual-gui-sdk.json', inspected)
-            after_browse = observer.call('state')
-            base.require(progress_rows(before) == progress_rows(after_browse), 'BROWSING_ALONE_CREATES_NO_PROGRESS')
-            passed('real_wnt_catalog_browse_no_history', exact_page=QUEEN_E4, actual_gui_item=inspected['actual_gui_item'])
-            gui_item = inspected['actual_gui_item']
-            valid_episode = gui_item.get('media_type') == 'episode' and gui_item.get('episode') == 4
-            if saved_key is None and valid_episode:
-                observer.call('context', **row)
-                menu_choose(device, observer, 'Add to Watchlist')
-                after_save = until(device, lambda: (s if (s := observer.call('state')) and
-                    len(saved_source(s, row['file'])) == 1 else None), 'Existing episode menu save completed', 20)
-                base.require(progress_rows(before) == progress_rows(after_save), 'SAVING_ALONE_CREATES_NO_PROGRESS')
-                saved = saved_source(after_save, row['file'])
-                base.require(len(saved) == 1, 'EXACT_ACTUAL_ROW_SAVED_BY_EXISTING_MENU')
-                saved_key = saved[0]['key']
-                saved_kind = 'episode'
-                passed('existing_actual_title_save_no_history', key=saved_key)
-                watchlist = open_directory(device, observer, 'plugin://script.infinity.commandcenter/?action=library&media=tv&bucket=watchlist')
-                selected = [r for r in watchlist['controls'].get('50', []) if r['key'] == saved_key]
-                base.require(len(selected) == 1, 'ACTUAL_SAVED_ROW_KEY_UNIQUE')
-                row = dict(control=50, **{k: selected[0][k] for k in ('index', 'file', 'label')})
-            floor = event_sequence(observer)
-            launch_origin = 'existing_infinity_saved_entry' if saved_key is not None else 'native_provider_identity_probe'
-            report['queens_blade_launch'] = dict(launch_origin=launch_origin, saved_key=saved_key, saved_kind=saved_kind,
-                                                actual_selected_file=row['file'])
-            observer.call('click', **row)
-            # Real source chooser, DRM/site errors or missing playable media remain failures;
-            # no fake account/server or substituted clip is supplied.
-            actual = actual_av(device, observer, floor)
-            base.save(out / 'queens-blade-e4-actual-av.json', actual)
-            base.require(actual['item']['media_type'] == 'episode' and actual['item']['episode'] == 4,
-                         'ACTUAL_PUBLISHER_SDK_EPISODE_METADATA_REQUIRED_NO_INFERRED_SEASON_OR_EPISODE')
-            sdk_item = actual['item']
-            base.require(actual['total'] >= 420 and actual['time'] < 30, 'ACTUAL_LONG_ENOUGH_SOURCE_STARTS_BEFORE_30_SECONDS')
-            samples, began, initial = [actual], time.monotonic(), actual['time']
-            while samples[-1]['time'] - initial < 300:
-                base.require(time.monotonic() - began < 420, 'ACTUAL_TV_300_SECOND_MEDIA_CLOCK_BUFFERING_DEADLINE')
-                time.sleep(10)
-                current = observer.call('playing')
-                base.require(current.get('playing') and current['file'] == actual['file'] and
-                             current['item']['episode'] == 4 and current['time'] >= samples[-1]['time'], 'SAME_REAL_MEDIA_CLOCK_NEVER_REGRESSES_WITHOUT_SEEK')
-                samples.append(current)
-                base.save(out / 'queens-blade-e4-real-clock.json', samples)
-            base.require(samples[-1]['time'] - initial >= 300, 'FIVE_MINUTES_ACTUAL_PLAYBACK_CLOCK')
-            active = device.rpc('Player.GetActivePlayers')
-            base.require(len(active) == 1 and active[0]['type'] == 'video', 'ONE_ACTUAL_VIDEO_PLAYER')
-            device.rpc('Player.Stop', dict(playerid=active[0]['playerid']))
-            until(device, lambda: not observer.call('playing')['playing'] and
-                  any(e['event'] == 'Stopped' for e in observer.call('events')), 'Genuine native Stopped callback', 30)
-            state = until(device, lambda: (s if (s := observer.call('state')) and
-                len(matching_source_rows(s, QUEEN_E4)) == 1 else None), 'Existing recorder exact WNT progress', 35)
-            stored = matching_source_rows(state, QUEEN_E4)[0]
-            base.require(stored.get('episode') == 4 and stored.get('season') == sdk_item['season'] and
-                         290 <= float(stored.get('position') or 0) <= samples[-1]['time'] + 15,
-                         'EXACT_ACTUAL_EPISODE_POSITION_NO_METADATA_GUESS')
-            passed('real_wnt_infinity_e4_300_second_clock_stop_progress' if saved_key is not None else
-                   'real_wnt_native_provider_e4_300_second_clock_stop_progress', stored=stored,
-                   launch_origin=launch_origin, callbacks=observer.call('events'))
-            cards = sections(device, observer, out, 'after-wnt-stop')
-            current_state = observer.call('state')
-            for section, field in (('continue', 'continue_entries'), ('progress', 'progress_shows'), ('next', 'next_episodes')):
-                assert_native_projection(cards[section], current_state[field], stored['key'])
-            base.require(current_state['series_proof'].get(stored['key']),
-                         'LIMITATION_ACTUAL_TV_PARENT_SERIES_PROOF_MISSING_NO_INVENTED_SHOW_GROUP')
-            # Unknown/unproved successors must be withheld; do not assert E+1.
-            candidates = state['next_episodes']
-            for entry in candidates:
-                if entry.get('synthetic_next'):
-                    base.require(entry.get('next_verified') is True, 'NO_UNPROVED_SYNTHETIC_SUCCESSOR')
-            passed('actual_existing_unfinished_tv_cards_present_once_no_invented_successor', next_entries=candidates,
-                   key=stored['key'], series_proof=current_state['series_proof'][stored['key']])
-            before_restart = observer.call('state')
-            device.shell('am', 'force-stop', base.PACKAGE)
-            base.require(not device.pids(), 'EXPLICIT_SELECTED_PERSISTENCE_RESTART_STOPPED')
-            report['persistence_restart'] = base.start_once(device, 'progress-persistence', out)
-            observer = Observer(device, out)
-            observer.call('identity')
-            after_restart = observer.call('state')
-            base.require(progress_rows(after_restart) == progress_rows(before_restart) and
-                         after_restart['data'].get('watchlist') == before_restart['data'].get('watchlist'), 'EXISTING_STORE_RELOAD_RETAINS_PROGRESS_AND_SAVED_MEMBERSHIP')
-            passed('explicit_restart_exact_progress_and_membership_persistence')
-            # Resume is an independent actual existing menu path; never seek or add AV restore.
-            base.require(saved_key is not None, 'ACTUAL_GUI_SAVE_METADATA_UNAVAILABLE_NO_INVENTED_SAVED_IDENTITY')
-            resume_route = ('plugin://script.infinity.commandcenter/?action=resume' if saved_kind == 'tvshow' else
-                            'plugin://script.infinity.commandcenter/?action=library&media=tv&bucket=watchlist')
-            watchlist = open_directory(device, observer, resume_route)
-            selected = [r for r in watchlist['controls'].get('50', []) if r['key'] == (stored['key'] if saved_kind == 'tvshow' else saved_key)]
-            base.require(len(selected) == 1, 'EXACT_SAVED_RESUME_ROW')
-            row = dict(control=50, **{k: selected[0][k] for k in ('index', 'file', 'label')})
-            observer.call('context', **row)
-            floor = event_sequence(observer)
-            menu_choose(device, observer, 'Resume')
-            resumed = actual_av(device, observer, floor)
-            exact_resume_observation(resumed, actual, stored, floor)
-            resumed = until(device, lambda: exact_resume_observation(observer.call('playing'), actual, stored, floor),
-                            'Existing exact episode offset settles within actual AV elapsed bound', 20)
-            base.require(resumed['time'] >= stored['position'] - 20, 'EXISTING_EXACT_EPISODE_RESUME_POSITION')
-            base.require(resumed['item']['episode'] == 4 and resumed['item']['season'] == sdk_item['season'], 'NO_OTHER_EPISODE_OFFSET')
-            exact = matching_source_rows(observer.call('state'), QUEEN_E4)
-            base.require(len(exact) == 1 and exact[0]['key'] == stored['key'] and
-                         exact[0]['season'] == sdk_item['season'] and exact[0]['episode'] == 4 and
-                         float(exact[0]['position']) >= float(stored['position']) - 15,
-                         'EXACT_EPISODE_PROGRESS_KEY_POSITION_RETAINED_ON_RESUME')
-            passed('existing_saved_exact_episode_resume_no_harness_seek', actual=resumed)
-            stop_video(device, observer)
-        except Exception as error:
-            record_case_failure(device, observer, out, report, 'queens_blade_e4', error)
         base.crash_free_alive(device)
         try:
             run_public_movie(device, observer, out, passed)
@@ -799,15 +706,13 @@ def run(staged_path, sdk, out):
             record_case_failure(device, observer, out, report, 'independent_recorded_state_persistence', error)
         base.crash_free_alive(device)
         try:
-            capture_rezero_metadata(device, observer, out, passed)
-        except Exception as error:
-            record_case_failure(device, observer, out, report, 'rezero_actual_metadata', error)
-        try:
             report['view_theme_matrix'] = capture_ui(device, observer, out)
         except Exception as error:
             record_case_failure(device, observer, out, report, 'independent_ui_capture', error)
         base.crash_free_alive(device)
         failed = any(case['status'] == 'FAIL' for case in report['cases'])
+        report['focused_execution_status'] = ('FAIL' if any(case['status'] == 'FAIL' and not case.get('retained')
+            for case in report['cases']) else 'PASS_SELECTED_INDEPENDENT_MOVIE_CASES_ONLY')
         report['status'] = ('FAIL_SELECTED_REAL_TRACKING_ANDROID' if failed else
                             'PASS_SELECTED_REAL_WNT_TRACKING_CASES_OTHER_REQUIREMENTS_NOT_RUN')
         # This is deliberately not an all-family/release PASS.

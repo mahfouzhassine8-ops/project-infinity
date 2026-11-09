@@ -15,6 +15,12 @@ WORKFLOW = '.github/workflows/infinity-saved-navigation-android.yml'
 BRANCH = 'work/infinity-tracking-integration-20261108'
 REVIEWED = '2e52b7befd0228a09449f79eaf9774a3946dfa1c'
 MODULE_SOURCE = '9d64ffb84404036ce6e02d6cb160fb004a029b33'
+RETAINED_RUN = 42567028842
+RETAINED_SOURCE = '9b05d1b4bf2283b7adc92f7ef6db0aff3b9fede3'
+RETAINED_ARTIFACT = 13652516052
+RETAINED_DIGEST = '20a7c899f2abdc556e1843fc828d53f8f80d774f18642f7bb512581191c5b240'
+RETAINED_SIZE = 2324287
+RETAINED_DIR = 'evidence/native-av-identity-fail-42567028842/'
 
 
 def require(value, label):
@@ -35,6 +41,21 @@ def git(*args):
     return subprocess.check_output(['git', '-C', str(ROOT), *args], timeout=30)
 
 
+def checked_focus(selected):
+    require(selected.get('execution_focus') == 'independent-movie', 'EXACT_MISSING_MOVIE_FOCUS_ONLY')
+    require(selected.get('retained_actual_evidence') == dict(run=RETAINED_RUN, source=RETAINED_SOURCE,
+        artifact=RETAINED_ARTIFACT, artifact_sha256=RETAINED_DIGEST, artifact_size=RETAINED_SIZE,
+        queens_blade_status='FAIL_ACTUAL_SDK_MOVIE_UNKNOWN_EPISODE',
+        cross_entry_rezero_status='BLOCKED_UNVERIFIED_METADATA', replay_known_wrong_typed_tv=False),
+        'RETAIN_ACTUAL_EPISODE_FAILURE_WITHOUT_REPLAY_OR_PASS')
+    actual = load(HERE / RETAINED_DIR / 'queens-blade-e4-actual-av.json')
+    item = actual['item']
+    require(actual['playing'] is True and item['media_type'] == 'movie' and
+            item['season'] == item['episode'] == -1 and not any(item['ids'].values()) and
+            any(event['event'] == 'AVStarted' for event in actual['events']),
+            'ACTUAL_RETAINED_AV_IS_PLAYABLE_BUT_NOT_VERIFIED_EPISODE')
+
+
 def checked_request():
     selected = load(REQUEST)
     require(selected['operation'] == 'verify-infinity-movies-tv-existing-tracking' and
@@ -52,6 +73,7 @@ def checked_request():
         'dependency-evidence/PUBLIC-MOVIE-INPUT.json',
         'SCOPE.json', 'INTEGRATION-SOURCE-PROOF.json', 'PROJECTION-HOST-RESULT.json', 'ACTUAL-SOURCE-HOST-RESULT.json',
         'evidence/api36-startup-pass-42542862696/EVIDENCE.json',
+        RETAINED_DIR + 'EVIDENCE.json', RETAINED_DIR + 'queens-blade-e4-actual-av.json',
         'evidence/signed-tracking80-42555855742/MODULE-UPGRADE-RECOVERY.json'}
     expected |= {'overlay/script.infinity.commandcenter/' + n for n in ('plugin.py', 'resume_hub.py', 'service.py')}
     prefix = HERE.relative_to(ROOT).as_posix() + '/'
@@ -59,6 +81,7 @@ def checked_request():
     for name, wanted in selected['source_bindings'].items():
         require(sha(ROOT / name) == wanted, 'FROZEN_ANDROID_INPUT:' + name)
     require(sha(ROOT / WORKFLOW) == selected['workflow_sha256'], 'EXACT_ANDROID_WORKFLOW_SOURCE')
+    checked_focus(selected)
     for name in ['overlay/script.infinity.commandcenter/' + n for n in ('plugin.py', 'resume_hub.py', 'service.py')] + [
             'SCOPE.json', 'INTEGRATION-SOURCE-PROOF.json', 'PROJECTION-HOST-RESULT.json', 'ACTUAL-SOURCE-HOST-RESULT.json']:
         path = HERE / name
@@ -112,6 +135,15 @@ def admit(out):
     module = load(HERE / 'TRACKING-MODULE-FIXTURE-PIN.json')
     require(module['run'] == 42555855742 and module['source'] == MODULE_SOURCE and module['workflow_id'] == 397702717 and
             module['APK_build'] is False and module['publication'] is False, 'EXACT_INTERNAL_SIGNED_MODULE_PRODUCER')
+    retained = original.api('actions/runs/' + str(RETAINED_RUN))
+    require(retained['status'] == 'completed' and retained['conclusion'] == 'failure' and
+            retained['head_sha'] == RETAINED_SOURCE and retained['workflow_id'] == 393886994 and
+            retained['path'] == WORKFLOW, 'ORIGINAL_FAILED_EPISODE_PRODUCER_PROVENANCE')
+    artifact = original.api('actions/artifacts/' + str(RETAINED_ARTIFACT))
+    require(artifact['workflow_run']['id'] == RETAINED_RUN and
+            artifact['workflow_run']['head_sha'] == RETAINED_SOURCE and
+            artifact['digest'] == 'sha256:' + RETAINED_DIGEST and artifact['size_in_bytes'] == RETAINED_SIZE,
+            'ORIGINAL_FAILED_EPISODE_ARTIFACT_PROVENANCE')
     signed = original.download(original.SIGNED, out / 'original69')
     fixtures = original.download(module, out / 'signed-modules')
     require(sha(fixtures / 'pair/SOURCE-PINS.json') == module['source_pins_sha256'], 'FROZEN_MODULE_SOURCE_PINS')
@@ -119,6 +151,7 @@ def admit(out):
         APK=str((signed / 'Infinity-2103469-Combined-Original-Signer.apk').resolve()),
         module_fixture=str(fixtures.resolve()), selected_request_sha256=sha(REQUEST),
         qualified_startup_run_reused=42542862696, startup_qualification_repeated=False,
+        execution_focus=selected['execution_focus'], retained_actual_evidence=selected['retained_actual_evidence'],
         application_execution=False, module_producer=module, APK_build=False, publication=False)
     (out / 'ADMISSION.json').write_text(json.dumps(proof, indent=2, sort_keys=True) + '\n')
     print(proof['status'])
