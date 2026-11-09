@@ -1,8 +1,8 @@
 name: Infinity feature-only verification
 on:
   push:
-    branches: [work/infinity-2103402-final-stabilization-20261024, work/infinity-final-corrective-from-2103407-20261025, work/infinity-final-release-462-20261107]
-    paths: ['repairs/infinity-2103402-final/android17/REQUEST.json', 'repairs/infinity-final-closure-2103407/ANDROID17-REQUEST.json', 'repairs/infinity-final-release-462-20261107/SCOPE.json', 'repairs/infinity-final-release-462-20261107/ANDROID-SCOPE.json', 'repairs/infinity-final-release-462-20261107/RELEASE-REQUEST.json']
+    branches: [work/infinity-2103402-final-stabilization-20261024, work/infinity-final-corrective-from-2103407-20261025, work/infinity-final-release-462-20261107, work/infinity-tracking-integration-20261108]
+    paths: ['repairs/infinity-2103402-final/android17/REQUEST.json', 'repairs/infinity-final-closure-2103407/ANDROID17-REQUEST.json', 'repairs/infinity-final-release-462-20261107/SCOPE.json', 'repairs/infinity-final-release-462-20261107/ANDROID-SCOPE.json', 'repairs/infinity-final-release-462-20261107/RELEASE-REQUEST.json', 'repairs/infinity-tracking-integration-2103469-20261108/ANDROID-BASELINE-REQUEST.json']
   workflow_dispatch:
     inputs:
       source_ref:
@@ -19,7 +19,7 @@ on:
         required: true
         type: choice
         default: select-a-feature
-        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host, infinity-performance-android, cobra-owner-host, cobra-android-launch, cobra-cards-baseline, cobra-cards-host, cobra-fold-more433, cobra-rejected434-controls, infinity-seamless-loading434, cobra-drawer436-prepare, cobra-drawer436-android, cobra-quality444-final, external-player447-android, preview-resume448-android, preview-chrome449-android, preview-layout450-android, preview-fullscreen451-android, watchlist-playback-android]
+        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host, infinity-performance-android, cobra-owner-host, cobra-android-launch, cobra-cards-baseline, cobra-cards-host, cobra-fold-more433, cobra-rejected434-controls, infinity-seamless-loading434, cobra-drawer436-prepare, cobra-drawer436-android, cobra-quality444-final, external-player447-android, preview-resume448-android, preview-chrome449-android, preview-layout450-android, preview-fullscreen451-android, watchlist-playback-android, tracking-baseline-android]
       candidate_build:
         description: Existing signed build run (no rebuild)
         required: true
@@ -32,6 +32,100 @@ concurrency:
   group: infinity-feature-${{ inputs.source_ref || github.ref }}-${{ inputs.feature || 'explicit-request' }}-${{ github.ref == 'refs/heads/work/infinity-final-corrective-from-2103407-20261025' && github.sha || 'serial' }}
   cancel-in-progress: false
 jobs:
+  tracking69_qualification:
+    name: Unchanged signed69 stock API36 startup qualification only
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/work/infinity-tracking-integration-20261108' && startsWith(github.event.head_commit.message, 'Qualify tracking69:')) || (github.event_name == 'workflow_dispatch' && inputs.feature == 'tracking-baseline-android')
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {ref: '${{ inputs.source_ref || github.sha }}', fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '21'}
+      - name: Exact baseline-only scope and unchanged reviewed production sources before setup
+        run: |
+          python3 - <<'PYBASELINE'
+          import hashlib,json,os,subprocess
+          from pathlib import Path
+          task=Path('repairs/infinity-tracking-integration-2103469-20261108')
+          def require(value,label):
+              if not value:raise RuntimeError(label)
+          require(os.environ['GITHUB_REPOSITORY']=='mahfouzhassine8-ops/project-infinity','EXACT_REPOSITORY')
+          require(os.environ['GITHUB_REF']=='refs/heads/work/infinity-tracking-integration-20261108','EXACT_INTEGRATION_BRANCH')
+          if os.environ['GITHUB_EVENT_NAME']=='push':
+              event=json.loads(Path(os.environ['GITHUB_EVENT_PATH']).read_text())
+              require(event['head_commit']['message'].startswith('Qualify tracking69:'),'EXACT_STARTUP_PUSH_PREFIX')
+          actual_head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+          require(actual_head==os.environ['GITHUB_SHA'],'EXACT_WORKFLOW_COMMIT_CHECKOUT')
+          reviewed='2e52b7befd0228a09449f79eaf9774a3946dfa1c'
+          for name in ['overlay/script.infinity.commandcenter/service.py','overlay/script.infinity.commandcenter/plugin.py','overlay/script.infinity.commandcenter/resume_hub.py','SCOPE.json','PROJECTION-HOST-RESULT.json','ACTUAL-SOURCE-HOST-RESULT.json','BASELINE-AUTHENTICATION.json']:
+              path=task/name
+              require(path.read_bytes()==subprocess.check_output(['git','show',reviewed+':'+path.as_posix()]),'UNCHANGED_REVIEWED_SOURCE_OR_EVIDENCE:'+name)
+          request=json.loads((task/'ANDROID-BASELINE-REQUEST.json').read_text())
+          require(request['operation']=='qualify-unchanged69-stock-api36-startup' and request['baseline_only'] is True and request['application_startup_only'] is True,'STARTUP_ONLY_SCOPE')
+          require(request['application_feature_tests'] is False and request['shutdown_tests'] is False,'NO_FEATURE_OR_SHUTDOWN_SUITE')
+          require(request['startup_attempts']==3 and request['stable_seconds']==45,'EXACT_FINITE_STARTUP_OBSERVATION')
+          require(request['image']=='system-images;android-36;google_apis;x86_64' and request['image_revision']==7 and request['avd_name']=='infinity-tracking-baseline-api36','EXACT_STOCK_API36_ENVIRONMENT')
+          for name,key in [('qualify_android_baseline.py','harness_sha256'),('ANDROID-BASELINE-HOST-GUARDS.json','host_guard_receipt_sha256')]:
+              require(hashlib.sha256((task/name).read_bytes()).hexdigest()==request[key],'SOURCE_BOUND_STARTUP_HARNESS:'+name)
+          print('PASS unchanged source/40-case evidence; exact stock API36 baseline-only request; no build/signing/feature/shutdown suite')
+          PYBASELINE
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with: {cmdline-tools-version: '15859902', packages: 'platform-tools build-tools;35.0.0 cmdline-tools;22.0', log-accepted-android-sdk-licenses: false}
+      - name: Authenticate and stage exact originally signed69 without modifying its APK or modules
+        run: python3 repairs/infinity-tracking-integration-2103469-20261108/qualify_android_baseline.py admit --request repairs/infinity-tracking-integration-2103469-20261108/ANDROID-BASELINE-REQUEST.json --sdk "$ANDROID_HOME/build-tools/35.0.0" --out tracking-baseline-admission
+      - name: Prepare only disposable host SDK and unchanged pinned emulator support
+        run: |
+          set -euo pipefail
+          sudo apt-get -o Acquire::Retries=3 update -qq
+          sudo apt-get install -y libpulse0
+          python3 - <<'PYSDK'
+          import ast,os,subprocess
+          from pathlib import Path
+          source='a4a89977f085480c720a7b6e73489374d01395dc'
+          path='repairs/four-repair-20261018/android37_gate.py'
+          raw=subprocess.check_output(['git','show',source+':'+path])
+          tree=ast.parse(raw)
+          fn=next(n for n in tree.body if isinstance(n,ast.FunctionDef) and n.name=='pin_tools')
+          namespace={'os':os,'Path':Path,'json':__import__('json')}
+          exec(compile(ast.Module(body=[fn],type_ignores=[]),path,'exec'),namespace)
+          namespace['pin_tools'](os.environ['ANDROID_HOME'],'tracking-baseline-platform')
+          path='repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py'
+          raw=subprocess.check_output(['git','show',source+':'+path])
+          temporary=Path('/tmp/infinity-tracking-baseline-emulator-prepare.py');temporary.write_bytes(raw)
+          subprocess.run(['python3',str(temporary),'--out','tracking-baseline-emulator-setup'],check=True)
+          PYSDK
+          sudo chmod 666 /dev/kvm
+      - uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        timeout-minutes: 20
+        with:
+          api-level: '36'
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disk-size: 10G
+          avd-name: infinity-tracking-baseline-api36
+          disable-animations: false
+          emulator-options: -no-window -memory 4096 -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: python3 repairs/infinity-tracking-integration-2103469-20261108/qualify_android_baseline.py run --request repairs/infinity-tracking-integration-2103469-20261108/ANDROID-BASELINE-REQUEST.json --admission tracking-baseline-admission --out tracking-baseline-results
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity69-API36-Startup-Qualification-${{ github.run_id }}-NOT-TRACKING-OR-FOLD-ACCEPTANCE
+          path: |
+            tracking-baseline-results/
+            tracking-baseline-admission/*.json
+            tracking-baseline-admission/*SIGNATURE*.txt
+            tracking-baseline-admission/INFINITY-MODULES.v1*
+            tracking-baseline-platform/
+            tracking-baseline-emulator-setup/
+          retention-days: 90
+          if-no-files-found: warn
   final464-verified-publication:
     name: Verified original signed464 and matching465 recovery publication; all engineering gates required
     if: github.event_name == 'push' && github.ref == 'refs/heads/work/infinity-final-release-462-20261107' && startsWith(github.event.head_commit.message, 'Publish final464:')
@@ -1812,7 +1906,7 @@ jobs:
           retention-days: 90
           if-no-files-found: error
   android17:
-    if: github.ref != 'refs/heads/work/infinity-final-release-462-20261107' && inputs.feature != 'preview-fullscreen451-android' && inputs.feature != 'preview-layout450-android' && inputs.feature != 'preview-chrome449-android' && inputs.feature != 'preview-resume448-android' && inputs.feature != 'external-player447-android' && inputs.feature != 'infinity-performance-host' && inputs.feature != 'infinity-performance-android' && inputs.feature != 'cobra-owner-host' && inputs.feature != 'cobra-android-launch' && inputs.feature != 'cobra-cards-baseline' && inputs.feature != 'cobra-cards-host' && inputs.feature != 'cobra-fold-more433' && inputs.feature != 'cobra-rejected434-controls' && inputs.feature != 'infinity-seamless-loading434' && inputs.feature != 'cobra-drawer436-prepare' && inputs.feature != 'cobra-drawer436-android' && inputs.feature != 'cobra-quality444-final' && inputs.feature != 'watchlist-playback-android'
+    if: github.ref != 'refs/heads/work/infinity-final-release-462-20261107' && !(github.event_name == 'push' && github.ref == 'refs/heads/work/infinity-tracking-integration-20261108') && inputs.feature != 'tracking-baseline-android' && inputs.feature != 'preview-fullscreen451-android' && inputs.feature != 'preview-layout450-android' && inputs.feature != 'preview-chrome449-android' && inputs.feature != 'preview-resume448-android' && inputs.feature != 'external-player447-android' && inputs.feature != 'infinity-performance-host' && inputs.feature != 'infinity-performance-android' && inputs.feature != 'cobra-owner-host' && inputs.feature != 'cobra-android-launch' && inputs.feature != 'cobra-cards-baseline' && inputs.feature != 'cobra-cards-host' && inputs.feature != 'cobra-fold-more433' && inputs.feature != 'cobra-rejected434-controls' && inputs.feature != 'infinity-seamless-loading434' && inputs.feature != 'cobra-drawer436-prepare' && inputs.feature != 'cobra-drawer436-android' && inputs.feature != 'cobra-quality444-final' && inputs.feature != 'watchlist-playback-android'
     name: Selected feature ${{ inputs.feature || 'explicit baseline Search request' }}
     runs-on: ubuntu-22.04
     timeout-minutes: 150

@@ -26,5 +26,17 @@
   "new_workflow_dispatches": 0,
   "new_builds": 0,
   "new_signatures": 0,
-  "sourcecode_fixes_for_startup": "NONE: outside tracking scope and cause unproved"
+  "sourcecode_fixes_for_startup": "NONE: outside tracking scope and cause unproved",
+  "selected_new_comparison": {
+    "operation": "qualify-unchanged69-stock-api36-startup",
+    "image": "system-images;android-36;google_apis;x86_64",
+    "image_revision": 7,
+    "production_APK_changed": false,
+    "status": "REQUEST_REVIEWED_PENDING_ACTUAL_EXECUTION",
+    "startup_attempts": 3,
+    "stable_seconds": 45,
+    "scope": "Original69 native startup only, not tracking or Fold clearance",
+    "reviewed_request": "ANDROID-BASELINE-REQUEST.json",
+    "constructor_evidence": "STARTUP-CONSTRUCTOR-EVIDENCE.json"
+  }
 }
