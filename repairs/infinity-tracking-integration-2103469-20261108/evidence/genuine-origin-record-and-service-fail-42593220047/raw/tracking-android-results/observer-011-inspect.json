@@ -1,0 +1,72 @@
+{
+  "bootstrap_phases": [
+    {
+      "monotonic": 280.864744058,
+      "phase": "NATIVE_IDENTITY_BEGIN"
+    },
+    {
+      "monotonic": 280.990017306,
+      "phase": "NATIVE_FULL80_IDENTITY_ACCEPTED"
+    },
+    {
+      "monotonic": 286.071862262,
+      "phase": "EXPECTED_FULL80_SOURCE_MAP_ACCEPTED"
+    },
+    {
+      "monotonic": 287.37307464,
+      "phase": "INSTALLED_VERIFIED_BOOTSTRAP_SOURCE_EXECUTED"
+    },
+    {
+      "monotonic": 287.583023831,
+      "phase": "ORIGINAL_IMPORT_GUARD_ACTIVE_BEFORE_CONTROLLER_IMPORT"
+    },
+    {
+      "monotonic": 287.693598778,
+      "phase": "CONTROLLER_ACCESS_IMPORTED_THROUGH_ORIGINAL_GUARD"
+    },
+    {
+      "monotonic": 292.936883876,
+      "phase": "NATIVE_IDENTITY_BEGIN"
+    },
+    {
+      "monotonic": 293.083010443,
+      "phase": "NATIVE_FULL80_IDENTITY_ACCEPTED"
+    },
+    {
+      "monotonic": 293.781282391,
+      "phase": "EXPECTED_FULL80_SOURCE_MAP_ACCEPTED"
+    },
+    {
+      "monotonic": 293.784847927,
+      "phase": "EXISTING_AUTHENTICATED_BOOTSTRAP_GUARD_ACCEPTED"
+    },
+    {
+      "monotonic": 293.786747042,
+      "phase": "ORIGINAL_IMPORT_GUARD_ACTIVE_BEFORE_CONTROLLER_IMPORT"
+    },
+    {
+      "monotonic": 293.787112313,
+      "phase": "CONTROLLER_ACCESS_IMPORTED_THROUGH_ORIGINAL_GUARD"
+    }
+  ],
+  "passed": true,
+  "pid": 6118,
+  "result": {
+    "actual_gui_item": {
+      "episode": -1,
+      "episode_raw": "",
+      "ids": {
+        "imdb": "",
+        "tmdb": "",
+        "tvdb": ""
+      },
+      "label": "Queen's Blade",
+      "media_type": "tvshow",
+      "path": "plugin://plugin.video.watchnixtoons2/?action=actionEpisodesMenu&url=%2fanime%2fqueen-s-blade%3fseason%3dall%26lang%3ddub",
+      "season": -1,
+      "season_raw": ""
+    },
+    "live_native_file": "plugin://plugin.video.watchnixtoons2/?action=actionEpisodesMenu&url=%2fanime%2fqueen-s-blade%3fseason%3dall%26lang%3ddub"
+  },
+  "sequence": 11
+}

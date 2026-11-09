@@ -1779,6 +1779,33 @@ def _consume_home_runtime_sync(now):
         return False
 
 
+def _tick_loading_observer(loading, owner, foreground=True):
+    """A retired UI window must not retire the resident playback observer."""
+    try:
+        return loading.tick(foreground=foreground)
+    except RuntimeError as error:
+        if str(error) != 'Window id does not exist':
+            raise
+        terminal = error.__traceback__
+        while terminal.tb_next is not None:
+            terminal = terminal.tb_next
+        relative = 'script.infinity.commandcenter/action_loading.py'
+        loader = getattr(owner, '__loader__', None)
+        context = getattr(owner, '_context', None)
+        if (_infinity_contract.files.get(relative) != '8b758bba6eabd7a051213834c136a81d52c6af819ff9c6d7d1f456a45be4474f' or
+                not isinstance(loader, _infinity_contract_module._SourceLoader) or loader.contract is not _infinity_contract or
+                getattr(owner, '__file__', None) != str(_infinity_contract.root / relative) or
+                getattr(context, '__globals__', None) is not owner.__dict__ or
+                terminal.tb_frame.f_code is not getattr(context, '__code__', None) or
+                terminal.tb_lineno != context.__code__.co_firstlineno + 31):
+            raise
+        # This pinned source's _context +31 is exactly its FrameControls read.
+        # Keep the original loader/current-generation gate; no UI reset/retry.
+        _infinity_contract.current()
+        log('Loading presentation deferred: observed window retired')
+        return None
+
+
 def main():
     startup = time.monotonic()
     hub.trace_timing('service_start')
@@ -1806,8 +1833,8 @@ def main():
         'progress_lock': PROGRESS_LOCK,
     })
     player.experience = experience
-    from action_loading import make_monitor
-    loading = make_monitor(xbmc, xbmcgui)
+    import action_loading as loading_owner
+    loading = loading_owner.make_monitor(xbmc, xbmcgui)
     normal_return = NormalReturnController()
     display_reflow = DisplayReflowController()
     from media_view import MediaViewPreference
@@ -1846,7 +1873,7 @@ def main():
                 log("Watched presentation deferred: " + type(error).__name__)
         now = time.monotonic()
         if not foreground_gate.visible():
-            loading.tick(foreground=False)
+            _tick_loading_observer(loading, loading_owner, foreground=False)
             if suspended_at is None:
                 suspended_at = now
             experience.background_tick(now)
@@ -1856,7 +1883,7 @@ def main():
         if suspended_at is not None:
             stability.started += now - suspended_at
             suspended_at = None
-        loading.tick()
+        _tick_loading_observer(loading, loading_owner)
         media_views.tick()
         _consume_home_observer_epoch()
         _consume_home_runtime_sync(now)

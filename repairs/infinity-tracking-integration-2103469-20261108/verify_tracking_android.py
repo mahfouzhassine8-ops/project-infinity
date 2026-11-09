@@ -632,7 +632,7 @@ def breadcrumb(trace, name, **observed):
     trace.append(dict(step=name, observed_epoch=time.time(), **observed))
 
 
-def infinity_section(device, observer, media, bucket, trace):
+def infinity_section(device, observer, media, bucket, trace, known_history=()):
     """Native Home9000 -> existing first-party root -> real section row."""
     device.rpc('Input.Home')
     section = 'trakttv' if media == 'tv' else 'traktmovies'
@@ -645,10 +645,26 @@ def infinity_section(device, observer, media, bucket, trace):
     snap, row = until(device, home, 'Actual visible first-party Infinity Home selection', 45)
     observed = observer.call('home-select', index=row['index'], label=row['label'], section=section, hubsource='infinity')
     breadcrumb(trace, 'home', native=observed, window=snap['window'])
+    history_back = []
+    trace[-1]['native_history_back'] = history_back
+    returned_from = set()
     action = 'tv' if media == 'tv' else 'movies'
     def root():
         current = observer.call('snapshot')
-        return current if current['window'] == 10025 and current['dialog'] in (0, -1, 9999) and route_matches(current['folder'], action=action) and content_rows(current, optional=True) else None
+        if history_back and 'observed_to' not in history_back[-1] and current['folder'] != history_back[-1]['observed_from']:
+            history_back[-1]['observed_to'] = current['folder']
+        if current['window'] != 10025 or current['dialog'] not in (0, -1, 9999): return None
+        rows = content_rows(current, optional=True)
+        if route_matches(current['folder'], action=action) and rows: return current
+        # Original Home onclick uses ActivateWindow(...,return), which may
+        # restore the observed saved child/section. Follow only that real history.
+        if (rows and current['folder'] in known_history and current['folder'] not in returned_from and
+                len(history_back) < 3):
+            returned_from.add(current['folder'])
+            history_back.append(dict(observed_from=current['folder'], window=current['window'],
+                dialog=current['dialog'], focused_control=current['focused_control'], action='Input.Back'))
+            device.rpc('Input.Back')
+        return None
     root_snapshot = until(device, root, 'Actual first-party Infinity root', 60)
     breadcrumb(trace, 'root', folder=root_snapshot['folder'], window=root_snapshot['window'])
     matches = [row for row in content_rows(root_snapshot) if route_matches(row['file'], action='library', media=media, bucket=bucket)]
@@ -740,6 +756,7 @@ def run_origin_scenario(device, observer, out, media, scenario, persist):
     scenario['steps']['fixture_preparation'] = dict(status='PASS', key=saved['key'], source=saved['source'])
     scenario['last_step'] = 'infinity_origin'; persist()
     watchlist = infinity_section(device, observer, media, 'watchlist', trace)
+    known_history = [watchlist['folder']]
     cards = [row for row in content_rows(watchlist) if row['key'] == saved['key']]
     base.require(len(cards) == 1, 'ACTUAL_SAVED_WATCHLIST_CARD_REQUIRED')
     selected = cards[0]
@@ -751,6 +768,7 @@ def run_origin_scenario(device, observer, out, media, scenario, persist):
             snap = observer.call('snapshot')
             return snap if snap['window'] == 10025 and snap['dialog'] in (0, -1, 9999) and snap['folder'] == saved['source'] and content_rows(snap, optional=True) else None
         child_snapshot = until(device, children, 'Actual saved Queen parent episode list', 90)
+        known_history.append(child_snapshot['folder'])
         selected = exact_episode_row(child_snapshot, QUEEN_E4)
         breadcrumb(trace, 'child', folder=child_snapshot['folder'], selected=selected)
     floor = event_sequence(observer)
@@ -799,7 +817,9 @@ def run_origin_scenario(device, observer, out, media, scenario, persist):
     scenario['last_step'] = 'tracking_sections'; persist()
     for bucket, field in ([('progress', 'progress_shows'), ('next', 'next_episodes'), ('continue', 'continue_entries')] if media == 'tv' else [('continue', 'continue_entries')]):
         section_trace = []
-        cards = infinity_section(device, observer, media, bucket, section_trace)
+        scenario.setdefault('tracking_navigation', []).append(section_trace)
+        cards = infinity_section(device, observer, media, bucket, section_trace, known_history=known_history)
+        known_history.append(cards['folder'])
         current_state = observer.call('state')
         projection = [entry for entry in current_state[field] if entry.get('media') == media]
         try:
@@ -814,7 +834,9 @@ def run_origin_scenario(device, observer, out, media, scenario, persist):
         device.screenshot(media + '-' + bucket)
     scenario['successor'] = 'NOT_ASSERTED_WITHOUT_EXISTING_VERIFIED_ORDERING; unfinished current source required'
     scenario['last_step'] = 'resume'; persist()
-    cards = infinity_section(device, observer, media, 'continue', [])
+    resume_trace = []
+    scenario['resume_navigation'] = resume_trace
+    cards = infinity_section(device, observer, media, 'continue', resume_trace, known_history=known_history)
     matches = [row for row in content_rows(cards) if row['key'] == stored['key']]
     functional(len(matches) == 1, 'ONE_EXACT_REAL_INFINITY_CONTINUE_CARD_REQUIRED')
     observer.call('context', **row_request(matches[0]))

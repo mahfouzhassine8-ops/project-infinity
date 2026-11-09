@@ -1,0 +1,56 @@
+{
+  "APK": "/home/runner/work/project-infinity/project-infinity/tracking-android-admission/original69/files/Infinity-2103469-Combined-Original-Signer.apk",
+  "APK_build": false,
+  "application_execution": false,
+  "automatic_retries": 0,
+  "direct_provider_acceptance": false,
+  "execution_focus": "infinity-origin-acceptance",
+  "maximum_new_attempts": 1,
+  "module_fixture": "/home/runner/work/project-infinity/project-infinity/tracking-android-admission/signed-modules/files",
+  "module_producer": {
+    "APK_build": false,
+    "APK_present": false,
+    "Android": "NOT_RUN",
+    "candidate_CC": "0.3.5.70",
+    "digest": "sha256:22913a51131eb30509f2bf58b679232c4b1195a52750e89f865f06266f51e37a",
+    "fixture_packages": [
+      {
+        "CC": "0.3.5.70",
+        "archive": "script.infinity.commandcenter-0.3.5.70-INTERNAL-ANDROID-FIXTURE.zip",
+        "modules_path": "pair/2103472/modules",
+        "recovery": false,
+        "sha256": "5cb6b2c790f34d7c4fb09d09fd540934b0b71eaaf26badd10d76be89100c19ff",
+        "versionCode": 2103472
+      },
+      {
+        "CC": "0.3.5.71",
+        "archive": "script.infinity.commandcenter-0.3.5.71-INTERNAL-ANDROID-FIXTURE.zip",
+        "modules_path": "pair/2103473/modules",
+        "recovery": true,
+        "sha256": "94c97444f8be64fba22ab89d45d0a3fc5b947789b619432064ca3596b0b43aee",
+        "versionCode": 2103473
+      }
+    ],
+    "id": 13659704122,
+    "independent_review": "Astra public RSA/all80/member preservation +4 CI case/sourcepin proof; no Java/app rerun",
+    "installed_target_versionCode": 2103469,
+    "metadata_production_field": "production_source",
+    "name": "Infinity69-Tracking80-Original-Signed-Modules-42588102830-INTERNAL-NOT-APK-OR-ACCEPTANCE",
+    "production_source_checkpoint": "e410f30ba9e38182e4e77810e5237e5442cbd31a",
+    "publication": false,
+    "recovery_CC": "0.3.5.71",
+    "run": 42588102830,
+    "size_in_bytes": 1304003,
+    "source": "ce88dc9dd16aad4d0bdd2e4f9ce1bcbb9f203cd4",
+    "source_pins_sha256": "5686b7687185b717be2c68815ec2ea5894219a0746e46c3d8fe0df18625da8f5",
+    "workflow_id": 397702717,
+    "workflow_path": ".github/workflows/infinity-combined-release.yml"
+  },
+  "publication": false,
+  "qualified_startup_run_reused": 42542862696,
+  "retained_environment_failure_run": 42570831467,
+  "selected_request_sha256": "2160781e32b348674dd2d1387061c63a24d153ae13e8a454be6e6ea2ab7fb7d7",
+  "source": "7a98ff8daef96b09aba84691625aa556f40b01df",
+  "startup_qualification_repeated": false,
+  "status": "PASS_SELECTED_TRACKING_ANDROID_INPUT_ADMISSION_ONLY"
+}

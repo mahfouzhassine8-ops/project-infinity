@@ -86,3 +86,18 @@ Movie catalogue F was not independently tested: the retained lifecycle log line2
 ```sh
 python repairs/infinity-tracking-integration-2103469-20261108/test_origin_recorded_content_readiness.py
 ```
+
+## Selected service-survival and native-return correction (before new guards)
+
+Retain the genuine42593220047 Infinity TV origin/AV/304.257-second clock/307.902 exact validated episode record and its proved parent unchanged. That five-minute proof is not a setup task to repeat. Native Home `ActivateWindow(...,return)` legitimately restored the saved episode directory; Kodi's unchanged GUIMediaWindow517–542 preserves the nested path for the same startDirectory. The driver may follow only bounded actual native Back through already observed saved-child/CC-section history to the actual first-party root. Every from/to path and action is captured. Unknown paths, modals, cycles and paths beyond three Back actions remain blocked; no raw activation substitutes for origin and no production navigation changes.
+
+The same run's resident service exited on the exact original action_loading FrameControls window lookup before movie AV, so movie record/resume needs a correction-specific attempt after service survival is repaired. The production delta is service.py only: one optional loading tick boundary helper defers exact RuntimeError “Window id does not exist” only when the terminal traceback code object is the authenticated unchanged action_loading._context and the terminal line is its pinned FrameControls read. Its original source SHA, canonical file, original verified loader and current contract must match. Other messages, other code/read sites, later tick errors and changed/retired loader generations propagate. Both original foreground arguments are forwarded; there is no loading reset, background substitution, retry, player/writer/threshold/checkpoint/lifecycle change or action_loading edit.
+
+Select only these NEW host guard files before execution. `test_loading_window_survival.py` executes original action_loading source/code objects through its original source loader with an explicit host contract double; it tests normal True/False forwarding, the recorded native-SDK throw site returning so the original loop can continue, wrong message/read/code/later tick propagation, untrusted/changed source and retired-generation refusal. The host Python SDK adds a traceback frame that native C++ does not; only that host-double frame is removed to model the exact recorded terminal code object. No installed import guard or module is reset or patched. `test_origin_native_return_history.py` tests only actual-action routing boundaries: known saved child/section Back chain, unknown/modal refusal, cycle refusal and three-action cap. These are source-bound host controls, not app playback or Android acceptance. Retain old40/14 and all prior runtime receipts; do not rerun them.
+
+```sh
+python test_loading_window_survival.py
+python test_origin_native_return_history.py
+```
+
+First freeze this minimal source and host proof for independent review. A later root-selected runtime attempt can reuse the retained five-minute evidence and use a short eligible genuine TV playback to populate the isolated profile for new GUI/resume/service-lifetime assertions. Completion/replay/restart/view selections, any new signed fixture, experimental APK and forward recovery remain root-owned follow-up work; this change does not dispatch/sign/build or broaden the application test.
