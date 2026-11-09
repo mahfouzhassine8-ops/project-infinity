@@ -1,0 +1,95 @@
+{
+  "all_bindings_match": true,
+  "apks": {
+    "2103469": {
+      "APK_sha256": "804eebc57af2e4ef4e5418b56994bda64eb7fd7e7f2c0653b5c6e2a9f7833058",
+      "APK_size": 780149833,
+      "BUILD_RECEIPT_sha256": "e17a97ec93b477668ff34f7562ada3a9b6c13f5525558c2562b24c97ec0b8bce",
+      "SIGNATURE_sha256": "daf0259134728e4bc6a7f29d66e669f8312ef87c0ed4627c2d95adebc21421b2",
+      "actual_payload7764_matches_prepared": "BASELINE_REUSED",
+      "all80_expected_source_hashes_and_manifest_match": true,
+      "embedded_original_cert_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+      "five_DEX_byte_identical_original69": true,
+      "generation": 56,
+      "native_sha256": "ee3be7c7a95b86f8357539001fcd50bedbd80217b02f130d649f7f57e6075794",
+      "registry_sha256": "dc06fef6103d286fa09cd1fa30b12dd4f6bc8bc57eb7eaf23e1f4ece0ecb4a4f",
+      "source": "a76e29b84996304241e6b309d56a31e6659ad190"
+    },
+    "2103474": {
+      "APK_sha256": "c4e8ec4dae7e296578bfbfe2f705cf8fc51bbb96f7884e103717c444ffc75894",
+      "APK_size": 780149833,
+      "BUILD_RECEIPT_sha256": "21916102baed5d5f60a1713df33d2670e1ad5f22a07519c35065f058e81aa8ec",
+      "SIGNATURE_sha256": "daf0259134728e4bc6a7f29d66e669f8312ef87c0ed4627c2d95adebc21421b2",
+      "actual_payload7764_matches_prepared": true,
+      "all80_expected_source_hashes_and_manifest_match": true,
+      "embedded_original_cert_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+      "five_DEX_byte_identical_original69": true,
+      "generation": 58,
+      "native_sha256": "ee3be7c7a95b86f8357539001fcd50bedbd80217b02f130d649f7f57e6075794",
+      "registry_sha256": "4912c9aeedf8b7ac32174fec774f46c9dfd5fef7eea83b384e2d17d84c3a76db",
+      "source": "ab95df440018a32032cdb382fc52f59d5afb4fe7"
+    },
+    "2103475": {
+      "APK_sha256": "f11c9373f253f1c9b2059a0d8e49e50ff961879fd26ed2e1d0c82c04a448207e",
+      "APK_size": 780149833,
+      "BUILD_RECEIPT_sha256": "27cd9c73cd8fa8b1c3fd82522b0e07053c5e48a449014530bd5c193bf07d82f4",
+      "SIGNATURE_sha256": "daf0259134728e4bc6a7f29d66e669f8312ef87c0ed4627c2d95adebc21421b2",
+      "actual_payload7764_matches_prepared": true,
+      "all80_expected_source_hashes_and_manifest_match": true,
+      "embedded_original_cert_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+      "five_DEX_byte_identical_original69": true,
+      "generation": 59,
+      "native_sha256": "ee3be7c7a95b86f8357539001fcd50bedbd80217b02f130d649f7f57e6075794",
+      "registry_sha256": "a4594f07350f4f598f6f93063b6985baad4cd2f490667bea4f002a4ad617b723",
+      "source": "ce478cbd719c6fbb103632d558334184c3b5ff8e"
+    }
+  },
+  "concrete_blockers": [],
+  "exact75_predecessor_signed74_registry": true,
+  "limits": [
+    "No apps/tests/build/sign/dispatch executed by reviewer.",
+    "New74/75 actual startup/in-place installation/data retention/functional recovery remain NOT_RUN pending selected experiment.",
+    "Prior C1 constructor failure/unverified tracking/Fold behavior remain explicit; packaging match is not owner delivery clearance."
+  ],
+  "module_public_review_reused_sha256": "25d39f9964ecbeee941873efa7af26013391ed38bd054611eed48b19f86e7a4d",
+  "official_signed_pair": {
+    "2103474": {
+      "artifact": {
+        "id": 13672253204,
+        "name": "Infinity-Tracking-Experimental-Original-Signed-2103474-42615752695-INTERNAL-QA",
+        "sha256": "65c548ac2abbab49591ec76cc5b34d59811652a909434b06ab086eac25aaa095",
+        "size": 329134351
+      },
+      "conclusion": "success",
+      "run_id": 42615752695,
+      "source": "ab95df440018a32032cdb382fc52f59d5afb4fe7",
+      "workflow_id": 397702717,
+      "workflow_path": ".github/workflows/infinity-combined-release.yml"
+    },
+    "2103475": {
+      "artifact": {
+        "id": 13671998939,
+        "name": "Infinity-Tracking-Experimental-Original-Signed-2103475-42616590591-INTERNAL-QA",
+        "sha256": "37a0414e82f5df75fe36fc16f78d05ef46180ed9d10f6cc5e7c550d528d97f9d",
+        "size": 329128232
+      },
+      "conclusion": "success",
+      "run_id": 42616590591,
+      "source": "ce478cbd719c6fbb103632d558334184c3b5ff8e",
+      "workflow_id": 397702717,
+      "workflow_path": ".github/workflows/infinity-combined-release.yml"
+    }
+  },
+  "owner_delivery_cleared": false,
+  "prepared_review_reused_sha256": "ae3464b99f221f805406c99c86351e131b7971d7e603e2bd599f6475bb76e9a2",
+  "protected_local_refs": [
+    "refs/heads/locks/infinity-tracking-e410f30b-20261109 e410f30ba9e38182e4e77810e5237e5442cbd31a"
+  ],
+  "request_sha256": "7b35b23b91059ffd41273e1e89c29e8fa3820b480427f45c4887e8124f64a6bd",
+  "review_note": "Read-only member-vector inspection explicitly includes the five DEX files in addition to7764 component payload members and three signing entries.",
+  "reviewed_at_utc": "2026-11-09T12:32:25.319982+00:00",
+  "runtime_acceptance": false,
+  "signature_verification": "Source-bound originalCI apksigner v1/v2/v3 verification receipts reused; actual single embedded original cert fingerprint independently checked. No private-key use or local APK signing.",
+  "source_bindings": 16,
+  "status": "PASS_ACTUAL_SIGNED_PAIR_AND_SELECTED_INSTALL_INPUT_BINDINGS_PACKAGING_ONLY"
+}
