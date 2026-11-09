@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "scope": "disposable emulator setup only",
+  "application_test_retried": false,
+  "attempts": [
+    {
+      "attempt": 1,
+      "exit_code": 0,
+      "observed_invalid_emulator_zip": false,
+      "log": "sdkmanager-attempt-1.log"
+    }
+  ],
+  "loader_dependencies": {
+    "exit_code": 1,
+    "log": "emulator-loader-dependencies.log",
+    "missing": []
+  },
+  "emulator_revision": "37.2.13",
+  "version_command": {
+    "exit_code": 0,
+    "output": "Android emulator version 37.2.13.0 (build_id 16740729) (CL:N/A)\nCopyright (C) 2006-2024 The Android Open Source Project and many others.\nThis program is a derivative of the QEMU CPU emulator (www.qemu.org).\n\n  This software is licensed under the terms of the GNU General Public\n  License version 2, as published by the Free Software Foundation, and\n  may be copied, distributed, and modified under those terms.\n\n  This program is distributed in the hope that it will be useful,\n  but WITHOUT ANY WARRANTY; without even the implied warranty of\n  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n  GNU General Public License for more details.\n\n",
+    "log": "emulator-version.log"
+  },
+  "executable_revision": "37.2.13.0"
+}

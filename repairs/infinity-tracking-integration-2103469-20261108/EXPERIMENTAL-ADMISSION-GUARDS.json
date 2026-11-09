@@ -1,0 +1,87 @@
+{
+  "application_or_native_or_APK_execution": false,
+  "count": 11,
+  "final_actual_disposition_binding": {
+    "application_or_APK_execution": false,
+    "clearance_sha256": "49e779f8d12a3325382187a63c77d77dc48c93fcdbacde3f652aa8f2cbd11b9e",
+    "generic_full_schema2_pass_refused": true,
+    "module_generator_noncore_AST_and_historical_inputs": "UNCHANGED",
+    "status": "PASS_ROOT_RECORD_AND13_EVIDENCE_HASHES"
+  },
+  "not_selected": [
+    "Original17inputguards",
+    "Old40/14/9behaviorhosttests",
+    "Java4/13installer suites",
+    "APKassembly/signing",
+    "Application/native/emulator execution",
+    "Versionauthoritymutation"
+  ],
+  "results": [
+    {
+      "case": "exact_actual_C1_blocked_outcome_and_explicit_owner_admitted",
+      "status": "PASS_METADATA_SOURCE_GUARD_ONLY"
+    },
+    {
+      "case": "fake_featurePASS_refused",
+      "status": "REFUSED_AS_REQUIRED"
+    },
+    {
+      "case": "changed_ownerhash_refused",
+      "status": "REFUSED_AS_REQUIRED"
+    },
+    {
+      "case": "missing_explicit_blocked_permission_refused",
+      "status": "REFUSED_AS_REQUIRED"
+    },
+    {
+      "case": "changed_native_outcomehash_refused",
+      "status": "REFUSED_AS_REQUIRED"
+    },
+    {
+      "case": "changed_C1source_refused",
+      "status": "REFUSED_AS_REQUIRED"
+    },
+    {
+      "case": "future_actual_fourPASS_route_retained",
+      "status": "PASS_METADATA_SOURCE_GUARD_ONLY"
+    },
+    {
+      "case": "pre_sign_fake_APKPASS_refused",
+      "status": "REFUSED_AS_REQUIRED"
+    },
+    {
+      "case": "all_noncore_prepare_nodes_and_historical_moduleinputs_unchanged",
+      "status": "PASS_METADATA_SOURCE_GUARD_ONLY"
+    },
+    {
+      "case": "disabled_APKrequest_refuses_before_import",
+      "status": "REFUSED_AS_REQUIRED"
+    },
+    {
+      "case": "new_manual_workflow_routing_inline_syntax_originaljobs_signer_env_previously_checked",
+      "status": "PASS_METADATA_SOURCE_GUARD_ONLY"
+    }
+  ],
+  "scope": "Only new runtime-blocked disposition, disabled APK requests, separate-producer source guard and two manual original-workflow routes",
+  "selected": [
+    "Accept exactsource native-blockedexperimental disposition withoutfakefeaturePASS",
+    "Refuse missingownerpermission, wrongownerhash/source/outcome orfakefeaturePASS",
+    "RetainfutureactualfourPASS route andrefusepre-signclaimedAPKPASS",
+    "RequireallnoncoreprepareASTidenticaltosignedmoduleproducer583d",
+    "DisablednewAPKrequestsrefusebeforeimport/build",
+    "Two manualjobrouting/inlinePython syntax; allpriorjobs/originalsigneridentity bytepreserved"
+  ],
+  "source_path_correction_selection": {
+    "APK_or_app_or_key_execution": false,
+    "cases": [
+      "All sign helper/request/audit copy literals remain3469 source path; version artifactdirs74/75 retained",
+      "Actual3469 registrationhelper+APKprepare request sourceSHA loop precedes downloadhelper andoriginalsigner",
+      "Preflight/registration/copy shareone exact426022auditevidencepath",
+      "Relocated3475helper failsbefore source/API/key use",
+      "Originalalljobs unchanged except2dispatchchoices; originalassembler signerCLI/env unchanged"
+    ],
+    "selected_before_execution": true,
+    "status": "PASS_FIVE_FOCUSED_PATH_AND_ORIGINAL_SOURCE_GUARDS"
+  },
+  "status": "PASS_FOCUSED_NEW_DISPOSITION_AND_MANUAL_ROUTE_GUARDS"
+}

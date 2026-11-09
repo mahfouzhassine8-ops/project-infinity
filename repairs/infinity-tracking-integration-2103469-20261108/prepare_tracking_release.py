@@ -369,36 +369,66 @@ def inputs(apk, prepared, admission_file, out):
 
 def core_clearance(proof, source_map):
     path = HERE / 'EXPERIMENTAL-RELEASE-CLEARANCE.json'
-    require(path.is_file(), 'ACTUAL_CORE_MOVIE_SERVICE_TV_CLEARANCE_REQUIRED')
+    require(path.is_file(), 'ROOT_REVIEWED_EXPERIMENTAL_DISPOSITION_REQUIRED')
     value = load(path)
-    require(value['status'] == 'ROOT_REVIEWED_EXPERIMENTAL_CORE_CLEARANCE' and
-            value['production_source'] == proof['production_source'] and value['source_sha256'] == source_map and
+    require(value['production_source'] == proof['production_source'] and value['source_sha256'] == source_map and
             value['source_pins_sha256'] == proof['source_pins_sha256'] and value['baseline_APK_sha256'] == BASE_APK and
-            value['core_checks'] == {'service_survival': 'PASS', 'movie_stop_continue': 'PASS', 'tv_ui_resume': 'PASS',
-                                     'actual_schema2_recovery_read_save': 'PASS'} and
             value['experimental'] is True and value['publication'] is False and value['accepted_pointer_updated'] is False and
             isinstance(value['remaining_unverified'], list) and all(isinstance(v, str) and v for v in value['remaining_unverified']),
-            'SOURCE_BOUND_ACTUAL_PRE_SIGN_EXPERIMENTAL_CORE_CLEARANCE')
-    # This file is frozen pre-sign evidence. Actual signed-APK in-place install,
-    # forward recovery and data retention require the resulting signed APKs.
-    # Their separate post-sign clearance blocks owner delivery, never assembly.
-    require(value.get('signed_APK_install_forward_recovery', 'PENDING_POST_SIGN_OWNER_DELIVERY') ==
-            'PENDING_POST_SIGN_OWNER_DELIVERY', 'SIGNED_APK_TEST_CANNOT_BE_CLAIMED_BY_PRE_SIGN_CLEARANCE')
-    evidence = value['evidence_source_files']
-    require(bool(evidence), 'RETAINED_ACTUAL_CORE_EVIDENCE_REQUIRED')
-    result = {path.relative_to(ROOT).as_posix(): file_sha(path)}
+            'SOURCE_BOUND_REVIEWED_EXPERIMENTAL_DISPOSITION')
     owner_path = HERE / 'EXPERIMENTAL-RELEASE-AUTHORIZATION.json'
     owner = load(owner_path)
     require(owner['operation'] == 'prepare-owner-experimental-infinity-tracking-and-forward-recovery' and
             owner['prospective_candidate_APK'] == 2103474 and owner['prospective_recovery_APK'] == 2103475 and
-            owner['signing_protection_bypasses'] is False and owner['public_release_selected'] is False,
+            owner['signing_protection_bypasses'] is False and owner['public_release_selected'] is False and
+            value['owner_authorization_sha256'] == file_sha(owner_path),
             'EXACT_OWNER_EXPERIMENTAL_AUTHORIZATION_WITHOUT_SIGNING_BYPASS')
-    result[owner_path.relative_to(ROOT).as_posix()] = file_sha(owner_path)
+    core = value['core_checks']
+    if value['status'] == 'ROOT_REVIEWED_EXPERIMENTAL_CORE_CLEARANCE':
+        require(core == {'service_survival': 'PASS', 'movie_stop_continue': 'PASS', 'tv_ui_resume': 'PASS',
+                         'actual_schema2_recovery_read_save': 'PASS'}, 'ACTUAL_FOUR_CORE_CHECKS_REQUIRED')
+    else:
+        require(value['status'] == 'ROOT_REVIEWED_EXPERIMENTAL_RUNTIME_BLOCKED' and
+                owner['runtime_blocked_experimental_authorized'] is True and bool(value['remaining_unverified']) and
+                {k: core[k] for k in ('service_survival', 'movie_stop_continue', 'tv_ui_resume')} ==
+                {k: 'NOT_RUN_NATIVE_CONSTRUCTOR_BLOCK' for k in ('service_survival', 'movie_stop_continue', 'tv_ui_resume')} and
+                core.get('actual_schema2_recovery_read_save') == 'NOT_RUN_PENDING_ACTUAL_MOVIE_PROGRESS',
+                'HONEST_OWNER_AUTHORIZED_RUNTIME_BLOCKED_DISPOSITION')
+        outcome_path = HERE / 'C1-42604600259-OUTCOME-REVIEW.json'
+        outcome_name = outcome_path.relative_to(ROOT).as_posix()
+        require(value['evidence_source_files'].get(outcome_name) == file_sha(outcome_path), 'EXACT_NATIVE_BLOCK_OUTCOME_REVIEW')
+        outcome = load(outcome_path)
+        require(outcome['run'] == 42604600259 and
+                outcome['status'] == 'C1_ANDROID_BLOCKED_BY_OBSERVED_NATIVE_STARTUP_CRASH_TRACKING_NOT_RUN' and
+                outcome['source_preservation']['checkpoint'] == proof['production_source'] and
+                outcome['source_preservation']['source_sha256'] == source_map and
+                outcome['tracking_result']['C1_native_identity'] == 'NOT_REACHED' and
+                outcome['tracking_result']['movie'] == outcome['tracking_result']['TV'] == 'NOT_RUN',
+                'EXACT_C1_UNEXECUTED_FEATURE_AND_NATIVE_BLOCK_EVIDENCE')
+        available = value.get('available_schema2_preservation')
+        if available is not None:
+            compat_path = HERE / 'OBSERVED-SCHEMA2-COMPATIBILITY.json'
+            require(available['status'] == 'PASS_OBSERVED_TV_AND_WATCHLIST_ONLY' and
+                    available['movie_progress'] == 'NOT_OBSERVED' and available['runtime'] == 'NOT_RUN' and
+                    available['receipt'] == {'path': compat_path.relative_to(ROOT).as_posix(), 'sha256': file_sha(compat_path)} and
+                    value['evidence_source_files'].get(compat_path.relative_to(ROOT).as_posix()) == file_sha(compat_path),
+                    'EXACT_SEPARATE_OBSERVED_COMPATIBILITY_RECEIPT')
+            compat = load(compat_path)
+            require(compat['status'] == 'PASS_OBSERVED_TV_AND_WATCHLIST_ONLY' and compat['movie_progress'] == 'NOT_OBSERVED' and
+                    compat['original69_APK_sha256'] == BASE_APK, 'NO_UNOBSERVED_MOVIE_PROGRESS_COMPATIBILITY_CLAIM')
+    # Signed-APK PackageManager installation/data retention has a separate
+    # post-sign owner-delivery gate. It never means boot/functional recovery.
+    require(value.get('signed_APK_install_forward_recovery', 'PENDING_POST_SIGN_OWNER_DELIVERY') ==
+            'PENDING_POST_SIGN_OWNER_DELIVERY' and value.get('owner_delivery_cleared', False) is False,
+            'SIGNED_APK_TEST_CANNOT_BE_CLAIMED_BY_PRE_SIGN_CLEARANCE')
+    evidence = value['evidence_source_files']
+    require(bool(evidence), 'RETAINED_ACTUAL_EVIDENCE_REQUIRED')
+    result = {path.relative_to(ROOT).as_posix(): file_sha(path), owner_path.relative_to(ROOT).as_posix(): file_sha(owner_path)}
     for name, wanted in evidence.items():
         relative = Path(name)
         require(not relative.is_absolute() and '..' not in relative.parts and
                 relative.is_relative_to(HERE.relative_to(ROOT)) and file_sha(ROOT / relative) == wanted,
-                'UNCHANGED_ACTUAL_CORE_EVIDENCE:' + name)
+                'UNCHANGED_ACTUAL_EVIDENCE:' + name)
         result[name] = wanted
     return value, result
 

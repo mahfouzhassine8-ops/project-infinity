@@ -10,7 +10,7 @@ on:
         type: choice
         required: true
         default: final-combined
-        options: [final-combined, prepare-preview451, prepare-kodi452, prepare-kodi453, prepare-ui454-455, prepare-controlled456-457, review-controlled456-457, prepare-browser458-459, review-browser458-459, prepare-six460-461, review-six460-461, package-nine-quick-updates, verify-nine-update-recovery, prepare-nine-native462-463, package-umbrella-pov-462, verify-three-native, prepare-three, sign-three, watchlist-verify-native, prepare-watchlist, sign-watchlist, publish-watchlist, prepare-tracking-modules]
+        options: [final-combined, prepare-preview451, prepare-kodi452, prepare-kodi453, prepare-ui454-455, prepare-controlled456-457, review-controlled456-457, prepare-browser458-459, review-browser458-459, prepare-six460-461, review-six460-461, package-nine-quick-updates, verify-nine-update-recovery, prepare-nine-native462-463, package-umbrella-pov-462, verify-three-native, prepare-three, sign-three, watchlist-verify-native, prepare-watchlist, sign-watchlist, publish-watchlist, prepare-tracking-modules, prepare-tracking-release, sign-tracking]
       prepared_run:
         description: Completed official controlled preparation run for read-only authority review
         type: string
@@ -2191,5 +2191,162 @@ jobs:
             tracking-module-fixture/pair/2103474/INPUTS.json
             tracking-module-fixture/pair/2103475/INPUTS.json
             tracking-module-fixture/module-audit/
+          if-no-files-found: warn
+          retention-days: 90
+  prepare-tracking-release:
+    name: Original69 experimental74 and forward75 unsigned preparation; no APK signing
+    if: github.event_name == 'workflow_dispatch' && github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/work/infinity-tracking-integration-20261108' && inputs.operation == 'prepare-tracking-release'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    env: {GH_TOKEN: '${{ github.token }}', PYTHONDONTWRITEBYTECODE: '1'}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11'}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '21'}
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with: {packages: 'build-tools;35.0.0', log-accepted-android-sdk-licenses: false}
+      - name: Reviewed APK-only request and adapter hashes before importing preparation
+        run: |
+          python3 - <<'PYADMIT'
+          import hashlib,json,os,subprocess
+          from pathlib import Path
+          task=Path('repairs/infinity-tracking-integration-2103469-20261108')
+          request=json.loads((task/'APK-PREPARE-REQUEST.json').read_text())
+          assert request['enabled'] is True and request['operation']=='prepare-tracking-experimental74-75'
+          assert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()==os.environ['GITHUB_SHA']
+          assert not subprocess.check_output(['git','status','--porcelain','--untracked-files=no']).strip()
+          assert request['APK_signing'] is False and request['registry_mutation'] is False and request['publication'] is False
+          assert hashlib.file_digest(Path('.github/workflows/infinity-combined-release.yml').open('rb'),'sha256').hexdigest()==request['workflow_sha256']
+          for name,wanted in request['source_bindings'].items():
+            path=Path(name);assert not path.is_absolute() and '..' not in path.parts
+            assert hashlib.file_digest(path.open('rb'),'sha256').hexdigest()==wanted,'REVIEWED_APK_INPUT:'+name
+          assert str(task/'register_tracking_release.py') in request['source_bindings']
+          assert str(task/'prepare_tracking_release.py') in request['source_bindings']
+          original=json.loads(subprocess.check_output(['git','show','a76e29b84996304241e6b309d56a31e6659ad190:repairs/dual-experience-isolation-2103420/release-authority.json']))
+          assert 'repairs/dual-experience-isolation-2103420/signer_policy.py' in original['source_files']
+          for name,wanted in original['source_files'].items():
+            assert hashlib.file_digest(Path(name).open('rb'),'sha256').hexdigest()==wanted,'UNCHANGED_ORIGINAL_PRE_IMPORT_TOOL:'+name
+          PYADMIT
+          python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out TRACKING-SIGNER-ROUTES.json
+          python3 repairs/infinity-tracking-integration-2103469-20261108/register_tracking_release.py prepare_official --out tracking-apk-prepared --sdk "$ANDROID_HOME/build-tools/35.0.0"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity2103474-Tracking-Experimental-Prepared-${{ github.run_id }}-INTERNAL
+          path: tracking-apk-prepared/pair/2103474/publish/
+          if-no-files-found: error
+          retention-days: 90
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity2103475-Tracking-Forward-Recovery-Prepared-${{ github.run_id }}-INTERNAL
+          path: tracking-apk-prepared/pair/2103475/publish/
+          if-no-files-found: error
+          retention-days: 90
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-Tracking-Unsigned-Preparation-Evidence-${{ github.run_id }}-NOT-ACCEPTANCE
+          path: |
+            TRACKING-SIGNER-ROUTES.json
+            tracking-apk-prepared/APK-PREPARATION-ADMISSION.json
+            tracking-apk-prepared/ORIGINAL69-SIGNATURE.txt
+          if-no-files-found: warn
+          retention-days: 90
+  sign-tracking:
+    name: Registered experimental74/forward75 through unchanged original owner gate and signer
+    if: github.event_name == 'workflow_dispatch' && github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/work/infinity-2103460-nine-corrections-20261106' && inputs.operation == 'sign-tracking'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    env: {GH_TOKEN: '${{ github.token }}', PYTHONDONTWRITEBYTECODE: '1'}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11'}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '21'}
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with: {packages: 'build-tools;35.0.0', log-accepted-android-sdk-licenses: false}
+      - name: Exact internal-QA request, registered generation and unchanged sole signer policy before keys
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,os,re
+          from pathlib import Path
+          task=Path('repairs/infinity-tracking-integration-2103469-20261108')
+          request=json.loads((task/'RELEASE-REQUEST.json').read_text())
+          pair=json.loads((task/'PREPARED-PAIR-REQUEST.json').read_text())
+          authority=json.loads(Path('repairs/dual-experience-isolation-2103420/release-authority.json').read_text())
+          assert request['operation']=='sign-tracking-experimental-internal' and request['enabled'] is True and request['publication'] is False and request['owner_delivery_cleared'] is False
+          version=request['version'];assert type(version) is int and version in (2103474,2103475)
+          generation={2103474:57,2103475:58}[version]
+          assert authority['candidate_versionCode']==version and authority['generation']==generation
+          reviewed=authority['owner_update_evidence']['source_files']
+          assert 'repairs/infinity-tracking-integration-2103469-20261108/register_tracking_release.py' in reviewed
+          assert 'repairs/infinity-tracking-integration-2103469-20261108/APK-PREPARE-REQUEST.json' in reviewed
+          for relative,wanted in authority['source_files'].items():
+            path=Path(relative);assert not path.is_absolute() and '..' not in path.parts and path.is_file()
+            assert hashlib.file_digest(path.open('rb'),'sha256').hexdigest()==wanted,'UNCHANGED_ORIGINAL_RELEASE_TOOL:'+relative
+          for relative,wanted in reviewed.items():
+            path=Path(relative)
+            assert not path.is_absolute() and '..' not in path.parts and path.is_file(),'EXACT_REVIEWED_SOURCE_PATH:'+relative
+            assert hashlib.file_digest(path.open('rb'),'sha256').hexdigest()==wanted,'REGISTERED_SOURCE_CHANGED:'+relative
+          assert type(pair['run_id']) is int and pair['run_id']>0 and re.fullmatch('[0-9a-f]{40}',pair['source_commit'])
+          assert set(pair['artifacts'])=={'2103474','2103475'}
+          row=pair['artifacts'][str(version)]
+          assert set(row)=={'id','name','digest','size_in_bytes'} and type(row['id']) is int and row['id']>0
+          assert re.fullmatch('sha256:[0-9a-f]{64}',row['digest']) and type(row['size_in_bytes']) is int and 0<row['size_in_bytes']<=2*1024**3
+          audit=task/'evidence/signed-c1-fixture-42602243785/MODULE-UPGRADE-RECOVERY.json'
+          assert audit.is_file() and hashlib.file_digest(audit.open('rb'),'sha256').hexdigest()==pair['module_audit_sha256']
+          with Path(os.environ['GITHUB_ENV']).open('a') as output:
+            output.write('TRACKING_VERSION='+str(version)+'\nTRACKING_GENERATION='+str(generation)+'\n')
+          PY
+          python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out SIGNER-ROUTES.json
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13631340281', run-id: '42514440156', github-token: '${{ github.token }}', path: tracking-baseline, merge-multiple: true}
+      - name: Exact official prepared archive digest, safe members and separate module provenance
+        run: python3 repairs/infinity-tracking-integration-2103469-20261108/register_tracking_release.py download_prepared --out tracking-reviewed --version "$TRACKING_VERSION"
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {run-id: '39867073954', name: Infinity-Receipt-Race-Android17-Investigation, github-token: '${{ github.token }}', path: tools}
+      - name: Exact official registration, unsigned combine and all APK members before APK key access
+        run: |
+          python3 repairs/infinity-tracking-integration-2103469-20261108/register_tracking_release.py check_registered --prepared "tracking-reviewed/$TRACKING_VERSION" --version "$TRACKING_VERSION" --audit repairs/infinity-tracking-integration-2103469-20261108/evidence/signed-c1-fixture-42602243785/MODULE-UPGRADE-RECOVERY.json --request repairs/infinity-tracking-integration-2103469-20261108/PREPARED-PAIR-REQUEST.json --out REGISTERED-CANDIDATE-CHECK.json
+          python3 repairs/dual-experience-isolation-2103420/component_bundles.py combine --bundles "tracking-reviewed/$TRACKING_VERSION/components" --catalog "tracking-reviewed/$TRACKING_VERSION/components/catalog.json" --out combined-unsigned.apk --version "$TRACKING_VERSION"
+          python3 - <<'PY'
+          import hashlib,json,os
+          from pathlib import Path
+          proof=json.loads((Path('tracking-reviewed')/os.environ['TRACKING_VERSION']/'PREPARATION.json').read_text())
+          assert hashlib.file_digest(Path('combined-unsigned.apk').open('rb'),'sha256').hexdigest()==proof['unsigned_sha256']
+          assert proof['versionCode']==int(os.environ['TRACKING_VERSION']) and proof['public_release'] is False
+          PY
+          python3 repairs/infinity-tracking-integration-2103469-20261108/register_tracking_release.py compare --parent tracking-baseline/Infinity-2103469-Combined-Original-Signer.apk --candidate combined-unsigned.apk --prepared "tracking-reviewed/$TRACKING_VERSION" --out unsigned-preservation
+          python3 repairs/dual-experience-isolation-2103420/release_gate.py --apk combined-unsigned.apk --jars tools/receipt-evidence/tool-jars --work gate-dex --repository . --expected-head "$GITHUB_SHA" --expected-generation "$TRACKING_GENERATION" --out SIGNING-DECISION.json
+      - name: Existing permanent original APK signer after unchanged owner and source guard
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: python3 repairs/dual-experience-isolation-2103420/assemble.py sign --apk combined-unsigned.apk --jars tools/receipt-evidence/tool-jars --work signer-dex --repository . --expected-head "$GITHUB_SHA" --expected-generation "$TRACKING_GENERATION" --sdk "$ANDROID_HOME/build-tools/35.0.0" --out signed-combined
+      - name: Original certificate, exact signed payload and immutable engineering receipts
+        run: |
+          python3 repairs/infinity-tracking-integration-2103469-20261108/register_tracking_release.py compare --parent tracking-baseline/Infinity-2103469-Combined-Original-Signer.apk --candidate "signed-combined/Infinity-$TRACKING_VERSION-Combined-Original-Signer.apk" --prepared "tracking-reviewed/$TRACKING_VERSION" --out signed-combined/preservation --sdk "$ANDROID_HOME/build-tools/35.0.0"
+          cp SIGNING-DECISION.json REGISTERED-CANDIDATE-CHECK.json SIGNER-ROUTES.json signed-combined/
+          cp repairs/dual-experience-isolation-2103420/release-authority.json signed-combined/
+          cp repairs/infinity-tracking-integration-2103469-20261108/RELEASE-REQUEST.json repairs/infinity-tracking-integration-2103469-20261108/PREPARED-PAIR-REQUEST.json signed-combined/
+          cp repairs/infinity-tracking-integration-2103469-20261108/evidence/signed-c1-fixture-42602243785/MODULE-UPGRADE-RECOVERY.json signed-combined/
+          cp "tracking-reviewed/$TRACKING_VERSION/PREPARATION.json" signed-combined/
+      - uses: actions/upload-artifact@v4
+        with: {name: 'Infinity-Tracking-Experimental-Original-Signed-${{ env.TRACKING_VERSION }}-${{ github.run_id }}-INTERNAL-QA', path: signed-combined/, if-no-files-found: error, retention-days: 90, compression-level: 6}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-Tracking-Signing-Evidence-${{ github.run_id }}-NOT-ACCEPTANCE
+          path: |
+            SIGNING-DECISION.json
+            REGISTERED-CANDIDATE-CHECK.json
+            SIGNER-ROUTES.json
+            unsigned-preservation/
           if-no-files-found: warn
           retention-days: 90
