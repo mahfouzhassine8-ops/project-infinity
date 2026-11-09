@@ -1,0 +1,38 @@
+{
+  "status": "PASS_SIX_OPTIMIZE1_OBSERVER_VALIDATOR_CONTROLS_ONLY",
+  "cases": [
+    {
+      "case": "exact_map_host_control",
+      "status": "PASS_OPTIMIZED_PYTHON_VALIDATOR_ONLY"
+    },
+    {
+      "case": "wrong_manifest",
+      "status": "REFUSED_UNDER_OPTIMIZE1_AS_REQUIRED"
+    },
+    {
+      "case": "wrong_source_map",
+      "status": "REFUSED_UNDER_OPTIMIZE1_AS_REQUIRED"
+    },
+    {
+      "case": "wrong_UI_path_before_click",
+      "status": "REFUSED_UNDER_OPTIMIZE1_AS_REQUIRED"
+    },
+    {
+      "case": "wrong_UI_label_before_click",
+      "status": "REFUSED_UNDER_OPTIMIZE1_AS_REQUIRED"
+    },
+    {
+      "case": "invalid_control_before_input",
+      "status": "REFUSED_UNDER_OPTIMIZE1_AS_REQUIRED"
+    }
+  ],
+  "observer_sha256": "0472b80f7fcf7f853da888d6dadc507bc66013da5184bd553328624e8b144f0e",
+  "test_sha256": "60d3833579e3922a7e3274a157baa554df0d3bed541e20561397288859b5bec0",
+  "selection_sha256": "987c07e9102d4d4ae58f51581a161ccae0e33d255023aa5eee110c20da238395",
+  "target_compile_optimization": 1,
+  "host_python_optimization": 1,
+  "actual_Kodi_SDK_execution": false,
+  "native_module_authentication_acceptance": false,
+  "player_or_provider_acceptance": false,
+  "previous40_13_17_5_tests_rerun": false
+}

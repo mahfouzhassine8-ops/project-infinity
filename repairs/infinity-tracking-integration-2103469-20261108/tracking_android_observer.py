@@ -22,6 +22,11 @@ CC = 'script.infinity.commandcenter'
 EVENTS = None
 
 
+def require(value, label):
+    if not value:
+        raise RuntimeError(label)
+
+
 class ActualEvents(xbmc.Player):
     def __init__(self):
         super().__init__()
@@ -59,22 +64,22 @@ def identity():
         fields = line.split('\t')
         if fields[0] == 'file':
             path = root.parent / fields[2]
-            assert path.resolve().is_relative_to(root.parent.resolve())
+            require(path.resolve().is_relative_to(root.parent.resolve()), 'OWNED_MODULE_PATH_REQUIRED')
             actual[fields[2]] = hashlib.sha256(path.read_bytes()).hexdigest()
     expected = json.loads((Path(__file__).parent / 'expected.json').read_text())
-    assert native.manifest_sha256 == expected['manifest_sha256']
-    assert actual == expected['module_sources'] and len(actual) == 80
+    require(native.manifest_sha256 == expected['manifest_sha256'], 'EXACT_NATIVE_FIXTURE_MANIFEST_REQUIRED')
+    require(actual == expected['module_sources'] and len(actual) == 80, 'EXACT_AUTHENTICATED80_SOURCE_SET_REQUIRED')
     providers = {}
     for aid, hashes in expected['provider_sources'].items():
         addon = xbmcaddon.Addon(aid)
         source = Path(xbmcvfs.translatePath(addon.getAddonInfo('path')))
         observed = {name: hashlib.sha256((source / name).read_bytes()).hexdigest() for name in hashes}
-        assert observed == hashes, 'UNMODIFIED_PUBLISHER_SOURCE_REQUIRED:' + aid
+        require(observed == hashes, 'UNMODIFIED_PUBLISHER_SOURCE_REQUIRED:' + aid)
         providers[aid] = dict(path=str(source), version=addon.getAddonInfo('version'), files=observed)
     return dict(pid=os.getpid(), cc_version=native.package_version,
                 manifest_sha256=native.manifest_sha256, module_files=actual,
                 module_count=len(actual), controller_path=str(root), loaded_plugin=str(plugin.__file__),
-                provider_sources=providers, skin=xbmc.getSkinDir())
+                provider_sources=providers, skin=xbmc.getSkinDir(), Python_optimization=sys.flags.optimize)
 
 
 def tag(item):
@@ -90,7 +95,7 @@ def snapshot():
     controls = {}
     for control in (50, 450, 451, 1000):
         count = int(xbmc.getInfoLabel('Container(%d).NumItems' % control) or 0)
-        assert 0 <= count <= 1500
+        require(0 <= count <= 1500, 'BOUNDED_ACTUAL_DIRECTORY_REQUIRED')
         if count:
             rows = []
             for i in range(count + 1):
@@ -114,11 +119,12 @@ def snapshot():
 
 def selected(request):
     control, index = request['control'], request['index']
-    assert control in (50, 450, 451, 1000) and type(index) is int and 0 <= index <= 1500
+    require(control in (50, 450, 451, 1000) and type(index) is int and 0 <= index <= 1500,
+            'EXACT_SELECTED_NATIVE_CONTROL_AND_INDEX_REQUIRED')
     xbmc.executebuiltin('SetFocus(%d,%d,absolute)' % (control, index), True)
     p = 'Container(%d).ListItem.' % control
-    assert xbmc.getInfoLabel(p + 'FileNameAndPath') == request['file']
-    assert xbmc.getInfoLabel(p + 'Label') == request['label']
+    require(xbmc.getInfoLabel(p + 'FileNameAndPath') == request['file'], 'LIVE_NATIVE_SELECTED_PATH_REQUIRED')
+    require(xbmc.getInfoLabel(p + 'Label') == request['label'], 'LIVE_NATIVE_SELECTED_LABEL_REQUIRED')
     # A native ControlList Python wrapper has no Python-owned vecItems; its
     # getSelectedItem() would return None. Read the actual native GUI labels.
     # Only playing() below supplies an authoritative SDK CFileItem copy.
@@ -157,14 +163,16 @@ def action(request):
             # Native GUI selection/context, preserving the real selected item.
             method = 'Input.Select' if kind == 'click' else 'Input.ContextMenu'
             reply = json.loads(xbmc.executeJSONRPC(json.dumps(dict(jsonrpc='2.0', id=1, method=method))))
-            assert 'error' not in reply
+            require('error' not in reply, 'ACTUAL_NATIVE_INPUT_RPC_REQUIRED')
         return result
     if kind == 'menu-select':
         control, index = request['control'], request['index']
-        assert control in (50, 450, 1000) and type(index) is int and 0 <= index <= 100
-        assert xbmcgui.getCurrentWindowDialogId() not in (0, -1, 9999)
+        require(control in (50, 450, 1000) and type(index) is int and 0 <= index <= 100,
+                'EXACT_NATIVE_MENU_CONTROL_AND_INDEX_REQUIRED')
+        require(xbmcgui.getCurrentWindowDialogId() not in (0, -1, 9999), 'ACTUAL_NATIVE_MENU_DIALOG_REQUIRED')
         xbmc.executebuiltin('SetFocus(%d,%d,absolute)' % (control, index), True)
-        assert xbmc.getInfoLabel('Container(%d).ListItem.Label' % control) == request['label']
+        require(xbmc.getInfoLabel('Container(%d).ListItem.Label' % control) == request['label'],
+                'LIVE_NATIVE_MENU_LABEL_REQUIRED')
         xbmc.executeJSONRPC('{"jsonrpc":"2.0","id":1,"method":"Input.Select"}')
         return dict(actual_selected_label=request['label'])
     raise ValueError('UNSELECTED_OBSERVER_ACTION:' + str(kind))
@@ -180,9 +188,9 @@ def serve():
     while not monitor.waitForAbort(.15):
         try:
             raw = (root / 'request.json').read_text()
-            assert len(raw.encode()) <= 65536
+            require(len(raw.encode()) <= 65536, 'BOUNDED_QA_REQUEST_REQUIRED')
             request = json.loads(raw)
-        except (OSError, ValueError, AssertionError):
+        except (OSError, ValueError, RuntimeError):
             continue
         if request.get('pid') != pid or type(request.get('sequence')) is not int or request['sequence'] <= last:
             continue

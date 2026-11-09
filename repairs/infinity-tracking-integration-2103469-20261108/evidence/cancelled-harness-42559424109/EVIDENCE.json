@@ -1,0 +1,17 @@
+{
+  "status": "CANCELLED_TEST_HARNESS_OPTIMIZATION_FAULT_NOT_PROVIDER_OR_NATIVE_RESULT",
+  "run_id": 42559424109,
+  "source_commit": "7d3b60239a144376cbaf1ab05d6b72f8fbff52dd",
+  "artifact_id": 13648872152,
+  "artifact_sha256": "db1d7c78fb7049be9cd05ec8a9d23641b9d559dd0b6e513b285239befd1c517e",
+  "artifact_size": 12456,
+  "reason": "Observer assert checks could be stripped at KodiPythonoptimization1; replaced with always-on require RuntimeError. Never counts toward feature acceptance.",
+  "feature_result_files_in_artifact": [],
+  "feature_acceptance": false,
+  "unchanged_baseline_run": 42542862696,
+  "baseline_requalification": false,
+  "original_module_fixture_reused": 42555855742,
+  "no_new_APK": true,
+  "actual_feature_command_logged": false,
+  "cancelled_during": "Emulator system-image installation; no actual feature runner command"
+}

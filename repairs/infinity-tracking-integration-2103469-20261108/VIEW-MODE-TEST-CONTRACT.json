@@ -1,0 +1,567 @@
+{
+  "execution": {
+    "application_or_UI_tests": "NOT_RUN",
+    "build_or_sign": false,
+    "frozen_harness_changed": false,
+    "only_written_file": "VIEW-MODE-TEST-CONTRACT.json",
+    "production_source_changed": false,
+    "source40_tests_rerun": false,
+    "workflow_changed": false
+  },
+  "existing_data_container_contract": {
+    "Home_profile_inspected": "unified; other protected XML profiles remain unchanged and need actual active-profile observation",
+    "Infinity_owned_library_rows": [
+      {
+        "container_id": 28103,
+        "content_expression": "$VAR[InfinityP0HomeFeed28103]",
+        "content_gate": "Integer.IsGreater(Container(28103).NumItems,0) | [Control.IsVisible(28103) + [!System.AddonIsEnabled(script.infinity.commandcenter) | String.IsEqual(Window(Home).Property(Infinity.Home.FirstViewportReady),true) | [!String.IsEmpty(Window(Home).Property(Infinity.ContinueWatchingRevision)) + [!Control.IsVisible(8830) | !Integer.IsGreater(Window(Home).Property(Infinity.ContinueWatchingMovies),0) | Integer.IsGreater(Container(8830).NumItems,0)] + [!Control.IsVisible(8831) | !Integer.IsGreater(Window(Home).Property(Infinity.ContinueWatchingTV),0) | Integer.IsGreater(Container(8831).NumItems,0)]]]]",
+        "mode_visibility_conditions": [
+          "[[String.IsEqual(Container(9000).ListItem.Property(section),trakttv) + !String.IsEqual(Window(Home).Property(Infinity.WidgetPrimaryReady),false)] + [String.IsEqual(Skin.String(Infinity.VisualMode),normal) | String.IsEqual(Window(Home).Property(Infinity.EffectiveViewMode),normal)]] + [String.IsEqual(Container(9000).ListItem.Property(hubsource),infinity)]"
+        ],
+        "regular_Trakt_counterpart_id": 8103,
+        "route": "plugin://script.infinity.commandcenter/?action=library&media=tv&bucket=next&rev=$INFO[Window(Home).Property(Infinity.ResumeHubRevision)]&home=1",
+        "variable": "InfinityP0HomeFeed28103"
+      },
+      {
+        "container_id": 28104,
+        "content_expression": "$VAR[InfinityP0HomeFeed28104]",
+        "content_gate": "Integer.IsGreater(Container(28104).NumItems,0) | [Control.IsVisible(28104) + [!System.AddonIsEnabled(script.infinity.commandcenter) | String.IsEqual(Window(Home).Property(Infinity.Home.FirstViewportReady),true) | [!String.IsEmpty(Window(Home).Property(Infinity.ContinueWatchingRevision)) + [!Control.IsVisible(8830) | !Integer.IsGreater(Window(Home).Property(Infinity.ContinueWatchingMovies),0) | Integer.IsGreater(Container(8830).NumItems,0)] + [!Control.IsVisible(8831) | !Integer.IsGreater(Window(Home).Property(Infinity.ContinueWatchingTV),0) | Integer.IsGreater(Container(8831).NumItems,0)]]]]",
+        "mode_visibility_conditions": [
+          "[[String.IsEqual(Container(9000).ListItem.Property(section),traktmovies) + !String.IsEqual(Window(Home).Property(Infinity.WidgetPrimaryReady),false)] + [String.IsEqual(Skin.String(Infinity.VisualMode),normal) | String.IsEqual(Window(Home).Property(Infinity.EffectiveViewMode),normal)]] + [String.IsEqual(Container(9000).ListItem.Property(hubsource),infinity)]"
+        ],
+        "regular_Trakt_counterpart_id": 8104,
+        "route": "plugin://script.infinity.commandcenter/?action=library&media=movie&bucket=watchlist&rev=$INFO[Window(Home).Property(Infinity.ResumeHubRevision)]&home=1",
+        "variable": "InfinityP0HomeFeed28104"
+      },
+      {
+        "container_id": 28603,
+        "content_expression": "$VAR[InfinityP0HomeFeed28603]",
+        "content_gate": "Integer.IsGreater(Container(28603).NumItems,0) | [Control.IsVisible(28603) + [!System.AddonIsEnabled(script.infinity.commandcenter) | String.IsEqual(Window(Home).Property(Infinity.Home.FirstViewportReady),true) | [!String.IsEmpty(Window(Home).Property(Infinity.ContinueWatchingRevision)) + [!Control.IsVisible(8830) | !Integer.IsGreater(Window(Home).Property(Infinity.ContinueWatchingMovies),0) | Integer.IsGreater(Container(8830).NumItems,0)] + [!Control.IsVisible(8831) | !Integer.IsGreater(Window(Home).Property(Infinity.ContinueWatchingTV),0) | Integer.IsGreater(Container(8831).NumItems,0)]]]]",
+        "mode_visibility_conditions": [
+          "[[[String.IsEqual(Window(Home).Property(Infinity.EffectiveViewMode),cinema) | [String.IsEmpty(Window(Home).Property(Infinity.EffectiveViewMode)) + String.IsEqual(Skin.String(Infinity.HomeView),cinema)]]] + [String.IsEqual(Container(9000).ListItem.Property(section),trakttv)]] + [String.IsEqual(Container(9000).ListItem.Property(hubsource),infinity)]",
+          "[String.IsEqual(Window(Home).Property(Infinity.EffectiveViewMode),cinema) | [String.IsEmpty(Window(Home).Property(Infinity.EffectiveViewMode)) + String.IsEqual(Skin.String(Infinity.HomeView),cinema)]]"
+        ],
+        "regular_Trakt_counterpart_id": 8603,
+        "route": "plugin://script.infinity.commandcenter/?action=library&media=tv&bucket=next&rev=$INFO[Window(Home).Property(Infinity.ResumeHubRevision)]&home=1",
+        "variable": "InfinityP0HomeFeed28603"
+      },
+      {
+        "container_id": 28604,
+        "content_expression": "$VAR[InfinityP0HomeFeed28604]",
+        "content_gate": "Integer.IsGreater(Container(28604).NumItems,0) | [Control.IsVisible(28604) + [!System.AddonIsEnabled(script.infinity.commandcenter) | String.IsEqual(Window(Home).Property(Infinity.Home.FirstViewportReady),true) | [!String.IsEmpty(Window(Home).Property(Infinity.ContinueWatchingRevision)) + [!Control.IsVisible(8830) | !Integer.IsGreater(Window(Home).Property(Infinity.ContinueWatchingMovies),0) | Integer.IsGreater(Container(8830).NumItems,0)] + [!Control.IsVisible(8831) | !Integer.IsGreater(Window(Home).Property(Infinity.ContinueWatchingTV),0) | Integer.IsGreater(Container(8831).NumItems,0)]]]]",
+        "mode_visibility_conditions": [
+          "[[[String.IsEqual(Window(Home).Property(Infinity.EffectiveViewMode),cinema) | [String.IsEmpty(Window(Home).Property(Infinity.EffectiveViewMode)) + String.IsEqual(Skin.String(Infinity.HomeView),cinema)]]] + [String.IsEqual(Container(9000).ListItem.Property(section),traktmovies)]] + [String.IsEqual(Container(9000).ListItem.Property(hubsource),infinity)]",
+          "[String.IsEqual(Window(Home).Property(Infinity.EffectiveViewMode),cinema) | [String.IsEmpty(Window(Home).Property(Infinity.EffectiveViewMode)) + String.IsEqual(Skin.String(Infinity.HomeView),cinema)]]"
+        ],
+        "regular_Trakt_counterpart_id": 8604,
+        "route": "plugin://script.infinity.commandcenter/?action=library&media=movie&bucket=watchlist&rev=$INFO[Window(Home).Property(Infinity.ResumeHubRevision)]&home=1",
+        "variable": "InfinityP0HomeFeed28604"
+      },
+      {
+        "container_id": 28703,
+        "content_expression": "$VAR[InfinityP0HomeFeed28703]",
+        "content_gate": "Integer.IsGreater(Container(28703).NumItems,0) | [Control.IsVisible(28703) + [!System.AddonIsEnabled(script.infinity.commandcenter) | String.IsEqual(Window(Home).Property(Infinity.Home.FirstViewportReady),true) | [!String.IsEmpty(Window(Home).Property(Infinity.ContinueWatchingRevision)) + [!Control.IsVisible(8830) | !Integer.IsGreater(Window(Home).Property(Infinity.ContinueWatchingMovies),0) | Integer.IsGreater(Container(8830).NumItems,0)] + [!Control.IsVisible(8831) | !Integer.IsGreater(Window(Home).Property(Infinity.ContinueWatchingTV),0) | Integer.IsGreater(Container(8831).NumItems,0)]]]]",
+        "mode_visibility_conditions": [
+          "[[[String.IsEqual(Window(Home).Property(Infinity.EffectiveViewMode),twopane) | [String.IsEmpty(Window(Home).Property(Infinity.EffectiveViewMode)) + String.IsEqual(Skin.String(Infinity.HomeView),twopane)]]] + [String.IsEqual(Container(9000).ListItem.Property(section),trakttv)]] + [String.IsEqual(Container(9000).ListItem.Property(hubsource),infinity)]",
+          "[String.IsEqual(Window(Home).Property(Infinity.EffectiveViewMode),twopane) | [String.IsEmpty(Window(Home).Property(Infinity.EffectiveViewMode)) + String.IsEqual(Skin.String(Infinity.HomeView),twopane)]]"
+        ],
+        "regular_Trakt_counterpart_id": 8703,
+        "route": "plugin://script.infinity.commandcenter/?action=library&media=tv&bucket=next&rev=$INFO[Window(Home).Property(Infinity.ResumeHubRevision)]&home=1",
+        "variable": "InfinityP0HomeFeed28703"
+      },
+      {
+        "container_id": 28704,
+        "content_expression": "$VAR[InfinityP0HomeFeed28704]",
+        "content_gate": "Integer.IsGreater(Container(28704).NumItems,0) | [Control.IsVisible(28704) + [!System.AddonIsEnabled(script.infinity.commandcenter) | String.IsEqual(Window(Home).Property(Infinity.Home.FirstViewportReady),true) | [!String.IsEmpty(Window(Home).Property(Infinity.ContinueWatchingRevision)) + [!Control.IsVisible(8830) | !Integer.IsGreater(Window(Home).Property(Infinity.ContinueWatchingMovies),0) | Integer.IsGreater(Container(8830).NumItems,0)] + [!Control.IsVisible(8831) | !Integer.IsGreater(Window(Home).Property(Infinity.ContinueWatchingTV),0) | Integer.IsGreater(Container(8831).NumItems,0)]]]]",
+        "mode_visibility_conditions": [
+          "[[[String.IsEqual(Window(Home).Property(Infinity.EffectiveViewMode),twopane) | [String.IsEmpty(Window(Home).Property(Infinity.EffectiveViewMode)) + String.IsEqual(Skin.String(Infinity.HomeView),twopane)]]] + [String.IsEqual(Container(9000).ListItem.Property(section),traktmovies)]] + [String.IsEqual(Container(9000).ListItem.Property(hubsource),infinity)]",
+          "[String.IsEqual(Window(Home).Property(Infinity.EffectiveViewMode),twopane) | [String.IsEmpty(Window(Home).Property(Infinity.EffectiveViewMode)) + String.IsEqual(Skin.String(Infinity.HomeView),twopane)]]"
+        ],
+        "regular_Trakt_counterpart_id": 8704,
+        "route": "plugin://script.infinity.commandcenter/?action=library&media=movie&bucket=watchlist&rev=$INFO[Window(Home).Property(Infinity.ResumeHubRevision)]&home=1",
+        "variable": "InfinityP0HomeFeed28704"
+      },
+      {
+        "container_id": 28721,
+        "content_expression": "$VAR[InfinityP0HomeFeed28721]",
+        "content_gate": "Integer.IsGreater(Container(28721).NumItems,0) | [Control.IsVisible(28721) + [!System.AddonIsEnabled(script.infinity.commandcenter) | String.IsEqual(Window(Home).Property(Infinity.Home.FirstViewportReady),true) | [!String.IsEmpty(Window(Home).Property(Infinity.ContinueWatchingRevision)) + [!Control.IsVisible(8830) | !Integer.IsGreater(Window(Home).Property(Infinity.ContinueWatchingMovies),0) | Integer.IsGreater(Container(8830).NumItems,0)] + [!Control.IsVisible(8831) | !Integer.IsGreater(Window(Home).Property(Infinity.ContinueWatchingTV),0) | Integer.IsGreater(Container(8831).NumItems,0)]]]]",
+        "mode_visibility_conditions": [
+          "[[[String.IsEqual(Window(Home).Property(Infinity.EffectiveViewMode),twopane) | [String.IsEmpty(Window(Home).Property(Infinity.EffectiveViewMode)) + String.IsEqual(Skin.String(Infinity.HomeView),twopane)]]] + [String.IsEqual(Container(9000).ListItem.Property(section),trakttv)] + [!String.IsEqual(Window(Home).Property(Infinity.WidgetSecondaryReady),false)]] + [String.IsEqual(Container(9000).ListItem.Property(hubsource),infinity)]",
+          "[String.IsEqual(Window(Home).Property(Infinity.EffectiveViewMode),twopane) | [String.IsEmpty(Window(Home).Property(Infinity.EffectiveViewMode)) + String.IsEqual(Skin.String(Infinity.HomeView),twopane)]]"
+        ],
+        "regular_Trakt_counterpart_id": 8721,
+        "route": "plugin://script.infinity.commandcenter/?action=library&media=tv&bucket=progress&rev=$INFO[Window(Home).Property(Infinity.ResumeHubRevision)]&home=1",
+        "variable": "InfinityP0HomeFeed28721"
+      },
+      {
+        "container_id": 28722,
+        "content_expression": "$VAR[InfinityP0HomeFeed28722]",
+        "content_gate": "Integer.IsGreater(Container(28722).NumItems,0) | [Control.IsVisible(28722) + [!System.AddonIsEnabled(script.infinity.commandcenter) | String.IsEqual(Window(Home).Property(Infinity.Home.FirstViewportReady),true) | [!String.IsEmpty(Window(Home).Property(Infinity.ContinueWatchingRevision)) + [!Control.IsVisible(8830) | !Integer.IsGreater(Window(Home).Property(Infinity.ContinueWatchingMovies),0) | Integer.IsGreater(Container(8830).NumItems,0)] + [!Control.IsVisible(8831) | !Integer.IsGreater(Window(Home).Property(Infinity.ContinueWatchingTV),0) | Integer.IsGreater(Container(8831).NumItems,0)]]]]",
+        "mode_visibility_conditions": [
+          "[[[String.IsEqual(Window(Home).Property(Infinity.EffectiveViewMode),twopane) | [String.IsEmpty(Window(Home).Property(Infinity.EffectiveViewMode)) + String.IsEqual(Skin.String(Infinity.HomeView),twopane)]]] + [String.IsEqual(Container(9000).ListItem.Property(section),traktmovies)] + [!String.IsEqual(Window(Home).Property(Infinity.WidgetSecondaryReady),false)]] + [String.IsEqual(Container(9000).ListItem.Property(hubsource),infinity)]",
+          "[String.IsEqual(Window(Home).Property(Infinity.EffectiveViewMode),twopane) | [String.IsEmpty(Window(Home).Property(Infinity.EffectiveViewMode)) + String.IsEqual(Skin.String(Infinity.HomeView),twopane)]]"
+        ],
+        "regular_Trakt_counterpart_id": 8722,
+        "route": "plugin://script.infinity.commandcenter/?action=library&media=movie&bucket=collection&rev=$INFO[Window(Home).Property(Infinity.ResumeHubRevision)]&home=1",
+        "variable": "InfinityP0HomeFeed28722"
+      },
+      {
+        "container_id": 28803,
+        "content_expression": "$VAR[InfinityP0HomeFeed28803]",
+        "content_gate": "Integer.IsGreater(Container(28803).NumItems,0) | [Control.IsVisible(28803) + [!System.AddonIsEnabled(script.infinity.commandcenter) | String.IsEqual(Window(Home).Property(Infinity.Home.FirstViewportReady),true) | [!String.IsEmpty(Window(Home).Property(Infinity.ContinueWatchingRevision)) + [!Control.IsVisible(8830) | !Integer.IsGreater(Window(Home).Property(Infinity.ContinueWatchingMovies),0) | Integer.IsGreater(Container(8830).NumItems,0)] + [!Control.IsVisible(8831) | !Integer.IsGreater(Window(Home).Property(Infinity.ContinueWatchingTV),0) | Integer.IsGreater(Container(8831).NumItems,0)]]]]",
+        "mode_visibility_conditions": [
+          "[[[String.IsEqual(Window(Home).Property(Infinity.EffectiveViewMode),compact) | [String.IsEmpty(Window(Home).Property(Infinity.EffectiveViewMode)) + String.IsEqual(Skin.String(Infinity.HomeView),compact)]]] + [String.IsEqual(Container(9000).ListItem.Property(section),trakttv)] + [!String.IsEqual(Window(Home).Property(Infinity.WidgetPrimaryReady),false)]] + [String.IsEqual(Container(9000).ListItem.Property(hubsource),infinity)]"
+        ],
+        "regular_Trakt_counterpart_id": 8803,
+        "route": "plugin://script.infinity.commandcenter/?action=library&media=tv&bucket=next&rev=$INFO[Window(Home).Property(Infinity.ResumeHubRevision)]&home=1",
+        "variable": "InfinityP0HomeFeed28803"
+      },
+      {
+        "container_id": 28804,
+        "content_expression": "$VAR[InfinityP0HomeFeed28804]",
+        "content_gate": "Integer.IsGreater(Container(28804).NumItems,0) | [Control.IsVisible(28804) + [!System.AddonIsEnabled(script.infinity.commandcenter) | String.IsEqual(Window(Home).Property(Infinity.Home.FirstViewportReady),true) | [!String.IsEmpty(Window(Home).Property(Infinity.ContinueWatchingRevision)) + [!Control.IsVisible(8830) | !Integer.IsGreater(Window(Home).Property(Infinity.ContinueWatchingMovies),0) | Integer.IsGreater(Container(8830).NumItems,0)] + [!Control.IsVisible(8831) | !Integer.IsGreater(Window(Home).Property(Infinity.ContinueWatchingTV),0) | Integer.IsGreater(Container(8831).NumItems,0)]]]]",
+        "mode_visibility_conditions": [
+          "[[[String.IsEqual(Window(Home).Property(Infinity.EffectiveViewMode),compact) | [String.IsEmpty(Window(Home).Property(Infinity.EffectiveViewMode)) + String.IsEqual(Skin.String(Infinity.HomeView),compact)]]] + [String.IsEqual(Container(9000).ListItem.Property(section),traktmovies)] + [!String.IsEqual(Window(Home).Property(Infinity.WidgetPrimaryReady),false)]] + [String.IsEqual(Container(9000).ListItem.Property(hubsource),infinity)]"
+        ],
+        "regular_Trakt_counterpart_id": 8804,
+        "route": "plugin://script.infinity.commandcenter/?action=library&media=movie&bucket=watchlist&rev=$INFO[Window(Home).Property(Infinity.ResumeHubRevision)]&home=1",
+        "variable": "InfinityP0HomeFeed28804"
+      },
+      {
+        "container_id": 28821,
+        "content_expression": "$VAR[InfinityP0HomeFeed28821]",
+        "content_gate": "Integer.IsGreater(Container(28821).NumItems,0) | [Control.IsVisible(28821) + [!System.AddonIsEnabled(script.infinity.commandcenter) | String.IsEqual(Window(Home).Property(Infinity.Home.FirstViewportReady),true) | [!String.IsEmpty(Window(Home).Property(Infinity.ContinueWatchingRevision)) + [!Control.IsVisible(8830) | !Integer.IsGreater(Window(Home).Property(Infinity.ContinueWatchingMovies),0) | Integer.IsGreater(Container(8830).NumItems,0)] + [!Control.IsVisible(8831) | !Integer.IsGreater(Window(Home).Property(Infinity.ContinueWatchingTV),0) | Integer.IsGreater(Container(8831).NumItems,0)]]]]",
+        "mode_visibility_conditions": [
+          "[[[String.IsEqual(Window(Home).Property(Infinity.EffectiveViewMode),compact) | [String.IsEmpty(Window(Home).Property(Infinity.EffectiveViewMode)) + String.IsEqual(Skin.String(Infinity.HomeView),compact)]]] + [String.IsEqual(Container(9000).ListItem.Property(section),trakttv)] + [!String.IsEqual(Window(Home).Property(Infinity.WidgetSecondaryReady),false)]] + [String.IsEqual(Container(9000).ListItem.Property(hubsource),infinity)]"
+        ],
+        "regular_Trakt_counterpart_id": 8821,
+        "route": "plugin://script.infinity.commandcenter/?action=library&media=tv&bucket=progress&rev=$INFO[Window(Home).Property(Infinity.ResumeHubRevision)]&home=1",
+        "variable": "InfinityP0HomeFeed28821"
+      },
+      {
+        "container_id": 28822,
+        "content_expression": "$VAR[InfinityP0HomeFeed28822]",
+        "content_gate": "Integer.IsGreater(Container(28822).NumItems,0) | [Control.IsVisible(28822) + [!System.AddonIsEnabled(script.infinity.commandcenter) | String.IsEqual(Window(Home).Property(Infinity.Home.FirstViewportReady),true) | [!String.IsEmpty(Window(Home).Property(Infinity.ContinueWatchingRevision)) + [!Control.IsVisible(8830) | !Integer.IsGreater(Window(Home).Property(Infinity.ContinueWatchingMovies),0) | Integer.IsGreater(Container(8830).NumItems,0)] + [!Control.IsVisible(8831) | !Integer.IsGreater(Window(Home).Property(Infinity.ContinueWatchingTV),0) | Integer.IsGreater(Container(8831).NumItems,0)]]]]",
+        "mode_visibility_conditions": [
+          "[[[String.IsEqual(Window(Home).Property(Infinity.EffectiveViewMode),compact) | [String.IsEmpty(Window(Home).Property(Infinity.EffectiveViewMode)) + String.IsEqual(Skin.String(Infinity.HomeView),compact)]]] + [String.IsEqual(Container(9000).ListItem.Property(section),traktmovies)] + [!String.IsEqual(Window(Home).Property(Infinity.WidgetSecondaryReady),false)]] + [String.IsEqual(Container(9000).ListItem.Property(hubsource),infinity)]"
+        ],
+        "regular_Trakt_counterpart_id": 8822,
+        "route": "plugin://script.infinity.commandcenter/?action=library&media=movie&bucket=collection&rev=$INFO[Window(Home).Property(Infinity.ResumeHubRevision)]&home=1",
+        "variable": "InfinityP0HomeFeed28822"
+      },
+      {
+        "container_id": 29201,
+        "content_expression": "$VAR[InfinityP0HomeFeed29201]",
+        "content_gate": "Integer.IsGreater(Container(29201).NumItems,0) | [Control.IsVisible(29201) + [!System.AddonIsEnabled(script.infinity.commandcenter) | String.IsEqual(Window(Home).Property(Infinity.Home.FirstViewportReady),true) | [!String.IsEmpty(Window(Home).Property(Infinity.ContinueWatchingRevision)) + [!Control.IsVisible(8830) | !Integer.IsGreater(Window(Home).Property(Infinity.ContinueWatchingMovies),0) | Integer.IsGreater(Container(8830).NumItems,0)] + [!Control.IsVisible(8831) | !Integer.IsGreater(Window(Home).Property(Infinity.ContinueWatchingTV),0) | Integer.IsGreater(Container(8831).NumItems,0)]]]]",
+        "mode_visibility_conditions": [
+          "[[String.IsEqual(Container(9000).ListItem.Property(section),trakttv) + !String.IsEqual(Window(Home).Property(Infinity.WidgetSecondaryReady),false)] + [String.IsEqual(Skin.String(Infinity.VisualMode),normal) | String.IsEqual(Window(Home).Property(Infinity.EffectiveViewMode),normal)]] + [String.IsEqual(Container(9000).ListItem.Property(hubsource),infinity)]"
+        ],
+        "regular_Trakt_counterpart_id": 9201,
+        "route": "plugin://script.infinity.commandcenter/?action=library&media=tv&bucket=progress&rev=$INFO[Window(Home).Property(Infinity.ResumeHubRevision)]&home=1",
+        "variable": "InfinityP0HomeFeed29201"
+      },
+      {
+        "container_id": 29202,
+        "content_expression": "$VAR[InfinityP0HomeFeed29202]",
+        "content_gate": "Integer.IsGreater(Container(29202).NumItems,0) | [Control.IsVisible(29202) + [!System.AddonIsEnabled(script.infinity.commandcenter) | String.IsEqual(Window(Home).Property(Infinity.Home.FirstViewportReady),true) | [!String.IsEmpty(Window(Home).Property(Infinity.ContinueWatchingRevision)) + [!Control.IsVisible(8830) | !Integer.IsGreater(Window(Home).Property(Infinity.ContinueWatchingMovies),0) | Integer.IsGreater(Container(8830).NumItems,0)] + [!Control.IsVisible(8831) | !Integer.IsGreater(Window(Home).Property(Infinity.ContinueWatchingTV),0) | Integer.IsGreater(Container(8831).NumItems,0)]]]]",
+        "mode_visibility_conditions": [
+          "[[String.IsEqual(Container(9000).ListItem.Property(section),traktmovies) + !String.IsEqual(Window(Home).Property(Infinity.WidgetSecondaryReady),false)] + [String.IsEqual(Skin.String(Infinity.VisualMode),normal) | String.IsEqual(Window(Home).Property(Infinity.EffectiveViewMode),normal)]] + [String.IsEqual(Container(9000).ListItem.Property(hubsource),infinity)]"
+        ],
+        "regular_Trakt_counterpart_id": 9202,
+        "route": "plugin://script.infinity.commandcenter/?action=library&media=movie&bucket=collection&rev=$INFO[Window(Home).Property(Infinity.ResumeHubRevision)]&home=1",
+        "variable": "InfinityP0HomeFeed29202"
+      }
+    ],
+    "auto_applicability": "Use actual effective mode and its existing visible controls. Balanced effective=auto uses existing fallback surfaces; do not invent an Infinity control mapping or assume every control exists in every mode.",
+    "cinema_progress_limitation": "Protected cinema Home has Next primary Infinity container28603; no separate Infinity Progress Shows Home row in the14 inspected mappings. The existing Progress Shows public library route remains a separate surface.",
+    "continue_controls": {
+      "8830": {
+        "applicable_effective_modes": [
+          "normal",
+          "compact"
+        ],
+        "content": "$VAR[InfinityCompactContinueMoviesPath]",
+        "media": "movie"
+      },
+      "8831": {
+        "applicable_effective_modes": [
+          "normal",
+          "compact"
+        ],
+        "content": "$VAR[InfinityCompactContinueTVPath]",
+        "media": "tv"
+      }
+    },
+    "continue_publications": [
+      "Infinity.ContinueWatchingRevision",
+      "Infinity.ContinueWatchingMovies",
+      "Infinity.ContinueWatchingTV"
+    ],
+    "continue_route_variables": {
+      "InfinityCompactContinueMoviesPath": [
+        {
+          "condition": "System.AddonIsEnabled(script.infinity.uirepair)",
+          "route": "plugin://script.infinity.uirepair/?action=continue&media=movie&rev=$INFO[Window(Home).Property(Infinity.ContinueWatchingRevision)]"
+        },
+        {
+          "condition": "",
+          "route": "plugin://script.infinity.commandcenter/?action=continue&home=1&media=movie&rev=$INFO[Window(Home).Property(Infinity.ContinueWatchingRevision)]"
+        }
+      ],
+      "InfinityCompactContinueTVPath": [
+        {
+          "condition": "System.AddonIsEnabled(script.infinity.uirepair)",
+          "route": "plugin://script.infinity.uirepair/?action=continue&media=tv&rev=$INFO[Window(Home).Property(Infinity.ContinueWatchingRevision)]"
+        },
+        {
+          "condition": "",
+          "route": "plugin://script.infinity.commandcenter/?action=continue&home=1&media=tv&rev=$INFO[Window(Home).Property(Infinity.ContinueWatchingRevision)]"
+        }
+      ]
+    },
+    "existing_Home_limit": 20,
+    "home_query_parameter": "home=1",
+    "no_view_specific_tracker": "Modes/themes select existing presentation and data-container bindings; they do not authorize another store, fabricated records, or replayed history.",
+    "revision_property": "Infinity.ResumeHubRevision",
+    "routes_semantics": {
+      "action=library&media=movie&bucket=collection": "Existing movie Collection",
+      "action=library&media=movie&bucket=watchlist": "Existing movie Watchlist",
+      "action=library&media=tv&bucket=next": "Existing Next Episodes projection",
+      "action=library&media=tv&bucket=progress": "Existing Progress Shows projection"
+    },
+    "source_separation": "Infinity copies have distinct IDs regular_Trakt_id+20000 and hubsource=infinity visibility. Do not read regular Trakt control IDs as Infinity evidence."
+  },
+  "future_40_combo_capture_plan": {
+    "capture_each": [
+      "Actual geometry/profile/window and requested/effective mode/skin strings/policy reason/pane",
+      "Existing theme selection/owner readback/ThemeReady/ThemeRevision/effective palette and dark variant",
+      "Real screenshot and applicable visible Infinity data rows with identity/source/key/episode/progress fields",
+      "Same canonical saved/playback records and positions/completion/watch-state as the post-Stop baseline; no new duplicate progress/history",
+      "Applicable routes and source-owned container IDs; absence of a non-applicable control is not data loss or a test PASS"
+    ],
+    "combinations": "5 requested modes x 2 existing theme choices x 4 representative emulator geometries =40",
+    "data_comparison": "Compare the genuine playback-domain records/projections and applicable rows, not entire store bytes: ordinary navigation/session metadata may legitimately change while playback progress must not.",
+    "forbidden": [
+      "Provider playback repetition solely for view captures",
+      "Direct Home-property fake mode/theme/native-display writes",
+      "Direct database or tracking-store writes",
+      "Layout/resource/source changes",
+      "Clearing settings/data/cache",
+      "Claiming physical front/unfolded Fold acceptance from emulator geometry"
+    ],
+    "geometry_limits": "Proposed representative emulator dimensions only; record actual Android/Kodi dimensions, native display/layout/orientation facts and active skin profile. These are not physical Fold presets, fold-sensor proof or owner-device clearance. Never spoof Home native-fact properties.",
+    "geometry_presets": [
+      {
+        "density_dpi": 420,
+        "name": "representative-phone-front-portrait",
+        "pixels": [
+          1080,
+          2340
+        ]
+      },
+      {
+        "density_dpi": 420,
+        "name": "representative-phone-front-landscape",
+        "pixels": [
+          2340,
+          1080
+        ]
+      },
+      {
+        "density_dpi": 320,
+        "name": "representative-inner-portrait",
+        "pixels": [
+          1768,
+          2208
+        ]
+      },
+      {
+        "density_dpi": 320,
+        "name": "representative-inner-landscape",
+        "pixels": [
+          2208,
+          1768
+        ]
+      }
+    ],
+    "loop_order": "Geometry outer loop, theme middle loop, requested-mode inner loop; use existing public entrypoints, then bounded publication/visible-data settling checks.",
+    "modes": [
+      "normal",
+      "auto",
+      "cinema",
+      "compact",
+      "twopane"
+    ],
+    "playback_reuse": "After one genuine required playback/Stop establishes each actual shared record, retain the same profile/store and capture it across the40 combinations. Do not replay the five-minute episode per combination; viewing is not playback.",
+    "status": "NOT_RUN; root decides wiring after actual provider/identity gate",
+    "themes": [
+      "Light Pearl",
+      "Dark"
+    ]
+  },
+  "mode_entrypoint": {
+    "JSONRPC_Addons_ExecuteAddon_argument_mapping": "NOT_INFERRED; use source-proven RunScript builtin contract",
+    "aliases": {
+      "adaptive": "auto",
+      "follow": "auto",
+      "wide": "twopane",
+      "wide-pane": "twopane"
+    },
+    "argument_order": [
+      "view-mode",
+      "normal|auto|cinema|compact|twopane"
+    ],
+    "builtin_template": "RunScript(script.infinity.commandcenter,view-mode,<mode>)",
+    "existing_palette_label_auto": "View: Adaptive",
+    "existing_palette_route": "RunScript(script.infinity.commandcenter,palette-run,view-<mode>)",
+    "function": "direct_command(sys.argv)",
+    "invalid_mode": "Handled without mode mutation; do not treat acknowledgement as successful selection",
+    "registered_script": "assets/addons/script.infinity.commandcenter/default.py"
+  },
+  "protected_baseline": {
+    "APK_SHA256": "804eebc57af2e4ef4e5418b56994bda64eb7fd7e7f2c0653b5c6e2a9f7833058",
+    "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "contract_sources_same69_66": true,
+    "functional_foundation": 2103466,
+    "version": 2103469
+  },
+  "requested_effective_contract": {
+    "Home_properties": [
+      "Infinity.ViewMode.Requested",
+      "Infinity.ViewMode.Effective",
+      "Infinity.EffectiveViewMode",
+      "Infinity.EffectivePaneMode",
+      "Infinity.ViewMode.PolicyReason"
+    ],
+    "auto_inputs_in_priority_order": [
+      "Infinity.NativeDeviceMode or Infinity.DeviceMode",
+      "Infinity.NativeLayout or Infinity.Layout",
+      "Infinity.NativeOrientation or Infinity.Orientation",
+      "Infinity.NativeWidthDp",
+      "Infinity.NativeHeightDp",
+      "System.ScreenWidth",
+      "System.ScreenHeight"
+    ],
+    "auto_policy": [
+      "Compact/cover/front/phone/handset layout or device => compact",
+      "TV device => cinema",
+      "Expanded/inner/tablet/wide layout plus landscape => cinema",
+      "Expanded layout plus portrait/square => twopane",
+      "Otherwise source-bound conservative dimension fallback in resolve_effective_view_mode; unresolved balanced fallback stays auto"
+    ],
+    "limits": "This is Home presentation/global pane publication, not a claim that this command selects Kodi per-directory view IDs.",
+    "modes": {
+      "auto": {
+        "HomeView": "auto",
+        "VisualMode": "follow",
+        "effective": "Resolve actual current native facts; do not hardcode from requested label",
+        "pane": "two-pane only if resolved twopane, otherwise single-pane"
+      },
+      "cinema": {
+        "HomeView": "cinema",
+        "VisualMode": "cinema",
+        "effective": "cinema",
+        "pane": "single-pane",
+        "reason": "manual-cinema"
+      },
+      "compact": {
+        "HomeView": "compact",
+        "VisualMode": "compact",
+        "effective": "compact",
+        "pane": "single-pane",
+        "reason": "manual-compact"
+      },
+      "normal": {
+        "HomeView": "auto",
+        "VisualMode": "normal",
+        "effective": "normal",
+        "meaning": "Explicit Normal; legacy HomeView=auto is not Adaptive intent",
+        "pane": "single-pane",
+        "reason": "explicit-normal-local"
+      },
+      "twopane": {
+        "HomeView": "twopane",
+        "VisualMode": "twopane",
+        "effective": "twopane",
+        "pane": "two-pane",
+        "reason": "manual-twopane"
+      }
+    },
+    "runtime_republication": "Existing service._effective_view_mode and publish_runtime_capabilities repeat requested/effective/reason/pane from actual facts; wait for matching stable readback, not just RunScript completion",
+    "skin_string_readbacks": [
+      "Skin.String(Infinity.VisualMode)",
+      "Skin.String(Infinity.HomeView)"
+    ],
+    "window_id": 10000
+  },
+  "schema": 1,
+  "source_bindings": {
+    "assets/addons/script.infinity.commandcenter/default.py": {
+      "byte_identical_protected69_66": true,
+      "functions": {
+        "direct_command": {
+          "end_line": 356,
+          "line": 241,
+          "source_sha256": "2d13278c741632fc0360d5f03b01708f7f2a7c4ddef5bbdb3a4f0e3a088b0cba"
+        },
+        "experience_command": {
+          "end_line": 405,
+          "line": 359,
+          "source_sha256": "222f6574b68d2ee05b2581ea26c2d54ad9e7faa779ccb0407f3438190d07f259"
+        }
+      },
+      "reference": "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/default.py",
+      "sha256": "6ecfa94ca3256d20d9605d016b7585a9e587c8cb4dd87ada8bbe0dcbacd47cc4"
+    },
+    "assets/addons/script.infinity.commandcenter/infinity_settings.py": {
+      "byte_identical_protected69_66": true,
+      "functions": {
+        "choose": {
+          "end_line": 80,
+          "line": 34,
+          "source_sha256": "f40e117eca85265142a588d63719b526a07a1c3b50f6687317c4bc0f218e55d4"
+        },
+        "open_settings": {
+          "end_line": 140,
+          "line": 110,
+          "source_sha256": "b2da1f10e3d75df2314042b69c1b1622e4ad7acaaa54c44a361d17f1f01e7968"
+        },
+        "setting_choice": {
+          "end_line": 107,
+          "line": 83,
+          "source_sha256": "bc60f027facc1b173edb334d3ce262b18578e80edee4ed3e0b108a62f57eccfe"
+        }
+      },
+      "reference": "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/infinity_settings.py",
+      "sha256": "a846e6fa285618495e572ff77665b4914eb2438ae3c1d7f38f2e53b150cb8e3d"
+    },
+    "assets/addons/script.infinity.commandcenter/resources/skins/Default/1080i/InfinityItemOptions.xml": {
+      "byte_identical_protected69_66": true,
+      "reference": "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/resources/skins/Default/1080i/InfinityItemOptions.xml",
+      "sha256": "201125d0d7bdda987d92523c04882f19e03560d361f70e52508cd4783e071db6"
+    },
+    "assets/addons/script.infinity.commandcenter/resume_hub.py": {
+      "byte_identical_protected69_66": true,
+      "functions": {
+        "publish_home": {
+          "end_line": 1160,
+          "line": 1137,
+          "source_sha256": "abf68afc294a0edab8cf6ee5010559d50910054c6f86ab22df5c19661ca32f41"
+        }
+      },
+      "reference": "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/resume_hub.py",
+      "sha256": "1c38df4f68201dc209d309f31bebf051e24baf0e45f4cb7318828af2212780d5"
+    },
+    "assets/addons/script.infinity.commandcenter/service.py": {
+      "byte_identical_protected69_66": true,
+      "functions": {
+        "_effective_view_mode": {
+          "end_line": 203,
+          "line": 190,
+          "source_sha256": "b9f90fc4674db016dc50b7555e09468e64acc3e07f1e029f20846be5b9c7f33f"
+        },
+        "publish_runtime_capabilities": {
+          "end_line": 301,
+          "line": 206,
+          "source_sha256": "7f43e0d4d067984e92c7efcbf9b049f65760b8986347e973f90701e58fadfd8d"
+        }
+      },
+      "reference": "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/service.py",
+      "sha256": "1844b2b217ccc7f3adef4d82bc825588fb2d561a87d6447f32ebedf3295e927d"
+    },
+    "assets/addons/script.infinity.commandcenter/view_mode.py": {
+      "byte_identical_protected69_66": true,
+      "functions": {
+        "resolve_effective_view_mode": {
+          "end_line": 91,
+          "line": 16,
+          "source_sha256": "9b0c7c82947a14997cca90ef5ad3c7ff49878a563a718d05f910d387e9bf080c"
+        }
+      },
+      "reference": "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/view_mode.py",
+      "sha256": "5f5583e9c36e32e970a0341ca353d32dd92e48d41079aaabaf7a113c66ddfc71"
+    },
+    "assets/addons/service.infinity.compat/theme_contract.py": {
+      "byte_identical_protected69_66": true,
+      "functions": {
+        "_effective_theme": {
+          "end_line": 133,
+          "line": 125,
+          "source_sha256": "fa708590f74a41dc4d37f2761aae427a5b331a81a34fbc325c775d46ff30e0c1"
+        },
+        "publish": {
+          "end_line": 236,
+          "line": 198,
+          "source_sha256": "539f30e7cb3071f13cad923fdbc7812b0aa8cce050826901ea37ffebfc94e52c"
+        }
+      },
+      "sha256": "93320b9c0bfdb3ea87b1d76d2aae1a39bef715015977326a74740f3490410735"
+    },
+    "assets/addons/skin.infinity.diggz/unified/Custom_1198_InfinityNav.xml": {
+      "byte_identical_protected69_66": true,
+      "sha256": "15da2e0b3e3779f08018a624d20d72f8aef4a0d412a559fb679c64fd1858dfde"
+    },
+    "assets/addons/skin.infinity.diggz/unified/Home.xml": {
+      "byte_identical_protected69_66": true,
+      "sha256": "3f92581a3a6e0e379336fdea9dbe25543f599333e70ab075007f14bac033720f"
+    },
+    "assets/addons/skin.infinity.diggz/unified/Includes_InfinityHomeUnified.xml": {
+      "byte_identical_protected69_66": true,
+      "sha256": "34342f7b2149c564e86e3f99ee4093f272e99122a27fd7371598ebf95ea33273"
+    },
+    "assets/addons/skin.infinity.diggz/unified/Includes_InfinityMediaLists.xml": {
+      "byte_identical_protected69_66": true,
+      "sha256": "20b44d5beefd2d6143e511add0c92fb7b68e2e4967c253e5e45d97eb4f62297c"
+    },
+    "assets/addons/skin.infinity.diggz/unified/SkinSettings.xml": {
+      "byte_identical_protected69_66": true,
+      "sha256": "64541799ebca9d2f4a1d9f3bd54ba5b5d3eeabe7874229c482ce92a93c84b12a"
+    }
+  },
+  "status": "READ_ONLY_SOURCE_CONTRACT_FUTURE_CAPTURE_PLAN_NOT_EXECUTED",
+  "theme_public_UI": {
+    "Dark_effective": "dark",
+    "Light_Pearl_effective": "light",
+    "dialog_XML": "InfinityItemOptions.xml",
+    "dialog_title": "Infinity Theme",
+    "entries": [
+      {
+        "index": 0,
+        "label": "Follow System",
+        "owner_value": "system"
+      },
+      {
+        "index": 1,
+        "label": "Light Pearl",
+        "owner_value": "light"
+      },
+      {
+        "index": 2,
+        "label": "Dark",
+        "owner_value": "dark"
+      },
+      {
+        "index": 3,
+        "label": "Dark Mode Appearance",
+        "opens_secondary_dialog": true
+      }
+    ],
+    "entrypoint": "RunScript(script.infinity.commandcenter,theme)",
+    "existing_dark_variant": "Dark Mode Appearance: Original Infinity Dark / True OLED Black; Skin.String(Infinity.DarkAppearance) original/oled. Record current variant; do not add another dimension or silently alter it.",
+    "function": "infinity_settings.open_settings(theme)",
+    "list_control_id": 50,
+    "owner": "service.infinity.compat",
+    "owner_setting": "theme_mode",
+    "publication": "theme_contract.publish commits ThemeReady=false, palette and policy values, signature/revision, then ThemeReady=true; do not claim settled while false.",
+    "raw_OS_fact": "Infinity.NativeSystemTheme; Infinity.SystemTheme is backward-compatible effective output, not raw OS truth",
+    "selection_contract": "Select actual existing control50 row through normal UI; onClick records selected position and closes. Do not write theme Home properties or addon settings directly in the capture test.",
+    "theme_readiness_properties": [
+      "Infinity.ThemeReady",
+      "Infinity.Theme",
+      "Infinity.SystemTheme",
+      "Infinity.ThemeRevision",
+      "Infinity.ThemeContractSignature",
+      "Infinity.ThemeContract"
+    ]
+  }
+}
