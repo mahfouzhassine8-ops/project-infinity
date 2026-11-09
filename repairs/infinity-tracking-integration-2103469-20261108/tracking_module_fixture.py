@@ -25,11 +25,11 @@ CC = 'script.infinity.commandcenter'
 REQUEST = HERE / 'MODULE-REQUEST.json'
 SOURCES = ('plugin.py', 'resume_hub.py', 'service.py')
 REVIEWED = '2e52b7befd0228a09449f79eaf9774a3946dfa1c'
-PRODUCTION_SOURCE = 'e410f30ba9e38182e4e77810e5237e5442cbd31a'
-PRIOR_FIXTURE_SOURCE = '9d64ffb84404036ce6e02d6cb160fb004a029b33'
-PRIOR_FIXTURE_RUN = 42555855742
+BRIDGE_SOURCE = 'e410f30ba9e38182e4e77810e5237e5442cbd31a'
+PRIOR_FIXTURE_SOURCE = 'ce88dc9dd16aad4d0bdd2e4f9ce1bcbb9f203cd4'
+PRIOR_FIXTURE_RUN = 42588102830
 SELECTION = ('signed69_to_tracking_complete80_and_data', 'same_candidate_idempotent_noop',
-             'forward_recovery_restores_exact69_functional80_and_data',
+             'forward_recovery_restores69_with_loading_guard_and_data',
              'older_candidate_retains_authenticated_recovery')
 SIGNED = dict(run=42514440156, source=AUTHORITY, id=13631340281,
     name='Infinity-Watchlist-Original-Signed-2103469-42514440156-INTERNAL-QA',
@@ -77,14 +77,25 @@ def check_sources():
     require(request['operation'] == 'prepare-authenticated-tracking80-internal-android-fixture' and
             request['APK_build'] is False and request['publication'] is False and request['registry_mutation'] is False,
             'MODULE_FIXTURE_ONLY')
+    freeze_path = HERE / 'SERVICE-SURVIVAL-SOURCE-PROOF.json'
+    require(freeze_path.is_file(), 'SERVICE_SURVIVAL_SOURCE_FREEZE_REQUIRED')
+    freeze = load(freeze_path)
+    receipt_names = set()
+    for key in ('host_receipt', 'independent_review', 'delta_proof'):
+        path = Path(freeze[key]['path'])
+        require(not path.is_absolute() and '..' not in path.parts and (ROOT / path).parent == HERE, 'EXACT_TASK_CORRECTION_RECEIPT')
+        receipt_names.add(path.name)
     required_names = {'prepare_tracking_release.py', 'verify_tracking_modules.py', 'tracking_module_fixture.py',
         'MODULE-TEST-SELECTION.md', 'RELEASE-INPUT-SELECTION.json', 'VERSION-ADMISSION.json',
         'SCOPE.json', 'PROJECTION-HOST-RESULT.json', 'ACTUAL-SOURCE-HOST-RESULT.json',
         'INTEGRATION-SOURCE-PROOF.json', 'evidence/api36-startup-pass-42542862696/EVIDENCE.json',
-        'CURRENT-INPUT-FIXTURE.json', 'CURRENT-SOURCE-PROOF.json',
+        'CURRENT-INPUT-FIXTURE.json', 'CURRENT-SOURCE-PROOF.json', 'register_tracking_release.py',
+        'SERVICE-SURVIVAL-SOURCE-PROOF.json', 'RECOVERY-SERVICE-PRESERVATION.json', 'RECOVERY-SERVICE-REVIEW.json',
+        'EXPERIMENTAL-RELEASE-AUTHORIZATION.json',
         'TV-IDENTITY-SAFETY-BRIDGE-HOST-RESULT.json', 'TV-IDENTITY-SAFETY-BRIDGE-REVIEW.json',
-        'evidence/signed-tracking80-42555855742/MODULE-UPGRADE-RECOVERY.json'}
-    required_names |= {'overlay/' + CC + '/' + name for name in SOURCES}
+        'evidence/signed-tracking80-42555855742/MODULE-UPGRADE-RECOVERY.json',
+        'evidence/signed-e410-origin-fixture-42588102830/MODULE-UPGRADE-RECOVERY.json'}
+    required_names |= receipt_names | {'overlay/' + CC + '/' + name for name in SOURCES}
     require(set(request['source_bindings']) == {HERE.relative_to(ROOT).as_posix() + '/' + name for name in required_names},
             'EXACT_MANDATORY_SOURCE_BINDING_SET')
     require(os.environ.get('GITHUB_ACTIONS') == 'true' and os.environ.get('GITHUB_REPOSITORY') == REPO and
@@ -104,17 +115,31 @@ def check_sources():
         path = HERE / name
         require(path.read_bytes() == git('show', REVIEWED + ':' + path.relative_to(ROOT).as_posix()),
                 'UNCHANGED_REVIEWED_TRACKING_SOURCE_OR_EVIDENCE:' + name)
-    for name in [*('overlay/' + CC + '/' + n for n in SOURCES), 'CURRENT-SOURCE-PROOF.json',
+    for name in ['CURRENT-SOURCE-PROOF.json',
                  'TV-IDENTITY-SAFETY-BRIDGE-HOST-RESULT.json', 'TV-IDENTITY-SAFETY-BRIDGE-REVIEW.json']:
         path = HERE / name
-        require(path.read_bytes() == git('show', PRODUCTION_SOURCE + ':' + path.relative_to(ROOT).as_posix()),
+        require(path.read_bytes() == git('show', BRIDGE_SOURCE + ':' + path.relative_to(ROOT).as_posix()),
                 'UNCHANGED_E410_REVIEWED_BRIDGE_SOURCE_OR_EVIDENCE:' + name)
     selection = load(HERE / 'CURRENT-INPUT-FIXTURE.json')
-    require(selection['production_source'] == PRODUCTION_SOURCE and tuple(selection['selected_installer_cases']) == SELECTION and
+    require(selection['production_source'] == freeze['production_source'] and tuple(selection['selected_installer_cases']) == SELECTION and
             selection['APK_build'] is False and selection['reserved'] is False, 'EXACT_FOUR_CASE_INTERNAL_FIXTURE_SELECTION')
+    prep = prep_module()
+    prep.source_inputs()  # exact new3/C1 receipts; no APK or signing
+    recovery_proof = load(HERE / 'RECOVERY-SERVICE-PRESERVATION.json')
+    require(hashlib.sha256(prep.recovery_source('service.py')).hexdigest() == recovery_proof['recovery_service_sha256'],
+            'EXACT_REVIEWED_RECOVERY_LOADING_GUARD')
+    recovery_review = load(HERE / 'RECOVERY-SERVICE-REVIEW.json')
+    require(recovery_review['status'] == 'ACCEPTED_SOURCE_PRESERVATION_ORIGINAL69_PLUS_EXACT_REVIEWED_LOADING_GUARD_ONLY' and
+            recovery_review['concrete_blockers'] == [] and
+            recovery_review['recovery_service_sha256'] == recovery_proof['recovery_service_sha256'] and
+            recovery_review['preservation_receipt_sha256'] == sha(HERE / 'RECOVERY-SERVICE-PRESERVATION.json'),
+            'INDEPENDENT_REVIEWED_RECOVERY_SOURCE_VARIANT')
     prior = HERE / 'evidence/signed-tracking80-42555855742/MODULE-UPGRADE-RECOVERY.json'
-    require(prior.read_bytes() == git('show', PRODUCTION_SOURCE + ':' + prior.relative_to(ROOT).as_posix()) and
+    require(prior.read_bytes() == git('show', BRIDGE_SOURCE + ':' + prior.relative_to(ROOT).as_posix()) and
             sha(prior) == selection['retained_tracking13_receipt_sha256'], 'RETAINED_TRACKING13_RECEIPT')
+    prior4 = HERE / 'evidence/signed-e410-origin-fixture-42588102830/MODULE-UPGRADE-RECOVERY.json'
+    require(prior4.read_bytes() == git('show', freeze['production_source'] + ':' + prior4.relative_to(ROOT).as_posix()) and
+            sha(prior4) == selection['retained_tracking4_receipt_sha256'], 'RETAINED_TRACKING4_RECEIPT')
     live = api('git/ref/heads/work/infinity-2103460-nine-corrections-20261106')
     require(live['object']['sha'] == AUTHORITY, 'LIVE_VERSION_AUTHORITY_ADVANCED')
     lock = api('git/ref/heads/locks/infinity-2103469-protected-recovery-20261108')
@@ -205,7 +230,7 @@ def frozen(out, signed=False):
             'EXACT_PREFLIGHT_SOURCE_AND_ORIGINAL_TOOLS')
     require(p.source_inputs()[1] == pins['overlay_sha256'] and sha(pair / 'VERSION-ADMISSION.json') == pins['version_admission_sha256'],
             'FROZEN_RUNTIME_AND_UNUSED_VERSION_ADMISSION')
-    require(pins['production_source'] == PRODUCTION_SOURCE and
+    require(pins['production_source'] == load(HERE / 'SERVICE-SURVIVAL-SOURCE-PROOF.json')['production_source'] and
             pins['installer_selection_sha256'] == sha(HERE / 'CURRENT-INPUT-FIXTURE.json'), 'FROZEN_SELECTED_CURRENT_GENERATION')
     roots = []
     for version, cc in p.admission(pair / 'VERSION-ADMISSION.json'):
@@ -253,7 +278,7 @@ def archive(out):
                             modules_path='pair/' + str(metadata['versionCode']) + '/modules'))
     save(dest / 'MODULE-FIXTURE.json', dict(status='ORIGINAL_KEY_SIGNED_INTERNAL_MODULE_FIXTURE_NOT_RELEASE_ACCEPTANCE',
          source=os.environ['GITHUB_SHA'], run_id=int(os.environ['GITHUB_RUN_ID']), fixture_packages=reports,
-         production_source=PRODUCTION_SOURCE, installed_target_versionCode=2103469,
+         production_source=load(HERE / 'SERVICE-SURVIVAL-SOURCE-PROOF.json')['production_source'], installed_target_versionCode=2103469,
          source_pins_sha256=sha(out / 'pair/SOURCE-PINS.json'), original80_source_signatures=True,
          APK_build=False, APK_present=False, APK_signing=False, registry_mutated=False, publication=False,
          Android='NOT_RUN', Fold='NOT_RUN', release_acceptance=False))

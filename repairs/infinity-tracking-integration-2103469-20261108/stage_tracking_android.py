@@ -14,6 +14,7 @@ import xml.etree.ElementTree as ET
 from zipfile import ZipFile, ZIP_DEFLATED
 
 import qualify_android_baseline as base
+import prepare_tracking_release as releaseprep
 
 HERE = Path(__file__).resolve().parent
 QA = 'script.infinity.trackingqa'
@@ -31,10 +32,12 @@ def selected_focus():
         request['source_bindings'][relative] == base.sha(CONTRACT) and
         contract['operation'] == 'accept-existing-infinity-origin-playback-tracking' and
         contract['protected_source_checkpoint'] == 'e410f30ba9e38182e4e77810e5237e5442cbd31a' and
+        contract['production_source_checkpoint'] == '5787ca4569faa70dec4f10493b08bd8015d542ea' and
         contract['protected_recovery'] == 2103469, 'EXACT_ENABLED_COMMITTED_INFINITY_ORIGIN_ACCEPTANCE_REQUIRED')
     return dict(request_sha256=base.sha(request_path), execution_focus=request['execution_focus'],
         acceptance_contract_sha256=base.sha(CONTRACT), fixture_pin_sha256=base.sha(FIXTURE_PIN),
-        protected_source_checkpoint=contract['protected_source_checkpoint'])
+        protected_source_checkpoint=contract['protected_source_checkpoint'],
+        production_source_checkpoint=contract['production_source_checkpoint'])
 
 
 def stage(apk, sdk, fixture, pins_path, out):
@@ -47,7 +50,7 @@ def stage(apk, sdk, fixture, pins_path, out):
     admission = base.load(fixture / 'pair/VERSION-ADMISSION.json')
     contract = base.load(CONTRACT)
     base.require(metadata['run_id'] == approved['run'] and metadata['source'] == approved['source'] and
-        metadata['production_source'] == contract['protected_source_checkpoint'] and
+        metadata['production_source'] == contract['production_source_checkpoint'] and
         metadata['source_pins_sha256'] == approved['source_pins_sha256'] and
         metadata['status'] == 'ORIGINAL_KEY_SIGNED_INTERNAL_MODULE_FIXTURE_NOT_RELEASE_ACCEPTANCE' and
         metadata['original80_source_signatures'] is True and metadata['APK_build'] is False and
@@ -74,7 +77,8 @@ def stage(apk, sdk, fixture, pins_path, out):
                       '-signature', str(manifest) + '.sig', manifest])
         base.require(ET.fromstring(files[CC + '/addon.xml']).get('version') == version, 'EXACT_FIXTURE_VERSION')
         for name in ('plugin.py', 'resume_hub.py', 'service.py'):
-            expected = (HERE / ('reference' if package['recovery'] else 'overlay') / CC / name).read_bytes()
+            expected = (releaseprep.recovery_source(name) if package['recovery'] else
+                        (HERE / 'overlay' / CC / name).read_bytes())
             base.require(files[CC + '/' + name] == expected, 'EXACT_FROZEN_THREE_SOURCES:' + name)
             if not package['recovery']:
                 base.require(hashlib.sha256(expected).hexdigest() == contract['production_source_sha256'][name],

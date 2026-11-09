@@ -5,6 +5,7 @@ execution. Uses the unchanged original Java installer and host API adapters;
 never builds/signs an APK or accesses a device, owner profile, or private key.
 """
 import argparse
+import ast
 import hashlib
 import importlib.util
 import json
@@ -13,7 +14,10 @@ import re
 import shutil
 import subprocess
 import tempfile
+import threading
+import time
 import xml.etree.ElementTree as ET
+from zipfile import ZipFile
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
@@ -27,9 +31,9 @@ BASE_MANIFEST_SHA = '6fb82d58f2488a2eac23d2f0aa0e8a4eaa600f5fcf35901a24445b32beb
 BASE_APK_SHA = '804eebc57af2e4ef4e5418b56994bda64eb7fd7e7f2c0653b5c6e2a9f7833058'
 PRIOR = ROOT / 'repairs/infinity-watchlist-playback-2103466-20261108'
 PRIOR_VERIFIER_SHA = 'dfc1f71802b0d0b18cf49a559ed4fe8965e8cbf7bed49ebfa1bd6ee860cd9b43'
-PRODUCTION_SOURCE = 'e410f30ba9e38182e4e77810e5237e5442cbd31a'
+SOURCE_FREEZE = HERE / 'SERVICE-SURVIVAL-SOURCE-PROOF.json'
 SELECTION = ('signed69_to_tracking_complete80_and_data', 'same_candidate_idempotent_noop',
-             'forward_recovery_restores_exact69_functional80_and_data',
+             'forward_recovery_restores69_with_loading_guard_and_data',
              'older_candidate_retains_authenticated_recovery')
 
 
@@ -96,10 +100,10 @@ def admitted_versions(path):
           'Root-confirmed unchanged69 forward-pair admission required')
     candidate, recovery = admission['candidate_versionCode'], admission['recovery_versionCode']
     check(type(candidate) is int and type(recovery) is int and
-          (candidate, recovery) == (2103472, 2103473), 'Fresh internal labels required; no APK issuance')
+          (candidate, recovery) == (2103474, 2103475), 'Fresh internal labels required; no APK issuance')
     versions = [admission['candidate_CC'], admission['recovery_CC']]
     check(all(isinstance(v, str) and re.fullmatch(r'0\.3\.5\.[0-9]+', v) for v in versions) and
-          versions == ['0.3.5.70', '0.3.5.71'] and admission['APK_build'] is False and
+          versions == ['0.3.5.72', '0.3.5.73'] and admission['APK_build'] is False and
           admission['version_issued'] is False and admission['publication'] is False,
           'Admitted increasing CC pair required')
     return [(candidate, versions[0]), (recovery, versions[1])]
@@ -113,10 +117,20 @@ def audit(prepared, out):
     versions = admitted_versions(prepared / 'VERSION-ADMISSION.json')
     check(sha(prepared / 'VERSION-ADMISSION.json') == pins['version_admission_sha256'] and
           pins['baseline_APK_sha256'] == BASE_APK_SHA, 'Frozen exact69 input admission differs')
+    check(SOURCE_FREEZE.is_file(), 'Successor source checkpoint required')
+    freeze = load(SOURCE_FREEZE)
+    check(re.fullmatch('[0-9a-f]{40}', freeze['production_source']) and
+          sha(SOURCE_FREEZE) == pins['source_preservation_sha256'], 'Frozen successor source proof required')
     selection = load(HERE / 'CURRENT-INPUT-FIXTURE.json')
-    check(tuple(selection['selected_installer_cases']) == SELECTION and selection['production_source'] == PRODUCTION_SOURCE and
-          pins['production_source'] == PRODUCTION_SOURCE and
+    check(tuple(selection['selected_installer_cases']) == SELECTION and selection['production_source'] == freeze['production_source'] and
+          pins['production_source'] == freeze['production_source'] and
           pins['installer_selection_sha256'] == sha(HERE / 'CURRENT-INPUT-FIXTURE.json'), 'Frozen four-case selection differs')
+    prep_path = HERE / 'prepare_tracking_release.py'
+    request = load(HERE / 'MODULE-REQUEST.json')
+    check(request['source_bindings'][prep_path.relative_to(ROOT).as_posix()] == sha(prep_path), 'Reviewed recovery recipe before import')
+    spec = importlib.util.spec_from_file_location('verified_tracking_recovery_recipe', prep_path)
+    recipe = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(recipe)
     baseline = prepared / 'baseline-modules'
     payload, base_files = bundle.build(baseline)
     check(len(base_files) == 80 and hashlib.sha256(payload).hexdigest() == BASE_MANIFEST_SHA and
@@ -144,6 +158,8 @@ def audit(prepared, out):
                 expected[name] = (HERE / 'overlay' / name).read_bytes()
             check({name for name in base_files if files[name] != base_files[name]} == PYTHON | {CC + '/addon.xml'},
                   'Only the three selected Python files and CC version may change')
+        else:
+            expected[CC + '/service.py'] = recipe.recovery_source('service.py')
         addon = base_files[CC + '/addon.xml']
         check(addon.count(b'version="0.3.5.67"') == 1, 'Exact69 CC metadata preimage required')
         expected[CC + '/addon.xml'] = addon.replace(b'version="0.3.5.67"', ('version="' + cc_version + '"').encode(), 1)
@@ -206,7 +222,7 @@ def audit(prepared, out):
         before = hashes(storage)
         passed('same_candidate_idempotent_noop', storage, candidate_version)
         check(hashes(storage) == before, 'Same-version install wrote bytes')
-        passed('forward_recovery_restores_exact69_functional80_and_data', storage, recovery_version)
+        passed('forward_recovery_restores69_with_loading_guard_and_data', storage, recovery_version)
         before = hashes(storage)
         result = call(storage, candidate_version)
         check(result.returncode == 0 and 'VERIFIED_VERSION=' + recovery_version in result.stdout and hashes(storage) == before,
@@ -220,17 +236,83 @@ def audit(prepared, out):
         verifier_sha256=sha(Path(__file__)), original_installer_changed=False,
         retained_thirteen_case_evidence_sha256=sha(PRIOR / 'evidence/MODULE-UPGRADE-RECOVERY.json'),
         retained_tracking13_evidence_sha256=sha(HERE / 'evidence/signed-tracking80-42555855742/MODULE-UPGRADE-RECOVERY.json'),
+        retained_tracking4_evidence_sha256=sha(HERE / 'evidence/signed-e410-origin-fixture-42588102830/MODULE-UPGRADE-RECOVERY.json'),
         prior_thirteen_cases_rerun=False, complete80_signatures_verified=True,
-        inactive_helper_unchanged=True, recovery_exact69_functional_bytes=True,
+        inactive_helper_unchanged=True, recovery_original69_plus_loading_survival_guard=True,
         user_data_and_unknown_files_preserved=True, native_or_APK_build=False,
         signing=False, Android='NOT_RUN_BY_HOST_TEST', Fold='NOT_RUN', shutdown='NOT_SELECTED')
     (out / 'MODULE-UPGRADE-RECOVERY.json').write_text(json.dumps(report, indent=2, sort_keys=True) + '\n')
     print(report['status'])
 
 
+def recovery_compatibility(observation, observation_sha256, baseline_apk, out):
+    """One pending actual-state semantic read/save case in a temporary profile.
+
+    Requires actual TV AND movie progress in the source-bound observer state;
+    the retained425932 state lacks movie progress and cannot pass this intake.
+    Runs the exact original69 load/normalize/save functions with disposable JSON
+    file transport. This does not model checkpoint durability, Android recovery
+    installation, rendering, or acceptance; those retain separate actual gates.
+    """
+    check(not out.exists() and sha(observation) == observation_sha256 and sha(baseline_apk) == BASE_APK_SHA,
+          'Fresh output and exact actual-state/original69 bytes required')
+    observed = load(observation)['data']
+    check(observed.get('schema') == 2 and isinstance(observed.get('items'), dict), 'Actual schema2 state required')
+    records = [r for r in observed['items'].values() if isinstance(r, dict) and
+               isinstance(r.get('position'), (int, float)) and r['position'] > 0 and
+               isinstance(r.get('duration'), (int, float)) and r['duration'] > 0]
+    check({'tv', 'movie'} <= {r.get('media') for r in records} and
+          any(r.get('media') == 'tv' and r.get('source_parent') for r in records),
+          'PENDING_ACTUAL_BOTH_TV_AND_MOVIE_PROGRESS_WITH_SOURCE_PARENT')
+    watchlist = observed.get('watchlist', {})
+    check({'tv', 'movie'} <= {r.get('media') for r in watchlist.values() if isinstance(r, dict)} and
+          any('?' in r.get('source', '') for r in watchlist.values() if isinstance(r, dict)),
+          'Actual TV/movie query-bearing Watchlist memberships required')
+    with ZipFile(baseline_apk) as zipped:
+        raw = zipped.read('assets/addons/' + CC + '/resume_hub.py')
+    check(raw == (HERE / 'reference' / CC / 'resume_hub.py').read_bytes(), 'Exact signed69 recovery code required')
+    names = {'_dict', '_normalize', 'load', '_now', 'save'}
+    nodes = [node for node in ast.parse(raw).body if isinstance(node, ast.FunctionDef) and node.name in names]
+    check({node.name for node in nodes} == names, 'Exact selected original69 semantic functions required')
+    env = dict(Path=Path, time=time, SCHEMA=2, KEY_RE=re.compile(r'^[a-f0-9]{64}$'),
+               _view_lock=threading.RLock(), _view_cache=None,
+               read_json=lambda path, default: json.loads(path.read_text()),
+               atomic_json=lambda path, data: path.write_text(json.dumps(data, sort_keys=True) + '\n'))
+    exec(compile(ast.Module(body=nodes, type_ignores=[]), 'signed69/resume_hub.py', 'exec'), env)
+    semantic = lambda data: {k: v for k, v in data.items() if k not in ('revision', 'updated')}
+    with tempfile.TemporaryDirectory() as temporary:
+        profile = Path(temporary)
+        env['CONTINUE_FILE'] = 'continue-watching.json'
+        (profile / env['CONTINUE_FILE']).write_text(json.dumps(observed))
+        loaded = env['load'](profile)
+        check(semantic(loaded) == semantic(observed), 'Original69 read changed actual semantic records')
+        env['save'](profile, loaded)
+        after = env['load'](profile)
+        check(semantic(after) == semantic(observed), 'Original69 save changed actual records/positions/memberships')
+    out.mkdir(parents=True)
+    report = dict(status='PASS_ONE_ACTUAL_SCHEMA2_ORIGINAL69_READ_SAVE_COMPATIBILITY',
+        observation_sha256=observation_sha256, original69_APK_sha256=BASE_APK_SHA,
+        original69_hub_sha256=hashlib.sha256(raw).hexdigest(),
+        actual_data_sha256=hashlib.sha256(json.dumps(observed, sort_keys=True).encode()).hexdigest(),
+        semantic_records_positions_memberships_preserved=True, host_JSON_transport_only=True,
+        Android_installation_recovery='NOT_RUN_BY_HOST_CASE', checkpoint_durability='NOT_RUN',
+        display='Original69 local classification/display may differ; no rendering equivalence claimed',
+        provider_or_owner_data_mutation=False)
+    (out / 'RECOVERY-COMPATIBILITY.json').write_text(json.dumps(report, indent=2, sort_keys=True) + '\n')
+    return report
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--prepared', type=Path, required=True)
+    selected = parser.add_mutually_exclusive_group(required=True)
+    selected.add_argument('--prepared', type=Path)
+    selected.add_argument('--compatibility-observation', type=Path)
+    parser.add_argument('--observation-sha256')
+    parser.add_argument('--baseline-apk', type=Path)
     parser.add_argument('--out', type=Path, required=True)
     args = parser.parse_args()
-    audit(args.prepared, args.out)
+    if args.prepared:
+        audit(args.prepared, args.out)
+    else:
+        check(args.observation_sha256 and args.baseline_apk, 'Actual observation SHA and original69 APK required')
+        recovery_compatibility(args.compatibility_observation, args.observation_sha256, args.baseline_apk, args.out)

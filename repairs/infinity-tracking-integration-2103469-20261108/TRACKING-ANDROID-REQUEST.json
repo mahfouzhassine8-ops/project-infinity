@@ -1,7 +1,7 @@
 {
   "schema": 2,
   "operation": "verify-infinity-movies-tv-existing-tracking",
-  "application_tests": true,
+  "application_tests": false,
   "shutdown_tests": false,
   "APK_build": false,
   "publication": false,
@@ -89,7 +89,7 @@
     "replay_known_wrong_typed_tv": false
   },
   "retained_parent_save_failure_run": 42569526805,
-  "execution_status": "SOURCE_REVIEWED_EMPTY_READINESS_CORRECTION_SELECTED_NOT_EXECUTED",
+  "execution_status": "BLOCKED_PENDING_C1_SIGNED_FIXTURE_AND_FOCUSED_SELECTION",
   "direct_provider_acceptance": false,
   "direct_provider_fallback": false,
   "maximum_new_attempts": 1,
@@ -101,9 +101,10 @@
   "production_source_sha256": {
     "plugin.py": "580a2d7b25bc7a415c2db059fe1fa696808107a4f997a32d544baf2468a2877a",
     "resume_hub.py": "807157626f817dd5375e0e60872b6cd351d33135a23c5a225f26c86a196e7ed5",
-    "service.py": "569fea31b465674b5e9fc357a895b0a00706df999c201246a33e8fcd00c9b669"
+    "service.py": "c0f45709166d9b7018eac0cee4834aaa617e8a684d6d199568e4e65a4645d6bd"
   },
-  "correction_selected_after_run": 42591104063,
-  "correction_scope": "test_observer_empty_content_readiness_only",
-  "owner_origin_attempt_number": 2
+  "correction_selected_after_run": 42593220047,
+  "correction_scope": "confirmed_service_survival_and_native_history_only",
+  "owner_origin_attempt_number": 3,
+  "production_source_checkpoint": "5787ca4569faa70dec4f10493b08bd8015d542ea"
 }

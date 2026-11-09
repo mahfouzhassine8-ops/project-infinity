@@ -1,0 +1,26 @@
+{
+  "Android_recovery": "NOT_RUN",
+  "all_other_original69_bytes_roundtrip_identical": true,
+  "allowed_delta": [
+    "ExactC1 _tick_loading_observer helper",
+    "ExactC1 action_loading module/make_monitor binding",
+    "ExactC1 foregroundFalse tick substitution",
+    "ExactC1 foregroundTrue tick substitution"
+  ],
+  "behavior_tests": "NOT_RUN_NEW_BEHAVIOR_TESTS; exacthelper_and_sites_already9guardreviewed",
+  "candidate_service_sha256": "c0f45709166d9b7018eac0cee4834aaa617e8a684d6d199568e4e65a4645d6bd",
+  "diff": "--- signed69/service.py\n+++ forward75/service.py\n@@ -1580,6 +1580,32 @@\n         return False\n \n \n+def _tick_loading_observer(loading, owner, foreground=True):\n+    \"\"\"A retired UI window must not retire the resident playback observer.\"\"\"\n+    try:\n+        return loading.tick(foreground=foreground)\n+    except RuntimeError as error:\n+        if str(error) != 'Window id does not exist':\n+            raise\n+        terminal = error.__traceback__\n+        while terminal.tb_next is not None:\n+            terminal = terminal.tb_next\n+        relative = 'script.infinity.commandcenter/action_loading.py'\n+        loader = getattr(owner, '__loader__', None)\n+        context = getattr(owner, '_context', None)\n+        if (_infinity_contract.files.get(relative) != '8b758bba6eabd7a051213834c136a81d52c6af819ff9c6d7d1f456a45be4474f' or\n+                not isinstance(loader, _infinity_contract_module._SourceLoader) or loader.contract is not _infinity_contract or\n+                getattr(owner, '__file__', None) != str(_infinity_contract.root / relative) or\n+                getattr(context, '__globals__', None) is not owner.__dict__ or\n+                terminal.tb_frame.f_code is not getattr(context, '__code__', None) or\n+                terminal.tb_lineno != context.__code__.co_firstlineno + 31):\n+            raise\n+        # This pinned source's _context +31 is exactly its FrameControls read.\n+        # Keep the original loader/current-generation gate; no UI reset/retry.\n+        _infinity_contract.current()\n+        log('Loading presentation deferred: observed window retired')\n+        return None\n+\n def main():\n     startup = time.monotonic()\n     hub.trace_timing('service_start')\n@@ -1607,8 +1633,8 @@\n         'progress_lock': PROGRESS_LOCK,\n     })\n     player.experience = experience\n-    from action_loading import make_monitor\n-    loading = make_monitor(xbmc, xbmcgui)\n+    import action_loading as loading_owner\n+    loading = loading_owner.make_monitor(xbmc, xbmcgui)\n     normal_return = NormalReturnController()\n     display_reflow = DisplayReflowController()\n     from media_view import MediaViewPreference\n@@ -1647,7 +1673,7 @@\n                 log(\"Watched presentation deferred: \" + type(error).__name__)\n         now = time.monotonic()\n         if not foreground_gate.visible():\n-            loading.tick(foreground=False)\n+            _tick_loading_observer(loading, loading_owner, foreground=False)\n             if suspended_at is None:\n                 suspended_at = now\n             experience.background_tick(now)\n@@ -1657,7 +1683,7 @@\n         if suspended_at is not None:\n             stability.started += now - suspended_at\n             suspended_at = None\n-        loading.tick()\n+        _tick_loading_observer(loading, loading_owner)\n         media_views.tick()\n         _consume_home_observer_epoch()\n         _consume_home_runtime_sync(now)\n",
+  "functional_base_APK": 2103469,
+  "functional_base_APK_sha256": "804eebc57af2e4ef4e5418b56994bda64eb7fd7e7f2c0653b5c6e2a9f7833058",
+  "functional_restoration_disclosure": "Recovery restores69 tracking semantics plus loading-survival correction; original69 local display/classification may differ from candidate. Actual state read/save compatibility and Android recovery remain pending.",
+  "helper_AST_identical_to_C1": true,
+  "only_reviewed_loading_guard_added": true,
+  "original69_service_sha256": "1844b2b217ccc7f3adef4d82bc825588fb2d561a87d6447f32ebedf3295e927d",
+  "production_source": "5787ca4569faa70dec4f10493b08bd8015d542ea",
+  "recovery_service_sha256": "887fcbc6e90a1c33ac465147ac52d75c89cc43072665bbc8c94636d2b68722ba",
+  "reference_files_modified": false,
+  "reference_matches_signed69_asset": true,
+  "selected_before_execution": true,
+  "selection": "Only source-byte/AST preservation proof for approved original69 plus exact already-reviewed C1 loading-survival guard; no behavior test.",
+  "status": "DETERMINISTIC_RECOVERY_SOURCE_PRESERVATION_FOR_ROOT_ASTRA_REVIEW"
+}

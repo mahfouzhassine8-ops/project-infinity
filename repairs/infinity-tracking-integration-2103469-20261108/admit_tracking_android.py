@@ -13,7 +13,8 @@ ROOT = HERE.parents[1]
 REQUEST = HERE / 'TRACKING-ANDROID-REQUEST.json'
 WORKFLOW = '.github/workflows/infinity-saved-navigation-android.yml'
 BRANCH = 'work/infinity-tracking-integration-20261108'
-REVIEWED = 'e410f30ba9e38182e4e77810e5237e5442cbd31a'
+PROTECTED = 'e410f30ba9e38182e4e77810e5237e5442cbd31a'
+REVIEWED = '5787ca4569faa70dec4f10493b08bd8015d542ea'
 WORKFLOW_SHAPE_BASE = '9d64ffb84404036ce6e02d6cb160fb004a029b33'
 RETAINED_RUN = 42567028842
 RETAINED_SOURCE = '9b05d1b4bf2283b7adc92f7ef6db0aff3b9fede3'
@@ -47,12 +48,14 @@ def checked_focus(selected):
             selected.get('direct_provider_fallback') is False, 'NO_PROVIDER_BYPASS_AS_INFINITY_ACCEPTANCE')
     require(selected.get('maximum_new_attempts') == 1 and selected.get('automatic_retries') == 0,
             'ONE_NEW_ORIGIN_ATTEMPT_NO_RETRIES')
-    require(selected.get('protected_source_checkpoint') == REVIEWED and
+    require(selected.get('protected_source_checkpoint') == PROTECTED and
+            selected.get('production_source_checkpoint') == REVIEWED and
             selected.get('retained_environment_failure_run') == 42570831467,
             'FROZEN_E410_AND_RETAINED_STARTUP_FAILURE_REQUIRED')
     contract = load(HERE / 'INFINITY-ORIGIN-ACCEPTANCE.json')
     require(contract['operation'] == 'accept-existing-infinity-origin-playback-tracking' and
-            contract['protected_source_checkpoint'] == REVIEWED and contract['protected_recovery'] == 2103469,
+            contract['protected_source_checkpoint'] == PROTECTED and
+            contract['production_source_checkpoint'] == REVIEWED and contract['protected_recovery'] == 2103469,
             'EXACT_OWNER_ORIGIN_ACCEPTANCE_CONTRACT')
     require(contract['owner_confirmed_navigation']['status'] == 'PASS_OWNER_REPORTED_GALAXY_FOLD_NAVIGATION_ONLY' and
             contract['owner_confirmed_navigation']['tracking_acceptance'] is False,
@@ -87,10 +90,10 @@ def checked_request():
             'REUSE_VALID_UNCHANGED69_STARTUP_PASS')
     require(selected['image'] == 'system-images;android-36;google_apis;x86_64' and selected['image_revision'] == 7 and
             selected['avd_name'] == 'infinity-tracking-baseline-api36', 'REUSE_EXACT_QUALIFIED_STOCK_RUNTIME')
-    require(selected.get('correction_selected_after_run') == 42591104063 and
-            selected.get('correction_scope') == 'test_observer_empty_content_readiness_only' and
-            selected.get('owner_origin_attempt_number') == 2,
-            'NEW_SELECTION_REQUIRES_RECORDED_OBSERVER_CORRECTION_NOT_A_BLIND_RETRY')
+    require(selected.get('correction_selected_after_run') == 42593220047 and
+            selected.get('correction_scope') == 'confirmed_service_survival_and_native_history_only' and
+            selected.get('owner_origin_attempt_number') == 3,
+            'NEW_SELECTION_REQUIRES_RECORDED_SERVICE_AND_HISTORY_CORRECTION_NOT_A_BLIND_RETRY')
     require(set(selected['mandatory_checks']) == {r['id'] for r in load(HERE / 'SCOPE.json')['selected_checks']},
             'ALL_MANDATORY_GATES_REMAIN_VISIBLE')
     expected = {'admit_tracking_android.py', 'stage_tracking_android.py', 'tracking_android_observer.py',
@@ -108,6 +111,10 @@ def checked_request():
         'evidence/origin-observer-blocked-42591104063/EVIDENCE.json',
         'evidence/origin-observer-blocked-42591104063/raw/tracking-android-results/observer-003-snapshot.json',
         'evidence/origin-observer-blocked-42591104063/raw/tracking-android-results/observer-014-snapshot.json',
+        'SERVICE-SURVIVAL-SOURCE-PROOF.json', 'SERVICE-LOADING-SURVIVAL-HOST.json',
+        'SERVICE-LOADING-SURVIVAL-REVIEW.json', 'ORIGIN-42593220047-OUTCOME-REVIEW.json',
+        'EXPERIMENTAL-RELEASE-AUTHORIZATION.json',
+        'evidence/genuine-origin-record-and-service-fail-42593220047/EVIDENCE.json',
         'evidence/api36-startup-pass-42542862696/EVIDENCE.json',
         RETAINED_DIR + 'EVIDENCE.json', RETAINED_DIR + 'queens-blade-e4-actual-av.json',
         'evidence/signed-tracking80-42555855742/MODULE-UPGRADE-RECOVERY.json'}
@@ -177,7 +184,18 @@ def admit(out):
             module_run['workflow_id'] == module['workflow_id'] and module_run['path'] == module['workflow_path'] and
             module_run['head_sha'] == module['source'], 'EXACT_ORIGINAL_SIGNED_E410_MODULE_PRODUCER')
     e410 = original.api('git/ref/heads/locks/infinity-tracking-e410f30b-20261109')
-    require(e410['object']['sha'] == REVIEWED, 'PROTECTED_E410_CHECKPOINT_UNCHANGED')
+    require(e410['object']['sha'] == PROTECTED, 'PROTECTED_E410_CHECKPOINT_UNCHANGED')
+    origin = original.api('actions/runs/42593220047')
+    require(origin['status'] == 'completed' and origin['conclusion'] == 'failure' and
+            origin['head_sha'] == '7a98ff8daef96b09aba84691625aa556f40b01df' and
+            origin['workflow_id'] == 393886994 and origin['path'] == WORKFLOW,
+            'RETAIN_ACTUAL_INFINITY_ORIGIN_AND_SERVICE_FAILURE_PRODUCER')
+    origin_artifact = original.api('actions/artifacts/13663895600')
+    require(origin_artifact['workflow_run']['id'] == 42593220047 and
+            origin_artifact['workflow_run']['head_sha'] == origin['head_sha'] and
+            origin_artifact['digest'] == 'sha256:a9e05fd255fa34882a1af2a67007ee1dc6284460325127a98cd5601d42bc8533' and
+            origin_artifact['size_in_bytes'] == 2124997,
+            'RETAIN_ACTUAL_INFINITY_ORIGIN_AND_SERVICE_FAILURE_ARTIFACT')
     previous = original.api('actions/runs/42591104063')
     require(previous['status'] == 'completed' and previous['conclusion'] == 'failure' and
             previous['head_sha'] == '28f1853495f570ce75282ce4603765258223378e' and

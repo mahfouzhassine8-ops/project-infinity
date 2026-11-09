@@ -6,7 +6,7 @@
   "production_source_sha256": {
     "plugin.py": "580a2d7b25bc7a415c2db059fe1fa696808107a4f997a32d544baf2468a2877a",
     "resume_hub.py": "807157626f817dd5375e0e60872b6cd351d33135a23c5a225f26c86a196e7ed5",
-    "service.py": "569fea31b465674b5e9fc357a895b0a00706df999c201246a33e8fcd00c9b669"
+    "service.py": "c0f45709166d9b7018eac0cee4834aaa617e8a684d6d199568e4e65a4645d6bd"
   },
   "authorization": "Owner directive: genuine Infinity-origin TV/movie workflow only; no direct-provider substitute; preserve e410f30b and existing saving/navigation/tracker.",
   "owner_confirmed_navigation": {
@@ -50,7 +50,7 @@
   ],
   "TV_scenario": {
     "id": "infinity_tv_watchlist_queens_blade_real_playback",
-    "status": "NOT_RUN",
+    "status": "PRIOR_ACTUAL_ORIGIN_AND_RECORD_PASS; NEW_UI_RESUME_SOURCE_NOT_RUN",
     "sequence": [
       "Infinity TV",
       "Watchlist",
@@ -58,7 +58,7 @@
       "Episode List",
       "Episode 4",
       "Play",
-      "At least 300 seconds of advancing actual playback clock while meeting existing tracker eligibility",
+      "Prior304.257-second playback evidence retained; new fresh-profile actual playback need only meet original tracker eligibility to verify displayed cards and resume after the service-survival correction.",
       "Stop",
       "Infinity TV Progress Shows",
       "Next Episodes",
@@ -73,11 +73,18 @@
       "Assert a completed successor only when existing trusted ordering proves it; otherwise record successor unavailable, never infer E+1.",
       "Resume the same exact content through existing Infinity UI and verify the observed position against stored progress without a test seek.",
       "Do not require a native numeric episode tag as a pre-play gate when the reviewed source-bound local identity path is applicable; keep unknown coordinates unknown and report that limitation."
-    ]
+    ],
+    "retained_observed_evidence": {
+      "run": 42593220047,
+      "actual_clock_delta": 304.257,
+      "stored_position": 307.902,
+      "exact_local_parent_and_child": "PASS",
+      "native_tracking_cards_and_resume": "NOT_RUN_PREVIOUS_TEST_HISTORY_ASSUMPTION"
+    }
   },
   "movie_scenario": {
     "id": "infinity_movies_watchlist_real_playback",
-    "status": "NOT_RUN",
+    "status": "PRIOR_RECORD_FAIL_AFTER_SERVICE_EXIT; NEW_SERVICE_FIX_NOT_RUN",
     "sequence": [
       "Infinity Movies",
       "Watchlist",
@@ -115,11 +122,11 @@
     "raw_history": "Retain original workflow failures/logs unchanged; current interpretation must not promote them to unexecuted functional failures or successes."
   },
   "execution": {
-    "status": "SOURCE_REVIEWED_READINESS_CORRECTION_SELECTED_PENDING_ANDROID",
+    "status": "BLOCKED_PENDING_MATCHING_C1_AUTHENTICATED_FIXTURE_AND_REVIEWED_NEW_SELECTION",
     "application_tests_executed_this_change": 1,
     "repeat_completed_tests": false,
     "old_independent_movie_selection_retired_for_acceptance": true,
-    "new_origin_runner_activation": "One new attempt selected after source-reviewed test-only empty-directory readiness correction; prior failed run and snapshots retained. No automatic retries.",
+    "new_origin_runner_activation": "Disabled until original-key signedC1 fixture and reviewed focused runtime selection are bound.",
     "APK_build": false,
     "publication": false,
     "release_acceptance": false,
@@ -128,9 +135,9 @@
     "maximum_new_attempts": 1,
     "automatic_retries": 0,
     "retained_environment_failure_run": 42570831467,
-    "last_attempt": 42591104063,
-    "last_attempt_result": "BLOCKED_OBSERVER_BEFORE_INFINITY_ORIGIN; Movie activation refused by prior busy modal",
-    "owner_origin_attempt_number": 2
+    "last_attempt": 42593220047,
+    "last_attempt_result": "TVrealrecordPASS/nativeUIblocked; movierecordFAILafterresidentserviceexit; bothretainedunchanged",
+    "owner_origin_attempt_number": 3
   },
   "shared_record_view_coverage": {
     "status": "NOT_RUN",
@@ -150,5 +157,11 @@
       "Light and dark themes"
     ],
     "rule": "Same existing records and approved layouts; empty viewport captures do not establish tracking acceptance."
-  }
+  },
+  "protected_e410_source_sha256": {
+    "plugin.py": "580a2d7b25bc7a415c2db059fe1fa696808107a4f997a32d544baf2468a2877a",
+    "resume_hub.py": "807157626f817dd5375e0e60872b6cd351d33135a23c5a225f26c86a196e7ed5",
+    "service.py": "569fea31b465674b5e9fc357a895b0a00706df999c201246a33e8fcd00c9b669"
+  },
+  "production_source_checkpoint": "5787ca4569faa70dec4f10493b08bd8015d542ea"
 }
