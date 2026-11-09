@@ -1,0 +1,73 @@
+{
+  "APK_sha256": "804eebc57af2e4ef4e5418b56994bda64eb7fd7e7f2c0653b5c6e2a9f7833058",
+  "Fold": "NOT_RUN",
+  "adb_root_handshake": {
+    "application_installed": false,
+    "elapsed_seconds": 1.6040303080000058,
+    "root_command": {
+      "returncode": 0,
+      "stderr": "",
+      "stdout": ""
+    },
+    "root_requests": 1,
+    "status": "PASS_VERIFIED_ROOT_RECONNECTION_ONLY",
+    "verified_uid": "0"
+  },
+  "application_installed": true,
+  "environment": {
+    "application_installed": false,
+    "application_started": false,
+    "compatibility_overrides": false,
+    "fingerprint": "google/sdk_gphone64_x86_64/emu64xa:16/BE2A.250530.026.F3/13894323:userdebug/dev-keys",
+    "image": "system-images;android-36;google_apis;x86_64",
+    "page_size": 4096,
+    "revision": 7,
+    "sdk": 36,
+    "serial": "emulator-5554",
+    "status": "PASS_STOCK_API36_ENVIRONMENT_INTAKE_ONLY",
+    "stock_bridge_build_id": "2810e5b44895c4ea0b1ad6882ea73b73",
+    "stock_bridge_sha256": "fbadc774c989534a567e6af8fd16d2c00727b1f1d9cc778bf538d6b59ed9776d"
+  },
+  "error": "RuntimeError('ONE_EXACT_STOCK_ALL_FILES_SWITCH')",
+  "feature_checks": "NOT_RUN",
+  "force_stop_scope": "Only the two explicitly selected startup-reliability resets; no data clear or Close/shutdown coverage",
+  "full_twelve_checks": "NOT_RUN",
+  "installed_APK_sha256": "804eebc57af2e4ef4e5418b56994bda64eb7fd7e7f2c0653b5c6e2a9f7833058",
+  "measured_UI_actions": [
+    {
+      "bounds": "[324,1114][760,1240]",
+      "center": [
+        542,
+        1177
+      ],
+      "description": "",
+      "package": "com.projectinfinity.kodi",
+      "purpose": "Measured exact Infinity initial media/files permission rationale Continue",
+      "resource_id": "android:id/button3",
+      "text": "Continue"
+    },
+    {
+      "bounds": "[133,857][947,1004]",
+      "center": [
+        540,
+        930
+      ],
+      "description": "",
+      "package": "com.google.android.permissioncontroller",
+      "purpose": "Measured stock OS runtime permission for Infinity",
+      "resource_id": "com.android.permissioncontroller:id/permission_allow_foreground_only_button",
+      "text": "While using the app"
+    }
+  ],
+  "release_acceptance": false,
+  "retained_host_disposal": {
+    "adaptation": "Only DISPOSABLE_AVD literal; original PID/start/exe/SDK/action/pidfd/report gates unchanged",
+    "adapted_sha256": "e1215db2aa0520b865fbe0e2f1f87cf83f67aefde425ba4ae7552cc2df57ec28",
+    "source": "a4a89977f085480c720a7b6e73489374d01395dc",
+    "source_sha256": "f8d5b4cec4db192ffa096e683f1f95d1b48cf3a62ba9acebc5ee7cff65dfa712"
+  },
+  "shutdown": "NOT_SELECTED",
+  "starts": [],
+  "status": "FAIL_UNCHANGED69_STOCK_API36_STARTUP_QUALIFICATION",
+  "traceback": "Traceback (most recent call last):\n  File \"/home/runner/work/project-infinity/project-infinity/repairs/infinity-tracking-integration-2103469-20261108/qualify_android_baseline.py\", line 577, in run\n    record = start_once(device, cycle, out)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/project-infinity/project-infinity/repairs/infinity-tracking-integration-2103469-20261108/qualify_android_baseline.py\", line 505, in start_once\n    device.handle_ui(tree)\n  File \"/home/runner/work/project-infinity/project-infinity/repairs/infinity-tracking-integration-2103469-20261108/qualify_android_baseline.py\", line 309, in handle_ui\n    require(len(switches) == 1, 'ONE_EXACT_STOCK_ALL_FILES_SWITCH')\n  File \"/home/runner/work/project-infinity/project-infinity/repairs/infinity-tracking-integration-2103469-20261108/qualify_android_baseline.py\", line 52, in require\n    raise RuntimeError(label)\nRuntimeError: ONE_EXACT_STOCK_ALL_FILES_SWITCH\n"
+}

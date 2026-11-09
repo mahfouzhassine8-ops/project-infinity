@@ -60,8 +60,9 @@
       "reason": "EXACT_STARTUP_PUSH_PREFIX"
     }
   ],
-  "final_request_sha256": "3f7916015b8e98f3656f53a8c5a99c3a7a1eaa75e6e915d5bc4656b71bb19e91",
+  "final_request_sha256": "f8c74b04405017acbcb209875acec65f5bd2ccfddc93601b16524810cf5bde87",
   "independent_review": "Astra final workflow/harness review accepted; source/guard only, no runtime acceptance",
   "setup_reconnect_binding": "PASS actual checked_request and actual workflow guard after source-bound reconnect correction; prior guard evidence retained",
-  "rationale_binding": "PASS actual checked_request final source/guard binding; original workflow guard unchanged; Astra targeted guard review accepted"
+  "rationale_binding": "PASS actual checked_request final source/guard binding; original workflow guard unchanged; Astra targeted guard review accepted",
+  "compose_binding": "PASS checked_request; unchanged workflow guard; exact Compose row source reviewed by Astra"
 }

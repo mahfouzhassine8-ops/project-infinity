@@ -303,12 +303,22 @@ class Device:
             self.tap(allow[0], 'Measured stock OS runtime permission for Infinity')
             return True
         settings = [n for n in nodes if n.get('package') == 'com.android.settings']
+        compose = [n for n in settings if n.get('class') == 'android.view.View' and n.get('checkable') == 'true' and n.get('clickable') == 'true' and n.get('enabled') == 'true' and
+                   any(child.get('package') == 'com.android.settings' and child.get('text') == 'Allow access to manage all files' for child in n.iter('node') if child is not n)]
+        if len([n for n in settings if n.get('text') == 'Infinity']) == 1 and len([n for n in settings if n.get('text') == 'All files access']) == 1 and compose:
+            require(len(compose) == 1 and compose[0].get('checked') in ('false', 'true'), 'ONE_EXACT_STOCK_COMPOSE_ALL_FILES_ROW')
+            if compose[0].get('checked') == 'false':
+                self.tap(compose[0], 'Measured exact stock Settings Compose all-files row for Infinity')
+                return True
+            self.shell('input', 'keyevent', 'KEYCODE_BACK')
+            return True
         texts = ' '.join(n.get('text', '') for n in settings)
         if 'Infinity' in texts and ('Allow access to manage all files' in texts or 'Allow access to all files' in texts):
             switches = [n for n in settings if n.get('class') in ('android.widget.Switch', 'android.widget.CompoundButton') and n.get('clickable') == 'true']
             require(len(switches) == 1, 'ONE_EXACT_STOCK_ALL_FILES_SWITCH')
             if switches[0].get('checked') != 'true':
                 self.tap(switches[0], 'Measured stock Settings all-files permission for Infinity')
+                return True
             self.shell('input', 'keyevent', 'KEYCODE_BACK')
             return True
         tutorials = [n for n in nodes if n.get('package') == 'com.android.systemui' and n.get('text') in ('Got it', 'GOT IT') and n.get('clickable') == 'true']

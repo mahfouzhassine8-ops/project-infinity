@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "status": "PASS_SELECTED_BASELINE_HOST_GUARDS_ONLY",
-  "harness_sha256": "6d8670051215ddb1c68d14a155c8b865791b0f7733c302f6653f41b99d0b250f",
+  "harness_sha256": "9108c34952046829ac64d460321518795a44b1bce9102d5b1d2153602dd3ce29",
   "selection": "New baseline-only API36 intake and artifact/UI/teardown guards; no forty-case suite repeated",
   "checks_selected": [
     "Syntax parses",
@@ -147,9 +147,27 @@
     {
       "case": "unknown_modal_no_generic_dismissal",
       "status": "PASS_HOST_UI_GUARD_ONLY"
+    },
+    {
+      "case": "actual42539616751_unchecked_Compose_row_measured_tap_no_Back",
+      "status": "PASS_HOST_UI_GUARD_ONLY",
+      "fixture_sha256": "81d3d978c9575c022503cf75b2f06472af145ae01f2516f11da4f6cd62e5addd",
+      "center": [
+        540,
+        981
+      ]
+    },
+    {
+      "case": "subsequent_checked_Compose_capture_Back_without_tap",
+      "status": "PASS_HOST_UI_GUARD_ONLY"
+    },
+    {
+      "case": "wrong_Compose_label_app_owner_or_noncheckable_refuses",
+      "status": "PASS_HOST_UI_GUARD_ONLY",
+      "negative_variants": 4
     }
   ],
-  "check_count": 31,
+  "check_count": 34,
   "SDK_APK_signature_check": "NOT_RUN_LOCALLY_NO_SDK; required in admit before application execution",
   "module_RSA_signature_check": "PASS_ORIGINAL_PUBLIC_KEY_ONLY",
   "host_disposal_worker_executed": false,
@@ -251,5 +269,33 @@
     }
   ],
   "failed42538614119_native_startup": "NOT_STARTED; app-owned initial rationale not handled; not a native API36 failure",
-  "report_only_delta": "After successful adb install and installed-APK SHA verification, persist application_installed=true and installed_APK_sha256 before any start attempt; no extra tests selected."
+  "report_only_delta": "After successful adb install and installed-APK SHA verification, persist application_installed=true and installed_APK_sha256 before any start attempt; no extra tests selected.",
+  "compose_permission_selection_before_execution": [
+    "Captured real API36 Compose unchecked all-files row selects measured tap without Back",
+    "Later captured checked=true row returns Back without tap",
+    "Wrong exact descendant label/app label/row owner/noncheckable row rejects without input"
+  ],
+  "prior31_checks_preserved_not_rerun": true,
+  "compose_permission_checks": [
+    {
+      "case": "actual42539616751_unchecked_Compose_row_measured_tap_no_Back",
+      "status": "PASS_HOST_UI_GUARD_ONLY",
+      "fixture_sha256": "81d3d978c9575c022503cf75b2f06472af145ae01f2516f11da4f6cd62e5addd",
+      "center": [
+        540,
+        981
+      ]
+    },
+    {
+      "case": "subsequent_checked_Compose_capture_Back_without_tap",
+      "status": "PASS_HOST_UI_GUARD_ONLY"
+    },
+    {
+      "case": "wrong_Compose_label_app_owner_or_noncheckable_refuses",
+      "status": "PASS_HOST_UI_GUARD_ONLY",
+      "negative_variants": 4
+    }
+  ],
+  "legacy_settings_selector": "Unchanged; after a legacy tap also waits for later checked=true capture before Back",
+  "failed42539616751_native_startup": "NOT_STARTED; stock Settings Compose permission row not handled; not a native API36 constructor failure"
 }
