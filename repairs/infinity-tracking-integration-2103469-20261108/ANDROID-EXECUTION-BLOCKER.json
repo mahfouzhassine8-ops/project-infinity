@@ -1,5 +1,5 @@
 {
-  "status": "BLOCKED_NO_VERIFIED_ANDROID_EXECUTION_ROUTE",
+  "status": "BASELINE_EXECUTION_ROUTE_QUALIFIED; INTEGRATED_FEATURE_GATES_PENDING",
   "local_host_arch": "x86_64",
   "adb_on_PATH": null,
   "emulator_on_PATH": null,
@@ -21,8 +21,8 @@
   },
   "repeat_failure_run": 42527381943,
   "protected69_native": "Exact same original66 ARM64 native SHA256 ee3be7c7a95b86f8357539001fcd50bedbd80217b02f130d649f7f57e6075794",
-  "new_application_tests": "NOT_RUN",
-  "minimum_requirement": "First demonstrate stable unchanged signed2103469 startup in a qualified disposable Android execution environment, then run exact twelve selected checks on originally signed internal QA candidate/recovery",
+  "new_application_tests": "PASS_UNCHANGED69_STOCK_API36_THREE_STARTS_ONLY; NEW_SOURCE_NOT_RUN",
+  "minimum_requirement": "Use qualified unchanged stockAPI36r7 environment for originally signed internalQA candidate/recovery and twelve selected integrated tracking checks; no new native compilation needed for three Python-only changes.",
   "new_workflow_dispatches": 0,
   "new_builds": 0,
   "new_signatures": 0,
@@ -32,11 +32,14 @@
     "image": "system-images;android-36;google_apis;x86_64",
     "image_revision": 7,
     "production_APK_changed": false,
-    "status": "REQUEST_REVIEWED_PENDING_ACTUAL_EXECUTION",
+    "status": "PASS_UNCHANGED69_STOCK_API36_THREE_STARTS_ONLY",
     "startup_attempts": 3,
     "stable_seconds": 45,
     "scope": "Original69 native startup only, not tracking or Fold clearance",
     "reviewed_request": "ANDROID-BASELINE-REQUEST.json",
-    "constructor_evidence": "STARTUP-CONSTRUCTOR-EVIDENCE.json"
-  }
+    "constructor_evidence": "STARTUP-CONSTRUCTOR-EVIDENCE.json",
+    "run_id": 42542862696,
+    "artifact_id": 13642681405
+  },
+  "new_selected_push_runs": 5
 }

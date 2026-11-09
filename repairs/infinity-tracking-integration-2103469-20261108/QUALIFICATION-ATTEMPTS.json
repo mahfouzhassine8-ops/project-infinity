@@ -79,6 +79,62 @@
       "production_source_changes": false,
       "build": false,
       "signing": false
+    },
+    {
+      "status": "PASS_UNCHANGED69_STOCK_API36_THREE_STARTS_ONLY",
+      "run_id": 42542862696,
+      "source_commit": "3d32dfa90510011701c11c49a763774ce3428200",
+      "artifact_id": 13642681405,
+      "artifact_sha256": "d9a0baa149a248ad85fcafdb9b07ef120a97228631dfd53af8bd6c5e4c60e82d",
+      "artifact_size": 1684557,
+      "APK_sha256": "804eebc57af2e4ef4e5418b56994bda64eb7fd7e7f2c0653b5c6e2a9f7833058",
+      "starts": [
+        {
+          "cycle": 1,
+          "pid": 5268,
+          "process_start": "20234",
+          "stable_seconds": 54.08230541299997,
+          "startup_seconds": 104.94756216300004,
+          "installed80_source_hashes_unchanged": true,
+          "actual_GUI_RPC_responsive": true,
+          "foreground_at_readiness": "com.projectinfinity.kodi/.Main",
+          "Home_observations": 18
+        },
+        {
+          "cycle": 2,
+          "pid": 6577,
+          "process_start": "28876",
+          "stable_seconds": 53.13189215400001,
+          "startup_seconds": 26.821762682000042,
+          "installed80_source_hashes_unchanged": true,
+          "actual_GUI_RPC_responsive": true,
+          "foreground_at_readiness": "com.projectinfinity.kodi/.Main",
+          "Home_observations": 18
+        },
+        {
+          "cycle": 3,
+          "pid": 7425,
+          "process_start": "36962",
+          "stable_seconds": 52.74957870399999,
+          "startup_seconds": 26.549305452999988,
+          "installed80_source_hashes_unchanged": true,
+          "actual_GUI_RPC_responsive": true,
+          "foreground_at_readiness": "com.projectinfinity.kodi/.Main",
+          "Home_observations": 18
+        }
+      ],
+      "all_eight_installed_source_snapshots_match": true,
+      "source_count": 80,
+      "metadata_count": 2,
+      "independent_review": "Astra: accepted unchanged69 stockAPI36r7 startup only; no package crash in retained uncapped lifecycle log",
+      "foreground_scope": "At readiness only; not continuously sampled through stable interval",
+      "production_source_changes": false,
+      "new_tracking_source_tested": false,
+      "all_twelve_feature_gates": "NOT_RUN",
+      "Fold": "NOT_RUN",
+      "API37": "NOT_CLEARED",
+      "shutdown": "NOT_SELECTED",
+      "release_acceptance": false
     }
   ],
   "new_tracking_source_app_checks": "NOT_RUN",
