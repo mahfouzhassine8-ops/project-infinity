@@ -1,0 +1,78 @@
+{
+  "CI42619001211": "CANCELLED_ON_OWNER_REJECTION. Partial69/74PackageManager/native80/start observations retained;74moviecaseunfinished,75notrun. Noacceptanceinferred.",
+  "Fold_actual_installed_APK_hash": "NOT_FRESHLY_COLLECTED; OWNER_VERSION_AND_BEHAVIOR_ACCEPTED_AS_REGRESSION_EVIDENCE",
+  "actual_Fold_log": "OwnerconfirmedNOlogexport/upload; onlyscreenshot. Onlyolderidentity/sourceexportattachmentsavailable.",
+  "confirmed_Fold_path": [
+    "Infinity TV",
+    "Watchlist",
+    "Blade Queen",
+    "provider episode list",
+    "Episode4"
+  ],
+  "confirmed_trace": {
+    "indirect_effects": "NewlyrecognizedWNT entersunchanged experience.on_started/source-memory anderror-recoverybehavior; no directsource-provenfirstfailuremechanism. Existingauto/manualretry requirespriorerror; do not confuseitwithinitialcause.",
+    "loading_guard": "ExactauthenticatedmissingFrameControlsWindowexception nowkeepsresidentloopalive; potentialtiming/lifecycleseam ONLYifFoldlogshowsitfired. Not establishedasrootcause.",
+    "native_packaging": "47native.so entries preservecompression/mode/flags/size. Alluncompressedentryoffsets unchanged; libkodi.so samebytes/same125009920offset aligned16384 inboth. Compressedentryoffsetshiftsareordinaryarchivepositionchanges, notidentifiedcause.",
+    "provider_native_episode": "Clickedchildis constructed/resolved by installedWatchNixtoons2, notCC._list_item. ActualfailingpluginURI/stream/traceback unavailable.",
+    "saved_show_folder": "plugin.navigation_target/_target/play_saved unchanged; exact_progress returnsNone for typedtvshow/season. Newresumeoffset projection isnotdirectlyappliedtotheprovider-createdEpisode4child.",
+    "service": "Newfallback reads copiedactualplayingitem andbuildsPythontrackingentry; no newnativepath/tag setters orPlay/Stop/Seek calls. Existingpoll mayarmonceisPlayingVideo istrue beforeAVStarted callback; strictAV-only timing isnotproved."
+  },
+  "correction": "NONE_PROPOSED_OR_IMPLEMENTED. FirstidentifyinitialFoldresolver/playerfailure anditscallsequence fromexistingKodi log; no provider-specific workaround or speculative global locking.",
+  "exact_error": "One or more items failed to play",
+  "issued74_APK_sha256": "c4e8ec4dae7e296578bfbfe2f705cf8fc51bbb96f7884e103717c444ffc75894",
+  "original_APK_sha256": "804eebc57af2e4ef4e5418b56994bda64eb7fd7e7f2c0653b5c6e2a9f7833058",
+  "owner_device_result": "FAIL_2103474_NATIVE_EPISODE_PLAYBACK; SAME_EPISODE_WORKS_2103469",
+  "preservation_impact_after_rejection": "Metadatafreeze/cancellation/evidenceonly; no productionAPK/provider/native/UI/data source modifications; no newcandidate/versionissued.",
+  "production_diff": {
+    "plugin.py": {
+      "added_functions": [],
+      "modified_functions": [
+        "_menu_resume",
+        "show_item_menu",
+        "_list_item"
+      ],
+      "removed_functions": [],
+      "source69_sha256": "a61290fe791e264e82f00aebb7c5b6173226639edca3bee15d17dccdda82fc8e",
+      "source74_sha256": "580a2d7b25bc7a415c2db059fe1fa696808107a4f997a32d544baf2468a2877a"
+    },
+    "resume_hub.py": {
+      "added_functions": [
+        "exact_progress",
+        "_progress_rows",
+        "_series_rows"
+      ],
+      "modified_functions": [
+        "watchnixtoons_source_identity",
+        "_resume_groups",
+        "_resume_aliases",
+        "record_progress",
+        "_entries_projection",
+        "continue_series_ids",
+        "progress_shows",
+        "next_episodes"
+      ],
+      "removed_functions": [],
+      "source69_sha256": "1c38df4f68201dc209d309f31bebf051e24baf0e45f4cb7318828af2212780d5",
+      "source74_sha256": "807157626f817dd5375e0e60872b6cd351d33135a23c5a225f26c86a196e7ed5"
+    },
+    "service.py": {
+      "added_functions": [
+        "_watchnixtoons_episode_producer",
+        "_continue_source_item",
+        "_tick_loading_observer"
+      ],
+      "modified_functions": [
+        "InfinityPlayer.__init__",
+        "InfinityPlayer.onAVStarted",
+        "InfinityPlayer._arm_continue",
+        "main"
+      ],
+      "removed_functions": [],
+      "source69_sha256": "1844b2b217ccc7f3adef4d82bc825588fb2d561a87d6447f32ebedf3295e927d",
+      "source74_sha256": "c0f45709166d9b7018eac0cee4834aaa617e8a684d6d199568e4e65a4645d6bd"
+    }
+  },
+  "provider_boundary": "WatchNixtoons2 is not bundled in eitherAPK. Its live Foldinstalled code/version/hash is not established by APKcomparison; no provider replacement is supplied by74. Knownreference0.14.24 source is not a freshFoldsource report.",
+  "source_preservation_evidence": "SIGNED-74-75-PRESERVATION-REVIEW.json; actual signedpayloads verified againstreviewedpreparedcomponents, fiveDEX unchanged, exactly8memberdifferences69->74, noaddedpayloadmembers. Reused, not rerun.",
+  "status": "READ_ONLY_COMPARISON_COMPLETE; ROOT_CAUSE_UNRESOLVED; NO_CORRECTION_JUSTIFIED"
+}

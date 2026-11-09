@@ -1,0 +1,49 @@
+{
+  "application_execution": false,
+  "baseline": {
+    "artifact": {
+      "id": 13631340281,
+      "name": "Infinity-Watchlist-Original-Signed-2103469-42514440156-INTERNAL-QA",
+      "sha256": "f9d054ee500326b77ee2bf4ce8673af2bd54c54115831899d374d931a98dff43",
+      "size": 329126132
+    },
+    "conclusion": "success",
+    "run_id": 42514440156,
+    "source": "a76e29b84996304241e6b309d56a31e6659ad190",
+    "workflow_id": 397702717,
+    "workflow_path": ".github/workflows/infinity-combined-release.yml"
+  },
+  "build_sign_dispatch": false,
+  "inputs": "/home/runner/work/project-infinity/project-infinity/tracking-install-intake/inputs",
+  "official_signed_pair": {
+    "2103474": {
+      "artifact": {
+        "id": 13672253204,
+        "name": "Infinity-Tracking-Experimental-Original-Signed-2103474-42615752695-INTERNAL-QA",
+        "sha256": "65c548ac2abbab49591ec76cc5b34d59811652a909434b06ab086eac25aaa095",
+        "size": 329134351
+      },
+      "conclusion": "success",
+      "run_id": 42615752695,
+      "source": "ab95df440018a32032cdb382fc52f59d5afb4fe7",
+      "workflow_id": 397702717,
+      "workflow_path": ".github/workflows/infinity-combined-release.yml"
+    },
+    "2103475": {
+      "artifact": {
+        "id": 13671998939,
+        "name": "Infinity-Tracking-Experimental-Original-Signed-2103475-42616590591-INTERNAL-QA",
+        "sha256": "37a0414e82f5df75fe36fc16f78d05ef46180ed9d10f6cc5e7c550d528d97f9d",
+        "size": 329128232
+      },
+      "conclusion": "success",
+      "run_id": 42616590591,
+      "source": "ce478cbd719c6fbb103632d558334184c3b5ff8e",
+      "workflow_id": 397702717,
+      "workflow_path": ".github/workflows/infinity-combined-release.yml"
+    }
+  },
+  "request_sha256": "0787d8328a5b97b516cda66c8cf9eab1e9f318ceaf734754618b937a6dbc7e0e",
+  "source": "b34724e862fe57b4bb9027709fbe129fdb4c0060",
+  "status": "PASS_OFFICIAL_PAIR_API_ARCHIVES_ORIGINAL_CERT_AND80_HOST_ONLY"
+}

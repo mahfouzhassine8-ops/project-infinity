@@ -1,0 +1,34 @@
+{
+  "Kodi_Fold_logs": "OWNER_CONFIRMED_NOT_EXPORTED_OR_UPLOADED",
+  "acceptance_testing": "CANCELLED_RUN42619001211; NO_FURTHER_APPLICATION_TESTS",
+  "comparison": "FOLD-3474-READONLY-COMPARISON.json",
+  "expected_issued_candidate": {
+    "actual_Fold_installed_hash_freshly_supplied": false,
+    "production_source": "5787ca4569faa70dec4f10493b08bd8015d542ea",
+    "sha256": "c4e8ec4dae7e296578bfbfe2f705cf8fc51bbb96f7884e103717c444ffc75894",
+    "signing_run": 42615752695,
+    "signing_source": "ab95df440018a32032cdb382fc52f59d5afb4fe7",
+    "versionCode": 2103474
+  },
+  "host_and_signing_results": "RETAINED_VALID_SCOPE; DO_NOT_OVERRIDE_DEVICE_REGRESSION",
+  "new_candidate": "PROHIBITED_PENDING_ROOT_CAUSE_PROPOSED_CORRECTION_AND_PRESERVATION_REPORT",
+  "next": "Read-only exactAPK/source/playbackpath/logcomparison only; no sourcefix/providerworkaround/newtestbuild",
+  "owner_delivery": false,
+  "owner_report": {
+    "confirmed_path": [
+      "Infinity TV",
+      "Watchlist",
+      "Blade Queen",
+      "provider episode list",
+      "Episode4"
+    ],
+    "device": "Galaxy Fold",
+    "evidence_type": "OWNER_REPORTED_ACTUAL_DEVICE_COMPARISON; NOT_EMULATOR_ASSUMPTION",
+    "exact_dialog": "One or more items failed to play",
+    "regression": "2103474 same episode fails",
+    "working": "2103469 Blade Queen Episode4 plays correctly"
+  },
+  "production_source_modified": false,
+  "reported_utc": "2026-11-09T12:53:53.293645+00:00",
+  "status": "REJECTED_ACTUAL_FOLD_PLAYBACK_REGRESSION"
+}
