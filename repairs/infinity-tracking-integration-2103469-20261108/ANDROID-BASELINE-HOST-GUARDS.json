@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "status": "PASS_SELECTED_BASELINE_HOST_GUARDS_ONLY",
-  "harness_sha256": "def31e4e8c93779b9d535e21af7460437409f92400e1c95407e54eddb7137fb7",
+  "harness_sha256": "5272ececcde49a2ab31b505309d2773afdd67ffdc00cbf412707b7b548f36c38",
   "selection": "New baseline-only API36 intake and artifact/UI/teardown guards; no forty-case suite repeated",
   "checks_selected": [
     "Syntax parses",
@@ -117,9 +117,21 @@
     {
       "case": "post_final_hashes_and_final_PASS_crash_alive_guards_present",
       "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "closed_then_verified_root",
+      "status": "PASS_HOST_INFRASTRUCTURE_GUARD_ONLY"
+    },
+    {
+      "case": "denied_uid2000",
+      "status": "PASS_HOST_INFRASTRUCTURE_GUARD_ONLY"
+    },
+    {
+      "case": "reconnect_timeout",
+      "status": "PASS_HOST_INFRASTRUCTURE_GUARD_ONLY"
     }
   ],
-  "check_count": 25,
+  "check_count": 28,
   "SDK_APK_signature_check": "NOT_RUN_LOCALLY_NO_SDK; required in admit before application execution",
   "module_RSA_signature_check": "PASS_ORIGINAL_PUBLIC_KEY_ONLY",
   "host_disposal_worker_executed": false,
@@ -172,6 +184,26 @@
     {
       "case": "post_final_hashes_and_final_PASS_crash_alive_guards_present",
       "status": "PASS_HOST_GUARD_ONLY"
+    }
+  ],
+  "root_handshake_selection_before_execution": [
+    "Single adb root nonzero/closed result retained; successful root reconnect UID0 allowed",
+    "UID2000 refuses before install",
+    "Bounded wait-for-device timeout refuses before install"
+  ],
+  "prior25_checks_preserved_not_rerun": true,
+  "root_handshake_checks": [
+    {
+      "case": "closed_then_verified_root",
+      "status": "PASS_HOST_INFRASTRUCTURE_GUARD_ONLY"
+    },
+    {
+      "case": "denied_uid2000",
+      "status": "PASS_HOST_INFRASTRUCTURE_GUARD_ONLY"
+    },
+    {
+      "case": "reconnect_timeout",
+      "status": "PASS_HOST_INFRASTRUCTURE_GUARD_ONLY"
     }
   ]
 }

@@ -408,6 +408,27 @@ def installed_apk(device):
     require(device.shell('sha256sum', paths[0].removeprefix('package:')).split()[0] == APK_SHA, 'INSTALLED_APK_STILL_EXACT_ORIGINAL69')
 
 
+def root_reconnect(device, out):
+    detail = dict(status='ROOT_HANDSHAKE_STARTED', root_requests=1, application_installed=False)
+    started = time.monotonic()
+    try:
+        result = subprocess.run([str(device.adb_bin), '-s', device.serial, 'root'],
+                                check=False, capture_output=True, text=True, timeout=20)
+        detail['root_command'] = dict(returncode=result.returncode, stdout=result.stdout, stderr=result.stderr)
+        save(out / 'ADB-ROOT-HANDSHAKE.json', detail)
+        device.adb('wait-for-device', timeout=25)
+        detail['verified_uid'] = device.shell('id', '-u', timeout=8).strip()
+        require(detail['verified_uid'] == '0', 'ACTUAL_ROOT_RECONNECTION_REQUIRED_BEFORE_INSTALL')
+        detail['status'] = 'PASS_VERIFIED_ROOT_RECONNECTION_ONLY'
+        return detail
+    except Exception as error:
+        detail.update(status='FAIL_ROOT_RECONNECTION_NO_INSTALL', error=repr(error))
+        raise
+    finally:
+        detail['elapsed_seconds'] = time.monotonic() - started
+        save(out / 'ADB-ROOT-HANDSHAKE.json', detail)
+
+
 def crash_free_alive(device):
     device.alive()
     crash = device.shell('logcat', '-b', 'crash', '-d', '-t', '2000', timeout=5)
@@ -518,9 +539,7 @@ def run(request, admission, out, avd):
         require(targets, 'EXACT_PINNED_SDK_EMULATOR_HOST_PROCESS_REQUIRED')
         report['environment'] = environment(device, out)
         require(not device.shell('pm', 'list', 'packages', PACKAGE).strip(), 'FRESH_VM_NO_PRIOR_INFINITY_INSTALLATION')
-        device.adb('root')
-        device.adb('wait-for-device', timeout=20)
-        require(device.shell('id', '-u').strip() == '0', 'DISPOSABLE_ROOT_FOR_READONLY_IDENTITY_AND_MODULE_CAPTURE')
+        report['adb_root_handshake'] = root_reconnect(device, out)
         device.adb('install', '--no-streaming', apk, timeout=300)
         installed_apk(device)
         # Minimal disposable settings only. No addon, provider, observer or tracking seed.
