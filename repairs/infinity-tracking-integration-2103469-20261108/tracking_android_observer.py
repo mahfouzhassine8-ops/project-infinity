@@ -197,12 +197,21 @@ def snapshot():
                     key=xbmc.getInfoLabel(p + 'Property(Infinity.ResumeHub.Key)'),
                     selection=xbmc.getInfoLabel(p + 'Property(Infinity.Selection.Snapshot)')))
             controls[str(control)] = rows
+    # Theme telemetry is independent of native directory/player observation.
+    # An APK asset is not proof that its historical addon owner is registered.
+    theme, theme_error = None, None
+    try:
+        theme = xbmcaddon.Addon('service.infinity.compat').getSetting('theme_mode')
+        require(theme in ('system', 'light', 'dark'), 'THEME_OWNER_POLICY_UNAVAILABLE')
+    except Exception as error:
+        theme, theme_error = None, repr(error)
     return dict(pid=os.getpid(), window=xbmcgui.getCurrentWindowId(),
                 dialog=xbmcgui.getCurrentWindowDialogId(), controls=controls,
                 folder=xbmc.getInfoLabel('Container.FolderPath'), skin=xbmc.getSkinDir(),
                 heading=xbmc.getInfoLabel('Control.GetLabel(1)'), body=xbmc.getInfoLabel('Control.GetLabel(9)'),
                 screen_width=xbmc.getInfoLabel('System.ScreenWidth'), screen_height=xbmc.getInfoLabel('System.ScreenHeight'),
-                theme=xbmcaddon.Addon('service.infinity.compat').getSetting('theme_mode'),
+                theme=theme, theme_available=theme is not None, theme_error=theme_error,
+                published_theme=xbmc.getInfoLabel('Window(Home).Property(Infinity.Theme)'),
                 visual_mode=xbmc.getInfoLabel('Skin.String(Infinity.VisualMode)'),
                 home_view=xbmc.getInfoLabel('Skin.String(Infinity.HomeView)'))
 

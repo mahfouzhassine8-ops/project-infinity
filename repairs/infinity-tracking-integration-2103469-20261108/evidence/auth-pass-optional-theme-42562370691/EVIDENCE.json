@@ -1,0 +1,23 @@
+{
+  "status": "PASS_ANDROID_NATIVE80_AUTH; PLAYBACK_BLOCKED_BY_OBSERVER_OPTIONAL_THEME_LOOKUP",
+  "run_id": 42562370691,
+  "source_commit": "db86d3b32e1d880747b15a949ff126a184a44b61",
+  "artifact_id": 13650078322,
+  "artifact_sha256": "cb398c7f1986978d4865af500f2145c2a919991111183de59fb623adf8c0b4b8",
+  "artifact_size": 2098276,
+  "completed_case": "normal_zip_install_and_dynamic_original_full80_auth",
+  "cc_version": "0.3.5.68",
+  "manifest_sha256": "b07c258f05f334ea5700705c9fc98c034e53f9e7e394b6eb97169b1855a5f8be",
+  "Python_optimization": 1,
+  "module_source_count": 80,
+  "original_signature_and_import_guard_verified_on_Android": true,
+  "WNT_version": "0.14.24",
+  "provider_source_hashes_verified": true,
+  "original_APK_unchanged": true,
+  "tracking_or_playback_acceptance": false,
+  "blocker": "Observer snapshot optional historical theme owner lookup raises Unknown addon id service.infinity.compat, discarding otherwise valid native GUI rows. Producer playback not yet tested.",
+  "cleanup_GetDirectory_errors": "Not producer-failure evidence; test cleanup cancelled pending directories after observer errors.",
+  "fix_scope": "Observer telemetry resilience and truthful separate theme case only; no production or baseline-addon installation changes",
+  "old40_13_retained": true,
+  "release_acceptance": false
+}

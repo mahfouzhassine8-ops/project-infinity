@@ -498,6 +498,12 @@ def capture_ui(device, observer, out):
             result['samples'].append(dict(viewport=name, requested=[width, height], actual=snap, gui=gui(device)))
         device.shell('wm', 'size', 'reset')
         time.sleep(2)
+        if not original.get('theme_available'):
+            result.update(status='VIEWPORT_CAPTURED_THEME_UNVERIFIED_OWNER_UNAVAILABLE',
+                          theme_status='UNVERIFIED', theme_error=original.get('theme_error'),
+                          published_theme=original.get('published_theme'))
+            base.save(out / 'independent-viewport-theme-captures.json', result)
+            raise RuntimeError('THEME_UNVERIFIED_OWNER_UNAVAILABLE:' + str(original.get('theme_error')))
         for label, value in (('Light Pearl', 'light'), ('Dark', 'dark')):
             device.rpc('Addons.ExecuteAddon', dict(addonid=base.CC, params=['theme']))
             menu_choose(device, observer, label)
@@ -506,7 +512,7 @@ def capture_ui(device, observer, out):
             result['samples'].append(dict(theme=value, actual=snap))
     finally:
         device.shell('wm', 'size', 'reset')
-        if original['theme'] in ('system', 'light', 'dark'):
+        if original.get('theme_available') and original['theme'] in ('system', 'light', 'dark'):
             device.rpc('Addons.ExecuteAddon', dict(addonid=base.CC, params=['theme']))
             menu_choose(device, observer, {'system': 'Follow System', 'light': 'Light Pearl', 'dark': 'Dark'}[original['theme']])
     base.save(out / 'independent-viewport-theme-captures.json', result)
