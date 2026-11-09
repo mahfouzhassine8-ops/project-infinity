@@ -1,0 +1,57 @@
+{
+  "status": "IMMEDIATE_STARTUP_CAUSE_LOCALIZED; RUNTIME_POINTER_ORIGIN_UNDETERMINED",
+  "protected_native_sha256": "ee3be7c7a95b86f8357539001fcd50bedbd80217b02f130d649f7f57e6075794",
+  "APK69_sha256": "804eebc57af2e4ef4e5418b56994bda64eb7fd7e7f2c0653b5c6e2a9f7833058",
+  "retained_run": 42528730683,
+  "tombstone_artifact": 13636716810,
+  "constructor": "talloc_lib_init",
+  "guest_pc": "0x2be89fc",
+  "instruction": "ldr w8,[x19,x8]",
+  "call_path": [
+    {
+      "pc": "0x2be89cc",
+      "instruction": "mov w0,#25",
+      "meaning": "AT_RANDOM"
+    },
+    {
+      "pc": "0x2be89d0",
+      "instruction": "bl PLT0x14484d0",
+      "symbol": "getauxval@LIBC",
+      "GOT": "0x5d20bb0"
+    },
+    {
+      "pc": "0x2be89d8",
+      "meaning": "getauxval result saved in x19"
+    },
+    {
+      "pc": "0x2be89dc",
+      "symbol": "rand@LIBC",
+      "GOT": "0x5d21088"
+    },
+    {
+      "pc": "0x2be89fc",
+      "meaning": "four-byte read from AT_RANDOM pointer plus rand()%12"
+    }
+  ],
+  "observed": {
+    "x19": "0x7ec164cb7fa0",
+    "x8": 7,
+    "x0": "0x6b8b4567",
+    "fault_address": "0x7ec164cb7fa7",
+    "mapping": "Unmapped between regions, explicitly recorded by tombstone line1532"
+  },
+  "upstream": {
+    "samba_pin": "4.15.13",
+    "bundled_talloc": "2.3.3",
+    "version_source": "https://github.com/samba-team/samba/blob/samba-4.15.13/lib/talloc/wscript#L4",
+    "constructor_source": "https://github.com/samba-team/samba/blob/samba-4.15.13/lib/talloc/talloc.c#L406",
+    "matching_operations": "getauxval(AT_RANDOM); rand()%12; memcpy4bytes"
+  },
+  "conclusion": "Original library constructor reads a non-null but unmapped runtime auxiliary-vector pointer before Kodi/tracking functionality starts.",
+  "not_proved": "Why the runtime supplied that pointer: native bridge, Android environment, or another loader interaction not isolated.",
+  "minimum_discriminator": "Unchanged signed69 startup on a separately qualified compatible stock image; nativeARM64 would remove translation but no verified host is currently available.",
+  "selected_comparison": "Stock API36 Google APIs x86_64 revision7, compatible with actual minSDK21,targetSDK35; not an API37 pass",
+  "production_code_changes": false,
+  "APK_rebuild": false,
+  "host40_case_rerun": false
+}

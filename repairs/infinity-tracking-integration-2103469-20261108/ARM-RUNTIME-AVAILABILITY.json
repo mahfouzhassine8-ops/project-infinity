@@ -1,0 +1,36 @@
+{
+  "status": "STANDARD_NATIVE_ARM_ANDROID_EXECUTION_UNAVAILABLE_FROM_OBSERVED_CAPABILITIES",
+  "checked_utc": "2026-11-09",
+  "retained_ubuntu_arm_probe": {
+    "run_id": 39133157301,
+    "machine": "aarch64",
+    "RAM_GiB": 15.57,
+    "kvm_exists": false,
+    "kvm_readwrite": false,
+    "native_arm64_runner": true,
+    "candidate_for_direct_arm64_avd": false,
+    "workflow_success_meaning": "Read-only host probe completed; no Android boot or application execution"
+  },
+  "current_official_emulator_catalog": {
+    "url": "https://dl.google.com/android/repository/repository2-3.xml",
+    "linux_host_archives": "x64 only",
+    "Linux_aarch64_archive": false,
+    "stable": {
+      "version": "37.2.13",
+      "archive": "emulator-linux_x64-16740729.zip"
+    },
+    "preview": {
+      "version": "37.3.8",
+      "archive": "emulator-linux_x64-16847572.zip"
+    }
+  },
+  "retained_macos_probe": {
+    "run_id": 40405405813,
+    "result": "HV_UNSUPPORTED before Android boot"
+  },
+  "scope": "Reused retained host logs plus current official catalogue metadata only; no additional jobs or SDK downloads",
+  "not_claimed": "Does not establish that native ARM Android testing is impossible; no usable standard native ARM route is currently available to this session.",
+  "production_source_changes": false,
+  "new_builds": false,
+  "new_signing": false
+}

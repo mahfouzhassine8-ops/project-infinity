@@ -1,0 +1,90 @@
+{
+  "status": "PASS_SELECTED_TRACKING_ANDROID_HOST_GUARDS_ONLY",
+  "cases": [
+    {
+      "case": "actual19bindings_unchanged_reviewed_source40evidence_and_old_workflow_bodies",
+      "status": "PASS_HOST_SOURCE_GUARD_ONLY"
+    },
+    {
+      "case": "missing_binding",
+      "status": "PASS_EXPECTED_HOST_REFUSAL"
+    },
+    {
+      "case": "changed_binding",
+      "status": "PASS_EXPECTED_HOST_REFUSAL"
+    },
+    {
+      "case": "wrong_image",
+      "status": "PASS_EXPECTED_HOST_REFUSAL"
+    },
+    {
+      "case": "repeat_baseline",
+      "status": "PASS_EXPECTED_HOST_REFUSAL"
+    },
+    {
+      "case": "unselected_application",
+      "status": "PASS_EXPECTED_HOST_REFUSAL"
+    },
+    {
+      "case": "omitted_mandatory",
+      "status": "PASS_EXPECTED_HOST_REFUSAL"
+    },
+    {
+      "case": "selected_push",
+      "status": "PASS_HOST_ROUTING_ONLY"
+    },
+    {
+      "case": "unselected_prefix",
+      "status": "PASS_HOST_ROUTING_ONLY"
+    },
+    {
+      "case": "wrong_branch",
+      "status": "PASS_HOST_ROUTING_ONLY"
+    },
+    {
+      "case": "wrong_repository",
+      "status": "PASS_HOST_ROUTING_ONLY"
+    },
+    {
+      "case": "selected_manual",
+      "status": "PASS_HOST_ROUTING_ONLY"
+    },
+    {
+      "case": "wrong_manual",
+      "status": "PASS_HOST_ROUTING_ONLY"
+    },
+    {
+      "case": "refuse_unselected_System.Shutdown",
+      "status": "PASS_REFUSED_BEFORE_SOCKET"
+    },
+    {
+      "case": "refuse_unselected_Input.ExecuteAction",
+      "status": "PASS_REFUSED_BEFORE_SOCKET"
+    },
+    {
+      "case": "refuse_unselected_Addons.ExecuteAddon",
+      "status": "PASS_REFUSED_BEFORE_SOCKET"
+    },
+    {
+      "case": "refuse_unselected_Player.Seek",
+      "status": "PASS_REFUSED_BEFORE_SOCKET"
+    }
+  ],
+  "selected_tests_sha256": "a74f2311517a980d02d94fcb7bc2ccf6b3b6b684d229479c168e384ed3c07c26",
+  "source_bindings": {
+    "admit_tracking_android.py": "7d063c8f69c90728e6f34cf081a16e48959193278e5010362787f9a49bf9a30d",
+    "stage_tracking_android.py": "5480769de20c1685dd34ec6f784846910b92c320530d3ede224ac6b6fa46fa8a",
+    "tracking_android_observer.py": "c4e32cb0b9ff0409abae47f4d22d867aab2bb125b3f5648e15ba553f93b18cd0",
+    "verify_tracking_android.py": "26f9e43eec61a44929c2482d9efe7759a2a8e6f5a2a852ffbcaa8534abcb972f",
+    "test_tracking_android_guards.py": "6b93a8beca387bd04f047b3229e9d8b1ce1a508ea54da9767f1d0811109c6bd8"
+  },
+  "workflow_sha256": "51532274f846a9f3af3b3ed65772caf52741b416213aef2c89c7c42e898a0f72",
+  "request_sha256": "e52205d791bc13595a0432e058e5039f03906d12204e28e076add7b935a33ef8",
+  "application_execution": false,
+  "provider_response_simulated": false,
+  "actual_Android_SDK_execution": false,
+  "prior40_rerun": false,
+  "prior13_installer_rerun": false,
+  "signing": false,
+  "release_acceptance": false
+}

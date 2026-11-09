@@ -1,0 +1,22 @@
+{
+  "status": "READ_ONLY_ACTUAL69_PERMISSION_FLOW_TRACED",
+  "APK_sha256": "804eebc57af2e4ef4e5418b56994bda64eb7fd7e7f2c0653b5c6e2a9f7833058",
+  "classes_dex_sha256": "8cbfe62eae167e4441462cf5be970dbfbb2cc96e068134a39e12b61c64223118",
+  "DEX_methods": {
+    "Splash$StateMachine": "0xc2a10",
+    "Splash.CheckPermissions": "0xc2e24",
+    "Splash.onActivityResult": "0xc9024",
+    "Splash.onRequestPermissionsResult": "0xc95b8"
+  },
+  "matching_retained_source": "repairs/android-checkpoint-shutdown/runtime/android/overlay/tools/android/packaging/xbmc/src/Splash.java.in",
+  "required_flow": [
+    "Exact rationale Continue requests RECORD_AUDIO.",
+    "Its callback advances to ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION on API>=33 regardless of microphone grant.",
+    "Return requires Environment.isExternalStorageManager() true, otherwise Permission denied dialog.",
+    "Success proceeds to preparation/chooser/launch; chooser task is removed only after requesting selected experience launch."
+  ],
+  "normal_permission_success_finish_relaunch": false,
+  "qualification_rule": "No blind relaunch; fresh measured UI and actual grant/lifecycle evidence must distinguish setup from native execution.",
+  "production_code_modified": false,
+  "source_review_only": true
+}

@@ -1,0 +1,17 @@
+{
+  "run_id": 42539616751,
+  "source_commit": "c9d8cb5ae2e40a9472f815276e786642bb23887d",
+  "artifact_id": 13640639200,
+  "artifact_sha256": "2f1ab5a934d4300a44a2bcdc77ad1316d003aea44ef63098d29a98fd3164c3e7",
+  "artifact_size": 1596144,
+  "status": "FAIL_STOCK_COMPOSE_PERMISSION_CONTROL_SELECTOR; NATIVE_NOT_STARTED",
+  "APK_installed": true,
+  "installed_APK_sha256": "804eebc57af2e4ef4e5418b56994bda64eb7fd7e7f2c0653b5c6e2a9f7833058",
+  "normal_rationale_and_runtime_permission": "PASS_REAL_MEASURED_UI_ACTIONS",
+  "native_process_started": false,
+  "completed_starts": 0,
+  "actual_control": "Stock Settings checkable android.view.View with exact Allow access to manage all files descendant; legacy Switch class absent",
+  "correction": "Support exact measured Compose control; require subsequent captured checked=true before normal Back. No appops or permission bypass.",
+  "production_source_changes": false,
+  "new_APK": false
+}

@@ -1,0 +1,100 @@
+{
+  "actual_apks_verified_by_this_run": false,
+  "application_execution": false,
+  "build_sign_dispatch": false,
+  "cases": [
+    {
+      "case": "InstallGuards.test_fixed_chain_original_cert_and_full80_expectations",
+      "status": "PASS"
+    },
+    {
+      "case": "InstallGuards.test_installed_identity_is_parameter_bound_and_uid_cannot_change",
+      "status": "PASS"
+    },
+    {
+      "case": "InstallGuards.test_absent_data_is_not_preservation_and_mutation_refuses",
+      "status": "PASS"
+    },
+    {
+      "case": "InstallGuards.test_single_start_reservation_refuses_retry_or_unknown_version",
+      "status": "PASS"
+    },
+    {
+      "case": "InstallGuards.test_new_crash_attribution_preserves_old_and_rejects_new_package_crash",
+      "status": "PASS"
+    },
+    {
+      "case": "InstallGuards.test_initial_blocked_setup_has_no_fabricated_functional_pass",
+      "status": "PASS"
+    },
+    {
+      "case": "InstallGuards.test_nested_observed_failures_remain_visible",
+      "status": "PASS"
+    }
+  ],
+  "command": "python repairs/infinity-tracking-integration-2103469-20261108/test_tracking_install_guards.py",
+  "created_utc": "2026-11-09T11:28:29.337551+00:00",
+  "exit_code": 0,
+  "final_new_files_sha256": {
+    "POST-SIGN-INSTALL-PLAN.md": "80a42f35b0e3d08dcac8eeb2fce570ed19c134021757fc60805ff38e96ffd623",
+    "POST-SIGN-INSTALL-SELECTION.json": "3969527263a4823db75502040c7e79aa5935de71dcfad5e29d8d07d5da754de1",
+    "test_tracking_install_guards.py": "8179fcf6f02437b3807fac13f1ff8deccef209d1ddc10b2d44aee399b56c311a",
+    "verify_tracking_install.py": "ed500734e7c851e4ac157d33b56c3cf1c1cd1ba72117fc470a800f96181265c1"
+  },
+  "followup_selected_controls": [
+    {
+      "case": "InstallGuards.test_observed_native_failure_cannot_become_blocked_inside_optional_work",
+      "command": "python -m unittest -v test_tracking_install_guards.InstallGuards.test_observed_native_failure_cannot_become_blocked_inside_optional_work",
+      "exit_code": 0,
+      "prior_seven_rerun": false,
+      "reported_elapsed_seconds": 0.008,
+      "selection_recorded_before_execution": true,
+      "status": "PASS"
+    },
+    {
+      "case": "InstallGuards.test_expired_work_budget_cannot_mask_terminal_native_crash",
+      "command": "python -m unittest -v test_tracking_install_guards.InstallGuards.test_expired_work_budget_cannot_mask_terminal_native_crash",
+      "exit_code": 0,
+      "prior_eight_rerun": false,
+      "reported_elapsed_seconds": 0.008,
+      "selection_recorded_before_execution": true,
+      "status": "PASS"
+    }
+  ],
+  "frozen_reused_readers_sha256": {
+    "qualify_android_baseline.py": "9b4cf409c35688a77e94849361aff510b6b896871314b32b15cc5844b4e23734",
+    "stage_tracking_android.py": "d5d2e8e99721a576e6e52611fa9f0ca8a02a9c89f639f6fe99ba90db020323b8",
+    "tracking_android_observer.py": "517e9edf111b129d0907190cf2783d427c4775f78a5f0188416bd4245dcf9b50",
+    "verify_tracking_android.py": "04e736720a44f6a56d99132cce24498c32311ab8df728d8305284a28d4e10315"
+  },
+  "head_at_test": "3b68308da68506513e4f5410c87215422a4f68d0",
+  "limits": [
+    "Only selected new pure test-tool predicates execute with controlled refusal inputs.",
+    "No APK/certificate/module verification process or application ran in these host controls.",
+    "Root official signed artifact admission and independent review remain required before selected Android dispatch.",
+    "Frozen C3 helpers and protected sourceC1 are unchanged."
+  ],
+  "new_files_sha256": {
+    "POST-SIGN-INSTALL-PLAN.md": "a82dca74b6fa393485a5bbcbbbaa2b8879b1fcbf05960395c2623ab99fab7818",
+    "POST-SIGN-INSTALL-SELECTION.json": "da04738234463a40925e7e46dcb5db5ae41d774fe88a2a052259d80929c40533",
+    "test_tracking_install_guards.py": "5eeec6d3d1f912bc7a6777828062cc1dd93d4c773ba03cae2dbf180a59bd25d1",
+    "verify_tracking_install.py": "3caa81acb5d328e32b62381a38985b276541ffc4cfbbc5f84a7ee8263035818e"
+  },
+  "prior_suites_rerun": false,
+  "production_sha256": {
+    "plugin.py": "580a2d7b25bc7a415c2db059fe1fa696808107a4f997a32d544baf2468a2877a",
+    "resume_hub.py": "807157626f817dd5375e0e60872b6cd351d33135a23c5a225f26c86a196e7ed5",
+    "service.py": "c0f45709166d9b7018eac0cee4834aaa617e8a684d6d199568e4e65a4645d6bd"
+  },
+  "reported_elapsed_seconds": 0.038,
+  "runtime_recovery_pass_claim": false,
+  "schema": 1,
+  "selected_count": 7,
+  "source_compilation_optimization": 1,
+  "source_history": {
+    "detail": "Independent review required native failures to retain FAIL inside optional fixture/core/state-capture and final phase liveness. One new selected control passed; prior seven retained. Later setting-file label correction only removes an unproved persisted-setting claim; it does not change selected predicate semantics. Final narrow liveness guard clears only an expired operation deadline before the terminal read-only original PID/new-crash check, preserving earlier timeout evidence. Only one additional new control passed; prior eight retained.",
+    "host_command_setup_error": "A followup edit command used task-directory cwd with repository-relative paths and failed FileNotFoundError before any edit; the already selected native-failure control then executed and passed. Reapplied only the label/doc edit from repository cwd; did not repeat the passing control. No app/production effect."
+  },
+  "status": "PASS_NEW_SELECTED_HOST_GUARDS_ONLY_NOT_ANDROID",
+  "total_distinct_selected_controls_passed": 9
+}

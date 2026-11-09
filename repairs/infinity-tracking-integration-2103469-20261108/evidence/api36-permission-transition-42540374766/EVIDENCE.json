@@ -1,0 +1,26 @@
+{
+  "run_id": 42540374766,
+  "source_commit": "796b7639fe7d5919f8dae7c2092183131221c093",
+  "artifact_id": 13641516754,
+  "artifact_sha256": "a82b22158e77bbcbd8056162e0d84d440e87d8ba51f7f647e889c7364191558d",
+  "artifact_size": 2732503,
+  "status": "FAIL_UNEXPLAINED_PRENATIVE_PERMISSION_TRANSITION_TO_LAUNCHER",
+  "APK_installed": true,
+  "installed_APK_sha256": "804eebc57af2e4ef4e5418b56994bda64eb7fd7e7f2c0653b5c6e2a9f7833058",
+  "native_process_observed": false,
+  "native_crash_observed": false,
+  "completed_starts": 0,
+  "actual_actions": [
+    "Exact Infinity rationale Continue",
+    "Two captured stock runtime permission allow actions"
+  ],
+  "all_files_permission_grant": "NOT_ESTABLISHED_BY_RETAINED_ACTIONS",
+  "final_UI": "Stock Android launcher",
+  "log_limitation": "Only last15seconds retained, containing AccessibilityNodeInfoDumper spam after original permission transition",
+  "UI_limitation": "One reused XML filename, dump stdout/stderr discarded; source confirms possibility of exit0 error with old XML. Occurrence in this run NOT_PROVEN.",
+  "permission_source": "Actual69 classes.dex SHA8cbfe62eae167e4441462cf5be970dbfbb2cc96e068134a39e12b61c64223118 matches retained Splash permission semantics; successful permission handling does not finish/relaunch Splash.",
+  "safe_next_step": "Fresh XML per action, bounded retained launch/permission chronology and read-only actual grant state; no blind relaunch, no production edit",
+  "production_source_changes": false,
+  "build": false,
+  "signing": false
+}

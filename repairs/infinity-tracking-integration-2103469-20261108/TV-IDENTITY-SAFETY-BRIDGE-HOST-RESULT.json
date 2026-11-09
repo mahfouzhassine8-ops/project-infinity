@@ -1,0 +1,75 @@
+{
+  "status": "PASS_FOCUSED_HOST_UNNUMBERED_EPISODE_LIST_BRIDGE",
+  "baseline_commit": "83d1bc15031390c99cb170f20faa2a9720700133",
+  "runs": [
+    {
+      "command": "python test_tv_unnumbered_bridge.py",
+      "tests": 11,
+      "failures": 0,
+      "errors": 0,
+      "exit_code": 0
+    },
+    {
+      "command": "python -m unittest -v test_actual_source_item.ActualSourceItem.test_exact_actual_copy_retains_unknown_season_and_provider_parent test_actual_source_item.ActualSourceItem.test_cc_or_missing_parent_never_creates_series_association test_actual_source_item.ActualSourceItem.test_actual_or_json_canonical_ids_leave_generic_recorder_unchanged",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "exit_code": 0
+    }
+  ],
+  "tests_passed": 14,
+  "production_source": {
+    "overlay/script.infinity.commandcenter/resume_hub.py": {
+      "baseline_sha256": "c5069a231b72cbca2281b4cb09c9df3f74673c28a264cf1cfbc919770f88b645",
+      "current_sha256": "807157626f817dd5375e0e60872b6cd351d33135a23c5a225f26c86a196e7ed5",
+      "changed_functions": [
+        "watchnixtoons_source_identity"
+      ],
+      "added_functions": [],
+      "removed_functions": [],
+      "all_other_functions_classes_imports_module_statements_identical": true
+    },
+    "overlay/script.infinity.commandcenter/service.py": {
+      "baseline_sha256": "ee50426e4c5b804041eda279dcd2d6f83b335c59c40f685849c47f002dd358c8",
+      "current_sha256": "569fea31b465674b5e9fc357a895b0a00706df999c201246a33e8fcd00c9b669",
+      "changed_functions": [
+        "_continue_source_item"
+      ],
+      "added_functions": [
+        "_watchnixtoons_episode_producer"
+      ],
+      "removed_functions": [],
+      "all_other_functions_classes_imports_module_statements_identical": true
+    }
+  },
+  "selection_sha256": "1f15743fda50494c0bc77332cec37af174bdc87f20bd9f545597203f3e3c2868",
+  "test_sha256": "c7b2505ec686784f8babd461bf15ce23cad37546866ada356132a9a5d9d20955",
+  "captured_real_AV_sha256": "6379cf40aee737c98731fca4ba7d84000acbd404b49bd2a271b7252b7420353e",
+  "retained_failclosed_receipt_sha256": "a4f1195d71fd402778d1471b73b12a227badd87b433bba9eb7778000e02bdb49",
+  "protected_file_sha256": {
+    "overlay/script.infinity.commandcenter/plugin.py": "580a2d7b25bc7a415c2db059fe1fa696808107a4f997a32d544baf2468a2877a",
+    "test_actual_source_item.py": "1ef64397b786cf08b6dd3b71141ce69ee238bba29be083f8a3abbb1de005c5db",
+    "ACTUAL-SOURCE-HOST-RESULT.json": "f5b458be19d432f72ca0eb436959dc5c58a72f7936882cc4c3da2e782e64b0ad",
+    "PROJECTION-HOST-RESULT.json": "739712d256192f7860c254c766ba13eb65eeca3053582a4565ac00ab260e52f2"
+  },
+  "producer_gate": {
+    "files": 15,
+    "source_bytes": 108603,
+    "registered_addon": "plugin.video.watchnixtoons2",
+    "version": "0.14.24",
+    "site_setting": "baseURL=0",
+    "settings_read_only": [
+      "baseURL"
+    ],
+    "provider_imports_or_writes": false,
+    "new_worker_cache_or_global_state": false
+  },
+  "contract": "Exact local unnumbered episode-list child only. Native movie tag is observed unchanged; effective local episode retains S/E=-1, actual native label and exact provider route. Copied valid parent or prior strict exact local unknown-episode row supplies lineage. Wrongkind/canonical/coordinate associations quarantine. Existing explicit verified parent SHOW IDs may be retained, without canonical episode promotion.",
+  "preservation": "Only two integration production files changed by this task; only listed AST functions differ. Plugin, generic canonical admission, callbacks, writers, thresholds and resume functions are unchanged. Root-owned STATUS documentation changes are outside this code task.",
+  "limitations": [
+    "Source-pinned host logic does not prove numerical E4/S1, canonical cross-provider episode equivalence, live playback stability or Android behavior.",
+    "No Android execution, signing, build or dispatch performed. Production Android validation and final release gates remain visible and blocked."
+  ],
+  "earlier_receipts_edited": false,
+  "selection_artifact_error": "Exact correction/tests were selected in owner instruction, commentary, test source and submitted tool command before execution. Initial JSON emission used an incorrect task-relative path and failed; this artifact was repaired afterward. No unselected test ran."
+}

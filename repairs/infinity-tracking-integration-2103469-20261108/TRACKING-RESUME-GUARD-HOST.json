@@ -1,0 +1,33 @@
+{
+  "status": "PASS_FIVE_SELECTED_PURE_RESUME_VALIDATOR_CONTROLS_ONLY",
+  "cases": [
+    {
+      "case": "in_bound_same_source_validator_control",
+      "status": "PASS_HOST_VALIDATOR_ONLY"
+    },
+    {
+      "case": "late_offset",
+      "status": "PASS_EXPECTED_HOST_REFUSAL"
+    },
+    {
+      "case": "wrong_source",
+      "status": "PASS_EXPECTED_HOST_REFUSAL"
+    },
+    {
+      "case": "wrong_episode",
+      "status": "PASS_EXPECTED_HOST_REFUSAL"
+    },
+    {
+      "case": "no_fresh_AV",
+      "status": "PASS_EXPECTED_HOST_REFUSAL"
+    }
+  ],
+  "verifier_sha256": "26f9e43eec61a44929c2482d9efe7759a2a8e6f5a2a852ffbcaa8534abcb972f",
+  "test_sha256": "36972b5c08ebe6b6f1d8cbba50cbbbdc90744bd144d8c3e0523b1202f7a96d34",
+  "selection_sha256": "f7e4ab28401e8b1326b7dcd17f2c02205c3f119211e91246bf36c03153cf015f",
+  "application_execution": false,
+  "actual_player_callback_or_source_acceptance": false,
+  "prior17_rerun": false,
+  "prior40_rerun": false,
+  "Android": "NOT_RUN"
+}

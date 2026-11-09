@@ -1,0 +1,364 @@
+{
+  "schema": 1,
+  "status": "PASS_SELECTED_BASELINE_HOST_GUARDS_ONLY",
+  "harness_sha256": "9b4cf409c35688a77e94849361aff510b6b896871314b32b15cc5844b4e23734",
+  "selection": "New baseline-only API36 intake and artifact/UI/teardown guards; no forty-case suite repeated",
+  "checks_selected": [
+    "Syntax parses",
+    "Actual signed69 APK safe ZIP/AXML min21 target35/native66 and original RSA authenticated80 module input",
+    "Reject ZIP traversal/symlink/duplicate",
+    "Reject wrong API/physical/nontranslated/missing ARM64/16KiB environment before install",
+    "Reject disabled/nonclickable/invalid measured UI bounds",
+    "Retained a4 host disposal source exact SHA and sole AVD-literal adaptation"
+  ],
+  "application_execution": false,
+  "application_mock_or_CALLBACK_PASS": false,
+  "APK_build_or_signing": false,
+  "all_twelve_feature_checks": "NOT_RUN",
+  "shutdown": "NOT_SELECTED",
+  "root_review_required_before_launch": true,
+  "checks": [
+    {
+      "case": "source_syntax",
+      "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "actual_original69_safe_zip_AXML_native66_and_public_RSA_authenticated80",
+      "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "zip_traversal",
+      "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "zip_duplicate",
+      "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "zip_symlink",
+      "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "wrong_API37",
+      "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "physical_device",
+      "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "missing_stock_bridge",
+      "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "missing_ARM64_ABI",
+      "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "16KiB_image",
+      "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "measured_ui_center",
+      "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "disabled_ui",
+      "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "nonclickable_ui",
+      "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "empty_ui_bounds",
+      "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "immutable_a4_host_disposal_only_AVD_literal_adapted_no_worker_executed",
+      "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "live_kodi_with_main_crash_refuses",
+      "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "live_kodi_with_child_crash_refuses",
+      "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "native_death_at_alive_check_1",
+      "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "native_death_at_alive_check_2",
+      "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "similarly_prefixed_other_package_does_not_mask_exact_scope",
+      "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "completed_tombstone_uncapped_source_size_recorded",
+      "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "completed_tombstone_truncation_explicit",
+      "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "current_corrected_request_hashes_accept",
+      "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "previous_harness_request_hash_refuses",
+      "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "post_final_hashes_and_final_PASS_crash_alive_guards_present",
+      "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "closed_then_verified_root",
+      "status": "PASS_HOST_INFRASTRUCTURE_GUARD_ONLY"
+    },
+    {
+      "case": "denied_uid2000",
+      "status": "PASS_HOST_INFRASTRUCTURE_GUARD_ONLY"
+    },
+    {
+      "case": "reconnect_timeout",
+      "status": "PASS_HOST_INFRASTRUCTURE_GUARD_ONLY"
+    },
+    {
+      "case": "real42538614119_exact_rationale_XML_measured_Continue",
+      "status": "PASS_HOST_UI_GUARD_ONLY",
+      "fixture_sha256": "8dcaccde9157f4983c314de086aa52e3d857a591daec2331aace6038fe2cc796",
+      "center": [
+        542,
+        1177
+      ]
+    },
+    {
+      "case": "wrong_rationale_message_or_any_required_owner_refuses",
+      "status": "PASS_HOST_UI_GUARD_ONLY",
+      "negative_variants": 4
+    },
+    {
+      "case": "unknown_modal_no_generic_dismissal",
+      "status": "PASS_HOST_UI_GUARD_ONLY"
+    },
+    {
+      "case": "actual42539616751_unchecked_Compose_row_measured_tap_no_Back",
+      "status": "PASS_HOST_UI_GUARD_ONLY",
+      "fixture_sha256": "81d3d978c9575c022503cf75b2f06472af145ae01f2516f11da4f6cd62e5addd",
+      "center": [
+        540,
+        981
+      ]
+    },
+    {
+      "case": "subsequent_checked_Compose_capture_Back_without_tap",
+      "status": "PASS_HOST_UI_GUARD_ONLY"
+    },
+    {
+      "case": "wrong_Compose_label_app_owner_or_noncheckable_refuses",
+      "status": "PASS_HOST_UI_GUARD_ONLY",
+      "negative_variants": 4
+    },
+    {
+      "case": "fresh_unique_XML_and_action_sequence_timestamp_binding",
+      "status": "PASS_HOST_DIAGNOSTIC_GUARD_ONLY"
+    },
+    {
+      "case": "exit0_failed_dump_and_timeout_never_read_or_tap_previous_XML",
+      "status": "PASS_HOST_DIAGNOSTIC_GUARD_ONLY"
+    },
+    {
+      "case": "fresh_launcher_exit_refuses_without_relaunch_native_RPC_independent_of_UI_capture",
+      "status": "PASS_HOST_DIAGNOSTIC_GUARD_ONLY"
+    },
+    {
+      "case": "bounded_filtered_own_reader_cleanup_and_readonly_permission_snapshot_binding",
+      "status": "PASS_HOST_DIAGNOSTIC_GUARD_ONLY"
+    },
+    {
+      "case": "exact_current_foreground_withholds_background_RPC_Home_and_preserves_none_UI_polling",
+      "status": "PASS_HOST_DIAGNOSTIC_GUARD_ONLY",
+      "parser_variants": 6,
+      "negative_control": "Launcher remains foreground despite live native Ping/Home; no second Splash; startup not accepted"
+    }
+  ],
+  "check_count": 39,
+  "SDK_APK_signature_check": "NOT_RUN_LOCALLY_NO_SDK; required in admit before application execution",
+  "module_RSA_signature_check": "PASS_ORIGINAL_PUBLIC_KEY_ONLY",
+  "host_disposal_worker_executed": false,
+  "old_API37_guard_imported_or_overridden": false,
+  "correction_check_selection_before_execution": [
+    "Exact package/child crash refuses even with live native PID",
+    "Native death before/after crash read refuses",
+    "Tombstone source size and truncation status",
+    "Post-hash and final-pass crash/liveness wiring",
+    "Updated request accepts current hashes and refuses previous harness hash"
+  ],
+  "previous15_checks_preserved_not_rerun": true,
+  "focused_correction_checks": [
+    {
+      "case": "live_kodi_with_main_crash_refuses",
+      "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "live_kodi_with_child_crash_refuses",
+      "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "native_death_at_alive_check_1",
+      "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "native_death_at_alive_check_2",
+      "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "similarly_prefixed_other_package_does_not_mask_exact_scope",
+      "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "completed_tombstone_uncapped_source_size_recorded",
+      "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "completed_tombstone_truncation_explicit",
+      "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "current_corrected_request_hashes_accept",
+      "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "previous_harness_request_hash_refuses",
+      "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "post_final_hashes_and_final_PASS_crash_alive_guards_present",
+      "status": "PASS_HOST_GUARD_ONLY"
+    }
+  ],
+  "root_handshake_selection_before_execution": [
+    "Single adb root nonzero/closed result retained; successful root reconnect UID0 allowed",
+    "UID2000 refuses before install",
+    "Bounded wait-for-device timeout refuses before install"
+  ],
+  "prior25_checks_preserved_not_rerun": true,
+  "root_handshake_checks": [
+    {
+      "case": "closed_then_verified_root",
+      "status": "PASS_HOST_INFRASTRUCTURE_GUARD_ONLY"
+    },
+    {
+      "case": "denied_uid2000",
+      "status": "PASS_HOST_INFRASTRUCTURE_GUARD_ONLY"
+    },
+    {
+      "case": "reconnect_timeout",
+      "status": "PASS_HOST_INFRASTRUCTURE_GUARD_ONLY"
+    }
+  ],
+  "permission_rationale_selection_before_execution": [
+    "Captured real app-owned exact rationale selects sole measured Continue button",
+    "Wrong exact rationale message or any required owner refuses without tap",
+    "Unknown modal refuses without generic dismissal"
+  ],
+  "prior28_checks_preserved_not_rerun": true,
+  "permission_rationale_checks": [
+    {
+      "case": "real42538614119_exact_rationale_XML_measured_Continue",
+      "status": "PASS_HOST_UI_GUARD_ONLY",
+      "fixture_sha256": "8dcaccde9157f4983c314de086aa52e3d857a591daec2331aace6038fe2cc796",
+      "center": [
+        542,
+        1177
+      ]
+    },
+    {
+      "case": "wrong_rationale_message_or_any_required_owner_refuses",
+      "status": "PASS_HOST_UI_GUARD_ONLY",
+      "negative_variants": 4
+    },
+    {
+      "case": "unknown_modal_no_generic_dismissal",
+      "status": "PASS_HOST_UI_GUARD_ONLY"
+    }
+  ],
+  "failed42538614119_native_startup": "NOT_STARTED; app-owned initial rationale not handled; not a native API36 failure",
+  "report_only_delta": "After successful adb install and installed-APK SHA verification, persist application_installed=true and installed_APK_sha256 before any start attempt; no extra tests selected.",
+  "compose_permission_selection_before_execution": [
+    "Captured real API36 Compose unchecked all-files row selects measured tap without Back",
+    "Later captured checked=true row returns Back without tap",
+    "Wrong exact descendant label/app label/row owner/noncheckable row rejects without input"
+  ],
+  "prior31_checks_preserved_not_rerun": true,
+  "compose_permission_checks": [
+    {
+      "case": "actual42539616751_unchecked_Compose_row_measured_tap_no_Back",
+      "status": "PASS_HOST_UI_GUARD_ONLY",
+      "fixture_sha256": "81d3d978c9575c022503cf75b2f06472af145ae01f2516f11da4f6cd62e5addd",
+      "center": [
+        540,
+        981
+      ]
+    },
+    {
+      "case": "subsequent_checked_Compose_capture_Back_without_tap",
+      "status": "PASS_HOST_UI_GUARD_ONLY"
+    },
+    {
+      "case": "wrong_Compose_label_app_owner_or_noncheckable_refuses",
+      "status": "PASS_HOST_UI_GUARD_ONLY",
+      "negative_variants": 4
+    }
+  ],
+  "legacy_settings_selector": "Unchanged; after a legacy tap also waits for later checked=true capture before Back",
+  "failed42539616751_native_startup": "NOT_STARTED; stock Settings Compose permission row not handled; not a native API36 constructor failure",
+  "freshness_diagnostic_selection_before_execution": [
+    "Successful unique dump binds versioned XML and action sequence/time",
+    "Exit0 idle/null-root and timeout cannot reuse previous XML or tap stale nodes",
+    "Multiple fresh launcher captures after app UI fail with one Splash only; native RPC remains outside successful-XML branch",
+    "Filtered capped lifecycle reader cleanup is own-session only; permission queries are read-only"
+  ],
+  "prior34_checks_preserved_not_rerun": true,
+  "freshness_diagnostic_checks": [
+    {
+      "case": "fresh_unique_XML_and_action_sequence_timestamp_binding",
+      "status": "PASS_HOST_DIAGNOSTIC_GUARD_ONLY"
+    },
+    {
+      "case": "exit0_failed_dump_and_timeout_never_read_or_tap_previous_XML",
+      "status": "PASS_HOST_DIAGNOSTIC_GUARD_ONLY"
+    },
+    {
+      "case": "fresh_launcher_exit_refuses_without_relaunch_native_RPC_independent_of_UI_capture",
+      "status": "PASS_HOST_DIAGNOSTIC_GUARD_ONLY"
+    },
+    {
+      "case": "bounded_filtered_own_reader_cleanup_and_readonly_permission_snapshot_binding",
+      "status": "PASS_HOST_DIAGNOSTIC_GUARD_ONLY"
+    }
+  ],
+  "failed42540374766_classification": "Freshness risk confirmed in prior harness; occurrence not proven; native PID never observed; no automatic relaunch added",
+  "post_Back_diagnostic_placement_selected_before_check": "Both stock checked-state paths send immediate capture-bound Back and record action before any read-only permission snapshot.",
+  "post_Back_diagnostic_placement": "PASS_HOST_ORDERING_GUARD_ONLY; no Android execution; same four focused groups, previous34/40 not rerun",
+  "foreground_readiness_selection_before_execution": [
+    "Only exact unambiguous current resumed component satisfies foreground policy; duplicate identical component lines deduplicate",
+    "Background Kodi Home/Ping cannot pass with launcher foreground, including failed subsequent UI capture; no extra Splash",
+    "Reader diagnostic reports leader exit only, not descendant retirement"
+  ],
+  "foreground_readiness_check": {
+    "case": "exact_current_foreground_withholds_background_RPC_Home_and_preserves_none_UI_polling",
+    "status": "PASS_HOST_DIAGNOSTIC_GUARD_ONLY",
+    "parser_variants": 6,
+    "negative_control": "Launcher remains foreground despite live native Ping/Home; no second Splash; startup not accepted"
+  },
+  "reader_report_wording_check": "PASS_HOST_FACTUAL_LEADER_ONLY_LABEL; no reader/adb descendant retirement audit",
+  "prior34_and_four_diagnostic_groups_preserved_not_rerun": true
+}

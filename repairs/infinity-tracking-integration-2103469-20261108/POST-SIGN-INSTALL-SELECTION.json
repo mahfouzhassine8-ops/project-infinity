@@ -1,0 +1,51 @@
+{
+  "application_execution": "ROOT_REVIEW_AND_OFFICIAL_SIGNED_PIN_REQUIRED_NOT_RUN",
+  "automatic_retries": 0,
+  "existing_workflow_id": 393886994,
+  "frozen_C3_edits": false,
+  "host_scope": "Compile only new selected test-tool predicates at optimize=1. Explicit controlled values test refusal/classification; no installed records, SDK callbacks or app workflow are manufactured.",
+  "intentional_start_limit": {
+    "2103469": 1,
+    "2103474": 1,
+    "2103475": 1
+  },
+  "not_selected": [
+    "Prior9/40/14/13 or baseline suites",
+    "Android execution",
+    "APK or module build/sign",
+    "workflow dispatch",
+    "production/native/provider/theme changes",
+    "uninstall/data clear/downgrade",
+    "shutdown/Normal Close",
+    "public release or Fold acceptance"
+  ],
+  "operation": "verify-experimental-tracking-signed-pair-install",
+  "original_signing_workflow_id": 397702717,
+  "production_changes": false,
+  "schema": 1,
+  "selected_command": "python repairs/infinity-tracking-integration-2103469-20261108/test_tracking_install_guards.py",
+  "selected_final_liveness_before_execution": {
+    "case": "InstallGuards.test_expired_work_budget_cannot_mask_terminal_native_crash",
+    "command": "python -m unittest -v test_tracking_install_guards.InstallGuards.test_expired_work_budget_cannot_mask_terminal_native_crash",
+    "prior_eight_rerun": false,
+    "reason": "Final read-only original PID/crash observation must execute after an earlier work timeout; only the already recorded work deadline is cleared, not native/crash evidence."
+  },
+  "selected_followup_before_execution": {
+    "case": "InstallGuards.test_observed_native_failure_cannot_become_blocked_inside_optional_work",
+    "command": "python -m unittest -v test_tracking_install_guards.InstallGuards.test_observed_native_failure_cannot_become_blocked_inside_optional_work",
+    "prior_seven_rerun": false,
+    "reason": "Independent review: baseline fixture/candidate core/state capture and final phase liveness must preserve observed new crash/PID failures even when runtime prerequisites would otherwise be BLOCKED."
+  },
+  "selected_new_cases": [
+    "InstallGuards.test_fixed_chain_original_cert_and_full80_expectations",
+    "InstallGuards.test_installed_identity_is_parameter_bound_and_uid_cannot_change",
+    "InstallGuards.test_absent_data_is_not_preservation_and_mutation_refuses",
+    "InstallGuards.test_single_start_reservation_refuses_retry_or_unknown_version",
+    "InstallGuards.test_new_crash_attribution_preserves_old_and_rejects_new_package_crash",
+    "InstallGuards.test_initial_blocked_setup_has_no_fabricated_functional_pass",
+    "InstallGuards.test_nested_observed_failures_remain_visible"
+  ],
+  "selected_new_host_file": "test_tracking_install_guards.py",
+  "status": "SELECTED_NEW_HOST_GUARDS_BEFORE_EXECUTION_NOT_ANDROID",
+  "transport_scaffold": "HARNESS_BOOTSTRAP_NOT_USER_FIXTURE"
+}

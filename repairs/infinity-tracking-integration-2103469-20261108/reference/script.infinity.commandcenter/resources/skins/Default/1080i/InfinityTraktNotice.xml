@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<window type="dialog">
+ <defaultcontrol>9</defaultcontrol>
+ <animation effect="fade" start="0" end="100" time="120" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowOpen</animation>
+ <animation effect="fade" start="100" end="0" time="100" condition="!String.IsEqual(Window(Home).Property(Infinity.OptionalMotionAllowed),false)">WindowClose</animation>
+ <controls>
+  <control type="button" id="2"><left>0</left><top>0</top><width>100%</width><height>100%</height><label/><texturefocus colordiffuse="88000000">infinity_ui/contract_white.png</texturefocus><texturenofocus colordiffuse="88000000">infinity_ui/contract_white.png</texturenofocus></control>
+  <control type="group" id="100">
+   <control type="image" id="110"><texture border="24" colordiffuse="$VAR[InfinityLegacySurface]">infinity_glass/surface.png</texture></control>
+   <control type="image" id="111"><texture border="24" colordiffuse="$VAR[InfinityLegacyBorder]">infinity_glass/rim.png</texture></control>
+   <control type="label" id="10"><left>24</left><top>18</top><height>48</height><font>InfinityBodyBold</font><textcolor>$VAR[InfinityLegacyText]</textcolor><label>Infinity Trakt</label></control>
+   <control type="textbox" id="11"><left>24</left><top>82</top><font>InfinityBody</font><textcolor>$VAR[InfinityLegacyText]</textcolor><label/></control>
+   <control type="button" id="9"><width>52</width><height>52</height><font>InfinityBodyBold</font><label>×</label><align>center</align><aligny>center</aligny><textcolor>$VAR[InfinityLegacyText]</textcolor><texturefocus border="12" colordiffuse="$VAR[InfinityLegacyAccent]">infinity_glass/field.png</texturefocus><texturenofocus border="12" colordiffuse="$VAR[InfinityLegacyField]">infinity_glass/field.png</texturenofocus></control>
+  </control>
+ </controls>
+</window>

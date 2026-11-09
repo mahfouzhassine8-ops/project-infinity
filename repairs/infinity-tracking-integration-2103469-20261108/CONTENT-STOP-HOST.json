@@ -1,0 +1,15 @@
+{
+  "status": "PASS_NINE_NEW_OPTIMIZE1_CONTENT_STOP_FOCUS_CONTROLS_ONLY",
+  "executor": "GPT-6.1 design agent; source-frozen command result reported to root",
+  "command": "python test_tracking_content_stop_focus.py",
+  "cases": 9,
+  "source_sha256": {
+    "stage_tracking_android.py": "aaaf577dd9758b1b8b1427f62c7490d3e5966a8f60326086465402b337c8a0b5",
+    "tracking_android_observer.py": "13a98c8eef54bf08e67de675f632a015a9fdead2ca78c551739078e2278fa42c",
+    "verify_tracking_android.py": "cd6ea0ab965a839040256f042fc984b55f541ac065fd5a140fc99ab6b621ce72",
+    "test_tracking_content_stop_focus.py": "93163f033b1e1193339cf7a8233595fb89a41d93406ff98a64947189784b9f44"
+  },
+  "selection_sha256": "046e1bda45fa4e7179f8df74f78790f199f58442e86fb5e54a06742f2252f6f5",
+  "actual_Android_or_provider_execution": false,
+  "original11_40_13_startup_rerun": false
+}

@@ -1,0 +1,69 @@
+{
+  "schema": 2,
+  "status": "ROOT_REVIEWED_EXPERIMENTAL_RUNTIME_BLOCKED",
+  "production_source": "5787ca4569faa70dec4f10493b08bd8015d542ea",
+  "source_sha256": {
+    "plugin.py": "580a2d7b25bc7a415c2db059fe1fa696808107a4f997a32d544baf2468a2877a",
+    "resume_hub.py": "807157626f817dd5375e0e60872b6cd351d33135a23c5a225f26c86a196e7ed5",
+    "service.py": "c0f45709166d9b7018eac0cee4834aaa617e8a684d6d199568e4e65a4645d6bd"
+  },
+  "source_pins_sha256": "5bb7dd06098d0c8feec13a1fcee744e5ce9e96565d0a525ecb58ac3cc122ea2c",
+  "baseline_APK_sha256": "804eebc57af2e4ef4e5418b56994bda64eb7fd7e7f2c0653b5c6e2a9f7833058",
+  "owner_authorization_sha256": "a7b8b1a8daca2aff4b65e894073dabddde1ebfd8e0d9a8856dd13d7f8cda71d9",
+  "core_checks": {
+    "service_survival": "NOT_RUN_NATIVE_CONSTRUCTOR_BLOCK",
+    "movie_stop_continue": "NOT_RUN_NATIVE_CONSTRUCTOR_BLOCK",
+    "tv_ui_resume": "NOT_RUN_NATIVE_CONSTRUCTOR_BLOCK",
+    "actual_schema2_recovery_read_save": "NOT_RUN_PENDING_ACTUAL_MOVIE_PROGRESS"
+  },
+  "evidence_source_files": {
+    "repairs/infinity-tracking-integration-2103469-20261108/C1-42604600259-OUTCOME-REVIEW.json": "5bbcf280ce444903354958f0765aacb392f887aa890910bf686beefa280eba6f",
+    "repairs/infinity-tracking-integration-2103469-20261108/C1-SIGNED-MODULE-REVIEW.json": "25d39f9964ecbeee941873efa7af26013391ed38bd054611eed48b19f86e7a4d",
+    "repairs/infinity-tracking-integration-2103469-20261108/C1-MODULE-PREP-REVIEW.json": "2dfe603c4dc05afbf6872194c5c6b8e2c9e9671f02a310d8d3c50a346e101b2a",
+    "repairs/infinity-tracking-integration-2103469-20261108/SERVICE-SURVIVAL-SOURCE-PROOF.json": "ab854ef97e09d77183c5da8e2f909cdbb4ef20746a8eee004c2605076b2585a3",
+    "repairs/infinity-tracking-integration-2103469-20261108/SERVICE-LOADING-SURVIVAL-HOST.json": "e0f097de358f070c6f00c22fc505423c67769f76f515da86aba9e65f7233fde2",
+    "repairs/infinity-tracking-integration-2103469-20261108/SERVICE-LOADING-SURVIVAL-REVIEW.json": "850b9db023deba0ddf2ccc748976ef18b3100e572ee1e62d6924e8cf26ae3fbb",
+    "repairs/infinity-tracking-integration-2103469-20261108/RECOVERY-SERVICE-PRESERVATION.json": "a458f0b248eaea73f1aadd0f2b9354c2c9fd783cee560ed51189e0360f46f240",
+    "repairs/infinity-tracking-integration-2103469-20261108/RECOVERY-SERVICE-REVIEW.json": "67ec898196f578d579fd388c9359399834be78991e5ad12a6cd2daea288d3487",
+    "repairs/infinity-tracking-integration-2103469-20261108/evidence/c1-native-constructor-block-42604600259/EVIDENCE.json": "758a03432fc135abfb9ddc02be7316f74f7fa266d5ff1e657e05c915099c4181",
+    "repairs/infinity-tracking-integration-2103469-20261108/evidence/c1-native-constructor-block-42604600259/raw/tracking-android-results/ANDROID-VERIFICATION.json": "f79d87341af141fb9179c31f07e30fe73e79856e0f0a155cf58b5b6735127741",
+    "repairs/infinity-tracking-integration-2103469-20261108/evidence/c1-native-constructor-block-42604600259/raw/tracking-android-results/lifecycle-filtered.log": "8987ec94de7ac6a1c8afd790cfa626581f36b1013b5456c309af219e4fb53945",
+    "repairs/infinity-tracking-integration-2103469-20261108/evidence/c1-native-constructor-block-42604600259/raw/tracking-android-results/failure-final-tombstone.txt": "3d32b211082f0cd55cb09f967f351a505f96240d92f85f9793a5542fc3a729d5",
+    "repairs/infinity-tracking-integration-2103469-20261108/OBSERVED-SCHEMA2-COMPATIBILITY.json": "4f91e4e08bb89e80192e35efc5452a2b280805d3219595a9268a222239aca7aa"
+  },
+  "retained_prior_source_results": {
+    "source": "e410f30ba9e38182e4e77810e5237e5442cbd31a",
+    "run": 42593220047,
+    "TV_actual_clock": 304.257,
+    "TV_recorded_position": 307.902,
+    "TV_native_cards_resume": "NOT_RUN_TEST_RETURN_ASSUMPTION",
+    "movie_record": "FAIL_OLD_RESIDENT_SERVICE_EXIT_BEFORE_MOVIE"
+  },
+  "reviewed_native_failure": "Unchanged original69 ARM64 constructor SIGBUS at talloc_lib_init+32 during activation on API36r7 x86_64/native bridge; rootcause unresolved. Initial69Home and normalCC72installation were observed; no accepted C1identity/playback result.",
+  "experimental": true,
+  "publication": false,
+  "accepted_pointer_updated": false,
+  "owner_delivery_cleared": false,
+  "post_sign_owner_delivery_clearance": "PENDING_SIGNED_APK_IN_PLACE_INSTALL_FORWARD_RECOVERY_AND_DATA_RETENTION",
+  "formal_release_blockers": "UNCHANGED_ORIGINAL_AUTHORITY_POLICY_MUST_VALIDATE; DO_NOT_CLEAR_NONEMPTY_LIST",
+  "remaining_unverified": [
+    "C1 resident-service survival and actual movie progress after correction",
+    "C1 displayedTV ProgressShows/NextEpisodes/ContinuePlaying and exactresume",
+    "Native startup reliability and on-device module activation for new APKs",
+    "Actual canonical ReZero cross-entry and other providerfamilies",
+    "Completion/replay/seek and apprestart persistence under C1",
+    "All other Infinity saved/playable entrypoint execution",
+    "All applicable view modes/themes/Fold front/inner orientations",
+    "Actual runtime/functional recovery; PackageManager retention alone doesnotprove it",
+    "Galaxy Fold owneracceptance NOT_RUN"
+  ],
+  "available_schema2_preservation": {
+    "status": "PASS_OBSERVED_TV_AND_WATCHLIST_ONLY",
+    "movie_progress": "NOT_OBSERVED",
+    "runtime": "NOT_RUN",
+    "receipt": {
+      "path": "repairs/infinity-tracking-integration-2103469-20261108/OBSERVED-SCHEMA2-COMPATIBILITY.json",
+      "sha256": "4f91e4e08bb89e80192e35efc5452a2b280805d3219595a9268a222239aca7aa"
+    }
+  }
+}

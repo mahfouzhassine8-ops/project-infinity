@@ -1,0 +1,70 @@
+{
+  "status": "PASS_SELECTED_MODULE_SOURCE_AND_ROUTING_HOST_GUARDS_ONLY",
+  "cases": [
+    {
+      "case": "bound_actual_files_and_unchanged_original_workflow_jobs",
+      "status": "PASS_HOST_GUARD_ONLY"
+    },
+    {
+      "case": "wrong_branch",
+      "status": "PASS_EXPECTED_HOST_REFUSAL"
+    },
+    {
+      "case": "missing_binding",
+      "status": "PASS_EXPECTED_HOST_REFUSAL"
+    },
+    {
+      "case": "changed_binding",
+      "status": "PASS_EXPECTED_HOST_REFUSAL"
+    },
+    {
+      "case": "APK_build",
+      "status": "PASS_EXPECTED_HOST_REFUSAL"
+    },
+    {
+      "case": "authority_advanced",
+      "status": "PASS_EXPECTED_HOST_REFUSAL"
+    },
+    {
+      "case": "baseline_failed",
+      "status": "PASS_EXPECTED_HOST_REFUSAL"
+    },
+    {
+      "case": "selected_push",
+      "status": "PASS_HOST_ROUTING_ONLY"
+    },
+    {
+      "case": "unselected_prefix",
+      "status": "PASS_HOST_ROUTING_ONLY"
+    },
+    {
+      "case": "wrong_branch",
+      "status": "PASS_HOST_ROUTING_ONLY"
+    },
+    {
+      "case": "wrong_repo",
+      "status": "PASS_HOST_ROUTING_ONLY"
+    },
+    {
+      "case": "selected_manual",
+      "status": "PASS_HOST_ROUTING_ONLY"
+    },
+    {
+      "case": "wrong_manual",
+      "status": "PASS_HOST_ROUTING_ONLY"
+    }
+  ],
+  "application_execution": false,
+  "signing": false,
+  "CI_admission": false,
+  "scope": "Live API responses and clean CI status simulated for guard controls only; actual CI must independently enforce them. Actual bound file hashes and original workflow prefix checked.",
+  "source_hashes": {
+    "tracking_module_fixture.py": "6d6896260d3359626521b869fa4cd1fb0d25f3492373b224037ada09bc381b7c",
+    "prepare_tracking_release.py": "5472259db56c3956fb990a94c70642f3f10d9aaa549eb9fd71616c39107534fb",
+    "verify_tracking_modules.py": "fdf14f4817de922d26bf615369a7be63effa577b07b1a681e92df8d705d2e77b"
+  },
+  "workflow_sha256": "82790b40dd24c92e9fa87c90a6018752c003219b2c8f5197362ade0cab342198",
+  "selection_sha256": "fbdfa322ca3082a2f20deb0e8402e4b35053cacba1e191e878a09be4cdbfcc6c",
+  "test_script_sha256": "0d0a7335b4636b42058e535f6127ed881310d9af8c7963a3dd7209f4ea95413c",
+  "original40_rerun": false
+}

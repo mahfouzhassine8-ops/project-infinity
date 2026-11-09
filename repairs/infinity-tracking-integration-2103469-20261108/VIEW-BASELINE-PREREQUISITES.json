@@ -1,0 +1,261 @@
+{
+  "baseline": {
+    "APK_SHA256": "804eebc57af2e4ef4e5418b56994bda64eb7fd7e7f2c0653b5c6e2a9f7833058",
+    "all_compat_asset_bytes_same69_66": true,
+    "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "compat_asset_file_count": 17,
+    "compat_asset_version": "0.7.2",
+    "functional_foundation": 2103466,
+    "version": 2103469
+  },
+  "clean_registry_registration_chain": {
+    "conclusion": "Source explains the fresh-fixture exception without asserting an unqueried runtime row. Confirm enabled/version/path with the public read-only API before changing fixture state; do not label theme permanently unavailable.",
+    "constructor_lookup": "xbmc/interfaces/legacy/Addon.cpp:54-69 requests GetAddon(...OnlyEnabled::CHOICE_YES). AddonManager.cpp:631-652 rejects disabled entries and Python raises Unknown addon id.",
+    "discovery": "Pinned CAddonMgr::FindAddons scans visible special://xbmcbin/addons, special://xbmc/addons and special://home/addons descriptors, then calls CAddonDatabase::SyncInstalled. Manifest omission is not a global addon-discovery blacklist.",
+    "fresh_database_default": "SyncInstalled inserts each newly discovered addon with enabled=0 unless its id is in the mandatory or optional system manifest. Therefore a newly discovered exact compat0.7.2 defaults disabled on this clean APK.",
+    "module_bootstrap": "The original signed80 module bootstrap installs/authenticates four script.infinity.* ids only; it does not register/enable compat. A successful complete80 admission does not establish the optional compat owner enabled.",
+    "system_manifest": "service.infinity.compat is neither mandatory nor optional in exact signed69 assets/system/addon-manifest.xml."
+  },
+  "complete_signed69_compat_asset_member_sha256": {
+    "assets/addons/service.infinity.compat/addon.xml": "aa894dc9678edfb5ba9781de2ef5c7594a2883900291550364675ee4e19f30a9",
+    "assets/addons/service.infinity.compat/checkpoint_runtime.py": "82785f254ac6ec1746b22a092a949e8209701be2d06bd26252ffc05479e249fd",
+    "assets/addons/service.infinity.compat/compat_runtime.py": "ba14d7b3e0fb9d3b9f557ebf7d59decc014668a69219543a93d66dd0f4aa6a6e",
+    "assets/addons/service.infinity.compat/layout_service.py": "1f1da17d8d9f2fbbdc8b2c3bbe9ee00b078939fe2589a34029374156f06319cb",
+    "assets/addons/service.infinity.compat/resources/capabilities.json": "68ad5af0bcd6b078cb90f9fc6de39e3cdda245718503d47b447b6e1734863d8f",
+    "assets/addons/service.infinity.compat/resources/colors/InfinityDark.xml": "01aa13d3834fffc60c6f7dc959bdf1b4cccdc7dd1aa7a6286c7a37515018f38a",
+    "assets/addons/service.infinity.compat/resources/colors/InfinityLight.xml": "6a317bd9209c39fe1cc1c72c44e52ca0ca15f33809dd58405d5f6b773e0b8a0d",
+    "assets/addons/service.infinity.compat/resources/colors/InfinityOLED.xml": "80487754120a84b7b9b8a8b9e7fc28d33194858378471bdc144f9088a3f643ba",
+    "assets/addons/service.infinity.compat/resources/infinity-skin.example.json": "63cfc3566ef7d0a11ba9c611e3df4883dd1736abc37dd4c7870f8ce94b2b165b",
+    "assets/addons/service.infinity.compat/resources/settings.xml": "20bc05d316e38d30e9756125a5a4fa56b6a2e4fe33fa04dda95e5e000410b396",
+    "assets/addons/service.infinity.compat/resources/skin-api.json": "a697c7e56d05e480da5889c73f2b0faa74fcc24e2d6bc967c248b28f6676dd39",
+    "assets/addons/service.infinity.compat/resources/xml/Custom_1197_InfinityPlayerPanel.xml": "7588bb8d17429e92e2d94b807611520ae76a3159e53b66d167d2e335baa2e405",
+    "assets/addons/service.infinity.compat/resources/xml/Custom_1199_InfinityVideoLock.xml": "b3e3fa03f208cd9ddc036d9fe9950b010f37ba38ce603934bfa3974267f9364a",
+    "assets/addons/service.infinity.compat/resources/xml/DialogSeekBar.xml": "3effc7ce0b185d01f78eb2eecf55605beb3a3d18c2e9f3a3c903841d092cb725",
+    "assets/addons/service.infinity.compat/resources/xml/VideoOSD.xml": "3792cb70ddc2d4bf3caa12ad0ee211862bcb4bf365607b9da9e4da0e4d6d4626",
+    "assets/addons/service.infinity.compat/service.py": "bacdf368a8ec77d48ddfa34279e64a445d2f9ae048b1a7bec15eca48d86b7c4d",
+    "assets/addons/service.infinity.compat/theme_contract.py": "93320b9c0bfdb3ea87b1d76d2aae1a39bef715015977326a74740f3490410735"
+  },
+  "conditional_fixture_resolution": {
+    "if_enabled_exact_072": "Do not reinstall. Re-read the public theme owner and effective publisher state; investigate actual mismatch if Python still cannot resolve it.",
+    "if_existing_exact_disabled_072": "After runtime identity matches the signed69 asset, root may choose ordinary Kodi enabling of that existing addon to restore the public owner dependency. This is a fixture/runtime-state action, not an APK/source patch; it has not been performed here.",
+    "if_missing_or_other_version_or_custom_source": "Do not duplicate-install, downgrade, overwrite, fabricate an addon id or silently substitute the partial0.8.2 checkpoint ZIP. Preserve the evidence and let root decide a separately scoped fixture path.",
+    "not_a_permanent_blocker": "The exact0.7.2 code is a known original baseline participant. No source evidence found of a global retirement/ban of this addon; generic fresh-addon disabled policy alone is not retirement.",
+    "not_equivalent_without_observation": "Enabling is more than telemetry registration. It can start the compat primary service and its writer/checkpoint obligations; opening the menu or saving theme_mode alone does not establish effective Light/Dark rendering or reproduce an unknown owner-device installed addon version."
+  },
+  "conditional_read_only_probe_plan": [
+    {
+      "method": "Addons.GetAddonDetails",
+      "params": {
+        "addonid": "service.infinity.compat",
+        "properties": [
+          "enabled",
+          "version",
+          "path",
+          "installed"
+        ]
+      },
+      "why": "Pinned AddonsOperations.cpp:132-144 uses OnlyEnabled::CHOICE_NO, so this read can resolve disabled entries that Python Addon cannot."
+    },
+    {
+      "method": "Addons.GetAddons",
+      "params": {
+        "enabled": false,
+        "installed": true,
+        "properties": [
+          "enabled",
+          "version",
+          "path",
+          "installed"
+        ]
+      },
+      "when": "Only if the single-id result needs clarification; find exact id, do not infer from the Python exception."
+    },
+    {
+      "read_only_identity": "Read the returned actual source root without importing/running the addon. Require id0.7.2 addon.xml plus every source/resource member in complete_signed69_compat_asset_member_sha256 to match the signed APK. Record actual path and enabled flag; no settings or userdata reads are needed for source identity."
+    }
+  ],
+  "declared_service_effects_and_checkpoint_classes": {
+    "actual_automatic_launch_caveat": "The descriptor declares three xbmc.service extensions, but pinned AddonInfoBuilder.cpp selects m_types[0]/first libname, AddonInfo::Type returns first matching type, and CServiceAddonManager starts one LibPath per addon id. For this descriptor the primary lib is service.py. Ordinary enabling alone does NOT prove layout_service.py or theme_contract.py automatically launched. Observe actual ThemeReady/revision/palette publication; do not assume three daemons or inject a replacement dispatcher.",
+    "checkpoint_provenance": "All three declared entrypoint hashes and the service.py dependency closure appear exactly in pinned InfinityScriptCheckpointContracts.cpp:72-82. This is existing participation, not permission to remove or weaken checkpoints.",
+    "descriptor_entries": [
+      {
+        "library": "service.py",
+        "point": "xbmc.service",
+        "start": "startup"
+      },
+      {
+        "library": "layout_service.py",
+        "point": "xbmc.service",
+        "start": "startup"
+      },
+      {
+        "library": "theme_contract.py",
+        "point": "xbmc.service",
+        "start": "startup"
+      }
+    ],
+    "layout_service.py": {
+      "effects": [
+        "Publishes existing responsive display/device/layout/pane properties; native v5 facts preferred",
+        "Monitor republishes on existing notifications/settings/screensaver/DPMS events"
+      ],
+      "native_contract_owner": "nonpersistent:layout-properties",
+      "sha256": "1f1da17d8d9f2fbbdc8b2c3bbe9ee00b078939fe2589a34029374156f06319cb"
+    },
+    "service.py": {
+      "effects": [
+        "register_start writes startup-marker/history and can select safe mode after repeated unclean starts under existing policy",
+        "Publishes Hook/Skin APIs and compatibility/theme aliases",
+        "CompatCheckpoint participates in the original checkpoint protocol",
+        "Marks stable after120 seconds and periodically applies existing guard",
+        "Xenon player/theme/font file reassertion is gated to compat_runtime.SKIN_ID, not skin.infinity.diggz; normal Infinity skin returns inactive_skin after state publication"
+      ],
+      "native_authenticated_closure": [
+        "service.py",
+        "compat_runtime.py",
+        "checkpoint_runtime.py"
+      ],
+      "native_contract_owner": "compat",
+      "sha256": "bacdf368a8ec77d48ddfa34279e64a445d2f9ae048b1a7bec15eca48d86b7c4d"
+    },
+    "theme_contract.py": {
+      "effects": [
+        "Reads existing theme policy/raw native system theme",
+        "Publishes palette/theme/motion/refresh/power properties with ThemeReady commit markers",
+        "Persists reconstructible theme revision cache",
+        "Monitor republishes on settings/notifications/screensaver/DPMS events"
+      ],
+      "native_contract_owner": "reconstructible-cache:theme-revision",
+      "sha256": "93320b9c0bfdb3ea87b1d76d2aae1a39bef715015977326a74740f3490410735"
+    }
+  },
+  "execution": {
+    "addon_install_or_enable": false,
+    "application_actions": false,
+    "existing_provider_run_cancelled": false,
+    "only_written_file": "VIEW-BASELINE-PREREQUISITES.json",
+    "prior_40_and_13_tests_rerun": false,
+    "runtime_queries_executed": false,
+    "settings_or_source_changes": false,
+    "tests_build_sign_or_dispatch": false,
+    "workflow_or_harness_changes": false
+  },
+  "native_registration_source_pins": {
+    "xbmc/addons/AddonDatabase.cpp": {
+      "matches_protected66_69_native_source_map": true,
+      "read_from": "/workspace/project-infinity/kodi/xbmc/addons/AddonDatabase.cpp",
+      "sha256": "06c93d4a2ffe15d65b96f94b934658ded09e8a106db0bbda06a185f0743d21d3"
+    },
+    "xbmc/addons/AddonManager.cpp": {
+      "matches_protected66_69_native_source_map": true,
+      "read_from": "/workspace/project-infinity/kodi/xbmc/addons/AddonManager.cpp",
+      "sha256": "6de231bc742535a3f1f7180b1edf11b0db4d615836a3b5541acc95ba9207e620"
+    },
+    "xbmc/addons/Service.cpp": {
+      "matches_protected66_69_native_source_map": true,
+      "read_from": "/workspace/project-infinity/kodi/xbmc/addons/Service.cpp",
+      "sha256": "9c7a3fe4dc4457214be50731d9ccee939cf72b33ecba8e72cd692537edfb1749"
+    },
+    "xbmc/addons/addoninfo/AddonInfo.cpp": {
+      "matches_protected66_69_native_source_map": true,
+      "read_from": "/workspace/project-infinity/kodi/xbmc/addons/addoninfo/AddonInfo.cpp",
+      "sha256": "9d3fb9a08257de6cce8a54811c131e074ad0ff2d8fbf0978417a882c003d7ff6"
+    },
+    "xbmc/addons/addoninfo/AddonInfoBuilder.cpp": {
+      "matches_protected66_69_native_source_map": true,
+      "read_from": "/workspace/project-infinity/kodi/xbmc/addons/addoninfo/AddonInfoBuilder.cpp",
+      "sha256": "58b92cd1d230c55d2a6275590eea3b9ef95ec4204d5f35a8f69b8ebbb8dce3c0"
+    },
+    "xbmc/interfaces/json-rpc/AddonsOperations.cpp": {
+      "matches_protected66_69_native_source_map": true,
+      "read_from": "/workspace/project-infinity/kodi/xbmc/interfaces/json-rpc/AddonsOperations.cpp",
+      "sha256": "f5ffa7acdd3e47a6661345d63dd8ea86b996922c4373ca2e138f9c8dfd2911d7"
+    },
+    "xbmc/interfaces/legacy/Addon.cpp": {
+      "matches_protected66_69_native_source_map": true,
+      "read_from": "/workspace/project-infinity/kodi/xbmc/interfaces/legacy/Addon.cpp",
+      "sha256": "cce5f9857dc5102c8c7f744a110dde53c757e10400472131f4da401c96e72ff4"
+    },
+    "xbmc/platform/android/activity/InfinityScriptCheckpointContracts.cpp": {
+      "matches_protected66_69_native_source_map": true,
+      "read_from": "/workspace/project-infinity/kodi/xbmc/platform/android/activity/InfinityScriptCheckpointContracts.cpp",
+      "sha256": "451950111f7aff53739aa8d69b6fa9c912bc7b5fd4cb59e4d193e1b1edf0d857"
+    }
+  },
+  "observed_failure": {
+    "actual_disabled_state": "NOT_QUERIED_HERE",
+    "evidence_file": "/workspace/scratch/tracking-android-42562370691/tracking-android-results/observer-004-snapshot.json",
+    "evidence_sha256": "10eafbc53585b526b5441c92f7c75a75a47b1e3f6162ffa2ddc3b69d5a9309c9",
+    "important_correction": "xbmcaddon.Addon reports Unknown for both missing and disabled addons. The recorded exception does not prove absence from the addon registry.",
+    "module_identity": "Native complete80 CC0.3.5.68 accepted in retained observer-001-identity.json; not contradicted by optional theme telemetry failure",
+    "run_id": 42562370691,
+    "snapshot_error": "RuntimeError(\"Unknown addon id 'service.infinity.compat'.\")"
+  },
+  "public_CC_theme_contract": {
+    "entrypoint": "RunScript(script.infinity.commandcenter,theme)",
+    "failure_boundary": "The Addon constructor is unguarded before choose(Infinity Theme), so a disabled/missing owner prevents this public theme menu, not merely optional observer telemetry. The `or system` fallback handles empty setting values only; it does not catch Unknown addon id.",
+    "implementation": "default.direct_command -> infinity_settings.open_settings(theme)",
+    "menu": [
+      "Follow System",
+      "Light Pearl",
+      "Dark",
+      "Dark Mode Appearance"
+    ],
+    "normal_write_path": "Selection light/dark/system -> existing common.addon_set_setting(service.infinity.compat,theme_mode,value) -> fresh owner setting readback; existing checkpoint persistence scope retained. No direct Home-property policy spoofing.",
+    "precondition": "Active skin.infinity.diggz; enabled service.infinity.compat resolvable through xbmcaddon.Addon",
+    "requested_policy_accessor": "xbmcaddon.Addon('service.infinity.compat').getSetting('theme_mode')",
+    "separate_public_dark_variant": "RunScript(script.infinity.commandcenter,dark-appearance) uses existing Dark Mode Appearance selector and protected Skin.SetString(Infinity.DarkAppearance,original|oled); this branch does not construct the compat addon but does not replace Light/Dark theme-policy coverage."
+  },
+  "read_only_public_fallbacks": {
+    "interpretation": "Read these properties without constructing the optional addon; blank/unavailable values remain unknown. They observe effective/raw state and do not prove the manual requested owner policy was selected.",
+    "owner_independent_observation": [
+      "Window(Home).Property(Infinity.Theme)",
+      "Window(Home).Property(Infinity.ThemeReady)",
+      "Window(Home).Property(Infinity.ThemeRevision)",
+      "Window(Home).Property(Infinity.ThemeContractSignature)",
+      "Window(Home).Property(Infinity.ThemeContract)",
+      "Window(Home).Property(Infinity.SystemTheme)",
+      "Window(Home).Property(Infinity.NativeSystemTheme)",
+      "Skin.String(Infinity.DarkAppearance)"
+    ],
+    "raw_vs_effective": "Infinity.NativeSystemTheme is raw host fact. theme_contract.publish writes effective Infinity.Theme and compatibility Infinity.SystemTheme, palette values, then signature/revision/ThemeReady=true.",
+    "theme_contract_fallback": "_addon_value catches a provided addon object setting-read failure and defaults to system. _effective_theme uses manual light/dark/oled or raw NativeSystemTheme when bridge>=5; missing/invalid raw theme falls back dark. These functions must actually run; passive property reads do not execute this fallback."
+  },
+  "schema": 1,
+  "scope": "Read-only CC theme and clean-baseline optional-addon prerequisites only; no installation, enabling, settings writes or app actions",
+  "source_pins": {
+    "assets/addons/script.infinity.commandcenter/common.py": {
+      "same_protected66_69_bytes": true,
+      "sha256": "168e2888b7f75363875aa5c70ddcf31128f0e66efa17e1fe82935aec457747b7"
+    },
+    "assets/addons/script.infinity.commandcenter/default.py": {
+      "same_protected66_69_bytes": true,
+      "sha256": "6ecfa94ca3256d20d9605d016b7585a9e587c8cb4dd87ada8bbe0dcbacd47cc4"
+    },
+    "assets/addons/script.infinity.commandcenter/infinity_settings.py": {
+      "same_protected66_69_bytes": true,
+      "sha256": "a846e6fa285618495e572ff77665b4914eb2438ae3c1d7f38f2e53b150cb8e3d"
+    },
+    "assets/addons/service.infinity.compat/addon.xml": {
+      "same_protected66_69_bytes": true,
+      "sha256": "aa894dc9678edfb5ba9781de2ef5c7594a2883900291550364675ee4e19f30a9"
+    },
+    "assets/addons/service.infinity.compat/layout_service.py": {
+      "same_protected66_69_bytes": true,
+      "sha256": "1f1da17d8d9f2fbbdc8b2c3bbe9ee00b078939fe2589a34029374156f06319cb"
+    },
+    "assets/addons/service.infinity.compat/service.py": {
+      "same_protected66_69_bytes": true,
+      "sha256": "bacdf368a8ec77d48ddfa34279e64a445d2f9ae048b1a7bec15eca48d86b7c4d"
+    },
+    "assets/addons/service.infinity.compat/theme_contract.py": {
+      "same_protected66_69_bytes": true,
+      "sha256": "93320b9c0bfdb3ea87b1d76d2aae1a39bef715015977326a74740f3490410735"
+    },
+    "assets/system/addon-manifest.xml": {
+      "same_protected66_69_bytes": true,
+      "sha256": "38148b0f5130d5bbd3e0ac3dab1ec4234c7017c0605277b3e2efd4b165517029"
+    }
+  },
+  "status": "SOURCE_PREREQUISITES_RESOLVED_RUNTIME_ENABLED_STATE_NOT_YET_QUERIED"
+}

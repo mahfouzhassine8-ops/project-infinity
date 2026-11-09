@@ -1,0 +1,32 @@
+{
+  "status": "UNRELEASED_REVIEWED_SOURCE_WITH_BLOCKED_ANDROID_GATES",
+  "original_reviewed_commit": "2e52b7befd0228a09449f79eaf9774a3946dfa1c",
+  "original40_receipts_preserved": true,
+  "original_integration_proof_sha256": "12503af6ce8700a8785299fa518bdc4110de08e85785541966636d7a1b17e1d2",
+  "current3source_sha256": {
+    "service.py": "569fea31b465674b5e9fc357a895b0a00706df999c201246a33e8fcd00c9b669",
+    "resume_hub.py": "807157626f817dd5375e0e60872b6cd351d33135a23c5a225f26c86a196e7ed5",
+    "plugin.py": "580a2d7b25bc7a415c2db059fe1fa696808107a4f997a32d544baf2468a2877a"
+  },
+  "changed_since_original_review": {
+    "resume_hub.py": [
+      "watchnixtoons_source_identity"
+    ],
+    "service.py": [
+      "_watchnixtoons_episode_producer (new)",
+      "_continue_source_item"
+    ],
+    "plugin.py": []
+  },
+  "new_host_cases": {
+    "new": 11,
+    "affected_original": 3,
+    "receipt": "5f7ee550b4ea03d4502e8a437d5fb6c6814c9edecd78901bd0551de522dea140"
+  },
+  "independent_review": "8f89b384b905de842598ed2b7328bfb3b9217f9824df986a4a0ae7c79a92ab78",
+  "production_scope": "Only original3 integration overlay files differ from protected69; latest delta touches2 of them. No native/DEX/provider/skin/Cobra/Trakt-source changes.",
+  "new_full80_manifest_signed": false,
+  "old_fixture_applies_to_new_sources": false,
+  "APK_built": false,
+  "owner_installation_cleared": false
+}

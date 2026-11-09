@@ -1,0 +1,147 @@
+--- signed2103469/service.py
++++ candidate/service.py
+@@ -685,6 +685,103 @@
+     }
+ 
+ 
++def _continue_source_item(item):
++    """Reuse exact Nixtoons page identities when its actual tag has no IDs.
++
++    Original URL and directory lineage come from copied playing items, never
++    the current GUI selection. Unknown seasons stay unknown. This compatibility
++    path does not change admission for any already typed canonical playback.
++    """
++    if xbmc.getSkinDir() != 'skin.infinity.diggz':
++        return None
++    try:
++        player = xbmc.Player()
++        if not player.isPlayingVideo():
++            return None
++
++        def snapshot():
++            playing = player.getPlayingItem()
++            tag = playing.getVideoInfoTag()
++            return playing, dict(file=player.getPlayingFile(), path=playing.getPath(),
++                original=playing.getProperty('original_listitem_url'),
++                parent=playing.getProperty('ParentPath'), kind=tag.getMediaType(),
++                season=tag.getSeason(), episode=tag.getEpisode(),
++                ids={name: str(tag.getUniqueID(name) or '').strip()
++                     for name in ('tmdb', 'tvdb', 'imdb')})
++
++        playing, actual = snapshot()
++        kind = actual['kind']
++        route = actual['original'] or actual['path']
++        if (kind not in ('movie', 'episode') or actual['path'] != route or
++                hub.verified_ids(actual['ids']) or hub.verified_ids(item.get('uniqueid')) or
++                (item.get('file') and item['file'] not in (route, actual['file'])) or
++                (item.get('type') in ('movie', 'episode') and item['type'] != kind)):
++            return None
++        for field in ('season', 'episode'):
++            if kind == 'episode' and field in item and hub.episode_number(item[field]) != hub.episode_number(actual[field]):
++                return None
++        identity = hub.watchnixtoons_source_identity(route, kind, actual['season'], actual['episode'])
++        if not identity:
++            return None
++        # These existing read-only lookups inspect the same exact URI, kind and
++        # episode coordinates and quarantine contradictory saved associations.
++        from context import (_watchnixtoons_exact_previous, _watchnixtoons_verified_link,
++                             _watchnixtoons_owned_records, _watchnixtoons_identity_slot)
++        data = hub.load_view(addon_profile())
++        associations = list(_watchnixtoons_owned_records(data, route))
++        links = data.get('nixtoons_verified_links', {})
++        linked = links.get(_watchnixtoons_identity_slot(route)) if isinstance(links, dict) else None
++        if isinstance(linked, dict):
++            associations.append(linked)
++        previous = _watchnixtoons_exact_previous(playing, route, kind)
++        if associations and (not previous or any(
++                hub.entry_identity(row) and not hub.same_identity(hub.entry_identity(previous), hub.entry_identity(row))
++                for row in associations)):
++            return None  # Retain conflicting or unproved old route associations.
++        if previous:
++            identity = hub.entry_identity(previous)
++        tag = playing.getVideoInfoTag()
++        show = str(tag.getTVShowTitle() or '')
++        title = str(tag.getTitle() or playing.getLabel() or '')
++        entry = dict(identity=identity, key=hub.identity_key(identity),
++            media='tv' if kind == 'episode' else 'movie', title=title,
++            label=playing.getLabel() or title, showtitle=show,
++            season=hub.episode_number(actual['season']) if kind == 'episode' else -1,
++            episode=hub.episode_number(actual['episode']) if kind == 'episode' else -1,
++            source=route, stable_source=route, dbid=-1,
++            poster=playing.getArt('poster') or playing.getArt('thumb'),
++            fanart=playing.getArt('fanart'))
++        if identity.get('scope') != 'watchnixtoons_local':
++            entry.update(hub.verified_ids(identity.get('ids')))
++        parent_route = actual['parent']
++        if not hub.watchnixtoons_source_identity(parent_route, 'tvshow') and previous:
++            parent_route = previous.get('source_parent', '')
++        if kind == 'episode' and hub.watchnixtoons_source_identity(parent_route, 'tvshow'):
++            # A direct saved-episode replay can retain its previously proved
++            # parent through the existing exact-URI/kind/S/E lookup above.
++            entry['source_parent'] = parent_route
++            parent = _watchnixtoons_verified_link(data, parent_route, 'tvshow')
++            parent_identity = hub.entry_identity(parent) if parent else None
++            if parent_identity and parent_identity.get('scope') == 'show':
++                if any(hub.entry_identity(row) and not hub.same_identity(parent_identity, hub.entry_identity(row))
++                       for row in _watchnixtoons_owned_records(data, parent_route)):
++                    return None
++                if identity.get('scope') == 'show_episode' and not hub.same_identity(
++                        hub.show_identity('tvshow', identity['ids']), parent_identity):
++                    return None
++                parent_ids = hub.verified_ids(parent_identity['ids'])
++                if parent_ids:
++                    entry.update(show_ids_verified=True, **{'show_' + name: value for name, value in parent_ids.items()})
++        if actual != snapshot()[1] or not player.isPlayingVideo():
++            return None
++        if identity.get('scope') == 'watchnixtoons_local':
++            entry['_tracking_limitation'] = ('Exact source-page identity is available; canonical episode identity and successor are unverified.'
++                if kind == 'episode' else 'Exact source-page movie identity is available; cross-provider equivalence is unverified.')
++        return entry if hub.entry_identity(entry) else None
++    except Exception:
++        return None
++
++
+ def _load_continue(profile: Path):
+     return hub.load(profile)
+ 
+@@ -741,6 +838,7 @@
+         self.cw_occurrence = None
+         self.experience = None
+         self.shutdown_checkpoint = None
++        self.cw_identity_limitation = False
+ 
+     @_serialized_callback
+     def onAVStarted(self):
+@@ -749,6 +847,7 @@
+         self.cw_item = None
+         self.cw_key = None
+         self.cw_occurrence = uuid.uuid4().hex
++        self.cw_identity_limitation = False
+         if (setting_bool('continue_watching_enabled', True) or setting_bool('source_memory_enabled', True)
+                 or setting_str('playback_recovery', 'prompt') != 'off'):
+             self.cw_pending = True
+@@ -827,13 +926,23 @@
+             return
+         actual_item = _continue_player_item(player_id)
+         item = _continue_identity(actual_item)
++        if not item:
++            item = _continue_source_item(actual_item)
+         # This is the existing playback-start path, not another poll/worker.
+         # A pending recovery may be saved only when its resolved item really starts.
+         if _prop('Infinity.SavedNavigation.Pending', ''):
+             from saved_navigation import confirm_playback
+             confirm_playback(self.profile, actual_item)
+         if not item:
+-            return
++            if not self.cw_identity_limitation and xbmc.getSkinDir() == 'skin.infinity.diggz':
++                log('Infinity tracking unavailable: the actual playback item has no supported exact identity; playback and existing resume remain unchanged.')
++                self.cw_identity_limitation = True
++            return
++        limitation = item.pop('_tracking_limitation', '')
++        if not limitation and item.get('media') == 'tv' and not hub.continue_series_ids(item):
++            limitation = 'Exact episode identity is available; its parent series and successor are unverified.'
++        if limitation:
++            log('Infinity tracking limitation: ' + limitation)
+         if not self.cw_occurrence:
+             self.cw_occurrence = uuid.uuid4().hex
+         item['playback_occurrence'] = self.cw_occurrence

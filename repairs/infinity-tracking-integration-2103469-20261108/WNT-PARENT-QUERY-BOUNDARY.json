@@ -1,0 +1,99 @@
+{
+  "actual_evidence": {
+    "episode_gui": {
+      "canonical_ids": {},
+      "episode": -1,
+      "media_type": "tvshow",
+      "path": "/workspace/scratch/tracking-android-42564230119/tracking-android-results/queens-blade-e4-actual-gui-sdk.json",
+      "season": -1,
+      "sha256": "670ee152a533bc47edaf50697d9cdd8bc29622fd59ac6cbecdede919f52321b9"
+    },
+    "parent_folder": {
+      "actual_folder": "plugin://plugin.video.watchnixtoons2/?action=actionEpisodesMenu&url=%2Fanime%2Fqueen-s-blade%3Fseason%3Dall%26lang%3Ddub",
+      "path": "/workspace/scratch/tracking-android-42564230119/tracking-android-results/observer-003-snapshot.json",
+      "sha256": "7955d1bf5aec482a0d1920af5a5127e017788b725317590819032097b82d9efa"
+    },
+    "playback": "No actual AV or playing-item identity established in this run",
+    "report": {
+      "path": "/workspace/scratch/tracking-android-42564230119/tracking-android-results/ANDROID-VERIFICATION.json",
+      "sha256": "9e38f9c52e9aef4bec34bdd35525f253035d0e05d990b5cbfcf3cfd38d1c518b"
+    }
+  },
+  "next_evidence_gate": "Obtain actual final AV item via corrected dialog harness first. Preserve any natural parent-save refusal separately. No new production fixture/signing is justified by this proposal alone.",
+  "prior_receipts_changed": false,
+  "production_changed": false,
+  "proposed_narrow_contract": {
+    "forbidden_equivalence": [
+      "strip or reorder query",
+      "replace relative URL with absolute URL",
+      "normalize domain or source page",
+      "infer season=1 or episode number from URL/title"
+    ],
+    "implemented": false,
+    "initial_action": "actionEpisodesMenu",
+    "initial_kind": "tvshow",
+    "preserve": [
+      "entire original plugin URI and decoded source_url unchanged",
+      "existing action+source_url+kind+S/E identity hash algorithm",
+      "all previously admitted keys and canonical IDs",
+      "distinct exact query/language variants; no implicit merge"
+    ],
+    "raw_query_grammar": "season=all optionally followed by &lang=(dub|sub|cartoon)",
+    "reject": [
+      "duplicate/unknown/blank query fields",
+      "fragments",
+      "relative network authority or scheme",
+      "control characters or backslashes",
+      "additional decoding",
+      "query-bearing actionResolve expansion"
+    ],
+    "relative_path": "Observed /anime/<nonempty> parent path, with existing path/scheme/control-character safeguards retained",
+    "season_all_meaning": "Publisher catalogue selector only; never a numbered season identity"
+  },
+  "provider": "plugin.video.watchnixtoons2",
+  "provider_changed": false,
+  "provider_version": "0.14.24",
+  "run_id": 42564230119,
+  "schema": 1,
+  "source_contract": {
+    "existing_exact_proof_escape": "context.py:189-205,261-293 can reuse an existing unconflicted exact-URI canonical/manual verified link. This requires genuine prior proof; it is not an automatic equivalent URL fallback.",
+    "existing_refusal": "resume_hub.py:115-117 rejects any ? in a relative source_url; observed /anime/queen-s-blade?season=all&lang=dub is rejected for local parent identity",
+    "provider_consume": "lib/plugin.py:311-320 uses exact params[url] for episode-list cache and request",
+    "provider_emit": "lib/plugin.py:253,295-297 preserves entry_url in actionEpisodesMenu url parameter; artwork-only replacements at255-257 recognize season=all and lang=sub/dub/cartoon"
+  },
+  "source_pins": {
+    "addon.xml": {
+      "local_path": "/workspace/scratch/tracking-provider-reference/plugin.video.watchnixtoons2/addon.xml",
+      "matches_actual_runtime_source_map": true,
+      "sha256": "9dc68f15ce6d7e80ff31443eff8fcf43afe80d8fcdd88a5e8fc592f9fa31318c"
+    },
+    "lib/common.py": {
+      "local_path": "/workspace/scratch/tracking-provider-reference/plugin.video.watchnixtoons2/lib/common.py",
+      "matches_actual_runtime_source_map": true,
+      "sha256": "826e411989c9d02b89ce6efe9715f3c74f7e241cbaca4bbac5c5f9999425c03e"
+    },
+    "lib/plugin.py": {
+      "local_path": "/workspace/scratch/tracking-provider-reference/plugin.video.watchnixtoons2/lib/plugin.py",
+      "matches_actual_runtime_source_map": true,
+      "sha256": "d8d395634eff8ada8c9d09138744997573035b7819fcac91985ff870bbfc2283"
+    },
+    "lib/sites/wcostream.py": {
+      "local_path": "/workspace/scratch/tracking-provider-reference/plugin.video.watchnixtoons2/lib/sites/wcostream.py",
+      "matches_actual_runtime_source_map": true,
+      "sha256": "9c7b2e051cf61e147e860494f8eaebe597e0eddf3ef883ea35c0fb7fa226fa0d"
+    },
+    "script.infinity.commandcenter/context.py": {
+      "local_path": "/workspace/infinity-tracking-integration/repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/context.py",
+      "matches_actual_runtime_source_map": true,
+      "sha256": "bd874b64942262853f424b3a3258a72ce67d905f07784f55b81fbb0af4cef050"
+    },
+    "script.infinity.commandcenter/resume_hub.py": {
+      "local_path": "/workspace/infinity-tracking-integration/repairs/infinity-tracking-integration-2103469-20261108/overlay/script.infinity.commandcenter/resume_hub.py",
+      "matches_actual_runtime_source_map": true,
+      "sha256": "c5069a231b72cbca2281b4cb09c9df3f74673c28a264cf1cfbc919770f88b645"
+    }
+  },
+  "status": "SOURCE_BOUND_QUERY_COMPATIBILITY_GAP_PROPOSAL_NOT_IMPLEMENTED",
+  "tests_executed_by_reviewer": false,
+  "unknown_coordinate_correction": "Existing WNT local helper permits episode=-1 as well as season=-1 when actual kind is episode. This proves only exact source-page identity, not E3/E4 semantics. The selected E4 acceptance still requires actual SDK episode==4."
+}

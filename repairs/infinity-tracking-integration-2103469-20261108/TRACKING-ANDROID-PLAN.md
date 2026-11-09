@@ -1,0 +1,139 @@
+# Existing Infinity-origin playback acceptance
+
+This runner implements `INFINITY-ORIGIN-ACCEPTANCE.json` against the unchanged original signed APK2103469 and an original-key-signed complete80 module fixture containing the exact approved e410 source. It changes test tooling only. Owner-reported Fold navigation (Infinity TV → Watchlist → Queen's Blade → Episode List) is preserved as reported navigation evidence; it is not a repair target or tracking acceptance result.
+
+No application run is authorized by editing this plan. Root owns the disabled request, approved producer/artifact pin, provenance admission and final activation. No push, dispatch, APK build, signing or production change is performed by this harness author.
+
+## Inputs and source boundaries
+
+- APK SHA256 `804eebc57af2e4ef4e5418b56994bda64eb7fd7e7f2c0653b5c6e2a9f7833058`; original native engine/certificate verification remains unchanged.
+- Production checkpoint `e410f30ba9e38182e4e77810e5237e5442cbd31a`. Candidate plugin/resume_hub/service bytes must equal the acceptance contract's three SHA256 values. No source, provider preference, metadata/identity or navigation fix is included.
+- Fixed committed request focus `infinity-origin-acceptance`, application_tests=true, shutdown_tests=false, exact acceptance-contract source binding and approved fixture-pin SHA are required. No focus/source CLI or environment override exists. The current disabled request must refuse before device execution.
+- Fixture producer run/source/SOURCE-PINS come from the approved artifact pin. Candidate/recovery versions and module directories come from the signed artifact's MODULE-FIXTURE and VERSION-ADMISSION mapping; no CC68 or unissued version is hardcoded. Original RSA/full80 manifest and package source checks run before staging. Candidate source3 must be e410; recovery source3 stays the original69 reference.
+- Normal Kodi ZIP installation installs the disposable observer, exact unchanged publisher dependencies and complete candidate package. No raw production-file copy, signature bypass, database seed, progress-record seed, invented ID or account fixture is used. Only ordinary isolated-VM startup/ZIP settings are staged; provider preferences and owner data are untouched.
+- Native full80 authentication, exact source map, authenticated installed module_contract bootstrap, original ImportGuard/controller loader and publisher source hashes must pass before behavior. Diagnostic phases and Python optimization are recorded. All guards remain active under optimize=1.
+
+The original69 skin was read only at precise entrypoint/control boundaries: unified/Home.xml SHA256 `3f92581a3a6e0e379336fdea9dbe25543f599333e70ab075007f14bac033720f` defines the actual Home9000 Infinity TV/Movies items with section=trakttv/traktmovies and hubsource=infinity. Their existing native onclick opens the CC action=tv/movies root. The unchanged plugin navigator creates actual Watchlist/Progress/Next/Continue section rows. Unified MyVideoNav/Includes_InfinityMediaLists define the finite native content views including65050/65051/65052. Owned menu50, native Select3/6 and context10106 buttons1001–1100 retain their original source-defined roles; ambiguous/invisible/stale controls refuse selection.
+
+## Genuine origin method
+
+For each scenario, first find an existing valid saved title by its exact persisted source and the existing hub's validated identity. If absent, prepare it only through the original native catalogue/context **Infinity Tracked → Add to Watchlist**. Catalogue access is explicitly preparation, not play-origin evidence. Saving must leave items/watched unchanged. Unsupported metadata, save refusal, missing title, unsupported navigation, auth or runtime prerequisites block the scenario; unreached steps remain NOT_RUN. There is no direct-provider playback fallback.
+
+The acceptance trace must then contain actual observed native actions in this order:
+
+1. Return to Home and select the real Home9000 Infinity TV/Movies row, checking actual section and hubsource=infinity at native focus. Infinity skin alone or a stale Home property is insufficient.
+2. Observe the actual first-party CC TV/Movies root reached by that native click.
+3. Click its real Watchlist row and observe the actual first-party section directory.
+4. Select the real saved title by validated persisted key/source and current native GUI label/path.
+5. For TV, click the saved Queen parent and observe the original provider episode directory reached through that click. Select only the actual native row with the exact reviewed Episode4 source page URI. No raw provider ActivateWindow establishes origin.
+6. Click the real saved movie or native child, select a genuine visible native quality option if required, then observe new real Started/AVStarted and the actual getPlayingItem/getPlayingFile/clock.
+
+The ordered test-only trace is written before AV and extended with genuine AV evidence. Missing/wrong-scope/direct-provider traces cannot satisfy acceptance. Explicit fixtures and GUI actions do not mutate first-party tracker code or establish trust for production.
+
+## Playback and existing record assertions
+
+TV must accumulate at least300 seconds of advancing actual playback clock from the first AV observation, without a test seek, within a finite buffering deadline. Movie playback must meet the original duration/position/percentage eligibility. Stop must produce the real SDK Stopped callback. Original PID/start and native crash checks remain hard; no relaunch/retry conceals a crash.
+
+Raw SDK media type/IDs/S/E are recorded as diagnostics. A raw movie tag with S/E=-1 is not a numeric pre-play gate: the reviewed e410 local bridge may produce a valid exact-source local episode with unknown coordinates. Acceptance requires the existing hub's validated persisted identity, the exact played source, proved exact parent, preserved native label, accurate observed position, and no duplicate episode/movie row. Unknown coordinates stay unknown; no label/slug is converted into an episode number or canonical ID.
+
+After Stop, return through the real Infinity Home/root/section rows to Progress Shows, Next Episodes and Continue Playing (TV), or Continue Playing (movie). Match the genuine existing projections against actual native GUI card keys, with exactly one played key. Unfinished Next must retain the current source. A completed successor is not asserted without existing verified ordering; no E+1 is invented.
+
+Resume through the real Infinity Continue card/context and original Resume/Continue From path. Require actual native source and raw SDK identity continuity and an observed offset within stored−20 to stored+actual elapsed since the new AVStarted+20. No QA seek restores position. The existing optional96% completion scenario is not selected by this runner; its status remains NOT_RUN. Collection, Save For Later, Custom Lists, other entry points and the full mode/theme/display matrix remain explicitly NOT_RUN, not inferred from Watchlist acceptance or empty captures.
+
+SDK Stop transitions are observed coherently: only original exact no-media RuntimeErrors plus a second isPlayingVideo=false produce a stopped-transition record without partial clocks. Other SDK errors are not suppressed. Unknown auth/DRM/server modals remain visible. Only recognized original quality cancellation/exact resulting Playback failed, or the exact owned identity-refusal dialog, may be acknowledged by the existing bounded cleanup.
+
+## Reporting and execution boundary
+
+- Initial report and every scenario/step start NOT_RUN before Device construction. Environment/startup failure is BLOCKED_ENVIRONMENT; cases stay unreached.
+- Fixture/auth/save/navigation/runtime prerequisites are BLOCKED with exact phase/last step. Observer/control errors are BLOCKED_OBSERVER, not production failures.
+- A relevant observed functional assertion after actual origin/playback may FAIL. Never promote an unreached step to FAIL/PASS because the workflow exited nonzero.
+- Only completed actual Infinity-origin scenarios may PASS. release_acceptance=false, Fold=NOT_RUN and other entrypoints/modes remain separate.
+- Final APK read timeout/malformed query is UNVERIFIED and blocks a success claim; only a well-formed actual SHA differing from original69 is FAIL_MISMATCH.
+- Prior raw runs/logs/results stay immutable. Direct-provider diagnostics cannot satisfy current origin acceptance. Prior40/14/13 and baseline startup evidence are retained without rerun.
+
+The existing commands retain their arguments; root supplies the new admitted artifact and binds the request before execution:
+
+```sh
+python repairs/infinity-tracking-integration-2103469-20261108/stage_tracking_android.py \
+  --apk /admitted/Infinity-2103469-Combined-Original-Signer.apk \
+  --sdk "$ANDROID_HOME/build-tools/35.0.0" --fixture-dir /admitted/approved-fixture \
+  --dependency-pins repairs/infinity-tracking-integration-2103469-20261108/TRACKING-DEPENDENCY-PINS.json \
+  --out /staged-origin
+python repairs/infinity-tracking-integration-2103469-20261108/verify_tracking_android.py \
+  --staged /staged-origin --sdk "$ANDROID_HOME" --out /origin-evidence
+```
+
+## New selected focused host controls — recorded before execution
+
+Run only `test_infinity_origin_acceptance_guards.py`: reject direct-provider origin, regular Trakt/wrong-media/missing saved chain/wrong parent, require ordered origin plus genuine AV when requested, fixture/observer blocked reporting with unreached NOT_RUN, normal valid local bridge identity retaining unknown coordinates, and final digest timeout/unverified versus actual mismatch. The test compiles only selected actual guard functions with optimize=1; controlled dictionaries are not installed records, synthetic playback or Android acceptance. Do not mirror/run the full application workflow or repeat prior suites.
+
+```sh
+python repairs/infinity-tracking-integration-2103469-20261108/test_infinity_origin_acceptance_guards.py
+```
+
+Selected review correction, before execution: run only `AcceptanceGuards.test_observed_save_and_resume_assertions_fail_without_hiding_blockers`. An observed save-alone history mutation is FAIL even during preparation. After genuine origin/AV, explicit resume source/type/known-ID/upper-offset mismatches are FAIL. Only the existing outer lower-position deadline with a currently playing, already source/identity-validated sample becomes FAIL; no AV, stopped/ambiguous SDK observations, observer errors and nested transport deadlines remain BLOCKED. Call order, timing, playback scope and production are unchanged.
+
+```sh
+python -m unittest -v test_infinity_origin_acceptance_guards.AcceptanceGuards.test_observed_save_and_resume_assertions_fail_without_hiding_blockers
+```
+
+Selected readiness correction after actual42591104063, recorded before execution: observer003 is an empty initialization snapshot with visible content views500+65051, no rows and no focus. The optional directory wait must return pending/[] for that entirely empty observed primary-control state before its unique-visible check. Mandatory selection and any populated ambiguous state keep the original refusal. Observer014 then contains the sole focused65051 and the actual Queen parent row. Control500 is a legitimate original content view; control50 was not visible in this ambiguity and is also a legitimate media panel in the signed skin. No popup-ID exclusion, view picking, metadata relaxation or saving/navigation change is warranted.
+
+Run only `test_origin_recorded_content_readiness.ActualReadiness.test_actual_empty_transient_waits_settled_reads_and_populated_ambiguity_refuses`. It hash-binds the actual003/014 snapshot bytes from the retained run, compiles only the pure content_rows guard with optimize=1, confirms empty optional pending, settled actual rows, mandatory empty ambiguity refusal and a counterfactual populated-ambiguity refusal. It creates no installed records/SDK/app and reruns none of the prior eight guards or other suites.
+
+Movie catalogue F was not independently tested: the retained lifecycle log line2570 explicitly reports its Videos activation refused while the earlier modal was active, and later snapshots remain Q. This is a preparation blocker, not evidence of broken movie source/navigation. Root archives raw evidence unchanged and separately selects any next correction-specific actual attempt; this host control authorizes no dispatch.
+
+```sh
+python repairs/infinity-tracking-integration-2103469-20261108/test_origin_recorded_content_readiness.py
+```
+
+## Selected service-survival and native-return correction (before new guards)
+
+Retain the genuine42593220047 Infinity TV origin/AV/304.257-second clock/307.902 exact validated episode record and its proved parent unchanged. That five-minute proof is not a setup task to repeat. Native Home `ActivateWindow(...,return)` legitimately restored the saved episode directory; Kodi's unchanged GUIMediaWindow517–542 preserves the nested path for the same startDirectory. The driver may follow only bounded actual native Back through already observed saved-child/CC-section history to the actual first-party root. Every from/to path and action is captured. Unknown paths, modals, cycles and paths beyond three Back actions remain blocked; no raw activation substitutes for origin and no production navigation changes.
+
+The same run's resident service exited on the exact original action_loading FrameControls window lookup before movie AV, so movie record/resume needs a correction-specific attempt after service survival is repaired. The production delta is service.py only: one optional loading tick boundary helper defers exact RuntimeError “Window id does not exist” only when the terminal traceback code object is the authenticated unchanged action_loading._context and the terminal line is its pinned FrameControls read. Its original source SHA, canonical file, original verified loader and current contract must match. Other messages, other code/read sites, later tick errors and changed/retired loader generations propagate. Both original foreground arguments are forwarded; there is no loading reset, background substitution, retry, player/writer/threshold/checkpoint/lifecycle change or action_loading edit.
+
+Select only these NEW host guard files before execution. `test_loading_window_survival.py` executes original action_loading source/code objects through its original source loader with an explicit host contract double; it tests normal True/False forwarding, the recorded native-SDK throw site returning so the original loop can continue, wrong message/read/code/later tick propagation, untrusted/changed source and retired-generation refusal. The host Python SDK adds a traceback frame that native C++ does not; only that host-double frame is removed to model the exact recorded terminal code object. No installed import guard or module is reset or patched. `test_origin_native_return_history.py` tests only actual-action routing boundaries: known saved child/section Back chain, unknown/modal refusal, cycle refusal and three-action cap. These are source-bound host controls, not app playback or Android acceptance. Retain old40/14 and all prior runtime receipts; do not rerun them.
+
+```sh
+python test_loading_window_survival.py
+python test_origin_native_return_history.py
+```
+
+First freeze this minimal source and host proof for independent review. A later root-selected runtime attempt can reuse the retained five-minute evidence and use a short eligible genuine TV playback to populate the isolated profile for new GUI/resume/service-lifetime assertions. Completion/replay/restart/view selections, any new signed fixture, experimental APK and forward recovery remain root-owned follow-up work; this change does not dispatch/sign/build or broaden the application test.
+
+## SourceC1 selected continuation — recorded before new host controls
+
+This tooling selection supersedes the earlier NOT_RUN completion/entrypoint/view paragraph for the next root-admitted run only. Production remains exactly sourceC1 5787ca4569faa70dec4f10493b08bd8015d542ea; neither staging/admission nor the signed fixture is selected by this driver. The actual42593220047 five-minute TV clock304.257s / validated stored307.902s remains retained evidence. Do not repeat that five-minute proof as profile setup. After genuine Infinity Home→TV→Watchlist→saved Queen→actual native child selection, use max(45s,1% of actual duration+5s) advancing media clock to establish the fresh eligible record needed to exercise the repaired resident service, actual Progress/Next/Continue cards and existing Resume. Unknown local coordinates remain unknown; no numeric episode is invented. Movie uses the equivalent genuine Infinity Movies workflow and max(90s,1%+5s), followed by exact recorded position/card/resume assertions. Neither raw provider preparation nor direct fallback satisfies origin.
+
+After core checks, use a twelve-minute optional budget inside the existing45-minute emulator bound. First, from the existing movie Continue card, resume normally and use only the explicitly selected native Player.Seek96% to observe the unchanged95% completion rule, exact watched identity/source and absence from unfinished Continue. This is a seek-completion check, not natural Ended proof. Replay through the real saved Watchlist Play action, require actual source continuity/clock near beginning without QA resume seek, run an eligible advancing clock and require one existing progress key/new occurrence. Then explicitly force-stop/start the same profile once for selected persistence (not Normal Close/shutdown acceptance), reauthenticate native full80 and compare genuine playback-domain and saved memberships. Observer evidence goes into a distinct restart directory; old replies are not overwritten.
+
+With remaining time, attempt Collection, Save For Later and Custom Lists separately for TV/movie using the actual saved-title context actions. Custom Lists uses only the original native keyboard10103 with exact heading311 `Add to custom list` and fixed name `Tracking QA`, then normal Home/root/Custom Lists/named-list navigation. No record/settings/identity is seeded. Each applicable real saved entry must select the same actual native source, receive genuine AV, advance its clock, stop and retain one validated existing progress key. A blocked save/navigation/account prerequisite remains BLOCKED; budget-skipped checks remain NOT_RUN_BUDGET. Other provider families are NOT_RUN without genuine installed source/account fixtures; no fake accounts/catalogues, allowlists or successor guesses.
+
+Finally, consume these same actual records for bounded view captures from VIEW-MODE-TEST-CONTRACT.json: only original public RunScript view-mode/theme commands, actual Home9000 focus, native requested/effective/pane/theme readback and visible source-declared data containers. Geometry uses ordinary emulator wm dimensions/density and records published native facts; it does not spoof Home facts or claim physical Fold coverage. Theme owner unavailable means explicit BLOCKED_THEME_OWNER_UNAVAILABLE and current-unverified captures only, with no theme installation/repair/fake value. Screenshots are CAPTURED...VISUAL_ACCEPTANCE_PENDING, never automatic visual PASS. Empty/inapplicable data containers do not prove card preservation. Playback-domain records must remain unchanged. Mode/theme/geometry are restored through original public UI/native commands. Unknown modals remain visible and blocked; no blanket Back/ack cleanup is added.
+
+Core/optional results remain separate. An observed functional FAIL makes the selected overall result FAIL. Core PASS plus any blocked/unexecuted/visual-pending optional coverage is PARTIAL_SELECTED_INFINITY_TRACKING_CORE_PASS, not release acceptance or universal provider/Fold PASS. Native process/deadlock/crash guards, final unchanged APK validation and full80 authentication are retained. No execution is authorized by this document alone; root owns admission, request, module pin and the single coordinated selected application attempt.
+
+Run only the NEW `test_tracking_c1_selection_guards.py` controls, selected here before execution. They compile the actual selected functions at optimize=1 and cover: eligibility-target arithmetic (45s actual TV with retained proof, no threshold mutation); playback-domain comparison detecting real position/identity changes while ignoring ordinary revision metadata; requested/effective/pane agreement (including genuine auto resolution); fixed-name original custom-list keyboard and wrong/auth-dialog refusal; public-mode acknowledgement versus verified state and invalid/obscured-command refusal; aggregate FAIL/PARTIAL/blocked handling for unexecuted coverage. These are test-tool boundary controls using explicit host doubles, not fake installed records or Android/provider evidence. Do not run old9/40/14, earlier guard files or any application here.
+
+```sh
+python repairs/infinity-tracking-integration-2103469-20261108/test_tracking_c1_selection_guards.py
+```
+
+Targeted independent-review correction (before execution): another saved section may legitimately launch at zero. Its new occurrence check must wait for at least12 seconds advancing media and actual position>=max(35 seconds,1% of actual duration+5 seconds), rather than fail after12 seconds with an ineligible clock. No QA resume seek is added. View captures require a nonempty actual expected-key comparison for each applicable media; screenshots without those observations remain BLOCKED_DATA_NOT_OBSERVABLE. Run only NEW `Selection.test_other_saved_origin_clock_does_not_assume_resume` from the same new control file. Retain the previous six results without rerunning them.
+
+```sh
+python -m unittest -v test_tracking_c1_selection_guards.Selection.test_other_saved_origin_clock_does_not_assume_resume
+```
+
+Second narrow optional-view review correction (before execution): actual Home focus may leave an asynchronously empty applicable native container briefly. Bound a20-second wait for a real key/file-bearing row when that visible source-declared container has existing expected records. Timeout is BLOCKED_VIEW_PREREQUISITE; populated wrong/duplicate keys still reach functional comparison and FAIL. No applicable visible nonempty expected data remains NOT_OBSERVABLE. Select only NEW `Selection.test_view_data_readiness_waits_empty_without_excusing_populated_wrong_rows`; previous seven controls stay retained.
+
+```sh
+python -m unittest -v test_tracking_c1_selection_guards.Selection.test_view_data_readiness_waits_empty_without_excusing_populated_wrong_rows
+```
+
+Final narrow empty-projection correction (selected before execution): compare actual and expected key sets, including duplicate refusal, even when expected is empty. Empty both remains NOT_APPLICABLE; expected empty with an actual stale/nonempty card is an observed functional FAIL. Run only NEW `Selection.test_empty_projection_cannot_hide_unexpected_or_duplicate_cards`; retain the previous eight controls without rerun. Production/sourceC1 is unchanged.
+
+```sh
+python -m unittest -v test_tracking_c1_selection_guards.Selection.test_empty_projection_cannot_hide_unexpected_or_duplicate_cards
+```

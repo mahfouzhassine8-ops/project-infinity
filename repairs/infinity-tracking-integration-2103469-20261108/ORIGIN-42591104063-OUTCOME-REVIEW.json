@@ -1,0 +1,79 @@
+{
+  "artifact_sha256": "337c51263a7be671ec8568f917a8232e9594535cc337c6e111d47f0181ec30d1",
+  "control_role_correction": "Control50 is a legitimate native Videos panel in signed69 MyVideoNav/Includes_InfinityMediaLists and separately an owned popup control in other windows. It was not visible in the failing snapshot; actual ambiguity was500+65051.",
+  "evidence_interpretation_update": {
+    "previous_receipt_sha256": "ce46121da65c42c48d682c31ce2e64a108a953259607e50889874f3c4582399a",
+    "raw_log_sha256": "0552b36634e9ac82ef0ea57b5fdee9f79d85b6edae2cfea5b1e1aba1ff82da45",
+    "reason": "Read exact retained log line2570; upgrades prior plausible explanation to directly observed modal refusal. Original raw evidence unchanged."
+  },
+  "evidence_root": "/workspace/scratch/tracking-origin-42591104063/files/tracking-android-results",
+  "evidence_sha256": {
+    "ANDROID-VERIFICATION.json": "8c292ba0a000c3c9bd3a0be142c1528066400268a83a6f5bb869466a7a73723f",
+    "LIFECYCLE-CAPTURE.json": "7fefea5dc891f9d627d5d229924e677345761fe91e8ed30276b17ad2cc7a0caa",
+    "lifecycle-filtered.log": "0552b36634e9ac82ef0ea57b5fdee9f79d85b6edae2cfea5b1e1aba1ff82da45",
+    "movie-outcome-events.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "movie-outcome-playing.json": "c91f066d54a6f8221dc61865bead774ac1da71d32ed814e481d0e9ed5752eb23",
+    "movie-outcome-snapshot.json": "0b8dfddfebe915d51374d93733ba4e6874e4a8377145545f1528d3451518ec2f",
+    "movie-outcome-state.json": "30ccb0334249adc9b8ea09152f9ed9dce116cf6a3fa31fd2eb6308f1c6d038dd",
+    "observer-001-identity.json": "ace94a3840f626718e13fc2f9dadc490131bc9d9f2d3154891f1f6745eeb8833",
+    "observer-003-snapshot.json": "1cba1d0b9691072a54316857793480abe7862a67df5d13e6b1b8a033fe5846ae",
+    "observer-010-snapshot.json": "5b0c64c25410557468df6f1a4f85fead50d1e26f4b68af34cecf1bd8f0a36f5e",
+    "observer-012-snapshot.json": "4a0d64f535067281a87a1e10323c8835e0f3f181906c804c09ab32c6e2dfd614",
+    "observer-013-snapshot.json": "d8b1109a0fc62239f3edb96166f816e9f4cfe879ca43293e2366281ca434b55e",
+    "observer-014-snapshot.json": "7e3648e844f6c5fe2c50ae3c53aa954cc55cf0bc6cf1ebbad8e94116c4c8433e",
+    "tv-outcome-events.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "tv-outcome-playing.json": "c91f066d54a6f8221dc61865bead774ac1da71d32ed814e481d0e9ed5752eb23",
+    "tv-outcome-snapshot.json": "9923b695cd79f43fa78f2f5c4faf08247e632607f98854940576899fd67a2da9",
+    "tv-outcome-state.json": "30ccb0334249adc9b8ea09152f9ed9dce116cf6a3fa31fd2eb6308f1c6d038dd"
+  },
+  "movie": {
+    "evidence": "Lifecycle-filtered.log line2570,09:14:58.839: Activate of window10025 refused because active modal dialogs; observer010/012/013 show prior Q busy10138. Subsequent observations remain populated Qfolder. No successful Fdirectory activation or actual movie item was observed.",
+    "provider_failure_established": false,
+    "residual_prior_UI_state": "OBSERVED_ACTIVE_MODAL_REFUSED_NEW_VIDEOS_ACTIVATION",
+    "status": "BLOCKED_FIXTURE_PREPARATION"
+  },
+  "native_crash_observation": {
+    "capture_limit": "Retained filtered lifecycle log and successful observer replies; not an unconditional stability guarantee.",
+    "fatal_signal_SIGSEGV_SIGABRT_FATAL_EXCEPTION_am_crash_talloc_markers": 0,
+    "known_termination": "Explicit module-activation force-stop of initialPID4941; not a crash.",
+    "log_bytes": 406784,
+    "log_lines": 2685,
+    "status": "NO_NATIVE_CRASH_OBSERVED_IN_RETAINED_CAPTURE",
+    "successful_observer_replies_same_pid5896": 112
+  },
+  "not_run": [
+    "Saving a title",
+    "Infinity Home/root/Watchlist origin",
+    "Saved child launch",
+    "AVStarted/playback clocks",
+    "Eligible Stop",
+    "Progress record/projections",
+    "Resume",
+    "Other entrypoints/provider families/Fold/release acceptance"
+  ],
+  "observed_pass": [
+    "Original native full80 CC0.3.5.70/e410 authentication and guarded first-party load.",
+    "Final installed original69 APK SHA804eebc57af2e4ef4e5418b56994bda64eb7fd7e7f2c0653b5c6e2a9f7833058."
+  ],
+  "prior_review_limitation": "Previous source acceptance missed premature ambiguity rejection during entirely empty transient directory readiness; guard failed closed and no false playback PASS occurred.",
+  "production_changes": false,
+  "reporting_note": "Scenario status/last_step correctly show blocked fixture preparation. Per-step fixture_preparation NOT_RUN should be read as not completed; preparation was attempted. Later integration steps genuinely NOT_RUN.",
+  "reviewed_at_utc": "2026-11-09T09:20:34.400525+00:00",
+  "run": 42591104063,
+  "runtime_acceptance": false,
+  "source": "28f18534",
+  "state": {
+    "origin_traces_empty": true,
+    "player_events_empty": true,
+    "playing": false,
+    "revision": 0,
+    "watchlist_items_watched_empty": true
+  },
+  "status": "BLOCKED_QA_PREPARATION_NO_INFINITY_ORIGIN_OR_PLAYBACK_EXECUTED",
+  "tests_apps_retries_by_reviewer": false,
+  "tv": {
+    "evidence": "observer003: Videos10025/dialog9999, visible primary500 and65051, both zero rows, no focused control. content_rows(optional=True) raises before directory readiness. Later busy10138 settles to focused65051 and real Qcatalogue including Queens Blade.",
+    "save_attempted": false,
+    "status": "BLOCKED_OBSERVER_DURING_FIXTURE_PREPARATION"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "status": "SELECTED_BEFORE_EXECUTION",
+  "baseline_commit": "83d1bc15031390c99cb170f20faa2a9720700133",
+  "correction": "Admit only source-proven exact relative TV parent catalogue queries, preserve raw hashes, reject actual movie metadata with valid copied TV parent before progress admission. Do not infer E4 identity.",
+  "commands": [
+    "python test_tv_parent_identity_safety.py",
+    "python -m unittest -v test_actual_source_item.ActualSourceItem.test_exact_actual_copy_retains_unknown_season_and_provider_parent test_actual_source_item.ActualSourceItem.test_cc_or_missing_parent_never_creates_series_association test_actual_source_item.ActualSourceItem.test_actual_or_json_canonical_ids_leave_generic_recorder_unchanged"
+  ],
+  "selected_new_cases": 7,
+  "selected_affected_cases": 3,
+  "input_sha256": {
+    "evidence/native-av-identity-fail-42567028842/queens-blade-e4-actual-av.json": "6379cf40aee737c98731fca4ba7d84000acbd404b49bd2a271b7252b7420353e",
+    "WNT-PARENT-QUERY-BOUNDARY.json": "88ddde458a8d38c3d8f3822115d302bf03c79b1a7d97e220461643acfbfcef60",
+    "test_actual_source_item.py": "1ef64397b786cf08b6dd3b71141ce69ee238bba29be083f8a3abbb1de005c5db",
+    "dependency-evidence/PUBLIC-MOVIE-INPUT.json": "7cac362596a05265228c31dbe25163aaccae14959ee724ea8505e955bf9e0e15"
+  },
+  "not_run": [
+    "old40-case sweep",
+    "old13 module installer cases",
+    "Android",
+    "provider playback",
+    "build",
+    "signing",
+    "dispatch"
+  ],
+  "runtime_limitation": "Controlled host API inputs reuse retained real AV fields; no SDK or provider execution is simulated as acceptance. Production Android validation and release gates remain blocked."
+}

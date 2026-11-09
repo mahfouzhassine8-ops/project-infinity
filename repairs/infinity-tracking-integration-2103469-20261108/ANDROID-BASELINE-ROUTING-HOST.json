@@ -1,0 +1,69 @@
+{
+  "status": "PASS_FOCUSED_BASELINE_ROUTING_HOST_ONLY",
+  "cases": 19,
+  "selected_route": "Only original69 API36 baseline startup; no feature/shutdown/build/signer job",
+  "checks": [
+    "new selected push",
+    "unselected new push",
+    "Old job predicates preserved on hypothetical non-triggering branch; new baseline predicate refused",
+    "new manual",
+    "old watchlist manual",
+    "old selected provider",
+    "old signed464 verify",
+    "old signed464 publication",
+    "All old non-generic job bodies unchanged",
+    "Old generic job body unchanged; only explicit new selection exclusions",
+    "Whole-workflow push branch filter refuses unlisted branches"
+  ],
+  "workflow_sha256": "6918accaac86e98191f26bf7fcdb4d0b16e83264b4c5bb6c2c64dd27af5c13af",
+  "application": "NOT_RUN",
+  "production_source_edits": false,
+  "original40_host_tests": "NOT_RERUN",
+  "actual_workflow_guard_checks": [
+    {
+      "case": "exact bound request and unchanged reviewed sources",
+      "result": "PASS_ACTUAL_WORKFLOW_GUARD"
+    },
+    {
+      "case": "feature_tests_rejected",
+      "result": "PASS_EXPECTED_REFUSAL",
+      "reason": "NO_FEATURE_OR_SHUTDOWN_SUITE"
+    },
+    {
+      "case": "shutdown_rejected",
+      "result": "PASS_EXPECTED_REFUSAL",
+      "reason": "NO_FEATURE_OR_SHUTDOWN_SUITE"
+    },
+    {
+      "case": "wrong_image_rejected",
+      "result": "PASS_EXPECTED_REFUSAL",
+      "reason": "EXACT_STOCK_API36_ENVIRONMENT"
+    },
+    {
+      "case": "stale_harness_binding_rejected",
+      "result": "PASS_EXPECTED_REFUSAL",
+      "reason": "SOURCE_BOUND_STARTUP_HARNESS:qualify_android_baseline.py"
+    },
+    {
+      "case": "wrong_branch_rejected",
+      "result": "PASS_EXPECTED_REFUSAL",
+      "reason": "EXACT_INTEGRATION_BRANCH"
+    },
+    {
+      "case": "wrong_checkout_head_rejected",
+      "result": "PASS_EXPECTED_REFUSAL",
+      "reason": "EXACT_WORKFLOW_COMMIT_CHECKOUT"
+    },
+    {
+      "case": "unselected_push_rejected",
+      "result": "PASS_EXPECTED_REFUSAL",
+      "reason": "EXACT_STARTUP_PUSH_PREFIX"
+    }
+  ],
+  "final_request_sha256": "88578a97c34dcea5cb2ab0241f35a618a7e9871b6588815d4640a3bd54b1b54c",
+  "independent_review": "Astra final workflow/harness review accepted; source/guard only, no runtime acceptance",
+  "setup_reconnect_binding": "PASS actual checked_request and actual workflow guard after source-bound reconnect correction; prior guard evidence retained",
+  "rationale_binding": "PASS actual checked_request final source/guard binding; original workflow guard unchanged; Astra targeted guard review accepted",
+  "compose_binding": "PASS checked_request; unchanged workflow guard; exact Compose row source reviewed by Astra",
+  "freshness_foreground_binding": "PASS checked_request with final source/host guard binding; original workflow guard unchanged"
+}

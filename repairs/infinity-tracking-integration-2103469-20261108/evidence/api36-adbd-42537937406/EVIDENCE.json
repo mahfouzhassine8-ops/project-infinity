@@ -1,0 +1,19 @@
+{
+  "run_id": 42537937406,
+  "source_commit": "73ff27b825298a23147205890aab832c72508c34",
+  "artifact_id": 13640571355,
+  "artifact_sha256": "831aa93644fb43f95c14f9de79b558b3bfa60762fd848f07be326a34e44a3ec5",
+  "artifact_size": 1942111,
+  "status": "FAIL_ADBD_ROOT_RECONNECTION_BEFORE_INSTALL; NOT_AN_APPLICATION_STARTUP_RESULT",
+  "original_APK_admission": "PASS_ORIGINAL_CERTIFICATE_PACKAGE_MIN21_TARGET35_NATIVE66_RSA80",
+  "stock_API36_intake": "PASS_REVISION7_4KiB_ARM64_BRIDGE",
+  "bridge_sha256": "fbadc774c989534a567e6af8fd16d2c00727b1f1d9cc778bf538d6b59ed9776d",
+  "bridge_build_id": "2810e5b44895c4ea0b1ad6882ea73b73",
+  "APK_installed": false,
+  "application_starts": 0,
+  "cause": "adb root closed its transport during daemon transition; harness required command exit0 before waiting for verified reconnection.",
+  "correction_scope": "One root command; retain its actual result, finite reconnect, require actual UID0 before install; no app retry or verification bypass",
+  "production_source_changes": false,
+  "build": false,
+  "signing": false
+}

@@ -1,0 +1,240 @@
+{
+  "status": "READ_ONLY_ARCHIVE_AND_APK_METADATA_EVIDENCE",
+  "pins_sha256": "750d95f74969f01cf1c147a991852794a6bf5e72def1f1b7d9497113bdfa9350",
+  "retained_source_pin_files": {
+    "repairs/save-later-multiimage-20261023/ANDROID-INPUT-PINS.json": "9fcfe4a7ed1f70fb2b1edb2c7c07c7648da5f278b116766b09239e05cb02767b",
+    "repairs/infinity-final-release-462-20261107/ANDROID-EXTRA-INPUT-PINS.json": "b7eff355217dffaef7d7903a63828750201c2053c9973de9cd78ce4200f81b74"
+  },
+  "local_archives": [
+    {
+      "addon": "script.module.certifi",
+      "local_archive": "/workspace/scratch/three-android-inputs/script.module.certifi-2023.5.7.zip",
+      "bytes": 162689,
+      "sha256": "c16d4cd2efe6e57dbb5e8d71a9beb3af213b1e3d717e8b0b24f0cbdc4c645070",
+      "manifest_sha256": "186548abb00ea69b67b43bd23f988b1f68150332d9ca5698c9b48c4beffe0732",
+      "source": "retained cache",
+      "archive_members": 7
+    },
+    {
+      "addon": "script.module.chardet",
+      "local_archive": "/workspace/scratch/three-android-inputs/script.module.chardet-5.1.0.zip",
+      "bytes": 204491,
+      "sha256": "d5010fc55a9523d86a306ae9e6a8dea0e3248fe079b9ed37280fe86110cd766a",
+      "manifest_sha256": "73aa4e0b9f9ad26896a6d63df4321bb4dbb2eac5ebdc463c1c997902b6a3078b",
+      "source": "retained cache",
+      "archive_members": 51
+    },
+    {
+      "addon": "script.module.idna",
+      "local_archive": "/workspace/scratch/three-android-inputs/script.module.idna-3.10.0.zip",
+      "bytes": 73349,
+      "sha256": "c4ff34dbfab2736e9214a374d331bd6f558d8b3fea8eb7902e210749509242b3",
+      "manifest_sha256": "c250f4a73ac9f6e75d7539879fd59a864ea93e7f9d35bb586953abe6ab4376bd",
+      "source": "retained cache",
+      "archive_members": 11
+    },
+    {
+      "addon": "script.module.urllib3",
+      "local_archive": "/workspace/scratch/three-android-inputs/script.module.urllib3-2.2.3.zip",
+      "bytes": 130842,
+      "sha256": "740b2d63bb50eee9fb35f01c567ec8d3588c5bbd548e2b8d280932be30d82f53",
+      "manifest_sha256": "9ee4d9805a67de90965bb7c69c0363983c9961ea6cce8545df5181b50ebc7426",
+      "source": "retained cache",
+      "archive_members": 40
+    },
+    {
+      "addon": "script.module.requests",
+      "local_archive": "/workspace/scratch/three-android-inputs/script.module.requests-2.31.0.zip",
+      "bytes": 67576,
+      "sha256": "a5704f0fd7afb4154e1beea9b5f05a002bcd75fa581a1e5fd15ece39bf2bd38a",
+      "manifest_sha256": "7921891c05b4fbb1ddbc8fc9d78ecab2ce083b3a83015cd670427ea0ff4e950d",
+      "source": "retained cache",
+      "archive_members": 21
+    },
+    {
+      "addon": "script.module.six",
+      "local_archive": "/workspace/scratch/three-android-inputs/script.module.six-1.16.0+matrix.1.zip",
+      "bytes": 16999,
+      "sha256": "4197f7773f75ab9f16b3c920195acbb8b8b151b4b3c8c3e14fc4876e764e3860",
+      "manifest_sha256": "ce96b1ab08b36219bc0b7cc99f728d5ad64db4f5e274cb5802fe3abe095684ad",
+      "source": "retained cache",
+      "archive_members": 4
+    },
+    {
+      "addon": "inputstream.adaptive",
+      "local_archive": "/workspace/scratch/tracking-dependency-cache/inputstream.adaptive-21.5.25.zip",
+      "bytes": 1588238,
+      "sha256": "5bec8b8ca1f1ca8264e32455cb34b2939e523f9bdb18cd65d7383d18afdf04cb",
+      "manifest_sha256": "60c0ee38bf04f65834d619fb2950d2d8bc44dc960e25339e838921d608b32713",
+      "source": "downloaded exact retained public URL",
+      "archive_members": 78
+    },
+    {
+      "addon": "plugin.video.watchnixtoons2",
+      "local_archive": "/workspace/scratch/tracking-dependency-cache/plugin.video.watchnixtoons2-0.14.24.zip",
+      "bytes": 486529,
+      "sha256": "76a0580d035b80634fc6775f46aacc780a9449a9ca46b446dde63c2360ce6540",
+      "manifest_sha256": "9dc68f15ce6d7e80ff31443eff8fcf43afe80d8fcdd88a5e8fc592f9fa31318c",
+      "source": "downloaded exact retained public URL",
+      "archive_members": 34
+    }
+  ],
+  "baseline_apk": {
+    "path": "/workspace/scratch/watchlist-signed/2103469/Infinity-2103469-Combined-Original-Signer.apk",
+    "sha256": "804eebc57af2e4ef4e5418b56994bda64eb7fd7e7f2c0653b5c6e2a9f7833058",
+    "inputstream_member_count": 0,
+    "sdk_manifests_checked": [
+      {
+        "addon": "kodi.binary.global.filesystem",
+        "version": "1.1.9",
+        "apk_member": "assets/addons/kodi.binary.global.filesystem/addon.xml",
+        "manifest_sha256": "0fb6d7a3a0918b0323c3c3da8b4ab04be2518eaff150858b15a648150c5b4ded"
+      },
+      {
+        "addon": "kodi.binary.global.general",
+        "version": "1.0.5",
+        "apk_member": "assets/addons/kodi.binary.global.general/addon.xml",
+        "manifest_sha256": "8455bb4d770a689bf807eb2361221cb4594fce5d9b14fb16c2b861b950d43e8f"
+      },
+      {
+        "addon": "kodi.binary.global.gui",
+        "version": "5.15.0",
+        "apk_member": "assets/addons/kodi.binary.global.gui/addon.xml",
+        "manifest_sha256": "fdaabd8db2742e2fb8c70366f7fc13ce7299ac51b1b3a17059943f6386cda3f7"
+      },
+      {
+        "addon": "kodi.binary.global.main",
+        "version": "2.0.2",
+        "apk_member": "assets/addons/kodi.binary.global.main/addon.xml",
+        "manifest_sha256": "294a55b1568509695c9cb62b71a0f9b8c2f1f88a014d3a0a229f0ceec9dd9617"
+      },
+      {
+        "addon": "kodi.binary.global.tools",
+        "version": "1.0.4",
+        "apk_member": "assets/addons/kodi.binary.global.tools/addon.xml",
+        "manifest_sha256": "c6c06b9b026e79dae5695137d846e763523d9b968020503d9f7fbee42afcf331"
+      },
+      {
+        "addon": "kodi.binary.instance.inputstream",
+        "version": "3.3.0",
+        "apk_member": "assets/addons/kodi.binary.instance.inputstream/addon.xml",
+        "manifest_sha256": "6b19568b9b7761ebea99e4673c7140399c86076b35cc290efe76a6075ea15b2f"
+      },
+      {
+        "addon": "kodi.binary.instance.videocodec",
+        "version": "2.1.0",
+        "apk_member": "assets/addons/kodi.binary.instance.videocodec/addon.xml",
+        "manifest_sha256": "8744b52e8c0a18a2c5af4cf8ea5267e5c02d92f0075c2e2469e79580926bb9f5"
+      },
+      {
+        "addon": "xbmc.python",
+        "version": "3.0.1",
+        "apk_member": "assets/addons/xbmc.python/addon.xml",
+        "manifest_sha256": "8f461fbda037a4c50ed0688249e4835f69c45fd74bb5f768f854c365ed933fea"
+      }
+    ],
+    "libcxx": {
+      "apk_member": "lib/arm64-v8a/libc++_shared.so",
+      "sha256": "f1ce8bc0759504421da60393b8654cce473973615416254e68255306ec913222",
+      "elf_machine": 183
+    }
+  },
+  "inputstream_binary_inspection": "ELF64 e_machine183 AArch64; readelf -d reports only libc++_shared.so, libm.so, libdl.so, libc.so. Exact required Kodi SDK versions are present in signed69 APK; runtime loading is NOT RUN.",
+  "public_html": [
+    {
+      "local_saved_public_page": "/workspace/scratch/tracking69-public-provider-inputs/queens_blade.html",
+      "sha256": "75dd677e414095d921225b536024505f0c4840d669bf8d7bdc070be6caa3b816",
+      "bytes": 78143,
+      "episode_listing_start_marker": "name=\"pid\"",
+      "start_index": 26502,
+      "end_index": 54186,
+      "actual_pinned_regex_matches": 42,
+      "episode4_rows": [
+        {
+          "link": "/queens-blade-ova-beautiful-warriors-episode-4-english-dubbed",
+          "type": "dub",
+          "name": "OVA: Beautiful Warriors Episode 4 English Dubbed"
+        },
+        {
+          "link": "/queens-blade-rebellion-episode-4-english-dubbed-2",
+          "type": "dub",
+          "name": "Rebellion Episode 4 English Dubbed"
+        },
+        {
+          "link": "/queens-blade-the-evil-eye-episode-4-english-dubbed",
+          "type": "dub",
+          "name": "2 The Evil Eye Episode 4 English Dubbed"
+        },
+        {
+          "link": "/queens-blade-episode-4-english-dubbed",
+          "type": "dub",
+          "name": "Episode 4 English Dubbed"
+        }
+      ],
+      "limitations": "Read-only parsing of root-collected public HTML; not Kodi navigation, resolver success, media availability, parent-page proof or canonical identity."
+    },
+    {
+      "local_saved_public_page": "/workspace/scratch/tracking69-public-provider-inputs/rezero.html",
+      "sha256": "2371a7c4ca08aae6d55baacca3dca79c6ff6db6080417cf8d5b72a688b848431",
+      "bytes": 134187,
+      "episode_listing_start_marker": "name=\"pid\"",
+      "start_index": 27342,
+      "end_index": 110206,
+      "actual_pinned_regex_matches": 175,
+      "episode4_rows": [
+        {
+          "link": "/rezero-starting-life-in-another-world-season-4-episode-4-english-dubbed",
+          "type": "dub",
+          "name": "Season 4 Episode 4 English Dubbed"
+        },
+        {
+          "link": "/rezero-starting-life-in-another-world-season-4-episode-4-english-subbed",
+          "type": "sub",
+          "name": "Season 4 Episode 4 English Subbed"
+        },
+        {
+          "link": "/rezero-starting-life-in-another-world-season-3-episode-4-english-dubbed",
+          "type": "dub",
+          "name": "Season 3 Episode 4 English Dubbed"
+        },
+        {
+          "link": "/rezero-kara-hajimeru-isekai-seikatsu-season-3-episode-4-english-subbed",
+          "type": "sub",
+          "name": "Season 3 Episode 4 English Subbed"
+        },
+        {
+          "link": "/re-zero-starting-life-in-another-world-season-2-episode-4-english-dubbed",
+          "type": "dub",
+          "name": "Season 2 Episode 4 English Dubbed"
+        },
+        {
+          "link": "/re-zero-kara-hajimeru-isekai-seikatsu-season-2-episode-4-english-subbed",
+          "type": "sub",
+          "name": "Season 2 Episode 4 English Subbed"
+        },
+        {
+          "link": "/re-zero-starting-life-in-another-world-episode-4-english-dubbed",
+          "type": "dub",
+          "name": "Episode 4 English Dubbed"
+        },
+        {
+          "link": "/re-zero-kara-hajimeru-isekai-seikatsu-episode-4-english-subbed",
+          "type": "sub",
+          "name": "Episode 4 English Subbed"
+        }
+      ],
+      "limitations": "Read-only parsing of root-collected public HTML; not Kodi navigation, resolver success, media availability, parent-page proof or canonical identity."
+    }
+  ],
+  "pinned_wnt_site_source": {
+    "path": "/workspace/scratch/tracking-provider-reference/plugin.video.watchnixtoons2/lib/sites/wcostream.py",
+    "sha256": "9c7b2e051cf61e147e860494f8eaebe597e0eddf3ef883ea35c0fb7fa226fa0d",
+    "episode_listing_marker": "name=\"pid\"",
+    "resolver_parent_start": "\"lalyx\"",
+    "resolver_parent_regex": "class=\\\"ildate\\\">\\s*<a href=\\\"([^\\\"]+)\\\"(?:[^\\>]+)?><span(?:[^\\>]+)>([^/<]+)<"
+  },
+  "application_tests": "NOT_RUN",
+  "build": "NOT_RUN",
+  "provider_mutation": false,
+  "credentials_accessed": false
+}

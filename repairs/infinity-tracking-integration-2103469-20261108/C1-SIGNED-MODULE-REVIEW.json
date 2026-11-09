@@ -1,0 +1,74 @@
+{
+  "APK_build": false,
+  "Android_execution_by_reviewer": false,
+  "Java_rerun_by_reviewer": false,
+  "actual_CI_cases": [
+    {
+      "CC": "0.3.5.72",
+      "case": "signed69_to_tracking_complete80_and_data",
+      "status": "PASS_REAL_UNCHANGED_JAVA"
+    },
+    {
+      "CC": "0.3.5.72",
+      "case": "same_candidate_idempotent_noop",
+      "status": "PASS_REAL_UNCHANGED_JAVA"
+    },
+    {
+      "CC": "0.3.5.73",
+      "case": "forward_recovery_restores69_with_loading_guard_and_data",
+      "status": "PASS_REAL_UNCHANGED_JAVA"
+    },
+    {
+      "case": "older_candidate_retains_authenticated_recovery",
+      "status": "PASS_NO_WRITE"
+    }
+  ],
+  "actual_CI_installer_receipt_sha256": "cfb23d41b8d616a7446c2d820da071ed6c66f75e6409a6a84f067806ad93d30b",
+  "artifact_sha256": "b4b3924c822899104202c1055a336dbff35f2c627da82c987a11fc8679fdc80c",
+  "artifact_size": 1306355,
+  "concrete_blockers": [],
+  "inactive_helper_and_other_sources": "EXACT_ORIGINAL69",
+  "limits": [
+    "Public signature/member/source verification only.",
+    "Four actual CI installer cases bind exact frozen producer/verifier/selection; not rerun.",
+    "No new Android tracking/service-survival/resume or actual saved-state recovery compatibility established."
+  ],
+  "module_fixture_sha256": "a7403cea997da1bc4c12358c849e0fa2b677838c6c8d370a31ea9e994a7142b3",
+  "private_key_access": false,
+  "producer": "583daae30747d265eab46730a0bac2cd012bd919",
+  "production_checkpoint": "5787ca4569faa70dec4f10493b08bd8015d542ea",
+  "recovery_service": "EXACT_PREVIOUSLY_REVIEWED887f_ORIGINAL69_PLUS_C1_LOADING_GUARD",
+  "release_acceptance": false,
+  "reviewed_at_utc": "2026-11-09T10:42:06.297822+00:00",
+  "run": 42602243785,
+  "source_and_signatures": [
+    {
+      "CC": "0.3.5.72",
+      "CC_zip_members": 66,
+      "RSA": "Verified OK",
+      "changed_sources": [
+        "script.infinity.commandcenter/addon.xml",
+        "script.infinity.commandcenter/plugin.py",
+        "script.infinity.commandcenter/resume_hub.py",
+        "script.infinity.commandcenter/service.py"
+      ],
+      "manifest_sha256": "d920522dabaf2a5202d2db5d9300eab57ce20d8a53b7dfbe7ce8fdabc366188c",
+      "signature_sha256": "2342d107c00b30f80ce14c2ae7320fa2b6727f9f5a7badaf74f2edc37b537980",
+      "source_count": 80
+    },
+    {
+      "CC": "0.3.5.73",
+      "CC_zip_members": 66,
+      "RSA": "Verified OK",
+      "changed_sources": [
+        "script.infinity.commandcenter/addon.xml",
+        "script.infinity.commandcenter/service.py"
+      ],
+      "manifest_sha256": "bc5f896b5a1690cdc8b570f2b09e303fab23f290460fa386ba230b2961628752",
+      "signature_sha256": "e019e401d7b2490944044e988b45c917762527c5c9355916c1e6ab0c9cbd0fc1",
+      "source_count": 80
+    }
+  ],
+  "source_pins_sha256": "5bb7dd06098d0c8feec13a1fcee744e5ce9e96565d0a525ecb58ac3cc122ea2c",
+  "status": "PASS_INDEPENDENT_PUBLIC_C1_MODULE_SIGNATURE_AND_SOURCE_PRESERVATION"
+}

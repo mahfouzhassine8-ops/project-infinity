@@ -1,0 +1,123 @@
+{
+  "schema": 1,
+  "status": "READ_ONLY_SUPPORTED_PATHS_IDENTIFIED_NO_AUTHLESS_RICH_PROVIDER_PLAYBACK_ESTABLISHED",
+  "captured_utc": "2026-11-09T04:46:27.046006+00:00",
+  "scope": "Retained unmodified POV6.11.02 and Umbrella6.8.00 public/native source only; no credentials, source/profile edits, application execution, build or dispatch.",
+  "source_sha256": {
+    "/workspace/scratch/fold-installed-evidence/plugin.video.pov/addon.xml": "d1183b5c1fbdf9aa692048a54e66b89bba4bfaa40d78aa615d00351cdf8ebf05",
+    "/workspace/scratch/fold-installed-evidence/plugin.video.pov/resources/lib/modules/entry.py": "0814bc3b11b377ce96ce3373936a4fd40fb683e5330daa25fc8a17f63c732b6f",
+    "/workspace/scratch/fold-installed-evidence/plugin.video.pov/resources/lib/modules/sources.py": "530c6446e25c87088e4aab72526824513b14c1e9f5af575cc6e5d6f1e0e56f89",
+    "/workspace/scratch/fold-installed-evidence/plugin.video.pov/resources/lib/modules/settings.py": "b421a943390209917530ea00d44b608a0177359e5f1dce30bbb7e773c95639e2",
+    "/workspace/scratch/fold-installed-evidence/plugin.video.pov/resources/lib/modules/player.py": "5051f95b9989c5d1608e84c5562edc6795a7bef8e5cf9d14386e79471a1d2f9c",
+    "/workspace/scratch/fold-installed-evidence/plugin.video.pov/resources/lib/modules/debrid.py": "c4d36545a1529d864a36612926439898d7d19a11a07205c44dd42a5b2b65453d",
+    "/workspace/scratch/fold-installed-evidence/plugin.video.pov/resources/lib/debrids/aiostreams.py": "0977c2383028ea1b52c8c217c85d6e24dc60c462fd48b709e2a9e67f3881908d",
+    "/workspace/scratch/fold-installed-evidence/plugin.video.pov/resources/lib/menus/navigator.py": "a3d178063be49b0bb0540a353e96c7b0443dee22f3bcd9bfdc7160fab9915989",
+    "/workspace/scratch/umbrella6800-publisher/plugin.video.umbrella/addon.xml": "879343065f8c9a515fa76dfabb8faa7c375047ca9b0ae179cbbaae2f0f771b5e",
+    "/workspace/scratch/umbrella6800-publisher/plugin.video.umbrella/resources/lib/modules/router.py": "c0cfecb068b0ee80f78e774791cad4205cdb269987888f858d4710627a1a51ea",
+    "/workspace/scratch/umbrella6800-publisher/plugin.video.umbrella/resources/lib/modules/control.py": "f0bf8b18d1019e6fc9c38bfb56eaeb37b7b0c2e90ebdcf33d42e12b7f548a29d",
+    "/workspace/scratch/umbrella6800-publisher/plugin.video.umbrella/resources/lib/modules/sources.py": "f1a1a70784dfff702f2394932990d3f113e80069e9ba2e7798d7660636b7b997",
+    "/workspace/scratch/umbrella6800-publisher/plugin.video.umbrella/resources/lib/menus/navigator.py": "66ace3a79d7413c0072774f3fafb5945b582d6298dbc6a8fdf678a2ce8a4ff37"
+  },
+  "providers": {
+    "plugin.video.pov": {
+      "version": "6.11.02",
+      "normal_metadata_path": {
+        "route": "plugin://plugin.video.pov/?mode=play_media&tmdb_id=<authoritatively-verified-movie-ID>",
+        "parameters": "For movies, actual movie TMDb ID; episode path additionally exact season/episode. No direct file/url parameter is consumed by ConfigLoader.apply.",
+        "source": [
+          "resources/lib/modules/entry.py:9-13 play_media -> Sources.factory",
+          "resources/lib/modules/sources.py:37-82 factory/source_select -> metadata builder/get_sources/play_source",
+          "resources/lib/modules/sources.py:275-307 ConfigLoader.apply parses tmdb_id/coordinates/scraper settings",
+          "resources/lib/modules/sources.py:210-255 play_file resolves genuine selected scraper result -> POVPlayer.run",
+          "resources/lib/modules/player.py:59-81 run -> make_listitem -> self.play",
+          "resources/lib/modules/player.py:125-142 make_listitem supplies typed actual metadata and IDs"
+        ],
+        "gate": "Available internal scrapers are five account-backed clouds, Easynews and AIOStreams; no native local-library/offline-file scraper appears in the current internal scraper set. External torrent scraping is disabled when no enabled debrid torrent service exists.",
+        "gate_source": [
+          "resources/lib/modules/settings.py:311-328 default_internal_scrapers/active_internal_scrapers",
+          "resources/lib/modules/sources.py:427-435 ScraperProcessor.activate_external"
+        ]
+      },
+      "legitimate_downloaded_file_path": {
+        "route": "plugin://plugin.video.pov/?mode=navigator.downloads",
+        "generated_child_route": "plugin://plugin.video.pov/?mode=navigator.folder_navigator&folder_path=<configured-local-download-directory>",
+        "source": [
+          "resources/lib/menus/navigator.py:266-275 downloads",
+          "resources/lib/menus/navigator.py:377-396 folder_navigator"
+        ],
+        "metadata": "folder_navigator emits actual local file URL, cleaned filename label and fanart; no movie/episode InfoTag or unique IDs are assigned.",
+        "coverage": "Actual existing Kodi file/player events can be exercised. This path bypasses Sources resolution and POVPlayer.run/make_listitem, so it does not establish typed provider playback or debrid/service success.",
+        "availability": "Requires an actual complete lawful film already downloaded to the configured local directory. No such file was installed or selected by this lookup."
+      },
+      "aiostreams": {
+        "source": [
+          "resources/lib/debrids/aiostreams.py:11-19 Debrid auth and instance URL",
+          "resources/lib/debrids/aiostreams.py:112-129 search",
+          "resources/lib/debrids/aiostreams.py:153-168 user-facing service documentation"
+        ],
+        "request": "GET <configured-instance>/api/v1/search?type=movie&id=<verified-media-ID>&requiredFields=parsedFile with auth=(aio.username,aio.password)",
+        "documented_instances": [
+          "https://aiostreams.stremio.ru",
+          "https://aiostreams.viren070.me",
+          "https://aiostreams.fortheweak.cloud",
+          "https://aiostreamsfortheweebsstable.midnightignite.me"
+        ],
+        "credential_contract": "The provider explicitly instructs creating an account and entering its instance-specific UUID/password. Public instance means publicly hosted, not anonymous access.",
+        "custom_endpoint": "aio.instance=1 selects aio.custom_url, but provider documentation says custom URLs are not supported/YMMV. No genuine anonymous compatible service with a real lawful film catalogue was established.",
+        "not_claimed": "No anonymous HTTP probe or credentials validation occurred. Code sends configured auth; this evidence does not assert a measured HTTP rejection by any instance. A fabricated local AIO response or invented UUID/password would not satisfy this test."
+      }
+    },
+    "plugin.video.umbrella": {
+      "version": "6.8.00",
+      "normal_metadata_path": {
+        "route": "plugin://plugin.video.umbrella/?action=play_Item&title=<real-title>&year=<real-year>&imdb=<verified-IMDb-ID>&tmdb=<verified-TMDb-ID>",
+        "source": [
+          "resources/lib/modules/router.py:1670-1682 play_Item/play_info -> Sources.play",
+          "resources/lib/modules/router.py:1810 old play -> same Sources.play",
+          "resources/lib/modules/sources.py:84-92 Sources.play account-provider gate",
+          "resources/lib/modules/sources.py:1917-1923 getConstants builds prem_providers"
+        ],
+        "gate": "Sources.play returns notification33034 when prem_providers is empty, before local/library source processing. Account/token sources are Easynews, Filepursuit, GDrive, Plexshare or enabled debrid resolvers. Local source retention later in sources.py1194/1348 does not bypass this entry gate.",
+        "outcome": "Without a genuine configured service account, this normal provider metadata/source path is blocked; no token, setting, resolver result or source was fabricated."
+      },
+      "legitimate_downloaded_file_path": {
+        "route": "plugin://plugin.video.umbrella/?action=downloadNavigator",
+        "source": [
+          "resources/lib/modules/router.py:1239-1241 downloads dispatch",
+          "resources/lib/menus/navigator.py:870-877 downloads"
+        ],
+        "behavior": "Exposes configured movie/TV download directories as native filesystem folders; does not pass their files through normal Sources.play or the custom provider Player metadata builder.",
+        "coverage": "Actual Kodi local-file playback can be exercised; provider account resolution remains unverified."
+      },
+      "supported_raw_url_path": {
+        "route_template": "plugin://plugin.video.umbrella/?action=play_URL&url=<percent-encoded-actual-full-film-file-or-URL>",
+        "source": [
+          "resources/lib/modules/router.py:1699-1723 play_URL",
+          "resources/lib/modules/control.py:56 player=xbmc.Player()"
+        ],
+        "behavior": "With no service caller, the branch calls the plain native xbmc.Player.play(url) using only the supplied actual URL. It does not construct provider metadata or call provider Player.play_source.",
+        "coverage": "Genuine native playback events only; filename/title alone does not establish a typed canonical movie identity. This route is not evidence that normal Umbrella scraping/accounts work."
+      }
+    }
+  },
+  "film_candidate": {
+    "description": "Night of the Living Dead (1968), proposed public-domain full-film input",
+    "actual_full_film_selected_or_downloaded": false,
+    "verified_ids": {},
+    "reason": "No qualifying authless rich provider route was established. Lookup stopped at the account/metadata boundary rather than downloading a film or supplying guessed IDs. A future separate native-file test must independently verify the authoritative movie identity, lawful complete-film source and actual duration before execution."
+  },
+  "scope_safe_remaining_option": {
+    "path": "Actual native Kodi movie-library playback of a legitimately obtained complete film, with identity established through genuine library metadata/scraping and exact path matching. A provider download-folder browser may expose that file.",
+    "source": "Baseline PlayerOperations.cpp175-198 can enrich actual CurrentFileItem by VideoLibrary.FillFileItem using the exact actual playing file path.",
+    "limits": "This can validate native metadata/events and the existing tracker in a separately selected test. It cannot validate POVPlayer fresh-item metadata, normal Umbrella Sources account admission, premium resolution, AIO service availability, or cross-provider catalogue equivalence. No profile/library seeding is performed or authorized by this evidence."
+  },
+  "not_run": [
+    "provider/network/account probes",
+    "film download",
+    "application/native runtime",
+    "harness changes",
+    "build",
+    "signing",
+    "dispatch"
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "status": "SELECTED_TESTS_EXECUTED",
+  "reason": "Source-pinned WNT episode-list children may retain local episode identity with unknown coordinates despite native missing-Episode movie fallback. No numerical episode or canonical episode ID is inferred.",
+  "commands": [
+    "python test_tv_unnumbered_bridge.py",
+    "python -m unittest -v test_actual_source_item.ActualSourceItem.test_exact_actual_copy_retains_unknown_season_and_provider_parent test_actual_source_item.ActualSourceItem.test_cc_or_missing_parent_never_creates_series_association test_actual_source_item.ActualSourceItem.test_actual_or_json_canonical_ids_leave_generic_recorder_unchanged"
+  ],
+  "new_cases": 11,
+  "affected_retained_cases": 3,
+  "selection_record_note": "Exact correction/tests were selected in owner instruction, commentary, test source and submitted tool command before execution. Initial JSON emission used an incorrect task-relative path and failed; this artifact was repaired afterward. No unselected test ran.",
+  "not_run": [
+    "old40-case sweep",
+    "old13 installer cases",
+    "Android",
+    "provider playback",
+    "native build",
+    "signing",
+    "dispatch"
+  ]
+}

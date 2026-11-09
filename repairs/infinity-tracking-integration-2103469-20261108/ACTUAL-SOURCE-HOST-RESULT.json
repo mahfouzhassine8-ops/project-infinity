@@ -1,0 +1,93 @@
+{
+  "status": "PASS_FOCUSED_ACTUAL_SOURCE_ITEM_HOST",
+  "scope": "Host-only _continue_source_item actual-item WNT compatibility; actual overlay hub and baseline read-only context functions extracted by AST, controlled Kodi playback boundary",
+  "command": "python test_actual_source_item.py",
+  "selected_before_execution": [
+    "exact copied playing item original URL and parent; unknown season -1/E4 retained; dbid -1",
+    "CC or absent parent gives no series association",
+    "canonical actual or JSON IDs leave generic recorder untouched",
+    "before/after file, kind, coordinates, original route, native path, parent or IDs change rejected",
+    "JSON kind, file and coordinate contradiction rejected",
+    "existing canonical row reused only for exact URI, kind and coordinates; unknown season not upgraded",
+    "conflicting exact child associations quarantined",
+    "only exact verified parent link supplies canonical parent; conflicting parent/child proof quarantined",
+    "stopped/non-Infinity playback and malformed routes withheld"
+  ],
+  "not_run": [
+    "Android",
+    "provider execution",
+    "native",
+    "build",
+    "signer",
+    "shutdown",
+    "unrelated suites"
+  ],
+  "tests_run": 17,
+  "failures": 0,
+  "errors": 0,
+  "runs": [
+    {
+      "command": "python test_actual_source_item.py",
+      "exit_code": 0,
+      "tests": 11,
+      "result": "PASS",
+      "source_sha256": {
+        "test_actual_source_item.py": "11fb5955ab24c561d4ace1d5327b37d4af454fd61a738b60c49b554d648a6e26",
+        "overlay/script.infinity.commandcenter/service.py": "62de5bacb2a23d03835e02a2a669861efbdaa50507a3bb38d9e908e4a10cbb7c",
+        "overlay/script.infinity.commandcenter/resume_hub.py": "a7edb9eb386dcfc1422eeee6c7536d525c6431e40b71f1675928800e2c7513a3",
+        "reference/script.infinity.commandcenter/context.py": "bd874b64942262853f424b3a3258a72ce67d905f07784f55b81fbb0af4cef050"
+      }
+    },
+    {
+      "command": "python -m unittest -v test_actual_source_item.ActualSourceItem.test_exact_previous_episode_retains_parent_for_direct_saved_replay test_actual_source_item.ActualSourceItem.test_wrong_coordinates_or_malformed_previous_parent_are_not_inherited test_actual_source_item.ActualSourceItem.test_exact_actual_copy_retains_unknown_season_and_provider_parent test_actual_source_item.ActualSourceItem.test_cc_or_missing_parent_never_creates_series_association test_actual_source_item.ActualSourceItem.test_only_exact_verified_parent_link_can_supply_canonical_parent test_actual_source_item.ActualSourceItem.test_conflicting_parent_or_child_parent_proof_is_quarantined",
+      "exit_code": 0,
+      "tests": 6,
+      "result": "PASS",
+      "reason": "Exact same saved episode may retain previously proved source_parent when actual native parent is CC/absent; wrong coordinates or malformed parent cannot inherit.",
+      "source_sha256": {
+        "test_actual_source_item.py": "1ef64397b786cf08b6dd3b71141ce69ee238bba29be083f8a3abbb1de005c5db",
+        "overlay/script.infinity.commandcenter/service.py": "ee50426e4c5b804041eda279dcd2d6f83b335c59c40f685849c47f002dd358c8",
+        "overlay/script.infinity.commandcenter/resume_hub.py": "ffecec5cd4e646579c2c1ebac9162952c218a45765c9b3d045c380d749e73c3c",
+        "reference/script.infinity.commandcenter/context.py": "bd874b64942262853f424b3a3258a72ce67d905f07784f55b81fbb0af4cef050"
+      }
+    }
+  ],
+  "limitations": "Controlled playback API observations validate host logic only; no actual Android, provider playback, or native runtime claim.",
+  "source_sha256": {
+    "test_actual_source_item.py": "1ef64397b786cf08b6dd3b71141ce69ee238bba29be083f8a3abbb1de005c5db",
+    "overlay/script.infinity.commandcenter/service.py": "ee50426e4c5b804041eda279dcd2d6f83b335c59c40f685849c47f002dd358c8",
+    "overlay/script.infinity.commandcenter/resume_hub.py": "ffecec5cd4e646579c2c1ebac9162952c218a45765c9b3d045c380d749e73c3c",
+    "reference/script.infinity.commandcenter/context.py": "bd874b64942262853f424b3a3258a72ce67d905f07784f55b81fbb0af4cef050"
+  },
+  "tested_functions": {
+    "overlay/script.infinity.commandcenter/service.py": [
+      "_continue_source_item"
+    ],
+    "reference/script.infinity.commandcenter/context.py": [
+      "_watchnixtoons_identity_slot",
+      "_watchnixtoons_verified_link",
+      "_watchnixtoons_owned_records",
+      "_watchnixtoons_exact_previous"
+    ]
+  },
+  "function_ast_sha256": {
+    "overlay/script.infinity.commandcenter/service.py:_continue_source_item": "3863abd7258f8d4bd4c3ebf2eb25764280934c1de43357a50644ea7a5e61db55",
+    "reference/script.infinity.commandcenter/context.py:_watchnixtoons_identity_slot": "6b3556c3a9b0f721e2512c007961f75b6ac8e64e12d39177126b35a6b367b1c8",
+    "reference/script.infinity.commandcenter/context.py:_watchnixtoons_verified_link": "af8ef038abd634a1e93e102f3a221b8973f0bf2023e428cbc55b393723c17cde",
+    "reference/script.infinity.commandcenter/context.py:_watchnixtoons_owned_records": "4dd850b1eb247fa16d7bf921760691056a07b75619b189916ae71f8beb502aa1",
+    "reference/script.infinity.commandcenter/context.py:_watchnixtoons_exact_previous": "c42ad49deeb995de8f86013fdac20ad8521422abf72d3e630564380c79167140"
+  },
+  "followup_selection_before_execution": {
+    "reason": "Exact same saved episode may retain previously proved source_parent when actual native parent is CC/absent; wrong coordinates or malformed parent cannot inherit.",
+    "cases": [
+      "test_exact_previous_episode_retains_parent_for_direct_saved_replay",
+      "test_wrong_coordinates_or_malformed_previous_parent_are_not_inherited",
+      "test_exact_actual_copy_retains_unknown_season_and_provider_parent",
+      "test_cc_or_missing_parent_never_creates_series_association",
+      "test_only_exact_verified_parent_link_can_supply_canonical_parent",
+      "test_conflicting_parent_or_child_parent_proof_is_quarantined"
+    ]
+  },
+  "unique_cases_passed": 13,
+  "final_source_coverage": "Original 11-case pass retained; new parent-inheritance delta tested by two new cases and four affected parent cases only. No unrelated repeat."
+}

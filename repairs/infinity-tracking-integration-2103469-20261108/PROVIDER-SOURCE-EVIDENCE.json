@@ -1,0 +1,32 @@
+{
+  "provider": "plugin.video.watchnixtoons2",
+  "reference": {
+    "addon": "plugin.video.watchnixtoons2",
+    "version": "0.14.24",
+    "url": "https://raw.githubusercontent.com/OldManJax/repository.animaniac/ac317fdf6d001f6e252b41037fb1086817e8b00f/plugin.video.watchnixtoons2/plugin.video.watchnixtoons2-0.14.24.zip",
+    "sha256": "76a0580d035b80634fc6775f46aacc780a9449a9ca46b446dde63c2360ce6540"
+  },
+  "owner_installed_version": "NOT_VERIFIED_FOR_THIS_NEW_BRIEF",
+  "reference_status": "Existing repository-pinned publisher archive downloaded and SHA256 verified; not a new claim about Fold source",
+  "proof_files": {
+    "lib/plugin.py": {
+      "actual_resolver": "actionResolve at1350; typed metadata1642-1675; setResolvedUrl1679; no unique IDs; unknown season remains-1",
+      "sha256": "d8d395634eff8ada8c9d09138744997573035b7819fcac91985ff870bbfc2283"
+    },
+    "lib/common.py": {
+      "metadata_helper": "item_set_info at135; typed setters only, no canonical IDs",
+      "sha256": "826e411989c9d02b89ce6efe9715f3c74f7e241cbaca4bbac5c5f9999425c03e"
+    }
+  },
+  "native_interfaces": {
+    "Player.getPlayingItem": "Existing actual CurrentFileItem copy; native/Player.cpp380-387",
+    "original_listitem_url": "Existing PluginDirectory.cpp165-166 before SetResolvedURL metadata merge",
+    "ParentPath": "Existing GUIMediaWindow.cpp769-772 actual directory row provenance"
+  },
+  "fallback": "Existing resume_hub.watchnixtoons_source_identity and context exact URI/kind/S/E verified-link lookups; local identity never represented as TMDb/TVDb/IMDb",
+  "limitations": [
+    "A source-local parent is not an external canonical identity or complete episode catalogue.",
+    "Missing parent evidence retains exact episode playback progress only; no title merge or season guess.",
+    "Other providers retain existing generic typed recording; their real current playback metadata and cross-provider parent mappings remain unverified."
+  ]
+}

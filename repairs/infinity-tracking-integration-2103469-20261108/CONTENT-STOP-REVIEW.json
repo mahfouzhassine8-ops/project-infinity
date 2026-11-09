@@ -1,0 +1,26 @@
+{
+  "status": "ACCEPTED_TARGETED_SOURCE_REVIEW_ONLY",
+  "reviewer": "Astra independent review",
+  "request_sha256": "de18f52dae7ecdf8e8759e2f6bfab133f50f8defbee1556daafa0f5d6823ab17",
+  "source_bindings": 21,
+  "source_sha256": {
+    "stage_tracking_android.py": "aaaf577dd9758b1b8b1427f62c7490d3e5966a8f60326086465402b337c8a0b5",
+    "tracking_android_observer.py": "13a98c8eef54bf08e67de675f632a015a9fdead2ca78c551739078e2278fa42c",
+    "verify_tracking_android.py": "cd6ea0ab965a839040256f042fc984b55f541ac065fd5a140fc99ab6b621ce72",
+    "admit_tracking_android.py": "00c939fbb1069ba1470a5bad85bf95a9869efe61307779a506de5f104f5a9697",
+    "test_tracking_content_stop_focus.py": "93163f033b1e1193339cf7a8233595fb89a41d93406ff98a64947189784b9f44"
+  },
+  "findings": [
+    "Finite content views equal signed69 MyVideoNav views; one visible unobscured content list, exact file/label/focus",
+    "Only exact SDK no-media error plus second playbackfalse treated as stopped transition; no partial metadata/clocks",
+    "Committed independent-movie focus; no E4/ReZero replay",
+    "Original failed native AV retained and overallFAIL; focused movie result separate",
+    "Original failed run/source/workflow and artifact SHA/size admission verified"
+  ],
+  "host_cases": {
+    "new_content_stop_focus": 9,
+    "new_admission_focus": 6
+  },
+  "production_sources_changed": false,
+  "actual_playback_acceptance": false
+}

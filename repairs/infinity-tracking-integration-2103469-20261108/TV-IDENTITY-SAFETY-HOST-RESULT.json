@@ -1,0 +1,65 @@
+{
+  "status": "PASS_FOCUSED_HOST_TV_PARENT_IDENTITY_SAFETY",
+  "baseline_commit": "83d1bc15031390c99cb170f20faa2a9720700133",
+  "runs": [
+    {
+      "command": "python test_tv_parent_identity_safety.py",
+      "tests": 7,
+      "failures": 0,
+      "errors": 0,
+      "exit_code": 0
+    },
+    {
+      "command": "python -m unittest -v test_actual_source_item.ActualSourceItem.test_exact_actual_copy_retains_unknown_season_and_provider_parent test_actual_source_item.ActualSourceItem.test_cc_or_missing_parent_never_creates_series_association test_actual_source_item.ActualSourceItem.test_actual_or_json_canonical_ids_leave_generic_recorder_unchanged",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0,
+      "exit_code": 0
+    }
+  ],
+  "selected_tests": 10,
+  "production_source": {
+    "overlay/script.infinity.commandcenter/resume_hub.py": {
+      "baseline_sha256": "c5069a231b72cbca2281b4cb09c9df3f74673c28a264cf1cfbc919770f88b645",
+      "current_sha256": "807157626f817dd5375e0e60872b6cd351d33135a23c5a225f26c86a196e7ed5",
+      "changed_functions": [
+        "watchnixtoons_source_identity"
+      ],
+      "all_other_functions_classes_imports_and_module_statements_identical": true
+    },
+    "overlay/script.infinity.commandcenter/service.py": {
+      "baseline_sha256": "ee50426e4c5b804041eda279dcd2d6f83b335c59c40f685849c47f002dd358c8",
+      "current_sha256": "134d3c32a50caa855bdff1c3cabe4ac4ef07232d8b64389b49376b12fe779366",
+      "changed_functions": [
+        "_continue_source_item"
+      ],
+      "all_other_functions_classes_imports_and_module_statements_identical": true
+    }
+  },
+  "tracked_diff_exactly_authorized_files": [
+    "repairs/infinity-tracking-integration-2103469-20261108/overlay/script.infinity.commandcenter/resume_hub.py",
+    "repairs/infinity-tracking-integration-2103469-20261108/overlay/script.infinity.commandcenter/service.py"
+  ],
+  "all_other_tracked_files_unchanged_from_baseline": true,
+  "protected_file_sha256": {
+    "overlay/script.infinity.commandcenter/plugin.py": "580a2d7b25bc7a415c2db059fe1fa696808107a4f997a32d544baf2468a2877a",
+    "test_actual_source_item.py": "1ef64397b786cf08b6dd3b71141ce69ee238bba29be083f8a3abbb1de005c5db",
+    "ACTUAL-SOURCE-HOST-RESULT.json": "f5b458be19d432f72ca0eb436959dc5c58a72f7936882cc4c3da2e782e64b0ad",
+    "PROJECTION-HOST-RESULT.json": "739712d256192f7860c254c766ba13eb65eeca3053582a4565ac00ab260e52f2"
+  },
+  "test_sha256": "d04cf7f22919f3589e3309b39283e0762e0986bba9206d9a32aab8afc733652e",
+  "selection_sha256": "e1593a50ce5399cd761b4515f1b13e6d118ba72ebf45579e4666970c2116967a",
+  "captured_actual_AV_sha256": "6379cf40aee737c98731fca4ba7d84000acbd404b49bd2a271b7252b7420353e",
+  "contract": "Only the newly admitted relative query-bearing TV-parent grammar is narrowed to exact publisher bytes; existing queryless/absolute identity paths and hash inputs remain unchanged. Movie plus valid actual copied TV-parent is rejected before identity/association construction.",
+  "limitations": [
+    "Fail-closed correction does not supply actual Queen E4 episode identity or coordinates.",
+    "Captured Android observations are host test inputs; no fresh Android/provider runtime acceptance is claimed.",
+    "Existing-fixture Android probe uses earlier frozen source and excludes these edits.",
+    "Production Android validation and final release gates remain blocked."
+  ],
+  "old_receipts_modified": false,
+  "Android": "NOT_RUN",
+  "native_build": "NOT_RUN",
+  "signing": "NOT_RUN",
+  "dispatch": "NOT_RUN"
+}

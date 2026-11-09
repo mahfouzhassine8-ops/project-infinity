@@ -1,0 +1,181 @@
+{
+  "bootstrap_phases": [
+    {
+      "monotonic": 280.864744058,
+      "phase": "NATIVE_IDENTITY_BEGIN"
+    },
+    {
+      "monotonic": 280.990017306,
+      "phase": "NATIVE_FULL80_IDENTITY_ACCEPTED"
+    },
+    {
+      "monotonic": 286.071862262,
+      "phase": "EXPECTED_FULL80_SOURCE_MAP_ACCEPTED"
+    },
+    {
+      "monotonic": 287.37307464,
+      "phase": "INSTALLED_VERIFIED_BOOTSTRAP_SOURCE_EXECUTED"
+    },
+    {
+      "monotonic": 287.583023831,
+      "phase": "ORIGINAL_IMPORT_GUARD_ACTIVE_BEFORE_CONTROLLER_IMPORT"
+    },
+    {
+      "monotonic": 287.693598778,
+      "phase": "CONTROLLER_ACCESS_IMPORTED_THROUGH_ORIGINAL_GUARD"
+    }
+  ],
+  "passed": true,
+  "pid": 6118,
+  "result": {
+    "Python_optimization": 1,
+    "bootstrap_phases": [
+      {
+        "monotonic": 280.864744058,
+        "phase": "NATIVE_IDENTITY_BEGIN"
+      },
+      {
+        "monotonic": 280.990017306,
+        "phase": "NATIVE_FULL80_IDENTITY_ACCEPTED"
+      },
+      {
+        "monotonic": 286.071862262,
+        "phase": "EXPECTED_FULL80_SOURCE_MAP_ACCEPTED"
+      },
+      {
+        "monotonic": 287.37307464,
+        "phase": "INSTALLED_VERIFIED_BOOTSTRAP_SOURCE_EXECUTED"
+      },
+      {
+        "monotonic": 287.583023831,
+        "phase": "ORIGINAL_IMPORT_GUARD_ACTIVE_BEFORE_CONTROLLER_IMPORT"
+      },
+      {
+        "monotonic": 287.693598778,
+        "phase": "CONTROLLER_ACCESS_IMPORTED_THROUGH_ORIGINAL_GUARD"
+      }
+    ],
+    "cc_version": "0.3.5.70",
+    "controller_path": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/addons/script.infinity.commandcenter",
+    "loaded_plugin": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/addons/script.infinity.commandcenter/plugin.py",
+    "manifest_sha256": "7566c19813de8dc01df5837bad12ad641046786fecfee0fbd4ddea497999b910",
+    "module_count": 80,
+    "module_files": {
+      "script.infinity.commandcenter/INSTALL-BASELINE.v1": "957e7e3b5666bd9191e9170633d2176b9acd65ce34a3800160eebc18a734c804",
+      "script.infinity.commandcenter/MODE-CLASS-SEARCH-POLICY.json": "e9195747744735e0848b94f26959cea411146b262a7d6865611ab5281fb4b45a",
+      "script.infinity.commandcenter/NAVIGATION-CONTRACTS.json": "fd5b58e3a8a5671ded84c0a91ba57d1bbd03a51c5d08869805d33269d275d76d",
+      "script.infinity.commandcenter/SEARCH-STRUCTURES.json": "d0ced0458371ade4fb3ab73bd378159d5a8a79eca4103e114510ea1e72d4ab30",
+      "script.infinity.commandcenter/action_loading.py": "8b758bba6eabd7a051213834c136a81d52c6af819ff9c6d7d1f456a45be4474f",
+      "script.infinity.commandcenter/addon.xml": "b8259f9987df2ea415238f04f5c45ca92471c44adc3f32308268958f2e692cbc",
+      "script.infinity.commandcenter/checkpoint_runtime.py": "902fbf1a03051efbd39bbd2380c344c0a9942c0e8e43cfcaf0deaddd06fd954e",
+      "script.infinity.commandcenter/common.py": "168e2888b7f75363875aa5c70ddcf31128f0e66efa17e1fe82935aec457747b7",
+      "script.infinity.commandcenter/context.py": "bd874b64942262853f424b3a3258a72ce67d905f07784f55b81fbb0af4cef050",
+      "script.infinity.commandcenter/default.py": "6ecfa94ca3256d20d9605d016b7585a9e587c8cb4dd87ada8bbe0dcbacd47cc4",
+      "script.infinity.commandcenter/experience.py": "95daaaf48fc762db845b6befa8e6cd8aa6832caf236ad2883978162e5fe9a511",
+      "script.infinity.commandcenter/infinity_modules/__init__.py": "dd65da30f3d82529011a305293041fabcc63d369f4805a446774996ae9ae5fc3",
+      "script.infinity.commandcenter/infinity_modules/rails/__init__.py": "8798e72d7a93a29641e5368044bd7164b2f1024108791daf4b57c2d3cc7b79ab",
+      "script.infinity.commandcenter/infinity_modules/rails/catalog.py": "7c307a52bf4fef44d9c1b1b910c1f76bd8b689c6de7f4a456205f13b5c1ab457",
+      "script.infinity.commandcenter/infinity_modules/rails/dialog.py": "34dd1815176455278dabc10640627faffe16feabbcaa945578d573bbd8ec66ee",
+      "script.infinity.commandcenter/infinity_modules/rails/input_status.py": "217073f1e9df990aa39215cf29067776612528fd0311b5c2d723e866812db111",
+      "script.infinity.commandcenter/infinity_modules/rails/mocha.py": "b813b5d7a340c697917fa7b2b29b6cee86d97d284da59ce8bc96bde9ad629c96",
+      "script.infinity.commandcenter/infinity_modules/rails/runtime.py": "2cb188fbc6f59da3c2c2bf43e64f1b523921290cd6e4937cf9303743785bcd3f",
+      "script.infinity.commandcenter/infinity_modules/rails/stability_probe.py": "e275668b0638fdffb8810ee6f1cab1d9590a9bc8b9f08f402216a8ae50d754f9",
+      "script.infinity.commandcenter/infinity_modules/rails/store.py": "22fc4b1f4ddb4d18be77acb89cd49e975f65cc9db410df40d17c62f4ad4171e4",
+      "script.infinity.commandcenter/infinity_modules/uirepair/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "script.infinity.commandcenter/infinity_modules/uirepair/controller_access.py": "4160a511efa9e12776db5bba28ab16d5d9d5e1a7825826df16ed76b7430ad826",
+      "script.infinity.commandcenter/infinity_modules/uirepair/default.py": "5bbeb30b76ae9b169c18d2abcdc5a036f8c952ae91cadb317bf4a4576c3bb5c1",
+      "script.infinity.commandcenter/infinity_modules/uirepair/home_option_b.py": "01dbb12c89cbb95d7b28200816a30fb0fbe66fb320928a65bb8be804e3d582f0",
+      "script.infinity.commandcenter/infinity_modules/uirepair/latest_identity.py": "225ac23336701db63715583ca8b6716afa96bb9b738b4b99750d9a5bbd8ab223",
+      "script.infinity.commandcenter/infinity_modules/uirepair/menu_model.py": "eea9605cf7b3712b6029bf49958d470dbc59df6b92e7f394799c1098e58956da",
+      "script.infinity.commandcenter/infinity_modules/uirepair/plugin.py": "a7bcae40488ae5e015372e9538a536e98768b4bbc744582ed5d39b10c87ac593",
+      "script.infinity.commandcenter/infinity_modules/uirepair/popup.py": "230ee5646bf5b73faa9e9bc9988bb29e9a6d238da95efeec06e480a9c6d259de",
+      "script.infinity.commandcenter/infinity_modules/uirepair/runtime.py": "31f7494146e476636e2732bb3a9cd37776d59ee61414335e7a03bb5eb81fee79",
+      "script.infinity.commandcenter/infinity_modules/watchedbridge/PROVIDER-CONTRACTS.json": "c03846eaa853307da91634641bb4266a5420242d6b33770f1328cc18e9fd974e",
+      "script.infinity.commandcenter/infinity_modules/watchedbridge/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "script.infinity.commandcenter/infinity_modules/watchedbridge/bridge_state.py": "babe606965d4e81481ea573dd4ecc7cec82a7d23476364326731eb86ce1eeb1d",
+      "script.infinity.commandcenter/infinity_modules/watchedbridge/context.py": "fb9867572530edec876192152c9adca8cb82387323ec26b6cbf7ffdc5a0b22d3",
+      "script.infinity.commandcenter/infinity_modules/watchedbridge/controller.py": "a629c46a693f5d025fb8bc6805b7302e7876593d0918f07b45c96cd1bab5b703",
+      "script.infinity.commandcenter/infinity_modules/watchedbridge/default.py": "77c65366ed07261992d12357bb284c3f96039452fd393cc0e36e15c2f75d5f9d",
+      "script.infinity.commandcenter/infinity_modules/watchedbridge/provider_contracts.py": "5819eec3f7b29f43de164c4739753db0ad48bb5c5d92fe6ae136fa5c9753f804",
+      "script.infinity.commandcenter/infinity_modules/watchedbridge/service.py": "0450559f72dbb1a3894de7075934bdc28d3fea5b91fc0d83f1da34e1ef4c1014",
+      "script.infinity.commandcenter/infinity_search.py": "a5949485c723cd56f727feec40f3be66eb60976af255ede431040511c145dc44",
+      "script.infinity.commandcenter/infinity_settings.py": "a846e6fa285618495e572ff77665b4914eb2438ae3c1d7f38f2e53b150cb8e3d",
+      "script.infinity.commandcenter/infinity_trakt.py": "e2f8b87ed45bea2423b0a12d3b2d30fad822e9435d6115f6b96adf3ffb0778af",
+      "script.infinity.commandcenter/information.py": "9033cc6042eb5349c0f6e53e81564a137853c32190287e2cebe3e654f78f47b1",
+      "script.infinity.commandcenter/library_navigation.py": "7fd5c5a75ba054a92a46914dfbc0348b11b6e4988650d952b7c3c8fad3c505fe",
+      "script.infinity.commandcenter/media_view.py": "0110de2cdc4c8295fdb314df221385f356e0ed0247547cf49c16a4dff2a6b54c",
+      "script.infinity.commandcenter/module_contract.py": "759e60439fae0b1bf0f8a2ff6895209ac848101b9544ac6c0e297b9c73df1267",
+      "script.infinity.commandcenter/native_search_compatibility.py": "1281c379d2dca044d11727ba017e5c6b05e1ce2ce818b8d942d9ecb4771608b9",
+      "script.infinity.commandcenter/persistence_participant.py": "7658db0f21c20853f272f61832e720df02b2b4b9ebaeba83ca1c7ba8758e1b9b",
+      "script.infinity.commandcenter/plugin.py": "580a2d7b25bc7a415c2db059fe1fa696808107a4f997a32d544baf2468a2877a",
+      "script.infinity.commandcenter/provider_capabilities.py": "7b0fda13e0fb529aa974b1e8ef792afb3adf0f681490784cb7837b715ae1fc44",
+      "script.infinity.commandcenter/provider_inventory.py": "fc0e9aa3d1592c720a2fcd1ce9fdc3fe1b2ec8619c5a117cf92df273f5a262d0",
+      "script.infinity.commandcenter/resources/settings.xml": "7cf7649f80c4c3e6c81caa6e80b1f325f470055e7de62fdf37367effe8484451",
+      "script.infinity.commandcenter/resources/skins/Default/1080i/InfinityInformation.xml": "b9059729493751dfc0be65801f73e41a06b604f3fdaf099963821b84f2b2e443",
+      "script.infinity.commandcenter/resources/skins/Default/1080i/InfinityItemOptions.xml": "201125d0d7bdda987d92523c04882f19e03560d361f70e52508cd4783e071db6",
+      "script.infinity.commandcenter/resources/skins/Default/1080i/InfinitySearch.xml": "0fb440287b00d6dc4f6c15c99e16be0a4e4e70a62cd4be08b1dd9375595272ad",
+      "script.infinity.commandcenter/resources/skins/Default/1080i/InfinityTraktNotice.xml": "321835add4ebbb71fcf9e177868f000ca35659c776d1473e0532aa0a1fd70064",
+      "script.infinity.commandcenter/resume_hub.py": "807157626f817dd5375e0e60872b6cd351d33135a23c5a225f26c86a196e7ed5",
+      "script.infinity.commandcenter/runtime_visibility.py": "11a985fc544fdb37c906f2575516b78c6141ed2b68e95b6c390d824f4386560a",
+      "script.infinity.commandcenter/saved_navigation.py": "36061dae60e4787131c6e333da4f1036b34ea3baa68d962b3e1a879ed192c19f",
+      "script.infinity.commandcenter/saved_playback.py": "ba80dd13b100fbe45ce80af23b7edd8e66abdb748d15a4fa6006d02f68fea209",
+      "script.infinity.commandcenter/selection_contract.py": "31f04371cdf9902e234ef441e11a41bc914daf1a9cc12b1cc435d58285dc46c2",
+      "script.infinity.commandcenter/service.py": "569fea31b465674b5e9fc357a895b0a00706df999c201246a33e8fcd00c9b669",
+      "script.infinity.commandcenter/skin_upgrade.py": "e3aadefa8345a78dc71bb9ab5ee428e947819d6e76576c772bb34e474b3eaedb",
+      "script.infinity.commandcenter/structural_search.py": "dd0b200829fc63372ec88a0ba991bd98a7a3459f597853a5bc991a9e4e6693b3",
+      "script.infinity.commandcenter/title_metadata.py": "115ac88c67e3fc9b3568ede2b3b019e10ab2829c6d0c14bef60d90d6248ad51e",
+      "script.infinity.commandcenter/view_mode.py": "5f5583e9c36e32e970a0341ca353d32dd92e48d41079aaabaf7a113c66ddfc71",
+      "script.infinity.rails/addon.xml": "436b6fdfae5e76ef9b52027ae80e59ade2ff621784f328f96efbb83bdf6ac711",
+      "script.infinity.rails/context_add.py": "8ab29309b62147bbccfe45c92090ffe91e037a209f0e1cefce71fd09acc623f5",
+      "script.infinity.rails/default.py": "9b1030183c36f3b591cc2857588f97d759a48f176b6765ed6906a05378a5c432",
+      "script.infinity.rails/plugin.py": "1f684387061f6507e93c55c96eba9a0832e3255fcac3808efc80ec8af00f2144",
+      "script.infinity.rails/resources/defaults.xml": "bd1c102f0b2bcacb36556c19dbfbdb027c7aac7481af44ba3445edcf84d7c110",
+      "script.infinity.rails/resources/language/resource.language.en_gb/strings.po": "48314b935797774fbac9f78e443ed329737ffb3bc994c945e14bf4bfd3980e5f",
+      "script.infinity.rails/resources/skins/Default/720p/InfinityRailsOptions.xml": "351a03286dd4e5b3d82dcba01974bdc5af082de3fb348bd581c2c0b70586e5ab",
+      "script.infinity.uirepair/addon.xml": "0ae97add7a937568f92ab9ab2b4655741ffb0a12465d76838e1b8dde2286a890",
+      "script.infinity.uirepair/default.py": "cd91adb02e7b57f0c4485968d8c53c55eabe5ff3883f38d2f36f5aea8184adef",
+      "script.infinity.uirepair/plugin.py": "45df6e0886980856f78469209a3a28cb8b9948c68f4b22bcf916400424fa027c",
+      "script.infinity.uirepair/resources/skins/Default/1080i/InfinityHomeOptionB.xml": "b524ebc4bc586ef3642190e43897bd0f9b23e5844fd67c2b02806f9159bc0c6e",
+      "script.infinity.uirepair/resources/skins/Default/1080i/InfinityItemOptions.xml": "201125d0d7bdda987d92523c04882f19e03560d361f70e52508cd4783e071db6",
+      "script.infinity.watchedbridge/PROVIDER-CONTRACTS.json": "c03846eaa853307da91634641bb4266a5420242d6b33770f1328cc18e9fd974e",
+      "script.infinity.watchedbridge/addon.xml": "8f3b36fdf00763266b283abec03ab3c65213811669407280e6c11636381e8ae0",
+      "script.infinity.watchedbridge/context.py": "ca373257b2b797c9ddd01c197d946eb43251d7259faf684d53e09e7a28f355a2",
+      "script.infinity.watchedbridge/default.py": "7eb8a980d862bf2469f2bc68129e06f7a695fd206611430861ba563ec9f4908c"
+    },
+    "pid": 6118,
+    "provider_sources": {
+      "plugin.video.watchnixtoons2": {
+        "files": {
+          "addon.xml": "9dc68f15ce6d7e80ff31443eff8fcf43afe80d8fcdd88a5e8fc592f9fa31318c",
+          "default.py": "aa2ce18fcbdf1a4076419e3e5b23b65d1dcc6abe0bf9edc66c206b4bfe8c7d75",
+          "icon.png": "bfa9d7a7560012e866128bb2ecc5e608949868b4f45aea92efdbc46161a244d6",
+          "lib/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "lib/common.py": "826e411989c9d02b89ce6efe9715f3c74f7e241cbaca4bbac5c5f9999425c03e",
+          "lib/constants.py": "81c63b78d46f8cd7c99318be2923d86e85b4ff6833b6047970c5bb9155a6ee23",
+          "lib/integration/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "lib/integration/trakt.py": "72df5eef646b8401cae21b13ee84dc3d23a31fb0441ca35eb15b0aa65cc321b2",
+          "lib/integration/trakt_actions.py": "4a043b7e460edd487bded85df8187382c6c63e8b7911b2fd20c3385c4854518e",
+          "lib/network.py": "6cd59019db4fddeb86d83596cc163bd56176f181efcd3f21cf4313554b564d66",
+          "lib/plugin.py": "d8d395634eff8ada8c9d09138744997573035b7819fcac91985ff870bbfc2283",
+          "lib/recently_watched.py": "c251a4adca347111281f257d0d81df3b89481ee11642d14ddb795831351ea096",
+          "lib/sites/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "lib/sites/wcoflix.py": "171a090d4e26b0f94a39a9dd1e48301849561abbaa6aec2fd7c6534f42273395",
+          "lib/sites/wcoforever.py": "5a8fe52886a516b146481bcbb41b11ea31f8bdbdf0f10a1664481d7a239dd213",
+          "lib/sites/wcostream.py": "9c7b2e051cf61e147e860494f8eaebe597e0eddf3ef883ea35c0fb7fa226fa0d",
+          "resources/data/thumbnail/cartoon-list.json": "97c636ba932675636b388bb38a2558c49faea5afd3fd03927efb8deaae41d668",
+          "resources/data/thumbnail/dubbed-anime-list.json": "795199522bfb83410975aa421b6402f3db40d84c5aeb107b297e412992df109b",
+          "resources/data/thumbnail/movie-list.json": "6b4399cdc51e0fe708a0796be49393b06b0bef0700caa916c3105d6c49904c90",
+          "resources/data/thumbnail/ova-list.json": "744c788b506fbeda4b70dacdb9be5f8c5e5a36af79eb8ae5d2cb28df611ab838",
+          "resources/data/thumbnail/subbed-anime-list.json": "252938429ade49cdd887ce3dabf9d8dd59c0329a44b3b09e3d681b33b77e1825",
+          "resources/language/resource.language.en_gb/strings.po": "6b4f7cef92dcd7db18a5bb2a98b07d827ad14bfacb7d014d24bb3123cb22d584",
+          "resources/media/trakt_icon.png": "1fa1883e53ba4ea079f184cacff3d1d5704371ff220de954a0dd93a44286f9ef",
+          "resources/settings.xml": "1ae17597474ce05220c10338d788d86cac2cd7f9ff7f84862f546ea66eaf4be2"
+        },
+        "path": "/storage/emulated/0/Android/data/com.projectinfinity.kodi/files/.kodi/addons/plugin.video.watchnixtoons2",
+        "version": "0.14.24"
+      }
+    },
+    "skin": "skin.infinity.diggz"
+  },
+  "sequence": 1
+}

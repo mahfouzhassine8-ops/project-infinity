@@ -1,0 +1,94 @@
+{
+  "artifact_sha256": "a9e05fd255fa34882a1af2a67007ee1dc6284460325127a98cd5601d42bc8533",
+  "artifact_size": 2124997,
+  "authentication": "PASS_NATIVE_FULL80_CC70_E410_AND_FINAL_EXACT_ORIGINAL69_APK",
+  "evidence_sha256": {
+    "ANDROID-VERIFICATION.json": "e8e0e5f4fe7be2deea01dfba309c89f756099e8798b1c46e37078ef7ff615887",
+    "LIFECYCLE-CAPTURE.json": "189ac2191f46ca39f869799a5842213e1048260f12d9b95d394750797d5aa372",
+    "lifecycle-filtered.log": "4dd0ee1a51e61af2e76de560eb7657901e592ea027545c64e027f68928b7338f",
+    "movie-outcome-events.json": "7780e4b419e3bf7fe6d2c9c9c6b3f977c6602061e2cb24b68c51574e4d2bdac2",
+    "movie-outcome-snapshot.json": "58f80de71663e3e8939ee5e9572ff5266c79097163ddc1d3b80f75968f484cc1",
+    "movie-outcome-state.json": "fb245ab44dd28e46f5b5aa1f4665bacadfa779bcd3defc2c42854fa0fc9fa3f3",
+    "tv-outcome-events.json": "d79a8a7250138b23f4f4d4d8ae5fc35f650374ae52c321b64b2e3faa10ba9b99",
+    "tv-outcome-snapshot.json": "dca442ad3054516890c7cb8078533d0db51b691248e0794a1240f7b0d9dbc002",
+    "tv-outcome-state.json": "c527372acc3d09c5dc8223000a422d98f5355ac73f0478eb866a6b51b39d682f"
+  },
+  "minimal_proposed_boundary": {
+    "admission": "Only exact RuntimeError Window id does not exist from authenticated action_loading._context Window(window) observation; unexpected messages/origins re-raise.",
+    "implementation": "NOT_IMPLEMENTED_BY_REVIEWER",
+    "limits": "Candidate source design only; any implementation needs authorization, narrow verification and new authenticated fixture before Android claims.",
+    "prohibited_shortcuts": [
+      "Broad exception swallowing",
+      "Substitute foreground=False context",
+      "Reset loading monitor or clear GUI properties",
+      "New playback/progress identity or persistence action",
+      "Provider/native/navigation edits",
+      "Service restart or automatic app retry"
+    ],
+    "scope": "Existing service.py loading.tick call only; unchanged action_loading/provider/native/GUI sources.",
+    "why_narrow": "_context is the first tick operation, before fingerprint/state/mailbox/property mutation. Defer only this vanished-window observation while the same player/checkpoint/service loop continues."
+  },
+  "movie": {
+    "failed_assertion": "No exact eligible movie progress record after real playback and Stop.",
+    "not_run": [
+      "Continue native-card assertion",
+      "Existing resume"
+    ],
+    "observed_pass": [
+      "Legitimate save with no playback history",
+      "Actual Infinity Home/Movies/Watchlist/saved movie/AVStarted origin",
+      "94.423 seconds advancing actual playback and genuine Stopped callback"
+    ],
+    "reporting_note": "Scenario correctly FAIL; nested record step remains NOT_RUN in raw report although assertion was attempted and failed. Raw report is retained unchanged."
+  },
+  "native_crash": {
+    "log_bytes": 530275,
+    "markers": {
+      "FATAL EXCEPTION": 0,
+      "Fatal signal": 0,
+      "SIGABRT": 0,
+      "SIGSEGV": 0,
+      "am_crash": 0
+    },
+    "scope": "Retained filtered lifecycle evidence only; Python service failure is explicitly not suppressed by this classification.",
+    "status": "NO_NATIVE_CRASH_OBSERVED_IN_RETAINED_CAPTURE"
+  },
+  "release_acceptance": false,
+  "resident_service_blocker": {
+    "classification": "Python resident tracker service terminated before movie AV; native process/player survived. This is a concrete recording blocker, not an established provider movie identity failure.",
+    "exception": "RuntimeError: Window id does not exist",
+    "exception_epoch": "2026-11-09 09:40:36.160",
+    "movie_OpenFile_epoch": "2026-11-09 09:41:29.883",
+    "service_invoker_exit_epoch": "2026-11-09 09:40:36.357",
+    "source_preservation": {
+      "action_loading.py_sha256": "8b758bba6eabd7a051213834c136a81d52c6af819ff9c6d7d1f456a45be4474f",
+      "action_loading_exact_original69": true,
+      "service.py_sha256": "569fea31b465674b5e9fc357a895b0a00706df999c201246a33e8fcd00c9b669"
+    },
+    "stack": [
+      "service.py:1859 main loading.tick()",
+      "action_loading.py:271 tick context=_context(...)",
+      "action_loading.py:193 _context gui.Window(window).getProperty(FrameControls)"
+    ]
+  },
+  "reviewed_at_utc": "2026-11-09T09:49:19.600614+00:00",
+  "reviewer_tests_apps_build_sign_edits": false,
+  "run": 42593220047,
+  "source": "7a98ff8daef96b09aba84691625aa556f40b01df",
+  "status": "TV_LOCAL_RECORD_OBSERVED_PASS_MOVIE_RECORD_FAIL_RESIDENT_SERVICE_EXIT_BLOCKER",
+  "tv": {
+    "blocked": "Return to actual first-party TV root timed out before native tracking-section assertions.",
+    "identity_limit": "Local source-page episode, season=-1 episode=-1; no numeric E4 or canonical cross-provider claim.",
+    "not_run": [
+      "Native Progress Shows/Next Episodes/Continue card assertions",
+      "Existing resume"
+    ],
+    "observed_pass": [
+      "Legitimate save with no playback history",
+      "Actual Infinity Home/TV/Watchlist/saved parent/native child/AVStarted origin",
+      "304.257 seconds advancing actual playback clock and genuine Stopped callback",
+      "Persisted307.902/1424.423 seconds exact source local episode with exact Queen parent and native label"
+    ],
+    "read_only_projection_observation": "Each existing hub projection contains one TV entry; this does not establish native GUI card PASS."
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "artifact": {
+    "id": 13666484206,
+    "sha256": "3cfdd5323355eabc09b5a12bcd5605c290f718eefc8a738ace101266f7984e9a",
+    "size": 1724015
+  },
+  "causality_limits": [
+    "Actual native crash is retained as a failure on this API36 translation target; unchanged native bytes and historical successful runs do not erase it.",
+    "Constructor stack precedes selected C1 bootstrap and does not establish a C1 tracking regression. It also does not prove the native bridge is the sole root cause or predict physical Fold startup.",
+    "Historical three-start42542862696 and realTV42593220047 remain valid for their exact sources/targets, not current C1 acceptance."
+  ],
+  "evidence_sha256": {
+    "ANDROID-VERIFICATION.json": "f79d87341af141fb9179c31f07e30fe73e79856e0f0a155cf58b5b6735127741",
+    "failure-final-tombstone.txt": "3d32b211082f0cd55cb09f967f351a505f96240d92f85f9793a5542fc3a729d5",
+    "install-approved-candidate-installed.json": "70dd840cbe794e15424a2707c6a68701c33fcb52f57c2884397418455051a8de",
+    "lifecycle-filtered.log": "8987ec94de7ac6a1c8afd790cfa626581f36b1013b5456c309af219e4fb53945"
+  },
+  "experimental_policy_disposition": {
+    "current_adapter_still_blocks": true,
+    "finding": "The four-PASS core_clearance predicate is in the new task prepare_tracking_release adapter, not an added requirement in original release_authority.verify_evidence or signer_policy. Latest explicit owner permission can support a reviewed change to that local disposition without manufacturing runtime PASS.",
+    "limits": "Packaging/install preservation can justify a bounded experimental handoff under owner authorization; it cannot establish C1 service survival, actual schema2 runtime compatibility, resumed playback, all-provider correctness or Fold reliability. No present claim that APK74/75 is safe or verified is made.",
+    "required_before_changed_path_use": [
+      "Record the latest owner experimental/unverified-behavior directive and exact blocked actual evidence in a new source-bound disposition; reconcile task authorization wording that currently makes actual movie/UI/resume mandatory before delivery. Preserve old receipts.",
+      "Review any local prepare/register/clearance change explicitly; replace the local behavioral acceptance requirement with truthful BLOCKED/NOT_RUN experimental disposition, not fabricated PASS or silent deletion of failure evidence.",
+      "Keep original sole original-key workflow, signer policy, authority transition, release_blockers rule, evidence/source/workflow hash verification, live version/registry guards, complete module authentication and whole-component preservation unchanged and actually passing. If an original gate rejects, stop; this opinion does not override it.",
+      "Exact original-signature APKs and higher forward-recovery pair must undergo actual PackageManager in-place/version/signature and scoped data-preservation checks after signing and before owner delivery. Host Java cases alone do not satisfy these actual APK checks.",
+      "No accepted release pointer/public release or full tracking acceptance. One coordinated owner Fold test remains experimental; disclose current service/movie/UI/resume/recovery behavior that remains unverified."
+    ],
+    "status": "CONDITIONAL_OWNER_AUTHORIZED_EXPERIMENTAL_PATH_POSSIBLE_NOT_CURRENT_CLEARANCE"
+  },
+  "observed": [
+    {
+      "pid": 4774,
+      "process_start": "11325",
+      "result": "PASS_OBSERVED_HOME_AND_RPC",
+      "step": "Initial original69 startup"
+    },
+    {
+      "detail": "10:58:57 PID4774 service.py1660 -> action_loading.tick271 -> _context193 FrameControls read, Window id does not exist. Occurs before CC72 installation completion; not a C1 guard failure.",
+      "lifecycle_lines": [
+        1885,
+        1903
+      ],
+      "result": "OBSERVED_BASELINE_PYTHON_FAILURE",
+      "step": "Old resident service during fixture preparation"
+    },
+    {
+      "after": "0.3.5.72",
+      "before": "0.3.5.67",
+      "limit": "Not subsequent native full80 identity or C1 Python execution acceptance.",
+      "mechanism": "Native AddonBrowser InstallFromZip",
+      "result": "PASS_ADDON_REGISTRY_VERSION_OBSERVED",
+      "step": "Normal signed CC72 ZIP installation"
+    },
+    {
+      "code": "BUS_ADRERR",
+      "lifecycle_lines": [
+        2069,
+        2111
+      ],
+      "location": "talloc_lib_init+32 in unchanged libkodi.so; ARM64 linker constructor/dlopen stack under x86_64 native bridge",
+      "pid": 5795,
+      "result": "FAIL_NATIVE_STARTUP",
+      "signal": "SIGBUS",
+      "step": "Selected explicit module-activation restart"
+    },
+    {
+      "detail": "ActivityManager line2123 starts next-top-activity; no harness retry accepted, no tracking result inferred.",
+      "pid": 5918,
+      "result": "OBSERVED_OS_NEXT_TOP_ACTIVITY_START",
+      "step": "Android subsequent process"
+    },
+    {
+      "result": "PASS_EXACT_ORIGINAL69",
+      "sha256": "804eebc57af2e4ef4e5418b56994bda64eb7fd7e7f2c0653b5c6e2a9f7833058",
+      "step": "Final installed APK identity"
+    }
+  ],
+  "production_edited": false,
+  "release_acceptance": false,
+  "reviewed_at_utc": "2026-11-09T11:09:09.109000+00:00",
+  "reviewed_policy_sources_sha256": {
+    "repairs/dual-experience-isolation-2103420/release_authority.py": "154ce118db491ac2a62e4d2a6eda9d1ffa82eebbba42bd7ccb3d34884b83f78d",
+    "repairs/dual-experience-isolation-2103420/release_gate.py": "21a843b8fcb621cb58922fd257c2b9fbe48f099843cceee65952fe2d425c7f82",
+    "repairs/dual-experience-isolation-2103420/signer-policy.json": "668be3057893450fb53c2c3d506723de16de45abe46c0034a0ba81234c1fc06b",
+    "repairs/dual-experience-isolation-2103420/signer_policy.py": "ee7e23d29858cc40d2a8e15e3b77f2d2299609b0eb2c7bde3b26647a549442bb",
+    "repairs/infinity-tracking-integration-2103469-20261108/EXPERIMENTAL-RELEASE-AUTHORIZATION.json": "71c79efc91857c0040c27cd9ddb46698332bfdb86d07098ab47fc4e983a9c915",
+    "repairs/infinity-tracking-integration-2103469-20261108/prepare_tracking_release.py": "43fb6c5443bc53708f6b7e1a26d2dd71cb43e85ab59818297469fd1a9c01b0b6",
+    "repairs/infinity-tracking-integration-2103469-20261108/register_tracking_release.py": "2670f630e4a9e99ed58b10e9c63685290d57ee591bb07a6581a42751bbb11bd3"
+  },
+  "reviewer_tests_apps_build_sign_dispatch": false,
+  "run": 42604600259,
+  "source": "3b68308da68506513e4f5410c87215422a4f68d0",
+  "source_preservation": {
+    "all_three_current_overlay_files_byte_equal_checkpoint": true,
+    "checkpoint": "5787ca4569faa70dec4f10493b08bd8015d542ea",
+    "original_module_review_reused_sha256": "25d39f9964ecbeee941873efa7af26013391ed38bd054611eed48b19f86e7a4d",
+    "source_sha256": {
+      "plugin.py": "580a2d7b25bc7a415c2db059fe1fa696808107a4f997a32d544baf2468a2877a",
+      "resume_hub.py": "807157626f817dd5375e0e60872b6cd351d33135a23c5a225f26c86a196e7ed5",
+      "service.py": "c0f45709166d9b7018eac0cee4834aaa617e8a684d6d199568e4e65a4645d6bd"
+    }
+  },
+  "status": "C1_ANDROID_BLOCKED_BY_OBSERVED_NATIVE_STARTUP_CRASH_TRACKING_NOT_RUN",
+  "tracking_result": {
+    "C1_native_identity": "NOT_REACHED",
+    "Fold": "NOT_RUN",
+    "TV": "NOT_RUN",
+    "aggregate": "BLOCKED_FIXTURE_PREPARATION",
+    "completion_replay": "NOT_RUN",
+    "movie": "NOT_RUN",
+    "other_entrypoints": "NOT_RUN",
+    "restart_persistence": "NOT_RUN",
+    "resume": "NOT_RUN",
+    "view_coverage": "NOT_RUN"
+  }
+}

@@ -1,0 +1,322 @@
+--- a/assets/addons/script.infinity.commandcenter/resume_hub.py
++++ b/assets/addons/script.infinity.commandcenter/resume_hub.py
+@@ -647,7 +647,11 @@
+     for index, ids in enumerate(row_ids):
+         group = root(index)
+         known = combined.setdefault(group, {})
+-        if any(namespace in known and known[namespace] != uid for namespace, uid in ids.items()):
++        # Exact local parent URLs are locator aliases: several may have one
++        # explicitly proved canonical show. Canonical namespace conflicts still
++        # quarantine the component; exact episode matching never uses this rule.
++        if any(namespace in known and known[namespace] != uid and
++               not (series and namespace == 'wnt2') for namespace, uid in ids.items()):
+             conflicts.add(group)
+         known.update(ids)
+     return [('row', index) if root(index) in conflicts else ('group', root(index))
+@@ -655,6 +659,11 @@
+ 
+ 
+ def _resume_aliases(data, entry, series=False):
++    if series:
++        rows = _progress_rows(_normalize(data), entry)
++        group = rows[-1][3]
++        return [(key, value) for bucket, key, value, identity in rows
++                if bucket == 'items' and KEY_RE.fullmatch(str(key)) and identity == group]
+     values = [(key, old) for key, old in _dict(data.get('items')).items()
+               if KEY_RE.fullmatch(str(key)) and isinstance(old, dict)]
+     groups = _resume_groups([old for _, old in values] + [entry], series=series)
+@@ -704,9 +713,84 @@
+     return compatible_key(data, entry)
+ 
+ 
++def exact_progress(data, entry):
++    """Current progress for one playable movie/episode, never a series card.
++
++    All saved projections use the same existing identity/alias contracts. This
++    does not change identities, routes, membership, history or progress keys.
++    """
++    import math
++    if not isinstance(data, dict) or not isinstance(entry, dict) or entry.get('synthetic_next'):
++        return None
++    identity = _resume_identity(entry)
++    locations = []
++    if identity:
++        if identity.get('kind') not in ('movie', 'episode'):
++            return None
++        values = []
++        for bucket in ('items', 'watched'):
++            for key, row in _dict(data.get(bucket)).items():
++                if KEY_RE.fullmatch(str(key)) and isinstance(row, dict) and _resume_identity(row):
++                    values.append(row)
++                    locations.append((bucket, key, row))
++        groups = _resume_groups(values + [entry], series=False)
++        locations = [location for location, group in zip(locations, groups) if group == groups[-1]]
++    else:
++        # Retain an old row's own existing offset without guessing a new typed
++        # identity. Legacy keys never join other records by title or source.
++        key = entry.get('key')
++        old = _dict(data.get('items')).get(key)
++        if (not KEY_RE.fullmatch(str(key)) or not isinstance(old, dict) or
++                entry.get('media') not in ('movie', 'tv') or
++                any(old.get(name) != entry.get(name) for name in ('media', 'source', 'season', 'episode'))):
++            return None
++        a = verified_ids({name: old.get(name) for name in ('tmdb', 'tvdb', 'imdb')})
++        b = verified_ids({name: entry.get(name) for name in ('tmdb', 'tvdb', 'imdb')})
++        if any(a[name] != b[name] for name in set(a) & set(b)) or (_resume_identity(old) and not _agreeing_ids(a, b)):
++            return None
++        locations = [('items', key, old)]
++        watched = _dict(data.get('watched')).get(key)
++        if isinstance(watched, dict):
++            locations.append(('watched', key, watched))
++    items = [(key, row) for bucket, key, row in locations if bucket == 'items']
++    if not items:
++        return None
++
++    def marker(row):
++        try:
++            return (int(row.get('updated') or row.get('watched_at') or 0), int(row.get('resume_revision') or 0))
++        except (TypeError, ValueError, OverflowError):
++            return (0, 0)
++
++    key, row = max(items, key=lambda pair: (marker(pair[1]), pair[0]))
++    if not resume_visible(data, key):
++        return None
++    for bucket, _, watched in locations:
++        if bucket == 'watched' and (marker(watched) >= marker(row) or
++                (row.get('playback_occurrence') and watched.get('completed_occurrence') == row['playback_occurrence'])):
++            return None
++    try:
++        if type(row.get('position')) is bool or type(row.get('duration')) is bool:
++            return None
++        position, duration = float(row.get('position')), float(row.get('duration'))
++        if not (math.isfinite(position) and math.isfinite(duration) and
++                0 < position < duration and position / duration < .95):
++            return None
++    except (TypeError, ValueError, OverflowError):
++        return None
++    return _entry_copy(row, key)
++
++
+ def record_progress(data, entry):
+     """Update exact playback aliases without rewriting any saved navigation action."""
+     data = _normalize(data)
++    local = entry_identity(entry)
++    local_parent = bool(local and local.get('scope') == 'watchnixtoons_local' and
++                        local.get('kind') == 'episode' and
++                        watchnixtoons_source_identity(entry.get('source_parent'), 'tvshow'))
++    if 'source_parent' in entry and not local_parent:
++        entry = dict(entry)
++        entry.pop('source_parent')  # Invalid new evidence never enters a new row.
+     key = progress_key(data, entry)
+     if not KEY_RE.fullmatch(str(key)):
+         return data, ''
+@@ -729,6 +813,8 @@
+     # disk and independent of the provider route or media identity.
+     entry = dict(entry, resume_revision=int(data.get('revision') or 0) + 1)
+     fields = ('position', 'duration', 'percentage', 'updated', 'playback_occurrence', 'resume_revision')
++    if local_parent:
++        fields += ('source_parent',)
+     # Preserve new native/library parent and successor proof in existing rows,
+     # alongside their progress. Saved identity, provider routes and keys stay
+     # intact. No title match or guessed episode increment grants a successor.
+@@ -900,7 +986,9 @@
+         # in storage; newest playback wins, even when it is an earlier episode.
+         values = [value for value in values if resume_visible(data, value['key'])]
+         seen, visible = set(), []
+-        for value, group in zip(values, _resume_groups(values)):
++        groups = {str(key): group for owner, key, _, group in _progress_rows(data) if owner == 'items'}
++        for index, value in enumerate(values):
++            group = groups.get(str(value.get('key')), ('unindexed', index))
+             if group not in seen:
+                 seen.add(group)
+                 visible.append(value)
+@@ -921,12 +1009,17 @@
+     if value.get('media') != 'tv':
+         return {}
+     identity = _resume_identity(value)
++    local = {}
++    if identity and identity.get('scope') == 'watchnixtoons_local' and identity.get('kind') == 'episode':
++        parent_source = watchnixtoons_source_identity(value.get('source_parent'), 'tvshow')
++        if parent_source:
++            local = parent_source['ids']
+     typed = identity['ids'] if identity and identity.get('scope') in ('show_episode', 'show', 'show_season') else {}
+     parent = verified_ids({name: value.get('show_' + name) for name in ('tmdb', 'tvdb', 'imdb')}) \
+         if value.get('show_ids_verified') is True else {}
+     if any(typed[name] != parent[name] for name in set(typed) & set(parent)):
+         return {}
+-    return dict(typed, **parent)
++    return dict(local, **dict(typed, **parent))
+ 
+ 
+ def _show_key(value, key):
+@@ -938,23 +1031,66 @@
+     return 'legacy-record:' + str(key)
+ 
+ 
++def _progress_rows(data, query=None):
++    """One alias proof input for Continue, Progress Shows and Next Episodes."""
++    locations = [(bucket, key, value) for bucket in ('watched', 'items')
++                 for key, value in data[bucket].items()
++                 if isinstance(value, dict)]
++    if query is not None:
++        locations.append(('query', query.get('key'), query))
++    groups = _resume_groups([value for _, _, value in locations], series=True)
++    def contradictory_parent(value):
++        identity = _resume_identity(value)
++        if not identity or identity.get('scope') not in ('show_episode', 'show', 'show_season') or value.get('show_ids_verified') is not True:
++            return False
++        parent = verified_ids({name: value.get('show_' + name) for name in ('tmdb', 'tvdb', 'imdb')})
++        return any(identity['ids'][name] != parent[name] for name in set(identity['ids']) & set(parent))
++    # A replay can retain both watched and unfinished state under one original
++    # key even when no parent-series identity is known. Keep that exact record
++    # together without merging different legacy keys or guessing a series.
++    unproven = {}
++    for index, (_, key, value) in enumerate(locations):
++        if value.get('media') != 'tv':
++            continue
++        prior = unproven.get(key)
++        if prior is not None:
++            other = locations[prior][2]
++            if contradictory_parent(value) or contradictory_parent(other):
++                continue
++            known, previous = continue_series_ids(value), continue_series_ids(other)
++            if known and previous:
++                continue  # Conflicting proven components must stay quarantined.
++            a, b = _resume_identity(other), _resume_identity(value)
++            if (same_identity(a, b) or (not a and not b and
++                    all(other.get(name) == value.get(name) for name in ('media', 'source', 'season', 'episode')))):
++                if known:
++                    groups[prior] = groups[index]
++                else:
++                    groups[index] = groups[prior]
++        else:
++            unproven[key] = index
++    return [(bucket, key, value, group) for (bucket, key, value), group in zip(locations, groups)]
++
++
++def _series_rows(data):
++    return [row for row in _progress_rows(data) if row[2].get('media') == 'tv']
++
++
+ def progress_shows(data, limit=None):
+     """Return the newest known episode per show, preferring in-progress episodes."""
+     if limit is not None and (type(limit) is not int or not 0 <= limit <= 100):
+         raise ValueError('Invalid display projection limit')
+     data = _normalize(data)
+     chosen = {}
+-    for bucket, priority in (('watched', 0), ('items', 1)):
+-        for key, value in data[bucket].items():
+-            if (not isinstance(value, dict) or value.get('media') != 'tv' or
+-                    (bucket == 'items' and not resume_visible(data, key))):
+-                continue
+-            show_key = _show_key(value, key)
+-            marker = (priority, int(value.get('updated') or value.get('watched_at') or 0),
+-                      int(value.get('resume_revision') or 0),
+-                      episode_number(value.get('season')), episode_number(value.get('episode')))
+-            if show_key not in chosen or marker > chosen[show_key][0]:
+-                chosen[show_key] = (marker, dict(value, **({'key': str(key)} if key and KEY_RE.fullmatch(str(key)) else {})))
++    for bucket, key, value, group in _series_rows(data):
++        if bucket == 'items' and not resume_visible(data, key):
++            continue
++        marker = (1 if bucket == 'items' else 0,
++                  int(value.get('updated') or value.get('watched_at') or 0),
++                  int(value.get('resume_revision') or 0),
++                  episode_number(value.get('season')), episode_number(value.get('episode')))
++        if group not in chosen or marker > chosen[group][0]:
++            chosen[group] = (marker, dict(value, **({'key': str(key)} if key and KEY_RE.fullmatch(str(key)) else {})))
+     result = [value[1] for value in chosen.values()]
+     result.sort(key=lambda e: int(e.get('updated') or e.get('watched_at') or 0), reverse=True)
+     return [_entry_copy(value) for value in result[:limit]]
+@@ -971,32 +1107,32 @@
+     if limit is not None and (type(limit) is not int or not 0 <= limit <= 100):
+         raise ValueError('Invalid display projection limit')
+     data = _normalize(data)
++    rows = _series_rows(data)
+     progress = {}
+-    for key, value in data['items'].items():
+-        if isinstance(value, dict) and value.get('media') == 'tv' and resume_visible(data, key):
+-            show_key = _show_key(value, key)
+-            current = progress.get(show_key)
++    for bucket, key, value, group in rows:
++        if bucket == 'items' and resume_visible(data, key):
++            current = progress.get(group)
+             marker = (int(value.get('updated') or 0), int(value.get('resume_revision') or 0),
+                       episode_number(value.get('season')), episode_number(value.get('episode')))
+             if current is None or marker > current[0]:
+-                progress[show_key] = (marker, dict(value, **({'key': str(key)} if key and KEY_RE.fullmatch(str(key)) else {})))
++                progress[group] = (marker, dict(value, **({'key': str(key)} if key and KEY_RE.fullmatch(str(key)) else {})))
+     result = [v[1] for v in progress.values()]
+ 
+     watched_latest = {}
+-    for key, value in data['watched'].items():
+-        if not isinstance(value, dict) or value.get('media') != 'tv':
++    for bucket, key, value, group in rows:
++        if bucket != 'watched':
+             continue
+-        show_key = _show_key(value, key)
+-        if show_key in progress:
++        if group in progress:
+             continue
+         season = episode_number(value.get('season'))
+         episode = episode_number(value.get('episode'))
+-        if season < 0 or episode < 0 or value.get('show_ids_verified') is not True:
++        if (season < 0 or episode < 0 or value.get('show_ids_verified') is not True or
++                not continue_series_ids(value)):
+             continue
+         marker = (int(value.get('watched_at') or value.get('updated') or 0),
+                   int(value.get('resume_revision') or 0), season, episode)
+-        if show_key not in watched_latest or marker > watched_latest[show_key][0]:
+-            watched_latest[show_key] = (marker, dict(value, **({'key': str(key)} if key and KEY_RE.fullmatch(str(key)) else {})))
++        if group not in watched_latest or marker > watched_latest[group][0]:
++            watched_latest[group] = (marker, dict(value, **({'key': str(key)} if key and KEY_RE.fullmatch(str(key)) else {})))
+     for marker, last in watched_latest.values():
+         successor = _dict(last.get('verified_next'))
+         # The catalogue's successor must match the completed episode and series.
+--- a/assets/addons/script.infinity.commandcenter/plugin.py
++++ b/assets/addons/script.infinity.commandcenter/plugin.py
+@@ -345,6 +345,8 @@
+ 
+ 
+ def _menu_resume(entry, data):
++    if (hub.entry_identity(entry) or {}).get('kind') in ('movie', 'episode'):
++        return hub.exact_progress(data, entry)
+     return next((row for row in hub.entries(data)
+                  if row['key'] == entry['key'] or hub.resume_matches(entry, row)), None)
+ 
+@@ -540,8 +542,8 @@
+                 current, key, bucket = progress, progress['key'], 'continue'
+         target, item = _list_item(current, current_data, bucket, list_name)
+         if target.startswith('plugin://script.infinity.commandcenter/?action=saved-recovery&'):
+-            recover_entry(key, bucket, resume_offset=max(0.0, number(current.get('position')))
+-                          if hub.resume_visible(current_data, key) else 0)
++            progress = hub.exact_progress(current_data, current)
++            recover_entry(key, bucket, resume_offset=number(progress.get('position')) if progress else 0)
+         elif (hub.entry_identity(current) or {}).get('kind') in ('tvshow', 'season'):
+             _rpc('GUI.ActivateWindow', {'window': 'videos', 'parameters': [target, 'return']})
+         elif target:
+@@ -597,7 +599,8 @@
+     li = xbmcgui.ListItem(label=label, label2=label2, path=target, offscreen=True)
+     flags = render.get('watched_flags', {}) if render is not None and render.get('watched_data') is data else {}
+     watched = flags[key] if key in flags else hub.is_watched(data, key)
+-    in_progress = hub.resume_visible(data, key) and number(entry.get('position')) > 0
++    progress = hub.exact_progress(data, entry)
++    in_progress = progress is not None
+     info = {
+         'title': str(entry.get('title') or label),
+         'mediatype': (hub.entry_identity(entry) or {}).get('kind') or ('episode' if kind == 'tv' else 'movie'),
+@@ -650,12 +653,12 @@
+     if rating:
+         li.setProperty('Rating', str(rating))
+     if in_progress:
+-        position = number(entry.get('position'))
+-        duration = number(entry.get('duration'))
++        position = number(progress.get('position'))
++        duration = number(progress.get('duration'))
+         li.setProperty('ResumeTime', str(position))
+         li.setProperty('TotalTime', str(duration))
+         li.setProperty('StartOffset', str(position))
+-        li.setProperty('PercentPlayed', str(entry.get('percentage', 0) or 0))
++        li.setProperty('PercentPlayed', str(progress.get('percentage', 0) or 0))
+     else:
+         # A watched title started again must begin from zero, not its prior completion point.
+         li.setProperty('ResumeTime', '0')

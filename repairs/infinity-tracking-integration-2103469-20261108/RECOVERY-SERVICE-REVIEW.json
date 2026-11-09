@@ -1,0 +1,35 @@
+{
+  "candidate_service_sha256": "c0f45709166d9b7018eac0cee4834aaa617e8a684d6d199568e4e65a4645d6bd",
+  "candidate_source_checkpoint": "5787ca4569faa70dec4f10493b08bd8015d542ea",
+  "concrete_blockers": [],
+  "independent_source_checks": [
+    "Reference service bytes match the original signed69 APK asset.",
+    "Read C1 service directly from its frozen commit; extracted exact already-reviewed helper source.",
+    "In-memory reconstruction applies only helper insertion, original loading module/make_monitor binding and two original tick-call replacements; resulting SHA matches declared887fcbc6.",
+    "Removing those exact edits restores all original69 source bytes; all other nonmain/nonhelper top-level AST matches original69.",
+    "recovery_source returns unchanged protected69 plugin/resume_hub; prepared recovery payload adds only guardedservice and version/manifest/signature metadata to protectedbaseline modules."
+  ],
+  "limits": [
+    "Source preservation only; generated recovery is not byte-identical to original69 service because it intentionally retains the reviewed guard.",
+    "Actual saved-state read/save compatibility and Android forward recovery remain NOT_RUN.",
+    "Original signer/full80/archive/member verification remains required for the final prepared/signed pair.",
+    "No behavioral tests, Java reruns, apps, builds/signing or private-key access performed by reviewer."
+  ],
+  "original69_service_sha256": "1844b2b217ccc7f3adef4d82bc825588fb2d561a87d6447f32ebedf3295e927d",
+  "preservation_receipt_sha256": "a458f0b248eaea73f1aadd0f2b9354c2c9fd783cee560ed51189e0360f46f240",
+  "preserved_semantics": "Original69 tracking, IDs, writer, thresholds and persistence code retained; no e410 tracking bridge/projection changes added. The resident loading observation guard is the sole functional exception.",
+  "prior_guard_review": "SERVICE-LOADING-SURVIVAL-REVIEW.json; exact authenticated source/code-object/read/currentgeneration admission and unrelated-error propagation unchanged.",
+  "protected_original_APK": 2103469,
+  "protected_original_artifact_modified": false,
+  "recipe_function_source_sha256": {
+    "recovery_service": "117f57ac42f0f9262870280cca718c40cb73da3287b6e225c595039caa6c1d44",
+    "recovery_source": "e4c03ad9ac351f1a24f95fb6e63b4431fc0e44b0f7cd57ffd68cdda9b5bdf75e"
+  },
+  "recovery_artifact_intent": 2103475,
+  "recovery_service_sha256": "887fcbc6e90a1c33ac465147ac52d75c89cc43072665bbc8c94636d2b68722ba",
+  "release_acceptance": false,
+  "reviewed_at_utc": "2026-11-09T10:27:22.132382+00:00",
+  "reviewer_production_or_reference_edits": false,
+  "runtime_acceptance": false,
+  "status": "ACCEPTED_SOURCE_PRESERVATION_ORIGINAL69_PLUS_EXACT_REVIEWED_LOADING_GUARD_ONLY"
+}

@@ -1,0 +1,39 @@
+{
+  "run": 42588102830,
+  "source": "ce88dc9dd16aad4d0bdd2e4f9ce1bcbb9f203cd4",
+  "id": 13659704122,
+  "name": "Infinity69-Tracking80-Original-Signed-Modules-42588102830-INTERNAL-NOT-APK-OR-ACCEPTANCE",
+  "digest": "sha256:22913a51131eb30509f2bf58b679232c4b1195a52750e89f865f06266f51e37a",
+  "size_in_bytes": 1304003,
+  "workflow_id": 397702717,
+  "workflow_path": ".github/workflows/infinity-combined-release.yml",
+  "source_pins_sha256": "5686b7687185b717be2c68815ec2ea5894219a0746e46c3d8fe0df18625da8f5",
+  "production_source_checkpoint": "e410f30ba9e38182e4e77810e5237e5442cbd31a",
+  "metadata_production_field": "production_source",
+  "installed_target_versionCode": 2103469,
+  "candidate_CC": "0.3.5.70",
+  "recovery_CC": "0.3.5.71",
+  "fixture_packages": [
+    {
+      "CC": "0.3.5.70",
+      "archive": "script.infinity.commandcenter-0.3.5.70-INTERNAL-ANDROID-FIXTURE.zip",
+      "modules_path": "pair/2103472/modules",
+      "recovery": false,
+      "sha256": "5cb6b2c790f34d7c4fb09d09fd540934b0b71eaaf26badd10d76be89100c19ff",
+      "versionCode": 2103472
+    },
+    {
+      "CC": "0.3.5.71",
+      "archive": "script.infinity.commandcenter-0.3.5.71-INTERNAL-ANDROID-FIXTURE.zip",
+      "modules_path": "pair/2103473/modules",
+      "recovery": true,
+      "sha256": "94c97444f8be64fba22ab89d45d0a3fc5b947789b619432064ca3596b0b43aee",
+      "versionCode": 2103473
+    }
+  ],
+  "APK_build": false,
+  "APK_present": false,
+  "publication": false,
+  "independent_review": "Astra public RSA/all80/member preservation +4 CI case/sourcepin proof; no Java/app rerun",
+  "Android": "NOT_RUN"
+}

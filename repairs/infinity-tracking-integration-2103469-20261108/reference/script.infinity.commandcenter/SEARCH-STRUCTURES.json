@@ -1,0 +1,37 @@
+{
+  "schema": 1,
+  "profiles": [
+    {
+      "family": "static-lazy-action-map-v1",
+      "entry_shape": "5a9496fe014b987bc17e9b49d8656ced110f5d98dc9ae7366f7f1967ca3bc4a1",
+      "declared_dependency": "script.module.thecrew",
+      "library": "lib",
+      "router": "lib/resources/lib/modules/crew.py",
+      "router_shape": "6e2d668965555fc34b4aa5d88105abe25ed3d1a3107dc2319800e26e47cfa684",
+      "receivers": {
+        "movie": {
+          "module": "resources.lib.indexers.movies",
+          "class": "Movies",
+          "path": "lib/resources/lib/indexers/movies.py",
+          "methods": {
+            "__init__": "098a3b2260ec459c9dab26c49055e64a65ba8f884b883e0c33de6ddaed9f3cc3",
+            "search_term": "e219eb31a0535a20ef5447e3a306924b7f78d64db13a764ac83d47c19562ba46",
+            "get": "e62092b809a150cc6ad34528021a49d5a39a23d8a881be68e00eed904cbf0721"
+          },
+          "source_shape": "7d075b7d94d4224bec89d812c220420fd96b026a25b1e989ad89d91fe1574bed"
+        },
+        "tv": {
+          "module": "resources.lib.indexers.tvshows",
+          "class": "TVShows",
+          "path": "lib/resources/lib/indexers/tvshows.py",
+          "methods": {
+            "__init__": "4745e8aed3ed3c2d2659c2f5ab2dce341525777d2924ee7fab34a129a5d417e2",
+            "search_term": "79a003b63f7f099e18dbd2a712bac6593d6018a1c2cc6425d09490e920195b5c",
+            "get": "2f18f29925fbe615af3365060e2e447610ab4bd362dbdf1e771dbca402801673"
+          },
+          "source_shape": "9c8d8fa97a055d62ecd87a16f6da812be2de5826d296017efe07df9c922b63c0"
+        }
+      }
+    }
+  ]
+}
