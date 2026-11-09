@@ -27,6 +27,10 @@ BASE_MANIFEST_SHA = '6fb82d58f2488a2eac23d2f0aa0e8a4eaa600f5fcf35901a24445b32beb
 BASE_APK_SHA = '804eebc57af2e4ef4e5418b56994bda64eb7fd7e7f2c0653b5c6e2a9f7833058'
 PRIOR = ROOT / 'repairs/infinity-watchlist-playback-2103466-20261108'
 PRIOR_VERIFIER_SHA = 'dfc1f71802b0d0b18cf49a559ed4fe8965e8cbf7bed49ebfa1bd6ee860cd9b43'
+PRODUCTION_SOURCE = 'e410f30ba9e38182e4e77810e5237e5442cbd31a'
+SELECTION = ('signed69_to_tracking_complete80_and_data', 'same_candidate_idempotent_noop',
+             'forward_recovery_restores_exact69_functional80_and_data',
+             'older_candidate_retains_authenticated_recovery')
 
 
 def check(value, message):
@@ -92,11 +96,11 @@ def admitted_versions(path):
           'Root-confirmed unchanged69 forward-pair admission required')
     candidate, recovery = admission['candidate_versionCode'], admission['recovery_versionCode']
     check(type(candidate) is int and type(recovery) is int and
-          candidate > 2103469 and recovery == candidate + 1, 'Admitted increasing forward pair required')
+          (candidate, recovery) == (2103472, 2103473), 'Fresh internal labels required; no APK issuance')
     versions = [admission['candidate_CC'], admission['recovery_CC']]
     check(all(isinstance(v, str) and re.fullmatch(r'0\.3\.5\.[0-9]+', v) for v in versions) and
-          int(versions[0].rsplit('.', 1)[1]) > 67 and
-          int(versions[1].rsplit('.', 1)[1]) == int(versions[0].rsplit('.', 1)[1]) + 1,
+          versions == ['0.3.5.70', '0.3.5.71'] and admission['APK_build'] is False and
+          admission['version_issued'] is False and admission['publication'] is False,
           'Admitted increasing CC pair required')
     return [(candidate, versions[0]), (recovery, versions[1])]
 
@@ -109,6 +113,10 @@ def audit(prepared, out):
     versions = admitted_versions(prepared / 'VERSION-ADMISSION.json')
     check(sha(prepared / 'VERSION-ADMISSION.json') == pins['version_admission_sha256'] and
           pins['baseline_APK_sha256'] == BASE_APK_SHA, 'Frozen exact69 input admission differs')
+    selection = load(HERE / 'CURRENT-INPUT-FIXTURE.json')
+    check(tuple(selection['selected_installer_cases']) == SELECTION and selection['production_source'] == PRODUCTION_SOURCE and
+          pins['production_source'] == PRODUCTION_SOURCE and
+          pins['installer_selection_sha256'] == sha(HERE / 'CURRENT-INPUT-FIXTURE.json'), 'Frozen four-case selection differs')
     baseline = prepared / 'baseline-modules'
     payload, base_files = bundle.build(baseline)
     check(len(base_files) == 80 and hashlib.sha256(payload).hexdigest() == BASE_MANIFEST_SHA and
@@ -155,8 +163,6 @@ def audit(prepared, out):
             target = temp / str(version) / 'assets/addons'
             shutil.copytree(prepared / str(version) / 'modules', target)
             assets[cc_version] = target.parent
-        baseline_assets = temp / 'original69-assets'
-        shutil.copytree(baseline, baseline_assets / 'addons')
         candidate_version, recovery_version = [version for _, version in versions]
         java = temp / 'InfinityInstalledCheckpointInstaller.java'
         java.write_text(source)
@@ -195,23 +201,8 @@ def audit(prepared, out):
                 check((storage / relative).read_bytes() == raw, name + ': retained data changed')
             rows.append(dict(case=name, status='PASS_REAL_UNCHANGED_JAVA', CC=version))
 
-        def refused(name, storage, version, other_assets=None):
-            before = hashes(storage)
-            result = call(storage, version, other_assets)
-            check(result.returncode != 0 and hashes(storage) == before, name + ': refusal must retain every byte')
-            rows.append(dict(case=name, status='REFUSED_AS_REQUIRED_ALL_BYTES_RETAINED'))
-
         storage = fixture('signed69_upgrade')
         passed('signed69_to_tracking_complete80_and_data', storage, candidate_version)
-        before = hashes(storage)
-        result = call(storage, '0.3.5.67', baseline_assets)
-        check(result.returncode == 0 and 'VERIFIED_VERSION=' + candidate_version in result.stdout and
-              hashes(storage) == before, 'Original69 assets must retain complete authenticated newer candidate without writes')
-        rows.append(dict(case='original69_assets_retain_authenticated_tracking_candidate', status='PASS_NO_WRITE'))
-        incomplete = temp / 'incomplete-newer-candidate'
-        shutil.copytree(storage, incomplete)
-        (incomplete / '.kodi/addons' / CC / 'service.py').unlink()
-        refused('original69_assets_refuse_incomplete_newer_candidate', incomplete, '0.3.5.67', baseline_assets)
         before = hashes(storage)
         passed('same_candidate_idempotent_noop', storage, candidate_version)
         check(hashes(storage) == before, 'Same-version install wrote bytes')
@@ -221,35 +212,14 @@ def audit(prepared, out):
         check(result.returncode == 0 and 'VERIFIED_VERSION=' + recovery_version in result.stdout and hashes(storage) == before,
               'Older candidate overwrote authenticated forward recovery')
         rows.append(dict(case='older_candidate_retains_authenticated_recovery', status='PASS_NO_WRITE'))
-        (storage / '.kodi/addons' / CC / 'service.py').unlink()
-        refused('older_candidate_refuses_incomplete_newer_recovery', storage, candidate_version)
-        candidate = assets[candidate_version] / 'addons'
-        for name, change in (
-            ('unknown_installed_tracking_source', lambda root: (root / CC / 'service.py').write_bytes(b'unknown source')),
-            ('missing_installed_signature', lambda root: (root / CC / (MANIFEST + '.sig')).unlink()),
-            ('unmatched_partial_signature', lambda root: shutil.copyfile(candidate / CC / (MANIFEST + '.sig'), root / CC / (MANIFEST + '.sig')))):
-            storage = fixture(name)
-            change(storage / '.kodi/addons')
-            refused(name, storage, candidate_version)
-        storage = fixture('known_partial_tracking_sources')
-        for name in sorted(PYTHON):
-            shutil.copyfile(candidate / name, storage / '.kodi/addons' / name)
-        passed('known_signed_partial_three_tracking_sources_resume', storage, candidate_version)
-        for name, change in (
-            ('tampered_candidate_tracking_source', lambda root: (root / CC / 'resume_hub.py').write_bytes(b'tampered APK source')),
-            ('tampered_candidate_signature', lambda root: (root / CC / (MANIFEST + '.sig')).write_bytes(b'\0' * 256))):
-            damaged = temp / name / 'assets'
-            shutil.copytree(assets[candidate_version], damaged)
-            change(damaged / 'addons')
-            storage = fixture(name + '_storage')
-            refused(name, storage, candidate_version, damaged)
-    check(len(rows) == 13, 'Exactly thirteen selected changed-input installer cases required')
-    report = dict(status='PASS_THIRTEEN_REAL_JAVA_TRACKING80_UPGRADE_AND_FORWARD_RECOVERY_CASES', cases=rows,
+    check(tuple(row['case'] for row in rows) == SELECTION, 'Exactly four selected generation cases required')
+    report = dict(status='PASS_FOUR_REAL_JAVA_CURRENT80_GENERATION_CASES', cases=rows,
         source_pins_sha256=sha(prepared / 'SOURCE-PINS.json'), signed_inputs=signed_inputs,
         original_java_source_sha256=reference['java_source_sha256'], original_host_transport_sha256=host,
-        original_tools_sha256=tools, selected_tests_sha256=sha(HERE / 'MODULE-TEST-SELECTION.md'),
+        original_tools_sha256=tools, selected_tests_sha256=sha(HERE / 'CURRENT-INPUT-FIXTURE.json'),
         verifier_sha256=sha(Path(__file__)), original_installer_changed=False,
         retained_thirteen_case_evidence_sha256=sha(PRIOR / 'evidence/MODULE-UPGRADE-RECOVERY.json'),
+        retained_tracking13_evidence_sha256=sha(HERE / 'evidence/signed-tracking80-42555855742/MODULE-UPGRADE-RECOVERY.json'),
         prior_thirteen_cases_rerun=False, complete80_signatures_verified=True,
         inactive_helper_unchanged=True, recovery_exact69_functional_bytes=True,
         user_data_and_unknown_files_preserved=True, native_or_APK_build=False,

@@ -1,0 +1,114 @@
+{
+  "APK_build": false,
+  "APK_present": false,
+  "APK_signing": false,
+  "Android": "NOT_RUN",
+  "app_tests_executed": false,
+  "candidate_CC": "0.3.5.70",
+  "guard_selection_before_execution": [
+    "fresh admission accepts only72/73 labels and CC70/71, rejects consumed70/71 labels",
+    "source gate accepts exacte410/current14+Astra and preservedold40; rejects changed source, checkpoint, review or historical receipt",
+    "live-run guard permits current selectedrun plus reviewed history; rejects other newer signingrun or missing currentrun",
+    "module verifier/archive select exactly4 generation cases, no13sweep",
+    "appended-job-only delta; original signer inline and all preceding jobs byteidentical"
+  ],
+  "host_guard_count": 13,
+  "host_guard_results": [
+    {
+      "case": "fresh_unique_pair_admitted",
+      "status": "PASS_INPUT_GUARD_ONLY"
+    },
+    {
+      "case": "consumed_internal_pair_refused",
+      "status": "REFUSED_AS_REQUIRED"
+    },
+    {
+      "case": "verifier_consumed_labels_refused",
+      "status": "REFUSED_AS_REQUIRED"
+    },
+    {
+      "case": "exact_e410_plus14_review_and_old40_admitted",
+      "status": "PASS_READ_ONLY_INPUT_GUARD"
+    },
+    {
+      "case": "changed_runtime_source_refused",
+      "status": "REFUSED_AS_REQUIRED"
+    },
+    {
+      "case": "changed_frozen_checkpoint_refused",
+      "status": "REFUSED_AS_REQUIRED"
+    },
+    {
+      "case": "review_receipt_mismatch_refused",
+      "status": "REFUSED_AS_REQUIRED"
+    },
+    {
+      "case": "historical40_drift_refused",
+      "status": "REFUSED_AS_REQUIRED"
+    },
+    {
+      "case": "current_run_plus_reviewed_history_admitted",
+      "status": "PASS_METADATA_GUARD"
+    },
+    {
+      "case": "other_later_signing_run_refused",
+      "status": "REFUSED_AS_REQUIRED"
+    },
+    {
+      "case": "missing_current_run_refused",
+      "status": "REFUSED_AS_REQUIRED"
+    },
+    {
+      "case": "only_selected_job_label_and_evidence_path_delta_original_signer_unchanged",
+      "status": "PASS_SOURCE_GUARD"
+    },
+    {
+      "case": "exact_four_generation_selection",
+      "status": "PASS_SOURCE_GUARD"
+    }
+  ],
+  "host_guard_status": "PASS_FOCUSED_MODIFIED_INPUT_GUARDS_ONLY",
+  "installed_target_versionCode": 2103469,
+  "installer_cases_executed": false,
+  "internal_input_directory_labels": [
+    2103472,
+    2103473
+  ],
+  "old40_receipts_unchanged": true,
+  "prepare_job_sha256": "fe5ef431eaa55a9428807750fa272aee05b25d3982ab5626b553f422cfe49c88",
+  "production_source": "e410f30ba9e38182e4e77810e5237e5442cbd31a",
+  "publication": false,
+  "recovery_CC": "0.3.5.71",
+  "reserved": false,
+  "retained_tracking13_receipt_sha256": "0dc8b126aca62d299df8038bb2bd023fb0524723ef9ea50f54a710892f8c6bfb",
+  "retained_watchlist13_receipt": "repairs/infinity-watchlist-playback-2103466-20261108/evidence/MODULE-UPGRADE-RECOVERY.json",
+  "selected_before_execution": true,
+  "selected_installer_cases": [
+    "signed69_to_tracking_complete80_and_data",
+    "same_candidate_idempotent_noop",
+    "forward_recovery_restores_exact69_functional80_and_data",
+    "older_candidate_retains_authenticated_recovery"
+  ],
+  "selected_tests_execution": "NOT_RUN_PENDING_ORIGINAL_SIGNATURES",
+  "selection_reason": "Only changed authenticated source generation and forward version inputs; unchanged Java refusal semantics retain historical13-case evidence. No new refusal selected.",
+  "shutdown": "NOT_SELECTED",
+  "source_and_review_sha256": {
+    "CURRENT-SOURCE-PROOF.json": "ab9e89a84fa441ed7e2c75d5c0d715bc799a10adbec403b977db84f9f72e4c7b",
+    "TV-IDENTITY-SAFETY-BRIDGE-HOST-RESULT.json": "5f7ee550b4ea03d4502e8a437d5fb6c6814c9edecd78901bd0551de522dea140",
+    "TV-IDENTITY-SAFETY-BRIDGE-REVIEW.json": "8f89b384b905de842598ed2b7328bfb3b9217f9824df986a4a0ae7c79a92ab78"
+  },
+  "source_checkpoint_sha256": {
+    "plugin.py": "580a2d7b25bc7a415c2db059fe1fa696808107a4f997a32d544baf2468a2877a",
+    "resume_hub.py": "807157626f817dd5375e0e60872b6cd351d33135a23c5a225f26c86a196e7ed5",
+    "service.py": "569fea31b465674b5e9fc357a895b0a00706df999c201246a33e8fcd00c9b669"
+  },
+  "status": "SELECTED_BEFORE_EXECUTION_PENDING_ORIGINAL_SIGNED_PAIR",
+  "tool_sha256": {
+    "prepare_tracking_release.py": "82bf0a9a713805fa20a9dab7931c4a4b88fc0adf1662823fef41c36e3b977652",
+    "tracking_module_fixture.py": "cea0fbfa0c11937671a9e943819d99192a6358ff689f082acd2bceafa5e9dbf2",
+    "verify_tracking_modules.py": "43c835e3ff0e5461d1e505be7fd1b6bbe98b982c3963aeccb0da7c3a16f08424"
+  },
+  "version_admission_sha256": "641ed2c46162477f34e47d1c0fa5f6e0587a7cbc4dc7cdd61db9c228cff9224d",
+  "version_issued": false,
+  "workflow_sha256": "dbb52096f211457eb7ffc1ef1779dec42a4d9b1e6c9398ff5379121dec4a679a"
+}

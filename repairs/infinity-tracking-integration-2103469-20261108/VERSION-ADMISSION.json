@@ -1,23 +1,41 @@
 {
-  "status": "CONFIRMED_UNUSED_FORWARD_PAIR",
-  "checked_at": "2026-11-09T01:10:08.480895+00:00",
-  "authority_source": "a76e29b84996304241e6b309d56a31e6659ad190",
-  "authority_sha256": "1d0cf9a80f2690d160acc5187e8ca9568245f7e2bebf59fdd4fe3b738db7b57b",
-  "generation": 56,
-  "latest_signed_versionCode": 2103469,
-  "candidate_versionCode": 2103470,
-  "recovery_versionCode": 2103471,
-  "candidate_CC": "0.3.5.68",
-  "recovery_CC": "0.3.5.69",
-  "reserved": false,
-  "latest_signed_run": 42514440156,
-  "protected69_ref": "locks/infinity-2103469-protected-recovery-20261108",
+  "APK_build": false,
+  "APK_present": false,
   "audit_basis": [
-    "Live authority ref at exacta76 generation56 candidate69, original69 signing run completed success with original workflow397702717",
-    "No matching70/71remoteheadortag refs",
-    "Available release list contains no70/71 APK; no signing claim based on display labels"
+    "Live authority and protected69 refs remain exacta76; live blob4905f8d3 matches immutable locala76 registry gen56,lastissued68,candidate69",
+    "Latest original workflow397 remains42555855742 signed internalCC68/69; actual latestAPK69 signing42514440156 retained",
+    "No matching72/73 head/tag refs observed; new pair skips prior signed internalCC68/69 and labels70/71",
+    "Fresh original-workflow run guard executes before credentials and blocks any unreviewed later original signing run; root rechecks prior to launch"
   ],
+  "authority_blob": "4905f8d31c9996bd1f8a93a4bf8a4347da71bd8d",
+  "authority_sha256": "1d0cf9a80f2690d160acc5187e8ca9568245f7e2bebf59fdd4fe3b738db7b57b",
+  "authority_source": "a76e29b84996304241e6b309d56a31e6659ad190",
+  "candidate_CC": "0.3.5.70",
+  "candidate_versionCode": 2103472,
+  "checked_at": "2026-11-09T08:18:35.630473+00:00",
+  "generation": 56,
+  "installed_target_versionCode": 2103469,
+  "latest_original_workflow_run": 42555855742,
+  "latest_signed_run": 42514440156,
+  "latest_signed_versionCode": 2103469,
+  "previous_internal_pair": {
+    "CC": [
+      "0.3.5.68",
+      "0.3.5.69"
+    ],
+    "input_directory_labels": [
+      2103470,
+      2103471
+    ],
+    "run": 42555855742
+  },
+  "protected69_ref": "locks/infinity-2103469-protected-recovery-20261108",
+  "publication": false,
   "recheck_required_before_keys": true,
-  "version_issued": false,
-  "publication": false
+  "recovery_CC": "0.3.5.71",
+  "recovery_versionCode": 2103473,
+  "reserved": false,
+  "status": "CONFIRMED_UNUSED_FORWARD_PAIR",
+  "versionCode_usage": "INTERNAL_INPUT_DIRECTORY_LABELS_ONLY_NOT_APK_ISSUANCE",
+  "version_issued": false
 }

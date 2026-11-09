@@ -25,6 +25,12 @@ CC = 'script.infinity.commandcenter'
 REQUEST = HERE / 'MODULE-REQUEST.json'
 SOURCES = ('plugin.py', 'resume_hub.py', 'service.py')
 REVIEWED = '2e52b7befd0228a09449f79eaf9774a3946dfa1c'
+PRODUCTION_SOURCE = 'e410f30ba9e38182e4e77810e5237e5442cbd31a'
+PRIOR_FIXTURE_SOURCE = '9d64ffb84404036ce6e02d6cb160fb004a029b33'
+PRIOR_FIXTURE_RUN = 42555855742
+SELECTION = ('signed69_to_tracking_complete80_and_data', 'same_candidate_idempotent_noop',
+             'forward_recovery_restores_exact69_functional80_and_data',
+             'older_candidate_retains_authenticated_recovery')
 SIGNED = dict(run=42514440156, source=AUTHORITY, id=13631340281,
     name='Infinity-Watchlist-Original-Signed-2103469-42514440156-INTERNAL-QA',
     digest='sha256:f9d054ee500326b77ee2bf4ce8673af2bd54c54115831899d374d931a98dff43', size_in_bytes=329126132)
@@ -60,6 +66,12 @@ def api(path):
     return json.loads(subprocess.check_output(['gh', 'api', 'repos/' + REPO + '/' + path], timeout=30))
 
 
+def check_fresh_runs(runs, current_run):
+    require(any(r['id'] == current_run for r in runs) and
+            all(r['id'] == current_run or r['id'] <= PRIOR_FIXTURE_RUN for r in runs),
+            'NO_UNREVIEWED_LATER_ORIGINAL_SIGNING_RUN')
+
+
 def check_sources():
     request = load(REQUEST)
     require(request['operation'] == 'prepare-authenticated-tracking80-internal-android-fixture' and
@@ -68,7 +80,10 @@ def check_sources():
     required_names = {'prepare_tracking_release.py', 'verify_tracking_modules.py', 'tracking_module_fixture.py',
         'MODULE-TEST-SELECTION.md', 'RELEASE-INPUT-SELECTION.json', 'VERSION-ADMISSION.json',
         'SCOPE.json', 'PROJECTION-HOST-RESULT.json', 'ACTUAL-SOURCE-HOST-RESULT.json',
-        'INTEGRATION-SOURCE-PROOF.json', 'evidence/api36-startup-pass-42542862696/EVIDENCE.json'}
+        'INTEGRATION-SOURCE-PROOF.json', 'evidence/api36-startup-pass-42542862696/EVIDENCE.json',
+        'CURRENT-INPUT-FIXTURE.json', 'CURRENT-SOURCE-PROOF.json',
+        'TV-IDENTITY-SAFETY-BRIDGE-HOST-RESULT.json', 'TV-IDENTITY-SAFETY-BRIDGE-REVIEW.json',
+        'evidence/signed-tracking80-42555855742/MODULE-UPGRADE-RECOVERY.json'}
     required_names |= {'overlay/' + CC + '/' + name for name in SOURCES}
     require(set(request['source_bindings']) == {HERE.relative_to(ROOT).as_posix() + '/' + name for name in required_names},
             'EXACT_MANDATORY_SOURCE_BINDING_SET')
@@ -84,15 +99,30 @@ def check_sources():
         p = Path(name)
         require(not p.is_absolute() and '..' not in p.parts and sha(ROOT / p) == expected, 'FROZEN_REVIEWED_INPUT:' + name)
     require(sha(ROOT / WORKFLOW) == request['workflow_sha256'], 'SOURCE_BOUND_ORIGINAL_WORKFLOW_ADDITION')
-    for name in [*('overlay/' + CC + '/' + n for n in SOURCES), 'SCOPE.json',
+    for name in ['SCOPE.json',
                  'PROJECTION-HOST-RESULT.json', 'ACTUAL-SOURCE-HOST-RESULT.json', 'INTEGRATION-SOURCE-PROOF.json']:
         path = HERE / name
         require(path.read_bytes() == git('show', REVIEWED + ':' + path.relative_to(ROOT).as_posix()),
                 'UNCHANGED_REVIEWED_TRACKING_SOURCE_OR_EVIDENCE:' + name)
+    for name in [*('overlay/' + CC + '/' + n for n in SOURCES), 'CURRENT-SOURCE-PROOF.json',
+                 'TV-IDENTITY-SAFETY-BRIDGE-HOST-RESULT.json', 'TV-IDENTITY-SAFETY-BRIDGE-REVIEW.json']:
+        path = HERE / name
+        require(path.read_bytes() == git('show', PRODUCTION_SOURCE + ':' + path.relative_to(ROOT).as_posix()),
+                'UNCHANGED_E410_REVIEWED_BRIDGE_SOURCE_OR_EVIDENCE:' + name)
+    selection = load(HERE / 'CURRENT-INPUT-FIXTURE.json')
+    require(selection['production_source'] == PRODUCTION_SOURCE and tuple(selection['selected_installer_cases']) == SELECTION and
+            selection['APK_build'] is False and selection['reserved'] is False, 'EXACT_FOUR_CASE_INTERNAL_FIXTURE_SELECTION')
+    prior = HERE / 'evidence/signed-tracking80-42555855742/MODULE-UPGRADE-RECOVERY.json'
+    require(prior.read_bytes() == git('show', PRODUCTION_SOURCE + ':' + prior.relative_to(ROOT).as_posix()) and
+            sha(prior) == selection['retained_tracking13_receipt_sha256'], 'RETAINED_TRACKING13_RECEIPT')
     live = api('git/ref/heads/work/infinity-2103460-nine-corrections-20261106')
     require(live['object']['sha'] == AUTHORITY, 'LIVE_VERSION_AUTHORITY_ADVANCED')
     lock = api('git/ref/heads/locks/infinity-2103469-protected-recovery-20261108')
     require(lock['object']['sha'] == AUTHORITY, 'PROTECTED69_LOCK_CHANGED')
+    live_authority = api('contents/repairs/dual-experience-isolation-2103420/release-authority.json?ref=' + AUTHORITY)
+    require(live_authority['sha'] == '4905f8d31c9996bd1f8a93a4bf8a4347da71bd8d', 'UNCHANGED_LIVE_AUTHORITY_BLOB')
+    runs = api('actions/workflows/397702717/runs?per_page=10')['workflow_runs']
+    check_fresh_runs(runs, int(os.environ['GITHUB_RUN_ID']))
     prior = git('show', AUTHORITY + ':' + WORKFLOW).decode()
     actual = (ROOT / WORKFLOW).read_text()
     expected = prior.replace('publish-watchlist]', 'publish-watchlist, prepare-tracking-modules]', 1)
@@ -175,6 +205,8 @@ def frozen(out, signed=False):
             'EXACT_PREFLIGHT_SOURCE_AND_ORIGINAL_TOOLS')
     require(p.source_inputs()[1] == pins['overlay_sha256'] and sha(pair / 'VERSION-ADMISSION.json') == pins['version_admission_sha256'],
             'FROZEN_RUNTIME_AND_UNUSED_VERSION_ADMISSION')
+    require(pins['production_source'] == PRODUCTION_SOURCE and
+            pins['installer_selection_sha256'] == sha(HERE / 'CURRENT-INPUT-FIXTURE.json'), 'FROZEN_SELECTED_CURRENT_GENERATION')
     roots = []
     for version, cc in p.admission(pair / 'VERSION-ADMISSION.json'):
         work = pair / str(version)
@@ -197,7 +229,9 @@ def frozen(out, signed=False):
 def archive(out):
     p, roots = frozen(out, signed=True)
     audit = load(out / 'module-audit/MODULE-UPGRADE-RECOVERY.json')
-    require(audit['complete80_signatures_verified'] and len(audit['cases']) == 13 and
+    require(audit['status'] == 'PASS_FOUR_REAL_JAVA_CURRENT80_GENERATION_CASES' and
+            audit['complete80_signatures_verified'] and tuple(r['case'] for r in audit['cases']) == SELECTION and
+            audit['selected_tests_sha256'] == sha(HERE / 'CURRENT-INPUT-FIXTURE.json') and
             audit['verifier_sha256'] == sha(HERE / 'verify_tracking_modules.py') and
             audit['source_pins_sha256'] == sha(out / 'pair/SOURCE-PINS.json'), 'ACTUAL_SELECTED_INSTALLER_CASES_REQUIRED')
     dest = out / 'publish'
@@ -214,11 +248,14 @@ def archive(out):
                     info = ZipInfo(path.relative_to(root).as_posix(), date_time=(2026,11,9,0,0,0))
                     info.compress_type = ZIP_DEFLATED
                     z.writestr(info, path.read_bytes())
-        reports.append(dict(CC=metadata['CC'], archive=target.name, sha256=sha(target), recovery=metadata['recovery']))
+        reports.append(dict(CC=metadata['CC'], archive=target.name, sha256=sha(target), recovery=metadata['recovery'],
+                            versionCode=metadata['versionCode'],
+                            modules_path='pair/' + str(metadata['versionCode']) + '/modules'))
     save(dest / 'MODULE-FIXTURE.json', dict(status='ORIGINAL_KEY_SIGNED_INTERNAL_MODULE_FIXTURE_NOT_RELEASE_ACCEPTANCE',
          source=os.environ['GITHUB_SHA'], run_id=int(os.environ['GITHUB_RUN_ID']), fixture_packages=reports,
+         production_source=PRODUCTION_SOURCE, installed_target_versionCode=2103469,
          source_pins_sha256=sha(out / 'pair/SOURCE-PINS.json'), original80_source_signatures=True,
-         APK_build=False, APK_signing=False, registry_mutated=False, publication=False,
+         APK_build=False, APK_present=False, APK_signing=False, registry_mutated=False, publication=False,
          Android='NOT_RUN', Fold='NOT_RUN', release_acceptance=False))
 
 

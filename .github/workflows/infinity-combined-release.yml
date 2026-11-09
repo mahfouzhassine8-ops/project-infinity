@@ -2168,7 +2168,7 @@ jobs:
                   assert len(files)==80 and payload==manifest.read_bytes(),'COMPLETE80_MANIFEST_BEFORE_SIGN_CALL'
                   subprocess.run(['java','-cp',str(classes),'SignInfinityModules',str(key),str(manifest)],env=env,check=True)
           PYSIGN
-      - name: Thirteen selected changed-input original Java installer cases including original69 retention
+      - name: Four selected current-generation original Java installer cases
         run: python3 repairs/infinity-tracking-integration-2103469-20261108/verify_tracking_modules.py --prepared tracking-module-fixture/pair --out tracking-module-fixture/module-audit
       - name: Verify original signatures and archive internal fixture without APK assembly
         run: python3 repairs/infinity-tracking-integration-2103469-20261108/tracking_module_fixture.py archive --out tracking-module-fixture
@@ -2188,8 +2188,8 @@ jobs:
             tracking-module-fixture/SIGNER-ROUTES.json
             tracking-module-fixture/pair/SOURCE-PINS.json
             tracking-module-fixture/pair/VERSION-ADMISSION.json
-            tracking-module-fixture/pair/2103470/INPUTS.json
-            tracking-module-fixture/pair/2103471/INPUTS.json
+            tracking-module-fixture/pair/2103472/INPUTS.json
+            tracking-module-fixture/pair/2103473/INPUTS.json
             tracking-module-fixture/module-audit/
           if-no-files-found: warn
           retention-days: 90

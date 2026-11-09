@@ -29,6 +29,8 @@ BASE_APK = '804eebc57af2e4ef4e5418b56994bda64eb7fd7e7f2c0653b5c6e2a9f7833058'
 BASE_NATIVE = 'ee3be7c7a95b86f8357539001fcd50bedbd80217b02f130d649f7f57e6075794'
 BASE_MANIFEST_SHA = '6fb82d58f2488a2eac23d2f0aa0e8a4eaa600f5fcf35901a24445b32beb852d2'
 PREPARED_SOURCE = 'a56ef7d9e96146a167afe84e5a8a6fcf904f40cb'
+PRODUCTION_SOURCE = 'e410f30ba9e38182e4e77810e5237e5442cbd31a'
+ORIGINAL_REVIEWED = '2e52b7befd0228a09449f79eaf9774a3946dfa1c'
 CC = 'script.infinity.commandcenter'
 MANIFEST = 'INFINITY-MODULES.v1'
 PYTHON = {'plugin.py', 'resume_hub.py', 'service.py'}
@@ -36,6 +38,8 @@ NATIVE = 'lib/arm64-v8a/libkodi.so'
 LABEL = 'assets/experience-component-updates.properties'
 PREFIX = 'assets/addons/' + CC + '/'
 HOST_EVIDENCE = ('INTEGRATION-SOURCE-PROOF.json', 'ACTUAL-SOURCE-HOST-RESULT.json', 'PROJECTION-HOST-RESULT.json')
+CURRENT_EVIDENCE = ('CURRENT-SOURCE-PROOF.json', 'TV-IDENTITY-SAFETY-BRIDGE-HOST-RESULT.json',
+                    'TV-IDENTITY-SAFETY-BRIDGE-REVIEW.json')
 
 
 def require(value, label):
@@ -104,19 +108,41 @@ def verify_signature(modules):
 def admission(path):
     a = load(path)
     expected = dict(status='CONFIRMED_UNUSED_FORWARD_PAIR', authority_source=BASE_SOURCE, generation=56,
-                    latest_signed_versionCode=2103469, candidate_versionCode=2103470, recovery_versionCode=2103471,
-                    candidate_CC='0.3.5.68', recovery_CC='0.3.5.69', reserved=False)
+                    latest_signed_versionCode=2103469, candidate_versionCode=2103472, recovery_versionCode=2103473,
+                    candidate_CC='0.3.5.70', recovery_CC='0.3.5.71', reserved=False,
+                    APK_build=False, version_issued=False, publication=False)
     require(all(type(a.get(k)) is type(v) and a[k] == v for k, v in expected.items()), 'ROOT_CONFIRMED_UNUSED_FORWARD_PAIR_REQUIRED')
     return [(a['candidate_versionCode'], a['candidate_CC']), (a['recovery_versionCode'], a['recovery_CC'])]
 
 
 def source_inputs():
-    proof = load(HERE / 'INTEGRATION-SOURCE-PROOF.json')
-    require(proof['status'] == 'PASS_SCOPED_SOURCE_PRESERVATION_NOT_ANDROID' and
-            proof['protected_APK_SHA256'] == BASE_APK and set(proof['files']) == PYTHON, 'EXACT_THREE_SOURCE_PRESERVATION_PROOF')
+    for name in HOST_EVIDENCE:
+        path = HERE / name
+        require(path.read_bytes() == git('show', ORIGINAL_REVIEWED + ':' + path.relative_to(ROOT).as_posix()),
+                'UNCHANGED_ORIGINAL40_SOURCE_EVIDENCE:' + name)
+    for name in CURRENT_EVIDENCE:
+        path = HERE / name
+        require(path.read_bytes() == git('show', PRODUCTION_SOURCE + ':' + path.relative_to(ROOT).as_posix()),
+                'EXACT_REVIEWED_BRIDGE_EVIDENCE:' + name)
+    original = load(HERE / 'INTEGRATION-SOURCE-PROOF.json')
+    proof = load(HERE / 'CURRENT-SOURCE-PROOF.json')
+    require(original['protected_APK_SHA256'] == BASE_APK and set(original['files']) == PYTHON and
+            proof['original40_receipts_preserved'] is True and
+            proof['original_integration_proof_sha256'] == file_sha(HERE / 'INTEGRATION-SOURCE-PROOF.json') and
+            set(proof['current3source_sha256']) == PYTHON, 'EXACT_THREE_SOURCE_PRESERVATION_PROOF')
     overlay = HERE / 'overlay' / CC
     actual = {name: file_sha(overlay / name) for name in PYTHON}
-    require(actual == {name: row['overlay_sha256'] for name, row in proof['files'].items()}, 'FROZEN_THREE_PYTHON_SOURCE_HASHES')
+    require(actual == proof['current3source_sha256'], 'FROZEN_THREE_PYTHON_SOURCE_HASHES')
+    for name, wanted in actual.items():
+        path = (overlay / name).relative_to(ROOT).as_posix()
+        require(digest(git('show', PRODUCTION_SOURCE + ':' + path)) == wanted, 'EXACT_E410_PRODUCTION_SOURCE:' + name)
+    host = load(HERE / CURRENT_EVIDENCE[1])
+    review = load(HERE / CURRENT_EVIDENCE[2])
+    require(host['status'] == 'PASS_FOCUSED_HOST_UNNUMBERED_EPISODE_LIST_BRIDGE' and host['tests_passed'] == 14 and
+            file_sha(HERE / CURRENT_EVIDENCE[1]) == proof['new_host_cases']['receipt'] == review['host_receipt_sha256'] and
+            file_sha(HERE / CURRENT_EVIDENCE[2]) == proof['independent_review'] and
+            review['status'] == 'ACCEPTED_INDEPENDENT_BOUNDED_BRIDGE_SOURCE_REVIEW_ONLY' and
+            review['source_sha256'] == actual and review['host_tests'] == 14, 'SOURCE_BOUND14_HOST_AND_ASTRA_REVIEW')
     # Only these explicit files are copied. Host __pycache__ files are never payload inputs.
     return proof, actual
 
@@ -242,8 +268,10 @@ def inputs(apk, prepared, admission_file, out):
          baseline_preparation_sha256=file_sha(prepared / 'PREPARATION.json'),
          baseline_components_sha256=hashes(prepared / 'components'),
          input_metadata_sha256=metadata, version_admission_sha256=file_sha(admission_file),
-         source_preservation_sha256=file_sha(HERE / 'INTEGRATION-SOURCE-PROOF.json'),
-         host_evidence_sha256={name: file_sha(HERE / name) for name in HOST_EVIDENCE},
+         source_preservation_sha256=file_sha(HERE / 'CURRENT-SOURCE-PROOF.json'),
+         production_source=PRODUCTION_SOURCE,
+         host_evidence_sha256={name: file_sha(HERE / name) for name in (*HOST_EVIDENCE, *CURRENT_EVIDENCE)},
+         installer_selection_sha256=file_sha(HERE / 'CURRENT-INPUT-FIXTURE.json'),
          native_sha256=BASE_NATIVE, APK_produced=False, registry_mutated=False,
          signing='PENDING_EXISTING_ORIGINAL_SIGNER', Android='NOT_RUN', public_release=False))
 
