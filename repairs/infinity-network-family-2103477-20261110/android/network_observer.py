@@ -177,10 +177,10 @@ def action(request):
     if name == 'focus_hub':
         xbmc.executebuiltin('ActivateWindow(1191)')
         for _ in range(30):
-            if xbmcgui.getCurrentWindowDialogId() == 1191:
+            if xbmcgui.getCurrentWindowDialogId() == 11191:
                 break
             xbmc.sleep(100)
-        window = xbmcgui.Window(1191)
+        window = xbmcgui.Window(11191)
         window.setFocusId(1191105)
         return dict(window=xbmcgui.getCurrentWindowDialogId(), focus=window.getFocusId(),
                     label=window.getControl(1191105).getLabel())

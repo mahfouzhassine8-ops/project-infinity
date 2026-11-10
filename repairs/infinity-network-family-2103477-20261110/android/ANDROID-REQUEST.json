@@ -31,15 +31,44 @@
     }
   },
   "build_sign": false,
+  "executed_versions": [
+    2103478,
+    2103479
+  ],
   "inherited_DNS_hard_deadline": "HISTORICAL_FAIL_NOT_RELABELLED_PASS;OWNER_APPROVED_BASELINE_EQUIVALENCE",
   "operation": "verify-original77-network78-recovery79",
   "physical_Fold": "PENDING_OWNER_FINAL_ACCEPTANCE",
   "publication": false,
+  "reused_verification": {
+    "APK_rebuild": false,
+    "active_candidate_skin": "1.0.5.271",
+    "artifact": {
+      "digest": "sha256:0fc31dc13d1176183c22c14d11f36a21973863d504249b8c4455960213257e89",
+      "id": 13742200977,
+      "size_in_bytes": 1778294
+    },
+    "candidate78_started_and_authenticated_all81": true,
+    "correction": "TEST_ONLY_Window1191_to11191;production dispatch ActivateWindow1191 unchanged",
+    "network_functional_cases": "NOT_RUN",
+    "not_a_production_Window_id_exception": true,
+    "original77_started_and_authenticated": true,
+    "original_signed77_to78_package_and_profile_checks_reached_and_passed": true,
+    "outcome": "BLOCKED_TEST_OBSERVER_WRONG_RUNTIME_WINDOW_ID",
+    "recovery79": "NOT_RUN",
+    "run": 42768544753,
+    "source": "c071d3760567924cbfb5cccca9afcde97b7b120d",
+    "workflow": 393886994
+  },
   "shutdown_tests": false,
   "source_bindings": {
     ".github/workflows/infinity-saved-navigation-android.yml": "e7131c0bb30ea79fd3b13b52d7b41206dd0f4111899fde25cf7cf47e92901186",
-    "repairs/infinity-network-family-2103477-20261110/android/network_observer.py": "04066913446777e39dee68436bff82d2103b4da4c852ac1200815a6e59eb4e05",
-    "repairs/infinity-network-family-2103477-20261110/android/verify_android.py": "0fe58a90ffe4738d8f0986e078e1f11bb28fe701259fcd9c41b76c65e8c70134",
+    "repairs/infinity-network-family-2103477-20261110/android/network_observer.py": "330af40d3a67fca0ea019f61e155cbe669086ba22266b324b545cc7190d721dd",
+    "repairs/infinity-network-family-2103477-20261110/android/verify_android.py": "82b48c9140c43a510ebb85e9586266db683683168ab9817478c9aaa474d2a63c",
+    "repairs/infinity-network-family-2103477-20261110/evidence/android-42768544753/ANDROID-NETWORK-VERIFICATION.json": "5bed69e135387161ceb91c750612e9d69c1232f637d6bd1a019a8f8559a30009",
+    "repairs/infinity-network-family-2103477-20261110/evidence/android-42768544753/ARTIFACT-AND-REUSE.json": "78a384b61eeeceec9072c1099b2d49faf770c0e947894a4a2cd1c39fb1725159",
+    "repairs/infinity-network-family-2103477-20261110/evidence/android-42768544753/NETWORK78-ACTIVE-IDENTITY.json": "ae35d85713d8b18169ed060a2ef00b31d5cd7d364cfb22eefabc53f091b01419",
+    "repairs/infinity-network-family-2103477-20261110/evidence/android-42768544753/ORIGINAL77-ACTIVE-IDENTITY.json": "43edec3abc6df4137dff4fb63e5f3281e577de2f23c50c6bba6d1036bc337d50",
+    "repairs/infinity-network-family-2103477-20261110/evidence/android-42768544753/SYSTEM-HUB-WINDOW-EVIDENCE.txt": "f62d35a425b6763d036a75dba64742519972b09d7248bd5ebb84bbb085533c02",
     "repairs/infinity-network-family-2103477-20261110/release/DNS-CONTRACT-OWNER-APPROVAL.json": "88bd8e9961809fddd342b37a82ef75fe792e8ad118465489e41b2bc50426b134",
     "repairs/infinity-network-family-2103477-20261110/release/SIGNED-CANDIDATE-PIN.json": "1c7e996043e43c8a8191bf0750498912ab72334237ff1f0a0db476be41e86064",
     "repairs/infinity-network-family-2103477-20261110/release/SIGNED-RECOVERY-PIN.json": "dc31062d8cbc3e3784a5e41ce32df093dfc75e9ea4735e0db0047af9a2adbad9",

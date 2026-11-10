@@ -182,7 +182,7 @@ def admit(out, sdk):
 
 def select_mode(device, observer, mode):
     hub = observer.call('focus_hub')
-    require(hub == dict(window=1191, focus=1191105, label='NETWORK CONNECTIONS'), 'ACTUAL_HUB_NETWORK_CONTROL')
+    require(hub == dict(window=11191, focus=1191105, label='NETWORK CONNECTIONS'), 'ACTUAL_HUB_NETWORK_CONTROL')
     device.rpc('Input.Select')
     wanted = {'auto': 'Automatic (Default)', 'ipv4': 'IPv4 Only', 'ipv6': 'IPv6 Only'}[mode]
     popup = native.until(device, lambda: (p if (p := observer.call('popup')).get('title') == 'Network Connections' else None),
@@ -285,7 +285,17 @@ def checks(device, observer, out):
     started = time.monotonic()
     observer.call('stop')
     stopped = native.until(device, lambda: (p if not (p := observer.call('playing'))['playing'] else None), 'Stop while transport fixture delayed', 15)
+    cancelled_event_floor = len(stopped['events'])
+    grace = []
+    # Let the bounded fixture delay expire: no delayed playback may start after Stop.
+    for _ in range(9):
+        time.sleep(1)
+        current = observer.call('playing')
+        require(not current['playing'] and not any(e['event'] == 'AVStarted' for e in current['events'][cancelled_event_floor:]),
+                'CANCELLED_PENDING_PLAYBACK_MUST_NOT_START_LATER')
+        grace.append(current)
     report['cancellation'] = dict(status='PASS_OBSERVED_PLAYER_STOP_ONLY', seconds=time.monotonic()-started, delayed=delayed, stopped=stopped,
+                                 after_fixture_delay=grace,
                                  specific_CurlFile_Cancel_callback='NOT_CLAIMED_WITHOUT_NATIVE_TRACE')
     select_mode(device, observer, 'ipv6')
     layouts = []
@@ -329,9 +339,12 @@ def run(inputs, sdk, out):
         reader = base.start_lifecycle_log(device, out)
         device.adb('forward', 'tcp:19090', 'tcp:9090')
         uid, sentinel = None, None
-        for version in VERSIONS:
+        executed = tuple(selected['executed_versions'])
+        require(executed == (2103478, 2103479), 'REUSE_VERIFIED77_START_AND_UPGRADE;RUN_UNREACHED_NETWORK_AND_RECOVERY')
+        report['reused_verification'] = selected['reused_verification']
+        for version in executed:
             phase = out / str(version); phase.mkdir()
-            if version != VERSIONS[0]:
+            if version != executed[0]:
                 # Package update naturally restarts process; not shutdown qualification.
                 device.shell('am', 'force-stop', base.PACKAGE)
                 require(not device.pids(), 'STOP_ONLY_FOR_SELECTED_PACKAGE_UPDATE')
@@ -341,7 +354,7 @@ def run(inputs, sdk, out):
             uid = observation['uid']
             if sentinel:
                 require(device.shell('sha256sum', sentinel['remote']).split()[0] == sentinel['sha256'], 'USERDATA_SENTINEL_RETAINED')
-            if version == VERSIONS[0]:
+            if version == executed[0]:
                 device.shell('mkdir', '-p', base.PROFILE, REMOTE)
                 settings = out / 'guisettings.xml'
                 settings.write_text('<settings version="2"><setting id="lookandfeel.skin">skin.infinity.diggz</setting>'
@@ -365,13 +378,16 @@ def run(inputs, sdk, out):
                 device.shell('chown', '-R', str(uid)+':'+str(uid), '/data/media/0/Android/data/'+base.PACKAGE)
                 device.shell('restorecon', '-RF', '/data/media/0/Android/data/'+base.PACKAGE)
             start = base.start_once(device, version, phase)
-            if version == VERSIONS[0]:
+            if version == executed[0]:
                 native.install_zip(device, staged['qa'], dict(remote_zip_directory=REMOTE), phase, 'network-observer')
             observer = Observer(device, phase)
             active = identity(observer, version)
             record = dict(install=observation, startup=start, active_identity=active)
+            report['versions'][str(version)] = record
+            base.save(out / 'ANDROID-NETWORK-VERIFICATION.json', report)
             if version == 2103478:
                 record['network'] = checks(device, observer, phase)
+                device.adb('pull', base.HOME + '/temp/kodi.log', phase / 'NETWORK-CHECKS-kodi.log', check=False)
                 observer.call('close')
                 # One selected setting-persistence restart, not a shutdown test.
                 device.shell('am', 'force-stop', base.PACKAGE)
@@ -388,6 +404,7 @@ def run(inputs, sdk, out):
                 record['recovery'] = dict(status='PASS_ORIGINAL_FUNCTIONALITY_HIGHER_METADATA', inactive_extra_helper_may_remain=True)
             observer.call('close')
             device.screenshot('version-' + str(version))
+            device.adb('pull', base.HOME + '/temp/kodi.log', phase / 'PHASE-END-kodi.log', check=False)
             base.crash_free_alive(device)
             report['versions'][str(version)] = record
             base.save(out / 'ANDROID-NETWORK-VERIFICATION.json', report)
