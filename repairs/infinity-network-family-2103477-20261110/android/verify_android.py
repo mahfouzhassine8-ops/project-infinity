@@ -289,6 +289,7 @@ def checks(device, observer, out):
     started = time.monotonic()
     observer.call('stop')
     stopped = native.until(device, lambda: (p if not (p := observer.call('playing'))['playing'] else None), 'Stop while transport fixture delayed', 15)
+    stop_seconds = time.monotonic() - started
     cancelled_event_floor = len(stopped['events'])
     grace = []
     # Let the bounded fixture delay expire: no delayed playback may start after Stop.
@@ -298,8 +299,9 @@ def checks(device, observer, out):
         require(not current['playing'] and not any(e['event'] == 'AVStarted' for e in current['events'][cancelled_event_floor:]),
                 'CANCELLED_PENDING_PLAYBACK_MUST_NOT_START_LATER')
         grace.append(current)
-    report['cancellation'] = dict(status='PASS_OBSERVED_PLAYER_STOP_ONLY', seconds=time.monotonic()-started, delayed=delayed, stopped=stopped,
+    report['cancellation'] = dict(status='PASS_OBSERVED_PLAYER_STOP_ONLY', seconds=stop_seconds, delayed=delayed, stopped=stopped,
                                  after_fixture_delay=grace,
+                                 observation_grace_seconds=time.monotonic()-started-stop_seconds,
                                  specific_CurlFile_Cancel_callback='NOT_CLAIMED_WITHOUT_NATIVE_TRACE')
     select_mode(device, observer, 'ipv6')
     layouts = []
