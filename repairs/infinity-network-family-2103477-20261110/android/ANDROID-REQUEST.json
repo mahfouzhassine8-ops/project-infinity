@@ -1,0 +1,60 @@
+{
+  "APK_sha256": {
+    "2103477": "93eb081cd6a86ff9cf1cb9aa75bc6d9087cd9c982fb46e0a9baa12c12aa9af22",
+    "2103478": "787df8f3e851a9af99c299cecc65f2acacae0321294ceedd6c0e56dbb3d748fd",
+    "2103479": "7f466d83b84a8078c1004d1595267ddb34ac830eeb6ca4e9d98a0c0605a2c6e7"
+  },
+  "artifacts": {
+    "2103477": {
+      "digest": "sha256:722320ab0780b4bb96c5282e12e211f3ce6ce6d78aa09891730dbe0414ba1c78",
+      "id": 13721668270,
+      "name": "Infinity2103477-Exact74-OriginalSigned-ExperimentalRetest-42724088145",
+      "run": 42724088145,
+      "size_in_bytes": 328333278,
+      "source": "80f9c78e5c133ef63abe95af359c3e4e7366153f"
+    },
+    "2103478": {
+      "digest": "sha256:e914b643de596f3efbe292b710867ad1b9c62c439d3c1e29e50117a1d962a40b",
+      "id": 13739504756,
+      "name": "Infinity-Network-Original-Signed-2103478-42766730356-INTERNAL-QA-NOT-ACCEPTED",
+      "run": 42766730356,
+      "size_in_bytes": 328357083,
+      "source": "80b7f9e6010f607e1779bb6979d65b8754cd1948"
+    },
+    "2103479": {
+      "digest": "sha256:cf6b7938c066677f927b17583ff96bb24f7b92b5014a28ab63b8cfd6dbf78475",
+      "id": 13740388061,
+      "name": "Infinity-Network-Original-Signed-2103479-42767681923-INTERNAL-QA-NOT-ACCEPTED",
+      "run": 42767681923,
+      "size_in_bytes": 328346790,
+      "source": "1b6897546d16bc5e074675b3fb9f2b3a683fa2d2"
+    }
+  },
+  "build_sign": false,
+  "inherited_DNS_hard_deadline": "HISTORICAL_FAIL_NOT_RELABELLED_PASS;OWNER_APPROVED_BASELINE_EQUIVALENCE",
+  "operation": "verify-original77-network78-recovery79",
+  "physical_Fold": "PENDING_OWNER_FINAL_ACCEPTANCE",
+  "publication": false,
+  "shutdown_tests": false,
+  "source_bindings": {
+    ".github/workflows/infinity-saved-navigation-android.yml": "e7131c0bb30ea79fd3b13b52d7b41206dd0f4111899fde25cf7cf47e92901186",
+    "repairs/infinity-network-family-2103477-20261110/android/network_observer.py": "04066913446777e39dee68436bff82d2103b4da4c852ac1200815a6e59eb4e05",
+    "repairs/infinity-network-family-2103477-20261110/android/verify_android.py": "0fe58a90ffe4738d8f0986e078e1f11bb28fe701259fcd9c41b76c65e8c70134",
+    "repairs/infinity-network-family-2103477-20261110/release/DNS-CONTRACT-OWNER-APPROVAL.json": "88bd8e9961809fddd342b37a82ef75fe792e8ad118465489e41b2bc50426b134",
+    "repairs/infinity-network-family-2103477-20261110/release/SIGNED-CANDIDATE-PIN.json": "1c7e996043e43c8a8191bf0750498912ab72334237ff1f0a0db476be41e86064",
+    "repairs/infinity-network-family-2103477-20261110/release/SIGNED-RECOVERY-PIN.json": "dc31062d8cbc3e3784a5e41ce32df093dfc75e9ea4735e0db0047af9a2adbad9",
+    "repairs/infinity-network-family-2103477-20261110/release/prepare_apk.py": "b960d04d7383e8bd7e4a77b0942cd30f69d0df51987ee353fc67e30ef51599f4",
+    "repairs/infinity-network-family-2103477-20261110/release/prepare_modules.py": "071097dca7be3710c63ef5df090ee7aff8a5b2e2d82daa5e3c3bbded87c6da17",
+    "repairs/infinity-tracking-integration-2103469-20261108/prepare_tracking_release.py": "49c4d49bd679b2dd2ae2819ab45b8a673d4b362f80fc30090223553d3abc9e0b",
+    "repairs/infinity-tracking-integration-2103469-20261108/qualify_android_baseline.py": "9b4cf409c35688a77e94849361aff510b6b896871314b32b15cc5844b4e23734",
+    "repairs/infinity-tracking-integration-2103469-20261108/stage_tracking_android.py": "d5d2e8e99721a576e6e52611fa9f0ca8a02a9c89f639f6fe99ba90db020323b8",
+    "repairs/infinity-tracking-integration-2103469-20261108/tracking_module_fixture.py": "af14da368c555a5d9d0862aa1c1f490bfcf64d389026cb82092261d39ce3ecdb",
+    "repairs/infinity-tracking-integration-2103469-20261108/verify_tracking_android.py": "04e736720a44f6a56d99132cce24498c32311ab8df728d8305284a28d4e10315",
+    "repairs/infinity-tracking-integration-2103469-20261108/verify_tracking_install.py": "ed500734e7c851e4ac157d33b56c3cf1c1cd1ba72117fc470a800f96181265c1"
+  },
+  "unsupported_transports": [
+    "Independent Python requests/urllib",
+    "Direct FFmpeg networking",
+    "Independent inputstream networking"
+  ]
+}

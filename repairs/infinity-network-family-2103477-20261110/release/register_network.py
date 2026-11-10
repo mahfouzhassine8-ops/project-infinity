@@ -100,7 +100,7 @@ def sources():
                               prep.sha((prep.HERE/'SIGN-REQUEST.json').read_bytes())})
 
 
-def issued_candidate():
+def issued_candidate(prepared=None):
     """Authenticate the actual original-signed predecessor, not just a green run."""
     signed=load(prep.HERE/'SIGNED-CANDIDATE-PIN.json')
     assert signed['version']==2103478
@@ -109,7 +109,23 @@ def issued_candidate():
     spec=importlib.util.spec_from_file_location('original_signed78_receipt_intake',helper)
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
     with tempfile.TemporaryDirectory(prefix='network-original-signed78-') as tmp:
-        root=module.download(dict(signed['artifact'],run=signed['run'],source=signed['source']),Path(tmp)/'input')
+        if prepared is None:
+            root=module.download(dict(signed['artifact'],run=signed['run'],source=signed['source']),Path(tmp)/'input')
+        else:
+            # Reuse a retained download, with the same live provenance and whole-ZIP checks.
+            row=dict(signed['artifact'],run=signed['run'],source=signed['source'])
+            run=module.api('actions/runs/'+str(row['run']))
+            assert run['workflow_id']==397702717 and run['path']==module.WORKFLOW and run['head_sha']==row['source'] and run['status']=='completed' and run['conclusion']=='success'
+            meta=module.api('actions/artifacts/'+str(row['id']))
+            assert not meta['expired'] and meta['workflow_run']['id']==row['run'] and all(meta[k]==row[k] for k in ('id','name','digest','size_in_bytes'))
+            archive=prepared.parent/'artifact.zip'
+            assert archive.stat().st_size==row['size_in_bytes'] and 'sha256:'+prep.sha(archive.read_bytes())==row['digest']
+            # Read the checked archive itself; a retained extraction alone is not authority.
+            from zipfile import ZipFile
+            with ZipFile(archive) as z:
+                for name in ('BUILD-RECEIPT.json','SIGNATURE.txt','SIGNED-77-PRESERVATION.json','Infinity-2103478-Combined-Original-Signer.apk'):
+                    assert z.read(name)==(prepared/name).read_bytes(),name
+            root=prepared
         receipt=load(root/'BUILD-RECEIPT.json')
         assert receipt['versionCode']==2103478 and receipt['source']==signed['source']
         assert receipt['certificate_sha256']=='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
@@ -124,14 +140,14 @@ def issued_candidate():
     return signed
 
 
-def propose(prepared, version, previous, out):
+def propose(prepared, version, previous, out, predecessor=None):
     t,a,recipe,pin,row,proof,catalog,metas=intake(prepared,version)
     before=load(previous)
     if version==2103478:
         assert before==json.loads(git('show',CANONICAL+':'+AUTHORITY)), 'EXACT_LAST_CANONICAL75_PREDECESSOR'
         last_issued=2103477
     else:
-        signed=issued_candidate()
+        signed=issued_candidate(predecessor)
         assert before==json.loads(git('show',signed['source']+':'+AUTHORITY))
         assert before['generation']==60 and before['candidate_versionCode']==2103478
         last_issued=2103478
@@ -192,8 +208,9 @@ if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('operation',choices=['download','baseline','propose','check'])
     p.add_argument('--version',type=int);p.add_argument('--out',type=Path,required=True)
     p.add_argument('--prepared',type=Path);p.add_argument('--previous',type=Path)
+    p.add_argument('--predecessor',type=Path)
     args=p.parse_args()
     if args.operation=='baseline':baseline(args.out)
     elif args.operation=='download':download(args.version,args.out)
-    elif args.operation=='propose':propose(args.prepared,args.version,args.previous,args.out)
+    elif args.operation=='propose':propose(args.prepared,args.version,args.previous,args.out,args.predecessor)
     else:check_registered(args.prepared,args.version,args.out)
