@@ -1,0 +1,46 @@
+--------- beginning of crash
+11-10 07:54:36.730  5136  5136 F libc    : Fatal signal 6 (SIGABRT), code -1 (SI_QUEUE) in tid 5136 (inity.kodi:kodi), pid 5136 (inity.kodi:kodi)
+11-10 07:54:37.782  5206  5206 F DEBUG   : *** *** *** *** *** *** *** *** *** *** *** *** *** *** *** ***
+11-10 07:54:37.782  5206  5206 F DEBUG   : Build fingerprint: 'google/sdk_gphone64_x86_64/emu64xa:16/BE2A.250530.026.F3/13894323:userdebug/dev-keys'
+11-10 07:54:37.782  5206  5206 F DEBUG   : Revision: '0'
+11-10 07:54:37.782  5206  5206 F DEBUG   : ABI: 'x86_64'
+11-10 07:54:37.782  5206  5206 F DEBUG   : Guest architecture: 'arm64'
+11-10 07:54:37.782  5206  5206 F DEBUG   : Timestamp: 2026-11-10 07:54:37.026530342+0000
+11-10 07:54:37.782  5206  5206 F DEBUG   : Process uptime: 7s
+11-10 07:54:37.782  5206  5206 F DEBUG   : Cmdline: com.projectinfinity.kodi:kodi
+11-10 07:54:37.782  5206  5206 F DEBUG   : pid: 5136, tid: 5136, name: inity.kodi:kodi  >>> com.projectinfinity.kodi:kodi <<<
+11-10 07:54:37.782  5206  5206 F DEBUG   : uid: 10216
+11-10 07:54:37.782  5206  5206 F DEBUG   : signal 6 (SIGABRT), code -1 (SI_QUEUE), fault addr --------
+11-10 07:54:37.782  5206  5206 F DEBUG   : Abort message: 'Pure virtual function called!'
+11-10 07:54:37.782  5206  5206 F DEBUG   :     rax 0000000000000000  rbx 0000758d3d71c000  rcx 0000758d26f60808  rdx 0000000000000006
+11-10 07:54:37.782  5206  5206 F DEBUG   :     r8  0000000000000010  r9  0000000000000010  r10 00007589dfc21d70  r11 0000000000000206
+11-10 07:54:37.782  5206  5206 F DEBUG   :     r12 0000758d3dd10388  r13 0000000000000002  r14 0000758d3d4f4020  r15 00000000e111d101
+11-10 07:54:37.782  5206  5206 F DEBUG   :     rdi 0000000000001410  rsi 0000000000001410
+11-10 07:54:37.782  5206  5206 F DEBUG   :     rbp 00007ffdc0c0c1b0  rsp 00007ffdc0c0c178  rip 0000758d26f60808
+11-10 07:54:37.782  5206  5206 F DEBUG   : 3 total frames
+11-10 07:54:37.782  5206  5206 F DEBUG   : backtrace:
+11-10 07:54:37.782  5206  5206 F DEBUG   :       #00 pc 000000000008f808  /apex/com.android.runtime/lib64/bionic/libc.so (syscall+24) (BuildId: fcb82240218d1473de1e3d2137c0be35)
+11-10 07:54:37.782  5206  5206 F DEBUG   :       #01 pc 0000000000441461  /system/lib64/libndk_translation.so (berberis::RunKernelSyscall(berberis::ThreadState*)+81) (BuildId: 2810e5b44895c4ea0b1ad6882ea73b73)
+11-10 07:54:37.782  5206  5206 F DEBUG   :       #02 pc 0000000000201964  /memfd:exec (deleted)
+11-10 07:54:37.789  5206  5206 F DEBUG   :     x0  0000000000001410  x1  0000000000001410  x2  0000000000000006  x3  00007589dfc21d70
+11-10 07:54:37.789  5206  5206 F DEBUG   :     x4  0000000000000010  x5  0000000000000010  x6  0000000000000010  x7  7f7f7f7f7f7f7f7f
+11-10 07:54:37.789  5206  5206 F DEBUG   :     x8  00000000000000f0  x9  106a280f0ddf245a  x10 000000ff00000020  x11 0000000000000011
+11-10 07:54:37.789  5206  5206 F DEBUG   :     x12 0000000000000000  x13 000000000000000a  x14 0000000100000000  x15 0000000000000000
+11-10 07:54:37.789  5206  5206 F DEBUG   :     x16 00007589e11a31f0  x17 00007589e1177a00  x18 00007589de424000  x19 0000000000001410
+11-10 07:54:37.789  5206  5206 F DEBUG   :     x20 0000000000001410  x21 00000000ffffffff  x22 ffffff80ffffffc8  x23 00007589dfc21fc0
+11-10 07:54:37.789  5206  5206 F DEBUG   :     x24 00007589dfc21ea0  x25 00007589dfc21ee0  x26 0000000000000000  x27 0000000000000000
+11-10 07:54:37.789  5206  5206 F DEBUG   :     x28 0000000000000000  x29 00007589dfc21df0  lr  00007589e111d148  sp  00007589dfc21d70
+11-10 07:54:37.789  5206  5206 F DEBUG   :     pc  00007589e111d168  pst 0000000000000000
+11-10 07:54:37.789  5206  5206 F DEBUG   :   
+11-10 07:54:37.789  5206  5206 F DEBUG   : 4 total frames
+11-10 07:54:37.789  5206  5206 F DEBUG   : backtrace:
+11-10 07:54:37.789  5206  5206 F DEBUG   :       #00 pc 000000000005d168  /system/lib64/arm64/libc.so (abort+152) (BuildId: 21e157f6cb4e18f9c52b0b18ba9b5a4c)
+11-10 07:54:37.789  5206  5206 F DEBUG   :       #01 pc 000000000009ce88  /data/app/~~aLAdke8yrNqTTSh5gSOpog==/com.projectinfinity.kodi-3Sbn0kuQNeDmHdFS_s0kHQ==/lib/arm64/libc++_shared.so (BuildId: ece72a2ebc3774a1be9fd21271258acd3bcdfaa7)
+11-10 07:54:37.789  5206  5206 F DEBUG   :       #02 pc 00000000000b028c  /data/app/~~aLAdke8yrNqTTSh5gSOpog==/com.projectinfinity.kodi-3Sbn0kuQNeDmHdFS_s0kHQ==/lib/arm64/libc++_shared.so (__cxa_pure_virtual+16) (BuildId: ece72a2ebc3774a1be9fd21271258acd3bcdfaa7)
+11-10 07:54:37.789  5206  5206 F DEBUG   :       #03 pc 0000000000008018  /system/lib64/arm64/libnative_bridge_vdso.so (BuildId: 5082e3064230f41f0158350ba172b967)
+11-10 07:54:37.791  5206  5206 F DEBUG   : 4 total frames
+11-10 07:54:37.791  5206  5206 F DEBUG   : backtrace:
+11-10 07:54:37.791  5206  5206 F DEBUG   : 5 total frames
+11-10 07:54:37.791  5206  5206 F DEBUG   : backtrace:
+11-10 07:54:37.792  5206  5206 F DEBUG   : 2 total frames
+11-10 07:54:37.792  5206  5206 F DEBUG   : backtrace:

@@ -1,0 +1,43 @@
+{
+  "environment": {
+    "application_installed": false,
+    "application_started": false,
+    "compatibility_overrides": false,
+    "fingerprint": "google/sdk_gphone64_x86_64/emu64xa:16/BE2A.250530.026.F3/13894323:userdebug/dev-keys",
+    "image": "system-images;android-36;google_apis;x86_64",
+    "page_size": 4096,
+    "revision": 7,
+    "sdk": 36,
+    "serial": "emulator-5554",
+    "status": "PASS_STOCK_API36_ENVIRONMENT_INTAKE_ONLY",
+    "stock_bridge_build_id": "2810e5b44895c4ea0b1ad6882ea73b73",
+    "stock_bridge_sha256": "fbadc774c989534a567e6af8fd16d2c00727b1f1d9cc778bf538d6b59ed9776d"
+  },
+  "error": "Traceback (most recent call last):\n  File \"/home/runner/work/project-infinity/project-infinity/repairs/infinity-network-family-2103477-20261110/android/verify_android.py\", line 402, in run\n    start = base.start_once(device, version, phase)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/project-infinity/project-infinity/repairs/infinity-tracking-integration-2103469-20261108/qualify_android_baseline.py\", line 620, in start_once\n    device.alive()\n  File \"/home/runner/work/project-infinity/project-infinity/repairs/infinity-tracking-integration-2103469-20261108/qualify_android_baseline.py\", line 320, in alive\n    require(self.pids() == [str(self.pid)], 'NATIVE_ENGINE_DIED_OR_RESTARTED')\n  File \"/home/runner/work/project-infinity/project-infinity/repairs/infinity-tracking-integration-2103469-20261108/qualify_android_baseline.py\", line 54, in require\n    raise RuntimeError(label)\nRuntimeError: NATIVE_ENGINE_DIED_OR_RESTARTED\n",
+  "failure_capture_error": "ConnectionError('Incomplete network QA RPC: GUI.GetProperties')",
+  "inherited_DNS_hard_deadline": "FAIL_RETAINED_OWNER_APPROVED_LIMITATION",
+  "physical_Fold": "PENDING_OWNER",
+  "production_changes": false,
+  "reused_verification": {
+    "APK_rebuild": false,
+    "active_candidate_skin": "1.0.5.271",
+    "artifact": {
+      "digest": "sha256:0fc31dc13d1176183c22c14d11f36a21973863d504249b8c4455960213257e89",
+      "id": 13742200977,
+      "size_in_bytes": 1778294
+    },
+    "candidate78_started_and_authenticated_all81": true,
+    "correction": "TEST_ONLY_Window1191_to11191;production dispatch ActivateWindow1191 unchanged",
+    "network_functional_cases": "NOT_RUN",
+    "not_a_production_Window_id_exception": true,
+    "original77_started_and_authenticated": true,
+    "original_signed77_to78_package_and_profile_checks_reached_and_passed": true,
+    "outcome": "BLOCKED_TEST_OBSERVER_WRONG_RUNTIME_WINDOW_ID",
+    "recovery79": "NOT_RUN",
+    "run": 42768544753,
+    "source": "c071d3760567924cbfb5cccca9afcde97b7b120d",
+    "workflow": 393886994
+  },
+  "status": "BLOCKED_OR_FAILED_SEE_EXACT_ERROR",
+  "versions": {}
+}

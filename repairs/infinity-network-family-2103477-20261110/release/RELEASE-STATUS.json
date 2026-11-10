@@ -1,0 +1,58 @@
+{
+  "Cobra": 2103445,
+  "artifacts": [
+    {
+      "APK_sha256": "787df8f3e851a9af99c299cecc65f2acacae0321294ceedd6c0e56dbb3d748fd",
+      "CC": "0.3.5.76",
+      "artifact_id": 13739504756,
+      "role": "INTERNAL_CANDIDATE_WITHHELD",
+      "signing_run": 42766730356,
+      "skin": "1.0.5.271",
+      "version": 2103478
+    },
+    {
+      "APK_sha256": "7f466d83b84a8078c1004d1595267ddb34ac830eeb6ca4e9d98a0c0605a2c6e7",
+      "CC": "0.3.5.77",
+      "artifact_id": 13740388061,
+      "role": "INTERNAL_FORWARD_RECOVERY_WITHHELD",
+      "signing_run": 42767681923,
+      "skin": "1.0.5.272",
+      "version": 2103479
+    }
+  ],
+  "blocker": "See BLOCKED-STARTUP-42777116255.json and immutable failing workflow; no inherited or bridge-only attribution established",
+  "code_changes_since_original_signing": false,
+  "engineering_complete": false,
+  "gates": {
+    "ARM64_compile_and_full_native_link": "PASS_42743103577_REUSED",
+    "Actual_Android_candidate_authentication": "PASS_81_SOURCES_CC76_SKIN271",
+    "Android_Automatic_working_available_routes": "PASS_42774629373",
+    "Android_IPv4_IPv6_restrictions_redirects_TLS_DNS_HTTP_errors": "PASS_SELECTED_CASES_42774629373",
+    "Android_original77_start_and_signed77_to78_upgrade_checks": "PASS_42768544753_RETAINED",
+    "Android_signed_forward79_install_and_functional_recovery": "NOT_RUN",
+    "Complete_module_RSA_and_four_original_Java_install_recovery_cases": "PASS_42761231636_REUSED",
+    "Completed_native_user_Stop_and_pending_play_cancel": "NOT_RUN_STARTUP_CRASH_BLOCKED_LATEST_ATTEMPT",
+    "Exact77_member_preservation": "PASS_13_CANDIDATE_CHANGES_8_RECOVERY_METADATA_CHANGES_5_DEX_COBRA_IDENTICAL",
+    "Final_Galaxy_Fold_acceptance": "PENDING_OWNER_AFTER_ENGINEERING_CLEARANCE",
+    "Fold_front_inner_viewport_selector": "NOT_RUN;PHYSICAL_FOLD_NOT_TESTED",
+    "Historical_hard_DNS_deadline": "FAIL_BASELINE_AND_CANDIDATE;INHERITED_OWNER_APPROVED_CONTRACT;NOT_RELABELLED_PASS",
+    "Network_mode_process_restart_persistence": "NOT_RUN",
+    "New_native_startup_SIGABRT": "FAIL_42777116255_PURE_VIRTUAL_CALL_CAUSE_UNRESOLVED",
+    "Original_signing_identity_v1_v2_v3": "PASS_BOTH_INTERNAL_APKS",
+    "Provider_account_and_full_live_provider_workflows": "NOT_RUN;PROVIDER_SOURCES_PRESERVED_UNCHANGED",
+    "Python_selfhosted_SDK_Stop": "TIMEOUT_45S_RETAINED;SOURCE_PROVEN_GIL_CYCLE;NORMAL_NATIVE_CONTROL_REPLACEMENT_NOT_YET_EXECUTED",
+    "Real_HTTP_play_and_advance_after_setting_switch": "RAW_EVIDENCE_CONFIRMED_INDEPENDENT_ASTRA_REVIEW_NOT_FULL_PLAY_STOP_PASS",
+    "Timed_IPv6_handshake_fallback_toIPv4": "HOST_PASS_REUSED_NOT_REPRODUCED_ANDROID_LOOPBACK",
+    "Warmed_30_VFS_requests": "PASS_NO_OBSERVED_FD_UPWARD_DRIFT_447_447_447_NOT_GLOBAL_LEAK_PROOF"
+  },
+  "installation_instructions": "WITHHELD; stay on protected2103477. Internal78/79 are not offered for device installation.",
+  "minimum_next_scope": "Read-only matched protected77/candidate78 startup control with complete guest tombstone/load-stage evidence; no speculative source correction, signing or APK rebuild",
+  "next_performance_phase": "NOT_STARTED",
+  "original_signer_certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "owner_delivery_cleared": false,
+  "production_input_commit": "5e19f2ba861b51f23918594c68ee1edaaacb65f3",
+  "protected_baseline": 2103477,
+  "retained_native_compile_commit": "e9248b7813b5a0060e0e2aafab455ebbd1a2cdc5",
+  "status": "BLOCKED_DO_NOT_INSTALL_CANDIDATE_OR_RECOVERY",
+  "transport_enforcement": "Native Kodi CCurlFile HTTP/VFS only; independent Python/directFFmpeg/inputstream sockets not controlled"
+}

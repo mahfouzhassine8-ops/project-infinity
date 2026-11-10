@@ -1,0 +1,56 @@
+{
+  "APK_rebuild": false,
+  "APK_sha256": "787df8f3e851a9af99c299cecc65f2acacae0321294ceedd6c0e56dbb3d748fd",
+  "Kodi_caller": "NOT_RESOLVED_IN_RETAINED_CRASH_BUFFER",
+  "abort_message": "Pure virtual function called!",
+  "additional_read_only_build_evidence": "Original successful42743103577 log confirms FileFactory.cpp and HTTPDirectory.cpp rebuilt during full CMake link; no evidence of omitted header consumers from four-unit preflight count",
+  "artifact": {
+    "digest": "sha256:36ae4219e8dfad74d005e663c9277443cb8114f6f9633174d41a311c37be0734",
+    "id": 13744254975,
+    "size_in_bytes": 1506417
+  },
+  "bridge_build_id": "2810e5b44895c4ea0b1ad6882ea73b73",
+  "broader_performance_phase": "NOT_STARTED",
+  "candidate_version": 2103478,
+  "earlier_same_APK_starts": "Four separate earlier VMs reached native authenticated81 source checks; does not invalidate this crash",
+  "fingerprint": "google/sdk_gphone64_x86_64/emu64xa:16/BE2A.250530.026.F3/13894323:userdebug/dev-keys",
+  "guest_architecture": "arm64 via stock x86_64 libndk_translation",
+  "guest_frames": [
+    "libc.so abort+152",
+    "libc++_shared.so __cxa_pure_virtual+16",
+    "libnative_bridge_vdso.so+0x8018"
+  ],
+  "kodi_log": "NOT_CREATED_BEFORE_CRASH",
+  "matching_recovery_Android": "NOT_RUN",
+  "minimum_next_evidence": [
+    "Matched protected77 versus unchanged78 startup control in same qualified environment",
+    "Complete guest tombstone/maps/load-stage capture on failure; compare constructor relocation/target sequences before proposing source changes"
+  ],
+  "owner_delivery_cleared": false,
+  "prior_baseline_failure_review": "Existing original69 matching API36/bridge failures are SIGSEGV or SIGBUS in talloc_lib_init, not this SIGABRT",
+  "process_uptime_seconds": 7,
+  "production_changes_after_original_signing": false,
+  "remaining_tests": [
+    "Native user Stop completion and pending-playback cancellation",
+    "Selected network mode persistence after process restart",
+    "Front/inner viewport selector screenshots",
+    "Signed78-to79 forward installation and functional recovery"
+  ],
+  "reviewers": [
+    "GPT-6.1: no retained matching unchanged69/77 purevirtual abort; attribution unresolved",
+    "Astra: preserved source/member evidence narrows surface but cannot clear startup regression"
+  ],
+  "root_cause": "UNDETERMINED: no source repair supported by current stack",
+  "run": 42777116255,
+  "signal": "SIGABRT",
+  "source": "053e34bb67765730ac3561e44194c80ac28d20ff",
+  "status": "BLOCKED_REAL_NATIVE_STARTUP_SIGABRT_UNATTRIBUTED",
+  "trigger": "Fresh stock API36 normal Splash/Infinity entry; before QA observer or network cases",
+  "unchanged_evidence": {
+    "DEX": 5,
+    "changed_native_source_files": 7,
+    "libc++_shared.so": true,
+    "native_sources": 9404,
+    "new_native_header": 1
+  }
+}
