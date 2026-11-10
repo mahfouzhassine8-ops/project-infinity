@@ -185,7 +185,7 @@ def select_mode(device, observer, mode):
     require(hub == dict(window=11191, focus=1191105, label='NETWORK CONNECTIONS'), 'ACTUAL_HUB_NETWORK_CONTROL')
     device.rpc('Input.Select')
     wanted = {'auto': 'Automatic (Default)', 'ipv4': 'IPv4 Only', 'ipv6': 'IPv6 Only'}[mode]
-    popup = native.until(device, lambda: (p if (p := observer.call('popup')).get('title') == 'Network Connections' else None),
+    popup = native.until(device, lambda: (p if (p := observer.call('popup')).get('title') == 'Network Connections' and p.get('ready') else None),
                          'Real Network Connections selector', 15)
     for _ in range(5):
         if popup['label'] == wanted:

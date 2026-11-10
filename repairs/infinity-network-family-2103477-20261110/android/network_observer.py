@@ -182,16 +182,27 @@ def action(request):
             xbmc.sleep(100)
         window = xbmcgui.Window(11191)
         window.setFocusId(1191105)
+        for _ in range(40):
+            if window.getFocusId() == 1191105:
+                break
+            xbmc.sleep(50)
         return dict(window=xbmcgui.getCurrentWindowDialogId(), focus=window.getFocusId(),
                     label=window.getControl(1191105).getLabel())
     if name == 'popup':
         dialog = xbmcgui.getCurrentWindowDialogId()
         if dialog in (0, 9999):
-            return dict(title='', label='', focus=0)
+            return dict(title='', label='', focus=0, ready=False)
         window = xbmcgui.Window(dialog)
-        return dict(title=window.getProperty('Infinity.UI.Title'),
-                    label=xbmc.getInfoLabel('Container(50).ListItem.Label'),
-                    focus=window.getFocusId())
+        title, focus = window.getProperty('Infinity.UI.Title'), window.getFocusId()
+        if title != 'Network Connections' or focus != 50:
+            return dict(title=title, label='', focus=focus, ready=False)
+        rows = window.getControl(50)
+        index, count = rows.getSelectedPosition(), rows.size()
+        ready = 0 <= index < count and count == 4
+        # Read a selected SDK item only while this stable modal is active.
+        # The item wrapper is destroyed before any subsequent navigation command.
+        label = rows.getSelectedItem().getLabel() if ready else ''
+        return dict(title=title, label=label, focus=focus, position=index, count=count, ready=ready)
     if name == 'fetch':
         # Only fixed test servers and public TLS/DNS controls; never credentials.
         url = request['url']
