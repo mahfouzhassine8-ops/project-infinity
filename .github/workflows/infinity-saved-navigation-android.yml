@@ -2396,7 +2396,7 @@ jobs:
           print('PASS exact diagnostic scope; production unchanged; all prior jobs preserved')
           PYDNS
       - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
-        with: {packages: 'platform-tools build-tools;35.0.0 platforms;android-35', log-accepted-android-sdk-licenses: false}
+        with: {cmdline-tools-version: '15859902', packages: 'platform-tools build-tools;35.0.0 platforms;android-35 cmdline-tools;22.0', log-accepted-android-sdk-licenses: false}
       - uses: actions/cache@v4
         with: {path: /usr/local/lib/android/sdk/ndk/21.4.7075529, key: infinity-pinned-ndk-linux-21.4.7075529-v1}
       - name: Restore existing pinned Android toolchain only
