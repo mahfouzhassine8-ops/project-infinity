@@ -1,0 +1,16 @@
+{
+  "authorization": "Owner full performance brief at33e666a0; measured periodic read-only checksum stall",
+  "baseline_APK": 2103477,
+  "baseline_CC": "0.3.5.75",
+  "selected_production_files": ["script.infinity.commandcenter/common.py", "script.infinity.commandcenter/service.py"],
+  "correction": "Single-flight cooperative read-only periodic skin integrity scan; manual checks remain synchronous",
+  "measurement": "42815469317: original healthy948-file43.8MB check took3147.704ms warm",
+  "rejected_prototype": "Six-label batching median129.914ms vs57.307ms original; not applied",
+  "selected_host_tests": "test_integrity_worker.py: actual-source result parity, bounded reads/FDs/cancellation, scheduling/generation/single-flight/error/ownership contracts",
+  "application_candidate_tests": "NOT_SELECTED_YET; source review and original-key authentication required first",
+  "source_guard": "action_loading.py and authenticated retired-window survival guard unchanged",
+  "Cobra_native_Java_DEX_skin_provider_tracking_persistence_changes": false,
+  "shutdown_source_or_tests": false,
+  "signing_or_version_reservation": false,
+  "status": "IMPLEMENTED_CANDIDATE_NOT_VERIFIED_OR_INSTALLABLE"
+}
