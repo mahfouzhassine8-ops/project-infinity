@@ -1,0 +1,21 @@
+{
+  "APK_build_or_signing": "NOT_RUN",
+  "ARM64_compilation": "NOT_RUN",
+  "Android_shutdown_and_reopen": "NOT_RUN",
+  "Astra": "PASS_SCOPED_PRESERVATION_DIFF",
+  "Cobra_source_changes": false,
+  "GPT_6_1": "PASS_SCOPED_NATIVE_SEQUENCE_DEPENDENCIES_AND_HOST_BOUNDARIES",
+  "baseline_receipt_defect_reproduced": true,
+  "baseline_sha256": "e8f617ac615d657ec0b37d1bef39d277ceafa8e2ad20bb2b6118cebae7f0350f",
+  "candidate_sha256": "2273becee60a25e81b2c5844f052fe32eaa8d03335311672cd67b66bc3738648",
+  "final_protected_seal_and_authorization": "UNCHANGED_FAIL_CLOSED",
+  "host_candidate_cases_passed": 5,
+  "initial_host_fixture_compile": "FAILED_MISSING_PEER_STARTUP_ADMISSION_METHOD;PEER_ONLY_CORRECTED;CASES_NOT_STARTED_ON_INITIAL_ATTEMPT",
+  "modified_production_function": "xbmc/platform/android/activity/InfinityAndroidCheckpoint.cpp::Pump.stage6",
+  "owner_directive": "7dfe1f92",
+  "owner_optional_native_image": "UNVERIFIED",
+  "production_shutdown_acceptance": "NOT_CLAIMED",
+  "python_metadata_adapter": "NOT_IMPLEMENTED",
+  "schema": 1,
+  "source_only_candidate": true
+}

@@ -1,6 +1,6 @@
 # 2103480 Close/startup — first source checkpoint
 
-Status: historical source checkpoint, superseded for evidence availability by `EXTRACTED-EVIDENCE-REVIEW.md`. All nineteen privately supplied readable files are now admitted and hash-checked. They confirm the failed admission, but do not establish a safe operation exemption or the cause of incomplete Home. No application test, build, signing, version reservation or production source change. Starting brief:101f6c28. Starting signed APK:2103480 (`9cbb4c5f89a214924b6890463aa5842f85b18ff445d04d855e441fa61f4578c2`). This is the selected repair input, not final owner acceptance.
+Status: historical source checkpoint. Evidence availability was resolved at `EXTRACTED-EVIDENCE-REVIEW.md`; subsequent owner directive 7dfe1f92 led to the independent coordinator correction recorded in `IMPLEMENTATION-RESULT.md`. The statements below describe the earlier read-only checkpoint, not the later implementation/test status. Starting brief:101f6c28. Starting signed APK:2103480 (`9cbb4c5f89a214924b6890463aa5842f85b18ff445d04d855e441fa61f4578c2`). This is the selected repair input, not final owner acceptance.
 
 ## Verified input and preservation
 

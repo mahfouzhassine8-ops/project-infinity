@@ -1,0 +1,50 @@
+--- a/xbmc/platform/android/activity/InfinityAndroidCheckpoint.cpp
++++ b/xbmc/platform/android/activity/InfinityAndroidCheckpoint.cpp
+@@ -1420 +1420,2 @@
+-      if (!InfinityDatabaseBarrier::Seal(s.generation))
++      const bool databaseSealed = InfinityDatabaseBarrier::Seal(s.generation);
++      if (!databaseSealed)
+@@ -1421,0 +1423,27 @@
++      // Independent save receipts describe completed work, not permission to
++      // terminate. A later unknown/opaque writer must still fail final
++      // admission without erasing the database/dialog saves already proved.
++      bool databaseBlocked=false;
++      {
++        std::lock_guard<std::mutex> lock(s.mutex);
++        databaseBlocked=!s.owners["native_databases"].error.empty();
++      }
++      if(databaseSealed && !databaseBlocked)Complete("native_databases", true);
++
++      bool deferredBlocked=false;
++      {
++        std::lock_guard<std::mutex> lock(s.mutex);
++        deferredBlocked=!s.owners["deferred_dialog_state"].error.empty();
++        // Captured settings/calibration dialog effects depend on the final
++        // canonical settings/XML save, not just a successful capture callback.
++        for (const char* name : {"kodi_settings", "xml_files"})
++        {
++          const auto saved = s.owners.find(name);
++          if (saved == s.owners.end() || !saved->second.complete || saved->second.dirty ||
++              !saved->second.error.empty() ||
++              saved->second.generation != saved->second.durableGeneration)
++            deferredBlocked = true;
++        }
++      }
++      if(databaseSealed && !deferredBlocked && !databaseBlocked)
++        Complete("deferred_dialog_state", true); // Captured state covered by settings save + DB seal.
+@@ -1431,15 +1458,0 @@
+-
+-      bool databaseBlocked=false;
+-      {
+-        std::lock_guard<std::mutex> lock(s.mutex);
+-        databaseBlocked=!s.owners["native_databases"].error.empty();
+-      }
+-      if(!databaseBlocked)Complete("native_databases", true);
+-
+-      bool deferredBlocked=false;
+-      {
+-        std::lock_guard<std::mutex> lock(s.mutex);
+-        deferredBlocked=!s.owners["deferred_dialog_state"].error.empty();
+-      }
+-      if(!deferredBlocked && !databaseBlocked)
+-        Complete("deferred_dialog_state", true); // Captured state covered by settings save + DB seal.

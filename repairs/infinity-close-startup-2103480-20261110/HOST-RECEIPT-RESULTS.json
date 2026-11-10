@@ -1,0 +1,39 @@
+{
+  "android_or_physical_test": "NOT_RUN",
+  "baseline_observation": [
+    {
+      "case": "opaque-retired",
+      "result": "PASS"
+    }
+  ],
+  "baseline_sha256": "e8f617ac615d657ec0b37d1bef39d277ceafa8e2ad20bb2b6118cebae7f0350f",
+  "candidate_cases": [
+    {
+      "case": "optional-private",
+      "result": "PASS"
+    },
+    {
+      "case": "opaque-retired",
+      "result": "PASS"
+    },
+    {
+      "case": "database-seal-fails",
+      "result": "PASS"
+    },
+    {
+      "case": "deferred-save-fails",
+      "result": "PASS"
+    },
+    {
+      "case": "settings-save-fails",
+      "result": "PASS"
+    }
+  ],
+  "candidate_sha256": "2273becee60a25e81b2c5844f052fe32eaa8d03335311672cd67b66bc3738648",
+  "historical_checkpoint_failure": "RETAINED",
+  "peer_source_sha256": "2ba6f823d8e616fef54ae8552600c3ab749b4d89c5145a438a98f7ae84a72115",
+  "python_metadata_adapter": "NOT_IMPLEMENTED",
+  "schema": 1,
+  "scope": "HOST_CONTROLLED_FINAL_SAVE_BOUNDARY",
+  "signed_install_or_process_death_or_reopen": "NOT_RUN"
+}
