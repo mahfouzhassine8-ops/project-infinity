@@ -250,6 +250,8 @@ def action(request):
                 playing = False
         return dict(playing=playing, video=PLAYER.isPlayingVideo(), source=source,
                     time=position, events=EVENTS[-100:], hits=HITS[-30:])
+    if name == 'events':
+        return dict(events=EVENTS[-100:], hits=HITS[-30:])
     if name == 'close':
         return dict(closing=True)
     raise ValueError('Unknown selected diagnostic action')

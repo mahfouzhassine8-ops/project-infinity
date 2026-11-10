@@ -285,8 +285,12 @@ def checks(device, observer, out):
     require(observer.call('fetch', url=urls['v6'] + '/echo')['opened'], 'NEW_CONNECTION_USES_NEW_MODE')
     stopped_event_floor = len(advanced['events'])
     device.rpc('Input.ExecuteAction', dict(action='stop'))
-    stopped = native.until(device, lambda: (p if not (p := observer.call('playing'))['playing'] and
-                any(e['event'] == 'Stopped' for e in p['events'][stopped_event_floor:]) else None), 'Native user Stop completed with actual event', 15)
+    def actual_stopped_event():
+        current = observer.call('events')
+        return current if any(e['event'] == 'Stopped' for e in current['events'][stopped_event_floor:]) else None
+    native.until(device, actual_stopped_event, 'Native user Stop completed with actual event', 15)
+    stopped = observer.call('playing')
+    require(not stopped['playing'], 'STOPPED_EVENT_AND_NATIVE_PLAYER_STATE')
     before_bytes = max(h['bytes_sent'] for h in playing['hits'] if h['path'] == '/fixture.mp4')
     after_bytes = max(h['bytes_sent'] for h in advanced['hits'] if h['path'] == '/fixture.mp4')
     require(after_bytes > before_bytes, 'EXISTING_HTTP_PLAYBACK_CONNECTION_CONTINUES_AFTER_MODE_SWITCH')
