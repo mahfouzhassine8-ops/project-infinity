@@ -1,0 +1,41 @@
+{
+  "APK_build": false,
+  "Cobra_changes": false,
+  "DNS_contract": "Retain originalresolver; historical5-secondcleanupFAIL accepted as inherited, neverrelabeledPASS",
+  "authorization": "Owner UNIVERSAL NETWORK INTEGRATION & END-TO-END CORRECTION plus device clarification in this turn",
+  "device_evidence": {
+    "connection": "Regular Wi-Fi/internet",
+    "diagnostic_limit": "Owner reports versions only; no Kodi/networktrace; maypredatefailure. Package not found in this workspace.",
+    "diagnostic_name": "Infinity-Diagnostics-20261110-034510.zip",
+    "do_not_assume_BladeQueen_was_tested": true,
+    "exact_error": null,
+    "failed_modes": [
+      "ipv4",
+      "ipv6"
+    ],
+    "failure_stage": "UNCLASSIFIED",
+    "provider": null,
+    "reported_APK": 2103478,
+    "reported_CC": "0.3.5.76",
+    "reported_device": "Galaxy Fold8Ultra Android17",
+    "title": null
+  },
+  "frozen_versions": [
+    2103478,
+    2103479
+  ],
+  "playback_tests": false,
+  "production_edits_in_this_selection": false,
+  "protected_baseline": 2103477,
+  "release": "Remain disabled until required gates pass; nextunusedversion must be above allissuedversions",
+  "selected_application_test": "Exactly one first start per frozen77 and78, separate fresh stockAPI36 VMs with same configuration; no app retry",
+  "shutdown_tests": false,
+  "signing": false,
+  "source_edit_boundaries": "No provider, shared runtime, global socket/JVM/DNS/Android, or speculative native lifecycle edits",
+  "source_investigation": [
+    "Actual policy->plugin->provider HTTP client->selected streaming transport",
+    "Supported Infinity-owned adapter attachment boundaries",
+    "Unattributed startup Purevirtual SIGABRT"
+  ],
+  "starting_checkpoint": "8d704ec0"
+}

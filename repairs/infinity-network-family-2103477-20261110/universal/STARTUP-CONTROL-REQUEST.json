@@ -1,0 +1,47 @@
+{
+  "APK_sha256": {
+    "2103477": "93eb081cd6a86ff9cf1cb9aa75bc6d9087cd9c982fb46e0a9baa12c12aa9af22",
+    "2103478": "787df8f3e851a9af99c299cecc65f2acacae0321294ceedd6c0e56dbb3d748fd"
+  },
+  "artifacts": {
+    "2103477": {
+      "digest": "sha256:722320ab0780b4bb96c5282e12e211f3ce6ce6d78aa09891730dbe0414ba1c78",
+      "id": 13721668270,
+      "name": "Infinity2103477-Exact74-OriginalSigned-ExperimentalRetest-42724088145",
+      "run": 42724088145,
+      "size_in_bytes": 328333278,
+      "source": "80f9c78e5c133ef63abe95af359c3e4e7366153f"
+    },
+    "2103478": {
+      "digest": "sha256:e914b643de596f3efbe292b710867ad1b9c62c439d3c1e29e50117a1d962a40b",
+      "id": 13739504756,
+      "name": "Infinity-Network-Original-Signed-2103478-42766730356-INTERNAL-QA-NOT-ACCEPTED",
+      "run": 42766730356,
+      "size_in_bytes": 328357083,
+      "source": "80b7f9e6010f607e1779bb6979d65b8754cd1948"
+    }
+  },
+  "emulator_config": "Same pixel2/4096MB/10G/noSnapshot/swiftshader per matrix VM",
+  "image": "system-images;android-36;google_apis;x86_64",
+  "image_revision": 7,
+  "interpretation": "Bothpass does notresolveintermittency; failures require exactsignaturecomparison. No retry and no automatic releaseclearance.",
+  "operation": "matched-frozen77-78-first-start-only",
+  "playback_tests": false,
+  "production_changes": false,
+  "shutdown_tests": false,
+  "signing": false,
+  "source_bindings": {
+    ".github/workflows/infinity-saved-navigation-android.yml": "186bcf675728b3d4878a5d528cd343dc46d947f12fdc454cb4be01185e1dab4b",
+    "repairs/infinity-network-family-2103477-20261110/universal/CONTINUATION-SCOPE.json": "2f36854e06ab1542bce5caa19a2f2bc36ffa9d418fe91229f474ef4fa33e0911",
+    "repairs/infinity-network-family-2103477-20261110/universal/startup_control.py": "fa8c031eddd40b50e681d6add28f6be61d2d0d67f16f7066d9659cb85f8c8200",
+    "repairs/infinity-tracking-integration-2103469-20261108/prepare_tracking_release.py": "49c4d49bd679b2dd2ae2819ab45b8a673d4b362f80fc30090223553d3abc9e0b",
+    "repairs/infinity-tracking-integration-2103469-20261108/qualify_android_baseline.py": "9b4cf409c35688a77e94849361aff510b6b896871314b32b15cc5844b4e23734",
+    "repairs/infinity-tracking-integration-2103469-20261108/tracking_module_fixture.py": "af14da368c555a5d9d0862aa1c1f490bfcf64d389026cb82092261d39ce3ecdb"
+  },
+  "stable_after_home_seconds": 10,
+  "starts_per_VM": 1,
+  "versions": [
+    2103477,
+    2103478
+  ]
+}
