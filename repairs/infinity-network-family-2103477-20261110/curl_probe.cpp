@@ -63,15 +63,23 @@ int main(int argc, char** argv)
       g_curlInterface.easy_setopt(easy, CURLOPT_NOPROGRESS, 0L);
     }
     CURLcode result = g_curlInterface.easy_perform(easy);
+    const auto returned = std::chrono::steady_clock::now();
+    curl_off_t reportedMicroseconds = 0;
+    g_curlInterface.easy_getinfo(easy, CURLINFO_TOTAL_TIME_T, &reportedMicroseconds);
     char* ip = nullptr;
     g_curlInterface.easy_getinfo(easy, CURLINFO_PRIMARY_IP, &ip);
-    double elapsed = std::chrono::duration<double>(std::chrono::steady_clock::now()-start).count();
+    const int family = !ip || !*ip ? 0 : std::string(ip).find(':') == std::string::npos ? 4 : 6;
     bool cookie = body.find("cookie=probe=kept") != std::string::npos;
-    std::cout << "{\"mode\":" << mode << ",\"result\":" << result
-              << ",\"family\":" << (!ip || !*ip ? 0 : std::string(ip).find(':') == std::string::npos ? 4 : 6)
-              << ",\"elapsed\":" << elapsed << ",\"cookie\":" << (cookie?"true":"false")
-              << ",\"fresh\":" << (fresh?"true":"false") << "}\n";
     g_curlInterface.easy_release(&easy, &multi);
     if (resolve) g_curlInterface.slist_free_all(resolve);
+    const auto cleaned = std::chrono::steady_clock::now();
+    double elapsed = std::chrono::duration<double>(cleaned-start).count();
+    std::cout << "{\"mode\":" << mode << ",\"result\":" << result
+              << ",\"family\":" << family
+              << ",\"elapsed\":" << elapsed << ",\"cookie\":" << (cookie?"true":"false")
+              << ",\"curl_reported_seconds\":" << reportedMicroseconds / 1000000.0
+              << ",\"perform_return_seconds\":" << std::chrono::duration<double>(returned-start).count()
+              << ",\"release_seconds\":" << std::chrono::duration<double>(cleaned-returned).count()
+              << ",\"fresh\":" << (fresh?"true":"false") << "}\n";
   }
 }

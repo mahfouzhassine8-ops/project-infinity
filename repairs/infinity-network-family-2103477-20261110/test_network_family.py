@@ -16,6 +16,9 @@ import unittest
 HERE = Path(__file__).resolve().parent
 PROBE = Path(os.environ.get('INFINITY_NETWORK_PROBE',
                             '/workspace/scratch/network-family-host/curl_probe'))
+CONNECT_TIMEOUT_SECONDS = 2.0
+TOTAL_TIMEOUT_SECONDS = 3.5
+SCHEDULING_TOLERANCE_SECONDS = .25
 
 
 class Server(http.server.ThreadingHTTPServer):
@@ -105,11 +108,16 @@ class Transport(unittest.TestCase):
         port = self.tls.server_port if tls else self.v4.server_port
         url = url or f'{"https" if tls else "http"}://{host}:{port}{path}'
         resolved = f'{host}:{port}:{addresses}' if addresses else ''
+        started = time.monotonic()
         output = subprocess.check_output([str(PROBE), modes, url, resolved,
                                           str(self.ca) if tls else '', proxy,
                                           'cancel' if cancel else '', 'selected'],
                                          text=True, timeout=12)
-        return [json.loads(line) for line in output.splitlines()]
+        process_wall = time.monotonic() - started
+        rows = [json.loads(line) for line in output.splitlines()]
+        for row in rows:
+            row['process_wall_seconds'] = process_wall
+        return rows
 
     def test_auto_uses_working_ipv6(self):
         row, = self.probe('0')
@@ -190,7 +198,15 @@ class Transport(unittest.TestCase):
         # this does not claim the environment produced a specific DNS response.
         self.assertIn(row['result'], (6, 28))
         self.assertEqual(row['family'], 0)
-        self.assertLess(row['elapsed'], 3.0)
+        # DNS belongs to connection setup. Preserve that tighter 2s deadline,
+        # and separately enforce the explicit 3.5s total including process
+        # return/cleanup. Tolerance covers scheduling, not resolver work.
+        with self.subTest(deadline='connection_and_resolver_cleanup'):
+            self.assertLessEqual(row['elapsed'],
+                                 CONNECT_TIMEOUT_SECONDS + SCHEDULING_TOLERANCE_SECONDS, row)
+        with self.subTest(deadline='total_caller_return'):
+            self.assertLessEqual(row['process_wall_seconds'],
+                                 TOTAL_TIMEOUT_SECONDS + SCHEDULING_TOLERANCE_SECONDS, row)
 
 
 if __name__ == '__main__':

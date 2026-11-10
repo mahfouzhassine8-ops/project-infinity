@@ -1,0 +1,39 @@
+{
+  "Android_ARM64_bridge_limits": "Report nativeexec/librarybridge errors separately; never substitute x86successforARM64acceptance",
+  "Android_OS_network_configuration_changes": false,
+  "Infinity_or_Cobra_APK_built_or_installed": false,
+  "authorization": "Owner DNS-DEADLINE-CORRECTION-HANDOFF78be3d13 plus current executiondirective",
+  "base": "78be3d13",
+  "owner_data_access": false,
+  "phase": "ISOLATED_RESOLVER_FEASIBILITY_NOT_PRODUCTION_ACTIVATION",
+  "probe_process_only_network_bind_reset_to_default": true,
+  "production_curl_DNS_gate": "STILL_FAIL_UNTIL_INTEGRATED_AND_VERIFIED",
+  "production_network_implementation": "ddf6b078",
+  "protected_APK": 2103477,
+  "selected_tests": [
+    "Actualsigned77ELFresolverbackendidentification",
+    "Correctedconnect2s+.25andtotal3.5s+.25caller-returncontracts",
+    "Hostboundedchilddeadline/cancel/reap/FDinheritance/repeatedfailureresources",
+    "CompileownedresolverhelperandJNIprobe forAndroidARM64andx86_64",
+    "DisposableAPI36native-directoryexecution;defaultandexplicitprocessnetworkbinding;deadline;cancel;25repeatfailures;missinghelperdiagnostics"
+  ],
+  "shutdown_tests": false,
+  "source_files": {
+    "android-probe/AndroidManifest.xml": "447419e8ac989e517d3030d173bda4659014d1f70b61d6a016cf1a6bf38e638f",
+    "android-probe/ProbeActivity.java": "1c0234c21af3edce1499e1bc8231ff6e3ebec8e13682935da707f32bad1a03f9",
+    "android-probe/android_probe.py": "9df1a1377162876324a0d9738541a8fff45f854d49bad11ec22b88266381658f",
+    "android-probe/jni_probe.cpp": "1c2a721d1d59a9f009dec23b0e2f3bc2ef0fc24a7bf0413f3dba93c73623a95a",
+    "prototype/helper.c": "bca67e08460c313a8b41f75334911879403f8165eb81c3f00be027e94550ca44",
+    "prototype/owned_lookup.cpp": "8a29fc3140b60313f32078e9fee393ba3eeec6b8ebb1952817884a77459acc5c",
+    "prototype/owned_lookup.h": "7479073588c050e918081c9434dec5db60eb1bf184fa5b253b3902a054d2d404",
+    "prototype/probe.cpp": "0ceffde3f046aa34069424f592215429f3f410fd49db38d79f10d6635ba67890",
+    "prototype/stalled_helper.c": "afa6a910d8f0075b281f7c1f181d470ad3f4bfbdaac2fd365f8eb6f78914153d",
+    "prototype/test_feasibility.py": "c556c0d0371ad86d6e4b8c82b8896ddd6b3e56ed14a35a23361efe0d513e7e17",
+    "prototype/wire.h": "0104acd76781b58c8b28b38113bfda239df00e3762ea12b5456650dc6fe892e5"
+  },
+  "test_packages": [
+    "com.projectinfinity.dnsprobe.x86",
+    "com.projectinfinity.dnsprobe.arm64"
+  ],
+  "test_signing": "Disposable test certificate for disjoint diagnostic packages only; no owner APK and no originalkey access. APKs are not delivery artifacts."
+}
