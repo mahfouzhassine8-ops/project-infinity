@@ -51,7 +51,7 @@ class Device(base.Device):
         if method == 'Addons.ExecuteAddon':
             require(params == dict(addonid=QA), 'ONLY_DISPOSABLE_NETWORK_OBSERVER')
         if method == 'Input.ExecuteAction':
-            require(params == dict(action='firstpage'), 'ONLY_NATIVE_LIST_FIRSTPAGE')
+            require(params in (dict(action='firstpage'), dict(action='stop')), 'ONLY_NATIVE_LIST_FIRSTPAGE_OR_USER_STOP')
         deadline = time.monotonic() + min(timeout, 15)
         def remaining():
             seconds = deadline - time.monotonic()
@@ -219,7 +219,7 @@ def identity(observer, version):
     return result
 
 
-def checks(device, observer, out):
+def initial_network_checks(device, observer, out):
     ready = observer.ready
     urls = dict(v4='http://127.0.0.1:%d' % ready['ipv4'], v6='http://[::1]:%d' % ready['ipv6'])
     report = {}
@@ -260,6 +260,15 @@ def checks(device, observer, out):
         samples.append(observer.call('identity'))
     report['connection_stability'] = dict(samples=samples, requests=30, status='MEASURED_REQUIRES_RESOURCE_REVIEW',
                                          global_leak_proof=False)
+    return report
+
+
+def checks(device, observer, out):
+    selected = request()
+    require(selected['phase'] == 'remaining-native-stop-persistence-viewport-forward-recovery', 'REUSE_PASSED_NETWORK_CASES')
+    ready = observer.ready
+    urls = dict(v4='http://127.0.0.1:%d' % ready['ipv4'], v6='http://[::1]:%d' % ready['ipv6'])
+    report = dict(reused_network_cases=selected['reused_network_cases'])
     select_mode(device, observer, 'ipv4')
     before_play = observer.call('playing')
     event_floor = len(before_play['events'])
@@ -274,8 +283,10 @@ def checks(device, observer, out):
     advanced = native.until(device, lambda: (p if (p := observer.call('playing'))['video'] and p['time'] > first + 2 else None),
                             'Active playback survives setting switch', 20)
     require(observer.call('fetch', url=urls['v6'] + '/echo')['opened'], 'NEW_CONNECTION_USES_NEW_MODE')
-    observer.call('stop')
-    stopped = native.until(device, lambda: (p if not (p := observer.call('playing'))['playing'] else None), 'Ordinary player stop', 15)
+    stopped_event_floor = len(advanced['events'])
+    device.rpc('Input.ExecuteAction', dict(action='stop'))
+    stopped = native.until(device, lambda: (p if not (p := observer.call('playing'))['playing'] and
+                any(e['event'] == 'Stopped' for e in p['events'][stopped_event_floor:]) else None), 'Native user Stop completed with actual event', 15)
     before_bytes = max(h['bytes_sent'] for h in playing['hits'] if h['path'] == '/fixture.mp4')
     after_bytes = max(h['bytes_sent'] for h in advanced['hits'] if h['path'] == '/fixture.mp4')
     require(after_bytes > before_bytes, 'EXISTING_HTTP_PLAYBACK_CONNECTION_CONTINUES_AFTER_MODE_SWITCH')
@@ -287,7 +298,7 @@ def checks(device, observer, out):
         return current if any(h['path'] == '/stalled.mp4' and h.get('delay_enter') for h in current['hits']) else None
     delayed = native.until(device, actual_delay, 'Actual server observed delayed playback request', 15)
     started = time.monotonic()
-    observer.call('stop')
+    device.rpc('Input.ExecuteAction', dict(action='stop'))
     stopped = native.until(device, lambda: (p if not (p := observer.call('playing'))['playing'] else None), 'Stop while transport fixture delayed', 15)
     stop_seconds = time.monotonic() - started
     cancelled_event_floor = len(stopped['events'])

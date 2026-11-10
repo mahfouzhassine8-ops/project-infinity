@@ -1,0 +1,44 @@
+{
+  "passed": true,
+  "pid": 5266,
+  "result": {
+    "bytes": 33,
+    "hits": [
+      {
+        "at": 283.088347098,
+        "bytes_sent": 0,
+        "family": 2,
+        "method": "GET",
+        "path": "/echo"
+      },
+      {
+        "at": 284.958188309,
+        "bytes_sent": 0,
+        "family": 2,
+        "method": "GET",
+        "path": "/redirect"
+      },
+      {
+        "at": 285.037535305,
+        "bytes_sent": 0,
+        "family": 2,
+        "method": "GET",
+        "path": "/echo"
+      },
+      {
+        "at": 293.722390015,
+        "bytes_sent": 0,
+        "family": 10,
+        "method": "GET",
+        "path": "/echo"
+      }
+    ],
+    "opened": true,
+    "response": {
+      "family": 10,
+      "networkqa": true
+    },
+    "seconds": 0.07165721799998437
+  },
+  "sequence": 21
+}
