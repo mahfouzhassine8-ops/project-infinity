@@ -1,0 +1,24 @@
+{
+  "run": 42754990984,
+  "source": "6b115cfb4dafd6a52d3eda0cd3a33cdc80e144b1",
+  "job": 129627190974,
+  "artifact": 13734948138,
+  "artifact_bytes": 1086000,
+  "artifact_sha256": "5680cc846f0fb93c79fbb762e43cd909f8c666be28614fd758602451ba9f16fa",
+  "status": "FAIL_RETAINED_NOT_ACCEPTANCE",
+  "findings": {
+    "x86": "Normal and bound lookup return addresses. Cancellation/repeated cancellation reaped. Deadline fixture skipped bound-network resolver and returned Answer; deadline not proven.",
+    "ARM64": "Helper exec returned zero and an address. Unexpected post-exec descriptor count1 caused strict validation failure; origin unresolved. No blanket allowance.",
+    "DNS_GATE": "FAIL_ORIGINAL_CURL_NOT_INTEGRATED"
+  },
+  "next_corrections": [
+    "Child pre-exec calls use reviewed raw LP64 signal/time syscalls, avoiding inherited ART sigchain state.",
+    "Stall fixture applies before both default and explicit-network lookups.",
+    "Raw child re-enumerates descriptors and sends versioned zero-FD attestation before exec.",
+    "Helper reports sanitized descriptor category bits; paths and endpoints are never emitted.",
+    "Remaining cases collected after fully-reaped invalid reply. All existing acceptance predicates remain strict."
+  ],
+  "protected_production_native_overlay_delta_since_ddf6b078": 0,
+  "owner_signing_key_access": false,
+  "Infinity_Cobra_installation": false
+}

@@ -33,8 +33,11 @@ public final class ProbeActivity extends Activity {
         report.put("scope", "Isolated DNS helper feasibility; no Infinity or Cobra installation");
         JSONArray normal = new JSONArray(runNative(helper, -1, 1));
         report.put("normal", normal);
-        if (normal.length() == 0 || normal.getJSONObject(0).getInt("outcome") != 0)
-          throw new IllegalStateException("NATIVE_DIRECTORY_EXEC_OR_CAPABILITY_FAILED");
+        // Retain strict host acceptance. Collect remaining diagnostics after a
+        // fully reaped invalid reply; do not hide other cases behind that result.
+        if (normal.length() == 0 || normal.getJSONObject(0).getInt("wait_error") != 0 ||
+            normal.getJSONObject(0).getInt("outcome") == 3)
+          throw new IllegalStateException("NATIVE_CAPABILITY_OR_OWNERSHIP_FAILED");
         ConnectivityManager connectivity = getSystemService(ConnectivityManager.class);
         Network network = connectivity.getActiveNetwork();
         boolean bound = network != null && connectivity.bindProcessToNetwork(network);

@@ -1,13 +1,11 @@
 /* Test fixture only: delay the real system resolver. Never a release member. */
 #define _GNU_SOURCE
-#include <netdb.h>
+#include <errno.h>
 #include <time.h>
-static int stalled_getaddrinfo(const char *name, const char *service,
-                              const struct addrinfo *hints, struct addrinfo **out)
+static void stall_before_lookup(void)
 {
   struct timespec delay = {5, 0};
-  nanosleep(&delay, 0);
-  return getaddrinfo(name, service, hints, out);
+  while (nanosleep(&delay, &delay) && errno == EINTR) {}
 }
-#define getaddrinfo stalled_getaddrinfo
+#define DNS_BEFORE_LOOKUP() stall_before_lookup()
 #include "helper.c"

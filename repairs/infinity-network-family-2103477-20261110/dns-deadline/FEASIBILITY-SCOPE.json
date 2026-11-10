@@ -4,6 +4,11 @@
   "Infinity_or_Cobra_APK_built_or_installed": false,
   "authorization": "Owner DNS-DEADLINE-CORRECTION-HANDOFF78be3d13 plus current executiondirective",
   "base": "78be3d13",
+  "narrow_correction_since_c19e6506": [
+    "raw child LP64 signal/time syscall boundary",
+    "fixture stalls either network selection path",
+    "preexec FD closure attestation and postexec sanitized diagnostics; no descriptor acceptance weakened"
+  ],
   "owner_data_access": false,
   "phase": "ISOLATED_RESOLVER_FEASIBILITY_NOT_PRODUCTION_ACTIVATION",
   "probe_process_only_network_bind_reset_to_default": true,
@@ -20,16 +25,16 @@
   "shutdown_tests": false,
   "source_files": {
     "android-probe/AndroidManifest.xml": "447419e8ac989e517d3030d173bda4659014d1f70b61d6a016cf1a6bf38e638f",
-    "android-probe/ProbeActivity.java": "1c0234c21af3edce1499e1bc8231ff6e3ebec8e13682935da707f32bad1a03f9",
-    "android-probe/android_probe.py": "9df1a1377162876324a0d9738541a8fff45f854d49bad11ec22b88266381658f",
-    "android-probe/jni_probe.cpp": "1c2a721d1d59a9f009dec23b0e2f3bc2ef0fc24a7bf0413f3dba93c73623a95a",
-    "prototype/helper.c": "bca67e08460c313a8b41f75334911879403f8165eb81c3f00be027e94550ca44",
-    "prototype/owned_lookup.cpp": "8a29fc3140b60313f32078e9fee393ba3eeec6b8ebb1952817884a77459acc5c",
-    "prototype/owned_lookup.h": "7479073588c050e918081c9434dec5db60eb1bf184fa5b253b3902a054d2d404",
-    "prototype/probe.cpp": "0ceffde3f046aa34069424f592215429f3f410fd49db38d79f10d6635ba67890",
-    "prototype/stalled_helper.c": "afa6a910d8f0075b281f7c1f181d470ad3f4bfbdaac2fd365f8eb6f78914153d",
-    "prototype/test_feasibility.py": "c556c0d0371ad86d6e4b8c82b8896ddd6b3e56ed14a35a23361efe0d513e7e17",
-    "prototype/wire.h": "0104acd76781b58c8b28b38113bfda239df00e3762ea12b5456650dc6fe892e5"
+    "android-probe/ProbeActivity.java": "4f06378c0b1172dbe5d3c1058552fc79c7885a6566b6e08bf150122effc47687",
+    "android-probe/android_probe.py": "d2131b46f3ed3965fe6de878224f5986c3081332b884536c056f0090ee41a0a5",
+    "android-probe/jni_probe.cpp": "93c68038a245b194053711c51a9bbd1940cb1ab54d86abb5e3e21cf89e820d51",
+    "prototype/helper.c": "b51f70da1fd621c3674dfdf8fa3896416de6d68b0af500cd5a3aa536debd3d59",
+    "prototype/owned_lookup.cpp": "008a0c9ac15a04bf23d110ea05bc5a8bc7e10ecffcf3122f4da4fce1ff0a2ffb",
+    "prototype/owned_lookup.h": "02d28edd58219830abdb088b12ee8a34cb2ea5947cf74f5a954228a30a18ab3c",
+    "prototype/probe.cpp": "358a7a062418fef2b56da98d92ac15e7572b0137c50b067ca045f6a8232ee3bf",
+    "prototype/stalled_helper.c": "2115a412dee68b3f9fd05dd8cbf72a41fe4e1fff13838c8c54fd48d4a755daa6",
+    "prototype/test_feasibility.py": "f70868b52fb290570595a7e6625bff2c402eeca0102182b6c40b2a98cde13c8f",
+    "prototype/wire.h": "b37a33c54f4ffcf0d472f726dfc831a9b1e0ab5e6e9a37b029405f1b24d5d6c4"
   },
   "test_packages": [
     "com.projectinfinity.dnsprobe.x86",

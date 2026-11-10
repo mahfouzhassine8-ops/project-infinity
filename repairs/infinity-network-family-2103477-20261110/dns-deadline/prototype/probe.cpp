@@ -58,6 +58,8 @@ int main(int argc, char** argv)
               << ",\"gai_error\":" << result.reply.gai_error
               << ",\"addresses\":" << result.reply.count
               << ",\"inherited_extra_fds\":" << result.reply.extra_fds
+              << ",\"preexec_extra_fds\":" << result.preexec_extra_fds
+              << ",\"runtime_fd_kind_bits\":" << result.reply.runtime_fd_kinds
               << ",\"caller_seconds\":" << caller
               << ",\"return_seconds\":" << result.return_seconds
               << ",\"cleanup_seconds\":" << result.cleanup_seconds

@@ -131,6 +131,7 @@ def execute():
                     require(row['binding_read'],label+':BINDING_CAPTURE')
                     require(row['wait_error']==0,label+':CHILD_NOT_REAPED')
                     if label in ('normal','explicit_binding'):
+                        require(row['preexec_extra_fds']==0,label+':PREEXEC_FD_INHERITANCE')
                         require(row['gai_error']==0 and row['addresses']>0,label+':NO_ADDRESS')
                         require(row['inherited_extra_fds']==0,label+':FD_INHERITANCE')
                     if label=='explicit_binding': require(row['explicit_binding'],label+':NOT_BOUND')

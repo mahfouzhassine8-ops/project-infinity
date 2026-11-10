@@ -58,6 +58,8 @@ Java_com_projectinfinity_dnsprobe_ProbeActivity_runNative(JNIEnv* env, jclass,
         << ",\"system_errno\":" << result.reply.system_errno
         << ",\"addresses\":" << result.reply.count
         << ",\"inherited_extra_fds\":" << result.reply.extra_fds
+        << ",\"preexec_extra_fds\":" << result.preexec_extra_fds
+        << ",\"runtime_fd_kind_bits\":" << result.reply.runtime_fd_kinds
         << ",\"binding_read\":" << (bindingRead ? "true" : "false")
         << ",\"explicit_binding\":" << (request.network ? "true" : "false")
         << ",\"caller_seconds\":" << wall

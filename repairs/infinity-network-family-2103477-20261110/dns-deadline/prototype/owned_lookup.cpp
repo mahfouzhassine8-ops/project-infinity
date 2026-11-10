@@ -46,41 +46,16 @@ struct LinuxDirent {
   unsigned char type;
   char name[1];
 };
+struct ChildSignals {
+  uint64_t all, alarmOnlyUnblocked, defaultAction[4];
+};
 
-// Only raw syscalls between clone and exec. No inherited libc/ART locks,
-// fdsan callbacks, allocation, logging, resolver, or application callbacks.
-[[noreturn]] void Child(const char* path, int channel, int nullFd,
-                         pid_t parent, char* const* arguments, char* const* environment,
-                         int64_t deadlineNs, const sigset_t* childMask,
-                         const struct sigaction* alarmAction)
+static int ChildDescriptors(bool closeOthers)
 {
-  if (syscall(SYS_prctl, PR_SET_PDEATHSIG, SIGKILL, 0, 0, 0) ||
-      syscall(SYS_getppid) != parent) syscall(SYS_exit_group, 121);
-  // The child alone gets a deadline signal. No parent/global handler changes.
-  // This also bounds cleanup if Android refuses a parent-to-child signal.
-  timespec now{};
-  if (clock_gettime(CLOCK_MONOTONIC, &now)) syscall(SYS_exit_group, 120);
-  int64_t left = deadlineNs - (static_cast<int64_t>(now.tv_sec) * 1000000000 + now.tv_nsec);
-  if (left <= 0) syscall(SYS_exit_group, 120);
-  itimerval timer{};
-  timer.it_value.tv_sec = left / 1000000000;
-  timer.it_value.tv_usec = (left % 1000000000 + 999) / 1000;
-  if (timer.it_value.tv_usec == 1000000) {
-    ++timer.it_value.tv_sec; timer.it_value.tv_usec = 0;
-  }
-  if (sigaction(SIGALRM, alarmAction, nullptr) ||
-      sigprocmask(SIG_SETMASK, childMask, nullptr) || setitimer(ITIMER_REAL, &timer, nullptr))
-    syscall(SYS_exit_group, 120);
-  if (channel != 0 && syscall(SYS_dup3, channel, 0, 0) < 0) syscall(SYS_exit_group, 122);
-  for (int target = 1; target <= 2; ++target) {
-    if (nullFd != target && syscall(SYS_dup3, nullFd, target, 0) < 0)
-      syscall(SYS_exit_group, 123);
-    syscall(SYS_fcntl, target, F_SETFD, 0);
-  }
-  syscall(SYS_fcntl, 0, F_SETFD, 0);
   const int directory = static_cast<int>(syscall(SYS_openat, AT_FDCWD,
       "/proc/self/fd", O_RDONLY | O_DIRECTORY | O_CLOEXEC, 0));
   if (directory < 0) syscall(SYS_exit_group, 124);
+  int count = 0;
   char buffer[4096];
   for (;;) {
     long n = syscall(SYS_getdents64, directory, buffer, sizeof(buffer));
@@ -95,11 +70,63 @@ struct LinuxDirent {
         if (row->name[i] < '0' || row->name[i] > '9') { number = false; break; }
         fd = fd * 10 + row->name[i] - '0';
       }
-      if (number && fd > 2 && fd != directory) syscall(SYS_close, fd);
+      if (number && fd > 2 && fd != directory) {
+        ++count;
+        if (closeOthers) syscall(SYS_close, fd);
+      }
       at += row->length;
     }
   }
   syscall(SYS_close, directory);
+  return count;
+}
+
+// Only raw syscalls between clone and exec. No inherited libc/ART locks,
+// fdsan callbacks, allocation, logging, resolver, or application callbacks.
+[[noreturn]] void Child(const char* path, int channel, int nullFd,
+                         pid_t parent, char* const* arguments, char* const* environment,
+                         int64_t deadlineNs, const ChildSignals* signals)
+{
+  if (syscall(SYS_rt_sigprocmask, SIG_SETMASK, &signals->all, nullptr, sizeof(uint64_t)) ||
+      syscall(SYS_rt_sigaction, SIGALRM, signals->defaultAction, nullptr, sizeof(uint64_t)))
+    syscall(SYS_exit_group, 120);
+  if (syscall(SYS_prctl, PR_SET_PDEATHSIG, SIGKILL, 0, 0, 0) ||
+      syscall(SYS_getppid) != parent) syscall(SYS_exit_group, 121);
+  // The child alone gets a deadline signal. No parent/global handler changes.
+  // This also bounds cleanup if Android refuses a parent-to-child signal.
+  timespec now{};
+  if (syscall(SYS_clock_gettime, CLOCK_MONOTONIC, &now)) syscall(SYS_exit_group, 120);
+  int64_t left = deadlineNs - (static_cast<int64_t>(now.tv_sec) * 1000000000 + now.tv_nsec);
+  if (left <= 0) syscall(SYS_exit_group, 120);
+  itimerval timer{};
+  timer.it_value.tv_sec = left / 1000000000;
+  timer.it_value.tv_usec = (left % 1000000000 + 999) / 1000;
+  if (timer.it_value.tv_usec == 1000000) {
+    ++timer.it_value.tv_sec; timer.it_value.tv_usec = 0;
+  }
+  // Linux LP64 kernel sigaction: handler, flags, restorer, mask (32 bytes).
+  // Only SIG_DFL is installed. Passing libc's sigaction/sigset_t here would
+  // be ABI-incorrect on glibc and can invoke inherited ART sigchain locks.
+  static_assert(sizeof(void*) == 8 && SIGALRM == 14 && SIG_SETMASK == 2,
+                "Reviewed Linux x86_64/AArch64 syscall ABI only");
+  static_assert(sizeof(timespec) == 16 && sizeof(itimerval) == 32,
+                "Reviewed LP64 kernel time ABI only");
+  if (syscall(SYS_setitimer, ITIMER_REAL, &timer, nullptr) ||
+      syscall(SYS_rt_sigprocmask, SIG_SETMASK, &signals->alarmOnlyUnblocked,
+              nullptr, sizeof(uint64_t)))
+    syscall(SYS_exit_group, 120);
+  if (channel != 0 && syscall(SYS_dup3, channel, 0, 0) < 0) syscall(SYS_exit_group, 122);
+  for (int target = 1; target <= 2; ++target) {
+    if (nullFd != target && syscall(SYS_dup3, nullFd, target, 0) < 0)
+      syscall(SYS_exit_group, 123);
+    syscall(SYS_fcntl, target, F_SETFD, 0);
+  }
+  syscall(SYS_fcntl, 0, F_SETFD, 0);
+  ChildDescriptors(true);
+  const dns_bootstrap bootstrap{DNS_BOOTSTRAP_MAGIC, 1, ChildDescriptors(false)};
+  if (syscall(SYS_sendto, 0, &bootstrap, sizeof(bootstrap), MSG_NOSIGNAL, nullptr, 0)
+      != sizeof(bootstrap)) syscall(SYS_exit_group, 126);
+  if (bootstrap.extra_fds) syscall(SYS_exit_group, 126);
   syscall(SYS_execve, path, arguments, environment);
   const int execError = errno;
   static_assert(offsetof(dns_reply, addresses) == 24, "Versioned IPC prefix");
@@ -142,19 +169,16 @@ static DnsResult PerformLookup(const std::string& helper, const dns_request& req
   char* arguments[] = {const_cast<char*>(path), nullptr};
   sigset_t blocked, original;
   sigfillset(&blocked);
-  sigset_t childMask = blocked;
-  sigdelset(&childMask, SIGALRM);
-  struct sigaction alarmAction{};
-  alarmAction.sa_handler = SIG_DFL;
-  sigemptyset(&alarmAction.sa_mask);
   const auto deadlineNs = std::chrono::duration_cast<std::chrono::nanoseconds>(
       deadline.time_since_epoch()).count();
+  const ChildSignals signals{UINT64_MAX,
+      UINT64_MAX & ~(UINT64_C(1) << (SIGALRM - 1)), {0, 0, 0, 0}};
   if (pthread_sigmask(SIG_SETMASK, &blocked, &original)) return result;
   int pidfd = -1;
   const pid_t parent = getpid();
   const long child = syscall(SYS_clone, ClonePidfd | SIGCHLD, nullptr, &pidfd, nullptr, 0);
   if (!child) Child(path, childChannel.value, nullFd.value, parent, arguments, environ,
-                    deadlineNs, &childMask, &alarmAction);
+                    deadlineNs, &signals);
   const int spawnError = errno;
   const int maskError = pthread_sigmask(SIG_SETMASK, &original, nullptr);
   Fd identity{pidfd};
@@ -169,7 +193,28 @@ static DnsResult PerformLookup(const std::string& helper, const dns_request& req
   result.spawn_seconds = std::chrono::duration<double>(Clock::now() - began).count();
   bool terminate = maskError != 0;
   if (fcntl(channel.value, F_SETFL, O_NONBLOCK) < 0) terminate = true;
-  size_t sent = 0, received = 0;
+  size_t sent = 0, received = 0, bootReceived = 0;
+  dns_bootstrap bootstrap{};
+  auto receiveFrames = [&]() {
+    for (;;) {
+      char* dest;
+      size_t available;
+      if (bootReceived < sizeof(bootstrap)) {
+        dest = reinterpret_cast<char*>(&bootstrap) + bootReceived;
+        available = sizeof(bootstrap) - bootReceived;
+      } else if (received < sizeof(result.reply)) {
+        dest = reinterpret_cast<char*>(&result.reply) + received;
+        available = sizeof(result.reply) - received;
+      } else break;
+      const ssize_t n = recv(channel.value, dest, available, MSG_DONTWAIT);
+      if (n > 0) {
+        if (bootReceived < sizeof(bootstrap)) bootReceived += static_cast<size_t>(n);
+        else received += static_cast<size_t>(n);
+      } else if (n < 0 && errno == EINTR) continue;
+      else return n < 0 && errno != EAGAIN ? -1 : 0;
+    }
+    return 0;
+  };
   bool dead = false, failed = false;
   bool waitConsumed = false;
   siginfo_t status{};
@@ -212,26 +257,16 @@ static DnsResult PerformLookup(const std::string& helper, const dns_request& req
       else if (n < 0 && errno != EAGAIN && errno != EINTR) { failed = terminate = true; }
     }
     if (descriptors[0].revents & (POLLIN | POLLHUP)) {
-      ssize_t n = 0;
-      do {
-        if (received == sizeof(result.reply)) break;
-        n = recv(channel.value, reinterpret_cast<char*>(&result.reply) + received,
-                 sizeof(result.reply) - received, MSG_DONTWAIT);
-        if (n > 0) received += static_cast<size_t>(n);
-      } while (n > 0);
-      if (n < 0 && errno != EAGAIN && errno != EINTR) { failed = terminate = true; }
+      if (receiveFrames() < 0) { failed = terminate = true; }
     }
     dead = descriptors[1].revents & POLLIN;
   }
   const auto exitObserved = Clock::now();
   // Completion can race the initial socket poll. Drain after observing exit.
-  while (received < sizeof(result.reply)) {
-    const ssize_t n = recv(channel.value, reinterpret_cast<char*>(&result.reply) + received,
-                           sizeof(result.reply) - received, MSG_DONTWAIT);
-    if (n > 0) received += static_cast<size_t>(n);
-    else if (n < 0 && errno == EINTR) continue;
-    else break;
-  }
+  if (receiveFrames() < 0) failed = true;
+  const bool bootstrapValid = bootReceived == sizeof(bootstrap) &&
+      bootstrap.magic == DNS_BOOTSTRAP_MAGIC && bootstrap.version == 1;
+  if (bootstrapValid) result.preexec_extra_fds = bootstrap.extra_fds;
   char excess;
   if (recv(channel.value, &excess, 1, MSG_DONTWAIT) > 0) failed = true;
   if (!waitConsumed)
@@ -246,7 +281,7 @@ static DnsResult PerformLookup(const std::string& helper, const dns_request& req
   // ECHILD after pidfd exit readiness is already reaped, not a successful answer.
   const size_t expected = offsetof(dns_reply, addresses) +
       result.reply.count * sizeof(dns_address);
-  bool valid = result.reply.magic == DNS_MAGIC && result.reply.count <= DNS_MAX_ADDRESSES &&
+  bool valid = bootstrapValid && bootstrap.extra_fds == 0 && result.reply.magic == DNS_MAGIC && result.reply.count <= DNS_MAX_ADDRESSES &&
                received == expected && result.reply.extra_fds == 0 &&
                (result.reply.gai_error == 0 || result.reply.count == 0);
   for (unsigned i = 0; valid && i < result.reply.count; ++i) {

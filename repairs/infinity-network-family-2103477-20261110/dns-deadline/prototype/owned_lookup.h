@@ -6,6 +6,7 @@
 
 enum class DnsOutcome { Answer, Timeout, Cancelled, Unsupported, Capacity, Failed };
 struct DnsResult {
+  int preexec_extra_fds = -1;
   DnsOutcome outcome = DnsOutcome::Failed;
   dns_reply reply{};
   double spawn_seconds = 0, return_seconds = 0, cleanup_seconds = 0;

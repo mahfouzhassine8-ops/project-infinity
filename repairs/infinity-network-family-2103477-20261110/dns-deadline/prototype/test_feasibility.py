@@ -28,6 +28,7 @@ class Feasibility(unittest.TestCase):
             self.assertEqual(row['gai_error'], 0, row)
             self.assertGreater(row['addresses'], 0, row)
             self.assertEqual(row['inherited_extra_fds'], 0, row)
+            self.assertEqual(row['preexec_extra_fds'], 0, row)
         self.assert_clean(rows)
 
     def test_stalled_lookup_deadline_includes_reap(self):

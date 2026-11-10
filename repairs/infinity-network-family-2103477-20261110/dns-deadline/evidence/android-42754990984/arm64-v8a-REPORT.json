@@ -1,0 +1,27 @@
+{
+  "error": "IllegalStateException:NATIVE_DIRECTORY_EXEC_OR_CAPABILITY_FAILED",
+  "helper_executable": true,
+  "helper_writable": false,
+  "normal": [
+    {
+      "addresses": 1,
+      "binding_read": true,
+      "caller_seconds": 1.60033,
+      "child_code": 1,
+      "child_status": 0,
+      "cleanup_seconds": 0.000414208,
+      "explicit_binding": true,
+      "fd_difference": 25,
+      "gai_error": 0,
+      "inherited_extra_fds": 1,
+      "outcome": 5,
+      "return_seconds": 1.60029,
+      "system_errno": 0,
+      "wait_error": 0
+    }
+  ],
+  "scope": "Isolated DNS helper feasibility; no Infinity or Cobra installation",
+  "sdk": 36,
+  "status": "FAIL",
+  "test_package": "com.projectinfinity.dnsprobe.arm64"
+}

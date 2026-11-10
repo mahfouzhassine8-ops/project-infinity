@@ -9,11 +9,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#ifndef DNS_BEFORE_LOOKUP
+#define DNS_BEFORE_LOOKUP() ((void)0)
+#endif
 #if defined(__ANDROID__)
 #include <dlfcn.h>
 #endif
 
-static int extra_fds(void)
+static int extra_fds(uint32_t *kinds)
 {
   DIR *dir = opendir("/proc/self/fd");
   if (!dir) return -1;
@@ -22,7 +25,22 @@ static int extra_fds(void)
   while ((entry = readdir(dir))) {
     char *end;
     long fd = strtol(entry->d_name, &end, 10);
-    if (*entry->d_name && !*end && fd > 2 && fd != dirfd(dir)) ++count;
+    if (*entry->d_name && !*end && fd > 2 && fd != dirfd(dir)) {
+      ++count;
+      char target[512];
+      ssize_t length = readlinkat(dirfd(dir), entry->d_name, target, sizeof(target)-1);
+      if (length < 0) { *kinds |= 128; continue; }
+      target[length] = 0;
+      // Categories only. Never copy a file path or network endpoint to IPC/logs.
+      if (!strncmp(target, "socket:", 7)) *kinds |= 1;
+      else if (!strncmp(target, "anon_inode:", 11)) *kinds |= 2;
+      else if (!strncmp(target, "/memfd:", 7) || !strncmp(target, "memfd:", 6)) *kinds |= 4;
+      else if (!strncmp(target, "/system/", 8) || !strncmp(target, "/apex/", 6)) *kinds |= 8;
+      else if (!strncmp(target, "/dev/", 5)) *kinds |= 16;
+      else if (!strncmp(target, "/data/app/", 10)) *kinds |= 32;
+      else if (!strncmp(target, "/proc/", 6)) *kinds |= 64;
+      else *kinds |= 128;
+    }
   }
   closedir(dir);
   return count;
@@ -46,7 +64,7 @@ int main(void)
   struct dns_reply *reply = calloc(1, sizeof(*reply));
   if (!reply) return 13;
   reply->magic = DNS_MAGIC;
-  reply->extra_fds = extra_fds();
+  reply->extra_fds = extra_fds(&reply->runtime_fd_kinds);
   struct addrinfo hints;
   memset(&hints, 0, sizeof(hints));
   hints.ai_family = request.family;
@@ -54,6 +72,7 @@ int main(void)
   hints.ai_protocol = request.protocol;
   hints.ai_flags = request.flags;
   struct addrinfo *addresses = NULL;
+  DNS_BEFORE_LOOKUP();
   if (request.network) {
 #if defined(__ANDROID__)
     typedef int (*network_gai)(uint64_t, const char *, const char *,

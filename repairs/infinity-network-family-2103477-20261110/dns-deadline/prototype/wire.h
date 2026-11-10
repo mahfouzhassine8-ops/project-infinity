@@ -4,6 +4,11 @@
 #include <sys/socket.h>
 #define DNS_MAGIC 0x49444e53u
 #define DNS_MAX_ADDRESSES 64u
+#define DNS_BOOTSTRAP_MAGIC 0x49424453u
+struct dns_bootstrap {
+  uint32_t magic, version;
+  int32_t extra_fds;
+};
 struct dns_request {
   uint32_t magic;
   int32_t family, socktype, protocol, flags;
@@ -20,5 +25,6 @@ struct dns_address {
 struct dns_reply {
   uint32_t magic, count;
   int32_t gai_error, system_errno, extra_fds;
+  uint32_t runtime_fd_kinds;
   struct dns_address addresses[DNS_MAX_ADDRESSES];
 };
