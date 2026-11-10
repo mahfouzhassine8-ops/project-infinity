@@ -54,15 +54,19 @@ def authenticated_loading():
 
 def state():
     window = xbmcgui.getCurrentWindowId()
+    dialog = xbmcgui.getCurrentWindowDialogId()
+    focused_window = dialog if dialog not in (0, 9999) else window
     try:
-        focus = xbmcgui.Window(window).getFocusId()
+        focus = xbmcgui.Window(focused_window).getFocusId()
     except RuntimeError:
         focus = None
-    return dict(at=time.monotonic(), window=window, dialog=xbmcgui.getCurrentWindowDialogId(),
+    return dict(at=time.monotonic(), window=window, dialog=dialog, focused_window=focused_window,
                 focus=focus, skin=xbmc.getSkinDir(),
                 properties={key: HOME.getProperty('Infinity.Loading.' + key)
                             for key in ('Active', 'Global', 'Token', 'State', 'Control', 'Window')},
                 motion=HOME.getProperty('Infinity.OptionalMotionAllowed'),
+                resident_context=HOME.getProperty('Infinity.Loading.Context'),
+                resident_current_window=HOME.getProperty('Infinity.Loading.CurrentWindow'),
                 screen=[xbmc.getInfoLabel('System.ScreenWidth'), xbmc.getInfoLabel('System.ScreenHeight')])
 
 
@@ -79,8 +83,10 @@ def preparation_probe(loading, outcome, sequence):
     token = None
     failed = False
     back_sent = None
+    body_entered = None
     try:
         with loading.preparation('performance-diagnostic-' + str(sequence)) as token:
+            body_entered = time.monotonic()
             deadline = time.monotonic() + 2.0
             navigated = False
             while time.monotonic() < deadline and not MONITOR.abortRequested():
@@ -89,9 +95,9 @@ def preparation_probe(loading, outcome, sequence):
                 rows.append(row)
                 if row['properties']['Token'] == token and row['properties']['Active'] == 'true':
                     save('visible.json', dict(sequence=sequence, token=token, at=row['at']))
-                if outcome == 'context-cancel' and not navigated and time.monotonic() - begin > .8:
+                if outcome == 'context-cancel' and not navigated and time.monotonic() - body_entered > .8:
                     # Existing native Back from System Hub, never app Close.
-                    require(xbmcgui.getCurrentWindowId() == 11191, 'BACK_ONLY_FROM_SELECTED_HUB')
+                    require(xbmcgui.getCurrentWindowDialogId() == 11191, 'BACK_ONLY_FROM_SELECTED_HUB_DIALOG')
                     back_sent = time.monotonic()
                     xbmc.executebuiltin('Action(Back)')
                     navigated = True
@@ -118,6 +124,8 @@ def preparation_probe(loading, outcome, sequence):
     context_clear = [r['at'] for r in rows if back_sent and back_sent <= r['at'] < terminal and
                      (r['properties']['Token'] != token or r['properties']['Active'] != 'true')]
     return dict(begin=begin, terminal=terminal, outcome=outcome, token=token, failed_fixture=failed,
+                body_entered=body_entered,
+                context_capture_and_notify_call_ms=1000*(body_entered-begin) if body_entered else None,
                 first_active_property_ms=1000*(active[0]-begin) if active else None,
                 local_owner_measurement='OBSERVED_MATCHING_TOKEN' if active else 'NOT_AVAILABLE_NO_PUBLISHED_MATCHING_TOKEN',
                 unattributed_global_cue_observation=global_rows,
@@ -154,13 +162,17 @@ def main():
             contract.current()
             action = value['action']
             if action == 'hub':
-                xbmc.executebuiltin('ActivateWindow(11191)')
+                xbmc.executebuiltin('ActivateWindow(1191)')
                 deadline = time.monotonic() + 8
-                while xbmcgui.getCurrentWindowId() != 11191 and time.monotonic() < deadline:
+                while xbmcgui.getCurrentWindowDialogId() != 11191 and time.monotonic() < deadline:
                     MONITOR.waitForAbort(.05)
-                require(xbmcgui.getCurrentWindowId() == 11191, 'REAL_SYSTEM_HUB')
+                require(xbmcgui.getCurrentWindowDialogId() == 11191, 'REAL_SYSTEM_HUB_DIALOG')
                 # Focus the existing Command Center button, never activate Cobra.
                 xbmcgui.Window(11191).setFocusId(1191102)
+                deadline = time.monotonic() + 2
+                while xbmcgui.Window(11191).getFocusId() != 1191102 and time.monotonic() < deadline:
+                    MONITOR.waitForAbort(.05)
+                require(xbmcgui.Window(11191).getFocusId() == 1191102, 'EXISTING_HUB_COMMAND_BUTTON_FOCUS')
                 result = state()
             elif action == 'home-focus':
                 require(xbmcgui.getCurrentWindowId() == 10000, 'REAL_HOME_ONLY')

@@ -23,6 +23,7 @@ import qualify_android_baseline as base
 import verify_tracking_android as gui
 sys.path.insert(0, str(ROOT / 'repairs/infinity-final-closure-2103407'))
 import android_frame_samples as frames
+import surface_layers
 
 QA = 'script.infinity.performanceprobe'
 QP = base.PROFILE + '/addon_data/' + QA
@@ -33,8 +34,10 @@ CERT = 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
 
 def selected():
     scope = base.load(HERE / 'SCOPE.json')
-    base.require(scope['operation'] == 'signed77-performance-baseline' and
+    base.require(scope['operation'] in ('signed77-performance-baseline','signed77-performance-followup') and
                  not scope['shutdown_tests'] and not scope['production_edits'], 'BASELINE_ONLY_SCOPE')
+    if os.environ.get('GITHUB_ACTIONS') == 'true':
+        base.require(os.environ.get('SELECTED_FEATURE') == scope['selected_feature'], 'EXACT_NAMED_MEASUREMENT_SELECTION')
     for name, digest in scope['source_bindings'].items():
         base.require(base.sha(ROOT / name) == digest, 'SELECTED_SOURCE_BINDING:' + name)
     return scope
@@ -130,12 +133,17 @@ def snapshot(device, out, label, layer=None):
                        ('threads', ['ps', '-T', '-p', str(device.pid)]),
                        ('layers', ['dumpsys', 'SurfaceFlinger', '--list'])]:
         row[name] = query(device, *args)
-    candidates = [v for v in row['layers']['stdout'].splitlines()
-                  if 'SurfaceView' in v and base.PACKAGE in v and '.Main' in v]
+    candidates = surface_layers.candidates(row['layers']['stdout']) if row['layers']['returncode']==0 and not row['layers']['stdout_truncated'] else []
     row['matching_layer_candidates'] = candidates
-    row['layer'] = layer if layer in candidates else candidates[0] if layer is None and len(candidates) == 1 else None
+    selected = next((v for v in candidates if v['name']==layer),None) if layer else candidates[0] if len(candidates)==1 else None
+    if len(candidates) != 1:
+        selected = None
+    row['layer'] = selected['name'] if selected else None
+    row['layer_identity'] = selected
     row['same_requested_layer_present'] = layer is None or row['layer'] == layer
     if row['layer']:
+        row['surface_inventory'] = query(device, 'dumpsys', 'SurfaceFlinger',timeout=12)
+        row['layer_corroboration'] = surface_layers.corroborate(row['surface_inventory']['stdout'],selected,device.pid)
         row['presentations'] = query(device, 'dumpsys', 'SurfaceFlinger', '--latency', row['layer'])
     row['finished_monotonic'] = time.monotonic()
     base.save(out / (label + '.json'), row)
@@ -158,6 +166,10 @@ def scene(device, out, label, actions):
     same_layer = bool(before['layer'] and before['layer'] == after['layer'])
     available = (same_layer and stable and before.get('presentations', {}).get('returncode') == 0
                  and after.get('presentations', {}).get('returncode') == 0
+                 and before.get('layer_corroboration',{}).get('confirmed')
+                 and after.get('layer_corroboration',{}).get('confirmed')
+                 and before['surface_inventory']['returncode']==0 and after['surface_inventory']['returncode']==0
+                 and not before['surface_inventory']['stdout_truncated'] and not after['surface_inventory']['stdout_truncated']
                  and not before['presentations']['stdout_truncated'] and not after['presentations']['stdout_truncated'])
     observed = frames.summarize(before.get('presentations', {}).get('stdout', ''),
                                 after.get('presentations', {}).get('stdout', '')) if available else dict(status='UNAVAILABLE_LAYER_PROCESS_OR_QUERY')
@@ -217,7 +229,7 @@ class Observer:
 
 
 def run(sdk, inputs, out):
-    selected()
+    scope = selected()
     base.require(os.environ.get('GITHUB_ACTIONS') == 'true' and os.environ.get('GITHUB_REF') ==
         'refs/heads/work/infinity-2103477-full-performance-ui-stability-20261110', 'EXACT_DISPOSABLE_CI_BRANCH')
     base.require(not out.exists(), 'FRESH_RESULTS'); out.mkdir(parents=True)
@@ -263,12 +275,32 @@ def run(sdk, inputs, out):
         for name, args in [('display', ('dumpsys','display')), ('surface-inventory', ('dumpsys','SurfaceFlinger')),
                            ('memory-initial', ('dumpsys','meminfo',str(device.pid)))]:
             base.save(out/(name+'.json'), query(device,*args,timeout=12))
-        report['idle_home_before_observer'] = scene(device,out,'idle-home', ['idle']*20)
+        followup = scope['operation']=='signed77-performance-followup'
+        report['reused_first_run'] = scope.get('reuse',{})
+        if not followup:
+            report['idle_home_before_observer'] = scene(device,out,'idle-home', ['idle']*20)
+        else:
+            report['startup_is_fresh_VM_setup_not_repeated_acceptance_metric'] = True
         report['home_horizontal_focus'] = scene(device,out,'home-horizontal', ['Input.Right']*8+['Input.Left']*8)
         gui.install_zip(device, intake['observer'], dict(remote_zip_directory=REMOTE), out, 'performance-observer')
         observer = Observer(device, out)
         report['native_authenticated_CC75'] = observer.ready
         device.rpc('Input.Home')
+        ready_started = time.monotonic()
+        resident_samples = []
+        deadline = ready_started + 60
+        while time.monotonic() < deadline:
+            current = observer.call('state')
+            resident_samples.append(current)
+            if (current['resident_context'] and current['resident_current_window']=='10000'
+                    and current['properties']['State'] in ('idle','preparing')):
+                break
+            time.sleep(.25)
+        else:
+            base.save(out/'RESIDENT-READINESS.json',resident_samples)
+            raise TimeoutError('Resident loading observer not ready; no loading preparation sent')
+        report['resident_readiness'] = dict(wait_seconds=time.monotonic()-ready_started,samples=resident_samples)
+        base.save(out/'RESIDENT-READINESS.json',report['resident_readiness'])
         report['home_frame_focus'] = observer.call('home-focus')
         report['loading'] = []
         for outcome in ('ready','ready','failed'):

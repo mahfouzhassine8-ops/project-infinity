@@ -23,24 +23,45 @@
   "branch": "work/infinity-2103477-full-performance-ui-stability-20261110",
   "build_or_signing": false,
   "networking_production_or_APK_inputs": false,
-  "operation": "signed77-performance-baseline",
+  "operation": "signed77-performance-followup",
   "owner_brief": "handoffs/infinity-full-performance-ui-stability-20261110/CODEX-OWNER-END-TO-END-BRIEF.md",
   "production_edits": false,
+  "reuse": {
+    "artifact": 13761222346,
+    "overall_first_result": "FAIL_RETAINED_modalwindowtestassertion",
+    "retained_completed_observations": [
+      "FirstusableHome + source/auth intake",
+      "InitialidleCPU/FD",
+      "InitialfocusCPU/FD"
+    ],
+    "run": 42808674960,
+    "same_APK_required": true,
+    "source": "a5607a7a7ff62c6f5f1f82de68e32cd53ca3c0c3"
+  },
   "selected_cases": [
-    "Freshprofile firstobserved usableHome with exactscope limits",
-    "Homeidle beforediagnostic and afterdiagnostic",
-    "Homehorizontal andSystemHubvertical nativefocusmotion",
-    "Controlledactualresident loadingpublication/cleanup:ready twice,failed once,Back/contextcancel once",
-    "Read-onlyprocess/FD/thread/PSS/CPU/display/nativeSurfacepresentation observations"
+    "Freshsigned77startasrequirednewVMsetup; notnewstartupacceptancemetric",
+    "Missingnativepresentation samplesusingcanonicalvisibleownerBLASTidentity",
+    "Loadingready twice/failedonce onlyAFTERrealresidentContextandStatepublication",
+    "CorrectmodalSystemHubfocusmotion",
+    "ExistingHubBack/contextcancel; tokenlocaltimingunavailableunlessactuallypublished",
+    "UnreachedsamePIDforegroundreturn andafterprobeidle/resourcecomparison"
+  ],
+  "selected_feature": "infinity77-performance-followup",
+  "selected_host_contract_cases": [
+    "test_surface_layers.py: five focused offline attributionchecks usingcapturedAndroidformat"
   ],
   "shutdown_tests": false,
   "source_bindings": {
-    ".github/workflows/infinity-saved-navigation-android.yml": "fd7b8838e56aabe12b6cf789137b7199927b9dfd2a83b45e8d9e0b27f3ea5903",
+    ".github/workflows/infinity-saved-navigation-android.yml": "b7485bd9c94f0ed2e5da559a736802f6f0adb1bd203429a107cf423ae8933530",
     "handoffs/infinity-full-performance-ui-stability-20261110/CODEX-OWNER-END-TO-END-BRIEF.md": "838f0dec1b777b582af6b4dfc123298aaf22d027aec3aed270c0abeaaf2c948e",
     "repairs/infinity-final-closure-2103407/android_frame_samples.py": "e121d1c098bf6541b9bdac08bac0ffcb4bab6baa11bbe7af0f1be53f8678807b",
     "repairs/infinity-performance-ui-2103477-20261110/FIRST-REPORT.md": "3729297222152f0695e76015e9cb0332f1f47dc31c9e8c804927ec11db0918cd",
-    "repairs/infinity-performance-ui-2103477-20261110/baseline.py": "534f161a8fbcfb3a9f12cf6e89e9ac8de48c7d0b3b437a9828111b4264c9b66e",
-    "repairs/infinity-performance-ui-2103477-20261110/observer.py": "ac1b5737d3f450b60c1a2285f69590ce177b7f455b28f0521bdf16e76da4586b",
+    "repairs/infinity-performance-ui-2103477-20261110/FOLLOWUP-REQUEST.md": "8139caeeca858539deb9e3c2ff758e9936185f5fb304816e3336ee2cf63717a9",
+    "repairs/infinity-performance-ui-2103477-20261110/baseline.py": "659f7e5a91866e71761d8cf5d6b498f53eec2c1bb116c78225f94a0394c5b8e5",
+    "repairs/infinity-performance-ui-2103477-20261110/observer.py": "9ab39016d16f7d78bb209b9301381a5d2d874ef0ff1c8ff094fd845a2108e137",
+    "repairs/infinity-performance-ui-2103477-20261110/surface-layer-fixture.txt": "b0de4bb99ce0d0dd8868d2ce679fe52d3b18c7187edede9e4018e1f37fda33dd",
+    "repairs/infinity-performance-ui-2103477-20261110/surface_layers.py": "238d249e7aa4b083c0dcc60868e0783d9caa610c1b166e8755484d00e8571956",
+    "repairs/infinity-performance-ui-2103477-20261110/test_surface_layers.py": "e0c6144f5bd39614b044a4d32638fd4f297014342741e0e89619a92975954b42",
     "repairs/infinity-tracking-integration-2103469-20261108/prepare_tracking_release.py": "49c4d49bd679b2dd2ae2819ab45b8a673d4b362f80fc30090223553d3abc9e0b",
     "repairs/infinity-tracking-integration-2103469-20261108/qualify_android_baseline.py": "9b4cf409c35688a77e94849361aff510b6b896871314b32b15cc5844b4e23734",
     "repairs/infinity-tracking-integration-2103469-20261108/tracking_module_fixture.py": "af14da368c555a5d9d0862aa1c1f490bfcf64d389026cb82092261d39ce3ecdb",
