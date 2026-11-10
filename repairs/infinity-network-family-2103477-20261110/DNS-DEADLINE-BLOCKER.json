@@ -1,0 +1,24 @@
+{
+  "status": "DNS_WALL_CLOCK_BOUND_NOT_MET",
+  "code_change_to_curl_dependency": false,
+  "library_source": "https://curl.se/download/curl-8.10.0.tar.xz",
+  "archive_sha512": "055277695ea242fcb0bf26ca6c4867a385cd578cd73ed4c5c4a020233248044c1ecaebcbaeaac47d3ffe07a41300ea5fc86396d7e812137cf75ed3e1b54ca5b2",
+  "source_file": "lib/asyn-thread.c",
+  "source_sha256": "6c60e80c4a6535564303db5160ff23b5a0aac8ae432b75db7e303405ddfe0ef6",
+  "confirmed_function": "Curl_resolver_kill -> thread_wait_resolv -> Curl_thread_join",
+  "source_excerpt": "\n\n/*\n * Until we gain a way to signal the resolver threads to stop early, we must\n * simply wait for them and ignore their results.\n */\nvoid Curl_resolver_kill(struct Curl_easy *data)\n{\n  struct thread_data *td = data->state.async.tdata;\n\n  /* If we are still resolving, we must wait for the threads to fully clean up,\n     unfortunately. Otherwise, we can simply cancel to clean up any resolver\n     data. */\n  if(td && td->thread_hnd != curl_thread_t_null\n     && (data->set.quick_exit != 1L))\n    (void)thread_wait_resolv(data, NULL, FALSE);\n  else\n    Curl_resolver_cancel(data);\n}",
+  "observed": {
+    "library": "Exactcurl8.10.0 POSIXthreadedresolver",
+    "configured_connect_ms": 2000,
+    "configured_total_ms": 3500,
+    "elapsed_seconds": 5.01987,
+    "CURLcode": 28,
+    "NOSIGNAL": 1
+  },
+  "what_this_proves": "The retainedthreadedresolverbackend can outlast configuredcurltimeouts whilewaitingforplatformgetaddrinfo cleanup. Does notproveexactAndroidtiming or itsselectedresolverbackend.",
+  "automatic_fallback": "200msHappyEyeballs controlsconnectionattempts afterusableDNSanswers; not a hardDNSdeadline.",
+  "cancellation": "Cancel()flagsetter unchanged; transfercompletion/disconnectcleanup canwaitonDNSworker. No claim thatCancelAPIitselfblocks.",
+  "QUICK_EXIT_rejected": "Officialoptiondocs target a program about to exit and permit possible resourceleaks. NotenabledinlongrunningKodi.",
+  "gate": "Keep failurevisible; Androiddeadlineandcancellationwallclock NOT_PROVEN; no approvedsignedAPKwhilemandatorygateunresolved.",
+  "required_supported_resolution": "A safely bounded resolver/cleanup mechanism preservingAndroidDNS/TLS/proxy semantics andCobra isolation, or an explicit revisedacceptancecontract. No speculative dependency/signal/globalresolverchange applied."
+}

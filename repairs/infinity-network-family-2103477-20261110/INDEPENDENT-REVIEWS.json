@@ -1,0 +1,25 @@
+{
+  "network_reviewer": "GPT-6.1",
+  "stability_reviewer": "Astra",
+  "source_reviews": "PASS_SCOPED_SOURCE_WITH_RUNTIME_GATES_OPEN",
+  "network_findings_closed": [
+    "Per-modefreshconnectionwithoutpoolpartition/cookieloss",
+    "Strictnumericliteral/redirect/v4mappedguard",
+    "Writepathfailclosedonpolicysetupfailure",
+    "Preserveexplicitmanualhost/WSDoverrides; bypassonlyautomaticone-addresscache"
+  ],
+  "preservation_findings": [
+    "Hubsingleinsertdeletionrestoresall77XMLbytes",
+    "Defaultdispatchonlynetworkaction",
+    "Existingapprovedselectorandserializedsettingwriterreused",
+    "NoCobraDEXJavaresourcespreferencesmodifications"
+  ],
+  "remaining": [
+    "DNSwallclockdeadlineFAIL",
+    "ActualAndroidnetwork/UI/playbackpreservationNOT_RUN",
+    "Original-key81-filemodulegenerationNOT_RUN",
+    "Registryreconciliation/reservationNOT_APPLIED",
+    "SignedcandidateandrecoveryNOT_PREPARED"
+  ],
+  "no_independent_acceptance_claim": true
+}
