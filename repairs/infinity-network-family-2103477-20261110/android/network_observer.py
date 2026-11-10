@@ -196,12 +196,15 @@ def action(request):
         title, focus = window.getProperty('Infinity.UI.Title'), window.getFocusId()
         if title != 'Network Connections' or focus != 50:
             return dict(title=title, label='', focus=focus, ready=False)
-        rows = window.getControl(50)
-        index, count = rows.getSelectedPosition(), rows.size()
-        ready = 0 <= index < count and count == 4
-        # Read a selected SDK item only while this stable modal is active.
-        # The item wrapper is destroyed before any subsequent navigation command.
-        label = rows.getSelectedItem().getLabel() if ready else ''
+        # Foreign Window.getControl wrappers have an empty Python vecItems even
+        # when the native dialog is populated. Query the actual GUI container.
+        count_text = xbmc.getInfoLabel('Container(50).NumItems')
+        position_text = xbmc.getInfoLabel('Container(50).CurrentItem')
+        label = xbmc.getInfoLabel('Container(50).ListItem.Label')
+        count = int(count_text) if count_text.isdigit() else 0
+        index = int(position_text) - 1 if position_text.isdigit() else -1
+        ready = (0 <= index < count and count == 4 and xbmcgui.getCurrentWindowDialogId() == dialog
+                 and window.getProperty('Infinity.UI.Title') == title and window.getFocusId() == 50)
         return dict(title=title, label=label, focus=focus, position=index, count=count, ready=ready)
     if name == 'fetch':
         # Only fixed test servers and public TLS/DNS controls; never credentials.

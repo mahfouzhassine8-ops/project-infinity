@@ -187,11 +187,15 @@ def select_mode(device, observer, mode):
     wanted = {'auto': 'Automatic (Default)', 'ipv4': 'IPv4 Only', 'ipv6': 'IPv6 Only'}[mode]
     popup = native.until(device, lambda: (p if (p := observer.call('popup')).get('title') == 'Network Connections' and p.get('ready') else None),
                          'Real Network Connections selector', 15)
-    for _ in range(5):
+    target = ('auto', 'ipv4', 'ipv6').index(mode)
+    for _ in range(4):
         if popup['label'] == wanted:
             break
-        device.rpc('Input.Down')
-        popup = observer.call('popup')
+        direction = 1 if popup['position'] < target else -1
+        expected = popup['position'] + direction
+        device.rpc('Input.Down' if direction > 0 else 'Input.Up')
+        popup = native.until(device, lambda: (p if (p := observer.call('popup')).get('ready')
+                    and p.get('position') == expected else None), 'Queued selector movement completed', 10)
     require(popup['label'] == wanted, 'ACTUAL_SELECTED_FAMILY_LABEL')
     device.rpc('Input.Select')
     current = native.until(device, lambda: (v if (v := observer.call('identity'))['mode'] == mode else None), 'Persisted network setting', 10)
@@ -303,9 +307,10 @@ def checks(device, observer, out):
         for name, size in (('fold-front-surrogate', '904x2316'), ('fold-inner-surrogate', '1812x2176')):
             device.shell('wm', 'size', size)
             time.sleep(1)
-            observer.call('focus_hub')
+            hub = observer.call('focus_hub')
+            require(hub == dict(window=11191, focus=1191105, label='NETWORK CONNECTIONS'), 'ACTUAL_RESPONSIVE_HUB_FOCUS')
             device.rpc('Input.Select')
-            popup = native.until(device, lambda: (p if (p := observer.call('popup'))['title'] == 'Network Connections' else None),
+            popup = native.until(device, lambda: (p if (p := observer.call('popup'))['title'] == 'Network Connections' and p.get('ready') else None),
                                  'Network selector after Android viewport change', 15)
             device.screenshot(name + '-network-selector')
             device.rpc('Input.Back')
@@ -416,6 +421,12 @@ def run(inputs, sdk, out):
             'No global resource-leak proof or inherited DNS deadline PASS claimed']
     except Exception:
         report.update(status='BLOCKED_OR_FAILED_SEE_EXACT_ERROR', error=traceback.format_exc())
+        if device:
+            try:
+                device.screenshot('failure-current-screen')
+                base.save(out / 'failure-current-gui.json', native.gui(device))
+            except Exception as capture_error:
+                report['failure_capture_error'] = repr(capture_error)
         raise
     finally:
         if device:

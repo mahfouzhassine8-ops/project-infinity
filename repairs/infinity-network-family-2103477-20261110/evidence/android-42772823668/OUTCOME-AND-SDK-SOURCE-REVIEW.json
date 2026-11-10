@@ -1,0 +1,23 @@
+{
+  "APK_rebuild": false,
+  "artifact": {
+    "digest": "sha256:97ad867eec3d8e1f056f59d9e3cc280a71731231015f9276566de7a90a946b6a",
+    "id": 13743186229,
+    "size_in_bytes": 1596390
+  },
+  "correction": "Use native Container50 NumItems CurrentItem ListItem.Label with active modal/title/focus guards; strings only",
+  "network_functional_cases": "NOT_RUN",
+  "outcome": "BLOCKED_FOREIGN_SDK_CONTROLLIST_WRAPPER_NOT_NATIVE_CONTAINER",
+  "production_changes": false,
+  "production_empty_list": "NOT_ESTABLISHED",
+  "recovery79": "NOT_RUN",
+  "reviewer": "GPT-6.1",
+  "run": 42772823668,
+  "source": "3d5907e7e6706962e0906f6b03b0e3541ac1d42c",
+  "source_evidence": {
+    "Control.cpp": "1410 size returns vecItems.size;1323 and1342 selection guarded by localvecItems",
+    "GUIBaseContainer.cpp": "2110 CurrentItem is onebased native;2119 native count",
+    "GUIInfoHelper.cpp": "94-108 DEFAULT_CONTEXT selects topmodal;162-183 actual native ListItem",
+    "Window.cpp": "321 constructs new ControlList;358-380 copies native pointer/id/geometry only; no vecItems"
+  }
+}
