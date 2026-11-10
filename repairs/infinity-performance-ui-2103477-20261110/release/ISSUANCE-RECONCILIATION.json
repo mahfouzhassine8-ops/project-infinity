@@ -1,0 +1,27 @@
+{
+  "APK_built": false,
+  "actual_highest_issued": 2103479,
+  "baseline": 2103477,
+  "candidate_CC": "0.3.5.78",
+  "canonical_head": "bd46fa73c713ed869f75822fab1b0821a7d2d11b",
+  "frozen_signed_APK_sha256": {
+    "2103478": "787df8f3e851a9af99c299cecc65f2acacae0321294ceedd6c0e56dbb3d748fd",
+    "2103479": "7f466d83b84a8078c1004d1595267ddb34ac830eeb6ca4e9d98a0c0605a2c6e7"
+  },
+  "generation": 62,
+  "guards": "Recheck live canonical and original-signed issuance before reservation; abort on advancement",
+  "legacy_last_issued_field": 2103478,
+  "next_possible_pair_if_authority_unchanged": [
+    2103480,
+    2103481
+  ],
+  "recovery_CC": "0.3.5.79",
+  "registry_candidate": 2103479,
+  "registry_mutated": false,
+  "required_skin_metadata": [
+    "1.0.5.273",
+    "1.0.5.274"
+  ],
+  "reserved": false,
+  "status": "READ_ONLY_ISSUANCE_RECONCILIATION_NOT_RESERVATION"
+}

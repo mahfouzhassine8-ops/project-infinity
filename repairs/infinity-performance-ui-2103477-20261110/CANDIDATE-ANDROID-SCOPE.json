@@ -1,0 +1,53 @@
+{
+  "APK_build": false,
+  "Cobra_edits_or_tests": false,
+  "baseline_artifact": {
+    "digest": "sha256:722320ab0780b4bb96c5282e12e211f3ce6ce6d78aa09891730dbe0414ba1c78",
+    "id": 13721668270,
+    "name": "Infinity2103477-Exact74-OriginalSigned-ExperimentalRetest-42724088145",
+    "run": 42724088145,
+    "size_in_bytes": 328333278,
+    "source": "80f9c78e5c133ef63abe95af359c3e4e7366153f"
+  },
+  "candidate_manifest_sha256": "c67327c9683ec21be4aae58fe9add45d04372c91b16f1e1b2ee49e5dca50f2b9",
+  "limitations": [
+    "No physical Fold/thermal/battery/120Hz acceptance",
+    "Process-wide FD/CPU observations include resident and diagnostic work",
+    "Provider playback smoke selected later, not claimed here"
+  ],
+  "module_artifact": {
+    "digest": "sha256:cfd616ddf63c43c25d6400b228af8ff8090ba5c40820de7adb5de5eff34e20ad",
+    "id": 13768638025,
+    "name": "Infinity-Performance-OriginalSigned-Modules-42826144691-INTERNAL-NOT-APK",
+    "run": 42826144691,
+    "size_in_bytes": 846463,
+    "source": "7b84194eed8f0a6d5d07739e2f6ba041e816a79a"
+  },
+  "networking_inputs": false,
+  "selected_before_execution": true,
+  "selected_cases": [
+    "One required fresh VM signed77 setup, not repeated baseline acceptance",
+    "Normal InstallFromZip of complete original-key CC78 plus disposable observer",
+    "Native module authentication of complete80 sources",
+    "Real full948 worker/manual parity, bounded dispatch, singleflight, event cancellation and owned-thread retirement",
+    "Actual resident checking-to-ok full948 periodic cycle with raw timestamps",
+    "Real resident token-matched ready/failure loading feedback",
+    "Home/Hub native focus and partial attributable SurfaceFlinger observations",
+    "SamePID background/foreground and final native crash check",
+    "Actual existing native visibility gate false in Android background and true after return; no global SDK patch"
+  ],
+  "selected_feature": "infinity77-integrity-worker-android",
+  "shutdown_tests": false,
+  "source_bindings": {
+    ".github/workflows/infinity-saved-navigation-android.yml": "9dd1d550c37085b25dd7f1532b252c7453efbcf8f8594df037c764387f6b1a8b",
+    "repairs/infinity-performance-ui-2103477-20261110/HOST-SOURCE-VERIFICATION.json": "a3cb1799c606e63b7c0f1b37837a2dc1a3accbfd6846d372b341a383d2fe02ef",
+    "repairs/infinity-performance-ui-2103477-20261110/IMPLEMENTATION-SCOPE.json": "e9dee76355c5868c4f1fad63072023866161bed5eb954dba3f3a46ee025ee60e",
+    "repairs/infinity-performance-ui-2103477-20261110/INDEPENDENT-WORKER-REVIEW.json": "a57ee1a78d661985695e1b39e10ded8424689967653b95c4559108663a0a2a52",
+    "repairs/infinity-performance-ui-2103477-20261110/baseline.py": "9db30720394914920a965e726d8989ba7dad8d1e9ac7a0d9e92640d07eb9554e",
+    "repairs/infinity-performance-ui-2103477-20261110/context_batch_prototype.py": "80dc916af52924b39f20a92e463d1433fd729abacfc1f21d767e62dfc0862e65",
+    "repairs/infinity-performance-ui-2103477-20261110/integrity_android.py": "0d1c76963ddc11b29d525a78e12bedfc498b99053511d44bd129a6656ce9471e",
+    "repairs/infinity-performance-ui-2103477-20261110/integrity_observer.py": "1fa1457a9f6284f7b33c0e58db18b30c3a8dcff02f740fd50994cb64d7317817",
+    "repairs/infinity-performance-ui-2103477-20261110/integrity_probe.py": "1d3bba5b08bdaf8ac031f108841de182b2e0c42a563fd8ad8cb6adef87436d46",
+    "repairs/infinity-performance-ui-2103477-20261110/surface_layers.py": "238d249e7aa4b083c0dcc60868e0783d9caa610c1b166e8755484d00e8571956"
+  }
+}

@@ -1,0 +1,86 @@
+{
+  "Android": "NOT_RUN_CANDIDATE",
+  "Fold": "NOT_RUN",
+  "files": {
+    "common.py": {
+      "after_sha256": "7cb441cb6db8ba71466afd97de6e786152997a6d4b74c9e9d4536c1807e9ad82",
+      "all_other_functions_and_classes": "AST_IDENTICAL",
+      "before_sha256": "168e2888b7f75363875aa5c70ddcf31128f0e66efa17e1fe82935aec457747b7",
+      "changed_existing_functions": [
+        "skin_baseline_integrity"
+      ],
+      "new_functions": [
+        "_scan_skin_integrity",
+        "_skin_digest_cancellable"
+      ]
+    },
+    "service.py": {
+      "after_sha256": "934b05012d5f6e86e28174dc2291ba4f0ffd0238c880061f6476264578915397",
+      "all_other_functions_and_classes": "AST_IDENTICAL",
+      "before_sha256": "c0f45709166d9b7018eac0cee4834aaa617e8a684d6d199568e4e65a4645d6bd",
+      "changed_existing_functions": [
+        "_background_integrity",
+        "main"
+      ],
+      "new_functions": [
+        "_cancel_integrity",
+        "_integrity_pending",
+        "_read_integrity_manifest",
+        "_run_skin_integrity",
+        "_skin_integrity_signature"
+      ]
+    }
+  },
+  "full_parity": {
+    "manual": {
+      "host_seconds": 0.04360610299772816,
+      "result": {
+        "candidate": 270,
+        "checked": 948,
+        "mismatches": [],
+        "skin_version": "1.0.5.270",
+        "status": "ok"
+      }
+    },
+    "original": {
+      "host_seconds": 0.048500185999728274,
+      "result": {
+        "candidate": 270,
+        "checked": 948,
+        "mismatches": [],
+        "skin_version": "1.0.5.270",
+        "status": "ok"
+      }
+    },
+    "worker": {
+      "host_seconds": 0.04437369899824262,
+      "result": {
+        "candidate": 270,
+        "checked": 948,
+        "mismatches": [],
+        "skin_version": "1.0.5.270",
+        "status": "ok"
+      }
+    }
+  },
+  "host_worker_contracts": {
+    "cases": 18,
+    "status": "PASS"
+  },
+  "loading_guard": "BYTE_IDENTICAL",
+  "protected_bytes": 43793653,
+  "protected_files": 948,
+  "shutdown_tail": "BYTE_IDENTICAL",
+  "status": "PASS_SOURCE_PRESERVATION_AND_FULL948_HOST_PARITY",
+  "unmodified": [
+    "Cobra",
+    "native",
+    "Java",
+    "DEX",
+    "skin/layouts",
+    "providers",
+    "networking",
+    "tracking/resume",
+    "persistence wrappers"
+  ]
+}
