@@ -19,7 +19,7 @@ on:
         required: true
         type: choice
         default: select-a-feature
-        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host, infinity-performance-android, cobra-owner-host, cobra-android-launch, cobra-cards-baseline, cobra-cards-host, cobra-fold-more433, cobra-rejected434-controls, infinity-seamless-loading434, cobra-drawer436-prepare, cobra-drawer436-android, cobra-quality444-final, external-player447-android, preview-resume448-android, preview-chrome449-android, preview-layout450-android, preview-fullscreen451-android, watchlist-playback-android, tracking-baseline-android, tracking-integration-android, tracking-signed-install-android, infinity77-performance-baseline, infinity77-performance-followup]
+        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host, infinity-performance-android, cobra-owner-host, cobra-android-launch, cobra-cards-baseline, cobra-cards-host, cobra-fold-more433, cobra-rejected434-controls, infinity-seamless-loading434, cobra-drawer436-prepare, cobra-drawer436-android, cobra-quality444-final, external-player447-android, preview-resume448-android, preview-chrome449-android, preview-layout450-android, preview-fullscreen451-android, watchlist-playback-android, tracking-baseline-android, tracking-integration-android, tracking-signed-install-android, infinity77-performance-baseline, infinity77-performance-followup, infinity77-ui-cost-comparison]
       candidate_build:
         description: Existing signed build run (no rebuild)
         required: true
@@ -1906,7 +1906,7 @@ jobs:
           retention-days: 90
           if-no-files-found: error
   android17:
-    if: github.ref != 'refs/heads/work/infinity-final-release-462-20261107' && !(github.event_name == 'push' && github.ref == 'refs/heads/work/infinity-tracking-integration-20261108') && inputs.feature != 'tracking-baseline-android' && inputs.feature != 'tracking-integration-android' && inputs.feature != 'tracking-signed-install-android' && inputs.feature != 'preview-fullscreen451-android' && inputs.feature != 'preview-layout450-android' && inputs.feature != 'preview-chrome449-android' && inputs.feature != 'preview-resume448-android' && inputs.feature != 'external-player447-android' && inputs.feature != 'infinity-performance-host' && inputs.feature != 'infinity-performance-android' && inputs.feature != 'cobra-owner-host' && inputs.feature != 'cobra-android-launch' && inputs.feature != 'cobra-cards-baseline' && inputs.feature != 'cobra-cards-host' && inputs.feature != 'cobra-fold-more433' && inputs.feature != 'cobra-rejected434-controls' && inputs.feature != 'infinity-seamless-loading434' && inputs.feature != 'cobra-drawer436-prepare' && inputs.feature != 'cobra-drawer436-android' && inputs.feature != 'cobra-quality444-final' && inputs.feature != 'watchlist-playback-android' && inputs.feature != 'infinity77-performance-baseline' && inputs.feature != 'infinity77-performance-followup'
+    if: github.ref != 'refs/heads/work/infinity-final-release-462-20261107' && !(github.event_name == 'push' && github.ref == 'refs/heads/work/infinity-tracking-integration-20261108') && inputs.feature != 'tracking-baseline-android' && inputs.feature != 'tracking-integration-android' && inputs.feature != 'tracking-signed-install-android' && inputs.feature != 'preview-fullscreen451-android' && inputs.feature != 'preview-layout450-android' && inputs.feature != 'preview-chrome449-android' && inputs.feature != 'preview-resume448-android' && inputs.feature != 'external-player447-android' && inputs.feature != 'infinity-performance-host' && inputs.feature != 'infinity-performance-android' && inputs.feature != 'cobra-owner-host' && inputs.feature != 'cobra-android-launch' && inputs.feature != 'cobra-cards-baseline' && inputs.feature != 'cobra-cards-host' && inputs.feature != 'cobra-fold-more433' && inputs.feature != 'cobra-rejected434-controls' && inputs.feature != 'infinity-seamless-loading434' && inputs.feature != 'cobra-drawer436-prepare' && inputs.feature != 'cobra-drawer436-android' && inputs.feature != 'cobra-quality444-final' && inputs.feature != 'watchlist-playback-android' && inputs.feature != 'infinity77-performance-baseline' && inputs.feature != 'infinity77-performance-followup' && inputs.feature != 'infinity77-ui-cost-comparison'
     name: Selected feature ${{ inputs.feature || 'explicit baseline Search request' }}
     runs-on: ubuntu-22.04
     timeout-minutes: 150
@@ -2355,8 +2355,8 @@ jobs:
           retention-days: 90
 
   infinity77_performance_baseline:
-    name: Exact signed77 performance baseline only; no production changes or shutdown
-    if: github.event_name == 'workflow_dispatch' && (inputs.feature == 'infinity77-performance-baseline' || inputs.feature == 'infinity77-performance-followup')
+    name: Exact signed77 selected performance measurements; no production changes or shutdown
+    if: github.event_name == 'workflow_dispatch' && (inputs.feature == 'infinity77-performance-baseline' || inputs.feature == 'infinity77-performance-followup' || inputs.feature == 'infinity77-ui-cost-comparison')
     runs-on: ubuntu-22.04
     timeout-minutes: 30
     env:

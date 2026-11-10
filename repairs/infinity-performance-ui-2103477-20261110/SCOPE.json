@@ -23,44 +23,44 @@
   "branch": "work/infinity-2103477-full-performance-ui-stability-20261110",
   "build_or_signing": false,
   "networking_production_or_APK_inputs": false,
-  "operation": "signed77-performance-followup",
+  "operation": "signed77-ui-cost-comparison",
   "owner_brief": "handoffs/infinity-full-performance-ui-stability-20261110/CODEX-OWNER-END-TO-END-BRIEF.md",
   "production_edits": false,
   "reuse": {
-    "artifact": 13761222346,
-    "overall_first_result": "FAIL_RETAINED_modalwindowtestassertion",
-    "retained_completed_observations": [
-      "FirstusableHome + source/auth intake",
-      "InitialidleCPU/FD",
-      "InitialfocusCPU/FD"
-    ],
-    "run": 42808674960,
-    "same_APK_required": true,
-    "source": "a5607a7a7ff62c6f5f1f82de68e32cd53ca3c0c3"
+    "completed_followup_run": 42811609761,
+    "initial_run": 42808674960,
+    "not_repeated_as_acceptance": true,
+    "retained": [
+      "NativeSFpartialpresentationobservations",
+      "Loadingmatchingtokenready/errortraces",
+      "Hubfocus/Backinteraction",
+      "SamePIDforegroundreturn",
+      "IdleCPU/FDsnapshots"
+    ]
   },
   "selected_cases": [
-    "Freshsigned77startasrequirednewVMsetup; notnewstartupacceptancemetric",
-    "Missingnativepresentation samplesusingcanonicalvisibleownerBLASTidentity",
-    "Loadingready twice/failedonce onlyAFTERrealresidentContextandStatepublication",
-    "CorrectmodalSystemHubfocusmotion",
-    "ExistingHubBack/contextcancel; tokenlocaltimingunavailableunlessactuallypublished",
-    "UnreachedsamePIDforegroundreturn andafterprobeidle/resourcecomparison"
+    "Onefresh77start/auth/residentready asnecessaryVMsetup only",
+    "SevenalternatingABBA actualsigned_context pairs withper-calladapter sixlabelsbatch; no globalpatch; exactcontext/callcount/time records",
+    "One exactsignedread-onlyskin_baseline_integrity call; separateimportcost; warm-cachelimit"
   ],
-  "selected_feature": "infinity77-performance-followup",
+  "selected_feature": "infinity77-ui-cost-comparison",
   "selected_host_contract_cases": [
-    "test_surface_layers.py: five focused offline attributionchecks usingcapturedAndroidformat"
+    "test_context_prototype.py: fourofflineadaptercontracts; prior5surfacecasesretainednotrerun"
   ],
   "shutdown_tests": false,
   "source_bindings": {
-    ".github/workflows/infinity-saved-navigation-android.yml": "b7485bd9c94f0ed2e5da559a736802f6f0adb1bd203429a107cf423ae8933530",
+    ".github/workflows/infinity-saved-navigation-android.yml": "45d8bd873e88d29db9e793ce38437c0a41ff6f150d2a6812e19244b7627d3dbc",
     "handoffs/infinity-full-performance-ui-stability-20261110/CODEX-OWNER-END-TO-END-BRIEF.md": "838f0dec1b777b582af6b4dfc123298aaf22d027aec3aed270c0abeaaf2c948e",
     "repairs/infinity-final-closure-2103407/android_frame_samples.py": "e121d1c098bf6541b9bdac08bac0ffcb4bab6baa11bbe7af0f1be53f8678807b",
+    "repairs/infinity-performance-ui-2103477-20261110/COST-COMPARISON-REQUEST.md": "b97e59dda7020af7113896f9eca7d59e5176014b3a30449c6938f85967075cef",
     "repairs/infinity-performance-ui-2103477-20261110/FIRST-REPORT.md": "3729297222152f0695e76015e9cb0332f1f47dc31c9e8c804927ec11db0918cd",
     "repairs/infinity-performance-ui-2103477-20261110/FOLLOWUP-REQUEST.md": "8139caeeca858539deb9e3c2ff758e9936185f5fb304816e3336ee2cf63717a9",
-    "repairs/infinity-performance-ui-2103477-20261110/baseline.py": "659f7e5a91866e71761d8cf5d6b498f53eec2c1bb116c78225f94a0394c5b8e5",
-    "repairs/infinity-performance-ui-2103477-20261110/observer.py": "9ab39016d16f7d78bb209b9301381a5d2d874ef0ff1c8ff094fd845a2108e137",
+    "repairs/infinity-performance-ui-2103477-20261110/baseline.py": "9db30720394914920a965e726d8989ba7dad8d1e9ac7a0d9e92640d07eb9554e",
+    "repairs/infinity-performance-ui-2103477-20261110/context_batch_prototype.py": "80dc916af52924b39f20a92e463d1433fd729abacfc1f21d767e62dfc0862e65",
+    "repairs/infinity-performance-ui-2103477-20261110/observer.py": "59f59280eabf66fddf0f370bedf4a500cceced9cd2b9c2e5253703b160f286eb",
     "repairs/infinity-performance-ui-2103477-20261110/surface-layer-fixture.txt": "b0de4bb99ce0d0dd8868d2ce679fe52d3b18c7187edede9e4018e1f37fda33dd",
     "repairs/infinity-performance-ui-2103477-20261110/surface_layers.py": "238d249e7aa4b083c0dcc60868e0783d9caa610c1b166e8755484d00e8571956",
+    "repairs/infinity-performance-ui-2103477-20261110/test_context_prototype.py": "be13977ced0d3aa6bf660ebdae165deb0d7e0449fe513523710e9e5935d9fd69",
     "repairs/infinity-performance-ui-2103477-20261110/test_surface_layers.py": "e0c6144f5bd39614b044a4d32638fd4f297014342741e0e89619a92975954b42",
     "repairs/infinity-tracking-integration-2103469-20261108/prepare_tracking_release.py": "49c4d49bd679b2dd2ae2819ab45b8a673d4b362f80fc30090223553d3abc9e0b",
     "repairs/infinity-tracking-integration-2103469-20261108/qualify_android_baseline.py": "9b4cf409c35688a77e94849361aff510b6b896871314b32b15cc5844b4e23734",

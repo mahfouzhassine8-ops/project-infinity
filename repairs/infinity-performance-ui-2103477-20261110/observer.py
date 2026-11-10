@@ -12,6 +12,7 @@ import xbmc
 import xbmcaddon
 import xbmcgui
 import xbmcvfs
+from context_batch_prototype import LabelReader
 
 QA = 'script.infinity.performanceprobe'
 OUT = Path(xbmcvfs.translatePath('special://profile/addon_data/' + QA))
@@ -45,11 +46,12 @@ def authenticated_loading():
     sys.modules['module_contract'] = module
     exec(compile(raw, module.__file__, 'exec', dont_inherit=True), module.__dict__)
     contract = module.active_contract(str(root), '0.3.5.75')
+    sys.path.insert(0, str(root))  # This interpreter only, after the signed ImportGuard is active.
     require(contract.identity.manifest_sha256 ==
             '63110023bf70f4ec32b0ab4750b3c1293a4976aa58cdfd1afbcd55027758b371', 'EXACT_ORIGINAL80_MANIFEST')
     loading = module.source_module(contract, 'performance_probe_loading',
                                    'script.infinity.commandcenter/action_loading.py')
-    return contract, loading
+    return contract, loading, module
 
 
 def state():
@@ -141,7 +143,7 @@ def preparation_probe(loading, outcome, sequence):
 
 
 def main():
-    contract, loading = authenticated_loading()
+    contract, loading, trust = authenticated_loading()
     save('ready.json', dict(qa=QA, pid=os.getpid(), manifest=contract.identity.manifest_sha256,
                            files=len(contract.files), state=state()))
     until = time.monotonic() + 240
@@ -200,6 +202,35 @@ def main():
                 result = state()
             elif action == 'loading':
                 result = preparation_probe(loading, value['outcome'], sequence)
+            elif action == 'context-compare':
+                rows = []
+                for pair in range(7):
+                    outputs = {}
+                    for batch in ((False, True) if pair % 2 == 0 else (True, False)):
+                        before = state()
+                        reader = LabelReader(xbmc, batch, before['focus'])
+                        started = time.monotonic()
+                        context = loading._context(reader, xbmcgui)
+                        elapsed = 1000*(time.monotonic()-started)
+                        outputs[str(batch)] = dict(context=context, elapsed_ms=elapsed,
+                            direct_label_calls=reader.direct_calls, batch_calls=reader.batch_calls,
+                            batch_valid=reader.batch_valid, adapter_control=reader.control,
+                            before=before, after=state())
+                    rows.append(dict(pair=pair, order='AB' if pair % 2 == 0 else 'BA',
+                        exact_context_equal=outputs['False']['context']==outputs['True']['context'], outputs=outputs))
+                    MONITOR.waitForAbort(.15)
+                result = dict(rows=rows, actual_signed_context=True, production_patch=False,
+                              global_monkeypatch=False, GUI_focus_may_invalidate_pairs=True)
+            elif action == 'skin-integrity-cost':
+                load_started = time.monotonic()
+                common = trust.source_module(contract, 'performance_probe_common',
+                                             'script.infinity.commandcenter/common.py')
+                module_load_ms = 1000*(time.monotonic()-load_started)
+                started = time.monotonic()
+                integrity = common.skin_baseline_integrity()
+                result = dict(elapsed_ms=1000*(time.monotonic()-started), module_load_ms=module_load_ms, integrity=integrity,
+                    source_operation='Exact signed common.skin_baseline_integrity, read-only',
+                    warm_cache_may_apply=True, not_attribution_of_original_cold_span=True)
             elif action == 'finish':
                 save('reply.json', dict(pid=os.getpid(), sequence=sequence, result=state()))
                 return  # Retire this diagnostic interpreter only, not the app.

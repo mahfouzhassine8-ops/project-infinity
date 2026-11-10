@@ -34,7 +34,7 @@ CERT = 'd7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
 
 def selected():
     scope = base.load(HERE / 'SCOPE.json')
-    base.require(scope['operation'] in ('signed77-performance-baseline','signed77-performance-followup') and
+    base.require(scope['operation'] in ('signed77-performance-baseline','signed77-performance-followup','signed77-ui-cost-comparison') and
                  not scope['shutdown_tests'] and not scope['production_edits'], 'BASELINE_ONLY_SCOPE')
     if os.environ.get('GITHUB_ACTIONS') == 'true':
         base.require(os.environ.get('SELECTED_FEATURE') == scope['selected_feature'], 'EXACT_NAMED_MEASUREMENT_SELECTION')
@@ -65,6 +65,7 @@ def admit(sdk, out):
             '<extension point="xbmc.addon.metadata"><summary lang="en_GB">CI-only measurement</summary>'
             '<description lang="en_GB">Not shipped</description><platform>all</platform><license>GPL-2.0-or-later</license></extension></addon>')
         z.write(HERE / 'observer.py', QA + '/default.py')
+        z.write(HERE / 'context_batch_prototype.py', QA + '/context_batch_prototype.py')
     base.save(out / 'INTAKE.json', dict(apk=str(apk.resolve()), sha256=APK_SHA,
         artifact=scope['artifact'], observer=dict(addon=QA, version='1.0.0', archive=archive.name,
         sha256=base.sha(archive)), observer_path=str(archive.resolve()), scope_sha256=base.sha(HERE / 'SCOPE.json')))
@@ -215,14 +216,14 @@ class Observer:
             time.sleep(.15)
         raise TimeoutError('Observer reply: ' + name)
 
-    def call(self, action, **kwargs):
+    def call(self, action, *, timeout=25, **kwargs):
         self.sequence += 1
         request = dict(sequence=self.sequence, pid=self.device.pid, action=action, **kwargs)
         path = self.out / 'request.json'
         base.save(path, request)
         self.device.adb('push', path, QP+'/request.pending')
         self.device.shell('mv', QP+'/request.pending', QP+'/request.json')
-        reply = self.wait('reply.json', lambda r: r.get('pid') == self.device.pid and r.get('sequence') == self.sequence, 25)
+        reply = self.wait('reply.json', lambda r: r.get('pid') == self.device.pid and r.get('sequence') == self.sequence, timeout)
         base.save(self.out / ('observer-%02d.json' % self.sequence), reply)
         base.require('error' not in reply, 'REAL_OBSERVER_FAILURE:' + str(reply.get('error')))
         return reply['result']
@@ -272,16 +273,19 @@ def run(sdk, inputs, out):
         report['startup'] = base.start_once(device, 2103477, out)
         report['startup_observed_usable_ms'] = 1000*(time.monotonic()-begun)
         report['startup_measurement_limit'] = 'Fresh-profile bootstrap and permission/chooser handling plus polling; not exact first-frame latency or representative owner-cache cold launch'
-        for name, args in [('display', ('dumpsys','display')), ('surface-inventory', ('dumpsys','SurfaceFlinger')),
-                           ('memory-initial', ('dumpsys','meminfo',str(device.pid)))]:
-            base.save(out/(name+'.json'), query(device,*args,timeout=12))
+        comparison = scope['operation']=='signed77-ui-cost-comparison'
+        if not comparison:
+            for name, args in [('display', ('dumpsys','display')), ('surface-inventory', ('dumpsys','SurfaceFlinger')),
+                               ('memory-initial', ('dumpsys','meminfo',str(device.pid)))]:
+                base.save(out/(name+'.json'), query(device,*args,timeout=12))
         followup = scope['operation']=='signed77-performance-followup'
         report['reused_first_run'] = scope.get('reuse',{})
-        if not followup:
+        if not followup and not comparison:
             report['idle_home_before_observer'] = scene(device,out,'idle-home', ['idle']*20)
         else:
             report['startup_is_fresh_VM_setup_not_repeated_acceptance_metric'] = True
-        report['home_horizontal_focus'] = scene(device,out,'home-horizontal', ['Input.Right']*8+['Input.Left']*8)
+        if not comparison:
+            report['home_horizontal_focus'] = scene(device,out,'home-horizontal', ['Input.Right']*8+['Input.Left']*8)
         gui.install_zip(device, intake['observer'], dict(remote_zip_directory=REMOTE), out, 'performance-observer')
         observer = Observer(device, out)
         report['native_authenticated_CC75'] = observer.ready
@@ -302,6 +306,13 @@ def run(sdk, inputs, out):
         report['resident_readiness'] = dict(wait_seconds=time.monotonic()-ready_started,samples=resident_samples)
         base.save(out/'RESIDENT-READINESS.json',report['resident_readiness'])
         report['home_frame_focus'] = observer.call('home-focus')
+        if comparison:
+            report['context_comparison'] = observer.call('context-compare',timeout=90)
+            report['read_only_integrity_cost'] = observer.call('skin-integrity-cost',timeout=90)
+            report['observer_finished'] = observer.call('finish')
+            base.crash_free_alive(device)
+            report['status'] = 'COMPLETED_SELECTED_ACTUAL_SOURCE_COST_COMPARISON_NOT_PRODUCTION_PATCH_OR_RELEASE'
+            return
         report['loading'] = []
         for outcome in ('ready','ready','failed'):
             report['loading'].append(observer.call('loading',outcome=outcome))
