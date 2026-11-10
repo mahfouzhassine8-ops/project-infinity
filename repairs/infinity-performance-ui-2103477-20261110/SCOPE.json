@@ -1,0 +1,51 @@
+{
+  "Cobra_tests_or_edits": false,
+  "NOT_RUN": [
+    "ProviderSearchandplayback/tracking smoke",
+    "Shutdown",
+    "PhysicalFoldfrontinner",
+    "120Hzphysicaldisplay",
+    "Thermalbattery",
+    "Trueinputtopresentationlatency",
+    "Exactfirstdrawnartworkframe",
+    "Themes/viewmode/rotationmatrix",
+    "Full/reduced/off runtime settings matrix"
+  ],
+  "artifact": {
+    "digest": "sha256:722320ab0780b4bb96c5282e12e211f3ce6ce6d78aa09891730dbe0414ba1c78",
+    "id": 13721668270,
+    "name": "Infinity2103477-Exact74-OriginalSigned-ExperimentalRetest-42724088145",
+    "run": 42724088145,
+    "size_in_bytes": 328333278,
+    "source": "80f9c78e5c133ef63abe95af359c3e4e7366153f"
+  },
+  "automatic_retries": 0,
+  "branch": "work/infinity-2103477-full-performance-ui-stability-20261110",
+  "build_or_signing": false,
+  "networking_production_or_APK_inputs": false,
+  "operation": "signed77-performance-baseline",
+  "owner_brief": "handoffs/infinity-full-performance-ui-stability-20261110/CODEX-OWNER-END-TO-END-BRIEF.md",
+  "production_edits": false,
+  "selected_cases": [
+    "Freshprofile firstobserved usableHome with exactscope limits",
+    "Homeidle beforediagnostic and afterdiagnostic",
+    "Homehorizontal andSystemHubvertical nativefocusmotion",
+    "Controlledactualresident loadingpublication/cleanup:ready twice,failed once,Back/contextcancel once",
+    "Read-onlyprocess/FD/thread/PSS/CPU/display/nativeSurfacepresentation observations"
+  ],
+  "shutdown_tests": false,
+  "source_bindings": {
+    ".github/workflows/infinity-saved-navigation-android.yml": "fd7b8838e56aabe12b6cf789137b7199927b9dfd2a83b45e8d9e0b27f3ea5903",
+    "handoffs/infinity-full-performance-ui-stability-20261110/CODEX-OWNER-END-TO-END-BRIEF.md": "838f0dec1b777b582af6b4dfc123298aaf22d027aec3aed270c0abeaaf2c948e",
+    "repairs/infinity-final-closure-2103407/android_frame_samples.py": "e121d1c098bf6541b9bdac08bac0ffcb4bab6baa11bbe7af0f1be53f8678807b",
+    "repairs/infinity-performance-ui-2103477-20261110/FIRST-REPORT.md": "3729297222152f0695e76015e9cb0332f1f47dc31c9e8c804927ec11db0918cd",
+    "repairs/infinity-performance-ui-2103477-20261110/baseline.py": "534f161a8fbcfb3a9f12cf6e89e9ac8de48c7d0b3b437a9828111b4264c9b66e",
+    "repairs/infinity-performance-ui-2103477-20261110/observer.py": "ac1b5737d3f450b60c1a2285f69590ce177b7f455b28f0521bdf16e76da4586b",
+    "repairs/infinity-tracking-integration-2103469-20261108/prepare_tracking_release.py": "49c4d49bd679b2dd2ae2819ab45b8a673d4b362f80fc30090223553d3abc9e0b",
+    "repairs/infinity-tracking-integration-2103469-20261108/qualify_android_baseline.py": "9b4cf409c35688a77e94849361aff510b6b896871314b32b15cc5844b4e23734",
+    "repairs/infinity-tracking-integration-2103469-20261108/tracking_module_fixture.py": "af14da368c555a5d9d0862aa1c1f490bfcf64d389026cb82092261d39ce3ecdb",
+    "repairs/infinity-tracking-integration-2103469-20261108/verify_tracking_android.py": "04e736720a44f6a56d99132cce24498c32311ab8df728d8305284a28d4e10315"
+  },
+  "starts": 1,
+  "warm_return": "SamePIDbackgroundforeground; no apptermination"
+}
