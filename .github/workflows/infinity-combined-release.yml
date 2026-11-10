@@ -10,7 +10,7 @@ on:
         type: choice
         required: true
         default: final-combined
-        options: [final-combined, prepare-preview451, prepare-kodi452, prepare-kodi453, prepare-ui454-455, prepare-controlled456-457, review-controlled456-457, prepare-browser458-459, review-browser458-459, prepare-six460-461, review-six460-461, package-nine-quick-updates, verify-nine-update-recovery, prepare-nine-native462-463, package-umbrella-pov-462, verify-three-native, prepare-three, sign-three, watchlist-verify-native, prepare-watchlist, sign-watchlist, publish-watchlist, prepare-tracking-modules, prepare-tracking-release, sign-tracking, verify-network-native]
+        options: [final-combined, prepare-preview451, prepare-kodi452, prepare-kodi453, prepare-ui454-455, prepare-controlled456-457, review-controlled456-457, prepare-browser458-459, review-browser458-459, prepare-six460-461, review-six460-461, package-nine-quick-updates, verify-nine-update-recovery, prepare-nine-native462-463, package-umbrella-pov-462, verify-three-native, prepare-three, sign-three, watchlist-verify-native, prepare-watchlist, sign-watchlist, publish-watchlist, prepare-tracking-modules, prepare-tracking-release, sign-tracking, verify-network-native, prepare-network-modules]
       prepared_run:
         description: Completed official controlled preparation run for read-only authority review
         type: string
@@ -2604,3 +2604,108 @@ jobs:
             network-native-evidence/libkodi.so
           if-no-files-found: warn
           retention-days: 90
+
+  prepare-network-modules:
+    name: Original-key network81 and forward80 modules from signed77; no APK or publication
+    if: github.event_name == 'workflow_dispatch' && github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/work/infinity-network-family-from-2103477-20261109' && inputs.operation == 'prepare-network-modules'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
+    env: {GH_TOKEN: '${{ github.token }}', PYTHONDONTWRITEBYTECODE: '1'}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '21'}
+      - name: Exact module-only authorization and frozen sources before importing preparation or accessing keys
+        run: |
+          python3 - <<'PYNET'
+          import hashlib,json,os,subprocess
+          from pathlib import Path
+          task=Path('repairs/infinity-network-family-2103477-20261110')
+          request=json.loads((task/'release/MODULE-PREPARE-REQUEST.json').read_text())
+          assert request['operation']=='prepare-original77-network81-forward80-modules'
+          assert request['APK'] is False and request['registry_mutation'] is False and request['publication'] is False
+          assert request['resolver']=='ORIGINAL_KODI_UNCHANGED'
+          assert request['DNS_contract_owner_approved'] is True
+          assert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()==os.environ['GITHUB_SHA']
+          assert not subprocess.check_output(['git','status','--porcelain','--untracked-files=no']).strip()
+          for name,wanted in request['source_bindings'].items():
+              p=Path(name);assert not p.is_absolute() and '..' not in p.parts and p.is_file()
+              assert hashlib.sha256(p.read_bytes()).hexdigest()==wanted,name
+          workflow=Path('.github/workflows/infinity-combined-release.yml')
+          assert hashlib.sha256(workflow.read_bytes()).hexdigest()==request['workflow_sha256']
+          before=subprocess.check_output(['git','show','b13996af:'+str(workflow)],text=True).rstrip()
+          expected=before.replace('sign-tracking, verify-network-native]','sign-tracking, verify-network-native, prepare-network-modules]',1)
+          assert workflow.read_text().split('\n  prepare-network-modules:\n')[0].rstrip()==expected,'PRIOR_SIGNER_JOBS_CHANGED'
+          original=json.loads(subprocess.check_output(['git','show','dfee7205dd88abe81db5e263c368f67ece43df02:repairs/dual-experience-isolation-2103420/release-authority.json']))
+          for name,wanted in original['source_files'].items():
+              assert hashlib.sha256(Path(name).read_bytes()).hexdigest()==wanted,name
+          signer='repairs/infinity-final-closure-2103407/SignInfinityModules.java'
+          assert Path(signer).read_bytes()==subprocess.check_output(['git','show','a76e29b84996304241e6b309d56a31e6659ad190:'+signer])
+          pins=json.loads((task/'SOURCE-PINS.json').read_text())
+          compiled=json.loads(subprocess.check_output(['git','show','e9248b7813b5a0060e0e2aafab455ebbd1a2cdc5:'+str(task/'SOURCE-PINS.json')]))
+          assert pins['native']==compiled['native'],'VERIFIED_NATIVE_SOURCE_CHANGED'
+          for group,files in pins.items():
+              for name,wanted in files.items():
+                  assert hashlib.sha256((task/group/name).read_bytes()).hexdigest()==wanted,name
+          print('PASS exact reviewed module-only scope; original39 release tools and permanent signer unchanged; retained native compilation applicable')
+          PYNET
+          python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out NETWORK-SIGNER-ROUTES.json
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13721668270', run-id: '42724088145', github-token: '${{ github.token }}', path: network-baseline77, merge-multiple: true}
+      - name: Stage exact81 candidate and80 forward recovery with minimal version and integrity metadata
+        run: python3 repairs/infinity-network-family-2103477-20261110/release/prepare_modules.py --apk network-baseline77/Infinity-2103477-Combined-Original-Signer.apk --out network-module-prepared
+      - name: Original module signer after complete staged source readback
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PYREADBACK'
+          import hashlib,json,os
+          from pathlib import Path
+          prepared=json.loads(Path('network-module-prepared/PREPARATION.json').read_text())
+          request=json.loads(Path('repairs/infinity-network-family-2103477-20261110/release/MODULE-PREPARE-REQUEST.json').read_text())
+          for label in ('candidate','recovery'):
+              root=Path('network-module-prepared')/label
+              assert hashlib.sha256((root/'INPUTS.json').read_bytes()).hexdigest()==prepared['inputs'][label],'PREPARED_INPUT_BINDING_CHANGED'
+              pins=json.loads((root/'INPUTS.json').read_text())
+              assert pins['source_commit']==os.environ['GITHUB_SHA'],'UNEXPECTED_PREPARATION_SOURCE'
+              for key,wanted in request['expected_outputs'][label].items():
+                  assert pins[key]==wanted,'GENERATED_INPUT_DIFFERS_FROM_COMMITTED_REVIEW:'+key
+              actual={p.relative_to(root/'modules').as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in (root/'modules').rglob('*') if p.is_file()}
+              assert actual==pins['modules'],'STAGED_SOURCE_CHANGED_BEFORE_KEY_ACCESS'
+          PYREADBACK
+          umask 077
+          key="$(mktemp)"
+          trap 'rm -f "$key"' EXIT
+          printf '%s' "$INFINITY_KEYSTORE_B64" | base64 -d > "$key"
+          javac --release 8 -g:none -d "$RUNNER_TEMP" repairs/infinity-final-closure-2103407/SignInfinityModules.java
+          for label in candidate recovery; do
+            java -cp "$RUNNER_TEMP" SignInfinityModules "$key" "network-module-prepared/$label/modules/script.infinity.commandcenter/INFINITY-MODULES.v1"
+          done
+      - name: Original public-key verification and four affected real Java upgrade recovery cases
+        run: python3 repairs/infinity-network-family-2103477-20261110/release/verify_modules.py --prepared network-module-prepared --out network-module-audit
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-Network-OriginalSigned-Modules-${{ github.run_id }}-NOT-APK-NOT-INSTALLER
+          path: |
+            network-module-prepared/
+            network-module-audit/
+            NETWORK-SIGNER-ROUTES.json
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: Infinity-Network-Module-Preparation-Failure-${{ github.run_id }}
+          path: |
+            network-module-prepared/PREPARATION.json
+            network-module-prepared/*/INPUTS.json
+            NETWORK-SIGNER-ROUTES.json
+          retention-days: 90
+          if-no-files-found: warn

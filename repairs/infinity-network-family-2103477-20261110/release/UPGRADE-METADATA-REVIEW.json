@@ -1,0 +1,21 @@
+{
+  "reviewer": "GPT-6.1 independent selected-source and actual77DEX review",
+  "baseline": 2103477,
+  "CommandCenter": "Existing original installer refuses different manifests at equal/lower version. Candidate76 and forward77 required over installed75.",
+  "Skin": "Native AddonManager scans systemfirst/homeuserlast and permits equalversionoverride. Actual77 StartupPreparation refreshessystemassets, nothomeoverride. Candidate271 andforward272 ensure normalversionselection over installed270.",
+  "preservation": "IDs/settings/libraries/accounts/Cobra/sourcebehavior protected; only requiredversionmetadata and approvedHub insertion changed.",
+  "skin_protected_file_hash_keys": [
+    "unified/Custom_1191_InfinitySystemHub.xml",
+    "addon.xml",
+    "infinity-skin.json"
+  ],
+  "protected_entry_set": 948,
+  "guard_bypass": false,
+  "self_heal_exception": false,
+  "source_evidence": {
+    "AddonManager.cpp_sha256": "6de231bc742535a3f1f7180b1edf11b0db4d615836a3b5541acc95ba9207e620",
+    "actual77_StartupPreparation_class_sha256": "3ce4b2d98407650695faa4f60c2240db811bfae8a87187d7468120e3714183e6",
+    "actual77_classes3_dex_sha256": "5634f2376e5d0bf6176ebef6fa1ac16bb22fdecc1d018ac078f266bb757fe9b8"
+  },
+  "Android_must_verify": "Actual active skin version/path and signedmodule generation, notonlypackagedassets."
+}

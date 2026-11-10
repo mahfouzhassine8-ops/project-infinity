@@ -51,12 +51,15 @@ def scope():
     changed = subprocess.check_output(['git', 'diff', '--name-only', BASE, 'HEAD'], text=True).splitlines()
     assert all(n.startswith(HERE.relative_to(ROOT).as_posix() + '/') or
                n.startswith('handoffs/infinity-network-family-20261109/') or
-               n == '.github/workflows/infinity-combined-release.yml' for n in changed), changed
+               n in ('.github/workflows/infinity-combined-release.yml',
+                     '.github/workflows/infinity-saved-navigation-android.yml') for n in changed), changed
     old = subprocess.check_output(['git', 'show', BASE + ':.github/workflows/infinity-combined-release.yml'], text=True)
     now = (ROOT / '.github/workflows/infinity-combined-release.yml').read_text()
     prefix = now.split('\n  verify-network-native:\n')[0].rstrip()
-    assert prefix == old.rstrip().replace('sign-tracking]', 'sign-tracking, verify-network-native]')
-    assert 'secrets.' not in now.split('\n  verify-network-native:\n')[1]
+    assert prefix == old.rstrip().replace('sign-tracking]', 'sign-tracking, verify-network-native, prepare-network-modules]')
+    assert 'secrets.' not in now.split('\n  verify-network-native:\n')[1].split('\n  prepare-network-modules:\n')[0]
+    feature = '.github/workflows/infinity-saved-navigation-android.yml'
+    assert (ROOT / feature).read_bytes() == subprocess.check_output(['git', 'show', 'b13996af:' + feature]), 'FEATURE_ROUTING_CHANGED'
     return pins
 
 
