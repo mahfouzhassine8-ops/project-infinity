@@ -1,0 +1,1682 @@
+{
+  "Cobra_tests": false,
+  "Fold": "NOT_RUN",
+  "baseline_setup_not_repeated_acceptance": {
+    "cycle": 2103477,
+    "entry": "Original Splash and measured original Infinity card or retained original admission",
+    "foreground": {
+      "captured_epoch": 1794322254.9171867,
+      "component": "com.projectinfinity.kodi/.Main",
+      "error": null,
+      "query_truncated": false,
+      "raw_query": "ACTIVITY MANAGER ACTIVITIES (dumpsys activity activities)\nDisplay #0 (activities from top to bottom):\n  * Task{134cb7c #10 type=standard A=10216:com.projectinfinity.kodi.infinity.kodi U=0 visible=true visibleRequested=true mode=fullscreen translucent=false sz=1}\n    mLastNonFullscreenBounds=Rect(215, 420 - 865, 1500)\n    isSleeping=false\n    topResumedActivity=ActivityRecord{28492399 u0 com.projectinfinity.kodi/.Main t10}\n    * Hist  #0: ActivityRecord{28492399 u0 com.projectinfinity.kodi/.Main t10}\n      packageName=com.projectinfinity.kodi processName=com.projectinfinity.kodi:kodi\n      launchedFromUid=10216 launchedFromPackage=com.projectinfinity.kodi launchedFromFeature=null userId=0\n      app=ProcessRecord{6869d90 5066:com.projectinfinity.kodi:kodi/u0a216}\n      Intent { flg=0x10008000 xflg=0x4 cmp=com.projectinfinity.kodi/.Main (has extras) }\n      rootOfTask=true task=Task{134cb7c #10 type=standard A=10216:com.projectinfinity.kodi.infinity.kodi}\n      taskAffinity=10216:com.projectinfinity.kodi.infinity.kodi\n      mActivityComponent=com.projectinfinity.kodi/.Main\n      baseDir=/data/app/~~ha-6j1bBoIQBzaS_Srv-lQ==/com.projectinfinity.kodi-wKB84GzqYKS8XeZSkSnwnw==/base.apk\n      dataDir=/data/user/0/com.projectinfinity.kodi\n      stateNotNeeded=false componentSpecified=true mActivityType=standard\n      compat={420dpi} theme=0x7f0a0000\n      mLastReportedConfigurations:\n        mGlobalConfig={1.0 310mcc260mnc [en_US] ldltr sw411dp w411dp h731dp 420dpi nrml long port finger qwerty/v/v -nav/h winConfig={ mBounds=Rect(0, 0 - 1080, 1920) mAppBounds=Rect(0, 0 - 1080, 1920) mMaxBounds=Rect(0, 0 - 1080, 1920) mDisplayRotation=ROTATION_0 mWindowingMode=fullscreen mActivityType=undefined mAlwaysOnTop=undefined mRotation=ROTATION_0} as.2 s.46 fontWeightAdjustment=0}\n        mOverrideConfig={1.0 310mcc260mnc [en_US] ldltr sw411dp w411dp h731dp 420dpi nrml long port finger qwerty/v/v -nav/h winConfig={ mBounds=Rect(0, 0 - 1080, 1920) mAppBounds=Rect(0, 0 - 1080, 1920) mMaxBounds=Rect(0, 0 - 1080, 1920) mDisplayRotation=ROTATION_0 mWindowingMode=fullscreen mActivityType=standard mAlwaysOnTop=undefined mRotation=ROTATION_0} as.2 s.2 fontWeightAdjustment=0}\n      mLastReportedActivityWindowInfo=ActivityWindowInfo{isEmbedded=false, taskBounds=Rect(0, 0 - 1080, 1920), taskFragmentBounds=Rect(0, 0 - 1080, 1920)}\n      CurrentConfiguration={1.0 310mcc260mnc [en_US] ldltr sw411dp w411dp h731dp 420dpi nrml long port finger qwerty/v/v -nav/h winConfig={ mBounds=Rect(0, 0 - 1080, 1920) mAppBounds=Rect(0, 0 - 1080, 1920) mMaxBounds=Rect(0, 0 - 1080, 1920) mDisplayRotation=ROTATION_0 mWindowingMode=fullscreen mActivityType=standard mAlwaysOnTop=undefined mRotation=ROTATION_0} as.2 s.2 fontWeightAdjustment=0}\n      RequestedOverrideConfiguration={0.0 ?mcc0mnc ?localeList ?layoutDir ?swdp ?wdp ?hdp ?density ?lsize ?long ?ldr ?wideColorGamut ?orien ?uimode ?night ?touch ?keyb/?/? ?nav/? winConfig={ mBounds=Rect(0, 0 - 0, 0) mAppBounds=null mMaxBounds=Rect(0, 0 - 0, 0) mDisplayRotation=undefined mWindowingMode=undefined mActivityType=standard mAlwaysOnTop=undefined mRotation=undefined} ?fontWeightAdjustment}\n      ResolvedOverrideConfiguration={0.0 ?mcc0mnc ?localeList ?layoutDir ?swdp ?wdp ?hdp ?density ?lsize ?long ?ldr ?wideColorGamut ?orien ?uimode ?night ?touch ?keyb/?/? ?nav/? winConfig={ mBounds=Rect(0, 0 - 0, 0) mAppBounds=null mMaxBounds=Rect(0, 0 - 0, 0) mDisplayRotation=undefined mWindowingMode=undefined mActivityType=undefined mAlwaysOnTop=undefined mRotation=undefined} s.2 ?fontWeightAdjustment}\n      taskDescription: label=\"null\" icon=null iconResource=/0 iconFilename=null primaryColor=ff24b7ff\n        backgroundColor=ff000000 statusBarColor=ff000000 navigationBarColor=808080\n       backgroundColorFloating=ff000000\n      launchFailed=false launchCount=1 lastLaunchTime=-13s673ms\n      mHaveState=false mIcicle=null\n      state=RESUMED delayedResume=false finishing=false\n      keysPaused=false inHistory=true idle=true\n      occludesParent=true mNoDisplay=false immersive=false launchMode=3\n      mActivityType=standard\n      windows=[Window{5afec0e u0 com.projectinfinity.kodi/com.projectinfinity.kodi.Main}]\n      windowType=2\n      mOccludesParent=true\n      overrideOrientation=SCREEN_ORIENTATION_UNSPECIFIED\n      requestedOrientation=SCREEN_ORIENTATION_UNSPECIFIED\n      mVisibleRequested=true mVisible=true mClientVisible=true reportedDrawn=true reportedVisible=true\n      mNumInterestingWindows=1 mNumDrawnWindows=1 allDrawn=true)\n      startingData=null firstWindowDrawn=true\n      nowVisible=true lastVisibleTime=-11s635ms\n      resizeMode=RESIZE_MODE_RESIZEABLE\n      mLastReportedMultiWindowMode=false mLastReportedPictureInPictureMode=false\n      supportsPictureInPicture=true\n      supportsEnterPipOnTaskSwitch: false\n      mPauseSchedulePendingForPip=false\n      supportsSizeChanges=SIZE_CHANGES_SUPPORTED_METADATA\n      configChanges=0x5ffb\n      neverSandboxDisplayApis=false\n      alwaysSandboxDisplayApis=false\n      isTransparentPolicyRunning=false\n      areBoundsLetterboxed=false\n      isLetterboxRunning=false\n\n  * Task{5ab1c69 #1 type=home U=0 visible=false visibleRequested=false mode=fullscreen translucent=true sz=1}\n    * Task{a7a9dbe #6 type=home I=com.google.android.apps.nexuslauncher/.NexusLauncherActivity U=0 rootTaskId=1 visible=false visibleRequested=false mode=fullscreen translucent=true sz=2}\n      mLastPausedActivity: ActivityRecord{184000468 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t6}\n      mLastNonFullscreenBounds=Rect(237, 420 - 844, 1500)\n      isSleeping=false\n      * Hist  #1: ActivityRecord{184000468 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t6}\n        packageName=com.google.android.apps.nexuslauncher processName=com.google.android.apps.nexuslauncher\n        launchedFromUid=0 launchedFromPackage=null launchedFromFeature=null userId=0\n        app=ProcessRecord{e67f26e 1285:com.google.android.apps.nexuslauncher/u0a180}\n        Intent { act=android.intent.action.MAIN cat=[android.intent.category.HOME] flg=0x10000100 cmp=com.google.android.apps.nexuslauncher/.NexusLauncherActivity (has extras) }\n        rootOfTask=true task=Task{a7a9dbe #6 type=home I=com.google.android.apps.nexuslauncher/.NexusLauncherActivity}\n        taskAffinity=null\n        mActivityComponent=com.google.android.apps.nexuslauncher/.NexusLauncherActivity\n        baseDir=/system_ext/priv-app/NexusLauncherRelease/NexusLauncherRelease.apk\n        dataDir=/data/user/0/com.google.android.apps.nexuslauncher\n        stateNotNeeded=true componentSpecified=true mActivityType=home\n        compat={420dpi} theme=0x7f14001c\n        mLastReportedConfigurations:\n          mGlobalConfig={1.0 310mcc260mnc [en_US] ldltr sw411dp w411dp h731dp 420dpi nrml long port finger qwerty/v/v -nav/h winConfig={ mBounds=Rect(0, 0 - 1080, 1920) mAppBounds=Rect(0, 0 - 1080, 1920) mMaxBounds=Rect(0, 0 - 1080, 1920) mDisplayRotation=ROTATION_0 mWindowingMode=fullscreen mActivityType=undefined mAlwaysOnTop=undefined mRotation=ROTATION_0} as.2 s.33 fontWeightAdjustment=0}\n          mOverrideConfig={1.0 310mcc260mnc [en_US] ldltr sw411dp w411dp h731dp 420dpi nrml long port finger qwerty/v/v -nav/h winConfig={ mBounds=Rect(0, 0 - 1080, 1920) mAppBounds=Rect(0, 0 - 1080, 1920) mMaxBounds=Rect(0, 0 - 1080, 1920) mDisplayRotation=ROTATION_0 mWindowingMode=fullscreen mActivityType=home mAlwaysOnTop=undefined mRotation=ROTATION_0} as.2 s.5 fontWeightAdjustment=0}\n        mLastReportedActivityWindowInfo=ActivityWindowInfo{isEmbedded=false, taskBounds=Rect(0, 0 - 1080, 1920), taskFragmentBounds=Rect(0, 0 - 1080, 1920)}\n        CurrentConfiguration={1.0 310mcc260mnc [en_US] ldltr sw411dp w411dp h731dp 420dpi nrml long port finger qwerty/v/v -nav/h winConfig={ mBounds=Rect(0, 0 - 1080, 1920) mAppBounds=Rect(0, 0 - 1080, 1920) mMaxBounds=Rect(0, 0 - 1080, 1920) mDisplayRotation=ROTATION_0 mWindowingMode=fullscreen mActivityType=home mAlwaysOnTop=undefined mRotation=ROTATION_0} as.2 s.6 fontWeightAdjustment=0}\n        RequestedOverrideConfiguration={0.0 ?mcc0mnc ?localeList ?layoutDir ?swdp ?wdp ?hdp ?density ?lsize ?long ?ldr ?wideColorGamut ?orien ?uimode ?night ?touch ?keyb/?/? ?nav/? winConfig={ mBounds=Rect(0, 0 - 0, 0) mAppBounds=null mMaxBounds=Rect(0, 0 - 0, 0) mDisplayRotation=undefined mWindowingMode=undefined mActivityType=home mAlwaysOnTop=undefined mRotation=undefined} as.2 ?fontWeightAdjustment}\n        taskDescription: label=\"null\" icon=null iconResource=/0 iconFilename=null primaryColor=fff1f0f7\n          backgroundColor=ffeeedf4 statusBarColor=0 navigationBarColor=0\n         backgroundColorFloating=fff1f0f7\n        launchFailed=false launchCount=0 lastLaunchTime=-2m22s746ms\n        mHaveState=true mIcicle=Bundle[mParcelledData.dataSize=7108]\n        state=STOPPED delayedResume=false finishing=false\n        keysPaused=false inHistory=true idle=true\n        occludesParent=true mNoDisplay=false immersive=false launchMode=2\n        mActivityType=home\n        windows=[Window{2f5cd57 u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}]\n        windowType=2\n        mOccludesParent=true\n        overrideOrientation=SCREEN_ORIENTATION_NOSENSOR\n        requestedOrientation=SCREEN_ORIENTATION_NOSENSOR\n        mVisibleRequested=false mVisible=false mClientVisible=false reportedDrawn=false reportedVisible=false\n        mAppStopped=true\n        mNumInterestingWindows=2 mNumDrawnWindows=2 allDrawn=false)\n        nowVisible=false lastVisibleTime=-2m22s322ms\n        connections={ConnectionRecord{491b592 u0 com.google.android.apps.nexuslauncher/com.android.quickstep.TouchInteractionService:@e234f1d flags=0x0}}\n        resizeMode=RESIZE_MODE_RESIZEABLE\n        mLastReportedMultiWindowMode=false mLastReportedPictureInPictureMode=false\n        supportsSizeChanges=SIZE_CHANGES_UNSUPPORTED_METADATA\n        configChanges=0xff3\n        neverSandboxDisplayApis=false\n        alwaysSandboxDisplayApis=false\n        isTransparentPolicyRunning=false\n        areBoundsLetterboxed=false\n        isLetterboxRunning=false\n      * TaskFragment{b61a56 mode=multi-window organizerUid=10180 organizerProc=com.google.android.apps.nexuslauncher}\n\n  * Task{ac3cdd9 #2 type=undefined U=0 visible=false visibleRequested=false mode=fullscreen translucent=true sz=2}\n    mCreatedByOrganizer=true\n    * Task{d520e7f #4 type=undefined U=0 rootTaskId=2 visible=false visibleRequested=false mode=multi-window translucent=true sz=0}\n      mBounds=Rect(0, 1920 - 1080, 2880)\n      mCreatedByOrganizer=true\n      isSleeping=false\n    * Task{cecf39e #3 type=undefined U=0 rootTaskId=2 visible=false visibleRequested=false mode=multi-window translucent=true sz=0}\n      mCreatedByOrganizer=true\n      isSleeping=false\n\n  Resumed activities in task display areas (from top to bottom):\n    Resumed: ActivityRecord{28492399 u0 com.projectinfinity.kodi/.Main t10}\n\n  ResumedActivity: ActivityRecord{28492399 u0 com.projectinfinity.kodi/.Main t10}\n\nActivityTaskSupervisor state:\n  topDisplayFocusedRootTask=Task{134cb7c #10 type=standard A=10216:com.projectinfinity.kodi.infinity.kodi}\n  Display: mDisplayId=0 (organized)\n    init=1080x1920 420dpi mMinSizeOfResizeableTaskDp=220 cur=1080x1920 app=1080x1920 rng=1080x1080-1920x1920\n    deferred=false mLayoutNeeded=false\n  mLastOrientationSource=WindowedMagnification:0:31@75991716\n  deepestLastOrientationSource=ActivityRecord{28492399 u0 com.projectinfinity.kodi/.Main t10}\n  overrideConfig={1.0 310mcc260mnc [en_US] ldltr sw411dp w411dp h731dp 420dpi nrml long port finger qwerty/v/v -nav/h winConfig={ mBounds=Rect(0, 0 - 1080, 1920) mAppBounds=Rect(0, 0 - 1080, 1920) mMaxBounds=Rect(0, 0 - 1080, 1920) mDisplayRotation=ROTATION_0 mWindowingMode=fullscreen mActivityType=undefined mAlwaysOnTop=undefined mRotation=ROTATION_0} as.2 s.27 fontWeightAdjustment=0}\n  ignoreOrientationRequest=false\n  mLayoutSeq=150\n  mCurrentFocus=Window{5afec0e u0 com.projectinfinity.kodi/com.projectinfinity.kodi.Main}\n  mFocusedApp=ActivityRecord{28492399 u0 com.projectinfinity.kodi/.Main t10}\n\n  mHoldScreenWindow=null\n  mObscuringWindow=null\n  mLastWakeLockHoldingWindow=null\n  mLastWakeLockObscuringWindow=null\n\n  displayId=0\n  mWallpaperTarget=null\n  mLastWallpaperZoomOut=0.0\n  token WallpaperWindowToken{4e04488 showWhenLocked=true}:\n    mWallpaperX=0.0\n    mWallpaperY=0.5\n    mWallpaperXStep=0.33333334\n    mWallpaperYStep=1.0\n    mWallpaperDisplayOffsetX=NA\n    mWallpaperDisplayOffsetY=NA\n\n  mSystemGestureExclusion=SkRegion()\n\n  Display areas in top down Z order:\n    * Leaf:36:36\n    * HideDisplayCutout:32:35\n      * OneHanded:34:35\n        * AppZoomOut:34:35\n          * Leaf:34:35\n      * AppZoomOut:33:33\n        * Leaf:33:33\n      * OneHanded:32:32\n        * AppZoomOut:32:32\n          * Leaf:32:32\n    * WindowedMagnification:0:31\n      * HideDisplayCutout:26:31\n        * OneHanded:26:31\n          * AppZoomOut:26:31\n            * Leaf:26:31\n      * Leaf:24:25\n      * HideDisplayCutout:18:23\n        * OneHanded:18:23\n          * AppZoomOut:23:23\n            * Leaf:23:23\n          * Leaf:22:22\n          * AppZoomOut:20:21\n            * Leaf:20:21\n          * Leaf:19:19\n          * AppZoomOut:18:18\n            * Leaf:18:18\n      * OneHanded:17:17\n        * Leaf:17:17\n      * HideDisplayCutout:16:16\n        * OneHanded:16:16\n          * AppZoomOut:16:16\n            * Leaf:16:16\n      * OneHanded:15:15\n        * Leaf:15:15\n      * HideDisplayCutout:0:14\n        * OneHanded:0:14\n          * AppZoomOut:2:14\n            * ImePlaceholder:13:14\n              * ImeContainer\n            * Leaf:3:12\n            * DefaultTaskDisplayArea (organized)\n          * Leaf:1:1\n          * AppZoomOut:0:0\n            * Leaf:0:0\n\n  Task display areas in top down Z order:\n    TaskDisplayArea DefaultTaskDisplayArea\n      overrideConfig={0.0 ?mcc0mnc ?localeList ?layoutDir ?swdp ?wdp ?hdp ?density ?lsize ?long ?ldr ?wideColorGamut ?orien ?uimode ?night ?touch ?keyb/?/? ?nav/? winConfig={ mBounds=Rect(0, 0 - 0, 0) mAppBounds=null mMaxBounds=Rect(0, 0 - 0, 0) mDisplayRotation=undefined mWindowingMode=fullscreen mActivityType=undefined mAlwaysOnTop=undefined mRotation=undefined} ?fontWeightAdjustment}\n      mPreferredTopFocusableRootTask=Task{134cb7c #10 type=standard A=10216:com.projectinfinity.kodi.infinity.kodi}\n      mLastFocusedRootTask=Task{134cb7c #10 type=standard A=10216:com.projectinfinity.kodi.infinity.kodi}\n      Application tokens in top down Z order:\n      * Task{134cb7c #10 type=standard A=10216:com.projectinfinity.kodi.infinity.kodi U=0 visible=true visibleRequested=true mode=fullscreen translucent=false sz=1}\n        bounds=[0,0][1080,1920]\n        * ActivityRecord{28492399 u0 com.projectinfinity.kodi/.Main t10}\n      * Task{5ab1c69 #1 type=home U=0 visible=false visibleRequested=false mode=fullscreen translucent=true sz=1}\n        bounds=[0,0][1080,1920]\n        * Task{a7a9dbe #6 type=home I=com.google.android.apps.nexuslauncher/.NexusLauncherActivity U=0 rootTaskId=1 visible=false visibleRequested=false mode=fullscreen translucent=true sz=2}\n          bounds=[0,0][1080,1920]\n          * ActivityRecord{184000468 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t6}\n          * TaskFragment{b61a56 mode=multi-window organizerUid=10180 organizerProc=com.google.android.apps.nexuslauncher}\n            bounds=[0,0][1080,1920]\n      * Task{ac3cdd9 #2 type=undefined U=0 visible=false visibleRequested=false mode=fullscreen translucent=true sz=2}\n        bounds=[0,0][1080,1920]\n        * Task{d520e7f #4 type=undefined U=0 rootTaskId=2 visible=false visibleRequested=false mode=multi-window translucent=true sz=0}\n          bounds=[0,1920][1080,2880]\n        * Task{cecf39e #3 type=undefined U=0 rootTaskId=2 visible=false visibleRequested=false mode=multi-window translucent=true sz=0}\n          bounds=[0,0][1080,1920]\n\n  rootHomeTask=Task=1\n\n  PinnedTaskController\n    mIsImeShowing=false\n    mImeHeight=0\n    mMinAspectRatio=0.41841003\n    mMaxAspectRatio=2.39\n\n  DisplayFrames w=1080 h=1920 r=0\n\n  DisplayPolicy\n    mCarDockEnablesAccelerometer=true mDeskDockEnablesAccelerometer=true\n    mDockMode=EXTRA_DOCK_STATE_UNDOCKED mLidState=LID_OPEN\n    mAwake=true mScreenOnEarly=true mScreenOnFully=true\n    mKeyguardDrawComplete=true mWindowManagerDrawComplete=true\n    mHdmiPlugged=false\n    mLastBehavior=SHOW_TRANSIENT_BARS_BY_SWIPE\n    mShowingDream=false mDreamingLockscreen=false\n    mStatusBar=Window{a4d3e4 u0 StatusBar}\n    mExpandedPanel=Window{f103023 u0 NotificationShade}\n    isKeyguardShowing=false\n    mNavigationBar=Window{ae4d07f u0 Taskbar}\n    mNavBarOpacityMode=2\n    mNavigationBarCanMove=false\n    mHasBottomNavigationBar=true\n    mLeftGestureHost=Window{ae4d07f u0 Taskbar}\n    mTopGestureHost=Window{a4d3e4 u0 StatusBar}\n    mRightGestureHost=Window{ae4d07f u0 Taskbar}\n    mBottomGestureHost=Window{ae4d07f u0 Taskbar}\n    mFocusedWindow=Window{5afec0e u0 com.projectinfinity.kodi/com.projectinfinity.kodi.Main}\n    mTopFullscreenOpaqueWindowState=Window{5afec0e u0 com.projectinfinity.kodi/com.projectinfinity.kodi.Main}\n    mSystemBarColorApps={ActivityRecord{28492399 u0 com.projectinfinity.kodi/.Main t10}}\n    mNavBarColorWindowCandidate=Window{5afec0e u0 com.projectinfinity.kodi/com.projectinfinity.kodi.Main}\n    mNavBarBackgroundWindowCandidate=Window{5afec0e u0 com.projectinfinity.kodi/com.projectinfinity.kodi.Main}\n    mLastStatusBarAppearanceRegions=\n      AppearanceRegion{ bounds=[0,0][1080,1920]}\n    mLastLetterboxDetails=\n    mStatusBarBackgroundWindows=\n      Window{5afec0e u0 com.projectinfinity.kodi/com.projectinfinity.kodi.Main}\n    mTopIsFullscreen=true\n    mImeInsetsConsumed=false\n    mForceShowNavigationBarEnabled=false mAllowLockscreenWhenOn=false\n    mRemoteInsetsControllerControlsSystemBars=false\n    mDecorInsetsInfo:\n      ROTATION_0={nonDecorInsets=[0,0][0,0], overrideNonDecorInsets=[0,0][0,63], configInsets=[0,0][0,0], overrideConfigInsets=[0,63][0,63], nonDecorFrame=[0,0][1080,1920], overrideNonDecorFrame=[0,0][1080,1857], configFrame=[0,0][1080,1920], overrideConfigFrame=[0,63][1080,1857]}\n      ROTATION_90={nonDecorInsets=[0,0][0,0], overrideNonDecorInsets=[0,0][0,63], configInsets=[0,0][0,0], overrideConfigInsets=[0,63][0,63], nonDecorFrame=[0,0][1920,1080], overrideNonDecorFrame=[0,0][1920,1017], configFrame=[0,0][1920,1080], overrideConfigFrame=[0,63][1920,1017]}\n      ROTATION_180={nonDecorInsets=[0,0][0,0], overrideNonDecorInsets=[0,0][0,63], configInsets=[0,0][0,0], overrideConfigInsets=[0,63][0,63], nonDecorFrame=[0,0][1080,1920], overrideNonDecorFrame=[0,0][1080,1857], configFrame=[0,0][1080,1920], overrideConfigFrame=[0,63][1080,1857]}\n      ROTATION_270={nonDecorInsets=[0,0][0,0], overrideNonDecorInsets=[0,0][0,63], configInsets=[0,0][0,0], overrideConfigInsets=[0,63][0,63], nonDecorFrame=[0,0][1920,1080], overrideNonDecorFrame=[0,0][1920,1017], configFrame=[0,0][1920,1080], overrideConfigFrame=[0,63][1920,1017]}\n    SystemGestures:\n      mDisplayCutoutTouchableRegionSize=0\n      mSwipeStartThreshold=Rect(63, 63 - 63, 63)\n      mSwipeDistanceThreshold=63\n\n  DisplayRotation\n    mCurrentAppOrientation=SCREEN_ORIENTATION_UNSPECIFIED\n    mLastOrientation=-1\n    mRotation=0 mDeferredRotationPauseCount=0\n    mLandscapeRotation=ROTATION_90 mSeascapeRotation=ROTATION_270\n    mPortraitRotation=ROTATION_0 mUpsideDownRotation=ROTATION_180\n    mSupportAutoRotation=true\n    WindowOrientationListener\n      mEnabled=true\n      mCurrentRotation=ROTATION_0\n      mSensorType=null\n      mSensor={Sensor name=\"Goldfish 3-axis Accelerometer\", vendor=\"The Android Open Source Project\", version=1, type=1, maxRange=39.300102, resolution=2.480159E-4, power=3.0, minDelay=10000}\n      mRate=2\n      AccelSensorJudge\n        mProposedRotation=0\n        mPredictedRotation=0\n        mLastFilteredX=0.0\n        mLastFilteredY=9.776321\n        mLastFilteredZ=0.812345\n        mLastFilteredTimestampNanos=182725528198 (10.505193ms ago)\n        mTiltHistory={last: 5.0}\n        mFlat=false\n        mSwinging=false\n        mAccelerating=false\n        mOverhead=false\n        mTouched=false\n        mTiltToleranceConfig=[[-25, 70], [-25, 65], [-25, 60], [-25, 65]]\n\n    mCarDockRotation=-1 mDeskDockRotation=-1\n    mUserRotationMode=USER_ROTATION_FREE mUserRotation=ROTATION_0 mCameraRotationMode=0 mAllowAllRotations=unknown\n    mDemoHdmiRotation=ROTATION_90 mDemoHdmiRotationLock=false mUndockedHdmiRotation=-1\n    mLidOpenRotation=-1\n    mFixedToUserRotation=false\n  FoldController\n    mPauseAutorotationDuringUnfolding=false\n    mShouldDisableRotationSensor=false\n    mShouldIgnoreSensorRotation=false\n    mLastDisplaySwitchTime=0\n    mLastHingeAngleEventTime=0\n    mDeviceState=UNKNOWN\n\n    RotationLockHistory\n      11-10 14:50:29.350: mode=USER_ROTATION_FREE, rotation=ROTATION_0, caller=UiAutomationConnection#restoreRotationStateLocked\n      11-10 14:50:33.175: mode=USER_ROTATION_FREE, rotation=ROTATION_0, caller=UiAutomationConnection#restoreRotationStateLocked\n      11-10 14:50:36.953: mode=USER_ROTATION_FREE, rotation=ROTATION_0, caller=UiAutomationConnection#restoreRotationStateLocked\n      11-10 14:50:41.969: mode=USER_ROTATION_FREE, rotation=ROTATION_0, caller=UiAutomationConnection#restoreRotationStateLocked\n      11-10 14:50:44.757: mode=USER_ROTATION_FREE, rotation=ROTATION_0, caller=UiAutomationConnection#restoreRotationStateLocked\n      11-10 14:50:47.439: mode=USER_ROTATION_FREE, rotation=ROTATION_0, caller=UiAutomationConnection#restoreRotationStateLocked\n      11-10 14:50:50.082: mode=USER_ROTATION_FREE, rotation=ROTATION_0, caller=UiAutomationConnection#restoreRotationStateLocked\n      11-10 14:50:52.877: mode=USER_ROTATION_FREE, rotation=ROTATION_0, caller=UiAutomationConnection#restoreRotationStateLocked\n\n  InputConsumers:\n    name=recents_animation_input_consumer pid=1285 user=UserHandle{0}\n\n  WindowInsetsStateController\n    InsetsState\n      mDisplayFrame=Rect(0, 0 - 1080, 1920)\n      mDisplayCutout=DisplayCutout{insets=Rect(0, 0 - 0, 0) waterfall=Insets{left=0, top=0, right=0, bottom=0} boundingRect={Bounds=[Rect(0, 0 - 0, 0), Rect(0, 0 - 0, 0), Rect(0, 0 - 0, 0), Rect(0, 0 - 0, 0)]} cutoutPathParserInfo={CutoutPathParserInfo{displayWidth=0 displayHeight=0 physicalDisplayWidth=0 physicalDisplayHeight=0 density={0.0} cutoutSpec={} rotation={0} scale={0.0} physicalPixelDisplaySizeRatio={0.0}}} sideOverrides=null}\n      mRoundedCorners=RoundedCorners{[RoundedCorner{position=TopLeft, radius=0, center=Point(0, 0)}, RoundedCorner{position=TopRight, radius=0, center=Point(0, 0)}, RoundedCorner{position=BottomRight, radius=0, center=Point(0, 0)}, RoundedCorner{position=BottomLeft, radius=0, center=Point(0, 0)}]}\n      mRoundedCornerFrame=Rect(0, 0 - 0, 0)\n      mPrivacyIndicatorBounds=PrivacyIndicatorBounds {static bounds=Rect(827, 0 - 1043, 63) rotation=0}\n      mDisplayShape=DisplayShape{ spec=1673867177 displayWidth=1080 displayHeight=1920 physicalPixelDisplaySizeRatio=1.0 rotation=0 offsetX=0 offsetY=0 scale=1.0}\n        InsetsSource id=d8650001 type=navigationBars frame=[0,1857][1080,1920] visible=false flags=SUPPRESS_SCRIM|ANIMATE_RESIZING sideHint=BOTTOM boundingRects=null\n        InsetsSource id=d8650004 type=systemGestures frame=[0,0][78,1920] visible=true flags= sideHint=LEFT boundingRects=null\n        InsetsSource id=d8650005 type=mandatorySystemGestures frame=[0,1836][1080,1920] visible=true flags= sideHint=BOTTOM boundingRects=null\n        InsetsSource id=d8650006 type=tappableElement frame=[0,0][0,0] visible=true flags= sideHint=NONE boundingRects=null\n        InsetsSource id=d8650024 type=systemGestures frame=[1002,0][1080,1920] visible=true flags= sideHint=RIGHT boundingRects=null\n        InsetsSource id=3 type=ime frame=[0,0][0,0] visible=false flags= sideHint=NONE boundingRects=null\n        InsetsSource id=37410000 type=statusBars frame=[0,0][1080,63] visible=false flags= sideHint=TOP boundingRects=null\n        InsetsSource id=37410005 type=mandatorySystemGestures frame=[0,0][1080,63] visible=true flags= sideHint=TOP boundingRects=null\n        InsetsSource id=37410006 type=tappableElement frame=[0,0][1080,63] visible=true flags= sideHint=TOP boundingRects=null\n    Control map:\n      Window{5afec0e u0 com.projectinfinity.kodi/com.projectinfinity.kodi.Main}:\n        InsetsSourceControl: {3 mType=ime mSurfacePosition=Point(120, 1794) mInsetsHint=Insets{left=0, top=0, right=0, bottom=0}}\n        InsetsSourceControl: {d8650001 mType=navigationBars initiallyVisible mSurfacePosition=Point(0, 1857) mInsetsHint=Insets{left=0, top=0, right=0, bottom=63}}\n        InsetsSourceControl: {37410000 mType=statusBars initiallyVisible mSurfacePosition=Point(0, 0) mInsetsHint=Insets{left=0, top=63, right=0, bottom=0}}\n    InsetsSourceProviders:\n      InsetsSourceProvider\n        mSource=InsetsSource id=37410006 type=tappableElement frame=[0,0][1080,63] visible=true flags= sideHint=TOP boundingRects=null\n        mSourceFrame=Rect(0, 0 - 1080, 63)\n        mIsLeashInitialized=false mHasPendingPosition=false\n        mWindowContainer=Window{a4d3e4 u0 StatusBar}\n      InsetsSourceProvider\n        mSource=InsetsSource id=37410005 type=mandatorySystemGestures frame=[0,0][1080,63] visible=true flags= sideHint=TOP boundingRects=null\n        mSourceFrame=Rect(0, 0 - 1080, 63)\n        mIsLeashInitialized=false mHasPendingPosition=false\n        mWindowContainer=Window{a4d3e4 u0 StatusBar}\n      InsetsSourceProvider\n        mSource=InsetsSource id=37410000 type=statusBars frame=[0,0][1080,63] visible=false flags= sideHint=TOP boundingRects=null\n        mSourceFrame=Rect(0, 0 - 1080, 63)\n        mControl=InsetsSourceControl mId=37410000 mType=statusBars mLeash=Surface(name=Surface(name=a4d3e4 StatusBar)/@0xba9b39c - animation-leash of insets_animation)/@0x934b678 mInitiallyVisible=true mSurfacePosition=Point(0, 0) mInsetsHint=Insets{left=0, top=63, right=0, bottom=0} mSkipAnimationOnce=false mImeStatsToken=null\n        mInsetsHint=Insets{left=0, top=63, right=0, bottom=0}\n        mIsLeashInitialized=true mHasPendingPosition=false\n        mWindowContainer=Window{a4d3e4 u0 StatusBar}\n        mAdapter=ControlAdapter mCapturedLeash=Surface(name=Surface(name=a4d3e4 StatusBar)/@0xba9b39c - animation-leash of insets_animation)/@0x934b678\n        mControlTarget=Window{5afec0e u0 com.projectinfinity.kodi/com.projectinfinity.kodi.Main}\n      ImeInsetsSourceProvider\n        mSource=InsetsSource id=3 type=ime frame=[0,0][0,0] visible=false flags= sideHint=NONE boundingRects=null\n        mSourceFrame=Rect(120, 1794 - 960, 1920)\n        mControl=InsetsSourceControl mId=3 mType=ime mLeash=Surface(name=Surface(name=c8f984 InputMethod)/@0x9ebd5a2 - animation-leash of insets_animation)/@0x3da7151 mInitiallyVisible=false mSurfacePosition=Point(120, 1794) mInsetsHint=Insets{left=0, top=0, right=0, bottom=0} mSkipAnimationOnce=false mImeStatsToken=null\n        mInsetsHint=Insets{left=0, top=0, right=0, bottom=0} stale\n        mIsLeashInitialized=true mHasPendingPosition=false\n        mWindowContainer=Window{c8f984 u0 InputMethod}\n        mAdapter=ControlAdapter mCapturedLeash=Surface(name=Surface(name=c8f984 InputMethod)/@0x9ebd5a2 - animation-leash of insets_animation)/@0x3da7151\n        mControlTarget=Window{5afec0e u0 com.projectinfinity.kodi/com.projectinfinity.kodi.Main}\n        mImeShowing=false mLastDrawn=false        showImePostLayout not scheduled, mImeRequester=null\n\n      InsetsSourceProvider\n        mSource=InsetsSource id=d8650024 type=systemGestures frame=[1002,0][1080,1920] visible=true flags= sideHint=RIGHT boundingRects=null\n        mSourceFrame=Rect(1002, 0 - 1080, 1920)\n        mIsLeashInitialized=false mHasPendingPosition=false\n        mWindowContainer=Window{ae4d07f u0 Taskbar}\n      InsetsSourceProvider\n        mSource=InsetsSource id=d8650006 type=tappableElement frame=[0,0][0,0] visible=true flags= sideHint=NONE boundingRects=null\n        mSourceFrame=Rect(0, 0 - 0, 0)\n        mOverrideFrames={2011=Rect(0, 1857 - 1080, 1920), 2031=Rect(0, 0 - 0, 0)}\n        mIsLeashInitialized=false mHasPendingPosition=false\n        mWindowContainer=Window{ae4d07f u0 Taskbar}\n      InsetsSourceProvider\n        mSource=InsetsSource id=d8650005 type=mandatorySystemGestures frame=[0,1836][1080,1920] visible=true flags= sideHint=BOTTOM boundingRects=null\n        mSourceFrame=Rect(0, 1836 - 1080, 1920)\n        mOverrideFrames={2011=Rect(0, 1857 - 1080, 1920), 2031=Rect(0, 1836 - 1080, 1920)}\n        mIsLeashInitialized=false mHasPendingPosition=false\n        mWindowContainer=Window{ae4d07f u0 Taskbar}\n      InsetsSourceProvider\n        mSource=InsetsSource id=d8650004 type=systemGestures frame=[0,0][78,1920] visible=true flags= sideHint=LEFT boundingRects=null\n        mSourceFrame=Rect(0, 0 - 78, 1920)\n        mIsLeashInitialized=false mHasPendingPosition=false\n        mWindowContainer=Window{ae4d07f u0 Taskbar}\n      InsetsSourceProvider\n        mSource=InsetsSource id=d8650001 type=navigationBars frame=[0,1857][1080,1920] visible=false flags=SUPPRESS_SCRIM|ANIMATE_RESIZING sideHint=BOTTOM boundingRects=null\n        mSourceFrame=Rect(0, 1857 - 1080, 1920)\n        mOverrideFrames={2011=Rect(0, 1857 - 1080, 1920), 2031=Rect(0, 1857 - 1080, 1920)}\n        mControl=InsetsSourceControl mId=d8650001 mType=navigationBars mLeash=Surface(name=Surface(name=ae4d07f Taskbar)/@0x3c46bf1 - animation-leash of insets_animation)/@0x82f1db6 mInitiallyVisible=true mSurfacePosition=Point(0, 1857) mInsetsHint=Insets{left=0, top=0, right=0, bottom=63} mSkipAnimationOnce=false mImeStatsToken=null\n        mInsetsHint=Insets{left=0, top=0, right=0, bottom=63}\n        mIsLeashInitialized=true mHasPendingPosition=false\n        mWindowContainer=Window{ae4d07f u0 Taskbar}\n        mAdapter=ControlAdapter mCapturedLeash=Surface(name=Surface(name=ae4d07f Taskbar)/@0x3c46bf1 - animation-leash of insets_animation)/@0x82f1db6\n        mControlTarget=Window{5afec0e u0 com.projectinfinity.kodi/com.projectinfinity.kodi.Main}\n  InsetsPolicy\n    status: WINDOW_STATE_HIDDEN\n    nav: WINDOW_STATE_HIDDEN\n\n  KeyguardController:\n    mKeyguardShowing=false\n    mAodShowing=false\n    mKeyguardGoingAway=false\n   KeyguardShowing=false AodShowing=false KeyguardGoingAway=false DismissalRequested=false  Occluded=false DismissingKeyguardActivity=null TurnScreenOnActivity=null at display=0\n    mDismissalRequested=false\n\n  LockTaskController:\n    mLockTaskModeState=NONE\n    mLockTaskModeTasks=\n    mLockTaskPackages (userId:packages)=\n\n  mCurTaskIdForUser={0=10}\n  mUserRootTaskInFront={}\n  mVisibilityTransactionDepth=0\n  isHomeRecentsComponent=true\n  mNoHistoryActivities=[]\n\n  TaskOrganizerController:\n      android.window.ITaskOrganizer$Stub$Proxy@2b317ca uid=10184 (active):\n        (fullscreen) Task{5ab1c69 #1 type=home}\n        (fullscreen) Task{ac3cdd9 #2 type=undefined}\n        (multi-window) Task{cecf39e #3 type=undefined}\n        (multi-window) Task{d520e7f #4 type=undefined}\n        (fullscreen) Task{134cb7c #10 type=standard A=10216:com.projectinfinity.kodi.infinity.kodi}\n\n  VisibleActivityProcess:[ ProcessRecord{6869d90 5066:com.projectinfinity.kodi:kodi/u0a216}]\n  NumNonAppVisibleWindowUidMap:[ 10184:1 10180:1]\n  SleepTokens={}\n"
+    },
+    "home": {
+      "currentcontrol": {
+        "label": "TV SHOWS"
+      },
+      "currentwindow": {
+        "id": 10000,
+        "label": "Home"
+      },
+      "skin": {
+        "id": "skin.infinity.diggz",
+        "name": "Infinity"
+      }
+    },
+    "pid": 5066,
+    "ping": "pong",
+    "process_start": "16734"
+  },
+  "environment": {
+    "application_installed": false,
+    "application_started": false,
+    "compatibility_overrides": false,
+    "fingerprint": "google/sdk_gphone64_x86_64/emu64xa:16/BE2A.250530.026.F3/13894323:userdebug/dev-keys",
+    "image": "system-images;android-36;google_apis;x86_64",
+    "page_size": 4096,
+    "revision": 7,
+    "sdk": 36,
+    "serial": "emulator-5554",
+    "status": "PASS_STOCK_API36_ENVIRONMENT_INTAKE_ONLY",
+    "stock_bridge_build_id": "2810e5b44895c4ea0b1ad6882ea73b73",
+    "stock_bridge_sha256": "fbadc774c989534a567e6af8fd16d2c00727b1f1d9cc778bf538d6b59ed9776d"
+  },
+  "lifecycle_reader": {
+    "application_state_changed": false,
+    "command": [
+      "/usr/bin/timeout",
+      "--signal=TERM",
+      "--kill-after=2",
+      "900",
+      "/usr/local/lib/android/sdk/platform-tools/adb",
+      "-s",
+      "emulator-5554",
+      "logcat",
+      "-v",
+      "threadtime",
+      "-b",
+      "main",
+      "-b",
+      "system",
+      "-b",
+      "crash",
+      "-b",
+      "events",
+      "ActivityTaskManager:I",
+      "ActivityManager:I",
+      "WindowManager:I",
+      "PermissionController:I",
+      "PermissionManager:I",
+      "AndroidRuntime:E",
+      "libc:F",
+      "DEBUG:F",
+      "linker:W",
+      "Kodi:V",
+      "kodi:V",
+      "XBMC:V",
+      "Infinity:V",
+      "Splash:V",
+      "am_proc_start:I",
+      "am_proc_died:I",
+      "am_crash:I",
+      "am_kill:I",
+      "am_finish_activity:I",
+      "am_create_activity:I",
+      "am_resume_activity:I",
+      "am_pause_activity:I",
+      "am_destroy_activity:I",
+      "am_force_stop:I",
+      "*:S"
+    ],
+    "duration_limit_seconds": 900,
+    "finished_epoch": 1794322480.4071221,
+    "host_pid": 4079,
+    "logcat_cleared": false,
+    "observation_scope": "Owned reader leader exit only; adb descendant retirement not independently audited",
+    "per_file_limit_bytes": 8388608,
+    "returncode": -15,
+    "size_cap_reached": false,
+    "started_epoch": 1794322123.704236,
+    "status": "OWN_READER_STOP_REQUESTED_LEADER_EXITED",
+    "stderr_bytes": 0,
+    "stdout_bytes": 409041
+  },
+  "physical_Hz_thermal_battery": "NOT_RUN",
+  "provider_online_playback": "NOT_RUN_THIS_CASE_IS_LOCAL_MEDIA_SMOKE",
+  "shutdown": "NOT_SELECTED",
+  "stages": {
+    "candidate": {
+      "authenticated_native_module_identity": {
+        "files": 80,
+        "manifest": "c67327c9683ec21be4aae58fe9add45d04372c91b16f1e1b2ee49e5dca50f2b9",
+        "pid": 6022,
+        "qa": "script.infinity.performanceprobe",
+        "state": {
+          "at": 262.055750077,
+          "dialog": 9999,
+          "focus": 50,
+          "focused_window": 10040,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "0",
+            "BaselineIntegrityStatus": "checking",
+            "BaselineMismatchCount": "0"
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "",
+            "Control": "",
+            "Global": "",
+            "State": "",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "",
+          "resident_current_window": "",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10040
+        }
+      },
+      "finished": {
+        "at": 303.122010883,
+        "dialog": 9999,
+        "focus": 9000,
+        "focused_window": 10000,
+        "integrity": {
+          "BaselineCandidate": "273",
+          "BaselineCheckedFiles": "948",
+          "BaselineIntegrityStatus": "ok",
+          "BaselineMismatchCount": "0"
+        },
+        "motion": "true",
+        "properties": {
+          "Active": "false",
+          "Control": "",
+          "Global": "false",
+          "State": "idle",
+          "Token": "",
+          "Window": ""
+        },
+        "resident_context": "baa56d7c803d42f4861d77771caa6082",
+        "resident_current_window": "10025",
+        "screen": [
+          "1080",
+          "1920"
+        ],
+        "skin": "skin.infinity.diggz",
+        "window": 10000
+      },
+      "hub": {
+        "at": 277.0071359,
+        "dialog": 11191,
+        "focus": 1191102,
+        "focused_window": 11191,
+        "integrity": {
+          "BaselineCandidate": "273",
+          "BaselineCheckedFiles": "948",
+          "BaselineIntegrityStatus": "ok",
+          "BaselineMismatchCount": "0"
+        },
+        "motion": "true",
+        "properties": {
+          "Active": "false",
+          "Control": "",
+          "Global": "false",
+          "State": "idle",
+          "Token": "",
+          "Window": ""
+        },
+        "resident_context": "c69c87a58ac7416ea5ff754678efcd11",
+        "resident_current_window": "10000",
+        "screen": [
+          "1080",
+          "1920"
+        ],
+        "skin": "skin.infinity.diggz",
+        "window": 10000
+      },
+      "install": "Performing Push Install\nSuccess\n",
+      "installed_sha256": "9cbb4c5f89a214924b6890463aa5842f85b18ff445d04d855e441fa61f4578c2",
+      "navigation": {
+        "continue": {
+          "at": 1760.11523022,
+          "labels": {
+            "Container.FolderPath": "plugin://script.infinity.commandcenter/?action=library&media=movie&bucket=continue",
+            "Container.NumItems": "0",
+            "Container.PluginCategory": "Movies \u2014 Continue Playing",
+            "System.CurrentWindowId": ""
+          },
+          "native_current_window": 10025
+        },
+        "movies": {
+          "at": 1749.610139648,
+          "labels": {
+            "Container.FolderPath": "plugin://script.infinity.commandcenter/?action=movies",
+            "Container.NumItems": "7",
+            "Container.PluginCategory": "Infinity Movies",
+            "System.CurrentWindowId": ""
+          },
+          "native_current_window": 10025
+        },
+        "next": {
+          "at": 1757.620608575,
+          "labels": {
+            "Container.FolderPath": "plugin://script.infinity.commandcenter/?action=library&media=tv&bucket=next",
+            "Container.NumItems": "0",
+            "Container.PluginCategory": "TV Shows \u2014 Next Episodes",
+            "System.CurrentWindowId": ""
+          },
+          "native_current_window": 10025
+        },
+        "progress": {
+          "at": 1754.935123367,
+          "labels": {
+            "Container.FolderPath": "plugin://script.infinity.commandcenter/?action=library&media=tv&bucket=progress",
+            "Container.NumItems": "0",
+            "Container.PluginCategory": "TV Shows \u2014 Progress Shows",
+            "System.CurrentWindowId": ""
+          },
+          "native_current_window": 10025
+        },
+        "tv": {
+          "at": 1752.438737251,
+          "labels": {
+            "Container.FolderPath": "plugin://script.infinity.commandcenter/?action=tv",
+            "Container.NumItems": "9",
+            "Container.PluginCategory": "Infinity TV Shows",
+            "System.CurrentWindowId": ""
+          },
+          "native_current_window": 10025
+        }
+      },
+      "playback_smoke_reused": {
+        "actual_playback_seconds": 41.408,
+        "artifact_id": 13772574106,
+        "complete948_check_while_playing": true,
+        "overall_prior_run": "FAIL_RETAINED_NATIVE_ANDROID_SEARCH_OBSERVER_API",
+        "path": "repairs/infinity-performance-ui-2103477-20261110/evidence/42833554341/PLAYBACK-PASS.json",
+        "replayed": false,
+        "run": 42833554341,
+        "sha256": "c8da47f1d588f1ce148bddb4f4138dfc0d4f103d48649c3172330fa1e30c0d20",
+        "source": "b40c8266a27bf4cbdf8b728f55bd971b8604b39b"
+      },
+      "provider_availability": [
+        {
+          "id": "plugin.video.thecrew",
+          "installed": false
+        },
+        {
+          "id": "plugin.video.watchnixtoons2",
+          "installed": false
+        },
+        {
+          "id": "plugin.video.otaku",
+          "installed": false
+        },
+        {
+          "id": "plugin.video.seren",
+          "installed": false
+        },
+        {
+          "id": "plugin.video.umbrella",
+          "installed": false
+        },
+        {
+          "id": "plugin.video.pov",
+          "installed": false
+        }
+      ],
+      "resident_ready": [
+        {
+          "at": 262.350569857,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "0",
+            "BaselineIntegrityStatus": "checking",
+            "BaselineMismatchCount": "0"
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "",
+            "Control": "",
+            "Global": "",
+            "State": "",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "",
+          "resident_current_window": "",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 263.006742624,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "0",
+            "BaselineIntegrityStatus": "checking",
+            "BaselineMismatchCount": "0"
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "",
+            "Control": "",
+            "Global": "",
+            "State": "",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "",
+          "resident_current_window": "",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 263.933172857,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "0",
+            "BaselineIntegrityStatus": "checking",
+            "BaselineMismatchCount": "0"
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "",
+            "Control": "",
+            "Global": "",
+            "State": "",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "",
+          "resident_current_window": "",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 264.738887203,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "0",
+            "BaselineIntegrityStatus": "checking",
+            "BaselineMismatchCount": "0"
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "",
+            "Control": "",
+            "Global": "",
+            "State": "",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "",
+          "resident_current_window": "",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 265.266918471,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "0",
+            "BaselineIntegrityStatus": "checking",
+            "BaselineMismatchCount": "0"
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "",
+            "Control": "",
+            "Global": "",
+            "State": "",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "",
+          "resident_current_window": "",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 265.658763939,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "0",
+            "BaselineIntegrityStatus": "checking",
+            "BaselineMismatchCount": "0"
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "",
+            "Control": "",
+            "Global": "",
+            "State": "",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "",
+          "resident_current_window": "",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 266.322147097,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "0",
+            "BaselineIntegrityStatus": "checking",
+            "BaselineMismatchCount": "0"
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "",
+            "Control": "",
+            "Global": "",
+            "State": "",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "",
+          "resident_current_window": "",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 266.906910722,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "0",
+            "BaselineIntegrityStatus": "checking",
+            "BaselineMismatchCount": "0"
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "false",
+            "Control": "",
+            "Global": "false",
+            "State": "idle",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "c69c87a58ac7416ea5ff754678efcd11",
+          "resident_current_window": "10000",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 267.659146138,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "0",
+            "BaselineIntegrityStatus": "checking",
+            "BaselineMismatchCount": "0"
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "false",
+            "Control": "",
+            "Global": "false",
+            "State": "idle",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "c69c87a58ac7416ea5ff754678efcd11",
+          "resident_current_window": "10000",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 268.375275545,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "0",
+            "BaselineIntegrityStatus": "checking",
+            "BaselineMismatchCount": "0"
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "false",
+            "Control": "",
+            "Global": "false",
+            "State": "idle",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "c69c87a58ac7416ea5ff754678efcd11",
+          "resident_current_window": "10000",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 269.135981457,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "0",
+            "BaselineIntegrityStatus": "checking",
+            "BaselineMismatchCount": "0"
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "false",
+            "Control": "",
+            "Global": "false",
+            "State": "idle",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "c69c87a58ac7416ea5ff754678efcd11",
+          "resident_current_window": "10000",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 269.710544063,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "0",
+            "BaselineIntegrityStatus": "checking",
+            "BaselineMismatchCount": "0"
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "false",
+            "Control": "",
+            "Global": "false",
+            "State": "idle",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "c69c87a58ac7416ea5ff754678efcd11",
+          "resident_current_window": "10000",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 270.259536427,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "0",
+            "BaselineIntegrityStatus": "checking",
+            "BaselineMismatchCount": "0"
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "false",
+            "Control": "",
+            "Global": "false",
+            "State": "idle",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "c69c87a58ac7416ea5ff754678efcd11",
+          "resident_current_window": "10000",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 270.869085455,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "0",
+            "BaselineIntegrityStatus": "checking",
+            "BaselineMismatchCount": "0"
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "false",
+            "Control": "",
+            "Global": "false",
+            "State": "idle",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "c69c87a58ac7416ea5ff754678efcd11",
+          "resident_current_window": "10000",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 271.537030605,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "0",
+            "BaselineIntegrityStatus": "checking",
+            "BaselineMismatchCount": "0"
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "false",
+            "Control": "",
+            "Global": "false",
+            "State": "idle",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "c69c87a58ac7416ea5ff754678efcd11",
+          "resident_current_window": "10000",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 272.146749354,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "0",
+            "BaselineIntegrityStatus": "checking",
+            "BaselineMismatchCount": "0"
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "false",
+            "Control": "",
+            "Global": "false",
+            "State": "idle",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "c69c87a58ac7416ea5ff754678efcd11",
+          "resident_current_window": "10000",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 272.932808523,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "0",
+            "BaselineIntegrityStatus": "checking",
+            "BaselineMismatchCount": "0"
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "false",
+            "Control": "",
+            "Global": "false",
+            "State": "idle",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "c69c87a58ac7416ea5ff754678efcd11",
+          "resident_current_window": "10000",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 273.614796525,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "0",
+            "BaselineIntegrityStatus": "checking",
+            "BaselineMismatchCount": "0"
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "false",
+            "Control": "",
+            "Global": "false",
+            "State": "idle",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "c69c87a58ac7416ea5ff754678efcd11",
+          "resident_current_window": "10000",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 274.465743412,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "0",
+            "BaselineIntegrityStatus": "checking",
+            "BaselineMismatchCount": "0"
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "false",
+            "Control": "",
+            "Global": "false",
+            "State": "idle",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "c69c87a58ac7416ea5ff754678efcd11",
+          "resident_current_window": "10000",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 274.963696342,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "0",
+            "BaselineIntegrityStatus": "checking",
+            "BaselineMismatchCount": "0"
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "false",
+            "Control": "",
+            "Global": "false",
+            "State": "idle",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "c69c87a58ac7416ea5ff754678efcd11",
+          "resident_current_window": "10000",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 275.436064031,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "0",
+            "BaselineIntegrityStatus": "checking",
+            "BaselineMismatchCount": "0"
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "false",
+            "Control": "",
+            "Global": "false",
+            "State": "idle",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "c69c87a58ac7416ea5ff754678efcd11",
+          "resident_current_window": "10000",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 275.87735549,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "0",
+            "BaselineIntegrityStatus": "checking",
+            "BaselineMismatchCount": "0"
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "false",
+            "Control": "",
+            "Global": "false",
+            "State": "idle",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "c69c87a58ac7416ea5ff754678efcd11",
+          "resident_current_window": "10000",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 276.688298743,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "273",
+            "BaselineCheckedFiles": "948",
+            "BaselineIntegrityStatus": "ok",
+            "BaselineMismatchCount": "0"
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "false",
+            "Control": "",
+            "Global": "false",
+            "State": "idle",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "c69c87a58ac7416ea5ff754678efcd11",
+          "resident_current_window": "10000",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        }
+      ],
+      "retained_sentinel_sha256": "a6bb9e9ceedf31b0436e73913774afdb21f037efdbf9512664e6c0164ea712e2",
+      "search_interface": {
+        "Android_UI": true,
+        "Cancel": {
+          "UI_capture": {
+            "XML_file": "native-infinity-search-dump-00030.xml",
+            "captured_epoch": 1794322354.9283826,
+            "sequence": 30
+          },
+          "action_epoch": 1794322356.297951,
+          "bounds": "[880,131][1006,257]",
+          "center": [
+            943,
+            194
+          ],
+          "description": "Close Infinity Search",
+          "package": "com.projectinfinity.kodi",
+          "purpose": "Cancel existing Infinity Android Search; no query or provider request",
+          "resource_id": "",
+          "text": "\u00d7"
+        },
+        "after_capture": {
+          "XML_file": "native-infinity-search-after-cancel-dump-00031.xml",
+          "captured_epoch": 1794322359.6272306,
+          "sequence": 31
+        },
+        "before_capture": {
+          "XML_file": "native-infinity-search-dump-00030.xml",
+          "captured_epoch": 1794322354.9283826,
+          "sequence": 30
+        },
+        "foreground": "com.projectinfinity.kodi/.Main",
+        "provider_calls": false,
+        "query_submitted": false,
+        "transient_capture_errors": []
+      },
+      "search_request": {
+        "existing_RunScript_requested": true,
+        "state": {
+          "at": 277.962448845,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "273",
+            "BaselineCheckedFiles": "948",
+            "BaselineIntegrityStatus": "ok",
+            "BaselineMismatchCount": "0"
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "false",
+            "Control": "",
+            "Global": "false",
+            "State": "idle",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "19e1f35c8ab64c5bbefcf05d15f8a085",
+          "resident_current_window": "11191",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        }
+      },
+      "startup": {
+        "cycle": 2103480,
+        "entry": "Original Splash and measured original Infinity card or retained original admission",
+        "foreground": {
+          "captured_epoch": 1794322324.9906085,
+          "component": "com.projectinfinity.kodi/.Main",
+          "error": null,
+          "query_truncated": false,
+          "raw_query": "ACTIVITY MANAGER ACTIVITIES (dumpsys activity activities)\nDisplay #0 (activities from top to bottom):\n  * Task{5969ae3 #13 type=standard A=10216:com.projectinfinity.kodi.infinity.kodi U=0 visible=true visibleRequested=true mode=fullscreen translucent=false sz=1}\n    mLastNonFullscreenBounds=Rect(215, 420 - 865, 1500)\n    isSleeping=false\n    topResumedActivity=ActivityRecord{152838930 u0 com.projectinfinity.kodi/.Main t13}\n    * Hist  #0: ActivityRecord{152838930 u0 com.projectinfinity.kodi/.Main t13}\n      packageName=com.projectinfinity.kodi processName=com.projectinfinity.kodi:kodi\n      launchedFromUid=10216 launchedFromPackage=com.projectinfinity.kodi launchedFromFeature=null userId=0\n      app=ProcessRecord{5208020 6022:com.projectinfinity.kodi:kodi/u0a216}\n      Intent { flg=0x10008000 xflg=0x4 cmp=com.projectinfinity.kodi/.Main (has extras) }\n      rootOfTask=true task=Task{5969ae3 #13 type=standard A=10216:com.projectinfinity.kodi.infinity.kodi}\n      taskAffinity=10216:com.projectinfinity.kodi.infinity.kodi\n      mActivityComponent=com.projectinfinity.kodi/.Main\n      baseDir=/data/app/~~vhywPW6rJJh3ZI0EavwZeg==/com.projectinfinity.kodi-5arsoXUTjPc7ABMcpT97AQ==/base.apk\n      dataDir=/data/user/0/com.projectinfinity.kodi\n      stateNotNeeded=false componentSpecified=true mActivityType=standard\n      compat={420dpi} theme=0x7f0a0000\n      mLastReportedConfigurations:\n        mGlobalConfig={1.0 310mcc260mnc [en_US] ldltr sw411dp w411dp h731dp 420dpi nrml long port finger qwerty/v/v -nav/h winConfig={ mBounds=Rect(0, 0 - 1080, 1920) mAppBounds=Rect(0, 0 - 1080, 1920) mMaxBounds=Rect(0, 0 - 1080, 1920) mDisplayRotation=ROTATION_0 mWindowingMode=fullscreen mActivityType=undefined mAlwaysOnTop=undefined mRotation=ROTATION_0} as.2 s.47 fontWeightAdjustment=0}\n        mOverrideConfig={1.0 310mcc260mnc [en_US] ldltr sw411dp w411dp h731dp 420dpi nrml long port finger qwerty/v/v -nav/h winConfig={ mBounds=Rect(0, 0 - 1080, 1920) mAppBounds=Rect(0, 0 - 1080, 1920) mMaxBounds=Rect(0, 0 - 1080, 1920) mDisplayRotation=ROTATION_0 mWindowingMode=fullscreen mActivityType=standard mAlwaysOnTop=undefined mRotation=ROTATION_0} as.2 s.2 fontWeightAdjustment=0}\n      mLastReportedActivityWindowInfo=ActivityWindowInfo{isEmbedded=false, taskBounds=Rect(0, 0 - 1080, 1920), taskFragmentBounds=Rect(0, 0 - 1080, 1920)}\n      CurrentConfiguration={1.0 310mcc260mnc [en_US] ldltr sw411dp w411dp h731dp 420dpi nrml long port finger qwerty/v/v -nav/h winConfig={ mBounds=Rect(0, 0 - 1080, 1920) mAppBounds=Rect(0, 0 - 1080, 1920) mMaxBounds=Rect(0, 0 - 1080, 1920) mDisplayRotation=ROTATION_0 mWindowingMode=fullscreen mActivityType=standard mAlwaysOnTop=undefined mRotation=ROTATION_0} as.2 s.2 fontWeightAdjustment=0}\n      RequestedOverrideConfiguration={0.0 ?mcc0mnc ?localeList ?layoutDir ?swdp ?wdp ?hdp ?density ?lsize ?long ?ldr ?wideColorGamut ?orien ?uimode ?night ?touch ?keyb/?/? ?nav/? winConfig={ mBounds=Rect(0, 0 - 0, 0) mAppBounds=null mMaxBounds=Rect(0, 0 - 0, 0) mDisplayRotation=undefined mWindowingMode=undefined mActivityType=standard mAlwaysOnTop=undefined mRotation=undefined} ?fontWeightAdjustment}\n      ResolvedOverrideConfiguration={0.0 ?mcc0mnc ?localeList ?layoutDir ?swdp ?wdp ?hdp ?density ?lsize ?long ?ldr ?wideColorGamut ?orien ?uimode ?night ?touch ?keyb/?/? ?nav/? winConfig={ mBounds=Rect(0, 0 - 0, 0) mAppBounds=null mMaxBounds=Rect(0, 0 - 0, 0) mDisplayRotation=undefined mWindowingMode=undefined mActivityType=undefined mAlwaysOnTop=undefined mRotation=undefined} s.2 ?fontWeightAdjustment}\n      taskDescription: label=\"null\" icon=null iconResource=/0 iconFilename=null primaryColor=ff24b7ff\n        backgroundColor=ff000000 statusBarColor=ff000000 navigationBarColor=808080\n       backgroundColorFloating=ff000000\n      launchFailed=false launchCount=1 lastLaunchTime=-14s26ms\n      mHaveState=false mIcicle=null\n      state=RESUMED delayedResume=false finishing=false\n      keysPaused=false inHistory=true idle=true\n      occludesParent=true mNoDisplay=false immersive=false launchMode=3\n      mActivityType=standard\n      windows=[Window{f48d5a5 u0 com.projectinfinity.kodi/com.projectinfinity.kodi.Main}]\n      windowType=2\n      mOccludesParent=true\n      overrideOrientation=SCREEN_ORIENTATION_UNSPECIFIED\n      requestedOrientation=SCREEN_ORIENTATION_UNSPECIFIED\n      mVisibleRequested=true mVisible=true mClientVisible=true reportedDrawn=true reportedVisible=true\n      mNumInterestingWindows=1 mNumDrawnWindows=1 allDrawn=true)\n      startingData=null firstWindowDrawn=true\n      nowVisible=true lastVisibleTime=-12s218ms\n      resizeMode=RESIZE_MODE_RESIZEABLE\n      mLastReportedMultiWindowMode=false mLastReportedPictureInPictureMode=false\n      supportsPictureInPicture=true\n      supportsEnterPipOnTaskSwitch: false\n      mPauseSchedulePendingForPip=false\n      supportsSizeChanges=SIZE_CHANGES_SUPPORTED_METADATA\n      configChanges=0x5ffb\n      neverSandboxDisplayApis=false\n      alwaysSandboxDisplayApis=false\n      isTransparentPolicyRunning=false\n      areBoundsLetterboxed=false\n      isLetterboxRunning=false\n\n  * Task{5ab1c69 #1 type=home U=0 visible=false visibleRequested=false mode=fullscreen translucent=true sz=1}\n    * Task{a7a9dbe #6 type=home I=com.google.android.apps.nexuslauncher/.NexusLauncherActivity U=0 rootTaskId=1 visible=false visibleRequested=false mode=fullscreen translucent=true sz=2}\n      mLastPausedActivity: ActivityRecord{184000468 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t6}\n      mLastNonFullscreenBounds=Rect(237, 420 - 844, 1500)\n      isSleeping=false\n      * Hist  #1: ActivityRecord{184000468 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t6}\n        packageName=com.google.android.apps.nexuslauncher processName=com.google.android.apps.nexuslauncher\n        launchedFromUid=0 launchedFromPackage=null launchedFromFeature=null userId=0\n        app=ProcessRecord{e67f26e 1285:com.google.android.apps.nexuslauncher/u0a180}\n        Intent { act=android.intent.action.MAIN cat=[android.intent.category.HOME] flg=0x10000100 cmp=com.google.android.apps.nexuslauncher/.NexusLauncherActivity (has extras) }\n        rootOfTask=true task=Task{a7a9dbe #6 type=home I=com.google.android.apps.nexuslauncher/.NexusLauncherActivity}\n        taskAffinity=null\n        mActivityComponent=com.google.android.apps.nexuslauncher/.NexusLauncherActivity\n        baseDir=/system_ext/priv-app/NexusLauncherRelease/NexusLauncherRelease.apk\n        dataDir=/data/user/0/com.google.android.apps.nexuslauncher\n        stateNotNeeded=true componentSpecified=true mActivityType=home\n        compat={420dpi} theme=0x7f14001c\n        mLastReportedConfigurations:\n          mGlobalConfig={1.0 310mcc260mnc [en_US] ldltr sw411dp w411dp h731dp 420dpi nrml long port finger qwerty/v/v -nav/h winConfig={ mBounds=Rect(0, 0 - 1080, 1920) mAppBounds=Rect(0, 0 - 1080, 1920) mMaxBounds=Rect(0, 0 - 1080, 1920) mDisplayRotation=ROTATION_0 mWindowingMode=fullscreen mActivityType=undefined mAlwaysOnTop=undefined mRotation=ROTATION_0} as.2 s.33 fontWeightAdjustment=0}\n          mOverrideConfig={1.0 310mcc260mnc [en_US] ldltr sw411dp w411dp h731dp 420dpi nrml long port finger qwerty/v/v -nav/h winConfig={ mBounds=Rect(0, 0 - 1080, 1920) mAppBounds=Rect(0, 0 - 1080, 1920) mMaxBounds=Rect(0, 0 - 1080, 1920) mDisplayRotation=ROTATION_0 mWindowingMode=fullscreen mActivityType=home mAlwaysOnTop=undefined mRotation=ROTATION_0} as.2 s.5 fontWeightAdjustment=0}\n        mLastReportedActivityWindowInfo=ActivityWindowInfo{isEmbedded=false, taskBounds=Rect(0, 0 - 1080, 1920), taskFragmentBounds=Rect(0, 0 - 1080, 1920)}\n        CurrentConfiguration={1.0 310mcc260mnc [en_US] ldltr sw411dp w411dp h731dp 420dpi nrml long port finger qwerty/v/v -nav/h winConfig={ mBounds=Rect(0, 0 - 1080, 1920) mAppBounds=Rect(0, 0 - 1080, 1920) mMaxBounds=Rect(0, 0 - 1080, 1920) mDisplayRotation=ROTATION_0 mWindowingMode=fullscreen mActivityType=home mAlwaysOnTop=undefined mRotation=ROTATION_0} as.2 s.6 fontWeightAdjustment=0}\n        RequestedOverrideConfiguration={0.0 ?mcc0mnc ?localeList ?layoutDir ?swdp ?wdp ?hdp ?density ?lsize ?long ?ldr ?wideColorGamut ?orien ?uimode ?night ?touch ?keyb/?/? ?nav/? winConfig={ mBounds=Rect(0, 0 - 0, 0) mAppBounds=null mMaxBounds=Rect(0, 0 - 0, 0) mDisplayRotation=undefined mWindowingMode=undefined mActivityType=home mAlwaysOnTop=undefined mRotation=undefined} as.2 ?fontWeightAdjustment}\n        taskDescription: label=\"null\" icon=null iconResource=/0 iconFilename=null primaryColor=fff1f0f7\n          backgroundColor=ffeeedf4 statusBarColor=0 navigationBarColor=0\n         backgroundColorFloating=fff1f0f7\n        launchFailed=false launchCount=0 lastLaunchTime=-3m32s839ms\n        mHaveState=true mIcicle=Bundle[mParcelledData.dataSize=7108]\n        state=STOPPED delayedResume=false finishing=false\n        keysPaused=false inHistory=true idle=true\n        occludesParent=true mNoDisplay=false immersive=false launchMode=2\n        mActivityType=home\n        windows=[Window{2f5cd57 u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}]\n        windowType=2\n        mOccludesParent=true\n        overrideOrientation=SCREEN_ORIENTATION_NOSENSOR\n        requestedOrientation=SCREEN_ORIENTATION_NOSENSOR\n        mVisibleRequested=false mVisible=false mClientVisible=false reportedDrawn=false reportedVisible=false\n        mAppStopped=true\n        mNumInterestingWindows=1 mNumDrawnWindows=1 allDrawn=false)\n        nowVisible=false lastVisibleTime=-52s405ms\n        connections={ConnectionRecord{491b592 u0 com.google.android.apps.nexuslauncher/com.android.quickstep.TouchInteractionService:@e234f1d flags=0x0}}\n        resizeMode=RESIZE_MODE_RESIZEABLE\n        mLastReportedMultiWindowMode=false mLastReportedPictureInPictureMode=false\n        supportsSizeChanges=SIZE_CHANGES_UNSUPPORTED_METADATA\n        configChanges=0xff3\n        neverSandboxDisplayApis=false\n        alwaysSandboxDisplayApis=false\n        isTransparentPolicyRunning=false\n        areBoundsLetterboxed=false\n        isLetterboxRunning=false\n      * TaskFragment{b61a56 mode=multi-window organizerUid=10180 organizerProc=com.google.android.apps.nexuslauncher}\n\n  * Task{ac3cdd9 #2 type=undefined U=0 visible=false visibleRequested=false mode=fullscreen translucent=true sz=2}\n    mCreatedByOrganizer=true\n    * Task{d520e7f #4 type=undefined U=0 rootTaskId=2 visible=false visibleRequested=false mode=multi-window translucent=true sz=0}\n      mBounds=Rect(0, 1920 - 1080, 2880)\n      mCreatedByOrganizer=true\n      isSleeping=false\n    * Task{cecf39e #3 type=undefined U=0 rootTaskId=2 visible=false visibleRequested=false mode=multi-window translucent=true sz=0}\n      mCreatedByOrganizer=true\n      isSleeping=false\n\n  Resumed activities in task display areas (from top to bottom):\n    Resumed: ActivityRecord{152838930 u0 com.projectinfinity.kodi/.Main t13}\n\n  ResumedActivity: ActivityRecord{152838930 u0 com.projectinfinity.kodi/.Main t13}\n\nActivityTaskSupervisor state:\n  topDisplayFocusedRootTask=Task{5969ae3 #13 type=standard A=10216:com.projectinfinity.kodi.infinity.kodi}\n  Display: mDisplayId=0 (organized)\n    init=1080x1920 420dpi mMinSizeOfResizeableTaskDp=220 cur=1080x1920 app=1080x1920 rng=1080x1080-1920x1920\n    deferred=false mLayoutNeeded=false\n  mLastOrientationSource=WindowedMagnification:0:31@75991716\n  deepestLastOrientationSource=ActivityRecord{152838930 u0 com.projectinfinity.kodi/.Main t13}\n  overrideConfig={1.0 310mcc260mnc [en_US] ldltr sw411dp w411dp h731dp 420dpi nrml long port finger qwerty/v/v -nav/h winConfig={ mBounds=Rect(0, 0 - 1080, 1920) mAppBounds=Rect(0, 0 - 1080, 1920) mMaxBounds=Rect(0, 0 - 1080, 1920) mDisplayRotation=ROTATION_0 mWindowingMode=fullscreen mActivityType=undefined mAlwaysOnTop=undefined mRotation=ROTATION_0} as.2 s.27 fontWeightAdjustment=0}\n  ignoreOrientationRequest=false\n  mLayoutSeq=229\n  mCurrentFocus=Window{f48d5a5 u0 com.projectinfinity.kodi/com.projectinfinity.kodi.Main}\n  mFocusedApp=ActivityRecord{152838930 u0 com.projectinfinity.kodi/.Main t13}\n\n  mHoldScreenWindow=null\n  mObscuringWindow=null\n  mLastWakeLockHoldingWindow=null\n  mLastWakeLockObscuringWindow=null\n\n  displayId=0\n  mWallpaperTarget=null\n  mLastWallpaperZoomOut=0.0\n  token WallpaperWindowToken{4e04488 showWhenLocked=true}:\n    mWallpaperX=0.0\n    mWallpaperY=0.5\n    mWallpaperXStep=0.33333334\n    mWallpaperYStep=1.0\n    mWallpaperDisplayOffsetX=NA\n    mWallpaperDisplayOffsetY=NA\n\n  mSystemGestureExclusion=SkRegion()\n\n  Display areas in top down Z order:\n    * Leaf:36:36\n    * HideDisplayCutout:32:35\n      * OneHanded:34:35\n        * AppZoomOut:34:35\n          * Leaf:34:35\n      * AppZoomOut:33:33\n        * Leaf:33:33\n      * OneHanded:32:32\n        * AppZoomOut:32:32\n          * Leaf:32:32\n    * WindowedMagnification:0:31\n      * HideDisplayCutout:26:31\n        * OneHanded:26:31\n          * AppZoomOut:26:31\n            * Leaf:26:31\n      * Leaf:24:25\n      * HideDisplayCutout:18:23\n        * OneHanded:18:23\n          * AppZoomOut:23:23\n            * Leaf:23:23\n          * Leaf:22:22\n          * AppZoomOut:20:21\n            * Leaf:20:21\n          * Leaf:19:19\n          * AppZoomOut:18:18\n            * Leaf:18:18\n      * OneHanded:17:17\n        * Leaf:17:17\n      * HideDisplayCutout:16:16\n        * OneHanded:16:16\n          * AppZoomOut:16:16\n            * Leaf:16:16\n      * OneHanded:15:15\n        * Leaf:15:15\n      * HideDisplayCutout:0:14\n        * OneHanded:0:14\n          * AppZoomOut:2:14\n            * ImePlaceholder:13:14\n              * ImeContainer\n            * Leaf:3:12\n            * DefaultTaskDisplayArea (organized)\n          * Leaf:1:1\n          * AppZoomOut:0:0\n            * Leaf:0:0\n\n  Task display areas in top down Z order:\n    TaskDisplayArea DefaultTaskDisplayArea\n      overrideConfig={0.0 ?mcc0mnc ?localeList ?layoutDir ?swdp ?wdp ?hdp ?density ?lsize ?long ?ldr ?wideColorGamut ?orien ?uimode ?night ?touch ?keyb/?/? ?nav/? winConfig={ mBounds=Rect(0, 0 - 0, 0) mAppBounds=null mMaxBounds=Rect(0, 0 - 0, 0) mDisplayRotation=undefined mWindowingMode=fullscreen mActivityType=undefined mAlwaysOnTop=undefined mRotation=undefined} ?fontWeightAdjustment}\n      mPreferredTopFocusableRootTask=Task{5969ae3 #13 type=standard A=10216:com.projectinfinity.kodi.infinity.kodi}\n      mLastFocusedRootTask=Task{5969ae3 #13 type=standard A=10216:com.projectinfinity.kodi.infinity.kodi}\n      Application tokens in top down Z order:\n      * Task{5969ae3 #13 type=standard A=10216:com.projectinfinity.kodi.infinity.kodi U=0 visible=true visibleRequested=true mode=fullscreen translucent=false sz=1}\n        bounds=[0,0][1080,1920]\n        * ActivityRecord{152838930 u0 com.projectinfinity.kodi/.Main t13}\n      * Task{5ab1c69 #1 type=home U=0 visible=false visibleRequested=false mode=fullscreen translucent=true sz=1}\n        bounds=[0,0][1080,1920]\n        * Task{a7a9dbe #6 type=home I=com.google.android.apps.nexuslauncher/.NexusLauncherActivity U=0 rootTaskId=1 visible=false visibleRequested=false mode=fullscreen translucent=true sz=2}\n          bounds=[0,0][1080,1920]\n          * ActivityRecord{184000468 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t6}\n          * TaskFragment{b61a56 mode=multi-window organizerUid=10180 organizerProc=com.google.android.apps.nexuslauncher}\n            bounds=[0,0][1080,1920]\n      * Task{ac3cdd9 #2 type=undefined U=0 visible=false visibleRequested=false mode=fullscreen translucent=true sz=2}\n        bounds=[0,0][1080,1920]\n        * Task{d520e7f #4 type=undefined U=0 rootTaskId=2 visible=false visibleRequested=false mode=multi-window translucent=true sz=0}\n          bounds=[0,1920][1080,2880]\n        * Task{cecf39e #3 type=undefined U=0 rootTaskId=2 visible=false visibleRequested=false mode=multi-window translucent=true sz=0}\n          bounds=[0,0][1080,1920]\n\n  rootHomeTask=Task=1\n\n  PinnedTaskController\n    mIsImeShowing=false\n    mImeHeight=0\n    mMinAspectRatio=0.41841003\n    mMaxAspectRatio=2.39\n\n  DisplayFrames w=1080 h=1920 r=0\n\n  DisplayPolicy\n    mCarDockEnablesAccelerometer=true mDeskDockEnablesAccelerometer=true\n    mDockMode=EXTRA_DOCK_STATE_UNDOCKED mLidState=LID_OPEN\n    mAwake=true mScreenOnEarly=true mScreenOnFully=true\n    mKeyguardDrawComplete=true mWindowManagerDrawComplete=true\n    mHdmiPlugged=false\n    mLastBehavior=SHOW_TRANSIENT_BARS_BY_SWIPE\n    mShowingDream=false mDreamingLockscreen=false\n    mStatusBar=Window{a4d3e4 u0 StatusBar}\n    mExpandedPanel=Window{f103023 u0 NotificationShade}\n    isKeyguardShowing=false\n    mNavigationBar=Window{ae4d07f u0 Taskbar}\n    mNavBarOpacityMode=2\n    mNavigationBarCanMove=false\n    mHasBottomNavigationBar=true\n    mLeftGestureHost=Window{ae4d07f u0 Taskbar}\n    mTopGestureHost=Window{a4d3e4 u0 StatusBar}\n    mRightGestureHost=Window{ae4d07f u0 Taskbar}\n    mBottomGestureHost=Window{ae4d07f u0 Taskbar}\n    mFocusedWindow=Window{f48d5a5 u0 com.projectinfinity.kodi/com.projectinfinity.kodi.Main}\n    mTopFullscreenOpaqueWindowState=Window{f48d5a5 u0 com.projectinfinity.kodi/com.projectinfinity.kodi.Main}\n    mSystemBarColorApps={ActivityRecord{152838930 u0 com.projectinfinity.kodi/.Main t13}}\n    mNavBarColorWindowCandidate=Window{f48d5a5 u0 com.projectinfinity.kodi/com.projectinfinity.kodi.Main}\n    mNavBarBackgroundWindowCandidate=Window{f48d5a5 u0 com.projectinfinity.kodi/com.projectinfinity.kodi.Main}\n    mLastStatusBarAppearanceRegions=\n      AppearanceRegion{ bounds=[0,0][1080,1920]}\n    mLastLetterboxDetails=\n    mStatusBarBackgroundWindows=\n      Window{f48d5a5 u0 com.projectinfinity.kodi/com.projectinfinity.kodi.Main}\n    mTopIsFullscreen=true\n    mImeInsetsConsumed=false\n    mForceShowNavigationBarEnabled=false mAllowLockscreenWhenOn=false\n    mRemoteInsetsControllerControlsSystemBars=false\n    mDecorInsetsInfo:\n      ROTATION_0={nonDecorInsets=[0,0][0,0], overrideNonDecorInsets=[0,0][0,63], configInsets=[0,0][0,0], overrideConfigInsets=[0,63][0,63], nonDecorFrame=[0,0][1080,1920], overrideNonDecorFrame=[0,0][1080,1857], configFrame=[0,0][1080,1920], overrideConfigFrame=[0,63][1080,1857]}\n      ROTATION_90={nonDecorInsets=[0,0][0,0], overrideNonDecorInsets=[0,0][0,63], configInsets=[0,0][0,0], overrideConfigInsets=[0,63][0,63], nonDecorFrame=[0,0][1920,1080], overrideNonDecorFrame=[0,0][1920,1017], configFrame=[0,0][1920,1080], overrideConfigFrame=[0,63][1920,1017]}\n      ROTATION_180={nonDecorInsets=[0,0][0,0], overrideNonDecorInsets=[0,0][0,63], configInsets=[0,0][0,0], overrideConfigInsets=[0,63][0,63], nonDecorFrame=[0,0][1080,1920], overrideNonDecorFrame=[0,0][1080,1857], configFrame=[0,0][1080,1920], overrideConfigFrame=[0,63][1080,1857]}\n      ROTATION_270={nonDecorInsets=[0,0][0,0], overrideNonDecorInsets=[0,0][0,63], configInsets=[0,0][0,0], overrideConfigInsets=[0,63][0,63], nonDecorFrame=[0,0][1920,1080], overrideNonDecorFrame=[0,0][1920,1017], configFrame=[0,0][1920,1080], overrideConfigFrame=[0,63][1920,1017]}\n    SystemGestures:\n      mDisplayCutoutTouchableRegionSize=0\n      mSwipeStartThreshold=Rect(63, 63 - 63, 63)\n      mSwipeDistanceThreshold=63\n\n  DisplayRotation\n    mCurrentAppOrientation=SCREEN_ORIENTATION_UNSPECIFIED\n    mLastOrientation=-1\n    mRotation=0 mDeferredRotationPauseCount=0\n    mLandscapeRotation=ROTATION_90 mSeascapeRotation=ROTATION_270\n    mPortraitRotation=ROTATION_0 mUpsideDownRotation=ROTATION_180\n    mSupportAutoRotation=true\n    WindowOrientationListener\n      mEnabled=true\n      mCurrentRotation=ROTATION_0\n      mSensorType=null\n      mSensor={Sensor name=\"Goldfish 3-axis Accelerometer\", vendor=\"The Android Open Source Project\", version=1, type=1, maxRange=39.300102, resolution=2.480159E-4, power=3.0, minDelay=10000}\n      mRate=2\n      AccelSensorJudge\n        mProposedRotation=0\n        mPredictedRotation=0\n        mLastFilteredX=0.0\n        mLastFilteredY=9.776321\n        mLastFilteredZ=0.812345\n        mLastFilteredTimestampNanos=252779209198 (36.114952ms ago)\n        mTiltHistory={last: 5.0}\n        mFlat=false\n        mSwinging=false\n        mAccelerating=false\n        mOverhead=false\n        mTouched=false\n        mTiltToleranceConfig=[[-25, 70], [-25, 65], [-25, 60], [-25, 65]]\n\n    mCarDockRotation=-1 mDeskDockRotation=-1\n    mUserRotationMode=USER_ROTATION_FREE mUserRotation=ROTATION_0 mCameraRotationMode=0 mAllowAllRotations=unknown\n    mDemoHdmiRotation=ROTATION_90 mDemoHdmiRotationLock=false mUndockedHdmiRotation=-1\n    mLidOpenRotation=-1\n    mFixedToUserRotation=false\n  FoldController\n    mPauseAutorotationDuringUnfolding=false\n    mShouldDisableRotationSensor=false\n    mShouldIgnoreSensorRotation=false\n    mLastDisplaySwitchTime=0\n    mLastHingeAngleEventTime=0\n    mDeviceState=UNKNOWN\n\n    RotationLockHistory\n      11-10 14:51:37.824: mode=USER_ROTATION_FREE, rotation=ROTATION_0, caller=UiAutomationConnection#restoreRotationStateLocked\n      11-10 14:51:41.885: mode=USER_ROTATION_FREE, rotation=ROTATION_0, caller=UiAutomationConnection#restoreRotationStateLocked\n      11-10 14:51:45.831: mode=USER_ROTATION_FREE, rotation=ROTATION_0, caller=UiAutomationConnection#restoreRotationStateLocked\n      11-10 14:51:51.540: mode=USER_ROTATION_FREE, rotation=ROTATION_0, caller=UiAutomationConnection#restoreRotationStateLocked\n      11-10 14:51:54.261: mode=USER_ROTATION_FREE, rotation=ROTATION_0, caller=UiAutomationConnection#restoreRotationStateLocked\n      11-10 14:51:56.829: mode=USER_ROTATION_FREE, rotation=ROTATION_0, caller=UiAutomationConnection#restoreRotationStateLocked\n      11-10 14:51:59.414: mode=USER_ROTATION_FREE, rotation=ROTATION_0, caller=UiAutomationConnection#restoreRotationStateLocked\n      11-10 14:52:02.019: mode=USER_ROTATION_FREE, rotation=ROTATION_0, caller=UiAutomationConnection#restoreRotationStateLocked\n\n  InputConsumers:\n    name=recents_animation_input_consumer pid=1285 user=UserHandle{0}\n\n  WindowInsetsStateController\n    InsetsState\n      mDisplayFrame=Rect(0, 0 - 1080, 1920)\n      mDisplayCutout=DisplayCutout{insets=Rect(0, 0 - 0, 0) waterfall=Insets{left=0, top=0, right=0, bottom=0} boundingRect={Bounds=[Rect(0, 0 - 0, 0), Rect(0, 0 - 0, 0), Rect(0, 0 - 0, 0), Rect(0, 0 - 0, 0)]} cutoutPathParserInfo={CutoutPathParserInfo{displayWidth=0 displayHeight=0 physicalDisplayWidth=0 physicalDisplayHeight=0 density={0.0} cutoutSpec={} rotation={0} scale={0.0} physicalPixelDisplaySizeRatio={0.0}}} sideOverrides=null}\n      mRoundedCorners=RoundedCorners{[RoundedCorner{position=TopLeft, radius=0, center=Point(0, 0)}, RoundedCorner{position=TopRight, radius=0, center=Point(0, 0)}, RoundedCorner{position=BottomRight, radius=0, center=Point(0, 0)}, RoundedCorner{position=BottomLeft, radius=0, center=Point(0, 0)}]}\n      mRoundedCornerFrame=Rect(0, 0 - 0, 0)\n      mPrivacyIndicatorBounds=PrivacyIndicatorBounds {static bounds=Rect(827, 0 - 1043, 63) rotation=0}\n      mDisplayShape=DisplayShape{ spec=1673867177 displayWidth=1080 displayHeight=1920 physicalPixelDisplaySizeRatio=1.0 rotation=0 offsetX=0 offsetY=0 scale=1.0}\n        InsetsSource id=d8650001 type=navigationBars frame=[0,1857][1080,1920] visible=false flags=SUPPRESS_SCRIM|ANIMATE_RESIZING sideHint=BOTTOM boundingRects=null\n        InsetsSource id=d8650004 type=systemGestures frame=[0,0][78,1920] visible=true flags= sideHint=LEFT boundingRects=null\n        InsetsSource id=d8650005 type=mandatorySystemGestures frame=[0,1836][1080,1920] visible=true flags= sideHint=BOTTOM boundingRects=null\n        InsetsSource id=d8650006 type=tappableElement frame=[0,0][0,0] visible=true flags= sideHint=NONE boundingRects=null\n        InsetsSource id=d8650024 type=systemGestures frame=[1002,0][1080,1920] visible=true flags= sideHint=RIGHT boundingRects=null\n        InsetsSource id=3 type=ime frame=[0,0][0,0] visible=false flags= sideHint=NONE boundingRects=null\n        InsetsSource id=37410000 type=statusBars frame=[0,0][1080,63] visible=false flags= sideHint=TOP boundingRects=null\n        InsetsSource id=37410005 type=mandatorySystemGestures frame=[0,0][1080,63] visible=true flags= sideHint=TOP boundingRects=null\n        InsetsSource id=37410006 type=tappableElement frame=[0,0][1080,63] visible=true flags= sideHint=TOP boundingRects=null\n    Control map:\n      Window{f48d5a5 u0 com.projectinfinity.kodi/com.projectinfinity.kodi.Main}:\n        InsetsSourceControl: {3 mType=ime mSurfacePosition=Point(120, 1794) mInsetsHint=Insets{left=0, top=0, right=0, bottom=0}}\n        InsetsSourceControl: {d8650001 mType=navigationBars initiallyVisible mSurfacePosition=Point(0, 1857) mInsetsHint=Insets{left=0, top=0, right=0, bottom=63}}\n        InsetsSourceControl: {37410000 mType=statusBars initiallyVisible mSurfacePosition=Point(0, 0) mInsetsHint=Insets{left=0, top=63, right=0, bottom=0}}\n    InsetsSourceProviders:\n      InsetsSourceProvider\n        mSource=InsetsSource id=37410006 type=tappableElement frame=[0,0][1080,63] visible=true flags= sideHint=TOP boundingRects=null\n        mSourceFrame=Rect(0, 0 - 1080, 63)\n        mIsLeashInitialized=false mHasPendingPosition=false\n        mWindowContainer=Window{a4d3e4 u0 StatusBar}\n      InsetsSourceProvider\n        mSource=InsetsSource id=37410005 type=mandatorySystemGestures frame=[0,0][1080,63] visible=true flags= sideHint=TOP boundingRects=null\n        mSourceFrame=Rect(0, 0 - 1080, 63)\n        mIsLeashInitialized=false mHasPendingPosition=false\n        mWindowContainer=Window{a4d3e4 u0 StatusBar}\n      InsetsSourceProvider\n        mSource=InsetsSource id=37410000 type=statusBars frame=[0,0][1080,63] visible=false flags= sideHint=TOP boundingRects=null\n        mSourceFrame=Rect(0, 0 - 1080, 63)\n        mControl=InsetsSourceControl mId=37410000 mType=statusBars mLeash=Surface(name=Surface(name=a4d3e4 StatusBar)/@0xba9b39c - animation-leash of insets_animation)/@0xdcfc8b5 mInitiallyVisible=true mSurfacePosition=Point(0, 0) mInsetsHint=Insets{left=0, top=63, right=0, bottom=0} mSkipAnimationOnce=false mImeStatsToken=null\n        mInsetsHint=Insets{left=0, top=63, right=0, bottom=0}\n        mIsLeashInitialized=true mHasPendingPosition=false\n        mWindowContainer=Window{a4d3e4 u0 StatusBar}\n        mAdapter=ControlAdapter mCapturedLeash=Surface(name=Surface(name=a4d3e4 StatusBar)/@0xba9b39c - animation-leash of insets_animation)/@0xdcfc8b5\n        mControlTarget=Window{f48d5a5 u0 com.projectinfinity.kodi/com.projectinfinity.kodi.Main}\n      ImeInsetsSourceProvider\n        mSource=InsetsSource id=3 type=ime frame=[0,0][0,0] visible=false flags= sideHint=NONE boundingRects=null\n        mSourceFrame=Rect(120, 1794 - 960, 1920)\n        mControl=InsetsSourceControl mId=3 mType=ime mLeash=Surface(name=Surface(name=c8f984 InputMethod)/@0x9ebd5a2 - animation-leash of insets_animation)/@0x19dcb4a mInitiallyVisible=false mSurfacePosition=Point(120, 1794) mInsetsHint=Insets{left=0, top=0, right=0, bottom=0} mSkipAnimationOnce=false mImeStatsToken=null\n        mInsetsHint=Insets{left=0, top=0, right=0, bottom=0} stale\n        mIsLeashInitialized=true mHasPendingPosition=false\n        mWindowContainer=Window{c8f984 u0 InputMethod}\n        mAdapter=ControlAdapter mCapturedLeash=Surface(name=Surface(name=c8f984 InputMethod)/@0x9ebd5a2 - animation-leash of insets_animation)/@0x19dcb4a\n        mControlTarget=Window{f48d5a5 u0 com.projectinfinity.kodi/com.projectinfinity.kodi.Main}\n        mImeShowing=false mLastDrawn=false        showImePostLayout not scheduled, mImeRequester=null\n\n      InsetsSourceProvider\n        mSource=InsetsSource id=d8650024 type=systemGestures frame=[1002,0][1080,1920] visible=true flags= sideHint=RIGHT boundingRects=null\n        mSourceFrame=Rect(1002, 0 - 1080, 1920)\n        mIsLeashInitialized=false mHasPendingPosition=false\n        mWindowContainer=Window{ae4d07f u0 Taskbar}\n      InsetsSourceProvider\n        mSource=InsetsSource id=d8650006 type=tappableElement frame=[0,0][0,0] visible=true flags= sideHint=NONE boundingRects=null\n        mSourceFrame=Rect(0, 0 - 0, 0)\n        mOverrideFrames={2011=Rect(0, 1857 - 1080, 1920), 2031=Rect(0, 0 - 0, 0)}\n        mIsLeashInitialized=false mHasPendingPosition=false\n        mWindowContainer=Window{ae4d07f u0 Taskbar}\n      InsetsSourceProvider\n        mSource=InsetsSource id=d8650005 type=mandatorySystemGestures frame=[0,1836][1080,1920] visible=true flags= sideHint=BOTTOM boundingRects=null\n        mSourceFrame=Rect(0, 1836 - 1080, 1920)\n        mOverrideFrames={2011=Rect(0, 1857 - 1080, 1920), 2031=Rect(0, 1836 - 1080, 1920)}\n        mIsLeashInitialized=false mHasPendingPosition=false\n        mWindowContainer=Window{ae4d07f u0 Taskbar}\n      InsetsSourceProvider\n        mSource=InsetsSource id=d8650004 type=systemGestures frame=[0,0][78,1920] visible=true flags= sideHint=LEFT boundingRects=null\n        mSourceFrame=Rect(0, 0 - 78, 1920)\n        mIsLeashInitialized=false mHasPendingPosition=false\n        mWindowContainer=Window{ae4d07f u0 Taskbar}\n      InsetsSourceProvider\n        mSource=InsetsSource id=d8650001 type=navigationBars frame=[0,1857][1080,1920] visible=false flags=SUPPRESS_SCRIM|ANIMATE_RESIZING sideHint=BOTTOM boundingRects=null\n        mSourceFrame=Rect(0, 1857 - 1080, 1920)\n        mOverrideFrames={2011=Rect(0, 1857 - 1080, 1920), 2031=Rect(0, 1857 - 1080, 1920)}\n        mControl=InsetsSourceControl mId=d8650001 mType=navigationBars mLeash=Surface(name=Surface(name=ae4d07f Taskbar)/@0x3c46bf1 - animation-leash of insets_animation)/@0x95c4abb mInitiallyVisible=true mSurfacePosition=Point(0, 1857) mInsetsHint=Insets{left=0, top=0, right=0, bottom=63} mSkipAnimationOnce=false mImeStatsToken=null\n        mInsetsHint=Insets{left=0, top=0, right=0, bottom=63}\n        mIsLeashInitialized=true mHasPendingPosition=false\n        mWindowContainer=Window{ae4d07f u0 Taskbar}\n        mAdapter=ControlAdapter mCapturedLeash=Surface(name=Surface(name=ae4d07f Taskbar)/@0x3c46bf1 - animation-leash of insets_animation)/@0x95c4abb\n        mControlTarget=Window{f48d5a5 u0 com.projectinfinity.kodi/com.projectinfinity.kodi.Main}\n  InsetsPolicy\n    status: WINDOW_STATE_HIDDEN\n    nav: WINDOW_STATE_HIDDEN\n\n  KeyguardController:\n    mKeyguardShowing=false\n    mAodShowing=false\n    mKeyguardGoingAway=false\n   KeyguardShowing=false AodShowing=false KeyguardGoingAway=false DismissalRequested=false  Occluded=false DismissingKeyguardActivity=null TurnScreenOnActivity=null at display=0\n    mDismissalRequested=false\n\n  LockTaskController:\n    mLockTaskModeState=NONE\n    mLockTaskModeTasks=\n    mLockTaskPackages (userId:packages)=\n\n  mCurTaskIdForUser={0=13}\n  mUserRootTaskInFront={}\n  mVisibilityTransactionDepth=0\n  isHomeRecentsComponent=true\n  mNoHistoryActivities=[]\n\n  TaskOrganizerController:\n      android.window.ITaskOrganizer$Stub$Proxy@2b317ca uid=10184 (active):\n        (fullscreen) Task{5ab1c69 #1 type=home}\n        (fullscreen) Task{ac3cdd9 #2 type=undefined}\n        (multi-window) Task{cecf39e #3 type=undefined}\n        (multi-window) Task{d520e7f #4 type=undefined}\n        (fullscreen) Task{5969ae3 #13 type=standard A=10216:com.projectinfinity.kodi.infinity.kodi}\n\n  VisibleActivityProcess:[ ProcessRecord{5208020 6022:com.projectinfinity.kodi:kodi/u0a216}]\n  NumNonAppVisibleWindowUidMap:[ 10184:1 10180:1]\n  SleepTokens={}\n"
+        },
+        "home": {
+          "currentcontrol": {
+            "label": "TV SHOWS"
+          },
+          "currentwindow": {
+            "id": 10000,
+            "label": "Home"
+          },
+          "skin": {
+            "id": "skin.infinity.diggz",
+            "name": "Infinity"
+          }
+        },
+        "pid": 6022,
+        "ping": "pong",
+        "process_start": "23717"
+      }
+    },
+    "recovery": {
+      "authenticated_native_module_identity": {
+        "files": 80,
+        "manifest": "da8cc80647fa7fca9af25c5922c7b2402b6f6626e189ad43e052f2479ca7df5c",
+        "pid": 7466,
+        "qa": "script.infinity.performanceprobe",
+        "state": {
+          "at": 394.528095369,
+          "dialog": 9999,
+          "focus": 50,
+          "focused_window": 10040,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "",
+            "BaselineIntegrityStatus": "",
+            "BaselineMismatchCount": ""
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "",
+            "Control": "",
+            "Global": "",
+            "State": "",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "",
+          "resident_current_window": "",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10040
+        }
+      },
+      "finished": {
+        "at": 407.770395739,
+        "dialog": 11191,
+        "focus": 1191102,
+        "focused_window": 11191,
+        "integrity": {
+          "BaselineCandidate": "274",
+          "BaselineCheckedFiles": "948",
+          "BaselineIntegrityStatus": "ok",
+          "BaselineMismatchCount": "0"
+        },
+        "motion": "true",
+        "properties": {
+          "Active": "false",
+          "Control": "",
+          "Global": "false",
+          "State": "idle",
+          "Token": "",
+          "Window": ""
+        },
+        "resident_context": "642c301e6b1c4edfa1c6b263415f452c",
+        "resident_current_window": "10000",
+        "screen": [
+          "1080",
+          "1920"
+        ],
+        "skin": "skin.infinity.diggz",
+        "window": 10000
+      },
+      "hub": {
+        "at": 407.509027315,
+        "dialog": 11191,
+        "focus": 1191102,
+        "focused_window": 11191,
+        "integrity": {
+          "BaselineCandidate": "274",
+          "BaselineCheckedFiles": "948",
+          "BaselineIntegrityStatus": "ok",
+          "BaselineMismatchCount": "0"
+        },
+        "motion": "true",
+        "properties": {
+          "Active": "false",
+          "Control": "",
+          "Global": "false",
+          "State": "idle",
+          "Token": "",
+          "Window": ""
+        },
+        "resident_context": "642c301e6b1c4edfa1c6b263415f452c",
+        "resident_current_window": "10000",
+        "screen": [
+          "1080",
+          "1920"
+        ],
+        "skin": "skin.infinity.diggz",
+        "window": 10000
+      },
+      "install": "Performing Push Install\nSuccess\n",
+      "installed_sha256": "621060de911fcb3e5098dd063ccb4a97aa339884342cec39f216d10159fe022c",
+      "resident_ready": [
+        {
+          "at": 395.034943629,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "",
+            "BaselineIntegrityStatus": "",
+            "BaselineMismatchCount": ""
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "",
+            "Control": "",
+            "Global": "",
+            "State": "",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "",
+          "resident_current_window": "",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 396.50462533,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "",
+            "BaselineIntegrityStatus": "",
+            "BaselineMismatchCount": ""
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "",
+            "Control": "",
+            "Global": "",
+            "State": "",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "",
+          "resident_current_window": "",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 397.346849171,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "",
+            "BaselineIntegrityStatus": "",
+            "BaselineMismatchCount": ""
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "",
+            "Control": "",
+            "Global": "",
+            "State": "",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "",
+          "resident_current_window": "",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 398.099858467,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "",
+            "BaselineIntegrityStatus": "",
+            "BaselineMismatchCount": ""
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "",
+            "Control": "",
+            "Global": "",
+            "State": "",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "",
+          "resident_current_window": "",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 398.928138128,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "",
+            "BaselineIntegrityStatus": "",
+            "BaselineMismatchCount": ""
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "",
+            "Control": "",
+            "Global": "",
+            "State": "",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "",
+          "resident_current_window": "",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 399.598256597,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "",
+            "BaselineIntegrityStatus": "",
+            "BaselineMismatchCount": ""
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "",
+            "Control": "",
+            "Global": "",
+            "State": "",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "",
+          "resident_current_window": "",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 400.412731789,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "",
+            "BaselineIntegrityStatus": "",
+            "BaselineMismatchCount": ""
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "",
+            "Control": "",
+            "Global": "",
+            "State": "",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "",
+          "resident_current_window": "",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 400.937260263,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "",
+            "BaselineIntegrityStatus": "",
+            "BaselineMismatchCount": ""
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "",
+            "Control": "",
+            "Global": "",
+            "State": "",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "",
+          "resident_current_window": "",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 401.66307143,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "",
+            "BaselineIntegrityStatus": "",
+            "BaselineMismatchCount": ""
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "",
+            "Control": "",
+            "Global": "",
+            "State": "",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "",
+          "resident_current_window": "",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 402.231651733,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "",
+            "BaselineIntegrityStatus": "",
+            "BaselineMismatchCount": ""
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "",
+            "Control": "",
+            "Global": "",
+            "State": "",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "",
+          "resident_current_window": "",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 402.69588183,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "",
+            "BaselineIntegrityStatus": "",
+            "BaselineMismatchCount": ""
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "",
+            "Control": "",
+            "Global": "",
+            "State": "",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "",
+          "resident_current_window": "",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 403.187666584,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "",
+            "BaselineIntegrityStatus": "",
+            "BaselineMismatchCount": ""
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "",
+            "Control": "",
+            "Global": "",
+            "State": "",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "",
+          "resident_current_window": "",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 403.741623297,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "",
+            "BaselineCheckedFiles": "",
+            "BaselineIntegrityStatus": "",
+            "BaselineMismatchCount": ""
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "",
+            "Control": "",
+            "Global": "",
+            "State": "",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "",
+          "resident_current_window": "",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 404.266434685,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "274",
+            "BaselineCheckedFiles": "948",
+            "BaselineIntegrityStatus": "ok",
+            "BaselineMismatchCount": "0"
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "",
+            "Control": "",
+            "Global": "",
+            "State": "",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "",
+          "resident_current_window": "",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 404.93239166,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "274",
+            "BaselineCheckedFiles": "948",
+            "BaselineIntegrityStatus": "ok",
+            "BaselineMismatchCount": "0"
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "",
+            "Control": "",
+            "Global": "",
+            "State": "",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "",
+          "resident_current_window": "",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 405.665045604,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "274",
+            "BaselineCheckedFiles": "948",
+            "BaselineIntegrityStatus": "ok",
+            "BaselineMismatchCount": "0"
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "",
+            "Control": "",
+            "Global": "",
+            "State": "",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "",
+          "resident_current_window": "",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        },
+        {
+          "at": 406.387003947,
+          "dialog": 9999,
+          "focus": 9000,
+          "focused_window": 10000,
+          "integrity": {
+            "BaselineCandidate": "274",
+            "BaselineCheckedFiles": "948",
+            "BaselineIntegrityStatus": "ok",
+            "BaselineMismatchCount": "0"
+          },
+          "motion": "true",
+          "properties": {
+            "Active": "false",
+            "Control": "",
+            "Global": "false",
+            "State": "idle",
+            "Token": "",
+            "Window": ""
+          },
+          "resident_context": "642c301e6b1c4edfa1c6b263415f452c",
+          "resident_current_window": "10000",
+          "screen": [
+            "1080",
+            "1920"
+          ],
+          "skin": "skin.infinity.diggz",
+          "window": 10000
+        }
+      ],
+      "retained_sentinel_sha256": "a6bb9e9ceedf31b0436e73913774afdb21f037efdbf9512664e6c0164ea712e2",
+      "startup": {
+        "cycle": 2103481,
+        "entry": "Original Splash and measured original Infinity card or retained original admission",
+        "foreground": {
+          "captured_epoch": 1794322457.1264844,
+          "component": "com.projectinfinity.kodi/.Main",
+          "error": null,
+          "query_truncated": false,
+          "raw_query": "ACTIVITY MANAGER ACTIVITIES (dumpsys activity activities)\nDisplay #0 (activities from top to bottom):\n  * Task{a0e916e #16 type=standard A=10216:com.projectinfinity.kodi.infinity.kodi U=0 visible=true visibleRequested=true mode=fullscreen translucent=false sz=1}\n    mLastNonFullscreenBounds=Rect(215, 420 - 865, 1500)\n    isSleeping=false\n    topResumedActivity=ActivityRecord{3473641 u0 com.projectinfinity.kodi/.Main t16}\n    * Hist  #0: ActivityRecord{3473641 u0 com.projectinfinity.kodi/.Main t16}\n      packageName=com.projectinfinity.kodi processName=com.projectinfinity.kodi:kodi\n      launchedFromUid=10216 launchedFromPackage=com.projectinfinity.kodi launchedFromFeature=null userId=0\n      app=ProcessRecord{338329 7466:com.projectinfinity.kodi:kodi/u0a216}\n      Intent { flg=0x10008000 xflg=0x4 cmp=com.projectinfinity.kodi/.Main (has extras) }\n      rootOfTask=true task=Task{a0e916e #16 type=standard A=10216:com.projectinfinity.kodi.infinity.kodi}\n      taskAffinity=10216:com.projectinfinity.kodi.infinity.kodi\n      mActivityComponent=com.projectinfinity.kodi/.Main\n      baseDir=/data/app/~~wy5p5-1Ach0lKRvbZngqdw==/com.projectinfinity.kodi-kwEM6jXfDXI9XFbSm2BqaQ==/base.apk\n      dataDir=/data/user/0/com.projectinfinity.kodi\n      stateNotNeeded=false componentSpecified=true mActivityType=standard\n      compat={420dpi} theme=0x7f0a0000\n      mLastReportedConfigurations:\n        mGlobalConfig={1.0 310mcc260mnc [en_US] ldltr sw411dp w411dp h731dp 420dpi nrml long port finger qwerty/v/v -nav/h winConfig={ mBounds=Rect(0, 0 - 1080, 1920) mAppBounds=Rect(0, 0 - 1080, 1920) mMaxBounds=Rect(0, 0 - 1080, 1920) mDisplayRotation=ROTATION_0 mWindowingMode=fullscreen mActivityType=undefined mAlwaysOnTop=undefined mRotation=ROTATION_0} as.2 s.48 fontWeightAdjustment=0}\n        mOverrideConfig={1.0 310mcc260mnc [en_US] ldltr sw411dp w411dp h731dp 420dpi nrml long port finger qwerty/v/v -nav/h winConfig={ mBounds=Rect(0, 0 - 1080, 1920) mAppBounds=Rect(0, 0 - 1080, 1920) mMaxBounds=Rect(0, 0 - 1080, 1920) mDisplayRotation=ROTATION_0 mWindowingMode=fullscreen mActivityType=standard mAlwaysOnTop=undefined mRotation=ROTATION_0} as.2 s.2 fontWeightAdjustment=0}\n      mLastReportedActivityWindowInfo=ActivityWindowInfo{isEmbedded=false, taskBounds=Rect(0, 0 - 1080, 1920), taskFragmentBounds=Rect(0, 0 - 1080, 1920)}\n      CurrentConfiguration={1.0 310mcc260mnc [en_US] ldltr sw411dp w411dp h731dp 420dpi nrml long port finger qwerty/v/v -nav/h winConfig={ mBounds=Rect(0, 0 - 1080, 1920) mAppBounds=Rect(0, 0 - 1080, 1920) mMaxBounds=Rect(0, 0 - 1080, 1920) mDisplayRotation=ROTATION_0 mWindowingMode=fullscreen mActivityType=standard mAlwaysOnTop=undefined mRotation=ROTATION_0} as.2 s.2 fontWeightAdjustment=0}\n      RequestedOverrideConfiguration={0.0 ?mcc0mnc ?localeList ?layoutDir ?swdp ?wdp ?hdp ?density ?lsize ?long ?ldr ?wideColorGamut ?orien ?uimode ?night ?touch ?keyb/?/? ?nav/? winConfig={ mBounds=Rect(0, 0 - 0, 0) mAppBounds=null mMaxBounds=Rect(0, 0 - 0, 0) mDisplayRotation=undefined mWindowingMode=undefined mActivityType=standard mAlwaysOnTop=undefined mRotation=undefined} ?fontWeightAdjustment}\n      ResolvedOverrideConfiguration={0.0 ?mcc0mnc ?localeList ?layoutDir ?swdp ?wdp ?hdp ?density ?lsize ?long ?ldr ?wideColorGamut ?orien ?uimode ?night ?touch ?keyb/?/? ?nav/? winConfig={ mBounds=Rect(0, 0 - 0, 0) mAppBounds=null mMaxBounds=Rect(0, 0 - 0, 0) mDisplayRotation=undefined mWindowingMode=undefined mActivityType=undefined mAlwaysOnTop=undefined mRotation=undefined} s.2 ?fontWeightAdjustment}\n      taskDescription: label=\"null\" icon=null iconResource=/0 iconFilename=null primaryColor=ff24b7ff\n        backgroundColor=ff000000 statusBarColor=ff000000 navigationBarColor=808080\n       backgroundColorFloating=ff000000\n      launchFailed=false launchCount=1 lastLaunchTime=-14s368ms\n      mHaveState=false mIcicle=null\n      state=RESUMED delayedResume=false finishing=false\n      keysPaused=false inHistory=true idle=true\n      occludesParent=true mNoDisplay=false immersive=false launchMode=3\n      mActivityType=standard\n      windows=[Window{e4de3e2 u0 com.projectinfinity.kodi/com.projectinfinity.kodi.Main}]\n      windowType=2\n      mOccludesParent=true\n      overrideOrientation=SCREEN_ORIENTATION_UNSPECIFIED\n      requestedOrientation=SCREEN_ORIENTATION_UNSPECIFIED\n      mVisibleRequested=true mVisible=true mClientVisible=true reportedDrawn=true reportedVisible=true\n      mNumInterestingWindows=1 mNumDrawnWindows=1 allDrawn=true)\n      startingData=null firstWindowDrawn=true\n      nowVisible=true lastVisibleTime=-12s145ms\n      resizeMode=RESIZE_MODE_RESIZEABLE\n      mLastReportedMultiWindowMode=false mLastReportedPictureInPictureMode=false\n      supportsPictureInPicture=true\n      supportsEnterPipOnTaskSwitch: false\n      mPauseSchedulePendingForPip=false\n      supportsSizeChanges=SIZE_CHANGES_SUPPORTED_METADATA\n      configChanges=0x5ffb\n      neverSandboxDisplayApis=false\n      alwaysSandboxDisplayApis=false\n      isTransparentPolicyRunning=false\n      areBoundsLetterboxed=false\n      isLetterboxRunning=false\n\n  * Task{5ab1c69 #1 type=home U=0 visible=false visibleRequested=false mode=fullscreen translucent=true sz=1}\n    * Task{a7a9dbe #6 type=home I=com.google.android.apps.nexuslauncher/.NexusLauncherActivity U=0 rootTaskId=1 visible=false visibleRequested=false mode=fullscreen translucent=true sz=2}\n      mLastPausedActivity: ActivityRecord{184000468 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t6}\n      mLastNonFullscreenBounds=Rect(237, 420 - 844, 1500)\n      isSleeping=false\n      * Hist  #1: ActivityRecord{184000468 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t6}\n        packageName=com.google.android.apps.nexuslauncher processName=com.google.android.apps.nexuslauncher\n        launchedFromUid=0 launchedFromPackage=null launchedFromFeature=null userId=0\n        app=ProcessRecord{e67f26e 1285:com.google.android.apps.nexuslauncher/u0a180}\n        Intent { act=android.intent.action.MAIN cat=[android.intent.category.HOME] flg=0x10000100 cmp=com.google.android.apps.nexuslauncher/.NexusLauncherActivity (has extras) }\n        rootOfTask=true task=Task{a7a9dbe #6 type=home I=com.google.android.apps.nexuslauncher/.NexusLauncherActivity}\n        taskAffinity=null\n        mActivityComponent=com.google.android.apps.nexuslauncher/.NexusLauncherActivity\n        baseDir=/system_ext/priv-app/NexusLauncherRelease/NexusLauncherRelease.apk\n        dataDir=/data/user/0/com.google.android.apps.nexuslauncher\n        stateNotNeeded=true componentSpecified=true mActivityType=home\n        compat={420dpi} theme=0x7f14001c\n        mLastReportedConfigurations:\n          mGlobalConfig={1.0 310mcc260mnc [en_US] ldltr sw411dp w411dp h731dp 420dpi nrml long port finger qwerty/v/v -nav/h winConfig={ mBounds=Rect(0, 0 - 1080, 1920) mAppBounds=Rect(0, 0 - 1080, 1920) mMaxBounds=Rect(0, 0 - 1080, 1920) mDisplayRotation=ROTATION_0 mWindowingMode=fullscreen mActivityType=undefined mAlwaysOnTop=undefined mRotation=ROTATION_0} as.2 s.33 fontWeightAdjustment=0}\n          mOverrideConfig={1.0 310mcc260mnc [en_US] ldltr sw411dp w411dp h731dp 420dpi nrml long port finger qwerty/v/v -nav/h winConfig={ mBounds=Rect(0, 0 - 1080, 1920) mAppBounds=Rect(0, 0 - 1080, 1920) mMaxBounds=Rect(0, 0 - 1080, 1920) mDisplayRotation=ROTATION_0 mWindowingMode=fullscreen mActivityType=home mAlwaysOnTop=undefined mRotation=ROTATION_0} as.2 s.5 fontWeightAdjustment=0}\n        mLastReportedActivityWindowInfo=ActivityWindowInfo{isEmbedded=false, taskBounds=Rect(0, 0 - 1080, 1920), taskFragmentBounds=Rect(0, 0 - 1080, 1920)}\n        CurrentConfiguration={1.0 310mcc260mnc [en_US] ldltr sw411dp w411dp h731dp 420dpi nrml long port finger qwerty/v/v -nav/h winConfig={ mBounds=Rect(0, 0 - 1080, 1920) mAppBounds=Rect(0, 0 - 1080, 1920) mMaxBounds=Rect(0, 0 - 1080, 1920) mDisplayRotation=ROTATION_0 mWindowingMode=fullscreen mActivityType=home mAlwaysOnTop=undefined mRotation=ROTATION_0} as.2 s.6 fontWeightAdjustment=0}\n        RequestedOverrideConfiguration={0.0 ?mcc0mnc ?localeList ?layoutDir ?swdp ?wdp ?hdp ?density ?lsize ?long ?ldr ?wideColorGamut ?orien ?uimode ?night ?touch ?keyb/?/? ?nav/? winConfig={ mBounds=Rect(0, 0 - 0, 0) mAppBounds=null mMaxBounds=Rect(0, 0 - 0, 0) mDisplayRotation=undefined mWindowingMode=undefined mActivityType=home mAlwaysOnTop=undefined mRotation=undefined} as.2 ?fontWeightAdjustment}\n        taskDescription: label=\"null\" icon=null iconResource=/0 iconFilename=null primaryColor=fff1f0f7\n          backgroundColor=ffeeedf4 statusBarColor=0 navigationBarColor=0\n         backgroundColorFloating=fff1f0f7\n        launchFailed=false launchCount=0 lastLaunchTime=-5m44s974ms\n        mHaveState=true mIcicle=Bundle[mParcelledData.dataSize=7108]\n        state=STOPPED delayedResume=false finishing=false\n        keysPaused=false inHistory=true idle=true\n        occludesParent=true mNoDisplay=false immersive=false launchMode=2\n        mActivityType=home\n        windows=[Window{2f5cd57 u0 com.google.android.apps.nexuslauncher/com.google.android.apps.nexuslauncher.NexusLauncherActivity}]\n        windowType=2\n        mOccludesParent=true\n        overrideOrientation=SCREEN_ORIENTATION_NOSENSOR\n        requestedOrientation=SCREEN_ORIENTATION_NOSENSOR\n        mVisibleRequested=false mVisible=false mClientVisible=false reportedDrawn=false reportedVisible=false\n        mAppStopped=true\n        mNumInterestingWindows=1 mNumDrawnWindows=1 allDrawn=false)\n        nowVisible=false lastVisibleTime=-46s239ms\n        connections={ConnectionRecord{491b592 u0 com.google.android.apps.nexuslauncher/com.android.quickstep.TouchInteractionService:@e234f1d flags=0x0}}\n        resizeMode=RESIZE_MODE_RESIZEABLE\n        mLastReportedMultiWindowMode=false mLastReportedPictureInPictureMode=false\n        supportsSizeChanges=SIZE_CHANGES_UNSUPPORTED_METADATA\n        configChanges=0xff3\n        neverSandboxDisplayApis=false\n        alwaysSandboxDisplayApis=false\n        isTransparentPolicyRunning=false\n        areBoundsLetterboxed=false\n        isLetterboxRunning=false\n      * TaskFragment{b61a56 mode=multi-window organizerUid=10180 organizerProc=com.google.android.apps.nexuslauncher}\n\n  * Task{ac3cdd9 #2 type=undefined U=0 visible=false visibleRequested=false mode=fullscreen translucent=true sz=2}\n    mCreatedByOrganizer=true\n    * Task{d520e7f #4 type=undefined U=0 rootTaskId=2 visible=false visibleRequested=false mode=multi-window translucent=true sz=0}\n      mBounds=Rect(0, 1920 - 1080, 2880)\n      mCreatedByOrganizer=true\n      isSleeping=false\n    * Task{cecf39e #3 type=undefined U=0 rootTaskId=2 visible=false visibleRequested=false mode=multi-window translucent=true sz=0}\n      mCreatedByOrganizer=true\n      isSleeping=false\n\n  Resumed activities in task display areas (from top to bottom):\n    Resumed: ActivityRecord{3473641 u0 com.projectinfinity.kodi/.Main t16}\n\n  ResumedActivity: ActivityRecord{3473641 u0 com.projectinfinity.kodi/.Main t16}\n\nActivityTaskSupervisor state:\n  topDisplayFocusedRootTask=Task{a0e916e #16 type=standard A=10216:com.projectinfinity.kodi.infinity.kodi}\n  Display: mDisplayId=0 (organized)\n    init=1080x1920 420dpi mMinSizeOfResizeableTaskDp=220 cur=1080x1920 app=1080x1920 rng=1080x1080-1920x1920\n    deferred=false mLayoutNeeded=false\n  mLastOrientationSource=WindowedMagnification:0:31@75991716\n  deepestLastOrientationSource=ActivityRecord{3473641 u0 com.projectinfinity.kodi/.Main t16}\n  overrideConfig={1.0 310mcc260mnc [en_US] ldltr sw411dp w411dp h731dp 420dpi nrml long port finger qwerty/v/v -nav/h winConfig={ mBounds=Rect(0, 0 - 1080, 1920) mAppBounds=Rect(0, 0 - 1080, 1920) mMaxBounds=Rect(0, 0 - 1080, 1920) mDisplayRotation=ROTATION_0 mWindowingMode=fullscreen mActivityType=undefined mAlwaysOnTop=undefined mRotation=ROTATION_0} as.2 s.27 fontWeightAdjustment=0}\n  ignoreOrientationRequest=false\n  mLayoutSeq=325\n  mCurrentFocus=Window{e4de3e2 u0 com.projectinfinity.kodi/com.projectinfinity.kodi.Main}\n  mFocusedApp=ActivityRecord{3473641 u0 com.projectinfinity.kodi/.Main t16}\n\n  mHoldScreenWindow=null\n  mObscuringWindow=null\n  mLastWakeLockHoldingWindow=null\n  mLastWakeLockObscuringWindow=null\n\n  displayId=0\n  mWallpaperTarget=null\n  mLastWallpaperZoomOut=0.0\n  token WallpaperWindowToken{4e04488 showWhenLocked=true}:\n    mWallpaperX=0.0\n    mWallpaperY=0.5\n    mWallpaperXStep=0.33333334\n    mWallpaperYStep=1.0\n    mWallpaperDisplayOffsetX=NA\n    mWallpaperDisplayOffsetY=NA\n\n  mSystemGestureExclusion=SkRegion()\n\n  Display areas in top down Z order:\n    * Leaf:36:36\n    * HideDisplayCutout:32:35\n      * OneHanded:34:35\n        * AppZoomOut:34:35\n          * Leaf:34:35\n      * AppZoomOut:33:33\n        * Leaf:33:33\n      * OneHanded:32:32\n        * AppZoomOut:32:32\n          * Leaf:32:32\n    * WindowedMagnification:0:31\n      * HideDisplayCutout:26:31\n        * OneHanded:26:31\n          * AppZoomOut:26:31\n            * Leaf:26:31\n      * Leaf:24:25\n      * HideDisplayCutout:18:23\n        * OneHanded:18:23\n          * AppZoomOut:23:23\n            * Leaf:23:23\n          * Leaf:22:22\n          * AppZoomOut:20:21\n            * Leaf:20:21\n          * Leaf:19:19\n          * AppZoomOut:18:18\n            * Leaf:18:18\n      * OneHanded:17:17\n        * Leaf:17:17\n      * HideDisplayCutout:16:16\n        * OneHanded:16:16\n          * AppZoomOut:16:16\n            * Leaf:16:16\n      * OneHanded:15:15\n        * Leaf:15:15\n      * HideDisplayCutout:0:14\n        * OneHanded:0:14\n          * AppZoomOut:2:14\n            * ImePlaceholder:13:14\n              * ImeContainer\n            * Leaf:3:12\n            * DefaultTaskDisplayArea (organized)\n          * Leaf:1:1\n          * AppZoomOut:0:0\n            * Leaf:0:0\n\n  Task display areas in top down Z order:\n    TaskDisplayArea DefaultTaskDisplayArea\n      overrideConfig={0.0 ?mcc0mnc ?localeList ?layoutDir ?swdp ?wdp ?hdp ?density ?lsize ?long ?ldr ?wideColorGamut ?orien ?uimode ?night ?touch ?keyb/?/? ?nav/? winConfig={ mBounds=Rect(0, 0 - 0, 0) mAppBounds=null mMaxBounds=Rect(0, 0 - 0, 0) mDisplayRotation=undefined mWindowingMode=fullscreen mActivityType=undefined mAlwaysOnTop=undefined mRotation=undefined} ?fontWeightAdjustment}\n      mPreferredTopFocusableRootTask=Task{a0e916e #16 type=standard A=10216:com.projectinfinity.kodi.infinity.kodi}\n      mLastFocusedRootTask=Task{a0e916e #16 type=standard A=10216:com.projectinfinity.kodi.infinity.kodi}\n      Application tokens in top down Z order:\n      * Task{a0e916e #16 type=standard A=10216:com.projectinfinity.kodi.infinity.kodi U=0 visible=true visibleRequested=true mode=fullscreen translucent=false sz=1}\n        bounds=[0,0][1080,1920]\n        * ActivityRecord{3473641 u0 com.projectinfinity.kodi/.Main t16}\n      * Task{5ab1c69 #1 type=home U=0 visible=false visibleRequested=false mode=fullscreen translucent=true sz=1}\n        bounds=[0,0][1080,1920]\n        * Task{a7a9dbe #6 type=home I=com.google.android.apps.nexuslauncher/.NexusLauncherActivity U=0 rootTaskId=1 visible=false visibleRequested=false mode=fullscreen translucent=true sz=2}\n          bounds=[0,0][1080,1920]\n          * ActivityRecord{184000468 u0 com.google.android.apps.nexuslauncher/.NexusLauncherActivity t6}\n          * TaskFragment{b61a56 mode=multi-window organizerUid=10180 organizerProc=com.google.android.apps.nexuslauncher}\n            bounds=[0,0][1080,1920]\n      * Task{ac3cdd9 #2 type=undefined U=0 visible=false visibleRequested=false mode=fullscreen translucent=true sz=2}\n        bounds=[0,0][1080,1920]\n        * Task{d520e7f #4 type=undefined U=0 rootTaskId=2 visible=false visibleRequested=false mode=multi-window translucent=true sz=0}\n          bounds=[0,1920][1080,2880]\n        * Task{cecf39e #3 type=undefined U=0 rootTaskId=2 visible=false visibleRequested=false mode=multi-window translucent=true sz=0}\n          bounds=[0,0][1080,1920]\n\n  rootHomeTask=Task=1\n\n  PinnedTaskController\n    mIsImeShowing=false\n    mImeHeight=0\n    mMinAspectRatio=0.41841003\n    mMaxAspectRatio=2.39\n\n  DisplayFrames w=1080 h=1920 r=0\n\n  DisplayPolicy\n    mCarDockEnablesAccelerometer=true mDeskDockEnablesAccelerometer=true\n    mDockMode=EXTRA_DOCK_STATE_UNDOCKED mLidState=LID_OPEN\n    mAwake=true mScreenOnEarly=true mScreenOnFully=true\n    mKeyguardDrawComplete=true mWindowManagerDrawComplete=true\n    mHdmiPlugged=false\n    mLastBehavior=SHOW_TRANSIENT_BARS_BY_SWIPE\n    mShowingDream=false mDreamingLockscreen=false\n    mStatusBar=Window{a4d3e4 u0 StatusBar}\n    mExpandedPanel=Window{f103023 u0 NotificationShade}\n    isKeyguardShowing=false\n    mNavigationBar=Window{ae4d07f u0 Taskbar}\n    mNavBarOpacityMode=2\n    mNavigationBarCanMove=false\n    mHasBottomNavigationBar=true\n    mLeftGestureHost=Window{ae4d07f u0 Taskbar}\n    mTopGestureHost=Window{a4d3e4 u0 StatusBar}\n    mRightGestureHost=Window{ae4d07f u0 Taskbar}\n    mBottomGestureHost=Window{ae4d07f u0 Taskbar}\n    mFocusedWindow=Window{e4de3e2 u0 com.projectinfinity.kodi/com.projectinfinity.kodi.Main}\n    mTopFullscreenOpaqueWindowState=Window{e4de3e2 u0 com.projectinfinity.kodi/com.projectinfinity.kodi.Main}\n    mSystemBarColorApps={ActivityRecord{3473641 u0 com.projectinfinity.kodi/.Main t16}}\n    mNavBarColorWindowCandidate=Window{e4de3e2 u0 com.projectinfinity.kodi/com.projectinfinity.kodi.Main}\n    mNavBarBackgroundWindowCandidate=Window{e4de3e2 u0 com.projectinfinity.kodi/com.projectinfinity.kodi.Main}\n    mLastStatusBarAppearanceRegions=\n      AppearanceRegion{ bounds=[0,0][1080,1920]}\n    mLastLetterboxDetails=\n    mStatusBarBackgroundWindows=\n      Window{e4de3e2 u0 com.projectinfinity.kodi/com.projectinfinity.kodi.Main}\n    mTopIsFullscreen=true\n    mImeInsetsConsumed=false\n    mForceShowNavigationBarEnabled=false mAllowLockscreenWhenOn=false\n    mRemoteInsetsControllerControlsSystemBars=false\n    mDecorInsetsInfo:\n      ROTATION_0={nonDecorInsets=[0,0][0,0], overrideNonDecorInsets=[0,0][0,63], configInsets=[0,0][0,0], overrideConfigInsets=[0,63][0,63], nonDecorFrame=[0,0][1080,1920], overrideNonDecorFrame=[0,0][1080,1857], configFrame=[0,0][1080,1920], overrideConfigFrame=[0,63][1080,1857]}\n      ROTATION_90={nonDecorInsets=[0,0][0,0], overrideNonDecorInsets=[0,0][0,63], configInsets=[0,0][0,0], overrideConfigInsets=[0,63][0,63], nonDecorFrame=[0,0][1920,1080], overrideNonDecorFrame=[0,0][1920,1017], configFrame=[0,0][1920,1080], overrideConfigFrame=[0,63][1920,1017]}\n      ROTATION_180={nonDecorInsets=[0,0][0,0], overrideNonDecorInsets=[0,0][0,63], configInsets=[0,0][0,0], overrideConfigInsets=[0,63][0,63], nonDecorFrame=[0,0][1080,1920], overrideNonDecorFrame=[0,0][1080,1857], configFrame=[0,0][1080,1920], overrideConfigFrame=[0,63][1080,1857]}\n      ROTATION_270={nonDecorInsets=[0,0][0,0], overrideNonDecorInsets=[0,0][0,63], configInsets=[0,0][0,0], overrideConfigInsets=[0,63][0,63], nonDecorFrame=[0,0][1920,1080], overrideNonDecorFrame=[0,0][1920,1017], configFrame=[0,0][1920,1080], overrideConfigFrame=[0,63][1920,1017]}\n    SystemGestures:\n      mDisplayCutoutTouchableRegionSize=0\n      mSwipeStartThreshold=Rect(63, 63 - 63, 63)\n      mSwipeDistanceThreshold=63\n\n  DisplayRotation\n    mCurrentAppOrientation=SCREEN_ORIENTATION_UNSPECIFIED\n    mLastOrientation=-1\n    mRotation=0 mDeferredRotationPauseCount=0\n    mLandscapeRotation=ROTATION_90 mSeascapeRotation=ROTATION_270\n    mPortraitRotation=ROTATION_0 mUpsideDownRotation=ROTATION_180\n    mSupportAutoRotation=true\n    WindowOrientationListener\n      mEnabled=true\n      mCurrentRotation=ROTATION_0\n      mSensorType=null\n      mSensor={Sensor name=\"Goldfish 3-axis Accelerometer\", vendor=\"The Android Open Source Project\", version=1, type=1, maxRange=39.300102, resolution=2.480159E-4, power=3.0, minDelay=10000}\n      mRate=2\n      AccelSensorJudge\n        mProposedRotation=0\n        mPredictedRotation=0\n        mLastFilteredX=0.0\n        mLastFilteredY=9.776321\n        mLastFilteredZ=0.812345\n        mLastFilteredTimestampNanos=384913203198 (36.291553ms ago)\n        mTiltHistory={last: 5.0}\n        mFlat=false\n        mSwinging=false\n        mAccelerating=false\n        mOverhead=false\n        mTouched=false\n        mTiltToleranceConfig=[[-25, 70], [-25, 65], [-25, 60], [-25, 65]]\n\n    mCarDockRotation=-1 mDeskDockRotation=-1\n    mUserRotationMode=USER_ROTATION_FREE mUserRotation=ROTATION_0 mCameraRotationMode=0 mAllowAllRotations=unknown\n    mDemoHdmiRotation=ROTATION_90 mDemoHdmiRotationLock=false mUndockedHdmiRotation=-1\n    mLidOpenRotation=-1\n    mFixedToUserRotation=false\n  FoldController\n    mPauseAutorotationDuringUnfolding=false\n    mShouldDisableRotationSensor=false\n    mShouldIgnoreSensorRotation=false\n    mLastDisplaySwitchTime=0\n    mLastHingeAngleEventTime=0\n    mDeviceState=UNKNOWN\n\n    RotationLockHistory\n      11-10 14:53:50.273: mode=USER_ROTATION_FREE, rotation=ROTATION_0, caller=UiAutomationConnection#restoreRotationStateLocked\n      11-10 14:53:54.231: mode=USER_ROTATION_FREE, rotation=ROTATION_0, caller=UiAutomationConnection#restoreRotationStateLocked\n      11-10 14:53:58.269: mode=USER_ROTATION_FREE, rotation=ROTATION_0, caller=UiAutomationConnection#restoreRotationStateLocked\n      11-10 14:54:03.774: mode=USER_ROTATION_FREE, rotation=ROTATION_0, caller=UiAutomationConnection#restoreRotationStateLocked\n      11-10 14:54:06.447: mode=USER_ROTATION_FREE, rotation=ROTATION_0, caller=UiAutomationConnection#restoreRotationStateLocked\n      11-10 14:54:09.018: mode=USER_ROTATION_FREE, rotation=ROTATION_0, caller=UiAutomationConnection#restoreRotationStateLocked\n      11-10 14:54:11.585: mode=USER_ROTATION_FREE, rotation=ROTATION_0, caller=UiAutomationConnection#restoreRotationStateLocked\n      11-10 14:54:14.253: mode=USER_ROTATION_FREE, rotation=ROTATION_0, caller=UiAutomationConnection#restoreRotationStateLocked\n\n  InputConsumers:\n    name=recents_animation_input_consumer pid=1285 user=UserHandle{0}\n\n  WindowInsetsStateController\n    InsetsState\n      mDisplayFrame=Rect(0, 0 - 1080, 1920)\n      mDisplayCutout=DisplayCutout{insets=Rect(0, 0 - 0, 0) waterfall=Insets{left=0, top=0, right=0, bottom=0} boundingRect={Bounds=[Rect(0, 0 - 0, 0), Rect(0, 0 - 0, 0), Rect(0, 0 - 0, 0), Rect(0, 0 - 0, 0)]} cutoutPathParserInfo={CutoutPathParserInfo{displayWidth=0 displayHeight=0 physicalDisplayWidth=0 physicalDisplayHeight=0 density={0.0} cutoutSpec={} rotation={0} scale={0.0} physicalPixelDisplaySizeRatio={0.0}}} sideOverrides=null}\n      mRoundedCorners=RoundedCorners{[RoundedCorner{position=TopLeft, radius=0, center=Point(0, 0)}, RoundedCorner{position=TopRight, radius=0, center=Point(0, 0)}, RoundedCorner{position=BottomRight, radius=0, center=Point(0, 0)}, RoundedCorner{position=BottomLeft, radius=0, center=Point(0, 0)}]}\n      mRoundedCornerFrame=Rect(0, 0 - 0, 0)\n      mPrivacyIndicatorBounds=PrivacyIndicatorBounds {static bounds=Rect(827, 0 - 1043, 63) rotation=0}\n      mDisplayShape=DisplayShape{ spec=1673867177 displayWidth=1080 displayHeight=1920 physicalPixelDisplaySizeRatio=1.0 rotation=0 offsetX=0 offsetY=0 scale=1.0}\n        InsetsSource id=d8650001 type=navigationBars frame=[0,1857][1080,1920] visible=false flags=SUPPRESS_SCRIM|ANIMATE_RESIZING sideHint=BOTTOM boundingRects=null\n        InsetsSource id=d8650004 type=systemGestures frame=[0,0][78,1920] visible=true flags= sideHint=LEFT boundingRects=null\n        InsetsSource id=d8650005 type=mandatorySystemGestures frame=[0,1836][1080,1920] visible=true flags= sideHint=BOTTOM boundingRects=null\n        InsetsSource id=d8650006 type=tappableElement frame=[0,0][0,0] visible=true flags= sideHint=NONE boundingRects=null\n        InsetsSource id=d8650024 type=systemGestures frame=[1002,0][1080,1920] visible=true flags= sideHint=RIGHT boundingRects=null\n        InsetsSource id=3 type=ime frame=[0,0][0,0] visibleFrame=[0,1794][1080,1920] visible=false flags= sideHint=NONE boundingRects=null\n        InsetsSource id=37410000 type=statusBars frame=[0,0][1080,63] visible=false flags= sideHint=TOP boundingRects=null\n        InsetsSource id=37410005 type=mandatorySystemGestures frame=[0,0][1080,63] visible=true flags= sideHint=TOP boundingRects=null\n        InsetsSource id=37410006 type=tappableElement frame=[0,0][1080,63] visible=true flags= sideHint=TOP boundingRects=null\n    Control map:\n      Window{e4de3e2 u0 com.projectinfinity.kodi/com.projectinfinity.kodi.Main}:\n        InsetsSourceControl: {3 mType=ime mSurfacePosition=Point(0, 0) mInsetsHint=Insets{left=0, top=0, right=0, bottom=872}}\n        InsetsSourceControl: {d8650001 mType=navigationBars initiallyVisible mSurfacePosition=Point(0, 1857) mInsetsHint=Insets{left=0, top=0, right=0, bottom=63}}\n        InsetsSourceControl: {37410000 mType=statusBars initiallyVisible mSurfacePosition=Point(0, 0) mInsetsHint=Insets{left=0, top=63, right=0, bottom=0}}\n    InsetsSourceProviders:\n      InsetsSourceProvider\n        mSource=InsetsSource id=37410006 type=tappableElement frame=[0,0][1080,63] visible=true flags= sideHint=TOP boundingRects=null\n        mSourceFrame=Rect(0, 0 - 1080, 63)\n        mIsLeashInitialized=false mHasPendingPosition=false\n        mWindowContainer=Window{a4d3e4 u0 StatusBar}\n      InsetsSourceProvider\n        mSource=InsetsSource id=37410005 type=mandatorySystemGestures frame=[0,0][1080,63] visible=true flags= sideHint=TOP boundingRects=null\n        mSourceFrame=Rect(0, 0 - 1080, 63)\n        mIsLeashInitialized=false mHasPendingPosition=false\n        mWindowContainer=Window{a4d3e4 u0 StatusBar}\n      InsetsSourceProvider\n        mSource=InsetsSource id=37410000 type=statusBars frame=[0,0][1080,63] visible=false flags= sideHint=TOP boundingRects=null\n        mSourceFrame=Rect(0, 0 - 1080, 63)\n        mControl=InsetsSourceControl mId=37410000 mType=statusBars mLeash=Surface(name=Surface(name=a4d3e4 StatusBar)/@0xba9b39c - animation-leash of insets_animation)/@0x91ab67c mInitiallyVisible=true mSurfacePosition=Point(0, 0) mInsetsHint=Insets{left=0, top=63, right=0, bottom=0} mSkipAnimationOnce=false mImeStatsToken=null\n        mInsetsHint=Insets{left=0, top=63, right=0, bottom=0}\n        mIsLeashInitialized=true mHasPendingPosition=false\n        mWindowContainer=Window{a4d3e4 u0 StatusBar}\n        mAdapter=ControlAdapter mCapturedLeash=Surface(name=Surface(name=a4d3e4 StatusBar)/@0xba9b39c - animation-leash of insets_animation)/@0x91ab67c\n        mControlTarget=Window{e4de3e2 u0 com.projectinfinity.kodi/com.projectinfinity.kodi.Main}\n      ImeInsetsSourceProvider\n        mSource=InsetsSource id=3 type=ime frame=[0,0][0,0] visibleFrame=[0,1794][1080,1920] visible=false flags= sideHint=NONE boundingRects=null\n        mSourceFrame=Rect(0, 1794 - 1080, 1920)\n        mControl=InsetsSourceControl mId=3 mType=ime mLeash=Surface(name=Surface(name=c8f984 InputMethod)/@0x9ebd5a2 - animation-leash of insets_animation)/@0x3e1ab05 mInitiallyVisible=false mSurfacePosition=Point(0, 0) mInsetsHint=Insets{left=0, top=0, right=0, bottom=872} mSkipAnimationOnce=false mImeStatsToken=null\n        mInsetsHint=Insets{left=0, top=0, right=0, bottom=872} stale\n        mIsLeashInitialized=true mHasPendingPosition=false\n        mWindowContainer=Window{c8f984 u0 InputMethod}\n        mAdapter=ControlAdapter mCapturedLeash=Surface(name=Surface(name=c8f984 InputMethod)/@0x9ebd5a2 - animation-leash of insets_animation)/@0x3e1ab05\n        mControlTarget=Window{e4de3e2 u0 com.projectinfinity.kodi/com.projectinfinity.kodi.Main}\n        mImeShowing=false mLastDrawn=false        showImePostLayout not scheduled, mImeRequester=null\n\n      InsetsSourceProvider\n        mSource=InsetsSource id=d8650024 type=systemGestures frame=[1002,0][1080,1920] visible=true flags= sideHint=RIGHT boundingRects=null\n        mSourceFrame=Rect(1002, 0 - 1080, 1920)\n        mIsLeashInitialized=false mHasPendingPosition=false\n        mWindowContainer=Window{ae4d07f u0 Taskbar}\n      InsetsSourceProvider\n        mSource=InsetsSource id=d8650006 type=tappableElement frame=[0,0][0,0] visible=true flags= sideHint=NONE boundingRects=null\n        mSourceFrame=Rect(0, 0 - 0, 0)\n        mOverrideFrames={2011=Rect(0, 1857 - 1080, 1920), 2031=Rect(0, 0 - 0, 0)}\n        mIsLeashInitialized=false mHasPendingPosition=false\n        mWindowContainer=Window{ae4d07f u0 Taskbar}\n      InsetsSourceProvider\n        mSource=InsetsSource id=d8650005 type=mandatorySystemGestures frame=[0,1836][1080,1920] visible=true flags= sideHint=BOTTOM boundingRects=null\n        mSourceFrame=Rect(0, 1836 - 1080, 1920)\n        mOverrideFrames={2011=Rect(0, 1857 - 1080, 1920), 2031=Rect(0, 1836 - 1080, 1920)}\n        mIsLeashInitialized=false mHasPendingPosition=false\n        mWindowContainer=Window{ae4d07f u0 Taskbar}\n      InsetsSourceProvider\n        mSource=InsetsSource id=d8650004 type=systemGestures frame=[0,0][78,1920] visible=true flags= sideHint=LEFT boundingRects=null\n        mSourceFrame=Rect(0, 0 - 78, 1920)\n        mIsLeashInitialized=false mHasPendingPosition=false\n        mWindowContainer=Window{ae4d07f u0 Taskbar}\n      InsetsSourceProvider\n        mSource=InsetsSource id=d8650001 type=navigationBars frame=[0,1857][1080,1920] visible=false flags=SUPPRESS_SCRIM|ANIMATE_RESIZING sideHint=BOTTOM boundingRects=null\n        mSourceFrame=Rect(0, 1857 - 1080, 1920)\n        mOverrideFrames={2011=Rect(0, 1857 - 1080, 1920), 2031=Rect(0, 1857 - 1080, 1920)}\n        mControl=InsetsSourceControl mId=d8650001 mType=navigationBars mLeash=Surface(name=Surface(name=ae4d07f Taskbar)/@0x3c46bf1 - animation-leash of insets_animation)/@0x40f875a mInitiallyVisible=true mSurfacePosition=Point(0, 1857) mInsetsHint=Insets{left=0, top=0, right=0, bottom=63} mSkipAnimationOnce=false mImeStatsToken=null\n        mInsetsHint=Insets{left=0, top=0, right=0, bottom=63}\n        mIsLeashInitialized=true mHasPendingPosition=false\n        mWindowContainer=Window{ae4d07f u0 Taskbar}\n        mAdapter=ControlAdapter mCapturedLeash=Surface(name=Surface(name=ae4d07f Taskbar)/@0x3c46bf1 - animation-leash of insets_animation)/@0x40f875a\n        mControlTarget=Window{e4de3e2 u0 com.projectinfinity.kodi/com.projectinfinity.kodi.Main}\n  InsetsPolicy\n    status: WINDOW_STATE_HIDDEN\n    nav: WINDOW_STATE_HIDDEN\n\n  KeyguardController:\n    mKeyguardShowing=false\n    mAodShowing=false\n    mKeyguardGoingAway=false\n   KeyguardShowing=false AodShowing=false KeyguardGoingAway=false DismissalRequested=false  Occluded=false DismissingKeyguardActivity=null TurnScreenOnActivity=null at display=0\n    mDismissalRequested=false\n\n  LockTaskController:\n    mLockTaskModeState=NONE\n    mLockTaskModeTasks=\n    mLockTaskPackages (userId:packages)=\n\n  mCurTaskIdForUser={0=16}\n  mUserRootTaskInFront={}\n  mVisibilityTransactionDepth=0\n  isHomeRecentsComponent=true\n  mNoHistoryActivities=[]\n\n  TaskOrganizerController:\n      android.window.ITaskOrganizer$Stub$Proxy@2b317ca uid=10184 (active):\n        (fullscreen) Task{5ab1c69 #1 type=home}\n        (fullscreen) Task{ac3cdd9 #2 type=undefined}\n        (multi-window) Task{cecf39e #3 type=undefined}\n        (multi-window) Task{d520e7f #4 type=undefined}\n        (fullscreen) Task{a0e916e #16 type=standard A=10216:com.projectinfinity.kodi.infinity.kodi}\n\n  VisibleActivityProcess:[ ProcessRecord{338329 7466:com.projectinfinity.kodi:kodi/u0a216}]\n  NumNonAppVisibleWindowUidMap:[ 10184:1 10180:1]\n  SleepTokens={}\n"
+        },
+        "home": {
+          "currentcontrol": {
+            "label": "TV SHOWS"
+          },
+          "currentwindow": {
+            "id": 10000,
+            "label": "Home"
+          },
+          "skin": {
+            "id": "skin.infinity.diggz",
+            "name": "Infinity"
+          }
+        },
+        "pid": 7466,
+        "ping": "pong",
+        "process_start": "36909"
+      }
+    }
+  },
+  "status": "PASS_SELECTED_ORIGINAL_SIGNED_UPGRADE_FORWARD_RECOVERY_AND_INFINITY_SMOKE_NOT_FOLD_ACCEPTANCE",
+  "uninstall_reset_or_data_clear": false
+}
