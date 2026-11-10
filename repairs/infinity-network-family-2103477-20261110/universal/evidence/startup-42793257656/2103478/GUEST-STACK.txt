@@ -1,0 +1,20 @@
+Guest thread information for tid: 5212
+    x0  000000006b8b4567  x1  0000705ab51dabc0  x2  0000705ab51dabc0  x3  0000000000000000
+    x4  0000000000000000  x5  0000000054554e47  x6  0000000054554e47  x7  0000000000534c54
+    x8  0000000000000007  x9  0000000008f645c8  x10 000000000000000c  x11 0000705ab51c94a8
+    x12 00000000d7168acf  x13 0000705ab51c94b4  x14 0000705ab51c94a4  x15 0000705ab51c94a8
+    x16 0000000000000001  x17 0000705ab515217c  x18 0000705aaf208000  x19 0000705b076385b0
+    x20 0000705b076ca1db  x21 0000705aa8946230  x22 00000000000003ae  x23 0000705b076c2d04
+    x24 0000705b076c1e41  x25 0000705b076c4550  x26 00000000000003cf  x27 0000705aa5ab89c0
+    x28 0000705b07772000  x29 0000705ab0a06ce0  lr  0000705aa5ab89e0  sp  0000705ab0a06cd0
+    pc  0000705aa5ab89e0  pst 0000000000000000
+
+
+6 total frames
+backtrace:
+      #00 pc 0000000002bf49e0  /data/app/~~ybPxoHbB9TavY86E-HDv3w==/com.projectinfinity.kodi-5P10W-egukj5kVXkssKW8g==/lib/arm64/libkodi.so (talloc_lib_init+32)
+      #01 pc 0000000000092a08  /system/bin/arm64/linker64 (__dl__ZL10call_arrayIPFviPPcS1_EEvPKcPT_mbS5_+264) (BuildId: 7fca2d1744cbef84e84107906c74e353)
+      #02 pc 0000000000092c3c  /system/bin/arm64/linker64 (__dl__ZN6soinfo17call_constructorsEv+432) (BuildId: 7fca2d1744cbef84e84107906c74e353)
+      #03 pc 0000000000079050  /system/bin/arm64/linker64 (__dl__Z9do_dlopenPKciPK17android_dlextinfoPKv+3272) (BuildId: 7fca2d1744cbef84e84107906c74e353)
+      #04 pc 0000000000072d20  /system/bin/arm64/linker64 (__dl__ZL10dlopen_extPKciPK17android_dlextinfoPKv+72) (BuildId: 7fca2d1744cbef84e84107906c74e353)
+      #05 pc 0000000000008018  /system/lib64/arm64/libnative_bridge_vdso.so (BuildId: 5082e3064230f41f0158350ba172b967)

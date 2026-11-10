@@ -1,0 +1,60 @@
+{
+  "complete_file_does_not_guarantee_resolved_guest_unwind": true,
+  "errors": [],
+  "files": [
+    {
+      "complete_text": true,
+      "matches_first_startup_runner_PID": true,
+      "name": "tombstone_00",
+      "pid": 5212,
+      "producer_after_query": {
+        "argv": [
+          "shell",
+          "pidof",
+          "crash_dump64"
+        ],
+        "finished_epoch": 1794304245.8535898,
+        "returncode": 1,
+        "started_epoch": 1794304245.778149,
+        "stderr": "",
+        "stdout": ""
+      },
+      "producer_finished_before_and_after": true,
+      "proto_bytes": 289759,
+      "proto_sha256": "c78c50b3327ccb12886d708ce4a03ea19b947d792f0689cfa62cc1e9356094f9",
+      "proto_stat": {
+        "argv": [
+          "shell",
+          "stat",
+          "-c",
+          "%s",
+          "/data/tombstones/tombstone_00.pb"
+        ],
+        "finished_epoch": 1794304245.9467864,
+        "returncode": 0,
+        "started_epoch": 1794304245.8558426,
+        "stderr": "",
+        "stdout": "289759\n"
+      },
+      "size_stable": true,
+      "text_bytes": 496838,
+      "text_sha256": "cc04bdadded0179e2469adf121cc1d8200e7c9ea6a2fb5830a910dd6a9f62640",
+      "timestamp": "2026-11-10 09:50:27.513587906+0000"
+    }
+  ],
+  "matching_complete_text_captured": true,
+  "partial_crash_buffer_is_not_full_tombstone": true,
+  "producer_query": {
+    "argv": [
+      "shell",
+      "pidof",
+      "crash_dump64"
+    ],
+    "finished_epoch": 1794304245.4562624,
+    "returncode": 1,
+    "started_epoch": 1794304245.3343644,
+    "stderr": "",
+    "stdout": ""
+  },
+  "read_only": true
+}

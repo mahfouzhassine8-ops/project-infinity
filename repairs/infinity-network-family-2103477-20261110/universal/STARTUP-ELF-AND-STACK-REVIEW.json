@@ -1,0 +1,35 @@
+{
+  "baseline_native_sha256": "ee3be7c7a95b86f8357539001fcd50bedbd80217b02f130d649f7f57e6075794",
+  "builds_or_tests_run_by_reviewer": false,
+  "candidate_native_sha256": "9935873eb1c8563281743e6d4b978f530c9dde3e9d6d777519af70643c4f66db",
+  "conclusion": "No evidence-supported lifecycle, constructor, DNS or networking production correction identified; startup not cleared",
+  "constructor_table": {
+    "all_R_AARCH64_RELATIVE": true,
+    "bytes_each": 7800,
+    "constructor_bodies_or_callback_timing_not_proven_equal": true,
+    "resolved_function_symbol_sequence_equal": true,
+    "slots_each": 975,
+    "unresolved_or_ambiguous_slots": 0
+  },
+  "read_only": true,
+  "reviewer": "Astra",
+  "talloc_lib_init": {
+    "attribution_limit": "Guest PC equals LR after call to rand; do not claim instruction+32 accessed the host fault address",
+    "baseline_address": "0x2be89c0",
+    "baseline_raw_sha256": "a3ab0148503559f5650ad16a65f1612c3505e45a0375a62de8caf413cd92bd6c",
+    "bytes_each": 100,
+    "candidate_address": "0x2bf49c0",
+    "candidate_raw_sha256": "cd49cd49b699af44ebfec161cffa24d27158887e582fd1d810bd96852033eb8e",
+    "differing_fields": "PC-relative BL imm26 displacement only",
+    "differing_instruction_offsets": [
+      16,
+      28
+    ],
+    "instruction_at_offset32": "0xb201f3e9 logical-immediate, not load/store",
+    "normalized_sha256": "8e526e60d6cb14e289074a652dd16ae59c6fa26e40ddef25afbfe7bb9e7f6ec6",
+    "resolved_calls": [
+      "getauxval",
+      "rand"
+    ]
+  }
+}

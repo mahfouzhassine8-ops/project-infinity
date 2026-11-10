@@ -20,7 +20,7 @@
       "version": 2103479
     }
   ],
-  "blocker": "See BLOCKED-STARTUP-42777116255.json and immutable failing workflow; no inherited or bridge-only attribution established",
+  "blocker": "Universal provider/direct-transport enforcement has no supported attachment point in inspected clients; protected-component changes stopped. Earlier Purevirtual startup unresolved; matched run42793257656 has distinct talloc constructor SIGSEGV. See universal/REPORT.md.",
   "code_changes_since_original_signing": false,
   "engineering_complete": false,
   "gates": {
@@ -36,6 +36,7 @@
     "Final_Galaxy_Fold_acceptance": "PENDING_OWNER_AFTER_ENGINEERING_CLEARANCE",
     "Fold_front_inner_viewport_selector": "NOT_RUN;PHYSICAL_FOLD_NOT_TESTED",
     "Historical_hard_DNS_deadline": "FAIL_BASELINE_AND_CANDIDATE;INHERITED_OWNER_APPROVED_CONTRACT;NOT_RELABELLED_PASS",
+    "Matched_frozen77_78_startup_control": "42793257656:77_ONE_START_PASS;78_SIGSEGV_TALLOC_CONSTRUCTOR_FAIL;PRIOR_PUREVIRTUAL_UNRESOLVED",
     "Network_mode_process_restart_persistence": "NOT_RUN",
     "New_native_startup_SIGABRT": "FAIL_42777116255_PURE_VIRTUAL_CALL_CAUSE_UNRESOLVED",
     "Original_signing_identity_v1_v2_v3": "PASS_BOTH_INTERNAL_APKS",
@@ -43,10 +44,13 @@
     "Python_selfhosted_SDK_Stop": "TIMEOUT_45S_RETAINED;SOURCE_PROVEN_GIL_CYCLE;NORMAL_NATIVE_CONTROL_REPLACEMENT_NOT_YET_EXECUTED",
     "Real_HTTP_play_and_advance_after_setting_switch": "RAW_EVIDENCE_CONFIRMED_INDEPENDENT_ASTRA_REVIEW_NOT_FULL_PLAY_STOP_PASS",
     "Timed_IPv6_handshake_fallback_toIPv4": "HOST_PASS_REUSED_NOT_REPRODUCED_ANDROID_LOOPBACK",
+    "Universal_provider_and_direct_FFmpeg_family_enforcement": "NOT_IMPLEMENTED_NO_SUPPORTED_ATTACHMENT_IN_REVIEWED_CLIENTS;PROTECTED_COMPONENT_CHANGES_STOPPED",
     "Warmed_30_VFS_requests": "PASS_NO_OBSERVED_FD_UPWARD_DRIFT_447_447_447_NOT_GLOBAL_LEAK_PROOF"
   },
-  "installation_instructions": "WITHHELD; stay on protected2103477. Internal78/79 are not offered for device installation.",
-  "minimum_next_scope": "Read-only matched protected77/candidate78 startup control with complete guest tombstone/load-stage evidence; no speculative source correction, signing or APK rebuild",
+  "installation_instructions": "WITHHELD; no new installation is cleared. Do not infer a downgrade or blind reinstall. Original78/79 remain frozen engineering evidence.",
+  "latest_investigation_source": "883ff761a7228a47c9a58683ade607692c2588a1",
+  "minimum_next_scope": "No speculative production edit or build. Resolve supported provider/shared-transport contract within explicit authority, and obtain causal startup evidence before release; do not repeat owner playback to fill unknown historical details.",
+  "new_production_edits_after_frozen_pair": false,
   "next_performance_phase": "NOT_STARTED",
   "original_signer_certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
   "owner_delivery_cleared": false,

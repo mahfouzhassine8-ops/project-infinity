@@ -1,0 +1,121 @@
+{
+  "APK_build": "NOT_RUN",
+  "candidate_code": "SEGV_MAPERR",
+  "candidate_process_uptime_seconds": 6,
+  "candidate_signal": "SIGSEGV",
+  "earlier_candidate_Purevirtual": {
+    "run": 42777116255,
+    "signal": "SIGABRT",
+    "status": "STILL_UNRESOLVED_DIFFERENT_SIGNATURE_NOT_REPRODUCED_IN_THIS_CONTROL"
+  },
+  "earlier_unchanged69_matching_guest_constructor_failures": [
+    {
+      "run": 42570831467,
+      "signal": "SIGSEGV",
+      "uptime_seconds": 6
+    },
+    {
+      "run": 42604600259,
+      "signal": "SIGBUS",
+      "uptime_seconds": 7
+    }
+  ],
+  "environment_equal": true,
+  "environment_limit": "stock API36 x86_64 with qualified ARM64 translation, not native ARM64 hardware or physical Fold Android17",
+  "full_text_contains_guest_frames": true,
+  "guest_frames": [
+    "libkodi.so talloc_lib_init+32",
+    "linker64 call_array",
+    "linker64 soinfo::call_constructors",
+    "linker64 do_dlopen",
+    "linker64 dlopen_ext",
+    "libnative_bridge_vdso.so+0x8018"
+  ],
+  "host_frame": "/memfd:exec (deleted)+0x187355",
+  "native_production_repair_supported": false,
+  "networking_cause": "NOT_ESTABLISHED",
+  "owner_acceptance": "NOT_RUN",
+  "playback_tests": "NOT_SELECTED",
+  "results": [
+    {
+      "actual_installed_APK_sha256": "93eb081cd6a86ff9cf1cb9aa75bc6d9087cd9c982fb46e0a9baa12c12aa9af22",
+      "artifact_bytes": 3705582,
+      "artifact_downloaded_and_verified": true,
+      "artifact_id": 13752887691,
+      "artifact_link": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/42793257656/artifacts/13752887691",
+      "artifact_sha256": "4c006f19461f70fa3e1b9a89c8dbb4178dee7fce43837cc1848075c7a643fdba",
+      "automatic_retries": 0,
+      "first_startup_runner_observed_native_pid": 5336,
+      "raw_evidence": {
+        "PID-GENERATIONS.jsonl": {
+          "bytes": 93190,
+          "location": "original immutable workflow artifact",
+          "sha256": "d9175e27b9b2ba5281c4f8cc36ecfbed8fd43f4ec06c10571ef185a3b506c13e"
+        },
+        "all-logcat.txt": {
+          "bytes": 12070923,
+          "location": "original immutable workflow artifact",
+          "sha256": "30f168631a261c17eea4494ccc21a2ee3be917e46265e2ada9a0be5576091955"
+        }
+      },
+      "retained_report_hashes": {
+        "ENVIRONMENT.json": "0021cc52f42bd1ebffc995b67eaca174a1bb628fbb610e3025f819efcb2e7ed2",
+        "STARTUP-CONTROL.json": "d44c700d9ea9babd88ef11880b053a1b104968bb36e64ed925840496d5c836f2",
+        "TOMBSTONE-CAPTURE.json": "52a6eb6f4617ddbd99ea1f7cb6b1acf034e08c0e45450cd3657d19f391c19739"
+      },
+      "starts_requested": 1,
+      "status": "PASS_ONE_SELECTED_FIRST_START_ONLY_NOT_INTERMITTENT_CRASH_RESOLUTION",
+      "version": 2103477
+    },
+    {
+      "actual_installed_APK_sha256": "787df8f3e851a9af99c299cecc65f2acacae0321294ceedd6c0e56dbb3d748fd",
+      "artifact_bytes": 5908803,
+      "artifact_downloaded_and_verified": true,
+      "artifact_id": 13753397396,
+      "artifact_link": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/42793257656/artifacts/13753397396",
+      "artifact_sha256": "4a6ab27e49ef7c1281cc6938f5898ebb412d329b71166de92f4edfae41464e97",
+      "automatic_retries": 0,
+      "first_startup_runner_observed_native_pid": 5212,
+      "raw_evidence": {
+        "PID-GENERATIONS.jsonl": {
+          "bytes": 69402,
+          "location": "original immutable workflow artifact",
+          "sha256": "f51b092858a098031f1bececa225dfe5f4c37a39360045aa16d7039909bb31de"
+        },
+        "all-logcat.txt": {
+          "bytes": 11319588,
+          "location": "original immutable workflow artifact",
+          "sha256": "5d443c47be2a2bb29eeddb9aff3bf6051788ce1a55ef27b16ce9d423e387fa89"
+        },
+        "tombstone_00.pb": {
+          "bytes": 289759,
+          "location": "original immutable workflow artifact",
+          "sha256": "c78c50b3327ccb12886d708ce4a03ea19b947d792f0689cfa62cc1e9356094f9"
+        },
+        "tombstone_00.txt": {
+          "bytes": 496838,
+          "location": "original immutable workflow artifact",
+          "sha256": "cc04bdadded0179e2469adf121cc1d8200e7c9ea6a2fb5830a910dd6a9f62640"
+        }
+      },
+      "retained_report_hashes": {
+        "ENVIRONMENT.json": "0021cc52f42bd1ebffc995b67eaca174a1bb628fbb610e3025f819efcb2e7ed2",
+        "STARTUP-CONTROL.json": "de259884cafa481b3fc13587414b80fc4594fff9bc7780df24a1f76ff727f9bd",
+        "TOMBSTONE-CAPTURE.json": "94a5d902adfe598f79732943d7d0d67d7a835c124b0be09312882bcfeab99e0d"
+      },
+      "starts_requested": 1,
+      "status": "FAIL_OR_BLOCKED_SELECTED_FIRST_START",
+      "version": 2103478
+    }
+  ],
+  "run": 42793257656,
+  "run_link": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/42793257656",
+  "selected_feature": "network-startup-pair",
+  "shutdown_tests": "NOT_SELECTED",
+  "signing": "NOT_RUN",
+  "source": "883ff761a7228a47c9a58683ade607692c2588a1",
+  "status": "BASELINE_ONE_START_PASS_CANDIDATE_ONE_START_FAIL_NOT_ROOT_CAUSE_RESOLUTION",
+  "tombstone_complete_text": true,
+  "tombstone_completeness_does_not_imply_causal_attribution": true,
+  "workflow": 393886994
+}

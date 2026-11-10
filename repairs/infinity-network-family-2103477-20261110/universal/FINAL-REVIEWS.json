@@ -1,0 +1,26 @@
+{
+  "Astra": {
+    "production_changes_or_tests_by_reviewer": false,
+    "result": "NO_CORRECTIONS_REQUIRED",
+    "reviewed_report_sha256": {
+      "REPORT.md": "eb8f4ca6fe5adc4405aa54e4a5ffb4ff85cf0e7f4e705c1657a8702a0d5e63d6",
+      "STARTUP-ELF-AND-STACK-REVIEW.json": "aef72e1c94f59d83fea3141112f9c48bb5ca0f57fec1adb66468b3e2aa15e9e6",
+      "STARTUP-RESULT-42793257656.json": "3e1d7902b0a1b2fa94a1b9882f9007112faae32161ba6d71cd93727b0d3d0314"
+    },
+    "scope": "Startup result attribution, ELF/constructor comparison, retained report hashes and preservation since883ff761"
+  },
+  "GPT_6_1": {
+    "corrections": [
+      "Label POV as 2026-11-08 installed export rather than current inventory; exact session.py path",
+      "Name Crew get_session parameters and indexers/movies.py Movies.__init__ explicitly"
+    ],
+    "production_changes_or_tests_by_reviewer": false,
+    "result": "PASS_WITH_TWO_PRECISION_CORRECTIONS_APPLIED",
+    "reviewed_report_sha256": {
+      "REPORT.md": "eb8f4ca6fe5adc4405aa54e4a5ffb4ff85cf0e7f4e705c1657a8702a0d5e63d6",
+      "TRANSPORT-BOUNDARIES.md": "7dba18a865182d5371af935c97b5fb9f47696c3ff97c86abd0311c07b9fb0477"
+    },
+    "scope": "Network source ownership, supported attachment points, source identities and transport/security limits"
+  },
+  "review_is_not_Android_release_acceptance": true
+}
