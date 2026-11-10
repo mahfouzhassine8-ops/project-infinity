@@ -3,45 +3,46 @@
   "coverage": [
     {
       "client": "Kodi CCurlFile HTTP/HTTPS including VFS-based artwork and streams",
-      "state": "NOT_PROVEN_ANDROID",
-      "implementation": "New per-transfer policy implemented; actual core+pool13host cases:12PASS,1DNSdeadlineFAIL."
+      "implementation": "ActualAPI36 nativeHTTP/VFS family/redirect/TLS/error cases and realHTTPAV advancement passed42774629373; completedStop,cancel,restart,recovery stillunverified. NewstartupSIGABRT42777116255 blocksdelivery.",
+      "state": "PARTIAL_ANDROID_PASS_RELEASE_BLOCKED"
     },
     {
       "client": "Provider independent Python requests/urllib sockets (including reviewedWNT; provider families must retain ownclients)",
-      "state": "NOT_ENFORCED",
-      "implementation": "No provider/socket monkeypatch. CommandCenter delegatesnativeproviderwork; settingcannotgovernindependentHTTP."
+      "implementation": "No provider/socket monkeypatch. CommandCenter delegatesnativeproviderwork; settingcannotgovernindependentHTTP.",
+      "state": "NOT_ENFORCED"
     },
     {
       "client": "FFmpeg direct avformat HTTP",
-      "state": "NOT_ENFORCED",
-      "implementation": "No directFFmpeg modifications."
+      "implementation": "No directFFmpeg modifications.",
+      "state": "NOT_ENFORCED"
     },
     {
       "client": "Inputstream requests delegated through Kodi VFS",
-      "state": "NOT_PROVEN",
-      "implementation": "ConditionalCurlFilecoverage mustbe demonstrated perpath."
+      "implementation": "ConditionalCurlFilecoverage mustbe demonstrated perpath.",
+      "state": "NOT_PROVEN"
     },
     {
       "client": "Inputstream add-on own sockets or HTTP",
-      "state": "NOT_ENFORCED",
-      "implementation": "IndependentclientoutsideCurlFile."
+      "implementation": "IndependentclientoutsideCurlFile.",
+      "state": "NOT_ENFORCED"
     },
     {
       "client": "HTTP/SOCKS proxies using controlledCurlFile",
-      "state": "NOT_PROVEN_ANDROID",
-      "implementation": "Strictlocalhopfamily. Originfamilyunmeasuredwhenproxyresolvesremotely; localHTTPproxyhostcasepassed."
+      "implementation": "Strictlocalhopfamily. Originfamilyunmeasuredwhenproxyresolvesremotely; localHTTPproxyhostcasepassed.",
+      "state": "NOT_PROVEN_ANDROID"
     },
     {
       "client": "Cobra OkHttp/HttpURLConnection/Media3",
-      "state": "UNAFFECTED_OUT_OF_SCOPE",
-      "implementation": "NoDEx/resource/settingschanges. Nativeengineownershipverifiedbyretainedcomponentinventoryandactual77manifest; no globalDNS/JVM mutation."
+      "implementation": "NoDEx/resource/settingschanges. Nativeengineownershipverifiedbyretainedcomponentinventoryandactual77manifest; no globalDNS/JVM mutation.",
+      "state": "UNAFFECTED_OUT_OF_SCOPE"
     },
     {
       "client": "System DNS query transport",
-      "state": "NOT_ENFORCED_OS_MANAGED",
-      "implementation": "Destination/proxy socket family iscontrolled; Android/system DNS routing and configurationremainunchanged. Threadedresolvercleanupcanoverrunconnectiontimeouts; seeDNS-DEADLINE-BLOCKER.json."
+      "implementation": "Destination/proxy socket family iscontrolled; Android/system DNS routing and configurationremainunchanged. Threadedresolvercleanupcanoverrunconnectiontimeouts; seeDNS-DEADLINE-BLOCKER.json.",
+      "state": "NOT_ENFORCED_OS_MANAGED"
     }
   ],
-  "search_metadata_Trakt_and_Watchlists": "Architectureandproviderlogicunchanged; representativeAndroidfeaturepreservationNOT_RUN",
-  "owner_acceptance": "NOT_RUN_FOR_NETWORK_FEATURE"
+  "owner_acceptance": "NOT_RUN_FOR_NETWORK_FEATURE",
+  "release_status": "BLOCKED_REAL_NATIVE_STARTUP_SIGABRT",
+  "search_metadata_Trakt_and_Watchlists": "Sources byte-preserved from77; publicHTTPS/VFS requests passed; liveprovider/account flows not executed by fixture."
 }

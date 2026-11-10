@@ -120,7 +120,7 @@
       "repairs/infinity-2103445-standalone-external-player/release_guard.py": "3c80c746931c9723d5a858e83779d369694cdc4e08ec7d688837761c368078b0"
     }
   },
-  "generation": 61,
+  "generation": 62,
   "guard_schema": 2,
   "last_issued_versionCode": 2103478,
   "launcher_icon_exception": {
@@ -168,11 +168,13 @@
     }
   },
   "owner_update_evidence": {
-    "Android": "PENDING_INTERNAL_QA_NOT_OWNER_DELIVERY",
+    "Android": "BLOCKED_REAL_STARTUP_SIGABRT_42777116255",
     "CC": "0.3.5.77",
     "Cobra_changes": false,
     "DNS_contract": "OWNER_APPROVED_BASELINE_COMPARISON;ORIGINAL_RESOLVER;HISTORICAL_HARD_DEADLINE_FAIL_RETAINED",
     "accepted_pointer_updated": false,
+    "actual_signed79_APK_sha256": "7f466d83b84a8078c1004d1595267ddb34ac830eeb6ca4e9d98a0c0605a2c6e7",
+    "actual_signed79_run": 42767681923,
     "artifact": {
       "digest": "sha256:7f0bb7cc4a54bb78751a56842dc0a69d55d064d080133ec70134444c0225e3a7",
       "id": 13738876243,
@@ -182,6 +184,7 @@
     "baseline_APK_sha256": "93eb081cd6a86ff9cf1cb9aa75bc6d9087cd9c982fb46e0a9baa12c12aa9af22",
     "engineering_QA_only": true,
     "experimental": true,
+    "freeze": "EVIDENCE_REFRESH_ONLY;PAYLOAD_COMPONENTS_AND_VERSIONS_UNCHANGED;NO_APK_MUTATION",
     "immutable_functional_base": 2103477,
     "issuance_reconciliation": {
       "actual_signed76_APK_sha256": "6f5a90c548c41f0a38b8420010419f15939b6d2b731fc0e87588d2944560e6f7",
@@ -192,6 +195,10 @@
       "previous_canonical": "dfee7205dd88abe81db5e263c368f67ece43df02",
       "previous_registered_candidate": 2103475
     },
+    "mandatory_release_blockers": [
+      "Unattributed native startup SIGABRT Pure virtual function called in42777116255",
+      "Native Stop/cancel completion,setting restart,viewport,Androidforward79 recovery remain unverified"
+    ],
     "module_manifest_sha256": "55165964fc2f97f6de5805e7c0b477fc13dac21a894fe58dc0bdf2d8070e39c9",
     "module_source_count": 80,
     "module_upgrade_recovery_sha256": "f794154a617c4f097e8df473345207d478aa2d7a5c13b296f7eed4650ec5f7df",
@@ -205,9 +212,7 @@
     "public_release": false,
     "publication": false,
     "remaining_unverified": [
-      "Actual Android UI/mode/connections/fallback/cancellation/playback",
-      "Signed in-place Android installation and forward recovery",
-      "One final physical Galaxy Fold owner acceptance"
+      "See source-bound RELEASE-STATUS.json; all retained native startup failures remain visible"
     ],
     "resolver_helpers_or_replacement_included": false,
     "skin": "1.0.5.272",
@@ -231,11 +236,13 @@
       "repairs/infinity-network-family-2103477-20261110/overlay/skin.infinity.diggz/unified/Custom_1191_InfinitySystemHub.xml": "6f8787e68dd6ee4f67471efae3be5a463ebb7b98e12b80cea6ee1b3234803f2a",
       "repairs/infinity-network-family-2103477-20261110/release/APK-PREPARATION-SOURCE-REVIEW.json": "49173085eac8714bbb0983fd435ea75cd53526aa9e01d630ebb72f071598d050",
       "repairs/infinity-network-family-2103477-20261110/release/APK-PREPARE-REQUEST.json": "7bbe42d57b3711fdd46e0edd1bfb4bb49c2ea73c4509e7aca0ad49b543017943",
+      "repairs/infinity-network-family-2103477-20261110/release/BLOCKED-STARTUP-42777116255.json": "018f044d81cc63c65dda27d01765890791f343f29e6b00a1356e38148b323e22",
       "repairs/infinity-network-family-2103477-20261110/release/DNS-CONTRACT-OWNER-APPROVAL.json": "88bd8e9961809fddd342b37a82ef75fe792e8ad118465489e41b2bc50426b134",
       "repairs/infinity-network-family-2103477-20261110/release/INPUT-ARTIFACTS.json": "d2d70bdcd9e75f18cd6db678470e0fa50bf026ad612be13acdecc23abd51d08c",
       "repairs/infinity-network-family-2103477-20261110/release/MODULE-PREPARE-REQUEST.json": "d81283eef0e64200788d898adf1a9541b4a53c42ef41517b60751fa8205398b7",
       "repairs/infinity-network-family-2103477-20261110/release/PREPARED-PAIR-PIN.json": "3aac1a52550e1cbf1e191acfd14c0f475f657df2b8e2f80202fa6634c72320f0",
-      "repairs/infinity-network-family-2103477-20261110/release/SIGN-REQUEST.json": "eecbe99400c0cf7802fd46b62fe06aa3d04ec378dc4997bdb9e2d8172de4f2b8",
+      "repairs/infinity-network-family-2103477-20261110/release/RELEASE-STATUS.json": "b26b730ae25e43a50a1c73eb4d9308c586f915dcdaf40bd97c6420a129356b5a",
+      "repairs/infinity-network-family-2103477-20261110/release/SIGN-REQUEST.json": "037804cf675a7e69589a1a06dc9c3c92d26261a82818dacb4084c17f61498e98",
       "repairs/infinity-network-family-2103477-20261110/release/SIGNED-CANDIDATE-PIN.json": "1c7e996043e43c8a8191bf0750498912ab72334237ff1f0a0db476be41e86064",
       "repairs/infinity-network-family-2103477-20261110/release/UPGRADE-METADATA-REVIEW.json": "e9e33248fd62e590aee96fa9e2f5de86a8f08bf3aab4a032621f7694e396aca9",
       "repairs/infinity-network-family-2103477-20261110/release/evidence/signed-modules-42761231636/ARTIFACT.json": "f22c7515b2fbcdae2e188af057de09af699700bb496e57cdd17c4ff54fa24a49",
@@ -246,6 +253,7 @@
       "repairs/infinity-network-family-2103477-20261110/release/register_network.py": "de4e6cb50e3f44d7c82cb02640902a303d6c6164b834df3e98523bd51de8ac6f",
       "repairs/infinity-network-family-2103477-20261110/release/verify_modules.py": "7b3ea61cae76a7ecbc1b615d66589f44138d41ff1a80aea0b299d9e53412d6e3"
     },
+    "task_signing_enabled": false,
     "verification_toolchain": {
       "java_major": 21,
       "unchanged_original_DEX": true
@@ -67631,7 +67639,7 @@
     "root": "CobraCardsTheme",
     "source_sha256": "58bd661ed94a2a949b459bab470c095bfb48d6d84d1e3fddc178f8ea21851864"
   },
-  "previous_authority_sha256": "256d37f7599618781fdf665d8cc6cc8b1aa936d90592cac640c9401097bec466",
+  "previous_authority_sha256": "a07d5397f6afc3f14dd00d2b8cb3cc7fd077ef9f3d82423430f29e3a1aaf4a65",
   "proofs": {
     "COMBINATION-CONTROLS.json": "bcb21adb63fefb898a8e8799d9892f76e382315518d8e94b51c42060cc5ece83",
     "OWNER-CONTRACT.json": "dd0fdfdcb7715777007984969bfac45b36f3e4ef04023b5ba1884c67904d0846",
@@ -67826,10 +67834,7 @@
     "repairs/dual-experience-isolation-2103420/verify_runtime.py": "b903edd3d6c3402d46613841c9ac44f0103420a64da5dff2897d14c9952e7460"
   },
   "status": "ENGINEERING_REVIEWED_FOLD_PENDING",
-  "target_owners": [
-    "INFINITY",
-    "CHOOSER_SHELL"
-  ],
-  "update_kind": "owner_update",
+  "target_owners": [],
+  "update_kind": "evidence_refresh",
   "workflow_sha256": "8715208f27c4fd00039ec440b11d3fed4219c60d43677aa8304f465ad1714531"
 }
