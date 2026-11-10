@@ -1,8 +1,8 @@
 name: Infinity combined release | owner gate before original signing
 on:
   push:
-    branches: [work/infinity-final-release-462-20261107, work/infinity-tracking-integration-20261108]
-    paths: [repairs/infinity-final-release-462-20261107/REQUEST.json, repairs/infinity-tracking-integration-2103469-20261108/MODULE-REQUEST.json]
+    branches: [work/infinity-final-release-462-20261107, work/infinity-tracking-integration-20261108, work/infinity-exact69-forward-2103476-20261109, work/infinity-exact74-retest-2103477-20261109]
+    paths: [repairs/infinity-final-release-462-20261107/REQUEST.json, repairs/infinity-tracking-integration-2103469-20261108/MODULE-REQUEST.json, repairs/infinity-exact69-forward-2103476/REQUEST.json, repairs/infinity-exact74-retest-2103477/REQUEST.json]
   workflow_dispatch:
     inputs:
       operation:
@@ -10,7 +10,7 @@ on:
         type: choice
         required: true
         default: final-combined
-        options: [final-combined, prepare-preview451, prepare-kodi452, prepare-kodi453, prepare-ui454-455, prepare-controlled456-457, review-controlled456-457, prepare-browser458-459, review-browser458-459, prepare-six460-461, review-six460-461, package-nine-quick-updates, verify-nine-update-recovery, prepare-nine-native462-463, package-umbrella-pov-462, verify-three-native, prepare-three, sign-three, watchlist-verify-native, prepare-watchlist, sign-watchlist, publish-watchlist, prepare-tracking-modules, prepare-tracking-release, sign-tracking]
+        options: [final-combined, prepare-preview451, prepare-kodi452, prepare-kodi453, prepare-ui454-455, prepare-controlled456-457, review-controlled456-457, prepare-browser458-459, review-browser458-459, prepare-six460-461, review-six460-461, package-nine-quick-updates, verify-nine-update-recovery, prepare-nine-native462-463, package-umbrella-pov-462, verify-three-native, prepare-three, sign-three, watchlist-verify-native, prepare-watchlist, sign-watchlist, publish-watchlist, prepare-tracking-modules, prepare-tracking-release, sign-tracking, verify-network-native, prepare-network-modules, prepare-network-release, sign-network]
       prepared_run:
         description: Completed official controlled preparation run for read-only authority review
         type: string
@@ -2350,3 +2350,559 @@ jobs:
             unsigned-preservation/
           if-no-files-found: warn
           retention-days: 90
+
+  recover-exact69-2103476:
+    name: Original signed 2103469 functional files as higher-version 2103476; internal QA
+    if: github.repository == 'mahfouzhassine8-ops/project-infinity' && github.event_name == 'push' && github.ref == 'refs/heads/work/infinity-exact69-forward-2103476-20261109' && startsWith(github.event.head_commit.message, 'Recover exact69 2103476:')
+    runs-on: ubuntu-22.04
+    permissions: {contents: read, actions: read}
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11'}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '21'}
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with: {packages: 'build-tools;35.0.0', log-accepted-android-sdk-licenses: false}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13631340281', run-id: '42514440156', github-token: '${{ github.token }}', path: exact69-source, merge-multiple: true}
+      - name: Prove exact protected 2103469 and metadata-only next version before private key access
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json,subprocess
+          from pathlib import Path
+          p=Path('repairs/infinity-exact69-forward-2103476')
+          req=json.loads((p/'REQUEST.json').read_text())
+          assert req == {'operation':'original69-functional-metadata-only-recovery','from_version':2103469,'to_version':2103476,'new_command_center':'0.3.5.74','user_data_reset':False,'tracking_changes':False,'dns_changes':False,'publication':False,'owner_delivery_requires_fold_test':True}
+          src=p/'exact69_recovery.py'
+          original=subprocess.check_output(['git','show','b8080537af332622594ad15ff8ee7aed94d63ed4:'+str(src)])
+          assert src.read_bytes()==original,'FROZEN_REPACKAGER_CHANGED'
+          signer=Path('repairs/infinity-final-closure-2103407/SignInfinityModules.java')
+          assert signer.read_bytes()==subprocess.check_output(['git','show','a76e29b84996304241e6b309d56a31e6659ad190:'+str(signer)]),'ORIGINAL_RSA_SIGNER_CHANGED'
+          public=Path('repairs/infinity-final-closure-2103407/ORIGINAL-INFINITY-PUBLIC-KEY.pem')
+          assert public.read_bytes()==subprocess.check_output(['git','show','a76e29b84996304241e6b309d56a31e6659ad190:'+str(public)]),'ORIGINAL_PUBLIC_KEY_CHANGED'
+          print('PASS_FROZEN_REPACKAGING_AND_ORIGINAL_SIGNING_CODE')
+          PY
+          python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out RECOVERY-SIGNER-ROUTES.json
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs exact69-source/Infinity-2103469-Combined-Original-Signer.apk > baseline-certificate.txt
+          grep -q 'certificate SHA-256 digest: d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' baseline-certificate.txt
+          python3 repairs/infinity-exact69-forward-2103476/exact69_recovery.py stage --source exact69-source/Infinity-2103469-Combined-Original-Signer.apk --out recovery-stage
+      - name: Original-module signature and original APK signature; metadata-only change
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          umask 077
+          key="$(mktemp)"
+          trap 'rm -f "$key"' EXIT
+          printf '%s' "$INFINITY_KEYSTORE_B64" | base64 -d > "$key"
+          javac -d "$RUNNER_TEMP" repairs/infinity-final-closure-2103407/SignInfinityModules.java
+          java -cp "$RUNNER_TEMP" SignInfinityModules "$key" recovery-stage/assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1
+          python3 repairs/infinity-exact69-forward-2103476/exact69_recovery.py assemble --source exact69-source/Infinity-2103469-Combined-Original-Signer.apk --staged recovery-stage --public-key repairs/infinity-final-closure-2103407/ORIGINAL-INFINITY-PUBLIC-KEY.pem --target recovery-unsigned.apk
+          "$ANDROID_HOME/build-tools/35.0.0/zipalign" -P 16 -f 4 recovery-unsigned.apk recovery-aligned.apk
+          mkdir -p recovery-signed
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" sign --ks "$key" --ks-key-alias "$INFINITY_KEY_ALIAS" --ks-pass env:INFINITY_STORE_PASSWORD --key-pass env:INFINITY_KEY_PASSWORD --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true --out recovery-signed/Infinity-2103476-Combined-Original-Signer.apk recovery-aligned.apk
+      - name: Verify actual signed APK original certificate and all original production members
+        run: |
+          set -euo pipefail
+          apk=recovery-signed/Infinity-2103476-Combined-Original-Signer.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs "$apk" > recovery-signed/SIGNATURE.txt
+          grep -q 'certificate SHA-256 digest: d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' recovery-signed/SIGNATURE.txt
+          "$ANDROID_HOME/build-tools/35.0.0/zipalign" -c -P 16 4 "$apk"
+          python3 repairs/infinity-exact69-forward-2103476/exact69_recovery.py verify --source exact69-source/Infinity-2103469-Combined-Original-Signer.apk --candidate "$apk" > recovery-signed/FILE-COMPARISON.json
+          sha256sum "$apk" > recovery-signed/SHA256SUMS
+          cp recovery-stage/PREPARATION.json recovery-signed/
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('recovery-signed')
+          r=json.loads((p/'FILE-COMPARISON.json').read_text())
+          assert r['passed'] is True and r['functional_source_members_identical'] is True and len(r['content_differences'])==5
+          (p/'RELEASE-STATUS.json').write_text(json.dumps({'versionCode':2103476,'functional_base':2103469,'Command_Center':'0.3.5.74','all_nonmetadata_APK_members_identical':True,'original_APK_signing_identity':True,'published_stable':False,'Fold_verified':False,'uninstall_or_data_wipe_required':False,'live_streaming_server_connectivity_unverified':True},indent=2)+'\n')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity2103476-Exact69-OriginalSigned-InternalRecovery-${{ github.run_id }}
+          path: recovery-signed/
+          if-no-files-found: error
+          retention-days: 90
+          compression-level: 6
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: Infinity2103476-Recovery-Signing-Failure-Evidence-${{ github.run_id }}
+          path: |
+            RECOVERY-SIGNER-ROUTES.json
+            recovery-stage/PREPARATION.json
+            baseline-certificate.txt
+          if-no-files-found: warn
+          retention-days: 30
+
+  retest-exact74-2103477:
+    name: Repackage exact signed 2103474 tracking candidate as 2103477; internal retest
+    if: github.repository == 'mahfouzhassine8-ops/project-infinity' && github.event_name == 'push' && github.ref == 'refs/heads/work/infinity-exact74-retest-2103477-20261109' && startsWith(github.event.head_commit.message, 'Retest exact74 2103477:')
+    runs-on: ubuntu-22.04
+    permissions: {contents: read, actions: read}
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11'}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '21'}
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with: {packages: 'build-tools;35.0.0', log-accepted-android-sdk-licenses: false}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13672253204', run-id: '42615752695', github-token: '${{ github.token }}', path: exact74-source, merge-multiple: true}
+      - name: Prove exact protected 2103474 and metadata-only next version before private key access
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib,json,subprocess
+          from pathlib import Path
+          p=Path('repairs/infinity-exact74-retest-2103477')
+          req=json.loads((p/'REQUEST.json').read_text())
+          assert req == {'operation':'original74-experimental-retest-metadata-only','from_version':2103474,'to_version':2103477,'new_command_center':'0.3.5.75','user_data_reset':False,'tracking_changes':False,'dns_changes':False,'publication':False,'owner_delivery_requires_fold_test':True}
+          src=p/'exact74_retest.py'
+          original=subprocess.check_output(['git','show','5d05fb65fcbcb15f30bf935a4b10142ae4b7f5b4:'+str(src)])
+          assert src.read_bytes()==original,'FROZEN_REPACKAGER_CHANGED'
+          signer=Path('repairs/infinity-final-closure-2103407/SignInfinityModules.java')
+          assert signer.read_bytes()==subprocess.check_output(['git','show','a76e29b84996304241e6b309d56a31e6659ad190:'+str(signer)]),'ORIGINAL_RSA_SIGNER_CHANGED'
+          public=Path('repairs/infinity-final-closure-2103407/ORIGINAL-INFINITY-PUBLIC-KEY.pem')
+          assert public.read_bytes()==subprocess.check_output(['git','show','a76e29b84996304241e6b309d56a31e6659ad190:'+str(public)]),'ORIGINAL_PUBLIC_KEY_CHANGED'
+          print('PASS_FROZEN_REPACKAGING_AND_ORIGINAL_SIGNING_CODE')
+          PY
+          python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out RECOVERY-SIGNER-ROUTES.json
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs exact74-source/Infinity-2103474-Combined-Original-Signer.apk > baseline-certificate.txt
+          grep -q 'certificate SHA-256 digest: d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' baseline-certificate.txt
+          python3 repairs/infinity-exact74-retest-2103477/exact74_retest.py stage --source exact74-source/Infinity-2103474-Combined-Original-Signer.apk --out retest-stage
+      - name: Original-module signature and original APK signature; metadata-only change
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          umask 077
+          key="$(mktemp)"
+          trap 'rm -f "$key"' EXIT
+          printf '%s' "$INFINITY_KEYSTORE_B64" | base64 -d > "$key"
+          javac -d "$RUNNER_TEMP" repairs/infinity-final-closure-2103407/SignInfinityModules.java
+          java -cp "$RUNNER_TEMP" SignInfinityModules "$key" retest-stage/assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1
+          python3 repairs/infinity-exact74-retest-2103477/exact74_retest.py assemble --source exact74-source/Infinity-2103474-Combined-Original-Signer.apk --staged retest-stage --public-key repairs/infinity-final-closure-2103407/ORIGINAL-INFINITY-PUBLIC-KEY.pem --target retest-unsigned.apk
+          "$ANDROID_HOME/build-tools/35.0.0/zipalign" -P 16 -f 4 retest-unsigned.apk retest-aligned.apk
+          mkdir -p retest-signed
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" sign --ks "$key" --ks-key-alias "$INFINITY_KEY_ALIAS" --ks-pass env:INFINITY_STORE_PASSWORD --key-pass env:INFINITY_KEY_PASSWORD --v1-signing-enabled true --v2-signing-enabled true --v3-signing-enabled true --out retest-signed/Infinity-2103477-Combined-Original-Signer.apk retest-aligned.apk
+      - name: Verify actual signed APK original certificate and all original production members
+        run: |
+          set -euo pipefail
+          apk=retest-signed/Infinity-2103477-Combined-Original-Signer.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs "$apk" > retest-signed/SIGNATURE.txt
+          grep -q 'certificate SHA-256 digest: d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' retest-signed/SIGNATURE.txt
+          "$ANDROID_HOME/build-tools/35.0.0/zipalign" -c -P 16 4 "$apk"
+          python3 repairs/infinity-exact74-retest-2103477/exact74_retest.py verify --source exact74-source/Infinity-2103474-Combined-Original-Signer.apk --candidate "$apk" > retest-signed/FILE-COMPARISON.json
+          sha256sum "$apk" > retest-signed/SHA256SUMS
+          cp retest-stage/PREPARATION.json retest-signed/
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('retest-signed')
+          r=json.loads((p/'FILE-COMPARISON.json').read_text())
+          assert r['passed'] is True and r['functional_source_members_identical'] is True and len(r['content_differences'])==5
+          (p/'RELEASE-STATUS.json').write_text(json.dumps({'versionCode':2103477,'retest_functional_source':2103474,'Command_Center':'0.3.5.75','all_nonmetadata_APK_members_identical':True,'original_APK_signing_identity':True,'published_stable':False,'Fold_verified':False,'uninstall_or_data_wipe_required':False,'live_streaming_server_connectivity_unverified':True},indent=2)+'\n')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity2103477-Exact74-OriginalSigned-ExperimentalRetest-${{ github.run_id }}
+          path: retest-signed/
+          if-no-files-found: error
+          retention-days: 90
+          compression-level: 6
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: Infinity2103477-Retest-Signing-Failure-Evidence-${{ github.run_id }}
+          path: |
+            RECOVERY-SIGNER-ROUTES.json
+            retest-stage/PREPARATION.json
+            baseline-certificate.txt
+          if-no-files-found: warn
+          retention-days: 30
+
+
+  verify-network-native:
+    name: Signed77 Infinity network policy real ARM64 compile and link; no APK or keys
+    if: github.event_name == 'workflow_dispatch' && github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/work/infinity-network-family-from-2103477-20261109' && inputs.operation == 'verify-network-native'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 420
+    env:
+      GH_TOKEN: '${{ github.token }}'
+      NDK_VER: '21.4.7075529'
+      DEPENDS: '${{ github.workspace }}/android-tools/xbmc-depends'
+      TARBALLS: '${{ github.workspace }}/android-tools/xbmc-tarballs'
+      BUILD_DIR: '${{ github.workspace }}/kodi-build'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with: {packages: 'platform-tools build-tools;35.0.0 platforms;android-34', log-accepted-android-sdk-licenses: false}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13274901825', run-id: '41726452356', merge-multiple: true, github-token: '${{ github.token }}', path: verified-inputs}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13571276665', run-id: '42364232328', merge-multiple: true, github-token: '${{ github.token }}', path: previous-review}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13595626273', run-id: '42425522122', merge-multiple: true, github-token: '${{ github.token }}', path: exact464}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13721668270', run-id: '42724088145', merge-multiple: true, github-token: '${{ github.token }}', path: signed77}
+      - name: Admit exact signed77 native foundation and scoped network sources
+        run: python3 repairs/infinity-network-family-2103477-20261110/compile_native.py prepare
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '11698374892', run-id: '38132105717', merge-multiple: true, github-token: '${{ github.token }}', path: dependency-transfer}
+      - name: Restore existing authenticated compiler dependencies
+        run: |
+          set -euo pipefail
+          sudo apt-get -o Acquire::Retries=3 update -qq
+          sudo apt-get install -y python3-yaml python3-dev libsqlite3-dev libssl-dev libffi-dev
+          (cd dependency-transfer && sha256sum -c SHA256SUMS)
+          tar --no-same-owner -xf dependency-transfer/verified-android-dependencies.tar
+          tar --no-same-owner -xf dependency-transfer/verified-compiler-cache.tar -C "$HOME"
+      - uses: actions/cache@v4
+        with: {path: /usr/local/lib/android/sdk/ndk/21.4.7075529, key: infinity-pinned-ndk-linux-21.4.7075529-v1}
+      - name: Restore unchanged original Android ARM64 toolchain
+        run: bash repairs/android-checkpoint-shutdown/install_ndk.sh
+      - name: Compile four selected production network translation units
+        run: python3 repairs/infinity-network-family-2103477-20261110/compile_native.py compile
+      - name: Link the complete native engine and verify original ABI preservation
+        run: python3 repairs/infinity-network-family-2103477-20261110/compile_native.py link
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity77-Network-Native-${{ github.run_id }}-INTERNAL-NOT-APK
+          path: |
+            network-native-evidence/*.json
+            network-native-evidence/*.txt
+            network-native-evidence/*.sh
+            network-native-evidence/libkodi.so
+          if-no-files-found: warn
+          retention-days: 90
+
+  prepare-network-modules:
+    name: Original-key network81 and forward80 modules from signed77; no APK or publication
+    if: github.event_name == 'workflow_dispatch' && github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/work/infinity-network-family-from-2103477-20261109' && inputs.operation == 'prepare-network-modules'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 25
+    env: {GH_TOKEN: '${{ github.token }}', PYTHONDONTWRITEBYTECODE: '1'}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '21'}
+      - name: Exact module-only authorization and frozen sources before importing preparation or accessing keys
+        run: |
+          python3 - <<'PYNET'
+          import hashlib,json,os,subprocess
+          from pathlib import Path
+          task=Path('repairs/infinity-network-family-2103477-20261110')
+          request=json.loads((task/'release/MODULE-PREPARE-REQUEST.json').read_text())
+          assert request['operation']=='prepare-original77-network81-forward80-modules'
+          assert request['APK'] is False and request['registry_mutation'] is False and request['publication'] is False
+          assert request['resolver']=='ORIGINAL_KODI_UNCHANGED'
+          assert request['DNS_contract_owner_approved'] is True
+          assert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()==os.environ['GITHUB_SHA']
+          assert not subprocess.check_output(['git','status','--porcelain','--untracked-files=no']).strip()
+          for name,wanted in request['source_bindings'].items():
+              p=Path(name);assert not p.is_absolute() and '..' not in p.parts and p.is_file()
+              assert hashlib.sha256(p.read_bytes()).hexdigest()==wanted,name
+          workflow=Path('.github/workflows/infinity-combined-release.yml')
+          assert hashlib.sha256(workflow.read_bytes()).hexdigest()==request['workflow_sha256']
+          before=subprocess.check_output(['git','show','b13996af:'+str(workflow)],text=True).rstrip()
+          expected=before.replace('sign-tracking, verify-network-native]','sign-tracking, verify-network-native, prepare-network-modules, prepare-network-release, sign-network]',1)
+          assert workflow.read_text().split('\n  prepare-network-modules:\n')[0].rstrip()==expected,'PRIOR_SIGNER_JOBS_CHANGED'
+          original=json.loads(subprocess.check_output(['git','show','dfee7205dd88abe81db5e263c368f67ece43df02:repairs/dual-experience-isolation-2103420/release-authority.json']))
+          for name,wanted in original['source_files'].items():
+              assert hashlib.sha256(Path(name).read_bytes()).hexdigest()==wanted,name
+          signer='repairs/infinity-final-closure-2103407/SignInfinityModules.java'
+          assert Path(signer).read_bytes()==subprocess.check_output(['git','show','a76e29b84996304241e6b309d56a31e6659ad190:'+signer])
+          pins=json.loads((task/'SOURCE-PINS.json').read_text())
+          compiled=json.loads(subprocess.check_output(['git','show','e9248b7813b5a0060e0e2aafab455ebbd1a2cdc5:'+str(task/'SOURCE-PINS.json')]))
+          assert pins['native']==compiled['native'],'VERIFIED_NATIVE_SOURCE_CHANGED'
+          for group,files in pins.items():
+              for name,wanted in files.items():
+                  assert hashlib.sha256((task/group/name).read_bytes()).hexdigest()==wanted,name
+          print('PASS exact reviewed module-only scope; original39 release tools and permanent signer unchanged; retained native compilation applicable')
+          PYNET
+          python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out NETWORK-SIGNER-ROUTES.json
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13721668270', run-id: '42724088145', github-token: '${{ github.token }}', path: network-baseline77, merge-multiple: true}
+      - name: Stage exact81 candidate and80 forward recovery with minimal version and integrity metadata
+        run: python3 repairs/infinity-network-family-2103477-20261110/release/prepare_modules.py --apk network-baseline77/Infinity-2103477-Combined-Original-Signer.apk --out network-module-prepared
+      - name: Original module signer after complete staged source readback
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PYREADBACK'
+          import hashlib,json,os
+          from pathlib import Path
+          prepared=json.loads(Path('network-module-prepared/PREPARATION.json').read_text())
+          request=json.loads(Path('repairs/infinity-network-family-2103477-20261110/release/MODULE-PREPARE-REQUEST.json').read_text())
+          for label in ('candidate','recovery'):
+              root=Path('network-module-prepared')/label
+              assert hashlib.sha256((root/'INPUTS.json').read_bytes()).hexdigest()==prepared['inputs'][label],'PREPARED_INPUT_BINDING_CHANGED'
+              pins=json.loads((root/'INPUTS.json').read_text())
+              assert pins['source_commit']==os.environ['GITHUB_SHA'],'UNEXPECTED_PREPARATION_SOURCE'
+              for key,wanted in request['expected_outputs'][label].items():
+                  assert pins[key]==wanted,'GENERATED_INPUT_DIFFERS_FROM_COMMITTED_REVIEW:'+key
+              actual={p.relative_to(root/'modules').as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in (root/'modules').rglob('*') if p.is_file()}
+              assert actual==pins['modules'],'STAGED_SOURCE_CHANGED_BEFORE_KEY_ACCESS'
+          PYREADBACK
+          umask 077
+          key="$(mktemp)"
+          trap 'rm -f "$key"' EXIT
+          printf '%s' "$INFINITY_KEYSTORE_B64" | base64 -d > "$key"
+          javac --release 8 -g:none -d "$RUNNER_TEMP" repairs/infinity-final-closure-2103407/SignInfinityModules.java
+          for label in candidate recovery; do
+            java -cp "$RUNNER_TEMP" SignInfinityModules "$key" "network-module-prepared/$label/modules/script.infinity.commandcenter/INFINITY-MODULES.v1"
+          done
+      - name: Original public-key verification and four affected real Java upgrade recovery cases
+        run: python3 repairs/infinity-network-family-2103477-20261110/release/verify_modules.py --prepared network-module-prepared --out network-module-audit
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-Network-OriginalSigned-Modules-${{ github.run_id }}-NOT-APK-NOT-INSTALLER
+          path: |
+            network-module-prepared/
+            network-module-audit/
+            NETWORK-SIGNER-ROUTES.json
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: Infinity-Network-Module-Preparation-Failure-${{ github.run_id }}
+          path: |
+            network-module-prepared/PREPARATION.json
+            network-module-prepared/*/INPUTS.json
+            NETWORK-SIGNER-ROUTES.json
+          retention-days: 90
+          if-no-files-found: warn
+
+  prepare-network-release:
+    name: Exact signed77 network and forward-recovery owner bundles; unsigned internal QA
+    if: github.event_name == 'workflow_dispatch' && github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/work/infinity-network-family-from-2103477-20261109' && inputs.operation == 'prepare-network-release'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    env: {GH_TOKEN: '${{ github.token }}', PYTHONDONTWRITEBYTECODE: '1'}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - name: Exact reviewed no-key preparation and current preserved native source before import
+        run: |
+          python3 - <<'PYAPK'
+          import hashlib,json,os,subprocess
+          from pathlib import Path
+          task=Path('repairs/infinity-network-family-2103477-20261110')
+          request=json.loads((task/'release/APK-PREPARE-REQUEST.json').read_text())
+          assert request['operation']=='prepare-signed77-network-forward-owner-bundles'
+          assert request['APK_signing'] is False and request['registry_mutation'] is False and request['publication'] is False
+          assert request['candidate_version']==2103478 and request['recovery_version']==2103479
+          assert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()==os.environ['GITHUB_SHA']
+          assert not subprocess.check_output(['git','status','--porcelain','--untracked-files=no']).strip()
+          assert hashlib.sha256(Path('.github/workflows/infinity-combined-release.yml').read_bytes()).hexdigest()==request['workflow_sha256']
+          for name,wanted in request['source_bindings'].items():
+              p=Path(name);assert not p.is_absolute() and '..' not in p.parts and p.is_file()
+              assert hashlib.sha256(p.read_bytes()).hexdigest()==wanted,name
+          original=json.loads(subprocess.check_output(['git','show','dfee7205dd88abe81db5e263c368f67ece43df02:repairs/dual-experience-isolation-2103420/release-authority.json']))
+          for name,wanted in original['source_files'].items():
+              assert hashlib.sha256(Path(name).read_bytes()).hexdigest()==wanted,name
+          pins=json.loads((task/'SOURCE-PINS.json').read_text())
+          for group,files in pins.items():
+              for name,wanted in files.items():
+                  assert hashlib.sha256((task/group/name).read_bytes()).hexdigest()==wanted,name
+          live=json.loads(subprocess.check_output(['gh','api','repos/mahfouzhassine8-ops/project-infinity/git/ref/heads/work/infinity-2103460-nine-corrections-20261106']))
+          assert live['object']['sha']=='dfee7205dd88abe81db5e263c368f67ece43df02','REGISTRY_ADVANCED_RECONCILE_BEFORE_PREPARATION'
+          print('PASS exact official unsigned preparation; source and authority anchors unchanged; no keys or application tests')
+          PYAPK
+      - name: Reuse authenticated original-workflow artifact intake; no source reconstruction from old APK
+        run: python3 repairs/infinity-network-family-2103477-20261110/release/intake.py --out network-release-inputs
+      - name: Preserve exact77 components and reuse existing linked engine; no Android/native compilation
+        run: |
+          python3 - <<'PYPREP'
+          import json,shutil,sys
+          from pathlib import Path
+          task=Path('repairs/infinity-network-family-2103477-20261110/release')
+          sys.path.insert(0,str(task))
+          import prepare_apk
+          record=json.loads(Path('network-release-inputs/INTAKE.json').read_text())
+          prepare_apk.prepare(Path(record['apk']),Path(record['native']),Path(record['module_fixture']),Path(record['components']),Path('network-apk-prepared'),2103478,2103479)
+          for version in (2103478,2103479):
+              work=Path('network-apk-prepared')/str(version)
+              shutil.copyfile(Path(record['module_fixture'])/'network-module-audit/MODULE-UPGRADE-RECOVERY.json',work/'MODULE-UPGRADE-RECOVERY.json')
+              shutil.copyfile('network-release-inputs/INTAKE.json',work/'OFFICIAL-INPUT-INTAKE.json')
+              for name in ('ARM64-LINK-VERIFIED.json','SOURCE-PRESERVATION.json'):
+                  shutil.copyfile(Path(record['native']).parent/name,work/name)
+          PYPREP
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity2103478-Network-Prepared-${{ github.run_id }}-INTERNAL-NOT-INSTALLER
+          path: |
+            network-apk-prepared/2103478/components/
+            network-apk-prepared/2103478/*.json
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity2103479-Network-Forward-Recovery-Prepared-${{ github.run_id }}-INTERNAL-NOT-INSTALLER
+          path: |
+            network-apk-prepared/2103479/components/
+            network-apk-prepared/2103479/*.json
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-Network-Preparation-Evidence-${{ github.run_id }}
+          path: |
+            network-release-inputs/INTAKE.json
+            network-apk-prepared/PAIR-PREPARATION.json
+          retention-days: 90
+          if-no-files-found: warn
+
+  sign-network:
+    name: Registered original-key network candidate or forward recovery; internal Android QA only
+    if: github.event_name == 'workflow_dispatch' && github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/work/infinity-2103460-nine-corrections-20261106' && inputs.operation == 'sign-network'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    env: {GH_TOKEN: '${{ github.token }}', PYTHONDONTWRITEBYTECODE: '1'}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '21'}
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with: {packages: 'build-tools;35.0.0', log-accepted-android-sdk-licenses: false}
+      - name: Exact registered owner payload and source-bound adapter admission before imports or keys
+        run: |
+          python3 - <<'PYSIGN'
+          import hashlib,json,os,subprocess
+          from pathlib import Path
+          task=Path('repairs/infinity-network-family-2103477-20261110/release')
+          request=json.loads((task/'SIGN-REQUEST.json').read_text())
+          registered=json.loads(Path('repairs/dual-experience-isolation-2103420/release-authority.json').read_text())
+          assert request['operation']=='sign-registered-network-internal-QA' and request['enabled'] is True
+          assert request['publication'] is False and request['owner_delivery_cleared'] is False
+          version=request['version'];assert type(version) is int and version in (2103478,2103479)
+          generation=60 if version==2103478 else 61
+          assert registered['candidate_versionCode']==version and registered['generation']==generation
+          assert registered['target_owners']==['INFINITY','CHOOSER_SHELL'] and registered['update_kind']=='owner_update'
+          assert registered['owner_update_evidence']['immutable_functional_base']==2103477
+          assert registered['owner_update_evidence']['resolver_helpers_or_replacement_included'] is False
+          assert registered['owner_update_evidence']['owner_delivery_cleared'] is False
+          assert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()==os.environ['GITHUB_SHA']
+          assert not subprocess.check_output(['git','status','--porcelain','--untracked-files=no']).strip()
+          expected=dict(request['source_bindings'])
+          required={str(task/name) for name in ('register_network.py','prepare_apk.py','prepare_modules.py','PREPARED-PAIR-PIN.json','INPUT-ARTIFACTS.json')}
+          if version==2103479:
+              required.add(str(task/'SIGNED-CANDIDATE-PIN.json'))
+          assert required <= set(expected)
+          for name,wanted in expected.items():
+              p=Path(name);assert not p.is_absolute() and '..' not in p.parts and p.is_file()
+              assert hashlib.sha256(p.read_bytes()).hexdigest()==wanted,name
+          expected[str(task/'SIGN-REQUEST.json')]=hashlib.sha256((task/'SIGN-REQUEST.json').read_bytes()).hexdigest()
+          assert registered['owner_update_evidence']['source_files']==expected
+          assert registered['workflow_sha256']==hashlib.sha256(Path('.github/workflows/infinity-combined-release.yml').read_bytes()).hexdigest()
+          for name,wanted in registered['source_files'].items():
+              assert hashlib.sha256(Path(name).read_bytes()).hexdigest()==wanted,name
+          with Path(os.environ['GITHUB_ENV']).open('a') as f:
+              f.write('NETWORK_VERSION='+str(version)+'\nNETWORK_GENERATION='+str(generation)+'\n')
+          print('PASS exact canonical generation; original release policy and owner adapter sources unchanged; internal QA only')
+          PYSIGN
+          python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out SIGNER-ROUTES.json
+      - name: Authenticate official prepared artifact and protected original signed77
+        run: |
+          python3 repairs/infinity-network-family-2103477-20261110/release/register_network.py download --version "$NETWORK_VERSION" --out network-reviewed
+          python3 repairs/infinity-network-family-2103477-20261110/release/register_network.py baseline --out network-original77
+          python3 repairs/infinity-network-family-2103477-20261110/release/register_network.py check --prepared network-reviewed/files --version "$NETWORK_VERSION" --out REGISTERED-NETWORK-PAYLOAD.json
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {run-id: '39867073954', name: Infinity-Receipt-Race-Android17-Investigation, github-token: '${{ github.token }}', path: tools}
+      - name: Original assembler and exact77 member preservation before permanent APK key access
+        run: |
+          python3 repairs/dual-experience-isolation-2103420/component_bundles.py combine --bundles network-reviewed/files/components --catalog network-reviewed/files/components/catalog.json --out combined-unsigned.apk --version "$NETWORK_VERSION"
+          python3 - <<'PYCOMPARE'
+          import json,os,sys
+          from pathlib import Path
+          sys.path.insert(0,'repairs/infinity-network-family-2103477-20261110/release')
+          import prepare_apk
+          proof=json.loads(Path('network-reviewed/files/PREPARATION.json').read_text())
+          assert prepare_apk.prep.sha(Path('combined-unsigned.apk').read_bytes())==proof['unsigned_sha256']
+          report=prepare_apk.compare(Path('network-original77/files/Infinity-2103477-Combined-Original-Signer.apk'),Path('combined-unsigned.apk'),proof)
+          prepare_apk.prep.save(Path('UNSIGNED-77-PRESERVATION.json'),report)
+          PYCOMPARE
+          python3 repairs/dual-experience-isolation-2103420/release_gate.py --apk combined-unsigned.apk --jars tools/receipt-evidence/tool-jars --work network-gate-dex --repository . --expected-head "$GITHUB_SHA" --expected-generation "$NETWORK_GENERATION" --out SIGNING-DECISION.json
+      - name: Unchanged permanent original APK signer after original owner and source gate
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: python3 repairs/dual-experience-isolation-2103420/assemble.py sign --apk combined-unsigned.apk --jars tools/receipt-evidence/tool-jars --work network-signer-dex --repository . --expected-head "$GITHUB_SHA" --expected-generation "$NETWORK_GENERATION" --sdk "$ANDROID_HOME/build-tools/35.0.0" --out network-original-signed
+      - name: Original-signed payload and baseline preservation; keep Android and owner acceptance pending
+        run: |
+          python3 - <<'PYFINAL'
+          import json,os,shutil,sys
+          from pathlib import Path
+          sys.path.insert(0,'repairs/infinity-network-family-2103477-20261110/release')
+          import prepare_apk
+          proof=json.loads(Path('network-reviewed/files/PREPARATION.json').read_text())
+          apk=Path('network-original-signed')/('Infinity-'+os.environ['NETWORK_VERSION']+'-Combined-Original-Signer.apk')
+          report=prepare_apk.compare(Path('network-original77/files/Infinity-2103477-Combined-Original-Signer.apk'),apk,proof)
+          prepare_apk.prep.save(Path('network-original-signed/SIGNED-77-PRESERVATION.json'),report)
+          for name in ('SIGNING-DECISION.json','REGISTERED-NETWORK-PAYLOAD.json','SIGNER-ROUTES.json','UNSIGNED-77-PRESERVATION.json'):
+              shutil.copyfile(name,Path('network-original-signed')/name)
+          for name in ('PREPARATION.json','MODULE-UPGRADE-RECOVERY.json','ARM64-LINK-VERIFIED.json'):
+              shutil.copyfile(Path('network-reviewed/files')/name,Path('network-original-signed')/name)
+          PYFINAL
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-Network-Original-Signed-${{ env.NETWORK_VERSION }}-${{ github.run_id }}-INTERNAL-QA-NOT-ACCEPTED
+          path: network-original-signed/
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: Infinity-Network-Signing-Failure-${{ github.run_id }}
+          path: |
+            SIGNING-DECISION.json
+            REGISTERED-NETWORK-PAYLOAD.json
+            SIGNER-ROUTES.json
+            UNSIGNED-77-PRESERVATION.json
+          retention-days: 90
+          if-no-files-found: warn

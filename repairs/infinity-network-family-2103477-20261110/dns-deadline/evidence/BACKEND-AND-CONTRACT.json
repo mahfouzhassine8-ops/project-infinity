@@ -1,0 +1,25 @@
+{
+  "protected_baseline": 2103477,
+  "native_sha256": "ee3be7c7a95b86f8357539001fcd50bedbd80217b02f130d649f7f57e6075794",
+  "backend": "THREADED_LIBC_GETADDRINFO_CONFIRMED_IN_ACTUAL_SIGNED77_ARM64_ELF",
+  "actual_Android_resolver_reproduction": "NOT_RUN",
+  "corrected_deadline_contract": {
+    "connect_and_resolver_cleanup_max_seconds": 2.25,
+    "total_caller_return_max_seconds": 3.75,
+    "configured_connect_seconds": 2.0,
+    "configured_total_seconds": 3.5,
+    "scheduling_tolerance_seconds": 0.25,
+    "observed_perform_return_seconds": 5.07744,
+    "observed_release_seconds": 3.7517e-05,
+    "observed_process_return_seconds": 5.084908553999412,
+    "result": "FAIL_RETAINED_BOTH_BOUNDS"
+  },
+  "production_changes_in_this_correction": "NONE_YET_FEASIBILITY_PROTOTYPE_ONLY",
+  "API_limitations": [
+    "Android asyncDNS APIs29+; binding getters31+",
+    "Raw DNS answer APIs are not equivalent to all libc hosts/search/DNS64 semantics",
+    "NDK query initiation and result consumption need genuine wall-clock proof"
+  ],
+  "new_prototype": "owned libc resolver child with atomicpidfd, cancellation+reaping; not integrated into curl or APK",
+  "Cobra_changes": false
+}

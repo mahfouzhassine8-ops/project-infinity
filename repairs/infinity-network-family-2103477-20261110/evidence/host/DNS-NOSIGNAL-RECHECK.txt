@@ -1,0 +1,14 @@
+test_dns_failure_is_bounded (__main__.Transport.test_dns_failure_is_bounded) ... FAIL
+
+======================================================================
+FAIL: test_dns_failure_is_bounded (__main__.Transport.test_dns_failure_is_bounded)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/infinity-network-family/repairs/infinity-network-family-2103477-20261110/test_network_family.py", line 193, in test_dns_failure_is_bounded
+    self.assertLess(row['elapsed'], 3.0)
+AssertionError: 5.07691 not less than 3.0
+
+----------------------------------------------------------------------
+Ran 1 test in 6.619s
+
+FAILED (failures=1)

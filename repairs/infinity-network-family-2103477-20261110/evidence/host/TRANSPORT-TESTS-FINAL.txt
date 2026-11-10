@@ -1,0 +1,51 @@
+test_auto_falls_back_after_ipv6_connection_refused (__main__.Transport.test_auto_falls_back_after_ipv6_connection_refused) ... ok
+test_auto_uses_working_ipv6 (__main__.Transport.test_auto_uses_working_ipv6) ... ok
+test_cancellation_stops_active_transfer (__main__.Transport.test_cancellation_stops_active_transfer) ... ok
+test_dns_failure_is_bounded (__main__.Transport.test_dns_failure_is_bounded) ... FAIL
+test_http_proxy_family_is_local_hop (__main__.Transport.test_http_proxy_family_is_local_hop) ... ok
+test_http_rejection_does_not_trigger_family_retry (__main__.Transport.test_http_rejection_does_not_trigger_family_retry) ... ok
+test_https_sni_and_host_verification (__main__.Transport.test_https_sni_and_host_verification) ... ----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 55674)
+ok
+test_only_mode_without_matching_address_fails (__main__.Transport.test_only_mode_without_matching_address_fails) ... Traceback (most recent call last):
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/socketserver.py", line 697, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/socketserver.py", line 766, in __init__
+    self.handle()
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/http/server.py", line 440, in handle
+    self.handle_one_request()
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/http/server.py", line 408, in handle_one_request
+    self.raw_requestline = self.rfile.readline(65537)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/socket.py", line 720, in readinto
+    return self._sock.recv_into(b)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/ssl.py", line 1267, in recv_into
+    return self.read(nbytes, buffer)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/ssl.py", line 1119, in read
+    return self._sslobj.read(len, buffer)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+ok
+test_opposite_numeric_literals_and_mapped_v6_rejected (__main__.Transport.test_opposite_numeric_literals_and_mapped_v6_rejected) ... ok
+test_pool_mode_change_preserves_cookies_and_reuses_same_mode (__main__.Transport.test_pool_mode_change_preserves_cookies_and_reuses_same_mode) ... ok
+test_redirect_cannot_escape_only_mode (__main__.Transport.test_redirect_cannot_escape_only_mode) ... ok
+test_v4_only_dual_stack (__main__.Transport.test_v4_only_dual_stack) ... ok
+test_v6_only_dual_stack (__main__.Transport.test_v6_only_dual_stack) ... ok
+
+======================================================================
+FAIL: test_dns_failure_is_bounded (__main__.Transport.test_dns_failure_is_bounded)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/infinity-network-family/repairs/infinity-network-family-2103477-20261110/test_network_family.py", line 193, in test_dns_failure_is_bounded
+    self.assertLess(row['elapsed'], 3.0)
+AssertionError: 5.03133 not less than 3.0
+
+----------------------------------------------------------------------
+Ran 13 tests in 6.389s
+
+FAILED (failures=1)

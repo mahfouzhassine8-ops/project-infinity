@@ -1,0 +1,24 @@
+test_dns_failure_is_bounded (__main__.Transport.test_dns_failure_is_bounded) ... 
+  test_dns_failure_is_bounded (__main__.Transport.test_dns_failure_is_bounded) (deadline='connection_and_resolver_cleanup') ... FAIL
+  test_dns_failure_is_bounded (__main__.Transport.test_dns_failure_is_bounded) (deadline='total_caller_return') ... FAIL
+
+======================================================================
+FAIL: test_dns_failure_is_bounded (__main__.Transport.test_dns_failure_is_bounded) (deadline='connection_and_resolver_cleanup')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/infinity-network-family/repairs/infinity-network-family-2103477-20261110/test_network_family.py", line 205, in test_dns_failure_is_bounded
+    self.assertLessEqual(row['elapsed'],
+AssertionError: 5.07747 not less than or equal to 2.25 : {'mode': 0, 'result': 28, 'family': 0, 'elapsed': 5.07747, 'cookie': False, 'curl_reported_seconds': 5.07719, 'perform_return_seconds': 5.07744, 'release_seconds': 3.7517e-05, 'fresh': True, 'process_wall_seconds': 5.084908553999412}
+
+======================================================================
+FAIL: test_dns_failure_is_bounded (__main__.Transport.test_dns_failure_is_bounded) (deadline='total_caller_return')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/infinity-network-family/repairs/infinity-network-family-2103477-20261110/test_network_family.py", line 208, in test_dns_failure_is_bounded
+    self.assertLessEqual(row['process_wall_seconds'],
+AssertionError: 5.084908553999412 not less than or equal to 3.75 : {'mode': 0, 'result': 28, 'family': 0, 'elapsed': 5.07747, 'cookie': False, 'curl_reported_seconds': 5.07719, 'perform_return_seconds': 5.07744, 'release_seconds': 3.7517e-05, 'fresh': True, 'process_wall_seconds': 5.084908553999412}
+
+----------------------------------------------------------------------
+Ran 1 test in 6.565s
+
+FAILED (failures=2)

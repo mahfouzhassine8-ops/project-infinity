@@ -1,0 +1,37 @@
+{
+  "baseline": 2103477,
+  "cobra_boundary": "A Kodi-global setting does not by itself prove a CobraJava effect. Prove nativeengineownership/isolation before code; never change CobraJava/network/settings or process-wide resolver/socket policy.",
+  "findings": [
+    {
+      "existing": "m_curlDisableIPV6 sets CURL_IPRESOLVE_V4 at638-639; no existing per-requestIPv6Only control.",
+      "feasible": "New per-easy-handle mode snapshot, V4/V6/WHATEVER and boundedlibcurlHappyEyeballs; ownership, DNS cache pinning, pool reuse and cancellation must be handled and tested before claim of enforcement.",
+      "functions": "CCurlFile::SetCommonOptions and URL option handling",
+      "path": "xbmc/filesystem/CurlFile.cpp",
+      "source_sha256": "87fc256ad172a2dbc0f860cca0f7f7248e59df81e8b9ab3d1211225f39fb2f1d"
+    },
+    {
+      "path": "xbmc/network/DNSNameCache.cpp and xbmc/filesystem/DllLibCurl.cpp",
+      "risk": "First-address DNS cache and host/protocol connection reuse can defeat a new mode unless specifically accounted for; no global purge or active playback termination."
+    },
+    {
+      "existing": "AF_UNIX coordination107/545; provider work delegated via Files.GetDirectory. ChangingCCsetting cannot enforce provider sockets.",
+      "path": "actual77 assets/addons/script.infinity.commandcenter/infinity_search.py"
+    },
+    {
+      "existing": "Own requests.Session and GET/POST HTTP client; independent of Kodi libcurl. Historical source evidence, no new Foldinstalledsource collection.",
+      "path": "reviewed WatchNixtoons2 0.14.24 lib/network.py",
+      "support": "NOT_ENFORCED_BY_CURL_ONLY_POLICY; no claim this feature fixes historical embed-host timeout."
+    },
+    {
+      "path": "FFmpeg direct avformat and independent inputstream addons",
+      "support": "NOT_PROVEN_COVERED_BY_CURL_ONLY_POLICY"
+    }
+  ],
+  "native_engine_sha256": "ee3be7c7a95b86f8357539001fcd50bedbd80217b02f130d649f7f57e6075794",
+  "production_changes": 0,
+  "read_only": true,
+  "reviewer": "GPT-6.1",
+  "runtime_checks": "NOT_RUN",
+  "scope": "Brief allows honest owned-transport coverage and explicit unsupported independent clients; no universal provider guarantee.",
+  "status": "PRE_IMPLEMENTATION_SOURCE_FINDINGS_ONLY"
+}

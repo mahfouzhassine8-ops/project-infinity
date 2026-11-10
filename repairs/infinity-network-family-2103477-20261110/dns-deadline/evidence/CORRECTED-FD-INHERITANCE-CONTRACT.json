@@ -1,0 +1,18 @@
+{
+  "scope": "Descriptor inheritance and lifecycle correction only; timeout/cancel acceptance bounds unchanged.",
+  "old_proxy": "All post-exec extraFDs==0. Incorrectly includes runtime-created descriptors as inheritance.",
+  "replacement_requirements": [
+    "Atomic CLONE_PIDFD child identity with CLONE_FILES absent.",
+    "Raw child closes inherited descriptors; independent complete versioned preexecFD attestation must equal0 except intended0/1/2.",
+    "No SCM_RIGHTS or other post-attestation caller-FD transfer.",
+    "Helper has no descendant-spawn/delegated owned background path.",
+    "Child termination and waitid reaping confirmed, no kill/wait failure accepted asAnswer.",
+    "Parent closes channel/pidfd/nullFD and releases slot before return.",
+    "Retain runtime postexecFD counts and sanitized categories; never close/whitelist unexplained descriptors.",
+    "Record all10 completed lookups and parent FD/thread/child/RSS observations; no universal leak-freedom claim."
+  ],
+  "Astra_review": "Post-execFDzero is stronger than actual preservation invariant. Kernel closes child-owned runtimeFDs at confirmed exit; complete preexec0 and cleanup establish inheritance/lifecycle. Unexplained parent growth or surviving children remain blockers.",
+  "ARM_extraFD_attribution": "Created after preexec attestation and observed before DNS, categorymemfd. Exact creator unknown, not claimed bridge-owned.",
+  "production_activation": false,
+  "next_selected_test": "ARM64 ten completed lookups resources only; retain previous validdeadline/cancel/x86 evidence."
+}

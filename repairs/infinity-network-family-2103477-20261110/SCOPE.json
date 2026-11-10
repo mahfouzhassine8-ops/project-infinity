@@ -1,0 +1,42 @@
+{
+  "Cobra_changes": false,
+  "application_tests": "Only explicitly selectednetworkfeaturetests. Notrunbycompilejob.",
+  "authorization": "Owner NETWORK CONNECTIONS IMPLEMENTATION & END-TO-END VERIFICATION instruction2026-11-10",
+  "baseline_APK_sha256": "93eb081cd6a86ff9cf1cb9aa75bc6d9087cd9c982fb46e0a9baa12c12aa9af22",
+  "baseline_receipt": "handoffs/infinity-network-family-20261109/BASELINE-VERIFICATION.json",
+  "baseline_source_checkpoint": "daf205b5",
+  "baseline_versionCode": 2103477,
+  "branch": "work/infinity-network-family-from-2103477-20261109",
+  "native_scope": [
+    "xbmc/filesystem/CurlFile.cpp",
+    "xbmc/filesystem/CurlFile.h",
+    "xbmc/filesystem/DllLibCurl.cpp",
+    "xbmc/filesystem/DllLibCurl.h",
+    "xbmc/filesystem/InfinityNetworkFamily.h",
+    "xbmc/network/DNSNameCache.cpp",
+    "xbmc/network/DNSNameCache.h",
+    "xbmc/settings/AdvancedSettings.cpp"
+  ],
+  "required_upgrade_metadata": {
+    "candidate_CC": "0.3.5.76",
+    "candidate_skin": "1.0.5.271",
+    "functional_foundation": "Approved2103477/CC75/Skin270; no unrelated function or layout changes.",
+    "protected_hash_entries_only": [
+      "unified/Custom_1191_InfinitySystemHub.xml",
+      "addon.xml",
+      "infinity-skin.json"
+    ],
+    "reason": "Existing original module anti-downgrade and Kodi normal user/system skin version selection; preserve guards.",
+    "recovery_CC": "0.3.5.77",
+    "recovery_skin": "1.0.5.272",
+    "skin_metadata_only": [
+      "addon.xml",
+      "infinity-skin.json",
+      "Infinity-Protected-Manifest.json"
+    ]
+  },
+  "shutdown_tests": false,
+  "signing": "DISABLED_PENDING_VERSION_REGISTRY_AND_ENGINEERING_GATES",
+  "source_scope_note": "DNS provenance retainsmanualhost/WSDoverrides; nativeprivatepoolmode metadata preservescookies; no provider/socketglobal/JVM edits.",
+  "versionCode": "UNRESERVED"
+}

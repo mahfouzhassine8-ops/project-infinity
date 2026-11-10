@@ -1,0 +1,17 @@
+{
+  "transport": "12PASS_1FAIL_DNS_DEADLINE",
+  "settings_contracts": "7PASS",
+  "DNS_deadline_failure": {
+    "configured_connect_ms": 2000,
+    "configured_total_ms": 3500,
+    "observed_seconds": 5.03133,
+    "curl_code": 28,
+    "finding": "Host resolver deadline overrun; retained asFAIL until exactAndroidcurlbehavior is established.",
+    "production_fix": "NOT_SPECULATED"
+  },
+  "host_curl_pkgconfig": "8.14.1",
+  "actual_production_header_and_pool_compiled": true,
+  "Android": "NOT_RUN",
+  "Fold": "NOT_RUN",
+  "shutdown_tests": false
+}

@@ -1,0 +1,45 @@
+{
+  "APK": false,
+  "application_tests": false,
+  "baseline_APK_sha256": "93eb081cd6a86ff9cf1cb9aa75bc6d9087cd9c982fb46e0a9baa12c12aa9af22",
+  "baseline_engine_sha256": "ee3be7c7a95b86f8357539001fcd50bedbd80217b02f130d649f7f57e6075794",
+  "baseline_versionCode": 2103477,
+  "native_delta": {
+    "xbmc/filesystem/CurlFile.cpp": {
+      "after": "eb0867b77f94a01e400c5e24a16468a13d17a8ad4e8fb9b2aca05ad2bc26c8d7",
+      "before": "87fc256ad172a2dbc0f860cca0f7f7248e59df81e8b9ab3d1211225f39fb2f1d"
+    },
+    "xbmc/filesystem/CurlFile.h": {
+      "after": "4c3dd2c42ba896c0fa8f03aa98f5bcb4e89635fce7d87d312057bbc5377a0bd1",
+      "before": "a0da5663fb84ce1ca9d927d8470a4ac06ca076db7d8d164c5e1d7779660390a8"
+    },
+    "xbmc/filesystem/DllLibCurl.cpp": {
+      "after": "5f06c29476df48b873d86425685fd7a41ad1a970a90225ed4184447eab8d9a70",
+      "before": "e3af5f8466ca0be19286321670d42a883facb83fac1cfe65c0a79b7cd554404b"
+    },
+    "xbmc/filesystem/DllLibCurl.h": {
+      "after": "bfda194481f32be8c159b45576d549df56c823d7b9f74ff096b2e175762a6000",
+      "before": "f3c9eb094b9e3e2b65bf1fa683d9362f0421e883ea5ed316122b351a5ddc0f5b"
+    },
+    "xbmc/filesystem/InfinityNetworkFamily.h": {
+      "after": "d98c00131f3cec787c05c35441600fe1c878f87dfaa0b556edaafdbc75bb4e70",
+      "before": null
+    },
+    "xbmc/network/DNSNameCache.cpp": {
+      "after": "fc2201e47b8e4d53338e5d5044aa3ce87dd45b565d3483bc6ed1018ef13683fc",
+      "before": "a76e211323f0af695f989f6851368ed4c504861847ed49fb8a96cab1769c54c1"
+    },
+    "xbmc/network/DNSNameCache.h": {
+      "after": "8a3128c349a7c9760207f5a4247f94df94de60bd9e0f1965abfe17ef7dfa1107",
+      "before": "43fa74439f797f5009732d505a62235dc9dd8ae038267bf0f4b50e554630e487"
+    },
+    "xbmc/settings/AdvancedSettings.cpp": {
+      "after": "169f7c3d56674106b294eddee8ab2562458414cb3dc4756ced2599067eef9f9d",
+      "before": "bb81b403138727783fe1855a619a19be9f9814823fcb8ce0956c803eb9fdcd43"
+    }
+  },
+  "shutdown_tests": false,
+  "signing": false,
+  "source_commit": "e9248b7813b5a0060e0e2aafab455ebbd1a2cdc5",
+  "unchanged_native_source_count": 9404
+}

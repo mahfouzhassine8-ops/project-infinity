@@ -1,0 +1,32 @@
+{
+  "Fold_acceptance": "NOT_RUN",
+  "Infinity_or_Cobra_app_tests": "NOT_RUN",
+  "production_curl_integration": "NOT_IMPLEMENTED",
+  "resources_only": true,
+  "status": "INCOMPLETE_OR_FAIL",
+  "variants": {
+    "arm64-v8a": {
+      "failures": [
+        "completed_lookup_resources:OUTCOME",
+        "completed_lookup_resources:NO_ADDRESS",
+        "completed_lookup_resources:REMAINING_CHILD",
+        "completed_lookup_resources:INCOMPLETE_LOOKUP",
+        "completed_lookup_resources:REMAINING_CHILD",
+        "completed_lookup_resources:REMAINING_CHILD",
+        "completed_lookup_resources:NO_ADDRESS",
+        "completed_lookup_resources:REMAINING_CHILD",
+        "completed_lookup_resources:REMAINING_CHILD",
+        "completed_lookup_resources:REMAINING_CHILD",
+        "completed_lookup_resources:REMAINING_CHILD",
+        "completed_lookup_resources:REMAINING_CHILD",
+        "completed_lookup_resources:REMAINING_CHILD",
+        "completed_lookup_resources:OUTCOME",
+        "completed_lookup_resources:NO_ADDRESS",
+        "completed_lookup_resources:REMAINING_CHILD",
+        "completed_lookup_resources:INCOMPLETE_LOOKUP"
+      ],
+      "package": "com.projectinfinity.dnsprobe.arm64",
+      "status": "FAIL"
+    }
+  }
+}

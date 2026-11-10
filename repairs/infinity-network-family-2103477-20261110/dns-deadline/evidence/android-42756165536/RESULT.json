@@ -1,0 +1,23 @@
+{
+  "Fold_acceptance": "NOT_RUN",
+  "Infinity_or_Cobra_app_tests": "NOT_RUN",
+  "production_curl_integration": "NOT_IMPLEMENTED",
+  "status": "INCOMPLETE_OR_FAIL",
+  "variants": {
+    "arm64-v8a": {
+      "failures": [
+        "normal:OUTCOME",
+        "normal:FD_INHERITANCE",
+        "explicit_binding:OUTCOME",
+        "explicit_binding:FD_INHERITANCE"
+      ],
+      "package": "com.projectinfinity.dnsprobe.arm64",
+      "status": "FAIL"
+    },
+    "x86_64": {
+      "failures": [],
+      "package": "com.projectinfinity.dnsprobe.x86",
+      "status": "PASS_ISOLATED_ANDROID_FEASIBILITY"
+    }
+  }
+}
