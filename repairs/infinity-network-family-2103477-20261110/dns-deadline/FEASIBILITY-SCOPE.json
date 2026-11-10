@@ -4,10 +4,15 @@
   "Infinity_or_Cobra_APK_built_or_installed": false,
   "authorization": "Owner DNS-DEADLINE-CORRECTION-HANDOFF78be3d13 plus current executiondirective",
   "base": "78be3d13",
+  "current_selected_Android_test": "ARM64_TEN_COMPLETED_LOOKUPS_RESOURCE_OBSERVATIONS_ONLY",
+  "executed_packages": [
+    "com.projectinfinity.dnsprobe.arm64"
+  ],
   "narrow_correction_since_c19e6506": [
     "raw child LP64 signal/time syscall boundary",
     "fixture stalls either network selection path",
-    "preexec FD closure attestation and postexec sanitized diagnostics; no descriptor acceptance weakened"
+    "preexec FD closure attestation and postexec sanitized diagnostics; no descriptor acceptance weakened",
+    "Inheritance checked before exec; runtimeFD observations retained and closed by confirmed childexit, no descriptor whitelist or forced closure."
   ],
   "owner_data_access": false,
   "phase": "ISOLATED_RESOLVER_FEASIBILITY_NOT_PRODUCTION_ACTIVATION",
@@ -15,6 +20,7 @@
   "production_curl_DNS_gate": "STILL_FAIL_UNTIL_INTEGRATED_AND_VERIFIED",
   "production_network_implementation": "ddf6b078",
   "protected_APK": 2103477,
+  "retained_Android_evidence": 42756165536,
   "selected_tests": [
     "Actualsigned77ELFresolverbackendidentification",
     "Correctedconnect2s+.25andtotal3.5s+.25caller-returncontracts",
@@ -25,11 +31,11 @@
   "shutdown_tests": false,
   "source_files": {
     "android-probe/AndroidManifest.xml": "447419e8ac989e517d3030d173bda4659014d1f70b61d6a016cf1a6bf38e638f",
-    "android-probe/ProbeActivity.java": "4f06378c0b1172dbe5d3c1058552fc79c7885a6566b6e08bf150122effc47687",
-    "android-probe/android_probe.py": "d2131b46f3ed3965fe6de878224f5986c3081332b884536c056f0090ee41a0a5",
-    "android-probe/jni_probe.cpp": "93c68038a245b194053711c51a9bbd1940cb1ab54d86abb5e3e21cf89e820d51",
+    "android-probe/ProbeActivity.java": "458e7232977c2d4aafa1c04e1716cfb4b8b499ee9683b7a1ef1f46ee3cdb0cc3",
+    "android-probe/android_probe.py": "bf8cd12914ede7c932f53ddf0c531d1cefa6cce8a19bd06f79e005608e61314b",
+    "android-probe/jni_probe.cpp": "195fae7ca333ea2f2ba4057ed4838d91b27542da00e61fb64a66c7f24cc587a5",
     "prototype/helper.c": "b51f70da1fd621c3674dfdf8fa3896416de6d68b0af500cd5a3aa536debd3d59",
-    "prototype/owned_lookup.cpp": "008a0c9ac15a04bf23d110ea05bc5a8bc7e10ecffcf3122f4da4fce1ff0a2ffb",
+    "prototype/owned_lookup.cpp": "da815c300b81e74b0532f4761de12e67689d3793e9bf40088c9d6bab82b9007d",
     "prototype/owned_lookup.h": "02d28edd58219830abdb088b12ee8a34cb2ea5947cf74f5a954228a30a18ab3c",
     "prototype/probe.cpp": "358a7a062418fef2b56da98d92ac15e7572b0137c50b067ca045f6a8232ee3bf",
     "prototype/stalled_helper.c": "2115a412dee68b3f9fd05dd8cbf72a41fe4e1fff13838c8c54fd48d4a755daa6",

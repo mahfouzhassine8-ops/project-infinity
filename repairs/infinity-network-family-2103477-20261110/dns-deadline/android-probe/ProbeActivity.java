@@ -31,24 +31,30 @@ public final class ProbeActivity extends Activity {
         report.put("helper_executable", new File(helper).canExecute());
         report.put("helper_writable", new File(helper).canWrite());
         report.put("scope", "Isolated DNS helper feasibility; no Infinity or Cobra installation");
-        JSONArray normal = new JSONArray(runNative(helper, -1, 1));
-        report.put("normal", normal);
-        // Retain strict host acceptance. Collect remaining diagnostics after a
-        // fully reaped invalid reply; do not hide other cases behind that result.
-        if (normal.length() == 0 || normal.getJSONObject(0).getInt("wait_error") != 0 ||
-            normal.getJSONObject(0).getInt("outcome") == 3)
-          throw new IllegalStateException("NATIVE_CAPABILITY_OR_OWNERSHIP_FAILED");
-        ConnectivityManager connectivity = getSystemService(ConnectivityManager.class);
-        Network network = connectivity.getActiveNetwork();
-        boolean bound = network != null && connectivity.bindProcessToNetwork(network);
-        report.put("bound_probe_process", bound);
-        try {
-          if (bound) report.put("explicit_binding", new JSONArray(runNative(helper, -1, 1)));
-        } finally { connectivity.bindProcessToNetwork(null); }
-        report.put("deadline", new JSONArray(runNative(stalled, -1, 1)));
-        report.put("cancel", new JSONArray(runNative(stalled, 150, 1)));
-        report.put("repeated_cancel", new JSONArray(runNative(stalled, 10, 25)));
-        report.put("missing_helper", new JSONArray(runNative(base + "/missing-helper", -1, 1)));
+        boolean resourceOnly = getIntent().getBooleanExtra("resource_only", false);
+        report.put("resource_only", resourceOnly);
+        if (resourceOnly) {
+          report.put("completed_lookup_resources", new JSONArray(runNative(helper, -1, 10)));
+        } else {
+          JSONArray normal = new JSONArray(runNative(helper, -1, 1));
+          report.put("normal", normal);
+          // Retain strict host acceptance. Collect remaining diagnostics after a
+          // fully reaped invalid reply; do not hide other cases behind that result.
+          if (normal.length() == 0 || normal.getJSONObject(0).getInt("wait_error") != 0 ||
+              normal.getJSONObject(0).getInt("outcome") == 3)
+            throw new IllegalStateException("NATIVE_CAPABILITY_OR_OWNERSHIP_FAILED");
+          ConnectivityManager connectivity = getSystemService(ConnectivityManager.class);
+          Network network = connectivity.getActiveNetwork();
+          boolean bound = network != null && connectivity.bindProcessToNetwork(network);
+          report.put("bound_probe_process", bound);
+          try {
+            if (bound) report.put("explicit_binding", new JSONArray(runNative(helper, -1, 1)));
+          } finally { connectivity.bindProcessToNetwork(null); }
+          report.put("deadline", new JSONArray(runNative(stalled, -1, 1)));
+          report.put("cancel", new JSONArray(runNative(stalled, 150, 1)));
+          report.put("repeated_cancel", new JSONArray(runNative(stalled, 10, 25)));
+          report.put("missing_helper", new JSONArray(runNative(base + "/missing-helper", -1, 1)));
+        }
         report.put("status", "EXECUTED_REQUIRES_HOST_ASSERTIONS");
       } catch (Throwable error) {
         try {

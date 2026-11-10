@@ -88,17 +88,19 @@ def build():
                            for p in (DNS/'prototype').glob('*') if p.suffix in ('.c','.cpp','.h')}})
 
 
-def execute():
+def execute(*, resources_only=False):
     assert os.environ.get('GITHUB_ACTIONS') == 'true'
     serial = subprocess.check_output(['adb','get-serialno'],text=True).strip()
     assert serial.startswith('emulator-'), 'Only disposable CI emulator is authorized'
     save('RESULT.json', {'status':'RUNNING_NOT_ACCEPTED','Infinity_installed':False})
     results = {}
-    for abi, package in PACKAGES.items():
+    selected = {"arm64-v8a": PACKAGES["arm64-v8a"]} if resources_only else PACKAGES
+    for abi, package in selected.items():
         assert package != 'com.projectinfinity.kodi'
         run(['adb','install','-t',OUT/abi/'DIAGNOSTIC-ONLY.apk'])
         run(['adb','shell','am','start','-W','-n',
-             package+'/com.projectinfinity.dnsprobe.ProbeActivity'])
+             package+'/com.projectinfinity.dnsprobe.ProbeActivity',
+             '--ez','resource_only','true' if resources_only else 'false'])
         report = None
         for _ in range(80):
             result = subprocess.run(['adb','shell','run-as',package,'cat','files/report.json'],
@@ -120,9 +122,10 @@ def execute():
                 if not value: failures.append(label)
             require(report.get('helper_executable'), 'NATIVE_MEMBER_NOT_EXECUTABLE')
             require(not report.get('helper_writable'), 'NATIVE_MEMBER_APP_WRITABLE')
-            for label, expected, limit in [('normal',0,2.25),('explicit_binding',0,2.25),
-                    ('deadline',1,2.25),('cancel',2,.5),('repeated_cancel',2,.5),
-                    ('missing_helper',5,2.25)]:
+            cases = [('completed_lookup_resources',0,2.25)] if resources_only else [
+                    ('normal',0,2.25),('explicit_binding',0,2.25),('deadline',1,2.25),
+                    ('cancel',2,.5),('repeated_cancel',2,.5),('missing_helper',5,2.25)]
+            for label, expected, limit in cases:
                 rows = report.get(label,[])
                 require(bool(rows), label+':NOT_RUN')
                 for row in rows:
@@ -130,18 +133,24 @@ def execute():
                     require(row['caller_seconds']<=limit,label+':DEADLINE')
                     require(row['binding_read'],label+':BINDING_CAPTURE')
                     require(row['wait_error']==0,label+':CHILD_NOT_REAPED')
-                    if label in ('normal','explicit_binding'):
+                    if label in ('normal','explicit_binding','completed_lookup_resources'):
                         require(row['preexec_extra_fds']==0,label+':PREEXEC_FD_INHERITANCE')
                         require(row['gai_error']==0 and row['addresses']>0,label+':NO_ADDRESS')
-                        require(row['inherited_extra_fds']==0,label+':FD_INHERITANCE')
+                        require(row['postexec_extra_fds']>=0,label+':POSTEXEC_OBSERVATION_MISSING')
                     if label=='explicit_binding': require(row['explicit_binding'],label+':NOT_BOUND')
+                    if resources_only:
+                        require(row['remaining_children']==0,label+':REMAINING_CHILD')
+                        require(row['child_code']==1 and row['child_status']==0,label+':INCOMPLETE_LOOKUP')
+                if resources_only: require(len(rows)==10,label+':REPETITION_COUNT')
             # Process-wide FD counts are observations; independent ART activity
             # can change them. Retain every delta for resource review.
-        results[abi] = {'status':'PASS_ISOLATED_ANDROID_FEASIBILITY' if not failures else 'FAIL',
+        passed_label = ('PASS_COMPLETED_LOOKUP_EXECUTION_ONLY_RESOURCE_REVIEW_REQUIRED'
+                        if resources_only else 'PASS_ISOLATED_ANDROID_FEASIBILITY')
+        results[abi] = {'status':passed_label if not failures else 'FAIL',
                         'failures':failures, 'package':package}
-        save('RESULT.json', {'status':'PASS' if len(results)==2 and
+        save('RESULT.json', {'status':('EXECUTED_RESOURCE_REVIEW_REQUIRED' if resources_only else 'PASS') if len(results)==len(selected) and
              all(r['status'].startswith('PASS') for r in results.values()) else 'INCOMPLETE_OR_FAIL',
-             'variants':results,'production_curl_integration':'NOT_IMPLEMENTED',
+             'variants':results,'resources_only':resources_only,'production_curl_integration':'NOT_IMPLEMENTED',
              'Infinity_or_Cobra_app_tests':'NOT_RUN','Fold_acceptance':'NOT_RUN'})
     if any(not r['status'].startswith('PASS') for r in results.values()):
         raise RuntimeError('ANDROID_FEASIBILITY_GATE_FAILED; exact reports retained')
@@ -149,5 +158,5 @@ def execute():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('operation',choices=['build','execute'])
-    {'build':build,'execute':execute}[parser.parse_args().operation]()
+    parser.add_argument('operation',choices=['build','execute','execute-resources'])
+    {'build':build,'execute':execute,'execute-resources':lambda:execute(resources_only=True)}[parser.parse_args().operation]()

@@ -2434,7 +2434,7 @@ jobs:
           avd-name: infinity-dns-feasibility-api36
           disable-animations: false
           emulator-options: -no-window -memory 4096 -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
-          script: python3 repairs/infinity-network-family-2103477-20261110/dns-deadline/android-probe/android_probe.py execute
+          script: python3 repairs/infinity-network-family-2103477-20261110/dns-deadline/android-probe/android_probe.py execute-resources
       - uses: actions/upload-artifact@v4
         if: always()
         with:

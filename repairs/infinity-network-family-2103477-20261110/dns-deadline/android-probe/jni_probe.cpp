@@ -8,6 +8,30 @@
 #include <thread>
 #include <unistd.h>
 #include <dirent.h>
+#include <fstream>
+#include <sys/resource.h>
+#include <sys/syscall.h>
+
+static int RemainingChildren()
+{
+  std::ifstream in("/proc/self/task/" + std::to_string(syscall(SYS_gettid)) + "/children");
+  if (!in) return -1;
+  int count = 0;
+  std::string child;
+  while (in >> child) ++count;
+  return count;
+}
+
+static int ThreadCount()
+{
+  DIR* dir = opendir("/proc/self/task");
+  if (!dir) return -1;
+  int count = 0;
+  while (auto* entry = readdir(dir))
+    if (entry->d_name[0] != '.') ++count;
+  closedir(dir);
+  return count;
+}
 
 static unsigned FdCount()
 {
@@ -53,11 +77,13 @@ Java_com_projectinfinity_dnsprobe_ProbeActivity_runNative(JNIEnv* env, jclass,
     double wall = std::chrono::duration<double>(std::chrono::steady_clock::now()-begin).count();
     if (cancellation.joinable()) cancellation.join();
     const unsigned finalFds = FdCount();
+    rusage usage{};
+    const bool memoryRead = getrusage(RUSAGE_SELF, &usage) == 0;
     out << "{\"outcome\":" << static_cast<int>(result.outcome)
         << ",\"gai_error\":" << result.reply.gai_error
         << ",\"system_errno\":" << result.reply.system_errno
         << ",\"addresses\":" << result.reply.count
-        << ",\"inherited_extra_fds\":" << result.reply.extra_fds
+        << ",\"postexec_extra_fds\":" << result.reply.extra_fds
         << ",\"preexec_extra_fds\":" << result.preexec_extra_fds
         << ",\"runtime_fd_kind_bits\":" << result.reply.runtime_fd_kinds
         << ",\"binding_read\":" << (bindingRead ? "true" : "false")
@@ -68,6 +94,10 @@ Java_com_projectinfinity_dnsprobe_ProbeActivity_runNative(JNIEnv* env, jclass,
         << ",\"child_code\":" << result.child_code
         << ",\"child_status\":" << result.child_status
         << ",\"fd_difference\":" << static_cast<int>(finalFds) - static_cast<int>(initialFds)
+        << ",\"parent_fd_count\":" << finalFds
+        << ",\"parent_thread_count\":" << ThreadCount()
+        << ",\"remaining_children\":" << RemainingChildren()
+        << ",\"max_rss_kb\":" << (memoryRead ? usage.ru_maxrss : -1)
         << ",\"wait_error\":" << result.wait_error << '}';
   }
   out << ']';

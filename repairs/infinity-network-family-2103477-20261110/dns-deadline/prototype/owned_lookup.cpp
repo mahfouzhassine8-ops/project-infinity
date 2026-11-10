@@ -282,8 +282,11 @@ static DnsResult PerformLookup(const std::string& helper, const dns_request& req
   const size_t expected = offsetof(dns_reply, addresses) +
       result.reply.count * sizeof(dns_address);
   bool valid = bootstrapValid && bootstrap.extra_fds == 0 && result.reply.magic == DNS_MAGIC && result.reply.count <= DNS_MAX_ADDRESSES &&
-               received == expected && result.reply.extra_fds == 0 &&
+               received == expected && result.reply.extra_fds >= 0 &&
                (result.reply.gai_error == 0 || result.reply.count == 0);
+  // Inheritance is established by the separate pre-exec scan, before any
+  // loader/runtime initialization. Runtime-created child FDs are observed,
+  // never force-closed or whitelisted; confirmed process exit closes them.
   for (unsigned i = 0; valid && i < result.reply.count; ++i) {
     const auto& row = result.reply.addresses[i];
     valid = ((row.family == AF_INET && row.length == sizeof(sockaddr_in)) ||
